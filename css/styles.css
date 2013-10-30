@@ -1,0 +1,390 @@
+html {
+	width:100%;
+}
+h3 {
+	font-weight: bold;
+}
+h4 {
+	font-weight: bold;
+	color: #093c53;
+	font-size: 16px;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #093C53;
+}
+body {
+	font: 12px Arial, Helvetica, sans-serif;
+	min-width:980px;
+	margin: 0;
+	padding: 0;
+}
+
+ul {
+	margin: 0;
+}
+a:link {
+	color:#093c53;
+	text-decoration: none;
+}
+a:active {
+	color:#093c53;
+	text-decoration: none;
+}
+a:hover {
+	color:#534A59;
+	text-decoration: none;
+}
+a:visited {
+	color:#093c53;
+	text-decoration: none;
+}
+.header {
+	height:80px;
+	/* [disabled]z-index:99;
+*/
+	background-color: #093c53;
+}
+
+.logo {
+	background-image: url(../images/logo.png);
+	background-repeat: no-repeat;
+	margin-top: 40px;
+	height:80px;
+	/* [disabled]z-index:99; */
+	background-color: #093c53;
+	background-position: center;
+	margin-left: 0px;
+	width: 400px;
+}
+
+.logo {
+	margin-top: 0px;
+	margin-left: 290px;
+}
+input {
+	width: 180px;
+	height: 20px;
+	background-color:#F0EFDD;
+	color: #093c53;
+}
+
+select {
+	width: 180px;
+	height: 20px;
+	background-color:#F0EFDD;
+	color: #093c53;
+}
+textarea {
+	width: 200px;
+	height: 70px;
+	background-color:#F0EFDD;
+	color: #093c53;
+}
+img {
+	border-top-width: 0px;
+	border-right-width: 0px;
+	border-bottom-width: 0px;
+	border-left-width: 0px;
+}
+.img_border {
+	border: 6px solid #093c53;
+	margin-top: 0px;
+}
+.img_border2 {
+	border: 4px solid #093c53;
+	margin-top: 0px;
+}
+section .container {
+	position:relative;
+	width:870px;
+	padding:59px 40px 20px;
+	-moz-border-radius: 0 0 10px 10px;
+	-webkit-border-radius: 0 0 10px 10px;
+	-khtml-border-radius: 0 0 10px 10px;
+	border-radius: 0 0 10px 10px;
+	background:#fff;
+}
+.container {
+	width:950px;
+	margin:0 auto;
+	position:relative;
+}
+.table1 {
+	padding: 0px;
+	border-right-width: 1px;
+	border-left-width: 1px;
+	border-right-style: solid;
+	border-left-style: solid;
+	border-right-color: #CEC582;
+	border-left-color: #3399FF;
+}
+.table2 {
+	/* [disabled]background-color: #E8D0AE;
+*/
+	background-image: url(images/beige-1.png);
+	background-repeat: repeat-y;
+	border-right-width: 1px;
+	border-left-width: 1px;
+	border-right-style: solid;
+	border-left-style: solid;
+	border-right-color: #CEC582;
+	border-left-color: #CEC582;
+}
+.table3 {
+	margin-top: 0px;
+	background-color: #666666;
+}
+
+.contact_form {
+	font-weight: bold;
+	text-align: left;
+
+}
+.title {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 20px;
+	font-weight: bold;
+	line-height: 22px;
+	margin-left: 10px;
+	margin-top: 10px;
+	color: #8F2137;
+}
+.sub_title {
+	font-size: 16px;
+	line-height: 20px;
+	font-weight: bold;
+	margin-top: 20px;
+	margin-bottom: 10px;
+}
+.text {
+	margin-left: 0px;
+	font-size: 12px;
+	line-height: 18px;
+	/* [disabled]background-color: #EAE8CC;
+*/
+	margin-right: 0px;
+	padding: 10px;
+}
+.chef_title {
+	font-size: 15px;
+	font-weight: bold;
+	line-height: 30px;
+}
+
+.chef_title a {
+	font-size: 15px;
+	font-weight: bold;
+	line-height: 20px;
+	color: #B72A45;
+	text-decoration: none;
+}
+.chef_title a:hover {
+	font-size: 15px;
+	font-weight: bold;
+	line-height: 20px;
+	color: #B72A45;
+}
+.recipe_text {
+	margin-left: 0px;
+	font-size: 12px;
+	line-height: 18px;
+	margin-right: 0px;
+	padding: 10px;
+	height: 500px;
+	overflow: visible;
+}
+.recipes ul {
+	margin-left: 0px;
+	line-height:30px;
+	font-weight: bold;
+}
+.recipes li {
+	margin-left: 20px;
+	list-style-type: disk;
+	line-height:14px;
+	font-weight: bold;
+	margin-top: 10px;
+}
+.recipes li a {
+	line-height:14px;
+	font-weight: bold;
+	color: #B72A45;
+}
+.recipes li a:hover {
+	line-height:14px;
+	font-weight: bold;
+	color: #262152;
+}
+.team ul {
+	line-height:30px;
+	font-weight: bold;
+}
+.team li {
+	margin-left: -40px;
+	list-style-type: none;
+	line-height:16px;
+	font-weight: bold;
+}
+.team li a {
+	line-height:16px;
+	font-weight: bold;
+	color: #B50937;
+}
+.team li a:hover {
+	line-height:16px;
+	font-weight: bold;
+	color: #3C4A52;
+}
+.footer {
+	margin-top: 20px;
+	text-align: center;
+	color: #FFF;
+	font-size: 11px;
+	height: 30px;
+}
+.footer li {
+	padding-right: 10px;
+	list-style-type: none;
+	margin-left: 10px;
+	display: inline;
+	vertical-align: bottom;
+}
+.footer a:link {
+	color:#FFF;
+	font-size: 11px;
+	text-decoration: none;
+	font-weight: bold;
+}
+.footer a:visited {
+	color:#FFF;
+	font-size: 11px;
+	text-decoration: none;
+	font-weight: bold;
+}
+.footer a:active {
+	color:#FFF;
+	font-size: 11px;
+	text-decoration: none;
+	font-weight: bold;
+}
+.footer a:hover {
+	color:#6A8297;
+	font-size: 11px;
+	text-decoration: none;
+	font-weight: bold;
+}
+.button {
+	color: #F0EFDD;
+	background-color: #B72A45;
+	height: 28px;
+	width: 80px;
+	font-weight: bold;
+	padding: 2px 2px 5px 2px;
+	border: none;
+	line-height: 25px;
+}
+.copy {
+	font-size: 10px;
+	color: #FFF;
+	margin-left: 10px;
+	height: 30px;
+	font-weight: normal;
+	margin-top: 20px;
+}
+.copy a:link {
+	color:#FFF;
+	font-size: 10px;
+	text-decoration: none;
+	font-weight: normal;
+}
+.copy a:visited {
+	color:#FFF;
+	font-size: 10px;
+	text-decoration: none;
+	font-weight: normal;
+}
+.copy a:active {
+	color:#FFF;
+	font-size: 10px;
+	text-decoration: none;
+	font-weight: normal;
+}
+.copy a:hover {
+	color:#79818A;
+	font-size: 10px;
+	text-decoration: none;
+	font-weight: normal;
+}
+.clear {
+	clear: both;
+}
+.none {
+	display: none;
+} /* End Clearfix */
+.appt {
+	height: 650px;
+	width: 150px;
+	border: 4px solid #CCC;
+	padding: 10px 0px 0px 5px;
+	color: #FFF;
+	font-weight: bold;
+	font-size: 12px;
+	line-height: 26px;
+	background-color: #093C53;
+}
+
+
+.appt ul {
+	list-style-type: square;
+}
+
+
+.appt a:link {
+	color:#FFF;
+	text-decoration: underline;
+}
+.appt a:active {
+	color:#FFF;
+	text-decoration: underline;
+}
+.appt a:hover {
+	color:#CCC;
+	text-decoration: none;
+}
+.appt a:visited {
+	color:#FFF;
+	text-decoration: underline;
+}
+.appt2 {
+	width: 260px;
+	border: 4px solid #CCC;
+	padding: 10px 0px 0px 10px;
+	color: #FFF;
+	font-weight: bold;
+	font-size: 12px;
+	line-height: 26px;
+	background-color: #093C53;
+	height: 120px;
+}
+
+.appt2 ul {
+	list-style-type: square;
+}
+
+
+.appt2 a:link {
+	color:#FFF;
+	text-decoration: underline;
+}
+.appt2 a:active {
+	color:#FFF;
+	text-decoration: underline;
+}
+.appt2 a:hover {
+	color:#CCC;
+	text-decoration: none;
+}
+.appt2 a:visited {
+	color:#FFF;
+	text-decoration: underline;
+}
