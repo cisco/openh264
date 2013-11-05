@@ -1,4 +1,4 @@
-openh264
+OpenH264
 ========
 
 This repo has no code yet - that might seem a bit weird but let us explain.... 
