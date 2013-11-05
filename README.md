@@ -1,22 +1,22 @@
 OpenH264
 ========
 
-This repo has no code yet - that might seem a bit weird but let us explain.... 
+This goal of this project is to build a BSD-licensed open source H.264
+codec that is suitable for use in real time applications such as WebRTC. See
+http://www.openh264.org/ for more details.
 
-Cisco is working on getting the code separated from dependancies. We
-want to checking that there are no existing known security
-vulnerabilities listed against it because existing products use this
-code and it would be bad to zero day our own products. We also go
-through a legal process to open source code that takes time.
+This repo has no codec code yet (only the code for the website, in the gh-pages
+branch). The code exists, and is used internally in Cisco products. But before
+we can release it and start the public project, we need to do the following
+things:
 
-Right now the only thing in the repo is the HTML for the
-www.openh264.org website in the gh-pages branch.
+* Separate the code from its dependencies on Cisco source code which is not
+  intended to be open sourced;
 
+* Check that we won't 0-day other Cisco products by releasing code which
+  has known unpublished security vulnerabilities;
 
-Open Source H.264 Codec 
-----------------------
+* Make sure all the legal processes necessary before opening code have been
+  completed.
 
-This goal of this project is to have a BSD licensed open source H.264
-codec that is suitable for use in real time applications such as
-WebRTC.
-
+We hope to have these steps completed soon.
