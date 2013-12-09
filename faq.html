@@ -22,12 +22,11 @@
           <ul>
             <li><a href="index.html">Home</a></li>
             <li><a href="faq.html">FAQ</a></li>
-            <!--
-            
+               
             <li> <a href="https://github.com/cisco/openh264" target="_blank">Source Code</a></li>
             <li> <a href="https://github.com/cisco/openh264/issues"
             target="_blank">Issue Tracker </a></li>
-            -->
+   
             
           </ul>
           <div style="margin-top:20px; margin-left: -10px; width: 100; text-align:center">Follow us on <br />
@@ -35,34 +34,96 @@
         </div></td>
       <td width="740" rowspan="4" valign="top" align="left"><H4>FAQ</H4>
         <div class="text">
+          
           <p> <strong>Q. When will the H.264 source code and binary module be available?</strong><br />
-            A: Shortly, Cisco will form a governance board for the open source initiative, establish the project, and make the source code and binary module available for download. We will move quickly to carry out these steps, but past experience suggests that it will take a few months before the entire process is complete. </p>
+            A: The first step of making the source code available is
+            complete. Cisco will form a governance board for the open source
+            initiative, establish the project, and make the source code and
+            binary module available for download. We will move quickly to carry
+            out these steps, but past experience suggests that it will take a
+            few months before the entire process is complete. </p>
+          
           <p> <strong>Q. Can I take advantage of the H.264 codec binary module in my project?</strong><br />
-            A: Yes. Your users can download this module to utilize the H.264 video codec with your project.</p>
-          <p> <strong>Q. Why is Cisco making both source and binary versions available?</strong><br />
-            A: The source code is available so that an implementation of H.264 is available for the community to use across any project, and to leverage the community to make the codec better for all. We will select licensing terms that allow for this code to be used in commercial products as well as open source projects. In order for Cisco to be responsible for the MPEG LA licensing royalties for the module, Cisco must provide the packaging and distribution of this code in a binary module format (think of it like a plug-in, but not using the same APIs as existing plugins), in addition to several other constraints. This gives the community the best of all worlds - a team can choose to use the source code, in which case the team is responsible for paying all applicable license fees, or the team can use the binary module distributed by Cisco, in which case Cisco will cover the MPEG LA licensing fees. </p>
-          <p> <strong>Q: Is Cisco guaranteeing that it will pay other licensing fees for H.264, should additional patent holders assert claims in the future?<br />
-   
-            </strong>A: Cisco is providing no such guarantee.  We are only covering the royalties that would apply to the binary module under MPEG LA's AVC/H.264 patent pool.</p>
-          <p> <strong>Q: If I use the source code in my product, and then distribute that product on my own, will Cisco cover the MPEG LA licensing fees which I'd otherwise have to pay? </strong><br />
-            A: No. Cisco is only covering the licensing fees for its own binary module, and products or projects that utilize it must download it at the time the product or project is installed on the user's computer or device. Cisco will not be liable for any licensing fees incurred by other parties. </p>
-          <p> <strong>Q.</strong> <strong>I'm a competitor of Cisco making a commercial product. Can I still take advantage of the H.264 module in my project? </strong><br />
-            A: Yes. If everyone has at least one video codec in common, our products will be able to communicate. That increases the number of other people everyone's products can talk to. The network effect helps everyone. </p>
+            A: Yes. Your users can download this module to utilize the H.264
+            video codec with your project.</p>
+          
+          <p> <strong>Q. Why is Cisco making both source and binary versions
+          available?</strong><br />
+          A: The source code is available so that an implementation of H.264
+          is available for the community to use across any project, and to
+          leverage the community to make the codec better for all. We will
+          select licensing terms that allow for this code to be used in
+          commercial products as well as open source projects. In order for
+          Cisco to be responsible for the MPEG LA licensing royalties for the
+          module, Cisco must provide the packaging and distribution of this code
+          in a binary module format (think of it like a plug-in, but not using
+          the same APIs as existing plugins), in addition to several other
+          constraints. This gives the community the best of all worlds - a team
+          can choose to use the source code, in which case the team is
+          responsible for paying all applicable license fees, or the team can
+          use the binary module distributed by Cisco, in which case Cisco will
+          cover the MPEG LA licensing fees. </p>
+
+          <p> <strong>Q: Is Cisco guaranteeing that it will pay other licensing
+            fees for H.264, should additional patent holders assert claims in
+            the future?<br />  </strong>A: Cisco is providing no such guarantee.  We are only
+            covering the royalties that would apply to the binary module under
+            MPEG LA's AVC/H.264 patent pool.</p>
+
+          <p> <strong>Q: If I use the source code in my product, and then
+          distribute that product on my own, will Cisco cover the MPEG LA
+          licensing fees which I'd otherwise have to pay? </strong><br />
+
+            A: No. Cisco is only covering the licensing fees for its own binary
+            module, and products or projects that utilize it must download it at
+            the time the product or project is installed on the user's computer
+            or device. Cisco will not be liable for any licensing fees incurred
+            by other parties. </p>
+
+          <p> <strong>Q.</strong> <strong>I'm a competitor of Cisco making a
+          commercial product. Can I still take advantage of the H.264 module in
+          my project? </strong><br />
+
+            A: Yes. If everyone has at least one video codec in common, our
+            products will be able to communicate. That increases the number of
+            other people everyone's products can talk to. The network effect
+            helps everyone. </p>
+
           <p> <strong>Q. How will the open source project be governed?</strong><br />
-            A: We will form a board consisting of leaders from the open source community as well as Unified Communication vendors. </p>
+            A: We will form a board consisting of leaders from the open source
+            community as well as Unified Communication vendors. </p>
+
           <p> <strong>Q. What source code license will you use?</strong><br />
-            A: Our current plan is to utilize a BSD license. </p>
+            A: The code utilizes a BSD license. </p>
+
           <p> <strong>Q. What platforms will you support?</strong><br />
-            A: Our initial plan is to support Linux (x86 and ARM), Windows (XP forward), OSX, and Android. The governance board can decide to add additional platforms. As long as there are ports of the source code and automatic build scripts contributed as part of the open source, we do not see difficulties in adding additional platforms.            </p>
-          <p> <strong>Q. iOS is noticeably absent from the list of platforms. Why is that?</strong><br />
-            A: Unfortunately, iOS does not allow for applications to fetch and install modules from the Internet once that application has been installed on the device. Consequently, it is simply not feasible for us to provide a distribution at this time. <br />
-          </p>
+            A: Our initial plan is to support Linux (x86 and ARM), Windows (XP
+            forward), OSX, and Android. The governance board can decide to add
+            additional platforms. As long as there are ports of the source code
+            and automatic build scripts contributed as part of the open source,
+            we do not see difficulties in adding additional platforms.
+            </p>
+
+          <p> <strong>Q. iOS is noticeably absent from the list of
+            platforms. Why is that?</strong><br /> A: Unfortunately, iOS does
+            not allow for applications to fetch and install modules from the
+            Internet once that application has been installed on the
+            device. Consequently, it is simply not feasible for us to provide a
+            distribution at this time. <br /> </p>
+
           <p> <strong>Q. Where will the project be hosted?</strong><br />
-            A: Initially at <a href="http://www.openh264.org" target="_blank">www.openh264.org</a>. </p>
+            A: Initially at <a href="http://www.openh264.org"
+            target="_blank">www.openh264.org</a>. </p>
+
           <p> <strong>Q. Where will the source code repository be hosted?</strong><br />
-            A: Eventually at <a href="http://imgflip.com/i/4hvnk" target="_blank">https://github.com/cisco/openh264</a>. </p>
+            A: Eventually at <a href="http://imgflip.com/i/4hvnk"
+            target="_blank">https://github.com/cisco/openh264</a>. </p>
+
           <p> <strong>Q. Which profiles of H.264 will be supported?</strong><br />
-            A: The initial code has the baseline profile. We look forward to working with the open source community to add high profile and others. </p>
+            A: The initial code has the baseline profile. We look forward to
+            working with the open source community to add high profile and
+            others. </p>
+
         </div></td>
     </tr>
     <tr>
@@ -75,10 +136,10 @@
          <li><a href="index.html">Home</a></li>
           |
           <li><a href="faq.html">FAQ</a></li>
-          <!--|
+          |
            <li> <a href="https://github.com/cisco/openh264" target="_blank">Source Code</a></li> |
             <li> <a href="https://github.com/cisco/openh264/issues"
-          target="_blank">Issue Tracker </a></li>  -->
+          target="_blank">Issue Tracker </a></li> 
           
         </div></td>
     </tr>
