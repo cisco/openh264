@@ -1,0 +1,267 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{01B4AE41-6AD6-4CAF-AEB3-C42F7F9121D5}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\..\..\..\..\bin\win32\Release</OutDir>
+    <IntDir>.\..\..\..\obj\decoder\core\release\</IntDir>
+    <TargetName>welsdcore</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\..\..\..\..\bin\win32\Debug</OutDir>
+    <IntDir>.\..\..\..\obj\decoder\core\debug\</IntDir>
+    <TargetName>welsdcore</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;HAVE_CACHE_LINE_ALIGN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>.\..\..\..\obj\decoder\core\release/WelsDecCore.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\..\..\..\obj\decoder\core\release/</AssemblerListingLocation>
+      <ObjectFileName>.\..\..\..\obj\decoder\core\release/</ObjectFileName>
+      <ProgramDataBaseFileName>.\..\..\..\obj\decoder\core\release/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat />
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)\welsdcore.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>$(OutDir)\welsdcore.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;X86_ASM;HAVE_CACHE_LINE_ALIGN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>.\..\..\..\obj\decoder\core\debug/WelsDecCore.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\..\..\..\obj\decoder\core\debug/</AssemblerListingLocation>
+      <ObjectFileName>.\..\..\..\obj\decoder\core\debug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\..\..\..\obj\decoder\core\debug/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)\welsdcore.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>$(OutDir)\welsdcore.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\decoder\core\asm\asm_inc.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\decoder\core\asm\block_add.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\decoder\core\asm\cpuid.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\decoder\core\asm\dct.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\decoder\core\asm\deblock.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\decoder\core\asm\expand_picture.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\decoder\core\asm\intra_pred.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\decoder\core\asm\mb_copy.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\decoder\core\asm\mc_chroma.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\decoder\core\asm\mc_luma.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\decoder\core\asm\memzero.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\decoder\core\inc\as264_common.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\au_parser.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\bit_stream.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\cpu.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\cpu_core.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\deblocking.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\decode_mb_aux.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\decoder.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\decoder_context.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\error_code.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\expand_pic.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\fmo.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\get_intra_predictor.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\ls_defines.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\macros.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\manage_dec_ref.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\mb_cache.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\mc.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\measure_time.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\mem_align.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\memmgr_nal_unit.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\mv_pred.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\nal_prefix.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\nalu.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\parameter_sets.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\parse_mb_syn_cavlc.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\pic_queue.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\picture.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\rec_mb.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\slice.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\decode_slice.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\dec_frame.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\dec_golomb.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\decoder_core.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\typedefs.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\utils.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\vlc_decoder.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\wels_common_basis.h" />
+    <ClInclude Include="..\..\..\decoder\core\inc\wels_const.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\decoder\core\src\au_parser.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\bit_stream.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\cpu.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\deblocking.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\decode_mb_aux.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\decoder.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\decoder_data_tables.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\expand_pic.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\fmo.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\get_intra_predictor.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\manage_dec_ref.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\mc.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\mem_align.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\memmgr_nal_unit.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\mv_pred.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\parse_mb_syn_cavlc.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\pic_queue.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\rec_mb.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\decode_slice.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\decoder_core.cpp" />
+    <ClCompile Include="..\..\..\decoder\core\src\utils.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+  </ImportGroup>
+</Project>
