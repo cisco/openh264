@@ -50,10 +50,15 @@
 #include "encoder_context.h"
 #include "utils.h"
 
+#ifdef NO_DYNAMIC_VP
+EResult WELSAPI CreateVpInterface  (void **ppCtx, int iVersion);
+EResult WELSAPI DestroyVpInterface  (void **ppCtx, int iVersion);
+#endif
 
 namespace WelsSVCEnc {
 
 #define WelsSafeDelete(p) if(p){ delete (p); (p) = NULL; }
+
 
 //***** entry API declaration ************************************************************************//
 typedef EResult (WELSAPI *pfnCreateVpInterface)  (void **, int );
@@ -87,6 +92,8 @@ inline  void   WelsUpdateSpatialIdxMap(sWelsEncCtx * pEncCtx, int32_t iPos, SPic
 CWelsLib::CWelsLib(void *pEncCtx)
 {
 	m_pInterface[0] = m_pInterface[1] = NULL;
+
+#ifndef NO_DYNAMIC_VP
 #if defined(WIN32)
 	const str_t WelsVPLib[] = "welsvp.dll";
 	HMODULE shModule = LoadLibrary(WelsVPLib);
@@ -111,6 +118,7 @@ CWelsLib::CWelsLib(void *pEncCtx)
 #endif
 
 	m_pVpLib = (void *)shModule;
+#endif
 }
 
 CWelsLib::~CWelsLib()
@@ -136,6 +144,7 @@ CWelsLib::~CWelsLib()
 void* CWelsLib::QueryFunction(const str_t *pName)
 {
 	void *pFunc = NULL;
+
 	if (m_pVpLib)
 	{
 #if defined(WIN32)
@@ -158,23 +167,34 @@ void* CWelsLib::QueryFunction(const str_t *pName)
 
 int32_t CWelsLib::CreateIface(void **ppEncCtx)
 {
+#ifndef NO_DYNAMIC_VP
 	if (m_pVpLib)
 	{
+
+#endif
 		pfnCreateVpInterface  pCreateVpInterface  = NULL;
 		pfnDestroyVpInterface pDestroyVpInterface = NULL;
 
+#ifndef NO_DYNAMIC_VP
 		pCreateVpInterface  = (pfnCreateVpInterface)  QueryFunction("CreateVpInterface");
 		pDestroyVpInterface = (pfnDestroyVpInterface) QueryFunction("DestroyVpInterface");
+#else
+		pCreateVpInterface  = CreateVpInterface;
+		// TODO(ekr@rtfm.com): This cast corrects a signature difference... This is a potential real problem
+		pDestroyVpInterface = (pfnDestroyVpInterface)DestroyVpInterface;
+#endif
 
 		m_pInterface[0] = (void *)pCreateVpInterface;
 		m_pInterface[1] = (void *)pDestroyVpInterface;
 
 		if (m_pInterface[0] && m_pInterface[1])
 			pCreateVpInterface(ppEncCtx, WELSVP_INTERFACE_VERION);
+#ifndef NO_DYNAMIC_VP
 	}
 	else
 	{
 	}	
+#endif
 
 	return ppEncCtx ? 0 : 1;
 }
