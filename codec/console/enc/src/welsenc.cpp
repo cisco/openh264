@@ -478,8 +478,18 @@ int ParseCommandLine( int argc, char ** argv, SVCEncodingParam & sParam)
                         int32_t iLog = atoi (argv[i+1]);
                         WelsStderrSetTraceLevel(iLog);
                         i += 2;
-                }
-else {
+		} else if( !strcmp(pCmd,"-sw") )
+		{
+                        int iWidth = atoi (argv[i+1]);
+			sParam.iPicWidth = iWidth;
+			i += 2;
+		} else if( !strcmp(pCmd,"-sh") )
+		{
+                        int iHeight = atoi (argv[i+1]);
+			sParam.iPicHeight = iHeight;
+			i += 2;
+		}
+                else {
 			i ++;
 		}		
 	}
