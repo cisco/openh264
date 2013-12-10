@@ -44,6 +44,7 @@
 
 #include "welsCodecTrace.h"
 #include "utils.h"
+#include "logging.h"
 #if defined LINUX || defined SOLARIS || defined UNIX || defined MACOS //LINUX/SOLARIS/UNIX
 #include <dlfcn.h>
 #endif
@@ -210,7 +211,7 @@ int32_t CWelsTraceWinDgb::WriteString(int32_t iLevel, const str_t * pStr)
 CWelsCodecTrace::CWelsCodecTrace()
 {
 	m_hTraceHandle = NULL;
-    m_fpDebugTrace = NULL;
+        m_fpDebugTrace = NULL;
 	m_fpInfoTrace = NULL;
 	m_fpWarnTrace = NULL;
 	m_fpErrorTrace = NULL;
@@ -224,7 +225,13 @@ CWelsCodecTrace::~CWelsCodecTrace()
 }
 
 int32_t  CWelsCodecTrace::LoadWelsTraceModule()
-{	
+{
+#ifdef NO_DYNAMIC_VP
+        m_fpDebugTrace = welsStderrTrace<WELS_LOG_DEBUG>;
+        m_fpInfoTrace = welsStderrTrace<WELS_LOG_INFO>;
+        m_fpWarnTrace = welsStderrTrace<WELS_LOG_WARNING>;
+        m_fpErrorTrace = welsStderrTrace<WELS_LOG_ERROR>;
+#else
 #if defined WIN32	
 	HMODULE hHandle = ::LoadLibrary("welstrace.dll");
 //	HMODULE handle = ::LoadLibrary("contrace.dll");  // for c7 trace
@@ -307,6 +314,7 @@ int32_t  CWelsCodecTrace::LoadWelsTraceModule()
 		}
 	}
 #endif
+#endif  // NO_DYNAMIC_VP
 	return 0;
 }
 
@@ -336,7 +344,9 @@ int32_t  CWelsCodecTrace::UnloadWelsTraceModule()
 
 int32_t  CWelsCodecTrace::WriteString(int32_t iLevel, const str_t * pStr)
 {
+#ifndef NO_DYNAMIC_VP
 	if( m_hTraceHandle )
+#endif
 	{
 #ifdef WIN32
 		switch(iLevel)

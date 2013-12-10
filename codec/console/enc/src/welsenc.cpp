@@ -75,6 +75,7 @@
 #include "extern.h"
 #include "macros.h"
 #include "wels_const.h"
+#include "logging.h"
 
 #ifdef MT_ENABLED
 #include "mt_defs.h"
@@ -473,7 +474,12 @@ int ParseCommandLine( int argc, char ** argv, SVCEncodingParam & sParam)
 			int iSpatialBitrate = atoi( argv[i+2] );
 			sParam.sSpatialLayers[iLayer].iSpatialBitrate	= iSpatialBitrate;
 			i += 3;
-		} else {
+                } else if( !strcmp(pCmd,"-trace") ) {
+                        int32_t iLog = atoi (argv[i+1]);
+                        WelsStderrSetTraceLevel(iLog);
+                        i += 2;
+                }
+else {
 			i ++;
 		}		
 	}
