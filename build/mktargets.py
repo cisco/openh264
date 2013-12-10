@@ -23,7 +23,15 @@ def write_cpp_rule(f, x):
     f.write("%s: %s\n"%(dst, src))
     f.write('\t$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(' + PREFIX + '_CFLAGS) $(' + PREFIX + '_INCLUDES) -c -o ' + dst + ' ' + src + '\n');
     f.write("\n")
+
+def write_asm_rule(f, x):
+    src = "$(%s_SRCDIR)/%s"%(PREFIX, x)
+    dst = "$(%s_SRCDIR)/%s"%(PREFIX, make_o(x))
     
+    f.write("%s: %s\n"%(dst, src))
+    f.write('\t$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(' + PREFIX + '_ASMFLAGS) $(' + PREFIX + '_ASM_INCLUDES) -o ' + dst + ' ' + src + '\n');
+    f.write("\n")
+
 
 def find_sources():
     cpp_files = []
@@ -65,7 +73,7 @@ for c in cpp:
 f.write("\n")    
 f.write("%s_OBJS += $(%s_CPP_SRCS:.cpp=.o)\n"%(PREFIX, PREFIX))
 
-f.write("ifdef USE_ASM\n")
+f.write("ifeq ($(USE_ASM), Yes)\n");
 f.write("%s_ASM_SRCS=\\\n"%(PREFIX))
 for c in asm:
     f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
@@ -78,8 +86,8 @@ f.write("OBJS += $(%s_OBJS)\n"%PREFIX)
 for c in cpp:
     write_cpp_rule(f, c)
 
-#for a in asm:
-#    write_asm_rule(f, a)
+for a in asm:
+    write_asm_rule(f, a)
 
 if args.library is not None:
     f.write("$(LIBPREFIX)%s.$(LIBSUFFIX): $(%s_OBJS)\n"%(args.library, PREFIX));

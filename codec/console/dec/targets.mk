@@ -6,7 +6,7 @@ H264DEC_CPP_SRCS=\
 	$(H264DEC_SRCDIR)/./src/read_config.cpp\
 
 H264DEC_OBJS += $(H264DEC_CPP_SRCS:.cpp=.o)
-ifdef USE_ASM
+ifeq ($(USE_ASM), Yes)
 H264DEC_ASM_SRCS=\
 
 H264DEC_OBJS += $(H264DEC_ASM_SRCS:.asm=.o)

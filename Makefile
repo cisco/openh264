@@ -1,11 +1,32 @@
+UNAME=$(shell uname | tr A-Z a-z)
 LIBPREFIX=lib
 LIBSUFFIX=a
 ROOTDIR=$(PWD)
 
-CFLAGS = -g -arch i386 -fPIC -DNO_DYNAMIC_VP
-LDFLAGS = -arch i386 -ldl -lpthread 
+# Configurations
+ifeq ($(BUILDTYPE), Release)
+CFLAGS += -O3
+USE_ASM = Yes
+else
+CFLAGS = -g
+USE_ASM = No
+endif
 
+ifeq ($(USE_ASM),Yes)
+  CFLAGS += -DX86_ASM 
+endif
+
+include build/platform-$(UNAME).mk
+
+CFLAGS += -DNO_DYNAMIC_VP -DHAVE_CACHE_LINE_ALIGN
+LDFLAGS +=
+ASMFLAGS += -DNO_DYNAMIC_VP -DNOPREFIX 
+
+
+#### No user-serviceable parts below this line
 INCLUDES = -Icodec/api/svc
+ASM_INCLUDES = -Iprocessing/src/asm/
+
 DECODER_INCLUDES = \
     -Icodec/decoder/core/inc \
     -Icodec/decoder/plus/inc
@@ -29,6 +50,7 @@ all:	libraries binaries
 
 clean:
 	rm -f $(OBJS) $(LIBRARIES) $(BINARIES)
+
 
 include codec/decoder/targets.mk
 include codec/encoder/targets.mk

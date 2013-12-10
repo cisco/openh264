@@ -36,7 +36,7 @@ ENCODER_CPP_SRCS=\
 	$(ENCODER_SRCDIR)/./plus/src/welsEncoderExt.cpp\
 
 ENCODER_OBJS += $(ENCODER_CPP_SRCS:.cpp=.o)
-ifdef USE_ASM
+ifeq ($(USE_ASM), Yes)
 ENCODER_ASM_SRCS=\
 	$(ENCODER_SRCDIR)/./core/asm/asm_inc.asm\
 	$(ENCODER_SRCDIR)/./core/asm/coeff.asm\
@@ -157,6 +157,54 @@ $(ENCODER_SRCDIR)/./plus/src/welsCodecTrace.o: $(ENCODER_SRCDIR)/./plus/src/wels
 
 $(ENCODER_SRCDIR)/./plus/src/welsEncoderExt.o: $(ENCODER_SRCDIR)/./plus/src/welsEncoderExt.cpp
 	$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(ENCODER_CFLAGS) $(ENCODER_INCLUDES) -c -o $(ENCODER_SRCDIR)/./plus/src/welsEncoderExt.o $(ENCODER_SRCDIR)/./plus/src/welsEncoderExt.cpp
+
+$(ENCODER_SRCDIR)/./core/asm/asm_inc.o: $(ENCODER_SRCDIR)/./core/asm/asm_inc.asm
+	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $(ENCODER_SRCDIR)/./core/asm/asm_inc.o $(ENCODER_SRCDIR)/./core/asm/asm_inc.asm
+
+$(ENCODER_SRCDIR)/./core/asm/coeff.o: $(ENCODER_SRCDIR)/./core/asm/coeff.asm
+	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $(ENCODER_SRCDIR)/./core/asm/coeff.o $(ENCODER_SRCDIR)/./core/asm/coeff.asm
+
+$(ENCODER_SRCDIR)/./core/asm/cpuid.o: $(ENCODER_SRCDIR)/./core/asm/cpuid.asm
+	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $(ENCODER_SRCDIR)/./core/asm/cpuid.o $(ENCODER_SRCDIR)/./core/asm/cpuid.asm
+
+$(ENCODER_SRCDIR)/./core/asm/dct.o: $(ENCODER_SRCDIR)/./core/asm/dct.asm
+	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $(ENCODER_SRCDIR)/./core/asm/dct.o $(ENCODER_SRCDIR)/./core/asm/dct.asm
+
+$(ENCODER_SRCDIR)/./core/asm/deblock.o: $(ENCODER_SRCDIR)/./core/asm/deblock.asm
+	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $(ENCODER_SRCDIR)/./core/asm/deblock.o $(ENCODER_SRCDIR)/./core/asm/deblock.asm
+
+$(ENCODER_SRCDIR)/./core/asm/expand_picture.o: $(ENCODER_SRCDIR)/./core/asm/expand_picture.asm
+	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $(ENCODER_SRCDIR)/./core/asm/expand_picture.o $(ENCODER_SRCDIR)/./core/asm/expand_picture.asm
+
+$(ENCODER_SRCDIR)/./core/asm/intra_pred.o: $(ENCODER_SRCDIR)/./core/asm/intra_pred.asm
+	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $(ENCODER_SRCDIR)/./core/asm/intra_pred.o $(ENCODER_SRCDIR)/./core/asm/intra_pred.asm
+
+$(ENCODER_SRCDIR)/./core/asm/intra_pred_util.o: $(ENCODER_SRCDIR)/./core/asm/intra_pred_util.asm
+	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $(ENCODER_SRCDIR)/./core/asm/intra_pred_util.o $(ENCODER_SRCDIR)/./core/asm/intra_pred_util.asm
+
+$(ENCODER_SRCDIR)/./core/asm/mb_copy.o: $(ENCODER_SRCDIR)/./core/asm/mb_copy.asm
+	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $(ENCODER_SRCDIR)/./core/asm/mb_copy.o $(ENCODER_SRCDIR)/./core/asm/mb_copy.asm
+
+$(ENCODER_SRCDIR)/./core/asm/mc_chroma.o: $(ENCODER_SRCDIR)/./core/asm/mc_chroma.asm
+	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $(ENCODER_SRCDIR)/./core/asm/mc_chroma.o $(ENCODER_SRCDIR)/./core/asm/mc_chroma.asm
+
+$(ENCODER_SRCDIR)/./core/asm/mc_luma.o: $(ENCODER_SRCDIR)/./core/asm/mc_luma.asm
+	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $(ENCODER_SRCDIR)/./core/asm/mc_luma.o $(ENCODER_SRCDIR)/./core/asm/mc_luma.asm
+
+$(ENCODER_SRCDIR)/./core/asm/memzero.o: $(ENCODER_SRCDIR)/./core/asm/memzero.asm
+	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $(ENCODER_SRCDIR)/./core/asm/memzero.o $(ENCODER_SRCDIR)/./core/asm/memzero.asm
+
+$(ENCODER_SRCDIR)/./core/asm/quant.o: $(ENCODER_SRCDIR)/./core/asm/quant.asm
+	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $(ENCODER_SRCDIR)/./core/asm/quant.o $(ENCODER_SRCDIR)/./core/asm/quant.asm
+
+$(ENCODER_SRCDIR)/./core/asm/satd_sad.o: $(ENCODER_SRCDIR)/./core/asm/satd_sad.asm
+	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $(ENCODER_SRCDIR)/./core/asm/satd_sad.o $(ENCODER_SRCDIR)/./core/asm/satd_sad.asm
+
+$(ENCODER_SRCDIR)/./core/asm/score.o: $(ENCODER_SRCDIR)/./core/asm/score.asm
+	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $(ENCODER_SRCDIR)/./core/asm/score.o $(ENCODER_SRCDIR)/./core/asm/score.asm
+
+$(ENCODER_SRCDIR)/./core/asm/vaa.o: $(ENCODER_SRCDIR)/./core/asm/vaa.asm
+	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $(ENCODER_SRCDIR)/./core/asm/vaa.o $(ENCODER_SRCDIR)/./core/asm/vaa.asm
 
 $(LIBPREFIX)encoder.$(LIBSUFFIX): $(ENCODER_OBJS)
 	rm -f $(LIBPREFIX)encoder.$(LIBSUFFIX)

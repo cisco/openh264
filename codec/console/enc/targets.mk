@@ -5,7 +5,7 @@ H264ENC_CPP_SRCS=\
 	$(H264ENC_SRCDIR)/./src/welsenc.cpp\
 
 H264ENC_OBJS += $(H264ENC_CPP_SRCS:.cpp=.o)
-ifdef USE_ASM
+ifeq ($(USE_ASM), Yes)
 H264ENC_ASM_SRCS=\
 
 H264ENC_OBJS += $(H264ENC_ASM_SRCS:.asm=.o)
