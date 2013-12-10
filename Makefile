@@ -17,7 +17,7 @@ tools:
 	mkdir tools
 
 $(GYP): tools
-	cd tools && rm -rf gyp && svn co http://gyp.googlecode.com/svn/trunk gyp
+	cd tools && rm -rf gyp && svn co https://gyp.googlecode.com/svn/trunk gyp
 
 clean:
 	rm -rf $(PROJECT_FILES) *~ ./build
