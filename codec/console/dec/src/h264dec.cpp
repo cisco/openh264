@@ -52,9 +52,6 @@ typedef long   (*PCreateDecoderFunc) (ISVCDecoder** ppDecoder);
 typedef void_t (*PDestroyDecoderFunc)(ISVCDecoder* pDecoder);
 
 
-#if defined(__APPLE__)
-#include "dec_console.h"
-#endif
 using namespace std;
 
 //using namespace WelsDec;
@@ -346,11 +343,7 @@ label_exit:
 }
 
 
-#if !defined(__APPLE__)
 int32_t main(int32_t iArgC, char* pArgV[])
-#else
-int32_t DecoderMain(int32_t iArgC, char * pArgV[])
-#endif
 {
 	ISVCDecoder *pDecoder = NULL;
 
@@ -488,18 +481,6 @@ int32_t DecoderMain(int32_t iArgC, char * pArgV[])
 	}
 
 
-#elif defined(__APPLE__)
-
-
-	bool flag_load_bundle = load_bundle_welsdec();
-	
-	get_functions_address_create_decoder(&pDecoder);
-	
-	if (flag_load_bundle == false) {
-		printf( "Create Decoder failed.\n" );
-		return NULL;
-	}	
-
 #else
 
 
@@ -535,8 +516,6 @@ int32_t DecoderMain(int32_t iArgC, char * pArgV[])
 		
 #if defined(_MSC_VER)
 		pDestroyDecoderFunc( pDecoder );
-#elif defined(__APPLE__)
-		get_functions_address_free_decoder(pDecoder);
 #else
 		DestroyDecoder(pDecoder);
 #endif

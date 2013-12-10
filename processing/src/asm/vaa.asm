@@ -481,6 +481,7 @@ SampleVariance16x16_sse2:
 
 ; , 6/7/2010
 
+%ifndef NO_DYNAMIC_VP
 WELS_EXTERN AnalysisVaaInfoIntra_sse2
 ;***********************************************************************
 ;	int32_t AnalysisVaaInfoIntra_sse2(	uint8_t *pDataY, const int32_t linesize );
@@ -566,7 +567,7 @@ AnalysisVaaInfoIntra_sse2:
 	pop edx
 	pop ebx
 	ret
-
+        
 WELS_EXTERN AnalysisVaaInfoIntra_ssse3
 ;***********************************************************************
 ;	int32_t AnalysisVaaInfoIntra_ssse3(	uint8_t *pDataY, const int32_t linesize );
@@ -652,6 +653,7 @@ AnalysisVaaInfoIntra_ssse3:
 	pop edx
 	pop ebx
 	ret
+%endif
 	
 	
 
