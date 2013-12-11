@@ -13,19 +13,22 @@ USE_ASM = No
 endif
 
 ifeq ($(USE_ASM),Yes)
-  CFLAGS += -DX86_ASM 
+  CFLAGS += -DX86_ASM
 endif
 
 include build/platform-$(UNAME).mk
 
 CFLAGS += -DNO_DYNAMIC_VP -DHAVE_CACHE_LINE_ALIGN
 LDFLAGS +=
-ASMFLAGS += -DNO_DYNAMIC_VP -DNOPREFIX 
+ASMFLAGS += -DNO_DYNAMIC_VP -DNOPREFIX
 
 
 #### No user-serviceable parts below this line
-INCLUDES = -Icodec/api/svc
+INCLUDES = -Icodec/api/svc  -Icodec/common
 ASM_INCLUDES = -Iprocessing/src/asm/
+
+COMMON_INCLUDES = \
+    -Icodec/decoder/core/inc
 
 DECODER_INCLUDES = \
     -Icodec/decoder/core/inc \
@@ -41,10 +44,10 @@ PROCESSING_INCLUDES = \
     -Icodec/encoder/plus/inc
 
 H264DEC_INCLUDES = $(DECODER_INCLUDES) -Icodec/console/dec/inc
-H264DEC_LDFLAGS = -L. -ldecoder
+H264DEC_LDFLAGS = -L. -ldecoder -lcommon
 
 H264ENC_INCLUDES = $(ENCODER_INCLUDES) -Icodec/console/enc/inc
-H264ENC_LDFLAGS = -L. -lencoder -lprocessing
+H264ENC_LDFLAGS = -L. -lencoder -lprocessing -lcommon
 
 all:	libraries binaries
 
@@ -52,6 +55,7 @@ clean:
 	rm -f $(OBJS) $(LIBRARIES) $(BINARIES)
 
 
+include codec/common/targets.mk
 include codec/decoder/targets.mk
 include codec/encoder/targets.mk
 include processing/targets.mk
