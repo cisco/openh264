@@ -34,6 +34,7 @@
 #include <string.h>
 #include <assert.h>
 #include <signal.h>
+#include <stdarg.h>
 
 #ifdef ONLY_ENC_FRAMES_NUM
 #undef ONLY_ENC_FRAMES_NUM

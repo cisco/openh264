@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api,..\..\..\encoder\core\inc,..\..\..\common\inc"
+				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api,..\..\..\encoder\core\inc,..\..\..\common"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;ENCODER_CORE;MT_ENABLED;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -140,7 +140,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api,..\..\..\encoder\core\inc,..\..\..\common\inc"
+				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api,..\..\..\encoder\core\inc,..\..\..\common"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;ENCODER_CORE;X86_ASM;MT_ENABLED;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -213,6 +213,10 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
+			<File
+				RelativePath="..\..\..\common\logging.cpp"
+				>
+			</File>
 			<File
 				RelativePath="..\..\..\console\enc\src\read_config.cpp"
 				>

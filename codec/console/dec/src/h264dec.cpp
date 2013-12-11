@@ -39,6 +39,7 @@
 #endif
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 #include "codec_def.h"
 #include "codec_app_def.h"

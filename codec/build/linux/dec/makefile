@@ -7,11 +7,12 @@ DEPEND= dependencies
 
 BINDIR= 	../bin
 OUTDIR= 	../../../../bin/linux
-INCLUDE= 	-I../../../api/svc -I../../../decoder/core/inc -I../../../decoder/plus/inc -I../../../console/dec/inc
+INCLUDE= 	-I../../../api/svc -I../../../decoder/core/inc -I../../../decoder/plus/inc -I../../../console/dec/inc -I../../../common
 CORESRCDIR=	../../../decoder/core/src
 PLUSSRCDIR=	../../../decoder/plus/src
 ASMSRCDIR=	../../../decoder/core/asm
 MAINSRCDIR=	../../../console/dec/src
+COMMONSRCDIR=   ../../../common
 
 OBJMAINDIR= ../obj
 OBJDIR= ../obj/dec
@@ -63,7 +64,8 @@ $(CORESRCDIR)/decode_slice.cpp \
 $(CORESRCDIR)/decoder_core.cpp \
 $(CORESRCDIR)/utils.cpp \
 $(PLUSSRCDIR)/welsDecoderExt.cpp \
-$(PLUSSRCDIR)/welsCodecTrace.cpp
+$(PLUSSRCDIR)/welsCodecTrace.cpp \
+$(COMMONSRCDIR)/logging.cpp 
 
 ASMSRC= $(ASMSRCDIR)/block_add.asm \
 $(ASMSRCDIR)/cpuid.asm \
@@ -103,7 +105,8 @@ $(OBJDIR)/decode_slice.o \
 $(OBJDIR)/decoder_core.o \
 $(OBJDIR)/utils.o \
 $(OBJDIR)/welsDecoderExt.o \
-$(OBJDIR)/welsCodecTrace.o
+$(OBJDIR)/welsCodecTrace.o \
+$(OBJDIR)/logging.o
 
 ifeq ($(NASM), 1)
 OBJDEC+=$(OBJDIR)/block_add.o \
@@ -241,6 +244,10 @@ $(OBJDIR)/%.o$(SUFFIX): $(ASMSRCDIR)/%.asm
 $(OBJDIR)/%.o$(SUFFIX): $(MAINSRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
 	@$(CC) -m32 -c $(CFLAGS) -o $@ $<		
+
+$(OBJDIR)/%.o$(SUFFIX): $(COMMONSRCDIR)/%.cpp
+	@echo 'compiling object file "$@" ...'
+	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
 	
 include $(DEPEND)
 
