@@ -7,12 +7,13 @@ DEPEND= dependencies
 
 OUTDIR=		../../../../bin/linux
 BINDIR= 	../bin
-INCLUDE=  -I../../../encoder/core/inc -I../../../encoder/plus/inc -I../../../api/svc -I../../../WelsThreadLib/api -I../../../console/enc/inc
+INCLUDE=  -I../../../encoder/core/inc -I../../../encoder/plus/inc -I../../../api/svc -I../../../WelsThreadLib/api -I../../../console/enc/inc -I../../../common
 THREADLIBSRCDIR=../../../WelsThreadLib/src
 CORESRCDIR=	../../../encoder/core/src
 PLUSSRCDIR=	../../../encoder/plus/src
 ASMSRCDIR=	../../../encoder/core/asm
 MAINSRCDIR=	../../../console/enc/src
+COMMONSRCDIR=   ../../../common
 
 OBJMAINDIR= ../obj
 OBJDIR= ../obj/enc
@@ -24,7 +25,7 @@ GCC = gcc -m32
 
 ASFLAGS= -f elf -DNOPREFIX -I ../../../encoder/core/asm/
 
-LIBS= -lstdc++ -ldl -lpthread
+LIBS= -lstdc++ -ldl -lpthread -lm
 #-lm 
 CFLAGS=  $(INCLUDE) -m32 -fPIC -D__GCC__ -DLINUX -D__NO_CTYPE -DWELS_SVC -DENCODER_CORE -DHAVE_CACHE_LINE_ALIGN -DWELS_TESTBED -DMT_ENABLED 
 
@@ -73,7 +74,8 @@ $(CORESRCDIR)/svc_set_mb_syn_cavlc.cpp \
 $(CORESRCDIR)/utils.cpp \
 $(THREADLIBSRCDIR)/WelsThreadLib.cpp \
 $(PLUSSRCDIR)/welsEncoderExt.cpp \
-$(PLUSSRCDIR)/welsCodecTrace.cpp
+$(PLUSSRCDIR)/welsCodecTrace.cpp \
+$(COMMONSRCDIR)/logging.cpp
 
 ASMSRC=	$(ASMSRCDIR)/coeff.asm \
 $(ASMSRCDIR)/cpuid.asm \
@@ -129,7 +131,8 @@ $(OBJDIR)/svc_set_mb_syn_cavlc.o \
 $(OBJDIR)/utils.o \
 $(OBJDIR)/WelsThreadLib.o \
 $(OBJDIR)/welsEncoderExt.o \
-$(OBJDIR)/welsCodecTrace.o
+$(OBJDIR)/welsCodecTrace.o \
+$(OBJDIR)/logging.o
 
 ifeq ($(NASM), 1)
 OBJENC += $(OBJDIR)/cpuid.o \
@@ -266,5 +269,9 @@ $(OBJDIR)/%.o$(SUFFIX): $(MAINSRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
 	@$(CC) -m32 -c $(CFLAGS) -o $@ $<	
 	
+$(OBJDIR)/%.o$(SUFFIX): $(COMMONSRCDIR)/%.cpp
+	@echo 'compiling object file "$@" ...'
+	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+
 include $(DEPEND)
 

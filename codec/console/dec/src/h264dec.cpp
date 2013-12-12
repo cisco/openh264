@@ -39,6 +39,7 @@
 #endif
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 #include "codec_def.h"
 #include "codec_app_def.h"
@@ -47,6 +48,7 @@
 #include "../../decoder/core/inc/typedefs.h"
 #include "../../decoder/core/inc/measure_time.h"
 #include "d3d9_utils.h"
+#include "logging.h"
 
 typedef long   (*PCreateDecoderFunc) (ISVCDecoder** ppDecoder);
 typedef void_t (*PDestroyDecoderFunc)(ISVCDecoder* pDecoder);
@@ -434,8 +436,24 @@ int32_t main(int32_t iArgC, char* pArgV[])
 		sDecParam.uiTargetDqLayer	= (uint8_t)-1;
 		sDecParam.uiEcActiveFlag	= 1;
 		sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
-		if (iArgC > 3)
-			strOptionFile	= pArgV[3];
+		if (iArgC > 3) {
+                  // Basic option parser. Note that this is not safe about the
+                  // number of remaining arguments.
+                  // TODO: rewrite
+                  for (int i = 3; i < iArgC; i++) {
+                    char *cmd = pArgV[i];
+
+                    if( !strcmp(cmd, "-options") ) {
+                      strOutputFile = pArgV[i+1];
+                      i += 2;
+                    } else if( !strcmp(cmd, "-trace") ) {
+                      WelsStderrSetTraceLevel(atoi(pArgV[i + 1]));
+                      i += 2;
+                    } else {
+                      i++;
+                    }
+                  }
+                }
 
 		if (strOutputFile.empty())
 		{

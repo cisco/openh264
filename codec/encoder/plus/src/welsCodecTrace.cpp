@@ -56,6 +56,8 @@
 extern HANDLE g_hInstDll;
 #endif
 
+#include "logging.h"
+
 //#define CODEC_TRACE_ERROR 0
 //#define CODEC_TRACE_WARNING 1
 //#define CODEC_TRACE_INFO 2
@@ -153,10 +155,10 @@ CM_WELS_TRACE welsCodecTrace::m_fpInfoTrace	= NULL;
 CM_WELS_TRACE welsCodecTrace::m_fpWarnTrace	= NULL;
 CM_WELS_TRACE welsCodecTrace::m_fpErrorTrace	= NULL;
 #else
-CM_WELS_TRACE2 welsCodecTrace::m_fpDebugTrace= NULL;
+CM_WELS_TRACE2 welsCodecTrace::m_fpDebugTrace   = NULL; 
 CM_WELS_TRACE2 welsCodecTrace::m_fpInfoTrace	= NULL;
 CM_WELS_TRACE2 welsCodecTrace::m_fpWarnTrace	= NULL;
-CM_WELS_TRACE2 welsCodecTrace::m_fpErrorTrace= NULL;
+CM_WELS_TRACE2 welsCodecTrace::m_fpErrorTrace   = NULL;
 #endif//WIN32
 
 welsCodecTrace::welsCodecTrace()
@@ -167,7 +169,14 @@ welsCodecTrace::welsCodecTrace()
 	m_fpWarnTrace = NULL;
 	m_fpErrorTrace = NULL;
 	m_WelsTraceExistFlag	= false;
-	
+#ifdef NO_DYNAMIC_VP
+        m_fpDebugTrace = welsStderrTrace<WELS_LOG_DEBUG>;
+        m_fpInfoTrace = welsStderrTrace<WELS_LOG_INFO>;
+        m_fpWarnTrace = welsStderrTrace<WELS_LOG_WARNING>;
+        m_fpErrorTrace = welsStderrTrace<WELS_LOG_ERROR>;
+
+        m_WelsTraceExistFlag = true;
+#else
 #if defined WIN32	
 	HMODULE handle = ::GetModuleHandle("welstrace.dll");
 //	HMODULE handle = ::GetModuleHandle("contrace.dll"); // for c7 
@@ -247,6 +256,7 @@ welsCodecTrace::welsCodecTrace()
 	{
 		m_WelsTraceExistFlag	= true;
 	}
+#endif
 }
 
 welsCodecTrace::~welsCodecTrace()

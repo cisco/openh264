@@ -1,0 +1,22 @@
+COMMON_PREFIX=COMMON
+COMMON_SRCDIR=codec/common
+COMMON_CPP_SRCS=\
+	$(COMMON_SRCDIR)/./logging.cpp\
+
+COMMON_OBJS += $(COMMON_CPP_SRCS:.cpp=.o)
+ifdef USE_ASM
+COMMON_ASM_SRCS=\
+
+COMMON_OBJS += $(COMMON_ASM_SRCS:.asm=.o)
+endif
+
+OBJS += $(COMMON_OBJS)
+$(COMMON_SRCDIR)/./logging.o: $(COMMON_SRCDIR)/./logging.cpp
+	$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(COMMON_CFLAGS) $(COMMON_INCLUDES) -c -o $(COMMON_SRCDIR)/./logging.o $(COMMON_SRCDIR)/./logging.cpp
+
+$(LIBPREFIX)common.$(LIBSUFFIX): $(COMMON_OBJS)
+	rm -f $(LIBPREFIX)common.$(LIBSUFFIX)
+	ar cr $@ $(COMMON_OBJS)
+
+libraries: $(LIBPREFIX)common.$(LIBSUFFIX)
+LIBRARIES += $(LIBPREFIX)common.$(LIBSUFFIX)
