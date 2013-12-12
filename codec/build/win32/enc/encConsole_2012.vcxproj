@@ -153,7 +153,7 @@
     <ClInclude Include="..\..\..\console\enc\inc\read_config.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="WelsEncPlus.vcxproj">
+    <ProjectReference Include="WelsEncPlus_2012.vcxproj">
       <Project>{1e7b4e9a-986e-4167-8c70-6e4f60eaee7f}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

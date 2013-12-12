@@ -171,7 +171,7 @@
     <ClInclude Include="..\..\..\decoder\plus\inc\welsDecoderExt.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="WelsDecCore.vcxproj">
+    <ProjectReference Include="WelsDecCore_2012.vcxproj">
       <Project>{01b4ae41-6ad6-4caf-aeb3-c42f7f9121d5}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

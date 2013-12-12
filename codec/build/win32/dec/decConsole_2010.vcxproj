@@ -162,7 +162,7 @@
     <None Include="..\..\..\..\bin\Release\welsdec.cfg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="WelsDecPlus.vcxproj">
+    <ProjectReference Include="WelsDecPlus_2010.vcxproj">
       <Project>{1131558a-9986-4f4b-a13f-8b7f4c8438bf}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

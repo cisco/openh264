@@ -183,7 +183,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="WelsEncCore.vcxproj">
+    <ProjectReference Include="WelsEncCore_2010.vcxproj">
       <Project>{59208004-1774-4816-ac24-31ff44c324b4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
