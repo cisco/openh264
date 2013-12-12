@@ -4,7 +4,7 @@ LIBSUFFIX=a
 CP=cp
 ROOTDIR=$(PWD)
 
-ifeq (,wildcard ./gtest)
+ifeq (,$(wildcard ./gtest))
 HAVE_GTEST=No
 else
 HAVE_GTEST=Yes
@@ -58,10 +58,11 @@ H264ENC_LDFLAGS = -L. -lencoder -lprocessing -lcommon
 
 CODEC_UNITTEST_LDFLAGS = -L. -lgtest -ldecoder -lcommon
 
-all:	$(GTEST_TARGETS) libraries binaries
+all:	libraries binaries
 
 clean:
 	rm -f $(OBJS) $(LIBRARIES) $(BINARIES)
+	echo $(HAVE_GTEST)
 
 gtest-bootstrap:
 	svn co https://googletest.googlecode.com/svn/trunk/ gtest
