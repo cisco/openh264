@@ -110,7 +110,7 @@ static int32_t CreatePicBuff(PWelsDecoderContext pCtx, PPicBuff *ppPicBuf, const
 		return 1;
 	}
 	for (iPicIdx = 0; iPicIdx < kiSize; ++ iPicIdx)
-	{	
+	{
 		PPicture pPic = AllocPicture( pCtx, kiPicWidth, kiPicHeight );
 		if ( NULL == pPic )
 		{
@@ -120,7 +120,7 @@ static int32_t CreatePicBuff(PWelsDecoderContext pCtx, PPicBuff *ppPicBuf, const
 	}
 
 	// initialize context in queue
-	pPicBuf->iCapacity	 = kiSize;	
+	pPicBuf->iCapacity	 = kiSize;
 	pPicBuf->iCurrentIdx = 0;
 	*ppPicBuf			 = pPicBuf;
 
@@ -144,7 +144,7 @@ static void_t DestroyPicBuff( PPicBuff *ppPicBuf )
 			if(pPic != NULL)
 			{
 				FreePicture( pPic );
-			}	
+			}
 			pPic = NULL;
 			++ iPicIdx;
 		}
@@ -174,9 +174,9 @@ void_t WelsDecoderDefaults( PWelsDecoderContext pCtx )
 	pCtx->iOutputColorFormat		= videoFormatI420;	// yuv in default
 	pCtx->bHaveGotMemory			= false;	// not ever request memory blocks for decoder context related
 	pCtx->uiCpuFlag					= 0;
-	
+
 	pCtx->bAuReadyFlag				= 0; // au data is not ready
-	
+
 
 	g_uiCacheLineSize				= 16;
 #if defined(X86_ASM)
@@ -191,7 +191,7 @@ void_t WelsDecoderDefaults( PWelsDecoderContext pCtx )
 		g_uiCacheLineSize	= 32;
 	}
 #endif//HAVE_CACHE_LINE_ALIGN
-#endif//X86_ASM	
+#endif//X86_ASM
 
 	pCtx->iImgWidthInPixel		= 0;
 	pCtx->iImgHeightInPixel		= 0;		// alloc picture data when picture size is available
@@ -199,11 +199,11 @@ void_t WelsDecoderDefaults( PWelsDecoderContext pCtx )
 	pCtx->iFrameNum				= -1;
 	pCtx->iPrevFrameNum			= -1;
 	pCtx->iErrorCode			= ERR_NONE;
-	
+
 	pCtx->pDec					= NULL;
 
 	WelsResetRefPic(pCtx);
-	
+
 	pCtx->iActiveFmoNum			= 0;
 
 	pCtx->pPicBuff[LIST_0]		= NULL;
@@ -222,7 +222,7 @@ void_t WelsDecoderDefaults( PWelsDecoderContext pCtx )
  *	get size of reference picture list in target layer incoming, = (iNumRefFrames x 2)
  */
 static inline int32_t GetTargetRefListSize( PWelsDecoderContext pCtx )
-{	
+{
 	bool_t  *pSubsetSpsAvail= &pCtx->bSubspsAvailFlags[0];
 	bool_t  *pSpsAvail		= &pCtx->bSpsAvailFlags[0];
 	int32_t iSubsetIdx		= -1;
@@ -265,13 +265,13 @@ static inline int32_t GetTargetRefListSize( PWelsDecoderContext pCtx )
 	else
 	{
 		PSps pSps = bExistSubsetSps ? (&pCtx->sSubsetSpsBuffer[iSubsetIdx].sSps) : (&pCtx->sSpsBuffer[iSpsIdx]);
-		
+
         iNumRefFrames	= (pSps->iNumRefFrames ) + 1;
 	}
 
 	if ( 0 == iNumRefFrames )
         iNumRefFrames	= (MIN_REF_PIC_COUNT);
-	
+
 #ifdef LONG_TERM_REF
 	//pic_queue size minimum set 2
 	if (iNumRefFrames <2)
@@ -295,8 +295,8 @@ int32_t WelsRequestMem( PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
 	int32_t iListIdx			= 0;	//, mb_blocks	= 0;
 	int32_t	iPicQueueSize		= 0;	// adaptive size of picture queue, = (pSps->iNumRefFrames x 2)
 	bool_t  bNeedChangePicQueue	= true;
-	
-	WELS_VERIFY_RETURN_IF( ERR_INFO_INVALID_PARAM, ( NULL == pCtx || kiPicWidth <= 0 || kiPicHeight <= 0 ) )	
+
+	WELS_VERIFY_RETURN_IF( ERR_INFO_INVALID_PARAM, ( NULL == pCtx || kiPicWidth <= 0 || kiPicHeight <= 0 ) )
 
 	// Fixed the issue about different gop size over last, 5/17/2010
 	// get picture queue size currently
@@ -309,23 +309,23 @@ int32_t WelsRequestMem( PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
 
 	// sync update pRefList
 	WelsResetRefPic( pCtx );	// added to sync update ref list due to pictures are free
-	
+
 	// for Recycled_Pic_Queue
 	for ( iListIdx = LIST_0; iListIdx < LIST_A; ++ iListIdx )
 	{
  		PPicBuff *ppPic = &pCtx->pPicBuff[iListIdx];
  		if ( NULL != ppPic && NULL != *ppPic )
  		{
- 			DestroyPicBuff( ppPic );			
+ 			DestroyPicBuff( ppPic );
  		}
 	}
-	
+
 	// currently only active for LIST_0 due to have no B frames
 	iErr = CreatePicBuff( pCtx, &pCtx->pPicBuff[LIST_0], iPicQueueSize, kiPicWidth, kiPicHeight );
 	if ( iErr != ERR_NONE )
-		return iErr;	
-	
-	
+		return iErr;
+
+
 	pCtx->iImgWidthInPixel	= kiPicWidth;	// target width of image to be reconstruted while decoding
 	pCtx->iImgHeightInPixel	= kiPicHeight;	// target height of image to be reconstruted while decoding
 
@@ -340,7 +340,7 @@ int32_t WelsRequestMem( PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
 void_t WelsFreeMem( PWelsDecoderContext pCtx )
 {
 	int32_t iListIdx = 0;
-	
+
 	/* TODO: free memory blocks introduced in avc */
 	ResetFmoList( pCtx );
 
@@ -352,19 +352,19 @@ void_t WelsFreeMem( PWelsDecoderContext pCtx )
 		PPicBuff *pPicBuff = &pCtx->pPicBuff[iListIdx];
 		if ( NULL != pPicBuff && NULL != *pPicBuff )
 		{
-			DestroyPicBuff( pPicBuff );			
+			DestroyPicBuff( pPicBuff );
 		}
-	}	
+	}
 
 	// added for safe memory
 	pCtx->iImgWidthInPixel	= 0;
 	pCtx->iImgHeightInPixel = 0;
 	pCtx->bHaveGotMemory	= false;
-	
+
 }
 
 /*!
- * \brief	Open decoder	
+ * \brief	Open decoder
  */
 void_t WelsOpenDecoder( PWelsDecoderContext pCtx )
 {
@@ -374,13 +374,13 @@ void_t WelsOpenDecoder( PWelsDecoderContext pCtx )
 
     InitExpandPictureFunc(&(pCtx->sExpandPicFunc), pCtx->uiCpuFlag);
 	AssignFuncPointerForRec(pCtx);
-	
+
 	// vlc tables
 	InitVlcTable(&pCtx->sVlcTable);
 
 	// startup memory
 	if ( ERR_NONE != WelsInitMemory( pCtx ) )
-		return;	
+		return;
 
 	pCtx->iMaxWidthInSps	= 0;
 	pCtx->iMaxHeightInSps	= 0;
@@ -392,12 +392,12 @@ void_t WelsOpenDecoder( PWelsDecoderContext pCtx )
 }
 
 /*!
- * \brief	Close decoder	
+ * \brief	Close decoder
  */
 void_t WelsCloseDecoder( PWelsDecoderContext pCtx )
 {
 	WelsFreeMem( pCtx );
-	
+
 	WelsFreeMemory( pCtx );
 
 	UninitialDqLayersContext( pCtx );
@@ -410,7 +410,7 @@ void_t WelsCloseDecoder( PWelsDecoderContext pCtx )
 }
 
 /*!
- * \brief	configure decoder parameters	
+ * \brief	configure decoder parameters
  */
 int32_t DecoderConfigParam ( PWelsDecoderContext pCtx, const void_t* kpParam )
 {
@@ -441,11 +441,11 @@ int32_t DecoderConfigParam ( PWelsDecoderContext pCtx, const void_t* kpParam )
 	return 0;
 }
 
-/*! 
+/*!
  *************************************************************************************
- * \brief	Initialize Wels decoder parameters and memory 
+ * \brief	Initialize Wels decoder parameters and memory
  *
- * \param 	pCtx input context to be initialized at first stage 
+ * \param 	pCtx input context to be initialized at first stage
  *
  * \return	0 - successed
  * \return	1 - failed
@@ -460,7 +460,7 @@ int32_t WelsInitDecoder( PWelsDecoderContext pCtx, void_t * pTraceHandle, PWelsL
 	}
 
 	// default
-	WelsDecoderDefaults( pCtx );	
+	WelsDecoderDefaults( pCtx );
 
 	pCtx->pTraceHandle = pTraceHandle;
 
@@ -468,8 +468,8 @@ int32_t WelsInitDecoder( PWelsDecoderContext pCtx, void_t * pTraceHandle, PWelsL
 
 	// open decoder
 	WelsOpenDecoder( pCtx );
-	
-	// decode mode setting 
+
+	// decode mode setting
 	pCtx->iDecoderMode = SW_MODE;
 	pCtx->iSetMode = AUTO_MODE;
 	pCtx->iDecoderOutputProperty = BUFFER_HOST;
@@ -479,11 +479,11 @@ int32_t WelsInitDecoder( PWelsDecoderContext pCtx, void_t * pTraceHandle, PWelsL
 	return ERR_NONE;
 }
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	Uninitialize Wels decoder parameters and memory
  *
- * \param 	pCtx input context to be uninitialized at release stage 
+ * \param 	pCtx input context to be uninitialized at release stage
  *
  * \return	NONE
  *
@@ -493,7 +493,7 @@ int32_t WelsInitDecoder( PWelsDecoderContext pCtx, void_t * pTraceHandle, PWelsL
 void_t WelsEndDecoder( PWelsDecoderContext pCtx )
 {
 	// close decoder
-	WelsCloseDecoder( pCtx );	
+	WelsCloseDecoder( pCtx );
 }
 
 void_t GetVclNalTemporalId( PWelsDecoderContext pCtx )
@@ -505,7 +505,7 @@ void_t GetVclNalTemporalId( PWelsDecoderContext pCtx )
 	pCtx->iFeedbackTidInAu    = pAccessUnit->pNalUnitsList[idx]->sNalHeaderExt.uiTemporalId;
 }
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	First entrance to decoding core interface.
  *
@@ -521,9 +521,9 @@ void_t GetVclNalTemporalId( PWelsDecoderContext pCtx )
  * \note	N/A
  *************************************************************************************
  */
-int32_t WelsDecodeBs( PWelsDecoderContext pCtx, const uint8_t *kpBsBuf, const int32_t kiBsLen, 
+int32_t WelsDecodeBs( PWelsDecoderContext pCtx, const uint8_t *kpBsBuf, const int32_t kiBsLen,
 			   uint8_t **ppDst, SBufferInfo* pDstBufInfo)
-{	
+{
 	if ( !pCtx->bEndOfStreamFlag)
 	{
 		SDataBuffer* pRawData   = &pCtx->sRawData;
@@ -533,14 +533,14 @@ int32_t WelsDecodeBs( PWelsDecoderContext pCtx, const uint8_t *kpBsBuf, const in
 		int32_t iDstIdx        = 0; //the size of current NAL after 0x03 removal and 00 00 01 removal
 		int32_t iSrcLength     = 0;	//the total size of current AU or NAL
 
-		int32_t iConsumedBytes = 0;	
-		int32_t iOffset        = 0;	
+		int32_t iConsumedBytes = 0;
+		int32_t iOffset        = 0;
 
 		uint8_t* pSrcNal       = NULL;
 		uint8_t* pDstNal       = NULL;
-		uint8_t *pNalPayload   = NULL;	
-		
-		
+		uint8_t *pNalPayload   = NULL;
+
+
 		if ( NULL == DetectStartCodePrefix( kpBsBuf, &iOffset, kiBsLen ) ) //CAN'T find the 00 00 01 start prefix from the source buffer
 		{
 			return dsBitstreamError;
@@ -561,7 +561,7 @@ int32_t WelsDecodeBs( PWelsDecoderContext pCtx, const uint8_t *kpBsBuf, const in
 
 		while ( iSrcConsumed < iSrcLength )
 		{
-			if ( ( 2 + iSrcConsumed < iSrcLength ) && 
+			if ( ( 2 + iSrcConsumed < iSrcLength ) &&
 				( 0 == LD16(pSrcNal+iSrcIdx) ) &&
 				( (pSrcNal[2+iSrcIdx]==0x03) || (pSrcNal[2+iSrcIdx]==0x01) ) )
 			{
@@ -569,7 +569,7 @@ int32_t WelsDecodeBs( PWelsDecoderContext pCtx, const uint8_t *kpBsBuf, const in
 				{
 					ST16(pDstNal+iDstIdx, 0);
 					iDstIdx	+= 2;
-					iSrcIdx	+= 3;	
+					iSrcIdx	+= 3;
 					iSrcConsumed += 3;
 				}
 				else
@@ -578,13 +578,13 @@ int32_t WelsDecodeBs( PWelsDecoderContext pCtx, const uint8_t *kpBsBuf, const in
 
 					iConsumedBytes = 0;
 					pNalPayload	= ParseNalHeader( pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal-3, iSrcIdx+3, &iConsumedBytes );
-					
+
 					if (pCtx->bAuReadyFlag)
-					{	
-						ConstructAccessUnit( pCtx, ppDst, pDstBufInfo );	
+					{
+						ConstructAccessUnit( pCtx, ppDst, pDstBufInfo );
 
 						if ( (dsOutOfMemory | dsNoParamSets) & pCtx->iErrorCode)
-						{							
+						{
 #ifdef LONG_TERM_REF
 							pCtx->bParamSetsLostFlag = true;
 #else
@@ -597,10 +597,10 @@ int32_t WelsDecodeBs( PWelsDecoderContext pCtx, const uint8_t *kpBsBuf, const in
                             }
 						}
 					}
-					
+
 					if( (IS_PARAM_SETS_NALS(pCtx->sCurNalHead.eNalUnitType) || IS_SEI_NAL(pCtx->sCurNalHead.eNalUnitType)) &&
 						pNalPayload )
-					{	
+					{
 						if ( ParseNonVclNal( pCtx, pNalPayload, iDstIdx-iConsumedBytes ) )
 						{
 							if ( dsNoParamSets & pCtx->iErrorCode )
@@ -628,16 +628,16 @@ int32_t WelsDecodeBs( PWelsDecoderContext pCtx, const uint8_t *kpBsBuf, const in
 					pDstNal = pRawData->pCurPos + 4; //init, 4 bytes used to store the next NAL
 
 					pSrcNal += iSrcIdx+3;
-					iSrcConsumed += 3;						
-					iSrcIdx = 0;	
-					iDstIdx  = 0; //reset 0, used to statistic the length of next NAL					
+					iSrcConsumed += 3;
+					iSrcIdx = 0;
+					iDstIdx  = 0; //reset 0, used to statistic the length of next NAL
 				}
 				continue;
 			}
 			pDstNal[iDstIdx++] = pSrcNal[iSrcIdx++];
 			iSrcConsumed++;
 		}
-		
+
 		//last NAL decoding
 		GetValueOf4Bytes( pDstNal-4, iDstIdx ); //pDstNal-4 (non-aligned by 4) in Solaris10(SPARC). Given value by byte.
 
@@ -645,11 +645,11 @@ int32_t WelsDecodeBs( PWelsDecoderContext pCtx, const uint8_t *kpBsBuf, const in
 		pNalPayload = ParseNalHeader( pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal-3, iSrcIdx+3, &iConsumedBytes );
 
 		if (pCtx->bAuReadyFlag)
-		{	
+		{
 			ConstructAccessUnit( pCtx, ppDst, pDstBufInfo );
 
 			if ( (dsOutOfMemory | dsNoParamSets) & pCtx->iErrorCode)
-			{				
+			{
 #ifdef LONG_TERM_REF
 				pCtx->bParamSetsLostFlag = true;
 #else
@@ -657,7 +657,7 @@ int32_t WelsDecodeBs( PWelsDecoderContext pCtx, const uint8_t *kpBsBuf, const in
 #endif
 				ResetParameterSetsState( pCtx );
 				return pCtx->iErrorCode;
-			}			
+			}
 		}
 
 		if( (IS_PARAM_SETS_NALS(pCtx->sCurNalHead.eNalUnitType) || IS_SEI_NAL(pCtx->sCurNalHead.eNalUnitType)) && pNalPayload )
@@ -675,27 +675,27 @@ int32_t WelsDecodeBs( PWelsDecoderContext pCtx, const uint8_t *kpBsBuf, const in
 				}
 				return pCtx->iErrorCode;
 			}
-		}	
+		}
 
 		pDstNal += iDstIdx;
 		pRawData->pCurPos = pDstNal; //init the pCurPos for next NAL(s) storage
-	}	
+	}
 	else  /* no supplementary picture payload input, but stored a picture */
 	{
 		PAccessUnit pCurAu	= pCtx->pAccessUnitList;	// current access unit, it will never point to NULL after decode's successful initialization
-		
+
 		if ( pCurAu->uiAvailUnitsNum == 0 )
 		{
 			return pCtx->iErrorCode;
 		}
 		else
-		{			
+		{
 			pCtx->pAccessUnitList->uiEndPos = pCtx->pAccessUnitList->uiAvailUnitsNum - 1;
-			
+
 			ConstructAccessUnit( pCtx, ppDst, pDstBufInfo );
 
 			if ( (dsOutOfMemory | dsNoParamSets) & pCtx->iErrorCode)
-			{				
+			{
 #ifdef LONG_TERM_REF
 				pCtx->bParamSetsLostFlag = true;
 #else
@@ -704,7 +704,7 @@ int32_t WelsDecodeBs( PWelsDecoderContext pCtx, const uint8_t *kpBsBuf, const in
 				ResetParameterSetsState( pCtx );
 				return pCtx->iErrorCode;
 			}
-			
+
 		}
 	}
 
@@ -733,7 +733,7 @@ int32_t DecoderSetCsp(PWelsDecoderContext pCtx, const int32_t kiColorFormat)
  * ( MB coordinate and parts of data within decoder context structure )
  * \param	pCtx		Wels decoder context
  * \param	iMbWidth	MB width
- * \pram	iMbHeight	MB height 
+ * \pram	iMbHeight	MB height
  * \return	0 - successful; none 0 - something wrong
  */
 int32_t SyncPictureResolutionExt( PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight )
@@ -741,13 +741,13 @@ int32_t SyncPictureResolutionExt( PWelsDecoderContext pCtx, const int32_t kiMbWi
 	int32_t iErr = ERR_NONE;
 	const int32_t kiPicWidth	= kiMbWidth << 4;
 	const int32_t kiPicHeight   = kiMbHeight<< 4;
-	
+
 	iErr = WelsRequestMem( pCtx, kiMbWidth, kiMbHeight );	// common memory used
 	if ( ERR_NONE != iErr )
 	{
 		WelsLog( pCtx, WELS_LOG_WARNING, "SyncPictureResolutionExt()::WelsRequestMem--buffer allocated failure.\n" );
 		pCtx->iErrorCode = dsOutOfMemory;
-		return iErr;	
+		return iErr;
 	}
 
 	iErr = InitialDqLayersContext( pCtx, kiPicWidth, kiPicHeight );
@@ -755,7 +755,7 @@ int32_t SyncPictureResolutionExt( PWelsDecoderContext pCtx, const int32_t kiMbWi
 	{
 		WelsLog( pCtx, WELS_LOG_WARNING, "SyncPictureResolutionExt()::InitialDqLayersContext--buffer allocated failure.\n" );
 		pCtx->iErrorCode = dsOutOfMemory;
-	}	
+	}
 
 	return iErr;
 }
@@ -766,7 +766,7 @@ int32_t SyncPictureResolutionExt( PWelsDecoderContext pCtx, const int32_t kiMbWi
 void_t UpdateMaxPictureResolution( PWelsDecoderContext pCtx, const int32_t kiCurWidth, const int32_t kiCurHeight )
 {
 	//any dimension larger than that of current dimension, should modify the max-dimension
-	if ( kiCurWidth > pCtx->iMaxWidthInSps || kiCurHeight > pCtx->iMaxHeightInSps)		
+	if ( kiCurWidth > pCtx->iMaxWidthInSps || kiCurHeight > pCtx->iMaxHeightInSps)
 	{
 		pCtx->iMaxWidthInSps	= kiCurWidth;
 		pCtx->iMaxHeightInSps	= kiCurHeight;
@@ -799,7 +799,7 @@ void_t AssignFuncPointerForRec(PWelsDecoderContext pCtx)
 	pCtx->pGetI4x4LumaPredFunc[I4_PRED_VR    ] = WelsI4x4LumaPredVR_c;
 	pCtx->pGetI4x4LumaPredFunc[I4_PRED_HU    ] = WelsI4x4LumaPredHU_c;
 	pCtx->pGetI4x4LumaPredFunc[I4_PRED_HD    ] = WelsI4x4LumaPredHD_c;
-		
+
 	pCtx->pGetIChromaPredFunc[C_PRED_DC    ] = WelsIChromaPredDc_c;
 	pCtx->pGetIChromaPredFunc[C_PRED_H     ] = WelsIChromaPredH_c;
 	pCtx->pGetIChromaPredFunc[C_PRED_V     ] = WelsIChromaPredV_c;
@@ -813,13 +813,13 @@ void_t AssignFuncPointerForRec(PWelsDecoderContext pCtx)
 
 #if defined(X86_ASM)
 	if ( pCtx->uiCpuFlag & WELS_CPU_MMXEXT )
-	{		
-		pCtx->pIdctResAddPredFunc	= IdctResAddPred_mmx;	
+	{
+		pCtx->pIdctResAddPredFunc	= IdctResAddPred_mmx;
 
 		/////////mmx code opt---
 		pCtx->pGetIChromaPredFunc[C_PRED_H]      = WelsIChromaPredH_mmx;
 		pCtx->pGetIChromaPredFunc[C_PRED_V]      = WelsIChromaPredV_mmx;
-		pCtx->pGetIChromaPredFunc[C_PRED_DC_L  ] = WelsIChromaPredDcLeft_mmx;		
+		pCtx->pGetIChromaPredFunc[C_PRED_DC_L  ] = WelsIChromaPredDcLeft_mmx;
 		pCtx->pGetIChromaPredFunc[C_PRED_DC_128] = WelsIChromaPredDcNA_mmx;
 		pCtx->pGetI4x4LumaPredFunc[I4_PRED_DDR]  = WelsI4x4LumaPredDDR_mmx;
 		pCtx->pGetI4x4LumaPredFunc[I4_PRED_HD ]  = WelsI4x4LumaPredHD_mmx;

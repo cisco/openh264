@@ -47,7 +47,7 @@ CDownsampling::CDownsampling(int32_t iCpuFlag)
 }
 
 CDownsampling::~CDownsampling()
-{	
+{
 }
 
 void CDownsampling::InitDownsampleFuncs(SDownsampleFuncs &sDownsampleFunc,  int32_t iCpuFlag)
@@ -81,7 +81,7 @@ void CDownsampling::InitDownsampleFuncs(SDownsampleFuncs &sDownsampleFunc,  int3
 		sDownsampleFunc.pfHalfAverage[1]	= DyadicBilinearDownsamplerWidthx16_sse4;
 	}
 #endif//X86_ASM
-	
+
 }
 
 EResult CDownsampling::Process(int32_t iType, SPixMap *pSrcPixMap, SPixMap *pDstPixMap)
@@ -113,9 +113,9 @@ EResult CDownsampling::Process(int32_t iType, SPixMap *pSrcPixMap, SPixMap *pDst
 		m_pfDownsample.pfHalfAverage[iAlignIndex]((uint8_t*)pDstPixMap->pPixel[1], pDstPixMap->iStride[1], (uint8_t*)pSrcPixMap->pPixel[1], pSrcPixMap->iStride[1], iSrcWidthUV, iSrcHeightUV);
 		m_pfDownsample.pfHalfAverage[iAlignIndex]((uint8_t*)pDstPixMap->pPixel[2], pDstPixMap->iStride[2], (uint8_t*)pSrcPixMap->pPixel[2], pSrcPixMap->iStride[2], iSrcWidthUV, iSrcHeightUV);
 	}
-	else 
+	else
 	{
-		m_pfDownsample.pfGeneralRatioLuma((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0], iDstWidthY, iDstHeightY, 
+		m_pfDownsample.pfGeneralRatioLuma((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0], iDstWidthY, iDstHeightY,
 			(uint8_t*)pSrcPixMap->pPixel[0], pSrcPixMap->iStride[0], iSrcWidthY, iSrcHeightY);
 
 		m_pfDownsample.pfGeneralRatioChroma((uint8_t*)pDstPixMap->pPixel[1], pDstPixMap->iStride[1], iDstWidthUV, iDstHeightUV,
@@ -130,7 +130,7 @@ EResult CDownsampling::Process(int32_t iType, SPixMap *pSrcPixMap, SPixMap *pDst
 int32_t CDownsampling::GetAlignedIndex( const int32_t kiSrcWidth )
 {
 	int32_t iAlignIndex = 3;
-	if ( (kiSrcWidth & 0x1f) == 0 )	// x32	
+	if ( (kiSrcWidth & 0x1f) == 0 )	// x32
 		iAlignIndex	= 0;
 	else if ( (kiSrcWidth & 0x0f) == 0 )	// x16
 		iAlignIndex	= 1;

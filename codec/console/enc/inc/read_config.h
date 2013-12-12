@@ -64,14 +64,14 @@ public:
 	CReadConfig( const char *pConfigFileName );
 	CReadConfig( const string& pConfigFileName );
 	virtual ~CReadConfig();
-	
+
 	void Openf(const char * strFile);
 	long ReadLine( string* strVal, const int iValSize = 4 );
 	const bool EndOfFile();
 	const int GetLines();
 	const bool ExistFile();
 	const string& GetFileName();
-	
+
 private:
 	FILE			*m_pCfgFile;
 	string			m_strCfgFileName;

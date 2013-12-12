@@ -36,7 +36,7 @@
  * \date        :  2011/01/04
  *
  * \description :  1. should support both C/C++ style interface
- *                 2. should concern with the feature extension requirement 
+ *                 2. should concern with the feature extension requirement
  *                 3. should care the usage of "char"==>
  *                     1) value char  : signed char/unsigned char
  *                     2) string char : char
@@ -45,19 +45,19 @@
  */
 
 #ifndef _IWELSVP_H_
-#define _IWELSVP_H_ 
+#define _IWELSVP_H_
 
 #ifdef _WIN32
 #define WELSAPI __stdcall
 #else
-#define WELSAPI 
+#define WELSAPI
 #endif
 
 #define WELSVP_MAJOR_VERSION   1
 #define WELSVP_MINOR_VERSION   1
 #define WELSVP_VERSION         ((WELSVP_MAJOR_VERSION << 8) + WELSVP_MINOR_VERSION)
 
-typedef enum 
+typedef enum
 {
 	RET_SUCCESS          =  0,
 	RET_FAILED           = -1,
@@ -68,8 +68,8 @@ typedef enum
 	RET_NEEDREINIT		  = -6
 } EResult;
 
-typedef enum 
-{ 
+typedef enum
+{
 	VIDEO_FORMAT_NULL       = 0,   /* invalid format   */
 	/*rgb color formats*/
 	VIDEO_FORMAT_RGB        = 1,   /* rgb 24bits       */
@@ -85,9 +85,9 @@ typedef enum
 	VIDEO_FORMAT_YUY2       = 20,   /* yuy2             */
 	VIDEO_FORMAT_YVYU       = 21,   /* yvyu             */
 	VIDEO_FORMAT_UYVY       = 22,   /* uyvy             */
-	VIDEO_FORMAT_I420       = 23,   /* yuv 4:2:0 planar */              
+	VIDEO_FORMAT_I420       = 23,   /* yuv 4:2:0 planar */
 	VIDEO_FORMAT_YV12       = 24,   /* yuv 4:2:0 planar */
-	VIDEO_FORMAT_INTERNAL   = 25,   /* Only Used for SVC decoder testbed */ 
+	VIDEO_FORMAT_INTERNAL   = 25,   /* Only Used for SVC decoder testbed */
 	VIDEO_FORMAT_NV12		= 26,	/* y planar + uv packed */
 	VIDEO_FORMAT_I422       = 27,   /* yuv 4:2:2 planar */
 	VIDEO_FORMAT_I444       = 28,   /* yuv 4:4:4 planar */
@@ -102,11 +102,11 @@ typedef enum
 	VIDEO_FORMAT_YUV2       = 21,
 	VIDEO_FORMAT_420        = 23,
 
-	VIDEO_FORMAT_VFlip      = 0x80000000 
+	VIDEO_FORMAT_VFlip      = 0x80000000
 } EVideoFormat;
 
-typedef enum 
-{ 
+typedef enum
+{
 	BUFFER_HOSTMEM  = 0,
 	BUFFER_SURFACE
 } EPixMapBufferProperty;
@@ -121,16 +121,16 @@ typedef struct
 
 typedef struct
 {
-	void        *pPixel[3]; 
+	void        *pPixel[3];
 	int          iSizeInBits;
 	int          iStride[3];
-	SRect        sRect;	
+	SRect        sRect;
 	EVideoFormat eFormat;
 	EPixMapBufferProperty eProperty;//not use? to remove? but how about the size of SPixMap?
 } SPixMap;
 
 typedef enum
-{	
+{
 	METHOD_NULL              = 0,
 	METHOD_COLORSPACE_CONVERT    ,//not support yet
 	METHOD_DENOISE              ,
@@ -141,7 +141,7 @@ typedef enum
 	METHOD_ADAPTIVE_QUANT ,
 	METHOD_COMPLEXITY_ANALYSIS   ,
 	METHOD_IMAGE_ROTATE		  ,
-	METHOD_MASK                 
+	METHOD_MASK
 } EMethods;
 
 //-----------------------------------------------------------------//
@@ -155,7 +155,7 @@ typedef struct
 
 typedef enum
 {
-	SIMILAR_SCENE,      //similar scene 
+	SIMILAR_SCENE,      //similar scene
 	MEDIUM_CHANGED_SCENE,   //medium changed scene
 	LARGE_CHANGED_SCENE,   //large changed scene
 } ESceneChangeIdc;
@@ -194,7 +194,7 @@ typedef enum
 	AQ_BITRATE_MODE,   //Bitrate mode
 }EAQModes;
 
-typedef struct 
+typedef struct
 {
 	unsigned short    uiMotionIndex;
 	unsigned short    uiTextureIndex;
@@ -206,11 +206,11 @@ typedef struct
 	SVAACalcResult		*pCalcResult;
 	SMotionTextureUnit  *pMotionTextureUnit;
 
-	signed char			*pMotionTextureIndexToDeltaQp;	
+	signed char			*pMotionTextureIndexToDeltaQp;
 	double				dAverMotionTextureIndexToDeltaQp;
 } SAdaptiveQuantizationParam;
 
-typedef enum 
+typedef enum
 {
 	FRAME_SAD     =  0,
 	GOM_SAD       = -1,
@@ -221,7 +221,7 @@ typedef struct
 {
 	int  iComplexityAnalysisMode;
 	int  iCalcBgd;
-	int  iMbNumInGom;		
+	int  iMbNumInGom;
 	int  iFrameComplexity;
 	int  *pGomComplexity;
 	int  *pGomForegroundBlockNum;
@@ -232,15 +232,15 @@ typedef struct
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-typedef struct 
+typedef struct
 {
 	void    *pCtx;
 	EResult (*Init)    (void *pCtx, int iType, void *pCfg);
 	EResult (*Uninit)  (void *pCtx, int iType);
 	EResult (*Flush)   (void *pCtx, int iType);
-	EResult (*Process) (void *pCtx, int iType, SPixMap *pSrc, SPixMap *dst); 
-	EResult (*Get)     (void *pCtx, int iType, void *pParam); 
-	EResult (*Set)     (void *pCtx, int iType, void *pParam); 
+	EResult (*Process) (void *pCtx, int iType, SPixMap *pSrc, SPixMap *dst);
+	EResult (*Get)     (void *pCtx, int iType, void *pParam);
+	EResult (*Set)     (void *pCtx, int iType, void *pParam);
 	EResult (*SpecialFeature) (void *pCtx, int iType, void *pIn, void *pOut);
 } IWelsVPc;
 
@@ -251,45 +251,45 @@ class IWelsVP
 public:
 	virtual ~IWelsVP() {}
 
-public:		
-	virtual EResult Init    (int iType, void *pCfg) = 0; 
+public:
+	virtual EResult Init    (int iType, void *pCfg) = 0;
 	virtual EResult Uninit  (int iType) = 0;
 	virtual EResult Flush   (int iType) = 0;
-	virtual EResult Process (int iType, SPixMap *pSrc, SPixMap *dst) = 0; 
-	virtual EResult Get     (int iType, void *pParam) = 0; 
-	virtual EResult Set     (int iType, void *pParam) = 0; 
+	virtual EResult Process (int iType, SPixMap *pSrc, SPixMap *dst) = 0;
+	virtual EResult Get     (int iType, void *pParam) = 0;
+	virtual EResult Set     (int iType, void *pParam) = 0;
 	virtual EResult SpecialFeature (int iType, void *pIn, void *pOut) = 0;
 };
 
 /* Recommend to invoke the interface via the micro for convenient */
-#define IWelsVPFunc_Init(p, a, b)                  (p)->Init(a, b)              
-#define IWelsVPFunc_Uninit(p, a)                   (p)->Uninit(a)               
-#define IWelsVPFunc_Flush(p, a)                    (p)->Flush(a)                
-#define IWelsVPFunc_Process(p, a, b, c)            (p)->Process(a, b, c)        
-#define IWelsVPFunc_Get(p, a, b)                   (p)->Get(a, b)               
-#define IWelsVPFunc_Set(p, a, b)                   (p)->Set(a, b)               
+#define IWelsVPFunc_Init(p, a, b)                  (p)->Init(a, b)
+#define IWelsVPFunc_Uninit(p, a)                   (p)->Uninit(a)
+#define IWelsVPFunc_Flush(p, a)                    (p)->Flush(a)
+#define IWelsVPFunc_Process(p, a, b, c)            (p)->Process(a, b, c)
+#define IWelsVPFunc_Get(p, a, b)                   (p)->Get(a, b)
+#define IWelsVPFunc_Set(p, a, b)                   (p)->Set(a, b)
 #define IWelsVPFunc_SpecialFeature(p, a, b, c)     (p)->SpecialFeature(a, b, c)
 
 /* C++ interface version */
-#define WELSVP_INTERFACE_VERION                    (0x8000 + (WELSVP_VERSION & 0x7fff)) 
+#define WELSVP_INTERFACE_VERION                    (0x8000 + (WELSVP_VERSION & 0x7fff))
 #define WELSVP_EXTERNC_BEGIN                       extern "C" {
 #define WELSVP_EXTERNC_END                         }
 
 #else    /* C style interface */
 
 /* Recommend to invoke the interface via the micro for convenient */
-#define IWelsVPFunc_Init(p, a, b)                  (p)->Init(p->h, a, b)              
-#define IWelsVPFunc_Uninit(p, a)                   (p)->Uninit(p->h, a)               
-#define IWelsVPFunc_Flush(p, a)                    (p)->Flush(p->h, a)                
-#define IWelsVPFunc_Process(p, a, b, c)            (p)->Process(p->h, a, b, c)        
-#define IWelsVPFunc_Get(p, a, b)                   (p)->Get(p->h, a, b)               
-#define IWelsVPFunc_Set(p, a, b)                   (p)->Set(p->h, a, b)               
-#define IWelsVPFunc_SpecialFeature(p, a, b, c)     (p)->SpecialFeature(p->h, a, b, c) 
+#define IWelsVPFunc_Init(p, a, b)                  (p)->Init(p->h, a, b)
+#define IWelsVPFunc_Uninit(p, a)                   (p)->Uninit(p->h, a)
+#define IWelsVPFunc_Flush(p, a)                    (p)->Flush(p->h, a)
+#define IWelsVPFunc_Process(p, a, b, c)            (p)->Process(p->h, a, b, c)
+#define IWelsVPFunc_Get(p, a, b)                   (p)->Get(p->h, a, b)
+#define IWelsVPFunc_Set(p, a, b)                   (p)->Set(p->h, a, b)
+#define IWelsVPFunc_SpecialFeature(p, a, b, c)     (p)->SpecialFeature(p->h, a, b, c)
 
 /* C interface version */
-#define WELSVP_INTERFACE_VERION                    (0x0001 + (WELSVP_VERSION & 0x7fff)) 
-#define WELSVP_EXTERNC_BEGIN                      
-#define WELSVP_EXTERNC_END                       
+#define WELSVP_INTERFACE_VERION                    (0x0001 + (WELSVP_VERSION & 0x7fff))
+#define WELSVP_EXTERNC_BEGIN
+#define WELSVP_EXTERNC_END
 
 #endif
 

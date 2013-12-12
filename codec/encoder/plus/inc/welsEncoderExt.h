@@ -56,7 +56,7 @@
 
 class ISVCEncoder;
 namespace WelsSVCEnc {
-class CWelsH264SVCEncoder : public ISVCEncoder  
+class CWelsH264SVCEncoder : public ISVCEncoder
 {
 public:
 	CWelsH264SVCEncoder();
@@ -70,23 +70,23 @@ public:
 	virtual int Initialize(void* argv, const INIT_TYPE init_type);
 
 	virtual int Uninitialize();
-	
+
 	/*
 	 * return: EVideoFrameType [IDR: videoFrameTypeIDR; P: videoFrameTypeP; ERROR: videoFrameTypeInvalid]
 	 */
 	virtual int EncodeFrame(const unsigned char* kpSrc, SFrameBSInfo* pBsInfo);
 	virtual int EncodeFrame(const SSourcePicture ** kppSrcPicList, int nSrcPicNum, SFrameBSInfo * pBsInfo);
-	
+
 	/*
 	 * return: 0 - success; otherwise - failed;
 	 */
-	virtual int PauseFrame(const unsigned char* pSrc, SFrameBSInfo* pBsInfo);	
-	
+	virtual int PauseFrame(const unsigned char* pSrc, SFrameBSInfo* pBsInfo);
+
 	/*
 	 * return: 0 - success; otherwise - failed;
 	 */
-	virtual int ForceIntraFrame(bool bIDR);		
-	
+	virtual int ForceIntraFrame(bool bIDR);
+
 	/************************************************************************
 	 * InDataFormat, IDRInterval, SVC Encode Param, Frame Rate, Bitrate,..
 	 ************************************************************************/
@@ -94,22 +94,22 @@ public:
 	 * return: CM_RETURN: 0 - success; otherwise - failed;
 	 */
 	virtual int SetOption(ENCODER_OPTION opt_id, void* option);
-	virtual int GetOption(ENCODER_OPTION opt_id, void* option);	
+	virtual int GetOption(ENCODER_OPTION opt_id, void* option);
 
-private:	
+private:
 	sWelsEncCtx	*m_pEncContext;
 
-#if defined(WIN32)||defined(_MACH_PLATFORM)||defined(__GNUC__) 
+#if defined(WIN32)||defined(_MACH_PLATFORM)||defined(__GNUC__)
 	welsCodecTrace			*m_pWelsTrace;
-#endif	
+#endif
 	SSourcePicture			**m_pSrcPicList;
 	int32_t						m_iSrcListSize;
 
 	int32_t						m_iMaxPicWidth;
 	int32_t						m_iMaxPicHeight;
-	
+
 	int32_t						m_iCspInternal;
-	BOOL_T					m_bInitialFlag;	
+	BOOL_T					m_bInitialFlag;
 
 #ifdef OUTPUT_BIT_STREAM
 	FILE*				m_pFileBs;
@@ -121,8 +121,8 @@ private:
 #ifdef REC_FRAME_COUNT
    int32_t		m_uiCountFrameNum;
 #endif//REC_FRAME_COUNT
-	
-	void    InitEncoder( void );	
+
+	void    InitEncoder( void );
 	int32_t RawData2SrcPic(const uint8_t * pSrc);
 	void    DumpSrcPicture(const uint8_t *pSrc);
 };

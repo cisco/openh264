@@ -33,7 +33,7 @@
  *
  * \brief	common flag definitions
  *
- * \date	7/6/2009 Created 
+ * \date	7/6/2009 Created
  *************************************************************************************
  */
 #ifndef WELS_AS264_COMMON_H__

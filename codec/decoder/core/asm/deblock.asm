@@ -62,978 +62,978 @@ WELS_EXTERN   DeblockChromaEq4V_sse2
 
 ALIGN  16
 DeblockChromaEq4V_sse2:
-  push        ebp  
-  mov         ebp,esp 
-  and         esp,0FFFFFFF0h 
-  sub         esp,68h 
+  push        ebp
+  mov         ebp,esp
+  and         esp,0FFFFFFF0h
+  sub         esp,68h
   mov         edx,[ebp+10h]      ;  iStride
   mov         eax,[ebp+8]        ;  pPixCb
   mov         ecx,[ebp+0Ch]      ;  pPixCr
-  movq        xmm4,[ecx] 
-  movq        xmm5,[edx+ecx] 
-  push        esi  
-  push        edi  
-  lea         esi,[edx+edx] 
-  mov         edi,eax 
-  sub         edi,esi 
-  movq        xmm1,[edi] 
-  mov         edi,ecx 
-  sub         edi,esi 
-  movq        xmm2,[edi] 
-  punpcklqdq  xmm1,xmm2 
-  mov         esi,eax 
-  sub         esi,edx 
-  movq        xmm2,[esi] 
-  mov         edi,ecx 
-  sub         edi,edx 
-  movq        xmm3,[edi] 
-  punpcklqdq  xmm2,xmm3 
-  movq        xmm3,[eax] 
-  punpcklqdq  xmm3,xmm4 
-  movq        xmm4,[edx+eax] 
-  mov       edx, [ebp + 14h] 
-  punpcklqdq  xmm4,xmm5 
-  movd        xmm5,edx 
-  mov       edx, [ebp + 18h] 
-  pxor        xmm0,xmm0 
-  movdqa      xmm6,xmm5 
-  punpcklwd   xmm6,xmm5 
-  pshufd      xmm5,xmm6,0 
-  movd        xmm6,edx 
-  movdqa      xmm7,xmm6 
-  punpcklwd   xmm7,xmm6 
-  pshufd      xmm6,xmm7,0 
-  movdqa      xmm7,xmm1 
-  punpckhbw   xmm1,xmm0 
-  punpcklbw   xmm7,xmm0 
-  movdqa      [esp+40h],xmm1 
-  movdqa      [esp+60h],xmm7 
-  movdqa      xmm7,xmm2 
-  punpcklbw   xmm7,xmm0 
-  movdqa      [esp+10h],xmm7 
-  movdqa      xmm7,xmm3 
-  punpcklbw   xmm7,xmm0 
-  punpckhbw   xmm3,xmm0 
-  movdqa      [esp+50h],xmm7 
-  movdqa      xmm7,xmm4 
-  punpckhbw   xmm4,xmm0 
-  punpckhbw   xmm2,xmm0 
-  punpcklbw   xmm7,xmm0 
-  movdqa      [esp+30h],xmm3 
-  movdqa      xmm3,[esp+10h] 
-  movdqa      xmm1,xmm3 
-  psubw       xmm1,[esp+50h] 
-  pabsw       xmm1,xmm1 
-  movdqa      [esp+20h],xmm4 
-  movdqa      xmm0,xmm5 
-  pcmpgtw     xmm0,xmm1 
-  movdqa      xmm1,[esp+60h] 
-  psubw       xmm1,xmm3 
-  pabsw       xmm1,xmm1 
-  movdqa      xmm4,xmm6 
-  pcmpgtw     xmm4,xmm1 
-  pand        xmm0,xmm4 
-  movdqa      xmm1,xmm7 
-  psubw       xmm1,[esp+50h] 
-  pabsw       xmm1,xmm1 
-  movdqa      xmm4,xmm6 
-  pcmpgtw     xmm4,xmm1 
-  movdqa      xmm1,xmm2 
-  psubw       xmm1,[esp+30h] 
-  pabsw       xmm1,xmm1 
-  pcmpgtw     xmm5,xmm1 
-  movdqa      xmm1,[esp+40h] 
-  pand        xmm0,xmm4 
-  psubw       xmm1,xmm2 
-  pabsw       xmm1,xmm1 
-  movdqa      xmm4,xmm6 
-  pcmpgtw     xmm4,xmm1 
-  movdqa      xmm1,[esp+20h] 
-  psubw       xmm1,[esp+30h] 
-  pand        xmm5,xmm4 
-  pabsw       xmm1,xmm1 
-  pcmpgtw     xmm6,xmm1 
-  pand        xmm5,xmm6 
-  mov         edx,2 
-  movsx       edx,dx 
-  movd        xmm1,edx 
-  movdqa      xmm4,xmm1 
-  punpcklwd   xmm4,xmm1 
-  pshufd      xmm1,xmm4,0 
-  movdqa      xmm4,[esp+60h] 
-  movdqa      xmm6,xmm4 
-  paddw       xmm6,xmm4 
-  paddw       xmm6,xmm3 
-  paddw       xmm6,xmm7 
-  movdqa      [esp+10h],xmm1 
-  paddw       xmm6,[esp+10h] 
-  psraw       xmm6,2 
-  movdqa      xmm4,xmm0 
-  pandn       xmm4,xmm3 
-  movdqa      xmm3,[esp+40h] 
-  movdqa      xmm1,xmm0 
-  pand        xmm1,xmm6 
-  por         xmm1,xmm4 
-  movdqa      xmm6,xmm3 
-  paddw       xmm6,xmm3 
-  movdqa      xmm3,[esp+10h] 
-  paddw       xmm6,xmm2 
-  paddw       xmm6,[esp+20h] 
-  paddw       xmm6,xmm3 
-  psraw       xmm6,2 
-  movdqa      xmm4,xmm5 
-  pand        xmm4,xmm6 
-  movdqa      xmm6,xmm5 
-  pandn       xmm6,xmm2 
-  por         xmm4,xmm6 
-  packuswb    xmm1,xmm4 
-  movdqa      xmm4,[esp+50h] 
-  movdqa      xmm6,xmm7 
-  paddw       xmm6,xmm7 
-  paddw       xmm6,xmm4 
-  paddw       xmm6,[esp+60h] 
-  paddw       xmm6,xmm3 
-  psraw       xmm6,2 
-  movdqa      xmm2,xmm0 
-  pand        xmm2,xmm6 
-  pandn       xmm0,xmm4 
-  por         xmm2,xmm0 
-  movdqa      xmm0,[esp+20h] 
-  movdqa      xmm6,xmm0 
-  paddw       xmm6,xmm0 
-  movdqa      xmm0,[esp+30h] 
-  paddw       xmm6,xmm0 
-  paddw       xmm6,[esp+40h] 
-  movdqa      xmm4,xmm5 
-  paddw       xmm6,xmm3 
-  movq        [esi],xmm1 
-  psraw       xmm6,2 
-  pand        xmm4,xmm6 
-  pandn       xmm5,xmm0 
-  por         xmm4,xmm5 
-  packuswb    xmm2,xmm4 
-  movq        [eax],xmm2 
-  psrldq      xmm1,8 
-  movq        [edi],xmm1 
-  pop         edi  
-  psrldq      xmm2,8 
-  movq        [ecx],xmm2 
-  pop         esi  
-  mov         esp,ebp 
-  pop         ebp  
-  ret              
+  movq        xmm4,[ecx]
+  movq        xmm5,[edx+ecx]
+  push        esi
+  push        edi
+  lea         esi,[edx+edx]
+  mov         edi,eax
+  sub         edi,esi
+  movq        xmm1,[edi]
+  mov         edi,ecx
+  sub         edi,esi
+  movq        xmm2,[edi]
+  punpcklqdq  xmm1,xmm2
+  mov         esi,eax
+  sub         esi,edx
+  movq        xmm2,[esi]
+  mov         edi,ecx
+  sub         edi,edx
+  movq        xmm3,[edi]
+  punpcklqdq  xmm2,xmm3
+  movq        xmm3,[eax]
+  punpcklqdq  xmm3,xmm4
+  movq        xmm4,[edx+eax]
+  mov       edx, [ebp + 14h]
+  punpcklqdq  xmm4,xmm5
+  movd        xmm5,edx
+  mov       edx, [ebp + 18h]
+  pxor        xmm0,xmm0
+  movdqa      xmm6,xmm5
+  punpcklwd   xmm6,xmm5
+  pshufd      xmm5,xmm6,0
+  movd        xmm6,edx
+  movdqa      xmm7,xmm6
+  punpcklwd   xmm7,xmm6
+  pshufd      xmm6,xmm7,0
+  movdqa      xmm7,xmm1
+  punpckhbw   xmm1,xmm0
+  punpcklbw   xmm7,xmm0
+  movdqa      [esp+40h],xmm1
+  movdqa      [esp+60h],xmm7
+  movdqa      xmm7,xmm2
+  punpcklbw   xmm7,xmm0
+  movdqa      [esp+10h],xmm7
+  movdqa      xmm7,xmm3
+  punpcklbw   xmm7,xmm0
+  punpckhbw   xmm3,xmm0
+  movdqa      [esp+50h],xmm7
+  movdqa      xmm7,xmm4
+  punpckhbw   xmm4,xmm0
+  punpckhbw   xmm2,xmm0
+  punpcklbw   xmm7,xmm0
+  movdqa      [esp+30h],xmm3
+  movdqa      xmm3,[esp+10h]
+  movdqa      xmm1,xmm3
+  psubw       xmm1,[esp+50h]
+  pabsw       xmm1,xmm1
+  movdqa      [esp+20h],xmm4
+  movdqa      xmm0,xmm5
+  pcmpgtw     xmm0,xmm1
+  movdqa      xmm1,[esp+60h]
+  psubw       xmm1,xmm3
+  pabsw       xmm1,xmm1
+  movdqa      xmm4,xmm6
+  pcmpgtw     xmm4,xmm1
+  pand        xmm0,xmm4
+  movdqa      xmm1,xmm7
+  psubw       xmm1,[esp+50h]
+  pabsw       xmm1,xmm1
+  movdqa      xmm4,xmm6
+  pcmpgtw     xmm4,xmm1
+  movdqa      xmm1,xmm2
+  psubw       xmm1,[esp+30h]
+  pabsw       xmm1,xmm1
+  pcmpgtw     xmm5,xmm1
+  movdqa      xmm1,[esp+40h]
+  pand        xmm0,xmm4
+  psubw       xmm1,xmm2
+  pabsw       xmm1,xmm1
+  movdqa      xmm4,xmm6
+  pcmpgtw     xmm4,xmm1
+  movdqa      xmm1,[esp+20h]
+  psubw       xmm1,[esp+30h]
+  pand        xmm5,xmm4
+  pabsw       xmm1,xmm1
+  pcmpgtw     xmm6,xmm1
+  pand        xmm5,xmm6
+  mov         edx,2
+  movsx       edx,dx
+  movd        xmm1,edx
+  movdqa      xmm4,xmm1
+  punpcklwd   xmm4,xmm1
+  pshufd      xmm1,xmm4,0
+  movdqa      xmm4,[esp+60h]
+  movdqa      xmm6,xmm4
+  paddw       xmm6,xmm4
+  paddw       xmm6,xmm3
+  paddw       xmm6,xmm7
+  movdqa      [esp+10h],xmm1
+  paddw       xmm6,[esp+10h]
+  psraw       xmm6,2
+  movdqa      xmm4,xmm0
+  pandn       xmm4,xmm3
+  movdqa      xmm3,[esp+40h]
+  movdqa      xmm1,xmm0
+  pand        xmm1,xmm6
+  por         xmm1,xmm4
+  movdqa      xmm6,xmm3
+  paddw       xmm6,xmm3
+  movdqa      xmm3,[esp+10h]
+  paddw       xmm6,xmm2
+  paddw       xmm6,[esp+20h]
+  paddw       xmm6,xmm3
+  psraw       xmm6,2
+  movdqa      xmm4,xmm5
+  pand        xmm4,xmm6
+  movdqa      xmm6,xmm5
+  pandn       xmm6,xmm2
+  por         xmm4,xmm6
+  packuswb    xmm1,xmm4
+  movdqa      xmm4,[esp+50h]
+  movdqa      xmm6,xmm7
+  paddw       xmm6,xmm7
+  paddw       xmm6,xmm4
+  paddw       xmm6,[esp+60h]
+  paddw       xmm6,xmm3
+  psraw       xmm6,2
+  movdqa      xmm2,xmm0
+  pand        xmm2,xmm6
+  pandn       xmm0,xmm4
+  por         xmm2,xmm0
+  movdqa      xmm0,[esp+20h]
+  movdqa      xmm6,xmm0
+  paddw       xmm6,xmm0
+  movdqa      xmm0,[esp+30h]
+  paddw       xmm6,xmm0
+  paddw       xmm6,[esp+40h]
+  movdqa      xmm4,xmm5
+  paddw       xmm6,xmm3
+  movq        [esi],xmm1
+  psraw       xmm6,2
+  pand        xmm4,xmm6
+  pandn       xmm5,xmm0
+  por         xmm4,xmm5
+  packuswb    xmm2,xmm4
+  movq        [eax],xmm2
+  psrldq      xmm1,8
+  movq        [edi],xmm1
+  pop         edi
+  psrldq      xmm2,8
+  movq        [ecx],xmm2
+  pop         esi
+  mov         esp,ebp
+  pop         ebp
+  ret
 
 ;******************************************************************************
-; void DeblockChromaLt4V_sse2(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride, 
+; void DeblockChromaLt4V_sse2(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride,
 ;                           int32_t iAlpha, int32_t iBeta, int8_t * pTC);
 ;*******************************************************************************
 
 WELS_EXTERN  DeblockChromaLt4V_sse2
 
 DeblockChromaLt4V_sse2:
-  push        ebp  
-  mov         ebp,esp 
-  and         esp,0FFFFFFF0h 
-  sub         esp,0E4h 
-  push        ebx  
-  push        esi  
+  push        ebp
+  mov         ebp,esp
+  and         esp,0FFFFFFF0h
+  sub         esp,0E4h
+  push        ebx
+  push        esi
   mov         esi, [ebp+1Ch]      ;  pTC
-  movsx       ebx, byte [esi+2] 
-  push        edi  
-  movsx       di,byte [esi+3] 
-  mov         word [esp+0Ch],bx 
-  movsx       bx,byte  [esi+1] 
-  movsx       esi,byte  [esi] 
-  mov         word  [esp+0Eh],si 
-  movzx       esi,di 
-  movd        xmm1,esi 
-  movzx       esi,di 
-  movd        xmm2,esi 
-  mov         si,word  [esp+0Ch] 
-  mov         edx, [ebp + 10h] 
-  mov         eax, [ebp + 08h] 
-  movzx       edi,si 
-  movzx       esi,si 
-  mov         ecx, [ebp + 0Ch] 
-  movd        xmm4,esi 
-  movzx       esi,bx 
-  movd        xmm5,esi 
-  movd        xmm3,edi 
-  movzx       esi,bx 
-  movd        xmm6,esi 
-  mov         si,word [esp+0Eh] 
-  movzx       edi,si 
-  movzx       esi,si 
-  punpcklwd   xmm6,xmm2 
-  pxor        xmm0,xmm0 
-  movdqa      [esp+40h],xmm0 
-  movd        xmm7,edi 
-  movd        xmm0,esi 
-  lea         esi,[edx+edx] 
-  mov         edi,eax 
-  sub         edi,esi 
-  punpcklwd   xmm5,xmm1 
-  movdqa      xmm1,[esp+40h] 
-  punpcklwd   xmm0,xmm4 
-  movq        xmm4,[edx+ecx] 
-  punpcklwd   xmm7,xmm3 
-  movq        xmm3,[eax] 
-  punpcklwd   xmm0,xmm6 
-  movq        xmm6,[edi] 
-  punpcklwd   xmm7,xmm5 
-  punpcklwd   xmm0,xmm7 
-  mov         edi,ecx 
-  sub         edi,esi 
-  movdqa      xmm2,xmm1 
-  psubw       xmm2,xmm0 
-  movdqa      [esp+60h],xmm2 
-  movq        xmm2, [edi] 
-  punpcklqdq  xmm6,xmm2 
-  mov         esi,eax 
-  sub         esi,edx 
-  movq        xmm7,[esi] 
-  mov         edi,ecx 
-  sub         edi,edx 
-  movq        xmm2,[edi] 
-  punpcklqdq  xmm7,xmm2 
-  movq        xmm2,[ecx] 
-  punpcklqdq  xmm3,xmm2 
-  movq        xmm2,[edx+eax] 
-  movsx       edx,word [ebp + 14h] 
-  punpcklqdq  xmm2,xmm4 
-  movdqa      [esp+0E0h],xmm2 
-  movd        xmm2,edx 
-  movsx       edx,word [ebp + 18h] 
-  movdqa      xmm4,xmm2 
-  punpcklwd   xmm4,xmm2 
-  movd        xmm2,edx 
-  movdqa      xmm5,xmm2 
-  punpcklwd   xmm5,xmm2 
-  pshufd      xmm2,xmm5,0 
-  movdqa      [esp+50h],xmm2 
-  movdqa      xmm2,xmm6 
-  punpcklbw   xmm2,xmm1 
-  movdqa      [esp+0D0h],xmm3 
-  pshufd      xmm4,xmm4,0 
-  movdqa      [esp+30h],xmm2 
-  punpckhbw   xmm6,xmm1 
-  movdqa      [esp+80h],xmm6 
-  movdqa      xmm6,[esp+0D0h] 
-  punpckhbw   xmm6,xmm1 
-  movdqa      [esp+70h],xmm6 
-  movdqa      xmm6, [esp+0E0h] 
-  punpckhbw   xmm6,xmm1 
-  movdqa     [esp+90h],xmm6 
-  movdqa      xmm5, [esp+0E0h] 
-  movdqa      xmm2,xmm7 
-  punpckhbw   xmm7,xmm1 
-  punpcklbw   xmm5,xmm1 
-  movdqa       [esp+0A0h],xmm7 
-  punpcklbw   xmm3,xmm1 
-  mov         edx,4 
-  punpcklbw   xmm2,xmm1 
-  movsx       edx,dx 
-  movd        xmm6,edx 
-  movdqa      xmm7,xmm6 
-  punpcklwd   xmm7,xmm6 
-  pshufd      xmm6,xmm7,0 
-  movdqa      xmm7,[esp+30h] 
-  movdqa      [esp+20h],xmm6 
-  psubw       xmm7,xmm5 
-  movdqa      xmm6,xmm0 
-  pcmpgtw     xmm6,xmm1 
-  movdqa      xmm1,[esp+60h] 
-  movdqa      [esp+40h],xmm6 
-  movdqa      xmm6,xmm3 
-  psubw       xmm6,xmm2 
-  psllw       xmm6,2 
-  paddw       xmm6,xmm7 
-  paddw       xmm6, [esp+20h] 
-  movdqa      xmm7, [esp+50h] 
-  psraw       xmm6,3 
-  pmaxsw      xmm1,xmm6 
-  movdqa      [esp+10h],xmm0 
-  movdqa      xmm6, [esp+10h] 
-  pminsw      xmm6,xmm1 
-  movdqa      [esp+10h],xmm6 
-  movdqa      xmm1,xmm2 
-  psubw       xmm1,xmm3 
-  pabsw       xmm1,xmm1 
-  movdqa      xmm6,xmm4 
-  pcmpgtw     xmm6,xmm1 
-  movdqa      xmm1, [esp+30h] 
-  psubw       xmm1,xmm2 
-  pabsw       xmm1,xmm1 
-  pcmpgtw     xmm7,xmm1 
-  movdqa      xmm1,[esp+50h] 
-  pand        xmm6,xmm7 
-  movdqa      xmm7,[esp+50h] 
-  psubw       xmm5,xmm3 
-  pabsw       xmm5,xmm5 
-  pcmpgtw     xmm1,xmm5 
-  movdqa      xmm5,[esp+80h] 
-  psubw       xmm5,[esp+90h] 
-  pand        xmm6,xmm1 
-  pand        xmm6,[esp+40h] 
-  movdqa      xmm1,[esp+10h] 
-  pand        xmm1,xmm6 
-  movdqa      xmm6,[esp+70h] 
-  movdqa      [esp+30h],xmm1 
-  movdqa      xmm1,[esp+0A0h] 
-  psubw       xmm6,xmm1 
-  psllw       xmm6,2 
-  paddw       xmm6,xmm5 
-  paddw       xmm6,[esp+20h] 
-  movdqa      xmm5,[esp+60h] 
-  psraw       xmm6,3 
-  pmaxsw      xmm5,xmm6 
-  pminsw      xmm0,xmm5 
-  movdqa      xmm5,[esp+70h] 
-  movdqa      xmm6,xmm1 
-  psubw       xmm6,xmm5 
-  pabsw       xmm6,xmm6 
-  pcmpgtw     xmm4,xmm6 
-  movdqa      xmm6,[esp+80h] 
-  psubw       xmm6,xmm1 
-  pabsw       xmm6,xmm6 
-  pcmpgtw     xmm7,xmm6 
-  movdqa      xmm6,[esp+90h] 
-  pand        xmm4,xmm7 
-  movdqa      xmm7,[esp+50h] 
-  psubw       xmm6,xmm5 
-  pabsw       xmm6,xmm6 
-  pcmpgtw     xmm7,xmm6 
-  pand        xmm4,xmm7 
-  pand        xmm4,[esp+40h] 
-  pand        xmm0,xmm4 
-  movdqa      xmm4,[esp+30h] 
-  paddw       xmm2,xmm4 
-  paddw       xmm1,xmm0 
-  packuswb    xmm2,xmm1 
-  movq        [esi],xmm2 
-  psubw       xmm3,xmm4 
-  psubw       xmm5,xmm0 
-  packuswb    xmm3,xmm5 
-  movq        [eax],xmm3 
-  psrldq      xmm2,8 
-  movq        [edi],xmm2 
-  pop         edi  
-  pop         esi  
-  psrldq      xmm3,8 
-  movq        [ecx],xmm3 
-  pop         ebx  
-  mov         esp,ebp 
-  pop         ebp  
-  ret    
-  
+  movsx       ebx, byte [esi+2]
+  push        edi
+  movsx       di,byte [esi+3]
+  mov         word [esp+0Ch],bx
+  movsx       bx,byte  [esi+1]
+  movsx       esi,byte  [esi]
+  mov         word  [esp+0Eh],si
+  movzx       esi,di
+  movd        xmm1,esi
+  movzx       esi,di
+  movd        xmm2,esi
+  mov         si,word  [esp+0Ch]
+  mov         edx, [ebp + 10h]
+  mov         eax, [ebp + 08h]
+  movzx       edi,si
+  movzx       esi,si
+  mov         ecx, [ebp + 0Ch]
+  movd        xmm4,esi
+  movzx       esi,bx
+  movd        xmm5,esi
+  movd        xmm3,edi
+  movzx       esi,bx
+  movd        xmm6,esi
+  mov         si,word [esp+0Eh]
+  movzx       edi,si
+  movzx       esi,si
+  punpcklwd   xmm6,xmm2
+  pxor        xmm0,xmm0
+  movdqa      [esp+40h],xmm0
+  movd        xmm7,edi
+  movd        xmm0,esi
+  lea         esi,[edx+edx]
+  mov         edi,eax
+  sub         edi,esi
+  punpcklwd   xmm5,xmm1
+  movdqa      xmm1,[esp+40h]
+  punpcklwd   xmm0,xmm4
+  movq        xmm4,[edx+ecx]
+  punpcklwd   xmm7,xmm3
+  movq        xmm3,[eax]
+  punpcklwd   xmm0,xmm6
+  movq        xmm6,[edi]
+  punpcklwd   xmm7,xmm5
+  punpcklwd   xmm0,xmm7
+  mov         edi,ecx
+  sub         edi,esi
+  movdqa      xmm2,xmm1
+  psubw       xmm2,xmm0
+  movdqa      [esp+60h],xmm2
+  movq        xmm2, [edi]
+  punpcklqdq  xmm6,xmm2
+  mov         esi,eax
+  sub         esi,edx
+  movq        xmm7,[esi]
+  mov         edi,ecx
+  sub         edi,edx
+  movq        xmm2,[edi]
+  punpcklqdq  xmm7,xmm2
+  movq        xmm2,[ecx]
+  punpcklqdq  xmm3,xmm2
+  movq        xmm2,[edx+eax]
+  movsx       edx,word [ebp + 14h]
+  punpcklqdq  xmm2,xmm4
+  movdqa      [esp+0E0h],xmm2
+  movd        xmm2,edx
+  movsx       edx,word [ebp + 18h]
+  movdqa      xmm4,xmm2
+  punpcklwd   xmm4,xmm2
+  movd        xmm2,edx
+  movdqa      xmm5,xmm2
+  punpcklwd   xmm5,xmm2
+  pshufd      xmm2,xmm5,0
+  movdqa      [esp+50h],xmm2
+  movdqa      xmm2,xmm6
+  punpcklbw   xmm2,xmm1
+  movdqa      [esp+0D0h],xmm3
+  pshufd      xmm4,xmm4,0
+  movdqa      [esp+30h],xmm2
+  punpckhbw   xmm6,xmm1
+  movdqa      [esp+80h],xmm6
+  movdqa      xmm6,[esp+0D0h]
+  punpckhbw   xmm6,xmm1
+  movdqa      [esp+70h],xmm6
+  movdqa      xmm6, [esp+0E0h]
+  punpckhbw   xmm6,xmm1
+  movdqa     [esp+90h],xmm6
+  movdqa      xmm5, [esp+0E0h]
+  movdqa      xmm2,xmm7
+  punpckhbw   xmm7,xmm1
+  punpcklbw   xmm5,xmm1
+  movdqa       [esp+0A0h],xmm7
+  punpcklbw   xmm3,xmm1
+  mov         edx,4
+  punpcklbw   xmm2,xmm1
+  movsx       edx,dx
+  movd        xmm6,edx
+  movdqa      xmm7,xmm6
+  punpcklwd   xmm7,xmm6
+  pshufd      xmm6,xmm7,0
+  movdqa      xmm7,[esp+30h]
+  movdqa      [esp+20h],xmm6
+  psubw       xmm7,xmm5
+  movdqa      xmm6,xmm0
+  pcmpgtw     xmm6,xmm1
+  movdqa      xmm1,[esp+60h]
+  movdqa      [esp+40h],xmm6
+  movdqa      xmm6,xmm3
+  psubw       xmm6,xmm2
+  psllw       xmm6,2
+  paddw       xmm6,xmm7
+  paddw       xmm6, [esp+20h]
+  movdqa      xmm7, [esp+50h]
+  psraw       xmm6,3
+  pmaxsw      xmm1,xmm6
+  movdqa      [esp+10h],xmm0
+  movdqa      xmm6, [esp+10h]
+  pminsw      xmm6,xmm1
+  movdqa      [esp+10h],xmm6
+  movdqa      xmm1,xmm2
+  psubw       xmm1,xmm3
+  pabsw       xmm1,xmm1
+  movdqa      xmm6,xmm4
+  pcmpgtw     xmm6,xmm1
+  movdqa      xmm1, [esp+30h]
+  psubw       xmm1,xmm2
+  pabsw       xmm1,xmm1
+  pcmpgtw     xmm7,xmm1
+  movdqa      xmm1,[esp+50h]
+  pand        xmm6,xmm7
+  movdqa      xmm7,[esp+50h]
+  psubw       xmm5,xmm3
+  pabsw       xmm5,xmm5
+  pcmpgtw     xmm1,xmm5
+  movdqa      xmm5,[esp+80h]
+  psubw       xmm5,[esp+90h]
+  pand        xmm6,xmm1
+  pand        xmm6,[esp+40h]
+  movdqa      xmm1,[esp+10h]
+  pand        xmm1,xmm6
+  movdqa      xmm6,[esp+70h]
+  movdqa      [esp+30h],xmm1
+  movdqa      xmm1,[esp+0A0h]
+  psubw       xmm6,xmm1
+  psllw       xmm6,2
+  paddw       xmm6,xmm5
+  paddw       xmm6,[esp+20h]
+  movdqa      xmm5,[esp+60h]
+  psraw       xmm6,3
+  pmaxsw      xmm5,xmm6
+  pminsw      xmm0,xmm5
+  movdqa      xmm5,[esp+70h]
+  movdqa      xmm6,xmm1
+  psubw       xmm6,xmm5
+  pabsw       xmm6,xmm6
+  pcmpgtw     xmm4,xmm6
+  movdqa      xmm6,[esp+80h]
+  psubw       xmm6,xmm1
+  pabsw       xmm6,xmm6
+  pcmpgtw     xmm7,xmm6
+  movdqa      xmm6,[esp+90h]
+  pand        xmm4,xmm7
+  movdqa      xmm7,[esp+50h]
+  psubw       xmm6,xmm5
+  pabsw       xmm6,xmm6
+  pcmpgtw     xmm7,xmm6
+  pand        xmm4,xmm7
+  pand        xmm4,[esp+40h]
+  pand        xmm0,xmm4
+  movdqa      xmm4,[esp+30h]
+  paddw       xmm2,xmm4
+  paddw       xmm1,xmm0
+  packuswb    xmm2,xmm1
+  movq        [esi],xmm2
+  psubw       xmm3,xmm4
+  psubw       xmm5,xmm0
+  packuswb    xmm3,xmm5
+  movq        [eax],xmm3
+  psrldq      xmm2,8
+  movq        [edi],xmm2
+  pop         edi
+  pop         esi
+  psrldq      xmm3,8
+  movq        [ecx],xmm3
+  pop         ebx
+  mov         esp,ebp
+  pop         ebp
+  ret
+
 ;***************************************************************************
-;  void DeblockChromaEq4H_sse2(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride, 
+;  void DeblockChromaEq4H_sse2(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride,
 ;          int32_t iAlpha, int32_t iBeta)
 ;***************************************************************************
 
 WELS_EXTERN     DeblockChromaEq4H_sse2
 
 ALIGN  16
-  
+
 DeblockChromaEq4H_sse2:
-  push        ebp  
-  mov         ebp,esp 
-  and         esp,0FFFFFFF0h 
-  sub         esp,0C8h  
-  mov         ecx,dword [ebp+8] 
-  mov         edx,dword [ebp+0Ch] 
-  mov         eax,dword [ebp+10h] 
-  sub         ecx,2 
-  sub         edx,2 
-  push        esi  
-  lea         esi,[eax+eax*2] 
-  mov         dword [esp+18h],ecx 
-  mov         dword [esp+4],edx 
-  lea         ecx,[ecx+eax*4] 
-  lea         edx,[edx+eax*4] 
-  lea         eax,[esp+7Ch] 
-  push        edi  
-  mov         dword [esp+14h],esi 
-  mov         dword [esp+18h],ecx 
-  mov         dword [esp+0Ch],edx 
-  mov         dword [esp+10h],eax 
-  mov         esi,dword [esp+1Ch] 
-  mov         ecx,dword [ebp+10h] 
-  mov         edx,dword [esp+14h] 
-  movd        xmm0,dword [esi] 
-  movd        xmm1,dword [esi+ecx] 
-  movd        xmm2,dword [esi+ecx*2] 
-  movd        xmm3,dword [esi+edx] 
-  mov         esi,dword  [esp+8] 
-  movd        xmm4,dword [esi] 
-  movd        xmm5,dword [esi+ecx] 
-  movd        xmm6,dword [esi+ecx*2] 
-  movd        xmm7,dword [esi+edx] 
-  punpckldq   xmm0,xmm4 
-  punpckldq   xmm1,xmm5 
-  punpckldq   xmm2,xmm6 
-  punpckldq   xmm3,xmm7 
-  mov         esi,dword [esp+18h] 
-  mov         edi,dword [esp+0Ch] 
-  movd        xmm4,dword [esi] 
-  movd        xmm5,dword [edi] 
-  punpckldq   xmm4,xmm5 
-  punpcklqdq  xmm0,xmm4 
-  movd        xmm4,dword [esi+ecx] 
-  movd        xmm5,dword [edi+ecx] 
-  punpckldq   xmm4,xmm5 
-  punpcklqdq  xmm1,xmm4 
-  movd        xmm4,dword [esi+ecx*2] 
-  movd        xmm5,dword [edi+ecx*2] 
-  punpckldq   xmm4,xmm5 
-  punpcklqdq  xmm2,xmm4 
-  movd        xmm4,dword [esi+edx] 
-  movd        xmm5,dword [edi+edx] 
-  punpckldq   xmm4,xmm5 
-  punpcklqdq  xmm3,xmm4 
-  movdqa      xmm6,xmm0 
-  punpcklbw   xmm0,xmm1 
-  punpckhbw   xmm6,xmm1 
-  movdqa      xmm7,xmm2 
-  punpcklbw   xmm2,xmm3 
-  punpckhbw   xmm7,xmm3 
-  movdqa      xmm4,xmm0 
-  movdqa      xmm5,xmm6 
-  punpcklwd   xmm0,xmm2 
-  punpckhwd   xmm4,xmm2 
-  punpcklwd   xmm6,xmm7 
-  punpckhwd   xmm5,xmm7 
-  movdqa      xmm1,xmm0 
-  movdqa      xmm2,xmm4 
-  punpckldq   xmm0,xmm6 
-  punpckhdq   xmm1,xmm6 
-  punpckldq   xmm4,xmm5 
-  punpckhdq   xmm2,xmm5 
-  movdqa      xmm5,xmm0 
-  movdqa      xmm6,xmm1 
-  punpcklqdq  xmm0,xmm4 
-  punpckhqdq  xmm5,xmm4 
-  punpcklqdq  xmm1,xmm2 
-  punpckhqdq  xmm6,xmm2 
-  mov         edi,dword [esp+10h] 
-  movdqa      [edi],xmm0 
-  movdqa      [edi+10h],xmm5 
-  movdqa      [edi+20h],xmm1 
-  movdqa      [edi+30h],xmm6 
-  movsx       ecx,word [ebp+14h] 
-  movsx       edx,word [ebp+18h] 
-  movdqa      xmm6,[esp+80h] 
-  movdqa      xmm4,[esp+90h] 
-  movdqa      xmm5,[esp+0A0h] 
-  movdqa      xmm7,[esp+0B0h] 
-  pxor        xmm0,xmm0 
-  movd        xmm1,ecx 
-  movdqa      xmm2,xmm1 
-  punpcklwd   xmm2,xmm1 
-  pshufd      xmm1,xmm2,0 
-  movd        xmm2,edx 
-  movdqa      xmm3,xmm2 
-  punpcklwd   xmm3,xmm2 
-  pshufd      xmm2,xmm3,0 
-  movdqa      xmm3,xmm6 
-  punpckhbw   xmm6,xmm0 
-  movdqa      [esp+60h],xmm6 
-  movdqa      xmm6,[esp+90h] 
-  punpckhbw   xmm6,xmm0 
-  movdqa      [esp+30h],xmm6 
-  movdqa      xmm6,[esp+0A0h] 
-  punpckhbw   xmm6,xmm0 
-  movdqa      [esp+40h],xmm6 
-  movdqa      xmm6,[esp+0B0h] 
-  punpckhbw   xmm6,xmm0 
-  movdqa      [esp+70h],xmm6 
-  punpcklbw   xmm7,xmm0 
-  punpcklbw   xmm4,xmm0 
-  punpcklbw   xmm5,xmm0 
-  punpcklbw   xmm3,xmm0 
-  movdqa      [esp+50h],xmm7 
-  movdqa      xmm6,xmm4 
-  psubw       xmm6,xmm5 
-  pabsw       xmm6,xmm6 
-  movdqa      xmm0,xmm1 
-  pcmpgtw     xmm0,xmm6 
-  movdqa      xmm6,xmm3 
-  psubw       xmm6,xmm4 
-  pabsw       xmm6,xmm6 
-  movdqa      xmm7,xmm2 
-  pcmpgtw     xmm7,xmm6 
-  movdqa      xmm6,[esp+50h] 
-  psubw       xmm6,xmm5 
-  pabsw       xmm6,xmm6 
-  pand        xmm0,xmm7 
-  movdqa      xmm7,xmm2 
-  pcmpgtw     xmm7,xmm6 
-  movdqa      xmm6,[esp+30h] 
-  psubw       xmm6,[esp+40h] 
-  pabsw       xmm6,xmm6 
-  pcmpgtw     xmm1,xmm6 
-  movdqa      xmm6,[esp+60h] 
-  psubw       xmm6,[esp+30h] 
-  pabsw       xmm6,xmm6 
-  pand        xmm0,xmm7 
-  movdqa      xmm7,xmm2 
-  pcmpgtw     xmm7,xmm6 
-  movdqa      xmm6,[esp+70h] 
-  psubw       xmm6,[esp+40h] 
-  pabsw       xmm6,xmm6 
-  pand        xmm1,xmm7 
-  pcmpgtw     xmm2,xmm6 
-  pand        xmm1,xmm2 
-  mov         eax,2 
-  movsx       ecx,ax 
-  movd        xmm2,ecx 
-  movdqa      xmm6,xmm2 
-  punpcklwd   xmm6,xmm2 
-  pshufd      xmm2,xmm6,0 
-  movdqa      [esp+20h],xmm2 
-  movdqa      xmm2,xmm3 
-  paddw       xmm2,xmm3 
-  paddw       xmm2,xmm4 
-  paddw       xmm2,[esp+50h] 
-  paddw       xmm2,[esp+20h] 
-  psraw       xmm2,2 
-  movdqa      xmm6,xmm0 
-  pand        xmm6,xmm2 
-  movdqa      xmm2,xmm0 
-  pandn       xmm2,xmm4 
-  por         xmm6,xmm2 
-  movdqa      xmm2,[esp+60h] 
-  movdqa      xmm7,xmm2 
-  paddw       xmm7,xmm2 
-  paddw       xmm7,[esp+30h] 
-  paddw       xmm7,[esp+70h] 
-  paddw       xmm7,[esp+20h] 
-  movdqa      xmm4,xmm1 
-  movdqa      xmm2,xmm1 
-  pandn       xmm2,[esp+30h] 
-  psraw       xmm7,2 
-  pand        xmm4,xmm7 
-  por         xmm4,xmm2 
-  movdqa      xmm2,[esp+50h] 
-  packuswb    xmm6,xmm4 
-  movdqa      [esp+90h],xmm6 
-  movdqa      xmm6,xmm2 
-  paddw       xmm6,xmm2 
-  movdqa      xmm2,[esp+20h] 
-  paddw       xmm6,xmm5 
-  paddw       xmm6,xmm3 
-  movdqa      xmm4,xmm0 
-  pandn       xmm0,xmm5 
-  paddw       xmm6,xmm2 
-  psraw       xmm6,2 
-  pand        xmm4,xmm6 
-  por         xmm4,xmm0 
-  movdqa      xmm0,[esp+70h] 
-  movdqa      xmm5,xmm0 
-  paddw       xmm5,xmm0 
-  movdqa      xmm0,[esp+40h] 
-  paddw       xmm5,xmm0 
-  paddw       xmm5,[esp+60h] 
-  movdqa      xmm3,xmm1 
-  paddw       xmm5,xmm2 
-  psraw       xmm5,2 
-  pand        xmm3,xmm5 
-  pandn       xmm1,xmm0 
-  por         xmm3,xmm1 
-  packuswb    xmm4,xmm3 
-  movdqa      [esp+0A0h],xmm4 
-  mov         esi,dword [esp+10h] 
-  movdqa      xmm0,[esi] 
-  movdqa      xmm1,[esi+10h] 
-  movdqa      xmm2,[esi+20h] 
-  movdqa      xmm3,[esi+30h] 
-  movdqa      xmm6,xmm0 
-  punpcklbw   xmm0,xmm1 
-  punpckhbw   xmm6,xmm1 
-  movdqa      xmm7,xmm2 
-  punpcklbw   xmm2,xmm3 
-  punpckhbw   xmm7,xmm3 
-  movdqa      xmm4,xmm0 
-  movdqa      xmm5,xmm6 
-  punpcklwd   xmm0,xmm2 
-  punpckhwd   xmm4,xmm2 
-  punpcklwd   xmm6,xmm7 
-  punpckhwd   xmm5,xmm7 
-  movdqa      xmm1,xmm0 
-  movdqa      xmm2,xmm4 
-  punpckldq   xmm0,xmm6 
-  punpckhdq   xmm1,xmm6 
-  punpckldq   xmm4,xmm5 
-  punpckhdq   xmm2,xmm5 
-  movdqa      xmm5,xmm0 
-  movdqa      xmm6,xmm1 
-  punpcklqdq  xmm0,xmm4 
-  punpckhqdq  xmm5,xmm4 
-  punpcklqdq  xmm1,xmm2 
-  punpckhqdq  xmm6,xmm2 
-  mov         esi,dword [esp+1Ch] 
-  mov         ecx,dword [ebp+10h] 
-  mov         edx,dword [esp+14h] 
-  mov         edi,dword [esp+8] 
-  movd        dword [esi],xmm0 
-  movd        dword [esi+ecx],xmm5 
-  movd        dword [esi+ecx*2],xmm1 
-  movd        dword [esi+edx],xmm6 
-  psrldq      xmm0,4 
-  psrldq      xmm5,4 
-  psrldq      xmm1,4 
-  psrldq      xmm6,4 
-  mov         esi,dword [esp+18h] 
-  movd        dword [edi],xmm0 
-  movd        dword [edi+ecx],xmm5 
-  movd        dword [edi+ecx*2],xmm1 
-  movd        dword [edi+edx],xmm6 
-  psrldq      xmm0,4 
-  psrldq      xmm5,4 
-  psrldq      xmm1,4 
-  psrldq      xmm6,4 
-  movd        dword [esi],xmm0 
-  movd        dword [esi+ecx],xmm5 
-  movd        dword [esi+ecx*2],xmm1 
-  movd        dword [esi+edx],xmm6 
-  psrldq      xmm0,4 
-  psrldq      xmm5,4 
-  psrldq      xmm1,4 
-  psrldq      xmm6,4 
-  mov         edi,dword [esp+0Ch] 
-  movd        dword [edi],xmm0 
-  movd        dword [edi+ecx],xmm5 
-  movd        dword [edi+ecx*2],xmm1 
-  movd        dword [edi+edx],xmm6 
-  pop         edi  
-  pop         esi  
-  mov         esp,ebp 
-  pop         ebp  
-  ret              
-  
+  push        ebp
+  mov         ebp,esp
+  and         esp,0FFFFFFF0h
+  sub         esp,0C8h
+  mov         ecx,dword [ebp+8]
+  mov         edx,dword [ebp+0Ch]
+  mov         eax,dword [ebp+10h]
+  sub         ecx,2
+  sub         edx,2
+  push        esi
+  lea         esi,[eax+eax*2]
+  mov         dword [esp+18h],ecx
+  mov         dword [esp+4],edx
+  lea         ecx,[ecx+eax*4]
+  lea         edx,[edx+eax*4]
+  lea         eax,[esp+7Ch]
+  push        edi
+  mov         dword [esp+14h],esi
+  mov         dword [esp+18h],ecx
+  mov         dword [esp+0Ch],edx
+  mov         dword [esp+10h],eax
+  mov         esi,dword [esp+1Ch]
+  mov         ecx,dword [ebp+10h]
+  mov         edx,dword [esp+14h]
+  movd        xmm0,dword [esi]
+  movd        xmm1,dword [esi+ecx]
+  movd        xmm2,dword [esi+ecx*2]
+  movd        xmm3,dword [esi+edx]
+  mov         esi,dword  [esp+8]
+  movd        xmm4,dword [esi]
+  movd        xmm5,dword [esi+ecx]
+  movd        xmm6,dword [esi+ecx*2]
+  movd        xmm7,dword [esi+edx]
+  punpckldq   xmm0,xmm4
+  punpckldq   xmm1,xmm5
+  punpckldq   xmm2,xmm6
+  punpckldq   xmm3,xmm7
+  mov         esi,dword [esp+18h]
+  mov         edi,dword [esp+0Ch]
+  movd        xmm4,dword [esi]
+  movd        xmm5,dword [edi]
+  punpckldq   xmm4,xmm5
+  punpcklqdq  xmm0,xmm4
+  movd        xmm4,dword [esi+ecx]
+  movd        xmm5,dword [edi+ecx]
+  punpckldq   xmm4,xmm5
+  punpcklqdq  xmm1,xmm4
+  movd        xmm4,dword [esi+ecx*2]
+  movd        xmm5,dword [edi+ecx*2]
+  punpckldq   xmm4,xmm5
+  punpcklqdq  xmm2,xmm4
+  movd        xmm4,dword [esi+edx]
+  movd        xmm5,dword [edi+edx]
+  punpckldq   xmm4,xmm5
+  punpcklqdq  xmm3,xmm4
+  movdqa      xmm6,xmm0
+  punpcklbw   xmm0,xmm1
+  punpckhbw   xmm6,xmm1
+  movdqa      xmm7,xmm2
+  punpcklbw   xmm2,xmm3
+  punpckhbw   xmm7,xmm3
+  movdqa      xmm4,xmm0
+  movdqa      xmm5,xmm6
+  punpcklwd   xmm0,xmm2
+  punpckhwd   xmm4,xmm2
+  punpcklwd   xmm6,xmm7
+  punpckhwd   xmm5,xmm7
+  movdqa      xmm1,xmm0
+  movdqa      xmm2,xmm4
+  punpckldq   xmm0,xmm6
+  punpckhdq   xmm1,xmm6
+  punpckldq   xmm4,xmm5
+  punpckhdq   xmm2,xmm5
+  movdqa      xmm5,xmm0
+  movdqa      xmm6,xmm1
+  punpcklqdq  xmm0,xmm4
+  punpckhqdq  xmm5,xmm4
+  punpcklqdq  xmm1,xmm2
+  punpckhqdq  xmm6,xmm2
+  mov         edi,dword [esp+10h]
+  movdqa      [edi],xmm0
+  movdqa      [edi+10h],xmm5
+  movdqa      [edi+20h],xmm1
+  movdqa      [edi+30h],xmm6
+  movsx       ecx,word [ebp+14h]
+  movsx       edx,word [ebp+18h]
+  movdqa      xmm6,[esp+80h]
+  movdqa      xmm4,[esp+90h]
+  movdqa      xmm5,[esp+0A0h]
+  movdqa      xmm7,[esp+0B0h]
+  pxor        xmm0,xmm0
+  movd        xmm1,ecx
+  movdqa      xmm2,xmm1
+  punpcklwd   xmm2,xmm1
+  pshufd      xmm1,xmm2,0
+  movd        xmm2,edx
+  movdqa      xmm3,xmm2
+  punpcklwd   xmm3,xmm2
+  pshufd      xmm2,xmm3,0
+  movdqa      xmm3,xmm6
+  punpckhbw   xmm6,xmm0
+  movdqa      [esp+60h],xmm6
+  movdqa      xmm6,[esp+90h]
+  punpckhbw   xmm6,xmm0
+  movdqa      [esp+30h],xmm6
+  movdqa      xmm6,[esp+0A0h]
+  punpckhbw   xmm6,xmm0
+  movdqa      [esp+40h],xmm6
+  movdqa      xmm6,[esp+0B0h]
+  punpckhbw   xmm6,xmm0
+  movdqa      [esp+70h],xmm6
+  punpcklbw   xmm7,xmm0
+  punpcklbw   xmm4,xmm0
+  punpcklbw   xmm5,xmm0
+  punpcklbw   xmm3,xmm0
+  movdqa      [esp+50h],xmm7
+  movdqa      xmm6,xmm4
+  psubw       xmm6,xmm5
+  pabsw       xmm6,xmm6
+  movdqa      xmm0,xmm1
+  pcmpgtw     xmm0,xmm6
+  movdqa      xmm6,xmm3
+  psubw       xmm6,xmm4
+  pabsw       xmm6,xmm6
+  movdqa      xmm7,xmm2
+  pcmpgtw     xmm7,xmm6
+  movdqa      xmm6,[esp+50h]
+  psubw       xmm6,xmm5
+  pabsw       xmm6,xmm6
+  pand        xmm0,xmm7
+  movdqa      xmm7,xmm2
+  pcmpgtw     xmm7,xmm6
+  movdqa      xmm6,[esp+30h]
+  psubw       xmm6,[esp+40h]
+  pabsw       xmm6,xmm6
+  pcmpgtw     xmm1,xmm6
+  movdqa      xmm6,[esp+60h]
+  psubw       xmm6,[esp+30h]
+  pabsw       xmm6,xmm6
+  pand        xmm0,xmm7
+  movdqa      xmm7,xmm2
+  pcmpgtw     xmm7,xmm6
+  movdqa      xmm6,[esp+70h]
+  psubw       xmm6,[esp+40h]
+  pabsw       xmm6,xmm6
+  pand        xmm1,xmm7
+  pcmpgtw     xmm2,xmm6
+  pand        xmm1,xmm2
+  mov         eax,2
+  movsx       ecx,ax
+  movd        xmm2,ecx
+  movdqa      xmm6,xmm2
+  punpcklwd   xmm6,xmm2
+  pshufd      xmm2,xmm6,0
+  movdqa      [esp+20h],xmm2
+  movdqa      xmm2,xmm3
+  paddw       xmm2,xmm3
+  paddw       xmm2,xmm4
+  paddw       xmm2,[esp+50h]
+  paddw       xmm2,[esp+20h]
+  psraw       xmm2,2
+  movdqa      xmm6,xmm0
+  pand        xmm6,xmm2
+  movdqa      xmm2,xmm0
+  pandn       xmm2,xmm4
+  por         xmm6,xmm2
+  movdqa      xmm2,[esp+60h]
+  movdqa      xmm7,xmm2
+  paddw       xmm7,xmm2
+  paddw       xmm7,[esp+30h]
+  paddw       xmm7,[esp+70h]
+  paddw       xmm7,[esp+20h]
+  movdqa      xmm4,xmm1
+  movdqa      xmm2,xmm1
+  pandn       xmm2,[esp+30h]
+  psraw       xmm7,2
+  pand        xmm4,xmm7
+  por         xmm4,xmm2
+  movdqa      xmm2,[esp+50h]
+  packuswb    xmm6,xmm4
+  movdqa      [esp+90h],xmm6
+  movdqa      xmm6,xmm2
+  paddw       xmm6,xmm2
+  movdqa      xmm2,[esp+20h]
+  paddw       xmm6,xmm5
+  paddw       xmm6,xmm3
+  movdqa      xmm4,xmm0
+  pandn       xmm0,xmm5
+  paddw       xmm6,xmm2
+  psraw       xmm6,2
+  pand        xmm4,xmm6
+  por         xmm4,xmm0
+  movdqa      xmm0,[esp+70h]
+  movdqa      xmm5,xmm0
+  paddw       xmm5,xmm0
+  movdqa      xmm0,[esp+40h]
+  paddw       xmm5,xmm0
+  paddw       xmm5,[esp+60h]
+  movdqa      xmm3,xmm1
+  paddw       xmm5,xmm2
+  psraw       xmm5,2
+  pand        xmm3,xmm5
+  pandn       xmm1,xmm0
+  por         xmm3,xmm1
+  packuswb    xmm4,xmm3
+  movdqa      [esp+0A0h],xmm4
+  mov         esi,dword [esp+10h]
+  movdqa      xmm0,[esi]
+  movdqa      xmm1,[esi+10h]
+  movdqa      xmm2,[esi+20h]
+  movdqa      xmm3,[esi+30h]
+  movdqa      xmm6,xmm0
+  punpcklbw   xmm0,xmm1
+  punpckhbw   xmm6,xmm1
+  movdqa      xmm7,xmm2
+  punpcklbw   xmm2,xmm3
+  punpckhbw   xmm7,xmm3
+  movdqa      xmm4,xmm0
+  movdqa      xmm5,xmm6
+  punpcklwd   xmm0,xmm2
+  punpckhwd   xmm4,xmm2
+  punpcklwd   xmm6,xmm7
+  punpckhwd   xmm5,xmm7
+  movdqa      xmm1,xmm0
+  movdqa      xmm2,xmm4
+  punpckldq   xmm0,xmm6
+  punpckhdq   xmm1,xmm6
+  punpckldq   xmm4,xmm5
+  punpckhdq   xmm2,xmm5
+  movdqa      xmm5,xmm0
+  movdqa      xmm6,xmm1
+  punpcklqdq  xmm0,xmm4
+  punpckhqdq  xmm5,xmm4
+  punpcklqdq  xmm1,xmm2
+  punpckhqdq  xmm6,xmm2
+  mov         esi,dword [esp+1Ch]
+  mov         ecx,dword [ebp+10h]
+  mov         edx,dword [esp+14h]
+  mov         edi,dword [esp+8]
+  movd        dword [esi],xmm0
+  movd        dword [esi+ecx],xmm5
+  movd        dword [esi+ecx*2],xmm1
+  movd        dword [esi+edx],xmm6
+  psrldq      xmm0,4
+  psrldq      xmm5,4
+  psrldq      xmm1,4
+  psrldq      xmm6,4
+  mov         esi,dword [esp+18h]
+  movd        dword [edi],xmm0
+  movd        dword [edi+ecx],xmm5
+  movd        dword [edi+ecx*2],xmm1
+  movd        dword [edi+edx],xmm6
+  psrldq      xmm0,4
+  psrldq      xmm5,4
+  psrldq      xmm1,4
+  psrldq      xmm6,4
+  movd        dword [esi],xmm0
+  movd        dword [esi+ecx],xmm5
+  movd        dword [esi+ecx*2],xmm1
+  movd        dword [esi+edx],xmm6
+  psrldq      xmm0,4
+  psrldq      xmm5,4
+  psrldq      xmm1,4
+  psrldq      xmm6,4
+  mov         edi,dword [esp+0Ch]
+  movd        dword [edi],xmm0
+  movd        dword [edi+ecx],xmm5
+  movd        dword [edi+ecx*2],xmm1
+  movd        dword [edi+edx],xmm6
+  pop         edi
+  pop         esi
+  mov         esp,ebp
+  pop         ebp
+  ret
+
 ;*******************************************************************************
-;    void DeblockChromaLt4H_sse2(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride, 
+;    void DeblockChromaLt4H_sse2(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride,
 ;                                int32_t iAlpha, int32_t iBeta, int8_t * pTC);
 ;*******************************************************************************
-  
+
 WELS_EXTERN  DeblockChromaLt4H_sse2
-  
+
 ALIGN  16
 
 DeblockChromaLt4H_sse2:
-  push        ebp  
-  mov         ebp,esp 
-  and         esp,0FFFFFFF0h 
-  sub         esp,108h   
-  mov         ecx,dword [ebp+8] 
-  mov         edx,dword [ebp+0Ch] 
-  mov         eax,dword [ebp+10h] 
-  sub         ecx,2 
-  sub         edx,2 
-  push        esi  
-  lea         esi,[eax+eax*2] 
-  mov         dword [esp+10h],ecx 
-  mov         dword [esp+4],edx 
-  lea         ecx,[ecx+eax*4] 
-  lea         edx,[edx+eax*4] 
-  lea         eax,[esp+6Ch] 
-  push        edi  
-  mov         dword [esp+0Ch],esi 
-  mov         dword [esp+18h],ecx 
-  mov         dword [esp+10h],edx 
-  mov         dword [esp+1Ch],eax 
-  mov         esi,dword [esp+14h] 
-  mov         ecx,dword [ebp+10h] 
-  mov         edx,dword [esp+0Ch] 
-  movd        xmm0,dword [esi] 
-  movd        xmm1,dword [esi+ecx] 
-  movd        xmm2,dword [esi+ecx*2] 
-  movd        xmm3,dword [esi+edx] 
-  mov         esi,dword [esp+8] 
-  movd        xmm4,dword [esi] 
-  movd        xmm5,dword [esi+ecx] 
-  movd        xmm6,dword [esi+ecx*2] 
-  movd        xmm7,dword [esi+edx] 
-  punpckldq   xmm0,xmm4 
-  punpckldq   xmm1,xmm5 
-  punpckldq   xmm2,xmm6 
-  punpckldq   xmm3,xmm7 
-  mov         esi,dword [esp+18h] 
-  mov         edi,dword [esp+10h] 
-  movd        xmm4,dword [esi] 
-  movd        xmm5,dword [edi] 
-  punpckldq   xmm4,xmm5 
-  punpcklqdq  xmm0,xmm4 
-  movd        xmm4,dword [esi+ecx] 
-  movd        xmm5,dword [edi+ecx] 
-  punpckldq   xmm4,xmm5 
-  punpcklqdq  xmm1,xmm4 
-  movd        xmm4,dword [esi+ecx*2] 
-  movd        xmm5,dword [edi+ecx*2] 
-  punpckldq   xmm4,xmm5 
-  punpcklqdq  xmm2,xmm4 
-  movd        xmm4,dword [esi+edx] 
-  movd        xmm5,dword [edi+edx] 
-  punpckldq   xmm4,xmm5 
-  punpcklqdq  xmm3,xmm4 
-  movdqa      xmm6,xmm0 
-  punpcklbw   xmm0,xmm1 
-  punpckhbw   xmm6,xmm1 
-  movdqa      xmm7,xmm2 
-  punpcklbw   xmm2,xmm3 
-  punpckhbw   xmm7,xmm3 
-  movdqa      xmm4,xmm0 
-  movdqa      xmm5,xmm6 
-  punpcklwd   xmm0,xmm2 
-  punpckhwd   xmm4,xmm2 
-  punpcklwd   xmm6,xmm7 
-  punpckhwd   xmm5,xmm7 
-  movdqa      xmm1,xmm0 
-  movdqa      xmm2,xmm4 
-  punpckldq   xmm0,xmm6 
-  punpckhdq   xmm1,xmm6 
-  punpckldq   xmm4,xmm5 
-  punpckhdq   xmm2,xmm5 
-  movdqa      xmm5,xmm0 
-  movdqa      xmm6,xmm1 
-  punpcklqdq  xmm0,xmm4 
-  punpckhqdq  xmm5,xmm4 
-  punpcklqdq  xmm1,xmm2 
-  punpckhqdq  xmm6,xmm2 
-  mov         edi,dword [esp+1Ch] 
-  movdqa      [edi],xmm0 
-  movdqa      [edi+10h],xmm5 
-  movdqa      [edi+20h],xmm1 
-  movdqa      [edi+30h],xmm6 
-  mov         eax,dword [ebp+1Ch] 
-  movsx       cx,byte [eax+3] 
-  movsx       dx,byte [eax+2] 
-  movsx       si,byte [eax+1] 
-  movsx       ax,byte [eax] 
-  movzx       edi,cx 
-  movzx       ecx,cx 
-  movd        xmm2,ecx 
-  movzx       ecx,dx 
-  movzx       edx,dx 
-  movd        xmm3,ecx 
-  movd        xmm4,edx 
-  movzx       ecx,si 
-  movzx       edx,si 
-  movd        xmm5,ecx 
-  pxor        xmm0,xmm0 
-  movd        xmm6,edx 
-  movzx       ecx,ax 
-  movdqa      [esp+60h],xmm0 
-  movzx       edx,ax 
-  movsx       eax,word [ebp+14h] 
-  punpcklwd   xmm6,xmm2 
-  movd        xmm1,edi 
-  movd        xmm7,ecx 
-  movsx       ecx,word [ebp+18h] 
-  movd        xmm0,edx 
-  punpcklwd   xmm7,xmm3 
-  punpcklwd   xmm5,xmm1 
-  movdqa      xmm1,[esp+60h] 
-  punpcklwd   xmm7,xmm5 
-  movdqa      xmm5,[esp+0A0h] 
-  punpcklwd   xmm0,xmm4 
-  punpcklwd   xmm0,xmm6 
-  movdqa      xmm6, [esp+70h] 
-  punpcklwd   xmm0,xmm7 
-  movdqa      xmm7,[esp+80h] 
-  movdqa      xmm2,xmm1 
-  psubw       xmm2,xmm0 
-  movdqa      [esp+0D0h],xmm2 
-  movd        xmm2,eax 
-  movdqa      xmm3,xmm2 
-  punpcklwd   xmm3,xmm2 
-  pshufd      xmm4,xmm3,0 
-  movd        xmm2,ecx 
-  movdqa      xmm3,xmm2 
-  punpcklwd   xmm3,xmm2 
-  pshufd      xmm2,xmm3,0 
-  movdqa      xmm3, [esp+90h] 
-  movdqa      [esp+50h],xmm2 
-  movdqa      xmm2,xmm6 
-  punpcklbw   xmm2,xmm1 
-  punpckhbw   xmm6,xmm1 
-  movdqa      [esp+40h],xmm2 
-  movdqa      [esp+0B0h],xmm6 
-  movdqa      xmm6,[esp+90h] 
-  movdqa      xmm2,xmm7 
-  punpckhbw   xmm7,xmm1 
-  punpckhbw   xmm6,xmm1 
-  punpcklbw   xmm2,xmm1 
-  punpcklbw   xmm3,xmm1 
-  punpcklbw   xmm5,xmm1 
-  movdqa      [esp+0F0h],xmm7 
-  movdqa      [esp+0C0h],xmm6 
-  movdqa      xmm6, [esp+0A0h] 
-  punpckhbw   xmm6,xmm1 
-  movdqa      [esp+0E0h],xmm6 
-  mov         edx,4 
-  movsx       eax,dx 
-  movd        xmm6,eax 
-  movdqa      xmm7,xmm6 
-  punpcklwd   xmm7,xmm6 
-  pshufd      xmm6,xmm7,0 
-  movdqa      [esp+30h],xmm6 
-  movdqa      xmm7, [esp+40h] 
-  psubw       xmm7,xmm5 
-  movdqa      xmm6,xmm0 
-  pcmpgtw     xmm6,xmm1 
-  movdqa      [esp+60h],xmm6 
-  movdqa      xmm1, [esp+0D0h] 
-  movdqa      xmm6,xmm3 
-  psubw       xmm6,xmm2 
-  psllw       xmm6,2 
-  paddw       xmm6,xmm7 
-  paddw       xmm6,[esp+30h] 
-  psraw       xmm6,3 
-  pmaxsw      xmm1,xmm6 
-  movdqa      xmm7,[esp+50h] 
-  movdqa      [esp+20h],xmm0 
-  movdqa      xmm6, [esp+20h] 
-  pminsw      xmm6,xmm1 
-  movdqa      [esp+20h],xmm6 
-  movdqa      xmm6,xmm4 
-  movdqa      xmm1,xmm2 
-  psubw       xmm1,xmm3 
-  pabsw       xmm1,xmm1 
-  pcmpgtw     xmm6,xmm1 
-  movdqa      xmm1, [esp+40h] 
-  psubw       xmm1,xmm2 
-  pabsw       xmm1,xmm1 
-  pcmpgtw     xmm7,xmm1 
-  movdqa      xmm1, [esp+50h] 
-  pand        xmm6,xmm7 
-  movdqa      xmm7, [esp+50h] 
-  psubw       xmm5,xmm3 
-  pabsw       xmm5,xmm5 
-  pcmpgtw     xmm1,xmm5 
-  movdqa      xmm5, [esp+0B0h] 
-  psubw       xmm5,[esp+0E0h] 
-  pand        xmm6,xmm1 
-  pand        xmm6, [esp+60h] 
-  movdqa      xmm1, [esp+20h] 
-  pand        xmm1,xmm6 
-  movdqa      xmm6, [esp+0C0h] 
-  movdqa      [esp+40h],xmm1 
-  movdqa      xmm1, [esp+0F0h] 
-  psubw       xmm6,xmm1 
-  psllw       xmm6,2 
-  paddw       xmm6,xmm5 
-  paddw       xmm6, [esp+30h] 
-  movdqa      xmm5, [esp+0D0h] 
-  psraw       xmm6,3 
-  pmaxsw      xmm5,xmm6 
-  pminsw      xmm0,xmm5 
-  movdqa      xmm5,[esp+0C0h] 
-  movdqa      xmm6,xmm1 
-  psubw       xmm6,xmm5 
-  pabsw       xmm6,xmm6 
-  pcmpgtw     xmm4,xmm6 
-  movdqa      xmm6,[esp+0B0h] 
-  psubw       xmm6,xmm1 
-  pabsw       xmm6,xmm6 
-  pcmpgtw     xmm7,xmm6 
-  movdqa      xmm6, [esp+0E0h] 
-  pand        xmm4,xmm7 
-  movdqa      xmm7, [esp+50h] 
-  psubw       xmm6,xmm5 
-  pabsw       xmm6,xmm6 
-  pcmpgtw     xmm7,xmm6 
-  pand        xmm4,xmm7 
-  pand        xmm4,[esp+60h] 
-  pand        xmm0,xmm4 
-  movdqa      xmm4, [esp+40h] 
-  paddw       xmm2,xmm4 
-  paddw       xmm1,xmm0 
-  psubw       xmm3,xmm4 
-  psubw       xmm5,xmm0 
-  packuswb    xmm2,xmm1 
-  packuswb    xmm3,xmm5 
-  movdqa      [esp+80h],xmm2 
-  movdqa      [esp+90h],xmm3 
-  mov         esi,dword [esp+1Ch] 
-  movdqa      xmm0, [esi] 
-  movdqa      xmm1, [esi+10h] 
-  movdqa      xmm2, [esi+20h] 
-  movdqa      xmm3, [esi+30h] 
-  movdqa      xmm6,xmm0 
-  punpcklbw   xmm0,xmm1 
-  punpckhbw   xmm6,xmm1 
-  movdqa      xmm7,xmm2 
-  punpcklbw   xmm2,xmm3 
-  punpckhbw   xmm7,xmm3 
-  movdqa      xmm4,xmm0 
-  movdqa      xmm5,xmm6 
-  punpcklwd   xmm0,xmm2 
-  punpckhwd   xmm4,xmm2 
-  punpcklwd   xmm6,xmm7 
-  punpckhwd   xmm5,xmm7 
-  movdqa      xmm1,xmm0 
-  movdqa      xmm2,xmm4 
-  punpckldq   xmm0,xmm6 
-  punpckhdq   xmm1,xmm6 
-  punpckldq   xmm4,xmm5 
-  punpckhdq   xmm2,xmm5 
-  movdqa      xmm5,xmm0 
-  movdqa      xmm6,xmm1 
-  punpcklqdq  xmm0,xmm4 
-  punpckhqdq  xmm5,xmm4 
-  punpcklqdq  xmm1,xmm2 
-  punpckhqdq  xmm6,xmm2 
-  mov         esi,dword [esp+14h] 
-  mov         ecx,dword [ebp+10h] 
-  mov         edx,dword [esp+0Ch] 
-  mov         edi,dword [esp+8] 
-  movd        dword [esi],xmm0 
-  movd        dword [esi+ecx],xmm5 
-  movd        dword [esi+ecx*2],xmm1 
-  movd        dword [esi+edx],xmm6 
-  psrldq      xmm0,4 
-  psrldq      xmm5,4 
-  psrldq      xmm1,4 
-  psrldq      xmm6,4 
-  mov         esi,dword [esp+18h] 
-  movd        dword [edi],xmm0 
-  movd        dword [edi+ecx],xmm5 
-  movd        dword [edi+ecx*2],xmm1 
-  movd        dword [edi+edx],xmm6 
-  psrldq      xmm0,4 
-  psrldq      xmm5,4 
-  psrldq      xmm1,4 
-  psrldq      xmm6,4 
-  movd        dword [esi],xmm0 
-  movd        dword [esi+ecx],xmm5 
-  movd        dword [esi+ecx*2],xmm1 
-  movd        dword [esi+edx],xmm6 
-  psrldq      xmm0,4 
-  psrldq      xmm5,4 
-  psrldq      xmm1,4 
-  psrldq      xmm6,4 
-  mov         edi,dword [esp+10h] 
-  movd        dword [edi],xmm0 
-  movd        dword [edi+ecx],xmm5 
-  movd        dword [edi+ecx*2],xmm1 
-  movd        dword [edi+edx],xmm6  
-  pop         edi  
-  pop         esi   
-  mov         esp,ebp 
-  pop         ebp  
-  ret     
-  
-  
-  
+  push        ebp
+  mov         ebp,esp
+  and         esp,0FFFFFFF0h
+  sub         esp,108h
+  mov         ecx,dword [ebp+8]
+  mov         edx,dword [ebp+0Ch]
+  mov         eax,dword [ebp+10h]
+  sub         ecx,2
+  sub         edx,2
+  push        esi
+  lea         esi,[eax+eax*2]
+  mov         dword [esp+10h],ecx
+  mov         dword [esp+4],edx
+  lea         ecx,[ecx+eax*4]
+  lea         edx,[edx+eax*4]
+  lea         eax,[esp+6Ch]
+  push        edi
+  mov         dword [esp+0Ch],esi
+  mov         dword [esp+18h],ecx
+  mov         dword [esp+10h],edx
+  mov         dword [esp+1Ch],eax
+  mov         esi,dword [esp+14h]
+  mov         ecx,dword [ebp+10h]
+  mov         edx,dword [esp+0Ch]
+  movd        xmm0,dword [esi]
+  movd        xmm1,dword [esi+ecx]
+  movd        xmm2,dword [esi+ecx*2]
+  movd        xmm3,dword [esi+edx]
+  mov         esi,dword [esp+8]
+  movd        xmm4,dword [esi]
+  movd        xmm5,dword [esi+ecx]
+  movd        xmm6,dword [esi+ecx*2]
+  movd        xmm7,dword [esi+edx]
+  punpckldq   xmm0,xmm4
+  punpckldq   xmm1,xmm5
+  punpckldq   xmm2,xmm6
+  punpckldq   xmm3,xmm7
+  mov         esi,dword [esp+18h]
+  mov         edi,dword [esp+10h]
+  movd        xmm4,dword [esi]
+  movd        xmm5,dword [edi]
+  punpckldq   xmm4,xmm5
+  punpcklqdq  xmm0,xmm4
+  movd        xmm4,dword [esi+ecx]
+  movd        xmm5,dword [edi+ecx]
+  punpckldq   xmm4,xmm5
+  punpcklqdq  xmm1,xmm4
+  movd        xmm4,dword [esi+ecx*2]
+  movd        xmm5,dword [edi+ecx*2]
+  punpckldq   xmm4,xmm5
+  punpcklqdq  xmm2,xmm4
+  movd        xmm4,dword [esi+edx]
+  movd        xmm5,dword [edi+edx]
+  punpckldq   xmm4,xmm5
+  punpcklqdq  xmm3,xmm4
+  movdqa      xmm6,xmm0
+  punpcklbw   xmm0,xmm1
+  punpckhbw   xmm6,xmm1
+  movdqa      xmm7,xmm2
+  punpcklbw   xmm2,xmm3
+  punpckhbw   xmm7,xmm3
+  movdqa      xmm4,xmm0
+  movdqa      xmm5,xmm6
+  punpcklwd   xmm0,xmm2
+  punpckhwd   xmm4,xmm2
+  punpcklwd   xmm6,xmm7
+  punpckhwd   xmm5,xmm7
+  movdqa      xmm1,xmm0
+  movdqa      xmm2,xmm4
+  punpckldq   xmm0,xmm6
+  punpckhdq   xmm1,xmm6
+  punpckldq   xmm4,xmm5
+  punpckhdq   xmm2,xmm5
+  movdqa      xmm5,xmm0
+  movdqa      xmm6,xmm1
+  punpcklqdq  xmm0,xmm4
+  punpckhqdq  xmm5,xmm4
+  punpcklqdq  xmm1,xmm2
+  punpckhqdq  xmm6,xmm2
+  mov         edi,dword [esp+1Ch]
+  movdqa      [edi],xmm0
+  movdqa      [edi+10h],xmm5
+  movdqa      [edi+20h],xmm1
+  movdqa      [edi+30h],xmm6
+  mov         eax,dword [ebp+1Ch]
+  movsx       cx,byte [eax+3]
+  movsx       dx,byte [eax+2]
+  movsx       si,byte [eax+1]
+  movsx       ax,byte [eax]
+  movzx       edi,cx
+  movzx       ecx,cx
+  movd        xmm2,ecx
+  movzx       ecx,dx
+  movzx       edx,dx
+  movd        xmm3,ecx
+  movd        xmm4,edx
+  movzx       ecx,si
+  movzx       edx,si
+  movd        xmm5,ecx
+  pxor        xmm0,xmm0
+  movd        xmm6,edx
+  movzx       ecx,ax
+  movdqa      [esp+60h],xmm0
+  movzx       edx,ax
+  movsx       eax,word [ebp+14h]
+  punpcklwd   xmm6,xmm2
+  movd        xmm1,edi
+  movd        xmm7,ecx
+  movsx       ecx,word [ebp+18h]
+  movd        xmm0,edx
+  punpcklwd   xmm7,xmm3
+  punpcklwd   xmm5,xmm1
+  movdqa      xmm1,[esp+60h]
+  punpcklwd   xmm7,xmm5
+  movdqa      xmm5,[esp+0A0h]
+  punpcklwd   xmm0,xmm4
+  punpcklwd   xmm0,xmm6
+  movdqa      xmm6, [esp+70h]
+  punpcklwd   xmm0,xmm7
+  movdqa      xmm7,[esp+80h]
+  movdqa      xmm2,xmm1
+  psubw       xmm2,xmm0
+  movdqa      [esp+0D0h],xmm2
+  movd        xmm2,eax
+  movdqa      xmm3,xmm2
+  punpcklwd   xmm3,xmm2
+  pshufd      xmm4,xmm3,0
+  movd        xmm2,ecx
+  movdqa      xmm3,xmm2
+  punpcklwd   xmm3,xmm2
+  pshufd      xmm2,xmm3,0
+  movdqa      xmm3, [esp+90h]
+  movdqa      [esp+50h],xmm2
+  movdqa      xmm2,xmm6
+  punpcklbw   xmm2,xmm1
+  punpckhbw   xmm6,xmm1
+  movdqa      [esp+40h],xmm2
+  movdqa      [esp+0B0h],xmm6
+  movdqa      xmm6,[esp+90h]
+  movdqa      xmm2,xmm7
+  punpckhbw   xmm7,xmm1
+  punpckhbw   xmm6,xmm1
+  punpcklbw   xmm2,xmm1
+  punpcklbw   xmm3,xmm1
+  punpcklbw   xmm5,xmm1
+  movdqa      [esp+0F0h],xmm7
+  movdqa      [esp+0C0h],xmm6
+  movdqa      xmm6, [esp+0A0h]
+  punpckhbw   xmm6,xmm1
+  movdqa      [esp+0E0h],xmm6
+  mov         edx,4
+  movsx       eax,dx
+  movd        xmm6,eax
+  movdqa      xmm7,xmm6
+  punpcklwd   xmm7,xmm6
+  pshufd      xmm6,xmm7,0
+  movdqa      [esp+30h],xmm6
+  movdqa      xmm7, [esp+40h]
+  psubw       xmm7,xmm5
+  movdqa      xmm6,xmm0
+  pcmpgtw     xmm6,xmm1
+  movdqa      [esp+60h],xmm6
+  movdqa      xmm1, [esp+0D0h]
+  movdqa      xmm6,xmm3
+  psubw       xmm6,xmm2
+  psllw       xmm6,2
+  paddw       xmm6,xmm7
+  paddw       xmm6,[esp+30h]
+  psraw       xmm6,3
+  pmaxsw      xmm1,xmm6
+  movdqa      xmm7,[esp+50h]
+  movdqa      [esp+20h],xmm0
+  movdqa      xmm6, [esp+20h]
+  pminsw      xmm6,xmm1
+  movdqa      [esp+20h],xmm6
+  movdqa      xmm6,xmm4
+  movdqa      xmm1,xmm2
+  psubw       xmm1,xmm3
+  pabsw       xmm1,xmm1
+  pcmpgtw     xmm6,xmm1
+  movdqa      xmm1, [esp+40h]
+  psubw       xmm1,xmm2
+  pabsw       xmm1,xmm1
+  pcmpgtw     xmm7,xmm1
+  movdqa      xmm1, [esp+50h]
+  pand        xmm6,xmm7
+  movdqa      xmm7, [esp+50h]
+  psubw       xmm5,xmm3
+  pabsw       xmm5,xmm5
+  pcmpgtw     xmm1,xmm5
+  movdqa      xmm5, [esp+0B0h]
+  psubw       xmm5,[esp+0E0h]
+  pand        xmm6,xmm1
+  pand        xmm6, [esp+60h]
+  movdqa      xmm1, [esp+20h]
+  pand        xmm1,xmm6
+  movdqa      xmm6, [esp+0C0h]
+  movdqa      [esp+40h],xmm1
+  movdqa      xmm1, [esp+0F0h]
+  psubw       xmm6,xmm1
+  psllw       xmm6,2
+  paddw       xmm6,xmm5
+  paddw       xmm6, [esp+30h]
+  movdqa      xmm5, [esp+0D0h]
+  psraw       xmm6,3
+  pmaxsw      xmm5,xmm6
+  pminsw      xmm0,xmm5
+  movdqa      xmm5,[esp+0C0h]
+  movdqa      xmm6,xmm1
+  psubw       xmm6,xmm5
+  pabsw       xmm6,xmm6
+  pcmpgtw     xmm4,xmm6
+  movdqa      xmm6,[esp+0B0h]
+  psubw       xmm6,xmm1
+  pabsw       xmm6,xmm6
+  pcmpgtw     xmm7,xmm6
+  movdqa      xmm6, [esp+0E0h]
+  pand        xmm4,xmm7
+  movdqa      xmm7, [esp+50h]
+  psubw       xmm6,xmm5
+  pabsw       xmm6,xmm6
+  pcmpgtw     xmm7,xmm6
+  pand        xmm4,xmm7
+  pand        xmm4,[esp+60h]
+  pand        xmm0,xmm4
+  movdqa      xmm4, [esp+40h]
+  paddw       xmm2,xmm4
+  paddw       xmm1,xmm0
+  psubw       xmm3,xmm4
+  psubw       xmm5,xmm0
+  packuswb    xmm2,xmm1
+  packuswb    xmm3,xmm5
+  movdqa      [esp+80h],xmm2
+  movdqa      [esp+90h],xmm3
+  mov         esi,dword [esp+1Ch]
+  movdqa      xmm0, [esi]
+  movdqa      xmm1, [esi+10h]
+  movdqa      xmm2, [esi+20h]
+  movdqa      xmm3, [esi+30h]
+  movdqa      xmm6,xmm0
+  punpcklbw   xmm0,xmm1
+  punpckhbw   xmm6,xmm1
+  movdqa      xmm7,xmm2
+  punpcklbw   xmm2,xmm3
+  punpckhbw   xmm7,xmm3
+  movdqa      xmm4,xmm0
+  movdqa      xmm5,xmm6
+  punpcklwd   xmm0,xmm2
+  punpckhwd   xmm4,xmm2
+  punpcklwd   xmm6,xmm7
+  punpckhwd   xmm5,xmm7
+  movdqa      xmm1,xmm0
+  movdqa      xmm2,xmm4
+  punpckldq   xmm0,xmm6
+  punpckhdq   xmm1,xmm6
+  punpckldq   xmm4,xmm5
+  punpckhdq   xmm2,xmm5
+  movdqa      xmm5,xmm0
+  movdqa      xmm6,xmm1
+  punpcklqdq  xmm0,xmm4
+  punpckhqdq  xmm5,xmm4
+  punpcklqdq  xmm1,xmm2
+  punpckhqdq  xmm6,xmm2
+  mov         esi,dword [esp+14h]
+  mov         ecx,dword [ebp+10h]
+  mov         edx,dword [esp+0Ch]
+  mov         edi,dword [esp+8]
+  movd        dword [esi],xmm0
+  movd        dword [esi+ecx],xmm5
+  movd        dword [esi+ecx*2],xmm1
+  movd        dword [esi+edx],xmm6
+  psrldq      xmm0,4
+  psrldq      xmm5,4
+  psrldq      xmm1,4
+  psrldq      xmm6,4
+  mov         esi,dword [esp+18h]
+  movd        dword [edi],xmm0
+  movd        dword [edi+ecx],xmm5
+  movd        dword [edi+ecx*2],xmm1
+  movd        dword [edi+edx],xmm6
+  psrldq      xmm0,4
+  psrldq      xmm5,4
+  psrldq      xmm1,4
+  psrldq      xmm6,4
+  movd        dword [esi],xmm0
+  movd        dword [esi+ecx],xmm5
+  movd        dword [esi+ecx*2],xmm1
+  movd        dword [esi+edx],xmm6
+  psrldq      xmm0,4
+  psrldq      xmm5,4
+  psrldq      xmm1,4
+  psrldq      xmm6,4
+  mov         edi,dword [esp+10h]
+  movd        dword [edi],xmm0
+  movd        dword [edi+ecx],xmm5
+  movd        dword [edi+ecx*2],xmm1
+  movd        dword [edi+edx],xmm6
+  pop         edi
+  pop         esi
+  mov         esp,ebp
+  pop         ebp
+  ret
+
+
+
 ;*******************************************************************************
-;    void DeblockLumaLt4V_sse2(uint8_t * pPix, int32_t iStride, int32_t iAlpha, 
+;    void DeblockLumaLt4V_sse2(uint8_t * pPix, int32_t iStride, int32_t iAlpha,
 ;                                 int32_t iBeta, int8_t * pTC)
 ;*******************************************************************************
-  
+
 
 WELS_EXTERN  DeblockLumaLt4V_sse2
-  
+
 ALIGN  16
 
 DeblockLumaLt4V_sse2:
@@ -1419,12 +1419,12 @@ DeblockLumaLt4V_sse2:
 
 
 ;*******************************************************************************
-;    void DeblockLumaEq4V_sse2(uint8_t * pPix, int32_t iStride, int32_t iAlpha, 
+;    void DeblockLumaEq4V_sse2(uint8_t * pPix, int32_t iStride, int32_t iAlpha,
 ;                                 int32_t iBeta)
 ;*******************************************************************************
 
 WELS_EXTERN  DeblockLumaEq4V_sse2
-  
+
 ALIGN  16
 
 DeblockLumaEq4V_sse2:
@@ -1965,11 +1965,11 @@ DeblockLumaEq4V_sse2:
 	mov	esp, ebp
 	pop	ebp
 	ret
-  
-    
+
+
 ;********************************************************************************
 ;
-;   void DeblockLumaTransposeH2V_sse2(uint8_t * pPixY, int32_t iStride, uint8_t * pDst);     
+;   void DeblockLumaTransposeH2V_sse2(uint8_t * pPixY, int32_t iStride, uint8_t * pDst);
 ;
 ;********************************************************************************
 
@@ -1982,64 +1982,64 @@ DeblockLumaTransposeH2V_sse2:
     push    ebx
     mov     ebp,   esp
     and     esp,0FFFFFFF0h
-    sub     esp,   10h    
-    
-    mov     eax,   [ebp + 0Ch]  
+    sub     esp,   10h
+
+    mov     eax,   [ebp + 0Ch]
     mov     ecx,   [ebp + 10h]
     lea     edx,   [eax + ecx * 8]
     lea     ebx,   [ecx*3]
-    
-    movq    xmm0,  [eax] 
+
+    movq    xmm0,  [eax]
     movq    xmm7,  [edx]
-    punpcklqdq   xmm0,  xmm7  
+    punpcklqdq   xmm0,  xmm7
     movq    xmm1,  [eax + ecx]
     movq    xmm7,  [edx + ecx]
     punpcklqdq   xmm1,  xmm7
-    movq    xmm2,  [eax + ecx*2] 
+    movq    xmm2,  [eax + ecx*2]
     movq    xmm7,  [edx + ecx*2]
     punpcklqdq   xmm2,  xmm7
     movq    xmm3,  [eax + ebx]
     movq    xmm7,  [edx + ebx]
     punpcklqdq   xmm3,  xmm7
-    
+
     lea     eax,   [eax + ecx * 4]
     lea     edx,   [edx + ecx * 4]
-    movq    xmm4,  [eax] 
+    movq    xmm4,  [eax]
     movq    xmm7,  [edx]
-    punpcklqdq   xmm4,  xmm7  
+    punpcklqdq   xmm4,  xmm7
     movq    xmm5,  [eax + ecx]
     movq    xmm7,  [edx + ecx]
     punpcklqdq   xmm5,  xmm7
-    movq    xmm6,  [eax + ecx*2] 
+    movq    xmm6,  [eax + ecx*2]
     movq    xmm7,  [edx + ecx*2]
     punpcklqdq   xmm6,  xmm7
-    
+
     movdqa  [esp],   xmm0
     movq    xmm7,  [eax + ebx]
     movq    xmm0,  [edx + ebx]
     punpcklqdq   xmm7,  xmm0
     movdqa  xmm0,   [esp]
-    
+
     SSE2_TransTwo8x8B  xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [esp]
     ;pOut: m5, m3, m4, m8, m6, m2, m7, m1
-    
+
     mov    eax,   [ebp + 14h]
-    movdqa  [eax],    xmm4 
+    movdqa  [eax],    xmm4
     movdqa  [eax + 10h],  xmm2
     movdqa  [eax + 20h],  xmm3
     movdqa  [eax + 30h],  xmm7
     movdqa  [eax + 40h],  xmm5
     movdqa  [eax + 50h],  xmm1
     movdqa  [eax + 60h],  xmm6
-    movdqa  [eax + 70h],  xmm0   
-    
+    movdqa  [eax + 70h],  xmm0
+
     mov     esp,   ebp
     pop     ebx
     pop     ebp
     ret
-    
-    
-    
+
+
+
 ;*******************************************************************************************
 ;
 ;   void DeblockLumaTransposeV2H_sse2(uint8_t * pPixY, int32_t iStride, uint8_t * pSrc);
@@ -2053,14 +2053,14 @@ ALIGN  16
 DeblockLumaTransposeV2H_sse2:
     push     ebp
     mov      ebp,   esp
-    
+
     and     esp,  0FFFFFFF0h
-    sub     esp,   10h  
-    
-    mov      eax,   [ebp + 10h]  
+    sub     esp,   10h
+
+    mov      eax,   [ebp + 10h]
     mov      ecx,   [ebp + 0Ch]
     mov      edx,   [ebp + 08h]
-      
+
     movdqa   xmm0,  [eax]
     movdqa   xmm1,  [eax + 10h]
     movdqa   xmm2,  [eax + 20h]
@@ -2069,23 +2069,23 @@ DeblockLumaTransposeV2H_sse2:
     movdqa   xmm5,	[eax + 50h]
     movdqa   xmm6,	[eax + 60h]
     movdqa   xmm7,	[eax + 70h]
-    
+
     SSE2_TransTwo8x8B  xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [esp]
     ;pOut: m5, m3, m4, m8, m6, m2, m7, m1
-    
+
     lea      eax,   [ecx * 3]
-    
-    movq     [edx],  xmm4 
+
+    movq     [edx],  xmm4
     movq     [edx + ecx],  xmm2
     movq     [edx + ecx*2],  xmm3
     movq     [edx + eax],  xmm7
-    
+
     lea      edx,   [edx + ecx*4]
-    movq     [edx],  xmm5 
+    movq     [edx],  xmm5
     movq     [edx + ecx],  xmm1
     movq     [edx + ecx*2],  xmm6
-    movq     [edx + eax],  xmm0    
-    
+    movq     [edx + eax],  xmm0
+
     psrldq    xmm4,   8
     psrldq    xmm2,   8
     psrldq    xmm3,   8
@@ -2094,20 +2094,20 @@ DeblockLumaTransposeV2H_sse2:
     psrldq    xmm1,   8
     psrldq    xmm6,   8
     psrldq    xmm0,   8
-    
+
     lea       edx,  [edx + ecx*4]
-    movq     [edx],  xmm4 
+    movq     [edx],  xmm4
     movq     [edx + ecx],  xmm2
     movq     [edx + ecx*2],  xmm3
     movq     [edx + eax],  xmm7
-    
+
     lea      edx,   [edx + ecx*4]
-    movq     [edx],  xmm5 
+    movq     [edx],  xmm5
     movq     [edx + ecx],  xmm1
     movq     [edx + ecx*2],  xmm6
-    movq     [edx + eax],  xmm0   
-    
-    
+    movq     [edx + eax],  xmm0
+
+
     mov      esp,   ebp
     pop      ebp
     ret

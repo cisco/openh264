@@ -83,7 +83,7 @@ namespace WelsDec {
 //	#define __align8(t,v) t v __attribute__ ((aligned (8)))
 	#define __align16(t,v) t v __attribute__ ((aligned (16)))
 
-#if defined(APPLE_IOS)  
+#if defined(APPLE_IOS)
     #define inline  //For iOS platform
 #endif
 
@@ -159,8 +159,8 @@ the second path will degrades the performance
 #if 1
 static inline int32_t WelsMedian(int32_t iX,  int32_t iY, int32_t iZ)
 {
-	int32_t iMin = iX, iMax = iX;	
-	
+	int32_t iMin = iX, iMax = iX;
+
 	if ( iY < iMin )
 		iMin	= iY;
 	else
@@ -222,7 +222,7 @@ static inline int32_t WelsMedian(int32_t iX,  int32_t iY, int32_t iZ)
 #endif//#if WELS_VERIFY_RETURN_IF
 
 /*
- *	Description: to check variable validation and return the specified result 
+ *	Description: to check variable validation and return the specified result
  *		with correspoinding process advance.
  *	 result:	value to be return
  *	 case_if:	negative condition to be verified
@@ -281,7 +281,7 @@ static inline int32_t WelsMedian(int32_t iX,  int32_t iY, int32_t iZ)
  * Description: to safe free an array ptr with free function pointer
  *	arr:		pointer to an array, something like "**p";
  *	num:		number of elements in array
- *  free_fn:	free function pointer	
+ *  free_fn:	free function pointer
  */
 #ifndef WELS_SAFE_FREE_ARR
 #define WELS_SAFE_FREE_ARR(pArray, iNum, fFreeFunc) \

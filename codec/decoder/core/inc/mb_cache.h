@@ -48,7 +48,7 @@ namespace WelsDec {
  */
 /*
  * Cache for Luma				Cache for Chroma(Cb, Cr)
- *	
+ *
  *	TL T T T T					TL T T
  *	 L - - - -					 L - -
  *	 L - - - -					 L - - TR
@@ -76,7 +76,7 @@ typedef struct TagNeighborAvail
 	int32_t iLeftType;
 	int32_t iTopType;
 	int32_t iLeftTopType;
-	int32_t iRightTopType; 
+	int32_t iRightTopType;
 }SNeighAvail, *PNeighAvail;
 
 } // namespace WelsDec

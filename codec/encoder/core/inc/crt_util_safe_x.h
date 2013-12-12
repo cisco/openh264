@@ -55,23 +55,23 @@
 #include "typedefs.h"
 #endif//WIN32
 
-/* 
+/*
  * Safe Lib specific errno codes.  These can be added to the errno.h file
- * if desired. 
+ * if desired.
  */
-#define ESNULLP         ( 400 )       /* null ptr                    */  
-#define ESZEROL         ( 401 )       /* length is zero              */  
-#define ESLEMIN         ( 402 )       /* length is below min         */  
-#define ESLEMAX         ( 403 )       /* length exceeds max          */  
-#define ESOVRLP         ( 404 )       /* overlap undefined           */ 
-#define ESEMPTY         ( 405 )       /* empty string                */ 
-#define ESNOSPC         ( 406 )       /* not enough space for s2     */  
-#define ESUNTERM        ( 407 )       /* unterminated string         */  
-#define ESNODIFF        ( 408 )       /* no difference               */ 
-#define ESNOTFND        ( 409 )       /* not found                   */ 
+#define ESNULLP         ( 400 )       /* null ptr                    */
+#define ESZEROL         ( 401 )       /* length is zero              */
+#define ESLEMIN         ( 402 )       /* length is below min         */
+#define ESLEMAX         ( 403 )       /* length exceeds max          */
+#define ESOVRLP         ( 404 )       /* overlap undefined           */
+#define ESEMPTY         ( 405 )       /* empty string                */
+#define ESNOSPC         ( 406 )       /* not enough space for s2     */
+#define ESUNTERM        ( 407 )       /* unterminated string         */
+#define ESNODIFF        ( 408 )       /* no difference               */
+#define ESNOTFND        ( 409 )       /* not found                   */
 
-/* EOK may or may not be defined in errno.h */ 
-#ifndef EOK 
+/* EOK may or may not be defined in errno.h */
+#ifndef EOK
 #define EOK   0
 #endif
 
@@ -84,19 +84,19 @@ static __inline int wels_strncpy_s( char *dest, int dmax, const char *src, int s
     const char *overlap_bumper;
 
     if (dest == NULL) {
-//        invoke_safe_lib_constraint_handler("strncpy_s: dest is null", 
+//        invoke_safe_lib_constraint_handler("strncpy_s: dest is null",
 //                   NULL, ESNULLP);
         return (ESNULLP);
     }
 
     if (dmax <= 0) {
-//        invoke_safe_lib_constraint_handler("strncpy_s: dmax is 0", 
+//        invoke_safe_lib_constraint_handler("strncpy_s: dmax is 0",
 //                   NULL, ESZEROL);
         return (ESZEROL);
     }
 
 //    if (dmax > RSIZE_MAX_STR) {
-//        invoke_safe_lib_constraint_handler("strncpy_s: dmax exceeds max", 
+//        invoke_safe_lib_constraint_handler("strncpy_s: dmax exceeds max",
 //                   NULL, ESLEMAX);
 //        return (ESLEMAX);
 //    }
@@ -116,7 +116,7 @@ static __inline int wels_strncpy_s( char *dest, int dmax, const char *src, int s
 //        return (ESLEMAX);
 //    }
 
-    /* hold base in case src was not copied */  
+    /* hold base in case src was not copied */
     orig_dmax = dmax;
     orig_dest = dest;
 
@@ -126,7 +126,7 @@ static __inline int wels_strncpy_s( char *dest, int dmax, const char *src, int s
         while (dmax > 0) {
             if (dest == overlap_bumper) {
 //                handle_error(orig_dest, orig_dmax, "strncpy_s: overlapping objects", ESOVRLP);
-                return (ESOVRLP); 
+                return (ESOVRLP);
             }
 
 			if (slen == 0) {
@@ -137,8 +137,8 @@ static __inline int wels_strncpy_s( char *dest, int dmax, const char *src, int s
 #ifdef SAFE_LIB_STR_NULL_SLACK
                 while (dmax) { *dest = '\0'; dmax--; dest++; }
 #else
-                *dest = '\0'; 
-#endif 
+                *dest = '\0';
+#endif
                 return (EOK);
 			}
 
@@ -147,7 +147,7 @@ static __inline int wels_strncpy_s( char *dest, int dmax, const char *src, int s
 #ifdef SAFE_LIB_STR_NULL_SLACK
                 /* null slack */
                 while (dmax) { *dest = '\0'; dmax--; dest++; }
-#endif 
+#endif
                 return (EOK);
             }
 
@@ -157,13 +157,13 @@ static __inline int wels_strncpy_s( char *dest, int dmax, const char *src, int s
             src++;
         }
 
-    } else { 
+    } else {
         overlap_bumper = dest;
 
         while (dmax > 0) {
             if (src == overlap_bumper) {
 //                handle_error(orig_dest, orig_dmax, "strncpy_s: overlapping objects", ESOVRLP);
-                return (ESOVRLP); 
+                return (ESOVRLP);
             }
 
 	    if (slen == 0) {
@@ -174,8 +174,8 @@ static __inline int wels_strncpy_s( char *dest, int dmax, const char *src, int s
 #ifdef SAFE_LIB_STR_NULL_SLACK
                 while (dmax) { *dest = '\0'; dmax--; dest++; }
 #else
-                *dest = '\0'; 
-#endif 
+                *dest = '\0';
+#endif
                 return (EOK);
             }
 
@@ -184,7 +184,7 @@ static __inline int wels_strncpy_s( char *dest, int dmax, const char *src, int s
 #ifdef SAFE_LIB_STR_NULL_SLACK
                 /* null slack */
                 while (dmax) { *dest = '\0'; dmax--; dest++; }
-#endif 
+#endif
                 return (EOK);
             }
 
@@ -193,7 +193,7 @@ static __inline int wels_strncpy_s( char *dest, int dmax, const char *src, int s
             dest++;
             src++;
         }
-    } 
+    }
 
     /*
      * the entire src was not copied, so zero the string
@@ -209,25 +209,25 @@ static __inline int wels_strcat_s(char *dest, int dmax, const char *src)
     const char *overlap_bumper;
 
     if (dest == NULL) {
-//        invoke_safe_lib_constraint_handler("strcat_s: dest is null", 
+//        invoke_safe_lib_constraint_handler("strcat_s: dest is null",
 //                   NULL, ESNULLP);
         return (ESNULLP);
     }
 
     if (src == NULL) {
-//        invoke_safe_lib_constraint_handler("strcat_s: src is null", 
+//        invoke_safe_lib_constraint_handler("strcat_s: src is null",
 //                   NULL, ESNULLP);
         return (ESNULLP);
     }
 
     if (dmax <= 0) {
-//        invoke_safe_lib_constraint_handler("strcat_s: dmax is 0", 
+//        invoke_safe_lib_constraint_handler("strcat_s: dmax is 0",
 //                   NULL, ESZEROL);
         return (ESZEROL);
     }
 
 //    if (dmax > RSIZE_MAX_STR) {
-//        invoke_safe_lib_constraint_handler("strcat_s: dmax exceeds max", 
+//        invoke_safe_lib_constraint_handler("strcat_s: dmax exceeds max",
 //                   NULL, ESLEMAX);
 //        return (ESLEMAX);
 //    }
@@ -241,23 +241,23 @@ static __inline int wels_strcat_s(char *dest, int dmax, const char *src)
 
         /* Find the end of dest */
         while (*dest != '\0') {
- 
+
             if (dest == overlap_bumper) {
-//                handle_error(orig_dest, orig_dmax, "strcat_s: overlapping objects", ESOVRLP); 
+//                handle_error(orig_dest, orig_dmax, "strcat_s: overlapping objects", ESOVRLP);
                 return (ESOVRLP);
             }
 
             dest++;
             dmax--;
             if (dmax == 0) {
-//                handle_error(orig_dest, orig_dmax, "strcat_s: dest unterminated", ESUNTERM); 
+//                handle_error(orig_dest, orig_dmax, "strcat_s: dest unterminated", ESUNTERM);
                 return (ESUNTERM);
             }
         }
 
         while (dmax > 0) {
             if (dest == overlap_bumper) {
-//                handle_error(orig_dest, orig_dmax, "strcat_s: overlapping objects", ESOVRLP); 
+//                handle_error(orig_dest, orig_dmax, "strcat_s: overlapping objects", ESOVRLP);
                 return (ESOVRLP);
             }
 
@@ -266,7 +266,7 @@ static __inline int wels_strcat_s(char *dest, int dmax, const char *src)
 #ifdef SAFE_LIB_STR_NULL_SLACK
                 /* null slack to clear any data */
                 while (dmax) { *dest = '\0'; dmax--; dest++; }
-#endif 
+#endif
                 return (EOK);
             }
 
@@ -288,14 +288,14 @@ static __inline int wels_strcat_s(char *dest, int dmax, const char *src)
             dest++;
             dmax--;
             if (dmax == 0) {
-//                handle_error(orig_dest, orig_dmax, "strcat_s: dest unterminated", ESUNTERM); 
+//                handle_error(orig_dest, orig_dmax, "strcat_s: dest unterminated", ESUNTERM);
                 return (ESUNTERM);
             }
         }
 
         while (dmax > 0) {
             if (src == overlap_bumper) {
-//                handle_error(orig_dest, orig_dmax, "strcat_s: overlapping objects", ESOVRLP); 
+//                handle_error(orig_dest, orig_dmax, "strcat_s: overlapping objects", ESOVRLP);
                 return (ESOVRLP);
             }
 
@@ -304,7 +304,7 @@ static __inline int wels_strcat_s(char *dest, int dmax, const char *src)
 #ifdef SAFE_LIB_STR_NULL_SLACK
                 /* null slack to clear any data */
                 while (dmax) { *dest = '\0'; dmax--; dest++; }
-#endif 
+#endif
                 return (EOK);
             }
 
@@ -312,12 +312,12 @@ static __inline int wels_strcat_s(char *dest, int dmax, const char *src)
             dest++;
             src++;
         }
-    } 
+    }
 
     /*
-     * the entire src was not copied, so null the string 
+     * the entire src was not copied, so null the string
      */
-//    handle_error(orig_dest, orig_dmax, "strcat_s: not enough space for src", ESNOSPC); 
+//    handle_error(orig_dest, orig_dmax, "strcat_s: not enough space for src", ESNOSPC);
 
     return (ESNOSPC);
 }
@@ -330,14 +330,14 @@ static __inline int wels_strnlen_s(const char *dest, int dmax)
         return (0);
     }
 
-    if (dmax <= 0) { 
-//        invoke_safe_lib_constraint_handler("strnlen_s: dmax is 0", 
+    if (dmax <= 0) {
+//        invoke_safe_lib_constraint_handler("strnlen_s: dmax is 0",
 //                   NULL, ESZEROL);
         return (0);
     }
 
 //    if (dmax > RSIZE_MAX_STR) {
-//        invoke_safe_lib_constraint_handler("strnlen_s: dmax exceeds max", 
+//        invoke_safe_lib_constraint_handler("strnlen_s: dmax exceeds max",
 //                   NULL, ESLEMAX);
 //        return (0);
 //    }

@@ -91,7 +91,7 @@ int32_t InitPic( const void *kpSrc, const int32_t kiColorspace, const int32_t ki
 	pSrcPic->iColorFormat	= kiColorspace;
 	pSrcPic->iPicWidth		= kiWidth;
 	pSrcPic->iPicHeight		= kiHeight;
-	
+
 	switch( kiColorspace & (~videoFormatVFlip) ) {
 	case videoFormatI420:
 	case videoFormatYV12:
@@ -102,28 +102,28 @@ int32_t InitPic( const void *kpSrc, const int32_t kiColorspace, const int32_t ki
 		pSrcPic->iStride[0]	= kiWidth;
 		pSrcPic->iStride[2]	= pSrcPic->iStride[1] = kiWidth >> 1;
 		pSrcPic->iStride[3]	= 0;
-		break;	
+		break;
 	case videoFormatYUY2:
 	case videoFormatYVYU:
 	case videoFormatUYVY:
 		pSrcPic->pData[0]	= NULL;
 		pSrcPic->pData[1]	= NULL;
 		pSrcPic->pData[2]	= NULL;
-		pSrcPic->pData[3]	= NULL;		
+		pSrcPic->pData[3]	= NULL;
 		pSrcPic->iStride[0]	= CALC_BI_STRIDE(kiWidth,  16);
-		pSrcPic->iStride[3]	= pSrcPic->iStride[2] = pSrcPic->iStride[1] = 0;		
+		pSrcPic->iStride[3]	= pSrcPic->iStride[2] = pSrcPic->iStride[1] = 0;
 		break;
 	case videoFormatRGB:
 	case videoFormatBGR:
 		pSrcPic->pData[0]	= NULL;
 		pSrcPic->pData[1]	= NULL;
 		pSrcPic->pData[2]	= NULL;
-		pSrcPic->pData[3]	= NULL;		
+		pSrcPic->pData[3]	= NULL;
 		pSrcPic->iStride[0]	= CALC_BI_STRIDE(kiWidth, 24);
 		pSrcPic->iStride[3]	= pSrcPic->iStride[2] = pSrcPic->iStride[1] = 0;
 		if( kiColorspace & videoFormatVFlip )
 			pSrcPic->iColorFormat = kiColorspace & (~videoFormatVFlip);
-		else 
+		else
 			pSrcPic->iColorFormat = kiColorspace | videoFormatVFlip;
 		break;
 	case videoFormatBGRA:
@@ -133,12 +133,12 @@ int32_t InitPic( const void *kpSrc, const int32_t kiColorspace, const int32_t ki
 		pSrcPic->pData[0]	= NULL;
 		pSrcPic->pData[1]	= NULL;
 		pSrcPic->pData[2]	= NULL;
-		pSrcPic->pData[3]	= NULL;		
+		pSrcPic->pData[3]	= NULL;
 		pSrcPic->iStride[0]	= kiWidth << 2;
-		pSrcPic->iStride[3]	= pSrcPic->iStride[2] = pSrcPic->iStride[1] = 0;	
+		pSrcPic->iStride[3]	= pSrcPic->iStride[2] = pSrcPic->iStride[1] = 0;
 		if( kiColorspace & videoFormatVFlip )
 			pSrcPic->iColorFormat = kiColorspace & (~videoFormatVFlip);
-		else 
+		else
 			pSrcPic->iColorFormat = kiColorspace | videoFormatVFlip;
 		break;
 	default:
@@ -169,7 +169,7 @@ void WelsInitBGDFunc( SWelsFuncPtrList *pFuncList, const bool_t kbEnableBackgrou
  * \return	successful - 0; otherwise none 0 for failed
  */
 int32_t InitFunctionPointers( SWelsFuncPtrList *pFuncList, SWelsSvcCodingParam *pParam, uint32_t uiCpuFlag )
-{	
+{
 	int32_t iReturn = 0;
 
 	/* Functionality utilization of CPU instructions dependency */
@@ -178,7 +178,7 @@ int32_t InitFunctionPointers( SWelsFuncPtrList *pFuncList, SWelsSvcCodingParam *
 	pFuncList->pfSetMemZeroSize64	= WelsSetMemZero_c;	// confirmed_safe_unsafe_usage
 #if defined(X86_ASM)
 	if ( uiCpuFlag & WELS_CPU_MMXEXT )
-	{		
+	{
 		pFuncList->pfSetMemZeroSize8	= WelsSetMemZeroSize8_mmx;		// confirmed_safe_unsafe_usage
 		pFuncList->pfSetMemZeroSize64Aligned16	= WelsSetMemZeroSize64_mmx;	// confirmed_safe_unsafe_usage
 		pFuncList->pfSetMemZeroSize64	= WelsSetMemZeroSize64_mmx;	// confirmed_safe_unsafe_usage
@@ -191,7 +191,7 @@ int32_t InitFunctionPointers( SWelsFuncPtrList *pFuncList, SWelsSvcCodingParam *
 
 	InitExpandPictureFunc( pFuncList, uiCpuFlag );
 
-	/* Intra_Prediction_fn*/	
+	/* Intra_Prediction_fn*/
 	WelsInitFillingPredFuncs( uiCpuFlag );
 	WelsInitIntraPredFuncs( pFuncList, uiCpuFlag );
 
@@ -202,7 +202,7 @@ int32_t InitFunctionPointers( SWelsFuncPtrList *pFuncList, SWelsSvcCodingParam *
 	WelsInitBGDFunc(pFuncList, pParam->bEnableBackgroundDetection );
 	// for pfGetVarianceFromIntraVaa function ptr adaptive by CPU features, 6/7/2010
 	InitIntraAnalysisVaaInfo( pFuncList, uiCpuFlag );
-	
+
 	/* Motion compensation */
 	/*init pixel average function*/
 	/*get one column or row pixel when refinement*/
@@ -221,14 +221,14 @@ int32_t InitFunctionPointers( SWelsFuncPtrList *pFuncList, SWelsSvcCodingParam *
 }
 
 /*!
- * \brief	initialize frame coding	
+ * \brief	initialize frame coding
  */
 void InitFrameCoding( sWelsEncCtx *pEncCtx, const EFrameType keFrameType )
 {
 	// for bitstream writing
 	pEncCtx->iPosBsBuffer		= 0;	// reset bs pBuffer position
 	pEncCtx->pOut->iNalIndex		= 0;	// reset NAL index
-	
+
 	InitBits( &pEncCtx->pOut->sBsWrite, pEncCtx->pOut->pBsBuffer, pEncCtx->pOut->uiSize );
 
 	if ( keFrameType == WELS_FRAME_TYPE_P )
@@ -237,14 +237,14 @@ void InitFrameCoding( sWelsEncCtx *pEncCtx, const EFrameType keFrameType )
 		{
 			++pEncCtx->iFrameIndex;
 		}
-		
+
 		++pEncCtx->uiFrameIdxRc;
 
 		if ( pEncCtx->iPOC < ( 1 << pEncCtx->pSps->iLog2MaxPocLsb ) - 2 ) // if iPOC type is no 0, this need be modification
 			pEncCtx->iPOC			+= 2;	// for POC type 0
 		else
 			pEncCtx->iPOC = 0;
-		
+
 		if ( pEncCtx->eLastNalPriority != 0 )
 		{
 			if ( pEncCtx->iFrameNum < (1 << pEncCtx->pSps->uiLog2MaxFrameNum) - 1  )
@@ -264,7 +264,7 @@ void InitFrameCoding( sWelsEncCtx *pEncCtx, const EFrameType keFrameType )
 		if ( pEncCtx->pSvcParam->uiIntraPeriod )
 		{
 			pEncCtx->iFrameIndex = 0;
-		}		
+		}
 		pEncCtx->uiFrameIdxRc = 0;
 
 		pEncCtx->eNalType		= NAL_UNIT_CODED_SLICE_IDR;
@@ -275,7 +275,7 @@ void InitFrameCoding( sWelsEncCtx *pEncCtx, const EFrameType keFrameType )
 
 		// reset_ref_list
 
-		// rc_init_gop		
+		// rc_init_gop
 	}
 	else if ( keFrameType == WELS_FRAME_TYPE_I )
 	{
@@ -283,7 +283,7 @@ void InitFrameCoding( sWelsEncCtx *pEncCtx, const EFrameType keFrameType )
 			pEncCtx->iPOC			+= 2;	// for POC type 0
 		else
 			pEncCtx->iPOC = 0;
-		
+
 		if ( pEncCtx->eLastNalPriority != 0 )
 		{
 			if ( pEncCtx->iFrameNum < (1 << pEncCtx->pSps->uiLog2MaxFrameNum) - 1  )
@@ -314,14 +314,14 @@ void InitFrameCoding( sWelsEncCtx *pEncCtx, const EFrameType keFrameType )
 }
 
 EFrameType DecideFrameType( sWelsEncCtx *pEncCtx, const int8_t kiSpatialNum )
-{	
+{
 	SWelsSvcCodingParam *pSvcParam	= pEncCtx->pSvcParam;
 	EFrameType iFrameType = WELS_FRAME_TYPE_AUTO;
 	bool_t bSceneChangeFlag = false;
-	
-	// perform scene change detection	
-	if ( (!pSvcParam->bEnableSceneChangeDetect) || pEncCtx->pVaa->bIdrPeriodFlag || 
-		(kiSpatialNum < pSvcParam->iNumDependencyLayer) || (pEncCtx->uiFrameIdxRc < (VGOP_SIZE << 1)) ) // avoid too frequent I frame coding, rc control 
+
+	// perform scene change detection
+	if ( (!pSvcParam->bEnableSceneChangeDetect) || pEncCtx->pVaa->bIdrPeriodFlag ||
+		(kiSpatialNum < pSvcParam->iNumDependencyLayer) || (pEncCtx->uiFrameIdxRc < (VGOP_SIZE << 1)) ) // avoid too frequent I frame coding, rc control
 	{
 		bSceneChangeFlag = false;
 	}
@@ -330,7 +330,7 @@ EFrameType DecideFrameType( sWelsEncCtx *pEncCtx, const int8_t kiSpatialNum )
 		bSceneChangeFlag = pEncCtx->pVaa->bSceneChangeFlag;
 	}
 
-	//scene_changed_flag: RC enable && iSpatialNum == pSvcParam->iNumDependencyLayer 
+	//scene_changed_flag: RC enable && iSpatialNum == pSvcParam->iNumDependencyLayer
 	//bIdrPeriodFlag: RC disable || iSpatialNum != pSvcParam->iNumDependencyLayer
 	//pEncCtx->bEncCurFrmAsIdrFlag: 1. first frame should be IDR; 2. idr pause; 3. idr request
 	iFrameType = ( pEncCtx->pVaa->bIdrPeriodFlag || bSceneChangeFlag || pEncCtx->bEncCurFrmAsIdrFlag ) ? WELS_FRAME_TYPE_IDR : WELS_FRAME_TYPE_P;
@@ -354,13 +354,13 @@ EFrameType DecideFrameType( sWelsEncCtx *pEncCtx, const int8_t kiSpatialNum )
 
 extern "C" void DumpDependencyRec( SPicture *pCurPicture, const str_t *kpFileName, const int8_t kiDid )
 {
-	FILE *pDumpRecFile											= NULL;	
+	FILE *pDumpRecFile											= NULL;
 	static bool_t bDependencyRecFlag[MAX_DEPENDENCY_LAYER]	= {0};
 	int32_t iWrittenSize											= 0;
 
 	if ( NULL == pCurPicture || NULL == kpFileName || kiDid >= MAX_DEPENDENCY_LAYER )
 		return;
-	
+
 	if ( bDependencyRecFlag[kiDid] )
 	{
 		if ( STRNLEN(kpFileName, MAX_FNAME_LEN) > 0 )	// confirmed_safe_unsafe_usage
@@ -371,7 +371,7 @@ extern "C" void DumpDependencyRec( SPicture *pCurPicture, const str_t *kpFileNam
 #endif//__GNUC__..
 		else
 		{
-			str_t sDependencyRecFileName[16] = {0};			
+			str_t sDependencyRecFileName[16] = {0};
 #if defined(WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
 			SNPRINTF( sDependencyRecFileName, 16, 16, "rec%d.yuv", kiDid );	// confirmed_safe_unsafe_usage
 			FOPEN( &pDumpRecFile, sDependencyRecFileName, "ab" );
@@ -411,12 +411,12 @@ extern "C" void DumpDependencyRec( SPicture *pCurPicture, const str_t *kpFileNam
 	{
 		int32_t i = 0;
 		int32_t j = 0;
-		const int32_t kiStrideY	= pCurPicture->iLineSize[0];		
+		const int32_t kiStrideY	= pCurPicture->iLineSize[0];
 		const int32_t kiLumaWidth	= pCurPicture->iWidthInPixel;
 		const int32_t kiLumaHeight	= pCurPicture->iHeightInPixel;
 		const int32_t kiChromaWidth	= kiLumaWidth >> 1;
-		const int32_t kiChromaHeight	= kiLumaHeight >> 1;		
-		
+		const int32_t kiChromaHeight	= kiLumaHeight >> 1;
+
 		for( j = 0; j < kiLumaHeight; ++ j)
 		{
 			iWrittenSize = fwrite( &pCurPicture->pData[0][j*kiStrideY], 1, kiLumaWidth, pDumpRecFile );
@@ -430,7 +430,7 @@ extern "C" void DumpDependencyRec( SPicture *pCurPicture, const str_t *kpFileNam
 		}
 		for( i = 1; i < I420_PLANES; ++ i)
 		{
-			const int32_t kiStrideUV = pCurPicture->iLineSize[i];			
+			const int32_t kiStrideUV = pCurPicture->iLineSize[i];
 			for ( j = 0; j < kiChromaHeight; ++ j)
 			{
 				iWrittenSize = fwrite( &pCurPicture->pData[i][j*kiStrideUV], 1, kiChromaWidth, pDumpRecFile );
@@ -454,13 +454,13 @@ extern "C" void DumpDependencyRec( SPicture *pCurPicture, const str_t *kpFileNam
 
 void DumpRecFrame( SPicture *pCurPicture, const str_t *kpFileName )
 {
-	FILE *pDumpRecFile				= NULL;	
+	FILE *pDumpRecFile				= NULL;
 	static bool_t bRecFlag	= false;
 	int32_t iWrittenSize			= 0;
 
 	if ( NULL == pCurPicture || NULL == kpFileName )
 		return;
-	
+
 	if ( bRecFlag )
 	{
 		if ( STRNLEN(kpFileName, MAX_FNAME_LEN) > 0 )	// confirmed_safe_unsafe_usage
@@ -507,12 +507,12 @@ void DumpRecFrame( SPicture *pCurPicture, const str_t *kpFileName )
 	{
 		int32_t i = 0;
 		int32_t j = 0;
-		const int32_t kiStrideY	= pCurPicture->iLineSize[0];		
+		const int32_t kiStrideY	= pCurPicture->iLineSize[0];
 		const int32_t kiLumaWidth	= pCurPicture->iWidthInPixel;
 		const int32_t kiLumaHeight	= pCurPicture->iHeightInPixel;
 		const int32_t kiChromaWidth	= kiLumaWidth >> 1;
-		const int32_t kiChromaHeight	= kiLumaHeight >> 1;		
-		
+		const int32_t kiChromaHeight	= kiLumaHeight >> 1;
+
 		for( j = 0; j < kiLumaHeight; ++ j)
 		{
 			iWrittenSize = fwrite( &pCurPicture->pData[0][j*kiStrideY], 1, kiLumaWidth, pDumpRecFile );
@@ -526,7 +526,7 @@ void DumpRecFrame( SPicture *pCurPicture, const str_t *kpFileName )
 		}
 		for( i = 1; i < I420_PLANES; ++ i)
 		{
-			const int32_t kiStrideUV = pCurPicture->iLineSize[i];			
+			const int32_t kiStrideUV = pCurPicture->iLineSize[i];
 			for ( j = 0; j < kiChromaHeight; ++ j)
 			{
 				iWrittenSize = fwrite( &pCurPicture->pData[i][j*kiStrideUV], 1, kiChromaWidth, pDumpRecFile );

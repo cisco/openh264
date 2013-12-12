@@ -52,7 +52,7 @@ CSceneChangeDetection::CSceneChangeDetection(int32_t iCpuFlag)
 }
 
 CSceneChangeDetection::~CSceneChangeDetection()
-{	
+{
 }
 
 EResult CSceneChangeDetection::Process(int32_t iType, SPixMap *pSrcPixMap, SPixMap *pRefPixMap)
@@ -60,7 +60,7 @@ EResult CSceneChangeDetection::Process(int32_t iType, SPixMap *pSrcPixMap, SPixM
 	EResult eReturn = RET_INVALIDPARAM;
 
 	int32_t iWidth                  = pSrcPixMap->sRect.iRectWidth;
-	int32_t iHeight                 = pSrcPixMap->sRect.iRectHeight;	
+	int32_t iHeight                 = pSrcPixMap->sRect.iRectHeight;
 	int32_t iBlock8x8Width      = iWidth  >> 3;
 	int32_t iBlock8x8Height	 = iHeight >> 3;
 	int32_t iBlock8x8Num       = iBlock8x8Width * iBlock8x8Height;
@@ -86,7 +86,7 @@ EResult CSceneChangeDetection::Process(int32_t iType, SPixMap *pSrcPixMap, SPixM
 
 	m_sSceneChangeParam.bSceneChangeFlag = 0;
 
-	for (int32_t j = 0; j < iBlock8x8Height; j ++ ) 
+	for (int32_t j = 0; j < iBlock8x8Height; j ++ )
 	{
 		pRefTmp	= pRefY;
 		pCurTmp 	= pCurY;
@@ -96,7 +96,7 @@ EResult CSceneChangeDetection::Process(int32_t iType, SPixMap *pSrcPixMap, SPixM
 			iBlockSad = m_pfSad(pRefTmp, iRefStride, pCurTmp, iCurStride);
 
 			iMotionBlockNum += (iBlockSad > HIGH_MOTION_BLOCK_THRESHOLD);
-			
+
 			pRefTmp += 8;
 			pCurTmp += 8;
 		}
@@ -105,8 +105,8 @@ EResult CSceneChangeDetection::Process(int32_t iType, SPixMap *pSrcPixMap, SPixM
 		pCurY += iCurRowStride;
 	}
 
-	if ( iMotionBlockNum >= iSceneChangeThreshold ) 
-	{ 
+	if ( iMotionBlockNum >= iSceneChangeThreshold )
+	{
 		m_sSceneChangeParam.bSceneChangeFlag = 1;
 	}
 
@@ -134,7 +134,7 @@ void CSceneChangeDetection::InitSadFuncs(SadFuncPtr &pfSad,  int32_t iCpuFlag)
 {
 	pfSad = WelsSampleSad8x8_c;
 
-#ifdef X86_ASM	
+#ifdef X86_ASM
 	if ( iCpuFlag & WELS_CPU_SSE2 )
 	{
 		pfSad = WelsSampleSad8x8_sse21;

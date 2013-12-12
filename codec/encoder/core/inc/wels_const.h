@@ -72,7 +72,7 @@
 #define MB_PARTITION_SIZE		4	// Macroblock partition size in 8x8 sub-blocks
 #define MB_SUB_PARTITION_SIZE	4	// Sub partition size in a 8x8 sub-block
 #define MB_BLOCK4x4_NUM				16
-#define INTRA_4x4_MODE_NUM		8	
+#define INTRA_4x4_MODE_NUM		8
 #define MB_BLOCK8x8_NUM				4
 #define MB_LUMA_CHROMA_BLOCK4x4_NUM  24
 
@@ -83,8 +83,8 @@
 #define MAX_PPS_COUNT 			(MAX_PPS_COUNT_LIMITED)//in Standard is 256	// Count number of PPS
 
 #define PARA_SET_TYPE			3 // SPS+PPS
-#define PARA_SET_TYPE_AVCSPS	0 
-#define PARA_SET_TYPE_SUBSETSPS	1 
+#define PARA_SET_TYPE_AVCSPS	0
+#define PARA_SET_TYPE_SUBSETSPS	1
 #define PARA_SET_TYPE_PPS		2
 
 #define MAX_FRAME_RATE			30	// maximal frame rate to support

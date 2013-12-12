@@ -43,26 +43,26 @@ public:
 	 * return: CM_RETURN: 0 - success; otherwise - failed;
 	 */
 	virtual int Initialize(SVCEncodingParam* pParam, const INIT_TYPE kiInitType = INIT_TYPE_PARAMETER_BASED) = 0;
-	virtual int Initialize(void* pParam, const INIT_TYPE kiInitType = INIT_TYPE_CONFIG_BASED) = 0;	
-	  
+	virtual int Initialize(void* pParam, const INIT_TYPE kiInitType = INIT_TYPE_CONFIG_BASED) = 0;
+
 	virtual int Uninitialize() = 0;
-	
+
 	/*
 	 * return: EVideoFrameType [IDR: videoFrameTypeIDR; P: videoFrameTypeP; ERROR: videoFrameTypeInvalid]
 	 */
-	virtual int EncodeFrame(const unsigned char* kpSrc, SFrameBSInfo* pBsInfo) = 0;	
+	virtual int EncodeFrame(const unsigned char* kpSrc, SFrameBSInfo* pBsInfo) = 0;
 	virtual int EncodeFrame(const SSourcePicture  ** kppSrcPicList, int nSrcPicNum, SFrameBSInfo * pBsInfo) = 0;
-	
+
 	/*
 	 * return: 0 - success; otherwise - failed;
 	 */
-	virtual int PauseFrame(const unsigned char* kpSrc, SFrameBSInfo* pBsInfo) = 0;	
-	
+	virtual int PauseFrame(const unsigned char* kpSrc, SFrameBSInfo* pBsInfo) = 0;
+
 	/*
 	 * return: 0 - success; otherwise - failed;
 	 */
-	virtual int ForceIntraFrame(bool bIDR) = 0;		
-	
+	virtual int ForceIntraFrame(bool bIDR) = 0;
+
 	/************************************************************************
 	 * InDataFormat, IDRInterval, SVC Encode Param, Frame Rate, Bitrate,..
 	 ************************************************************************/
@@ -80,7 +80,7 @@ public:
 	virtual long Uninitialize() = 0;
 
 	virtual DECODING_STATE DecodeFrame(	const unsigned char* pSrc,
-		                                const int iSrcLen,	
+		                                const int iSrcLen,
                                         unsigned char** ppDst,
 		                                int* pStride,
 		                                int& iWidth,
@@ -90,7 +90,7 @@ public:
 	 *  src must be 4 byte aligned,   recommend 16 byte aligned.    the available src size must be multiple of 4.
 	 */
 	virtual DECODING_STATE DecodeFrame(	const unsigned char* pSrc,
-											const int iSrcLen,	
+											const int iSrcLen,
 											void ** ppDst,
 											SBufferInfo* pDstInfo) = 0;
 
@@ -114,7 +114,7 @@ public:
 };
 
 
-extern "C" 
+extern "C"
 {
 int  CreateSVCEncoder(ISVCEncoder** ppEncoder);
 void DestroySVCEncoder(ISVCEncoder* pEncoder);

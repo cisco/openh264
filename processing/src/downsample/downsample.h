@@ -34,7 +34,7 @@
  *
  * \date        :  2011/03/33
  *
- * \description :  1. rewrite the package code of downsample class  
+ * \description :  1. rewrite the package code of downsample class
  *
  *************************************************************************************
  */
@@ -104,7 +104,7 @@ WELSVP_EXTERN_C_END
 
 
 class CDownsampling : public IStrategy
-{			  
+{
 public:
 	CDownsampling(int32_t iCpuFlag);
 	~CDownsampling();
@@ -119,7 +119,7 @@ private:
 private:
 	SDownsampleFuncs m_pfDownsample;
 	int32_t  m_iCPUFlag;
-};	
+};
 
 WELSVP_NAMESPACE_END
 

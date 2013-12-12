@@ -45,7 +45,7 @@ BOOL WINAPI DllEntryPoint(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved
 	}
 //	else if (DLL_PROCESS_DETACH == dwReason)
 //	{
-//	
+//
 //	}
     return TRUE;
 }

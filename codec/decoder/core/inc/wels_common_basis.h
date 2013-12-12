@@ -59,7 +59,7 @@ enum{
 	PRO_HIGH422		= 122,
 	PRO_HIGH444		= 144,
 	PRO_CAVLC444	= 244,
-	
+
 	PRO_SCALABLE_BASELINE	= 83,
 	PRO_SCALABLE_HIGH		= 86,
 };
@@ -117,7 +117,7 @@ enum{
 };
 
 /*
- * VCL TYPE	
+ * VCL TYPE
  */
 typedef uint8_t		VclType;
 enum{
@@ -129,7 +129,7 @@ enum{
 /*
  *	vcl type map for given NAL unit type and corresponding H264 type
  */
-extern const VclType g_kuiVclTypeMap[32][2];  
+extern const VclType g_kuiVclTypeMap[32][2];
 
 #define IS_VCL_NAL(t, ext_idx)			(g_kuiVclTypeMap[t][ext_idx] == VCL)
 #define IS_PARAM_SETS_NALS(t)			( (t) == NAL_UNIT_SPS || (t) == NAL_UNIT_PPS || (t) == NAL_UNIT_SUBSET_SPS )
@@ -291,7 +291,7 @@ enum{
 
 #define C_PRED_DC_L      4
 #define C_PRED_DC_T      5
-#define C_PRED_DC_128    6 
+#define C_PRED_DC_128    6
 
 } // namespace WelsDec
 

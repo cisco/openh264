@@ -67,14 +67,14 @@ namespace WelsSVCEnc {
 		type name[size] __attribute__((aligned(alignment)))
 	#define ALLOC_ALLIGN_MEM_2(name,sizex,sizey,type,alignment) \
 		type name[(sizex)*(sizey)] __attribute__((aligned(alignment)))
-		
+
 #endif//_MSC_VER
 
 
 #if defined(_MSC_VER)
 
 	#if(_MSC_VER < 1700)
-	#define inline	__inline  
+	#define inline	__inline
 	#endif
 
     #define __FASTCALL   __fastcall
@@ -86,7 +86,7 @@ namespace WelsSVCEnc {
     #define __FASTCALL    __attribute__ ((fastcall))
 #else
 	#define __FASTCALL	// mean NULL for mac ppc
-#endif//MAC_POWERPC    
+#endif//MAC_POWERPC
 	#define ALIGNED_DECLARE( type, var, n ) type var __attribute__((aligned(n)))
 	#define __align8(t,v) t v __attribute__ ((aligned (8)))
 	#define __align16(t,v) t v __attribute__ ((aligned (16)))
@@ -94,7 +94,7 @@ namespace WelsSVCEnc {
 
 #if defined(_MACH_PLATFORM) || defined(__GNUC__)
 #define ALIGNED_DECLARE_MATRIX_2D(name,sizex,sizey,type,alignment) \
-	type name[(sizex)*(sizey)] __attribute__((aligned(alignment)))	
+	type name[(sizex)*(sizey)] __attribute__((aligned(alignment)))
 #else //_MSC_VER <= 1200
 #define ALIGNED_DECLARE_MATRIX_2D(name,sizex,sizey,type,alignment) \
 __declspec(align(alignment)) type name[(sizex)*(sizey)]
@@ -102,7 +102,7 @@ __declspec(align(alignment)) type name[(sizex)*(sizey)]
 
 #if defined(_MACH_PLATFORM) || defined(__GNUC__)
 #define ALIGNED_DECLARE_MATRIX_1D(name,size,type,alignment) \
-	type name[size] __attribute__((aligned(alignment)))	
+	type name[size] __attribute__((aligned(alignment)))
 #else //_MSC_VER <= 1200
 #define ALIGNED_DECLARE_MATRIX_1D(name,size,type,alignment) \
 	__declspec(align(alignment)) type name[(size)]
@@ -144,7 +144,7 @@ static inline int32_t WELS_CEIL(float v)
 
 static inline int32_t WELS_FLOOR(float v)
 {
-	return (int32_t)v;		
+	return (int32_t)v;
 }
 
 
@@ -152,7 +152,7 @@ static inline int32_t WELS_FLOOR(float v)
     iC = iA + iB + 1;                           \
 	iC >>= (int32_t)( iA != -1 && iB != -1);    \
 	iC += (iA == -1 && iB == -1);               \
-}    
+}
 
 /*
  * log base 2 of v and ceil/floor extension
@@ -171,7 +171,7 @@ static inline int32_t WELS_CEILLOG2( uint32_t v )
 }
 
 static inline int32_t WELS_FLOORLOG2( uint32_t v )
-{	
+{
 	int32_t r = 0;
 	while( v > 1 )
 	{
@@ -182,7 +182,7 @@ static inline int32_t WELS_FLOORLOG2( uint32_t v )
 }
 
 static inline int32_t WELS_LOG2( uint32_t v )
-{	
+{
 	int32_t r = 0;
 	while (v >>= 1)
 	{
@@ -229,7 +229,7 @@ static inline int32_t WELS_MEDIAN(int32_t x,  int32_t y, int32_t z)
 //#endif// NEG_NUM
 
 #ifndef WELS_CLIP1
-#define WELS_CLIP1(x) (((x) & ~255) ? (-(x) >> 31) : (x)) 
+#define WELS_CLIP1(x) (((x) & ~255) ? (-(x) >> 31) : (x))
 #endif//WELS_CLIP1
 
 #ifndef WELS_SIGN
@@ -261,10 +261,10 @@ static inline bool_t BITWISE_ENABLED(const uint32_t n, const uint8_t b)
 {
 	const uint8_t bit = (b&0x1f);	// maximal bit position 31 for uint32_t 4 bytes
 #if defined(WORDS_BIGENDIAN)
-	/* 
+	/*
 	 * 31 .. 24, 23 .. 16, 15 .. 8, 7 .. 0
 	 * 7 .. 0, 15 .. 8, 23 .. 16, 31 .. 24
-	 */	
+	 */
 	const uint8_t map = 24+((bit&7)<<1)-bit;	// BIG_ENDIAN map
 	return (bool_t)((n & (1<<map)) >> map);	// BIG_ENDIAN
 #else
@@ -283,7 +283,7 @@ static inline uint32_t ENDIAN_FIX(uint32_t x)
     return x;
 }
 
-#else 
+#else
 
 
 #ifdef    _MSC_VER
@@ -333,7 +333,7 @@ static inline uint32_t ENDIAN_FIX(uint32_t x)
 #endif//#if WELS_VERIFY_RETURN_IF
 
 /*
- *	Description: to check variable validation and return the specified result 
+ *	Description: to check variable validation and return the specified result
  *		with correspoinding process advance.
  *	 result:	value to be return
  *	 case_if:	negative condition to be verified
@@ -392,7 +392,7 @@ static inline uint32_t ENDIAN_FIX(uint32_t x)
  * Description: to safe free an array ptr with free function pointer
  *	arr:		pointer to an array, something like "**p";
  *	num:		number of elements in array
- *  free_fn:	free function pointer	
+ *  free_fn:	free function pointer
  */
 #ifndef WELS_SAFE_FREE_ARR
 #define WELS_SAFE_FREE_ARR(arr, num, free_fn) \

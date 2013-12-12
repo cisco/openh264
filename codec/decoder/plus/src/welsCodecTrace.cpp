@@ -64,13 +64,13 @@ static CFBundleRef LoadLibrary(const char* lpszbundle)
 	// 1.get bundle path
 	char cBundlePath[PATH_MAX];
 	memset(cBundlePath, 0, PATH_MAX);
-	
+
 	Dl_info 	dlInfo;
 	static int  sDummy;
 	dladdr((void_t*)&sDummy, &dlInfo);
-	
+
 	strlcpy(cBundlePath, dlInfo.dli_fname, PATH_MAX);
-	
+
 	char * pPath = NULL;
 	for(int i = 4; i > 0; i--)
 	{
@@ -92,39 +92,39 @@ static CFBundleRef LoadLibrary(const char* lpszbundle)
 	{
 		return NULL;
 	}
-	
+
 	strlcat(cBundlePath, lpszbundle, PATH_MAX);
-	
+
 	FSRef bundlePath;
 	OSStatus iStatus = FSPathMakeRef((unsigned char*)cBundlePath, &bundlePath, NULL);
 	if(noErr != iStatus)
 		return NULL;
-	
+
 	CFURLRef bundleURL = CFURLCreateFromFSRef(kCFAllocatorSystemDefault, &bundlePath);
 	if(NULL == bundleURL)
 		return NULL;
-	
+
 	// 2.get bundle ref
 	CFBundleRef bundleRef = CFBundleCreate(kCFAllocatorSystemDefault, bundleURL);
 	CFRelease(bundleURL);
-	
+
 //	Boolean bReturn = FALSE;
 	if(NULL != bundleRef)
 	{
 		//	bReturn = CFBundleLoadExecutable(bundleRef);
 	}
-	
+
 	return bundleRef;
 }
 
 static Boolean FreeLibrary(CFBundleRef bundle)
-{	
+{
 	if(NULL != bundle)
 	{
 		//	CFBundleUnloadExecutable(bundle);
 		CFRelease(bundle);
 	}
-	
+
 	return TRUE;
 }
 
@@ -132,11 +132,11 @@ static void_t* GetProcessAddress(CFBundleRef bundle, const char* lpszprocname)
 {
 	if(NULL == bundle)
 		return NULL;
-	
+
 	CFStringRef cfprocname = CFStringCreateWithCString(NULL,lpszprocname,CFStringGetSystemEncoding());
 	void_t *processAddress = CFBundleGetFunctionPointerForName(bundle,cfprocname);
 	CFRelease(cfprocname);
-	
+
 	return processAddress;
 }
 #endif
@@ -158,7 +158,7 @@ int32_t  CWelsTraceBase::Trace(const int kLevel, const str_t *kpFormat, va_list 
 		str_t chResult[MAX_LOG_SIZE] = {0};
 		const int32_t kLen	= WelsStrnlen((const str_t *)"[DECODER]: ", MAX_LOG_SIZE);
 
-		WelsStrncpy(chWStrFormat, MAX_LOG_SIZE, (const str_t *)kpFormat, WelsStrnlen((const str_t *)kpFormat, MAX_LOG_SIZE));	
+		WelsStrncpy(chWStrFormat, MAX_LOG_SIZE, (const str_t *)kpFormat, WelsStrnlen((const str_t *)kpFormat, MAX_LOG_SIZE));
 
 		WelsStrncpy(chBuf, MAX_LOG_SIZE, (const str_t *)"[DECODER]: ", kLen);
 
@@ -232,7 +232,7 @@ int32_t  CWelsCodecTrace::LoadWelsTraceModule()
         m_fpWarnTrace = welsStderrTrace<WELS_LOG_WARNING>;
         m_fpErrorTrace = welsStderrTrace<WELS_LOG_ERROR>;
 #else
-#if defined WIN32	
+#if defined WIN32
 	HMODULE hHandle = ::LoadLibrary("welstrace.dll");
 //	HMODULE handle = ::LoadLibrary("contrace.dll");  // for c7 trace
 	if ( NULL == hHandle )
@@ -242,7 +242,7 @@ int32_t  CWelsCodecTrace::LoadWelsTraceModule()
 	GetModuleFileName( (HMODULE)hHandle, chPath, _MAX_PATH);
 
 	m_hTraceHandle = ::LoadLibrary(chPath);
-	
+
 	OutputDebugStringA(chPath);
 	if( m_hTraceHandle) {
 		m_fpDebugTrace = ( CM_WELS_TRACE)::GetProcAddress( ( HMODULE)m_hTraceHandle, "WELSDEBUGA");

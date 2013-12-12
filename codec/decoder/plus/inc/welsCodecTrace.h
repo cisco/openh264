@@ -52,7 +52,7 @@ typedef  enum {
 	Wels_Trace_Type_WinDgb  = 2,
 } EWelsTraceType;
 
-class  IWelsTrace 
+class  IWelsTrace
 {
 public:
 	enum {
@@ -86,12 +86,12 @@ public:
 	{
 		IWelsTrace * pThis = (IWelsTrace *)(pObject);
 
-		va_list  argptr;	
+		va_list  argptr;
 
-		va_start(argptr, kpFormat);	
+		va_start(argptr, kpFormat);
 
 		if( pThis ){
-			pThis->Trace(kLevel, kpFormat, argptr);		
+			pThis->Trace(kLevel, kpFormat, argptr);
 		}
 
 		va_end(argptr);
@@ -108,7 +108,7 @@ public:
 
     virtual int32_t  WriteString(int32_t iLevel, const str_t * pStr) = 0;
 protected:
-	CWelsTraceBase() 
+	CWelsTraceBase()
 	{
 		m_iLevel = WELS_LOG_DEFAULT;
 	};

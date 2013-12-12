@@ -43,7 +43,7 @@
 namespace WelsSVCEnc {
 //basic pMv prediction unit for pMv width (4, 2, 1)
 void PredMv(const SMVComponentUnit* kpMvComp, int8_t iPartIdx, int8_t iPartW, int32_t iRef, SMVUnitXY* sMvp)
-{	
+{
 	const uint8_t kuiLeftIdx		= g_kuiCache30ScanIdx[iPartIdx] - 1;
 	const uint8_t kuiTopIdx		= g_kuiCache30ScanIdx[iPartIdx] - 6;
 
@@ -56,7 +56,7 @@ void PredMv(const SMVComponentUnit* kpMvComp, int8_t iPartIdx, int8_t iPartW, in
 	SMVUnitXY sMvB(kpMvComp->sMotionVectorCache[kuiTopIdx]);
 	SMVUnitXY sMvC;
 
-	if (REF_NOT_AVAIL == iRightTopRef) 
+	if (REF_NOT_AVAIL == iRightTopRef)
 	{
 		iDiagonalRef = kpMvComp->iRefIndexCache[ kuiTopIdx - 1];// left_top;
 		sMvC = kpMvComp->sMotionVectorCache[kuiTopIdx - 1];
@@ -65,9 +65,9 @@ void PredMv(const SMVComponentUnit* kpMvComp, int8_t iPartIdx, int8_t iPartW, in
 	{
 		iDiagonalRef = iRightTopRef;// right_top;
 		sMvC = kpMvComp->sMotionVectorCache[kuiTopIdx + iPartW];
-	}	
+	}
 
-	if ((REF_NOT_AVAIL == iTopRef) && (REF_NOT_AVAIL == iDiagonalRef) && iLeftRef != REF_NOT_AVAIL) 
+	if ((REF_NOT_AVAIL == iTopRef) && (REF_NOT_AVAIL == iDiagonalRef) && iLeftRef != REF_NOT_AVAIL)
 	{
 		*sMvp = sMvA;
 		return;
@@ -77,7 +77,7 @@ void PredMv(const SMVComponentUnit* kpMvComp, int8_t iPartIdx, int8_t iPartW, in
 	iMatchRef  = (iRef == iLeftRef)	<<MB_LEFT_BIT;
 	iMatchRef |= (iRef == iTopRef)		<<MB_TOP_BIT;
 	iMatchRef |= (iRef == iDiagonalRef)<<MB_TOPRIGHT_BIT;
-	switch(iMatchRef) 
+	switch(iMatchRef)
 	{
 		case LEFT_MB_POS:// A
 			*sMvp = sMvA;
@@ -97,14 +97,14 @@ void PredMv(const SMVComponentUnit* kpMvComp, int8_t iPartIdx, int8_t iPartW, in
 void PredInter8x16Mv(SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* sMvp)
 {
 	const SMVComponentUnit *kpMvComp = &pMbCache->sMvComponents;
-	if (0 == iPartIdx) 
+	if (0 == iPartIdx)
 	{
 		const int8_t kiLeftRef = kpMvComp->iRefIndexCache[6];
 		if (iRef == kiLeftRef)
 		{
 			*sMvp = kpMvComp->sMotionVectorCache[6];
 			return;
-		}		
+		}
 	}
 	else // 1 == iPartIdx
 	{
@@ -115,11 +115,11 @@ void PredInter8x16Mv(SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitX
 			iDiagonalRef = kpMvComp->iRefIndexCache[2]; //top-left for 8*8 block(iIndex 1)
 			iIndex = 2;
 		}
-		if (iRef == iDiagonalRef) 
+		if (iRef == iDiagonalRef)
 		{
 			*sMvp = kpMvComp->sMotionVectorCache[iIndex];
 			return;
-		}	
+		}
 	}
 
 	PredMv(kpMvComp, iPartIdx, 2, iRef, sMvp);
@@ -127,7 +127,7 @@ void PredInter8x16Mv(SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitX
 void PredInter16x8Mv(SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* sMvp)
 {
 	const SMVComponentUnit *kpMvComp = &pMbCache->sMvComponents;
-	if (0 == iPartIdx) 
+	if (0 == iPartIdx)
 	{
 		const int8_t kiTopRef = kpMvComp->iRefIndexCache[1];
 		if (iRef == kiTopRef)
@@ -139,7 +139,7 @@ void PredInter16x8Mv(SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitX
 	else // 8 == iPartIdx
 	{
 		const int8_t kiLeftRef = kpMvComp->iRefIndexCache[18];
-		if (iRef == kiLeftRef) 
+		if (iRef == kiLeftRef)
 		{
 			*sMvp = kpMvComp->sMotionVectorCache[18];
 			return;
@@ -149,20 +149,20 @@ void PredInter16x8Mv(SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitX
 	PredMv(kpMvComp, iPartIdx, 4, iRef, sMvp);
 }
 void PredSkipMv(SMbCache* pMbCache, SMVUnitXY* sMvp)
-{	
+{
 	const SMVComponentUnit *kpMvComp = &pMbCache->sMvComponents;
 	const int8_t kiLeftRef = kpMvComp->iRefIndexCache[6]; //A
 	const int8_t kiTopRef  = kpMvComp->iRefIndexCache[1]; //B
 
 	if (REF_NOT_AVAIL == kiLeftRef  || REF_NOT_AVAIL == kiTopRef ||
-		(0 == kiLeftRef && 0 == *(int32_t*)(&kpMvComp->sMotionVectorCache[6])) || 
+		(0 == kiLeftRef && 0 == *(int32_t*)(&kpMvComp->sMotionVectorCache[6])) ||
 		(0 == kiTopRef  && 0 == *(int32_t*)(&kpMvComp->sMotionVectorCache[1])) )
 	{
 		ST32( sMvp, 0 );
 		return;
 	}
 
-	PredMv(kpMvComp, 0, 4, 0, sMvp);	
+	PredMv(kpMvComp, 0, 4, 0, sMvp);
 }
 
 //update pMv and uiRefIndex cache for current MB, only for P_16*16 (SKIP inclusive)
@@ -172,14 +172,14 @@ void UpdateP16x16MotionInfo(SMbCache* pMbCache, SMB* pCurMb, const int8_t kiRef,
 	SMVComponentUnit *pMvComp	= &pMbCache->sMvComponents;
 	const uint32_t kuiMv32			= LD32(pMv);
 	const uint64_t kuiMv64			= BUTTERFLY4x8(kuiMv32);
-	uint64_t uiMvBuf[8]			= { kuiMv64, kuiMv64, kuiMv64, kuiMv64, kuiMv64, kuiMv64, kuiMv64, kuiMv64 };	
+	uint64_t uiMvBuf[8]			= { kuiMv64, kuiMv64, kuiMv64, kuiMv64, kuiMv64, kuiMv64, kuiMv64, kuiMv64 };
 	const uint16_t kuiRef16		= BUTTERFLY1x2(kiRef);
 	const uint32_t kuiRef32		= BUTTERFLY2x4(kuiRef16);
 
 	ST32( pCurMb->pRefIndex, kuiRef32 );
 	// update pMv range from 0~15
 	memcpy( pCurMb->sMv, uiMvBuf, sizeof(uiMvBuf) );	// confirmed_safe_unsafe_usage
-	
+
 	/*
 	 * blocks 0: 7~10, 1: 13~16, 2: 19~22, 3: 25~28
 	 */
@@ -201,7 +201,7 @@ void UpdateP16x16MotionInfo(SMbCache* pMbCache, SMB* pCurMb, const int8_t kiRef,
 	*/
 	pMvComp->sMotionVectorCache[7]	= *pMv;
 	ST64( &pMvComp->sMotionVectorCache[8], kuiMv64 );
-	pMvComp->sMotionVectorCache[10] = *pMv;	
+	pMvComp->sMotionVectorCache[10] = *pMv;
 	pMvComp->sMotionVectorCache[13] = *pMv;
 	ST64( &pMvComp->sMotionVectorCache[14], kuiMv64 );
 	pMvComp->sMotionVectorCache[16] = *pMv;
@@ -213,7 +213,7 @@ void UpdateP16x16MotionInfo(SMbCache* pMbCache, SMB* pCurMb, const int8_t kiRef,
 	pMvComp->sMotionVectorCache[28] = *pMv;
 }
 
-//update uiRefIndex and pMv of both SMB and Mb_cache, only for P16x8 
+//update uiRefIndex and pMv of both SMB and Mb_cache, only for P16x8
 void UpdateP16x8MotionInfo(SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartIdx, const int8_t kiRef, SMVUnitXY* pMv)
 {
 	// optimized 11/25/2011
@@ -248,7 +248,7 @@ void UpdateP16x8MotionInfo(SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPart
 	*/
 	pMvComp->sMotionVectorCache[kiCacheIdx]	= *pMv;
 	ST64( &pMvComp->sMotionVectorCache[kiCacheIdx1], kuiMv64 );
-	pMvComp->sMotionVectorCache[kiCacheIdx3]= *pMv;	
+	pMvComp->sMotionVectorCache[kiCacheIdx3]= *pMv;
 	pMvComp->sMotionVectorCache[kiCacheIdx6]= *pMv;
 	ST64( &pMvComp->sMotionVectorCache[kiCacheIdx7], kuiMv64 );
 	pMvComp->sMotionVectorCache[kiCacheIdx9]= *pMv;
@@ -269,7 +269,7 @@ void update_P8x16_motion_info(SMbCache* pMbCache, SMB* pCurMb, const int32_t kiP
 	const int16_t kiCacheIdx15	= 15+kiCacheIdx;
 	const int16_t kiBlkIdx		= kiPartIdx>>2;
 	const uint16_t kuiRef16		= BUTTERFLY1x2(kiRef);
-		
+
 	pCurMb->pRefIndex[kiBlkIdx]	= kiRef;
 	pCurMb->pRefIndex[2+kiBlkIdx]= kiRef;
 	ST64( &pCurMb->sMv[kiScan4Idx], kuiMv64 );
@@ -292,7 +292,7 @@ void update_P8x16_motion_info(SMbCache* pMbCache, SMB* pCurMb, const int32_t kiP
 	*/
 	pMvComp->sMotionVectorCache[kiCacheIdx]	= *pMv;
 	ST64( &pMvComp->sMotionVectorCache[kiCacheIdx1], kuiMv64 );
-	pMvComp->sMotionVectorCache[kiCacheIdx3] = *pMv;	
+	pMvComp->sMotionVectorCache[kiCacheIdx3] = *pMv;
 	pMvComp->sMotionVectorCache[kiCacheIdx12] = *pMv;
 	ST64( &pMvComp->sMotionVectorCache[kiCacheIdx13], kuiMv64 );
 	pMvComp->sMotionVectorCache[kiCacheIdx15] = *pMv;
@@ -308,14 +308,14 @@ void UpdateP8x8MotionInfo(SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartI
 	const int16_t kiCacheIdx1	= 1+kiCacheIdx;
 	const int16_t kiCacheIdx6	= 6+kiCacheIdx;
 	const int16_t kiCacheIdx7	= 7+kiCacheIdx;
-	
+
 	//mb
 	ST64( &pCurMb->sMv[  kiScan4Idx], kuiMv64 );
 	ST64( &pCurMb->sMv[4+kiScan4Idx], kuiMv64 );
-	
+
 	//cache
    	pMvComp->iRefIndexCache[kiCacheIdx ] =
-   	pMvComp->iRefIndexCache[kiCacheIdx1] = 
+   	pMvComp->iRefIndexCache[kiCacheIdx1] =
    	pMvComp->iRefIndexCache[kiCacheIdx6] =
    	pMvComp->iRefIndexCache[kiCacheIdx7] = kiRef;
 	pMvComp->sMotionVectorCache[kiCacheIdx ] =
@@ -327,13 +327,13 @@ void UpdateP8x8MotionInfo(SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartI
 //=========================update motion info(MV and ref_idx) into Mb_cache==========================
 //update pMv and uiRefIndex cache only for Mb_cache, only for P_16*16 (SKIP inclusive)
 
-//update uiRefIndex and pMv of only Mb_cache, only for P16x8 
+//update uiRefIndex and pMv of only Mb_cache, only for P16x8
 void UpdateP16x8Motion2Cache(SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* pMv)
 {
 	SMVComponentUnit *pMvComp = &pMbCache->sMvComponents;
-	int32_t i;	
+	int32_t i;
 
-	for (i = 0; i < 2; i++, iPartIdx+=4) 
+	for (i = 0; i < 2; i++, iPartIdx+=4)
 	{
 		//cache
 		const uint8_t kuiCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
@@ -346,7 +346,7 @@ void UpdateP16x8Motion2Cache(SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, 
 		pMvComp->sMotionVectorCache[1+kuiCacheIdx] =
 		pMvComp->sMotionVectorCache[6+kuiCacheIdx] =
 		pMvComp->sMotionVectorCache[7+kuiCacheIdx] = *pMv;
-	}	
+	}
 }
 //update uiRefIndex and pMv of only Mb_cache, only for P8x16
 void UpdateP8x16Motion2Cache(SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* pMv)
@@ -354,7 +354,7 @@ void UpdateP8x16Motion2Cache(SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, 
 	SMVComponentUnit *pMvComp = &pMbCache->sMvComponents;
 	int32_t i;
 
-	for (i = 0; i < 2; i++, iPartIdx+=8) 
+	for (i = 0; i < 2; i++, iPartIdx+=8)
 	{
 		//cache
 		const uint8_t kuiCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
@@ -367,7 +367,7 @@ void UpdateP8x16Motion2Cache(SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, 
 		pMvComp->sMotionVectorCache[1+kuiCacheIdx] =
 		pMvComp->sMotionVectorCache[6+kuiCacheIdx] =
 		pMvComp->sMotionVectorCache[7+kuiCacheIdx] = *pMv;
-	}	
+	}
 }
 
 //update uiRefIndex and pMv of only Mb_cache, only for P8x8
@@ -375,7 +375,7 @@ void UpdateP8x8Motion2Cache(SMbCache* pMbCache, int32_t iPartIdx, int8_t pRef, S
 {
 	SMVComponentUnit *pMvComp = &pMbCache->sMvComponents;
 	const uint8_t kuiCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
-	
+
     pMvComp->iRefIndexCache[  kuiCacheIdx] =
     pMvComp->iRefIndexCache[1+kuiCacheIdx] =
     pMvComp->iRefIndexCache[6+kuiCacheIdx] =
@@ -386,4 +386,4 @@ void UpdateP8x8Motion2Cache(SMbCache* pMbCache, int32_t iPartIdx, int8_t pRef, S
 	pMvComp->sMotionVectorCache[7+kuiCacheIdx] = *pMv;
 }
 
-} // namespace WelsSVCEnc 
+} // namespace WelsSVCEnc

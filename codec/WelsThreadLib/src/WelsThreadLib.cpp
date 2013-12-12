@@ -134,7 +134,7 @@ WELS_THREAD_ERROR_CODE    WelsEventDestroy( WELS_EVENT * event )
 }
 
 
-WELS_THREAD_ERROR_CODE    WelsThreadCreate( WELS_THREAD_HANDLE * thread,  LPWELS_THREAD_ROUTINE  routine, 
+WELS_THREAD_ERROR_CODE    WelsThreadCreate( WELS_THREAD_HANDLE * thread,  LPWELS_THREAD_ROUTINE  routine,
 										   void * arg, WELS_THREAD_ATTR attr)
 {
     WELS_THREAD_HANDLE   h = CreateThread(NULL, 0, routine, arg, 0, NULL);
@@ -172,7 +172,7 @@ WELS_THREAD_ERROR_CODE    WelsThreadDestroy( WELS_THREAD_HANDLE *thread )
 	{
 		CloseHandle(*thread);
 		*thread = NULL;
-	}	
+	}
 	return WELS_THREAD_ERROR_OK;
 }
 
@@ -183,8 +183,8 @@ WELS_THREAD_HANDLE        WelsThreadSelf()
 
 WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo(WelsLogicalProcessInfo * pInfo)
 {
-	SYSTEM_INFO  si;	
-	
+	SYSTEM_INFO  si;
+
 	GetSystemInfo(&si);
 
 	pInfo->ProcessorCount = si.dwNumberOfProcessors;
@@ -235,7 +235,7 @@ static int32_t  SystemCall(const str_t * pCmd, str_t * pRes, int32_t iSize)
     while( (iCount = read(fd[0], p, left)) ){
         p += iCount;
         left -= iCount;
-        if( left <=0 ) break;   
+        if( left <=0 ) break;
     }
     close(fd[0]);
     return 0;
@@ -246,7 +246,7 @@ void WelsSleep( uint32_t dwMilliseconds )
 	usleep( dwMilliseconds * 1000 );	// microseconds
 }
 
-WELS_THREAD_ERROR_CODE    WelsThreadCreate( WELS_THREAD_HANDLE * thread,  LPWELS_THREAD_ROUTINE  routine, 
+WELS_THREAD_ERROR_CODE    WelsThreadCreate( WELS_THREAD_HANDLE * thread,  LPWELS_THREAD_ROUTINE  routine,
 										   void * arg, WELS_THREAD_ATTR attr)
 {
 	WELS_THREAD_ERROR_CODE err = 0;
@@ -267,7 +267,7 @@ WELS_THREAD_ERROR_CODE    WelsThreadCreate( WELS_THREAD_HANDLE * thread,  LPWELS
 
 	return err;
 
-//	return pthread_create(thread, NULL, routine, arg); 
+//	return pthread_create(thread, NULL, routine, arg);
 }
 
 WELS_THREAD_ERROR_CODE	  WelsSetThreadCancelable()
@@ -289,7 +289,7 @@ WELS_THREAD_ERROR_CODE    WelsThreadCancel( WELS_THREAD_HANDLE  thread )
 }
 
 WELS_THREAD_ERROR_CODE    WelsThreadDestroy( WELS_THREAD_HANDLE *thread )
-{	
+{
 	return WELS_THREAD_ERROR_OK;
 }
 
@@ -327,7 +327,7 @@ WELS_THREAD_ERROR_CODE    WelsEventInit( WELS_EVENT *event )
 
 WELS_THREAD_ERROR_CODE   WelsEventDestroy( WELS_EVENT * event )
 {
-	return sem_destroy( event );	// match with sem_init	
+	return sem_destroy( event );	// match with sem_init
 }
 
 WELS_THREAD_ERROR_CODE    WelsEventOpen( WELS_EVENT **p_event, str_t *event_name )
@@ -339,7 +339,7 @@ WELS_THREAD_ERROR_CODE    WelsEventOpen( WELS_EVENT **p_event, str_t *event_name
 		sem_unlink( event_name );
 		*p_event = NULL;
 		return WELS_THREAD_ERROR_GENERIAL;
-	} else {		
+	} else {
 		return WELS_THREAD_ERROR_OK;
 	}
 }
@@ -375,7 +375,7 @@ WELS_THREAD_ERROR_CODE   WelsEventWait( WELS_EVENT * event )
 }
 
 WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut( WELS_EVENT * event, uint32_t dwMilliseconds )
-{	
+{
 	if ( dwMilliseconds != (uint32_t)-1 )
 	{
 		return sem_wait(event);
@@ -426,18 +426,18 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking(	uint32_t nCount,
 		nIdx = 0;	// access each event by order
 		while ( nIdx < nCount )
 		{
-			int32_t err = 0;			
+			int32_t err = 0;
 //#if defined(MACOS)	// clock_gettime(CLOCK_REALTIME) & sem_timedwait not supported on mac, so have below impl
 			int32_t wait_count = 0;
 //			struct timespec ts;
 //			struct timeval tv;
-//			
+//
 //			gettimeofday(&tv,0);
 //			ts.tv_sec = tv.tv_sec/*+ kuiAccessTime / 1000*/;		// second
 //			ts.tv_nsec = (tv.tv_usec + kuiAccessTime) * 1000;	// nano-second
-			
+
 			/*
-			 * although such interface is not used in __GNUC__ like platform, to use 
+			 * although such interface is not used in __GNUC__ like platform, to use
 			 * pthread_cond_timedwait() might be better choice if need
 			 */
 			do{
@@ -451,11 +451,11 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking(	uint32_t nCount,
 			}while( 1 );
 //#else
 //			struct timespec ts;
-//			
+//
 //			if ( clock_gettime(CLOCK_REALTIME, &ts) == -1 )
 //				return WELS_THREAD_ERROR_WAIT_FAILED;
 //			ts.tv_nsec += kuiAccessTime/*(kuiAccessTime % 1000)*/ * 1000;
-//			
+//
 ////			fprintf( stderr, "sem_timedwait(): start to wait event %d..\n", nIdx );
 //			err = sem_timedwait(event_list[nIdx], &ts);
 ////			if ( err == -1 )
@@ -463,24 +463,24 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking(	uint32_t nCount,
 ////				sem_getvalue(&event_list[nIdx], &val);
 ////				fprintf( stderr, "sem_timedwait() errno(%d) semaphore %d..\n", errno, val);
 ////				return WELS_THREAD_ERROR_WAIT_FAILED;
-////			}			
+////			}
 ////			fprintf( stderr, "sem_timedwait(): wait event %d result %d errno %d..\n", nIdx, err, errno );
 //			if ( WELS_THREAD_ERROR_OK == err ) // non-blocking mode
-//			{	
+//			{
 ////				int32_t val = 0;
 ////				sem_getvalue(&event_list[nIdx], &val);
 ////				fprintf( stderr, "after sem_timedwait(), event_list[%d] semaphore value= %d..\n", nIdx, val);
 ////				fprintf( stderr, "WelsMultipleEventsWaitSingleBlocking sleep %d us\n", uiSleepMs);
 //				return WELS_THREAD_ERROR_WAIT_OBJECT_0 + nIdx;
 //			}
-//#endif					
+//#endif
 			// we do need access next event next time
 			++ nIdx;
 //			uiSleepMs += kuiAccessTime;
 		}
 		usleep( 1 );	// switch to working threads
 //		++ uiSleepMs;
-	}	
+	}
 
 	return WELS_THREAD_ERROR_WAIT_FAILED;
 }
@@ -492,19 +492,19 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking( uint32_t nCount, WE
 //	const uint32_t kuiAccessTime = (uint32_t)-1;// 1 ms once
 	uint32_t uiCountSignals = 0;
 	uint32_t uiSignalFlag	= 0;	// UGLY: suppose maximal event number up to 32
-	
+
 	if ( nCount == 0 || nCount > (sizeof(uint32_t)<<3) )
 		return WELS_THREAD_ERROR_WAIT_FAILED;
-	
+
 	while (1)
 	{
 		nIdx = 0;	// access each event by order
 		while (nIdx < nCount)
-		{			
+		{
 			const uint32_t kuiBitwiseFlag = (1<<nIdx);
-			
+
 			if ( (uiSignalFlag & kuiBitwiseFlag) != kuiBitwiseFlag ) // non-blocking mode
-			{	
+			{
 				int32_t err = 0;
 //				fprintf( stderr, "sem_wait(): start to wait event %d..\n", nIdx );
 				err = sem_wait(event_list[nIdx]);
@@ -518,16 +518,16 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking( uint32_t nCount, WE
 					uiSignalFlag |= kuiBitwiseFlag;
 					++ uiCountSignals;
 					if ( uiCountSignals >= nCount )
-					{						
+					{
 						return WELS_THREAD_ERROR_OK;
 					}
-				}				
-			}			
+				}
+			}
 			// we do need access next event next time
 			++ nIdx;
-		}		
-	}	
-	
+		}
+	}
+
 	return WELS_THREAD_ERROR_WAIT_FAILED;
 }
 
@@ -537,15 +537,15 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo(WelsLogicalProcessInfo * p
 
 #define   CMD_RES_SIZE    2048
     str_t pBuf[CMD_RES_SIZE];
-   
+
     SystemCall("cat /proc/cpuinfo | grep \"processor\" | wc -l", pBuf, CMD_RES_SIZE);
 
     pInfo->ProcessorCount = atoi(pBuf);
 
     if( pInfo->ProcessorCount == 0 ){
         pInfo->ProcessorCount = 1;
-    }   
- 
+    }
+
 	return WELS_THREAD_ERROR_OK;
 #undef   CMD_RES_SIZE
 

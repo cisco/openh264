@@ -51,31 +51,31 @@ WELSVP_NAMESPACE_BEGIN
 
 uint32_t WelsCPUFeatureDetect( int32_t *pNumberOfLogicProcessors )
 {
-    uint32_t uiCPU = 0;	
+    uint32_t uiCPU = 0;
     uint32_t uiFeatureA = 0, uiFeatureB = 0, uiFeatureC = 0, uiFeatureD = 0;
 	int32_t  CacheLineSize = 0;
-	int8_t   chVenderName[16] = { 0 };	
-	
+	int8_t   chVenderName[16] = { 0 };
+
     if( !WelsCPUIdVerify() )
     {
         /* cpuid is not supported in cpu */
         return 0;
     }
-	
+
 	WelsCPUId( 0, &uiFeatureA, (uint32_t*)&chVenderName[0],(uint32_t*)&chVenderName[8],(uint32_t*)&chVenderName[4] );
     if( uiFeatureA == 0 )
     {
 		/* maximum input value for basic cpuid information */
         return 0;
     }
-	
+
 	WelsCPUId( 1, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD );
     if( (uiFeatureD & 0x00800000) == 0 )
     {
         /* Basic MMX technology is not support in cpu, mean nothing for us so return here */
         return 0;
     }
-	
+
     uiCPU = WELS_CPU_MMX;
     if( uiFeatureD & 0x02000000 )
     {
@@ -104,7 +104,7 @@ uint32_t WelsCPUFeatureDetect( int32_t *pNumberOfLogicProcessors )
 			/* Multi-Threading checking: contains of multiple logic processors */
 			uiCPU |= WELS_CPU_HTT;
 		}
-	}	
+	}
 
 	if( uiFeatureC & 0x00000001 ){
 		/* SSE3 support here */
@@ -116,18 +116,18 @@ uint32_t WelsCPUFeatureDetect( int32_t *pNumberOfLogicProcessors )
 	}
 	if( uiFeatureC & 0x00080000 ){
 		/* SSE4.1 support here, 45nm Penryn processor */
-		uiCPU |= WELS_CPU_SSE41; 
+		uiCPU |= WELS_CPU_SSE41;
 	}
 	if( uiFeatureC & 0x00100000 ){
 		/* SSE4.2 support here, next generation Nehalem processor */
 		uiCPU |= WELS_CPU_SSE42;
 	}
-	if ( WelsCPUSupportAVX( uiFeatureA, uiFeatureC ) )	// 
+	if ( WelsCPUSupportAVX( uiFeatureA, uiFeatureC ) )	//
 	{
 		/* AVX supported */
 		uiCPU |= WELS_CPU_AVX;
 	}
-	if ( WelsCPUSupportFMA( uiFeatureA, uiFeatureC ) )	// 
+	if ( WelsCPUSupportFMA( uiFeatureA, uiFeatureC ) )	//
 	{
 		/* AVX FMA supported */
 		uiCPU |= WELS_CPU_FMA;
@@ -146,9 +146,9 @@ uint32_t WelsCPUFeatureDetect( int32_t *pNumberOfLogicProcessors )
 	if ( pNumberOfLogicProcessors != NULL )
 	{
 		// HTT enabled on chip
-		*pNumberOfLogicProcessors = (uiFeatureB & 0x00ff0000) >> 16; // feature bits: 23-16 on returned EBX		
-	}	
-	
+		*pNumberOfLogicProcessors = (uiFeatureB & 0x00ff0000) >> 16; // feature bits: 23-16 on returned EBX
+	}
+
     WelsCPUId( 0x80000000, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD );
 
 	if( (!strcmp((const str_t*)chVenderName,CPU_Vender_AMD)) && (uiFeatureA>=0x80000001) ){	// confirmed_safe_unsafe_usage
@@ -192,7 +192,7 @@ uint32_t WelsCPUFeatureDetect( int32_t *pNumberOfLogicProcessors )
 			uiCPU |= WELS_CPU_CACHELINE_16;
 		}
 	}
-	
+
     return uiCPU;
 }
 

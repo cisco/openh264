@@ -115,7 +115,7 @@ static inline int32_t WelsCheckLevelLimitation( const SWelsSPS* kpSps, const SLe
 }
 
 static inline int32_t WelsGetLevelIdc( const SWelsSPS* kpSps, float fFrameRate, int32_t iTargetBitRate )
-{	
+{
 	int32_t iOrder;
 	for( iOrder = 0; iOrder < LEVEL_NUMBER; iOrder++ )
 	{
@@ -128,12 +128,12 @@ static inline int32_t WelsGetLevelIdc( const SWelsSPS* kpSps, float fFrameRate, 
 }
 
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	to set Sequence Parameter Set (SPS)
  *
  * \param 	pSps 	SWelsSPS to be wrote, update iSpsId dependency
- * \param	pBitStringAux		bitstream writer auxiliary 
+ * \param	pBitStringAux		bitstream writer auxiliary
  *
  * \return	0 - successed
  *	    	1 - failed
@@ -145,7 +145,7 @@ int32_t WelsWriteSpsSyntax( SWelsSPS *pSps, SBitStringAux *pBitStringAux, int32_
 {
 	SBitStringAux *pLocalBitStringAux = pBitStringAux;
 
-	assert( pSps != NULL && pBitStringAux != NULL );			
+	assert( pSps != NULL && pBitStringAux != NULL );
 
 	BsWriteBits( pLocalBitStringAux, 8, pSps->uiProfileIdc );
 
@@ -190,7 +190,7 @@ int32_t WelsWriteSpsSyntax( SWelsSPS *pSps, SBitStringAux *pBitStringAux, int32_
 	}
 
 	BsWriteOneBit( pLocalBitStringAux, 0/*pSps->bVuiParamPresentFlag*/ );	// vui_parameters_present_flag
-	
+
 	return 0;
 }
 
@@ -206,12 +206,12 @@ int32_t WelsWriteSpsNal( SWelsSPS *pSps, SBitStringAux *pBitStringAux, int32_t* 
 	return 0;
 }
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	to write SubSet Sequence Parameter Set
  *
  * \param 	sub_sps		subset pSps parsed
- * \param	pBitStringAux		bitstream writer auxiliary 
+ * \param	pBitStringAux		bitstream writer auxiliary
  *
  * \return	0 - successed
  *		    1 - failed
@@ -228,7 +228,7 @@ int32_t WelsWriteSubsetSpsSyntax( SSubsetSps *pSubsetSps, SBitStringAux *pBitStr
 
 	if ( pSps->uiProfileIdc == PRO_SCALABLE_BASELINE || pSps->uiProfileIdc == PRO_SCALABLE_HIGH ){
 		SSpsSvcExt *pSubsetSpsExt = &pSubsetSps->sSpsSvcExt;
-		
+
 		BsWriteOneBit( pBitStringAux, true/*pSubsetSpsExt->bInterLayerDeblockingFilterCtrlPresentFlag*/ );
 		BsWriteBits( pBitStringAux, 2, pSubsetSpsExt->iExtendedSpatialScalability );
 			BsWriteOneBit( pBitStringAux, 0/*pSubsetSpsExt->uiChromaPhaseXPlus1Flag*/ );
@@ -236,9 +236,9 @@ int32_t WelsWriteSubsetSpsSyntax( SSubsetSps *pSubsetSps, SBitStringAux *pBitStr
 		if ( pSubsetSpsExt->iExtendedSpatialScalability == 1 ){
 				BsWriteOneBit( pBitStringAux, 0/*pSubsetSpsExt->uiSeqRefLayerChromaPhaseXPlus1Flag*/ );
 				BsWriteBits( pBitStringAux, 2, 1/*pSubsetSpsExt->uiSeqRefLayerChromaPhaseYPlus1*/ );
-			BsWriteSE( pBitStringAux, 0/*pSubsetSpsExt->sSeqScaledRefLayer.left_offset*/ ); 
-			BsWriteSE( pBitStringAux, 0/*pSubsetSpsExt->sSeqScaledRefLayer.top_offset*/ ); 
-			BsWriteSE( pBitStringAux, 0/*pSubsetSpsExt->sSeqScaledRefLayer.right_offset*/ ); 
+			BsWriteSE( pBitStringAux, 0/*pSubsetSpsExt->sSeqScaledRefLayer.left_offset*/ );
+			BsWriteSE( pBitStringAux, 0/*pSubsetSpsExt->sSeqScaledRefLayer.top_offset*/ );
+			BsWriteSE( pBitStringAux, 0/*pSubsetSpsExt->sSeqScaledRefLayer.right_offset*/ );
 			BsWriteSE( pBitStringAux, 0/*pSubsetSpsExt->sSeqScaledRefLayer.bottom_offset*/ );
 		}
 		BsWriteOneBit( pBitStringAux, pSubsetSpsExt->bSeqTcoeffLevelPredFlag );
@@ -246,9 +246,9 @@ int32_t WelsWriteSubsetSpsSyntax( SSubsetSps *pSubsetSps, SBitStringAux *pBitStr
 			BsWriteOneBit( pBitStringAux, pSubsetSpsExt->bAdaptiveTcoeffLevelPredFlag );
 		}
 		BsWriteOneBit( pBitStringAux, pSubsetSpsExt->bSliceHeaderRestrictionFlag );
-		
+
 		BsWriteOneBit( pBitStringAux, false/*pSubsetSps->bSvcVuiParamPresentFlag*/ );
-	}		
+	}
 	BsWriteOneBit( pBitStringAux, false/*pSubsetSps->bAdditionalExtension2Flag*/ );
 
 	BsRbspTrailingBits( pBitStringAux );
@@ -258,12 +258,12 @@ int32_t WelsWriteSubsetSpsSyntax( SSubsetSps *pSubsetSps, SBitStringAux *pBitStr
 	return 0;
 }
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	to write Picture Parameter Set (PPS)
  *
  * \param 	pPps     	pPps
- * \param	pBitStringAux		bitstream writer auxiliary 
+ * \param	pBitStringAux		bitstream writer auxiliary
  *
  * \return	0 - successed
  *	    	1 - failed
@@ -278,10 +278,10 @@ int32_t WelsWritePpsSyntax( SWelsPPS *pPps, SBitStringAux *pBitStringAux, SParaS
 	bool_t bUsedSubset    =  sPSOVector->bPpsIdMappingIntoSubsetsps[pPps->iPpsId];
 	int32_t iParameterSetType = ( bUsedSubset ? PARA_SET_TYPE_SUBSETSPS : PARA_SET_TYPE_AVCSPS );
 
-	BsWriteUE( pLocalBitStringAux, pPps->iPpsId + sPSOVector->sParaSetOffsetVariable[PARA_SET_TYPE_PPS].iParaSetIdDelta[pPps->iPpsId] );	
+	BsWriteUE( pLocalBitStringAux, pPps->iPpsId + sPSOVector->sParaSetOffsetVariable[PARA_SET_TYPE_PPS].iParaSetIdDelta[pPps->iPpsId] );
 	BsWriteUE( pLocalBitStringAux, pPps->iSpsId + sPSOVector->sParaSetOffsetVariable[iParameterSetType].iParaSetIdDelta[pPps->iSpsId] );
-	
-#if _DEBUG 
+
+#if _DEBUG
 	//SParaSetOffset use, 110421
 	if ( sPSOVector->bEnableSpsPpsIdAddition )
 	{
@@ -295,17 +295,17 @@ int32_t WelsWritePpsSyntax( SWelsPPS *pPps, SBitStringAux *pBitStringAux, SParaS
 
 	BsWriteOneBit( pLocalBitStringAux, false/*pPps->entropy_coding_mode_flag*/ );
 	BsWriteOneBit( pLocalBitStringAux, false/*pPps->bPicOrderPresentFlag*/ );
-	
+
 #ifdef DISABLE_FMO_FEATURE
-	BsWriteUE( pLocalBitStringAux, 0/*pPps->uiNumSliceGroups - 1*/ );	
+	BsWriteUE( pLocalBitStringAux, 0/*pPps->uiNumSliceGroups - 1*/ );
 #else
-	BsWriteUE( pLocalBitStringAux, pPps->uiNumSliceGroups - 1 );	
+	BsWriteUE( pLocalBitStringAux, pPps->uiNumSliceGroups - 1 );
 	if ( pPps->uiNumSliceGroups > 1 )
 	{
 		uint32_t i, uiNumBits;
 
 		BsWriteUE( pLocalBitStringAux, pPps->uiSliceGroupMapType );
-		
+
 		switch ( pPps->uiSliceGroupMapType )
 		{
 		case 0:
@@ -330,7 +330,7 @@ int32_t WelsWritePpsSyntax( SWelsPPS *pPps, SBitStringAux *pBitStringAux, SParaS
 		case 6:
 			BsWriteUE( pLocalBitStringAux, pPps->uiPicSizeInMapUnits - 1 );
 			uiNumBits = 0;///////////////////WELS_CEILLOG2(pPps->uiPicSizeInMapUnits);
-			for ( i = 0; i < pPps->uiPicSizeInMapUnits; i ++ ) 
+			for ( i = 0; i < pPps->uiPicSizeInMapUnits; i ++ )
 			{
 				BsWriteBits( pLocalBitStringAux, uiNumBits, pPps->uiSliceGroupId[i] );
 			}
@@ -340,22 +340,22 @@ int32_t WelsWritePpsSyntax( SWelsPPS *pPps, SBitStringAux *pBitStringAux, SParaS
 		}
 	}
 #endif//!DISABLE_FMO_FEATURE
-	
+
 	BsWriteUE( pLocalBitStringAux, 0/*pPps->uiNumRefIdxL0Active - 1*/ );
 	BsWriteUE( pLocalBitStringAux, 0/*pPps->uiNumRefIdxL1Active - 1*/ );
-	
-	
+
+
 	BsWriteOneBit( pLocalBitStringAux, false/*pPps->bWeightedPredFlag*/ );
 	BsWriteBits (pLocalBitStringAux, 2, 0/*pPps->uiWeightedBiPredIdc*/ );
-	
+
 	BsWriteSE( pLocalBitStringAux, pPps->iPicInitQp - 26 );
 	BsWriteSE( pLocalBitStringAux, pPps->iPicInitQs - 26 );
-	
+
 	BsWriteSE( pLocalBitStringAux, pPps->uiChromaQpIndexOffset );
 	BsWriteOneBit( pLocalBitStringAux, pPps->bDeblockingFilterControlPresentFlag );
 	BsWriteOneBit( pLocalBitStringAux, false/*pPps->bConstainedIntraPredFlag*/ );
 	BsWriteOneBit( pLocalBitStringAux, false/*pPps->bRedundantPicCntPresentFlag*/ );
-	
+
     BsRbspTrailingBits( pLocalBitStringAux );
 
 	BsFlush( pLocalBitStringAux );
@@ -392,7 +392,7 @@ int32_t WelsInitSps( SWelsSPS *pSps, SDLayerParam *pLayerParam, const uint32_t k
 	if ( 0 == kuiIntraPeriod )
 	{
 		//max value of both iFrameNum and POC are 2^16-1, in our encoder, iPOC=2*iFrameNum, so max of iFrameNum should be 2^15-1.--
-		pSps->uiLog2MaxFrameNum = 15;//16; 
+		pSps->uiLog2MaxFrameNum = 15;//16;
 	}
 	else
 	{
@@ -414,7 +414,7 @@ int32_t WelsInitSps( SWelsSPS *pSps, SDLayerParam *pLayerParam, const uint32_t k
 	{
 		pSps->bFrameCroppingFlag	= false;
 	}
-	
+
 	pSps->uiProfileIdc	= pLayerParam->uiProfileIdc ? pLayerParam->uiProfileIdc : PRO_BASELINE;
 
 	if( bEnableRc ) //fixed QP condition
@@ -426,7 +426,7 @@ int32_t WelsInitSps( SWelsSPS *pSps, SDLayerParam *pLayerParam, const uint32_t k
 }
 
 
-int32_t WelsInitSubsetSps( SSubsetSps *pSubsetSps, SDLayerParam *pLayerParam, const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame, 
+int32_t WelsInitSubsetSps( SSubsetSps *pSubsetSps, SDLayerParam *pLayerParam, const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame,
 							 const uint32_t kuiSpsId, const bool_t kbEnableFrameCropping, bool_t bEnableRc )
 {
 	SWelsSPS *pSps = &pSubsetSps->pSps;
@@ -436,7 +436,7 @@ int32_t WelsInitSubsetSps( SSubsetSps *pSubsetSps, SDLayerParam *pLayerParam, co
 	WelsInitSps( pSps, pLayerParam, kuiIntraPeriod, kiNumRefFrame, kuiSpsId, kbEnableFrameCropping, bEnableRc );
 
 	pSps->uiProfileIdc	= (pLayerParam->uiProfileIdc >= PRO_SCALABLE_BASELINE) ? pLayerParam->uiProfileIdc : PRO_SCALABLE_BASELINE;
-	
+
 	pSubsetSps->sSpsSvcExt.iExtendedSpatialScalability	= 0;	/* ESS is 0 in default */
 	pSubsetSps->sSpsSvcExt.bAdaptiveTcoeffLevelPredFlag	= false;
 	pSubsetSps->sSpsSvcExt.bSeqTcoeffLevelPredFlag	= false;
@@ -459,25 +459,25 @@ int32_t WelsInitPps(	SWelsPPS *pPps,
 		assert( pSps != NULL );
 		if ( NULL == pSps )
 			return 1;
-		pUsedSps	= pSps;		
+		pUsedSps	= pSps;
 	}
 	else{
 		assert(pSubsetSps != NULL);
 		if ( NULL == pSubsetSps )
 			return 1;
-		pUsedSps	= &pSubsetSps->pSps;		
+		pUsedSps	= &pSubsetSps->pSps;
 	}
-	
+
 	/* fill picture parameter set syntax */
 	pPps->iPpsId		= kuiPpsId;
 	pPps->iSpsId		= pUsedSps->uiSpsId;
 #if !defined(DISABLE_FMO_FEATURE)
 	pPps->uiNumSliceGroups =  1;	//param->qos_param.sliceGroupCount;
     if( pPps->uiNumSliceGroups > 1 )
-    {        
+    {
         pPps->uiSliceGroupMapType = 0;	//param->qos_param.sliceGroupType;
         if( pPps->uiSliceGroupMapType == 0 )
-        {   
+        {
 			uint32_t uiGroup = 0;
 			while (uiGroup < pPps->uiNumSliceGroups) {
 				pPps->uiRunLength[uiGroup]	= 25;
@@ -502,13 +502,13 @@ int32_t WelsInitPps(	SWelsPPS *pPps,
         }
     }
 #endif//!DISABLE_FMO_FEATURE
-	
+
     pPps->iPicInitQp							= 26;
     pPps->iPicInitQs							= 26;
-	
-    pPps->uiChromaQpIndexOffset					= 0;		
+
+    pPps->uiChromaQpIndexOffset					= 0;
 	pPps->bDeblockingFilterControlPresentFlag	= kbDeblockingFilterPresentFlag;
-	
+
 	return 0;
 }
 } // namespace WelsSVCEnc

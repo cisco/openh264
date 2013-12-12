@@ -34,7 +34,7 @@
  *
  * \date        :  2011/02/22
  *
- * \description :  
+ * \description :
  *
  *************************************************************************************
  */
@@ -62,7 +62,7 @@ inline_t int32_t WelsMemcmp( const void *kpBuf1, const void *kpBuf2, uint32_t ui
 	return ::memcmp( kpBuf1, kpBuf2, uiSize);
 }
 
-/*! 
+/*!
 *************************************************************************************
 * \brief	malloc with zero filled utilization in Wels
 *
@@ -75,11 +75,11 @@ inline_t int32_t WelsMemcmp( const void *kpBuf1, const void *kpBuf2, uint32_t ui
 */
 void * WelsMalloc( const uint32_t kuiSize, str_t *pTag = NULL );
 
-/*! 
+/*!
 *************************************************************************************
 * \brief	free utilization in Wels
 *
-* \param 	p	data pointer to be free. 
+* \param 	p	data pointer to be free.
 *			i.e, uint8_t *p = actual data to be free, argv = &p.
 *
 * \return	NONE
@@ -89,9 +89,9 @@ void * WelsMalloc( const uint32_t kuiSize, str_t *pTag = NULL );
 */
 void WelsFree( void * pPointer, str_t *pTag = NULL );
 
-/*! 
+/*!
 *************************************************************************************
-* \brief	reallocation in Wels. Do nothing and continue using old block 
+* \brief	reallocation in Wels. Do nothing and continue using old block
 *		in case the block is large enough currently
 *
 * \param 	p	    memory block required in old time

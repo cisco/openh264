@@ -53,8 +53,8 @@ void PrintHelp(TCHAR *strAppName, TCHAR *strError)
 	if (strError)
 	{
 		_tprintf(_T("Error: %s\n"), strError);
-	} 
-	else 
+	}
+	else
 	{
 		_tprintf(_T("Welsvp Sample Console\n"));
 	}
@@ -86,36 +86,36 @@ void PrintHelp(TCHAR *strAppName, TCHAR *strError)
 
 	_tprintf(_T("Usage2: %s -sw 640 -sh 480 -scc rgb3 -dw 320 -dh 240 -dcc i420 -denoise -vaa -i in.rgb -o out.yuv\n"), strAppName);
 	_tprintf(_T("\n"));
-} 
+}
 
 vVideoFormat Str2FourCC( TCHAR* strInput )
 {
 	vVideoFormat format = vVideoFormat_I420; // as default
 
-	if ( 0 == _tcscmp(strInput, _T("yv12")) ) 
+	if ( 0 == _tcscmp(strInput, _T("yv12")) )
 	{
 		format = vVideoFormat_YV12;
-	} 
-	else if ( 0 == _tcscmp(strInput, _T("i420")) ) 
+	}
+	else if ( 0 == _tcscmp(strInput, _T("i420")) )
 	{
 		format = vVideoFormat_I420;
-	} 
-	else if ( 0 == _tcscmp(strInput, _T("rgb24")) ) 
+	}
+	else if ( 0 == _tcscmp(strInput, _T("rgb24")) )
 	{
 		format = vVideoFormat_RGB24;
-	} 
-	else if ( 0 == _tcscmp(strInput, _T("rgb32")) ) 
+	}
+	else if ( 0 == _tcscmp(strInput, _T("rgb32")) )
 	{
 		format = vVideoFormat_RGB32;
-	} 
+	}
 	else if ( 0 == _tcscmp(strInput, _T("yuy2")) )
 	{
 		format = vVideoFormat_YUY2;
-	} 
-	else if ( 0 == _tcscmp(strInput, _T("nv12")) ) 
+	}
+	else if ( 0 == _tcscmp(strInput, _T("nv12")) )
 	{
 		format = vVideoFormat_NV12;
-	} 
+	}
 
 	return format;
 }
@@ -131,7 +131,7 @@ int ReadFile(vPixMap &pixmap, FILE *fp)
 	case vVideoFormat_YV12:
 		{
 			if ( fread(pixmap.pPixel[0], pixmap.nSizeInBits/8, (3*size)>>1, fp) <= 0 )
-				ret = 1;		
+				ret = 1;
 		}
 		break;
 	case vVideoFormat_YUY2:
@@ -169,7 +169,7 @@ int WriteFile(vPixMap &pixmap, FILE *fp)
 	case vVideoFormat_YV12:
 		{
 			if ( fwrite(pixmap.pPixel[0], pixmap.nSizeInBits/8, (3*size)>>1, fp) <= 0 )
-				ret = 1;		
+				ret = 1;
 		}
 		break;
 	case vVideoFormat_YUY2:
@@ -242,7 +242,7 @@ int AllocPixMap(vPixMap &pixmap)
 	default:
 		return 1;
 	}
-	
+
 	return (pixmap.pPixel[0]) ? 0 : 1;
 }
 
@@ -257,13 +257,13 @@ void FreePixMap(vPixMap &pixmap)
 
 int InitResource(TCHAR *strAppName, VpConfigure &cfg)
 {
-	if (0 == cfg.srcfile) 
+	if (0 == cfg.srcfile)
 	{
 		PrintHelp(strAppName, _T("Source file can not found!\n"));
 		goto exit;
 	};
 
-	if (0 == cfg.dstfile) 
+	if (0 == cfg.dstfile)
 	{
 		PrintHelp(strAppName, _T("Destination file name not found"));
 		goto exit;
@@ -287,7 +287,7 @@ int InitResource(TCHAR *strAppName, VpConfigure &cfg)
 exit:
 	FreePixMap(cfg.src);
 	FreePixMap(cfg.dst);
-	return 1;	
+	return 1;
 }
 
 int ParseCommond(TCHAR* strInput[], int nArgNum, VpConfigure &cfg)
@@ -299,12 +299,12 @@ int ParseCommond(TCHAR* strInput[], int nArgNum, VpConfigure &cfg)
 	}
 
 	int width = 0, height = 0;
-	for (int i = 1; i < nArgNum; i++ ) 
+	for (int i = 1; i < nArgNum; i++ )
 	{
 		if (strInput[i])
-		{ 
-			if ( 0 == _tcscmp(strInput[i], _T("-i")) ) 
-			{          
+		{
+			if ( 0 == _tcscmp(strInput[i], _T("-i")) )
+			{
 				i++;
 				_tfopen_s(&cfg.srcfile, strInput[i], _T("rb"));
 			}
@@ -380,7 +380,7 @@ int ParseCommond(TCHAR* strInput[], int nArgNum, VpConfigure &cfg)
 			else if (0 == _tcscmp(strInput[i], _T("-denoise")))
 			{
 				cfg.methods[vMethods_Denoise] = vMethods_Denoise;
-			}	
+			}
 			else if (0 == _tcscmp(strInput[i], _T("-scd")))
 			{
 				cfg.methods[vMethods_SceneChangeDetection] = vMethods_SceneChangeDetection;
@@ -398,7 +398,7 @@ int ParseCommond(TCHAR* strInput[], int nArgNum, VpConfigure &cfg)
 			{
 			}
 		}
-	}	
+	}
 
 	if (cfg.src.Rect.width == 0)  cfg.src.Rect.width  = width;
 	if (cfg.src.Rect.height == 0) cfg.src.Rect.height = height;
@@ -440,7 +440,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 			if (WriteFile(cfg.dst, cfg.dstfile))
 				break;
-		}		
+		}
 	}
 
 exit:
@@ -457,7 +457,7 @@ exit:
 		fclose(cfg.dstfile);
 
 	FreePixMap(cfg.src);
-	FreePixMap(cfg.dst);	
+	FreePixMap(cfg.dst);
 
 	return 0;
 }

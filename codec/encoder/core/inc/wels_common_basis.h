@@ -37,7 +37,7 @@
 #include "typedefs.h"
 #include "macros.h"
 
-#include "wels_const.h" 
+#include "wels_const.h"
 
 
 namespace WelsSVCEnc {
@@ -57,7 +57,7 @@ enum EProfileIdc{
 	PRO_HIGH422		= 122,
 	PRO_HIGH444		= 144,
 	PRO_CAVLC444	= 244,
-	
+
 	PRO_SCALABLE_BASELINE	= 83,
 	PRO_SCALABLE_HIGH		= 86,
 };
@@ -114,7 +114,7 @@ enum EWelsNalRefIdc
 };
 
 /*
- * VCL TYPE	
+ * VCL TYPE
  */
 
 enum EVclType{
@@ -185,7 +185,7 @@ enum EListIndex{
 struct SMVUnitXY{			// each 4 Bytes
     int16_t		iMvX;
     int16_t		iMvY;
-public:	
+public:
 	SMVUnitXY& sDeltaMv ( const SMVUnitXY& _v0, const SMVUnitXY& _v1 )
 	{
 		iMvX = _v0.iMvX - _v1.iMvX;
@@ -200,7 +200,7 @@ typedef struct TagMVComponentUnit{		// each 	LIST_0/LIST_1
 }SMVComponentUnit, *PMVComponentUnit;
 
 
-typedef struct TagParaSetOffsetVariable{	
+typedef struct TagParaSetOffsetVariable{
 	int32_t 	iParaSetIdDelta[MAX_DQ_LAYER_NUM/*+1*/];	//mark delta between SPS_ID_in_bs and sps_id_in_encoder, can be minus, for each dq-layer
 															//need not extra +1 due no MGS and FMO case so far
 	bool_t		bUsedParaSetIdInBs[MAX_PPS_COUNT];	//mark the used SPS_ID with 1
@@ -209,11 +209,11 @@ typedef struct TagParaSetOffsetVariable{
 
 typedef struct TagParaSetOffset{
 	//in PS0 design, "sParaSetOffsetVariable" record the previous paras before current IDR, AND NEED to be stacked and recover across IDR
-	SParaSetOffsetVariable   sParaSetOffsetVariable[PARA_SET_TYPE]; //PARA_SET_TYPE=3; paraset_type = 0: AVC_SPS; =1: Subset_SPS; =2: PPS	
+	SParaSetOffsetVariable   sParaSetOffsetVariable[PARA_SET_TYPE]; //PARA_SET_TYPE=3; paraset_type = 0: AVC_SPS; =1: Subset_SPS; =2: PPS
 	//in PSO design, "bPpsIdMappingIntoSubsetsps" uses the current para of current IDR period
 	bool_t                  bPpsIdMappingIntoSubsetsps[MAX_DQ_LAYER_NUM/*+1*/];	// need not extra +1 due no MGS and FMO case so far
 	uint16_t	            uiIdrPicId;		// IDR picture id: [0, 65535], this one is used for LTR!! Can we just NOT put this into the SParaSetOffset structure?!!
-#if _DEBUG 
+#if _DEBUG
 	bool_t                  bEnableSpsPpsIdAddition;
 #endif
 }SParaSetOffset;
@@ -253,15 +253,15 @@ enum ETransType{
 	T_PCM	= 3
 };
 
-enum EMbPosition 
+enum EMbPosition
 {
     LEFT_MB_POS     = 0x01,	// A
     TOP_MB_POS      = 0x02,	// B
     TOPRIGHT_MB_POS = 0x04,	// C
 	TOPLEFT_MB_POS	= 0x08,	// D,
 	RIGHT_MB_POS	= 0x10,	//  add followed four case to reuse when intra up-sample
-	BOTTOM_MB_POS	= 0x20,	// 
-	BOTTOMRIGHT_MB_POS = 0x40,	// 
+	BOTTOM_MB_POS	= 0x20,	//
+	BOTTOMRIGHT_MB_POS = 0x40,	//
 	BOTTOMLEFT_MB_POS	= 0x80,	//
 	MB_POS_A  = 0x100
 };
@@ -311,7 +311,7 @@ typedef uint32_t Mb_Type;
 #define SUB_TYPE_8x8			(MB_TYPE_8x8 | MB_TYPE_8x8_REF0)
 
 #define MB_TYPE_UNAVAILABLE		0xFF000000
-#define REF_NOT_AVAIL    -2   
+#define REF_NOT_AVAIL    -2
 #define REF_NOT_IN_LIST -1    //intra
 #define	REF_PIC_REORDER_DEFAULT	TRUE
 
@@ -393,7 +393,7 @@ enum EMmcoCode{
 
 #define C_PRED_DC_L      4
 #define C_PRED_DC_T      5
-#define C_PRED_DC_128    6 
-#define C_PRED_A    7 
+#define C_PRED_DC_128    6
+#define C_PRED_A    7
 }
 #endif//WELS_COMMON_BASIS_H__

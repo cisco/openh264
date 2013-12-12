@@ -65,7 +65,7 @@ CBackgroundDetection::~CBackgroundDetection()
 
 EResult CBackgroundDetection::Process(int32_t iType, SPixMap *pSrcPixMap, SPixMap *pRefPixMap)
 {
-	EResult eReturn = RET_INVALIDPARAM;	
+	EResult eReturn = RET_INVALIDPARAM;
 
 	if (pSrcPixMap==NULL || pRefPixMap==NULL)
 		return eReturn;
@@ -88,7 +88,7 @@ EResult CBackgroundDetection::Process(int32_t iType, SPixMap *pSrcPixMap, SPixMa
 		FreeOUArrayMemory();
 		m_BgdParam.pOU_array = AllocateOUArrayMemory(m_BgdParam.iBgdWidth, m_BgdParam.iBgdHeight);
 		m_iLargestFrameSize = iCurFrameSize;
-	} 
+	}
 
 	if (m_BgdParam.pOU_array == NULL)
 		return eReturn;
@@ -175,7 +175,7 @@ void CBackgroundDetection::ForegroundBackgroundDivision(vBGDParam *pBgdParam)
 
 	SBackgroundOU *pBackgroundOU = pBgdParam->pOU_array;
 
-	for (int32_t j = 0; j < iPicHeightInOU; j ++ ) 
+	for (int32_t j = 0; j < iPicHeightInOU; j ++ )
 	{
 		for (int32_t i = 0; i < iPicWidthInOU; i++ )
 		{
@@ -192,11 +192,11 @@ void CBackgroundDetection::ForegroundBackgroundDivision(vBGDParam *pBgdParam)
 				if (pBackgroundOU->iSAD<=BGD_OU_SIZE*Q_FACTOR)
 				{
 					pBackgroundOU->iBackgroundFlag = 1;
-				} 
+				}
 				else
 				{
 					pBackgroundOU->iBackgroundFlag = pBackgroundOU->iSAD < BGD_THD_SAD ?
-						(pBackgroundOU->iSD < (pBackgroundOU->iSAD*3)>>2) : 
+						(pBackgroundOU->iSD < (pBackgroundOU->iSAD*3)>>2) :
 					(pBackgroundOU->iSD<<1 < pBackgroundOU->iSAD);
 				}
 			}
@@ -326,7 +326,7 @@ inline void CBackgroundDetection::BackgroundErosion(SBackgroundOU *pBackgroundOU
 			if (iSumNeighBackgroundFlags==4)
 			{
 				pBackgroundOU->iBackgroundFlag = 1;
-			} 
+			}
 			else
 			{
 				if ((pOUNeighbours[0]->iBackgroundFlag & pOUNeighbours[1]->iBackgroundFlag) || (pOUNeighbours[2]->iBackgroundFlag & pOUNeighbours[3]->iBackgroundFlag))
@@ -350,7 +350,7 @@ inline void CBackgroundDetection::UpperOUForegroundCheck(SBackgroundOU *pCurOU, 
 		SBackgroundOU	*pOU_L = pCurOU-1;
 		SBackgroundOU	*pOU_R = pCurOU+1;
 		SBackgroundOU	*pOU_U = pCurOU-iPicWidthInOU;
-		SBackgroundOU	*pOU_D = pCurOU+iPicWidthInOU; 
+		SBackgroundOU	*pOU_D = pCurOU+iPicWidthInOU;
 		if (pOU_L->iBackgroundFlag + pOU_R->iBackgroundFlag + pOU_U->iBackgroundFlag + pOU_D->iBackgroundFlag <= 1)
 		{
 			SetBackgroundMbFlag(pBackgroundMbFlag,iPicWidthInMb,0);
@@ -384,7 +384,7 @@ void CBackgroundDetection::ForegroundDilationAndBackgroundErosion(vBGDParam *pBg
 
 			if (pBackgroundOU->iBackgroundFlag)
 				ForegroundDilation(pBackgroundOU, pOUNeighbours, pBgdParam, j*iOUStrideUV+(i<<LOG2_BGD_OU_SIZE_UV));
-			else 
+			else
 				BackgroundErosion(pBackgroundOU, pOUNeighbours);
 
 			// check the up OU

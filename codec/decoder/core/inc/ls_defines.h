@@ -40,7 +40,7 @@
 	struct tagUnaligned_64 { uint64_t l; } __attribute__((packed));
 	struct tagUnaligned_32 { uint32_t l; } __attribute__((packed));
 	struct tagUnaligned_16 { uint16_t l; } __attribute__((packed));
-	
+
 	#define LD16(a) (((struct tagUnaligned_16 *) (a))->l)
 	#define LD32(a) (((struct tagUnaligned_32 *) (a))->l)
 	#define LD64(a) (((struct tagUnaligned_64 *) (a))->l)
@@ -56,7 +56,7 @@
 //	#endif
 
 #else
-	
+
 //#define INTD16(a) (*((int16_t*)(a)))
 //#define INTD32(a) (*((int32_t*)(a)))
 //#define INTD64(a) (*((int64_t*)(a)))

@@ -65,14 +65,14 @@ void FreeMemorySvc( sWelsEncCtx **ppCtx);
 int32_t InitFunctionPointers( SWelsFuncPtrList *pFuncList, SWelsSvcCodingParam *_param, uint32_t  uiCpuFlag );
 
 ///*!
-// * \brief	decide frame type (IDR/P frame)	
+// * \brief	decide frame type (IDR/P frame)
 // * \param	uiFrameType	frame type output
 // * \param	frame_idx	frame index elapsed currently
 // * \param	idr			IDR interval
 // * \return	successful - 0; otherwise none 0 for failed
 // */
 /*!
- * \brief	initialize frame coding	
+ * \brief	initialize frame coding
  */
 void InitFrameCoding( sWelsEncCtx *pEncCtx, const EFrameType keFrameType );
 
@@ -104,7 +104,7 @@ int32_t EncodeFrame(	sWelsEncCtx *pEncCtx,
 
 
 /**********************************************************************************
- * memzero Function 
+ * memzero Function
 ***********************************************************************************/
 void WelsSetMemZero_c(void *pDst, int32_t iSize);	// confirmed_safe_unsafe_usage
 

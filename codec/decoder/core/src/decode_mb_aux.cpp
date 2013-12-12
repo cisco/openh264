@@ -47,7 +47,7 @@ void_t InitDctClipTable(void_t)
 	uint8_t *p		        = &g_ClipTable[0];
 	const int32_t kiLength	= MAX_NEG_CROP * sizeof(uint8_t);
 	int32_t i               = 0;
-	
+
 	do
     {
 		const int32_t kiIdx = MAX_NEG_CROP + i;
@@ -73,7 +73,7 @@ void_t IdctResAddPred_c(uint8_t *pPred, const int32_t kiStride, int16_t *pRs)
 	uint8_t *pDst			= pPred;
 	const int32_t kiStride2	= kiStride<<1;
 	const int32_t kiStride3	= kiStride + kiStride2;
-	uint8_t *pClip			= &g_ClipTable[MAX_NEG_CROP];	
+	uint8_t *pClip			= &g_ClipTable[MAX_NEG_CROP];
 	int32_t i;
 
 	for(i=0; i<4; i++)
@@ -96,7 +96,7 @@ void_t IdctResAddPred_c(uint8_t *pPred, const int32_t kiStride, int16_t *pRs)
 		int32_t kT2	= iSrc[i+4] + (iSrc[i+12]>>1);
 		int32_t kT3	= (32 + kT1 + kT2) >> 6;
 		int32_t kT4	= (32 + kT1 - kT2) >> 6;
-		
+
 		pDst[i] = pClip[ kT3 + pPred[i] ];
 		pDst[i+kiStride3] = pClip[ kT4 + pPred[i+kiStride3] ];
 

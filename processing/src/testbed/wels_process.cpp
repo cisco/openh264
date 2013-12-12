@@ -111,7 +111,7 @@ IWelsVpPlugin::IWelsVpPlugin(int &ret)
 	pDestroyVpInterface = (pfnDestroyVpInterface) queryfunc(hlib, ("DestroyVpInterface"));
 	if (!pCreateVpInterface || !pDestroyVpInterface)
 		goto exit;
-    
+
 	iface[0] = (void *) pCreateVpInterface;
 	iface[1] = (void *) pDestroyVpInterface;
 	pCreateVpInterface((void **)&ivp, WELSVP_INTERFACE_VERION);
@@ -151,7 +151,7 @@ vResult IWelsVpPlugin::Uninit (int nType)
 	vResult ret = vRet_NotSupport;
 	if (hlib && nType > 0)
 		ret = ivp->Uninit(nType);
-	return ret; 
+	return ret;
 }
 
 vResult IWelsVpPlugin::Flush (int nType)
@@ -159,7 +159,7 @@ vResult IWelsVpPlugin::Flush (int nType)
 	vResult ret = vRet_NotSupport;
 	if (hlib && nType > 0)
 		ret = ivp->Flush(nType);
-	return ret; 	
+	return ret;
 }
 
 vResult IWelsVpPlugin::Process (int nType, vPixMap *src, vPixMap *dst)
@@ -167,7 +167,7 @@ vResult IWelsVpPlugin::Process (int nType, vPixMap *src, vPixMap *dst)
 	vResult ret = vRet_NotSupport;
 	if (hlib && nType > 0)
 		ret = ivp->Process(nType, src, dst);
-	return ret; 
+	return ret;
 }
 
 vResult IWelsVpPlugin::Get (int nType, void *pParam)
@@ -175,7 +175,7 @@ vResult IWelsVpPlugin::Get (int nType, void *pParam)
 	vResult ret = vRet_NotSupport;
 	if (hlib && nType > 0)
 		ret = ivp->Get(nType, pParam);
-	return ret; 
+	return ret;
 }
 
 vResult IWelsVpPlugin::Set (int nType, void *pParam)
@@ -183,7 +183,7 @@ vResult IWelsVpPlugin::Set (int nType, void *pParam)
 	vResult ret = vRet_NotSupport;
 	if (hlib && nType > 0)
 		ret = ivp->Set(nType, pParam);
-	return ret; 
+	return ret;
 }
 
 vResult IWelsVpPlugin::SpecialFeature (int nType, void *pIn, void *pOut)
@@ -191,5 +191,5 @@ vResult IWelsVpPlugin::SpecialFeature (int nType, void *pIn, void *pOut)
 	vResult ret = vRet_NotSupport;
 	if (hlib && nType > 0)
 		ret = ivp->SpecialFeature(nType, pIn, pOut);
-	return ret; 
+	return ret;
 }

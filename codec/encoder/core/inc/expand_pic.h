@@ -66,7 +66,7 @@ void ExpandPictureChromaUnalign_sse2(	uint8_t *pDst,
 									const int32_t kiPicW,
 									const int32_t kiPicH	);
 #endif//X86_ASM
-	
+
 #if defined(__cplusplus)
 }
 #endif//__cplusplus

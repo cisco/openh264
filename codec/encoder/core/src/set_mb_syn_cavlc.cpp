@@ -47,12 +47,12 @@
 namespace WelsSVCEnc {
 SCoeffFunc    sCoeffFunc;
 
-const  ALIGNED_DECLARE(uint8_t, g_kuiZeroLeftMap[16], 16) = 
+const  ALIGNED_DECLARE(uint8_t, g_kuiZeroLeftMap[16], 16) =
 {
 	0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7
 };
 
-const ALIGNED_DECLARE(uint8_t, g_kuiTrailingOneIndex[8], 16) = 
+const ALIGNED_DECLARE(uint8_t, g_kuiTrailingOneIndex[8], 16) =
 {
 	3, 0, 1, 0, 2, 0, 1, 0
 };
@@ -65,10 +65,10 @@ int32_t CavlcParamCal_c(int16_t *pCoffLevel, uint8_t *pRun, int16_t *pLevel, int
 	while (iLastIndex >= 0 && pCoffLevel[iLastIndex] == 0) {
 		-- iLastIndex;
 	}
-	 
+
 	while (iLastIndex >= 0) {
 		int32_t iCountZero = 0;
-		pLevel[iTotalCoeffs] = pCoffLevel[iLastIndex--];   
+		pLevel[iTotalCoeffs] = pCoffLevel[iLastIndex--];
 
 		while (iLastIndex >= 0 && pCoffLevel[iLastIndex] == 0) {
 			++ iCountZero;
@@ -82,7 +82,7 @@ int32_t CavlcParamCal_c(int16_t *pCoffLevel, uint8_t *pRun, int16_t *pLevel, int
 }
 
 void  WriteBlockResidualCavlc( int16_t *pCoffLevel, int32_t iEndIdx, int32_t iCalRunLevelFlag, int32_t iResidualProperty, int8_t iNC, SBitStringAux *pBs )
-{		
+{
 	ENFORCE_STACK_ALIGN_1D(int16_t, iLevel, 16, 16)
 	ENFORCE_STACK_ALIGN_1D(uint8_t, uiRun, 16, 16)
 
@@ -92,17 +92,17 @@ void  WriteBlockResidualCavlc( int16_t *pCoffLevel, int32_t iEndIdx, int32_t iCa
 	uint32_t uiSign = 0;
 	int32_t iLevelCode = 0, iLevelPrefix = 0, iLevelSuffix = 0, uiSuffixLength = 0, iLevelSuffixSize = 0;
 	int32_t iValue = 0, iThreshold, iZeroLeft;
-	int32_t n = 0;	
+	int32_t n = 0;
 	int32_t i = 0;
 
 
 	CAVLC_BS_INIT(pBs);
 
-    /*Step 1: calculate iLevel and iRun and total */ 
+    /*Step 1: calculate iLevel and iRun and total */
 
 	if( iCalRunLevelFlag ){
 		int32_t iCount = 0;
-		iTotalZeros = sCoeffFunc.pfCavlcParamCal(pCoffLevel, uiRun, iLevel, &iTotalCoeffs, iEndIdx);        
+		iTotalZeros = sCoeffFunc.pfCavlcParamCal(pCoffLevel, uiRun, iLevel, &iTotalCoeffs, iEndIdx);
 		iCount = (iTotalCoeffs>3)?3:iTotalCoeffs;
 		for(i = 0;i <iCount ;i++)
 		{
@@ -123,7 +123,7 @@ void  WriteBlockResidualCavlc( int16_t *pCoffLevel, int32_t iEndIdx, int32_t iCa
 	/*Step 3: coeff token */
 	const uint8_t *upCoeffToken = &g_kuiVlcCoeffToken[g_kuiEncNcMapTable[iNC]][iTotalCoeffs][iTrailingOnes][0];
 	iValue = upCoeffToken[0];
-	n = upCoeffToken[1];	
+	n = upCoeffToken[1];
 
     if( iTotalCoeffs == 0 )
     {
@@ -131,7 +131,7 @@ void  WriteBlockResidualCavlc( int16_t *pCoffLevel, int32_t iEndIdx, int32_t iCa
 
 		CAVLC_BS_UNINIT(pBs);
         return;
-    }	
+    }
 
     /* Step 4: */
    /*  trailing */
@@ -140,7 +140,7 @@ void  WriteBlockResidualCavlc( int16_t *pCoffLevel, int32_t iEndIdx, int32_t iCa
 	CAVLC_BS_WRITE(n, iValue);
 
     /*  levels */
-	uiSuffixLength = ( iTotalCoeffs > 10 && iTrailingOnes < 3 ) ? 1 : 0;	
+	uiSuffixLength = ( iTotalCoeffs > 10 && iTrailingOnes < 3 ) ? 1 : 0;
 
 	for( i=iTrailingOnes; i<iTotalCoeffs; i++ ){
 		int32_t iVal = iLevel[i];
@@ -150,24 +150,24 @@ void  WriteBlockResidualCavlc( int16_t *pCoffLevel, int32_t iEndIdx, int32_t iCa
 			iLevelCode = (iLevelCode ^ uiSign) + (uiSign<<1);
 			iLevelCode -= ((i == iTrailingOnes) && (iTrailingOnes < 3)) << 1;
 
-			iLevelPrefix = iLevelCode >> uiSuffixLength; 
+			iLevelPrefix = iLevelCode >> uiSuffixLength;
 			iLevelSuffixSize = uiSuffixLength;
 			iLevelSuffix = iLevelCode - (iLevelPrefix<<uiSuffixLength);
 
 			if (iLevelPrefix >= 14 && iLevelPrefix < 30 && uiSuffixLength == 0) {
-				iLevelPrefix = 14; 
+				iLevelPrefix = 14;
 				iLevelSuffix = iLevelCode - iLevelPrefix;
 				iLevelSuffixSize = 4;
 			}
 			else if (iLevelPrefix >= 15) {
-				iLevelPrefix = 15; 
+				iLevelPrefix = 15;
 				iLevelSuffix = iLevelCode - (iLevelPrefix << uiSuffixLength);
 
 				if (uiSuffixLength == 0) {
 					iLevelSuffix -= 15;
 				}
 				iLevelSuffixSize = 12;
-			}		
+			}
 
 			n = iLevelPrefix + 1 + iLevelSuffixSize;
 			iValue = ((1<< iLevelSuffixSize) | iLevelSuffix);
@@ -184,30 +184,30 @@ void  WriteBlockResidualCavlc( int16_t *pCoffLevel, int32_t iEndIdx, int32_t iCa
     if( iTotalCoeffs < iEndIdx + 1 )
     {
 		if ( CHROMA_DC != iResidualProperty )
-		{	
+		{
 			const uint8_t *upTotalZeros = &g_kuiVlcTotalZeros[iTotalCoeffs][iTotalZeros][0];
 			n = upTotalZeros[1];
 			iValue = upTotalZeros[0];
 			CAVLC_BS_WRITE( n, iValue );
 		}
 		else
-		{	
+		{
 			const uint8_t *upTotalZeros = &g_kuiVlcTotalZerosChromaDc[iTotalCoeffs][iTotalZeros][0];
 			n = upTotalZeros[1];
 			iValue = upTotalZeros[0];
-			CAVLC_BS_WRITE( n, iValue );	
+			CAVLC_BS_WRITE( n, iValue );
 		}
     }
 
-    /* Step 6: pRun before */	
+    /* Step 6: pRun before */
 	iZerosLeft = iTotalZeros;
     for( i = 0; i+1 < iTotalCoeffs && iZerosLeft > 0; ++ i )
-    {	
+    {
 		const uint8_t uirun = uiRun[i];
 		iZeroLeft = g_kuiZeroLeftMap[iZerosLeft];
 		n = g_kuiVlcRunBefore[iZeroLeft][uirun][1];
 		iValue = g_kuiVlcRunBefore[iZeroLeft][uirun][0];
-		CAVLC_BS_WRITE(n, iValue);		
+		CAVLC_BS_WRITE(n, iValue);
         iZerosLeft -= uirun;
     }
 

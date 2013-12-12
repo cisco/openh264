@@ -38,7 +38,7 @@
  *************************************************************************************
  */
 
- 
+
 #ifndef WELS_PARSE_MB_SYN_CAVLC_H__
 #define WELS_PARSE_MB_SYN_CAVLC_H__
 
@@ -50,7 +50,7 @@
 namespace WelsDec {
 
 #define I16_LUMA_DC  1
-#define I16_LUMA_AC  2 
+#define I16_LUMA_AC  2
 #define LUMA_DC_AC   3
 #define CHROMA_DC    4
 #define CHROMA_AC    5
@@ -66,10 +66,10 @@ typedef struct TagReadBitsCache
 #define POP_BUFFER(pBitsCache, iCount)	{ pBitsCache->uiCache32Bit <<= iCount;	pBitsCache->uiRemainBits -= iCount;	}
 
 static const uint8_t g_kuiZigzagScan[16]={//4*4block residual zig-zag scan order
-	0,  1,  4,  8,	
-	5,  2,  3,  6,		
-	9, 12, 13, 10,	
-	7, 11, 14, 15,	
+	0,  1,  4,  8,
+	5,  2,  3,  6,
+	9, 12, 13, 10,
+	7, 11, 14, 15,
 };
 
 
@@ -120,7 +120,7 @@ typedef struct TagPartMbInfo{
     MbType iType;
     int8_t iPartCount; //P_16*16, P_16*8, P_8*16, P_8*8 based on 8*8 block; P_8*4, P_4*8, P_4*4 based on 4*4 block
 	int8_t iPartWidth; //based on 4*4 block
-} SPartMbInfo; 
+} SPartMbInfo;
 static const SPartMbInfo g_ksInterMbTypeInfo[5]={
 {MB_TYPE_16x16,    1, 4},
 {MB_TYPE_16x8,     2, 4},
@@ -139,7 +139,7 @@ void_t GetNeighborAvailMbType         (PNeighAvail pNeighAvail, PDqLayer pCurLay
 void_t WelsFillCacheNonZeroCount      (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, PDqLayer pCurLayer);
 void_t WelsFillCacheConstrain0Intra4x4(PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int8_t* pIntraPredMode, PDqLayer pCurLayer);
 void_t WelsFillCacheConstrain1Intra4x4(PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int8_t* pIntraPredMode, PDqLayer pCurLayer);
-void_t WelsFillCacheInter             (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, 
+void_t WelsFillCacheInter             (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
 						              int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30], PDqLayer pCurLayer);
 
 void_t PredPSkipMvFromNeighbor       (PDqLayer pCurLayer, int16_t iMvp[2]);
@@ -191,7 +191,7 @@ int32_t WelsResidualBlockCavlc(	SVlcTable* pVlcTable,
 										PWelsDecoderContext pCtx);
 
 /*!
- * \brief   parsing intra mode 
+ * \brief   parsing intra mode
  * \param 	input : current mb, bit-stream
  * \param 	output: 0 indicating decoding correctly; -1 means error
  */
@@ -201,7 +201,7 @@ int32_t ParseIntra16x16ModeConstrain0(PNeighAvail pNeighAvail, PBitStringAux pBs
 int32_t ParseIntra16x16ModeConstrain1(PNeighAvail pNeighAvail, PBitStringAux pBs, PDqLayer pCurDqLayer);
 
 /*!
- * \brief   parsing inter info (including ref_index and mvd) 
+ * \brief   parsing inter info (including ref_index and mvd)
  * \param 	input : decoding context, current mb, bit-stream
  * \param 	output: 0 indicating decoding correctly; -1 means error
  */

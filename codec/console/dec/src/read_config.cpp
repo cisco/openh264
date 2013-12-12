@@ -63,24 +63,24 @@ CReadConfig::~CReadConfig()
 		m_pCfgFile = NULL;
 	}
 }
-	
+
 long CReadConfig::ReadLine( string* pStr, const int kiValSize/* = 4*/ )
 {
 	if ( m_pCfgFile == NULL || pStr == NULL || kiValSize <= 1)
 		return 0;
-	
+
 	string *strTags = &pStr[0];
 	int iTagNum = 0, iNum = 0;
-	bool bCommentFlag = false;	
-	
+	bool bCommentFlag = false;
+
 	while (iNum < kiValSize) {
 		pStr[iNum]	= "";
 		++ iNum;
-	}	
+	}
 
 	do {
 		const char kChar = (char)fgetc(m_pCfgFile);
-		
+
 		if ( kChar == '\n' || feof(m_pCfgFile) ){
 			++ m_ulLines;
 			break;
@@ -99,9 +99,9 @@ long CReadConfig::ReadLine( string* pStr, const int kiValSize/* = 4*/ )
 			else
 				*strTags += kChar;
 		}
-		
+
 	} while(true);
-	
+
 	return 1+iTagNum;
 }
 

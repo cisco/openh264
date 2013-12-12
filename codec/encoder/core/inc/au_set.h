@@ -47,12 +47,12 @@
 #include "param_svc.h"
 
 namespace WelsSVCEnc {
-/*! 
+/*!
  *************************************************************************************
  * \brief	to write Sequence Parameter Set (SPS)
  *
  * \param 	pSps     	SWelsSPS to be wrote
- * \param	bs_aux		bitstream writer auxiliary 
+ * \param	bs_aux		bitstream writer auxiliary
  *
  * \return	0 - successed
  *		    1 - failed
@@ -64,12 +64,12 @@ namespace WelsSVCEnc {
 int32_t WelsWriteSpsNal( SWelsSPS *pSps, SBitStringAux *pBitStringAux, int32_t* pSpsIdDelta );
 
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	to write SubSet Sequence Parameter Set
  *
  * \param 	sub_sps		subset pSps parsed
- * \param	bs_aux		bitstream writer auxiliary 
+ * \param	bs_aux		bitstream writer auxiliary
  *
  * \return	0 - successed
  *		    1 - failed
@@ -80,12 +80,12 @@ int32_t WelsWriteSpsNal( SWelsSPS *pSps, SBitStringAux *pBitStringAux, int32_t* 
 int32_t WelsWriteSubsetSpsSyntax( SSubsetSps *pSubsetSps, SBitStringAux *pBitStringAux , int32_t* pSpsIdDelta );
 
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	to write Picture Parameter Set (PPS)
  *
  * \param 	pPps     	pPps
- * \param	bs_aux		bitstream writer auxiliary 
+ * \param	bs_aux		bitstream writer auxiliary
  *
  * \return	0 - successed
  *		    1 - failed
@@ -130,7 +130,7 @@ int32_t WelsInitSubsetSps( SSubsetSps *pSubsetSps, SDLayerParam *pLayerParam, co
  */
 int32_t WelsInitPps(	SWelsPPS *pPps,
 						SWelsSPS *pSps,
-						SSubsetSps *pSubsetSps,						
+						SSubsetSps *pSubsetSps,
 						const uint32_t kuiPpsId,
 						const bool_t kbDeblockingFilterPresentFlag,
 						const bool_t kbUsingSubsetSps );

@@ -52,7 +52,7 @@ CDenoiser::CDenoiser(int32_t iCpuFlag)
 }
 
 CDenoiser::~CDenoiser()
-{	
+{
 }
 
 void CDenoiser::InitDenoiseFunc(SDenoiseFuncs &denoiser,  int32_t iCpuFlag)
@@ -63,7 +63,7 @@ void CDenoiser::InitDenoiseFunc(SDenoiseFuncs &denoiser,  int32_t iCpuFlag)
 	if ( iCpuFlag & WELS_CPU_SSE2 )
 	{
 		denoiser.pfBilateralLumaFilter8 = BilateralLumaFilter8_sse2;
-		denoiser.pfWaverageChromaFilter8 = WaverageChromaFilter8_sse2;	
+		denoiser.pfWaverageChromaFilter8 = WaverageChromaFilter8_sse2;
 	}
 #endif
 }
@@ -103,7 +103,7 @@ void CDenoiser::BilateralDenoiseLuma(uint8_t * pSrcY, int32_t iWidth, int32_t iH
 	for(int32_t h = m_uiSpaceRadius;h < iHeight - m_uiSpaceRadius; h++)
 	{
 		for(w = m_uiSpaceRadius; w < iWidth - m_uiSpaceRadius - TAIL_OF_LINE8; w+=8)
-		{	
+		{
 			m_pfDenoise.pfBilateralLumaFilter8(pSrcY + w, iStride);
 		}
 		for(w = w + TAIL_OF_LINE8; w < iWidth - m_uiSpaceRadius; w++)
@@ -123,7 +123,7 @@ void CDenoiser::WaverageDenoiseChroma(uint8_t *pSrcUV, int32_t iWidth, int32_t i
 	{
 		for( w = UV_WINDOWS_RADIUS; w < iWidth - UV_WINDOWS_RADIUS - TAIL_OF_LINE8; w+=8)
 		{
-			m_pfDenoise.pfWaverageChromaFilter8(pSrcUV + w, iStride);		
+			m_pfDenoise.pfWaverageChromaFilter8(pSrcUV + w, iStride);
 		}
 
 		for(w = w + TAIL_OF_LINE8; w < iWidth - UV_WINDOWS_RADIUS; w++)

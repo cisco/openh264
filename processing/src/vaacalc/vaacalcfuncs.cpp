@@ -35,7 +35,7 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-void VAACalcSadSsd_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride, 
+void VAACalcSadSsd_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
 						int32_t *pFrameSad, int32_t *pSad8x8, int32_t *pSum16x16, int32_t *psqsum16x16, int32_t *psqdiff16x16)
 {
 	uint8_t *tmp_ref = pRefData;
@@ -59,7 +59,7 @@ void VAACalcSadSsd_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, in
 			pSum16x16[mb_index] = 0;
 			psqsum16x16[mb_index] = 0;
 			psqdiff16x16[mb_index] = 0;
-			
+
 			l_sad =  l_sqdiff =  l_sum =  l_sqsum = 0;
 			tmp_cur_row = tmp_cur;
 			tmp_ref_row = tmp_ref;
@@ -125,7 +125,7 @@ void VAACalcSadSsd_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, in
 			pSum16x16[mb_index] += l_sum;
 			psqsum16x16[mb_index] += l_sqsum;
 			psqdiff16x16[mb_index] += l_sqdiff;
-			
+
 			l_sad =  l_sqdiff =  l_sum =  l_sqsum = 0;
 			tmp_cur_row = tmp_cur + pic_stride_x8 + 8;
 			tmp_ref_row = tmp_ref + pic_stride_x8 + 8;
@@ -147,8 +147,8 @@ void VAACalcSadSsd_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, in
 			pSum16x16[mb_index] += l_sum;
 			psqsum16x16[mb_index] += l_sqsum;
 			psqdiff16x16[mb_index] += l_sqdiff;
-			
-			
+
+
 			tmp_ref += 16;
 			tmp_cur += 16;
 			++mb_index;
@@ -157,7 +157,7 @@ void VAACalcSadSsd_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, in
 		tmp_cur += step;
 	}
 }
-void VAACalcSadVar_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride, 
+void VAACalcSadVar_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
 						int32_t *pFrameSad, int32_t *pSad8x8, int32_t *pSum16x16, int32_t *psqsum16x16)
 {
 	uint8_t *tmp_ref = pRefData;
@@ -180,7 +180,7 @@ void VAACalcSadVar_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, in
 
 			pSum16x16[mb_index] = 0;
 			psqsum16x16[mb_index] = 0;
-			
+
 			l_sad =  l_sum =  l_sqsum = 0;
 			tmp_cur_row = tmp_cur;
 			tmp_ref_row = tmp_ref;
@@ -240,7 +240,7 @@ void VAACalcSadVar_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, in
 			pSad8x8[(mb_index << 2) + 2] = l_sad;
 			pSum16x16[mb_index] += l_sum;
 			psqsum16x16[mb_index] += l_sqsum;
-			
+
 			l_sad =  l_sum =  l_sqsum = 0;
 			tmp_cur_row = tmp_cur + pic_stride_x8 + 8;
 			tmp_ref_row = tmp_ref + pic_stride_x8 + 8;
@@ -260,8 +260,8 @@ void VAACalcSadVar_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, in
 			pSad8x8[(mb_index << 2) + 3] = l_sad;
 			pSum16x16[mb_index] += l_sum;
 			psqsum16x16[mb_index] += l_sqsum;
-			
-			
+
+
 			tmp_ref += 16;
 			tmp_cur += 16;
 			++mb_index;
@@ -272,7 +272,7 @@ void VAACalcSadVar_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, in
 }
 
 
-void VAACalcSad_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride, 
+void VAACalcSad_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
 						int32_t *pFrameSad, int32_t *pSad8x8)
 {
 	uint8_t *tmp_ref = pRefData;
@@ -292,7 +292,7 @@ void VAACalcSad_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32
 			int32_t l_sad;
 			uint8_t *tmp_cur_row;
 			uint8_t *tmp_ref_row;
-			
+
 			l_sad =  0;
 			tmp_cur_row = tmp_cur;
 			tmp_ref_row = tmp_ref;
@@ -340,7 +340,7 @@ void VAACalcSad_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32
 			}
 			*pFrameSad += l_sad;
 			pSad8x8[(mb_index << 2) + 2] = l_sad;
-			
+
 			l_sad =  0;
 			tmp_cur_row = tmp_cur + pic_stride_x8 + 8;
 			tmp_ref_row = tmp_ref + pic_stride_x8 + 8;
@@ -356,7 +356,7 @@ void VAACalcSad_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32
 			}
 			*pFrameSad += l_sad;
 			pSad8x8[(mb_index << 2) + 3] = l_sad;
-			
+
 			tmp_ref += 16;
 			tmp_cur += 16;
 			++mb_index;
@@ -366,7 +366,7 @@ void VAACalcSad_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32
 	}
 }
 
-void VAACalcSadSsdBgd_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride, 
+void VAACalcSadSsdBgd_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
 							int32_t *pFrameSad, int32_t *pSad8x8, int32_t *pSum16x16, int32_t *psqsum16x16, int32_t *psqdiff16x16, int32_t *pSd8x8, uint8_t *pMad8x8)
 
 {
@@ -526,7 +526,7 @@ void VAACalcSadSsdBgd_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth,
 	}
 }
 
-void VAACalcSadBgd_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride, 
+void VAACalcSadBgd_c(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
 						int32_t *pFrameSad, int32_t *pSad8x8, int32_t *pSd8x8, uint8_t *pMad8x8)
 {
 	uint8_t *tmp_ref = pRefData;

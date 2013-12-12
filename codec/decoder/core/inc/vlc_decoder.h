@@ -117,22 +117,22 @@ extern const uint8_t g_kuiZeroLeftBitNumMap[16];
 static inline void_t InitVlcTable(SVlcTable * pVlcTable)
 {
 	pVlcTable->kpChromaCoeffTokenVlcTable = g_kuiVlcChromaTable;
-	
+
 	pVlcTable->kpCoeffTokenVlcTable[0][0] = g_kuiVlcTable_0;
 	pVlcTable->kpCoeffTokenVlcTable[0][1] = g_kuiVlcTable_1;
 	pVlcTable->kpCoeffTokenVlcTable[0][2] = g_kuiVlcTable_2;
 	pVlcTable->kpCoeffTokenVlcTable[0][3] = g_kuiVlcTable_3;
-	
+
 	pVlcTable->kpCoeffTokenVlcTable[1][0] = g_kuiVlcTable_0_0;
 	pVlcTable->kpCoeffTokenVlcTable[1][1] = g_kuiVlcTable_0_1;
 	pVlcTable->kpCoeffTokenVlcTable[1][2] = g_kuiVlcTable_0_2;
 	pVlcTable->kpCoeffTokenVlcTable[1][3] = g_kuiVlcTable_0_3;
-	
+
 	pVlcTable->kpCoeffTokenVlcTable[2][0] = g_kuiVlcTable_1_0;
 	pVlcTable->kpCoeffTokenVlcTable[2][1] = g_kuiVlcTable_1_1;
 	pVlcTable->kpCoeffTokenVlcTable[2][2] = g_kuiVlcTable_1_2;
 	pVlcTable->kpCoeffTokenVlcTable[2][3] = g_kuiVlcTable_1_3;
-	
+
 	pVlcTable->kpCoeffTokenVlcTable[3][0] = g_kuiVlcTable_2_0;
 	pVlcTable->kpCoeffTokenVlcTable[3][1] = g_kuiVlcTable_2_1;
 	pVlcTable->kpCoeffTokenVlcTable[3][2] = g_kuiVlcTable_2_2;
@@ -141,7 +141,7 @@ static inline void_t InitVlcTable(SVlcTable * pVlcTable)
 	pVlcTable->kpCoeffTokenVlcTable[3][5] = g_kuiVlcTable_2_5;
 	pVlcTable->kpCoeffTokenVlcTable[3][6] = g_kuiVlcTable_2_6;
 	pVlcTable->kpCoeffTokenVlcTable[3][7] = g_kuiVlcTable_2_7;
-	
+
 	pVlcTable->kpZeroTable[0] = g_kuiZeroLeftTable0;
 	pVlcTable->kpZeroTable[1] = g_kuiZeroLeftTable1;
 	pVlcTable->kpZeroTable[2] = g_kuiZeroLeftTable2;

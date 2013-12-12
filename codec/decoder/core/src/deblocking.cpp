@@ -34,7 +34,7 @@
  * \brief	Interfaces introduced in frame deblocking filtering
  *
  * \date	08/02/2010
- *           
+ *
  *************************************************************************************
  */
 
@@ -124,13 +124,13 @@ static const int8_t g_kiTc0Table[52+24][4] = { //this table refers Table 8-17 in
 	,{ -1,13,17,25 },{ -1,13,17,25 },{ -1,13,17,25 },{ -1,13,17,25 },{ -1,13,17,25 },{ -1,13,17,25 }
 };
 
-static const uint8_t g_kuiTableBIdx[2][8] =   
-{     
-	{0,  4,  8,  12, 
-	3,  7,  11, 15}, 
+static const uint8_t g_kuiTableBIdx[2][8] =
+{
+	{0,  4,  8,  12,
+	3,  7,  11, 15},
 
-	{0,  1,  2,  3 , 
-	12, 13, 14, 15}, 
+	{0,  1,  2,  3 ,
+	12, 13, 14, 15},
 };
 
 #define TC0_TBL_LOOKUP(tc, iIndexA, pBS, bChroma) \
@@ -171,7 +171,7 @@ void_t inline DeblockingBSInsideMBAvsbase( int8_t* pNnzTab, uint8_t nBS[2][4][4]
 	*(uint32_t *)uiBsx3 = (uiNnz32b3|(uiNnz32b3>>8))<<iLShiftFactor;
 	nBS[0][1][3] = uiBsx3[0];
 	nBS[0][2][3] = uiBsx3[1];
-	nBS[0][3][3] = uiBsx3[2];	
+	nBS[0][3][3] = uiBsx3[2];
 	*(uint32_t *)nBS[1][3] = (uiNnz32b2|uiNnz32b3)<<iLShiftFactor;
 
 }
@@ -230,10 +230,10 @@ void_t static inline DeblockingBSInsideMBNormal( PDqLayer pCurDqLayer, uint8_t n
 uint32_t DeblockingBsMarginalMBAvcbase( PDqLayer pCurDqLayer, int32_t iEdge, int32_t iNeighMb, int32_t iMbXy)
 {
 	int32_t i;
-	uint32_t uiBSx4;    
+	uint32_t uiBSx4;
     //uint8_t* bS = static_cast<uint8_t*>(&uiBSx4);
     uint8_t* pBS = (uint8_t*)(&uiBSx4);
-	uint32_t uiBIdx  = *(uint32_t *)(&g_kuiTableBIdx[iEdge][0]); 
+	uint32_t uiBIdx  = *(uint32_t *)(&g_kuiTableBIdx[iEdge][0]);
 	uint32_t uiBnIdx = *(uint32_t *)(&g_kuiTableBIdx[iEdge][4]);
 
 	for( i = 0; i < 4; i++ )
@@ -241,8 +241,8 @@ uint32_t DeblockingBsMarginalMBAvcbase( PDqLayer pCurDqLayer, int32_t iEdge, int
 		if( pCurDqLayer->pNzc[iMbXy][uiBIdx&0xff] | pCurDqLayer->pNzc[iNeighMb][uiBnIdx&0xff] )
 		{
 			pBS[i] = 2;
-		} 
-		else 
+		}
+		else
 		{
 			pBS[i] = MB_BS_MV(pCurDqLayer->pRefIndex[LIST_0], pCurDqLayer->pMv[LIST_0], iMbXy, iNeighMb, (uiBIdx&0xff), (uiBnIdx&0xff));
 		}
@@ -258,7 +258,7 @@ int32_t DeblockingAvailableNoInterlayer( PDqLayer pCurDqLayer, int32_t iFilterId
 	int32_t iMbXy = pCurDqLayer->iMbXyIndex;
 	BOOL_T bLeftFlag = FALSE;
 	BOOL_T bTopFlag  = FALSE;
-   
+
 	if ( 2 == iFilterIdc )
 	{
 		bLeftFlag = ( iMbX > 0 ) && ( pCurDqLayer->pSliceIdc[iMbXy] == pCurDqLayer->pSliceIdc[iMbXy-1] );
@@ -274,9 +274,9 @@ int32_t DeblockingAvailableNoInterlayer( PDqLayer pCurDqLayer, int32_t iFilterId
 
 void_t FilteringEdgeLumaH(SDeblockingFilter* pFilter, uint8_t* pPix, int32_t iStride, uint8_t* pBS )
 {
-	int32_t iIndexA; 
-	int32_t iAlpha; 
-	int32_t iBeta;  
+	int32_t iIndexA;
+	int32_t iAlpha;
+	int32_t iBeta;
 	FORCE_STACK_ALIGN_1D( int8_t, tc, 4, 16 );
 
 	GET_ALPHA_BETA_FROM_QP(pFilter->iLumaQP, pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha, iBeta);
@@ -294,7 +294,7 @@ void_t FilteringEdgeLumaV(SDeblockingFilter* pFilter, uint8_t* pPix, int32_t iSt
 {
 	int32_t  iIndexA;
 	int32_t  iAlpha;
-	int32_t  iBeta; 
+	int32_t  iBeta;
 	FORCE_STACK_ALIGN_1D( int8_t, tc, 4, 16 );
 
 	GET_ALPHA_BETA_FROM_QP(pFilter->iLumaQP, pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha, iBeta);
@@ -310,9 +310,9 @@ void_t FilteringEdgeLumaV(SDeblockingFilter* pFilter, uint8_t* pPix, int32_t iSt
 
 void_t FilteringEdgeLumaIntraH( SDeblockingFilter* pFilter, uint8_t* pPix, int32_t iStride, uint8_t* pBS )
 {
-	int32_t iIndexA; 
-	int32_t iAlpha; 
-	int32_t iBeta;  	
+	int32_t iIndexA;
+	int32_t iAlpha;
+	int32_t iBeta;
 
 	GET_ALPHA_BETA_FROM_QP(pFilter->iLumaQP, pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha, iBeta);
 
@@ -325,23 +325,23 @@ void_t FilteringEdgeLumaIntraH( SDeblockingFilter* pFilter, uint8_t* pPix, int32
 
 void_t FilteringEdgeLumaIntraV( SDeblockingFilter* pFilter, uint8_t* pPix, int32_t iStride, uint8_t* pBS )
 {
-	int32_t iIndexA; 
-	int32_t iAlpha; 
-	int32_t iBeta;  
+	int32_t iIndexA;
+	int32_t iAlpha;
+	int32_t iBeta;
 
 	GET_ALPHA_BETA_FROM_QP(pFilter->iLumaQP, pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha, iBeta);
 
 	if( iAlpha | iBeta )
-	{	
+	{
 		pFilter->pLoopf->pfLumaDeblockingEQ4Hor(pPix, iStride, iAlpha, iBeta);
 	}
 	return;
 }
 void_t FilteringEdgeChromaH( SDeblockingFilter* pFilter, uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, uint8_t* pBS )
-{	
-	int32_t iIndexA; 
-	int32_t iAlpha; 
-	int32_t iBeta;  
+{
+	int32_t iIndexA;
+	int32_t iAlpha;
+	int32_t iBeta;
 	FORCE_STACK_ALIGN_1D( int8_t, tc, 4, 16 );
 
 	GET_ALPHA_BETA_FROM_QP(pFilter->iChromaQP, pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha, iBeta);
@@ -352,12 +352,12 @@ void_t FilteringEdgeChromaH( SDeblockingFilter* pFilter, uint8_t* pPixCb, uint8_
 		pFilter->pLoopf->pfChromaDeblockingLT4Ver(pPixCb, pPixCr, iStride,iAlpha, iBeta, tc);
 	}
 	return;
-} 
+}
 void_t FilteringEdgeChromaV( SDeblockingFilter* pFilter, uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, uint8_t* pBS )
-{	  
-	int32_t iIndexA; 
-	int32_t iAlpha; 
-	int32_t iBeta;  
+{
+	int32_t iIndexA;
+	int32_t iAlpha;
+	int32_t iBeta;
 	FORCE_STACK_ALIGN_1D( int8_t, tc, 4, 16 );
 
 	GET_ALPHA_BETA_FROM_QP(pFilter->iChromaQP, pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha, iBeta);
@@ -372,9 +372,9 @@ void_t FilteringEdgeChromaV( SDeblockingFilter* pFilter, uint8_t* pPixCb, uint8_
 
 void_t FilteringEdgeChromaIntraH( SDeblockingFilter* pFilter, uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, uint8_t* pBS )
 {
-	int32_t iIndexA; 
-	int32_t iAlpha; 
-	int32_t iBeta;  
+	int32_t iIndexA;
+	int32_t iAlpha;
+	int32_t iBeta;
 
 	GET_ALPHA_BETA_FROM_QP(pFilter->iChromaQP, pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha, iBeta);
 
@@ -387,9 +387,9 @@ void_t FilteringEdgeChromaIntraH( SDeblockingFilter* pFilter, uint8_t* pPixCb, u
 
 void_t FilteringEdgeChromaIntraV( SDeblockingFilter* pFilter, uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, uint8_t* pBS )
 {
-	int32_t iIndexA; 
-	int32_t iAlpha; 
-	int32_t iBeta;  
+	int32_t iIndexA;
+	int32_t iAlpha;
+	int32_t iBeta;
 
 	GET_ALPHA_BETA_FROM_QP(pFilter->iChromaQP, pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha, iBeta);
 
@@ -406,7 +406,7 @@ void_t DeblockingInterMb( PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint
 	int32_t iMbXyIndex = pCurDqLayer->iMbXyIndex;
 	int32_t iMbX = pCurDqLayer->iMbX;
 	int32_t iMbY = pCurDqLayer->iMbY;
-    
+
 	int32_t iCurLumaQp = pCurDqLayer->pLumaQp[iMbXyIndex];
 	int32_t iCurChromaQp = pCurDqLayer->pChromaQp[iMbXyIndex];
 	int32_t iLineSize   = pFilter->iCsStride[0];
@@ -414,7 +414,7 @@ void_t DeblockingInterMb( PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint
 
     uint8_t * pDestY, * pDestCb, * pDestCr;
 	pDestY  = pFilter->pCsData[0] + ((iMbY * iLineSize + iMbX) << 4);
-	pDestCb = pFilter->pCsData[1] + ((iMbY * iLineSizeUV + iMbX) << 3);				
+	pDestCb = pFilter->pCsData[1] + ((iMbY * iLineSizeUV + iMbX) << 3);
 	pDestCr = pFilter->pCsData[2] + ((iMbY * iLineSizeUV + iMbX) << 3);
 
 	if( iBoundryFlag & LEFT_FLAG_MASK)
@@ -427,7 +427,7 @@ void_t DeblockingInterMb( PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint
 		{
 			FilteringEdgeLumaIntraV( pFilter, pDestY, iLineSize, NULL );
 			FilteringEdgeChromaIntraV( pFilter, pDestCb, pDestCr, iLineSizeUV, NULL );
-		} 
+		}
 		else
 		{
 			if(*(uint32_t *)nBS[0][0] != 0)
@@ -437,10 +437,10 @@ void_t DeblockingInterMb( PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint
 			}
 		}
 	}
-	
+
 	pFilter->iLumaQP = iCurLumaQp;
 	pFilter->iChromaQP = iCurChromaQp;
-    
+
 	if(*(uint32_t *)nBS[0][1] != 0)
 	{
 		FilteringEdgeLumaV( pFilter, &pDestY[1<<2], iLineSize, nBS[0][1]);
@@ -456,28 +456,28 @@ void_t DeblockingInterMb( PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint
 	{
 		FilteringEdgeLumaV( pFilter, &pDestY[3<<2], iLineSize, nBS[0][3] );
 	}
-	
+
 	if( iBoundryFlag & TOP_FLAG_MASK)
-	{	
+	{
 		int32_t iTopXyIndex = iMbXyIndex - pCurDqLayer->iMbWidth;
         pFilter->iLumaQP = (iCurLumaQp + pCurDqLayer->pLumaQp[iTopXyIndex] + 1) >> 1;
         pFilter->iChromaQP = (iCurChromaQp + pCurDqLayer->pChromaQp[iTopXyIndex] + 1) >> 1;
-		
+
 		if(  nBS[1][0][0] == 0x04)
 		{
 			FilteringEdgeLumaIntraH( pFilter, pDestY, iLineSize, NULL );
 			FilteringEdgeChromaIntraH( pFilter, pDestCb, pDestCr, iLineSizeUV, NULL );
-		} 
-		else 
+		}
+		else
 		{
 			if(*(uint32_t *)nBS[1][0] != 0)
 			{
 				FilteringEdgeLumaH( pFilter, pDestY, iLineSize, nBS[1][0] );
 				FilteringEdgeChromaH( pFilter, pDestCb, pDestCr, iLineSizeUV, nBS[1][0] );
 			}
-		}  
+		}
 	}
-	
+
 	pFilter->iLumaQP = iCurLumaQp;
 	pFilter->iChromaQP = iCurChromaQp;
 
@@ -506,7 +506,7 @@ void_t /*__FASTCALL*/ FilteringEdgeLumaHV( PDqLayer pCurDqLayer, PDeblockingFilt
 	int32_t iMbWidth  = pCurDqLayer->iMbWidth;
 	int32_t iLineSize  = pFilter->iCsStride[0];
 
-	uint8_t  *pDestY;	
+	uint8_t  *pDestY;
 	int32_t  iCurQp;
 	int32_t  iIndexA, iAlpha, iBeta;
 
@@ -515,17 +515,17 @@ void_t /*__FASTCALL*/ FilteringEdgeLumaHV( PDqLayer pCurDqLayer, PDeblockingFilt
 
 	pDestY  = pFilter->pCsData[0] + ((iMbY * iLineSize + iMbX) << 4);
 	iCurQp  = pCurDqLayer->pLumaQp[iMbXyIndex];
-	
+
 	*(uint32_t*)uiBSx4 = 0x03030303;
 
 	// luma v
 	if( iBoundryFlag & LEFT_FLAG_MASK)
 	{
-		pFilter->iLumaQP   = ( iCurQp   + pCurDqLayer->pLumaQp[iMbXyIndex-1] + 1 ) >> 1;		
+		pFilter->iLumaQP   = ( iCurQp   + pCurDqLayer->pLumaQp[iMbXyIndex-1] + 1 ) >> 1;
 		FilteringEdgeLumaIntraV( pFilter, pDestY, iLineSize, NULL );
 	}
 
-	pFilter->iLumaQP   = iCurQp;	
+	pFilter->iLumaQP   = iCurQp;
 	GET_ALPHA_BETA_FROM_QP(pFilter->iLumaQP, pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha, iBeta);
 	if( iAlpha | iBeta )
 	{
@@ -538,11 +538,11 @@ void_t /*__FASTCALL*/ FilteringEdgeLumaHV( PDqLayer pCurDqLayer, PDeblockingFilt
 	// luma h
 	if( iBoundryFlag & TOP_FLAG_MASK)
 	{
-		pFilter->iLumaQP   = ( iCurQp   + pCurDqLayer->pLumaQp[iMbXyIndex-iMbWidth] + 1 ) >> 1;	
+		pFilter->iLumaQP   = ( iCurQp   + pCurDqLayer->pLumaQp[iMbXyIndex-iMbWidth] + 1 ) >> 1;
 		FilteringEdgeLumaIntraH( pFilter, pDestY, iLineSize, NULL );
-	}   
+	}
 
-	pFilter->iLumaQP   = iCurQp;	
+	pFilter->iLumaQP   = iCurQp;
 	if( iAlpha | iBeta )
 	{
 		pFilter->pLoopf->pfLumaDeblockingLT4Ver( &pDestY[(1<<2)*iLineSize],iLineSize,iAlpha,iBeta,iTc );
@@ -558,26 +558,26 @@ void_t /*__FASTCALL*/ FilteringEdgeChromaHV( PDqLayer pCurDqLayer, PDeblockingFi
 	int32_t iMbWidth  = pCurDqLayer->iMbWidth;
 	int32_t iLineSize  = pFilter->iCsStride[1];
 
-	uint8_t  *pDestCb, *pDestCr;	
+	uint8_t  *pDestCb, *pDestCr;
 	int32_t  iCurQp;
 	int32_t  iIndexA, iAlpha, iBeta;
-	
+
 	FORCE_STACK_ALIGN_1D( int8_t,  iTc,   4, 16 );
 	FORCE_STACK_ALIGN_1D( uint8_t, uiBSx4, 4, 4  );
 
-	pDestCb = pFilter->pCsData[1] + ((iMbY * iLineSize + iMbX) << 3);				
-	pDestCr = pFilter->pCsData[2] + ((iMbY * iLineSize + iMbX) << 3);	
+	pDestCb = pFilter->pCsData[1] + ((iMbY * iLineSize + iMbX) << 3);
+	pDestCr = pFilter->pCsData[2] + ((iMbY * iLineSize + iMbX) << 3);
 	iCurQp  = pCurDqLayer->pChromaQp[iMbXyIndex];
 	*(uint32_t*)uiBSx4 = 0x03030303;
 
 	// chroma v
 	if( iBoundryFlag & LEFT_FLAG_MASK)
 	{
-		pFilter->iChromaQP = ( iCurQp + pCurDqLayer->pChromaQp[iMbXyIndex-1] + 1 ) >> 1;	
+		pFilter->iChromaQP = ( iCurQp + pCurDqLayer->pChromaQp[iMbXyIndex-1] + 1 ) >> 1;
 		FilteringEdgeChromaIntraV( pFilter, pDestCb, pDestCr, iLineSize, NULL);
 	}
 
-	pFilter->iChromaQP   = iCurQp;	
+	pFilter->iChromaQP   = iCurQp;
 	GET_ALPHA_BETA_FROM_QP(pFilter->iChromaQP, pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha, iBeta);
 	if( iAlpha | iBeta )
 	{
@@ -588,11 +588,11 @@ void_t /*__FASTCALL*/ FilteringEdgeChromaHV( PDqLayer pCurDqLayer, PDeblockingFi
 	// chroma h
 	if( iBoundryFlag & TOP_FLAG_MASK)
 	{
-		pFilter->iChromaQP = ( iCurQp + pCurDqLayer->pChromaQp[iMbXyIndex-iMbWidth] + 1 ) >> 1;		
+		pFilter->iChromaQP = ( iCurQp + pCurDqLayer->pChromaQp[iMbXyIndex-iMbWidth] + 1 ) >> 1;
 		FilteringEdgeChromaIntraH( pFilter, pDestCb, pDestCr, iLineSize, NULL);
-	}   
+	}
 
-	pFilter->iChromaQP   = iCurQp;	
+	pFilter->iChromaQP   = iCurQp;
 	if( iAlpha | iBeta )
 	{
 		pFilter->pLoopf->pfChromaDeblockingLT4Ver( &pDestCb[(2<<1)*iLineSize],&pDestCr[(2<<1)*iLineSize],iLineSize,iAlpha,iBeta,iTc );
@@ -613,7 +613,7 @@ void_t WelsDeblockingMb( PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32
 	int32_t iMbXyIndex	= pCurDqLayer->iMbXyIndex;
 	int32_t iCurMbType  = pCurDqLayer->pMbType[iMbXyIndex];
     int32_t iMbNb;
-	
+
 	switch( iCurMbType )
     {
 	case MB_TYPE_INTRA4x4:
@@ -647,15 +647,15 @@ void_t WelsDeblockingMb( PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32
 			if( iCurMbType == MB_TYPE_16x16 )
 			{
 				DeblockingBSInsideMBAvsbase( pCurDqLayer->pNzc[iMbXyIndex], nBS, 1 );
-			} 
-			else 
+			}
+			else
 			{
 				DeblockingBSInsideMBNormal(pCurDqLayer, nBS, pCurDqLayer->pNzc[iMbXyIndex], iMbXyIndex);
 			}
 		}
 		else
 		{
-			*(uint32_t*)nBS[0][1] = *(uint32_t*)nBS[0][2] = *(uint32_t*)nBS[0][3] = 
+			*(uint32_t*)nBS[0][1] = *(uint32_t*)nBS[0][2] = *(uint32_t*)nBS[0][3] =
 			*(uint32_t*)nBS[1][1] = *(uint32_t*)nBS[1][2] = *(uint32_t*)nBS[1][3] = 0;
 		}
 		DeblockingInterMb( pCurDqLayer, pFilter, nBS, iBoundryFlag );
@@ -671,21 +671,21 @@ void_t DeblockLumaLt4_c( uint8_t *pPix, int32_t iStrideX,int32_t iStrideY, int32
 		int32_t iTc0 = pTc[i>>2];
 		if(iTc0>=0)
 		{
-				int32_t p0 = pPix[-iStrideX];	
-				int32_t p1 = pPix[-2*iStrideX];	
-				int32_t p2 = pPix[-3*iStrideX];	
-				int32_t q0 = pPix[0];	
-				int32_t q1 = pPix[iStrideX];	
-				int32_t q2 = pPix[2*iStrideX];	
+				int32_t p0 = pPix[-iStrideX];
+				int32_t p1 = pPix[-2*iStrideX];
+				int32_t p2 = pPix[-3*iStrideX];
+				int32_t q0 = pPix[0];
+				int32_t q1 = pPix[iStrideX];
+				int32_t q2 = pPix[2*iStrideX];
 				bool_t bDetaP0Q0= WELS_ABS( p0 - q0 )<iAlpha;
 				bool_t bDetaP1P0 = WELS_ABS( p1 - p0 ) < iBeta;
 				bool_t bDetaQ1Q0 = WELS_ABS( q1 - q0 ) < iBeta;
 				int32_t iTc = iTc0;
 				if ( bDetaP0Q0&& bDetaP1P0 && bDetaQ1Q0 )
-				{	
+				{
 					bool_t bDetaP2P0 =  WELS_ABS( p2 - p0 ) < iBeta;
 					bool_t bDetaQ2Q0 =  WELS_ABS( q2 - q0 ) < iBeta;
-					if ( bDetaP2P0) 
+					if ( bDetaP2P0)
 					{
 						pPix[-2*iStrideX] = p1 + WELS_CLIP3( ( p2 + ( ( p0 + q0 + 1 ) >> 1 ) - ( p1 << 1 ) ) >> 1, -iTc0, iTc0 );
 						iTc++;
@@ -712,7 +712,7 @@ void_t DeblockLumaEq4_c( uint8_t *pPix, int32_t iStrideX, int32_t iStrideY, int3
 	{
 		p0 = pPix[-iStrideX];
 		p1 = pPix[-2*iStrideX];
-		p2 = pPix[-3*iStrideX];							
+		p2 = pPix[-3*iStrideX];
 		q0 = pPix[0];
 		q1 = pPix[iStrideX];
 		q2 = pPix[2*iStrideX];
@@ -726,25 +726,25 @@ void_t DeblockLumaEq4_c( uint8_t *pPix, int32_t iStrideX, int32_t iStrideY, int3
 				bool_t bDetaP2P0 = WELS_ABS( p2 - p0 ) < iBeta;
 				bool_t bDetaQ2Q0 =  WELS_ABS( q2 - q0 ) < iBeta;
 				if(bDetaP2P0)
-				{	
-					const int32_t p3 = pPix[-4*iStrideX];	
+				{
+					const int32_t p3 = pPix[-4*iStrideX];
 					pPix[-iStrideX] = ( p2 + (p1 << 1) + (p0 << 1) + (q0 << 1) + q1 + 4 ) >> 3;	 //p0
 					pPix[-2*iStrideX] = ( p2 + p1 + p0 + q0 + 2 ) >> 2;	 //p1
 					pPix[-3*iStrideX] = ( (p3 << 1) + p2 + (p2 << 1) + p1 + p0 + q0 + 4 ) >> 3;//p2
-				 } 
-				 else 
+				 }
+				 else
 				 {
 					pPix[-1*iStrideX] = ( (p1 << 1) + p0 + q1 + 2 ) >> 2;	//p0
-			     }	
-				 if (bDetaQ2Q0)	
-				 {	
-					const int32_t q3 = pPix[3*iStrideX];		
+			     }
+				 if (bDetaQ2Q0)
+				 {
+					const int32_t q3 = pPix[3*iStrideX];
 					pPix[0] = ( p1 + (p0 << 1) + (q0 << 1) + (q1 << 1) + q2 + 4 ) >> 3; //q0
 					pPix[iStrideX] = ( p0 + q0 + q1 + q2 + 2 ) >> 2; //q1
 					pPix[2*iStrideX] = ( (q3 << 1) + q2 + (q2 << 1) + q1 + q0 + p0 + 4 ) >> 3;//q2
-				  } 
-				  else 
-				  {	
+				  }
+				  else
+				  {
 					pPix[0] = ( (q1 << 1) + q0 + p1 + 2 ) >> 2; //q0
 				  }
 			}
@@ -755,7 +755,7 @@ void_t DeblockLumaEq4_c( uint8_t *pPix, int32_t iStrideX, int32_t iStrideY, int3
 			}
 		}
 	 pPix += iStrideY;
-	} 
+	}
 }
 void_t DeblockLumaLt4V_c( uint8_t *pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t *tc )
 {
@@ -786,29 +786,29 @@ void_t DeblockChromaLt4_c( uint8_t *pPixCb, uint8_t *pPixCr, int32_t iStrideX, i
 		p0 = pPixCb[-iStrideX];
 		p1 = pPixCb[-2*iStrideX];
 		q0 = pPixCb[0];
-		q1 = pPixCb[iStrideX];		
+		q1 = pPixCb[iStrideX];
 
 		bDetaP0Q0 =  WELS_ABS( p0 - q0 ) < iAlpha;
 		bDetaP1P0 =  WELS_ABS( p1 - p0 ) < iBeta;
 		bDetaQ1Q0 = WELS_ABS( q1 - q0 ) < iBeta;
-		if( bDetaP0Q0&&bDetaP1P0 &&	bDetaQ1Q0) 
+		if( bDetaP0Q0&&bDetaP1P0 &&	bDetaQ1Q0)
 		{
 			iDeta = WELS_CLIP3( (((q0 - p0 ) << 2) + (p1 - q1) + 4) >> 3, -iTc0, iTc0 );
 			pPixCb[-iStrideX] = WELS_CLIP1( p0 + iDeta );    /* p0' */
 			pPixCb[0]  = WELS_CLIP1( q0 - iDeta );    /* q0' */
 		}
-	
+
 
 		p0 = pPixCr[-iStrideX];
 		p1 = pPixCr[-2*iStrideX];
 		q0 = pPixCr[0];
-		q1 = pPixCr[iStrideX];	
+		q1 = pPixCr[iStrideX];
 
 		bDetaP0Q0 =  WELS_ABS( p0 - q0 ) < iAlpha;
 		bDetaP1P0 =  WELS_ABS( p1 - p0 ) < iBeta;
 		bDetaQ1Q0 = WELS_ABS( q1 - q0 ) < iBeta;
 
-		if( bDetaP0Q0&&bDetaP1P0 &&	bDetaQ1Q0) 
+		if( bDetaP0Q0&&bDetaP1P0 &&	bDetaQ1Q0)
 		{
 			iDeta = WELS_CLIP3( (((q0 - p0 ) << 2) + (p1 - q1) + 4) >> 3, -iTc0, iTc0 );
 			pPixCr[-iStrideX] = WELS_CLIP1( p0 + iDeta );    /* p0' */
@@ -839,7 +839,7 @@ void_t DeblockChromaEq4_c( uint8_t *pPixCb, uint8_t *pPixCr, int32_t iStrideX, i
 				pPixCb[-iStrideX] = ( (p1 << 1) + p0 + q1 + 2 ) >> 2;   /* p0' */
 				pPixCb[0]  = ( (q1 << 1) + q0 + p1 + 2 ) >> 2;   /* q0' */
 			}
-			
+
 			//cr
 			p0 = pPixCr[-iStrideX];
 			p1 = pPixCr[-2*iStrideX];
@@ -853,8 +853,8 @@ void_t DeblockChromaEq4_c( uint8_t *pPixCb, uint8_t *pPixCr, int32_t iStrideX, i
 				pPixCr[-iStrideX] = ( (p1 << 1) + p0 + q1 + 2 ) >> 2;   /* p0' */
 				pPixCr[0]  = ( (q1 << 1) + q0 + p1 + 2 ) >> 2;   /* q0' */
 			}
-			pPixCr += iStrideY;	
-			pPixCb += iStrideY;	
+			pPixCr += iStrideY;
+			pPixCb += iStrideY;
 	}
 }
 void_t DeblockChromaLt4V_c( uint8_t *pPixCb, uint8_t *pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t *tc )
@@ -879,7 +879,7 @@ extern "C" {
 void DeblockLumaLt4H_sse2(uint8_t *pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t *pTc)
 {
     FORCE_STACK_ALIGN_1D(uint8_t,  uiBuf,   16*8, 16);
-    
+
     DeblockLumaTransposeH2V_sse2(pPixY - 4, iStride, &uiBuf[0]);
 	DeblockLumaLt4V_sse2(&uiBuf[4*16], 16, iAlpha, iBeta, pTc);
 	DeblockLumaTransposeV2H_sse2(pPixY - 4, iStride, &uiBuf[0]);
@@ -888,7 +888,7 @@ void DeblockLumaLt4H_sse2(uint8_t *pPixY, int32_t iStride, int32_t iAlpha, int32
 void DeblockLumaEq4H_sse2(uint8_t *pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta)
 {
 	FORCE_STACK_ALIGN_1D(uint8_t,  uiBuf,   16*8, 16);
-    
+
     DeblockLumaTransposeH2V_sse2(pPixY - 4, iStride, &uiBuf[0]);
 	DeblockLumaEq4V_sse2(&uiBuf[4*16], 16, iAlpha, iBeta);
 	DeblockLumaTransposeV2H_sse2(pPixY - 4, iStride, &uiBuf[0]);
@@ -920,16 +920,16 @@ void_t WelsDeblockingFilterSlice( PWelsDecoderContext pCtx, PDeblockingFilterMbF
 	int32_t iBoundryFlag;
 	int32_t iFilterIdc = pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.uiDisableDeblockingFilterIdc;
 
-	/* Step1: parameters set */	
+	/* Step1: parameters set */
 	pFilter.pCsData[0] = pCtx->pDec->pData[0];
 	pFilter.pCsData[1] = pCtx->pDec->pData[1];
 	pFilter.pCsData[2] = pCtx->pDec->pData[2];
-	
+
 	pFilter.iCsStride[0] = pCtx->pDec->iLinesize[0];
 	pFilter.iCsStride[1] = pCtx->pDec->iLinesize[1];
-	
+
 	pFilter.eSliceType = (ESliceType) pCurDqLayer->sLayerInfo.sSliceInLayer.eSliceType;
-	
+
 	pFilter.iSliceAlphaC0Offset = pSliceHeaderExt->sSliceHeader.iSliceAlphaC0Offset;
 	pFilter.iSliceBetaOffset     = pSliceHeaderExt->sSliceHeader.iSliceBetaOffset;
 
@@ -940,10 +940,10 @@ void_t WelsDeblockingFilterSlice( PWelsDecoderContext pCtx, PDeblockingFilterMbF
     {
 		iNextMbXyIndex = pSliceHeaderExt->sSliceHeader.iFirstMbInSlice;
 		pCurDqLayer->iMbX  = iNextMbXyIndex % iMbWidth;
-		pCurDqLayer->iMbY  = iNextMbXyIndex / iMbWidth; 
+		pCurDqLayer->iMbY  = iNextMbXyIndex / iMbWidth;
 		pCurDqLayer->iMbXyIndex = iNextMbXyIndex;
 
-		do 
+		do
 		{
 			iBoundryFlag = DeblockingAvailableNoInterlayer(pCurDqLayer, iFilterIdc);
 
@@ -975,14 +975,14 @@ void_t WelsDeblockingFilterSlice( PWelsDecoderContext pCtx, PDeblockingFilterMbF
 	}
 }
 /*!
- * \brief	deblocking module initialize 
+ * \brief	deblocking module initialize
  *
  * \param	pf
  *          cpu
  *
  * \return	NONE
  */
- 
+
 void_t  DeblockingInit( SDeblockingFunc  *pFunc,  int32_t iCpu )
 {
 	pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_c;

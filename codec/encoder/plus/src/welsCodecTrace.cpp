@@ -71,13 +71,13 @@ static CFBundleRef LoadLibrary(const str_t* lpszbundle)
 	// 1.get bundle path
 	str_t cBundlePath[PATH_MAX];
 	memset(cBundlePath, 0, PATH_MAX);
-	
+
 	Dl_info 	dlInfo;
 	static int32_t  sDummy;
 	dladdr((void*)&sDummy, &dlInfo);
-	
+
 	strlcpy(cBundlePath, dlInfo.dli_fname, PATH_MAX);	// confirmed_safe_unsafe_usage
-	
+
 	str_t * pPath = NULL;
 	for(int32_t i = 4; i > 0; i--)
 	{
@@ -99,39 +99,39 @@ static CFBundleRef LoadLibrary(const str_t* lpszbundle)
 	{
 		return NULL;
 	}
-	
+
 	strlcat(cBundlePath, lpszbundle, PATH_MAX);	// confirmed_safe_unsafe_usage
-	
+
 	FSRef bundlePath;
 	OSStatus iStatus = FSPathMakeRef((uint8_t*)cBundlePath, &bundlePath, NULL);
 	if(noErr != iStatus)
 		return NULL;
-	
+
 	CFURLRef bundleURL = CFURLCreateFromFSRef(kCFAllocatorSystemDefault, &bundlePath);
 	if(NULL == bundleURL)
 		return NULL;
-	
+
 	// 2.get bundle pRef
 	CFBundleRef bundleRef = CFBundleCreate(kCFAllocatorSystemDefault, bundleURL);
 	CFRelease(bundleURL);
-	
+
 //	Boolean bReturn = FALSE;
 	if(NULL != bundleRef)
 	{
 		//	bReturn = CFBundleLoadExecutable(bundleRef);
 	}
-	
+
 	return bundleRef;
 }
 
 static Boolean FreeLibrary(CFBundleRef bundle)
-{	
+{
 	if(NULL != bundle)
 	{
 		//	CFBundleUnloadExecutable(bundle);
 		CFRelease(bundle);
 	}
-	
+
 	return TRUE;
 }
 
@@ -139,11 +139,11 @@ static void* GetProcessAddress(CFBundleRef bundle, const str_t* lpszprocname)
 {
 	if(NULL == bundle)
 		return NULL;
-	
+
 	CFStringRef cfprocname = CFStringCreateWithCString(NULL,lpszprocname,CFStringGetSystemEncoding());
 	void *processAddress = CFBundleGetFunctionPointerForName(bundle,cfprocname);
 	CFRelease(cfprocname);
-	
+
 	return processAddress;
 }
 #endif
@@ -155,7 +155,7 @@ CM_WELS_TRACE welsCodecTrace::m_fpInfoTrace	= NULL;
 CM_WELS_TRACE welsCodecTrace::m_fpWarnTrace	= NULL;
 CM_WELS_TRACE welsCodecTrace::m_fpErrorTrace	= NULL;
 #else
-CM_WELS_TRACE2 welsCodecTrace::m_fpDebugTrace   = NULL; 
+CM_WELS_TRACE2 welsCodecTrace::m_fpDebugTrace   = NULL;
 CM_WELS_TRACE2 welsCodecTrace::m_fpInfoTrace	= NULL;
 CM_WELS_TRACE2 welsCodecTrace::m_fpWarnTrace	= NULL;
 CM_WELS_TRACE2 welsCodecTrace::m_fpErrorTrace   = NULL;
@@ -177,9 +177,9 @@ welsCodecTrace::welsCodecTrace()
 
         m_WelsTraceExistFlag = true;
 #else
-#if defined WIN32	
+#if defined WIN32
 	HMODULE handle = ::GetModuleHandle("welstrace.dll");
-//	HMODULE handle = ::GetModuleHandle("contrace.dll"); // for c7 
+//	HMODULE handle = ::GetModuleHandle("contrace.dll"); // for c7
 	if ( NULL == handle )
 		return;
 
@@ -187,7 +187,7 @@ welsCodecTrace::welsCodecTrace()
 	GetModuleFileName( (HMODULE)handle, achPath, _MAX_PATH);
 
 	m_hTraceHandle = ::LoadLibrary(achPath);
-	
+
 	OutputDebugStringA(achPath);
 	if( m_hTraceHandle) {
 		m_fpDebugTrace = ( CM_WELS_TRACE)::GetProcAddress( ( HMODULE)m_hTraceHandle, "WELSDEBUGA");
@@ -356,15 +356,15 @@ void welsCodecTrace::CODEC_TRACE(void* ignore, const int32_t iLevel, const str_t
 		str_t pBuf[MAX_LOG_SIZE] = {0};
 		str_t cResult[MAX_LOG_SIZE] = {0};
 		const int32_t len	= STRNLEN("[ENCODER]: ", MAX_LOG_SIZE);	// confirmed_safe_unsafe_usage
-		
-		STRNCPY(WStr_Format, MAX_LOG_SIZE, Str_Format, STRNLEN(Str_Format, MAX_LOG_SIZE));	// confirmed_safe_unsafe_usage	
-		
+
+		STRNCPY(WStr_Format, MAX_LOG_SIZE, Str_Format, STRNLEN(Str_Format, MAX_LOG_SIZE));	// confirmed_safe_unsafe_usage
+
 		STRNCPY(pBuf, MAX_LOG_SIZE, "[ENCODER]: ", len);	// confirmed_safe_unsafe_usage
 #if defined(WIN32)
 #if defined(_MSC_VER)
-#if _MSC_VER>=1500		
-		VSPRINTF(pBuf + len, MAX_LOG_SIZE-len, WStr_Format, vl);	// confirmed_safe_unsafe_usage		
-#else		
+#if _MSC_VER>=1500
+		VSPRINTF(pBuf + len, MAX_LOG_SIZE-len, WStr_Format, vl);	// confirmed_safe_unsafe_usage
+#else
 		VSPRINTF(pBuf + len, WStr_Format, vl);	// confirmed_safe_unsafe_usage
 #endif//_MSC_VER>=1500
 #endif//_MSC_VER
@@ -373,7 +373,7 @@ void welsCodecTrace::CODEC_TRACE(void* ignore, const int32_t iLevel, const str_t
 #endif//WIN32
 		STRNCPY(cResult, MAX_LOG_SIZE, pBuf, STRNLEN(pBuf, MAX_LOG_SIZE));	// confirmed_safe_unsafe_usage
 
-//		g_WelsCodecTrace.TraceString(iLevel, cResult);		
+//		g_WelsCodecTrace.TraceString(iLevel, cResult);
 		welsCodecTrace::TraceString(iLevel, cResult);
 }
 

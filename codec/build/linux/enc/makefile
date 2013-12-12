@@ -26,8 +26,8 @@ GCC = gcc -m32
 ASFLAGS= -f elf -DNOPREFIX -I ../../../encoder/core/asm/
 
 LIBS= -lstdc++ -ldl -lpthread -lm
-#-lm 
-CFLAGS=  $(INCLUDE) -m32 -fPIC -D__GCC__ -DLINUX -D__NO_CTYPE -DWELS_SVC -DENCODER_CORE -DHAVE_CACHE_LINE_ALIGN -DWELS_TESTBED -DMT_ENABLED 
+#-lm
+CFLAGS=  $(INCLUDE) -m32 -fPIC -D__GCC__ -DLINUX -D__NO_CTYPE -DWELS_SVC -DENCODER_CORE -DHAVE_CACHE_LINE_ALIGN -DWELS_TESTBED -DMT_ENABLED
 
 ifeq ($(DBG),1)
 #SUFFIX= .dbg
@@ -150,7 +150,7 @@ $(OBJDIR)/quant.o \
 $(OBJDIR)/satd_sad.o \
 $(OBJDIR)/score.o \
 $(OBJDIR)/asm_inc.o \
-$(OBJDIR)/vaa.o 
+$(OBJDIR)/vaa.o
 endif
 OBJBIN=	$(OBJDIR)/read_config.o \
 $(OBJDIR)/welsenc.o
@@ -163,7 +163,7 @@ default: depend checkdir lib dylib exe release
 
 dependencies:
 	@echo "" >dependencies
-	
+
 checkdir:
 	@echo 'checkdir..'
 	@if test ! -d $(OUTDIR) ; \
@@ -195,9 +195,9 @@ clean:
 tags:
 	@echo update tag table
 	@etags $(THREADLIBSRCDIR)/*.cpp $(COMMSRCDIR)/*.cpp $(CORESRCDIR)/*.cpp $(PLUSSRCDIR)/*.cpp $(MAINSRCDIR)/*.cpp
-	
-	
-lib:   	$(OBJENC) 
+
+
+lib:   	$(OBJENC)
 	@echo '$(OBJENC)'
 	@echo
 	@echo 'ar cr $(BINLIB) $(OBJENC)'
@@ -218,7 +218,7 @@ dylib:   $(OBJDEC)
 	@$(GCC)  -shared -Wl,-Bsymbolic -m32 -o $(SHAREDLIB) $(OBJENC)  $(LIBS)
 	@echo '... done'
 	@echo
-	
+
 release:
 	@echo 'release..'
 	@echo 'cp -f $(SHAREDLIB) $(OUTDIR)'
@@ -228,7 +228,7 @@ release:
 	@echo
 
 exe:	$(OBJBIN)
-	@echo	
+	@echo
 	@echo '$(OBJBIN)'
 	@echo
 	@echo '$(GCC) $(LIBS) $(OBJBIN) $(BINLIB) -m32 -o $(BIN)'
@@ -251,24 +251,24 @@ $(OBJDIR)/%.o$(SUFFIX): $(THREADLIBSRCDIR)/%.cpp
 
 $(OBJDIR)/%.o$(SUFFIX): $(CORESRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<		
-	
+	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+
 $(OBJDIR)/%.o$(SUFFIX): $(PLUSSRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<		
+	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o$(SUFFIX): $(ASMSRCDIR)/%.asm
 	@echo 'compiling object file "$@" ...'
-	@$(AS) $(ASFLAGS) -o $@ $<	
-	
+	@$(AS) $(ASFLAGS) -o $@ $<
+
 $(OBJDIR)/%.o$(SUFFIX): $(MAINSRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<	
-	
+	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+
 $(OBJDIR)/%.o$(SUFFIX): $(MAINSRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<	
-	
+	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+
 $(OBJDIR)/%.o$(SUFFIX): $(COMMONSRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
 	@$(CC) -m32 -c $(CFLAGS) -o $@ $<

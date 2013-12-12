@@ -46,7 +46,7 @@ CImageRotating::CImageRotating(int32_t iCpuFlag)
 }
 
 CImageRotating::~CImageRotating()
-{	
+{
 }
 
 void CImageRotating::InitImageRotateFuncs(SImageRotateFuncs &sImageRotateFuncs, int32_t iCpuFlag)
@@ -70,7 +70,7 @@ EResult CImageRotating::ProcessImageRotate(int32_t iType, uint8_t *pSrc, uint32_
 		m_pfRotateImage.pfImageRotate270D(pSrc, uiBytesPerPixel, iWidth, iHeight, pDst);
 	}
 	else
-	{	
+	{
 		return RET_NOTSUPPORTED;
 	}
 	return RET_SUCCESS;

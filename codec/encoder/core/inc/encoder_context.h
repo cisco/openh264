@@ -54,7 +54,7 @@
 #include "wels_func_ptr_def.h"
 
 #ifdef MT_ENABLED
-#include "mt_defs.h"	// for multiple threadin, 
+#include "mt_defs.h"	// for multiple threadin,
 #include "WelsThreadLib.h"
 #endif//MT_ENALBED
 
@@ -72,7 +72,7 @@ typedef struct TagRefList {
 	uint8_t						uiLongRefCount;	// dependend on pRef pic module
 } SRefList;
 
-typedef struct TagLTRState{	
+typedef struct TagLTRState{
 	// LTR mark feedback
 	uint32_t		    		uiLtrMarkState;	// LTR mark state, indicate whether there is a LTR mark feedback unsolved
 	int32_t						iLtrMarkFbFrameNum;// the unsolved LTR mark feedback, the marked iFrameNum feedback from decoder
@@ -87,8 +87,8 @@ typedef struct TagLTRState{
 	int32_t						iLTRMarkSuccessNum; //successful marked num, for mark mode switch
 	int32_t						iCurLtrIdx;// current int32_t term reference index to mark
 	int32_t						iLastLtrIdx;
-	uint32_t					uiLtrMarkInterval;// the interval from the last int32_t term pRef mark	
-		
+	uint32_t					uiLtrMarkInterval;// the interval from the last int32_t term pRef mark
+
 	bool_t						bLTRMarkingFlag;	//decide whether current frame marked as LTR
 	bool_t						bLTRMarkEnable; //when LTR is confirmed and the interval is no smaller than the marking period
 	bool_t						bReceivedT0LostFlag;	// indicate whether a t0 lost feedback is recieved, for LTR recovery
@@ -107,9 +107,9 @@ typedef struct TagStrideTables {
 } SStrideTables;
 
 typedef struct TagWelsEncCtx{
-	// Input	
-	SWelsSvcCodingParam		*pSvcParam;	// SVC parameter, WelsSVCParamConfig in svc_param_settings.h		
-	SWelsSliceBs			 *pSliceBs;		// bitstream buffering for various slices, [uiSliceIdx]	
+	// Input
+	SWelsSvcCodingParam		*pSvcParam;	// SVC parameter, WelsSVCParamConfig in svc_param_settings.h
+	SWelsSliceBs			 *pSliceBs;		// bitstream buffering for various slices, [uiSliceIdx]
 
 	int32_t					*pSadCostMb;
 	/* MVD cost tables for Inter MB */
@@ -118,7 +118,7 @@ typedef struct TagWelsEncCtx{
 	int8_t						*pRefIndexBlock4x4;	// (*pRefIndexBlock4x4[2])[MB_BLOCK8x8_NUM];	    // for store each 4x4 blocks' pRef index, the two swap after different d layer
 	int8_t                      *pNonZeroCountBlocks;	// (*pNonZeroCountBlocks)[MB_LUMA_CHROMA_BLOCK4x4_NUM];
 	int8_t                      *pIntra4x4PredModeBlocks;	// (*pIntra4x4PredModeBlocks)[INTRA_4x4_MODE_NUM];  //last byte is not used; the first 4 byte is for the bottom 12,13,14,15 4x4 block intra mode, and 3 byte for (3,7,11)
-	
+
 	SMB                          **ppMbListD;	// [MAX_DEPENDENCY_LAYER];
 	SStrideTables				*pStrideTab;	// stride tables for internal coding used
 	SWelsFuncPtrList			*pFuncList;
@@ -132,15 +132,15 @@ typedef struct TagWelsEncCtx{
 	// pointers
 	SPicture					*pEncPic;			// pointer to current picture to be encoded
 	SPicture					*pDecPic;			// pointer to current picture being reconstructed
-	SPicture					*pRefPic;			// pointer to current reference picture	
+	SPicture					*pRefPic;			// pointer to current reference picture
 
-	SDqLayer					*pCurDqLayer;				// DQ layer context used to being encoded currently, for reference base layer to refer: pCurDqLayer->pRefLayer if applicable	
-	SDqLayer					**ppDqLayerList;			// overall DQ layers encoded for storage	
+	SDqLayer					*pCurDqLayer;				// DQ layer context used to being encoded currently, for reference base layer to refer: pCurDqLayer->pRefLayer if applicable
+	SDqLayer					**ppDqLayerList;			// overall DQ layers encoded for storage
 
 	SRefList					**ppRefPicListExt;		// reference picture list for SVC
-	SPicture					*pRefList0[16];	
-	SLTRState					*pLtr;//[MAX_DEPENDENCY_LAYER];	
-	
+	SPicture					*pRefList0[16];
+	SLTRState					*pLtr;//[MAX_DEPENDENCY_LAYER];
+
 	// Derived
 	int32_t						iCodingIndex;
 	int32_t						iFrameIndex;			// count how many frames elapsed during coding context currently
@@ -150,22 +150,22 @@ typedef struct TagWelsEncCtx{
 	EWelsSliceType				eSliceType;			// currently coding slice type
 	EWelsNalUnitType			eNalType;			// NAL type
 	EWelsNalRefIdc				eNalPriority;		// NAL_Reference_Idc currently
-	EWelsNalRefIdc				eLastNalPriority;	// NAL_Reference_Idc in last frame		
-	uint8_t						iNumRef0;	
+	EWelsNalRefIdc				eLastNalPriority;	// NAL_Reference_Idc in last frame
+	uint8_t						iNumRef0;
 
 	uint8_t						uiDependencyId;	// Idc of dependecy layer to be coded
 	uint8_t						uiTemporalId;	// Idc of temporal layer to be coded
-	bool_t						bNeedPrefixNalFlag;	// whether add prefix nal	
-	bool_t                      bEncCurFrmAsIdrFlag;  
+	bool_t						bNeedPrefixNalFlag;	// whether add prefix nal
+	bool_t                      bEncCurFrmAsIdrFlag;
 
-	// Rate control routine	
+	// Rate control routine
 	SWelsSvcRc					*pWelsSvcRc;
 	int32_t						iSkipFrameFlag; //_GOM_RC_
 	int32_t						iGlobalQp;		// global qp
 
-	// VAA	
+	// VAA
 	SVAAFrameInfo			    *pVaa;		    // VAA information of reference
-	CWelsPreProcess				*pVpp;	
+	CWelsPreProcess				*pVpp;
 
 	SWelsSPS							*pSpsArray;		// MAX_SPS_COUNT by standard compatible
 	SWelsSPS							*pSps;
@@ -182,8 +182,8 @@ typedef struct TagWelsEncCtx{
 	uint8_t						*pFrameBs;		// restoring bitstream pBuffer of all NALs in a frame
 	int32_t						iFrameBsSize;	// count size of frame bs in bytes allocated
 	int32_t						iPosBsBuffer;	// current writing position of frame bs pBuffer
-	
-	/* For Downsampling & VAA I420 based source pictures */	
+
+	/* For Downsampling & VAA I420 based source pictures */
 	SPicture					*pSpatialPic[MAX_DEPENDENCY_LAYER][MAX_TEMPORAL_LEVEL+1+LONG_TERM_REF_NUM];	// need memory requirement with total number of (log2(uiGopSize)+1+1+long_term_ref_num)
 
 	SSpatialPicIndex			sSpatialIndexMap[MAX_DEPENDENCY_LAYER];
@@ -194,15 +194,15 @@ typedef struct TagWelsEncCtx{
 
 	int16_t						iMaxSliceCount;// maximal count number of slices for all layers observation
 	int16_t						iActiveThreadsNum;	// number of threads active so far
-	
+
 	/*
 	 * DQ layer idc map for svc encoding, might be a better scheme than that of design before,
 	 * can aware idc of referencing layer and that idc of successive layer to be coded
 	 */
 	/* SVC only */
-	SDqIdc						*pDqIdcMap;	// overall DQ map of full scalability in specific frame (All full D/T/Q layers involved)												// pDqIdcMap[dq_index] for each SDqIdc pData	
+	SDqIdc						*pDqIdcMap;	// overall DQ map of full scalability in specific frame (All full D/T/Q layers involved)												// pDqIdcMap[dq_index] for each SDqIdc pData
 
-	SParaSetOffset				sPSOVector;	
+	SParaSetOffset				sPSOVector;
 	CMemoryAlign				*pMemAlign;
 
 #ifdef ENABLE_TRACE_FILE
@@ -211,11 +211,11 @@ typedef struct TagWelsEncCtx{
 
 #endif//ENABLE_TRACE_FILE
 
-#if defined(STAT_OUTPUT)	
+#if defined(STAT_OUTPUT)
 	// overall stat pData, refer to SStatData in stat.h, in case avc to use stat[0][0]
 	SStatData					sStatData [ MAX_DEPENDENCY_LAYER ] [ MAX_QUALITY_LEVEL ];
 	SStatSliceInfo				sPerInfo;
-#endif//STAT_OUTPUT	
+#endif//STAT_OUTPUT
 
 }sWelsEncCtx/*, *PWelsEncCtx*/;
 }

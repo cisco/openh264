@@ -70,7 +70,7 @@ typedef int32_t (*PQuantizationHadamardFunc)(int16_t *pRes, const int16_t kiFF, 
 typedef void (*PWelsMcFunc) (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
 							  SMVUnitXY mv, int32_t iWidth, int32_t iHeight);
 
-typedef void (*PWelsLumaHalfpelMcFunc) (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, 
+typedef void (*PWelsLumaHalfpelMcFunc) (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                    int32_t iWidth, int32_t iHeight);
 typedef void (*PWelsLumaQuarpelMcFunc) (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 typedef void (*PWelsSampleAveragingFunc) ( uint8_t *, int32_t, uint8_t *, int32_t, uint8_t *, int32_t, int32_t );
@@ -104,7 +104,7 @@ typedef struct tagDeblockingFunc {
 
 typedef  void (*PSetNoneZeroCountZeroFunc) (int8_t * pNonZeroCount );
 
-typedef int32_t (*PIntraFineMdFunc)(void* pEncCtx, void * pWelsMd, SMB* pCurMb, SMbCache *pMbCache); 
+typedef int32_t (*PIntraFineMdFunc)(void* pEncCtx, void * pWelsMd, SMB* pCurMb, SMbCache *pMbCache);
 typedef void (*PInterFineMdFunc)(void* pEncCtx, void* pWelsMd, SSlice *slice, SMB* pCurMb, int32_t bestCost );
 typedef BOOL_T (*PInterMdFirstIntraModeFunc)(void* pEncCtx, void* pWelsMd, SMB* pCurMb, SMbCache *pMbCache);
 
@@ -150,7 +150,7 @@ struct TagWelsFuncPointerList
 {
 	PExpandPictureFunc			pfExpandLumaPicture;
 	PExpandPictureFunc			pfExpandChromaPicture[2];// 0: for chroma unalignment && width_uv >= 16; 1: for chroma alignment && width_uv >= 16;
-    	
+
     PFillInterNeighborCacheFunc       pfFillInterNeighborCache;
 
 	PGetVarianceFromIntraVaaFunc	pfGetVarianceFromIntraVaa;
@@ -167,8 +167,8 @@ struct TagWelsFuncPointerList
 	SMcFunc				        sMcFuncs;
 	SSampleDealingFunc     sSampleDealingFuncs;
 	PGetIntraPredFunc 		pfGetLumaI16x16Pred[I16_PRED_DC_A];
-	PGetIntraPredFunc 		pfGetLumaI4x4Pred[I4_PRED_A];		
-	PGetIntraPredFunc 		pfGetChromaPred[C_PRED_A];		
+	PGetIntraPredFunc 		pfGetLumaI4x4Pred[I4_PRED_A];
+	PGetIntraPredFunc 		pfGetChromaPred[C_PRED_A];
 	PMotionSearchFunc	    pfMotionSearch; //svc_encode_slice.c svc_mode_decision.c svc_enhance_layer_md.c svc_base_layer_md.c
 
 	PCopyFunc      pfCopy16x16Aligned;		//svc_encode_slice.c svc_mode_decision.c svc_base_layer_md.c
@@ -181,14 +181,14 @@ struct TagWelsFuncPointerList
 	PDctFunc					pfDctT4;
 	PDctFunc    		        pfDctFourT4;
 
-	PCalculateSingleCtrFunc				pfCalculateSingleCtr4x4;     
+	PCalculateSingleCtrFunc				pfCalculateSingleCtr4x4;
 	PScanFunc				pfScan4x4;		//DC/AC
     PScanFunc				pfScan4x4Ac;
 
-	PQuantizationFunc				        pfQuantization4x4;       
-	PQuantizationFunc				        pfQuantizationFour4x4;  
-    PQuantizationDcFunc			        pfQuantizationDc4x4; 
-	PQuantizationMaxFunc		        pfQuantizationFour4x4Max; 
+	PQuantizationFunc				        pfQuantization4x4;
+	PQuantizationFunc				        pfQuantizationFour4x4;
+    PQuantizationDcFunc			        pfQuantizationDc4x4;
+	PQuantizationMaxFunc		        pfQuantizationFour4x4Max;
 	PQuantizationHadamardFunc		pfQuantizationHadamard2x2;
 	PQuantizationSkipFunc		        pfQuantizationHadamard2x2Skip;
 
@@ -196,19 +196,19 @@ struct TagWelsFuncPointerList
 
 	PGetNoneZeroCountFunc		      pfGetNoneZeroCount;
 
-	PDeQuantizationFunc				      pfDequantization4x4;  
-	PDeQuantizationFunc			          pfDequantizationFour4x4; 
+	PDeQuantizationFunc				      pfDequantization4x4;
+	PDeQuantizationFunc			          pfDequantizationFour4x4;
 	PDeQuantizationHadamardFunc	  pfDequantizationIHadamard4x4;
 	PIDctFunc				                      pfIDctFourT4;
 	PIDctFunc				                      pfIDctT4;
 	PIDctFunc				                      pfIDctI16x16Dc;
 
-	
+
 
 	// OPTI: if MT under diff uiSliceMode, need change here
-	//PDynamicSlicingStepBackFunc	dynslc_funcpointer_stepback;//svc_encode_slice.c 
+	//PDynamicSlicingStepBackFunc	dynslc_funcpointer_stepback;//svc_encode_slice.c
 	//DYNSLC_LNGTH_CRTL		dynslc_funcpointer_slcsize_ctrl;
-    
+
     /* For Deblocking */
 	DeblockingFunc                         pfDeblocking;
 	PSetNoneZeroCountZeroFunc     pfSetNZCZero;

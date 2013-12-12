@@ -31,7 +31,7 @@
  *
  * \file	md.h
  *
- * \brief	mode decision 
+ * \brief	mode decision
  *
  * \date	2009.5.14 Created
  *
@@ -51,13 +51,13 @@ namespace WelsSVCEnc {
 #define ME_REFINE_BUF_WIDTH_BLK8   16
 #define ME_REFINE_BUF_STRIDE_BLK4  160
 #define ME_REFINE_BUF_STRIDE_BLK8  320
-	
+
 #define REFINE_ME_NO_BEST_HALF_PIXEL 0 //( 0,  0)
 #define REFINE_ME_HALF_PIXEL_LEFT    3 //(-2,  0)
 #define REFINE_ME_HALF_PIXEL_RIGHT   4 //( 2,  0)
 #define REFINE_ME_HALF_PIXEL_TOP     1 //( 0, -2)
 #define REFINE_ME_HALF_PIXEL_BOTTOM  2 //( 0,  2)
-	
+
 #define ME_NO_BEST_QUAR_PIXEL 1 //( 0,  0) or best half pixel
 #define ME_QUAR_PIXEL_LEFT    2 //(-1,  0)
 #define ME_QUAR_PIXEL_RIGHT   3 //( 1,  0)
@@ -69,7 +69,7 @@ namespace WelsSVCEnc {
 extern const int32_t g_kiQpCostTable[52];
 extern const int8_t g_kiMapModeI16x16[7];
 //extern const int8_t g_kiMapModeI4x4[14];
-extern const int8_t g_kiMapModeIntraChroma[7];	
+extern const int8_t g_kiMapModeIntraChroma[7];
 
 /////////////////////////////
 
@@ -81,7 +81,7 @@ typedef struct TagWelsMD
 
 	int32_t			iCostLuma;
     int32_t			iCostChroma;//satd+lambda(best_pred_mode) //i_sad_chroma;
-	int32_t			iSadPredMb; 
+	int32_t			iSadPredMb;
 
     uint8_t			uiRef; //uiRefIndex appointed by Encoder, used for MC
     bool_t			bMdUsingSad;
@@ -89,17 +89,17 @@ typedef struct TagWelsMD
 
 	int32_t			iCostSkipMb;
     int32_t			iSadPredSkip;
-    
+
 	//NO B frame in our Wels, we can ignore list1
 
-	struct 
-	{		
+	struct
+	{
 		SWelsME			sMe16x16;		//adjust each SWelsME for 8 D-word!
 		SWelsME			sMe8x8[4];
 		SWelsME			sMe16x8[2];
-		SWelsME			sMe8x16[2];				
+		SWelsME			sMe8x16[2];
 //		SMVUnitXY		i_mvbs[MB_BLOCK8x8_NUM];	//scaled MVB
-	} sMe;    
+	} sMe;
 
 }SWelsMD;
 
@@ -110,7 +110,7 @@ typedef struct TagMeRefinePointer
 	uint8_t* pHalfPixHV;
 
 	uint8_t* pQuarPixBest;
-	uint8_t* pQuarPixTmp; 
+	uint8_t* pQuarPixTmp;
 
 } SMeRefinePointer;
 
@@ -139,7 +139,7 @@ uint8_t MdInterAnalysisVaaInfo_c( int32_t *pSad8x8 );
 void InitMeRefinePointer(SMeRefinePointer* pMeRefine, SMbCache* pMbCache, int32_t iStride);
 void MeRefineFracPixel(sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME* pMe,
 						  SMeRefinePointer* pMeRefine, int32_t iWidth, int32_t iHeight);
-								 
+
 void InitBlkStrideWithRef(int32_t* pBlkStride, const int32_t kiStrideRef);
 
 void UpdateMbMv_c( SMVUnitXY *pMvBuffer, const SMVUnitXY ksMv );

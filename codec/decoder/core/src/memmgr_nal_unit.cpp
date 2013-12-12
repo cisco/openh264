@@ -51,7 +51,7 @@ int32_t MemInitNalList(PAccessUnit *ppAu, const uint32_t kuiSize){
 	const uint32_t kuiSizeNalUnitPtr= kuiSize*sizeof(PNalUnit);
 	const uint32_t kuiSizeNalUnit = sizeof(SNalUnit);
 	const uint32_t kuiCountSize = (kuiSizeAu + kuiSizeNalUnitPtr + kuiSize * kuiSizeNalUnit) * sizeof(uint8_t);
-	
+
 	if (kuiSize == 0)
 		return 1;
 
@@ -65,7 +65,7 @@ int32_t MemInitNalList(PAccessUnit *ppAu, const uint32_t kuiSize){
 	pPtr = pBase;
 	*ppAu = (PAccessUnit)pPtr;
 	pPtr += kuiSizeAu;
-	(*ppAu)->pNalUnitsList	= (PNalUnit*)pPtr;	
+	(*ppAu)->pNalUnitsList	= (PNalUnit*)pPtr;
 	pPtr += kuiSizeNalUnitPtr;
 	do {
 		(*ppAu)->pNalUnitsList[uiIdx] = (PNalUnit)pPtr;
@@ -77,7 +77,7 @@ int32_t MemInitNalList(PAccessUnit *ppAu, const uint32_t kuiSize){
 	(*ppAu)->uiAvailUnitsNum	= 0;
 	(*ppAu)->uiActualUnitsNum	= 0;
 	(*ppAu)->uiEndPos		    = 0;
-	(*ppAu)->bCompletedAuFlag	= false;	
+	(*ppAu)->bCompletedAuFlag	= false;
 
 	return 0;
 }
@@ -87,10 +87,10 @@ int32_t MemFreeNalList(PAccessUnit *ppAu)
 	if (ppAu != NULL){
 		PAccessUnit pAu = *ppAu;
 		if (pAu != NULL)
-		{			
+		{
 			WelsFree(pAu, "Access Unit");
 			*ppAu = NULL;
-		}		
+		}
 	}
 	return 0;
 }
@@ -112,7 +112,7 @@ int32_t ExpandNalUnitList(PAccessUnit *ppAu, const int32_t kiOrgSize, const int3
 		{
 			memcpy(pTmp->pNalUnitsList[iIdx], (*ppAu)->pNalUnitsList[iIdx], sizeof(SNalUnit) );//confirmed_safe_unsafe_usage
 			++ iIdx;
-		}while(iIdx < kiOrgSize);		
+		}while(iIdx < kiOrgSize);
 
 		pTmp->uiCountUnitsNum	= kiExpSize;
 		pTmp->uiAvailUnitsNum	= (*ppAu)->uiAvailUnitsNum;
@@ -131,10 +131,10 @@ int32_t ExpandNalUnitList(PAccessUnit *ppAu, const int32_t kiOrgSize, const int3
  *	Get next NAL Unit for using.
  *	Need expand NAL Unit list if exceeding count number of available NAL Units withing an Access Unit
  */
-PNalUnit MemGetNextNal(PAccessUnit *ppAu){	
+PNalUnit MemGetNextNal(PAccessUnit *ppAu){
 	PAccessUnit pAu = *ppAu;
 	PNalUnit pNu = NULL;
-	
+
 	if (pAu->uiAvailUnitsNum >= pAu->uiCountUnitsNum)	// need expand list
 	{
 		const uint32_t kuiExpandingSize = pAu->uiCountUnitsNum + (MAX_NAL_UNIT_NUM_IN_AU>>1);
@@ -146,7 +146,7 @@ PNalUnit MemGetNextNal(PAccessUnit *ppAu){
 	pNu = pAu->pNalUnitsList[pAu->uiAvailUnitsNum++];	// ready for next nal position
 
 	memset(pNu, 0, sizeof(SNalUnit));	// Please do not remove this for cache intend!!
-	
+
 	return pNu;
 }
 

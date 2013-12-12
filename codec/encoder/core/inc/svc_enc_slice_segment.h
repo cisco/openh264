@@ -47,7 +47,7 @@
 
 #include "codec_app_def.h"
 namespace WelsSVCEnc {
-/*! 
+/*!
  * \brief	SSlice mode
  */
 typedef uint16_t SliceMode;
@@ -68,7 +68,7 @@ typedef enum{
 // fine solution for MAX_SLICES_NUM, need us use the variable instead of MACRO for any resolution combining any multiple-slice mode adaptive
 #define SAVED_NALUNIT_NUM			( (MAX_SPATIAL_LAYER_NUM*MAX_QUALITY_LAYER_NUM) + 1 + MAX_SPATIAL_LAYER_NUM ) // SPS/PPS + SEI/SSEI + PADDING_NAL
 #define MAX_SLICES_NUM				( ( MAX_NAL_UNITS_IN_LAYER - SAVED_NALUNIT_NUM ) / 3 )	// Also MAX_SLICES_NUM need constrained by implementation: uiSliceIdc allocated in SSliceCtx.pOverallMbMap need a byte range as expected
-#define AVERSLICENUM_CONSTRAINT		(MAX_SLICES_NUM)			// used in sNalList initialization, 
+#define AVERSLICENUM_CONSTRAINT		(MAX_SLICES_NUM)			// used in sNalList initialization,
 
 #define MIN_NUM_MB_PER_SLICE		48							// (128/16 * 96/16), addressing the lowest resolution for multiple slicing is 128x96 above
 
@@ -81,27 +81,27 @@ typedef enum{
 //cur_mb_idx is for early tests, can be omit in optimization
 
 typedef struct TagSliceArgument{
-	uint32_t			uiSliceMbNum[MAX_SLICES_NUM];   //will perform check on this array to decide specific slicing, see note	
+	uint32_t			uiSliceMbNum[MAX_SLICES_NUM];   //will perform check on this array to decide specific slicing, see note
 	uint32_t			uiSliceSizeConstraint;
 	int16_t				iSliceNum;
 } SSliceArgument;
 
-typedef struct TagMulSliceOption{ //interfaces about slicing from application layer	
+typedef struct TagMulSliceOption{ //interfaces about slicing from application layer
 	SSliceArgument		sSliceArgument; //according to uiSliceMode, decide which elements of this structure will actually takes effect
 	SliceMode			uiSliceMode;
 } SMulSliceOption;
 
-/*! 
+/*!
  * \brief	SSlice context
  */
-/* Single/multiple slices */	
+/* Single/multiple slices */
 typedef struct SlicepEncCtx_s{
 	SliceMode		uiSliceMode;			/* 0: single slice in frame; 1: multiple slices in frame; */
 	int16_t			iMbWidth;			/* width of picture size in mb */
 	int16_t			iMbHeight;			/* height of picture size in mb */
 	int16_t			iSliceNumInFrame;	/* count number of slices in frame; */
 	int32_t			iMbNumInFrame;	/* count number of MBs in frame */
-	uint8_t			*pOverallMbMap;	/* overall MB map in frame, store virtual slice idc; */	
+	uint8_t			*pOverallMbMap;	/* overall MB map in frame, store virtual slice idc; */
 	int16_t			*pFirstMbInSlice;	/* first MB address top-left based in every slice respectively; */
 	int32_t			*pCountMbNumInSlice;	/* count number of MBs in every slice respectively; */
 	uint32_t		uiSliceSizeConstraint;/*in byte*/
@@ -110,11 +110,11 @@ typedef struct SlicepEncCtx_s{
 
 
 typedef struct TagDynamicSlicingStack{
-	int32_t		iStartPos;	
-	int32_t		iCurrentPos;	
+	int32_t		iStartPos;
+	int32_t		iCurrentPos;
 
-	uint8_t		*pBsStackBufPtr;	// current writing position	
-	uint32_t    uiBsStackCurBits;  
+	uint8_t		*pBsStackBufPtr;	// current writing position
+	uint32_t    uiBsStackCurBits;
 	int32_t		iBsStackLeftBits;
 
 	int32_t		iMbSkipRunStack;
@@ -125,7 +125,7 @@ typedef struct TagDynamicSlicingStack{
  *
  * \param	pSliceCtx		SSlice context to be initialized
  * \param	bFmoUseFlag	flag of using fmo
- * \param	iMbWidth		MB width 
+ * \param	iMbWidth		MB width
  * \param	iMbHeight		MB height
  * \param	uiSliceMode		slice mode
  * \param	mul_slice_arg	argument for multiple slice if it is applicable
@@ -145,7 +145,7 @@ int32_t InitSlicePEncCtx( SSliceCtx *pSliceCtx,
 /*!
  * \brief	Uninitialize Wels SSlice context (Single/multiple slices and FMO)
  *
- * \param	pSliceCtx		SSlice context to be initialized 
+ * \param	pSliceCtx		SSlice context to be initialized
  *
  * \return	NONE;
  */

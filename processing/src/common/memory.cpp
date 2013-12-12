@@ -74,8 +74,8 @@ WELSVP_NAMESPACE_BEGIN
  {
 	 uint32_t iOldSize = 0;
 	 uint8_t* pNew = NULL;
-	 if ( pPointer != NULL ) 
-		 iOldSize = *( (int32_t*) ( (uint8_t*) pPointer - sizeof( void ** ) - sizeof( int32_t ) ) ); 
+	 if ( pPointer != NULL )
+		 iOldSize = *( (int32_t*) ( (uint8_t*) pPointer - sizeof( void ** ) - sizeof( int32_t ) ) );
 	 else
 		 return WelsMalloc( kuiSize, pTag );
 
@@ -86,7 +86,7 @@ WELSVP_NAMESPACE_BEGIN
 			 return (pPointer);
 		 return 0;
 	 }
-	 else 
+	 else
 		 if( iOldSize > 0 && kuiSize > 0 )
 			 memcpy( pNew, pPointer, ( iOldSize < kuiSize ) ? iOldSize : kuiSize );
 		 else

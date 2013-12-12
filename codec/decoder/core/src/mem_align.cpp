@@ -39,7 +39,7 @@ namespace WelsDec {
 #ifdef MEMORY_CHECK
 
 WelsFileHandle * pMemCheckMalloc = NULL;
-WelsFileHandle * pMemCheckFree = NULL; 
+WelsFileHandle * pMemCheckFree = NULL;
 
 int32_t iCountMalloc = 0;
 #endif
@@ -61,7 +61,7 @@ void_t * WelsMalloc( const uint32_t kuiSize, const str_t *kpTag )
 	uint8_t* pBuf		= (uint8_t *) malloc( kuiSize + kiAlignBytes + kiSizeVoidPtr + kiSizeInt );
 	uint8_t* pAlignBuf;
 
-#ifdef MEMORY_CHECK	
+#ifdef MEMORY_CHECK
 	if( pMemCheckMalloc == NULL ){
 		pMemCheckMalloc = WelsFopen(".\\mem_check_malloc.txt", "at+");
 		pMemCheckFree   = WelsFopen(".\\mem_check_free.txt", "at+");
@@ -71,14 +71,14 @@ void_t * WelsMalloc( const uint32_t kuiSize, const str_t *kpTag )
 	{
 		if ( pMemCheckMalloc != NULL )
 		{
-			fprintf( pMemCheckMalloc, "0x%x, size: %d       , malloc %s\n", (void_t *)pBuf, (kuiSize + kiAlignBytes + kiSizeVoidPtr + kiSizeInt), kpTag );			
+			fprintf( pMemCheckMalloc, "0x%x, size: %d       , malloc %s\n", (void_t *)pBuf, (kuiSize + kiAlignBytes + kiSizeVoidPtr + kiSizeInt), kpTag );
 		}
 		if ( pMemCheckMalloc != NULL )
 		{
 			fflush( pMemCheckMalloc );
 		}
 	}
-#endif	
+#endif
 
 	if ( NULL == pBuf )
 		return NULL;
@@ -100,12 +100,12 @@ void_t WelsFree( void_t* pPtr, const str_t *kpTag )
 {
 	if( pPtr )
 	{
-#ifdef MEMORY_CHECK			
+#ifdef MEMORY_CHECK
 		if ( NULL != pMemCheckFree && kpTag != NULL )
-		{				
+		{
 			fprintf( pMemCheckFree, "0x%x, free %s\n", (void_t *)(*( ( ( void_t **) pPtr ) - 1 )), kpTag );
 			fflush( pMemCheckFree );
-		}	
+		}
 #endif
 		free( *( ( ( void_t **) pPtr ) - 1 ) );
 	}

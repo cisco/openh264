@@ -59,14 +59,14 @@ typedef enum
 	dsBitstreamError	= 0x04,	/* Error bitstreams(maybe broken internal frame) the decoder cared */
 	dsDepLayerLost		= 0x08,	/* Dependented layer is ever lost */
 	dsNoParamSets		= 0x10, /* No parameter set NALs involved */
-	
+
 	/* Errors derived from logic level */
 	dsInvalidArgument	= 0x1000,	/* Invalid argument specified */
 	dsInitialOptExpected= 0x2000,	/* Initializing operation is expected */
 	dsOutOfMemory		= 0x4000,	/* Out of memory due to new request */
 		/* ANY OTHERS? */
 	dsDstBufNeedExpand	= 0x8000	/* Actual picture size exceeds size of dst pBuffer feed in decoder, so need expand its size */
-	
+
 }DECODING_STATE;
 
 /* Option types introduced in SVC encoder application */
@@ -85,7 +85,7 @@ typedef enum
 	ENCODER_LTR_MARKING_FEEDBACK,
 	ENCOCER_LTR_MARKING_PERIOD,
 	ENCODER_OPTION_LTR,
-			
+
 	ENCODER_OPTION_ENABLE_SSEI,               //disable SSEI: true--disable ssei; false--enable ssei
 	ENCODER_OPTION_ENABLE_PREFIX_NAL_ADDING,   //enable prefix: true--enable prefix; false--disable prefix
 	ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, //disable pSps/pPps id addition: true--disable pSps/pPps id; false--enable pSps/pPps id addistion
@@ -114,7 +114,7 @@ typedef enum //feedback that whether or not have VCL NAL in current AU
 {
 	FEEDBACK_NON_VCL_NAL = 0,
 	FEEDBACK_VCL_NAL,
-	FEEDBACK_UNKNOWN_NAL	
+	FEEDBACK_UNKNOWN_NAL
 } FEEDBACK_VCL_NAL_IN_AU;
 typedef enum //feedback the iTemporalId in current AU if have VCL NAL
 {
@@ -123,7 +123,7 @@ typedef enum //feedback the iTemporalId in current AU if have VCL NAL
 	FEEDBACK_TEMPORAL_ID_2,
 	FEEDBACK_TEMPORAL_ID_3,
 	FEEDBACK_TEMPORAL_ID_4,
-	FEEDBACK_UNKNOWN_TEMPORAL_ID	
+	FEEDBACK_UNKNOWN_TEMPORAL_ID
 } FEEDBACK_TEMPORAL_ID;
 
 /* Type of layer being encoded */
@@ -143,7 +143,7 @@ typedef enum
 //enumerate the type of video bitstream which is provided to decoder
 typedef enum
 {
-	VIDEO_BITSTREAM_AVC               = 0,	
+	VIDEO_BITSTREAM_AVC               = 0,
 	VIDEO_BITSTREAM_SVC               = 1,
 	VIDEO_BITSTREAM_DEFAULT           = VIDEO_BITSTREAM_SVC,
 }VIDEO_BITSTREAM_TYPE;
@@ -174,9 +174,9 @@ typedef struct
 }SLTRMarkingFeedback;
 #pragma pack(1)
 
-typedef struct 
+typedef struct
 {
-	
+
 	//# 0 SM_SINGLE_SLICE			| SliceNum==1
 	//# 1 SM_FIXEDSLCNUM_SLICE	| according to SliceNum			| Enabled dynamic slicing for multi-thread
 	//# 2 SM_RASTER_SLICE			| according to SlicesAssign		| Need input of MB numbers each slice. In addition, if other constraint in SSliceArgument is presented, need to follow the constraints. Typically if MB num and slice size are both constrained, re-encoding may be involved.
@@ -184,10 +184,10 @@ typedef struct
 	//# 4 SM_DYN_SLICE			| according to SliceSize		| Dynamic slicing (have no idea about slice_nums until encoding current frame)
 	unsigned int uiSliceMode; //by default, uiSliceMode will be 0
 	struct {
-		unsigned int		uiSliceMbNum[MAX_SLICES_NUM_TMP];  //here we use a tmp fixed value since MAX_SLICES_NUM is not defined here and its definition may be changed; 
+		unsigned int		uiSliceMbNum[MAX_SLICES_NUM_TMP];  //here we use a tmp fixed value since MAX_SLICES_NUM is not defined here and its definition may be changed;
 		unsigned int		uiSliceNum;
 		unsigned int		uiSliceSizeConstraint;
-	} sSliceArgument;//not all the elements in this argument will be used, how it will be used depends on uiSliceMode; see below	
+	} sSliceArgument;//not all the elements in this argument will be used, how it will be used depends on uiSliceMode; see below
 } SSliceConfig;
 
 typedef struct {
@@ -200,7 +200,7 @@ typedef struct {
 	int	iInterSpatialLayerPredFlag;	// 0: diabled [independency spatial layer coding]; 1: enabled [base spatial layer dependency coding]
 
 	int	iQualityBitrate[MAX_QUALITY_LAYER_NUM];	// target bitrate for a quality layer
-	
+
 	SSliceConfig sSliceCfg;
 } SSpatialLayerConfig;
 
@@ -213,7 +213,7 @@ typedef struct {
 	int		iSpatialLayerNum;	// layer number at spatial level
 
 	float	fFrameRate;			// input maximal frame rate
-	
+
 	int		iInputCsp;			// color space of input sequence
 	int		iKeyPicCodingMode;// mode of key picture coding
 	int		iIntraPeriod;		// period of Intra frame
@@ -229,10 +229,10 @@ typedef struct {
 
 	int iRCMode;                 // RC mode
 	int	iTemporalBitrate[MAX_TEMPORAL_LAYER_NUM];	// target bitrate specified for a temporal level
-	int iPaddingFlag;            // 0:disable padding;1:padding	
+	int iPaddingFlag;            // 0:disable padding;1:padding
 
 	SSpatialLayerConfig sSpatialLayers[MAX_SPATIAL_LAYER_NUM];
-	
+
 } SVCEncodingParam, *PSVCEncodingParam;
 
 //Define a new struct to show the property of video bitstream.
@@ -244,7 +244,7 @@ typedef struct {
 /* SVC Decoding Parameters, reserved here and potential applicable in the future */
 typedef struct TagSVCDecodingParam{
 	char		*pFileNameRestructed;	// File name of restructed frame used for PSNR calculation based debug
-	
+
 	int				iOutputColorFormat;	// color space format to be outputed, EVideoFormatType specified in codec_def.h
 	unsigned int	uiCpuLoad;		// CPU load
 	unsigned char	uiTargetDqLayer;	// Setting target dq layer id
@@ -279,7 +279,7 @@ typedef struct {
 
 } SFrameBSInfo, *PFrameBSInfo;
 
-typedef struct Source_Picture_s {	
+typedef struct Source_Picture_s {
 	int		    iColorFormat;	// color space type
 	int  		iStride[4];		// stride for each plane pData
 	unsigned char  *pData[4];		// plane pData

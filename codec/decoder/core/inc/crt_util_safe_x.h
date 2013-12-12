@@ -73,7 +73,7 @@ typedef      FILE  WelsFileHandle;
 
 #ifdef WIN32
 typedef      struct _timeb     SWelsTime;
-#else 
+#else
 typedef      struct timeb      SWelsTime;
 #endif
 

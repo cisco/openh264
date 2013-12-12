@@ -51,7 +51,7 @@ typedef struct TagDqLayer	SDqLayer;
 typedef SDqLayer*			PDqLayer;
 typedef struct TagLayerInfo{
 	SNalUnitHeaderExt		sNalHeaderExt;
-	SSlice					sSliceInLayer;	// Here Slice identify to Frame on concept	
+	SSlice					sSliceInLayer;	// Here Slice identify to Frame on concept
 	PSubsetSps				pSubsetSps;	// current pSubsetSps used, memory alloc in external
 	PSps					pSps;		// current sps based avc used, memory alloc in external
 	PPps					pPps;		// current pps used
@@ -59,8 +59,8 @@ typedef struct TagLayerInfo{
 /* Layer Representation */
 
 struct TagDqLayer{
-	SLayerInfo			sLayerInfo;	
-		
+	SLayerInfo			sLayerInfo;
+
 	uint8_t				*pCsData[3];	// pointer to reconstructed picture data
 	int32_t				iCsStride[3];	// Cs stride
 	PBitStringAux		pBitStringAux;	// pointer to SBitStringAux
@@ -68,7 +68,7 @@ struct TagDqLayer{
 	int8_t  *pMbType;
 	int32_t *pSliceIdc;				// using int32_t for slice_idc
 	int16_t	(*pMv[LIST_A])[MB_BLOCK4x4_NUM][MV_A];
-	int8_t	(*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM]; 
+	int8_t	(*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM];
 	int8_t  *pLumaQp;
 	int8_t  *pChromaQp;
 	int8_t  *pCbp;
@@ -97,7 +97,7 @@ struct TagDqLayer{
 	uint32_t				uiPpsId;
 	uint32_t				uiDisableInterLayerDeblockingFilterIdc;
 	int32_t					iInterLayerSliceAlphaC0Offset;
-	int32_t					iInterLayerSliceBetaOffset;	
+	int32_t					iInterLayerSliceBetaOffset;
 	//SPosOffset			sScaledRefLayer;
 	int32_t					iSliceGroupChangeCycle;
 	PRefPicListReorderSyn	pRefPicListReordering;
@@ -118,7 +118,7 @@ struct TagDqLayer{
 };
 
 typedef struct TagGpuAvcLayer{
-	SLayerInfo				sLayerInfo;	
+	SLayerInfo				sLayerInfo;
 	PBitStringAux			pBitStringAux;	// pointer to SBitStringAux
 
 	int8_t					*pMbType;

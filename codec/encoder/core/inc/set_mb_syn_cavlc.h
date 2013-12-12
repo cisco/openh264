@@ -37,7 +37,7 @@
  *
  *************************************************************************************
  */
- 
+
 #ifndef SET_MB_SYN_CAVLC_H_
 #define SET_MB_SYN_CAVLC_H_
 
@@ -53,8 +53,8 @@ enum EResidualProperty{
     LUMA_DC     = 0,
 	LUMA_AC     = 1,
 	LUMA_4x4    = 2,
-	CHROMA_DC   = 3, 
-	CHROMA_AC   = 4    
+	CHROMA_DC   = 3,
+	CHROMA_AC   = 4
 };
 
 
@@ -62,7 +62,7 @@ enum EResidualProperty{
 
 typedef  int32_t  (*PCavlcParamCalFunc) ( int16_t * pCoff, uint8_t * pRun, int16_t * pLevel, int32_t * pTotalCoeffs, int32_t iEndIdx);
 
-typedef  struct TagCoeffFunc 
+typedef  struct TagCoeffFunc
 {
 	PCavlcParamCalFunc    pfCavlcParamCal;
 } SCoeffFunc;
@@ -88,7 +88,7 @@ extern "C" {
 #endif//__cplusplus
 
 #ifdef  X86_ASM
-int32_t CavlcParamCal_sse2(int16_t*pCoffLevel, uint8_t* pRun, int16_t *pLevel, int32_t * pTotalCoeffs , int32_t iEndIdx); 
+int32_t CavlcParamCal_sse2(int16_t*pCoffLevel, uint8_t* pRun, int16_t *pLevel, int32_t * pTotalCoeffs , int32_t iEndIdx);
 #endif
 
 #if defined(__cplusplus)

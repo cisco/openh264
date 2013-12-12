@@ -54,22 +54,22 @@ CAdaptiveQuantization::CAdaptiveQuantization(int32_t iCpuFlag)
 }
 
 CAdaptiveQuantization::~CAdaptiveQuantization()
-{	
+{
 }
 
 EResult CAdaptiveQuantization::Process(int32_t iType, SPixMap *pSrcPixMap, SPixMap *pRefPixMap)
 {
-	EResult eReturn = RET_INVALIDPARAM;	
+	EResult eReturn = RET_INVALIDPARAM;
 
 	int32_t iWidth     = pSrcPixMap->sRect.iRectWidth;
-	int32_t iHeight    = pSrcPixMap->sRect.iRectHeight;	
+	int32_t iHeight    = pSrcPixMap->sRect.iRectHeight;
 	int32_t iMbWidth  = iWidth  >> 4;
 	int32_t iMbHeight = iHeight >> 4;
 	int32_t iMbTotalNum    = iMbWidth * iMbHeight;
 
 	SMotionTextureUnit *pMotionTexture = NULL;
 	SVAACalcResult     *pVaaCalcResults = NULL;
-	int8_t   iMotionTextureIndexToDeltaQp = 0;	
+	int8_t   iMotionTextureIndexToDeltaQp = 0;
 	int32_t	 iAverMotionTextureIndexToDeltaQp = 0;	// double to uint32
 	double_t dAverageMotionIndex = 0.0;	// double to float
 	double_t dAverageTextureIndex = 0.0;
@@ -101,10 +101,10 @@ EResult CAdaptiveQuantization::Process(int32_t iType, SPixMap *pSrcPixMap, SPixM
 	{
 		int32_t iMbIndex = 0;
 		int32_t iSumDiff, iSQDiff, uiSum, iSQSum;
-		for ( j = 0; j < iMbHeight; j ++ ) 
+		for ( j = 0; j < iMbHeight; j ++ )
 		{
 			pRefFrameTmp  = pRefFrameY;
-			pCurFrameTmp  = pCurFrameY;	
+			pCurFrameTmp  = pCurFrameY;
 			for ( i = 0; i < iMbWidth; i++ )
 			{
 				iSumDiff =  pVaaCalcResults->pSad8x8[iMbIndex][0];
@@ -133,12 +133,12 @@ EResult CAdaptiveQuantization::Process(int32_t iType, SPixMap *pSrcPixMap, SPixM
 			pCurFrameY += (iCurStride)<<4;
 		}
 	}
-	else 
+	else
 	{
-		for ( j = 0; j < iMbHeight; j ++ ) 
+		for ( j = 0; j < iMbHeight; j ++ )
 		{
 			pRefFrameTmp  = pRefFrameY;
-			pCurFrameTmp  = pCurFrameY;	
+			pCurFrameTmp  = pCurFrameY;
 			for ( i = 0; i < iMbWidth; i++ )
 			{
 				m_pfVar( pRefFrameTmp, iRefStride, pCurFrameTmp, iCurStride, pMotionTexture);
@@ -164,7 +164,7 @@ EResult CAdaptiveQuantization::Process(int32_t iType, SPixMap *pSrcPixMap, SPixM
 		dAverageTextureIndex = 1.0;
 	}
 	//  motion mb residual map to QP
-	//  texture mb original map to QP	
+	//  texture mb original map to QP
 	iAverMotionTextureIndexToDeltaQp = 0;
 	dAverageMotionIndex = AVERAGE_TIME_MOTION * dAverageMotionIndex;
 
@@ -178,18 +178,18 @@ EResult CAdaptiveQuantization::Process(int32_t iType, SPixMap *pSrcPixMap, SPixM
 	}
 
 	pMotionTexture = m_sAdaptiveQuantParam.pMotionTextureUnit;
-	for ( j = 0; j < iMbHeight; j ++ ) 
+	for ( j = 0; j < iMbHeight; j ++ )
 	{
 		for ( i = 0; i < iMbWidth; i++ )
 		{
 			double_t a = pMotionTexture->uiTextureIndex / dAverageTextureIndex;
-			dQStep = (a - 1) / (a + MODEL_ALPHA); 		
+			dQStep = (a - 1) / (a + MODEL_ALPHA);
 			dLumaTextureDeltaQp = MODEL_TIME * dQStep;// range +- 6
 
 			iMotionTextureIndexToDeltaQp = (int8_t)dLumaTextureDeltaQp;
 
 			a = pMotionTexture->uiMotionIndex / dAverageMotionIndex;
-			dQStep = (a - 1) / (a + MODEL_ALPHA); 			
+			dQStep = (a - 1) / (a + MODEL_ALPHA);
 			dLumaMotionDeltaQp = MODEL_TIME * dQStep;// range +- 6
 
 			if ((m_sAdaptiveQuantParam.iAdaptiveQuantMode == AQ_QUALITY_MODE && dLumaMotionDeltaQp < -PESN) || (m_sAdaptiveQuantParam.iAdaptiveQuantMode == AQ_BITRATE_MODE))
@@ -243,7 +243,7 @@ void CAdaptiveQuantization::WelsInitVarFunc(PVarFunc &pfVar,  int32_t iCpuFlag)
 {
 	pfVar = SampleVariance16x16_c;
 
-#ifdef X86_ASM	
+#ifdef X86_ASM
 	if ( iCpuFlag & WELS_CPU_SSE2 )
 	{
 		pfVar = SampleVariance16x16_sse2;
@@ -260,7 +260,7 @@ void SampleVariance16x16_c( uint8_t * pRefY, int32_t iRefStride, uint8_t * pSrcY
 	{
 		for( int32_t x = 0; x < MB_WIDTH_LUMA; x++ )
 		{
-			uint32_t uiDiff = WELS_ABS(pRefY[x] - pSrcY[x]);	
+			uint32_t uiDiff = WELS_ABS(pRefY[x] - pSrcY[x]);
 			uiSum += uiDiff;
 			uiSquare += uiDiff * uiDiff;
 

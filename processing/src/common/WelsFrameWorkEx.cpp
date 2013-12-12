@@ -88,7 +88,7 @@ EResult CreateSpecificVpInterface(IWelsVPc **pCtx)
 			pVPc->pCtx       = WelsStaticCast(void *, pWelsVP);
 			*pCtx            = pVPc;
 		}
-		else 
+		else
 			ret = RET_OUTOFMEMORY;
 	}
 

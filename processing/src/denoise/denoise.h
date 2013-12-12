@@ -34,7 +34,7 @@
  *
  * \date        :  2011/03/15
  *
- * \description :  1. rewrite the package code of denoise class  
+ * \description :  1. rewrite the package code of denoise class
  *
  *************************************************************************************
  */
@@ -78,14 +78,14 @@ WELSVP_EXTERN_C_BEGIN
 WELSVP_EXTERN_C_END
 #endif
 
-typedef  struct TagDenoiseFuncs 
+typedef  struct TagDenoiseFuncs
 {
 	DenoiseFilterFuncPtr	pfBilateralLumaFilter8;//on 8 samples
 	DenoiseFilterFuncPtr	pfWaverageChromaFilter8;//on 8 samples
 } SDenoiseFuncs;
 
 class CDenoiser : public IStrategy
-{			  
+{
 public:
 	CDenoiser(int32_t iCpuFlag);
 	~CDenoiser();
@@ -106,7 +106,7 @@ private:
 
 	SDenoiseFuncs m_pfDenoise;
 	int32_t      m_CPUFlag;
-};	
+};
 
 WELSVP_NAMESPACE_END
 

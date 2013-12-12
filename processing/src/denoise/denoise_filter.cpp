@@ -51,20 +51,20 @@ void	BilateralLumaFilter8_c(uint8_t *pSample, int32_t iStride)
 	uint8_t aSample[8];
 
 	for(int32_t i = 0; i < 8; i++)
-	{		
+	{
 		nSum = 0;
 		nTotWeight = 0;
 		iCenterSample = *pSample;
 		pCurLine = pSample- iStride - DENOISE_GRAY_RADIUS;
 		for (y = 0; y < 3; y++)
 		{
-			for (x = 0; x < 3; x++) 
+			for (x = 0; x < 3; x++)
 			{
 				if(x == 1 && y == 1) continue;			// except center point
 				iCurSample = pCurLine[x];
 				iCurWeight = WELS_ABS(iCurSample - iCenterSample);
-				iGreyDiff = 32 - iCurWeight;				
-				if(iGreyDiff < 0)	continue; 
+				iGreyDiff = 32 - iCurWeight;
+				if(iGreyDiff < 0)	continue;
 				else iCurWeight = (iGreyDiff * iGreyDiff) >> 5;
 				nSum += iCurSample * iCurWeight;
 				nTotWeight +=  iCurWeight;
@@ -104,7 +104,7 @@ void	WaverageChromaFilter8_c(uint8_t *pSample, int32_t iStride)
 
 	for(int32_t i = 0; i < 8; i++)
 	{
-		sum = SUM_LINE1((pCurLine1+i)) + SUM_LINE2((pCurLine2+i)) + SUM_LINE3((pCurLine3+i)) 
+		sum = SUM_LINE1((pCurLine1+i)) + SUM_LINE2((pCurLine2+i)) + SUM_LINE3((pCurLine3+i))
 			+ SUM_LINE2((pCurLine4+i)) + SUM_LINE1((pCurLine5+i));
 		aSample[i] =  (sum >>6);
 		pSample++;
@@ -115,19 +115,19 @@ void	WaverageChromaFilter8_c(uint8_t *pSample, int32_t iStride)
 /***************************************************************************
 edge of y/uv use a 3x3 Gauss filter, radius = 1:
 1	2	1
-2	4	2	
+2	4	2
 1	2	1
 ***************************************************************************/
 void	Gauss3x3Filter(uint8_t *pSrc, int32_t iStride)
 {
 	int32_t nSum = 0;
-	uint8_t * pCurLine1 = pSrc - iStride - 1;		
+	uint8_t * pCurLine1 = pSrc - iStride - 1;
 	uint8_t * pCurLine2 = pCurLine1 + iStride;
 	uint8_t * pCurLine3 = pCurLine2 + iStride;
 
-	nSum =	 pCurLine1[0]		+ (pCurLine1[1]<<1) +  pCurLine1[2]		+ 
-			(pCurLine2[0]<<1)	+ (pCurLine2[1]<<2) + (pCurLine2[2]<<1) + 
-			 pCurLine3[0]		+ (pCurLine3[1]<<1) +  pCurLine3[2]; 
+	nSum =	 pCurLine1[0]		+ (pCurLine1[1]<<1) +  pCurLine1[2]		+
+			(pCurLine2[0]<<1)	+ (pCurLine2[1]<<2) + (pCurLine2[2]<<1) +
+			 pCurLine3[0]		+ (pCurLine3[1]<<1) +  pCurLine3[2];
 	*pSrc = nSum >> 4;
 }
 

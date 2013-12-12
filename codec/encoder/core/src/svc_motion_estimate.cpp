@@ -50,7 +50,7 @@
 #include "array_stack_align.h"
 #include "cpu_core.h"	// WELS_CPU_SSE41
 
-namespace WelsSVCEnc {	
+namespace WelsSVCEnc {
 /*!
  * \brief	BL mb motion estimate search
  *
@@ -72,7 +72,7 @@ void WelsMotionEstimateSearchSatd (SWelsFuncPtrList *pFuncList, void* pLplayer, 
 	WelsMotionEstimateInitialPoint ( pFuncList, pMe, pSlice, iStrideEnc, iStrideRef );
 
 	pMe->uSadPredISatd.uiSatd = pFuncList->sSampleDealingFuncs.pfSampleSatd[pMe->uiPixel]( pMe->pEncMb, iStrideEnc, pMe->pRefMb, iStrideRef );
-	pMe->uiSatdCost = pMe->uSadPredISatd.uiSatd + COST_MVD(pMe->pMvdCost, pMe->sMv.iMvX - pMe->sMvp.iMvX, pMe->sMv.iMvY - pMe->sMvp.iMvY);	
+	pMe->uiSatdCost = pMe->uSadPredISatd.uiSatd + COST_MVD(pMe->pMvdCost, pMe->sMv.iMvX - pMe->sMvp.iMvX, pMe->sMv.iMvY - pMe->sMvp.iMvY);
 }
 
 
@@ -99,10 +99,10 @@ void WelsMotionEstimateSearchSad (SWelsFuncPtrList *pFuncList, void* pLplayer, v
  * \return	NONE
  */
 void WelsMotionEstimateInitialPoint(SWelsFuncPtrList *pFuncList, SWelsME * pMe, SSlice *pSlice, int32_t iStrideEnc, int32_t iStrideRef )
-{   
+{
 	PSampleSadSatdCostFunc pSad		= pFuncList->sSampleDealingFuncs.pfSampleSad[pMe->uiPixel];
 	const uint16_t *kpMvdCost	= pMe->pMvdCost;
-	uint8_t* const kpEncMb		= pMe->pEncMb;	
+	uint8_t* const kpEncMb		= pMe->pEncMb;
 	int16_t iMvc0, iMvc1;
 	int32_t iSadCost;
 	int32_t iBestSadCost;
@@ -115,36 +115,36 @@ void WelsMotionEstimateInitialPoint(SWelsFuncPtrList *pFuncList, SWelsME * pMe, 
 	const SMVUnitXY ksMvMax		= pSlice->sMvMax;
 	const SMVUnitXY ksMvp		= pMe->sMvp;
 	SMVUnitXY sMv;
-	
+
 	//  Step 1: Initial point prediction
     // init with sMvp
 	sMv.iMvX	= WELS_CLIP3( (2 + ksMvp.iMvX) >> 2, ksMvMin.iMvX, ksMvMax.iMvX );
 	sMv.iMvY	= WELS_CLIP3( (2 + ksMvp.iMvY) >> 2, ksMvMin.iMvY, ksMvMax.iMvY );
 
     pRefMb = &pMe->pRefMb[sMv.iMvY * iStrideRef + sMv.iMvX];
-	
+
 	iBestSadCost = pSad( kpEncMb, iStrideEnc, pRefMb, iStrideRef );
     iBestSadCost += COST_MVD(kpMvdCost, ((sMv.iMvX)<<2) - ksMvp.iMvX, ((sMv.iMvY)<<2) - ksMvp.iMvY);
-	
+
 	for (i = 0; i < kuiMvcNum; i++)
 	{
 		//clipping here is essential since some pOut-of-range MVC may happen here (i.e., refer to baseMV)
 		iMvc0 = WELS_CLIP3( ( 2 + kpMvcList[i].iMvX ) >> 2, ksMvMin.iMvX, ksMvMax.iMvX );
 		iMvc1 = WELS_CLIP3( ( 2 + kpMvcList[i].iMvY ) >> 2, ksMvMin.iMvY, ksMvMax.iMvY );
-		
+
 		if( ((iMvc0-sMv.iMvX) || (iMvc1-sMv.iMvY)) )
 		{
 			pFref2 = &pMe->pRefMb[iMvc1*iStrideRef+iMvc0];
 
 			iSadCost = pSad( kpEncMb, iStrideEnc, pFref2, iStrideRef ) +
-				COST_MVD(kpMvdCost, (iMvc0<<2) - ksMvp.iMvX, (iMvc1<<2) - ksMvp.iMvY);		
-			
+				COST_MVD(kpMvdCost, (iMvc0<<2) - ksMvp.iMvX, (iMvc1<<2) - ksMvp.iMvY);
+
 			if( iSadCost < iBestSadCost )
 			{
 				sMv.iMvX = iMvc0;
-				sMv.iMvY = iMvc1;				
-				pRefMb = pFref2;				
-				iBestSadCost = iSadCost;				
+				sMv.iMvY = iMvc1;
+				pRefMb = pFref2;
+				iBestSadCost = iSadCost;
 			}
 		}
 	}
@@ -153,13 +153,13 @@ void WelsMotionEstimateInitialPoint(SWelsFuncPtrList *pFuncList, SWelsME * pMe, 
 	pMe->uiSadCost = iBestSadCost;
 	if ( iBestSadCost < pMe->uSadPredISatd.uiSadPred )
 	{
-        	//  Step 2: Initial early Stop	
+        	//  Step 2: Initial early Stop
 		/* -> qpel mv */
 		pMe->sMv.iMvX <<= 2;
-		pMe->sMv.iMvY <<= 2;		
+		pMe->sMv.iMvY <<= 2;
 		/* -> pRef */
 		pMe->pRefMb = pRefMb;
-		/* compute the real cost */  
+		/* compute the real cost */
  		pMe->uiSatdCost = iBestSadCost;
 	}
     else
@@ -224,7 +224,7 @@ void WelsMotionEstimateIterativeSearch( SWelsFuncPtrList *pFuncList, SWelsME *pM
 	int32_t iBestCost = (pMe->uiSadCost);
 
 	int32_t iTimeThreshold = ITERATIVE_TIMES;
-	ENFORCE_STACK_ALIGN_1D(int32_t, iSadCosts, 4, 16)	
+	ENFORCE_STACK_ALIGN_1D(int32_t, iSadCosts, 4, 16)
 
 	while(iTimeThreshold--)
 	{
@@ -236,7 +236,7 @@ void WelsMotionEstimateIterativeSearch( SWelsFuncPtrList *pFuncList, SWelsME *pM
 		if (kbIsBestCostWorse)
 			break;
 
-		iMvDx -= iX<<2 ;	
+		iMvDx -= iX<<2 ;
 		iMvDy -= iY<<2 ;
 
 		pRefMb -= (iX+iY*kiStrideRef);

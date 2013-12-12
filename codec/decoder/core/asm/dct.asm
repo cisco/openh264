@@ -99,9 +99,9 @@ IdctResAddPred_mmx:
 %define kiStride     esp+pushsize+8
 %define pRs         esp+pushsize+12
 
-	mov     eax, [pRs   ] 
-    mov     edx, [pPred ]   
-    mov     ecx, [kiStride]   
+	mov     eax, [pRs   ]
+    mov     edx, [pPred ]
+    mov     ecx, [kiStride]
     movq    mm0, [eax+ 0]
     movq    mm1, [eax+ 8]
     movq    mm2, [eax+16]
@@ -114,13 +114,13 @@ IdctResAddPred_mmx:
 
     WELS_Zero			mm7
     WELS_DW32			mm6
-    
+
     MMX_StoreDiff4P    mm3, mm0, mm6, mm7, [edx]
     MMX_StoreDiff4P    mm4, mm0, mm6, mm7, [edx+ecx]
     lea     edx, [edx+2*ecx]
     MMX_StoreDiff4P    mm1, mm0, mm6, mm7, [edx]
     MMX_StoreDiff4P    mm2, mm0, mm6, mm7, [edx+ecx]
-    
+
 %undef	pushsize
 %undef  pPred
 %undef  kiStride

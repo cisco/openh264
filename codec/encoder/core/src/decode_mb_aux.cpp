@@ -59,7 +59,7 @@ void WelsIHadamard4x4Dc(int16_t *pRes) //pBuffer size : 4x4
 		pRes[kiIdx ] = iTemp[0] + iTemp[3];
 		pRes[kiIdx1] = iTemp[1] + iTemp[2];
 		pRes[kiIdx2] = iTemp[1] - iTemp[2];
-		pRes[kiIdx3] = iTemp[0] - iTemp[3];		
+		pRes[kiIdx3] = iTemp[0] - iTemp[3];
 	}
 
 	i = 4;
@@ -86,16 +86,16 @@ void WelsDequantLumaDc4x4(int16_t *pRes, const int32_t kiQp)
 {
 	int32_t i	= 15;
 	const uint16_t kuiDequantValue	= g_kuiDequantCoeff[kiQp%6][0];
-	const int16_t kiQF0		= kiQp / 6; 
+	const int16_t kiQF0		= kiQp / 6;
 	const int16_t kiQF1		= 2 - kiQF0;
 	const int16_t kiQF0S	= 1 << (1 - kiQF0);
-	
+
 	while ( i >= 0 )
 	{
-		pRes[i  ] = ( pRes[i  ] * kuiDequantValue + kiQF0S ) >> kiQF1; 
-		pRes[i-1] = ( pRes[i-1] * kuiDequantValue + kiQF0S ) >> kiQF1; 
-		pRes[i-2] = ( pRes[i-2] * kuiDequantValue + kiQF0S ) >> kiQF1; 
-		pRes[i-3] = ( pRes[i-3] * kuiDequantValue + kiQF0S ) >> kiQF1; 
+		pRes[i  ] = ( pRes[i  ] * kuiDequantValue + kiQF0S ) >> kiQF1;
+		pRes[i-1] = ( pRes[i-1] * kuiDequantValue + kiQF0S ) >> kiQF1;
+		pRes[i-2] = ( pRes[i-2] * kuiDequantValue + kiQF0S ) >> kiQF1;
+		pRes[i-3] = ( pRes[i-3] * kuiDequantValue + kiQF0S ) >> kiQF1;
 
 		i -= 4;
 	}
@@ -117,7 +117,7 @@ void WelsDequantIHadamard4x4_c(int16_t *pRes, const uint16_t kuiMF)
 		pRes[i  ] = iTemp[0] + iTemp[3];
 		pRes[i+1] = iTemp[1] + iTemp[2];
 		pRes[i+2] = iTemp[1] - iTemp[2];
-		pRes[i+3] = iTemp[0] - iTemp[3];		
+		pRes[i+3] = iTemp[0] - iTemp[3];
 	}
 
 	for(i = 0; i < 4; i++)
@@ -131,7 +131,7 @@ void WelsDequantIHadamard4x4_c(int16_t *pRes, const uint16_t kuiMF)
 		pRes[i+4 ] = (iTemp[1] + iTemp[2]) * kuiMF;
 		pRes[i+8 ] = (iTemp[1] - iTemp[2]) * kuiMF;
 		pRes[i+12] = (iTemp[0] - iTemp[3]) * kuiMF;
-	}	
+	}
 }
 
 void WelsDequantIHadamard2x2Dc( int16_t* pDct, const uint16_t kuiMF)
@@ -140,7 +140,7 @@ void WelsDequantIHadamard2x2Dc( int16_t* pDct, const uint16_t kuiMF)
 	const int16_t kiDelU =   pDct[0] -  pDct[2];
 	const int16_t kiSumD = pDct[1] + pDct[3];
 	const int16_t kiDelD =   pDct[1] -  pDct[3];
-	
+
 	pDct[0] = (kiSumU + kiSumD) * kuiMF;
     pDct[1] = (kiSumU  -  kiSumD) * kuiMF;
     pDct[2] = (kiDelU   + kiDelD)   * kuiMF;
@@ -170,7 +170,7 @@ void WelsDequantFour4x4_c(int16_t *pRes, const uint16_t* kpMF)
 		pRes[i+40]*=	kpMF[i];
 		pRes[i+48]*=	kpMF[i];
 		pRes[i+56]*=	kpMF[i];
-	}	
+	}
 }
 
 /****************************************************************************
@@ -179,7 +179,7 @@ void WelsDequantFour4x4_c(int16_t *pRes, const uint16_t* kpMF)
 void WelsIDctT4Rec_c( uint8_t* pRec, int32_t iStride, uint8_t* pPred, int32_t iPredStride, int16_t* pDct )
 {
 	int32_t i;
-	int16_t iTemp[16];	
+	int16_t iTemp[16];
 
 	int32_t iDstStridex2 = iStride << 1;
 	int32_t iDstStridex3 = iStride + iDstStridex2;
@@ -187,14 +187,14 @@ void WelsIDctT4Rec_c( uint8_t* pRec, int32_t iStride, uint8_t* pPred, int32_t iP
 	int32_t iPredStridex3 = iPredStride + iPredStridex2;
 
 	for (i = 0; i < 4; i ++) //horizon
-	{		
+	{
 		int32_t iIdx = i << 2;
 		const int32_t kiHorSumU = pDct[iIdx] + pDct[iIdx+2];	// add 0-2
 		const int32_t kiHorDelU = pDct[iIdx] - pDct[iIdx+2];	// sub 0-2
 		const int32_t kiHorSumD = pDct[iIdx+1] + (pDct[iIdx+3] >> 1);
 		const int32_t kiHorDelD = (pDct[iIdx+1] >> 1) - pDct[iIdx+3];
 
-		iTemp[iIdx  ]   = kiHorSumU  + kiHorSumD;		
+		iTemp[iIdx  ]   = kiHorSumU  + kiHorSumD;
 		iTemp[iIdx+1] = kiHorDelU   + kiHorDelD;
 		iTemp[iIdx+2] = kiHorDelU   -  kiHorDelD;
 		iTemp[iIdx+3] = kiHorSumU  -  kiHorSumD;
@@ -211,7 +211,7 @@ void WelsIDctT4Rec_c( uint8_t* pRec, int32_t iStride, uint8_t* pPred, int32_t iP
 		pRec[iStride+i		]     = WELS_CLIP1( pPred[iPredStride+i  ]  + ((kiVerDelL + kiVerDelR + 32) >> 6) );
 		pRec[iDstStridex2 + i] = WELS_CLIP1( pPred[iPredStridex2+i] + ((kiVerDelL - kiVerDelR + 32) >> 6) );
 		pRec[iDstStridex3 + i] = WELS_CLIP1( pPred[iPredStridex3+i] + ((kiVerSumL - kiVerSumR + 32) >> 6) );
-	}	
+	}
 }
 
 void WelsIDctFourT4Rec_c( uint8_t* pRec, int32_t iStride, uint8_t* pPred, int32_t iPredStride, int16_t* pDct )
@@ -220,7 +220,7 @@ void WelsIDctFourT4Rec_c( uint8_t* pRec, int32_t iStride, uint8_t* pPred, int32_
 	int32_t iPredStridex4 = iPredStride << 2;
 	WelsIDctT4Rec_c( pRec,                  iStride, pPred,						iPredStride, pDct	);
 	WelsIDctT4Rec_c( &pRec[4],              iStride, &pPred[4],					iPredStride, pDct+16 );
-	WelsIDctT4Rec_c( &pRec[iDstStridex4  ], iStride, &pPred[iPredStridex4  ],	iPredStride, pDct+32 );	
+	WelsIDctT4Rec_c( &pRec[iDstStridex4  ], iStride, &pPred[iPredStridex4  ],	iPredStride, pDct+32 );
 	WelsIDctT4Rec_c( &pRec[iDstStridex4+4], iStride, &pPred[iPredStridex4+4],	iPredStride, pDct+48 );
 
 }
@@ -229,21 +229,21 @@ void WelsIDctT4RecOnMb(uint8_t* pDst, int32_t iDstStride, uint8_t* pPred, int32_
 {
 	int32_t iDstStridex8  = iDstStride << 3;
 	int32_t iPredStridex8 = iPredStride << 3;
-	
+
 	pfIDctFourT4(&pDst[0], iDstStride, &pPred[0], iPredStride, pDct);
 	pfIDctFourT4(&pDst[8], iDstStride, &pPred[8], iPredStride, pDct+64);
 	pfIDctFourT4(&pDst[iDstStridex8], iDstStride, &pPred[iPredStridex8], iPredStride, pDct+128);
 	pfIDctFourT4(&pDst[iDstStridex8+8], iDstStride, &pPred[iPredStridex8+8], iPredStride, pDct+192);
 }
 
-/* 
+/*
  * pfIDctI16x16Dc: do luma idct of an MB for I16x16 mode, when only dc value are non-zero
  */
 void WelsIDctRecI16x16Dc_c(uint8_t *pRec, int32_t iStride, uint8_t *pPred, int32_t iPredStride, int16_t *pDctDc)
 {
 	int32_t i, j;
 
-	for (i = 0; i < 16; i ++) 
+	for (i = 0; i < 16; i ++)
 	{
 		for(j = 0; j < 16; j++)
 		{
@@ -256,7 +256,7 @@ void WelsIDctRecI16x16Dc_c(uint8_t *pRec, int32_t iStride, uint8_t *pPred, int32
 
 void WelsGetEncBlockStrideOffset(int32_t *pBlock, const int32_t kiStrideY, const int32_t kiStrideUV)
 {
-	int32_t i, j, k, r;	
+	int32_t i, j, k, r;
 	for(j = 0; j < 4; j++)
 	{
 		i = j << 2;
