@@ -530,7 +530,7 @@ int32_t main(int32_t iArgC, char* pArgV[])
 	}
 		
 	if ( pDecoder ){
-		pDecoder->Unintialize();
+		pDecoder->Uninitialize();
 		
 #if defined(_MSC_VER)
 		pDestroyDecoderFunc( pDecoder );

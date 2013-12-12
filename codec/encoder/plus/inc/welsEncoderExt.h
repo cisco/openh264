@@ -69,7 +69,7 @@ public:
 	virtual int Initialize(SVCEncodingParam* argv, const INIT_TYPE init_type);
 	virtual int Initialize(void* argv, const INIT_TYPE init_type);
 
-	virtual int Unintialize();
+	virtual int Uninitialize();
 	
 	/*
 	 * return: EVideoFrameType [IDR: videoFrameTypeIDR; P: videoFrameTypeP; ERROR: videoFrameTypeInvalid]
