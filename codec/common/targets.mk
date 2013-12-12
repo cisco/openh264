@@ -4,7 +4,7 @@ COMMON_CPP_SRCS=\
 	$(COMMON_SRCDIR)/./logging.cpp\
 
 COMMON_OBJS += $(COMMON_CPP_SRCS:.cpp=.o)
-ifdef USE_ASM
+ifeq ($(USE_ASM), Yes)
 COMMON_ASM_SRCS=\
 
 COMMON_OBJS += $(COMMON_ASM_SRCS:.asm=.o)
