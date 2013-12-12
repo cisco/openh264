@@ -3,7 +3,7 @@ NAME      = libwelsvp
 
 OUTDIR    = ../../../bin/linux
 BINDIR    = ../../bin
-OBJDIR    = ../../obj  
+OBJDIR    = ../../obj
 SRCDIRS   = ../../src/asm \
             ../../src/common \
             ../../src/adaptivequantization \
@@ -12,7 +12,7 @@ SRCDIRS   = ../../src/asm \
             ../../src/downsample \
             ../../src/scenechangedetection \
             ../../src/vaacalc \
-            ../../src/complexityanalysis 
+            ../../src/complexityanalysis
 SRCDIRS  += ../../src/imagerotate
 
 
@@ -28,7 +28,7 @@ CPPFLAGS += -DX86_ASM
 endif
 ASMFLAGS  = -f elf -DNOPREFIX  -I ../../src/asm/
 LDFLAGS   = -lstdc++ -ldl
-          
+
 SRCEXTS  = .cpp
 ifeq ($(NASM), 1)
 SRCEXTS += .asm
@@ -54,11 +54,11 @@ LINK          = $(GCC) $(LDFLAGS)
 .SUFFIXES:
 
 all: $(TARGETLIB)
-	
+
 %.d:%.cpp
 	@echo -n $(dir $<) > $@
 	@$(DEPEND_cpp.d) $< >> $@
-	
+
 %.d:%.asm
 	@echo -n $(dir $<) > $@
 	@$(DEPEND_asm.d) $< >> $@
@@ -67,9 +67,9 @@ objs:$(OBJS)
 
 %.o:%.cpp
 	$(COMPILE.cpp) $< -o $@
-	
+
 %.o:%.asm
-	$(COMPILE.asm) $< -o $@	
+	$(COMPILE.asm) $< -o $@
 
 tags: $(HEADERS) $(SOURCES)
 	etags $(HEADERS) $(SOURCES)

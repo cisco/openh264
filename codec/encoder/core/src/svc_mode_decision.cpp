@@ -35,7 +35,7 @@
  *
  * \date	2009.7.29
  *
-		  
+
  **************************************************************************************
  */
 #include <assert.h>
@@ -87,7 +87,7 @@ void WelsMdSpatialelInterMbIlfmdNoilp(	sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, S
 	}
 
 	//step 1: try SKIP
-	bSkip = WelsMdInterJudgePskip( pEncCtx, pWelsMd, pSlice, pCurMb, pMbCache, bTrySkip ); 
+	bSkip = WelsMdInterJudgePskip( pEncCtx, pWelsMd, pSlice, pCurMb, pMbCache, bTrySkip );
 
 	if (  bSkip && bKeepSkip )
 	{
@@ -98,14 +98,14 @@ void WelsMdSpatialelInterMbIlfmdNoilp(	sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, S
 	if ( ! IS_SVC_INTRA(kuiRefMbType) )
 	{
 		if ( !bSkip )
-		{	
+		{
 			PredictSad( pMbCache->sMvComponents.iRefIndexCache, pMbCache->iSadCost, 0, &pWelsMd->iSadPredMb );
-			
+
 			//step 2: P_16x16
 			pWelsMd->iCostLuma = WelsMdP16x16(pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice, pCurMb);
 			pCurMb->uiMbType = MB_TYPE_16x16;
 		}
-		
+
 		WelsMdInterSecondaryModesEnc( pEncCtx, pWelsMd, pSlice, pCurMb, pMbCache, bSkip );
 	}
 	else //BLMODE == SVC_INTRA
@@ -118,12 +118,12 @@ void WelsMdSpatialelInterMbIlfmdNoilp(	sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, S
 		}
 		else
 		{
-			pWelsMd->iCostLuma = kiCostI16x16;		
+			pWelsMd->iCostLuma = kiCostI16x16;
 			pCurMb->uiMbType = MB_TYPE_INTRA16x16;
-			
+
 			WelsMdIntraSecondaryModesEnc( pEncCtx, pWelsMd, pCurMb, pMbCache );
-		}			
-	}		
+		}
+	}
 }
 
 
@@ -136,7 +136,7 @@ void WelsMdInterMbEnhancelayer( void* pEnc, void* pMd, SSlice *pSlice, SMB* pCur
 	const SMB* kpInterLayerRefMb		= GetRefMb( pCurLayer, pCurMb );
 	const Mb_Type kuiInterLayerRefMbType	= kpInterLayerRefMb->uiMbType;
 
-	SetMvBaseEnhancelayer( pWelsMd, pCurMb, kpInterLayerRefMb );// initial sMvBase here only when pRef mb type is inter, if not sMvBase will be not used! 	
+	SetMvBaseEnhancelayer( pWelsMd, pCurMb, kpInterLayerRefMb );// initial sMvBase here only when pRef mb type is inter, if not sMvBase will be not used!
 	//step (3): do the MD process
 	WelsMdSpatialelInterMbIlfmdNoilp(pEncCtx, pWelsMd, pSlice, pCurMb, kuiInterLayerRefMbType);//MD process
 }
@@ -155,7 +155,7 @@ SMB* GetRefMb( SDqLayer *pCurLayer, SMB *pCurMb )
 {
     const SDqLayer  *kpRefLayer		= pCurLayer->pRefLayer;
 	const int32_t  kiRefMbIdx = (pCurMb->iMbY>>1) * kpRefLayer->iMbWidth + (pCurMb->iMbX>>1);//because current lower layer is half size on both vertical and horizontal
-	return (&kpRefLayer->sMbDataP[kiRefMbIdx]);    
+	return (&kpRefLayer->sMbDataP[kiRefMbIdx]);
 }
 
 void SetMvBaseEnhancelayer( SWelsMD* pMd, SMB *pCurMb, const SMB *kpRefMb )
@@ -166,7 +166,7 @@ void SetMvBaseEnhancelayer( SWelsMD* pMd, SMB *pCurMb, const SMB *kpRefMb )
 	{
         SMVUnitXY sMv;
         int32_t iRefMbPartIdx = ((pCurMb->iMbY&0x01)<<1) + (pCurMb->iMbX&0x01); //may be need modified
-        int32_t iScan4RefPartIdx = g_kuiMbCountScan4Idx[(iRefMbPartIdx<<2)];	
+        int32_t iScan4RefPartIdx = g_kuiMbCountScan4Idx[(iRefMbPartIdx<<2)];
         sMv.iMvX = kpRefMb->sMv[iScan4RefPartIdx].iMvX << 1;
         sMv.iMvY = kpRefMb->sMv[iScan4RefPartIdx].iMvY << 1;
 
@@ -176,11 +176,11 @@ void SetMvBaseEnhancelayer( SWelsMD* pMd, SMB *pCurMb, const SMB *kpRefMb )
 		pMd->sMe.sMe8x8[1].sMvBase =
 		pMd->sMe.sMe8x8[2].sMvBase =
 		pMd->sMe.sMe8x8[3].sMvBase = sMv;
-        
+
  		pMd->sMe.sMe16x8[0].sMvBase =
  		pMd->sMe.sMe16x8[1].sMvBase =
 		pMd->sMe.sMe8x16[0].sMvBase =
- 		pMd->sMe.sMe8x16[1].sMvBase = sMv; 				
+ 		pMd->sMe.sMe8x16[1].sMvBase = sMv;
 	}
 }
 

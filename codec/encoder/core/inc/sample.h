@@ -66,7 +66,7 @@ int32_t WelsSampleSatd8x8_c( uint8_t *, int32_t, uint8_t *, int32_t );
 //int32_t WelsSampleSatd4x8( uint8_t *, int32_t, uint8_t *, int32_t );
 int32_t WelsSampleSatd4x4_c( uint8_t *, int32_t, uint8_t *, int32_t );
 
-void WelsSampleSadFour16x16_c( uint8_t *iSample1, int32_t iStride1, uint8_t *iSample2, int32_t iStride2, int32_t* pSad); 
+void WelsSampleSadFour16x16_c( uint8_t *iSample1, int32_t iStride1, uint8_t *iSample2, int32_t iStride2, int32_t* pSad);
 void WelsSampleSadFour16x8_c( uint8_t *iSample1, int32_t iStride1, uint8_t *iSample2, int32_t iStride2, int32_t* pSad);
 void WelsSampleSadFour8x16_c( uint8_t *iSample1, int32_t iStride1, uint8_t *iSample2, int32_t iStride2, int32_t* pSad);
 void WelsSampleSadFour8x8_c( uint8_t *iSample1, int32_t iStride1, uint8_t *iSample2, int32_t iStride2, int32_t* pSad);

@@ -54,7 +54,7 @@ void_t FreePicture( PPicture pPic );
 ///////////////////////////////////Recycled queue management for pictures///////////////////////////////////
 /*	 ______________________________________
   -->| P0 | P1 | P2 | P3 | P4 | .. | Pn-1 |-->
-	 -------------------------------------- 
+	 --------------------------------------
  *
  *	How does it work?
  *	node <- next; ++ next;
@@ -72,18 +72,18 @@ PPicture AllocPicture( PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
 	int32_t iPicChromaWidth	= 0;
 	int32_t iPicChromaHeight	= 0;
 	int32_t iLumaSize			= 0;
-	int32_t iChromaSize			= 0;	
+	int32_t iChromaSize			= 0;
 
-	pPic	= (PPicture) WelsMalloc( sizeof(SPicture), "PPicture" );	
+	pPic	= (PPicture) WelsMalloc( sizeof(SPicture), "PPicture" );
 	WELS_VERIFY_RETURN_IF( NULL, NULL == pPic );
-	
+
 	memset(pPic, 0, sizeof(SPicture) );
-	
+
 	iPicWidth = WELS_ALIGN(kiPicWidth + (PADDING_LENGTH<<1), PICTURE_RESOLUTION_ALIGNMENT);
 	iPicHeight = WELS_ALIGN(kiPicHeight + (PADDING_LENGTH<<1), PICTURE_RESOLUTION_ALIGNMENT);
 	iPicChromaWidth	= iPicWidth >> 1;
 	iPicChromaHeight	= iPicHeight >> 1;
-	
+
 	iLumaSize	= iPicWidth * iPicHeight;
 	iChromaSize	= iPicChromaWidth * iPicChromaHeight;
 	if(pCtx->iDecoderMode == SW_MODE)
@@ -99,7 +99,7 @@ PPicture AllocPicture( PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
 		pPic->pData[0]	= pPic->pBuffer[0] + (1+pPic->iLinesize[0]) * PADDING_LENGTH;
 		pPic->pData[1]	= pPic->pBuffer[1] + /*WELS_ALIGN*/( ((1+pPic->iLinesize[1]) * PADDING_LENGTH) >> 1 );
 		pPic->pData[2]	= pPic->pBuffer[2] + /*WELS_ALIGN*/( ((1+pPic->iLinesize[2]) * PADDING_LENGTH) >> 1 );
-	}	
+	}
 
 
 
@@ -120,7 +120,7 @@ void_t FreePicture( PPicture pPic )
 		if ( pPic->pBuffer[0] )
 		{
 			WelsFree( pPic->pBuffer[0], "pPic->pBuffer[0]" );
-		}		
+		}
 
 		WelsFree( pPic, "pPic" );
 
@@ -158,7 +158,7 @@ PPicture PrefetchPic( PPicBuff pPicBuf )
 			break;
 		}
 	}
-	
+
 	pPicBuf->iCurrentIdx = iPicIdx;
 	return pPic;
 }

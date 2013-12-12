@@ -35,7 +35,7 @@
  *
  * \date	03/15/2011
  *
- * \description : this class is designed as an interface to unify video pre-processing 
+ * \description : this class is designed as an interface to unify video pre-processing
  *                class implement sets such as denoise,colorspace conversion etc...
  *
  *************************************************************************************
@@ -59,7 +59,7 @@ typedef  struct
 	int32_t     iScaledHeight[MAX_DEPENDENCY_LAYER];
 } Scaled_Picture;
 
-typedef struct 
+typedef struct
 {
 	SVAACalcResult		sVaaCalcInfo;
 	SAdaptiveQuantizationParam sAdaptiveQuantParam;
@@ -70,11 +70,11 @@ typedef struct
 	int32_t         iPicStride;         //luma
 	int32_t			iPicStrideUV;
 
-	uint8_t         *pRefY; //pRef	
+	uint8_t         *pRefY; //pRef
 	uint8_t         *pCurY; //cur
-	uint8_t         *pRefU; //pRef	
+	uint8_t         *pRefU; //pRef
 	uint8_t         *pCurU; //cur
-	uint8_t         *pRefV; //pRef	
+	uint8_t         *pRefV; //pRef
 	uint8_t         *pCurV; //cur
 
 	int8_t			*pVaaBackgroundMbFlag;
@@ -89,7 +89,7 @@ class CWelsLib
 {
 public:
 	CWelsLib(void *pEncCtx);
-	virtual  ~CWelsLib();	
+	virtual  ~CWelsLib();
 
 	int32_t CreateIface(void **pEncCtx);
 	int32_t DestroyIface(void *pEncCtx);
@@ -140,8 +140,8 @@ private:
 
 private:
 	Scaled_Picture  m_sScaledPicture;
-	SPicture		*m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];	
-	IWelsVP         *m_pInterfaceVp;	
+	SPicture		*m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];
+	IWelsVP         *m_pInterfaceVp;
 	CWelsLib        *m_pEncLib;
 	void            *m_pEncCtx;
 	bool_t          m_bInitDone;

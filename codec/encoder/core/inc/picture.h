@@ -62,7 +62,7 @@ typedef struct TagPicture{
 	real32_t	fFrameRate;   // MOVE
 	int32_t		iFrameNum;		// frame number			//for pRef pic management
 
-	uint32_t	*uiRefMbType;	// for iMbWidth*iMbHeight	
+	uint32_t	*uiRefMbType;	// for iMbWidth*iMbHeight
 	uint8_t		*pRefMbQp;		// for iMbWidth*iMbHeight
 
 	int32_t     *pMbSkipSad;   //for iMbWidth*iMbHeight
@@ -77,8 +77,8 @@ typedef struct TagPicture{
 	bool_t		bIsLongRef;	// long term reference frame flag	//for pRef pic management
 	uint8_t		uiRecieveConfirmed;
 	uint8_t		uiTemporalId;
-	uint8_t		uiSpatialId;	
-}SPicture;	
+	uint8_t		uiSpatialId;
+}SPicture;
 
 /*
  *	Residual Picture

@@ -68,14 +68,14 @@ void FillNeighborCacheIntra(SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth)
 		pMbCache->iNonZeroCoeffCount[24] = pLeftMbNonZeroCount[11];
 		pMbCache->iNonZeroCoeffCount[32] = pLeftMbNonZeroCount[15];
 
-		pMbCache->iNonZeroCoeffCount[ 13] = pLeftMbNonZeroCount[17]; 
+		pMbCache->iNonZeroCoeffCount[ 13] = pLeftMbNonZeroCount[17];
 		pMbCache->iNonZeroCoeffCount[21] = pLeftMbNonZeroCount[21];
-		pMbCache->iNonZeroCoeffCount[37] = pLeftMbNonZeroCount[19]; 
+		pMbCache->iNonZeroCoeffCount[37] = pLeftMbNonZeroCount[19];
 		pMbCache->iNonZeroCoeffCount[45] = pLeftMbNonZeroCount[23];
 
         uiNeighborIntra |= LEFT_MB_POS;
 
-		if ( IS_INTRA4x4((pCurMb-1)->uiMbType ) ) 
+		if ( IS_INTRA4x4((pCurMb-1)->uiMbType ) )
 		{
 			int8_t* pLeftMbIntra4x4PredMode = pCurMb->pIntra4x4PredMode - INTRA_4x4_MODE_NUM;
 			pMbCache->iIntraPredMode[8] = pLeftMbIntra4x4PredMode[4];
@@ -83,28 +83,28 @@ void FillNeighborCacheIntra(SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth)
 			pMbCache->iIntraPredMode[24] = pLeftMbIntra4x4PredMode[6];
 			pMbCache->iIntraPredMode[32] = pLeftMbIntra4x4PredMode[3];
 		}
-		else// if ( 0 == constrained_intra_pred_flag || IS_INTRA16x16((pCurMb-1)->uiMbType )) 
+		else// if ( 0 == constrained_intra_pred_flag || IS_INTRA16x16((pCurMb-1)->uiMbType ))
 		{
-			pMbCache->iIntraPredMode[8] = 
-			pMbCache->iIntraPredMode[16] = 
-			pMbCache->iIntraPredMode[24] = 
-			pMbCache->iIntraPredMode[32] = 2; //DC		
+			pMbCache->iIntraPredMode[8] =
+			pMbCache->iIntraPredMode[16] =
+			pMbCache->iIntraPredMode[24] =
+			pMbCache->iIntraPredMode[32] = 2; //DC
 		}
 	}
 	else
 	{
-		pMbCache->iNonZeroCoeffCount[ 8] = 
-		pMbCache->iNonZeroCoeffCount[16] = 
+		pMbCache->iNonZeroCoeffCount[ 8] =
+		pMbCache->iNonZeroCoeffCount[16] =
 		pMbCache->iNonZeroCoeffCount[24] =
 		pMbCache->iNonZeroCoeffCount[32] = -1;//unavailable
-		pMbCache->iNonZeroCoeffCount[13] = 
+		pMbCache->iNonZeroCoeffCount[13] =
 		pMbCache->iNonZeroCoeffCount[21] =
 		pMbCache->iNonZeroCoeffCount[37] =
 		pMbCache->iNonZeroCoeffCount[45] = -1;//unavailable
 
-		pMbCache->iIntraPredMode[8] = 
-		pMbCache->iIntraPredMode[16] = 
-		pMbCache->iIntraPredMode[24] = 
+		pMbCache->iIntraPredMode[8] =
+		pMbCache->iIntraPredMode[16] =
+		pMbCache->iIntraPredMode[24] =
 		pMbCache->iIntraPredMode[32] = -1;//unavailable
 	}
 
@@ -115,14 +115,14 @@ void FillNeighborCacheIntra(SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth)
 
 		ST16(&pMbCache->iNonZeroCoeffCount[6], LD16(&pTopMb->pNonZeroCount[20]));
 		ST16(&pMbCache->iNonZeroCoeffCount[30], LD16(&pTopMb->pNonZeroCount[22]));
-		
+
         uiNeighborIntra |= TOP_MB_POS;
 
-		if ( IS_INTRA4x4( pTopMb->uiMbType ) ) 
+		if ( IS_INTRA4x4( pTopMb->uiMbType ) )
 		{
 			ST32(pMbCache->iIntraPredMode+1, LD32(&pTopMb->pIntra4x4PredMode[0]));
 		}
-		else// if ( 0 == constrained_intra_pred_flag || IS_INTRA16x16( pTopMb->uiMbType )) 
+		else// if ( 0 == constrained_intra_pred_flag || IS_INTRA16x16( pTopMb->uiMbType ))
 		{
 			const uint32_t kuiDc32 = 0x02020202;
 			ST32( pMbCache->iIntraPredMode+1 , kuiDc32 );
@@ -143,7 +143,7 @@ void FillNeighborCacheIntra(SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth)
         uiNeighborIntra |= 0x04;
 	}
 
-	
+
 	if (uiNeighborAvail & TOPRIGHT_MB_POS)
     {
         uiNeighborIntra |= 0x08;
@@ -152,14 +152,14 @@ void FillNeighborCacheIntra(SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth)
 }
 //fill cache of neighbor MB, containing motion_vector and uiRefIndex
 void FillNeighborCacheInterWithoutBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth, int8_t *pVaaBgMbFlag)
-{	
+{
 	uint32_t uiNeighborAvail = pCurMb->uiNeighborAvail;
 	SMB* pLeftMb = pCurMb -1 ;
 	SMB* pTopMb = pCurMb -iMbWidth;
 	SMB* pLeftTopMb = pCurMb - iMbWidth - 1 ;
 	SMB* iRightTopMb = pCurMb -iMbWidth + 1 ;
 	SMVComponentUnit *pMvComp = &pMbCache->sMvComponents;
-	if( (uiNeighborAvail & LEFT_MB_POS) && IS_SVC_INTER(pLeftMb->uiMbType) )	
+	if( (uiNeighborAvail & LEFT_MB_POS) && IS_SVC_INTER(pLeftMb->uiMbType) )
 	{
 		pMvComp->sMotionVectorCache[ 6] = pLeftMb->sMv[ 3];
 		pMvComp->sMotionVectorCache[12] = pLeftMb->sMv[ 7];
@@ -167,8 +167,8 @@ void FillNeighborCacheInterWithoutBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t i
 		pMvComp->sMotionVectorCache[24] = pLeftMb->sMv[15];
 		pMvComp->iRefIndexCache[ 6] = pLeftMb->pRefIndex[1];
 		pMvComp->iRefIndexCache[12] = pLeftMb->pRefIndex[1];
-		pMvComp->iRefIndexCache[18] = pLeftMb->pRefIndex[3];			
-		pMvComp->iRefIndexCache[24] = pLeftMb->pRefIndex[3];			
+		pMvComp->iRefIndexCache[18] = pLeftMb->pRefIndex[3];
+		pMvComp->iRefIndexCache[24] = pLeftMb->pRefIndex[3];
 		pMbCache->iSadCost[3] = pLeftMb->pSadCost[0];
 
 		if ( pLeftMb->uiMbType == MB_TYPE_SKIP )
@@ -190,14 +190,14 @@ void FillNeighborCacheInterWithoutBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t i
 		ST32(&pMvComp->sMotionVectorCache[24], 0);
 		pMvComp->iRefIndexCache[ 6] =
 			pMvComp->iRefIndexCache[12] =
-			pMvComp->iRefIndexCache[18] =		
-			pMvComp->iRefIndexCache[24] = (uiNeighborAvail & LEFT_MB_POS) ? REF_NOT_IN_LIST : REF_NOT_AVAIL;			
+			pMvComp->iRefIndexCache[18] =
+			pMvComp->iRefIndexCache[24] = (uiNeighborAvail & LEFT_MB_POS) ? REF_NOT_IN_LIST : REF_NOT_AVAIL;
 		pMbCache->iSadCost[3] = 0;
 		pMbCache->bMbTypeSkip[3] = 0;
 		pMbCache->iSadCostSkip[3] = 0;
 	}
 
-	if ( (uiNeighborAvail & TOP_MB_POS) && IS_SVC_INTER(pTopMb->uiMbType) ) //TOP MB	
+	if ( (uiNeighborAvail & TOP_MB_POS) && IS_SVC_INTER(pTopMb->uiMbType) ) //TOP MB
 	{
 		ST64(&pMvComp->sMotionVectorCache[1], LD64(&pTopMb->sMv[12]));
 		ST64(&pMvComp->sMotionVectorCache[3], LD64(&pTopMb->sMv[14]));
@@ -205,7 +205,7 @@ void FillNeighborCacheInterWithoutBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t i
 		pMvComp->iRefIndexCache[2] = pTopMb->pRefIndex[2];
 		pMvComp->iRefIndexCache[3] = pTopMb->pRefIndex[3];
 		pMvComp->iRefIndexCache[4] = pTopMb->pRefIndex[3];
-		pMbCache->iSadCost[1] = pTopMb->pSadCost[0];	
+		pMbCache->iSadCost[1] = pTopMb->pSadCost[0];
 
 		if ( pTopMb->uiMbType == MB_TYPE_SKIP )
 		{
@@ -216,26 +216,26 @@ void FillNeighborCacheInterWithoutBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t i
 		{
 			pMbCache->bMbTypeSkip[1] = 0;
 			pMbCache->iSadCostSkip[1] = 0;
-		}			
+		}
 	}
 	else //unavail
 	{
 		ST64(&pMvComp->sMotionVectorCache[1], 0);
 		ST64(&pMvComp->sMotionVectorCache[3], 0);
-		pMvComp->iRefIndexCache[1] = 
-			pMvComp->iRefIndexCache[2] = 
-			pMvComp->iRefIndexCache[3] = 
+		pMvComp->iRefIndexCache[1] =
+			pMvComp->iRefIndexCache[2] =
+			pMvComp->iRefIndexCache[3] =
 			pMvComp->iRefIndexCache[4] = (uiNeighborAvail & TOP_MB_POS) ? REF_NOT_IN_LIST : REF_NOT_AVAIL;
-		pMbCache->iSadCost[1] = 0; 
+		pMbCache->iSadCost[1] = 0;
 
 		pMbCache->bMbTypeSkip[1] = 0;
-		pMbCache->iSadCostSkip[1] = 0;	
+		pMbCache->iSadCostSkip[1] = 0;
 	}
 
-	if ( (uiNeighborAvail & TOPLEFT_MB_POS) && IS_SVC_INTER(pLeftTopMb->uiMbType) ) //LEFT_TOP MB	
+	if ( (uiNeighborAvail & TOPLEFT_MB_POS) && IS_SVC_INTER(pLeftTopMb->uiMbType) ) //LEFT_TOP MB
 	{
 		pMvComp->sMotionVectorCache[0] = pLeftTopMb->sMv[15];
-		pMvComp->iRefIndexCache[0] = pLeftTopMb->pRefIndex[3];		
+		pMvComp->iRefIndexCache[0] = pLeftTopMb->pRefIndex[3];
 		pMbCache->iSadCost[0] = pLeftTopMb->pSadCost[0];
 
 		if ( pLeftTopMb->uiMbType == MB_TYPE_SKIP )
@@ -258,11 +258,11 @@ void FillNeighborCacheInterWithoutBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t i
 		pMbCache->iSadCostSkip[0] = 0;
 	}
 
-	if ((uiNeighborAvail & TOPRIGHT_MB_POS) && IS_SVC_INTER(iRightTopMb->uiMbType) ) //RIGHT_TOP MB	
+	if ((uiNeighborAvail & TOPRIGHT_MB_POS) && IS_SVC_INTER(iRightTopMb->uiMbType) ) //RIGHT_TOP MB
 	{
 		pMvComp->sMotionVectorCache[5] = iRightTopMb->sMv[12];
 		pMvComp->iRefIndexCache[5] = iRightTopMb->pRefIndex[2];
-		pMbCache->iSadCost[2] = iRightTopMb->pSadCost[0];	
+		pMbCache->iSadCost[2] = iRightTopMb->pSadCost[0];
 
 		if ( iRightTopMb->uiMbType == MB_TYPE_SKIP )
 		{
@@ -273,7 +273,7 @@ void FillNeighborCacheInterWithoutBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t i
 		{
 			pMbCache->bMbTypeSkip[2] = 0;
 			pMbCache->iSadCostSkip[2] = 0;
-		}		
+		}
 	}
 	else //unavail
 	{
@@ -290,15 +290,15 @@ void FillNeighborCacheInterWithoutBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t i
 	ST32(&pMvComp->sMotionVectorCache[11], 0);
 	ST32(&pMvComp->sMotionVectorCache[17], 0);
 	ST32(&pMvComp->sMotionVectorCache[23], 0);
-	pMvComp->iRefIndexCache[ 9] = 
+	pMvComp->iRefIndexCache[ 9] =
 	pMvComp->iRefIndexCache[11] =
 	pMvComp->iRefIndexCache[17] =
-	pMvComp->iRefIndexCache[21] = 
+	pMvComp->iRefIndexCache[21] =
 	pMvComp->iRefIndexCache[23] = REF_NOT_AVAIL;
 }
 
 void FillNeighborCacheInterWithBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth, int8_t *pVaaBgMbFlag)
-{	
+{
 	uint32_t uiNeighborAvail = pCurMb->uiNeighborAvail;
 	SMB* pLeftMb = pCurMb -1 ;
 	SMB* pTopMb = pCurMb -iMbWidth;
@@ -306,7 +306,7 @@ void FillNeighborCacheInterWithBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t iMbW
 	SMB* iRightTopMb = pCurMb -iMbWidth + 1 ;
 	SMVComponentUnit *pMvComp = &pMbCache->sMvComponents;
 
-	if( (uiNeighborAvail & LEFT_MB_POS) && IS_SVC_INTER(pLeftMb->uiMbType) )	
+	if( (uiNeighborAvail & LEFT_MB_POS) && IS_SVC_INTER(pLeftMb->uiMbType) )
 	{
 		pMvComp->sMotionVectorCache[ 6] = pLeftMb->sMv[ 3];
 		pMvComp->sMotionVectorCache[12] = pLeftMb->sMv[ 7];
@@ -314,8 +314,8 @@ void FillNeighborCacheInterWithBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t iMbW
 		pMvComp->sMotionVectorCache[24] = pLeftMb->sMv[15];
 		pMvComp->iRefIndexCache[ 6] = pLeftMb->pRefIndex[1];
 		pMvComp->iRefIndexCache[12] = pLeftMb->pRefIndex[1];
-		pMvComp->iRefIndexCache[18] = pLeftMb->pRefIndex[3];			
-		pMvComp->iRefIndexCache[24] = pLeftMb->pRefIndex[3];			
+		pMvComp->iRefIndexCache[18] = pLeftMb->pRefIndex[3];
+		pMvComp->iRefIndexCache[24] = pLeftMb->pRefIndex[3];
 		pMbCache->iSadCost[3] = pLeftMb->pSadCost[0];
 
 		if ( pLeftMb->uiMbType == MB_TYPE_SKIP && pVaaBgMbFlag[-1] == 0)
@@ -337,14 +337,14 @@ void FillNeighborCacheInterWithBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t iMbW
 		ST32(&pMvComp->sMotionVectorCache[24], 0);
 		pMvComp->iRefIndexCache[ 6] =
 		pMvComp->iRefIndexCache[12] =
-		pMvComp->iRefIndexCache[18] =		
+		pMvComp->iRefIndexCache[18] =
 		pMvComp->iRefIndexCache[24] = (uiNeighborAvail & LEFT_MB_POS) ? REF_NOT_IN_LIST : REF_NOT_AVAIL;
 		pMbCache->iSadCost[3] = 0;
 		pMbCache->bMbTypeSkip[3] = 0;
 		pMbCache->iSadCostSkip[3] = 0;
 	}
 
-	if ( (uiNeighborAvail & TOP_MB_POS) && IS_SVC_INTER(pTopMb->uiMbType) ) //TOP MB	
+	if ( (uiNeighborAvail & TOP_MB_POS) && IS_SVC_INTER(pTopMb->uiMbType) ) //TOP MB
 	{
 		ST64(&pMvComp->sMotionVectorCache[1], LD64(&pTopMb->sMv[12]));
 		ST64(&pMvComp->sMotionVectorCache[3], LD64(&pTopMb->sMv[14]));
@@ -352,7 +352,7 @@ void FillNeighborCacheInterWithBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t iMbW
 		pMvComp->iRefIndexCache[2] = pTopMb->pRefIndex[2];
 		pMvComp->iRefIndexCache[3] = pTopMb->pRefIndex[3];
 		pMvComp->iRefIndexCache[4] = pTopMb->pRefIndex[3];
-		pMbCache->iSadCost[1] = pTopMb->pSadCost[0];	
+		pMbCache->iSadCost[1] = pTopMb->pSadCost[0];
 		if ( pTopMb->uiMbType == MB_TYPE_SKIP  && pVaaBgMbFlag[-iMbWidth] == 0 )
 		{
 			pMbCache->bMbTypeSkip[1] = 1;
@@ -362,26 +362,26 @@ void FillNeighborCacheInterWithBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t iMbW
 		{
 			pMbCache->bMbTypeSkip[1] = 0;
 			pMbCache->iSadCostSkip[1] = 0;
-		}				
+		}
 	}
 	else //unavail
 	{
 		ST64(&pMvComp->sMotionVectorCache[1], 0);
 		ST64(&pMvComp->sMotionVectorCache[3], 0);
-		pMvComp->iRefIndexCache[1] = 
-			pMvComp->iRefIndexCache[2] = 
-			pMvComp->iRefIndexCache[3] = 
+		pMvComp->iRefIndexCache[1] =
+			pMvComp->iRefIndexCache[2] =
+			pMvComp->iRefIndexCache[3] =
 			pMvComp->iRefIndexCache[4] = (uiNeighborAvail & TOP_MB_POS) ? REF_NOT_IN_LIST : REF_NOT_AVAIL;
-		pMbCache->iSadCost[1] = 0; 
+		pMbCache->iSadCost[1] = 0;
 		pMbCache->bMbTypeSkip[1] = 0;
-		pMbCache->iSadCostSkip[1] = 0;	
+		pMbCache->iSadCostSkip[1] = 0;
 	}
 
 
-	if ( (uiNeighborAvail & TOPLEFT_MB_POS) && IS_SVC_INTER(pLeftTopMb->uiMbType) ) //LEFT_TOP MB	
+	if ( (uiNeighborAvail & TOPLEFT_MB_POS) && IS_SVC_INTER(pLeftTopMb->uiMbType) ) //LEFT_TOP MB
 	{
 		pMvComp->sMotionVectorCache[0] = pLeftTopMb->sMv[15];
-		pMvComp->iRefIndexCache[0] = pLeftTopMb->pRefIndex[3];		
+		pMvComp->iRefIndexCache[0] = pLeftTopMb->pRefIndex[3];
 		pMbCache->iSadCost[0] = pLeftTopMb->pSadCost[0];
 
 		if ( pLeftTopMb->uiMbType == MB_TYPE_SKIP  && pVaaBgMbFlag[-iMbWidth-1] == 0 )
@@ -404,11 +404,11 @@ void FillNeighborCacheInterWithBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t iMbW
 		pMbCache->iSadCostSkip[0] = 0;
 	}
 
-	if ((uiNeighborAvail & TOPRIGHT_MB_POS) && IS_SVC_INTER(iRightTopMb->uiMbType) ) //RIGHT_TOP MB	
+	if ((uiNeighborAvail & TOPRIGHT_MB_POS) && IS_SVC_INTER(iRightTopMb->uiMbType) ) //RIGHT_TOP MB
 	{
 		pMvComp->sMotionVectorCache[5] = iRightTopMb->sMv[12];
 		pMvComp->iRefIndexCache[5] = iRightTopMb->pRefIndex[2];
-		pMbCache->iSadCost[2] = iRightTopMb->pSadCost[0];	
+		pMbCache->iSadCost[2] = iRightTopMb->pSadCost[0];
 
 		if ( iRightTopMb->uiMbType == MB_TYPE_SKIP  && pVaaBgMbFlag[-iMbWidth+1] == 0 )
 		{
@@ -419,7 +419,7 @@ void FillNeighborCacheInterWithBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t iMbW
 		{
 			pMbCache->bMbTypeSkip[2] = 0;
 			pMbCache->iSadCostSkip[2] = 0;
-		}		
+		}
 	}
 	else //unavail
 	{
@@ -427,7 +427,7 @@ void FillNeighborCacheInterWithBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t iMbW
 		pMvComp->iRefIndexCache[5] = (uiNeighborAvail & TOPRIGHT_MB_POS) ? REF_NOT_IN_LIST : REF_NOT_AVAIL;
 		pMbCache->iSadCost[2] = 0;
 		pMbCache->bMbTypeSkip[2] = 0;
-		pMbCache->iSadCostSkip[2] = 0;	
+		pMbCache->iSadCostSkip[2] = 0;
 	}
 
 	//right-top 4*4 pBlock unavailable
@@ -436,10 +436,10 @@ void FillNeighborCacheInterWithBGD(SMbCache* pMbCache, SMB* pCurMb, int32_t iMbW
 	ST32(&pMvComp->sMotionVectorCache[11], 0);
 	ST32(&pMvComp->sMotionVectorCache[17], 0);
 	ST32(&pMvComp->sMotionVectorCache[23], 0);
-	pMvComp->iRefIndexCache[ 9] = 
+	pMvComp->iRefIndexCache[ 9] =
 		pMvComp->iRefIndexCache[11] =
 		pMvComp->iRefIndexCache[17] =
-		pMvComp->iRefIndexCache[21] = 
+		pMvComp->iRefIndexCache[21] =
 		pMvComp->iRefIndexCache[23] = REF_NOT_AVAIL;
 }
 
@@ -453,19 +453,19 @@ void UpdateMbMv_c( SMVUnitXY *pMvBuffer, const SMVUnitXY ksMv )
 	int32_t k = 0;
 	for (; k < MB_BLOCK4x4_NUM; k += 4)
 	{
-		pMvBuffer[k  ] = 
+		pMvBuffer[k  ] =
 		pMvBuffer[k+1] =
-		pMvBuffer[k+2] = 
+		pMvBuffer[k+2] =
 		pMvBuffer[k+3] = ksMv;
 	}
 }
 
 
 uint8_t MdInterAnalysisVaaInfo_c( int32_t *pSad8x8 )
-{	
+{
 	int32_t iSadBlock[4], iAverageSadBlock[4];
 	int32_t iAverageSad, iVarianceSad;
-	
+
 	iSadBlock[0] = pSad8x8[0];
 	iAverageSad = iSadBlock[0];
 
@@ -482,7 +482,7 @@ uint8_t MdInterAnalysisVaaInfo_c( int32_t *pSad8x8 )
 
 	iAverageSadBlock[0] = (iSadBlock[0] >> 6) - (iAverageSad >> 6);
 	iVarianceSad = iAverageSadBlock[0] * iAverageSadBlock[0];
-	
+
 	iAverageSadBlock[1] = (iSadBlock[1] >> 6) - (iAverageSad >> 6);
 	iVarianceSad += iAverageSadBlock[1] * iAverageSadBlock[1];
 
@@ -493,18 +493,18 @@ uint8_t MdInterAnalysisVaaInfo_c( int32_t *pSad8x8 )
 	iVarianceSad += iAverageSadBlock[3] * iAverageSadBlock[3];
 
 	if ( iVarianceSad < INTER_VARIANCE_SAD_THRESHOLD )
-	{		
+	{
 		return 15;
 	}
 
 	uint8_t uiMbSign = 0;
-	if (iSadBlock[0] > iAverageSad) 
+	if (iSadBlock[0] > iAverageSad)
 		uiMbSign |= 0x08;
-	if (iSadBlock[1] > iAverageSad) 
+	if (iSadBlock[1] > iAverageSad)
 		uiMbSign |= 0x04;
-	if (iSadBlock[2] > iAverageSad) 
+	if (iSadBlock[2] > iAverageSad)
 		uiMbSign |= 0x02;
-	if (iSadBlock[3] > iAverageSad) 
+	if (iSadBlock[3] > iAverageSad)
 		uiMbSign |= 0x01;
 	return ( uiMbSign );
 }
@@ -517,9 +517,9 @@ static inline int32_t AnalysisVaaInfoIntra_c( uint8_t *pDataY, const int32_t kiL
 	const int32_t kiLineSize2	= kiLineSize << 1;
 	const int32_t kiLineSize3	= kiLineSize + kiLineSize2;
 	const int32_t kiLineSize4	= kiLineSize << 2;
-	int32_t i = 0, j = 0, num = 0;	
+	int32_t i = 0, j = 0, num = 0;
 	int32_t iSumAvg = 0, iSumSqr = 0;
-	
+
 //	analysis_vaa_info_intra_core_c( pDataY, iLineSize, pBlock );
 	for ( ; j < 16; j += 4 )
 	{
@@ -530,10 +530,10 @@ static inline int32_t AnalysisVaaInfoIntra_c( uint8_t *pDataY, const int32_t kiL
 			pBlock[num]	+= pEncData[i+kiLineSize ] + pEncData[i+kiLineSize+1 ] + pEncData[i+kiLineSize+2 ] + pEncData[i+kiLineSize+3 ];
 			pBlock[num]	+= pEncData[i+kiLineSize2] + pEncData[i+kiLineSize2+1] + pEncData[i+kiLineSize2+2] + pEncData[i+kiLineSize2+3];
 			pBlock[num]	+= pEncData[i+kiLineSize3] + pEncData[i+kiLineSize3+1] + pEncData[i+kiLineSize3+2] + pEncData[i+kiLineSize3+3];
-			pBlock[num]	>>=  4;			
+			pBlock[num]	>>=  4;
 		}
 		pBlock += 4;
-		pEncData += kiLineSize4; 
+		pEncData += kiLineSize4;
 	}
 
 	pBlock = &uiAvgBlock[0];
@@ -556,11 +556,11 @@ void InitIntraAnalysisVaaInfo( SWelsFuncPtrList *pFuncList, const uint32_t kuiCp
 	pFuncList->pfGetVarianceFromIntraVaa		= AnalysisVaaInfoIntra_c;
 	pFuncList->pfGetMbSignFromInterVaa	= MdInterAnalysisVaaInfo_c;
 	pFuncList->pfUpdateMbMv					= UpdateMbMv_c;
-	
+
 #if defined(X86_ASM)
 	if ( (kuiCpuFlag & WELS_CPU_SSE2) == WELS_CPU_SSE2 )
 	{
-		pFuncList->pfGetVarianceFromIntraVaa		= AnalysisVaaInfoIntra_sse2;	
+		pFuncList->pfGetVarianceFromIntraVaa		= AnalysisVaaInfoIntra_sse2;
 		pFuncList->pfGetMbSignFromInterVaa	= MdInterAnalysisVaaInfo_sse2;
 		pFuncList->pfUpdateMbMv					= UpdateMbMv_sse2;
 	}
@@ -576,9 +576,9 @@ void InitIntraAnalysisVaaInfo( SWelsFuncPtrList *pFuncList, const uint32_t kuiCp
 }
 
 BOOL_T MdIntraAnalysisVaaInfo( sWelsEncCtx* pEncCtx, uint8_t* pEncMb )
-{	
+{
 
-	SDqLayer* pCurDqLayer	= pEncCtx->pCurDqLayer;	
+	SDqLayer* pCurDqLayer	= pEncCtx->pCurDqLayer;
 	const int32_t kiLineSize  = pCurDqLayer->iEncStride[0];
 	const int32_t kiVariance	= pEncCtx->pFuncList->pfGetVarianceFromIntraVaa( pEncMb, kiLineSize );
 	return (kiVariance >= INTRA_VARIANCE_SAD_THRESHOLD);
@@ -593,7 +593,7 @@ void InitMeRefinePointer(SMeRefinePointer* pMeRefine, SMbCache* pMbCache, int32_
 	pMeRefine->pQuarPixTmp  = &pMbCache->pBufferInterPredMe[1920] + iStride;
 }
 typedef struct TagQuarParams
-{	
+{
 	int32_t iBestCost;
 	int32_t iBestHalfPix;
 	int32_t iStrideA;
@@ -621,8 +621,8 @@ inline void MeRefineQuarPixel( SWelsFuncPtrList *pFunc, SWelsME* pMe, SMeRefineP
 	uint8_t *pEncMb				= pMe->pEncMb;
 	uint8_t *pTmp				= NULL;
 	const uint8_t kuiPixel		= pMe->uiPixel;
-	
-	pSampleAvg[kiAvgIndex](pMeRefine->pQuarPixTmp, ME_REFINE_BUF_STRIDE, pParams->pSrcA[0], ME_REFINE_BUF_STRIDE,pParams->pSrcB[0], pParams->iStrideA, kiHeight);	
+
+	pSampleAvg[kiAvgIndex](pMeRefine->pQuarPixTmp, ME_REFINE_BUF_STRIDE, pParams->pSrcA[0], ME_REFINE_BUF_STRIDE,pParams->pSrcB[0], pParams->iStrideA, kiHeight);
 
 	iCurCost = CALC_COST(pMeRefine->pQuarPixTmp,pParams->iLms[0]);
 	if (iCurCost < pParams->iBestCost)
@@ -631,7 +631,7 @@ inline void MeRefineQuarPixel( SWelsFuncPtrList *pFunc, SWelsME* pMe, SMeRefineP
 		SWITCH_BEST_TMP_BUF(pMeRefine->pQuarPixBest,pMeRefine->pQuarPixTmp);
 	}
 	//=========================(0, 1)=======================//
-	pSampleAvg[kiAvgIndex](pMeRefine->pQuarPixTmp, ME_REFINE_BUF_STRIDE, pParams->pSrcA[1], 
+	pSampleAvg[kiAvgIndex](pMeRefine->pQuarPixTmp, ME_REFINE_BUF_STRIDE, pParams->pSrcA[1],
 		ME_REFINE_BUF_STRIDE,pParams->pSrcB[1], pParams->iStrideA, kiHeight);
 	iCurCost = CALC_COST(pMeRefine->pQuarPixTmp,pParams->iLms[1]);
 	if (iCurCost < pParams->iBestCost)
@@ -640,8 +640,8 @@ inline void MeRefineQuarPixel( SWelsFuncPtrList *pFunc, SWelsME* pMe, SMeRefineP
 		SWITCH_BEST_TMP_BUF(pMeRefine->pQuarPixBest,pMeRefine->pQuarPixTmp);
 	}
 	//==========================(-1, 0)=========================//
-	pSampleAvg[kiAvgIndex](pMeRefine->pQuarPixTmp, ME_REFINE_BUF_STRIDE,pParams->pSrcA[2], 
-		ME_REFINE_BUF_STRIDE,pParams->pSrcB[2], pParams->iStrideB, kiHeight);	
+	pSampleAvg[kiAvgIndex](pMeRefine->pQuarPixTmp, ME_REFINE_BUF_STRIDE,pParams->pSrcA[2],
+		ME_REFINE_BUF_STRIDE,pParams->pSrcB[2], pParams->iStrideB, kiHeight);
 	iCurCost = CALC_COST(pMeRefine->pQuarPixTmp,pParams->iLms[2]);
 	if (iCurCost < pParams->iBestCost)
 	{
@@ -649,7 +649,7 @@ inline void MeRefineQuarPixel( SWelsFuncPtrList *pFunc, SWelsME* pMe, SMeRefineP
 		SWITCH_BEST_TMP_BUF(pMeRefine->pQuarPixBest,pMeRefine->pQuarPixTmp);
 	}
 	//==========================(1, 0)=========================//
-	pSampleAvg[kiAvgIndex](pMeRefine->pQuarPixTmp, ME_REFINE_BUF_STRIDE,pParams->pSrcA[3], 
+	pSampleAvg[kiAvgIndex](pMeRefine->pQuarPixTmp, ME_REFINE_BUF_STRIDE,pParams->pSrcA[3],
 		ME_REFINE_BUF_STRIDE,	pParams->pSrcB[3], pParams->iStrideB,  kiHeight);
 
 	iCurCost = CALC_COST(pMeRefine->pQuarPixTmp,pParams->iLms[3]);
@@ -660,7 +660,7 @@ inline void MeRefineQuarPixel( SWelsFuncPtrList *pFunc, SWelsME* pMe, SMeRefineP
 	}
 }
 
-void MeRefineFracPixel(sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME* pMe, 
+void MeRefineFracPixel(sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME* pMe,
 						  SMeRefinePointer* pMeRefine, int32_t iWidth, int32_t iHeight)
 {
 	SWelsFuncPtrList *pFunc= pEncCtx->pFuncList;
@@ -671,7 +671,7 @@ void MeRefineFracPixel(sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME* 
 	int16_t iHalfMvy = iMvy;
 	const int32_t kiStrideEnc = pEncCtx->pCurDqLayer->iEncStride[0];
 	const int32_t kiStrideRef = pEncCtx->pCurDqLayer->pRefPic->iLineSize[0];
-    
+
 	uint8_t* pEncData = pMe->pEncMb;
 	uint8_t* pRef = pMe->pRefMb;//091010
 
@@ -722,7 +722,7 @@ void MeRefineFracPixel(sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME* 
 	}
 	pFunc->sMcFuncs.pfLumaHalfpelHor( pRef-1, kiStrideRef, pMeRefine->pHalfPixH, ME_REFINE_BUF_STRIDE, iWidth+1, iHeight );
 	//step 2: get [iWidth][iHeight+1] half pixel from horizon filter
-	
+
 	//===========================(-2, 0)==============================//
 	iCurCost = pFunc->sSampleDealingFuncs.pfMeCost[pMe->uiPixel](pEncData, kiStrideEnc, pMeRefine->pHalfPixH, ME_REFINE_BUF_STRIDE) +
 		COST_MVD( pMe->pMvdCost, iMvx - 2 - pMe->sMvp.iMvX, iMvy - pMe->sMvp.iMvY );
@@ -760,11 +760,11 @@ void MeRefineFracPixel(sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME* 
 
 		sParams.pSrcB[0] = sParams.pSrcB[1] = sParams.pSrcB[2] = sParams.pSrcB[3] = pRef;
 
-		sParams.iLms[0] = COST_MVD( pMe->pMvdCost, iHalfMvx - pMe->sMvp.iMvX, iHalfMvy - 1 - pMe->sMvp.iMvY ); 
+		sParams.iLms[0] = COST_MVD( pMe->pMvdCost, iHalfMvx - pMe->sMvp.iMvX, iHalfMvy - 1 - pMe->sMvp.iMvY );
 		sParams.iLms[1] = COST_MVD( pMe->pMvdCost, iHalfMvx - pMe->sMvp.iMvX, iHalfMvy + 1 - pMe->sMvp.iMvY );
 		sParams.iLms[2] = COST_MVD( pMe->pMvdCost, iHalfMvx - 1 - pMe->sMvp.iMvX, iHalfMvy - pMe->sMvp.iMvY );
 		sParams.iLms[3] = COST_MVD( pMe->pMvdCost, iHalfMvx + 1 - pMe->sMvp.iMvX, iHalfMvy - pMe->sMvp.iMvY );
-	}	
+	}
 	else //must get [X+1][X+1] half-pixel from (2, 2) horizontal and vertical filter
 	{
 		switch(iBestHalfPix)
@@ -773,7 +773,7 @@ void MeRefineFracPixel(sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME* 
 			{
                 pMeRefine->pHalfPixHV = pMeRefine->pHalfPixV;//reuse pBuffer, here only h&hv
 				pFunc->sMcFuncs.pfLumaHalfpelCen( pRef-1-kiStrideRef, kiStrideRef, pMeRefine->pHalfPixHV,ME_REFINE_BUF_STRIDE,iWidth+1, iHeight+1 );
-				
+
 				iHalfMvx -= 2;
 				sParams.iStrideA = ME_REFINE_BUF_STRIDE;
 				sParams.iStrideB = kiStrideRef;
@@ -803,16 +803,16 @@ void MeRefineFracPixel(sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME* 
 			{
                 pMeRefine->pHalfPixHV = pMeRefine->pHalfPixH;//reuse pBuffer, here only v&hv
 				pFunc->sMcFuncs.pfLumaHalfpelCen( pRef-1-kiStrideRef, kiStrideRef, pMeRefine->pHalfPixHV,ME_REFINE_BUF_STRIDE,iWidth+1, iHeight+1 );
-		
+
                	iHalfMvy -= 2;
 				sParams.iStrideA = kiStrideRef;
 				sParams.iStrideB = ME_REFINE_BUF_STRIDE;
-				sParams.pSrcA[0] = pMeRefine->pHalfPixV;				
+				sParams.pSrcA[0] = pMeRefine->pHalfPixV;
 				sParams.pSrcA[3] = sParams.pSrcA[2] = sParams.pSrcA[1] = sParams.pSrcA[0];
 				sParams.pSrcB[0] = pRef - kiStrideRef;
 				sParams.pSrcB[1] = pRef;
 				sParams.pSrcB[2] = pMeRefine->pHalfPixHV;
-				sParams.pSrcB[3] = pMeRefine->pHalfPixHV+1;		
+				sParams.pSrcB[3] = pMeRefine->pHalfPixHV+1;
 			}break;
 		case REFINE_ME_HALF_PIXEL_BOTTOM:
 			{
@@ -826,7 +826,7 @@ void MeRefineFracPixel(sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME* 
 				sParams.pSrcB[0] = pRef;
 				sParams.pSrcB[1] = pRef + kiStrideRef;
 				sParams.pSrcB[2] = pMeRefine->pHalfPixHV + ME_REFINE_BUF_STRIDE;
-				sParams.pSrcB[3] = pMeRefine->pHalfPixHV + ME_REFINE_BUF_STRIDE + 1;	
+				sParams.pSrcB[3] = pMeRefine->pHalfPixHV + ME_REFINE_BUF_STRIDE + 1;
 			}break;
 		default:
 			break;
@@ -837,7 +837,7 @@ void MeRefineFracPixel(sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME* 
 		sParams.iLms[3] = COST_MVD( pMe->pMvdCost, iHalfMvx + 1 - pMe->sMvp.iMvX, iHalfMvy - pMe->sMvp.iMvY );
 	}
 	MeRefineQuarPixel(pFunc, pMe, pMeRefine, iWidth, iHeight, &sParams, kiStrideEnc);
-	
+
 	if(iBestCost > sParams.iBestCost)
 	{
 		pBestPredInter = pMeRefine->pQuarPixBest;
@@ -855,7 +855,7 @@ void MeRefineFracPixel(sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME* 
 	{
 		pBestPredInter = pRef;
 		iInterBlk4Stride = kiStrideRef;
-	}	
+	}
 	if ( MB_WIDTH_LUMA == iWidth && MB_HEIGHT_LUMA == iHeight ) //P16x16
 	{
 		pFunc->pfCopy16x16NotAligned( pMemPredInterMb, MB_WIDTH_LUMA, pBestPredInter, iInterBlk4Stride );	// dst can be align with 16 bytes, but not sure at pSrc, 12/29/2011
@@ -866,12 +866,12 @@ void MeRefineFracPixel(sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME* 
 	}
 	else if ( MB_WIDTH_CHROMA == iWidth && MB_HEIGHT_LUMA == iHeight ) //P8x16
 	{
-		pFunc->pfCopy8x16Aligned( pMemPredInterMb, MB_WIDTH_LUMA, pBestPredInter, iInterBlk4Stride );		
+		pFunc->pfCopy8x16Aligned( pMemPredInterMb, MB_WIDTH_LUMA, pBestPredInter, iInterBlk4Stride );
 	}
 	else //P8x8
 	{
 		pFunc->pfCopy8x8Aligned( pMemPredInterMb, MB_WIDTH_LUMA, pBestPredInter, iInterBlk4Stride );
-	}	
+	}
 }
 
 void InitBlkStrideWithRef(int32_t* pBlkStride, const int32_t kiStrideRef)
@@ -894,10 +894,10 @@ void InitBlkStrideWithRef(int32_t* pBlkStride, const int32_t kiStrideRef)
 
 	for (i = 0; i < 16; i+=4)
 	{
-		pBlkStride[i  ] = kuiStrideX[i  ] + kuiStrideY[i  ] * kiStrideRef; 
-		pBlkStride[i+1] = kuiStrideX[i+1] + kuiStrideY[i+1] * kiStrideRef; 
-		pBlkStride[i+2] = kuiStrideX[i+2] + kuiStrideY[i+2] * kiStrideRef; 
-		pBlkStride[i+3] = kuiStrideX[i+3] + kuiStrideY[i+3] * kiStrideRef; 
+		pBlkStride[i  ] = kuiStrideX[i  ] + kuiStrideY[i  ] * kiStrideRef;
+		pBlkStride[i+1] = kuiStrideX[i+1] + kuiStrideY[i+1] * kiStrideRef;
+		pBlkStride[i+2] = kuiStrideX[i+2] + kuiStrideY[i+2] * kiStrideRef;
+		pBlkStride[i+3] = kuiStrideX[i+3] + kuiStrideY[i+3] * kiStrideRef;
 	}
 }
 
@@ -905,16 +905,16 @@ void InitBlkStrideWithRef(int32_t* pBlkStride, const int32_t kiStrideRef)
  * iMvdSz = (648*2+1) or (972*2+1);
  */
 void MvdCostInit( uint16_t* pMvdCostInter, const int32_t kiMvdSz )
-{	
+{
 	const int32_t kiSz		= kiMvdSz >> 1;
 	uint16_t *pNegMvd		= pMvdCostInter;
 	uint16_t *pPosMvd		= pMvdCostInter+kiSz+1;
 	const int32_t *kpQpLambda= &g_kiQpCostTable[0];
 	int32_t i,j;
-	
+
 	for( i = 0; i < 52; ++ i )
 	{
-		const uint16_t kiLambda = kpQpLambda[i];		
+		const uint16_t kiLambda = kpQpLambda[i];
 		int32_t iNegSe = -kiSz;
 		int32_t iPosSe = 1;
 
@@ -924,11 +924,11 @@ void MvdCostInit( uint16_t* pMvdCostInter, const int32_t kiMvdSz )
 			*pNegMvd++	= kiLambda * BsSizeSE(iNegSe++);
 			*pNegMvd++	= kiLambda * BsSizeSE(iNegSe++);
 			*pNegMvd++	= kiLambda * BsSizeSE(iNegSe++);
-			
+
 			*pPosMvd++	= kiLambda * BsSizeSE(iPosSe++);
 			*pPosMvd++	= kiLambda * BsSizeSE(iPosSe++);
 			*pPosMvd++	= kiLambda * BsSizeSE(iPosSe++);
-			*pPosMvd++	= kiLambda * BsSizeSE(iPosSe++);			
+			*pPosMvd++	= kiLambda * BsSizeSE(iPosSe++);
 		}
 		*pNegMvd = kiLambda;
 		pNegMvd += kiSz+1;
@@ -937,9 +937,9 @@ void MvdCostInit( uint16_t* pMvdCostInter, const int32_t kiMvdSz )
 }
 
 void PredictSad( int8_t* pRefIndexCache, int32_t* pSadCostCache, int32_t uiRef, int32_t * pSadPred )
-{    
+{
     const int32_t kiRefB	= pRefIndexCache[1];//top g_uiCache12_8x8RefIdx[0] - 4
-    int32_t iRefC			= pRefIndexCache[5];//top-right g_uiCache12_8x8RefIdx[0] - 2    
+    int32_t iRefC			= pRefIndexCache[5];//top-right g_uiCache12_8x8RefIdx[0] - 2
 	const int32_t kiRefA	= pRefIndexCache[6];//left g_uiCache12_8x8RefIdx[0] - 1
     const int32_t kiSadB		= pSadCostCache[1];
     int32_t iSadC			= pSadCostCache[2];
@@ -962,7 +962,7 @@ void PredictSad( int8_t* pRefIndexCache, int32_t* pSadCostCache, int32_t uiRef, 
 		iCount  = (uiRef == kiRefA)<<MB_LEFT_BIT;
 		iCount |= (uiRef == kiRefB)<<MB_TOP_BIT;
 		iCount |= (uiRef == iRefC)<<MB_TOPRIGHT_BIT;
-		switch(iCount) 
+		switch(iCount)
 		{
 			case LEFT_MB_POS:// A
 				*pSadPred = kiSadA;
@@ -987,10 +987,10 @@ void PredictSad( int8_t* pRefIndexCache, int32_t* pSadCostCache, int32_t uiRef, 
 
 
 void PredictSadSkip( int8_t* pRefIndexCache, bool_t* pMbSkipCache, int32_t* pSadCostCache, int32_t uiRef, int32_t * iSadPredSkip )
-{    
+{
     const int32_t kiRefB	= pRefIndexCache[1];//top g_uiCache12_8x8RefIdx[0] - 4
     int32_t iRefC			= pRefIndexCache[5];//top-right g_uiCache12_8x8RefIdx[0] - 2
-	const int32_t kiRefA	= pRefIndexCache[6];//left g_uiCache12_8x8RefIdx[0] - 1    
+	const int32_t kiRefA	= pRefIndexCache[6];//left g_uiCache12_8x8RefIdx[0] - 1
     const int32_t kiSadB		= (pMbSkipCache[1]==1 ? pSadCostCache[1] : 0);
     int32_t iSadC			= (pMbSkipCache[2]==1 ? pSadCostCache[2] : 0);
 	const int32_t kiSadA		= (pMbSkipCache[3]==1 ? pSadCostCache[3] : 0);
@@ -1014,7 +1014,7 @@ void PredictSadSkip( int8_t* pRefIndexCache, bool_t* pMbSkipCache, int32_t* pSad
 		iCount  = ((uiRef == kiRefA) && (pMbSkipCache[3]==1))<<MB_LEFT_BIT;
 		iCount |= ((uiRef == kiRefB) && (pMbSkipCache[1]==1))<<MB_TOP_BIT;
 		iCount |= ((uiRef == iRefC) && (iRefSkip==1))<<MB_TOPRIGHT_BIT;
-		switch(iCount) 
+		switch(iCount)
 		{
 			case LEFT_MB_POS:// A
 				*iSadPredSkip = kiSadA;

@@ -33,4 +33,4 @@
 LIBRARY		    welsvp.dll
 EXPORTS
                 CreateVpInterface    PRIVATE
-                DestroyVpInterface   PRIVATE      
+                DestroyVpInterface   PRIVATE

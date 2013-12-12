@@ -47,15 +47,15 @@ class welsCodecTrace
 public:
 	welsCodecTrace();
 	~welsCodecTrace();
-	
+
 	static void TraceString(int32_t iLevel, const str_t* kpStrFormat);
 	static void CODEC_TRACE(void* pIgnore, const int32_t kiLevel, const str_t* kpStrFormat, va_list vl);
 
 	void SetTraceLevel(const int32_t kiLevel);
 	int32_t WelsTraceModuleIsExist();
 
-private:	
-	
+private:
+
 	int32_t m_WelsTraceExistFlag;
 	void* m_hTraceHandle;
 
@@ -66,13 +66,13 @@ public:
 	static CM_WELS_TRACE m_fpInfoTrace;
 	static CM_WELS_TRACE m_fpWarnTrace;
 	static CM_WELS_TRACE m_fpErrorTrace;
-#else	
+#else
 	static CM_WELS_TRACE2 m_fpDebugTrace;
 	static CM_WELS_TRACE2 m_fpInfoTrace;
 	static CM_WELS_TRACE2 m_fpWarnTrace;
 	static CM_WELS_TRACE2 m_fpErrorTrace;
 #endif
-	
+
 };
 
 #endif //WELS_CODEC_TRACE

@@ -57,6 +57,6 @@ int32_t WelsSampleSad8x8_c( uint8_t * pSrcY, int32_t iSrcStrideY, uint8_t * pRef
 	}
 
 	return iSadSum;
-} 
+}
 
 WELSVP_NAMESPACE_END

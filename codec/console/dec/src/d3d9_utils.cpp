@@ -97,7 +97,7 @@ HRESULT CD3D9Utils::Init(BOOL bWindowed)
 	pFnCreateD3D9 pCreateD3D9 = NULL;
 	if(m_hDll)
 		pCreateD3D9 = (pFnCreateD3D9) GetProcAddress(m_hDll, TEXT("Direct3DCreate9"));
-	else 
+	else
 		return E_FAIL;
 
 	m_lpD3D9 = pCreateD3D9(D3D_SDK_VERSION);
@@ -143,9 +143,9 @@ HRESULT CD3D9Utils::Process(void *pDst[3], SBufferInfo *pInfo, FILE *pFp)
 	if (m_bInitDone)
 	{
 		if (bWindowed)
-		{	
-			hResult = Render(pDst, pInfo);				
-			Sleep(30); 
+		{
+			hResult = Render(pDst, pInfo);
+			Sleep(30);
 		}
 		else if (pFp)
 		{
@@ -168,7 +168,7 @@ HRESULT CD3D9Utils::Render(void *pDst[3], SBufferInfo *pInfo)
 		if (SUCCEEDED(hResult))
 		 hResult = Dump2Surface(pDst, m_lpD3D9RawSurfaceShare, pInfo->UsrData.sSystemBuffer.iWidth, pInfo->UsrData.sSystemBuffer.iHeight, pInfo->UsrData.sSystemBuffer.iStride);
 	}
-	
+
 	if (SUCCEEDED(hResult))
 	{
 		IDirect3DSurface9 *pBackBuffer = NULL;
@@ -186,13 +186,13 @@ HRESULT CD3D9Utils::Dump(void *pDst[3], SBufferInfo *pInfo, FILE *pFp)
 	EBufferProperty eBufferProperty = pInfo->eBufferProperty;
 	int iStride[2];
 	int iWidth;
-	int iHeight;	
+	int iHeight;
 
 	iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
 	iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
 	iStride[0] = pInfo->UsrData.sSystemBuffer.iStride[0];
 	iStride[1] = pInfo->UsrData.sSystemBuffer.iStride[1];
-	
+
 	if (pDst[0] && pDst[1] && pDst[2])
 		Write2File(pFp, (unsigned char **)pDst, iStride, iWidth, iHeight);
 
@@ -249,9 +249,9 @@ HRESULT CD3D9Utils::InitResource(void *pSharedHandle, SBufferInfo *pInfo)
 			D3Dformat = (D3DFORMAT)NV12_FORMAT;
 			D3Dpool = (D3DPOOL)D3DPOOL_DEFAULT;
 		}
-		
+
 		hResult = m_lpD3D9Device->CreateOffscreenPlainSurface(iWidth, iHeight, (D3DFORMAT)D3Dformat, (D3DPOOL)D3Dpool, &m_lpD3D9RawSurfaceShare, NULL);
-		
+
 	}
 
 	if (m_lpD3D9Device == NULL || m_lpD3D9RawSurfaceShare == NULL)
@@ -290,7 +290,7 @@ HRESULT CD3D9ExUtils::Init(BOOL bWindowed)
 	pFnCreateD3D9Ex pCreateD3D9Ex = NULL;
 	if(m_hDll)
 		pCreateD3D9Ex = (pFnCreateD3D9Ex) GetProcAddress(m_hDll, TEXT("Direct3DCreate9Ex"));
-	else 
+	else
 		return E_FAIL;
 
 	pCreateD3D9Ex(D3D_SDK_VERSION, &m_lpD3D9);
@@ -336,8 +336,8 @@ HRESULT CD3D9ExUtils::Process(void *pDst[3], SBufferInfo *pInfo, FILE *pFp)
 	if (m_bInitDone)
 	{
 		if (bWindowed)
-		{	
-			hResult = Render(pDst, pInfo);				
+		{
+			hResult = Render(pDst, pInfo);
 			Sleep(30); // set a simple time controlling with default of 30fps
 		}
 		else if (pFp)
@@ -363,7 +363,7 @@ HRESULT CD3D9ExUtils::Render(void *pDst[3], SBufferInfo *pInfo)
 	}
 	else if (eBufferProperty == BUFFER_DEVICE)
 	{
-		VOID * pSharedHandle = pDst[0];	
+		VOID * pSharedHandle = pDst[0];
 		hResult = InitResource(pSharedHandle, pInfo);
 	}
 
@@ -384,15 +384,15 @@ HRESULT CD3D9ExUtils::Dump(void *pDst[3], SBufferInfo *pInfo, FILE *pFp)
 	EBufferProperty eBufferProperty = pInfo->eBufferProperty;
 	int iStride[2];
 	int iWidth;
-	int iHeight;	
-	
+	int iHeight;
+
 	if (eBufferProperty != BUFFER_HOST)
-	{		
+	{
 		iWidth = pInfo->UsrData.sVideoBuffer.iSurfaceWidth;
 		iHeight = pInfo->UsrData.sVideoBuffer.iSurfaceHeight;
 		iStride[0] = iWidth;
 		iStride[1] = iWidth / 2;
-		
+
 		if (m_pDumpYUV == NULL)
 		{
 			m_pDumpYUV = (unsigned char *)malloc(iWidth * iHeight * 3 / 2 * sizeof(unsigned char));
@@ -414,7 +414,7 @@ HRESULT CD3D9ExUtils::Dump(void *pDst[3], SBufferInfo *pInfo, FILE *pFp)
 		iStride[0] = pInfo->UsrData.sSystemBuffer.iStride[0];
 		iStride[1] = pInfo->UsrData.sSystemBuffer.iStride[1];
 	}
-	
+
 	if (pDst[0] && pDst[1] && pDst[2])
 		Write2File(pFp, (unsigned char **)pDst, iStride, iWidth, iHeight);
 
@@ -541,7 +541,7 @@ HRESULT Dump2Surface(void *pDst[3], void *pSurface, int iWidth, int iHeight, int
 
 	for (int j=0; j<iHeight; j++)
 		memcpy(pOutY+j*iOutStride, pInY+j*iStride[0], iWidth);//confirmed_safe_unsafe_usage
-	
+
 	unsigned char * pInV = (unsigned char *)pDst[1];
 	unsigned char * pInU = (unsigned char *)pDst[2];
 	unsigned char * pOutC = pOutY + iOutStride * iHeight;
@@ -565,7 +565,7 @@ HRESULT InitWindow(HWND *hWnd)
 	const TCHAR kszWindowClass[] = TEXT("Wels Decoder Class");
 
 	WNDCLASSEX sWndClassEx = {0};
-	sWndClassEx.cbSize          = sizeof(WNDCLASSEX); 
+	sWndClassEx.cbSize          = sizeof(WNDCLASSEX);
 	sWndClassEx.style			= CS_HREDRAW | CS_VREDRAW;
 	sWndClassEx.lpfnWndProc	    = (WNDPROC)WndProc;
 	sWndClassEx.cbClsExtra		= 0;
@@ -598,11 +598,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	INT wmId, wmEvent;
 
-	switch (message) 
+	switch (message)
 	{
 	case WM_COMMAND:
-		wmId    = LOWORD(wParam); 
-		wmEvent = HIWORD(wParam); 
+		wmId    = LOWORD(wParam);
+		wmEvent = HIWORD(wParam);
 		switch (wmId)
 		{
 		case IDM_ABOUT:
@@ -667,7 +667,7 @@ CUtils::~CUtils()
 
 int CUtils::Process(void *pDst[3], SBufferInfo *pInfo, FILE *pFp)
 {
-	
+
 	int iRet = 0;
 
 	if (iOSType == OS_UNSUPPORTED)
@@ -704,12 +704,12 @@ int CUtils::Process(void *pDst[3], SBufferInfo *pInfo, FILE *pFp)
 
 				else if (iOSType == OS_VISTA_UPPER)
 					hResult = ((CD3D9ExUtils *)hHandle)->Process(pDst, pInfo, pFp);
-              
+
 				iRet = !SUCCEEDED(hResult);
 				break;
-			}		
+			}
 		}
-	}	
+	}
 #endif
 
 	return iRet;
@@ -727,18 +727,18 @@ int CUtils::CheckOS()
 	if( !GetVersionEx ((OSVERSIONINFO *) &osvi) )
 	{
 		osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-		if (! GetVersionEx ( (OSVERSIONINFO *) &osvi) ) 
+		if (! GetVersionEx ( (OSVERSIONINFO *) &osvi) )
 			return iType;
 	}
 
 	switch (osvi.dwPlatformId)
 	{
-	case VER_PLATFORM_WIN32_NT:	
+	case VER_PLATFORM_WIN32_NT:
 		if (osvi.dwMajorVersion >= 6)
 			iType = OS_VISTA_UPPER;
 		else if (osvi.dwMajorVersion == 5)
 			iType = OS_XP;
-		break;		
+		break;
 
 	default:
 		break;

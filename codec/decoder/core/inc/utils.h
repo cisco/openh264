@@ -68,7 +68,7 @@ extern void_t WelsLog(void_t *pPtr, int32_t iLevel, const char *kpFmt, ...) __at
 #else
 extern void_t WelsLog(void_t *pPtr, int32_t iLevel, const char *kpFmt, ...);
 #endif
-	
+
 #define DECODER_MODE_NAME(a) ((a == SW_MODE)?"SW_MODE":((a == GPU_MODE)?"GPU_MODE":((a == AUTO_MODE)?"AUTO_MODE":"SWITCH_MODE")))
 #define OUTPUT_PROPERTY_NAME(a) ((a == 0)?"system_memory":"video_memory")
 #define BUFFER_STATUS_NAME(a) ((a == 0)?"unvalid":"valid")

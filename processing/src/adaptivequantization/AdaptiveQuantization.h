@@ -34,7 +34,7 @@
  *
  * \date         :  2011/03/21
  *
- * \description  :  1. rewrite the package code of scene change detection class  
+ * \description  :  1. rewrite the package code of scene change detection class
  *
  */
 
@@ -62,7 +62,7 @@ WELSVP_EXTERN_C_END
 
 
 class CAdaptiveQuantization : public IStrategy
-{			  
+{
 public:
 	CAdaptiveQuantization(int32_t iCpuFlag);
 	~CAdaptiveQuantization();
@@ -78,7 +78,7 @@ private:
 	PVarFunc			                   m_pfVar;
 	int32_t                                  m_CPUFlag;
 	SAdaptiveQuantizationParam    m_sAdaptiveQuantParam;
-};	
+};
 
 WELSVP_NAMESPACE_END
 

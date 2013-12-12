@@ -52,33 +52,33 @@ namespace WelsDec {
 	iCurBits |= ((pBufPtr[0] << 8) | pBufPtr[1]) << (iLeftBits); \
 	iLeftBits -= 16; \
 	pBufPtr +=2; \
-} 
+}
 #define NEED_BITS(iCurBits, pBufPtr, iLeftBits) { \
 	if( iLeftBits > 0 ) { \
 	GET_WORD(iCurBits, pBufPtr, iLeftBits); \
 	} \
-} 
-#define UBITS(iCurBits, iNumBits) (iCurBits>>(32-(iNumBits)))  
+}
+#define UBITS(iCurBits, iNumBits) (iCurBits>>(32-(iNumBits)))
 #define DUMP_BITS(iCurBits, pBufPtr, iLeftBits, iNumBits) { \
 	iCurBits <<= (iNumBits); \
 	iLeftBits += (iNumBits); \
 	NEED_BITS(iCurBits, pBufPtr, iLeftBits); \
-}  
+}
 
 static inline int32_t ShowBits( PBitStringAux pBs, int32_t iNumBits )
 {
 	return UBITS( pBs->uiCurBits, iNumBits );
-} 
+}
 static inline void_t FlushBits( PBitStringAux pBs, int32_t iNumBits )
 {
 	DUMP_BITS( pBs->uiCurBits, pBs->pCurBuf, pBs->iLeftBits, iNumBits );
-} 
+}
 static inline int32_t BsGetBits( PBitStringAux pBs, int32_t iNumBits )
 {
 	int32_t iRc = UBITS( pBs->uiCurBits, iNumBits );
 	DUMP_BITS( pBs->uiCurBits, pBs->pCurBuf, pBs->iLeftBits, iNumBits );
 	return iRc;
-}   
+}
 
 /*
  *	Exponential Golomb codes decoding routines
@@ -98,14 +98,14 @@ static const uint32_t g_kuiPrefix8BitsTable[16] =
 
 static inline uint32_t GetPrefixBits(uint32_t uiValue)
 {
-	uint32_t iNumBit = 0;	
+	uint32_t iNumBit = 0;
 
-	if (uiValue & 0xffff0000) 
+	if (uiValue & 0xffff0000)
 	{
 		uiValue >>= 16;
 		iNumBit += 16;
 	}
-	if (uiValue & 0xff00) 
+	if (uiValue & 0xff00)
 	{
 		uiValue >>= 8;
 		iNumBit += 8;
@@ -129,9 +129,9 @@ static inline uint32_t BsGetOneBit(PBitStringAux pBs)
 	return ( BsGetBits(pBs, 1) );
 }
 
-static inline int32_t GetLeadingZeroBits( uint32_t iCurBits ) //<=16 bits 
+static inline int32_t GetLeadingZeroBits( uint32_t iCurBits ) //<=16 bits
 {
-	int32_t  iValue; 
+	int32_t  iValue;
 
 	iValue = UBITS( iCurBits, 8 );//ShowBits( bs, 8 );
 	if( iValue )
@@ -157,8 +157,8 @@ static inline uint32_t BsGetUe( PBitStringAux pBs )
 	if ( iLeadingZeroBits == -1 ) //bistream error
 	{
 		return 0xffffffff;//-1
-	}	
-	
+	}
+
 	DUMP_BITS( pBs->uiCurBits, pBs->pCurBuf, pBs->iLeftBits, iLeadingZeroBits + 1 );
 
 	if( iLeadingZeroBits )
@@ -167,7 +167,7 @@ static inline uint32_t BsGetUe( PBitStringAux pBs )
 		DUMP_BITS( pBs->uiCurBits, pBs->pCurBuf, pBs->iLeftBits, iLeadingZeroBits );
 	}
 
-	return ((1<<iLeadingZeroBits) - 1 + iValue);		
+	return ((1<<iLeadingZeroBits) - 1 + iValue);
 }
 
 
@@ -177,14 +177,14 @@ static inline uint32_t BsGetUe( PBitStringAux pBs )
 static inline int32_t BsGetSe(PBitStringAux pBs)
 {
 	uint32_t uiCodeNum;
-	
-	uiCodeNum = BsGetUe( pBs );	
 
-	if(uiCodeNum&0x01)							
+	uiCodeNum = BsGetUe( pBs );
+
+	if(uiCodeNum&0x01)
 	{
-		return (int32_t)((uiCodeNum+1)>>1);		
+		return (int32_t)((uiCodeNum+1)>>1);
 	}
-	else      
+	else
 	{
 		return NEG_NUM( (int32_t)(uiCodeNum>>1) );
 	}
@@ -200,7 +200,7 @@ static inline uint32_t BsGetTe(PBitStringAux pBs, uint8_t uiRange)
 		return BsGetOneBit(pBs)^1;
 	}
 	else
-	{	
+	{
 		return BsGetUe(pBs);
 	}
 }
@@ -226,15 +226,15 @@ static inline int32_t BsGetTrailingBits( uint8_t *pBuf )
 	// TODO
 	uint32_t uiValue = *pBuf;
     int32_t iRetNum = 1;
-	
-	do 
+
+	do
 	{
 		if (uiValue&1)
 			return iRetNum;
 		uiValue >>= 1;
 		++ iRetNum;
 	} while(iRetNum < 9);
-	
+
 	return 0;
 }
 

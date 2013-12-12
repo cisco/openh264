@@ -46,12 +46,12 @@ CComplexityAnalysis::CComplexityAnalysis(int32_t iCpuFlag)
 }
 
 CComplexityAnalysis::~CComplexityAnalysis()
-{	
+{
 }
 
 EResult CComplexityAnalysis::Process(int32_t iType, SPixMap *pSrcPixMap, SPixMap *pRefPixMap)
 {
-	EResult eReturn = RET_SUCCESS;	
+	EResult eReturn = RET_SUCCESS;
 
 	switch (m_sComplexityAnalysisParam.iComplexityAnalysisMode)
 	{
@@ -67,7 +67,7 @@ EResult CComplexityAnalysis::Process(int32_t iType, SPixMap *pSrcPixMap, SPixMap
 	default:
 		eReturn = RET_INVALIDPARAM;
 		break;
-	}	
+	}
 
 	return eReturn;
 }
@@ -117,7 +117,7 @@ void CComplexityAnalysis::AnalyzeFrameComplexityViaSad( SPixMap *pSrcPixMap, SPi
 int32_t CComplexityAnalysis::GetFrameSadExcludeBackground( SPixMap *pSrcPixMap, SPixMap *pRefPixMap )
 {
 	int32_t iWidth     = pSrcPixMap->sRect.iRectWidth;
-	int32_t iHeight    = pSrcPixMap->sRect.iRectHeight;	
+	int32_t iHeight    = pSrcPixMap->sRect.iRectHeight;
 	int32_t iMbWidth  = iWidth  >> 4;
 	int32_t iMbHeight = iHeight >> 4;
 	int32_t iMbNum    = iMbWidth * iMbHeight;
@@ -138,7 +138,7 @@ int32_t CComplexityAnalysis::GetFrameSadExcludeBackground( SPixMap *pSrcPixMap, 
 		iGomMbEndIndex = WELS_MIN( (j + 1) * iMbNumInGom, iMbNum);
 
 		for ( int32_t i = iGomMbStartIndex; i < iGomMbEndIndex; i ++)
-		{	
+		{
 			if ( pBackgroundMbFlag[i] == 0 || IS_INTRA(uiRefMbType[i]) )
 			{
 				pGomForegroundBlockNum[j]++;
@@ -188,7 +188,7 @@ void GomSampleSadExceptBackground(uint32_t *pGomSad, int32_t *pGomForegroundBloc
 void CComplexityAnalysis::AnalyzeGomComplexityViaSad( SPixMap *pSrcPixMap, SPixMap *pRefPixMap )
 {
 	int32_t iWidth     = pSrcPixMap->sRect.iRectWidth;
-	int32_t iHeight    = pSrcPixMap->sRect.iRectHeight;	
+	int32_t iHeight    = pSrcPixMap->sRect.iRectHeight;
 	int32_t iMbWidth  = iWidth  >> 4;
 	int32_t iMbHeight = iHeight >> 4;
 	int32_t iMbNum    = iMbWidth * iMbHeight;
@@ -233,8 +233,8 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaSad( SPixMap *pSrcPixMap, SPixM
 
 		iStartSampleIndex  = ( iMbStartIndex / iMbWidth ) * MB_WIDTH_LUMA * iRefStride + ( iMbStartIndex % iMbWidth ) * MB_WIDTH_LUMA;
 
-		do 
-		{   
+		do
+		{
 			pRefTmp = pRefY + iStartSampleIndex;
 			pCurTmp = pSrcY + iStartSampleIndex;
 
@@ -261,7 +261,7 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaSad( SPixMap *pSrcPixMap, SPixM
 void CComplexityAnalysis::AnalyzeGomComplexityViaVar( SPixMap *pSrcPixMap, SPixMap *pRefPixMap )
 {
 	int32_t iWidth     = pSrcPixMap->sRect.iRectWidth;
-	int32_t iHeight    = pSrcPixMap->sRect.iRectHeight;	
+	int32_t iHeight    = pSrcPixMap->sRect.iRectHeight;
 	int32_t iMbWidth  = iWidth  >> 4;
 	int32_t iMbHeight = iHeight >> 4;
 	int32_t iMbNum    = iMbWidth * iMbHeight;
@@ -301,7 +301,7 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaVar( SPixMap *pSrcPixMap, SPixM
 		iStartSampleIndex  = ( iMbStartIndex / iMbWidth ) * MB_WIDTH_LUMA * iCurStride + ( iMbStartIndex % iMbWidth ) * MB_WIDTH_LUMA;
 		iGomSampleNum = (iMbEndIndex - iMbStartIndex) * MB_WIDTH_LUMA * MB_WIDTH_LUMA;
 
-		do 
+		do
 		{
 			pCurTmp = pSrcY + iStartSampleIndex;
 
@@ -316,7 +316,7 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaVar( SPixMap *pSrcPixMap, SPixM
 
 			iStartSampleIndex  = ( iMbStartIndex / iMbWidth ) * MB_WIDTH_LUMA * iCurStride + ( iMbStartIndex % iMbWidth ) * MB_WIDTH_LUMA;
 		} while ( --iGomMbRowNum );
-	
+
 		pGomComplexity[j] = uiSquareSum - (uiSampleSum * uiSampleSum / iGomSampleNum);
 	}
 }

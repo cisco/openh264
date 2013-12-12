@@ -51,7 +51,7 @@ typedef struct TagPicture{
 	int32_t		iLinesize[4];// linesize of picture planes respectively used currently
 	int32_t		iPlanes;			// How many planes are introduced due to color space format?
 	// picture information
-	
+
 	/*******************************from other standard syntax****************************/
 	/*from sps*/
 	int32_t		iWidthInPixel;	// picture width in pixel
@@ -70,7 +70,7 @@ typedef struct TagPicture{
 	uint8_t		uiSpatialId;
 	uint8_t		uiQualityId;
 	bool_t		bRefBaseFlag;
-	
+
 	int32_t		iFrameNum;		// frame number			//for ref pic management
 	int32_t		iLongTermFrameIdx;					//id for long term ref pic
 

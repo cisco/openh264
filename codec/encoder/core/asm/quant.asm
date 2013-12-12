@@ -44,17 +44,17 @@
 
 BITS 32
 
-SECTION .text	
+SECTION .text
 ;************************************************
-;NEW_QUANT 
+;NEW_QUANT
 ;************************************************
 
 %macro SSE2_Quant8  5
 		MOVDQ	%1, %5
-		pxor	%2, %2							
-		pcmpgtw	%2, %1							
-		pxor	%1, %2							
-		psubw	%1, %2							
+		pxor	%2, %2
+		pcmpgtw	%2, %1
+		pxor	%1, %2
+		psubw	%1, %2
 		paddusw	%1, %3
 		pmulhuw	%1, %4
 		pxor	%1, %2
@@ -64,10 +64,10 @@ SECTION .text
 
 %macro SSE2_QuantMax8  6
 		MOVDQ	%1, %5
-		pxor	%2, %2							
-		pcmpgtw	%2, %1							
-		pxor	%1, %2							
-		psubw	%1, %2								
+		pxor	%2, %2
+		pcmpgtw	%2, %1
+		pxor	%1, %2
+		psubw	%1, %2
 		paddusw	%1, %3
 		pmulhuw	%1, %4
 		pmaxsw	%6, %1
@@ -86,17 +86,17 @@ SECTION .text
 WELS_EXTERN WelsQuant4x4_sse2
 align 16
 WelsQuant4x4_sse2:
-		mov		eax,  [ff]		
-		mov		ecx,  [mf]			
+		mov		eax,  [ff]
+		mov		ecx,  [mf]
 		MOVDQ	xmm2, [eax]
 		MOVDQ	xmm3, [ecx]
-		
+
 		mov		edx,  [pDct]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [edx]
-		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [edx + 0x10]	
+		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [edx + 0x10]
 
 		ret
-	
+
 ;***********************************************************************
 ;void WelsQuant4x4Dc_sse2(int16_t *pDct, const int16_t ff, int16_t mf);
 ;***********************************************************************
@@ -104,37 +104,37 @@ WELS_EXTERN WelsQuant4x4Dc_sse2
 align 16
 WelsQuant4x4Dc_sse2:
 		mov		ax,		[mf]
-		SSE2_Copy8Times xmm3, eax						
-		
+		SSE2_Copy8Times xmm3, eax
+
 		mov		cx, [ff]
-		SSE2_Copy8Times xmm2, ecx						
+		SSE2_Copy8Times xmm2, ecx
 
 		mov		edx,  [pDct]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [edx]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [edx + 0x10]
-				
-		ret		
-		
+
+		ret
+
 ;***********************************************************************
 ;	void WelsQuantFour4x4_sse2(int16_t *pDct, int16_t* ff,  int16_t *mf);
 ;***********************************************************************
 WELS_EXTERN WelsQuantFour4x4_sse2
 align 16
 WelsQuantFour4x4_sse2:
-		mov		eax,  [ff]		
-		mov		ecx,  [mf]			
+		mov		eax,  [ff]
+		mov		ecx,  [mf]
 		MOVDQ	xmm2, [eax]
 		MOVDQ	xmm3, [ecx]
-		
-		mov		edx,  [pDct]	
+
+		mov		edx,  [pDct]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [edx]
-		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [edx + 0x10]	
+		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [edx + 0x10]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [edx + 0x20]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [edx + 0x30]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [edx + 0x40]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [edx + 0x50]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [edx + 0x60]
-		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [edx + 0x70]	
+		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [edx + 0x70]
 
 		ret
 
@@ -144,17 +144,17 @@ WelsQuantFour4x4_sse2:
 WELS_EXTERN WelsQuantFour4x4Max_sse2
 align 16
 WelsQuantFour4x4Max_sse2:
-		mov		eax,  [ff]		
-		mov		ecx,  [mf]			
+		mov		eax,  [ff]
+		mov		ecx,  [mf]
 		MOVDQ	xmm2, [eax]
 		MOVDQ	xmm3, [ecx]
-		
-		mov		edx,  [pDct]		
+
+		mov		edx,  [pDct]
 		pxor	xmm4, xmm4
 		pxor	xmm5, xmm5
 		pxor	xmm6, xmm6
 		pxor	xmm7, xmm7
-		SSE2_QuantMax8	xmm0, xmm1, xmm2, xmm3, [edx	   ], xmm4		
+		SSE2_QuantMax8	xmm0, xmm1, xmm2, xmm3, [edx	   ], xmm4
 		SSE2_QuantMax8	xmm0, xmm1, xmm2, xmm3, [edx + 0x10], xmm4
 		SSE2_QuantMax8	xmm0, xmm1, xmm2, xmm3, [edx + 0x20], xmm5
 		SSE2_QuantMax8	xmm0, xmm1, xmm2, xmm3, [edx + 0x30], xmm5
@@ -162,19 +162,19 @@ WelsQuantFour4x4Max_sse2:
 		SSE2_QuantMax8	xmm0, xmm1, xmm2, xmm3, [edx + 0x50], xmm6
 		SSE2_QuantMax8	xmm0, xmm1, xmm2, xmm3, [edx + 0x60], xmm7
 		SSE2_QuantMax8	xmm0, xmm1, xmm2, xmm3, [edx + 0x70], xmm7
-		
+
 		SSE2_TransTwo4x4W xmm4, xmm5, xmm6, xmm7, xmm0
-		pmaxsw  xmm0,  xmm4	
+		pmaxsw  xmm0,  xmm4
 		pmaxsw  xmm0,  xmm5
-		pmaxsw  xmm0,  xmm7			
+		pmaxsw  xmm0,  xmm7
 		movdqa	xmm1,  xmm0
 		punpckhqdq	xmm0, xmm1
 		pmaxsw	xmm0, xmm1
 
-		mov		edx,  [max]	
-		movq	[edx], xmm0	
-			
-		ret		
+		mov		edx,  [max]
+		movq	[edx], xmm0
+
+		ret
 
 %macro  MMX_Copy4Times 2
 		movd		%1, %2
@@ -185,10 +185,10 @@ WelsQuantFour4x4Max_sse2:
 SECTION .text
 
 %macro MMX_Quant4  4
-		pxor	%2, %2							
-		pcmpgtw	%2, %1							
-		pxor	%1, %2							
-		psubw	%1, %2							
+		pxor	%2, %2
+		pcmpgtw	%2, %1
+		pxor	%1, %2
+		psubw	%1, %2
 		paddusw	%1, %3
 		pmulhuw	%1, %4
 		pxor	%1, %2
@@ -211,13 +211,13 @@ WelsHadamardQuant2x2_mmx:
 		movd		mm3,			[eax + 0x40]
 		movd		mm1,			[eax + 0x60]
 		punpcklwd	mm3,			mm1
-		
+
 		mov			cx,				0
 		mov			[eax],			cx
 		mov			[eax + 0x20],	cx
 		mov			[eax + 0x40],	cx
 		mov			[eax + 0x60],	cx
-		
+
 		;hdm_2x2,	mm0 = dct0 dct1, mm3 = dct2 dct3
 		movq		mm5,			mm3
 		paddw		mm3,			mm0
@@ -229,32 +229,32 @@ WelsHadamardQuant2x2_mmx:
 		paddw		mm1,			mm3
 		psubw		mm3,			mm5
 		punpcklwd	mm1,			mm3
-		
+
 		;quant_2x2_dc
 		mov			ax,				[mf]
-		MMX_Copy4Times	mm3,		eax		
+		MMX_Copy4Times	mm3,		eax
 		mov			cx,				[ff]
 		MMX_Copy4Times	mm2,		ecx
 		MMX_Quant4		mm1,	mm0,	mm2,	mm3
-		
+
 		; store dct_2x2
-		mov			edx,			[dct2x2]	
+		mov			edx,			[dct2x2]
 		movq		[edx],			mm1
 		mov			ecx,			[iChromaDc]
 		movq		[ecx],			mm1
-		
+
 		; pNonZeroCount of dct_2x2
-		pcmpeqb		mm2,			mm2		; mm2 = FF 
+		pcmpeqb		mm2,			mm2		; mm2 = FF
 		pxor		mm3,			mm3
 		packsswb	mm1,			mm3
 		pcmpeqb		mm1,			mm3		; set FF if equal, 0 if not equal
 		psubsb		mm1,			mm2		; set 0 if equal, 1 if not equal
 		psadbw		mm1,			mm3		;
 		movd		eax,			mm1
-					
+
 		WELSEMMS
 		ret
-	
+
 ;***********************************************************************
 ;int32_t WelsHadamardQuant2x2Skip_mmx(int16_t *pDct, int16_t ff,  int16_t mf);
 ;***********************************************************************
@@ -269,7 +269,7 @@ WelsHadamardQuant2x2Skip_mmx:
 		movd		mm3,			[eax + 0x40]
 		movd		mm1,			[eax + 0x60]
 		punpcklwd	mm3,			mm1
-		
+
 		;hdm_2x2,	mm0 = dct0 dct1, mm3 = dct2 dct3
 		movq		mm5,			mm3
 		paddw		mm3,			mm0
@@ -281,32 +281,32 @@ WelsHadamardQuant2x2Skip_mmx:
 		paddw		mm1,			mm3
 		psubw		mm3,			mm5
 		punpcklwd	mm1,			mm3
-		
+
 		;quant_2x2_dc
 		mov			ax,				[mf]
-		MMX_Copy4Times	mm3,		eax		
+		MMX_Copy4Times	mm3,		eax
 		mov			cx,				[ff]
 		MMX_Copy4Times	mm2,		ecx
 		MMX_Quant4		mm1,	mm0,	mm2,	mm3
-		
+
 		; pNonZeroCount of dct_2x2
-		pcmpeqb		mm2,			mm2		; mm2 = FF 
+		pcmpeqb		mm2,			mm2		; mm2 = FF
 		pxor		mm3,			mm3
 		packsswb	mm1,			mm3
 		pcmpeqb		mm1,			mm3		; set FF if equal, 0 if not equal
 		psubsb		mm1,			mm2		; set 0 if equal, 1 if not equal
 		psadbw		mm1,			mm3		;
 		movd		eax,			mm1
-			
-		WELSEMMS		
-		ret	
-		
-		
-%macro SSE2_DeQuant8 3  
+
+		WELSEMMS
+		ret
+
+
+%macro SSE2_DeQuant8 3
     MOVDQ  %2, %1
     pmullw %2, %3
     MOVDQ  %1, %2
-%endmacro 
+%endmacro
 
 
 ALIGN  16
@@ -329,7 +329,7 @@ WelsDequant4x4_sse2:
 ;***********************************************************************====
 ;void WelsDequantFour4x4_sse2(int16_t *pDct, const uint16_t* mf);
 ;***********************************************************************====
-    
+
 align 16
 
 WELS_EXTERN WelsDequantFour4x4_sse2
@@ -356,39 +356,38 @@ WelsDequantFour4x4_sse2:
 WELS_EXTERN WelsDequantIHadamard4x4_sse2
 align 16
 WelsDequantIHadamard4x4_sse2:
-		mov			eax,			[esp + 4]				
+		mov			eax,			[esp + 4]
 		mov			cx,				[esp + 8]
-		
+
 		; WelsDequantLumaDc4x4
-		SSE2_Copy8Times	xmm1,		ecx		
+		SSE2_Copy8Times	xmm1,		ecx
 		;psrlw		xmm1,		2		; for the (>>2) in ihdm
 		MOVDQ		xmm0,		[eax]
 		MOVDQ		xmm2,		[eax+0x10]
-		pmullw		xmm0,		xmm1		
+		pmullw		xmm0,		xmm1
 		pmullw		xmm2,		xmm1
 
 		; ihdm_4x4
 		movdqa		xmm1,		xmm0
 		psrldq		xmm1,		8
 		movdqa		xmm3,		xmm2
-		psrldq		xmm3,		8		
-		
-		SSE2_SumSub		xmm0, xmm3,	xmm5					; xmm0 = xmm0 - xmm3, xmm3 = xmm0 + xmm3	
-		SSE2_SumSub		xmm1, xmm2, xmm5					; xmm1 = xmm1 - xmm2, xmm2 = xmm1 + xmm2														
+		psrldq		xmm3,		8
+
+		SSE2_SumSub		xmm0, xmm3,	xmm5					; xmm0 = xmm0 - xmm3, xmm3 = xmm0 + xmm3
+		SSE2_SumSub		xmm1, xmm2, xmm5					; xmm1 = xmm1 - xmm2, xmm2 = xmm1 + xmm2
 		SSE2_SumSub		xmm3, xmm2, xmm5					; xmm3 = xmm3 - xmm2, xmm2 = xmm3 + xmm2
 		SSE2_SumSub		xmm0, xmm1, xmm5               		; xmm0 = xmm0 - xmm1, xmm1 = xmm0 + xmm1
 
-		SSE2_TransTwo4x4W	xmm2, xmm1, xmm3, xmm0, xmm4		
-		SSE2_SumSub		xmm2, xmm4,	xmm5		
-		SSE2_SumSub		xmm1, xmm0, xmm5																		
-		SSE2_SumSub		xmm4, xmm0, xmm5							
-		SSE2_SumSub		xmm2, xmm1, xmm5 
+		SSE2_TransTwo4x4W	xmm2, xmm1, xmm3, xmm0, xmm4
+		SSE2_SumSub		xmm2, xmm4,	xmm5
+		SSE2_SumSub		xmm1, xmm0, xmm5
+		SSE2_SumSub		xmm4, xmm0, xmm5
+		SSE2_SumSub		xmm2, xmm1, xmm5
 		SSE2_TransTwo4x4W	xmm0, xmm1, xmm4, xmm2, xmm3
-		
+
 		punpcklqdq	xmm0,		xmm1
 		MOVDQ		[eax],		xmm0
-		
+
 		punpcklqdq	xmm2,		xmm3
-		MOVDQ		[eax+16],	xmm2			
+		MOVDQ		[eax+16],	xmm2
 		ret
-	

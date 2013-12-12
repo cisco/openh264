@@ -33,11 +33,11 @@
  *
  * \brief	Seting all syntax elements of mb and decoding residual with cavlc
  *
- * \date	2009.8.12 Created 
+ * \date	2009.8.12 Created
  *
  *************************************************************************************
  */
- 
+
 #ifndef SVC_SET_MB_SYN_CAVLC_H_
 #define SVC_SET_MB_SYN_CAVLC_H_
 

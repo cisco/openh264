@@ -70,7 +70,7 @@
 
 /*
  *	Parallel slice bs output without memcpy used
- *  NOTE: might be not applicable for SVC 2.0/2.1 client application layer implementation 
+ *  NOTE: might be not applicable for SVC 2.0/2.1 client application layer implementation
  *	due bs of various slices need be continuous within a layer packing
  */
 //#define PACKING_ONE_SLICE_PER_LAYER	// MEAN packing only slice for a pLayerBs, disabled at SVC 2.0/2.1 in case Multi-Threading (MT) & Multi-SSlice (MS)
@@ -171,7 +171,7 @@
 typedef struct TagSliceThreadPrivateData {
 	void		*pWelsPEncCtx;
 	SLayerBSInfo	*pLayerBs;
-	int32_t		iSliceIndex;	// slice index, zero based								
+	int32_t		iSliceIndex;	// slice index, zero based
 	int32_t		iThreadIndex;	// thread index, zero based
 
 	// for dynamic slicing mode
@@ -179,7 +179,7 @@ typedef struct TagSliceThreadPrivateData {
 	int32_t		iEndMbIndex;	// exclusive
 } SSliceThreadPrivateData;
 
-typedef struct TagSliceThreading 
+typedef struct TagSliceThreading
 {
 	SSliceThreadPrivateData	*pThreadPEncCtx;// thread context, [iThreadIdx]
 	WELS_THREAD_HANDLE			*pThreadHandles;// thread handles, [iThreadIdx]
@@ -202,7 +202,7 @@ typedef struct TagSliceThreading
 	WELS_EVENT					*pFinUpdateMbListEvent;	// signal to indicate finish updating mb list
 #else
 	WELS_EVENT*					pUpdateMbListEvent[MAX_THREADS_NUM];		// signal to update mb list neighbor for various slices
-	WELS_EVENT*					pFinUpdateMbListEvent[MAX_THREADS_NUM];	// signal to indicate finish updating mb list	
+	WELS_EVENT*					pFinUpdateMbListEvent[MAX_THREADS_NUM];	// signal to indicate finish updating mb list
 #endif//WIN32
 #endif//#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 

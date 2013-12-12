@@ -76,7 +76,7 @@ namespace WelsDec {
 
 /***************************************************************************
 *	Description:
-*			class CWelsDecoder constructor function, do initialization	and    
+*			class CWelsDecoder constructor function, do initialization	and
 *       alloc memory required
 *
 *	Input parameters: none
@@ -95,18 +95,18 @@ CWelsDecoder::CWelsDecoder(void_t)
 	str_t chFileNameSize[1024] = { 0 }; //for .len
 	int iBufUsedSize = 0;
 	int iBufLeftSize = 1023;
-#endif//OUTPUT_BIT_STREAM 
+#endif//OUTPUT_BIT_STREAM
 
-	m_pTrace = CreateWelsTrace(Wels_Trace_Type);	
+	m_pTrace = CreateWelsTrace(Wels_Trace_Type);
 
 	IWelsTrace::WelsVTrace(m_pTrace, IWelsTrace::WELS_LOG_INFO,"CWelsDecoder::CWelsDecoder() entry");
-   
-	
+
+
 #ifdef OUTPUT_BIT_STREAM
     SWelsTime sCurTime;
 
-	WelsGetTimeOfDay(&sCurTime);	
-	
+	WelsGetTimeOfDay(&sCurTime);
+
 	iBufUsed      += WelsSnprintf(chFileName,  iBufLeft,  "bs_0x%p_", (void_t*)this);
 	iBufUsedSize += WelsSnprintf(chFileNameSize, iBufLeftSize, "size_0x%p_", (void_t*)this);
 
@@ -119,7 +119,7 @@ CWelsDecoder::CWelsDecoder(void_t)
 
 	iBufLeftSize -= iBufUsedSize;
 	if ( iBufLeftSize> iBufUsedSize )
-	{	
+	{
 		iBufUsedSize += WelsStrftime(&chFileNameSize[iBufUsedSize], iBufLeftSize, "%y%m%d%H%M%S", &sCurTime);
 		iBufLeftSize -= iBufUsedSize;
 	}
@@ -135,24 +135,24 @@ CWelsDecoder::CWelsDecoder(void_t)
         iBufUsedSize += WelsSnprintf(&chFileNameSize[iBufUsedSize], iBufLeftSize, ".%03.3u.len", WelsGetMillsecond(&sCurTime));
 		iBufLeftSize -= iBufUsedSize;
 	}
-	
+
 
 	m_pFBS = WelsFopen(chFileName, "wb");
-	m_pFBSSize = WelsFopen(chFileNameSize, "wb");	
+	m_pFBSSize = WelsFopen(chFileNameSize, "wb");
 #endif//OUTPUT_BIT_STREAM
-		
+
 }
 
 /***************************************************************************
 *	Description:
 *			class CWelsDecoder destructor function, destroy allocced memory
-*       
+*
 *	Input parameters: none
 *
 *	return: none
 /***************************************************************************/
 CWelsDecoder::~CWelsDecoder()
-{		
+{
 	IWelsTrace::WelsVTrace(m_pTrace, IWelsTrace::WELS_LOG_INFO, "CWelsDecoder::~CWelsDecoder()");
 
 	UninitDecoder();
@@ -173,7 +173,7 @@ CWelsDecoder::~CWelsDecoder()
 	if( NULL != m_pTrace ){
 		delete m_pTrace;
 		m_pTrace = NULL;
-	}	
+	}
 }
 
 long CWelsDecoder::Initialize(void_t* pParam, const INIT_TYPE keInitType)
@@ -187,14 +187,14 @@ long CWelsDecoder::Initialize(void_t* pParam, const INIT_TYPE keInitType)
 	InitDecoder();
 
 	DecoderConfigParam( m_pDecContext, pParam );
-	
+
 	return cmResultSuccess;
 }
 
 long CWelsDecoder::Uninitialize()
 {
 	UninitDecoder();
-	
+
 	return ERR_NONE;
 }
 
@@ -202,7 +202,7 @@ void_t CWelsDecoder::UninitDecoder( void_t )
 {
 	if ( NULL == m_pDecContext )
 		return;
-	
+
 	IWelsTrace::WelsVTrace(m_pTrace, IWelsTrace::WELS_LOG_INFO, "into CWelsDecoder::uninit_decoder()..");
 
 	WelsEndDecoder( m_pDecContext );
@@ -220,43 +220,43 @@ void_t CWelsDecoder::UninitDecoder( void_t )
 // the return value of this function is not suitable, it need report failure info to upper layer.
 void_t CWelsDecoder::InitDecoder( void_t )
 {
-	IWelsTrace::WelsVTrace(m_pTrace, IWelsTrace::WELS_LOG_INFO, "CWelsDecoder::init_decoder()..");	
+	IWelsTrace::WelsVTrace(m_pTrace, IWelsTrace::WELS_LOG_INFO, "CWelsDecoder::init_decoder()..");
 
 	m_pDecContext	= (PWelsDecoderContext)WelsMalloc( sizeof(SWelsDecoderContext), "m_pDecContext" );
-	
+
 	WelsInitDecoder( m_pDecContext, m_pTrace, IWelsTrace::WelsTrace );
 
 	IWelsTrace::WelsVTrace(m_pTrace, IWelsTrace::WELS_LOG_INFO, "CWelsDecoder::init_decoder().. left");
 }
 
 /*
- * Set Option	
+ * Set Option
  */
 long CWelsDecoder::SetOption(DECODER_OPTION eOptID, void_t* pOption)
 {
 	int iVal = 0;
-	
+
 	if ( m_pDecContext == NULL )
 		return dsInitialOptExpected;
-	
+
 	if ( eOptID == DECODER_OPTION_DATAFORMAT ) // Set color space of decoding output frame
-	{		
+	{
 		if ( pOption == NULL )
 			return cmInitParaError;
-		
+
 		iVal = *((int*)pOption);	// is_rgb
-		
+
 		return DecoderSetCsp( m_pDecContext, iVal );
 	}
 	else if ( eOptID == DECODER_OPTION_END_OF_STREAM ) // Indicate bit-stream of the final frame to be decoded
 	{
 		if ( pOption == NULL )
 			return cmInitParaError;
-		
+
 		iVal	= *((int*)pOption);	// boolean value for whether enabled End Of Stream flag
 
 		m_pDecContext->bEndOfStreamFlag	= iVal ? true : false;
-		
+
 		return cmResultSuccess;
 	}
 	else if ( eOptID == DECODER_OPTION_MODE)
@@ -278,9 +278,9 @@ long CWelsDecoder::SetOption(DECODER_OPTION eOptID, void_t* pOption)
 #else
 			m_pDecContext->iDecoderOutputProperty = BUFFER_HOST;//BUFFER_HOST;//BUFFER_DEVICE;
 #endif
-			
+
 		}
-		
+
 		return cmResultSuccess;
 	}
 	else if ( eOptID == DECODER_OPTION_OUTPUT_PROPERTY)
@@ -289,7 +289,7 @@ long CWelsDecoder::SetOption(DECODER_OPTION eOptID, void_t* pOption)
 			return cmInitParaError;
 
 		iVal = *((int *)pOption);
-		if( m_pDecContext->iSetMode != SW_MODE)	
+		if( m_pDecContext->iSetMode != SW_MODE)
 			m_pDecContext->iDecoderOutputProperty = iVal;
 	}
 
@@ -303,13 +303,13 @@ long CWelsDecoder::SetOption(DECODER_OPTION eOptID, void_t* pOption)
 long CWelsDecoder::GetOption(DECODER_OPTION eOptID, void_t* pOption)
 {
 	int iVal = 0;
-	
+
 	if ( m_pDecContext == NULL )
 		return cmInitExpected;
-	
+
 	if ( pOption == NULL )
 		return cmInitParaError;
-	
+
 	if ( DECODER_OPTION_DATAFORMAT == eOptID ){
 		iVal = m_pDecContext->iOutputColorFormat;
 		*((int*)pOption)	= iVal;
@@ -361,9 +361,9 @@ long CWelsDecoder::GetOption(DECODER_OPTION eOptID, void_t* pOption)
 	{
 		if ( pOption == NULL )
 			return cmInitParaError;
-		
+
 		iVal = m_pDecContext->iSetMode;
-		
+
 		*((int *)pOption) = iVal;
 		return cmResultSuccess;
 	}
@@ -374,17 +374,17 @@ long CWelsDecoder::GetOption(DECODER_OPTION eOptID, void_t* pOption)
 
 		return cmResultSuccess;
 	}
-	
+
 	return cmInitParaError;
 }
 
 DECODING_STATE CWelsDecoder::DecodeFrame(	const unsigned char* kpSrc,
-											const int kiSrcLen,	
+											const int kiSrcLen,
 											void_t ** ppDst,
 											SBufferInfo* pDstInfo)
 {
 	if ( kiSrcLen > 0 && kpSrc != NULL )
-	{		
+	{
 #ifdef OUTPUT_BIT_STREAM
 		if ( m_pFBS )
 		{
@@ -399,12 +399,12 @@ DECODING_STATE CWelsDecoder::DecodeFrame(	const unsigned char* kpSrc,
 #endif//OUTPUT_BIT_STREAM
 		m_pDecContext->bEndOfStreamFlag = false;
 	}
-	else  
+	else
 	{   //For application MODE, the error detection should be added for safe.
-		//But for CONSOLE MODE, when decoding LAST AU, kiSrcLen==0 && kpSrc==NULL. 
+		//But for CONSOLE MODE, when decoding LAST AU, kiSrcLen==0 && kpSrc==NULL.
 		m_pDecContext->bEndOfStreamFlag = true;
 	}
-		
+
 	ppDst[0] = ppDst[1] = ppDst[2] = NULL;
 	m_pDecContext->iErrorCode             = dsErrorFree; //initialize at the starting of AU decoding.
 	m_pDecContext->iFeedbackVclNalInAu = FEEDBACK_UNKNOWN_NAL; //initialize
@@ -419,17 +419,17 @@ DECODING_STATE CWelsDecoder::DecodeFrame(	const unsigned char* kpSrc,
 #endif
 
 	m_pDecContext->iFeedbackTidInAu             = -1; //initialize
-	
+
 	WelsDecodeBs( m_pDecContext, kpSrc, kiSrcLen, (unsigned char**)ppDst, pDstInfo); //iErrorCode has been modified in this function
-	
+
 	pDstInfo->eWorkMode = (EDecodeMode)m_pDecContext->iDecoderMode;
 
 	if ( m_pDecContext->iErrorCode )
-	{		
-		ENalUnitType eNalType = NAL_UNIT_UNSPEC_0;	//for NBR, IDR frames are expected to decode as followed if error decoding an IDR currently		
+	{
+		ENalUnitType eNalType = NAL_UNIT_UNSPEC_0;	//for NBR, IDR frames are expected to decode as followed if error decoding an IDR currently
 
 		eNalType	= m_pDecContext->sCurNalHead.eNalUnitType;
-		
+
 		//for AVC bitstream (excluding AVC with temporal scalability, including TP), as long as error occur, SHOULD notify upper layer key frame loss.
 		if ( (IS_PARAM_SETS_NALS(eNalType) || NAL_UNIT_CODED_SLICE_IDR == eNalType) ||
 			(VIDEO_BITSTREAM_AVC == m_pDecContext->eVideoType) )
@@ -440,7 +440,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame(	const unsigned char* kpSrc,
 			m_pDecContext->bReferenceLostAtT0Flag = true;
 #endif
 			ResetParameterSetsState( m_pDecContext ); //initial SPS&PPS ready flag
-		}		
+		}
 
 		IWelsTrace::WelsVTrace(m_pTrace, IWelsTrace::WELS_LOG_INFO, "decode failed, failure type:%d \n", m_pDecContext->iErrorCode);
 		return (DECODING_STATE)m_pDecContext->iErrorCode;
@@ -450,7 +450,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame(	const unsigned char* kpSrc,
 }
 
 DECODING_STATE CWelsDecoder::DecodeFrame(	const unsigned char* kpSrc,
-										   const int kiSrcLen,	
+										   const int kiSrcLen,
 										   unsigned char** ppDst,
 										   int* pStride,
 										   int& iWidth,
@@ -507,15 +507,15 @@ using namespace WelsDec;
 long CreateDecoder( ISVCDecoder** ppDecoder )
 {
 
-	if ( NULL == ppDecoder ){		
+	if ( NULL == ppDecoder ){
 		return ERR_INVALID_PARAMETERS;
 	}
 
 	*ppDecoder	= new CWelsDecoder();
 
-	if ( NULL == *ppDecoder ){		
+	if ( NULL == *ppDecoder ){
 		return ERR_MALLOC_FAILED;
-	}	
+	}
 
 	return ERR_NONE;
 }
@@ -524,7 +524,7 @@ long CreateDecoder( ISVCDecoder** ppDecoder )
 *	DestroyDecoder
 */
 void_t DestroyDecoder( ISVCDecoder* pDecoder )
-{	
+{
 	if ( NULL != pDecoder ){
 		delete (CWelsDecoder *)pDecoder;
 		pDecoder = NULL;

@@ -68,7 +68,7 @@ typedef struct TagPredWeightTabSyntax{
 		int32_t	iChromaWeight[MAX_REF_PIC_COUNT][2];
 		int32_t iChromaOffset[MAX_REF_PIC_COUNT][2];
 		bool_t	bLumaWeightFlag;
-		bool_t	bChromaWeightFlag;		
+		bool_t	bChromaWeightFlag;
 	}sPredList[LIST_A];
 }SPredWeightTabSyn;
 
@@ -85,7 +85,7 @@ typedef struct TagRefPicMarking {
 
     bool_t		bNoOutputOfPriorPicsFlag;
 	bool_t		bLongTermRefFlag;
-	bool_t		bAdaptiveRefPicMarkingModeFlag;	
+	bool_t		bAdaptiveRefPicMarkingModeFlag;
 } SRefPicMarking, *PRefPicMarking;
 
 /* Decode reference base picture marking syntax in Page 396 of JVT X201wcm */
@@ -101,9 +101,9 @@ typedef struct TagRefBasePicMarkingSyn {
 } SRefBasePicMarking, *PRefBasePicMarking;
 
 /* Header of slice syntax elements, refer to Page 63 in JVT X201wcm */
-typedef struct TagSliceHeaders{	
+typedef struct TagSliceHeaders{
 	/*****************************slice header syntax and generated****************************/
-	int32_t		iFirstMbInSlice;		
+	int32_t		iFirstMbInSlice;
 	int32_t		iFrameNum;
 	int32_t		iPicOrderCntLsb;
 	int32_t		iDeltaPicOrderCntBottom;
@@ -111,7 +111,7 @@ typedef struct TagSliceHeaders{
 	int32_t		iRedundantPicCnt;
 	int32_t		uiRefCount[LIST_A];
 	int32_t		iSliceQpDelta;	//no use for iSliceQp is used directly
-	int32_t		iSliceQp;	
+	int32_t		iSliceQp;
 	int32_t		iSliceQsDelta;	// For SP/SI slices
 	uint32_t	uiDisableDeblockingFilterIdc;
 	int32_t		iSliceAlphaC0Offset;
@@ -143,34 +143,34 @@ typedef struct TagSliceHeaders{
 
 
 /* Slice header in scalable extension syntax, refer to Page 394 in JVT X201wcm */
-typedef struct TagSliceHeaderExt{	
+typedef struct TagSliceHeaderExt{
 	SSliceHeader	sSliceHeader;
 	PSubsetSps	pSubsetSps;
-	
+
 	uint32_t	uiNumMbsInSlice;
 	uint32_t	uiDisableInterLayerDeblockingFilterIdc;
 	int32_t		iInterLayerSliceAlphaC0Offset;
-	int32_t		iInterLayerSliceBetaOffset;	
-	
+	int32_t		iInterLayerSliceBetaOffset;
+
 	//SPosOffset sScaledRefLayer;
 	int32_t		iScaledRefLayerPicWidthInSampleLuma;
 	int32_t		iScaledRefLayerPicHeightInSampleLuma;
 
 	SRefBasePicMarking	sRefBasePicMarking;
 	bool_t		bBasePredWeightTableFlag;
-	bool_t		bStoreRefBasePicFlag;	
-	bool_t		bConstrainedIntraResamplingFlag;	
+	bool_t		bStoreRefBasePicFlag;
+	bool_t		bConstrainedIntraResamplingFlag;
 	bool_t		bSliceSkipFlag;
-	
+
 	bool_t		bAdaptiveBaseModeFlag;
 	bool_t		bDefaultBaseModeFlag;
 	bool_t		bAdaptiveMotionPredFlag;
 	bool_t		bDefaultMotionPredFlag;
 	bool_t		bAdaptiveResidualPredFlag;
 	bool_t		bDefaultResidualPredFlag;
-	bool_t		bTCoeffLevelPredFlag;		
+	bool_t		bTCoeffLevelPredFlag;
 	uint8_t		uiRefLayerChromaPhaseXPlus1Flag;
-	
+
 	uint8_t		uiRefLayerChromaPhaseYPlus1;
 	uint8_t		uiRefLayerDqId;
 	uint8_t		uiScanIdxStart;
@@ -178,10 +178,10 @@ typedef struct TagSliceHeaderExt{
 }SSliceHeaderExt, *PSliceHeaderExt;
 
 
-typedef struct TagSlice{	
+typedef struct TagSlice{
 	/*******************************slice_header****************************/
-	SSliceHeaderExt	sSliceHeaderExt;		
-	
+	SSliceHeaderExt	sSliceHeaderExt;
+
 	/*******************************use for future****************************/
 	// for Macroblock coding within slice
 	int32_t		iLastMbQp;		// stored qp for last mb coded, maybe more efficient for mb skip detection etc.
@@ -190,15 +190,15 @@ typedef struct TagSlice{
 	/*slice_data_ext()*/
 	int32_t		iMbSkipRun;
 	int32_t     iTotalMbInCurSlice; //record the total number of MB in current slice.
-	
+
 	/*slice_data_ext() generate*/
-		
+
 	/*******************************misc use****************************/
 	bool_t		bSliceHeaderExtFlag; // Indicate which slice header is used, avc or ext?
 	/*************got from other layer for effiency if possible***************/
 	/*from lower layer: slice header*/
-	uint8_t		eSliceType;	
-	uint8_t		uiPadding[2];	
+	uint8_t		eSliceType;
+	uint8_t		uiPadding[2];
 }SSlice, *PSlice;
 
 } // namespace WelsDec

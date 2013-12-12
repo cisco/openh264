@@ -65,8 +65,8 @@ SPicture *AllocPicture( CMemoryAlign *pMa, const int32_t kiWidth , const int32_t
 
 	pPic	= static_cast<SPicture*>(pMa->WelsMallocz( sizeof(SPicture), "pPic" ));
 
-	WELS_VERIFY_RETURN_IF( NULL, NULL == pPic );	
-	
+	WELS_VERIFY_RETURN_IF( NULL, NULL == pPic );
+
 	iPicWidth	= WELS_ALIGN(kiWidth, MB_WIDTH_LUMA) + (PADDING_LENGTH<<1);	// with width of horizon
 	iPicHeight	= WELS_ALIGN(kiHeight, MB_HEIGHT_LUMA) + (PADDING_LENGTH<<1);	// with height of vertical
 	iPicChromaWidth	= iPicWidth >> 1;
@@ -96,11 +96,11 @@ SPicture *AllocPicture( CMemoryAlign *pMa, const int32_t kiWidth , const int32_t
 	pPic->iMarkFrameNum	= -1;
 
 	if ( bNeedMbInfo )
-	{	
+	{
 		const uint32_t kuiCountMbNum = ((15+kiWidth) >> 4) * ((15+kiHeight) >> 4);
 
 		pPic->uiRefMbType	= (uint32_t *)pMa->WelsMallocz( kuiCountMbNum * sizeof(uint32_t), "pPic->uiRefMbType" );
-		WELS_VERIFY_RETURN_PROC_IF( NULL, NULL == pPic->uiRefMbType, FreePicture(pMa, &pPic) );	
+		WELS_VERIFY_RETURN_PROC_IF( NULL, NULL == pPic->uiRefMbType, FreePicture(pMa, &pPic) );
 
 		pPic->pRefMbQp	= (uint8_t *)pMa->WelsMallocz( kuiCountMbNum * sizeof(uint8_t), "pPic->bgd_mb_qp" );
 		WELS_VERIFY_RETURN_PROC_IF( NULL, NULL == pPic->pRefMbQp, FreePicture(pMa, &pPic) );
@@ -110,8 +110,8 @@ SPicture *AllocPicture( CMemoryAlign *pMa, const int32_t kiWidth , const int32_t
 
 		pPic->pMbSkipSad       = (int32_t *)pMa->WelsMallocz( kuiCountMbNum*sizeof(int32_t), "pPic->pMbSkipSad" );
 		WELS_VERIFY_RETURN_PROC_IF( NULL, NULL == pPic->pMbSkipSad, FreePicture(pMa, &pPic) );
-	}	
-	
+	}
+
 	return pPic;
 }
 
@@ -121,7 +121,7 @@ SPicture *AllocPicture( CMemoryAlign *pMa, const int32_t kiWidth , const int32_t
  * \return	none
  */
 void FreePicture( CMemoryAlign *pMa, SPicture **ppPic )
-{	
+{
 	if ( NULL != ppPic && NULL != *ppPic )
 	{
 		SPicture *pPic = *ppPic;
@@ -168,7 +168,7 @@ void FreePicture( CMemoryAlign *pMa, SPicture **ppPic )
 		{
 			pMa->WelsFree( pPic->pMbSkipSad, "pPic->pMbSkipSad" );
 			pPic->pMbSkipSad = NULL;
-		}		
+		}
 		pMa->WelsFree( *ppPic, "pPic" );
 		*ppPic = NULL;
 	}
@@ -186,7 +186,7 @@ void WelsExchangeSpatialPictures( SPicture **ppPic1, SPicture **ppPic2 )
 	assert( *ppPic1 != *ppPic2 );
 
 	*ppPic1 = *ppPic2;
-	*ppPic2 = tmp;	
+	*ppPic2 = tmp;
 }
 
 } // namespace WelsSVCEnc

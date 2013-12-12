@@ -56,10 +56,10 @@ void_t WelsFillRecNeededMbInfo(PWelsDecoderContext pCtx, bool_t bOutput, PDqLaye
 	int32_t iChromaStride = pCurPic->iLinesize[1];
 	int32_t iMbX = pCurLayer->iMbX;
 	int32_t iMbY = pCurLayer->iMbY;
-	
+
 	pCurLayer->iLumaStride= iLumaStride;
 	pCurLayer->iChromaStride= iChromaStride;
-	
+
 	if(bOutput)
 	{
 		pCurLayer->pPred[0] = pCurPic->pData[0] + ((iMbY * iLumaStride + iMbX)<<4);
@@ -80,36 +80,36 @@ int32_t RecI4x4Luma(int32_t iMBXY, PWelsDecoderContext pCtx, int16_t *pScoeffLev
 	/*****get local variable from outer variable********/
 	/*prediction info*/
 	uint8_t *pPred = pDqLayer->pPred[0];
-	
+
 	int32_t iLumaStride = pDqLayer->iLumaStride;
 	int32_t *pBlockOffset = pCtx->iDecBlockOffsetArray;
-	PGetIntraPredFunc *pGetI4x4LumaPredFunc = pCtx->pGetI4x4LumaPredFunc;	
-	
+	PGetIntraPredFunc *pGetI4x4LumaPredFunc = pCtx->pGetI4x4LumaPredFunc;
+
 	int8_t *pIntra4x4PredMode = pDqLayer->pIntra4x4FinalMode[iMBXY];
 	int16_t *pRS = pScoeffLevel;
 	/*itransform info*/
 	PIdctResAddPredFunc	pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc;
-	
-	
+
+
 	/*************local variable********************/
 	uint8_t i = 0;
-	
+
 	/*************real process*********************/
 	for(i=0; i<16; i++)
 	{
-		
+
 		uint8_t *pPredI4x4 = pPred + pBlockOffset[i];
 		uint8_t uiMode= pIntra4x4PredMode[g_kuiScan4[i]];
-		
+
 		pGetI4x4LumaPredFunc[uiMode](pPredI4x4, iLumaStride);
-	
+
 		if ( pDqLayer->pNzc[iMBXY][g_kuiMbNonZeroCountIdx[i]] )
-		{	
+		{
 			int16_t *pRSI4x4 = &pRS[i<<4];
 			pIdctResAddPredFunc(pPredI4x4, iLumaStride, pRSI4x4);
 		}
-	}	
-	
+	}
+
 	return ERR_NONE;
 }
 
@@ -119,7 +119,7 @@ int32_t RecI4x4Chroma(int32_t iMBXY, PWelsDecoderContext pCtx, int16_t *pScoeffL
 	int32_t iChromaStride = pCtx->pCurDqLayer->iCsStride[1];
 
 	int8_t iChromaPredMode = pDqLayer->pChromaPredMode[iMBXY];
-	
+
 	PGetIntraPredFunc *pGetIChromaPredFunc = pCtx->pGetIChromaPredFunc;
 
 	uint8_t *pPred = pDqLayer->pPred[1];
@@ -127,7 +127,7 @@ int32_t RecI4x4Chroma(int32_t iMBXY, PWelsDecoderContext pCtx, int16_t *pScoeffL
 	pGetIChromaPredFunc[iChromaPredMode](pPred, iChromaStride);
 	pPred = pDqLayer->pPred[2];
 	pGetIChromaPredFunc[iChromaPredMode](pPred, iChromaStride);
-	
+
 	RecChroma(iMBXY, pCtx, pScoeffLevel, pDqLayer);
 
 	return ERR_NONE;
@@ -142,40 +142,40 @@ int32_t RecI16x16Mb(int32_t iMBXY, PWelsDecoderContext pCtx, int16_t *pScoeffLev
 	PGetIntraPredFunc *pGetIChromaPredFunc = pCtx->pGetIChromaPredFunc;
 	PGetIntraPredFunc *pGetI16x16LumaPredFunc = pCtx->pGetI16x16LumaPredFunc;
 	int32_t iUVStride = pCtx->pCurDqLayer->iCsStride[1];
-	
+
 	/*common use by decoder&encoder*/
 	int32_t iYStride = pDqLayer->iLumaStride;
 	int32_t *pBlockOffset = pCtx->iDecBlockOffsetArray;
 	int16_t *pRS = pScoeffLevel;
-	
+
 	uint8_t *pPred = pDqLayer->pPred[0];
-	
+
 	PIdctResAddPredFunc pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc;
-		
+
 	uint8_t i = 0;
-	
+
 	/*decode i16x16 y*/
 	pGetI16x16LumaPredFunc[iI16x16PredMode](pPred, iYStride);
-	
+
 	/*1 mb is divided 16 4x4_block to idct*/
 	for(i=0; i<16; i++)
 	{
 		int16_t *pRSI4x4 = pRS + (i<<4);
 		uint8_t *pPredI4x4 = pPred + pBlockOffset[i];
-		
+
 		if ( pDqLayer->pNzc[iMBXY][g_kuiMbNonZeroCountIdx[i]] || pRSI4x4[0] )
 		{
 			pIdctResAddPredFunc(pPredI4x4, iYStride, pRSI4x4);
 		}
 	}
-	
+
 	/*decode intra mb cb&cr*/
 	pPred = pDqLayer->pPred[1];
 	pGetIChromaPredFunc[iChromaPredMode](pPred, iUVStride);
 	pPred = pDqLayer->pPred[2];
 	pGetIChromaPredFunc[iChromaPredMode](pPred, iUVStride);
 	RecChroma(iMBXY, pCtx, pScoeffLevel,pDqLayer);
-	
+
 	return ERR_NONE;
 }
 
@@ -206,7 +206,7 @@ static inline void_t GetRefPic(sMCRefMember* pMCRefMem, PWelsDecoderContext pCtx
 	pRefPic = pCtx->sRefPic.pRefList[LIST_0][iRefIdx];
 
 	pMCRefMem->iSrcLineLuma   = pRefPic->iLinesize[0];
-	pMCRefMem->iSrcLineChroma = pRefPic->iLinesize[1];	
+	pMCRefMem->iSrcLineChroma = pRefPic->iLinesize[1];
 
 	pMCRefMem->pSrcY = pRefPic->pData[0];
 	pMCRefMem->pSrcU = pRefPic->pData[1];
@@ -219,10 +219,10 @@ static inline void_t GetRefPic(sMCRefMember* pMCRefMem, PWelsDecoderContext pCtx
 #endif //MC_FLOW_SIMPLE_JUDGE
 static inline void_t BaseMC(sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t iYOffset, SMcFunc* pMCFunc,
 						   int32_t iBlkWidth, int32_t iBlkHeight, int16_t iMVs[2])
-{		
+{
 	int32_t iExpandWidth = PADDING_LENGTH;
 	int32_t	iExpandHeight = PADDING_LENGTH;
-	
+
 
 	int16_t iMVX = iMVs[0] >> 2;
 	int16_t iMVY = iMVs[1] >> 2;
@@ -254,29 +254,29 @@ static inline void_t BaseMC(sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t i
 	bool_t bExpand = false;
 
 	FORCE_STACK_ALIGN_1D( uint8_t, uiExpandBuf, (PADDING_LENGTH+6)*(PADDING_LENGTH+6), 16 );
-	
+
 	if (iFullMVx & 0x07)
 	{
 		iExpandWidth -= 3;
-	}		
+	}
 	if (iFullMVy & 0x07)
 	{
 		iExpandHeight -= 3;
 	}
 
 #ifdef MC_FLOW_SIMPLE_JUDGE
-	if (iIntMVx < -iExpandWidth || 
-		iIntMVy < -iExpandHeight || 
-		iIntMVx + iBlkWidth > pMCRefMem->iPicWidth - 1 + iExpandWidth || 
+	if (iIntMVx < -iExpandWidth ||
+		iIntMVy < -iExpandHeight ||
+		iIntMVx + iBlkWidth > pMCRefMem->iPicWidth - 1 + iExpandWidth ||
 		iIntMVy + iBlkHeight > pMCRefMem->iPicHeight - 1 + iExpandHeight)
 #else
-	if (iIntMVx < -iExpandWidth || 
-		iIntMVy < -iExpandHeight || 
-		iIntMVx + PADDING_LENGTH > pMCRefMem->iPicWidth + iExpandWidth || 
+	if (iIntMVx < -iExpandWidth ||
+		iIntMVy < -iExpandHeight ||
+		iIntMVx + PADDING_LENGTH > pMCRefMem->iPicWidth + iExpandWidth ||
 		iIntMVy + PADDING_LENGTH > pMCRefMem->iPicHeight + iExpandHeight)
 #endif
 	{
-		FillBufForMc(uiExpandBuf, 21, pSrcY, pMCRefMem->iSrcLineLuma, iMVOffsetLuma-iPadOffset, 
+		FillBufForMc(uiExpandBuf, 21, pSrcY, pMCRefMem->iSrcLineLuma, iMVOffsetLuma-iPadOffset,
 			            iBlkWidth+5, iBlkHeight+5, iIntMVx-2, iIntMVy-2, pMCRefMem->iPicWidth, pMCRefMem->iPicHeight);
 		pMCFunc->pMcLumaFunc(uiExpandBuf+44, 21, pDstY, pMCRefMem->iDstLineLuma, iFullMVx, iFullMVy, iBlkWidth, iBlkHeight);//44=2+2*21
 		bExpand = true;
@@ -291,7 +291,7 @@ static inline void_t BaseMC(sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t i
 	{
 		FillBufForMc(uiExpandBuf, 21, pSrcU, pMCRefMem->iSrcLineChroma, iMVOffsetChroma, iBlkWidthChroma+1, iBlkHeightChroma+1, iFullMVx>>3, iFullMVy>>3, iPicWidthChroma, iPicHeightChroma);
 		pMCFunc->pMcChromaFunc(uiExpandBuf, 21, pDstU, pMCRefMem->iDstLineChroma, iFullMVx, iFullMVy, iBlkWidthChroma, iBlkHeightChroma);
-		
+
 		FillBufForMc(uiExpandBuf, 21, pSrcV, pMCRefMem->iSrcLineChroma, iMVOffsetChroma, iBlkWidthChroma+1, iBlkHeightChroma+1, iFullMVx>>3, iFullMVy>>3, iPicWidthChroma, iPicHeightChroma);
 		pMCFunc->pMcChromaFunc(uiExpandBuf, 21, pDstV, pMCRefMem->iDstLineChroma, iFullMVx, iFullMVy, iBlkWidthChroma, iBlkHeightChroma);
 	}
@@ -313,7 +313,7 @@ void_t GetInterPred(uint8_t *pPredY, uint8_t *pPredCb, uint8_t *pPredCr, PWelsDe
 	int32_t iMBXY = pCurDqLayer->iMbXyIndex;
 
 	int16_t iMVs[2] = {0};
- 	
+
 	int32_t iMBType = pCurDqLayer->pMbType[iMBXY];
 
 	int32_t iMBOffsetX = pCurDqLayer->iMbX << 4;
@@ -321,7 +321,7 @@ void_t GetInterPred(uint8_t *pPredY, uint8_t *pPredCb, uint8_t *pPredCr, PWelsDe
 
 	int32_t iDstLineLuma   = pCtx->pDec->iLinesize[0];
 	int32_t iDstLineChroma = pCtx->pDec->iLinesize[1];
-	
+
 	int32_t iBlk8X, iBlk8Y, iBlk4X, iBlk4Y, i, j, iIIdx, iJIdx;
 
 	pMCRefMem.iPicWidth = (pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iMbWidth<<4);
@@ -380,7 +380,7 @@ void_t GetInterPred(uint8_t *pPredY, uint8_t *pPredCb, uint8_t *pPredCr, PWelsDe
 			{
 				iSubMBType = pCurDqLayer->pSubMbType[iMBXY][i];
 				iBlk8X = (i&1) << 3;
-				iBlk8Y = (i>>1) << 3;				
+				iBlk8Y = (i>>1) << 3;
 				iXOffset = iMBOffsetX + iBlk8X;
 				iYOffset = iMBOffsetY + iBlk8Y;
 
@@ -398,8 +398,8 @@ void_t GetInterPred(uint8_t *pPredY, uint8_t *pPredCb, uint8_t *pPredCr, PWelsDe
 				case SUB_MB_TYPE_8x8:
 					iMVs[0] = pCurDqLayer->pMv[0][iMBXY][iIIdx][0];
 					iMVs[1] = pCurDqLayer->pMv[0][iMBXY][iIIdx][1];
-					BaseMC( &pMCRefMem, iXOffset, iYOffset, pMCFunc, 8, 8, iMVs );					
-					break;					
+					BaseMC( &pMCRefMem, iXOffset, iYOffset, pMCFunc, 8, 8, iMVs );
+					break;
 				case SUB_MB_TYPE_8x4:
 					iMVs[0] = pCurDqLayer->pMv[0][iMBXY][iIIdx][0];
 					iMVs[1] = pCurDqLayer->pMv[0][iMBXY][iIIdx][1];
@@ -434,9 +434,9 @@ void_t GetInterPred(uint8_t *pPredY, uint8_t *pPredCb, uint8_t *pPredCr, PWelsDe
 							iBlk4X = (j&1) << 2;
 							iBlk4Y = (j>>1) << 2;
 
-							iUVLineStride = (iBlk4X >> 1) + (iBlk4Y >> 1) * iDstLineChroma; 
-							pMCRefMem.pDstY = pDstY + iBlk4X + iBlk4Y * iDstLineLuma;							
-							pMCRefMem.pDstU = pDstU + iUVLineStride;  
+							iUVLineStride = (iBlk4X >> 1) + (iBlk4Y >> 1) * iDstLineChroma;
+							pMCRefMem.pDstY = pDstY + iBlk4X + iBlk4Y * iDstLineLuma;
+							pMCRefMem.pDstU = pDstU + iUVLineStride;
 							pMCRefMem.pDstV = pDstV + iUVLineStride;
 
 							iMVs[0] = pCurDqLayer->pMv[0][iMBXY][iIIdx+iJIdx][0];
@@ -459,27 +459,27 @@ void_t GetInterPred(uint8_t *pPredY, uint8_t *pPredCb, uint8_t *pPredCr, PWelsDe
 int32_t RecChroma(int32_t iMBXY, PWelsDecoderContext pCtx, int16_t *pScoeffLevel, PDqLayer pDqLayer)
 {
 	int32_t iChromaStride = pCtx->pCurDqLayer->iCsStride[1];
-	PIdctResAddPredFunc pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc;	
+	PIdctResAddPredFunc pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc;
 
 	uint8_t i=0, j=0;
 	uint8_t uiCbpC = pDqLayer->pCbp[iMBXY] >> 4;
-	
+
 	if ( 1 == uiCbpC || 2 == uiCbpC )
 	{
 		WelsChromaDcIdct( pScoeffLevel + 256 );	// 256 = 16*16
 		WelsChromaDcIdct( pScoeffLevel + 320 );	// 256 = 16*16
 		for(i=0; i<2; i++)
 		{
-			int16_t *pRS = pScoeffLevel + 256 + (i << 6);	
+			int16_t *pRS = pScoeffLevel + 256 + (i << 6);
 			uint8_t *pPred = pDqLayer->pPred[i+1];
 			int32_t *pBlockOffset = i==0 ? &pCtx->iDecBlockOffsetArray[16] : &pCtx->iDecBlockOffsetArray[20];
-			
+
 			/*1 chroma is divided 4 4x4_block to idct*/
 			for(j=0; j<4; j++)
 			{
 				int16_t *pRSI4x4 = &pRS[j<<4];
 				uint8_t *pPredI4x4 = pPred + pBlockOffset[j];
-				
+
 				if ( pDqLayer->pNzc[iMBXY][g_kuiMbNonZeroCountIdx[16+(i<<2)+j]] || pRSI4x4[0] )
 				{
 					pIdctResAddPredFunc(pPredI4x4, iChromaStride, pRSI4x4);
@@ -487,11 +487,11 @@ int32_t RecChroma(int32_t iMBXY, PWelsDecoderContext pCtx, int16_t *pScoeffLevel
 			}
 		}
 	}
-	
+
 	return ERR_NONE;
 }
 
-void_t FillBufForMc(uint8_t *pBuf, int32_t iBufStride, uint8_t *pSrc, int32_t iSrcStride, int32_t iSrcOffset, 
+void_t FillBufForMc(uint8_t *pBuf, int32_t iBufStride, uint8_t *pSrc, int32_t iSrcStride, int32_t iSrcOffset,
 					 int32_t iBlockWidth, int32_t iBlockHeight, int32_t iSrcX, int32_t iSrcY, int32_t iPicWidth, int32_t iPicHeight)
 {
     int32_t iY;
@@ -525,14 +525,14 @@ void_t FillBufForMc(uint8_t *pBuf, int32_t iBufStride, uint8_t *pSrc, int32_t iS
 
 	iOffsetAdj += iSrcOffset;
 
-#define MAX(a,b) ((a) > (b) ? (a) : (b))	
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
 #define MIN(a,b) ((a) > (b) ? (b) : (a))
 
     iStartY = MAX(0, -iSrcY);
     iStartX = MAX(0, -iSrcX);
     iEndY = MIN(iBlockHeight, iPicHeight - iSrcY);
     iEndX = MIN(iBlockWidth, iPicWidth - iSrcX);
-	
+
     // copy existing part
 	iAddrSrc = iStartX + iStartY * iSrcStride;
 	iAddrBuf = iStartX + iStartY * iBufStride;
@@ -543,7 +543,7 @@ void_t FillBufForMc(uint8_t *pBuf, int32_t iBufStride, uint8_t *pSrc, int32_t iS
 		iAddrSrc += iSrcStride;
 		iAddrBuf += iBufStride;
     }
-	
+
     //top
 	pBufSrc = pBuf + iStartX + iStartY * iBufStride;
 	pBufDst = pBuf + iStartX;
@@ -553,7 +553,7 @@ void_t FillBufForMc(uint8_t *pBuf, int32_t iBufStride, uint8_t *pSrc, int32_t iS
 		memcpy( pBufDst, pBufSrc, iNum );
 		pBufDst += iBufStride;
     }
-	
+
     //bottom
 	pBufSrc = pBuf + iStartX + ( iEndY - 1 ) * iBufStride;
 	pBufDst = pBuf + iStartX + iEndY * iBufStride;
@@ -563,8 +563,8 @@ void_t FillBufForMc(uint8_t *pBuf, int32_t iBufStride, uint8_t *pSrc, int32_t iS
 		memcpy( pBufDst, pBufSrc, iNum );
 		pBufDst += iBufStride;
     }
-	
-	
+
+
 	pBufSrc = pBuf + iStartX;
 	pBufDst = pBuf;
 	iNum = iStartX;
@@ -578,7 +578,7 @@ void_t FillBufForMc(uint8_t *pBuf, int32_t iBufStride, uint8_t *pSrc, int32_t iS
 		memset( pBufDst, pBufSrc[0], iNum );
 		pBufDst += iBufStride;
 		pBufSrc += iBufStride;
-		
+
 		//right
 		memset( pBufDst1, pBufSrc1[0], iNum1 );
 		pBufDst1 += iBufStride;

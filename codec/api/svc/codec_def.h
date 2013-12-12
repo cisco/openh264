@@ -41,7 +41,7 @@ typedef enum
 {
 	/*rgb color formats*/
 	videoFormatRGB        = 1,
-	videoFormatRGBA       = 2, 
+	videoFormatRGBA       = 2,
 	videoFormatRGB555     = 3,
 	videoFormatRGB565     = 4,
 	videoFormatBGR        = 5,
@@ -56,9 +56,9 @@ typedef enum
 	videoFormatI420       = 23,                        //same as IYUV
 	videoFormatYV12       = 24,
 	videoFormatInternal   = 25,                        // Only Used for SVC decoder testbed
-	
+
 	videoFormatNV12		  = 26,						// new format for output by DXVA decoding
-	
+
 	videoFormatVFlip      = 0x80000000
 }EVideoFormatType;
 
@@ -76,8 +76,8 @@ typedef enum
 {
 	cmResultSuccess,
 	cmInitParaError,                  /*Parameters are invalid */
-	cmMachPerfIsBad,                  /*The performance of machine is not enough to support 
-									    H264 CODEC, in this case, suggestion user use h263 
+	cmMachPerfIsBad,                  /*The performance of machine is not enough to support
+									    H264 CODEC, in this case, suggestion user use h263
 										or set fps to low like 5fps or more low*/
 	cmUnkonwReason,
 	cmMallocMemeError,                /*Malloc a memory error*/
@@ -140,7 +140,7 @@ typedef struct SliceInformation
 	int				iCodedSliceCount;	// number of coded slices
 	unsigned int*	pLengthOfSlices;		// array of slices length accordingly by number of slice
 	int				iFecType;			// FEC type[0, 50%FEC, 100%FEC]
-	unsigned char	uiSliceIdx;		// index of slice in frame [FMO: 0,..,uiSliceCount-1; No FMO: 0] 
+	unsigned char	uiSliceIdx;		// index of slice in frame [FMO: 0,..,uiSliceCount-1; No FMO: 0]
 	unsigned char	uiSliceCount;		// count number of slice in frame [FMO: 2-8; No FMO: 1]
 	char			iFrameIndex;		// index of frame[-1, .., idr_interval-1]
 	unsigned char	uiNalRefIdc;		// NRI, priority level of slice(NAL)
@@ -178,7 +178,7 @@ typedef struct WelsDeviceInfo
 	char Vendor[128];   // vendor name
 	char Device[128];    // device name
 	char Driver[128];     // driver version
-	char DriverDate[128]; //  driver release date 
+	char DriverDate[128]; //  driver release date
 } Device_Info;
 
 typedef enum TagBufferProperty
@@ -187,7 +187,7 @@ typedef enum TagBufferProperty
 	BUFFER_DEVICE  = 1,	  // device memory including surface and shared handle
 						  // for DXVA: shared handle
 						  // for VDA : iosurface
-						
+
 	//SURFACE_DEVICE ,	 // surface
 	//SHARED_HANDLE      // shared handle
 }EBufferProperty;
@@ -196,16 +196,16 @@ typedef enum TagDecodeMode
 {
 	AUTO_MODE = 0,   // decided by decoder itself, dynamic mode switch, delayed switch
 	SW_MODE = 1,		// decoded by CPU, instant switch
-	GPU_MODE = 2,	// decoded by GPU, instant switch 
+	GPU_MODE = 2,	// decoded by GPU, instant switch
 	SWITCH_MODE =3	// switch to the other mode, forced mode switch, delayed switch
 }EDecodeMode;
 
 typedef struct TagSysMemBuffer
-{	
+{
 	int	iWidth;			//width of decoded pic for display
 	int iHeight;			//height of decoded pic for display
 	int iFormat; 		// type is "EVideoFormatType"
-	int iStride[2];		//stride of 2 component	
+	int iStride[2];		//stride of 2 component
 }SSysMEMBuffer;
 
 typedef struct TagVideoMemBuffer
@@ -228,7 +228,7 @@ typedef struct TagBufferInfo
 	union {
 		SSysMEMBuffer sSystemBuffer;
 		SVideoMemBuffer sVideoBuffer;
-	}UsrData;	
+	}UsrData;
 }SBufferInfo;
 
 /* Constants related to transmission rate at various resolutions */
@@ -241,7 +241,7 @@ static const SRateThresholds ksRateThrMap[4] = {
 };
 
 
-// In a GOP, multiple of the key frame number, derived from 
+// In a GOP, multiple of the key frame number, derived from
 // the number of layers(index or array below)
 static const char kiKeyNumMultiple[] = {
 	1, 1, 2, 4, 8, 16,

@@ -34,7 +34,7 @@
 *
 * \date         :  2011/03/14
 *
-* \description  :  1. rewrite the package code of scene change detection class  
+* \description  :  1. rewrite the package code of scene change detection class
 *
 *************************************************************************************
 */
@@ -51,7 +51,7 @@
 WELSVP_NAMESPACE_BEGIN
 
 class CSceneChangeDetection : public IStrategy
-{			  
+{
 public:
 	CSceneChangeDetection(int32_t iCpuFlag);
 	~CSceneChangeDetection();
@@ -66,7 +66,7 @@ private:
 	SadFuncPtr m_pfSad;
 	int32_t    m_iCpuFlag;
 	SSceneChangeResult m_sSceneChangeParam;
-};	
+};
 
 WELSVP_NAMESPACE_END
 

@@ -85,7 +85,7 @@ extern void WelsLog(void *pCtx, int32_t iLevel, const str_t *kpFmt, ...);
 
 extern const str_t *g_sWelsLogTags[];
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	System trace log output in Wels
  *
@@ -103,11 +103,11 @@ void WelsLogDefault( void *pCtx, const int32_t kiLevel, const str_t *kpFmtStr, v
 void WelsLogNil( void *pCtx, const int32_t kiLevel, const str_t *kpFmtStr, va_list argv );
 
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	set log iLevel from external call
  *
- * \param	iLevel	iLevel of log 
+ * \param	iLevel	iLevel of log
  *
  * \return	NONE
  *
@@ -116,7 +116,7 @@ void WelsLogNil( void *pCtx, const int32_t kiLevel, const str_t *kpFmtStr, va_li
  */
 void WelsSetLogLevel( const int32_t kiLevel );
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	get log iLevel from external call
  *
@@ -129,7 +129,7 @@ void WelsSetLogLevel( const int32_t kiLevel );
  */
 int32_t WelsGetLogLevel( void );
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	set log callback from external call
  *
@@ -142,7 +142,7 @@ int32_t WelsGetLogLevel( void );
  */
 void WelsSetLogCallback( PWelsLogCallbackFunc _log );
 
-/*! 
+/*!
 *************************************************************************************
 * \brief	reopen log file when finish setting current path
 *
@@ -159,7 +159,7 @@ void WelsReopenTraceFile( void *pCtx, str_t *pCurPath );
 /*
  *	PSNR calculation routines
  */
-/*! 
+/*!
  *************************************************************************************
  * \brief	PSNR calculation utilization in Wels
  *

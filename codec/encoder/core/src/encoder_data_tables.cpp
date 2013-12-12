@@ -44,36 +44,36 @@ namespace WelsSVCEnc {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // extern at mb_cache.h
-const uint8_t g_kuiSmb4AddrIn256[16] = 
+const uint8_t g_kuiSmb4AddrIn256[16] =
 {
 	0,		4,		16*4,		16*4+4,
 	8,		12,		16*4+8,		16*4+12,
 	16*8,	16*8+4,	16*12,		16*12+4,
 	16*8+8,  16*8+12,  16*12+8, 16*12+12
-};                       
+};
 
 //////pNonZeroCount[16+8] mapping scan index
 const uint8_t g_kuiMbCountScan4Idx[24] =
-{                     //  0   1 | 4  5      luma 8*8 block           pNonZeroCount[16+8] 
-	0,  1,  4,  5,   //  2   3 | 6  7        0  |  1                  0   1   2   3 
-	2,  3,  6,  7,   //---------------      ---------                 4   5   6   7 
-	8,  9, 12, 13,   //  8   9 | 12 13       2  |  3                  8   9  10  11 
-	10, 11, 14, 15,   // 10  11 | 14 15-----------------------------> 12  13  14  15 
-	16, 17, 20, 21,   //----------------    chroma 8*8 block          16  17  18  19  
-	18, 19, 22, 23   // 16  17 | 20 21        0    1                 20  21  22  23 
+{                     //  0   1 | 4  5      luma 8*8 block           pNonZeroCount[16+8]
+	0,  1,  4,  5,   //  2   3 | 6  7        0  |  1                  0   1   2   3
+	2,  3,  6,  7,   //---------------      ---------                 4   5   6   7
+	8,  9, 12, 13,   //  8   9 | 12 13       2  |  3                  8   9  10  11
+	10, 11, 14, 15,   // 10  11 | 14 15-----------------------------> 12  13  14  15
+	16, 17, 20, 21,   //----------------    chroma 8*8 block          16  17  18  19
+	18, 19, 22, 23   // 16  17 | 20 21        0    1                 20  21  22  23
 };
 
 const uint8_t g_kuiCache48CountScan4Idx[24] =
 {	// [16 + 2*4]
-	9, 10, 17, 18,	
-	11, 12, 19, 20,	
-	25, 26, 33, 34,	
-	27, 28, 35, 36,	
-	14, 15,			
-	22, 23,			
-	38, 39,			
-	46, 47			
-};	
+	9, 10, 17, 18,
+	11, 12, 19, 20,
+	25, 26, 33, 34,
+	27, 28, 35, 36,
+	14, 15,
+	22, 23,
+	38, 39,
+	46, 47
+};
 
 
 //cache element equal to 30
@@ -184,7 +184,7 @@ __align16( const uint16_t, g_kuiDequantCoeff[52][8]) = {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // extern at md.h
-const int32_t g_kiQpCostTable[52] = 
+const int32_t g_kiQpCostTable[52] =
 {
 	1, 1, 1, 1, 1, 1, 1, 1,  /*  0-7 */
 	1, 1, 1, 1,              /*  8-11 */
@@ -194,12 +194,12 @@ const int32_t g_kiQpCostTable[52] =
 	16,18,20,23,25,29,32,36,  /* 36-43 */
 	40,45,51,57,64,72,81,91   /* 44-51 */
 };
-const int8_t g_kiMapModeI16x16[7] = 
+const int8_t g_kiMapModeI16x16[7] =
 {
 	0, 1, 2, 3, 2, 2, 2
 };//{I16_PRED_V, I16_PRED_H, I16_PRED_DC, I16_PRED_P, I16_PRED_DC, I16_PRED_DC, I16_PRED_DC};
 
-const int8_t g_kiMapModeIntraChroma[7] = 
+const int8_t g_kiMapModeIntraChroma[7] =
 {
 	0, 1, 2, 3, 0, 0, 0
 };//{C_PRED_DC, C_PRED_H, C_PRED_V, C_PRED_P, C_PRED_DC_L, C_PRED_DC_T, C_PRED_DC_128};
@@ -236,7 +236,7 @@ const uint32_t g_uiGolombUELength[256] =
 // extern at vlc_encoder.h
 
 //g_kuiVlcCoeffToken[nc][total-coeff][trailing-ones][0--value, 1--bit count]
-const uint8_t g_kuiVlcCoeffToken[5][17][4][2] = 
+const uint8_t g_kuiVlcCoeffToken[5][17][4][2] =
 {
 	{//0<=nc<2
 		{	{ 1,  1}, { 0,  0}, { 0,  0}, { 0,  0} }, //0
@@ -286,7 +286,7 @@ const uint8_t g_kuiVlcCoeffToken[5][17][4][2] =
 		{	{15,  7}, {10,  5}, {11,  5}, {11,  4} },//4
 		{	{11,  7}, { 8,  5}, { 9,  5}, {10,  4} },//5
 		{	{ 9,  7}, {14,  6}, {13,  6}, { 9,  4} },//6
-		{	{ 8,  7}, {10,  6}, { 9,  6}, { 8,  4} },//7 
+		{	{ 8,  7}, {10,  6}, { 9,  6}, { 8,  4} },//7
 		{	{15,  8}, {14,  7}, {13,  7}, {13,  5} },//8
 		{	{11,  8}, {14,  8}, {10,  7}, {12,  6} },//9
 		{	{15,  9}, {10,  8}, {13,  8}, {12,  7} },//10
@@ -342,13 +342,13 @@ const uint8_t g_kuiVlcCoeffToken[5][17][4][2] =
 //const uint8_t g_kuiVlcLevelPrefix[15][2] =
 //{
 //	{1, 1}, {1, 2}
-//}; 
+//};
 
 //g_kuiVlcTotalZeros[tzVlcIndex][total_zeros][0--value, 1--bit count]
-const uint8_t g_kuiVlcTotalZeros[16][16][2] = 
+const uint8_t g_kuiVlcTotalZeros[16][16][2] =
 {
 	{//0 not available
-		{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} 	
+		{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}
 	},
 	{//1
 		{1, 1}, {3, 3}, {2, 3}, {3, 4}, {2, 4}, {3, 5}, {2, 5}, {3, 6}, {2, 6}, {3, 7}, {2, 7}, {3, 8}, {2, 8}, {3, 9}, {2, 9}, {1, 9}
@@ -406,7 +406,7 @@ const uint8_t g_kuiVlcTotalZerosChromaDc[4][4][2] =
 		{1, 1}, {1, 2}, {1, 3}, {0, 3}
 	},
 	{
-		{1, 1}, {1, 2}, {0, 2}, {0, 0} 
+		{1, 1}, {1, 2}, {0, 2}, {0, 0}
 	},
 	{
 		{1, 1}, {0, 1}, {0, 0}, {0, 0}
@@ -415,10 +415,10 @@ const uint8_t g_kuiVlcTotalZerosChromaDc[4][4][2] =
 //
 
 //g_kuiVlcRunBefore[zeros-left][run-before][0--value, 1--bit count]
-const uint8_t g_kuiVlcRunBefore[8][15][2] = 
+const uint8_t g_kuiVlcRunBefore[8][15][2] =
 {
 	{//0 not available
-		{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} 	
+		{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}
 	},
 	{//1
 		{1, 1}, {0, 1}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}
@@ -450,7 +450,7 @@ const ALIGNED_DECLARE(uint8_t, g_kuiEncNcMapTable[18], 16) =
 
 
 
-const uint8_t   g_kuiTemporalIdListTable[MAX_TEMPORAL_LEVEL][MAX_GOP_SIZE + 1] = 
+const uint8_t   g_kuiTemporalIdListTable[MAX_TEMPORAL_LEVEL][MAX_GOP_SIZE + 1] =
 {
 	{  0, 0, 0, 0, 0, 0, 0, 0,
 	   0, 0, 0, 0, 0, 0, 0, 0,

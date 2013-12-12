@@ -86,11 +86,11 @@ void_t H264DecodeInstance( ISVCDecoder* pDecoder, const char* kpH264FileName, co
 
 	EDecodeMode     eDecoderMode    = AUTO_MODE;
 	EBufferProperty	eOutputProperty = BUFFER_DEVICE;
-	
+
 	CUtils cOutputModule;
 	double dElapsed = 0;
 
-	if (pDecoder == NULL) return;	
+	if (pDecoder == NULL) return;
 	if (kpH264FileName)
 	{
 		pH264File = fopen(kpH264FileName,"rb");
@@ -121,7 +121,7 @@ void_t H264DecodeInstance( ISVCDecoder* pDecoder, const char* kpH264FileName, co
 		fprintf(stderr, "Can not find any output file to write..\n");
 		// any options
 	}
-	
+
 	if (pOptionFileName){
 		pOptionFile = fopen((char*)pOptionFileName, "wb");
 		if ( pOptionFile == NULL ){
@@ -167,10 +167,10 @@ void_t H264DecodeInstance( ISVCDecoder* pDecoder, const char* kpH264FileName, co
 	}
 
 #if defined ( STICK_STREAM_SIZE )
-	FILE *fpTrack = fopen("3.len", "rb");	
+	FILE *fpTrack = fopen("3.len", "rb");
 
 #endif// STICK_STREAM_SIZE
-	
+
 
 	while ( true ) {
 
@@ -183,10 +183,10 @@ void_t H264DecodeInstance( ISVCDecoder* pDecoder, const char* kpH264FileName, co
 
 #if defined ( STICK_STREAM_SIZE )
 		if ( fpTrack )
-			fread(&iSliceSize, 1, sizeof(int32_t), fpTrack);		
+			fread(&iSliceSize, 1, sizeof(int32_t), fpTrack);
 #else
 		for (i=0; i<iFileSize; i++) {
-			if (pBuf[iBufPos+i]==0 && pBuf[iBufPos+i+1]==0 && pBuf[iBufPos+i+2]==0 && 
+			if (pBuf[iBufPos+i]==0 && pBuf[iBufPos+i+1]==0 && pBuf[iBufPos+i+2]==0 &&
 				pBuf[iBufPos+i+3]==1 && i>0) {
 				break;
 			}
@@ -208,7 +208,7 @@ void_t H264DecodeInstance( ISVCDecoder* pDecoder, const char* kpH264FileName, co
         int32_t iFrameNumOfAuMarkedLtr;
         pDecoder->GetOption(DECODER_OPTION_LTR_MARKED_FRAME_NUM, &iFrameNumOfAuMarkedLtr);
         int32_t iFeedbackVclNalInAu;
-        pDecoder->GetOption(DECODER_OPTION_VCL_NAL, &iFeedbackVclNalInAu);        
+        pDecoder->GetOption(DECODER_OPTION_VCL_NAL, &iFeedbackVclNalInAu);
         int32_t iFeedbackTidInAu;
         pDecoder->GetOption(DECODER_OPTION_TEMPORAL_ID, &iFeedbackTidInAu);
         int32_t iSetMode;
@@ -224,7 +224,7 @@ void_t H264DecodeInstance( ISVCDecoder* pDecoder, const char* kpH264FileName, co
 		memset(&sDstBufInfo, 0, sizeof(SBufferInfo));
 
 		pDecoder->DecodeFrame( pBuf + iBufPos, iSliceSize, pData, &sDstBufInfo );
-		
+
 		if(sDstBufInfo.iBufferStatus == 1)
 		{
 			pDst[0] = (uint8_t *)pData[0];
@@ -247,7 +247,7 @@ void_t H264DecodeInstance( ISVCDecoder* pDecoder, const char* kpH264FileName, co
 				iWidth  = sDstBufInfo.UsrData.sVideoBuffer.iSurfaceWidth;
 				iHeight = sDstBufInfo.UsrData.sVideoBuffer.iSurfaceHeight;
 			}
-					
+
 			if ( pOptionFile != NULL )
 			{
 				if ( iWidth != iLastWidth && iHeight != iLastHeight )
@@ -293,7 +293,7 @@ void_t H264DecodeInstance( ISVCDecoder* pDecoder, const char* kpH264FileName, co
 			iWidth  = sDstBufInfo.UsrData.sVideoBuffer.iSurfaceWidth;
 			iHeight = sDstBufInfo.UsrData.sVideoBuffer.iSurfaceHeight;
 		}
-		
+
 		if ( pOptionFile != NULL )
 		{
 			/* Anyway, we need write in case of final frame decoding */
@@ -313,7 +313,7 @@ void_t H264DecodeInstance( ISVCDecoder* pDecoder, const char* kpH264FileName, co
 		fpTrack = NULL;
 	}
 #endif// STICK_STREAM_SIZE
-	
+
 	dElapsed = iTotal / 1e6;
 	fprintf( stderr, "-------------------------------------------------------\n" );
 	fprintf( stderr, "iWidth:		%d\nheight:		%d\nFrames:		%d\ndecode time:	%f sec\nFPS:		%f fps\n",
@@ -322,11 +322,11 @@ void_t H264DecodeInstance( ISVCDecoder* pDecoder, const char* kpH264FileName, co
 
 	// coverity scan uninitial
 label_exit:
-	if (pBuf) 
+	if (pBuf)
 	{
 		delete[] pBuf;
 		pBuf = NULL;
-	}	
+	}
 	if ( pH264File )
 	{
 		fclose(pH264File);
@@ -391,7 +391,7 @@ int32_t main(int32_t iArgC, char* pArgV[])
 						if (sDecParam.pFileNameRestructed != NULL){
 							sDecParam.pFileNameRestructed[iLen] = 0;
 						}
-					
+
 						strncpy(sDecParam.pFileNameRestructed, strReconFile.c_str(), iLen);//confirmed_safe_unsafe_usage
 					}
 					else if (strTag[0].compare("TargetDQID") == 0){
@@ -461,13 +461,13 @@ int32_t main(int32_t iArgC, char* pArgV[])
 			return 1;
 		}
 	}
-	
+
 	if (strInputFile.empty())
 	{
 		printf( "No input file specified in configuration file.\n" );
 		return 1;
 	}
-	
+
 
 
 
@@ -492,7 +492,7 @@ int32_t main(int32_t iArgC, char* pArgV[])
 			return 1;
 		}
 	}
-	else 
+	else
 	{
 		printf("load library sw function failed\n");
 		return 1;
@@ -507,7 +507,7 @@ int32_t main(int32_t iArgC, char* pArgV[])
 		printf( "Create Decoder failed.\n" );
 		return 1;
 	}
-	
+
 #endif
 
 
@@ -516,22 +516,22 @@ int32_t main(int32_t iArgC, char* pArgV[])
 		printf( "Decoder initialization failed.\n" );
 		return 1;
 	}
-	
-	
+
+
 	int32_t iWidth = 0;
 	int32_t iHeight= 0;
 
-	
+
 	H264DecodeInstance( pDecoder, strInputFile.c_str(), strOutputFile.c_str(), iWidth, iHeight, (!strOptionFile.empty() ? (void_t*)(const_cast<char*>(strOptionFile.c_str())) : NULL) );
-	
+
 	if (sDecParam.pFileNameRestructed != NULL){
 		delete []sDecParam.pFileNameRestructed;
 		sDecParam.pFileNameRestructed = NULL;
 	}
-		
+
 	if ( pDecoder ){
 		pDecoder->Uninitialize();
-		
+
 #if defined(_MSC_VER)
 		pDestroyDecoderFunc( pDecoder );
 #else

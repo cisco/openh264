@@ -64,7 +64,7 @@ int32_t WelsSampleSad4x4_c( uint8_t* pSample1, int32_t iStride1, uint8_t* pSampl
 	}
 
 	return iSadSum;
-} 
+}
 
 int32_t WelsSampleSad8x8_c( uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2 )
 {
@@ -88,7 +88,7 @@ int32_t WelsSampleSad8x8_c( uint8_t* pSample1, int32_t iStride1, uint8_t* pSampl
 	}
 
 	return iSadSum;
-} 
+}
 int32_t WelsSampleSad16x8_c( uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2 )
 {
 	int32_t iSadSum = 0;
@@ -97,7 +97,7 @@ int32_t WelsSampleSad16x8_c( uint8_t* pSample1, int32_t iStride1, uint8_t* pSamp
 	iSadSum += WelsSampleSad8x8_c( pSample1 + 8, iStride1, pSample2 + 8, iStride2 );
 
 	return iSadSum;
-} 
+}
 int32_t WelsSampleSad8x16_c( uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2 )
 {
 	int32_t iSadSum = 0;
@@ -105,7 +105,7 @@ int32_t WelsSampleSad8x16_c( uint8_t* pSample1, int32_t iStride1, uint8_t* pSamp
 	iSadSum += WelsSampleSad8x8_c( pSample1+(iStride1<<3), iStride1, pSample2+(iStride2<<3), iStride2 );
 
 	return iSadSum;
-} 
+}
 int32_t WelsSampleSad16x16_c( uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2 )
 {
 	int32_t iSadSum = 0;
@@ -115,7 +115,7 @@ int32_t WelsSampleSad16x16_c( uint8_t* pSample1, int32_t iStride1, uint8_t* pSam
 	iSadSum += WelsSampleSad8x8_c( pSample1+(iStride1<<3)+8, iStride1, pSample2+(iStride2<<3)+8, iStride2 );
 
 	return iSadSum;
-} 
+}
 
 int32_t WelsSampleSatd4x4_c( uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2 )
 {
@@ -146,7 +146,7 @@ int32_t WelsSampleSatd4x4_c( uint8_t* pSample1, int32_t iStride1, uint8_t* pSamp
 		iSample2 = pSampleMix[i][0] - pSampleMix[i][2];
 		iSample3 = pSampleMix[i][1] - pSampleMix[i][3];
 
-		pSampleMix[i][0] = iSample0 + iSample1;		
+		pSampleMix[i][0] = iSample0 + iSample1;
 		pSampleMix[i][1] = iSample2 + iSample3;
 		pSampleMix[i][2] = iSample2 - iSample3;
 		pSampleMix[i][3] = iSample0 - iSample1;
@@ -160,7 +160,7 @@ int32_t WelsSampleSatd4x4_c( uint8_t* pSample1, int32_t iStride1, uint8_t* pSamp
 		iSample2 = pSampleMix[0][i] - pSampleMix[2][i];
 		iSample3 = pSampleMix[1][i] - pSampleMix[3][i];
 
-		pSampleMix[0][i] = iSample0 + iSample1;		
+		pSampleMix[0][i] = iSample0 + iSample1;
 		pSampleMix[1][i] = iSample2 + iSample3;
 		pSampleMix[2][i] = iSample2 - iSample3;
 		pSampleMix[3][i] = iSample0 - iSample1;
@@ -253,17 +253,17 @@ extern void WelsI4x4LumaPredDc_c(uint8_t *pPred, uint8_t *pRef, const int32_t iS
 extern void WelsI4x4LumaPredH_c(uint8_t *pPred, uint8_t *pRef, const int32_t iStride);
 extern void WelsI4x4LumaPredV_c(uint8_t *pPred, uint8_t *pRef, const int32_t iStride);
 
-int32_t WelsSampleSatdIntra4x4Combined3_c(uint8_t *pDec, int32_t iDecStride, uint8_t *pEnc, int32_t iEncStride, uint8_t *pDst, 
+int32_t WelsSampleSatdIntra4x4Combined3_c(uint8_t *pDec, int32_t iDecStride, uint8_t *pEnc, int32_t iEncStride, uint8_t *pDst,
 						  int32_t *pBestMode, int32_t iLambda2, int32_t iLambda1, int32_t iLambda0)
 {
 	int32_t iBestMode = -1;
 	int32_t iCurCost, iBestCost = INT_MAX;
 	ENFORCE_STACK_ALIGN_2D(uint8_t, uiLocalBuffer, 3, 16, 16)
-	
+
 	WelsI4x4LumaPredDc_c(uiLocalBuffer[2], pDec, iDecStride);
 	iCurCost = WelsSampleSatd4x4_c(uiLocalBuffer[2], 4, pEnc, iEncStride) + iLambda2;
 	if (iCurCost < iBestCost)
-	{			
+	{
 		iBestMode = 2;
 		iBestCost = iCurCost;
 	}
@@ -271,14 +271,14 @@ int32_t WelsSampleSatdIntra4x4Combined3_c(uint8_t *pDec, int32_t iDecStride, uin
 	WelsI4x4LumaPredH_c(uiLocalBuffer[1], pDec, iDecStride);
 	iCurCost = WelsSampleSatd4x4_c(uiLocalBuffer[1], 4, pEnc, iEncStride) + iLambda1;
 	if (iCurCost < iBestCost)
-	{			
+	{
 		iBestMode = 1;
 		iBestCost = iCurCost;
 	}
 	WelsI4x4LumaPredV_c(uiLocalBuffer[0], pDec, iDecStride);
 	iCurCost = WelsSampleSatd4x4_c(uiLocalBuffer[0], 4, pEnc, iEncStride) + iLambda0;
 	if (iCurCost < iBestCost)
-	{			
+	{
 		iBestMode = 0;
 		iBestCost = iCurCost;
 	}
@@ -292,7 +292,7 @@ extern void WelsIChormaPredDc_c(uint8_t *pPred, uint8_t *pRef, const int32_t iSt
 extern void WelsIChormaPredH_c(uint8_t *pPred, uint8_t *pRef, const int32_t iStride);
 extern void WelsIChormaPredV_c(uint8_t *pPred, uint8_t *pRef, const int32_t iStride);
 
-int32_t WelsSampleSatdIntra8x8Combined3_c(uint8_t *pDecCb, int32_t iDecStride, uint8_t *pEncCb, int32_t iEncStride, 
+int32_t WelsSampleSatdIntra8x8Combined3_c(uint8_t *pDecCb, int32_t iDecStride, uint8_t *pEncCb, int32_t iEncStride,
 							int32_t *pBestMode, int32_t iLambda, uint8_t *pDstChroma,uint8_t *pDecCr,uint8_t *pEncCr)
 {
 	int32_t iBestMode = -1;
@@ -302,19 +302,19 @@ int32_t WelsSampleSatdIntra8x8Combined3_c(uint8_t *pDecCb, int32_t iDecStride, u
 	WelsIChormaPredV_c(pDstChroma+64, pDecCr, iDecStride);
 	iCurCost = WelsSampleSatd8x8_c(pDstChroma, 8, pEncCb, iEncStride);
 	iCurCost += WelsSampleSatd8x8_c(pDstChroma+64, 8, pEncCr, iEncStride) + iLambda * 2;
-	
+
 	if (iCurCost < iBestCost)
-	{			
+	{
 		iBestMode = 2;
 		iBestCost = iCurCost;
 	}
-	
+
 	WelsIChormaPredH_c(pDstChroma, pDecCb, iDecStride);
 	WelsIChormaPredH_c(pDstChroma+64, pDecCr, iDecStride);
 	iCurCost = WelsSampleSatd8x8_c(pDstChroma, 8, pEncCb, iEncStride);
 	iCurCost += WelsSampleSatd8x8_c(pDstChroma+64, 8, pEncCr, iEncStride) + iLambda * 2;
 	if (iCurCost < iBestCost)
-	{			
+	{
 		iBestMode = 1;
 		iBestCost = iCurCost;
 	}
@@ -323,40 +323,40 @@ int32_t WelsSampleSatdIntra8x8Combined3_c(uint8_t *pDecCb, int32_t iDecStride, u
 	iCurCost = WelsSampleSatd8x8_c(pDstChroma, 8, pEncCb, iEncStride);
 	iCurCost += WelsSampleSatd8x8_c(pDstChroma+64, 8, pEncCr, iEncStride);
 	if (iCurCost < iBestCost)
-	{			
+	{
 		iBestMode = 0;
 		iBestCost = iCurCost;
 	}
-	
+
 	*pBestMode	= iBestMode;
 
     return iBestCost;
-	
+
 
 }
-int32_t WelsSampleSadIntra8x8Combined3_c(uint8_t *pDecCb, int32_t iDecStride, uint8_t *pEncCb, int32_t iEncStride, 
+int32_t WelsSampleSadIntra8x8Combined3_c(uint8_t *pDecCb, int32_t iDecStride, uint8_t *pEncCb, int32_t iEncStride,
 							int32_t *pBestMode, int32_t iLambda, uint8_t *pDstChroma,uint8_t *pDecCr,uint8_t *pEncCr)
 {
 	int32_t iBestMode = -1;
 	int32_t iCurCost, iBestCost = INT_MAX;
-	
+
 	WelsIChormaPredV_c(pDstChroma, pDecCb, iDecStride);
 	WelsIChormaPredV_c(pDstChroma+64, pDecCr, iDecStride);
 	iCurCost = WelsSampleSad8x8_c(pDstChroma, 8, pEncCb, iEncStride);
 	iCurCost += WelsSampleSad8x8_c(pDstChroma+64, 8, pEncCr, iEncStride) + iLambda * 2;
-	
+
 	if (iCurCost < iBestCost)
-	{			
+	{
 		iBestMode = 2;
 		iBestCost = iCurCost;
 	}
-	
+
 	WelsIChormaPredH_c(pDstChroma, pDecCb, iDecStride);
 	WelsIChormaPredH_c(pDstChroma+64, pDecCr, iDecStride);
 	iCurCost = WelsSampleSad8x8_c(pDstChroma, 8, pEncCb, iEncStride);
 	iCurCost += WelsSampleSad8x8_c(pDstChroma+64, 8, pEncCr, iEncStride) + iLambda * 2;
 	if (iCurCost < iBestCost)
-	{			
+	{
 		iBestMode = 1;
 		iBestCost = iCurCost;
 	}
@@ -365,7 +365,7 @@ int32_t WelsSampleSadIntra8x8Combined3_c(uint8_t *pDecCb, int32_t iDecStride, ui
 	iCurCost = WelsSampleSad8x8_c(pDstChroma, 8, pEncCb, iEncStride);
 	iCurCost += WelsSampleSad8x8_c(pDstChroma+64, 8, pEncCr, iEncStride);
 	if (iCurCost < iBestCost)
-	{			
+	{
 		iBestMode = 0;
 		iBestCost = iCurCost;
 	}
@@ -380,77 +380,77 @@ extern void WelsI16x16LumaPredDc_c(uint8_t *pPred, uint8_t *pRef, const int32_t 
 extern void WelsI16x16LumaPredH_c(uint8_t *pPred, uint8_t *pRef, const int32_t iStride);
 extern void WelsI16x16LumaPredV_c(uint8_t *pPred, uint8_t *pRef, const int32_t iStride);
 
-int32_t WelsSampleSatdIntra16x16Combined3_c(uint8_t *pDec, int32_t iDecStride, uint8_t *pEnc, int32_t iEncStride, 
+int32_t WelsSampleSatdIntra16x16Combined3_c(uint8_t *pDec, int32_t iDecStride, uint8_t *pEnc, int32_t iEncStride,
 							  int32_t *pBestMode, int32_t iLambda, uint8_t *pDst)
 {
 	int32_t iBestMode = -1;
 	int32_t iCurCost, iBestCost = INT_MAX;
-	
+
 	WelsI16x16LumaPredV_c(pDst, pDec, iDecStride);
 	iCurCost = WelsSampleSatd16x16_c(pDst, 16, pEnc, iEncStride);
-	
+
 	if (iCurCost < iBestCost)
-	{			
+	{
 		iBestMode = 0;
 		iBestCost = iCurCost;
 	}
-	
+
 	WelsI16x16LumaPredH_c(pDst, pDec, iDecStride);
 	iCurCost = WelsSampleSatd16x16_c(pDst, 16, pEnc, iEncStride) + iLambda * 2;
 	if (iCurCost < iBestCost)
-	{			
+	{
 		iBestMode = 1;
 		iBestCost = iCurCost;
 	}
 	WelsI16x16LumaPredDc_c(pDst, pDec, iDecStride);
 	iCurCost = WelsSampleSatd16x16_c(pDst, 16, pEnc, iEncStride) + iLambda * 2;
 	if (iCurCost < iBestCost)
-	{			
+	{
 		iBestMode = 2;
 		iBestCost = iCurCost;
 	}
-	
+
 	*pBestMode = iBestMode;
 
     return iBestCost;
-	
-	
+
+
 }
-int32_t WelsSampleSadIntra16x16Combined3_c(uint8_t *pDec, int32_t iDecStride, uint8_t *pEnc, int32_t iEncStride, 
+int32_t WelsSampleSadIntra16x16Combined3_c(uint8_t *pDec, int32_t iDecStride, uint8_t *pEnc, int32_t iEncStride,
 							  int32_t *pBestMode, int32_t iLambda, uint8_t *pDst)
 {
 	int32_t iBestMode = -1;
 	int32_t iCurCost, iBestCost = INT_MAX;
-	
+
 	WelsI16x16LumaPredV_c(pDst, pDec, iDecStride);
 	iCurCost = WelsSampleSad16x16_c(pDst, 16, pEnc, iEncStride);
-	
+
 	if (iCurCost < iBestCost)
-	{			
+	{
 		iBestMode = 0;
 		iBestCost = iCurCost;
 	}
-	
+
 	WelsI16x16LumaPredH_c(pDst, pDec, iDecStride);
 	iCurCost = WelsSampleSad16x16_c(pDst, 16, pEnc, iEncStride) + iLambda * 2;
 	if (iCurCost < iBestCost)
-	{			
+	{
 		iBestMode = 1;
 		iBestCost = iCurCost;
 	}
 	WelsI16x16LumaPredDc_c(pDst, pDec, iDecStride);
 	iCurCost = WelsSampleSad16x16_c(pDst, 16, pEnc, iEncStride) + iLambda * 2;
 	if (iCurCost < iBestCost)
-	{			
+	{
 		iBestMode = 2;
 		iBestCost = iCurCost;
 	}
-	
+
 	*pBestMode = iBestMode;
 
     return iBestCost;
-	
-	
+
+
 }
 
 void WelsInitSampleSadFunc( SWelsFuncPtrList *pFuncList, uint32_t uiCpuFlag)
@@ -485,8 +485,8 @@ void WelsInitSampleSadFunc( SWelsFuncPtrList *pFuncList, uint32_t uiCpuFlag)
 	if ( uiCpuFlag & WELS_CPU_MMXEXT )
 	{
 		pFuncList->sSampleDealingFuncs.pfSampleSad[BLOCK_4x4  ] = WelsSampleSad4x4_mmx;
-	}	
-	
+	}
+
 	if ( uiCpuFlag & WELS_CPU_SSE2 )
 	{
 		pFuncList->sSampleDealingFuncs.pfSampleSad[BLOCK_16x16] = WelsSampleSad16x16_sse2;
@@ -499,14 +499,14 @@ void WelsInitSampleSadFunc( SWelsFuncPtrList *pFuncList, uint32_t uiCpuFlag)
 	    pFuncList->sSampleDealingFuncs.pfSample4Sad[BLOCK_8x16] = WelsSampleSadFour8x16_sse2;
 	    pFuncList->sSampleDealingFuncs.pfSample4Sad[BLOCK_8x8] = WelsSampleSadFour8x8_sse2;
 	    pFuncList->sSampleDealingFuncs.pfSample4Sad[BLOCK_4x4] = WelsSampleSadFour4x4_sse2;
-		
+
 		pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_4x4  ] = WelsSampleSatd4x4_sse2;
 		pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_8x8  ] = WelsSampleSatd8x8_sse2;
 		pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_8x16 ] = WelsSampleSatd8x16_sse2;
 		pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x8 ] = WelsSampleSatd16x8_sse2;
-		pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x16] = WelsSampleSatd16x16_sse2;		
+		pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x16] = WelsSampleSatd16x16_sse2;
        	pFuncList->sSampleDealingFuncs.pfIntra4x4Combined3Satd =  WelsSmpleSatdThree4x4_sse2;
-	}	
+	}
 
 	if (uiCpuFlag & WELS_CPU_SSSE3)
 	{
@@ -514,7 +514,7 @@ void WelsInitSampleSadFunc( SWelsFuncPtrList *pFuncList, uint32_t uiCpuFlag)
 	}
 
 	if( uiCpuFlag & WELS_CPU_SSE41 )
-	{	   
+	{
 	    pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x16] = WelsSampleSatd16x16_sse41;
 		pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x8] = WelsSampleSatd16x8_sse41;
 		pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_8x16] = WelsSampleSatd8x16_sse41;
@@ -523,7 +523,7 @@ void WelsInitSampleSadFunc( SWelsFuncPtrList *pFuncList, uint32_t uiCpuFlag)
 		pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3Satd = WelsIntra16x16Combined3Satd_sse41;
 		pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3Satd = WelsIntraChroma8x8Combined3Satd_sse41;
 	}
-	
+
 #endif //(X86_ASM)
 
 }

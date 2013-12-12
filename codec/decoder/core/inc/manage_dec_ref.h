@@ -49,7 +49,7 @@ namespace WelsDec {
 
 typedef enum TagRemoveFlag{
 	REMOVE_TARGET = 0,
-	REMOVE_BASE = 1,	
+	REMOVE_BASE = 1,
 	REMOVE_BASE_FIRST = 2
 }ERemoveFlag;
 

@@ -34,7 +34,7 @@
 *
 * \date         :  2011/03/28
 *
-* \description  :  1. rewrite the package code of complexity analysis class  
+* \description  :  1. rewrite the package code of complexity analysis class
 *
 *************************************************************************************
 */
@@ -57,7 +57,7 @@ GOMSadFunc      GomSampleSad;
 GOMSadFunc      GomSampleSadExceptBackground;
 
 class CComplexityAnalysis : public IStrategy
-{			  
+{
 public:
 	CComplexityAnalysis(int32_t iCpuFlag);
 	~CComplexityAnalysis();
@@ -76,7 +76,7 @@ private:
 private:
 	PGOMSadFunc m_pfGomSad;
 	SComplexityAnalysisParam m_sComplexityAnalysisParam;
-};	
+};
 
 WELSVP_NAMESPACE_END
 

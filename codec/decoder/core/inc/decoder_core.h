@@ -32,7 +32,7 @@
  *  decoder_core.h
  *
  *  Abstract
- *      Encapsulative core interfaces 
+ *      Encapsulative core interfaces
  *
  *  History
  *      07/10/2008 Created
@@ -62,17 +62,17 @@ int32_t WelsInitMemory( PWelsDecoderContext pCtx );
 /*
  * WelsFreeMemory
  * Free memory introduced in WelsInitMemory at destruction of decoder.
- * 
+ *
  */
 void_t WelsFreeMemory( PWelsDecoderContext pCtx );
 
 /*!
- * \brief	request memory when maximal picture width and height are available	
+ * \brief	request memory when maximal picture width and height are available
  */
 int32_t InitialDqLayersContext ( PWelsDecoderContext pCtx, const int32_t kiMaxWidth, const int32_t kiMaxHeight );
 
 /*!
- * \brief	free dq layer context memory related		
+ * \brief	free dq layer context memory related
  */
 void_t UninitialDqLayersContext ( PWelsDecoderContext pCtx );
 

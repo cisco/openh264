@@ -48,7 +48,7 @@
 namespace WelsDec {
 
 /*!
- * \brief	deblocking module initialize 
+ * \brief	deblocking module initialize
  *
  * \param	pf
  *          cpu

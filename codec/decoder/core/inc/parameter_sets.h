@@ -47,7 +47,7 @@ typedef struct TagSps{
 	uint32_t	iMbWidth;
 	uint32_t	iMbHeight;
 	uint32_t	uiTotalMbCount;	//used in decode_slice_data()
-	
+
 	uint32_t	uiLog2MaxFrameNum;
 	uint32_t	uiPocType;
 	/* POC type 0 */
@@ -59,18 +59,18 @@ typedef struct TagSps{
 	int32_t		iNumRefFramesInPocCycle;
 	int8_t		iOffsetForRefFrame[256];
 	int32_t		iNumRefFrames;
-	
+
 	SPosOffset	sFrameCrop;
-	
+
 	ProfileIdc	uiProfileIdc;
 	uint8_t		uiLevelIdc;
 	uint8_t		uiChromaFormatIdc;
 	uint8_t		uiChromaArrayType;
-	
+
 	uint8_t		uiBitDepthLuma;
 	uint8_t		uiBitDepthChroma;
 	/* TO BE CONTINUE: POC type 1 */
-	bool_t		bDeltaPicOrderAlwaysZeroFlag;	
+	bool_t		bDeltaPicOrderAlwaysZeroFlag;
 	bool_t		bGapsInFrameNumValueAllowedFlag;
 
 	bool_t		bFrameMbsOnlyFlag;
@@ -88,7 +88,7 @@ typedef struct TagSps{
 	bool_t		bSeparateColorPlaneFlag;
 	bool_t		bQpPrimeYZeroTransfBypassFlag;
 	bool_t		bSeqScalingMatrixPresentFlag;
-	bool_t		bSeqScalingListPresentFlag[12];	
+	bool_t		bSeqScalingListPresentFlag[12];
 }SSps, *PSps;
 
 
@@ -98,7 +98,7 @@ typedef struct TagSps{
 //	uint32_t	uiAuxFormatIdc;
 //	int32_t		iAlphaOpaqueValue;
 //	int32_t		iAlphaTransparentValue;
-	
+
 //	uint8_t		uiBitDepthAux;
 //	bool_t		bAlphaIncrFlag;
 //	bool_t		bAdditionalExtFlag;
@@ -107,7 +107,7 @@ typedef struct TagSps{
 /* Sequence Parameter Set extension syntax, refer to Page 391 in JVT X201wcm */
 typedef struct TagSpsSvcExt{
 	SPosOffset	sSeqScaledRefLayer;
-	
+
 	uint8_t		uiExtendedSpatialScalability;	// ESS
 	uint8_t		uiChromaPhaseXPlus1Flag;
 	uint8_t		uiChromaPhaseYPlus1;
@@ -116,14 +116,14 @@ typedef struct TagSpsSvcExt{
 	bool_t		bInterLayerDeblockingFilterCtrlPresentFlag;
 	bool_t		bSeqTCoeffLevelPredFlag;
 	bool_t		bAdaptiveTCoeffLevelPredFlag;
-	bool_t		bSliceHeaderRestrictionFlag;	
+	bool_t		bSliceHeaderRestrictionFlag;
 }SSpsSvcExt, *PSpsSvcExt;
 
 /* Subset sequence parameter set syntax, refer to Page 391 in JVT X201wcm */
-typedef struct TagSubsetSps{	
+typedef struct TagSubsetSps{
 	SSps		sSps;
 	SSpsSvcExt	sSpsSvcExt;
-	bool_t		bSvcVuiParamPresentFlag;	
+	bool_t		bSvcVuiParamPresentFlag;
 	bool_t		bAdditionalExtension2Flag;
 	bool_t		bAdditionalExtension2DataFlag;
 }SSubsetSps, *PSubsetSps;
@@ -132,7 +132,7 @@ typedef struct TagSubsetSps{
 typedef struct TagPps{
 	int32_t	iSpsId;
 	int32_t	iPpsId;
-	
+
 	uint32_t	uiNumSliceGroups;
 	uint32_t	uiSliceGroupMapType;
 	/* slice_group_map_type = 0 */
@@ -145,25 +145,25 @@ typedef struct TagPps{
 	/* slice_group_map_type = 6 */
 	uint32_t	uiPicSizeInMapUnits;
 	uint32_t	uiSliceGroupId[MAX_SLICEGROUP_IDS];
-	
+
 	uint32_t	uiNumRefIdxL0Active;
 	uint32_t	uiNumRefIdxL1Active;
-	
+
 	int32_t		iPicInitQp;
 	int32_t		iPicInitQs;
-	int32_t		iChromaQpIndexOffset;	
+	int32_t		iChromaQpIndexOffset;
 
 	bool_t		bEntropyCodingModeFlag;
 	bool_t		bPicOrderPresentFlag;
 	/* slice_group_map_type = 3, 4 or 5 */
 	bool_t		bSliceGroupChangeDirectionFlag;
 	bool_t		bDeblockingFilterControlPresentFlag;
-	
+
 	bool_t		bConstainedIntraPredFlag;
 	bool_t		bRedundantPicCntPresentFlag;
 	bool_t		bWeightedPredFlag;
 	uint8_t		uiWeightedBipredIdc;
-	
+
 } SPps, *PPps;
 
 //#pragma pack()

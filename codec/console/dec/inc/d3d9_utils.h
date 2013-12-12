@@ -34,9 +34,9 @@
  *
  * \date	Created 12/14/2010
  *
- * \description : 1. Rendering in Vista and upper : D3D9Ex method, support host memory / shared surface input 
- *                2. Rendering in XP : D3D9 method w/o device lost handling, support host memory input  
- *                3. File Dump : support host memory / shared surface input 
+ * \description : 1. Rendering in Vista and upper : D3D9Ex method, support host memory / shared surface input
+ *                2. Rendering in XP : D3D9 method w/o device lost handling, support host memory input
+ *                3. File Dump : support host memory / shared surface input
  *
  *************************************************************************************
  */
@@ -49,7 +49,7 @@
 #include "codec_def.h"
 
 #if defined(_MSC_VER) && (_MSC_VER>=1500) // vs2008 and upper
-#define ENABLE_DISPLAY_MODULE // enable/disable the render feature 
+#define ENABLE_DISPLAY_MODULE // enable/disable the render feature
 #endif
 
 #ifdef ENABLE_DISPLAY_MODULE
@@ -72,7 +72,7 @@ private:
 	HRESULT InitResource(void *pSharedHandle, SBufferInfo *pInfo);
 	HRESULT Render(void *pDst[3], SBufferInfo *pInfo);
 	HRESULT Dump(void *pDst[3], SBufferInfo *pInfo, FILE *pFile);
-                  
+
 private:
 	HMODULE               m_hDll;
 	HWND                  m_hWnd;

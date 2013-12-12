@@ -59,7 +59,7 @@ public:
 
 private:
 	// private copy & assign constructors adding to fix klocwork scan issues
-	CMemoryAlign( const CMemoryAlign& kcMa );           
+	CMemoryAlign( const CMemoryAlign& kcMa );
 	CMemoryAlign& operator=( const CMemoryAlign& kcMa );
 
 protected:

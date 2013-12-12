@@ -72,14 +72,14 @@ typedef struct TagLayerInfo{
 /* Layer Representation */
 struct TagDqLayer{
 	SLayerInfo				sLayerInfo;
-	
+
 	uint8_t					*pCsData[3];	// pointer to reconstructed picture pData
 	int32_t					iCsStride[3];	// Cs stride
 
 	uint8_t					*pEncData[3];	// pData picture to be encoded in current layer
 	int32_t					iEncStride[3];	// pData picture stride
 
-	SMB*					sMbDataP;		// pointer to mb of mbAddr equal to 0 in slice, mb_data_ptr = mb_base_ptr + (1+iMbStride).	
+	SMB*					sMbDataP;		// pointer to mb of mbAddr equal to 0 in slice, mb_data_ptr = mb_base_ptr + (1+iMbStride).
 	int16_t					iMbWidth;		// MB width of this picture, equal to pSps.iMbWidth
 	int16_t					iMbHeight;		// MB height of this picture, equal to pSps.iMbHeight;
 
@@ -89,19 +89,19 @@ struct TagDqLayer{
 	int8_t					iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0
 	uint8_t				    uiDisableInterLayerDeblockingFilterIdc;
 	int8_t					iInterLayerSliceAlphaC0Offset;
-	int8_t					iInterLayerSliceBetaOffset;	
+	int8_t					iInterLayerSliceBetaOffset;
 	bool_t					bDeblockingParallelFlag; //parallel_deblocking_flag
 
 	SPicture				*pRefPic;			// reference picture pointer
 	SPicture				*pDecPic;			// reconstruction picture pointer for layer
 
 	SSliceCtx			*pSliceEncCtx;	// current slice context
-	
+
 	int32_t					*pNumSliceCodedOfPartition;		// for dynamic slicing mode
 	int32_t					*pLastCodedMbIdxOfPartition;	// for dynamic slicing mode
 	int32_t					*pLastMbIdxOfPartition;			// for dynamic slicing mode
 
-	SDqLayer				*pRefLayer;		// pointer to referencing dq_layer of current layer to be decoded	
+	SDqLayer				*pRefLayer;		// pointer to referencing dq_layer of current layer to be decoded
 
 };
 

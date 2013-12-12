@@ -143,7 +143,7 @@ typedef struct TagRCTemporal
 	int32_t   iMaxBitsTl;
 	double    dTlayerWeight;
 	int32_t   iGopBitsDq;
-	//P frame level R-Q Model 
+	//P frame level R-Q Model
 	double    dLinearCmplx;
 	int32_t   iPFrameNum;
 	int32_t   iFrameCmplxMean;
@@ -214,7 +214,7 @@ typedef struct TagWelsRc{
 
 	SRCSlicing	*pSlicingOverRc;
 	SRCTemporal *pTemporalOverRc;
-}SWelsSvcRc; 
+}SWelsSvcRc;
 
 typedef  void (*PWelsRCPictureInitFunc) (void *pCtx);
 typedef  void (*PWelsRCPictureInfoUpdateFunc) (void *pCtx, int32_t iLayerSize);

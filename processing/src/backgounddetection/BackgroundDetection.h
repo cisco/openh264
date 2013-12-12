@@ -34,7 +34,7 @@
  *
  * \date        :  2011/03/17
  *
- * \description :  1. rewrite the package code of background detection class  
+ * \description :  1. rewrite the package code of background detection class
  *
  */
 
@@ -53,27 +53,27 @@ typedef struct
 	int32_t	iBackgroundFlag;
 	int32_t	iSAD;
 	int32_t	iSD;
-	int32_t	iMAD;			
-	int32_t	iMinSubMad;		
-	int32_t	iMaxDiffSubSd;	
+	int32_t	iMAD;
+	int32_t	iMinSubMad;
+	int32_t	iMaxDiffSubSd;
 } SBackgroundOU;
 
 class CBackgroundDetection : public IStrategy
-{			  
+{
 public:
 	CBackgroundDetection(int32_t iCpuFlag);
 	~CBackgroundDetection();
 
 	EResult Process(int32_t iType, SPixMap *pSrc, SPixMap *pRef);
-	EResult Set    (int32_t iType, void *pParam); 
+	EResult Set    (int32_t iType, void *pParam);
 
 private:
 	struct vBGDParam
 	{
 		uint8_t   *pCur[3];
 		uint8_t   *pRef[3];
-		int32_t	   iBgdWidth;			
-		int32_t	   iBgdHeight;			
+		int32_t	   iBgdWidth;
+		int32_t	   iBgdHeight;
 		int32_t    iStride[3];
 		SBackgroundOU	  *pOU_array;
 		int8_t	  *pBackgroundMbFlag;
@@ -97,7 +97,7 @@ private:
 	void    ForegroundBackgroundDivision(vBGDParam *pBgdParam);
 	void    ForegroundDilationAndBackgroundErosion(vBGDParam *pBgdParam);
 	void    BackgroundDetection( vBGDParam *pBgdParam );
-};	
+};
 
 WELSVP_NAMESPACE_END
 

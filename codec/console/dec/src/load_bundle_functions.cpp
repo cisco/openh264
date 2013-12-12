@@ -36,7 +36,7 @@
  * \date	Created on 03/15/2011
  *
  * \description : 1. Load bundle: welsdec.bundle
- *                2. Load address of function  
+ *                2. Load address of function
  *                3. Create or destroy decoder
  *
  *************************************************************************************
@@ -76,20 +76,20 @@ int GetCurrentModulePath(char* lpModulePath, const int iPathMax)
 	{
 		return -1;
 	}
-	
+
 	memset(lpModulePath, 0, iPathMax);
-	
+
 	char cCurrentPath[PATH_MAX];
 	memset(cCurrentPath, 0, PATH_MAX);
-	
+
 	Dl_info 	dlInfo;
 	static int  sDummy;
 	dladdr((void*)&sDummy, &dlInfo);
-	
+
 	strlcpy(cCurrentPath, dlInfo.dli_fname, PATH_MAX);
-	
+
 #if defined(__apple__)
-	// whether is self a framework ? 
+	// whether is self a framework ?
 	int locateNumber = 1;
 	struct FSRef currentPath;
 	OSStatus iStatus = FSPathMakeRef((unsigned char*)cCurrentPath, &currentPath, NULL);
@@ -105,7 +105,7 @@ int GetCurrentModulePath(char* lpModulePath, const int iPathMax)
 #else
 	int locateNumber = 1;
 #endif
-	
+
 	std::string strPath(cCurrentPath);
 	int pos = std::string::npos;
 	for(int i = 0; i < locateNumber; i++)
@@ -122,10 +122,10 @@ int GetCurrentModulePath(char* lpModulePath, const int iPathMax)
 		return -2;
 	}
 	cCurrentPath[pos] = 0;
-	
+
 	strlcpy(lpModulePath, cCurrentPath, iPathMax);
 	strlcat(lpModulePath, "/", iPathMax);
-	
+
 	return 0;
 }
 
@@ -135,24 +135,24 @@ CFBundleRef LoadBundle(const char* lpBundlePath)
 	{
 		return NULL;
 	}
-	
+
 	CFStringRef bundlePath = CFStringCreateWithCString(kCFAllocatorSystemDefault, lpBundlePath, CFStringGetSystemEncoding());
 	if(NULL == bundlePath)
 	{
 		return NULL;
 	}
-	
+
 	CFURLRef bundleURL = CFURLCreateWithString(kCFAllocatorSystemDefault, bundlePath, NULL);
 	if(NULL == bundleURL)
 	{
 		return NULL;
 	}
 #endif
-	
+
 	// 2.get bundle ref
 	CFBundleRef bundleRef = CFBundleCreate(kCFAllocatorSystemDefault, bundleURL);
 	CFRelease(bundleURL);
-	
+
 	if(NULL != bundleRef)
 	{
 	}
@@ -177,14 +177,14 @@ void* GetProcessAddress(CFBundleRef bundleRef, const char* lpProcName)
 
 bool load_bundle_welsdec()
 {
-	
+
 	char achPath[512] = {0};
-	
+
 	GetCurrentModulePath(achPath, 512);
 	strlcat(achPath, H264DecoderDLL, 512);
-	
+
 	g_at264Module = LoadBundle(achPath);
-	
+
 	if (g_at264Module == NULL)
 		return false;
 
@@ -204,13 +204,13 @@ bool get_functions_address_create_decoder(ISVCDecoder** ppDecoder)
 {
 	if(!g_at264Module)
 		return false;
-	
-	LPCreateWelsCSDecoder pfuncCreateSWDec = 
+
+	LPCreateWelsCSDecoder pfuncCreateSWDec =
 	(LPCreateWelsCSDecoder)GetProcessAddress(g_at264Module, "CreateSVCDecoder");
-	
-	LPCreateVHDController pfuncCreateHWDec = 
+
+	LPCreateVHDController pfuncCreateHWDec =
 	(LPCreateVHDController)GetProcessAddress(g_at264Module, "CreateSVCVHDController");
-	
+
 
 	if(pfuncCreateSWDec != NULL)
 	{
@@ -220,7 +220,7 @@ bool get_functions_address_create_decoder(ISVCDecoder** ppDecoder)
 	{
 		return false;
 	}
-	
+
 	if(pfuncCreateHWDec != NULL)
 	{
 		pfuncCreateHWDec();
@@ -229,22 +229,22 @@ bool get_functions_address_create_decoder(ISVCDecoder** ppDecoder)
 	{
 		return false;
 	}
-	
+
 	return true;
-	
+
 }
 
 bool get_functions_address_free_decoder(ISVCDecoder* pDecoder)
 {
 	if(!g_at264Module)
 		return false;
-	
-	LPDestroyWelsCSDecoder pfuncDestroySWDec = 
+
+	LPDestroyWelsCSDecoder pfuncDestroySWDec =
 	(LPDestroyWelsCSDecoder)GetProcessAddress(g_at264Module, "DestroySVCDecoder");
-	
-	LPDestroyVHDController pfuncDestroyHWDec = 
+
+	LPDestroyVHDController pfuncDestroyHWDec =
 	(LPDestroyVHDController)GetProcessAddress(g_at264Module, "DestroySVCVHDController");
-	
+
 	if(pfuncDestroySWDec != NULL)
 	{
 		pfuncDestroySWDec( pDecoder );
@@ -253,7 +253,7 @@ bool get_functions_address_free_decoder(ISVCDecoder* pDecoder)
 	{
 		return false;
 	}
-	
+
 	if(pfuncDestroyHWDec != NULL)
 	{
 		pfuncDestroyHWDec();

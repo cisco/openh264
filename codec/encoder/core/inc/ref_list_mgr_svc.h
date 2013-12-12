@@ -80,7 +80,7 @@ void WelsResetRefList( sWelsEncCtx *pCtx );
 /*
  *	update reference picture list
  */
-BOOL_T WelsUpdateRefList( sWelsEncCtx *pCtx );	
+BOOL_T WelsUpdateRefList( sWelsEncCtx *pCtx );
 /*
  *	build reference picture list
  */

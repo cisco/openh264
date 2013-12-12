@@ -58,7 +58,7 @@ int GetCurrentModulePath(char* lpModulePath, const int iPathMax)
 
 	strlcpy(cCurrentPath, dlInfo.dli_fname, PATH_MAX);
 
-	// whether is self a framework ? 
+	// whether is self a framework ?
 	int locateNumber = 1;
 	struct FSRef currentPath;
 	OSStatus iStatus = FSPathMakeRef((unsigned char*)cCurrentPath, &currentPath, NULL);

@@ -84,110 +84,110 @@ static const ALIGNED_DECLARE(uint8_t, g_kiIntra4AvailMode[16][16], 16) = {
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID},  //  0000
 
-	{ 
-	I4_PRED_DC_L,    I4_PRED_H,       I4_PRED_HU,      I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
+	{
+	I4_PRED_DC_L,    I4_PRED_H,       I4_PRED_HU,      I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID},  //  0001
 
 #ifndef  I4_PRED_MODE_EXTEND
-	{ 
+	{
 	I4_PRED_DC_T,    I4_PRED_V,       I4_PRED_INVALID, I4_PRED_INVALID,
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID}, //  0010
-#else  
-	{ 
-	I4_PRED_DC_T,    I4_PRED_V,       I4_PRED_DDL_TOP, I4_PRED_VL_TOP, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
+#else
+	{
+	I4_PRED_DC_T,    I4_PRED_V,       I4_PRED_DDL_TOP, I4_PRED_VL_TOP,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID}, //  0010
 #endif //I4_PRED_MODE_EXTEND
 
-	{ 
-	I4_PRED_DC,      I4_PRED_H,       I4_PRED_V,       I4_PRED_HU, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
+	{
+	I4_PRED_DC,      I4_PRED_H,       I4_PRED_V,       I4_PRED_HU,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID}, //  0011
 
-	{ 
-	I4_PRED_DC_128,  I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,	
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
+	{
+	I4_PRED_DC_128,  I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID},  //  0100
 
-	{ 
-	I4_PRED_DC_L,    I4_PRED_H,       I4_PRED_HU,      I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
+	{
+	I4_PRED_DC_L,    I4_PRED_H,       I4_PRED_HU,      I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID},    //  0101
 
 #ifndef  I4_PRED_MODE_EXTEND
-	{ 
-	I4_PRED_DC_T,    I4_PRED_V,       I4_PRED_INVALID, I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
+	{
+	I4_PRED_DC_T,    I4_PRED_V,       I4_PRED_INVALID, I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID},     //  0110
-#else 
-	{ I4_PRED_DC_T,  I4_PRED_V,       I4_PRED_DDL_TOP, I4_PRED_VL_TOP, 
+#else
+	{ I4_PRED_DC_T,  I4_PRED_V,       I4_PRED_DDL_TOP, I4_PRED_VL_TOP,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID},     //  0110
 #endif //I4_PRED_MODE_EXTEND
 
-	{ 
+	{
 	I4_PRED_DC,      I4_PRED_H,       I4_PRED_V,       I4_PRED_HU,
-	I4_PRED_DDR,     I4_PRED_VR,      I4_PRED_HD,      I4_PRED_INVALID, 
+	I4_PRED_DDR,     I4_PRED_VR,      I4_PRED_HD,      I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID},               //  0111
 
-	{ 
-	I4_PRED_DC_128,   I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
+	{
+	I4_PRED_DC_128,   I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID,  I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID,  I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID,  I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID},  //  1000
 
-	{ 
-	I4_PRED_DC_L,    I4_PRED_H,       I4_PRED_HU,      I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
+	{
+	I4_PRED_DC_L,    I4_PRED_H,       I4_PRED_HU,      I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID},    //  1001
 
-	{ 
-	I4_PRED_DC_T,    I4_PRED_V,       I4_PRED_DDL,     I4_PRED_VL, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
+	{
+	I4_PRED_DC_T,    I4_PRED_V,       I4_PRED_DDL,     I4_PRED_VL,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID},     //  1010
 
-	{ 
-	I4_PRED_DC,      I4_PRED_H,       I4_PRED_V,       I4_PRED_HU, 
-	I4_PRED_DDL,     I4_PRED_VL,      I4_PRED_INVALID, I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID},          //  1011 
+	{
+	I4_PRED_DC,      I4_PRED_H,       I4_PRED_V,       I4_PRED_HU,
+	I4_PRED_DDL,     I4_PRED_VL,      I4_PRED_INVALID, I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID},          //  1011
 
-	{ 
-	I4_PRED_DC_128,  I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
+	{
+	I4_PRED_DC_128,  I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID},  //  1100
 
-	{ 
-	I4_PRED_DC_L,    I4_PRED_H,       I4_PRED_HU,      I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
+	{
+	I4_PRED_DC_L,    I4_PRED_H,       I4_PRED_HU,      I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID},    //  1101
 
-	{ 
-	I4_PRED_DC_T,    I4_PRED_V,       I4_PRED_DDL,     I4_PRED_VL, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
+	{
+	I4_PRED_DC_T,    I4_PRED_V,       I4_PRED_DDL,     I4_PRED_VL,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
 	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID},     //  1110
 
-	{ 
-	I4_PRED_DC,      I4_PRED_H,       I4_PRED_V,       I4_PRED_HU, 
-	I4_PRED_DDL,     I4_PRED_VL,      I4_PRED_DDR,     I4_PRED_VR, 
-	I4_PRED_HD,      I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, 
-	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID}                          //  1111 
+	{
+	I4_PRED_DC,      I4_PRED_H,       I4_PRED_V,       I4_PRED_HU,
+	I4_PRED_DDL,     I4_PRED_VL,      I4_PRED_DDR,     I4_PRED_VR,
+	I4_PRED_HD,      I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID,
+	I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID, I4_PRED_INVALID}                          //  1111
 
 };
 static const ALIGNED_DECLARE(int8_t, g_kiIntraChromaAvailMode[8][5], 16) = {
@@ -198,7 +198,7 @@ static const ALIGNED_DECLARE(int8_t, g_kiIntraChromaAvailMode[8][5], 16) = {
 		{ C_PRED_DC_128, C_PRED_INVALID, C_PRED_INVALID, C_PRED_INVALID, 1 },
 		{ C_PRED_DC_L,   C_PRED_H,       C_PRED_INVALID, C_PRED_INVALID, 2 },
 		{ C_PRED_DC_T,   C_PRED_V,       C_PRED_INVALID, C_PRED_INVALID, 2 },
-		{ C_PRED_V,      C_PRED_H,       C_PRED_DC,      C_PRED_P,       4 }		
+		{ C_PRED_V,      C_PRED_H,       C_PRED_DC,      C_PRED_P,       4 }
 };
 
 // for cache hit, two table are total sizeof 64 Bytes
@@ -211,7 +211,7 @@ const int8_t g_kiCoordinateIdx4x4Y[16] = { 0, 0, 4, 4,
 										  0, 0, 4, 4,
 										  8, 8, 12, 12,
 										  8, 8, 12, 12};
-static const ALIGNED_DECLARE(int8_t, g_kiNeighborIntraToI4x4[16][16], 16) = 
+static const ALIGNED_DECLARE(int8_t, g_kiNeighborIntraToI4x4[16][16], 16) =
 {
 	{	0,	1,	10,	7,	1,	1,	15,	7,	10,	15,	10,	7,	15,	7,	15,	7},
 	{	1,	1,	15,	7,	1,	1,	15,	7,	15,	15,	15,	7,	15,	7,	15,	7},
@@ -230,12 +230,12 @@ static const ALIGNED_DECLARE(int8_t, g_kiNeighborIntraToI4x4[16][16], 16) =
 	{	14,	15,	10,	7,	15,	15,	15,	7,	10,	15,	10,	7,	15,	7,	15,	7},
 	{	15,	15,	15,	7,	15,	15,	15,	7,	15,	15,	15,	7,	15,	7,	15,	7},
 };
-	
+
 __align16(const int8_t,g_kiMapModeI4x4[14]) =
 {
 	0, 1, 2, 3, 4, 5, 6, 7, 8, 2, 2, 2, 3, 7
 };
-	
+
 int32_t PredIntra4x4Mode(int8_t* pIntraPredMode, int32_t iIdx4)
 {
 	int8_t iTopMode = pIntraPredMode[iIdx4 - 8];
@@ -247,15 +247,15 @@ int32_t PredIntra4x4Mode(int8_t* pIntraPredMode, int32_t iIdx4)
 		iBestMode = 2;
 	}
 	else
-	{	
+	{
 		iBestMode = WELS_MIN(iLeftMode, iTopMode);
 	}
 	return iBestMode;
 }
 
 void WelsMdIntraInit(sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache *pMbCache, const int32_t iSliceFirstMbXY)
-{	
-	SDqLayer* pCurLayer = pEncCtx->pCurDqLayer;	
+{
+	SDqLayer* pCurLayer = pEncCtx->pCurDqLayer;
 
 	const int32_t kiMbX  = pCurMb->iMbX;
 	const int32_t kiMbY  = pCurMb->iMbY;
@@ -264,7 +264,7 @@ void WelsMdIntraInit(sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache *pMbCache, cons
 	// step 3. locating current pEnc and pDec
 	// unroll loops here
 	if( 0 == kiMbX || iSliceFirstMbXY == kiMbXY )
-	{   
+	{
 		int32_t iStrideY, iStrideUV;
 		int32_t iOffsetY, iOffsetUV;
 
@@ -309,7 +309,7 @@ void WelsMdIntraInit(sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache *pMbCache, cons
 
 	//step 2. initial pWelsMd
 	pCurMb->uiCbp			= 0;
-   
+
 	//step 4: locating scaled_tcoeff
 
 	//step 1. load neighbor cache
@@ -319,30 +319,30 @@ void WelsMdIntraInit(sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache *pMbCache, cons
 }
 
 void WelsMdInterInit( sWelsEncCtx* pEncCtx, SSlice *pSlice, SMB* pCurMb, const int32_t iSliceFirstMbXY )
-{	
+{
 	SDqLayer* pCurLayer = pEncCtx->pCurDqLayer;
-	SMbCache *pMbCache	= &pSlice->sMbCacheInfo;	
+	SMbCache *pMbCache	= &pSlice->sMbCacheInfo;
 	const int32_t kiMbX  = pCurMb->iMbX;
 	const int32_t kiMbY  = pCurMb->iMbY;
 	const int32_t kiMbXY	= pCurMb->iMbXY;
 	const int32_t kiMbWidth = pCurLayer->iMbWidth;
 	const int32_t kiMbHeight= pCurLayer->iMbHeight;
 
-	pMbCache->pEncSad		= &pCurLayer->pDecPic->pMbSkipSad[kiMbXY]; 
+	pMbCache->pEncSad		= &pCurLayer->pDecPic->pMbSkipSad[kiMbXY];
 
 	//step 1. load neighbor cache
-	pEncCtx->pFuncList->pfFillInterNeighborCache(pMbCache, pCurMb, kiMbWidth, pEncCtx->pVaa->pVaaBackgroundMbFlag+kiMbXY); //BGD spatial pFunc   
-	
+	pEncCtx->pFuncList->pfFillInterNeighborCache(pMbCache, pCurMb, kiMbWidth, pEncCtx->pVaa->pVaaBackgroundMbFlag+kiMbXY); //BGD spatial pFunc
+
 	//step 3: initial cost
 
 	//step 4. locating current p_ref
 	// merge loops
 	if( 0 == kiMbX || iSliceFirstMbXY == kiMbXY )
-	{   
+	{
 		const int32_t kiRefStrideY	= pCurLayer->pRefPic->iLineSize[0];
 		const int32_t kiRefStrideUV	= pCurLayer->pRefPic->iLineSize[1];
 		const int32_t kiCurStrideY	= (kiMbX + kiMbY * kiRefStrideY) << 4;
-		const int32_t kiCurStrideUV	= (kiMbX + kiMbY * kiRefStrideUV) << 3;	
+		const int32_t kiCurStrideUV	= (kiMbX + kiMbY * kiRefStrideUV) << 3;
 		pMbCache->SPicData.pRefMb[0]	= pCurLayer->pRefPic->pData[0] + kiCurStrideY;
 		pMbCache->SPicData.pRefMb[1]	= pCurLayer->pRefPic->pData[1] + kiCurStrideUV;
 		pMbCache->SPicData.pRefMb[2]	= pCurLayer->pRefPic->pData[2] + kiCurStrideUV;
@@ -378,7 +378,7 @@ void WelsMdInterInit( sWelsEncCtx* pEncCtx, SSlice *pSlice, SMB* pCurMb, const i
 int32_t WelsMdI16x16(SWelsFuncPtrList *pFunc, SDqLayer *pCurDqLayer, SMbCache *pMbCache, int32_t iLambda)
 {
 	const int8_t  *kpAvailMode;
-	int32_t iAvailCount;	
+	int32_t iAvailCount;
 	int32_t iIdx = 0;
 	uint8_t* pPredI16x16[2] = {pMbCache->pMemPredMb, pMbCache->pMemPredMb + 256};
 	uint8_t *pDst		= pPredI16x16[0];
@@ -431,7 +431,7 @@ int32_t WelsMdI16x16(SWelsFuncPtrList *pFunc, SDqLayer *pCurDqLayer, SMbCache *p
 		}
 	}
 	pMbCache->pMemPredChroma = pPredI16x16[iIdx];
-	
+
 	pMbCache->pMemPredLuma = pPredI16x16[iIdx ^ 0x01];
 	pMbCache->uiLumaI16x16Mode  = iBestMode;
 	return iBestCost;
@@ -450,7 +450,7 @@ int32_t WelsMdI4x4(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 	const int32_t kiLineSizeDec		= pCurDqLayer->iCsStride[0];
 
 	uint8_t *pCurEnc, *pCurDec, *pDst;
-	
+
 	int32_t iPredMode, iCurMode, iBestMode, iFinalMode;
 	int32_t iCurCost, iBestCost;
 	int32_t iAvailCount;
@@ -466,20 +466,20 @@ int32_t WelsMdI4x4(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 	const int8_t* kpCoordinateIdxY			= &g_kiCoordinateIdx4x4Y[0];
     int32_t iBestPredBufferNum			= 0;
     int32_t iCosti4x4						= 0;
-	
-#if defined(X86_ASM)	
+
+#if defined(X86_ASM)
 	WelsPrefetchZero_mmx(g_kiMapModeI4x4);
 	WelsPrefetchZero_mmx((int8_t *)&pFunc->pfGetLumaI4x4Pred);
 #endif//X86_ASM
 
-	for (i = 0; i < 16; i++) 
+	for (i = 0; i < 16; i++)
 	{
 		const int32_t kiOffset	= kpNeighborIntraToI4x4[i];
 
 		//step 1: locating current 4x4 block position in pEnc and pDecMb
 		iCoordinateX = kpCoordinateIdxX[i];
 		iCoordinateY = kpCoordinateIdxY[i];
-		
+
 		iIdxStrideEnc = (iCoordinateY * kiLineSizeEnc) + iCoordinateX;
 		pCurEnc = pEncMb + iIdxStrideEnc;
 		iIdxStrideDec = (iCoordinateY * kiLineSizeDec) + iCoordinateX;
@@ -488,19 +488,19 @@ int32_t WelsMdI4x4(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 		//step 2: get predicted mode from neighbor
 		iPredMode = PredIntra4x4Mode(pMbCache->iIntraPredMode, kpCache48CountScan4[i]);
 
-		//step 3: collect candidates of iPredMode		
+		//step 3: collect candidates of iPredMode
 		iAvailCount = kpIntra4x4AvailCount[kiOffset];
 		kpAvailMode = g_kiIntra4AvailMode[kiOffset];
 
-		//step 4: gain the best pred mode        
+		//step 4: gain the best pred mode
 		iBestCost = INT_MAX;
 		iBestMode = kpAvailMode[0];
-		
+
 		if (pFunc->sSampleDealingFuncs.pfIntra4x4Combined3Satd && (iAvailCount >= 6))
 		{
 			pDst = &pMbCache->pMemPredBlk4[iBestPredBufferNum << 4];
 
-			iBestCost = pFunc->sSampleDealingFuncs.pfIntra4x4Combined3(pCurDec, kiLineSizeDec, pCurEnc, kiLineSizeEnc, pDst, &iBestMode, 
+			iBestCost = pFunc->sSampleDealingFuncs.pfIntra4x4Combined3(pCurDec, kiLineSizeDec, pCurEnc, kiLineSizeEnc, pDst, &iBestMode,
 				lambda[iPredMode == 2], lambda[iPredMode == 1], lambda[iPredMode == 0]);
                //     ST64(&pMbCache->pMemPredBlk4[iBestMode<<4], LD64(mem_pred_blk4_temp));
                //     ST64(&pMbCache->pMemPredBlk4[8+(iBestMode<<4)], LD64(mem_pred_blk4_temp+8));
@@ -508,7 +508,7 @@ int32_t WelsMdI4x4(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
         		for (j = 3; j < iAvailCount; ++ j)
         		{
         			iCurMode = kpAvailMode[j];
-        			
+
         			assert( iCurMode >= 0 && iCurMode < 14 );
 
         			pDst = &pMbCache->pMemPredBlk4[(1 - iBestPredBufferNum) << 4];
@@ -516,9 +516,9 @@ int32_t WelsMdI4x4(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
         			pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec);
         			iCurCost = pFunc->sSampleDealingFuncs.pfSampleSatd[BLOCK_4x4](pDst, 4, pCurEnc, kiLineSizeEnc) +
         				lambda[iPredMode == g_kiMapModeI4x4[iCurMode]];
-        			
+
         			if (iCurCost < iBestCost)
-        			{			
+        			{
         				iBestMode = iCurMode;
         				iBestCost = iCurCost;
 						iBestPredBufferNum = 1 - iBestPredBufferNum;
@@ -530,7 +530,7 @@ int32_t WelsMdI4x4(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 			for (j = 0; j < iAvailCount; ++ j)
 			{
 				iCurMode = kpAvailMode[j];
-				
+
 				assert( iCurMode >= 0 && iCurMode < 14 );
 
 				pDst = &pMbCache->pMemPredBlk4[(1 - iBestPredBufferNum) << 4];
@@ -538,9 +538,9 @@ int32_t WelsMdI4x4(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 				pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec);
 				iCurCost = pFunc->sSampleDealingFuncs.pfSampleSatd[BLOCK_4x4](pDst, 4, pCurEnc, kiLineSizeEnc) +
 					lambda[iPredMode == g_kiMapModeI4x4[iCurMode]];
-				
+
 				if (iCurCost < iBestCost)
-				{			
+				{
 					iBestMode = iCurMode;
 					iBestCost = iCurCost;
 					iBestPredBufferNum = 1 - iBestPredBufferNum;
@@ -553,7 +553,7 @@ int32_t WelsMdI4x4(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 		{
 			break;
 		}
-		
+
 		//step 5: update pred mode and sample avail cache
 		iFinalMode = g_kiMapModeI4x4[iBestMode];
 		if (iPredMode == iFinalMode)
@@ -563,13 +563,13 @@ int32_t WelsMdI4x4(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 		else
 		{
 			*pPrevIntra4x4PredModeFlag++ = false;
-			*pRemIntra4x4PredModeFlag  = (iFinalMode < iPredMode ? iFinalMode: (iFinalMode-1));						
+			*pRemIntra4x4PredModeFlag  = (iFinalMode < iPredMode ? iFinalMode: (iFinalMode-1));
 		}
 		pRemIntra4x4PredModeFlag++;
 	//	pCurMb->pIntra4x4PredMode[g_kuiMbCountScan4Idx[i]] = iFinalMode;
 		pMbCache->iIntraPredMode[kpCache48CountScan4[i]] = iFinalMode;
 
-		//step 6: encoding I_4x4 
+		//step 6: encoding I_4x4
 		WelsEncRecI4x4Y(pEncCtx, pCurMb, pMbCache, i);
 	}
 	ST32(pCurMb->pIntra4x4PredMode, LD32(&pMbCache->iIntraPredMode[33]));
@@ -582,10 +582,10 @@ int32_t WelsMdI4x4(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 
 int32_t WelsMdI4x4Fast(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 {
-	sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pEnc;	
+	sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pEnc;
 	SWelsFuncPtrList *pFunc		= pEncCtx->pFuncList;
 	SWelsMD *pWelsMd					= (SWelsMD*)pMd;
-	SDqLayer *pCurDqLayer			= pEncCtx->pCurDqLayer;	
+	SDqLayer *pCurDqLayer			= pEncCtx->pCurDqLayer;
 	int32_t iLambda				= pWelsMd->iLambda;
 	int32_t iBestCostLuma				= pWelsMd->iCostLuma;
 	uint8_t *pEncMb					= pMbCache->SPicData.pEncMb[0];
@@ -602,10 +602,10 @@ int32_t WelsMdI4x4Fast(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 	int32_t iCostH, iCostV, iCostVR, iCostHD, iCostVL, iCostHU, iBestModeFake;
 	int32_t lambda[2]						= {iLambda<<2, iLambda};
 	bool_t* pPrevIntra4x4PredModeFlag	= pMbCache->pPrevIntra4x4PredModeFlag;
-	int8_t* pRemIntra4x4PredModeFlag		= pMbCache->pRemIntra4x4PredModeFlag;	
+	int8_t* pRemIntra4x4PredModeFlag		= pMbCache->pRemIntra4x4PredModeFlag;
 	const uint8_t* kpIntra4x4AvailCount		= &g_kiIntra4AvailCount[0];
 	const uint8_t* kpCache48CountScan4		= &g_kuiCache48CountScan4Idx[0];
-	const int8_t* kpNeighborIntraToI4x4	= g_kiNeighborIntraToI4x4[pMbCache->uiNeighborIntra];	
+	const int8_t* kpNeighborIntraToI4x4	= g_kiNeighborIntraToI4x4[pMbCache->uiNeighborIntra];
 	const int8_t* kpCoordinateIdxX			= &g_kiCoordinateIdx4x4X[0];
 	const int8_t* kpCoordinateIdxY			= &g_kiCoordinateIdx4x4Y[0];
 	int32_t iBestPredBufferNum			= 0;
@@ -615,15 +615,15 @@ int32_t WelsMdI4x4Fast(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 	WelsPrefetchZero_mmx((int8_t *)&pFunc->pfGetLumaI4x4Pred);
 #endif//X86_ASM
 
-	for (i = 0; i < 16; i++) 
+	for (i = 0; i < 16; i++)
 	{
 		const int32_t kiOffset	= kpNeighborIntraToI4x4[i];
 //		const int32_t i_next	= (1+i) & 15;												// next loop
 //		const uint8_t dummy_byte= pIntra4x4AvailCount[pNeighborIntraToI4x4[i_next]];	// prefetch pIntra4x4AvailCount of next loop to avoid cache missed
-		
+
 		//step 1: locating current 4x4 block position in pEnc and pDecMb
 		iCoordinateX = kpCoordinateIdxX[i];
-		iCoordinateY = kpCoordinateIdxY[i];		
+		iCoordinateY = kpCoordinateIdxY[i];
 
 		iIdxStrideEnc = (iCoordinateY * kiLineSizeEnc) + iCoordinateX;
 		pCurEnc = pEncMb + iIdxStrideEnc;
@@ -632,7 +632,7 @@ int32_t WelsMdI4x4Fast(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 
 		//step 2: get predicted mode from neighbor
 		iPredMode = PredIntra4x4Mode(pMbCache->iIntraPredMode, kpCache48CountScan4[i]);
-		//step 3: collect candidates of iPredMode		
+		//step 3: collect candidates of iPredMode
 		iAvailCount = kpIntra4x4AvailCount[kiOffset];
 		kpAvailMode = g_kiIntra4AvailMode[kiOffset];
 
@@ -646,37 +646,37 @@ int32_t WelsMdI4x4Fast(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 
 			pFunc->pfGetLumaI4x4Pred[I4_PRED_DC](pDst, pCurDec, kiLineSizeDec);
 			iBestCost = pFunc->sSampleDealingFuncs.pfMdCost[BLOCK_4x4](pDst, 4, pCurEnc, kiLineSizeEnc) +
-				lambda[iPredMode == g_kiMapModeI4x4[iBestMode]];	
+				lambda[iPredMode == g_kiMapModeI4x4[iBestMode]];
 
-			//I4_PRED_H(1)			
-			iCurMode = I4_PRED_H; 
+			//I4_PRED_H(1)
+			iCurMode = I4_PRED_H;
 
 			pDst = &pMbCache->pMemPredBlk4[(1 - iBestPredBufferNum) << 4];
 
-			pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec); 
+			pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec);
 			iCostH = iCurCost = pFunc->sSampleDealingFuncs.pfMdCost[BLOCK_4x4](pDst, 4, pCurEnc, kiLineSizeEnc) +
 				lambda[iPredMode == g_kiMapModeI4x4[iCurMode]];
 
-			if (iCurCost < iBestCost) 
-			{ 
-				iBestMode = iCurMode; 
-				iBestCost = iCurCost; 
+			if (iCurCost < iBestCost)
+			{
+				iBestMode = iCurMode;
+				iBestCost = iCurCost;
 				iBestPredBufferNum = 1 - iBestPredBufferNum;
 			}
 
 			//I4_PRED_V(0)
-			iCurMode = I4_PRED_V; 
+			iCurMode = I4_PRED_V;
 
 			pDst = &pMbCache->pMemPredBlk4[(1 - iBestPredBufferNum) << 4];
 
-			pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec); 
+			pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec);
 			iCostV = iCurCost = pFunc->sSampleDealingFuncs.pfMdCost[BLOCK_4x4](pDst, 4, pCurEnc, kiLineSizeEnc) +
 				lambda[iPredMode == g_kiMapModeI4x4[iCurMode]];
 
-			if (iCurCost < iBestCost) 
-			{ 
-				iBestMode = iCurMode; 
-				iBestCost = iCurCost; 
+			if (iCurCost < iBestCost)
+			{
+				iBestMode = iCurMode;
+				iBestCost = iCurCost;
 				iBestPredBufferNum = 1 - iBestPredBufferNum;
 			}
 			if ( iCostV < iCostH )
@@ -686,41 +686,41 @@ int32_t WelsMdI4x4Fast(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 					iBestModeFake = true; //indicating whether V is the best fake mode
 
 					//I4_PRED_VR(5) and I4_PRED_VL(7)
-					iCurMode = I4_PRED_VR; 
+					iCurMode = I4_PRED_VR;
 
 					pDst = &pMbCache->pMemPredBlk4[(1 - iBestPredBufferNum) << 4];
 
-					pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec); 
+					pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec);
 					iCostVR = iCurCost = pFunc->sSampleDealingFuncs.pfMdCost[BLOCK_4x4](pDst, 4, pCurEnc, kiLineSizeEnc) +
 						lambda[iPredMode == g_kiMapModeI4x4[iCurMode]];
 
-					if (iCurCost < iBestCost) 
-					{ 
-						iBestMode = iCurMode; 
-						iBestCost = iCurCost; 
+					if (iCurCost < iBestCost)
+					{
+						iBestMode = iCurMode;
+						iBestCost = iCurCost;
 						iBestPredBufferNum = 1 - iBestPredBufferNum;
 					}
 
-					if (iCurCost < iCostV) 
+					if (iCurCost < iCostV)
 						iBestModeFake = false;
 
-					iCurMode = I4_PRED_VL; 
+					iCurMode = I4_PRED_VL;
 
 					pDst = &pMbCache->pMemPredBlk4[(1 - iBestPredBufferNum) << 4];
 
-					pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec); 
+					pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec);
 					iCostVL = iCurCost = pFunc->sSampleDealingFuncs.pfMdCost[BLOCK_4x4](pDst, 4, pCurEnc, kiLineSizeEnc) +
 						lambda[iPredMode == g_kiMapModeI4x4[iCurMode]];
 
-					if (iCurCost < iBestCost) 
-					{ 
-						iBestMode = iCurMode; 
-						iBestCost = iCurCost; 
+					if (iCurCost < iBestCost)
+					{
+						iBestMode = iCurMode;
+						iBestCost = iCurCost;
 						iBestPredBufferNum = 1 - iBestPredBufferNum;
 					}
 
-					if (iCurCost < iCostV) 
-						iBestModeFake = false;	
+					if (iCurCost < iCostV)
+						iBestModeFake = false;
 
 					//Vertical Early Determination
 					if ( !iBestModeFake ) //Vertical is not the best, go on checking...
@@ -729,19 +729,19 @@ int32_t WelsMdI4x4Fast(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 						if (iCostVR < iCostVL)
 						{
 							//I4_PRED_DDR(4)
-							iCurMode = I4_PRED_DDR; 
+							iCurMode = I4_PRED_DDR;
 
 							pDst = &pMbCache->pMemPredBlk4[(1 - iBestPredBufferNum) << 4];
 
-							pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec); 
+							pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec);
 
 							iCurCost = pFunc->sSampleDealingFuncs.pfMdCost[BLOCK_4x4](pDst, 4, pCurEnc, kiLineSizeEnc) +
 								lambda[iPredMode == g_kiMapModeI4x4[iCurMode]];
 
-							if (iCurCost < iBestCost) 
-							{ 
-								iBestMode = iCurMode; 
-								iBestCost = iCurCost; 
+							if (iCurCost < iBestCost)
+							{
+								iBestMode = iCurMode;
+								iBestCost = iCurCost;
 								iBestPredBufferNum = 1 - iBestPredBufferNum;
 							}
 						}
@@ -752,15 +752,15 @@ int32_t WelsMdI4x4Fast(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 
 							pDst = &pMbCache->pMemPredBlk4[(1 - iBestPredBufferNum) << 4];
 
-							pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec); 
+							pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec);
 
 							iCurCost = pFunc->sSampleDealingFuncs.pfMdCost[BLOCK_4x4](pDst, 4, pCurEnc, kiLineSizeEnc) +
 								lambda[iPredMode == g_kiMapModeI4x4[iCurMode]];
 
-							if (iCurCost < iBestCost) 
-							{ 
-								iBestMode = iCurMode; 
-								iBestCost = iCurCost; 
+							if (iCurCost < iBestCost)
+							{
+								iBestMode = iCurMode;
+								iBestCost = iCurCost;
 								iBestPredBufferNum = 1 - iBestPredBufferNum;
 							}
 						}
@@ -768,77 +768,77 @@ int32_t WelsMdI4x4Fast(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 				}
 				else if(iAvailCount == 7)
 				{
-					iCurMode = I4_PRED_DDR; 
+					iCurMode = I4_PRED_DDR;
 
 					pDst = &pMbCache->pMemPredBlk4[(1 - iBestPredBufferNum) << 4];
 
-					pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec); 				
+					pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec);
 					iCurCost = pFunc->sSampleDealingFuncs.pfMdCost[BLOCK_4x4](pDst, 4, pCurEnc, kiLineSizeEnc) +
 						lambda[iPredMode == g_kiMapModeI4x4[iCurMode]];
 
-					if (iCurCost < iBestCost) 
-					{ 
-						iBestMode = iCurMode; 
-						iBestCost = iCurCost; 
+					if (iCurCost < iBestCost)
+					{
+						iBestMode = iCurMode;
+						iBestCost = iCurCost;
 						iBestPredBufferNum = 1 - iBestPredBufferNum;
-					}			
+					}
 
-					iCurMode = I4_PRED_VR; 
+					iCurMode = I4_PRED_VR;
 
 					pDst = &pMbCache->pMemPredBlk4[(1 - iBestPredBufferNum) << 4];
 
-					pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec); 
+					pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec);
 
 					iCurCost = pFunc->sSampleDealingFuncs.pfMdCost[BLOCK_4x4](pDst, 4, pCurEnc, kiLineSizeEnc) +
 						lambda[iPredMode == g_kiMapModeI4x4[iCurMode]];
 
-					if (iCurCost < iBestCost) 
-					{ 
-						iBestMode = iCurMode; 
-						iBestCost = iCurCost; 
+					if (iCurCost < iBestCost)
+					{
+						iBestMode = iCurMode;
+						iBestCost = iCurCost;
 						iBestPredBufferNum = 1 - iBestPredBufferNum;
-					}			
+					}
 				}
 			}
 			else
 			{
 				iBestModeFake = true; //indicating whether H is the best fake mode
 				//I4_PRED_HD(6) and I4_PRED_HU(8)
-				iCurMode = I4_PRED_HD; 
+				iCurMode = I4_PRED_HD;
 
 				pDst = &pMbCache->pMemPredBlk4[(1 - iBestPredBufferNum) << 4];
 
-				pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec); 
+				pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec);
 				iCostHD = iCurCost = pFunc->sSampleDealingFuncs.pfMdCost[BLOCK_4x4](pDst, 4, pCurEnc, kiLineSizeEnc) +
 					lambda[iPredMode == g_kiMapModeI4x4[iCurMode]];
 
-				if (iCurCost < iBestCost) 
-				{ 
-					iBestMode = iCurMode; 
-					iBestCost = iCurCost; 
+				if (iCurCost < iBestCost)
+				{
+					iBestMode = iCurMode;
+					iBestCost = iCurCost;
 					iBestPredBufferNum = 1 - iBestPredBufferNum;
-				}			
+				}
 
-				if (iCurCost < iCostH) 
+				if (iCurCost < iCostH)
 					iBestModeFake = false;
 
-				iCurMode = I4_PRED_HU; 
+				iCurMode = I4_PRED_HU;
 
 				pDst = &pMbCache->pMemPredBlk4[(1 - iBestPredBufferNum) << 4];
 
-				pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec); 
+				pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec);
 				iCostHU = iCurCost = pFunc->sSampleDealingFuncs.pfMdCost[BLOCK_4x4](pDst, 4, pCurEnc, kiLineSizeEnc) +
 					lambda[iPredMode == g_kiMapModeI4x4[iCurMode]];
 
-				if (iCurCost < iBestCost) 
-				{ 
-					iBestMode = iCurMode; 
-					iBestCost = iCurCost; 
+				if (iCurCost < iBestCost)
+				{
+					iBestMode = iCurMode;
+					iBestCost = iCurCost;
 					iBestPredBufferNum = 1 - iBestPredBufferNum;
-				}			
+				}
 
-				if (iCurCost < iCostH) 
-					iBestModeFake = false;	
+				if (iCurCost < iCostH)
+					iBestModeFake = false;
 
 				if ( !iBestModeFake ) //Horizontal is not the best, go on checking...
 				{
@@ -846,36 +846,36 @@ int32_t WelsMdI4x4Fast(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 					if (iCostHD < iCostHU)
 					{
 						//I4_PRED_DDR(4)
-						iCurMode = I4_PRED_DDR; 
+						iCurMode = I4_PRED_DDR;
 
 						pDst = &pMbCache->pMemPredBlk4[(1 - iBestPredBufferNum) << 4];
 
-						pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec); 
+						pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec);
 						iCurCost = pFunc->sSampleDealingFuncs.pfMdCost[BLOCK_4x4](pDst, 4, pCurEnc, kiLineSizeEnc) +
 							lambda[iPredMode == g_kiMapModeI4x4[iCurMode]];
 
-						if (iCurCost < iBestCost) 
-						{ 
-							iBestMode = iCurMode; 
-							iBestCost = iCurCost; 
+						if (iCurCost < iBestCost)
+						{
+							iBestMode = iCurMode;
+							iBestCost = iCurCost;
 							iBestPredBufferNum = 1 - iBestPredBufferNum;
-						}			
+						}
 					}
 					else if(iAvailCount == 9)
 					{
 						//I4_PRED_DDL(3)
-						iCurMode = I4_PRED_DDL; 
+						iCurMode = I4_PRED_DDL;
 
 						pDst = &pMbCache->pMemPredBlk4[(1 - iBestPredBufferNum) << 4];
-						pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec); 
+						pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec);
 
 						iCurCost = pFunc->sSampleDealingFuncs.pfMdCost[BLOCK_4x4](pDst, 4, pCurEnc, kiLineSizeEnc) +
 							lambda[iPredMode == g_kiMapModeI4x4[iCurMode]];
 
-						if (iCurCost < iBestCost) 
-						{ 
-							iBestMode = iCurMode; 
-							iBestCost = iCurCost; 
+						if (iCurCost < iBestCost)
+						{
+							iBestMode = iCurMode;
+							iBestCost = iCurCost;
 							iBestPredBufferNum = 1 - iBestPredBufferNum;
 						}
 
@@ -890,20 +890,20 @@ int32_t WelsMdI4x4Fast(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 			for (j = 0; j < iAvailCount; j++)
 			{
 				// I4x4_MODE_CHECK(pAvailMode[j], iCurCost);
-				iCurMode = kpAvailMode[j]; 
+				iCurMode = kpAvailMode[j];
 
 				pDst = &pMbCache->pMemPredBlk4[(1 - iBestPredBufferNum) << 4];
 
-				pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec); 
+				pFunc->pfGetLumaI4x4Pred[iCurMode](pDst, pCurDec, kiLineSizeDec);
 				iCurCost = pFunc->sSampleDealingFuncs.pfMdCost[BLOCK_4x4](pDst, 4, pCurEnc, kiLineSizeEnc) +
 					lambda[iPredMode == g_kiMapModeI4x4[iCurMode]];
 
-				if (iCurCost < iBestCost) 
-				{ 
-					iBestMode = iCurMode; 
-					iBestCost = iCurCost; 
+				if (iCurCost < iBestCost)
+				{
+					iBestMode = iCurMode;
+					iBestCost = iCurCost;
 					iBestPredBufferNum = 1 - iBestPredBufferNum;
-				}			
+				}
 			}
 		}
 		pMbCache->pBestPredI4x4Blk4 = &pMbCache->pMemPredBlk4[iBestPredBufferNum << 4];
@@ -922,19 +922,19 @@ int32_t WelsMdI4x4Fast(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 		else
 		{
 			*pPrevIntra4x4PredModeFlag++ = false;
-			*pRemIntra4x4PredModeFlag  = (iFinalMode < iPredMode ? iFinalMode: (iFinalMode-1));						
+			*pRemIntra4x4PredModeFlag  = (iFinalMode < iPredMode ? iFinalMode: (iFinalMode-1));
 		}
 		pRemIntra4x4PredModeFlag++;
 		//	pCurMb->pIntra4x4PredMode[scan4[i]] = iFinalMode;
 	    pMbCache->iIntraPredMode[kpCache48CountScan4[i]] = iFinalMode;
-		//step 6: encoding I_4x4 
+		//step 6: encoding I_4x4
 		WelsEncRecI4x4Y(pEncCtx, pCurMb, pMbCache, i);
 	}
 	ST32(pCurMb->pIntra4x4PredMode, LD32(&pMbCache->iIntraPredMode[33]));
 	pCurMb->pIntra4x4PredMode[4] = pMbCache->iIntraPredMode[12];
 	pCurMb->pIntra4x4PredMode[5] =	pMbCache->iIntraPredMode[20];
 	pCurMb->pIntra4x4PredMode[6] = pMbCache->iIntraPredMode[28];
-	iCosti4x4 += (iLambda << 4) + (iLambda << 3); //4*6*lambda from JVT SATD0	
+	iCosti4x4 += (iLambda << 4) + (iLambda << 3); //4*6*lambda from JVT SATD0
 	return iCosti4x4;
 }
 
@@ -1013,11 +1013,11 @@ int32_t WelsMdIntraChroma(SWelsFuncPtrList *pFunc, SDqLayer *pCurDqLayer, SMbCac
 }
 int32_t WelsMdIntraFinePartition(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 {
-	sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pEnc;	
+	sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pEnc;
 	SWelsMD* pWelsMd = (SWelsMD*)pMd;
-    
+
 	int32_t iCosti4x4 = WelsMdI4x4( pEncCtx, pWelsMd, pCurMb, pMbCache);
-	
+
 	if (iCosti4x4 < pWelsMd->iCostLuma)
 	{
 		pCurMb->uiMbType = MB_TYPE_INTRA4x4;
@@ -1027,26 +1027,26 @@ int32_t WelsMdIntraFinePartition(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *p
 }
 
 int32_t WelsMdIntraFinePartitionVaa(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
-{	
-	sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pEnc;	
+{
+	sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pEnc;
 	SWelsMD* pWelsMd = (SWelsMD*)pMd;
-    
+
 	if ( MdIntraAnalysisVaaInfo( pEncCtx, pMbCache->SPicData.pEncMb[0] ) )
 	{
-		int32_t iCosti4x4 = WelsMdI4x4Fast( pEncCtx, pWelsMd, pCurMb, pMbCache );	
-		
+		int32_t iCosti4x4 = WelsMdI4x4Fast( pEncCtx, pWelsMd, pCurMb, pMbCache );
+
 		if (iCosti4x4 < pWelsMd->iCostLuma)
 		{
 			pCurMb->uiMbType = MB_TYPE_INTRA4x4;
 			pWelsMd->iCostLuma = iCosti4x4;
-		}						
+		}
     }
 
     return pWelsMd->iCostLuma;
 }
 
 void WelsMdIntraMb(sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache *pMbCache)
-{		
+{
 	//initial prediction memory for I_16x16
 	pWelsMd->iCostLuma = WelsMdI16x16(pEncCtx->pFuncList, pEncCtx->pCurDqLayer, pMbCache, pWelsMd->iLambda);
 	pCurMb->uiMbType = MB_TYPE_INTRA16x16;
@@ -1078,7 +1078,7 @@ int32_t WelsMdP16x16(SWelsFuncPtrList *pFunc, SDqLayer* pCurLayer, SWelsMD* pWel
 	}
 	if(uiNeighborAvail & TOP_MB_POS) //top available
 	{
-		pSlice->sMvc[pSlice->uiMvcNum++] = (pCurMb-kiMbWidth)->sP16x16Mv;		
+		pSlice->sMvc[pSlice->uiMvcNum++] = (pCurMb-kiMbWidth)->sP16x16Mv;
 	}
 	//temporal motion vector predictors
 	if (pCurLayer->pRefPic->iPictureType == P_SLICE)
@@ -1100,7 +1100,7 @@ int32_t WelsMdP16x16(SWelsFuncPtrList *pFunc, SDqLayer* pCurLayer, SWelsMD* pWel
 	}
 
 	PredMv(&pMbCache->sMvComponents, 0, 4, 0, &(sMe16x16->sMvp));
-	pFunc->pfMotionSearch(pFunc, pCurLayer, sMe16x16, pSlice);	
+	pFunc->pfMotionSearch(pFunc, pCurLayer, sMe16x16, pSlice);
 //	update_p16x16_motion2cache(pMbCache, pWelsMd->uiRef, &(sMe16x16->mv));
 
 	pCurMb->sP16x16Mv = sMe16x16->sMv;
@@ -1113,10 +1113,10 @@ int32_t WelsMdP16x8(SWelsFuncPtrList *pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWe
 	SMbCache *pMbCache = &pSlice->sMbCacheInfo;
 	int32_t iStrideEnc = pCurDqLayer->iEncStride[0];
 	int32_t iStrideRef = pCurDqLayer->pRefPic->iLineSize[0];
-	SWelsME* sMe16x8; 
+	SWelsME* sMe16x8;
 	int32_t i = 0;
 	int32_t iCostP16x8 = 0;
-	do 
+	do
 	{
 		sMe16x8 = &pWelsMd->sMe.sMe16x8[i];
 
@@ -1124,14 +1124,14 @@ int32_t WelsMdP16x8(SWelsFuncPtrList *pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWe
 		sMe16x8->pMvdCost	 = pWelsMd->pMvdCost;
 
 		sMe16x8->pEncMb       = pMbCache->SPicData.pEncMb[0] + ((i << 3) * iStrideEnc);
-		sMe16x8->pRefMb       = pMbCache->SPicData.pRefMb[0] + ((i << 3) * iStrideRef);		
+		sMe16x8->pRefMb       = pMbCache->SPicData.pRefMb[0] + ((i << 3) * iStrideRef);
 		sMe16x8->uSadPredISatd.uiSadPred = pWelsMd->iSadPredMb >> 1;
 
 		pSlice->sMvc[0]	= sMe16x8->sMvBase;
 		pSlice->uiMvcNum = 1;
 
 		PredInter16x8Mv(pMbCache, i<<3, 0, &(sMe16x8->sMvp));
-		pFunc->pfMotionSearch(pFunc, pCurDqLayer, sMe16x8, pSlice);		
+		pFunc->pfMotionSearch(pFunc, pCurDqLayer, sMe16x8, pSlice);
 		UpdateP16x8Motion2Cache(pMbCache, i<<3, pWelsMd->uiRef, &(sMe16x8->sMv));
         iCostP16x8 += sMe16x8->uiSatdCost;
 		++i;
@@ -1144,7 +1144,7 @@ int32_t WelsMdP8x16(SWelsFuncPtrList *pFunc, SDqLayer* pCurLayer, SWelsMD* pWels
 	SWelsME* sMe8x16;
 	int32_t i = 0;
 	int32_t iCostP8x16 = 0;
-	do 
+	do
 	{
 		sMe8x16 = &pWelsMd->sMe.sMe8x16[i];
 
@@ -1152,14 +1152,14 @@ int32_t WelsMdP8x16(SWelsFuncPtrList *pFunc, SDqLayer* pCurLayer, SWelsMD* pWels
 		sMe8x16->pMvdCost     = pWelsMd->pMvdCost;
 
 		sMe8x16->pEncMb       = pMbCache->SPicData.pEncMb[0] + (i << 3);
-		sMe8x16->pRefMb       = pMbCache->SPicData.pRefMb[0] + (i << 3);			
+		sMe8x16->pRefMb       = pMbCache->SPicData.pRefMb[0] + (i << 3);
 		sMe8x16->uSadPredISatd.uiSadPred = pWelsMd->iSadPredMb >> 1;
-		
+
 		pSlice->sMvc[0] = sMe8x16->sMvBase;
-		pSlice->uiMvcNum = 1;		
+		pSlice->uiMvcNum = 1;
 
 		PredInter8x16Mv(pMbCache, i<<2, 0, &(sMe8x16->sMvp));
-		pFunc->pfMotionSearch(pFunc, pCurLayer, sMe8x16, pSlice);		
+		pFunc->pfMotionSearch(pFunc, pCurLayer, sMe8x16, pSlice);
 		UpdateP8x16Motion2Cache(pMbCache, i<<2, pWelsMd->uiRef, &(sMe8x16->sMv));
 		iCostP8x16 += sMe8x16->uiSatdCost;
 //		sMe8x16++;
@@ -1185,17 +1185,17 @@ int32_t WelsMdP8x8(SWelsFuncPtrList *pFunc,SDqLayer* pCurDqLayer, SWelsMD* pWels
 		sMe8x8 = &pWelsMd->sMe.sMe8x8[i];
 
 		sMe8x8->uiPixel = BLOCK_8x8;
-		sMe8x8->pMvdCost     = pWelsMd->pMvdCost;		
+		sMe8x8->pMvdCost     = pWelsMd->pMvdCost;
 
 		sMe8x8->pEncMb       = pMbCache->SPicData.pEncMb[0] + iStrideEnc;
-		sMe8x8->pRefMb       = pMbCache->SPicData.pRefMb[0] + iStrideRef;			
+		sMe8x8->pRefMb       = pMbCache->SPicData.pRefMb[0] + iStrideRef;
 		sMe8x8->uSadPredISatd.uiSadPred = pWelsMd->iSadPredMb >> 2;
 
 		pSlice->sMvc[0] = sMe8x8->sMvBase;
-		pSlice->uiMvcNum = 1;		
+		pSlice->uiMvcNum = 1;
 
 		PredMv(&pMbCache->sMvComponents, i<<2, 2, pWelsMd->uiRef, &(sMe8x8->sMvp));
-		pFunc->pfMotionSearch(pFunc, pCurDqLayer, sMe8x8, pSlice);		
+		pFunc->pfMotionSearch(pFunc, pCurDqLayer, sMe8x8, pSlice);
 		UpdateP8x8Motion2Cache(pMbCache, i<<2, pWelsMd->uiRef, &(sMe8x8->sMv));
         iCostP8x8 += sMe8x8->uiSatdCost;
 //		sMe8x8++;
@@ -1204,23 +1204,23 @@ int32_t WelsMdP8x8(SWelsFuncPtrList *pFunc,SDqLayer* pCurDqLayer, SWelsMD* pWels
 }
 
 void WelsMdInterFinePartition(void* pEnc, void* pMd, SSlice *pSlice, SMB* pCurMb, int32_t iBestCost)
-{	
-	sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pEnc;	
+{
+	sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pEnc;
 	SWelsMD* pWelsMd = (SWelsMD*)pMd;
-    
+
 	SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
 //	SMbCache *pMbCache = &pSlice->sMbCacheInfo;
 	int32_t iCost = 0;
 
 //	WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP8x8, p_ref[0]= 0x%p\n", pMbCache->SPicData.pRefMb[0]);
-	
+
 	iCost = WelsMdP8x8(pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
 
 	if (iCost < iBestCost)
 	{
 		int32_t iCostPart;
 		pCurMb->uiMbType = MB_TYPE_8x8;
-			
+
 //		WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP16x8, p_ref[0]= 0x%p\n", pMbCache->SPicData.pRefMb[0]);
 		iCostPart = WelsMdP16x8(pEncCtx->pFuncList,pCurDqLayer, pWelsMd, pSlice);
 		if (iCostPart <= iCost)
@@ -1229,7 +1229,7 @@ void WelsMdInterFinePartition(void* pEnc, void* pMd, SSlice *pSlice, SMB* pCurMb
 			pCurMb->uiMbType = MB_TYPE_16x8;
 			//pCurMb->mb_partition = 2;
 		}
-		
+
 //		WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP8x16, p_ref[0]= 0x%p\n", pMbCache->SPicData.pRefMb[0]);
 		iCostPart = WelsMdP8x16(pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
 		if (iCostPart <= iCost)
@@ -1242,22 +1242,22 @@ void WelsMdInterFinePartition(void* pEnc, void* pMd, SSlice *pSlice, SMB* pCurMb
 }
 
 void WelsMdInterFinePartitionVaa( void* pEnc, void* pMd, SSlice *pSlice, SMB* pCurMb, int32_t iBestCost )
-{	
-	sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pEnc;	
+{
+	sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pEnc;
 	SWelsMD* pWelsMd = (SWelsMD*)pMd;
-    
+
 	SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
 //	SMbCache *pMbCache = &pSlice->sMbCacheInfo;
 	int32_t iCostP8x16, iCostP16x8, iCostP8x8;
-	uint8_t uiMbSign = pEncCtx->pFuncList->pfGetMbSignFromInterVaa( &pEncCtx->pVaa->sVaaCalcInfo.pSad8x8[pCurMb->iMbXY][0] );			
-	
+	uint8_t uiMbSign = pEncCtx->pFuncList->pfGetMbSignFromInterVaa( &pEncCtx->pVaa->sVaaCalcInfo.pSad8x8[pCurMb->iMbXY][0] );
+
  	if ( uiMbSign == 15 )
 	{
 		return;
 	}
 
 //	iCost = pWelsMd->sMe16x16.uiSatdCost;
-	
+
 	switch ( uiMbSign )
 	{
 	case 3:
@@ -1283,10 +1283,10 @@ void WelsMdInterFinePartitionVaa( void* pEnc, void* pMd, SSlice *pSlice, SMB* pC
 			//pCurMb->mb_partition = 2;
 		}
 		break;
-		
+
 	case 6:
 	case 9:
-		iCostP8x8 = WelsMdP8x8(pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice );	
+		iCostP8x8 = WelsMdP8x8(pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice );
 		if ( iCostP8x8 < iBestCost )
 		{
 			iBestCost = iCostP8x8;
@@ -1307,13 +1307,13 @@ void WelsMdInterFinePartitionVaa( void* pEnc, void* pMd, SSlice *pSlice, SMB* pC
 				iBestCost = iCostP16x8;
 				pCurMb->uiMbType = MB_TYPE_16x8;
 			}
-			
+
 			iCostP8x16 = WelsMdP8x16(pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
 			if (iCostP8x16 <= iBestCost)
 			{
 				iBestCost = iCostP8x16;
 				pCurMb->uiMbType = MB_TYPE_8x16;
-			}						
+			}
 		}
 		break;
 	}
@@ -1333,7 +1333,7 @@ inline void VaaBackgroundMbDataUpdate(  SWelsFuncPtrList *pFunc, SVAAFrameInfo *
 	pFunc->pfCopy8x8Aligned(pVaaInfo->pCurV+kiOffsetUV, kiPicStrideUV, pVaaInfo->pRefV+kiOffsetUV, kiPicStrideUV);
 }
 
-void WelsMdBackgroundMbEnc(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache, SSlice *pSlice, bool_t bSkipMbFlag) 
+void WelsMdBackgroundMbEnc(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache, SSlice *pSlice, bool_t bSkipMbFlag)
 {
 	sWelsEncCtx * pEncCtx	= (sWelsEncCtx *)pEnc;
 	SDqLayer* pCurDqLayer	= pEncCtx->pCurDqLayer;
@@ -1363,7 +1363,7 @@ void WelsMdBackgroundMbEnc(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCach
 	pCurMb->uiCbp = 0;
 	pMbCache->bCollocatedPredFlag = true;
 	pWelsMd->iCostLuma = 0;//BGD&RC integration
-	pCurMb->pSadCost[0] = pFunc->sSampleDealingFuncs.pfSampleSad[BLOCK_16x16](pMbCache->SPicData.pEncMb[0], pCurDqLayer->iEncStride[0], pRefLuma, iLineSizeY );	
+	pCurMb->pSadCost[0] = pFunc->sSampleDealingFuncs.pfSampleSad[BLOCK_16x16](pMbCache->SPicData.pEncMb[0], pCurDqLayer->iEncStride[0], pRefLuma, iLineSizeY );
 	ST32(&pCurMb->sP16x16Mv, 0);
 	ST32(&pCurDqLayer->pDecPic->sMvList[pCurMb->iMbXY], 0);
 
@@ -1373,7 +1373,7 @@ void WelsMdBackgroundMbEnc(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCach
 
 		//update motion info to current MB
 		ST32(pCurMb->pRefIndex, 0);
-		pFunc->pfUpdateMbMv(pCurMb->sMv, sMvp);		
+		pFunc->pfUpdateMbMv(pCurMb->sMv, sMvp);
 
 		pCurMb->uiLumaQp   = pSlice->uiLastMbQp;
 		pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51(pCurMb->uiLumaQp + pCurDqLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset)];
@@ -1395,7 +1395,7 @@ void WelsMdBackgroundMbEnc(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCach
 	if(pWelsMd->bMdUsingSad)
 		pWelsMd->iCostLuma = pCurMb->pSadCost[0];
 	else
-		pWelsMd->iCostLuma = pFunc->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x16](pMbCache->SPicData.pEncMb[0], pCurDqLayer->iEncStride[0], pRefLuma, iLineSizeY );	
+		pWelsMd->iCostLuma = pFunc->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x16](pMbCache->SPicData.pEncMb[0], pCurDqLayer->iEncStride[0], pRefLuma, iLineSizeY );
 
 	WelsInterMbEncode( pEncCtx, pSlice, pCurMb );
 	WelsPMbChromaEncode( pEncCtx, pSlice, pCurMb );
@@ -1405,7 +1405,7 @@ void WelsMdBackgroundMbEnc(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCach
 	pFunc->pfCopy8x8Aligned(   pMbCache->SPicData.pCsMb[2], pCurDqLayer->iCsStride[1], pMbCache->pMemPredChroma+64, 8 );
 }
 
-BOOL_T WelsMdPSkipEnc(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache) 
+BOOL_T WelsMdPSkipEnc(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 {
 	sWelsEncCtx *pEncCtx	= (sWelsEncCtx *)pEnc;
 	SDqLayer *pCurLayer				= pEncCtx->pCurDqLayer;
@@ -1428,7 +1428,7 @@ BOOL_T WelsMdPSkipEnc(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 
 	int32_t iEncStride		= pCurLayer->iEncStride[0];
 	uint8_t* pEncMb			= pMbCache->SPicData.pEncMb[0];
-	int32_t *pStrideEncBlockOffset= pEncCtx->pStrideTab->pStrideEncBlockOffset[pEncCtx->uiDependencyId]; 
+	int32_t *pStrideEncBlockOffset= pEncCtx->pStrideTab->pStrideEncBlockOffset[pEncCtx->uiDependencyId];
 	int32_t *pEncBlockOffset;
 
 	int32_t iSadCostLuma = 0;
@@ -1436,7 +1436,7 @@ BOOL_T WelsMdPSkipEnc(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 	int32_t iSadCostMb = 0;
 
 	PredSkipMv(pMbCache, &sMvp);
-	
+
 	// Special case, need to clip the vector //
 	SMVUnitXY sQpelMvp = { sMvp.iMvX>>2, sMvp.iMvY>>2 };
     n = (pCurMb->iMbX<<4) + sQpelMvp.iMvX;
@@ -1451,47 +1451,47 @@ BOOL_T WelsMdPSkipEnc(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
     else if( n > (int32_t)((pCurLayer->iMbHeight<<4) + 12) )
         return FALSE;
 
-	//luma	
+	//luma
 	pRefLuma += sQpelMvp.iMvY * iLineSizeY + sQpelMvp.iMvX;
     uiMvpIdx = ((sMvp.iMvY&0x03)<<2)+(sMvp.iMvX&0x03);
 	pFunc->sMcFuncs.pfLumaQuarpelMc[uiMvpIdx](pRefLuma, iLineSizeY, pDstLuma, 16,16);
-	iSadCostLuma    = pFunc->sSampleDealingFuncs.pfSampleSad[BLOCK_16x16](pMbCache->SPicData.pEncMb[0], pCurLayer->iEncStride[0], pDstLuma, 16 );	
+	iSadCostLuma    = pFunc->sSampleDealingFuncs.pfSampleSad[BLOCK_16x16](pMbCache->SPicData.pEncMb[0], pCurLayer->iEncStride[0], pDstLuma, 16 );
 
 	const int32_t iStrideUV = (sQpelMvp.iMvY>>1) * iLineSizeUV + (sQpelMvp.iMvX>>1);
 	pRefCb += iStrideUV;
-	pFunc->sMcFuncs.pfChromaMc(pRefCb, iLineSizeUV, pDstCb, 8, sMvp, 8, 8);//Cb	
-	iSadCostChroma  = pFunc->sSampleDealingFuncs.pfSampleSad[BLOCK_8x8](pMbCache->SPicData.pEncMb[1], pCurLayer->iEncStride[1], pDstCb, 8 );	
-	
+	pFunc->sMcFuncs.pfChromaMc(pRefCb, iLineSizeUV, pDstCb, 8, sMvp, 8, 8);//Cb
+	iSadCostChroma  = pFunc->sSampleDealingFuncs.pfSampleSad[BLOCK_8x8](pMbCache->SPicData.pEncMb[1], pCurLayer->iEncStride[1], pDstCb, 8 );
+
 	pRefCr += iStrideUV;
 	pFunc->sMcFuncs.pfChromaMc(pRefCr, iLineSizeUV, pDstCr, 8, sMvp, 8, 8);//Cr
-	iSadCostChroma += pFunc->sSampleDealingFuncs.pfSampleSad[BLOCK_8x8](pMbCache->SPicData.pEncMb[2], pCurLayer->iEncStride[2], pDstCr, 8 );	
+	iSadCostChroma += pFunc->sSampleDealingFuncs.pfSampleSad[BLOCK_8x8](pMbCache->SPicData.pEncMb[2], pCurLayer->iEncStride[2], pDstCr, 8 );
 
 	iSadCostMb = iSadCostLuma + iSadCostChroma;
 
 	if ( iSadCostMb == 0                             ||
-		 iSadCostMb < pWelsMd->iSadPredSkip   || 
-	   ( pCurLayer->pRefPic->iPictureType == P_SLICE     && 
+		 iSadCostMb < pWelsMd->iSadPredSkip   ||
+	   ( pCurLayer->pRefPic->iPictureType == P_SLICE     &&
 	     pMbCache->uiRefMbType == MB_TYPE_SKIP    &&
 		 iSadCostMb < pCurLayer->pRefPic->pMbSkipSad[pCurMb->iMbXY]) )
 	{
 		//update motion info to current MB
 		ST32(pCurMb->pRefIndex, 0);
-		pFunc->pfUpdateMbMv(pCurMb->sMv, sMvp);		
+		pFunc->pfUpdateMbMv(pCurMb->sMv, sMvp);
 
 		pCurMb->pSadCost[0] = pFunc->sSampleDealingFuncs.pfSampleSad[BLOCK_16x16](pMbCache->SPicData.pEncMb[0], pCurLayer->iEncStride[0], pRefLuma, iLineSizeY );
-		
+
 		if (pWelsMd->bMdUsingSad)
 			pWelsMd->iCostLuma = pCurMb->pSadCost[0];
 		else
-			pWelsMd->iCostLuma = pFunc->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x16](pMbCache->SPicData.pEncMb[0], pCurLayer->iEncStride[0], pRefLuma, iLineSizeY );	
-	
-		pWelsMd->iCostSkipMb = iSadCostMb;	
+			pWelsMd->iCostLuma = pFunc->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x16](pMbCache->SPicData.pEncMb[0], pCurLayer->iEncStride[0], pRefLuma, iLineSizeY );
+
+		pWelsMd->iCostSkipMb = iSadCostMb;
 
 		pCurMb->sP16x16Mv = sMvp;
 		pCurLayer->pDecPic->sMvList[pCurMb->iMbXY] = sMvp;
-		
+
 		return TRUE;
-	}	
+	}
 
 	WelsDctMb(pMbCache->pCoeffLevel,  pEncMb, iEncStride, pDstLuma, pEncCtx->pFuncList->pfDctFourT4 );
 
@@ -1510,15 +1510,15 @@ BOOL_T WelsMdPSkipEnc(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache)
 			{
 				//update motion info to current MB
 				ST32(pCurMb->pRefIndex, 0);
-				pFunc->pfUpdateMbMv(pCurMb->sMv, sMvp);				
+				pFunc->pfUpdateMbMv(pCurMb->sMv, sMvp);
 
 				pCurMb->pSadCost[0] = pFunc->sSampleDealingFuncs.pfSampleSad[BLOCK_16x16](pMbCache->SPicData.pEncMb[0], pCurLayer->iEncStride[0], pRefLuma, iLineSizeY );
 
                 if (pWelsMd->bMdUsingSad)
 					pWelsMd->iCostLuma = pCurMb->pSadCost[0];
 				else
-					pWelsMd->iCostLuma = pFunc->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x16](pMbCache->SPicData.pEncMb[0], pCurLayer->iEncStride[0], pRefLuma, iLineSizeY );	
-				
+					pWelsMd->iCostLuma = pFunc->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x16](pMbCache->SPicData.pEncMb[0], pCurLayer->iEncStride[0], pRefLuma, iLineSizeY );
+
 				pWelsMd->iCostSkipMb = iSadCostMb;
 
 				pCurMb->sP16x16Mv = sMvp;
@@ -1538,34 +1538,34 @@ void WelsMdInterMbRefinement(sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb
 {
 	SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
 	uint8_t *pTmpRefCb, *pTmpRefCr, *pTmpDstCb, *pTmpDstCr;
-	int32_t iMvStride, iRefBlk4Stride, iDstBlk4Stride; 	
+	int32_t iMvStride, iRefBlk4Stride, iDstBlk4Stride;
 	SMVUnitXY* pMv;
-	int32_t iBestSadCost = 0, iBestSatdCost = 0;	
+	int32_t iBestSadCost = 0, iBestSatdCost = 0;
 	SMeRefinePointer sMeRefine;
 
 	int32_t i, iIdx, iPixStride;
 
 	uint8_t* pRefCb = pMbCache->SPicData.pRefMb[1];
-	uint8_t* pRefCr = pMbCache->SPicData.pRefMb[2]; 
+	uint8_t* pRefCr = pMbCache->SPicData.pRefMb[2];
 	uint8_t* pDstCb = pMbCache->pMemPredChroma;
 	uint8_t* pDstCr = pMbCache->pMemPredChroma+64;
 	uint8_t* pDstLuma = pMbCache->pMemPredLuma;
 
 	int32_t iLineSizeRefUV = pCurDqLayer->pRefPic->iLineSize[1];
-	
+
 	switch(pCurMb->uiMbType)
 	{
-	case MB_TYPE_16x16:			
+	case MB_TYPE_16x16:
 		//luma
 		InitMeRefinePointer(&sMeRefine, pMbCache, 0);
-		MeRefineFracPixel(pEncCtx, pDstLuma, &pWelsMd->sMe.sMe16x16, &sMeRefine, 16, 16);			
+		MeRefineFracPixel(pEncCtx, pDstLuma, &pWelsMd->sMe.sMe16x16, &sMeRefine, 16, 16);
 		UpdateP16x16MotionInfo(pMbCache, pCurMb, pWelsMd->uiRef, &pWelsMd->sMe.sMe16x16.sMv);
-		
+
 		pMbCache->sMbMvp[0] = pWelsMd->sMe.sMe16x16.sMvp;
 		//save the best cost of final mode
 		iBestSadCost  = pWelsMd->sMe.sMe16x16.uiSadCost;
 		iBestSatdCost = pWelsMd->sMe.sMe16x16.uiSatdCost;
-		
+
 		//chroma
 		pMv = &pWelsMd->sMe.sMe16x16.sMv;
 		iMvStride = (pMv->iMvY >> 3) * iLineSizeRefUV + (pMv->iMvX >> 3);
@@ -1575,10 +1575,10 @@ void WelsMdInterMbRefinement(sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb
 		pEncCtx->pFuncList->sMcFuncs.pfChromaMc(pTmpRefCr, iLineSizeRefUV, pDstCr, 8, *pMv, 8, 8);//Cr
 
 		pWelsMd->iCostSkipMb = pEncCtx->pFuncList->sSampleDealingFuncs.pfSampleSad[BLOCK_16x16](pMbCache->SPicData.pEncMb[0], pCurDqLayer->iEncStride[0], pDstLuma, 16 );
-		pWelsMd->iCostSkipMb += pEncCtx->pFuncList->sSampleDealingFuncs.pfSampleSad[BLOCK_8x8](pMbCache->SPicData.pEncMb[1], pCurDqLayer->iEncStride[1], pDstCb, 8 );	
-		pWelsMd->iCostSkipMb += pEncCtx->pFuncList->sSampleDealingFuncs.pfSampleSad[BLOCK_8x8](pMbCache->SPicData.pEncMb[2], pCurDqLayer->iEncStride[2], pDstCr, 8 );	
+		pWelsMd->iCostSkipMb += pEncCtx->pFuncList->sSampleDealingFuncs.pfSampleSad[BLOCK_8x8](pMbCache->SPicData.pEncMb[1], pCurDqLayer->iEncStride[1], pDstCb, 8 );
+		pWelsMd->iCostSkipMb += pEncCtx->pFuncList->sSampleDealingFuncs.pfSampleSad[BLOCK_8x8](pMbCache->SPicData.pEncMb[2], pCurDqLayer->iEncStride[2], pDstCr, 8 );
 		break;
-		
+
 	case MB_TYPE_16x8:
 		iPixStride = 0;
 		for (i = 0; i < 2; i++)
@@ -1588,13 +1588,13 @@ void WelsMdInterMbRefinement(sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb
 			InitMeRefinePointer(&sMeRefine, pMbCache, iPixStride);
 			iPixStride += ME_REFINE_BUF_STRIDE_BLK8;
 			PredInter16x8Mv( pMbCache, iIdx, pWelsMd->uiRef, &pWelsMd->sMe.sMe16x8[i].sMvp );
-			MeRefineFracPixel(pEncCtx, pDstLuma + g_kuiSmb4AddrIn256[iIdx], &pWelsMd->sMe.sMe16x8[i], &sMeRefine, 16, 8);				
+			MeRefineFracPixel(pEncCtx, pDstLuma + g_kuiSmb4AddrIn256[iIdx], &pWelsMd->sMe.sMe16x8[i], &sMeRefine, 16, 8);
 			UpdateP16x8MotionInfo(pMbCache, pCurMb, iIdx, pWelsMd->uiRef, &pWelsMd->sMe.sMe16x8[i].sMv);
 			pMbCache->sMbMvp[i] = pWelsMd->sMe.sMe16x8[i].sMvp;
 			//save the best cost of final mode
 			iBestSadCost += pWelsMd->sMe.sMe16x8[i].uiSadCost;
-			iBestSatdCost += pWelsMd->sMe.sMe16x8[i].uiSatdCost;		
-			
+			iBestSatdCost += pWelsMd->sMe.sMe16x8[i].uiSatdCost;
+
 			//chroma
 			iRefBlk4Stride = (i << 2) * iLineSizeRefUV;
 			iDstBlk4Stride = i << 5; // 4*8
@@ -1605,11 +1605,11 @@ void WelsMdInterMbRefinement(sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb
 			pTmpDstCb = pDstCb + iDstBlk4Stride;
 			pTmpDstCr = pDstCr + iDstBlk4Stride;
 			pEncCtx->pFuncList->sMcFuncs.pfChromaMc(pTmpRefCb, iLineSizeRefUV, pTmpDstCb, 8, *pMv, 8, 4);//Cb
-			pEncCtx->pFuncList->sMcFuncs.pfChromaMc(pTmpRefCr, iLineSizeRefUV, pTmpDstCr, 8, *pMv, 8, 4);//Cr	
-		}	
+			pEncCtx->pFuncList->sMcFuncs.pfChromaMc(pTmpRefCr, iLineSizeRefUV, pTmpDstCr, 8, *pMv, 8, 4);//Cr
+		}
 		break;
-		
-	case MB_TYPE_8x16:		
+
+	case MB_TYPE_8x16:
 		iPixStride = 0;
 		for (i = 0; i < 2; i++)
 		{
@@ -1618,13 +1618,13 @@ void WelsMdInterMbRefinement(sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb
 			InitMeRefinePointer(&sMeRefine, pMbCache, iPixStride);
 			iPixStride += ME_REFINE_BUF_WIDTH_BLK8;
 			PredInter8x16Mv( pMbCache, iIdx, pWelsMd->uiRef, &pWelsMd->sMe.sMe8x16[i].sMvp );
-			MeRefineFracPixel(pEncCtx, pDstLuma + g_kuiSmb4AddrIn256[iIdx], &pWelsMd->sMe.sMe8x16[i], &sMeRefine, 8, 16);				
+			MeRefineFracPixel(pEncCtx, pDstLuma + g_kuiSmb4AddrIn256[iIdx], &pWelsMd->sMe.sMe8x16[i], &sMeRefine, 8, 16);
 			update_P8x16_motion_info(pMbCache, pCurMb, iIdx, pWelsMd->uiRef, &pWelsMd->sMe.sMe8x16[i].sMv);
 			pMbCache->sMbMvp[i] = pWelsMd->sMe.sMe8x16[i].sMvp;
 			//save the best cost of final mode
 			iBestSadCost += pWelsMd->sMe.sMe8x16[i].uiSadCost;
 			iBestSatdCost += pWelsMd->sMe.sMe8x16[i].uiSatdCost;
-			
+
 			//chroma
 			iRefBlk4Stride = iIdx; //4
 			pMv = &pWelsMd->sMe.sMe8x16[i].sMv;
@@ -1637,41 +1637,41 @@ void WelsMdInterMbRefinement(sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb
 			pEncCtx->pFuncList->sMcFuncs.pfChromaMc(pTmpRefCr, iLineSizeRefUV, pTmpDstCr, 8, *pMv, 4, 8);//Cr
 		}
 		break;
-		
+
 	case MB_TYPE_8x8:
 		for (i = 0; i < 4; i++)
 		{
 			int32_t iBlk8Idx = i<<2; //0, 4, 8, 12
 			int32_t	iBlk4X, iBlk4Y;
-			
+
 			pCurMb->pRefIndex[i] = pWelsMd->uiRef;
-			
+
 			//luma
 			InitMeRefinePointer(&sMeRefine, pMbCache, g_kiPixStrideIdx8x8[i]);
 			PredMv( &pMbCache->sMvComponents, iBlk8Idx, 2, pWelsMd->uiRef, &pWelsMd->sMe.sMe8x8[i].sMvp );
-			MeRefineFracPixel(pEncCtx, pDstLuma + g_kuiSmb4AddrIn256[iBlk8Idx], &pWelsMd->sMe.sMe8x8[i], &sMeRefine, 8, 8);					
+			MeRefineFracPixel(pEncCtx, pDstLuma + g_kuiSmb4AddrIn256[iBlk8Idx], &pWelsMd->sMe.sMe8x8[i], &sMeRefine, 8, 8);
 			UpdateP8x8MotionInfo(pMbCache, pCurMb, iBlk8Idx, pWelsMd->uiRef, &pWelsMd->sMe.sMe8x8[i].sMv);
 			pMbCache->sMbMvp[i] = pWelsMd->sMe.sMe8x8[i].sMvp;
 			iBestSadCost += pWelsMd->sMe.sMe8x8[i].uiSadCost;
-			iBestSatdCost += pWelsMd->sMe.sMe8x8[i].uiSatdCost; 
-			
+			iBestSatdCost += pWelsMd->sMe.sMe8x8[i].uiSatdCost;
+
 			//chroma
 			pMv = &pWelsMd->sMe.sMe8x8[i].sMv;
 			iMvStride = (pMv->iMvY >> 3) * iLineSizeRefUV + (pMv->iMvX >> 3);
-			
+
 			iBlk4X = (i & 1) << 2;
 			iBlk4Y = (i >> 1) << 2;
 			iRefBlk4Stride = iBlk4Y * iLineSizeRefUV + iBlk4X;
 			iDstBlk4Stride = (iBlk4Y << 3) + iBlk4X;
-			
+
 			pTmpRefCb = pRefCb + iRefBlk4Stride;
 			pTmpDstCb = pDstCb + iDstBlk4Stride;
 			pTmpRefCr = pRefCr + iRefBlk4Stride;
 			pTmpDstCr = pDstCr + iDstBlk4Stride;
 			pEncCtx->pFuncList->sMcFuncs.pfChromaMc(pTmpRefCb+iMvStride, iLineSizeRefUV, pTmpDstCb, 8, *pMv, 4, 4);//Cb
-			pEncCtx->pFuncList->sMcFuncs.pfChromaMc(pTmpRefCr+iMvStride, iLineSizeRefUV, pTmpDstCr, 8, *pMv, 4, 4);//Cr		
-		
-		}		
+			pEncCtx->pFuncList->sMcFuncs.pfChromaMc(pTmpRefCr+iMvStride, iLineSizeRefUV, pTmpDstCr, 8, *pMv, 4, 4);//Cr
+
+		}
 		break;
 	default:
 		break;
@@ -1688,28 +1688,28 @@ BOOL_T WelsMdFirstIntraMode(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCac
 	sWelsEncCtx *pEncCtx	= (sWelsEncCtx*)pEnc;
 	SWelsFuncPtrList *pFunc	= pEncCtx->pFuncList;
 	SWelsMD *pWelsMd		= (SWelsMD*)pMd;
-    
+
 	int32_t iCostI16x16 = WelsMdI16x16(pFunc, pEncCtx->pCurDqLayer, pMbCache, pWelsMd->iLambda);
-	
+
 	//compare cost_p16x16 with cost_i16x16
-	if ( iCostI16x16 < pWelsMd->iCostLuma ) 
+	if ( iCostI16x16 < pWelsMd->iCostLuma )
 	{
 		pCurMb->uiMbType = MB_TYPE_INTRA16x16;
 		pWelsMd->iCostLuma = iCostI16x16;
-		
+
 		pFunc->pfIntraFineMd( pEncCtx, pWelsMd, pCurMb, pMbCache );
-		
+
 		//add pEnc&rec to MD--2010.3.15
 		if ( IS_INTRA16x16(pCurMb->uiMbType) )
 		{
 			pCurMb->uiCbp = 0;
 			WelsEncRecI16x16Y( pEncCtx, pCurMb, pMbCache );
 		}
-		
-		//chroma				
+
+		//chroma
 		pWelsMd->iCostChroma = WelsMdIntraChroma(pFunc, pEncCtx->pCurDqLayer, pMbCache, pWelsMd->iLambda);
 		WelsIMbChromaEncode( pEncCtx, pCurMb, pMbCache ); //add pEnc&rec to MD--2010.3.15
-		
+
 		pCurMb->pSadCost[0] = 0;
 		return TRUE; //intra_mb_type is best
 	}
@@ -1740,7 +1740,7 @@ void WelsMdInterMb(void* pEnc, void* pMd, SSlice *pSlice, SMB* pCurMb )
 	}
 
 	//step 1: try SKIP
-	bSkip = WelsMdInterJudgePskip( pEncCtx, pWelsMd, pSlice, pCurMb, pMbCache, bTrySkip ); 
+	bSkip = WelsMdInterJudgePskip( pEncCtx, pWelsMd, pSlice, pCurMb, pMbCache, bTrySkip );
 
 	if ( bSkip )
 	{
@@ -1748,17 +1748,17 @@ void WelsMdInterMb(void* pEnc, void* pMd, SSlice *pSlice, SMB* pCurMb )
 		{
 			WelsMdInterDecidedPskip(pEncCtx,  pSlice,  pCurMb, pMbCache);
 			return;
-		}	
+		}
 	}
 	else
-	{		
+	{
 		PredictSad( pMbCache->sMvComponents.iRefIndexCache, pMbCache->iSadCost, 0, &pWelsMd->iSadPredMb );
 
 		//step 2: P_16x16
 		pWelsMd->iCostLuma = WelsMdP16x16(pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice, pCurMb);
 		pCurMb->uiMbType = MB_TYPE_16x16;
 	}
-		
+
 	WelsMdInterSecondaryModesEnc( pEncCtx, pWelsMd, pSlice, pCurMb, pMbCache, bSkip );
 }
 
@@ -1773,9 +1773,9 @@ bool_t WelsMdInterJudgePskip( sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice *pS
 	if ( (( pEncCtx->pRefPic->iPictureType == P_SLICE ) && (pMbCache->uiRefMbType == MB_TYPE_SKIP || pMbCache->uiRefMbType == MB_TYPE_BACKGROUND) ) ||
 		bTrySkip )
 	{
-		PredictSadSkip( pMbCache->sMvComponents.iRefIndexCache, pMbCache->bMbTypeSkip, pMbCache->iSadCostSkip, 0, &(pWelsMd->iSadPredSkip) );	
+		PredictSadSkip( pMbCache->sMvComponents.iRefIndexCache, pMbCache->bMbTypeSkip, pMbCache->iSadCostSkip, 0, &(pWelsMd->iSadPredSkip) );
 		bRet = WelsMdPSkipEnc(pEncCtx, pWelsMd, pCurMb, pMbCache)? true:false;
-		return bRet; 
+		return bRet;
 	}
 
 	return false;
@@ -1809,7 +1809,7 @@ void WelsMdInterDoubleCheckPskip( SMB* pCurMb, SMbCache *pMbCache )
 			if ( LD32(&sMvp) == LD32(&pCurMb->sMv[0]) )
 			{
 				pCurMb->uiMbType = MB_TYPE_SKIP;
-			}			
+			}
 		}
 		pMbCache->bCollocatedPredFlag = (LD32(&pCurMb->sMv[0]) == 0);
 	}
@@ -1867,11 +1867,11 @@ bool_t WelsMdInterJudgeBGDPskip( void* pCtx, void* pMd, SSlice *pSlice, SMB* pCu
 
 	const int32_t kiMbWidth = pCurDqLayer->iMbWidth;
 
-		*bKeepSkip = (*bKeepSkip) && 
+		*bKeepSkip = (*bKeepSkip) &&
 			((!pVaaBgMbFlag[-1])&&
 			(!pVaaBgMbFlag[-kiMbWidth])&&
 			(!pVaaBgMbFlag[-kiMbWidth+1]));
-		
+
 		if (
 			*pVaaBgMbFlag
 			&& !IS_INTRA(pMbCache->uiRefMbType)
@@ -1898,7 +1898,7 @@ bool_t WelsMdInterJudgeBGDPskipFalse( void* pCtx, void* pMd, SSlice *pSlice, SMB
 //  update BGD related info
 //////
 void WelsMdInterUpdateBGDInfo( SDqLayer* pCurLayer,  SMB* pCurMb, const bool_t bCollocatedPredFlag, const int32_t iRefPictureType )
-{ 
+{
 	uint8_t* pTargetRefMbQpList = (pCurLayer->pDecPic->pRefMbQp);
 	const int32_t kiMbXY = pCurMb->iMbXY;
 
@@ -1937,7 +1937,7 @@ void WelsMdInterSaveSadAndRefMbType(Mb_Type* pRefMbtypeList, SMbCache * pMbCache
 
 void WelsMdInterSecondaryModesEnc(sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice *pSlice, SMB* pCurMb, SMbCache *pMbCache, const BOOL_T bSkip )
 {
-		//step 2: Intra	
+		//step 2: Intra
 		const BOOL_T kbTrySkip = pEncCtx->pFuncList->pfFirstIntraMode(pEncCtx, pWelsMd, pCurMb, pMbCache);
         if(kbTrySkip)
             return;
@@ -1959,7 +1959,7 @@ void WelsMdInterSecondaryModesEnc(sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice
 
 			//step 8: double check Pskip
 			WelsMdInterDoubleCheckPskip(pCurMb, pMbCache);
-		}	
+		}
 }
 
 
@@ -1977,9 +1977,9 @@ void WelsMdIntraSecondaryModesEnc( sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* 
 	}
 
 	//chroma
-	pWelsMd->iCostChroma = WelsMdIntraChroma(pFunc, pEncCtx->pCurDqLayer, pMbCache, pWelsMd->iLambda);	
+	pWelsMd->iCostChroma = WelsMdIntraChroma(pFunc, pEncCtx->pCurDqLayer, pMbCache, pWelsMd->iLambda);
 	WelsIMbChromaEncode( pEncCtx, pCurMb, pMbCache ); //add pEnc&rec to MD--2010.3.15
-	pCurMb->pSadCost[0] = 0;	
+	pCurMb->pSadCost[0] = 0;
 }
 
 } // namespace WelsSVCEnc

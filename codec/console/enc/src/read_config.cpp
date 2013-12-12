@@ -96,19 +96,19 @@ long CReadConfig::ReadLine( string* pVal, const int kiValSize/* = 4*/ )
 {
 	if ( m_pCfgFile == NULL || pVal == NULL || kiValSize <= 1)
 		return 0;
-	
+
 	string *strTags = &pVal[0];
 	int nTagNum = 0, n = 0;
-	bool bCommentFlag = false;	
-	
+	bool bCommentFlag = false;
+
 	while (n < kiValSize) {
 		pVal[n]	= "";
 		++ n;
-	}	
+	}
 
 	do {
 		const char kCh = (char)fgetc(m_pCfgFile);
-		
+
 		if ( kCh == '\n' || feof(m_pCfgFile) ){
 			++ m_iLines;
 			break;
@@ -127,9 +127,9 @@ long CReadConfig::ReadLine( string* pVal, const int kiValSize/* = 4*/ )
 			else
 				*strTags += kCh;
 		}
-		
+
 	} while(true);
-	
+
 	return 1+nTagNum;
 }
 

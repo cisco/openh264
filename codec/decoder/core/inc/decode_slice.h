@@ -54,12 +54,12 @@ int32_t WelsDecodeSlice(PWelsDecoderContext pCtx, bool_t bFirstSliceInLayer, PNa
 int32_t WelsTargetMbConstruction(PWelsDecoderContext pCtx);
 
 int32_t WelsMbIntraPredictionConstruction(PWelsDecoderContext pCtx, PDqLayer pCurLayer, bool_t bOutput);
-int32_t WelsMbInterSampleConstruction( PWelsDecoderContext pCtx, PDqLayer pCurLayer, 
+int32_t WelsMbInterSampleConstruction( PWelsDecoderContext pCtx, PDqLayer pCurLayer,
 											  uint8_t* pDstY, uint8_t* pDstU, uint8_t* pDstV, int32_t iStrideL, int32_t iStrideC );
 int32_t WelsMbInterConstruction(PWelsDecoderContext pCtx, PDqLayer pCurLayer);
 void_t WelsLumaDcDequantIdct(int16_t *pBlock, int32_t iQp);
 int32_t WelsMbInterPrediction  (PWelsDecoderContext pCtx, PDqLayer pCurLayer);
-void_t WelsMbCopy( uint8_t *pDst, int32_t iStrideDst, uint8_t *pSrc, int32_t iStrideSrc, 
+void_t WelsMbCopy( uint8_t *pDst, int32_t iStrideDst, uint8_t *pSrc, int32_t iStrideSrc,
 				 int32_t iHeight, int32_t iWidth );
 
 void_t WelsChromaDcIdct( int16_t *pBlock );

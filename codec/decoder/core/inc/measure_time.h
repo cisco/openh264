@@ -68,7 +68,7 @@ int64_t WelsTime( void_t )
 {
 #if !(defined(_MSC_VER) || defined(__MINGW32__))
 	struct timeval tv_date;
-	
+
 	gettimeofday( &tv_date, NULL );
 	return( (int64_t) tv_date.tv_sec * 1000000 + (int64_t) tv_date.tv_usec );
 #else
@@ -86,7 +86,7 @@ int64_t WelsTime( void_t )
 	return iResult;
 #else
 	struct _timeb sTime;
-	
+
 	_ftime(&sTime);
 	return ((int64_t)sTime.time * (1000) + (int64_t)sTime.millitm) * (1000);
 #endif//#if WIN32

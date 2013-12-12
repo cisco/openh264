@@ -76,7 +76,7 @@ typedef struct TagDataBuffer
 //#pragma pack(1)
 
 /*
- *	Need move below structures to function pointer to seperate module/file later  
+ *	Need move below structures to function pointer to seperate module/file later
  */
 
 //typedef int32_t (*rec_mb) (Mb *cur_mb, PWelsDecoderContext pCtx);
@@ -91,7 +91,7 @@ typedef struct TagRefPic {
 	PPicture			pRefList[LIST_A][MAX_REF_PIC_COUNT];	// reference picture marking plus FIFO scheme
 	PPicture			pShortRefList[LIST_A][MAX_SHORT_REF_COUNT];
 	PPicture			pLongRefList[LIST_A][MAX_LONG_REF_COUNT];
-	uint8_t				uiRefCount[LIST_A]; 
+	uint8_t				uiRefCount[LIST_A];
 	uint8_t				uiShortRefCount[LIST_A];
 	uint8_t				uiLongRefCount[LIST_A];	// dependend on ref pic module
 	int32_t				iMaxLongTermFrameIdx;
@@ -144,7 +144,7 @@ typedef void_t (*PWelsSimpleIdct4x4AddFunc) (int16_t *pDest, int16_t *pSrc, int3
 typedef  struct  TagBlockFunc {
 	PWelsBlockZeroFunc			pWelsBlockZero16x16Func;
 	PWelsBlockZeroFunc			pWelsBlockZero8x8Func;
-	PWelsNonZeroCountFunc		pWelsSetNonZeroCountFunc;  
+	PWelsNonZeroCountFunc		pWelsSetNonZeroCountFunc;
 } SBlockFunc;
 
 typedef void_t ( *PWelsFillNeighborMbInfoIntra4x4Func )( PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int8_t* pIntraPredMode, PDqLayer pCurLayer );
@@ -160,7 +160,7 @@ typedef struct TagExpandPicFunc{
  *	SWelsDecoderContext: to maintail all modules data over decoder@framework
  */
 
-typedef struct TagWelsDecoderContext {	
+typedef struct TagWelsDecoderContext {
 	// Input
 	void_t				*pArgDec;			// structured arguments for decoder, reserved here for extension in the future
 
@@ -173,12 +173,12 @@ typedef struct TagWelsDecoderContext {
 	int32_t				iSetMode;			// indicate decoder mode set from upper layer, this is read-only for decoder internal
 	int32_t 			iDecoderOutputProperty; // indicate the output buffer property
 	int32_t				iModeSwitchType;	// 1: optimal decision; 2: forced switch to the other mode; 0: no switch
-	
+
 	int32_t				iOutputColorFormat;		// color space format to be outputed
 	VIDEO_BITSTREAM_TYPE eVideoType; //indicate the type of video to decide whether or not to do qp_delta error detection.
 	bool_t				bErrorResilienceFlag;		// error resilience flag
-	bool_t				bHaveGotMemory;	// global memory for decoder context related ever requested?	
-	
+	bool_t				bHaveGotMemory;	// global memory for decoder context related ever requested?
+
 	int32_t				iImgWidthInPixel;	// width of image in pixel reconstruction picture to be output
 	int32_t				iImgHeightInPixel;// height of image in pixel reconstruction picture to be output
 	int32_t				iMaxWidthInSps;	// maximal width of pixel in SPS sets
@@ -202,11 +202,11 @@ typedef struct TagWelsDecoderContext {
 	{
 		int8_t  *pMbType[LAYER_NUM_EXCHANGEABLE];                      /* mb type */
 		int16_t	(*pMv[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM][MV_A]; //[LAYER_NUM_EXCHANGEABLE   MB_BLOCK4x4_NUM*]
-		int8_t	(*pRefIndex[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM]; 
+		int8_t	(*pRefIndex[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM];
 		int8_t	*pLumaQp[LAYER_NUM_EXCHANGEABLE];	/*mb luma_qp*/
 		int8_t	*pChromaQp[LAYER_NUM_EXCHANGEABLE];					/*mb chroma_qp*/
 		int8_t	(*pNzc[LAYER_NUM_EXCHANGEABLE])[24];
-		int8_t	(*pNzcRs[LAYER_NUM_EXCHANGEABLE])[24];	
+		int8_t	(*pNzcRs[LAYER_NUM_EXCHANGEABLE])[24];
 		int16_t (*pScaledTCoeff[LAYER_NUM_EXCHANGEABLE])[MB_COEFF_LIST_SIZE]; /*need be aligned*/
 		int8_t	(*pIntraPredMode[LAYER_NUM_EXCHANGEABLE])[8]; //0~3 top4x4 ; 4~6 left 4x4; 7 intra16x16
 		int8_t  (*pIntra4x4FinalMode[LAYER_NUM_EXCHANGEABLE])[MB_BLOCK4x4_NUM];
@@ -215,21 +215,21 @@ typedef struct TagWelsDecoderContext {
 		uint8_t (*pMotionPredFlag[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_PARTITION_SIZE]; // 8x8
 		int8_t  (*pSubMbType[LAYER_NUM_EXCHANGEABLE])[MB_SUB_PARTITION_SIZE];
 		int32_t *pSliceIdc[LAYER_NUM_EXCHANGEABLE];		// using int32_t for slice_idc
-		int8_t  *pResidualPredFlag[LAYER_NUM_EXCHANGEABLE];	
+		int8_t  *pResidualPredFlag[LAYER_NUM_EXCHANGEABLE];
 		int8_t  *pInterPredictionDoneFlag[LAYER_NUM_EXCHANGEABLE];
 		int16_t iMbWidth;
 		int16_t iMbHeight;
 	}sMb;
 
 
-	// reconstruction picture	
+	// reconstruction picture
 	PPicture			pDec;			//pointer to current picture being reconstructed
 
 	// reference pictures
 	SRefPic				sRefPic;
 
 	SVlcTable			sVlcTable;		 // vlc table
-	
+
 	SBitStringAux		sBs;
 
 	/* Global memory external */
@@ -240,7 +240,7 @@ typedef struct TagWelsDecoderContext {
 	int32_t             iSpsTotalNum;  //the number of SPS in current IDR interval
 	int32_t             iSubspsTotalNum; //the number of subsps in current IDR interval
 	int32_t             iPpsTotalNum; //the number of PPS in current IDR interval.
-#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID	
+#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
 
 	SSps				sSpsBuffer[MAX_SPS_COUNT];
 	SPps				sPpsBuffer[MAX_PPS_COUNT];
@@ -248,10 +248,10 @@ typedef struct TagWelsDecoderContext {
 
 	PPicBuff	        pPicBuff[LIST_A];	// Initially allocated memory for pictures which are used in decoding.
 	int32_t				iPicQueueNumber;
-	
+
 	SSubsetSps			sSubsetSpsBuffer[MAX_SPS_COUNT];
 	SNalUnit            sPrefixNal;
-	
+
 	PAccessUnit			pAccessUnitList;	// current access unit list to be performed
 	PSps				pSps;	// used by current AU
 	PPps				pPps;	// used by current AU
@@ -267,13 +267,13 @@ typedef struct TagWelsDecoderContext {
 	int32_t             iPicWidthReq;		// picture width have requested the memory
 	int32_t             iPicHeightReq;		// picture height have requested the memory
 
-	uint8_t				uiTargetDqId;		// maximal DQ ID in current access unit, meaning target layer ID	
+	uint8_t				uiTargetDqId;		// maximal DQ ID in current access unit, meaning target layer ID
 	bool_t				bAvcBasedFlag;		// For decoding bitstream:
 	bool_t				bEndOfStreamFlag;	// Flag on end of stream requested by external application layer
 	bool_t				bInitialDqLayersMem;	// dq layers related memory is available?
 
 	bool_t              bOnlyOneLayerInCurAuFlag; //only one layer in current AU: 1
-	
+
 	// for EC parameter sets
 	bool_t				bSpsExistAheadFlag;	// whether does SPS NAL exist ahead of sequence?
 	bool_t				bSubspsExistAheadFlag;// whether does Subset SPS NAL exist ahead of sequence?
@@ -307,20 +307,20 @@ typedef struct TagWelsDecoderContext {
 	int32_t iCurSeqIntervalTargetDependId;
 	int32_t iCurSeqIntervalMaxPicWidth;
 	int32_t iCurSeqIntervalMaxPicHeight;
-	
+
 	PWelsFillNeighborMbInfoIntra4x4Func  pFillInfoCacheIntra4x4Func;
 	PWelsParseIntra4x4ModeFunc           pParseIntra4x4ModeFunc;
 	PWelsParseIntra16x16ModeFunc         pParseIntra16x16ModeFunc;
 
 	//feedback whether or not have VCL in current AU, and the temporal ID
 	int32_t iFeedbackVclNalInAu;
-	int32_t iFeedbackTidInAu;	
+	int32_t iFeedbackTidInAu;
 
 	bool_t bAuReadyFlag;   // TRUE: one au is ready for decoding; FALSE: default value
-	
+
 	//trace handle
 	void_t   *   pTraceHandle;
-	
+
 #ifdef NO_WAITING_AU
 	//Save the last nal header info
 	SNalUnitHeaderExt sLastNalHdrExt;

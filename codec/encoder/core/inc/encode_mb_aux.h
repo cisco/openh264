@@ -49,7 +49,7 @@ void	WelsScan4x4DcAc_c( int16_t* pLevel, int16_t *pDct );
 int32_t		WelsCalculateSingleCtr4x4_c( int16_t *pDct);
 
 /****************************************************************************
- * HDM and Quant functions 
+ * HDM and Quant functions
  ****************************************************************************/
 void WelsHadamardT4Dc_c( int16_t *pLumaDc, int16_t *pDct);
 int32_t WelsHadamardQuant2x2_c(int16_t *pRes, const int16_t kiFF, int16_t iMF, int16_t * pDct, int16_t * pBlock);
@@ -73,8 +73,8 @@ void WelsDctFourT4_c(int16_t *pDct, uint8_t *pPixel1, int32_t iStride1, uint8_t 
  ****************************************************************************/
 void WelsCopy4x4( uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS );
 void WelsCopy8x8_c( uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS );
-void WelsCopy8x16_c( uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS );	// 
-void WelsCopy16x8_c( uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS );	// 
+void WelsCopy8x16_c( uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS );	//
+void WelsCopy16x8_c( uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS );	//
 void WelsCopy16x16_c( uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS );
 
 #if defined(__cplusplus)
@@ -100,7 +100,7 @@ void WelsDctT4_mmx( int16_t *pDct,  uint8_t *pPixel1, int32_t iStride1, uint8_t 
 void WelsDctFourT4_sse2(int16_t *pDct, uint8_t *pPixel1, int32_t iStride1, uint8_t *pPixel2, int32_t iStride2);
 
 /****************************************************************************
- * HDM and Quant functions 
+ * HDM and Quant functions
  ****************************************************************************/
 int32_t WelsHadamardQuant2x2_mmx(int16_t *pRes, const int16_t kiFF, int16_t iMF, int16_t * pDct, int16_t * pBlock);
 void WelsHadamardT4Dc_sse2( int16_t *pLumaDc, int16_t *pDct);
@@ -116,8 +116,8 @@ void WelsQuantFour4x4Max_sse2(int16_t *pDct, int16_t* pFF,  int16_t *pMF, int16_
  * Copy functions for rec
  ****************************************************************************/
 void WelsCopy8x8_mmx( uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS );
-void WelsCopy8x16_mmx( uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS );	
-void WelsCopy16x8NotAligned_sse2( uint8_t* Dst, int32_t  iStrideD, uint8_t* Src,int32_t  iStrideS );	
+void WelsCopy8x16_mmx( uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS );
+void WelsCopy16x8NotAligned_sse2( uint8_t* Dst, int32_t  iStrideD, uint8_t* Src,int32_t  iStrideS );
 void WelsCopy16x16_sse2( uint8_t* Dst, int32_t  iStrideD, uint8_t* Src,int32_t  iStrideS );
 void WelsCopy16x16NotAligned_sse2( uint8_t* Dst, int32_t  iStrideD, uint8_t* Src,int32_t  iStrideS );
 #endif

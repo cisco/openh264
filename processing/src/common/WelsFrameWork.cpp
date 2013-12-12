@@ -72,7 +72,7 @@ EResult CreateSpecificVpInterface(IWelsVP **ppCtx)
 {
 	EResult  eReturn = RET_FAILED;
 
-	CVpFrameWork *pFr = new CVpFrameWork(1, eReturn);  
+	CVpFrameWork *pFr = new CVpFrameWork(1, eReturn);
 	if (pFr)
 	{
 		*ppCtx  = (IWelsVP *)pFr;
@@ -104,12 +104,12 @@ CVpFrameWork::CVpFrameWork(uint32_t uiThreadsNum, EResult &eReturn)
 	{
 		IStrategy *pStrategy = m_pStgChain[i];
 		pStrategy = CreateStrategy(WelsStaticCast(EMethods, i + 1), uiCPUFlag);
-		m_pStgChain[i] = pStrategy;	
+		m_pStgChain[i] = pStrategy;
 	}
-	
+
 	WelsMutexInit(&m_mutes);
 
-	eReturn = RET_SUCCESS;	
+	eReturn = RET_SUCCESS;
 }
 
 CVpFrameWork::~CVpFrameWork()
@@ -120,16 +120,16 @@ CVpFrameWork::~CVpFrameWork()
 		{
 			Uninit(m_pStgChain[i]->m_eMethod);
 			_SafeDelete(m_pStgChain[i]);
-		}		
+		}
 	}
- 
+
 	WelsMutexDestroy(&m_mutes);
 }
 
 EResult CVpFrameWork::Init(int32_t iType, void *pCfg)
 {
 	EResult eReturn   = RET_SUCCESS;
-	int32_t iCurIdx    = WelsStaticCast(int32_t, WelsVpGetValidMethod(iType)) - 1;	
+	int32_t iCurIdx    = WelsStaticCast(int32_t, WelsVpGetValidMethod(iType)) - 1;
 
 	Uninit(iType);
 

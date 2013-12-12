@@ -44,7 +44,7 @@ namespace WelsSVCEnc {
 typedef struct TagWelsSPS{
 	uint32_t	uiSpsId;
 	int16_t		iMbWidth;
-	int16_t		iMbHeight;	
+	int16_t		iMbHeight;
 	uint32_t	uiLog2MaxFrameNum;
 //	uint32_t	uiPocType;
 	/* POC type 0 */
@@ -54,21 +54,21 @@ typedef struct TagWelsSPS{
 
 //	int32_t		iOffsetForTopToBottomField;
 //	int32_t		iNumRefFramesInPocCycle;
-//	int8_t		iOffsetForRefFrame[256];	
+//	int8_t		iOffsetForRefFrame[256];
 	SCropOffset	sFrameCrop;
-	int16_t		iNumRefFrames;	
+	int16_t		iNumRefFrames;
 //	uint32_t	uiNumUnitsInTick;
 //	uint32_t	uiTimeScale;
-	
+
 	uint8_t		uiProfileIdc;
 	uint8_t		iLevelIdc;
 //	uint8_t		uiChromaFormatIdc;
 //	uint8_t		uiChromaArrayType;		//support =1
-	
+
 //	uint8_t		uiBitDepthLuma;         //=8, only used in decoder, encoder in general_***; it can be removed when removed general up_sample
 //	uint8_t		uiBitDepthChroma;		//=8
 	/* TO BE CONTINUE: POC type 1 */
-//	bool_t		bDeltaPicOrderAlwaysZeroFlag;	
+//	bool_t		bDeltaPicOrderAlwaysZeroFlag;
 //	bool_t		bGapsInFrameNumValueAllowedFlag;	//=true
 
 //	bool_t		bFrameMbsOnlyFlag;
@@ -86,14 +86,14 @@ typedef struct TagWelsSPS{
 
 //	bool_t		bConstraintSet3Flag;		// reintroduce constrain_set3_flag instead of reserved filling bytes here
 //	bool_t		bSeparateColorPlaneFlag;  // =false,: only used in decoder, encoder in general_***; it can be removed when removed general up_sample
-	
+
 }SWelsSPS, *PWelsSPS;
 
 
 /* Sequence Parameter Set SVC extension syntax, refer to Page 391 in JVT X201wcm */
 typedef struct TagSpsSvcExt{
 //	SCropOffset	sSeqScaledRefLayer;
-	
+
 	uint8_t		iExtendedSpatialScalability;	// ESS
 //	uint8_t		uiChromaPhaseXPlus1Flag;
 //	uint8_t		uiChromaPhaseYPlus1;
@@ -102,15 +102,15 @@ typedef struct TagSpsSvcExt{
 //	bool_t		bInterLayerDeblockingFilterCtrlPresentFlag;
 	bool_t		bSeqTcoeffLevelPredFlag;
 	bool_t		bAdaptiveTcoeffLevelPredFlag;
-	bool_t		bSliceHeaderRestrictionFlag;	
+	bool_t		bSliceHeaderRestrictionFlag;
 }SSpsSvcExt, *PSpsSvcExt;
 
 /* Subset sequence parameter set syntax, refer to Page 391 in JVT X201wcm */
-typedef struct TagSubsetSps{	
+typedef struct TagSubsetSps{
 	SWelsSPS		pSps;
 	SSpsSvcExt	sSpsSvcExt;
 
-//	bool_t		bSvcVuiParamPresentFlag;	
+//	bool_t		bSvcVuiParamPresentFlag;
 //	bool_t		bAdditionalExtension2Flag;
 //	bool_t		bAdditionalExtension2DataFlag;
 }SSubsetSps, *PSubsetSps;
@@ -119,7 +119,7 @@ typedef struct TagSubsetSps{
 typedef struct TagWelsPPS{
 	uint32_t	iSpsId;
 	uint32_t	iPpsId;
-		
+
 #if !defined(DISABLE_FMO_FEATURE)
 	uint32_t	uiNumSliceGroups;
 	uint32_t	uiSliceGroupMapType;
@@ -136,27 +136,27 @@ typedef struct TagWelsPPS{
 	uint32_t	uiPicSizeInMapUnits;
 	uint32_t	uiSliceGroupId[MAX_SLICEGROUP_IDS];
 #endif//!DISABLE_FMO_FEATURE
-	
+
 //	uint32_t	uiNumRefIdxL0Active;
 //	uint32_t	uiNumRefIdxL1Active;
-	
+
 	int8_t		iPicInitQp;
 	int8_t		iPicInitQs;
-	uint8_t		uiChromaQpIndexOffset;	
-	
+	uint8_t		uiChromaQpIndexOffset;
+
 	/* potential application for High profile */
 //	int32_t		iSecondChromaQpIndexOffset;
 //	/* potential application for High profile */
 
 //	bool_t		bPicOrderPresentFlag;
-	
+
 	bool_t		bDeblockingFilterControlPresentFlag;
-	
+
 //	bool_t		bConstainedIntraPredFlag;
 //	bool_t		bRedundantPicCntPresentFlag;
 //	bool_t		bWeightedPredFlag;
 //	uint8_t		uiWeightedBiPredIdc;
-	
+
 } SWelsPPS, *PWelsPPPS;
 
 //#pragma pack()

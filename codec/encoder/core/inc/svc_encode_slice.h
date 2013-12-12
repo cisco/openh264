@@ -31,7 +31,7 @@
  *
  * \file	svc_encode_slice.h
  *
- * \brief	svc encoding slice 
+ * \brief	svc encoding slice
  *
  * \date	2009.07.27 Created
  *

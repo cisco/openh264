@@ -37,7 +37,7 @@
  *
  *************************************************************************************
  */
- 
+
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -86,7 +86,7 @@ void_t WelsLog(void_t *pPtr, int32_t iLevel, const char *kpFmt, ...)
 
 int32_t WelsSnprintf(str_t * pBuffer,  int32_t iSizeOfBuffer, const str_t * kpFormat, ...)
 {
-	va_list  pArgPtr; 
+	va_list  pArgPtr;
 	int32_t  iRc;
 
 	va_start(pArgPtr, kpFormat);
@@ -144,7 +144,7 @@ int32_t WelsStrftime(str_t * pBuffer, int32_t iSize, const str_t * kpFormat, con
 	return strftime(pBuffer, iSize, kpFormat, &sTimeNow);
 }
 
-#else 
+#else
 
 int32_t WelsSnprintf(str_t * pBuffer,  int32_t iSizeOfBuffer, const str_t * kpFormat, ...)
 {
@@ -223,7 +223,7 @@ int32_t WelsSnprintf(str_t * pBuffer,  int32_t iSizeOfBuffer, const str_t * kpFo
 
 str_t* WelsStrncpy(str_t * pDest, int32_t iSizeInBytes, const str_t * kpSrc, int32_t iCount)
 {
-    return strncpy(pDest, kpSrc, iCount);//confirmed_safe_unsafe_usage	
+    return strncpy(pDest, kpSrc, iCount);//confirmed_safe_unsafe_usage
 }
 
 #if !defined(MACOS) && !defined(UNIX) && !defined(APPLE_IOS)
@@ -236,15 +236,15 @@ int32_t WelsStrnlen(const str_t *kpString, int32_t iMaxlen)
 {
 	// In mac os, there is no strnlen in string.h, we can only use strlen instead of strnlen or
 	// implement strnlen by ourself
-	
+
 #if 1
 	return strlen(pString);//confirmed_safe_unsafe_usage
-#else	
+#else
 	const str_t *kpSrc;
 	for (kpSrc = kpString; iMaxlen-- && *kpSrc != '\0'; ++kpSrc)
 		return kpSrc - kpString;
 #endif
-	
+
 }
 #endif
 
@@ -280,7 +280,7 @@ int32_t WelsGetTimeOfDay(SWelsTime * pTp)
 int32_t WelsStrftime(str_t * pBuffer, int32_t iSize, const str_t * kpFormat, const SWelsTime * kpTp)
 {
 	struct tm  * pTnow;
-        
+
 	pTnow = localtime(&kpTp->time);
 
 	return strftime(pBuffer, iSize, kpFormat, pTnow);

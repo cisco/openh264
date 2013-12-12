@@ -34,7 +34,7 @@
  *
  * \date         :  2011/03/14
  *
- * \description  :  1. rewrite the package code of scene change detection class  
+ * \description  :  1. rewrite the package code of scene change detection class
  *
  */
 

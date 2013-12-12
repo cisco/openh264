@@ -41,10 +41,10 @@
 #define WELS_ENCODER_STATISTICAL_DATA_H__
 
 /*
- *	Stat quality 
+ *	Stat quality
  */
 typedef struct TagStatQuality {
-	
+
 	real32_t	rYPsnr[5];
 	real32_t	rUPsnr[5];
 	real32_t	rVPsnr[5];
@@ -71,7 +71,7 @@ typedef struct TagComplexityStat {
  *	Stat slice details information
  */
 typedef struct TagStatSliceInfo {
-	
+
 	/* per slice info */
 	int32_t		iSliceCount[5];
 	int32_t		iSliceSize [5];
@@ -86,12 +86,12 @@ typedef struct TagStatData {
 
 	// Quality
 	SStatQuality		sQualityStat;
-	
+
 	// Complexity
 	SComplexityStat		sComplexityStat;
 
 	// SSlice information output
-	SStatSliceInfo		sSliceData;	
+	SStatSliceInfo		sSliceData;
 
 } SStatData;
 

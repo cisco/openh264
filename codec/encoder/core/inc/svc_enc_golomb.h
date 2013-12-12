@@ -57,13 +57,13 @@ namespace WelsSVCEnc {
 #define    CAVLC_BS_INIT( pBs )  \
 	uint8_t  * pBufPtr = pBs->pBufPtr; \
 	uint32_t   uiCurBits = pBs->uiCurBits; \
-	int32_t    iLeftBits = pBs->iLeftBits; 
+	int32_t    iLeftBits = pBs->iLeftBits;
 
 #define    CAVLC_BS_UNINIT( pBs ) \
 	pBs->pBufPtr = pBufPtr;  \
 	pBs->uiCurBits = uiCurBits;  \
 	pBs->iLeftBits = iLeftBits;
-   
+
 #define    CAVLC_BS_WRITE( n,  v ) \
 	{  \
 	if ( (n) < iLeftBits ) {\
@@ -78,7 +78,7 @@ namespace WelsSVCEnc {
 		uiCurBits = (v) & ((1<<(n))-1);\
 		iLeftBits = 32 - (n);\
 	}\
-	} ;  
+	} ;
 
 extern const uint32_t g_uiGolombUELength[256];
 
@@ -90,28 +90,28 @@ static inline uint32_t BsSizeUE( const uint32_t kiValue )
 {
 	if ( 256 > kiValue )
 	{
-		return g_uiGolombUELength[kiValue];	
+		return g_uiGolombUELength[kiValue];
 	}
 	else
 	{
-		uint32_t n = 0;	
+		uint32_t n = 0;
 		uint32_t iTmpValue = kiValue+1;
-		
-		if (iTmpValue & 0xffff0000) 
+
+		if (iTmpValue & 0xffff0000)
 		{
 			iTmpValue >>= 16;
 			n += 16;
 		}
-		if (iTmpValue & 0xff00) 
+		if (iTmpValue & 0xff00)
 		{
 			iTmpValue >>= 8;
 			n += 8;
 		}
-		
+
 		//n += (g_uiGolombUELength[iTmpValue] >> 1);
 		n += (g_uiGolombUELength[iTmpValue-1] >> 1);
 		return ((n<<1) + 1);
-		
+
 	}
 }
 
@@ -148,14 +148,14 @@ static inline int32_t BsSizeTE( const int32_t kiX, const int32_t kiValue )
 
 
 static inline int32_t BsWriteBits( SBitStringAux *pBs, int32_t n, const uint32_t kuiValue )
-{  
+{
 	if( n < pBs->iLeftBits ){
 		pBs->uiCurBits = (pBs->uiCurBits<<n) | kuiValue;
-		pBs->iLeftBits -= n;	
+		pBs->iLeftBits -= n;
 	} else {
 	    n -= pBs->iLeftBits;
 		pBs->uiCurBits = (pBs->uiCurBits<<pBs->iLeftBits) | (kuiValue>>n);
-		*((uint32_t*)pBs->pBufPtr) = ENDIAN_FIX(pBs->uiCurBits);		
+		*((uint32_t*)pBs->pBufPtr) = ENDIAN_FIX(pBs->uiCurBits);
 		pBs->pBufPtr += 4;
 		pBs->uiCurBits = kuiValue & ((1<<n)-1);
 		pBs->iLeftBits = 32 - n;
@@ -169,7 +169,7 @@ static inline int32_t BsWriteBits( SBitStringAux *pBs, int32_t n, const uint32_t
 static inline int32_t BsWriteOneBit( SBitStringAux *pBs, const uint32_t kuiValue )
 {
 	BsWriteBits(pBs, 1, kuiValue);
-	
+
 	return 0;
 }
 
@@ -192,15 +192,15 @@ static inline void BsWriteUE( SBitStringAux *pBs, const uint32_t kuiValue )
 	}
 	else
 	{
-		uint32_t n = 0;	
+		uint32_t n = 0;
 		uint32_t iTmpValue = kuiValue + 1;
-		
-		if (iTmpValue & 0xffff0000) 
+
+		if (iTmpValue & 0xffff0000)
 		{
 			iTmpValue >>= 16;
 			n += 16;
 		}
-		if (iTmpValue & 0xff00) 
+		if (iTmpValue & 0xff00)
 		{
 			iTmpValue >>= 8;
 			n += 8;
@@ -218,7 +218,7 @@ static inline void BsWriteUE( SBitStringAux *pBs, const uint32_t kuiValue )
  *	Write signed exp golomb codes
  */
 static inline void BsWriteSE( SBitStringAux *pBs, int32_t iValue )
-{	
+{
 	uint32_t iTmpValue;
 	if ( 0 == iValue )
 	{
@@ -258,8 +258,8 @@ static inline void BsWriteTE( SBitStringAux *pBs, const int32_t kiX, const uint3
  */
 static inline void BsRbspTrailingBits( SBitStringAux *pBs )
 {
-	BsWriteOneBit(pBs, 1);	
-	BsFlush(pBs);	
+	BsWriteOneBit(pBs, 1);
+	BsFlush(pBs);
 }
 
 

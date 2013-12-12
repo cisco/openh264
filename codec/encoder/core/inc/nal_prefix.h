@@ -46,18 +46,18 @@ typedef struct TagNalUnitHeader{
 	uint8_t		uiForbiddenZeroBit;
 	uint8_t		uiNalRefIdc;
 	EWelsNalUnitType	eNalUnitType;
-	uint8_t		uiReservedOneByte;		
+	uint8_t		uiReservedOneByte;
 }SNalUnitHeader, *PNalUnitHeader;
 
 /* NAL Unit Header in scalable extension syntax, refer to Page 390 in JVT X201wcm */
 typedef struct TagNalUnitHeaderExt{
 	SNalUnitHeader	sNalHeader;
-	
+
 	bool_t		bIdrFlag;
 	uint8_t		uiDependencyId;
 	uint8_t		uiTemporalId;
 	bool_t		bDiscardableFlag;
-	
+
 
 }SNalUnitHeaderExt, *PNalUnitHeaderExt;
 }

@@ -42,8 +42,8 @@ namespace WelsDec {
 static inline void_t ExpandPictureLuma_c( uint8_t *pDst, const int32_t kiStride, const int32_t kiPicWidth, const int32_t kiPicHeight )
 {
 	uint8_t *pTmp				= pDst;
-	uint8_t *pDstLastLine		= pTmp + (kiPicHeight-1) * kiStride;	
-	const int32_t kiPaddingLen	= PADDING_LENGTH;	
+	uint8_t *pDstLastLine		= pTmp + (kiPicHeight-1) * kiStride;
+	const int32_t kiPaddingLen	= PADDING_LENGTH;
 	const uint8_t kuiTopLeft	= pTmp[0];
 	const uint8_t kuiTopRight	= pTmp[kiPicWidth-1];
 	const uint8_t kuiBottomLeft	= pDstLastLine[0];
@@ -54,17 +54,17 @@ static inline void_t ExpandPictureLuma_c( uint8_t *pDst, const int32_t kiStride,
 		const int32_t kiStrides	= (1+i) * kiStride;
 		uint8_t* pTop			= pTmp - kiStrides;
 		uint8_t* pBottom		= pDstLastLine + kiStrides;
-		
+
 		// pad pTop and pBottom
 		memcpy(pTop, pTmp, kiPicWidth);
 		memcpy(pBottom, pDstLastLine, kiPicWidth);
-		
+
 		// pad corners
 		memset(pTop-kiPaddingLen,    kuiTopLeft,     kiPaddingLen); //pTop left
 		memset(pTop+kiPicWidth,      kuiTopRight,    kiPaddingLen); //pTop right
 		memset(pBottom-kiPaddingLen, kuiBottomLeft,  kiPaddingLen); //pBottom left
 		memset(pBottom+kiPicWidth,   kuiBottomRight, kiPaddingLen); //pBottom right
-		
+
 		++ i;
 	} while( i < kiPaddingLen );
 
@@ -82,38 +82,38 @@ static inline void_t ExpandPictureLuma_c( uint8_t *pDst, const int32_t kiStride,
 static inline void_t ExpandPictureChroma_c( uint8_t *pDst, const int32_t kiStride, const int32_t kiPicWidth, const int32_t kiPicHeight )
 {
 	uint8_t *pTmp				= pDst;
-	uint8_t *pDstLastLine		= pTmp + (kiPicHeight-1) * kiStride;	
-	const int32_t kiPaddingLen	= (PADDING_LENGTH>>1);	
+	uint8_t *pDstLastLine		= pTmp + (kiPicHeight-1) * kiStride;
+	const int32_t kiPaddingLen	= (PADDING_LENGTH>>1);
 	const uint8_t kuiTopLeft	= pTmp[0];
 	const uint8_t kuiTopRight	= pTmp[kiPicWidth-1];
 	const uint8_t kuiBottomLeft	= pDstLastLine[0];
 	const uint8_t kuiBottomRight= pDstLastLine[kiPicWidth-1];
 	int32_t i					= 0;
-	
+
 	do {
 		const int32_t kiStrides	= (1+i) * kiStride;
 		uint8_t* pTop			= pTmp - kiStrides;
 		uint8_t* pBottom		= pDstLastLine + kiStrides;
-		
+
 		// pad pTop and pBottom
 		memcpy(pTop, pTmp, kiPicWidth);
 		memcpy(pBottom, pDstLastLine, kiPicWidth);
-		
+
 		// pad corners
 		memset(pTop-kiPaddingLen,    kuiTopLeft,     kiPaddingLen); //pTop left
 		memset(pTop+kiPicWidth,      kuiTopRight,    kiPaddingLen); //pTop right
 		memset(pBottom-kiPaddingLen, kuiBottomLeft,  kiPaddingLen); //pBottom left
 		memset(pBottom+kiPicWidth,   kuiBottomRight, kiPaddingLen); //pBottom right
-		
+
 		++ i;
 	} while( i < kiPaddingLen );
-	
+
 	// pad left and right
 	i = 0;
 	do {
 		memset(pTmp-kiPaddingLen, pTmp[0], kiPaddingLen);
 		memset(pTmp+kiPicWidth, pTmp[kiPicWidth-1], kiPaddingLen);
-		
+
 		pTmp += kiStride;
 		++ i;
 	} while( i < kiPicHeight );
@@ -144,9 +144,9 @@ void_t ExpandReferencingPicture(PPicture pPic, PExpandPictureFunc pExpLuma, PExp
 	const int32_t kiWidthY	= pPic->iWidthInPixel;
 	const int32_t kiHeightY	= pPic->iHeightInPixel;
 	const int32_t kiWidthUV	= kiWidthY >> 1;
-	const int32_t kiHeightUV= kiHeightY >> 1;	
-	
-    pExpLuma(pPicY, pPic->iLinesize[0], kiWidthY, kiHeightY);	
+	const int32_t kiHeightUV= kiHeightY >> 1;
+
+    pExpLuma(pPicY, pPic->iLinesize[0], kiWidthY, kiHeightY);
 	if ( kiWidthUV >= 16 )
 	{
 		// fix coding picture size as 16x16 issues 7/27/2010

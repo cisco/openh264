@@ -65,7 +65,7 @@ int32_t RecChroma    (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t *pScoeffL
 
 void_t GetInterPred (uint8_t *pPredY, uint8_t *pPredCb, uint8_t *pPredCr, PWelsDecoderContext pCtx);
 
-void_t FillBufForMc(uint8_t *pBuf, int32_t iBufStride, uint8_t *pSrc, int32_t iSrcStride, int32_t iSrcOffset, 
+void_t FillBufForMc(uint8_t *pBuf, int32_t iBufStride, uint8_t *pSrc, int32_t iSrcStride, int32_t iSrcOffset,
 					 int32_t iBlockWidth, int32_t iBlockHeight, int32_t iSrcX, int32_t iSrcY, int32_t iPicWidth, int32_t iPicHeight);
 
 } // namespace WelsDec

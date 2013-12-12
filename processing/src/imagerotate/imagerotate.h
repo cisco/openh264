@@ -34,7 +34,7 @@
  *
  * \date        :  2011/04/06
  *
- * \description :  
+ * \description :
  *
  *************************************************************************************
  */
@@ -63,7 +63,7 @@ typedef struct {
 }SImageRotateFuncs;
 
 class CImageRotating : public IStrategy
-{			  
+{
 public:
 	CImageRotating(int32_t iCpuFlag);
 	~CImageRotating();
@@ -77,7 +77,7 @@ private:
 private:
 	SImageRotateFuncs m_pfRotateImage;
 	int32_t          m_iCPUFlag;
-};	
+};
 
 WELSVP_NAMESPACE_END
 

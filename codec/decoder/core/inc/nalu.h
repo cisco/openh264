@@ -46,7 +46,7 @@ namespace WelsDec {
 /* NAL Unit Structure */
 typedef struct TagNalUnit{
 	SNalUnitHeaderExt	sNalHeaderExt;
-	
+
 	union{
 		struct SVclNal{
 			SSliceHeaderExt	sSliceHeaderExt;
@@ -56,8 +56,8 @@ typedef struct TagNalUnit{
 			bool_t			bSliceHeaderExtFlag;
 		} sVclNal;
 		SPrefixNalUnit	sPrefixNal;
-	} sNalData;		
-	
+	} sNalData;
+
 }SNalUnit, *PNalUnit;
 
 ///////////////////////////////////ACCESS Unit level///////////////////////////////////

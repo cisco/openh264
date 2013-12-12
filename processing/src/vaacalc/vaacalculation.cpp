@@ -49,7 +49,7 @@ CVAACalculation::CVAACalculation(int32_t iCpuFlag)
 }
 
 CVAACalculation::~CVAACalculation()
-{	
+{
 }
 
 void CVAACalculation::InitVaaFuncs(SVaaFuncs &sVaaFuncs, int32_t iCpuFlag)
@@ -78,7 +78,7 @@ EResult CVAACalculation::Process(int32_t iType, SPixMap *pSrcPixMap, SPixMap *pR
 	int32_t iPicWidth	= pSrcPixMap->sRect.iRectWidth;
 	int32_t iPicHeight	= pSrcPixMap->sRect.iRectHeight;
 	int32_t iPicStride	= pSrcPixMap->iStride[0];
-	
+
 	SVAACalcResult *pResult = m_sCalcParam.pCalcResult;
 
 	if (pCurData == NULL || pRefData == NULL)
@@ -92,8 +92,8 @@ EResult CVAACalculation::Process(int32_t iType, SPixMap *pSrcPixMap, SPixMap *pR
 	{
 		if (m_sCalcParam.iCalcSsd)
 		{
-			m_sVaaFuncs.pfVAACalcSadSsdBgd(pCurData, pRefData, iPicWidth, iPicHeight, iPicStride, &pResult->iFrameSad, 
-				(int32_t*)pResult->pSad8x8, pResult->pSum16x16, pResult->pSumOfSquare16x16, pResult->pSsd16x16, 
+			m_sVaaFuncs.pfVAACalcSadSsdBgd(pCurData, pRefData, iPicWidth, iPicHeight, iPicStride, &pResult->iFrameSad,
+				(int32_t*)pResult->pSad8x8, pResult->pSum16x16, pResult->pSumOfSquare16x16, pResult->pSsd16x16,
 				(int32_t*)pResult->pSumOfDiff8x8, (uint8_t*)pResult->pMad8x8);
 		}
 		else
@@ -116,7 +116,7 @@ EResult CVAACalculation::Process(int32_t iType, SPixMap *pSrcPixMap, SPixMap *pR
 			}else{
 				m_sVaaFuncs.pfVAACalcSad(pCurData, pRefData, iPicWidth, iPicHeight, iPicStride, &pResult->iFrameSad,
 					(int32_t*)pResult->pSad8x8);
-			}			
+			}
 		}
 	}
 

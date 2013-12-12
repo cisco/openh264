@@ -93,7 +93,7 @@ int32_t			g_iSizeLogBuf	= 1024;			// pBuffer size for each log output
  * \return  tag of log iLevel
  */
 static inline str_t *GetLogTag( const int32_t kiLevel, int32_t *pBit )
-{	
+{
 	int32_t iShift	= 0;
 	int32_t iVal		= 0;
 	bool_t	bFound	= false;
@@ -122,7 +122,7 @@ static inline str_t *GetLogTag( const int32_t kiLevel, int32_t *pBit )
 	return NULL;
 }
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	System trace log output in Wels
  *
@@ -147,12 +147,12 @@ void WelsLogDefault( void *pCtx, const int32_t kiLevel, const str_t *kpFmtStr, v
 	}
 	else
 	{
-		str_t pBuf[WELS_LOG_BUF_SIZE+1] = {0};		
+		str_t pBuf[WELS_LOG_BUF_SIZE+1] = {0};
 		const int32_t kiBufSize = sizeof(pBuf) / sizeof(pBuf[0]) - 1;
 		int32_t iCurUsed = 0;
 		int32_t iBufUsed = 0;
 		int32_t iBufLeft = kiBufSize - iBufUsed;
-		
+
 		if ( pEncCtx ){
 			time_t l_time;
 #if defined(WIN32)
@@ -165,11 +165,11 @@ void WelsLogDefault( void *pCtx, const int32_t kiLevel, const str_t *kpFmtStr, v
 #endif//_MSC_VER
 #else//__GNUC__
 			struct tm* t_now;
-#endif//WIN32			
-			
+#endif//WIN32
+
 #if defined( WIN32 )
 			struct _timeb tb;
-			
+
 			time(&l_time);
 #ifdef _MSC_VER
 #if _MSC_VER >= 1500
@@ -181,7 +181,7 @@ void WelsLogDefault( void *pCtx, const int32_t kiLevel, const str_t *kpFmtStr, v
 				return;
 			}
 #endif//_MSC_VER >= 1500
-#endif//_MSC_VER			
+#endif//_MSC_VER
 			FTIME(&tb);
 #elif defined( __GNUC__ )
 			struct timeval tv;
@@ -200,13 +200,13 @@ void WelsLogDefault( void *pCtx, const int32_t kiLevel, const str_t *kpFmtStr, v
 				if (iCurUsed >= 0){
 					iBufUsed += iCurUsed;
 					iBufLeft -= iCurUsed;
-				}				
+				}
 			}
 			else{
 				return;
 			}
 
-			if ( iBufLeft > 0 ){			
+			if ( iBufLeft > 0 ){
 				iCurUsed = GetCodeName( &pBuf[iBufUsed], iBufLeft );
 				if ( iCurUsed > 0 ){
 					iBufUsed += iCurUsed;
@@ -215,7 +215,7 @@ void WelsLogDefault( void *pCtx, const int32_t kiLevel, const str_t *kpFmtStr, v
 				pBuf[iBufUsed] = ' ';
 				++ iBufUsed;
 				-- iBufLeft;
-				
+
 				iCurUsed = GetLibName( &pBuf[iBufUsed], iBufLeft );
 				if ( iCurUsed > 0 ){
 					iBufUsed += iCurUsed;
@@ -227,7 +227,7 @@ void WelsLogDefault( void *pCtx, const int32_t kiLevel, const str_t *kpFmtStr, v
 
 				pBuf[iBufUsed] = 'v';
 				++ iBufUsed;
-				-- iBufLeft;		
+				-- iBufLeft;
 				iCurUsed = GetVerNum( &pBuf[iBufUsed], iBufLeft );
 				if ( iCurUsed > 0 ){
 					iBufUsed += iCurUsed;
@@ -235,7 +235,7 @@ void WelsLogDefault( void *pCtx, const int32_t kiLevel, const str_t *kpFmtStr, v
 				}
 				pBuf[iBufUsed] = ' ';
 				++ iBufUsed;
-				-- iBufLeft;				
+				-- iBufLeft;
 			}
 
 			if (iBufLeft > 0){
@@ -277,7 +277,7 @@ void WelsLogDefault( void *pCtx, const int32_t kiLevel, const str_t *kpFmtStr, v
 
 		// fixed stack corruption issue on vs2008
 		if ( iBufLeft > 0 ){
-			int32_t i_shift = 0;			
+			int32_t i_shift = 0;
 			str_t *pStr = NULL;
 			pStr	= GetLogTag( kiLevel, &i_shift );
 			if ( NULL != pCtx){
@@ -288,7 +288,7 @@ void WelsLogDefault( void *pCtx, const int32_t kiLevel, const str_t *kpFmtStr, v
 				iBufUsed++;
 				++iLenTag;
 				iBufLeft -= iLenTag;
-			}			
+			}
 		}
 		if (iBufLeft > 0){
 #if defined(WIN32) && defined(_MSC_VER) && (_MSC_VER >= 1500)
@@ -316,7 +316,7 @@ void WelsLogDefault( void *pCtx, const int32_t kiLevel, const str_t *kpFmtStr, v
 				fflush( pEncCtx->pFileLog );
 				if ( iCurUsed == iBufUsed )
 					pEncCtx->uiSizeLog += iBufUsed;
-			}			
+			}
 		}
 		else{
 #if defined(WIN32) && defined(_DEBUG)
@@ -324,14 +324,14 @@ void WelsLogDefault( void *pCtx, const int32_t kiLevel, const str_t *kpFmtStr, v
 #endif
 		}
 #endif//ENABLE_TRACE_FILE
-	}	
+	}
 }
 void WelsLogNil( void *pCtx, const int32_t kiLevel, const str_t *kpFmtStr, va_list argv )
 {
 	// NULL implementation
 }
 
-/*! 
+/*!
 *************************************************************************************
 * \brief	reopen log file when finish setting current path
 *
@@ -361,7 +361,7 @@ void WelsReopenTraceFile( void *pCtx, str_t *pCurPath )
 		if (len >= MAX_FNAME_LEN)
 			return;
 		STRNCPY(strTraceFile, MAX_FNAME_LEN, pCurPath, len);	// confirmed_safe_unsafe_usage
-#ifdef __GNUC__		
+#ifdef __GNUC__
 		STRCAT(strTraceFile, MAX_FNAME_LEN-len, "/wels_encoder_trace.txt");	// confirmed_safe_unsafe_usage
 		pEncCtx->pFileLog	= FOPEN(strTraceFile, "wt+");	// confirmed_safe_unsafe_usage
 #elif WIN32
@@ -371,17 +371,17 @@ void WelsReopenTraceFile( void *pCtx, str_t *pCurPath )
 #else
 		pEncCtx->pFileLog	= FOPEN(strTraceFile, "wt+");	// confirmed_safe_unsafe_usage
 #endif//_MSC_VER>=1500
-#else		
+#else
 #endif//__GNUC__
 	}
 #endif//ENABLE_TRACE_FILE
 }
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	set log iLevel from external call
  *
- * \param	iLevel	iLevel of log 
+ * \param	iLevel	iLevel of log
  *
  * \return	NONE
  *
@@ -407,10 +407,10 @@ void WelsSetLogLevel( const int32_t kiLevel )
 	{
 		iVal |= WELS_LOG_DEBUG;
 	}
-	g_iLevelLog	= iVal;	
+	g_iLevelLog	= iVal;
 }
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	get log iLevel from external call
  *
@@ -426,7 +426,7 @@ int32_t WelsGetLogLevel( void )
 	return g_iLevelLog;
 }
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	set log callback from external call
  *
@@ -463,7 +463,7 @@ void WelsLog(void *pCtx, int32_t iLevel, const str_t *kpFmt, ...)
 /*
  *	PSNR calculation routines
  */
-/*! 
+/*!
  *************************************************************************************
  * \brief	PSNR calculation utilization in Wels
  *

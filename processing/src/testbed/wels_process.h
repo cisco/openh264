@@ -34,7 +34,7 @@
  *
  * \date	03/21/2011
  *
- * \description : this class is designed as an interface to unify video pre-processing 
+ * \description : this class is designed as an interface to unify video pre-processing
  *                class implement sets such as denoise,colorspace conversion etc...
  *
  *************************************************************************************
@@ -58,12 +58,12 @@ public:
 	};
 
 public:
-	vResult Init    (int nType, void *pCfg); 
+	vResult Init    (int nType, void *pCfg);
 	vResult Uninit  (int nType);
 	vResult Flush   (int nType);
-	vResult Process (int nType, vPixMap *src, vPixMap *dst); 
-	vResult Get     (int nType, void *pParam); 
-	vResult Set     (int nType, void *pParam); 
+	vResult Process (int nType, vPixMap *src, vPixMap *dst);
+	vResult Get     (int nType, void *pParam);
+	vResult Set     (int nType, void *pParam);
 	vResult SpecialFeature (int nType, void *pIn, void *pOut);
 
 	void SetFlag(int a)   { flag = a; }
@@ -71,7 +71,7 @@ public:
 
 private:
 	int      flag;
-	IWelsVP  *ivp;	
+	IWelsVP  *ivp;
 	void     *hlib;
 	void     *iface[2];
 };

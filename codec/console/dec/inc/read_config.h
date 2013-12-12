@@ -49,13 +49,13 @@ class CReadConfig
 public:
 	CReadConfig( const char *kpConfigFileName );
 	virtual ~CReadConfig();
-	
+
 	long ReadLine( string* val, const int kiValSize = 4 );
 	const bool EndOfFile();
 	const int GetLines();
 	const bool ExistFile();
 	const string& GetFileName();
-	
+
 private:
 	FILE			*m_pCfgFile;
 	string			m_strCfgFileName;

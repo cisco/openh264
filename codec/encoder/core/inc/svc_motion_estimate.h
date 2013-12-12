@@ -51,17 +51,17 @@ namespace WelsSVCEnc {
 
 union SadPredISatdUnit{
 	uint16_t	uiSadPred;
-	uint16_t	uiSatd;    //reuse the sad_pred as a temp satd pData 
+	uint16_t	uiSatd;    //reuse the sad_pred as a temp satd pData
 };
 typedef struct TagWelsME {
     /* input */
 	uint16_t					*pMvdCost;
     union SadPredISatdUnit	uSadPredISatd; //reuse the sad_pred as a temp pData
-	uint16_t					uiSadCost;  //used by ME and RC 
+	uint16_t					uiSadCost;  //used by ME and RC
     uint16_t					uiSatdCost; /* satd + lm * nbits */
     uint8_t						uiPixel;   /* PIXEL_WxH */
     uint8_t						uiReserved;
-	
+
     uint8_t						*pEncMb;
     uint8_t						*pRefMb;
 
