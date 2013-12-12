@@ -191,7 +191,7 @@ long CWelsDecoder::Initialize(void_t* pParam, const INIT_TYPE keInitType)
 	return cmResultSuccess;
 }
 
-long CWelsDecoder::Unintialize()
+long CWelsDecoder::Uninitialize()
 {
 	UninitDecoder();
 	

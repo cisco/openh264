@@ -45,7 +45,7 @@ public:
 	virtual int Initialize(SVCEncodingParam* pParam, const INIT_TYPE kiInitType = INIT_TYPE_PARAMETER_BASED) = 0;
 	virtual int Initialize(void* pParam, const INIT_TYPE kiInitType = INIT_TYPE_CONFIG_BASED) = 0;	
 	  
-	virtual int Unintialize() = 0;
+	virtual int Uninitialize() = 0;
 	
 	/*
 	 * return: EVideoFrameType [IDR: videoFrameTypeIDR; P: videoFrameTypeP; ERROR: videoFrameTypeInvalid]
@@ -77,7 +77,7 @@ class ISVCDecoder
 {
 public:
 	virtual long Initialize(void* pParam, const INIT_TYPE iInitType) = 0;
-	virtual long Unintialize() = 0;
+	virtual long Uninitialize() = 0;
 
 	virtual DECODING_STATE DecodeFrame(	const unsigned char* pSrc,
 		                                const int iSrcLen,	

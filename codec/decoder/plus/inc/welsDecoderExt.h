@@ -65,7 +65,7 @@ public:
 	virtual ~CWelsDecoder();
 
 	virtual long Initialize(void_t* pParam, const INIT_TYPE keInitType);
-	virtual long Unintialize();		
+	virtual long Uninitialize();
 	
 	/***************************************************************************
 	*	Description:
