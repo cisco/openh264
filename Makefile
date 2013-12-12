@@ -2,6 +2,7 @@ UNAME=$(shell uname | tr A-Z a-z)
 LIBPREFIX=lib
 LIBSUFFIX=a
 ROOTDIR=$(PWD)
+HAVE_GTEST=Yes
 
 # Configurations
 ifeq ($(BUILDTYPE), Release)
@@ -24,7 +25,7 @@ ASMFLAGS += -DNO_DYNAMIC_VP -DNOPREFIX
 
 
 #### No user-serviceable parts below this line
-INCLUDES = -Icodec/api/svc  -Icodec/common
+INCLUDES = -Icodec/api/svc  -Icodec/common -Igtest/include
 ASM_INCLUDES = -Iprocessing/src/asm/
 
 COMMON_INCLUDES = \
@@ -49,6 +50,8 @@ H264DEC_LDFLAGS = -L. -ldecoder -lcommon
 H264ENC_INCLUDES = $(ENCODER_INCLUDES) -Icodec/console/enc/inc
 H264ENC_LDFLAGS = -L. -lencoder -lprocessing -lcommon
 
+CODEC_UNITTEST_LDFLAGS = -L. -lgtest
+
 all:	libraries binaries
 
 clean:
@@ -61,6 +64,13 @@ include codec/encoder/targets.mk
 include processing/targets.mk
 include codec/console/dec/targets.mk
 include codec/console/enc/targets.mk
+
+ifdef HAVE_GTEST
+include gtest/targets.mk
+include test/targets.mk
+endif
+
+
 
 
 
