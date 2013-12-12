@@ -217,7 +217,7 @@ int32_t WelsStrnlen (const str_t* kpString, int32_t iMaxlen) {
   // implement strnlen by ourself
 
 #if 1
-  return strlen (pString); //confirmed_safe_unsafe_usage
+  return strlen (kpString); //confirmed_safe_unsafe_usage
 #else
   const str_t* kpSrc;
   for (kpSrc = kpString; iMaxlen-- && *kpSrc != '\0'; ++kpSrc)
