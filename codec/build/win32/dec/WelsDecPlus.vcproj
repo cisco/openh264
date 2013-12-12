@@ -513,6 +513,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath="..\..\..\decoder\plus\src\welsDecoderC.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\decoder\plus\src\welsDecoderExt.cpp"
 					>
 					<FileConfiguration

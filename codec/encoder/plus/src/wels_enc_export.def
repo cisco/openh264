@@ -1,3 +1,13 @@
 EXPORTS
     CreateSVCEncoder
     DestroySVCEncoder
+    SVCEncoder_Initialize
+    SVCEncoder_Initialize2
+    SVCEncoder_Uninitialize
+    SVCEncoder_EncodeFrame
+    SVCEncoder_EncodeFrame2
+    SVCEncoder_EncodeParameterSets
+    SVCEncoder_PauseFrame
+    SVCEncoder_ForceIntraFrame
+    SVCEncoder_SetOption
+    SVCEncoder_GetOption

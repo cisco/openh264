@@ -32,6 +32,7 @@ ENCODER_CPP_SRCS=\
 	$(ENCODER_SRCDIR)/./core/src/utils.cpp\
 	$(ENCODER_SRCDIR)/./core/src/wels_preprocess.cpp\
 	$(ENCODER_SRCDIR)/./plus/src/welsCodecTrace.cpp\
+	$(ENCODER_SRCDIR)/./plus/src/welsEncoderC.cpp\
 	$(ENCODER_SRCDIR)/./plus/src/welsEncoderExt.cpp\
 
 ENCODER_OBJS += $(ENCODER_CPP_SRCS:.cpp=.o)
