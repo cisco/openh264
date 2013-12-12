@@ -38,36 +38,40 @@
 
 #ifdef __GNUC__
 
-	struct tagUnaligned_64 { uint64_t l; } __attribute__((packed));
-	struct tagUnaligned_32 { uint32_t l; } __attribute__((packed));
-	struct tagUnaligned_16 { uint16_t l; } __attribute__((packed));
-	
-	#define LD16(a) (((struct tagUnaligned_16 *) (a))->l)
-	#define LD32(a) (((struct tagUnaligned_32 *) (a))->l)
-	//#define LD64(a) (((struct tagUnaligned_64 *) (a))->l)
-        inline uint64_t LD64(const void * a)
-		{
-			uint64_t v;
-			memcpy(&v, a, sizeof(v));	// confirmed_safe_unsafe_usage
-			return v;
-		}
-	//#define _USE_STRUCT_INT_CVT
+struct tagUnaligned_64 {
+uint64_t l;
+} __attribute__ ((packed));
+struct tagUnaligned_32 {
+uint32_t l;
+} __attribute__ ((packed));
+struct tagUnaligned_16 {
+uint16_t l;
+} __attribute__ ((packed));
+
+#define LD16(a) (((struct tagUnaligned_16 *) (a))->l)
+#define LD32(a) (((struct tagUnaligned_32 *) (a))->l)
+//#define LD64(a) (((struct tagUnaligned_64 *) (a))->l)
+inline uint64_t LD64 (const void* a) {
+uint64_t v;
+memcpy (&v, a, sizeof (v));	// confirmed_safe_unsafe_usage
+return v;
+}
+//#define _USE_STRUCT_INT_CVT
 //	#ifdef _USE_STRUCT_INT_CVT
-		#define ST16(a, b) (((struct tagUnaligned_16 *) (a))->l) = (b)             
-		#define ST32(a, b) (((struct tagUnaligned_32 *) (a))->l) = (b)
-		//#define ST64(a, b) (((struct tagUnaligned_64 *) (a))->l) = (b)                               
-                inline void ST64(void * a, uint64_t b)
-				{
-					memcpy(a, &b, sizeof(b));	// confirmed_safe_unsafe_usage
-				}
+#define ST16(a, b) (((struct tagUnaligned_16 *) (a))->l) = (b)
+#define ST32(a, b) (((struct tagUnaligned_32 *) (a))->l) = (b)
+//#define ST64(a, b) (((struct tagUnaligned_64 *) (a))->l) = (b)
+inline void ST64 (void* a, uint64_t b) {
+  memcpy (a, &b, sizeof (b));	// confirmed_safe_unsafe_usage
+}
 //	#else
 //		inline void __ST16(void *dst, uint16_t v) { memcpy(dst, &v, 2); }
 //		inline void __ST32(void *dst, uint32_t v) { memcpy(dst, &v, 4); }
-		//inline void __ST64(void *dst, uint64_t v) { memcpy(dst, &v, 8); }
+//inline void __ST64(void *dst, uint64_t v) { memcpy(dst, &v, 8); }
 //	#endif
 
 #else
-	
+
 //#define INTD16(a) (*((int16_t*)(a)))
 //#define INTD32(a) (*((int32_t*)(a)))
 //#define INTD64(a) (*((int64_t*)(a)))

@@ -47,18 +47,18 @@
 
 #include "codec_app_def.h"
 namespace WelsSVCEnc {
-/*! 
+/*!
  * \brief	SSlice mode
  */
 typedef uint16_t SliceMode;
-typedef enum{
-	SM_SINGLE_SLICE         = 0,
-	SM_FIXEDSLCNUM_SLICE	= 1,
-	SM_RASTER_SLICE			= 2,
-	SM_ROWMB_SLICE			= 3,
-	SM_DYN_SLICE			= 4,
-	SM_RESERVED				= 5
-}SliceModeEnum;
+typedef enum {
+SM_SINGLE_SLICE         = 0,
+SM_FIXEDSLCNUM_SLICE	= 1,
+SM_RASTER_SLICE			= 2,
+SM_ROWMB_SLICE			= 3,
+SM_DYN_SLICE			= 4,
+SM_RESERVED				= 5
+} SliceModeEnum;
 
 
 // NOTE:
@@ -80,44 +80,45 @@ typedef enum{
 #define JUMPPACKETSIZE_JUDGE(len,mb_idx,max_byte)	 ( (len) > JUMPPACKETSIZE_CONSTRAINT(max_byte) ) //( (mb_idx+1)%40/*16slice for compare*/ == 0 )	//
 //cur_mb_idx is for early tests, can be omit in optimization
 
-typedef struct TagSliceArgument{
-	uint32_t			uiSliceMbNum[MAX_SLICES_NUM];   //will perform check on this array to decide specific slicing, see note	
-	uint32_t			uiSliceSizeConstraint;
-	int16_t				iSliceNum;
+typedef struct TagSliceArgument {
+uint32_t			uiSliceMbNum[MAX_SLICES_NUM];   //will perform check on this array to decide specific slicing, see note
+uint32_t			uiSliceSizeConstraint;
+int16_t				iSliceNum;
 } SSliceArgument;
 
-typedef struct TagMulSliceOption{ //interfaces about slicing from application layer	
-	SSliceArgument		sSliceArgument; //according to uiSliceMode, decide which elements of this structure will actually takes effect
-	SliceMode			uiSliceMode;
+typedef struct TagMulSliceOption { //interfaces about slicing from application layer
+SSliceArgument
+sSliceArgument; //according to uiSliceMode, decide which elements of this structure will actually takes effect
+SliceMode			uiSliceMode;
 } SMulSliceOption;
 
-/*! 
+/*!
  * \brief	SSlice context
  */
-/* Single/multiple slices */	
-typedef struct SlicepEncCtx_s{
-	SliceMode		uiSliceMode;			/* 0: single slice in frame; 1: multiple slices in frame; */
-	int16_t			iMbWidth;			/* width of picture size in mb */
-	int16_t			iMbHeight;			/* height of picture size in mb */
-	int16_t			iSliceNumInFrame;	/* count number of slices in frame; */
-	int32_t			iMbNumInFrame;	/* count number of MBs in frame */
-	uint8_t			*pOverallMbMap;	/* overall MB map in frame, store virtual slice idc; */	
-	int16_t			*pFirstMbInSlice;	/* first MB address top-left based in every slice respectively; */
-	int32_t			*pCountMbNumInSlice;	/* count number of MBs in every slice respectively; */
-	uint32_t		uiSliceSizeConstraint;/*in byte*/
-	int32_t			iMaxSliceNumConstraint;/*maximal number of slices constraint*/
+/* Single/multiple slices */
+typedef struct SlicepEncCtx_s {
+SliceMode		uiSliceMode;			/* 0: single slice in frame; 1: multiple slices in frame; */
+int16_t			iMbWidth;			/* width of picture size in mb */
+int16_t			iMbHeight;			/* height of picture size in mb */
+int16_t			iSliceNumInFrame;	/* count number of slices in frame; */
+int32_t			iMbNumInFrame;	/* count number of MBs in frame */
+uint8_t*			pOverallMbMap;	/* overall MB map in frame, store virtual slice idc; */
+int16_t*			pFirstMbInSlice;	/* first MB address top-left based in every slice respectively; */
+int32_t*			pCountMbNumInSlice;	/* count number of MBs in every slice respectively; */
+uint32_t		uiSliceSizeConstraint;/*in byte*/
+int32_t			iMaxSliceNumConstraint;/*maximal number of slices constraint*/
 } SSliceCtx;
 
 
-typedef struct TagDynamicSlicingStack{
-	int32_t		iStartPos;	
-	int32_t		iCurrentPos;	
+typedef struct TagDynamicSlicingStack {
+int32_t		iStartPos;
+int32_t		iCurrentPos;
 
-	uint8_t		*pBsStackBufPtr;	// current writing position	
-	uint32_t    uiBsStackCurBits;  
-	int32_t		iBsStackLeftBits;
+uint8_t*		pBsStackBufPtr;	// current writing position
+uint32_t    uiBsStackCurBits;
+int32_t		iBsStackLeftBits;
 
-	int32_t		iMbSkipRunStack;
+int32_t		iMbSkipRunStack;
 } SDynamicSlicingStack;
 
 /*!
@@ -125,7 +126,7 @@ typedef struct TagDynamicSlicingStack{
  *
  * \param	pSliceCtx		SSlice context to be initialized
  * \param	bFmoUseFlag	flag of using fmo
- * \param	iMbWidth		MB width 
+ * \param	iMbWidth		MB width
  * \param	iMbHeight		MB height
  * \param	uiSliceMode		slice mode
  * \param	mul_slice_arg	argument for multiple slice if it is applicable
@@ -133,23 +134,23 @@ typedef struct TagDynamicSlicingStack{
  *
  * \return	0 - successful; none 0 - failed;
  */
-int32_t InitSlicePEncCtx( SSliceCtx *pSliceCtx,
-						    CMemoryAlign *pMa,
-						    bool_t bFmoUseFlag,
-							int32_t iMbWidth,
-							int32_t iMbHeight,
-							SMulSliceOption *pMulSliceOption,
-							void *pPpsArg );
+int32_t InitSlicePEncCtx (SSliceCtx* pSliceCtx,
+                          CMemoryAlign* pMa,
+                          bool_t bFmoUseFlag,
+                          int32_t iMbWidth,
+                          int32_t iMbHeight,
+                          SMulSliceOption* pMulSliceOption,
+                          void* pPpsArg);
 
 
 /*!
  * \brief	Uninitialize Wels SSlice context (Single/multiple slices and FMO)
  *
- * \param	pSliceCtx		SSlice context to be initialized 
+ * \param	pSliceCtx		SSlice context to be initialized
  *
  * \return	NONE;
  */
-void UninitSlicePEncCtx( SSliceCtx *pSliceCtx, CMemoryAlign *pMa );
+void UninitSlicePEncCtx (SSliceCtx* pSliceCtx, CMemoryAlign* pMa);
 
 /*!
  * \brief	Get slice idc for given iMbXY (apply in Single/multiple slices and FMO)
@@ -159,7 +160,7 @@ void UninitSlicePEncCtx( SSliceCtx *pSliceCtx, CMemoryAlign *pMa );
  *
  * \return	uiSliceIdc - successful; (uint8_t)(-1) - failed;
  */
-uint8_t WelsMbToSliceIdc( SSliceCtx *pSliceCtx, const int16_t kiMbXY );
+uint8_t WelsMbToSliceIdc (SSliceCtx* pSliceCtx, const int16_t kiMbXY);
 
 /*!
  * \brief	Get first mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
@@ -169,7 +170,7 @@ uint8_t WelsMbToSliceIdc( SSliceCtx *pSliceCtx, const int16_t kiMbXY );
  *
  * \return	first_mb - successful; -1 - failed;
  */
-int32_t WelsGetFirstMbOfSlice( SSliceCtx *pSliceCtx, const int32_t kiSliceIdc );
+int32_t WelsGetFirstMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiSliceIdc);
 
 /*!
  * \brief	Get successive mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
@@ -179,7 +180,7 @@ int32_t WelsGetFirstMbOfSlice( SSliceCtx *pSliceCtx, const int32_t kiSliceIdc );
  *
  * \return	next_mb - successful; -1 - failed;
  */
-int32_t WelsGetNextMbOfSlice( SSliceCtx *pSliceCtx, const int16_t kiMbXY );
+int32_t WelsGetNextMbOfSlice (SSliceCtx* pSliceCtx, const int16_t kiMbXY);
 
 /*!
  * \brief	Get previous mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
@@ -189,7 +190,7 @@ int32_t WelsGetNextMbOfSlice( SSliceCtx *pSliceCtx, const int16_t kiMbXY );
  *
  * \return	prev_mb - successful; -1 - failed;
  */
-int32_t WelsGetPrevMbOfSlice( SSliceCtx *pSliceCtx, const int16_t kiMbXY );
+int32_t WelsGetPrevMbOfSlice (SSliceCtx* pSliceCtx, const int16_t kiMbXY);
 
 /*!
  * \brief	Get number of mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
@@ -199,27 +200,27 @@ int32_t WelsGetPrevMbOfSlice( SSliceCtx *pSliceCtx, const int16_t kiMbXY );
  *
  * \return	count_num_of_mb - successful; -1 - failed;
  */
-int32_t WelsGetNumMbInSlice( SSliceCtx *pSliceCtx, const int32_t kiSliceIdc );
+int32_t WelsGetNumMbInSlice (SSliceCtx* pSliceCtx, const int32_t kiSliceIdc);
 
 /*!
  *	Get slice count for multiple slice segment
  *
  */
-int32_t GetInitialSliceNum( const int32_t kiMbWidth, const int32_t kiMbHeight, SMulSliceOption* pMso );
-int32_t GetCurrentSliceNum( const SSliceCtx *kpSliceCtx );
+int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SMulSliceOption* pMso);
+int32_t GetCurrentSliceNum (const SSliceCtx* kpSliceCtx);
 
 //checking valid para
-int32_t DynamicMaxSliceNumConstraint( uint32_t uiMaximumNum, int32_t uiConsumedNum, uint32_t uiDulplicateTimes  );
+int32_t DynamicMaxSliceNumConstraint (uint32_t uiMaximumNum, int32_t uiConsumedNum, uint32_t uiDulplicateTimes);
 
-bool_t CheckFixedSliceNumMultiSliceSetting( const int32_t kiMbNumInFrame,  SSliceArgument * pSliceArg );
-bool_t CheckRasterMultiSliceSetting( const int32_t kiMbNumInFrame, SSliceArgument * pSliceArg );
-bool_t CheckRowMbMultiSliceSetting( const int32_t kiMbWidth,  SSliceArgument * pSliceArg );
+bool_t CheckFixedSliceNumMultiSliceSetting (const int32_t kiMbNumInFrame,  SSliceArgument* pSliceArg);
+bool_t CheckRasterMultiSliceSetting (const int32_t kiMbNumInFrame, SSliceArgument* pSliceArg);
+bool_t CheckRowMbMultiSliceSetting (const int32_t kiMbWidth,  SSliceArgument* pSliceArg);
 
-void GomValidCheckSliceNum( const int32_t kiMbWidth, const int32_t kiMbHeight, int32_t *pSliceNum );
-void GomValidCheckSliceMbNum( const int32_t kiMbWidth, const int32_t kiMbHeight,  SSliceArgument * pSliceArg );
+void GomValidCheckSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, int32_t* pSliceNum);
+void GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,  SSliceArgument* pSliceArg);
 //end of checking valid para
 
-int32_t DynamicAdjustSlicePEncCtxAll(	SSliceCtx *pSliceCtx,
-											int32_t *pRunLength	);
+int32_t DynamicAdjustSlicePEncCtxAll (SSliceCtx* pSliceCtx,
+                                      int32_t* pRunLength);
 }
 #endif//WELS_SLICE_SEGMENT_H__

@@ -15,27 +15,27 @@
 
 class CodecTest : public ::testing::Test {
  public:
-  CodecTest() : decoder_(NULL) {}
+  CodecTest() : decoder_ (NULL) {}
 
   ~CodecTest() {
-    if (decoder_) DestroyDecoder(decoder_);
+    if (decoder_) DestroyDecoder (decoder_);
   }
 
   void SetUp() {
-    long rv = CreateDecoder(&decoder_);
-    ASSERT_EQ(0, rv);
-    ASSERT_TRUE(decoder_);
+    long rv = CreateDecoder (&decoder_);
+    ASSERT_EQ (0, rv);
+    ASSERT_TRUE (decoder_);
   }
 
-protected:
-  ISVCDecoder *decoder_;
+ protected:
+  ISVCDecoder* decoder_;
 };
 
-TEST_F(CodecTest, JustInit) {
+TEST_F (CodecTest, JustInit) {
 }
 
-int main(int argc, char **argv) {
-  testing::InitGoogleTest(&argc, argv);
+int main (int argc, char** argv) {
+  testing::InitGoogleTest (&argc, argv);
 
   return RUN_ALL_TESTS();
 }

@@ -34,9 +34,9 @@
  * \brief	promised alignment of array pData declaration on stack
  *			multidimensional array can be extended if applicable need
  *
- * \date		8/8/2011 Created 
+ * \date		8/8/2011 Created
  *			8/12/2011 functionality implementation for multidimensional array
- *			8/26/2011 better solution with reducing extra memory used, 
+ *			8/26/2011 better solution with reducing extra memory used,
  *						stack size is adaptively reduced by _tp & _al
  *
  *************************************************************************************

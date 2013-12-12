@@ -47,51 +47,53 @@ namespace WelsDec {
 
 /*!
 * \brief	 update mv and ref_index cache for current MB, only for P_16x16 (SKIP inclusive)
-* \param	 
-* \param	 
+* \param
+* \param
 */
-void_t UpdateP16x16MotionInfo(PDqLayer pCurDqLayer, int8_t iRef, int16_t iMVs[2]);
+void_t UpdateP16x16MotionInfo (PDqLayer pCurDqLayer, int8_t iRef, int16_t iMVs[2]);
 
- /*!
- * \brief   update mv and ref_index cache for current MB, only for P_16x8
- * \param 	
- * \param 	
+/*!
+* \brief   update mv and ref_index cache for current MB, only for P_16x8
+* \param
+* \param
+*/
+void_t UpdateP16x8MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][30][MV_A],
+                              int8_t iRefIndex[LIST_A][30],
+                              int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]);
+
+
+/*!
+ * \brief	 update mv and ref_index cache for current MB, only for P_8x16
+ * \param
+ * \param
  */
-void_t UpdateP16x8MotionInfo(PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30], 
-							  int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]);
+void_t UpdateP8x16MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][30][MV_A],
+                              int8_t iRefIndex[LIST_A][30],
+                              int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]);
 
-
- /*!
-  * \brief	 update mv and ref_index cache for current MB, only for P_8x16
-  * \param	 
-  * \param	 
-  */
-void_t UpdateP8x16MotionInfo(PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30], 
-							  int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]);
- 
 /*!
  * \brief   get the motion predictor for 4*4 or 8*8 or 16*16 block
- * \param 	
+ * \param
  * \param 	output mvp_x and mvp_y
  */
-void_t PredMv(int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30], 
-			 int32_t iPartIdx, int32_t iPartWidth, int8_t iRef, int16_t iMVP[2]);
+void_t PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
+               int32_t iPartIdx, int32_t iPartWidth, int8_t iRef, int16_t iMVP[2]);
 
 /*!
  * \brief   get the motion predictor for inter16x8 MB
- * \param 	
+ * \param
  * \param 	output mvp_x and mvp_y
  */
-void_t PredInter16x8Mv(int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30], 
-						int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]);
+void_t PredInter16x8Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
+                        int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]);
 
 /*!
  * \brief   get the motion predictor for inter8x16 MB
- * \param 	
+ * \param
  * \param 	output mvp_x and mvp_y
  */
-void_t PredInter8x16Mv(int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30], 
-						int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]);
+void_t PredInter8x16Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
+                        int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]);
 
 } // namespace WelsDec
 

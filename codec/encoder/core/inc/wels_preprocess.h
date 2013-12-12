@@ -35,7 +35,7 @@
  *
  * \date	03/15/2011
  *
- * \description : this class is designed as an interface to unify video pre-processing 
+ * \description : this class is designed as an interface to unify video pre-processing
  *                class implement sets such as denoise,colorspace conversion etc...
  *
  *************************************************************************************
@@ -52,100 +52,100 @@
 
 namespace WelsSVCEnc {
 
-typedef  struct
-{
-	SPicture	*pScaledInputPicture;
-	int32_t		iScaledWidth[MAX_DEPENDENCY_LAYER];
-	int32_t     iScaledHeight[MAX_DEPENDENCY_LAYER];
+typedef  struct {
+  SPicture*	pScaledInputPicture;
+  int32_t		iScaledWidth[MAX_DEPENDENCY_LAYER];
+  int32_t     iScaledHeight[MAX_DEPENDENCY_LAYER];
 } Scaled_Picture;
 
-typedef struct 
-{
-	SVAACalcResult		sVaaCalcInfo;
-	SAdaptiveQuantizationParam sAdaptiveQuantParam;
-	SComplexityAnalysisParam sComplexityAnalysisParam;
+typedef struct {
+  SVAACalcResult		sVaaCalcInfo;
+  SAdaptiveQuantizationParam sAdaptiveQuantParam;
+  SComplexityAnalysisParam sComplexityAnalysisParam;
 
-	int32_t			iPicWidth;			// maximal iWidth of picture in samples for svc coding
-	int32_t			iPicHeight;			// maximal iHeight of picture in samples for svc coding
-	int32_t         iPicStride;         //luma
-	int32_t			iPicStrideUV;
+  int32_t			iPicWidth;			// maximal iWidth of picture in samples for svc coding
+  int32_t			iPicHeight;			// maximal iHeight of picture in samples for svc coding
+  int32_t         iPicStride;         //luma
+  int32_t			iPicStrideUV;
 
-	uint8_t         *pRefY; //pRef	
-	uint8_t         *pCurY; //cur
-	uint8_t         *pRefU; //pRef	
-	uint8_t         *pCurU; //cur
-	uint8_t         *pRefV; //pRef	
-	uint8_t         *pCurV; //cur
+  uint8_t*         pRefY; //pRef
+  uint8_t*         pCurY; //cur
+  uint8_t*         pRefU; //pRef
+  uint8_t*         pCurU; //cur
+  uint8_t*         pRefV; //pRef
+  uint8_t*         pCurV; //cur
 
-	int8_t			*pVaaBackgroundMbFlag;
-	uint8_t         uiValidLongTermPicIdx;
-	uint8_t         uiMarkLongTermPicIdx;
+  int8_t*			pVaaBackgroundMbFlag;
+  uint8_t         uiValidLongTermPicIdx;
+  uint8_t         uiMarkLongTermPicIdx;
 
-	bool_t          bSceneChangeFlag;
-	bool_t          bIdrPeriodFlag;
+  bool_t          bSceneChangeFlag;
+  bool_t          bIdrPeriodFlag;
 } SVAAFrameInfo;
 
-class CWelsLib
-{
-public:
-	CWelsLib(void *pEncCtx);
-	virtual  ~CWelsLib();	
+class CWelsLib {
+ public:
+  CWelsLib (void* pEncCtx);
+  virtual  ~CWelsLib();
 
-	int32_t CreateIface(void **pEncCtx);
-	int32_t DestroyIface(void *pEncCtx);
+  int32_t CreateIface (void** pEncCtx);
+  int32_t DestroyIface (void* pEncCtx);
 
-protected:
-	void *QueryFunction(const str_t *pName);
+ protected:
+  void* QueryFunction (const str_t* pName);
 
-private:
-	void *m_pVpLib;
-	void *m_pInterface[2];
+ private:
+  void* m_pVpLib;
+  void* m_pInterface[2];
 };
 
-class CWelsPreProcess
-{
-public:
-	CWelsPreProcess(void *pEncCtx);
-	virtual  ~CWelsPreProcess();
+class CWelsPreProcess {
+ public:
+  CWelsPreProcess (void* pEncCtx);
+  virtual  ~CWelsPreProcess();
 
-public:
-	int32_t WelsPreprocessReset ( void *pEncCtx );
-	int32_t WelsPreprocessStep1( void *pEncCtx, const SSourcePicture **kppSrcPicList, const int32_t kiConfiguredLayerNum );
-	int32_t WelsPreprocessStep3( void *pEncCtx, const int32_t kiDIdx );
+ public:
+  int32_t WelsPreprocessReset (void* pEncCtx);
+  int32_t WelsPreprocessStep1 (void* pEncCtx, const SSourcePicture** kppSrcPicList, const int32_t kiConfiguredLayerNum);
+  int32_t WelsPreprocessStep3 (void* pEncCtx, const int32_t kiDIdx);
 
-private:
-	int32_t WelsPreprocessCreate();
-	int32_t WelsPreprocessDestroy();
-	int32_t InitLastSpatialPictures( void *pEncCtx );
+ private:
+  int32_t WelsPreprocessCreate();
+  int32_t WelsPreprocessDestroy();
+  int32_t InitLastSpatialPictures (void* pEncCtx);
 
-private:
-	int32_t SingleLayerPreprocess( void *pEncCtx, const SSourcePicture *kpSrc, Scaled_Picture * m_sScaledPicture );
-	int32_t MultiLayerPreprocess( void *pEncCtx, const SSourcePicture **kppSrcPicList, const int32_t kiSpatialNum );
+ private:
+  int32_t SingleLayerPreprocess (void* pEncCtx, const SSourcePicture* kpSrc, Scaled_Picture* m_sScaledPicture);
+  int32_t MultiLayerPreprocess (void* pEncCtx, const SSourcePicture** kppSrcPicList, const int32_t kiSpatialNum);
 
-	void	BilateralDenoising ( SPicture *pSrc, const int32_t iWidth, const int32_t iHeight );
-	bool_t  DetectSceneChange( SPicture *pCurPicture, SPicture *pRefPicture );
-	int32_t DownsamplePadding( SPicture *pSrc, SPicture *pDstPic,  int32_t iSrcWidth, int32_t iSrcHeight,
-		                        int32_t iShrinkWidth, int32_t iShrinkHeight, int32_t iTargetWidth, int32_t iTargetHeight );
+  void	BilateralDenoising (SPicture* pSrc, const int32_t iWidth, const int32_t iHeight);
+  bool_t  DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture);
+  int32_t DownsamplePadding (SPicture* pSrc, SPicture* pDstPic,  int32_t iSrcWidth, int32_t iSrcHeight,
+                             int32_t iShrinkWidth, int32_t iShrinkHeight, int32_t iTargetWidth, int32_t iTargetHeight);
 
-	void    VaaCalculation( SVAAFrameInfo *pVaaInfo, SPicture *pCurPicture, SPicture *pRefPicture, bool_t bCalculateSQDiff, bool_t bCalculateVar, bool_t bCalculateBGD );
-	void    BackgroundDetection( SVAAFrameInfo *pVaaInfo, SPicture *pCurPicture, SPicture *pRefPicture, bool_t bDetectFlag );
-	void    AdaptiveQuantCalculation( SVAAFrameInfo *pVaaInfo, SPicture *pCurPicture, SPicture *pRefPicture );
-	void    AnalyzePictureComplexity( void *pCtx, SPicture *pCurPicture, SPicture *pRefPicture, const int32_t kiDependencyId, const bool_t kbCalculateBGD );
-	void    Padding(uint8_t *pSrcY, uint8_t *pSrcU, uint8_t *pSrcV, int32_t iStrideY, int32_t iStrideUV,
-		            int32_t iActualWidth, int32_t iPaddingWidth, int32_t iActualHeight, int32_t iPaddingHeight);
-    void    SetRefMbType(void *pCtx, uint32_t **pRefMbTypeArray, int32_t iRefPicType);
+  void    VaaCalculation (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture, bool_t bCalculateSQDiff,
+                          bool_t bCalculateVar, bool_t bCalculateBGD);
+  void    BackgroundDetection (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture, bool_t bDetectFlag);
+  void    AdaptiveQuantCalculation (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture);
+  void    AnalyzePictureComplexity (void* pCtx, SPicture* pCurPicture, SPicture* pRefPicture,
+                                    const int32_t kiDependencyId, const bool_t kbCalculateBGD);
+  void    Padding (uint8_t* pSrcY, uint8_t* pSrcU, uint8_t* pSrcV, int32_t iStrideY, int32_t iStrideUV,
+                   int32_t iActualWidth, int32_t iPaddingWidth, int32_t iActualHeight, int32_t iPaddingHeight);
+  void    SetRefMbType (void* pCtx, uint32_t** pRefMbTypeArray, int32_t iRefPicType);
 
- 	int32_t ColorspaceConvert( SWelsSvcCodingParam *pSvcParam, SPicture *pDstPic, const SSourcePicture *kpSrc, const int32_t kiWidth, const int32_t kiHeight );
-	void WelsMoveMemoryWrapper(SWelsSvcCodingParam * pSvcParam, SPicture *pDstPic, const SSourcePicture *kpSrc, const int32_t kiWidth, const int32_t kiHeight );
+  int32_t ColorspaceConvert (SWelsSvcCodingParam* pSvcParam, SPicture* pDstPic, const SSourcePicture* kpSrc,
+                             const int32_t kiWidth, const int32_t kiHeight);
+  void WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SPicture* pDstPic, const SSourcePicture* kpSrc,
+                              const int32_t kiWidth, const int32_t kiHeight);
 
-private:
-	Scaled_Picture  m_sScaledPicture;
-	SPicture		*m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];	
-	IWelsVP         *m_pInterfaceVp;	
-	CWelsLib        *m_pEncLib;
-	void            *m_pEncCtx;
-	bool_t          m_bInitDone;
-	bool_t          m_bOfficialBranch;
+ private:
+  Scaled_Picture  m_sScaledPicture;
+  SPicture*		m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];
+  IWelsVP*         m_pInterfaceVp;
+  CWelsLib*        m_pEncLib;
+  void*            m_pEncCtx;
+  bool_t          m_bInitDone;
+  bool_t          m_bOfficialBranch;
 };
 
 }

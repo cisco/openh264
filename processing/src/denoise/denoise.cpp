@@ -39,99 +39,85 @@ WELSVP_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CDenoiser::CDenoiser(int32_t iCpuFlag)
-{
-	m_CPUFlag = iCpuFlag;
-	m_eMethod   = METHOD_DENOISE;
-	WelsMemset(&m_pfDenoise, 0, sizeof(m_pfDenoise));
+CDenoiser::CDenoiser (int32_t iCpuFlag) {
+  m_CPUFlag = iCpuFlag;
+  m_eMethod   = METHOD_DENOISE;
+  WelsMemset (&m_pfDenoise, 0, sizeof (m_pfDenoise));
 
-	m_uiSpaceRadius = DENOISE_GRAY_RADIUS;
-	m_fSigmaGrey  = DENOISE_GRAY_SIGMA;
-	m_uiType		 = DENOISE_ALL_COMPONENT;
-	InitDenoiseFunc(m_pfDenoise, m_CPUFlag);
+  m_uiSpaceRadius = DENOISE_GRAY_RADIUS;
+  m_fSigmaGrey  = DENOISE_GRAY_SIGMA;
+  m_uiType		 = DENOISE_ALL_COMPONENT;
+  InitDenoiseFunc (m_pfDenoise, m_CPUFlag);
 }
 
-CDenoiser::~CDenoiser()
-{	
+CDenoiser::~CDenoiser() {
 }
 
-void CDenoiser::InitDenoiseFunc(SDenoiseFuncs &denoiser,  int32_t iCpuFlag)
-{
-		denoiser.pfBilateralLumaFilter8 = BilateralLumaFilter8_c;
-		denoiser.pfWaverageChromaFilter8 = WaverageChromaFilter8_c;
+void CDenoiser::InitDenoiseFunc (SDenoiseFuncs& denoiser,  int32_t iCpuFlag) {
+  denoiser.pfBilateralLumaFilter8 = BilateralLumaFilter8_c;
+  denoiser.pfWaverageChromaFilter8 = WaverageChromaFilter8_c;
 #if defined(X86_ASM)
-	if ( iCpuFlag & WELS_CPU_SSE2 )
-	{
-		denoiser.pfBilateralLumaFilter8 = BilateralLumaFilter8_sse2;
-		denoiser.pfWaverageChromaFilter8 = WaverageChromaFilter8_sse2;	
-	}
+  if (iCpuFlag & WELS_CPU_SSE2) {
+    denoiser.pfBilateralLumaFilter8 = BilateralLumaFilter8_sse2;
+    denoiser.pfWaverageChromaFilter8 = WaverageChromaFilter8_sse2;
+  }
 #endif
 }
 
-EResult CDenoiser::Process(int32_t iType, SPixMap *pSrc, SPixMap *dst)
-{
-	uint8_t *pSrcY = (uint8_t *)pSrc->pPixel[0];
-	uint8_t *pSrcU = (uint8_t *)pSrc->pPixel[1];
-	uint8_t *pSrcV = (uint8_t *)pSrc->pPixel[2];
-	if (pSrcY == NULL || pSrcU == NULL || pSrcV == NULL)
-	{
-		return RET_INVALIDPARAM;
-	}
+EResult CDenoiser::Process (int32_t iType, SPixMap* pSrc, SPixMap* dst) {
+  uint8_t* pSrcY = (uint8_t*)pSrc->pPixel[0];
+  uint8_t* pSrcU = (uint8_t*)pSrc->pPixel[1];
+  uint8_t* pSrcV = (uint8_t*)pSrc->pPixel[2];
+  if (pSrcY == NULL || pSrcU == NULL || pSrcV == NULL) {
+    return RET_INVALIDPARAM;
+  }
 
-	int32_t iWidthY = pSrc->sRect.iRectWidth;
-	int32_t iHeightY = pSrc->sRect.iRectHeight;
-	int32_t iWidthUV = iWidthY >> 1;
-	int32_t iHeightUV = iHeightY >> 1;
+  int32_t iWidthY = pSrc->sRect.iRectWidth;
+  int32_t iHeightY = pSrc->sRect.iRectHeight;
+  int32_t iWidthUV = iWidthY >> 1;
+  int32_t iHeightUV = iHeightY >> 1;
 
-	if(m_uiType & DENOISE_Y_COMPONENT)
-		BilateralDenoiseLuma(pSrcY, iWidthY, iHeightY, pSrc->iStride[0]);
+  if (m_uiType & DENOISE_Y_COMPONENT)
+    BilateralDenoiseLuma (pSrcY, iWidthY, iHeightY, pSrc->iStride[0]);
 
-	if(m_uiType & DENOISE_U_COMPONENT)
-		WaverageDenoiseChroma(pSrcU, iWidthUV, iHeightUV, pSrc->iStride[1]);
+  if (m_uiType & DENOISE_U_COMPONENT)
+    WaverageDenoiseChroma (pSrcU, iWidthUV, iHeightUV, pSrc->iStride[1]);
 
-	if(m_uiType & DENOISE_V_COMPONENT)
-		WaverageDenoiseChroma(pSrcV, iWidthUV, iHeightUV, pSrc->iStride[2]);
+  if (m_uiType & DENOISE_V_COMPONENT)
+    WaverageDenoiseChroma (pSrcV, iWidthUV, iHeightUV, pSrc->iStride[2]);
 
-	return RET_SUCCESS;
+  return RET_SUCCESS;
 }
 
-void CDenoiser::BilateralDenoiseLuma(uint8_t * pSrcY, int32_t iWidth, int32_t iHeight, int32_t iStride)
-{
-	int32_t w;
+void CDenoiser::BilateralDenoiseLuma (uint8_t* pSrcY, int32_t iWidth, int32_t iHeight, int32_t iStride) {
+  int32_t w;
 
-	pSrcY = pSrcY + m_uiSpaceRadius * iStride;
-	for(int32_t h = m_uiSpaceRadius;h < iHeight - m_uiSpaceRadius; h++)
-	{
-		for(w = m_uiSpaceRadius; w < iWidth - m_uiSpaceRadius - TAIL_OF_LINE8; w+=8)
-		{	
-			m_pfDenoise.pfBilateralLumaFilter8(pSrcY + w, iStride);
-		}
-		for(w = w + TAIL_OF_LINE8; w < iWidth - m_uiSpaceRadius; w++)
-		{
-			Gauss3x3Filter(pSrcY + w, iStride);
-		}
-		pSrcY += iStride;
-	}
+  pSrcY = pSrcY + m_uiSpaceRadius * iStride;
+  for (int32_t h = m_uiSpaceRadius; h < iHeight - m_uiSpaceRadius; h++) {
+    for (w = m_uiSpaceRadius; w < iWidth - m_uiSpaceRadius - TAIL_OF_LINE8; w += 8) {
+      m_pfDenoise.pfBilateralLumaFilter8 (pSrcY + w, iStride);
+    }
+    for (w = w + TAIL_OF_LINE8; w < iWidth - m_uiSpaceRadius; w++) {
+      Gauss3x3Filter (pSrcY + w, iStride);
+    }
+    pSrcY += iStride;
+  }
 }
 
-void CDenoiser::WaverageDenoiseChroma(uint8_t *pSrcUV, int32_t iWidth, int32_t iHeight, int32_t iStride)
-{
-	int32_t w;
+void CDenoiser::WaverageDenoiseChroma (uint8_t* pSrcUV, int32_t iWidth, int32_t iHeight, int32_t iStride) {
+  int32_t w;
 
-	pSrcUV = pSrcUV + UV_WINDOWS_RADIUS * iStride;
-	for(int32_t h = UV_WINDOWS_RADIUS; h < iHeight - UV_WINDOWS_RADIUS; h++)
-	{
-		for( w = UV_WINDOWS_RADIUS; w < iWidth - UV_WINDOWS_RADIUS - TAIL_OF_LINE8; w+=8)
-		{
-			m_pfDenoise.pfWaverageChromaFilter8(pSrcUV + w, iStride);		
-		}
+  pSrcUV = pSrcUV + UV_WINDOWS_RADIUS * iStride;
+  for (int32_t h = UV_WINDOWS_RADIUS; h < iHeight - UV_WINDOWS_RADIUS; h++) {
+    for (w = UV_WINDOWS_RADIUS; w < iWidth - UV_WINDOWS_RADIUS - TAIL_OF_LINE8; w += 8) {
+      m_pfDenoise.pfWaverageChromaFilter8 (pSrcUV + w, iStride);
+    }
 
-		for(w = w + TAIL_OF_LINE8; w < iWidth - UV_WINDOWS_RADIUS; w++)
-		{
-			Gauss3x3Filter(pSrcUV + w,iStride);
-		}
-		pSrcUV += iStride;
-	}
+    for (w = w + TAIL_OF_LINE8; w < iWidth - UV_WINDOWS_RADIUS; w++) {
+      Gauss3x3Filter (pSrcUV + w, iStride);
+    }
+    pSrcUV += iStride;
+  }
 }
 
 

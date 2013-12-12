@@ -50,16 +50,16 @@ namespace WelsDec {
 #define MB_XY_T	int16_t
 #endif//MB_XY_T
 
-/*! 
- * \brief	Wels Flexible Macroblock Ordering (FMO) 
+/*!
+ * \brief	Wels Flexible Macroblock Ordering (FMO)
  */
-typedef struct TagFmo{
-	uint8_t		*pMbAllocMap;
-	int32_t		iCountMbNum;
-	int32_t		iSliceGroupCount;
-	int32_t		iSliceGroupType;	
-	bool_t		bActiveFlag;
-	uint8_t		uiReserved[3];		// reserved padding bytes
+typedef struct TagFmo {
+uint8_t*		pMbAllocMap;
+int32_t		iCountMbNum;
+int32_t		iSliceGroupCount;
+int32_t		iSliceGroupType;
+bool_t		bActiveFlag;
+uint8_t		uiReserved[3];		// reserved padding bytes
 } SFmo, *PFmo;
 
 
@@ -73,7 +73,7 @@ typedef struct TagFmo{
  *
  * \return	0 - successful; none 0 - failed;
  */
-int32_t	InitFmo( PFmo pFmo, PPps pPps, const int32_t kiMbWidth, const int32_t kiMbHeight );
+int32_t	InitFmo (PFmo pFmo, PPps pPps, const int32_t kiMbWidth, const int32_t kiMbHeight);
 
 /*!
  * \brief	Uninitialize Wels Flexible Macroblock Ordering (FMO) list
@@ -84,7 +84,7 @@ int32_t	InitFmo( PFmo pFmo, PPps pPps, const int32_t kiMbWidth, const int32_t ki
  *
  * \return	NONE
  */
-void_t UninitFmoList( PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail );
+void_t UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail);
 
 /*!
  * \brief	update/insert FMO parameter unit
@@ -96,7 +96,7 @@ void_t UninitFmoList( PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail );
  *
  * \return	true - update/insert successfully; false - failed;
  */
-bool_t FmoParamUpdate( PFmo pFmo, PSps pSps, PPps pPps, int32_t *pActiveFmoNum );
+bool_t FmoParamUpdate (PFmo pFmo, PSps pSps, PPps pPps, int32_t* pActiveFmoNum);
 
 /*!
  * \brief	Get successive mb to be processed with given current mb_xy
@@ -106,7 +106,7 @@ bool_t FmoParamUpdate( PFmo pFmo, PSps pSps, PPps pPps, int32_t *pActiveFmoNum )
  *
  * \return	iNextMb - successful; -1 - failed;
  */
-MB_XY_T FmoNextMb( PFmo pFmo, const MB_XY_T kiMbXy );
+MB_XY_T FmoNextMb (PFmo pFmo, const MB_XY_T kiMbXy);
 
 } // namespace WelsDec
 

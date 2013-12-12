@@ -34,7 +34,7 @@
  *
  * \date	03/21/2011
  *
- * \description : this class is designed as an interface to unify video pre-processing 
+ * \description : this class is designed as an interface to unify video pre-processing
  *                class implement sets such as denoise,colorspace conversion etc...
  *
  *************************************************************************************
@@ -45,35 +45,37 @@
 
 #include "../../interface/IWelsVP.h"
 
-class IWelsVpPlugin
-{
-public:
-	IWelsVpPlugin(int &ret);
-	~IWelsVpPlugin();
+class IWelsVpPlugin {
+ public:
+  IWelsVpPlugin (int& ret);
+  ~IWelsVpPlugin();
 
-	enum
-	{
-		STATE_BEFOREENC = 0, /* before picture encoding */
-		STATE_AFTERENC     , /* after picture encoded */
-	};
+  enum {
+    STATE_BEFOREENC = 0, /* before picture encoding */
+    STATE_AFTERENC     , /* after picture encoded */
+  };
 
-public:
-	vResult Init    (int nType, void *pCfg); 
-	vResult Uninit  (int nType);
-	vResult Flush   (int nType);
-	vResult Process (int nType, vPixMap *src, vPixMap *dst); 
-	vResult Get     (int nType, void *pParam); 
-	vResult Set     (int nType, void *pParam); 
-	vResult SpecialFeature (int nType, void *pIn, void *pOut);
+ public:
+  vResult Init (int nType, void* pCfg);
+  vResult Uninit (int nType);
+  vResult Flush (int nType);
+  vResult Process (int nType, vPixMap* src, vPixMap* dst);
+  vResult Get (int nType, void* pParam);
+  vResult Set (int nType, void* pParam);
+  vResult SpecialFeature (int nType, void* pIn, void* pOut);
 
-	void SetFlag(int a)   { flag = a; }
-	void GetFlag(int &a)  { a = flag; }
+  void SetFlag (int a)   {
+    flag = a;
+  }
+  void GetFlag (int& a)  {
+    a = flag;
+  }
 
-private:
-	int      flag;
-	IWelsVP  *ivp;	
-	void     *hlib;
-	void     *iface[2];
+ private:
+  int      flag;
+  IWelsVP*  ivp;
+  void*     hlib;
+  void*     iface[2];
 };
 
 #endif

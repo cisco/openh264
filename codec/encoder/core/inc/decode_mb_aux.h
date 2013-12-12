@@ -38,34 +38,36 @@
 #include "wels_func_ptr_def.h"
 
 namespace WelsSVCEnc {
-void WelsDequantLumaDc4x4(int16_t *pRes, const int32_t kiQp);
-void WelsIHadamard4x4Dc(int16_t* pRes);
+void WelsDequantLumaDc4x4 (int16_t* pRes, const int32_t kiQp);
+void WelsIHadamard4x4Dc (int16_t* pRes);
 
-void WelsInitReconstructionFuncs( SWelsFuncPtrList *pList, uint32_t  iCpuFlags );
-void WelsGetEncBlockStrideOffset(int32_t *pBlock, const int32_t kiStrideY, const int32_t kiStrideUV);
+void WelsInitReconstructionFuncs (SWelsFuncPtrList* pList, uint32_t  iCpuFlags);
+void WelsGetEncBlockStrideOffset (int32_t* pBlock, const int32_t kiStrideY, const int32_t kiStrideUV);
 
-void WelsDequantFour4x4_c(int16_t *pRes, const uint16_t* kpQpTable);
-void WelsDequant4x4_c(int16_t *pRes, const uint16_t* kpQpTable);
-void WelsDequantIHadamard4x4_c(int16_t *pRes, const uint16_t kuiMF);
-void WelsDequantIHadamard2x2Dc( int16_t* pDct, const uint16_t kuiMF);
+void WelsDequantFour4x4_c (int16_t* pRes, const uint16_t* kpQpTable);
+void WelsDequant4x4_c (int16_t* pRes, const uint16_t* kpQpTable);
+void WelsDequantIHadamard4x4_c (int16_t* pRes, const uint16_t kuiMF);
+void WelsDequantIHadamard2x2Dc (int16_t* pDct, const uint16_t kuiMF);
 
-void WelsIDctT4RecOnMb(uint8_t* pDst, int32_t iDstStride, uint8_t* pPred, int32_t iPredStride, int16_t* pDct, PIDctFunc pfIDctFourT4);
-void WelsIDctT4Rec_c( uint8_t* pRec, int32_t iStride, uint8_t* pPred, int32_t iPredStride, int16_t* pDct );
-void WelsIDctFourT4Rec_c( uint8_t* pRec, int32_t iStride, uint8_t* pPred, int32_t iPredStride, int16_t* pDct );
-void WelsIDctRecI16x16Dc_c(uint8_t *pRec, int32_t iStride, uint8_t *pPred, int32_t iPredStride, int16_t *pDctDc);
+void WelsIDctT4RecOnMb (uint8_t* pDst, int32_t iDstStride, uint8_t* pPred, int32_t iPredStride, int16_t* pDct,
+                        PIDctFunc pfIDctFourT4);
+void WelsIDctT4Rec_c (uint8_t* pRec, int32_t iStride, uint8_t* pPred, int32_t iPredStride, int16_t* pDct);
+void WelsIDctFourT4Rec_c (uint8_t* pRec, int32_t iStride, uint8_t* pPred, int32_t iPredStride, int16_t* pDct);
+void WelsIDctRecI16x16Dc_c (uint8_t* pRec, int32_t iStride, uint8_t* pPred, int32_t iPredStride, int16_t* pDctDc);
 
 #if defined(__cplusplus)
 extern "C" {
 #endif//__cplusplus
 
 #if defined(X86_ASM)
-void WelsDequant4x4_sse2(int16_t *pDct, const uint16_t* kpMF);
-void WelsDequantFour4x4_sse2(int16_t *pDct, const uint16_t* kpMF);
-void WelsDequantIHadamard4x4_sse2(int16_t *pRes, const uint16_t kuiMF);
+void WelsDequant4x4_sse2 (int16_t* pDct, const uint16_t* kpMF);
+void WelsDequantFour4x4_sse2 (int16_t* pDct, const uint16_t* kpMF);
+void WelsDequantIHadamard4x4_sse2 (int16_t* pRes, const uint16_t kuiMF);
 
-void WelsIDctT4Rec_mmx( uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride, int16_t* pDct );
-void WelsIDctFourT4Rec_sse2( uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride, int16_t* pDct );
-void WelsIDctRecI16x16Dc_sse2(uint8_t *pRec, int32_t iStride, uint8_t *pPrediction, int32_t iPredStride, int16_t *pDctDc);
+void WelsIDctT4Rec_mmx (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride, int16_t* pDct);
+void WelsIDctFourT4Rec_sse2 (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride, int16_t* pDct);
+void WelsIDctRecI16x16Dc_sse2 (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride,
+                               int16_t* pDctDc);
 #endif//X86_ASM
 
 #if defined(__cplusplus)

@@ -72,7 +72,7 @@
 #define MB_PARTITION_SIZE		4	// Macroblock partition size in 8x8 sub-blocks
 #define MB_SUB_PARTITION_SIZE	4	// Sub partition size in a 8x8 sub-block
 #define MB_BLOCK4x4_NUM				16
-#define INTRA_4x4_MODE_NUM		8	
+#define INTRA_4x4_MODE_NUM		8
 #define MB_BLOCK8x8_NUM				4
 #define MB_LUMA_CHROMA_BLOCK4x4_NUM  24
 
@@ -83,8 +83,8 @@
 #define MAX_PPS_COUNT 			(MAX_PPS_COUNT_LIMITED)//in Standard is 256	// Count number of PPS
 
 #define PARA_SET_TYPE			3 // SPS+PPS
-#define PARA_SET_TYPE_AVCSPS	0 
-#define PARA_SET_TYPE_SUBSETSPS	1 
+#define PARA_SET_TYPE_AVCSPS	0
+#define PARA_SET_TYPE_SUBSETSPS	1
 #define PARA_SET_TYPE_PPS		2
 
 #define MAX_FRAME_RATE			30	// maximal frame rate to support
@@ -174,15 +174,15 @@
 #define MAX_NAL_UNIT_NUM_IN_AU	256	// predefined maximal number of NAL Units in an access unit
 #define MAX_ACCESS_UINT_CAPACITY	(1<<20)	// Maximal AU capacity in bytes: 1024 KB predefined
 #define MAX_ACCESS_UNIT_CACHE_NUM	2	// Maximal Access Unit(AU) cache number to be processed, denote current AU and the next coming AU.
-enum{
-	CUR_AU_IDX	= 0,			// index symbol for current access unit
-	SUC_AU_IDX	= 1				// index symbol for successive access unit
+enum {
+  CUR_AU_IDX	= 0,			// index symbol for current access unit
+  SUC_AU_IDX	= 1				// index symbol for successive access unit
 };
 
 enum {
-	BASE_MB = 0,
-		AVC_REWRITE_ENHANCE_MB = 1,
-		NON_AVC_REWRITE_ENHANCE_MB =2
+  BASE_MB = 0,
+  AVC_REWRITE_ENHANCE_MB = 1,
+  NON_AVC_REWRITE_ENHANCE_MB = 2
 };
 
 #endif//WELS_CONSTANCE_H__

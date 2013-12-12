@@ -50,7 +50,7 @@ extern "C" {
 
 
 
-/*! 
+/*!
 *************************************************************************************
 * \brief	malloc with zero filled utilization in Wels
 *
@@ -61,13 +61,13 @@ extern "C" {
 * \note	N/A
 *************************************************************************************
 */
-void_t * WelsMalloc( const uint32_t kuiSize, const str_t *kpTag );
+void_t* WelsMalloc (const uint32_t kuiSize, const str_t* kpTag);
 
-/*! 
+/*!
 *************************************************************************************
 * \brief	free utilization in Wels
 *
-* \param 	pPtr	data pointer to be free. 
+* \param 	pPtr	data pointer to be free.
 *			i.e, uint8_t *pPtr = actual data to be free, argv = &pPtr.
 *
 * \return	NONE
@@ -75,7 +75,7 @@ void_t * WelsMalloc( const uint32_t kuiSize, const str_t *kpTag );
 * \note	N/A
 *************************************************************************************
 */
-void_t WelsFree( void_t * pPtr, const str_t *kpTag );
+void_t WelsFree (void_t* pPtr, const str_t* kpTag);
 
 #define WELS_SAFE_FREE(pPtr, pTag)		if (pPtr) { WelsFree(pPtr, pTag); pPtr = NULL; }
 

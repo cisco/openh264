@@ -70,21 +70,21 @@ namespace WelsDec {
 
 ///////////// from encoder
 #if defined(_MSC_VER)
-	#define inline	__inline
-    #define __FASTCALL   __fastcall
+#define inline	__inline
+#define __FASTCALL   __fastcall
 //	#define __align8(t,v) __declspec(align(8)) t v
-	#define __align16(t,v) __declspec(align(16)) t v
+#define __align16(t,v) __declspec(align(16)) t v
 #elif defined(__GNUC__)
 #if !defined(MAC_POWERPC) && !defined(UNIX) && !defined(ANDROID_NDK) && !defined(APPLE_IOS)
-    #define __FASTCALL    __attribute__ ((fastcall))// linux, centos, mac_x86 can be used
+#define __FASTCALL    __attribute__ ((fastcall))// linux, centos, mac_x86 can be used
 #else
-	#define __FASTCALL	// mean NULL for mac_ppc, solaris(sparc/x86)
+#define __FASTCALL	// mean NULL for mac_ppc, solaris(sparc/x86)
 #endif//MAC_POWERPC
 //	#define __align8(t,v) t v __attribute__ ((aligned (8)))
-	#define __align16(t,v) t v __attribute__ ((aligned (16)))
+#define __align16(t,v) t v __attribute__ ((aligned (16)))
 
-#if defined(APPLE_IOS)  
-    #define inline  //For iOS platform
+#if defined(APPLE_IOS)
+#define inline  //For iOS platform
 #endif
 
 #endif//_MSC_VER
@@ -143,45 +143,42 @@ namespace WelsDec {
 	nC += (uint8_t)(nA == -1 && nB == -1);           \
 }
 
-static __inline int32_t CeilLog2( int32_t i )
-{
-	int32_t s = 0; i--;
-	while( i > 0 )
-	{
-		s++;
-		i >>= 1;
-	}
-	return s;
+static __inline int32_t CeilLog2 (int32_t i) {
+int32_t s = 0;
+i--;
+while (i > 0) {
+  s++;
+  i >>= 1;
+}
+return s;
 }
 /*
 the second path will degrades the performance
 */
 #if 1
-static inline int32_t WelsMedian(int32_t iX,  int32_t iY, int32_t iZ)
-{
-	int32_t iMin = iX, iMax = iX;	
-	
-	if ( iY < iMin )
-		iMin	= iY;
-	else
-		iMax = iY;
+static inline int32_t WelsMedian (int32_t iX,  int32_t iY, int32_t iZ) {
+int32_t iMin = iX, iMax = iX;
 
-	if ( iZ < iMin )
-		iMin	= iZ;
-	else if ( iZ > iMax )
-		iMax	= iZ;
+if (iY < iMin)
+  iMin	= iY;
+else
+  iMax = iY;
 
-	return (iX + iY + iZ) - (iMin + iMax);
+if (iZ < iMin)
+  iMin	= iZ;
+else if (iZ > iMax)
+  iMax	= iZ;
+
+return (iX + iY + iZ) - (iMin + iMax);
 }
 #else
-static inline int32_t WelsMedian(int32_t iX,  int32_t iY, int32_t iZ)
-{
-	int32_t iTmp = (iX-iY)&((iX-iY)>>31);
-	iX -= iTmp;
-	iY += iTmp;
-	iY -= (iY-iZ)&((iY-iZ)>>31);
-	iY += (iX-iY)&((iX-iY)>>31);
-	return iY;
+static inline int32_t WelsMedian (int32_t iX,  int32_t iY, int32_t iZ) {
+int32_t iTmp = (iX - iY) & ((iX - iY) >> 31);
+iX -= iTmp;
+iY += iTmp;
+iY -= (iY - iZ) & ((iY - iZ) >> 31);
+iY += (iX - iY) & ((iX - iY) >> 31);
+return iY;
 }
 
 #endif
@@ -222,7 +219,7 @@ static inline int32_t WelsMedian(int32_t iX,  int32_t iY, int32_t iZ)
 #endif//#if WELS_VERIFY_RETURN_IF
 
 /*
- *	Description: to check variable validation and return the specified result 
+ *	Description: to check variable validation and return the specified result
  *		with correspoinding process advance.
  *	 result:	value to be return
  *	 case_if:	negative condition to be verified
@@ -281,7 +278,7 @@ static inline int32_t WelsMedian(int32_t iX,  int32_t iY, int32_t iZ)
  * Description: to safe free an array ptr with free function pointer
  *	arr:		pointer to an array, something like "**p";
  *	num:		number of elements in array
- *  free_fn:	free function pointer	
+ *  free_fn:	free function pointer
  */
 #ifndef WELS_SAFE_FREE_ARR
 #define WELS_SAFE_FREE_ARR(pArray, iNum, fFreeFunc) \

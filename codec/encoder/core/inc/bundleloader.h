@@ -40,113 +40,97 @@
 #include <coreFoundation/CFBundle.h>
 #include <string>
 
-int GetCurrentModulePath(char* lpModulePath, const int iPathMax)
-{
-	if(lpModulePath == NULL || iPathMax <= 0)
-	{
-		return -1;
-	}
-
-	memset(lpModulePath, 0, iPathMax);
-
-	char cCurrentPath[PATH_MAX];
-	memset(cCurrentPath, 0, PATH_MAX);
-
-	Dl_info 	dlInfo;
-	static int  sDummy;
-	dladdr((void*)&sDummy, &dlInfo);
-
-	strlcpy(cCurrentPath, dlInfo.dli_fname, PATH_MAX);
-
-	// whether is self a framework ? 
-	int locateNumber = 1;
-	struct FSRef currentPath;
-	OSStatus iStatus = FSPathMakeRef((unsigned char*)cCurrentPath, &currentPath, NULL);
-	if(noErr == iStatus)
-	{
-		LSItemInfoRecord  info;
-		iStatus = LSCopyItemInfoForRef(&currentPath, kLSRequestExtension, &info);
-		if(noErr == iStatus && NULL == info.extension)
-		{
-			locateNumber = 4;
-		}
-	}
-	std::string strPath(cCurrentPath);
-	int pos = std::string::npos;
-	for(int i = 0; i < locateNumber; i++)
-	{
-		pos = strPath.rfind('/');
-		if(std::string::npos == pos)
-		{
-			break;
-		}
-		strPath.erase(pos);
-	}
-	if(std::string::npos == pos)
-	{
-		return -2;
-	}
-	cCurrentPath[pos] = 0;
-
-	strlcpy(lpModulePath, cCurrentPath, iPathMax);
-	strlcat(lpModulePath, "/", iPathMax);
-
-	return 0;
+int GetCurrentModulePath (char* lpModulePath, const int iPathMax) {
+if (lpModulePath == NULL || iPathMax <= 0) {
+  return -1;
 }
 
-CFBundleRef LoadBundle(const char* lpBundlePath)
-{
-	if(lpBundlePath == NULL)
-	{
-		return NULL;
-	}
+memset (lpModulePath, 0, iPathMax);
 
-	struct FSRef bundlePath;
-	OSStatus iStatus = FSPathMakeRef((unsigned char*)lpBundlePath, &bundlePath, NULL);
-	if(noErr != iStatus)
-	{
-		return NULL;
-	}
+char cCurrentPath[PATH_MAX];
+memset (cCurrentPath, 0, PATH_MAX);
 
-	CFURLRef bundleURL = CFURLCreateFromFSRef(kCFAllocatorSystemDefault, &bundlePath);
-	if(NULL == bundleURL)
-	{
-		return NULL;
-	}
+Dl_info 	dlInfo;
+static int  sDummy;
+dladdr ((void*)&sDummy, &dlInfo);
 
-	// 2.get bundle ref
-	CFBundleRef bundleRef = CFBundleCreate(kCFAllocatorSystemDefault, bundleURL);
-	CFRelease(bundleURL);
+strlcpy (cCurrentPath, dlInfo.dli_fname, PATH_MAX);
 
-	//	Boolean bReturn = FALSE;
-	if(NULL != bundleRef)
-	{
-		//	bReturn = CFBundleLoadExecutable(bundleRef);
-	}
+// whether is self a framework ?
+int locateNumber = 1;
+struct FSRef currentPath;
+OSStatus iStatus = FSPathMakeRef ((unsigned char*)cCurrentPath, &currentPath, NULL);
+if (noErr == iStatus) {
+  LSItemInfoRecord  info;
+  iStatus = LSCopyItemInfoForRef (&currentPath, kLSRequestExtension, &info);
+  if (noErr == iStatus && NULL == info.extension) {
+    locateNumber = 4;
+  }
+}
+std::string strPath (cCurrentPath);
+int pos = std::string::npos;
+for (int i = 0; i < locateNumber; i++) {
+  pos = strPath.rfind ('/');
+  if (std::string::npos == pos) {
+    break;
+  }
+  strPath.erase (pos);
+}
+if (std::string::npos == pos) {
+  return -2;
+}
+cCurrentPath[pos] = 0;
 
-	return bundleRef;
+strlcpy (lpModulePath, cCurrentPath, iPathMax);
+strlcat (lpModulePath, "/", iPathMax);
+
+return 0;
 }
 
-Boolean FreeBundle(CFBundleRef bundleRef)
-{
-	if(NULL != bundleRef)
-	{
-		//	CFBundleUnloadExecutable(bundleRef);
-		CFRelease(bundleRef);
-	}
-	return TRUE;
+CFBundleRef LoadBundle (const char* lpBundlePath) {
+  if (lpBundlePath == NULL) {
+    return NULL;
+  }
+
+  struct FSRef bundlePath;
+  OSStatus iStatus = FSPathMakeRef ((unsigned char*)lpBundlePath, &bundlePath, NULL);
+  if (noErr != iStatus) {
+    return NULL;
+  }
+
+  CFURLRef bundleURL = CFURLCreateFromFSRef (kCFAllocatorSystemDefault, &bundlePath);
+  if (NULL == bundleURL) {
+    return NULL;
+  }
+
+  // 2.get bundle ref
+  CFBundleRef bundleRef = CFBundleCreate (kCFAllocatorSystemDefault, bundleURL);
+  CFRelease (bundleURL);
+
+  //	Boolean bReturn = FALSE;
+  if (NULL != bundleRef) {
+    //	bReturn = CFBundleLoadExecutable(bundleRef);
+  }
+
+  return bundleRef;
 }
 
-void* GetProcessAddress(CFBundleRef bundleRef, const char* lpProcName)
-{
-	void *processAddress = NULL;
-	if(NULL != bundleRef)
-	{
-		CFStringRef cfProcName = CFStringCreateWithCString(kCFAllocatorSystemDefault, lpProcName, CFStringGetSystemEncoding());
-		processAddress = CFBundleGetFunctionPointerForName(bundleRef, cfProcName);
-		CFRelease(cfProcName);
-	}
-	return processAddress;
+Boolean FreeBundle (CFBundleRef bundleRef) {
+  if (NULL != bundleRef) {
+    //	CFBundleUnloadExecutable(bundleRef);
+    CFRelease (bundleRef);
+  }
+  return TRUE;
+}
+
+void* GetProcessAddress (CFBundleRef bundleRef, const char* lpProcName) {
+  void* processAddress = NULL;
+  if (NULL != bundleRef) {
+    CFStringRef cfProcName = CFStringCreateWithCString (kCFAllocatorSystemDefault, lpProcName, CFStringGetSystemEncoding());
+    processAddress = CFBundleGetFunctionPointerForName (bundleRef, cfProcName);
+    CFRelease (cfProcName);
+  }
+  return processAddress;
 }
 #endif
 

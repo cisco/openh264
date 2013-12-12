@@ -34,9 +34,9 @@
  *
  * \date	Created 12/14/2010
  *
- * \description : 1. Rendering in Vista and upper : D3D9Ex method, support host memory / shared surface input 
- *                2. Rendering in XP : D3D9 method w/o device lost handling, support host memory input  
- *                3. File Dump : support host memory / shared surface input 
+ * \description : 1. Rendering in Vista and upper : D3D9Ex method, support host memory / shared surface input
+ *                2. Rendering in XP : D3D9 method w/o device lost handling, support host memory input
+ *                3. File Dump : support host memory / shared surface input
  *
  *************************************************************************************
  */
@@ -57,86 +57,82 @@
 #include <d3d9.h>
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CD3D9Utils
-{
-public:
-	CD3D9Utils();
-	~CD3D9Utils();
+class CD3D9Utils {
+ public:
+  CD3D9Utils();
+  ~CD3D9Utils();
 
-public:
-	HRESULT Init(BOOL bWindowed);
-	HRESULT Uninit(void);
-	HRESULT Process(void *pDst[3], SBufferInfo *Info, FILE *pFile = NULL);
+ public:
+  HRESULT Init (BOOL bWindowed);
+  HRESULT Uninit (void);
+  HRESULT Process (void* pDst[3], SBufferInfo* Info, FILE* pFile = NULL);
 
-private:
-	HRESULT InitResource(void *pSharedHandle, SBufferInfo *pInfo);
-	HRESULT Render(void *pDst[3], SBufferInfo *pInfo);
-	HRESULT Dump(void *pDst[3], SBufferInfo *pInfo, FILE *pFile);
-                  
-private:
-	HMODULE               m_hDll;
-	HWND                  m_hWnd;
-	unsigned char        *m_pDumpYUV;
-	BOOL                  m_bInitDone;
+ private:
+  HRESULT InitResource (void* pSharedHandle, SBufferInfo* pInfo);
+  HRESULT Render (void* pDst[3], SBufferInfo* pInfo);
+  HRESULT Dump (void* pDst[3], SBufferInfo* pInfo, FILE* pFile);
 
-	LPDIRECT3D9           m_lpD3D9;
-	LPDIRECT3DDEVICE9     m_lpD3D9Device;
+ private:
+  HMODULE               m_hDll;
+  HWND                  m_hWnd;
+  unsigned char*        m_pDumpYUV;
+  BOOL                  m_bInitDone;
 
-	D3DPRESENT_PARAMETERS m_d3dpp;
-	LPDIRECT3DSURFACE9    m_lpD3D9RawSurfaceShare;
+  LPDIRECT3D9           m_lpD3D9;
+  LPDIRECT3DDEVICE9     m_lpD3D9Device;
+
+  D3DPRESENT_PARAMETERS m_d3dpp;
+  LPDIRECT3DSURFACE9    m_lpD3D9RawSurfaceShare;
 };
 
-class CD3D9ExUtils
-{
-public:
-	CD3D9ExUtils();
-	~CD3D9ExUtils();
+class CD3D9ExUtils {
+ public:
+  CD3D9ExUtils();
+  ~CD3D9ExUtils();
 
-public:
-	HRESULT Init(BOOL bWindowed);
-	HRESULT Uninit(void);
-	HRESULT Process(void *dst[3], SBufferInfo *Info, FILE *fp = NULL);
+ public:
+  HRESULT Init (BOOL bWindowed);
+  HRESULT Uninit (void);
+  HRESULT Process (void* dst[3], SBufferInfo* Info, FILE* fp = NULL);
 
-private:
-	HRESULT InitResource(void *pSharedHandle, SBufferInfo *Info);
-	HRESULT Render(void *pDst[3], SBufferInfo *Info);
-	HRESULT Dump(void *pDst[3], SBufferInfo *Info, FILE *fp);
+ private:
+  HRESULT InitResource (void* pSharedHandle, SBufferInfo* Info);
+  HRESULT Render (void* pDst[3], SBufferInfo* Info);
+  HRESULT Dump (void* pDst[3], SBufferInfo* Info, FILE* fp);
 
-private:
-	HMODULE               m_hDll;
-	HWND                  m_hWnd;
-	unsigned char        *m_pDumpYUV;
-	BOOL                  m_bInitDone;
+ private:
+  HMODULE               m_hDll;
+  HWND                  m_hWnd;
+  unsigned char*        m_pDumpYUV;
+  BOOL                  m_bInitDone;
 
-	LPDIRECT3D9EX         m_lpD3D9;
-	LPDIRECT3DDEVICE9EX   m_lpD3D9Device;
+  LPDIRECT3D9EX         m_lpD3D9;
+  LPDIRECT3DDEVICE9EX   m_lpD3D9Device;
 
-	D3DPRESENT_PARAMETERS m_d3dpp;
-	LPDIRECT3DSURFACE9    m_lpD3D9RawSurfaceShare;
+  D3DPRESENT_PARAMETERS m_d3dpp;
+  LPDIRECT3DSURFACE9    m_lpD3D9RawSurfaceShare;
 };
 #endif
 
-typedef enum
-{
+typedef enum {
   OS_UNSUPPORTED = 0,
   OS_XP,
   OS_VISTA_UPPER
 };
 
-class CUtils
-{
-public:
-	CUtils();
-	~CUtils();
+class CUtils {
+ public:
+  CUtils();
+  ~CUtils();
 
-	int Process(void *dst[3], SBufferInfo *Info, FILE *fp);
+  int Process (void* dst[3], SBufferInfo* Info, FILE* fp);
 
-private:
-	int CheckOS(void);
+ private:
+  int CheckOS (void);
 
-private:
-	int iOSType;
-	void *hHandle;
+ private:
+  int iOSType;
+  void* hHandle;
 };
 
 #endif//WELS_D3D9_UTILS_H__

@@ -36,9 +36,8 @@ WELSVP_NAMESPACE_BEGIN
 /////////////////////////////////////////////////////////////////////////////////
 
 
-int32_t  WelsStrCmp(const str_t * kpStr1, const str_t * kpStr2)
-{
-	return ::strcmp(kpStr1, kpStr2);
+int32_t  WelsStrCmp (const str_t* kpStr1, const str_t* kpStr2) {
+  return ::strcmp (kpStr1, kpStr2);
 }
 
 

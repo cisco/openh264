@@ -34,7 +34,7 @@
  *
  * \date         :  2011/03/21
  *
- * \description  :  1. rewrite the package code of scene change detection class  
+ * \description  :  1. rewrite the package code of scene change detection class
  *
  */
 
@@ -48,9 +48,10 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-typedef void (VarFunc) ( uint8_t * pRefY, int32_t iRefStrideY, uint8_t * pSrc, int32_t iSrcStrideY, SMotionTextureUnit* pMotionTexture );
+typedef void (VarFunc) (uint8_t* pRefY, int32_t iRefStrideY, uint8_t* pSrc, int32_t iSrcStrideY,
+                        SMotionTextureUnit* pMotionTexture);
 
-typedef VarFunc  * PVarFunc;
+typedef VarFunc*   PVarFunc;
 
 VarFunc      SampleVariance16x16_c;
 
@@ -61,24 +62,23 @@ WELSVP_EXTERN_C_END
 #endif
 
 
-class CAdaptiveQuantization : public IStrategy
-{			  
-public:
-	CAdaptiveQuantization(int32_t iCpuFlag);
-	~CAdaptiveQuantization();
+class CAdaptiveQuantization : public IStrategy {
+ public:
+  CAdaptiveQuantization (int32_t iCpuFlag);
+  ~CAdaptiveQuantization();
 
-	EResult Process(int32_t iType, SPixMap *pSrc, SPixMap *pRef);
-	EResult Set(int32_t iType, void *pParam);
-	EResult Get(int32_t iType, void *pParam);
+  EResult Process (int32_t iType, SPixMap* pSrc, SPixMap* pRef);
+  EResult Set (int32_t iType, void* pParam);
+  EResult Get (int32_t iType, void* pParam);
 
-private:
-	void WelsInitVarFunc(PVarFunc &pfVar, int32_t iCpuFlag);
+ private:
+  void WelsInitVarFunc (PVarFunc& pfVar, int32_t iCpuFlag);
 
-private:
-	PVarFunc			                   m_pfVar;
-	int32_t                                  m_CPUFlag;
-	SAdaptiveQuantizationParam    m_sAdaptiveQuantParam;
-};	
+ private:
+  PVarFunc			                   m_pfVar;
+  int32_t                                  m_CPUFlag;
+  SAdaptiveQuantizationParam    m_sAdaptiveQuantParam;
+};
 
 WELSVP_NAMESPACE_END
 

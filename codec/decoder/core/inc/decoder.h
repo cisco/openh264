@@ -50,15 +50,15 @@ extern "C" {
 #endif//__cplusplus
 
 /*!
- * \brief	configure decoder parameters	
+ * \brief	configure decoder parameters
  */
-int32_t DecoderConfigParam ( PWelsDecoderContext pCtx, const void_t* kpParam );
+int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const void_t* kpParam);
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	Initialize Wels decoder parameters and memory
  *
- * \param 	pCtx	        input context to be initialized at first stage 
+ * \param 	pCtx	        input context to be initialized at first stage
  * \param   pTraceHandle    handle for trace
  * \param   pLo             log info pointer
  *
@@ -68,22 +68,22 @@ int32_t DecoderConfigParam ( PWelsDecoderContext pCtx, const void_t* kpParam );
  * \note	N/A
  *************************************************************************************
  */
-int32_t WelsInitDecoder( PWelsDecoderContext pCtx,  void_t * pTraceHandle, PWelsLogCallbackFunc pLog );
+int32_t WelsInitDecoder (PWelsDecoderContext pCtx,  void_t* pTraceHandle, PWelsLogCallbackFunc pLog);
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	Uninitialize Wels decoder parameters and memory
  *
- * \param 	pCtx	input context to be uninitialized at release stage 
+ * \param 	pCtx	input context to be uninitialized at release stage
  *
  * \return	NONE
  *
  * \note	N/A
  *************************************************************************************
  */
-void_t WelsEndDecoder( PWelsDecoderContext pCtx );
+void_t WelsEndDecoder (PWelsDecoderContext pCtx);
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	First entrance to decoding core interface.
  *
@@ -100,24 +100,24 @@ void_t WelsEndDecoder( PWelsDecoderContext pCtx );
  *************************************************************************************
  */
 
-int32_t WelsDecodeBs( PWelsDecoderContext pCtx, const uint8_t *kpBsBuf, const int32_t kiBsLen, 
-					   uint8_t **ppDst, SBufferInfo* pDstBufInfo);
+int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const int32_t kiBsLen,
+                      uint8_t** ppDst, SBufferInfo* pDstBufInfo);
 
 /*
  *	request memory blocks for decoder avc part
  */
-int32_t WelsRequestMem( PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight );
+int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight);
 
 
 /*
  *	free memory blocks in avc
  */
-void_t WelsFreeMem( PWelsDecoderContext pCtx );
+void_t WelsFreeMem (PWelsDecoderContext pCtx);
 
 /*
  * set colorspace format in decoder
  */
-int32_t DecoderSetCsp(PWelsDecoderContext pCtx, const int32_t kiColorFormat);
+int32_t DecoderSetCsp (PWelsDecoderContext pCtx, const int32_t kiColorFormat);
 
 /*!
  * \brief	make sure synchonozization picture resolution (get from slice header) among different parts (i.e, memory related and so on)
@@ -125,22 +125,22 @@ int32_t DecoderSetCsp(PWelsDecoderContext pCtx, const int32_t kiColorFormat);
  * ( MB coordinate and parts of data within decoder context structure )
  * \param	pCtx		Wels decoder context
  * \param	iMbWidth	MB width
- * \pram	iMbHeight	MB height 
+ * \pram	iMbHeight	MB height
  * \return	0 - successful; none 0 - something wrong
  */
-int32_t SyncPictureResolutionExt( PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight );
+int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight);
 
 /*!
  * \brief	update maximal picture width and height if applicable when receiving a SPS NAL
  */
-void_t UpdateMaxPictureResolution( PWelsDecoderContext pCtx, const int32_t kiCurWidth, const int32_t kiCurHeight );
+void_t UpdateMaxPictureResolution (PWelsDecoderContext pCtx, const int32_t kiCurWidth, const int32_t kiCurHeight);
 
-void_t AssignFuncPointerForRec( PWelsDecoderContext pCtx );
+void_t AssignFuncPointerForRec (PWelsDecoderContext pCtx);
 
-void_t ResetParameterSetsState( PWelsDecoderContext pCtx );
+void_t ResetParameterSetsState (PWelsDecoderContext pCtx);
 
-void_t GetVclNalTemporalId( PWelsDecoderContext pCtx );//get the info that whether or not have VCL NAL in current AU,
-                                                            //and if YES, get the temporal ID
+void_t GetVclNalTemporalId (PWelsDecoderContext pCtx); //get the info that whether or not have VCL NAL in current AU,
+//and if YES, get the temporal ID
 
 #ifdef __cplusplus
 }

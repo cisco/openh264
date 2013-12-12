@@ -36,24 +36,24 @@
 #define WELS_LOGGING_H__
 
 // API surface.
-void WelsStderrSetTraceLevel(int32_t level);
+void WelsStderrSetTraceLevel (int32_t level);
 
 
 // Internal details.
-int32_t welsStderrLevelTrace(int32_t level, const str_t* format, va_list ap);
+int32_t welsStderrLevelTrace (int32_t level, const str_t* format, va_list ap);
 
-template<int level> int32_t welsStderrTrace(
+template<int level> int32_t welsStderrTrace (
 #ifndef WIN32
-  const str_t *dllname,
+  const str_t* dllname,
 #endif
   const str_t* format, ...) {
 #ifndef WIN32
   (void)dllname;  // Unused.
 #endif
   va_list ap;
-  va_start(ap, format);
-  welsStderrLevelTrace(level, format, ap);
-  va_end(ap);
+  va_start (ap, format);
+  welsStderrLevelTrace (level, format, ap);
+  va_end (ap);
   return 0;
 }
 
