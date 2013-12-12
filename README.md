@@ -56,7 +56,7 @@ Linux makefiles for 32 bit builds are available:
  
 Windows Visual Studio 2008/2010/2012 projects are available:
     : build the decoder via the Visual Studio projects in codec/build/win32/dec
-    : build the encoder via the Visual Studio projects in codec/build/win32/dec
+    : build the encoder via the Visual Studio projects in codec/build/win32/enc
     : build the encoder shared library via the Visual Studio projects in processing/build/win32/
  
 NASM needed to be installed for assembly code: workable version 2.07 or above, nasm can downloaded from http://www.nasm.us/
