@@ -48,13 +48,13 @@
 
 namespace WelsDec {
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	Start Code Prefix (0x 00 00 00 01) detection
  *
  * \param 	pBuf		bitstream payload buffer
  * \param	pOffset		offset between NAL rbsp and original bitsteam that
- * 				start code prefix is seperated from. 
+ * 				start code prefix is seperated from.
  * \param	iBufSize	count size of buffer
  *
  * \return	RBSP buffer of start code prefix exclusive
@@ -62,9 +62,9 @@ namespace WelsDec {
  * \note	N/A
  *************************************************************************************
  */
-uint8_t* DetectStartCodePrefix( const uint8_t *kpBuf, int32_t *pOffset, int32_t iBufSize );
+uint8_t* DetectStartCodePrefix (const uint8_t* kpBuf, int32_t* pOffset, int32_t iBufSize);
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	to parse network abstraction layer unit,
  *			escape emulation_prevention_three_byte within it
@@ -74,31 +74,33 @@ uint8_t* DetectStartCodePrefix( const uint8_t *kpBuf, int32_t *pOffset, int32_t 
  * \param 	pNalUnitHeader	parsed result of NAL Unit Header to output
  * \param   pSrcRbsp        bitstream buffer to input
  * \param   iSrcRbspLen     length size of bitstream buffer payload
- * \param	pSrcNal		    
- * \param	iSrcNalLen		
+ * \param	pSrcNal
+ * \param	iSrcNalLen
  * \param	pConsumedBytes	consumed bytes during parsing
  *
- * \return	decoded bytes payload, might be (pSrcRbsp+1) if no escapes 
+ * \return	decoded bytes payload, might be (pSrcRbsp+1) if no escapes
  *
  * \note	N/A
  *************************************************************************************
  */
-uint8_t* ParseNalHeader( PWelsDecoderContext pCtx, SNalUnitHeader *pNalUnitHeader, uint8_t *pSrcRbsp, int32_t iSrcRbspLen, uint8_t *pSrcNal, int32_t iSrcNalLen, int32_t* pConsumedBytes );		 
+uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeader, uint8_t* pSrcRbsp,
+                         int32_t iSrcRbspLen, uint8_t* pSrcNal, int32_t iSrcNalLen, int32_t* pConsumedBytes);
 
-int32_t ParseNonVclNal( PWelsDecoderContext pCtx, uint8_t *pRbsp, const int32_t kiSrcLen );
+int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t kiSrcLen);
 
-void_t ParseRefBasePicMarking ( PBitStringAux pBs, PRefBasePicMarking pRefBasePicMarking );
+void_t ParseRefBasePicMarking (PBitStringAux pBs, PRefBasePicMarking pRefBasePicMarking);
 
-void_t ParsePrefixNalUnit ( PWelsDecoderContext pCtx, PBitStringAux pBs );
+void_t ParsePrefixNalUnit (PWelsDecoderContext pCtx, PBitStringAux pBs);
 
-bool_t CheckAccessUnitBoundary( const PNalUnit kpCurNal, const PNalUnit kpLastNal, const PSps kpSps );
-bool_t CheckAccessUnitBoundaryExt( PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeaderExt pCurNalHeaderExt, PSliceHeader pLastSliceHeader, PSliceHeader pCurSliceHeader );
-/*! 
+bool_t CheckAccessUnitBoundary (const PNalUnit kpCurNal, const PNalUnit kpLastNal, const PSps kpSps);
+bool_t CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeaderExt pCurNalHeaderExt,
+                                   PSliceHeader pLastSliceHeader, PSliceHeader pCurSliceHeader);
+/*!
  *************************************************************************************
  * \brief	to parse Sequence Parameter Set (SPS)
  *
  * \param	pCtx		Decoder context
- * \param	pBsAux		bitstream reader auxiliary 
+ * \param	pBsAux		bitstream reader auxiliary
  * \param	pPicWidth	picture width current Sps represented
  * \param	pPicHeight	picture height current Sps represented
  *
@@ -108,15 +110,15 @@ bool_t CheckAccessUnitBoundaryExt( PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHea
  * \note	Call it in case eNalUnitType is SPS.
  *************************************************************************************
  */
-int32_t ParseSps( PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t *pPicWidth, int32_t *pPicHeight );
+int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicWidth, int32_t* pPicHeight);
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	to parse Picture Parameter Set (PPS)
  *
  * \param	pCtx		Decoder context
  * \param 	pPpsList	pps list
- * \param	pBsAux		bitstream reader auxiliary 
+ * \param	pBsAux		bitstream reader auxiliary
  *
  * \return	0 - successed
  *		1 - failed
@@ -124,14 +126,14 @@ int32_t ParseSps( PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t *pPicW
  * \note	Call it in case eNalUnitType is PPS.
  *************************************************************************************
  */
-int32_t ParsePps( PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux );
+int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux);
 
-/*! 
+/*!
  *************************************************************************************
  * \brief	to parse SEI message payload
  *
  * \param 	pSei		sei message to be parsed output
- * \param	pBsAux		bitstream reader auxiliary 
+ * \param	pBsAux		bitstream reader auxiliary
  *
  * \return	0 - successed
  *		1 - failed
@@ -139,7 +141,7 @@ int32_t ParsePps( PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux 
  * \note	Call it in case eNalUnitType is NAL_UNIT_SEI.
  *************************************************************************************
  */
-int32_t ParseSei( void_t *pSei, PBitStringAux pBsAux );	// reserved Sei_Msg type
+int32_t ParseSei (void_t* pSei, PBitStringAux pBsAux);	// reserved Sei_Msg type
 
 /*!
  *************************************************************************************
@@ -150,7 +152,7 @@ int32_t ParseSei( void_t *pSei, PBitStringAux pBsAux );	// reserved Sei_Msg type
  * \return	count number of fmo context units are reset
  *************************************************************************************
  */
-int32_t ResetFmoList( PWelsDecoderContext pCtx );
+int32_t ResetFmoList (PWelsDecoderContext pCtx);
 
 } // namespace WelsDec
 

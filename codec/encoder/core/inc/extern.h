@@ -55,7 +55,7 @@ namespace WelsSVCEnc {
  * \param	kiHeight	height of picture in pixels
  * \return	successful - 0; otherwise none 0 for failed
  */
-int32_t InitPic( const void *kpSrc, const int32_t kiCsp, const int32_t kiWidth, const int32_t kiHeight );
+int32_t InitPic (const void* kpSrc, const int32_t kiCsp, const int32_t kiWidth, const int32_t kiHeight);
 
 /*
  *	SVC core encoder external interfaces
@@ -66,10 +66,10 @@ int32_t InitPic( const void *kpSrc, const int32_t kiCsp, const int32_t kiWidth, 
  * \pParam	pParam		SWelsSvcCodingParam*
  * \return	successful - 0; otherwise none 0 for failed
  */
-int32_t ParamValidationExt( void *pParam );
+int32_t ParamValidationExt (void* pParam);
 
 // GOM based RC related for uiSliceNum decision
-void GomValidCheck(const int32_t kiMbWidth, const int32_t kiMbHeight, int32_t *pSliceNum);
+void GomValidCheck (const int32_t kiMbWidth, const int32_t kiMbHeight, int32_t* pSliceNum);
 
 /*!
  * \brief	initialize Wels avc encoder core library
@@ -77,14 +77,14 @@ void GomValidCheck(const int32_t kiMbWidth, const int32_t kiMbHeight, int32_t *p
  * \param	para		SWelsSvcCodingParam*
  * \return	successful - 0; otherwise none 0 for failed
  */
-int32_t WelsInitEncoderExt( sWelsEncCtx **ppCtx, SWelsSvcCodingParam *pPara );
+int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pPara);
 
 /*!
  * \brief	uninitialize Wels encoder core library
  * \param	pEncCtx		sWelsEncCtx*
  * \return	none
  */
-void WelsUninitEncoderExt( sWelsEncCtx **ppCtx );
+void WelsUninitEncoderExt (sWelsEncCtx** ppCtx);
 
 /*!
  * \brief	core svc encoding process
@@ -97,22 +97,23 @@ void WelsUninitEncoderExt( sWelsEncCtx **ppCtx );
  *						[NO in picture list case, YES in console aplication based]
  * \return	EFrameType (WELS_FRAME_TYPE_IDR/WELS_FRAME_TYPE_I/WELS_FRAME_TYPE_P)
  */
-int32_t WelsEncoderEncodeExt( sWelsEncCtx *, void *pDst, const SSourcePicture **kppSrcList, const int32_t kiConfiguredLayerNum );
+int32_t WelsEncoderEncodeExt (sWelsEncCtx*, void* pDst, const SSourcePicture** kppSrcList,
+                              const int32_t kiConfiguredLayerNum);
 
 /*
  * Force coding IDR as follows
  */
-int32_t ForceCodingIDR( sWelsEncCtx *pCtx );
+int32_t ForceCodingIDR (sWelsEncCtx* pCtx);
 
 /*!
  * \brief	Wels SVC encoder parameters adjustment
  *			SVC adjustment results in new requirement in memory blocks adjustment
  */
-int32_t WelsEncoderParamAdjust( sWelsEncCtx **ppCtx, SWelsSvcCodingParam *pNew );
+int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNew);
 
-int32_t FilterLTRRecoveryRequest(sWelsEncCtx *pCtx,SLTRRecoverRequest* pLTRRecoverRequest);
+int32_t FilterLTRRecoveryRequest (sWelsEncCtx* pCtx, SLTRRecoverRequest* pLTRRecoverRequest);
 
-void FilterLTRMarkingFeedback(sWelsEncCtx *pCtx,SLTRMarkingFeedback* pLTRMarkingFeedback);
+void FilterLTRMarkingFeedback (sWelsEncCtx* pCtx, SLTRMarkingFeedback* pLTRMarkingFeedback);
 }
 
 #endif//WELS_ENCODER_CALLBACK_H__

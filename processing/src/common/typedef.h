@@ -30,13 +30,13 @@
  *
  * \file	    :  typedef.h
  *
- * \brief	    :  basic type definition 
+ * \brief	    :  basic type definition
  *
  * \date        :  2011/01/04
  *
  * \description :  1. Define basic type with platform-independent;
  *                 2. Define specific namespace to avoid name pollution;
- *                 3. C++ ONLY;             
+ *                 3. C++ ONLY;
  *
  *************************************************************************************
  */
@@ -66,7 +66,8 @@ typedef unsigned __int64   uint64_t ;
 
 #else	// GCC
 
-typedef signed char        int8_t   ; // [comment]: some compilers may identify the type "char" as "unsigned char" as default, so declare it explicit 
+typedef signed char        int8_t
+; // [comment]: some compilers may identify the type "char" as "unsigned char" as default, so declare it explicit
 typedef unsigned char      uint8_t  ;
 typedef signed short       int16_t  ;
 typedef unsigned short     uint16_t ;
@@ -76,7 +77,7 @@ typedef long long          int64_t  ;
 typedef unsigned long long uint64_t ;
 #define inline_t           inline
 
-#endif 
+#endif
 
 typedef char    str_t    ; // [comment]: specific use plain char only for character parameters
 typedef long    long_t   ;
@@ -84,17 +85,16 @@ typedef int32_t bool_t   ;
 
 #if defined(WIN32) || defined(_MACH_PLATFORM) || defined(__GNUC__)
 typedef float   float_t  ;
-typedef double  double_t ; 
+typedef double  double_t ;
 #endif
 
 #ifndef NULL
 #define NULL    0
 #endif
 
-enum
-{
-   FALSE = 0,
-   TRUE  = !FALSE
+enum {
+  FALSE = 0,
+  TRUE  = !FALSE
 };
 
 WELSVP_NAMESPACE_END

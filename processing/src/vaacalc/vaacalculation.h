@@ -34,7 +34,7 @@
  *
  * \date        :  2011/03/18
  *
- * \description :  1. rewrite the package code of pVaa calculation class  
+ * \description :  1. rewrite the package code of pVaa calculation class
  *
  *************************************************************************************
  */
@@ -49,36 +49,40 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-typedef void (VAACalcSadBgdFunc)( uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
-								int32_t *pFrameSad, int32_t *pSad8x8, int32_t *pSd8x8, uint8_t *pMad8x8);
+typedef void (VAACalcSadBgdFunc) (uint8_t* pCurData, uint8_t* pRefData, int32_t iPicWidth, int32_t iPicHeight,
+                                  int32_t iPicStride,
+                                  int32_t* pFrameSad, int32_t* pSad8x8, int32_t* pSd8x8, uint8_t* pMad8x8);
 
-typedef void (VAACalcSadSsdBgdFunc)(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
-								int32_t *pFrameSad, int32_t *pSad8x8, int32_t *pSum16x16, int32_t *pSumSquare16x16, 
-												int32_t *pSsd16x16, int32_t *pSd8x8, uint8_t *pMad8x8);
+typedef void (VAACalcSadSsdBgdFunc) (uint8_t* pCurData, uint8_t* pRefData, int32_t iPicWidth, int32_t iPicHeight,
+                                     int32_t iPicStride,
+                                     int32_t* pFrameSad, int32_t* pSad8x8, int32_t* pSum16x16, int32_t* pSumSquare16x16,
+                                     int32_t* pSsd16x16, int32_t* pSd8x8, uint8_t* pMad8x8);
 
-typedef void (VAACalcSadFunc)( uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
-								int32_t *pFrameSad, int32_t *pSad8x8);
+typedef void (VAACalcSadFunc) (uint8_t* pCurData, uint8_t* pRefData, int32_t iPicWidth, int32_t iPicHeight,
+                               int32_t iPicStride,
+                               int32_t* pFrameSad, int32_t* pSad8x8);
 
-typedef void (VAACalcSadVarFunc)( uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
-								int32_t *pFrameSad, int32_t *pSad8x8, int32_t *pSum16x16, int32_t *pSumSquare16x16);
+typedef void (VAACalcSadVarFunc) (uint8_t* pCurData, uint8_t* pRefData, int32_t iPicWidth, int32_t iPicHeight,
+                                  int32_t iPicStride,
+                                  int32_t* pFrameSad, int32_t* pSad8x8, int32_t* pSum16x16, int32_t* pSumSquare16x16);
 
-typedef void (VAACalcSadSsdFunc)(uint8_t *pCurData, uint8_t *pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
-								int32_t *pFrameSad, int32_t *pSad8x8, int32_t *pSum16x16, int32_t *pSumSquare16x16, int32_t *pSsd16x16);
+typedef void (VAACalcSadSsdFunc) (uint8_t* pCurData, uint8_t* pRefData, int32_t iPicWidth, int32_t iPicHeight,
+                                  int32_t iPicStride,
+                                  int32_t* pFrameSad, int32_t* pSad8x8, int32_t* pSum16x16, int32_t* pSumSquare16x16, int32_t* pSsd16x16);
 
 
-typedef VAACalcSadBgdFunc		* PVAACalcSadBgdFunc;
-typedef VAACalcSadSsdBgdFunc	* PVAACalcSadSsdBgdFunc;
-typedef VAACalcSadFunc			* PVAACalcSadFunc;
-typedef VAACalcSadVarFunc		* PVAACalcSadVarFunc;
-typedef VAACalcSadSsdFunc		* PVAACalcSadSsdFunc;
+typedef VAACalcSadBgdFunc*		 PVAACalcSadBgdFunc;
+typedef VAACalcSadSsdBgdFunc*	 PVAACalcSadSsdBgdFunc;
+typedef VAACalcSadFunc*			 PVAACalcSadFunc;
+typedef VAACalcSadVarFunc*		 PVAACalcSadVarFunc;
+typedef VAACalcSadSsdFunc*		 PVAACalcSadSsdFunc;
 
-typedef  struct TagVaaFuncs 
-{
-	PVAACalcSadBgdFunc		pfVAACalcSadBgd;
-	PVAACalcSadSsdBgdFunc	pfVAACalcSadSsdBgd;
-	PVAACalcSadFunc			pfVAACalcSad;
-	PVAACalcSadVarFunc		pfVAACalcSadVar;
-	PVAACalcSadSsdFunc		pfVAACalcSadSsd;
+typedef  struct TagVaaFuncs {
+  PVAACalcSadBgdFunc		pfVAACalcSadBgd;
+  PVAACalcSadSsdBgdFunc	pfVAACalcSadSsdBgd;
+  PVAACalcSadFunc			pfVAACalcSad;
+  PVAACalcSadVarFunc		pfVAACalcSadVar;
+  PVAACalcSadSsdFunc		pfVAACalcSadSsd;
 } SVaaFuncs;
 
 
@@ -91,31 +95,30 @@ VAACalcSadSsdFunc		VAACalcSadSsd_c;
 
 #ifdef X86_ASM
 WELSVP_EXTERN_C_BEGIN
-	VAACalcSadBgdFunc		VAACalcSadBgd_sse2;
-	VAACalcSadSsdBgdFunc	VAACalcSadSsdBgd_sse2;
-	VAACalcSadFunc			    VAACalcSad_sse2;
-	VAACalcSadVarFunc		VAACalcSadVar_sse2;
-	VAACalcSadSsdFunc		VAACalcSadSsd_sse2;
+VAACalcSadBgdFunc		VAACalcSadBgd_sse2;
+VAACalcSadSsdBgdFunc	VAACalcSadSsdBgd_sse2;
+VAACalcSadFunc			    VAACalcSad_sse2;
+VAACalcSadVarFunc		VAACalcSadVar_sse2;
+VAACalcSadSsdFunc		VAACalcSadSsd_sse2;
 WELSVP_EXTERN_C_END
 #endif
 
-class CVAACalculation : public IStrategy
-{			  
-public:
-	CVAACalculation(int32_t iCpuFlag);
-	~CVAACalculation();
+class CVAACalculation : public IStrategy {
+ public:
+  CVAACalculation (int32_t iCpuFlag);
+  ~CVAACalculation();
 
-	EResult Process(int32_t iType, SPixMap *pCurPixMap, SPixMap *pRefPixMap);
-	EResult Set    (int32_t iType, void *pParam); 
+  EResult Process (int32_t iType, SPixMap* pCurPixMap, SPixMap* pRefPixMap);
+  EResult Set (int32_t iType, void* pParam);
 
-private:
-	void InitVaaFuncs(SVaaFuncs &sVaaFunc, int32_t iCpuFlag);
+ private:
+  void InitVaaFuncs (SVaaFuncs& sVaaFunc, int32_t iCpuFlag);
 
-private:
-	SVaaFuncs      m_sVaaFuncs;
-	int32_t       m_iCPUFlag;
-	SVAACalcParam m_sCalcParam;
-};	
+ private:
+  SVaaFuncs      m_sVaaFuncs;
+  int32_t       m_iCPUFlag;
+  SVAACalcParam m_sCalcParam;
+};
 
 WELSVP_NAMESPACE_END
 

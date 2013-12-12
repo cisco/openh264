@@ -43,53 +43,47 @@
 namespace WelsDec {
 
 #ifdef WORDS_BIGENDIAN
-inline uint32_t EndianFix(uint32_t uiX)
-{
-	return uiX;
+inline uint32_t EndianFix (uint32_t uiX) {
+  return uiX;
 }
 #else //WORDS_BIGENDIAN
 
 #ifdef _MSC_VER
-inline uint32_t EndianFix(uint32_t uiX)
-{
-	__asm
-	{
-		mov   eax,  uiX
-		bswap   eax
-		mov   uiX,    eax
-	}
-	return uiX;
+inline uint32_t EndianFix (uint32_t uiX) {
+  __asm {
+    mov   eax,  uiX
+    bswap   eax
+    mov   uiX,    eax
+  }
+  return uiX;
 }
 #else  //_MSC_VER
 
-inline uint32_t EndianFix(uint32_t uiX)
-{
+inline uint32_t EndianFix (uint32_t uiX) {
 #ifdef ARM_ARCHv7
-	__asm__ __volatile__("rev %0, %0":"+r"(uiX)); //Just for the ARMv7 
+  __asm__ __volatile__ ("rev %0, %0":"+r" (uiX)); //Just for the ARMv7
 #elif defined (X86_ARCH)
-	__asm__ __volatile__("bswap %0":"+r"(uiX));
+  __asm__ __volatile__ ("bswap %0":"+r" (uiX));
 #else
-    uiX = ((uiX & 0xff000000)>> 24) | ((uiX & 0xff0000) >> 8) |
-        ((uiX & 0xff00) << 8) | ((uiX&0xff) << 24);
-#endif	
-	return uiX;
+  uiX = ((uiX & 0xff000000) >> 24) | ((uiX & 0xff0000) >> 8) |
+        ((uiX & 0xff00) << 8) | ((uiX & 0xff) << 24);
+#endif
+  return uiX;
 }
 #endif //_MSC_VER
 
 #endif //WORDS_BIGENDIAN
 
-inline uint32_t GetValue4Bytes( uint8_t* pDstNal )
-{
-	uint32_t uiValue = 0;
-	uiValue = (pDstNal[0]<<24) | (pDstNal[1]<<16) | (pDstNal[2]<<8) | (pDstNal[3]);
-	return uiValue;
+inline uint32_t GetValue4Bytes (uint8_t* pDstNal) {
+  uint32_t uiValue = 0;
+  uiValue = (pDstNal[0] << 24) | (pDstNal[1] << 16) | (pDstNal[2] << 8) | (pDstNal[3]);
+  return uiValue;
 }
 
-void_t InitReadBits( PBitStringAux pBitString )
-{
-	pBitString->uiCurBits  = GetValue4Bytes( pBitString->pCurBuf );
-	pBitString->pCurBuf  += 4;
-	pBitString->iLeftBits = -16;
+void_t InitReadBits (PBitStringAux pBitString) {
+  pBitString->uiCurBits  = GetValue4Bytes (pBitString->pCurBuf);
+  pBitString->pCurBuf  += 4;
+  pBitString->iLeftBits = -16;
 }
 
 /*!
@@ -101,22 +95,21 @@ void_t InitReadBits( PBitStringAux pBitString )
  *
  * \return	size of buffer data in byte; failed in -1 return
  */
-int32_t InitBits( PBitStringAux pBitString, const uint8_t *kpBuf, const int32_t kiSize )
-{	
-	const int32_t kiSizeBuf = (kiSize + 7) >> 3;
-	uint8_t *pTmp = (uint8_t *)kpBuf;
+int32_t InitBits (PBitStringAux pBitString, const uint8_t* kpBuf, const int32_t kiSize) {
+  const int32_t kiSizeBuf = (kiSize + 7) >> 3;
+  uint8_t* pTmp = (uint8_t*)kpBuf;
 
-	if ( NULL == pTmp )
-		return -1;
+  if (NULL == pTmp)
+    return -1;
 
-	pBitString->pStartBuf   = pTmp;				// buffer to start position
-	pBitString->pEndBuf	    = pTmp + kiSizeBuf;	// buffer + length
-	pBitString->iBits	    = kiSize;				// count bits of overall bitstreaming inputindex;
+  pBitString->pStartBuf   = pTmp;				// buffer to start position
+  pBitString->pEndBuf	    = pTmp + kiSizeBuf;	// buffer + length
+  pBitString->iBits	    = kiSize;				// count bits of overall bitstreaming inputindex;
 
-	pBitString->pCurBuf   = pBitString->pStartBuf;
-	InitReadBits( pBitString );
+  pBitString->pCurBuf   = pBitString->pStartBuf;
+  InitReadBits (pBitString);
 
-	return kiSizeBuf;
+  return kiSizeBuf;
 }
 
 } // namespace WelsDec

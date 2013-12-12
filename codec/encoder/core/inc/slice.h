@@ -53,132 +53,130 @@ namespace WelsSVCEnc {
  *	Reference picture list reordering syntax, refer to page 64 in JVT X201wcm
  */
 typedef struct TagRefPicListReorderSyntax {
-	struct
-	{
-		uint32_t	uiAbsDiffPicNumMinus1; //uiAbsDiffPicNumMinus1 SHOULD be in the range of [4, (1<<pSps->uiLog2MaxFrameNum)-1], {p104, JVT-X201wcm1}
-		                                     //but int8_t can't cover the range, SHOULD modify it.
-		uint16_t	iLongTermPicNum;
-		uint16_t	uiReorderingOfPicNumsIdc; //in order to pack 2-uint16_t into 1-(u)int32_t, so modify the type into uint16_t.
-	} SReorderingSyntax[MAX_REFERENCE_REORDER_COUNT_NUM];	// MAX_REF_PIC_COUNT
-}SRefPicListReorderSyntax;
+  struct {
+    uint32_t	uiAbsDiffPicNumMinus1; //uiAbsDiffPicNumMinus1 SHOULD be in the range of [4, (1<<pSps->uiLog2MaxFrameNum)-1], {p104, JVT-X201wcm1}
+    //but int8_t can't cover the range, SHOULD modify it.
+    uint16_t	iLongTermPicNum;
+    uint16_t	uiReorderingOfPicNumsIdc; //in order to pack 2-uint16_t into 1-(u)int32_t, so modify the type into uint16_t.
+  } SReorderingSyntax[MAX_REFERENCE_REORDER_COUNT_NUM];	// MAX_REF_PIC_COUNT
+} SRefPicListReorderSyntax;
 
-		
+
 /* Decoded reference picture marking syntax, refer to Page 66 in JVT X201wcm */
 typedef struct TagRefPicMarking {
-	struct
-	{
-		int32_t	iMmcoType;
-		int32_t iShortFrameNum;
-		int32_t	iDiffOfPicNum;
-		int32_t	iLongTermPicNum;
-		int32_t	iLongTermFrameIdx;
-		int32_t	iMaxLongTermFrameIdx;
-	} SMmcoRef[MAX_REFERENCE_MMCO_COUNT_NUM];	// MAX_MMCO_COUNT
-	
-	//	int32_t		mmco_index;
-	uint8_t		uiMmcoCount;
-	bool_t		bNoOutputOfPriorPicsFlag;
-	bool_t		bLongTermRefFlag;
-	bool_t		bAdaptiveRefPicMarkingModeFlag;	
+  struct {
+    int32_t	iMmcoType;
+    int32_t iShortFrameNum;
+    int32_t	iDiffOfPicNum;
+    int32_t	iLongTermPicNum;
+    int32_t	iLongTermFrameIdx;
+    int32_t	iMaxLongTermFrameIdx;
+  } SMmcoRef[MAX_REFERENCE_MMCO_COUNT_NUM];	// MAX_MMCO_COUNT
+
+  //	int32_t		mmco_index;
+  uint8_t		uiMmcoCount;
+  bool_t		bNoOutputOfPriorPicsFlag;
+  bool_t		bLongTermRefFlag;
+  bool_t		bAdaptiveRefPicMarkingModeFlag;
 } SRefPicMarking;
 
 
 /* Header of slice syntax elements, refer to Page 63 in JVT X201wcm */
-typedef struct TagSliceHeader{	
-	/*****************************slice header syntax and generated****************************/
-	int32_t		iFirstMbInSlice;		
+typedef struct TagSliceHeader {
+  /*****************************slice header syntax and generated****************************/
+  int32_t		iFirstMbInSlice;
 //	uint32_t	pic_parameter_set_id;
-	int32_t		iFrameNum;	
-	int32_t		iPicOrderCntLsb;
-    
+  int32_t		iFrameNum;
+  int32_t		iPicOrderCntLsb;
+
 //	int32_t		delta_pic_order_cnt_bottom;
 //	int32_t		delta_pic_order_cnt[2];
 //	int32_t		redundant_pic_cnt;
-		
-	EWelsSliceType	eSliceType;
-	uint8_t		uiNumRefIdxL0Active;			//
-	//int32_t		num_ref_idx_l1_active_minus1	//B frame is not supported
-	uint8_t		uiRefCount;
-	//Ref_Pic				*ref_pic;
-	uint8_t		uiRefIndex;	// exact reference picture index for slice	
-	
-	int8_t		iSliceQpDelta;
-//	int32_t		slice_qp;	
+
+  EWelsSliceType	eSliceType;
+  uint8_t		uiNumRefIdxL0Active;			//
+  //int32_t		num_ref_idx_l1_active_minus1	//B frame is not supported
+  uint8_t		uiRefCount;
+  //Ref_Pic				*ref_pic;
+  uint8_t		uiRefIndex;	// exact reference picture index for slice
+
+  int8_t		iSliceQpDelta;
+//	int32_t		slice_qp;
 //	int32_t		slice_qs_delta;		// For SP/SI slices
-	uint8_t		uiDisableDeblockingFilterIdc;
-	int8_t		iSliceAlphaC0Offset;
-	int8_t		iSliceBetaOffset;
+  uint8_t		uiDisableDeblockingFilterIdc;
+  int8_t		iSliceAlphaC0Offset;
+  int8_t		iSliceBetaOffset;
 #if !defined(DISABLE_FMO_FEATURE)
-	int32_t		iSliceGroupChangeCycle;
+  int32_t		iSliceGroupChangeCycle;
 #endif//!DISABLE_FMO_FEATURE
 
-	SWelsSPS			*pSps;
-	SWelsPPS			*pPps;
-	int32_t		iSpsId;
-	int32_t		iPpsId;
+  SWelsSPS*			pSps;
+  SWelsPPS*			pPps;
+  int32_t		iSpsId;
+  int32_t		iPpsId;
 
-	uint16_t    uiIdrPicId;	
+  uint16_t    uiIdrPicId;
 //	uint8_t		color_plane_id;//from?
 
-	bool_t		bNumRefIdxActiveOverrideFlag;
+  bool_t		bNumRefIdxActiveOverrideFlag;
 //	bool_t		field_pic_flag;		//not supported in base profile
 //	bool_t		bottom_field_flag;		//not supported in base profile
-	uint8_t		uiPadding1Bytes;
+  uint8_t		uiPadding1Bytes;
 
-	SRefPicMarking		sRefMarking;	// Decoded reference picture marking syntaxs
+  SRefPicMarking		sRefMarking;	// Decoded reference picture marking syntaxs
 
-	SRefPicListReorderSyntax	sRefReordering;	// Reference picture list reordering syntaxs
-}SSliceHeader, *PSliceHeader;
+  SRefPicListReorderSyntax	sRefReordering;	// Reference picture list reordering syntaxs
+} SSliceHeader, *PSliceHeader;
 
 
 /* SSlice header in scalable extension syntax, refer to Page 394 in JVT X201wcm */
-typedef struct TagSliceHeaderExt{	
-	SSliceHeader	sSliceHeader;
+typedef struct TagSliceHeaderExt {
+  SSliceHeader	sSliceHeader;
 
-	SSubsetSps	*pSubsetSps;
-	
-	uint32_t	uiNumMbsInSlice;	
-	
-	bool_t		bStoreRefBasePicFlag;	
-	bool_t		bConstrainedIntraResamplingFlag;	
-	bool_t		bSliceSkipFlag;
-	
-	bool_t		bAdaptiveBaseModeFlag;
-	bool_t		bDefaultBaseModeFlag;
-	bool_t		bAdaptiveMotionPredFlag;
-	bool_t		bDefaultMotionPredFlag;
+  SSubsetSps*	pSubsetSps;
 
-	bool_t		bAdaptiveResidualPredFlag;
-	bool_t		bDefaultResidualPredFlag;
-	bool_t		bTcoeffLevelPredFlag;		
-	uint8_t		uiDisableInterLayerDeblockingFilterIdc;
-	
-}SSliceHeaderExt, *PSliceHeaderExt;
+  uint32_t	uiNumMbsInSlice;
 
+  bool_t		bStoreRefBasePicFlag;
+  bool_t		bConstrainedIntraResamplingFlag;
+  bool_t		bSliceSkipFlag;
 
-typedef struct TagSlice{	
-	// mainly for multiple threads imp.
-	SMbCache	sMbCacheInfo;	// MBCache is introduced within slice dependency
-	SBitStringAux *pSliceBsa;
+  bool_t		bAdaptiveBaseModeFlag;
+  bool_t		bDefaultBaseModeFlag;
+  bool_t		bAdaptiveMotionPredFlag;
+  bool_t		bDefaultMotionPredFlag;
 
-	/*******************************sSliceHeader****************************/
-	SSliceHeaderExt	sSliceHeaderExt;	
+  bool_t		bAdaptiveResidualPredFlag;
+  bool_t		bDefaultResidualPredFlag;
+  bool_t		bTcoeffLevelPredFlag;
+  uint8_t		uiDisableInterLayerDeblockingFilterIdc;
+
+} SSliceHeaderExt, *PSliceHeaderExt;
 
 
-	SMVUnitXY	sMvMin;
-	SMVUnitXY	sMvMax;	
-	SMVUnitXY	sMvc[5];
-	uint8_t		uiMvcNum;
-	uint8_t		sScaleShift;
+typedef struct TagSlice {
+  // mainly for multiple threads imp.
+  SMbCache	sMbCacheInfo;	// MBCache is introduced within slice dependency
+  SBitStringAux* pSliceBsa;
 
-	uint8_t		uiSliceIdx;
-	bool_t		bSliceHeaderExtFlag; // Indicate which slice header is used, avc or ext?	
-	uint8_t		uiLastMbQp;		// stored qp for last mb coded, maybe more efficient for mb skip detection etc.
+  /*******************************sSliceHeader****************************/
+  SSliceHeaderExt	sSliceHeaderExt;
 
-	bool_t		bDynamicSlicingSliceSizeCtrlFlag;
-	uint8_t		uiAssumeLog2BytePerMb;
-	uint8_t		uiReservedFillByte;	// reserved to meet 4 bytes alignment
-}SSlice, *PSlice;
+
+  SMVUnitXY	sMvMin;
+  SMVUnitXY	sMvMax;
+  SMVUnitXY	sMvc[5];
+  uint8_t		uiMvcNum;
+  uint8_t		sScaleShift;
+
+  uint8_t		uiSliceIdx;
+  bool_t		bSliceHeaderExtFlag; // Indicate which slice header is used, avc or ext?
+  uint8_t		uiLastMbQp;		// stored qp for last mb coded, maybe more efficient for mb skip detection etc.
+
+  bool_t		bDynamicSlicingSliceSizeCtrlFlag;
+  uint8_t		uiAssumeLog2BytePerMb;
+  uint8_t		uiReservedFillByte;	// reserved to meet 4 bytes alignment
+} SSlice, *PSlice;
 
 }
 //#pragma pack()

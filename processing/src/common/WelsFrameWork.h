@@ -34,7 +34,7 @@
  *
  * \date        :  2011/01/04
  *
- * \description :  
+ * \description :
  *
  *************************************************************************************
  */
@@ -48,72 +48,81 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-EResult CreateSpecificVpInterface (IWelsVP **ppCtx);
-EResult DestroySpecificVpInterface(IWelsVP *pCtx );
+EResult CreateSpecificVpInterface (IWelsVP** ppCtx);
+EResult DestroySpecificVpInterface (IWelsVP* pCtx);
 
-EResult CreateSpecificVpInterface (IWelsVPc **ppCtx);
-EResult DestroySpecificVpInterface(IWelsVPc *pCtx );
+EResult CreateSpecificVpInterface (IWelsVPc** ppCtx);
+EResult DestroySpecificVpInterface (IWelsVPc* pCtx);
 
 #define MAX_STRATEGY_NUM (METHOD_MASK - 1)
 
-class IStrategy : public IWelsVP
-{
-public:		
-	IStrategy() 
-	{
-		m_eMethod  = METHOD_NULL;
-		m_eFormat  = VIDEO_FORMAT_I420;
-		m_iIndex   = 0;		
-		m_bInit    = FALSE;
-	};
+class IStrategy : public IWelsVP {
+ public:
+  IStrategy() {
+    m_eMethod  = METHOD_NULL;
+    m_eFormat  = VIDEO_FORMAT_I420;
+    m_iIndex   = 0;
+    m_bInit    = FALSE;
+  };
 
-	virtual ~IStrategy() {}
+  virtual ~IStrategy() {}
 
-public:
-	virtual EResult Init(int32_t iType, void *pCfg)  { return RET_SUCCESS; } 
-	virtual EResult Uninit(int32_t iType)              { return RET_SUCCESS; }
-	virtual EResult Flush(int32_t iType)               { return RET_SUCCESS; }		
-	virtual EResult Get(int32_t iType, void *pParam) { return RET_SUCCESS; } 
-	virtual EResult Set(int32_t iType, void *pParam) { return RET_SUCCESS; } 
-	virtual EResult SpecialFeature(int32_t iType, void *pIn, void *pOut) { return RET_SUCCESS; }
-	virtual EResult Process(int32_t iType, SPixMap *pSrc, SPixMap *pDst) = 0; 		
+ public:
+  virtual EResult Init (int32_t iType, void* pCfg)  {
+    return RET_SUCCESS;
+  }
+  virtual EResult Uninit (int32_t iType)              {
+    return RET_SUCCESS;
+  }
+  virtual EResult Flush (int32_t iType)               {
+    return RET_SUCCESS;
+  }
+  virtual EResult Get (int32_t iType, void* pParam) {
+    return RET_SUCCESS;
+  }
+  virtual EResult Set (int32_t iType, void* pParam) {
+    return RET_SUCCESS;
+  }
+  virtual EResult SpecialFeature (int32_t iType, void* pIn, void* pOut) {
+    return RET_SUCCESS;
+  }
+  virtual EResult Process (int32_t iType, SPixMap* pSrc, SPixMap* pDst) = 0;
 
-public:
-	EMethods       m_eMethod;
-	EVideoFormat m_eFormat;
-	int32_t           m_iIndex;		
-	bool_t            m_bInit;			
+ public:
+  EMethods       m_eMethod;
+  EVideoFormat m_eFormat;
+  int32_t           m_iIndex;
+  bool_t            m_bInit;
 };
 
-class CVpFrameWork : public IWelsVP
-{
-public:
-	CVpFrameWork(uint32_t uiThreadsNum, EResult &ret);
-	~CVpFrameWork();
+class CVpFrameWork : public IWelsVP {
+ public:
+  CVpFrameWork (uint32_t uiThreadsNum, EResult& ret);
+  ~CVpFrameWork();
 
-public:
-	EResult Init(int32_t iType, void *pCfg); 
+ public:
+  EResult Init (int32_t iType, void* pCfg);
 
-	EResult Uninit(int32_t iType);
+  EResult Uninit (int32_t iType);
 
-	EResult Flush(int32_t iType);
+  EResult Flush (int32_t iType);
 
-	EResult Process(int32_t iType, SPixMap *pSrc, SPixMap *pDst); 
+  EResult Process (int32_t iType, SPixMap* pSrc, SPixMap* pDst);
 
-	EResult Get(int32_t iType, void *pParam); 
+  EResult Get (int32_t iType, void* pParam);
 
-	EResult Set(int32_t iType, void *pParam); 
+  EResult Set (int32_t iType, void* pParam);
 
-	EResult SpecialFeature(int32_t iType, void *pIn, void *pOut);
+  EResult SpecialFeature (int32_t iType, void* pIn, void* pOut);
 
-private:
-	bool_t  CheckValid(EMethods eMethod, SPixMap &sSrc, SPixMap &sDst);
-	IStrategy *CreateStrategy(EMethods eMethod, int32_t iCpuFlag);	
+ private:
+  bool_t  CheckValid (EMethods eMethod, SPixMap& sSrc, SPixMap& sDst);
+  IStrategy* CreateStrategy (EMethods eMethod, int32_t iCpuFlag);
 
-private:
-	IStrategy *m_pStgChain[MAX_STRATEGY_NUM];
+ private:
+  IStrategy* m_pStgChain[MAX_STRATEGY_NUM];
 
-	WELS_MUTEX m_mutes;
+  WELS_MUTEX m_mutes;
 };
 
 WELSVP_NAMESPACE_END

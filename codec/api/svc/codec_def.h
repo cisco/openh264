@@ -37,75 +37,70 @@
 #pragma once
 #endif//WIN32
 
-typedef enum
-{
-	/*rgb color formats*/
-	videoFormatRGB        = 1,
-	videoFormatRGBA       = 2, 
-	videoFormatRGB555     = 3,
-	videoFormatRGB565     = 4,
-	videoFormatBGR        = 5,
-	videoFormatBGRA       = 6,
-	videoFormatABGR       = 7,
-	videoFormatARGB       = 8,
+typedef enum {
+  /*rgb color formats*/
+  videoFormatRGB        = 1,
+  videoFormatRGBA       = 2,
+  videoFormatRGB555     = 3,
+  videoFormatRGB565     = 4,
+  videoFormatBGR        = 5,
+  videoFormatBGRA       = 6,
+  videoFormatABGR       = 7,
+  videoFormatARGB       = 8,
 
-	/*yuv color formats*/
-	videoFormatYUY2       = 20,
-	videoFormatYVYU       = 21,
-	videoFormatUYVY       = 22,
-	videoFormatI420       = 23,                        //same as IYUV
-	videoFormatYV12       = 24,
-	videoFormatInternal   = 25,                        // Only Used for SVC decoder testbed
-	
-	videoFormatNV12		  = 26,						// new format for output by DXVA decoding
-	
-	videoFormatVFlip      = 0x80000000
-}EVideoFormatType;
+  /*yuv color formats*/
+  videoFormatYUY2       = 20,
+  videoFormatYVYU       = 21,
+  videoFormatUYVY       = 22,
+  videoFormatI420       = 23,                        //same as IYUV
+  videoFormatYV12       = 24,
+  videoFormatInternal   = 25,                        // Only Used for SVC decoder testbed
 
-typedef enum
-{
-	videoFrameTypeInvalid,		/* Encoder not ready or parameters are invalidate */
-	videoFrameTypeIDR,		/* This type is only available for H264 if this frame is key frame, then return this type */
-	videoFrameTypeI,		/* I frame type */
-	videoFrameTypeP,		/* P frame type */
-	videoFrameTypeSkip,		/* Skip the frame based encoder kernel */
-	videoFrameTypeIPMixed,		/* Frame type introduced I and P slices are mixing */
-}EVideoFrameType;
+  videoFormatNV12		  = 26,						// new format for output by DXVA decoding
 
-typedef enum
-{
-	cmResultSuccess,
-	cmInitParaError,                  /*Parameters are invalid */
-	cmMachPerfIsBad,                  /*The performance of machine is not enough to support 
-									    H264 CODEC, in this case, suggestion user use h263 
+  videoFormatVFlip      = 0x80000000
+} EVideoFormatType;
+
+typedef enum {
+  videoFrameTypeInvalid,		/* Encoder not ready or parameters are invalidate */
+  videoFrameTypeIDR,		/* This type is only available for H264 if this frame is key frame, then return this type */
+  videoFrameTypeI,		/* I frame type */
+  videoFrameTypeP,		/* P frame type */
+  videoFrameTypeSkip,		/* Skip the frame based encoder kernel */
+  videoFrameTypeIPMixed,		/* Frame type introduced I and P slices are mixing */
+} EVideoFrameType;
+
+typedef enum {
+  cmResultSuccess,
+  cmInitParaError,                  /*Parameters are invalid */
+  cmMachPerfIsBad,                  /*The performance of machine is not enough to support
+									    H264 CODEC, in this case, suggestion user use h263
 										or set fps to low like 5fps or more low*/
-	cmUnkonwReason,
-	cmMallocMemeError,                /*Malloc a memory error*/
-	cmInitExpected,			  /*Initial action is expected*/
-}CM_RETURN;
+  cmUnkonwReason,
+  cmMallocMemeError,                /*Malloc a memory error*/
+  cmInitExpected,			  /*Initial action is expected*/
+} CM_RETURN;
 
 
 /* nal unit type */
-enum ENalUnitType
-{
-    NAL_UNKNOWN = 0,
-	NAL_SLICE   = 1,
-	NAL_SLICE_DPA   = 2,
-	NAL_SLICE_DPB   = 3,
-	NAL_SLICE_DPC   = 4,
-	NAL_SLICE_IDR   = 5,    /* ref_idc != 0 */
-	NAL_SEI         = 6,    /* ref_idc == 0 */
-	NAL_SPS         = 7,
-	NAL_PPS         = 8
-	/* ref_idc == 0 for 6,9,10,11,12 */
+enum ENalUnitType {
+  NAL_UNKNOWN = 0,
+  NAL_SLICE   = 1,
+  NAL_SLICE_DPA   = 2,
+  NAL_SLICE_DPB   = 3,
+  NAL_SLICE_DPC   = 4,
+  NAL_SLICE_IDR   = 5,    /* ref_idc != 0 */
+  NAL_SEI         = 6,    /* ref_idc == 0 */
+  NAL_SPS         = 7,
+  NAL_PPS         = 8
+                    /* ref_idc == 0 for 6,9,10,11,12 */
 };
 /* NRI: eNalRefIdc */
-enum ENalPriority
-{
-    NAL_PRIORITY_DISPOSABLE = 0,
-	NAL_PRIORITY_LOW        = 1,
-	NAL_PRIORITY_HIGH       = 2,
-	NAL_PRIORITY_HIGHEST    = 3,
+enum ENalPriority {
+  NAL_PRIORITY_DISPOSABLE = 0,
+  NAL_PRIORITY_LOW        = 1,
+  NAL_PRIORITY_HIGH       = 2,
+  NAL_PRIORITY_HIGHEST    = 3,
 };
 
 #define IS_PARAMETER_SET_NAL(eNalRefIdc, eNalType) \
@@ -121,31 +116,31 @@ enum ENalPriority
 
 /* Error Tools definition */
 typedef unsigned short ERR_TOOL;
-enum{
-	ET_NONE = 0x00,					// NONE Error Tools
-	ET_IP_SCALE = 0x01,				// IP Scalable
-	ET_FMO = 0x02,					// Flexible Macroblock Ordering
-	ET_IR_R1 = 0x04,				// Intra Refresh in predifined 2% MB
-	ET_IR_R2 = 0x08,				// Intra Refresh in predifined 5% MB
-	ET_IR_R3 = 0x10,				// Intra Refresh in predifined 10% MB
-	ET_FEC_HALF = 0x20,				// Forward Error Correction in 50% redundency mode
-	ET_FEC_FULL	= 0x40,				// Forward Error Correction in 100% redundency mode
-	ET_RFS = 0x80,					// Reference Frame Selection
+enum {
+  ET_NONE = 0x00,					// NONE Error Tools
+  ET_IP_SCALE = 0x01,				// IP Scalable
+  ET_FMO = 0x02,					// Flexible Macroblock Ordering
+  ET_IR_R1 = 0x04,				// Intra Refresh in predifined 2% MB
+  ET_IR_R2 = 0x08,				// Intra Refresh in predifined 5% MB
+  ET_IR_R3 = 0x10,				// Intra Refresh in predifined 10% MB
+  ET_FEC_HALF = 0x20,				// Forward Error Correction in 50% redundency mode
+  ET_FEC_FULL	= 0x40,				// Forward Error Correction in 100% redundency mode
+  ET_RFS = 0x80,					// Reference Frame Selection
 };
 
 /* information of coded Slice(=NAL)(s) */
-typedef struct SliceInformation
-{
-	unsigned char*	pBufferOfSlices;		// base buffer of coded slice(s)
-	int				iCodedSliceCount;	// number of coded slices
-	unsigned int*	pLengthOfSlices;		// array of slices length accordingly by number of slice
-	int				iFecType;			// FEC type[0, 50%FEC, 100%FEC]
-	unsigned char	uiSliceIdx;		// index of slice in frame [FMO: 0,..,uiSliceCount-1; No FMO: 0] 
-	unsigned char	uiSliceCount;		// count number of slice in frame [FMO: 2-8; No FMO: 1]
-	char			iFrameIndex;		// index of frame[-1, .., idr_interval-1]
-	unsigned char	uiNalRefIdc;		// NRI, priority level of slice(NAL)
-	unsigned char	uiNalType;			// NAL type
-	unsigned char	uiContainingFinalNal;	// whether final NAL is involved in buffer of coded slices, flag used in Pause feature in T27
+typedef struct SliceInformation {
+  unsigned char*	pBufferOfSlices;		// base buffer of coded slice(s)
+  int				iCodedSliceCount;	// number of coded slices
+  unsigned int*	pLengthOfSlices;		// array of slices length accordingly by number of slice
+  int				iFecType;			// FEC type[0, 50%FEC, 100%FEC]
+  unsigned char	uiSliceIdx;		// index of slice in frame [FMO: 0,..,uiSliceCount-1; No FMO: 0]
+  unsigned char	uiSliceCount;		// count number of slice in frame [FMO: 2-8; No FMO: 1]
+  char			iFrameIndex;		// index of frame[-1, .., idr_interval-1]
+  unsigned char	uiNalRefIdc;		// NRI, priority level of slice(NAL)
+  unsigned char	uiNalType;			// NAL type
+  unsigned char
+  uiContainingFinalNal;	// whether final NAL is involved in buffer of coded slices, flag used in Pause feature in T27
 } SliceInfo, *PSliceInfo;
 
 
@@ -161,90 +156,84 @@ typedef struct SliceInformation
 
 /* thresholds of the initial, maximal and minimal rate */
 typedef struct {
-	int	iWidth;			// frame width
-	int	iHeight;			// frame height
-	int	iThresholdOfInitRate;	// threshold of initial rate
-	int	iThresholdOfMaxRate;	// threshold of maximal rate
-	int	iThresholdOfMinRate;	// threshold of minimal rate
-	int iMinThresholdFrameRate;		//min frame rate min
-	int	iSkipFrameRate;	//skip to frame rate min
-	int iSkipFrameStep;	//how many frames to skip
-}SRateThresholds, *PRateThresholds;
+  int	iWidth;			// frame width
+  int	iHeight;			// frame height
+  int	iThresholdOfInitRate;	// threshold of initial rate
+  int	iThresholdOfMaxRate;	// threshold of maximal rate
+  int	iThresholdOfMinRate;	// threshold of minimal rate
+  int iMinThresholdFrameRate;		//min frame rate min
+  int	iSkipFrameRate;	//skip to frame rate min
+  int iSkipFrameStep;	//how many frames to skip
+} SRateThresholds, *PRateThresholds;
 
 /*new interface*/
-typedef struct WelsDeviceInfo
-{
-	int  bSupport;          /* a logic flag provided by decoder which indicates whether GPU decoder can work based on the following device info. */
-	char Vendor[128];   // vendor name
-	char Device[128];    // device name
-	char Driver[128];     // driver version
-	char DriverDate[128]; //  driver release date 
+typedef struct WelsDeviceInfo {
+  int  bSupport;          /* a logic flag provided by decoder which indicates whether GPU decoder can work based on the following device info. */
+  char Vendor[128];   // vendor name
+  char Device[128];    // device name
+  char Driver[128];     // driver version
+  char DriverDate[128]; //  driver release date
 } Device_Info;
 
-typedef enum TagBufferProperty
-{
-	BUFFER_HOST	   = 0,   // host memory
-	BUFFER_DEVICE  = 1,	  // device memory including surface and shared handle
-						  // for DXVA: shared handle
-						  // for VDA : iosurface
-						
-	//SURFACE_DEVICE ,	 // surface
-	//SHARED_HANDLE      // shared handle
-}EBufferProperty;
+typedef enum TagBufferProperty {
+  BUFFER_HOST	   = 0,   // host memory
+  BUFFER_DEVICE  = 1,	  // device memory including surface and shared handle
+  // for DXVA: shared handle
+  // for VDA : iosurface
 
-typedef enum TagDecodeMode
-{
-	AUTO_MODE = 0,   // decided by decoder itself, dynamic mode switch, delayed switch
-	SW_MODE = 1,		// decoded by CPU, instant switch
-	GPU_MODE = 2,	// decoded by GPU, instant switch 
-	SWITCH_MODE =3	// switch to the other mode, forced mode switch, delayed switch
-}EDecodeMode;
+  //SURFACE_DEVICE ,	 // surface
+  //SHARED_HANDLE      // shared handle
+} EBufferProperty;
 
-typedef struct TagSysMemBuffer
-{	
-	int	iWidth;			//width of decoded pic for display
-	int iHeight;			//height of decoded pic for display
-	int iFormat; 		// type is "EVideoFormatType"
-	int iStride[2];		//stride of 2 component	
-}SSysMEMBuffer;
+typedef enum TagDecodeMode {
+  AUTO_MODE = 0,   // decided by decoder itself, dynamic mode switch, delayed switch
+  SW_MODE = 1,		// decoded by CPU, instant switch
+  GPU_MODE = 2,	// decoded by GPU, instant switch
+  SWITCH_MODE = 3	// switch to the other mode, forced mode switch, delayed switch
+} EDecodeMode;
 
-typedef struct TagVideoMemBuffer
-{
-	int iSurfaceWidth;   // used for surface create
-	int iSurfaceHeight;
-	int D3Dformat;  //type is "D3DFORMAT"
-  	int D3DPool; // type is "D3DPOOL";
-	int iLeftTopX;
-	int iLeftTopY;
-	int iRightBottomX;
-	int iRightBottomY;
-}SVideoMemBuffer;
+typedef struct TagSysMemBuffer {
+  int	iWidth;			//width of decoded pic for display
+  int iHeight;			//height of decoded pic for display
+  int iFormat; 		// type is "EVideoFormatType"
+  int iStride[2];		//stride of 2 component
+} SSysMEMBuffer;
 
-typedef struct TagBufferInfo
-{
-	EBufferProperty eBufferProperty;	//0: host memory; 1: device memory;
-	int iBufferStatus;  // 0: one frame data is not ready; 1: one frame data is ready
-	EDecodeMode eWorkMode;				//indicate what the real working mode in decoder
-	union {
-		SSysMEMBuffer sSystemBuffer;
-		SVideoMemBuffer sVideoBuffer;
-	}UsrData;	
-}SBufferInfo;
+typedef struct TagVideoMemBuffer {
+  int iSurfaceWidth;   // used for surface create
+  int iSurfaceHeight;
+  int D3Dformat;  //type is "D3DFORMAT"
+  int D3DPool; // type is "D3DPOOL";
+  int iLeftTopX;
+  int iLeftTopY;
+  int iRightBottomX;
+  int iRightBottomY;
+} SVideoMemBuffer;
+
+typedef struct TagBufferInfo {
+  EBufferProperty eBufferProperty;	//0: host memory; 1: device memory;
+  int iBufferStatus;  // 0: one frame data is not ready; 1: one frame data is ready
+  EDecodeMode eWorkMode;				//indicate what the real working mode in decoder
+  union {
+    SSysMEMBuffer sSystemBuffer;
+    SVideoMemBuffer sVideoBuffer;
+  } UsrData;
+} SBufferInfo;
 
 /* Constants related to transmission rate at various resolutions */
 static const SRateThresholds ksRateThrMap[4] = {
-	// initial-maximal-minimal
-	{CIF_WIDTH, CIF_HEIGHT, 225000, 384000, 96000, 3, 1, 1},		// CIF
-	{QVGA_WIDTH, QVGA_HEIGHT, 192000, 320000, 80000, -1, -1, -1},	// QVGA
-	{QCIF_WIDTH, QCIF_HEIGHT, 150000, 256000, 64000, 8, 4, 2},		// QCIF
-	{SQCIF_WIDTH, SQCIF_HEIGHT, 120000, 192000, 48000, 5, 3, 1}	// SQCIF
+  // initial-maximal-minimal
+  {CIF_WIDTH, CIF_HEIGHT, 225000, 384000, 96000, 3, 1, 1},		// CIF
+  {QVGA_WIDTH, QVGA_HEIGHT, 192000, 320000, 80000, -1, -1, -1},	// QVGA
+  {QCIF_WIDTH, QCIF_HEIGHT, 150000, 256000, 64000, 8, 4, 2},		// QCIF
+  {SQCIF_WIDTH, SQCIF_HEIGHT, 120000, 192000, 48000, 5, 3, 1}	// SQCIF
 };
 
 
-// In a GOP, multiple of the key frame number, derived from 
+// In a GOP, multiple of the key frame number, derived from
 // the number of layers(index or array below)
 static const char kiKeyNumMultiple[] = {
-	1, 1, 2, 4, 8, 16,
+  1, 1, 2, 4, 8, 16,
 };
 
 #pragma pack()

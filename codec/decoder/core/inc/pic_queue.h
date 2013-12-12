@@ -44,17 +44,17 @@ namespace WelsDec {
 #define   PICTURE_RESOLUTION_ALIGNMENT      32
 
 
-typedef struct TagPicBuff{
-	PPicture*      ppPic;   
-	int32_t        iCapacity;  // capacity size of queue
-	int32_t        iCurrentIdx;
-}SPicBuff, *PPicBuff;
+typedef struct TagPicBuff {
+PPicture*      ppPic;
+int32_t        iCapacity;  // capacity size of queue
+int32_t        iCurrentIdx;
+} SPicBuff, *PPicBuff;
 
 /*
  *	Interfaces
  */
 
-PPicture PrefetchPic( PPicBuff pPicBuff ); // To get current node applicable
+PPicture PrefetchPic (PPicBuff pPicBuff);  // To get current node applicable
 
 } // namespace WelsDec
 

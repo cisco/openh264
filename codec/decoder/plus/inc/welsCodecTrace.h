@@ -40,132 +40,124 @@
 namespace WelsDec {
 
 #ifdef WIN32
-typedef int ( *CM_WELS_TRACE)( const char* kpFormat, ...);
+typedef int (*CM_WELS_TRACE) (const char* kpFormat, ...);
 #else
-typedef int ( *CM_WELS_TRACE)( const char* kpDllName, const char* kpFormat, ...);
+typedef int (*CM_WELS_TRACE) (const char* kpDllName, const char* kpFormat, ...);
 #endif
 
 
 typedef  enum {
-	Wels_Trace_Type     = 0,
-	Wels_Trace_Type_File    = 1,
-	Wels_Trace_Type_WinDgb  = 2,
+Wels_Trace_Type     = 0,
+Wels_Trace_Type_File    = 1,
+Wels_Trace_Type_WinDgb  = 2,
 } EWelsTraceType;
 
-class  IWelsTrace 
-{
-public:
-	enum {
-		WELS_LOG_QUIET     = 0,
-		WELS_LOG_ERROR     = 1 << 0,
-		WELS_LOG_WARNING   = 1 << 1,
-		WELS_LOG_INFO      = 1 << 2,
-		WELS_LOG_DEBUG     = 1 << 3,
-		WELS_LOG_RESV      = 1 << 4,
-	    WELS_LOG_DEFAULT   = WELS_LOG_ERROR | WELS_LOG_WARNING | WELS_LOG_INFO | WELS_LOG_DEBUG,
+class  IWelsTrace {
+ public:
+enum {
+  WELS_LOG_QUIET     = 0,
+  WELS_LOG_ERROR     = 1 << 0,
+  WELS_LOG_WARNING   = 1 << 1,
+  WELS_LOG_INFO      = 1 << 2,
+  WELS_LOG_DEBUG     = 1 << 3,
+  WELS_LOG_RESV      = 1 << 4,
+  WELS_LOG_DEFAULT   = WELS_LOG_ERROR | WELS_LOG_WARNING | WELS_LOG_INFO | WELS_LOG_DEBUG,
 
 
-		MAX_LOG_SIZE       = 1024,
-	};
+  MAX_LOG_SIZE       = 1024,
+};
 
-	virtual ~IWelsTrace() {};
+virtual ~IWelsTrace() {};
 
-	virtual int32_t  SetTraceLevel(int32_t iLevel) = 0;
-	virtual int32_t  Trace(const int32_t kLevel, const str_t * kpFormat,  va_list pVl) = 0;
+virtual int32_t  SetTraceLevel (int32_t iLevel) = 0;
+virtual int32_t  Trace (const int32_t kLevel, const str_t* kpFormat,  va_list pVl) = 0;
 
-	static void_t  WelsTrace(void_t* pObject, const int32_t kLevel, const str_t * kpFormat, va_list pVl)
-	{
-		IWelsTrace  * pThis = (IWelsTrace*)(pObject);
+static void_t  WelsTrace (void_t* pObject, const int32_t kLevel, const str_t* kpFormat, va_list pVl) {
+  IWelsTrace*   pThis = (IWelsTrace*) (pObject);
 
-		if( pThis ){
-			pThis->Trace(kLevel, kpFormat, pVl);
-		}
-	}
+  if (pThis) {
+    pThis->Trace (kLevel, kpFormat, pVl);
+  }
+}
 
-	static void_t WelsVTrace(void_t *pObject, const int32_t kLevel, const str_t *kpFormat, ...)
-	{
-		IWelsTrace * pThis = (IWelsTrace *)(pObject);
+static void_t WelsVTrace (void_t* pObject, const int32_t kLevel, const str_t* kpFormat, ...) {
+  IWelsTrace* pThis = (IWelsTrace*) (pObject);
 
-		va_list  argptr;	
+  va_list  argptr;
 
-		va_start(argptr, kpFormat);	
+  va_start (argptr, kpFormat);
 
-		if( pThis ){
-			pThis->Trace(kLevel, kpFormat, argptr);		
-		}
+  if (pThis) {
+    pThis->Trace (kLevel, kpFormat, argptr);
+  }
 
-		va_end(argptr);
-	}
+  va_end (argptr);
+}
 
 
 };
 
-class CWelsTraceBase : public IWelsTrace
-{
-public:
-	virtual int32_t  SetTraceLevel(int32_t iLevel);
-	virtual int32_t  Trace(const int32_t kLevel, const str_t * kpFormat,  va_list pVl);
+class CWelsTraceBase : public IWelsTrace {
+ public:
+virtual int32_t  SetTraceLevel (int32_t iLevel);
+virtual int32_t  Trace (const int32_t kLevel, const str_t* kpFormat,  va_list pVl);
 
-    virtual int32_t  WriteString(int32_t iLevel, const str_t * pStr) = 0;
-protected:
-	CWelsTraceBase() 
-	{
-		m_iLevel = WELS_LOG_DEFAULT;
-	};
-
-private:
-	int32_t   m_iLevel;
+virtual int32_t  WriteString (int32_t iLevel, const str_t* pStr) = 0;
+ protected:
+CWelsTraceBase() {
+  m_iLevel = WELS_LOG_DEFAULT;
 };
 
-class CWelsTraceFile : public CWelsTraceBase
-{
-public:
-	CWelsTraceFile(const str_t  * filename = (const str_t *)"wels_decoder_trace.txt");
-	virtual ~CWelsTraceFile();
+ private:
+int32_t   m_iLevel;
+};
 
-public:
-	virtual int32_t  WriteString(int32_t iLevel, const str_t * pStr);
+class CWelsTraceFile : public CWelsTraceBase {
+ public:
+CWelsTraceFile (const str_t*   filename = (const str_t*)"wels_decoder_trace.txt");
+virtual ~CWelsTraceFile();
 
-private:
-    WelsFileHandle* m_pTraceFile;
+ public:
+virtual int32_t  WriteString (int32_t iLevel, const str_t* pStr);
+
+ private:
+WelsFileHandle* m_pTraceFile;
 };
 
 #ifdef  WIN32
-class CWelsTraceWinDgb : public CWelsTraceBase
-{
-public:
-	CWelsTraceWinDgb() {};
-	virtual ~CWelsTraceWinDgb() {};
+class CWelsTraceWinDgb : public CWelsTraceBase {
+ public:
+CWelsTraceWinDgb() {};
+virtual ~CWelsTraceWinDgb() {};
 
-public:
-	virtual int32_t  WriteString(int32_t iLevel, const str_t * pStr);
+ public:
+virtual int32_t  WriteString (int32_t iLevel, const str_t* pStr);
 };
 #endif
 
-class CWelsCodecTrace : public CWelsTraceBase
-{
-public:
-	CWelsCodecTrace() ;
-	virtual ~CWelsCodecTrace();
+class CWelsCodecTrace : public CWelsTraceBase {
+ public:
+CWelsCodecTrace() ;
+virtual ~CWelsCodecTrace();
 
-public:
-	virtual int32_t  WriteString(int32_t iLevel, const str_t * pStr);
+ public:
+virtual int32_t  WriteString (int32_t iLevel, const str_t* pStr);
 
-protected:
-	int32_t  LoadWelsTraceModule();
-	int32_t  UnloadWelsTraceModule();
+ protected:
+int32_t  LoadWelsTraceModule();
+int32_t  UnloadWelsTraceModule();
 
-private:
-    void_t  * m_hTraceHandle;
+ private:
+void_t*   m_hTraceHandle;
 
-    CM_WELS_TRACE m_fpDebugTrace;
-	CM_WELS_TRACE m_fpInfoTrace;
-	CM_WELS_TRACE m_fpWarnTrace;
-	CM_WELS_TRACE m_fpErrorTrace;
+CM_WELS_TRACE m_fpDebugTrace;
+CM_WELS_TRACE m_fpInfoTrace;
+CM_WELS_TRACE m_fpWarnTrace;
+CM_WELS_TRACE m_fpErrorTrace;
 };
 
 
-IWelsTrace  * CreateWelsTrace(EWelsTraceType  eType,  void_t * pParam = NULL);
+IWelsTrace*   CreateWelsTrace (EWelsTraceType  eType,  void_t* pParam = NULL);
 
 } // namespace WelsDec
 

@@ -49,27 +49,27 @@ namespace WelsSVCEnc {
 #define	ITERATIVE_TIMES	(16)
 #define	BASE_MV_MB_NMB	((2*(MV_RANGE+ITERATIVE_TIMES)/MB_WIDTH_LUMA)-1)
 
-union SadPredISatdUnit{
-	uint16_t	uiSadPred;
-	uint16_t	uiSatd;    //reuse the sad_pred as a temp satd pData 
+union SadPredISatdUnit {
+uint16_t	uiSadPred;
+uint16_t	uiSatd;    //reuse the sad_pred as a temp satd pData
 };
 typedef struct TagWelsME {
-    /* input */
-	uint16_t					*pMvdCost;
-    union SadPredISatdUnit	uSadPredISatd; //reuse the sad_pred as a temp pData
-	uint16_t					uiSadCost;  //used by ME and RC 
-    uint16_t					uiSatdCost; /* satd + lm * nbits */
-    uint8_t						uiPixel;   /* PIXEL_WxH */
-    uint8_t						uiReserved;
-	
-    uint8_t						*pEncMb;
-    uint8_t						*pRefMb;
+/* input */
+uint16_t*					pMvdCost;
+union SadPredISatdUnit	uSadPredISatd; //reuse the sad_pred as a temp pData
+uint16_t					uiSadCost;  //used by ME and RC
+uint16_t					uiSatdCost; /* satd + lm * nbits */
+uint8_t						uiPixel;   /* PIXEL_WxH */
+uint8_t						uiReserved;
 
-	SMVUnitXY					sMvp;
-	SMVUnitXY					sMvBase;
-	/* output */
-    SMVUnitXY					sMv;
-}SWelsME;
+uint8_t*						pEncMb;
+uint8_t*						pRefMb;
+
+SMVUnitXY					sMvp;
+SMVUnitXY					sMvBase;
+/* output */
+SMVUnitXY					sMv;
+} SWelsME;
 
 #define  COST_MVD(table, mx, my)  (table[mx] + table[my])
 
@@ -83,9 +83,9 @@ typedef struct TagWelsME {
  *
  * \return	NONE
  */
-void WelsMotionEstimateSearchSatd(SWelsFuncPtrList *pFuncList, void* pLplayer, void* pLpme, void* pLpslice );
+void WelsMotionEstimateSearchSatd (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice);
 
-void WelsMotionEstimateSearchSad(SWelsFuncPtrList *pFuncList, void* pLplayer, void* pLpme, void* pLpslice );
+void WelsMotionEstimateSearchSad (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice);
 
 
 
@@ -112,7 +112,8 @@ void WelsMotionEstimateSearchSad(SWelsFuncPtrList *pFuncList, void* pLplayer, vo
  * \return	NONE
  */
 
-void WelsMotionEstimateInitialPoint(SWelsFuncPtrList *pFuncList, SWelsME *pMe, SSlice *pSlice, const int32_t kiStrideEnc, const int32_t kiStrideRef );
+void WelsMotionEstimateInitialPoint (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlice,
+                                     const int32_t kiStrideEnc, const int32_t kiStrideRef);
 
 /*!
  * \brief	mb iterative motion estimate search
@@ -123,9 +124,11 @@ void WelsMotionEstimateInitialPoint(SWelsFuncPtrList *pFuncList, SWelsME *pMe, S
  *
  * \return	NONE
  */
-void WelsMotionEstimateIterativeSearch( SWelsFuncPtrList *pFuncList, SWelsME *pMe, const int32_t kiStrideEnc, const int32_t kiStrideRef, uint8_t *pRef );
+void WelsMotionEstimateIterativeSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, const int32_t kiStrideEnc,
+                                        const int32_t kiStrideRef, uint8_t* pRef);
 
-bool_t WelsMeSadCostSelect( int32_t *pSadCost, const uint16_t *kpMvdCost, int32_t *pBestCost, const int32_t kiDx, const int32_t kiDy, int32_t *pIx, int32_t *pIy);
+bool_t WelsMeSadCostSelect (int32_t* pSadCost, const uint16_t* kpMvdCost, int32_t* pBestCost, const int32_t kiDx,
+                            const int32_t kiDy, int32_t* pIx, int32_t* pIy);
 
 }
 #endif

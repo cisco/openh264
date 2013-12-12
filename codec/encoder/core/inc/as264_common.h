@@ -48,14 +48,14 @@ $(TargetPath)
 */
 
 /****************************************************************************
- * Options for algorithm, usually change bitrate 
+ * Options for algorithm, usually change bitrate
  ****************************************************************************/
 #define DISABLE_FMO_FEATURE	// 
 
 /****************************************************************************
- * Options for optimization, not change bitrate 
+ * Options for optimization, not change bitrate
  ****************************************************************************/
-//#undef	X86_ASM			// X86_ASM is included in project preprocessor definitions, undef it when need to disable asm code 
+//#undef	X86_ASM			// X86_ASM is included in project preprocessor definitions, undef it when need to disable asm code
 #define SINGLE_REF_FRAME		// need to disable it when use multi-reference
 
 

@@ -42,7 +42,7 @@
 
 /*
  *	WELS CPU feature flags
- */ 
+ */
 #define WELS_CPU_MMX        0x00000001    /* mmx */
 #define WELS_CPU_MMXEXT     0x00000002    /* mmx-ext*/
 #define WELS_CPU_SSE        0x00000004    /* sse */

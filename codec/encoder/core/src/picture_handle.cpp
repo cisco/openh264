@@ -52,67 +52,67 @@ namespace WelsSVCEnc {
  * \pram	need_expand		need borders expanding
  * \return	successful if effective picture pointer returned, otherwise failed with NULL
  */
-SPicture *AllocPicture( CMemoryAlign *pMa, const int32_t kiWidth , const int32_t kiHeight, bool_t bNeedMbInfo )
-{
-	SPicture *pPic = NULL;
-	int32_t iPicWidth = 0;
-	int32_t iPicHeight= 0;
+SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth , const int32_t kiHeight, bool_t bNeedMbInfo) {
+  SPicture* pPic = NULL;
+  int32_t iPicWidth = 0;
+  int32_t iPicHeight = 0;
 
-	int32_t iPicChromaWidth	= 0;
-	int32_t iPicChromaHeight	= 0;
-	int32_t iLumaSize			= 0;
-	int32_t iChromaSize			= 0;
+  int32_t iPicChromaWidth	= 0;
+  int32_t iPicChromaHeight	= 0;
+  int32_t iLumaSize			= 0;
+  int32_t iChromaSize			= 0;
 
-	pPic	= static_cast<SPicture*>(pMa->WelsMallocz( sizeof(SPicture), "pPic" ));
+  pPic	= static_cast<SPicture*> (pMa->WelsMallocz (sizeof (SPicture), "pPic"));
 
-	WELS_VERIFY_RETURN_IF( NULL, NULL == pPic );	
-	
-	iPicWidth	= WELS_ALIGN(kiWidth, MB_WIDTH_LUMA) + (PADDING_LENGTH<<1);	// with width of horizon
-	iPicHeight	= WELS_ALIGN(kiHeight, MB_HEIGHT_LUMA) + (PADDING_LENGTH<<1);	// with height of vertical
-	iPicChromaWidth	= iPicWidth >> 1;
-	iPicChromaHeight	= iPicHeight >> 1;
-	iPicWidth	= WELS_ALIGN( iPicWidth, 32 );	// 32(or 16 for chroma below) to match original imp. here instead of cache_line_size
-	iPicChromaWidth	= WELS_ALIGN( iPicChromaWidth, 16 );
-	iLumaSize	= iPicWidth * iPicHeight;
-	iChromaSize	= iPicChromaWidth * iPicChromaHeight;
+  WELS_VERIFY_RETURN_IF (NULL, NULL == pPic);
 
-	pPic->pBuffer	= (uint8_t*)pMa->WelsMalloc(	iLumaSize /* luma */
-								  + (iChromaSize << 1) /* Cb,Cr */
-								  , "pPic->pBuffer"	);
-	WELS_VERIFY_RETURN_PROC_IF( NULL, NULL == pPic->pBuffer, FreePicture(pMa, &pPic) );
-	pPic->iLineSize[0]	= iPicWidth;
-	pPic->iLineSize[1]	= pPic->iLineSize[2]	= iPicChromaWidth;
-	pPic->pData[0]	= pPic->pBuffer + (1+pPic->iLineSize[0]) * PADDING_LENGTH;
-	pPic->pData[1]	= pPic->pBuffer + iLumaSize + ( ((1+pPic->iLineSize[1]) * PADDING_LENGTH) >> 1 );
-	pPic->pData[2]	= pPic->pBuffer + iLumaSize + iChromaSize + ( ((1+pPic->iLineSize[2]) * PADDING_LENGTH) >> 1 );
+  iPicWidth	= WELS_ALIGN (kiWidth, MB_WIDTH_LUMA) + (PADDING_LENGTH << 1);	// with width of horizon
+  iPicHeight	= WELS_ALIGN (kiHeight, MB_HEIGHT_LUMA) + (PADDING_LENGTH << 1);	// with height of vertical
+  iPicChromaWidth	= iPicWidth >> 1;
+  iPicChromaHeight	= iPicHeight >> 1;
+  iPicWidth	= WELS_ALIGN (iPicWidth,
+                          32);	// 32(or 16 for chroma below) to match original imp. here instead of cache_line_size
+  iPicChromaWidth	= WELS_ALIGN (iPicChromaWidth, 16);
+  iLumaSize	= iPicWidth * iPicHeight;
+  iChromaSize	= iPicChromaWidth * iPicChromaHeight;
 
-	pPic->iWidthInPixel	= kiWidth;
-	pPic->iHeightInPixel	= kiHeight;
-	pPic->iFrameNum			= -1;
+  pPic->pBuffer	= (uint8_t*)pMa->WelsMalloc (iLumaSize /* luma */
+                  + (iChromaSize << 1) /* Cb,Cr */
+                  , "pPic->pBuffer");
+  WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pBuffer, FreePicture (pMa, &pPic));
+  pPic->iLineSize[0]	= iPicWidth;
+  pPic->iLineSize[1]	= pPic->iLineSize[2]	= iPicChromaWidth;
+  pPic->pData[0]	= pPic->pBuffer + (1 + pPic->iLineSize[0]) * PADDING_LENGTH;
+  pPic->pData[1]	= pPic->pBuffer + iLumaSize + (((1 + pPic->iLineSize[1]) * PADDING_LENGTH) >> 1);
+  pPic->pData[2]	= pPic->pBuffer + iLumaSize + iChromaSize + (((1 + pPic->iLineSize[2]) * PADDING_LENGTH) >> 1);
 
-	pPic->bIsLongRef		= false;
-	pPic->iLongTermPicNum = -1;
-	pPic->uiRecieveConfirmed = 0;
-	pPic->iMarkFrameNum	= -1;
+  pPic->iWidthInPixel	= kiWidth;
+  pPic->iHeightInPixel	= kiHeight;
+  pPic->iFrameNum			= -1;
 
-	if ( bNeedMbInfo )
-	{	
-		const uint32_t kuiCountMbNum = ((15+kiWidth) >> 4) * ((15+kiHeight) >> 4);
+  pPic->bIsLongRef		= false;
+  pPic->iLongTermPicNum = -1;
+  pPic->uiRecieveConfirmed = 0;
+  pPic->iMarkFrameNum	= -1;
 
-		pPic->uiRefMbType	= (uint32_t *)pMa->WelsMallocz( kuiCountMbNum * sizeof(uint32_t), "pPic->uiRefMbType" );
-		WELS_VERIFY_RETURN_PROC_IF( NULL, NULL == pPic->uiRefMbType, FreePicture(pMa, &pPic) );	
+  if (bNeedMbInfo) {
+    const uint32_t kuiCountMbNum = ((15 + kiWidth) >> 4) * ((15 + kiHeight) >> 4);
 
-		pPic->pRefMbQp	= (uint8_t *)pMa->WelsMallocz( kuiCountMbNum * sizeof(uint8_t), "pPic->bgd_mb_qp" );
-		WELS_VERIFY_RETURN_PROC_IF( NULL, NULL == pPic->pRefMbQp, FreePicture(pMa, &pPic) );
+    pPic->uiRefMbType	= (uint32_t*)pMa->WelsMallocz (kuiCountMbNum * sizeof (uint32_t), "pPic->uiRefMbType");
+    WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->uiRefMbType, FreePicture (pMa, &pPic));
 
-		pPic->sMvList           = static_cast<SMVUnitXY *>(pMa->WelsMallocz( kuiCountMbNum*sizeof(SMVUnitXY), "pPic->sMvList" ));
-		WELS_VERIFY_RETURN_PROC_IF( NULL, NULL == pPic->sMvList, FreePicture(pMa, &pPic) );
+    pPic->pRefMbQp	= (uint8_t*)pMa->WelsMallocz (kuiCountMbNum * sizeof (uint8_t), "pPic->bgd_mb_qp");
+    WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pRefMbQp, FreePicture (pMa, &pPic));
 
-		pPic->pMbSkipSad       = (int32_t *)pMa->WelsMallocz( kuiCountMbNum*sizeof(int32_t), "pPic->pMbSkipSad" );
-		WELS_VERIFY_RETURN_PROC_IF( NULL, NULL == pPic->pMbSkipSad, FreePicture(pMa, &pPic) );
-	}	
-	
-	return pPic;
+    pPic->sMvList           = static_cast<SMVUnitXY*> (pMa->WelsMallocz (kuiCountMbNum * sizeof (SMVUnitXY),
+                              "pPic->sMvList"));
+    WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->sMvList, FreePicture (pMa, &pPic));
+
+    pPic->pMbSkipSad       = (int32_t*)pMa->WelsMallocz (kuiCountMbNum * sizeof (int32_t), "pPic->pMbSkipSad");
+    WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pMbSkipSad, FreePicture (pMa, &pPic));
+  }
+
+  return pPic;
 }
 
 /*!
@@ -120,58 +120,51 @@ SPicture *AllocPicture( CMemoryAlign *pMa, const int32_t kiWidth , const int32_t
  * \param	pPic		picture pointer to be destoryed
  * \return	none
  */
-void FreePicture( CMemoryAlign *pMa, SPicture **ppPic )
-{	
-	if ( NULL != ppPic && NULL != *ppPic )
-	{
-		SPicture *pPic = *ppPic;
+void FreePicture (CMemoryAlign* pMa, SPicture** ppPic) {
+  if (NULL != ppPic && NULL != *ppPic) {
+    SPicture* pPic = *ppPic;
 
-		if ( NULL != pPic->pBuffer )
-		{
-			pMa->WelsFree( pPic->pBuffer, "pPic->pBuffer" );
-			pPic->pBuffer = NULL;
-		}
-		pPic->pBuffer		= NULL;
-		pPic->pData[0]	=
-		pPic->pData[1]	=
-		pPic->pData[2]	= NULL;
-		pPic->iLineSize[0] =
-		pPic->iLineSize[1] =
-		pPic->iLineSize[2] = 0;
+    if (NULL != pPic->pBuffer) {
+      pMa->WelsFree (pPic->pBuffer, "pPic->pBuffer");
+      pPic->pBuffer = NULL;
+    }
+    pPic->pBuffer		= NULL;
+    pPic->pData[0]	=
+      pPic->pData[1]	=
+        pPic->pData[2]	= NULL;
+    pPic->iLineSize[0] =
+      pPic->iLineSize[1] =
+        pPic->iLineSize[2] = 0;
 
-		pPic->iWidthInPixel		= 0;
-		pPic->iHeightInPixel	= 0;
-		pPic->iFrameNum			= -1;
+    pPic->iWidthInPixel		= 0;
+    pPic->iHeightInPixel	= 0;
+    pPic->iFrameNum			= -1;
 
-		pPic->bIsLongRef		= false;
-		pPic->uiRecieveConfirmed  = 0;
-		pPic->iLongTermPicNum  = -1;
-		pPic->iMarkFrameNum		= -1;
+    pPic->bIsLongRef		= false;
+    pPic->uiRecieveConfirmed  = 0;
+    pPic->iLongTermPicNum  = -1;
+    pPic->iMarkFrameNum		= -1;
 
-		if ( pPic->uiRefMbType)
-		{
-			pMa->WelsFree( pPic->uiRefMbType, "pPic->bgd_mb_type" );
-			pPic->uiRefMbType = NULL;
-		}
-		if ( pPic->pRefMbQp)
-		{
-			pMa->WelsFree( pPic->pRefMbQp, "pPic->bgd_mb_qp" );
-			pPic->pRefMbQp = NULL;
-		}
+    if (pPic->uiRefMbType) {
+      pMa->WelsFree (pPic->uiRefMbType, "pPic->bgd_mb_type");
+      pPic->uiRefMbType = NULL;
+    }
+    if (pPic->pRefMbQp) {
+      pMa->WelsFree (pPic->pRefMbQp, "pPic->bgd_mb_qp");
+      pPic->pRefMbQp = NULL;
+    }
 
-		if ( pPic->sMvList )
-		{
-			pMa->WelsFree( pPic->sMvList, "pPic->sMvList" );
-			pPic->sMvList = NULL;
-		}
-		if ( pPic->pMbSkipSad )
-		{
-			pMa->WelsFree( pPic->pMbSkipSad, "pPic->pMbSkipSad" );
-			pPic->pMbSkipSad = NULL;
-		}		
-		pMa->WelsFree( *ppPic, "pPic" );
-		*ppPic = NULL;
-	}
+    if (pPic->sMvList) {
+      pMa->WelsFree (pPic->sMvList, "pPic->sMvList");
+      pPic->sMvList = NULL;
+    }
+    if (pPic->pMbSkipSad) {
+      pMa->WelsFree (pPic->pMbSkipSad, "pPic->pMbSkipSad");
+      pPic->pMbSkipSad = NULL;
+    }
+    pMa->WelsFree (*ppPic, "pPic");
+    *ppPic = NULL;
+  }
 }
 /*!
 * \brief	exchange two picture pData planes
@@ -179,14 +172,13 @@ void FreePicture( CMemoryAlign *pMa, SPicture **ppPic )
 * \param	ppPic2		picture pointer to picture 2
 * \return	none
 */
-void WelsExchangeSpatialPictures( SPicture **ppPic1, SPicture **ppPic2 )
-{
-	SPicture *tmp	= *ppPic1;
+void WelsExchangeSpatialPictures (SPicture** ppPic1, SPicture** ppPic2) {
+  SPicture* tmp	= *ppPic1;
 
-	assert( *ppPic1 != *ppPic2 );
+  assert (*ppPic1 != *ppPic2);
 
-	*ppPic1 = *ppPic2;
-	*ppPic2 = tmp;	
+  *ppPic1 = *ppPic2;
+  *ppPic2 = tmp;
 }
 
 } // namespace WelsSVCEnc
