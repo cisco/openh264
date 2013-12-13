@@ -69,16 +69,16 @@ WELS_EXTERN McHorVer20WidthEq4_mmx
 
 ALIGN 16
 ;*******************************************************************************
-; void_t McHorVer20WidthEq4_mmx( uint8_t *pSrc, 
-;                       int iSrcStride, 
-;						uint8_t *pDst, 
-;						int iDstStride, 
+; void_t McHorVer20WidthEq4_mmx( uint8_t *pSrc,
+;                       int iSrcStride,
+;						uint8_t *pDst,
+;						int iDstStride,
 ;						int iHeight)
 ;*******************************************************************************
 McHorVer20WidthEq4_mmx:
 	push esi
 	push edi
-	
+
 	mov  esi, [esp+12]
 	mov eax, [esp+16]
 	mov edi, [esp+20]
@@ -100,7 +100,7 @@ McHorVer20WidthEq4_mmx:
 	punpcklbw mm4, mm7
 	movd mm5, [esi+3]
 	punpcklbw mm5, mm7
-	
+
 	paddw mm2, mm3
 	paddw mm4, mm5
 	psllw mm4, 2
@@ -113,12 +113,12 @@ McHorVer20WidthEq4_mmx:
 	psraw mm0, 5
 	packuswb mm0, mm7
 	movd [edi], mm0
-	
+
 	add esi, eax
 	add edi, ecx
 	dec edx
 	jnz .height_loop
-	
+
 	WELSEMMS
 	pop edi
 	pop esi
@@ -181,8 +181,8 @@ WELS_EXTERN McHorVer20WidthEq16_sse2
 
 ALIGN 16
 ;***********************************************************************
-; void_t McHorVer22Width8HorFirst_sse2(int16_t *pSrc, 
-;                       int16_t iSrcStride, 
+; void_t McHorVer22Width8HorFirst_sse2(int16_t *pSrc,
+;                       int16_t iSrcStride,
 ;						uint8_t *pDst,
 ;						int32_t iDstStride
 ;						int32_t iHeight
@@ -197,11 +197,11 @@ McHorVer22Width8HorFirst_sse2:
 	mov edi, [esp+24]		;pDst
 	mov edx, [esp+28]	;iDstStride
 	mov ebx, [esp+32]	;iHeight
-	pxor xmm7, xmm7	
-	
+	pxor xmm7, xmm7
+
 	sub esi, eax				;;;;;;;;need more 5 lines.
 	sub esi, eax
-		
+
 .yloop_width_8:
 	movq xmm0, [esi]
 	punpcklbw xmm0, xmm7
@@ -215,7 +215,7 @@ McHorVer22Width8HorFirst_sse2:
 	punpcklbw xmm4, xmm7
 	movq xmm5, [esi+3]
 	punpcklbw xmm5, xmm7
-	
+
 	paddw xmm2, xmm3
 	paddw xmm4, xmm5
 	psllw xmm4, 2
@@ -225,7 +225,7 @@ McHorVer22Width8HorFirst_sse2:
 	psllw xmm4, 2
 	paddw xmm0, xmm4
 	movdqa [edi], xmm0
-		
+
 	add esi, eax
 	add edi, edx
 	dec ebx
@@ -238,8 +238,8 @@ McHorVer22Width8HorFirst_sse2:
 ALIGN 16
 ;***********************************************************************
 ;void_t McHorVer22VerLast_sse2(
-;											uint8_t *pSrc, 
-;											int32_t pSrcStride, 
+;											uint8_t *pSrc,
+;											int32_t pSrcStride,
 ;											uint8_t * pDst,
 ;											int32_t iDstStride,
 ;											int32_t iWidth,
@@ -250,17 +250,17 @@ ALIGN 16
 	paddw  %1, %6
 	movdqa %7, %2
 	movdqa %8, %3
-	
-	
+
+
 	paddw %7, %5
 	paddw %8, %4
-	
-	psubw  %1, %7   
-	psraw   %1, 2	  
-	paddw  %1, %8   
-	psubw  %1, %7 
-	psraw   %1, 2	
-	paddw  %8, %1   
+
+	psubw  %1, %7
+	psraw   %1, 2
+	paddw  %1, %8
+	psubw  %1, %7
+	psraw   %1, 2
+	paddw  %8, %1
 	paddw  %8, [h264_mc_hc_32]
 	psraw   %8, 6
 	packuswb %8, %8
@@ -272,15 +272,15 @@ McHorVer22VerLast_sse2:
 	push edi
 	push ebx
 	push ebp
-	
+
 	mov esi, [esp+20]
 	mov eax, [esp+24]
 	mov edi, [esp+28]
 	mov edx, [esp+32]
 	mov ebx, [esp+36]
-	mov ecx, [esp+40]	
-	shr ebx, 3	
-	
+	mov ecx, [esp+40]
+	shr ebx, 3
+
 .width_loop:
 	movdqa xmm0, [esi]
 	movdqa xmm1, [esi+eax]
@@ -290,73 +290,73 @@ McHorVer22VerLast_sse2:
 	lea esi, [esi+2*eax]
 	movdqa xmm4, [esi]
 	movdqa xmm5, [esi+eax]
-	
+
 	FILTER_VER xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [edi]
 	dec ecx
 	lea esi, [esi+2*eax]
 	movdqa xmm6, [esi]
-	
+
 	movdqa xmm0, xmm1
 	movdqa xmm1, xmm2
 	movdqa xmm2, xmm3
 	movdqa xmm3, xmm4
 	movdqa xmm4, xmm5
 	movdqa xmm5, xmm6
-	
+
 	add edi, edx
-	sub esi, eax		
-	
+	sub esi, eax
+
 .start:
 	FILTER_VER xmm0,xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [edi]
 	dec ecx
 	jz near .x_loop_dec
-	
+
 	lea esi, [esi+2*eax]
 	movdqa xmm6, [esi]
 	FILTER_VER xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,[edi+edx]
 	dec ecx
 	jz near .x_loop_dec
-	
+
 	lea edi, [edi+2*edx]
 	movdqa xmm7, [esi+eax]
 	FILTER_VER  xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0, xmm1, [edi]
 	dec ecx
 	jz near .x_loop_dec
-	
+
 	lea esi, [esi+2*eax]
 	movdqa xmm0, [esi]
 	FILTER_VER  xmm3, xmm4, xmm5, xmm6, xmm7, xmm0, xmm1, xmm2,[edi+edx]
 	dec ecx
 	jz near .x_loop_dec
-	
+
 	lea edi, [edi+2*edx]
 	movdqa xmm1, [esi+eax]
 	FILTER_VER  xmm4, xmm5, xmm6, xmm7, xmm0, xmm1, xmm2, xmm3,[edi]
 	dec ecx
 	jz near .x_loop_dec
-	
+
 	lea esi, [esi+2*eax]
 	movdqa xmm2, [esi]
 	FILTER_VER  xmm5, xmm6, xmm7, xmm0, xmm1, xmm2, xmm3,xmm4,[edi+edx]
 	dec ecx
 	jz near .x_loop_dec
-	
+
 	lea edi, [edi+2*edx]
 	movdqa xmm3, [esi+eax]
 	FILTER_VER  xmm6, xmm7, xmm0, xmm1, xmm2, xmm3,xmm4,xmm5,[edi]
 	dec ecx
 	jz near .x_loop_dec
-	
+
 	lea esi, [esi+2*eax]
 	movdqa xmm4, [esi]
 	FILTER_VER  xmm7, xmm0, xmm1, xmm2, xmm3,xmm4,xmm5,xmm6, [edi+edx]
 	dec ecx
 	jz near .x_loop_dec
-	
+
 	lea edi, [edi+2*edx]
 	movdqa xmm5, [esi+eax]
 	jmp near .start
-	
+
 .x_loop_dec:
 	dec ebx
 	jz near .exit
@@ -366,9 +366,9 @@ McHorVer22VerLast_sse2:
 	add esi, 16
 	add edi, 8
 	jmp .width_loop
-	
-	
-	
+
+
+
 .exit:
 	pop ebp
 	pop ebx
@@ -379,28 +379,28 @@ McHorVer22VerLast_sse2:
 
 ALIGN 16
 ;*******************************************************************************
-; void_t McHorVer20WidthEq8_sse2(  uint8_t *pSrc, 
-;                       int iSrcStride, 
-;												uint8_t *pDst, 
-;												int iDstStride, 
+; void_t McHorVer20WidthEq8_sse2(  uint8_t *pSrc,
+;                       int iSrcStride,
+;												uint8_t *pDst,
+;												int iDstStride,
 ;												int iHeight,
 ;                      );
 ;*******************************************************************************
 McHorVer20WidthEq8_sse2:
 	push	esi
 	push	edi
-	
+
 	mov esi, [esp + 12]         ;pSrc
 	mov eax, [esp + 16]         ;iSrcStride
 	mov edi, [esp + 20]         ;pDst
 	mov ecx, [esp + 28]         ;iHeight
 	mov edx, [esp + 24]			;iDstStride
-	
+
 	lea esi, [esi-2]            ;pSrc -= 2;
-	
+
 	pxor xmm7, xmm7
 	movdqa xmm6, [h264_w0x10_1]
-.y_loop:	
+.y_loop:
 	movq xmm0, [esi]
 	punpcklbw xmm0, xmm7
 	movq xmm1, [esi+5]
@@ -413,7 +413,7 @@ McHorVer20WidthEq8_sse2:
 	punpcklbw xmm4, xmm7
 	movq xmm5, [esi+3]
 	punpcklbw xmm5, xmm7
-	
+
 	paddw xmm2, xmm3
 	paddw xmm4, xmm5
 	psllw xmm4, 2
@@ -424,7 +424,7 @@ McHorVer20WidthEq8_sse2:
 	paddw xmm0, xmm4
 	paddw xmm0, xmm6
 	psraw xmm0, 5
-	
+
 	packuswb xmm0, xmm7
 	movq [edi], xmm0
 
@@ -432,37 +432,37 @@ McHorVer20WidthEq8_sse2:
 	lea esi, [esi+eax]
 	dec ecx
 	jnz near .y_loop
-	
+
 	pop edi
 	pop esi
 	ret
-	
+
 ALIGN 16
 ;*******************************************************************************
-; void_t McHorVer20WidthEq16_sse2(  uint8_t *pSrc, 
-;                       int iSrcStride, 
-;												uint8_t *pDst, 
-;												int iDstStride, 
+; void_t McHorVer20WidthEq16_sse2(  uint8_t *pSrc,
+;                       int iSrcStride,
+;												uint8_t *pDst,
+;												int iDstStride,
 ;												int iHeight,
 ;                      );
 ;*******************************************************************************
 McHorVer20WidthEq16_sse2:
 	push	esi
 	push	edi
-	
+
 
 	mov esi, [esp + 12]         ;pSrc
 	mov eax, [esp + 16]         ;iSrcStride
 	mov edi, [esp + 20]         ;pDst
 	mov ecx, [esp + 28]         ;iHeight
 	mov edx, [esp + 24]			;iDstStride
-	
+
 	lea esi, [esi-2]            ;pSrc -= 2;
-	
+
 	pxor xmm7, xmm7
 	movdqa xmm6, [h264_w0x10_1]
 .y_loop:
-	
+
 	movq xmm0, [esi]
 	punpcklbw xmm0, xmm7
 	movq xmm1, [esi+5]
@@ -475,7 +475,7 @@ McHorVer20WidthEq16_sse2:
 	punpcklbw xmm4, xmm7
 	movq xmm5, [esi+3]
 	punpcklbw xmm5, xmm7
-	
+
 	paddw xmm2, xmm3
 	paddw xmm4, xmm5
 	psllw xmm4, 2
@@ -501,7 +501,7 @@ McHorVer20WidthEq16_sse2:
 	punpcklbw xmm4, xmm7
 	movq xmm5, [esi+3+8]
 	punpcklbw xmm5, xmm7
-	
+
 	paddw xmm2, xmm3
 	paddw xmm4, xmm5
 	psllw xmm4, 2
@@ -514,9 +514,9 @@ McHorVer20WidthEq16_sse2:
 	psraw xmm0, 5
 	packuswb xmm0, xmm7
 	movq [edi+8], xmm0
-	
-	lea edi, [edi+edx]	
-	lea esi, [esi+eax]	
+
+	lea edi, [edi+edx]
+	lea esi, [esi+eax]
 	dec ecx
 	jnz near .y_loop
 	pop edi
@@ -525,17 +525,17 @@ McHorVer20WidthEq16_sse2:
 
 
 ;*******************************************************************************
-; void_t McHorVer02WidthEq8_sse2( uint8_t *pSrc, 
-;                       int iSrcStride, 
-;                       uint8_t *pDst, 
-;                       int iDstStride, 
+; void_t McHorVer02WidthEq8_sse2( uint8_t *pSrc,
+;                       int iSrcStride,
+;                       uint8_t *pDst,
+;                       int iDstStride,
 ;                       int iHeight )
 ;*******************************************************************************
 ALIGN 16
 McHorVer02WidthEq8_sse2:
 	push esi
 	push edi
-	
+
 	mov esi, [esp + 12]           ;pSrc
 	mov edx, [esp + 16]	          ;iSrcStride
 	mov edi, [esp + 20]           ;pDst
@@ -546,7 +546,7 @@ McHorVer02WidthEq8_sse2:
 	sub esi, edx
 
 	WELS_Zero xmm7
-			
+
 	SSE_LOAD_8P xmm0, xmm7, [esi]
 	SSE_LOAD_8P xmm1, xmm7, [esi+edx]
 	lea esi, [esi+2*edx]
@@ -555,8 +555,8 @@ McHorVer02WidthEq8_sse2:
 	lea esi, [esi+2*edx]
 	SSE_LOAD_8P xmm4, xmm7, [esi]
 	SSE_LOAD_8P xmm5, xmm7, [esi+edx]
-	
-.start:	
+
+.start:
 	FILTER_HV_W8 xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [edi]
 	dec ecx
 	jz near .xx_exit
@@ -566,7 +566,7 @@ McHorVer02WidthEq8_sse2:
 	FILTER_HV_W8 xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0, [edi+eax]
 	dec ecx
 	jz near .xx_exit
-	
+
 	lea edi, [edi+2*eax]
 	SSE_LOAD_8P xmm7, xmm0, [esi+edx]
 	FILTER_HV_W8 xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0, xmm1, [edi]

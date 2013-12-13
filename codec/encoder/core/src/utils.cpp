@@ -157,7 +157,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
 #endif//_MSC_VER
 #else//__GNUC__
       struct tm* t_now;
-#endif//WIN32			
+#endif//WIN32
 
 #if defined( WIN32 )
       struct _timeb tb;
@@ -172,7 +172,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
         return;
       }
 #endif//_MSC_VER >= 1500
-#endif//_MSC_VER			
+#endif//_MSC_VER
       FTIME (&tb);
 #elif defined( __GNUC__ )
       struct timeval tv;

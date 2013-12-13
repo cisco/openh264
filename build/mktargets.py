@@ -19,7 +19,7 @@ def make_o(x):
 def write_cpp_rule(f, x):
     src = "$(%s_SRCDIR)/%s"%(PREFIX, x)
     dst = "$(%s_SRCDIR)/%s"%(PREFIX, make_o(x))
-    
+
     f.write("%s: %s\n"%(dst, src))
     f.write('\t$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(' + PREFIX + '_CFLAGS) $(' + PREFIX + '_INCLUDES) -c -o ' + dst + ' ' + src + '\n');
     f.write("\n")
@@ -27,7 +27,7 @@ def write_cpp_rule(f, x):
 def write_asm_rule(f, x):
     src = "$(%s_SRCDIR)/%s"%(PREFIX, x)
     dst = "$(%s_SRCDIR)/%s"%(PREFIX, make_o(x))
-    
+
     f.write("%s: %s\n"%(dst, src))
     f.write('\t$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(' + PREFIX + '_ASMFLAGS) $(' + PREFIX + '_ASM_INCLUDES) -o ' + dst + ' ' + src + '\n');
     f.write("\n")
@@ -70,7 +70,7 @@ f.write("%s_SRCDIR=%s\n"%(PREFIX, args.directory))
 f.write("%s_CPP_SRCS=\\\n"%(PREFIX))
 for c in cpp:
     f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
-f.write("\n")    
+f.write("\n")
 f.write("%s_OBJS += $(%s_CPP_SRCS:.cpp=.o)\n"%(PREFIX, PREFIX))
 
 f.write("ifeq ($(USE_ASM), Yes)\n");
