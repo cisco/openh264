@@ -119,6 +119,7 @@ CWelsLib::CWelsLib (void* pEncCtx) {
 }
 
 CWelsLib::~CWelsLib() {
+#ifndef NO_DYNAMIC_VP
   if (m_pVpLib) {
 #if defined(WIN32)
     HMODULE shModule = (HMODULE)m_pVpLib;
@@ -134,6 +135,7 @@ CWelsLib::~CWelsLib() {
 #endif
     m_pVpLib = NULL;
   }
+#endif
 }
 
 void* CWelsLib::QueryFunction (const str_t* pName) {
