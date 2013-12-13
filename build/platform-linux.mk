@@ -1,5 +1,5 @@
 ASM = nasm
-CFLAGS += -m32 -fPIC -DLINUX -D__NO_CTYPE
-LDFLAGS += -m32 -ldl -lpthread
+CFLAGS +=  -fPIC -DLINUX -D__NO_CTYPE
+LDFLAGS +=  -ldl -lpthread
 ASMFLAGS += -f elf
 

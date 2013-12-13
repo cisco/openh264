@@ -13,7 +13,9 @@ endif
 # Configurations
 ifeq ($(BUILDTYPE), Release)
 CFLAGS += -O3
+ifneq ($(ENABLE_64BIT), Yes)
 USE_ASM = Yes
+endif
 else
 CFLAGS = -g
 USE_ASM = No
@@ -22,7 +24,13 @@ endif
 ifeq ($(USE_ASM),Yes)
   CFLAGS += -DX86_ASM
 endif
-
+ifeq ($(ENABLE_64BIT), Yes)
+CFLAGS += -m64
+LDFLAGS += -m64
+else
+CFLAGS += -m32
+LDFLAGS += -m32
+endif
 include build/platform-$(UNAME).mk
 
 CFLAGS += -DNO_DYNAMIC_VP -DHAVE_CACHE_LINE_ALIGN
