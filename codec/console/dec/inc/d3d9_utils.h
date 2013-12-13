@@ -49,7 +49,7 @@
 #include "codec_def.h"
 
 #if defined(_MSC_VER) && (_MSC_VER>=1500) // vs2008 and upper
-#define ENABLE_DISPLAY_MODULE // enable/disable the render feature 
+#define ENABLE_DISPLAY_MODULE // enable/disable the render feature
 #endif
 
 #ifdef ENABLE_DISPLAY_MODULE

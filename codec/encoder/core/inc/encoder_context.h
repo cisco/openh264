@@ -54,7 +54,7 @@
 #include "wels_func_ptr_def.h"
 
 #ifdef MT_ENABLED
-#include "mt_defs.h"	// for multiple threadin, 
+#include "mt_defs.h"	// for multiple threadin,
 #include "WelsThreadLib.h"
 #endif//MT_ENALBED
 
@@ -223,7 +223,7 @@ typedef struct TagWelsEncCtx {
   // overall stat pData, refer to SStatData in stat.h, in case avc to use stat[0][0]
   SStatData					sStatData [ MAX_DEPENDENCY_LAYER ] [ MAX_QUALITY_LEVEL ];
   SStatSliceInfo				sPerInfo;
-#endif//STAT_OUTPUT	
+#endif//STAT_OUTPUT
 
 } sWelsEncCtx/*, *PWelsEncCtx*/;
 }

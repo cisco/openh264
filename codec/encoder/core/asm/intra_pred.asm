@@ -95,13 +95,13 @@ mmx_0x02: dw 0x02, 0x00, 0x00, 0x00
 	punpcklbw	%1,	%3
 	movdqa		%3,	%1
 	punpcklbw	%1,	%3
-	
+
 	;add			%4,	%5
 	movd		%2,	[%4+%5-1]
 	movdqa		%3,	%2
 	punpcklbw	%2,	%3
 	movdqa		%3,	%2
-	punpcklbw	%2,	%3	
+	punpcklbw	%2,	%3
 	punpckldq	%1,	%2
 %endmacro
 
@@ -126,24 +126,24 @@ mmx_0x02: dw 0x02, 0x00, 0x00, 0x00
 		movd	%2,	[%5+%6]
 		punpcklbw %3,	%2
 		punpcklwd %1,	%3
-		lea		%5,	[%5+2*%6]	
+		lea		%5,	[%5+2*%6]
 		movd	%4,	[%5]
 		movd	%2,	[%5+%6]
 		punpcklbw %4,	%2
-		lea		%5,	[%5+2*%6]	
+		lea		%5,	[%5+2*%6]
 		movd	%3,	[%5]
 		movd	%2,	[%5+%6]
 		lea		%5,	[%5+2*%6]
 		punpcklbw %3,	%2
 		punpcklwd %4,	%3
-		punpckhdq %1,	%4	
-%endmacro	
+		punpckhdq %1,	%4
+%endmacro
 
 %macro  SUMW_HORIZON 3
 	movhlps		%2, %1			; x2 = xx xx xx xx d7 d6 d5 d4
 	paddw		%1, %2			; x1 = xx xx xx xx d37 d26 d15 d04
-	punpcklwd	%1, %3			; x1 =  d37  d26 d15 d04 
-	movhlps		%2, %1			; x2 = xxxx xxxx d37 d26 
+	punpcklwd	%1, %3			; x1 =  d37  d26 d15 d04
+	movhlps		%2, %1			; x2 = xxxx xxxx d37 d26
 	paddd		%1, %2			; x1 = xxxx xxxx d1357 d0246
 	pshuflw		%2, %1, 0x4e	; x2 = xxxx xxxx d0246 d1357
 	paddd		%1, %2			; x1 = xxxx xxxx xxxx  d01234567
@@ -173,7 +173,7 @@ mmx_0x02: dw 0x02, 0x00, 0x00, 0x00
 		movd	%2,	[%5+%6]
 		punpcklbw %3,	%2
 		punpckhwd %1,	%3
-		lea		%5,	[%5+2*%6]			
+		lea		%5,	[%5+2*%6]
 %endmacro
 
 %macro LOAD_2_LEFT_AND_ADD 0
@@ -197,7 +197,7 @@ WELS_EXTERN WelsI16x16LumaPredPlane_sse2
 ALIGN 16
 ;***********************************************************************
 ;   void __cdecl WelsI4x4LumaPredH_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride)
-;   
+;
 ;	pred must align to 16
 ;***********************************************************************
 WelsI4x4LumaPredH_sse2:
@@ -207,30 +207,30 @@ WelsI4x4LumaPredH_sse2:
 	movzx		edx,	byte [eax-1]
 	movd		xmm0,	edx
 	pmuludq		xmm0,	[mmx_01bytes]
-	
+
 	movzx		edx,	byte [eax+ecx-1]
 	movd		xmm1,	edx
 	pmuludq		xmm1,	[mmx_01bytes]
-	
+
 	unpcklps	xmm0,	xmm1
 
 	lea			eax,	[eax+ecx*2]
 	movzx		edx,	byte [eax-1]
 	movd		xmm2,	edx
 	pmuludq		xmm2,	[mmx_01bytes]
-	
+
 	movzx		edx,	byte [eax+ecx-1]
-	movd		xmm3,	edx	
+	movd		xmm3,	edx
 	pmuludq		xmm3,	[mmx_01bytes]
-	
+
 	unpcklps	xmm2,	xmm3
 	unpcklpd	xmm0,	xmm2
-	
+
 	mov			edx,	[esp+4]			;pred
 	movdqa		[edx],	xmm0
-	
+
 	ret
-	
+
 ;***********************************************************************
 ; void WelsI16x16LumaPredPlane_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride);
 ;***********************************************************************
@@ -241,9 +241,9 @@ WelsI16x16LumaPredPlane_sse2:
 		mov		ecx,	[esp + pushsize + 12]
 		sub		esi,	1
 		sub		esi,	ecx
-		
+
 		;for H
-		pxor	xmm7,	xmm7	
+		pxor	xmm7,	xmm7
 		movq	xmm0,	[esi]
 		movdqa	xmm5,	[sse2_plane_dec]
 		punpcklbw xmm0,	xmm7
@@ -253,7 +253,7 @@ WelsI16x16LumaPredPlane_sse2:
 		punpcklbw xmm1,	xmm7
 		pmullw	xmm1,	xmm6
 		psubw	xmm1,	xmm0
-		
+
 		SUMW_HORIZON	xmm1,xmm0,xmm2
 		movd    eax,	xmm1		; H += (i + 1) * (top[8 + i] - top[6 - i]);
 		movsx	eax,	ax
@@ -261,26 +261,26 @@ WelsI16x16LumaPredPlane_sse2:
 		add		eax,	32
 		sar		eax,	6			; b = (5 * H + 32) >> 6;
 		SSE2_Copy8Times	xmm1, eax	; xmm1 = b,b,b,b,b,b,b,b
-		
-		movzx	edx,	BYTE [esi+16]	
+
+		movzx	edx,	BYTE [esi+16]
 		sub	esi, 3
 		LOAD_COLUMN		xmm0, xmm2, xmm3, xmm4, esi, ecx
-			
+
 		add		esi,	3
 		movzx	eax,	BYTE [esi+8*ecx]
 		add		edx,	eax
 		shl		edx,	4			;	a = (left[15*stride] + top[15]) << 4;
-		
+
 		sub	esi, 3
 		add		esi,	ecx
 		LOAD_COLUMN		xmm7, xmm2, xmm3, xmm4, esi, ecx
-		pxor	xmm4,	xmm4	
+		pxor	xmm4,	xmm4
 		punpckhbw xmm0,	xmm4
 		pmullw	xmm0,	xmm5
 		punpckhbw xmm7,	xmm4
 		pmullw	xmm7,	xmm6
 		psubw	xmm7,	xmm0
-		
+
 		SUMW_HORIZON   xmm7,xmm0,xmm2
 		movd    eax,   xmm7			; V
 		movsx	eax,	ax
@@ -288,17 +288,17 @@ WelsI16x16LumaPredPlane_sse2:
 		imul	eax,	5
 		add		eax,	32
 		sar		eax,	6				; c = (5 * V + 32) >> 6;
-		SSE2_Copy8Times	xmm4, eax		; xmm4 = c,c,c,c,c,c,c,c		
-		
+		SSE2_Copy8Times	xmm4, eax		; xmm4 = c,c,c,c,c,c,c,c
+
 		mov		esi,	[esp + pushsize + 4]
 		add		edx,	16
 		imul	eax,	-7
-		add		edx,	eax				; s = a + 16 + (-7)*c		
-		SSE2_Copy8Times	xmm0, edx		; xmm0 = s,s,s,s,s,s,s,s		
-		
+		add		edx,	eax				; s = a + 16 + (-7)*c
+		SSE2_Copy8Times	xmm0, edx		; xmm0 = s,s,s,s,s,s,s,s
+
 		xor		eax,	eax
 		movdqa	xmm5,	[sse2_plane_inc_minus]
-		
+
 get_i16x16_luma_pred_plane_sse2_1:
 		movdqa	xmm2,	xmm1
 		pmullw	xmm2,	xmm5
@@ -307,27 +307,27 @@ get_i16x16_luma_pred_plane_sse2_1:
 		movdqa	xmm3,	xmm1
 		pmullw	xmm3,	xmm6
 		paddw	xmm3,	xmm0
-		psraw	xmm3,	5	
+		psraw	xmm3,	5
 		packuswb xmm2,	xmm3
 		movdqa	[esi],	xmm2
 		paddw	xmm0,	xmm4
 		add		esi,	16
 		inc		eax
 		cmp		eax,	16
-		jnz get_i16x16_luma_pred_plane_sse2_1					
-		
+		jnz get_i16x16_luma_pred_plane_sse2_1
+
 		pop		esi
 		ret
-		
-		
-		
+
+
+
 ;***********************************************************************
 ; void WelsI16x16LumaPredH_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride);
 ;***********************************************************************
 
 %macro SSE2_PRED_H_16X16_TWO_LINE 1
     lea     eax,	[eax+ecx*2]
-    
+
     COPY_16_TIMES	eax,	xmm0
     movdqa			[edx+%1],	xmm0
    COPY_16_TIMESS eax,	xmm0,	ecx
@@ -340,22 +340,22 @@ WelsI16x16LumaPredH_sse2:
     mov     edx, [esp+4]    ; pred
     mov     eax, [esp+8]	; pRef
     mov     ecx, [esp+12]   ; stride
-    
+
     COPY_16_TIMES eax,	xmm0
     movdqa  [edx],		xmm0
     COPY_16_TIMESS eax,	xmm0,	ecx
     movdqa  [edx+0x10],	xmm0
-    
-	SSE2_PRED_H_16X16_TWO_LINE   0x20 
+
+	SSE2_PRED_H_16X16_TWO_LINE   0x20
 	SSE2_PRED_H_16X16_TWO_LINE   0x40
 	SSE2_PRED_H_16X16_TWO_LINE   0x60
 	SSE2_PRED_H_16X16_TWO_LINE   0x80
 	SSE2_PRED_H_16X16_TWO_LINE   0xa0
 	SSE2_PRED_H_16X16_TWO_LINE   0xc0
 	SSE2_PRED_H_16X16_TWO_LINE   0xe0
-   
+
     ret
-    
+
 ;***********************************************************************
 ; void WelsI16x16LumaPredV_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride);
 ;***********************************************************************
@@ -364,10 +364,10 @@ WelsI16x16LumaPredV_sse2:
     mov     edx, [esp+4]    ; pred
     mov     eax, [esp+8]	; pRef
     mov     ecx, [esp+12]   ; stride
-    
+
     sub     eax, ecx
     movdqa  xmm0, [eax]
-    
+
     movdqa  [edx], xmm0
     movdqa  [edx+10h], xmm0
     movdqa  [edx+20h], xmm0
@@ -378,15 +378,15 @@ WelsI16x16LumaPredV_sse2:
     movdqa  [edx+70h], xmm0
     movdqa  [edx+80h], xmm0
     movdqa  [edx+90h], xmm0
-    movdqa  [edx+160], xmm0 
+    movdqa  [edx+160], xmm0
 	movdqa  [edx+176], xmm0
     movdqa  [edx+192], xmm0
     movdqa  [edx+208], xmm0
     movdqa  [edx+224], xmm0
     movdqa  [edx+240], xmm0
-    
+
     ret
-    
+
 ;***********************************************************************
 ; void WelsIChromaPredPlane_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride);
 ;***********************************************************************
@@ -398,8 +398,8 @@ WelsIChromaPredPlane_sse2:
 		mov		ecx,	[esp + pushsize + 12]	;stride
 		sub		esi,	1
 		sub		esi,	ecx
-		
-		pxor	mm7,	mm7	
+
+		pxor	mm7,	mm7
 		movq	mm0,	[esi]
 		movq	mm5,	[sse2_plane_dec_c]
 		punpcklbw mm0,	mm7
@@ -409,7 +409,7 @@ WelsIChromaPredPlane_sse2:
 		punpcklbw mm1,	mm7
 		pmullw	mm1,	mm6
 		psubw	mm1,	mm0
-		
+
 		movq2dq xmm1,   mm1
 		pxor    xmm2,   xmm2
 		SUMW_HORIZON	xmm1,xmm0,xmm2
@@ -419,7 +419,7 @@ WelsIChromaPredPlane_sse2:
 		add		eax,	16
 		sar		eax,	5			; b = (17 * H + 16) >> 5;
 		SSE2_Copy8Times	xmm1, eax	; mm1 = b,b,b,b,b,b,b,b
-		
+
 		movzx	edx,	BYTE [esi+8]
 		sub	esi, 3
 		LOAD_COLUMN_C	mm0, mm2, mm3, mm4, esi, ecx
@@ -428,17 +428,17 @@ WelsIChromaPredPlane_sse2:
 		movzx	eax,	BYTE [esi+4*ecx]
 		add		edx,	eax
 		shl		edx,	4			; a = (left[7*stride] + top[7]) << 4;
-		
+
 		sub	esi, 3
 		add		esi,	ecx
 		LOAD_COLUMN_C	mm7, mm2, mm3, mm4, esi, ecx
-		pxor	mm4,	mm4	
+		pxor	mm4,	mm4
 		punpckhbw mm0,	mm4
 		pmullw	mm0,	mm5
 		punpckhbw mm7,	mm4
 		pmullw	mm7,	mm6
 		psubw	mm7,	mm0
-		
+
 		movq2dq xmm7,   mm7
 		pxor    xmm2,   xmm2
 		SUMW_HORIZON	xmm7,xmm0,xmm2
@@ -448,17 +448,17 @@ WelsIChromaPredPlane_sse2:
 		imul	eax,	17
 		add		eax,	16
 		sar		eax,	5				; c = (17 * V + 16) >> 5;
-		SSE2_Copy8Times	xmm4, eax		; mm4 = c,c,c,c,c,c,c,c		
-		
+		SSE2_Copy8Times	xmm4, eax		; mm4 = c,c,c,c,c,c,c,c
+
 		mov		esi,	[esp + pushsize + 4]
 		add		edx,	16
 		imul	eax,	-3
-		add		edx,	eax				; s = a + 16 + (-3)*c		
-		SSE2_Copy8Times	xmm0, edx		; xmm0 = s,s,s,s,s,s,s,s		
-		
+		add		edx,	eax				; s = a + 16 + (-3)*c
+		SSE2_Copy8Times	xmm0, edx		; xmm0 = s,s,s,s,s,s,s,s
+
 		xor		eax,	eax
 		movdqa	xmm5,	[sse2_plane_mul_b_c]
-		
+
 get_i_chroma_pred_plane_sse2_1:
 		movdqa	xmm2,	xmm1
 		pmullw	xmm2,	xmm5
@@ -470,12 +470,12 @@ get_i_chroma_pred_plane_sse2_1:
 		add		esi,	8
 		inc		eax
 		cmp		eax,	8
-		jnz get_i_chroma_pred_plane_sse2_1					
-		
+		jnz get_i_chroma_pred_plane_sse2_1
+
 		pop		esi
 		WELSEMMS
-		ret	
-		
+		ret
+
 ALIGN 16
 ;***********************************************************************
 ;	0 |1 |2 |3 |4 |
@@ -487,13 +487,13 @@ ALIGN 16
 ;	pred[7] = ([6]+[0]*2+[1]+2)/4
 ;
 ;   void __cdecl WelsI4x4LumaPredDDR_mmx(uint8_t *pred,uint8_t *pRef,int32_t stride)
-;   
+;
 ;***********************************************************************
-WelsI4x4LumaPredDDR_mmx:	
+WelsI4x4LumaPredDDR_mmx:
 	mov			edx,[esp+4]			;pred
 	mov         eax,[esp+8]			;pRef
 	mov			ecx,[esp+12]		;stride
-	
+
 	movq        mm1,[eax+ecx-8]		;get value of 11,decreasing 8 is trying to improve the performance of movq mm1[8] = 11
 	movq        mm2,[eax-8]			;get value of 6 mm2[8] = 6
 	sub			eax, ecx			;mov eax to above line of current block(postion of 1)
@@ -520,17 +520,17 @@ WelsI4x4LumaPredDDR_mmx:
 	pand        mm1,[mmx_01bytes]	;set the odd bit
 	psubusb     mm3,mm1				;decrease 1 from odd bytes
 	pavgb       mm2,mm3				;mm2=(([11]+[21]+1)/2+1+[16])/2
-	
-	movd        [edx+12],mm2 
-	psrlq       mm2,8 
-	movd        [edx+8],mm2 
-	psrlq       mm2,8 
-	movd        [edx+4],mm2 
-	psrlq       mm2,8 
+
+	movd        [edx+12],mm2
+	psrlq       mm2,8
+	movd        [edx+8],mm2
+	psrlq       mm2,8
+	movd        [edx+4],mm2
+	psrlq       mm2,8
 	movd        [edx],mm2
 	WELSEMMS
 	ret
-	
+
 ALIGN 16
 ;***********************************************************************
 ;	0 |1 |2 |3 |4 |
@@ -542,44 +542,44 @@ ALIGN 16
 ;	pred[6] = ([1]+[2]+[3]+[4]+[5]+[10]+[15]+[20]+4)/8
 ;
 ;   void __cdecl WelsI4x4LumaPredDc_sse2(uint8_t *pred,uint8_t *pRef,int32_t stride)
-;   
+;
 ;***********************************************************************
-WelsI4x4LumaPredDc_sse2:	
+WelsI4x4LumaPredDc_sse2:
 	mov         eax,[esp+8]			;pRef
 	mov			ecx,[esp+12]		;stride
 	push		ebx
-		
+
 	movzx		edx,	byte [eax-1h]
-	
+
 	sub			eax,	ecx
 	movd		xmm0,	[eax]
 	pxor		xmm1,	xmm1
 	psadbw		xmm0,	xmm1
-	
+
 	movd		ebx,	xmm0
 	add			ebx,	edx
-	
+
 	movzx		edx,	byte [eax+ecx*2-1h]
 	add			ebx,	edx
-	
+
 	lea			eax,	[eax+ecx*2-1]
 	movzx		edx,	byte [eax+ecx]
 	add			ebx,	edx
-	
+
 	movzx		edx,	byte [eax+ecx*2]
 	add			ebx,	edx
 	add			ebx,	4
 	sar			ebx,	3
 	imul		ebx,	0x01010101
-	
+
 	mov			edx,	[esp+8]			;pred
 	movd		xmm0,	ebx
 	pshufd		xmm0,	xmm0,	0
 	movdqa		[edx],	xmm0
-				
+
 	pop ebx
-	ret	
-	
+	ret
+
 ALIGN 16
 ;***********************************************************************
 ;	void __cdecl WelsIChromaPredH_mmx(uint8_t *pred, uint8_t *pRef, int32_t stride)
@@ -588,7 +588,7 @@ ALIGN 16
 %macro MMX_PRED_H_8X8_ONE_LINE 4
 	movq		%1,		[%3-8]
 	psrlq		%1,		38h
-	
+
 	;pmuludq		%1,		[mmx_01bytes]		;extend to 4 bytes
 	pmullw		%1,		[mmx_01bytes]
 	pshufw		%1,		%1,	0
@@ -598,7 +598,7 @@ ALIGN 16
 %macro MMX_PRED_H_8X8_ONE_LINEE 4
 	movq		%1,		[%3+ecx-8]
 	psrlq		%1,		38h
-	
+
 	;pmuludq		%1,		[mmx_01bytes]		;extend to 4 bytes
 	pmullw		%1,		[mmx_01bytes]
 	pshufw		%1,		%1,	0
@@ -610,34 +610,34 @@ WelsIChromaPredH_mmx:
 	mov			edx,	[esp+4]			;pred
 	mov         eax,	[esp+8]			;pRef
 	mov			ecx,	[esp+12]		;stride
-	
+
 	movq		mm0,	[eax-8]
 	psrlq		mm0,	38h
-	
+
 	;pmuludq		mm0,	[mmx_01bytes]		;extend to 4 bytes
 	pmullw		mm0,		[mmx_01bytes]
 	pshufw		mm0,	mm0,	0
 	movq		[edx],	mm0
-	
+
 	MMX_PRED_H_8X8_ONE_LINEE	mm0, mm1, eax,edx+8
-	
+
 	lea			eax,[eax+ecx*2]
 	MMX_PRED_H_8X8_ONE_LINE	mm0, mm1, eax,edx+16
-	
+
 	MMX_PRED_H_8X8_ONE_LINEE	mm0, mm1, eax,edx+24
-	
+
 	lea			eax,[eax+ecx*2]
 	MMX_PRED_H_8X8_ONE_LINE	mm0, mm1, eax,edx+32
-	
+
 	MMX_PRED_H_8X8_ONE_LINEE	mm0, mm1, eax,edx+40
-	
+
 	lea			eax,[eax+ecx*2]
 	MMX_PRED_H_8X8_ONE_LINE	mm0, mm1, eax,edx+48
 
-	MMX_PRED_H_8X8_ONE_LINEE	mm0, mm1, eax,edx+56		
+	MMX_PRED_H_8X8_ONE_LINEE	mm0, mm1, eax,edx+56
 	WELSEMMS
-	ret	
-	
+	ret
+
 ALIGN 16
 ;***********************************************************************
 ;	void __cdecl WelsI4x4LumaPredV_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride)
@@ -648,12 +648,12 @@ WelsI4x4LumaPredV_sse2:
 	mov			edx,	[esp+4]			;pred
 	mov         eax,	[esp+8]			;pRef
 	mov			ecx,	[esp+12]		;stride
-	
+
 	sub			eax,	ecx
 	movd		xmm0,	[eax]
 	pshufd		xmm0,	xmm0,	0
 	movdqa		[edx],	xmm0
-	ret	
+	ret
 
 ALIGN 16
 ;***********************************************************************
@@ -665,7 +665,7 @@ WelsIChromaPredV_sse2:
 	mov			edx,		[esp+4]			;pred
 	mov         eax,		[esp+8]			;pRef
 	mov			ecx,		[esp+12]		;stride
-	
+
 	sub			eax,		ecx
 	movq		xmm0,		[eax]
 	movdqa		xmm1,		xmm0
@@ -676,8 +676,8 @@ WelsIChromaPredV_sse2:
 	movdqa		[edx+32],	xmm0
 	movdqa		[edx+48],	xmm0
 	ret
-	
-	
+
+
 	ALIGN 16
 ;***********************************************************************
 ;	lt|t0|t1|t2|t3|
@@ -703,29 +703,29 @@ WelsIChromaPredV_sse2:
 
 ;   f = (2 + l1 + (l0<<1) + lt)>>2
 ;   h = (2 + l2 + (l1<<1) + l0)>>2
-;   j = (2 + l3 + (l2<<1) + l1)>>2   
+;   j = (2 + l3 + (l2<<1) + l1)>>2
 ;   [b a f e h g j i] + [d c b a] --> mov to memory
-;   
+;
 ;   void WelsI4x4LumaPredHD_mmx(uint8_t *pred,uint8_t *pRef,int32_t stride)
 ;***********************************************************************
 WELS_EXTERN WelsI4x4LumaPredHD_mmx
-WelsI4x4LumaPredHD_mmx:	
+WelsI4x4LumaPredHD_mmx:
 	mov			edx, [esp+4]			; pred
 	mov         eax, [esp+8]			; pRef
 	mov			ecx, [esp+12]           ; stride
 	sub         eax, ecx
 	movd        mm0, [eax-1]            ; mm0 = [xx xx xx xx t2 t1 t0 lt]
 	psllq       mm0, 20h                ; mm0 = [t2 t1 t0 lt xx xx xx xx]
-	
-	movd        mm1, [eax+2*ecx-4]        
-	punpcklbw   mm1, [eax+ecx-4]        ; mm1[7] = l0, mm1[6] = l1	
+
+	movd        mm1, [eax+2*ecx-4]
+	punpcklbw   mm1, [eax+ecx-4]        ; mm1[7] = l0, mm1[6] = l1
 	lea         eax, [eax+2*ecx]
-	movd        mm2, [eax+2*ecx-4]        
+	movd        mm2, [eax+2*ecx-4]
 	punpcklbw   mm2, [eax+ecx-4]        ; mm2[7] = l2, mm2[6] = l3
 	punpckhwd   mm2, mm1                ; mm2 = [l0 l1 l2 l3 xx xx xx xx]
 	psrlq       mm2, 20h
 	pxor        mm0, mm2                ; mm0 = [t2 t1 t0 lt l0 l1 l2 l3]
-	
+
 	movq        mm1, mm0
 	psrlq       mm1, 10h                ; mm1 = [xx xx t2 t1 t0 lt l0 l1]
 	movq        mm2, mm0
@@ -733,24 +733,24 @@ WelsI4x4LumaPredHD_mmx:
 	movq        mm3, mm2
 	movq        mm4, mm1
 	pavgb       mm1, mm0
-	
+
 	pxor        mm4, mm0				; find odd value in the lowest bit of each byte
 	pand        mm4, [mmx_01bytes]	    ; set the odd bit
 	psubusb     mm1, mm4				; decrease 1 from odd bytes
-	
+
 	pavgb       mm2, mm1                ; mm2 = [xx xx d  c  b  f  h  j]
-	
+
 	movq        mm4, mm0
 	pavgb       mm3, mm4                ; mm3 = [xx xx xx xx a  e  g  i]
 	punpcklbw   mm3, mm2                ; mm3 = [b  a  f  e  h  g  j  i]
-	
+
 	psrlq       mm2, 20h
 	psllq       mm2, 30h                ; mm2 = [d  c  0  0  0  0  0  0]
 	movq        mm4, mm3
 	psrlq       mm4, 10h                ; mm4 = [0  0  b  a  f  e  h  j]
 	pxor        mm2, mm4                ; mm2 = [d  c  b  a  xx xx xx xx]
 	psrlq       mm2, 20h                ; mm2 = [xx xx xx xx  d  c  b  a]
-	
+
 	movd        [edx], mm2
 	movd        [edx+12], mm3
 	psrlq       mm3, 10h
@@ -759,9 +759,9 @@ WelsI4x4LumaPredHD_mmx:
 	movd        [edx+4], mm3
 	WELSEMMS
 	ret
-	
-	
-	
+
+
+
 ALIGN 16
 ;***********************************************************************
 ;	lt|t0|t1|t2|t3|
@@ -784,17 +784,17 @@ ALIGN 16
 ;   b = (2 + l0 + (l1<<1) + l2)>>2
 ;   d = (2 + l1 + (l2<<1) + l3)>>2
 ;   f = (2 + l2 + (l3<<1) + l3)>>2
- 
+
 ;   [g g f e d c b a] + [g g g g] --> mov to memory
-;   
+;
 ;   void WelsI4x4LumaPredHU_mmx(uint8_t *pred,uint8_t *pRef,int32_t stride)
 ;***********************************************************************
 WELS_EXTERN WelsI4x4LumaPredHU_mmx
-WelsI4x4LumaPredHU_mmx:	
+WelsI4x4LumaPredHU_mmx:
 	mov			edx, [esp+4]			; pred
 	mov         eax, [esp+8]			; pRef
 	mov			ecx, [esp+12]           ; stride
-	
+
 	movd        mm0, [eax-4]            ; mm0[3] = l0
 	punpcklbw   mm0, [eax+ecx-4]        ; mm0[7] = l1, mm0[6] = l0
 	lea         eax, [eax+2*ecx]
@@ -802,38 +802,38 @@ WelsI4x4LumaPredHU_mmx:
 	movd        mm4, [eax+ecx-4]        ; mm4[3] = l3
 	punpcklbw   mm2, mm4
 	punpckhwd   mm0, mm2                ; mm0 = [l3 l2 l1 l0 xx xx xx xx]
-	
+
 	psrlq       mm4, 18h
 	psllq       mm4, 38h                ; mm4 = [l3 xx xx xx xx xx xx xx]
 	psrlq       mm0, 8h
 	pxor        mm0, mm4                ; mm0 = [l3 l3 l2 l1 l0 xx xx xx]
-	
+
 	movq        mm1, mm0
 	psllq       mm1, 8h                 ; mm1 = [l3 l2 l1 l0 xx xx xx xx]
 	movq        mm3, mm1                ; mm3 = [l3 l2 l1 l0 xx xx xx xx]
 	pavgb       mm1, mm0                ; mm1 = [g  e  c  a  xx xx xx xx]
-	
+
 	movq        mm2, mm0
 	psllq       mm2, 10h                ; mm2 = [l2 l1 l0 xx xx xx xx xx]
 	movq        mm5, mm2
 	pavgb       mm2, mm0
-	
+
 	pxor        mm5, mm0				; find odd value in the lowest bit of each byte
 	pand        mm5, [mmx_01bytes]	    ; set the odd bit
 	psubusb     mm2, mm5				; decrease 1 from odd bytes
-	
+
 	pavgb       mm2, mm3                ; mm2 = [f  d  b  xx xx xx xx xx]
-	
+
 	psrlq       mm2, 8h
 	pxor        mm2, mm4                ; mm2 = [g  f  d  b  xx xx xx xx]
-	
+
 	punpckhbw   mm1, mm2                ; mm1 = [g  g  f  e  d  c  b  a]
 	punpckhbw   mm4, mm4                ; mm4 = [g  g  xx xx xx xx xx xx]
 	punpckhbw   mm4, mm4                ; mm4 = [g  g  g  g  xx xx xx xx]
-	
+
 	psrlq       mm4, 20h
 	movd        [edx+12], mm4
-	
+
 	movd        [edx], mm1
 	psrlq       mm1, 10h
 	movd        [edx+4], mm1
@@ -841,9 +841,9 @@ WelsI4x4LumaPredHU_mmx:
 	movd        [edx+8], mm1
 	WELSEMMS
 	ret
-	
-	
-	
+
+
+
 ALIGN 16
 ;***********************************************************************
 ;	lt|t0|t1|t2|t3|
@@ -869,69 +869,69 @@ ALIGN 16
 
 ;   h = (2 + t1 + (t2<<1) + t3)>>2
 ;   i = (2 + lt + (l0<<1) + l1)>>2
-;   j = (2 + l0 + (l1<<1) + l2)>>2   
-;   
+;   j = (2 + l0 + (l1<<1) + l2)>>2
+;
 ;   void WelsI4x4LumaPredVR_mmx(uint8_t *pred,uint8_t *pRef,int32_t stride)
 ;***********************************************************************
 WELS_EXTERN WelsI4x4LumaPredVR_mmx
-WelsI4x4LumaPredVR_mmx:	
+WelsI4x4LumaPredVR_mmx:
 	mov			edx, [esp+4]			; pred
 	mov         eax, [esp+8]			; pRef
 	mov			ecx, [esp+12]           ; stride
 	sub         eax, ecx
 	movq        mm0, [eax-1]            ; mm0 = [xx xx xx t3 t2 t1 t0 lt]
 	psllq       mm0, 18h                ; mm0 = [t3 t2 t1 t0 lt xx xx xx]
-	
-	movd        mm1, [eax+2*ecx-4]        
-	punpcklbw   mm1, [eax+ecx-4]        ; mm1[7] = l0, mm1[6] = l1	
+
+	movd        mm1, [eax+2*ecx-4]
+	punpcklbw   mm1, [eax+ecx-4]        ; mm1[7] = l0, mm1[6] = l1
 	lea         eax, [eax+2*ecx]
 	movq        mm2, [eax+ecx-8]        ; mm2[7] = l2
 	punpckhwd   mm2, mm1                ; mm2 = [l0 l1 l2 xx xx xx xx xx]
 	psrlq       mm2, 28h
 	pxor        mm0, mm2                ; mm0 = [t3 t2 t1 t0 lt l0 l1 l2]
-	
+
 	movq        mm1, mm0
 	psllq       mm1, 8h                 ; mm1 = [t2 t1 t0 lt l0 l1 l2 xx]
 	pavgb       mm1, mm0                ; mm1 = [d  c  b  a  xx xx xx xx]
-	
+
 	movq        mm2, mm0
 	psllq       mm2, 10h                ; mm2 = [t1 t0 lt l0 l1 l2 xx xx]
 	movq        mm3, mm2
 	pavgb       mm2, mm0
-	
+
 	pxor        mm3, mm0				; find odd value in the lowest bit of each byte
 	pand        mm3, [mmx_01bytes]	    ; set the odd bit
 	psubusb     mm2, mm3				; decrease 1 from odd bytes
-	
+
 	movq        mm3, mm0
 	psllq       mm3, 8h                 ; mm3 = [t2 t1 t0 lt l0 l1 l2 xx]
 	pavgb       mm3, mm2                ; mm3 = [h  g  f  e  i  j  xx xx]
 	movq        mm2, mm3
-	
+
 	psrlq       mm1, 20h                ; mm1 = [xx xx xx xx d  c  b  a]
 	movd        [edx], mm1
-	
+
 	psrlq       mm2, 20h                ; mm2 = [xx xx xx xx h  g  f  e]
 	movd        [edx+4], mm2
-	
+
 	movq        mm4, mm3
 	psllq       mm4, 20h
 	psrlq       mm4, 38h                ; mm4 = [xx xx xx xx xx xx xx i]
-	
+
 	movq        mm5, mm3
 	psllq       mm5, 28h
 	psrlq       mm5, 38h                ; mm5 = [xx xx xx xx xx xx xx j]
-	
+
 	psllq       mm1, 8h
 	pxor        mm4, mm1                ; mm4 = [xx xx xx xx c  b  a  i]
 	movd        [edx+8], mm4
-	
+
 	psllq       mm2, 8h
 	pxor        mm5, mm2                ; mm5 = [xx xx xx xx g  f  e  j]
 	movd        [edx+12], mm5
 	WELSEMMS
 	ret
-	
+
 ALIGN 16
 ;***********************************************************************
 ;	lt|t0|t1|t2|t3|t4|t5|t6|t7
@@ -954,13 +954,13 @@ ALIGN 16
 ;   e = (2 + t4 + t6 + (t5<<1))>>2
 ;   f = (2 + t5 + t7 + (t6<<1))>>2
 ;   g = (2 + t6 + t7 + (t7<<1))>>2
- 
+
 ;   [g f e d c b a] --> mov to memory
-;   
+;
 ;   void WelsI4x4LumaPredDDL_mmx(uint8_t *pred,uint8_t *pRef,int32_t stride)
 ;***********************************************************************
 WELS_EXTERN WelsI4x4LumaPredDDL_mmx
-WelsI4x4LumaPredDDL_mmx:	
+WelsI4x4LumaPredDDL_mmx:
 	mov			edx, [esp+4]			; pred
 	mov         eax, [esp+8]			; pRef
 	mov			ecx, [esp+12]           ; stride
@@ -968,11 +968,11 @@ WelsI4x4LumaPredDDL_mmx:
 	movq        mm0, [eax]              ; mm0 = [t7 t6 t5 t4 t3 t2 t1 t0]
 	movq        mm1, mm0
 	movq        mm2, mm0
-	
+
 	movq        mm3, mm0
 	psrlq       mm3, 38h
 	psllq       mm3, 38h                ; mm3 = [t7 xx xx xx xx xx xx xx]
-	
+
 	psllq       mm1, 8h                 ; mm1 = [t6 t5 t4 t3 t2 t1 t0 xx]
 	psrlq       mm2, 8h
 	pxor        mm2, mm3                ; mm2 = [t7 t7 t6 t5 t4 t3 t2 t1]
@@ -982,9 +982,9 @@ WelsI4x4LumaPredDDL_mmx:
 	pxor        mm3, mm2				; find odd value in the lowest bit of each byte
 	pand        mm3, [mmx_01bytes]	    ; set the odd bit
 	psubusb     mm1, mm3				; decrease 1 from odd bytes
-	
+
 	pavgb       mm0, mm1                ; mm0 = [g f e d c b a xx]
-	
+
 	psrlq       mm0, 8h
 	movd        [edx], mm0
 	psrlq       mm0, 8h
@@ -995,8 +995,8 @@ WelsI4x4LumaPredDDL_mmx:
 	movd        [edx+12], mm0
 	WELSEMMS
 	ret
-	
-	
+
+
 ALIGN 16
 ;***********************************************************************
 ;	lt|t0|t1|t2|t3|t4|t5|t6|t7
@@ -1022,60 +1022,60 @@ ALIGN 16
 ;   g = (2 + t2 + (t3<<1) + t4)>>2
 ;   h = (2 + t3 + (t4<<1) + t5)>>2
 ;   j = (2 + t4 + (t5<<1) + t6)>>2
- 
+
 ;   [i d c b a] + [j h g f e] --> mov to memory
-;   
+;
 ;   void WelsI4x4LumaPredVL_mmx(uint8_t *pred,uint8_t *pRef,int32_t stride)
 ;***********************************************************************
 WELS_EXTERN WelsI4x4LumaPredVL_mmx
-WelsI4x4LumaPredVL_mmx:	
+WelsI4x4LumaPredVL_mmx:
 	mov			edx, [esp+4]			; pred
 	mov         eax, [esp+8]			; pRef
 	mov			ecx, [esp+12]           ; stride
-	
+
 	sub         eax, ecx
 	movq        mm0, [eax]              ; mm0 = [t7 t6 t5 t4 t3 t2 t1 t0]
 	movq        mm1, mm0
 	movq        mm2, mm0
-	
+
 	psrlq       mm1, 8h                 ; mm1 = [xx t7 t6 t5 t4 t3 t2 t1]
 	psrlq       mm2, 10h                ; mm2 = [xx xx t7 t6 t5 t4 t3 t2]
 
 	movq        mm3, mm1
 	pavgb       mm3, mm0                ; mm3 = [xx xx xx i  d  c  b  a]
-	
+
 	movq        mm4, mm2
-	pavgb       mm2, mm0	
+	pavgb       mm2, mm0
 	pxor        mm4, mm0				; find odd value in the lowest bit of each byte
 	pand        mm4, [mmx_01bytes]	    ; set the odd bit
 	psubusb     mm2, mm4				; decrease 1 from odd bytes
-	
+
 	pavgb       mm2, mm1                ; mm2 = [xx xx xx j  h  g  f  e]
-	
+
 	movd        [edx], mm3
 	psrlq       mm3, 8h
 	movd        [edx+8], mm3
-	
+
 	movd        [edx+4], mm2
 	psrlq       mm2, 8h
 	movd        [edx+12], mm2
 	WELSEMMS
 	ret
-	
+
 ALIGN 16
 ;***********************************************************************
 ;
 ;   void WelsIChromaPredDc_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride)
 ;***********************************************************************
 WELS_EXTERN WelsIChromaPredDc_sse2
-WelsIChromaPredDc_sse2:	
+WelsIChromaPredDc_sse2:
 	push        ebx
 	mov         eax, [esp+12]			; pRef
 	mov			ecx, [esp+16]           ; stride
-	
+
 	sub         eax, ecx
 	movq        mm0, [eax]
-	
+
 	;xor         ebx, ebx
 	;movzx		edx, byte [eax+ecx-0x01] ; l1
 	movzx		ebx, byte [eax+ecx-0x01] ; l1
@@ -1089,7 +1089,7 @@ WelsIChromaPredDc_sse2:
 	movzx		edx, byte [eax-0x01]     ; l4
 	add			ebx, edx
 	movd        mm1, ebx                 ; mm1 = l1+l2+l3+l4
-	
+
 	;xor         ebx, ebx
 	;movzx		edx, byte [eax+ecx-0x01] ; l5
 	movzx		ebx, byte [eax+ecx-0x01] ; l5
@@ -1103,74 +1103,74 @@ WelsIChromaPredDc_sse2:
 	movzx		edx, byte [eax-0x01]     ; l8
 	add			ebx, edx
 	movd        mm2, ebx                 ; mm2 = l5+l6+l7+l8
-	
+
 	movq        mm3, mm0
 	psrlq       mm0, 0x20
 	psllq       mm3, 0x20
 	psrlq       mm3, 0x20
 	pxor		mm4, mm4
 	psadbw		mm0, mm4
-	psadbw		mm3, mm4                 ; sum1 = mm3+mm1, sum2 = mm0, sum3 = mm2	
-	
+	psadbw		mm3, mm4                 ; sum1 = mm3+mm1, sum2 = mm0, sum3 = mm2
+
 	paddq       mm3, mm1
 	movq        mm1, mm2
 	paddq       mm1, mm0;                ; sum1 = mm3, sum2 = mm0, sum3 = mm2, sum4 = mm1
-	
+
 	movq        mm4, [mmx_0x02]
-	
+
 	paddq       mm0, mm4
 	psrlq       mm0, 0x02
-	
+
 	paddq       mm2, mm4
 	psrlq       mm2, 0x02
-	
+
 	paddq       mm3, mm4
 	paddq       mm3, mm4
 	psrlq       mm3, 0x03
-	
+
 	paddq       mm1, mm4
 	paddq       mm1, mm4
 	psrlq       mm1, 0x03
-	
+
 	pmuludq     mm0, [mmx_01bytes]
 	pmuludq     mm3, [mmx_01bytes]
 	psllq       mm0, 0x20
 	pxor        mm0, mm3                 ; mm0 = m_up
-	
+
 	pmuludq     mm2, [mmx_01bytes]
 	pmuludq     mm1, [mmx_01bytes]
 	psllq       mm1, 0x20
 	pxor        mm1, mm2                 ; mm2 = m_down
-	
+
 	mov         edx, [esp+8]			 ; pRef
-	
+
 	movq        [edx], mm0
 	movq        [edx+0x08], mm0
 	movq        [edx+0x10], mm0
 	movq        [edx+0x18], mm0
-	
+
 	movq        [edx+0x20], mm1
 	movq        [edx+0x28], mm1
 	movq        [edx+0x30], mm1
 	movq        [edx+0x38], mm1
-	
+
 	pop         ebx
 	WELSEMMS
 	ret
-	
-	
-	
+
+
+
 ALIGN 16
 ;***********************************************************************
 ;
 ;   void WelsI16x16LumaPredDc_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride)
 ;***********************************************************************
 WELS_EXTERN WelsI16x16LumaPredDc_sse2
-WelsI16x16LumaPredDc_sse2:	
+WelsI16x16LumaPredDc_sse2:
 	push        ebx
 	mov         eax, [esp+12]			; pRef
 	mov			ecx, [esp+16]           ; stride
-	
+
 	sub         eax, ecx
 	movdqa      xmm0, [eax]             ; read one row
 	pxor		xmm1, xmm1
@@ -1180,7 +1180,7 @@ WelsI16x16LumaPredDc_sse2:
 	pslldq      xmm0, 0x08
 	psrldq      xmm0, 0x08
 	paddw       xmm0, xmm1
-	
+
 	;xor         ebx, ebx
 	;movzx		edx, byte [eax+ecx-0x01]
 	movzx		ebx, byte [eax+ecx-0x01]
@@ -1201,7 +1201,7 @@ WelsI16x16LumaPredDc_sse2:
 	psrld       xmm0, 0x05
 	pmuludq     xmm0, [mmx_01bytes]
 	pshufd      xmm0, xmm0, 0
-	
+
 	mov         edx, [esp+8]			; pred
 	movdqa      [edx], xmm0
 	movdqa      [edx+0x10], xmm0
@@ -1219,14 +1219,14 @@ WelsI16x16LumaPredDc_sse2:
 	movdqa      [edx+0xd0], xmm0
 	movdqa      [edx+0xe0], xmm0
 	movdqa      [edx+0xf0], xmm0
-	
+
 	pop         ebx
 
 	ret
 
 ;***********************************************************************
 ;
-;int32_t WelsSmpleSatdThree4x4_sse2( uint8_t *pDec, int32_t iLineSizeDec, uint8_t *pEnc, int32_t iLinesizeEnc, 
+;int32_t WelsSmpleSatdThree4x4_sse2( uint8_t *pDec, int32_t iLineSizeDec, uint8_t *pEnc, int32_t iLinesizeEnc,
 ;                             uint8_t* pRed, int32_t* pBestMode, int32_t, int32_t, int32_t);
 ;
 ;***********************************************************************
@@ -1238,7 +1238,7 @@ WelsSmpleSatdThree4x4_sse2:
 	push      edi
 	mov       eax,  [esp+24];p_enc
 	mov       ebx,  [esp+28];linesize_enc
-	
+
 	; load source 4x4 samples and Hadamard transform
     movd      xmm0, [eax]
     movd      xmm1, [eax+ebx]
@@ -1247,16 +1247,16 @@ WelsSmpleSatdThree4x4_sse2:
     movd      xmm3, [eax+ebx]
     punpckldq xmm0, xmm2
     punpckldq xmm1, xmm3
-       
+
     pxor      xmm6, xmm6
     punpcklbw xmm0, xmm6
     punpcklbw xmm1, xmm6
-    
+
     movdqa    xmm2, xmm0
     paddw     xmm0, xmm1
     psubw     xmm2, xmm1
     SSE2_XSawp  qdq, xmm0, xmm2, xmm3
-    
+
     movdqa    xmm4, xmm0
     paddw     xmm0, xmm3
     psubw     xmm4, xmm3
@@ -1264,21 +1264,21 @@ WelsSmpleSatdThree4x4_sse2:
     movdqa    xmm2, xmm0
     punpcklwd xmm0, xmm4
     punpckhwd xmm4, xmm2
-    
+
 	SSE2_XSawp  dq,  xmm0, xmm4, xmm3
 	SSE2_XSawp  qdq, xmm0, xmm3, xmm5
 
     movdqa    xmm7, xmm0
     paddw     xmm0, xmm5
     psubw     xmm7, xmm5
-    
+
 	SSE2_XSawp  qdq,  xmm0, xmm7, xmm1
-    
+
     ; Hadamard transform results are saved in xmm0 and xmm2
     movdqa    xmm2, xmm0
     paddw     xmm0, xmm1
     psubw     xmm2, xmm1
-  	
+
 	; load top boundary samples: [a b c d]
     mov       eax,  [esp+16];p_dec
 	sub		  eax,	[esp+20];linesize_dec
@@ -1286,7 +1286,7 @@ WelsSmpleSatdThree4x4_sse2:
 	movzx     edx,  byte [eax+1]
 	movzx     esi,  byte [eax+2]
 	movzx     edi,  byte [eax+3]
-	
+
 	; get the transform results of top boundary samples: [a b c d]
 	add       edx, ecx ; edx = a + b
 	add       edi, esi ; edi = c + d
@@ -1300,7 +1300,7 @@ WelsSmpleSatdThree4x4_sse2:
 	add       esi, ecx ; esi = (a - b) + (c - d)
 	add       ecx, ecx
 	sub       ecx, esi ; ecx = (a - b) - (c - d) ; [edi edx ecx esi]
-	
+
 	movdqa    xmm6, xmm0
 	movdqa    xmm7, xmm2
 	movd      xmm5, edi ; store the edi for DC mode
@@ -1312,16 +1312,16 @@ WelsSmpleSatdThree4x4_sse2:
 	pinsrw    xmm4, edx, 0
 	pinsrw    xmm4, ecx, 4
 	psllw     xmm4, 2
-	
+
 	; get the satd of H
 	psubw     xmm0, xmm3
 	psubw     xmm2, xmm4
-	
+
 	WELS_AbsW  xmm0, xmm1
 	WELS_AbsW  xmm2, xmm1
     paddusw        xmm0, xmm2
     SUMW_HORIZON1  xmm0, xmm1 ; satd of V is stored in xmm0
-	
+
 	; load left boundary samples: [a b c d]'
     mov       eax,  [esp+16]
 	mov       ebx,  [esp+20]
@@ -1330,7 +1330,7 @@ WelsSmpleSatdThree4x4_sse2:
 	lea       eax , [eax+2*ebx]
 	movzx     esi,  byte [eax-1]
 	movzx     edi,  byte [eax+ebx-1]
-	
+
 	; get the transform results of left boundary samples: [a b c d]'
 	add       edx, ecx ; edx = a + b
 	add       edi, esi ; edi = c + d
@@ -1344,14 +1344,14 @@ WelsSmpleSatdThree4x4_sse2:
 	add       esi, ecx ; esi = (a - b) + (c - d)
 	add       ecx, ecx
 	sub       ecx, esi ; ecx = (a - b) - (c - d) ; [edi edx ecx esi]'
-	
-	; store the transform results in xmm3	
+
+	; store the transform results in xmm3
     movd      xmm3, edi
 	pinsrw    xmm3, edx, 1
 	pinsrw    xmm3, ecx, 2
 	pinsrw    xmm3, esi, 3
 	psllw     xmm3, 2
-	
+
 	; get the satd of V
 	movdqa    xmm2, xmm6
 	movdqa    xmm4, xmm7
@@ -1368,14 +1368,14 @@ WelsSmpleSatdThree4x4_sse2:
 	psrlw     xmm1, 3
 	movdqa    xmm5, xmm1
 	psllw     xmm1, 4
-	
+
     ; get the satd of DC
     psubw          xmm6, xmm1
     WELS_AbsW  xmm6, xmm1
 	WELS_AbsW  xmm7, xmm1
     paddusw        xmm6, xmm7
     SUMW_HORIZON1  xmm6, xmm1 ; satd of DC is stored in xmm6
-    
+
     ; comparing order: DC H V
     mov       edx, [esp+32]
     movd      eax, xmm6
@@ -1394,9 +1394,9 @@ WelsSmpleSatdThree4x4_sse2:
     jg near   not_dc
     cmp       ax, si
     jg near   not_dc_h
-    
+
     ; for DC mode
-    movd      ebx, xmm5 
+    movd      ebx, xmm5
     imul      ebx, 0x01010101
     movd	  xmm5, ebx
 	pshufd    xmm5, xmm5, 0
@@ -1407,11 +1407,11 @@ WelsSmpleSatdThree4x4_sse2:
     pop       esi
     pop       ebx
     ret
-    
+
 not_dc:
     cmp       di, si
     jg near   not_dc_h
-    
+
     ; for H mode
     SSE_DB_1_2REG  xmm6, xmm7
     mov       eax,  [esp+16]
@@ -1422,33 +1422,33 @@ not_dc:
 
 	movzx     ecx,  byte [eax+ebx-1]
 	movd      xmm1, ecx
-    pmuludq   xmm1, xmm6 
+    pmuludq   xmm1, xmm6
 %if 1
     punpckldq xmm0, xmm1
-%else    
+%else
 	unpcklps  xmm0,	xmm1
 %endif
 	lea       eax,	[eax+ebx*2]
 	movzx	  ecx,	byte [eax-1]
 	movd	  xmm2,	ecx
-    pmuludq   xmm2, xmm6  
+    pmuludq   xmm2, xmm6
 
 	movzx	  ecx,	byte [eax+ebx-1]
-	movd	  xmm3,	ecx	
-    pmuludq   xmm3, xmm6  
+	movd	  xmm3,	ecx
+    pmuludq   xmm3, xmm6
 %if 1
     punpckldq  xmm2, xmm3
     punpcklqdq xmm0, xmm2
 %else
 	unpcklps  xmm2,	xmm3
 	unpcklpd  xmm0,	xmm2
-%endif	
+%endif
 	movdqa	  [edx],xmm0
-	
+
 	mov       eax, edi
     mov       ebx, [esp+36]
 	mov       dword [ebx], 0x01
-    
+
     pop       edi
     pop       esi
     pop       ebx
@@ -1460,14 +1460,14 @@ not_dc_h:
 	movd	  xmm0,	[eax]
 	pshufd	  xmm0,	xmm0, 0
 	movdqa	  [edx],xmm0
-	
+
 	mov       eax, esi
     mov       ebx, [esp+36]
 	mov       dword [ebx], 0x00
-    
+
     pop       edi
     pop       esi
     pop       ebx
     ret
-    
+
 

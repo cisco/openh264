@@ -43,7 +43,7 @@
 ; Options, for DEBUG
 ;***********************************************************************
 
-%if 1 
+%if 1
 	%define MOVDQ movdqa
 %else
 	%define MOVDQ movdqu
@@ -58,7 +58,7 @@
 BITS 32
 
 ;***********************************************************************
-; Macros 
+; Macros
 ;***********************************************************************
 
 %macro WELS_EXTERN 1
@@ -74,7 +74,7 @@ BITS 32
 	pxor        %2, %2
     psubw       %2, %1
     pmaxsw      %1, %2
-%endmacro 	
+%endmacro
 
 %macro MMX_XSwap  4
     movq		%4, %2
@@ -105,7 +105,7 @@ BITS 32
     SSE2_XSawp qdq, %5, %2, %3
 %endmacro
 
-;in: xmm0, xmm1, xmm2, xmm3  pOut:  xmm0, xmm1, xmm3, xmm4 
+;in: xmm0, xmm1, xmm2, xmm3  pOut:  xmm0, xmm1, xmm3, xmm4
 %macro SSE2_TransTwo4x4W 5
     SSE2_XSawp wd,  %1, %2, %5
     SSE2_XSawp wd,  %3, %4, %2
@@ -125,26 +125,26 @@ BITS 32
 	movdqa	%6, %9
 	movdqa	%9, %4
 	SSE2_XSawp bw,  %7, %6, %4
-	
-	SSE2_XSawp wd,  %1, %3, %6	
+
+	SSE2_XSawp wd,  %1, %3, %6
 	SSE2_XSawp wd,  %8, %2, %3
 	SSE2_XSawp wd,  %5, %7, %2
 	movdqa	%7, %9
-	movdqa	%9, %3	
+	movdqa	%9, %3
 	SSE2_XSawp wd,  %7, %4, %3
-	
-	SSE2_XSawp dq,  %1, %5, %4	
+
+	SSE2_XSawp dq,  %1, %5, %4
 	SSE2_XSawp dq,  %6, %2, %5
 	SSE2_XSawp dq,  %8, %7, %2
 	movdqa	%7, %9
-	movdqa	%9, %5		
+	movdqa	%9, %5
 	SSE2_XSawp dq,  %7, %3, %5
-	
+
 	SSE2_XSawp qdq,  %1, %8, %3
 	SSE2_XSawp qdq,  %4, %2, %8
 	SSE2_XSawp qdq,  %6, %7, %2
 	movdqa	%7, %9
-	movdqa	%9, %1		
+	movdqa	%9, %1
 	SSE2_XSawp qdq,  %7, %5, %1
 	movdqa	%5, %9
 %endmacro
@@ -170,9 +170,9 @@ BITS 32
 %macro butterfly_1to16_sse	3	; xmm? for dst, xmm? for tmp, one byte for pSrc [generic register name: a/b/c/d]
 	mov %3h, %3l
 	movd %1, e%3x		; i.e, 1% = eax (=b0)
-	pshuflw %2, %1, 00h	; ..., b0 b0 b0 b0 b0 b0 b0 b0	
-	pshufd %1, %2, 00h	; b0 b0 b0 b0, b0 b0 b0 b0, b0 b0 b0 b0, b0 b0 b0 b0	
-%endmacro  
+	pshuflw %2, %1, 00h	; ..., b0 b0 b0 b0 b0 b0 b0 b0
+	pshufd %1, %2, 00h	; b0 b0 b0 b0, b0 b0 b0 b0, b0 b0 b0 b0, b0 b0 b0 b0
+%endmacro
 
 ;copy a dw into a xmm for 8 times
 %macro  SSE2_Copy8Times 2

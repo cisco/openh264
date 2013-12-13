@@ -38,7 +38,7 @@
 ;*      04/14/2010	Created
 ;*		06/07/2010	Added AnalysisVaaInfoIntra_sse2(ssse3)
 ;*		06/10/2010	Tune rc_sad_frame_sse2 and got about 40% improvement
-;*		08/11/2010	Added abs_difference_mbrow_sse2 & sum_sqrsum_mbrow_sse2 
+;*		08/11/2010	Added abs_difference_mbrow_sse2 & sum_sqrsum_mbrow_sse2
 ;*
 ;*************************************************************************/
 %include "asm_inc.asm"
@@ -167,7 +167,7 @@ AnalysisVaaInfoIntra_sse2:
 	mov ebp, esp
 	and ebp, 0fh
 	sub esp, ebp
-	sub esp, 32	
+	sub esp, 32
 	%define PUSH_SIZE	52	; 20 + 32
 
 	mov esi, [esp+ebp+PUSH_SIZE+4]	; data_y
@@ -179,31 +179,31 @@ AnalysisVaaInfoIntra_sse2:
 	add edx, ecx		; iLineSize x 3 [edx]
 	mov eax, ebx
 	sal eax, $1			; iLineSize x 4 [eax]
-	
+
 	pxor xmm7, xmm7
-	
+
 	; loops
 	VAA_AVG_BLOCK_SSE2 xmm0, xmm1, xmm2, xmm3, xmm4, xmm5
-	movq [esp], xmm0	
+	movq [esp], xmm0
 
 	lea esi, [esi+eax]
 	VAA_AVG_BLOCK_SSE2 xmm0, xmm1, xmm2, xmm3, xmm4, xmm5
-	movq [esp+8], xmm0	
+	movq [esp+8], xmm0
 
 	lea esi, [esi+eax]
 	VAA_AVG_BLOCK_SSE2 xmm0, xmm1, xmm2, xmm3, xmm4, xmm5
-	movq [esp+16], xmm0	
+	movq [esp+16], xmm0
 
 	lea esi, [esi+eax]
 	VAA_AVG_BLOCK_SSE2 xmm0, xmm1, xmm2, xmm3, xmm4, xmm5
 	movq [esp+24], xmm0
-		
+
 	movdqa xmm0, [esp]		; block 0~7
 	movdqa xmm1, [esp+16]	; block 8~15
 	movdqa xmm2, xmm0
 	paddw xmm0, xmm1
 	SUM_WORD_8x2_SSE2 xmm0, xmm3
-	
+
 	pmullw xmm1, xmm1
 	pmullw xmm2, xmm2
 	movdqa xmm3, xmm1
@@ -219,7 +219,7 @@ AnalysisVaaInfoIntra_sse2:
 	paddd xmm1, xmm2
 	pshufd xmm2, xmm1, 0B1h
 	paddd xmm1, xmm2
-	
+
 	movd ebx, xmm0
 	and ebx, 0ffffh		; effective low word truncated
 	mov ecx, ebx
@@ -227,7 +227,7 @@ AnalysisVaaInfoIntra_sse2:
 	sar ebx, $4
 	movd eax, xmm1
 	sub eax, ebx
-	
+
 	%undef PUSH_SIZE
 	add esp, 32
 	add esp, ebp
@@ -253,7 +253,7 @@ AnalysisVaaInfoIntra_ssse3:
 	mov ebp, esp
 	and ebp, 0fh
 	sub esp, ebp
-	sub esp, 32	
+	sub esp, 32
 	%define PUSH_SIZE	52	; 20 + 32
 
 	mov esi, [esp+ebp+PUSH_SIZE+4]	; data_y
@@ -265,25 +265,25 @@ AnalysisVaaInfoIntra_ssse3:
 	add edx, ecx		; iLineSize x 3 [edx]
 	mov eax, ebx
 	sal eax, $1			; iLineSize x 4 [eax]
-	
+
 	pxor xmm7, xmm7
-	
+
 	; loops
 	VAA_AVG_BLOCK_SSSE3 xmm0, xmm1, xmm2, xmm3, xmm4, xmm5
-	movq [esp], xmm0	
+	movq [esp], xmm0
 
 	lea esi, [esi+eax]
 	VAA_AVG_BLOCK_SSSE3 xmm1, xmm2, xmm3, xmm4, xmm5, xmm6
-	movq [esp+8], xmm1	
+	movq [esp+8], xmm1
 
 	lea esi, [esi+eax]
 	VAA_AVG_BLOCK_SSSE3 xmm0, xmm1, xmm2, xmm3, xmm4, xmm5
-	movq [esp+16], xmm0	
+	movq [esp+16], xmm0
 
 	lea esi, [esi+eax]
 	VAA_AVG_BLOCK_SSSE3 xmm1, xmm2, xmm3, xmm4, xmm5, xmm6
 	movq [esp+24], xmm1
-		
+
 	movdqa xmm0, [esp]		; block 0~7
 	movdqa xmm1, [esp+16]	; block 8~15
 	movdqa xmm2, xmm0
@@ -305,7 +305,7 @@ AnalysisVaaInfoIntra_ssse3:
 	paddd xmm1, xmm2
 	pshufd xmm2, xmm1, 0B1h
 	paddd xmm1, xmm2
-	
+
 	movd ebx, xmm0
 	and ebx, 0ffffh		; effective low work truncated
 	mov ecx, ebx
@@ -313,7 +313,7 @@ AnalysisVaaInfoIntra_ssse3:
 	sar ebx, $4
 	movd eax, xmm1
 	sub eax, ebx
-	
+
 	%undef PUSH_SIZE
 	add esp, 32
 	add esp, ebp
@@ -323,7 +323,7 @@ AnalysisVaaInfoIntra_ssse3:
 	pop edx
 	pop ebx
 	ret
-	
+
 WELS_EXTERN MdInterAnalysisVaaInfo_sse41
 ;***********************************************************************
 ;	uint8_t MdInterAnalysisVaaInfo_sse41( int32_t *pSad8x8 )
@@ -331,18 +331,18 @@ WELS_EXTERN MdInterAnalysisVaaInfo_sse41
 ALIGN 16
 MdInterAnalysisVaaInfo_sse41:
 	mov eax, [esp+4]
-	movdqa xmm0, [eax]	; load 4 sad_8x8	
+	movdqa xmm0, [eax]	; load 4 sad_8x8
 	pshufd xmm1, xmm0, 01Bh
 	paddd xmm1, xmm0
 	pshufd xmm2, xmm1, 0B1h
-	paddd xmm1, xmm2	
+	paddd xmm1, xmm2
 	psrad xmm1, 02h		; iAverageSad
 	movdqa xmm2, xmm1
 	psrad xmm2, 06h
 	movdqa xmm3, xmm0	; iSadBlock
 	psrad xmm3, 06h
 	psubd xmm3, xmm2
-	pmulld xmm3, xmm3	; [comment]: pmulld from SSE4.1 instruction sets	
+	pmulld xmm3, xmm3	; [comment]: pmulld from SSE4.1 instruction sets
 	pshufd xmm4, xmm3, 01Bh
 	paddd xmm4, xmm3
 	pshufd xmm3, xmm4, 0B1h
@@ -354,7 +354,7 @@ MdInterAnalysisVaaInfo_sse41:
 	pcmpgtd xmm0, xmm1	; iSadBlock > iAverageSad
 	movmskps eax, xmm0
 	ret
-.threshold_exit:	
+.threshold_exit:
 	mov eax, 15
 	ret
 
@@ -365,28 +365,28 @@ WELS_EXTERN MdInterAnalysisVaaInfo_sse2
 ALIGN 16
 MdInterAnalysisVaaInfo_sse2:
 	mov eax, [esp+4]
-	movdqa xmm0, [eax]	; load 4 sad_8x8	
+	movdqa xmm0, [eax]	; load 4 sad_8x8
 	pshufd xmm1, xmm0, 01Bh
 	paddd xmm1, xmm0
 	pshufd xmm2, xmm1, 0B1h
-	paddd xmm1, xmm2	
+	paddd xmm1, xmm2
 	psrad xmm1, 02h		; iAverageSad
 	movdqa xmm2, xmm1
 	psrad xmm2, 06h
 	movdqa xmm3, xmm0	; iSadBlock
 	psrad xmm3, 06h
 	psubd xmm3, xmm2
-	
+
 	; to replace pmulld functionality as below
-	movdqa xmm2, xmm3	
+	movdqa xmm2, xmm3
 	pmuludq xmm2, xmm3
 	pshufd xmm4, xmm3, 0B1h
 	pmuludq xmm4, xmm4
 	movdqa xmm5, xmm2
 	punpckldq xmm5, xmm4
 	punpckhdq xmm2, xmm4
-	punpcklqdq xmm5, xmm2	
-	
+	punpcklqdq xmm5, xmm2
+
 	pshufd xmm4, xmm5, 01Bh
 	paddd xmm4, xmm5
 	pshufd xmm5, xmm4, 0B1h
@@ -398,6 +398,6 @@ MdInterAnalysisVaaInfo_sse2:
 	pcmpgtd xmm0, xmm1	; iSadBlock > iAverageSad
 	movmskps eax, xmm0
 	ret
-.threshold_exit:	
+.threshold_exit:
 	mov eax, 15
 	ret

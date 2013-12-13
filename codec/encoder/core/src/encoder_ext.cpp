@@ -1772,7 +1772,7 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
 
 #if defined(MEMORY_MONITOR)
     assert (pMa->WelsGetMemoryUsage() == 0);	// ensure all memory free well
-#endif//MEMORY_MONITOR		
+#endif//MEMORY_MONITOR
 
     if ((*ppCtx)->pMemAlign != NULL) {
       WelsLog (NULL, WELS_LOG_INFO, "FreeMemorySvc(), verify memory usage (%d bytes) after free..\n",
@@ -2030,7 +2030,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
 
   uiCpuCores	= pCodingParam->iMultipleThreadIdc;	// assigned uiCpuCores from iMultipleThreadIdc from SGE testing
 
-#endif//WELS_TESTBED	
+#endif//WELS_TESTBED
 
   uiCpuCores	= WELS_CLIP3 (uiCpuCores, 1, MAX_THREADS_NUM);
 
@@ -3522,7 +3522,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
                    (pCtx->eSliceType == P_SLICE ? 'P' : 'I'),
                    eNalRefIdc,
                    iSliceSize);
-#endif//SLICE_INFO_OUTPUT						
+#endif//SLICE_INFO_OUTPUT
           ++ iNalIdxInLayer;
           ++ iSliceIdx;
         }
@@ -3758,7 +3758,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
 
 #if defined(X86_ASM)
   WelsEmms();
-#endif //X86_ASM	
+#endif //X86_ASM
 
   return eFrameType;
 }

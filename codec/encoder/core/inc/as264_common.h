@@ -50,7 +50,7 @@ $(TargetPath)
 /****************************************************************************
  * Options for algorithm, usually change bitrate
  ****************************************************************************/
-#define DISABLE_FMO_FEATURE	// 
+#define DISABLE_FMO_FEATURE	//
 
 /****************************************************************************
  * Options for optimization, not change bitrate

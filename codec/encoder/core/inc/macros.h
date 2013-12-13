@@ -86,7 +86,7 @@ namespace WelsSVCEnc {
 #define __FASTCALL    __attribute__ ((fastcall))
 #else
 #define __FASTCALL	// mean NULL for mac ppc
-#endif//MAC_POWERPC    
+#endif//MAC_POWERPC
 #define ALIGNED_DECLARE( type, var, n ) type var __attribute__((aligned(n)))
 #define __align8(t,v) t v __attribute__ ((aligned (8)))
 #define __align16(t,v) t v __attribute__ ((aligned (16)))

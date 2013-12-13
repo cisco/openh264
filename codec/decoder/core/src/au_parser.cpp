@@ -672,7 +672,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     pCtx->iSpsTotalNum    = 0;
     pCtx->iSubspsTotalNum = 0;
     pCtx->iPpsTotalNum    = 0;
-#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID		
+#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
   }
 
   uiProfileIdc	= BsGetBits (pBs, 8);
@@ -705,7 +705,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     pSubsetSps	= &pCtx->sSubsetSpsBuffer[iSpsId];
     pSps		= &pSubsetSps->sSps;
     pCtx->bSubspsAvailFlags[iSpsId]	= true; // added for EC, 10/28/2009
-#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID			
+#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
   } else {
 #ifdef MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
     pSps = &pCtx->sSpsBuffer[pCtx->iSpsTotalNum];
@@ -716,7 +716,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
 #else
     pSps = &pCtx->sSpsBuffer[iSpsId];
     pCtx->bSpsAvailFlags[iSpsId] = true; // added for EC, 10/28/2009
-#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID		
+#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
   }
 
   // syntax elements in default
@@ -858,7 +858,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux)
   pPps = &pPpsList[pCtx->iPpsTotalNum];
 #else
   pPps = &pPpsList[uiPpsId];
-#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID	
+#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
 
 
   pPps->iPpsId = uiPpsId;
