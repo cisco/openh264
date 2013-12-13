@@ -58,6 +58,8 @@ H264ENC_LDFLAGS = -L. -lencoder -lprocessing -lcommon
 
 CODEC_UNITTEST_LDFLAGS = -L. -lgtest -ldecoder -lcommon
 
+.PHONY: test
+
 all:	libraries binaries
 
 clean:
@@ -66,6 +68,9 @@ clean:
 
 gtest-bootstrap:
 	svn co https://googletest.googlecode.com/svn/trunk/ gtest
+
+test:
+	./codec_unittest
 
 include codec/common/targets.mk
 include codec/decoder/targets.mk
