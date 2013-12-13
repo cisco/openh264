@@ -119,103 +119,6 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory=".\..\..\..\..\bin\win32\Debug"
-			IntermediateDirectory=".\..\..\..\obj\decoder\plus\debug"
-			ConfigurationType="2"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="true"
-				SuppressStartupBanner="true"
-				TargetEnvironment="1"
-				TypeLibraryName=".\..\..\..\..\..\bin\win32\Debug/WelsDecPlus.tlb"
-				HeaderFileName=""
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;WELSDECPLUS_EXPORTS;HAVE_CACHE_LINE_ALIGN"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				PrecompiledHeaderFile=".\..\..\..\obj\decoder\plus\debug/WelsDecPlus.pch"
-				AssemblerListingLocation=".\..\..\..\obj\decoder\plus\debug/"
-				ObjectFile=".\..\..\..\obj\decoder\plus\debug/"
-				ProgramDataBaseFileName=".\..\..\..\obj\decoder\plus\debug/"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
-				DebugInformationFormat="4"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies=".\..\..\..\..\bin\win32\Debug\welsdcore.lib"
-				OutputFile="$(OutDir)\welsdec.dll"
-				LinkIncremental="1"
-				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\..\libs\debug"
-				ModuleDefinitionFile="..\..\..\decoder\plus\src\wels_dec_export.def"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\..\..\..\bin\win32\Debug/welsdec.pdb"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="2"
-				ImportLibrary="$(OutDir)\welsdec.lib"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
-				OutputFile=".\..\..\..\..\bin\win32\Debug/WelsDecPlus.bsc"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
 			Name="Release|x64"
 			OutputDirectory="..\..\..\..\bin\win64\Release"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
@@ -304,6 +207,103 @@
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
 				OutputFile=".\..\..\..\..\bin\win32\Release/WelsDecPlus.bsc"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory=".\..\..\..\..\bin\win32\Debug"
+			IntermediateDirectory=".\..\..\..\obj\decoder\plus\debug"
+			ConfigurationType="2"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName=".\..\..\..\..\..\bin\win32\Debug/WelsDecPlus.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;WELSDECPLUS_EXPORTS;HAVE_CACHE_LINE_ALIGN"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				PrecompiledHeaderFile=".\..\..\..\obj\decoder\plus\debug/WelsDecPlus.pch"
+				AssemblerListingLocation=".\..\..\..\obj\decoder\plus\debug/"
+				ObjectFile=".\..\..\..\obj\decoder\plus\debug/"
+				ProgramDataBaseFileName=".\..\..\..\obj\decoder\plus\debug/"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="4"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies=".\..\..\..\..\bin\win32\Debug\welsdcore.lib"
+				OutputFile="$(OutDir)\welsdec.dll"
+				LinkIncremental="1"
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\..\..\libs\debug"
+				ModuleDefinitionFile="..\..\..\decoder\plus\src\wels_dec_export.def"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile=".\..\..\..\..\bin\win32\Debug/welsdec.pdb"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="2"
+				ImportLibrary="$(OutDir)\welsdec.lib"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+				OutputFile=".\..\..\..\..\bin\win32\Debug/WelsDecPlus.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -423,46 +423,6 @@
 				Name="Resource Files"
 				Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 				>
-				<File
-					RelativePath="..\..\..\decoder\plus\res\welsdec.rc"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCResourceCompilerTool"
-							PreprocessorDefinitions=""
-							AdditionalIncludeDirectories="\SVN_project_https\trunk\codec\Wels\project\decoder\plus\res"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCResourceCompilerTool"
-							PreprocessorDefinitions=""
-							AdditionalIncludeDirectories="\SVN_project_https\trunk\codec\Wels\project\decoder\plus\res"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|x64"
-						>
-						<Tool
-							Name="VCResourceCompilerTool"
-							PreprocessorDefinitions=""
-							AdditionalIncludeDirectories="\SVN_project_https\trunk\codec\Wels\project\decoder\plus\res"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|x64"
-						>
-						<Tool
-							Name="VCResourceCompilerTool"
-							PreprocessorDefinitions=""
-							AdditionalIncludeDirectories="\SVN_project_https\trunk\codec\Wels\project\decoder\plus\res"
-						/>
-					</FileConfiguration>
-				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
@@ -485,7 +445,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Win32"
+						Name="Release|x64"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
@@ -494,7 +454,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Release|x64"
+						Name="Debug|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
@@ -525,7 +485,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Win32"
+						Name="Release|x64"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
@@ -534,7 +494,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Release|x64"
+						Name="Debug|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"

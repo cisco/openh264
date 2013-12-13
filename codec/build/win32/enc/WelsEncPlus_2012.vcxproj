@@ -306,14 +306,6 @@
     <ClInclude Include="..\..\..\encoder\plus\inc\welsEncoderExt.h" />
     <ClInclude Include="..\..\..\encoder\plus\inc\welsCodecTrace.h" />
   </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="..\..\..\encoder\plus\res\welsenc.rc">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\Project\svc_perf_opt_b\codec\Wels\project\encoder\plus\res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">\Project\svc_perf_opt_b\codec\Wels\project\encoder\plus\res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">\Project\svc_perf_opt_b\codec\Wels\project\encoder\plus\res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">\Project\svc_perf_opt_b\codec\Wels\project\encoder\plus\res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

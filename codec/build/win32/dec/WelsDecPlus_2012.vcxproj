@@ -286,14 +286,6 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\..\decoder\plus\res\welsdec.rc">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\SVN_project_https\trunk\codec\Wels\project\decoder\plus\res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">\SVN_project_https\trunk\codec\Wels\project\decoder\plus\res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">\SVN_project_https\trunk\codec\Wels\project\decoder\plus\res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">\SVN_project_https\trunk\codec\Wels\project\decoder\plus\res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\..\decoder\plus\src\welsCodecTrace.cpp" />
     <ClCompile Include="..\..\..\decoder\plus\src\welsDecoderExt.cpp" />
   </ItemGroup>

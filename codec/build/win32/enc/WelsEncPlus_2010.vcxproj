@@ -316,18 +316,6 @@
     <ClInclude Include="..\..\..\encoder\plus\inc\welsEncoderExt.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\..\encoder\plus\res\welsenc.rc">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\Project\svc_perf_opt_b\codec\Wels\project\encoder\plus\res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">\Project\svc_perf_opt_b\codec\Wels\project\encoder\plus\res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">\Project\svc_perf_opt_b\codec\Wels\project\encoder\plus\res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">\Project\svc_perf_opt_b\codec\Wels\project\encoder\plus\res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="WelsEncCore_2010.vcxproj">
       <Project>{59208004-1774-4816-ac24-31ff44c324b4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
