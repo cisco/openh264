@@ -61,7 +61,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\console\enc\inc;..\..\..\api\svc;..\..\..\WelsThreadLib\api;..\..\..\encoder\core\inc;..\..\..\common\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\console\enc\inc;..\..\..\api\svc;..\..\..\WelsThreadLib\api;..\..\..\encoder\core\inc;..\..\..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;ENCODER_CORE;X86_ASM;MT_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -105,7 +105,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\console\enc\inc;..\..\..\api\svc;..\..\..\WelsThreadLib\api;..\..\..\encoder\core\inc;..\..\..\common\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\console\enc\inc;..\..\..\api\svc;..\..\..\WelsThreadLib\api;..\..\..\encoder\core\inc;..\..\..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;ENCODER_CORE;X86_ASM;MT_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -147,12 +147,13 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\console\enc\src\read_config.cpp" />
     <ClCompile Include="..\..\..\console\enc\src\welsenc.cpp" />
+    <ClCompile Include="..\..\..\common\logging.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\console\enc\inc\read_config.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="WelsEncPlus.vcxproj">
+    <ProjectReference Include="WelsEncPlus_2012.vcxproj">
       <Project>{1e7b4e9a-986e-4167-8c70-6e4f60eaee7f}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

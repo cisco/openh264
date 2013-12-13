@@ -58,62 +58,61 @@ namespace WelsDec {
 
 //#define OUTPUT_BIT_STREAM  ////for test to output bitstream
 
-class CWelsDecoder : public ISVCDecoder  
-{
-public:
-	CWelsDecoder(void_t);
-	virtual ~CWelsDecoder();
+class CWelsDecoder : public ISVCDecoder {
+ public:
+CWelsDecoder (void_t);
+virtual ~CWelsDecoder();
 
-	virtual long Initialize(void_t* pParam, const INIT_TYPE keInitType);
-	virtual long Unintialize();		
-	
-	/***************************************************************************
-	*	Description:
-	*		Decompress one frame, and output RGB24 or YV12 decoded stream and its length.
-	*	Input parameters:
-	*       Parameter		TYPE			       Description
-	*       pSrc             unsigned char*         the h264 stream to decode
-	*       srcLength       int                    the length of h264 steam
-	*       pDst             unsigned char*         buffer pointer of decoded data
-	*       pDstInfo        SBufferInfo&           information provided to API including width, height, SW/HW option, etc
-	*
-	*	return: if decode frame success return 0, otherwise corresponding error returned.
-	/***************************************************************************/
-	virtual DECODING_STATE DecodeFrame(	const unsigned char* kpSrc,
-		                                const int kiSrcLen,	
-		                                unsigned char** ppDst,
-		                                int* pStride,
-		                                int& iWidth,
-		                                int& iHeight	);
+virtual long Initialize (void_t* pParam, const INIT_TYPE keInitType);
+virtual long Uninitialize();
 
-	virtual DECODING_STATE DecodeFrame(	const unsigned char* kpSrc,
-											const int kiSrcLen,	
-											void_t ** ppDst,
-											SBufferInfo* pDstInfo);
-	virtual DECODING_STATE DecodeFrameEx( const unsigned char * kpSrc,
-		                                  const int kiSrcLen,
-		                                  unsigned char * pDst,
-										  int iDstStride,
-		                                  int & iDstLen,
-		                                  int & iWidth,
-		                                  int & iHeight,
-		                                  int & color_format);
+/***************************************************************************
+*	Description:
+*		Decompress one frame, and output RGB24 or YV12 decoded stream and its length.
+*	Input parameters:
+*       Parameter		TYPE			       Description
+*       pSrc             unsigned char*         the h264 stream to decode
+*       srcLength       int                    the length of h264 steam
+*       pDst             unsigned char*         buffer pointer of decoded data
+*       pDstInfo        SBufferInfo&           information provided to API including width, height, SW/HW option, etc
+*
+*	return: if decode frame success return 0, otherwise corresponding error returned.
+/***************************************************************************/
+virtual DECODING_STATE DecodeFrame (const unsigned char* kpSrc,
+                                    const int kiSrcLen,
+                                    unsigned char** ppDst,
+                                    int* pStride,
+                                    int& iWidth,
+                                    int& iHeight);
 
-    virtual long SetOption(DECODER_OPTION eOptID, void_t* pOption);
-	virtual long GetOption(DECODER_OPTION eOptID, void_t* pOption);
+virtual DECODING_STATE DecodeFrame (const unsigned char* kpSrc,
+                                    const int kiSrcLen,
+                                    void_t** ppDst,
+                                    SBufferInfo* pDstInfo);
+virtual DECODING_STATE DecodeFrameEx (const unsigned char* kpSrc,
+                                      const int kiSrcLen,
+                                      unsigned char* pDst,
+                                      int iDstStride,
+                                      int& iDstLen,
+                                      int& iWidth,
+                                      int& iHeight,
+                                      int& color_format);
 
-private:	
-	PWelsDecoderContext 				m_pDecContext;
-	IWelsTrace							*m_pTrace;
-	
-	void_t InitDecoder( void_t );
-	void_t UninitDecoder( void_t );
-	
+virtual long SetOption (DECODER_OPTION eOptID, void_t* pOption);
+virtual long GetOption (DECODER_OPTION eOptID, void_t* pOption);
+
+ private:
+PWelsDecoderContext 				m_pDecContext;
+IWelsTrace*							m_pTrace;
+
+void_t InitDecoder (void_t);
+void_t UninitDecoder (void_t);
+
 #ifdef OUTPUT_BIT_STREAM
-	WelsFileHandle* m_pFBS;
-	WelsFileHandle* m_pFBSSize;
+WelsFileHandle* m_pFBS;
+WelsFileHandle* m_pFBSSize;
 #endif//OUTPUT_BIT_STREAM
-	
+
 };
 
 } // namespace WelsDec

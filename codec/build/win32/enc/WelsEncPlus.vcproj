@@ -49,7 +49,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\encoder\plus\inc;..\..\..\encoder\core\inc;..\..\..\api\svc;..\..\..\WelsThreadLib\api"
+				AdditionalIncludeDirectories="..\..\..\encoder\plus\inc;..\..\..\encoder\core\inc;..\..\..\api\svc;..\..\..\common;..\..\..\WelsThreadLib\api"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;WELSENCPLUS_EXPORTS;ENCODER_CORE;HAVE_CACHE_LINE_ALIGN;MT_ENABLED;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -152,7 +152,7 @@
 				FavorSizeOrSpeed="1"
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\..\encoder\plus\inc;..\..\..\encoder\core\inc;..\..\..\api\svc;..\..\..\WelsThreadLib\api"
+				AdditionalIncludeDirectories="..\..\..\encoder\plus\inc;..\..\..\encoder\core\inc;..\..\..\api\svc;..\..\..\common;..\..\..\WelsThreadLib\api"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;WELSENCPLUS_EXPORTS;ENCODER_CORE;HAVE_CACHE_LINE_ALIGN;MT_ENABLED;"
 				StringPooling="true"
 				RuntimeLibrary="2"

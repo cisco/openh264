@@ -45,37 +45,34 @@
 #include "wels_const.h"
 using namespace std;
 
-typedef struct tagFilesSet
-{
-	string strBsFile;
-	string strSeqFile;	// for cmd lines
-	struct
-	{
-		string strLayerCfgFile;
-		string strSeqFile;
-	} sSpatialLayers[MAX_DEPENDENCY_LAYER];
+typedef struct tagFilesSet {
+  string strBsFile;
+  string strSeqFile;	// for cmd lines
+  struct {
+    string strLayerCfgFile;
+    string strSeqFile;
+  } sSpatialLayers[MAX_DEPENDENCY_LAYER];
 } SFilesSet;
 
 
-class CReadConfig
-{
-public:
-	CReadConfig();
-	CReadConfig( const char *pConfigFileName );
-	CReadConfig( const string& pConfigFileName );
-	virtual ~CReadConfig();
-	
-	void Openf(const char * strFile);
-	long ReadLine( string* strVal, const int iValSize = 4 );
-	const bool EndOfFile();
-	const int GetLines();
-	const bool ExistFile();
-	const string& GetFileName();
-	
-private:
-	FILE			*m_pCfgFile;
-	string			m_strCfgFileName;
-	unsigned long	m_iLines;
+class CReadConfig {
+ public:
+  CReadConfig();
+  CReadConfig (const char* pConfigFileName);
+  CReadConfig (const string& pConfigFileName);
+  virtual ~CReadConfig();
+
+  void Openf (const char* strFile);
+  long ReadLine (string* strVal, const int iValSize = 4);
+  const bool EndOfFile();
+  const int GetLines();
+  const bool ExistFile();
+  const string& GetFileName();
+
+ private:
+  FILE*			m_pCfgFile;
+  string			m_strCfgFileName;
+  unsigned long	m_iLines;
 };
 
 #endif	// READ_CONFIG_H__

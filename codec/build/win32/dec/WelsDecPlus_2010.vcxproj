@@ -67,7 +67,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;WELSDECPLUS_EXPORTS;HAVE_CACHE_LINE_ALIGN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -116,7 +116,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;WELSDECPLUS_EXPORTS;HAVE_CACHE_LINE_ALIGN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>

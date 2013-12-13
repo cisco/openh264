@@ -61,45 +61,44 @@
  * \return	time elapsed since run (unit: microsecond)
  */
 
-static inline int64_t WelsTime()
-{
+static inline int64_t WelsTime() {
 #if !(defined(_MSC_VER) || defined(__MINGW32__))
-	struct timeval tv_date;
-	
-	gettimeofday( &tv_date, NULL );
-	return( (int64_t) tv_date.tv_sec * 1000000 + (int64_t) tv_date.tv_usec );
+struct timeval tv_date;
+
+gettimeofday (&tv_date, NULL);
+return ((int64_t) tv_date.tv_sec * 1000000 + (int64_t) tv_date.tv_usec);
 #else
-#if defined (WIN32)	
-	static int64_t iMeasureTimeFreq = 0;
+#if defined (WIN32)
+static int64_t iMeasureTimeFreq = 0;
 //	static BOOL_T support_high_resolution_perf_flag = TRUE;
-	int64_t iMeasureTimeCur = 0;
-	int64_t iResult = 0;	
-	if ( 0 == iMeasureTimeFreq ){
-		// Per MSDN minimum supported OS is Windows 2000 Professional/Server above for high-resolution performance counter
-		/*BOOL_T ret = */QueryPerformanceFrequency((LARGE_INTEGER *)&iMeasureTimeFreq);
+int64_t iMeasureTimeCur = 0;
+int64_t iResult = 0;
+if (0 == iMeasureTimeFreq) {
+  // Per MSDN minimum supported OS is Windows 2000 Professional/Server above for high-resolution performance counter
+  /*BOOL_T ret = */QueryPerformanceFrequency ((LARGE_INTEGER*)&iMeasureTimeFreq);
 //		if ( !ret )	// the installed hardware can not support a high-resolution performance counter, we have to use others instead for well feature
 //		{
-//			support_high_resolution_perf_flag	= FALSE;			
+//			support_high_resolution_perf_flag	= FALSE;
 //		}
-		if ( !iMeasureTimeFreq )
-			iMeasureTimeFreq = 1;
-	}
+  if (!iMeasureTimeFreq)
+    iMeasureTimeFreq = 1;
+}
 //	if ( support_high_resolution_perf_flag )
 //	{
-		QueryPerformanceCounter((LARGE_INTEGER *)&iMeasureTimeCur);
-		iResult = (int64_t)((double)iMeasureTimeCur * 1e6 / (double)iMeasureTimeFreq + 0.5);
+QueryPerformanceCounter ((LARGE_INTEGER*)&iMeasureTimeCur);
+iResult = (int64_t) ((double)iMeasureTimeCur * 1e6 / (double)iMeasureTimeFreq + 0.5);
 //	}
 //	else
 //	{
-//		iResult = timeGetTime() * 1000;	// 10 ms precision		
-//	}	
-	return iResult;
-	
+//		iResult = timeGetTime() * 1000;	// 10 ms precision
+//	}
+return iResult;
+
 #else
-	struct _timeb tb;
-	
-	_ftime(&tb);
-	return ((int64_t)tb.time * (1000) + (int64_t)tb.millitm) * (1000);
+struct _timeb tb;
+
+_ftime (&tb);
+return ((int64_t)tb.time * (1000) + (int64_t)tb.millitm) * (1000);
 #endif//#if WIN32
 #endif//!(defined(_MSC_VER) || defined(__MINGW32__))
 }

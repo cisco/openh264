@@ -35,161 +35,147 @@
 #include "bundleloader.h"
 
 // entry API declaration
-typedef vResult (WELSAPI *pfnCreateVpInterface)  (void **, int );
-typedef vResult (WELSAPI *pfnDestroyVpInterface) (void * , int );
+typedef vResult (WELSAPI* pfnCreateVpInterface) (void**, int);
+typedef vResult (WELSAPI* pfnDestroyVpInterface) (void*, int);
 
 ////////////////////////////////////////////////////////
-void *loadlib()
-{
+void* loadlib() {
 #if defined(WIN32)
-	HMODULE shModule = LoadLibraryA("WelsVP.dll");
-	if (shModule == NULL)
-		shModule = LoadLibraryA("../WelsVP.dll");
+  HMODULE shModule = LoadLibraryA ("WelsVP.dll");
+  if (shModule == NULL)
+    shModule = LoadLibraryA ("../WelsVP.dll");
 
 #elif defined(MACOS)
-	const char WelsVPLib[] = "WelsVP.bundle";
-	CFBundleRef shModule = LoadBundle(WelsVPLib);
+  const char WelsVPLib[] = "WelsVP.bundle";
+  CFBundleRef shModule = LoadBundle (WelsVPLib);
 
 #elif defined(UNIX)
-	const char WelsVPLib[] = "WelsVP.so";
-	void* shModule = dlopen(WelsVPLib, RTLD_LAZY);
+  const char WelsVPLib[] = "WelsVP.so";
+  void* shModule = dlopen (WelsVPLib, RTLD_LAZY);
 #endif
 
-	return (void *)shModule;
+  return (void*)shModule;
 }
 
-void freelib(void *lib)
-{
-	if (lib)
-	{
+void freelib (void* lib) {
+  if (lib) {
 #ifdef WIN32
-		HMODULE shModule = (HMODULE)lib;
-		FreeLibrary(shModule);
+    HMODULE shModule = (HMODULE)lib;
+    FreeLibrary (shModule);
 
 #elif defined(MACOS)
-		CFBundleRef shModule = (CFBundleRef)lib;
-		FreeBundle(shModule);
+    CFBundleRef shModule = (CFBundleRef)lib;
+    FreeBundle (shModule);
 
 #elif defined(UNIX)
-		void* shModule = lib;
-		dlclose(shModule);
+    void* shModule = lib;
+    dlclose (shModule);
 #endif
-	}
+  }
 }
 
-void *queryfunc(void *lib, const char *name)
-{
-    void *pFunc = NULL;
+void* queryfunc (void* lib, const char* name) {
+  void* pFunc = NULL;
 #ifdef WIN32
-	HMODULE shModule = (HMODULE)lib;
-	pFunc = (void *)GetProcAddress(shModule, name);
+  HMODULE shModule = (HMODULE)lib;
+  pFunc = (void*)GetProcAddress (shModule, name);
 #elif defined(MACOS)
-	CFBundleRef shModule = (CFBundleRef)lib;
-	pFunc = (void *)GetProcessAddress(shModule, name);
+  CFBundleRef shModule = (CFBundleRef)lib;
+  pFunc = (void*)GetProcessAddress (shModule, name);
 #elif defined(UNIX)
-	void* shModule = lib;
-	pFunc = (void *)dlsym(shModule, name);
+  void* shModule = lib;
+  pFunc = (void*)dlsym (shModule, name);
 #endif
 
-	return pFunc;
+  return pFunc;
 }
 
-IWelsVpPlugin::IWelsVpPlugin(int &ret)
-: flag(0)
-, ivp(NULL)
-, hlib(NULL)
-{
-	pfnCreateVpInterface  pCreateVpInterface  = NULL;
-	pfnDestroyVpInterface pDestroyVpInterface = NULL;
-	iface[0] = iface[1] = NULL;
+IWelsVpPlugin::IWelsVpPlugin (int& ret)
+  : flag (0)
+  , ivp (NULL)
+  , hlib (NULL) {
+  pfnCreateVpInterface  pCreateVpInterface  = NULL;
+  pfnDestroyVpInterface pDestroyVpInterface = NULL;
+  iface[0] = iface[1] = NULL;
 
-	hlib  = loadlib();
-	if (!hlib)
-		goto exit;
+  hlib  = loadlib();
+  if (!hlib)
+    goto exit;
 
-	pCreateVpInterface  = (pfnCreateVpInterface)  queryfunc(hlib, ("CreateVpInterface"));
-	pDestroyVpInterface = (pfnDestroyVpInterface) queryfunc(hlib, ("DestroyVpInterface"));
-	if (!pCreateVpInterface || !pDestroyVpInterface)
-		goto exit;
-    
-	iface[0] = (void *) pCreateVpInterface;
-	iface[1] = (void *) pDestroyVpInterface;
-	pCreateVpInterface((void **)&ivp, WELSVP_INTERFACE_VERION);
-	if (!iface)
-		goto exit;
+  pCreateVpInterface  = (pfnCreateVpInterface)  queryfunc (hlib, ("CreateVpInterface"));
+  pDestroyVpInterface = (pfnDestroyVpInterface) queryfunc (hlib, ("DestroyVpInterface"));
+  if (!pCreateVpInterface || !pDestroyVpInterface)
+    goto exit;
 
-	ret = 0;
-	return;
+  iface[0] = (void*) pCreateVpInterface;
+  iface[1] = (void*) pDestroyVpInterface;
+  pCreateVpInterface ((void**)&ivp, WELSVP_INTERFACE_VERION);
+  if (!iface)
+    goto exit;
+
+  ret = 0;
+  return;
 
 exit:
-	ret = 1;
+  ret = 1;
 }
 
-IWelsVpPlugin::~IWelsVpPlugin()
-{
-	if (hlib)
-	{
-		pfnDestroyVpInterface pDestroyVpInterface = (pfnDestroyVpInterface) iface[1];
-		if (pDestroyVpInterface)
-			pDestroyVpInterface((void *)ivp, WELSVP_INTERFACE_VERION);
+IWelsVpPlugin::~IWelsVpPlugin() {
+  if (hlib) {
+    pfnDestroyVpInterface pDestroyVpInterface = (pfnDestroyVpInterface) iface[1];
+    if (pDestroyVpInterface)
+      pDestroyVpInterface ((void*)ivp, WELSVP_INTERFACE_VERION);
 
-		freelib(hlib);
-		hlib = NULL;
-	}
+    freelib (hlib);
+    hlib = NULL;
+  }
 }
 
-vResult IWelsVpPlugin::Init (int nType, void *pCfg)
-{
-	vResult ret = vRet_NotSupport;
-	if (hlib && nType > 0)
-		ret = ivp->Init(nType, pCfg);
-	return ret;
+vResult IWelsVpPlugin::Init (int nType, void* pCfg) {
+  vResult ret = vRet_NotSupport;
+  if (hlib && nType > 0)
+    ret = ivp->Init (nType, pCfg);
+  return ret;
 }
 
-vResult IWelsVpPlugin::Uninit (int nType)
-{
-	vResult ret = vRet_NotSupport;
-	if (hlib && nType > 0)
-		ret = ivp->Uninit(nType);
-	return ret; 
+vResult IWelsVpPlugin::Uninit (int nType) {
+  vResult ret = vRet_NotSupport;
+  if (hlib && nType > 0)
+    ret = ivp->Uninit (nType);
+  return ret;
 }
 
-vResult IWelsVpPlugin::Flush (int nType)
-{
-	vResult ret = vRet_NotSupport;
-	if (hlib && nType > 0)
-		ret = ivp->Flush(nType);
-	return ret; 	
+vResult IWelsVpPlugin::Flush (int nType) {
+  vResult ret = vRet_NotSupport;
+  if (hlib && nType > 0)
+    ret = ivp->Flush (nType);
+  return ret;
 }
 
-vResult IWelsVpPlugin::Process (int nType, vPixMap *src, vPixMap *dst)
-{
-	vResult ret = vRet_NotSupport;
-	if (hlib && nType > 0)
-		ret = ivp->Process(nType, src, dst);
-	return ret; 
+vResult IWelsVpPlugin::Process (int nType, vPixMap* src, vPixMap* dst) {
+  vResult ret = vRet_NotSupport;
+  if (hlib && nType > 0)
+    ret = ivp->Process (nType, src, dst);
+  return ret;
 }
 
-vResult IWelsVpPlugin::Get (int nType, void *pParam)
-{
-	vResult ret = vRet_NotSupport;
-	if (hlib && nType > 0)
-		ret = ivp->Get(nType, pParam);
-	return ret; 
+vResult IWelsVpPlugin::Get (int nType, void* pParam) {
+  vResult ret = vRet_NotSupport;
+  if (hlib && nType > 0)
+    ret = ivp->Get (nType, pParam);
+  return ret;
 }
 
-vResult IWelsVpPlugin::Set (int nType, void *pParam)
-{
-	vResult ret = vRet_NotSupport;
-	if (hlib && nType > 0)
-		ret = ivp->Set(nType, pParam);
-	return ret; 
+vResult IWelsVpPlugin::Set (int nType, void* pParam) {
+  vResult ret = vRet_NotSupport;
+  if (hlib && nType > 0)
+    ret = ivp->Set (nType, pParam);
+  return ret;
 }
 
-vResult IWelsVpPlugin::SpecialFeature (int nType, void *pIn, void *pOut)
-{
-	vResult ret = vRet_NotSupport;
-	if (hlib && nType > 0)
-		ret = ivp->SpecialFeature(nType, pIn, pOut);
-	return ret; 
+vResult IWelsVpPlugin::SpecialFeature (int nType, void* pIn, void* pOut) {
+  vResult ret = vRet_NotSupport;
+  if (hlib && nType > 0)
+    ret = ivp->SpecialFeature (nType, pIn, pOut);
+  return ret;
 }

@@ -38,57 +38,49 @@
 #include <dlfcn.h>
 #include <string>
 
-CFBundleRef LoadBundle(const char* lpBundlePath)
-{
-	if(lpBundlePath == NULL)
-	{
-		return NULL;
-	}
-	CFStringRef bundlePath = CFStringCreateWithCString(kCFAllocatorSystemDefault, lpBundlePath, CFStringGetSystemEncoding());
-	if(NULL == bundlePath)
-	{
-		return NULL;
-	}
+CFBundleRef LoadBundle (const char* lpBundlePath) {
+  if (lpBundlePath == NULL) {
+    return NULL;
+  }
+  CFStringRef bundlePath = CFStringCreateWithCString (kCFAllocatorSystemDefault, lpBundlePath,
+                           CFStringGetSystemEncoding());
+  if (NULL == bundlePath) {
+    return NULL;
+  }
 
-	CFURLRef bundleURL = CFURLCreateWithString(kCFAllocatorSystemDefault, bundlePath, NULL);
-	if(NULL == bundleURL)
-	{
-		return NULL;
-	}
+  CFURLRef bundleURL = CFURLCreateWithString (kCFAllocatorSystemDefault, bundlePath, NULL);
+  if (NULL == bundleURL) {
+    return NULL;
+  }
 
-	// 2.get bundle ref
-	CFBundleRef bundleRef = CFBundleCreate(kCFAllocatorSystemDefault, bundleURL);
-	CFRelease(bundleURL);
+  // 2.get bundle ref
+  CFBundleRef bundleRef = CFBundleCreate (kCFAllocatorSystemDefault, bundleURL);
+  CFRelease (bundleURL);
 
-	//	Boolean bReturn = FALSE;
-	if(NULL != bundleRef)
-	{
-		//	bReturn = CFBundleLoadExecutable(bundleRef);
-	}
+  //	Boolean bReturn = FALSE;
+  if (NULL != bundleRef) {
+    //	bReturn = CFBundleLoadExecutable(bundleRef);
+  }
 
-	return bundleRef;
+  return bundleRef;
 }
 
-Boolean FreeBundle(CFBundleRef bundleRef)
-{
-	if(NULL != bundleRef)
-	{
-		//	CFBundleUnloadExecutable(bundleRef);
-		CFRelease(bundleRef);
-	}
-	return TRUE;
+Boolean FreeBundle (CFBundleRef bundleRef) {
+  if (NULL != bundleRef) {
+    //	CFBundleUnloadExecutable(bundleRef);
+    CFRelease (bundleRef);
+  }
+  return TRUE;
 }
 
-void* GetProcessAddress(CFBundleRef bundleRef, const char* lpProcName)
-{
-	void *processAddress = NULL;
-	if(NULL != bundleRef)
-	{
-		CFStringRef cfProcName = CFStringCreateWithCString(kCFAllocatorSystemDefault, lpProcName, CFStringGetSystemEncoding());
-		processAddress = CFBundleGetFunctionPointerForName(bundleRef, cfProcName);
-		CFRelease(cfProcName);
-	}
-	return processAddress;
+void* GetProcessAddress (CFBundleRef bundleRef, const char* lpProcName) {
+  void* processAddress = NULL;
+  if (NULL != bundleRef) {
+    CFStringRef cfProcName = CFStringCreateWithCString (kCFAllocatorSystemDefault, lpProcName, CFStringGetSystemEncoding());
+    processAddress = CFBundleGetFunctionPointerForName (bundleRef, cfProcName);
+    CFRelease (cfProcName);
+  }
+  return processAddress;
 }
 #endif
 

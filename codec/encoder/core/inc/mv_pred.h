@@ -48,95 +48,98 @@
 namespace WelsSVCEnc {
 /*!
  * \brief   update pMv and uiRefIndex cache for current MB, only for P_16x16 (SKIP inclusive)
- * \param 	
- * \param 	
+ * \param
+ * \param
  */
 
 /*!
  * \brief   update pMv and uiRefIndex cache for current MB and pMbCache, only for P_16x16 (SKIP inclusive)
- * \param 	
- * \param 	
+ * \param
+ * \param
  */
-void UpdateP16x16MotionInfo(SMbCache* pMbCache, SMB* pCurMb, const int8_t kiRef, SMVUnitXY* pMv);//for encoder
+void UpdateP16x16MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int8_t kiRef, SMVUnitXY* pMv); //for encoder
 
 /*!
  * \brief   update pMv and uiRefIndex cache for current MB and pMbCache, only for P_16x8
- * \param 	
- * \param 	
+ * \param
+ * \param
  */
-void UpdateP16x8MotionInfo(SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartIdx, const int8_t kiRef, SMVUnitXY* pMv);
+void UpdateP16x8MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartIdx, const int8_t kiRef,
+                            SMVUnitXY* pMv);
 
 /*!
  * \brief   update pMv and uiRefIndex cache for current MB and pMbCache, only for P_8x16
- * \param 	
- * \param 	
+ * \param
+ * \param
  */
-void update_P8x16_motion_info(SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartIdx, const int8_t kiRef, SMVUnitXY* pMv);
+void update_P8x16_motion_info (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartIdx, const int8_t kiRef,
+                               SMVUnitXY* pMv);
 
 /*!
  * \brief   update pMv and uiRefIndex cache for current MB and pMbCache, only for P_8x8
- * \param 	
- * \param 	
+ * \param
+ * \param
  */
-void UpdateP8x8MotionInfo(SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartIdx, const int8_t kiRef, SMVUnitXY* pMv);
+void UpdateP8x8MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartIdx, const int8_t kiRef,
+                           SMVUnitXY* pMv);
 
 /*!
  * \brief   get the motion predictor for 4*4 or 8*8 or 16*16 block
- * \param 	
+ * \param
  * \param 	output mvp_x and mvp_y
  */
-void PredMv(const SMVComponentUnit* kpMvComp, int8_t iPartIdx, int8_t iPartW, int32_t iRef, SMVUnitXY* sMvp);
+void PredMv (const SMVComponentUnit* kpMvComp, int8_t iPartIdx, int8_t iPartW, int32_t iRef, SMVUnitXY* sMvp);
 
 
 /*!
  * \brief   get the motion predictor for SKIP MB
- * \param 	
+ * \param
  * \param 	output mvp_x and mvp_y
  */
-void PredSkipMv(SMbCache* pMbCache, SMVUnitXY* sMvp);
+void PredSkipMv (SMbCache* pMbCache, SMVUnitXY* sMvp);
 
 
 /*!
  * \brief   get the motion predictor for inter16x8 MB
- * \param 	
+ * \param
  * \param 	output mvp_x and mvp_y
  */
-void PredInter16x8Mv(SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* sMvp);
+void PredInter16x8Mv (SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* sMvp);
 
 
 /*!
  * \brief   get the motion predictor for inter8x16 MB
- * \param 	
+ * \param
  * \param 	output mvp_x and mvp_y
  */
-void PredInter8x16Mv(SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* sMvp);
+void PredInter8x16Mv (SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* sMvp);
 
 //=========================update motion info(MV and ref_idx) into Mb_cache==========================
 /*!
  * \brief   only update pMv cache for current MB, only for P_16x16
- * \param 	
- * \param 	
+ * \param
+ * \param
  */
 //void update_p16x16_motion2cache(SMbCache* pMbCache, int8_t pRef, SMVUnitXY* pMv);
 
 /*!
  * \brief   only update pMv cache for current MB, only for P_16x8
- * \param 	
- * \param 	
+ * \param
+ * \param
  */
-void UpdateP16x8Motion2Cache(SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* pMv);
+void UpdateP16x8Motion2Cache (SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* pMv);
 
 /*!
  * \brief   only update pMv cache for current MB, only for P_8x16
- * \param 	
- * \param 	
+ * \param
+ * \param
  */
-void UpdateP8x16Motion2Cache(SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* pMv);
+void UpdateP8x16Motion2Cache (SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* pMv);
 /*!
  * \brief   only update pMv cache for current MB, only for P_8x8
- * \param 	
- * \param 	
+ * \param
+ * \param
  */
-void UpdateP8x8Motion2Cache(SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* pMv);
+void UpdateP8x8Motion2Cache (SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* pMv);
 }
 #endif//WELS_MV_PRED_H__

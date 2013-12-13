@@ -50,7 +50,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc"
+				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;WELSDECPLUS_EXPORTS;HAVE_CACHE_LINE_ALIGN"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -149,7 +149,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc"
+				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;WELSDECPLUS_EXPORTS;HAVE_CACHE_LINE_ALIGN"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"

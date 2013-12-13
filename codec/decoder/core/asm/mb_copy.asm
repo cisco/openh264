@@ -37,7 +37,7 @@
 ;*  History
 ;*      15/09/2009 Created
 ;*		12/28/2009 Modified with larger throughput
-;*		12/29/2011 Tuned WelsCopy16x16NotAligned_sse2, added UpdateMbMv_sse2 WelsCopy16x8NotAligned_sse2, 
+;*		12/29/2011 Tuned WelsCopy16x16NotAligned_sse2, added UpdateMbMv_sse2 WelsCopy16x8NotAligned_sse2,
 ;*				   WelsCopy16x8_mmx, WelsCopy8x16_mmx etc;
 ;*
 ;*
@@ -84,7 +84,7 @@ ALIGN 16
 ;                           int iHeight );
 ;*******************************************************************************
 PixelAvgWidthEq4_mmx:
-   
+
     push        esi
     push        edi
     push        ebp
@@ -102,7 +102,7 @@ ALIGN 4
 	movd        mm0, [ebp]
     pavgb       mm0, [esi]
     movd        [edi], mm0
-   
+
     dec         ebx
     lea         edi, [edi+eax]
     lea         esi, [esi+ecx]
@@ -115,7 +115,7 @@ ALIGN 4
     pop         edi
     pop         esi
     ret
-                          
+
 ALIGN 16
 ;*******************************************************************************
 ; void_t PixelAvgWidthEq8_mmx( uint8_t *pDst,  int iDstStride,
@@ -124,7 +124,7 @@ ALIGN 16
 ;                           int iHeight );
 ;*******************************************************************************
 PixelAvgWidthEq8_mmx:
-    
+
     push        esi
     push        edi
     push        ebp
@@ -145,14 +145,14 @@ ALIGN 4
     movq        mm0, [esi+ecx]
     pavgb       mm0, [ebp+edx]
     movq		[edi+eax], mm0
-    
+
     lea			esi,  [esi+2*ecx]
     lea			ebp, [ebp+2*edx]
     lea			edi,  [edi+2*eax]
-    
+
     sub           ebx, 2
     jnz         .height_loop
-	
+
 	WELSEMMS
     pop         ebx
     pop         ebp
@@ -174,7 +174,7 @@ PixelAvgWidthEq16_sse2:
     push        edi
     push        ebp
     push        ebx
-    
+
 
     mov         edi, [esp+20]       ; pDst
     mov         eax, [esp+24]       ; iDstStride
@@ -188,28 +188,28 @@ ALIGN 4
 	movdqu      xmm0, [esi]
 	pavgb         xmm0, [ebp]
     movdqu      [edi], xmm0
-    
+
 	movdqu      xmm0, [esi+ecx]
 	pavgb         xmm0, [ebp+edx]
     movdqu      [edi+eax], xmm0
-	
+
 	movdqu      xmm0, [esi+2*ecx]
 	pavgb         xmm0, [ebp+2*edx]
     movdqu      [edi+2*eax], xmm0
-    
+
     lea              esi,  [esi+2*ecx]
     lea			   ebp, [ebp+2*edx]
     lea			   edi,  [edi+2*eax]
-     
+
 	movdqu      xmm0, [esi+ecx]
 	pavgb         xmm0, [ebp+edx]
     movdqu      [edi+eax], xmm0
-    
+
     lea              esi,  [esi+2*ecx]
     lea			   ebp, [ebp+2*edx]
     lea			   edi,  [edi+2*eax]
-	    
-    
+
+
     sub         ebx, 4
     jne         .height_loop
 
@@ -232,7 +232,7 @@ McCopyWidthEq4_mmx:
     push    edi
     push    ebx
 
-    
+
     mov esi,  [esp+16]
     mov eax, [esp+20]
     mov edi,  [esp+24]
@@ -242,12 +242,12 @@ ALIGN 4
 .height_loop:
 	mov ebx, [esi]
 	mov [edi], ebx
-	
+
 	add esi, eax
 	add edi, ecx
 	dec edx
 	jnz .height_loop
-	WELSEMMS   
+	WELSEMMS
 	pop	   ebx
     pop     edi
     pop     esi
@@ -275,12 +275,12 @@ ALIGN 4
 	add edi, ecx
 	dec edx
 	jnz .height_loop
-	
-	WELSEMMS   
+
+	WELSEMMS
     pop     edi
     pop     esi
     ret
-	
+
 
 
 
@@ -308,7 +308,7 @@ McCopyWidthEq16_sse2:
     push    edi
 
     mov     esi, [esp+12]       ; pSrc
-    mov     eax, [esp+16]       ; iSrcStride    
+    mov     eax, [esp+16]       ; iSrcStride
     mov     edi, [esp+20]       ; pDst
     mov     edx, [esp+24]       ; iDstStride
     mov     ecx, [esp+28]       ; iHeight
@@ -324,7 +324,7 @@ ALIGN 4
     lea     esi, [esi+eax*2]
     lea     edi, [edi+edx*2]
     jnz     .height_loop
-  
+
     pop     edi
     pop     esi
     ret

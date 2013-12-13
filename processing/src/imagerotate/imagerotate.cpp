@@ -37,68 +37,56 @@ WELSVP_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CImageRotating::CImageRotating(int32_t iCpuFlag)
-{
-	m_iCPUFlag = iCpuFlag;
-	m_eMethod   = METHOD_IMAGE_ROTATE;
-	WelsMemset(&m_pfRotateImage, 0, sizeof(m_pfRotateImage));
-	InitImageRotateFuncs(m_pfRotateImage, m_iCPUFlag);
+CImageRotating::CImageRotating (int32_t iCpuFlag) {
+  m_iCPUFlag = iCpuFlag;
+  m_eMethod   = METHOD_IMAGE_ROTATE;
+  WelsMemset (&m_pfRotateImage, 0, sizeof (m_pfRotateImage));
+  InitImageRotateFuncs (m_pfRotateImage, m_iCPUFlag);
 }
 
-CImageRotating::~CImageRotating()
-{	
+CImageRotating::~CImageRotating() {
 }
 
-void CImageRotating::InitImageRotateFuncs(SImageRotateFuncs &sImageRotateFuncs, int32_t iCpuFlag)
-{
-	sImageRotateFuncs.pfImageRotate90D = ImageRotate90D_c;
-	sImageRotateFuncs.pfImageRotate180D = ImageRotate180D_c;
-	sImageRotateFuncs.pfImageRotate270D = ImageRotate270D_c;
+void CImageRotating::InitImageRotateFuncs (SImageRotateFuncs& sImageRotateFuncs, int32_t iCpuFlag) {
+  sImageRotateFuncs.pfImageRotate90D = ImageRotate90D_c;
+  sImageRotateFuncs.pfImageRotate180D = ImageRotate180D_c;
+  sImageRotateFuncs.pfImageRotate270D = ImageRotate270D_c;
 }
-EResult CImageRotating::ProcessImageRotate(int32_t iType, uint8_t *pSrc, uint32_t uiBytesPerPixel, uint32_t iWidth, uint32_t iHeight, uint8_t *pDst)
-{
-	if (iType == 90)
-	{
-		m_pfRotateImage.pfImageRotate90D(pSrc, uiBytesPerPixel, iWidth, iHeight, pDst);
-	}
-	else if (iType == 180)
-	{
-		m_pfRotateImage.pfImageRotate180D(pSrc, uiBytesPerPixel, iWidth, iHeight, pDst);
-	}
-	else if (iType == 270)
-	{
-		m_pfRotateImage.pfImageRotate270D(pSrc, uiBytesPerPixel, iWidth, iHeight, pDst);
-	}
-	else
-	{	
-		return RET_NOTSUPPORTED;
-	}
-	return RET_SUCCESS;
+EResult CImageRotating::ProcessImageRotate (int32_t iType, uint8_t* pSrc, uint32_t uiBytesPerPixel, uint32_t iWidth,
+    uint32_t iHeight, uint8_t* pDst) {
+  if (iType == 90) {
+    m_pfRotateImage.pfImageRotate90D (pSrc, uiBytesPerPixel, iWidth, iHeight, pDst);
+  } else if (iType == 180) {
+    m_pfRotateImage.pfImageRotate180D (pSrc, uiBytesPerPixel, iWidth, iHeight, pDst);
+  } else if (iType == 270) {
+    m_pfRotateImage.pfImageRotate270D (pSrc, uiBytesPerPixel, iWidth, iHeight, pDst);
+  } else {
+    return RET_NOTSUPPORTED;
+  }
+  return RET_SUCCESS;
 }
 
-EResult CImageRotating::Process(int32_t iType, SPixMap *pSrc, SPixMap *pDst)
-{
-	EResult eReturn = RET_INVALIDPARAM;
+EResult CImageRotating::Process (int32_t iType, SPixMap* pSrc, SPixMap* pDst) {
+  EResult eReturn = RET_INVALIDPARAM;
 
-	if ((pSrc->eFormat == VIDEO_FORMAT_RGBA) ||
-		(pSrc->eFormat == VIDEO_FORMAT_BGRA) ||
-		(pSrc->eFormat == VIDEO_FORMAT_ABGR) ||
-		(pSrc->eFormat == VIDEO_FORMAT_ARGB))
-	{
-		eReturn = ProcessImageRotate(iType, (uint8_t *)pSrc->pPixel[0], pSrc->iSizeInBits*8, pSrc->sRect.iRectWidth, pSrc->sRect.iRectHeight, (uint8_t *)pDst->pPixel[0]);
-	}
-	else if (pSrc->eFormat == VIDEO_FORMAT_I420)
-	{
-		ProcessImageRotate(iType, (uint8_t *)pSrc->pPixel[0], pSrc->iSizeInBits*8, pSrc->sRect.iRectWidth, pSrc->sRect.iRectHeight, (uint8_t *)pDst->pPixel[0]);
-		ProcessImageRotate(iType, (uint8_t *)pSrc->pPixel[1], pSrc->iSizeInBits*8, (pSrc->sRect.iRectWidth >> 1), (pSrc->sRect.iRectHeight >> 1), (uint8_t *)pDst->pPixel[1]);
-		eReturn = ProcessImageRotate(iType, (uint8_t *)pSrc->pPixel[2], pSrc->iSizeInBits*8, (pSrc->sRect.iRectWidth >> 1), (pSrc->sRect.iRectHeight >> 1), (uint8_t *)pDst->pPixel[2]);
-	}
-	else
-	{
-		eReturn = RET_NOTSUPPORTED;
-	}
+  if ((pSrc->eFormat == VIDEO_FORMAT_RGBA) ||
+      (pSrc->eFormat == VIDEO_FORMAT_BGRA) ||
+      (pSrc->eFormat == VIDEO_FORMAT_ABGR) ||
+      (pSrc->eFormat == VIDEO_FORMAT_ARGB)) {
+    eReturn = ProcessImageRotate (iType, (uint8_t*)pSrc->pPixel[0], pSrc->iSizeInBits * 8, pSrc->sRect.iRectWidth,
+                                  pSrc->sRect.iRectHeight, (uint8_t*)pDst->pPixel[0]);
+  } else if (pSrc->eFormat == VIDEO_FORMAT_I420) {
+    ProcessImageRotate (iType, (uint8_t*)pSrc->pPixel[0], pSrc->iSizeInBits * 8, pSrc->sRect.iRectWidth,
+                        pSrc->sRect.iRectHeight, (uint8_t*)pDst->pPixel[0]);
+    ProcessImageRotate (iType, (uint8_t*)pSrc->pPixel[1], pSrc->iSizeInBits * 8, (pSrc->sRect.iRectWidth >> 1),
+                        (pSrc->sRect.iRectHeight >> 1), (uint8_t*)pDst->pPixel[1]);
+    eReturn = ProcessImageRotate (iType, (uint8_t*)pSrc->pPixel[2], pSrc->iSizeInBits * 8, (pSrc->sRect.iRectWidth >> 1),
+                                  (pSrc->sRect.iRectHeight >> 1), (uint8_t*)pDst->pPixel[2]);
+  } else {
+    eReturn = RET_NOTSUPPORTED;
+  }
 
-	return eReturn;
+  return eReturn;
 }
 
 

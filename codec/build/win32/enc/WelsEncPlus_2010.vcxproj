@@ -66,7 +66,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\encoder\plus\inc;..\..\..\encoder\core\inc;..\..\..\api\svc;..\..\..\WelsThreadLib\api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\encoder\plus\inc;..\..\..\encoder\core\inc;..\..\..\api\svc;..\..\..\common;..\..\..\WelsThreadLib\api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;WELSENCPLUS_EXPORTS;ENCODER_CORE;HAVE_CACHE_LINE_ALIGN;MT_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -117,7 +117,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\..\encoder\plus\inc;..\..\..\encoder\core\inc;..\..\..\api\svc;..\..\..\WelsThreadLib\api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\encoder\plus\inc;..\..\..\encoder\core\inc;..\..\..\api\svc;..\..\..\common;..\..\..\WelsThreadLib\api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;WELSENCPLUS_EXPORTS;ENCODER_CORE;HAVE_CACHE_LINE_ALIGN;MT_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -183,7 +183,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="WelsEncCore.vcxproj">
+    <ProjectReference Include="WelsEncCore_2010.vcxproj">
       <Project>{59208004-1774-4816-ac24-31ff44c324b4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

@@ -42,23 +42,23 @@ namespace WelsSVCEnc {
 ///////////////////////////////////NAL Unit prefix/headers///////////////////////////////////
 
 /* NAL Unix Header in AVC, refer to Page 56 in JVT X201wcm */
-typedef struct TagNalUnitHeader{
-	uint8_t		uiForbiddenZeroBit;
-	uint8_t		uiNalRefIdc;
-	EWelsNalUnitType	eNalUnitType;
-	uint8_t		uiReservedOneByte;		
-}SNalUnitHeader, *PNalUnitHeader;
+typedef struct TagNalUnitHeader {
+  uint8_t		uiForbiddenZeroBit;
+  uint8_t		uiNalRefIdc;
+  EWelsNalUnitType	eNalUnitType;
+  uint8_t		uiReservedOneByte;
+} SNalUnitHeader, *PNalUnitHeader;
 
 /* NAL Unit Header in scalable extension syntax, refer to Page 390 in JVT X201wcm */
-typedef struct TagNalUnitHeaderExt{
-	SNalUnitHeader	sNalHeader;
-	
-	bool_t		bIdrFlag;
-	uint8_t		uiDependencyId;
-	uint8_t		uiTemporalId;
-	bool_t		bDiscardableFlag;
-	
+typedef struct TagNalUnitHeaderExt {
+  SNalUnitHeader	sNalHeader;
 
-}SNalUnitHeaderExt, *PNalUnitHeaderExt;
+  bool_t		bIdrFlag;
+  uint8_t		uiDependencyId;
+  uint8_t		uiTemporalId;
+  bool_t		bDiscardableFlag;
+
+
+} SNalUnitHeaderExt, *PNalUnitHeaderExt;
 }
 #endif//WELS_NAL_UNIT_PREFIX_H__

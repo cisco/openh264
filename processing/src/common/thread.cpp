@@ -43,54 +43,46 @@ WELSVP_NAMESPACE_BEGIN
 
 #if defined(WIN32)
 
-WELS_THREAD_ERROR_CODE    WelsMutexInit( WELS_MUTEX   * mutex )
-{
-	InitializeCriticalSection(mutex);
+WELS_THREAD_ERROR_CODE    WelsMutexInit (WELS_MUTEX*    mutex) {
+  InitializeCriticalSection (mutex);
 
-	return WELS_THREAD_ERROR_OK;
+  return WELS_THREAD_ERROR_OK;
 }
 
-WELS_THREAD_ERROR_CODE    WelsMutexLock( WELS_MUTEX   * mutex )
-{
-	EnterCriticalSection(mutex);
+WELS_THREAD_ERROR_CODE    WelsMutexLock (WELS_MUTEX*    mutex) {
+  EnterCriticalSection (mutex);
 
-	return WELS_THREAD_ERROR_OK;
+  return WELS_THREAD_ERROR_OK;
 }
 
-WELS_THREAD_ERROR_CODE    WelsMutexUnlock( WELS_MUTEX * mutex )
-{
-	LeaveCriticalSection(mutex);
+WELS_THREAD_ERROR_CODE    WelsMutexUnlock (WELS_MUTEX* mutex) {
+  LeaveCriticalSection (mutex);
 
-	return WELS_THREAD_ERROR_OK;
+  return WELS_THREAD_ERROR_OK;
 }
 
-WELS_THREAD_ERROR_CODE    WelsMutexDestroy( WELS_MUTEX * mutex )
-{
-    DeleteCriticalSection(mutex);
+WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex) {
+  DeleteCriticalSection (mutex);
 
-	return WELS_THREAD_ERROR_OK;
+  return WELS_THREAD_ERROR_OK;
 }
 
 #elif  defined(__GNUC__)
 
-WELS_THREAD_ERROR_CODE    WelsMutexInit( WELS_MUTEX   * mutex )
-{
-	return pthread_mutex_init(mutex, NULL);
+WELS_THREAD_ERROR_CODE    WelsMutexInit (WELS_MUTEX*    mutex) {
+  return pthread_mutex_init (mutex, NULL);
 }
 
-WELS_THREAD_ERROR_CODE    WelsMutexLock( WELS_MUTEX   * mutex )
-{
-	return pthread_mutex_lock(mutex);
+WELS_THREAD_ERROR_CODE    WelsMutexLock (WELS_MUTEX*    mutex) {
+  return pthread_mutex_lock (mutex);
 }
 
-WELS_THREAD_ERROR_CODE    WelsMutexUnlock( WELS_MUTEX * mutex )
-{
-	return pthread_mutex_unlock(mutex);
+WELS_THREAD_ERROR_CODE    WelsMutexUnlock (WELS_MUTEX* mutex) {
+  return pthread_mutex_unlock (mutex);
 }
 
-WELS_THREAD_ERROR_CODE    WelsMutexDestroy( WELS_MUTEX * mutex )
-{
-    return pthread_mutex_destroy(mutex);
+WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex) {
+  return pthread_mutex_destroy (mutex);
 }
 
 #endif

@@ -62,7 +62,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\console\dec\inc;..\..\..\api\svc;..\..\..\common\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\console\dec\inc;..\..\..\api\svc;..\..\..\common;..\..\..\encoder\core\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -103,7 +103,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\console\dec\inc;..\..\..\api\svc;..\..\..\common\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\console\dec\inc;..\..\..\api\svc;..\..\..\common;..\..\..\encoder\core\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -152,6 +152,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="..\..\..\common\logging.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\console\dec\inc\d3d9_utils.h" />
@@ -161,7 +162,7 @@
     <None Include="..\..\..\..\bin\Release\welsdec.cfg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="WelsDecPlus.vcxproj">
+    <ProjectReference Include="WelsDecPlus_2010.vcxproj">
       <Project>{1131558a-9986-4f4b-a13f-8b7f4c8438bf}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

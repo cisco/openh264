@@ -34,7 +34,7 @@
  *
  * \date        :  2011/03/17
  *
- * \description :  1. rewrite the package code of background detection class  
+ * \description :  1. rewrite the package code of background detection class
  *
  */
 
@@ -48,56 +48,58 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-typedef struct
-{
-	int32_t	iBackgroundFlag;
-	int32_t	iSAD;
-	int32_t	iSD;
-	int32_t	iMAD;			
-	int32_t	iMinSubMad;		
-	int32_t	iMaxDiffSubSd;	
+typedef struct {
+  int32_t	iBackgroundFlag;
+  int32_t	iSAD;
+  int32_t	iSD;
+  int32_t	iMAD;
+  int32_t	iMinSubMad;
+  int32_t	iMaxDiffSubSd;
 } SBackgroundOU;
 
-class CBackgroundDetection : public IStrategy
-{			  
-public:
-	CBackgroundDetection(int32_t iCpuFlag);
-	~CBackgroundDetection();
+class CBackgroundDetection : public IStrategy {
+ public:
+  CBackgroundDetection (int32_t iCpuFlag);
+  ~CBackgroundDetection();
 
-	EResult Process(int32_t iType, SPixMap *pSrc, SPixMap *pRef);
-	EResult Set    (int32_t iType, void *pParam); 
+  EResult Process (int32_t iType, SPixMap* pSrc, SPixMap* pRef);
+  EResult Set (int32_t iType, void* pParam);
 
-private:
-	struct vBGDParam
-	{
-		uint8_t   *pCur[3];
-		uint8_t   *pRef[3];
-		int32_t	   iBgdWidth;			
-		int32_t	   iBgdHeight;			
-		int32_t    iStride[3];
-		SBackgroundOU	  *pOU_array;
-		int8_t	  *pBackgroundMbFlag;
-		SVAACalcResult  *pCalcRes;
-	}m_BgdParam;
+ private:
+  struct vBGDParam {
+    uint8_t*   pCur[3];
+    uint8_t*   pRef[3];
+    int32_t	   iBgdWidth;
+    int32_t	   iBgdHeight;
+    int32_t    iStride[3];
+    SBackgroundOU*  	pOU_array;
+    int8_t*  	pBackgroundMbFlag;
+    SVAACalcResult*  pCalcRes;
+  } m_BgdParam;
 
-	int32_t     m_iLargestFrameSize;
+  int32_t     m_iLargestFrameSize;
 
-private:
-	inline SBackgroundOU* AllocateOUArrayMemory(int32_t iWidth, int32_t iHeight);
-	inline void     FreeOUArrayMemory();
-	inline int32_t  CalculateAsdChromaEdge( uint8_t *pOriRef, uint8_t *pOriCur, int32_t iStride );
-	inline bool_t   ForegroundDilation23Luma(SBackgroundOU *pBackgroundOU, SBackgroundOU *pOUNeighbours[]);//Foreground_Dilation_2_3_Luma
-	inline bool_t   ForegroundDilation23Chroma(int8_t iNeighbourForegroundFlags, int32_t iStartSamplePos, int32_t iPicStrideUV, vBGDParam *pBgdParam);//Foreground_Dilation_2_3_Chroma
-	inline void     ForegroundDilation(SBackgroundOU *pBackgroundOU, SBackgroundOU *pOUNeighbours[], vBGDParam *pBgdParam, int32_t	iChromaSampleStartPos);
-	inline void     BackgroundErosion(SBackgroundOU *pBackgroundOU, SBackgroundOU *pOUNeighbours[]);
-	inline void     SetBackgroundMbFlag(int8_t *pBackgroundMbFlag,int32_t iPicWidthInMb, int32_t iBackgroundMbFlag);
-	inline void     UpperOUForegroundCheck(SBackgroundOU *pCurOU, int8_t *pBackgroundMbFlag, int32_t iPicWidthInOU, int32_t iPicWidthInMb);
+ private:
+  inline SBackgroundOU* AllocateOUArrayMemory (int32_t iWidth, int32_t iHeight);
+  inline void     FreeOUArrayMemory();
+  inline int32_t  CalculateAsdChromaEdge (uint8_t* pOriRef, uint8_t* pOriCur, int32_t iStride);
+  inline bool_t   ForegroundDilation23Luma (SBackgroundOU* pBackgroundOU,
+      SBackgroundOU* pOUNeighbours[]); //Foreground_Dilation_2_3_Luma
+  inline bool_t   ForegroundDilation23Chroma (int8_t iNeighbourForegroundFlags, int32_t iStartSamplePos,
+      int32_t iPicStrideUV, vBGDParam* pBgdParam);//Foreground_Dilation_2_3_Chroma
+  inline void     ForegroundDilation (SBackgroundOU* pBackgroundOU, SBackgroundOU* pOUNeighbours[], vBGDParam* pBgdParam,
+                                      int32_t	iChromaSampleStartPos);
+  inline void     BackgroundErosion (SBackgroundOU* pBackgroundOU, SBackgroundOU* pOUNeighbours[]);
+  inline void     SetBackgroundMbFlag (int8_t* pBackgroundMbFlag, int32_t iPicWidthInMb, int32_t iBackgroundMbFlag);
+  inline void     UpperOUForegroundCheck (SBackgroundOU* pCurOU, int8_t* pBackgroundMbFlag, int32_t iPicWidthInOU,
+                                          int32_t iPicWidthInMb);
 
-	void    GetOUParameters( SVAACalcResult *sVaaCalcInfo, int32_t iMbIndex, int32_t iMbWidth, SBackgroundOU* pBackgroundOU);
-	void    ForegroundBackgroundDivision(vBGDParam *pBgdParam);
-	void    ForegroundDilationAndBackgroundErosion(vBGDParam *pBgdParam);
-	void    BackgroundDetection( vBGDParam *pBgdParam );
-};	
+  void    GetOUParameters (SVAACalcResult* sVaaCalcInfo, int32_t iMbIndex, int32_t iMbWidth,
+                           SBackgroundOU* pBackgroundOU);
+  void    ForegroundBackgroundDivision (vBGDParam* pBgdParam);
+  void    ForegroundDilationAndBackgroundErosion (vBGDParam* pBgdParam);
+  void    BackgroundDetection (vBGDParam* pBgdParam);
+};
 
 WELSVP_NAMESPACE_END
 

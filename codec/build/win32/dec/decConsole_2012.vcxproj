@@ -61,7 +61,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\console\dec\inc;..\..\..\api\svc;..\..\..\common\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\console\dec\inc;..\..\..\api\svc;..\..\..\common;..\..\..\encoder\core\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -102,7 +102,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\console\dec\inc;..\..\..\api\svc;..\..\..\common\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\console\dec\inc;..\..\..\api\svc;..\..\..\common;..\..\..\encoder\core\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -143,6 +143,7 @@
     <ClCompile Include="..\..\..\console\dec\src\d3d9_utils.cpp" />
     <ClCompile Include="..\..\..\console\dec\src\h264dec.cpp" />
     <ClCompile Include="..\..\..\console\dec\src\read_config.cpp" />
+    <ClCompile Include="..\..\..\common\logging.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\console\dec\inc\d3d9_utils.h" />
@@ -152,7 +153,7 @@
     <None Include="..\..\..\..\bin\Release\welsdec.cfg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="WelsDecPlus.vcxproj">
+    <ProjectReference Include="WelsDecPlus_2012.vcxproj">
       <Project>{1131558a-9986-4f4b-a13f-8b7f4c8438bf}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

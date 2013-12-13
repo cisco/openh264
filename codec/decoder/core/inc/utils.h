@@ -59,16 +59,17 @@ extern uint32_t g_uiCacheLineSize;
  *	Function pointer declaration for various tool sets
  */
 // wels log output
-typedef void_t (*PWelsLogCallbackFunc)(void_t *pPtr, const int32_t kiLevel, const char *kpFmt, va_list pArgv);
+typedef void_t (*PWelsLogCallbackFunc) (void_t* pPtr, const int32_t kiLevel, const char* kpFmt, va_list pArgv);
 
 extern PWelsLogCallbackFunc	g_pLog;
 
 #ifdef __GNUC__
-extern void_t WelsLog(void_t *pPtr, int32_t iLevel, const char *kpFmt, ...) __attribute__ ((__format__ (__printf__, 3, 4)));
+extern void_t WelsLog (void_t* pPtr, int32_t iLevel, const char* kpFmt, ...) __attribute__ ((__format__ (__printf__, 3,
+    4)));
 #else
-extern void_t WelsLog(void_t *pPtr, int32_t iLevel, const char *kpFmt, ...);
+extern void_t WelsLog (void_t* pPtr, int32_t iLevel, const char* kpFmt, ...);
 #endif
-	
+
 #define DECODER_MODE_NAME(a) ((a == SW_MODE)?"SW_MODE":((a == GPU_MODE)?"GPU_MODE":((a == AUTO_MODE)?"AUTO_MODE":"SWITCH_MODE")))
 #define OUTPUT_PROPERTY_NAME(a) ((a == 0)?"system_memory":"video_memory")
 #define BUFFER_STATUS_NAME(a) ((a == 0)?"unvalid":"valid")
@@ -79,15 +80,15 @@ extern void_t WelsLog(void_t *pPtr, int32_t iLevel, const char *kpFmt, ...);
  */
 
 typedef int32_t	WelsLogLevel;
-enum{
-	WELS_LOG_QUIET		= 0x00,		// Quiet mode
-	WELS_LOG_ERROR		= 1 << 0,	// Error log level
-	WELS_LOG_WARNING	= 1 << 1,	// Warning log level
-	WELS_LOG_INFO		= 1 << 2,	// Information log level
-	WELS_LOG_DEBUG		= 1 << 3,	// Debug log level
-	WELS_LOG_RESV		= 1 << 4,	// Resversed log level
-	WELS_LOG_LEVEL_COUNT= 5,
-	WELS_LOG_DEFAULT	= WELS_LOG_ERROR | WELS_LOG_WARNING | WELS_LOG_INFO | WELS_LOG_DEBUG	// Default log level in Wels codec
+enum {
+  WELS_LOG_QUIET		= 0x00,		// Quiet mode
+  WELS_LOG_ERROR		= 1 << 0,	// Error log level
+  WELS_LOG_WARNING	= 1 << 1,	// Warning log level
+  WELS_LOG_INFO		= 1 << 2,	// Information log level
+  WELS_LOG_DEBUG		= 1 << 3,	// Debug log level
+  WELS_LOG_RESV		= 1 << 4,	// Resversed log level
+  WELS_LOG_LEVEL_COUNT = 5,
+  WELS_LOG_DEFAULT	= WELS_LOG_ERROR | WELS_LOG_WARNING | WELS_LOG_INFO | WELS_LOG_DEBUG	// Default log level in Wels codec
 };
 
 #ifdef __cplusplus

@@ -44,279 +44,258 @@
 
 /* interface API implement */
 
-EResult WELSAPI CreateVpInterface  (void **ppCtx, int iVersion)
-{
-	if (iVersion & 0x8000)
-		return nsWelsVP::CreateSpecificVpInterface((IWelsVP **)ppCtx);
-	else if (iVersion & 0x7fff)
-		return nsWelsVP::CreateSpecificVpInterface((IWelsVPc **)ppCtx);
-	else
-		return RET_INVALIDPARAM;
+EResult WELSAPI CreateVpInterface (void** ppCtx, int iVersion) {
+  if (iVersion & 0x8000)
+    return nsWelsVP::CreateSpecificVpInterface ((IWelsVP**)ppCtx);
+  else if (iVersion & 0x7fff)
+    return nsWelsVP::CreateSpecificVpInterface ((IWelsVPc**)ppCtx);
+  else
+    return RET_INVALIDPARAM;
 }
 
-EResult WELSAPI DestroyVpInterface  (void *pCtx, int iVersion)
-{
-	if (iVersion & 0x8000)
-		return nsWelsVP::DestroySpecificVpInterface((IWelsVP *)pCtx);
-	else if (iVersion & 0x7fff)
-		return nsWelsVP::DestroySpecificVpInterface((IWelsVPc *)pCtx);
-	else
-		return RET_INVALIDPARAM;
+EResult WELSAPI DestroyVpInterface (void* pCtx, int iVersion) {
+  if (iVersion & 0x8000)
+    return nsWelsVP::DestroySpecificVpInterface ((IWelsVP*)pCtx);
+  else if (iVersion & 0x7fff)
+    return nsWelsVP::DestroySpecificVpInterface ((IWelsVPc*)pCtx);
+  else
+    return RET_INVALIDPARAM;
 }
 
 WELSVP_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////
 
-EResult CreateSpecificVpInterface(IWelsVP **ppCtx)
-{
-	EResult  eReturn = RET_FAILED;
+EResult CreateSpecificVpInterface (IWelsVP** ppCtx) {
+  EResult  eReturn = RET_FAILED;
 
-	CVpFrameWork *pFr = new CVpFrameWork(1, eReturn);  
-	if (pFr)
-	{
-		*ppCtx  = (IWelsVP *)pFr;
-		eReturn = RET_SUCCESS;
-	}
+  CVpFrameWork* pFr = new CVpFrameWork (1, eReturn);
+  if (pFr) {
+    *ppCtx  = (IWelsVP*)pFr;
+    eReturn = RET_SUCCESS;
+  }
 
-	return eReturn;
+  return eReturn;
 }
 
-EResult DestroySpecificVpInterface  (IWelsVP *pCtx)
-{
-	_SafeDelete(pCtx);
+EResult DestroySpecificVpInterface (IWelsVP* pCtx) {
+  _SafeDelete (pCtx);
 
-	return RET_SUCCESS;
+  return RET_SUCCESS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CVpFrameWork::CVpFrameWork(uint32_t uiThreadsNum, EResult &eReturn)
-{
-	int32_t iCoreNum = 1;
+CVpFrameWork::CVpFrameWork (uint32_t uiThreadsNum, EResult& eReturn) {
+  int32_t iCoreNum = 1;
 #ifndef X86_ASM
-	uint32_t uiCPUFlag = 0;
+  uint32_t uiCPUFlag = 0;
 #else
-	uint32_t uiCPUFlag = WelsCPUFeatureDetect(&iCoreNum);
+  uint32_t uiCPUFlag = WelsCPUFeatureDetect (&iCoreNum);
 #endif
 
-	for (int32_t i = 0; i < MAX_STRATEGY_NUM; i++)
-	{
-		IStrategy *pStrategy = m_pStgChain[i];
-		pStrategy = CreateStrategy(WelsStaticCast(EMethods, i + 1), uiCPUFlag);
-		m_pStgChain[i] = pStrategy;	
-	}
-	
-	WelsMutexInit(&m_mutes);
+  for (int32_t i = 0; i < MAX_STRATEGY_NUM; i++) {
+    IStrategy* pStrategy = m_pStgChain[i];
+    pStrategy = CreateStrategy (WelsStaticCast (EMethods, i + 1), uiCPUFlag);
+    m_pStgChain[i] = pStrategy;
+  }
 
-	eReturn = RET_SUCCESS;	
+  WelsMutexInit (&m_mutes);
+
+  eReturn = RET_SUCCESS;
 }
 
-CVpFrameWork::~CVpFrameWork()
-{
-	for (int32_t i = 0; i < MAX_STRATEGY_NUM; i++)
-	{
-		if (m_pStgChain[i])
-		{
-			Uninit(m_pStgChain[i]->m_eMethod);
-			_SafeDelete(m_pStgChain[i]);
-		}		
-	}
- 
-	WelsMutexDestroy(&m_mutes);
+CVpFrameWork::~CVpFrameWork() {
+  for (int32_t i = 0; i < MAX_STRATEGY_NUM; i++) {
+    if (m_pStgChain[i]) {
+      Uninit (m_pStgChain[i]->m_eMethod);
+      _SafeDelete (m_pStgChain[i]);
+    }
+  }
+
+  WelsMutexDestroy (&m_mutes);
 }
 
-EResult CVpFrameWork::Init(int32_t iType, void *pCfg)
-{
-	EResult eReturn   = RET_SUCCESS;
-	int32_t iCurIdx    = WelsStaticCast(int32_t, WelsVpGetValidMethod(iType)) - 1;	
+EResult CVpFrameWork::Init (int32_t iType, void* pCfg) {
+  EResult eReturn   = RET_SUCCESS;
+  int32_t iCurIdx    = WelsStaticCast (int32_t, WelsVpGetValidMethod (iType)) - 1;
 
-	Uninit(iType);
+  Uninit (iType);
 
-	WelsMutexLock(&m_mutes);
+  WelsMutexLock (&m_mutes);
 
-	IStrategy *pStrategy = m_pStgChain[iCurIdx];
-	if (pStrategy)
-		eReturn = pStrategy->Init(0, pCfg);
+  IStrategy* pStrategy = m_pStgChain[iCurIdx];
+  if (pStrategy)
+    eReturn = pStrategy->Init (0, pCfg);
 
-	WelsMutexUnlock(&m_mutes);
+  WelsMutexUnlock (&m_mutes);
 
-	return eReturn;
+  return eReturn;
 }
 
-EResult CVpFrameWork::Uninit(int32_t iType)
-{
-	EResult eReturn        = RET_SUCCESS;
-	int32_t iCurIdx    = WelsStaticCast(int32_t, WelsVpGetValidMethod(iType)) - 1;
+EResult CVpFrameWork::Uninit (int32_t iType) {
+  EResult eReturn        = RET_SUCCESS;
+  int32_t iCurIdx    = WelsStaticCast (int32_t, WelsVpGetValidMethod (iType)) - 1;
 
-	WelsMutexLock(&m_mutes);
+  WelsMutexLock (&m_mutes);
 
-	IStrategy *pStrategy = m_pStgChain[iCurIdx];
-	if (pStrategy)
-		eReturn = pStrategy->Uninit(0);
+  IStrategy* pStrategy = m_pStgChain[iCurIdx];
+  if (pStrategy)
+    eReturn = pStrategy->Uninit (0);
 
-	WelsMutexUnlock(&m_mutes);
+  WelsMutexUnlock (&m_mutes);
 
-	return eReturn;
+  return eReturn;
 }
 
-EResult CVpFrameWork::Flush(int32_t iType)
-{
-	EResult eReturn        = RET_SUCCESS;
+EResult CVpFrameWork::Flush (int32_t iType) {
+  EResult eReturn        = RET_SUCCESS;
 
-	return eReturn;
+  return eReturn;
 }
 
-EResult CVpFrameWork::Process(int32_t iType, SPixMap *pSrcPixMap, SPixMap *pDstPixMap)
-{
-	EResult eReturn        = RET_NOTSUPPORTED;
-	EMethods eMethod    = WelsVpGetValidMethod(iType);
-	int32_t iCurIdx    = WelsStaticCast(int32_t, eMethod) - 1;
-	SPixMap sSrcPic;
-	SPixMap sDstPic;
-    memset(&sSrcPic, 0, sizeof(sSrcPic));// confirmed_safe_unsafe_usage
-    memset(&sDstPic, 0, sizeof(sDstPic));// confirmed_safe_unsafe_usage
+EResult CVpFrameWork::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDstPixMap) {
+  EResult eReturn        = RET_NOTSUPPORTED;
+  EMethods eMethod    = WelsVpGetValidMethod (iType);
+  int32_t iCurIdx    = WelsStaticCast (int32_t, eMethod) - 1;
+  SPixMap sSrcPic;
+  SPixMap sDstPic;
+  memset (&sSrcPic, 0, sizeof (sSrcPic)); // confirmed_safe_unsafe_usage
+  memset (&sDstPic, 0, sizeof (sDstPic)); // confirmed_safe_unsafe_usage
 
-	if (pSrcPixMap) sSrcPic = *pSrcPixMap;
-	if (pDstPixMap) sDstPic = *pDstPixMap;
-	if (!CheckValid(eMethod, sSrcPic, sDstPic))
-		return RET_INVALIDPARAM;
+  if (pSrcPixMap) sSrcPic = *pSrcPixMap;
+  if (pDstPixMap) sDstPic = *pDstPixMap;
+  if (!CheckValid (eMethod, sSrcPic, sDstPic))
+    return RET_INVALIDPARAM;
 
-	WelsMutexLock(&m_mutes);
+  WelsMutexLock (&m_mutes);
 
-	IStrategy *pStrategy = m_pStgChain[iCurIdx];
-	if (pStrategy)
-		eReturn = pStrategy->Process(0, &sSrcPic, &sDstPic);
+  IStrategy* pStrategy = m_pStgChain[iCurIdx];
+  if (pStrategy)
+    eReturn = pStrategy->Process (0, &sSrcPic, &sDstPic);
 
-	WelsMutexUnlock(&m_mutes);
+  WelsMutexUnlock (&m_mutes);
 
-	return eReturn;
+  return eReturn;
 }
 
-EResult CVpFrameWork::Get(int32_t iType, void *pParam)
-{
-	EResult eReturn        = RET_SUCCESS;
-	int32_t iCurIdx    = WelsStaticCast(int32_t, WelsVpGetValidMethod(iType)) - 1;
+EResult CVpFrameWork::Get (int32_t iType, void* pParam) {
+  EResult eReturn        = RET_SUCCESS;
+  int32_t iCurIdx    = WelsStaticCast (int32_t, WelsVpGetValidMethod (iType)) - 1;
 
-	if (!pParam)
-		return RET_INVALIDPARAM;
+  if (!pParam)
+    return RET_INVALIDPARAM;
 
-	WelsMutexLock(&m_mutes);
+  WelsMutexLock (&m_mutes);
 
-	IStrategy *pStrategy = m_pStgChain[iCurIdx];
-	if (pStrategy)
-		eReturn = pStrategy->Get(0, pParam);
+  IStrategy* pStrategy = m_pStgChain[iCurIdx];
+  if (pStrategy)
+    eReturn = pStrategy->Get (0, pParam);
 
-	WelsMutexUnlock(&m_mutes);
+  WelsMutexUnlock (&m_mutes);
 
-	return eReturn;
+  return eReturn;
 }
 
-EResult CVpFrameWork::Set(int32_t iType, void *pParam)
-{
-	EResult eReturn        = RET_SUCCESS;
-	int32_t iCurIdx    = WelsStaticCast(int32_t, WelsVpGetValidMethod(iType)) - 1;
+EResult CVpFrameWork::Set (int32_t iType, void* pParam) {
+  EResult eReturn        = RET_SUCCESS;
+  int32_t iCurIdx    = WelsStaticCast (int32_t, WelsVpGetValidMethod (iType)) - 1;
 
-	if (!pParam)
-		return RET_INVALIDPARAM;
+  if (!pParam)
+    return RET_INVALIDPARAM;
 
-	WelsMutexLock(&m_mutes);
+  WelsMutexLock (&m_mutes);
 
-	IStrategy *pStrategy = m_pStgChain[iCurIdx];
-	if (pStrategy)
-		eReturn = pStrategy->Set(0, pParam);
+  IStrategy* pStrategy = m_pStgChain[iCurIdx];
+  if (pStrategy)
+    eReturn = pStrategy->Set (0, pParam);
 
-	WelsMutexUnlock(&m_mutes);
+  WelsMutexUnlock (&m_mutes);
 
-	return eReturn;
+  return eReturn;
 }
 
-EResult CVpFrameWork::SpecialFeature(int32_t iType, void *pIn, void *pOut)
-{
-	EResult eReturn        = RET_SUCCESS;
+EResult CVpFrameWork::SpecialFeature (int32_t iType, void* pIn, void* pOut) {
+  EResult eReturn        = RET_SUCCESS;
 
-	return eReturn;
+  return eReturn;
 }
 
-bool_t  CVpFrameWork::CheckValid(EMethods eMethod, SPixMap &pSrcPixMap, SPixMap &pDstPixMap)
-{
-	bool_t eReturn = FALSE;
+bool_t  CVpFrameWork::CheckValid (EMethods eMethod, SPixMap& pSrcPixMap, SPixMap& pDstPixMap) {
+  bool_t eReturn = FALSE;
 
-	if (eMethod == METHOD_NULL)
-		goto exit;
+  if (eMethod == METHOD_NULL)
+    goto exit;
 
-	if (eMethod != METHOD_COLORSPACE_CONVERT)
-	{
-		if (pSrcPixMap.pPixel[0])
-		{
-			if (pSrcPixMap.eFormat != VIDEO_FORMAT_I420 && pSrcPixMap.eFormat != VIDEO_FORMAT_YV12)
-				goto exit;
-		}
-		if (pSrcPixMap.pPixel[0] && pDstPixMap.pPixel[0])
-		{
-			if (pDstPixMap.eFormat != pSrcPixMap.eFormat)
-				goto exit;
-		}
-	}
+  if (eMethod != METHOD_COLORSPACE_CONVERT) {
+    if (pSrcPixMap.pPixel[0]) {
+      if (pSrcPixMap.eFormat != VIDEO_FORMAT_I420 && pSrcPixMap.eFormat != VIDEO_FORMAT_YV12)
+        goto exit;
+    }
+    if (pSrcPixMap.pPixel[0] && pDstPixMap.pPixel[0]) {
+      if (pDstPixMap.eFormat != pSrcPixMap.eFormat)
+        goto exit;
+    }
+  }
 
-	if (pSrcPixMap.pPixel[0])
-	{
-		if (pSrcPixMap.sRect.iRectWidth <= 0 || pSrcPixMap.sRect.iRectWidth > MAX_WIDTH || pSrcPixMap.sRect.iRectHeight <= 0 || pSrcPixMap.sRect.iRectHeight > MAX_HEIGHT)
-			goto exit;
-		if (pSrcPixMap.sRect.iRectTop >= pSrcPixMap.sRect.iRectHeight || pSrcPixMap.sRect.iRectLeft >= pSrcPixMap.sRect.iRectWidth || pSrcPixMap.sRect.iRectWidth > pSrcPixMap.iStride[0])
-			goto exit;
-	}
-	if (pDstPixMap.pPixel[0])
-	{
-		if (pDstPixMap.sRect.iRectWidth <= 0 || pDstPixMap.sRect.iRectWidth > MAX_WIDTH || pDstPixMap.sRect.iRectHeight <= 0 || pDstPixMap.sRect.iRectHeight > MAX_HEIGHT)
-			goto exit;
-		if (pDstPixMap.sRect.iRectTop >= pDstPixMap.sRect.iRectHeight || pDstPixMap.sRect.iRectLeft >= pDstPixMap.sRect.iRectWidth || pDstPixMap.sRect.iRectWidth > pDstPixMap.iStride[0])
-			goto exit;
-	}
-	eReturn = TRUE;
+  if (pSrcPixMap.pPixel[0]) {
+    if (pSrcPixMap.sRect.iRectWidth <= 0 || pSrcPixMap.sRect.iRectWidth > MAX_WIDTH || pSrcPixMap.sRect.iRectHeight <= 0
+        || pSrcPixMap.sRect.iRectHeight > MAX_HEIGHT)
+      goto exit;
+    if (pSrcPixMap.sRect.iRectTop >= pSrcPixMap.sRect.iRectHeight
+        || pSrcPixMap.sRect.iRectLeft >= pSrcPixMap.sRect.iRectWidth || pSrcPixMap.sRect.iRectWidth > pSrcPixMap.iStride[0])
+      goto exit;
+  }
+  if (pDstPixMap.pPixel[0]) {
+    if (pDstPixMap.sRect.iRectWidth <= 0 || pDstPixMap.sRect.iRectWidth > MAX_WIDTH || pDstPixMap.sRect.iRectHeight <= 0
+        || pDstPixMap.sRect.iRectHeight > MAX_HEIGHT)
+      goto exit;
+    if (pDstPixMap.sRect.iRectTop >= pDstPixMap.sRect.iRectHeight
+        || pDstPixMap.sRect.iRectLeft >= pDstPixMap.sRect.iRectWidth || pDstPixMap.sRect.iRectWidth > pDstPixMap.iStride[0])
+      goto exit;
+  }
+  eReturn = TRUE;
 
 exit:
-	return eReturn;
+  return eReturn;
 }
 
-IStrategy* CVpFrameWork::CreateStrategy(EMethods m_eMethod, int32_t iCpuFlag)
-{
-	IStrategy *pStrategy = NULL;
+IStrategy* CVpFrameWork::CreateStrategy (EMethods m_eMethod, int32_t iCpuFlag) {
+  IStrategy* pStrategy = NULL;
 
-	switch (m_eMethod)
-	{
-	case METHOD_COLORSPACE_CONVERT:
-		//not support yet
-		break;
-	case METHOD_DENOISE:
-		pStrategy = WelsDynamicCast(IStrategy *, new CDenoiser(iCpuFlag));
-		break;
-	case METHOD_SCENE_CHANGE_DETECTION:
-		pStrategy = WelsDynamicCast(IStrategy *, new CSceneChangeDetection(iCpuFlag));
-		break;
-	case METHOD_DOWNSAMPLE:
-		pStrategy = WelsDynamicCast(IStrategy *, new CDownsampling(iCpuFlag));
-		break;
-	case METHOD_VAA_STATISTICS:
-		pStrategy = WelsDynamicCast(IStrategy *, new CVAACalculation(iCpuFlag));
-		break;
-	case METHOD_BACKGROUND_DETECTION:
-		pStrategy = WelsDynamicCast(IStrategy *, new CBackgroundDetection(iCpuFlag));
-		break;
-	case METHOD_ADAPTIVE_QUANT:
-		pStrategy = WelsDynamicCast(IStrategy *, new CAdaptiveQuantization(iCpuFlag));
-		break;
-	case METHOD_COMPLEXITY_ANALYSIS:
-		pStrategy = WelsDynamicCast(IStrategy *, new CComplexityAnalysis(iCpuFlag));
-		break;
-	case METHOD_IMAGE_ROTATE:
-		pStrategy = WelsDynamicCast(IStrategy *, new CImageRotating(iCpuFlag));
-		break;
-	default:
-		break;
-	}
+  switch (m_eMethod) {
+  case METHOD_COLORSPACE_CONVERT:
+    //not support yet
+    break;
+  case METHOD_DENOISE:
+    pStrategy = WelsDynamicCast (IStrategy*, new CDenoiser (iCpuFlag));
+    break;
+  case METHOD_SCENE_CHANGE_DETECTION:
+    pStrategy = WelsDynamicCast (IStrategy*, new CSceneChangeDetection (iCpuFlag));
+    break;
+  case METHOD_DOWNSAMPLE:
+    pStrategy = WelsDynamicCast (IStrategy*, new CDownsampling (iCpuFlag));
+    break;
+  case METHOD_VAA_STATISTICS:
+    pStrategy = WelsDynamicCast (IStrategy*, new CVAACalculation (iCpuFlag));
+    break;
+  case METHOD_BACKGROUND_DETECTION:
+    pStrategy = WelsDynamicCast (IStrategy*, new CBackgroundDetection (iCpuFlag));
+    break;
+  case METHOD_ADAPTIVE_QUANT:
+    pStrategy = WelsDynamicCast (IStrategy*, new CAdaptiveQuantization (iCpuFlag));
+    break;
+  case METHOD_COMPLEXITY_ANALYSIS:
+    pStrategy = WelsDynamicCast (IStrategy*, new CComplexityAnalysis (iCpuFlag));
+    break;
+  case METHOD_IMAGE_ROTATE:
+    pStrategy = WelsDynamicCast (IStrategy*, new CImageRotating (iCpuFlag));
+    break;
+  default:
+    break;
+  }
 
-	return pStrategy;
+  return pStrategy;
 }
 
 WELSVP_NAMESPACE_END
