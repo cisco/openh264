@@ -1,0 +1,5 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+script: make gtest-bootstrap && make
