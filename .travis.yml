@@ -6,5 +6,5 @@ compiler:
 before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -qq g++-4.6-multilib gcc-multilib libc6-dev-i386 lib32z1-dev
-script: make gtest-bootstrap && make
+script: make gtest-bootstrap && make && make test
 
