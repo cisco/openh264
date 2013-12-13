@@ -32,7 +32,7 @@
 ;*  intra_pred_util.asm
 ;*
 ;*  Abstract
-;*      mmxext/sse for WelsFillingPred8to16, WelsFillingPred8x2to16 and 
+;*      mmxext/sse for WelsFillingPred8to16, WelsFillingPred8x2to16 and
 ;*		WelsFillingPred1to16 etc.
 ;*
 ;*  History
@@ -84,7 +84,7 @@ WelsFillingPred8to16_mmx:
 	movq mm0, [ecx]
 	movq [eax  ], mm0
 	movq [eax+8], mm0
-	
+
 	WELSEMMS
 	ret
 
@@ -100,16 +100,16 @@ WelsFillingPred8x2to16_mmx:
 	movq mm1, [ecx+8]
 	movq [eax  ], mm0
 	movq [eax+8], mm1
-	
+
 	WELSEMMS
 
 	ret
 
 %macro butterfly_1to8_mmx	3	; mm? for dst, mm? for tmp, one byte for pSrc [generic register name: a/b/c/d]
-	mov %3h, %3l	
-	movd %2, e%3x		; i.e, 1% = eax (=b0)	
-	pshufw %1, %2, 00h	; b0 b0 b0 b0, b0 b0 b0 b0	
-%endmacro 
+	mov %3h, %3l
+	movd %2, e%3x		; i.e, 1% = eax (=b0)
+	pshufw %1, %2, 00h	; b0 b0 b0 b0, b0 b0 b0 b0
+%endmacro
 
 ALIGN 16
 ;***********************************************************************----------------
@@ -120,10 +120,10 @@ WelsFillingPred1to16_mmx:
 
 	mov cl, byte [esp+8]	; v
 	butterfly_1to8_mmx	mm0, mm1, c	; mm? for dst, mm? for tmp, one byte for pSrc [generic register name: a/b/c/d]
-	
+
 	movq [eax  ], mm0
 	movq [eax+8], mm0
-	
+
 	WELSEMMS
 
 	ret
@@ -136,9 +136,9 @@ WelsFillingPred8x2to16_sse2:
 	mov eax, [esp+4]	; pred
 	mov ecx, [esp+8]	; v
 
-	movdqa xmm0, [ecx]	
-	movdqa [eax], xmm0	
-	
+	movdqa xmm0, [ecx]
+	movdqa [eax], xmm0
+
 	ret
 
 ALIGN 16
@@ -150,7 +150,7 @@ WelsFillingPred1to16_sse2:
 
 	mov cl, byte [esp+8]	; v
 	butterfly_1to16_sse	xmm0, xmm1, c		; dst, tmp, pSrc [generic register name: a/b/c/d]
-	
+
 	movdqa [eax], xmm0
-	
+
 	ret

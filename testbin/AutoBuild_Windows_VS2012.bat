@@ -36,7 +36,7 @@ echo "WelsEncoder Building....."
 cd %CurDir%
 cd %EncoderProjectDir%
 echo current directory is %EncoderProjectDir%
-rem vcclean 
+rem vcclean
 
 echo %VCMSBUILDEXE_RELEASE% WelsEncoder_2012.sln
 %VCMSBUILDEXE_RELEASE% WelsEncoder_2012.sln
@@ -49,7 +49,7 @@ echo "WelsDecoder Building....."
 cd %CurDir%
 cd %DecoderProjectDir%
 echo current directory is %DecoderProjectDir%
-rem vcclean 
+rem vcclean
 
 echo %VCMSBUILDEXE_RELEASE% WelsDecoder_2012.sln
 

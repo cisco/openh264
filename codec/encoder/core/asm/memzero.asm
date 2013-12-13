@@ -32,7 +32,7 @@
 ;*  memzero.asm
 ;*
 ;*  Abstract
-;*      
+;*
 ;*
 ;*  History
 ;*      9/16/2009 Created
@@ -47,8 +47,8 @@ BITS 32
 ; Code
 ;***********************************************************************
 
-SECTION .text			
-		
+SECTION .text
+
 ALIGN 16
 ;***********************************************************************
 ;_inline void __cdecl WelsPrefetchZero_mmx(int8_t const*_A);
@@ -57,7 +57,7 @@ WELS_EXTERN WelsPrefetchZero_mmx
 WelsPrefetchZero_mmx:
 	mov  eax,[esp+4]
 	prefetchnta [eax]
-	ret 			
+	ret
 
 
 ALIGN 16
@@ -69,7 +69,7 @@ WelsSetMemZeroAligned64_sse2:
 		mov		eax,	[esp + 4]          ; dst
 		mov		ecx,	[esp + 8]
 		neg		ecx
-			
+
 		pxor	xmm0,		xmm0
 .memzeroa64_sse2_loops:
 		movdqa	[eax],		xmm0
@@ -77,11 +77,11 @@ WelsSetMemZeroAligned64_sse2:
 		movdqa	[eax+32],	xmm0
 		movdqa	[eax+48],	xmm0
 		add		eax, 0x40
-		
+
 		add ecx, 0x40
 		jnz near .memzeroa64_sse2_loops
-			
-		ret	
+
+		ret
 
 ALIGN 16
 ;***********************************************************************
@@ -92,7 +92,7 @@ WelsSetMemZeroSize64_mmx:
 		mov		eax,	[esp + 4]          ; dst
 		mov		ecx,	[esp + 8]
 		neg		ecx
-			
+
 		pxor	mm0,		mm0
 .memzero64_mmx_loops:
 		movq	[eax],		mm0
@@ -102,16 +102,16 @@ WelsSetMemZeroSize64_mmx:
 		movq	[eax+32],	mm0
 		movq	[eax+40],	mm0
 		movq	[eax+48],	mm0
-		movq	[eax+56],	mm0		
+		movq	[eax+56],	mm0
 		add		eax,		0x40
-		
+
 		add ecx, 0x40
 		jnz near .memzero64_mmx_loops
-			
-		WELSEMMS	
-		ret	
-	
-ALIGN 16		
+
+		WELSEMMS
+		ret
+
+ALIGN 16
 ;***********************************************************************
 ;   void WelsSetMemZeroSize8_mmx(void *dst, int32_t size)
 ;***********************************************************************
@@ -119,17 +119,17 @@ WELS_EXTERN WelsSetMemZeroSize8_mmx
 WelsSetMemZeroSize8_mmx:
 		mov		eax,	[esp + 4]		; dst
 		mov		ecx,	[esp + 8]		; size
-		neg		ecx			
+		neg		ecx
 		pxor	mm0,		mm0
-		
+
 .memzero8_mmx_loops:
 		movq	[eax],		mm0
 		add		eax,		0x08
-	
+
 		add		ecx,		0x08
 		jnz near .memzero8_mmx_loops
-		
-		WELSEMMS	
-		ret	
 
-							
+		WELSEMMS
+		ret
+
+

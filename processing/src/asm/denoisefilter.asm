@@ -55,25 +55,25 @@ BITS 32
 ; Code
 ;***********************************************************************
 SECTION .text
-	
+
 %macro	WEIGHT_LINE	9
 		movq		%2,	%9
 		punpcklbw	%2,	%7
 		movdqa		%8,	%2
-		
+
 		movdqa		%1,	%6
 		psubusb		%1,	%8
 		psubusb		%8,	%6
 		por			%8,	%1		; ABS(curPixel - centerPixel);
-		
+
 		movdqa		%1,	%3
 		psubusb		%1,	%8
 
 		pmullw		%1,	%1
 		psrlw		%1,	5
-		pmullw		%2,	%1		
+		pmullw		%2,	%1
 		paddusw		%4,	%1
-		paddusw		%5,	%2	
+		paddusw		%5,	%2
 %endmacro
 
 %macro	WEIGHT_LINE1_UV	4
@@ -91,12 +91,12 @@ SECTION .text
 		punpcklbw	%2,	%4
 		psllw		%2,	1
 		paddw		%3,	%2
-		
+
 		movdqa		%2,	%1
 		psrldq		%2,	3
 		punpcklbw	%2,	%4
 		paddw		%3,	%2
-		
+
 		movdqa		%2,	%1
 		psrldq		%2,	4
 		punpcklbw	%2,	%4
@@ -119,13 +119,13 @@ SECTION .text
 		punpcklbw	%2,	%4
 		psllw		%2,	2
 		paddw		%3,	%2
-		
+
 		movdqa		%2,	%1
 		psrldq		%2,	3
 		punpcklbw	%2,	%4
 		psllw		%2,	1
 		paddw		%3,	%2
-		
+
 		movdqa		%2,	%1
 		psrldq		%2,	4
 		punpcklbw	%2,	%4
@@ -149,13 +149,13 @@ SECTION .text
 		punpcklbw	%2,	%4
 		pmullw		%2,	[sse2_20]
 		paddw		%3,	%2
-		
+
 		movdqa		%2,	%1
 		psrldq		%2,	3
 		punpcklbw	%2,	%4
 		psllw		%2,	2
 		paddw		%3,	%2
-		
+
 		movdqa		%2,	%1
 		psrldq		%2,	4
 		punpcklbw	%2,	%4
@@ -177,7 +177,7 @@ WELS_EXTERN BilateralLumaFilter8_sse2
 %define		stride		esp + pushsize + 8
 BilateralLumaFilter8_sse2:
 		push		ebx
-		
+
 		pxor		xmm7,	xmm7
 		mov			eax,	[pixel]
 		mov			ebx,	eax
@@ -186,23 +186,23 @@ BilateralLumaFilter8_sse2:
 		movdqa		xmm3,	[sse2_32]
 		pxor		xmm4,	xmm4		; nTotWeight
 		pxor		xmm5,	xmm5		; nSum
-		
+
 		dec			eax
 		mov			ecx,	[stride]
-		
+
 		WEIGHT_LINE	xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [eax]			; pixel 4
 		WEIGHT_LINE	xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [eax + 2]		; pixel 5
-		
+
 		sub			eax,	ecx
 		WEIGHT_LINE	xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [eax]			; pixel 1
 		WEIGHT_LINE	xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [eax + 1]		; pixel 2
 		WEIGHT_LINE	xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [eax + 2]		; pixel 3
-		
+
 		lea			eax,	[eax + ecx * 2]
 		WEIGHT_LINE	xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [eax]			; pixel 6
 		WEIGHT_LINE	xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [eax + 1]		; pixel 7
 		WEIGHT_LINE	xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [eax + 2]		; pixel 8
-		
+
 		pcmpeqw		xmm0,	xmm0
 		psrlw		xmm0,	15
 		psllw		xmm0,	8
@@ -211,10 +211,10 @@ BilateralLumaFilter8_sse2:
 		paddusw		xmm5,	xmm0
 		psrlw		xmm5,	8
 		packuswb	xmm5,	xmm5
-		movq		[ebx],	xmm5		
-		
+		movq		[ebx],	xmm5
+
 		pop ebx
-		ret	
+		ret
 
 WELS_EXTERN WaverageChromaFilter8_sse2
 ;***********************************************************************
@@ -231,33 +231,33 @@ ALIGN 16
 WaverageChromaFilter8_sse2:
 		mov		edx,	[esp + 4]	; pixels
 		mov		ecx,	[esp + 8]	; stride
-		
+
 		mov		eax,	ecx
 		add		eax,	eax
 		sub		edx,	eax			; pixels - 2 * stride
 		sub		edx,	2
-			
-		pxor	xmm0,	xmm0	
+
+		pxor	xmm0,	xmm0
 		pxor	xmm3,	xmm3
-	
+
 		movdqu		xmm1,	[edx]
 		WEIGHT_LINE1_UV	xmm1,	xmm2,	xmm3,	xmm0
-		
+
 		movdqu		xmm1,	[edx + ecx]
-		WEIGHT_LINE2_UV	xmm1,	xmm2,	xmm3,	xmm0	
-		
-		add		edx,	eax	
+		WEIGHT_LINE2_UV	xmm1,	xmm2,	xmm3,	xmm0
+
+		add		edx,	eax
 		movdqu		xmm1,	[edx]
 		WEIGHT_LINE3_UV	xmm1,	xmm2,	xmm3,	xmm0
-		
+
 		movdqu		xmm1,	[edx + ecx]
-		WEIGHT_LINE2_UV	xmm1,	xmm2,	xmm3,	xmm0	
-		
+		WEIGHT_LINE2_UV	xmm1,	xmm2,	xmm3,	xmm0
+
 		movdqu		xmm1,	[edx + ecx * 2]
-		WEIGHT_LINE1_UV	xmm1,	xmm2,	xmm3,	xmm0		
-	
+		WEIGHT_LINE1_UV	xmm1,	xmm2,	xmm3,	xmm0
+
 		psrlw		xmm3,		6
 		packuswb	xmm3,		xmm3
-		movq		[edx + 2],		xmm3			
+		movq		[edx + 2],		xmm3
 
-		ret	
+		ret

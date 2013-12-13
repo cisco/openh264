@@ -45,7 +45,7 @@
 bits 32
 
 ;***********************************************************************
-; Macros 
+; Macros
 ;***********************************************************************
 
 ;***********************************************************************
@@ -59,7 +59,7 @@ align 16
 sse2_1: dw 1, 1, 1, 1, 1, 1, 1, 1
 align 16
 sse2_b1: db 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
-i_ds_table: db 3, 2, 2, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
+i_ds_table: db 3, 2, 2, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 align 16
 sse2_plane_inc_minus: dw -7, -6, -5, -4, -3, -2, -1, 0
 align 16
@@ -139,7 +139,7 @@ low_mask_table:
     db  4, 8, 5, 8, 8,12, 1, 4, 4, 8
     db  4, 7, 7,11, 4, 8, 7,11, 8,11
     db 11,15, 1, 4, 3, 7, 4, 7, 7,11
-    db  3, 7, 6,10, 7,10,10,14, 4, 7 
+    db  3, 7, 6,10, 7,10,10,14, 4, 7
     db  7,11, 7,10,10,14, 7,11,10,14
     db 11,14,14,18, 0, 4, 3, 7, 3, 6
     db  6,10, 3, 7, 6,10, 7,10,10,14
@@ -191,7 +191,7 @@ WelsScan4x4DcAc_sse2:
 	movdqa     [eax],xmm0
 	movdqa     [eax+16], xmm1
 	ret
-	
+
 ;***********************************************************************
 ;void WelsScan4x4DcAc_ssse3( int16_t level[16], int16_t *pDct )
 ;***********************************************************************
@@ -206,7 +206,7 @@ WelsScan4x4DcAc_ssse3:
 	pinsrw		xmm0, eax, 7			; xmm0[7]	=	[8]
 	pinsrw		xmm1, ecx, 0			; xmm1[0]	=	[7]
 	pshufb		xmm1, [pb_scanacdc_maskb]
-	pshufb		xmm0, [pb_scanacdc_maska]	
+	pshufb		xmm0, [pb_scanacdc_maska]
 
 	mov        eax,  [esp+4]
 	movdqa     [eax],xmm0
@@ -224,7 +224,7 @@ WelsScan4x4Ac_sse2:
 	movdqa     xmm2, xmm0
 	punpcklqdq xmm0, xmm1
 	punpckhqdq xmm2, xmm1
-	
+
 	movdqa     xmm3, xmm0
 	punpckldq  xmm0, xmm2
 	punpckhdq  xmm3, xmm2
@@ -236,10 +236,10 @@ WelsScan4x4Ac_sse2:
 	pextrw     edx,  xmm3, 0
 	pinsrw     xmm3, eax,  0
 	pinsrw     xmm0, edx,  3
-	
+
 	pshufhw    xmm1, xmm0, 0x93
 	pshuflw    xmm2, xmm3, 0x39
-    
+
     movdqa     xmm3, xmm2
     psrldq     xmm1, 2
     pslldq     xmm3, 14
@@ -255,13 +255,13 @@ WelsScan4x4Ac_sse2:
 ;void int32_t WelsCalculateSingleCtr4x4_sse2( int16_t *pDct );
 ;***********************************************************************
 ALIGN 16
-WELS_EXTERN WelsCalculateSingleCtr4x4_sse2 
+WELS_EXTERN WelsCalculateSingleCtr4x4_sse2
 WelsCalculateSingleCtr4x4_sse2:
 	push      ebx
 	mov       eax,  [esp+8]
 	movdqa    xmm0, [eax]
 	movdqa    xmm1, [eax+16]
-	
+
 	packsswb  xmm0, xmm1
 
     pxor      xmm3, xmm3
@@ -317,7 +317,7 @@ WelsGetNoneZeroCount_sse2:
 	and       edx,  0xff
 	shr       ecx,  8
 ;	and       ecx,  0xff	; we do not need this due to high 16bits equal to 0 yet
-	xor       eax,  eax	
+	xor       eax,  eax
 	add       al,  [nozero_count_table+ecx]
 	add       al,  [nozero_count_table+edx]
 	ret

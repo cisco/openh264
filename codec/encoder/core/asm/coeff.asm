@@ -318,25 +318,25 @@ byte_1pos_table:
 SECTION .text
 
 
-	
+
 ;***********************************************************************
-;int32_t CavlcParamCal_sse2(int16_t*coffLevel, uint8_t* run, int16_t *Level, int32_t* total_coeffs , int32_t endIdx); 
+;int32_t CavlcParamCal_sse2(int16_t*coffLevel, uint8_t* run, int16_t *Level, int32_t* total_coeffs , int32_t endIdx);
 ;***********************************************************************
 WELS_EXTERN CavlcParamCal_sse2
 CavlcParamCal_sse2:
 	push ebx
 	push edi
 	push esi
-	
+
 	mov			eax,	[esp+16]	;coffLevel
 	mov			edi,	[esp+24]	;Level
 	mov			ebx,	[esp+32]	;endIdx
 	cmp			ebx,	3
-	jne			.Level16	
+	jne			.Level16
 	pxor		xmm1,	xmm1
 	movq		xmm0,	[eax]	; removed QWORD
-	jmp			.Cal_begin		
-.Level16:	
+	jmp			.Cal_begin
+.Level16:
 	movdqa		xmm0,	[eax]
 	movdqa		xmm1,	[eax+16]
 .Cal_begin:
@@ -354,7 +354,7 @@ CavlcParamCal_sse2:
 	pcmpeqw		xmm7,	xmm7	;generate -1
     mov			ebx,	0xff
     ;pinsrw		xmm6,	ebx,	3
-   
+
     mov       bl,   dh
 
 	lea       ebx,  [byte_1pos_table+8*ebx]
@@ -362,7 +362,7 @@ CavlcParamCal_sse2:
 	pextrw    ecx,  xmm0, 3
 	shr       ecx,  8
     mov       dh,   cl
- 
+
 .loopHighFind0:
     cmp       ecx,   0
     je        .loopHighFind0End
@@ -372,7 +372,7 @@ CavlcParamCal_sse2:
     add       esi, 8
     mov       esi, [eax+2*esi]
     mov       [edi], si
-    add       edi,   2 
+    add       edi,   2
     ;add       ebx,   1
     inc		  ebx
     dec       ecx
@@ -403,8 +403,8 @@ CavlcParamCal_sse2:
 	;and       edx, 0xff
 	movzx	  edx,	byte [ebx]
 	mov       edx, [eax+2*edx]
-	mov       [edi], dx 
-	add       edi,   2 
+	mov       [edi], dx
+	add       edi,   2
 	;add       ebx,   1
 	inc		  ebx
     dec       esi
@@ -436,8 +436,8 @@ CavlcParamCal_sse2:
     psllq    xmm0, xmm3
     psrlq    xmm0, xmm3
     movdqa   xmm4, xmm1
-    psllq    xmm1, xmm2 
-    psrlq    xmm4, xmm3 
+    psllq    xmm1, xmm2
+    psrlq    xmm4, xmm3
     punpcklqdq xmm1, xmm4
     por      xmm0,  xmm1
 

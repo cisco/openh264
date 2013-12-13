@@ -48,26 +48,26 @@ SECTION .rodata align=16
 
 ;***********************************************************************
 ; Constant
-;***********************************************************************		
-			
+;***********************************************************************
+
 align 16
-SSE2_DeQuant8 dw  10, 13, 10, 13, 13, 16, 13, 16, 
+SSE2_DeQuant8 dw  10, 13, 10, 13, 13, 16, 13, 16,
 			dw	10, 13, 10, 13, 13, 16, 13, 16,
-            dw  11, 14, 11, 14, 14, 18, 14, 18, 
+            dw  11, 14, 11, 14, 14, 18, 14, 18,
 			dw  11, 14, 11, 14, 14, 18, 14, 18,
-			dw  13, 16, 13, 16, 16, 20, 16, 20, 
 			dw  13, 16, 13, 16, 16, 20, 16, 20,
-            dw  14, 18, 14, 18, 18, 23, 18, 23, 
+			dw  13, 16, 13, 16, 16, 20, 16, 20,
+            dw  14, 18, 14, 18, 18, 23, 18, 23,
 			dw  14, 18, 14, 18, 18, 23, 18, 23,
-			dw  16, 20, 16, 20, 20, 25, 20, 25, 
 			dw  16, 20, 16, 20, 20, 25, 20, 25,
-            dw  18, 23, 18, 23, 23, 29, 23, 29, 
+			dw  16, 20, 16, 20, 20, 25, 20, 25,
+            dw  18, 23, 18, 23, 23, 29, 23, 29,
 			dw  18, 23, 18, 23, 23, 29, 23, 29
-			
+
 
 ;***********************************************************************
 ; MMX functions
-;***********************************************************************			
+;***********************************************************************
 
 %macro MMX_LoadDiff4P 5
 	movd        %1, [%3]
@@ -112,7 +112,7 @@ SSE2_DeQuant8 dw  10, 13, 10, 13, 13, 16, 13, 16,
     MMX_SumSub		%4, %1, %6
     MMX_SumSub		%3, %2, %6
     MMX_SumSub		%3, %4, %6
-    MMX_SumSubMul2  %1, %2, %5  
+    MMX_SumSubMul2  %1, %2, %5
 %endmacro
 
 %macro MMX_IDCT 6
@@ -145,13 +145,13 @@ WelsDctT4_mmx:
     mov     edx, [esp+24]   ; i_pix2
 
     WELS_Zero    mm7
-    
+
     MMX_LoadDiff4x4P mm1, mm2, mm3, mm4, eax, ebx, ecx, edx, mm0, mm7
 
-    MMX_DCT			mm1, mm2, mm3 ,mm4, mm5, mm6           
+    MMX_DCT			mm1, mm2, mm3 ,mm4, mm5, mm6
     MMX_Trans4x4W	mm3, mm1, mm4, mm5, mm2
-    
-    MMX_DCT			mm3, mm5, mm2 ,mm4, mm1, mm6                    
+
+    MMX_DCT			mm3, mm5, mm2 ,mm4, mm1, mm6
     MMX_Trans4x4W	mm2, mm3, mm4, mm1, mm5
 
     mov     eax, [esp+ 8]   ; pDct
@@ -178,15 +178,15 @@ WelsIDctT4Rec_mmx:
 %define     i_pred      esp+pushsize+16
 %define     pDct        esp+pushsize+20
 
-	mov     eax, [pDct   ] 
+	mov     eax, [pDct   ]
     movq    mm0, [eax+ 0]
     movq    mm1, [eax+ 8]
     movq    mm2, [eax+16]
     movq    mm3, [eax+24]
-    mov     edx, [p_dst ]   
-    mov     ecx, [i_dst ]   
+    mov     edx, [p_dst ]
+    mov     ecx, [i_dst ]
     mov     eax, [p_pred]
-    mov     ebx, [i_pred]     
+    mov     ebx, [i_pred]
 
 	MMX_Trans4x4W		mm0, mm1, mm2, mm3, mm4
 	MMX_IDCT			mm1, mm2, mm3, mm4, mm0, mm6
@@ -195,14 +195,14 @@ WelsIDctT4Rec_mmx:
 
     WELS_Zero			mm7
     WELS_DW32			mm6
-    
+
     MMX_StoreDiff4P		mm3, mm0, mm6, mm7, [edx], [eax]
     MMX_StoreDiff4P		mm4, mm0, mm6, mm7, [edx+ecx], [eax+ebx]
     lea     edx, [edx+2*ecx]
     lea     eax, [eax+2*ebx]
     MMX_StoreDiff4P		mm1, mm0, mm6, mm7, [edx], [eax]
     MMX_StoreDiff4P		mm2, mm0, mm6, mm7, [edx+ecx], [eax+ebx]
-    
+
 	WELSEMMS
 %undef	pushsize
 %undef  p_dst
@@ -220,17 +220,17 @@ WelsIDctT4Rec_mmx:
 %macro SSE2_Store4x8p 6
 	SSE2_XSawp qdq, %2, %3, %6
 	SSE2_XSawp qdq, %4, %5, %3
-	MOVDQ    [%1+0x00], %2 
-	MOVDQ    [%1+0x10], %4 
-	MOVDQ    [%1+0x20], %6 
-	MOVDQ    [%1+0x30], %3 
+	MOVDQ    [%1+0x00], %2
+	MOVDQ    [%1+0x10], %4
+	MOVDQ    [%1+0x20], %6
+	MOVDQ    [%1+0x30], %3
 %endmacro
 
 %macro SSE2_Load4x8p 6
 	MOVDQ    %2,	[%1+0x00]
-	MOVDQ    %4,	[%1+0x10]  
-	MOVDQ    %6,	[%1+0x20]  
-	MOVDQ    %3,	[%1+0x30]  
+	MOVDQ    %4,	[%1+0x10]
+	MOVDQ    %6,	[%1+0x20]
+	MOVDQ    %3,	[%1+0x30]
 	SSE2_XSawp qdq, %4, %3, %5
 	SSE2_XSawp qdq, %2, %6, %3
 %endmacro
@@ -271,40 +271,40 @@ WelsIDctT4Rec_mmx:
 %endmacro
 
 %macro SSE2_Load8DC	6
-	movdqa		%1,		%6		; %1 = dc0 dc1	
+	movdqa		%1,		%6		; %1 = dc0 dc1
 	paddw       %1,		%5
-    psraw       %1,		$6		; (dc + 32) >> 6	
-    
+    psraw       %1,		$6		; (dc + 32) >> 6
+
     movdqa		%2,		%1
     psrldq		%2,		4
  	punpcklwd	%2,		%2
-	punpckldq	%2,		%2		; %2 = dc2 dc2 dc2 dc2 dc3 dc3 dc3 dc3	   
+	punpckldq	%2,		%2		; %2 = dc2 dc2 dc2 dc2 dc3 dc3 dc3 dc3
 
     movdqa		%3,		%1
     psrldq		%3,		8
  	punpcklwd	%3,		%3
 	punpckldq	%3,		%3		; %3 = dc4 dc4 dc4 dc4 dc5 dc5 dc5 dc5
-	
+
 	movdqa		%4,		%1
     psrldq		%4,		12
  	punpcklwd	%4,		%4
 	punpckldq	%4,		%4		; %4 = dc6 dc6 dc6 dc6 dc7 dc7 dc7 dc7
-	    	
+
 	punpcklwd	%1,		%1
-	punpckldq	%1,		%1		; %1 = dc0 dc0 dc0 dc0 dc1 dc1 dc1 dc1	
+	punpckldq	%1,		%1		; %1 = dc0 dc0 dc0 dc0 dc1 dc1 dc1 dc1
 %endmacro
 
 %macro SSE2_DCT 6
-    SSE2_SumSub		%6, %3,	%5						
-	SSE2_SumSub		%1, %2, %5																		
-	SSE2_SumSub		%3, %2, %5					
-	SSE2_SumSubMul2		%6, %1, %4               	
+    SSE2_SumSub		%6, %3,	%5
+	SSE2_SumSub		%1, %2, %5
+	SSE2_SumSub		%3, %2, %5
+	SSE2_SumSubMul2		%6, %1, %4
 %endmacro
 
 %macro SSE2_IDCT 7
-    SSE2_SumSub       %7, %2, %6					
-    SSE2_SumSubDiv2     %1, %3, %5, %4              
-    SSE2_SumSub	     %2, %1, %5 
+    SSE2_SumSub       %7, %2, %6
+    SSE2_SumSubDiv2     %1, %3, %5, %4
+    SSE2_SumSub	     %2, %1, %5
     SSE2_SumSub		 %7, %4, %5
 %endmacro
 
@@ -316,12 +316,12 @@ ALIGN 16
 WelsDctFourT4_sse2:
     push    ebx
     push	esi
-    mov		esi, [esp+12] 
+    mov		esi, [esp+12]
     mov     eax, [esp+16]   ; pix1
     mov     ebx, [esp+20]   ; i_pix1
     mov     ecx, [esp+24]   ; pix2
-    mov     edx, [esp+28]   ; i_pix2    
-    
+    mov     edx, [esp+28]   ; i_pix2
+
     pxor    xmm7, xmm7
 
 	;Load 4x8
@@ -331,33 +331,33 @@ WelsDctFourT4_sse2:
 	lea		ecx, [ecx + 2 * edx]
 	SSE2_LoadDiff8P    xmm2, xmm6, xmm7, [eax], [ecx]
     SSE2_LoadDiff8P    xmm3, xmm6, xmm7, [eax+ebx], [ecx+edx]
-	
+
 	SSE2_DCT			xmm1, xmm2, xmm3, xmm4, xmm5, xmm0
 	SSE2_TransTwo4x4W	xmm2, xmm0, xmm3, xmm4, xmm1
-	SSE2_DCT			xmm0, xmm4, xmm1, xmm3, xmm5, xmm2             		
+	SSE2_DCT			xmm0, xmm4, xmm1, xmm3, xmm5, xmm2
 	SSE2_TransTwo4x4W	xmm4, xmm2, xmm1, xmm3, xmm0
-	
-	SSE2_Store4x8p esi, xmm4, xmm2, xmm3, xmm0, xmm5  
-	
+
+	SSE2_Store4x8p esi, xmm4, xmm2, xmm3, xmm0, xmm5
+
 	lea		eax, [eax + 2 * ebx]
 	lea		ecx, [ecx + 2 * edx]
-    
+
 	;Load 4x8
 	SSE2_LoadDiff8P    xmm0, xmm6, xmm7, [eax      ], [ecx    ]
     SSE2_LoadDiff8P    xmm1, xmm6, xmm7, [eax+ebx  ], [ecx+edx]
 	lea		eax, [eax + 2 * ebx]
-	lea		ecx, [ecx + 2 * edx]	
+	lea		ecx, [ecx + 2 * edx]
     SSE2_LoadDiff8P    xmm2, xmm6, xmm7, [eax], [ecx]
     SSE2_LoadDiff8P    xmm3, xmm6, xmm7, [eax+ebx], [ecx+edx]
-	
+
 	SSE2_DCT			xmm1, xmm2, xmm3, xmm4, xmm5, xmm0
-	SSE2_TransTwo4x4W	xmm2, xmm0, xmm3, xmm4, xmm1		
-    SSE2_DCT			xmm0, xmm4, xmm1, xmm3, xmm5, xmm2              		
+	SSE2_TransTwo4x4W	xmm2, xmm0, xmm3, xmm4, xmm1
+    SSE2_DCT			xmm0, xmm4, xmm1, xmm3, xmm5, xmm2
 	SSE2_TransTwo4x4W	xmm4, xmm2, xmm1, xmm3, xmm0
-	
+
 	lea		esi, [esi+64]
-	SSE2_Store4x8p esi, xmm4, xmm2, xmm3, xmm0, xmm5 
-	
+	SSE2_Store4x8p esi, xmm4, xmm2, xmm3, xmm0, xmm5
+
     pop esi
     pop ebx
     ret
@@ -377,62 +377,62 @@ WelsIDctFourT4Rec_sse2:
 %define	pushsize	8
     push		ebx
     push		esi
-    
-    mov			eax,		[rec]   
-    mov			ebx,		[stride]   
-    mov			ecx,		[pred]  
-    mov			edx,		[pred_stride]   
-    mov			esi,		[rs]  
+
+    mov			eax,		[rec]
+    mov			ebx,		[stride]
+    mov			ecx,		[pred]
+    mov			edx,		[pred_stride]
+    mov			esi,		[rs]
 
 	;Load 4x8
-	SSE2_Load4x8p  esi, xmm0, xmm1, xmm4, xmm2, xmm5 	
-	
+	SSE2_Load4x8p  esi, xmm0, xmm1, xmm4, xmm2, xmm5
+
 	SSE2_TransTwo4x4W	xmm0, xmm1, xmm4, xmm2, xmm3
   	SSE2_IDCT			xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm0
     SSE2_TransTwo4x4W	xmm1, xmm4, xmm0, xmm2, xmm3
     SSE2_IDCT			xmm4, xmm2, xmm3, xmm0, xmm5, xmm6, xmm1
-    
+
 	WELS_Zero			xmm7
     WELS_DW32			xmm6
 
 	SSE2_StoreDiff8p   xmm4, xmm5, xmm6, xmm7, [eax		],	[ecx]
 	SSE2_StoreDiff8p   xmm0, xmm5, xmm6, xmm7, [eax + ebx	],	[ecx + edx]
 	lea		eax, [eax + 2 * ebx]
-	lea		ecx, [ecx + 2 * edx]	
+	lea		ecx, [ecx + 2 * edx]
 	SSE2_StoreDiff8p   xmm1, xmm5, xmm6, xmm7, [eax],			[ecx]
 	SSE2_StoreDiff8p   xmm2, xmm5, xmm6, xmm7, [eax + ebx	],	[ecx + edx]
-   
+
     add		esi, 64
 	lea		eax, [eax + 2 * ebx]
 	lea		ecx, [ecx + 2 * edx]
-   	SSE2_Load4x8p  esi, xmm0, xmm1, xmm4, xmm2, xmm5 	
-	
+   	SSE2_Load4x8p  esi, xmm0, xmm1, xmm4, xmm2, xmm5
+
 	SSE2_TransTwo4x4W   xmm0, xmm1, xmm4, xmm2, xmm3
-	SSE2_IDCT			xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm0           
+	SSE2_IDCT			xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm0
     SSE2_TransTwo4x4W   xmm1, xmm4, xmm0, xmm2, xmm3
 	SSE2_IDCT			xmm4, xmm2, xmm3, xmm0, xmm5, xmm6, xmm1
 
 	WELS_Zero			xmm7
     WELS_DW32			xmm6
-    
+
 	SSE2_StoreDiff8p   xmm4, xmm5, xmm6, xmm7, [eax		],	[ecx]
 	SSE2_StoreDiff8p   xmm0, xmm5, xmm6, xmm7, [eax + ebx	],	[ecx + edx]
 	lea		eax, [eax + 2 * ebx]
-	lea		ecx, [ecx + 2 * edx]	
+	lea		ecx, [ecx + 2 * edx]
 	SSE2_StoreDiff8p   xmm1, xmm5, xmm6, xmm7, [eax],			[ecx]
-	SSE2_StoreDiff8p   xmm2, xmm5, xmm6, xmm7, [eax + ebx],	[ecx + edx] 
+	SSE2_StoreDiff8p   xmm2, xmm5, xmm6, xmm7, [eax + ebx],	[ecx + edx]
 
     pop		esi
     pop		ebx
     ret
-    
+
   %macro SSE2_StoreDiff4x8p 8
    	SSE2_StoreDiff8p    %1, %3, %4, [%5],			[%6]
-	SSE2_StoreDiff8p    %1, %3, %4, [%5 + %7],		[%6 + %8]	
+	SSE2_StoreDiff8p    %1, %3, %4, [%5 + %7],		[%6 + %8]
 	SSE2_StoreDiff8p    %2, %3, %4, [%5 + 8],		[%6 + 8]
-	SSE2_StoreDiff8p    %2, %3, %4, [%5 + %7 + 8],	[%6 + %8 + 8]	
+	SSE2_StoreDiff8p    %2, %3, %4, [%5 + %7 + 8],	[%6 + %8 + 8]
  %endmacro
- 
+
  ;***********************************************************************
 ; void WelsIDctRecI16x16Dc_sse2(uint8_t *rec, int32_t stride, uint8_t *pred, int32_t pred_stride, int16_t *dct_dc)
 ;***********************************************************************
@@ -443,47 +443,47 @@ ALIGN 16
 WelsIDctRecI16x16Dc_sse2:
     push		esi
     push		edi
-    
+
 	mov			ecx,		[luma_dc]
-    mov			eax,		[rec]	
-    mov			edx,		[stride]	
-    mov			esi,		[pred]	
-    mov			edi,		[pred_stride]	    	
+    mov			eax,		[rec]
+    mov			edx,		[stride]
+    mov			esi,		[pred]
+    mov			edi,		[pred_stride]
 	pxor		xmm7,		xmm7
     WELS_DW32	xmm6
-    
+
 	SSE2_Load8DC			xmm0, xmm1, xmm2, xmm3, xmm6, [ecx]
 	SSE2_StoreDiff4x8p		xmm0, xmm1, xmm5, xmm7, eax, esi, edx, edi
-	
+
 	lea			eax,		[eax + 2 * edx]
-	lea			esi,		[esi + 2 * edi]	
-	SSE2_StoreDiff4x8p		xmm0, xmm1, xmm5, xmm7, eax, esi, edx, edi	
-	  
-	lea			eax,		[eax + 2 * edx]
-	lea			esi,		[esi + 2 * edi]	
-	SSE2_StoreDiff4x8p		xmm2, xmm3, xmm5, xmm7, eax, esi, edx, edi
-	
-	lea			eax,		[eax + 2 * edx]
-	lea			esi,		[esi + 2 * edi]		
-	SSE2_StoreDiff4x8p		xmm2, xmm3, xmm5, xmm7, eax, esi, edx, edi
-	
-	SSE2_Load8DC			xmm0, xmm1, xmm2, xmm3, xmm6, [ecx + 16]	
-	lea			eax,		[eax + 2 * edx]
-	lea			esi,		[esi + 2 * edi]		
+	lea			esi,		[esi + 2 * edi]
 	SSE2_StoreDiff4x8p		xmm0, xmm1, xmm5, xmm7, eax, esi, edx, edi
-	
+
 	lea			eax,		[eax + 2 * edx]
-	lea			esi,		[esi + 2 * edi]	
-	SSE2_StoreDiff4x8p		xmm0, xmm1, xmm5, xmm7, eax, esi, edx, edi	
-	  
-	lea			eax,		[eax + 2 * edx]
-	lea			esi,		[esi + 2 * edi]	 
+	lea			esi,		[esi + 2 * edi]
 	SSE2_StoreDiff4x8p		xmm2, xmm3, xmm5, xmm7, eax, esi, edx, edi
-	
+
 	lea			eax,		[eax + 2 * edx]
-	lea			esi,		[esi + 2 * edi]		
+	lea			esi,		[esi + 2 * edi]
 	SSE2_StoreDiff4x8p		xmm2, xmm3, xmm5, xmm7, eax, esi, edx, edi
-		
+
+	SSE2_Load8DC			xmm0, xmm1, xmm2, xmm3, xmm6, [ecx + 16]
+	lea			eax,		[eax + 2 * edx]
+	lea			esi,		[esi + 2 * edi]
+	SSE2_StoreDiff4x8p		xmm0, xmm1, xmm5, xmm7, eax, esi, edx, edi
+
+	lea			eax,		[eax + 2 * edx]
+	lea			esi,		[esi + 2 * edi]
+	SSE2_StoreDiff4x8p		xmm0, xmm1, xmm5, xmm7, eax, esi, edx, edi
+
+	lea			eax,		[eax + 2 * edx]
+	lea			esi,		[esi + 2 * edi]
+	SSE2_StoreDiff4x8p		xmm2, xmm3, xmm5, xmm7, eax, esi, edx, edi
+
+	lea			eax,		[eax + 2 * edx]
+	lea			esi,		[esi + 2 * edi]
+	SSE2_StoreDiff4x8p		xmm2, xmm3, xmm5, xmm7, eax, esi, edx, edi
+
     pop		edi
     pop		esi
     ret
@@ -517,7 +517,7 @@ WelsIDctRecI16x16Dc_sse2:
 	punpckldq	%3,			%4
 	punpcklqdq	%1,			%3
  %endmacro
- 
+
 ;***********************************************************************
 ;void WelsHadamardT4Dc_sse2( int16_t *luma_dc, int16_t *pDct)
 ;***********************************************************************
@@ -525,23 +525,23 @@ WELS_EXTERN WelsHadamardT4Dc_sse2
 WelsHadamardT4Dc_sse2:
 		mov			eax,		[esp + 4]	; luma_dc
 		mov			ecx,		[esp + 8]	; pDct
-		
+
 		SSE2_Load4Col	    xmm1, xmm5, xmm6, xmm0, ecx
 		SSE2_Load4Col	    xmm2, xmm5, xmm6, xmm0, ecx + 0x40
 		SSE2_Load4Col	    xmm3, xmm5, xmm6, xmm0, ecx + 0x100
 		SSE2_Load4Col	    xmm4, xmm5, xmm6, xmm0, ecx + 0x140
-		
+
 		SSE2_SumSubD		xmm1, xmm2, xmm7
 		SSE2_SumSubD		xmm3, xmm4, xmm7
 		SSE2_SumSubD		xmm2, xmm4, xmm7
-		SSE2_SumSubD		xmm1, xmm3, xmm7	
+		SSE2_SumSubD		xmm1, xmm3, xmm7
 
 		SSE2_Trans4x4D		xmm4, xmm2, xmm1, xmm3, xmm5	; pOut: xmm4,xmm3,xmm5,xmm1
-	
+
 		SSE2_SumSubD		xmm4, xmm3, xmm7
 		SSE2_SumSubD		xmm5, xmm1, xmm7
 
-		WELS_DD1 xmm6      
+		WELS_DD1 xmm6
 		SSE2_SumSubDiv2D	xmm3, xmm1, xmm6, xmm0			; pOut: xmm3 = (xmm3+xmm1+1)/2, xmm0 = (xmm3-xmm1+1)/2
 		SSE2_SumSubDiv2D	xmm4, xmm5, xmm6, xmm1			; pOut: xmm4 = (xmm4+xmm5+1)/2, xmm1 = (xmm4-xmm5+1)/2
         SSE2_Trans4x4D		xmm3, xmm0, xmm1, xmm4, xmm2	; pOut: xmm3,xmm4,xmm2,xmm1
@@ -550,7 +550,7 @@ WelsHadamardT4Dc_sse2:
 		packssdw	xmm2,	xmm1
 		movdqa	[eax+ 0],   xmm3
 		movdqa	[eax+16],   xmm2
-		
-		ret	
+
+		ret
 
 
