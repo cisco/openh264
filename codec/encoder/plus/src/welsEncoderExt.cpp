@@ -31,18 +31,10 @@
  */
 
 #include <assert.h>
-#include "welsEncoderExt.h"
-#include "welsCodecTrace.h"
-#include "typedefs.h"
-#include "wels_const.h"
-#include "utils.h"
-#include "macros.h"
 
-#include "crt_util_safe_x.h"	// Safe CRT routines like util for cross platforms
-#include "ref_list_mgr_svc.h"
 
 #include <time.h>
-#if defined(WIN32) /*&& defined(_DEBUG)*/
+#if defined(WIN32) || defined(WIN64)/*&& defined(_DEBUG)*/
 
 #include <windows.h>
 #include <stdio.h>
@@ -52,7 +44,15 @@
 #else
 #include <sys/time.h>
 #endif
+#include "welsEncoderExt.h"
+#include "welsCodecTrace.h"
+#include "typedefs.h"
+#include "wels_const.h"
+#include "utils.h"
+#include "macros.h"
 
+#include "crt_util_safe_x.h"	// Safe CRT routines like util for cross platforms
+#include "ref_list_mgr_svc.h"
 namespace WelsSVCEnc {
 
 /*
@@ -60,7 +60,7 @@ namespace WelsSVCEnc {
  */
 CWelsH264SVCEncoder::CWelsH264SVCEncoder()
   :	m_pEncContext (NULL),
-#if defined(WIN32)||defined(_MACH_PLATFORM)||defined(__GNUC__)
+#if (defined(WIN32) || defined(WIN64))||defined(_MACH_PLATFORM)||defined(__GNUC__)
     m_pWelsTrace (NULL),
 #endif
     m_pSrcPicList (NULL),
@@ -115,7 +115,7 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
   gettimeofday (&tTimev, NULL);
 #endif//WIN32	
 
-#ifdef WIN32
+#if (defined(WIN32) || defined(WIN64))
 #if defined(_MSC_VER)
 #if _MSC_VER>=1500
   iBufferUsed      += SNPRINTF (strStreamFileName,      iBufferLeft, iBufferLeft,      "enc_bs_0x%p_", (void*)this);
@@ -168,7 +168,7 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
   }
 
   if (iBufferLeft > iBufferUsed) {
-#ifdef WIN32
+#if (defined(WIN32) || defined(WIN64))
 #if defined(_MSC_VER)
 #if _MSC_VER>=1500
     iBufferUsed += SNPRINTF (&strStreamFileName[iBufferUsed], iBufferLeft, iBufferLeft, ".%03.3u.264", tTimeb.millitm);
@@ -183,7 +183,7 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
   }
 
   if (iBufferLeftSize > iBufferUsedSize) {
-#ifdef WIN32
+#if (defined(WIN32) || defined(WIN64))
 #if defined(_MSC_VER)
 #if _MSC_VER>=1500
     iBufferUsedSize += SNPRINTF (&strLenFileName[iBufferUsedSize], iBufferLeftSize, iBufferLeftSize, ".%03.3u.len",
@@ -222,7 +222,7 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
 
 CWelsH264SVCEncoder::~CWelsH264SVCEncoder() {
   WelsLog (NULL, WELS_LOG_INFO, "CWelsH264SVCEncoder::~CWelsH264SVCEncoder()\n");
-#if defined(WIN32)||defined(_MACH_PLATFORM)||defined(__GNUC__)
+#if (defined(WIN32) || defined(WIN64))||defined(_MACH_PLATFORM)||defined(__GNUC__)
 
   if (m_pWelsTrace != NULL) {
     delete m_pWelsTrace;
@@ -256,7 +256,7 @@ CWelsH264SVCEncoder::~CWelsH264SVCEncoder() {
 }
 
 void CWelsH264SVCEncoder::InitEncoder (void) {
-#if defined(WIN32)||defined(_MACH_PLATFORM)||defined(__GNUC__)
+#if (defined(WIN32) || defined(WIN64))||defined(_MACH_PLATFORM)||defined(__GNUC__)
 
 #ifdef REC_FRAME_COUNT
   WelsLog (m_pEncContext, WELS_LOG_INFO,

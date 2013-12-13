@@ -37,7 +37,7 @@
  *      08/18/2008 Created
  *
  *****************************************************************************/
-#if !defined(WIN32)
+#if !(defined(WIN32) || defined(WIN64))
 #include <string.h>
 #include <stdio.h>
 #endif

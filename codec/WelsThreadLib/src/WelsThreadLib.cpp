@@ -42,7 +42,7 @@
 #include "WelsThreadLib.h"
 #include <stdio.h>
 
-#ifdef  WIN32
+#if  (defined(WIN32) || defined(WIN64))
 
 void WelsSleep (uint32_t dwMilliseconds) {
   Sleep (dwMilliseconds);

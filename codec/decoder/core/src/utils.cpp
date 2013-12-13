@@ -42,7 +42,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-#if defined(WIN32)
+#if defined(WIN32) || defined (WIN64)
 #include <windows.h>
 #include <sys/types.h>
 #include <sys/timeb.h>
@@ -79,7 +79,7 @@ void_t WelsLog (void_t* pPtr, int32_t iLevel, const char* kpFmt, ...) {
 }
 
 
-#if  defined(WIN32)
+#if  (defined(WIN32) || defined(WIN64))
 
 #if  defined(_MSC_VER) && (_MSC_VER>=1500)
 

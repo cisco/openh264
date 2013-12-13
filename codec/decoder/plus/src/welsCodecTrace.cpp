@@ -30,7 +30,7 @@
  *
  */
 
-#ifdef WIN32
+#if (defined(WIN32) || defined(WIN64))
 #include <windows.h>
 #include <tchar.h>
 #endif
@@ -180,7 +180,7 @@ int32_t CWelsTraceFile::WriteString (int32_t iLevel, const str_t* pStr) {
 }
 
 
-#ifdef WIN32
+#if (defined(WIN32) || defined(WIN64))
 
 int32_t CWelsTraceWinDgb::WriteString (int32_t iLevel, const str_t* pStr) {
   OutputDebugStringA (pStr);
@@ -211,7 +211,7 @@ int32_t  CWelsCodecTrace::LoadWelsTraceModule() {
   m_fpWarnTrace = welsStderrTrace<WELS_LOG_WARNING>;
   m_fpErrorTrace = welsStderrTrace<WELS_LOG_ERROR>;
 #else
-#if defined WIN32
+#if (defined(WIN32) || defined(WIN64))
   HMODULE hHandle = ::LoadLibrary ("welstrace.dll");
 //	HMODULE handle = ::LoadLibrary("contrace.dll");  // for c7 trace
   if (NULL == hHandle)
@@ -293,7 +293,7 @@ int32_t  CWelsCodecTrace::LoadWelsTraceModule() {
 }
 
 int32_t  CWelsCodecTrace::UnloadWelsTraceModule() {
-#if defined WIN32
+#if (defined(WIN32) || defined(WIN64))
   if (m_hTraceHandle) {
     ::FreeLibrary ((HMODULE)m_hTraceHandle);
   }
@@ -320,7 +320,7 @@ int32_t  CWelsCodecTrace::WriteString (int32_t iLevel, const str_t* pStr) {
   if (m_hTraceHandle)
 #endif
   {
-#ifdef WIN32
+#if (defined(WIN32) || defined(WIN64))
     switch (iLevel) {
     case WELS_LOG_ERROR:
       if (m_fpErrorTrace)
@@ -382,7 +382,7 @@ IWelsTrace*   CreateWelsTrace (EWelsTraceType  eType,  void_t* pParam) {
   case Wels_Trace_Type_File:
     pTrace = new CWelsTraceFile();
     break;
-#ifdef WIN32
+#if (defined(WIN32) || defined(WIN64))
   case Wels_Trace_Type_WinDgb:
     pTrace = new CWelsTraceWinDgb();
     break;

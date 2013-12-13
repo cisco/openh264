@@ -182,7 +182,7 @@ int32_t		iEndMbIndex;	// exclusive
 typedef struct TagSliceThreading {
 SSliceThreadPrivateData*	pThreadPEncCtx;// thread context, [iThreadIdx]
 WELS_THREAD_HANDLE*			pThreadHandles;// thread handles, [iThreadIdx]
-#ifdef WIN32
+#if defined (WIN32) || defined(WIN64)
 WELS_EVENT*					pSliceCodedEvent;// events for slice coded state, [iThreadIdx]
 WELS_EVENT*					pReadySliceCodingEvent;	// events for slice coding ready, [iThreadIdx]
 WELS_EVENT*					pFinSliceCodingEvent;	// notify slice coding thread is done

@@ -98,7 +98,7 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
  private:
   sWelsEncCtx*	m_pEncContext;
 
-#if defined(WIN32)||defined(_MACH_PLATFORM)||defined(__GNUC__)
+#if (defined(WIN32) || defined(WIN64))||defined(_MACH_PLATFORM)||defined(__GNUC__)
   welsCodecTrace*			m_pWelsTrace;
 #endif
   SSourcePicture**			m_pSrcPicList;
