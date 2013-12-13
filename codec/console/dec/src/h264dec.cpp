@@ -31,7 +31,7 @@
  * h264dec.cpp:		Wels Decoder Console Implementation file
  */
 
-#if defined (WIN32)
+#if (defined(WIN32) || defined(WIN64))
 #include <windows.h>
 #include <tchar.h>
 #else

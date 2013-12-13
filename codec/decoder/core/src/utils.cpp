@@ -79,7 +79,7 @@ void_t WelsLog (void_t* pPtr, int32_t iLevel, const char* kpFmt, ...) {
 }
 
 
-#if  defined(WIN32)
+#if  (defined(WIN32) || defined(WIN64))
 
 #if  defined(_MSC_VER) && (_MSC_VER>=1500)
 

@@ -39,7 +39,7 @@
 //using namespace WelsDec;
 namespace WelsDec {
 
-#ifdef WIN32
+#if (defined(WIN32) || defined(WIN64))
 typedef int (*CM_WELS_TRACE) (const char* kpFormat, ...);
 #else
 typedef int (*CM_WELS_TRACE) (const char* kpDllName, const char* kpFormat, ...);
@@ -124,7 +124,7 @@ virtual int32_t  WriteString (int32_t iLevel, const str_t* pStr);
 WelsFileHandle* m_pTraceFile;
 };
 
-#ifdef  WIN32
+#if  (defined(WIN32) || defined(WIN64))
 class CWelsTraceWinDgb : public CWelsTraceBase {
  public:
 CWelsTraceWinDgb() {};
