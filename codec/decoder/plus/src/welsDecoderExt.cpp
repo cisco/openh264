@@ -82,7 +82,7 @@ namespace WelsDec {
 *	Input parameters: none
 *
 *	return: none
-/***************************************************************************/
+***************************************************************************/
 CWelsDecoder::CWelsDecoder (void_t)
   :	m_pDecContext (NULL),
     m_pTrace (NULL) {
@@ -146,7 +146,7 @@ CWelsDecoder::CWelsDecoder (void_t)
 *	Input parameters: none
 *
 *	return: none
-/***************************************************************************/
+***************************************************************************/
 CWelsDecoder::~CWelsDecoder() {
   IWelsTrace::WelsVTrace (m_pTrace, IWelsTrace::WELS_LOG_INFO, "CWelsDecoder::~CWelsDecoder()");
 

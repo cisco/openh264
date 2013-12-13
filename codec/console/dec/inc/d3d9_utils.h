@@ -114,7 +114,7 @@ class CD3D9ExUtils {
 };
 #endif
 
-typedef enum {
+enum {
   OS_UNSUPPORTED = 0,
   OS_XP,
   OS_VISTA_UPPER
