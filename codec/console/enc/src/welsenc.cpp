@@ -970,7 +970,7 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     long iEncode = pPtrEnc->EncodeFrame (pPlanes[0], &sFbi);
     iTotal += WelsTime() - iStart;
     if (videoFrameTypeInvalid == iEncode) {
-      fprintf (stderr, "EncodeFrame() failed: %d.\n", iEncode);
+      fprintf (stderr, "EncodeFrame() failed: %ld.\n", iEncode);
       break;
     }
 

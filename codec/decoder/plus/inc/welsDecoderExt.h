@@ -77,7 +77,7 @@ virtual long Uninitialize();
 *       pDstInfo        SBufferInfo&           information provided to API including width, height, SW/HW option, etc
 *
 *	return: if decode frame success return 0, otherwise corresponding error returned.
-/***************************************************************************/
+***************************************************************************/
 virtual DECODING_STATE DecodeFrame (const unsigned char* kpSrc,
                                     const int kiSrcLen,
                                     unsigned char** ppDst,

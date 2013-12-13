@@ -225,7 +225,7 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
     }
     iEnd	= WelsTime();
     iTotal	+= iEnd - iStart;
-    if ((sDstBufInfo.iBufferStatus == 1)) {
+    if (sDstBufInfo.iBufferStatus == 1) {
       iFrameNum++;
       cOutputModule.Process ((void_t**)pDst, &sDstBufInfo, pYuvFile);
       if (sDstBufInfo.eBufferProperty == BUFFER_HOST) {
@@ -265,7 +265,7 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
     pDst[2] = (uint8_t*)pData[2];
   }
 
-  if ((sDstBufInfo.iBufferStatus == 1)) {
+  if (sDstBufInfo.iBufferStatus == 1) {
     cOutputModule.Process ((void_t**)pDst, &sDstBufInfo, pYuvFile);
     if (sDstBufInfo.eBufferProperty == BUFFER_HOST) {
       iWidth  = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
