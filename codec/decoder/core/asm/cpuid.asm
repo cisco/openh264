@@ -84,12 +84,12 @@ ALIGN 16
 ;   void WelsCPUId( int32_t index, int32_t *uiFeatureA, int32_t *uiFeatureB, int32_t *uiFeatureC, int32_t *uiFeatureD )
 ;****************************************************************************************************
 WelsCPUId:
-	push	ebx	
+	push	ebx
 	push	edi
-	
+
 	mov     eax, [esp+12]	; operating index
     cpuid					; cpuid
-	
+
 	; processing various information return
 	mov     edi, [esp+16]
     mov     [edi], eax
@@ -100,10 +100,10 @@ WelsCPUId:
     mov     edi, [esp+28]
     mov     [edi], edx
 
-	pop		edi	
+	pop		edi
     pop     ebx
 	ret
-	
+
 WELS_EXTERN WelsCPUSupportAVX
 ; need call after cpuid=1 and eax, ecx flag got then
 ALIGN 16
@@ -139,7 +139,7 @@ ALIGN 16
 WelsCPUSupportFMA:
 	mov eax, [esp+4]
 	mov ecx, [esp+8]
-	
+
 	; refer to detection of FMA addressed in INTEL AVX manual document
 	and ecx, 018001000H
 	cmp ecx, 018001000H		; check OSXSAVE, AVX, FMA feature flags
@@ -153,7 +153,7 @@ WelsCPUSupportFMA:
 	mov eax, 1
 	ret
 fma_not_supported:
-	mov eax, 0	
+	mov eax, 0
 	ret
 
 WELS_EXTERN WelsEmms

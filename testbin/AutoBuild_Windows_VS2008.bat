@@ -23,7 +23,7 @@ rem ************************************************
 rem call VP build
 echo "Welsvp Building....."
 cd %VPProjectDir%
-rem vcclean 
+rem vcclean
 %VCBUILDEXE% WelsVP_2008.vcproj
 
 
@@ -33,7 +33,7 @@ echo "WelsEncoder Building....."
 
 cd %CurDir%
 cd %EncoderProjectDir%
-rem vcclean 
+rem vcclean
 %VCBUILDEXE% WelsEncCore.vcproj
 %VCBUILDEXE% WelsEncPlus.vcproj
 %VCBUILDEXE% encConsole.vcproj
@@ -44,7 +44,7 @@ echo "WelsDecoder Building....."
 
 cd %CurDir%
 cd %DecoderProjectDir%
-rem vcclean 
+rem vcclean
 %VCBUILDEXE% WelsDecCore.vcproj
 %VCBUILDEXE% WelsDecPlus.vcproj
 %VCBUILDEXE% decConsole.vcproj

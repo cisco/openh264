@@ -85,7 +85,7 @@ SECTION .text
 
 %macro SSE2_PRED_H_16X16_TWO_LINE 1
     lea     eax,	[eax+ecx*2]
-    
+
     COPY_16_TIMES eax,	xmm0
     movdqa  [edx+%1],	xmm0
     COPY_16_TIMESS eax,	xmm0,	ecx
@@ -97,22 +97,22 @@ WelsI16x16LumaPredH_sse2:
     mov     edx, [esp+4]    ; pred
     mov     eax, [esp+8]	; pRef
     mov     ecx, [esp+12]   ; stride
-    
+
     COPY_16_TIMES eax,	xmm0
     movdqa  [edx],		xmm0
     COPY_16_TIMESS eax,	xmm0,	ecx
     movdqa  [edx+0x10],	xmm0
-    
-	SSE2_PRED_H_16X16_TWO_LINE   0x20 
+
+	SSE2_PRED_H_16X16_TWO_LINE   0x20
 	SSE2_PRED_H_16X16_TWO_LINE   0x40
 	SSE2_PRED_H_16X16_TWO_LINE   0x60
 	SSE2_PRED_H_16X16_TWO_LINE   0x80
 	SSE2_PRED_H_16X16_TWO_LINE   0xa0
 	SSE2_PRED_H_16X16_TWO_LINE   0xc0
 	SSE2_PRED_H_16X16_TWO_LINE   0xe0
-   
+
     ret
-    
+
 ;***********************************************************************
 ; void WelsI16x16LumaPredV_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride);
 ;***********************************************************************
@@ -121,10 +121,10 @@ WelsI16x16LumaPredV_sse2:
     mov     edx, [esp+4]    ; pred
     mov     eax, [esp+8]	; pRef
     mov     ecx, [esp+12]   ; stride
-    
+
     sub     eax, ecx
     movdqa  xmm0, [eax]
-    
+
     movdqa  [edx], xmm0
     movdqa  [edx+10h], xmm0
     movdqa  [edx+20h], xmm0
@@ -135,11 +135,11 @@ WelsI16x16LumaPredV_sse2:
     movdqa  [edx+70h], xmm0
     movdqa  [edx+80h], xmm0
     movdqa  [edx+90h], xmm0
-    movdqa  [edx+160], xmm0 
+    movdqa  [edx+160], xmm0
 	movdqa  [edx+176], xmm0
     movdqa  [edx+192], xmm0
     movdqa  [edx+208], xmm0
     movdqa  [edx+224], xmm0
     movdqa  [edx+240], xmm0
-    
+
     ret
