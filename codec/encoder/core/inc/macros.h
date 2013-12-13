@@ -42,7 +42,9 @@
 
 //#include <math.h>
 #include "typedefs.h"
-
+#if defined(WIN64) && defined(WIN32)
+#undef WIN32
+#endif
 namespace WelsSVCEnc {
 #if defined(_MSC_VER)
 #if _MSC_VER <= 1200
@@ -273,7 +275,7 @@ return x;
 #else
 
 
-#ifdef    _MSC_VER
+#ifdef    WIN32
 static inline uint32_t ENDIAN_FIX (uint32_t x) {
 __asm {
   mov   eax,  x

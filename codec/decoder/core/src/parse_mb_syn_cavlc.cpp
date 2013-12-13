@@ -49,7 +49,9 @@
 #include "ls_defines.h"
 #include "mv_pred.h"
 #include "decode_slice.h"
-
+#ifdef WIN64
+#undef WIN32
+#endif
 namespace WelsDec {
 
 void_t PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {

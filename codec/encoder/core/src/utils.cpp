@@ -42,7 +42,7 @@
 #include <assert.h>
 #include <math.h>
 #include <time.h>
-#if defined(WIN32)
+#if defined(WIN32) || defined(WIN64)
 #include <windows.h>
 #include <sys/types.h>
 #include <sys/timeb.h>
@@ -279,7 +279,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
       }
     }
     if (iBufLeft > 0) {
-#if defined(WIN32) && defined(_MSC_VER) && (_MSC_VER >= 1500)
+#if (defined(WIN64)||defined(WIN32)) && defined(_MSC_VER) && (_MSC_VER >= 1500)
       int32_t len = 0;
       len = _vscprintf (kpFmtStr, argv)  // _vscprintf doesn't count
             + 1; // terminating '\0'

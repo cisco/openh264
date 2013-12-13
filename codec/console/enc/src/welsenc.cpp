@@ -86,7 +86,9 @@
 #include <iostream>
 using namespace std;
 using namespace WelsSVCEnc;
-
+#if defined(WIN64) && defined(WIN32)
+#undef WIN32
+#endif
 /*
  *	Layer Context
  */
@@ -1339,7 +1341,7 @@ INSIDE_MEM_FREE: {
 
 //  Merge from Heifei's Wonder.  Lock process to a single core
 void LockToSingleCore() {
-#ifdef _MSC_VER
+#ifdef WIN32
   //for 2005 compiler, change "DWORD" to "DWORD_PTR"
   DWORD ProcessAffMask = 0, SystemAffMask = 0;
   HANDLE hProcess = GetCurrentProcess();

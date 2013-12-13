@@ -48,7 +48,7 @@ inline uint32_t EndianFix (uint32_t uiX) {
 }
 #else //WORDS_BIGENDIAN
 
-#ifdef _MSC_VER
+#ifdef WIN32
 inline uint32_t EndianFix (uint32_t uiX) {
   __asm {
     mov   eax,  uiX
@@ -57,7 +57,7 @@ inline uint32_t EndianFix (uint32_t uiX) {
   }
   return uiX;
 }
-#else  //_MSC_VER
+#else  //WIN32
 
 inline uint32_t EndianFix (uint32_t uiX) {
 #ifdef ARM_ARCHv7
@@ -70,7 +70,7 @@ inline uint32_t EndianFix (uint32_t uiX) {
 #endif
   return uiX;
 }
-#endif //_MSC_VER
+#endif //WIN32
 
 #endif //WORDS_BIGENDIAN
 

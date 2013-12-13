@@ -42,7 +42,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-#if defined(WIN32)
+#if defined(WIN32) || defined (WIN64)
 #include <windows.h>
 #include <sys/types.h>
 #include <sys/timeb.h>

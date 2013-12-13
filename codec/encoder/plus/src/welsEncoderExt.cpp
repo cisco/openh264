@@ -31,18 +31,10 @@
  */
 
 #include <assert.h>
-#include "welsEncoderExt.h"
-#include "welsCodecTrace.h"
-#include "typedefs.h"
-#include "wels_const.h"
-#include "utils.h"
-#include "macros.h"
 
-#include "crt_util_safe_x.h"	// Safe CRT routines like util for cross platforms
-#include "ref_list_mgr_svc.h"
 
 #include <time.h>
-#if defined(WIN32) /*&& defined(_DEBUG)*/
+#if defined(WIN32) || defined(WIN64)/*&& defined(_DEBUG)*/
 
 #include <windows.h>
 #include <stdio.h>
@@ -52,7 +44,15 @@
 #else
 #include <sys/time.h>
 #endif
+#include "welsEncoderExt.h"
+#include "welsCodecTrace.h"
+#include "typedefs.h"
+#include "wels_const.h"
+#include "utils.h"
+#include "macros.h"
 
+#include "crt_util_safe_x.h"	// Safe CRT routines like util for cross platforms
+#include "ref_list_mgr_svc.h"
 namespace WelsSVCEnc {
 
 /*
