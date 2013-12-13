@@ -57,14 +57,14 @@ namespace WelsDec {
 */
 #define FORCE_STACK_ALIGN_1D(_tp, _nm, _sz, _al) \
 	_tp _nm ## _tEmP[(_sz)+(_al)-1]; \
-	_tp *_nm = _nm ## _tEmP + ((_al)-1) - (((int32_t)(_nm ## _tEmP + ((_al)-1)) & ((_al)-1))/sizeof(_tp))
+	_tp *_nm = _nm ## _tEmP + ((_al)-1) - (((intptr_t)(_nm ## _tEmP + ((_al)-1)) & ((_al)-1))/sizeof(_tp))
 
 
 #define ENFORCE_STACK_ALIGN_2D(_tp, _nm, _cx, _cy, _al) \
 	assert( ((_al) && !((_al) & ((_al) - 1))) && ((_al) >= sizeof(_tp)) ); /*_al should be power-of-2 and >= sizeof(_tp)*/\
 	_tp _nm ## _tEmP[(_cx)*(_cy)+(_al)/sizeof(_tp)-1]; \
 	_tp *_nm ## _tEmP_al = _nm ## _tEmP + ((_al)/sizeof(_tp)-1); \
-	_nm ## _tEmP_al -= (((int32_t)_nm ## _tEmP_al & ((_al)-1))/sizeof(_tp)); \
+	_nm ## _tEmP_al -= (((intptr_t)_nm ## _tEmP_al & ((_al)-1))/sizeof(_tp)); \
 	_tp (*_nm)[(_cy)] = (_tp (*)[(_cy)])_nm ## _tEmP_al;
 
 
