@@ -19,11 +19,11 @@ CFLAGS = -g
 USE_ASM = No
 endif
 
+include build/platform-$(UNAME).mk
+
 ifeq ($(USE_ASM),Yes)
   CFLAGS += -DX86_ASM
 endif
-
-include build/platform-$(UNAME).mk
 
 CFLAGS += -DNO_DYNAMIC_VP -DHAVE_CACHE_LINE_ALIGN
 LDFLAGS +=
