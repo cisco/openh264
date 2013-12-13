@@ -41,7 +41,7 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-#if defined(WIN32)
+#if (defined(WIN32) || defined(WIN64))
 
 WELS_THREAD_ERROR_CODE    WelsMutexInit (WELS_MUTEX*    mutex) {
   InitializeCriticalSection (mutex);

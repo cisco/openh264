@@ -75,7 +75,7 @@
 #define EOK   0
 #endif
 
-#if (defined(WIN32) && defined(_MSC_VER) && (_MSC_VER<1500)) || defined(__GNUC__)
+#if ((defined(WIN32) || defined(WIN64)) && defined(_MSC_VER) && (_MSC_VER<1500)) || defined(__GNUC__)
 
 static __inline int wels_strncpy_s (char* dest, int dmax, const char* src, int slen) {
 int orig_dmax;

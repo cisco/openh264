@@ -30,7 +30,7 @@
  *
  */
 
-#if defined(WIN32)
+#if defined(WIN32) || defined(WIN64)
 #include <windows.h>
 #elif defined(MACOS)
 #include "bundleloader.h"
@@ -91,7 +91,7 @@ CWelsLib::CWelsLib (void* pEncCtx) {
   m_pInterface[0] = m_pInterface[1] = NULL;
 
 #ifndef NO_DYNAMIC_VP
-#if defined(WIN32)
+#if defined(WIN32) || defined(WIN64)
   const str_t WelsVPLib[] = "welsvp.dll";
   HMODULE shModule = LoadLibrary (WelsVPLib);
   if (!shModule)
@@ -120,7 +120,7 @@ CWelsLib::CWelsLib (void* pEncCtx) {
 
 CWelsLib::~CWelsLib() {
   if (m_pVpLib) {
-#if defined(WIN32)
+#if defined(WIN32) || defined(WIN64)
     HMODULE shModule = (HMODULE)m_pVpLib;
     FreeLibrary (shModule);
 
@@ -140,7 +140,7 @@ void* CWelsLib::QueryFunction (const str_t* pName) {
   void* pFunc = NULL;
 
   if (m_pVpLib) {
-#if defined(WIN32)
+#if defined(WIN32) || defined(WIN64)
     HMODULE shModule = (HMODULE)m_pVpLib;
     pFunc = (void*)GetProcAddress (shModule, pName);
 

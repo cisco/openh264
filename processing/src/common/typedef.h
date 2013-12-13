@@ -52,7 +52,7 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-#if defined(WIN32) || defined(_WIN32) || defined(_MSC_VER)
+#if defined(WIN64) || defined(_WIN32) || defined(_MSC_VER)
 
 typedef char               int8_t   ;
 typedef unsigned char      uint8_t  ;

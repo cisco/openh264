@@ -50,7 +50,7 @@
 #include <sys/timeb.h>
 #endif
 #include <time.h>
-#if defined(WIN32)
+#if defined(WIN32) || defined (WIN64)
 #include <windows.h>
 //#include <mmsystem.h>	// need static lib winmm.lib for link for such windows 95/98 mm timer
 #endif//#if WIN32
@@ -68,7 +68,7 @@ struct timeval tv_date;
 gettimeofday (&tv_date, NULL);
 return ((int64_t) tv_date.tv_sec * 1000000 + (int64_t) tv_date.tv_usec);
 #else
-#if defined (WIN32)
+#if defined (WIN32) || defined (WIN64)
 static int64_t iMeasureTimeFreq = 0;
 //	static BOOL_T support_high_resolution_perf_flag = TRUE;
 int64_t iMeasureTimeCur = 0;
