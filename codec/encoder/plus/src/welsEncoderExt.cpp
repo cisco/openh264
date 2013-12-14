@@ -1205,9 +1205,6 @@ using namespace WelsSVCEnc;
 int32_t CreateSVCEncoder (ISVCEncoder** ppEncoder) {
   assert (ppEncoder);
 
-  if (NULL == ppEncoder)
-    return 1;
-
   if ((*ppEncoder = new CWelsH264SVCEncoder()) != NULL) {
     return 0;
   }
