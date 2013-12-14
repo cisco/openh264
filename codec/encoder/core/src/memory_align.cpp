@@ -111,7 +111,7 @@ void* CMemoryAlign::WelsMalloc (const uint32_t kuiSize, const str_t* kpTag) {
     return NULL;
 
   pAlignedBuffer = pBuf + kiAlignedBytes + kiSizeOfVoidPointer + kiSizeOfInt;
-  pAlignedBuffer -= ((int32_t) pAlignedBuffer & kiAlignedBytes);
+  pAlignedBuffer -= ((intptr_t) pAlignedBuffer & kiAlignedBytes);
   * ((void**) (pAlignedBuffer - kiSizeOfVoidPointer)) = pBuf;
   * ((int32_t*) (pAlignedBuffer - (kiSizeOfVoidPointer + kiSizeOfInt))) = kiPayloadSize;
 
