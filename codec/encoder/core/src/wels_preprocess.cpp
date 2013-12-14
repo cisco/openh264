@@ -141,6 +141,7 @@ CWelsLib::~CWelsLib() {
 void* CWelsLib::QueryFunction (const str_t* pName) {
   void* pFunc = NULL;
 
+#ifndef NO_DYNAMIC_VP
   if (m_pVpLib) {
 #if defined(WIN32)
     HMODULE shModule = (HMODULE)m_pVpLib;
@@ -157,6 +158,7 @@ void* CWelsLib::QueryFunction (const str_t* pName) {
       printf ("dlsym %s iRet=%p, err=%s\n", shModule, pFunc, dlerror());
 #endif
   }
+#endif
   return pFunc;
 }
 
