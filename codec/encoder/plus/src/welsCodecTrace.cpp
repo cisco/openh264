@@ -242,6 +242,7 @@ welsCodecTrace::welsCodecTrace() {
 }
 
 welsCodecTrace::~welsCodecTrace() {
+#ifndef NO_DYNAMIC_VP
 #if defined WIN32
   if (m_hTraceHandle) {
     ::FreeLibrary ((HMODULE)m_hTraceHandle);
@@ -254,6 +255,7 @@ welsCodecTrace::~welsCodecTrace() {
   if (m_hTraceHandle) {
     ::dlclose (m_hTraceHandle);
   }
+#endif
 #endif
 
   m_hTraceHandle = NULL;
