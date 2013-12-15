@@ -84,7 +84,7 @@ void_t* WelsMalloc (const uint32_t kuiSize, const str_t* kpTag) {
   memset (pBuf, 0, kuiSize + kiAlignBytes + kiSizeVoidPtr + kiSizeInt);
 
   pAlignBuf = pBuf + kiAlignBytes + kiSizeVoidPtr + kiSizeInt;
-  pAlignBuf -= (int32_t) pAlignBuf & kiAlignBytes;
+  pAlignBuf -= (uintptr_t) pAlignBuf & kiAlignBytes;
   * ((void_t**) (pAlignBuf - kiSizeVoidPtr)) = pBuf;
   * ((int32_t*) (pAlignBuf - (kiSizeVoidPtr + kiSizeInt))) = kuiSize;
 
