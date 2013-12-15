@@ -4,11 +4,15 @@
 	Version="9.00"
 	Name="WelsDecCore"
 	ProjectGUID="{01B4AE41-6AD6-4CAF-AEB3-C42F7F9121D5}"
+	RootNamespace="WelsDecCore"
 	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
 			Name="Win32"
+		/>
+		<Platform
+			Name="x64"
 		/>
 	</Platforms>
 	<ToolFiles>
@@ -51,6 +55,86 @@
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;X86_ASM;HAVE_CACHE_LINE_ALIGN"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				PrecompiledHeaderFile=".\..\..\..\obj\decoder\core\release/WelsDecCore.pch"
+				AssemblerListingLocation=".\..\..\..\obj\decoder\core\release/"
+				ObjectFile=".\..\..\..\obj\decoder\core\release/"
+				ProgramDataBaseFileName=".\..\..\..\obj\decoder\core\release/"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="0"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)\welsdcore.lib"
+				SuppressStartupBanner="true"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+				OutputFile=".\..\..\..\..\bin\win32\Release/WelsDecCore.bsc"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory=".\..\..\..\..\bin\win64\Release"
+			IntermediateDirectory=".\..\..\..\obj\decoder\core\release"
+			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="MASM"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc"
+				PreprocessorDefinitions="WIN64;NDEBUG;_LIB;HAVE_CACHE_LINE_ALIGN"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -174,6 +258,85 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory=".\..\..\..\..\bin\win64\Debug"
+			IntermediateDirectory=".\..\..\..\obj\decoder\core\debug"
+			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="MASM"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc"
+				PreprocessorDefinitions="WIN64;_DEBUG;_LIB;HAVE_CACHE_LINE_ALIGN"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				PrecompiledHeaderFile=".\..\..\..\obj\decoder\core\debug/WelsDecCore.pch"
+				AssemblerListingLocation=".\..\..\..\obj\decoder\core\debug/"
+				ObjectFile=".\..\..\..\obj\decoder\core\debug/"
+				ProgramDataBaseFileName=".\..\..\..\obj\decoder\core\debug/"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)\welsdcore.lib"
+				SuppressStartupBanner="true"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+				OutputFile=".\..\..\..\..\bin\win32\Debug/WelsDecCore.bsc"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -198,7 +361,25 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm  -I$(InputDir) -f win32 -O3 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -218,7 +399,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm -I$(InputDir) -f win32 -O3 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm -I$(InputDir) -f win32 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -240,7 +441,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm  -I$(InputDir) -f win32 -O3 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm -I$(InputDir) -f win32 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -262,7 +483,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm -I$(InputDir) -f win32 -O3 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm  -I$(InputDir) -f win32 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -284,7 +525,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm -I$(InputDir) -f win32 -O3 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm -I$(InputDir) -f win32 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -306,7 +567,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm -I$(InputDir) -f win32 -O3 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm -I$(InputDir) -f win32 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -328,7 +609,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm -I$(InputDir) -f win32 -O3 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm -I$(InputDir) -f win32 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -350,7 +651,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm -I$(InputDir) -f win32 -O3 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm  -I$(InputDir) -f win32 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -372,7 +693,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm -I$(InputDir) -f win32 -O3 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm  -I$(InputDir) -f win32 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -394,7 +735,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm  -I$(InputDir) -f win32 -O3 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm -I$(InputDir) -f win32 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -416,7 +777,27 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Release|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm  -I$(InputDir) -f win32 -O3 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="nasm -I$(InputDir) -f win32 -DPREFIX -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						ExcludedFromBuild="true"
 						>
 						<Tool
 							Name="VCCustomBuildTool"

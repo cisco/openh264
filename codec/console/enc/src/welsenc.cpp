@@ -1035,7 +1035,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   int8_t  iDlayerIdx = 0;
   uint8_t* pYUV[MAX_DEPENDENCY_LAYER] = { 0 };
   SSourcePicture**    pSrcPicList = NULL;
-#if (defined(RUN_SIMULATOR) || defined(WIN32)||defined(_MACH_PLATFORM) || (defined(__GNUC__)))
+#if (defined(RUN_SIMULATOR) || defined(_WIN32)||defined(_MACH_PLATFORM) || (defined(__GNUC__)))
   // Inactive with sink with output file handler
   FILE* pFpBs = NULL;
 #endif
@@ -1095,7 +1095,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     iRet = 1;
     goto INSIDE_MEM_FREE;
   }
-#if (defined(RUN_SIMULATOR) || defined(WIN32)||defined(_MACH_PLATFORM) || (defined(__GNUC__)))
+#if (defined(RUN_SIMULATOR) || defined(_WIN32)||defined(_MACH_PLATFORM) || (defined(__GNUC__)))
   // Inactive with sink with output file handler
   if (fs.strBsFile.length() > 0) {
     pFpBs = fopen (fs.strBsFile.c_str(), "wb");
@@ -1259,7 +1259,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
             delete [] pUCArry;
           }
 #endif
-#if (defined(RUN_SIMULATOR) || defined(WIN32)||defined(_MACH_PLATFORM) || (defined(__GNUC__)))
+#if (defined(RUN_SIMULATOR) || defined(_WIN32)||defined(_MACH_PLATFORM) || (defined(__GNUC__)))
           fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs);	// write pure bit stream into file
 #endif
           iFrameSize += iLayerSize;
@@ -1287,7 +1287,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   }
 
 INSIDE_MEM_FREE: {
-#if (defined(RUN_SIMULATOR) || defined(WIN32)||defined(_MACH_PLATFORM) || (defined(__GNUC__)))
+#if (defined(RUN_SIMULATOR) || defined(_WIN32)||defined(_MACH_PLATFORM) || (defined(__GNUC__)))
     if (pFpBs) {
       fclose (pFpBs);
       pFpBs = NULL;
@@ -1339,7 +1339,7 @@ INSIDE_MEM_FREE: {
 
 //  Merge from Heifei's Wonder.  Lock process to a single core
 void LockToSingleCore() {
-#ifdef _MSC_VER
+#if defined(WIN32) && !defined(WIN64)
   //for 2005 compiler, change "DWORD" to "DWORD_PTR"
   DWORD ProcessAffMask = 0, SystemAffMask = 0;
   HANDLE hProcess = GetCurrentProcess();

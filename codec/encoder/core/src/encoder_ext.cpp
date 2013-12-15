@@ -2072,7 +2072,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
 #if defined(__GNUC__)
     pCtx->pFileLog	= FOPEN (fname, "wt+");
 #else//WIN32
-#if defined(WIN32) && defined(_MSC_VER)
+#if defined(_WIN32) && defined(_MSC_VER)
 #if _MSC_VER >= 1500
     FOPEN (&pCtx->pFileLog, fname, "wt+");
 #else
@@ -2236,7 +2236,7 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
     const int32_t iThreadCount = (*ppCtx)->pSvcParam->iCountThreadsNum;
     int32_t iThreadIdx = 0;
 
-#if defined(WIN32)
+#if defined(_WIN32)
     if ((*ppCtx)->pSliceThreading->pExitEncodeEvent != NULL) {
       do {
         if ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx] != NULL)	// iThreadIdx is already created successfully
@@ -3351,7 +3351,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
           t_bs_append = WelsTime() - t_bs_append;
           if (pCtx->pSliceThreading->pFSliceDiff) {
             fprintf (pCtx->pSliceThreading->pFSliceDiff,
-#if defined(WIN32)
+#if defined(_WIN32)
                      "%6I64d us consumed at AppendSliceToFrameBs() for coding_idx: %d iDid: %d qid: %d\n",
 #else
                      "%6lld us consumed at AppendSliceToFrameBs() for coding_idx: %d iDid: %d qid: %d\n",
@@ -3391,7 +3391,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
           while (1) {
             if (iIndexOfSliceToBeCoded >= iSliceCount && iNumThreadsRunning <= 0)
               break;
-#ifdef WIN32
+#ifdef _WIN32
             WELS_THREAD_ERROR_CODE lwait	= 0;
             int32_t iEventId				= -1;
 
@@ -3440,7 +3440,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
             } else {
               iNumThreadsRunning = 0;
             }
-#endif//WIN32
+#endif//_WIN32
           }//while(1)
 
 // all slices are finished coding here

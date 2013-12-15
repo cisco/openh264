@@ -96,13 +96,13 @@ int32_t CreateSliceThreads (sWelsEncCtx* pCtx);
 void ResetCountBsSizeInPartitions (uint32_t* pCountBsSizeList, const int32_t kiPartitionCnt);
 #endif//PACKING_ONE_SLICE_PER_LAYER
 
-#ifdef WIN32
+#ifdef _WIN32
 int32_t FiredSliceThreads (SSliceThreadPrivateData* pPriData, WELS_EVENT* pEventsList, SLayerBSInfo* pLayerBsInfo,
                            const uint32_t kuiNumThreads/*, int32_t *iLayerNum*/, SSliceCtx* pSliceCtx, const BOOL_T kbIsDynamicSlicingMode);
 #else
 int32_t FiredSliceThreads (SSliceThreadPrivateData* pPriData, WELS_EVENT** ppEventsList, SLayerBSInfo* pLayerBsInfo,
                            const uint32_t kuiNumThreads/*, int32_t *iLayerNum*/, SSliceCtx* pSliceCtx, const BOOL_T kbIsDynamicSlicingMode);
-#endif//WIN32
+#endif//_WIN32
 
 int32_t DynamicDetectCpuCores();
 

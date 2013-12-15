@@ -47,7 +47,7 @@
 #include <math.h>
 #include <time.h>
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #include <windows.h>
 #include <sys/types.h>
 #include <sys/timeb.h>
@@ -55,7 +55,7 @@
 #include <sys/timeb.h>
 #include <sys/time.h>
 #include "typedefs.h"
-#endif//WIN32
+#endif//_WIN32
 
 #include "typedefs.h"
 
@@ -71,7 +71,7 @@ extern "C" {
 
 typedef      FILE  WelsFileHandle;
 
-#ifdef WIN32
+#ifdef _WIN32
 typedef      struct _timeb     SWelsTime;
 #else
 typedef      struct timeb      SWelsTime;

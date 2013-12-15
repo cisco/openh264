@@ -149,11 +149,11 @@ $(TargetPath)
 #endif//MEMORY_CHECK
 
 //#define ENABLE_TRACE_FILE
-#if defined(WIN32) && defined(_DEBUG)
+#if defined(_WIN32) && defined(_DEBUG)
 #ifdef ENABLE_TRACE_FILE
 #undef ENABLE_TRACE_FILE
 #endif//ENABLE_TRACE_FILE
-#endif//WIN32 & _DEBUG
+#endif//_WIN32 & _DEBUG
 
 
 #endif // _AS264_COMMON_H_

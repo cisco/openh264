@@ -46,7 +46,7 @@
 #include <math.h>
 
 #include <time.h>
-#if defined(WIN32)
+#if defined(_WIN32)
 #include <windows.h>
 #include <sys/types.h>
 #include <sys/timeb.h>

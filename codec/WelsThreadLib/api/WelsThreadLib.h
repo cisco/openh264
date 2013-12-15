@@ -47,7 +47,7 @@
 extern "C" {
 #endif
 
-#if defined(WIN32)
+#if defined(_WIN32)
 
 #include <windows.h>
 
@@ -88,7 +88,7 @@ typedef   sem_t                     WELS_EVENT;
 
 #endif//__GNUC__
 
-#endif//WIN32
+#endif//_WIN32
 
 typedef    int32_t        WELS_THREAD_ERROR_CODE;
 typedef    int32_t        WELS_THREAD_ATTR;
@@ -119,7 +119,7 @@ WELS_THREAD_ERROR_CODE    WelsEventSignal (WELS_EVENT* event);
 WELS_THREAD_ERROR_CODE    WelsEventReset (WELS_EVENT* event);
 WELS_THREAD_ERROR_CODE    WelsEventWait (WELS_EVENT* event);
 WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t dwMilliseconds);
-#ifdef WIN32
+#ifdef _WIN32
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount, WELS_EVENT* event_list,
     uint32_t dwMilliseconds);
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WELS_EVENT* event_list);
@@ -127,7 +127,7 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WE
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount, WELS_EVENT** event_list,
     uint32_t dwMilliseconds);
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WELS_EVENT** event_list);
-#endif//WIN32
+#endif//_WIN32
 
 WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_THREAD_ROUTINE  routine,
     void* arg, WELS_THREAD_ATTR attr);
