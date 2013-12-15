@@ -1373,7 +1373,7 @@ long CreateSVCEncHandle (ISVCEncoder** ppEncoder) {
   return ret;
 }
 
-void DestroySVCEncHanlde (ISVCEncoder* pEncoder) {
+void DestroySVCEncHandle (ISVCEncoder* pEncoder) {
   if (pEncoder) {
 #if defined(MACOS)
     WelsEncBundleDestroyEncoder (pEncoder);
@@ -1438,11 +1438,11 @@ int main (int argc, char** argv)
     }
   }
 
-  DestroySVCEncHanlde (pSVCEncoder);
+  DestroySVCEncHandle (pSVCEncoder);
   return 0;
 
 exit:
-  DestroySVCEncHanlde (pSVCEncoder);
+  DestroySVCEncHandle (pSVCEncoder);
   PrintHelp();
   return 1;
 }
