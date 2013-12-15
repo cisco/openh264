@@ -497,76 +497,76 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
 
   while (n < argc) {
     pCommand = argv[n++];
-    if (! (strcmp (pCommand, "-h"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-h")) {	// confirmed_safe_unsafe_usage
       PrintHelp();
       continue;
     }
-    if (! (strcmp (pCommand, "-bf"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-bf")) {	// confirmed_safe_unsafe_usage
       sFileSet.strBsFile.assign (argv[n]);
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-frms"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-frms")) {	// confirmed_safe_unsafe_usage
       pSvcParam.uiFrameToBeCoded = atoi (argv[n ]);
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-gop"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-gop")) {	// confirmed_safe_unsafe_usage
       pSvcParam.uiGopSize = atoi (argv[n ]);
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-iper"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-iper")) {	// confirmed_safe_unsafe_usage
       pSvcParam.uiIntraPeriod = atoi (argv[n ]);
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-spsid"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-spsid")) {	// confirmed_safe_unsafe_usage
       pSvcParam.bEnableSpsPpsIdAddition = atoi (argv[n ]) ? true : false;
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-denois"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-denois")) {	// confirmed_safe_unsafe_usage
       pSvcParam.bEnableDenoise = atoi (argv[n ]) ? true : false;
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-scene"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-scene")) {	// confirmed_safe_unsafe_usage
       pSvcParam.bEnableSceneChangeDetect = atoi (argv[n ]) ? true : false;
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-bgd"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-bgd")) {	// confirmed_safe_unsafe_usage
       pSvcParam.bEnableBackgroundDetection = atoi (argv[n ]) ? true : false;
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-aq"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-aq")) {	// confirmed_safe_unsafe_usage
       pSvcParam.bEnableAdaptiveQuant = atoi (argv[n ]) ? true : false;
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-ltr"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-ltr")) {	// confirmed_safe_unsafe_usage
       pSvcParam.bEnableLongTermReference = atoi (argv[n ]) ? true : false;
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-ltrper"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-ltrper")) {	// confirmed_safe_unsafe_usage
       pSvcParam.uiLtrMarkPeriod = atoi (argv[n ]);
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-rc"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-rc")) {	// confirmed_safe_unsafe_usage
       pSvcParam.bEnableRc = atoi (argv[n ]) ? true : false;
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-tarb"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-tarb")) {	// confirmed_safe_unsafe_usage
       pSvcParam.iTargetBitrate = atoi (argv[n ]);
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-numl"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-numl")) {	// confirmed_safe_unsafe_usage
       bool_t bFound = false;
       pSvcParam.iNumDependencyLayer = atoi (argv[n++]);
       for (int ln = 0 ; ln < pSvcParam.iNumDependencyLayer ; ln++) {
@@ -669,13 +669,13 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
       //n += 1;
       continue;
     }
-    if (! (strcmp (pCommand, "-org"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-org")) {	// confirmed_safe_unsafe_usage
       unsigned int	iLayer = atoi (argv[n++]);
       sFileSet.sSpatialLayers[iLayer].strSeqFile.assign (argv[n]);
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-drec"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-drec")) {	// confirmed_safe_unsafe_usage
       unsigned int	iLayer = atoi (argv[n++]);
       const int iLen = strlen (argv[n]);	// confirmed_safe_unsafe_usage
 #ifdef ENABLE_FRAME_DUMP
@@ -686,7 +686,7 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-sw"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-sw")) {	// confirmed_safe_unsafe_usage
       unsigned int	iLayer = atoi (argv[n++]);
       SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
       pDLayer->iFrameWidth =  atoi (argv[n ]);
@@ -694,7 +694,7 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-sh"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-sh")) {	// confirmed_safe_unsafe_usage
       unsigned int	iLayer = atoi (argv[n++]);
       SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
       pDLayer->iFrameHeight =  atoi (argv[n ]);
@@ -702,14 +702,14 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-frin"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-frin")) {	// confirmed_safe_unsafe_usage
       unsigned int	iLayer = atoi (argv[n++]);
       SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
       pDLayer->fInputFrameRate = (float)atof (argv[n ]);
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-frout"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-frout")) {	// confirmed_safe_unsafe_usage
       unsigned int	iLayer = atoi (argv[n++]);
       SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
       pDLayer->fOutputFrameRate = (float)atof (argv[n ]);
@@ -717,7 +717,7 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
       continue;
     }
 
-    if (! (strcmp (pCommand, "-lqp"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-lqp")) {	// confirmed_safe_unsafe_usage
       unsigned int	iLayer = atoi (argv[n++]);
       SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
       uiQpChangeFlag[iLayer] = 1;
@@ -727,7 +727,7 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
     }
     //sLayerCtx[iLayer].num_quality_layers = pDLayer->num_quality_layers = 1;
 
-    if (! (strcmp (pCommand, "-ltarb"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-ltarb")) {	// confirmed_safe_unsafe_usage
       unsigned int	iLayer = atoi (argv[n++]);
       SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
       pDLayer->iSpatialBitrate	= 1000 * atoi (argv[n ]);
@@ -735,7 +735,7 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
       continue;
     }
 
-    if (! (strcmp (pCommand, "-slcmd"))) {	// confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-slcmd")) {	// confirmed_safe_unsafe_usage
       unsigned int	iLayer = atoi (argv[n++]);
       SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
 
@@ -762,14 +762,14 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-slcsize"))) { //confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-slcsize")) { //confirmed_safe_unsafe_usage
       unsigned int	iLayer = atoi (argv[n++]);
       SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
       pDLayer->sMso.sSliceArgument.uiSliceSizeConstraint = atoi (argv[n ]);
       ++ n;
       continue;
     }
-    if (! (strcmp (pCommand, "-slcnum"))) { // confirmed_safe_unsafe_usage
+    if (!strcmp (pCommand, "-slcnum")) { // confirmed_safe_unsafe_usage
       unsigned int	iLayer = atoi (argv[n++]);
       SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
       pDLayer->sMso.sSliceArgument.iSliceNum = atoi (argv[n ]);
