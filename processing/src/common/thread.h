@@ -42,7 +42,7 @@
 
 #include "typedef.h"
 
-#if defined(WIN32)
+#if defined(_WIN32)
 
 #include <windows.h>
 
@@ -59,7 +59,7 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-#if defined(WIN32)
+#if defined(_WIN32)
 
 typedef  HANDLE            WELS_THREAD_HANDLE;
 typedef  CRITICAL_SECTION  WELS_MUTEX;

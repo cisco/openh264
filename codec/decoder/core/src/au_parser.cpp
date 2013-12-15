@@ -86,7 +86,7 @@ uint8_t* DetectStartCodePrefix (const uint8_t* kpBuf, int32_t* pOffset, int32_t 
     ++ pBits;
 
     if ((iIdx >= 3) && ((* (pBits - 1)) == 0x1)) {
-      *pOffset = ((uint32_t)pBits) - ((uint32_t)kpBuf);
+      *pOffset = ((uintptr_t)pBits) - ((uintptr_t)kpBuf);
       return pBits;
     }
 

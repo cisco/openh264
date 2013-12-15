@@ -273,7 +273,7 @@ return x;
 #else
 
 
-#ifdef    _MSC_VER
+#if defined(WIN32) && !defined(WIN64)
 static inline uint32_t ENDIAN_FIX (uint32_t x) {
 __asm {
   mov   eax,  x
