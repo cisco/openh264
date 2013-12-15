@@ -1203,8 +1203,6 @@ void CWelsH264SVCEncoder::DumpSrcPicture (const uint8_t* pSrc) {
 using namespace WelsSVCEnc;
 
 int32_t CreateSVCEncoder (ISVCEncoder** ppEncoder) {
-  assert (ppEncoder);
-
   if ((*ppEncoder = new CWelsH264SVCEncoder()) != NULL) {
     return 0;
   }
