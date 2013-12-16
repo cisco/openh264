@@ -50,9 +50,9 @@
 #include <sys/timeb.h>
 #endif
 #include <time.h>
-#if defined(WIN32)
+#if defined(_WIN32)
 #include <windows.h>
-#endif//#if WIN32
+#endif//#if _WIN32
 
 #ifdef __cplusplus
 extern "C" {
@@ -71,7 +71,7 @@ int64_t WelsTime (void_t) {
   gettimeofday (&tv_date, NULL);
   return ((int64_t) tv_date.tv_sec * 1000000 + (int64_t) tv_date.tv_usec);
 #else
-#if defined (WIN32)
+#if defined (_WIN32)
   static int64_t iMtimeFreq = 0;
   int64_t iMtimeCur = 0;
   int64_t iResult = 0;
@@ -88,7 +88,7 @@ int64_t WelsTime (void_t) {
 
   _ftime (&sTime);
   return ((int64_t)sTime.time * (1000) + (int64_t)sTime.millitm) * (1000);
-#endif//#if WIN32
+#endif//#if _WIN32
 #endif//!(defined(_MSC_VER) || defined(__MINGW32__))
 }
 

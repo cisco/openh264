@@ -57,7 +57,7 @@ extern "C" {
 #include "error_code.h"
 #include "crt_util_safe_x.h"	// Safe CRT routines like util for cross platforms
 #include <time.h>
-#if defined(WIN32) /*&& defined(_DEBUG)*/
+#if defined(_WIN32) /*&& defined(_DEBUG)*/
 
 #include <windows.h>
 #include <stdio.h>

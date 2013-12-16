@@ -2,9 +2,12 @@ language: cpp
 compiler:
   - gcc
   - clang
-# Change this to your needs
+branches:
+  except:
+    - gh-pages
 before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -qq g++-4.6-multilib gcc-multilib libc6-dev-i386 lib32z1-dev
-script: make gtest-bootstrap && make && make test
+install: make gtest-bootstrap
+script: make && make test && make clean && make ENABLE64BIT=Yes && make test
 

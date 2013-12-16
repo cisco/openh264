@@ -42,7 +42,7 @@
 #include <assert.h>
 #include <math.h>
 #include <time.h>
-#if defined(WIN32)
+#if defined(_WIN32)
 #include <windows.h>
 #include <sys/types.h>
 #include <sys/timeb.h>
@@ -147,7 +147,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
 
     if (pEncCtx) {
       time_t l_time;
-#if defined(WIN32)
+#if defined(_WIN32)
 #if defined(_MSC_VER)
 #if _MSC_VER >= 1500
       struct tm t_now;
@@ -159,7 +159,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
       struct tm* t_now;
 #endif//WIN32
 
-#if defined( WIN32 )
+#if defined( _WIN32 )
       struct _timeb tb;
 
       time (&l_time);
@@ -229,7 +229,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
       }
 
       if (iBufLeft > 0) {
-#if defined(WIN32) && defined(_MSC_VER) && (_MSC_VER >= 1500)
+#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER >= 1500)
         iCurUsed = strftime (&pBuf[iBufUsed], iBufLeft, "%y-%m-%d %H:%M:%S", &t_now);
 #else
         iCurUsed = strftime (&pBuf[iBufUsed], iBufLeft, "%y-%m-%d %H:%M:%S", t_now);
@@ -243,7 +243,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
       }
 
       if (iBufLeft > 0) {
-#if defined (WIN32)
+#if defined (_WIN32)
 #ifdef _MSC_VER
 #if _MSC_VER >= 1500
         iCurUsed = SNPRINTF (&pBuf[iBufUsed], iBufLeft, iBufLeft, ".%03.3u]: ", tb.millitm);	// confirmed_safe_unsafe_usage
@@ -279,7 +279,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
       }
     }
     if (iBufLeft > 0) {
-#if defined(WIN32) && defined(_MSC_VER) && (_MSC_VER >= 1500)
+#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER >= 1500)
       int32_t len = 0;
       len = _vscprintf (kpFmtStr, argv)  // _vscprintf doesn't count
             + 1; // terminating '\0'
@@ -305,7 +305,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
           pEncCtx->uiSizeLog += iBufUsed;
       }
     } else {
-#if defined(WIN32) && defined(_DEBUG)
+#if defined(_WIN32) && defined(_DEBUG)
       OutputDebugStringA (pBuf);
 #endif
     }
@@ -346,7 +346,7 @@ void WelsReopenTraceFile (void* pCtx, str_t* pCurPath) {
 #ifdef __GNUC__
     STRCAT (strTraceFile, MAX_FNAME_LEN - len, "/wels_encoder_trace.txt");	// confirmed_safe_unsafe_usage
     pEncCtx->pFileLog	= FOPEN (strTraceFile, "wt+");	// confirmed_safe_unsafe_usage
-#elif WIN32
+#elif _WIN32
     STRCAT (strTraceFile, MAX_FNAME_LEN - len, "\\wels_encoder_trace.txt"); // confirmed_safe_unsafe_usage
 #if _MSC_VER >= 1500
     FOPEN (&pEncCtx->pFileLog, strTraceFile, "wt+");	// confirmed_safe_unsafe_usage

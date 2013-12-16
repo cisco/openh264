@@ -30,7 +30,7 @@
  *
  */
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #include <tchar.h>
 #endif
@@ -52,7 +52,7 @@
 #include <CoreFoundation/CFBundle.h>
 #endif//MACOS
 
-#ifdef WIN32
+#ifdef _WIN32
 extern HANDLE g_hInstDll;
 #endif
 
@@ -137,7 +137,7 @@ static void* GetProcessAddress (CFBundleRef bundle, const str_t* lpszprocname) {
 #endif
 
 int32_t	welsCodecTrace::m_iTraceLevel			= WELS_LOG_DEFAULT;
-#if defined(WIN32)
+#if defined(_WIN32)
 CM_WELS_TRACE welsCodecTrace::m_fpDebugTrace	= NULL;
 CM_WELS_TRACE welsCodecTrace::m_fpInfoTrace	= NULL;
 CM_WELS_TRACE welsCodecTrace::m_fpWarnTrace	= NULL;
@@ -164,7 +164,7 @@ welsCodecTrace::welsCodecTrace() {
 
   m_WelsTraceExistFlag = true;
 #else
-#if defined WIN32
+#if defined _WIN32
   HMODULE handle = ::GetModuleHandle ("welstrace.dll");
 //	HMODULE handle = ::GetModuleHandle("contrace.dll"); // for c7
   if (NULL == handle)
@@ -242,7 +242,8 @@ welsCodecTrace::welsCodecTrace() {
 }
 
 welsCodecTrace::~welsCodecTrace() {
-#if defined WIN32
+#ifndef NO_DYNAMIC_VP
+#if defined _WIN32
   if (m_hTraceHandle) {
     ::FreeLibrary ((HMODULE)m_hTraceHandle);
   }
@@ -254,6 +255,7 @@ welsCodecTrace::~welsCodecTrace() {
   if (m_hTraceHandle) {
     ::dlclose (m_hTraceHandle);
   }
+#endif
 #endif
 
   m_hTraceHandle = NULL;
@@ -270,7 +272,7 @@ int32_t welsCodecTrace::WelsTraceModuleIsExist() {
 }
 
 void welsCodecTrace::TraceString (int32_t iLevel, const str_t* str) {
-#ifdef WIN32
+#ifdef _WIN32
   switch (iLevel) {
   case WELS_LOG_ERROR:
     if (m_fpErrorTrace)
@@ -335,7 +337,7 @@ void welsCodecTrace::CODEC_TRACE (void* ignore, const int32_t iLevel, const str_
   STRNCPY (WStr_Format, MAX_LOG_SIZE, Str_Format, STRNLEN (Str_Format, MAX_LOG_SIZE));	// confirmed_safe_unsafe_usage
 
   STRNCPY (pBuf, MAX_LOG_SIZE, "[ENCODER]: ", len);	// confirmed_safe_unsafe_usage
-#if defined(WIN32)
+#if defined(_WIN32)
 #if defined(_MSC_VER)
 #if _MSC_VER>=1500
   VSPRINTF (pBuf + len, MAX_LOG_SIZE - len, WStr_Format, vl);	// confirmed_safe_unsafe_usage

@@ -52,7 +52,7 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-#if defined(WIN32) || defined(_WIN32) || defined(_MSC_VER)
+#if defined(_WIN32) || defined(_WIN32) || defined(_MSC_VER)
 
 typedef char               int8_t   ;
 typedef unsigned char      uint8_t  ;
@@ -83,7 +83,7 @@ typedef char    str_t    ; // [comment]: specific use plain char only for charac
 typedef long    long_t   ;
 typedef int32_t bool_t   ;
 
-#if defined(WIN32) || defined(_MACH_PLATFORM) || defined(__GNUC__)
+#if defined(_WIN32) || defined(_MACH_PLATFORM) || defined(__GNUC__)
 typedef float   float_t  ;
 typedef double  double_t ;
 #endif
