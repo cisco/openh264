@@ -480,6 +480,5 @@ long CreateDecoder (ISVCDecoder** ppDecoder) {
 void_t DestroyDecoder (ISVCDecoder* pDecoder) {
   if (NULL != pDecoder) {
     delete (CWelsDecoder*)pDecoder;
-    pDecoder = NULL;
   }
 }
