@@ -461,10 +461,6 @@ using namespace WelsDec;
 */
 long CreateDecoder (ISVCDecoder** ppDecoder) {
 
-  if (NULL == ppDecoder) {
-    return ERR_INVALID_PARAMETERS;
-  }
-
   *ppDecoder	= new CWelsDecoder();
 
   if (NULL == *ppDecoder) {
