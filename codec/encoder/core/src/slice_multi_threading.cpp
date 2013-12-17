@@ -41,7 +41,7 @@
 #if defined(MT_ENABLED)
 
 #include <assert.h>
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(_WIN32)
 #include <semaphore.h>
 #ifndef SEM_NAME_MAX
 // length of semaphore name should be system constrained at least on mac 10.7
@@ -441,7 +441,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 
   iIdx = 0;
   while (iIdx < iThreadNum) {
-#ifdef __GNUC__	// for posix threading
+#if defined(__GNUC__) && !defined(_WIN32)	// for posix threading
     str_t name[SEM_NAME_MAX] = {0};
     int32_t used_len = 0;
     WELS_THREAD_ERROR_CODE err = 0;
@@ -852,7 +852,7 @@ int32_t WriteSliceBs (sWelsEncCtx* pCtx, uint8_t* pSliceBsBuf, const int32_t iSl
 }
 
 #if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
-#if defined(__GNUC__)
+#if defined(__GNUC__) && !defined(_WIN32)
 WELS_THREAD_ROUTINE_TYPE UpdateMbListThreadProc (void* arg) {
   SSliceThreadPrivateData* pPrivateData	= (SSliceThreadPrivateData*)arg;
   sWelsEncCtx* pEncPEncCtx			= NULL;
@@ -1243,7 +1243,7 @@ int32_t CreateSliceThreads (sWelsEncCtx* pCtx) {
     // due to WelsMultipleEventsWaitSingleBlocking implememtation can not work well
     // in case waiting pUpdateMbListEvent and pReadySliceCodingEvent events at the same time
 #if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
-#if defined(__GNUC__)
+#if defined(__GNUC__) && !defined(_WIN32)
     WelsThreadCreate (&pCtx->pSliceThreading->pUpdateMbListThrdHandles[iIdx], UpdateMbListThreadProc,
                       &pCtx->pSliceThreading->pThreadPEncCtx[iIdx], 0);
 #endif//__GNUC__

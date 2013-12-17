@@ -375,9 +375,7 @@ static __inline int wels_strnlen_s (const char* dest, int dmax) {
 
 #endif//(WIN32 && _MSC_VER && _MSC_VER<1500) || __GNUC__
 
-#if defined(WIN32)
-
-#ifdef _MSC_VER
+#if defined(WIN32) && defined(_MSC_VER)
 #if _MSC_VER >= 1500	// VS2008
 #define SNPRINTF	_snprintf_s
 #define LOCALTIME	localtime_s
@@ -397,7 +395,6 @@ static __inline int wels_strnlen_s (const char* dest, int dmax) {
 #define VSPRINTF	vsprintf
 #define FOPEN		fopen
 #endif//_MSC_VER >= 1500
-#endif//_MSC_VER
 
 #else//__GNUC__
 
