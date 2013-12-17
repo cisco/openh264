@@ -83,6 +83,17 @@
 #include "WelsThreadLib.h"
 #endif//MT_ENABLED
 
+#ifdef WIN32
+#ifdef WINAPI_FAMILY
+#include <winapifamily.h>
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#define HAVE_PROCESS_AFFINITY
+#endif
+#else /* defined(WINAPI_FAMILY) */
+#define HAVE_PROCESS_AFFINITY
+#endif
+#endif /* WIN32 */
+
 #include <iostream>
 using namespace std;
 using namespace WelsSVCEnc;
@@ -1207,7 +1218,7 @@ INSIDE_MEM_FREE: {
 
 //  Merge from Heifei's Wonder.  Lock process to a single core
 void LockToSingleCore() {
-#if defined(WIN32)
+#ifdef HAVE_PROCESS_AFFINITY
   //for 2005 compiler, change "DWORD" to "DWORD_PTR"
   ULONG_PTR ProcessAffMask = 0, SystemAffMask = 0;
   HANDLE hProcess = GetCurrentProcess();
