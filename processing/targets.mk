@@ -120,7 +120,7 @@ $(PROCESSING_SRCDIR)/./src/asm/vaa.o: $(PROCESSING_SRCDIR)/./src/asm/vaa.asm
 
 $(LIBPREFIX)processing.$(LIBSUFFIX): $(PROCESSING_OBJS)
 	rm -f $(LIBPREFIX)processing.$(LIBSUFFIX)
-	ar cr $@ $(PROCESSING_OBJS)
+	$(AR) cr $@ $(PROCESSING_OBJS)
 
 libraries: $(LIBPREFIX)processing.$(LIBSUFFIX)
 LIBRARIES += $(LIBPREFIX)processing.$(LIBSUFFIX)

@@ -208,7 +208,7 @@ $(ENCODER_SRCDIR)/./core/asm/vaa.o: $(ENCODER_SRCDIR)/./core/asm/vaa.asm
 
 $(LIBPREFIX)encoder.$(LIBSUFFIX): $(ENCODER_OBJS)
 	rm -f $(LIBPREFIX)encoder.$(LIBSUFFIX)
-	ar cr $@ $(ENCODER_OBJS)
+	$(AR) cr $@ $(ENCODER_OBJS)
 
 libraries: $(LIBPREFIX)encoder.$(LIBSUFFIX)
 LIBRARIES += $(LIBPREFIX)encoder.$(LIBSUFFIX)
