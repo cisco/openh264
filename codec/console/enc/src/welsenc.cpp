@@ -1414,10 +1414,7 @@ int main (int argc, char** argv)
   if (argc < 2) {
     goto exit;
   } else {
-    string	strCfgFileName = argv[1];
-    basic_string <char>::size_type index;
-    index = strCfgFileName.rfind (".cfg");	// check configuration type (like .cfg?)
-    if (index == std::string::npos) {
+    if (strstr(argv[1], ".cfg")) { // check configuration type (like .cfg?)
       if (argc > 2) {
         iRet = ProcessEncodingSvcWithParam (pSVCEncoder, argc, argv);
         if (iRet != 0)

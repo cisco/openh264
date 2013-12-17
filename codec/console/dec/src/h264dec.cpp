@@ -443,7 +443,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
   if ((hModule != NULL) && (pCreateDecoderFunc != NULL) && (pDestroyDecoderFunc != NULL)) {
     printf ("load library sw function successfully\n");
 
-    if (pCreateDecoderFunc (&pDecoder)  || (NULL == pDecoder)) {
+    if (NULL == pDecoder) {
       printf ("Create Decoder failed.\n");
       return 1;
     }
@@ -456,7 +456,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
 #else
 
 
-  if (CreateDecoder (&pDecoder)  || (NULL == pDecoder)) {
+  if (NULL == pDecoder) {
     printf ("Create Decoder failed.\n");
     return 1;
   }
