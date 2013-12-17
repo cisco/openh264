@@ -46,6 +46,9 @@
 #include <windows.h>
 #include <sys/types.h>
 #include <sys/timeb.h>
+#ifdef __GNUC__
+#include <sys/time.h>
+#endif
 #else
 #include <sys/time.h>
 #include <sys/timeb.h>
@@ -79,7 +82,7 @@ void_t WelsLog (void_t* pPtr, int32_t iLevel, const char* kpFmt, ...) {
 }
 
 
-#if  defined(_WIN32)
+#if  defined(_WIN32) && !defined(__GNUC__)
 
 #if  defined(_MSC_VER) && (_MSC_VER>=1500)
 

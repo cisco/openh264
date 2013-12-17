@@ -1,4 +1,4 @@
-UNAME=$(shell uname | tr A-Z a-z)
+UNAME=$(shell uname | tr A-Z a-z | tr -d \\-[:digit:].[:digit:])
 LIBPREFIX=lib
 LIBSUFFIX=a
 CP=cp
@@ -35,7 +35,7 @@ endif
 
 CFLAGS += -DNO_DYNAMIC_VP -DHAVE_CACHE_LINE_ALIGN
 LDFLAGS +=
-ASMFLAGS += -DNO_DYNAMIC_VP -DNOPREFIX
+ASMFLAGS += -DNO_DYNAMIC_VP
 
 
 #### No user-serviceable parts below this line
