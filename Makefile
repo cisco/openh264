@@ -3,6 +3,9 @@ LIBPREFIX=lib
 LIBSUFFIX=a
 CP=cp
 ROOTDIR=$(PWD)
+CXX_O=-o $@
+CXX_LINK_O=-o $@
+AR_OPTS=cr $@
 
 
 
