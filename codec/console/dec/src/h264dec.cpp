@@ -401,7 +401,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
         char* cmd = pArgV[i];
 
         if (!strcmp (cmd, "-options")) {
-          strOutputFile = pArgV[i + 1];
+          strOptionFile = pArgV[i + 1];
           i += 2;
         } else if (!strcmp (cmd, "-trace")) {
           WelsStderrSetTraceLevel (atoi (pArgV[i + 1]));
