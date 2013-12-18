@@ -344,7 +344,6 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
         printf ("Specified file: %s not exist, maybe invalid path or parameter settting.\n", cReadCfg.GetFileName().c_str());
         return 1;
       }
-      memset (&sDecParam, 0, sizeof (sDecParam));
 
       while (!cReadCfg.EndOfFile()) {
         long nRd = cReadCfg.ReadLine (&strTag[0]);
@@ -382,7 +381,6 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
     } else if (strstr (pArgV[1],
                        ".264")) { // no output dump yuv file, just try to render the decoded pictures //confirmed_safe_unsafe_usage
       strInputFile	= pArgV[1];
-      memset (&sDecParam, 0, sizeof (sDecParam));
       sDecParam.iOutputColorFormat          = videoFormatI420;
       sDecParam.uiTargetDqLayer	          = (uint8_t) - 1;
       sDecParam.uiEcActiveFlag	          = 1;
@@ -391,7 +389,6 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
   } else { //iArgC > 2
     strInputFile	= pArgV[1];
     strOutputFile	= pArgV[2];
-    memset (&sDecParam, 0, sizeof (sDecParam));
     sDecParam.iOutputColorFormat	= videoFormatI420;
     sDecParam.uiTargetDqLayer	= (uint8_t) - 1;
     sDecParam.uiEcActiveFlag	= 1;
