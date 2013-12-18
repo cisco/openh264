@@ -394,20 +394,23 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
     sDecParam.uiEcActiveFlag	= 1;
     sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
     if (iArgC > 3) {
-      // Basic option parser. Note that this is not safe about the
-      // number of remaining arguments.
-      // TODO: rewrite
       for (int i = 3; i < iArgC; i++) {
         char* cmd = pArgV[i];
 
         if (!strcmp (cmd, "-options")) {
-          strOptionFile = pArgV[i + 1];
-          i += 2;
+          if (i + 1 < iArgC)
+            strOptionFile = pArgV[i++];
+          else {
+            printf ("options file not specified.\n");
+            return 1;
+          }
         } else if (!strcmp (cmd, "-trace")) {
-          WelsStderrSetTraceLevel (atoi (pArgV[i + 1]));
-          i += 2;
-        } else {
-          i++;
+          if (i + 1 < iArgC)
+            WelsStderrSetTraceLevel (atoi (pArgV[i++]));
+          else {
+            printf ("trace level not specified.\n");
+            return 1;
+          }
         }
       }
     }
@@ -491,4 +494,3 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
 
   return 0;
 }
-
