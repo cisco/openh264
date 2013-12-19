@@ -2123,9 +2123,9 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   }
 
 #if defined(MEMORY_MONITOR)
-  WelsLog (pCtx, WELS_LOG_INFO, "WelsInitEncoderExt() exit, overall memory usage: %u bytes\n",
-           (unsigned int) (sizeof (sWelsEncCtx) /* requested size from malloc() or new operator */
-           + pCtx->pMemAlign->WelsGetMemoryUsage())	/* requested size from CMemoryAlign::WelsMalloc() */
+  WelsLog (pCtx, WELS_LOG_INFO, "WelsInitEncoderExt() exit, overall memory usage: %zu bytes\n",
+           sizeof (sWelsEncCtx) /* requested size from malloc() or new operator */
+           + pCtx->pMemAlign->WelsGetMemoryUsage()	/* requested size from CMemoryAlign::WelsMalloc() */
           );
 #endif//MEMORY_MONITOR
 
@@ -2944,7 +2944,7 @@ int32_t WritePadding (sWelsEncCtx* pCtx, int32_t iLen) {
 #if GOM_TRACE_FLAG
     WelsLog (pCtx, WELS_LOG_ERROR,
              "[RC] paddingcal pBuffer overflow, bufferlen=%d, paddinglen=%d, iNalIdx= %d, iCountNals= %d\n",
-             (pBs->pBufEnd - pBs->pBufPtr), iLen, iNal, pCtx->pOut->iCountNals);
+             static_cast<int>(pBs->pBufEnd - pBs->pBufPtr), iLen, iNal, pCtx->pOut->iCountNals);
 #endif
     return 0;
   }

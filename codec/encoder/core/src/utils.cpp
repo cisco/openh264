@@ -252,7 +252,8 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
 #endif//_MSC_VER >= 1500
 #endif//_MSC_VER
 #elif defined (__GNUC__)
-        iCurUsed = SNPRINTF (&pBuf[iBufUsed], iBufLeft, ".%3.3u]: ", (unsigned int) (tv.tv_usec / 1000));	// confirmed_safe_unsafe_usage
+        iCurUsed = SNPRINTF (&pBuf[iBufUsed], iBufLeft, ".%3.3u]: ",
+            static_cast<unsigned int>(tv.tv_usec / 1000));	// confirmed_safe_unsafe_usage
 #endif//WIN32
         if (iCurUsed >= 0) {
           iBufUsed += iCurUsed;
