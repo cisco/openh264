@@ -20,14 +20,23 @@ OBJDIR= ../obj/enc
 
 CC= $(shell which gcc)
 AS= $(shell which nasm)
-CXX = g++ -m32
-GCC = gcc -m32
-
+CXX = g++
+GCC = gcc 
+ifeq ($(ENABLE64BIT), Yes)
+CXX += -m64
+GCC += -m64
+CC += -m64
+NASM = 0 # disable NASM in 64 bit mode
+else
+CXX += -m32
+GCC += -m32
+CC += -m32
+endif
 ASFLAGS= -f elf -DNOPREFIX -I ../../../encoder/core/asm/
 
 LIBS= -lstdc++ -ldl -lpthread -lm
 #-lm
-CFLAGS=  $(INCLUDE) -m32 -fPIC -D__GCC__ -DLINUX -D__NO_CTYPE -DWELS_SVC -DENCODER_CORE -DHAVE_CACHE_LINE_ALIGN -DWELS_TESTBED -DMT_ENABLED
+CFLAGS=  $(INCLUDE) -fPIC -D__GCC__ -DLINUX -D__NO_CTYPE -DWELS_SVC -DENCODER_CORE -DHAVE_CACHE_LINE_ALIGN -DWELS_TESTBED -DMT_ENABLED
 
 ifeq ($(DBG),1)
 #SUFFIX= .dbg
@@ -213,9 +222,9 @@ lib:   	$(OBJENC)
 dylib:   $(OBJDEC)
 	@echo '$(OBJENC)'
 	@echo
-	@echo '$(GCC) -shared -Wl,-Bsymbolic -m32 -o $(SHAREDLIB) $(OBJENC) $(LIBS)'
+	@echo '$(GCC) -shared -Wl,-Bsymbolic  -o $(SHAREDLIB) $(OBJENC) $(LIBS)'
 	@echo 'creating dynamic library "$(SHAREDLIB)"'
-	@$(GCC)  -shared -Wl,-Bsymbolic -m32 -o $(SHAREDLIB) $(OBJENC)  $(LIBS)
+	@$(GCC)  -shared -Wl,-Bsymbolic  -o $(SHAREDLIB) $(OBJENC)  $(LIBS)
 	@echo '... done'
 	@echo
 
@@ -231,31 +240,31 @@ exe:	$(OBJBIN)
 	@echo
 	@echo '$(OBJBIN)'
 	@echo
-	@echo '$(GCC) $(LIBS) $(OBJBIN) $(BINLIB) -m32 -o $(BIN)'
+	@echo '$(GCC) $(LIBS) $(OBJBIN) $(BINLIB)  -o $(BIN)'
 	@echo 'creating binary "$(BIN)"'
-	@$(GCC)  $(OBJBIN) $(BINLIB) -m32 -o $(BIN) $(LIBS)
+	@$(GCC)  $(OBJBIN) $(BINLIB)  -o $(BIN) $(LIBS)
 	@echo '... done'
 	@echo
 
 depend:
 	@echo
 	@echo 'checking dependencies'
-	@$(SHELL) -ec '$(CC) -m32 -MM $(CFLAGS) $(ENCODESRC) $(ASMSRC) $(MAINSRC)\
+	@$(SHELL) -ec '$(CC)  -MM $(CFLAGS) $(ENCODESRC) $(ASMSRC) $(MAINSRC)\
          | sed '\''s@\(.*\)\.o[ :]@$(OBJDIR)/\1.o$(SUFFIX):@g'\''               \
          >$(DEPEND)'
 	@echo
 
 $(OBJDIR)/%.o$(SUFFIX): $(THREADLIBSRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+	@$(CC)  -c $(CFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o$(SUFFIX): $(CORESRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+	@$(CC)  -c $(CFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o$(SUFFIX): $(PLUSSRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+	@$(CC)  -c $(CFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o$(SUFFIX): $(ASMSRCDIR)/%.asm
 	@echo 'compiling object file "$@" ...'
@@ -263,15 +272,15 @@ $(OBJDIR)/%.o$(SUFFIX): $(ASMSRCDIR)/%.asm
 
 $(OBJDIR)/%.o$(SUFFIX): $(MAINSRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+	@$(CC)  -c $(CFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o$(SUFFIX): $(MAINSRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+	@$(CC)  -c $(CFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o$(SUFFIX): $(COMMONSRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+	@$(CC)  -c $(CFLAGS) -o $@ $<
 
 include $(DEPEND)
 

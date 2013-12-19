@@ -19,8 +19,18 @@ OBJDIR= ../obj/dec
 
 CC= $(shell which gcc)
 AS= $(shell which nasm)
-CXX = g++ -m32
-GCC = gcc -m32
+CXX = g++
+GCC = gcc
+ifeq ($(ENABLE64BIT), Yes)
+CXX += -m64
+GCC += -m64
+CC += -m64
+NASM = 0 # disable NASM in 64 bit mode
+else
+CXX += -m32
+GCC += -m32
+CC += -m32
+endif
 
 ASFLAGS= -f elf -DNOPREFIX -I ../../../decoder/core/asm/
 
@@ -212,7 +222,7 @@ exe:	$(OBJBIN)
 depend:
 	@echo
 	@echo 'checking dependencies'
-	@$(SHELL) -ec '$(CC) -m32 -MM $(CFLAGS) $(DECODESRC) $(ASMSRC) $(MAINSRC)\
+	@$(SHELL) -ec '$(CC) -MM $(CFLAGS) $(DECODESRC) $(ASMSRC) $(MAINSRC)\
          | sed '\''s@\(.*\)\.o[ :]@$(OBJDIR)/\1.o$(SUFFIX):@g'\''               \
          >$(DEPEND)'
 	@echo
@@ -223,15 +233,15 @@ depend:
 
 $(OBJDIR)/%.o$(SUFFIX): $(CORESRCDIR)/%.c
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+	@$(CC)  -c $(CFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o$(SUFFIX): $(CORESRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+	@$(CC) -c $(CFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o$(SUFFIX): $(PLUSSRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+	@$(CC) -c $(CFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o$(SUFFIX): $(ASMSRCDIR)/%.asm
 	@echo 'compiling object file "$@" ...'
@@ -243,11 +253,11 @@ $(OBJDIR)/%.o$(SUFFIX): $(ASMSRCDIR)/%.asm
 
 $(OBJDIR)/%.o$(SUFFIX): $(MAINSRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+	@$(CC) -c $(CFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o$(SUFFIX): $(COMMONSRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+	@$(CC) -c $(CFLAGS) -o $@ $<
 
 include $(DEPEND)
 

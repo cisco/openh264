@@ -20,9 +20,15 @@ TARGETLIB =  $(BINDIR)/$(NAME).so
 
 CC        = $(shell which gcc)
 AS        = $(shell which nasm)
-GCC       = gcc -m32
+GCC       = gcc 
+ifeq ($(ENABLE64BIT), Yes)
+GCC += -m64
+NASM = 0
+else
+GCC += -m32
+endif
 
-CPPFLAGS  = -Wall -g -O3
+CPPFLAGS  = -Wall -g -O3 -fpic
 ifeq ($(NASM), 1)
 CPPFLAGS += -DX86_ASM
 endif
