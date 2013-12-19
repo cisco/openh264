@@ -293,6 +293,7 @@ int32_t  CWelsCodecTrace::LoadWelsTraceModule() {
 }
 
 int32_t  CWelsCodecTrace::UnloadWelsTraceModule() {
+#ifndef NO_DYNAMIC_VP
 #if defined _WIN32
   if (m_hTraceHandle) {
     ::FreeLibrary ((HMODULE)m_hTraceHandle);
@@ -305,6 +306,7 @@ int32_t  CWelsCodecTrace::UnloadWelsTraceModule() {
   if (m_hTraceHandle) {
     ::dlclose (m_hTraceHandle);
   }
+#endif
 #endif
 
   m_hTraceHandle = NULL;
