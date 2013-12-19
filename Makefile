@@ -17,10 +17,9 @@ ifneq ($(ENABLE64BIT), Yes)
 USE_ASM = Yes
 endif
 else
-CFLAGS += -g
+CFLAGS = -g
 USE_ASM = No
 endif
-
 ifeq ($(ENABLE64BIT), Yes)
 CFLAGS += -m64
 LDFLAGS += -m64
@@ -28,11 +27,6 @@ else
 CFLAGS += -m32
 LDFLAGS += -m32
 endif
-
-ifeq ($(WERROR), Yes)
-CFLAGS += -Werror
-endif
-
 include build/platform-$(UNAME).mk
 
 ifeq ($(USE_ASM),Yes)

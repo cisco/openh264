@@ -2123,9 +2123,9 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   }
 
 #if defined(MEMORY_MONITOR)
-  WelsLog (pCtx, WELS_LOG_INFO, "WelsInitEncoderExt() exit, overall memory usage: %zu bytes\n",
-           sizeof (sWelsEncCtx) /* requested size from malloc() or new operator */
-           + pCtx->pMemAlign->WelsGetMemoryUsage()	/* requested size from CMemoryAlign::WelsMalloc() */
+  WelsLog (pCtx, WELS_LOG_INFO, "WelsInitEncoderExt() exit, overall memory usage: %u bytes\n",
+           static_cast<unsigned int>(sizeof (sWelsEncCtx) /* requested size from malloc() or new operator */
+           + pCtx->pMemAlign->WelsGetMemoryUsage())	/* requested size from CMemoryAlign::WelsMalloc() */
           );
 #endif//MEMORY_MONITOR
 
