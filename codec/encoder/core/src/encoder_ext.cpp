@@ -2943,8 +2943,8 @@ int32_t WritePadding (sWelsEncCtx* pCtx, int32_t iLen) {
   if ((pBs->pBufEnd - pBs->pBufPtr) < iLen || iNal >= pCtx->pOut->iCountNals) {
 #if GOM_TRACE_FLAG
     WelsLog (pCtx, WELS_LOG_ERROR,
-             "[RC] paddingcal pBuffer overflow, bufferlen=%d, paddinglen=%d, iNalIdx= %d, iCountNals= %d\n",
-             static_cast<int>(pBs->pBufEnd - pBs->pBufPtr), iLen, iNal, pCtx->pOut->iCountNals);
+             "[RC] paddingcal pBuffer overflow, bufferlen=%lld, paddinglen=%d, iNalIdx= %d, iCountNals= %d\n",
+             static_cast<long long int>(pBs->pBufEnd - pBs->pBufPtr), iLen, iNal, pCtx->pOut->iCountNals);
 #endif
     return 0;
   }
