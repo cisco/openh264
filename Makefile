@@ -1,4 +1,4 @@
-UNAME=$(shell uname | tr A-Z a-z | tr -d \\-[:digit:].[:digit:])
+UNAME=$(shell uname | tr A-Z a-z | tr -d \\-[:digit:].)
 LIBPREFIX=lib
 LIBSUFFIX=a
 CP=cp
