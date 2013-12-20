@@ -157,7 +157,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
 #endif//_MSC_VER
 #else//__GNUC__
       struct tm* t_now;
-#endif//WIN32			
+#endif//WIN32
 
 #if defined( _WIN32 )
       struct _timeb tb;
@@ -172,7 +172,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
         return;
       }
 #endif//_MSC_VER >= 1500
-#endif//_MSC_VER			
+#endif//_MSC_VER
       FTIME (&tb);
 #elif defined( __GNUC__ )
       struct timeval tv;
@@ -252,7 +252,8 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
 #endif//_MSC_VER >= 1500
 #endif//_MSC_VER
 #elif defined (__GNUC__)
-        iCurUsed = SNPRINTF (&pBuf[iBufUsed], iBufLeft, ".%3.3u]: ", tv.tv_usec / 1000);	// confirmed_safe_unsafe_usage
+        iCurUsed = SNPRINTF (&pBuf[iBufUsed], iBufLeft, ".%3.3u]: ",
+            static_cast<unsigned int>(tv.tv_usec / 1000));	// confirmed_safe_unsafe_usage
 #endif//WIN32
         if (iCurUsed >= 0) {
           iBufUsed += iCurUsed;
