@@ -410,6 +410,7 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (void* pCtx, const SSourcePicture
   DownsamplePadding (pSrcPic, pDstPic, iSrcWidth, iSrcHeight, iShrinkWidth, iShrinkHeight, iTargetWidth, iTargetHeight);
 
   if (pSvcParam->bEnableSceneChangeDetect && !pEncCtx->pVaa->bIdrPeriodFlag
+      && !pEncCtx->bEncCurFrmAsIdrFlag
       && ! (pEncCtx->iCodingIndex & (pSvcParam->uiGopSize - 1))) {
     SPicture* pRefPic = pEncCtx->pLtr[iDependencyId].bReceivedT0LostFlag ?
                         pEncCtx->pSpatialPic[iDependencyId][pEncCtx->uiSpatialLayersInTemporal[iDependencyId] +
@@ -510,7 +511,7 @@ int32_t CWelsPreProcess::MultiLayerPreprocess (void* pCtx, const SSourcePicture*
   } while (i < kiSpatialNum);
 
   if (pSvcParam->bEnableSceneChangeDetect && (kiSpatialNum == pSvcParam->iNumDependencyLayer)
-      && !pEncCtx->pVaa->bIdrPeriodFlag) {
+      && !pEncCtx->pVaa->bIdrPeriodFlag && !pEncCtx->bEncCurFrmAsIdrFlag) {
     SPicture* pRef = pEncCtx->pLtr[0].bReceivedT0LostFlag ?
                      pEncCtx->pSpatialPic[0][pEncCtx->uiSpatialLayersInTemporal[0] + pEncCtx->pVaa->uiValidLongTermPicIdx] :
                      m_pLastSpatialPicture[0][0];
