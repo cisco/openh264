@@ -2,7 +2,7 @@ NAME= welsenc
 
 ### include debug information: 1=yes, 0=no
 DBG= 0
-NASM = 1
+NASM = Yes
 DEPEND= dependencies
 
 OUTDIR=		../../../../bin/linux
@@ -26,7 +26,7 @@ ifeq ($(ENABLE64BIT), Yes)
 CXX += -m64
 GCC += -m64
 CC += -m64
-NASM = 0 # disable NASM in 64 bit mode
+NASM = No # disable NASM in 64 bit mode
 else
 CXX += -m32
 GCC += -m32
@@ -45,7 +45,7 @@ else
 #SUFFIX=
 CFLAGS+= -O3
 endif
-ifeq ($(NASM), 1)
+ifeq ($(NASM), Yes)
 CFLAGS += -DX86_ASM
 endif
 OBJSUF= .o$(SUFFIX)
@@ -143,7 +143,7 @@ $(OBJDIR)/welsEncoderExt.o \
 $(OBJDIR)/welsCodecTrace.o \
 $(OBJDIR)/logging.o
 
-ifeq ($(NASM), 1)
+ifeq ($(NASM), Yes)
 OBJENC += $(OBJDIR)/cpuid.o \
 $(OBJDIR)/coeff.o \
 $(OBJDIR)/dct.o \

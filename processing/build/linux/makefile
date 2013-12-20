@@ -1,4 +1,4 @@
-NASM = 1
+NASM = Yes
 NAME      = libwelsvp
 
 OUTDIR    = ../../../bin/linux
@@ -23,20 +23,20 @@ AS        = $(shell which nasm)
 GCC       = gcc 
 ifeq ($(ENABLE64BIT), Yes)
 GCC += -m64
-NASM = 0
+NASM = No
 else
 GCC += -m32
 endif
 
 CPPFLAGS  = -Wall -g -O3 -fpic
-ifeq ($(NASM), 1)
+ifeq ($(NASM), Yes)
 CPPFLAGS += -DX86_ASM
 endif
 ASMFLAGS  = -f elf -DNOPREFIX  -I ../../src/asm/
 LDFLAGS   = -lstdc++ -ldl
 
 SRCEXTS  = .cpp
-ifeq ($(NASM), 1)
+ifeq ($(NASM), Yes)
 SRCEXTS += .asm
 endif
 HDREXTS  = .h
