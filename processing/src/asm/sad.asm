@@ -67,7 +67,7 @@ BITS 32
 %endmacro
 
 
-  
+
 %macro CACHE_SPLIT_CHECK 3 ; address, width, cacheline
 and    %1,  0x1f|(%3>>1)
 cmp    %1,  (32-%2)|(%3>>1)
@@ -108,15 +108,15 @@ WelsSampleSad8x8_sse21:
 	push   edi
 	mov    eax,    [esp+12]
 	mov    ebx,    [esp+16]
-    
+
     pxor   xmm7,   xmm7
-    
+
     mov    edi,    ecx
     and    edi,    0x07
-    sub    ecx,    edi   
+    sub    ecx,    edi
     mov    edx,    8
     sub    edx,    edi
-    
+
     shl    edi,    3
     shl    edx,    3
     movd   xmm5,   edi
@@ -124,10 +124,10 @@ WelsSampleSad8x8_sse21:
 	mov    edi,    8
 	add    edi,    ecx
     mov    edx,    [esp+24]
-    
+
     movq   xmm0,   [eax]
 	movhps xmm0,   [eax+ebx]
-		
+
 	movq   xmm1,   [ecx]
 	movq   xmm2,   [edi]
 	movhps xmm1,   [ecx+edx]
@@ -135,35 +135,17 @@ WelsSampleSad8x8_sse21:
 	psrlq  xmm1,   xmm5
 	psllq  xmm2,   xmm6
 	por    xmm1,   xmm2
-	
-	psadbw xmm0,   xmm1
-	paddw  xmm7,   xmm0
-	
-	lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
-	lea    edi,    [edi+2*edx]
-	 
-    movq   xmm0,   [eax]
-	movhps xmm0,   [eax+ebx]
-		
-	movq   xmm1,   [ecx]
-	movq   xmm2,   [edi]
-	movhps xmm1,   [ecx+edx]
-	movhps xmm2,   [edi+edx]
-	psrlq  xmm1,   xmm5
-	psllq  xmm2,   xmm6
-	por    xmm1,   xmm2
-	
+
 	psadbw xmm0,   xmm1
 	paddw  xmm7,   xmm0
 
 	lea    eax,    [eax+2*ebx]
 	lea    ecx,    [ecx+2*edx]
 	lea    edi,    [edi+2*edx]
-	 
+
     movq   xmm0,   [eax]
 	movhps xmm0,   [eax+ebx]
-		
+
 	movq   xmm1,   [ecx]
 	movq   xmm2,   [edi]
 	movhps xmm1,   [ecx+edx]
@@ -171,17 +153,17 @@ WelsSampleSad8x8_sse21:
 	psrlq  xmm1,   xmm5
 	psllq  xmm2,   xmm6
 	por    xmm1,   xmm2
-	
+
 	psadbw xmm0,   xmm1
 	paddw  xmm7,   xmm0
-	
+
 	lea    eax,    [eax+2*ebx]
 	lea    ecx,    [ecx+2*edx]
 	lea    edi,    [edi+2*edx]
-	 
+
     movq   xmm0,   [eax]
 	movhps xmm0,   [eax+ebx]
-		
+
 	movq   xmm1,   [ecx]
 	movq   xmm2,   [edi]
 	movhps xmm1,   [ecx+edx]
@@ -189,10 +171,28 @@ WelsSampleSad8x8_sse21:
 	psrlq  xmm1,   xmm5
 	psllq  xmm2,   xmm6
 	por    xmm1,   xmm2
-	
+
 	psadbw xmm0,   xmm1
 	paddw  xmm7,   xmm0
-	
+
+	lea    eax,    [eax+2*ebx]
+	lea    ecx,    [ecx+2*edx]
+	lea    edi,    [edi+2*edx]
+
+    movq   xmm0,   [eax]
+	movhps xmm0,   [eax+ebx]
+
+	movq   xmm1,   [ecx]
+	movq   xmm2,   [edi]
+	movhps xmm1,   [ecx+edx]
+	movhps xmm2,   [edi+edx]
+	psrlq  xmm1,   xmm5
+	psllq  xmm2,   xmm6
+	por    xmm1,   xmm2
+
+	psadbw xmm0,   xmm1
+	paddw  xmm7,   xmm0
+
     movhlps    xmm0, xmm7
 	paddw      xmm0, xmm7
 	movd       eax,  xmm0
@@ -202,12 +202,12 @@ WelsSampleSad8x8_sse21:
     push   ebx
     mov    eax,    [esp+8]
 	mov    ebx,    [esp+12]
-	mov    edx,    [esp+20]    
+	mov    edx,    [esp+20]
 	pxor   xmm6,   xmm6
 	SSE2_GetSad8x4
     lea    eax,    [eax+2*ebx]
 	lea    ecx,    [ecx+2*edx]
-    SSE2_GetSad8x4    
+    SSE2_GetSad8x4
     movhlps    xmm0, xmm6
 	paddw      xmm0, xmm6
 	movd       eax,  xmm0

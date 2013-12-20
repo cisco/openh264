@@ -47,7 +47,7 @@
 extern "C" {
 #endif
 
-#if defined(WIN32)
+#if defined(_WIN32)
 
 #include <windows.h>
 
@@ -78,70 +78,71 @@ typedef    HANDLE                    WELS_EVENT;
 #include <fcntl.h>
 
 typedef   pthread_t    WELS_THREAD_HANDLE;
-typedef  void* (*LPWELS_THREAD_ROUTINE)  ( void * );
+typedef  void* (*LPWELS_THREAD_ROUTINE) (void*);
 
 typedef   pthread_mutex_t           WELS_MUTEX;
-typedef   sem_t                     WELS_EVENT; 
+typedef   sem_t                     WELS_EVENT;
 
-#define   WELS_THREAD_ROUTINE_TYPE         void * 
+#define   WELS_THREAD_ROUTINE_TYPE         void *
 #define   WELS_THREAD_ROUTINE_RETURN(rc)   return (void*)rc;
 
 #endif//__GNUC__
 
-#endif//WIN32
+#endif//_WIN32
 
 typedef    int32_t        WELS_THREAD_ERROR_CODE;
 typedef    int32_t        WELS_THREAD_ATTR;
 
-typedef  struct _WelsLogicalProcessorInfo
-{
-	int32_t    ProcessorCount;
+typedef  struct _WelsLogicalProcessorInfo {
+  int32_t    ProcessorCount;
 } WelsLogicalProcessInfo;
 
 #define    WELS_THREAD_ERROR_OK					0
 #define    WELS_THREAD_ERROR_GENERIAL			((uint32_t)(-1))
 #define    WELS_THREAD_ERROR_WAIT_OBJECT_0		0
-#define	   WELS_THREAD_ERROR_WAIT_TIMEOUT		((uint32_t)0x00000102L)  
+#define	   WELS_THREAD_ERROR_WAIT_TIMEOUT		((uint32_t)0x00000102L)
 #define	   WELS_THREAD_ERROR_WAIT_FAILED		WELS_THREAD_ERROR_GENERIAL
 
-void WelsSleep( uint32_t dwMilliseconds );
-WELS_THREAD_ERROR_CODE    WelsMutexInit( WELS_MUTEX   * mutex );
-WELS_THREAD_ERROR_CODE    WelsMutexLock( WELS_MUTEX   * mutex );
-WELS_THREAD_ERROR_CODE    WelsMutexUnlock( WELS_MUTEX * mutex );
-WELS_THREAD_ERROR_CODE    WelsMutexDestroy( WELS_MUTEX * mutex );
+void WelsSleep (uint32_t dwMilliseconds);
+WELS_THREAD_ERROR_CODE    WelsMutexInit (WELS_MUTEX*    mutex);
+WELS_THREAD_ERROR_CODE    WelsMutexLock (WELS_MUTEX*    mutex);
+WELS_THREAD_ERROR_CODE    WelsMutexUnlock (WELS_MUTEX* mutex);
+WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex);
 
 #ifdef __GNUC__
-WELS_THREAD_ERROR_CODE    WelsEventOpen( WELS_EVENT **p_event, str_t *event_name );
-WELS_THREAD_ERROR_CODE    WelsEventClose( WELS_EVENT *event, str_t *event_name );
+WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT** p_event, str_t* event_name);
+WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, str_t* event_name);
 #endif//__GNUC__
-WELS_THREAD_ERROR_CODE    WelsEventInit( WELS_EVENT *event );
-WELS_THREAD_ERROR_CODE    WelsEventDestroy( WELS_EVENT * event );
-WELS_THREAD_ERROR_CODE    WelsEventSignal( WELS_EVENT * event );
-WELS_THREAD_ERROR_CODE    WelsEventReset( WELS_EVENT * event );
-WELS_THREAD_ERROR_CODE    WelsEventWait( WELS_EVENT * event );
-WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut( WELS_EVENT * event, uint32_t dwMilliseconds );
-#ifdef WIN32
-WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking( uint32_t nCount, WELS_EVENT *event_list, uint32_t dwMilliseconds );
-WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking( uint32_t nCount, WELS_EVENT *event_list );
+WELS_THREAD_ERROR_CODE    WelsEventInit (WELS_EVENT* event);
+WELS_THREAD_ERROR_CODE    WelsEventDestroy (WELS_EVENT* event);
+WELS_THREAD_ERROR_CODE    WelsEventSignal (WELS_EVENT* event);
+WELS_THREAD_ERROR_CODE    WelsEventReset (WELS_EVENT* event);
+WELS_THREAD_ERROR_CODE    WelsEventWait (WELS_EVENT* event);
+WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t dwMilliseconds);
+#ifdef _WIN32
+WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount, WELS_EVENT* event_list,
+    uint32_t dwMilliseconds);
+WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WELS_EVENT* event_list);
 #else
-WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking( uint32_t nCount, WELS_EVENT **event_list, uint32_t dwMilliseconds );
-WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking( uint32_t nCount, WELS_EVENT **event_list );
-#endif//WIN32
+WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount, WELS_EVENT** event_list,
+    uint32_t dwMilliseconds);
+WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WELS_EVENT** event_list);
+#endif//_WIN32
 
-WELS_THREAD_ERROR_CODE    WelsThreadCreate( WELS_THREAD_HANDLE * thread,  LPWELS_THREAD_ROUTINE  routine, 
-										   void * arg, WELS_THREAD_ATTR attr);
+WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_THREAD_ROUTINE  routine,
+    void* arg, WELS_THREAD_ATTR attr);
 
 WELS_THREAD_ERROR_CODE	  WelsSetThreadCancelable();
 
-WELS_THREAD_ERROR_CODE    WelsThreadJoin( WELS_THREAD_HANDLE  thread );
+WELS_THREAD_ERROR_CODE    WelsThreadJoin (WELS_THREAD_HANDLE  thread);
 
-WELS_THREAD_ERROR_CODE    WelsThreadCancel( WELS_THREAD_HANDLE  thread );
+WELS_THREAD_ERROR_CODE    WelsThreadCancel (WELS_THREAD_HANDLE  thread);
 
-WELS_THREAD_ERROR_CODE    WelsThreadDestroy( WELS_THREAD_HANDLE *thread );
+WELS_THREAD_ERROR_CODE    WelsThreadDestroy (WELS_THREAD_HANDLE* thread);
 
 WELS_THREAD_HANDLE        WelsThreadSelf();
 
-WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo(WelsLogicalProcessInfo * pInfo);
+WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* pInfo);
 
 
 #ifdef  __cplusplus

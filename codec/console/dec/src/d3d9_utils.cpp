@@ -33,7 +33,7 @@
 #include "d3d9_utils.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Write2File(FILE *pFp, unsigned char* pData[3], int iStride[2], int iWidth, int iHeight);
+void Write2File (FILE* pFp, unsigned char* pData[3], int iStride[2], int iWidth, int iHeight);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifdef ENABLE_DISPLAY_MODULE
@@ -47,732 +47,655 @@ void Write2File(FILE *pFp, unsigned char* pData[3], int iStride[2], int iWidth, 
 
 #define NV12_FORMAT  MAKEFOURCC('N','V','1','2')
 
-typedef struct
-{
-	UINT      uiWidth;
-	UINT      uiHeight;
-	D3DFORMAT D3Dformat;
-	D3DPOOL   D3DPool;
+typedef struct {
+  UINT      uiWidth;
+  UINT      uiHeight;
+  D3DFORMAT D3Dformat;
+  D3DPOOL   D3DPool;
 } SHandleInfo;
 
 #define SAFE_RELEASE(p) if(p) { (p)->Release(); (p) = NULL; }
 #define SAFE_FREE(p)    if(p) { free (p); (p) = NULL; }
 
-HRESULT Dump2YUV(void *pDst[3], void *pSurface, int iWidth, int iHeight, int iStride[2]);
-HRESULT Dump2Surface(void *pDst[3], void *pSurface, int iWidth, int iHeight, int iStride[2]);
-HRESULT InitWindow(HWND *hWnd);
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+HRESULT Dump2YUV (void* pDst[3], void* pSurface, int iWidth, int iHeight, int iStride[2]);
+HRESULT Dump2Surface (void* pDst[3], void* pSurface, int iWidth, int iHeight, int iStride[2]);
+HRESULT InitWindow (HWND* hWnd);
+LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM);
 
-typedef HRESULT (WINAPI *pFnCreateD3D9Ex) (UINT SDKVersion, IDirect3D9Ex** );
-typedef LPDIRECT3D9 (WINAPI *pFnCreateD3D9)(UINT SDKVersion);
+typedef HRESULT (WINAPI* pFnCreateD3D9Ex) (UINT SDKVersion, IDirect3D9Ex**);
+typedef LPDIRECT3D9 (WINAPI* pFnCreateD3D9) (UINT SDKVersion);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CD3D9Utils::CD3D9Utils()
-{
-	m_hDll        = NULL;
-	m_hWnd        = NULL;
-	m_pDumpYUV    = NULL;
+CD3D9Utils::CD3D9Utils() {
+  m_hDll        = NULL;
+  m_hWnd        = NULL;
+  m_pDumpYUV    = NULL;
 
-	m_bInitDone   = FALSE;
+  m_bInitDone   = FALSE;
 
-	m_lpD3D9                = NULL;
-	m_lpD3D9Device          = NULL;
-	m_lpD3D9RawSurfaceShare = NULL;
+  m_lpD3D9                = NULL;
+  m_lpD3D9Device          = NULL;
+  m_lpD3D9RawSurfaceShare = NULL;
 
-	// coverity scan uninitial
-	ZeroMemory(&m_d3dpp, sizeof(m_d3dpp));
+  // coverity scan uninitial
+  ZeroMemory (&m_d3dpp, sizeof (m_d3dpp));
 }
 
-CD3D9Utils::~CD3D9Utils()
-{
-	Uninit();
+CD3D9Utils::~CD3D9Utils() {
+  Uninit();
 }
 
-HRESULT CD3D9Utils::Init(BOOL bWindowed)
-{
-	if (m_bInitDone)
-		return S_OK;
+HRESULT CD3D9Utils::Init (BOOL bWindowed) {
+  if (m_bInitDone)
+    return S_OK;
 
-	m_hDll = LoadLibrary(TEXT("d3d9.dll"));
-	pFnCreateD3D9 pCreateD3D9 = NULL;
-	if(m_hDll)
-		pCreateD3D9 = (pFnCreateD3D9) GetProcAddress(m_hDll, TEXT("Direct3DCreate9"));
-	else 
-		return E_FAIL;
+  m_hDll = LoadLibrary (TEXT ("d3d9.dll"));
+  pFnCreateD3D9 pCreateD3D9 = NULL;
+  if (m_hDll)
+    pCreateD3D9 = (pFnCreateD3D9) GetProcAddress (m_hDll, TEXT ("Direct3DCreate9"));
+  else
+    return E_FAIL;
 
-	m_lpD3D9 = pCreateD3D9(D3D_SDK_VERSION);
+  m_lpD3D9 = pCreateD3D9 (D3D_SDK_VERSION);
 
-	return bWindowed ? InitWindow(&m_hWnd) : S_OK;
+  return bWindowed ? InitWindow (&m_hWnd) : S_OK;
 }
 
-HRESULT CD3D9Utils::Uninit()
-{
-	SAFE_RELEASE(m_lpD3D9RawSurfaceShare);
-    SAFE_RELEASE(m_lpD3D9Device);
-    SAFE_RELEASE(m_lpD3D9);
-	SAFE_FREE(m_pDumpYUV);
+HRESULT CD3D9Utils::Uninit() {
+  SAFE_RELEASE (m_lpD3D9RawSurfaceShare);
+  SAFE_RELEASE (m_lpD3D9Device);
+  SAFE_RELEASE (m_lpD3D9);
+  SAFE_FREE (m_pDumpYUV);
 
-	if(m_hDll)
-	{
-		FreeLibrary(m_hDll);
-		m_hDll = NULL;
-	}
+  if (m_hDll) {
+    FreeLibrary (m_hDll);
+    m_hDll = NULL;
+  }
 
-	return S_OK;
+  return S_OK;
 }
 
-HRESULT CD3D9Utils::Process(void *pDst[3], SBufferInfo *pInfo, FILE *pFp)
-{
-	HRESULT hResult = E_FAIL;
+HRESULT CD3D9Utils::Process (void* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
+  HRESULT hResult = E_FAIL;
 
-	if (pDst == NULL || pInfo == NULL)
-		return hResult;
+  if (pDst == NULL || pInfo == NULL)
+    return hResult;
 
-	BOOL bWindowed = pFp ? FALSE : TRUE;
-	BOOL bNeedD3D9 = !(!bWindowed && pInfo->eBufferProperty == BUFFER_HOST);
-	if (!m_bInitDone)
-		m_bInitDone = !bNeedD3D9;
+  BOOL bWindowed = pFp ? FALSE : TRUE;
+  BOOL bNeedD3D9 = ! (!bWindowed && pInfo->eBufferProperty == BUFFER_HOST);
+  if (!m_bInitDone)
+    m_bInitDone = !bNeedD3D9;
 
-	if (!m_bInitDone)
-	{
-		hResult = Init(bWindowed);
-		if (SUCCEEDED(hResult))
-			m_bInitDone = TRUE;
-	}
+  if (!m_bInitDone) {
+    hResult = Init (bWindowed);
+    if (SUCCEEDED (hResult))
+      m_bInitDone = TRUE;
+  }
 
-	if (m_bInitDone)
-	{
-		if (bWindowed)
-		{	
-			hResult = Render(pDst, pInfo);				
-			Sleep(30); 
-		}
-		else if (pFp)
-		{
-			hResult = Dump(pDst, pInfo, pFp);
-			Sleep(0);
-		}
-	}
+  if (m_bInitDone) {
+    if (bWindowed) {
+      hResult = Render (pDst, pInfo);
+      Sleep (30);
+    } else if (pFp) {
+      hResult = Dump (pDst, pInfo, pFp);
+      Sleep (0);
+    }
+  }
 
-	return hResult;
+  return hResult;
 }
 
-HRESULT CD3D9Utils::Render(void *pDst[3], SBufferInfo *pInfo)
-{
-	HRESULT hResult = E_FAIL;
-	EBufferProperty eBufferProperty = pInfo->eBufferProperty;
+HRESULT CD3D9Utils::Render (void* pDst[3], SBufferInfo* pInfo) {
+  HRESULT hResult = E_FAIL;
+  EBufferProperty eBufferProperty = pInfo->eBufferProperty;
 
-	if (eBufferProperty == BUFFER_HOST)
-	{
-		hResult = InitResource(NULL, pInfo);
-		if (SUCCEEDED(hResult))
-		 hResult = Dump2Surface(pDst, m_lpD3D9RawSurfaceShare, pInfo->UsrData.sSystemBuffer.iWidth, pInfo->UsrData.sSystemBuffer.iHeight, pInfo->UsrData.sSystemBuffer.iStride);
-	}
-	
-	if (SUCCEEDED(hResult))
-	{
-		IDirect3DSurface9 *pBackBuffer = NULL;
-		hResult = m_lpD3D9Device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
-		hResult = m_lpD3D9Device->StretchRect(m_lpD3D9RawSurfaceShare, NULL, pBackBuffer, NULL, D3DTEXF_NONE);
-		hResult = m_lpD3D9Device->Present(0, 0, NULL, NULL);
-	}
+  if (eBufferProperty == BUFFER_HOST) {
+    hResult = InitResource (NULL, pInfo);
+    if (SUCCEEDED (hResult))
+      hResult = Dump2Surface (pDst, m_lpD3D9RawSurfaceShare, pInfo->UsrData.sSystemBuffer.iWidth,
+                              pInfo->UsrData.sSystemBuffer.iHeight, pInfo->UsrData.sSystemBuffer.iStride);
+  }
 
-	return hResult;
+  if (SUCCEEDED (hResult)) {
+    IDirect3DSurface9* pBackBuffer = NULL;
+    hResult = m_lpD3D9Device->GetBackBuffer (0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
+    hResult = m_lpD3D9Device->StretchRect (m_lpD3D9RawSurfaceShare, NULL, pBackBuffer, NULL, D3DTEXF_NONE);
+    hResult = m_lpD3D9Device->Present (0, 0, NULL, NULL);
+  }
+
+  return hResult;
 }
 
-HRESULT CD3D9Utils::Dump(void *pDst[3], SBufferInfo *pInfo, FILE *pFp)
-{
-	HRESULT hResult = E_FAIL;
-	EBufferProperty eBufferProperty = pInfo->eBufferProperty;
-	int iStride[2];
-	int iWidth;
-	int iHeight;	
+HRESULT CD3D9Utils::Dump (void* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
+  HRESULT hResult = E_FAIL;
+  EBufferProperty eBufferProperty = pInfo->eBufferProperty;
+  int iStride[2];
+  int iWidth;
+  int iHeight;
 
-	iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
-	iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
-	iStride[0] = pInfo->UsrData.sSystemBuffer.iStride[0];
-	iStride[1] = pInfo->UsrData.sSystemBuffer.iStride[1];
-	
-	if (pDst[0] && pDst[1] && pDst[2])
-		Write2File(pFp, (unsigned char **)pDst, iStride, iWidth, iHeight);
+  iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
+  iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
+  iStride[0] = pInfo->UsrData.sSystemBuffer.iStride[0];
+  iStride[1] = pInfo->UsrData.sSystemBuffer.iStride[1];
 
-	return hResult;
+  if (pDst[0] && pDst[1] && pDst[2])
+    Write2File (pFp, (unsigned char**)pDst, iStride, iWidth, iHeight);
+
+  return hResult;
 }
 
-HRESULT CD3D9Utils::InitResource(void *pSharedHandle, SBufferInfo *pInfo)
-{
-	HRESULT hResult = S_OK;
+HRESULT CD3D9Utils::InitResource (void* pSharedHandle, SBufferInfo* pInfo) {
+  HRESULT hResult = S_OK;
 
-	// coverity scan uninitial
-	int iWidth = 0;
-	int iHeight = 0;
-	D3DFORMAT D3Dformat = (D3DFORMAT)D3DFMT_UNKNOWN;
-	D3DPOOL D3Dpool = (D3DPOOL)D3DPOOL_DEFAULT;
+  // coverity scan uninitial
+  int iWidth = 0;
+  int iHeight = 0;
+  D3DFORMAT D3Dformat = (D3DFORMAT)D3DFMT_UNKNOWN;
+  D3DPOOL D3Dpool = (D3DPOOL)D3DPOOL_DEFAULT;
 
-	if (pInfo == NULL)
-		return E_FAIL;
+  if (pInfo == NULL)
+    return E_FAIL;
 
-	if (m_lpD3D9Device == NULL && m_lpD3D9RawSurfaceShare == NULL)
-	{
-		HMONITOR hMonitorWnd = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONULL);
+  if (m_lpD3D9Device == NULL && m_lpD3D9RawSurfaceShare == NULL) {
+    HMONITOR hMonitorWnd = MonitorFromWindow (m_hWnd, MONITOR_DEFAULTTONULL);
 
-		UINT uiAdapter = D3DADAPTER_DEFAULT;
-		UINT uiCnt = m_lpD3D9->GetAdapterCount();
-		for(UINT i=0; i<uiCnt; i++)
-		{
-			HMONITOR hMonitor = m_lpD3D9->GetAdapterMonitor(i);
-			if(hMonitor == hMonitorWnd)
-			{
-				uiAdapter = i;
-				break;
-			}
-		}
+    UINT uiAdapter = D3DADAPTER_DEFAULT;
+    UINT uiCnt = m_lpD3D9->GetAdapterCount();
+    for (UINT i = 0; i < uiCnt; i++) {
+      HMONITOR hMonitor = m_lpD3D9->GetAdapterMonitor (i);
+      if (hMonitor == hMonitorWnd) {
+        uiAdapter = i;
+        break;
+      }
+    }
 
-		D3DDISPLAYMODE D3DDisplayMode;
-		hResult = m_lpD3D9->GetAdapterDisplayMode(uiAdapter, &D3DDisplayMode);
+    D3DDISPLAYMODE D3DDisplayMode;
+    hResult = m_lpD3D9->GetAdapterDisplayMode (uiAdapter, &D3DDisplayMode);
 
-		D3DDEVTYPE D3DDevType = D3DDEVTYPE_HAL;
-		DWORD dwBehaviorFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED;
+    D3DDEVTYPE D3DDevType = D3DDEVTYPE_HAL;
+    DWORD dwBehaviorFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED;
 
-		ZeroMemory(&m_d3dpp, sizeof(m_d3dpp));
-		m_d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
-		m_d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-		m_d3dpp.BackBufferFormat = D3DDisplayMode.Format;
-		m_d3dpp.Windowed = TRUE;
-		m_d3dpp.hDeviceWindow = m_hWnd;
-		m_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-		hResult = m_lpD3D9->CreateDevice(uiAdapter, D3DDevType, NULL, dwBehaviorFlags, &m_d3dpp, &m_lpD3D9Device);
-		if (pInfo->eBufferProperty == BUFFER_HOST)
-		{
-			iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
-			iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
-			D3Dformat = (D3DFORMAT)NV12_FORMAT;
-			D3Dpool = (D3DPOOL)D3DPOOL_DEFAULT;
-		}
-		
-		hResult = m_lpD3D9Device->CreateOffscreenPlainSurface(iWidth, iHeight, (D3DFORMAT)D3Dformat, (D3DPOOL)D3Dpool, &m_lpD3D9RawSurfaceShare, NULL);
-		
-	}
+    ZeroMemory (&m_d3dpp, sizeof (m_d3dpp));
+    m_d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
+    m_d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    m_d3dpp.BackBufferFormat = D3DDisplayMode.Format;
+    m_d3dpp.Windowed = TRUE;
+    m_d3dpp.hDeviceWindow = m_hWnd;
+    m_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+    hResult = m_lpD3D9->CreateDevice (uiAdapter, D3DDevType, NULL, dwBehaviorFlags, &m_d3dpp, &m_lpD3D9Device);
+    if (pInfo->eBufferProperty == BUFFER_HOST) {
+      iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
+      iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
+      D3Dformat = (D3DFORMAT)NV12_FORMAT;
+      D3Dpool = (D3DPOOL)D3DPOOL_DEFAULT;
+    }
 
-	if (m_lpD3D9Device == NULL || m_lpD3D9RawSurfaceShare == NULL)
-		hResult = E_FAIL;
+    hResult = m_lpD3D9Device->CreateOffscreenPlainSurface (iWidth, iHeight, (D3DFORMAT)D3Dformat, (D3DPOOL)D3Dpool,
+              &m_lpD3D9RawSurfaceShare, NULL);
 
-	return hResult;
+  }
+
+  if (m_lpD3D9Device == NULL || m_lpD3D9RawSurfaceShare == NULL)
+    hResult = E_FAIL;
+
+  return hResult;
 }
 
-CD3D9ExUtils::CD3D9ExUtils()
-{
-	m_hDll        = NULL;
-	m_hWnd        = NULL;
-	m_pDumpYUV    = NULL;
+CD3D9ExUtils::CD3D9ExUtils() {
+  m_hDll        = NULL;
+  m_hWnd        = NULL;
+  m_pDumpYUV    = NULL;
 
-	m_bInitDone   = FALSE;
+  m_bInitDone   = FALSE;
 
-	m_lpD3D9                = NULL;
-	m_lpD3D9Device          = NULL;
-	m_lpD3D9RawSurfaceShare = NULL;
+  m_lpD3D9                = NULL;
+  m_lpD3D9Device          = NULL;
+  m_lpD3D9RawSurfaceShare = NULL;
 
-	// coverity scan uninitial
-	ZeroMemory(&m_d3dpp, sizeof(m_d3dpp));
+  // coverity scan uninitial
+  ZeroMemory (&m_d3dpp, sizeof (m_d3dpp));
 }
 
-CD3D9ExUtils::~CD3D9ExUtils()
-{
-	Uninit();
+CD3D9ExUtils::~CD3D9ExUtils() {
+  Uninit();
 }
 
-HRESULT CD3D9ExUtils::Init(BOOL bWindowed)
-{
-	if (m_bInitDone)
-		return S_OK;
+HRESULT CD3D9ExUtils::Init (BOOL bWindowed) {
+  if (m_bInitDone)
+    return S_OK;
 
-	m_hDll = LoadLibrary(TEXT("d3d9.dll"));
-	pFnCreateD3D9Ex pCreateD3D9Ex = NULL;
-	if(m_hDll)
-		pCreateD3D9Ex = (pFnCreateD3D9Ex) GetProcAddress(m_hDll, TEXT("Direct3DCreate9Ex"));
-	else 
-		return E_FAIL;
+  m_hDll = LoadLibrary (TEXT ("d3d9.dll"));
+  pFnCreateD3D9Ex pCreateD3D9Ex = NULL;
+  if (m_hDll)
+    pCreateD3D9Ex = (pFnCreateD3D9Ex) GetProcAddress (m_hDll, TEXT ("Direct3DCreate9Ex"));
+  else
+    return E_FAIL;
 
-	pCreateD3D9Ex(D3D_SDK_VERSION, &m_lpD3D9);
+  pCreateD3D9Ex (D3D_SDK_VERSION, &m_lpD3D9);
 
-	return bWindowed ? InitWindow(&m_hWnd) : S_OK;
+  return bWindowed ? InitWindow (&m_hWnd) : S_OK;
 }
 
-HRESULT CD3D9ExUtils::Uninit()
-{
-	SAFE_RELEASE(m_lpD3D9RawSurfaceShare);
-	SAFE_RELEASE(m_lpD3D9Device);
-	SAFE_RELEASE(m_lpD3D9);
-	SAFE_FREE(m_pDumpYUV);
+HRESULT CD3D9ExUtils::Uninit() {
+  SAFE_RELEASE (m_lpD3D9RawSurfaceShare);
+  SAFE_RELEASE (m_lpD3D9Device);
+  SAFE_RELEASE (m_lpD3D9);
+  SAFE_FREE (m_pDumpYUV);
 
-	if(m_hDll)
-	{
-		FreeLibrary(m_hDll);
-		m_hDll = NULL;
-	}
+  if (m_hDll) {
+    FreeLibrary (m_hDll);
+    m_hDll = NULL;
+  }
 
-	return S_OK;
+  return S_OK;
 }
 
-HRESULT CD3D9ExUtils::Process(void *pDst[3], SBufferInfo *pInfo, FILE *pFp)
-{
-	HRESULT hResult = E_FAIL;
+HRESULT CD3D9ExUtils::Process (void* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
+  HRESULT hResult = E_FAIL;
 
-	if (pDst == NULL || pInfo == NULL)
-		return hResult;
+  if (pDst == NULL || pInfo == NULL)
+    return hResult;
 
-	BOOL bWindowed = pFp ? FALSE : TRUE;
-	BOOL bNeedD3D9 = !(!bWindowed && pInfo->eBufferProperty == BUFFER_HOST);
-	if (!m_bInitDone)
-		m_bInitDone = !bNeedD3D9;
+  BOOL bWindowed = pFp ? FALSE : TRUE;
+  BOOL bNeedD3D9 = ! (!bWindowed && pInfo->eBufferProperty == BUFFER_HOST);
+  if (!m_bInitDone)
+    m_bInitDone = !bNeedD3D9;
 
-	if (!m_bInitDone)
-	{
-		hResult = Init(bWindowed);
-		if (SUCCEEDED(hResult))
-			m_bInitDone = TRUE;
-	}
+  if (!m_bInitDone) {
+    hResult = Init (bWindowed);
+    if (SUCCEEDED (hResult))
+      m_bInitDone = TRUE;
+  }
 
-	if (m_bInitDone)
-	{
-		if (bWindowed)
-		{	
-			hResult = Render(pDst, pInfo);				
-			Sleep(30); // set a simple time controlling with default of 30fps
-		}
-		else if (pFp)
-		{
-			hResult = Dump(pDst, pInfo, pFp);
-			Sleep(0);
-		}
-	}
+  if (m_bInitDone) {
+    if (bWindowed) {
+      hResult = Render (pDst, pInfo);
+      Sleep (30); // set a simple time controlling with default of 30fps
+    } else if (pFp) {
+      hResult = Dump (pDst, pInfo, pFp);
+      Sleep (0);
+    }
+  }
 
- 	return hResult;
+  return hResult;
 }
 
-HRESULT CD3D9ExUtils::Render(void *pDst[3], SBufferInfo *pInfo)
-{
-	HRESULT hResult = E_FAIL;
-	EBufferProperty eBufferProperty = pInfo->eBufferProperty;
+HRESULT CD3D9ExUtils::Render (void* pDst[3], SBufferInfo* pInfo) {
+  HRESULT hResult = E_FAIL;
+  EBufferProperty eBufferProperty = pInfo->eBufferProperty;
 
-	if (eBufferProperty == BUFFER_HOST)
-	{
-		hResult = InitResource(NULL, pInfo);
-		if (SUCCEEDED(hResult))
-			hResult = Dump2Surface(pDst, m_lpD3D9RawSurfaceShare, pInfo->UsrData.sSystemBuffer.iWidth, pInfo->UsrData.sSystemBuffer.iHeight, pInfo->UsrData.sSystemBuffer.iStride);
-	}
-	else if (eBufferProperty == BUFFER_DEVICE)
-	{
-		VOID * pSharedHandle = pDst[0];	
-		hResult = InitResource(pSharedHandle, pInfo);
-	}
+  if (eBufferProperty == BUFFER_HOST) {
+    hResult = InitResource (NULL, pInfo);
+    if (SUCCEEDED (hResult))
+      hResult = Dump2Surface (pDst, m_lpD3D9RawSurfaceShare, pInfo->UsrData.sSystemBuffer.iWidth,
+                              pInfo->UsrData.sSystemBuffer.iHeight, pInfo->UsrData.sSystemBuffer.iStride);
+  } else if (eBufferProperty == BUFFER_DEVICE) {
+    VOID* pSharedHandle = pDst[0];
+    hResult = InitResource (pSharedHandle, pInfo);
+  }
 
-	if (SUCCEEDED(hResult))
-	{
-		IDirect3DSurface9 *pBackBuffer = NULL;
-		hResult = m_lpD3D9Device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
-		hResult = m_lpD3D9Device->StretchRect(m_lpD3D9RawSurfaceShare, NULL, pBackBuffer, NULL, D3DTEXF_NONE);
-		hResult = m_lpD3D9Device->PresentEx(0, 0, NULL, NULL, 0);
-	}
+  if (SUCCEEDED (hResult)) {
+    IDirect3DSurface9* pBackBuffer = NULL;
+    hResult = m_lpD3D9Device->GetBackBuffer (0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
+    hResult = m_lpD3D9Device->StretchRect (m_lpD3D9RawSurfaceShare, NULL, pBackBuffer, NULL, D3DTEXF_NONE);
+    hResult = m_lpD3D9Device->PresentEx (0, 0, NULL, NULL, 0);
+  }
 
-	return hResult;
+  return hResult;
 }
 
-HRESULT CD3D9ExUtils::Dump(void *pDst[3], SBufferInfo *pInfo, FILE *pFp)
-{
-	HRESULT hResult = E_FAIL;
-	EBufferProperty eBufferProperty = pInfo->eBufferProperty;
-	int iStride[2];
-	int iWidth;
-	int iHeight;	
-	
-	if (eBufferProperty != BUFFER_HOST)
-	{		
-		iWidth = pInfo->UsrData.sVideoBuffer.iSurfaceWidth;
-		iHeight = pInfo->UsrData.sVideoBuffer.iSurfaceHeight;
-		iStride[0] = iWidth;
-		iStride[1] = iWidth / 2;
-		
-		if (m_pDumpYUV == NULL)
-		{
-			m_pDumpYUV = (unsigned char *)malloc(iWidth * iHeight * 3 / 2 * sizeof(unsigned char));
-		}
+HRESULT CD3D9ExUtils::Dump (void* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
+  HRESULT hResult = E_FAIL;
+  EBufferProperty eBufferProperty = pInfo->eBufferProperty;
+  int iStride[2];
+  int iWidth;
+  int iHeight;
 
-		if (m_pDumpYUV)
-		{
-			void *pSurface = pDst[1];
-			pDst[0] = m_pDumpYUV;
-			pDst[1] = m_pDumpYUV + iHeight * iStride[0] * sizeof(unsigned char);
-			pDst[2] = m_pDumpYUV + iHeight * iStride[0] * 5 / 4 * sizeof(unsigned char);
-			hResult = Dump2YUV(pDst, pSurface, iWidth, iHeight, iStride);
-		}
-	}
-	else
-	{
-		iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
-		iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
-		iStride[0] = pInfo->UsrData.sSystemBuffer.iStride[0];
-		iStride[1] = pInfo->UsrData.sSystemBuffer.iStride[1];
-	}
-	
-	if (pDst[0] && pDst[1] && pDst[2])
-		Write2File(pFp, (unsigned char **)pDst, iStride, iWidth, iHeight);
+  if (eBufferProperty != BUFFER_HOST) {
+    iWidth = pInfo->UsrData.sVideoBuffer.iSurfaceWidth;
+    iHeight = pInfo->UsrData.sVideoBuffer.iSurfaceHeight;
+    iStride[0] = iWidth;
+    iStride[1] = iWidth / 2;
 
-	return hResult;
+    if (m_pDumpYUV == NULL) {
+      m_pDumpYUV = (unsigned char*)malloc (iWidth * iHeight * 3 / 2 * sizeof (unsigned char));
+    }
+
+    if (m_pDumpYUV) {
+      void* pSurface = pDst[1];
+      pDst[0] = m_pDumpYUV;
+      pDst[1] = m_pDumpYUV + iHeight * iStride[0] * sizeof (unsigned char);
+      pDst[2] = m_pDumpYUV + iHeight * iStride[0] * 5 / 4 * sizeof (unsigned char);
+      hResult = Dump2YUV (pDst, pSurface, iWidth, iHeight, iStride);
+    }
+  } else {
+    iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
+    iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
+    iStride[0] = pInfo->UsrData.sSystemBuffer.iStride[0];
+    iStride[1] = pInfo->UsrData.sSystemBuffer.iStride[1];
+  }
+
+  if (pDst[0] && pDst[1] && pDst[2])
+    Write2File (pFp, (unsigned char**)pDst, iStride, iWidth, iHeight);
+
+  return hResult;
 }
 
-HRESULT CD3D9ExUtils::InitResource(void *pSharedHandle, SBufferInfo *pInfo)
-{
-	HRESULT hResult = S_OK;
-	int iWidth;
-	int iHeight;
-	D3DFORMAT D3Dformat;
-	D3DPOOL D3Dpool;
+HRESULT CD3D9ExUtils::InitResource (void* pSharedHandle, SBufferInfo* pInfo) {
+  HRESULT hResult = S_OK;
+  int iWidth;
+  int iHeight;
+  D3DFORMAT D3Dformat;
+  D3DPOOL D3Dpool;
 
-	if (pInfo == NULL)
-		return E_FAIL;
+  if (pInfo == NULL)
+    return E_FAIL;
 
-	if (m_lpD3D9Device == NULL && m_lpD3D9RawSurfaceShare == NULL)
-	{
-		HMONITOR hMonitorWnd = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONULL);
+  if (m_lpD3D9Device == NULL && m_lpD3D9RawSurfaceShare == NULL) {
+    HMONITOR hMonitorWnd = MonitorFromWindow (m_hWnd, MONITOR_DEFAULTTONULL);
 
-		UINT uiAdapter = D3DADAPTER_DEFAULT;
-		UINT uiCnt = m_lpD3D9->GetAdapterCount();
-		for(UINT i=0; i<uiCnt; i++)
-		{
-			HMONITOR hMonitor = m_lpD3D9->GetAdapterMonitor(i);
-			if(hMonitor == hMonitorWnd)
-			{
-				uiAdapter = i;
-				break;
-			}
-		}
+    UINT uiAdapter = D3DADAPTER_DEFAULT;
+    UINT uiCnt = m_lpD3D9->GetAdapterCount();
+    for (UINT i = 0; i < uiCnt; i++) {
+      HMONITOR hMonitor = m_lpD3D9->GetAdapterMonitor (i);
+      if (hMonitor == hMonitorWnd) {
+        uiAdapter = i;
+        break;
+      }
+    }
 
-		D3DDISPLAYMODEEX D3DDisplayMode;
-		D3DDisplayMode.Size = sizeof(D3DDISPLAYMODEEX);
-		hResult = m_lpD3D9->GetAdapterDisplayModeEx(uiAdapter, &D3DDisplayMode, NULL);
+    D3DDISPLAYMODEEX D3DDisplayMode;
+    D3DDisplayMode.Size = sizeof (D3DDISPLAYMODEEX);
+    hResult = m_lpD3D9->GetAdapterDisplayModeEx (uiAdapter, &D3DDisplayMode, NULL);
 
-		D3DDEVTYPE D3DDevType = D3DDEVTYPE_HAL;
-		DWORD dwBehaviorFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED;
+    D3DDEVTYPE D3DDevType = D3DDEVTYPE_HAL;
+    DWORD dwBehaviorFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED;
 
-		ZeroMemory(&m_d3dpp, sizeof(m_d3dpp));
-		m_d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
-		m_d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-		m_d3dpp.BackBufferFormat = D3DDisplayMode.Format;
-		m_d3dpp.Windowed = TRUE;
-		m_d3dpp.hDeviceWindow = m_hWnd;
-		m_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-		hResult = m_lpD3D9->CreateDeviceEx(uiAdapter, D3DDevType, NULL, dwBehaviorFlags, &m_d3dpp, NULL, &m_lpD3D9Device);
-		if (pInfo->eBufferProperty == BUFFER_HOST)
-		{
-			iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
-			iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
-			D3Dformat = (D3DFORMAT)NV12_FORMAT;
-			D3Dpool = (D3DPOOL)D3DPOOL_DEFAULT;
-		}
-		else
-		{
-			iWidth = pInfo->UsrData.sVideoBuffer.iSurfaceWidth;
-			iHeight = pInfo->UsrData.sVideoBuffer.iSurfaceHeight;
-			D3Dformat = (D3DFORMAT)pInfo->UsrData.sVideoBuffer.D3Dformat;
-			D3Dpool = (D3DPOOL)pInfo->UsrData.sVideoBuffer.D3DPool;
-		}
-		hResult = m_lpD3D9Device->CreateOffscreenPlainSurface(iWidth, iHeight, (D3DFORMAT)D3Dformat, (D3DPOOL)D3Dpool, &m_lpD3D9RawSurfaceShare, &pSharedHandle);
-	}
+    ZeroMemory (&m_d3dpp, sizeof (m_d3dpp));
+    m_d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
+    m_d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    m_d3dpp.BackBufferFormat = D3DDisplayMode.Format;
+    m_d3dpp.Windowed = TRUE;
+    m_d3dpp.hDeviceWindow = m_hWnd;
+    m_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+    hResult = m_lpD3D9->CreateDeviceEx (uiAdapter, D3DDevType, NULL, dwBehaviorFlags, &m_d3dpp, NULL, &m_lpD3D9Device);
+    if (pInfo->eBufferProperty == BUFFER_HOST) {
+      iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
+      iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
+      D3Dformat = (D3DFORMAT)NV12_FORMAT;
+      D3Dpool = (D3DPOOL)D3DPOOL_DEFAULT;
+    } else {
+      iWidth = pInfo->UsrData.sVideoBuffer.iSurfaceWidth;
+      iHeight = pInfo->UsrData.sVideoBuffer.iSurfaceHeight;
+      D3Dformat = (D3DFORMAT)pInfo->UsrData.sVideoBuffer.D3Dformat;
+      D3Dpool = (D3DPOOL)pInfo->UsrData.sVideoBuffer.D3DPool;
+    }
+    hResult = m_lpD3D9Device->CreateOffscreenPlainSurface (iWidth, iHeight, (D3DFORMAT)D3Dformat, (D3DPOOL)D3Dpool,
+              &m_lpD3D9RawSurfaceShare, &pSharedHandle);
+  }
 
-	if (m_lpD3D9Device == NULL || m_lpD3D9RawSurfaceShare == NULL)
-		hResult = E_FAIL;
+  if (m_lpD3D9Device == NULL || m_lpD3D9RawSurfaceShare == NULL)
+    hResult = E_FAIL;
 
-	return hResult;
+  return hResult;
 }
 
 
-HRESULT Dump2YUV(void *pDst[3], void *pSurface, int iWidth, int iHeight, int iStride[2])
-{
-	HRESULT hResult = E_FAIL;
+HRESULT Dump2YUV (void* pDst[3], void* pSurface, int iWidth, int iHeight, int iStride[2]) {
+  HRESULT hResult = E_FAIL;
 
-	if (!pDst[0] || !pDst[1] || !pDst[2] || !pSurface)
-		return hResult;
+  if (!pDst[0] || !pDst[1] || !pDst[2] || !pSurface)
+    return hResult;
 
-	IDirect3DSurface9 *pSurfaceData = (IDirect3DSurface9 *)pSurface;
-	D3DLOCKED_RECT sD3DLockedRect = {0};
-	hResult = pSurfaceData->LockRect(&sD3DLockedRect, NULL, 0);
+  IDirect3DSurface9* pSurfaceData = (IDirect3DSurface9*)pSurface;
+  D3DLOCKED_RECT sD3DLockedRect = {0};
+  hResult = pSurfaceData->LockRect (&sD3DLockedRect, NULL, 0);
 
-	unsigned char * pInY = (unsigned char *)sD3DLockedRect.pBits;
-	unsigned char * pOutY = (unsigned char *)pDst[0];
-	int iInStride = sD3DLockedRect.Pitch;
-	int iOutStride = iStride[0];
+  unsigned char* pInY = (unsigned char*)sD3DLockedRect.pBits;
+  unsigned char* pOutY = (unsigned char*)pDst[0];
+  int iInStride = sD3DLockedRect.Pitch;
+  int iOutStride = iStride[0];
 
-	for (int j=0; j<iHeight; j++)
-		memcpy(pOutY+j*iOutStride, pInY+j*iInStride, iWidth);//confirmed_safe_unsafe_usage
+  for (int j = 0; j < iHeight; j++)
+    memcpy (pOutY + j * iOutStride, pInY + j * iInStride, iWidth); //confirmed_safe_unsafe_usage
 
-	unsigned char * pOutV = (unsigned char *)pDst[1];
-	unsigned char * pOutU = (unsigned char *)pDst[2];
-	unsigned char * pInC = pInY + iInStride * iHeight;
-	iOutStride = iStride[1];
-	for (int i=0; i<iHeight/2; i++)
-	{
-		for (int j=0; j<iWidth; j+=2)
-		{
-			pOutV[i*iOutStride+j/2] = pInC[i*iInStride+j  ];
-			pOutU[i*iOutStride+j/2] = pInC[i*iInStride+j+1];
-		}
-	}
+  unsigned char* pOutV = (unsigned char*)pDst[1];
+  unsigned char* pOutU = (unsigned char*)pDst[2];
+  unsigned char* pInC = pInY + iInStride * iHeight;
+  iOutStride = iStride[1];
+  for (int i = 0; i < iHeight / 2; i++) {
+    for (int j = 0; j < iWidth; j += 2) {
+      pOutV[i * iOutStride + j / 2] = pInC[i * iInStride + j  ];
+      pOutU[i * iOutStride + j / 2] = pInC[i * iInStride + j + 1];
+    }
+  }
 
-	pSurfaceData->UnlockRect();
+  pSurfaceData->UnlockRect();
 
-	return hResult;
+  return hResult;
 }
 
-HRESULT Dump2Surface(void *pDst[3], void *pSurface, int iWidth, int iHeight, int iStride[2])
-{
-	HRESULT hResult = E_FAIL;
+HRESULT Dump2Surface (void* pDst[3], void* pSurface, int iWidth, int iHeight, int iStride[2]) {
+  HRESULT hResult = E_FAIL;
 
-	if (!pDst[0] || !pDst[1] || !pDst[2] || !pSurface)
-		return hResult;
+  if (!pDst[0] || !pDst[1] || !pDst[2] || !pSurface)
+    return hResult;
 
-	IDirect3DSurface9 *pSurfaceData = (IDirect3DSurface9 *)pSurface;
-	D3DLOCKED_RECT sD3DLockedRect = {0};
-	hResult = pSurfaceData->LockRect(&sD3DLockedRect, NULL, 0);
+  IDirect3DSurface9* pSurfaceData = (IDirect3DSurface9*)pSurface;
+  D3DLOCKED_RECT sD3DLockedRect = {0};
+  hResult = pSurfaceData->LockRect (&sD3DLockedRect, NULL, 0);
 
-	unsigned char * pInY = (unsigned char *)pDst[0];
-	unsigned char * pOutY = (unsigned char *)sD3DLockedRect.pBits;
-	int iOutStride = sD3DLockedRect.Pitch;
+  unsigned char* pInY = (unsigned char*)pDst[0];
+  unsigned char* pOutY = (unsigned char*)sD3DLockedRect.pBits;
+  int iOutStride = sD3DLockedRect.Pitch;
 
-	for (int j=0; j<iHeight; j++)
-		memcpy(pOutY+j*iOutStride, pInY+j*iStride[0], iWidth);//confirmed_safe_unsafe_usage
-	
-	unsigned char * pInV = (unsigned char *)pDst[1];
-	unsigned char * pInU = (unsigned char *)pDst[2];
-	unsigned char * pOutC = pOutY + iOutStride * iHeight;
-	for (int i=0; i<iHeight/2; i++)
-	{
-		for (int j=0; j<iWidth; j+=2)
-		{
-			pOutC[i*iOutStride+j  ] = pInV[i*iStride[1]+j/2];
-			pOutC[i*iOutStride+j+1] = pInU[i*iStride[1]+j/2];
-		}
-	}
+  for (int j = 0; j < iHeight; j++)
+    memcpy (pOutY + j * iOutStride, pInY + j * iStride[0], iWidth); //confirmed_safe_unsafe_usage
 
-	pSurfaceData->UnlockRect();
+  unsigned char* pInV = (unsigned char*)pDst[1];
+  unsigned char* pInU = (unsigned char*)pDst[2];
+  unsigned char* pOutC = pOutY + iOutStride * iHeight;
+  for (int i = 0; i < iHeight / 2; i++) {
+    for (int j = 0; j < iWidth; j += 2) {
+      pOutC[i * iOutStride + j  ] = pInV[i * iStride[1] + j / 2];
+      pOutC[i * iOutStride + j + 1] = pInU[i * iStride[1] + j / 2];
+    }
+  }
 
-	return hResult;
+  pSurfaceData->UnlockRect();
+
+  return hResult;
 }
 
-HRESULT InitWindow(HWND *hWnd)
-{
-	const TCHAR kszWindowTitle[] = TEXT("Wels Decoder Application");
-	const TCHAR kszWindowClass[] = TEXT("Wels Decoder Class");
+HRESULT InitWindow (HWND* hWnd) {
+  const TCHAR kszWindowTitle[] = TEXT ("Wels Decoder Application");
+  const TCHAR kszWindowClass[] = TEXT ("Wels Decoder Class");
 
-	WNDCLASSEX sWndClassEx = {0};
-	sWndClassEx.cbSize          = sizeof(WNDCLASSEX); 
-	sWndClassEx.style			= CS_HREDRAW | CS_VREDRAW;
-	sWndClassEx.lpfnWndProc	    = (WNDPROC)WndProc;
-	sWndClassEx.cbClsExtra		= 0;
-	sWndClassEx.cbWndExtra		= 0;
-	sWndClassEx.hInstance		= GetModuleHandle(NULL);
-	sWndClassEx.hIcon			= LoadIcon(sWndClassEx.hInstance, (LPCTSTR)IDI_TESTSHARESURFACE);
-	sWndClassEx.hCursor		    = LoadCursor(NULL, IDC_ARROW);
-	sWndClassEx.hbrBackground	= (HBRUSH)(COLOR_WINDOW + 1);
-	sWndClassEx.lpszMenuName	= (LPCSTR)IDC_TESTSHARESURFACE;
-	sWndClassEx.lpszClassName	= kszWindowClass;
-	sWndClassEx.hIconSm		    = LoadIcon(sWndClassEx.hInstance, (LPCTSTR)IDI_SMALL);
+  WNDCLASSEX sWndClassEx = {0};
+  sWndClassEx.cbSize          = sizeof (WNDCLASSEX);
+  sWndClassEx.style			= CS_HREDRAW | CS_VREDRAW;
+  sWndClassEx.lpfnWndProc	    = (WNDPROC)WndProc;
+  sWndClassEx.cbClsExtra		= 0;
+  sWndClassEx.cbWndExtra		= 0;
+  sWndClassEx.hInstance		= GetModuleHandle (NULL);
+  sWndClassEx.hIcon			= LoadIcon (sWndClassEx.hInstance, (LPCTSTR)IDI_TESTSHARESURFACE);
+  sWndClassEx.hCursor		    = LoadCursor (NULL, IDC_ARROW);
+  sWndClassEx.hbrBackground	= (HBRUSH) (COLOR_WINDOW + 1);
+  sWndClassEx.lpszMenuName	= (LPCSTR)IDC_TESTSHARESURFACE;
+  sWndClassEx.lpszClassName	= kszWindowClass;
+  sWndClassEx.hIconSm		    = LoadIcon (sWndClassEx.hInstance, (LPCTSTR)IDI_SMALL);
 
-	if (!RegisterClassEx(&sWndClassEx))
-		return E_FAIL;
+  if (!RegisterClassEx (&sWndClassEx))
+    return E_FAIL;
 
-	HWND hTmpWnd = CreateWindow(kszWindowClass, kszWindowTitle, WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, sWndClassEx.hInstance, NULL);
+  HWND hTmpWnd = CreateWindow (kszWindowClass, kszWindowTitle, WS_OVERLAPPEDWINDOW,
+                               CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, sWndClassEx.hInstance, NULL);
 
-    *hWnd = hTmpWnd;
-	if (!hTmpWnd)
-		return E_FAIL;
+  *hWnd = hTmpWnd;
+  if (!hTmpWnd)
+    return E_FAIL;
 
-	ShowWindow(hTmpWnd, SW_SHOWDEFAULT);
-	UpdateWindow(hTmpWnd);
+  ShowWindow (hTmpWnd, SW_SHOWDEFAULT);
+  UpdateWindow (hTmpWnd);
 
-	return S_OK;
+  return S_OK;
 }
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	INT wmId, wmEvent;
+LRESULT CALLBACK WndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+  INT wmId, wmEvent;
 
-	switch (message) 
-	{
-	case WM_COMMAND:
-		wmId    = LOWORD(wParam); 
-		wmEvent = HIWORD(wParam); 
-		switch (wmId)
-		{
-		case IDM_ABOUT:
-			break;
-		case IDM_EXIT:
-			DestroyWindow(hWnd);
-			break;
-		default:
-			return DefWindowProc(hWnd, message, wParam, lParam);
-		}
-		break;
-	case WM_PAINT:
-		ValidateRect(hWnd , NULL);
-		break;
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
-	}
-	return 0;
+  switch (message) {
+  case WM_COMMAND:
+    wmId    = LOWORD (wParam);
+    wmEvent = HIWORD (wParam);
+    switch (wmId) {
+    case IDM_ABOUT:
+      break;
+    case IDM_EXIT:
+      DestroyWindow (hWnd);
+      break;
+    default:
+      return DefWindowProc (hWnd, message, wParam, lParam);
+    }
+    break;
+  case WM_PAINT:
+    ValidateRect (hWnd , NULL);
+    break;
+  case WM_DESTROY:
+    PostQuitMessage (0);
+    break;
+  default:
+    return DefWindowProc (hWnd, message, wParam, lParam);
+  }
+  return 0;
 }
 
 #endif
 
-CUtils::CUtils()
-{
-	hHandle = NULL;
-	iOSType = CheckOS();
+CUtils::CUtils() {
+  hHandle = NULL;
+  iOSType = CheckOS();
 
 #ifdef ENABLE_DISPLAY_MODULE
-	if (iOSType == OS_XP)
-		hHandle = (void *) new CD3D9Utils;
+  if (iOSType == OS_XP)
+    hHandle = (void*) new CD3D9Utils;
 
-	else if (iOSType == OS_VISTA_UPPER)
-		hHandle = (void *) new CD3D9ExUtils;
+  else if (iOSType == OS_VISTA_UPPER)
+    hHandle = (void*) new CD3D9ExUtils;
 #endif
 
-	if (hHandle == NULL)
-		iOSType = OS_UNSUPPORTED;
+  if (hHandle == NULL)
+    iOSType = OS_UNSUPPORTED;
 }
 
-CUtils::~CUtils()
-{
+CUtils::~CUtils() {
 #ifdef ENABLE_DISPLAY_MODULE
-	if (hHandle)
-	{
-		if (iOSType == OS_XP)
-		{
-			CD3D9Utils *hTmp = (CD3D9Utils *) hHandle;
-		    delete hTmp;
-		}
-		else if (iOSType == OS_VISTA_UPPER)
-		{
-			CD3D9ExUtils *hTmp = (CD3D9ExUtils *) hHandle;
-			delete hTmp;
-		}
-		hHandle = NULL;
-	}
+  if (hHandle) {
+    if (iOSType == OS_XP) {
+      CD3D9Utils* hTmp = (CD3D9Utils*) hHandle;
+      delete hTmp;
+    } else if (iOSType == OS_VISTA_UPPER) {
+      CD3D9ExUtils* hTmp = (CD3D9ExUtils*) hHandle;
+      delete hTmp;
+    }
+    hHandle = NULL;
+  }
 #endif
 }
 
-int CUtils::Process(void *pDst[3], SBufferInfo *pInfo, FILE *pFp)
-{
-	
-	int iRet = 0;
+int CUtils::Process (void* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
 
-	if (iOSType == OS_UNSUPPORTED)
-	{
-		if (pFp && pDst[0] && pDst[1] && pDst[2] && pInfo)
-		{
-			int iStride[2];
-			int iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
-			int iHeight= pInfo->UsrData.sSystemBuffer.iHeight;
-			iStride[0] = pInfo->UsrData.sSystemBuffer.iStride[0];
-			iStride[1] = pInfo->UsrData.sSystemBuffer.iStride[1];
+  int iRet = 0;
 
-			Write2File(pFp, (unsigned char **)pDst, iStride, iWidth, iHeight);
-		}
-	}
+  if (iOSType == OS_UNSUPPORTED) {
+    if (pFp && pDst[0] && pDst[1] && pDst[2] && pInfo) {
+      int iStride[2];
+      int iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
+      int iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
+      iStride[0] = pInfo->UsrData.sSystemBuffer.iStride[0];
+      iStride[1] = pInfo->UsrData.sSystemBuffer.iStride[1];
+
+      Write2File (pFp, (unsigned char**)pDst, iStride, iWidth, iHeight);
+    }
+  }
 
 #ifdef ENABLE_DISPLAY_MODULE
-	else
-	{
-		MSG msg;
-		ZeroMemory( &msg, sizeof(msg) );
-		while( msg.message != WM_QUIT )
-		{
-			if( PeekMessage( &msg, NULL, 0U, 0U, PM_REMOVE ) )
-			{
-				TranslateMessage( &msg );
-				DispatchMessage( &msg );
-			}
-			else
-			{
-				HRESULT hResult = S_OK;
-				if (iOSType == OS_XP)
-					hResult = ((CD3D9Utils *)hHandle)->Process(pDst, pInfo, pFp);
+  else {
+    MSG msg;
+    ZeroMemory (&msg, sizeof (msg));
+    while (msg.message != WM_QUIT) {
+      if (PeekMessage (&msg, NULL, 0U, 0U, PM_REMOVE)) {
+        TranslateMessage (&msg);
+        DispatchMessage (&msg);
+      } else {
+        HRESULT hResult = S_OK;
+        if (iOSType == OS_XP)
+          hResult = ((CD3D9Utils*)hHandle)->Process (pDst, pInfo, pFp);
 
-				else if (iOSType == OS_VISTA_UPPER)
-					hResult = ((CD3D9ExUtils *)hHandle)->Process(pDst, pInfo, pFp);
-              
-				iRet = !SUCCEEDED(hResult);
-				break;
-			}		
-		}
-	}	
+        else if (iOSType == OS_VISTA_UPPER)
+          hResult = ((CD3D9ExUtils*)hHandle)->Process (pDst, pInfo, pFp);
+
+        iRet = !SUCCEEDED (hResult);
+        break;
+      }
+    }
+  }
 #endif
 
-	return iRet;
+  return iRet;
 }
 
-int CUtils::CheckOS()
-{
-	int iType = OS_UNSUPPORTED;
+int CUtils::CheckOS() {
+  int iType = OS_UNSUPPORTED;
 
 #ifdef ENABLE_DISPLAY_MODULE
-	OSVERSIONINFOEX osvi;
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+  OSVERSIONINFOEX osvi;
+  ZeroMemory (&osvi, sizeof (OSVERSIONINFOEX));
+  osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
 
-	if( !GetVersionEx ((OSVERSIONINFO *) &osvi) )
-	{
-		osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-		if (! GetVersionEx ( (OSVERSIONINFO *) &osvi) ) 
-			return iType;
-	}
+  if (!GetVersionEx ((OSVERSIONINFO*) &osvi)) {
+    osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
+    if (! GetVersionEx ((OSVERSIONINFO*) &osvi))
+      return iType;
+  }
 
-	switch (osvi.dwPlatformId)
-	{
-	case VER_PLATFORM_WIN32_NT:	
-		if (osvi.dwMajorVersion >= 6)
-			iType = OS_VISTA_UPPER;
-		else if (osvi.dwMajorVersion == 5)
-			iType = OS_XP;
-		break;		
+  switch (osvi.dwPlatformId) {
+  case VER_PLATFORM_WIN32_NT:
+    if (osvi.dwMajorVersion >= 6)
+      iType = OS_VISTA_UPPER;
+    else if (osvi.dwMajorVersion == 5)
+      iType = OS_XP;
+    break;
 
-	default:
-		break;
-	}
+  default:
+    break;
+  }
 #endif
 
-	return iType;
+  return iType;
 }
 
-void Write2File(FILE *pFp, unsigned char* pData[3], int iStride[2], int iWidth, int iHeight)
-{
-	int   i;
-	unsigned char  *pPtr = NULL;
+void Write2File (FILE* pFp, unsigned char* pData[3], int iStride[2], int iWidth, int iHeight) {
+  int   i;
+  unsigned char*  pPtr = NULL;
 
-	pPtr = pData[0];
-	for( i=0; i<iHeight; i++ )
-	{
-		fwrite(pPtr, 1, iWidth, pFp);
-		pPtr += iStride[0];
-	}
+  pPtr = pData[0];
+  for (i = 0; i < iHeight; i++) {
+    fwrite (pPtr, 1, iWidth, pFp);
+    pPtr += iStride[0];
+  }
 
-	iHeight = iHeight/2;
-	iWidth = iWidth/2;
-	pPtr = pData[1];
-	for( i=0; i<iHeight; i++ )
-	{
-		fwrite(pPtr, 1, iWidth, pFp);
-		pPtr += iStride[1];
-	}
+  iHeight = iHeight / 2;
+  iWidth = iWidth / 2;
+  pPtr = pData[1];
+  for (i = 0; i < iHeight; i++) {
+    fwrite (pPtr, 1, iWidth, pFp);
+    pPtr += iStride[1];
+  }
 
-	pPtr = pData[2];
-	for( i=0; i<iHeight; i++ )
-	{
-		fwrite(pPtr, 1, iWidth, pFp);
-		pPtr += iStride[1];
-	}
+  pPtr = pData[2];
+  for (i = 0; i < iHeight; i++) {
+    fwrite (pPtr, 1, iWidth, pFp);
+    pPtr += iStride[1];
+  }
 }

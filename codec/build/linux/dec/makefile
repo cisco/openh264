@@ -7,11 +7,12 @@ DEPEND= dependencies
 
 BINDIR= 	../bin
 OUTDIR= 	../../../../bin/linux
-INCLUDE= 	-I../../../api/svc -I../../../decoder/core/inc -I../../../decoder/plus/inc -I../../../console/dec/inc
+INCLUDE= 	-I../../../api/svc -I../../../decoder/core/inc -I../../../decoder/plus/inc -I../../../console/dec/inc -I../../../common
 CORESRCDIR=	../../../decoder/core/src
 PLUSSRCDIR=	../../../decoder/plus/src
 ASMSRCDIR=	../../../decoder/core/asm
 MAINSRCDIR=	../../../console/dec/src
+COMMONSRCDIR=   ../../../common
 
 OBJMAINDIR= ../obj
 OBJDIR= ../obj/dec
@@ -24,7 +25,7 @@ GCC = gcc -m32
 ASFLAGS= -f elf -DNOPREFIX -I ../../../decoder/core/asm/
 
 LIBS= -lstdc++ -ldl
-#-lm 
+#-lm
 CFLAGS=  $(INCLUDE) -fPIC -D__GCC__ -DLINUX -D__NO_CTYPE -DHAVE_CACHE_LINE_ALIGN
 
 ifeq ($(DBG),1)
@@ -63,7 +64,8 @@ $(CORESRCDIR)/decode_slice.cpp \
 $(CORESRCDIR)/decoder_core.cpp \
 $(CORESRCDIR)/utils.cpp \
 $(PLUSSRCDIR)/welsDecoderExt.cpp \
-$(PLUSSRCDIR)/welsCodecTrace.cpp
+$(PLUSSRCDIR)/welsCodecTrace.cpp \
+$(COMMONSRCDIR)/logging.cpp
 
 ASMSRC= $(ASMSRCDIR)/block_add.asm \
 $(ASMSRCDIR)/cpuid.asm \
@@ -76,7 +78,7 @@ $(ASMSRCDIR)/mb_copy.asm \
 $(ASMSRCDIR)/mc_luma.asm \
 $(ASMSRCDIR)/memzero.asm \
 $(ASMSRCDIR)/asm_inc.asm \
- 
+
 MAINSRC= $(MAINSRCDIR)/d3d9_utils.cpp \
 $(MAINSRCDIR)/h264dec.cpp \
 $(MAINSRCDIR)/read_config.cpp
@@ -103,7 +105,8 @@ $(OBJDIR)/decode_slice.o \
 $(OBJDIR)/decoder_core.o \
 $(OBJDIR)/utils.o \
 $(OBJDIR)/welsDecoderExt.o \
-$(OBJDIR)/welsCodecTrace.o
+$(OBJDIR)/welsCodecTrace.o \
+$(OBJDIR)/logging.o
 
 ifeq ($(NASM), 1)
 OBJDEC+=$(OBJDIR)/block_add.o \
@@ -116,7 +119,7 @@ $(OBJDIR)/mc_chroma.o \
 $(OBJDIR)/mb_copy.o \
 $(OBJDIR)/mc_luma.o \
 $(OBJDIR)/memzero.o \
-$(OBJDIR)/asm_inc.o 
+$(OBJDIR)/asm_inc.o
 endif
 
 OBJBIN=	$(OBJDIR)/d3d9_utils.o \
@@ -131,7 +134,7 @@ default: depend checkdir lib dylib exe release
 
 dependencies:
 	@echo "" >dependencies
-	
+
 checkdir:
 	@echo 'checkdir..'
 	@if test ! -d $(BINDIR) ; \
@@ -151,7 +154,7 @@ checkdir:
 		mkdir -p $(OBJDIR) ; \
 	fi
 	@echo
-	
+
 release:
 	@echo 'release..'
 	@echo 'cp -f $(SHAREDLIB) $(OUTDIR)'
@@ -166,14 +169,14 @@ clean:
 	@rm -f $(OBJBIN)
 	@rm -f $(BINLIB)
 	@rm -f $(SHAREDLIB)
-	@rm -f $(BIN)    
+	@rm -f $(BIN)
 
 tags:
 	@echo update tag table
 	@etags $(CORESRCDIR)/*.c $(CORESRCDIR)/*.cpp $(PLUSSRCDIR)/*.cpp $(MAINSRCDIR)/*.cpp
-	
-	
-lib:   	$(OBJDEC) 
+
+
+lib:   	$(OBJDEC)
 	@echo '$(OBJDEC)'
 	@echo
 	@echo 'ar cr $(BINLIB) $(OBJDEC)'
@@ -194,15 +197,15 @@ dylib:   $(OBJDEC)
 	@$(CXX)  -shared -Wl,-Bsymbolic -o $(SHAREDLIB) $(OBJDEC)  $(LIBS)
 	@echo '... done'
 	@echo
-	
+
 
 exe:	$(OBJBIN)
-	@echo	
+	@echo
 	@echo '$(OBJBIN)'
 	@echo
 	@echo '$(CXX) $(LIBS) $(OBJBIN) $(BINLIB) -o $(BIN)'
 	@echo 'creating binary "$(BIN)"'
-	@$(CXX) $(OBJBIN) $(BINLIB) -o $(BIN) $(LIBS) 
+	@$(CXX) $(OBJBIN) $(BINLIB) -o $(BIN) $(LIBS)
 	@echo '... done'
 	@echo
 
@@ -220,27 +223,31 @@ depend:
 
 $(OBJDIR)/%.o$(SUFFIX): $(CORESRCDIR)/%.c
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<		
+	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o$(SUFFIX): $(CORESRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
 	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
-		
+
 $(OBJDIR)/%.o$(SUFFIX): $(PLUSSRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<		
-	
+	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+
 $(OBJDIR)/%.o$(SUFFIX): $(ASMSRCDIR)/%.asm
 	@echo 'compiling object file "$@" ...'
-	@$(AS) $(ASFLAGS) -o $@ $<	
+	@$(AS) $(ASFLAGS) -o $@ $<
 
 #$(OBJDIR)/%.o$(SUFFIX): $(ASMCOMDIR)/%.asm
 #	@echo 'compiling object file "$@" ...'
 #	@$(AS) $(ASFLAGS) -o $@ $<
-	
+
 $(OBJDIR)/%.o$(SUFFIX): $(MAINSRCDIR)/%.cpp
 	@echo 'compiling object file "$@" ...'
-	@$(CC) -m32 -c $(CFLAGS) -o $@ $<		
-	
+	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+
+$(OBJDIR)/%.o$(SUFFIX): $(COMMONSRCDIR)/%.cpp
+	@echo 'compiling object file "$@" ...'
+	@$(CC) -m32 -c $(CFLAGS) -o $@ $<
+
 include $(DEPEND)
 

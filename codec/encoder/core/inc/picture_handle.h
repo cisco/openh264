@@ -52,14 +52,14 @@ namespace WelsSVCEnc {
  * \pram	need_expand		need borders expanding
  * \return	successful if effective picture pointer returned, otherwise failed with NULL
  */
-SPicture *AllocPicture( CMemoryAlign *pMa, const int32_t kiWidth, const int32_t kiHeight, bool_t bNeedMbInfo );
+SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth, const int32_t kiHeight, bool_t bNeedMbInfo);
 
 /*!
  * \brief	free picture pData planes
  * \param	pic		picture pointer to be destoryed
  * \return	none
  */
-void FreePicture( CMemoryAlign *pMa, SPicture **ppPic );
+void FreePicture (CMemoryAlign* pMa, SPicture** ppPic);
 
 /*!
 * \brief	exchange two picture pData planes
@@ -67,6 +67,6 @@ void FreePicture( CMemoryAlign *pMa, SPicture **ppPic );
 * \param	ppPic2		picture pointer to picture 2
 * \return	none
 */
-void WelsExchangeSpatialPictures( SPicture **ppPic1, SPicture **ppPic2 );
+void WelsExchangeSpatialPictures (SPicture** ppPic1, SPicture** ppPic2);
 }
 #endif//WELS_ENCODER_PICTURE_HANDLE_H__

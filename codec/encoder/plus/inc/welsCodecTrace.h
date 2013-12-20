@@ -36,43 +36,42 @@
 #include <stdarg.h>
 #include "typedefs.h"
 
-#ifdef WIN32
-typedef int32_t ( *CM_WELS_TRACE)( const str_t* format, ...);
+#ifdef _WIN32
+typedef int32_t (*CM_WELS_TRACE) (const str_t* format, ...);
 #else
-typedef int32_t ( *CM_WELS_TRACE2)( const str_t* dllname, const str_t* format, ...);
+typedef int32_t (*CM_WELS_TRACE2) (const str_t* dllname, const str_t* format, ...);
 #endif
 
-class welsCodecTrace
-{
-public:
-	welsCodecTrace();
-	~welsCodecTrace();
-	
-	static void TraceString(int32_t iLevel, const str_t* kpStrFormat);
-	static void CODEC_TRACE(void* pIgnore, const int32_t kiLevel, const str_t* kpStrFormat, va_list vl);
+class welsCodecTrace {
+ public:
+  welsCodecTrace();
+  ~welsCodecTrace();
 
-	void SetTraceLevel(const int32_t kiLevel);
-	int32_t WelsTraceModuleIsExist();
+  static void TraceString (int32_t iLevel, const str_t* kpStrFormat);
+  static void CODEC_TRACE (void* pIgnore, const int32_t kiLevel, const str_t* kpStrFormat, va_list vl);
 
-private:	
-	
-	int32_t m_WelsTraceExistFlag;
-	void* m_hTraceHandle;
+  void SetTraceLevel (const int32_t kiLevel);
+  int32_t WelsTraceModuleIsExist();
 
-public:
-	static int32_t	m_iTraceLevel;
-#if defined WIN32
-	static CM_WELS_TRACE m_fpDebugTrace;
-	static CM_WELS_TRACE m_fpInfoTrace;
-	static CM_WELS_TRACE m_fpWarnTrace;
-	static CM_WELS_TRACE m_fpErrorTrace;
-#else	
-	static CM_WELS_TRACE2 m_fpDebugTrace;
-	static CM_WELS_TRACE2 m_fpInfoTrace;
-	static CM_WELS_TRACE2 m_fpWarnTrace;
-	static CM_WELS_TRACE2 m_fpErrorTrace;
+ private:
+
+  int32_t m_WelsTraceExistFlag;
+  void* m_hTraceHandle;
+
+ public:
+  static int32_t	m_iTraceLevel;
+#if defined _WIN32
+  static CM_WELS_TRACE m_fpDebugTrace;
+  static CM_WELS_TRACE m_fpInfoTrace;
+  static CM_WELS_TRACE m_fpWarnTrace;
+  static CM_WELS_TRACE m_fpErrorTrace;
+#else
+  static CM_WELS_TRACE2 m_fpDebugTrace;
+  static CM_WELS_TRACE2 m_fpInfoTrace;
+  static CM_WELS_TRACE2 m_fpWarnTrace;
+  static CM_WELS_TRACE2 m_fpErrorTrace;
 #endif
-	
+
 };
 
 #endif //WELS_CODEC_TRACE

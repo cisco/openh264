@@ -155,11 +155,11 @@ WELS_EXTERN ExpandPictureChromaUnalign_sse2	; for chroma unalignment
 	lea %1, [%1+%2]
 %endmacro
 
-%macro exp_top_bottom_sse2	1	; iPaddingSize [luma(32)/chroma(16)]		
+%macro exp_top_bottom_sse2	1	; iPaddingSize [luma(32)/chroma(16)]
 	; ebx [width/16(8)]
 	; esi [pSrc+0], edi [pSrc-1], ecx [-stride], 32(16)		; top
 	; eax [pSrc+(h-1)*stride], ebp [pSrc+(h+31)*stride], 32(16)	; bottom
-		
+
 %if %1 == 32		; for luma
 	sar ebx, 04h 	; width / 16(8) pixels
 .top_bottom_loops:
@@ -173,7 +173,7 @@ WELS_EXTERN ExpandPictureChromaUnalign_sse2	; for chroma unalignment
 	mov_line_16x4_sse2 edi, ecx, xmm0, a
 	mov_line_16x4_sse2 edi, ecx, xmm0, a
 	mov_line_end16x4_sse2 edi, ecx, xmm0, a
-	
+
 	; bottom
 	movdqa xmm1, [eax] 		; last line of picture pData
 	mov_line_16x4_sse2 ebp, ecx, xmm1, a	; dst, stride, xmm?
@@ -184,15 +184,15 @@ WELS_EXTERN ExpandPictureChromaUnalign_sse2	; for chroma unalignment
 	mov_line_16x4_sse2 ebp, ecx, xmm1, a
 	mov_line_16x4_sse2 ebp, ecx, xmm1, a
 	mov_line_end16x4_sse2 ebp, ecx, xmm1, a
-		
+
 	lea esi, [esi+16]		; top pSrc
 	lea edi, [edi+16]		; top dst
 	lea eax, [eax+16]		; bottom pSrc
 	lea ebp, [ebp+16]		; bottom dst
-	neg ecx 			; positive/negative stride need for next loop?	
-	
+	neg ecx 			; positive/negative stride need for next loop?
+
 	dec ebx
-	jnz near .top_bottom_loops		
+	jnz near .top_bottom_loops
 %elif %1 == 16	; for chroma ??
 	mov edx, ebx
 	sar ebx, 04h 	; (width / 16) pixels
@@ -202,21 +202,21 @@ WELS_EXTERN ExpandPictureChromaUnalign_sse2	; for chroma unalignment
 	mov_line_16x4_sse2 edi, ecx, xmm0, a	; dst, stride, xmm?
 	mov_line_16x4_sse2 edi, ecx, xmm0, a
 	mov_line_16x4_sse2 edi, ecx, xmm0, a
-	mov_line_end16x4_sse2 edi, ecx, xmm0, a	
-	
+	mov_line_end16x4_sse2 edi, ecx, xmm0, a
+
 	; bottom
 	movdqa xmm1, [eax] 		; last line of picture pData
 	mov_line_16x4_sse2 ebp, ecx, xmm1, a	; dst, stride, xmm?
 	mov_line_16x4_sse2 ebp, ecx, xmm1, a
 	mov_line_16x4_sse2 ebp, ecx, xmm1, a
-	mov_line_end16x4_sse2 ebp, ecx, xmm1, a	
-		
+	mov_line_end16x4_sse2 ebp, ecx, xmm1, a
+
 	lea esi, [esi+16]		; top pSrc
 	lea edi, [edi+16]		; top dst
 	lea eax, [eax+16]		; bottom pSrc
 	lea ebp, [ebp+16]		; bottom dst
-	neg ecx 			; positive/negative stride need for next loop?	
-	
+	neg ecx 			; positive/negative stride need for next loop?
+
 	dec ebx
 	jnz near .top_bottom_loops
 
@@ -243,50 +243,50 @@ WELS_EXTERN ExpandPictureChromaUnalign_sse2	; for chroma unalignment
 %endif
 %endmacro
 
-%macro exp_left_right_sse2	2	; iPaddingSize [luma(32)/chroma(16)], u/a	
+%macro exp_left_right_sse2	2	; iPaddingSize [luma(32)/chroma(16)], u/a
 	; ecx [height]
 	; esi [pSrc+0], 	   edi [pSrc-32], edx [stride], 32(16)	; left
 	; ebx [pSrc+(w-1)], ebp [pSrc+w], 32(16)			; right
 ;	xor eax, eax 	; for pixel pData (uint8_t)		; make sure eax=0 at least high 24 bits of eax = 0
-	
-%if %1 == 32		; for luma	
+
+%if %1 == 32		; for luma
 .left_right_loops:
 	; left
 	mov al, byte [esi]		; pixel pData for left border
 	butterfly_1to16_sse	xmm0, xmm1, a				; dst, tmp, pSrc [generic register name: a/b/c/d]
 	movdqa [edi], xmm0
 	movdqa [edi+16], xmm0
-	
+
 	; right
 	mov al, byte [ebx]
 	butterfly_1to16_sse	xmm1, xmm2, a				; dst, tmp, pSrc [generic register name: a/b/c/d]
 	movdqa [ebp], xmm1
 	movdqa [ebp+16], xmm1
-	
+
 	lea esi, [esi+edx]		; left pSrc
 	lea edi, [edi+edx]		; left dst
 	lea ebx, [ebx+edx]		; right pSrc
-	lea ebp, [ebp+edx]		; right dst	
-	
+	lea ebp, [ebp+edx]		; right dst
+
 	dec ecx
-	jnz near .left_right_loops		
-%elif %1 == 16	; for chroma ??	
+	jnz near .left_right_loops
+%elif %1 == 16	; for chroma ??
 .left_right_loops:
 	; left
 	mov al, byte [esi]		; pixel pData for left border
 	butterfly_1to16_sse	xmm0, xmm1, a				; dst, tmp, pSrc [generic register name: a/b/c/d]
-	movdqa [edi], xmm0	
-	
+	movdqa [edi], xmm0
+
 	; right
 	mov al, byte [ebx]
 	butterfly_1to16_sse	xmm1, xmm2, a				; dst, tmp, pSrc [generic register name: a/b/c/d]
 	movdq%2 [ebp], xmm1								; might not be aligned 16 bytes in case chroma planes
-	
+
 	lea esi, [esi+edx]		; left pSrc
 	lea edi, [edi+edx]		; left dst
 	lea ebx, [ebx+edx]		; right pSrc
-	lea ebp, [ebp+edx]		; right dst	
-	
+	lea ebp, [ebp+edx]		; right dst
+
 	dec ecx
 	jnz near .left_right_loops
 %endif
@@ -339,25 +339,25 @@ WELS_EXTERN ExpandPictureChromaUnalign_sse2	; for chroma unalignment
 	; TL
 	mov_line_16x4_sse2	edi, ecx, xmm3, a	; dst, stride, xmm?
 	mov_line_16x4_sse2	edi, ecx, xmm3, a	; dst, stride, xmm?
-	mov_line_16x4_sse2	edi, ecx, xmm3, a	; dst, stride, xmm?	
+	mov_line_16x4_sse2	edi, ecx, xmm3, a	; dst, stride, xmm?
 	mov_line_end16x4_sse2	edi, ecx, xmm3, a	; dst, stride, xmm?
 
 	; TR
 	mov_line_16x4_sse2	ebp, ecx, xmm4, %2	; dst, stride, xmm?
 	mov_line_16x4_sse2	ebp, ecx, xmm4, %2	; dst, stride, xmm?
-	mov_line_16x4_sse2	ebp, ecx, xmm4, %2	; dst, stride, xmm?	
+	mov_line_16x4_sse2	ebp, ecx, xmm4, %2	; dst, stride, xmm?
 	mov_line_end16x4_sse2 ebp, ecx, xmm4, %2	; dst, stride, xmm?
 
 	; BL
 	mov_line_16x4_sse2	eax, ecx, xmm5, a	; dst, stride, xmm?
 	mov_line_16x4_sse2	eax, ecx, xmm5, a	; dst, stride, xmm?
-	mov_line_16x4_sse2	eax, ecx, xmm5, a	; dst, stride, xmm?	
+	mov_line_16x4_sse2	eax, ecx, xmm5, a	; dst, stride, xmm?
 	mov_line_end16x4_sse2	eax, ecx, xmm5, a	; dst, stride, xmm?
 
 	; BR
 	mov_line_16x4_sse2	ebx, ecx, xmm6, %2	; dst, stride, xmm?
 	mov_line_16x4_sse2	ebx, ecx, xmm6, %2	; dst, stride, xmm?
-	mov_line_16x4_sse2	ebx, ecx, xmm6, %2	; dst, stride, xmm?	
+	mov_line_16x4_sse2	ebx, ecx, xmm6, %2	; dst, stride, xmm?
 	mov_line_end16x4_sse2	ebx, ecx, xmm6, %2	; dst, stride, xmm?
 %endif
 %endmacro
@@ -375,7 +375,7 @@ ExpandPictureLuma_sse2:
 	push esi
 	push edi
 	push ebp
-	
+
 	; for both top and bottom border
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	mov esi, [esp+24]						; pDst
@@ -387,10 +387,10 @@ ExpandPictureLuma_sse2:
 	mov cl, byte [esi]
 	butterfly_1to16_sse xmm3, xmm4, c		; pDst, tmp, pSrc [generic register name: a/b/c/d]
 	; load top border
-	mov ecx, edx							; kiStride	
+	mov ecx, edx							; kiStride
 	neg ecx 								; -kiStride
 	lea edi, [esi+ecx]						; last line of top border
-	; load bottom border 
+	; load bottom border
 	dec eax									; h-1
 	imul eax, edx 							; (h-1)*kiStride
 	lea eax, [esi+eax]						; last line of picture pData
@@ -398,16 +398,16 @@ ExpandPictureLuma_sse2:
 	lea ebp, [eax+edx]						; last line of bottom border, (h-1)*stride + 32 * stride
 	; also prepare for cross border pData: bottom-left with xmm5, bottom-right xmm6
 	dec ebx									; kiWidth-1
-	lea ebx, [eax+ebx]						; dst[w-1][h-1]	
+	lea ebx, [eax+ebx]						; dst[w-1][h-1]
 ;	xor edx, edx
 	mov dl, byte [eax]						; bottom-left
 	butterfly_1to16_sse xmm5, xmm6, d		; dst, tmp, pSrc [generic register name: a/b/c/d]
 	mov dl, byte [ebx]						; bottom-right
 	butterfly_1to16_sse xmm6, xmm4, d		; dst, tmp, pSrc [generic register name: a/b/c/d]
-	; for top & bottom expanding	
+	; for top & bottom expanding
 	mov ebx, [esp+32]						; kiWidth
-	exp_top_bottom_sse2	32	
-	
+	exp_top_bottom_sse2	32
+
 	; for both left and right border
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	mov esi, [esp+24]						; p_dst: left border pSrc
@@ -419,14 +419,14 @@ ExpandPictureLuma_sse2:
 	lea edi, [esi+eax]						; left border dst
 	dec ebx
 	lea ebx, [esi+ebx]						; right border pSrc, (p_dst + width - 1)
-	lea ebp, [ebx+1]						; right border dst	
+	lea ebp, [ebx+1]						; right border dst
 	; prepare for cross border pData: top-right with xmm4
 ;	xor eax, eax
 	mov al, byte [ebx]						; top-right
 	butterfly_1to16_sse xmm4, xmm0, a		; pDst, tmp, pSrc [generic register name: a/b/c/d]
 	; for left & right border expanding
 	exp_left_right_sse2	32, a
-	
+
 	; for cross border [top-left, top-right, bottom-left, bottom-right]
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	mov esi, [esp+24]						; pDst
@@ -436,7 +436,7 @@ ExpandPictureLuma_sse2:
 	; have done xmm3,..,xmm6 cross pData initialization above, perform pading as below, To be continued..
 	mov eax, -32							; luma=-32, chroma=-16
 	neg ecx										; -stride
-	lea edi, [esi+eax]						
+	lea edi, [esi+eax]
 	lea edi, [edi+ecx]				; last line of top-left border
 	lea ebp, [esi+ebx]
 	lea ebp, [ebp+ecx]				; last line of top-right border
@@ -444,19 +444,19 @@ ExpandPictureLuma_sse2:
 	mov ecx, [esp+28]					; kiStride
 	imul edx, ecx							; (height+32(16)) * stride
 	lea eax, [edi+edx]						; last line of bottom-left border
-	lea ebx, [ebp+edx]						; last line of bottom-right border	
+	lea ebx, [ebp+edx]						; last line of bottom-right border
 	neg ecx										; -kiStride
 	; for left & right border expanding
-	exp_cross_sse2		32, a	
-	
+	exp_cross_sse2		32, a
+
 ;	sfence									; commit cache write back memory
-	
+
 	pop ebp
 	pop edi
 	pop esi
 	pop edx
 	pop ebx
-	
+
 	ret
 
 ALIGN 16
@@ -472,7 +472,7 @@ ExpandPictureChromaAlign_sse2:
 	push esi
 	push edi
 	push ebp
-	
+
 	; for both top and bottom border
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	mov esi, [esp+24]						; pDst
@@ -484,10 +484,10 @@ ExpandPictureChromaAlign_sse2:
 	mov cl, byte [esi]
 	butterfly_1to16_sse xmm3, xmm4, c		; pDst, tmp, pSrc [generic register name: a/b/c/d]
 	; load top border
-	mov ecx, edx							; kiStride	
+	mov ecx, edx							; kiStride
 	neg ecx 								; -kiStride
 	lea edi, [esi+ecx]						; last line of top border
-	; load bottom border 
+	; load bottom border
 	dec eax									; h-1
 	imul eax, edx 							; (h-1)*kiStride
 	lea eax, [esi+eax]						; last line of picture pData
@@ -495,16 +495,16 @@ ExpandPictureChromaAlign_sse2:
 	lea ebp, [eax+edx]						; last line of bottom border, (h-1)*kiStride + 16 * kiStride
 	; also prepare for cross border pData: bottom-left with xmm5, bottom-right xmm6
 	dec ebx									; kiWidth-1
-	lea ebx, [eax+ebx]						; pDst[w-1][h-1]	
+	lea ebx, [eax+ebx]						; pDst[w-1][h-1]
 ;	xor edx, edx
 	mov dl, byte [eax]						; bottom-left
 	butterfly_1to16_sse xmm5, xmm6, d		; dst, tmp, pSrc [generic register name: a/b/c/d]
 	mov dl, byte [ebx]						; bottom-right
 	butterfly_1to16_sse xmm6, xmm4, d		; dst, tmp, pSrc [generic register name: a/b/c/d]
-	; for top & bottom expanding	
+	; for top & bottom expanding
 	mov ebx, [esp+32]						; kiWidth
-	exp_top_bottom_sse2	16	
-	
+	exp_top_bottom_sse2	16
+
 	; for both left and right border
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	mov esi, [esp+24]						; pDst: left border pSrc
@@ -516,14 +516,14 @@ ExpandPictureChromaAlign_sse2:
 	lea edi, [esi+eax]						; left border dst
 	dec ebx
 	lea ebx, [esi+ebx]						; right border pSrc, (p_dst + width - 1)
-	lea ebp, [ebx+1]						; right border dst	
+	lea ebp, [ebx+1]						; right border dst
 	; prepare for cross border pData: top-right with xmm4
 ;	xor eax, eax
 	mov al, byte [ebx]						; top-right
 	butterfly_1to16_sse xmm4, xmm0, a		; pDst, tmp, pSrc [generic register name: a/b/c/d]
 	; for left & right border expanding
 	exp_left_right_sse2	16, a
-	
+
 	; for cross border [top-left, top-right, bottom-left, bottom-right]
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	mov esi, [esp+24]						; pDst
@@ -533,9 +533,9 @@ ExpandPictureChromaAlign_sse2:
 	; have done xmm3,..,xmm6 cross pData initialization above, perform pading as below, To be continued..
 	mov eax, -16							; chroma=-16
 	neg ecx										; -stride
-	lea edi, [esi+eax]						
+	lea edi, [esi+eax]
 	lea edi, [edi+ecx]				; last line of top-left border
-	lea ebp, [esi+ebx]				
+	lea ebp, [esi+ebx]
 	lea ebp, [ebp+ecx]				; last line of top-right border
 	mov ecx, [esp+28]						; kiStride
 	add edx, 16							; height+16, luma=32, chroma=16
@@ -545,15 +545,15 @@ ExpandPictureChromaAlign_sse2:
 	neg ecx										; -kiStride
 	; for left & right border expanding
 	exp_cross_sse2		16, a
-	
+
 ;	sfence									; commit cache write back memory
-	
+
 	pop ebp
 	pop edi
 	pop esi
 	pop edx
 	pop ebx
-	
+
 	ret
 
 ALIGN 16
@@ -569,7 +569,7 @@ ExpandPictureChromaUnalign_sse2:
 	push esi
 	push edi
 	push ebp
-	
+
 	; for both top and bottom border
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	mov esi, [esp+24]						; pDst
@@ -581,10 +581,10 @@ ExpandPictureChromaUnalign_sse2:
 	mov cl, byte [esi]
 	butterfly_1to16_sse xmm3, xmm4, c		; pDst, tmp, pSrc [generic register name: a/b/c/d]
 	; load top border
-	mov ecx, edx							; kiStride	
+	mov ecx, edx							; kiStride
 	neg ecx 								; -kiStride
 	lea edi, [esi+ecx]						; last line of top border
-	; load bottom border 
+	; load bottom border
 	dec eax									; h-1
 	imul eax, edx 							; (h-1)*kiStride
 	lea eax, [esi+eax]						; last line of picture pData
@@ -592,16 +592,16 @@ ExpandPictureChromaUnalign_sse2:
 	lea ebp, [eax+edx]						; last line of bottom border, (h-1)*kiStride + 16 * kiStride
 	; also prepare for cross border pData: bottom-left with xmm5, bottom-right xmm6
 	dec ebx									; kiWidth-1
-	lea ebx, [eax+ebx]						; dst[w-1][h-1]	
+	lea ebx, [eax+ebx]						; dst[w-1][h-1]
 ;	xor edx, edx
 	mov dl, byte [eax]						; bottom-left
 	butterfly_1to16_sse xmm5, xmm6, d		; dst, tmp, pSrc [generic register name: a/b/c/d]
 	mov dl, byte [ebx]						; bottom-right
 	butterfly_1to16_sse xmm6, xmm4, d		; dst, tmp, pSrc [generic register name: a/b/c/d]
-	; for top & bottom expanding	
+	; for top & bottom expanding
 	mov ebx, [esp+32]						; kiWidth
-	exp_top_bottom_sse2	16	
-	
+	exp_top_bottom_sse2	16
+
 	; for both left and right border
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	mov esi, [esp+24]						; p_dst: left border pSrc
@@ -613,14 +613,14 @@ ExpandPictureChromaUnalign_sse2:
 	lea edi, [esi+eax]						; left border dst
 	dec ebx
 	lea ebx, [esi+ebx]						; right border pSrc, (p_dst + width - 1)
-	lea ebp, [ebx+1]						; right border dst	
+	lea ebp, [ebx+1]						; right border dst
 	; prepare for cross border pData: top-right with xmm4
 ;	xor eax, eax
 	mov al, byte [ebx]						; top-right
 	butterfly_1to16_sse xmm4, xmm0, a		; dst, tmp, pSrc [generic register name: a/b/c/d]
 	; for left & right border expanding
 	exp_left_right_sse2	16, u
-	
+
 	; for cross border [top-left, top-right, bottom-left, bottom-right]
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	mov esi, [esp+24]						; p_dst
@@ -630,9 +630,9 @@ ExpandPictureChromaUnalign_sse2:
 	; have done xmm3,..,xmm6 cross pData initialization above, perform pading as below, To be continued..
 	neg ecx									; -kiStride
 	mov eax, -16							; chroma=-16
-	lea edi, [esi+eax]						
+	lea edi, [esi+eax]
 	lea edi, [edi+ecx]				; last line of top-left border
-	lea ebp, [esi+ebx]						
+	lea ebp, [esi+ebx]
 	lea ebp, [ebp+ecx]				; last line of top-right border
 	mov ecx, [esp+28]						; kiStride
 	add edx, 16							; kiHeight+16, luma=32, chroma=16
@@ -642,14 +642,14 @@ ExpandPictureChromaUnalign_sse2:
 	neg ecx									; -kiStride
 	; for left & right border expanding
 	exp_cross_sse2		16, u
-	
+
 ;	sfence									; commit cache write back memory
-	
+
 	pop ebp
 	pop edi
 	pop esi
 	pop edx
 	pop ebx
-	
+
 	ret
 

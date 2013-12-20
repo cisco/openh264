@@ -32,7 +32,7 @@
 ;*  mb_copy.asm
 ;*
 ;*  Abstract
-;*      mb_copy 
+;*      mb_copy
 ;*
 ;*
 ;*********************************************************************************************/
@@ -52,9 +52,9 @@ SECTION .text
 WELS_EXTERN WelsCopy16x16_sse2
 WELS_EXTERN WelsCopy16x16NotAligned_sse2
 WELS_EXTERN WelsCopy8x8_mmx
-WELS_EXTERN WelsCopy16x8NotAligned_sse2	; 
-WELS_EXTERN WelsCopy8x16_mmx		; 
-WELS_EXTERN UpdateMbMv_sse2		; 
+WELS_EXTERN WelsCopy16x8NotAligned_sse2	;
+WELS_EXTERN WelsCopy8x16_mmx		;
+WELS_EXTERN UpdateMbMv_sse2		;
 
 ;***********************************************************************
 ; void WelsCopy16x16_sse2(	uint8_t* Dst,
@@ -66,7 +66,7 @@ ALIGN 16
 WelsCopy16x16_sse2:
 	push esi
 	push edi
-	push ebx	
+	push ebx
 
 	mov edi, [esp+16]	; Dst
 	mov eax, [esp+20]	; iStrideD
@@ -107,7 +107,7 @@ WelsCopy16x16_sse2:
 	movdqa xmm5, [esi+ecx]
 	movdqa xmm6, [esi+2*ecx]
 	movdqa xmm7, [esi+edx]
-	
+
 	movdqa [edi], xmm0
 	movdqa [edi+eax], xmm1
 	movdqa [edi+2*eax], xmm2
@@ -116,7 +116,7 @@ WelsCopy16x16_sse2:
 	movdqa [edi], xmm4
 	movdqa [edi+eax], xmm5
 	movdqa [edi+2*eax], xmm6
-	movdqa [edi+ebx], xmm7	
+	movdqa [edi+ebx], xmm7
 
 	pop ebx
 	pop edi
@@ -134,7 +134,7 @@ ALIGN 16
 WelsCopy16x16NotAligned_sse2:
 	push esi
 	push edi
-	push ebx	
+	push ebx
 
 	mov edi, [esp+16]	; Dst
 	mov eax, [esp+20]	; iStrideD
@@ -175,7 +175,7 @@ WelsCopy16x16NotAligned_sse2:
 	movdqu xmm5, [esi+ecx]
 	movdqu xmm6, [esi+2*ecx]
 	movdqu xmm7, [esi+edx]
-	
+
 	movdqa [edi], xmm0
 	movdqa [edi+eax], xmm1
 	movdqa [edi+2*eax], xmm2
@@ -184,8 +184,8 @@ WelsCopy16x16NotAligned_sse2:
 	movdqa [edi], xmm4
 	movdqa [edi+eax], xmm5
 	movdqa [edi+2*eax], xmm6
-	movdqa [edi+ebx], xmm7	
-	
+	movdqa [edi+ebx], xmm7
+
 	pop ebx
 	pop edi
 	pop esi
@@ -202,7 +202,7 @@ ALIGN 16
 WelsCopy16x8NotAligned_sse2:
 	push esi
 	push edi
-	push ebx	
+	push ebx
 
 	mov edi, [esp+16]	; Dst
 	mov eax, [esp+20]	; iStrideD
@@ -220,7 +220,7 @@ WelsCopy16x8NotAligned_sse2:
 	movdqu xmm4, [esi]
 	movdqu xmm5, [esi+ecx]
 	movdqu xmm6, [esi+2*ecx]
-	movdqu xmm7, [esi+edx]	
+	movdqu xmm7, [esi+edx]
 
 	movdqa [edi], xmm0
 	movdqa [edi+eax], xmm1
@@ -231,7 +231,7 @@ WelsCopy16x8NotAligned_sse2:
 	movdqa [edi+eax], xmm5
 	movdqa [edi+2*eax], xmm6
 	movdqa [edi+ebx], xmm7
-	
+
 	pop ebx
 	pop edi
 	pop esi
@@ -245,7 +245,7 @@ WelsCopy16x8NotAligned_sse2:
 ;                       int32_t  iStrideS )
 ;***********************************************************************
 ALIGN 16
-WelsCopy8x16_mmx:	
+WelsCopy8x16_mmx:
 	push ebx
 
 	mov eax, [esp + 8 ]           ;Dst
@@ -253,60 +253,60 @@ WelsCopy8x16_mmx:
 	mov ebx, [esp + 16]           ;Src
 	mov edx, [esp + 20]           ;iStrideS
 
-	movq mm0, [ebx]	
-	movq mm1, [ebx+edx]	
+	movq mm0, [ebx]
+	movq mm1, [ebx+edx]
 	lea ebx, [ebx+2*edx]
-	movq mm2, [ebx]	
-	movq mm3, [ebx+edx]	
+	movq mm2, [ebx]
+	movq mm3, [ebx+edx]
 	lea ebx, [ebx+2*edx]
-	movq mm4, [ebx]	
-	movq mm5, [ebx+edx]	
+	movq mm4, [ebx]
+	movq mm5, [ebx+edx]
 	lea ebx, [ebx+2*edx]
-	movq mm6, [ebx]	
-	movq mm7, [ebx+edx]	
+	movq mm6, [ebx]
+	movq mm7, [ebx+edx]
 	lea ebx, [ebx+2*edx]
-	
-	movq [eax], mm0	
-	movq [eax+ecx], mm1	
+
+	movq [eax], mm0
+	movq [eax+ecx], mm1
 	lea eax, [eax+2*ecx]
-	movq [eax], mm2	
+	movq [eax], mm2
 	movq [eax+ecx], mm3
 	lea eax, [eax+2*ecx]
-	movq [eax], mm4	
+	movq [eax], mm4
 	movq [eax+ecx], mm5
 	lea eax, [eax+2*ecx]
-	movq [eax], mm6	
+	movq [eax], mm6
 	movq [eax+ecx], mm7
 	lea eax, [eax+2*ecx]
 
-	movq mm0, [ebx]	
-	movq mm1, [ebx+edx]	
+	movq mm0, [ebx]
+	movq mm1, [ebx+edx]
 	lea ebx, [ebx+2*edx]
-	movq mm2, [ebx]	
-	movq mm3, [ebx+edx]	
+	movq mm2, [ebx]
+	movq mm3, [ebx+edx]
 	lea ebx, [ebx+2*edx]
-	movq mm4, [ebx]	
-	movq mm5, [ebx+edx]	
+	movq mm4, [ebx]
+	movq mm5, [ebx+edx]
 	lea ebx, [ebx+2*edx]
-	movq mm6, [ebx]	
-	movq mm7, [ebx+edx]		
-	
-	movq [eax], mm0	
-	movq [eax+ecx], mm1	
+	movq mm6, [ebx]
+	movq mm7, [ebx+edx]
+
+	movq [eax], mm0
+	movq [eax+ecx], mm1
 	lea eax, [eax+2*ecx]
-	movq [eax], mm2	
+	movq [eax], mm2
 	movq [eax+ecx], mm3
 	lea eax, [eax+2*ecx]
-	movq [eax], mm4	
+	movq [eax], mm4
 	movq [eax+ecx], mm5
 	lea eax, [eax+2*ecx]
-	movq [eax], mm6	
-	movq [eax+ecx], mm7	
+	movq [eax], mm6
+	movq [eax+ecx], mm7
 
 	WELSEMMS
-	pop ebx	
+	pop ebx
 	ret
-	
+
 ;***********************************************************************
 ; void WelsCopy8x8_mmx(  uint8_t* Dst,
 ;                        int32_t  iStrideD,
@@ -314,7 +314,7 @@ WelsCopy8x16_mmx:
 ;                        int32_t  iStrideS )
 ;***********************************************************************
 ALIGN 16
-WelsCopy8x8_mmx:	
+WelsCopy8x8_mmx:
 	push ebx
 	push esi
 	mov eax, [esp + 12]           ;Dst
@@ -343,7 +343,7 @@ WelsCopy8x8_mmx:
 	lea esi, [esi+2*ebx]
 	movq mm6, [esi]
 	movq mm7, [esi+ebx]
-	
+
 	movq [eax], mm0
 	movq [eax+ecx], mm1
 	lea eax, [eax+2*ecx]
@@ -355,12 +355,12 @@ WelsCopy8x8_mmx:
 	lea eax, [eax+2*ecx]
 	movq [eax], mm6
 	movq [eax+ecx], mm7
-		
+
 	WELSEMMS
-	pop esi	
+	pop esi
 	pop ebx
 	ret
-	
+
 ; (dunhuang@cisco), 12/21/2011
 ;***********************************************************************
 ; void UpdateMbMv_sse2( SMVUnitXY *pMvBuffer, const SMVUnitXY sMv )
@@ -417,7 +417,7 @@ WELS_EXTERN PixelAvgWidthEq16_sse2
 WELS_EXTERN McCopyWidthEq4_mmx
 WELS_EXTERN McCopyWidthEq8_mmx
 WELS_EXTERN McCopyWidthEq16_sse2
-                          
+
 
 ALIGN 16
 ;***********************************************************************
@@ -432,38 +432,38 @@ PixelAvgWidthEq8_mmx:
     push        esi
     push        edi
 
-    mov         edi, [esp+20]       
-    mov         esi, [esp+28]       
-    mov         edx, [esp+36]       
-    mov         ebp, [esp+24]       
-    mov         eax, [esp+32]       
-    mov         ebx, [esp+40]       
-    mov         ecx, [esp+44]       
+    mov         edi, [esp+20]
+    mov         esi, [esp+28]
+    mov         edx, [esp+36]
+    mov         ebp, [esp+24]
+    mov         eax, [esp+32]
+    mov         ebx, [esp+40]
+    mov         ecx, [esp+44]
 	sar			ecx, 2
 .height_loop:
-	movq        mm0, [esi]	
+	movq        mm0, [esi]
     pavgb       mm0, [edx]
     movq        [edi], mm0
-	movq		mm1, [esi+eax]		
+	movq		mm1, [esi+eax]
 	pavgb		mm1, [edx+ebx]
 	movq		[edi+ebp], mm1
 	lea         edi, [edi+2*ebp]
 	lea         esi, [esi+2*eax]
 	lea         edx, [edx+2*ebx]
 
-	movq        mm2, [esi]	
+	movq        mm2, [esi]
 	pavgb       mm2, [edx]
     movq        [edi], mm2
-	movq		mm3, [esi+eax]	
+	movq		mm3, [esi+eax]
 	pavgb		mm3, [edx+ebx]
 	movq		[edi+ebp], mm3
 	lea         edi, [edi+2*ebp]
 	lea         esi, [esi+2*eax]
 	lea         edx, [edx+2*ebx]
-	
+
 	dec         ecx
     jne         .height_loop
-	
+
 	WELSEMMS
     pop         edi
     pop         esi
@@ -485,42 +485,42 @@ PixelAvgWidthEq16_sse2:
     push        esi
     push        edi
 
-    mov         edi, [esp+20]       
-    mov         esi, [esp+28]       
-    mov         edx, [esp+36]       
-    mov         ebp, [esp+24]       
-    mov         eax, [esp+32]       
-    mov         ebx, [esp+40]       
-    mov         ecx, [esp+44]       
+    mov         edi, [esp+20]
+    mov         esi, [esp+28]
+    mov         edx, [esp+36]
+    mov         ebp, [esp+24]
+    mov         eax, [esp+32]
+    mov         ebx, [esp+40]
+    mov         ecx, [esp+44]
 	sar			ecx, 2
 .height_loop:
 	movdqu      xmm0, [esi]
 	movdqu      xmm1, [edx]
 	movdqu      xmm2, [esi+eax]
-	movdqu      xmm3, [edx+ebx]	
+	movdqu      xmm3, [edx+ebx]
 	pavgb       xmm0, xmm1
 	pavgb       xmm2, xmm3
 	movdqu      [edi], xmm0
 	movdqu      [edi+ebp], xmm2
 	lea			edi, [edi+2*ebp]
 	lea			esi, [esi+2*eax]
-	lea			edx, [edx+2*ebx]	
+	lea			edx, [edx+2*ebx]
 
 	movdqu      xmm4, [esi]
 	movdqu      xmm5, [edx]
 	movdqu      xmm6, [esi+eax]
-	movdqu      xmm7, [edx+ebx]	
+	movdqu      xmm7, [edx+ebx]
 	pavgb       xmm4, xmm5
 	pavgb       xmm6, xmm7
 	movdqu      [edi], xmm4
 	movdqu      [edi+ebp], xmm6
 	lea         edi, [edi+2*ebp]
 	lea         esi, [esi+2*eax]
-    lea         edx, [edx+2*ebx]	
-    
+    lea         edx, [edx+2*ebx]
+
 	dec         ecx
 	jne         .height_loop
-	
+
     pop         edi
     pop         esi
     pop         ebx
@@ -540,7 +540,7 @@ avg_w16_align_0_ssse3:
     dec    dword [esp+4]
     jg     avg_w16_align_0_ssse3
     ret
-    
+
     ALIGN 64
 avg_w16_align_1_ssse3:
     movdqa  xmm1, [ebx+16]
@@ -555,7 +555,7 @@ avg_w16_align_1_ssse3:
     jg     avg_w16_align_1_ssse3
     ret
 
-  
+
 ALIGN 16
 ;***********************************************************************
 ; void PixelAvgWidthEq16_ssse3(uint8_t *pDst,  int32_t iDstStride,
@@ -574,7 +574,7 @@ PixelAvgWidthEq16_ssse3:
     mov         ebx, [esp+28]       ; src1
     mov         ecx, [esp+36]       ; src2
     mov         esi, [esp+24]       ; i_dst_stride
-    
+
      %define avg_w16_offset (avg_w16_align_1_ssse3-avg_w16_align_0_ssse3)
     mov edx, ebx
     and edx, 0x01
@@ -582,11 +582,11 @@ PixelAvgWidthEq16_ssse3:
     lea ebp, [avg_w16_offset]
     imul ebp, edx
     lea edx, [ebp+eax]
-    
-    mov eax, [esp+32]  
-    mov ebp, [esp+44] 
+
+    mov eax, [esp+32]
+    mov ebp, [esp+44]
     push ebp
-    mov ebp, [esp+44]	
+    mov ebp, [esp+44]
     and ebx, 0xfffffff0
     call edx
 	pop		   ebp
@@ -607,7 +607,7 @@ McCopyWidthEq4_mmx:
     push    edi
     push    ebx
 
-    
+
     mov esi,  [esp+16]
     mov eax, [esp+20]
     mov edi,  [esp+24]
@@ -617,12 +617,12 @@ ALIGN 4
 .height_loop:
 	mov ebx, [esi]
 	mov [edi], ebx
-	
+
 	add esi, eax
 	add edi, ecx
 	dec edx
 	jnz .height_loop
-	WELSEMMS   
+	WELSEMMS
 	pop	   ebx
     pop     edi
     pop     esi
@@ -650,12 +650,12 @@ ALIGN 4
 	add edi, ecx
 	dec edx
 	jnz .height_loop
-	
-	WELSEMMS   
+
+	WELSEMMS
     pop     edi
     pop     esi
     ret
-	
+
 ALIGN 16
 ;***********************************************************************
 ;   void McCopyWidthEq16_sse2( uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst, int32_t iDstStride, int32_t iHeight )
@@ -664,11 +664,11 @@ McCopyWidthEq16_sse2:
     push    esi
     push    edi
 
-    mov     esi, [esp+12]       
-    mov     eax, [esp+16]       
-    mov     edi, [esp+20]       
-    mov     edx, [esp+24]       
-    mov     ecx, [esp+28]       
+    mov     esi, [esp+12]
+    mov     eax, [esp+16]
+    mov     edi, [esp+20]
+    mov     edx, [esp+24]
+    mov     ecx, [esp+28]
 
 ALIGN 4
 .height_loop:
@@ -681,7 +681,7 @@ ALIGN 4
     lea     esi, [esi+eax*2]
     lea     edi, [edi+edx*2]
     jnz     .height_loop
-  
+
     pop     edi
     pop     esi
     ret

@@ -38,101 +38,85 @@ WELSVP_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CVAACalculation::CVAACalculation(int32_t iCpuFlag)
-{
-	m_iCPUFlag = iCpuFlag;
-	m_eMethod   = METHOD_VAA_STATISTICS;
+CVAACalculation::CVAACalculation (int32_t iCpuFlag) {
+  m_iCPUFlag = iCpuFlag;
+  m_eMethod   = METHOD_VAA_STATISTICS;
 
-	WelsMemset(&m_sCalcParam, 0, sizeof(m_sCalcParam));
-	WelsMemset(&m_sVaaFuncs, 0, sizeof(m_sVaaFuncs));
-	InitVaaFuncs(m_sVaaFuncs, m_iCPUFlag);
+  WelsMemset (&m_sCalcParam, 0, sizeof (m_sCalcParam));
+  WelsMemset (&m_sVaaFuncs, 0, sizeof (m_sVaaFuncs));
+  InitVaaFuncs (m_sVaaFuncs, m_iCPUFlag);
 }
 
-CVAACalculation::~CVAACalculation()
-{	
+CVAACalculation::~CVAACalculation() {
 }
 
-void CVAACalculation::InitVaaFuncs(SVaaFuncs &sVaaFuncs, int32_t iCpuFlag)
-{
-	sVaaFuncs.pfVAACalcSad				= VAACalcSad_c;
-	sVaaFuncs.pfVAACalcSadBgd			= VAACalcSadBgd_c;
-	sVaaFuncs.pfVAACalcSadSsd			= VAACalcSadSsd_c;
-	sVaaFuncs.pfVAACalcSadSsdBgd		= VAACalcSadSsdBgd_c;
-	sVaaFuncs.pfVAACalcSadVar			= VAACalcSadVar_c;
+void CVAACalculation::InitVaaFuncs (SVaaFuncs& sVaaFuncs, int32_t iCpuFlag) {
+  sVaaFuncs.pfVAACalcSad				= VAACalcSad_c;
+  sVaaFuncs.pfVAACalcSadBgd			= VAACalcSadBgd_c;
+  sVaaFuncs.pfVAACalcSadSsd			= VAACalcSadSsd_c;
+  sVaaFuncs.pfVAACalcSadSsdBgd		= VAACalcSadSsdBgd_c;
+  sVaaFuncs.pfVAACalcSadVar			= VAACalcSadVar_c;
 #ifdef X86_ASM
-	if ( (iCpuFlag & WELS_CPU_SSE2) == WELS_CPU_SSE2 )
-	{
-		sVaaFuncs.pfVAACalcSad			= VAACalcSad_sse2;
-		sVaaFuncs.pfVAACalcSadBgd		= VAACalcSadBgd_sse2;
-		sVaaFuncs.pfVAACalcSadSsd		= VAACalcSadSsd_sse2;
-		sVaaFuncs.pfVAACalcSadSsdBgd = VAACalcSadSsdBgd_sse2;
-		sVaaFuncs.pfVAACalcSadVar		= VAACalcSadVar_sse2;
-	}
+  if ((iCpuFlag & WELS_CPU_SSE2) == WELS_CPU_SSE2) {
+    sVaaFuncs.pfVAACalcSad			= VAACalcSad_sse2;
+    sVaaFuncs.pfVAACalcSadBgd		= VAACalcSadBgd_sse2;
+    sVaaFuncs.pfVAACalcSadSsd		= VAACalcSadSsd_sse2;
+    sVaaFuncs.pfVAACalcSadSsdBgd = VAACalcSadSsdBgd_sse2;
+    sVaaFuncs.pfVAACalcSadVar		= VAACalcSadVar_sse2;
+  }
 #endif//X86_ASM
 }
 
-EResult CVAACalculation::Process(int32_t iType, SPixMap *pSrcPixMap, SPixMap *pRefPixMap)
-{
-	uint8_t *pCurData	= (uint8_t *)pSrcPixMap->pPixel[0];
-	uint8_t *pRefData	= (uint8_t *)pRefPixMap->pPixel[0];
-	int32_t iPicWidth	= pSrcPixMap->sRect.iRectWidth;
-	int32_t iPicHeight	= pSrcPixMap->sRect.iRectHeight;
-	int32_t iPicStride	= pSrcPixMap->iStride[0];
-	
-	SVAACalcResult *pResult = m_sCalcParam.pCalcResult;
+EResult CVAACalculation::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap) {
+  uint8_t* pCurData	= (uint8_t*)pSrcPixMap->pPixel[0];
+  uint8_t* pRefData	= (uint8_t*)pRefPixMap->pPixel[0];
+  int32_t iPicWidth	= pSrcPixMap->sRect.iRectWidth;
+  int32_t iPicHeight	= pSrcPixMap->sRect.iRectHeight;
+  int32_t iPicStride	= pSrcPixMap->iStride[0];
 
-	if (pCurData == NULL || pRefData == NULL)
-	{
-		return RET_INVALIDPARAM;
-	}
+  SVAACalcResult* pResult = m_sCalcParam.pCalcResult;
 
-	pResult->pCurY = pCurData;
-	pResult->pRefY = pRefData;
-	if (m_sCalcParam.iCalcBgd)
-	{
-		if (m_sCalcParam.iCalcSsd)
-		{
-			m_sVaaFuncs.pfVAACalcSadSsdBgd(pCurData, pRefData, iPicWidth, iPicHeight, iPicStride, &pResult->iFrameSad, 
-				(int32_t*)pResult->pSad8x8, pResult->pSum16x16, pResult->pSumOfSquare16x16, pResult->pSsd16x16, 
-				(int32_t*)pResult->pSumOfDiff8x8, (uint8_t*)pResult->pMad8x8);
-		}
-		else
-		{
-			m_sVaaFuncs.pfVAACalcSadBgd(pCurData, pRefData, iPicWidth, iPicHeight, iPicStride, &pResult->iFrameSad,
-				(int32_t*)(pResult->pSad8x8), (int32_t*)(pResult->pSumOfDiff8x8), (uint8_t*)pResult->pMad8x8);
-		}
-	}
-	else
-	{
-		if (m_sCalcParam.iCalcSsd)
-		{
-			m_sVaaFuncs.pfVAACalcSadSsd(pCurData, pRefData, iPicWidth, iPicHeight, iPicStride, &pResult->iFrameSad,
-				(int32_t*)pResult->pSad8x8, pResult->pSum16x16, pResult->pSumOfSquare16x16, pResult->pSsd16x16);
-		}else{
-			if (m_sCalcParam.iCalcVar)
-			{
-				m_sVaaFuncs.pfVAACalcSadVar(pCurData, pRefData, iPicWidth, iPicHeight, iPicStride, &pResult->iFrameSad,
-					(int32_t*)pResult->pSad8x8, pResult->pSum16x16, pResult->pSumOfSquare16x16);
-			}else{
-				m_sVaaFuncs.pfVAACalcSad(pCurData, pRefData, iPicWidth, iPicHeight, iPicStride, &pResult->iFrameSad,
-					(int32_t*)pResult->pSad8x8);
-			}			
-		}
-	}
+  if (pCurData == NULL || pRefData == NULL) {
+    return RET_INVALIDPARAM;
+  }
 
-	return RET_SUCCESS;
+  pResult->pCurY = pCurData;
+  pResult->pRefY = pRefData;
+  if (m_sCalcParam.iCalcBgd) {
+    if (m_sCalcParam.iCalcSsd) {
+      m_sVaaFuncs.pfVAACalcSadSsdBgd (pCurData, pRefData, iPicWidth, iPicHeight, iPicStride, &pResult->iFrameSad,
+                                      (int32_t*)pResult->pSad8x8, pResult->pSum16x16, pResult->pSumOfSquare16x16, pResult->pSsd16x16,
+                                      (int32_t*)pResult->pSumOfDiff8x8, (uint8_t*)pResult->pMad8x8);
+    } else {
+      m_sVaaFuncs.pfVAACalcSadBgd (pCurData, pRefData, iPicWidth, iPicHeight, iPicStride, &pResult->iFrameSad,
+                                   (int32_t*) (pResult->pSad8x8), (int32_t*) (pResult->pSumOfDiff8x8), (uint8_t*)pResult->pMad8x8);
+    }
+  } else {
+    if (m_sCalcParam.iCalcSsd) {
+      m_sVaaFuncs.pfVAACalcSadSsd (pCurData, pRefData, iPicWidth, iPicHeight, iPicStride, &pResult->iFrameSad,
+                                   (int32_t*)pResult->pSad8x8, pResult->pSum16x16, pResult->pSumOfSquare16x16, pResult->pSsd16x16);
+    } else {
+      if (m_sCalcParam.iCalcVar) {
+        m_sVaaFuncs.pfVAACalcSadVar (pCurData, pRefData, iPicWidth, iPicHeight, iPicStride, &pResult->iFrameSad,
+                                     (int32_t*)pResult->pSad8x8, pResult->pSum16x16, pResult->pSumOfSquare16x16);
+      } else {
+        m_sVaaFuncs.pfVAACalcSad (pCurData, pRefData, iPicWidth, iPicHeight, iPicStride, &pResult->iFrameSad,
+                                  (int32_t*)pResult->pSad8x8);
+      }
+    }
+  }
+
+  return RET_SUCCESS;
 }
 
-EResult CVAACalculation::Set(int32_t iType, void *pParam)
-{
-	if (pParam == NULL || ((SVAACalcParam*)pParam)->pCalcResult == NULL)
-	{
-		return RET_INVALIDPARAM;
-	}
+EResult CVAACalculation::Set (int32_t iType, void* pParam) {
+  if (pParam == NULL || ((SVAACalcParam*)pParam)->pCalcResult == NULL) {
+    return RET_INVALIDPARAM;
+  }
 
-	m_sCalcParam = *(SVAACalcParam*)pParam;
+  m_sCalcParam = * (SVAACalcParam*)pParam;
 
-	return RET_SUCCESS;
+  return RET_SUCCESS;
 }
 
 

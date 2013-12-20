@@ -51,71 +51,73 @@ namespace WelsSVCEnc {
  *	Raw payload pData for NAL unit, AVC/SVC compatible
  */
 typedef struct TagWelsNalRaw {
-	uint8_t				*pRawData;		// pRawNal payload for slice pData
-	int32_t				iPayloadSize;		// size of pRawNal pData
-	
-	SNalUnitHeaderExt		sNalExt;		// NAL header information
+uint8_t*				pRawData;		// pRawNal payload for slice pData
+int32_t				iPayloadSize;		// size of pRawNal pData
 
-}SWelsNalRaw;
+SNalUnitHeaderExt		sNalExt;		// NAL header information
+
+} SWelsNalRaw;
 
 /*
  *	Encoder majoy output pData
  */
-typedef struct TagWelsEncoderOutput {	
-	uint8_t				*pBsBuffer;			// overall bitstream pBuffer allocation for a coded picture, recycling use intend. 
-	uint32_t			uiSize;				// size of allocation pBuffer above
+typedef struct TagWelsEncoderOutput {
+uint8_t*				pBsBuffer;			// overall bitstream pBuffer allocation for a coded picture, recycling use intend.
+uint32_t			uiSize;				// size of allocation pBuffer above
 
-	SBitStringAux		sBsWrite;
-	
+SBitStringAux		sBsWrite;
+
 //	SWelsNalRaw		raw_nals[MAX_DEPENDENCY_LAYER*2+MAX_DEPENDENCY_LAYER*MAX_QUALITY_LEVEL]; // AVC: max up to SPS+PPS+max_slice_idc (2 + 8) for FMO;
-	SWelsNalRaw		*sNalList;			// nal list, adaptive for AVC/SVC in case single slice, multiple slices or fmo
-	int32_t				iCountNals;			// count number of NAL in list
-																								 // SVC: num_sps (MAX_D) + num_pps (MAX_D) + num_vcl (MAX_D * MAX_Q)	
-	int32_t				iNalIndex;			// coding NAL currently, 0 based
-	
+SWelsNalRaw*		sNalList;			// nal list, adaptive for AVC/SVC in case single slice, multiple slices or fmo
+int32_t				iCountNals;			// count number of NAL in list
+// SVC: num_sps (MAX_D) + num_pps (MAX_D) + num_vcl (MAX_D * MAX_Q)
+int32_t				iNalIndex;			// coding NAL currently, 0 based
+
 //	BOOL_T				bAnnexBFlag;		// annexeb flag, to figure it pOut the packetization mode whether need 4 bytes (0 0 0 1) of start code prefix
-}SWelsEncoderOutput;
+} SWelsEncoderOutput;
 
 //#define MT_DEBUG_BS_WR	0	// for MT debugging if needed
 
 typedef struct TagWelsSliceBs {
-	uint8_t				*pBs;				// output bitstream, pBitStringAux not needed for slice 0 due to no dependency of pFrameBs available
-	uint32_t			uiBsPos;				// position of output bitstream
-	uint8_t				*pBsBuffer;			// overall bitstream pBuffer allocation for a coded slice, recycling use intend. 
-	uint32_t			uiSize;				// size of allocation pBuffer above
-	
-	SBitStringAux		sBsWrite;
-		
-	SWelsNalRaw		sNalList[2];		// nal list, PREFIX NAL(if applicable) + SLICE NAL
+uint8_t*				pBs;				// output bitstream, pBitStringAux not needed for slice 0 due to no dependency of pFrameBs available
+uint32_t			uiBsPos;				// position of output bitstream
+uint8_t*				pBsBuffer;			// overall bitstream pBuffer allocation for a coded slice, recycling use intend.
+uint32_t			uiSize;				// size of allocation pBuffer above
+
+SBitStringAux		sBsWrite;
+
+SWelsNalRaw		sNalList[2];		// nal list, PREFIX NAL(if applicable) + SLICE NAL
 //	int32_t				iCountNals;			// count number of NAL in list
-	int32_t				iNalLen[2];
-	int32_t				iNalIndex;			// coding NAL currently, 0 based	
-	
+int32_t				iNalLen[2];
+int32_t				iNalIndex;			// coding NAL currently, 0 based
+
 //	BOOL_T				bAnnexBFlag;		// annexeb flag, to figure it pOut the packetization mode whether need 4 bytes (0 0 0 1) of start code prefix
 #if MT_DEBUG_BS_WR
-	BOOL_T				bSliceCodedFlag;
+BOOL_T				bSliceCodedFlag;
 #endif//MT_DEBUG_BS_WR
-}SWelsSliceBs;
+} SWelsSliceBs;
 
 /*!
- * \brief	load an initialize NAL pRawNal pData	
+ * \brief	load an initialize NAL pRawNal pData
  */
-void WelsLoadNal( SWelsEncoderOutput *pEncoderOuput, const int32_t/*EWelsNalUnitType*/ kiType, const int32_t/*EWelsNalRefIdc*/ kiNalRefIdc );
-
-/*!
- * \brief	unload pRawNal NAL
- */
-void WelsUnloadNal( SWelsEncoderOutput *pEncoderOuput );
-
-/*!
- * \brief	load an initialize NAL pRawNal pData	
- */
-void WelsLoadNalForSlice( SWelsSliceBs *pSliceBs, const int32_t/*EWelsNalUnitType*/ kiType, const int32_t/*EWelsNalRefIdc*/ kiNalRefIdc );
+void WelsLoadNal (SWelsEncoderOutput* pEncoderOuput, const int32_t/*EWelsNalUnitType*/ kiType,
+                  const int32_t/*EWelsNalRefIdc*/ kiNalRefIdc);
 
 /*!
  * \brief	unload pRawNal NAL
  */
-void WelsUnloadNalForSlice( SWelsSliceBs *pSliceBs );
+void WelsUnloadNal (SWelsEncoderOutput* pEncoderOuput);
+
+/*!
+ * \brief	load an initialize NAL pRawNal pData
+ */
+void WelsLoadNalForSlice (SWelsSliceBs* pSliceBs, const int32_t/*EWelsNalUnitType*/ kiType,
+                          const int32_t/*EWelsNalRefIdc*/ kiNalRefIdc);
+
+/*!
+ * \brief	unload pRawNal NAL
+ */
+void WelsUnloadNalForSlice (SWelsSliceBs* pSliceBs);
 
 /*!
  * \brief	encode NAL with emulation forbidden three bytes checking
@@ -125,7 +127,7 @@ void WelsUnloadNalForSlice( SWelsSliceBs *pSliceBs );
  * \param	pRawNal			pRawNal NAL pData
  * \return	length of pDst NAL
  */
-int32_t WelsEncodeNal( SWelsNalRaw *pRawNal, void *pDst, int32_t *pDstLen );
+int32_t WelsEncodeNal (SWelsNalRaw* pRawNal, void* pDst, int32_t* pDstLen);
 
 /*!
  * \brief	encode a nal into a pBuffer for any type of NAL, involved WelsEncodeNal introduced in AVC
@@ -138,11 +140,11 @@ int32_t WelsEncodeNal( SWelsNalRaw *pRawNal, void *pDst, int32_t *pDstLen );
  *
  * \return	length of pDst NAL
  */
-int32_t WelsEncodeNalExt( SWelsNalRaw *pRawNal, void *pNalHeaderExt, void *pDst, int32_t *pDstLen );
+int32_t WelsEncodeNalExt (SWelsNalRaw* pRawNal, void* pNalHeaderExt, void* pDst, int32_t* pDstLen);
 
 /*!
  * \brief	write prefix nal
  */
-int32_t WelsWriteSVCPrefixNal( SBitStringAux *pBitStringAux, const int32_t keNalRefIdc,const bool_t kbIdrFlag );
+int32_t WelsWriteSVCPrefixNal (SBitStringAux* pBitStringAux, const int32_t keNalRefIdc, const bool_t kbIdrFlag);
 }
 #endif//WELS_NAL_UNIT_ENCAPSULATION_H__

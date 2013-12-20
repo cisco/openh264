@@ -37,7 +37,7 @@
  *      08/18/2008 Created
  *
  *****************************************************************************/
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <string.h>
 #include <stdio.h>
 #endif
@@ -46,83 +46,75 @@
 
 #include "read_config.h"
 
-CReadConfig::CReadConfig( const char *kpConfigFileName )
-: m_pCfgFile(0)
-, m_strCfgFileName(kpConfigFileName)
-, m_ulLines(0)
-{
-	if ( strlen(kpConfigFileName) > 0 ){	// FIXME: To check validation in configure file name
-		m_pCfgFile = fopen(kpConfigFileName, "r");
-	}
+CReadConfig::CReadConfig (const char* kpConfigFileName)
+  : m_pCfgFile (0)
+  , m_strCfgFileName (kpConfigFileName)
+  , m_ulLines (0) {
+  if (strlen (kpConfigFileName) > 0) {	// FIXME: To check validation in configure file name
+    m_pCfgFile = fopen (kpConfigFileName, "r");
+  }
 }
 
-CReadConfig::~CReadConfig()
-{
-	if ( m_pCfgFile ){
-		fclose( m_pCfgFile );
-		m_pCfgFile = NULL;
-	}
-}
-	
-long CReadConfig::ReadLine( string* pStr, const int kiValSize/* = 4*/ )
-{
-	if ( m_pCfgFile == NULL || pStr == NULL || kiValSize <= 1)
-		return 0;
-	
-	string *strTags = &pStr[0];
-	int iTagNum = 0, iNum = 0;
-	bool bCommentFlag = false;	
-	
-	while (iNum < kiValSize) {
-		pStr[iNum]	= "";
-		++ iNum;
-	}	
-
-	do {
-		const char kChar = (char)fgetc(m_pCfgFile);
-		
-		if ( kChar == '\n' || feof(m_pCfgFile) ){
-			++ m_ulLines;
-			break;
-		}
-		if ( kChar == '#' )
-			bCommentFlag = true;
-		if ( !bCommentFlag ){
-			if ( kChar == '\t' || kChar == ' ' ){
-				if ( iTagNum >= kiValSize )
-					break;
-				if ( !(*strTags).empty() ){
-					++ iTagNum;
-					strTags	= &pStr[iTagNum];
-				}
-			}
-			else
-				*strTags += kChar;
-		}
-		
-	} while(true);
-	
-	return 1+iTagNum;
+CReadConfig::~CReadConfig() {
+  if (m_pCfgFile) {
+    fclose (m_pCfgFile);
+    m_pCfgFile = NULL;
+  }
 }
 
-const bool CReadConfig::EndOfFile()
-{
-	if (m_pCfgFile == NULL)
-		return true;
-	return feof(m_pCfgFile) ? true : false;
+long CReadConfig::ReadLine (string* pStr, const int kiValSize/* = 4*/) {
+  if (m_pCfgFile == NULL || pStr == NULL || kiValSize <= 1)
+    return 0;
+
+  string* strTags = &pStr[0];
+  int iTagNum = 0, iNum = 0;
+  bool bCommentFlag = false;
+
+  while (iNum < kiValSize) {
+    pStr[iNum]	= "";
+    ++ iNum;
+  }
+
+  do {
+    const char kChar = (char)fgetc (m_pCfgFile);
+
+    if (kChar == '\n' || feof (m_pCfgFile)) {
+      ++ m_ulLines;
+      break;
+    }
+    if (kChar == '#')
+      bCommentFlag = true;
+    if (!bCommentFlag) {
+      if (kChar == '\t' || kChar == ' ') {
+        if (iTagNum >= kiValSize)
+          break;
+        if (! (*strTags).empty()) {
+          ++ iTagNum;
+          strTags	= &pStr[iTagNum];
+        }
+      } else
+        *strTags += kChar;
+    }
+
+  } while (true);
+
+  return 1 + iTagNum;
 }
 
-const int CReadConfig::GetLines()
-{
-	return m_ulLines;
+const bool CReadConfig::EndOfFile() {
+  if (m_pCfgFile == NULL)
+    return true;
+  return feof (m_pCfgFile) ? true : false;
 }
 
-const bool CReadConfig::ExistFile()
-{
-	return (m_pCfgFile != NULL);
+const int CReadConfig::GetLines() {
+  return m_ulLines;
 }
 
-const string& CReadConfig::GetFileName()
-{
-	return m_strCfgFileName;
+const bool CReadConfig::ExistFile() {
+  return (m_pCfgFile != NULL);
+}
+
+const string& CReadConfig::GetFileName() {
+  return m_strCfgFileName;
 }

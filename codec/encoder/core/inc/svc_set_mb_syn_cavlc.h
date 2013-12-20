@@ -33,11 +33,11 @@
  *
  * \brief	Seting all syntax elements of mb and decoding residual with cavlc
  *
- * \date	2009.8.12 Created 
+ * \date	2009.8.12 Created
  *
  *************************************************************************************
  */
- 
+
 #ifndef SVC_SET_MB_SYN_CAVLC_H_
 #define SVC_SET_MB_SYN_CAVLC_H_
 
@@ -51,15 +51,15 @@
 namespace WelsSVCEnc {
 //#pragma pack(1)
 
-void WelsWriteMbResidual( SMbCache* sMbCacheInfo, SMB *pCurMb, SBitStringAux *pBs );
+void WelsWriteMbResidual (SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux* pBs);
 
 //for Enhance Layer CAVLC writing
-void WelsSpatialWriteSubMbPred( sWelsEncCtx *pEncCtx, SSlice *pSlice, SMB *pCurMb );
+void WelsSpatialWriteSubMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb);
 
-void WelsSpatialWriteMbPred( sWelsEncCtx *pEncCtx, SSlice *pSlice, SMB *pCurMb );
+void WelsSpatialWriteMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb);
 
 //for Base Layer CAVLC writing
-void WelsSpatialWriteMbSyn( sWelsEncCtx *pEncCtx, SSlice *pSlice, SMB *pCurMb );
+void WelsSpatialWriteMbSyn (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb);
 
 //#pragma pack()
 }

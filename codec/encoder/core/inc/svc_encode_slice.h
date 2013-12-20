@@ -31,7 +31,7 @@
  *
  * \file	svc_encode_slice.h
  *
- * \brief	svc encoding slice 
+ * \brief	svc encoding slice
  *
  * \date	2009.07.27 Created
  *
@@ -47,54 +47,59 @@
 
 namespace WelsSVCEnc {
 #if defined(MB_TYPES_CHECK)
-void WelsCountMbType(int32_t (*iMbCount)[18], const EWelsSliceType eSt, const SMB* pMb);
+void WelsCountMbType (int32_t (*iMbCount)[18], const EWelsSliceType eSt, const SMB* pMb);
 #endif
 
 
-void UpdateNonZeroCountCache(SMB *pMb, SMbCache *pMbCache);
+void UpdateNonZeroCountCache (SMB* pMb, SMbCache* pMbCache);
 
 //for P SSlice (intra part + inter part, MB level)
-void OutputPMbWithoutConstructCsRsNoCopy( sWelsEncCtx *pEncCtx, SDqLayer* pDq, SSlice *pSlice, SMB* pMb );
+void OutputPMbWithoutConstructCsRsNoCopy (sWelsEncCtx* pEncCtx, SDqLayer* pDq, SSlice* pSlice, SMB* pMb);
 
-void WelsSliceHeaderScalExtInit( SDqLayer* pCurLayer, SSlice *pSlice );
-void WelsSliceHeaderExtInit( sWelsEncCtx* pEncCtx, SDqLayer* pCurLayer, SSlice *pSlice );
+void WelsSliceHeaderScalExtInit (SDqLayer* pCurLayer, SSlice* pSlice);
+void WelsSliceHeaderExtInit (sWelsEncCtx* pEncCtx, SDqLayer* pCurLayer, SSlice* pSlice);
 
-void WelsSliceHeaderWrite( SBitStringAux* pBs, SDqLayer* pCurLayer, SSlice *pSlice, uint32_t uiPpsIdBasis );
-void WelsSliceHeaderExtWrite( SBitStringAux* pBs, SDqLayer* pCurLayer, SSlice *pSlice, uint32_t uiPpsIdBasis );
+void WelsSliceHeaderWrite (SBitStringAux* pBs, SDqLayer* pCurLayer, SSlice* pSlice, uint32_t uiPpsIdBasis);
+void WelsSliceHeaderExtWrite (SBitStringAux* pBs, SDqLayer* pCurLayer, SSlice* pSlice, uint32_t uiPpsIdBasis);
 
 //===================MB-leve encode====================//
-void WelsInterMbEncode( sWelsEncCtx* pEncCtx, SSlice *pSlice, SMB* pCurMb );//only for inter part
+void WelsInterMbEncode (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb); //only for inter part
 //for I SSlice (only intra part, MB level)
-void WelsIMbChromaEncode( sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache *pMbCache );
+void WelsIMbChromaEncode (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache);
 //for P SSlice (intra part + inter part, MB level)
-void WelsPMbChromaEncode( sWelsEncCtx* pEncCtx, SSlice *pSlice, SMB* pCurMb );
+void WelsPMbChromaEncode (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb);
 
 
 //===================MB-level encode====================//
 //encapsulation func: store base rec, highest Dependency Layer(only one quality) rec, single layer rec
-void WelsPSliceMdEnc( sWelsEncCtx* pEncCtx, SSlice *pSlice,  const bool_t kbIsHighestDlayerFlag );
-void WelsPSliceMdEncDynamic( sWelsEncCtx* pEncCtx, SSlice *pSlice,  const bool_t kbIsHighestDlayerFlag );
+void WelsPSliceMdEnc (sWelsEncCtx* pEncCtx, SSlice* pSlice,  const bool_t kbIsHighestDlayerFlag);
+void WelsPSliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice,  const bool_t kbIsHighestDlayerFlag);
 
 //encapsulation func: store base rec, highest Dependency Layer(only one quality) rec, single layer rec
-void WelsISliceMdEnc( sWelsEncCtx* pEncCtx, SSlice *pSlice );	// for intra non-dynamic slice
-void WelsISliceMdEncDynamic( sWelsEncCtx* pEncCtx, SSlice *pSlice );	// for intra dynamic slice
+void WelsISliceMdEnc (sWelsEncCtx* pEncCtx, SSlice* pSlice);	// for intra non-dynamic slice
+void WelsISliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice);	// for intra dynamic slice
 
-void WelsCodePSlice( sWelsEncCtx* pEncCtx, SSlice *pSlice );
-void WelsCodePOverDynamicSlice( sWelsEncCtx* pEncCtx, SSlice *pSlice );
+void WelsCodePSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice);
+void WelsCodePOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice);
 
-void WelsCodeOneSlice( sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx, const int32_t/*EWelsNalUnitType*/ keNalType/*, bool_t bNewLayer*/ );
+void WelsCodeOneSlice (sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx,
+                       const int32_t/*EWelsNalUnitType*/ keNalType/*, bool_t bNewLayer*/);
 
-void WelsInitSliceEncodingFuncs( uint32_t uiCpuFlag );
+void WelsInitSliceEncodingFuncs (uint32_t uiCpuFlag);
 
-void UpdateMbNeighbourInfoForNextSlice(	SSliceCtx *pSliceCtx,
-											 SMB *pMbList,
-											 const int32_t kiNextSliceFirstMbIdx,
-											 const int32_t kiLastMbIdxInPartition );
-void AddSliceBoundary(sWelsEncCtx* pEncCtx, SSlice * pCurSlice, SSliceCtx *pSliceCtx, SMB* pCurMb, int32_t iNextSliceFirstMbIdx, const int32_t kiLastMbIdxInPartition );
-void WelsMdInterMbLoop( sWelsEncCtx* pEncCtx, SSlice *pSlice, void* pMd, const int32_t kiSliceFirstMbXY );	// for inter non-dynamic slice
-void WelsMdInterMbLoopOverDynamicSlice( sWelsEncCtx* pEncCtx, SSlice *pSlice, void* pMd, const int32_t kiSliceFirstMbXY );	// for inter dynamic slice
+void UpdateMbNeighbourInfoForNextSlice (SSliceCtx* pSliceCtx,
+                                        SMB* pMbList,
+                                        const int32_t kiNextSliceFirstMbIdx,
+                                        const int32_t kiLastMbIdxInPartition);
+void AddSliceBoundary (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
+                       int32_t iNextSliceFirstMbIdx, const int32_t kiLastMbIdxInPartition);
+void WelsMdInterMbLoop (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pMd,
+                        const int32_t kiSliceFirstMbXY);	// for inter non-dynamic slice
+void WelsMdInterMbLoopOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pMd,
+                                        const int32_t kiSliceFirstMbXY);	// for inter dynamic slice
 
 
-BOOL_T DynSlcJudgeSliceBoundaryStepBack(void *pEncCtx, void *pSlice, SSliceCtx *pSliceCtx, SMB* pCurMb, SDynamicSlicingStack* pDss );
+BOOL_T DynSlcJudgeSliceBoundaryStepBack (void* pEncCtx, void* pSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
+    SDynamicSlicingStack* pDss);
 }
 #endif //SVC_ENCODE_SLICE_H__

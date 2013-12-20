@@ -45,56 +45,56 @@
 
 namespace WelsSVCEnc {
 #if defined(_MSC_VER)
-	#if _MSC_VER <= 1200
-		#define ALLOC_ALLIGN_MEM(name,size,type,alignment) \
+#if _MSC_VER <= 1200
+#define ALLOC_ALLIGN_MEM(name,size,type,alignment) \
 			type name##_storage[size+(alignment)-1]; \
 			type * name = (type *) (((int32_t) name##_storage+(alignment - 1)) & ~((int32_t)(alignment)-1))
 
-		#define ALLOC_ALLIGN_MEM_2(name,sizex,sizey,type,alignment) \
+#define ALLOC_ALLIGN_MEM_2(name,sizex,sizey,type,alignment) \
 			type name##_storage[(sizex)*(sizey)+(alignment)-1]; \
 			type * name = (type *) (((int32_t) name##_storage+(alignment - 1)) & ~((int32_t)(alignment)-1))
-	#else //_MSC_VER <= 1200
-		#define ALLOC_ALLIGN_MEM(name,size,type,alignment) \
+#else //_MSC_VER <= 1200
+#define ALLOC_ALLIGN_MEM(name,size,type,alignment) \
 			__declspec(align(alignment)) type name[size]
 
-		#define ALLOC_ALLIGN_MEM_2(name,sizex,sizey,type,alignment) \
+#define ALLOC_ALLIGN_MEM_2(name,sizex,sizey,type,alignment) \
 		__declspec(align(alignment)) type name[(sizex)*(sizey)]
-	#endif//_MSC_VER <= 1200
+#endif//_MSC_VER <= 1200
 
 #elif defined(__GNUC__)
 
-	#define ALLOC_ALLIGN_MEM(name,size,type,alignment) \
+#define ALLOC_ALLIGN_MEM(name,size,type,alignment) \
 		type name[size] __attribute__((aligned(alignment)))
-	#define ALLOC_ALLIGN_MEM_2(name,sizex,sizey,type,alignment) \
+#define ALLOC_ALLIGN_MEM_2(name,sizex,sizey,type,alignment) \
 		type name[(sizex)*(sizey)] __attribute__((aligned(alignment)))
-		
+
 #endif//_MSC_VER
 
 
 #if defined(_MSC_VER)
 
-	#if(_MSC_VER < 1700)
-	#define inline	__inline  
-	#endif
+#if(_MSC_VER < 1700)
+#define inline	__inline
+#endif
 
-    #define __FASTCALL   __fastcall
-	#define ALIGNED_DECLARE( type, var, n ) __declspec(align(n)) type var
-	#define __align8(t,v) __declspec(align(8)) t v
-	#define __align16(t,v) __declspec(align(16)) t v
+#define __FASTCALL   __fastcall
+#define ALIGNED_DECLARE( type, var, n ) __declspec(align(n)) type var
+#define __align8(t,v) __declspec(align(8)) t v
+#define __align16(t,v) __declspec(align(16)) t v
 #elif defined(__GNUC__)
 #if !defined(MAC_POWERPC)
-    #define __FASTCALL    __attribute__ ((fastcall))
+#define __FASTCALL    __attribute__ ((fastcall))
 #else
-	#define __FASTCALL	// mean NULL for mac ppc
+#define __FASTCALL	// mean NULL for mac ppc
 #endif//MAC_POWERPC    
-	#define ALIGNED_DECLARE( type, var, n ) type var __attribute__((aligned(n)))
-	#define __align8(t,v) t v __attribute__ ((aligned (8)))
-	#define __align16(t,v) t v __attribute__ ((aligned (16)))
+#define ALIGNED_DECLARE( type, var, n ) type var __attribute__((aligned(n)))
+#define __align8(t,v) t v __attribute__ ((aligned (8)))
+#define __align16(t,v) t v __attribute__ ((aligned (16)))
 #endif//_MSC_VER
 
 #if defined(_MACH_PLATFORM) || defined(__GNUC__)
 #define ALIGNED_DECLARE_MATRIX_2D(name,sizex,sizey,type,alignment) \
-	type name[(sizex)*(sizey)] __attribute__((aligned(alignment)))	
+	type name[(sizex)*(sizey)] __attribute__((aligned(alignment)))
 #else //_MSC_VER <= 1200
 #define ALIGNED_DECLARE_MATRIX_2D(name,sizex,sizey,type,alignment) \
 __declspec(align(alignment)) type name[(sizex)*(sizey)]
@@ -102,7 +102,7 @@ __declspec(align(alignment)) type name[(sizex)*(sizey)]
 
 #if defined(_MACH_PLATFORM) || defined(__GNUC__)
 #define ALIGNED_DECLARE_MATRIX_1D(name,size,type,alignment) \
-	type name[size] __attribute__((aligned(alignment)))	
+	type name[size] __attribute__((aligned(alignment)))
 #else //_MSC_VER <= 1200
 #define ALIGNED_DECLARE_MATRIX_1D(name,size,type,alignment) \
 	__declspec(align(alignment)) type name[(size)]
@@ -136,15 +136,13 @@ __declspec(align(alignment)) type name[(sizex)*(sizey)]
 #define WELS_ROUND(x)	((int32_t)((x)+0.5f+EPSN))
 #endif//WELS_ROUND
 
-static inline int32_t WELS_CEIL(float v)
-{
-	const int32_t n = (int32_t)v;	// floor value
-	return ((v>EPSN+n) ? (1+n) : n);	// (int32_t)ceil(v);
+static inline int32_t WELS_CEIL (float v) {
+const int32_t n = (int32_t)v;	// floor value
+return ((v > EPSN + n) ? (1 + n) : n);	// (int32_t)ceil(v);
 }
 
-static inline int32_t WELS_FLOOR(float v)
-{
-	return (int32_t)v;		
+static inline int32_t WELS_FLOOR (float v) {
+return (int32_t)v;
 }
 
 
@@ -152,59 +150,51 @@ static inline int32_t WELS_FLOOR(float v)
     iC = iA + iB + 1;                           \
 	iC >>= (int32_t)( iA != -1 && iB != -1);    \
 	iC += (iA == -1 && iB == -1);               \
-}    
+}
 
 /*
  * log base 2 of v and ceil/floor extension
  */
 
-static inline int32_t WELS_CEILLOG2( uint32_t v )
-{
-	int32_t r = 0;
-	--v;
-	while( v > 0 )
-	{
-		++r;
-		v >>= 1;
-	}
-	return r;
+static inline int32_t WELS_CEILLOG2 (uint32_t v) {
+int32_t r = 0;
+--v;
+while (v > 0) {
+  ++r;
+  v >>= 1;
+}
+return r;
 }
 
-static inline int32_t WELS_FLOORLOG2( uint32_t v )
-{	
-	int32_t r = 0;
-	while( v > 1 )
-	{
-		++r;
-		v >>= 1;
-	}
-	return r;
+static inline int32_t WELS_FLOORLOG2 (uint32_t v) {
+int32_t r = 0;
+while (v > 1) {
+  ++r;
+  v >>= 1;
+}
+return r;
 }
 
-static inline int32_t WELS_LOG2( uint32_t v )
-{	
-	int32_t r = 0;
-	while (v >>= 1)
-	{
-  		++r;
-	}
-	return r;
+static inline int32_t WELS_LOG2 (uint32_t v) {
+int32_t r = 0;
+while (v >>= 1) {
+  ++r;
+}
+return r;
 
 }
 
-static inline BOOL_T WELS_POWER2_IF( uint32_t v )
-{
-	return ( v && !(v & (v - 1)) );
+static inline BOOL_T WELS_POWER2_IF (uint32_t v) {
+return (v && ! (v & (v - 1)));
 }
 
-static inline int32_t WELS_MEDIAN(int32_t x,  int32_t y, int32_t z)
-{
-	int32_t t = (x-y)&((x-y)>>31);
-	x -= t;
-	y += t;
-	y -= (y-z)&((y-z)>>31);
-	y += (x-y)&((x-y)>>31);
-	return y;
+static inline int32_t WELS_MEDIAN (int32_t x,  int32_t y, int32_t z) {
+int32_t t = (x - y) & ((x - y) >> 31);
+x -= t;
+y += t;
+y -= (y - z) & ((y - z) >> 31);
+y += (x - y) & ((x - y) >> 31);
+return y;
 }
 
 #ifndef BUTTERFLY1x2
@@ -229,17 +219,16 @@ static inline int32_t WELS_MEDIAN(int32_t x,  int32_t y, int32_t z)
 //#endif// NEG_NUM
 
 #ifndef WELS_CLIP1
-#define WELS_CLIP1(x) (((x) & ~255) ? (-(x) >> 31) : (x)) 
+#define WELS_CLIP1(x) (((x) & ~255) ? (-(x) >> 31) : (x))
 #endif//WELS_CLIP1
 
 #ifndef WELS_SIGN
 #define WELS_SIGN(a) ((int32_t)(a) >> 31)	// General: (a)>>(sizeof(int)*CHAR_BIT-1), CHAR_BIT= the number of bits per byte (normally 8)
 #endif //WELS_SIGN
 
-static inline int32_t WELS_ABS(int32_t a)
-{
-	const int32_t sign = WELS_SIGN(a);
-	return ((a + sign) ^ sign);
+static inline int32_t WELS_ABS (int32_t a) {
+const int32_t sign = WELS_SIGN (a);
+return ((a + sign) ^ sign);
 }
 
 // wels_tostring
@@ -257,18 +246,17 @@ static inline int32_t WELS_ABS(int32_t a)
 // Bitwise routines
 // n: ulong
 // b: bit order
-static inline bool_t BITWISE_ENABLED(const uint32_t n, const uint8_t b)
-{
-	const uint8_t bit = (b&0x1f);	// maximal bit position 31 for uint32_t 4 bytes
+static inline bool_t BITWISE_ENABLED (const uint32_t n, const uint8_t b) {
+const uint8_t bit = (b & 0x1f);	// maximal bit position 31 for uint32_t 4 bytes
 #if defined(WORDS_BIGENDIAN)
-	/* 
-	 * 31 .. 24, 23 .. 16, 15 .. 8, 7 .. 0
-	 * 7 .. 0, 15 .. 8, 23 .. 16, 31 .. 24
-	 */	
-	const uint8_t map = 24+((bit&7)<<1)-bit;	// BIG_ENDIAN map
-	return (bool_t)((n & (1<<map)) >> map);	// BIG_ENDIAN
+/*
+ * 31 .. 24, 23 .. 16, 15 .. 8, 7 .. 0
+ * 7 .. 0, 15 .. 8, 23 .. 16, 31 .. 24
+ */
+const uint8_t map = 24 + ((bit & 7) << 1) - bit;	// BIG_ENDIAN map
+return (bool_t) ((n & (1 << map)) >> map);	// BIG_ENDIAN
 #else
-	return ((n & (1<<bit)) >> bit)?true:false;	// LITTLE_ENDIAN
+return ((n & (1 << bit)) >> bit) ? true : false;	// LITTLE_ENDIAN
 #endif//WORDS_BIGENDIAN
 }
 
@@ -278,35 +266,31 @@ static inline bool_t BITWISE_ENABLED(const uint32_t n, const uint8_t b)
 
 #ifdef    WORDS_BIGENDIAN
 
-static inline uint32_t ENDIAN_FIX(uint32_t x)
-{
-    return x;
+static inline uint32_t ENDIAN_FIX (uint32_t x) {
+return x;
 }
 
-#else 
+#else
 
 
-#ifdef    _MSC_VER
-static inline uint32_t ENDIAN_FIX(uint32_t x)
-{
-    __asm
-    {
-        mov   eax,  x
-		bswap   eax
-		mov   x,    eax
-    }
-    return x;
+#if defined(WIN32) && !defined(WIN64)
+static inline uint32_t ENDIAN_FIX (uint32_t x) {
+__asm {
+  mov   eax,  x
+  bswap   eax
+  mov   x,    eax
+}
+return x;
 }
 #else  // GCC
-static inline uint32_t ENDIAN_FIX(uint32_t x)
-{
+static inline uint32_t ENDIAN_FIX (uint32_t x) {
 #ifdef X86_ARCH
-	__asm__ __volatile__("bswap %0":"+r"(x));
+__asm__ __volatile__ ("bswap %0":"+r" (x));
 #else
-    x = ((x & 0xff000000)>> 24) | ((x & 0xff0000) >> 8) |
-        ((x & 0xff00) << 8) | ((x&0xff) << 24);
+x = ((x & 0xff000000) >> 24) | ((x & 0xff0000) >> 8) |
+    ((x & 0xff00) << 8) | ((x & 0xff) << 24);
 #endif
-	return x;
+return x;
 }
 
 
@@ -333,7 +317,7 @@ static inline uint32_t ENDIAN_FIX(uint32_t x)
 #endif//#if WELS_VERIFY_RETURN_IF
 
 /*
- *	Description: to check variable validation and return the specified result 
+ *	Description: to check variable validation and return the specified result
  *		with correspoinding process advance.
  *	 result:	value to be return
  *	 case_if:	negative condition to be verified
@@ -392,7 +376,7 @@ static inline uint32_t ENDIAN_FIX(uint32_t x)
  * Description: to safe free an array ptr with free function pointer
  *	arr:		pointer to an array, something like "**p";
  *	num:		number of elements in array
- *  free_fn:	free function pointer	
+ *  free_fn:	free function pointer
  */
 #ifndef WELS_SAFE_FREE_ARR
 #define WELS_SAFE_FREE_ARR(arr, num, free_fn) \

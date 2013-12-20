@@ -34,9 +34,9 @@
  * \brief	promised alignment of array pData declaration on stack
  *			multidimensional array can be extended if applicable need
  *
- * \date		8/8/2011 Created 
+ * \date		8/8/2011 Created
  *			8/12/2011 functionality implementation for multidimensional array
- *			8/26/2011 better solution with reducing extra memory used, 
+ *			8/26/2011 better solution with reducing extra memory used,
  *						stack size is adaptively reduced by _tp & _al
  *
  *************************************************************************************
@@ -67,7 +67,7 @@
 assert( ((_al) && !((_al) & ((_al) - 1))) && ((_al) >= sizeof(_tp)) ); /*_al should be power-of-2 and >= sizeof(_tp)*/\
 _tp _nm ## _tEmP[(_sz)+(_al)/sizeof(_tp)-1]; \
 _tp *_nm = _nm ## _tEmP + ((_al)/sizeof(_tp)-1); \
-_nm -= (((int32_t)_nm & ((_al)-1))/sizeof(_tp));
+_nm -= (((uintptr_t)_nm & ((_al)-1))/sizeof(_tp));
 
 /*
  * ENFORCE_STACK_ALIGN_2D: force 2 dimension local pData aligned in stack
@@ -90,7 +90,7 @@ _nm -= (((int32_t)_nm & ((_al)-1))/sizeof(_tp));
 assert( ((_al) && !((_al) & ((_al) - 1))) && ((_al) >= sizeof(_tp)) ); /*_al should be power-of-2 and >= sizeof(_tp)*/\
 _tp _nm ## _tEmP[(_cx)*(_cy)+(_al)/sizeof(_tp)-1]; \
 _tp *_nm ## _tEmP_al = _nm ## _tEmP + ((_al)/sizeof(_tp)-1); \
-_nm ## _tEmP_al -= (((int32_t)_nm ## _tEmP_al & ((_al)-1))/sizeof(_tp)); \
+_nm ## _tEmP_al -= (((uintptr_t)_nm ## _tEmP_al & ((_al)-1))/sizeof(_tp)); \
 _tp (*_nm)[(_cy)] = (_tp (*)[(_cy)])_nm ## _tEmP_al;
 
 /*
