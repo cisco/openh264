@@ -48,11 +48,14 @@
 #include <sys/timeb.h>
 #ifndef _MSC_VER
 #include <sys/time.h>
-#endif
+#ifndef HAVE_STRNLEN
+#define strnlen(a,b) strlen(a)
+#endif //!HAVE_STRNLEN
+#endif //!_MSC_VER
 #else
 #include <sys/time.h>
 #include <sys/timeb.h>
-#endif
+#endif //_WIN32
 
 #include "utils.h"
 #include "macros.h"
