@@ -47,40 +47,42 @@ Processor Support
 - ARMv7 optionally with NEON (initial release does not include this target, will follow later)
 - Any architecture using C/C++ fallback functions
 
-Using the Library
+Building the Library
 -----------------------
-Linux makefiles for 32 bit builds are available:
-    : build the decoder library and executable via codec/build/linux/dec/makefile
-    : build the encoder library and executable via codec/build/linux/enc/makefile
-    : build the encoder shared library via processing/build/linux/makefile
+NASM needed to be installed for assembly code: workable version 2.07 or above, nasm can downloaded from http://www.nasm.us/
 
+For Windows Builds
+-----------------------
 Windows Visual Studio 2008/2010/2012 projects are available:
     : build the decoder via the Visual Studio projects in codec/build/win32/dec
     : build the encoder via the Visual Studio projects in codec/build/win32/enc
     : build the encoder shared library via the Visual Studio projects in processing/build/win32/
 
-NASM needed to be installed for assembly code: workable version 2.07 or above, nasm can downloaded from http://www.nasm.us/
+The command line programs will be bin/win32/decConsoled.exe and bin/win32/encConsole.exe.
 
-API details to be provided later.
-
-Using the Test App
--------------------------
-Linux shell scripts to build the test apps:
-    : build via testbin/AutoBuild_Linux.sh
-    : clean via testbin/AutoClean_Linux.sh
-
-Windows batch files to build the test apps:
+Windows batch files also exist for building:
     : Visual Studio 2008 use testbin/AutoBuild_Windows_VS2008.bat
     : Visual Studio 2010 use testbin/AutoBuild_Windows_VS2010.bat
     : Visual Studio 2012 use testbin/AutoBuild_Windows_VS2012.bat
 
+For Other Platforms
+------------------------
+From the main project directory:
+'make' for 32bit builds
+'make ENABLE64BIT=Yes' for 64bit builds
+
+The command line programs h264enc and h264dec will appear in the main project directory.
+
+A shell script to run the command-line apps is in testbin/CmdLineExample.sh
+
 Usage information can be found in testbin/CmdLineReadMe
-Command line options and details to be provided later.
 
 Using the Source
 -----------------------
 codec - encoder, decoder, console (test app), build (makefile, vcproj)
 processing - raw pixel processing (used by encoder)
+build - scripts for Makefile build system.
+test - GTest unittest files.
 testbin - autobuild scripts, test app config files, yuv test files
 bin - binaries for library and test app
 
