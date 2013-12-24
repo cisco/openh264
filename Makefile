@@ -39,7 +39,7 @@ ASMFLAGS += -DNO_DYNAMIC_VP -DNOPREFIX
 
 
 #### No user-serviceable parts below this line
-INCLUDES = -Icodec/api/svc  -Icodec/common -Igtest/include
+INCLUDES = -Icodec/api/svc  -Icodec/common -Igtest/include -Icryptopp
 ASM_INCLUDES = -Iprocessing/src/asm/
 
 COMMON_INCLUDES = \
@@ -64,7 +64,7 @@ H264DEC_LDFLAGS = -L. -ldecoder -lcommon
 H264ENC_INCLUDES = $(ENCODER_INCLUDES) -Icodec/console/enc/inc
 H264ENC_LDFLAGS = -L. -lencoder -lprocessing -lcommon
 
-CODEC_UNITTEST_LDFLAGS = -L. -lgtest -ldecoder -lcommon
+CODEC_UNITTEST_LDFLAGS = -L. -lgtest -ldecoder -lcommon -lcryptopp
 
 .PHONY: test
 
@@ -76,7 +76,9 @@ clean:
 
 gtest-bootstrap:
 	svn co https://googletest.googlecode.com/svn/trunk/ gtest
-
+cryptopp-bootstrap:
+	svn checkout https://svn.code.sf.net/p/cryptopp/code/trunk/c5 cryptopp
+	sh -c "cd cryptopp; make static; cp libcryptopp.a ..; cd .."
 test:
 	./codec_unittest
 
