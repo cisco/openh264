@@ -41,7 +41,7 @@ ASMFLAGS += -DNO_DYNAMIC_VP -DNOPREFIX
 
 
 #### No user-serviceable parts below this line
-INCLUDES = -Icodec/api/svc  -Icodec/common -Igtest/include -Icryptopp
+INCLUDES = -Icodec/api/svc  -Icodec/common  -Igtest/include
 ASM_INCLUDES = -Iprocessing/src/asm/
 
 COMMON_INCLUDES = \
@@ -65,7 +65,7 @@ H264DEC_LDFLAGS = -L. -ldecoder -lcommon
 
 H264ENC_INCLUDES = $(ENCODER_INCLUDES) -Icodec/console/enc/inc
 H264ENC_LDFLAGS = -L. -lencoder -lprocessing -lcommon
-
+CODEC_UNITTEST_INCLUDES =  -Icryptopp
 CODEC_UNITTEST_LDFLAGS = -L. -lgtest -ldecoder -lcommon -lcryptopp
 
 .PHONY: test
