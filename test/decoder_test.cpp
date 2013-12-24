@@ -4,6 +4,7 @@
 #include <tchar.h>
 #else
 #include <string.h>
+#include <stdint.h>
 #endif
 #include <stdio.h>
 #include <stdlib.h>
