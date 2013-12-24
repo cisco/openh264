@@ -23,9 +23,11 @@ endif
 ifeq ($(ENABLE64BIT), Yes)
 CFLAGS += -m64
 LDFLAGS += -m64
+X86 = g++ -m64
 else
 CFLAGS += -m32
 LDFLAGS += -m32
+X86 = g++ -m32
 endif
 include build/platform-$(UNAME).mk
 
@@ -78,7 +80,7 @@ gtest-bootstrap:
 	svn co https://googletest.googlecode.com/svn/trunk/ gtest
 cryptopp-bootstrap:
 	svn checkout https://svn.code.sf.net/p/cryptopp/code/trunk/c5 cryptopp
-	sh -c "cd cryptopp; make static; cp libcryptopp.a ..; cd .."
+	sh -c 'cd cryptopp; make static CXX="$(X86)"; cp libcryptopp.a ..;make clean; cd ..'
 test:
 	./codec_unittest
 
