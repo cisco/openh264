@@ -37,7 +37,7 @@ endif
 
 CFLAGS += -DNO_DYNAMIC_VP -DHAVE_CACHE_LINE_ALIGN
 LDFLAGS +=
-ASMFLAGS += -DNO_DYNAMIC_VP -DNOPREFIX
+ASMFLAGS += -DNO_DYNAMIC_VP -DPREFIX
 
 
 #### No user-serviceable parts below this line
