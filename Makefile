@@ -80,7 +80,6 @@ gtest-bootstrap:
 	svn co https://googletest.googlecode.com/svn/trunk/ gtest
 cryptopp-bootstrap:
 	svn checkout https://svn.code.sf.net/p/cryptopp/code/trunk/c5 cryptopp
-	sh -c 'cd cryptopp; make static CXX="$(X86)"; cp libcryptopp.a ..;make clean; cd ..'
 test:
 	./codec_unittest
 
@@ -93,6 +92,7 @@ include codec/console/enc/targets.mk
 
 ifeq ($(HAVE_GTEST),Yes)
 include build/gtest-targets.mk
+include build/cryptopp-targets.mk
 include test/targets.mk
 endif
 
