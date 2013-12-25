@@ -35,12 +35,12 @@ class DecoderTest : public ::testing::Test {
     rv = decoder_->Initialize (&sDecParam, INIT_TYPE_PARAMETER_BASED);
     ASSERT_EQ (0, rv);
   }
- // decode a bitstream @bitstream and compute 
- // the SHA1 hash of the reconstruction YUV file
  void updateHash(CryptoPP::SHA1 & hash, uint8_t *buf, int width, int height, int stride) {
     for(int i = 0; i < height; i++)
       hash.Update(buf + i * stride, width);
  }
+ // decode a bitstream @bitstream and compute 
+ // the SHA1 hash of the reconstruction YUV file
  void DecodeHash(const char* bitstream, unsigned char* md) {
   FILE* pH264File	  = NULL;
   int64_t iStart = 0, iEnd = 0, iTotal = 0;
