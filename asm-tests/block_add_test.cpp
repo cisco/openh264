@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <stdlib.h>
+#include <stdint.h>
 extern "C" void WelsResBlockZero16x16_sse2(int16_t* pBlock, int32_t iStride);
 TEST(block_add, WelsResBlockZero16x16_sse2) {
   const int32_t iStride = 64;

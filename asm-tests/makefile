@@ -5,22 +5,38 @@ BINDIR    = ../../bin
 OBJDIR    = .
 SRCDIRS  = .
 
-
-
+SYSTEM = $(shell uname)
 CC        = $(shell which gcc)
 AS        = $(shell which nasm)
 GCC       = gcc 
-LDFLAGS   = -lstdc++ -ldl
+LDFLAGS   = -lstdc++ -ldl -lpthread
 ifeq ($(ENABLE64BIT), Yes)
 GCC += -m64
-ASMFLAGS = -f macho64 -DUNIX64 -DPREFIX
+ASMFLAGS = -DUNIX64
 LDFLAGS += libgtest_64.a
+
+ifeq ($(SYSTEM), Darwin)
+ASMFLAGS += -f macho64
+else #Linux
+ASMFLAGS += -f elf64
+endif
+
 else
 GCC += -m32
-ASMFLAGS = -f macho32  -DX86_32 -DPREFIX
+ASMFLAGS =  -DX86_32 
+
+ifeq ($(SYSTEM), Darwin)
+ASMFLAGS += -f macho32
+else # Linux
+ASMFLAGS += -f elf
+endif
+
 LDFLAGS += libgtest_32.a
 endif
 
+ifeq ($(SYSTEM), Darwin)
+ASMFLAGS += -DPREFIX
+endif
 CPPFLAGS  = -Wall -g -O3 -fpic -I ../gtest/include
 ifeq ($(NASM), Yes)
 CPPFLAGS += -DX86_ASM
@@ -69,7 +85,7 @@ objs:$(OBJS)
 	$(COMPILE.asm) $< -o $@
 
 $(TARGET):$(OBJS)
-	$(LINK) $(OBJS) -o $@
+	$(GCC) -o $@ $(OBJS) $(LDFLAGS)
 
 clean:
 	rm -f $(OBJS) $(TARGET)
