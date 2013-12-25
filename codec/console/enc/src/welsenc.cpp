@@ -1088,6 +1088,11 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   sSvcParam.iActualPicHeight =
     sSvcParam.SUsedPicRect.iHeight = sSvcParam.sDependencyLayers[sSvcParam.iNumDependencyLayer - 1].iFrameHeight;
 
+  sSvcParam.sDependencyLayers[sSvcParam.iNumDependencyLayer - 1].iFrameWidth =
+    WELS_ALIGN(sSvcParam.sDependencyLayers[sSvcParam.iNumDependencyLayer - 1].iActualWidth, MB_WIDTH_LUMA);
+  sSvcParam.sDependencyLayers[sSvcParam.iNumDependencyLayer - 1].iFrameHeight =
+    WELS_ALIGN(sSvcParam.sDependencyLayers[sSvcParam.iNumDependencyLayer - 1].iActualHeight, MB_HEIGHT_LUMA);
+
   if (cmResultSuccess != pPtrEnc->Initialize ((void*)&sSvcParam, INIT_TYPE_CONFIG_BASED)) {	// SVC encoder initialization
     fprintf (stderr, "SVC encoder Initialize failed\n");
     iRet = 1;
@@ -1117,7 +1122,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   pSrcPicList = new SSourcePicture * [sSvcParam.iNumDependencyLayer];
   while (iDlayerIdx < sSvcParam.iNumDependencyLayer) {
     SDLayerParam* pDLayer = &sSvcParam.sDependencyLayers[iDlayerIdx];
-    const int kiPicResSize = pDLayer->iFrameWidth * pDLayer->iFrameHeight;
+    const int kiPicResSize = pDLayer->iActualWidth * pDLayer->iActualHeight;
     SSourcePicture* pSrcPic = new SSourcePicture;
     if (pSrcPic == NULL) {
       iRet = 1;
@@ -1132,10 +1137,10 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     }
 
     pSrcPic->iColorFormat = videoFormatI420;
-    pSrcPic->iPicWidth = pDLayer->iFrameWidth;
-    pSrcPic->iPicHeight = pDLayer->iFrameHeight;
-    pSrcPic->iStride[0] = pDLayer->iFrameWidth;
-    pSrcPic->iStride[1] = pSrcPic->iStride[2] = pDLayer->iFrameWidth >> 1;
+    pSrcPic->iPicWidth = pDLayer->iActualWidth;
+    pSrcPic->iPicHeight = pDLayer->iActualHeight;
+    pSrcPic->iStride[0] = pDLayer->iActualWidth;
+    pSrcPic->iStride[1] = pSrcPic->iStride[2] = pDLayer->iActualWidth >> 1;
 
     pSrcPicList[iDlayerIdx] = pSrcPic;
 
@@ -1173,7 +1178,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     int  nSpatialLayerNum = 0;
     while (iDlayerIdx < sSvcParam.iNumDependencyLayer) {
       SDLayerParam* pDLayer = &sSvcParam.sDependencyLayers[iDlayerIdx];
-      const int kiPicResSize = ((pDLayer->iFrameWidth * pDLayer->iFrameHeight) * 3) >> 1;
+      const int kiPicResSize = ((pDLayer->iActualWidth * pDLayer->iActualHeight) * 3) >> 1;
       uint32_t uiSkipIdx = (1 << pDLayer->iTemporalResolution);
 
       bool_t bCanBeRead = false;
@@ -1186,15 +1191,15 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
 
           pSrcPicList[nSpatialLayerNum]->pData[0] = pYUV[iDlayerIdx];
           pSrcPicList[nSpatialLayerNum]->pData[1] = pSrcPicList[nSpatialLayerNum]->pData[0] +
-              (pDLayer->iFrameWidth * pDLayer->iFrameHeight);
+              (pDLayer->iActualWidth * pDLayer->iActualHeight);
           pSrcPicList[nSpatialLayerNum]->pData[2] = pSrcPicList[nSpatialLayerNum]->pData[1] +
-              ((pDLayer->iFrameWidth * pDLayer->iFrameHeight) >> 2);
+              ((pDLayer->iActualWidth * pDLayer->iActualHeight) >> 2);
 
-          pSrcPicList[nSpatialLayerNum]->iPicWidth = pDLayer->iFrameWidth;
-          pSrcPicList[nSpatialLayerNum]->iPicHeight = pDLayer->iFrameHeight;
-          pSrcPicList[nSpatialLayerNum]->iStride[0] = pDLayer->iFrameWidth;
+          pSrcPicList[nSpatialLayerNum]->iPicWidth = pDLayer->iActualWidth;
+          pSrcPicList[nSpatialLayerNum]->iPicHeight = pDLayer->iActualHeight;
+          pSrcPicList[nSpatialLayerNum]->iStride[0] = pDLayer->iActualWidth;
           pSrcPicList[nSpatialLayerNum]->iStride[1] = pSrcPicList[nSpatialLayerNum]->iStride[2]
-              = pDLayer->iFrameWidth >> 1;
+              = pDLayer->iActualWidth >> 1;
 
           ++ nSpatialLayerNum;
         } else {	// file end while reading
