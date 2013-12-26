@@ -234,9 +234,9 @@ WelsHadamardQuant2x2_mmx:
 
 		;quant_2x2_dc
 		;mov			ax,				[mf]
-		MMX_Copy4Times	mm3,		r2
+		MMX_Copy4Times	mm3,		r2d
 		;mov			cx,				[ff]
-		MMX_Copy4Times	mm2,		r1
+		MMX_Copy4Times	mm2,		r1d
 		MMX_Quant4		mm1,	mm0,	mm2,	mm3
 
 		; store dct_2x2
@@ -295,9 +295,9 @@ WelsHadamardQuant2x2Skip_mmx:
 
 		;quant_2x2_dc
 		;mov			ax,				[mf]
-		MMX_Copy4Times	mm3,		r2
+		MMX_Copy4Times	mm3,		r2d
 		;mov			cx,				[ff]
-		MMX_Copy4Times	mm2,		r1
+		MMX_Copy4Times	mm2,		r1d
 		MMX_Quant4		mm1,	mm0,	mm2,	mm3
 
 		; pNonZeroCount of dct_2x2
