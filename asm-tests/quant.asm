@@ -42,7 +42,6 @@
 
 %include "asm_inc.asm"
 
-BITS 32
 
 SECTION .text
 ;************************************************
@@ -90,8 +89,8 @@ WelsQuant4x4_sse2:
                 LOAD_3_PARA
 		;mov		eax,  [ff]
 		;mov		ecx,  [mf]
-		MOVDQ	xmm2, [r1]
-		MOVDQ	xmm3, [r2]
+		movdqa	xmm2, [r1]
+		movdqa	xmm3, [r2]
 
 		;mov		edx,  [pDct]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0]
@@ -108,10 +107,10 @@ WelsQuant4x4Dc_sse2:
  		%assign push_num 0
 		LOAD_3_PARA
 		;mov		ax,		[mf]
-		SSE2_Copy8Times xmm3, r2
+		SSE2_Copy8Times xmm3, r2d
 
 		;mov		cx, [ff]
-		SSE2_Copy8Times xmm2, r1
+		SSE2_Copy8Times xmm2, r1d
 
 		;mov		edx,  [pDct]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0]
@@ -179,8 +178,8 @@ WelsQuantFour4x4Max_sse2:
 		punpckhqdq	xmm0, xmm1
 		pmaxsw	xmm0, xmm1
 
-		mov		r0,  [r3]
-		movq	[r0], xmm0
+		;mov		r0,  [r3]
+		movq	[r3], xmm0
 		LOAD_4_PARA_POP
 		ret
 
@@ -211,20 +210,15 @@ SECTION .text
 WELS_EXTERN WelsHadamardQuant2x2_mmx
 align 16
 WelsHadamardQuant2x2_mmx:
-
-		mov			eax,			[pDct]
-		movd		mm0,			[eax]
-		movd		mm1,			[eax + 0x20]
+		%assign push_num 0
+		LOAD_5_PARA
+		;mov			eax,			[pDct]
+		movd		mm0,			[r0]
+		movd		mm1,			[r0 + 0x20]
 		punpcklwd	mm0,			mm1
-		movd		mm3,			[eax + 0x40]
-		movd		mm1,			[eax + 0x60]
+		movd		mm3,			[r0 + 0x40]
+		movd		mm1,			[r0 + 0x60]
 		punpcklwd	mm3,			mm1
-
-		mov			cx,				0
-		mov			[eax],			cx
-		mov			[eax + 0x20],	cx
-		mov			[eax + 0x40],	cx
-		mov			[eax + 0x60],	cx
 
 		;hdm_2x2,	mm0 = dct0 dct1, mm3 = dct2 dct3
 		movq		mm5,			mm3
@@ -239,17 +233,17 @@ WelsHadamardQuant2x2_mmx:
 		punpcklwd	mm1,			mm3
 
 		;quant_2x2_dc
-		mov			ax,				[mf]
-		MMX_Copy4Times	mm3,		eax
-		mov			cx,				[ff]
-		MMX_Copy4Times	mm2,		ecx
+		;mov			ax,				[mf]
+		MMX_Copy4Times	mm3,		r2
+		;mov			cx,				[ff]
+		MMX_Copy4Times	mm2,		r1
 		MMX_Quant4		mm1,	mm0,	mm2,	mm3
 
 		; store dct_2x2
-		mov			edx,			[dct2x2]
-		movq		[edx],			mm1
-		mov			ecx,			[iChromaDc]
-		movq		[ecx],			mm1
+		;mov			edx,			[dct2x2]
+		movq		[r3],			mm1
+		;mov			ecx,			[iChromaDc]
+		movq		[r4],			mm1
 
 		; pNonZeroCount of dct_2x2
 		pcmpeqb		mm2,			mm2		; mm2 = FF
@@ -258,9 +252,17 @@ WelsHadamardQuant2x2_mmx:
 		pcmpeqb		mm1,			mm3		; set FF if equal, 0 if not equal
 		psubsb		mm1,			mm2		; set 0 if equal, 1 if not equal
 		psadbw		mm1,			mm3		;
-		movd		eax,			mm1
+		mov			r1w,				0
+		mov			[r0],			r1w
+		mov			[r0 + 0x20],	r1w
+		mov			[r0 + 0x40],	r1w
+		mov			[r0 + 0x60],	r1w
+
+
+		movd		retrd,		mm1
 
 		WELSEMMS
+		LOAD_5_PARA_POP
 		ret
 
 ;***********************************************************************
@@ -269,13 +271,14 @@ WelsHadamardQuant2x2_mmx:
 WELS_EXTERN WelsHadamardQuant2x2Skip_mmx
 align 16
 WelsHadamardQuant2x2Skip_mmx:
-
-		mov			eax,			[pDct]
-		movd		mm0,			[eax]
-		movd		mm1,			[eax + 0x20]
+		%assign push_num 0
+		LOAD_3_PARA
+		;mov			eax,			[pDct]
+		movd		mm0,			[r0]
+		movd		mm1,			[r0 + 0x20]
 		punpcklwd	mm0,			mm1
-		movd		mm3,			[eax + 0x40]
-		movd		mm1,			[eax + 0x60]
+		movd		mm3,			[r0 + 0x40]
+		movd		mm1,			[r0 + 0x60]
 		punpcklwd	mm3,			mm1
 
 		;hdm_2x2,	mm0 = dct0 dct1, mm3 = dct2 dct3
@@ -291,10 +294,10 @@ WelsHadamardQuant2x2Skip_mmx:
 		punpcklwd	mm1,			mm3
 
 		;quant_2x2_dc
-		mov			ax,				[mf]
-		MMX_Copy4Times	mm3,		eax
-		mov			cx,				[ff]
-		MMX_Copy4Times	mm2,		ecx
+		;mov			ax,				[mf]
+		MMX_Copy4Times	mm3,		r2
+		;mov			cx,				[ff]
+		MMX_Copy4Times	mm2,		r1
 		MMX_Quant4		mm1,	mm0,	mm2,	mm3
 
 		; pNonZeroCount of dct_2x2
@@ -304,7 +307,7 @@ WelsHadamardQuant2x2Skip_mmx:
 		pcmpeqb		mm1,			mm3		; set FF if equal, 0 if not equal
 		psubsb		mm1,			mm2		; set 0 if equal, 1 if not equal
 		psadbw		mm1,			mm3		;
-		movd		eax,			mm1
+		movd		retrd,			mm1
 
 		WELSEMMS
 		ret
@@ -368,14 +371,16 @@ WelsDequantFour4x4_sse2:
 WELS_EXTERN WelsDequantIHadamard4x4_sse2
 align 16
 WelsDequantIHadamard4x4_sse2:
-		mov			eax,			[esp + 4]
-		mov			cx,				[esp + 8]
+		%assign push_num 0
+		LOAD_2_PARA
+		;mov			eax,			[esp + 4]
+		;mov			cx,				[esp + 8]
 
 		; WelsDequantLumaDc4x4
-		SSE2_Copy8Times	xmm1,		ecx
+		SSE2_Copy8Times	xmm1,		r1d
 		;psrlw		xmm1,		2		; for the (>>2) in ihdm
-		MOVDQ		xmm0,		[eax]
-		MOVDQ		xmm2,		[eax+0x10]
+		MOVDQ		xmm0,		[r0]
+		MOVDQ		xmm2,		[r0+0x10]
 		pmullw		xmm0,		xmm1
 		pmullw		xmm2,		xmm1
 
@@ -398,8 +403,8 @@ WelsDequantIHadamard4x4_sse2:
 		SSE2_TransTwo4x4W	xmm0, xmm1, xmm4, xmm2, xmm3
 
 		punpcklqdq	xmm0,		xmm1
-		MOVDQ		[eax],		xmm0
+		MOVDQ		[r0],		xmm0
 
 		punpcklqdq	xmm2,		xmm3
-		MOVDQ		[eax+16],	xmm2
+		MOVDQ		[r0+16],	xmm2
 		ret

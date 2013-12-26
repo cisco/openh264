@@ -55,17 +55,12 @@
 	%define WELSEMMS
 %endif
 
+
 ;***********************************************************************
 ; Macros
 ;***********************************************************************
 
 DEFAULT REL
-
-%ifndef WIN64
-	%ifndef UNIX64
-		%define X86_32
-	%endif
-%endif
 
 %ifdef WIN64 ; Windows x64 ;************************************
 
@@ -98,7 +93,20 @@ BITS 64
 %define r4d eax
 %define r5d r10d
 
-%define RETURN_VALUE rax
+%define r0w  cx
+%define r1w  dx
+%define r2w  r8w
+%define r3w  r9w
+
+%define r0b  cl
+%define r1b  dl
+%define r2b  r8l
+%define r3b  r9l
+
+%define  PUSHRFLAGS     pushfq
+%define  POPRFLAGS      popfq
+%define  retrq          rax
+%define  retrd          eax
 
 %elifdef UNIX64 ; Unix x64 ;************************************
 
@@ -131,7 +139,20 @@ BITS 64
 %define r4d r8d
 %define r5d r9d
 
-%define RETURN_VALUE rax
+%define r0w  di
+%define r1w  si
+%define r2w  dx
+%define r32  cx
+
+%define r0b  dil
+%define r1b  sil
+%define r2b  dl
+%define r3b  cl
+
+%define  PUSHRFLAGS     pushfq
+%define  POPRFLAGS      popfq
+%define  retrq          rax
+%define  retrd          eax 
 
 %elifdef X86_32 ; X86_32 ;************************************
 
@@ -164,141 +185,154 @@ BITS 32
 %define r4d esi
 %define r5d edi
 
-%define RETURN_VALUE eax
+%define r0w ax
+%define r1w cx
+%define r2w dx
+%define r3w bx
+
+%define r0b al
+%define r1b cl
+%define r2b dl
+%define r3b bl
+
+%define  PUSHRFLAGS     pushfd
+%define  POPRFLAGS      popfd
+%define  retrq          eax      ; 32 bit mode do not support 64 bits regesters
+%define  retrd          eax
 
 %endif
 
 %macro LOAD_PARA 2
-		mov %1, %2
+    mov %1, %2
 %endmacro
 
 %macro LOAD_1_PARA 0
-	%ifdef X86_32
-		mov r0, [esp + push_num*4 + 4]
-	%endif
+    %ifdef X86_32
+	mov r0, [esp + push_num*4 + 4]
+    %endif
 %endmacro
 
 %macro LOAD_2_PARA 0
-	%ifdef X86_32
-		mov r0, [esp + push_num*4 + 4]
-		mov r1, [esp + push_num*4 + 8]
-	%endif
+    %ifdef X86_32
+        mov r0, [esp + push_num*4 + 4]
+        mov r1, [esp + push_num*4 + 8]
+    %endif
 %endmacro
 
 %macro LOAD_3_PARA 0
-	%ifdef X86_32
-		mov r0, [esp + push_num*4 + 4]
-		mov r1, [esp + push_num*4 + 8]
-		mov r2, [esp + push_num*4 + 12]
-	%endif
+    %ifdef X86_32
+        mov r0, [esp + push_num*4 + 4]
+	mov r1, [esp + push_num*4 + 8]
+	mov r2, [esp + push_num*4 + 12]
+    %endif
 %endmacro
 
 %macro LOAD_4_PARA 0
-	%ifdef X86_32
-		push r3
-		%assign  push_num push_num+1	
-		mov r0, [esp + push_num*4 + 4]
-		mov r1, [esp + push_num*4 + 8]
-		mov r2, [esp + push_num*4 + 12]
-		mov r3, [esp + push_num*4 + 16]
-	%endif
+    %ifdef X86_32
+        push r3
+        %assign  push_num push_num+1	
+        mov r0, [esp + push_num*4 + 4]
+        mov r1, [esp + push_num*4 + 8]
+        mov r2, [esp + push_num*4 + 12]
+        mov r3, [esp + push_num*4 + 16]
+    %endif
 %endmacro
 
 %macro LOAD_5_PARA 0
-	%ifdef X86_32
-		push r3
-		push r4
-		%assign  push_num push_num+2	
-		mov r0, [esp + push_num*4 + 4]
-		mov r1, [esp + push_num*4 + 8]
-		mov r2, [esp + push_num*4 + 12]
-		mov r3, [esp + push_num*4 + 16]
-		mov r4, [esp + push_num*4 + 20]
-	%elifdef WIN64
-		mov r4, [rsp + push_num*8 + 40]
-	%endif
+    %ifdef X86_32
+        push r3
+        push r4
+        %assign  push_num push_num+2	
+        mov r0, [esp + push_num*4 + 4]
+        mov r1, [esp + push_num*4 + 8]
+        mov r2, [esp + push_num*4 + 12]
+        mov r3, [esp + push_num*4 + 16]
+        mov r4, [esp + push_num*4 + 20]
+    %elifdef WIN64
+        mov r4, [rsp + push_num*8 + 40]
+    %endif
 %endmacro
 
 %macro LOAD_6_PARA 0
-	%ifdef X86_32
-		push r3
-		push r4
-		push r5
-		%assign  push_num push_num+3	
-		mov r0, [esp + push_num*4 + 4]
-		mov r1, [esp + push_num*4 + 8]
-		mov r2, [esp + push_num*4 + 12]
-		mov r3, [esp + push_num*4 + 16]
-		mov r4, [esp + push_num*4 + 20]
-		mov r5, [esp + push_num*4 + 24]
-	%elifdef WIN64
-		mov r4, [rsp + push_num*8 + 40]
-		mov r5, [rsp + push_num*8 + 48]
-	%endif
+    %ifdef X86_32
+	push r3
+        push r4
+        push r5
+        %assign  push_num push_num+3	
+        mov r0, [esp + push_num*4 + 4]
+        mov r1, [esp + push_num*4 + 8]
+        mov r2, [esp + push_num*4 + 12]
+        mov r3, [esp + push_num*4 + 16]
+        mov r4, [esp + push_num*4 + 20]
+        mov r5, [esp + push_num*4 + 24]
+    %elifdef WIN64
+        mov r4, [rsp + push_num*8 + 40]
+        mov r5, [rsp + push_num*8 + 48]
+    %endif
 %endmacro
 
 %macro LOAD_7_PARA 0
-	%ifdef X86_32
-		push r3
-		push r4
-		push r5
-		push r6
-		%assign  push_num push_num+4	
-		mov r0, [esp + push_num*4 + 4]
-		mov r1, [esp + push_num*4 + 8]
-		mov r2, [esp + push_num*4 + 12]
-		mov r3, [esp + push_num*4 + 16]
-		mov r4, [esp + push_num*4 + 20]
-		mov r5, [esp + push_num*4 + 24]
-		mov r6, [esp + push_num*4 + 28]
-	%elifdef WIN64
-		mov r4, [rsp + push_num*8 + 40]
-		mov r5, [rsp + push_num*8 + 48]
-		mov r6, [rsp + push_num*8 + 56]
-	%elifdef UNIX64
-		mov r6, [rsp + push_num*8 + 8]
-	%endif
+    %ifdef X86_32
+        push r3
+        push r4
+        push r5
+        push r6
+        %assign  push_num push_num+4	
+        mov r0, [esp + push_num*4 + 4]
+        mov r1, [esp + push_num*4 + 8]
+        mov r2, [esp + push_num*4 + 12]
+        mov r3, [esp + push_num*4 + 16]
+        mov r4, [esp + push_num*4 + 20]
+        mov r5, [esp + push_num*4 + 24]
+        mov r6, [esp + push_num*4 + 28]
+    %elifdef WIN64
+        mov r4, [rsp + push_num*8 + 40]
+        mov r5, [rsp + push_num*8 + 48]
+        mov r6, [rsp + push_num*8 + 56]
+    %elifdef UNIX64
+        mov r6, [rsp + push_num*8 + 8]
+    %endif
 %endmacro
+
 
 
 %macro LOAD_4_PARA_POP 0
-	%ifdef X86_32
-		pop r3
-	%endif
+    %ifdef X86_32
+	pop r3
+    %endif
 %endmacro
 
 %macro LOAD_5_PARA_POP 0
-	%ifdef X86_32
-		pop r4
-		pop r3
-	%endif
+    %ifdef X86_32
+        pop r4
+	pop r3
+    %endif
 %endmacro
 
 %macro LOAD_6_PARA_POP 0
-	%ifdef X86_32
-		pop r5
-		pop r4
-		pop r3
-	%endif
+    %ifdef X86_32
+        pop r5
+  	pop r4
+ 	pop r3
+    %endif
 %endmacro
 
 %macro LOAD_7_PARA_POP 0
-	%ifdef X86_32
-		pop r6
-		pop r5
-		pop r4
-		pop r3
-	%endif
+    %ifdef X86_32
+        pop r6
+        pop r5
+        pop r4
+        pop r3
+    %endif
 %endmacro
 
-
 %macro WELS_EXTERN 1
-	%ifdef PREFIX
-		global _%1
-		%define %1 _%1
-	%else
-		global %1
-	%endif
+    %ifdef PREFIX
+        global _%1
+        %define %1 _%1
+    %else
+        global %1
+    %endif
 %endmacro
 
 %macro WELS_AbsW 2
