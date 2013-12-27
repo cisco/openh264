@@ -43,6 +43,12 @@ WELSVP_NAMESPACE_BEGIN
 
 #if defined(_WIN32)
 
+#ifdef WINAPI_FAMILY
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#define InitializeCriticalSection(x) InitializeCriticalSectionEx(x, 0, 0)
+#endif
+#endif
+
 WELS_THREAD_ERROR_CODE    WelsMutexInit (WELS_MUTEX*    mutex) {
   InitializeCriticalSection (mutex);
 
