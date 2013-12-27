@@ -286,7 +286,6 @@ WelsI16x16LumaPredPlane_sse2:
 		SUMW_HORIZON   xmm7,xmm0,xmm2
 		movd    r3d,   xmm7			; V
 		movsx	r3,	r3w
-
 		imul	r3,	5
 		add		r3,	32
 		sar		r3,	6				; c = (5 * V + 32) >> 6;
@@ -454,7 +453,6 @@ WelsIChromaPredPlane_sse2:
 		SUMW_HORIZON	xmm7,xmm0,xmm2
 		movd    r3d,    xmm7			; V
 		movsx	r3,	r3w
-
 		imul	r3,	17
 		add		r3,	16
 		sar		r3,	5				; c = (17 * V + 16) >> 5;
@@ -1215,6 +1213,7 @@ WelsI16x16LumaPredDc_sse2:
 ;                             uint8_t* pRed, int32_t* pBestMode, int32_t, int32_t, int32_t);
 ;
 ;***********************************************************************
+%ifdef X86_ASM
 WELS_EXTERN WelsSmpleSatdThree4x4_sse2
 align 16
 WelsSmpleSatdThree4x4_sse2:
@@ -1454,5 +1453,5 @@ not_dc_h:
     pop       esi
     pop       ebx
     ret
-
+%endif
 

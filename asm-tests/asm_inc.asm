@@ -142,7 +142,7 @@ BITS 64
 %define r0w  di
 %define r1w  si
 %define r2w  dx
-%define r32  cx
+%define r3w  cx
 
 %define r0b  dil
 %define r1b  sil
