@@ -905,11 +905,13 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   int iParsedNum = 3;
   if (ParseCommandLine (argc - iParsedNum, argv + iParsedNum, sSvcParam) != 0) {
     printf ("parse pCommand line failed\n");
+    fclose(pFpSrc);
     return 1;
   }
 
   if (cmResultSuccess != pPtrEnc->Initialize (&sSvcParam, INIT_TYPE_PARAMETER_BASED)) {
     fprintf (stderr, "Encoder Initialization failed!\n");
+    fclose(pFpSrc);
     return 1;
   }
 
@@ -1414,10 +1416,7 @@ int main (int argc, char** argv)
   if (argc < 2) {
     goto exit;
   } else {
-    string	strCfgFileName = argv[1];
-    basic_string <char>::size_type index;
-    index = strCfgFileName.rfind (".cfg");	// check configuration type (like .cfg?)
-    if (index == std::string::npos) {
+    if (!strstr(argv[1], ".cfg")) { // check configuration type (like .cfg?)
       if (argc > 2) {
         iRet = ProcessEncodingSvcWithParam (pSVCEncoder, argc, argv);
         if (iRet != 0)

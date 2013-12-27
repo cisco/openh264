@@ -344,7 +344,6 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
         printf ("Specified file: %s not exist, maybe invalid path or parameter settting.\n", cReadCfg.GetFileName().c_str());
         return 1;
       }
-      memset (&sDecParam, 0, sizeof (sDecParam));
 
       while (!cReadCfg.EndOfFile()) {
         long nRd = cReadCfg.ReadLine (&strTag[0]);
@@ -382,7 +381,6 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
     } else if (strstr (pArgV[1],
                        ".264")) { // no output dump yuv file, just try to render the decoded pictures //confirmed_safe_unsafe_usage
       strInputFile	= pArgV[1];
-      memset (&sDecParam, 0, sizeof (sDecParam));
       sDecParam.iOutputColorFormat          = videoFormatI420;
       sDecParam.uiTargetDqLayer	          = (uint8_t) - 1;
       sDecParam.uiEcActiveFlag	          = 1;
@@ -391,26 +389,28 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
   } else { //iArgC > 2
     strInputFile	= pArgV[1];
     strOutputFile	= pArgV[2];
-    memset (&sDecParam, 0, sizeof (sDecParam));
     sDecParam.iOutputColorFormat	= videoFormatI420;
     sDecParam.uiTargetDqLayer	= (uint8_t) - 1;
     sDecParam.uiEcActiveFlag	= 1;
     sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
     if (iArgC > 3) {
-      // Basic option parser. Note that this is not safe about the
-      // number of remaining arguments.
-      // TODO: rewrite
       for (int i = 3; i < iArgC; i++) {
         char* cmd = pArgV[i];
 
         if (!strcmp (cmd, "-options")) {
-          strOutputFile = pArgV[i + 1];
-          i += 2;
+          if (i + 1 < iArgC)
+            strOptionFile = pArgV[i++];
+          else {
+            printf ("options file not specified.\n");
+            return 1;
+          }
         } else if (!strcmp (cmd, "-trace")) {
-          WelsStderrSetTraceLevel (atoi (pArgV[i + 1]));
-          i += 2;
-        } else {
-          i++;
+          if (i + 1 < iArgC)
+            WelsStderrSetTraceLevel (atoi (pArgV[i++]));
+          else {
+            printf ("trace level not specified.\n");
+            return 1;
+          }
         }
       }
     }
@@ -494,4 +494,3 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
 
   return 0;
 }
-
