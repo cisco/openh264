@@ -7,6 +7,10 @@ CXX_O=-o $@
 CXX_LINK_O=-o $@
 AR_OPTS=cr $@
 LINK_LIB=-l$(1)
+CFLAGS_OPT=-O3
+CFLAGS_DEBUG=-g
+CFLAGS_M32=-m32
+CFLAGS_M64=-m64
 
 
 
@@ -18,10 +22,10 @@ endif
 
 # Configurations
 ifeq ($(BUILDTYPE), Release)
-CFLAGS += -O3
+CFLAGS += $(CFLAGS_OPT)
 USE_ASM = Yes
 else
-CFLAGS = -g
+CFLAGS = $(CFLAGS_DEBUG)
 USE_ASM = No
 endif
 
@@ -31,12 +35,12 @@ LDFLAGS += -fsanitize=address
 endif
 
 ifeq ($(ENABLE64BIT), Yes)
-CFLAGS += -m64
-LDFLAGS += -m64
+CFLAGS += $(CFLAGS_M64)
+LDFLAGS += $(CFLAGS_M64)
 ASMFLAGS_PLATFORM = -DUNIX64
 else
-CFLAGS += -m32
-LDFLAGS += -m32
+CFLAGS += $(CFLAGS_M32)
+LDFLAGS += $(CFLAGS_M32)
 ASMFLAGS_PLATFORM = -DX86_32
 endif
 
