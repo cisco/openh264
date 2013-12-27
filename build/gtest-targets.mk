@@ -13,7 +13,7 @@ $(GTEST_SRCDIR)/src/gtest-all.o: $(GTEST_SRCDIR)/src/gtest-all.cc
 
 $(LIBPREFIX)gtest.$(LIBSUFFIX): $(GTEST_OBJS)
 	rm -f $(LIBPREFIX)gtest.$(LIBSUFFIX)
-	ar cr $@ $(GTEST_OBJS)
+	$(AR) cr $@ $(GTEST_OBJS)
 
 libraries: $(LIBPREFIX)gtest.$(LIBSUFFIX)
 LIBRARIES += $(LIBPREFIX)gtest.$(LIBSUFFIX)

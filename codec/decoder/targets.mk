@@ -148,7 +148,7 @@ $(DECODER_SRCDIR)/./core/asm/memzero.o: $(DECODER_SRCDIR)/./core/asm/memzero.asm
 
 $(LIBPREFIX)decoder.$(LIBSUFFIX): $(DECODER_OBJS)
 	rm -f $(LIBPREFIX)decoder.$(LIBSUFFIX)
-	ar cr $@ $(DECODER_OBJS)
+	$(AR) cr $@ $(DECODER_OBJS)
 
 libraries: $(LIBPREFIX)decoder.$(LIBSUFFIX)
 LIBRARIES += $(LIBPREFIX)decoder.$(LIBSUFFIX)
