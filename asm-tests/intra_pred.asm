@@ -1137,7 +1137,7 @@ WelsIChromaPredDc_sse2:
 	lea         r0, [r0+2*r1]
 	movzx		r3, byte [r0-0x01]     ; l4
 	add			r2, r3
-	movd        mm1, r2                 ; mm1 = l1+l2+l3+l4
+	movd        mm1, r2d                 ; mm1 = l1+l2+l3+l4
 
 	movzx		r2, byte [r0+r1-0x01] ; l5
 	lea         r0, [r0+2*r1]
@@ -1148,7 +1148,7 @@ WelsIChromaPredDc_sse2:
 	lea         r0, [r0+2*r1]
 	movzx		r3, byte [r0-0x01]     ; l8
 	add			r2, r3
-	movd        mm2, r2                 ; mm2 = l5+l6+l7+l8
+	movd        mm2, r2d                 ; mm2 = l5+l6+l7+l8
 
 	movq        mm3, mm0
 	psrlq       mm0, 0x20
