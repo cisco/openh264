@@ -708,7 +708,7 @@ static int32_t CavlcGetLevelVal (int32_t iLevel[16], SReadBitsCache* pBitsCache,
 
   for (; i < uiTotalCoeff; i++) {
     if (pBitsCache->uiRemainBits <= 16)		SHIFT_BUFFER (pBitsCache);
-#if defined(WIN32) && !defined(WIN64) && defined(_MSC_VER)
+#if defined(_MSC_VER) && defined(_M_IX86)
     uiCache32Bit = pBitsCache->uiCache32Bit;
     WELS_GET_PREFIX_BITS (uiCache32Bit, iPrefixBits);
 #else
@@ -811,7 +811,7 @@ static int32_t	CavlcGetRunBefore (int32_t iRun[16], SReadBitsCache* pBitsCache, 
           iRun[i] = pVlcTable->kpZeroTable[6][uiValue][0];
         } else {
           if (pBitsCache->uiRemainBits < 16) SHIFT_BUFFER (pBitsCache);
-#if defined(WIN32) && !defined(WIN64) && defined(_MSC_VER)
+#if defined(_MSC_VER) && defined(_M_IX86)
           uiCache32Bit = pBitsCache->uiCache32Bit;
           WELS_GET_PREFIX_BITS (uiCache32Bit, iPrefixBits);
 #else
