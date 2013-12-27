@@ -37,7 +37,7 @@ endif
 ifeq ($(SYSTEM), Darwin)
 ASMFLAGS += -DPREFIX
 endif
-CPPFLAGS  = -Wall -g -O3 -fpic -I ../gtest/include -I ../codec/decoder/core/inc -I ../codec/api/svc
+CPPFLAGS  = -Wall -g -O3 -fpic -I ../gtest/include -I ../codec/encoder/core/inc -I ../codec/api/svc
 ifeq ($(NASM), Yes)
 CPPFLAGS += -DX86_ASM
 endif
