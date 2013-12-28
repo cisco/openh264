@@ -34,6 +34,10 @@
  *  Created on 11-3-15.
  *
  */
+
+#ifndef DEC_CONSOLE_H__
+#define DEC_CONSOLE_H__
+
 #pragma once
 
 #include "code_api.h"
@@ -51,3 +55,4 @@ bool get_functions_address_create_decoder (ISVCDecoder** ppDecoder);
 
 
 
+#endif  // DEC_CONSOLE_H__
