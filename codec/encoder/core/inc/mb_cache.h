@@ -40,7 +40,6 @@
 #include "macros.h"
 
 namespace WelsSVCEnc {
-//#pragma pack(1)
 
 /*
  *	MB Cache information, such one cache should be defined within a slice

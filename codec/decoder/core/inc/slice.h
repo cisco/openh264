@@ -40,8 +40,6 @@
 #include "picture.h"
 #include "parameter_sets.h"
 
-//#pragma pack(1)
-
 namespace WelsDec {
 
 /*
@@ -203,5 +201,4 @@ typedef struct TagSlice {
 
 } // namespace WelsDec
 
-//#pragma pack()
 #endif//WELS_SLICE_H__

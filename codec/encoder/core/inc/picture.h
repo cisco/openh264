@@ -37,7 +37,6 @@
 #include "typedefs.h"
 #include "as264_common.h"
 #include "wels_common_basis.h"
-//#pragma pack(1)
 
 namespace WelsSVCEnc {
 
@@ -90,8 +89,6 @@ typedef struct TagPicture {
 //	int32_t		used_linesize[4];// iLineSize of picture planes respectively used currently
 //	int32_t		planes;			// planes of YUV
 //}Rs_Picture_t;
-
-//#pragma pack()
 
 }	// end of namespace WelsSVCEnc {
 

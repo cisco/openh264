@@ -36,8 +36,6 @@
 
 #include "typedefs.h"
 
-//#pragma pack(1)
-
 namespace WelsDec {
 
 /*
@@ -81,7 +79,5 @@ int32_t     iPpsId;
 } SPicture, *PPicture;	// "Picture" declaration is comflict with Mac system
 
 } // namespace WelsDec
-
-//#pragma pack()
 
 #endif//WELS_PICTURE_H__

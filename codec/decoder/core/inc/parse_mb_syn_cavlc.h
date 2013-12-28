@@ -211,7 +211,5 @@ int32_t ParseIntra16x16ModeConstrain1 (PNeighAvail pNeighAvail, PBitStringAux pB
 int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30],
                         PBitStringAux pBs);
 
-//#pragma pack()
-
 } // namespace WelsDec
 #endif//WELS_PARSE_MB_SYN_CAVLC_H__

@@ -45,7 +45,6 @@
 #include "bit_stream.h"
 
 namespace WelsSVCEnc {
-//#pragma pack(1)
 
 
 
@@ -97,5 +96,4 @@ int32_t CavlcParamCal_sse2 (int16_t* pCoffLevel, uint8_t* pRun, int16_t* pLevel,
 #endif//__cplusplus
 
 }
-//#pragma pack()
 #endif
