@@ -78,6 +78,8 @@ void WelsIHadamard4x4Dc (int16_t* pRes) { //pBuffer size : 4x4
   }
 }
 
+
+
 /* for qp >= 12 */
 void WelsDequantIHadamard4x4_c (int16_t* pRes, const uint16_t kuiMF) {
   int16_t iTemp[4];
@@ -231,6 +233,5 @@ void WelsGetEncBlockStrideOffset (int32_t* pBlock, const int32_t kiStrideY, cons
       pBlock[20 + j]	= ((j & 0x01) + r * kiStrideUV) << 2;
   }
 }
-
 
 }

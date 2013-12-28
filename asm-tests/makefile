@@ -12,7 +12,7 @@ GCC       = gcc
 LDFLAGS   = -lstdc++ -ldl -lpthread
 ifeq ($(ENABLE64BIT), Yes)
 GCC += -m64
-ASMFLAGS = -DUNIX64
+ASMFLAGS = -g -DUNIX64
 LDFLAGS += libgtest_64.a
 
 ifeq ($(SYSTEM), Darwin)
@@ -23,7 +23,7 @@ endif
 
 else
 GCC += -m32
-ASMFLAGS =  -DX86_32 
+ASMFLAGS =  -g -DX86_32 
 
 ifeq ($(SYSTEM), Darwin)
 ASMFLAGS += -f macho32

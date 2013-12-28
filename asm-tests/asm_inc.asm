@@ -60,12 +60,12 @@
 ; Macros
 ;***********************************************************************
 
-DEFAULT REL
 
 %ifdef WIN64 ; Windows x64 ;************************************
 
 BITS 64
 
+DEFAULT REL
 %define arg1 rcx
 %define arg2 rdx
 %define arg3 r8
@@ -111,7 +111,7 @@ BITS 64
 %elifdef UNIX64 ; Unix x64 ;************************************
 
 BITS 64
-
+DEFAULT REL
 %define arg1 rdi
 %define arg2 rsi
 %define arg3 rdx
