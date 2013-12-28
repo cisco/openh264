@@ -38,8 +38,8 @@
  *
  */
 
-#ifndef _WELSVP_ADAPTIVEQUANTIZATION_H
-#define _WELSVP_ADAPTIVEQUANTIZATION_H
+#ifndef WELSVP_ADAPTIVEQUANTIZATION_H
+#define WELSVP_ADAPTIVEQUANTIZATION_H
 
 #include "../common/util.h"
 #include "../common/memory.h"

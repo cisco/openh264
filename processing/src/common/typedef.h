@@ -41,8 +41,8 @@
  *************************************************************************************
  */
 
-#ifndef _WELSVP_TYPEDEF_H
-#define _WELSVP_TYPEDEF_H
+#ifndef WELSVP_TYPEDEF_H
+#define WELSVP_TYPEDEF_H
 
 #define WELSVP_EXTERN_C_BEGIN       extern "C" {
 #define WELSVP_EXTERN_C_END         }

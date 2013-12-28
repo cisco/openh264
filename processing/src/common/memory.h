@@ -39,8 +39,8 @@
  *************************************************************************************
  */
 
-#ifndef _WELSVP_MEMORY_H
-#define _WELSVP_MEMORY_H
+#ifndef WELSVP_MEMORY_H
+#define WELSVP_MEMORY_H
 
 #include "util.h"
 #include "typedef.h"

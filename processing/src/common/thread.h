@@ -37,8 +37,8 @@
  *************************************************************************************
  */
 
-#ifndef _WELSVP_THREAD_H
-#define _WELSVP_THREAD_H
+#ifndef WELSVP_THREAD_H
+#define WELSVP_THREAD_H
 
 #include "typedef.h"
 
