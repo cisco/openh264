@@ -161,7 +161,6 @@ typedef struct {
   unsigned int  uiIDRPicId; // distinguish request from different IDR
   int			  iLTRFrameNum; //specify current decoder frame_num
 } SLTRMarkingFeedback;
-#pragma pack(1)
 
 typedef struct {
 
@@ -277,5 +276,4 @@ typedef struct Source_Picture_s {
 } SSourcePicture;
 
 
-#pragma pack()
 #endif//WELS_VIDEO_CODEC_APPLICATION_DEFINITION_H__
