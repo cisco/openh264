@@ -1207,9 +1207,9 @@ INSIDE_MEM_FREE: {
 
 //  Merge from Heifei's Wonder.  Lock process to a single core
 void LockToSingleCore() {
-#if defined(WIN32) && !defined(WIN64)
+#if defined(WIN32)
   //for 2005 compiler, change "DWORD" to "DWORD_PTR"
-  DWORD ProcessAffMask = 0, SystemAffMask = 0;
+  ULONG_PTR ProcessAffMask = 0, SystemAffMask = 0;
   HANDLE hProcess = GetCurrentProcess();
 
   GetProcessAffinityMask (hProcess, &ProcessAffMask, &SystemAffMask);
