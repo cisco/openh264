@@ -39,8 +39,8 @@
 *************************************************************************************
 */
 
-#ifndef _WELSVP_COMPLEXITYANALYSIS_H
-#define _WELSVP_COMPLEXITYANALYSIS_H
+#ifndef WELSVP_COMPLEXITYANALYSIS_H
+#define WELSVP_COMPLEXITYANALYSIS_H
 
 #include "../common/util.h"
 #include "../common/memory.h"

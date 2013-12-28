@@ -39,8 +39,8 @@
  *************************************************************************************
  */
 
-#ifndef _WELSVP_DENOISE_H
-#define _WELSVP_DENOISE_H
+#ifndef WELSVP_DENOISE_H
+#define WELSVP_DENOISE_H
 
 #include "../common/util.h"
 #include "../common/memory.h"

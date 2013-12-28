@@ -44,8 +44,8 @@
  *************************************************************************************
  */
 
-#ifndef _IWELSVP_H_
-#define _IWELSVP_H_
+#ifndef IWELSVP_H_
+#define IWELSVP_H_
 
 #ifdef _WIN32
 #define WELSAPI __stdcall
@@ -281,6 +281,6 @@ EResult WELSAPI DestroyVpInterface (void* pCtx , int iVersion /*= WELSVP_INTERFA
 WELSVP_EXTERNC_END
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-#endif // _IWELSVP_H_
+#endif // IWELSVP_H_
 
 

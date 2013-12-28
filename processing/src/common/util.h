@@ -39,8 +39,8 @@
  *************************************************************************************
  */
 
-#ifndef _WELSVP_UTIL_H
-#define _WELSVP_UTIL_H
+#ifndef WELSVP_UTIL_H
+#define WELSVP_UTIL_H
 
 #include <stdio.h>
 #include <stdlib.h>

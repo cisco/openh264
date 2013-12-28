@@ -38,8 +38,8 @@
  *
  */
 
-#ifndef _WELSVP_BACKGROUNDDETECTION_H
-#define _WELSVP_BACKGROUNDDETECTION_H
+#ifndef WELSVP_BACKGROUNDDETECTION_H
+#define WELSVP_BACKGROUNDDETECTION_H
 
 #include "../common/util.h"
 #include "../common/memory.h"

@@ -30,8 +30,8 @@
  *
  */
 
-#ifndef _SAMPLE_H_
-#define _SAMPLE_H_
+#ifndef SAMPLE_H_
+#define SAMPLE_H_
 
 #include "typedefs.h"
 #include "wels_func_ptr_def.h"
@@ -122,4 +122,4 @@ void WelsInitSampleSadFunc (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag);
 
 }
 
-#endif //_SAMPLE_H_
+#endif //SAMPLE_H_

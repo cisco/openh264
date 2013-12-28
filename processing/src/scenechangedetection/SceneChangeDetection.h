@@ -39,8 +39,8 @@
 *************************************************************************************
 */
 
-#ifndef _WELSVP_SCENECHANGEDETECTION_H
-#define _WELSVP_SCENECHANGEDETECTION_H
+#ifndef WELSVP_SCENECHANGEDETECTION_H
+#define WELSVP_SCENECHANGEDETECTION_H
 
 #include "../common/util.h"
 #include "../common/memory.h"
