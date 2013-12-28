@@ -35,11 +35,11 @@
 
 #include "as264_common.h"
 
-#if defined (WIN32)
+#if defined (_WIN32)
 #if !defined CODEC_TRACE_WIN32
 #define CODEC_TRACE_WIN32
 #endif//CODEC_TRACE_WIN32
-#endif//WIN32
+#endif//_WIN32
 
 #endif//SVC_CONFIGURATION_H_
 

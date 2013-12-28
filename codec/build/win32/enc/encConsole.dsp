@@ -41,8 +41,8 @@ RSC=rc.exe
 # PROP Intermediate_Dir "..\..\..\obj\encConsole\Release"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "..\..\..\console\enc\inc" /I "..\..\..\api\svc" /I "..\..\..\encoder\core\inc" /I "..\..\..\common\inc" /I "..\..\..\WelsThreadLib\api" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "ENCODER_CORE" /YX /FD /c
+# ADD BASE CPP /nologo /W3 /GX /O2 /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "..\..\..\console\enc\inc" /I "..\..\..\api\svc" /I "..\..\..\encoder\core\inc" /I "..\..\..\common\inc" /I "..\..\..\WelsThreadLib\api" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "ENCODER_CORE" /YX /FD /c
 # ADD BASE RSC /l 0x804 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -66,8 +66,8 @@ LINK32=link.exe
 # PROP Intermediate_Dir "..\..\..\obj\encConsole\Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\..\console\enc\inc" /I "..\..\..\api\svc" /I "..\..\..\encoder\core\inc" /I "..\..\..\common\inc" /I "..\..\..\WelsThreadLib\api" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "ENCODER_CORE" /YX /FD /GZ /c
+# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\..\console\enc\inc" /I "..\..\..\api\svc" /I "..\..\..\encoder\core\inc" /I "..\..\..\common\inc" /I "..\..\..\WelsThreadLib\api" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "ENCODER_CORE" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x804 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe

@@ -33,9 +33,9 @@
 #ifndef WELS_VIDEO_CODEC_DEFINITION_H__
 #define WELS_VIDEO_CODEC_DEFINITION_H__
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #pragma once
-#endif//WIN32
+#endif//_WIN32
 
 typedef enum {
   /*rgb color formats*/

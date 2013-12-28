@@ -97,9 +97,9 @@
 
 #define DYNAMIC_DETECT_CPU_CORES
 
-//#if defined(WIN32)
+//#if defined(_WIN32)
 //#define BIND_CPU_CORES_TO_THREADS	// if it is not defined here mean cross cpu cores load balance automatically
-//#endif//WIN32
+//#endif//_WIN32
 
 #else
 
