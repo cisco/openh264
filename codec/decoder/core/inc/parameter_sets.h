@@ -39,8 +39,6 @@
 
 namespace WelsDec {
 
-//#pragma pack(1)
-
 /* Sequence Parameter Set, refer to Page 57 in JVT X201wcm */
 typedef struct TagSps {
 int32_t	    iSpsId;
@@ -165,8 +163,6 @@ bool_t		bWeightedPredFlag;
 uint8_t		uiWeightedBipredIdc;
 
 } SPps, *PPps;
-
-//#pragma pack()
 
 } // namespace WelsDec
 

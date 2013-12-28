@@ -47,8 +47,6 @@
 
 #include "decoder_context.h"
 
-//#pragma pack(1)
-
 namespace WelsDec {
 
 void_t WelsFillRecNeededMbInfo (PWelsDecoderContext pCtx, bool_t bOutput, PDqLayer pCurLayer);
@@ -69,8 +67,6 @@ void_t FillBufForMc (uint8_t* pBuf, int32_t iBufStride, uint8_t* pSrc, int32_t i
                      int32_t iBlockWidth, int32_t iBlockHeight, int32_t iSrcX, int32_t iSrcY, int32_t iPicWidth, int32_t iPicHeight);
 
 } // namespace WelsDec
-
-//#pragma pack()
 
 #endif //WELS_REC_MB_H__
 
