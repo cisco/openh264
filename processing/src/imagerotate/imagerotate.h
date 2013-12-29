@@ -39,8 +39,8 @@
  *************************************************************************************
  */
 
-#ifndef _WELSVP_IMAGEROTATE_H
-#define _WELSVP_IMAGEROTATE_H
+#ifndef WELSVP_IMAGEROTATE_H
+#define WELSVP_IMAGEROTATE_H
 
 #include "../common/util.h"
 #include "../common/WelsFrameWork.h"

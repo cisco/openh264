@@ -92,7 +92,7 @@ for a in asm:
 if args.library is not None:
     f.write("$(LIBPREFIX)%s.$(LIBSUFFIX): $(%s_OBJS)\n"%(args.library, PREFIX));
     f.write("\trm -f $(LIBPREFIX)%s.$(LIBSUFFIX)\n"%args.library)
-    f.write("\tar cr $@ $(%s_OBJS)\n"%PREFIX);
+    f.write("\t$(AR) cr $@ $(%s_OBJS)\n"%PREFIX);
     f.write("\n");
     f.write("libraries: $(LIBPREFIX)%s.$(LIBSUFFIX)\n"%args.library);
     f.write("LIBRARIES += $(LIBPREFIX)%s.$(LIBSUFFIX)\n"%args.library);

@@ -18,7 +18,6 @@ PROCESSING_CPP_SRCS=\
 	$(PROCESSING_SRCDIR)/./src/imagerotate/imagerotatefuncs.cpp\
 	$(PROCESSING_SRCDIR)/./src/scenechangedetection/SceneChangeDetection.cpp\
 	$(PROCESSING_SRCDIR)/./src/scenechangedetection/SceneChangeDetectionCommon.cpp\
-	$(PROCESSING_SRCDIR)/./src/testbed/stdafx.cpp\
 	$(PROCESSING_SRCDIR)/./src/vaacalc/vaacalcfuncs.cpp\
 	$(PROCESSING_SRCDIR)/./src/vaacalc/vaacalculation.cpp\
 
@@ -88,9 +87,6 @@ $(PROCESSING_SRCDIR)/./src/scenechangedetection/SceneChangeDetection.o: $(PROCES
 $(PROCESSING_SRCDIR)/./src/scenechangedetection/SceneChangeDetectionCommon.o: $(PROCESSING_SRCDIR)/./src/scenechangedetection/SceneChangeDetectionCommon.cpp
 	$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(PROCESSING_CFLAGS) $(PROCESSING_INCLUDES) -c -o $(PROCESSING_SRCDIR)/./src/scenechangedetection/SceneChangeDetectionCommon.o $(PROCESSING_SRCDIR)/./src/scenechangedetection/SceneChangeDetectionCommon.cpp
 
-$(PROCESSING_SRCDIR)/./src/testbed/stdafx.o: $(PROCESSING_SRCDIR)/./src/testbed/stdafx.cpp
-	$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(PROCESSING_CFLAGS) $(PROCESSING_INCLUDES) -c -o $(PROCESSING_SRCDIR)/./src/testbed/stdafx.o $(PROCESSING_SRCDIR)/./src/testbed/stdafx.cpp
-
 $(PROCESSING_SRCDIR)/./src/vaacalc/vaacalcfuncs.o: $(PROCESSING_SRCDIR)/./src/vaacalc/vaacalcfuncs.cpp
 	$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(PROCESSING_CFLAGS) $(PROCESSING_INCLUDES) -c -o $(PROCESSING_SRCDIR)/./src/vaacalc/vaacalcfuncs.o $(PROCESSING_SRCDIR)/./src/vaacalc/vaacalcfuncs.cpp
 
@@ -120,7 +116,7 @@ $(PROCESSING_SRCDIR)/./src/asm/vaa.o: $(PROCESSING_SRCDIR)/./src/asm/vaa.asm
 
 $(LIBPREFIX)processing.$(LIBSUFFIX): $(PROCESSING_OBJS)
 	rm -f $(LIBPREFIX)processing.$(LIBSUFFIX)
-	ar cr $@ $(PROCESSING_OBJS)
+	$(AR) cr $@ $(PROCESSING_OBJS)
 
 libraries: $(LIBPREFIX)processing.$(LIBSUFFIX)
 LIBRARIES += $(LIBPREFIX)processing.$(LIBSUFFIX)

@@ -39,8 +39,8 @@
  *************************************************************************************
  */
 
-#ifndef _WELSVP_VAACALCULATION_H
-#define _WELSVP_VAACALCULATION_H
+#ifndef WELSVP_VAACALCULATION_H
+#define WELSVP_VAACALCULATION_H
 
 #include "../common/util.h"
 #include "../common/memory.h"

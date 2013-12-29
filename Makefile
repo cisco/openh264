@@ -1,4 +1,4 @@
-UNAME=$(shell uname | tr A-Z a-z)
+UNAME=$(shell uname | tr A-Z a-z | tr -d \\-[:digit:].)
 LIBPREFIX=lib
 LIBSUFFIX=a
 CP=cp
@@ -95,9 +95,5 @@ include build/gtest-targets.mk
 include build/cryptopp-targets.mk
 include test/targets.mk
 endif
-
-
-
-
 
 

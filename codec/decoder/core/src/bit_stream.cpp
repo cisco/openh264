@@ -48,7 +48,7 @@ inline uint32_t EndianFix (uint32_t uiX) {
 }
 #else //WORDS_BIGENDIAN
 
-#ifdef WIN32
+#if defined(WIN32) && defined(_MSC_VER)
 inline uint32_t EndianFix (uint32_t uiX) {
   __asm {
     mov   eax,  uiX

@@ -46,10 +46,16 @@
 #include <windows.h>
 #include <sys/types.h>
 #include <sys/timeb.h>
+#ifndef _MSC_VER
+#include <sys/time.h>
+#ifndef HAVE_STRNLEN
+#define strnlen(a,b) strlen(a)
+#endif //!HAVE_STRNLEN
+#endif //!_MSC_VER
 #else
 #include <sys/time.h>
 #include <sys/timeb.h>
-#endif
+#endif //_WIN32
 
 #include "utils.h"
 #include "macros.h"
@@ -79,7 +85,7 @@ void_t WelsLog (void_t* pPtr, int32_t iLevel, const char* kpFmt, ...) {
 }
 
 
-#if  defined(_WIN32)
+#if  defined(_WIN32) && defined(_MSC_VER)
 
 #if  defined(_MSC_VER) && (_MSC_VER>=1500)
 

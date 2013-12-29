@@ -41,8 +41,8 @@
  *************************************************************************************
  */
 
-#ifndef _WELSVP_TYPEDEF_H
-#define _WELSVP_TYPEDEF_H
+#ifndef WELSVP_TYPEDEF_H
+#define WELSVP_TYPEDEF_H
 
 #define WELSVP_EXTERN_C_BEGIN       extern "C" {
 #define WELSVP_EXTERN_C_END         }
@@ -52,7 +52,7 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-#if defined(_WIN32) || defined(_WIN32) || defined(_MSC_VER)
+#if ( defined(_WIN32) || defined(_WIN32) ) && defined(_MSC_VER)
 
 typedef char               int8_t   ;
 typedef unsigned char      uint8_t  ;

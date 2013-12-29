@@ -46,6 +46,9 @@
 #include <windows.h>
 #include <sys/types.h>
 #include <sys/timeb.h>
+#ifndef _MSC_VER
+#include <sys/time.h>
+#endif
 #else
 #include <sys/time.h>
 #endif
@@ -147,23 +150,20 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
 
     if (pEncCtx) {
       time_t l_time;
-#if defined(_WIN32)
-#if defined(_MSC_VER)
+#if defined(_WIN32) && defined(_MSC_VER)
 #if _MSC_VER >= 1500
       struct tm t_now;
 #else//VC6
       struct tm* t_now;
 #endif//_MSC_VER >= 1500
-#endif//_MSC_VER
 #else//__GNUC__
       struct tm* t_now;
 #endif//WIN32
 
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && defined(_MSC_VER)
       struct _timeb tb;
 
       time (&l_time);
-#ifdef _MSC_VER
 #if _MSC_VER >= 1500
       LOCALTIME (&t_now, &l_time);
 #else
@@ -172,7 +172,6 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
         return;
       }
 #endif//_MSC_VER >= 1500
-#endif//_MSC_VER
       FTIME (&tb);
 #elif defined( __GNUC__ )
       struct timeval tv;

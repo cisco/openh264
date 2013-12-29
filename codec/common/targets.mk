@@ -16,7 +16,7 @@ $(COMMON_SRCDIR)/./logging.o: $(COMMON_SRCDIR)/./logging.cpp
 
 $(LIBPREFIX)common.$(LIBSUFFIX): $(COMMON_OBJS)
 	rm -f $(LIBPREFIX)common.$(LIBSUFFIX)
-	ar cr $@ $(COMMON_OBJS)
+	$(AR) cr $@ $(COMMON_OBJS)
 
 libraries: $(LIBPREFIX)common.$(LIBSUFFIX)
 LIBRARIES += $(LIBPREFIX)common.$(LIBSUFFIX)
