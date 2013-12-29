@@ -128,17 +128,16 @@ TEST(Dct_encoder, WelsIDctRecI16x16Dc_sse2) {
 	WelsFree(pPred, "pPred");
 }
 
-#if 1
 // this ut is always failed, and I found that the original asm code fails too, so I need to check it out
 TEST(Dct_encoder, WelsHadamardT4Dc_sse2) {
-	int16_t *pDct = (int16_t*) WelsMalloc(128*sizeof(int16_t), "pDct");
+	int16_t *pDct = (int16_t*) WelsMalloc(256*sizeof(int16_t), "pDct");
 	int16_t *pLumaDc = (int16_t*) WelsMalloc(16*sizeof(int16_t), "pLumaDc");
 	int16_t *pLumaDcRef = (int16_t*) WelsMalloc(16*sizeof(int16_t), "pLumaDc");
-	srand(time(NULL));
+	srand(100);
 	const int bits = 9;
 	const int range = (1 << bits) -1;
 	const int offset = 1 << (bits - 1);
-	for(int i = 0; i < 128; i++) {
+	for(int i = 0; i < 256; i++) {
 		pDct[i] = (rand() & range) - offset;
 	}
 	WelsHadamardT4Dc_c(pLumaDcRef, pDct);
@@ -149,4 +148,3 @@ TEST(Dct_encoder, WelsHadamardT4Dc_sse2) {
 	WelsFree(pLumaDc, "pLumaDc");
 	WelsFree(pLumaDcRef, "pLumaDcRef");
 }
-#endif
