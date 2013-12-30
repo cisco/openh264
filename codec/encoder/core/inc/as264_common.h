@@ -38,8 +38,8 @@
  *************************************************************************************
  */
 
-#ifndef _AS264_COMMON_H_
-#define _AS264_COMMON_H_
+#ifndef AS264_COMMON_H_
+#define AS264_COMMON_H_
 
 /* debug setting for console
 $(TargetPath)
@@ -156,5 +156,5 @@ $(TargetPath)
 #endif//_WIN32 & _DEBUG
 
 
-#endif // _AS264_COMMON_H_
+#endif // AS264_COMMON_H_
 

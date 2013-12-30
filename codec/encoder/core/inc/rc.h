@@ -40,8 +40,8 @@
  *
  *
  *************************************************************************/
-#ifndef _RC_H
-#define _RC_H
+#ifndef RC_H
+#define RC_H
 
 
 #include "codec_app_def.h"
@@ -229,4 +229,4 @@ void WelsRcInitModule (void* pCtx,  int32_t iModule);
 void WelsRcFreeMemory (void* pCtx);
 
 }
-#endif //_RC_H
+#endif //RC_H

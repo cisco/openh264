@@ -37,8 +37,8 @@
  *************************************************************************************
  */
 
-#ifndef _WELSVP_CPU_H
-#define _WELSVP_CPU_H
+#ifndef WELSVP_CPU_H
+#define WELSVP_CPU_H
 
 #include "typedef.h"
 

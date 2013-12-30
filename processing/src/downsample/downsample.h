@@ -39,8 +39,8 @@
  *************************************************************************************
  */
 
-#ifndef _WELSVP_DOWNSAMPLE_H
-#define _WELSVP_DOWNSAMPLE_H
+#ifndef WELSVP_DOWNSAMPLE_H
+#define WELSVP_DOWNSAMPLE_H
 
 #include "../common/util.h"
 #include "../common/WelsFrameWork.h"
