@@ -32,7 +32,7 @@
  *  decoder_core.h
  *
  *  Abstract
- *      Encapsulative core interfaces 
+ *      Encapsulative core interfaces
  *
  *  History
  *      07/10/2008 Created
@@ -57,24 +57,24 @@ namespace WelsDec {
  * return:
  *	0 - success; otherwise returned error_no defined in error_no.h.
 */
-int32_t WelsInitMemory( PWelsDecoderContext pCtx );
+int32_t WelsInitMemory (PWelsDecoderContext pCtx);
 
 /*
  * WelsFreeMemory
  * Free memory introduced in WelsInitMemory at destruction of decoder.
- * 
+ *
  */
-void_t WelsFreeMemory( PWelsDecoderContext pCtx );
+void_t WelsFreeMemory (PWelsDecoderContext pCtx);
 
 /*!
- * \brief	request memory when maximal picture width and height are available	
+ * \brief	request memory when maximal picture width and height are available
  */
-int32_t InitialDqLayersContext ( PWelsDecoderContext pCtx, const int32_t kiMaxWidth, const int32_t kiMaxHeight );
+int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWidth, const int32_t kiMaxHeight);
 
 /*!
- * \brief	free dq layer context memory related		
+ * \brief	free dq layer context memory related
  */
-void_t UninitialDqLayersContext ( PWelsDecoderContext pCtx );
+void_t UninitialDqLayersContext (PWelsDecoderContext pCtx);
 
 /*
  *	DecodeNalHeaderExt
@@ -83,19 +83,19 @@ void_t UninitialDqLayersContext ( PWelsDecoderContext pCtx );
  *	pNal:	target NALUnit ptr
  *	pSrc:	NAL Unit bitstream
  */
-void_t DecodeNalHeaderExt( PNalUnit pNal, uint8_t* pSrc );
+void_t DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc);
 
 /*
  *	ParseSliceHeaderSyntaxs
  *	Parse slice header of bitstream
  */
-int32_t ParseSliceHeaderSyntaxs ( PWelsDecoderContext pCtx, PBitStringAux pBs, const bool_t kbExtensionFlag );
+int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, const bool_t kbExtensionFlag);
 /*
  *	Copy relative syntax elements of NALUnitHeaderExt, sRefPicBaseMarking and bStoreRefBasePicFlag in prefix nal unit.
  *	pSrc:	mark as decoded prefix NAL
  *	pDst:	succeeded VCL NAL based AVC (I/P Slice)
  */
-bool_t PrefetchNalHeaderExtSyntax ( PWelsDecoderContext pCtx, PNalUnit const kpDst, PNalUnit const kpSrc);
+bool_t PrefetchNalHeaderExtSyntax (PWelsDecoderContext pCtx, PNalUnit const kpDst, PNalUnit const kpSrc);
 
 
 /*
@@ -110,26 +110,27 @@ bool_t PrefetchNalHeaderExtSyntax ( PWelsDecoderContext pCtx, PNalUnit const kpD
  * return:
  *	0 - success; otherwise returned error_no defined in error_no.h
  */
-int32_t ConstructAccessUnit( PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo *pDstInfo);
+int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo);
 
 
 /*
  * DecodeCurrentAccessUnit
  * Decode current access unit when current AU is completed.
  */
-int32_t DecodeCurrentAccessUnit( PWelsDecoderContext pCtx, uint8_t **ppDst, int32_t *iDstLen, int32_t *pWidth, int32_t *pHeight, SBufferInfo *pDstInfo );
+int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int32_t* iDstLen, int32_t* pWidth,
+                                 int32_t* pHeight, SBufferInfo* pDstInfo);
 
 /*
  *	Prepare current dq layer context initialization.
  */
-void_t WelsDqLayerDecodeStart ( PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pSps, PPps pPps );
+void_t WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pSps, PPps pPps);
 
 
-int32_t WelsDecodeAccessUnitStart ( PWelsDecoderContext pCtx );
-void_t WelsDecodeAccessUnitEnd ( PWelsDecoderContext pCtx );
+int32_t WelsDecodeAccessUnitStart (PWelsDecoderContext pCtx);
+void_t WelsDecodeAccessUnitEnd (PWelsDecoderContext pCtx);
 
-void_t ForceResetCurrentAccessUnit( PAccessUnit pAu );
-void_t ForceClearCurrentNal( PAccessUnit pAu );
+void_t ForceResetCurrentAccessUnit (PAccessUnit pAu);
+void_t ForceClearCurrentNal (PAccessUnit pAu);
 
 } // namespace WelsDec
 

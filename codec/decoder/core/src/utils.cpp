@@ -37,19 +37,25 @@
  *
  *************************************************************************************
  */
- 
+
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-#if defined(WIN32)
+#if defined(_WIN32)
 #include <windows.h>
 #include <sys/types.h>
 #include <sys/timeb.h>
+#ifndef _MSC_VER
+#include <sys/time.h>
+#ifndef HAVE_STRNLEN
+#define strnlen(a,b) strlen(a)
+#endif //!HAVE_STRNLEN
+#endif //!_MSC_VER
 #else
 #include <sys/time.h>
 #include <sys/timeb.h>
-#endif
+#endif //_WIN32
 
 #include "utils.h"
 #include "macros.h"
@@ -68,138 +74,121 @@ PWelsLogCallbackFunc g_pLog	= NULL;
 
 
 
-void_t WelsLog(void_t *pPtr, int32_t iLevel, const char *kpFmt, ...)
-{
-    va_list pVl;
+void_t WelsLog (void_t* pPtr, int32_t iLevel, const char* kpFmt, ...) {
+  va_list pVl;
 
-	PWelsDecoderContext pCtx  = (PWelsDecoderContext)pPtr;
+  PWelsDecoderContext pCtx  = (PWelsDecoderContext)pPtr;
 
-    va_start(pVl, kpFmt);
-    g_pLog(pCtx->pTraceHandle, iLevel, kpFmt, pVl);
-    va_end(pVl);
+  va_start (pVl, kpFmt);
+  g_pLog (pCtx->pTraceHandle, iLevel, kpFmt, pVl);
+  va_end (pVl);
 }
 
 
-#if  defined(WIN32)
+#if  defined(_WIN32) && defined(_MSC_VER)
 
 #if  defined(_MSC_VER) && (_MSC_VER>=1500)
 
-int32_t WelsSnprintf(str_t * pBuffer,  int32_t iSizeOfBuffer, const str_t * kpFormat, ...)
-{
-	va_list  pArgPtr; 
-	int32_t  iRc;
+int32_t WelsSnprintf (str_t* pBuffer,  int32_t iSizeOfBuffer, const str_t* kpFormat, ...) {
+  va_list  pArgPtr;
+  int32_t  iRc;
 
-	va_start(pArgPtr, kpFormat);
+  va_start (pArgPtr, kpFormat);
 
-	iRc = vsnprintf_s(pBuffer, iSizeOfBuffer, _TRUNCATE, kpFormat, pArgPtr);
+  iRc = vsnprintf_s (pBuffer, iSizeOfBuffer, _TRUNCATE, kpFormat, pArgPtr);
 
-	va_end(pArgPtr);
+  va_end (pArgPtr);
 
-	return iRc;
+  return iRc;
 }
 
-str_t* WelsStrncpy(str_t * pDest, int32_t iSizeInBytes, const str_t * kpSrc, int32_t iCount)
-{
-    strncpy_s(pDest, iSizeInBytes, kpSrc, iCount);
+str_t* WelsStrncpy (str_t* pDest, int32_t iSizeInBytes, const str_t* kpSrc, int32_t iCount) {
+  strncpy_s (pDest, iSizeInBytes, kpSrc, iCount);
 
-	return pDest;
+  return pDest;
 }
 
-int32_t WelsStrnlen(const str_t * kpStr,  int32_t iMaxlen)
-{
-	return strnlen_s(kpStr, iMaxlen);
+int32_t WelsStrnlen (const str_t* kpStr,  int32_t iMaxlen) {
+  return strnlen_s (kpStr, iMaxlen);
 }
 
-int32_t WelsVsprintf(str_t * pBuffer, int32_t iSizeOfBuffer, const str_t * kpFormat, va_list pArgPtr)
-{
-	return vsprintf_s(pBuffer, iSizeOfBuffer, kpFormat, pArgPtr);
+int32_t WelsVsprintf (str_t* pBuffer, int32_t iSizeOfBuffer, const str_t* kpFormat, va_list pArgPtr) {
+  return vsprintf_s (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr);
 }
 
-WelsFileHandle* WelsFopen(const str_t * kpFilename,  const str_t * kpMode)
-{
-	WelsFileHandle* pFp = NULL;
-	if( fopen_s(&pFp, kpFilename, kpMode) != 0 ){
-		return NULL;
-	}
+WelsFileHandle* WelsFopen (const str_t* kpFilename,  const str_t* kpMode) {
+  WelsFileHandle* pFp = NULL;
+  if (fopen_s (&pFp, kpFilename, kpMode) != 0) {
+    return NULL;
+  }
 
-	return pFp;
+  return pFp;
 }
 
-int32_t WelsFclose(WelsFileHandle* pFp)
-{
-	return fclose(pFp);
+int32_t WelsFclose (WelsFileHandle* pFp) {
+  return fclose (pFp);
 }
 
-int32_t WelsGetTimeOfDay(SWelsTime * pTp)
-{
-	return _ftime_s(pTp);
+int32_t WelsGetTimeOfDay (SWelsTime* pTp) {
+  return _ftime_s (pTp);
 }
 
-int32_t WelsStrftime(str_t * pBuffer, int32_t iSize, const str_t * kpFormat, const SWelsTime * kpTp)
-{
-	struct tm   sTimeNow;
+int32_t WelsStrftime (str_t* pBuffer, int32_t iSize, const str_t* kpFormat, const SWelsTime* kpTp) {
+  struct tm   sTimeNow;
 
-	localtime_s(&sTimeNow, &kpTp->time);
+  localtime_s (&sTimeNow, &kpTp->time);
 
-	return strftime(pBuffer, iSize, kpFormat, &sTimeNow);
+  return strftime (pBuffer, iSize, kpFormat, &sTimeNow);
 }
 
-#else 
+#else
 
-int32_t WelsSnprintf(str_t * pBuffer,  int32_t iSizeOfBuffer, const str_t * kpFormat, ...)
-{
-	va_list pArgPtr;
-	int32_t iRc;
+int32_t WelsSnprintf (str_t* pBuffer,  int32_t iSizeOfBuffer, const str_t* kpFormat, ...) {
+  va_list pArgPtr;
+  int32_t iRc;
 
-	va_start(pArgPtr, kpFormat);
+  va_start (pArgPtr, kpFormat);
 
-    iRc = vsprintf(pBuffer, kpFormat, pArgPtr);//confirmed_safe_unsafe_usage
+  iRc = vsprintf (pBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
 
-	va_end(pArgPtr);
+  va_end (pArgPtr);
 
-	return iRc;
+  return iRc;
 }
 
-str_t* WelsStrncpy(str_t * pDest, int32_t iSizeInBytes, const str_t * kpSrc, int32_t iCount)
-{
-	strncpy(pDest, kpSrc, iCount);//confirmed_safe_unsafe_usage
+str_t* WelsStrncpy (str_t* pDest, int32_t iSizeInBytes, const str_t* kpSrc, int32_t iCount) {
+  strncpy (pDest, kpSrc, iCount); //confirmed_safe_unsafe_usage
 
-	return pDest;
+  return pDest;
 }
 
-int32_t WelsStrnlen(const str_t * kpStr,  int32_t iMaxlen)
-{
-	return strlen(kpStr);//confirmed_safe_unsafe_usage
+int32_t WelsStrnlen (const str_t* kpStr,  int32_t iMaxlen) {
+  return strlen (kpStr); //confirmed_safe_unsafe_usage
 }
 
-int32_t WelsVsprintf(str_t * pBuffer, int32_t iSizeOfBuffer, const str_t * kpFormat, va_list pArgPtr)
-{
-	return vsprintf(pBuffer, kpFormat, pArgPtr);//confirmed_safe_unsafe_usage
+int32_t WelsVsprintf (str_t* pBuffer, int32_t iSizeOfBuffer, const str_t* kpFormat, va_list pArgPtr) {
+  return vsprintf (pBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
 }
 
 
-WelsFileHandle* WelsFopen(const str_t * kpFilename,  const str_t * kpMode)
-{
-	return fopen(kpFilename, kpMode);
+WelsFileHandle* WelsFopen (const str_t* kpFilename,  const str_t* kpMode) {
+  return fopen (kpFilename, kpMode);
 }
 
-int32_t WelsFclose(WelsFileHandle* pFp)
-{
-	return fclose(pFp);
+int32_t WelsFclose (WelsFileHandle* pFp) {
+  return fclose (pFp);
 }
 
-int32_t WelsGetTimeOfDay(SWelsTime * pTp)
-{
-	return _ftime(pTp);
+int32_t WelsGetTimeOfDay (SWelsTime* pTp) {
+  return _ftime (pTp);
 }
 
-int32_t WelsStrftime(str_t * pBuffer, int32_t iSize, const str_t * kpFormat, const SWelsTime * kpTp)
-{
-	struct tm  * pTnow;
+int32_t WelsStrftime (str_t* pBuffer, int32_t iSize, const str_t* kpFormat, const SWelsTime* kpTp) {
+  struct tm*   pTnow;
 
-	pTnow = localtime(&kpTp->time);
+  pTnow = localtime (&kpTp->time);
 
-	return strftime(pBuffer, iSize, kpFormat, pTnow);
+  return strftime (pBuffer, iSize, kpFormat, pTnow);
 }
 
 
@@ -207,101 +196,89 @@ int32_t WelsStrftime(str_t * pBuffer, int32_t iSize, const str_t * kpFormat, con
 
 #else  //GCC
 
-int32_t WelsSnprintf(str_t * pBuffer,  int32_t iSizeOfBuffer, const str_t * kpFormat, ...)
-{
-	va_list pArgPtr;
-	int32_t iRc;
+int32_t WelsSnprintf (str_t* pBuffer,  int32_t iSizeOfBuffer, const str_t* kpFormat, ...) {
+  va_list pArgPtr;
+  int32_t iRc;
 
-	va_start(pArgPtr, kpFormat);
+  va_start (pArgPtr, kpFormat);
 
-    iRc = vsnprintf(pBuffer, iSizeOfBuffer, kpFormat, pArgPtr);
+  iRc = vsnprintf (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr);
 
-	va_end(pArgPtr);
+  va_end (pArgPtr);
 
-	return iRc;
+  return iRc;
 }
 
-str_t* WelsStrncpy(str_t * pDest, int32_t iSizeInBytes, const str_t * kpSrc, int32_t iCount)
-{
-    return strncpy(pDest, kpSrc, iCount);//confirmed_safe_unsafe_usage	
+str_t* WelsStrncpy (str_t* pDest, int32_t iSizeInBytes, const str_t* kpSrc, int32_t iCount) {
+  return strncpy (pDest, kpSrc, iCount); //confirmed_safe_unsafe_usage
 }
 
 #if !defined(MACOS) && !defined(UNIX) && !defined(APPLE_IOS)
-int32_t WelsStrnlen(const str_t * kpStr,  int32_t iMaxlen)
-{
-	return strnlen(kpStr, iMaxlen);//confirmed_safe_unsafe_usage
+int32_t WelsStrnlen (const str_t* kpStr,  int32_t iMaxlen) {
+  return strnlen (kpStr, iMaxlen); //confirmed_safe_unsafe_usage
 }
 #else
-int32_t WelsStrnlen(const str_t *kpString, int32_t iMaxlen)
-{
-	// In mac os, there is no strnlen in string.h, we can only use strlen instead of strnlen or
-	// implement strnlen by ourself
-	
+int32_t WelsStrnlen (const str_t* kpString, int32_t iMaxlen) {
+  // In mac os, there is no strnlen in string.h, we can only use strlen instead of strnlen or
+  // implement strnlen by ourself
+
 #if 1
-	return strlen(pString);//confirmed_safe_unsafe_usage
-#else	
-	const str_t *kpSrc;
-	for (kpSrc = kpString; iMaxlen-- && *kpSrc != '\0'; ++kpSrc)
-		return kpSrc - kpString;
-#endif
-	
-}
+  return strlen (kpString); //confirmed_safe_unsafe_usage
+#else
+  const str_t* kpSrc;
+  for (kpSrc = kpString; iMaxlen-- && *kpSrc != '\0'; ++kpSrc)
+    return kpSrc - kpString;
 #endif
 
-int32_t WelsVsprintf(str_t * pBuffer, int32_t iSizeOfBuffer, const str_t * kpFormat, va_list pArgPtr)
-{
-	return vsprintf(pBuffer, kpFormat, pArgPtr);//confirmed_safe_unsafe_usage
+}
+#endif
+
+int32_t WelsVsprintf (str_t* pBuffer, int32_t iSizeOfBuffer, const str_t* kpFormat, va_list pArgPtr) {
+  return vsprintf (pBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
 }
 
-WelsFileHandle* WelsFopen(const str_t * kpFilename,  const str_t * kpMode)
-{
-	return fopen(kpFilename, kpMode);
+WelsFileHandle* WelsFopen (const str_t* kpFilename,  const str_t* kpMode) {
+  return fopen (kpFilename, kpMode);
 }
 
-int32_t WelsFclose(WelsFileHandle  * pFp)
-{
-	return fclose(pFp);
+int32_t WelsFclose (WelsFileHandle*   pFp) {
+  return fclose (pFp);
 }
 
-int32_t WelsGetTimeOfDay(SWelsTime * pTp)
-{
-        struct timeval  sTv;
+int32_t WelsGetTimeOfDay (SWelsTime* pTp) {
+  struct timeval  sTv;
 
-        if( gettimeofday(&sTv, NULL) ){
-             return -1;
-        }
+  if (gettimeofday (&sTv, NULL)) {
+    return -1;
+  }
 
-        pTp->time = sTv.tv_sec;
-        pTp->millitm = (uint16_t)sTv.tv_usec/1000;
+  pTp->time = sTv.tv_sec;
+  pTp->millitm = (uint16_t)sTv.tv_usec / 1000;
 
-        return 0;
+  return 0;
 }
 
-int32_t WelsStrftime(str_t * pBuffer, int32_t iSize, const str_t * kpFormat, const SWelsTime * kpTp)
-{
-	struct tm  * pTnow;
-        
-	pTnow = localtime(&kpTp->time);
+int32_t WelsStrftime (str_t* pBuffer, int32_t iSize, const str_t* kpFormat, const SWelsTime* kpTp) {
+  struct tm*   pTnow;
 
-	return strftime(pBuffer, iSize, kpFormat, pTnow);
+  pTnow = localtime (&kpTp->time);
+
+  return strftime (pBuffer, iSize, kpFormat, pTnow);
 }
 
 #endif
 
 
-int32_t WelsFwrite(const void_t * kpBuffer, int32_t iSize, int32_t iCount, WelsFileHandle* pFp)
-{
-	return fwrite(kpBuffer, iSize, iCount, pFp);
+int32_t WelsFwrite (const void_t* kpBuffer, int32_t iSize, int32_t iCount, WelsFileHandle* pFp) {
+  return fwrite (kpBuffer, iSize, iCount, pFp);
 }
 
-uint16_t WelsGetMillsecond(const SWelsTime * kpTp)
-{
-	return kpTp->millitm;
+uint16_t WelsGetMillsecond (const SWelsTime* kpTp) {
+  return kpTp->millitm;
 }
 
-int32_t WelsFflush(WelsFileHandle* pFp)
-{
-	return fflush(pFp);
+int32_t WelsFflush (WelsFileHandle* pFp) {
+  return fflush (pFp);
 }
 
 } // namespace WelsDec

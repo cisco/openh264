@@ -34,12 +34,12 @@
  *
  * \date         :  2011/03/14
  *
- * \description  :  1. rewrite the package code of scene change detection class  
+ * \description  :  1. rewrite the package code of scene change detection class
  *
  */
 
-#ifndef _WELSVP_SCENECHANGEDETECTIONCOMMON_H
-#define _WELSVP_SCENECHANGEDETECTIONCOMMON_H
+#ifndef WELSVP_SCENECHANGEDETECTIONCOMMON_H
+#define WELSVP_SCENECHANGEDETECTIONCOMMON_H
 
 #include "../common/util.h"
 #include "../common/memory.h"
@@ -48,9 +48,9 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-typedef  int32_t (SadFunc) ( uint8_t * pSrcY, int32_t iSrcStrideY, uint8_t * pRefY, int32_t iRefStrideY );
+typedef  int32_t (SadFunc) (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY);
 
-typedef SadFunc  * SadFuncPtr;
+typedef SadFunc*   SadFuncPtr;
 
 SadFunc      WelsSampleSad8x8_c;
 

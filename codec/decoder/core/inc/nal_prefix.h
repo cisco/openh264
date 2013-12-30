@@ -45,42 +45,42 @@ namespace WelsDec {
 ///////////////////////////////////NAL Unit prefix/headers///////////////////////////////////
 
 /* NAL Unix Header in AVC, refer to Page 56 in JVT X201wcm */
-typedef struct TagNalUnitHeader{
-	uint8_t		    uiForbiddenZeroBit;
-	uint8_t		    uiNalRefIdc;
-	ENalUnitType    eNalUnitType;
-	uint8_t		    uiReservedOneByte;		// only padding usage
-}SNalUnitHeader, *PNalUnitHeader;
+typedef struct TagNalUnitHeader {
+  uint8_t		    uiForbiddenZeroBit;
+  uint8_t		    uiNalRefIdc;
+  ENalUnitType    eNalUnitType;
+  uint8_t		    uiReservedOneByte;		// only padding usage
+} SNalUnitHeader, *PNalUnitHeader;
 
 /* NAL Unit Header in scalable extension syntax, refer to Page 390 in JVT X201wcm */
-typedef struct TagNalUnitHeaderExt{
-	SNalUnitHeader	sNalUnitHeader;
-	
-//	uint8_t		reserved_one_bit;
-	bool_t		bIdrFlag;
-	uint8_t		uiPriorityId;
-	int8_t		iNoInterLayerPredFlag;	// change as int8_t to support 3 values probably in encoder	
-	uint8_t		uiDependencyId;
+typedef struct TagNalUnitHeaderExt {
+  SNalUnitHeader	sNalUnitHeader;
 
-	uint8_t		uiQualityId;
-	uint8_t		uiTemporalId;
-	bool_t		bUseRefBasePicFlag;
-	bool_t		bDiscardableFlag;
-	
-	bool_t		bOutputFlag;
-	uint8_t		uiReservedThree2Bits;
-	// Derived variable(s)
-	uint8_t		uiLayerDqId;
-	bool_t		bNalExtFlag;
-}SNalUnitHeaderExt, *PNalUnitHeaderExt;
+//	uint8_t		reserved_one_bit;
+  bool_t		bIdrFlag;
+  uint8_t		uiPriorityId;
+  int8_t		iNoInterLayerPredFlag;	// change as int8_t to support 3 values probably in encoder
+  uint8_t		uiDependencyId;
+
+  uint8_t		uiQualityId;
+  uint8_t		uiTemporalId;
+  bool_t		bUseRefBasePicFlag;
+  bool_t		bDiscardableFlag;
+
+  bool_t		bOutputFlag;
+  uint8_t		uiReservedThree2Bits;
+  // Derived variable(s)
+  uint8_t		uiLayerDqId;
+  bool_t		bNalExtFlag;
+} SNalUnitHeaderExt, *PNalUnitHeaderExt;
 
 /* Prefix NAL Unix syntax, refer to Page 392 in JVT X201wcm */
-typedef struct TagPrefixNalUnit{
-	SRefBasePicMarking	sRefPicBaseMarking;	
-	bool_t		bStoreRefBasePicFlag;		
-	bool_t		bPrefixNalUnitAdditionalExtFlag;
-	bool_t		bPrefixNalUnitExtFlag;
-}SPrefixNalUnit, *PPrefixNalUnit;
+typedef struct TagPrefixNalUnit {
+  SRefBasePicMarking	sRefPicBaseMarking;
+  bool_t		bStoreRefBasePicFlag;
+  bool_t		bPrefixNalUnitAdditionalExtFlag;
+  bool_t		bPrefixNalUnitExtFlag;
+} SPrefixNalUnit, *PPrefixNalUnit;
 
 //#pragma pack()
 

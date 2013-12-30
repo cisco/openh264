@@ -46,11 +46,10 @@
  *	Dependency Quality IDC
  */
 
-typedef struct TagDqIdc
-{
-	uint16_t	iPpsId;			// pPps id
-	uint8_t	iSpsId;			// pSps id
-	int8_t		uiSpatialId;	// spatial id
-}SDqIdc;
+typedef struct TagDqIdc {
+  uint16_t	iPpsId;			// pPps id
+  uint8_t	iSpsId;			// pSps id
+  int8_t		uiSpatialId;	// spatial id
+} SDqIdc;
 
 #endif//WELS_ENCODER_DEPENDENCY_QUAILITY_IDC_MAP_H__

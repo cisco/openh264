@@ -33,7 +33,7 @@
  *
  * \brief	common flag definitions
  *
- * \date	7/6/2009 Created 
+ * \date	7/6/2009 Created
  *************************************************************************************
  */
 #ifndef WELS_AS264_COMMON_H__
@@ -47,15 +47,15 @@ extern "C" {
 
 #ifdef X86_ASM
 
-void MemZeroUnalign32Bytes(void *pSrc);
-void MemZeroAlign32Bytes(void *pSrc);
-void MemZeroUnalign16Bytes(void *pSrc);
-void MemZeroAlign16Bytes(void *pSrc);
-void MemZeroAlign128Bytes(void *pSrc);
-void MemZeroUnalign128Bytes(void *pSrc);
-void MemZeroAlign256Bytes(void *pSrc);
-void MemZeroAlign240Bytes(void *pSrc);
-void MmPrefetch0(char const *kpA);
+void MemZeroUnalign32Bytes (void* pSrc);
+void MemZeroAlign32Bytes (void* pSrc);
+void MemZeroUnalign16Bytes (void* pSrc);
+void MemZeroAlign16Bytes (void* pSrc);
+void MemZeroAlign128Bytes (void* pSrc);
+void MemZeroUnalign128Bytes (void* pSrc);
+void MemZeroAlign256Bytes (void* pSrc);
+void MemZeroAlign240Bytes (void* pSrc);
+void MmPrefetch0 (char const* kpA);
 
 #endif// X86_ASM
 

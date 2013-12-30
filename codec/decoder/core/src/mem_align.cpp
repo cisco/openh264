@@ -38,8 +38,8 @@ namespace WelsDec {
 //#define MEMORY_CHECK
 #ifdef MEMORY_CHECK
 
-WelsFileHandle * pMemCheckMalloc = NULL;
-WelsFileHandle * pMemCheckFree = NULL; 
+WelsFileHandle* pMemCheckMalloc = NULL;
+WelsFileHandle* pMemCheckFree = NULL;
 
 int32_t iCountMalloc = 0;
 #endif
@@ -49,66 +49,60 @@ int32_t iCountMalloc = 0;
 #define ALIGNBYTES (16)
 /////////////////////////////////////////////////////////////////////////////////
 
-void_t * WelsMalloc( const uint32_t kuiSize, const str_t *kpTag )
-{
-	const int32_t kiSizeVoidPtr	= sizeof( void_t ** );
-	const int32_t kiSizeInt		= sizeof( int32_t );
+void_t* WelsMalloc (const uint32_t kuiSize, const str_t* kpTag) {
+  const int32_t kiSizeVoidPtr	= sizeof (void_t**);
+  const int32_t kiSizeInt		= sizeof (int32_t);
 #ifdef HAVE_CACHE_LINE_ALIGN
-	const int32_t kiAlignBytes	= ALIGNBYTES - 1;
+  const int32_t kiAlignBytes	= ALIGNBYTES - 1;
 #else
-	const int32_t kiAlignBytes	= 15;
+  const int32_t kiAlignBytes	= 15;
 #endif// HAVE_CACHE_LINE_ALIGN
-	uint8_t* pBuf		= (uint8_t *) malloc( kuiSize + kiAlignBytes + kiSizeVoidPtr + kiSizeInt );
-	uint8_t* pAlignBuf;
+  uint8_t* pBuf		= (uint8_t*) malloc (kuiSize + kiAlignBytes + kiSizeVoidPtr + kiSizeInt);
+  uint8_t* pAlignBuf;
 
-#ifdef MEMORY_CHECK	
-	if( pMemCheckMalloc == NULL ){
-		pMemCheckMalloc = WelsFopen(".\\mem_check_malloc.txt", "at+");
-		pMemCheckFree   = WelsFopen(".\\mem_check_free.txt", "at+");
-	}
+#ifdef MEMORY_CHECK
+  if (pMemCheckMalloc == NULL) {
+    pMemCheckMalloc = WelsFopen (".\\mem_check_malloc.txt", "at+");
+    pMemCheckFree   = WelsFopen (".\\mem_check_free.txt", "at+");
+  }
 
-	if ( kpTag != NULL )
-	{
-		if ( pMemCheckMalloc != NULL )
-		{
-			fprintf( pMemCheckMalloc, "0x%x, size: %d       , malloc %s\n", (void_t *)pBuf, (kuiSize + kiAlignBytes + kiSizeVoidPtr + kiSizeInt), kpTag );			
-		}
-		if ( pMemCheckMalloc != NULL )
-		{
-			fflush( pMemCheckMalloc );
-		}
-	}
-#endif	
+  if (kpTag != NULL) {
+    if (pMemCheckMalloc != NULL) {
+      fprintf (pMemCheckMalloc, "0x%x, size: %d       , malloc %s\n", (void_t*)pBuf,
+               (kuiSize + kiAlignBytes + kiSizeVoidPtr + kiSizeInt), kpTag);
+    }
+    if (pMemCheckMalloc != NULL) {
+      fflush (pMemCheckMalloc);
+    }
+  }
+#endif
 
-	if ( NULL == pBuf )
-		return NULL;
+  if (NULL == pBuf)
+    return NULL;
 
-	// to fill zero values
-	memset( pBuf, 0, kuiSize + kiAlignBytes + kiSizeVoidPtr + kiSizeInt );
+  // to fill zero values
+  memset (pBuf, 0, kuiSize + kiAlignBytes + kiSizeVoidPtr + kiSizeInt);
 
-	pAlignBuf = pBuf + kiAlignBytes + kiSizeVoidPtr + kiSizeInt;
-	pAlignBuf -= (int32_t) pAlignBuf & kiAlignBytes;
-	*( (void_t **) ( pAlignBuf - kiSizeVoidPtr ) ) = pBuf;
-	*( (int32_t *) ( pAlignBuf - (kiSizeVoidPtr + kiSizeInt) ) ) = kuiSize;
+  pAlignBuf = pBuf + kiAlignBytes + kiSizeVoidPtr + kiSizeInt;
+  pAlignBuf -= (uintptr_t) pAlignBuf & kiAlignBytes;
+  * ((void_t**) (pAlignBuf - kiSizeVoidPtr)) = pBuf;
+  * ((int32_t*) (pAlignBuf - (kiSizeVoidPtr + kiSizeInt))) = kuiSize;
 
-	return (pAlignBuf);
+  return (pAlignBuf);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 
-void_t WelsFree( void_t* pPtr, const str_t *kpTag )
-{
-	if( pPtr )
-	{
-#ifdef MEMORY_CHECK			
-		if ( NULL != pMemCheckFree && kpTag != NULL )
-		{				
-			fprintf( pMemCheckFree, "0x%x, free %s\n", (void_t *)(*( ( ( void_t **) pPtr ) - 1 )), kpTag );
-			fflush( pMemCheckFree );
-		}	
+void_t WelsFree (void_t* pPtr, const str_t* kpTag) {
+  if (pPtr) {
+#ifdef MEMORY_CHECK
+    if (NULL != pMemCheckFree && kpTag != NULL) {
+      fprintf (pMemCheckFree, "0x%x, free %s\n", (void_t*) (* (((void_t**) pPtr) - 1)), kpTag);
+      fflush (pMemCheckFree);
+    }
 #endif
-		free( *( ( ( void_t **) pPtr ) - 1 ) );
-	}
+    free (* (((void_t**) pPtr) - 1));
+  }
 }
 
 /////////////////////////////////////////////////////////////////////////////

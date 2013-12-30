@@ -36,74 +36,61 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-EResult Init (void *pCtx, int32_t iType, void *pCfg)
-{
-	return pCtx ? WelsStaticCast(IWelsVP *, pCtx)->Init(iType, pCfg) : RET_INVALIDPARAM;
+EResult Init (void* pCtx, int32_t iType, void* pCfg) {
+  return pCtx ? WelsStaticCast (IWelsVP*, pCtx)->Init (iType, pCfg) : RET_INVALIDPARAM;
 }
-EResult Uninit (void *pCtx, int32_t iType)
-{
-	return pCtx ? WelsStaticCast(IWelsVP *, pCtx)->Uninit(iType) : RET_INVALIDPARAM;
+EResult Uninit (void* pCtx, int32_t iType) {
+  return pCtx ? WelsStaticCast (IWelsVP*, pCtx)->Uninit (iType) : RET_INVALIDPARAM;
 }
-EResult Flush (void *pCtx, int32_t iType)
-{
-	return pCtx ? WelsStaticCast(IWelsVP *, pCtx)->Flush(iType) : RET_INVALIDPARAM;
+EResult Flush (void* pCtx, int32_t iType) {
+  return pCtx ? WelsStaticCast (IWelsVP*, pCtx)->Flush (iType) : RET_INVALIDPARAM;
 }
-EResult Process (void *pCtx, int32_t iType, SPixMap *pSrc, SPixMap *dst)
-{
-	return pCtx ? WelsStaticCast(IWelsVP *, pCtx)->Process(iType, pSrc, dst) : RET_INVALIDPARAM;
+EResult Process (void* pCtx, int32_t iType, SPixMap* pSrc, SPixMap* dst) {
+  return pCtx ? WelsStaticCast (IWelsVP*, pCtx)->Process (iType, pSrc, dst) : RET_INVALIDPARAM;
 }
-EResult Get (void *pCtx, int32_t iType, void *pParam)
-{
-	return pCtx ? WelsStaticCast(IWelsVP *, pCtx)->Get(iType, pParam) : RET_INVALIDPARAM;
+EResult Get (void* pCtx, int32_t iType, void* pParam) {
+  return pCtx ? WelsStaticCast (IWelsVP*, pCtx)->Get (iType, pParam) : RET_INVALIDPARAM;
 }
-EResult Set (void *pCtx, int32_t iType, void *pParam)
-{
-	return pCtx ? WelsStaticCast(IWelsVP *, pCtx)->Set(iType, pParam) : RET_INVALIDPARAM;
+EResult Set (void* pCtx, int32_t iType, void* pParam) {
+  return pCtx ? WelsStaticCast (IWelsVP*, pCtx)->Set (iType, pParam) : RET_INVALIDPARAM;
 }
-EResult SpecialFeature (void *pCtx, int32_t iType, void *pIn, void *pOut)
-{
-	return pCtx ? WelsStaticCast(IWelsVP *, pCtx)->SpecialFeature(iType, pIn, pOut) : RET_INVALIDPARAM;
+EResult SpecialFeature (void* pCtx, int32_t iType, void* pIn, void* pOut) {
+  return pCtx ? WelsStaticCast (IWelsVP*, pCtx)->SpecialFeature (iType, pIn, pOut) : RET_INVALIDPARAM;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-EResult CreateSpecificVpInterface(IWelsVPc **pCtx)
-{
-	EResult  ret     = RET_FAILED;
-	IWelsVP *pWelsVP = NULL;
+EResult CreateSpecificVpInterface (IWelsVPc** pCtx) {
+  EResult  ret     = RET_FAILED;
+  IWelsVP* pWelsVP = NULL;
 
-	ret = CreateSpecificVpInterface(&pWelsVP);
-	if (ret == RET_SUCCESS)
-	{
-		IWelsVPc *pVPc = new IWelsVPc;
-		if (pVPc)
-		{
-			pVPc->Init    = Init;
-			pVPc->Uninit  = Uninit;
-			pVPc->Flush   = Flush;
-			pVPc->Process = Process;
-			pVPc->Get     = Get;
-			pVPc->Set     = Set;
-			pVPc->SpecialFeature = SpecialFeature;
-			pVPc->pCtx       = WelsStaticCast(void *, pWelsVP);
-			*pCtx            = pVPc;
-		}
-		else 
-			ret = RET_OUTOFMEMORY;
-	}
+  ret = CreateSpecificVpInterface (&pWelsVP);
+  if (ret == RET_SUCCESS) {
+    IWelsVPc* pVPc = new IWelsVPc;
+    if (pVPc) {
+      pVPc->Init    = Init;
+      pVPc->Uninit  = Uninit;
+      pVPc->Flush   = Flush;
+      pVPc->Process = Process;
+      pVPc->Get     = Get;
+      pVPc->Set     = Set;
+      pVPc->SpecialFeature = SpecialFeature;
+      pVPc->pCtx       = WelsStaticCast (void*, pWelsVP);
+      *pCtx            = pVPc;
+    } else
+      ret = RET_OUTOFMEMORY;
+  }
 
-	return ret;
+  return ret;
 }
 
-EResult DestroySpecificVpInterface(IWelsVPc *pCtx)
-{
-	if (pCtx)
-	{
-		DestroySpecificVpInterface(WelsStaticCast(IWelsVP *, pCtx->pCtx));
-		_SafeDelete(pCtx);
-	}
+EResult DestroySpecificVpInterface (IWelsVPc* pCtx) {
+  if (pCtx) {
+    DestroySpecificVpInterface (WelsStaticCast (IWelsVP*, pCtx->pCtx));
+    _SafeDelete (pCtx);
+  }
 
-	return RET_SUCCESS;
+  return RET_SUCCESS;
 }
 
 WELSVP_NAMESPACE_END

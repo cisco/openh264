@@ -37,8 +37,8 @@
  *************************************************************************************
  */
 
-#ifndef _WELSVP_CPU_H
-#define _WELSVP_CPU_H
+#ifndef WELSVP_CPU_H
+#define WELSVP_CPU_H
 
 #include "typedef.h"
 
@@ -46,7 +46,7 @@ WELSVP_NAMESPACE_BEGIN
 
 /*
  *	WELS CPU feature flags
- */ 
+ */
 #define WELS_CPU_MMX        0x00000001    /* mmx */
 #define WELS_CPU_MMXEXT     0x00000002    /* mmx-ext*/
 #define WELS_CPU_SSE        0x00000004    /* sse */
@@ -86,16 +86,16 @@ WELSVP_EXTERN_C_BEGIN
 
 int32_t WelsCPUIdVerify();
 
-void  WelsCPUId( uint32_t uiIndex, uint32_t *pFeatureA, uint32_t *pFeatureB, uint32_t *pFeatureC, uint32_t *pFeatureD );
-int32_t WelsCPUSupportAVX( uint32_t eax, uint32_t ecx );
-int32_t WelsCPUSupportFMA( uint32_t eax, uint32_t ecx );
+void  WelsCPUId (uint32_t uiIndex, uint32_t* pFeatureA, uint32_t* pFeatureB, uint32_t* pFeatureC, uint32_t* pFeatureD);
+int32_t WelsCPUSupportAVX (uint32_t eax, uint32_t ecx);
+int32_t WelsCPUSupportFMA (uint32_t eax, uint32_t ecx);
 
 void  WelsEmms();
 
 WELSVP_EXTERN_C_END
 #endif
 
-uint32_t WelsCPUFeatureDetect( int32_t *pNumberOfLogicProcessors );
+uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors);
 
 WELSVP_NAMESPACE_END
 

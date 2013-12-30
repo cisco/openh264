@@ -57,13 +57,13 @@ namespace WelsSVCEnc {
 #define    CAVLC_BS_INIT( pBs )  \
 	uint8_t  * pBufPtr = pBs->pBufPtr; \
 	uint32_t   uiCurBits = pBs->uiCurBits; \
-	int32_t    iLeftBits = pBs->iLeftBits; 
+	int32_t    iLeftBits = pBs->iLeftBits;
 
 #define    CAVLC_BS_UNINIT( pBs ) \
 	pBs->pBufPtr = pBufPtr;  \
 	pBs->uiCurBits = uiCurBits;  \
 	pBs->iLeftBits = iLeftBits;
-   
+
 #define    CAVLC_BS_WRITE( n,  v ) \
 	{  \
 	if ( (n) < iLeftBits ) {\
@@ -78,7 +78,7 @@ namespace WelsSVCEnc {
 		uiCurBits = (v) & ((1<<(n))-1);\
 		iLeftBits = 32 - (n);\
 	}\
-	} ;  
+	} ;
 
 extern const uint32_t g_uiGolombUELength[256];
 
@@ -86,192 +86,158 @@ extern const uint32_t g_uiGolombUELength[256];
 /*
  *	Get size of unsigned exp golomb codes
  */
-static inline uint32_t BsSizeUE( const uint32_t kiValue )
-{
-	if ( 256 > kiValue )
-	{
-		return g_uiGolombUELength[kiValue];	
-	}
-	else
-	{
-		uint32_t n = 0;	
-		uint32_t iTmpValue = kiValue+1;
-		
-		if (iTmpValue & 0xffff0000) 
-		{
-			iTmpValue >>= 16;
-			n += 16;
-		}
-		if (iTmpValue & 0xff00) 
-		{
-			iTmpValue >>= 8;
-			n += 8;
-		}
-		
-		//n += (g_uiGolombUELength[iTmpValue] >> 1);
-		n += (g_uiGolombUELength[iTmpValue-1] >> 1);
-		return ((n<<1) + 1);
-		
-	}
+static inline uint32_t BsSizeUE (const uint32_t kiValue) {
+if (256 > kiValue) {
+  return g_uiGolombUELength[kiValue];
+} else {
+  uint32_t n = 0;
+  uint32_t iTmpValue = kiValue + 1;
+
+  if (iTmpValue & 0xffff0000) {
+    iTmpValue >>= 16;
+    n += 16;
+  }
+  if (iTmpValue & 0xff00) {
+    iTmpValue >>= 8;
+    n += 8;
+  }
+
+  //n += (g_uiGolombUELength[iTmpValue] >> 1);
+  n += (g_uiGolombUELength[iTmpValue - 1] >> 1);
+  return ((n << 1) + 1);
+
+}
 }
 
 /*
  *	Get size of signed exp golomb codes
  */
-static inline uint32_t BsSizeSE( const int32_t kiValue )
-{
-	uint32_t iTmpValue;
-	if ( 0 == kiValue )
-	{
-		return 1;
-	}
-	else if ( 0 < kiValue )
-	{
-		iTmpValue = (kiValue<<1) - 1;
-		return BsSizeUE( iTmpValue );
-	}
-	else
-	{
-		iTmpValue = ((-kiValue)<<1);
-		return BsSizeUE( iTmpValue );
-	}
+static inline uint32_t BsSizeSE (const int32_t kiValue) {
+uint32_t iTmpValue;
+if (0 == kiValue) {
+  return 1;
+} else if (0 < kiValue) {
+  iTmpValue = (kiValue << 1) - 1;
+  return BsSizeUE (iTmpValue);
+} else {
+  iTmpValue = ((-kiValue) << 1);
+  return BsSizeUE (iTmpValue);
+}
 }
 
 /*
  *	Get size of truncated exp golomb codes
  */
-static inline int32_t BsSizeTE( const int32_t kiX, const int32_t kiValue )
-{
-	return 0;
+static inline int32_t BsSizeTE (const int32_t kiX, const int32_t kiValue) {
+return 0;
 }
 
 
 
-static inline int32_t BsWriteBits( SBitStringAux *pBs, int32_t n, const uint32_t kuiValue )
-{  
-	if( n < pBs->iLeftBits ){
-		pBs->uiCurBits = (pBs->uiCurBits<<n) | kuiValue;
-		pBs->iLeftBits -= n;	
-	} else {
-	    n -= pBs->iLeftBits;
-		pBs->uiCurBits = (pBs->uiCurBits<<pBs->iLeftBits) | (kuiValue>>n);
-		*((uint32_t*)pBs->pBufPtr) = ENDIAN_FIX(pBs->uiCurBits);		
-		pBs->pBufPtr += 4;
-		pBs->uiCurBits = kuiValue & ((1<<n)-1);
-		pBs->iLeftBits = 32 - n;
-	}
-	return 0;
+static inline int32_t BsWriteBits (SBitStringAux* pBs, int32_t n, const uint32_t kuiValue) {
+if (n < pBs->iLeftBits) {
+  pBs->uiCurBits = (pBs->uiCurBits << n) | kuiValue;
+  pBs->iLeftBits -= n;
+} else {
+  n -= pBs->iLeftBits;
+  pBs->uiCurBits = (pBs->uiCurBits << pBs->iLeftBits) | (kuiValue >> n);
+  * ((uint32_t*)pBs->pBufPtr) = ENDIAN_FIX (pBs->uiCurBits);
+  pBs->pBufPtr += 4;
+  pBs->uiCurBits = kuiValue & ((1 << n) - 1);
+  pBs->iLeftBits = 32 - n;
+}
+return 0;
 }
 
 /*
  *	Write 1 bit
  */
-static inline int32_t BsWriteOneBit( SBitStringAux *pBs, const uint32_t kuiValue )
-{
-	BsWriteBits(pBs, 1, kuiValue);
-	
-	return 0;
+static inline int32_t BsWriteOneBit (SBitStringAux* pBs, const uint32_t kuiValue) {
+BsWriteBits (pBs, 1, kuiValue);
+
+return 0;
 }
 
 
-static inline void BsFlush(SBitStringAux * pBs)
-{
-    *(uint32_t*)pBs->pBufPtr = ENDIAN_FIX(pBs->uiCurBits << pBs->iLeftBits);
-	pBs->pBufPtr += 4 - pBs->iLeftBits/8;
-	pBs->iLeftBits = 32;
-	pBs->uiCurBits = 0;	//  for future writing safe, 5/19/2010
+static inline void BsFlush (SBitStringAux* pBs) {
+* (uint32_t*)pBs->pBufPtr = ENDIAN_FIX (pBs->uiCurBits << pBs->iLeftBits);
+pBs->pBufPtr += 4 - pBs->iLeftBits / 8;
+pBs->iLeftBits = 32;
+pBs->uiCurBits = 0;	//  for future writing safe, 5/19/2010
 }
 
 /*
  *	Write unsigned exp golomb codes
  */
-static inline void BsWriteUE( SBitStringAux *pBs, const uint32_t kuiValue )
-{
-	if ( 256 > kuiValue )	{
-		BsWriteBits( pBs, g_uiGolombUELength[kuiValue], kuiValue+1 );
-	}
-	else
-	{
-		uint32_t n = 0;	
-		uint32_t iTmpValue = kuiValue + 1;
-		
-		if (iTmpValue & 0xffff0000) 
-		{
-			iTmpValue >>= 16;
-			n += 16;
-		}
-		if (iTmpValue & 0xff00) 
-		{
-			iTmpValue >>= 8;
-			n += 8;
-		}
+static inline void BsWriteUE (SBitStringAux* pBs, const uint32_t kuiValue) {
+if (256 > kuiValue)	{
+  BsWriteBits (pBs, g_uiGolombUELength[kuiValue], kuiValue + 1);
+} else {
+  uint32_t n = 0;
+  uint32_t iTmpValue = kuiValue + 1;
 
-		//n += (g_uiGolombUELength[iTmpValue] >> 1);
+  if (iTmpValue & 0xffff0000) {
+    iTmpValue >>= 16;
+    n += 16;
+  }
+  if (iTmpValue & 0xff00) {
+    iTmpValue >>= 8;
+    n += 8;
+  }
 
-		n += (g_uiGolombUELength[iTmpValue-1] >> 1);
-		BsWriteBits( pBs, (n<<1) + 1, kuiValue+1 );
-	}
-	return;
+  //n += (g_uiGolombUELength[iTmpValue] >> 1);
+
+  n += (g_uiGolombUELength[iTmpValue - 1] >> 1);
+  BsWriteBits (pBs, (n << 1) + 1, kuiValue + 1);
+}
+return;
 }
 
 /*
  *	Write signed exp golomb codes
  */
-static inline void BsWriteSE( SBitStringAux *pBs, int32_t iValue )
-{	
-	uint32_t iTmpValue;
-	if ( 0 == iValue )
-	{
-		BsWriteOneBit( pBs, 1 );
-	}
-	else if ( 0 < iValue )
-	{
-		iTmpValue = (iValue<<1) - 1;
-		BsWriteUE( pBs, iTmpValue );
-	}
-	else
-	{
-		iTmpValue = ((-iValue)<<1);
-		BsWriteUE( pBs, iTmpValue );
-	}
-	return;
+static inline void BsWriteSE (SBitStringAux* pBs, int32_t iValue) {
+uint32_t iTmpValue;
+if (0 == iValue) {
+  BsWriteOneBit (pBs, 1);
+} else if (0 < iValue) {
+  iTmpValue = (iValue << 1) - 1;
+  BsWriteUE (pBs, iTmpValue);
+} else {
+  iTmpValue = ((-iValue) << 1);
+  BsWriteUE (pBs, iTmpValue);
+}
+return;
 }
 
 /*
  *	Write truncated exp golomb codes
  */
-static inline void BsWriteTE( SBitStringAux *pBs, const int32_t kiX, const uint32_t kuiValue )
-{
-	if ( 1 == kiX )
-	{
-		BsWriteOneBit( pBs, !kuiValue );
-	}
-	else
-	{
-		BsWriteUE( pBs, kuiValue );
-	}
+static inline void BsWriteTE (SBitStringAux* pBs, const int32_t kiX, const uint32_t kuiValue) {
+if (1 == kiX) {
+  BsWriteOneBit (pBs, !kuiValue);
+} else {
+  BsWriteUE (pBs, kuiValue);
+}
 }
 
 
 /*
  *	Write RBSP trailing bits
  */
-static inline void BsRbspTrailingBits( SBitStringAux *pBs )
-{
-	BsWriteOneBit(pBs, 1);	
-	BsFlush(pBs);	
+static inline void BsRbspTrailingBits (SBitStringAux* pBs) {
+BsWriteOneBit (pBs, 1);
+BsFlush (pBs);
 }
 
 
-static inline BOOL_T   BsCheckByteAlign( SBitStringAux * pBs)
-{
-    return !(pBs->iLeftBits & 0x7);
+static inline BOOL_T   BsCheckByteAlign (SBitStringAux* pBs) {
+return ! (pBs->iLeftBits & 0x7);
 }
 
 
-static inline int32_t BsGetBitsPos( SBitStringAux *pBs )
-{
-	return ( ((pBs->pBufPtr - pBs->pBuf) << 3) + 32 - pBs->iLeftBits );
+static inline int32_t BsGetBitsPos (SBitStringAux* pBs) {
+return (((pBs->pBufPtr - pBs->pBuf) << 3) + 32 - pBs->iLeftBits);
 }
 
 }

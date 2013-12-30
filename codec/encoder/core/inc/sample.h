@@ -30,47 +30,46 @@
  *
  */
 
-#ifndef _SAMPLE_H_
-#define _SAMPLE_H_
+#ifndef SAMPLE_H_
+#define SAMPLE_H_
 
 #include "typedefs.h"
 #include "wels_func_ptr_def.h"
 
 namespace WelsSVCEnc {
-enum
-{
-    BLOCK_16x16 = 0,
-    BLOCK_16x8  = 1,
-    BLOCK_8x16  = 2,
-    BLOCK_8x8   = 3,
-    BLOCK_4x4   = 4,
+enum {
+  BLOCK_16x16 = 0,
+  BLOCK_16x8  = 1,
+  BLOCK_8x16  = 2,
+  BLOCK_8x8   = 3,
+  BLOCK_4x4   = 4,
 //    BLOCK_8x4   = 5,
 //    BLOCK_4x8   = 6,
 };
 
 //===================SAD=====================//
-int32_t WelsSampleSad16x16_c( uint8_t *, int32_t, uint8_t *, int32_t );
-int32_t WelsSampleSad16x8_c( uint8_t *, int32_t, uint8_t *, int32_t );
-int32_t WelsSampleSad8x16_c( uint8_t *, int32_t, uint8_t *, int32_t );
-int32_t WelsSampleSad8x8_c( uint8_t *, int32_t, uint8_t *, int32_t );
+int32_t WelsSampleSad16x16_c (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad16x8_c (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad8x16_c (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad8x8_c (uint8_t*, int32_t, uint8_t*, int32_t);
 //int32_t WelsSampleSad8x4( uint8_t *, int32_t, uint8_t *, int32_t );
 //int32_t WelsSampleSad4x8( uint8_t *, int32_t, uint8_t *, int32_t );
-int32_t WelsSampleSad4x4_c( uint8_t *, int32_t, uint8_t *, int32_t );
+int32_t WelsSampleSad4x4_c (uint8_t*, int32_t, uint8_t*, int32_t);
 
 //======================SATD======================//
-int32_t WelsSampleSatd16x16_c( uint8_t *, int32_t, uint8_t *, int32_t );
-int32_t WelsSampleSatd16x8_c( uint8_t *, int32_t, uint8_t *, int32_t );
-int32_t WelsSampleSatd8x16_c( uint8_t *, int32_t, uint8_t *, int32_t );
-int32_t WelsSampleSatd8x8_c( uint8_t *, int32_t, uint8_t *, int32_t );
+int32_t WelsSampleSatd16x16_c (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd16x8_c (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd8x16_c (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd8x8_c (uint8_t*, int32_t, uint8_t*, int32_t);
 //int32_t WelsSampleSatd8x4( uint8_t *, int32_t, uint8_t *, int32_t );
 //int32_t WelsSampleSatd4x8( uint8_t *, int32_t, uint8_t *, int32_t );
-int32_t WelsSampleSatd4x4_c( uint8_t *, int32_t, uint8_t *, int32_t );
+int32_t WelsSampleSatd4x4_c (uint8_t*, int32_t, uint8_t*, int32_t);
 
-void WelsSampleSadFour16x16_c( uint8_t *iSample1, int32_t iStride1, uint8_t *iSample2, int32_t iStride2, int32_t* pSad); 
-void WelsSampleSadFour16x8_c( uint8_t *iSample1, int32_t iStride1, uint8_t *iSample2, int32_t iStride2, int32_t* pSad);
-void WelsSampleSadFour8x16_c( uint8_t *iSample1, int32_t iStride1, uint8_t *iSample2, int32_t iStride2, int32_t* pSad);
-void WelsSampleSadFour8x8_c( uint8_t *iSample1, int32_t iStride1, uint8_t *iSample2, int32_t iStride2, int32_t* pSad);
-void WelsSampleSadFour4x4_c( uint8_t *iSample1, int32_t iStride1, uint8_t *iSample2, int32_t iStride2, int32_t* pSad);
+void WelsSampleSadFour16x16_c (uint8_t* iSample1, int32_t iStride1, uint8_t* iSample2, int32_t iStride2, int32_t* pSad);
+void WelsSampleSadFour16x8_c (uint8_t* iSample1, int32_t iStride1, uint8_t* iSample2, int32_t iStride2, int32_t* pSad);
+void WelsSampleSadFour8x16_c (uint8_t* iSample1, int32_t iStride1, uint8_t* iSample2, int32_t iStride2, int32_t* pSad);
+void WelsSampleSadFour8x8_c (uint8_t* iSample1, int32_t iStride1, uint8_t* iSample2, int32_t iStride2, int32_t* pSad);
+void WelsSampleSadFour4x4_c (uint8_t* iSample1, int32_t iStride1, uint8_t* iSample2, int32_t iStride2, int32_t* pSad);
 
 #if defined(__cplusplus)
 extern "C" {
@@ -78,35 +77,38 @@ extern "C" {
 
 #if defined (X86_ASM)
 
-int32_t WelsSampleSad4x4_mmx( uint8_t *, int32_t, uint8_t *, int32_t );
-int32_t WelsSampleSad16x16_sse2( uint8_t *, int32_t, uint8_t *, int32_t );
-int32_t WelsSampleSad16x8_sse2( uint8_t *, int32_t, uint8_t *, int32_t );
-int32_t WelsSampleSad8x16_sse2( uint8_t *, int32_t, uint8_t *, int32_t);
-int32_t WelsSampleSad8x8_sse21( uint8_t *, int32_t, uint8_t * , int32_t);
+int32_t WelsSampleSad4x4_mmx (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad16x16_sse2 (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad16x8_sse2 (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad8x16_sse2 (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad8x8_sse21 (uint8_t*, int32_t, uint8_t*, int32_t);
 
-void WelsSampleSadFour16x16_sse2( uint8_t *, int32_t, uint8_t *, int32_t, int32_t* );
-void WelsSampleSadFour16x8_sse2( uint8_t *, int32_t, uint8_t *, int32_t, int32_t* );
-void WelsSampleSadFour8x16_sse2( uint8_t *, int32_t, uint8_t *, int32_t, int32_t* );
-void WelsSampleSadFour8x8_sse2( uint8_t *, int32_t, uint8_t *, int32_t, int32_t* );
-void WelsSampleSadFour4x4_sse2( uint8_t *, int32_t, uint8_t *, int32_t, int32_t* );
+void WelsSampleSadFour16x16_sse2 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+void WelsSampleSadFour16x8_sse2 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+void WelsSampleSadFour8x16_sse2 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+void WelsSampleSadFour8x8_sse2 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+void WelsSampleSadFour4x4_sse2 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
 
-int32_t WelsSampleSatd8x8_sse2( uint8_t *, int32_t, uint8_t *, int32_t );
-int32_t WelsSampleSatd16x8_sse2( uint8_t *, int32_t, uint8_t *, int32_t );
-int32_t WelsSampleSatd8x16_sse2( uint8_t *, int32_t, uint8_t *, int32_t );
-int32_t WelsSampleSatd16x16_sse2( uint8_t *, int32_t, uint8_t *, int32_t );
-int32_t WelsSampleSatd4x4_sse2( uint8_t *, int32_t, uint8_t *, int32_t );
-int32_t WelsSmpleSatdThree4x4_sse2( uint8_t *, int32_t, uint8_t *, int32_t, uint8_t*, int32_t*, int32_t, int32_t, int32_t );
+int32_t WelsSampleSatd8x8_sse2 (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd16x8_sse2 (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd8x16_sse2 (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd16x16_sse2 (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd4x4_sse2 (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSmpleSatdThree4x4_sse2 (uint8_t*, int32_t, uint8_t*, int32_t, uint8_t*, int32_t*, int32_t, int32_t,
+                                    int32_t);
 
-int32_t WelsSampleSatd8x8_sse41( uint8_t *, int32_t, uint8_t *, int32_t);
-int32_t WelsSampleSatd8x16_sse41( uint8_t * , int32_t, uint8_t *, int32_t);
-int32_t WelsSampleSatd16x8_sse41( uint8_t * , int32_t, uint8_t *, int32_t);
-int32_t WelsSampleSatd16x16_sse41( uint8_t *, int32_t, uint8_t *, int32_t);
-int32_t WelsSampleSatd4x4_sse41( uint8_t *, int32_t, uint8_t *, int32_t );
+int32_t WelsSampleSatd8x8_sse41 (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd8x16_sse41 (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd16x8_sse41 (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd16x16_sse41 (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd4x4_sse41 (uint8_t*, int32_t, uint8_t*, int32_t);
 
-int32_t WelsIntra16x16Combined3Satd_sse41(uint8_t *, int32_t, uint8_t *, int32_t, int32_t*, int32_t, uint8_t*);
-int32_t WelsIntra16x16Combined3Sad_ssse3(uint8_t *, int32_t, uint8_t *, int32_t, int32_t*, int32_t, uint8_t*);
-int32_t WelsIntraChroma8x8Combined3Satd_sse41( uint8_t *, int32_t, uint8_t *, int32_t, int32_t*, int32_t, uint8_t*,uint8_t*,uint8_t*);
-int32_t WelsIntraChroma8x8Combined3Sad_ssse3( uint8_t *, int32_t, uint8_t *, int32_t, int32_t*, int32_t, uint8_t*,uint8_t*,uint8_t*);
+int32_t WelsIntra16x16Combined3Satd_sse41 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*);
+int32_t WelsIntra16x16Combined3Sad_ssse3 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*);
+int32_t WelsIntraChroma8x8Combined3Satd_sse41 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*,
+    uint8_t*, uint8_t*);
+int32_t WelsIntraChroma8x8Combined3Sad_ssse3 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*,
+    uint8_t*, uint8_t*);
 
 
 #endif//X86_ASM
@@ -116,8 +118,8 @@ int32_t WelsIntraChroma8x8Combined3Sad_ssse3( uint8_t *, int32_t, uint8_t *, int
 }
 #endif//__cplusplus
 
-void WelsInitSampleSadFunc( SWelsFuncPtrList *pFuncList, uint32_t uiCpuFlag );
+void WelsInitSampleSadFunc (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag);
 
 }
 
-#endif //_SAMPLE_H_
+#endif //SAMPLE_H_

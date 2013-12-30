@@ -36,27 +36,25 @@
 WELSVP_NAMESPACE_BEGIN
 
 
-int32_t WelsSampleSad8x8_c( uint8_t * pSrcY, int32_t iSrcStrideY, uint8_t * pRefY, int32_t iRefStrideY )
-{
-	int32_t iSadSum = 0;
-	uint8_t* pSrcA = pSrcY;
-	uint8_t* pSrcB = pRefY;
-	for (int32_t i = 0; i < 8; i++ )
-	{
-		iSadSum += WELS_ABS( ( pSrcA[0] - pSrcB[0] ) );
-		iSadSum += WELS_ABS( ( pSrcA[1] - pSrcB[1] ) );
-		iSadSum += WELS_ABS( ( pSrcA[2] - pSrcB[2] ) );
-		iSadSum += WELS_ABS( ( pSrcA[3] - pSrcB[3] ) );
-		iSadSum += WELS_ABS( ( pSrcA[4] - pSrcB[4] ) );
-		iSadSum += WELS_ABS( ( pSrcA[5] - pSrcB[5] ) );
-		iSadSum += WELS_ABS( ( pSrcA[6] - pSrcB[6] ) );
-		iSadSum += WELS_ABS( ( pSrcA[7] - pSrcB[7] ) );
+int32_t WelsSampleSad8x8_c (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY) {
+  int32_t iSadSum = 0;
+  uint8_t* pSrcA = pSrcY;
+  uint8_t* pSrcB = pRefY;
+  for (int32_t i = 0; i < 8; i++) {
+    iSadSum += WELS_ABS ((pSrcA[0] - pSrcB[0]));
+    iSadSum += WELS_ABS ((pSrcA[1] - pSrcB[1]));
+    iSadSum += WELS_ABS ((pSrcA[2] - pSrcB[2]));
+    iSadSum += WELS_ABS ((pSrcA[3] - pSrcB[3]));
+    iSadSum += WELS_ABS ((pSrcA[4] - pSrcB[4]));
+    iSadSum += WELS_ABS ((pSrcA[5] - pSrcB[5]));
+    iSadSum += WELS_ABS ((pSrcA[6] - pSrcB[6]));
+    iSadSum += WELS_ABS ((pSrcA[7] - pSrcB[7]));
 
-		pSrcA += iSrcStrideY;
-		pSrcB += iRefStrideY;
-	}
+    pSrcA += iSrcStrideY;
+    pSrcB += iRefStrideY;
+  }
 
-	return iSadSum;
-} 
+  return iSadSum;
+}
 
 WELSVP_NAMESPACE_END

@@ -60,48 +60,49 @@ namespace WelsSVCEnc {
 ///////////////////////////////////DQ Layer level///////////////////////////////////
 
 typedef struct TagDqLayer	SDqLayer;
-typedef SDqLayer *			pDqLayer;
+typedef SDqLayer* 			pDqLayer;
 
-typedef struct TagLayerInfo{
-	SNalUnitHeaderExt		sNalHeaderExt;
-	SSlice					*pSliceInLayer;// Here SSlice identify to Frame on concept, [iSliceIndex], need memory block external side	for MT
-	SSubsetSps				*pSubsetSpsP;	// current pSubsetSps used, memory alloc in external
-	SWelsSPS						*pSpsP;		// current pSps based avc used, memory alloc in external
-	SWelsPPS						*pPpsP;		// current pPps used
+typedef struct TagLayerInfo {
+  SNalUnitHeaderExt		sNalHeaderExt;
+  SSlice*
+  pSliceInLayer;// Here SSlice identify to Frame on concept, [iSliceIndex], need memory block external side	for MT
+  SSubsetSps*				pSubsetSpsP;	// current pSubsetSps used, memory alloc in external
+  SWelsSPS*						pSpsP;		// current pSps based avc used, memory alloc in external
+  SWelsPPS*						pPpsP;		// current pPps used
 } SLayerInfo;
 /* Layer Representation */
-struct TagDqLayer{
-	SLayerInfo				sLayerInfo;
-	
-	uint8_t					*pCsData[3];	// pointer to reconstructed picture pData
-	int32_t					iCsStride[3];	// Cs stride
+struct TagDqLayer {
+  SLayerInfo				sLayerInfo;
 
-	uint8_t					*pEncData[3];	// pData picture to be encoded in current layer
-	int32_t					iEncStride[3];	// pData picture stride
+  uint8_t*					pCsData[3];	// pointer to reconstructed picture pData
+  int32_t					iCsStride[3];	// Cs stride
 
-	SMB*					sMbDataP;		// pointer to mb of mbAddr equal to 0 in slice, mb_data_ptr = mb_base_ptr + (1+iMbStride).	
-	int16_t					iMbWidth;		// MB width of this picture, equal to pSps.iMbWidth
-	int16_t					iMbHeight;		// MB height of this picture, equal to pSps.iMbHeight;
+  uint8_t*					pEncData[3];	// pData picture to be encoded in current layer
+  int32_t					iEncStride[3];	// pData picture stride
 
-	bool_t					bBaseLayerAvailableFlag;	// whether base layer is available for prediction?
-	uint8_t					iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries
-	int8_t					iLoopFilterAlphaC0Offset;// AlphaOffset: valid range [-6, 6], default 0
-	int8_t					iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0
-	uint8_t				    uiDisableInterLayerDeblockingFilterIdc;
-	int8_t					iInterLayerSliceAlphaC0Offset;
-	int8_t					iInterLayerSliceBetaOffset;	
-	bool_t					bDeblockingParallelFlag; //parallel_deblocking_flag
+  SMB*					sMbDataP;		// pointer to mb of mbAddr equal to 0 in slice, mb_data_ptr = mb_base_ptr + (1+iMbStride).
+  int16_t					iMbWidth;		// MB width of this picture, equal to pSps.iMbWidth
+  int16_t					iMbHeight;		// MB height of this picture, equal to pSps.iMbHeight;
 
-	SPicture				*pRefPic;			// reference picture pointer
-	SPicture				*pDecPic;			// reconstruction picture pointer for layer
+  bool_t					bBaseLayerAvailableFlag;	// whether base layer is available for prediction?
+  uint8_t					iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries
+  int8_t					iLoopFilterAlphaC0Offset;// AlphaOffset: valid range [-6, 6], default 0
+  int8_t					iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0
+  uint8_t				    uiDisableInterLayerDeblockingFilterIdc;
+  int8_t					iInterLayerSliceAlphaC0Offset;
+  int8_t					iInterLayerSliceBetaOffset;
+  bool_t					bDeblockingParallelFlag; //parallel_deblocking_flag
 
-	SSliceCtx			*pSliceEncCtx;	// current slice context
-	
-	int32_t					*pNumSliceCodedOfPartition;		// for dynamic slicing mode
-	int32_t					*pLastCodedMbIdxOfPartition;	// for dynamic slicing mode
-	int32_t					*pLastMbIdxOfPartition;			// for dynamic slicing mode
+  SPicture*				pRefPic;			// reference picture pointer
+  SPicture*				pDecPic;			// reconstruction picture pointer for layer
 
-	SDqLayer				*pRefLayer;		// pointer to referencing dq_layer of current layer to be decoded	
+  SSliceCtx*			pSliceEncCtx;	// current slice context
+
+  int32_t*					pNumSliceCodedOfPartition;		// for dynamic slicing mode
+  int32_t*					pLastCodedMbIdxOfPartition;	// for dynamic slicing mode
+  int32_t*					pLastMbIdxOfPartition;			// for dynamic slicing mode
+
+  SDqLayer*				pRefLayer;		// pointer to referencing dq_layer of current layer to be decoded
 
 };
 

@@ -48,7 +48,7 @@
 namespace WelsDec {
 
 /*!
- * \brief	deblocking module initialize 
+ * \brief	deblocking module initialize
  *
  * \param	pf
  *          cpu
@@ -56,7 +56,7 @@ namespace WelsDec {
  * \return	NONE
  */
 
-void_t  DeblockingInit( PDeblockingFunc pDeblockingFunc,  int32_t iCpu );
+void_t  DeblockingInit (PDeblockingFunc pDeblockingFunc,  int32_t iCpu);
 
 
 /*!
@@ -66,7 +66,7 @@ void_t  DeblockingInit( PDeblockingFunc pDeblockingFunc,  int32_t iCpu );
  *
  * \return	NONE
  */
-void_t WelsDeblockingFilterSlice( PWelsDecoderContext pCtx, PDeblockingFilterMbFunc pDeblockMb );
+void_t WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFunc pDeblockMb);
 
 /*!
  * \brief	pixel deblocking filtering
@@ -79,42 +79,46 @@ void_t WelsDeblockingFilterSlice( PWelsDecoderContext pCtx, PDeblockingFilterMbF
  * \return	NONE
  */
 
-uint32_t DeblockingBsMarginalMBAvcbase( PDqLayer pCurDqLayer, int32_t iEdge, int32_t iNeighMb, int32_t iMbXy);
+uint32_t DeblockingBsMarginalMBAvcbase (PDqLayer pCurDqLayer, int32_t iEdge, int32_t iNeighMb, int32_t iMbXy);
 
-int32_t DeblockingAvailableNoInterlayer( PDqLayer pCurDqLayer, int32_t iFilterIdc );
+int32_t DeblockingAvailableNoInterlayer (PDqLayer pCurDqLayer, int32_t iFilterIdc);
 
-void_t DeblockingIntraMb( PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag );
-void_t DeblockingInterMb( PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint8_t nBS[2][4][4], int32_t iBoundryFlag );
+void_t DeblockingIntraMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag);
+void_t DeblockingInterMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint8_t nBS[2][4][4], int32_t iBoundryFlag);
 
-void_t WelsDeblockingMb( PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag );
+void_t WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag);
 
-void_t DeblockLumaLt4V_c( uint8_t *pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t *pTc );
-void_t DeblockLumaEq4V_c( uint8_t *pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta );
+void_t DeblockLumaLt4V_c (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTc);
+void_t DeblockLumaEq4V_c (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta);
 
-void_t DeblockLumaLt4H_c( uint8_t *pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t *pTc );
-void_t DeblockLumaEq4H_c( uint8_t *pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta );
+void_t DeblockLumaLt4H_c (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTc);
+void_t DeblockLumaEq4H_c (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta);
 
-void_t DeblockChromaLt4V_c( uint8_t *pPixCb, uint8_t *pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t *pTc );
-void_t DeblockChromaEq4V_c( uint8_t *pPixCb, uint8_t *pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta );
+void_t DeblockChromaLt4V_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
+                            int8_t* pTc);
+void_t DeblockChromaEq4V_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
 
-void_t DeblockChromaLt4H_c( uint8_t *pPixCb, uint8_t *pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t *pTc );
-void_t DeblockChromaEq4H_c( uint8_t *pPixCb, uint8_t *pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta );
+void_t DeblockChromaLt4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
+                            int8_t* pTc);
+void_t DeblockChromaEq4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
 
 #if defined(__cplusplus)
 extern "C" {
 #endif//__cplusplus
 
 #ifdef  X86_ASM
-void DeblockLumaLt4V_sse2( uint8_t *pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t *pTc );
-void DeblockLumaEq4V_sse2( uint8_t *pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta );
-void DeblockLumaTransposeH2V_sse2(uint8_t * pPixY, int32_t iStride, uint8_t * pDst);
-void DeblockLumaTransposeV2H_sse2(uint8_t * pPixY, int32_t iStride, uint8_t * pSrc);
-void DeblockLumaLt4H_sse2(uint8_t *pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t *pTc);
-void DeblockLumaEq4H_sse2(uint8_t *pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta);
-void DeblockChromaEq4V_sse2(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
-void DeblockChromaLt4V_sse2(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t * pTC);
-void DeblockChromaEq4H_sse2(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
-void DeblockChromaLt4H_sse2(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t * pTC);
+void DeblockLumaLt4V_sse2 (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTc);
+void DeblockLumaEq4V_sse2 (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta);
+void DeblockLumaTransposeH2V_sse2 (uint8_t* pPixY, int32_t iStride, uint8_t* pDst);
+void DeblockLumaTransposeV2H_sse2 (uint8_t* pPixY, int32_t iStride, uint8_t* pSrc);
+void DeblockLumaLt4H_sse2 (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTc);
+void DeblockLumaEq4H_sse2 (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta);
+void DeblockChromaEq4V_sse2 (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
+void DeblockChromaLt4V_sse2 (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
+                             int8_t* pTC);
+void DeblockChromaEq4H_sse2 (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
+void DeblockChromaLt4H_sse2 (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
+                             int8_t* pTC);
 #endif
 #if defined(__cplusplus)
 }

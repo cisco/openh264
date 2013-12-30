@@ -46,8 +46,8 @@
 
 bool load_bundle_welsdec();
 void free_bundle_welsdec();
-bool get_functions_address_free_decoder(ISVCDecoder* pDecoder);
-bool get_functions_address_create_decoder(ISVCDecoder** ppDecoder);
+bool get_functions_address_free_decoder (ISVCDecoder* pDecoder);
+bool get_functions_address_create_decoder (ISVCDecoder** ppDecoder);
 
 
 

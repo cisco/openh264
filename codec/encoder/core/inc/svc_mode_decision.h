@@ -51,11 +51,12 @@ namespace WelsSVCEnc {
 ///////////////////////
 
 // NOILP ILFMD ENTRANCE
-void WelsMdSpatialelInterMbIlfmdNoilp( sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice *pSlice, SMB* pCurMb, const Mb_Type kuiRefMbType);
-void WelsMdInterMbEnhancelayer( void* pEnc, void* pMd, SSlice *pSlice, SMB* pCurMb, SMbCache *pMbCache );
+void WelsMdSpatialelInterMbIlfmdNoilp (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb,
+                                       const Mb_Type kuiRefMbType);
+void WelsMdInterMbEnhancelayer (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache);
 
-SMB* GetRefMb( SDqLayer *pCurLayer, SMB *pCurMb );
-void SetMvBaseEnhancelayer( SWelsMD* pMd, SMB *pCurMb, const SMB *kpRefMb );
+SMB* GetRefMb (SDqLayer* pCurLayer, SMB* pCurMb);
+void SetMvBaseEnhancelayer (SWelsMD* pMd, SMB* pCurMb, const SMB* kpRefMb);
 }
 #endif //SVC_MODE_DECISION_H
 

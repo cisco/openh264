@@ -60,9 +60,9 @@
 			fflush(fp);\
 			}
 
-void TraceName(FILE *pFp, int8_t *pName, SBitStringAux *pBs);
+void TraceName (FILE* pFp, int8_t* pName, SBitStringAux* pBs);
 
-void TraceBits(FILE *pFp, uint32_t uiStart, uint32_t uiEnd, SBitStringAux *pBs);
+void TraceBits (FILE* pFp, uint32_t uiStart, uint32_t uiEnd, SBitStringAux* pBs);
 
 
 #endif

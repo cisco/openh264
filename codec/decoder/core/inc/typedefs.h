@@ -47,7 +47,7 @@
 
 #else
 
-// FIXME:     all singed type should be declared explicit,  for example,  int8_t should be declared as signed char.  
+// FIXME:     all singed type should be declared explicit,  for example,  int8_t should be declared as signed char.
 typedef signed char      int8_t  ;
 typedef unsigned char    uint8_t ;
 typedef short            int16_t ;
@@ -59,7 +59,7 @@ typedef unsigned __int64 uint64_t;
 
 #endif // _MSC_VER defined
 
-// FIXME:     all string type should be declared explicit as char. 
+// FIXME:     all string type should be declared explicit as char.
 typedef char      str_t;
 typedef float     real32_t;
 

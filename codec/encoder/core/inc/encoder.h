@@ -48,45 +48,45 @@ namespace WelsSVCEnc {
  * \param	pEncCtx		sWelsEncCtx*
  * \return	successful - 0; otherwise none 0 for failed
  */
-int32_t RequestMemorySvc( sWelsEncCtx **ppCtx );
+int32_t RequestMemorySvc (sWelsEncCtx** ppCtx);
 
 /*!
  * \brief	free memory	in SVC core encoder
  * \param	pEncCtx		sWelsEncCtx**
  * \return	none
  */
-void FreeMemorySvc( sWelsEncCtx **ppCtx);
+void FreeMemorySvc (sWelsEncCtx** ppCtx);
 
 /*!
  * \brief	initialize function pointers that potentially used in Wels encoding
  * \param	pEncCtx		sWelsEncCtx*
  * \return	successful - 0; otherwise none 0 for failed
  */
-int32_t InitFunctionPointers( SWelsFuncPtrList *pFuncList, SWelsSvcCodingParam *_param, uint32_t  uiCpuFlag );
+int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* _param, uint32_t  uiCpuFlag);
 
 ///*!
-// * \brief	decide frame type (IDR/P frame)	
+// * \brief	decide frame type (IDR/P frame)
 // * \param	uiFrameType	frame type output
 // * \param	frame_idx	frame index elapsed currently
 // * \param	idr			IDR interval
 // * \return	successful - 0; otherwise none 0 for failed
 // */
 /*!
- * \brief	initialize frame coding	
+ * \brief	initialize frame coding
  */
-void InitFrameCoding( sWelsEncCtx *pEncCtx, const EFrameType keFrameType );
+void InitFrameCoding (sWelsEncCtx* pEncCtx, const EFrameType keFrameType);
 
-EFrameType DecideFrameType( sWelsEncCtx *pEncCtx, const int8_t kiSpatialNum );
+EFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum);
 /*!
  * \brief	Dump reconstruction for dependency layer
  */
 
-extern "C" void DumpDependencyRec( SPicture *pSrcPic, const str_t *kpFileName, const int8_t kiDid );
+extern "C" void DumpDependencyRec (SPicture* pSrcPic, const str_t* kpFileName, const int8_t kiDid);
 
 /*!
  * \brief	Dump the reconstruction pictures
  */
-void DumpRecFrame( SPicture *pSrcPic, const str_t *kpFileName );
+void DumpRecFrame (SPicture* pSrcPic, const str_t* kpFileName);
 
 
 /*!
@@ -97,26 +97,26 @@ void DumpRecFrame( SPicture *pSrcPic, const str_t *kpFileName );
  * \param	nal_idc				EWelsNalRefIdc for a frame
  * \return	successful - 0; otherwise none 0 for failed
  */
-int32_t EncodeFrame(	sWelsEncCtx *pEncCtx,
-					const int32_t kiSliceNumCount,
-					const EWelsNalUnitType keNalType,
-					const EWelsNalRefIdc keNalIdc	);
+int32_t EncodeFrame (sWelsEncCtx* pEncCtx,
+                     const int32_t kiSliceNumCount,
+                     const EWelsNalUnitType keNalType,
+                     const EWelsNalRefIdc keNalIdc);
 
 
 /**********************************************************************************
- * memzero Function 
+ * memzero Function
 ***********************************************************************************/
-void WelsSetMemZero_c(void *pDst, int32_t iSize);	// confirmed_safe_unsafe_usage
+void WelsSetMemZero_c (void* pDst, int32_t iSize);	// confirmed_safe_unsafe_usage
 
 #if defined(__cplusplus)
 extern "C" {
 #endif//__cplusplus
 
 #ifdef X86_ASM
-void WelsSetMemZeroAligned64_sse2(void *pDst, int32_t iSize);
-void WelsSetMemZeroSize64_mmx(void *pDst, int32_t iSize);
-void WelsSetMemZeroSize8_mmx(void *pDst, int32_t iSize);
-void WelsPrefetchZero_mmx(int8_t const*kpDst);
+void WelsSetMemZeroAligned64_sse2 (void* pDst, int32_t iSize);
+void WelsSetMemZeroSize64_mmx (void* pDst, int32_t iSize);
+void WelsSetMemZeroSize8_mmx (void* pDst, int32_t iSize);
+void WelsPrefetchZero_mmx (int8_t const* kpDst);
 #endif
 
 #if defined(__cplusplus)

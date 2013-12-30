@@ -52,46 +52,42 @@ extern const uint8_t g_kuiVlcTotalZerosChromaDc[4][4][2];
 extern const uint8_t g_kuiVlcTotalZerosChromaDc422[8][8][2];
 //g_kuiVlcRunBefore[zeros-left][run-before][0--value, 1--bit count]
 extern const uint8_t g_kuiVlcRunBefore[8][15][2];
-extern const ALIGNED_DECLARE(uint8_t, g_kuiEncNcMapTable[18], 16);
+extern const ALIGNED_DECLARE (uint8_t, g_kuiEncNcMapTable[18], 16);
 
 #define    CHROMA_DC_NC_OFFSET       17
 
-static inline int32_t WriteTotalCoeffTrailingones( SBitStringAux *pBs, uint8_t uiNc, uint8_t uiTotalCoeff, uint8_t uiTrailingOnes )
-{
-	const uint8_t kuiNcIdx		= g_kuiEncNcMapTable[uiNc];
-	const uint8_t *kpCoeffToken	= &g_kuiVlcCoeffToken[kuiNcIdx][uiTotalCoeff][uiTrailingOnes][0];	
-	return BsWriteBits( pBs,  kpCoeffToken[1], kpCoeffToken[0] );	
+static inline int32_t WriteTotalCoeffTrailingones (SBitStringAux* pBs, uint8_t uiNc, uint8_t uiTotalCoeff,
+    uint8_t uiTrailingOnes) {
+const uint8_t kuiNcIdx		= g_kuiEncNcMapTable[uiNc];
+const uint8_t* kpCoeffToken	= &g_kuiVlcCoeffToken[kuiNcIdx][uiTotalCoeff][uiTrailingOnes][0];
+return BsWriteBits (pBs,  kpCoeffToken[1], kpCoeffToken[0]);
 }
 
-static inline int32_t WriteTotalcoeffTrailingonesChroma( SBitStringAux *pBs, uint8_t uiTotalCoeff, uint8_t uiTrailingOnes )
-{
-	const uint8_t *kpCoeffToken	= &g_kuiVlcCoeffToken[4][uiTotalCoeff][uiTrailingOnes][0];
-	return BsWriteBits( pBs, kpCoeffToken[1], kpCoeffToken[0] );	
+static inline int32_t WriteTotalcoeffTrailingonesChroma (SBitStringAux* pBs, uint8_t uiTotalCoeff,
+    uint8_t uiTrailingOnes) {
+const uint8_t* kpCoeffToken	= &g_kuiVlcCoeffToken[4][uiTotalCoeff][uiTrailingOnes][0];
+return BsWriteBits (pBs, kpCoeffToken[1], kpCoeffToken[0]);
 }
 
 //kuiZeroCount = level_prefix;
-static inline int32_t WriteLevelPrefix( SBitStringAux *pBs, const uint32_t kuiZeroCount )
-{	
-	BsWriteBits(pBs, kuiZeroCount+1, 1);
-	return 0;
+static inline int32_t WriteLevelPrefix (SBitStringAux* pBs, const uint32_t kuiZeroCount) {
+BsWriteBits (pBs, kuiZeroCount + 1, 1);
+return 0;
 }
 
-static inline int32_t WriteTotalZeros( SBitStringAux *pBs, uint32_t uiTotalCoeff, uint32_t uiTotalZeros )
-{
-	const uint8_t *kpTotalZeros	= &g_kuiVlcTotalZeros[uiTotalCoeff][uiTotalZeros][0];
-	return BsWriteBits( pBs, kpTotalZeros[1], kpTotalZeros[0] );	
+static inline int32_t WriteTotalZeros (SBitStringAux* pBs, uint32_t uiTotalCoeff, uint32_t uiTotalZeros) {
+const uint8_t* kpTotalZeros	= &g_kuiVlcTotalZeros[uiTotalCoeff][uiTotalZeros][0];
+return BsWriteBits (pBs, kpTotalZeros[1], kpTotalZeros[0]);
 }
 
-static inline int32_t WriteTotalZerosChromaDc( SBitStringAux *pBs, uint32_t uiTotalCoeff, uint32_t uiTotalZeros )
-{
-	const uint8_t *kpTotalZerosChromaDc = &g_kuiVlcTotalZerosChromaDc[uiTotalCoeff][uiTotalZeros][0];
-	return BsWriteBits( pBs, kpTotalZerosChromaDc[1], kpTotalZerosChromaDc[0] );	
+static inline int32_t WriteTotalZerosChromaDc (SBitStringAux* pBs, uint32_t uiTotalCoeff, uint32_t uiTotalZeros) {
+const uint8_t* kpTotalZerosChromaDc = &g_kuiVlcTotalZerosChromaDc[uiTotalCoeff][uiTotalZeros][0];
+return BsWriteBits (pBs, kpTotalZerosChromaDc[1], kpTotalZerosChromaDc[0]);
 }
 
-static inline int32_t WriteRunBefore( SBitStringAux *pBs, uint8_t uiZeroLeft, uint8_t uiRunBefore )
-{
-	const uint8_t *kpRunBefore = &g_kuiVlcRunBefore[uiZeroLeft][uiRunBefore][0];
-	return BsWriteBits( pBs, kpRunBefore[1], kpRunBefore[0] );
+static inline int32_t WriteRunBefore (SBitStringAux* pBs, uint8_t uiZeroLeft, uint8_t uiRunBefore) {
+const uint8_t* kpRunBefore = &g_kuiVlcRunBefore[uiZeroLeft][uiRunBefore][0];
+return BsWriteBits (pBs, kpRunBefore[1], kpRunBefore[0]);
 }
 }
 #endif

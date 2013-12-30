@@ -40,11 +40,11 @@
 #include "macros.h"
 #include "wels_func_ptr_def.h"
 
-/////////////////////luma MC////////////////////////// 
+/////////////////////luma MC//////////////////////////
 //x y means dx(mv[0] & 3) and dy(mv[1] & 3)
 
 namespace WelsSVCEnc {
-void WelsInitMcFuncs( SWelsFuncPtrList *pFuncList, uint32_t uiCpuFlag );
+void WelsInitMcFuncs (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag);
 
 
 #if defined(__cplusplus)
@@ -55,26 +55,35 @@ extern "C" {
 //                       MMXEXT and SSE2 definition                          //
 //***************************************************************************//
 #if defined(X86_ASM)
-void McChromaWidthEq4_mmx( uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst, int32_t iDstStride, const uint8_t *kpABCD,int32_t iHeigh );
-void McCopyWidthEq4_mmx ( uint8_t *, int32_t, uint8_t *, int32_t, int32_t );
-void McCopyWidthEq8_mmx( uint8_t *, int32_t, uint8_t *, int32_t, int32_t );
-void PixelAvgWidthEq8_mmx( uint8_t *,  int32_t, uint8_t *, int32_t, uint8_t *, int32_t, int32_t  );
+void McChromaWidthEq4_mmx (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, const uint8_t* kpABCD,
+                           int32_t iHeigh);
+void McCopyWidthEq4_mmx (uint8_t*, int32_t, uint8_t*, int32_t, int32_t);
+void McCopyWidthEq8_mmx (uint8_t*, int32_t, uint8_t*, int32_t, int32_t);
+void PixelAvgWidthEq8_mmx (uint8_t*,  int32_t, uint8_t*, int32_t, uint8_t*, int32_t, int32_t);
 
-void McHorVer20_sse2( uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst, int32_t iDstStride,int32_t iWidth, int32_t iHeight);
-void McHorVer02_sse2( uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst, int32_t iDstStride,int32_t iWidth, int32_t iHeight);
-void McHorVer22HorFirst_sse2(uint8_t * pSrc,int32_t iSrcStride,uint8_t * pTap,int32_t iTapStride,int32_t iWidth,int32_t iHeight);	
-void McHorVer22VerLastAlign_sse2(uint8_t * pTap, int32_t iTapStride, uint8_t * pDst,int32_t iDstStride,int32_t iWidth,int32_t iHeight);
-void McHorVer22VerLastUnAlign_sse2(uint8_t * pTap, int32_t iTapStride, uint8_t * pDst,int32_t iDstStride,int32_t iWidth,int32_t iHeight);
-void McChromaWidthEq8_sse2( uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst, int32_t iDstStride, const uint8_t *kpABCD, int32_t iHeigh );
-void McCopyWidthEq16_sse2( uint8_t *, int32_t, uint8_t *, int32_t, int32_t );
-void McHorVer20WidthEq16_sse2( uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst, int32_t iDstStride, int32_t iHeight );
-void McHorVer02WidthEq8_sse2(uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst, int32_t iDstStride, int32_t iHeight);
-void McHorVer22Width8HorFirst_sse2( uint8_t*pSrc, int32_t iSrcStride, uint8_t* pTap,	int32_t iTapStride,int32_t iHeight);
-void PixelAvgWidthEq16_sse2( uint8_t *,  int32_t, uint8_t *, int32_t, uint8_t *, int32_t, int32_t  );
+void McHorVer20_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
+                      int32_t iHeight);
+void McHorVer02_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
+                      int32_t iHeight);
+void McHorVer22HorFirst_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pTap, int32_t iTapStride, int32_t iWidth,
+                              int32_t iHeight);
+void McHorVer22VerLastAlign_sse2 (uint8_t* pTap, int32_t iTapStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
+                                  int32_t iHeight);
+void McHorVer22VerLastUnAlign_sse2 (uint8_t* pTap, int32_t iTapStride, uint8_t* pDst, int32_t iDstStride,
+                                    int32_t iWidth, int32_t iHeight);
+void McChromaWidthEq8_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, const uint8_t* kpABCD,
+                            int32_t iHeigh);
+void McCopyWidthEq16_sse2 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t);
+void McHorVer20WidthEq16_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
+void McHorVer02WidthEq8_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
+void McHorVer22Width8HorFirst_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pTap,	int32_t iTapStride,
+                                    int32_t iHeight);
+void PixelAvgWidthEq16_sse2 (uint8_t*,  int32_t, uint8_t*, int32_t, uint8_t*, int32_t, int32_t);
 
 
-void PixelAvgWidthEq16_ssse3( uint8_t *,  int32_t, uint8_t *, int32_t, uint8_t *, int32_t, int32_t  );
-void McChromaWidthEq8_ssse3( uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst, int32_t iDstStride, const uint8_t *kpABCD, int32_t iHeigh );
+void PixelAvgWidthEq16_ssse3 (uint8_t*,  int32_t, uint8_t*, int32_t, uint8_t*, int32_t, int32_t);
+void McChromaWidthEq8_ssse3 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                             const uint8_t* kpABCD, int32_t iHeigh);
 
 
 #endif //X86_ASM

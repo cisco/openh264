@@ -45,40 +45,40 @@ namespace WelsSVCEnc {
  *	Reconstructed Picture definition
  *	It is used to express reference picture, also consequent reconstruction picture for output
  */
-typedef struct TagPicture{
-	/************************************payload pData*********************************/
-	uint8_t		*pBuffer;		// pointer to the first allocated byte, basical offset of pBuffer, dimension:
-	uint8_t		*pData[3];		// pointer to picture planes respectively
-	int32_t		iLineSize[3];	// iLineSize of picture planes respectively
+typedef struct TagPicture {
+  /************************************payload pData*********************************/
+  uint8_t*		pBuffer;		// pointer to the first allocated byte, basical offset of pBuffer, dimension:
+  uint8_t*		pData[3];		// pointer to picture planes respectively
+  int32_t		iLineSize[3];	// iLineSize of picture planes respectively
 
-	// picture information
-	/*******************************from other standard syntax****************************/
-	/*from pSps*/
-	int32_t		iWidthInPixel;	// picture width in pixel
-	int32_t		iHeightInPixel;// picture height in pixel
-	int32_t		iPictureType;	// got from sSliceHeader(): eSliceType
-	int32_t		iFramePoc;		// frame POC
+  // picture information
+  /*******************************from other standard syntax****************************/
+  /*from pSps*/
+  int32_t		iWidthInPixel;	// picture width in pixel
+  int32_t		iHeightInPixel;// picture height in pixel
+  int32_t		iPictureType;	// got from sSliceHeader(): eSliceType
+  int32_t		iFramePoc;		// frame POC
 
-	real32_t	fFrameRate;   // MOVE
-	int32_t		iFrameNum;		// frame number			//for pRef pic management
+  real32_t	fFrameRate;   // MOVE
+  int32_t		iFrameNum;		// frame number			//for pRef pic management
 
-	uint32_t	*uiRefMbType;	// for iMbWidth*iMbHeight	
-	uint8_t		*pRefMbQp;		// for iMbWidth*iMbHeight
+  uint32_t*	uiRefMbType;	// for iMbWidth*iMbHeight
+  uint8_t*		pRefMbQp;		// for iMbWidth*iMbHeight
 
-	int32_t     *pMbSkipSad;   //for iMbWidth*iMbHeight
+  int32_t*     pMbSkipSad;   //for iMbWidth*iMbHeight
 
-	SMVUnitXY	*sMvList;
+  SMVUnitXY*	sMvList;
 
-	/*******************************sef_definition for misc use****************************/
-	int32_t		iMarkFrameNum;
-	int32_t		iLongTermPicNum;
+  /*******************************sef_definition for misc use****************************/
+  int32_t		iMarkFrameNum;
+  int32_t		iLongTermPicNum;
 
-	bool_t		bUsedAsRef;						//for pRef pic management
-	bool_t		bIsLongRef;	// long term reference frame flag	//for pRef pic management
-	uint8_t		uiRecieveConfirmed;
-	uint8_t		uiTemporalId;
-	uint8_t		uiSpatialId;	
-}SPicture;	
+  bool_t		bUsedAsRef;						//for pRef pic management
+  bool_t		bIsLongRef;	// long term reference frame flag	//for pRef pic management
+  uint8_t		uiRecieveConfirmed;
+  uint8_t		uiTemporalId;
+  uint8_t		uiSpatialId;
+} SPicture;
 
 /*
  *	Residual Picture

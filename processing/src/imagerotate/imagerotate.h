@@ -34,13 +34,13 @@
  *
  * \date        :  2011/04/06
  *
- * \description :  
+ * \description :
  *
  *************************************************************************************
  */
 
-#ifndef _WELSVP_IMAGEROTATE_H
-#define _WELSVP_IMAGEROTATE_H
+#ifndef WELSVP_IMAGEROTATE_H
+#define WELSVP_IMAGEROTATE_H
 
 #include "../common/util.h"
 #include "../common/WelsFrameWork.h"
@@ -48,36 +48,37 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-typedef void (ImageRotateFunc)( uint8_t *pSrc, uint32_t uiBytesPerPixel, uint32_t iWidth, uint32_t iHeight, uint8_t *pDst);
+typedef void (ImageRotateFunc) (uint8_t* pSrc, uint32_t uiBytesPerPixel, uint32_t iWidth, uint32_t iHeight,
+                                uint8_t* pDst);
 
-typedef ImageRotateFunc		*ImageRotateFuncPtr;
+typedef ImageRotateFunc*		ImageRotateFuncPtr;
 
 ImageRotateFunc   ImageRotate90D_c;
 ImageRotateFunc   ImageRotate180D_c;
 ImageRotateFunc   ImageRotate270D_c;
 
 typedef struct {
-	ImageRotateFuncPtr		pfImageRotate90D;
-	ImageRotateFuncPtr		pfImageRotate180D;
-	ImageRotateFuncPtr		pfImageRotate270D;
-}SImageRotateFuncs;
+  ImageRotateFuncPtr		pfImageRotate90D;
+  ImageRotateFuncPtr		pfImageRotate180D;
+  ImageRotateFuncPtr		pfImageRotate270D;
+} SImageRotateFuncs;
 
-class CImageRotating : public IStrategy
-{			  
-public:
-	CImageRotating(int32_t iCpuFlag);
-	~CImageRotating();
+class CImageRotating : public IStrategy {
+ public:
+  CImageRotating (int32_t iCpuFlag);
+  ~CImageRotating();
 
-	EResult Process(int32_t iType, SPixMap *pSrc, SPixMap *pDst);
+  EResult Process (int32_t iType, SPixMap* pSrc, SPixMap* pDst);
 
-private:
-	void InitImageRotateFuncs(SImageRotateFuncs &pf, int32_t iCpuFlag);
-	EResult ProcessImageRotate(int32_t iType, uint8_t *pSrc, uint32_t uiBytesPerPixel, uint32_t iWidth, uint32_t iHeight, uint8_t *pDst);
+ private:
+  void InitImageRotateFuncs (SImageRotateFuncs& pf, int32_t iCpuFlag);
+  EResult ProcessImageRotate (int32_t iType, uint8_t* pSrc, uint32_t uiBytesPerPixel, uint32_t iWidth, uint32_t iHeight,
+                              uint8_t* pDst);
 
-private:
-	SImageRotateFuncs m_pfRotateImage;
-	int32_t          m_iCPUFlag;
-};	
+ private:
+  SImageRotateFuncs m_pfRotateImage;
+  int32_t          m_iCPUFlag;
+};
 
 WELSVP_NAMESPACE_END
 

@@ -34,35 +34,32 @@
  *
  * \date        :  2011/02/22
  *
- * \description :  
+ * \description :
  *
  *************************************************************************************
  */
 
-#ifndef _WELSVP_MEMORY_H
-#define _WELSVP_MEMORY_H
+#ifndef WELSVP_MEMORY_H
+#define WELSVP_MEMORY_H
 
 #include "util.h"
 #include "typedef.h"
 
 WELSVP_NAMESPACE_BEGIN
 
-inline_t void * WelsMemset( void * pPointer, int32_t iValue, uint32_t uiSize)
-{
-	return ::memset(pPointer, iValue, uiSize);
+inline_t void* WelsMemset (void* pPointer, int32_t iValue, uint32_t uiSize) {
+  return ::memset (pPointer, iValue, uiSize);
 }
 
-inline_t void * WelsMemcpy( void *pDst, const void *kpSrc, uint32_t uiSize)
-{
-	return ::memcpy(pDst, kpSrc, uiSize);
+inline_t void* WelsMemcpy (void* pDst, const void* kpSrc, uint32_t uiSize) {
+  return ::memcpy (pDst, kpSrc, uiSize);
 }
 
-inline_t int32_t WelsMemcmp( const void *kpBuf1, const void *kpBuf2, uint32_t uiSize)
-{
-	return ::memcmp( kpBuf1, kpBuf2, uiSize);
+inline_t int32_t WelsMemcmp (const void* kpBuf1, const void* kpBuf2, uint32_t uiSize) {
+  return ::memcmp (kpBuf1, kpBuf2, uiSize);
 }
 
-/*! 
+/*!
 *************************************************************************************
 * \brief	malloc with zero filled utilization in Wels
 *
@@ -73,13 +70,13 @@ inline_t int32_t WelsMemcmp( const void *kpBuf1, const void *kpBuf2, uint32_t ui
 * \note	N/A
 *************************************************************************************
 */
-void * WelsMalloc( const uint32_t kuiSize, str_t *pTag = NULL );
+void* WelsMalloc (const uint32_t kuiSize, str_t* pTag = NULL);
 
-/*! 
+/*!
 *************************************************************************************
 * \brief	free utilization in Wels
 *
-* \param 	p	data pointer to be free. 
+* \param 	p	data pointer to be free.
 *			i.e, uint8_t *p = actual data to be free, argv = &p.
 *
 * \return	NONE
@@ -87,11 +84,11 @@ void * WelsMalloc( const uint32_t kuiSize, str_t *pTag = NULL );
 * \note	N/A
 *************************************************************************************
 */
-void WelsFree( void * pPointer, str_t *pTag = NULL );
+void WelsFree (void* pPointer, str_t* pTag = NULL);
 
-/*! 
+/*!
 *************************************************************************************
-* \brief	reallocation in Wels. Do nothing and continue using old block 
+* \brief	reallocation in Wels. Do nothing and continue using old block
 *		in case the block is large enough currently
 *
 * \param 	p	    memory block required in old time
@@ -103,7 +100,7 @@ void WelsFree( void * pPointer, str_t *pTag = NULL );
 * \note	N/A
 *************************************************************************************
 */
-void * WelsRealloc( void  *pPointer, uint32_t *pRealSize, const uint32_t kuiSize, str_t *pTag = NULL );
+void* WelsRealloc (void*  pPointer, uint32_t* pRealSize, const uint32_t kuiSize, str_t* pTag = NULL);
 
 //////////////////////////////////////////////////////////////////////////////////////
 WELSVP_NAMESPACE_END

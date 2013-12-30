@@ -34,7 +34,7 @@
 #ifndef WELS_CONSTANCE_H__
 #define WELS_CONSTANCE_H__
 
-// Miscellaneous sizing infos  
+// Miscellaneous sizing infos
 #ifndef MAX_FNAME_LEN
 #define MAX_FNAME_LEN		256	// maximal length of file name in char size
 #endif//MAX_FNAME_LEN
@@ -95,10 +95,10 @@
 #define MAX_ACCESS_UINT_CAPACITY	1048576	// Maximal AU capacity in bytes: (1<<20) = 1024 KB predefined
 
 enum {
-	BASE_MB = 0,
-	NON_AVC_REWRITE_ENHANCE_MB =1,
-	AVC_REWRITE_ENHANCE_MB = 2
-		
+  BASE_MB = 0,
+  NON_AVC_REWRITE_ENHANCE_MB = 1,
+  AVC_REWRITE_ENHANCE_MB = 2
+
 };
 
 #endif//WELS_CONSTANCE_H__

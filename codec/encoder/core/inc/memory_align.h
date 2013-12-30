@@ -43,35 +43,34 @@ namespace WelsSVCEnc {
 
 #define MEMORY_REQUEST_ALIGN_BYTES	0 // or (1^n), i.e, 0x04
 
-class CMemoryAlign
-{
-public:
-	CMemoryAlign( const uint32_t kuiCacheLineSize );
-	virtual ~CMemoryAlign();
+class CMemoryAlign {
+ public:
+CMemoryAlign (const uint32_t kuiCacheLineSize);
+virtual ~CMemoryAlign();
 
-	void* WelsMallocz( const uint32_t kuiSize, const str_t *kpTag );
-	void* WelsMalloc( const uint32_t kuiSize, const str_t *kpTag );
-	void WelsFree( void* pPointer, const str_t *kpTag );
-	const uint32_t WelsGetCacheLineSize() const;
+void* WelsMallocz (const uint32_t kuiSize, const str_t* kpTag);
+void* WelsMalloc (const uint32_t kuiSize, const str_t* kpTag);
+void WelsFree (void* pPointer, const str_t* kpTag);
+const uint32_t WelsGetCacheLineSize() const;
 #if defined(MEMORY_MONITOR)
-	const uint32_t WelsGetMemoryUsage() const;
+const uint32_t WelsGetMemoryUsage() const;
 #endif//MEMORY_MONITOR
 
-private:
-	// private copy & assign constructors adding to fix klocwork scan issues
-	CMemoryAlign( const CMemoryAlign& kcMa );           
-	CMemoryAlign& operator=( const CMemoryAlign& kcMa );
+ private:
+// private copy & assign constructors adding to fix klocwork scan issues
+CMemoryAlign (const CMemoryAlign& kcMa);
+CMemoryAlign& operator= (const CMemoryAlign& kcMa);
 
-protected:
-	uint32_t	m_nCacheLineSize;
+ protected:
+uint32_t	m_nCacheLineSize;
 
 #ifdef MEMORY_MONITOR
-	uint32_t	m_nMemoryUsageInBytes;
+uint32_t	m_nMemoryUsageInBytes;
 #endif//MEMORY_MONITOR
 
 #ifdef MEMORY_CHECK
-	FILE*		m_fpMemChkPoint;
-	uint32_t	m_nCountRequestNum;
+FILE*		m_fpMemChkPoint;
+uint32_t	m_nCountRequestNum;
 #endif//MEMORY_CHECK
 };
 

@@ -70,7 +70,7 @@
 
 /*
  *	Parallel slice bs output without memcpy used
- *  NOTE: might be not applicable for SVC 2.0/2.1 client application layer implementation 
+ *  NOTE: might be not applicable for SVC 2.0/2.1 client application layer implementation
  *	due bs of various slices need be continuous within a layer packing
  */
 //#define PACKING_ONE_SLICE_PER_LAYER	// MEAN packing only slice for a pLayerBs, disabled at SVC 2.0/2.1 in case Multi-Threading (MT) & Multi-SSlice (MS)
@@ -169,58 +169,57 @@
 #endif//NOT_ABSOLUTE_BALANCING
 
 typedef struct TagSliceThreadPrivateData {
-	void		*pWelsPEncCtx;
-	SLayerBSInfo	*pLayerBs;
-	int32_t		iSliceIndex;	// slice index, zero based								
-	int32_t		iThreadIndex;	// thread index, zero based
+void*		pWelsPEncCtx;
+SLayerBSInfo*	pLayerBs;
+int32_t		iSliceIndex;	// slice index, zero based
+int32_t		iThreadIndex;	// thread index, zero based
 
-	// for dynamic slicing mode
-	int32_t		iStartMbIndex;	// inclusive
-	int32_t		iEndMbIndex;	// exclusive
+// for dynamic slicing mode
+int32_t		iStartMbIndex;	// inclusive
+int32_t		iEndMbIndex;	// exclusive
 } SSliceThreadPrivateData;
 
-typedef struct TagSliceThreading 
-{
-	SSliceThreadPrivateData	*pThreadPEncCtx;// thread context, [iThreadIdx]
-	WELS_THREAD_HANDLE			*pThreadHandles;// thread handles, [iThreadIdx]
-#ifdef WIN32
-	WELS_EVENT					*pSliceCodedEvent;// events for slice coded state, [iThreadIdx]
-	WELS_EVENT					*pReadySliceCodingEvent;	// events for slice coding ready, [iThreadIdx]
-	WELS_EVENT					*pFinSliceCodingEvent;	// notify slice coding thread is done
-	WELS_EVENT					*pExitEncodeEvent;			// event for exit encoding event
+typedef struct TagSliceThreading {
+SSliceThreadPrivateData*	pThreadPEncCtx;// thread context, [iThreadIdx]
+WELS_THREAD_HANDLE*			pThreadHandles;// thread handles, [iThreadIdx]
+#ifdef _WIN32
+WELS_EVENT*					pSliceCodedEvent;// events for slice coded state, [iThreadIdx]
+WELS_EVENT*					pReadySliceCodingEvent;	// events for slice coding ready, [iThreadIdx]
+WELS_EVENT*					pFinSliceCodingEvent;	// notify slice coding thread is done
+WELS_EVENT*					pExitEncodeEvent;			// event for exit encoding event
 #else
-	WELS_EVENT*					pSliceCodedEvent[MAX_THREADS_NUM];// events for slice coded state, [iThreadIdx]
-	WELS_EVENT*					pReadySliceCodingEvent[MAX_THREADS_NUM];	// events for slice coding ready, [iThreadIdx]
-#endif//WIN32
+WELS_EVENT*					pSliceCodedEvent[MAX_THREADS_NUM];// events for slice coded state, [iThreadIdx]
+WELS_EVENT*					pReadySliceCodingEvent[MAX_THREADS_NUM];	// events for slice coding ready, [iThreadIdx]
+#endif//_WIN32
 
 #if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 #if defined(__GNUC__)
-	WELS_THREAD_HANDLE			*pUpdateMbListThrdHandles;	// thread handles for update mb list thread, [iThreadIdx]
+WELS_THREAD_HANDLE*			pUpdateMbListThrdHandles;	// thread handles for update mb list thread, [iThreadIdx]
 #endif//__GNUC__
-#ifdef WIN32
-	WELS_EVENT					*pUpdateMbListEvent;		// signal to update mb list neighbor for various slices
-	WELS_EVENT					*pFinUpdateMbListEvent;	// signal to indicate finish updating mb list
+#ifdef _WIN32
+WELS_EVENT*					pUpdateMbListEvent;		// signal to update mb list neighbor for various slices
+WELS_EVENT*					pFinUpdateMbListEvent;	// signal to indicate finish updating mb list
 #else
-	WELS_EVENT*					pUpdateMbListEvent[MAX_THREADS_NUM];		// signal to update mb list neighbor for various slices
-	WELS_EVENT*					pFinUpdateMbListEvent[MAX_THREADS_NUM];	// signal to indicate finish updating mb list	
-#endif//WIN32
+WELS_EVENT*					pUpdateMbListEvent[MAX_THREADS_NUM];		// signal to update mb list neighbor for various slices
+WELS_EVENT*					pFinUpdateMbListEvent[MAX_THREADS_NUM];	// signal to indicate finish updating mb list
+#endif//_WIN32
 #endif//#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 
-	WELS_MUTEX					mutexSliceNumUpdate;	// for dynamic slicing mode MT
+WELS_MUTEX					mutexSliceNumUpdate;	// for dynamic slicing mode MT
 
 #if defined(DYNAMIC_SLICE_ASSIGN) || defined(MT_DEBUG)
-	uint32_t					*pSliceConsumeTime[MAX_DEPENDENCY_LAYER];	// consuming time for each slice, [iSpatialIdx][uiSliceIdx]
+uint32_t*					pSliceConsumeTime[MAX_DEPENDENCY_LAYER];	// consuming time for each slice, [iSpatialIdx][uiSliceIdx]
 #endif//DYNAMIC_SLICE_ASSIGN || MT_DEBUG
 #if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
-	float						*pSliceComplexRatio[MAX_DEPENDENCY_LAYER];
+float*						pSliceComplexRatio[MAX_DEPENDENCY_LAYER];
 #endif//DYNAMIC_SLICE_ASSIGN && TRY_SLICING_BALANCE
 
 #ifdef MT_DEBUG
-	FILE						*pFSliceDiff;	// file handle for debug
+FILE*						pFSliceDiff;	// file handle for debug
 #endif//MT_DEBUG
 
 #ifdef PACKING_ONE_SLICE_PER_LAYER
-	uint32_t					*pCountBsSizeInPartition;
+uint32_t*					pCountBsSizeInPartition;
 #endif//PACKING_ONE_SLICE_PER_LAYER
 } SSliceThreading;
 

@@ -39,37 +39,28 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-void ImageRotate90D_c( uint8_t *pSrc, uint32_t uiBytesPerPixel, uint32_t iWidth, uint32_t iHeight, uint8_t *pDst)
-{
-	for (uint32_t j=0; j<iHeight; j++) 
-	{	
-		for (uint32_t i=0; i<iWidth; i++) 
-		{
-			for(uint32_t n = 0; n< uiBytesPerPixel; n++)				
-				pDst[(i*iHeight + iHeight-1-j)*uiBytesPerPixel + n] = pSrc[(iWidth*j+i)*uiBytesPerPixel+n];
-		}
-	}
+void ImageRotate90D_c (uint8_t* pSrc, uint32_t uiBytesPerPixel, uint32_t iWidth, uint32_t iHeight, uint8_t* pDst) {
+  for (uint32_t j = 0; j < iHeight; j++) {
+    for (uint32_t i = 0; i < iWidth; i++) {
+      for (uint32_t n = 0; n < uiBytesPerPixel; n++)
+        pDst[ (i * iHeight + iHeight - 1 - j)*uiBytesPerPixel + n] = pSrc[ (iWidth * j + i) * uiBytesPerPixel + n];
+    }
+  }
 }
-void ImageRotate180D_c( uint8_t *pSrc, uint32_t uiBytesPerPixel, uint32_t iWidth, uint32_t iHeight, uint8_t *pDst)
-{
-	for (uint32_t j=0; j<iHeight; j++) 
-	{	
-		for (uint32_t i=0; i<iWidth; i++) 
-		{
-			for(uint32_t n = 0; n< uiBytesPerPixel; n++)
-				pDst[((iHeight-1-j)*iWidth + iWidth-1-i)*uiBytesPerPixel + n] = pSrc[(iWidth*j+i)*uiBytesPerPixel+n];
-		}
-	}
+void ImageRotate180D_c (uint8_t* pSrc, uint32_t uiBytesPerPixel, uint32_t iWidth, uint32_t iHeight, uint8_t* pDst) {
+  for (uint32_t j = 0; j < iHeight; j++) {
+    for (uint32_t i = 0; i < iWidth; i++) {
+      for (uint32_t n = 0; n < uiBytesPerPixel; n++)
+        pDst[ ((iHeight - 1 - j)*iWidth + iWidth - 1 - i)*uiBytesPerPixel + n] = pSrc[ (iWidth * j + i) * uiBytesPerPixel + n];
+    }
+  }
 }
-void ImageRotate270D_c( uint8_t *pSrc, uint32_t uiBytesPerPixel, uint32_t iWidth, uint32_t iHeight, uint8_t *pDst)
-{
-	for (uint32_t j=0; j<iWidth; j++) 
-	{	
-		for (uint32_t i=0; i<iHeight; i++) 
-		{
-			for(uint32_t n = 0; n< uiBytesPerPixel; n++)
-				pDst[((iWidth - 1-j)*iHeight + i)*uiBytesPerPixel + n] = pSrc[(iWidth*i+j)*uiBytesPerPixel+n];
-		}
-	}
+void ImageRotate270D_c (uint8_t* pSrc, uint32_t uiBytesPerPixel, uint32_t iWidth, uint32_t iHeight, uint8_t* pDst) {
+  for (uint32_t j = 0; j < iWidth; j++) {
+    for (uint32_t i = 0; i < iHeight; i++) {
+      for (uint32_t n = 0; n < uiBytesPerPixel; n++)
+        pDst[ ((iWidth - 1 - j)*iHeight + i)*uiBytesPerPixel + n] = pSrc[ (iWidth * i + j) * uiBytesPerPixel + n];
+    }
+  }
 }
 WELSVP_NAMESPACE_END

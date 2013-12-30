@@ -32,21 +32,21 @@
  *
  * \brief	Interfaces introduced in thread programming
  *
- * \date	11/17/2009 Created 
+ * \date	11/17/2009 Created
  *
  *************************************************************************************
  */
 
-#ifndef _WELSVP_THREAD_H
-#define _WELSVP_THREAD_H
+#ifndef WELSVP_THREAD_H
+#define WELSVP_THREAD_H
 
 #include "typedef.h"
 
-#if defined(WIN32)
+#if defined(_WIN32)
 
 #include <windows.h>
 
-#elif defined(__GNUC__) 
+#elif defined(__GNUC__)
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -59,12 +59,12 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-#if defined(WIN32)
+#if defined(_WIN32)
 
 typedef  HANDLE            WELS_THREAD_HANDLE;
 typedef  CRITICAL_SECTION  WELS_MUTEX;
 
-#elif defined(__GNUC__) 
+#elif defined(__GNUC__)
 
 typedef   pthread_t         WELS_THREAD_HANDLE;
 typedef   pthread_mutex_t   WELS_MUTEX;
@@ -76,13 +76,13 @@ typedef long_t WELS_THREAD_ERROR_CODE;
 #define   WELS_THREAD_ERROR_OK					0
 #define   WELS_THREAD_ERROR_GENERIAL			((unsigned long)(-1))
 #define   WELS_THREAD_ERROR_WAIT_OBJECT_0		0
-#define	  WELS_THREAD_ERROR_WAIT_TIMEOUT		((unsigned long)0x00000102L)  
+#define	  WELS_THREAD_ERROR_WAIT_TIMEOUT		((unsigned long)0x00000102L)
 #define	  WELS_THREAD_ERROR_WAIT_FAILED		    WELS_THREAD_ERROR_GENERIAL
 
-WELS_THREAD_ERROR_CODE   WelsMutexInit( WELS_MUTEX   * mutex );
-WELS_THREAD_ERROR_CODE   WelsMutexLock( WELS_MUTEX   * mutex );
-WELS_THREAD_ERROR_CODE   WelsMutexUnlock( WELS_MUTEX * mutex );
-WELS_THREAD_ERROR_CODE   WelsMutexDestroy( WELS_MUTEX * mutex );
+WELS_THREAD_ERROR_CODE   WelsMutexInit (WELS_MUTEX*    mutex);
+WELS_THREAD_ERROR_CODE   WelsMutexLock (WELS_MUTEX*    mutex);
+WELS_THREAD_ERROR_CODE   WelsMutexUnlock (WELS_MUTEX* mutex);
+WELS_THREAD_ERROR_CODE   WelsMutexDestroy (WELS_MUTEX* mutex);
 
 WELSVP_NAMESPACE_END
 

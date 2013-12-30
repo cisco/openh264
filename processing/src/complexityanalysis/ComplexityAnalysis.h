@@ -34,13 +34,13 @@
 *
 * \date         :  2011/03/28
 *
-* \description  :  1. rewrite the package code of complexity analysis class  
+* \description  :  1. rewrite the package code of complexity analysis class
 *
 *************************************************************************************
 */
 
-#ifndef _WELSVP_COMPLEXITYANALYSIS_H
-#define _WELSVP_COMPLEXITYANALYSIS_H
+#ifndef WELSVP_COMPLEXITYANALYSIS_H
+#define WELSVP_COMPLEXITYANALYSIS_H
 
 #include "../common/util.h"
 #include "../common/memory.h"
@@ -49,34 +49,34 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-typedef  void (GOMSadFunc) (uint32_t *pGomSad, int32_t *pGomForegroundBlockNum, int32_t *pSad8x8, uint8_t pBackgroundMbFlag);
+typedef  void (GOMSadFunc) (uint32_t* pGomSad, int32_t* pGomForegroundBlockNum, int32_t* pSad8x8,
+                            uint8_t pBackgroundMbFlag);
 
-typedef GOMSadFunc  * PGOMSadFunc;
+typedef GOMSadFunc*   PGOMSadFunc;
 
 GOMSadFunc      GomSampleSad;
 GOMSadFunc      GomSampleSadExceptBackground;
 
-class CComplexityAnalysis : public IStrategy
-{			  
-public:
-	CComplexityAnalysis(int32_t iCpuFlag);
-	~CComplexityAnalysis();
+class CComplexityAnalysis : public IStrategy {
+ public:
+  CComplexityAnalysis (int32_t iCpuFlag);
+  ~CComplexityAnalysis();
 
-	EResult Process(int32_t iType, SPixMap *pSrc, SPixMap *pRef);
-	EResult Set(int32_t iType, void *pParam);
-	EResult Get(int32_t iType, void *pParam);
+  EResult Process (int32_t iType, SPixMap* pSrc, SPixMap* pRef);
+  EResult Set (int32_t iType, void* pParam);
+  EResult Get (int32_t iType, void* pParam);
 
-private:
-	void AnalyzeFrameComplexityViaSad(SPixMap *pSrc, SPixMap *pRef);
-	int32_t GetFrameSadExcludeBackground( SPixMap *pSrc, SPixMap *pRef );
+ private:
+  void AnalyzeFrameComplexityViaSad (SPixMap* pSrc, SPixMap* pRef);
+  int32_t GetFrameSadExcludeBackground (SPixMap* pSrc, SPixMap* pRef);
 
-	void AnalyzeGomComplexityViaSad(SPixMap *pSrc, SPixMap *pRef);
-	void AnalyzeGomComplexityViaVar(SPixMap *pSrc, SPixMap *pRef);
+  void AnalyzeGomComplexityViaSad (SPixMap* pSrc, SPixMap* pRef);
+  void AnalyzeGomComplexityViaVar (SPixMap* pSrc, SPixMap* pRef);
 
-private:
-	PGOMSadFunc m_pfGomSad;
-	SComplexityAnalysisParam m_sComplexityAnalysisParam;
-};	
+ private:
+  PGOMSadFunc m_pfGomSad;
+  SComplexityAnalysisParam m_sComplexityAnalysisParam;
+};
 
 WELSVP_NAMESPACE_END
 

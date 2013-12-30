@@ -50,9 +50,9 @@
 #include <sys/timeb.h>
 #endif
 #include <time.h>
-#if defined(WIN32)
+#if defined(_WIN32)
 #include <windows.h>
-#endif//#if WIN32
+#endif//#if _WIN32
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,32 +64,31 @@ extern "C" {
  * \return	time elapsed since run (unit: microsecond)
  */
 
-int64_t WelsTime( void_t )
-{
+int64_t WelsTime (void_t) {
 #if !(defined(_MSC_VER) || defined(__MINGW32__))
-	struct timeval tv_date;
-	
-	gettimeofday( &tv_date, NULL );
-	return( (int64_t) tv_date.tv_sec * 1000000 + (int64_t) tv_date.tv_usec );
+  struct timeval tv_date;
+
+  gettimeofday (&tv_date, NULL);
+  return ((int64_t) tv_date.tv_sec * 1000000 + (int64_t) tv_date.tv_usec);
 #else
-#if defined (WIN32)
-	static int64_t iMtimeFreq = 0;
-	int64_t iMtimeCur = 0;
-	int64_t iResult = 0;
-	if ( !iMtimeFreq ){
-		QueryPerformanceFrequency((LARGE_INTEGER *)&iMtimeFreq);
-		if ( !iMtimeFreq )
-			iMtimeFreq = 1;
-	}
-	QueryPerformanceCounter((LARGE_INTEGER *)&iMtimeCur);
-	iResult = (int64_t)((double)iMtimeCur * 1e6 / (double)iMtimeFreq + 0.5);
-	return iResult;
+#if defined (_WIN32)
+  static int64_t iMtimeFreq = 0;
+  int64_t iMtimeCur = 0;
+  int64_t iResult = 0;
+  if (!iMtimeFreq) {
+    QueryPerformanceFrequency ((LARGE_INTEGER*)&iMtimeFreq);
+    if (!iMtimeFreq)
+      iMtimeFreq = 1;
+  }
+  QueryPerformanceCounter ((LARGE_INTEGER*)&iMtimeCur);
+  iResult = (int64_t) ((double)iMtimeCur * 1e6 / (double)iMtimeFreq + 0.5);
+  return iResult;
 #else
-	struct _timeb sTime;
-	
-	_ftime(&sTime);
-	return ((int64_t)sTime.time * (1000) + (int64_t)sTime.millitm) * (1000);
-#endif//#if WIN32
+  struct _timeb sTime;
+
+  _ftime (&sTime);
+  return ((int64_t)sTime.time * (1000) + (int64_t)sTime.millitm) * (1000);
+#endif//#if _WIN32
 #endif//!(defined(_MSC_VER) || defined(__MINGW32__))
 }
 
