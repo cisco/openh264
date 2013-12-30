@@ -955,6 +955,19 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
 #endif//REC_FRAME_COUNT
     m_pEncContext->pSvcParam->iTargetBitrate	= iValue;
 
+    //TODO (Sijia):  this is a temporary solution
+    const int32_t iNumLayers = m_pEncContext->pSvcParam->iNumDependencyLayer;
+    int32_t i, iOriTotalBitrate=0;
+    //read old BR
+    for (i=0;i<iNumLayers;i++)
+    {
+        iOriTotalBitrate += m_pEncContext->pSvcParam->sDependencyLayers[i].iSpatialBitrate;
+    }
+    //write new BR
+    for (i=0;i<iNumLayers;i++)
+    {
+        m_pEncContext->pSvcParam->sDependencyLayers[i].iSpatialBitrate = static_cast<int>((m_pEncContext->pSvcParam->sDependencyLayers[i].iSpatialBitrate)*iValue/iOriTotalBitrate);
+    }
   }
   break;
   case ENCODER_OPTION_RC_MODE: {	// 0:quality mode;1:bit-rate mode
