@@ -9,7 +9,6 @@ SYSTEM = $(shell uname)
 CC        = $(shell which gcc)
 AS        = $(shell which nasm)
 GCC       = gcc 
-LDFLAGS   = -lstdc++ -ldl -lpthread
 ifeq ($(ENABLE64BIT), Yes)
 GCC += -m64
 ASMFLAGS = -g -DUNIX64 -I ../
@@ -34,6 +33,7 @@ endif
 LDFLAGS += ../libgtest_32.a
 endif
 
+LDFLAGS   += -lstdc++ -ldl -lpthread
 ifeq ($(SYSTEM), Darwin)
 ASMFLAGS += -DPREFIX
 endif
