@@ -956,13 +956,12 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     m_pEncContext->pSvcParam->iTargetBitrate	= iValue;
 
     //TODO (Sijia):  this is a temporary solution
-    const int32_t iNumLayers 
-        = m_pEncContext->pSvcParam->iNumDependencyLayer;
-    int32_t i, iOriTotalBitrate=0;
+    const int32_t iNumLayers = m_pEncContext->pSvcParam->iNumDependencyLayer;
+    int32_t i, iOrigTotalBitrate=0;
     //read old BR
     for (i=0;i<iNumLayers;i++)
     {
-        iOriTotalBitrate += 
+        iOrigTotalBitrate += 
             m_pEncContext->pSvcParam->sDependencyLayers[i].iSpatialBitrate;
     }
     //write new BR
@@ -970,8 +969,8 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     {
         m_pEncContext->pSvcParam->sDependencyLayers[i].iSpatialBitrate = 
             static_cast<int32_t>
-            ((m_pEncContext->pSvcParam->sDependencyLayers[i].iSpatialBitrate)
-            *iValue/iOriTotalBitrate);
+            ((m_pEncContext->pSvcParam->sDependencyLayers[i].iSpatialBitrate)*
+            iValue/iOrigTotalBitrate);
     }
   }
   break;
