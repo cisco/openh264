@@ -12,8 +12,8 @@ GCC       = gcc
 LDFLAGS   = -lstdc++ -ldl -lpthread
 ifeq ($(ENABLE64BIT), Yes)
 GCC += -m64
-ASMFLAGS = -g -DUNIX64
-LDFLAGS += libgtest_64.a
+ASMFLAGS = -g -DUNIX64 -I ../
+LDFLAGS += ../libgtest_64.a
 
 ifeq ($(SYSTEM), Darwin)
 ASMFLAGS += -f macho64
@@ -23,7 +23,7 @@ endif
 
 else
 GCC += -m32
-ASMFLAGS =  -g -DX86_32 
+ASMFLAGS =  -g -DX86_32  -I ../
 
 ifeq ($(SYSTEM), Darwin)
 ASMFLAGS += -f macho32
@@ -31,13 +31,13 @@ else # Linux
 ASMFLAGS += -f elf
 endif
 
-LDFLAGS += libgtest_32.a
+LDFLAGS += ../libgtest_32.a
 endif
 
 ifeq ($(SYSTEM), Darwin)
 ASMFLAGS += -DPREFIX
 endif
-CPPFLAGS  = -Wall -g -fpic -I ../gtest/include -I ../codec/encoder/core/inc -I ../codec/api/svc
+CPPFLAGS  = -Wall -g -fpic -I ../gtest/include -I ../../codec/decoder/core/inc -I ../../codec/api/svc
 ifeq ($(NASM), Yes)
 CPPFLAGS += -DX86_ASM
 endif
