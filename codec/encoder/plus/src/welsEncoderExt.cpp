@@ -950,11 +950,25 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     int32_t iValue = * ((int32_t*)pOption);
 #ifdef REC_FRAME_COUNT
     WelsLog (m_pEncContext, WELS_LOG_INFO,
-             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x, iValue= %d\n",
-             m_uiCountFrameNum, m_iCspInternal, iValue);
+      "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x, iValue= %d\n",
+      m_uiCountFrameNum, m_iCspInternal, iValue);
 #endif//REC_FRAME_COUNT
-    m_pEncContext->pSvcParam->iTargetBitrate	= iValue;
+    m_pEncContext->pSvcParam->iTargetBitrate = iValue;
 
+    //TODO (Sijia):  this is a temporary solution
+    const int32_t iNumLayers = m_pEncContext->pSvcParam->iNumDependencyLayer;
+    int32_t i, iOrigTotalBitrate=0;
+    //read old BR
+    for (i=0;i<iNumLayers;i++) {
+      iOrigTotalBitrate += 
+        m_pEncContext->pSvcParam->sDependencyLayers[i].iSpatialBitrate;
+    }
+    //write new BR
+    for (i=0;i<iNumLayers;i++) {
+      m_pEncContext->pSvcParam->sDependencyLayers[i].iSpatialBitrate = 
+        ((m_pEncContext->pSvcParam->sDependencyLayers[i].iSpatialBitrate)*
+        iValue)/iOrigTotalBitrate;
+    }
   }
   break;
   case ENCODER_OPTION_RC_MODE: {	// 0:quality mode;1:bit-rate mode
