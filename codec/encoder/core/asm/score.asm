@@ -42,8 +42,6 @@
 
 %include "asm_inc.asm"
 
-bits 32
-
 ;***********************************************************************
 ; Macros
 ;***********************************************************************
@@ -171,25 +169,34 @@ SECTION .text
 ALIGN 16
 WELS_EXTERN WelsScan4x4DcAc_sse2
 WelsScan4x4DcAc_sse2:
-
-	mov        eax, [esp+8]
-	movdqa     xmm0, [eax]			; 7 6 5 4 3 2 1 0
-	movdqa     xmm1, [eax+16]		; f e d c b a 9 8
-	pextrw     ecx, xmm0, 7			; ecx = 7
-	pextrw     edx, xmm1, 2			; edx = a
-	pextrw     eax, xmm0, 5			; eax = 5
-	pinsrw     xmm1, ecx, 2			; f e d c b 7 9 8
-	pinsrw     xmm0, eax, 7			; 5 6 5 4 3 2 1 0
-	pextrw     ecx, xmm1, 0			; ecx = 8
-	pinsrw     xmm0, ecx, 5			; 5 6 8 4 3 2 1 0
-	pinsrw     xmm1, edx, 0			; f e d c b 7 9 a
+	%ifdef X86_32
+	push r3
+	%assign push_num 1
+	%else
+	%assign push_num 0
+	%endif
+	LOAD_2_PARA
+	;mov        eax, [esp+8]
+	movdqa     xmm0, [r1]			; 7 6 5 4 3 2 1 0
+	movdqa     xmm1, [r1+16]		; f e d c b a 9 8
+	pextrw     r2d, xmm0, 7			; ecx = 7
+	pextrw     r3d, xmm1, 2			; edx = a
+	pextrw     r1d, xmm0, 5			; eax = 5
+	pinsrw     xmm1, r2d, 2			; f e d c b 7 9 8
+	pinsrw     xmm0, r1d, 7			; 5 6 5 4 3 2 1 0
+	pextrw     r2d, xmm1, 0			; ecx = 8
+	pinsrw     xmm0, r2d, 5			; 5 6 8 4 3 2 1 0
+	pinsrw     xmm1, r3d, 0			; f e d c b 7 9 a
 	pshufd     xmm2, xmm0, 0xd8		; 5 6 3 2 8 4 1 0
 	pshufd     xmm3, xmm1, 0xd8		; f e b 7 d c 9 a
 	pshufhw    xmm0, xmm2, 0x93		; 6 3 2 5 8 4 1 0
 	pshuflw    xmm1, xmm3, 0x39		; f e b 7 a d c 9
-	mov        eax,  [esp+4]
-	movdqa     [eax],xmm0
-	movdqa     [eax+16], xmm1
+	;mov        eax,  [esp+4]
+	movdqa     [r0],xmm0
+	movdqa     [r0+16], xmm1
+	%ifdef X86_32
+	pop r3
+	%endif
 	ret
 
 ;***********************************************************************
@@ -198,19 +205,21 @@ WelsScan4x4DcAc_sse2:
 ALIGN 16
 WELS_EXTERN WelsScan4x4DcAc_ssse3
 WelsScan4x4DcAc_ssse3:
-	mov        eax, [esp+8]
-	movdqa     xmm0, [eax]
-	movdqa     xmm1, [eax+16]
-	pextrw		ecx,  xmm0, 7			; ecx = [7]
-	pextrw		eax,  xmm1, 0			; eax = [8]
-	pinsrw		xmm0, eax, 7			; xmm0[7]	=	[8]
-	pinsrw		xmm1, ecx, 0			; xmm1[0]	=	[7]
+	%assign push_num 0
+	LOAD_2_PARA
+	;mov        eax, [esp+8]
+	movdqa     xmm0, [r1]
+	movdqa     xmm1, [r1+16]
+	pextrw		r2d,  xmm0, 7			; ecx = [7]
+	pextrw		r1d,  xmm1, 0			; eax = [8]
+	pinsrw		xmm0, r1d, 7			; xmm0[7]	=	[8]
+	pinsrw		xmm1, r2d, 0			; xmm1[0]	=	[7]
 	pshufb		xmm1, [pb_scanacdc_maskb]
 	pshufb		xmm0, [pb_scanacdc_maska]
 
-	mov        eax,  [esp+4]
-	movdqa     [eax],xmm0
-	movdqa     [eax+16], xmm1
+	;mov        eax,  [esp+4]
+	movdqa     [r0],xmm0
+	movdqa     [r0+16], xmm1
 	ret
 ;***********************************************************************
 ;void WelsScan4x4Ac_sse2( int16_t* zig_value, int16_t* pDct )
@@ -218,9 +227,11 @@ WelsScan4x4DcAc_ssse3:
 ALIGN 16
 WELS_EXTERN WelsScan4x4Ac_sse2
 WelsScan4x4Ac_sse2:
-	mov        eax, [esp+8]
-	movdqa     xmm0, [eax]
-	movdqa     xmm1, [eax+16]
+	%assign push_num 0
+	LOAD_2_PARA
+	;mov        eax, [esp+8]
+	movdqa     xmm0, [r1]
+	movdqa     xmm1, [r1+16]
 	movdqa     xmm2, xmm0
 	punpcklqdq xmm0, xmm1
 	punpckhqdq xmm2, xmm1
@@ -228,14 +239,14 @@ WelsScan4x4Ac_sse2:
 	movdqa     xmm3, xmm0
 	punpckldq  xmm0, xmm2
 	punpckhdq  xmm3, xmm2
-	pextrw     eax , xmm0, 3
-	pextrw     edx , xmm0, 7
-	pinsrw     xmm0, eax,  7
-	pextrw     eax,  xmm3, 4
-	pinsrw     xmm3, edx,  4
-	pextrw     edx,  xmm3, 0
-	pinsrw     xmm3, eax,  0
-	pinsrw     xmm0, edx,  3
+	pextrw     r1d , xmm0, 3
+	pextrw     r2d , xmm0, 7
+	pinsrw     xmm0, r1d,  7
+	pextrw     r1d,  xmm3, 4
+	pinsrw     xmm3, r2d,  4
+	pextrw     r2d,  xmm3, 0
+	pinsrw     xmm3, r1d,  0
+	pinsrw     xmm0, r2d,  3
 
 	pshufhw    xmm1, xmm0, 0x93
 	pshuflw    xmm2, xmm3, 0x39
@@ -245,9 +256,9 @@ WelsScan4x4Ac_sse2:
     pslldq     xmm3, 14
     por        xmm1, xmm3
     psrldq     xmm2, 2
-	mov        eax,  [esp+4]
-	movdqa     [eax],xmm1
-	movdqa     [eax+16], xmm2
+	;mov        eax,  [esp+4]
+	movdqa     [r0],xmm1
+	movdqa     [r0+16], xmm2
 	ret
 
 
@@ -257,44 +268,60 @@ WelsScan4x4Ac_sse2:
 ALIGN 16
 WELS_EXTERN WelsCalculateSingleCtr4x4_sse2
 WelsCalculateSingleCtr4x4_sse2:
-	push      ebx
-	mov       eax,  [esp+8]
-	movdqa    xmm0, [eax]
-	movdqa    xmm1, [eax+16]
+	;push      ebx
+	;mov       eax,  [esp+8]
+	%ifdef X86_32
+	push r3
+	%assign push_num 1
+	%else
+	%assign push_num 0
+	%endif
+	LOAD_1_PARA
+	movdqa    xmm0, [r0]
+	movdqa    xmm1, [r0+16]
 
 	packsswb  xmm0, xmm1
-
+	; below is the register map: r0 - eax, r1 - ebx, r2 - ecx, r3 - edx
+	xor r3, r3
     pxor      xmm3, xmm3
     pcmpeqb   xmm0, xmm3
-    pmovmskb  edx,  xmm0
+    pmovmskb  r3d,  xmm0
 
-    xor       edx,  0xffff
+    xor       r3,  0xffff
 
-	xor       eax,  eax
-	mov       ecx,  7
-	mov       ebx,  8
+	xor       r0,  r0
+	mov       r2,  7
+	mov       r1,  8
 .loop_low8_find1:
-	bt        edx,  ecx
+	bt        r3,  r2
 	jc        .loop_high8_find1
-	loop      .loop_low8_find1
+	dec		  r2
+	jnz      .loop_low8_find1
 .loop_high8_find1:
-	bt        edx, ebx
+	bt        r3, r1
 	jc        .find1end
-	inc       ebx
-	cmp       ebx,16
+	inc       r1
+	cmp       r1,16
 	jb        .loop_high8_find1
 .find1end:
-	sub       ebx, ecx
-	sub       ebx, 1
-	add       al,  [i_ds_table+ebx]
-	mov       ebx, edx
-	and       edx, 0xff
-	shr       ebx, 8
-	and       ebx, 0xff
-	add       al,  [low_mask_table +edx]
-	add       al,  [high_mask_table+ebx]
-
-	pop       ebx
+	sub       r1, r2
+	sub       r1, 1
+	lea	  r2,  [i_ds_table]
+	add       r0b,  [r2+r1]
+	mov       r1, r3
+	and       r3, 0xff
+	shr       r1, 8
+	and       r1, 0xff
+	lea	  r2 , [low_mask_table]
+	add       r0b,  [r2 +r3]
+	lea	  r2, [high_mask_table]
+	add       r0b,  [r2+r1]
+	%ifdef X86_32
+	pop r3
+	%else
+	mov retrd, r0d
+	%endif
+	;pop       ebx
 	ret
 
 
@@ -304,21 +331,29 @@ WelsCalculateSingleCtr4x4_sse2:
 ALIGN 16
 WELS_EXTERN WelsGetNoneZeroCount_sse2
 WelsGetNoneZeroCount_sse2:
-	mov       eax,  [esp+4]
-	movdqa    xmm0, [eax]
-	movdqa    xmm1, [eax+16]
+	%assign push_num 0
+	LOAD_1_PARA
+	;mov       eax,  [esp+4]
+	movdqa    xmm0, [r0]
+	movdqa    xmm1, [r0+16]
 	pxor      xmm2, xmm2
 	pcmpeqw   xmm0, xmm2
 	pcmpeqw   xmm1, xmm2
 	packsswb  xmm1, xmm0
-	pmovmskb  edx,  xmm1
-	xor       edx,  0xffff
-	mov       ecx,  edx
-	and       edx,  0xff
-	shr       ecx,  8
+	xor r1, r1
+	pmovmskb  r1d,  xmm1
+	xor       r1d,  0xffff
+	mov       r2,  r1
+	and       r1,  0xff
+	shr       r2,  8
 ;	and       ecx,  0xff	; we do not need this due to high 16bits equal to 0 yet
-	xor       eax,  eax
-	add       al,  [nozero_count_table+ecx]
-	add       al,  [nozero_count_table+edx]
+;	xor       retr,  retr
+	;add       al,  [nozero_count_table+r2]
+	lea 	  r0 , [nozero_count_table]
+	movzx	  r2, byte [r0+r2]
+	movzx	  r1,   byte [r0+r1]
+	mov	  retrq, r2
+	add	  retrq, r1
+	;add       al,  [nozero_count_table+r1]
 	ret
 

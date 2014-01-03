@@ -41,7 +41,6 @@
 ;*************************************************************************/
 %include "asm_inc.asm"
 
-BITS 32
 ;***********************************************************************
 ; Local Data (Read Only)
 ;***********************************************************************
@@ -177,11 +176,11 @@ mmx_0x02: dw 0x02, 0x00, 0x00, 0x00
 %endmacro
 
 %macro LOAD_2_LEFT_AND_ADD 0
-        lea         eax, [eax+2*ecx]
-        movzx		edx, byte [eax-0x01]
-        add			ebx, edx
-        movzx		edx, byte [eax+ecx-0x01]
-        add			ebx, edx
+        lea         r1, [r1+2*r2]
+        movzx		r4, byte [r1-0x01]
+        add			r3, r4
+        movzx		r4, byte [r1+r2-0x01]
+        add			r3, r4
 %endmacro
 
 ;***********************************************************************
@@ -201,79 +200,88 @@ ALIGN 16
 ;	pred must align to 16
 ;***********************************************************************
 WelsI4x4LumaPredH_sse2:
-	mov			eax,	[esp+8]			;pRef
-	mov			ecx,	[esp+12]		;stride
-
-	movzx		edx,	byte [eax-1]
-	movd		xmm0,	edx
+	push r3
+	%assign push_num 1
+	LOAD_3_PARA
+	%ifndef X86_32
+	movsx r2, r2d
+	%endif
+	movzx		r3,	byte [r1-1]
+	movd		xmm0,	r3d
 	pmuludq		xmm0,	[mmx_01bytes]
 
-	movzx		edx,	byte [eax+ecx-1]
-	movd		xmm1,	edx
+	movzx		r3,	byte [r1+r2-1]
+	movd		xmm1,	r3d
 	pmuludq		xmm1,	[mmx_01bytes]
 
 	unpcklps	xmm0,	xmm1
 
-	lea			eax,	[eax+ecx*2]
-	movzx		edx,	byte [eax-1]
-	movd		xmm2,	edx
+	lea			r1,	[r1+r2*2]
+	movzx		r3,	byte [r1-1]
+	movd		xmm2,	r3d
 	pmuludq		xmm2,	[mmx_01bytes]
 
-	movzx		edx,	byte [eax+ecx-1]
-	movd		xmm3,	edx
+	movzx		r3,	byte [r1+r2-1]
+	movd		xmm3,	r3d
 	pmuludq		xmm3,	[mmx_01bytes]
 
 	unpcklps	xmm2,	xmm3
 	unpcklpd	xmm0,	xmm2
 
-	mov			edx,	[esp+4]			;pred
-	movdqa		[edx],	xmm0
-
+	movdqa		[r0],	xmm0
+	pop r3
 	ret
 
 ;***********************************************************************
 ; void WelsI16x16LumaPredPlane_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride);
 ;***********************************************************************
 WelsI16x16LumaPredPlane_sse2:
-%define pushsize	4
-		push	esi
-		mov		esi,	[esp + pushsize + 8]
-		mov		ecx,	[esp + pushsize + 12]
-		sub		esi,	1
-		sub		esi,	ecx
+		;%define pushsize	4
+		;push	esi
+		;mov		esi,	[esp + pushsize + 8]
+		;mov		ecx,	[esp + pushsize + 12]
+		push r3
+		push r4
+		%assign push_num 2
+		LOAD_3_PARA
+		%ifndef X86_32
+		movsx r2, r2d
+		%endif
+		sub		r1,	1
+		sub		r1,	r2
 
 		;for H
 		pxor	xmm7,	xmm7
-		movq	xmm0,	[esi]
+		movq	xmm0,	[r1]
 		movdqa	xmm5,	[sse2_plane_dec]
 		punpcklbw xmm0,	xmm7
 		pmullw	xmm0,	xmm5
-		movq	xmm1,	[esi + 9]
+		movq	xmm1,	[r1 + 9]
 		movdqa	xmm6,	[sse2_plane_inc]
 		punpcklbw xmm1,	xmm7
 		pmullw	xmm1,	xmm6
 		psubw	xmm1,	xmm0
 
 		SUMW_HORIZON	xmm1,xmm0,xmm2
-		movd    eax,	xmm1		; H += (i + 1) * (top[8 + i] - top[6 - i]);
-		movsx	eax,	ax
-		imul	eax,	5
-		add		eax,	32
-		sar		eax,	6			; b = (5 * H + 32) >> 6;
-		SSE2_Copy8Times	xmm1, eax	; xmm1 = b,b,b,b,b,b,b,b
+		movd    r3d,	xmm1		; H += (i + 1) * (top[8 + i] - top[6 - i]);
+		movsx	r3,	r3w
+		imul	r3,	5
+		add		r3,	32
+		sar		r3,	6			; b = (5 * H + 32) >> 6;
+		SSE2_Copy8Times	xmm1, r3d	; xmm1 = b,b,b,b,b,b,b,b
 
-		movzx	edx,	BYTE [esi+16]
-		sub	esi, 3
-		LOAD_COLUMN		xmm0, xmm2, xmm3, xmm4, esi, ecx
+		movzx	r4,	BYTE [r1+16]
+		sub	r1, 3
+		LOAD_COLUMN		xmm0, xmm2, xmm3, xmm4, r1, r2
 
-		add		esi,	3
-		movzx	eax,	BYTE [esi+8*ecx]
-		add		edx,	eax
-		shl		edx,	4			;	a = (left[15*stride] + top[15]) << 4;
+		add		r1,	3
+		movzx	r3,	BYTE [r1+8*r2]
+		add		r4,	r3
+		shl		r4,	4			;	a = (left[15*stride] + top[15]) << 4;
 
-		sub	esi, 3
-		add		esi,	ecx
-		LOAD_COLUMN		xmm7, xmm2, xmm3, xmm4, esi, ecx
+		sub	r1, 3
+		add		r1,	r2
+		LOAD_COLUMN		xmm7, xmm2, xmm3, xmm4, r1, r2
 		pxor	xmm4,	xmm4
 		punpckhbw xmm0,	xmm4
 		pmullw	xmm0,	xmm5
@@ -282,21 +290,20 @@ WelsI16x16LumaPredPlane_sse2:
 		psubw	xmm7,	xmm0
 
 		SUMW_HORIZON   xmm7,xmm0,xmm2
-		movd    eax,   xmm7			; V
-		movsx	eax,	ax
+		movd    r3d,   xmm7			; V
+		movsx	r3,	r3w
+		imul	r3,	5
+		add		r3,	32
+		sar		r3,	6				; c = (5 * V + 32) >> 6;
+		SSE2_Copy8Times	xmm4, r3d		; xmm4 = c,c,c,c,c,c,c,c
 
-		imul	eax,	5
-		add		eax,	32
-		sar		eax,	6				; c = (5 * V + 32) >> 6;
-		SSE2_Copy8Times	xmm4, eax		; xmm4 = c,c,c,c,c,c,c,c
+		;mov		esi,	[esp + pushsize + 4]
+		add		r4,	16
+		imul	r3,	-7
+		add		r3,	r4				; s = a + 16 + (-7)*c
+		SSE2_Copy8Times	xmm0, r3d		; xmm0 = s,s,s,s,s,s,s,s
 
-		mov		esi,	[esp + pushsize + 4]
-		add		edx,	16
-		imul	eax,	-7
-		add		edx,	eax				; s = a + 16 + (-7)*c
-		SSE2_Copy8Times	xmm0, edx		; xmm0 = s,s,s,s,s,s,s,s
-
-		xor		eax,	eax
+		xor		r3,	r3
 		movdqa	xmm5,	[sse2_plane_inc_minus]
 
 get_i16x16_luma_pred_plane_sse2_1:
@@ -309,51 +316,56 @@ get_i16x16_luma_pred_plane_sse2_1:
 		paddw	xmm3,	xmm0
 		psraw	xmm3,	5
 		packuswb xmm2,	xmm3
-		movdqa	[esi],	xmm2
+		movdqa	[r0],	xmm2
 		paddw	xmm0,	xmm4
-		add		esi,	16
-		inc		eax
-		cmp		eax,	16
+		add		r0,	16
+		inc		r3
+		cmp		r3,	16
 		jnz get_i16x16_luma_pred_plane_sse2_1
-
-		pop		esi
+		pop r4
+		pop r3
 		ret
-
-
 
 ;***********************************************************************
 ; void WelsI16x16LumaPredH_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride);
 ;***********************************************************************
 
-%macro SSE2_PRED_H_16X16_TWO_LINE 1
-    lea     eax,	[eax+ecx*2]
-
-    COPY_16_TIMES	eax,	xmm0
-    movdqa			[edx+%1],	xmm0
-   COPY_16_TIMESS eax,	xmm0,	ecx
-   ; COPY_16_TIMES	eax + ecx,	xmm0
-    movdqa  [edx+%1+0x10],	xmm0
+%macro SSE2_PRED_H_16X16_ONE_LINE 0
+	add r0, 16
+	add r1, r2
+	movzx r3, byte [r1]
+	SSE2_Copy16Times xmm0, r3d
+	movdqa [r0], xmm0
 %endmacro
 
 WELS_EXTERN WelsI16x16LumaPredH_sse2
 WelsI16x16LumaPredH_sse2:
-    mov     edx, [esp+4]    ; pred
-    mov     eax, [esp+8]	; pRef
-    mov     ecx, [esp+12]   ; stride
-
-    COPY_16_TIMES eax,	xmm0
-    movdqa  [edx],		xmm0
-    COPY_16_TIMESS eax,	xmm0,	ecx
-    movdqa  [edx+0x10],	xmm0
-
-	SSE2_PRED_H_16X16_TWO_LINE   0x20
-	SSE2_PRED_H_16X16_TWO_LINE   0x40
-	SSE2_PRED_H_16X16_TWO_LINE   0x60
-	SSE2_PRED_H_16X16_TWO_LINE   0x80
-	SSE2_PRED_H_16X16_TWO_LINE   0xa0
-	SSE2_PRED_H_16X16_TWO_LINE   0xc0
-	SSE2_PRED_H_16X16_TWO_LINE   0xe0
-
+	push r3
+	%assign push_num 1
+	LOAD_3_PARA
+	%ifndef X86_32
+	movsx r2, r2d
+	%endif
+	dec r1
+	movzx r3, byte [r1]
+	SSE2_Copy16Times xmm0, r3d
+	movdqa [r0], xmm0
+	SSE2_PRED_H_16X16_ONE_LINE
+	SSE2_PRED_H_16X16_ONE_LINE
+	SSE2_PRED_H_16X16_ONE_LINE
+	SSE2_PRED_H_16X16_ONE_LINE
+	SSE2_PRED_H_16X16_ONE_LINE
+	SSE2_PRED_H_16X16_ONE_LINE
+	SSE2_PRED_H_16X16_ONE_LINE
+	SSE2_PRED_H_16X16_ONE_LINE
+	SSE2_PRED_H_16X16_ONE_LINE
+	SSE2_PRED_H_16X16_ONE_LINE
+	SSE2_PRED_H_16X16_ONE_LINE
+	SSE2_PRED_H_16X16_ONE_LINE
+	SSE2_PRED_H_16X16_ONE_LINE
+	SSE2_PRED_H_16X16_ONE_LINE
+	SSE2_PRED_H_16X16_ONE_LINE
+	pop r3
     ret
 
 ;***********************************************************************
@@ -361,29 +373,33 @@ WelsI16x16LumaPredH_sse2:
 ;***********************************************************************
 WELS_EXTERN WelsI16x16LumaPredV_sse2
 WelsI16x16LumaPredV_sse2:
-    mov     edx, [esp+4]    ; pred
-    mov     eax, [esp+8]	; pRef
-    mov     ecx, [esp+12]   ; stride
+    ;mov     edx, [esp+4]    ; pred
+    ;mov     eax, [esp+8]	; pRef
+    ;mov     ecx, [esp+12]   ; stride
+    %assign push_num 0
+    LOAD_3_PARA
+	%ifndef X86_32
+	movsx r2, r2d
+	%endif
+    sub     r1, r2
+    movdqa  xmm0, [r1]
 
-    sub     eax, ecx
-    movdqa  xmm0, [eax]
-
-    movdqa  [edx], xmm0
-    movdqa  [edx+10h], xmm0
-    movdqa  [edx+20h], xmm0
-    movdqa  [edx+30h], xmm0
-    movdqa  [edx+40h], xmm0
-    movdqa  [edx+50h], xmm0
-    movdqa  [edx+60h], xmm0
-    movdqa  [edx+70h], xmm0
-    movdqa  [edx+80h], xmm0
-    movdqa  [edx+90h], xmm0
-    movdqa  [edx+160], xmm0
-	movdqa  [edx+176], xmm0
-    movdqa  [edx+192], xmm0
-    movdqa  [edx+208], xmm0
-    movdqa  [edx+224], xmm0
-    movdqa  [edx+240], xmm0
+    movdqa  [r0], xmm0
+    movdqa  [r0+10h], xmm0
+    movdqa  [r0+20h], xmm0
+    movdqa  [r0+30h], xmm0
+    movdqa  [r0+40h], xmm0
+    movdqa  [r0+50h], xmm0
+    movdqa  [r0+60h], xmm0
+    movdqa  [r0+70h], xmm0
+    movdqa  [r0+80h], xmm0
+    movdqa  [r0+90h], xmm0
+    movdqa  [r0+160], xmm0
+    movdqa  [r0+176], xmm0
+    movdqa  [r0+192], xmm0
+    movdqa  [r0+208], xmm0
+    movdqa  [r0+224], xmm0
+    movdqa  [r0+240], xmm0
 
     ret
 
@@ -392,19 +408,26 @@ WelsI16x16LumaPredV_sse2:
 ;***********************************************************************
 WELS_EXTERN WelsIChromaPredPlane_sse2
 WelsIChromaPredPlane_sse2:
-%define pushsize	4
-		push	esi
-		mov		esi,	[esp + pushsize + 8]	;pRef
-		mov		ecx,	[esp + pushsize + 12]	;stride
-		sub		esi,	1
-		sub		esi,	ecx
+		;%define pushsize	4
+		;push	esi
+		;mov		esi,	[esp + pushsize + 8]	;pRef
+		;mov		ecx,	[esp + pushsize + 12]	;stride
+		push r3
+		push r4
+		%assign push_num 2
+		LOAD_3_PARA
+		%ifndef X86_32
+		movsx r2, r2d
+		%endif
+		sub		r1,	1
+		sub		r1,	r2
 
 		pxor	mm7,	mm7
-		movq	mm0,	[esi]
+		movq	mm0,	[r1]
 		movq	mm5,	[sse2_plane_dec_c]
 		punpcklbw mm0,	mm7
 		pmullw	mm0,	mm5
-		movq	mm1,	[esi + 5]
+		movq	mm1,	[r1 + 5]
 		movq	mm6,	[sse2_plane_inc_c]
 		punpcklbw mm1,	mm7
 		pmullw	mm1,	mm6
@@ -413,25 +436,25 @@ WelsIChromaPredPlane_sse2:
 		movq2dq xmm1,   mm1
 		pxor    xmm2,   xmm2
 		SUMW_HORIZON	xmm1,xmm0,xmm2
-		movd    eax,	xmm1
-		movsx	eax,	ax
-		imul	eax,	17
-		add		eax,	16
-		sar		eax,	5			; b = (17 * H + 16) >> 5;
-		SSE2_Copy8Times	xmm1, eax	; mm1 = b,b,b,b,b,b,b,b
+		movd    r3d,	xmm1
+		movsx	r3,	r3w
+		imul	r3,	17
+		add		r3,	16
+		sar		r3,	5			; b = (17 * H + 16) >> 5;
+		SSE2_Copy8Times	xmm1, r3d	; mm1 = b,b,b,b,b,b,b,b
 
-		movzx	edx,	BYTE [esi+8]
-		sub	esi, 3
-		LOAD_COLUMN_C	mm0, mm2, mm3, mm4, esi, ecx
+		movzx	r3,	BYTE [r1+8]
+		sub	r1, 3
+		LOAD_COLUMN_C	mm0, mm2, mm3, mm4, r1, r2
 
-		add		esi,	3
-		movzx	eax,	BYTE [esi+4*ecx]
-		add		edx,	eax
-		shl		edx,	4			; a = (left[7*stride] + top[7]) << 4;
+		add		r1,	3
+		movzx	r4,	BYTE [r1+4*r2]
+		add		r4,	r3
+		shl		r4,	4			; a = (left[7*stride] + top[7]) << 4;
 
-		sub	esi, 3
-		add		esi,	ecx
-		LOAD_COLUMN_C	mm7, mm2, mm3, mm4, esi, ecx
+		sub	r1, 3
+		add		r1,	r2
+		LOAD_COLUMN_C	mm7, mm2, mm3, mm4, r1, r2
 		pxor	mm4,	mm4
 		punpckhbw mm0,	mm4
 		pmullw	mm0,	mm5
@@ -442,21 +465,20 @@ WelsIChromaPredPlane_sse2:
 		movq2dq xmm7,   mm7
 		pxor    xmm2,   xmm2
 		SUMW_HORIZON	xmm7,xmm0,xmm2
-		movd    eax,    xmm7			; V
-		movsx	eax,	ax
+		movd    r3d,    xmm7			; V
+		movsx	r3,	r3w
+		imul	r3,	17
+		add		r3,	16
+		sar		r3,	5				; c = (17 * V + 16) >> 5;
+		SSE2_Copy8Times	xmm4, r3d	; mm4 = c,c,c,c,c,c,c,c
 
-		imul	eax,	17
-		add		eax,	16
-		sar		eax,	5				; c = (17 * V + 16) >> 5;
-		SSE2_Copy8Times	xmm4, eax		; mm4 = c,c,c,c,c,c,c,c
+		;mov		esi,	[esp + pushsize + 4]
+		add		r4,	16
+		imul	r3,	-3
+		add		r3,	r4		; s = a + 16 + (-3)*c
+		SSE2_Copy8Times	xmm0, r3d	; xmm0 = s,s,s,s,s,s,s,s
 
-		mov		esi,	[esp + pushsize + 4]
-		add		edx,	16
-		imul	eax,	-3
-		add		edx,	eax				; s = a + 16 + (-3)*c
-		SSE2_Copy8Times	xmm0, edx		; xmm0 = s,s,s,s,s,s,s,s
-
-		xor		eax,	eax
+		xor		r3,	r3
 		movdqa	xmm5,	[sse2_plane_mul_b_c]
 
 get_i_chroma_pred_plane_sse2_1:
@@ -465,14 +487,14 @@ get_i_chroma_pred_plane_sse2_1:
 		paddw	xmm2,	xmm0
 		psraw	xmm2,	5
 		packuswb xmm2,	xmm2
-		movq	[esi],	xmm2
+		movq	[r0],	xmm2
 		paddw	xmm0,	xmm4
-		add		esi,	8
-		inc		eax
-		cmp		eax,	8
+		add		r0,	8
+		inc		r3
+		cmp		r3,	8
 		jnz get_i_chroma_pred_plane_sse2_1
-
-		pop		esi
+		pop r4
+		pop r3
 		WELSEMMS
 		ret
 
@@ -490,27 +512,31 @@ ALIGN 16
 ;
 ;***********************************************************************
 WelsI4x4LumaPredDDR_mmx:
-	mov			edx,[esp+4]			;pred
-	mov         eax,[esp+8]			;pRef
-	mov			ecx,[esp+12]		;stride
-
-	movq        mm1,[eax+ecx-8]		;get value of 11,decreasing 8 is trying to improve the performance of movq mm1[8] = 11
-	movq        mm2,[eax-8]			;get value of 6 mm2[8] = 6
-	sub			eax, ecx			;mov eax to above line of current block(postion of 1)
-	punpckhbw   mm2,[eax-8]			;mm2[8](high 8th byte of mm2) = [0](value of 0), mm2[7]= [6]
-	movd        mm3,[eax]			;get value 1, mm3[1] = [1],mm3[2]=[2],mm3[3]=[3]
+	;mov			edx,[esp+4]			;pred
+	;mov         eax,[esp+8]			;pRef
+	;mov			ecx,[esp+12]		;stride
+	%assign push_num 0
+	LOAD_3_PARA
+	%ifndef X86_32
+	movsx r2, r2d
+	%endif
+	movq        mm1,[r1+r2-8]		;get value of 11,decreasing 8 is trying to improve the performance of movq mm1[8] = 11
+	movq        mm2,[r1-8]			;get value of 6 mm2[8] = 6
+	sub		r1, r2			;mov eax to above line of current block(postion of 1)
+	punpckhbw   mm2,[r1-8]			;mm2[8](high 8th byte of mm2) = [0](value of 0), mm2[7]= [6]
+	movd        mm3,[r1]			;get value 1, mm3[1] = [1],mm3[2]=[2],mm3[3]=[3]
 	punpckhwd   mm1,mm2				;mm1[8]=[0],mm1[7]=[6],mm1[6]=[11]
 	psllq       mm3,18h				;mm3[5]=[1]
 	psrlq       mm1,28h				;mm1[3]=[0],mm1[2]=[6],mm1[1]=[11]
 	por         mm3,mm1				;mm3[6]=[3],mm3[5]=[2],mm3[4]=[1],mm3[3]=[0],mm3[2]=[6],mm3[1]=[11]
 	movq        mm1,mm3				;mm1[6]=[3],mm1[5]=[2],mm1[4]=[1],mm1[3]=[0],mm1[2]=[6],mm1[1]=[11]
-	lea			eax,[eax+ecx*2-8h]		;set eax point to 12
-	movq        mm4,[eax+ecx]		;get value of 16, mm4[8]=[16]
+	lea  	    r1,[r1+r2*2-8h]		;set eax point to 12
+	movq        mm4,[r1+r2]		;get value of 16, mm4[8]=[16]
 	psllq       mm3,8				;mm3[7]=[3],mm3[6]=[2],mm3[5]=[1],mm3[4]=[0],mm3[3]=[6],mm3[2]=[11],mm3[1]=0
 	psrlq       mm4,38h				;mm4[1]=[16]
 	por         mm3,mm4				;mm3[7]=[3],mm3[6]=[2],mm3[5]=[1],mm3[4]=[0],mm3[3]=[6],mm3[2]=[11],mm3[1]=[16]
 	movq        mm2,mm3				;mm2[7]=[3],mm2[6]=[2],mm2[5]=[1],mm2[4]=[0],mm2[3]=[6],mm2[2]=[11],mm2[1]=[16]
-	movq        mm4,[eax+ecx*2]		;mm4[8]=[21]
+	movq        mm4,[r1+r2*2]		;mm4[8]=[21]
 	psllq       mm3,8				;mm3[8]=[3],mm3[7]=[2],mm3[6]=[1],mm3[5]=[0],mm3[4]=[6],mm3[3]=[11],mm3[2]=[16],mm3[1]=0
 	psrlq       mm4,38h				;mm4[1]=[21]
 	por         mm3,mm4				;mm3[8]=[3],mm3[7]=[2],mm3[6]=[1],mm3[5]=[0],mm3[4]=[6],mm3[3]=[11],mm3[2]=[16],mm3[1]=[21]
@@ -521,13 +547,13 @@ WelsI4x4LumaPredDDR_mmx:
 	psubusb     mm3,mm1				;decrease 1 from odd bytes
 	pavgb       mm2,mm3				;mm2=(([11]+[21]+1)/2+1+[16])/2
 
-	movd        [edx+12],mm2
+	movd        [r0+12],mm2
 	psrlq       mm2,8
-	movd        [edx+8],mm2
+	movd        [r0+8],mm2
 	psrlq       mm2,8
-	movd        [edx+4],mm2
+	movd        [r0+4],mm2
 	psrlq       mm2,8
-	movd        [edx],mm2
+	movd        [r0],mm2
 	WELSEMMS
 	ret
 
@@ -545,39 +571,39 @@ ALIGN 16
 ;
 ;***********************************************************************
 WelsI4x4LumaPredDc_sse2:
-	mov         eax,[esp+8]			;pRef
-	mov			ecx,[esp+12]		;stride
-	push		ebx
-
-	movzx		edx,	byte [eax-1h]
-
-	sub			eax,	ecx
-	movd		xmm0,	[eax]
+	push r3
+	push r4
+	%assign push_num 2
+	LOAD_3_PARA
+	%ifndef X86_32
+	movsx r2, r2d
+	%endif
+	movzx		r4,	byte [r1-1h]
+	sub			r1,	r2
+	movd		xmm0,	[r1]
 	pxor		xmm1,	xmm1
 	psadbw		xmm0,	xmm1
+	xor r3, r3
+	movd		r3d,	xmm0
+	add			r3,	r4
+	movzx		r4,	byte [r1+r2*2-1h]
+	add			r3,	r4
 
-	movd		ebx,	xmm0
-	add			ebx,	edx
+	lea			r1,	[r1+r2*2-1]
+	movzx		r4,	byte [r1+r2]
+	add			r3,	r4
 
-	movzx		edx,	byte [eax+ecx*2-1h]
-	add			ebx,	edx
+	movzx		r4,	byte [r1+r2*2]
+	add			r3,	r4
+	add			r3,	4
+	sar			r3,	3
+	imul		r3,	0x01010101
 
-	lea			eax,	[eax+ecx*2-1]
-	movzx		edx,	byte [eax+ecx]
-	add			ebx,	edx
-
-	movzx		edx,	byte [eax+ecx*2]
-	add			ebx,	edx
-	add			ebx,	4
-	sar			ebx,	3
-	imul		ebx,	0x01010101
-
-	mov			edx,	[esp+8]			;pred
-	movd		xmm0,	ebx
+	movd		xmm0,	r3d
 	pshufd		xmm0,	xmm0,	0
-	movdqa		[edx],	xmm0
-
-	pop ebx
+	movdqa		[r0],	xmm0
+	pop r4
+	pop r3
 	ret
 
 ALIGN 16
@@ -596,7 +622,7 @@ ALIGN 16
 %endmacro
 
 %macro MMX_PRED_H_8X8_ONE_LINEE 4
-	movq		%1,		[%3+ecx-8]
+	movq		%1,		[%3+r2-8]
 	psrlq		%1,		38h
 
 	;pmuludq		%1,		[mmx_01bytes]		;extend to 4 bytes
@@ -607,34 +633,38 @@ ALIGN 16
 
 WELS_EXTERN WelsIChromaPredH_mmx
 WelsIChromaPredH_mmx:
-	mov			edx,	[esp+4]			;pred
-	mov         eax,	[esp+8]			;pRef
-	mov			ecx,	[esp+12]		;stride
-
-	movq		mm0,	[eax-8]
+	;mov			edx,	[esp+4]			;pred
+	;mov         eax,	[esp+8]			;pRef
+	;mov			ecx,	[esp+12]		;stride
+	%assign push_num 0
+	LOAD_3_PARA
+	%ifndef X86_32
+	movsx r2, r2d
+	%endif
+	movq		mm0,	[r1-8]
 	psrlq		mm0,	38h
 
 	;pmuludq		mm0,	[mmx_01bytes]		;extend to 4 bytes
 	pmullw		mm0,		[mmx_01bytes]
 	pshufw		mm0,	mm0,	0
-	movq		[edx],	mm0
+	movq		[r0],	mm0
 
-	MMX_PRED_H_8X8_ONE_LINEE	mm0, mm1, eax,edx+8
+	MMX_PRED_H_8X8_ONE_LINEE	mm0, mm1, r1,r0+8
 
-	lea			eax,[eax+ecx*2]
-	MMX_PRED_H_8X8_ONE_LINE	mm0, mm1, eax,edx+16
+	lea			r1,[r1+r2*2]
+	MMX_PRED_H_8X8_ONE_LINE	mm0, mm1, r1,r0+16
 
-	MMX_PRED_H_8X8_ONE_LINEE	mm0, mm1, eax,edx+24
+	MMX_PRED_H_8X8_ONE_LINEE	mm0, mm1, r1,r0+24
 
-	lea			eax,[eax+ecx*2]
-	MMX_PRED_H_8X8_ONE_LINE	mm0, mm1, eax,edx+32
+	lea			r1,[r1+r2*2]
+	MMX_PRED_H_8X8_ONE_LINE	mm0, mm1, r1,r0+32
 
-	MMX_PRED_H_8X8_ONE_LINEE	mm0, mm1, eax,edx+40
+	MMX_PRED_H_8X8_ONE_LINEE	mm0, mm1, r1,r0+40
 
-	lea			eax,[eax+ecx*2]
-	MMX_PRED_H_8X8_ONE_LINE	mm0, mm1, eax,edx+48
+	lea			r1,[r1+r2*2]
+	MMX_PRED_H_8X8_ONE_LINE	mm0, mm1, r1,r0+48
 
-	MMX_PRED_H_8X8_ONE_LINEE	mm0, mm1, eax,edx+56
+	MMX_PRED_H_8X8_ONE_LINEE	mm0, mm1, r1,r0+56
 	WELSEMMS
 	ret
 
@@ -645,14 +675,15 @@ ALIGN 16
 ;***********************************************************************
 WELS_EXTERN WelsI4x4LumaPredV_sse2
 WelsI4x4LumaPredV_sse2:
-	mov			edx,	[esp+4]			;pred
-	mov         eax,	[esp+8]			;pRef
-	mov			ecx,	[esp+12]		;stride
-
-	sub			eax,	ecx
-	movd		xmm0,	[eax]
+	%assign push_num 0
+	LOAD_3_PARA
+	%ifndef X86_32
+	movsx r2, r2d
+	%endif
+	sub			r1,	r2
+	movd		xmm0,	[r1]
 	pshufd		xmm0,	xmm0,	0
-	movdqa		[edx],	xmm0
+	movdqa		[r0],	xmm0
 	ret
 
 ALIGN 16
@@ -662,21 +693,20 @@ ALIGN 16
 ;***********************************************************************
 WELS_EXTERN WelsIChromaPredV_sse2
 WelsIChromaPredV_sse2:
-	mov			edx,		[esp+4]			;pred
-	mov         eax,		[esp+8]			;pRef
-	mov			ecx,		[esp+12]		;stride
-
-	sub			eax,		ecx
-	movq		xmm0,		[eax]
+	%assign push_num 0
+	LOAD_3_PARA
+	%ifndef X86_32
+	movsx r2, r2d
+	%endif
+	sub		r1,		r2
+	movq		xmm0,		[r1]
 	movdqa		xmm1,		xmm0
 	punpcklqdq	xmm0,		xmm1
-
-	movdqa		[edx],		xmm0
-	movdqa		[edx+16],	xmm0
-	movdqa		[edx+32],	xmm0
-	movdqa		[edx+48],	xmm0
+	movdqa		[r0],		xmm0
+	movdqa		[r0+16],	xmm0
+	movdqa		[r0+32],	xmm0
+	movdqa		[r0+48],	xmm0
 	ret
-
 
 	ALIGN 16
 ;***********************************************************************
@@ -710,18 +740,20 @@ WelsIChromaPredV_sse2:
 ;***********************************************************************
 WELS_EXTERN WelsI4x4LumaPredHD_mmx
 WelsI4x4LumaPredHD_mmx:
-	mov			edx, [esp+4]			; pred
-	mov         eax, [esp+8]			; pRef
-	mov			ecx, [esp+12]           ; stride
-	sub         eax, ecx
-	movd        mm0, [eax-1]            ; mm0 = [xx xx xx xx t2 t1 t0 lt]
+	%assign push_num 0
+	LOAD_3_PARA
+	%ifndef X86_32
+	movsx r2, r2d
+	%endif
+	sub         r1, r2
+	movd        mm0, [r1-1]            ; mm0 = [xx xx xx xx t2 t1 t0 lt]
 	psllq       mm0, 20h                ; mm0 = [t2 t1 t0 lt xx xx xx xx]
 
-	movd        mm1, [eax+2*ecx-4]
-	punpcklbw   mm1, [eax+ecx-4]        ; mm1[7] = l0, mm1[6] = l1
-	lea         eax, [eax+2*ecx]
-	movd        mm2, [eax+2*ecx-4]
-	punpcklbw   mm2, [eax+ecx-4]        ; mm2[7] = l2, mm2[6] = l3
+	movd        mm1, [r1+2*r2-4]
+	punpcklbw   mm1, [r1+r2-4]        ; mm1[7] = l0, mm1[6] = l1
+	lea         r1, [r1+2*r2]
+	movd        mm2, [r1+2*r2-4]
+	punpcklbw   mm2, [r1+r2-4]        ; mm2[7] = l2, mm2[6] = l3
 	punpckhwd   mm2, mm1                ; mm2 = [l0 l1 l2 l3 xx xx xx xx]
 	psrlq       mm2, 20h
 	pxor        mm0, mm2                ; mm0 = [t2 t1 t0 lt l0 l1 l2 l3]
@@ -751,16 +783,14 @@ WelsI4x4LumaPredHD_mmx:
 	pxor        mm2, mm4                ; mm2 = [d  c  b  a  xx xx xx xx]
 	psrlq       mm2, 20h                ; mm2 = [xx xx xx xx  d  c  b  a]
 
-	movd        [edx], mm2
-	movd        [edx+12], mm3
+	movd        [r0], mm2
+	movd        [r0+12], mm3
 	psrlq       mm3, 10h
-	movd        [edx+8], mm3
+	movd        [r0+8], mm3
 	psrlq       mm3, 10h
-	movd        [edx+4], mm3
+	movd        [r0+4], mm3
 	WELSEMMS
 	ret
-
-
 
 ALIGN 16
 ;***********************************************************************
@@ -791,15 +821,16 @@ ALIGN 16
 ;***********************************************************************
 WELS_EXTERN WelsI4x4LumaPredHU_mmx
 WelsI4x4LumaPredHU_mmx:
-	mov			edx, [esp+4]			; pred
-	mov         eax, [esp+8]			; pRef
-	mov			ecx, [esp+12]           ; stride
-
-	movd        mm0, [eax-4]            ; mm0[3] = l0
-	punpcklbw   mm0, [eax+ecx-4]        ; mm0[7] = l1, mm0[6] = l0
-	lea         eax, [eax+2*ecx]
-	movd        mm2, [eax-4]            ; mm2[3] = l2
-	movd        mm4, [eax+ecx-4]        ; mm4[3] = l3
+	%assign push_num 0
+	LOAD_3_PARA
+	%ifndef X86_32
+	movsx r2, r2d
+	%endif
+	movd        mm0, [r1-4]            ; mm0[3] = l0
+	punpcklbw   mm0, [r1+r2-4]        ; mm0[7] = l1, mm0[6] = l0
+	lea         r1, [r1+2*r2]
+	movd        mm2, [r1-4]            ; mm2[3] = l2
+	movd        mm4, [r1+r2-4]        ; mm4[3] = l3
 	punpcklbw   mm2, mm4
 	punpckhwd   mm0, mm2                ; mm0 = [l3 l2 l1 l0 xx xx xx xx]
 
@@ -832,13 +863,13 @@ WelsI4x4LumaPredHU_mmx:
 	punpckhbw   mm4, mm4                ; mm4 = [g  g  g  g  xx xx xx xx]
 
 	psrlq       mm4, 20h
-	movd        [edx+12], mm4
+	movd        [r0+12], mm4
 
-	movd        [edx], mm1
+	movd        [r0], mm1
 	psrlq       mm1, 10h
-	movd        [edx+4], mm1
+	movd        [r0+4], mm1
 	psrlq       mm1, 10h
-	movd        [edx+8], mm1
+	movd        [r0+8], mm1
 	WELSEMMS
 	ret
 
@@ -875,17 +906,19 @@ ALIGN 16
 ;***********************************************************************
 WELS_EXTERN WelsI4x4LumaPredVR_mmx
 WelsI4x4LumaPredVR_mmx:
-	mov			edx, [esp+4]			; pred
-	mov         eax, [esp+8]			; pRef
-	mov			ecx, [esp+12]           ; stride
-	sub         eax, ecx
-	movq        mm0, [eax-1]            ; mm0 = [xx xx xx t3 t2 t1 t0 lt]
+	%assign push_num 0
+	LOAD_3_PARA
+	%ifndef X86_32
+	movsx r2, r2d
+	%endif
+	sub         r1, r2
+	movq        mm0, [r1-1]            ; mm0 = [xx xx xx t3 t2 t1 t0 lt]
 	psllq       mm0, 18h                ; mm0 = [t3 t2 t1 t0 lt xx xx xx]
 
-	movd        mm1, [eax+2*ecx-4]
-	punpcklbw   mm1, [eax+ecx-4]        ; mm1[7] = l0, mm1[6] = l1
-	lea         eax, [eax+2*ecx]
-	movq        mm2, [eax+ecx-8]        ; mm2[7] = l2
+	movd        mm1, [r1+2*r2-4]
+	punpcklbw   mm1, [r1+r2-4]        ; mm1[7] = l0, mm1[6] = l1
+	lea         r1, [r1+2*r2]
+	movq        mm2, [r1+r2-8]        ; mm2[7] = l2
 	punpckhwd   mm2, mm1                ; mm2 = [l0 l1 l2 xx xx xx xx xx]
 	psrlq       mm2, 28h
 	pxor        mm0, mm2                ; mm0 = [t3 t2 t1 t0 lt l0 l1 l2]
@@ -909,10 +942,10 @@ WelsI4x4LumaPredVR_mmx:
 	movq        mm2, mm3
 
 	psrlq       mm1, 20h                ; mm1 = [xx xx xx xx d  c  b  a]
-	movd        [edx], mm1
+	movd        [r0], mm1
 
 	psrlq       mm2, 20h                ; mm2 = [xx xx xx xx h  g  f  e]
-	movd        [edx+4], mm2
+	movd        [r0+4], mm2
 
 	movq        mm4, mm3
 	psllq       mm4, 20h
@@ -924,11 +957,11 @@ WelsI4x4LumaPredVR_mmx:
 
 	psllq       mm1, 8h
 	pxor        mm4, mm1                ; mm4 = [xx xx xx xx c  b  a  i]
-	movd        [edx+8], mm4
+	movd        [r0+8], mm4
 
 	psllq       mm2, 8h
 	pxor        mm5, mm2                ; mm5 = [xx xx xx xx g  f  e  j]
-	movd        [edx+12], mm5
+	movd        [r0+12], mm5
 	WELSEMMS
 	ret
 
@@ -961,11 +994,13 @@ ALIGN 16
 ;***********************************************************************
 WELS_EXTERN WelsI4x4LumaPredDDL_mmx
 WelsI4x4LumaPredDDL_mmx:
-	mov			edx, [esp+4]			; pred
-	mov         eax, [esp+8]			; pRef
-	mov			ecx, [esp+12]           ; stride
-	sub         eax, ecx
-	movq        mm0, [eax]              ; mm0 = [t7 t6 t5 t4 t3 t2 t1 t0]
+	%assign push_num 0
+	LOAD_3_PARA
+	%ifndef X86_32
+	movsx r2, r2d
+	%endif
+	sub         r1, r2
+	movq        mm0, [r1]              ; mm0 = [t7 t6 t5 t4 t3 t2 t1 t0]
 	movq        mm1, mm0
 	movq        mm2, mm0
 
@@ -986,13 +1021,13 @@ WelsI4x4LumaPredDDL_mmx:
 	pavgb       mm0, mm1                ; mm0 = [g f e d c b a xx]
 
 	psrlq       mm0, 8h
-	movd        [edx], mm0
+	movd        [r0], mm0
 	psrlq       mm0, 8h
-	movd        [edx+4], mm0
+	movd        [r0+4], mm0
 	psrlq       mm0, 8h
-	movd        [edx+8], mm0
+	movd        [r0+8], mm0
 	psrlq       mm0, 8h
-	movd        [edx+12], mm0
+	movd        [r0+12], mm0
 	WELSEMMS
 	ret
 
@@ -1029,12 +1064,13 @@ ALIGN 16
 ;***********************************************************************
 WELS_EXTERN WelsI4x4LumaPredVL_mmx
 WelsI4x4LumaPredVL_mmx:
-	mov			edx, [esp+4]			; pred
-	mov         eax, [esp+8]			; pRef
-	mov			ecx, [esp+12]           ; stride
-
-	sub         eax, ecx
-	movq        mm0, [eax]              ; mm0 = [t7 t6 t5 t4 t3 t2 t1 t0]
+	%assign push_num 0
+	LOAD_3_PARA
+	%ifndef X86_32
+	movsx r2, r2d
+	%endif
+	sub         r1, r2
+	movq        mm0, [r1]              ; mm0 = [t7 t6 t5 t4 t3 t2 t1 t0]
 	movq        mm1, mm0
 	movq        mm2, mm0
 
@@ -1052,13 +1088,13 @@ WelsI4x4LumaPredVL_mmx:
 
 	pavgb       mm2, mm1                ; mm2 = [xx xx xx j  h  g  f  e]
 
-	movd        [edx], mm3
+	movd        [r0], mm3
 	psrlq       mm3, 8h
-	movd        [edx+8], mm3
+	movd        [r0+8], mm3
 
-	movd        [edx+4], mm2
+	movd        [r0+4], mm2
 	psrlq       mm2, 8h
-	movd        [edx+12], mm2
+	movd        [r0+12], mm2
 	WELSEMMS
 	ret
 
@@ -1069,40 +1105,37 @@ ALIGN 16
 ;***********************************************************************
 WELS_EXTERN WelsIChromaPredDc_sse2
 WelsIChromaPredDc_sse2:
-	push        ebx
-	mov         eax, [esp+12]			; pRef
-	mov			ecx, [esp+16]           ; stride
+	push r3
+	push r4
+	%assign push_num 2
+	LOAD_3_PARA
+	%ifndef X86_32
+	movsx r2, r2d
+	%endif
+	sub         r1, r2
+	movq        mm0, [r1]
 
-	sub         eax, ecx
-	movq        mm0, [eax]
+	movzx		r3, byte [r1+r2-0x01] ; l1
+	lea         	r1, [r1+2*r2]
+	movzx		r4, byte [r1-0x01]     ; l2
+	add		r3, r4
+	movzx		r4, byte [r1+r2-0x01] ; l3
+	add		r3, r4
+	lea         	r1, [r1+2*r2]
+	movzx		r4, byte [r1-0x01]     ; l4
+	add		r3, r4
+	movd        	mm1, r3d                 ; mm1 = l1+l2+l3+l4
 
-	;xor         ebx, ebx
-	;movzx		edx, byte [eax+ecx-0x01] ; l1
-	movzx		ebx, byte [eax+ecx-0x01] ; l1
-	;mov			ebx, edx
-	lea         eax, [eax+2*ecx]
-	movzx		edx, byte [eax-0x01]     ; l2
-	add			ebx, edx
-	movzx		edx, byte [eax+ecx-0x01] ; l3
-	add			ebx, edx
-	lea         eax, [eax+2*ecx]
-	movzx		edx, byte [eax-0x01]     ; l4
-	add			ebx, edx
-	movd        mm1, ebx                 ; mm1 = l1+l2+l3+l4
-
-	;xor         ebx, ebx
-	;movzx		edx, byte [eax+ecx-0x01] ; l5
-	movzx		ebx, byte [eax+ecx-0x01] ; l5
-	;mov		ebx, edx
-	lea         eax, [eax+2*ecx]
-	movzx		edx, byte [eax-0x01]     ; l6
-	add			ebx, edx
-	movzx		edx, byte [eax+ecx-0x01] ; l7
-	add			ebx, edx
-	lea         eax, [eax+2*ecx]
-	movzx		edx, byte [eax-0x01]     ; l8
-	add			ebx, edx
-	movd        mm2, ebx                 ; mm2 = l5+l6+l7+l8
+	movzx		r3, byte [r1+r2-0x01] ; l5
+	lea         	r1, [r1+2*r2]
+	movzx		r4, byte [r1-0x01]     ; l6
+	add		r3, r4
+	movzx		r4, byte [r1+r2-0x01] ; l7
+	add		r3, r4
+	lea         	r1, [r1+2*r2]
+	movzx		r4, byte [r1-0x01]     ; l8
+	add		r3, r4
+	movd        	mm2, r3d                 ; mm2 = l5+l6+l7+l8
 
 	movq        mm3, mm0
 	psrlq       mm0, 0x20
@@ -1142,19 +1175,18 @@ WelsIChromaPredDc_sse2:
 	psllq       mm1, 0x20
 	pxor        mm1, mm2                 ; mm2 = m_down
 
-	mov         edx, [esp+8]			 ; pRef
+	movq        [r0], mm0
+	movq        [r0+0x08], mm0
+	movq        [r0+0x10], mm0
+	movq        [r0+0x18], mm0
 
-	movq        [edx], mm0
-	movq        [edx+0x08], mm0
-	movq        [edx+0x10], mm0
-	movq        [edx+0x18], mm0
+	movq        [r0+0x20], mm1
+	movq        [r0+0x28], mm1
+	movq        [r0+0x30], mm1
+	movq        [r0+0x38], mm1
 
-	movq        [edx+0x20], mm1
-	movq        [edx+0x28], mm1
-	movq        [edx+0x30], mm1
-	movq        [edx+0x38], mm1
-
-	pop         ebx
+	pop r4
+	pop r3
 	WELSEMMS
 	ret
 
@@ -1167,12 +1199,15 @@ ALIGN 16
 ;***********************************************************************
 WELS_EXTERN WelsI16x16LumaPredDc_sse2
 WelsI16x16LumaPredDc_sse2:
-	push        ebx
-	mov         eax, [esp+12]			; pRef
-	mov			ecx, [esp+16]           ; stride
-
-	sub         eax, ecx
-	movdqa      xmm0, [eax]             ; read one row
+	push r3
+	push r4
+	%assign push_num 2
+	LOAD_3_PARA
+	%ifndef X86_32
+	movsx r2, r2d
+	%endif
+	sub         r1, r2
+	movdqa      xmm0, [r1]             ; read one row
 	pxor		xmm1, xmm1
 	psadbw		xmm0, xmm1
 	movdqa      xmm1, xmm0
@@ -1181,13 +1216,10 @@ WelsI16x16LumaPredDc_sse2:
 	psrldq      xmm0, 0x08
 	paddw       xmm0, xmm1
 
-	;xor         ebx, ebx
-	;movzx		edx, byte [eax+ecx-0x01]
-	movzx		ebx, byte [eax+ecx-0x01]
-	;mov			ebx, edx
-	movzx		edx, byte [eax+2*ecx-0x01]
-	add			ebx, edx
-	lea         eax, [eax+ecx]
+	movzx		r3, byte [r1+r2-0x01]
+	movzx		r4, byte [r1+2*r2-0x01]
+	add		r3, r4
+	lea         r1, [r1+r2]
 	LOAD_2_LEFT_AND_ADD
 	LOAD_2_LEFT_AND_ADD
 	LOAD_2_LEFT_AND_ADD
@@ -1195,33 +1227,32 @@ WelsI16x16LumaPredDc_sse2:
 	LOAD_2_LEFT_AND_ADD
 	LOAD_2_LEFT_AND_ADD
 	LOAD_2_LEFT_AND_ADD
-	add         ebx, 0x10
-	movd        xmm1, ebx
+	add         r3, 0x10
+	movd        xmm1, r3d
 	paddw       xmm0, xmm1
 	psrld       xmm0, 0x05
 	pmuludq     xmm0, [mmx_01bytes]
 	pshufd      xmm0, xmm0, 0
 
-	mov         edx, [esp+8]			; pred
-	movdqa      [edx], xmm0
-	movdqa      [edx+0x10], xmm0
-	movdqa      [edx+0x20], xmm0
-	movdqa      [edx+0x30], xmm0
-	movdqa      [edx+0x40], xmm0
-	movdqa      [edx+0x50], xmm0
-	movdqa      [edx+0x60], xmm0
-	movdqa      [edx+0x70], xmm0
-	movdqa      [edx+0x80], xmm0
-	movdqa      [edx+0x90], xmm0
-	movdqa      [edx+0xa0], xmm0
-	movdqa      [edx+0xb0], xmm0
-	movdqa      [edx+0xc0], xmm0
-	movdqa      [edx+0xd0], xmm0
-	movdqa      [edx+0xe0], xmm0
-	movdqa      [edx+0xf0], xmm0
+	movdqa      [r0], xmm0
+	movdqa      [r0+0x10], xmm0
+	movdqa      [r0+0x20], xmm0
+	movdqa      [r0+0x30], xmm0
+	movdqa      [r0+0x40], xmm0
+	movdqa      [r0+0x50], xmm0
+	movdqa      [r0+0x60], xmm0
+	movdqa      [r0+0x70], xmm0
+	movdqa      [r0+0x80], xmm0
+	movdqa      [r0+0x90], xmm0
+	movdqa      [r0+0xa0], xmm0
+	movdqa      [r0+0xb0], xmm0
+	movdqa      [r0+0xc0], xmm0
+	movdqa      [r0+0xd0], xmm0
+	movdqa      [r0+0xe0], xmm0
+	movdqa      [r0+0xf0], xmm0
 
-	pop         ebx
-
+	pop r4
+	pop r3
 	ret
 
 ;***********************************************************************
@@ -1230,6 +1261,7 @@ WelsI16x16LumaPredDc_sse2:
 ;                             uint8_t* pRed, int32_t* pBestMode, int32_t, int32_t, int32_t);
 ;
 ;***********************************************************************
+%ifdef X86_32
 WELS_EXTERN WelsSmpleSatdThree4x4_sse2
 align 16
 WelsSmpleSatdThree4x4_sse2:
@@ -1469,5 +1501,5 @@ not_dc_h:
     pop       esi
     pop       ebx
     ret
-
+%endif
 

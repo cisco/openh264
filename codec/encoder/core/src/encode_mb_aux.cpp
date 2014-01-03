@@ -569,7 +569,7 @@ void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
   }
 //#ifndef MACOS
   if (uiCpuFlag & WELS_CPU_SSSE3) {
-    pFuncList->pfScan4x4				= WelsScan4x4DcAc_ssse3;
+  //  pFuncList->pfScan4x4				= WelsScan4x4DcAc_ssse3;
   }
 
 //#endif//MACOS

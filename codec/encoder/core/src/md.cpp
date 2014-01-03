@@ -439,7 +439,7 @@ uint8_t MdInterAnalysisVaaInfo_c (int32_t* pSad8x8) {
   return (uiMbSign);
 }
 
-static inline int32_t AnalysisVaaInfoIntra_c (uint8_t* pDataY, const int32_t kiLineSize) {
+int32_t AnalysisVaaInfoIntra_c (uint8_t* pDataY, const int32_t kiLineSize) {
   ENFORCE_STACK_ALIGN_1D (uint16_t, uiAvgBlock, 16, 16)
   uint16_t* pBlock = &uiAvgBlock[0];
   uint8_t* pEncData	= pDataY;

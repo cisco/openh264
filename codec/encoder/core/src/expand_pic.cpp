@@ -29,14 +29,12 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  */
-
 #include <string.h>
 #include "expand_pic.h"
 #include "cpu_core.h"
 #include "wels_func_ptr_def.h"
 
-namespace WelsSVCEnc {
-
+namespace WelsSVCEnc{
 // rewrite it (split into luma & chroma) that is helpful for mmx/sse2 optimization perform, 9/27/2009
 static inline void ExpandPictureLuma_c (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicW,
                                         const int32_t kiPicH) {
@@ -144,6 +142,8 @@ void ExpandReferencingPicture (SPicture* pPic, PExpandPictureFunc pExpLuma, PExp
   const int32_t kiWidthUV	= kiWidthY >> 1;
   const int32_t kiHeightUV	= kiHeightY >> 1;
 
+
+
   pExpLuma (pPicY, pPic->iLineSize[0], kiWidthY, kiHeightY);
   if (kiWidthUV >= 16) {
     // fix coding picture size as 16x16
@@ -155,6 +155,7 @@ void ExpandReferencingPicture (SPicture* pPic, PExpandPictureFunc pExpLuma, PExp
     ExpandPictureChroma_c (pPicCb, pPic->iLineSize[1], kiWidthUV, kiHeightUV);
     ExpandPictureChroma_c (pPicCr, pPic->iLineSize[2], kiWidthUV, kiHeightUV);
   }
+
 }
 
 }

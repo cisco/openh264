@@ -994,15 +994,15 @@ void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
 
 
 #ifdef X86_ASM
-  if (iCpu & WELS_CPU_SSE2) {
+  if (iCpu & WELS_CPU_SSE2) {	  
     pFunc->pfLumaDeblockingLT4Ver	= DeblockLumaLt4V_sse2;
     pFunc->pfLumaDeblockingEQ4Ver	= DeblockLumaEq4V_sse2;
-    pFunc->pfLumaDeblockingLT4Hor   = DeblockLumaLt4H_sse2;
-    pFunc->pfLumaDeblockingEQ4Hor   = DeblockLumaEq4H_sse2;
+    pFunc->pfLumaDeblockingLT4Hor       = DeblockLumaLt4H_sse2;
+    pFunc->pfLumaDeblockingEQ4Hor       = DeblockLumaEq4H_sse2;
     pFunc->pfChromaDeblockingLT4Ver	= DeblockChromaLt4V_sse2;
     pFunc->pfChromaDeblockingEQ4Ver	= DeblockChromaEq4V_sse2;
     pFunc->pfChromaDeblockingLT4Hor	= DeblockChromaLt4H_sse2;
-    pFunc->pfChromaDeblockinEQ4Hor	= DeblockChromaEq4H_sse2;
+    pFunc->pfChromaDeblockinEQ4Hor	= DeblockChromaEq4H_sse2; 
   }
 #endif
 }
