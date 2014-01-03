@@ -102,7 +102,7 @@ extern const uint8_t g_kuiZeroLeftTable5[8][2];
 extern const uint8_t g_kuiZeroLeftTable6[8][2];
 extern const uint8_t g_kuiZeroLeftBitNumMap[16];
 
-#ifdef WIN32
+#ifdef _WIN32
 //TODO need linux version
 #define WELS_GET_PREFIX_BITS(inval,outval){\
 	__asm xor		eax,	eax\

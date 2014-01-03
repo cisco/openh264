@@ -42,8 +42,8 @@ RSC=rc.exe
 # PROP Intermediate_Dir "..\..\..\obj\encoder\plus\Release"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "WELSENCPLUS_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /Zd /O2 /I "..\..\..\encoder\plus\inc" /I "..\..\..\encoder\core\inc" /I "..\..\..\api\svc" /I "..\..\..\WelsThreadLib\api" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "WELSENCPLUS_EXPORTS" /D "ENCODER_CORE" /D "HAVE_CACHE_LINE_ALIGN" /FD /c
+# ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "WELSENCPLUS_EXPORTS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /Zd /O2 /I "..\..\..\encoder\plus\inc" /I "..\..\..\encoder\core\inc" /I "..\..\..\api\svc" /I "..\..\..\WelsThreadLib\api" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "WELSENCPLUS_EXPORTS" /D "ENCODER_CORE" /D "HAVE_CACHE_LINE_ALIGN" /FD /c
 # SUBTRACT CPP /X /YX
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -70,8 +70,8 @@ LINK32=xilink6.exe
 # PROP Intermediate_Dir "..\..\..\obj\encoder\plus\Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "WELSENCPLUS_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\..\encoder\plus\inc" /I "..\..\..\encoder\core\inc" /I "..\..\..\api\svc" /I "..\..\..\WelsThreadLib\api" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "WELSENCPLUS_EXPORTS" /D "ENCODER_CORE" /D "HAVE_MMX" /D "HAVE_CACHE_LINE_ALIGN" /FD /GZ /c
+# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "WELSENCPLUS_EXPORTS" /YX /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\..\encoder\plus\inc" /I "..\..\..\encoder\core\inc" /I "..\..\..\api\svc" /I "..\..\..\WelsThreadLib\api" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "WELSENCPLUS_EXPORTS" /D "ENCODER_CORE" /D "HAVE_MMX" /D "HAVE_CACHE_LINE_ALIGN" /FD /GZ /c
 # SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32

@@ -43,8 +43,6 @@
 
 #include "typedefs.h"
 
-//#pragma pack(1)
-
 namespace WelsDec {
 
 void_t WelsI4x4LumaPredV_c (uint8_t* pPred, const int32_t kiStride);
@@ -113,8 +111,6 @@ void_t WelsI4x4LumaPredVL_mmx (uint8_t* pPred, const int32_t kiStride);
 #endif//__cplusplus
 
 } // namespace WelsDec
-
-//#pragma pack()
 
 #endif //WELS_GET_INTRA_PREDICTOR_H__
 

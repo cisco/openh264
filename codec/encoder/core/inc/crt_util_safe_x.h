@@ -75,7 +75,7 @@
 #define EOK   0
 #endif
 
-#if (defined(WIN32) && defined(_MSC_VER) && (_MSC_VER<1500)) || defined(__GNUC__)
+#if (defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER<1500)) || defined(__GNUC__)
 
 static __inline int wels_strncpy_s (char* dest, int dmax, const char* src, int slen) {
 int orig_dmax;
@@ -373,9 +373,9 @@ static __inline int wels_strnlen_s (const char* dest, int dmax) {
   return (count);
 }
 
-#endif//(WIN32 && _MSC_VER && _MSC_VER<1500) || __GNUC__
+#endif//(_WIN32 && _MSC_VER && _MSC_VER<1500) || __GNUC__
 
-#if defined(WIN32) && defined(_MSC_VER)
+#if defined(_WIN32) && defined(_MSC_VER)
 #if _MSC_VER >= 1500	// VS2008
 #define SNPRINTF	_snprintf_s
 #define LOCALTIME	localtime_s
@@ -406,6 +406,6 @@ static __inline int wels_strnlen_s (const char* dest, int dmax) {
 #define VSPRINTF	vsprintf
 #define FOPEN		fopen
 
-#endif//WIN32
+#endif//_WIN32
 
 #endif//WELS_CRT_UTIL_SAFE_CROSS_PLATFORMS_H__

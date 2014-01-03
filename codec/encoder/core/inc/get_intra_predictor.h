@@ -122,7 +122,6 @@ void WelsI4x4LumaPredHU_mmx (uint8_t* pPred, uint8_t* pRef, const int32_t kiStri
 void WelsInitFillingPredFuncs (const uint32_t kuiCpuFlag);
 void WelsInitIntraPredFuncs (SWelsFuncPtrList* pFuncList, const uint32_t kuiCpuFlag);
 
-//#pragma pack()
 }
 #endif //GET_INTRA_PREDICTOR_H
 

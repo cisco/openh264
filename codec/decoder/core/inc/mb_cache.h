@@ -38,8 +38,6 @@
 
 namespace WelsDec {
 
-//#pragma pack(1)
-
 #define REF_NOT_AVAIL    -2
 #define REF_NOT_IN_LIST  -1  //intra
 

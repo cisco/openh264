@@ -43,8 +43,6 @@
 #ifndef WELS_D3D9_UTILS_H__
 #define WELS_D3D9_UTILS_H__
 
-//#pragma once	// do not use this due cross platform, esp for Solaris
-
 #include <stdio.h>
 #include "codec_def.h"
 

@@ -37,8 +37,6 @@
 
 #include "picture.h"
 
-//#pragma pack(1)
-
 namespace WelsDec {
 
 #define   PICTURE_RESOLUTION_ALIGNMENT      32
@@ -57,7 +55,5 @@ int32_t        iCurrentIdx;
 PPicture PrefetchPic (PPicBuff pPicBuff);  // To get current node applicable
 
 } // namespace WelsDec
-
-//#pragma pack()
 
 #endif//WELS_PICTURE_QUEUE_H__
