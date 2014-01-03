@@ -426,14 +426,20 @@ int32_t ParamValidationExt (void* pParam) {
 
 void WelsEncoderAdjustFrameRate(SWelsSvcCodingParam* pParam)
 {
+  const float kfEpsn = 0.000001f;
   const int32_t kiNumLayer = pParam->iNumDependencyLayer;
   int32_t i;
   float fRatio;
 
+  //adjust to valid range
+  pParam->fMaxFrameRate = WELS_CLIP3 (pParam->fMaxFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE)
+
+  //set input frame rate to each layer
   for (i=0;i<kiNumLayer;i++) {
     fRatio 
       = (pParam->sDependencyLayers[i].fInputFrameRate / pParam->sDependencyLayers[i].fOutputFrameRate);
-    if (pParam->fMaxFrameRate < pParam->sDependencyLayers[i].fInputFrameRate) {
+    if ( pParam->fMaxFrameRate - pParam->sDependencyLayers[i].fInputFrameRate > kfEpsn 
+        || pParam->fMaxFrameRate - pParam->sDependencyLayers[i].fInputFrameRate < -kfEpsn ) {
       pParam->sDependencyLayers[i].fInputFrameRate = pParam->fMaxFrameRate;
       pParam->sDependencyLayers[i].fOutputFrameRate 
         = pParam->sDependencyLayers[i].fInputFrameRate/fRatio;
