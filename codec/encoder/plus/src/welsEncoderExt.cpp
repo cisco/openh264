@@ -942,8 +942,11 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
              "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_FRAME_RATE, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x, iValue= %d\n",
              m_uiCountFrameNum, m_iCspInternal, iValue);
 #endif//REC_FRAME_COUNT
+     if (iValue<=0) {
+        return cmInitParaError;
+    }
     m_pEncContext->pSvcParam->fMaxFrameRate	= iValue;
-
+    WelsEncoderAdjustFrameRate (m_pEncContext->pSvcParam);
   }
   break;
   case ENCODER_OPTION_BITRATE: {	// Target bit-rate
@@ -952,7 +955,10 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     WelsLog (m_pEncContext, WELS_LOG_INFO,
       "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x, iValue= %d\n",
       m_uiCountFrameNum, m_iCspInternal, iValue);
-#endif//REC_FRAME_COUNT
+#endif//REC_FRAME_COUNT     
+    if (iValue<=0) {
+        return cmInitParaError;
+    }
     m_pEncContext->pSvcParam->iTargetBitrate = iValue;
 
     //TODO (Sijia):  this is a temporary solution

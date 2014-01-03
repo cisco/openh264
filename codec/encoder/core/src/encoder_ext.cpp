@@ -423,6 +423,30 @@ int32_t ParamValidationExt (void* pParam) {
   return ParamValidation (pCodingParam);
 }
 
+
+void WelsEncoderAdjustFrameRate(SWelsSvcCodingParam* pParam)
+{
+  const int32_t kiNumLayer = pParam->iNumDependencyLayer;
+  int32_t i;
+  float fRatio;
+
+  for (i=0;i<kiNumLayer;i++) {
+    fRatio 
+      = (pParam->sDependencyLayers[i].fInputFrameRate / pParam->sDependencyLayers[i].fOutputFrameRate);
+    if (pParam->fMaxFrameRate < pParam->sDependencyLayers[i].fInputFrameRate) {
+      pParam->sDependencyLayers[i].fInputFrameRate = pParam->fMaxFrameRate;
+      pParam->sDependencyLayers[i].fOutputFrameRate 
+        = pParam->sDependencyLayers[i].fInputFrameRate/fRatio;
+
+      //TODO:{Sijia} from design, there is no sense to have temporal layer when under 6fps even with such setting?
+      if (pParam->sDependencyLayers[i].fOutputFrameRate<6) {
+        pParam->sDependencyLayers[i].fOutputFrameRate 
+          = pParam->sDependencyLayers[i].fInputFrameRate;
+      }
+    }
+  } 
+}
+
 /*!
  * \brief	acquire count number of layers and NALs based on configurable paramters dependency
  * \pParam	pCtx				sWelsEncCtx*
