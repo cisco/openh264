@@ -41,7 +41,7 @@ CPPFLAGS  = -Wall -g -fpic -I ../gtest/include -I ../../codec/encoder/core/inc -
 ifeq ($(NASM), Yes)
 CPPFLAGS += -DX86_ASM
 endif
-
+CPPFLAGS += -msse2 -O2
 SRCEXTS  = .cpp
 ifeq ($(NASM), Yes)
 SRCEXTS += .asm

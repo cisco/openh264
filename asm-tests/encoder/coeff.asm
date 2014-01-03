@@ -49,7 +49,8 @@ SECTION .rodata align=16
 
 align 16
 sse2_b8 db 8, 8, 8, 8, 8, 8, 8, 8
-
+align 16 
+sse2_b1 db 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 ALIGN  16
 sse2_b_1 db -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1
 
@@ -324,6 +325,7 @@ SECTION .text
 ;***********************************************************************
 WELS_EXTERN CavlcParamCal_sse2
 CavlcParamCal_sse2:
+%ifdef X86_32
 	push ebx
 	push edi
 	push esi
@@ -457,3 +459,4 @@ CavlcParamCal_sse2:
 	pop edi
 	pop ebx
 	ret
+%endif
