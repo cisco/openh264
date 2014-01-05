@@ -94,7 +94,7 @@ CWelsDecoder::CWelsDecoder (void_t)
   str_t chFileNameSize[1024] = { 0 }; //for .len
   int iBufUsedSize = 0;
   int iBufLeftSize = 1023;
-#endif//OUTPUT_BIT_STREAM 
+#endif//OUTPUT_BIT_STREAM
 
   m_pTrace = CreateWelsTrace (Wels_Trace_Type);
 
