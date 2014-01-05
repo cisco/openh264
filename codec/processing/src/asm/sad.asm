@@ -84,24 +84,24 @@ WelsSampleSad8x8_sse21:
 	;push   edi
 	;mov    eax,    [esp+12]
 	;mov    ebx,    [esp+16]
-	
+
 	%assign  push_num 0
 	mov		r2,  arg3
 	push	r2
 	CACHE_SPLIT_CHECK r2, 8, 64
 	jle    near   .pixel_sad_8x8_nsplit
 	pop		r2
-%ifdef X86_32	
+%ifdef X86_32
 	push	r3
 	push	r4
 	push	r5
 %endif
 	%assign  push_num 3
 	mov		r0,  arg1
-	mov		r1,  arg2	
+	mov		r1,  arg2
 	SIGN_EXTENTION r1, r1d
     pxor   xmm7,   xmm7
-    
+
     ;ecx r2, edx r4, edi r5
 
     mov    r5,    r2
@@ -195,18 +195,18 @@ WelsSampleSad8x8_sse21:
 	pop	 r3
 %endif
 	jmp        .return
-	
+
 .pixel_sad_8x8_nsplit:
     ;push   ebx
     ;mov    eax,    [esp+8]
 	;mov    ebx,    [esp+12]
 	;mov    edx,    [esp+20]
-	
+
 	pop r2
 	%assign  push_num 0
 	LOAD_4_PARA
 	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d	
+	SIGN_EXTENTION r3, r3d
 	pxor   xmm6,   xmm6
 	SSE2_GetSad8x4
     lea    r0,    [r0+2*r1]

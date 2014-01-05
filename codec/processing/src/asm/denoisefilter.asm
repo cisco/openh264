@@ -179,15 +179,15 @@ WELS_EXTERN BilateralLumaFilter8_sse2
 ;%define         stride r1
 
 BilateralLumaFilter8_sse2:
-       
-        push r3 
+
+        push r3
         %assign push_num 1
         LOAD_2_PARA
 
 		pxor		xmm7,	xmm7
-	
+
 		mov         r3,     r0
-		
+
 		movq        xmm6,   [r0]
 		punpcklbw	xmm6,	xmm7
 		movdqa		xmm3,	[sse2_32]
@@ -218,10 +218,10 @@ BilateralLumaFilter8_sse2:
 		packuswb	xmm5,	xmm5
 		movq		[r3],	xmm5
 
-       
+
 		pop r3
 		%assign push_num 0
-		
+
 		ret
 
 WELS_EXTERN WaverageChromaFilter8_sse2
@@ -239,11 +239,11 @@ ALIGN 16
 WaverageChromaFilter8_sse2:
 
         push r3
-       
+
         %assign push_num 1
-        
+
         LOAD_2_PARA
-        
+
         mov		r3,	r1
 		add		r3,	r3
 		sub		r0,	r3			; pixels - 2 * stride
@@ -272,8 +272,8 @@ WaverageChromaFilter8_sse2:
 		packuswb	xmm3,		xmm3
 		movq		[r0 + 2],		xmm3
 
-              
+
         pop r3
-        
+
         %assign push_num 0
 		ret

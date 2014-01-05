@@ -160,7 +160,7 @@ ALIGN 16
 AnalysisVaaInfoIntra_sse2:
 
     %assign push_num 0
-    LOAD_2_PARA 
+    LOAD_2_PARA
     SIGN_EXTENTION r1,r1d
 
 %ifdef X86_32
@@ -175,16 +175,16 @@ AnalysisVaaInfoIntra_sse2:
     and  r5,0fh
     sub  r7,r5
     sub  r7,32
-    
-    
-    mov r2,r1    
+
+
+    mov r2,r1
     sal r2,$1   ;r2 = 2*iLineSize
     mov r3,r2
     add r3,r1   ;r3 = 3*iLineSize
-    
+
     mov r4,r2
     sal r4,$1   ;r4 = 4*iLineSize
-    
+
 	pxor xmm7, xmm7
 
 	; loops
@@ -225,8 +225,8 @@ AnalysisVaaInfoIntra_sse2:
 	pshufd xmm2, xmm1, 0B1h
 	paddd xmm1, xmm2
 
-	
-	
+
+
 	movd r2d, xmm0
 	and r2, 0ffffh		; effective low work truncated
 	mov r3, r2
@@ -234,7 +234,7 @@ AnalysisVaaInfoIntra_sse2:
 	sar r2, $4
 	movd retrd, xmm1
 	sub retrd, r2d
-	
+
 	add r7,32
 	add r7,r5
 
@@ -244,7 +244,7 @@ AnalysisVaaInfoIntra_sse2:
 	pop r4
 	pop r3
 %endif
-	
+
 	ret
 
 WELS_EXTERN AnalysisVaaInfoIntra_ssse3
@@ -255,7 +255,7 @@ ALIGN 16
 AnalysisVaaInfoIntra_ssse3:
 
     %assign push_num 0
-    LOAD_2_PARA 
+    LOAD_2_PARA
     SIGN_EXTENTION r1,r1d
 
 %ifdef X86_32
@@ -265,41 +265,41 @@ AnalysisVaaInfoIntra_ssse3:
     push r6
     %assign push_num push_num+4
 %endif
-   
+
     mov  r5,r7
     and  r5,0fh
     sub  r7,r5
     sub  r7,32
-    
 
-    mov r2,r1    
+
+    mov r2,r1
     sal r2,$1   ;r2 = 2*iLineSize
     mov r3,r2
     add r3,r1   ;r3 = 3*iLineSize
-    
+
     mov r4,r2
     sal r4,$1   ;r4 = 4*iLineSize
-     
+
 	pxor xmm7, xmm7
 
 	; loops
 	VAA_AVG_BLOCK_SSSE3 xmm0, xmm1, xmm2, xmm3, xmm4, xmm5
     movq [r7],xmm0
-    
+
 	lea r0,[r0+r4]
 	VAA_AVG_BLOCK_SSSE3 xmm1, xmm2, xmm3, xmm4, xmm5, xmm6
     movq [r7+8],xmm1
-    
-    
+
+
 	lea r0,[r0+r4]
 	VAA_AVG_BLOCK_SSSE3 xmm0, xmm1, xmm2, xmm3, xmm4, xmm5
     movq [r7+16],xmm0
-    
+
 	lea r0,[r0+r4]
 	VAA_AVG_BLOCK_SSSE3 xmm1, xmm2, xmm3, xmm4, xmm5, xmm6
     movq [r7+24],xmm1
-    
-    
+
+
 	movdqa xmm0,[r7]
 	movdqa xmm1,[r7+16]
 	movdqa xmm2, xmm0
@@ -322,7 +322,7 @@ AnalysisVaaInfoIntra_ssse3:
 	pshufd xmm2, xmm1, 0B1h
 	paddd xmm1, xmm2
 
-    
+
     movd r2d, xmm0
     and r2, 0ffffh          ; effective low work truncated
     mov r3, r2
@@ -339,7 +339,7 @@ AnalysisVaaInfoIntra_ssse3:
 	pop r4
 	pop r3
 %endif
-	
+
 	ret
 
 WELS_EXTERN MdInterAnalysisVaaInfo_sse41
@@ -368,7 +368,7 @@ MdInterAnalysisVaaInfo_sse41:
 	paddd xmm3, xmm4
 	movd r0d, xmm3
 	cmp r0d, 20	; INTER_VARIANCE_SAD_THRESHOLD
-	
+
 	jb near .threshold_exit
 	pshufd xmm0, xmm0, 01Bh
 	pcmpgtd xmm0, xmm1	; iSadBlock > iAverageSad
@@ -412,7 +412,7 @@ MdInterAnalysisVaaInfo_sse2:
 	paddd xmm4, xmm5
 	pshufd xmm5, xmm4, 0B1h
 	paddd xmm5, xmm4
-	
+
 	movd r0d, xmm5
 	cmp r0d, 20	; INTER_VARIANCE_SAD_THRESHOLD
 	jb near .threshold_exit

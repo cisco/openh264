@@ -79,17 +79,17 @@ McChromaWidthEq4_mmx:
 	;push esi
 	;push edi
 	;push ebx
-	
+
 	%assign  push_num 0
-	LOAD_6_PARA 
+	LOAD_6_PARA
 %ifndef X86_32
 	movsx	r1, r1d
 	movsx	r3, r3d
 	movsx	r5, r5d
 %endif
-	
+
 	;mov eax, [esp +12 + 20]
-	
+
 	movd mm3, [r4];	[eax]
 	WELS_Zero mm7
 	punpcklbw mm3, mm3
@@ -173,7 +173,7 @@ McChromaWidthEq8_sse2:
 	;push ebx
 
 	%assign  push_num 0
-	LOAD_6_PARA 	
+	LOAD_6_PARA
 %ifndef X86_32
 	movsx	r1, r1d
 	movsx	r3, r3d
@@ -241,7 +241,7 @@ McChromaWidthEq8_sse2:
 
 	dec r5
 	jnz near .xloop
-	
+
 	LOAD_6_PARA_POP
 
 	;pop ebx
@@ -273,7 +273,7 @@ McChromaWidthEq8_ssse3:
 	movsx	r3, r3d
 	movsx	r5, r5d
 %endif
-	
+
 	;mov eax, [esp + 12 + 20]
 
     pxor      xmm7, xmm7
@@ -333,9 +333,9 @@ McChromaWidthEq8_ssse3:
 
 	sub r5, 2
 	jnz .hloop_chroma
-	
+
 	LOAD_6_PARA_POP
-	
+
 	;pop edi
 	;pop esi
 	;pop ebx

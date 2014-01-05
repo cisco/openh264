@@ -56,7 +56,7 @@ SECTION .rodata align=16
 
 ALIGN 16
 h264_w0x10:
-	dw 16, 16, 16, 16	
+	dw 16, 16, 16, 16
 ALIGN 16
 h264_w0x10_1:
 	dw 16, 16, 16, 16, 16, 16, 16, 16
@@ -91,7 +91,7 @@ McHorVer20WidthEq4_mmx:
 	;mov edi, [esp+20]
 	;mov ecx, [esp+24]
 	;mov edx, [esp+28]
-	
+
     %assign  push_num 0
     LOAD_5_PARA
 %ifndef X86_32
@@ -99,7 +99,7 @@ McHorVer20WidthEq4_mmx:
 	movsx	r3, r3d
 	movsx	r4, r4d
 %endif
-    
+
 	sub r0, 2
 	WELS_Zero mm7
 	movq mm6, [h264_w0x10]
@@ -195,7 +195,7 @@ McHorVer22Width8HorFirst_sse2:
 	;mov edi, [esp+24]		;pDst
 	;mov edx, [esp+28]	;iDstStride
 	;mov ebx, [esp+32]	;iHeight
-	
+
 	%assign  push_num 0
     LOAD_5_PARA
 %ifndef X86_32
@@ -257,7 +257,7 @@ McHorVer20WidthEq8_sse2:
 	;mov edi, [esp + 20]         ;pDst
 	;mov ecx, [esp + 28]         ;iHeight
 	;mov edx, [esp + 24]			;iDstStride
-	
+
 	%assign  push_num 0
     LOAD_5_PARA
 %ifndef X86_32
@@ -322,7 +322,7 @@ McHorVer20WidthEq16_sse2:
 	;mov edi, [esp + 20]         ;pDst
 	;mov ecx, [esp + 28]         ;iHeight
 	;mov edx, [esp + 24]			;iDstStride
-	
+
 	%assign  push_num 0
     LOAD_5_PARA
 %ifndef X86_32
@@ -392,7 +392,7 @@ McHorVer20WidthEq16_sse2:
 	lea r0, [r0+r1]
 	dec r4
 	jnz near .y_loop
-	
+
 	LOAD_5_PARA_POP
 	ret
 
@@ -523,7 +523,7 @@ McHorVer02Height9Or17_sse2:
 	;mov eax, [esp + 28]
 	;mov ecx, [esp + 36]
 	;mov ebx, [esp + 32]
-	
+
 	%assign  push_num 0
     LOAD_6_PARA
 %ifndef X86_32
@@ -532,7 +532,7 @@ McHorVer02Height9Or17_sse2:
 	movsx	r4, r4d
 	movsx	r5, r5d
 %endif
- 
+
 %ifndef X86_32
 	push r12
 	push r13
@@ -541,7 +541,7 @@ McHorVer02Height9Or17_sse2:
 	mov	 r13, r2
 	mov	 r14, r5
 %endif
-    
+
 	shr r4, 3
 	sub r0, r1
 	sub r0, r1
@@ -639,7 +639,7 @@ McHorVer02Height9Or17_sse2:
 	sub r0, r1
 	sub r0, r1
 	add r0, 8
-	add r2, 8	
+	add r2, 8
 	jmp near .xloop
 
 .xx_exit:
@@ -680,7 +680,7 @@ McHorVer20Width9Or17_sse2:
 	movsx	r3, r3d
 	movsx	r4, r4d
 	movsx	r5, r5d
-%endif    
+%endif
 	sub r0, 2
 	pxor xmm7, xmm7
 
@@ -842,7 +842,7 @@ McHorVer22HorFirst_sse2:
 	;mov edx, [esp+28]
 	;mov ecx, [esp+32]
 	;mov ebx, [esp+36]
-	
+
 	%assign  push_num 0
     LOAD_6_PARA
 %ifndef X86_32
@@ -850,7 +850,7 @@ McHorVer22HorFirst_sse2:
 	movsx	r3, r3d
 	movsx	r4, r4d
 	movsx	r5, r5d
-%endif    
+%endif
 	pxor xmm7, xmm7
 	sub r0, r1				;;;;;;;;need more 5 lines.
 	sub r0, r1
@@ -1023,7 +1023,7 @@ McHorVer22HorFirst_sse2:
 	;mov edx, [esp+32]
 	;mov ebx, [esp+36]
 	;mov ecx, [esp+40]
-	
+
 	%assign  push_num 0
     LOAD_6_PARA
 %ifndef X86_32
