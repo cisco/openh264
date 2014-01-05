@@ -80,13 +80,13 @@ void WelsInitFillingPredFuncs (const uint32_t kuiCpuFlag) {
 
 #if defined(X86_ASM)
   if (kuiCpuFlag & WELS_CPU_MMXEXT) {
-    WelsFillingPred8to16		= WelsFillingPred8to16_mmx;
-    WelsFillingPred8x2to16	    = WelsFillingPred8x2to16_mmx;
-    WelsFillingPred1to16		= WelsFillingPred1to16_mmx;
+  //  WelsFillingPred8to16		= WelsFillingPred8to16_mmx;
+  //  WelsFillingPred8x2to16	    = WelsFillingPred8x2to16_mmx;
+  //  WelsFillingPred1to16		= WelsFillingPred1to16_mmx;
   }
   if (kuiCpuFlag & WELS_CPU_SSE2) {
-    WelsFillingPred8x2to16	    = WelsFillingPred8x2to16_sse2;
-    WelsFillingPred1to16		= WelsFillingPred1to16_sse2;
+   // WelsFillingPred8x2to16	    = WelsFillingPred8x2to16_sse2;
+   // WelsFillingPred1to16		= WelsFillingPred1to16_sse2;
   }
 #endif//X86_ASM
 }

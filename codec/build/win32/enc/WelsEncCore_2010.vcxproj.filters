@@ -278,37 +278,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\..\..\encoder\core\asm\asm_inc.asm">
-      <Filter>ASM</Filter>
-    </CustomBuild>
     <CustomBuild Include="..\..\..\encoder\core\asm\coeff.asm">
-      <Filter>ASM</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\encoder\core\asm\cpuid.asm">
       <Filter>ASM</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\encoder\core\asm\dct.asm">
       <Filter>ASM</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\encoder\core\asm\deblock.asm">
-      <Filter>ASM</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\encoder\core\asm\expand_picture.asm">
-      <Filter>ASM</Filter>
-    </CustomBuild>
     <CustomBuild Include="..\..\..\encoder\core\asm\intra_pred.asm">
-      <Filter>ASM</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\encoder\core\asm\intra_pred_util.asm">
-      <Filter>ASM</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\encoder\core\asm\mb_copy.asm">
-      <Filter>ASM</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\encoder\core\asm\mc_chroma.asm">
-      <Filter>ASM</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\encoder\core\asm\mc_luma.asm">
       <Filter>ASM</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\encoder\core\asm\memzero.asm">
@@ -323,7 +299,25 @@
     <CustomBuild Include="..\..\..\encoder\core\asm\score.asm">
       <Filter>ASM</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\encoder\core\asm\vaa.asm">
+    <CustomBuild Include="..\..\..\common\mc_luma.asm">
+      <Filter>ASM</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\mc_chroma.asm">
+      <Filter>ASM</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\mb_copy.asm">
+      <Filter>ASM</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\expand_picture.asm">
+      <Filter>ASM</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\deblock.asm">
+      <Filter>ASM</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\cpuid.asm">
+      <Filter>ASM</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\vaa.asm">
       <Filter>ASM</Filter>
     </CustomBuild>
   </ItemGroup>

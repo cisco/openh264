@@ -10,7 +10,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WelsEncPlus_2010", "WelsEnc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "encConsole_2010", "encConsole_2010.vcxproj", "{8509E2A8-2CBD-49E2-B564-3EFF1E927459}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WelsVP_2010", "..\..\..\..\processing\build\win32\WelsVP_2010.vcxproj", "{E8DFAFA1-8DAC-4127-8D27-FBD5819EE562}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WelsVP_2010", "..\..\..\processing\build\win32\WelsVP_2010.vcxproj", "{E8DFAFA1-8DAC-4127-8D27-FBD5819EE562}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

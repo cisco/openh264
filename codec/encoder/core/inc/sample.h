@@ -107,9 +107,6 @@ int32_t WelsIntra16x16Combined3Satd_sse41 (uint8_t*, int32_t, uint8_t*, int32_t,
 int32_t WelsIntra16x16Combined3Sad_ssse3 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*);
 int32_t WelsIntraChroma8x8Combined3Satd_sse41 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*,
     uint8_t*, uint8_t*);
-int32_t WelsIntraChroma8x8Combined3Sad_ssse3 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*,
-    uint8_t*, uint8_t*);
-
 
 #endif//X86_ASM
 

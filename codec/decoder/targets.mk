@@ -28,17 +28,9 @@ DECODER_CPP_SRCS=\
 DECODER_OBJS += $(DECODER_CPP_SRCS:.cpp=.o)
 ifeq ($(USE_ASM), Yes)
 DECODER_ASM_SRCS=\
-	$(DECODER_SRCDIR)/./core/asm/asm_inc.asm\
 	$(DECODER_SRCDIR)/./core/asm/block_add.asm\
-	$(DECODER_SRCDIR)/./core/asm/cpuid.asm\
 	$(DECODER_SRCDIR)/./core/asm/dct.asm\
-	$(DECODER_SRCDIR)/./core/asm/deblock.asm\
-	$(DECODER_SRCDIR)/./core/asm/expand_picture.asm\
 	$(DECODER_SRCDIR)/./core/asm/intra_pred.asm\
-	$(DECODER_SRCDIR)/./core/asm/mb_copy.asm\
-	$(DECODER_SRCDIR)/./core/asm/mc_chroma.asm\
-	$(DECODER_SRCDIR)/./core/asm/mc_luma.asm\
-	$(DECODER_SRCDIR)/./core/asm/memzero.asm\
 
 DECODER_OBJS += $(DECODER_ASM_SRCS:.asm=.o)
 endif
@@ -113,38 +105,14 @@ $(DECODER_SRCDIR)/./plus/src/welsCodecTrace.o: $(DECODER_SRCDIR)/./plus/src/wels
 $(DECODER_SRCDIR)/./plus/src/welsDecoderExt.o: $(DECODER_SRCDIR)/./plus/src/welsDecoderExt.cpp
 	$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(DECODER_CFLAGS) $(DECODER_INCLUDES) -c -o $(DECODER_SRCDIR)/./plus/src/welsDecoderExt.o $(DECODER_SRCDIR)/./plus/src/welsDecoderExt.cpp
 
-$(DECODER_SRCDIR)/./core/asm/asm_inc.o: $(DECODER_SRCDIR)/./core/asm/asm_inc.asm
-	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(DECODER_ASMFLAGS) $(DECODER_ASM_INCLUDES) -o $(DECODER_SRCDIR)/./core/asm/asm_inc.o $(DECODER_SRCDIR)/./core/asm/asm_inc.asm
-
 $(DECODER_SRCDIR)/./core/asm/block_add.o: $(DECODER_SRCDIR)/./core/asm/block_add.asm
 	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(DECODER_ASMFLAGS) $(DECODER_ASM_INCLUDES) -o $(DECODER_SRCDIR)/./core/asm/block_add.o $(DECODER_SRCDIR)/./core/asm/block_add.asm
-
-$(DECODER_SRCDIR)/./core/asm/cpuid.o: $(DECODER_SRCDIR)/./core/asm/cpuid.asm
-	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(DECODER_ASMFLAGS) $(DECODER_ASM_INCLUDES) -o $(DECODER_SRCDIR)/./core/asm/cpuid.o $(DECODER_SRCDIR)/./core/asm/cpuid.asm
 
 $(DECODER_SRCDIR)/./core/asm/dct.o: $(DECODER_SRCDIR)/./core/asm/dct.asm
 	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(DECODER_ASMFLAGS) $(DECODER_ASM_INCLUDES) -o $(DECODER_SRCDIR)/./core/asm/dct.o $(DECODER_SRCDIR)/./core/asm/dct.asm
 
-$(DECODER_SRCDIR)/./core/asm/deblock.o: $(DECODER_SRCDIR)/./core/asm/deblock.asm
-	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(DECODER_ASMFLAGS) $(DECODER_ASM_INCLUDES) -o $(DECODER_SRCDIR)/./core/asm/deblock.o $(DECODER_SRCDIR)/./core/asm/deblock.asm
-
-$(DECODER_SRCDIR)/./core/asm/expand_picture.o: $(DECODER_SRCDIR)/./core/asm/expand_picture.asm
-	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(DECODER_ASMFLAGS) $(DECODER_ASM_INCLUDES) -o $(DECODER_SRCDIR)/./core/asm/expand_picture.o $(DECODER_SRCDIR)/./core/asm/expand_picture.asm
-
 $(DECODER_SRCDIR)/./core/asm/intra_pred.o: $(DECODER_SRCDIR)/./core/asm/intra_pred.asm
 	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(DECODER_ASMFLAGS) $(DECODER_ASM_INCLUDES) -o $(DECODER_SRCDIR)/./core/asm/intra_pred.o $(DECODER_SRCDIR)/./core/asm/intra_pred.asm
-
-$(DECODER_SRCDIR)/./core/asm/mb_copy.o: $(DECODER_SRCDIR)/./core/asm/mb_copy.asm
-	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(DECODER_ASMFLAGS) $(DECODER_ASM_INCLUDES) -o $(DECODER_SRCDIR)/./core/asm/mb_copy.o $(DECODER_SRCDIR)/./core/asm/mb_copy.asm
-
-$(DECODER_SRCDIR)/./core/asm/mc_chroma.o: $(DECODER_SRCDIR)/./core/asm/mc_chroma.asm
-	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(DECODER_ASMFLAGS) $(DECODER_ASM_INCLUDES) -o $(DECODER_SRCDIR)/./core/asm/mc_chroma.o $(DECODER_SRCDIR)/./core/asm/mc_chroma.asm
-
-$(DECODER_SRCDIR)/./core/asm/mc_luma.o: $(DECODER_SRCDIR)/./core/asm/mc_luma.asm
-	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(DECODER_ASMFLAGS) $(DECODER_ASM_INCLUDES) -o $(DECODER_SRCDIR)/./core/asm/mc_luma.o $(DECODER_SRCDIR)/./core/asm/mc_luma.asm
-
-$(DECODER_SRCDIR)/./core/asm/memzero.o: $(DECODER_SRCDIR)/./core/asm/memzero.asm
-	$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(DECODER_ASMFLAGS) $(DECODER_ASM_INCLUDES) -o $(DECODER_SRCDIR)/./core/asm/memzero.o $(DECODER_SRCDIR)/./core/asm/memzero.asm
 
 $(LIBPREFIX)decoder.$(LIBSUFFIX): $(DECODER_OBJS)
 	rm -f $(LIBPREFIX)decoder.$(LIBSUFFIX)

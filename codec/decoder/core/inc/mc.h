@@ -78,7 +78,7 @@ extern void_t McHorVer02WidthEq8_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_
                                        int32_t iHeight);
 extern void_t McHorVer22Width8HorFirst_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
     int32_t iHeight);
-extern void_t McHorVer22VerLast_sse2 (uint8_t* pTap, int32_t iTapStride, uint8_t* pDst, int32_t iDstStride,
+extern void_t McHorVer22Width8VerLastAlign_sse2 (uint8_t* pTap, int32_t iTapStride, uint8_t* pDst, int32_t iDstStride,
                                       int32_t iWidth, int32_t iHeight);
 extern void_t PixelAvgWidthEq16_sse2 (uint8_t* pDst, int32_t iDstStride, uint8_t* pSrcA, int32_t iSrcAStride,
                                       uint8_t* pSrcB, int32_t iSrcBStride, int32_t iHeight);

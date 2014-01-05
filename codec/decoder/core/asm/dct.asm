@@ -42,8 +42,6 @@
 
 %include "asm_inc.asm"
 
-BITS 32
-
 ;*******************************************************************************
 ; Macros and other preprocessor constants
 ;*******************************************************************************
@@ -93,19 +91,15 @@ ALIGN 16
 ;*******************************************************************************
 
 IdctResAddPred_mmx:
-
-%define	pushsize	0
-%define pPred       esp+pushsize+4
-%define kiStride     esp+pushsize+8
-%define pRs         esp+pushsize+12
-
-	mov     eax, [pRs   ]
-    mov     edx, [pPred ]
-    mov     ecx, [kiStride]
-    movq    mm0, [eax+ 0]
-    movq    mm1, [eax+ 8]
-    movq    mm2, [eax+16]
-    movq    mm3, [eax+24]
+    %assign push_num 0
+    LOAD_3_PARA
+	%ifndef X86_32
+	movsx r1, r1d
+	%endif
+    movq    mm0, [r2+ 0]
+    movq    mm1, [r2+ 8]
+    movq    mm2, [r2+16]
+    movq    mm3, [r2+24]
 
 	MMX_Trans4x4W        mm0, mm1, mm2, mm3, mm4
 	MMX_IDCT			mm1, mm2, mm3, mm4, mm0, mm6
@@ -115,15 +109,12 @@ IdctResAddPred_mmx:
     WELS_Zero			mm7
     WELS_DW32			mm6
 
-    MMX_StoreDiff4P    mm3, mm0, mm6, mm7, [edx]
-    MMX_StoreDiff4P    mm4, mm0, mm6, mm7, [edx+ecx]
-    lea     edx, [edx+2*ecx]
-    MMX_StoreDiff4P    mm1, mm0, mm6, mm7, [edx]
-    MMX_StoreDiff4P    mm2, mm0, mm6, mm7, [edx+ecx]
+    MMX_StoreDiff4P    mm3, mm0, mm6, mm7, [r0]
+    MMX_StoreDiff4P    mm4, mm0, mm6, mm7, [r0+r1]
+    lea     r0, [r0+2*r1]
+    MMX_StoreDiff4P    mm1, mm0, mm6, mm7, [r0]
+    MMX_StoreDiff4P    mm2, mm0, mm6, mm7, [r0+r1]
 
-%undef	pushsize
-%undef  pPred
-%undef  kiStride
-%undef  pRs
+
 	emms
     ret
