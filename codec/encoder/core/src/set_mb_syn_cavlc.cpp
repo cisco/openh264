@@ -207,7 +207,7 @@ void InitCoeffFunc (const uint32_t uiCpuFlag) {
 
 #if defined(X86_ASM)
   if (uiCpuFlag & WELS_CPU_SSE2) {
-   // sCoeffFunc.pfCavlcParamCal = CavlcParamCal_sse2;
+    // sCoeffFunc.pfCavlcParamCal = CavlcParamCal_sse2;
   }
 #endif
 }

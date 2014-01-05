@@ -223,7 +223,7 @@ void CAdaptiveQuantization::WelsInitVarFunc (PVarFunc& pfVar,  int32_t iCpuFlag)
 
 #ifdef X86_ASM
   if (iCpuFlag & WELS_CPU_SSE2) {
-   // pfVar = SampleVariance16x16_sse2;
+    // pfVar = SampleVariance16x16_sse2;
   }
 #endif
 }
