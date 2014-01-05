@@ -9,5 +9,5 @@ before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -qq g++-4.6-multilib gcc-multilib libc6-dev-i386 lib32z1-dev
 install: make gtest-bootstrap
-script: make && make test && make clean && make ENABLE64BIT=Yes && make test
+script: make && make test && make clean && make ENABLE64BIT=Yes && make test && make clean && make BUILDTYPE=Release && make test && make BUILDTYPE=Release clean && make ENABLE64BIT=Yes BUILDTYPE=Release && make test
 
