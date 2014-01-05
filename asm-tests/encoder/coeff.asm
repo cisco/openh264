@@ -49,8 +49,7 @@ SECTION .rodata align=16
 
 align 16
 sse2_b8 db 8, 8, 8, 8, 8, 8, 8, 8
-align 16 
-sse2_b1 db 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+
 ALIGN  16
 sse2_b_1 db -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1
 
@@ -458,5 +457,273 @@ CavlcParamCal_sse2:
 	pop esi
 	pop edi
 	pop ebx
+	ret
+%elifdef UNIX64
+	push	rbx
+	push	rbp
+	;mov			eax,	[esp+16]	;coffLevel
+	;mov			edi,	[esp+24]	;Level
+	;mov			ebx,	[esp+32]	;endIdx
+	cmp			r8d,	3
+	jne			.Level16
+	pxor		xmm1,	xmm1
+	movq		xmm0,	[rdi]	; removed QWORD
+	jmp			.Cal_begin
+.Level16:
+	movdqa		xmm0,	[rdi]
+	movdqa		xmm1,	[rdi+16]
+.Cal_begin:
+    movdqa		xmm2,	xmm0
+	packsswb	xmm0,	xmm1
+	movdqa		xmm4,	xmm0
+	pxor		xmm3,	xmm3
+	pcmpgtb		xmm0,	xmm3
+	pcmpgtb		xmm3,	xmm4
+	xor r8, r8
+	por			xmm0,	xmm3
+	pmovmskb	r8d,	xmm0
+	cmp			r8d,	0
+	je near   .return
+	movdqa		xmm6,	[sse2_b_1]
+	pcmpeqw		xmm7,	xmm7	;generate -1
+    ;mov			ebx,	0xff
+    ;pinsrw		xmm6,	ebx,	3
+
+    ;mov       bl,   dh
+	mov	  rbx, r8
+	shr	  rbx, 8
+	lea	  rbp, [byte_1pos_table]
+	lea       rbx,  [rbp+8*rbx]
+	movq      xmm0, [rbx]
+	pextrw    r9d,  xmm0, 3
+	shr       r9d,  8
+    ;mov       dh,   cl
+ 	mov     eax,  r9d
+.loopHighFind0:
+    cmp       eax,   0
+    je        .loopHighFind0End
+    ;mov       esi, [ebx]
+    ;and       esi, 0xff
+    movzx	 r10, byte [rbx]
+    add       r10, 8
+    mov       r10w, word [rdi+2*r10]
+    mov       [rdx], r10w
+    add       rdx,   2
+    ;add       ebx,   1
+    inc		  rbx
+    dec       eax
+	jmp       .loopHighFind0
+.loopHighFind0End:
+    ;mov       cl,   dh
+    cmp       r9d,   8
+	pand      xmm0, xmm6
+    jne       .LowByteFind0
+    sub       rdx,   2
+    mov       r10w, word  [rdi+16]
+    mov       [rdx], r10w
+    add       rdx,   2
+.LowByteFind0:
+    and       r8,  0xff
+	lea       rbx,  [rbp+8*r8]
+	movq      xmm1, [rbx]
+    pextrw    r10d,  xmm1, 3
+    shr   r10d, 8
+    pand      xmm1, xmm6
+	mov eax, r10d
+.loopLowFind0:
+    cmp       eax, 0
+    je        .loopLowFind0End
+	;mov       edx, [ebx]
+	;and       edx, 0xff
+	movzx	  r8,	byte [rbx]
+	mov       r8w,word [rdi+2*r8]
+	mov       [rdx], r8w
+	add       rdx,   2
+	;add       ebx,   1
+	inc		  rbx
+    dec       eax
+	jmp       .loopLowFind0
+.loopLowFind0End:
+    cmp       r10d,  8
+    jne       .getLevelEnd
+    sub       rdx, 2
+    mov       r8w, word [rdi]
+    mov       [rdx], r8w
+.getLevelEnd:
+	;mov      edx, [esp+28]	;total_coeffs
+    ;mov      ebx,   ecx
+    ;and      ebx,   0xff
+    add	        r10d,  r9d
+    mov         [rcx], r10d
+    ;movzx	 ebx,	byte cl
+    ;add      cl,    ch
+	;mov      [edx], cl
+;getRun
+    movq     xmm5, [sse2_b8]
+    paddb    xmm0, xmm5
+    pxor     xmm2, xmm2
+    pxor     xmm3, xmm3
+    mov      eax,  8
+    sub      eax,  r9d
+    shl      eax,  3
+    shl      r9d,  3
+	pinsrw   xmm2, r9d, 0
+    pinsrw   xmm3, eax, 0
+    psllq    xmm0, xmm3
+    psrlq    xmm0, xmm3
+    movdqa   xmm4, xmm1
+    psllq    xmm1, xmm2
+    psrlq    xmm4, xmm3
+    punpcklqdq xmm1, xmm4
+    por      xmm0,  xmm1
+
+    pextrw   eax,   xmm0, 0
+    and		 eax,   0xff
+    inc      eax
+    sub	     eax,  r10d
+	movdqa   xmm1,  xmm0
+	paddb    xmm1,  xmm7
+	psrldq   xmm0,  1
+	psubb    xmm1,  xmm0
+    ;mov      ecx,   [esp+20] ;run
+	movdqa   [rsi], xmm1
+;getRunEnd
+.return:
+	pop rbp
+	pop rbx
+	ret
+%else ; WIN64
+	push	rbx
+	push	rbp
+	mov     eax, dword [rsp + 40 + 16] ; endIdx
+	cmp			eax,	3
+	jne			.Level16
+	pxor		xmm1,	xmm1
+	movq		xmm0,	[rcx]	; removed QWORD
+	jmp			.Cal_begin
+.Level16:
+	movdqa		xmm0,	[rcx]
+	movdqa		xmm1,	[rcx+16]
+.Cal_begin:
+    movdqa		xmm2,	xmm0
+	packsswb	xmm0,	xmm1
+	movdqa		xmm4,	xmm0
+	pxor		xmm3,	xmm3
+	pcmpgtb		xmm0,	xmm3
+	pcmpgtb		xmm3,	xmm4
+	xor r10, r10
+	por			xmm0,	xmm3
+	pmovmskb	r10d,	xmm0
+	cmp			r10,	0
+	je near   .return
+	movdqa		xmm6,	[sse2_b_1]
+	pcmpeqw		xmm7,	xmm7	;generate -1
+	mov       [rsp + 16 + 16], rdx  ; save run in the stack, since we do not use it now
+    ;mov			ebx,	0xff
+    ;pinsrw		xmm6,	ebx,	3
+
+    ;mov       bl,   dh
+	mov	  rbx, r10
+	shr	  rbx, 8
+	lea	  rbp, [byte_1pos_table]
+	lea       rbx,  [rbp+8*rbx]
+	movq      xmm0, [rbx]
+	pextrw    r11d,  xmm0, 3
+	shr       r11d,  8
+    ;mov       dh,   cl
+ 	mov     eax,  r11d
+.loopHighFind0:
+    cmp       eax,   0
+    je        .loopHighFind0End
+    ;mov       esi, [ebx]
+    ;and       esi, 0xff
+    movzx	 rdx, byte [rbx]
+    add       rdx, 8
+    mov       dx, word [rcx+2*rdx]
+    mov       [r8], dx
+    add       r8,   2
+    ;add       ebx,   1
+    inc		  rbx
+    dec       eax
+	jmp       .loopHighFind0
+.loopHighFind0End:
+    ;mov       cl,   dh
+    cmp       r11d,   8
+	pand      xmm0, xmm6
+    jne       .LowByteFind0
+    sub       r8,   2
+    mov       dx, word  [rcx+16]
+    mov       [r8], dx
+    add       r8,   2
+.LowByteFind0:
+    and       r10,  0xff
+	lea       rbx,  [rbp+8*r10]
+	movq      xmm1, [rbx]
+    pextrw    r10d,  xmm1, 3
+    shr   r10d, 8
+    pand      xmm1, xmm6
+	mov eax, r10d
+.loopLowFind0:
+    cmp       eax, 0
+    je        .loopLowFind0End
+	;mov       edx, [ebx]
+	;and       edx, 0xff
+	movzx	  rdx,	byte [rbx]
+	mov       dx, word [rcx+2*rdx]
+	mov       [r8], dx
+	add       r8,   2
+	;add       ebx,   1
+	inc		  rbx
+    dec       eax
+	jmp       .loopLowFind0
+.loopLowFind0End:
+    cmp       r10d,  8
+    jne       .getLevelEnd
+    sub       r8, 2
+    mov       dx, word [rcx]
+    mov       [r8], dx
+.getLevelEnd:
+	;mov      edx, [esp+28]	;total_coeffs
+    ;mov      ebx,   ecx
+    ;and      ebx,   0xff
+    add	        r10d,  r11d
+    mov         [r9], r10d
+    ;movzx	 ebx,	byte cl
+    ;add      cl,    ch
+	;mov      [edx], cl
+;getRun
+    movq     xmm5, [sse2_b8]
+    paddb    xmm0, xmm5
+    pxor     xmm2, xmm2
+    pxor     xmm3, xmm3
+    mov      eax,  8
+    sub      eax,  r11d
+    shl      eax,  3
+    shl      r11d,  3
+	pinsrw   xmm2, r11d, 0
+    pinsrw   xmm3, eax, 0
+    psllq    xmm0, xmm3
+    psrlq    xmm0, xmm3
+    movdqa   xmm4, xmm1
+    psllq    xmm1, xmm2
+    psrlq    xmm4, xmm3
+    punpcklqdq xmm1, xmm4
+    por      xmm0,  xmm1
+
+    pextrw   eax,   xmm0, 0
+    and		 eax,   0xff
+    inc      eax
+    sub	     eax,  r10d
+	movdqa   xmm1,  xmm0
+	paddb    xmm1,  xmm7
+	psrldq   xmm0,  1
+	psubb    xmm1,  xmm0
+    ;mov      ecx,   [esp+20] ;run
+        mov   rdx, [rsp + 16 + 16] ; load rdx from stack
+	movdqa   [rdx], xmm1
+;getRunEnd
+.return:
+	pop rbp
+	pop rbx
 	ret
 %endif

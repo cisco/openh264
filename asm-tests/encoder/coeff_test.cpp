@@ -412,7 +412,7 @@ TEST(coeff_test, CavlcParamCal_sse2) {
 	pCoffLevel[i] = (rand() & range) - offset;
     }
     int rvRef = CavlcParamCal_c(pCoffLevel, pRunRef, pLevelRef, &iTotalCoeffRef, iLastIndex);
-    int rv = CavlcParamCal_sse2_intrincs(pCoffLevel, pRun, pLevel, &iTotalCoeff, iLastIndex);
+    int rv = CavlcParamCal_sse2(pCoffLevel, pRun, pLevel, &iTotalCoeff, iLastIndex);
     ASSERT_EQ(iTotalCoeff, iTotalCoeffRef);
     for(int i = 0; i < iTotalCoeff; i++) {
 	ASSERT_EQ(pLevel[i], pLevelRef[i]);
