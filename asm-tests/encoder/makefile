@@ -37,11 +37,11 @@ LDFLAGS   += -lstdc++ -ldl -lpthread
 ifeq ($(SYSTEM), Darwin)
 ASMFLAGS += -DPREFIX
 endif
-CPPFLAGS  = -Wall -g -fpic -I ../gtest/include -I ../../codec/encoder/core/inc -I ../../codec/api/svc
+CPPFLAGS  = -Wall -fpic -I ../gtest/include -I ../../codec/encoder/core/inc -I ../../codec/api/svc
 ifeq ($(NASM), Yes)
 CPPFLAGS += -DX86_ASM
 endif
-CPPFLAGS += -msse2 -O2
+CPPFLAGS += -msse2 -O3
 SRCEXTS  = .cpp
 ifeq ($(NASM), Yes)
 SRCEXTS += .asm

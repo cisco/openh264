@@ -297,6 +297,7 @@ __align16(int8_t, sse2_b8[8]) = {
 };
 int32_t CavlcParamCal_sse2_intrincs(int16_t *coffLevel, uint8_t* run, int16_t *Level, int32_t *total_coeffs, int32_t endIdx) {
 	__m128i r0, r1, r2, r3, r4, r5, r6, r7;
+	int eax, ebx, ecx, edx, esi;
 	if(endIdx == 3) {
 		r1 = _mm_setzero_si128();
 		r0 = _mm_loadl_epi64((__m128i const*)coffLevel);
@@ -305,62 +306,68 @@ int32_t CavlcParamCal_sse2_intrincs(int16_t *coffLevel, uint8_t* run, int16_t *L
 		r0 = _mm_load_si128((__m128i const*)coffLevel);
 		r1 = _mm_load_si128((__m128i const*)(coffLevel + 8));
 	}
-	r2 = r0;
+	//r2 = r0;
 	r0 = _mm_packs_epi16(r0, r1);
 	r4 = r0;
 	r3 = _mm_setzero_si128();
 	r0 = _mm_cmpgt_epi8(r0, r3);
 	r3 = _mm_cmpgt_epi8(r3, r4);
 	r0 = _mm_or_si128(r0, r3);
-	int edx = _mm_movemask_epi8(r0);
-	if (edx == 0) {
+	edx = _mm_movemask_epi8(r0);
+	if(edx == 0) {
 		*total_coeffs = 0;
 		return 0;
 	}
 	r6 = _mm_load_si128((__m128i const*)sse2_b_1);
-	r7 = _mm_cmpeq_epi16(r7, r7);
-	int ebx = (edx >> 8) & 255;
-	r0 = _mm_loadl_epi64((__m128i const*) (byte_1pos_table+8*ebx));
-	int ecx = _mm_extract_epi16(r0, 3);
-	ecx = ecx >> 8;
-	int i = ecx;
-	uint8_t *ptr = byte_1pos_table+8*ebx;
-	while (i > 0) {
-		int offset = *ptr++;
-		*Level = coffLevel[8+offset];
-		Level ++;
-		i --;
-	}
-	if(ecx == 8) {
-		Level[-1] = coffLevel[8];
-	}
+	r7 = _mm_set1_epi8(-1);
+	ebx = edx >> 8;
+	ebx = ebx << 3; // ebx = ebx * 8;
+	r0 = _mm_loadl_epi64((__m128i const*)&byte_1pos_table[ebx]);
+	ecx = _mm_extract_epi16(r0, 3);
+	ecx >>= 8;
 	r0 = _mm_and_si128(r0, r6);
+	int tmp = ecx;
+	if (tmp > 0) {
+		do {
+		esi = byte_1pos_table[ebx];
+		esi += 8;
+		esi = coffLevel[esi];
+		*Level++ = esi;
+		ebx ++;
+		tmp --;
+		} while(tmp > 0);
+		if(ecx == 8) {
+			Level[-1] = coffLevel[8];
+		}
+	}
 	edx &= 0xff;
-	ptr = byte_1pos_table + 8*edx;
-	r1 = _mm_loadl_epi64((__m128i const*) ptr);
-	int esi = _mm_extract_epi16(r1, 3);
-	esi = esi >> 8;
-	i = esi;
-	while (i > 0) {
-		int offset = *ptr++;
-		*Level = coffLevel[offset];
-		Level ++;
-		i --;
-	}
-	if (esi  == 8) {
-		*(Level - 1) = coffLevel[0];
-	}
+	ebx = edx << 3;
+	r1 = _mm_loadl_epi64((__m128i const*)&byte_1pos_table[ebx]);
+	esi = _mm_extract_epi16(r1, 3);
+	esi >>= 8;
 	r1 = _mm_and_si128(r1, r6);
+	tmp = esi;
+	if(tmp > 0) {
+		do {
+			edx = byte_1pos_table[ebx];
+			edx = coffLevel[edx];
+			*Level++ = edx;
+			ebx ++;
+			tmp --;
+		}while(tmp > 0);
+		if(esi == 8) {
+			Level[-1] = coffLevel[0];
+		}
+	}
 	*total_coeffs = esi + ecx;
-	// now we compute run
 	r5 = _mm_loadl_epi64((__m128i const*)sse2_b8);
 	r0 = _mm_add_epi8(r0, r5);
 	r2 = _mm_setzero_si128();
 	r3 = _mm_setzero_si128();
-	int eax = (8 - ecx ) << 3;
-	ecx = ecx;
+	eax = 8;
+	eax = eax - ecx;
 	r2 = _mm_insert_epi16(r2, ecx << 3, 0);
-	r3 = _mm_insert_epi16(r3, eax, 0);
+	r3 = _mm_insert_epi16(r3, eax << 3, 0);
 	r0 = _mm_sll_epi64(r0, r3);
 	r0 = _mm_srl_epi64(r0, r3);
 	r4 = r1;
@@ -368,15 +375,15 @@ int32_t CavlcParamCal_sse2_intrincs(int16_t *coffLevel, uint8_t* run, int16_t *L
 	r4 = _mm_srl_epi64(r4, r3);
 	r1 = _mm_unpacklo_epi64(r1, r4);
 	r0 = _mm_or_si128(r0, r1);
-	eax = _mm_extract_epi16(r0, 0);
-	eax = eax & 0xff;
+	eax = _mm_extract_epi16(r0, 0) & 0xff;
 	eax ++;
-	int ret = eax - (esi + (ecx));
-	r1 = _mm_add_epi8(r0, r7);
+	eax -= (esi + ecx);
+	r1 = r0;
+	r1 = _mm_add_epi8(r1, r7);
 	r0 = _mm_srli_si128(r0, 1);
 	r1 = _mm_sub_epi8(r1, r0);
-	_mm_store_si128((__m128i*) run, r1);
-	return ret;
+	_mm_store_si128((__m128i *)run, r1);
+	return eax;
 }
 TEST(coeff_test, CavlcParamCal_sse2) {
     int16_t *pCoffLevel = (int16_t*)WelsMalloc(16*sizeof(int16_t), "pCoffLevel");
