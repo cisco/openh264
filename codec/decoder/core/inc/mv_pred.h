@@ -72,9 +72,16 @@ void_t UpdateP8x16MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A
                               int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]);
 
 /*!
+ * \brief   get the motion predictor for skip mode
+ * \param
+ * \param 	output iMvp[]
+ */
+void_t PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]);
+
+/*!
  * \brief   get the motion predictor for 4*4 or 8*8 or 16*16 block
  * \param
- * \param 	output mvp_x and mvp_y
+ * \param 	output iMvp[]
  */
 void_t PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
                int32_t iPartIdx, int32_t iPartWidth, int8_t iRef, int16_t iMVP[2]);
