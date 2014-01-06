@@ -62,6 +62,11 @@ typedef unsigned __int64 uint64_t;
 // FIXME:     all string type should be declared explicit as char.
 typedef char      str_t;
 typedef float     real32_t;
+#ifdef EPSN
+#undef EPSN
+#endif//EPSN
+#define EPSN	  (0.000001f) // (1e-6)	// desired float precision
+
 
 #ifdef PESN
 #undef PESN
