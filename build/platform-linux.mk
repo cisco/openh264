@@ -4,7 +4,7 @@ LDFLAGS += -lpthread
 ASMFLAGS += -DNOPREFIX
 ifeq ($(ENABLE64BIT), Yes)
 ASMFLAGS += -f elf64
-else 
+else
 ASMFLAGS += -f elf32
 endif
 
