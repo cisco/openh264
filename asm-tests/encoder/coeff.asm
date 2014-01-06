@@ -603,6 +603,7 @@ CavlcParamCal_sse2:
 	mov [rcx], eax
 	pop rbp
 	pop rbx
+    ret
 %else ; WIN64
 	push	rbx
 	push	rbp
