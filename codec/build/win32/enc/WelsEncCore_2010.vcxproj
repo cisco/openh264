@@ -227,17 +227,8 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\common\cpu.cpp" />
     <ClCompile Include="..\..\..\encoder\core\src\au_set.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <ClCompile Include="..\..\..\encoder\core\src\cpu.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -504,12 +495,13 @@
     <ClCompile Include="..\..\..\encoder\core\src\wels_preprocess.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\common\cpu.h" />
+    <ClInclude Include="..\..\..\common\cpu_core.h" />
+    <ClInclude Include="..\..\..\common\typedefs.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\array_stack_align.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\as264_common.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\au_set.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\bit_stream.h" />
-    <ClInclude Include="..\..\..\encoder\core\inc\cpu.h" />
-    <ClInclude Include="..\..\..\encoder\core\inc\cpu_core.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\deblocking.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\decode_mb_aux.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\dq_map.h" />
@@ -554,7 +546,6 @@
     <ClInclude Include="..\..\..\encoder\core\inc\svc_motion_estimate.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\svc_set_mb_syn_cavlc.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\trace.h" />
-    <ClInclude Include="..\..\..\encoder\core\inc\typedefs.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\utils.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\vlc_encoder.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\wels_common_basis.h" />
