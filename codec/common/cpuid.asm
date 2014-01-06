@@ -63,13 +63,10 @@ ALIGN 16
 WelsCPUIdVerify:
     push    r1
     PUSHRFLAGS
-    PUSHRFLAGS
-
     pop      r1
     mov      eax, r1d
     xor      eax, 00200000h
     xor      eax, r1d
-    POPRFLAGS
     pop      r1
     ret
 
