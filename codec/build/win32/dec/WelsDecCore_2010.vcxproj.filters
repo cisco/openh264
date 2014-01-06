@@ -7,9 +7,6 @@
     <ClCompile Include="..\..\..\decoder\core\src\bit_stream.cpp">
       <Filter>sources</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\decoder\core\src\cpu.cpp">
-      <Filter>sources</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\decoder\core\src\deblocking.cpp">
       <Filter>sources</Filter>
     </ClCompile>
@@ -67,6 +64,9 @@
     <ClCompile Include="..\..\..\common\logging.cpp">
       <Filter>sources</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\common\cpu.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\decoder\core\inc\as264_common.h">
@@ -79,12 +79,6 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\decoder\core\inc\bit_stream.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\decoder\core\inc\cpu.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\decoder\core\inc\cpu_core.h">
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\decoder\core\inc\deblocking.h">
@@ -174,9 +168,6 @@
     <ClInclude Include="..\..\..\decoder\core\inc\slice.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\decoder\core\inc\typedefs.h">
-      <Filter>headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\decoder\core\inc\utils.h">
       <Filter>headers</Filter>
     </ClInclude>
@@ -187,6 +178,15 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\common\logging.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\cpu.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\cpu_core.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\typedefs.h">
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>
