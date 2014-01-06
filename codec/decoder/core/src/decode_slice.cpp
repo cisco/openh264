@@ -247,27 +247,17 @@ int32_t WelsMbIntraPredictionConstruction (PWelsDecoderContext pCtx, PDqLayer pC
 //seems IPCM should not enter this path
   int32_t iMbXy = pCurLayer->iMbXyIndex;
 
-  FORCE_STACK_ALIGN_1D (int16_t, pTempScaledTCoeff, MB_COEFF_LIST_SIZE, 16);
-
-  memcpy (pTempScaledTCoeff, pCurLayer->pScaledTCoeff[iMbXy], 384 * sizeof (pCurLayer->pScaledTCoeff[iMbXy][0]));
-
   WelsFillRecNeededMbInfo (pCtx, bOutput, pCurLayer);
 
   if (IS_INTRA16x16 (pCurLayer->pMbType[iMbXy])) {
-    int32_t i, j;
-    // really need?
-    for (i = 0; i < 16; i++) {
-      j = g_kuiLumaDcZigzagScan[i];
-      pTempScaledTCoeff[j] = pCurLayer->pScaledTCoeff[iMbXy][j];
-    }
-    WelsLumaDcDequantIdct (pTempScaledTCoeff, pCurLayer->pLumaQp[iMbXy]);
-    RecI16x16Mb (iMbXy, pCtx, pTempScaledTCoeff, pCurLayer);
+    WelsLumaDcDequantIdct (pCurLayer->pScaledTCoeff[iMbXy], pCurLayer->pLumaQp[iMbXy]);
+    RecI16x16Mb (iMbXy, pCtx, pCurLayer->pScaledTCoeff[iMbXy], pCurLayer);
 
     return 0;
   }
 
   if (IS_INTRA4x4 (pCurLayer->pMbType[iMbXy]))
-    RecI4x4Mb (iMbXy, pCtx, pTempScaledTCoeff, pCurLayer);
+    RecI4x4Mb (iMbXy, pCtx, pCurLayer->pScaledTCoeff[iMbXy], pCurLayer);
 
   return 0;
 }

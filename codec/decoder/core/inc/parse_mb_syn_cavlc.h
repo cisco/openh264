@@ -143,7 +143,6 @@ void_t WelsFillCacheConstrain1Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZe
 void_t WelsFillCacheInter (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
                            int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30], PDqLayer pCurLayer);
 
-void_t PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]);
 
 /*!
  * \brief   check iPredMode for intra16x16 eligible or not

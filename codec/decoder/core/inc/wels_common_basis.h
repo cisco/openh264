@@ -155,14 +155,6 @@ SI_SLICE = 4,
 UNKNOWN_SLICE = 5
 } ESliceType;
 
-/* Slice Types in scalable extension */
-typedef uint8_t		SliceTypeExt;
-enum {
-EP_SLICE = 0,	// EP_SLICE: 0, 5
-EB_SLICE = 1,	// EB_SLICE: 1, 6
-EI_SLICE = 2	// EI_SLICE: 2, 7
-};
-
 /* List Index */
 typedef uint8_t		ListIndex;
 enum {

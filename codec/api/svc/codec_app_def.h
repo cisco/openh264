@@ -91,10 +91,9 @@ typedef enum {
   ENCODER_OPTION_CURRENT_PATH
 } ENCODER_OPTION;
 
-/* Option types introduced in SVC decoder application */
+/* Option types introduced in decoder application */
 typedef enum {
   DECODER_OPTION_DATAFORMAT = 0,	/* Set color space of decoding output frame */
-  DECODER_OPTION_TRUNCATED_MODE,	/* Used in decoding bitstream of non integrated frame, only truncated working mode is supported by tune, so skip it */
   DECODER_OPTION_END_OF_STREAM,	/* Indicate bitstream of the final frame to be decoded */
   DECODER_OPTION_VCL_NAL,        //feedback whether or not have VCL NAL in current AU for application layer
   DECODER_OPTION_TEMPORAL_ID,      //feedback temporal id for application layer
