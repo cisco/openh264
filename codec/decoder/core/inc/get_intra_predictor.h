@@ -98,7 +98,7 @@ void_t WelsDecoderIChromaPredV_mmx (uint8_t* pPred, const int32_t kiStride);
 void_t WelsDecoderIChromaPredDcLeft_mmx (uint8_t* pPred, const int32_t kiStride);
 void_t WelsDecoderIChromaPredDcNA_mmx (uint8_t* pPred, const int32_t kiStride);
 
-void_t WelsI4x4LumaPredH_sse2 (uint8_t* pPred, const int32_t kiStride);
+
 void_t WelsI4x4LumaPredDc_sse2 (uint8_t* pPred, const int32_t kiStride);
 void_t WelsDecoderI4x4LumaPredDDR_mmx (uint8_t* pPred, const int32_t kiStride);
 void_t WelsDecoderI4x4LumaPredHD_mmx (uint8_t* pPred, const int32_t kiStride);

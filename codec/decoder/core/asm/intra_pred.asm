@@ -568,67 +568,6 @@ WelsDecoderI4x4LumaPredDDR_mmx:
 	WELSEMMS
 	ret
 
-ALIGN 16
-;*******************************************************************************
-;	0 |1 |2 |3 |4 |
-;	5 |6 |7 |8 |9 |
-;	10|11|12|13|14|
-;	15|16|17|18|19|
-;	20|21|22|23|24|
-;	6 is the start pixel of current 4x4 block
-;	pPred[6] = ([1]+[2]+[3]+[4]+[5]+[10]+[15]+[20]+4)/8
-;
-;   void_t __cdecl WelsI4x4LumaPredDc_sse2(uint8_t *pPred, const int32_t kiStride)
-;
-;*******************************************************************************
-WelsI4x4LumaPredDc_sse2:
-	push r3
-	push r4
-	%assign push_num 2
-	LOAD_2_PARA
-	%ifndef X86_32
-	movsx r1, r1d
-	%endif
-	mov r4, r0
-	;mov         eax,[esp+4]			;pPred
-	;mov			ecx,[esp+8]			;kiStride
-	;push		ebx
-
-	movzx		r2,	byte [r0-1h]
-
-	sub			r0,	r1
-	movd		xmm0,	[r0]
-	pxor		xmm1,	xmm1
-	psadbw		xmm0,	xmm1
-
-	movd		r3d,	xmm0
-	add			r3,	r2
-
-	movzx		r2,	byte [r0+r1*2-1h]
-	add			r3,	r2
-
-	lea			r0,	[r0+r1*2-1]
-	movzx		r2,	byte [r0+r1]
-	add			r3,	r2
-
-	movzx		r2,	byte [r0+r1*2]
-	add			r3,	r2
-	add			r3,	4
-	sar			r3,	3
-	imul		r3,	0x01010101
-
-	;mov			edx,	[esp+8]			;pPred
-	mov			r0, r4
-	mov         [r0],       r3d
-	mov         [r0+r1],   r3d
-	mov         [r0+2*r1], r3d
-	lea         r0, [r0+2*r1]
-	mov         [r0+r1],   r3d
-
-	;pop ebx
-	pop r4
-	pop r3
-	ret
 
 ALIGN 16
 ;*******************************************************************************
