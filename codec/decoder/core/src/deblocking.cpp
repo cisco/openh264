@@ -800,7 +800,7 @@ void_t DeblockChromaEq4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, i
 }
 
 #ifdef X86_ASM
-extern "C" {
+
   void DeblockLumaLt4H_sse2 (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTc) {
     FORCE_STACK_ALIGN_1D (uint8_t,  uiBuf,   16 * 8, 16);
 
@@ -817,7 +817,7 @@ extern "C" {
     DeblockLumaTransposeV2H_sse2 (pPixY - 4, iStride, &uiBuf[0]);
   }
 
-}
+
 
 #endif
 /*!

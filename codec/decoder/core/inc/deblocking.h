@@ -111,8 +111,6 @@ void DeblockLumaLt4V_sse2 (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int3
 void DeblockLumaEq4V_sse2 (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta);
 void DeblockLumaTransposeH2V_sse2 (uint8_t* pPixY, int32_t iStride, uint8_t* pDst);
 void DeblockLumaTransposeV2H_sse2 (uint8_t* pPixY, int32_t iStride, uint8_t* pSrc);
-void DeblockLumaLt4H_sse2 (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTc);
-void DeblockLumaEq4H_sse2 (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta);
 void DeblockChromaEq4V_sse2 (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
 void DeblockChromaLt4V_sse2 (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
                              int8_t* pTC);
