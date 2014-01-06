@@ -498,7 +498,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 #ifdef PACKING_ONE_SLICE_PER_LAYER
   pSmt->pCountBsSizeInPartition	= (uint32_t*)pMa->WelsMalloc (sizeof (uint32_t) * iThreadNum, "pCountBsSizeInPartition");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pCountBsSizeInPartition), FreeMemorySvc (ppCtx))
-#endif//PACKING_ONE_SLICE_PER_LAYER	
+#endif//PACKING_ONE_SLICE_PER_LAYER
 
   WelsMutexInit (&pSmt->mutexSliceNumUpdate);
 
@@ -592,7 +592,7 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
     ename[used_len] = '\0';
     WelsEventClose (pSmt->pFinUpdateMbListEvent[iIdx], ename);
 #endif//DYNAMIC_SLICE_ASSIGN && TRY_SLICING_BALANCE
-#endif//_WIN32		
+#endif//_WIN32
 
     ++ iIdx;
   }
@@ -930,7 +930,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
   pEventsList[iEventCount++]	= pEncPEncCtx->pSliceThreading->pExitEncodeEvent[iEventIdx];
 #if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
   pEventsList[iEventCount++] = pEncPEncCtx->pSliceThreading->pUpdateMbListEvent[iEventIdx];
-#endif//#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)	
+#endif//#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 #endif//_WIN32
 
   do {
@@ -945,7 +945,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
              iEventIdx, (void*) (pEncPEncCtx->pReadySliceCodingEvent[iEventIdx]), (void*)pEncPEncCtx);
 #endif
     iWaitRet = WelsEventWait (pEncPEncCtx->pSliceThreading->pReadySliceCodingEvent[iEventIdx]);
-#endif//WIN32		
+#endif//WIN32
     if (WELS_THREAD_ERROR_WAIT_OBJECT_0 == iWaitRet) {	// start pSlice coding signal waited
       SLayerBSInfo* pLbi = pPrivateData->pLayerBs;
       const int32_t kiCurDid			= pEncPEncCtx->uiDependencyId;
@@ -1052,7 +1052,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
                  eNalRefIdc,
                  iSliceSize
                 );
-#endif//SLICE_INFO_OUTPUT				
+#endif//SLICE_INFO_OUTPUT
 
 #if MT_DEBUG_BS_WR
         pSliceBs->bSliceCodedFlag	= TRUE;
@@ -1063,7 +1063,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
           &pEncPEncCtx->pSliceThreading->pSliceCodedEvent[iEventIdx]);	// mean finished coding current pSlice
 #else
         WelsEventSignal (pEncPEncCtx->pSliceThreading->pSliceCodedEvent[iEventIdx]);	// mean finished coding current pSlice
-#endif//WIN32				
+#endif//WIN32
       } else {	// for SM_DYN_SLICE parallelization
 #ifdef PACKING_ONE_SLICE_PER_LAYER
         SLayerBSInfo* pLbiPacking			= NULL;
@@ -1158,7 +1158,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
                    eNalRefIdc,
                    iSliceSize
                   );
-#endif//SLICE_INFO_OUTPUT					
+#endif//SLICE_INFO_OUTPUT
 
 #if defined(ENABLE_TRACE_MT)
           WelsLog (pEncPEncCtx, WELS_LOG_INFO,
@@ -1196,7 +1196,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         &pEncPEncCtx->pSliceThreading->pFinUpdateMbListEvent[iEventIdx]);	// mean finished update pMb list for this pSlice
     }
 #endif//#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
-#endif//WIN32		
+#endif//WIN32
     else { // WELS_THREAD_ERROR_WAIT_TIMEOUT, or WELS_THREAD_ERROR_WAIT_FAILED
       WelsLog (pEncPEncCtx, WELS_LOG_WARNING,
                "[MT] CodingSliceThreadProc(), waiting pReadySliceCodingEvent[%d] failed(%d) and thread%d terminated!\n", iEventIdx,

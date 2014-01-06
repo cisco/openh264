@@ -664,7 +664,7 @@ void_t InitMcFunc (SMcFunc* pMcFunc, int32_t iCpu) {
     pMcFunc->pMcLumaFunc   = McLuma_sse2;
     pMcFunc->pMcChromaFunc = McChroma_sse2;
   }
-#endif //(X86_ASM)	
+#endif //(X86_ASM)
 }
 
 } // namespace WelsDec
