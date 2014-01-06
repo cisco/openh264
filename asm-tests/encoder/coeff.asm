@@ -453,7 +453,14 @@ CavlcParamCal_sse2:
     mov      ecx,   [esp+20] ;run
 	movdqa   [ecx], xmm1
 ;getRunEnd
+	pop esi
+	pop edi
+	pop ebx
+	ret
 .return:
+	mov edx, [esp + 28]
+	xor eax, eax
+	mov  [edx], eax
 	pop esi
 	pop edi
 	pop ebx
@@ -588,10 +595,14 @@ CavlcParamCal_sse2:
     ;mov      ecx,   [esp+20] ;run
 	movdqa   [rsi], xmm1
 ;getRunEnd
-.return:
 	pop rbp
 	pop rbx
 	ret
+.return:
+	xor rax, rax
+	mov [rcx], eax
+	pop rbp
+	pop rbx
 %else ; WIN64
 	push	rbx
 	push	rbp
@@ -722,8 +733,12 @@ CavlcParamCal_sse2:
         mov   rdx, [rsp + 16 + 16] ; load rdx from stack
 	movdqa   [rdx], xmm1
 ;getRunEnd
-.return:
 	pop rbp
 	pop rbx
 	ret
+.return:
+	xor rax, rax
+	mov [r9], eax
+	pop rbp
+	pop rbx
 %endif
