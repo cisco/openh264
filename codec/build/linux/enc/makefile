@@ -219,7 +219,7 @@ lib:   	$(OBJENC)
 	@echo
 
 
-dylib:   $(OBJDEC)
+dylib:   $(OBJENC)
 	@echo '$(OBJENC)'
 	@echo
 	@echo '$(GCC) -shared -Wl,-Bsymbolic  -o $(SHAREDLIB) $(OBJENC) $(LIBS)'

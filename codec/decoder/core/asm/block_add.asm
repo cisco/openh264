@@ -42,27 +42,6 @@
 
 %include  "asm_inc.asm"
 
-BITS 32
-
-;*******************************************************************************
-; Data
-;*******************************************************************************
-
-%ifdef FORMAT_COFF
-SECTION .rodata data
-%else
-SECTION .rodata align=16
-%endif
-
-ALIGN  16
-SubMbScanIdx:
-     dd    0x0,  0x1,  0x4,  0x5,
-	 dd    0x2,  0x3,  0x6,  0x7,
-	 dd    0x8,  0x9,  0xc,  0xd,
-	 dd    0xa,  0xb,  0xe,  0xf,
-	 dd    0x10, 0x11, 0x14, 0x15,
-	 dd    0x12, 0x13, 0x16, 0x17,
-
 ;*******************************************************************************
 ; Code
 ;*******************************************************************************
@@ -77,71 +56,77 @@ ALIGN    16
 ;  void_t WelsResBlockZero16x16_sse2(int16_t* pBlock,int32_t iStride)
 ;*******************************************************************************
 WelsResBlockZero16x16_sse2:
-    push     esi
-
-	mov      esi,        [esp+08h]
-	mov      ecx,        [esp+0ch]
-	lea      ecx,        [ecx*2]
-	lea      eax,        [ecx*3]
+        ;push     r0
+        %assign push_num 0
+        LOAD_2_PARA
+		%ifndef X86_32
+		movsx r1, r1d
+		%endif
+	;mov      r0,        [esp+08h]
+	;mov      r1,        [esp+0ch]
+	;lea      r1,        [r1*2]
+        lea 	r1, 	[r1*2]
+	;lea      r2,        [r1*3]
+        lea 	r2,	[r1*3]
 
 	pxor     xmm7,       xmm7
 
     ; four  lines
-	movdqa   [esi],      xmm7
-	movdqa   [esi+10h],  xmm7
+	movdqa   [r0],      xmm7
+	movdqa   [r0+10h],  xmm7
 
-	movdqa   [esi+ecx],  xmm7
-	movdqa   [esi+ecx+10h],     xmm7
+	movdqa   [r0+r1],  xmm7
+	movdqa   [r0+r1+10h],     xmm7
 
-    movdqa   [esi+ecx*2],   xmm7
-	movdqa   [esi+ecx*2+10h],   xmm7
+    movdqa   [r0+r1*2],   xmm7
+	movdqa   [r0+r1*2+10h],   xmm7
 
-	movdqa   [esi+eax],     xmm7
-	movdqa   [esi+eax+10h],     xmm7
+	movdqa   [r0+r2],     xmm7
+	movdqa   [r0+r2+10h],     xmm7
 
     ;  four lines
-	lea      esi,       [esi+ecx*4]
-	movdqa   [esi],      xmm7
-	movdqa   [esi+10h],  xmm7
+	lea      r0,       [r0+r1*4]
+	movdqa   [r0],      xmm7
+	movdqa   [r0+10h],  xmm7
 
-	movdqa   [esi+ecx],  xmm7
-	movdqa   [esi+ecx+10h],     xmm7
+	movdqa   [r0+r1],  xmm7
+	movdqa   [r0+r1+10h],     xmm7
 
-    movdqa   [esi+ecx*2],   xmm7
-	movdqa   [esi+ecx*2+10h],   xmm7
+    movdqa   [r0+r1*2],   xmm7
+	movdqa   [r0+r1*2+10h],   xmm7
 
-	movdqa   [esi+eax],     xmm7
-	movdqa   [esi+eax+10h],     xmm7
-
-	;  four lines
-	lea      esi,       [esi+ecx*4]
-	movdqa   [esi],      xmm7
-	movdqa   [esi+10h],  xmm7
-
-	movdqa   [esi+ecx],  xmm7
-	movdqa   [esi+ecx+10h],     xmm7
-
-    movdqa   [esi+ecx*2],   xmm7
-	movdqa   [esi+ecx*2+10h],   xmm7
-
-	movdqa   [esi+eax],     xmm7
-	movdqa   [esi+eax+10h],     xmm7
+	movdqa   [r0+r2],     xmm7
+	movdqa   [r0+r2+10h],     xmm7
 
 	;  four lines
-	lea      esi,       [esi+ecx*4]
-	movdqa   [esi],      xmm7
-	movdqa   [esi+10h],  xmm7
+	lea      r0,       [r0+r1*4]
+	movdqa   [r0],      xmm7
+	movdqa   [r0+10h],  xmm7
 
-	movdqa   [esi+ecx],  xmm7
-	movdqa   [esi+ecx+10h],     xmm7
+	movdqa   [r0+r1],  xmm7
+	movdqa   [r0+r1+10h],     xmm7
 
-    movdqa   [esi+ecx*2],   xmm7
-	movdqa   [esi+ecx*2+10h],   xmm7
+    movdqa   [r0+r1*2],   xmm7
+	movdqa   [r0+r1*2+10h],   xmm7
 
-	movdqa   [esi+eax],     xmm7
-	movdqa   [esi+eax+10h],     xmm7
+	movdqa   [r0+r2],     xmm7
+	movdqa   [r0+r2+10h],     xmm7
 
-    pop      esi
+	;  four lines
+	lea      r0,       [r0+r1*4]
+	movdqa   [r0],      xmm7
+	movdqa   [r0+10h],  xmm7
+
+	movdqa   [r0+r1],  xmm7
+	movdqa   [r0+r1+10h],     xmm7
+
+    movdqa   [r0+r1*2],   xmm7
+	movdqa   [r0+r1*2+10h],   xmm7
+
+	movdqa   [r0+r2],     xmm7
+	movdqa   [r0+r2+10h],     xmm7
+
+    ;pop      r0
 	ret
 
 
@@ -152,27 +137,31 @@ ALIGN    16
 ;  void_t WelsResBlockZero8x8_sse2(int16_t * pBlock, int32_t iStride)
 ;*******************************************************************************
 WelsResBlockZero8x8_sse2:
-	  push      esi
-
-      mov       esi,     [esp+08h]
-	  mov       ecx,     [esp+0ch]
-	  lea       ecx,     [ecx*2]
-	  lea       eax,     [ecx*3]
+	  ;push      r0
+	  %assign push_num 0
+          LOAD_2_PARA
+		  %ifndef X86_32
+		  movsx r1, r1d
+		  %endif
+      	  ;mov       r0,     [esp+08h]
+	  ;mov       r1,     [esp+0ch]
+	  lea       r1,     [r1*2]
+	  lea       r2,     [r1*3]
 
 	  pxor      xmm7,          xmm7
 
-	  movdqa    [esi],         xmm7
-	  movdqa    [esi+ecx],     xmm7
-	  movdqa    [esi+ecx*2],   xmm7
-	  movdqa    [esi+eax],     xmm7
+	  movdqa    [r0],         xmm7
+	  movdqa    [r0+r1],     xmm7
+	  movdqa    [r0+r1*2],   xmm7
+	  movdqa    [r0+r2],     xmm7
 
-	  lea       esi,     [esi+ecx*4]
-	  movdqa    [esi],         xmm7
-	  movdqa    [esi+ecx],     xmm7
-	  movdqa    [esi+ecx*2],   xmm7
-	  movdqa    [esi+eax],     xmm7
+	  lea       r0,     [r0+r1*4]
+	  movdqa    [r0],         xmm7
+	  movdqa    [r0+r1],     xmm7
+	  movdqa    [r0+r1*2],   xmm7
+	  movdqa    [r0+r2],     xmm7
 
 
-	  pop       esi
+	  ;pop       r0
 	  ret
 

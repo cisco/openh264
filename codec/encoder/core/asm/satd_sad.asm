@@ -50,9 +50,6 @@
 
 %include "asm_inc.asm"
 
-BITS 32
-
-
 ;***********************************************************************
 ; Data
 ;***********************************************************************
@@ -126,26 +123,26 @@ SECTION .text
 %endmacro
 
 %macro SSE2_GetSatd8x8 0
-	SSE2_LoadDiff8P    xmm0,xmm4,xmm7,[eax],[ecx]
-	SSE2_LoadDiff8P    xmm1,xmm5,xmm7,[eax+ebx],[ecx+edx]
-	lea                 eax, [eax+2*ebx]
-	lea                 ecx, [ecx+2*edx]
-	SSE2_LoadDiff8P    xmm2,xmm4,xmm7,[eax],[ecx]
-	SSE2_LoadDiff8P    xmm3,xmm5,xmm7,[eax+ebx],[ecx+edx]
+	SSE2_LoadDiff8P    xmm0,xmm4,xmm7,[r0],[r2]
+	SSE2_LoadDiff8P    xmm1,xmm5,xmm7,[r0+r1],[r2+r3]
+	lea                 r0, [r0+2*r1]
+	lea                 r2, [r2+2*r3]
+	SSE2_LoadDiff8P    xmm2,xmm4,xmm7,[r0],[r2]
+	SSE2_LoadDiff8P    xmm3,xmm5,xmm7,[r0+r1],[r2+r3]
 
 	SSE2_HDMTwo4x4       xmm0,xmm1,xmm2,xmm3,xmm4
 	SSE2_TransTwo4x4W     xmm3,xmm1,xmm0,xmm2,xmm4
 	SSE2_HDMTwo4x4       xmm3,xmm1,xmm2,xmm4,xmm5
 	SSE2_SumAbs4         xmm4,xmm1,xmm0,xmm2,xmm3,xmm5,xmm6
 
-	lea					eax,    [eax+2*ebx]
-    lea					ecx,    [ecx+2*edx]
-	SSE2_LoadDiff8P    xmm0,xmm4,xmm7,[eax],[ecx]
-	SSE2_LoadDiff8P    xmm1,xmm5,xmm7,[eax+ebx],[ecx+edx]
-	lea                 eax, [eax+2*ebx]
-	lea                 ecx, [ecx+2*edx]
-	SSE2_LoadDiff8P    xmm2,xmm4,xmm7,[eax],[ecx]
-	SSE2_LoadDiff8P    xmm3,xmm5,xmm7,[eax+ebx],[ecx+edx]
+	lea					r0,    [r0+2*r1]
+    lea					r2,    [r2+2*r3]
+	SSE2_LoadDiff8P    xmm0,xmm4,xmm7,[r0],[r2]
+	SSE2_LoadDiff8P    xmm1,xmm5,xmm7,[r0+r1],[r2+r3]
+	lea                 r0, [r0+2*r1]
+	lea                 r2, [r2+2*r3]
+	SSE2_LoadDiff8P    xmm2,xmm4,xmm7,[r0],[r2]
+	SSE2_LoadDiff8P    xmm3,xmm5,xmm7,[r0+r1],[r2+r3]
 
 	SSE2_HDMTwo4x4       xmm0,xmm1,xmm2,xmm3,xmm4
 	SSE2_TransTwo4x4W     xmm3,xmm1,xmm0,xmm2,xmm4
@@ -161,25 +158,29 @@ SECTION .text
 WELS_EXTERN WelsSampleSatd4x4_sse2
 align 16
 WelsSampleSatd4x4_sse2:
-	push      ebx
-	mov       eax,  [esp+8]
-	mov       ebx,  [esp+12]
-	mov       ecx,  [esp+16]
-	mov       edx,  [esp+20]
-
-    movd      xmm0, [eax]
-    movd      xmm1, [eax+ebx]
-    lea       eax , [eax+2*ebx]
-    movd      xmm2, [eax]
-    movd      xmm3, [eax+ebx]
+	;push      ebx
+	;mov       eax,  [esp+8]
+	;mov       ebx,  [esp+12]
+	;mov       ecx,  [esp+16]
+	;mov       edx,  [esp+20]
+	
+	%assign  push_num 0
+	LOAD_4_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d
+    movd      xmm0, [r0]
+    movd      xmm1, [r0+r1]
+    lea       r0 , [r0+2*r1]
+    movd      xmm2, [r0]
+    movd      xmm3, [r0+r1]
     punpckldq xmm0, xmm2
     punpckldq xmm1, xmm3
 
-    movd      xmm4, [ecx]
-    movd      xmm5, [ecx+edx]
-    lea       ecx , [ecx+2*edx]
-    movd      xmm6, [ecx]
-    movd      xmm7, [ecx+edx]
+    movd      xmm4, [r2]
+    movd      xmm5, [r2+r3]
+    lea       r2 , [r2+2*r3]
+    movd      xmm6, [r2]
+    movd      xmm7, [r2+r3]
     punpckldq xmm4, xmm6
     punpckldq xmm5, xmm7
 
@@ -223,10 +224,10 @@ WelsSampleSatd4x4_sse2:
 	WELS_AbsW  xmm2, xmm4
     paddusw        xmm6, xmm2
     SSE2_SumWHorizon1  xmm6, xmm4
-	movd           eax,  xmm6
-    and            eax,  0xffff
-    shr            eax,  1
-	pop            ebx
+	movd           retrd,  xmm6
+    and            retrd,  0xffff
+    shr            retrd,  1
+	LOAD_4_PARA_POP
 	ret
 
  ;***********************************************************************
@@ -237,19 +238,24 @@ WelsSampleSatd4x4_sse2:
  WELS_EXTERN WelsSampleSatd8x8_sse2
 align 16
  WelsSampleSatd8x8_sse2:
-	 push   ebx
-	 mov    eax,    [esp+8]
-	 mov    ebx,    [esp+12]
-	 mov    ecx,    [esp+16]
-	 mov    edx,    [esp+20]
-	 pxor   xmm6,   xmm6
-     pxor   xmm7,   xmm7
-     SSE2_GetSatd8x8
-     psrlw   xmm6,  1
-	 SSE2_SumWHorizon   xmm6,xmm4,xmm7
-	 movd    eax,   xmm6
-	 pop     ebx
-	 ret
+	 ;push   ebx
+	 ;mov    eax,    [esp+8]
+	 ;mov    ebx,    [esp+12]
+	 ;mov    ecx,    [esp+16]
+	 ;mov    edx,    [esp+20]
+	 
+	%assign  push_num 0
+	LOAD_4_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d	
+	pxor   xmm6,   xmm6
+    pxor   xmm7,   xmm7
+    SSE2_GetSatd8x8
+    psrlw   xmm6,  1
+	SSE2_SumWHorizon   xmm6,xmm4,xmm7
+	movd    retrd,   xmm6
+	LOAD_4_PARA_POP
+	ret
 
  ;***********************************************************************
  ;
@@ -259,23 +265,28 @@ align 16
  WELS_EXTERN WelsSampleSatd8x16_sse2
 align 16
  WelsSampleSatd8x16_sse2:
-	 push   ebx
-	 mov    eax,    [esp+8]
-	 mov    ebx,    [esp+12]
-	 mov    ecx,    [esp+16]
-	 mov    edx,    [esp+20]
+	 ;push   ebx
+	 ;mov    eax,    [esp+8]
+	 ;mov    ebx,    [esp+12]
+	 ;mov    ecx,    [esp+16]
+	 ;mov    edx,    [esp+20]
+	 
+	 %assign  push_num 0
+	 LOAD_4_PARA
+	 SIGN_EXTENTION r1, r1d
+	 SIGN_EXTENTION r3, r3d	 
 	 pxor   xmm6,   xmm6
      pxor   xmm7,   xmm7
 
 	 SSE2_GetSatd8x8
-     lea    eax,    [eax+2*ebx]
-     lea    ecx,    [ecx+2*edx]
+     lea    r0,    [r0+2*r1]
+     lea    r2,    [r2+2*r3]
 	 SSE2_GetSatd8x8
 
 	 psrlw   xmm6,  1
 	 SSE2_SumWHorizon   xmm6,xmm4,xmm7
-	 movd    eax,   xmm6
-	 pop     ebx
+	 movd    retrd,   xmm6
+	 LOAD_4_PARA_POP
 	 ret
 
 ;***********************************************************************
@@ -286,25 +297,35 @@ align 16
 WELS_EXTERN WelsSampleSatd16x8_sse2
 align 16
 WelsSampleSatd16x8_sse2:
-	push   ebx
-	mov    eax,    [esp+8]
-	mov    ebx,    [esp+12]
-	mov    ecx,    [esp+16]
-	mov    edx,    [esp+20]
+	;push   ebx
+	;mov    eax,    [esp+8]
+	;mov    ebx,    [esp+12]
+	;mov    ecx,    [esp+16]
+	;mov    edx,    [esp+20]
+	
+	%assign  push_num 0
+	LOAD_4_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d	
+	push r0
+	push r2	
 	pxor   xmm6,   xmm6
     pxor   xmm7,   xmm7
 
 	SSE2_GetSatd8x8
-	mov    eax,    [esp+8]
-    mov    ecx,    [esp+16]
-    add    eax,    8
-    add    ecx,    8
+	
+	pop r2
+	pop r0
+	;mov    eax,    [esp+8]
+    ;mov    ecx,    [esp+16]
+    add    r0,    8
+    add    r2,    8
 	SSE2_GetSatd8x8
 
 	psrlw   xmm6,  1
 	SSE2_SumWHorizon   xmm6,xmm4,xmm7
-	movd    eax,   xmm6
-	pop     ebx
+	movd    retrd,   xmm6
+	LOAD_4_PARA_POP
 	ret
 
 ;***********************************************************************
@@ -315,34 +336,43 @@ WelsSampleSatd16x8_sse2:
 WELS_EXTERN WelsSampleSatd16x16_sse2
 align 16
 WelsSampleSatd16x16_sse2:
-	push   ebx
-	mov    eax,    [esp+8]
-	mov    ebx,    [esp+12]
-	mov    ecx,    [esp+16]
-	mov    edx,    [esp+20]
+	;push   ebx
+	;mov    eax,    [esp+8]
+	;mov    ebx,    [esp+12]
+	;mov    ecx,    [esp+16]
+	;mov    edx,    [esp+20]
+	
+	%assign  push_num 0
+	LOAD_4_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d
+	push r0
+	push r2	
 	pxor   xmm6,   xmm6
     pxor   xmm7,   xmm7
 
 	SSE2_GetSatd8x8
-	lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
 	SSE2_GetSatd8x8
 
-	mov    eax,    [esp+8]
-	mov    ecx,    [esp+16]
-	add    eax,    8
-	add    ecx,    8
+	pop r2
+	pop r0
+	;mov    eax,    [esp+8]
+	;mov    ecx,    [esp+16]
+	add    r0,    8
+	add    r2,    8
 
 	SSE2_GetSatd8x8
-	lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
 	SSE2_GetSatd8x8
 
  ; each column sum of SATD is necessarily even, so we don't lose any precision by shifting first.
     psrlw   xmm6,  1
 	SSE2_SumWHorizon   xmm6,xmm4,xmm7
-	movd    eax,   xmm6
-	pop     ebx
+	movd    retrd,   xmm6
+	LOAD_4_PARA_POP
 	ret
 
 ;***********************************************************************
@@ -485,6 +515,8 @@ WelsSampleSatd16x16_sse2:
 	paddd       %1, %3
 %endmacro
 
+
+%ifdef X86_32
 WELS_EXTERN WelsIntra16x16Combined3Satd_sse41
 WelsIntra16x16Combined3Satd_sse41:
 	push   ebx
@@ -911,7 +943,7 @@ return_sad_intra_16x16_x3:
 	pop    esi
 	pop    ebx
 	ret
-
+%endif
 ;***********************************************************************
 ;
 ;Pixel_sad_intra_ssse3 END
@@ -925,30 +957,30 @@ return_sad_intra_16x16_x3:
 
 ;SSE4.1
 %macro SSE41_GetSatd8x4 0
-	movq             xmm0, [eax]
+	movq             xmm0, [r0]
 	punpcklqdq       xmm0, xmm0
 	pmaddubsw        xmm0, xmm7
-	movq             xmm1, [eax+ebx]
+	movq             xmm1, [r0+r1]
 	punpcklqdq       xmm1, xmm1
 	pmaddubsw        xmm1, xmm7
-	movq             xmm2, [ecx]
+	movq             xmm2, [r2]
 	punpcklqdq       xmm2, xmm2
 	pmaddubsw        xmm2, xmm7
-	movq             xmm3, [ecx+edx]
+	movq             xmm3, [r2+r3]
 	punpcklqdq       xmm3, xmm3
 	pmaddubsw        xmm3, xmm7
 	psubsw           xmm0, xmm2
 	psubsw           xmm1, xmm3
-	movq             xmm2, [eax+2*ebx]
+	movq             xmm2, [r0+2*r1]
 	punpcklqdq       xmm2, xmm2
 	pmaddubsw        xmm2, xmm7
-	movq             xmm3, [eax+esi]
+	movq             xmm3, [r0+r4]
 	punpcklqdq       xmm3, xmm3
 	pmaddubsw        xmm3, xmm7
-	movq             xmm4, [ecx+2*edx]
+	movq             xmm4, [r2+2*r3]
 	punpcklqdq       xmm4, xmm4
 	pmaddubsw        xmm4, xmm7
-	movq             xmm5, [ecx+edi]
+	movq             xmm5, [r2+r5]
 	punpcklqdq       xmm5, xmm5
 	pmaddubsw        xmm5, xmm7
 	psubsw           xmm2, xmm4
@@ -990,25 +1022,30 @@ return_sad_intra_16x16_x3:
 ;***********************************************************************
 WELS_EXTERN WelsSampleSatd4x4_sse41
 WelsSampleSatd4x4_sse41:
-	push        ebx
-	mov         eax,[esp+8]
-	mov         ebx,[esp+12]
-	mov         ecx,[esp+16]
-	mov         edx,[esp+20]
+	;push        ebx
+	;mov         eax,[esp+8]
+	;mov         ebx,[esp+12]
+	;mov         ecx,[esp+16]
+	;mov         edx,[esp+20]
+	
+	%assign  push_num 0
+	LOAD_4_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d	
 	movdqa      xmm4,[HSwapSumSubDB1]
-	movd        xmm2,[ecx]
-	movd        xmm5,[ecx+edx]
+	movd        xmm2,[r2]
+	movd        xmm5,[r2+r3]
 	shufps      xmm2,xmm5,0
-	movd        xmm3,[ecx+edx*2]
-	lea         ecx, [edx*2+ecx]
-	movd        xmm5,[ecx+edx]
+	movd        xmm3,[r2+r3*2]
+	lea         r2, [r3*2+r2]
+	movd        xmm5,[r2+r3]
 	shufps      xmm3,xmm5,0
-	movd        xmm0,[eax]
-	movd        xmm5,[eax+ebx]
+	movd        xmm0,[r0]
+	movd        xmm5,[r0+r1]
 	shufps      xmm0,xmm5,0
-	movd        xmm1,[eax+ebx*2]
-	lea         eax, [ebx*2+eax]
-	movd        xmm5,[eax+ebx]
+	movd        xmm1,[r0+r1*2]
+	lea         r0, [r1*2+r0]
+	movd        xmm5,[r0+r1]
 	shufps      xmm1,xmm5,0
 	pmaddubsw   xmm0,xmm4
 	pmaddubsw   xmm1,xmm4
@@ -1033,8 +1070,8 @@ WelsSampleSatd4x4_sse41:
 	pabsw       xmm0,xmm0
 	pabsw       xmm2,xmm2
 	pmaxsw      xmm0,xmm2
-	SSSE3_SumWHorizon eax, xmm0, xmm5, xmm7
-	pop         ebx
+	SSSE3_SumWHorizon retrd, xmm0, xmm5, xmm7
+	LOAD_4_PARA_POP
 	ret
 
 ;***********************************************************************
@@ -1045,25 +1082,35 @@ WelsSampleSatd4x4_sse41:
 WELS_EXTERN WelsSampleSatd8x8_sse41
 align 16
 WelsSampleSatd8x8_sse41:
-	push   ebx
-	push   esi
-	push   edi
-	mov    eax,    [esp+16]
-	mov    ebx,    [esp+20]
-	mov    ecx,    [esp+24]
-	mov    edx,    [esp+28]
+	;push   ebx
+	;push   esi
+	;push   edi
+	;mov    eax,    [esp+16]
+	;mov    ebx,    [esp+20]
+	;mov    ecx,    [esp+24]
+	;mov    edx,    [esp+28]
+%ifdef X86_32	
+	push  r4
+	push  r5
+%endif	
+	%assign  push_num 2
+	LOAD_4_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d	
 	movdqa      xmm7, [HSumSubDB1]
-	lea         esi,  [ebx+ebx*2]
-	lea         edi,  [edx+edx*2]
+	lea         r4,  [r1+r1*2]
+	lea         r5,  [r3+r3*2]
 	pxor		xmm6, xmm6
 	SSE41_GetSatd8x4
-	lea			eax,	[eax+4*ebx]
-	lea			ecx,    [ecx+4*edx]
+	lea			r0,	 [r0+4*r1]
+	lea			r2,  [r2+4*r3]
 	SSE41_GetSatd8x4
-	SSSE3_SumWHorizon eax, xmm6, xmm5, xmm7
-	pop 		edi
-	pop 		esi
-	pop 		ebx
+	SSSE3_SumWHorizon retrd, xmm6, xmm5, xmm7
+	LOAD_4_PARA_POP
+%ifdef X86_32
+	pop  r5
+	pop  r4
+%endif
 	ret
 
 ;***********************************************************************
@@ -1074,32 +1121,43 @@ WelsSampleSatd8x8_sse41:
 WELS_EXTERN WelsSampleSatd8x16_sse41
 align 16
 WelsSampleSatd8x16_sse41:
-	push   ebx
-	push   esi
-	push   edi
-	push   ebp
-%define pushsize   16
-	mov    eax,    [esp+pushsize+4]
-	mov    ebx,    [esp+pushsize+8]
-	mov    ecx,    [esp+pushsize+12]
-	mov    edx,    [esp+pushsize+16]
+	;push   ebx
+	;push   esi
+	;push   edi
+	;push   ebp
+	;%define pushsize   16
+	;mov    eax,    [esp+pushsize+4]
+	;mov    ebx,    [esp+pushsize+8]
+	;mov    ecx,    [esp+pushsize+12]
+	;mov    edx,    [esp+pushsize+16]
+%ifdef X86_32	
+	push  r4
+	push  r5
+	push  r6
+%endif	
+	%assign  push_num 3
+	LOAD_4_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d	
 	movdqa      xmm7, [HSumSubDB1]
-	lea         esi,  [ebx+ebx*2]
-	lea         edi,  [edx+edx*2]
+	lea         r4,  [r1+r1*2]
+	lea         r5,  [r3+r3*2]
 	pxor        xmm6, xmm6
-	mov         ebp,    0
+	mov         r6,    0
 loop_get_satd_8x16:
 	SSE41_GetSatd8x4
-	lea			eax,  [eax+4*ebx]
-	lea			ecx,  [ecx+4*edx]
-	inc         ebp
-	cmp         ebp,  4
+	lea			r0,  [r0+4*r1]
+	lea			r2,  [r2+4*r3]
+	inc         r6
+	cmp         r6,  4
 	jl          loop_get_satd_8x16
-	SSSE3_SumWHorizon eax, xmm6, xmm5, xmm7
-	pop         ebp
-	pop 		edi
-	pop 		esi
-	pop 		ebx
+	SSSE3_SumWHorizon retrd, xmm6, xmm5, xmm7
+	LOAD_4_PARA_POP
+%ifdef X86_32
+	pop  r6
+	pop  r5
+	pop  r4
+%endif
 	ret
 
 ;***********************************************************************
@@ -1110,33 +1168,49 @@ loop_get_satd_8x16:
 WELS_EXTERN WelsSampleSatd16x8_sse41
 align 16
 WelsSampleSatd16x8_sse41:
-	push   ebx
-	push   esi
-	push   edi
-	mov    eax,    [esp+16]
-	mov    ebx,    [esp+20]
-	mov    ecx,    [esp+24]
-	mov    edx,    [esp+28]
+	;push   ebx
+	;push   esi
+	;push   edi
+	;mov    eax,    [esp+16]
+	;mov    ebx,    [esp+20]
+	;mov    ecx,    [esp+24]
+	;mov    edx,    [esp+28]
+%ifdef X86_32	
+	push  r4
+	push  r5
+%endif	
+	%assign  push_num 2
+	LOAD_4_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d	
+	push  r0
+	push  r2
+	
 	movdqa      xmm7, [HSumSubDB1]
-	lea         esi,  [ebx+ebx*2]
-	lea         edi,  [edx+edx*2]
+	lea         r4,  [r1+r1*2]
+	lea         r5,  [r3+r3*2]
 	pxor		xmm6,   xmm6
 	SSE41_GetSatd8x4
-	lea			eax,  [eax+4*ebx]
-	lea			ecx,  [ecx+4*edx]
+	lea			r0,  [r0+4*r1]
+	lea			r2,  [r2+4*r3]
 	SSE41_GetSatd8x4
-	mov			eax,    [esp+16]
-	mov			ecx,    [esp+24]
-	add			eax,    8
-	add			ecx,    8
+	
+	pop  r2
+	pop  r0
+	;mov			eax,    [esp+16]
+	;mov			ecx,    [esp+24]
+	add			r0,    8
+	add			r2,    8
 	SSE41_GetSatd8x4
-	lea			eax,    [eax+4*ebx]
-	lea			ecx,    [ecx+4*edx]
+	lea			r0,  [r0+4*r1]
+	lea			r2,  [r2+4*r3]
 	SSE41_GetSatd8x4
-	SSSE3_SumWHorizon eax, xmm6, xmm5, xmm7
-	pop 		edi
-	pop 		esi
-	pop 		ebx
+	SSSE3_SumWHorizon retrd, xmm6, xmm5, xmm7
+	LOAD_4_PARA_POP
+%ifdef X86_32
+	pop  r5
+	pop  r4
+%endif
 	ret
 
 ;***********************************************************************
@@ -1148,45 +1222,63 @@ WelsSampleSatd16x8_sse41:
 WELS_EXTERN WelsSampleSatd16x16_sse41
 align 16
 WelsSampleSatd16x16_sse41:
-	push   ebx
-	push   esi
-	push   edi
-	push   ebp
-	%define pushsize   16
-	mov    eax,    [esp+pushsize+4]
-	mov    ebx,    [esp+pushsize+8]
-	mov    ecx,    [esp+pushsize+12]
-	mov    edx,    [esp+pushsize+16]
+	;push   ebx
+	;push   esi
+	;push   edi
+	;push   ebp
+	;%define pushsize   16
+	;mov    eax,    [esp+pushsize+4]
+	;mov    ebx,    [esp+pushsize+8]
+	;mov    ecx,    [esp+pushsize+12]
+	;mov    edx,    [esp+pushsize+16]
+%ifdef X86_32	
+	push  r4
+	push  r5
+	push  r6
+%endif	
+	%assign  push_num 3
+	LOAD_4_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d
+	
+	push  r0
+	push  r2
+	
 	movdqa      xmm7, [HSumSubDB1]
-	lea         esi,  [ebx+ebx*2]
-	lea         edi,  [edx+edx*2]
+	lea         r4,  [r1+r1*2]
+	lea         r5,  [r3+r3*2]
 	pxor		xmm6,   xmm6
-	mov         ebp,    0
+	mov         r6,    0
 loop_get_satd_16x16_left:
 	SSE41_GetSatd8x4
-	lea			eax,  [eax+4*ebx]
-	lea			ecx,  [ecx+4*edx]
-	inc         ebp
-	cmp         ebp,  4
+	lea			r0,  [r0+4*r1]
+	lea			r2,  [r2+4*r3]
+	inc         r6
+	cmp         r6,  4
 	jl          loop_get_satd_16x16_left
-	mov			eax,    [esp+pushsize+4]
-	mov			ecx,    [esp+pushsize+12]
-	add			eax,    8
-	add			ecx,    8
-	mov         ebp,    0
+
+	pop  r2
+	pop  r0	
+	;mov			eax,    [esp+pushsize+4]
+	;mov			ecx,    [esp+pushsize+12]
+	add			r0,    8
+	add			r2,    8
+	mov         r6,    0
 loop_get_satd_16x16_right:
 	SSE41_GetSatd8x4
-	lea			eax,  [eax+4*ebx]
-	lea			ecx,  [ecx+4*edx]
-	inc         ebp
-	cmp         ebp,  4
+	lea			r0,  [r0+4*r1]
+	lea			r2,  [r2+4*r3]
+	inc         r6
+	cmp         r6,  4
 	jl          loop_get_satd_16x16_right
-	SSSE3_SumWHorizon eax, xmm6, xmm5, xmm7
-	%undef pushsize
-	pop         ebp
-	pop 		edi
-	pop 		esi
-	pop 		ebx
+	SSSE3_SumWHorizon retrd, xmm6, xmm5, xmm7
+	;%undef pushsize
+	LOAD_4_PARA_POP
+%ifdef X86_32
+	pop  r6
+	pop  r5
+	pop  r4
+%endif
 	ret
 
 ;***********************************************************************
@@ -1202,51 +1294,51 @@ loop_get_satd_16x16_right:
 ;***********************************************************************
 
 %macro SSE2_GetSad2x16 0
-	lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
-	movdqu xmm1,   [ecx]
-	MOVDQ  xmm2,   [eax];[eax] must aligned 16
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movdqu xmm1,   [r2]
+	MOVDQ  xmm2,   [r0];[eax] must aligned 16
 	psadbw xmm1,   xmm2
 	paddw  xmm0,   xmm1
-	movdqu xmm1,   [ecx+edx]
-	MOVDQ  xmm2,   [eax+ebx]
+	movdqu xmm1,   [r2+r3]
+	MOVDQ  xmm2,   [r0+r1]
 	psadbw xmm1,   xmm2
 	paddw  xmm0,   xmm1
 %endmacro
 
 
 %macro SSE2_GetSad4x16 0
-	movdqu xmm0,   [ecx]
-	MOVDQ  xmm2,   [eax]
+	movdqu xmm0,   [r2]
+	MOVDQ  xmm2,   [r0]
 	psadbw xmm0,   xmm2
 	paddw  xmm7,   xmm0
-	movdqu xmm1,   [ecx+edx]
-	MOVDQ  xmm2,   [eax+ebx]
+	movdqu xmm1,   [r2+r3]
+	MOVDQ  xmm2,   [r0+r1]
 	psadbw xmm1,   xmm2
 	paddw  xmm7,   xmm1
-	movdqu xmm1,   [ecx+2*edx]
-	MOVDQ  xmm2,   [eax+2*ebx];[eax] must aligned 16
+	movdqu xmm1,   [r2+2*r3]
+	MOVDQ  xmm2,   [r0+2*r1];[eax] must aligned 16
 	psadbw xmm1,   xmm2
 	paddw  xmm7,   xmm1
-	movdqu xmm1,   [ecx+edi]
-	MOVDQ  xmm2,   [eax+esi]
+	movdqu xmm1,   [r2+r5]
+	MOVDQ  xmm2,   [r0+r4]
 	psadbw xmm1,   xmm2
 	paddw  xmm7,   xmm1
 %endmacro
 
 
 %macro SSE2_GetSad8x4 0
-	movq   xmm0,   [eax]
-	movq   xmm1,   [eax+ebx]
-	lea    eax,    [eax+2*ebx]
-	movhps xmm0,   [eax]
-	movhps xmm1,   [eax+ebx]
+	movq   xmm0,   [r0]
+	movq   xmm1,   [r0+r1]
+	lea    r0,     [r0+2*r1]
+	movhps xmm0,   [r0]
+	movhps xmm1,   [r0+r1]
 
-	movq   xmm2,   [ecx]
-	movq   xmm3,   [ecx+edx]
-	lea    ecx,    [ecx+2*edx]
-	movhps xmm2,   [ecx]
-	movhps xmm3,   [ecx+edx]
+	movq   xmm2,   [r2]
+	movq   xmm3,   [r2+r3]
+	lea    r2,     [r2+2*r3]
+	movhps xmm2,   [r2]
+	movhps xmm3,   [r2+r3]
 	psadbw xmm0,   xmm2
 	psadbw xmm1,   xmm3
 	paddw  xmm6,   xmm0
@@ -1263,39 +1355,45 @@ loop_get_satd_16x16_right:
 WELS_EXTERN WelsSampleSad16x16_sse2
 align 16
 WelsSampleSad16x16_sse2:
-	push ebx
-	push edi
-	push esi
+	;push ebx
+	;push edi
+	;push esi
+	;%define _STACK_SIZE		12
+	;mov eax, [esp+_STACK_SIZE+4 ]
+	;mov	ebx, [esp+_STACK_SIZE+8 ]	
+	;mov ecx, [esp+_STACK_SIZE+12]
+	;mov edx, [esp+_STACK_SIZE+16]
+%ifdef X86_32
+	push  r4
+	push  r5
+%endif	
 
-	%define _STACK_SIZE		12
-
-	mov eax, [esp+_STACK_SIZE+4 ]
-	mov	ebx, [esp+_STACK_SIZE+8 ]
-	lea esi, [3*ebx]
-	mov ecx, [esp+_STACK_SIZE+12]
-	mov edx, [esp+_STACK_SIZE+16]
-	lea edi, [3*edx]
+	%assign  push_num 2
+	LOAD_4_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d
+	lea r4, [3*r1]
+	lea r5, [3*r3]
 
 	pxor   xmm7,   xmm7
 	SSE2_GetSad4x16
-	lea   eax,    [eax+4*ebx]
-	lea   ecx,    [ecx+4*edx]
+	lea	   r0,  [r0+4*r1]
+	lea	   r2,  [r2+4*r3]
 	SSE2_GetSad4x16
-	lea   eax,    [eax+4*ebx]
-	lea   ecx,    [ecx+4*edx]
+	lea	   r0,  [r0+4*r1]
+	lea	   r2,  [r2+4*r3]
 	SSE2_GetSad4x16
-	lea   eax,    [eax+4*ebx]
-	lea   ecx,    [ecx+4*edx]
+	lea	   r0,  [r0+4*r1]
+	lea	   r2,  [r2+4*r3]
 	SSE2_GetSad4x16
 	movhlps xmm0, xmm7
 	paddw xmm0, xmm7
-	movd eax, xmm0
-
-	%undef _STACK_SIZE
-
-	pop esi
-	pop edi
-	pop ebx
+	movd retrd, xmm0
+	LOAD_4_PARA_POP
+%ifdef X86_32
+	pop  r5
+	pop  r4
+%endif
 	ret
 
 ;***********************************************************************
@@ -1308,16 +1406,21 @@ WelsSampleSad16x16_sse2:
 WELS_EXTERN WelsSampleSad16x8_sse2
 align 16
 WelsSampleSad16x8_sse2:
-	push   ebx
-	mov    eax,    [esp+8]
-	mov    ebx,    [esp+12]
-	mov    ecx,    [esp+16]
-	mov    edx,    [esp+20]
-	movdqu xmm0,   [ecx]
-	MOVDQ  xmm2,   [eax]
+	;push   ebx
+	;mov    eax,    [esp+8]
+	;mov    ebx,    [esp+12]
+	;mov    ecx,    [esp+16]
+	;mov    edx,    [esp+20]
+	
+	%assign  push_num 0
+	LOAD_4_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d	
+	movdqu xmm0,   [r2]
+	MOVDQ  xmm2,   [r0]
 	psadbw xmm0,   xmm2
-	movdqu xmm1,   [ecx+edx]
-	MOVDQ  xmm2,   [eax+ebx]
+	movdqu xmm1,   [r2+r3]
+	MOVDQ  xmm2,   [r0+r1]
 	psadbw xmm1,   xmm2
 	paddw  xmm0,   xmm1
 
@@ -1327,36 +1430,41 @@ WelsSampleSad16x8_sse2:
 
 	movhlps     xmm1, xmm0
 	paddw       xmm0, xmm1
-	movd        eax,  xmm0
-	pop         ebx
+	movd        retrd,  xmm0
+	LOAD_4_PARA_POP
 	ret
 
 
 
 WELS_EXTERN WelsSampleSad8x16_sse2
 WelsSampleSad8x16_sse2:
-	push   ebx
-	mov    eax,    [esp+8]
-	mov    ebx,    [esp+12]
-	mov    ecx,    [esp+16]
-	mov    edx,    [esp+20]
+	;push   ebx
+	;mov    eax,    [esp+8]
+	;mov    ebx,    [esp+12]
+	;mov    ecx,    [esp+16]
+	;mov    edx,    [esp+20]
+	
+	%assign  push_num 0
+	LOAD_4_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d
     pxor   xmm6,   xmm6
 
 	SSE2_GetSad8x4
-    lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
     SSE2_GetSad8x4
-    lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
 	SSE2_GetSad8x4
-    lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
     SSE2_GetSad8x4
 
     movhlps    xmm0, xmm6
 	paddw      xmm0, xmm6
-	movd       eax,  xmm0
-	pop        ebx
+	movd       retrd,  xmm0
+	LOAD_4_PARA_POP
 	ret
 
 
@@ -1367,38 +1475,55 @@ cmp    %1,  (32-%2)|(%3>>1)
 
 WELS_EXTERN WelsSampleSad8x8_sse21
 WelsSampleSad8x8_sse21:
-    mov    ecx,    [esp+12]
-	mov    edx,    ecx
-    CACHE_SPLIT_CHECK edx, 8, 64
+    ;mov    ecx,    [esp+12]
+	;mov    edx,    ecx
+    ;CACHE_SPLIT_CHECK edx, 8, 64
+	;jle    near   .pixel_sad_8x8_nsplit
+	;push   ebx
+	;push   edi
+	;mov    eax,    [esp+12]
+	;mov    ebx,    [esp+16]
+	
+	%assign  push_num 0
+	mov		r2,  arg3
+	push	r2
+	CACHE_SPLIT_CHECK r2, 8, 64
 	jle    near   .pixel_sad_8x8_nsplit
-	push   ebx
-	push   edi
-	mov    eax,    [esp+12]
-	mov    ebx,    [esp+16]
-
+	pop		r2
+%ifdef X86_32	
+	push	r3
+	push	r4
+	push	r5
+%endif
+	%assign  push_num 3
+	mov		r0,  arg1
+	mov		r1,  arg2	
+	SIGN_EXTENTION r1, r1d
     pxor   xmm7,   xmm7
+    
+    ;ecx r2, edx r4, edi r5
 
-    mov    edi,    ecx
-    and    edi,    0x07
-    sub    ecx,    edi
-    mov    edx,    8
-    sub    edx,    edi
+    mov    r5,    r2
+    and    r5,    0x07
+    sub    r2,    r5
+    mov    r4,    8
+    sub    r4,    r5
 
-    shl    edi,    3
-    shl    edx,    3
-    movd   xmm5,   edi
-    movd   xmm6,   edx
-	mov    edi,    8
-	add    edi,    ecx
-    mov    edx,    [esp+24]
+    shl    r5,    3
+    shl    r4,    3
+    movd   xmm5,   r5d
+    movd   xmm6,   r4d
+	mov    r5,    8
+	add    r5,    r2
+    mov    r3,    arg4
+	SIGN_EXTENTION r3, r3d
+    movq   xmm0,   [r0]
+	movhps xmm0,   [r0+r1]
 
-    movq   xmm0,   [eax]
-	movhps xmm0,   [eax+ebx]
-
-	movq   xmm1,   [ecx]
-	movq   xmm2,   [edi]
-	movhps xmm1,   [ecx+edx]
-	movhps xmm2,   [edi+edx]
+	movq   xmm1,   [r2]
+	movq   xmm2,   [r5]
+	movhps xmm1,   [r2+r3]
+	movhps xmm2,   [r5+r3]
 	psrlq  xmm1,   xmm5
 	psllq  xmm2,   xmm6
 	por    xmm1,   xmm2
@@ -1406,17 +1531,17 @@ WelsSampleSad8x8_sse21:
 	psadbw xmm0,   xmm1
 	paddw  xmm7,   xmm0
 
-	lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
-	lea    edi,    [edi+2*edx]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	lea    r5,    [r5+2*r3]
 
-    movq   xmm0,   [eax]
-	movhps xmm0,   [eax+ebx]
+    movq   xmm0,   [r0]
+	movhps xmm0,   [r0+r1]
 
-	movq   xmm1,   [ecx]
-	movq   xmm2,   [edi]
-	movhps xmm1,   [ecx+edx]
-	movhps xmm2,   [edi+edx]
+	movq   xmm1,   [r2]
+	movq   xmm2,   [r5]
+	movhps xmm1,   [r2+r3]
+	movhps xmm2,   [r5+r3]
 	psrlq  xmm1,   xmm5
 	psllq  xmm2,   xmm6
 	por    xmm1,   xmm2
@@ -1424,17 +1549,17 @@ WelsSampleSad8x8_sse21:
 	psadbw xmm0,   xmm1
 	paddw  xmm7,   xmm0
 
-	lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
-	lea    edi,    [edi+2*edx]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	lea    r5,    [r5+2*r3]
 
-    movq   xmm0,   [eax]
-	movhps xmm0,   [eax+ebx]
+    movq   xmm0,   [r0]
+	movhps xmm0,   [r0+r1]
 
-	movq   xmm1,   [ecx]
-	movq   xmm2,   [edi]
-	movhps xmm1,   [ecx+edx]
-	movhps xmm2,   [edi+edx]
+	movq   xmm1,   [r2]
+	movq   xmm2,   [r5]
+	movhps xmm1,   [r2+r3]
+	movhps xmm2,   [r5+r3]
 	psrlq  xmm1,   xmm5
 	psllq  xmm2,   xmm6
 	por    xmm1,   xmm2
@@ -1442,17 +1567,17 @@ WelsSampleSad8x8_sse21:
 	psadbw xmm0,   xmm1
 	paddw  xmm7,   xmm0
 
-	lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
-	lea    edi,    [edi+2*edx]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	lea    r5,    [r5+2*r3]
 
-    movq   xmm0,   [eax]
-	movhps xmm0,   [eax+ebx]
+    movq   xmm0,   [r0]
+	movhps xmm0,   [r0+r1]
 
-	movq   xmm1,   [ecx]
-	movq   xmm2,   [edi]
-	movhps xmm1,   [ecx+edx]
-	movhps xmm2,   [edi+edx]
+	movq   xmm1,   [r2]
+	movq   xmm2,   [r5]
+	movhps xmm1,   [r2+r3]
+	movhps xmm2,   [r5+r3]
 	psrlq  xmm1,   xmm5
 	psllq  xmm2,   xmm6
 	por    xmm1,   xmm2
@@ -1462,24 +1587,35 @@ WelsSampleSad8x8_sse21:
 
     movhlps    xmm0, xmm7
 	paddw      xmm0, xmm7
-	movd       eax,  xmm0
-	pop        edi
+	movd       retrd,  xmm0
+%ifdef X86_32
+	pop	 r5
+	pop	 r4
+	pop	 r3
+%endif
 	jmp        .return
+	
 .pixel_sad_8x8_nsplit:
-    push   ebx
-    mov    eax,    [esp+8]
-	mov    ebx,    [esp+12]
-	mov    edx,    [esp+20]
+    ;push   ebx
+    ;mov    eax,    [esp+8]
+	;mov    ebx,    [esp+12]
+	;mov    edx,    [esp+20]
+	
+	pop r2
+	%assign  push_num 0
+	LOAD_4_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d	
 	pxor   xmm6,   xmm6
 	SSE2_GetSad8x4
-    lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
+    lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
     SSE2_GetSad8x4
     movhlps    xmm0, xmm6
 	paddw      xmm0, xmm6
-	movd       eax,  xmm0
+	movd       retrd,  xmm0
+	LOAD_4_PARA_POP
 .return:
-	pop        ebx
 	ret
 
 
@@ -1511,108 +1647,113 @@ WelsSampleSad8x8_sse21:
 %endmacro
 WELS_EXTERN WelsSampleSadFour16x16_sse2
 WelsSampleSadFour16x16_sse2:
-	push ebx
-	mov    eax,    [esp+8]
-	mov    ebx,    [esp+12]
-	mov    ecx,    [esp+16]
-	mov    edx,    [esp+20]
+	;push ebx
+	;mov    eax,    [esp+8]
+	;mov    ebx,    [esp+12]
+	;mov    ecx,    [esp+16]
+	;mov    edx,    [esp+20]
+	
+	%assign  push_num 0
+	LOAD_5_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d		
 	pxor   xmm4,   xmm4    ;sad pRefMb-i_stride_ref
 	pxor   xmm5,   xmm5    ;sad pRefMb+i_stride_ref
 	pxor   xmm6,   xmm6    ;sad pRefMb-1
 	pxor   xmm7,   xmm7    ;sad pRefMb+1
-	movdqa xmm0,   [eax]
-	sub    ecx,    edx
-	movdqu xmm3,   [ecx]
+	movdqa xmm0,   [r0]
+	sub    r2,    r3
+	movdqu xmm3,   [r2]
 	psadbw xmm3,   xmm0
 	paddw  xmm4,   xmm3
 
-	movdqa xmm1,   [eax+ebx]
-	movdqu xmm3,   [ecx+edx]
+	movdqa xmm1,   [r0+r1]
+	movdqu xmm3,   [r2+r3]
 	psadbw xmm3,   xmm1
 	paddw  xmm4,   xmm3
 
-	movdqu xmm2,   [ecx+edx-1]
+	movdqu xmm2,   [r2+r3-1]
 	psadbw xmm2,   xmm0
 	paddw  xmm6,   xmm2
 
-	movdqu xmm3,   [ecx+edx+1]
+	movdqu xmm3,   [r2+r3+1]
 	psadbw xmm3,   xmm0
 	paddw  xmm7,   xmm3
 
-	lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
-	movdqa xmm2,   [eax]
-	movdqu xmm3,   [ecx]
-	SSE2_Get4LW16Sad xmm0, xmm1, xmm2, xmm3, ecx
-	movdqa xmm0,   [eax+ebx]
-	movdqu xmm3,   [ecx+edx]
-	SSE2_Get4LW16Sad xmm1, xmm2, xmm0, xmm3, ecx+edx
-	lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
-	movdqa xmm1,   [eax]
-	movdqu xmm3,   [ecx]
-	SSE2_Get4LW16Sad xmm2, xmm0, xmm1, xmm3, ecx
-	movdqa xmm2,   [eax+ebx]
-	movdqu xmm3,   [ecx+edx]
-	SSE2_Get4LW16Sad xmm0, xmm1, xmm2, xmm3, ecx+edx
-	lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
-	movdqa xmm0,   [eax]
-	movdqu xmm3,   [ecx]
-	SSE2_Get4LW16Sad xmm1, xmm2, xmm0, xmm3, ecx
-	movdqa xmm1,   [eax+ebx]
-	movdqu xmm3,   [ecx+edx]
-	SSE2_Get4LW16Sad xmm2, xmm0, xmm1, xmm3, ecx+edx
-	lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
-	movdqa xmm2,   [eax]
-	movdqu xmm3,   [ecx]
-	SSE2_Get4LW16Sad xmm0, xmm1, xmm2, xmm3, ecx
-	movdqa xmm0,   [eax+ebx]
-	movdqu xmm3,   [ecx+edx]
-	SSE2_Get4LW16Sad xmm1, xmm2, xmm0, xmm3, ecx+edx
-	lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
-	movdqa xmm1,   [eax]
-	movdqu xmm3,   [ecx]
-	SSE2_Get4LW16Sad xmm2, xmm0, xmm1, xmm3, ecx
-	movdqa xmm2,   [eax+ebx]
-	movdqu xmm3,   [ecx+edx]
-	SSE2_Get4LW16Sad xmm0, xmm1, xmm2, xmm3, ecx+edx
-	lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
-	movdqa xmm0,   [eax]
-	movdqu xmm3,   [ecx]
-	SSE2_Get4LW16Sad xmm1, xmm2, xmm0, xmm3, ecx
-	movdqa xmm1,   [eax+ebx]
-	movdqu xmm3,   [ecx+edx]
-	SSE2_Get4LW16Sad xmm2, xmm0, xmm1, xmm3, ecx+edx
-	lea    eax,    [eax+2*ebx]
-	lea    ecx,    [ecx+2*edx]
-	movdqa xmm2,   [eax]
-	movdqu xmm3,   [ecx]
-	SSE2_Get4LW16Sad xmm0, xmm1, xmm2, xmm3, ecx
-	movdqa xmm0,   [eax+ebx]
-	movdqu xmm3,   [ecx+edx]
-	SSE2_Get4LW16Sad xmm1, xmm2, xmm0, xmm3, ecx+edx
-	lea    ecx,    [ecx+2*edx]
-	movdqu xmm3,   [ecx]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movdqa xmm2,   [r0]
+	movdqu xmm3,   [r2]
+	SSE2_Get4LW16Sad xmm0, xmm1, xmm2, xmm3, r2
+	movdqa xmm0,   [r0+r1]
+	movdqu xmm3,   [r2+r3]
+	SSE2_Get4LW16Sad xmm1, xmm2, xmm0, xmm3, r2+r3
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movdqa xmm1,   [r0]
+	movdqu xmm3,   [r2]
+	SSE2_Get4LW16Sad xmm2, xmm0, xmm1, xmm3, r2
+	movdqa xmm2,   [r0+r1]
+	movdqu xmm3,   [r2+r3]
+	SSE2_Get4LW16Sad xmm0, xmm1, xmm2, xmm3, r2+r3
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movdqa xmm0,   [r0]
+	movdqu xmm3,   [r2]
+	SSE2_Get4LW16Sad xmm1, xmm2, xmm0, xmm3, r2
+	movdqa xmm1,   [r0+r1]
+	movdqu xmm3,   [r2+r3]
+	SSE2_Get4LW16Sad xmm2, xmm0, xmm1, xmm3, r2+r3
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movdqa xmm2,   [r0]
+	movdqu xmm3,   [r2]
+	SSE2_Get4LW16Sad xmm0, xmm1, xmm2, xmm3, r2
+	movdqa xmm0,   [r0+r1]
+	movdqu xmm3,   [r2+r3]
+	SSE2_Get4LW16Sad xmm1, xmm2, xmm0, xmm3, r2+r3
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movdqa xmm1,   [r0]
+	movdqu xmm3,   [r2]
+	SSE2_Get4LW16Sad xmm2, xmm0, xmm1, xmm3, r2
+	movdqa xmm2,   [r0+r1]
+	movdqu xmm3,   [r2+r3]
+	SSE2_Get4LW16Sad xmm0, xmm1, xmm2, xmm3, r2+r3
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movdqa xmm0,   [r0]
+	movdqu xmm3,   [r2]
+	SSE2_Get4LW16Sad xmm1, xmm2, xmm0, xmm3, r2
+	movdqa xmm1,   [r0+r1]
+	movdqu xmm3,   [r2+r3]
+	SSE2_Get4LW16Sad xmm2, xmm0, xmm1, xmm3, r2+r3
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movdqa xmm2,   [r0]
+	movdqu xmm3,   [r2]
+	SSE2_Get4LW16Sad xmm0, xmm1, xmm2, xmm3, r2
+	movdqa xmm0,   [r0+r1]
+	movdqu xmm3,   [r2+r3]
+	SSE2_Get4LW16Sad xmm1, xmm2, xmm0, xmm3, r2+r3
+	lea    r2,    [r2+2*r3]
+	movdqu xmm3,   [r2]
 	psadbw xmm2,   xmm3
 	paddw xmm5,   xmm2
 
-	movdqu xmm2,   [ecx-1]
+	movdqu xmm2,   [r2-1]
 	psadbw xmm2,   xmm0
 	paddw xmm6,   xmm2
 
-	movdqu xmm3,   [ecx+1]
+	movdqu xmm3,   [r2+1]
 	psadbw xmm3,   xmm0
 	paddw xmm7,   xmm3
 
-	movdqu xmm3,   [ecx+edx]
+	movdqu xmm3,   [r2+r3]
 	psadbw xmm0,   xmm3
 	paddw xmm5,   xmm0
 
-	mov        ecx,  [esp+24]
+	;mov        ecx,  [esp+24]
 	movhlps    xmm0, xmm4
 	paddw      xmm4, xmm0
 	movhlps    xmm0, xmm5
@@ -1624,84 +1765,89 @@ WelsSampleSadFour16x16_sse2:
 	punpckldq  xmm4, xmm5
 	punpckldq  xmm6, xmm7
 	punpcklqdq xmm4, xmm6
-	movdqa     [ecx],xmm4
-	pop  ebx
+	movdqa     [r4],xmm4
+	LOAD_5_PARA_POP
 	ret
 
 
 WELS_EXTERN WelsSampleSadFour16x8_sse2
 WelsSampleSadFour16x8_sse2:
-	push ebx
-	push edi
-	mov    eax,    [esp+12]
-	mov    ebx,    [esp+16]
-	mov    edi,    [esp+20]
-	mov    edx,    [esp+24]
+	;push ebx
+	;push edi
+	;mov    eax,    [esp+12]
+	;mov    ebx,    [esp+16]
+	;mov    edi,    [esp+20]
+	;mov    edx,    [esp+24]
+	
+	%assign  push_num 0
+	LOAD_5_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d		
 	pxor   xmm4,   xmm4    ;sad pRefMb-i_stride_ref
 	pxor   xmm5,   xmm5    ;sad pRefMb+i_stride_ref
 	pxor   xmm6,   xmm6    ;sad pRefMb-1
 	pxor   xmm7,   xmm7    ;sad pRefMb+1
-	movdqa xmm0,   [eax]
-	sub    edi,    edx
-	movdqu xmm3,   [edi]
+	movdqa xmm0,   [r0]
+	sub    r2,    r3
+	movdqu xmm3,   [r2]
 	psadbw xmm3,   xmm0
 	paddw xmm4,   xmm3
 
-	movdqa xmm1,   [eax+ebx]
-	movdqu xmm3,   [edi+edx]
+	movdqa xmm1,   [r0+r1]
+	movdqu xmm3,   [r2+r3]
 	psadbw xmm3,   xmm1
 	paddw xmm4,   xmm3
 
-	movdqu xmm2,   [edi+edx-1]
+	movdqu xmm2,   [r2+r3-1]
 	psadbw xmm2,   xmm0
 	paddw xmm6,   xmm2
 
-	movdqu xmm3,   [edi+edx+1]
+	movdqu xmm3,   [r2+r3+1]
 	psadbw xmm3,   xmm0
 	paddw xmm7,   xmm3
 
-	lea    eax,    [eax+2*ebx]
-	lea    edi,    [edi+2*edx]
-	movdqa xmm2,   [eax]
-	movdqu xmm3,   [edi]
-	SSE2_Get4LW16Sad xmm0, xmm1, xmm2, xmm3, edi
-	movdqa xmm0,   [eax+ebx]
-	movdqu xmm3,   [edi+edx]
-	SSE2_Get4LW16Sad xmm1, xmm2, xmm0, xmm3, edi+edx
-	lea    eax,    [eax+2*ebx]
-	lea    edi,    [edi+2*edx]
-	movdqa xmm1,   [eax]
-	movdqu xmm3,   [edi]
-	SSE2_Get4LW16Sad xmm2, xmm0, xmm1, xmm3, edi
-	movdqa xmm2,   [eax+ebx]
-	movdqu xmm3,   [edi+edx]
-	SSE2_Get4LW16Sad xmm0, xmm1, xmm2, xmm3, edi+edx
-	lea    eax,    [eax+2*ebx]
-	lea    edi,    [edi+2*edx]
-	movdqa xmm0,   [eax]
-	movdqu xmm3,   [edi]
-	SSE2_Get4LW16Sad xmm1, xmm2, xmm0, xmm3, edi
-	movdqa xmm1,   [eax+ebx]
-	movdqu xmm3,   [edi+edx]
-	SSE2_Get4LW16Sad xmm2, xmm0, xmm1, xmm3, edi+edx
-	lea    edi,    [edi+2*edx]
-	movdqu xmm3,   [edi]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movdqa xmm2,   [r0]
+	movdqu xmm3,   [r2]
+	SSE2_Get4LW16Sad xmm0, xmm1, xmm2, xmm3, r2
+	movdqa xmm0,   [r0+r1]
+	movdqu xmm3,   [r2+r3]
+	SSE2_Get4LW16Sad xmm1, xmm2, xmm0, xmm3, r2+r3
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movdqa xmm1,   [r0]
+	movdqu xmm3,   [r2]
+	SSE2_Get4LW16Sad xmm2, xmm0, xmm1, xmm3, r2
+	movdqa xmm2,   [r0+r1]
+	movdqu xmm3,   [r2+r3]
+	SSE2_Get4LW16Sad xmm0, xmm1, xmm2, xmm3, r2+r3
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movdqa xmm0,   [r0]
+	movdqu xmm3,   [r2]
+	SSE2_Get4LW16Sad xmm1, xmm2, xmm0, xmm3, r2
+	movdqa xmm1,   [r0+r1]
+	movdqu xmm3,   [r2+r3]
+	SSE2_Get4LW16Sad xmm2, xmm0, xmm1, xmm3, r2+r3
+	lea    r2,    [r2+2*r3]
+	movdqu xmm3,   [r2]
 	psadbw xmm0,   xmm3
 	paddw xmm5,   xmm0
 
-	movdqu xmm0,   [edi-1]
+	movdqu xmm0,   [r2-1]
 	psadbw xmm0,   xmm1
 	paddw xmm6,   xmm0
 
-	movdqu xmm3,   [edi+1]
+	movdqu xmm3,   [r2+1]
 	psadbw xmm3,   xmm1
 	paddw xmm7,   xmm3
 
-	movdqu xmm3,   [edi+edx]
+	movdqu xmm3,   [r2+r3]
 	psadbw xmm1,   xmm3
 	paddw xmm5,   xmm1
 
-	mov        edi,  [esp+28]
+	;mov        edi,  [esp+28]
 	movhlps    xmm0, xmm4
 	paddw      xmm4, xmm0
 	movhlps    xmm0, xmm5
@@ -1713,210 +1859,214 @@ WelsSampleSadFour16x8_sse2:
 	punpckldq  xmm4, xmm5
 	punpckldq  xmm6, xmm7
 	punpcklqdq xmm4, xmm6
-	movdqa     [edi],xmm4
-	pop  edi
-	pop  ebx
+	movdqa     [r4],xmm4
+	LOAD_5_PARA_POP
 	ret
 
 WELS_EXTERN WelsSampleSadFour8x16_sse2
 WelsSampleSadFour8x16_sse2:
-	push ebx
-	push edi
-	mov    eax,    [esp+12]
-	mov    ebx,    [esp+16]
-	mov    edi,    [esp+20]
-	mov    edx,    [esp+24]
+	;push ebx
+	;push edi
+	;mov    eax,    [esp+12]
+	;mov    ebx,    [esp+16]
+	;mov    edi,    [esp+20]
+	;mov    edx,    [esp+24]
+	
+	%assign  push_num 0
+	LOAD_5_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d		
 	pxor   xmm4,   xmm4    ;sad pRefMb-i_stride_ref
 	pxor   xmm5,   xmm5    ;sad pRefMb+i_stride_ref
 	pxor   xmm6,   xmm6    ;sad pRefMb-1
 	pxor   xmm7,   xmm7    ;sad pRefMb+1
-	movq   xmm0,   [eax]
-	movhps xmm0,   [eax+ebx]
-	sub    edi,    edx
-	movq   xmm3,   [edi]
-	movhps xmm3,   [edi+edx]
+	movq   xmm0,   [r0]
+	movhps xmm0,   [r0+r1]
+	sub    r2,    r3
+	movq   xmm3,   [r2]
+	movhps xmm3,   [r2+r3]
 	psadbw xmm3,   xmm0
 	paddw  xmm4,   xmm3
 
-	movq   xmm1,  [edi+edx-1]
-	movq   xmm3,  [edi+edx+1]
+	movq   xmm1,  [r2+r3-1]
+	movq   xmm3,  [r2+r3+1]
 
-	lea    eax,   [eax+2*ebx]
-	lea    edi,   [edi+2*edx]
-	movhps xmm1,  [edi-1]
-	movhps xmm3,  [edi+1]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movhps xmm1,  [r2-1]
+	movhps xmm3,  [r2+1]
 	psadbw xmm1,  xmm0
 	paddw  xmm6,  xmm1
 	psadbw xmm3,  xmm0
 	paddw  xmm7,  xmm3
 
-	movq   xmm3,  [edi]
-	movhps xmm3,  [edi+edx]
+	movq   xmm3,  [r2]
+	movhps xmm3,  [r2+r3]
 	psadbw xmm0,  xmm3
 	paddw  xmm5,  xmm0
 
-	movq   xmm0,  [eax]
-	movhps xmm0,  [eax+ebx]
+	movq   xmm0,  [r0]
+	movhps xmm0,  [r0+r1]
 	psadbw xmm3,  xmm0
 	paddw  xmm4,  xmm3
 
-	movq   xmm1,  [edi+edx-1]
-	movq   xmm3,  [edi+edx+1]
+	movq   xmm1,  [r2+r3-1]
+	movq   xmm3,  [r2+r3+1]
 
-	lea    eax,   [eax+2*ebx]
-	lea    edi,   [edi+2*edx]
-	movhps xmm1,  [edi-1]
-	movhps xmm3,  [edi+1]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movhps xmm1,  [r2-1]
+	movhps xmm3,  [r2+1]
 
 	psadbw xmm1,  xmm0
 	paddw  xmm6,  xmm1
 	psadbw xmm3,  xmm0
 	paddw  xmm7,  xmm3
 
-	movq   xmm3,  [edi]
-	movhps xmm3,  [edi+edx]
+	movq   xmm3,  [r2]
+	movhps xmm3,  [r2+r3]
 	psadbw xmm0,  xmm3
 	paddw  xmm5,  xmm0
 
-	movq   xmm0,  [eax]
-	movhps xmm0,  [eax+ebx]
+	movq   xmm0,  [r0]
+	movhps xmm0,  [r0+r1]
 	psadbw xmm3,  xmm0
 	paddw  xmm4,  xmm3
 
-	movq   xmm1,  [edi+edx-1]
-	movq   xmm3,  [edi+edx+1]
+	movq   xmm1,  [r2+r3-1]
+	movq   xmm3,  [r2+r3+1]
 
-	lea    eax,   [eax+2*ebx]
-	lea    edi,   [edi+2*edx]
-	movhps xmm1,  [edi-1]
-	movhps xmm3,  [edi+1]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movhps xmm1,  [r2-1]
+	movhps xmm3,  [r2+1]
 
 	psadbw xmm1,  xmm0
 	paddw  xmm6,  xmm1
 	psadbw xmm3,  xmm0
 	paddw  xmm7,  xmm3
 
-	movq   xmm3,  [edi]
-	movhps xmm3,  [edi+edx]
+	movq   xmm3,  [r2]
+	movhps xmm3,  [r2+r3]
 	psadbw xmm0,  xmm3
 	paddw  xmm5,  xmm0
 
-	movq   xmm0,  [eax]
-	movhps xmm0,  [eax+ebx]
+	movq   xmm0,  [r0]
+	movhps xmm0,  [r0+r1]
 	psadbw xmm3,  xmm0
 	paddw  xmm4,  xmm3
 
-	movq   xmm1,  [edi+edx-1]
-	movq   xmm3,  [edi+edx+1]
+	movq   xmm1,  [r2+r3-1]
+	movq   xmm3,  [r2+r3+1]
 
-	lea    eax,   [eax+2*ebx]
-	lea    edi,   [edi+2*edx]
-	movhps xmm1,  [edi-1]
-	movhps xmm3,  [edi+1]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movhps xmm1,  [r2-1]
+	movhps xmm3,  [r2+1]
 
 	psadbw xmm1,  xmm0
 	paddw  xmm6,  xmm1
 	psadbw xmm3,  xmm0
 	paddw  xmm7,  xmm3
 
-	movq   xmm3,  [edi]
-	movhps xmm3,  [edi+edx]
+	movq   xmm3,  [r2]
+	movhps xmm3,  [r2+r3]
 	psadbw xmm0,  xmm3
 	paddw  xmm5,  xmm0
 
-	movq   xmm0,  [eax]
-	movhps xmm0,  [eax+ebx]
+	movq   xmm0,  [r0]
+	movhps xmm0,  [r0+r1]
 	psadbw xmm3,  xmm0
 	paddw  xmm4,  xmm3
 
-	movq   xmm1,  [edi+edx-1]
-	movq   xmm3,  [edi+edx+1]
+	movq   xmm1,  [r2+r3-1]
+	movq   xmm3,  [r2+r3+1]
 
-	lea    eax,   [eax+2*ebx]
-	lea    edi,   [edi+2*edx]
-	movhps xmm1,  [edi-1]
-	movhps xmm3,  [edi+1]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movhps xmm1,  [r2-1]
+	movhps xmm3,  [r2+1]
 
 	psadbw xmm1,  xmm0
 	paddw  xmm6,  xmm1
 	psadbw xmm3,  xmm0
 	paddw  xmm7,  xmm3
 
-	movq   xmm3,  [edi]
-	movhps xmm3,  [edi+edx]
+	movq   xmm3,  [r2]
+	movhps xmm3,  [r2+r3]
 	psadbw xmm0,  xmm3
 	paddw  xmm5,  xmm0
 
-	movq   xmm0,  [eax]
-	movhps xmm0,  [eax+ebx]
+	movq   xmm0,  [r0]
+	movhps xmm0,  [r0+r1]
 	psadbw xmm3,  xmm0
 	paddw  xmm4,  xmm3
 
-	movq   xmm1,  [edi+edx-1]
-	movq   xmm3,  [edi+edx+1]
+	movq   xmm1,  [r2+r3-1]
+	movq   xmm3,  [r2+r3+1]
 
-	lea    eax,   [eax+2*ebx]
-	lea    edi,   [edi+2*edx]
-	movhps xmm1,  [edi-1]
-	movhps xmm3,  [edi+1]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movhps xmm1,  [r2-1]
+	movhps xmm3,  [r2+1]
 
 	psadbw xmm1,  xmm0
 	paddw  xmm6,  xmm1
 	psadbw xmm3,  xmm0
 	paddw  xmm7,  xmm3
 
-	movq   xmm3,  [edi]
-	movhps xmm3,  [edi+edx]
+	movq   xmm3,  [r2]
+	movhps xmm3,  [r2+r3]
 	psadbw xmm0,  xmm3
 	paddw  xmm5,  xmm0
 
-	movq   xmm0,  [eax]
-	movhps xmm0,  [eax+ebx]
+	movq   xmm0,  [r0]
+	movhps xmm0,  [r0+r1]
 	psadbw xmm3,  xmm0
 	paddw  xmm4,  xmm3
 
-	movq   xmm1,  [edi+edx-1]
-	movq   xmm3,  [edi+edx+1]
+	movq   xmm1,  [r2+r3-1]
+	movq   xmm3,  [r2+r3+1]
 
-	lea    eax,   [eax+2*ebx]
-	lea    edi,   [edi+2*edx]
-	movhps xmm1,  [edi-1]
-	movhps xmm3,  [edi+1]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movhps xmm1,  [r2-1]
+	movhps xmm3,  [r2+1]
 
 	psadbw xmm1,  xmm0
 	paddw  xmm6,  xmm1
 	psadbw xmm3,  xmm0
 	paddw  xmm7,  xmm3
 
-	movq   xmm3,  [edi]
-	movhps xmm3,  [edi+edx]
+	movq   xmm3,  [r2]
+	movhps xmm3,  [r2+r3]
 	psadbw xmm0,  xmm3
 	paddw  xmm5,  xmm0
 
-	movq   xmm0,  [eax]
-	movhps xmm0,  [eax+ebx]
+	movq   xmm0,  [r0]
+	movhps xmm0,  [r0+r1]
 	psadbw xmm3,  xmm0
 	paddw  xmm4,  xmm3
 
-	movq   xmm1,  [edi+edx-1]
-	movq   xmm3,  [edi+edx+1]
+	movq   xmm1,  [r2+r3-1]
+	movq   xmm3,  [r2+r3+1]
 
-	lea    eax,   [eax+2*ebx]
-	lea    edi,   [edi+2*edx]
-	movhps xmm1,  [edi-1]
-	movhps xmm3,  [edi+1]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movhps xmm1,  [r2-1]
+	movhps xmm3,  [r2+1]
 
 	psadbw xmm1,  xmm0
 	paddw  xmm6,  xmm1
 	psadbw xmm3,  xmm0
 	paddw  xmm7,  xmm3
 
-	movq   xmm3,  [edi]
-	movhps xmm3,  [edi+edx]
+	movq   xmm3,  [r2]
+	movhps xmm3,  [r2+r3]
 	psadbw xmm0,  xmm3
 	paddw  xmm5,  xmm0
 
-	mov        edi,  [esp+28]
+	;mov        edi,  [esp+28]
 	movhlps    xmm0, xmm4
 	paddw      xmm4, xmm0
 	movhlps    xmm0, xmm5
@@ -1928,120 +2078,124 @@ WelsSampleSadFour8x16_sse2:
 	punpckldq  xmm4, xmm5
 	punpckldq  xmm6, xmm7
 	punpcklqdq xmm4, xmm6
-	movdqa     [edi],xmm4
-	pop  edi
-	pop  ebx
+	movdqa     [r4],xmm4
+	LOAD_5_PARA_POP
 	ret
 
 
 WELS_EXTERN WelsSampleSadFour8x8_sse2
 WelsSampleSadFour8x8_sse2:
-	push ebx
-	push edi
-	mov    eax,    [esp+12]
-	mov    ebx,    [esp+16]
-	mov    edi,    [esp+20]
-	mov    edx,    [esp+24]
+	;push ebx
+	;push edi
+	;mov    eax,    [esp+12]
+	;mov    ebx,    [esp+16]
+	;mov    edi,    [esp+20]
+	;mov    edx,    [esp+24]
+	
+	%assign  push_num 0
+	LOAD_5_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d		
 	pxor   xmm4,   xmm4    ;sad pRefMb-i_stride_ref
 	pxor   xmm5,   xmm5    ;sad pRefMb+i_stride_ref
 	pxor   xmm6,   xmm6    ;sad pRefMb-1
 	pxor   xmm7,   xmm7    ;sad pRefMb+1
-	movq   xmm0,   [eax]
-	movhps xmm0,   [eax+ebx]
-	sub    edi,    edx
-	movq   xmm3,   [edi]
-	movhps xmm3,   [edi+edx]
+	movq   xmm0,   [r0]
+	movhps xmm0,   [r0+r1]
+	sub    r2,    r3
+	movq   xmm3,   [r2]
+	movhps xmm3,   [r2+r3]
 	psadbw xmm3,   xmm0
 	paddw  xmm4,   xmm3
 
-	movq   xmm1,  [edi+edx-1]
-	movq   xmm3,  [edi+edx+1]
+	movq   xmm1,  [r2+r3-1]
+	movq   xmm3,  [r2+r3+1]
 
-	lea    eax,   [eax+2*ebx]
-	lea    edi,   [edi+2*edx]
-	movhps xmm1,  [edi-1]
-	movhps xmm3,  [edi+1]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movhps xmm1,  [r2-1]
+	movhps xmm3,  [r2+1]
 	psadbw xmm1,  xmm0
 	paddw  xmm6,  xmm1
 	psadbw xmm3,  xmm0
 	paddw  xmm7,  xmm3
 
-	movq   xmm3,  [edi]
-	movhps xmm3,  [edi+edx]
+	movq   xmm3,  [r2]
+	movhps xmm3,  [r2+r3]
 	psadbw xmm0,  xmm3
 	paddw  xmm5,  xmm0
 
-	movq   xmm0,  [eax]
-	movhps xmm0,  [eax+ebx]
+	movq   xmm0,  [r0]
+	movhps xmm0,  [r0+r1]
 	psadbw xmm3,  xmm0
 	paddw  xmm4,  xmm3
 
-	movq   xmm1,  [edi+edx-1]
-	movq   xmm3,  [edi+edx+1]
+	movq   xmm1,  [r2+r3-1]
+	movq   xmm3,  [r2+r3+1]
 
-	lea    eax,   [eax+2*ebx]
-	lea    edi,   [edi+2*edx]
-	movhps xmm1,  [edi-1]
-	movhps xmm3,  [edi+1]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movhps xmm1,  [r2-1]
+	movhps xmm3,  [r2+1]
 
 	psadbw xmm1,  xmm0
 	paddw  xmm6,  xmm1
 	psadbw xmm3,  xmm0
 	paddw  xmm7,  xmm3
 
-	movq   xmm3,  [edi]
-	movhps xmm3,  [edi+edx]
+	movq   xmm3,  [r2]
+	movhps xmm3,  [r2+r3]
 	psadbw xmm0,  xmm3
 	paddw  xmm5,  xmm0
 
-	movq   xmm0,  [eax]
-	movhps xmm0,  [eax+ebx]
+	movq   xmm0,  [r0]
+	movhps xmm0,  [r0+r1]
 	psadbw xmm3,  xmm0
 	paddw  xmm4,  xmm3
 
-	movq   xmm1,  [edi+edx-1]
-	movq   xmm3,  [edi+edx+1]
+	movq   xmm1,  [r2+r3-1]
+	movq   xmm3,  [r2+r3+1]
 
-	lea    eax,   [eax+2*ebx]
-	lea    edi,   [edi+2*edx]
-	movhps xmm1,  [edi-1]
-	movhps xmm3,  [edi+1]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movhps xmm1,  [r2-1]
+	movhps xmm3,  [r2+1]
 
 	psadbw xmm1,  xmm0
 	paddw  xmm6,  xmm1
 	psadbw xmm3,  xmm0
 	paddw  xmm7,  xmm3
 
-	movq   xmm3,  [edi]
-	movhps xmm3,  [edi+edx]
+	movq   xmm3,  [r2]
+	movhps xmm3,  [r2+r3]
 	psadbw xmm0,  xmm3
 	paddw  xmm5,  xmm0
 
-	movq   xmm0,  [eax]
-	movhps xmm0,  [eax+ebx]
+	movq   xmm0,  [r0]
+	movhps xmm0,  [r0+r1]
 	psadbw xmm3,  xmm0
 	paddw  xmm4,  xmm3
 
 
-	movq   xmm1,  [edi+edx-1]
-	movq   xmm3,  [edi+edx+1]
+	movq   xmm1,  [r2+r3-1]
+	movq   xmm3,  [r2+r3+1]
 
-	lea    eax,   [eax+2*ebx]
-	lea    edi,   [edi+2*edx]
-	movhps xmm1,  [edi-1]
-	movhps xmm3,  [edi+1]
+	lea    r0,    [r0+2*r1]
+	lea    r2,    [r2+2*r3]
+	movhps xmm1,  [r2-1]
+	movhps xmm3,  [r2+1]
 
 	psadbw xmm1,  xmm0
 	paddw  xmm6,  xmm1
 	psadbw xmm3,  xmm0
 	paddw  xmm7,  xmm3
 
-	movq   xmm3,  [edi]
-	movhps xmm3,  [edi+edx]
+	movq   xmm3,  [r2]
+	movhps xmm3,  [r2+r3]
 	psadbw xmm0,  xmm3
 	paddw  xmm5,  xmm0
 
-	mov        edi,  [esp+28]
+	;mov        edi,  [esp+28]
 	movhlps    xmm0, xmm4
 	paddw      xmm4, xmm0
 	movhlps    xmm0, xmm5
@@ -2053,59 +2207,63 @@ WelsSampleSadFour8x8_sse2:
 	punpckldq  xmm4, xmm5
 	punpckldq  xmm6, xmm7
 	punpcklqdq xmm4, xmm6
-	movdqa     [edi],xmm4
-	pop  edi
-	pop  ebx
+	movdqa     [r4],xmm4
+	LOAD_5_PARA_POP
 	ret
 
 WELS_EXTERN WelsSampleSadFour4x4_sse2
 WelsSampleSadFour4x4_sse2:
-	push ebx
-	push edi
-	mov    eax,    [esp+12]
-	mov    ebx,    [esp+16]
-	mov    edi,    [esp+20]
-	mov    edx,    [esp+24]
-	movd   xmm0,   [eax]
-	movd   xmm1,   [eax+ebx]
-	lea        eax,    [eax+2*ebx]
-	movd       xmm2,   [eax]
-	movd       xmm3,   [eax+ebx]
+	;push ebx
+	;push edi
+	;mov    eax,    [esp+12]
+	;mov    ebx,    [esp+16]
+	;mov    edi,    [esp+20]
+	;mov    edx,    [esp+24]
+	
+	%assign  push_num 0
+	LOAD_5_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d		
+	movd   xmm0,   [r0]
+	movd   xmm1,   [r0+r1]
+	lea        r0,    [r0+2*r1]
+	movd       xmm2,   [r0]
+	movd       xmm3,   [r0+r1]
 	punpckldq  xmm0, xmm1
 	punpckldq  xmm2, xmm3
 	punpcklqdq xmm0, xmm2
-	sub        edi,  edx
-	movd       xmm1, [edi]
-	movd       xmm2, [edi+edx]
+	sub        r2,  r3
+	movd       xmm1, [r2]
+	movd       xmm2, [r2+r3]
 	punpckldq  xmm1, xmm2
-	movd       xmm2, [edi+edx-1]
-	movd       xmm3, [edi+edx+1]
+	movd       xmm2, [r2+r3-1]
+	movd       xmm3, [r2+r3+1]
 
-	lea        edi,  [edi+2*edx]
+	lea        r2,  [r2+2*r3]
 
-	movd       xmm4, [edi]
-	movd       xmm5, [edi-1]
+	movd       xmm4, [r2]
+	movd       xmm5, [r2-1]
 	punpckldq  xmm2, xmm5
-	movd       xmm5, [edi+1]
+	movd       xmm5, [r2+1]
 	punpckldq  xmm3, xmm5
 
-	movd       xmm5, [edi+edx]
+	movd       xmm5, [r2+r3]
 	punpckldq  xmm4, xmm5
 
 	punpcklqdq xmm1, xmm4 ;-L
 
-	movd       xmm5, [edi+edx-1]
-	movd       xmm6, [edi+edx+1]
+	movd       xmm5, [r2+r3-1]
+	movd       xmm6, [r2+r3+1]
 
-	lea        edi,  [edi+2*edx]
-	movd       xmm7, [edi-1]
+	lea        r2,  [r2+2*r3]
+	movd       xmm7, [r2-1]
 	punpckldq  xmm5, xmm7
 	punpcklqdq xmm2, xmm5 ;-1
-	movd       xmm7, [edi+1]
+	movd       xmm7, [r2+1]
 	punpckldq  xmm6, xmm7
 	punpcklqdq xmm3, xmm6 ;+1
-	movd       xmm6, [edi]
-	movd       xmm7, [edi+edx]
+	movd       xmm6, [r2]
+	movd       xmm7, [r2+r3]
 	punpckldq  xmm6, xmm7
 	punpcklqdq xmm4, xmm6 ;+L
 	psadbw     xmm1, xmm0
@@ -2121,13 +2279,12 @@ WelsSampleSadFour4x4_sse2:
 	paddw      xmm3, xmm0
 	movhlps    xmm0, xmm4
 	paddw      xmm4, xmm0
-	mov        edi,  [esp+28]
+	;mov        edi,  [esp+28]
 	punpckldq  xmm1, xmm4
 	punpckldq  xmm2, xmm3
 	punpcklqdq xmm1, xmm2
-	movdqa     [edi],xmm1
-	pop  edi
-	pop  ebx
+	movdqa     [r4],xmm1
+	LOAD_5_PARA_POP
 	ret
 
 ;***********************************************************************
@@ -2143,47 +2300,45 @@ align 16
 ;   int32_t __cdecl WelsSampleSad4x4_mmx (uint8_t *, int32_t, uint8_t *, int32_t )
 ;***********************************************************************
 WelsSampleSad4x4_mmx:
-    push    ebx
-%define pushsize     4
-%define pix1address	 esp+pushsize+4
-%define pix1stride   esp+pushsize+8
-%define pix2address  esp+pushsize+12
-%define pix2stride   esp+pushsize+16
-
-    mov		  eax, [pix1address]
-    mov		  ebx, [pix1stride ]
-    mov		  ecx, [pix2address]
-    mov		  edx, [pix2stride ]
-
-	movd	  mm0, [eax]
-	movd	  mm1, [eax+ebx]
+    ;push    ebx
+	;%define pushsize     4
+	;%define pix1address	 esp+pushsize+4
+	;%define pix1stride   esp+pushsize+8
+	;%define pix2address  esp+pushsize+12
+	;%define pix2stride   esp+pushsize+16
+    ;mov		  eax, [pix1address]
+    ;mov		  ebx, [pix1stride ]
+    ;mov		  ecx, [pix2address]
+    ;mov		  edx, [pix2stride ]
+    
+    %assign  push_num 0
+	LOAD_4_PARA
+	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENTION r3, r3d	
+	movd	  mm0, [r0]
+	movd	  mm1, [r0+r1]
 	punpckldq mm0, mm1
 
-	movd      mm3, [ecx]
-	movd      mm4, [ecx+edx]
+	movd      mm3, [r2]
+	movd      mm4, [r2+r3]
 	punpckldq mm3, mm4
 	psadbw    mm0, mm3
 
-	lea       eax, [eax+2*ebx]
-	lea       ecx, [ecx+2*edx]
+	lea       r0, [r0+2*r1]
+	lea       r2, [r2+2*r3]
 
-	movd      mm1, [eax]
-	movd      mm2, [eax+ebx]
+	movd      mm1, [r0]
+	movd      mm2, [r0+r1]
 	punpckldq mm1, mm2
 
-	movd      mm3, [ecx]
-	movd      mm4, [ecx+edx]
+	movd      mm3, [r2]
+	movd      mm4, [r2+r3]
 	punpckldq mm3, mm4
 	psadbw    mm1, mm3
 	paddw     mm0, mm1
 
-    movd      eax, mm0
+    movd      retrd, mm0
 
 	WELSEMMS
-    pop ebx
-%undef pushsize
-%undef pix1address
-%undef pix1stride
-%undef pix2address
-%undef pix2stride
+    LOAD_4_PARA_POP
     ret

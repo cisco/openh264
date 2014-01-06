@@ -426,7 +426,7 @@ static inline void McHorVer22WidthEq8_sse2 (uint8_t* pSrc, int32_t iSrcStride, u
     int32_t iHeight) {
   ENFORCE_STACK_ALIGN_2D (int16_t, pTap, 21, 8, 16)
   McHorVer22Width8HorFirst_sse2 (pSrc - 2, iSrcStride, (uint8_t*)pTap, 16, iHeight + 5);
-  McHorVer22VerLastAlign_sse2 ((uint8_t*)pTap, 16, pDst, iDstStride, 8, iHeight);
+  McHorVer22Width8VerLastAlign_sse2 ((uint8_t*)pTap, 16, pDst, iDstStride, 8, iHeight);
 }
 
 //2010.2.5
@@ -441,13 +441,13 @@ static inline void McHorVer22WidthEq16_sse2 (uint8_t* pSrc, int32_t iSrcStride, 
   McHorVer22WidthEq8_sse2 (pSrc,     iSrcStride, pDst,     iDstStride, iHeight);
   McHorVer22WidthEq8_sse2 (&pSrc[8], iSrcStride, &pDst[8], iDstStride, iHeight);
 }
-void McHorVer22_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
+void McHorVer22Width9Or17Height9Or17_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
                       int32_t iHeight) {
   ENFORCE_STACK_ALIGN_2D (int16_t, pTap, 22, 24, 16)
   int32_t tmp1 = 2 * (iWidth - 8);
   McHorVer22HorFirst_sse2 (pSrc - 2, iSrcStride, (uint8_t*)pTap, 48, iWidth, iHeight + 5);
-  McHorVer22VerLastAlign_sse2 ((uint8_t*)pTap,  48, pDst, iDstStride, iWidth - 1, iHeight);
-  McHorVer22VerLastUnAlign_sse2 ((uint8_t*)pTap + tmp1,  48, pDst + iWidth - 8, iDstStride, 8, iHeight);
+  McHorVer22Width8VerLastAlign_sse2 ((uint8_t*)pTap,  48, pDst, iDstStride, iWidth - 1, iHeight);
+  McHorVer22Width8VerLastUnAlign_sse2 ((uint8_t*)pTap + tmp1,  48, pDst + iWidth - 8, iDstStride, 8, iHeight);
 }
 
 typedef void (*McChromaWidthEqx) (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
@@ -523,9 +523,9 @@ void WelsInitMcFuncs (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
   pFuncList->sMcFuncs.pfLumaQuarpelMc = pWelsMcFuncWidthEq16;
 #if defined (X86_ASM)
   if (uiCpuFlag & WELS_CPU_SSE2) {
-    pFuncList->sMcFuncs.pfLumaHalfpelHor = McHorVer20_sse2;
-    pFuncList->sMcFuncs.pfLumaHalfpelVer = McHorVer02_sse2;
-    pFuncList->sMcFuncs.pfLumaHalfpelCen = McHorVer22_sse2;
+    pFuncList->sMcFuncs.pfLumaHalfpelHor = McHorVer20Width9Or17_sse2;
+    pFuncList->sMcFuncs.pfLumaHalfpelVer = McHorVer02Height9Or17_sse2;
+    pFuncList->sMcFuncs.pfLumaHalfpelCen = McHorVer22Width9Or17Height9Or17_sse2;
     pFuncList->sMcFuncs.pfSampleAveraging[0] = PixelAvgWidthEq8_mmx;
     pFuncList->sMcFuncs.pfSampleAveraging[1] = PixelAvgWidthEq16_sse2;
     pFuncList->sMcFuncs.pfChromaMc = McChroma_sse2;
@@ -541,7 +541,6 @@ void WelsInitMcFuncs (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
 
   if (uiCpuFlag & WELS_CPU_SSSE3) {
     pFuncList->sMcFuncs.pfChromaMc = McChroma_ssse3;
-    pFuncList->sMcFuncs.pfSampleAveraging[1] = PixelAvgWidthEq16_ssse3;
   }
 
 #endif //(X86_ASM)

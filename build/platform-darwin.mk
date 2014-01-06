@@ -1,9 +1,11 @@
-#USE_ASM = No  # We don't have ASM working on Mac yet
+
 ASM = nasm
-CFLAGS +=  -fPIC
+CFLAGS += -Werror -fPIC
 LDFLAGS += -lpthread
+ASMFLAGS += --prefix _ -DNOPREFIX
 ifeq ($(ENABLE64BIT), Yes)
-ASMFLAGS += -f macho64 --prefix _
+ASMFLAGS += -f macho64
 else
-ASMFLAGS += -f macho32 
+ASMFLAGS += -f macho
 endif
+
