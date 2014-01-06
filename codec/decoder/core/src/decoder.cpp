@@ -746,28 +746,28 @@ void_t AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
     pCtx->pIdctResAddPredFunc	= IdctResAddPred_mmx;
 
     /////////mmx code opt---
-    pCtx->pGetIChromaPredFunc[C_PRED_H]      = WelsIChromaPredH_mmx;
-    pCtx->pGetIChromaPredFunc[C_PRED_V]      = WelsIChromaPredV_mmx;
-    pCtx->pGetIChromaPredFunc[C_PRED_DC_L  ] = WelsIChromaPredDcLeft_mmx;
-    pCtx->pGetIChromaPredFunc[C_PRED_DC_128] = WelsIChromaPredDcNA_mmx;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_DDR]  = WelsI4x4LumaPredDDR_mmx;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_HD ]  = WelsI4x4LumaPredHD_mmx;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_HU ]  = WelsI4x4LumaPredHU_mmx;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_VR ]  = WelsI4x4LumaPredVR_mmx;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_DDL]  = WelsI4x4LumaPredDDL_mmx;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_VL ]  = WelsI4x4LumaPredVL_mmx;
+    pCtx->pGetIChromaPredFunc[C_PRED_H]      = WelsDecoderIChromaPredH_mmx;
+    pCtx->pGetIChromaPredFunc[C_PRED_V]      = WelsDecoderIChromaPredV_mmx;
+    pCtx->pGetIChromaPredFunc[C_PRED_DC_L  ] = WelsDecoderIChromaPredDcLeft_mmx;
+    pCtx->pGetIChromaPredFunc[C_PRED_DC_128] = WelsDecoderIChromaPredDcNA_mmx;
+    pCtx->pGetI4x4LumaPredFunc[I4_PRED_DDR]  = WelsDecoderI4x4LumaPredDDR_mmx;
+    pCtx->pGetI4x4LumaPredFunc[I4_PRED_HD ]  = WelsDecoderI4x4LumaPredHD_mmx;
+    pCtx->pGetI4x4LumaPredFunc[I4_PRED_HU ]  = WelsDecoderI4x4LumaPredHU_mmx;
+    pCtx->pGetI4x4LumaPredFunc[I4_PRED_VR ]  = WelsDecoderI4x4LumaPredVR_mmx;
+    pCtx->pGetI4x4LumaPredFunc[I4_PRED_DDL]  = WelsDecoderI4x4LumaPredDDL_mmx;
+    pCtx->pGetI4x4LumaPredFunc[I4_PRED_VL ]  = WelsDecoderI4x4LumaPredVL_mmx;
   }
   if (pCtx->uiCpuFlag & WELS_CPU_SSE2) {
     /////////sse2 code opt---
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsI16x16LumaPredDc_sse2;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_P]  = WelsI16x16LumaPredPlane_sse2;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_H]  = WelsI16x16LumaPredH_sse2;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_V]  = WelsI16x16LumaPredV_sse2;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC_T  ] = WelsI16x16LumaPredDcTop_sse2;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC_128] = WelsI16x16LumaPredDcNA_sse2;
-    pCtx->pGetIChromaPredFunc[C_PRED_P ]      = WelsIChromaPredPlane_sse2;
-    pCtx->pGetIChromaPredFunc[C_PRED_DC]      = WelsIChromaPredDc_sse2;
-    pCtx->pGetIChromaPredFunc[C_PRED_DC_T]    = WelsIChromaPredDcTop_sse2;
+    pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_sse2;
+    pCtx->pGetI16x16LumaPredFunc[I16_PRED_P]  = WelsDecoderI16x16LumaPredPlane_sse2;
+    pCtx->pGetI16x16LumaPredFunc[I16_PRED_H]  = WelsDecoderI16x16LumaPredH_sse2;
+    pCtx->pGetI16x16LumaPredFunc[I16_PRED_V]  = WelsDecoderI16x16LumaPredV_sse2;
+    pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC_T  ] = WelsDecoderI16x16LumaPredDcTop_sse2;
+    pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC_128] = WelsDecoderI16x16LumaPredDcNA_sse2;
+    pCtx->pGetIChromaPredFunc[C_PRED_P ]      = WelsDecoderIChromaPredPlane_sse2;
+    pCtx->pGetIChromaPredFunc[C_PRED_DC]      = WelsDecoderIChromaPredDc_sse2;
+    pCtx->pGetIChromaPredFunc[C_PRED_DC_T]    = WelsDecoderIChromaPredDcTop_sse2;
   }
 #endif
   DeblockingInit (&pCtx->sDeblockingFunc, pCtx->uiCpuFlag);

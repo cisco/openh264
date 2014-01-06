@@ -1,39 +1,46 @@
 NASM = Yes
-NAME      = libwelsvp
-
-OUTDIR    = ../../../bin/linux
+TARGET = asm_tests
+OUTDIR    = .
 BINDIR    = ../../bin
-OBJDIR    = ../../obj
-SRCDIRS   = ../../src/asm \
-            ../../src/common \
-            ../../src/adaptivequantization \
-            ../../src/backgounddetection \
-            ../../src/denoise \
-            ../../src/downsample \
-            ../../src/scenechangedetection \
-            ../../src/vaacalc \
-            ../../src/complexityanalysis
-SRCDIRS  += ../../src/imagerotate
+OBJDIR    = .
+SRCDIRS  = .
 
-
-TARGETLIB =  $(BINDIR)/$(NAME).so
-
+SYSTEM = $(shell uname)
 CC        = $(shell which gcc)
 AS        = $(shell which nasm)
 GCC       = gcc 
+LDFLAGS   = -lstdc++ -ldl -lpthread
 ifeq ($(ENABLE64BIT), Yes)
 GCC += -m64
-NASM = No
-else
-GCC += -m32
+ASMFLAGS = -g -DUNIX64
+LDFLAGS += libgtest_64.a
+
+ifeq ($(SYSTEM), Darwin)
+ASMFLAGS += -f macho64
+else #Linux
+ASMFLAGS += -f elf64
 endif
 
-CPPFLAGS  = -Wall -g -O3 -fpic
+else
+GCC += -m32
+ASMFLAGS =  -g -DX86_32 
+
+ifeq ($(SYSTEM), Darwin)
+ASMFLAGS += -f macho32
+else # Linux
+ASMFLAGS += -f elf
+endif
+
+LDFLAGS += libgtest_32.a
+endif
+
+ifeq ($(SYSTEM), Darwin)
+ASMFLAGS += -DPREFIX
+endif
+CPPFLAGS  = -Wall -g -fpic -I ../gtest/include -I ../codec/encoder/core/inc -I ../codec/api/svc
 ifeq ($(NASM), Yes)
 CPPFLAGS += -DX86_ASM
 endif
-ASMFLAGS  = -f elf -DNOPREFIX  -I ../../src/asm/
-LDFLAGS   = -lstdc++ -ldl
 
 SRCEXTS  = .cpp
 ifeq ($(NASM), Yes)
@@ -59,7 +66,7 @@ LINK          = $(GCC) $(LDFLAGS)
 
 .SUFFIXES:
 
-all: $(TARGETLIB)
+all: $(TARGET)
 
 %.d:%.cpp
 	@echo -n $(dir $<) > $@
@@ -77,23 +84,11 @@ objs:$(OBJS)
 %.o:%.asm
 	$(COMPILE.asm) $< -o $@
 
-tags: $(HEADERS) $(SOURCES)
-	etags $(HEADERS) $(SOURCES)
-
-ctags: $(HEADERS) $(SOURCES)
-	ctags $(HEADERS) $(SOURCES)
-
-$(TARGETLIB):$(OBJS)
-	@if test ! -d $(BINDIR) ; then mkdir -p $(BINDIR) ; fi
-	$(LINK) $(OBJS) -shared -Wl,-Bsymbolic -o $@
-	@echo produce the lib to $(TARGETLIB).
-	@if test ! -d $(OUTDIR) ; then mkdir -p $(OUTDIR) ; fi
-	@cp -f $(TARGETLIB) $(OUTDIR)
-	@cp -f $(TARGETLIB) ../../../testbin
-	@echo copy the lib to $(OUTDIR).
+$(TARGET):$(OBJS)
+	$(GCC) -o $@ $(OBJS) $(LDFLAGS)
 
 clean:
-	rm -f $(OBJS) $(TARGETLIB)
+	rm -f $(OBJS) $(TARGET)
 
 distclean: clean
 	rm -f $(DEPS) TAGS
