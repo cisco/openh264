@@ -141,7 +141,11 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
     goto label_exit;
   }
 
-  fread (pBuf, 1, iFileSize, pH264File);
+  if (fread (pBuf, 1, iFileSize, pH264File) != iFileSize) {
+    fprintf (stderr, "Unable to read whole file\n");
+    goto label_exit;
+  }
+
   memcpy (pBuf + iFileSize, &uiStartCode[0], 4); //confirmed_safe_unsafe_usage
 
   if (pDecoder->SetOption (DECODER_OPTION_DATAFORMAT,  &iColorFormat)) {
