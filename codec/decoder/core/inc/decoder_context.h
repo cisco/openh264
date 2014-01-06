@@ -72,8 +72,6 @@ typedef struct TagDataBuffer {
 //extern "C" {
 //#endif//__cplusplus
 
-//#pragma pack(1)
-
 /*
  *	Need move below structures to function pointer to seperate module/file later
  */
@@ -335,8 +333,6 @@ typedef struct TagWelsDecoderContext {
 #endif
 
 } SWelsDecoderContext, *PWelsDecoderContext;
-
-//#pragma pack()
 
 //#ifdef __cplusplus
 //}

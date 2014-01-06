@@ -38,7 +38,6 @@
 #include "wels_common_basis.h"
 
 namespace WelsSVCEnc {
-//#pragma pack(1)
 
 /* Sequence Parameter Set, refer to Page 57 in JVT X201wcm */
 typedef struct TagWelsSPS {
@@ -159,7 +158,6 @@ bool_t		bDeblockingFilterControlPresentFlag;
 
 } SWelsPPS, *PWelsPPPS;
 
-//#pragma pack()
 }
 
 #endif //WELS_PARAMETER_SETS_H__

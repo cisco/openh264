@@ -179,5 +179,4 @@ typedef struct TagSlice {
 } SSlice, *PSlice;
 
 }
-//#pragma pack()
 #endif//WELS_SLICE_H__
