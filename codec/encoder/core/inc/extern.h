@@ -108,6 +108,7 @@ int32_t ForceCodingIDR (sWelsEncCtx* pCtx);
  *			SVC adjustment results in new requirement in memory blocks adjustment
  */
 int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNew);
+void WelsEncoderAdjustFrameRate (SWelsSvcCodingParam* pParam);
 
 int32_t FilterLTRRecoveryRequest (sWelsEncCtx* pCtx, SLTRRecoverRequest* pLTRRecoverRequest);
 
