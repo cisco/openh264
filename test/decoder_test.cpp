@@ -11,17 +11,7 @@
 #include "codec_api.h"
 
 #include "utils/BufferedData.h"
-
-static bool CompareHash(unsigned char(&digest)[SHA_DIGEST_LENGTH],
-    const char* hashStr) {
-
-  char hashStrCmp[SHA_DIGEST_LENGTH * 2 + 1];
-  for (int i = 0; i < SHA_DIGEST_LENGTH; ++i) {
-    sprintf(&hashStrCmp[i*2], "%.2x", digest[i]);
-  }
-  hashStrCmp[SHA_DIGEST_LENGTH * 2] = '\0';
-  return strncmp(hashStr, hashStrCmp, SHA_DIGEST_LENGTH * 2) == 0;
-}
+#include "utils/HashFunctions.h"
 
 static void UpdateHashFromPlane(SHA_CTX* ctx, const uint8_t* plane,
     int width, int height, int stride) {
