@@ -52,7 +52,7 @@ namespace WelsSVCEnc {
 
 #if defined(X86_ASM)
 
-uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
+uint32_t WelsCPUFeatureDetect () {
   uint32_t uiCPU = 0;
   uint32_t uiFeatureA = 0, uiFeatureB = 0, uiFeatureC = 0, uiFeatureD = 0;
   int32_t  CacheLineSize = 0;
@@ -130,11 +130,6 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
   if (uiFeatureC & 0x00400000) {
     /* MOVBE checking */
     uiCPU |= WELS_CPU_MOVBE;
-  }
-
-  if (pNumberOfLogicProcessors != NULL) {
-    // HTT enabled on chip
-    *pNumberOfLogicProcessors = (uiFeatureB & 0x00ff0000) >> 16; // feature bits: 23-16 on returned EBX
   }
 
   WelsCPUId (0x80000000, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);

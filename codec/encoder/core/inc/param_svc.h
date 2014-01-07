@@ -138,7 +138,7 @@ int32_t		iInputCsp;			// color space of input sequence
 uint32_t	uiFrameToBeCoded;	// frame to be encoded (at input frame rate)
 
 int32_t		iTargetBitrate;			// overall target bitrate introduced in RC module
-int16_t		iMultipleThreadIdc;		// 1	# 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
+int16_t		iMultipleThreadIdc;		// # 0, 1: multiple threads imp. disabled; > 1: count number of threads;
 int16_t		iCountThreadsNum;			//		# derived from disable_multiple_slice_idc (=0 or >1) means;
 
 int32_t		iLTRRefNum;
