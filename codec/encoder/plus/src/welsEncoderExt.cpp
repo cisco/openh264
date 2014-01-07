@@ -971,9 +971,8 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     }
     //write new BR
     for (i=0;i<iNumLayers;i++) {
-      m_pEncContext->pSvcParam->sDependencyLayers[i].iSpatialBitrate = 
-        ((m_pEncContext->pSvcParam->sDependencyLayers[i].iSpatialBitrate)*
-        iValue)/iOrigTotalBitrate;
+      float fRatio = m_pEncContext->pSvcParam->sDependencyLayers[i].iSpatialBitrate/iOrigTotalBitrate;
+      m_pEncContext->pSvcParam->sDependencyLayers[i].iSpatialBitrate = fRatio*iValue;
     }
   }
   break;
