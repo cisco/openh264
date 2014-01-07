@@ -176,7 +176,7 @@ void_t WelsDecoderDefaults (PWelsDecoderContext pCtx) {
     g_uiCacheLineSize	= 32;
   }
 #endif//HAVE_CACHE_LINE_ALIGN
-#endif//X86_ASM	
+#endif//X86_ASM
 
   pCtx->iImgWidthInPixel		= 0;
   pCtx->iImgHeightInPixel		= 0;		// alloc picture data when picture size is available
