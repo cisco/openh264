@@ -1,53 +1,41 @@
 #!/bin/bash
 
-usage="this file must located in ../testbin/ based on our code structure  "
-echo $usage
+CurDir="${PWD}"
 
-CurDir=`pwd`
-EncoderMakeDir="../codec/build/linux/enc/"
-DecoderMakeDir="../codec/build/linux/dec/"
-VPMakeDir="../processing/build/linux/"
+if [ "$(basename ${CurDir})" != "testbin" ]; then
+    usage="This file must located in ../testbin/ based on our code structure"
+    echo ${usage}
+    exit 1
+fi
 
-CodecBinDir="../codec/build/linux/bin/"
+EncoderMakeDir="../codec/build/linux/enc"
+DecoderMakeDir="../codec/build/linux/dec"
+VPMakeDir="../processing/build/linux"
+
+CodecBinDir="../codec/build/linux/bin"
 VPBinDir="../bin/linux"
 
-let "EncoderBuildFlag=1"
-let "DecoderBuildFlag=1"
-let "VPBuildFlag=1"
 MakefileLogFile="${CurDir}/CodecVPBuild.log"
 
 #************************************************
 #call Encoder make file
-echo "encoder cleanning....."
+echo "encoder cleaning....."
 cd ${EncoderMakeDir}
-make clean >${MakefileLogFile}
-#make >>${MakefileLogFile}
-
-
+make clean
 
 #************************************************
 #call Decoder make file
-echo "decoder cleanning....."
+echo "decoder cleaning....."
 cd ${CurDir}
 cd ${DecoderMakeDir}
-make clean >>${MakefileLogFile}
-#make >>${MakefileLogFile}
-
-
+make clean
 
 #************************************************
 #call VP make file
-echo "VP cleanning....."
+echo "VP cleaning....."
 cd ${CurDir}
 cd ${VPMakeDir}
-make clean >>${MakefileLogFile}
-#make >>${MakefileLogFile}
+make clean
 
 cd ${CurDir}
-
-rm -f *.exe *.so *.a *.log
-rm -fr ../bin  # remove the bin directory
-
-
-
-
+rm -f *.exe *.so *.a *.log ../bin
