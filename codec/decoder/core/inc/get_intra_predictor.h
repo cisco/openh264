@@ -43,6 +43,8 @@
 
 #include "typedefs.h"
 
+//#pragma pack(1)
+
 namespace WelsDec {
 
 void_t WelsI4x4LumaPredV_c (uint8_t* pPred, const int32_t kiStride);
@@ -97,7 +99,7 @@ void_t WelsDecoderIChromaPredDcLeft_mmx (uint8_t* pPred, const int32_t kiStride)
 void_t WelsDecoderIChromaPredDcNA_mmx (uint8_t* pPred, const int32_t kiStride);
 
 
-void_t WelsI4x4LumaPredDc_sse2 (uint8_t* pPred, const int32_t kiStride);
+
 void_t WelsDecoderI4x4LumaPredDDR_mmx (uint8_t* pPred, const int32_t kiStride);
 void_t WelsDecoderI4x4LumaPredHD_mmx (uint8_t* pPred, const int32_t kiStride);
 void_t WelsDecoderI4x4LumaPredHU_mmx (uint8_t* pPred, const int32_t kiStride);
@@ -111,6 +113,8 @@ void_t WelsDecoderI4x4LumaPredVL_mmx (uint8_t* pPred, const int32_t kiStride);
 #endif//__cplusplus
 
 } // namespace WelsDec
+
+//#pragma pack()
 
 #endif //WELS_GET_INTRA_PREDICTOR_H__
 

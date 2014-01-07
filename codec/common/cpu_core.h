@@ -58,7 +58,7 @@
 /* CPU features application extensive */
 #define WELS_CPU_AVX		0x00000800	/* Advanced Vector eXtentions */
 #define WELS_CPU_FPU		0x00001000	/* x87-FPU on chip */
-#define WELS_CPU_HTT		0x00002000	/* Hyper-Threading Technology (HTT), Multi-threading enabled feature:
+#define WELS_CPU_HTT		0x00002000	/* Hyper-Threading Technology (HTT), Multi-threading enabled feature: 
 										   physical processor package is capable of supporting more than one logic processor
 										*/
 #define WELS_CPU_CMOV		0x00004000	/* Conditional Move Instructions,

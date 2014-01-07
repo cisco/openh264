@@ -42,7 +42,7 @@
 
 #include "typedefs.h"
 
-namespace WelsDec {
+
 
 #if defined(__cplusplus)
 extern "C" {
@@ -75,6 +75,6 @@ void     WelsCPURestore (const uint32_t kuiCPU);
 }
 #endif//__cplusplus
 
-} // namespace WelsDec
+
 
 #endif//WELS_CPU_DETECTION_H__
