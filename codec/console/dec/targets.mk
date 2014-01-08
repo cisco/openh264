@@ -22,7 +22,7 @@ $(H264DEC_SRCDIR)/./src/h264dec.o: $(H264DEC_SRCDIR)/./src/h264dec.cpp
 $(H264DEC_SRCDIR)/./src/read_config.o: $(H264DEC_SRCDIR)/./src/read_config.cpp
 	$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(H264DEC_CFLAGS) $(H264DEC_INCLUDES) -c -o $(H264DEC_SRCDIR)/./src/read_config.o $(H264DEC_SRCDIR)/./src/read_config.cpp
 
-h264dec: $(H264DEC_OBJS) $(LIBS) $(H264DEC_LIBS)
+h264dec: $(H264DEC_OBJS) $(LIBS) $(H264DEC_LIBS) $(H264DEC_DEPS)
 	$(CXX) -o $@  $(H264DEC_OBJS) $(H264DEC_LDFLAGS) $(H264DEC_LIBS) $(LDFLAGS) $(LIBS)
 
 binaries: h264dec
