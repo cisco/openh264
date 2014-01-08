@@ -16,20 +16,20 @@ EXCLUDE=[]
 def make_o(x):
     return os.path.splitext(x)[0] + ".o"
 
-def write_cpp_rule(f, x):
-    src = "$(%s_SRCDIR)/%s"%(PREFIX, x)
-    dst = "$(%s_SRCDIR)/%s"%(PREFIX, make_o(x))
+def write_cpp_rule_pattern(f):
+    src = "$(%s_SRCDIR)/%%.cpp"%(PREFIX)
+    dst = "$(%s_SRCDIR)/%%.o"%(PREFIX)
 
     f.write("%s: %s\n"%(dst, src))
-    f.write('\t$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(' + PREFIX + '_CFLAGS) $(' + PREFIX + '_INCLUDES) -c -o ' + dst + ' ' + src + '\n');
+    f.write('\t$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(' + PREFIX + '_CFLAGS) $(' + PREFIX + '_INCLUDES) -c -o $@ $<\n');
     f.write("\n")
 
-def write_asm_rule(f, x):
-    src = "$(%s_SRCDIR)/%s"%(PREFIX, x)
-    dst = "$(%s_SRCDIR)/%s"%(PREFIX, make_o(x))
+def write_asm_rule_pattern(f):
+    src = "$(%s_SRCDIR)/%%.asm"%(PREFIX)
+    dst = "$(%s_SRCDIR)/%%.o"%(PREFIX)
 
     f.write("%s: %s\n"%(dst, src))
-    f.write('\t$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(' + PREFIX + '_ASMFLAGS) $(' + PREFIX + '_ASM_INCLUDES) -o ' + dst + ' ' + src + '\n');
+    f.write('\t$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(' + PREFIX + '_ASMFLAGS) $(' + PREFIX + '_ASM_INCLUDES) -o $@ $<\n');
     f.write("\n")
 
 
@@ -83,11 +83,9 @@ f.write("endif\n\n")
 
 f.write("OBJS += $(%s_OBJS)\n"%PREFIX)
 
-for c in cpp:
-    write_cpp_rule(f, c)
+write_cpp_rule_pattern(f)
 
-for a in asm:
-    write_asm_rule(f, a)
+write_asm_rule_pattern(f)
 
 if args.library is not None:
     f.write("$(LIBPREFIX)%s.$(LIBSUFFIX): $(%s_OBJS)\n"%(args.library, PREFIX));
