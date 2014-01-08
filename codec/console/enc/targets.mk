@@ -18,7 +18,7 @@ $(H264ENC_SRCDIR)/./src/read_config.o: $(H264ENC_SRCDIR)/./src/read_config.cpp
 $(H264ENC_SRCDIR)/./src/welsenc.o: $(H264ENC_SRCDIR)/./src/welsenc.cpp
 	$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(H264ENC_CFLAGS) $(H264ENC_INCLUDES) -c -o $(H264ENC_SRCDIR)/./src/welsenc.o $(H264ENC_SRCDIR)/./src/welsenc.cpp
 
-h264enc: $(H264ENC_OBJS) $(LIBS) $(H264ENC_LIBS)
+h264enc: $(H264ENC_OBJS) $(LIBS) $(H264ENC_LIBS) $(H264ENC_DEPS)
 	$(CXX) -o $@  $(H264ENC_OBJS) $(H264ENC_LDFLAGS) $(H264ENC_LIBS) $(LDFLAGS) $(LIBS)
 
 binaries: h264enc
