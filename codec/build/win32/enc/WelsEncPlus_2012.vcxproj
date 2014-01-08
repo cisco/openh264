@@ -19,33 +19,33 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{1E7B4E9A-986E-4167-8C70-6E4F60EAEE7F}</ProjectGuid>
+    <ProjectGuid>{B5988995-D15F-479C-BD4D-CA41A26871E0}</ProjectGuid>
     <RootNamespace>WelsEncPlus</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v110</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v110</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v110</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v110</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -68,31 +68,35 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>.\..\..\..\..\bin\win32\Debug</OutDir>
-    <IntDir>.\..\..\..\obj\encoder\plus\Debug\</IntDir>
-    <LinkIncremental>true</LinkIncremental>
-    <TargetName>welsenc</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-    <TargetName>welsenc</TargetName>
-    <OutDir>.\..\..\..\..\bin\win64\Debug</OutDir>
-    <IntDir>.\..\..\..\obj\encoder\plus\Debug\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>.\..\..\..\..\bin\win32\Release</OutDir>
-    <IntDir>.\..\..\..\obj\encoder\plus\Release\</IntDir>
-    <LinkIncremental>false</LinkIncremental>
-    <TargetName>welsenc</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
-    <TargetName>welsenc</TargetName>
-    <OutDir>.\..\..\..\..\bin\win64\Release</OutDir>
-    <IntDir>.\..\..\..\obj\encoder\plus\Release\</IntDir>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\..\..\..\bin\win32\Debug</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\..\..\..\..\bin\win64\Debug</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\..\..\obj\encoder\plus\Debug\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\..\..\..\obj\encoder\plus\Debug\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\..\..\..\..\bin\win32\Release</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\..\..\..\..\bin\win64\Release</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\..\..\..\obj\encoder\plus\Release\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\..\..\..\obj\encoder\plus\Release\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">welsenc</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">welsenc</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">welsenc</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">welsenc</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -101,7 +105,8 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
       <TypeLibraryName>.\..\..\..\..\..\bin\Debug/WelsEncPlus.tlb</TypeLibraryName>
-      <HeaderFileName />
+      <HeaderFileName>
+      </HeaderFileName>
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -123,7 +128,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>$(OutDir)\welsecore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>welsecore.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)\welsenc.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>..\..\..\..\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -134,11 +139,10 @@
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <ImportLibrary>$(OutDir)\welsenc.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
-      <ProfileGuidedDatabase>$(OutDir)\welsenc.pgd</ProfileGuidedDatabase>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>$(OutDir)\welsenc.bsc</OutputFile>
+      <OutputFile>.\..\..\..\..\..\bin\Debug/WelsEncPlus.bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -169,7 +173,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>$(OutDir)\welsecore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>welsecore.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)\welsenc.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>..\..\..\..\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -179,11 +183,10 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <ImportLibrary>$(OutDir)\welsenc.lib</ImportLibrary>
-      <ProfileGuidedDatabase>$(OutDir)\welsenc.pgd</ProfileGuidedDatabase>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>$(OutDir)\welsenc.bsc</OutputFile>
+      <OutputFile>.\..\..\..\..\..\bin\Debug/WelsEncPlus.bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -193,7 +196,8 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
       <TypeLibraryName>.\..\..\..\..\..\bin\Release/WelsEncPlus.tlb</TypeLibraryName>
-      <HeaderFileName />
+      <HeaderFileName>
+      </HeaderFileName>
     </Midl>
     <ClCompile>
       <Optimization>Full</Optimization>
@@ -220,7 +224,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MAPINFO:exports /LTCG %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>$(OutDir)\welsecore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>welsecore.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)\welsenc.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>..\..\..\..\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -234,11 +238,10 @@
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <ImportLibrary>$(OutDir)\welsenc.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
-      <ProfileGuidedDatabase>$(OutDir)\welsenc.pgd</ProfileGuidedDatabase>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>$(OutDir)\welsenc.bsc</OutputFile>
+      <OutputFile>.\..\..\..\..\..\bin\Release/WelsEncPlus.bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -275,7 +278,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MAPINFO:exports /LTCG %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>$(OutDir)\welsecore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>welsecore.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)\welsenc.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>..\..\..\..\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -288,15 +291,23 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <ImportLibrary>$(OutDir)\welsenc.lib</ImportLibrary>
-      <ProfileGuidedDatabase>$(OutDir)\welsenc.pgd</ProfileGuidedDatabase>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>$(OutDir)\welsenc.bsc</OutputFile>
+      <OutputFile>.\..\..\..\..\..\bin\Release/WelsEncPlus.bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\encoder\plus\src\DllEntry.cpp" />
+    <ClCompile Include="..\..\..\encoder\plus\src\DllEntry.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="..\..\..\encoder\plus\src\welsCodecTrace.cpp" />
     <ClCompile Include="..\..\..\encoder\plus\src\welsEncoderExt.cpp" />
   </ItemGroup>
@@ -305,13 +316,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\common\inc\mem_align.h" />
-    <ClInclude Include="..\..\..\encoder\plus\inc\welsEncoderExt.h" />
     <ClInclude Include="..\..\..\encoder\plus\inc\welsCodecTrace.h" />
+    <ClInclude Include="..\..\..\encoder\plus\inc\welsEncoderExt.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\encoder\plus\res\welsenc.rc">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\Project\svc_perf_opt_b\codec\Wels\project\encoder\plus\res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">\Project\svc_perf_opt_b\codec\Wels\project\encoder\plus\res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">\Project\svc_perf_opt_b\codec\Wels\project\encoder\plus\res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">\Project\svc_perf_opt_b\codec\Wels\project\encoder\plus\res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>

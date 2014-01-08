@@ -4,6 +4,7 @@ LIBSUFFIX=a
 CP=cp
 ROOTDIR=$(PWD)
 
+
 ifeq (,$(wildcard ./gtest))
 HAVE_GTEST=No
 else
@@ -13,20 +14,22 @@ endif
 # Configurations
 ifeq ($(BUILDTYPE), Release)
 CFLAGS += -O3
-ifneq ($(ENABLE64BIT), Yes)
 USE_ASM = Yes
-endif
 else
 CFLAGS = -g
 USE_ASM = No
 endif
+
 ifeq ($(ENABLE64BIT), Yes)
 CFLAGS += -m64
 LDFLAGS += -m64
+ASMFLAGS += -DUNIX64
 else
 CFLAGS += -m32
 LDFLAGS += -m32
+ASMFLAGS += -DX86_32
 endif
+
 include build/platform-$(UNAME).mk
 
 ifeq ($(USE_ASM),Yes)
@@ -40,7 +43,8 @@ ASMFLAGS += -DNO_DYNAMIC_VP
 
 #### No user-serviceable parts below this line
 INCLUDES = -Icodec/api/svc  -Icodec/common -Igtest/include
-ASM_INCLUDES = -Iprocessing/src/asm/
+#ASM_INCLUDES = -Iprocessing/src/asm/
+ASM_INCLUDES = -Icodec/common/
 
 COMMON_INCLUDES = \
     -Icodec/decoder/core/inc
@@ -83,7 +87,7 @@ test:
 include codec/common/targets.mk
 include codec/decoder/targets.mk
 include codec/encoder/targets.mk
-include processing/targets.mk
+include codec/processing/targets.mk
 include codec/console/dec/targets.mk
 include codec/console/enc/targets.mk
 

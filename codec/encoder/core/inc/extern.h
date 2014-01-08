@@ -45,8 +45,6 @@
 
 namespace WelsSVCEnc {
 
-//#pragma pack()
-
 /*!
  * \brief	initialize source picture body
  * \param	kpSrc		SSourcePicture*

@@ -1919,7 +1919,7 @@ void OutputCpuFeaturesLog (uint32_t uiCpuFeatureFlags, uint32_t uiCpuCores, int3
            uiCpuCores,
            iCacheLineSize);
 
-#ifdef _DEBUG	// output at console & _debug
+//#ifdef _DEBUG	// output at console & _debug
   fprintf (stderr, "WELS CPU features/capacities (0x%x) detected: \n"	\
            "HTT:      %c, "	\
            "MMX:      %c, "	\
@@ -1962,7 +1962,7 @@ void OutputCpuFeaturesLog (uint32_t uiCpuFeatureFlags, uint32_t uiCpuCores, int3
            (uiCpuFeatureFlags & WELS_CPU_AES) ? 'Y' : 'N',
            uiCpuCores,
            iCacheLineSize);
-#endif//_DEBUG
+//#endif//_DEBUG
 }
 
 /*!
@@ -2124,8 +2124,8 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
 
 #if defined(MEMORY_MONITOR)
   WelsLog (pCtx, WELS_LOG_INFO, "WelsInitEncoderExt() exit, overall memory usage: %llu bytes\n",
-           static_cast<unsigned long long>(sizeof (sWelsEncCtx) /* requested size from malloc() or new operator */
-           + pCtx->pMemAlign->WelsGetMemoryUsage())	/* requested size from CMemoryAlign::WelsMalloc() */
+           static_cast<unsigned long long> (sizeof (sWelsEncCtx) /* requested size from malloc() or new operator */
+               + pCtx->pMemAlign->WelsGetMemoryUsage())	/* requested size from CMemoryAlign::WelsMalloc() */
           );
 #endif//MEMORY_MONITOR
 
@@ -2944,7 +2944,7 @@ int32_t WritePadding (sWelsEncCtx* pCtx, int32_t iLen) {
 #if GOM_TRACE_FLAG
     WelsLog (pCtx, WELS_LOG_ERROR,
              "[RC] paddingcal pBuffer overflow, bufferlen=%lld, paddinglen=%d, iNalIdx= %d, iCountNals= %d\n",
-             static_cast<long long int>(pBs->pBufEnd - pBs->pBufPtr), iLen, iNal, pCtx->pOut->iCountNals);
+             static_cast<long long int> (pBs->pBufEnd - pBs->pBufPtr), iLen, iNal, pCtx->pOut->iCountNals);
 #endif
     return 0;
   }

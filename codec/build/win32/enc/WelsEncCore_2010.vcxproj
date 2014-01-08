@@ -127,7 +127,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\..\encoder\core\inc;..\..\..\api\svc;..\..\..\WelsThreadLib\api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN64;_DEBUG;_LIB;WELS_SVC;ENCODER_CORE;HAVE_CACHE_LINE_ALIGN;MT_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN64;_DEBUG;X86_ASM;_LIB;WELS_SVC;ENCODER_CORE;HAVE_CACHE_LINE_ALIGN;MT_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>.\..\..\..\obj\encoder\core\Debug/WelsEncCore.pch</PrecompiledHeaderOutputFile>
@@ -197,7 +197,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>..\..\..\encoder\core\inc;..\..\..\api\svc;..\..\..\WelsThreadLib\api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN64;NDEBUG;_LIB;WELS_SVC;ENCODER_CORE;HAVE_CACHE_LINE_ALIGN;MT_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN64;NDEBUG;X86_ASM;_LIB;WELS_SVC;ENCODER_CORE;HAVE_CACHE_LINE_ALIGN;MT_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -565,255 +565,154 @@
     <ClInclude Include="..\..\..\encoder\core\inc\wels_preprocess.h" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\..\..\encoder\core\asm\asm_inc.asm">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </CustomBuild>
     <CustomBuild Include="..\..\..\encoder\core\asm\coeff.asm">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\encoder\core\asm\cpuid.asm">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="..\..\..\encoder\core\asm\dct.asm">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm  -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\encoder\core\asm\deblock.asm">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\encoder\core\asm\expand_picture.asm">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="..\..\..\encoder\core\asm\intra_pred.asm">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm  -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\encoder\core\asm\intra_pred_util.asm">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm  -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\encoder\core\asm\mb_copy.asm">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm  -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\encoder\core\asm\mc_chroma.asm">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm  -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\encoder\core\asm\mc_luma.asm">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="..\..\..\encoder\core\asm\memzero.asm">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="..\..\..\encoder\core\asm\quant.asm">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm  -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="..\..\..\encoder\core\asm\satd_sad.asm">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="..\..\..\encoder\core\asm\score.asm">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\encoder\core\asm\vaa.asm">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I%(RootDir)%(Directory) -f win32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\common\cpuid.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm  -I%(RootDir)%(Directory) -f win32 -O3 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\deblock.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\expand_picture.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\mb_copy.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\mc_chroma.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\mc_luma.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\vaa.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win32 -DX86_32 -DPREFIX -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -I ..\..\..\common\  -I%(RootDir)%(Directory) -f win64 -DWIN64 -o $(IntDir)%(Filename).obj %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

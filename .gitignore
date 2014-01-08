@@ -16,3 +16,5 @@
 *.exe
 *.out
 *.app
+h264dec
+h264enc

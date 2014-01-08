@@ -40,8 +40,6 @@
 
 namespace WelsDec {
 
-//#pragma pack(1)
-
 ///////////////////////////////////NAL Unit prefix/headers///////////////////////////////////
 
 /* NAL Unix Header in AVC, refer to Page 56 in JVT X201wcm */
@@ -81,8 +79,6 @@ typedef struct TagPrefixNalUnit {
   bool_t		bPrefixNalUnitAdditionalExtFlag;
   bool_t		bPrefixNalUnitExtFlag;
 } SPrefixNalUnit, *PPrefixNalUnit;
-
-//#pragma pack()
 
 } // namespace WelsDec
 

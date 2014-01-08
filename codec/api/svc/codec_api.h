@@ -94,6 +94,7 @@ class ISVCDecoder {
 
   /*
    *  src must be 4 byte aligned,   recommend 16 byte aligned.    the available src size must be multiple of 4.
+   *  this API does not work for now!! This is for future use to support non-I420 color format output.
    */
   virtual DECODING_STATE DecodeFrameEx (const unsigned char* pSrc,
                                         const int iSrcLen,

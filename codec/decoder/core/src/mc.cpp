@@ -362,7 +362,7 @@ static inline void_t McHorVer22WidthEq8_sse2 (uint8_t* pSrc, int32_t iSrcStride,
     int32_t iHeight) {
   ENFORCE_STACK_ALIGN_2D (int16_t, iTap, 21, 8, 16)
   McHorVer22Width8HorFirst_sse2 (pSrc - 2, iSrcStride, (uint8_t*)iTap, 16, iHeight + 5);
-  McHorVer22VerLast_sse2 ((uint8_t*)iTap, 16, pDst, iDstStride, 8, iHeight);
+  McHorVer22Width8VerLastAlign_sse2 ((uint8_t*)iTap, 16, pDst, iDstStride, 8, iHeight);
 }
 
 static inline void_t McHorVer02WidthEq16_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
@@ -664,7 +664,7 @@ void_t InitMcFunc (SMcFunc* pMcFunc, int32_t iCpu) {
     pMcFunc->pMcLumaFunc   = McLuma_sse2;
     pMcFunc->pMcChromaFunc = McChroma_sse2;
   }
-#endif //(X86_ASM)	
+#endif //(X86_ASM)
 }
 
 } // namespace WelsDec

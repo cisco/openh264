@@ -43,8 +43,6 @@
 
 #include "decoder_context.h"
 
-//#pragma pack(1)
-
 namespace WelsDec {
 
 /*!
@@ -125,8 +123,6 @@ void DeblockChromaLt4H_sse2 (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, 
 #endif//__cplusplus
 
 } // namespace WelsDec
-
-//#pragma pack()
 
 #endif //WELS_DEBLOCKING_H__
 

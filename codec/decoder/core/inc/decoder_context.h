@@ -72,8 +72,6 @@ typedef struct TagDataBuffer {
 //extern "C" {
 //#endif//__cplusplus
 
-//#pragma pack(1)
-
 /*
  *	Need move below structures to function pointer to seperate module/file later
  */
@@ -246,7 +244,7 @@ typedef struct TagWelsDecoderContext {
   int32_t             iSpsTotalNum;  //the number of SPS in current IDR interval
   int32_t             iSubspsTotalNum; //the number of subsps in current IDR interval
   int32_t             iPpsTotalNum; //the number of PPS in current IDR interval.
-#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID	
+#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
 
   SSps				sSpsBuffer[MAX_SPS_COUNT];
   SPps				sPpsBuffer[MAX_PPS_COUNT];
@@ -335,8 +333,6 @@ typedef struct TagWelsDecoderContext {
 #endif
 
 } SWelsDecoderContext, *PWelsDecoderContext;
-
-//#pragma pack()
 
 //#ifdef __cplusplus
 //}

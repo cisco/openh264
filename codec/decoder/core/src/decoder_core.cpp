@@ -628,17 +628,6 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   pSliceHead->uiRefCount[1]	= pPps->uiNumRefIdxL1Active;
   if (kbExtensionFlag) {
     uiQualityId = pNalHeaderExt->uiQualityId;
-    if (BASE_QUALITY_ID == uiQualityId && (EP_SLICE == uiSliceType || EB_SLICE == uiSliceType)) {
-      const bool_t kbBipredFlag = (EB_SLICE == uiSliceType);
-      if (kbBipredFlag) {
-        WelsLog (pCtx, WELS_LOG_WARNING, "ParseSliceHeaderSyntaxs(): kbBipredFlag = 1 not supported.\n");
-        return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_UNSUPPORTED_BIPRED);
-      }
-      pSliceHead->bNumRefIdxActiveOverrideFlag	= !!BsGetOneBit (pBs);
-      if (pSliceHead->bNumRefIdxActiveOverrideFlag) {
-        pSliceHead->uiRefCount[0]	= 1 + BsGetUe (pBs);
-      }
-    }
   } else if (uiSliceType == P_SLICE || uiSliceType == SP_SLICE || uiSliceType == B_SLICE) {
     const bool_t kbBipredFlag = (B_SLICE == uiSliceType);
     if (kbBipredFlag) {

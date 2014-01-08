@@ -43,8 +43,6 @@
 
 #include "typedefs.h"
 
-//#pragma pack(1)
-
 namespace WelsDec {
 
 void_t WelsI4x4LumaPredV_c (uint8_t* pPred, const int32_t kiStride);
@@ -83,29 +81,29 @@ extern "C" {
 #endif//__cplusplus
 
 #if defined(X86_ASM)
-void_t WelsI16x16LumaPredPlane_sse2 (uint8_t* pPred, const int32_t kiStride);
-void_t WelsI16x16LumaPredH_sse2 (uint8_t* pPred, const int32_t kiStride);
-void_t WelsI16x16LumaPredV_sse2 (uint8_t* pPred, const int32_t kiStride);
-void_t WelsI16x16LumaPredDc_sse2 (uint8_t* pPred, const int32_t kiStride);
-void_t WelsI16x16LumaPredDcTop_sse2 (uint8_t* pPred, const int32_t kiStride);
-void_t WelsI16x16LumaPredDcNA_sse2 (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderI16x16LumaPredPlane_sse2 (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderI16x16LumaPredH_sse2 (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderI16x16LumaPredV_sse2 (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderI16x16LumaPredDc_sse2 (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderI16x16LumaPredDcTop_sse2 (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderI16x16LumaPredDcNA_sse2 (uint8_t* pPred, const int32_t kiStride);
 
-void_t WelsIChromaPredDcTop_sse2 (uint8_t* pPred, const int32_t kiStride);
-void_t WelsIChromaPredPlane_sse2 (uint8_t* pPred, const int32_t kiStride);
-void_t WelsIChromaPredDc_sse2 (uint8_t* pPred, const int32_t kiStride);
-void_t WelsIChromaPredH_mmx (uint8_t* pPred, const int32_t kiStride);
-void_t WelsIChromaPredV_mmx (uint8_t* pPred, const int32_t kiStride);
-void_t WelsIChromaPredDcLeft_mmx (uint8_t* pPred, const int32_t kiStride);
-void_t WelsIChromaPredDcNA_mmx (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderIChromaPredDcTop_sse2 (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderIChromaPredPlane_sse2 (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderIChromaPredDc_sse2 (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderIChromaPredH_mmx (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderIChromaPredV_mmx (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderIChromaPredDcLeft_mmx (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderIChromaPredDcNA_mmx (uint8_t* pPred, const int32_t kiStride);
 
-void_t WelsI4x4LumaPredH_sse2 (uint8_t* pPred, const int32_t kiStride);
+
 void_t WelsI4x4LumaPredDc_sse2 (uint8_t* pPred, const int32_t kiStride);
-void_t WelsI4x4LumaPredDDR_mmx (uint8_t* pPred, const int32_t kiStride);
-void_t WelsI4x4LumaPredHD_mmx (uint8_t* pPred, const int32_t kiStride);
-void_t WelsI4x4LumaPredHU_mmx (uint8_t* pPred, const int32_t kiStride);
-void_t WelsI4x4LumaPredVR_mmx (uint8_t* pPred, const int32_t kiStride);
-void_t WelsI4x4LumaPredDDL_mmx (uint8_t* pPred, const int32_t kiStride);
-void_t WelsI4x4LumaPredVL_mmx (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderI4x4LumaPredDDR_mmx (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderI4x4LumaPredHD_mmx (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderI4x4LumaPredHU_mmx (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderI4x4LumaPredVR_mmx (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderI4x4LumaPredDDL_mmx (uint8_t* pPred, const int32_t kiStride);
+void_t WelsDecoderI4x4LumaPredVL_mmx (uint8_t* pPred, const int32_t kiStride);
 #endif//X86_ASM
 
 #if defined(__cplusplus)
@@ -113,8 +111,6 @@ void_t WelsI4x4LumaPredVL_mmx (uint8_t* pPred, const int32_t kiStride);
 #endif//__cplusplus
 
 } // namespace WelsDec
-
-//#pragma pack()
 
 #endif //WELS_GET_INTRA_PREDICTOR_H__
 

@@ -33,10 +33,6 @@
 #ifndef WELS_VIDEO_CODEC_DEFINITION_H__
 #define WELS_VIDEO_CODEC_DEFINITION_H__
 
-#if defined(WIN32)
-#pragma once
-#endif//WIN32
-
 typedef enum {
   /*rgb color formats*/
   videoFormatRGB        = 1,
@@ -111,8 +107,6 @@ enum ENalPriority {
 
 #define FRAME_NUM_PARAM_SET		(-1)
 #define FRAME_NUM_IDR			0
-
-#pragma pack(1)
 
 /* Error Tools definition */
 typedef unsigned short ERR_TOOL;
@@ -235,7 +229,5 @@ static const SRateThresholds ksRateThrMap[4] = {
 static const char kiKeyNumMultiple[] = {
   1, 1, 2, 4, 8, 16,
 };
-
-#pragma pack()
 
 #endif//WELS_VIDEO_CODEC_DEFINITION_H__

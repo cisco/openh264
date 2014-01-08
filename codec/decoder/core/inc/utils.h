@@ -48,10 +48,6 @@
 
 namespace WelsDec {
 
-//#ifdef __cplusplus
-//extern "C" {
-//#endif//__cplusplus
-
 // cache line size
 extern uint32_t g_uiCacheLineSize;
 
@@ -90,10 +86,6 @@ enum {
   WELS_LOG_LEVEL_COUNT = 5,
   WELS_LOG_DEFAULT	= WELS_LOG_ERROR | WELS_LOG_WARNING | WELS_LOG_INFO | WELS_LOG_DEBUG	// Default log level in Wels codec
 };
-
-//#ifdef __cplusplus
-//}
-//#endif//__cplusplus
 
 } // namespace WelsDec
 

@@ -44,7 +44,7 @@
 
 
 
-
+%ifdef X86_32
 SECTION .rodata align=16
 
 align 16
@@ -457,3 +457,4 @@ CavlcParamCal_sse2:
 	pop edi
 	pop ebx
 	ret
+%endif
