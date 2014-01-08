@@ -61,7 +61,7 @@ int32_t WelsCPUSupportFMA (uint32_t eax, uint32_t ecx);
 
 void WelsEmms();
 
-uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors);
+uint32_t WelsCPUFeatureDetect ();
 
 /*
  *	clear FPU registers states for potential float based calculation if support

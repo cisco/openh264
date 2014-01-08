@@ -1895,7 +1895,6 @@ void OutputCpuFeaturesLog (uint32_t uiCpuFeatureFlags, uint32_t uiCpuCores, int3
            "CMOV:     %c, "	\
            "MOVBE:    %c, "	\
            "AES:      %c, "	\
-           "NUMBER OF LOGIC PROCESSORS ON CHIP: %d, "	\
            "CPU CACHE LINE SIZE (BYTES):        %d\n",
            uiCpuFeatureFlags,
            (uiCpuFeatureFlags & WELS_CPU_HTT) ? 'Y' : 'N',
@@ -1915,8 +1914,7 @@ void OutputCpuFeaturesLog (uint32_t uiCpuFeatureFlags, uint32_t uiCpuCores, int3
            (uiCpuFeatureFlags & WELS_CPU_ALTIVEC) ? 'Y' : 'N',
            (uiCpuFeatureFlags & WELS_CPU_CMOV) ? 'Y' : 'N',
            (uiCpuFeatureFlags & WELS_CPU_MOVBE) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_AES) ? 'Y' : 'N',
-           uiCpuCores,
+           (uiCpuFeatureFlags & WELS_CPU_AES) ? 'Y' : 'N',           
            iCacheLineSize);
 
 //#ifdef _DEBUG	// output at console & _debug
@@ -1939,7 +1937,6 @@ void OutputCpuFeaturesLog (uint32_t uiCpuFeatureFlags, uint32_t uiCpuCores, int3
            "CMOV:     %c, "	\
            "MOVBE:    %c, "	\
            "AES:      %c, "	\
-           "NUMBER OF LOGIC PROCESSORS ON CHIP: %d, "	\
            "CPU CACHE LINE SIZE (BYTES):        %d\n",
            uiCpuFeatureFlags,
            (uiCpuFeatureFlags & WELS_CPU_HTT) ? 'Y' : 'N',
@@ -1959,8 +1956,7 @@ void OutputCpuFeaturesLog (uint32_t uiCpuFeatureFlags, uint32_t uiCpuCores, int3
            (uiCpuFeatureFlags & WELS_CPU_ALTIVEC) ? 'Y' : 'N',
            (uiCpuFeatureFlags & WELS_CPU_CMOV) ? 'Y' : 'N',
            (uiCpuFeatureFlags & WELS_CPU_MOVBE) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_AES) ? 'Y' : 'N',
-           uiCpuCores,
+           (uiCpuFeatureFlags & WELS_CPU_AES) ? 'Y' : 'N',           
            iCacheLineSize);
 //#endif//_DEBUG
 }
@@ -1994,7 +1990,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
 
   // for cpu features detection, Only detect once??
 #ifdef X86_ASM
-  uiCpuFeatureFlags	= WelsCPUFeatureDetect (&uiCpuCores);	// detect cpu capacity features
+  uiCpuFeatureFlags	= WelsCPUFeatureDetect ();	// detect cpu capacity features
   if (uiCpuFeatureFlags & WELS_CPU_CACHELINE_128)
     iCacheLineSize = 128;
   else if (uiCpuFeatureFlags & WELS_CPU_CACHELINE_64)
@@ -2008,29 +2004,10 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   iCacheLineSize	= 16;	// 16 bytes aligned in default
 #endif//X86_ASM
 
-#ifndef WELS_TESTBED
-
-#if defined(MT_ENABLED) && defined(DYNAMIC_DETECT_CPU_CORES)
-  if (pCodingParam->iMultipleThreadIdc > 0)
-    uiCpuCores = pCodingParam->iMultipleThreadIdc;
-  else {
-    if (uiCpuFeatureFlags ==
-        0)	// cpuid not supported, use high level system API as followed to detect number of pysical/logic processor
-      uiCpuCores = DynamicDetectCpuCores();
-    // So far so many cpu cores up to MAX_THREADS_NUM mean for server platforms,
-    // for client application here it is constrained by maximal to MAX_THREADS_NUM
-    if (uiCpuCores > MAX_THREADS_NUM)	// MAX_THREADS_NUM
-      uiCpuCores	= MAX_THREADS_NUM;	// MAX_THREADS_NUM
-    else if (uiCpuCores < 1)	// just for safe
-      uiCpuCores	= 1;
+  if( pCodingParam->iMultipleThreadIdc <= 0 ){
+    pCodingParam->iMultipleThreadIdc = 1;
   }
-#endif//MT_ENABLED && DYNAMIC_DETECT_CPU_CORES
-
-#else//WELS_TESTBED
-
-  uiCpuCores	= pCodingParam->iMultipleThreadIdc;	// assigned uiCpuCores from iMultipleThreadIdc from SGE testing
-
-#endif//WELS_TESTBED
+  uiCpuCores    = pCodingParam->iMultipleThreadIdc;
 
   uiCpuCores	= WELS_CLIP3 (uiCpuCores, 1, MAX_THREADS_NUM);
 

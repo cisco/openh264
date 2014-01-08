@@ -95,7 +95,7 @@ void  WelsEmms();
 WELSVP_EXTERN_C_END
 #endif
 
-uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors);
+uint32_t WelsCPUFeatureDetect ();
 
 WELSVP_NAMESPACE_END
 

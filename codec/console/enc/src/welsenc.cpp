@@ -188,7 +188,6 @@ int ParseConfig (CReadConfig& cRdCfg, SWelsSvcCodingParam& pSvcParam, SFilesSet&
         else if (pSvcParam.iInterLayerLoopFilterBetaOffset > 6)
           pSvcParam.iInterLayerLoopFilterBetaOffset	= 6;
       } else if (strTag[0].compare ("MultipleThreadIdc") == 0) {
-        // # 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
         pSvcParam.iMultipleThreadIdc	= atoi (strTag[1].c_str());
         if (pSvcParam.iMultipleThreadIdc < 0)
           pSvcParam.iMultipleThreadIdc = 0;

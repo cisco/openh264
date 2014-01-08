@@ -138,7 +138,7 @@ int32_t		iInputCsp;			// color space of input sequence
 uint32_t	uiFrameToBeCoded;	// frame to be encoded (at input frame rate)
 
 int32_t		iTargetBitrate;			// overall target bitrate introduced in RC module
-int16_t		iMultipleThreadIdc;		// 1	# 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
+int16_t		iMultipleThreadIdc;		// # 0, 1: multiple threads imp. disabled; > 1: count number of threads;
 int16_t		iCountThreadsNum;			//		# derived from disable_multiple_slice_idc (=0 or >1) means;
 
 int32_t		iLTRRefNum;
@@ -213,12 +213,7 @@ void FillDefault (const bool_t kbEnableRc) {
 
   iTargetBitrate			= 0;	// overall target bitrate introduced in RC module
   bDeblockingParallelFlag = false;	// deblocking filter parallelization control flag
-#ifdef MT_ENABLED
-  iMultipleThreadIdc		= 0;	// auto to detect cpu cores inside
-#else
-  iMultipleThreadIdc		=
-    1;	// 1 # 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
-#endif//MT_ENABLED
+  iMultipleThreadIdc		= 1;
   iCountThreadsNum		= 1;	//		# derived from disable_multiple_slice_idc (=0 or >1) means;
 
   iLTRRefNum				= 0;

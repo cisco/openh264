@@ -153,8 +153,7 @@ static void_t DestroyPicBuff (PPicBuff* ppPicBuf) {
 /*
  * fill data fields in default for decoder context
  */
-void_t WelsDecoderDefaults (PWelsDecoderContext pCtx) {
-  int32_t iCpuCores               = 1;
+void_t WelsDecoderDefaults (PWelsDecoderContext pCtx) {  
   memset (pCtx, 0, sizeof (SWelsDecoderContext));	// fill zero first
 
   pCtx->pArgDec                   = NULL;
@@ -168,7 +167,7 @@ void_t WelsDecoderDefaults (PWelsDecoderContext pCtx) {
 
   g_uiCacheLineSize				= 16;
 #if defined(X86_ASM)
-  pCtx->uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores);
+  pCtx->uiCpuFlag = WelsCPUFeatureDetect ();
 #ifdef HAVE_CACHE_LINE_ALIGN
   if (pCtx->uiCpuFlag & WELS_CPU_CACHELINE_64) {
     g_uiCacheLineSize	= 64;
