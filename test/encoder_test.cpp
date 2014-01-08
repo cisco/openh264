@@ -57,7 +57,6 @@ static void UpdateHashFromFrame(const SFrameBSInfo& info, SHA_CTX* ctx) {
 static void CompareFileToHash(ISVCEncoder* encoder,
     const char* fileName, const char* hashStr,
     int width, int height, float frameRate) {
-
   std::ifstream file(fileName, std::ios::in | std::ios::binary);
   ASSERT_TRUE(file.is_open());
 
@@ -94,9 +93,9 @@ static void CompareFileToHash(ISVCEncoder* encoder,
   ASSERT_TRUE(CompareHash(digest, hashStr));
 }
 
-class EncoderInitTest : public ::testing::Test {
-public:
-  EncoderInitTest() : encoder_(NULL) {}
+class EncoderBaseTest : public ::testing::Test {
+ public:
+  EncoderBaseTest() : encoder_(NULL) {}
 
   virtual void SetUp() {
     int rv = CreateSVCEncoder(&encoder_);
@@ -105,17 +104,17 @@ public:
   }
 
   virtual void TearDown() {
-    if (encoder_ != NULL) {
+    if (encoder_) {
       encoder_->Uninitialize();
       DestroySVCEncoder(encoder_);
     }
   }
 
-protected:
+ protected:
   ISVCEncoder* encoder_;
 };
 
-TEST_F(EncoderInitTest, JustInit) {
+TEST_F(EncoderBaseTest, JustInit) {
 }
 
 struct EncodeFileParam {
@@ -126,7 +125,7 @@ struct EncodeFileParam {
   float frameRate;
 };
 
-class EncoderOutputTest : public EncoderInitTest ,
+class EncoderOutputTest : public EncoderBaseTest ,
     public ::testing::WithParamInterface<EncodeFileParam> {
 };
 

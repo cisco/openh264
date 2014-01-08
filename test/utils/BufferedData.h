@@ -4,11 +4,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-class BufferedData
-{
-public:
-  BufferedData() : data_(NULL), capacity_(0), length_(0) {
-  }
+class BufferedData {
+ public:
+  BufferedData() : data_(NULL), capacity_(0), length_(0) {}
 
   ~BufferedData() {
     free(data_);
@@ -40,7 +38,7 @@ public:
     return data_;
   }
 
-private:
+ private:
   bool EnsureCapacity(size_t capacity) {
     if (capacity > capacity_) {
       size_t newsize = capacity * 2;
