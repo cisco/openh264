@@ -441,8 +441,9 @@ static inline void McHorVer22WidthEq16_sse2 (uint8_t* pSrc, int32_t iSrcStride, 
   McHorVer22WidthEq8_sse2 (pSrc,     iSrcStride, pDst,     iDstStride, iHeight);
   McHorVer22WidthEq8_sse2 (&pSrc[8], iSrcStride, &pDst[8], iDstStride, iHeight);
 }
-void McHorVer22Width9Or17Height9Or17_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
-                      int32_t iHeight) {
+void McHorVer22Width9Or17Height9Or17_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+    int32_t iWidth,
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_2D (int16_t, pTap, 22, 24, 16)
   int32_t tmp1 = 2 * (iWidth - 8);
   McHorVer22HorFirst_sse2 (pSrc - 2, iSrcStride, (uint8_t*)pTap, 48, iWidth, iHeight + 5);

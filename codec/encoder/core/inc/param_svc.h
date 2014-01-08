@@ -103,7 +103,7 @@ float		fOutputFrameRate;		// output frame rate
 
 #ifdef ENABLE_FRAME_DUMP
 str_t		sRecFileName[MAX_FNAME_LEN];	// file to be constructed
-#endif//ENABLE_FRAME_DUMP	
+#endif//ENABLE_FRAME_DUMP
 } SDLayerParam;
 
 /*

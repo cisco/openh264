@@ -34,7 +34,7 @@
 #include "cpu_core.h"
 #include "wels_func_ptr_def.h"
 
-namespace WelsSVCEnc{
+namespace WelsSVCEnc {
 // rewrite it (split into luma & chroma) that is helpful for mmx/sse2 optimization perform, 9/27/2009
 static inline void ExpandPictureLuma_c (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicW,
                                         const int32_t kiPicH) {

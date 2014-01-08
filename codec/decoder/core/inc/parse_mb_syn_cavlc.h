@@ -143,7 +143,6 @@ void_t WelsFillCacheConstrain1Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZe
 void_t WelsFillCacheInter (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
                            int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30], PDqLayer pCurLayer);
 
-void_t PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]);
 
 /*!
  * \brief   check iPredMode for intra16x16 eligible or not
@@ -210,8 +209,6 @@ int32_t ParseIntra16x16ModeConstrain1 (PNeighAvail pNeighAvail, PBitStringAux pB
  */
 int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30],
                         PBitStringAux pBs);
-
-//#pragma pack()
 
 } // namespace WelsDec
 #endif//WELS_PARSE_MB_SYN_CAVLC_H__

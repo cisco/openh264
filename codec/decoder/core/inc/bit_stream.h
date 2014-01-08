@@ -53,8 +53,6 @@ int32_t		iLeftBits;	// count number of available bits left ([1, 8]),
 // need pointer to next byte start position in case 0 bit left then 8 instead
 } SBitStringAux, *PBitStringAux;
 
-//#pragma pack()
-
 /*!
  * \brief	input bits for decoder or initialize bitstream writing in encoder
  *
