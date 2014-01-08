@@ -47,7 +47,44 @@
 ;***********************************************************************
 ; Macros and other preprocessor constants
 ;***********************************************************************
+%macro SUM_SQR_SSE2	3	; dst, pSrc, zero
+	movdqa %1, %2
+	punpcklbw %1, %3
+	punpckhbw %2, %3
+	pmaddwd %1, %1
+	pmaddwd %2, %2
+	paddd %1, %2
+	pshufd %2, %1, 04Eh	; 01001110 B
+	paddd %1, %2
+	pshufd %2, %1, 0B1h	; 10110001 B
+	paddd %1, %2
+%endmacro	; END OF SUM_SQR_SSE2
 
+
+%macro WELS_SAD_16x2_SSE2  3 ;esi :%1 edi:%2 ebx:%3
+	movdqa	xmm1,	[%1]
+	movdqa	xmm2,	[%2]
+	movdqa	xmm3,	[%1+%3]
+	movdqa	xmm4,	[%2+%3]
+	psadbw	xmm1,	xmm2
+	psadbw	xmm3,	xmm4
+	paddd	xmm6,	xmm1
+	paddd	xmm6,	xmm3
+	lea		%1,	[%1+%3*2]
+	lea		%2,	[%2+%3*2]
+%endmacro
+
+; by comparing it outperforms than phaddw(SSSE3) sets
+%macro SUM_WORD_8x2_SSE2	2	; dst(pSrc), tmp
+	; @sum_8x2 begin
+	pshufd %2, %1, 04Eh	; 01001110 B
+	paddw %1, %2
+	pshuflw %2, %1, 04Eh	; 01001110 B
+	paddw %1, %2
+	pshuflw %2, %1, 0B1h	; 10110001 B
+	paddw %1, %2
+	; end of @sum_8x2
+%endmacro	; END of SUM_WORD_8x2_SSE2
 
 %macro	WELS_SAD_SUM_SQSUM_16x1_SSE2 3 ;esi:%1,edi:%2,ebx:%3
 	movdqa	xmm1,	[%1]
@@ -219,6 +256,401 @@ SECTION .text
 
 ; , 6/7/2010
 
+%ifdef X86_32
+
+WELS_EXTERN SampleVariance16x16_sse2
+;***********************************************************************
+;   void SampleVariance16x16_sse2(	uint8_t * y_ref, int32_t y_ref_stride, uint8_t * y_src, int32_t y_src_stride,SMotionTextureUnit* pMotionTexture );
+;***********************************************************************
+ALIGN 16
+SampleVariance16x16_sse2:
+	push esi
+	push edi
+	push ebx
+
+	sub esp, 16
+	%define SUM			[esp]
+	%define SUM_CUR		[esp+4]
+	%define SQR			[esp+8]
+	%define SQR_CUR		[esp+12]
+	%define PUSH_SIZE	28	; 12 + 16
+
+	mov edi, [esp+PUSH_SIZE+4]	; y_ref
+	mov edx, [esp+PUSH_SIZE+8]	; y_ref_stride
+	mov esi, [esp+PUSH_SIZE+12]	; y_src
+	mov eax, [esp+PUSH_SIZE+16]	; y_src_stride
+	mov ecx, 010h				; height = 16
+
+	pxor xmm7, xmm7
+	movdqu SUM, xmm7
+
+.hloops:
+	movdqa xmm0, [edi]		; y_ref
+	movdqa xmm1, [esi]		; y_src
+	movdqa xmm2, xmm0		; store first for future process
+	movdqa xmm3, xmm1
+	; sum += diff;
+	movdqa xmm4, xmm0
+	psadbw xmm4, xmm1		; 2 parts, [0,..,15], [64,..,79]
+	; to be continued for sum
+	pshufd xmm5, xmm4, 0C6h	; 11000110 B
+	paddw xmm4, xmm5
+	movd ebx, xmm4
+	add SUM, ebx
+
+	; sqr += diff * diff;
+	pmaxub xmm0, xmm1
+	pminub xmm1, xmm2
+	psubb xmm0, xmm1				; diff
+	SUM_SQR_SSE2 xmm1, xmm0, xmm7	; dst, pSrc, zero
+	movd ebx, xmm1
+	add SQR, ebx
+
+	; sum_cur += y_src[x];
+	movdqa xmm0, xmm3		; cur_orig
+	movdqa xmm1, xmm0
+	punpcklbw xmm0, xmm7
+	punpckhbw xmm1, xmm7
+	paddw xmm0, xmm1		; 8x2
+	SUM_WORD_8x2_SSE2 xmm0, xmm1
+	movd ebx, xmm0
+	and ebx, 0ffffh
+	add SUM_CUR, ebx
+
+	; sqr_cur += y_src[x] * y_src[x];
+	SUM_SQR_SSE2 xmm0, xmm3, xmm7	; dst, pSrc, zero
+	movd ebx, xmm0
+	add SQR_CUR, ebx
+
+	lea edi, [edi+edx]
+	lea esi, [esi+eax]
+	dec ecx
+	jnz near .hloops
+
+	mov ebx, 0
+	mov bx, word SUM
+	sar ebx, 8
+	imul ebx, ebx
+	mov ecx, SQR
+	sar ecx, 8
+	sub ecx, ebx
+	mov edi, [esp+PUSH_SIZE+20]	; pMotionTexture
+	mov [edi], cx				; to store uiMotionIndex
+	mov ebx, 0
+	mov bx, word SUM_CUR
+	sar ebx, 8
+	imul ebx, ebx
+	mov ecx, SQR_CUR
+	sar ecx, 8
+	sub ecx, ebx
+	mov [edi+2], cx				; to store uiTextureIndex
+
+	%undef SUM
+	%undef SUM_CUR
+	%undef SQR
+	%undef SQR_CUR
+	%undef PUSH_SIZE
+
+	add esp, 16
+	pop ebx
+	pop edi
+	pop esi
+
+	ret
+
+
+
+WELS_EXTERN VAACalcSad_sse2
+;*************************************************************************************************************
+;void VAACalcSad_sse2( uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight
+;								int32_t iPicStride, int32_t *psadframe, int32_t *psad8x8)
+;*************************************************************************************************************
+
+
+ALIGN 16
+VAACalcSad_sse2:
+%define		cur_data			esp + pushsize + 4
+%define		ref_data			esp + pushsize + 8
+%define		iPicWidth			esp + pushsize + 12
+%define		iPicHeight			esp + pushsize + 16
+%define		iPicStride			esp + pushsize + 20
+%define		psadframe			esp + pushsize + 24
+%define		psad8x8				esp + pushsize + 28
+%define		pushsize	12
+	push	esi
+	push	edi
+	push	ebx
+	mov		esi,	[cur_data]
+	mov		edi,	[ref_data]
+	mov		ebx,	[iPicStride]
+	mov		edx,	[psad8x8]
+	mov		eax,	ebx
+
+	shr		dword [iPicWidth],	4					; iPicWidth/16
+	shr		dword [iPicHeight],	4					; iPicHeight/16
+	shl		eax,	4								; iPicStride*16
+	pxor	xmm0,	xmm0
+	pxor	xmm7,	xmm7		; iFrameSad
+height_loop:
+	mov		ecx,	dword [iPicWidth]
+	push	esi
+	push	edi
+width_loop:
+	pxor	xmm6,	xmm6		;
+	WELS_SAD_16x2_SSE2 esi,edi,ebx
+	WELS_SAD_16x2_SSE2 esi,edi,ebx
+	WELS_SAD_16x2_SSE2 esi,edi,ebx
+	WELS_SAD_16x2_SSE2 esi,edi,ebx
+	paddd	xmm7,		xmm6
+	movd	[edx],		xmm6
+	psrldq	xmm6,		8
+	movd	[edx+4],	xmm6
+
+	pxor	xmm6,	xmm6
+	WELS_SAD_16x2_SSE2 esi,edi,ebx
+	WELS_SAD_16x2_SSE2 esi,edi,ebx
+	WELS_SAD_16x2_SSE2 esi,edi,ebx
+	WELS_SAD_16x2_SSE2 esi,edi,ebx
+	paddd	xmm7,		xmm6
+	movd	[edx+8],	xmm6
+	psrldq	xmm6,		8
+	movd	[edx+12],	xmm6
+
+	add		edx,	16
+	sub		esi,	eax
+	sub		edi,	eax
+	add		esi,	16
+	add		edi,	16
+
+	dec		ecx
+	jnz		width_loop
+
+	pop		edi
+	pop		esi
+	add		esi,	eax
+	add		edi,	eax
+
+	dec	dword [iPicHeight]
+	jnz		height_loop
+
+	mov		edx,	[psadframe]
+	movdqa	xmm5,	xmm7
+	psrldq	xmm7,	8
+	paddd	xmm7,	xmm5
+	movd	[edx],	xmm7
+
+%undef		cur_data
+%undef		ref_data
+%undef		iPicWidth
+%undef		iPicHeight
+%undef		iPicStride
+%undef		psadframe
+%undef		psad8x8
+%undef		pushsize
+	pop		ebx
+	pop		edi
+	pop		esi
+	ret
+	
+%else  ;64-bit 
+
+WELS_EXTERN SampleVariance16x16_sse2
+;***********************************************************************
+;   void SampleVariance16x16_sse2(	uint8_t * y_ref, int32_t y_ref_stride, uint8_t * y_src, int32_t y_src_stride,SMotionTextureUnit* pMotionTexture );
+;***********************************************************************
+ALIGN 16
+SampleVariance16x16_sse2:
+	%define SUM			r10;[esp]
+	%define SUM_CUR		r11;[esp+4]
+	%define SQR			r13;[esp+8]
+	%define SQR_CUR		r15;[esp+12]
+
+  movdqa xmm14,xmm6
+  movdqa xmm15,xmm7 
+	push r12
+	push r13
+	push r14
+	push r15
+	%assign push_num 4
+	LOAD_5_PARA
+	SIGN_EXTENTION r1,r1d
+	SIGN_EXTENTION r3,r3d
+	
+	mov r12,010h
+	pxor xmm7, xmm7
+	movq SUM, xmm7
+	movq SUM_CUR,xmm7
+	movq SQR,xmm7
+	movq SQR_CUR,xmm7
+
+.hloops:
+  mov r14,0
+	movdqa xmm0, [r0]		; y_ref
+	movdqa xmm1, [r2]		; y_src
+	movdqa xmm2, xmm0		; store first for future process
+	movdqa xmm3, xmm1
+	; sum += diff;
+	movdqa xmm4, xmm0
+	psadbw xmm4, xmm1		; 2 parts, [0,..,15], [64,..,79]
+	; to be continued for sum
+	pshufd xmm5, xmm4, 0C6h	; 11000110 B
+	paddw xmm4, xmm5
+	movd r14d, xmm4
+	add SUM, r14
+
+	; sqr += diff * diff;
+	pmaxub xmm0, xmm1
+	pminub xmm1, xmm2
+	psubb xmm0, xmm1				; diff
+	SUM_SQR_SSE2 xmm1, xmm0, xmm7	; dst, pSrc, zero
+	movd r14d, xmm1
+	add SQR, r14
+
+	; sum_cur += y_src[x];
+	movdqa xmm0, xmm3		; cur_orig
+	movdqa xmm1, xmm0
+	punpcklbw xmm0, xmm7
+	punpckhbw xmm1, xmm7
+	paddw xmm0, xmm1		; 8x2
+	SUM_WORD_8x2_SSE2 xmm0, xmm1
+	movd r14d, xmm0
+	and r14, 0ffffh
+	add SUM_CUR, r14
+
+	; sqr_cur += y_src[x] * y_src[x];
+	SUM_SQR_SSE2 xmm0, xmm3, xmm7	; dst, pSrc, zero
+	movd r14d, xmm0
+	add SQR_CUR, r14
+
+	lea r0, [r0+r1]
+	lea r2, [r2+r3]
+	dec r12
+	jnz near .hloops
+	
+	mov r0, SUM
+	sar r0, 8
+	imul r0, r0
+	mov r1, SQR
+	sar r1, 8
+	sub r1, r0
+	mov [r4], r1w				; to store uiMotionIndex
+	mov r0, SUM_CUR
+	sar r0, 8
+	imul r0, r0
+	mov r1, SQR_CUR
+	sar r1, 8
+	sub r1, r0
+	mov [r4+2], r1w				; to store uiTextureIndex
+
+	LOAD_5_PARA_POP
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+  
+  movdqa xmm6,xmm14
+  movdqa xmm7,xmm15
+  
+	%assign push_num 0
+ 
+	ret
+	
+	
+	WELS_EXTERN VAACalcSad_sse2
+;*************************************************************************************************************
+;void VAACalcSad_sse2( uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight
+;								int32_t iPicStride, int32_t *psadframe, int32_t *psad8x8)
+;*************************************************************************************************************
+
+
+ALIGN 16
+VAACalcSad_sse2:
+%define		cur_data			r0
+%define		ref_data			r1
+%define		iPicWidth			r2
+%define		iPicHeight		r3
+%define		iPicStride		r4
+%define		psadframe			r5
+%define		psad8x8				r6
+
+  push r12
+  push r13
+  %assign push_num 2
+  LOAD_7_PARA
+  SIGN_EXTENTION r2,r2d
+  SIGN_EXTENTION r3,r3d
+  SIGN_EXTENTION r4,r4d
+  
+    mov   r12,r4
+	shr		r2,	4					; iPicWidth/16
+	shr		r3,	4					; iPicHeight/16
+	
+	shl		r12,	4								; iPicStride*16
+	pxor	xmm0,	xmm0
+	pxor	xmm7,	xmm7		; iFrameSad
+height_loop:
+	mov		r13,	r2
+	push	r0
+	push	r1
+width_loop:
+	pxor	xmm6,	xmm6		
+	WELS_SAD_16x2_SSE2 r0,r1,r4
+	WELS_SAD_16x2_SSE2 r0,r1,r4
+	WELS_SAD_16x2_SSE2 r0,r1,r4
+	WELS_SAD_16x2_SSE2 r0,r1,r4
+	paddd	xmm7,		xmm6
+	movd	[r6],		xmm6
+	psrldq	xmm6,		8
+	movd	[r6+4],	xmm6
+
+	pxor	xmm6,	xmm6
+	WELS_SAD_16x2_SSE2 r0,r1,r4
+	WELS_SAD_16x2_SSE2 r0,r1,r4
+	WELS_SAD_16x2_SSE2 r0,r1,r4
+	WELS_SAD_16x2_SSE2 r0,r1,r4
+	paddd	xmm7,		xmm6
+	movd	[r6+8],	xmm6
+	psrldq	xmm6,		8
+	movd	[r6+12],	xmm6
+
+	add		r6,	16
+	sub		r0,	r12
+	sub		r1,	r12
+	add		r0,	16
+	add		r1,	16
+
+	dec		r13
+	jnz		width_loop
+
+	pop		r1
+	pop		r0
+	add		r0,	r12
+	add		r1,	r12
+
+	dec	r3
+	jnz		height_loop
+
+	;mov		r13,	[psadframe]
+	movdqa	xmm5,	xmm7
+	psrldq	xmm7,	8
+	paddd	xmm7,	xmm5
+    movd	[psadframe],	xmm7
+
+%undef		cur_data
+%undef		ref_data
+%undef		iPicWidth
+%undef		iPicHeight
+%undef		iPicStride
+%undef		psadframe
+%undef		psad8x8
+%undef		pushsize
+  LOAD_7_PARA_POP
+  pop r13
+  pop r12
+  %assign push_num 0
+  ret
+		
+%endif
 
 %ifdef X86_32
 WELS_EXTERN abs_difference_mbrow_sse2
