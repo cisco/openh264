@@ -15,7 +15,6 @@
 
 static void UpdateHashFromPlane(SHA_CTX* ctx, const uint8_t* plane,
     int width, int height, int stride) {
-
   for (int i = 0; i < height; i++) {
     SHA1_Update(ctx, plane, width);
     plane += stride;
@@ -30,7 +29,11 @@ static int ReadFrame(std::ifstream* file, BufferedData* buf) {
   int zeroCount = 0;
   char b;
 
-  while (file->read(&b, 1), file->gcount() == 1) {
+  for (;;) {
+    file->read(&b, 1);
+    if (file->gcount() != 1) {
+      break;
+    }
     if (!buf->Push(b)) {
       return -1;
     }
@@ -43,8 +46,12 @@ static int ReadFrame(std::ifstream* file, BufferedData* buf) {
       zeroCount = b != 0 ? 0 : zeroCount + 1;
     } else {
       if (b == 1) {
-        file->seekg(-4, file->cur);
-        return buf->Length() - 4;
+        if (file->seekg(-4, file->cur).good()) {
+          return buf->Length() - 4;
+        } else {
+          // seeking fails
+          return -1;
+        }
       } else if (b == 0) {
         zeroCount = 3;
       } else {
@@ -60,40 +67,38 @@ static int ReadFrame(std::ifstream* file, BufferedData* buf) {
  */
 static bool DecodeAndProcess(ISVCDecoder* decoder, const uint8_t* src,
     int sliceSize, SHA_CTX* ctx) {
-
   void* data[3];
   SBufferInfo bufInfo;
   memset(data, 0, sizeof(data));
   memset(&bufInfo, 0, sizeof(SBufferInfo));
 
   DECODING_STATE rv = decoder->DecodeFrame(src, sliceSize, data, &bufInfo);
-  if (rv == dsErrorFree) {
-    if (bufInfo.iBufferStatus == 1) {
-      // y plane
-      UpdateHashFromPlane(ctx, static_cast<uint8_t*>(data[0]),
-          bufInfo.UsrData.sSystemBuffer.iWidth,
-          bufInfo.UsrData.sSystemBuffer.iHeight,
-          bufInfo.UsrData.sSystemBuffer.iStride[0]);
-      // u plane
-      UpdateHashFromPlane(ctx, static_cast<uint8_t*>(data[1]),
-          bufInfo.UsrData.sSystemBuffer.iWidth / 2,
-          bufInfo.UsrData.sSystemBuffer.iHeight / 2,
-          bufInfo.UsrData.sSystemBuffer.iStride[1]);
-      // v plane
-      UpdateHashFromPlane(ctx, static_cast<uint8_t*>(data[2]),
-          bufInfo.UsrData.sSystemBuffer.iWidth / 2,
-          bufInfo.UsrData.sSystemBuffer.iHeight / 2,
-          bufInfo.UsrData.sSystemBuffer.iStride[1]);
-    }
-    return true;
-  } else {
+  if (rv != dsErrorFree) {
     return false;
   }
+
+  if (bufInfo.iBufferStatus == 1) {
+    // y plane
+    UpdateHashFromPlane(ctx, static_cast<uint8_t*>(data[0]),
+        bufInfo.UsrData.sSystemBuffer.iWidth,
+        bufInfo.UsrData.sSystemBuffer.iHeight,
+        bufInfo.UsrData.sSystemBuffer.iStride[0]);
+    // u plane
+    UpdateHashFromPlane(ctx, static_cast<uint8_t*>(data[1]),
+        bufInfo.UsrData.sSystemBuffer.iWidth / 2,
+        bufInfo.UsrData.sSystemBuffer.iHeight / 2,
+        bufInfo.UsrData.sSystemBuffer.iStride[1]);
+    // v plane
+    UpdateHashFromPlane(ctx, static_cast<uint8_t*>(data[2]),
+        bufInfo.UsrData.sSystemBuffer.iWidth / 2,
+        bufInfo.UsrData.sSystemBuffer.iHeight / 2,
+        bufInfo.UsrData.sSystemBuffer.iStride[1]);
+  }
+  return true;
 }
 
 static void CompareFileToHash(ISVCDecoder* decoder,
     const char* fileName, const char* hashStr) {
-
   std::ifstream file(fileName, std::ios::in | std::ios::binary);
   ASSERT_TRUE(file.is_open());
 
@@ -118,7 +123,7 @@ static void CompareFileToHash(ISVCDecoder* decoder,
     FAIL() << "unable to allocate memory";
   }
 
-  int32_t iEndOfStreamFlag = true;
+  int32_t iEndOfStreamFlag = 1;
   decoder->SetOption(DECODER_OPTION_END_OF_STREAM, &iEndOfStreamFlag);
 
   // Get pending last frame
@@ -132,7 +137,7 @@ static void CompareFileToHash(ISVCDecoder* decoder,
 }
 
 class DecoderInitTest : public ::testing::Test {
-public:
+ public:
   DecoderInitTest() : decoder_(NULL) {}
 
   virtual void SetUp() {
@@ -158,7 +163,7 @@ public:
     }
   }
 
-protected:
+ protected:
   ISVCDecoder* decoder_;
 };
 
