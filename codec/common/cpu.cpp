@@ -90,7 +90,8 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
     /* CMOV instruction checking */
     uiCPU |= WELS_CPU_CMOV;
   }
-  if (!strcmp ((const str_t*)chVenderName, CPU_Vender_INTEL)) {	// confirmed_safe_unsafe_usage
+  if ((!strcmp ((const str_t*)chVenderName, CPU_Vender_INTEL)) ||
+      (!strcmp((const str_t*)chVenderName, CPU_Vender_AMD)) ) {	// confirmed_safe_unsafe_usage
     if (uiFeatureD & 0x10000000) {
       /* Multi-Threading checking: contains of multiple logic processors */
       uiCPU |= WELS_CPU_HTT;
@@ -130,10 +131,18 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
     uiCPU |= WELS_CPU_MOVBE;
   }
 
-  if (pNumberOfLogicProcessors != NULL) {
-    // HTT enabled on chip
-    *pNumberOfLogicProcessors = (uiFeatureB & 0x00ff0000) >> 16; // feature bits: 23-16 on returned EBX
-  }
+  if( pNumberOfLogicProcessors != NULL ){
+    if (!strcmp((const str_t*)chVenderName, CPU_Vender_AMD)){
+      *pNumberOfLogicProcessors = (uiFeatureB & 0x00ff0000) >> 16; // feature bits: 23-16 on returned EBX
+    } else if( !strcmp((const str_t*)chVenderName, CPU_Vender_INTEL) ){
+      uiFeatureC = 0;
+      WelsCPUId(0x4, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);
+      *pNumberOfLogicProcessors = ((uiFeatureA&0xfc000000)>>26) + 1;
+    } else {
+      //FIXME:  other cpus
+      *pNumberOfLogicProcessors = 1;
+    }
+  } 
 
   WelsCPUId (0x80000000, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);
 
