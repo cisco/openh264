@@ -180,7 +180,7 @@ SECTION .text
 WELS_EXTERN WelsDecoderI4x4LumaPredH_sse2
 WELS_EXTERN WelsDecoderI4x4LumaPredDDR_mmx
 WELS_EXTERN WelsDecoderI16x16LumaPredPlane_sse2
-WELS_EXTERN WelsI4x4LumaPredDc_sse2
+
 
 ALIGN 16
 ;*******************************************************************************

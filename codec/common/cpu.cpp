@@ -42,7 +42,7 @@
 #include "cpu.h"
 #include "cpu_core.h"
 
-namespace WelsDec {
+
 
 #define    CPU_Vender_AMD    "AuthenticAMD"
 #define    CPU_Vender_INTEL  "GenuineIntel"
@@ -191,4 +191,4 @@ void WelsCPURestore (const uint32_t kuiCPU) {
 
 #endif
 
-} // namespace WelsDec
+
