@@ -1,6 +1,5 @@
 language: cpp
 compiler:
-  - gcc
   - clang
 branches:
   except:
@@ -9,5 +8,7 @@ before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -qq nasm g++-4.6-multilib gcc-multilib libc6-dev-i386 lib32z1-dev
 install: make gtest-bootstrap
+# libssl is not multiarch so we are building 64bit
+# and then installing the 32bit version
 script: make ENABLE64BIT=Yes && make test && make clean && make ENABLE64BIT=Yes BUILDTYPE=Release && make test && sudo apt-get install -qq libssl-dev:i386 && make clean && make && make test && make BUILDTYPE=Release clean && make BUILDTYPE=Release && make test
 
