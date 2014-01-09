@@ -423,6 +423,53 @@ int32_t ParamValidationExt (void* pParam) {
   return ParamValidation (pCodingParam);
 }
 
+
+void WelsEncoderApplyFrameRate(SWelsSvcCodingParam* pParam)
+{
+  SDLayerParam* pLayerParam;
+  const float kfEpsn = 0.000001f;
+  const int32_t kiNumLayer = pParam->iNumDependencyLayer;
+  int32_t i;
+  const float kfMaxFrameRate = pParam->fMaxFrameRate;
+  float fRatio;
+  float fTargetOutputFrameRate;
+
+  //set input frame rate to each layer
+  for (i=0;i<kiNumLayer;i++) {
+    pLayerParam = &(pParam->sDependencyLayers[i]);
+
+    fRatio = pLayerParam->fOutputFrameRate / pLayerParam->fInputFrameRate;
+    if ( (kfMaxFrameRate - pLayerParam->fInputFrameRate) > kfEpsn
+        || (kfMaxFrameRate - pLayerParam->fInputFrameRate) < -kfEpsn ) {
+      pLayerParam->fInputFrameRate = kfMaxFrameRate;
+      fTargetOutputFrameRate = kfMaxFrameRate*fRatio;
+      pLayerParam->fOutputFrameRate = (fTargetOutputFrameRate>=6)?fTargetOutputFrameRate:(pLayerParam->fInputFrameRate);
+      //TODO:{Sijia} from design, there is no sense to have temporal layer when under 6fps even with such setting?
+    }
+  }
+}
+
+
+void WelsEncoderApplyBitRate(SWelsSvcCodingParam* pParam)
+{
+  //TODO (Sijia):  this is a temporary solution which keep the ratio between layers
+  //but it is also possible to fulfill the bitrate of lower layer first
+
+  SDLayerParam* pLayerParam;
+  const int32_t iNumLayers = pParam->iNumDependencyLayer;
+  int32_t i, iOrigTotalBitrate=0;
+  //read old BR
+  for (i=0;i<iNumLayers;i++) {
+    iOrigTotalBitrate += pParam->sDependencyLayers[i].iSpatialBitrate;
+  }
+  //write new BR
+  float fRatio = 0.0;
+  for (i=0;i<iNumLayers;i++) {
+    pLayerParam = &(pParam->sDependencyLayers[i]);
+    fRatio = pLayerParam->iSpatialBitrate/(static_cast<float>(iOrigTotalBitrate));
+    pLayerParam->iSpatialBitrate = static_cast<int32_t>(pParam->iTargetBitrate*fRatio);
+  }
+}
 /*!
  * \brief	acquire count number of layers and NALs based on configurable paramters dependency
  * \pParam	pCtx				sWelsEncCtx*
