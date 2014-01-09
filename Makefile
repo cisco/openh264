@@ -5,6 +5,7 @@ CP=cp
 ROOTDIR=$(PWD)
 
 
+
 ifeq (,$(wildcard ./gtest))
 HAVE_GTEST=No
 else
@@ -18,6 +19,11 @@ USE_ASM = Yes
 else
 CFLAGS = -g
 USE_ASM = No
+endif
+
+ifeq ($(USE_ASAN), Yes)
+CFLAGS += -fsanitize=address
+LDFLAGS += -fsanitize=address
 endif
 
 ifeq ($(ENABLE64BIT), Yes)
