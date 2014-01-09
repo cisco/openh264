@@ -133,7 +133,11 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
 
   if( pNumberOfLogicProcessors != NULL ){
     if (!strcmp((const str_t*)chVenderName, CPU_Vender_AMD)){
-      *pNumberOfLogicProcessors = (uiFeatureB & 0x00ff0000) >> 16; // feature bits: 23-16 on returned EBX
+      if( uiCPU & WELS_CPU_HTT){
+        *pNumberOfLogicProcessors = (uiFeatureB & 0x00ff0000) >> 16; // feature bits: 23-16 on returned EBX
+      } else {
+        *pNumberOfLogicProcessors = 1;
+      }
     } else if( !strcmp((const str_t*)chVenderName, CPU_Vender_INTEL) ){
       uiFeatureC = 0;
       WelsCPUId(0x4, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);
