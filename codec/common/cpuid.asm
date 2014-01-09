@@ -85,7 +85,7 @@ WelsCPUId:
     push     rdx    
  
     mov      eax,     ecx
-    mov      ecx,     r9d
+    mov      rcx,     [r9]
     cpuid  
     mov      [r9],    ecx
     mov      [r8],    ebx
@@ -103,7 +103,8 @@ WelsCPUId:
     push     rcx
     push     rdx
 
-    mov      eax,     edi    
+    mov      eax,     edi 
+    mov      rcx,     [rcx]   
     cpuid
     mov      [r8],    edx
     pop      rdx
