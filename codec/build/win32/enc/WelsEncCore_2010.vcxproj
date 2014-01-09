@@ -126,7 +126,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\encoder\core\inc;..\..\..\api\svc;..\..\..\WelsThreadLib\api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\common;..\..\..\encoder\core\inc;..\..\..\api\svc;..\..\..\WelsThreadLib\api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN64;_DEBUG;X86_ASM;_LIB;WELS_SVC;ENCODER_CORE;HAVE_CACHE_LINE_ALIGN;MT_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -160,7 +160,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\..\encoder\core\inc;..\..\..\api\svc;..\..\..\WelsThreadLib\api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\common;..\..\..\encoder\core\inc;..\..\..\api\svc;..\..\..\WelsThreadLib\api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;WELS_SVC;ENCODER_CORE;X86_ASM;HAVE_CACHE_LINE_ALIGN;MT_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -196,7 +196,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\..\encoder\core\inc;..\..\..\api\svc;..\..\..\WelsThreadLib\api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\common;..\..\..\encoder\core\inc;..\..\..\api\svc;..\..\..\WelsThreadLib\api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN64;NDEBUG;X86_ASM;_LIB;WELS_SVC;ENCODER_CORE;HAVE_CACHE_LINE_ALIGN;MT_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -498,6 +498,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\common\cpu.h" />
     <ClInclude Include="..\..\..\common\cpu_core.h" />
+    <ClInclude Include="..\..\..\common\macros.h" />
     <ClInclude Include="..\..\..\common\typedefs.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\array_stack_align.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\as264_common.h" />
@@ -513,7 +514,6 @@
     <ClInclude Include="..\..\..\encoder\core\inc\extern.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\get_intra_predictor.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\ls_defines.h" />
-    <ClInclude Include="..\..\..\encoder\core\inc\macros.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\mb_cache.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\mc.h" />
     <ClInclude Include="..\..\..\encoder\core\inc\md.h" />

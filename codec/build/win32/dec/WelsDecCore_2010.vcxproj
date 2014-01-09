@@ -253,6 +253,7 @@
     <ClInclude Include="..\..\..\common\cpu.h" />
     <ClInclude Include="..\..\..\common\cpu_core.h" />
     <ClInclude Include="..\..\..\common\logging.h" />
+    <ClInclude Include="..\..\..\common\macros.h" />
     <ClInclude Include="..\..\..\common\typedefs.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\as264_common.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\au_parser.h" />
@@ -266,7 +267,6 @@
     <ClInclude Include="..\..\..\decoder\core\inc\fmo.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\get_intra_predictor.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\ls_defines.h" />
-    <ClInclude Include="..\..\..\decoder\core\inc\macros.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\manage_dec_ref.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\mb_cache.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\mc.h" />

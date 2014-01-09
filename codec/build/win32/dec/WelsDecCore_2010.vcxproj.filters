@@ -123,9 +123,6 @@
     <ClInclude Include="..\..\..\decoder\core\inc\ls_defines.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\decoder\core\inc\macros.h">
-      <Filter>headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\decoder\core\inc\manage_dec_ref.h">
       <Filter>headers</Filter>
     </ClInclude>
@@ -190,6 +187,9 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\common\typedefs.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\macros.h">
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>

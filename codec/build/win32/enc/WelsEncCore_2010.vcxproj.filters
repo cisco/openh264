@@ -147,9 +147,6 @@
     <ClInclude Include="..\..\..\encoder\core\inc\ls_defines.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\encoder\core\inc\macros.h">
-      <Filter>headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\encoder\core\inc\mb_cache.h">
       <Filter>headers</Filter>
     </ClInclude>
@@ -277,6 +274,9 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\common\typedefs.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\macros.h">
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>
