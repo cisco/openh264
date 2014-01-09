@@ -77,7 +77,7 @@ WELSVP_NAMESPACE_BEGIN
 #define WELS_ALIGN4(iInput)  ((iInput+3) & ~3)
 #define WELS_ALIGN8(iInput)  ((iInput+7) & ~7)
 
-#define WelsCastFromPointer(p)      (reinterpret_cast<long_t>(p))
+#define WelsCastFromPointer(p)      (reinterpret_cast<intptr_t>(p))
 #define WelsStaticCast(type, p)  (static_cast<type>(p))
 #define WelsDynamicCast(type, p) (dynamic_cast<type>(p))
 
