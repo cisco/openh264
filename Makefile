@@ -70,7 +70,7 @@ H264ENC_INCLUDES = $(ENCODER_INCLUDES) -Icodec/console/enc/inc
 H264ENC_LDFLAGS = -L. -lencoder -lprocessing -lcommon
 H264ENC_DEPS = $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX)
 
-CODEC_UNITTEST_LDFLAGS = -L. -lgtest -ldecoder -lcommon
+CODEC_UNITTEST_LDFLAGS = -L. -lgtest -ldecoder -lcrypto -lencoder -lprocessing -lcommon
 CODEC_UNITTEST_DEPS = $(LIBPREFIX)gtest.$(LIBSUFFIX) $(LIBPREFIX)decoder.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX)
 
 .PHONY: test
