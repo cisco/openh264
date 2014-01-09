@@ -67,12 +67,6 @@ typedef float     real32_t;
 #endif//EPSN
 #define EPSN	  (0.000001f) // (1e-6)	// desired float precision
 
-
-#ifdef PESN
-#undef PESN
-#endif//PESN
-#define PESN	  (0.000001f) // (1e-6)	// desired float precision
-
 #ifndef NULL
 #define NULL 0
 #endif
