@@ -250,12 +250,13 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\common\cpu.h" />
+    <ClInclude Include="..\..\..\common\cpu_core.h" />
     <ClInclude Include="..\..\..\common\logging.h" />
+    <ClInclude Include="..\..\..\common\typedefs.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\as264_common.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\au_parser.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\bit_stream.h" />
-    <ClInclude Include="..\..\..\decoder\core\inc\cpu.h" />
-    <ClInclude Include="..\..\..\decoder\core\inc\cpu_core.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\deblocking.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\decode_mb_aux.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\decoder.h" />
@@ -285,17 +286,17 @@
     <ClInclude Include="..\..\..\decoder\core\inc\dec_frame.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\dec_golomb.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\decoder_core.h" />
-    <ClInclude Include="..\..\..\decoder\core\inc\typedefs.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\utils.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\vlc_decoder.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\wels_common_basis.h" />
     <ClInclude Include="..\..\..\decoder\core\inc\wels_const.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\common\cpu.cpp" />
+    <ClCompile Include="..\..\..\common\deblocking_common.cpp" />
     <ClCompile Include="..\..\..\common\logging.cpp" />
     <ClCompile Include="..\..\..\decoder\core\src\au_parser.cpp" />
     <ClCompile Include="..\..\..\decoder\core\src\bit_stream.cpp" />
-    <ClCompile Include="..\..\..\decoder\core\src\cpu.cpp" />
     <ClCompile Include="..\..\..\decoder\core\src\deblocking.cpp" />
     <ClCompile Include="..\..\..\decoder\core\src\decode_mb_aux.cpp" />
     <ClCompile Include="..\..\..\decoder\core\src\decoder.cpp" />

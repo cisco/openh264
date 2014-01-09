@@ -7,9 +7,6 @@
     <ClCompile Include="..\..\..\encoder\core\src\au_set.cpp">
       <Filter>sources</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\encoder\core\src\cpu.cpp">
-      <Filter>sources</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\encoder\core\src\deblocking.cpp">
       <Filter>sources</Filter>
     </ClCompile>
@@ -97,6 +94,12 @@
     <ClCompile Include="..\..\..\encoder\core\src\wels_preprocess.cpp">
       <Filter>sources</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\common\cpu.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\deblocking_common.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\encoder\core\inc\array_stack_align.h">
@@ -109,12 +112,6 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\encoder\core\inc\bit_stream.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\encoder\core\inc\cpu.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\encoder\core\inc\cpu_core.h">
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\encoder\core\inc\deblocking.h">
@@ -252,9 +249,6 @@
     <ClInclude Include="..\..\..\encoder\core\inc\trace.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\encoder\core\inc\typedefs.h">
-      <Filter>headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\encoder\core\inc\utils.h">
       <Filter>headers</Filter>
     </ClInclude>
@@ -274,6 +268,15 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\WelsThreadLib\api\WelsThreadLib.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\cpu.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\cpu_core.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\typedefs.h">
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>
