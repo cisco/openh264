@@ -344,6 +344,13 @@ DECODING_STATE CWelsDecoder::DecodeFrame (const unsigned char* kpSrc,
     const int kiSrcLen,
     void_t** ppDst,
     SBufferInfo* pDstInfo) {
+  if (kiSrcLen > MAX_ACCESS_UNIT_CAPACITY) {
+    m_pDecContext->iErrorCode |= dsOutOfMemory;
+    IWelsTrace::WelsVTrace (m_pTrace, IWelsTrace::WELS_LOG_INFO,
+      "max AU size exceeded. Allowed size = %d, current size = %d",
+      MAX_ACCESS_UNIT_CAPACITY, kiSrcLen);
+    return dsOutOfMemory;
+  }
   if (kiSrcLen > 0 && kpSrc != NULL) {
 #ifdef OUTPUT_BIT_STREAM
     if (m_pFBS) {
