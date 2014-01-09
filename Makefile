@@ -84,7 +84,7 @@ clean:
 gtest-bootstrap:
 	svn co https://googletest.googlecode.com/svn/trunk/ gtest
 
-test:
+test: codec_unittest
 	./codec_unittest
 
 include codec/common/targets.mk
