@@ -29,11 +29,11 @@ endif
 ifeq ($(ENABLE64BIT), Yes)
 CFLAGS += -m64
 LDFLAGS += -m64
-ASMFLAGS += -DUNIX64
+ASMFLAGS_PLATFORM = -DUNIX64
 else
 CFLAGS += -m32
 LDFLAGS += -m32
-ASMFLAGS += -DX86_32
+ASMFLAGS_PLATFORM = -DX86_32
 endif
 
 include build/platform-$(UNAME).mk
@@ -44,7 +44,7 @@ endif
 
 CFLAGS += -DNO_DYNAMIC_VP -DHAVE_CACHE_LINE_ALIGN
 LDFLAGS +=
-ASMFLAGS += -DNO_DYNAMIC_VP
+ASMFLAGS += $(ASMFLAGS_PLATFORM) -DNO_DYNAMIC_VP
 
 
 #### No user-serviceable parts below this line
