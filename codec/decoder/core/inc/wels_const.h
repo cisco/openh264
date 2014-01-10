@@ -92,7 +92,7 @@
 #define LAYER_NUM_EXCHANGEABLE	1
 
 #define MAX_NAL_UNIT_NUM_IN_AU	32	// predefined maximal number of NAL Units in an access unit
-#define MAX_ACCESS_UINT_CAPACITY	1048576	// Maximal AU capacity in bytes: (1<<20) = 1024 KB predefined
+#define MAX_ACCESS_UNIT_CAPACITY	1048576	// Maximal AU capacity in bytes: (1<<20) = 1024 KB predefined
 
 enum {
   BASE_MB = 0,
