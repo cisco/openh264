@@ -27,7 +27,7 @@ ASFLAGS= -f elf -DNOPREFIX -I ../../../encoder/core/asm/
 
 LIBS= -lstdc++ -ldl -lpthread -lm
 #-lm
-CFLAGS=  $(INCLUDE) -m32 -fPIC -D__GCC__ -DLINUX -D__NO_CTYPE -DWELS_SVC -DENCODER_CORE -DHAVE_CACHE_LINE_ALIGN -DWELS_TESTBED -DMT_ENABLED
+CFLAGS=  $(INCLUDE) -m32 -fPIC -D__GCC__ -DLINUX -D__NO_CTYPE -DWELS_TESTBED -DMT_ENABLED
 
 ifeq ($(DBG),1)
 #SUFFIX= .dbg
