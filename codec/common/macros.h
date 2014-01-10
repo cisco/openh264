@@ -104,7 +104,9 @@ __declspec(align(alignment)) type name[(sizex)*(sizey)]
 #endif//#if _MACH_PLATFORM
 
 #if defined(_MSC_VER)
+#if _MSC_VER < 1700
 #define inline	__inline
+#endif
 #define __FASTCALL   __fastcall
 //	#define __align8(t,v) __declspec(align(8)) t v
 #define __align16(t,v) __declspec(align(16)) t v
