@@ -9,7 +9,7 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq nasm g++-4.6-multilib gcc-multilib libc6-dev-i386 lib32z1-dev libssl-dev
 #link libcrypto for 32bit
-  - ls -l /lib/i386-linux-gnu/libcrypto*
+  - find /lib -name 'libcrypto*'
   - sudo ln -s /lib/i386-linux-gnu/libcrypto.so.0.9.8 /lib/i386-linux-gnu/libcrypto.so
 install: make gtest-bootstrap
 script: make -B ENABLE64BIT=Yes && make test && make -B ENABLE64BIT=Yes BUILDTYPE=Release && make test && make -B && make test && make -B BUILDTYPE=Release && make test
