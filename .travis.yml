@@ -7,7 +7,7 @@ branches:
     - gh-pages
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq nasm g++-4.6-multilib gcc-multilib libc6-dev-i386 lib32z1-dev
+  - sudo apt-get install -qq nasm g++-4.6-multilib gcc-multilib libc6-dev-i386 lib32z1-dev libssl-dev
 #link libcrypto for 32bit
   - ls -l /lib/i386-linux-gnu/libcrypto*
   - sudo ln -s /lib/i386-linux-gnu/libcrypto.so.0.9.8 /lib/i386-linux-gnu/libcrypto.so
