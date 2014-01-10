@@ -55,6 +55,11 @@ class ISVCEncoder {
   /*
    * return: 0 - success; otherwise - failed;
    */
+  virtual int EncodeParameterSets (SFrameBSInfo* pBsInfo) = 0;
+
+  /*
+   * return: 0 - success; otherwise - failed;
+   */
   virtual int PauseFrame (const unsigned char* kpSrc, SFrameBSInfo* pBsInfo) = 0;
 
   /*

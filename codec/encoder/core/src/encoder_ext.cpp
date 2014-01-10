@@ -3093,6 +3093,37 @@ int32_t ForceCodingIDR (sWelsEncCtx* pCtx) {
   return 0;
 }
 
+int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst) {
+  SFrameBSInfo* pFbi          = (SFrameBSInfo*)pDst;
+  SLayerBSInfo* pLayerBsInfo  = &pFbi->sLayerInfo[0];
+  int32_t iNalLen[128]        = {0};
+  int32_t iCountNal           = 0;
+
+  pLayerBsInfo->pBsBuf = pCtx->pFrameBs;
+  InitBits (&pCtx->pOut->sBsWrite, pCtx->pOut->pBsBuffer, pCtx->pOut->uiSize);
+
+  WelsWriteParameterSets (pCtx, &iNalLen[0], &iCountNal);
+
+  pLayerBsInfo->uiPriorityId  = 0;
+  pLayerBsInfo->uiSpatialId   = 0;
+  pLayerBsInfo->uiTemporalId  = 0;
+  pLayerBsInfo->uiQualityId   = 0;
+  pLayerBsInfo->uiLayerType   = NON_VIDEO_CODING_LAYER;
+  pLayerBsInfo->iNalCount     = iCountNal;
+  for (int32_t iNalIndex      = 0; iNalIndex < iCountNal; ++ iNalIndex) {
+    pLayerBsInfo->iNalLengthInByte[iNalIndex] = iNalLen[iNalIndex];
+  }
+
+  pCtx->eLastNalPriority      = NRI_PRI_HIGHEST;
+  pFbi->iLayerNum             = 1;
+
+#if defined(X86_ASM)
+  WelsEmms();
+#endif //X86_ASM
+
+  return 0;
+}
+
 /*!
  * \brief	core svc encoding process
  *
