@@ -127,8 +127,8 @@ void WelsCopy16x16NotAligned_sse2 (uint8_t* Dst, int32_t  iStrideD, uint8_t* Src
 }
 #endif//__cplusplus
 
-__align16 (extern int16_t, g_kiQuantInterFF[58][8]);
+__align16 (extern const int16_t, g_kiQuantInterFF[58][8]);
 #define g_iQuantIntraFF (g_kiQuantInterFF +6 )
-__align16 (extern int16_t, g_kiQuantMF[52][8]) ;
+__align16 (extern const int16_t, g_kiQuantMF[52][8]) ;
 }
 #endif//ENCODE_MB_AUX_H
