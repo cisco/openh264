@@ -1113,13 +1113,8 @@ VAACalcSadSsd_sse2:
 %define		psqdiff16x16		arg10;esp + pushsize + localsize + 40
 %define		tmp_esi				r10;esp + 0
 %define		tmp_edi				r11;esp + 4
-%define		tmp_sadframe		r12;esp + 8
 %define		pushsize		16
-	;push	ebp
-	;push	esi
-	;push	edi
-	;push	ebx
-	;sub		esp,	localsize
+
 	push 12
 	push 13
 	push 14
@@ -1131,25 +1126,17 @@ VAACalcSadSsd_sse2:
     mov r5,arg6
 %endif
     mov r14,arg7
-
-	;mov		ecx,	[iPicWidth]
-	;mov		ecx,	[iPicHeight]
-	;mov		esi,	[cur_data]
-	;mov		edi,	[ref_data]
-	;mov		ebx,	[iPicStride]
-	;mov		edx,	[psad8x8]
-	;mov		eax,	ebx
-     mov        r13,r4
-	;shr		dword [iPicWidth],	4					; iPicWidth/16
-	;shr		dword [iPicHeight],	4					; iPicHeight/16
-	shr     r2,4
-	shr     r3,4
-	;shl		eax,	4							; iPicStride*16
-	shl     r13,4
-	;mov		ecx,	[iPicWidth]
-	;mov		ecx,	[iPicHeight]
+	SIGN_EXTENTION r2,r2d
+	SIGN_EXTENTION r3,r3d
+	SIGN_EXTENTION r4,r4d
+	
+    mov        r13,r4			
+	shr     r2,4   ; iPicWidth/16
+	shr     r3,4   ; iPicHeight/16			
+	shl     r13,4   ; iPicStride*16
 	pxor	xmm0,	xmm0
-	movq	tmp_sadframe,	xmm0
+	pxor  xmm8, xmm8  ;framesad
+	pxor  xmm9, xmm9 
 sqdiff_height_loop:
 	;mov		ecx,	dword [iPicWidth]
 	;mov      r14,r2
@@ -1176,8 +1163,9 @@ sqdiff_width_loop:
 	paddd	xmm1,		xmm7
 	movd	[r14+4],	xmm7
 	movd	r15d,		xmm1
-	SIGN_EXTENTION r15,r15d
-	add		tmp_sadframe,	r15
+	movd  xmm9, r15d
+	paddd xmm8,xmm9
+	
 
 	pxor	xmm7,	xmm7
 	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
@@ -1194,8 +1182,8 @@ sqdiff_width_loop:
 	paddd	xmm1,		xmm7
 	movd	[r14+12],	xmm7
 	movd	r15d,		xmm1
-	SIGN_EXTENTION r15,r15d
-	add		tmp_sadframe,	r15
+	movd  xmm9, r15d
+	paddd xmm8,xmm9
 
 	mov		r15,	psum16x16
 	movdqa	xmm1,	xmm6
@@ -1241,7 +1229,7 @@ sqdiff_width_loop:
 	jnz		sqdiff_height_loop
 
 	mov		r13,	psadframe
-	mov		[r13],	r12
+	movd	[r13],	xmm8
     
     pop r15
     pop r14
