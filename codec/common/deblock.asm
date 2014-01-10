@@ -64,7 +64,7 @@ WELS_EXTERN   DeblockLumaLt4V_sse2
 
 DeblockLumaLt4V_sse2:
   push        rbp      
-  mov         r11,[esp + 16 + 20h]  ; pTC                                                    
+  mov         r11,[rsp + 16 + 20h]  ; pTC
   sub         rsp,1B0h                                                       
   lea         rbp,[rsp+20h]                                                  
   movd        xmm4,r8d                                                                                                  
