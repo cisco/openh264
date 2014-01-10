@@ -84,7 +84,7 @@ typedef   pthread_mutex_t           WELS_MUTEX;
 typedef   sem_t                     WELS_EVENT;
 
 #define   WELS_THREAD_ROUTINE_TYPE         void *
-#define   WELS_THREAD_ROUTINE_RETURN(rc)   return (void*)rc;
+#define   WELS_THREAD_ROUTINE_RETURN(rc)   return (void*)(intptr_t)rc;
 
 #endif//__GNUC__
 
