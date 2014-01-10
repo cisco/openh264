@@ -165,7 +165,7 @@ __align16 (int16_t, g_kiQuantMF[52][8]) = {
 #define WELS_ABS_LC(a) ((iSign ^ (int32_t)(a)) - iSign)
 #define NEW_QUANT(pDct, iFF, iMF) (((iFF)+ WELS_ABS_LC(pDct))*(iMF)) >>16
 #define WELS_NEW_QUANT(pDct,iFF,iMF)	WELS_ABS_LC(NEW_QUANT(pDct, iFF, iMF))
-void WelsQuant4x4_c (int16_t* pDct, int16_t* pFF,  int16_t* pMF) {
+void WelsQuant4x4_c (int16_t* pDct, const int16_t* pFF,  const int16_t* pMF) {
   int32_t i, j, iSign;
   for (i = 0; i < 16; i += 4) {
     j = i & 0x07;
@@ -194,7 +194,7 @@ void WelsQuant4x4Dc_c (int16_t* pDct, int16_t iFF,  int16_t iMF) {
   }
 }
 
-void WelsQuantFour4x4_c (int16_t* pDct, int16_t* pFF,  int16_t* pMF) {
+void WelsQuantFour4x4_c (int16_t* pDct, const int16_t* pFF, const int16_t* pMF) {
   int32_t i, j, iSign;
 
   for (i = 0; i < 64; i += 4) {
@@ -210,7 +210,7 @@ void WelsQuantFour4x4_c (int16_t* pDct, int16_t* pFF,  int16_t* pMF) {
   }
 }
 
-void WelsQuantFour4x4Max_c (int16_t* pDct, int16_t* pFF,  int16_t* pMF, int16_t* pMax) {
+void WelsQuantFour4x4Max_c (int16_t* pDct, const int16_t* pFF, const int16_t* pMF, int16_t* pMax) {
   int32_t i, j, k, iSign;
   int16_t iMaxAbs;
   for (k = 0; k < 4; k++) {
