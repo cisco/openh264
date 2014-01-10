@@ -5,6 +5,7 @@ CP=cp
 ROOTDIR=$(PWD)
 
 
+
 ifeq (,$(wildcard ./gtest))
 HAVE_GTEST=No
 else
@@ -18,6 +19,11 @@ USE_ASM = Yes
 else
 CFLAGS = -g
 USE_ASM = No
+endif
+
+ifeq ($(USE_ASAN), Yes)
+CFLAGS += -fsanitize=address
+LDFLAGS += -fsanitize=address
 endif
 
 ifeq ($(ENABLE64BIT), Yes)
@@ -70,8 +76,8 @@ H264ENC_INCLUDES = $(ENCODER_INCLUDES) -Icodec/console/enc/inc
 H264ENC_LDFLAGS = -L. -lencoder -lprocessing -lcommon
 H264ENC_DEPS = $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX)
 
-CODEC_UNITTEST_LDFLAGS = -L. -lgtest -ldecoder -lcommon
-CODEC_UNITTEST_DEPS = $(LIBPREFIX)gtest.$(LIBSUFFIX) $(LIBPREFIX)decoder.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX)
+CODEC_UNITTEST_LDFLAGS = -L. -lgtest -ldecoder -lcrypto -lencoder -lprocessing -lcommon
+CODEC_UNITTEST_DEPS = $(LIBPREFIX)gtest.$(LIBSUFFIX) $(LIBPREFIX)decoder.$(LIBSUFFIX) $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX)
 
 .PHONY: test
 
@@ -84,7 +90,7 @@ clean:
 gtest-bootstrap:
 	svn co https://googletest.googlecode.com/svn/trunk/ gtest
 
-test:
+test: codec_unittest
 	./codec_unittest
 
 include codec/common/targets.mk
