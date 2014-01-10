@@ -652,68 +652,6 @@ width_loop:
 		
 %endif
 
-%ifdef X86_32
-WELS_EXTERN abs_difference_mbrow_sse2
-;*************************************************************************************************************
-;void abs_difference_mbrow_sse2( uint8_t *ref_orig, uint8_t *cur_orig, int32_t iPicStride,
-;								 int32_t gom_pixel_num, int32_t *pSum)
-;*************************************************************************************************************
-ALIGN 16
-abs_difference_mbrow_sse2:
-%define		ref_orig			esp + pushsize + 4
-%define		cur_orig			esp + pushsize + 8
-%define		iPicStride			esp + pushsize + 12
-%define		gom_pixel_num		esp + pushsize + 16
-%define		pSum				esp + pushsize + 20
-%define		pushsize	12
-	push	esi
-	push	edi
-	push	ebx
-	mov		esi,	[ref_orig]
-	mov		edi,	[cur_orig]
-	mov		ebx,	[iPicStride]
-	mov		eax,	[gom_pixel_num]
-	mov		ecx,	16					;MB_WIDTH_LUMA
-	pxor	xmm0,	xmm0
-mb_width_loop_p:
-	mov		edx,	esi
-	add		edx,	eax			; end address
-gom_row_loop_p:
-	movdqa	xmm1,	[esi]
-	movdqa	xmm2,	[edi]
-	psadbw	xmm1,	xmm2
-	paddd	xmm0,	xmm1
-	add		esi,	16
-	add		edi,	16
-	cmp		esi,	edx
-	jl		gom_row_loop_p
-
-	sub		esi,	eax
-	sub		edi,	eax
-	add		esi,	ebx
-	add		edi,	ebx
-	loop	mb_width_loop_p
-
-	movdqa	xmm1,	xmm0
-	psrldq	xmm1,	8
-	paddd	xmm1,	xmm0
-	movd	eax,	xmm1
-	mov		edx,	[pSum]	; pSum
-	add		[edx],	eax
-
-%undef		ref_orig
-%undef		cur_orig
-%undef		iPicStride
-%undef		gom_pixel_num
-%undef		pSum
-%undef		pushsize
-	pop		ebx
-	pop		edi
-	pop		esi
-	ret
-
-%endif
-
 
 %ifdef X86_32
 WELS_EXTERN VAACalcSadVar_sse2
@@ -850,7 +788,152 @@ var_width_loop:
 %undef		localsize
 	ret
 
+%else  ;64-bit
 
+WELS_EXTERN VAACalcSadVar_sse2
+;*************************************************************************************************************
+;void VAACalcSadVar_sse2( uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight
+;		int32_t iPicStride, int32_t *psadframe, int32_t *psad8x8, int32_t *psum16x16, int32_t *psqsum16x16)
+;*************************************************************************************************************
+
+
+ALIGN 16
+VAACalcSadVar_sse2:
+%define		cur_data			arg1 ;r0
+%define		ref_data			arg2 ;r1
+%define		iPicWidth			arg3 ;r2
+%define		iPicHeight		    arg4 ;r3
+%define		iPicStride		    arg5 
+%define		psadframe			arg6 
+%define		psad8x8				arg7
+%define		psum16x16			arg8
+%define		psqsum16x16		    arg9
+
+  push r12
+  push r13
+  push r14
+  push r15
+  %assign push_num 4
+
+%ifdef WIN64
+  mov r4, arg5  ;iPicStride
+  mov r5, arg6  ;psad8x8
+%endif	
+  mov r14,arg7
+  SIGN_EXTENTION r2,r2d
+  SIGN_EXTENTION r3,r3d
+  SIGN_EXTENTION r4,r4d
+  
+  mov   r13,r4
+  shr   r2,4 
+  shr   r3,4  
+						
+	shl   r13,4   ; iPicStride*16
+	pxor	xmm0,	xmm0
+	pxor	xmm7,	xmm7		; iFrameSad
+var_height_loop:
+	push    r2
+	%assign push_num push_num+1
+	mov		r11,	r0
+	mov		r12,	r1
+var_width_loop:
+	pxor	xmm6,	xmm6		; hiQuad_loQuad pSad8x8
+	pxor	xmm5,	xmm5		; pSum16x16
+	pxor	xmm4,	xmm4		; sqsum_16x16
+	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
+	paddd	xmm7,		xmm6
+	movd	[r14],		xmm6
+	psrldq	xmm6,		8
+	movd	[r14+4],	xmm6
+
+	pxor	xmm6,	xmm6
+	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
+	paddd	xmm7,		xmm6
+	movd	[r14+8],	xmm6
+	psrldq	xmm6,		8
+	movd	[r14+12],	xmm6
+
+	mov		r15,	psum16x16
+	movdqa	xmm1,	xmm5
+	psrldq	xmm1,	8
+	paddd	xmm5,	xmm1
+	movd	[r15],	xmm5
+	add		dword psum16x16, 4
+
+	movdqa	xmm5,	xmm4
+	psrldq	xmm5,	8
+	paddd	xmm4,	xmm5
+	movdqa	xmm3,	xmm4
+	psrldq	xmm3,	4
+	paddd	xmm4,	xmm3
+
+	mov		r15,	psqsum16x16
+	movd	[r15],	xmm4
+	add		dword psqsum16x16, 4
+
+	add		r14,16
+	sub		r0,	r13
+	sub		r1,	r13
+	add		r0,	16
+	add		r1,	16
+
+	dec		r2
+	jnz		var_width_loop
+
+	pop     r2
+	%assign push_num push_num-1
+	mov		r0,	r11
+	mov		r1,	r12
+	add		r0,	r13
+	add		r1,	r13
+
+	dec	r3
+	jnz		var_height_loop
+
+	mov		r15,	psadframe
+	movdqa	xmm5,	xmm7
+	psrldq	xmm7,	8
+	paddd	xmm7,	xmm5
+	movd	[r15],	xmm7
+
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    %assign push_num 0
+  
+%undef		cur_data
+%undef		ref_data
+%undef		iPicWidth
+%undef		iPicHeight
+%undef		iPicStride
+%undef		psadframe
+%undef		psad8x8
+%undef		psum16x16
+%undef		psqsum16x16
+%undef		tmp_esi
+%undef		tmp_edi
+%undef		pushsize
+%undef		localsize
+	ret
+
+%endif
+
+%ifdef X86_32
 
 WELS_EXTERN VAACalcSadSsd_sse2
 ;*************************************************************************************************************
@@ -862,7 +945,7 @@ WELS_EXTERN VAACalcSadSsd_sse2
 ALIGN 16
 VAACalcSadSsd_sse2:
 %define		localsize		12
-%define		cur_data			esp + pushsize + localsize + 4
+%define		cur_data			esp + pushsize + localsize + 4 
 %define		ref_data			esp + pushsize + localsize + 8
 %define		iPicWidth			esp + pushsize + localsize + 12
 %define		iPicHeight			esp + pushsize + localsize + 16
@@ -881,6 +964,7 @@ VAACalcSadSsd_sse2:
 	push	edi
 	push	ebx
 	sub		esp,	localsize
+		
 	mov		ecx,	[iPicWidth]
 	mov		ecx,	[iPicHeight]
 	mov		esi,	[cur_data]
@@ -1004,10 +1088,189 @@ sqdiff_width_loop:
 %undef		localsize
 	ret
 
+%else
+
+
+WELS_EXTERN VAACalcSadSsd_sse2
+;*************************************************************************************************************
+;void VAACalcSadSsd_sse2(uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
+;	int32_t iPicStride,int32_t *psadframe, int32_t *psad8x8, int32_t *psum16x16, int32_t *psqsum16x16, int32_t *psqdiff16x16)
+;*************************************************************************************************************
+
+
+ALIGN 16
+VAACalcSadSsd_sse2:
+%define		localsize		12
+%define		cur_data			arg1;esp + pushsize + localsize + 4 r0
+%define		ref_data			arg2;esp + pushsize + localsize + 8 r1
+%define		iPicWidth			arg3;esp + pushsize + localsize + 12 r2
+%define		iPicHeight			arg4;esp + pushsize + localsize + 16 r3
+%define		iPicStride			arg5;esp + pushsize + localsize + 20
+%define		psadframe			arg6;esp + pushsize + localsize + 24
+%define		psad8x8				arg7;esp + pushsize + localsize + 28
+%define		psum16x16			arg8;esp + pushsize + localsize + 32
+%define		psqsum16x16			arg9;esp + pushsize + localsize + 36
+%define		psqdiff16x16		arg10;esp + pushsize + localsize + 40
+%define		tmp_esi				r10;esp + 0
+%define		tmp_edi				r11;esp + 4
+%define		tmp_sadframe		r12;esp + 8
+%define		pushsize		16
+	;push	ebp
+	;push	esi
+	;push	edi
+	;push	ebx
+	;sub		esp,	localsize
+	push 12
+	push 13
+	push 14
+	push 15
+	%assign push_num 4
+
+%ifdef WIN64
+    mov r4,arg5
+    mov r5,arg6
+%endif
+    mov r14,arg7
+
+	;mov		ecx,	[iPicWidth]
+	;mov		ecx,	[iPicHeight]
+	;mov		esi,	[cur_data]
+	;mov		edi,	[ref_data]
+	;mov		ebx,	[iPicStride]
+	;mov		edx,	[psad8x8]
+	;mov		eax,	ebx
+     mov        r13,r4
+	;shr		dword [iPicWidth],	4					; iPicWidth/16
+	;shr		dword [iPicHeight],	4					; iPicHeight/16
+	shr     r2,4
+	shr     r3,4
+	;shl		eax,	4							; iPicStride*16
+	shl     r13,4
+	;mov		ecx,	[iPicWidth]
+	;mov		ecx,	[iPicHeight]
+	pxor	xmm0,	xmm0
+	movq	tmp_sadframe,	xmm0
+sqdiff_height_loop:
+	;mov		ecx,	dword [iPicWidth]
+	;mov      r14,r2
+	push r2
+	%assign push_num push_num +1
+	mov		r10,	r0
+	mov		r11,	r1
+sqdiff_width_loop:
+	pxor	xmm7,	xmm7		; hiQuad_loQuad pSad8x8
+	pxor	xmm6,	xmm6		; pSum16x16
+	pxor	xmm5,	xmm5		; sqsum_16x16  four dword
+	pxor	xmm4,	xmm4		; sqdiff_16x16	four Dword
+	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
+	movdqa	xmm1,		xmm7
+	movd	[r14],		xmm7
+	psrldq	xmm7,		8
+	paddd	xmm1,		xmm7
+	movd	[r14+4],	xmm7
+	movd	r15d,		xmm1
+	SIGN_EXTENTION r15,r15d
+	add		tmp_sadframe,	r15
+
+	pxor	xmm7,	xmm7
+	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
+	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
+	movdqa	xmm1,		xmm7
+	movd	[r14+8],	xmm7
+	psrldq	xmm7,		8
+	paddd	xmm1,		xmm7
+	movd	[r14+12],	xmm7
+	movd	r15d,		xmm1
+	SIGN_EXTENTION r15,r15d
+	add		tmp_sadframe,	r15
+
+	mov		r15,	psum16x16
+	movdqa	xmm1,	xmm6
+	psrldq	xmm1,	8
+	paddd	xmm6,	xmm1
+	movd	[r15],	xmm6
+	add		dword psum16x16, 4
+
+	mov		r15,	psqsum16x16
+	pshufd	xmm6,	xmm5,	14 ;00001110
+	paddd	xmm6,	xmm5
+	pshufd	xmm5,	xmm6,	1  ;00000001
+	paddd	xmm5,	xmm6
+	movd	[r15],	xmm5
+	add		dword psqsum16x16, 4
+
+	mov		r15,	psqdiff16x16
+	pshufd	xmm5,	xmm4,	14	; 00001110
+	paddd	xmm5,	xmm4
+	pshufd	xmm4,	xmm5,	1	; 00000001
+	paddd	xmm4,	xmm5
+	movd	[r15],	xmm4
+	add		dword	psqdiff16x16,	4
+
+	add		r14,16
+	sub		r0,	r13
+	sub		r1,	r13
+	add		r0,	16
+	add		r1,	16
+
+	dec		r2
+	jnz		sqdiff_width_loop
+
+    pop r2
+	%assign push_num push_num -1
+	
+	mov		r0,	r10
+	mov		r1,	r11
+	add		r0,	r13
+	add		r1,	r13
+
+	dec	r3
+	jnz		sqdiff_height_loop
+
+	mov		r13,	psadframe
+	mov		[r13],	r12
+    
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    %assign push_num 0
+    
+%undef		cur_data
+%undef		ref_data
+%undef		iPicWidth
+%undef		iPicHeight
+%undef		iPicStride
+%undef		psadframe
+%undef		psad8x8
+%undef		psum16x16
+%undef		psqsum16x16
+%undef		psqdiff16x16
+%undef		tmp_esi
+%undef		tmp_edi
+%undef		tmp_sadframe
+%undef		pushsize
+%undef		localsize
+	ret
 
 
 
+%endif
 
+%ifdef X86_32
 WELS_EXTERN VAACalcSadBgd_sse2
 ;*************************************************************************************************************
 ;void VAACalcSadBgd_sse2(uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
@@ -1399,6 +1662,411 @@ sqdiff_bgd_width_loop:
 	pop		edi
 	pop		esi
 	pop		ebp
+%undef		cur_data
+%undef		ref_data
+%undef		iPicWidth
+%undef		iPicHeight
+%undef		iPicStride
+%undef		psadframe
+%undef		psad8x8
+%undef		psum16x16
+%undef		psqsum16x16
+%undef		psqdiff16x16
+%undef		p_sd8x8
+%undef		p_mad8x8
+%undef		tmp_esi
+%undef		tmp_edi
+%undef		pushsize
+%undef		localsize
+	ret
+%else
+
+WELS_EXTERN VAACalcSadBgd_sse2
+;*************************************************************************************************************
+;void VAACalcSadBgd_sse2(uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
+;				int32_t iPicStride, int32_t *psadframe, int32_t *psad8x8, int32_t *p_sd8x8, uint8_t *p_mad8x8)
+;*************************************************************************************************************
+
+
+ALIGN 16
+VAACalcSadBgd_sse2:
+%define		localsize		12
+%define		cur_data			arg1;esp + pushsize + localsize + 4
+%define		ref_data			arg2;esp + pushsize + localsize + 8
+%define		iPicWidth			arg3;esp + pushsize + localsize + 12
+%define		iPicHeight			arg4;esp + pushsize + localsize + 16
+%define		iPicStride			arg5;esp + pushsize + localsize + 20
+%define		psadframe			arg6;esp + pushsize + localsize + 24
+%define		psad8x8				arg7;esp + pushsize + localsize + 28
+%define		p_sd8x8				arg8;esp + pushsize + localsize + 32
+%define		p_mad8x8			arg9;esp + pushsize + localsize + 36
+%define		tmp_esi				r10;esp + 0
+%define		tmp_edi				r11;esp + 4
+%define		tmp_ecx				r12;esp + 8
+	
+	push r12
+	push r13
+	push r14
+	push r15
+	%assign push_num 4
+%ifdef WIN64
+    mov r4,arg5
+    mov r5,arg6
+%endif
+    mov r14,arg7
+   SIGN_EXTENTION r2,r2d
+   SIGN_EXTENTION r3,r3d
+   SIGN_EXTENTION r4,r4d
+   
+
+	mov     r13,r4
+	shr     r2,4
+	shr     r3,4
+	shl     r13,4
+	pxor	xmm0,	xmm0
+	pxor    xmm8,   xmm8
+	pxor    xmm9,   xmm9
+bgd_height_loop:
+	;mov		ecx,	dword [iPicWidth]
+	push r2
+	%assign push_num push_num+1
+	mov		r10,	r0
+	mov		r11,	r1
+bgd_width_loop:
+	pxor	xmm7,	xmm7		; pSad8x8
+	pxor	xmm6,	xmm6		; sum_cur_8x8
+	pxor	xmm5,	xmm5		; sum_ref_8x8
+	pxor	xmm4,	xmm4		; pMad8x8
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+
+
+	mov			r14,		p_mad8x8
+	WELS_MAX_REG_SSE2	xmm4
+
+	;mov			[tmp_ecx],	ecx
+	movhlps		xmm1,	xmm4
+	movd		r15d,	xmm4
+	
+	mov			[r14],	r15d
+	movd		r15d,	xmm1
+	mov			[r14+1],r15d
+	add			r14,	2
+;	mov			p_mad8x8,	r14
+
+
+	pslldq		xmm7,	4
+	pslldq		xmm6,	4
+	pslldq		xmm5,	4
+
+
+	pxor	xmm4,	xmm4		; pMad8x8
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+
+;	mov			r14,		[p_mad8x8]
+	WELS_MAX_REG_SSE2	xmm4
+
+	movhlps		xmm1,	xmm4
+	movd		r15d,	xmm4
+	mov			[r14],	r15d
+	movd		r15d,	xmm1
+	mov			[r14+1],r15d
+	add			r14,	2
+	mov			p_mad8x8,	r14
+
+	; data in xmm7, xmm6, xmm5:  D1 D3 D0 D2
+
+	mov		r14,	psad8x8
+	pshufd	xmm1,	xmm7,	10001101b		; D3 D2 D1 D0
+	movdqa	[r14],	xmm1
+	add		r14,	16
+	mov		psad8x8,	r14					; sad8x8
+
+	paddd	xmm1,	xmm7					; D1+3 D3+2 D0+1 D2+0
+	pshufd	xmm2,	xmm1,	00000011b
+	paddd	xmm1,	xmm2
+	movd	r14d,	xmm1
+	movd    xmm9, r14d
+	paddd	xmm8,	xmm9						; sad frame
+
+	mov		r14,	p_sd8x8
+	psubd	xmm6,	xmm5
+	pshufd	xmm1,	xmm6,	10001101b
+	movdqa	[r14],	xmm1
+	add		r14,	16
+	mov		p_sd8x8,	r14
+
+
+	;add		edx,	16
+	sub		r0,	r13
+	sub		r1,	r13
+	add		r0,	16
+	add		r1,	16
+
+	
+	dec		r2
+	jnz		bgd_width_loop
+	pop     r2
+	%assign push_num push_num-1
+	mov		r0,	r10
+	mov		r1,	r11
+	add		r0,	r13
+	add		r1,	r13
+
+	dec		r3
+	jnz		bgd_height_loop
+
+	mov		r13,	psadframe
+	movd	[r13],	xmm8
+
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	%assign push_num 0
+%undef		cur_data
+%undef		ref_data
+%undef		iPicWidth
+%undef		iPicHeight
+%undef		iPicStride
+%undef		psadframe
+%undef		psad8x8
+%undef		p_sd8x8
+%undef		p_mad8x8
+%undef		tmp_esi
+%undef		tmp_edi
+%undef		pushsize
+%undef		localsize
+	ret
+
+
+
+WELS_EXTERN VAACalcSadSsdBgd_sse2
+;*************************************************************************************************************
+;void VAACalcSadSsdBgd_sse2(uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
+;		 int32_t iPicStride, int32_t *psadframe, int32_t *psad8x8, int32_t *psum16x16, int32_t *psqsum16x16,
+;			int32_t *psqdiff16x16, int32_t *p_sd8x8, uint8_t *p_mad8x8)
+;*************************************************************************************************************
+
+
+ALIGN 16
+VAACalcSadSsdBgd_sse2:
+%define		localsize		16
+%define		cur_data			arg1;esp + pushsize + localsize + 4
+%define		ref_data			arg2;esp + pushsize + localsize + 8
+%define		iPicWidth			arg3;esp + pushsize + localsize + 12
+%define		iPicHeight			arg4;esp + pushsize + localsize + 16
+%define		iPicStride			arg5;esp + pushsize + localsize + 20
+%define		psadframe			arg6;esp + pushsize + localsize + 24
+%define		psad8x8				arg7;esp + pushsize + localsize + 28
+%define		psum16x16			arg8;esp + pushsize + localsize + 32
+%define		psqsum16x16			arg9;esp + pushsize + localsize + 36
+%define		psqdiff16x16		arg10;esp + pushsize + localsize + 40
+%ifdef WIN64
+%define		p_sd8x8				[rsp + push_num*8 + 88];esp + pushsize + localsize + 44
+%define		p_mad8x8			[rsp + push_num*8 + 96];esp + pushsize + localsize + 48
+%else ;linux
+%define		p_sd8x8				[rsp + push_num*8 + 40];esp + pushsize + localsize + 44
+%define		p_mad8x8			[rsp + push_num*8 + 48];esp + pushsize + localsize + 48
+%endif
+
+	push r12
+	push r13
+	push r14
+	push r15
+	%assign push_num 4
+%ifdef WIN64
+    mov r4,arg5
+    mov r5,arg6
+%endif
+  SIGN_EXTENTION r2,r2d
+  SIGN_EXTENTION r3,r3d
+  SIGN_EXTENTION r4,r4d
+  
+  mov     r13,r4 
+	shr		r2,	4					; iPicWidth/16
+	shr		r3,	4					; iPicHeight/16
+	shl		r13,	4							; iPicStride*16
+	pxor	xmm0,	xmm0
+	pxor    xmm8,   xmm8
+	pxor    xmm9,   xmm9
+	
+	
+sqdiff_bgd_height_loop:
+	mov		r10,	r0
+	mov		r11,	r1
+	push r2
+  %assign push_num push_num+1
+sqdiff_bgd_width_loop:
+  
+	pxor	xmm7,	xmm7		; pSad8x8 interleaves sqsum16x16:  sqsum1 sad1 sqsum0 sad0
+	pxor	xmm6,	xmm6		; sum_8x8 interleaves cur and pRef in Dword,  Sref1 Scur1 Sref0 Scur0
+	pxor	xmm5,	xmm5		; pMad8x8
+	pxor	xmm4,	xmm4		; sqdiff_16x16	four Dword
+	WELS_SAD_BGD_SQDIFF_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4, r0 , r1 , r4 
+	WELS_SAD_BGD_SQDIFF_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4, r0 , r1 , r4 
+	WELS_SAD_BGD_SQDIFF_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4, r0 , r1 , r4  
+	WELS_SAD_BGD_SQDIFF_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4, r0 , r1 , r4  
+	WELS_SAD_BGD_SQDIFF_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4, r0 , r1 , r4  
+	WELS_SAD_BGD_SQDIFF_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4, r0 , r1 , r4  
+	WELS_SAD_BGD_SQDIFF_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4, r0 , r1 , r4  
+	WELS_SAD_BGD_SQDIFF_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4, r0 , r1 , r4 
+
+	mov		r14,		psad8x8
+	movdqa	xmm2,		xmm7
+	pshufd	xmm1,		xmm2,		00001110b
+	movd	[r14],		xmm2
+	movd	[r14+4],	xmm1
+	add		r14,		8
+	mov		psad8x8,	r14			; sad8x8
+
+	paddd	xmm1,				xmm2
+	movd	r14d,				xmm1
+	movd    xmm9,r14d
+	paddd		xmm8,		xmm9			; iFrameSad
+
+	mov		r14,		psum16x16
+	movdqa	xmm1,		xmm6
+	pshufd	xmm2,		xmm1,		00001110b
+	paddd	xmm1,		xmm2
+	movd	[r14],		xmm1				; sum
+
+	mov		r14,		p_sd8x8
+	pshufd	xmm1,		xmm6,		11110101b			; Sref1 Sref1 Sref0 Sref0
+	psubd	xmm6,		xmm1		; 00 diff1 00 diff0
+	pshufd	xmm1,		xmm6,		00001000b			;  xx xx diff1 diff0
+	movq	[r14],		xmm1
+	add		r14,		8
+	mov		p_sd8x8,	r14
+
+	mov			r14,		p_mad8x8
+	WELS_MAX_REG_SSE2	xmm5
+	
+	
+	movhlps		xmm1,	xmm5
+	push r0
+	movd		r0d,	xmm5
+	mov			[r14],	r0b
+	movd		r0d,	xmm1
+	mov			[r14+1],r0b
+	pop r0
+	add			r14,	2
+	mov			p_mad8x8,	r14
+
+	psrlq	xmm7,	32
+	psllq	xmm7,	32			; clear sad
+	pxor	xmm6,	xmm6		; sum_8x8 interleaves cur and pRef in Dword,  Sref1 Scur1 Sref0 Scur0
+	pxor	xmm5,	xmm5		; pMad8x8
+	WELS_SAD_BGD_SQDIFF_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4, r0 , r1 , r4  
+	WELS_SAD_BGD_SQDIFF_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4, r0 , r1 , r4 
+	WELS_SAD_BGD_SQDIFF_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4, r0 , r1 , r4 
+	WELS_SAD_BGD_SQDIFF_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4, r0 , r1 , r4 
+	WELS_SAD_BGD_SQDIFF_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4, r0 , r1 , r4  
+	WELS_SAD_BGD_SQDIFF_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4, r0 , r1 , r4  
+	WELS_SAD_BGD_SQDIFF_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4, r0 , r1 , r4  
+	WELS_SAD_BGD_SQDIFF_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4, r0 , r1 , r4 
+
+	mov		r14,		psad8x8
+	movdqa	xmm2,		xmm7
+	pshufd	xmm1,		xmm2,		00001110b
+	movd	[r14],		xmm2
+	movd	[r14+4],	xmm1
+	add		r14,		8
+	mov		psad8x8,	r14			; sad8x8
+
+	paddd	xmm1,				xmm2
+	movd	r14d,				xmm1
+	movd    xmm9, r14d
+	paddd	xmm8,		xmm9		; iFrameSad
+
+	mov		r14,			psum16x16
+	movdqa	xmm1,			xmm6
+	pshufd	xmm2,			xmm1,		00001110b
+	paddd	xmm1,			xmm2
+	movd	r15d,			xmm1				; sum
+	add		[r14],			r15d
+	add		r14,			4
+	mov		psum16x16,	r14
+
+	mov		r14,			psqsum16x16
+	psrlq	xmm7,			32
+	pshufd	xmm2,			xmm7,		00001110b
+	paddd	xmm2,			xmm7
+	movd	[r14],			xmm2				; sqsum
+	add		r14,			4
+	mov		psqsum16x16,	r14
+
+	mov		r14,		p_sd8x8
+	pshufd	xmm1,		xmm6,		11110101b			; Sref1 Sref1 Sref0 Sref0
+	psubd	xmm6,		xmm1		; 00 diff1 00 diff0
+	pshufd	xmm1,		xmm6,		00001000b			;  xx xx diff1 diff0
+	movq	[r14],		xmm1
+	add		r14,		8
+	mov		p_sd8x8,	r14
+
+	mov		r14,		p_mad8x8
+	WELS_MAX_REG_SSE2	xmm5
+	
+	
+	movhlps		xmm1,	xmm5
+	push r0
+	movd		r0d,	xmm5
+	mov			[r14],	r0b
+	movd		r0d,	xmm1
+	mov			[r14+1],r0b
+	pop r0
+	add			r14,	2
+	mov			p_mad8x8,	r14
+
+	mov		r14,		psqdiff16x16
+	pshufd	xmm1,		xmm4,		00001110b
+	paddd	xmm4,		xmm1
+	pshufd	xmm1,		xmm4,		00000001b
+	paddd	xmm4,		xmm1
+	movd	[r14],		xmm4
+	add		r14,		4
+	mov		psqdiff16x16,	r14
+
+	add		r14,	16
+	sub		r0,	r13
+	sub		r1,	r13
+	add		r0,	16
+	add		r1,	16
+
+	
+	dec		r2
+	jnz		sqdiff_bgd_width_loop
+	pop r2
+	%assign push_num push_num-1
+	mov		r0,	r10
+	mov		r1,	r11
+	add		r0,	r13
+	add		r1,	r13
+
+	dec	r3
+	jnz		sqdiff_bgd_height_loop
+
+	mov		r14,	psadframe
+	movd	[r14],	xmm8
+
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    %assign push_num 0
 %undef		cur_data
 %undef		ref_data
 %undef		iPicWidth

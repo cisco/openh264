@@ -59,10 +59,10 @@ void CVAACalculation::InitVaaFuncs (SVaaFuncs& sVaaFuncs, int32_t iCpuFlag) {
 #ifdef X86_ASM
   if ((iCpuFlag & WELS_CPU_SSE2) == WELS_CPU_SSE2) {
      sVaaFuncs.pfVAACalcSad			= VAACalcSad_sse2;
-    /* sVaaFuncs.pfVAACalcSadBgd		= VAACalcSadBgd_sse2;
+     sVaaFuncs.pfVAACalcSadBgd		= VAACalcSadBgd_sse2;
      sVaaFuncs.pfVAACalcSadSsd		= VAACalcSadSsd_sse2;
      sVaaFuncs.pfVAACalcSadSsdBgd = VAACalcSadSsdBgd_sse2;
-     sVaaFuncs.pfVAACalcSadVar		= VAACalcSadVar_sse2;*/
+     sVaaFuncs.pfVAACalcSadVar		= VAACalcSadVar_sse2;
   }
 #endif//X86_ASM
 }
