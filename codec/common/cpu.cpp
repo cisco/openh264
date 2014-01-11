@@ -134,29 +134,21 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
   }
 
   if( pNumberOfLogicProcessors != NULL ){
-    if (!strcmp((const str_t*)chVenderName, CPU_Vender_AMD)){
-      if( uiCPU & WELS_CPU_HTT){
-        *pNumberOfLogicProcessors = (uiFeatureB & 0x00ff0000) >> 16; // feature bits: 23-16 on returned EBX
-      } else {
-        *pNumberOfLogicProcessors = 1;
-      }
-    } else if( !strcmp((const str_t*)chVenderName, CPU_Vender_INTEL) ){
+    if( uiCPU & WELS_CPU_HTT){
+      *pNumberOfLogicProcessors = (uiFeatureB & 0x00ff0000) >> 16; // feature bits: 23-16 on returned EBX
+    } else {
+      *pNumberOfLogicProcessors = 1;
+    }
+    if( !strcmp((const str_t*)chVenderName, CPU_Vender_INTEL) ){
       if( uiMaxCpuidLevel >= 4 ){
         uiFeatureC = 0;
         WelsCPUId(0x4, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);
-        *pNumberOfLogicProcessors = ((uiFeatureA&0xfc000000)>>26) + 1;
-      } else {
-        if( uiCPU & WELS_CPU_HTT){
-          *pNumberOfLogicProcessors = (uiFeatureB & 0x00ff0000) >> 16; // feature bits: 23-16 on returned EBX
-        } else {
-          *pNumberOfLogicProcessors = 1;
+        if( uiFeatureA != 0 ){
+          *pNumberOfLogicProcessors = ((uiFeatureA&0xfc000000)>>26) + 1;
         }
       }
-    } else {
-      //FIXME:  other cpus
-      *pNumberOfLogicProcessors = 1;
     }
-  } 
+  }
 
   WelsCPUId (0x80000000, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);
 
