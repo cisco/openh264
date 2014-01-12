@@ -28,3 +28,5 @@ testbin/test_vd_1d.264
 testbin/test_vd_1d.yuv
 testbin/test_vd_rc.264
 testbin/test_vd_rc.yuv
+testbin/test.264
+testbin/test.yuv
