@@ -154,7 +154,7 @@ BITS 64
 %define  PUSHRFLAGS     pushfq
 %define  POPRFLAGS      popfq
 %define  retrq          rax
-%define  retrd          eax 
+%define  retrd          eax
 
 %elifdef X86_32 ; X86_32 ;************************************
 
@@ -233,7 +233,7 @@ BITS 32
 %macro LOAD_4_PARA 0
     %ifdef X86_32
         push r3
-        %assign  push_num push_num+1	
+        %assign  push_num push_num+1
         mov r0, [esp + push_num*4 + 4]
         mov r1, [esp + push_num*4 + 8]
         mov r2, [esp + push_num*4 + 12]
@@ -245,7 +245,7 @@ BITS 32
     %ifdef X86_32
         push r3
         push r4
-        %assign  push_num push_num+2	
+        %assign  push_num push_num+2
         mov r0, [esp + push_num*4 + 4]
         mov r1, [esp + push_num*4 + 8]
         mov r2, [esp + push_num*4 + 12]
@@ -261,7 +261,7 @@ BITS 32
 	push r3
         push r4
         push r5
-        %assign  push_num push_num+3	
+        %assign  push_num push_num+3
         mov r0, [esp + push_num*4 + 4]
         mov r1, [esp + push_num*4 + 8]
         mov r2, [esp + push_num*4 + 12]
@@ -280,7 +280,7 @@ BITS 32
         push r4
         push r5
         push r6
-        %assign  push_num push_num+4	
+        %assign  push_num push_num+4
         mov r0, [esp + push_num*4 + 4]
         mov r1, [esp + push_num*4 + 8]
         mov r2, [esp + push_num*4 + 12]
@@ -334,7 +334,7 @@ BITS 32
             movsx %1, %2
     %endif
 %endmacro
- 
+
 %macro WELS_EXTERN 1
     %ifdef PREFIX
         global _%1
