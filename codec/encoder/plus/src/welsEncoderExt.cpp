@@ -730,6 +730,10 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture**   pSrcPicList, int 
 
 }
 
+int CWelsH264SVCEncoder::EncodeParameterSets (SFrameBSInfo* pBsInfo) {
+    return WelsEncoderEncodeParameterSets (m_pEncContext, pBsInfo);
+}
+
 /*
  * return: 0 - success; otherwise - failed;
  */

@@ -79,6 +79,11 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   /*
    * return: 0 - success; otherwise - failed;
    */
+  virtual int EncodeParameterSets (SFrameBSInfo* pBsInfo);
+
+  /*
+   * return: 0 - success; otherwise - failed;
+   */
   virtual int PauseFrame (const unsigned char* pSrc, SFrameBSInfo* pBsInfo);
 
   /*
