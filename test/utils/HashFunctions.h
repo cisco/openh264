@@ -1,6 +1,8 @@
 #ifndef __HASHFUNCTIONS_H__
 #define __HASHFUNCTIONS_H__
 
+#include <stdio.h>
+#include <string.h>
 #include <openssl/sha.h>
 
 static bool CompareHash(const unsigned char* digest, const char* hashStr) {
