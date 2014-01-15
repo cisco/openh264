@@ -187,7 +187,8 @@ TEST_P(DecoderOutputTest, CompareOutput) {
 
 static const FileParam kFileParamArray[] = {
   {"res/test_vd_1d.264", "5827d2338b79ff82cd091c707823e466197281d3"},
-  {"res/test_vd_rc.264", "eea02e97bfec89d0418593a8abaaf55d02eaa1ca"}
+  {"res/test_vd_rc.264", "eea02e97bfec89d0418593a8abaaf55d02eaa1ca"},
+  {"res/Static.264", "91dd4a7a796805b2cd015cae8fd630d96c663f42"}
 };
 
 INSTANTIATE_TEST_CASE_P(DecodeFile, DecoderOutputTest,

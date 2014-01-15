@@ -133,7 +133,7 @@ void_t DeblockChromaLt4_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, i
 }
 void_t DeblockChromaEq4_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha,
                            int32_t iBeta) {
-  int32_t i = 0, d = 0;
+  int32_t d = 0;
   int32_t p0, p1, q0, q1;
   bool_t bDetaP0Q0, bDetaP1P0, bDetaQ1Q0;
   for (int32_t i = 0; i < 8; i++) {

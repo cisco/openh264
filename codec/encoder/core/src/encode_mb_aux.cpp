@@ -40,7 +40,7 @@
 #include "svc_encode_mb.h"
 namespace WelsSVCEnc {
 
-__align16 (int16_t, g_kiQuantInterFF[58][8]) = {
+__align16 (const int16_t, g_kiQuantInterFF[58][8]) = {
   /* 0*/ {   0,   1,   0,   1,   1,   1,   1,   1 },
   /* 1*/ {   0,   1,   0,   1,   1,   1,   1,   1 },
   /* 2*/ {   1,   1,   1,   1,   1,   1,   1,   1 },
@@ -104,7 +104,7 @@ __align16 (int16_t, g_kiQuantInterFF[58][8]) = {
 
 
 
-__align16 (int16_t, g_kiQuantMF[52][8]) = {
+__align16 (const int16_t, g_kiQuantMF[52][8]) = {
   /* 0*/	{26214, 16132, 26214, 16132, 16132, 10486, 16132, 10486 },
   /* 1*/	{23832, 14980, 23832, 14980, 14980,  9320, 14980,  9320 },
   /* 2*/	{20164, 13108, 20164, 13108, 13108,  8388, 13108,  8388 },
@@ -165,7 +165,7 @@ __align16 (int16_t, g_kiQuantMF[52][8]) = {
 #define WELS_ABS_LC(a) ((iSign ^ (int32_t)(a)) - iSign)
 #define NEW_QUANT(pDct, iFF, iMF) (((iFF)+ WELS_ABS_LC(pDct))*(iMF)) >>16
 #define WELS_NEW_QUANT(pDct,iFF,iMF)	WELS_ABS_LC(NEW_QUANT(pDct, iFF, iMF))
-void WelsQuant4x4_c (int16_t* pDct, int16_t* pFF,  int16_t* pMF) {
+void WelsQuant4x4_c (int16_t* pDct, const int16_t* pFF,  const int16_t* pMF) {
   int32_t i, j, iSign;
   for (i = 0; i < 16; i += 4) {
     j = i & 0x07;
@@ -194,7 +194,7 @@ void WelsQuant4x4Dc_c (int16_t* pDct, int16_t iFF,  int16_t iMF) {
   }
 }
 
-void WelsQuantFour4x4_c (int16_t* pDct, int16_t* pFF,  int16_t* pMF) {
+void WelsQuantFour4x4_c (int16_t* pDct, const int16_t* pFF, const int16_t* pMF) {
   int32_t i, j, iSign;
 
   for (i = 0; i < 64; i += 4) {
@@ -210,7 +210,7 @@ void WelsQuantFour4x4_c (int16_t* pDct, int16_t* pFF,  int16_t* pMF) {
   }
 }
 
-void WelsQuantFour4x4Max_c (int16_t* pDct, int16_t* pFF,  int16_t* pMF, int16_t* pMax) {
+void WelsQuantFour4x4Max_c (int16_t* pDct, const int16_t* pFF, const int16_t* pMF, int16_t* pMax) {
   int32_t i, j, k, iSign;
   int16_t iMaxAbs;
   for (k = 0; k < 4; k++) {

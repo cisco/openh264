@@ -91,7 +91,6 @@ Known Issues
 See the issue tracker on https://github.com/cisco/openh264/issues
 - Encoder errors when resolution exceeds 3840x2160
 - Encoder errors when compressed frame size exceeds half uncompressed size
-- Encoder console app only support multiple of 16 width/height for now
 - Decoder errors when compressed frame size exceeds 1MB
 
 License

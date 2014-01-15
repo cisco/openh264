@@ -81,16 +81,17 @@ ALIGN 16
 %ifdef       WIN64
 
 WelsCPUId:
-    push     rbx        
-    push     rdx    
- 
+    push     rbx
+    push     rdx
+
     mov      eax,     ecx
-    cpuid  
+    mov      rcx,     [r9]
+    cpuid
     mov      [r9],    ecx
     mov      [r8],    ebx
-    mov      rcx,    [rsp + 2*8 + 40]        
+    mov      rcx,    [rsp + 2*8 + 40]
     mov      [rcx],   edx
-    pop      rdx 
+    pop      rdx
     mov      [rdx],   eax
 
     pop      rbx
@@ -102,10 +103,11 @@ WelsCPUId:
     push     rcx
     push     rdx
 
-    mov      eax,     edi    
+    mov      eax,     edi
+    mov      rcx,     [rcx]
     cpuid
     mov      [r8],    edx
-    pop      rdx    
+    pop      rdx
     pop      r8
     mov      [r8],   ecx
     mov      [rdx],   ebx
@@ -121,6 +123,8 @@ WelsCPUId:
     push	edi
 
     mov     eax, [esp+12]	; operating index
+    mov     edi, [esp+24]
+    mov     ecx, [edi]
     cpuid					; cpuid
 
     ; processing various information return
@@ -152,9 +156,9 @@ WelsCPUSupportAVX:
 %elifdef   UNIX64
         mov eax, edi
         mov ecx, esi
-%else 
+%else
         mov eax, [esp+4]
-        mov ecx, [esp+8]  
+        mov ecx, [esp+8]
 %endif
 
         ; refer to detection of AVX addressed in INTEL AVX manual document

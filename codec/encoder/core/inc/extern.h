@@ -98,6 +98,8 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx);
 int32_t WelsEncoderEncodeExt (sWelsEncCtx*, void* pDst, const SSourcePicture** kppSrcList,
                               const int32_t kiConfiguredLayerNum);
 
+int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst);
+
 /*
  * Force coding IDR as follows
  */

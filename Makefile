@@ -29,26 +29,26 @@ endif
 ifeq ($(ENABLE64BIT), Yes)
 CFLAGS += -m64
 LDFLAGS += -m64
-ASMFLAGS += -DUNIX64
+ASMFLAGS_PLATFORM = -DUNIX64
 else
 CFLAGS += -m32
 LDFLAGS += -m32
-ASMFLAGS += -DX86_32
+ASMFLAGS_PLATFORM = -DX86_32
 endif
 
 include build/platform-$(UNAME).mk
 
 ifeq ($(USE_ASM),Yes)
-  CFLAGS += -DX86_ASM
+CFLAGS += -DX86_ASM
 endif
 
-CFLAGS += -DNO_DYNAMIC_VP -DHAVE_CACHE_LINE_ALIGN
+CFLAGS += -DNO_DYNAMIC_VP
 LDFLAGS +=
-ASMFLAGS += -DNO_DYNAMIC_VP
+ASMFLAGS += $(ASMFLAGS_PLATFORM) -DNO_DYNAMIC_VP
 
 
 #### No user-serviceable parts below this line
-INCLUDES = -Icodec/api/svc  -Icodec/common -Igtest/include
+INCLUDES = -Icodec/api/svc -Icodec/common -Igtest/include
 #ASM_INCLUDES = -Iprocessing/src/asm/
 ASM_INCLUDES = -Icodec/common/
 
@@ -79,19 +79,24 @@ H264ENC_DEPS = $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFF
 CODEC_UNITTEST_LDFLAGS = -L. -lgtest -ldecoder -lcrypto -lencoder -lprocessing -lcommon
 CODEC_UNITTEST_DEPS = $(LIBPREFIX)gtest.$(LIBSUFFIX) $(LIBPREFIX)decoder.$(LIBSUFFIX) $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX)
 
-.PHONY: test
+.PHONY: test gtest-bootstrap clean
 
 all:	libraries binaries
 
 clean:
 	rm -f $(OBJS) $(LIBRARIES) $(BINARIES)
-	echo $(HAVE_GTEST)
 
 gtest-bootstrap:
 	svn co https://googletest.googlecode.com/svn/trunk/ gtest
 
-test: codec_unittest
+test:
+ifeq ($(HAVE_GTEST),Yes)
+	$(MAKE) codec_unittest
 	./codec_unittest
+else
+	@echo "./gtest : No such file or directory."
+	@echo "You do not have gtest. Run make gtest-bootstrap to get gtest"
+endif
 
 include codec/common/targets.mk
 include codec/decoder/targets.mk
@@ -104,9 +109,3 @@ ifeq ($(HAVE_GTEST),Yes)
 include build/gtest-targets.mk
 include test/targets.mk
 endif
-
-
-
-
-
-

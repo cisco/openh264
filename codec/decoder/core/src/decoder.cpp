@@ -166,16 +166,8 @@ void_t WelsDecoderDefaults (PWelsDecoderContext pCtx) {
   pCtx->bAuReadyFlag				= 0; // au data is not ready
 
 
-  g_uiCacheLineSize				= 16;
 #if defined(X86_ASM)
   pCtx->uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores);
-#ifdef HAVE_CACHE_LINE_ALIGN
-  if (pCtx->uiCpuFlag & WELS_CPU_CACHELINE_64) {
-    g_uiCacheLineSize	= 64;
-  } else if (pCtx->uiCpuFlag & WELS_CPU_CACHELINE_32) {
-    g_uiCacheLineSize	= 32;
-  }
-#endif//HAVE_CACHE_LINE_ALIGN
 #endif//X86_ASM
 
   pCtx->iImgWidthInPixel		= 0;

@@ -144,6 +144,10 @@ static const EncodeFileParam kFileParamArray[] = {
       "res/CiscoVT2people_160x96_6fps.yuv",
       "6eb53b6bfdb95dfca0575bd3efe81aa58163951c", 160, 96, 6.0f
   },
+  {
+      "res/Static_152_100.yuv",
+      "c5af55647a5ead570bd5d96651e05ea699762b8e", 152, 100, 6.0f
+  },
 };
 
 INSTANTIATE_TEST_CASE_P(EncodeFile, EncoderOutputTest,

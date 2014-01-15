@@ -49,9 +49,6 @@
 namespace WelsDec {
 
 
-// cache line size
-extern uint32_t g_uiCacheLineSize;
-
 /*
  *	Function pointer declaration for various tool sets
  */

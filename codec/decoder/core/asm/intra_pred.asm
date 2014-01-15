@@ -477,7 +477,7 @@ WelsDecoderIChromaPredPlane_sse2:
 		SSE2_Copy8Times	xmm4, r2d		; mm4 = c,c,c,c,c,c,c,c
 
 		;mov		esi,	[esp + pushsize + 4]
-		mov 	r0, r4 
+		mov 	r0, r4
 		add		r3,	16
 		imul	r2,	-3
 		add		r3,	r2				; s = a + 16 + (-3)*c

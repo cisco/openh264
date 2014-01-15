@@ -64,7 +64,7 @@ WELS_EXTERN   DeblockLumaLt4V_ssse3
 
 DeblockLumaLt4V_ssse3:
   push        rbp
-  mov         r11,[esp + 16 + 20h]  ; pTC
+  mov         r11,[rsp + 16 + 20h]  ; pTC
   sub         rsp,1B0h
   lea         rbp,[rsp+20h]
   movd        xmm4,r8d
@@ -2533,8 +2533,8 @@ DeblockChromaLt4V_ssse3:
   pop         rbx
   ret
 
-WELS_EXTERN   DeblockChromaEq4V_ssse3
-ALIGN 16
+WELS_EXTERN DeblockChromaEq4V_ssse3
+
 DeblockChromaEq4V_ssse3:
   mov         rax,rsp
   push        rbx
@@ -2684,8 +2684,8 @@ DeblockChromaEq4V_ssse3:
   pop         rbx
   ret
 
+WELS_EXTERN DeblockChromaEq4H_ssse3
 
-WELS_EXTERN   DeblockChromaEq4H_ssse3
 ALIGN  16
 DeblockChromaEq4H_ssse3:
   mov         rax,rsp
