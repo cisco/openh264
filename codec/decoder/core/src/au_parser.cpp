@@ -210,6 +210,19 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
     }
 
     DecodeNalHeaderExt (pCurNal, pNal);
+    if (pCurNal->sNalHeaderExt.uiQualityId != 0) {
+      WelsLog (pCtx, WELS_LOG_WARNING, "ParseNalHeader() in Prefix Nal Unit:uiQualityId (%d) != 0, MGS not supported!\n",
+               pCurNal->sNalHeaderExt.uiQualityId);
+      pCtx->iErrorCode |= dsInvalidArgument;
+      return NULL;
+    }
+    if (pCurNal->sNalHeaderExt.bUseRefBasePicFlag != 0) {
+      WelsLog (pCtx, WELS_LOG_WARNING, "ParseNalHeader() in Prefix Nal Unit:bUseRefBasePicFlag (%d) != 0, MGS not supported!\n",
+               pCurNal->sNalHeaderExt.bUseRefBasePicFlag);
+      pCtx->iErrorCode |= dsInvalidArgument;
+      return NULL;
+    }
+
 
     pNal            += NAL_UNIT_HEADER_EXT_SIZE;
     iNalSize        -= NAL_UNIT_HEADER_EXT_SIZE;
