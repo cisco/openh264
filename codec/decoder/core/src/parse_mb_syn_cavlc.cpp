@@ -419,7 +419,7 @@ int32_t CheckIntraChromaPredMode (uint8_t uiSampleAvail, int8_t* pMode) {
   int32_t bLeftTopAvail  = uiSampleAvail & 0x02;
   int32_t iTopAvail      = uiSampleAvail & 0x01;
 
-  if (*pMode > MAX_PRED_MODE_ID_CHROMA) {
+  if ( *pMode < 0 || *pMode > MAX_PRED_MODE_ID_CHROMA) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
 
