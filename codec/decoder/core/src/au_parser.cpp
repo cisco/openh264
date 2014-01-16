@@ -211,7 +211,8 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
     DecodeNalHeaderExt (pCurNal, pNal);
     if (pCurNal->sNalHeaderExt.uiQualityId != 0 || pCurNal->sNalHeaderExt.bUseRefBasePicFlag != 0) {
-      WelsLog (pCtx, WELS_LOG_WARNING, "ParseNalHeader() in Prefix Nal Unit:uiQualityId (%d) != 0, bUseRefBasePicFlag (%d) != 0, not supported!\n",
+      WelsLog (pCtx, WELS_LOG_WARNING,
+               "ParseNalHeader() in Prefix Nal Unit:uiQualityId (%d) != 0, bUseRefBasePicFlag (%d) != 0, not supported!\n",
                pCurNal->sNalHeaderExt.uiQualityId, pCurNal->sNalHeaderExt.bUseRefBasePicFlag);
       PAccessUnit pCurAu	   = pCtx->pAccessUnitList;
       uint32_t uiAvailNalNum = pCurAu->uiAvailUnitsNum;
