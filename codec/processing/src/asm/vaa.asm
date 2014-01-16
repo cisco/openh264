@@ -1115,15 +1115,15 @@ VAACalcSadSsd_sse2:
 %define		tmp_edi				r11;esp + 4
 %define		pushsize		16
 
-	push 12
-	push 13
-	push 14
-	push 15
+	push r12
+	push r13
+	push r14
+	push r15
 	%assign push_num 4
 
 %ifdef WIN64
     mov r4,arg5
-    mov r5,arg6
+   ; mov r5,arg6
 %endif
     mov r14,arg7
 	SIGN_EXTENTION r2,r2d
@@ -1699,7 +1699,7 @@ VAACalcSadBgd_sse2:
 	%assign push_num 4
 %ifdef WIN64
     mov r4,arg5
-    mov r5,arg6
+  ;  mov r5,arg6
 %endif
     mov r14,arg7
    SIGN_EXTENTION r2,r2d
@@ -1708,6 +1708,7 @@ VAACalcSadBgd_sse2:
    
 
 	mov     r13,r4
+	mov     r15,r0
 	shr     r2,4
 	shr     r3,4
 	shl     r13,4
@@ -1718,21 +1719,21 @@ bgd_height_loop:
 	;mov		ecx,	dword [iPicWidth]
 	push r2
 	%assign push_num push_num+1
-	mov		r10,	r0
+	mov		r10,	r15
 	mov		r11,	r1
 bgd_width_loop:
 	pxor	xmm7,	xmm7		; pSad8x8
 	pxor	xmm6,	xmm6		; sum_cur_8x8
 	pxor	xmm5,	xmm5		; sum_ref_8x8
 	pxor	xmm4,	xmm4		; pMad8x8
-	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
-	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
-	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
-	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
-	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
-	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
-	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
-	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r15 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r15 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r15 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r15 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r15 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r15 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r15 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r15 ,r1, r4
 
 
 	mov			r14,		p_mad8x8
@@ -1740,11 +1741,12 @@ bgd_width_loop:
 
 	;mov			[tmp_ecx],	ecx
 	movhlps		xmm1,	xmm4
-	movd		r15d,	xmm4
+	movd		r0d,	xmm4
 	
-	mov			[r14],	r15d
-	movd		r15d,	xmm1
-	mov			[r14+1],r15d
+	
+	mov			[r14],	r0b
+	movd		r0d,	xmm1
+	mov			[r14+1],r0b
 	add			r14,	2
 ;	mov			p_mad8x8,	r14
 
@@ -1755,23 +1757,23 @@ bgd_width_loop:
 
 
 	pxor	xmm4,	xmm4		; pMad8x8
-	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
-	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
-	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
-	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
-	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
-	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
-	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
-	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r0 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r15 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r15 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r15 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r15 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r15 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r15 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r15 ,r1, r4
+	WELS_SAD_SD_MAD_16x1_SSE2	xmm7,	xmm6,	xmm5,	xmm4 ,r15 ,r1, r4
 
 ;	mov			r14,		[p_mad8x8]
 	WELS_MAX_REG_SSE2	xmm4
 
 	movhlps		xmm1,	xmm4
-	movd		r15d,	xmm4
-	mov			[r14],	r15d
-	movd		r15d,	xmm1
-	mov			[r14+1],r15d
+	movd		r0d,	xmm4
+	mov			[r14],	r0b
+	movd		r0d,	xmm1
+	mov			[r14+1],r0b
 	add			r14,	2
 	mov			p_mad8x8,	r14
 
@@ -1799,9 +1801,9 @@ bgd_width_loop:
 
 
 	;add		edx,	16
-	sub		r0,	r13
+	sub		r15,	r13
 	sub		r1,	r13
-	add		r0,	16
+	add		r15,	16
 	add		r1,	16
 
 	
@@ -1809,9 +1811,9 @@ bgd_width_loop:
 	jnz		bgd_width_loop
 	pop     r2
 	%assign push_num push_num-1
-	mov		r0,	r10
+	mov		r15,	r10
 	mov		r1,	r11
-	add		r0,	r13
+	add		r15,	r13
 	add		r1,	r13
 
 	dec		r3
@@ -1878,7 +1880,7 @@ VAACalcSadSsdBgd_sse2:
 	%assign push_num 4
 %ifdef WIN64
     mov r4,arg5
-    mov r5,arg6
+    ;mov r5,arg6
 %endif
   SIGN_EXTENTION r2,r2d
   SIGN_EXTENTION r3,r3d

@@ -469,6 +469,25 @@ const ALIGNED_DECLARE (uint8_t, g_kuiEncNcMapTable[18], 16) = {
 const uint8_t   g_kuiTemporalIdListTable[MAX_TEMPORAL_LEVEL][MAX_GOP_SIZE + 1] = {
   {
     0, 0, 0, 0, 0, 0, 0, 0,
+    0
+  },  // gop size = 1
+  {
+    0, 1, 0, 0, 0, 0, 0, 0,
+    0
+  },  // uiGopSize = 2
+  {
+    0, 2, 1, 2, 0, 0, 0, 0,
+    0
+  },  // uiGopSize = 4
+  {
+    0, 3, 2, 3, 1, 3, 2, 3,
+    0
+  }
+};
+/*
+const uint8_t   g_kuiTemporalIdListTable[MAX_TEMPORAL_LEVEL][MAX_GOP_SIZE + 1] = {
+  {
+    0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0
   },  // gop size = 1
@@ -493,6 +512,7 @@ const uint8_t   g_kuiTemporalIdListTable[MAX_TEMPORAL_LEVEL][MAX_GOP_SIZE + 1] =
     0
   }  //  uiGopSize = 16
 };
+*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // extern at svc_encode_slice.h
