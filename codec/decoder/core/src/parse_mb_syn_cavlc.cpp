@@ -687,8 +687,7 @@ static int32_t	CavlcGetRunBefore (int32_t iRun[16], SReadBitsCache* pBitsCache, 
 
 int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCache, PBitStringAux pBs, int32_t iIndex,
                                 int32_t iMaxNumCoeff,
-                                const uint8_t* kpZigzagTable, const int32_t kiTableLength, int32_t iResidualProperty, int16_t* pTCoeff, int32_t iMbMode,
-                                uint8_t uiQp,
+                                const uint8_t* kpZigzagTable, int32_t iResidualProperty, int16_t* pTCoeff, int32_t iMbMode, uint8_t uiQp,
                                 PWelsDecoderContext pCtx) {
   int32_t iLevel[16], iZerosLeft, iCoeffNum;
   int32_t  iRun[16] = {0};
@@ -751,7 +750,7 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
     iZerosLeft = 0;
   }
 
-  if (iZerosLeft < 0 || iZerosLeft + uiTotalCoeff > kiTableLength) {
+  if (iZerosLeft < 0 || iZerosLeft + uiTotalCoeff > iMaxNumCoeff) {
     return ERR_INFO_CAVLC_INVALID_ZERO_LEFT;
   }
   iUsedBits += CavlcGetRunBefore (iRun, &sReadBitsCache, uiTotalCoeff, pVlcTable, iZerosLeft);

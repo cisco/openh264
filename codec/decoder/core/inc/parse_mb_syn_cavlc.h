@@ -183,7 +183,6 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable,
                                 int32_t iIndex,
                                 int32_t iMaxNumCoeff,
                                 const uint8_t* kpZigzagTable,
-                                const int32_t kiTableLength,
                                 int32_t iResidualProperty,
                                 /*short *tCoeffLevel,*/
                                 int16_t* pTCoeff,
