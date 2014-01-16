@@ -9,7 +9,7 @@ OBJS += $(GTEST_OBJS)
 GTEST_INCLUDES += -Igtest
 
 $(GTEST_SRCDIR)/src/gtest-all.o: $(GTEST_SRCDIR)/src/gtest-all.cc
-	$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(GTEST_CFLAGS) $(GTEST_INCLUDES) -c -o $(GTEST_SRCDIR)/src/gtest-all.o $(GTEST_SRCDIR)/src/gtest-all.cc
+	$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(GTEST_CFLAGS) $(GTEST_INCLUDES) -c -o $@ $<
 
 $(LIBPREFIX)gtest.$(LIBSUFFIX): $(GTEST_OBJS)
 	rm -f $(LIBPREFIX)gtest.$(LIBSUFFIX)
