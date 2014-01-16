@@ -1019,8 +1019,6 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
       for (i = 0; i < 2; i++) { //Cb Cr
         int32_t iIndex = 16 + (i << 2);
         for (iId4x4 = 0; iId4x4 < 4; iId4x4++) {
-          //if(pCtx->iFrameNum == 6 &&pCtx->iPrevFrameNum == 6 && i ==1 && iId4x4 == 1)
-          //  iIndex = 21;
           if (WelsResidualBlockCavlc (pVlcTable, pNonZeroCount, pBs, iIndex,
                                       iScanIdxEnd - WELS_MAX (iScanIdxStart, 1) + 1, g_kuiZigzagScan + WELS_MAX (iScanIdxStart, 1),
                                       CHROMA_AC, pCurLayer->pScaledTCoeff[iMbXy] + (iIndex << 4), iNMbMode, pCurLayer->pChromaQp[iMbXy], pCtx)) {
