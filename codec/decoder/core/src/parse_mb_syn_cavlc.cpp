@@ -390,7 +390,7 @@ int32_t CheckIntra16x16PredMode (uint8_t uiSampleAvail, int8_t* pMode) {
   int32_t bLeftTopAvail  = uiSampleAvail & 0x02;
   int32_t iTopAvail      = uiSampleAvail & 0x01;
 
-  if (*pMode > MAX_PRED_MODE_ID_I16x16) {
+  if (*pMode < 0 || *pMode > MAX_PRED_MODE_ID_I16x16) {
     return ERR_INFO_INVALID_I16x16_PRED_MODE;
   }
 
@@ -451,7 +451,7 @@ int32_t CheckIntra4x4PredMode (int32_t* pSampleAvail, int8_t* pMode, int32_t iIn
 
   int8_t iFinalMode;
 
-  if (*pMode > MAX_PRED_MODE_ID_I4x4) {
+  if (*pMode < 0 || *pMode > MAX_PRED_MODE_ID_I4x4) {
     return -1;
   }
 
