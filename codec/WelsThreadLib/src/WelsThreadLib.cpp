@@ -76,7 +76,7 @@ WELS_THREAD_ERROR_CODE    WelsEventInit (WELS_EVENT*    event) {
   WELS_EVENT   h = CreateEvent (NULL, FALSE, FALSE, NULL);
 
   if (h == NULL) {
-    return WELS_THREAD_ERROR_GENERIAL;
+    return WELS_THREAD_ERROR_GENERAL;
   }
   *event = h;
   return WELS_THREAD_ERROR_OK;
@@ -86,13 +86,13 @@ WELS_THREAD_ERROR_CODE    WelsEventSignal (WELS_EVENT* event) {
   if (SetEvent (*event)) {
     return WELS_THREAD_ERROR_OK;
   }
-  return WELS_THREAD_ERROR_GENERIAL;
+  return WELS_THREAD_ERROR_GENERAL;
 }
 
 WELS_THREAD_ERROR_CODE    WelsEventReset (WELS_EVENT* event) {
   if (ResetEvent (*event))
     return WELS_THREAD_ERROR_OK;
-  return WELS_THREAD_ERROR_GENERIAL;
+  return WELS_THREAD_ERROR_GENERAL;
 }
 
 WELS_THREAD_ERROR_CODE    WelsEventWait (WELS_EVENT* event) {
@@ -126,7 +126,7 @@ WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_
   WELS_THREAD_HANDLE   h = CreateThread (NULL, 0, routine, arg, 0, NULL);
 
   if (h == NULL) {
-    return WELS_THREAD_ERROR_GENERIAL;
+    return WELS_THREAD_ERROR_GENERAL;
   }
   * thread = h;
 
@@ -297,12 +297,12 @@ WELS_THREAD_ERROR_CODE   WelsEventDestroy (WELS_EVENT* event) {
 
 WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT** p_event, str_t* event_name) {
   if (p_event == NULL || event_name == NULL)
-    return WELS_THREAD_ERROR_GENERIAL;
+    return WELS_THREAD_ERROR_GENERAL;
   *p_event = sem_open (event_name, O_CREAT, (S_IRUSR | S_IWUSR)/*0600*/, 0);
   if (*p_event == (sem_t*)SEM_FAILED) {
     sem_unlink (event_name);
     *p_event = NULL;
-    return WELS_THREAD_ERROR_GENERIAL;
+    return WELS_THREAD_ERROR_GENERAL;
   } else {
     return WELS_THREAD_ERROR_OK;
   }
