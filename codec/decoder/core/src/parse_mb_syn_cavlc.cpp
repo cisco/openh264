@@ -419,7 +419,7 @@ int32_t CheckIntraChromaPredMode (uint8_t uiSampleAvail, int8_t* pMode) {
   int32_t bLeftTopAvail  = uiSampleAvail & 0x02;
   int32_t iTopAvail      = uiSampleAvail & 0x01;
 
-  if ( *pMode < 0 || *pMode > MAX_PRED_MODE_ID_CHROMA) {
+  if (*pMode < 0 || *pMode > MAX_PRED_MODE_ID_CHROMA) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
 
@@ -687,7 +687,8 @@ static int32_t	CavlcGetRunBefore (int32_t iRun[16], SReadBitsCache* pBitsCache, 
 
 int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCache, PBitStringAux pBs, int32_t iIndex,
                                 int32_t iMaxNumCoeff,
-                                const uint8_t* kpZigzagTable, int32_t iResidualProperty, int16_t* pTCoeff, int32_t iMbMode, uint8_t uiQp,
+                                const uint8_t* kpZigzagTable, const int32_t kiTableLength, int32_t iResidualProperty, int16_t* pTCoeff, int32_t iMbMode,
+                                uint8_t uiQp,
                                 PWelsDecoderContext pCtx) {
   int32_t iLevel[16], iZerosLeft, iCoeffNum;
   int32_t  iRun[16] = {0};
@@ -750,7 +751,7 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
     iZerosLeft = 0;
   }
 
-  if (iZerosLeft < 0) {
+  if (iZerosLeft < 0 || iZerosLeft + uiTotalCoeff > kiTableLength) {
     return ERR_INFO_CAVLC_INVALID_ZERO_LEFT;
   }
   iUsedBits += CavlcGetRunBefore (iRun, &sReadBitsCache, uiTotalCoeff, pVlcTable, iZerosLeft);
