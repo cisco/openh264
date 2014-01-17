@@ -433,40 +433,10 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
 
 
 
-#if defined(_MSC_VER)
-
-  HMODULE hModule = LoadLibraryA (".\\welsdec.dll");
-
-  PCreateDecoderFunc  pCreateDecoderFunc				= NULL;
-  PDestroyDecoderFunc pDestroyDecoderFunc				= NULL;
-
-
-  pCreateDecoderFunc  = (PCreateDecoderFunc)::GetProcAddress (hModule, "CreateDecoder");
-  pDestroyDecoderFunc = (PDestroyDecoderFunc)::GetProcAddress (hModule, "DestroyDecoder");
-
-  if ((hModule != NULL) && (pCreateDecoderFunc != NULL) && (pDestroyDecoderFunc != NULL)) {
-    printf ("load library sw function successfully\n");
-
-    if (pCreateDecoderFunc (&pDecoder)  || (NULL == pDecoder)) {
-      printf ("Create Decoder failed.\n");
-      return 1;
-    }
-  } else {
-    printf ("load library sw function failed\n");
-    return 1;
-  }
-
-
-#else
-
-
   if (CreateDecoder (&pDecoder)  || (NULL == pDecoder)) {
     printf ("Create Decoder failed.\n");
     return 1;
   }
-
-#endif
-
 
   if (pDecoder->Initialize (&sDecParam, INIT_TYPE_PARAMETER_BASED)) {
     printf ("Decoder initialization failed.\n");
@@ -489,11 +459,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
   if (pDecoder) {
     pDecoder->Uninitialize();
 
-#if defined(_MSC_VER)
-    pDestroyDecoderFunc (pDecoder);
-#else
     DestroyDecoder (pDecoder);
-#endif
   }
 
   return 0;

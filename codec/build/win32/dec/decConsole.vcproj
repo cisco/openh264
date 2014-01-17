@@ -74,6 +74,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="$(OutDir)\welsdec.lib"
 				OutputFile="$(OutDir)\decConsole.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -166,6 +167,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="$(OutDir)\welsdec.lib"
 				OutputFile="$(OutDir)\decConsole.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -258,6 +260,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="$(OutDir)\welsdec.lib"
 				OutputFile="$(OutDir)\decConsoled.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -351,6 +354,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="$(OutDir)\welsdec.lib"
 				OutputFile="$(OutDir)\decConsoled.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
