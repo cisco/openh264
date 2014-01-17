@@ -36,7 +36,7 @@
 ////////////////Data and /or structures introduced in Cisco OpenH264 application////////////////
 
 /* Constants */
-#define MAX_TEMPORAL_LAYER_NUM		5
+#define MAX_TEMPORAL_LAYER_NUM		4
 #define MAX_SPATIAL_LAYER_NUM		4
 #define MAX_QUALITY_LAYER_NUM		4
 
