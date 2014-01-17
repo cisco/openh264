@@ -175,6 +175,8 @@ bool_t      bEnableSceneChangeDetect;
 bool_t		bEnableBackgroundDetection;
 /* adaptive quantization control */
 bool_t		bEnableAdaptiveQuant;
+/* frame skipping */
+bool_t		bEnableFrameSkip;
 /* long term reference control */
 bool_t      bEnableLongTermReference;
 
@@ -249,6 +251,7 @@ void FillDefault (const bool_t kbEnableRc) {
   bEnableSceneChangeDetect	= true;		// scene change detection control
   bEnableBackgroundDetection	= true;		// background detection control
   bEnableAdaptiveQuant		= true;		// adaptive quantization control
+  bEnableFrameSkip		= true;		// frame skipping
   bEnableLongTermReference	= false;	// long term reference control
   bEnableSpsPpsIdAddition	= true;		// pSps pPps id addition control
   bPrefixNalAddingCtrl		= true;		// prefix NAL adding control
@@ -305,6 +308,9 @@ int32_t ParamTranscode (SVCEncodingParam& pCodingParam, const bool_t kbEnableRc 
 
   /* Adaptive quantization control */
   bEnableAdaptiveQuant	= pCodingParam.bEnableAdaptiveQuant ? true : false;
+
+  /* Frame skipping */
+  bEnableFrameSkip	= pCodingParam.bEnableFrameSkip ? true : false;
 
   /* Enable cropping source picture */
   bEnableCropPic	= pCodingParam.bEnableCropPic ? true : false;

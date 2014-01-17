@@ -812,11 +812,10 @@ void  WelsRcPictureInfoUpdateGom (void* pCtx, int32_t layer_size) {
 #endif
 
 
-#if SKIP_FRAME_FLAG
-  if (pEncCtx->uiDependencyId == pEncCtx->pSvcParam->iNumDependencyLayer - 1) {
+  if (pEncCtx->pSvcParam->bEnableFrameSkip &&
+      pEncCtx->uiDependencyId == pEncCtx->pSvcParam->iNumDependencyLayer - 1) {
     RcVBufferCalculationSkip (pEncCtx);
   }
-#endif
 
   if (pEncCtx->pSvcParam->iPaddingFlag)
     RcVBufferCalculationPadding (pEncCtx);
