@@ -8,16 +8,22 @@ parser.add_argument("--directory", dest="directory", required=True)
 parser.add_argument("--library", dest="library", help="Make a library")
 parser.add_argument("--binary", dest="binary", help="Make a binary")
 parser.add_argument("--exclude", dest="exclude", help="Exclude file", action="append")
+parser.add_argument("--include", dest="include", help="Include file", action="append")
+parser.add_argument("--out", dest="out", help="Output file")
+parser.add_argument("--cpp-suffix", dest="cpp_suffix", help="C++ file suffix")
 PREFIX=None
 LIBRARY=None
 BINARY=None
 EXCLUDE=[]
+INCLUDE=[]
+OUTFILE="targets.mk"
+CPP_SUFFIX=".cpp"
 
 def make_o(x):
     return os.path.splitext(x)[0] + ".o"
 
 def write_cpp_rule_pattern(f):
-    src = "$(%s_SRCDIR)/%%.cpp"%(PREFIX)
+    src = "$(%s_SRCDIR)/%%%s"%(PREFIX, CPP_SUFFIX)
     dst = "$(%s_SRCDIR)/%%.o"%(PREFIX)
 
     f.write("%s: %s\n"%(dst, src))
@@ -39,8 +45,8 @@ def find_sources():
     print EXCLUDE
     for dir in os.walk("."):
         for file in dir[2]:
-            if not file in EXCLUDE:
-                if os.path.splitext(file)[1] == '.cpp':
+            if (len(INCLUDE) == 0 and not file in EXCLUDE) or file in INCLUDE:
+                if os.path.splitext(file)[1] == CPP_SUFFIX:
                     cpp_files.append(os.path.join(dir[0], file))
                 if os.path.splitext(file)[1] == '.asm':
                     asm_files.append(os.path.join(dir[0], file))
@@ -59,11 +65,17 @@ else:
 
 if args.exclude is not None:
     EXCLUDE = args.exclude
+if args.include is not None:
+    INCLUDE = args.include
+if args.out is not None:
+    OUTFILE = args.out
+if args.cpp_suffix is not None:
+    CPP_SUFFIX = args.cpp_suffix
 (cpp, asm) = find_sources()
 
 
 
-f = open("targets.mk", "w")
+f = open(OUTFILE, "w")
 f.write("%s_PREFIX=%s\n"%(PREFIX, PREFIX))
 f.write("%s_SRCDIR=%s\n"%(PREFIX, args.directory))
 
@@ -71,7 +83,7 @@ f.write("%s_CPP_SRCS=\\\n"%(PREFIX))
 for c in cpp:
     f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
 f.write("\n")
-f.write("%s_OBJS += $(%s_CPP_SRCS:.cpp=.o)\n"%(PREFIX, PREFIX))
+f.write("%s_OBJS += $(%s_CPP_SRCS:%s=.o)\n"%(PREFIX, PREFIX, CPP_SUFFIX))
 
 if len(asm) > 0:
     f.write("ifeq ($(USE_ASM), Yes)\n");
