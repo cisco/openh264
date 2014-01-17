@@ -759,6 +759,7 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   SFrameBSInfo sFbi;
   SVCEncodingParam sSvcParam;
   int64_t iStart = 0, iTotal = 0;
+  int32_t ret = 0;
 #if defined ( STICK_STREAM_SIZE )
   FILE* fTrackStream = fopen ("coding_size.stream", "wb");;
 #endif
@@ -781,15 +782,15 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   int iParsedNum = 3;
   if (ParseCommandLine (argc - iParsedNum, argv + iParsedNum, sSvcParam) != 0) {
     printf ("parse pCommand line failed\n");
-    fclose (pFpSrc);
-    return 1;
+  	ret = 1;
+    goto ERROR_RET;
   }
 
   if (cmResultSuccess != pPtrEnc->Initialize (&sSvcParam, INIT_TYPE_PARAMETER_BASED)) {
     fprintf (stderr, "Encoder Initialization failed!\n");
-    fclose (pFpSrc);
-    return 1;
-  }
+	ret = 1;
+    goto ERROR_RET;
+   }
 
   const int32_t iPicLumaSize = sSvcParam.iPicWidth * sSvcParam.iPicHeight;
   int32_t iFrameSize = 0;
@@ -826,7 +827,9 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     pPlanes[0]	= new uint8_t[iFrameSize];
     break;
   default:
-    return 1;
+    ret = 1;
+    goto ERROR_RET;
+  
   }
 
   int32_t iFrame = 0;
@@ -877,7 +880,7 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     delete [] pPlanes[0];
     pPlanes[0] = NULL;
   }
-
+ERROR_RET:
   if (pFpBs) {
     fclose (pFpBs);
     pFpBs = NULL;
@@ -887,7 +890,7 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     pFpSrc = NULL;
   }
 
-  return 0;
+  return ret;
 }
 
 
@@ -1201,7 +1204,7 @@ INSIDE_MEM_FREE: {
           pSrcPicList[i] = NULL;
         }
       }
-      delete pSrcPicList;
+      delete []pSrcPicList;
       pSrcPicList = NULL;
     }
 
