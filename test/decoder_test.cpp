@@ -2,10 +2,10 @@
 #include "utils/HashFunctions.h"
 #include "BaseDecoderTest.h"
 
-static void UpdateHashFromPlane(SHA_CTX* ctx, const uint8_t* plane,
+static void UpdateHashFromPlane(SHA1Context* ctx, const uint8_t* plane,
     int width, int height, int stride) {
   for (int i = 0; i < height; i++) {
-    SHA1_Update(ctx, plane, width);
+    SHA1Input(ctx, plane, width);
     plane += stride;
   }
 }
@@ -36,7 +36,7 @@ class DecoderOutputTest : public ::testing::WithParamInterface<FileParam>,
     if (HasFatalFailure()) {
       return;
     }
-    SHA1_Init(&ctx_);
+    SHA1Reset(&ctx_);
   }
   virtual void onDecodeFrame(const Frame& frame) {
     const Plane& y = frame.y;
@@ -47,7 +47,7 @@ class DecoderOutputTest : public ::testing::WithParamInterface<FileParam>,
     UpdateHashFromPlane(&ctx_, v.data, v.width, v.height, v.stride);
   }
  protected:
-  SHA_CTX ctx_;
+  SHA1Context ctx_;
 };
 
 TEST_P(DecoderOutputTest, CompareOutput) {
@@ -55,7 +55,7 @@ TEST_P(DecoderOutputTest, CompareOutput) {
   DecodeFile(p.fileName, this);
 
   unsigned char digest[SHA_DIGEST_LENGTH];
-  SHA1_Final(digest, &ctx_);
+  SHA1Result(&ctx_, digest);
   if (!HasFatalFailure()) {
     ASSERT_TRUE(CompareHash(digest, p.hashStr));
   }

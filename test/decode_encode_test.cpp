@@ -6,14 +6,14 @@
 #include "BaseDecoderTest.h"
 #include "BaseEncoderTest.h"
 
-static void UpdateHashFromFrame(const SFrameBSInfo& info, SHA_CTX* ctx) {
+static void UpdateHashFromFrame(const SFrameBSInfo& info, SHA1Context* ctx) {
   for (int i = 0; i < info.iLayerNum; ++i) {
     const SLayerBSInfo& layerInfo = info.sLayerInfo[i];
     int layerSize = 0;
     for (int j = 0; j < layerInfo.iNalCount; ++j) {
       layerSize += layerInfo.iNalLengthInByte[j];
     }
-    SHA1_Update(ctx, layerInfo.pBsBuf, layerSize);
+    SHA1Input(ctx, layerInfo.pBsBuf, layerSize);
   }
 }
 
@@ -49,7 +49,7 @@ class DecodeEncodeTest : public ::testing::TestWithParam<DecodeEncodeFileParam>,
     if (HasFatalFailure()) {
       return;
     }
-    SHA1_Init(&ctx_);
+    SHA1Reset(&ctx_);
   }
 
   virtual void TearDown() {
@@ -87,7 +87,7 @@ class DecodeEncodeTest : public ::testing::TestWithParam<DecodeEncodeFileParam>,
   }
 
  protected:
-  SHA_CTX ctx_;
+  SHA1Context ctx_;
   BufferedData buf_;
 };
 
@@ -97,7 +97,7 @@ TEST_P(DecodeEncodeTest, CompareOutput) {
   ASSERT_TRUE(Open(p.fileName));
   EncodeStream(this, p.width, p.height, p.frameRate, this);
   unsigned char digest[SHA_DIGEST_LENGTH];
-  SHA1_Final(digest, &ctx_);
+  SHA1Result(&ctx_, digest);
   if (!HasFatalFailure()) {
     ASSERT_TRUE(CompareHash(digest, p.hashStr));
   }
