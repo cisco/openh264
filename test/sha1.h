@@ -77,6 +77,12 @@ void SHA1Input( SHA1Context *,
                 const unsigned char *,
                 unsigned);
 
+#define SHA_DIGEST_LENGTH 20
+#define SHA_CTX SHA1Context
+#define SHA1_Init(ctx) SHA1Reset(ctx)
+#define SHA1_Update(ctx, d, l) SHA1Input(ctx, d, l)
+#define SHA1_Final(d, ctx) SHA1Result(ctx, d)
+
 #ifdef __cplusplus
 }
 #endif

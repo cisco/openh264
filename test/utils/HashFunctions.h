@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <openssl/sha.h>
+#include "../sha1.h"
 
 static bool CompareHash(const unsigned char* digest, const char* hashStr) {
   char hashStrCmp[SHA_DIGEST_LENGTH * 2 + 1];
