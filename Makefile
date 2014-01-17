@@ -97,11 +97,11 @@ clean:
 gtest-bootstrap:
 	svn co https://googletest.googlecode.com/svn/trunk/ gtest
 
-test:
 ifeq ($(HAVE_GTEST),Yes)
-	$(MAKE) codec_unittest
+test: codec_unittest
 	./codec_unittest
 else
+test:
 	@echo "./gtest : No such file or directory."
 	@echo "You do not have gtest. Run make gtest-bootstrap to get gtest"
 endif
