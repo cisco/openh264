@@ -76,6 +76,9 @@ PROCESSING_INCLUDES = \
     -Icodec/encoder/core/inc \
     -Icodec/encoder/plus/inc
 
+GTEST_INCLUDES = \
+    -Igtest
+
 H264DEC_INCLUDES = $(DECODER_INCLUDES) -Icodec/console/dec/inc
 H264DEC_LDFLAGS = -L. $(call LINK_LIB, decoder) $(call LINK_LIB, common)
 H264DEC_DEPS = $(LIBPREFIX)decoder.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX)
