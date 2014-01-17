@@ -186,7 +186,7 @@ WelsIDctT4Rec_mmx:
 	movsx r1, r1d
 	movsx r3, r3d
 	%endif
-;	mov     eax, [pDct   ] 
+;	mov     eax, [pDct   ]
     movq    mm0, [r4+ 0]
     movq    mm1, [r4+ 8]
     movq    mm2, [r4+16]

@@ -84,7 +84,7 @@ typedef   pthread_mutex_t           WELS_MUTEX;
 typedef   sem_t                     WELS_EVENT;
 
 #define   WELS_THREAD_ROUTINE_TYPE         void *
-#define   WELS_THREAD_ROUTINE_RETURN(rc)   return (void*)rc;
+#define   WELS_THREAD_ROUTINE_RETURN(rc)   return (void*)(intptr_t)rc;
 
 #endif//__GNUC__
 
@@ -98,10 +98,10 @@ typedef  struct _WelsLogicalProcessorInfo {
 } WelsLogicalProcessInfo;
 
 #define    WELS_THREAD_ERROR_OK					0
-#define    WELS_THREAD_ERROR_GENERIAL			((uint32_t)(-1))
+#define    WELS_THREAD_ERROR_GENERAL			((uint32_t)(-1))
 #define    WELS_THREAD_ERROR_WAIT_OBJECT_0		0
 #define	   WELS_THREAD_ERROR_WAIT_TIMEOUT		((uint32_t)0x00000102L)
-#define	   WELS_THREAD_ERROR_WAIT_FAILED		WELS_THREAD_ERROR_GENERIAL
+#define	   WELS_THREAD_ERROR_WAIT_FAILED		WELS_THREAD_ERROR_GENERAL
 
 void WelsSleep (uint32_t dwMilliseconds);
 WELS_THREAD_ERROR_CODE    WelsMutexInit (WELS_MUTEX*    mutex);

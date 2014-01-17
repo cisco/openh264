@@ -50,6 +50,12 @@
 #define WELSVP_NAMESPACE_BEGIN      namespace nsWelsVP {
 #define WELSVP_NAMESPACE_END        }
 
+#ifdef _MSC_VER
+#include <stddef.h>
+#else
+#include <stdint.h>
+#endif
+
 WELSVP_NAMESPACE_BEGIN
 
 #if ( defined(_WIN32) || defined(_WIN32) ) && defined(_MSC_VER)
@@ -66,15 +72,6 @@ typedef unsigned __int64   uint64_t ;
 
 #else	// GCC
 
-typedef signed char        int8_t
-; // [comment]: some compilers may identify the type "char" as "unsigned char" as default, so declare it explicit
-typedef unsigned char      uint8_t  ;
-typedef signed short       int16_t  ;
-typedef unsigned short     uint16_t ;
-typedef signed int         int32_t  ;
-typedef unsigned int       uint32_t ;
-typedef long long          int64_t  ;
-typedef unsigned long long uint64_t ;
 #define inline_t           inline
 
 #endif

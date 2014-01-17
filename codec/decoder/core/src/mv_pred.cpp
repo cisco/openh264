@@ -43,6 +43,155 @@
 #include "mb_cache.h"
 
 namespace WelsDec {
+void_t PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
+  bool_t bTopAvail, bLeftTopAvail, bRightTopAvail, bLeftAvail;
+
+  int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
+  int32_t iLeftTopType, iRightTopType, iTopType, iLeftType;
+  int32_t iCurX, iCurY, iCurXy, iLeftXy, iTopXy, iLeftTopXy, iRightTopXy;
+
+  int8_t iLeftRef;
+  int8_t iTopRef;
+  int8_t iRightTopRef;
+  int8_t iLeftTopRef;
+  int8_t iDiagonalRef;
+  int8_t iMatchRef;
+  int16_t iMvA[2], iMvB[2], iMvC[2], iMvD[2];
+
+  iCurXy = pCurLayer->iMbXyIndex;
+  iCurX  = pCurLayer->iMbX;
+  iCurY  = pCurLayer->iMbY;
+  iCurSliceIdc = pCurLayer->pSliceIdc[iCurXy];
+
+  if (iCurX != 0) {
+    iLeftXy = iCurXy - 1;
+    iLeftSliceIdc = pCurLayer->pSliceIdc[iLeftXy];
+    bLeftAvail = (iLeftSliceIdc == iCurSliceIdc);
+  } else {
+    bLeftAvail = 0;
+    bLeftTopAvail = 0;
+  }
+
+  if (iCurY != 0) {
+    iTopXy = iCurXy - pCurLayer->iMbWidth;
+    iTopSliceIdc = pCurLayer->pSliceIdc[iTopXy];
+    bTopAvail = (iTopSliceIdc == iCurSliceIdc);
+    if (iCurX != 0) {
+      iLeftTopXy = iTopXy - 1;
+      iLeftTopSliceIdc = pCurLayer->pSliceIdc[iLeftTopXy];
+      bLeftTopAvail = (iLeftTopSliceIdc  == iCurSliceIdc);
+    } else {
+      bLeftTopAvail = 0;
+    }
+    if (iCurX != (pCurLayer->iMbWidth - 1)) {
+      iRightTopXy = iTopXy + 1;
+      iRightTopSliceIdc = pCurLayer->pSliceIdc[iRightTopXy];
+      bRightTopAvail = (iRightTopSliceIdc == iCurSliceIdc);
+    } else {
+      bRightTopAvail = 0;
+    }
+  } else {
+    bTopAvail = 0;
+    bLeftTopAvail = 0;
+    bRightTopAvail = 0;
+  }
+
+  iLeftType = ((iCurX != 0 && bLeftAvail) ? pCurLayer->pMbType[iLeftXy] : 0);
+  iTopType = ((iCurY != 0 && bTopAvail) ? pCurLayer->pMbType[iTopXy] : 0);
+  iLeftTopType = ((iCurX != 0 && iCurY != 0 && bLeftTopAvail)
+                  ? pCurLayer->pMbType[iLeftTopXy] : 0);
+  iRightTopType = ((iCurX != pCurLayer->iMbWidth - 1 && iCurY != 0 && bRightTopAvail)
+                   ? pCurLayer->pMbType[iRightTopXy] : 0);
+
+  /*get neb mv&iRefIdxArray*/
+  /*left*/
+  if (bLeftAvail && IS_INTER (iLeftType)) {
+    ST32 (iMvA, LD32 (pCurLayer->pMv[0][iLeftXy][3]));
+    iLeftRef = pCurLayer->pRefIndex[0][iLeftXy][3];
+  } else {
+    ST32 (iMvA, 0);
+    if (0 == bLeftAvail) { //not available
+      iLeftRef = REF_NOT_AVAIL;
+    } else { //available but is intra mb type
+      iLeftRef = REF_NOT_IN_LIST;
+    }
+  }
+  if (REF_NOT_AVAIL == iLeftRef ||
+      (0 == iLeftRef && 0 == * (int32_t*)iMvA)) {
+    ST32 (iMvp, 0);
+    return;
+  }
+
+  /*top*/
+  if (bTopAvail && IS_INTER (iTopType)) {
+    ST32 (iMvB, LD32 (pCurLayer->pMv[0][iTopXy][12]));
+    iTopRef = pCurLayer->pRefIndex[0][iTopXy][12];
+  } else {
+    ST32 (iMvB, 0);
+    if (0 == bTopAvail) { //not available
+      iTopRef = REF_NOT_AVAIL;
+    } else { //available but is intra mb type
+      iTopRef = REF_NOT_IN_LIST;
+    }
+  }
+  if (REF_NOT_AVAIL == iTopRef ||
+      (0 == iTopRef  && 0 == * (int32_t*)iMvB)) {
+    ST32 (iMvp, 0);
+    return;
+  }
+
+  /*right_top*/
+  if (bRightTopAvail && IS_INTER (iRightTopType)) {
+    ST32 (iMvC, LD32 (pCurLayer->pMv[0][iRightTopXy][12]));
+    iRightTopRef = pCurLayer->pRefIndex[0][iRightTopXy][12];
+  } else {
+    ST32 (iMvC, 0);
+    if (0 == bRightTopAvail) { //not available
+      iRightTopRef = REF_NOT_AVAIL;
+    } else { //available but is intra mb type
+      iRightTopRef = REF_NOT_IN_LIST;
+    }
+  }
+
+  /*left_top*/
+  if (bLeftTopAvail && IS_INTER (iLeftTopType)) {
+    ST32 (iMvD, LD32 (pCurLayer->pMv[0][iLeftTopXy][15]));
+    iLeftTopRef = pCurLayer->pRefIndex[0][iLeftTopXy][15];
+  } else {
+    ST32 (iMvD, 0);
+    if (0 == bLeftTopAvail) { //not available
+      iLeftTopRef = REF_NOT_AVAIL;
+    } else { //available but is intra mb type
+      iLeftTopRef = REF_NOT_IN_LIST;
+    }
+  }
+
+  iDiagonalRef = iRightTopRef;
+  if (REF_NOT_AVAIL == iDiagonalRef) {
+    iDiagonalRef = iLeftTopRef;
+    * (int32_t*)iMvC = * (int32_t*)iMvD;
+  }
+
+  if (REF_NOT_AVAIL == iTopRef && REF_NOT_AVAIL == iDiagonalRef && iLeftRef >= REF_NOT_IN_LIST) {
+    ST32 (iMvp, LD32 (iMvA));
+    return;
+  }
+
+  iMatchRef = (0 == iLeftRef) + (0 == iTopRef) + (0 == iDiagonalRef);
+  if (1 == iMatchRef) {
+    if (0 == iLeftRef) {
+      ST32 (iMvp, LD32 (iMvA));
+    } else if (0 == iTopRef) {
+      ST32 (iMvp, LD32 (iMvB));
+    } else {
+      ST32 (iMvp, LD32 (iMvC));
+    }
+  } else {
+    iMvp[0] = WelsMedian (iMvA[0], iMvB[0], iMvC[0]);
+    iMvp[1] = WelsMedian (iMvA[1], iMvB[1], iMvC[1]);
+  }
+}
+
 
 //basic iMVs prediction unit for iMVs partition width (4, 2, 1)
 void_t PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],

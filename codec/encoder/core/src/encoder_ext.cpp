@@ -423,6 +423,53 @@ int32_t ParamValidationExt (void* pParam) {
   return ParamValidation (pCodingParam);
 }
 
+
+void WelsEncoderApplyFrameRate(SWelsSvcCodingParam* pParam)
+{
+  SDLayerParam* pLayerParam;
+  const float kfEpsn = 0.000001f;
+  const int32_t kiNumLayer = pParam->iNumDependencyLayer;
+  int32_t i;
+  const float kfMaxFrameRate = pParam->fMaxFrameRate;
+  float fRatio;
+  float fTargetOutputFrameRate;
+
+  //set input frame rate to each layer
+  for (i=0;i<kiNumLayer;i++) {
+    pLayerParam = &(pParam->sDependencyLayers[i]);
+
+    fRatio = pLayerParam->fOutputFrameRate / pLayerParam->fInputFrameRate;
+    if ( (kfMaxFrameRate - pLayerParam->fInputFrameRate) > kfEpsn
+        || (kfMaxFrameRate - pLayerParam->fInputFrameRate) < -kfEpsn ) {
+      pLayerParam->fInputFrameRate = kfMaxFrameRate;
+      fTargetOutputFrameRate = kfMaxFrameRate*fRatio;
+      pLayerParam->fOutputFrameRate = (fTargetOutputFrameRate>=6)?fTargetOutputFrameRate:(pLayerParam->fInputFrameRate);
+      //TODO:{Sijia} from design, there is no sense to have temporal layer when under 6fps even with such setting?
+    }
+  }
+}
+
+
+void WelsEncoderApplyBitRate(SWelsSvcCodingParam* pParam)
+{
+  //TODO (Sijia):  this is a temporary solution which keep the ratio between layers
+  //but it is also possible to fulfill the bitrate of lower layer first
+
+  SDLayerParam* pLayerParam;
+  const int32_t iNumLayers = pParam->iNumDependencyLayer;
+  int32_t i, iOrigTotalBitrate=0;
+  //read old BR
+  for (i=0;i<iNumLayers;i++) {
+    iOrigTotalBitrate += pParam->sDependencyLayers[i].iSpatialBitrate;
+  }
+  //write new BR
+  float fRatio = 0.0;
+  for (i=0;i<iNumLayers;i++) {
+    pLayerParam = &(pParam->sDependencyLayers[i]);
+    fRatio = pLayerParam->iSpatialBitrate/(static_cast<float>(iOrigTotalBitrate));
+    pLayerParam->iSpatialBitrate = static_cast<int32_t>(pParam->iTargetBitrate*fRatio);
+  }
+}
 /*!
  * \brief	acquire count number of layers and NALs based on configurable paramters dependency
  * \pParam	pCtx				sWelsEncCtx*
@@ -3042,6 +3089,37 @@ int32_t ForceCodingIDR (sWelsEncCtx* pCtx) {
 
   pCtx->bEncCurFrmAsIdrFlag = true;
   pCtx->iCodingIndex	= 0;
+
+  return 0;
+}
+
+int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst) {
+  SFrameBSInfo* pFbi          = (SFrameBSInfo*)pDst;
+  SLayerBSInfo* pLayerBsInfo  = &pFbi->sLayerInfo[0];
+  int32_t iNalLen[128]        = {0};
+  int32_t iCountNal           = 0;
+
+  pLayerBsInfo->pBsBuf = pCtx->pFrameBs;
+  InitBits (&pCtx->pOut->sBsWrite, pCtx->pOut->pBsBuffer, pCtx->pOut->uiSize);
+
+  WelsWriteParameterSets (pCtx, &iNalLen[0], &iCountNal);
+
+  pLayerBsInfo->uiPriorityId  = 0;
+  pLayerBsInfo->uiSpatialId   = 0;
+  pLayerBsInfo->uiTemporalId  = 0;
+  pLayerBsInfo->uiQualityId   = 0;
+  pLayerBsInfo->uiLayerType   = NON_VIDEO_CODING_LAYER;
+  pLayerBsInfo->iNalCount     = iCountNal;
+  for (int32_t iNalIndex      = 0; iNalIndex < iCountNal; ++ iNalIndex) {
+    pLayerBsInfo->iNalLengthInByte[iNalIndex] = iNalLen[iNalIndex];
+  }
+
+  pCtx->eLastNalPriority      = NRI_PRI_HIGHEST;
+  pFbi->iLayerNum             = 1;
+
+#if defined(X86_ASM)
+  WelsEmms();
+#endif //X86_ASM
 
   return 0;
 }

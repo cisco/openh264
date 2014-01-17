@@ -303,13 +303,13 @@ int32_t WelsInitMemory (PWelsDecoderContext pCtx) {
   if (MemInitNalList (&pCtx->pAccessUnitList, MAX_NAL_UNIT_NUM_IN_AU) != 0)
     return ERR_INFO_OUT_OF_MEMORY;
 
-  if ((pCtx->sRawData.pHead = static_cast<uint8_t*> (WelsMalloc (MAX_ACCESS_UINT_CAPACITY,
+  if ((pCtx->sRawData.pHead = static_cast<uint8_t*> (WelsMalloc (MAX_ACCESS_UNIT_CAPACITY,
                               "pCtx->sRawData->pHead"))) == NULL) {
     return ERR_INFO_OUT_OF_MEMORY;
   }
   pCtx->sRawData.pStartPos               =
     pCtx->sRawData.pCurPos                 = pCtx->sRawData.pHead;
-  pCtx->sRawData.pEnd                     = pCtx->sRawData.pHead + MAX_ACCESS_UINT_CAPACITY;
+  pCtx->sRawData.pEnd                     = pCtx->sRawData.pHead + MAX_ACCESS_UNIT_CAPACITY;
 
   pCtx->uiTargetDqId			= (uint8_t) - 1;
   pCtx->bEndOfStreamFlag	= false;
@@ -628,17 +628,6 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   pSliceHead->uiRefCount[1]	= pPps->uiNumRefIdxL1Active;
   if (kbExtensionFlag) {
     uiQualityId = pNalHeaderExt->uiQualityId;
-    if (BASE_QUALITY_ID == uiQualityId && (EP_SLICE == uiSliceType || EB_SLICE == uiSliceType)) {
-      const bool_t kbBipredFlag = (EB_SLICE == uiSliceType);
-      if (kbBipredFlag) {
-        WelsLog (pCtx, WELS_LOG_WARNING, "ParseSliceHeaderSyntaxs(): kbBipredFlag = 1 not supported.\n");
-        return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_UNSUPPORTED_BIPRED);
-      }
-      pSliceHead->bNumRefIdxActiveOverrideFlag	= !!BsGetOneBit (pBs);
-      if (pSliceHead->bNumRefIdxActiveOverrideFlag) {
-        pSliceHead->uiRefCount[0]	= 1 + BsGetUe (pBs);
-      }
-    }
   } else if (uiSliceType == P_SLICE || uiSliceType == SP_SLICE || uiSliceType == B_SLICE) {
     const bool_t kbBipredFlag = (B_SLICE == uiSliceType);
     if (kbBipredFlag) {

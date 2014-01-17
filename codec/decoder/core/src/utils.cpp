@@ -67,8 +67,6 @@
 
 namespace WelsDec {
 
-// cache line size
-uint32_t g_uiCacheLineSize	= 16;
 // to fill default routines
 PWelsLogCallbackFunc g_pLog	= NULL;
 

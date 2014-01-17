@@ -44,9 +44,6 @@
 #include <assert.h>
 #include "typedefs.h"
 
-
-namespace WelsDec {
-
 /*
 * FORCE_STACK_ALIGN_1D: force 1 dimension local data aligned in stack
 * _tp: type
@@ -70,7 +67,46 @@ namespace WelsDec {
 
 ///////////// from encoder
 #if defined(_MSC_VER)
+
+#if(_MSC_VER < 1700)
 #define inline	__inline
+#endif
+
+#define __FASTCALL   __fastcall
+#define ALIGNED_DECLARE( type, var, n ) __declspec(align(n)) type var
+#define __align8(t,v) __declspec(align(8)) t v
+#define __align16(t,v) __declspec(align(16)) t v
+#elif defined(__GNUC__)
+#if !defined(MAC_POWERPC)
+#define __FASTCALL    __attribute__ ((fastcall))
+#else
+#define __FASTCALL	// mean NULL for mac ppc
+#endif//MAC_POWERPC
+#define ALIGNED_DECLARE( type, var, n ) type var __attribute__((aligned(n)))
+#define __align8(t,v) t v __attribute__ ((aligned (8)))
+#define __align16(t,v) t v __attribute__ ((aligned (16)))
+#endif//_MSC_VER
+
+#if defined(_MACH_PLATFORM) || defined(__GNUC__)
+#define ALIGNED_DECLARE_MATRIX_2D(name,sizex,sizey,type,alignment) \
+	type name[(sizex)*(sizey)] __attribute__((aligned(alignment)))
+#else //_MSC_VER <= 1200
+#define ALIGNED_DECLARE_MATRIX_2D(name,sizex,sizey,type,alignment) \
+__declspec(align(alignment)) type name[(sizex)*(sizey)]
+#endif//#if _MACH_PLATFORM
+
+#if defined(_MACH_PLATFORM) || defined(__GNUC__)
+#define ALIGNED_DECLARE_MATRIX_1D(name,size,type,alignment) \
+	type name[size] __attribute__((aligned(alignment)))
+#else //_MSC_VER <= 1200
+#define ALIGNED_DECLARE_MATRIX_1D(name,size,type,alignment) \
+	__declspec(align(alignment)) type name[(size)]
+#endif//#if _MACH_PLATFORM
+
+#if defined(_MSC_VER)
+#if _MSC_VER < 1700
+#define inline	__inline
+#endif
 #define __FASTCALL   __fastcall
 //	#define __align8(t,v) __declspec(align(8)) t v
 #define __align16(t,v) __declspec(align(16)) t v
@@ -297,7 +333,73 @@ return iY;
 		} \
 	}while( 0 );
 #endif//#if WELS_SAFE_FREE_ARR
+static inline int32_t WELS_LOG2 (uint32_t v) {
+int32_t r = 0;
+while (v >>= 1) {
+  ++r;
+}
+return r;
 
-} // namespace WelsDec
+}
+
+#define CLIP3_QP_0_51(q)		WELS_CLIP3(q, 0, 51)	// ((q) < (0) ? (0) : ((q) > (51) ? (51) : (q)))
+#define   CALC_BI_STRIDE(width,bitcount)  ((((width * bitcount) + 31) & ~31) >> 3)
+#ifdef    WORDS_BIGENDIAN
+
+static inline uint32_t ENDIAN_FIX (uint32_t x) {
+return x;
+}
+
+#else
+
+
+#if defined(_MSC_VER) && defined(_M_IX86)
+static inline uint32_t ENDIAN_FIX (uint32_t x) {
+__asm {
+  mov   eax,  x
+  bswap   eax
+  mov   x,    eax
+}
+return x;
+}
+#else  // GCC
+static inline uint32_t ENDIAN_FIX (uint32_t x) {
+#ifdef X86_ARCH
+__asm__ __volatile__ ("bswap %0":"+r" (x));
+#else
+x = ((x & 0xff000000) >> 24) | ((x & 0xff0000) >> 8) |
+    ((x & 0xff00) << 8) | ((x & 0xff) << 24);
+#endif
+return x;
+}
+
+
+#endif
+
+#endif
+#ifndef BUTTERFLY1x2
+#define BUTTERFLY1x2(b) (((b)<<8) | (b))
+#endif//BUTTERFLY1x2
+
+#ifndef BUTTERFLY2x4
+#define BUTTERFLY2x4(wd) (((uint32_t)(wd)<<16) |(wd))
+#endif//BUTTERFLY2x4
+
+#ifndef BUTTERFLY4x8
+#define BUTTERFLY4x8(dw) (((uint64_t)(dw)<<32) | (dw))
+#endif//BUTTERFLY4x8
+
+static inline int32_t WELS_MEDIAN (int32_t x,  int32_t y, int32_t z) {
+int32_t t = (x - y) & ((x - y) >> 31);
+x -= t;
+y += t;
+y -= (y - z) & ((y - z) >> 31);
+y += (x - y) & ((x - y) >> 31);
+return y;
+}
+static inline BOOL_T WELS_POWER2_IF (uint32_t v) {
+return (v && ! (v & (v - 1)));
+}
+
 
 #endif//WELS_MACRO_UTILIZATIONS_H__

@@ -32,7 +32,7 @@
 ;*  memzero.asm
 ;*
 ;*  Abstract
-;*      
+;*
 ;*
 ;*  History
 ;*      9/16/2009 Created
@@ -45,8 +45,8 @@
 ; Code
 ;***********************************************************************
 
-SECTION .text			
-		
+SECTION .text
+
 ALIGN 16
 ;***********************************************************************
 ;_inline void __cdecl WelsPrefetchZero_mmx(int8_t const*_A);
@@ -57,7 +57,7 @@ WelsPrefetchZero_mmx:
 	LOAD_1_PARA
 	;mov  eax,[esp+4]
 	prefetchnta [r0]
-	ret 			
+	ret
 
 
 ALIGN 16
@@ -71,7 +71,7 @@ WelsSetMemZeroAligned64_sse2:
 		LOAD_2_PARA
 		SIGN_EXTENTION r1, r1d
 		neg		r1
-			
+
 		pxor	xmm0,		xmm0
 .memzeroa64_sse2_loops:
 		movdqa	[r0],		xmm0
@@ -79,11 +79,11 @@ WelsSetMemZeroAligned64_sse2:
 		movdqa	[r0+32],	xmm0
 		movdqa	[r0+48],	xmm0
 		add		r0, 0x40
-		
+
 		add r1, 0x40
 		jnz near .memzeroa64_sse2_loops
-			
-		ret	
+
+		ret
 
 ALIGN 16
 ;***********************************************************************
@@ -96,7 +96,7 @@ WelsSetMemZeroSize64_mmx:
 		LOAD_2_PARA
 		SIGN_EXTENTION r1, r1d
 		neg		r1
-			
+
 		pxor	mm0,		mm0
 .memzero64_mmx_loops:
 		movq	[r0],		mm0
@@ -106,16 +106,16 @@ WelsSetMemZeroSize64_mmx:
 		movq	[r0+32],	mm0
 		movq	[r0+40],	mm0
 		movq	[r0+48],	mm0
-		movq	[r0+56],	mm0		
+		movq	[r0+56],	mm0
 		add		r0,		0x40
-		
+
 		add r1, 0x40
 		jnz near .memzero64_mmx_loops
-			
-		WELSEMMS	
-		ret	
-	
-ALIGN 16		
+
+		WELSEMMS
+		ret
+
+ALIGN 16
 ;***********************************************************************
 ;   void WelsSetMemZeroSize8_mmx(void *dst, int32_t size)
 ;***********************************************************************
@@ -125,17 +125,17 @@ WelsSetMemZeroSize8_mmx:
 		%assign  push_num 0
 		LOAD_2_PARA
 		SIGN_EXTENTION r1, r1d
-		neg		r1			
+		neg		r1
 		pxor	mm0,		mm0
-		
+
 .memzero8_mmx_loops:
 		movq	[r0],		mm0
 		add		r0,		0x08
-	
+
 		add		r1,		0x08
 		jnz near .memzero8_mmx_loops
-		
-		WELSEMMS	
-		ret	
 
-							
+		WELSEMMS
+		ret
+
+

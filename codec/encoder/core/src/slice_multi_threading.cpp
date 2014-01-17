@@ -859,7 +859,7 @@ WELS_THREAD_ROUTINE_TYPE UpdateMbListThreadProc (void* arg) {
   SDqLayer* pCurDq							= NULL;
   int32_t iSliceIdx							= -1;
   int32_t iEventIdx							= -1;
-  WELS_THREAD_ERROR_CODE iWaitRet				= WELS_THREAD_ERROR_GENERIAL;
+  WELS_THREAD_ERROR_CODE iWaitRet				= WELS_THREAD_ERROR_GENERAL;
   uint32_t uiThrdRet							= 0;
 
   if (NULL == pPrivateData)
@@ -905,7 +905,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
   WELS_EVENT pEventsList[3];
   int32_t iEventCount						= 0;
 #endif
-  WELS_THREAD_ERROR_CODE iWaitRet				= WELS_THREAD_ERROR_GENERIAL;
+  WELS_THREAD_ERROR_CODE iWaitRet				= WELS_THREAD_ERROR_GENERAL;
   uint32_t uiThrdRet							= 0;
   int32_t iSliceSize							= 0;
   int32_t iSliceIdx							= -1;

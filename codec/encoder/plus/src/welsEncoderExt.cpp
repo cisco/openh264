@@ -730,6 +730,10 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture**   pSrcPicList, int 
 
 }
 
+int CWelsH264SVCEncoder::EncodeParameterSets (SFrameBSInfo* pBsInfo) {
+    return WelsEncoderEncodeParameterSets (m_pEncContext, pBsInfo);
+}
+
 /*
  * return: 0 - success; otherwise - failed;
  */
@@ -942,19 +946,27 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
              "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_FRAME_RATE, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x, iValue= %d\n",
              m_uiCountFrameNum, m_iCspInternal, iValue);
 #endif//REC_FRAME_COUNT
-    m_pEncContext->pSvcParam->fMaxFrameRate	= iValue;
-
+    if (iValue<=0) {
+      return cmInitParaError;
+    }
+    //adjust to valid range
+    m_pEncContext->pSvcParam->fMaxFrameRate	= WELS_CLIP3 (iValue, MIN_FRAME_RATE, MAX_FRAME_RATE);
+    WelsEncoderApplyFrameRate (m_pEncContext->pSvcParam);
   }
   break;
   case ENCODER_OPTION_BITRATE: {	// Target bit-rate
     int32_t iValue = * ((int32_t*)pOption);
 #ifdef REC_FRAME_COUNT
     WelsLog (m_pEncContext, WELS_LOG_INFO,
-             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x, iValue= %d\n",
-             m_uiCountFrameNum, m_iCspInternal, iValue);
+      "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x, iValue= %d\n",
+      m_uiCountFrameNum, m_iCspInternal, iValue);
 #endif//REC_FRAME_COUNT
-    m_pEncContext->pSvcParam->iTargetBitrate	= iValue;
-
+    if (iValue<=0) {
+        return cmInitParaError;
+    }
+    //adjust to valid range
+    m_pEncContext->pSvcParam->iTargetBitrate	= WELS_CLIP3 (iValue, MIN_BIT_RATE, MAX_BIT_RATE);
+    WelsEncoderApplyBitRate (m_pEncContext->pSvcParam);
   }
   break;
   case ENCODER_OPTION_RC_MODE: {	// 0:quality mode;1:bit-rate mode

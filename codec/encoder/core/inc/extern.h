@@ -98,6 +98,8 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx);
 int32_t WelsEncoderEncodeExt (sWelsEncCtx*, void* pDst, const SSourcePicture** kppSrcList,
                               const int32_t kiConfiguredLayerNum);
 
+int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst);
+
 /*
  * Force coding IDR as follows
  */
@@ -108,6 +110,8 @@ int32_t ForceCodingIDR (sWelsEncCtx* pCtx);
  *			SVC adjustment results in new requirement in memory blocks adjustment
  */
 int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNew);
+void WelsEncoderApplyFrameRate (SWelsSvcCodingParam* pParam);
+void WelsEncoderApplyBitRate(SWelsSvcCodingParam* pParam);
 
 int32_t FilterLTRRecoveryRequest (sWelsEncCtx* pCtx, SLTRRecoverRequest* pLTRRecoverRequest);
 

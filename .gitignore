@@ -18,3 +18,15 @@
 *.app
 h264dec
 h264enc
+codec_unittest
+
+# External source
+gtest
+
+# Output files from example commands
+testbin/test_vd_1d.264
+testbin/test_vd_1d.yuv
+testbin/test_vd_rc.264
+testbin/test_vd_rc.yuv
+testbin/test.264
+testbin/test.yuv
