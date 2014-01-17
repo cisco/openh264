@@ -60,9 +60,9 @@ SECTION .text
 %ifdef  WIN64
 
 
-WELS_EXTERN   DeblockLumaLt4V_sse2
+WELS_EXTERN   DeblockLumaLt4V_ssse3
 
-DeblockLumaLt4V_sse2:
+DeblockLumaLt4V_ssse3:
   push        rbp
   mov         r11,[rsp + 16 + 20h]  ; pTC
   sub         rsp,1B0h
@@ -317,10 +317,10 @@ DeblockLumaLt4V_sse2:
   ret
 
 
-WELS_EXTERN   DeblockLumaEq4V_sse2
+WELS_EXTERN   DeblockLumaEq4V_ssse3
 
 ALIGN  16
-DeblockLumaEq4V_sse2:
+DeblockLumaEq4V_ssse3:
   mov         rax,rsp
   push        rbx
   push        rbp
@@ -780,10 +780,10 @@ DeblockLumaEq4V_sse2:
   ret
 
 
-WELS_EXTERN  DeblockChromaLt4V_sse2
+WELS_EXTERN  DeblockChromaLt4V_ssse3
 
 ALIGN  16
-DeblockChromaLt4V_sse2:
+DeblockChromaLt4V_ssse3:
   mov         rax,rsp
   push        rbx
   push        rdi
@@ -942,9 +942,9 @@ DeblockChromaLt4V_sse2:
   ret
 
 
-WELS_EXTERN   DeblockChromaEq4V_sse2
+WELS_EXTERN   DeblockChromaEq4V_ssse3
 ALIGN 16
-DeblockChromaEq4V_sse2:
+DeblockChromaEq4V_ssse3:
   mov         rax,rsp
   push        rbx
   sub         rsp,90h
@@ -1096,9 +1096,9 @@ DeblockChromaEq4V_sse2:
 
 
 
-WELS_EXTERN   DeblockChromaEq4H_sse2
+WELS_EXTERN   DeblockChromaEq4H_ssse3
 ALIGN  16
-DeblockChromaEq4H_sse2:
+DeblockChromaEq4H_ssse3:
   mov         rax,rsp
   mov         [rax+20h],rbx
   push        rdi
@@ -1360,9 +1360,9 @@ DeblockChromaEq4H_sse2:
 
 
 
-WELS_EXTERN DeblockChromaLt4H_sse2
+WELS_EXTERN DeblockChromaLt4H_ssse3
 ALIGN  16
-DeblockChromaLt4H_sse2:
+DeblockChromaLt4H_ssse3:
   mov         rax,rsp
   push        rbx
   push        rbp
@@ -1646,9 +1646,9 @@ DeblockChromaLt4H_sse2:
 %elifdef  UNIX64
 
 
-WELS_EXTERN   DeblockLumaLt4V_sse2
+WELS_EXTERN   DeblockLumaLt4V_ssse3
 
-DeblockLumaLt4V_sse2:
+DeblockLumaLt4V_ssse3:
   push        rbp
   mov         r11,r8  ; pTC
   sub         rsp,1B0h
@@ -1903,10 +1903,10 @@ DeblockLumaLt4V_sse2:
   ret
 
 
-WELS_EXTERN DeblockLumaEq4V_sse2
+WELS_EXTERN DeblockLumaEq4V_ssse3
 
 ALIGN  16
-DeblockLumaEq4V_sse2:
+DeblockLumaEq4V_ssse3:
   mov         rax,rsp
   push        rbx
   push        rbp
@@ -2365,9 +2365,9 @@ DeblockLumaEq4V_sse2:
   pop         rbx
   ret
 
-WELS_EXTERN  DeblockChromaLt4V_sse2
+WELS_EXTERN  DeblockChromaLt4V_ssse3
 ALIGN  16
-DeblockChromaLt4V_sse2:
+DeblockChromaLt4V_ssse3:
   mov         rax,rsp
   push        rbx
   push        rbp
@@ -2533,9 +2533,9 @@ DeblockChromaLt4V_sse2:
   pop         rbx
   ret
 
-WELS_EXTERN   DeblockChromaEq4V_sse2
-ALIGN 16
-DeblockChromaEq4V_sse2:
+WELS_EXTERN DeblockChromaEq4V_ssse3
+
+DeblockChromaEq4V_ssse3:
   mov         rax,rsp
   push        rbx
   push        rbp
@@ -2684,10 +2684,10 @@ DeblockChromaEq4V_sse2:
   pop         rbx
   ret
 
+WELS_EXTERN DeblockChromaEq4H_ssse3
 
-WELS_EXTERN   DeblockChromaEq4H_sse2
 ALIGN  16
-DeblockChromaEq4H_sse2:
+DeblockChromaEq4H_ssse3:
   mov         rax,rsp
   push        rbx
   push        rbp
@@ -2959,9 +2959,9 @@ DeblockChromaEq4H_sse2:
   ret
 
 
-WELS_EXTERN DeblockChromaLt4H_sse2
+WELS_EXTERN DeblockChromaLt4H_ssse3
 ALIGN  16
-DeblockChromaLt4H_sse2:
+DeblockChromaLt4H_ssse3:
   mov         rax,rsp
   push        rbx
   push        rbp
@@ -3252,13 +3252,13 @@ DeblockChromaLt4H_sse2:
 %elifdef  X86_32
 
 ;********************************************************************************
-;  void DeblockChromaEq4V_sse2(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride,
+;  void DeblockChromaEq4V_ssse3(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride,
 ;                             int32_t iAlpha, int32_t iBeta)
 ;********************************************************************************
-WELS_EXTERN   DeblockChromaEq4V_sse2
+WELS_EXTERN   DeblockChromaEq4V_ssse3
 
 ALIGN  16
-DeblockChromaEq4V_sse2:
+DeblockChromaEq4V_ssse3:
   push        ebp
   mov         ebp,esp
   and         esp,0FFFFFFF0h
@@ -3421,13 +3421,13 @@ DeblockChromaEq4V_sse2:
   ret
 
 ;******************************************************************************
-; void DeblockChromaLt4V_sse2(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride,
+; void DeblockChromaLt4V_ssse3(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride,
 ;                           int32_t iAlpha, int32_t iBeta, int8_t * pTC);
 ;*******************************************************************************
 
-WELS_EXTERN  DeblockChromaLt4V_sse2
+WELS_EXTERN  DeblockChromaLt4V_ssse3
 
-DeblockChromaLt4V_sse2:
+DeblockChromaLt4V_ssse3:
   push        ebp
   mov         ebp,esp
   and         esp,0FFFFFFF0h
@@ -3624,15 +3624,15 @@ DeblockChromaLt4V_sse2:
   ret
 
 ;***************************************************************************
-;  void DeblockChromaEq4H_sse2(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride,
+;  void DeblockChromaEq4H_ssse3(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride,
 ;          int32_t iAlpha, int32_t iBeta)
 ;***************************************************************************
 
-WELS_EXTERN     DeblockChromaEq4H_sse2
+WELS_EXTERN     DeblockChromaEq4H_ssse3
 
 ALIGN  16
 
-DeblockChromaEq4H_sse2:
+DeblockChromaEq4H_ssse3:
   push        ebp
   mov         ebp,esp
   and         esp,0FFFFFFF0h
@@ -3909,15 +3909,15 @@ DeblockChromaEq4H_sse2:
   ret
 
 ;*******************************************************************************
-;    void DeblockChromaLt4H_sse2(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride,
+;    void DeblockChromaLt4H_ssse3(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride,
 ;                                int32_t iAlpha, int32_t iBeta, int8_t * pTC);
 ;*******************************************************************************
 
-WELS_EXTERN  DeblockChromaLt4H_sse2
+WELS_EXTERN  DeblockChromaLt4H_ssse3
 
 ALIGN  16
 
-DeblockChromaLt4H_sse2:
+DeblockChromaLt4H_ssse3:
   push        ebp
   mov         ebp,esp
   and         esp,0FFFFFFF0h
@@ -4224,16 +4224,16 @@ DeblockChromaLt4H_sse2:
 
 
 ;*******************************************************************************
-;    void DeblockLumaLt4V_sse2(uint8_t * pPix, int32_t iStride, int32_t iAlpha,
+;    void DeblockLumaLt4V_ssse3(uint8_t * pPix, int32_t iStride, int32_t iAlpha,
 ;                                 int32_t iBeta, int8_t * pTC)
 ;*******************************************************************************
 
 
-WELS_EXTERN  DeblockLumaLt4V_sse2
+WELS_EXTERN  DeblockLumaLt4V_ssse3
 
 ALIGN  16
 
-DeblockLumaLt4V_sse2:
+DeblockLumaLt4V_ssse3:
     push	ebp
 	mov	ebp, esp
 	and	esp, -16				; fffffff0H
@@ -4616,15 +4616,15 @@ DeblockLumaLt4V_sse2:
 
 
 ;*******************************************************************************
-;    void DeblockLumaEq4V_sse2(uint8_t * pPix, int32_t iStride, int32_t iAlpha,
+;    void DeblockLumaEq4V_ssse3(uint8_t * pPix, int32_t iStride, int32_t iAlpha,
 ;                                 int32_t iBeta)
 ;*******************************************************************************
 
-WELS_EXTERN  DeblockLumaEq4V_sse2
+WELS_EXTERN  DeblockLumaEq4V_ssse3
 
 ALIGN  16
 
-DeblockLumaEq4V_sse2:
+DeblockLumaEq4V_ssse3:
 
 	push	ebp
 	mov	ebp, esp
