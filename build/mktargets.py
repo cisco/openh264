@@ -21,7 +21,7 @@ def write_cpp_rule_pattern(f):
     dst = "$(%s_SRCDIR)/%%.o"%(PREFIX)
 
     f.write("%s: %s\n"%(dst, src))
-    f.write('\t$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(' + PREFIX + '_CFLAGS) $(' + PREFIX + '_INCLUDES) -c -o $@ $<\n');
+    f.write('\t$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(' + PREFIX + '_CFLAGS) $(' + PREFIX + '_INCLUDES) -c $(CXX_O) $<\n');
     f.write("\n")
 
 def write_asm_rule_pattern(f):
@@ -90,13 +90,13 @@ write_asm_rule_pattern(f)
 if args.library is not None:
     f.write("$(LIBPREFIX)%s.$(LIBSUFFIX): $(%s_OBJS)\n"%(args.library, PREFIX));
     f.write("\trm -f $(LIBPREFIX)%s.$(LIBSUFFIX)\n"%args.library)
-    f.write("\t$(AR) cr $@ $(%s_OBJS)\n"%PREFIX);
+    f.write("\t$(AR) $(AR_OPTS) $(%s_OBJS)\n"%PREFIX);
     f.write("\n");
     f.write("libraries: $(LIBPREFIX)%s.$(LIBSUFFIX)\n"%args.library);
     f.write("LIBRARIES += $(LIBPREFIX)%s.$(LIBSUFFIX)\n"%args.library);
 
 if args.binary is not None:
     f.write("%s: $(%s_OBJS) $(LIBS) $(%s_LIBS) $(%s_DEPS)\n"%(args.binary, PREFIX, PREFIX, PREFIX))
-    f.write("\t$(CXX) -o $@  $(%s_OBJS) $(%s_LDFLAGS) $(%s_LIBS) $(LDFLAGS) $(LIBS)\n\n"%(PREFIX, PREFIX, PREFIX))
+    f.write("\t$(CXX) $(CXX_LINK_O)  $(%s_OBJS) $(%s_LDFLAGS) $(%s_LIBS) $(LDFLAGS) $(LIBS)\n\n"%(PREFIX, PREFIX, PREFIX))
     f.write("binaries: %s\n"%args.binary);
     f.write("BINARIES += %s\n"%args.binary);

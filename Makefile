@@ -3,6 +3,14 @@ LIBPREFIX=lib
 LIBSUFFIX=a
 CP=cp
 ROOTDIR=$(PWD)
+CXX_O=-o $@
+CXX_LINK_O=-o $@
+AR_OPTS=cr $@
+LINK_LIB=-l$(1)
+CFLAGS_OPT=-O3
+CFLAGS_DEBUG=-g
+CFLAGS_M32=-m32
+CFLAGS_M64=-m64
 
 
 
@@ -14,10 +22,10 @@ endif
 
 # Configurations
 ifeq ($(BUILDTYPE), Release)
-CFLAGS += -O3
+CFLAGS += $(CFLAGS_OPT)
 USE_ASM = Yes
 else
-CFLAGS = -g
+CFLAGS = $(CFLAGS_DEBUG)
 USE_ASM = No
 endif
 
@@ -27,12 +35,12 @@ LDFLAGS += -fsanitize=address
 endif
 
 ifeq ($(ENABLE64BIT), Yes)
-CFLAGS += -m64
-LDFLAGS += -m64
+CFLAGS += $(CFLAGS_M64)
+LDFLAGS += $(CFLAGS_M64)
 ASMFLAGS_PLATFORM = -DUNIX64
 else
-CFLAGS += -m32
-LDFLAGS += -m32
+CFLAGS += $(CFLAGS_M32)
+LDFLAGS += $(CFLAGS_M32)
 ASMFLAGS_PLATFORM = -DX86_32
 endif
 
@@ -69,11 +77,11 @@ PROCESSING_INCLUDES = \
     -Icodec/encoder/plus/inc
 
 H264DEC_INCLUDES = $(DECODER_INCLUDES) -Icodec/console/dec/inc
-H264DEC_LDFLAGS = -L. -ldecoder -lcommon
+H264DEC_LDFLAGS = -L. $(call LINK_LIB, decoder) $(call LINK_LIB, common)
 H264DEC_DEPS = $(LIBPREFIX)decoder.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX)
 
 H264ENC_INCLUDES = $(ENCODER_INCLUDES) -Icodec/console/enc/inc
-H264ENC_LDFLAGS = -L. -lencoder -lprocessing -lcommon
+H264ENC_LDFLAGS = -L. $(call LINK_LIB, encoder) $(call LINK_LIB, processing) $(call LINK_LIB, common)
 H264ENC_DEPS = $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX)
 
 CODEC_UNITTEST_LDFLAGS = -L. -lgtest -ldecoder -lcrypto -lencoder -lprocessing -lcommon
