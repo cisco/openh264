@@ -73,19 +73,21 @@ for c in cpp:
 f.write("\n")
 f.write("%s_OBJS += $(%s_CPP_SRCS:.cpp=.o)\n"%(PREFIX, PREFIX))
 
-f.write("ifeq ($(USE_ASM), Yes)\n");
-f.write("%s_ASM_SRCS=\\\n"%(PREFIX))
-for c in asm:
-    f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
-f.write("\n")
-f.write("%s_OBJS += $(%s_ASM_SRCS:.asm=.o)\n"%(PREFIX, PREFIX))
-f.write("endif\n\n")
+if len(asm) > 0:
+    f.write("ifeq ($(USE_ASM), Yes)\n");
+    f.write("%s_ASM_SRCS=\\\n"%(PREFIX))
+    for c in asm:
+        f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
+    f.write("\n")
+    f.write("%s_OBJS += $(%s_ASM_SRCS:.asm=.o)\n"%(PREFIX, PREFIX))
+    f.write("endif\n\n")
 
 f.write("OBJS += $(%s_OBJS)\n"%PREFIX)
 
 write_cpp_rule_pattern(f)
 
-write_asm_rule_pattern(f)
+if len(asm) > 0:
+    write_asm_rule_pattern(f)
 
 if args.library is not None:
     f.write("$(LIBPREFIX)%s.$(LIBSUFFIX): $(%s_OBJS)\n"%(args.library, PREFIX));
