@@ -121,7 +121,7 @@
 	punpcklwd %1, %2
 	punpckhwd %3, %4
 	punpcklwd %1, %3
-	psraw %1, $4
+	psraw %1, $04
 %endmacro
 
 %macro VAA_AVG_BLOCK_SSSE3 6 ; dst, t0, t1, t2, t3, t4
@@ -149,7 +149,7 @@
 	paddw %2, %4	; block 2, 3
 	phaddw %1, %2	; block[0]: 0-15, 16-31; block[1]: 32-47, 48-63; ..
 	phaddw %1, xmm7	; block[0]: 0-15; block[1]: 16-31; block[2]: 32-47; block[3]: 48-63; ....
-	psraw %1, $4
+	psraw %1, $04
 %endmacro
 
 %macro WELS_SAD_16x2_SSE2  0
@@ -353,7 +353,7 @@ rc_sad_frame_sse2:
 	pxor xmm0, xmm0
 .hloop:
 	mov eax, ebx
-	mov ebp, $0
+	mov ebp, $00
 .wloop:
 	movdqa xmm1, [esi+ebp]
 	movdqa xmm2, [edi+ebp]
