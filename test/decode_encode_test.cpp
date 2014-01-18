@@ -56,10 +56,6 @@ class DecodeEncodeTest : public ::testing::TestWithParam<DecodeEncodeFileParam>,
   }
 
   virtual void TearDown() {
-    if (tmpFile_ != NULL) {
-      fclose(tmpFile_);
-      remove(tmpFileName_);
-    }
     BaseDecoderTest::TearDown();
     BaseEncoderTest::TearDown();
   }
@@ -91,17 +87,22 @@ TEST_P(DecodeEncodeTest, CompareOutput) {
     return;
   }
 
+  // force flushing the file
+  fclose(tmpFile_);
+
   EncodeFile(tmpFileName_, p.width, p.height, p.frameRate, this);
   unsigned char digest[SHA_DIGEST_LENGTH];
   SHA1_Final(digest, &ctx_);
   if (!HasFatalFailure()) {
     ASSERT_TRUE(CompareHash(digest, p.hashStr));
   }
+
+  remove(tmpFileName_);
 }
 
 static const DecodeEncodeFileParam kFileParamArray[] = {
-  {"res/test_vd_1d.264", "c17a760c3bc5d8682aae7f49dddebd2593071711", 320, 192, 12.0f},
-  {"res/test_vd_rc.264", "41e3e90f159fade7a89a4540c4fb9f8ac8f4d7da", 320, 192, 12.0f},
+  {"res/test_vd_1d.264", "41c672107cfe9e8e8a67b5d08cbd701f6c982ccd", 320, 192, 12.0f},
+  {"res/test_vd_rc.264", "d546ea7c671b42503f8a46ba50bef2a3eaca4c5a", 320, 192, 12.0f},
 };
 
 INSTANTIATE_TEST_CASE_P(DecodeEncodeFile, DecodeEncodeTest,
