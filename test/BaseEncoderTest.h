@@ -3,6 +3,7 @@
 
 #include "codec_api.h"
 #include "codec_app_def.h"
+#include "utils/InputStream.h"
 
 class BaseEncoderTest {
  public:
@@ -14,6 +15,7 @@ class BaseEncoderTest {
   void SetUp();
   void TearDown();
   void EncodeFile(const char* fileName, int width, int height, float frameRate, Callback* cbk);
+  void EncodeStream(InputStream* in, int width, int height, float frameRate, Callback* cbk);
 
  private:
   ISVCEncoder* encoder_;

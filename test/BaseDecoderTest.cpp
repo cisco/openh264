@@ -43,7 +43,8 @@ static void ReadFrame(std::ifstream* file, BufferedData* buf) {
   }
 }
 
-BaseDecoderTest::BaseDecoderTest() : decoder_(NULL) {}
+BaseDecoderTest::BaseDecoderTest()
+  : decoder_(NULL), decodeStatus_(OpenFile) {}
 
 void BaseDecoderTest::SetUp() {
   long rv = CreateDecoder(&decoder_);
@@ -125,4 +126,42 @@ void BaseDecoderTest::DecodeFile(const char* fileName, Callback* cbk) {
 
   // Get pending last frame
   DecodeFrame(NULL, 0, cbk);
+}
+
+bool BaseDecoderTest::Open(const char* fileName) {
+  if (decodeStatus_ == OpenFile) {
+    file_.open(fileName);
+    if (file_.is_open()) {
+      decodeStatus_ = Decoding;
+      return true;
+    }
+  }
+  return false;
+}
+
+bool BaseDecoderTest::DecodeNextFrame(Callback* cbk) {
+  switch (decodeStatus_) {
+  case Decoding:
+    ReadFrame(&file_, &buf_);
+    if (::testing::Test::HasFatalFailure()) {
+      return false;
+    }
+    if (buf_.Length() == 0) {
+      decodeStatus_ = EndOfStream;
+      return true;
+    }
+    DecodeFrame(buf_.data(), buf_.Length(), cbk);
+    if (::testing::Test::HasFatalFailure()) {
+      return false;
+    }
+    return true;
+  case EndOfStream: {
+    int32_t iEndOfStreamFlag = 1;
+    decoder_->SetOption(DECODER_OPTION_END_OF_STREAM, &iEndOfStreamFlag);
+    DecodeFrame(NULL, 0, cbk);
+    decodeStatus_ = End;
+    break;
+  }
+  }
+  return false;
 }

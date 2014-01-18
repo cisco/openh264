@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include "codec_def.h"
 #include "utils/BufferedData.h"
+#include "utils/FileInputStream.h"
 #include "BaseEncoderTest.h"
 
 static int InitWithParam(ISVCEncoder* encoder, int width,
@@ -50,11 +51,8 @@ void BaseEncoderTest::TearDown() {
   }
 }
 
-void BaseEncoderTest::EncodeFile(const char* fileName, int width, int height,
+void BaseEncoderTest::EncodeStream(InputStream* in, int width, int height,
     float frameRate, Callback* cbk) {
-  std::ifstream file(fileName, std::ios::in | std::ios::binary);
-  ASSERT_TRUE(file.is_open());
-
   int rv = InitWithParam(encoder_, width, height, frameRate);
   ASSERT_TRUE(rv == cmResultSuccess);
 
@@ -64,16 +62,22 @@ void BaseEncoderTest::EncodeFile(const char* fileName, int width, int height,
   BufferedData buf;
   buf.SetLength(frameSize);
   ASSERT_TRUE(buf.Length() == frameSize);
-  char* data = reinterpret_cast<char*>(buf.data());
 
   SFrameBSInfo info;
   memset(&info, 0, sizeof(SFrameBSInfo));
 
-  while (file.read(data, frameSize), file.gcount() == frameSize) {
+  while (in->read(buf.data(), frameSize) == frameSize) {
     rv = encoder_->EncodeFrame(buf.data(), &info);
     ASSERT_TRUE(rv != videoFrameTypeInvalid);
     if (rv != videoFrameTypeSkip && cbk != NULL) {
       cbk->onEncodeFrame(info);
     }
   }
+}
+
+void BaseEncoderTest::EncodeFile(const char* fileName, int width, int height,
+    float frameRate, Callback* cbk) {
+  FileInputStream fileStream;
+  ASSERT_TRUE(fileStream.Open(fileName));
+  EncodeStream(&fileStream, width, height, frameRate, cbk);
 }

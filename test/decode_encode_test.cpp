@@ -1,7 +1,8 @@
-#include <cstdio>
 #include <gtest/gtest.h>
 #include "codec_def.h"
 #include "utils/HashFunctions.h"
+#include "utils/BufferedData.h"
+#include "utils/InputStream.h"
 #include "BaseDecoderTest.h"
 #include "BaseEncoderTest.h"
 
@@ -16,10 +17,12 @@ static void UpdateHashFromFrame(const SFrameBSInfo& info, SHA_CTX* ctx) {
   }
 }
 
-static void WritePlaneToFile(FILE* file, const uint8_t* plane,
+static void WritePlaneBuffer(BufferedData* buf, const uint8_t* plane,
     int width, int height, int stride) {
   for (int i = 0; i < height; i++) {
-    fwrite(plane, 1, width, file);
+    if (!buf->Push(plane, width)) {
+      FAIL() << "unable to allocate memory";
+    }
     plane += stride;
   }
 }
@@ -34,10 +37,9 @@ struct DecodeEncodeFileParam {
 
 class DecodeEncodeTest : public ::testing::TestWithParam<DecodeEncodeFileParam>,
     public BaseDecoderTest, public BaseDecoderTest::Callback,
-    public BaseEncoderTest , public BaseEncoderTest::Callback {
+    public BaseEncoderTest , public BaseEncoderTest::Callback,
+    public InputStream {
  public:
-  DecodeEncodeTest() : tmpFileName_(NULL), tmpFile_(NULL) {}
-
   virtual void SetUp() {
     BaseDecoderTest::SetUp();
     if (HasFatalFailure()) {
@@ -47,11 +49,6 @@ class DecodeEncodeTest : public ::testing::TestWithParam<DecodeEncodeFileParam>,
     if (HasFatalFailure()) {
       return;
     }
-
-    tmpFileName_ = tmpnam(NULL);
-    tmpFile_ = fopen(tmpFileName_, "wb");
-    ASSERT_TRUE(tmpFile_ != NULL);
-
     SHA1_Init(&ctx_);
   }
 
@@ -64,40 +61,46 @@ class DecodeEncodeTest : public ::testing::TestWithParam<DecodeEncodeFileParam>,
     const Plane& y = frame.y;
     const Plane& u = frame.u;
     const Plane& v = frame.v;
-    WritePlaneToFile(tmpFile_, y.data, y.width, y.height, y.stride);
-    WritePlaneToFile(tmpFile_, u.data, u.width, u.height, u.stride);
-    WritePlaneToFile(tmpFile_, v.data, v.width, v.height, v.stride);
+    WritePlaneBuffer(&buf_, y.data, y.width, y.height, y.stride);
+    WritePlaneBuffer(&buf_, u.data, u.width, u.height, u.stride);
+    WritePlaneBuffer(&buf_, v.data, v.width, v.height, v.stride);
   }
 
   virtual void onEncodeFrame(const SFrameBSInfo& frameInfo) {
     UpdateHashFromFrame(frameInfo, &ctx_);
   }
 
+  virtual int read(void* ptr, size_t len) {
+    while (buf_.Length() < len) {
+      bool hasNext = DecodeNextFrame(this);
+      if (HasFatalFailure()) {
+        return -1;
+      }
+      if (!hasNext) {
+        if (buf_.Length() == 0) {
+          return -1;
+        }
+        break;
+      }
+    }
+    return buf_.Pop(static_cast<uint8_t*>(ptr), len);
+  }
+
  protected:
   SHA_CTX ctx_;
-  const char* tmpFileName_;
-  FILE* tmpFile_;
+  BufferedData buf_;
 };
 
 TEST_P(DecodeEncodeTest, CompareOutput) {
   DecodeEncodeFileParam p = GetParam();
 
-  DecodeFile(p.fileName, this);
-  if (HasFatalFailure()) {
-    return;
-  }
-
-  // force flushing the file
-  fclose(tmpFile_);
-
-  EncodeFile(tmpFileName_, p.width, p.height, p.frameRate, this);
+  ASSERT_TRUE(Open(p.fileName));
+  EncodeStream(this, p.width, p.height, p.frameRate, this);
   unsigned char digest[SHA_DIGEST_LENGTH];
   SHA1_Final(digest, &ctx_);
   if (!HasFatalFailure()) {
     ASSERT_TRUE(CompareHash(digest, p.hashStr));
   }
-
-  remove(tmpFileName_);
 }
 
 static const DecodeEncodeFileParam kFileParamArray[] = {

@@ -21,6 +21,23 @@ class BufferedData {
     return true;
   }
 
+  bool Push(const uint8_t* data, size_t len) {
+    if (!EnsureCapacity(length_ + len)) {
+      return false;
+    }
+    memcpy(data_ + length_, data, len);
+    length_ += len;
+    return true;
+  }
+
+  size_t Pop(uint8_t* ptr, size_t len) {
+    len = std::min(length_, len);
+    memcpy(ptr, data_, len);
+    memcpy(data_, data_ + len, length_ - len);
+    SetLength(length_ - len);
+    return len;
+  }
+
   void Clear() {
     length_ = 0;
   }
