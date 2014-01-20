@@ -206,6 +206,16 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
     pCurNal = &pCtx->sPrefixNal;
 
     if (iNalSize < NAL_UNIT_HEADER_EXT_SIZE) {
+      pCtx->iErrorCode |= dsBitstreamError;
+
+      PAccessUnit pCurAu	   = pCtx->pAccessUnitList;
+      uint32_t uiAvailNalNum = pCurAu->uiAvailUnitsNum;
+      ForceClearCurrentNal (pCurAu);
+
+      if (uiAvailNalNum > 1) {
+        pCurAu->uiEndPos = uiAvailNalNum - 2;
+        pCtx->bAuReadyFlag = true;
+      }
       return NULL;
     }
 
@@ -250,6 +260,14 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
     if (pNalUnitHeader->eNalUnitType == NAL_UNIT_CODED_SLICE_EXT) {
       if (iNalSize < NAL_UNIT_HEADER_EXT_SIZE) {
+        pCtx->iErrorCode |= dsBitstreamError;
+
+        ForceClearCurrentNal (pCurAu);
+
+        if (uiAvailNalNum > 1) {
+          pCurAu->uiEndPos = uiAvailNalNum - 2;
+          pCtx->bAuReadyFlag = true;
+        }
         return NULL;
       }
 
