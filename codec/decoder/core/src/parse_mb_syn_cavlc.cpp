@@ -390,7 +390,7 @@ int32_t CheckIntra16x16PredMode (uint8_t uiSampleAvail, int8_t* pMode) {
   int32_t bLeftTopAvail  = uiSampleAvail & 0x02;
   int32_t iTopAvail      = uiSampleAvail & 0x01;
 
-  if (*pMode < 0 || *pMode > MAX_PRED_MODE_ID_I16x16) {
+  if ((*pMode < 0) || (*pMode > MAX_PRED_MODE_ID_I16x16)) {
     return ERR_INFO_INVALID_I16x16_PRED_MODE;
   }
 
@@ -419,7 +419,7 @@ int32_t CheckIntraChromaPredMode (uint8_t uiSampleAvail, int8_t* pMode) {
   int32_t bLeftTopAvail  = uiSampleAvail & 0x02;
   int32_t iTopAvail      = uiSampleAvail & 0x01;
 
-  if (*pMode < 0 || *pMode > MAX_PRED_MODE_ID_CHROMA) {
+  if ((*pMode < 0) || (*pMode > MAX_PRED_MODE_ID_CHROMA)) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
 
@@ -451,7 +451,7 @@ int32_t CheckIntra4x4PredMode (int32_t* pSampleAvail, int8_t* pMode, int32_t iIn
 
   int8_t iFinalMode;
 
-  if (*pMode < 0 || *pMode > MAX_PRED_MODE_ID_I4x4) {
+  if ((*pMode < 0) || (*pMode > MAX_PRED_MODE_ID_I4x4)) {
     return -1;
   }
 
@@ -750,7 +750,7 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
     iZerosLeft = 0;
   }
 
-  if (iZerosLeft < 0 || iZerosLeft + uiTotalCoeff > iMaxNumCoeff) {
+  if ((iZerosLeft < 0) || (iZerosLeft + uiTotalCoeff > iMaxNumCoeff)) {
     return ERR_INFO_CAVLC_INVALID_ZERO_LEFT;
   }
   iUsedBits += CavlcGetRunBefore (iRun, &sReadBitsCache, uiTotalCoeff, pVlcTable, iZerosLeft);
