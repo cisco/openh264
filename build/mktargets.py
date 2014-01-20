@@ -94,8 +94,6 @@ if len(asm) > 0:
     f.write("%s_OBJS += $(%s_ASM_SRCS:.asm=.o)\n"%(PREFIX, PREFIX))
     f.write("endif\n\n")
 
-f.write("OBJS += $(%s_OBJS)\n"%PREFIX)
-
 write_cpp_rule_pattern(f)
 
 if len(asm) > 0:
