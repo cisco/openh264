@@ -419,10 +419,6 @@ int32_t CheckIntraChromaPredMode (uint8_t uiSampleAvail, int8_t* pMode) {
   int32_t bLeftTopAvail  = uiSampleAvail & 0x02;
   int32_t iTopAvail      = uiSampleAvail & 0x01;
 
-  if ((*pMode < 0) || (*pMode > MAX_PRED_MODE_ID_CHROMA)) {
-    return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
-  }
-
   if (C_PRED_DC == *pMode) {
     if (iLeftAvail && iTopAvail) {
       return 0;
@@ -805,7 +801,7 @@ int32_t ParseIntra4x4ModeConstrain0 (PNeighAvail pNeighAvail, int8_t* pIntraPred
   int32_t iFinalMode, i;
 
   uint8_t uiNeighAvail = 0;
-
+  uint32_t uiTmp;
   if (pNeighAvail->iLeftAvail) {  //left
     iSampleAvail[ 6] =
       iSampleAvail[12] =
@@ -858,9 +854,12 @@ int32_t ParseIntra4x4ModeConstrain0 (PNeighAvail pNeighAvail, int8_t* pIntraPred
   pCurDqLayer->pIntraPredMode[iMbXy][4] = pIntraPredMode[4 + 8 * 1];
   pCurDqLayer->pIntraPredMode[iMbXy][5] = pIntraPredMode[4 + 8 * 2];
   pCurDqLayer->pIntraPredMode[iMbXy][6] = pIntraPredMode[4 + 8 * 3];
-  pCurDqLayer->pChromaPredMode[iMbXy] = BsGetUe (pBs);
-  if (-1 == pCurDqLayer->pChromaPredMode[iMbXy]
-      || CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
+  uiTmp = BsGetUe (pBs);
+  if (uiTmp > MAX_PRED_MODE_ID_CHROMA) {
+    return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
+  }
+  pCurDqLayer->pChromaPredMode[iMbXy] = uiTmp;
+  if (CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
 
@@ -874,7 +873,7 @@ int32_t ParseIntra4x4ModeConstrain1 (PNeighAvail pNeighAvail, int8_t* pIntraPred
   int32_t iFinalMode, i;
 
   uint8_t uiNeighAvail = 0;
-
+  uint32_t uiTmp;
   if (pNeighAvail->iLeftAvail && IS_INTRA (pNeighAvail->iLeftType)) {   //left
     iSampleAvail[ 6] =
       iSampleAvail[12] =
@@ -927,10 +926,12 @@ int32_t ParseIntra4x4ModeConstrain1 (PNeighAvail pNeighAvail, int8_t* pIntraPred
   pCurDqLayer->pIntraPredMode[iMbXy][4] = pIntraPredMode[4 + 8 * 1];
   pCurDqLayer->pIntraPredMode[iMbXy][5] = pIntraPredMode[4 + 8 * 2];
   pCurDqLayer->pIntraPredMode[iMbXy][6] = pIntraPredMode[4 + 8 * 3];
-
-  pCurDqLayer->pChromaPredMode[iMbXy] = BsGetUe (pBs);
-  if (-1 == pCurDqLayer->pChromaPredMode[iMbXy]
-      || CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
+  uiTmp = BsGetUe (pBs);
+  if (uiTmp > MAX_PRED_MODE_ID_CHROMA) {
+    return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
+  }
+  pCurDqLayer->pChromaPredMode[iMbXy] = uiTmp;
+  if (CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
 
@@ -940,7 +941,7 @@ int32_t ParseIntra4x4ModeConstrain1 (PNeighAvail pNeighAvail, int8_t* pIntraPred
 int32_t ParseIntra16x16ModeConstrain0 (PNeighAvail pNeighAvail, PBitStringAux pBs, PDqLayer pCurDqLayer) {
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
   uint8_t uiNeighAvail = 0; //0x07 = 0 1 1 1, means left, top-left, top avail or not. (1: avail, 0: unavail)
-
+  uint32_t uiTmp;
   if (pNeighAvail->iLeftAvail) {
     uiNeighAvail = (1 << 2);
   }
@@ -955,10 +956,13 @@ int32_t ParseIntra16x16ModeConstrain0 (PNeighAvail pNeighAvail, PBitStringAux pB
                                &pCurDqLayer->pIntraPredMode[iMbXy][7])) { //invalid iPredMode, must stop decoding
     return ERR_INFO_INVALID_I16x16_PRED_MODE;
   }
-  pCurDqLayer->pChromaPredMode[iMbXy] = BsGetUe (pBs);
+  uiTmp = BsGetUe (pBs);
+  if (uiTmp > MAX_PRED_MODE_ID_CHROMA) {
+    return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
+  }
+  pCurDqLayer->pChromaPredMode[iMbXy] = uiTmp;
 
-  if (-1 == pCurDqLayer->pChromaPredMode[iMbXy]
-      || CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
+  if (CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
 
@@ -968,7 +972,7 @@ int32_t ParseIntra16x16ModeConstrain0 (PNeighAvail pNeighAvail, PBitStringAux pB
 int32_t ParseIntra16x16ModeConstrain1 (PNeighAvail pNeighAvail, PBitStringAux pBs, PDqLayer pCurDqLayer) {
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
   uint8_t uiNeighAvail = 0; //0x07 = 0 1 1 1, means left, top-left, top avail or not. (1: avail, 0: unavail)
-
+  uint32_t uiTmp;
   if (pNeighAvail->iLeftAvail && IS_INTRA (pNeighAvail->iLeftType)) {
     uiNeighAvail = (1 << 2);
   }
@@ -983,10 +987,13 @@ int32_t ParseIntra16x16ModeConstrain1 (PNeighAvail pNeighAvail, PBitStringAux pB
                                &pCurDqLayer->pIntraPredMode[iMbXy][7])) { //invalid iPredMode, must stop decoding
     return ERR_INFO_INVALID_I16x16_PRED_MODE;
   }
-  pCurDqLayer->pChromaPredMode[iMbXy] = BsGetUe (pBs);
+  uiTmp = BsGetUe (pBs);
+  if (uiTmp > MAX_PRED_MODE_ID_CHROMA) {
+    return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
+  }
+  pCurDqLayer->pChromaPredMode[iMbXy] = uiTmp;
 
-  if (-1 == pCurDqLayer->pChromaPredMode[iMbXy]
-      || CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
+  if (CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
 
