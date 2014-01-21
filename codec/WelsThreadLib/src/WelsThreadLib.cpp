@@ -42,6 +42,8 @@
 #include "WelsThreadLib.h"
 #include <stdio.h>
 
+#ifdef MT_ENABLED
+
 #ifdef  _WIN32
 
 void WelsSleep (uint32_t dwMilliseconds) {
@@ -510,4 +512,5 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* p
 #endif
 
 
+#endif // MT_ENABLED
 
