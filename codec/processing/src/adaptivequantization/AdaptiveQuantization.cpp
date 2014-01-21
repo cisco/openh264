@@ -50,9 +50,11 @@ CAdaptiveQuantization::CAdaptiveQuantization (int32_t iCpuFlag) {
   m_pfVar   = NULL;
   WelsMemset (&m_sAdaptiveQuantParam, 0, sizeof (m_sAdaptiveQuantParam));
   WelsInitVarFunc (m_pfVar, m_CPUFlag);
+  XMMREG_PROTECT_INIT(AdaptiveQuantization);
 }
 
 CAdaptiveQuantization::~CAdaptiveQuantization() {
+  XMMREG_PROTECT_UNINIT(AdaptiveQuantization);
 }
 
 EResult CAdaptiveQuantization::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap) {
@@ -101,6 +103,7 @@ EResult CAdaptiveQuantization::Process (int32_t iType, SPixMap* pSrcPixMap, SPix
       pRefFrameTmp  = pRefFrameY;
       pCurFrameTmp  = pCurFrameY;
       for (i = 0; i < iMbWidth; i++) {
+        XMMREG_PROTECT_STORE(AdaptiveQuantization);
         iSumDiff =  pVaaCalcResults->pSad8x8[iMbIndex][0];
         iSumDiff += pVaaCalcResults->pSad8x8[iMbIndex][1];
         iSumDiff += pVaaCalcResults->pSad8x8[iMbIndex][2];
@@ -109,6 +112,7 @@ EResult CAdaptiveQuantization::Process (int32_t iType, SPixMap* pSrcPixMap, SPix
         iSQDiff = pVaaCalcResults->pSsd16x16[iMbIndex];
         uiSum = pVaaCalcResults->pSum16x16[iMbIndex];
         iSQSum = pVaaCalcResults->pSumOfSquare16x16[iMbIndex];
+        XMMREG_PROTECT_LOAD(AdaptiveQuantization);
 
         iSumDiff = iSumDiff >> 8;
         pMotionTexture->uiMotionIndex = (iSQDiff >> 8) - (iSumDiff * iSumDiff);
@@ -131,7 +135,9 @@ EResult CAdaptiveQuantization::Process (int32_t iType, SPixMap* pSrcPixMap, SPix
       pRefFrameTmp  = pRefFrameY;
       pCurFrameTmp  = pCurFrameY;
       for (i = 0; i < iMbWidth; i++) {
+        XMMREG_PROTECT_STORE(AdaptiveQuantization);
         m_pfVar (pRefFrameTmp, iRefStride, pCurFrameTmp, iCurStride, pMotionTexture);
+        XMMREG_PROTECT_LOAD(AdaptiveQuantization);
         dAverageMotionIndex += pMotionTexture->uiMotionIndex;
         dAverageTextureIndex += pMotionTexture->uiTextureIndex;
         pMotionTexture++;
@@ -223,7 +229,7 @@ void CAdaptiveQuantization::WelsInitVarFunc (PVarFunc& pfVar,  int32_t iCpuFlag)
 
 #ifdef X86_ASM
   if (iCpuFlag & WELS_CPU_SSE2) {
-    // pfVar = SampleVariance16x16_sse2;
+    pfVar = SampleVariance16x16_sse2;
   }
 #endif
 }

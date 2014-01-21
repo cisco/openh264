@@ -204,6 +204,9 @@ void WelsCPURestore (const uint32_t kuiCPU) {
   }
 }
 
+void WelsXmmRegEmptyOp(void * pSrc) {
+}
+
 #endif
 
 
