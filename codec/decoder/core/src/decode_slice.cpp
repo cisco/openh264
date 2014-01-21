@@ -403,7 +403,7 @@ int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool_t bFirstSliceInLayer, PN
 
   iNextMbXyIndex = pSliceHeader->iFirstMbInSlice;
 
-  if (iNextMbXyIndex < 0 || iNextMbXyIndex >= kiCountNumMb) {
+  if ((iNextMbXyIndex < 0) || (iNextMbXyIndex >= kiCountNumMb)) {
     WelsLog (pCtx, WELS_LOG_ERROR,
              "WelsDecodeSlice()::iFirstMbInSlice(%d) > pSps->kiTotalMb(%d). ERROR!!! resolution change....\n",
              iNextMbXyIndex, kiCountNumMb);
