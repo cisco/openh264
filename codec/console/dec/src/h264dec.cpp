@@ -50,9 +50,6 @@
 #include "d3d9_utils.h"
 #include "logging.h"
 
-typedef long (*PCreateDecoderFunc) (ISVCDecoder** ppDecoder);
-typedef void_t (*PDestroyDecoderFunc) (ISVCDecoder* pDecoder);
-
 
 using namespace std;
 
