@@ -209,6 +209,7 @@ typedef struct {
   bool   	bEnableDenoise;	    // denoise control
   bool    bEnableBackgroundDetection; 	// background detection control //VAA_BACKGROUND_DETECTION //BGD cmd
   bool    bEnableAdaptiveQuant; // adaptive quantization control
+  bool    bEnableFrameSkip; // allow skipping frames to keep the bitrate within limits
   bool	bEnableCropPic;	// enable cropping source picture.  8/25/2010
   // FALSE: Streaming Video Sharing; TRUE: Video Conferencing Meeting;
   bool     bEnableLongTermReference; // 0: on, 1: off
