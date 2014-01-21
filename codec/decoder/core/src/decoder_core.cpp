@@ -1541,24 +1541,6 @@ void_t WelsDecodeAccessUnitEnd (PWelsDecoderContext pCtx) {
 }
 
 
-int32_t CheckBSBound (int32_t iWidth, int32_t iHeight, int32_t sliceNum, int32_t ppsId) {
-  int32_t iRet = 0;
-
-#if defined(_WIN32)
-  iRet = ((iWidth == 80) && (iHeight = 45) && (sliceNum < 60));
-
-#elif defined(MACOS)
-  iRet = ((iWidth == 80) && (iHeight = 45) && (ppsId < 57));
-
-#elif defined(ANDROID)
-  iRet = ((iWidth == 40) && (iHeight = 22));
-
-#endif
-
-  return iRet;
-
-}
-
 
 
 /*
