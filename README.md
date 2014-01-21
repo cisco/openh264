@@ -96,6 +96,8 @@ See the issue tracker on https://github.com/cisco/openh264/issues
 - Encoder errors when resolution exceeds 3840x2160
 - Encoder errors when compressed frame size exceeds half uncompressed size
 - Decoder errors when compressed frame size exceeds 1MB
+- Encoder RC requires frame skipping to be enabled to hit the target bitrate,
+  if frame skipping is disabled the target bitrate may be exceeded
 
 License
 -------
