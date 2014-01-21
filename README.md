@@ -58,7 +58,7 @@ Our Windows builds use MinGW which can be found here - http://www.mingw.org/
 
 To build with gcc, add the MinGW bin directory (e.g. /c/MinGW/bin) to your path and follow the 'For All Platforms' instructions below.
 
-To build with Visual Studio you will need to setup your path to run cl.exe.  Here is an example from a Windows 64bit install of VS2012:
+To build with Visual Studio you will need to set up your path to run cl.exe.  The easiest way is to start MSYS from a developer command line session - http://msdn.microsoft.com/en-us/library/ms229859(v=vs.110).aspx  If you need to do it by hand here is an example from a Windows 64bit install of VS2012:
 
 export PATH="$PATH:/c/Program Files (x86)/Microsoft Visual Studio 11.0/VC/bin:/c/Program Files (x86)/Microsoft Visual Studio 11.0/Common7/IDE"
 
