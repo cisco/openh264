@@ -392,7 +392,7 @@ UpdateMbMv_sse2:
 	;mov eax, [esp+4]	; mv_buffer
 	;movd xmm0, [esp+8]	; _mv
 	movd xmm0, r1d	; _mv
-	pshufd xmm1, xmm0, $0
+	pshufd xmm1, xmm0, $00
 	movdqa [r0     ], xmm1
 	movdqa [r0+0x10], xmm1
 	movdqa [r0+0x20], xmm1

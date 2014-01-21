@@ -86,17 +86,17 @@ SSE2_DeQuant8 dw  10, 13, 10, 13, 13, 16, 13, 16,
 
 %macro MMX_SumSubMul2 3
 	movq    %3, %1
-	psllw   %1, $1
+	psllw   %1, $01
 	paddw   %1, %2
-	psllw   %2, $1
+	psllw   %2, $01
     psubw   %3, %2
 %endmacro
 
 %macro MMX_SumSubDiv2 3
     movq    %3, %2
-    psraw   %3, $1
+    psraw   %3, $01
     paddw   %3, %1
-    psraw   %1, $1
+    psraw   %1, $01
     psubw   %1, %2
 %endmacro
 
@@ -124,7 +124,7 @@ SSE2_DeQuant8 dw  10, 13, 10, 13, 13, 16, 13, 16,
     movd       %2, %6
     punpcklbw  %2, %4
     paddw      %1, %3
-    psraw      %1, $6
+    psraw      %1, $06
     paddsw     %1, %2
     packuswb   %1, %2
     movd       %5, %1
@@ -255,15 +255,15 @@ WelsIDctT4Rec_mmx:
 %macro SSE2_SumSubDiv2 4
     movdqa  %4, %1
     movdqa  %3, %2
-    psraw   %2, $1
-    psraw   %4, $1
+    psraw   %2, $01
+    psraw   %4, $01
     paddw   %1, %2
     psubw   %4, %3
 %endmacro
 
 %macro SSE2_StoreDiff8p 6
     paddw       %1, %3
-    psraw       %1, $6
+    psraw       %1, $06
     movq		%2, %6
     punpcklbw   %2, %4
     paddsw      %2, %1
@@ -282,7 +282,7 @@ WelsIDctT4Rec_mmx:
 %macro SSE2_Load8DC	6
 	movdqa		%1,		%6		; %1 = dc0 dc1
 	paddw       %1,		%5
-    psraw       %1,		$6		; (dc + 32) >> 6
+    psraw       %1,		$06		; (dc + 32) >> 6
 
     movdqa		%2,		%1
     psrldq		%2,		4

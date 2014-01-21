@@ -1,13 +1,8 @@
 #include <gtest/gtest.h>
-#include <stdlib.h>
-#include <stdarg.h>
 #include <stdint.h>
 #include <limits.h>
 #include <fstream>
-#include <openssl/sha.h>
 
-#include "codec_def.h"
-#include "codec_app_def.h"
 #include "codec_api.h"
 
 #include "utils/BufferedData.h"

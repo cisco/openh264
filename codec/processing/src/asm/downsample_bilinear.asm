@@ -94,13 +94,13 @@ DyadicBilinearDownsamplerWidthx32_sse:
 	mov ecx, [esp+36]	; iSrcStride
 	mov ebp, [esp+44]	; iSrcHeight
 
-	sar ebp, $1			; iSrcHeight >> 1
+	sar ebp, $01			; iSrcHeight >> 1
 
 .yloops:
 	mov eax, [esp+40]	; iSrcWidth
-	sar eax, $1			; iSrcWidth >> 1
+	sar eax, $01			; iSrcWidth >> 1
 	mov ebx, eax		; iDstWidth restored at ebx
-	sar eax, $4			; (iSrcWidth >> 1) / 16		; loop count = num_of_mb
+	sar eax, $04			; (iSrcWidth >> 1) / 16		; loop count = num_of_mb
 	neg ebx				; - (iSrcWidth >> 1)
 	; each loop = source bandwidth: 32 bytes
 .xloops:
@@ -247,13 +247,13 @@ DyadicBilinearDownsamplerWidthx16_sse:
 	mov ecx, [esp+36]	; iSrcStride
 	mov ebp, [esp+44]	; iSrcHeight
 
-	sar ebp, $1		; iSrcHeight >> 1
+	sar ebp, $01		; iSrcHeight >> 1
 
 .yloops:
 	mov eax, [esp+40]	; iSrcWidth
-	sar eax, $1		; iSrcWidth >> 1
+	sar eax, $01		; iSrcWidth >> 1
 	mov ebx, eax		; iDstWidth restored at ebx
-	sar eax, $3		; (iSrcWidth >> 1) / 8		; loop count = num_of_mb
+	sar eax, $03		; (iSrcWidth >> 1) / 8		; loop count = num_of_mb
 	neg ebx			; - (iSrcWidth >> 1)
 	; each loop = source bandwidth: 16 bytes
 .xloops:
@@ -351,13 +351,13 @@ DyadicBilinearDownsamplerWidthx8_sse:
 	mov ecx, [esp+36]	; iSrcStride
 	mov ebp, [esp+44]	; iSrcHeight
 
-	sar ebp, $1		; iSrcHeight >> 1
+	sar ebp, $01		; iSrcHeight >> 1
 
 .yloops:
 	mov eax, [esp+40]	; iSrcWidth
-	sar eax, $1		; iSrcWidth >> 1
+	sar eax, $01		; iSrcWidth >> 1
 	mov ebx, eax		; iDstWidth restored at ebx
-	sar eax, $2		; (iSrcWidth >> 1) / 4		; loop count = num_of_mb
+	sar eax, $02		; (iSrcWidth >> 1) / 4		; loop count = num_of_mb
 	neg ebx			; - (iSrcWidth >> 1)
 	; each loop = source bandwidth: 8 bytes
 .xloops:
@@ -442,16 +442,16 @@ DyadicBilinearDownsamplerWidthx32_ssse3:
 	mov ecx, [esp+36]	; iSrcStride
 	mov ebp, [esp+44]	; iSrcHeight
 
-	sar ebp, $1			; iSrcHeight >> 1
+	sar ebp, $01			; iSrcHeight >> 1
 
 	movdqa xmm7, [shufb_mask_low]	; mask low
 	movdqa xmm6, [shufb_mask_high]	; mask high
 
 .yloops:
 	mov eax, [esp+40]	; iSrcWidth
-	sar eax, $1			; iSrcWidth >> 1
+	sar eax, $01			; iSrcWidth >> 1
 	mov ebx, eax		; iDstWidth restored at ebx
-	sar eax, $4			; (iSrcWidth >> 1) / 16		; loop count = num_of_mb
+	sar eax, $04			; (iSrcWidth >> 1) / 16		; loop count = num_of_mb
 	neg ebx				; - (iSrcWidth >> 1)
 	; each loop = source bandwidth: 32 bytes
 .xloops:
@@ -553,15 +553,15 @@ DyadicBilinearDownsamplerWidthx16_ssse3:
 	mov ecx, [esp+36]	; iSrcStride
 	mov ebp, [esp+44]	; iSrcHeight
 
-	sar ebp, $1		; iSrcHeight >> 1
+	sar ebp, $01		; iSrcHeight >> 1
 	movdqa xmm7, [shufb_mask_low]	; mask low
 	movdqa xmm6, [shufb_mask_high]	; mask high
 
 .yloops:
 	mov eax, [esp+40]	; iSrcWidth
-	sar eax, $1		; iSrcWidth >> 1
+	sar eax, $01		; iSrcWidth >> 1
 	mov ebx, eax		; iDstWidth restored at ebx
-	sar eax, $3		; (iSrcWidth >> 1) / 8		; loop count = num_of_mb
+	sar eax, $03		; (iSrcWidth >> 1) / 8		; loop count = num_of_mb
 	neg ebx			; - (iSrcWidth >> 1)
 	; each loop = source bandwidth: 16 bytes
 .xloops:
@@ -643,16 +643,16 @@ DyadicBilinearDownsamplerWidthx32_sse4:
 	mov ecx, [esp+36]	; iSrcStride
 	mov ebp, [esp+44]	; iSrcHeight
 
-	sar ebp, $1			; iSrcHeight >> 1
+	sar ebp, $01			; iSrcHeight >> 1
 
 	movdqa xmm7, [shufb_mask_low]	; mask low
 	movdqa xmm6, [shufb_mask_high]	; mask high
 
 .yloops:
 	mov eax, [esp+40]	; iSrcWidth
-	sar eax, $1			; iSrcWidth >> 1
+	sar eax, $01			; iSrcWidth >> 1
 	mov ebx, eax		; iDstWidth restored at ebx
-	sar eax, $4			; (iSrcWidth >> 1) / 16		; loop count = num_of_mb
+	sar eax, $04			; (iSrcWidth >> 1) / 16		; loop count = num_of_mb
 	neg ebx				; - (iSrcWidth >> 1)
 	; each loop = source bandwidth: 32 bytes
 .xloops:
@@ -753,15 +753,15 @@ DyadicBilinearDownsamplerWidthx16_sse4:
 	mov ecx, [esp+36]	; iSrcStride
 	mov ebp, [esp+44]	; iSrcHeight
 
-	sar ebp, $1		; iSrcHeight >> 1
+	sar ebp, $01		; iSrcHeight >> 1
 	movdqa xmm7, [shufb_mask_low]	; mask low
 	movdqa xmm6, [shufb_mask_high]	; mask high
 
 .yloops:
 	mov eax, [esp+40]	; iSrcWidth
-	sar eax, $1		; iSrcWidth >> 1
+	sar eax, $01		; iSrcWidth >> 1
 	mov ebx, eax		; iDstWidth restored at ebx
-	sar eax, $3		; (iSrcWidth >> 1) / 8		; loop count = num_of_mb
+	sar eax, $03		; (iSrcWidth >> 1) / 8		; loop count = num_of_mb
 	neg ebx			; - (iSrcWidth >> 1)
 	; each loop = source bandwidth: 16 bytes
 .xloops:

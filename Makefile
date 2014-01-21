@@ -56,7 +56,7 @@ ASMFLAGS += $(ASMFLAGS_PLATFORM) -DNO_DYNAMIC_VP
 
 
 #### No user-serviceable parts below this line
-INCLUDES = -Icodec/api/svc -Icodec/common -Igtest/include
+INCLUDES = -Icodec/api/svc -Icodec/common
 #ASM_INCLUDES = -Iprocessing/src/asm/
 ASM_INCLUDES = -Icodec/common/
 
@@ -77,7 +77,11 @@ PROCESSING_INCLUDES = \
     -Icodec/encoder/plus/inc
 
 GTEST_INCLUDES = \
-    -Igtest
+    -Igtest \
+    -Igtest/include
+
+CODEC_UNITTEST_INCLUDES = \
+    -Igtest/include
 
 H264DEC_INCLUDES = $(DECODER_INCLUDES) -Icodec/console/dec/inc
 H264DEC_LDFLAGS = -L. $(call LINK_LIB, decoder) $(call LINK_LIB, common)

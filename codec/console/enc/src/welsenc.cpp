@@ -215,6 +215,8 @@ int ParseConfig (CReadConfig& cRdCfg, SWelsSvcCodingParam& pSvcParam, SFilesSet&
         pSvcParam.bEnableBackgroundDetection	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableAdaptiveQuantization") == 0) {
         pSvcParam.bEnableAdaptiveQuant	= atoi (strTag[1].c_str()) ? true : false;
+      } else if (strTag[0].compare ("EnableFrameSkip") == 0) {
+        pSvcParam.bEnableFrameSkip	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableLongTermReference") == 0) {
         pSvcParam.bEnableLongTermReference	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("LtrMarkPeriod") == 0) {
@@ -364,6 +366,9 @@ int ParseCommandLine (int argc, char** argv, SVCEncodingParam& sParam) {
     else if (!strcmp (pCmd, "-aq") && (i < argc))
       sParam.bEnableAdaptiveQuant = atoi (argv[i++]) ? true : false;
 
+    else if (!strcmp (pCmd, "-fs") && (i < argc))
+      sParam.bEnableFrameSkip = atoi (argv[i++]) ? true : false;
+
     else if (!strcmp (pCmd, "-ltr") && (i < argc))
       sParam.bEnableLongTermReference = atoi (argv[i++]) ? true : false;
 
@@ -463,6 +468,9 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
 
     else if (!strcmp (pCommand, "-aq") && (n < argc))
       pSvcParam.bEnableAdaptiveQuant = atoi (argv[n++]) ? true : false;
+
+    else if (!strcmp (pCommand, "-fs") && (n < argc))
+      pSvcParam.bEnableFrameSkip = atoi (argv[n++]) ? true : false;
 
     else if (!strcmp (pCommand, "-ltr") && (n < argc))
       pSvcParam.bEnableLongTermReference = atoi (argv[n++]) ? true : false;
@@ -666,6 +674,7 @@ int FillSpecificParameters (SVCEncodingParam& sParam) {
   sParam.bEnableDenoise    = 0;    // denoise control
   sParam.bEnableBackgroundDetection = 1; // background detection control
   sParam.bEnableAdaptiveQuant       = 1; // adaptive quantization control
+  sParam.bEnableFrameSkip           = 1; // frame skipping
   sParam.bEnableLongTermReference  = 0; // long term reference control
   sParam.iLtrMarkPeriod = 30;
 
