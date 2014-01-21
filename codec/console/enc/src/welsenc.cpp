@@ -45,16 +45,6 @@
 
 //#define STICK_STREAM_SIZE
 
-#if defined(__GNUC__)
-#if !defined(MACOS)
-#if !defined(_MATH_H_MATHDEF)
-#define _MATH_H_MATHDEF
-//#else
-//#error "warning: have defined _MATH_H_MATHDEF!!"	// to check
-#endif//_MATH_H_MATHDEF
-#endif//MACOS
-#endif//__GNUC__
-
 #include "measure_time.h"
 #include "param_svc.h"
 //#include "layered_pic_buffer.h"
