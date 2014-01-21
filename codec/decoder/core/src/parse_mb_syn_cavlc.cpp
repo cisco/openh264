@@ -746,7 +746,7 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
     iZerosLeft = 0;
   }
 
-  if ((iZerosLeft < 0) || (iZerosLeft + uiTotalCoeff > iMaxNumCoeff)) {
+  if ((iZerosLeft < 0) || ((iZerosLeft + uiTotalCoeff) > iMaxNumCoeff)) {
     return ERR_INFO_CAVLC_INVALID_ZERO_LEFT;
   }
   iUsedBits += CavlcGetRunBefore (iRun, &sReadBitsCache, uiTotalCoeff, pVlcTable, iZerosLeft);
