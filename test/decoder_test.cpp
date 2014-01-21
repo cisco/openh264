@@ -67,7 +67,7 @@ static bool DecodeAndProcess(ISVCDecoder* decoder, const uint8_t* src,
   memset(data, 0, sizeof(data));
   memset(&bufInfo, 0, sizeof(SBufferInfo));
 
-  DECODING_STATE rv = decoder->DecodeFrame(src, sliceSize, data, &bufInfo);
+  DECODING_STATE rv = decoder->DecodeFrame2(src, sliceSize, data, &bufInfo);
   if (rv != dsErrorFree) {
     return false;
   }

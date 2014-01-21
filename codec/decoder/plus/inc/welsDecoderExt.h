@@ -81,7 +81,7 @@ virtual DECODING_STATE DecodeFrame (const unsigned char* kpSrc,
                                     int& iWidth,
                                     int& iHeight);
 
-virtual DECODING_STATE DecodeFrame (const unsigned char* kpSrc,
+virtual DECODING_STATE DecodeFrame2 (const unsigned char* kpSrc,
                                     const int kiSrcLen,
                                     void_t** ppDst,
                                     SBufferInfo* pDstInfo);

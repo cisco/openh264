@@ -217,7 +217,7 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
     pData[2] = NULL;
     memset (&sDstBufInfo, 0, sizeof (SBufferInfo));
 
-    pDecoder->DecodeFrame (pBuf + iBufPos, iSliceSize, pData, &sDstBufInfo);
+    pDecoder->DecodeFrame2 (pBuf + iBufPos, iSliceSize, pData, &sDstBufInfo);
 
     if (sDstBufInfo.iBufferStatus == 1) {
       pDst[0] = (uint8_t*)pData[0];
@@ -259,7 +259,7 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
   pData[2] = NULL;
   memset (&sDstBufInfo, 0, sizeof (SBufferInfo));
 
-  pDecoder->DecodeFrame (NULL, 0, pData, &sDstBufInfo);
+  pDecoder->DecodeFrame2 (NULL, 0, pData, &sDstBufInfo);
   if (sDstBufInfo.iBufferStatus == 1) {
     pDst[0] = (uint8_t*)pData[0];
     pDst[1] = (uint8_t*)pData[1];

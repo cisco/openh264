@@ -42,7 +42,7 @@ class ISVCEncoder {
    * return: CM_RETURN: 0 - success; otherwise - failed;
    */
   virtual int Initialize (SVCEncodingParam* pParam, const INIT_TYPE kiInitType = INIT_TYPE_PARAMETER_BASED) = 0;
-  virtual int Initialize (void* pParam, const INIT_TYPE kiInitType = INIT_TYPE_CONFIG_BASED) = 0;
+  virtual int Initialize2 (void* pParam, const INIT_TYPE kiInitType = INIT_TYPE_CONFIG_BASED) = 0;
 
   virtual int Uninitialize() = 0;
 
@@ -50,7 +50,7 @@ class ISVCEncoder {
    * return: EVideoFrameType [IDR: videoFrameTypeIDR; P: videoFrameTypeP; ERROR: videoFrameTypeInvalid]
    */
   virtual int EncodeFrame (const unsigned char* kpSrc, SFrameBSInfo* pBsInfo) = 0;
-  virtual int EncodeFrame (const SSourcePicture**   kppSrcPicList, int nSrcPicNum, SFrameBSInfo* pBsInfo) = 0;
+  virtual int EncodeFrame2 (const SSourcePicture**   kppSrcPicList, int nSrcPicNum, SFrameBSInfo* pBsInfo) = 0;
 
   /*
    * return: 0 - success; otherwise - failed;
@@ -92,7 +92,7 @@ class ISVCDecoder {
   /*
    *  src must be 4 byte aligned,   recommend 16 byte aligned.    the available src size must be multiple of 4.
    */
-  virtual DECODING_STATE DecodeFrame (const unsigned char* pSrc,
+  virtual DECODING_STATE DecodeFrame2 (const unsigned char* pSrc,
                                       const int iSrcLen,
                                       void** ppDst,
                                       SBufferInfo* pDstInfo) = 0;

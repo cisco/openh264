@@ -66,7 +66,7 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
    * return: CM_RETURN: 0 - success; otherwise - failed;
    */
   virtual int Initialize (SVCEncodingParam* argv, const INIT_TYPE init_type);
-  virtual int Initialize (void* argv, const INIT_TYPE init_type);
+  virtual int Initialize2 (void* argv, const INIT_TYPE init_type);
 
   virtual int Uninitialize();
 
@@ -74,7 +74,7 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
    * return: EVideoFrameType [IDR: videoFrameTypeIDR; P: videoFrameTypeP; ERROR: videoFrameTypeInvalid]
    */
   virtual int EncodeFrame (const unsigned char* kpSrc, SFrameBSInfo* pBsInfo);
-  virtual int EncodeFrame (const SSourcePicture** kppSrcPicList, int nSrcPicNum, SFrameBSInfo* pBsInfo);
+  virtual int EncodeFrame2 (const SSourcePicture** kppSrcPicList, int nSrcPicNum, SFrameBSInfo* pBsInfo);
 
   /*
    * return: 0 - success; otherwise - failed;
