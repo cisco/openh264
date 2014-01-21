@@ -649,21 +649,19 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
     (*ppCtx)->pSliceBs = NULL;
   }
 #if defined(DYNAMIC_SLICE_ASSIGN) || defined(MT_DEBUG)
-  if (pSmt->pSliceConsumeTime != NULL) {
-    iIdx = 0;
-    while (iIdx < pCodingParam->iNumDependencyLayer) {
-      if (pSmt->pSliceConsumeTime[iIdx]) {
-        pMa->WelsFree (pSmt->pSliceConsumeTime[iIdx], "pSliceConsumeTime[]");
-        pSmt->pSliceConsumeTime[iIdx] = NULL;
-      }
-#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
-      if (pSmt->pSliceComplexRatio[iIdx] != NULL) {
-        pMa->WelsFree (pSmt->pSliceComplexRatio[iIdx], "pSliceComplexRatio[]");
-        pSmt->pSliceComplexRatio[iIdx] = NULL;
-      }
-#endif//TRY_SLICING_BALANCE
-      ++ iIdx;
+  iIdx = 0;
+  while (iIdx < pCodingParam->iNumDependencyLayer) {
+    if (pSmt->pSliceConsumeTime[iIdx]) {
+      pMa->WelsFree (pSmt->pSliceConsumeTime[iIdx], "pSliceConsumeTime[]");
+      pSmt->pSliceConsumeTime[iIdx] = NULL;
     }
+#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
+    if (pSmt->pSliceComplexRatio[iIdx] != NULL) {
+      pMa->WelsFree (pSmt->pSliceComplexRatio[iIdx], "pSliceComplexRatio[]");
+      pSmt->pSliceComplexRatio[iIdx] = NULL;
+    }
+#endif//TRY_SLICING_BALANCE
+    ++ iIdx;
   }
 #endif//#if defined(DYNAMIC_SLICE_ASSIGN) || defined(MT_DEBUG)
 
