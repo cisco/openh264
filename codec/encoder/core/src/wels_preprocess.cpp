@@ -30,12 +30,14 @@
  *
  */
 
+#ifndef NO_DYNAMIC_VP
 #if defined(_WIN32)
 #include <windows.h>
 #elif defined(MACOS)
 #include "bundleloader.h"
 #elif defined(__GNUC__)
 #include <dlfcn.h>
+#endif
 #endif
 
 #include <stdio.h>
