@@ -50,11 +50,7 @@
 //#include "layered_pic_buffer.h"
 #include "read_config.h"
 
-#if defined(MACOS)
-#include "bundlewelsenc.h"
-#else
 #include "typedefs.h"
-#endif//MACOS
 
 #ifdef _MSC_VER
 #include <io.h>     /* _setmode() */
@@ -1242,22 +1238,13 @@ void LockToSingleCore() {
 
 long CreateSVCEncHandle (ISVCEncoder** ppEncoder) {
   long ret = 0;
-#if defined(MACOS)
-  ret = WelsEncBundleLoad();
-  WelsEncBundleCreateEncoder (ppEncoder);
-#else
   ret = CreateSVCEncoder (ppEncoder);
-#endif//MACOS
   return ret;
 }
 
 void DestroySVCEncHandle (ISVCEncoder* pEncoder) {
   if (pEncoder) {
-#if defined(MACOS)
-    WelsEncBundleDestroyEncoder (pEncoder);
-#else
     DestroySVCEncoder (pEncoder);
-#endif//MACOS
 
   }
 }
@@ -1265,11 +1252,7 @@ void DestroySVCEncHandle (ISVCEncoder* pEncoder) {
 /****************************************************************************
  * main:
  ****************************************************************************/
-#if (defined(MACOS))
-int main_demo (int argc, char** argv)
-#else
 int main (int argc, char** argv)
-#endif
 {
   ISVCEncoder* pSVCEncoder	= NULL;
   FILE* pFileOut					= NULL;
