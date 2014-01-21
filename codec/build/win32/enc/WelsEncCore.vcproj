@@ -52,7 +52,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\common;..\..\..\encoder\core\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api;"
+				AdditionalIncludeDirectories="..\..\..\common;..\..\..\encoder\core\inc,..\..\..\api\svc;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;X86_ASM;MT_ENABLED"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -132,7 +132,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\common;..\..\..\encoder\core\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api;"
+				AdditionalIncludeDirectories="..\..\..\common;..\..\..\encoder\core\inc,..\..\..\api\svc;"
 				PreprocessorDefinitions="WIN64;_DEBUG;_LIB;X86_ASM;MT_ENABLED"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -214,7 +214,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\..\common;..\..\..\encoder\core\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api"
+				AdditionalIncludeDirectories="..\..\..\common;..\..\..\encoder\core\inc,..\..\..\api\svc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;X86_ASM;MT_ENABLED;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -298,7 +298,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\..\common;..\..\..\encoder\core\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api"
+				AdditionalIncludeDirectories="..\..\..\common;..\..\..\encoder\core\inc,..\..\..\api\svc"
 				PreprocessorDefinitions="WIN64;NDEBUG;_LIB;MT_ENABLED;X86_ASM"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -1416,7 +1416,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\WelsThreadLib\src\WelsThreadLib.cpp"
+				RelativePath="..\..\..\common\WelsThreadLib.cpp"
 				>
 			</File>
 		</Filter>
@@ -1649,7 +1649,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\WelsThreadLib\api\WelsThreadLib.h"
+				RelativePath="..\..\..\common\WelsThreadLib.h"
 				>
 			</File>
 		</Filter>
