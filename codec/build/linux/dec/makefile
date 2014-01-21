@@ -26,7 +26,7 @@ ASFLAGS= -f elf -DNOPREFIX -I ../../../decoder/core/asm/
 
 LIBS= -lstdc++ -ldl
 #-lm
-CFLAGS=  $(INCLUDE) -fPIC -D__GCC__ -DLINUX -D__NO_CTYPE
+CFLAGS=  $(INCLUDE) -fPIC -D__GCC__ -DLINUX
 
 ifeq ($(DBG),1)
 #SUFFIX= .dbg
