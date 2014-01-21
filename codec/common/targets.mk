@@ -4,6 +4,7 @@ COMMON_CPP_SRCS=\
 	$(COMMON_SRCDIR)/./cpu.cpp\
 	$(COMMON_SRCDIR)/./deblocking_common.cpp\
 	$(COMMON_SRCDIR)/./logging.cpp\
+	$(COMMON_SRCDIR)/./WelsThreadLib.cpp\
 
 COMMON_OBJS += $(COMMON_CPP_SRCS:.cpp=.o)
 ifeq ($(USE_ASM), Yes)
