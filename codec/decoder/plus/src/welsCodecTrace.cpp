@@ -342,7 +342,7 @@ int32_t  CWelsCodecTrace::WriteString (int32_t iLevel, const str_t* pStr) {
       break;
     default:
       if (m_fpDebugTrace)
-        m_fpInfoTrace ("%s", pStr);
+        m_fpDebugTrace ("%s", pStr);
       break;
     }
 #else
