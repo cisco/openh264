@@ -788,7 +788,7 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   int iParsedNum = 3;
   if (ParseCommandLine (argc - iParsedNum, argv + iParsedNum, sSvcParam) != 0) {
     printf ("parse pCommand line failed\n");
-  	ret = 1;
+    ret = 1;
     goto ERROR_RET;
   }
 
@@ -799,7 +799,6 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
    }
 
   iPicLumaSize = sSvcParam.iPicWidth * sSvcParam.iPicHeight;
- 
   switch (sSvcParam.iInputCsp) {
     int iStride;
   case videoFormatI420:
@@ -833,10 +832,8 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   default:
     ret = 1;
     goto ERROR_RET;
-  
   }
 
-  
   while (true) {
     if (feof (pFpSrc))
       break;
