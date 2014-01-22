@@ -519,6 +519,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\..\encoder\plus\src\welsEncoderC.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\encoder\plus\src\welsEncoderExt.cpp"
 				>
 				<FileConfiguration

@@ -1,3 +1,10 @@
 EXPORTS
     CreateDecoder
     DestroyDecoder
+    SVCDecoder_Initialize
+    SVCDecoder_Uninitialize
+    SVCDecoder_DecodeFrame
+    SVCDecoder_DecodeFrame2
+    SVCDecoder_DecodeFrameEx
+    SVCDecoder_SetOption
+    SVCDecoder_GetOption
