@@ -1740,6 +1740,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
   InitCurDqLayerData (pCtx, pCtx->pCurDqLayer);
 
   pNalCur = pCurAu->pNalUnitsList[iIdx];
+  if (pNalCur == NULL)
+    return ERR_NONE;
   while (iIdx <= iEndIdx) {
     PDqLayer dq_cur							= pCtx->pCurDqLayer;
     SLayerInfo pLayerInfo;
@@ -1774,7 +1776,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
     }
     GetI4LumaIChromaAddrTable (pCtx->iDecBlockOffsetArray, pCtx->pDec->iLinesize[0], pCtx->pDec->iLinesize[1]);
 
-    if ((pNalCur == NULL) || (pNalCur->sNalHeaderExt.uiLayerDqId > kuiTargetLayerDqId)) {
+    if (pNalCur->sNalHeaderExt.uiLayerDqId > kuiTargetLayerDqId) { // confirmed pNalCur will never be NULL
       break;	// Per formance it need not to decode the remaining bits any more due to given uiLayerDqId required, 9/2/2009
     }
 
