@@ -470,7 +470,7 @@ const uint8_t   g_kuiTemporalIdListTable[MAX_TEMPORAL_LEVEL][MAX_GOP_SIZE + 1] =
   {
     0, 0, 0, 0, 0, 0, 0, 0,
     0
-  },  // gop size = 1
+  },  // uiGopSize = 1
   {
     0, 1, 0, 0, 0, 0, 0, 0,
     0
