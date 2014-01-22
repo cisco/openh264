@@ -257,6 +257,8 @@ void FillDefault (const bool_t kbEnableRc) {
   bPrefixNalAddingCtrl		= true;		// prefix NAL adding control
   iNumDependencyLayer		= 0;		// number of dependency(Spatial/CGS) layers used to be encoded
   iNumTemporalLayer			= 0;		// number of temporal layer specified
+
+  memset(sDependencyLayers,0,sizeof(SDLayerParam)*MAX_DEPENDENCY_LAYER); 
 }
 
 int32_t ParamTranscode (SVCEncodingParam& pCodingParam, const bool_t kbEnableRc = true) {
