@@ -1740,8 +1740,6 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
   InitCurDqLayerData (pCtx, pCtx->pCurDqLayer);
 
   pNalCur = pCurAu->pNalUnitsList[iIdx];
-  if (pNalCur == NULL)
-    return ERR_NONE;
   while (iIdx <= iEndIdx) {
     PDqLayer dq_cur							= pCtx->pCurDqLayer;
     SLayerInfo pLayerInfo;
