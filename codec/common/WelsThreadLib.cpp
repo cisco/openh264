@@ -39,6 +39,13 @@
  */
 
 
+#ifdef LINUX
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#include <sched.h>
+#endif
+
 #include "WelsThreadLib.h"
 #include <stdio.h>
 
@@ -175,51 +182,11 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* p
 
 #elif   defined(__GNUC__)
 
-#ifdef MACOS
-#include <CoreServices/CoreServices.h>
-//#include <Gestalt.h>
-#endif//MACOS
-
-static int32_t  SystemCall (const str_t* pCmd, str_t* pRes, int32_t iSize) {
-  int32_t fd[2];
-  int32_t iPid;
-  int32_t iCount;
-  int32_t left;
-  str_t* p = NULL;
-  int32_t iMaxLen = iSize - 1;
-  memset (pRes, 0, iSize);
-
-  if (pipe (fd)) {
-    return -1;
-  }
-
-  if ((iPid = fork()) == 0) {
-    int32_t  fd2[2];
-    if (pipe (fd2)) {
-      return -1;
-    }
-    close (STDOUT_FILENO);
-    dup2 (fd2[1], STDOUT_FILENO);
-    close (fd[0]);
-    close (fd2[1]);
-    system (pCmd);
-    read (fd2[0], pRes, iMaxLen);
-    write (fd[1], pRes, strlen (pRes));	// confirmed_safe_unsafe_usage
-    close (fd2[0]);
-    close (fd[1]);
-    exit (0);
-  }
-  close (fd[1]);
-  p = pRes;
-  left = iMaxLen;
-  while ((iCount = read (fd[0], p, left))) {
-    p += iCount;
-    left -= iCount;
-    if (left <= 0) break;
-  }
-  close (fd[0]);
-  return 0;
-}
+#ifdef __APPLE__
+#include <sys/sysctl.h>
+#include <sys/param.h>
+#include <unistd.h>
+#endif//__APPLE__
 
 void WelsSleep (uint32_t dwMilliseconds) {
   usleep (dwMilliseconds * 1000);	// microseconds
@@ -340,7 +307,7 @@ WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t 
   if (dwMilliseconds != (uint32_t) - 1) {
     return sem_wait (event);
   } else {
-#if defined(MACOS)
+#if defined(__APPLE__)
     int32_t err = 0;
     int32_t wait_count = 0;
     do {
@@ -363,7 +330,7 @@ WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t 
     ts.tv_nsec = tv.tv_usec * 1000 + (dwMilliseconds % 1000) * 1000000;
 
     return sem_timedwait (event, &ts);
-#endif//MACOS
+#endif//__APPLE__
   }
 }
 
@@ -382,7 +349,7 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount,
     nIdx = 0;	// access each event by order
     while (nIdx < nCount) {
       int32_t err = 0;
-//#if defined(MACOS)	// clock_gettime(CLOCK_REALTIME) & sem_timedwait not supported on mac, so have below impl
+//#if defined(__APPLE__)	// clock_gettime(CLOCK_REALTIME) & sem_timedwait not supported on mac, so have below impl
       int32_t wait_count = 0;
 //			struct timespec ts;
 //			struct timeval tv;
@@ -483,26 +450,23 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WE
 WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* pInfo) {
 #ifdef LINUX
 
-#define   CMD_RES_SIZE    2048
-  str_t pBuf[CMD_RES_SIZE];
+  cpu_set_t cpuset;
 
-  SystemCall ("cat /proc/cpuinfo | grep \"processor\" | wc -l", pBuf, CMD_RES_SIZE);
+  CPU_ZERO (&cpuset);
 
-  pInfo->ProcessorCount = atoi (pBuf);
-
-  if (pInfo->ProcessorCount == 0) {
+  if (!sched_getaffinity (0, sizeof (cpuset), &cpuset))
+    pInfo->ProcessorCount = CPU_COUNT (&cpuset);
+  else
     pInfo->ProcessorCount = 1;
-  }
 
   return WELS_THREAD_ERROR_OK;
-#undef   CMD_RES_SIZE
 
 #else
 
-  SInt32 cpunumber;
-  Gestalt (gestaltCountOfCPUs, &cpunumber);
+  size_t len = sizeof (pInfo->ProcessorCount);
 
-  pInfo->ProcessorCount	= cpunumber;
+  if (sysctlbyname ("hw.logicalcpu", &pInfo->ProcessorCount, &len, NULL, 0) == -1)
+    pInfo->ProcessorCount = 1;
 
   return WELS_THREAD_ERROR_OK;
 
