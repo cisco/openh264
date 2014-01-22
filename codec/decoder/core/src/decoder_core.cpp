@@ -768,7 +768,6 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     } else if (uiQualityId > BASE_QUALITY_ID) {
       WelsLog (pCtx, WELS_LOG_WARNING, "MGS not supported.\n");
       return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_UNSUPPORTED_MGS);
-      pSliceHeadExt->uiRefLayerDqId	= pNalHeaderExt->uiLayerDqId - 1;
     } else {
       pSliceHeadExt->uiRefLayerDqId	= (uint8_t) - 1;
     }
@@ -1775,7 +1774,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
     }
     GetI4LumaIChromaAddrTable (pCtx->iDecBlockOffsetArray, pCtx->pDec->iLinesize[0], pCtx->pDec->iLinesize[1]);
 
-    if (pNalCur->sNalHeaderExt.uiLayerDqId > kuiTargetLayerDqId) {
+    if ((pNalCur == NULL) || (pNalCur->sNalHeaderExt.uiLayerDqId > kuiTargetLayerDqId)) {
       break;	// Per formance it need not to decode the remaining bits any more due to given uiLayerDqId required, 9/2/2009
     }
 
