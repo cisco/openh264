@@ -65,31 +65,31 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   /*
    * return: CM_RETURN: 0 - success; otherwise - failed;
    */
-  virtual int Initialize (SVCEncodingParam* argv, const INIT_TYPE init_type);
-  virtual int Initialize (void* argv, const INIT_TYPE init_type);
+  virtual int EXTAPI Initialize (SVCEncodingParam* argv, const INIT_TYPE init_type);
+  virtual int EXTAPI Initialize2 (void* argv, const INIT_TYPE init_type);
 
-  virtual int Uninitialize();
+  virtual int EXTAPI Uninitialize();
 
   /*
    * return: EVideoFrameType [IDR: videoFrameTypeIDR; P: videoFrameTypeP; ERROR: videoFrameTypeInvalid]
    */
-  virtual int EncodeFrame (const unsigned char* kpSrc, SFrameBSInfo* pBsInfo);
-  virtual int EncodeFrame (const SSourcePicture** kppSrcPicList, int nSrcPicNum, SFrameBSInfo* pBsInfo);
+  virtual int EXTAPI EncodeFrame (const unsigned char* kpSrc, SFrameBSInfo* pBsInfo);
+  virtual int EXTAPI EncodeFrame2 (const SSourcePicture** kppSrcPicList, int nSrcPicNum, SFrameBSInfo* pBsInfo);
 
   /*
    * return: 0 - success; otherwise - failed;
    */
-  virtual int EncodeParameterSets (SFrameBSInfo* pBsInfo);
+  virtual int EXTAPI EncodeParameterSets (SFrameBSInfo* pBsInfo);
 
   /*
    * return: 0 - success; otherwise - failed;
    */
-  virtual int PauseFrame (const unsigned char* pSrc, SFrameBSInfo* pBsInfo);
+  virtual int EXTAPI PauseFrame (const unsigned char* pSrc, SFrameBSInfo* pBsInfo);
 
   /*
    * return: 0 - success; otherwise - failed;
    */
-  virtual int ForceIntraFrame (bool bIDR);
+  virtual int EXTAPI ForceIntraFrame (bool bIDR);
 
   /************************************************************************
    * InDataFormat, IDRInterval, SVC Encode Param, Frame Rate, Bitrate,..
@@ -97,8 +97,8 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   /*
    * return: CM_RETURN: 0 - success; otherwise - failed;
    */
-  virtual int SetOption (ENCODER_OPTION opt_id, void* option);
-  virtual int GetOption (ENCODER_OPTION opt_id, void* option);
+  virtual int EXTAPI SetOption (ENCODER_OPTION opt_id, void* option);
+  virtual int EXTAPI GetOption (ENCODER_OPTION opt_id, void* option);
 
  private:
   sWelsEncCtx*	m_pEncContext;

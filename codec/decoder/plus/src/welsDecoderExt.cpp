@@ -340,7 +340,7 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void_t* pOption) {
   return cmInitParaError;
 }
 
-DECODING_STATE CWelsDecoder::DecodeFrame (const unsigned char* kpSrc,
+DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     const int kiSrcLen,
     void_t** ppDst,
     SBufferInfo* pDstInfo) {
@@ -430,7 +430,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame (const unsigned char* kpSrc,
   DstInfo.UsrData.sSystemBuffer.iHeight = iHeight;
   DstInfo.eBufferProperty = BUFFER_HOST;
 
-  eDecState = DecodeFrame (kpSrc, kiSrcLen, (void_t**)ppDst, &DstInfo);
+  eDecState = DecodeFrame2 (kpSrc, kiSrcLen, (void_t**)ppDst, &DstInfo);
   if (eDecState == dsErrorFree) {
     pStride[0] = DstInfo.UsrData.sSystemBuffer.iStride[0];
     pStride[1] = DstInfo.UsrData.sSystemBuffer.iStride[1];

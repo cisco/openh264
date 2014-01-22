@@ -353,10 +353,10 @@ int CWelsH264SVCEncoder::Initialize (SVCEncodingParam* argv, const INIT_TYPE iIn
 
   m_iSrcListSize  = 1;
 
-  return Initialize ((void*)&sConfig, INIT_TYPE_CONFIG_BASED);
+  return Initialize2 ((void*)&sConfig, INIT_TYPE_CONFIG_BASED);
 }
 
-int CWelsH264SVCEncoder::Initialize (void* argv, const INIT_TYPE iInitType) {
+int CWelsH264SVCEncoder::Initialize2 (void* argv, const INIT_TYPE iInitType) {
   if (INIT_TYPE_CONFIG_BASED != iInitType || NULL == argv) {
     WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::Initialize(), invalid iInitType= %d, argv= 0x%p.\n",
              iInitType, (void*)argv);
@@ -602,7 +602,7 @@ int CWelsH264SVCEncoder::EncodeFrame (const unsigned char* pSrc, SFrameBSInfo* p
   int32_t uiFrameType = videoFrameTypeInvalid;
 
   if (RawData2SrcPic ((uint8_t*)pSrc) == 0) {
-    uiFrameType = EncodeFrame (const_cast<const SSourcePicture**> (m_pSrcPicList), 1, pBsInfo);
+    uiFrameType = EncodeFrame2 (const_cast<const SSourcePicture**> (m_pSrcPicList), 1, pBsInfo);
   }
 
 #ifdef REC_FRAME_COUNT
@@ -619,7 +619,7 @@ int CWelsH264SVCEncoder::EncodeFrame (const unsigned char* pSrc, SFrameBSInfo* p
 }
 
 
-int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture**   pSrcPicList, int nSrcPicNum, SFrameBSInfo* pBsInfo) {
+int CWelsH264SVCEncoder::EncodeFrame2 (const SSourcePicture**   pSrcPicList, int nSrcPicNum, SFrameBSInfo* pBsInfo) {
   if (! (pSrcPicList && m_pEncContext && m_bInitialFlag)) {
     return videoFrameTypeInvalid;
   }
