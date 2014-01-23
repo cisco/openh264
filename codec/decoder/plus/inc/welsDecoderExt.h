@@ -46,7 +46,7 @@
 #include "codec_app_def.h"
 #include "decoder_context.h"
 #include "welsCodecTrace.h"
-
+#include "cpu.h"
 
 class ISVCDecoder;
 
@@ -103,6 +103,8 @@ IWelsTrace*							m_pTrace;
 
 void_t InitDecoder (void_t);
 void_t UninitDecoder (void_t);
+
+XMMREG_PROTECT_DECLARE(CWelsH264Decoder);
 
 #ifdef OUTPUT_BIT_STREAM
 WelsFileHandle* m_pFBS;
