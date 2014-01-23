@@ -586,8 +586,6 @@ static int32_t CavlcGetLevelVal (int32_t iLevel[16], SReadBitsCache* pBitsCache,
 
     if (iSuffixLengthSize > 0) {
       if (pBitsCache->uiRemainBits <= iSuffixLengthSize) SHIFT_BUFFER (pBitsCache);
-      if (pBitsCache->uiRemainBits <= iSuffixLengthSize)
-        return 0;
       iLevelCode += (pBitsCache->uiCache32Bit >> (32 - iSuffixLengthSize));
       POP_BUFFER (pBitsCache, iSuffixLengthSize);
       iUsedBits  += iSuffixLengthSize;
@@ -628,8 +626,6 @@ static int32_t CavlcGetTotalZeros (int32_t& iZerosLeft, SReadBitsCache* pBitsCac
   iCount = kpBitNumMap[iTotalZeroVlcIdx - 1];
   if (pBitsCache->uiRemainBits < iCount) SHIFT_BUFFER (
       pBitsCache); // if uiRemainBits+16 still smaller than iCount?? potential bug
-  if (pBitsCache->uiRemainBits < iCount)
-    return 0;
   uiValue    = pBitsCache->uiCache32Bit >> (32 - iCount);
   iCount     = pVlcTable->kpTotalZerosTable[uiTableType][iTotalZeroVlcIdx - 1][uiValue][1];
   POP_BUFFER (pBitsCache, iCount);
@@ -647,8 +643,6 @@ static int32_t	CavlcGetRunBefore (int32_t iRun[16], SReadBitsCache* pBitsCache, 
     if (iZerosLeft > 0) {
       uiCount = g_kuiZeroLeftBitNumMap[iZerosLeft];
       if (pBitsCache->uiRemainBits < uiCount) SHIFT_BUFFER (pBitsCache);
-      if (pBitsCache->uiRemainBits < uiCount)
-        return 0;
       uiValue = pBitsCache->uiCache32Bit >> (32 - uiCount);
       if (iZerosLeft < 7) {
         uiCount = pVlcTable->kpZeroTable[iZerosLeft - 1][uiValue][1];
@@ -669,6 +663,8 @@ static int32_t	CavlcGetRunBefore (int32_t iRun[16], SReadBitsCache* pBitsCache, 
           iPrefixBits = GetPrefixBits (pBitsCache->uiCache32Bit);
 #endif
           iRun[i] = iPrefixBits + 6;
+          if (iRun[i] > iZerosLeft)
+            return -1;
           POP_BUFFER (pBitsCache, iPrefixBits);
           iUsedBits += iPrefixBits;
         }
@@ -739,8 +735,8 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
     pBs->iIndex += iUsedBits;
     return 0;
   }
-  if (uiTrailingOnes > 3 || uiTotalCoeff > 16) { /////////////////check uiTrailingOnes and uiTotalCoeff
-    return -1;
+  if ((uiTrailingOnes > 3) || (uiTotalCoeff > 16)) { /////////////////check uiTrailingOnes and uiTotalCoeff
+    return ERR_INFO_CAVLC_INVALID_TOTAL_COEFF_OR_TRAILING_ONES;
   }
   iUsedBits += CavlcGetLevelVal (iLevel, &sReadBitsCache, uiTotalCoeff, uiTrailingOnes);
 
@@ -753,8 +749,10 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
   if (iZerosLeft < 0) {
     return ERR_INFO_CAVLC_INVALID_ZERO_LEFT;
   }
-  iUsedBits += CavlcGetRunBefore (iRun, &sReadBitsCache, uiTotalCoeff, pVlcTable, iZerosLeft);
-
+  if ((i = CavlcGetRunBefore (iRun, &sReadBitsCache, uiTotalCoeff, pVlcTable, iZerosLeft)) == -1) {
+    return ERR_INFO_CAVLC_INVALID_RUN_BEFORE;
+  }
+  iUsedBits += i;
   pBs->iIndex += iUsedBits;
   iCoeffNum = -1;
 
