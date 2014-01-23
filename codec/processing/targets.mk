@@ -5,7 +5,6 @@ PROCESSING_CPP_SRCS=\
 	$(PROCESSING_SRCDIR)/./src/backgounddetection/BackgroundDetection.cpp\
 	$(PROCESSING_SRCDIR)/./src/common/memory.cpp\
 	$(PROCESSING_SRCDIR)/./src/common/thread.cpp\
-	$(PROCESSING_SRCDIR)/./src/common/util.cpp\
 	$(PROCESSING_SRCDIR)/./src/common/WelsFrameWork.cpp\
 	$(PROCESSING_SRCDIR)/./src/common/WelsFrameWorkEx.cpp\
 	$(PROCESSING_SRCDIR)/./src/complexityanalysis/ComplexityAnalysis.cpp\
