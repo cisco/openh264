@@ -3,7 +3,6 @@ PROCESSING_SRCDIR=codec/processing
 PROCESSING_CPP_SRCS=\
 	$(PROCESSING_SRCDIR)/./src/adaptivequantization/AdaptiveQuantization.cpp\
 	$(PROCESSING_SRCDIR)/./src/backgounddetection/BackgroundDetection.cpp\
-	$(PROCESSING_SRCDIR)/./src/common/cpu.cpp\
 	$(PROCESSING_SRCDIR)/./src/common/memory.cpp\
 	$(PROCESSING_SRCDIR)/./src/common/thread.cpp\
 	$(PROCESSING_SRCDIR)/./src/common/util.cpp\
