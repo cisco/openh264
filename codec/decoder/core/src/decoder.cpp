@@ -690,7 +690,7 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
  */
 void_t UpdateMaxPictureResolution (PWelsDecoderContext pCtx, const int32_t kiCurWidth, const int32_t kiCurHeight) {
   //any dimension larger than that of current dimension, should modify the max-dimension
-  if (kiCurWidth > pCtx->iMaxWidthInSps || kiCurHeight > pCtx->iMaxHeightInSps) {
+  if ((kiCurWidth * kiCurHeight) > (pCtx->iMaxWidthInSps * pCtx->iMaxHeightInSps)) {
     pCtx->iMaxWidthInSps	= kiCurWidth;
     pCtx->iMaxHeightInSps	= kiCurHeight;
   }
