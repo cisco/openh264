@@ -749,10 +749,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   bConstraintSetFlags[5]	= !!BsGetOneBit (pBs);	// constraint_set5_flag
   BsGetBits (pBs, 2);							// reserved_zero_2bits, equal to 0
   uiLevelIdc	= BsGetBits (pBs, 8);				// level_idc
-  
   iSpsId		= BsGetUe (pBs);					// seq_parameter_set_id
-
-
   if (iSpsId >= MAX_SPS_COUNT || iSpsId < 0) {	// Modified to check invalid negative iSpsId, 12/1/2009
     WelsLog (pCtx, WELS_LOG_WARNING, " iSpsId is out of range! \n");
     return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_SPS_ID_OVERFLOW);
