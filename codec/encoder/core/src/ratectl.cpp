@@ -319,7 +319,7 @@ void RcTraceVGopBitrate (sWelsEncCtx* pEncCtx) {
   if (pWelsSvcRc->iFrameCodedInVGop) {
     const int32_t kiHighestTid	= pEncCtx->pSvcParam->sDependencyLayers[kiDid].iHighestTemporalId;
     SRCTemporal* pTOverRc			= pWelsSvcRc->pTemporalOverRc;
-    int32_t iVGopBitrate;
+    int32_t iVGopBitrate = 0;
     int32_t	iTotalBits = pWelsSvcRc->iPaddingBitrateStat;
     int32_t iTid = 0;
     while (iTid <= kiHighestTid) {
