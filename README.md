@@ -84,11 +84,10 @@ Usage information can be found in testbin/CmdLineReadMe
 Using the Source
 ----------------
 codec - encoder, decoder, console (test app), build (makefile, vcproj)
-processing - raw pixel processing (used by encoder)
 build - scripts for Makefile build system.
 test - GTest unittest files.
-testbin - autobuild scripts, test app config files, yuv test files
-bin - binaries for library and test app
+testbin - autobuild scripts, test app config files
+res - yuv and bitstream test files
 
 Known Issues
 ------------
