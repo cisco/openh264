@@ -120,7 +120,7 @@ uint16_t               WelsGetMillsecond (const SWelsTime* tp);
 
 #if (defined(WIN32) && defined(_MSC_VER) && (_MSC_VER<1500)) || defined(__GNUC__)
 
-static __inline int wels_strncpy_s (char* dest, int dmax, const char* src, int slen) {
+static inline int wels_strncpy_s (char* dest, int dmax, const char* src, int slen) {
 int orig_dmax;
 char* orig_dest;
 const char* overlap_bumper;
@@ -260,7 +260,7 @@ if (dest < src) {
 return (ESNOSPC);
 }
 
-static __inline int wels_strcat_s (char* dest, int dmax, const char* src) {
+static inline int wels_strcat_s (char* dest, int dmax, const char* src) {
   int orig_dmax;
   char* orig_dest;
   const char* overlap_bumper;
@@ -387,7 +387,7 @@ static __inline int wels_strcat_s (char* dest, int dmax, const char* src) {
   return (ESNOSPC);
 }
 
-static __inline int wels_strnlen_s (const char* dest, int dmax) {
+static inline int wels_strnlen_s (const char* dest, int dmax) {
   int count;
 
   if (dest == NULL) {
