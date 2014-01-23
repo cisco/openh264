@@ -84,7 +84,7 @@ WELSVP_NAMESPACE_BEGIN
 #define GET_METHOD(x)  ((x) & 0xff)          // mask method as the lowest 8bits
 #define GET_SPECIAL(x) (((x) >> 8) & 0xff)   // mask special flag as 8bits
 
-inline_t EMethods WelsVpGetValidMethod (int32_t a) {
+inline EMethods WelsVpGetValidMethod (int32_t a) {
   int32_t iMethod = GET_METHOD (a);
   return WelsStaticCast (EMethods, WELS_CLAMP (iMethod, METHOD_NULL + 1, METHOD_MASK - 1));
 }

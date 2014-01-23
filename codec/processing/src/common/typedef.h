@@ -68,11 +68,9 @@ typedef int                int32_t  ;
 typedef unsigned int       uint32_t ;
 typedef __int64            int64_t  ;
 typedef unsigned __int64   uint64_t ;
-#define inline_t           _inline
-
-#else	// GCC
-
-#define inline_t           inline
+#if _MSC_VER < 1700
+#define inline            __inline
+#endif
 
 #endif
 
