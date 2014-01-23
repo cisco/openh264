@@ -391,10 +391,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\common\util.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\common\WelsFrameWork.cpp"
 				>
 			</File>
