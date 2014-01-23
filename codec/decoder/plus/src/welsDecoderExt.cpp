@@ -99,7 +99,7 @@ CWelsDecoder::CWelsDecoder (void_t)
   m_pTrace = CreateWelsTrace (Wels_Trace_Type);
 
   IWelsTrace::WelsVTrace (m_pTrace, IWelsTrace::WELS_LOG_INFO, "CWelsDecoder::CWelsDecoder() entry");
-
+  XMMREG_PROTECT_INIT(CWelsH264Decoder);
 
 #ifdef OUTPUT_BIT_STREAM
   SWelsTime sCurTime;
@@ -151,6 +151,7 @@ CWelsDecoder::~CWelsDecoder() {
   IWelsTrace::WelsVTrace (m_pTrace, IWelsTrace::WELS_LOG_INFO, "CWelsDecoder::~CWelsDecoder()");
 
   UninitDecoder();
+  XMMREG_PROTECT_UNINIT(CWelsH264Decoder);
 
 #ifdef OUTPUT_BIT_STREAM
   if (m_pFBS) {
@@ -384,8 +385,10 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
   m_pDecContext->iFeedbackTidInAu             = -1; //initialize
 
+  XMMREG_PROTECT_STORE(CWelsH264Decoder);
   WelsDecodeBs (m_pDecContext, kpSrc, kiSrcLen, (unsigned char**)ppDst,
                 pDstInfo); //iErrorCode has been modified in this function
+  XMMREG_PROTECT_LOAD(CWelsH264Decoder);
 
   pDstInfo->eWorkMode = (EDecodeMode)m_pDecContext->iDecoderMode;
 
