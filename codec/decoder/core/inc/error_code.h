@@ -57,7 +57,7 @@ ERR_BOUND				= 31,
  *
  */
 #define GENERATE_ERROR_NO(iErrLevel, iErrInfo)	((iErrLevel << 16) | (iErrInfo & 0xFFFF))
-
+#define ERR_INVALID_INTRA4X4_MODE -1
 
 /* ERR_LEVEL */
 //-----------------------------------------------------------------------------------------------------------
