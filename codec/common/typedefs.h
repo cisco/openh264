@@ -35,6 +35,7 @@
 #define WELS_TYPE_DEFINES_H__
 
 #include <limits.h>
+#include <stddef.h>
 
 ////////////////////////////////////////////////////////////////////////////
 // NOTICE : ALL internal implement MUST use the data type defined as below
@@ -66,10 +67,6 @@ typedef float     real32_t;
 #undef EPSN
 #endif//EPSN
 #define EPSN	  (0.000001f) // (1e-6)	// desired float precision
-
-#ifndef NULL
-#define NULL 0
-#endif
 
 typedef bool bool_t;
 typedef int32_t BOOL_T;

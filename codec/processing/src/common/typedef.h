@@ -50,9 +50,8 @@
 #define WELSVP_NAMESPACE_BEGIN      namespace nsWelsVP {
 #define WELSVP_NAMESPACE_END        }
 
-#ifdef _MSC_VER
 #include <stddef.h>
-#else
+#ifndef _MSC_VER
 #include <stdint.h>
 #endif
 
@@ -80,10 +79,6 @@ typedef bool    bool_t   ;
 #if defined(_WIN32) || defined(_MACH_PLATFORM) || defined(__GNUC__)
 typedef float   float_t  ;
 typedef double  double_t ;
-#endif
-
-#ifndef NULL
-#define NULL    0
 #endif
 
 enum {
