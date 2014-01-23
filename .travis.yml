@@ -8,5 +8,5 @@ before_install:
 #link libcrypto for 32bit
   - sudo ln -s /lib/i386-linux-gnu/libcrypto.so.1.0.0 /lib/i386-linux-gnu/libcrypto.so
 install: make gtest-bootstrap
-script: make -B ENABLE64BIT=Yes && make test && make -B ENABLE64BIT=Yes BUILDTYPE=Release && make test && make -B && make test && make -B BUILDTYPE=Release && make test
+script: make -B ENABLE64BIT=Yes && make test && make -B ENABLE64BIT=Yes BUILDTYPE=Debug && make test && make -B && make test && make -B BUILDTYPE=Debug && make test
 
