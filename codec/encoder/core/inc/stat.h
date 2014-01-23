@@ -45,9 +45,9 @@
  */
 typedef struct TagStatQuality {
 
-  real32_t	rYPsnr[5];
-  real32_t	rUPsnr[5];
-  real32_t	rVPsnr[5];
+  float	rYPsnr[5];
+  float	rUPsnr[5];
+  float	rVPsnr[5];
 
 } SStatQuality;
 

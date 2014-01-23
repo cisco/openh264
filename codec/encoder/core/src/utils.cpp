@@ -60,12 +60,12 @@ namespace WelsSVCEnc {
 void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, va_list argv);
 void WelsLogNil (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, va_list argv);
 
-real32_t WelsCalcPsnr (const void* kpTarPic,
-                       const int32_t kiTarStride,
-                       const void* kpRefPic,
-                       const int32_t kiRefStride,
-                       const int32_t kiWidth,
-                       const int32_t kiHeight);
+float WelsCalcPsnr (const void* kpTarPic,
+                    const int32_t kiTarStride,
+                    const void* kpRefPic,
+                    const int32_t kiRefStride,
+                    const int32_t kiWidth,
+                    const int32_t kiHeight);
 
 // to fill default routines
 #ifdef ENABLE_TRACE_FILE
@@ -343,7 +343,7 @@ void WelsLog (void* pCtx, int32_t iLevel, const str_t* kpFmt, ...) {
 
 #ifndef CALC_PSNR
 #define CONST_FACTOR_PSNR	(10.0 / log(10.0))	// for good computation
-#define CALC_PSNR(w, h, s)	((real32_t)(CONST_FACTOR_PSNR * log( 65025.0 * w * h / iSqe )))
+#define CALC_PSNR(w, h, s)	((float)(CONST_FACTOR_PSNR * log( 65025.0 * w * h / iSqe )))
 #endif//CALC_PSNR
 
 /*
@@ -365,12 +365,12 @@ void WelsLog (void* pCtx, int32_t iLevel, const str_t* kpFmt, ...) {
  * \note	N/A
  *************************************************************************************
  */
-real32_t WelsCalcPsnr (const void* kpTarPic,
-                       const int32_t kiTarStride,
-                       const void* kpRefPic,
-                       const int32_t kiRefStride,
-                       const int32_t kiWidth,
-                       const int32_t kiHeight) {
+float WelsCalcPsnr (const void* kpTarPic,
+                    const int32_t kiTarStride,
+                    const void* kpRefPic,
+                    const int32_t kiRefStride,
+                    const int32_t kiWidth,
+                    const int32_t kiHeight) {
   int64_t	iSqe = 0;
   int32_t x, y;
   uint8_t* pTar = (uint8_t*)kpTarPic;
