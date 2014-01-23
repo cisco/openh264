@@ -519,6 +519,11 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   if (uiSliceType > 4)
     uiSliceType -= 5;
 
+  if((eNalType == NAL_UNIT_CODED_SLICE_IDR) && (uiSliceType != 2)){
+    WelsLog (pCtx, WELS_LOG_WARNING, "Invalid slice type(%d) in IDR picture. \n", uiSliceType);
+    return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SLICE_TYPE);
+  }
+
   if (kbExtensionFlag) {
     if (uiSliceType > 2) {
       WelsLog (pCtx, WELS_LOG_WARNING, "Invalid slice type(%d).\n", uiSliceType);

@@ -81,7 +81,7 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
   int32_t iColorFormat = videoFormatInternal;
   static int32_t iFrameNum = 0;
 
-  EDecodeMode     eDecoderMode    = AUTO_MODE;
+  EDecodeMode     eDecoderMode    = SW_MODE;
   EBufferProperty	eOutputProperty = BUFFER_DEVICE;
 
   CUtils cOutputModule;
