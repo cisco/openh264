@@ -73,8 +73,8 @@ void GeneralBilinearFastDownsampler_c (uint8_t* pDst, const int32_t kiDstStride,
                                        uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
   const uint32_t kuiScaleBitWidth = 16, kuiScaleBitHeight = 15;
   const uint32_t kuiScaleWidth = (1 << kuiScaleBitWidth), kuiScaleHeight = (1 << kuiScaleBitHeight);
-  int32_t fScalex = (int32_t) ((float_t)kiSrcWidth / (float_t)kiDstWidth * kuiScaleWidth);
-  int32_t fScaley = (int32_t) ((float_t)kiSrcHeight / (float_t)kiDstHeight * kuiScaleHeight);
+  int32_t fScalex = (int32_t) ((float)kiSrcWidth / (float)kiDstWidth * kuiScaleWidth);
+  int32_t fScaley = (int32_t) ((float)kiSrcHeight / (float)kiDstHeight * kuiScaleHeight);
   uint32_t x;
   int32_t iYInverse, iXInverse;
 
@@ -142,8 +142,8 @@ void GeneralBilinearAccurateDownsampler_c (uint8_t* pDst, const int32_t kiDstStr
     uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
   const int32_t kiScaleBit = 15;
   const int32_t kiScale = (1 << kiScaleBit);
-  int32_t iScalex = (int32_t) ((float_t)kiSrcWidth / (float_t)kiDstWidth * kiScale);
-  int32_t iScaley = (int32_t) ((float_t)kiSrcHeight / (float_t)kiDstHeight * kiScale);
+  int32_t iScalex = (int32_t) ((float)kiSrcWidth / (float)kiDstWidth * kiScale);
+  int32_t iScaley = (int32_t) ((float)kiSrcHeight / (float)kiDstHeight * kiScale);
   int64_t x;
   int32_t iYInverse, iXInverse;
 
@@ -208,8 +208,8 @@ void GeneralBilinearAccurateDownsampler_c (uint8_t* pDst, const int32_t kiDstStr
 //  const int32_t kiScaleBitWidth = 16, kiScaleBitHeight = 15;
 //  const uint32_t kuiScaleWidth = (1 << kiScaleBitWidth), kuiScaleHeight = (1 << kiScaleBitHeight);
 //
-//  uint32_t uiScalex = (uint32_t) ((float_t)kiSrcWidth / (float_t)kiDstWidth * kuiScaleWidth);
-//  uint32_t uiScaley = (uint32_t) ((float_t)kiSrcHeight / (float_t)kiDstHeight * kuiScaleHeight);
+//  uint32_t uiScalex = (uint32_t) ((float)kiSrcWidth / (float)kiDstWidth * kuiScaleWidth);
+//  uint32_t uiScaley = (uint32_t) ((float)kiSrcHeight / (float)kiDstHeight * kuiScaleHeight);
 //
 //  GeneralBilinearFastDownsampler_sse2 (pDst, kiDstStride, kiDstWidth, kiDstHeight,
 //                                       pSrc, kiSrcStride, kiSrcWidth, kiSrcHeight, uiScalex, uiScaley);
@@ -221,8 +221,8 @@ void GeneralBilinearAccurateDownsampler_c (uint8_t* pDst, const int32_t kiDstStr
 //  const int32_t kiScaleBit = 15;
 //  const uint32_t kuiScale = (1 << kiScaleBit);
 //
-//  uint32_t uiScalex = (uint32_t) ((float_t)kiSrcWidth / (float_t)kiDstWidth * kuiScale);
-//  uint32_t uiScaley = (uint32_t) ((float_t)kiSrcHeight / (float_t)kiDstHeight * kuiScale);
+//  uint32_t uiScalex = (uint32_t) ((float)kiSrcWidth / (float)kiDstWidth * kuiScale);
+//  uint32_t uiScaley = (uint32_t) ((float)kiSrcHeight / (float)kiDstHeight * kuiScale);
 //
 //  GeneralBilinearAccurateDownsampler_sse2 (pDst, kiDstStride, kiDstWidth, kiDstHeight,
 //      pSrc, kiSrcStride, kiSrcWidth, kiSrcHeight, uiScalex, uiScaley);

@@ -69,12 +69,12 @@ EResult CAdaptiveQuantization::Process (int32_t iType, SPixMap* pSrcPixMap, SPix
   SVAACalcResult*     pVaaCalcResults = NULL;
   int8_t   iMotionTextureIndexToDeltaQp = 0;
   int32_t	 iAverMotionTextureIndexToDeltaQp = 0;	// double to uint32
-  double_t dAverageMotionIndex = 0.0;	// double to float
-  double_t dAverageTextureIndex = 0.0;
+  double dAverageMotionIndex = 0.0;	// double to float
+  double dAverageTextureIndex = 0.0;
 
-  double_t dQStep = 0.0;
-  double_t dLumaMotionDeltaQp = 0;
-  double_t dLumaTextureDeltaQp = 0;
+  double dQStep = 0.0;
+  double dLumaMotionDeltaQp = 0;
+  double dLumaTextureDeltaQp = 0;
 
   uint8_t* pRefFrameY = NULL, *pCurFrameY = NULL;
   int32_t iRefStride = 0, iCurStride = 0;
@@ -170,7 +170,7 @@ EResult CAdaptiveQuantization::Process (int32_t iType, SPixMap* pSrcPixMap, SPix
   pMotionTexture = m_sAdaptiveQuantParam.pMotionTextureUnit;
   for (j = 0; j < iMbHeight; j ++) {
     for (i = 0; i < iMbWidth; i++) {
-      double_t a = pMotionTexture->uiTextureIndex / dAverageTextureIndex;
+      double a = pMotionTexture->uiTextureIndex / dAverageTextureIndex;
       dQStep = (a - 1) / (a + MODEL_ALPHA);
       dLumaTextureDeltaQp = MODEL_TIME * dQStep;// range +- 6
 
