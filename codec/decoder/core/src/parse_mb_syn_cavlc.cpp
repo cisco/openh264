@@ -735,7 +735,7 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
     pBs->iIndex += iUsedBits;
     return 0;
   }
-  if (uiTrailingOnes > 3 || uiTotalCoeff > 16) { /////////////////check uiTrailingOnes and uiTotalCoeff
+  if ((uiTrailingOnes > 3) || (uiTotalCoeff > 16)) { /////////////////check uiTrailingOnes and uiTotalCoeff
     return ERR_INFO_CAVLC_INVALID_TOTAL_COEFF_OR_TRAILING_ONES;
   }
   iUsedBits += CavlcGetLevelVal (iLevel, &sReadBitsCache, uiTotalCoeff, uiTrailingOnes);
