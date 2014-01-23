@@ -75,7 +75,7 @@ typedef unsigned __int64   uint64_t ;
 #endif
 
 typedef char    str_t    ; // [comment]: specific use plain char only for character parameters
-typedef int32_t bool_t   ;
+typedef bool    bool_t   ;
 
 #if defined(_WIN32) || defined(_MACH_PLATFORM) || defined(__GNUC__)
 typedef float   float_t  ;
