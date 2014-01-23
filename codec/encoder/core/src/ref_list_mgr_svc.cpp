@@ -224,7 +224,7 @@ static inline void HandleLTRMarkFeedback (sWelsEncCtx* pCtx) {
         }
 
         pLtr->iLTRMarkSuccessNum++;
-        pLtr->iCurLtrIdx = (++pLtr->iCurLtrIdx % LONG_TERM_REF_NUM);
+        pLtr->iCurLtrIdx = (pLtr->iCurLtrIdx+1)%LONG_TERM_REF_NUM;
         pLtr->iLTRMarkMode = (pLtr->iLTRMarkSuccessNum >= (LONG_TERM_REF_NUM)) ? (LTR_DELAY_MARK) : (LTR_DIRECT_MARK);
         WelsLog (pCtx, WELS_LOG_WARNING, "LTR mark mode =%d", pLtr->iLTRMarkMode);
         pLtr->bLTRMarkEnable = TRUE;
@@ -350,27 +350,27 @@ BOOL_T WelsUpdateRefList (sWelsEncCtx* pCtx) {
   if (NULL == pRefList || NULL == pRefList->pRef[0] || NULL == pRefList->pRef[kiSwapIdx])
     return FALSE;
 
-  if ((NULL != pCtx->pDecPic)
+  if (NULL != pCtx->pDecPic) {
 #if !defined(ENABLE_FRAME_DUMP)	// to save complexity, 1/6/2009
-      && (pParamD->iHighestTemporalId == 0 || kuiTid < pParamD->iHighestTemporalId)
+    if ((pParamD->iHighestTemporalId == 0) || (kuiTid < pParamD->iHighestTemporalId))
 #endif// !ENABLE_FRAME_DUMP
-     )
     // Expanding picture for future reference
     ExpandReferencingPicture (pCtx->pDecPic, pCtx->pFuncList->pfExpandLumaPicture, pCtx->pFuncList->pfExpandChromaPicture);
 
-  // move picture in list
-  pCtx->pDecPic->uiTemporalId = kuiTid;
-  pCtx->pDecPic->uiSpatialId	= kuiDid;
-  pCtx->pDecPic->iFrameNum		= pCtx->iFrameNum;
-  pCtx->pDecPic->iFramePoc		= pCtx->iPOC;
-  pCtx->pDecPic->uiRecieveConfirmed = RECIEVE_UNKOWN;
-  pCtx->pDecPic->bUsedAsRef	= true;
+    // move picture in list
+    pCtx->pDecPic->uiTemporalId = kuiTid;
+    pCtx->pDecPic->uiSpatialId	= kuiDid;
+    pCtx->pDecPic->iFrameNum	= pCtx->iFrameNum;
+    pCtx->pDecPic->iFramePoc	= pCtx->iPOC;
+    pCtx->pDecPic->uiRecieveConfirmed = RECIEVE_UNKOWN;
+    pCtx->pDecPic->bUsedAsRef	= true;
 
-  for (iRefIdx = pRefList->uiShortRefCount - 1; iRefIdx >= 0; --iRefIdx)	{
-    pRefList->pShortRefList[iRefIdx + 1] = pRefList->pShortRefList[iRefIdx];
+    for (iRefIdx = pRefList->uiShortRefCount - 1; iRefIdx >= 0; --iRefIdx)	{
+      pRefList->pShortRefList[iRefIdx + 1] = pRefList->pShortRefList[iRefIdx];
+    }
+    pRefList->pShortRefList[0] = pCtx->pDecPic;
+    pRefList->uiShortRefCount++;
   }
-  pRefList->pShortRefList[0] = pCtx->pDecPic;
-  pRefList->uiShortRefCount++;
 
   if (keSliceType == P_SLICE) {
     if (pCtx->uiTemporalId == 0) {
@@ -398,7 +398,7 @@ BOOL_T WelsUpdateRefList (sWelsEncCtx* pCtx) {
     if (pCtx->pSvcParam->bEnableLongTermReference)	{
       LTRMarkProcess (pCtx);
 
-      pLtr->iCurLtrIdx = (++pLtr->iCurLtrIdx % LONG_TERM_REF_NUM);
+      pLtr->iCurLtrIdx = (pLtr->iCurLtrIdx+1)%LONG_TERM_REF_NUM;
       pLtr->iLTRMarkSuccessNum = 1; //IDR default suceess
       pLtr->bLTRMarkEnable =  TRUE;
       pLtr->uiLtrMarkInterval = 0;

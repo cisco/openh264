@@ -452,8 +452,6 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (void* pCtx, const SSourcePicture
       // spatial layer is able to encode indeed
       if ((iTemporalId != INVALID_TEMPORAL_ID)) {
         // down sampling performed
-        if (NULL == pSrcPic)
-          return -1;
 
         pDstPic	= pEncCtx->pSpatialPic[iDependencyId][iPicturePos];	// small
         iShrinkWidth = pScaledPicture->iScaledWidth[iDependencyId];

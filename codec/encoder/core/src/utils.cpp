@@ -179,20 +179,16 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
       t_now = (struct tm*)LOCALTIME (&l_time);
       gettimeofday (&tv, NULL);
 #endif//WIN32
-      if (iBufLeft > 0) {
 #ifdef _MSC_VER
 #if _MSC_VER >= 1500
-        iCurUsed = SNPRINTF (&pBuf[iBufUsed], iBufLeft, iBufLeft, "[0x%p @ ", pEncCtx);	// confirmed_safe_unsafe_usage
+      iCurUsed = SNPRINTF (&pBuf[iBufUsed], iBufLeft, iBufLeft, "[0x%p @ ", pEncCtx);	// confirmed_safe_unsafe_usage
 #else
-        iCurUsed = SNPRINTF (&pBuf[iBufUsed], iBufLeft, "[0x%p @ ", pEncCtx);	// confirmed_safe_unsafe_usage
+      iCurUsed = SNPRINTF (&pBuf[iBufUsed], iBufLeft, "[0x%p @ ", pEncCtx);	// confirmed_safe_unsafe_usage
 #endif//_MSC_VER >= 1500
 #endif//_MSC_VER
-        if (iCurUsed >= 0) {
-          iBufUsed += iCurUsed;
-          iBufLeft -= iCurUsed;
-        }
-      } else {
-        return;
+      if (iCurUsed >= 0) {
+        iBufUsed += iCurUsed;
+        iBufLeft -= iCurUsed;
       }
 
       if (iBufLeft > 0) {
