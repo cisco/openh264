@@ -11,4 +11,5 @@ else
 ASMFLAGS += -f win32 -DPREFIX
 CFLAGS += -DWIN32
 endif
+EXEEXT = .exe
 
