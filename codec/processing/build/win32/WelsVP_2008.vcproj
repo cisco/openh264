@@ -52,7 +52,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="../../../common/"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;WELSVP_EXPORTS;X86_ASM"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -224,6 +224,7 @@
 				Optimization="3"
 				EnableIntrinsicFunctions="false"
 				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="../../../common/"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;WELSVP_EXPORTS;X86_ASM"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="false"
