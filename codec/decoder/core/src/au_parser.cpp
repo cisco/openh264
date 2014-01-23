@@ -479,6 +479,8 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
   int32_t iPicHeight		= 0;
   int32_t iBitSize		= 0;
   int32_t iErr				= ERR_NONE;
+  if (kiSrcLen <= 0)
+    return iErr;
 
   pBs	     = &pCtx->sBs;	// SBitStringAux instance for non VCL NALs decoding
   iBitSize = (kiSrcLen << 3) - BsGetTrailingBits (pRbsp + kiSrcLen - 1); // convert into bit
