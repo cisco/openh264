@@ -448,7 +448,7 @@ int32_t CheckIntra4x4PredMode (int32_t* pSampleAvail, int8_t* pMode, int32_t iIn
   int8_t iFinalMode;
 
   if ((*pMode < 0) || (*pMode > MAX_PRED_MODE_ID_I4x4)) {
-    return -1;
+    return ERR_INVALID_INTRA4X4_MODE;
   }
 
   if (I4_PRED_DC == *pMode) {
@@ -464,7 +464,7 @@ int32_t CheckIntra4x4PredMode (int32_t* pSampleAvail, int8_t* pMode, int32_t iIn
   } else {
     bool_t bModeAvail = CHECK_I4_MODE (*pMode, iLeftAvail, iTopAvail, bLeftTopAvail);
     if (0 == bModeAvail) {
-      return -1;
+      return ERR_INVALID_INTRA4X4_MODE;
     }
 
     iFinalMode = *pMode;
@@ -840,7 +840,7 @@ int32_t ParseIntra4x4ModeConstrain0 (PNeighAvail pNeighAvail, int8_t* pIntraPred
     }
 
     iFinalMode = CheckIntra4x4PredMode (&iSampleAvail[0], &iBestMode, i);
-    if (iFinalMode < 0) {
+    if (iFinalMode  == ERR_INVALID_INTRA4X4_MODE) {
       return ERR_INFO_INVALID_I4x4_PRED_MODE;
     }
 
@@ -912,7 +912,7 @@ int32_t ParseIntra4x4ModeConstrain1 (PNeighAvail pNeighAvail, int8_t* pIntraPred
     }
 
     iFinalMode = CheckIntra4x4PredMode (&iSampleAvail[0], &iBestMode, i);
-    if (iFinalMode < 0) {
+    if (iFinalMode  == ERR_INVALID_INTRA4X4_MODE) {
       return ERR_INFO_INVALID_I4x4_PRED_MODE;
     }
 
