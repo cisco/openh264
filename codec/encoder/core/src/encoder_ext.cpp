@@ -1966,7 +1966,7 @@ void OutputCpuFeaturesLog (uint32_t uiCpuFeatureFlags, uint32_t uiCpuCores, int3
            uiCpuCores,
            iCacheLineSize);
 
-//#ifdef _DEBUG	// output at console & _debug
+#ifdef _DEBUG	// output at console & _debug
   fprintf (stderr, "WELS CPU features/capacities (0x%x) detected: \n"	\
            "HTT:      %c, "	\
            "MMX:      %c, "	\
@@ -2009,7 +2009,7 @@ void OutputCpuFeaturesLog (uint32_t uiCpuFeatureFlags, uint32_t uiCpuCores, int3
            (uiCpuFeatureFlags & WELS_CPU_AES) ? 'Y' : 'N',
            uiCpuCores,
            iCacheLineSize);
-//#endif//_DEBUG
+#endif//_DEBUG
 }
 
 /*!
