@@ -1,5 +1,5 @@
 ASM = nasm
-CFLAGS += -DMT_ENABLED
+CFLAGS += -DMT_ENABLED -MMD -MP
 LDFLAGS +=
 ifeq ($(ENABLE64BIT), Yes)
 ASMFLAGS += -f win64

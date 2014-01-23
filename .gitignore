@@ -2,6 +2,9 @@
 *.o
 *.ko
 
+# Dependency files
+*.d
+
 # Libraries
 *.lib
 *.a
