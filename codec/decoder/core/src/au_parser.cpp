@@ -481,6 +481,7 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
   int32_t iErr				= ERR_NONE;
   if (kiSrcLen <= 0)
     return iErr;
+
   pBs	     = &pCtx->sBs;	// SBitStringAux instance for non VCL NALs decoding
   iBitSize = (kiSrcLen << 3) - BsGetTrailingBits (pRbsp + kiSrcLen - 1); // convert into bit
   eNalType = pCtx->sCurNalHead.eNalUnitType;
@@ -629,6 +630,69 @@ int32_t DecodeSpsSvcExt (PWelsDecoderContext pCtx, PSubsetSps pSpsExt, PBitStrin
   return 0;
 }
 
+// table A-1 - Level limits
+static const SLevelLimits g_kSLevelLimits[17] = {
+  {1485, 99, 396, 64, 175, -256, 255, 2, 0x7fff}, /* level 1 */
+  {1485, 99, 396, 128, 350, -256, 255, 2, 0x7fff}, /* level 1.b */
+  {3000, 396, 900, 192, 500, -512, 511, 2, 0x7fff}, /* level 1.1 */
+  {6000, 396, 2376, 384, 1000, -512, 511, 2, 0x7fff}, /* level 1.2 */
+  {11880, 396, 2376, 768, 2000, -512, 511, 2, 0x7fff}, /* level 1.3 */
+  {11880, 396, 2376, 2000, 2000, -512, 511, 2, 0x7fff}, /* level 2 */
+  {19800, 792, 4752, 4000, 4000, -1024, 1023, 2, 0x7fff}, /* level 2.1 */
+  {20250, 1620, 8100, 4000, 4000, -1024, 1023, 2, 0x7fff}, /* level 2.2 */
+  {40500, 1620, 8100, 10000, 10000, -1024, 1023, 2, 32 }, /* level 3 */
+  {108000, 3600, 18000, 14000, 14000, -2048, 2047, 4, 16}, /* level 3.1 */
+  {216000, 5120, 20480, 20000, 20000, -2048, 2047, 4, 16}, /* level 3.2 */
+  {245760, 8192, 32768, 20000, 25000, -2048, 2047, 4, 16}, /* level 4 */
+  {245760, 8192, 32768, 50000, 62500, -2048, 2047, 2, 16}, /* level 4.1 */
+  {522240, 8704, 34816, 50000, 62500, -2048, 2047, 2, 16}, /* level 4.2 */
+  {589824, 22080, 110400, 135000, 135000, -2048, 2047, 2, 16}, /* level 5 */
+  {983040, 36864, 184320, 240000, 240000, -2048, 2047, 2, 16}, /* level 5.1 */
+  {2073600, 36864, 184320, 240000, 240000, -2048, 2047, 2, 16} /* level 5.2 */
+};
+
+const SLevelLimits *GetLevelLimits(int32_t iLevelIdx, bool_t bConstraint3) {
+  switch (iLevelIdx) {
+  case 10:
+    return &g_kSLevelLimits[0];
+  case 11:
+    if(bConstraint3)
+      return &g_kSLevelLimits[1];
+    else
+      return &g_kSLevelLimits[2];
+  case 12:
+    return &g_kSLevelLimits[3];
+  case 13:
+    return &g_kSLevelLimits[4];
+  case 20:
+    return &g_kSLevelLimits[5];
+  case 21:
+    return &g_kSLevelLimits[6];
+  case 22:
+    return &g_kSLevelLimits[7];
+  case 30:
+    return &g_kSLevelLimits[8];
+  case 31:
+    return &g_kSLevelLimits[9];
+  case 32:
+    return &g_kSLevelLimits[10];
+  case 40:
+    return &g_kSLevelLimits[11];
+  case 41:
+    return &g_kSLevelLimits[12];
+  case 42:
+    return &g_kSLevelLimits[13];
+  case 50:
+    return &g_kSLevelLimits[14];
+  case 51:
+    return &g_kSLevelLimits[15];
+  case 52:
+    return &g_kSLevelLimits[16];
+  default:
+    return NULL;
+  }
+  return NULL;
+}
 /*!
  *************************************************************************************
  * \brief	to parse Sequence Parameter Set (SPS)
@@ -685,10 +749,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   bConstraintSetFlags[5]	= !!BsGetOneBit (pBs);	// constraint_set5_flag
   BsGetBits (pBs, 2);							// reserved_zero_2bits, equal to 0
   uiLevelIdc	= BsGetBits (pBs, 8);				// level_idc
-
   iSpsId		= BsGetUe (pBs);					// seq_parameter_set_id
-
-
   if (iSpsId >= MAX_SPS_COUNT || iSpsId < 0) {	// Modified to check invalid negative iSpsId, 12/1/2009
     WelsLog (pCtx, WELS_LOG_WARNING, " iSpsId is out of range! \n");
     return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_SPS_ID_OVERFLOW);
@@ -719,7 +780,12 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     pCtx->bSpsAvailFlags[iSpsId] = true; // added for EC, 10/28/2009
 #endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
   }
-
+  const SLevelLimits *pSLevelLimits = GetLevelLimits(uiLevelIdc, bConstraintSetFlags[3]);
+  if (NULL == pSLevelLimits) {
+     WelsLog (pCtx, WELS_LOG_WARNING, "ParseSps(): level_idx (%d).\n", uiLevelIdc);
+     return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_NON_BASELINE);
+  }
+  else pSps->pSLevelLimits = pSLevelLimits;
   // syntax elements in default
   pSps->uiChromaFormatIdc	= 1;
   pSps->uiBitDepthLuma		=
