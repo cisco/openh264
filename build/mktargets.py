@@ -69,8 +69,17 @@ if args.include is not None:
     INCLUDE = args.include
 if args.out is not None:
     OUTFILE = args.out
+else:
+    OUTFILE = os.path.join(args.directory, OUTFILE)
 if args.cpp_suffix is not None:
     CPP_SUFFIX = args.cpp_suffix
+
+OUTFILE = os.path.abspath(OUTFILE)
+try:
+    os.chdir(args.directory)
+except:
+    sys.exit(1)
+
 (cpp, asm) = find_sources()
 
 
