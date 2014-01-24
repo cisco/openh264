@@ -77,11 +77,11 @@ void WelsResetRefList (sWelsEncCtx* pCtx);
 /*
  *	update reference picture list
  */
-BOOL_T WelsUpdateRefList (sWelsEncCtx* pCtx);
+bool_t WelsUpdateRefList (sWelsEncCtx* pCtx);
 /*
  *	build reference picture list
  */
-BOOL_T WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t kiPOC);
+bool_t WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t kiPOC);
 
 /*
  *	update syntax for reference base related

@@ -494,7 +494,7 @@ void InitIntraAnalysisVaaInfo (SWelsFuncPtrList* pFuncList, const uint32_t kuiCp
 #endif//X86_ASM
 }
 
-BOOL_T MdIntraAnalysisVaaInfo (sWelsEncCtx* pEncCtx, uint8_t* pEncMb) {
+bool_t MdIntraAnalysisVaaInfo (sWelsEncCtx* pEncCtx, uint8_t* pEncMb) {
 
   SDqLayer* pCurDqLayer	= pEncCtx->pCurDqLayer;
   const int32_t kiLineSize  = pCurDqLayer->iEncStride[0];

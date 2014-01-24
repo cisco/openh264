@@ -231,7 +231,7 @@ BsFlush (pBs);
 }
 
 
-static inline BOOL_T   BsCheckByteAlign (SBitStringAux* pBs) {
+static inline bool_t   BsCheckByteAlign (SBitStringAux* pBs) {
 return ! (pBs->iLeftBits & 0x7);
 }
 

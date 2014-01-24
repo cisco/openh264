@@ -114,12 +114,12 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   int32_t						m_iMaxPicHeight;
 
   int32_t						m_iCspInternal;
-  BOOL_T					m_bInitialFlag;
+  bool_t					m_bInitialFlag;
 
 #ifdef OUTPUT_BIT_STREAM
   FILE*				m_pFileBs;
   FILE*               m_pFileBsSize;
-  BOOL_T				m_bSwitch;
+  bool_t				m_bSwitch;
   int32_t					m_iSwitchTimes;
 #endif//OUTPUT_BIT_STREAM
 

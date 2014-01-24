@@ -130,7 +130,7 @@ void PredictSadSkip (int8_t* pRefIndexCache, bool_t* pMbSkipCache, int32_t* pSad
 
 //  for pfGetVarianceFromIntraVaa function ptr adaptive by CPU features, 6/7/2010
 void InitIntraAnalysisVaaInfo (SWelsFuncPtrList* pFuncList, const uint32_t kuiCpuFlag);
-BOOL_T MdIntraAnalysisVaaInfo (sWelsEncCtx* pEncCtx, uint8_t* pEncMb);
+bool_t MdIntraAnalysisVaaInfo (sWelsEncCtx* pEncCtx, uint8_t* pEncMb);
 
 uint8_t MdInterAnalysisVaaInfo_c (int32_t* pSad8x8);
 

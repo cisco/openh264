@@ -70,7 +70,6 @@ typedef char      str_t;
 #define EPSN	  (0.000001f) // (1e-6)	// desired float precision
 
 typedef bool bool_t;
-typedef int32_t BOOL_T;
 
 #ifndef FALSE
 #define FALSE   ((int32_t)0)

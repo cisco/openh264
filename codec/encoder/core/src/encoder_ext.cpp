@@ -636,10 +636,10 @@ static  void  InitMbInfo (sWelsEncCtx* pEnc, SMB*   pList, SDqLayer* pLayer, con
         &pEnc->pRefIndexBlock4x4[MB_BLOCK8x8_NUM * kiOffset]);
 
   for (iIdx = 0; iIdx < iMbNum; iIdx++) {
-    BOOL_T     bLeft;
-    BOOL_T     bTop;
-    BOOL_T     bLeftTop;
-    BOOL_T     bRightTop;
+    bool_t     bLeft;
+    bool_t     bTop;
+    bool_t     bLeftTop;
+    bool_t     bRightTop;
     int32_t  iLeftXY, iTopXY, iLeftTopXY, iRightTopXY;
     uint8_t  uiSliceIdc;
 
@@ -1667,7 +1667,7 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
       while (ilayer < pParam->iNumDependencyLayer) {
         SDqLayer* pDq	= pCtx->ppDqLayerList[ilayer];
         SDLayerParam* pDlp = &pCtx->pSvcParam->sDependencyLayers[ilayer];
-        const BOOL_T kbIsDynamicSlicing = (SM_DYN_SLICE == pDlp->sMso.uiSliceMode);
+        const bool_t kbIsDynamicSlicing = (SM_DYN_SLICE == pDlp->sMso.uiSliceMode);
 
         // pDq layers
         if (NULL != pDq) {
@@ -2312,10 +2312,10 @@ void DynslcUpdateMbNeighbourInfoListForAllSlices (SSliceCtx* pSliceCtx, SMB* pMb
     const int32_t kiMbXY				= pMb->iMbXY;
     const int32_t kiMbX				= pMb->iMbX;
     const int32_t kiMbY				= pMb->iMbY;
-    BOOL_T     bLeft;
-    BOOL_T     bTop;
-    BOOL_T     bLeftTop;
-    BOOL_T     bRightTop;
+    bool_t     bLeft;
+    bool_t     bTop;
+    bool_t     bLeftTop;
+    bool_t     bRightTop;
     int32_t  uiSliceIdc;
     int32_t   iLeftXY, iTopXY, iLeftTopXY, iRightTopXY;
 

@@ -99,7 +99,7 @@ void WelsMdInterMbLoopOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice, vo
                                         const int32_t kiSliceFirstMbXY);	// for inter dynamic slice
 
 
-BOOL_T DynSlcJudgeSliceBoundaryStepBack (void* pEncCtx, void* pSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
+bool_t DynSlcJudgeSliceBoundaryStepBack (void* pEncCtx, void* pSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
     SDynamicSlicingStack* pDss);
 }
 #endif //SVC_ENCODE_SLICE_H__
