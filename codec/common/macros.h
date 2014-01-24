@@ -72,11 +72,9 @@
 #endif
 
 #define ALIGNED_DECLARE( type, var, n ) __declspec(align(n)) type var
-#define __align8(t,v) __declspec(align(8)) t v
 #define __align16(t,v) __declspec(align(16)) t v
 #elif defined(__GNUC__)
 #define ALIGNED_DECLARE( type, var, n ) type var __attribute__((aligned(n)))
-#define __align8(t,v) t v __attribute__ ((aligned (8)))
 #define __align16(t,v) t v __attribute__ ((aligned (16)))
 #endif//_MSC_VER
 
@@ -101,13 +99,6 @@ __declspec(align(alignment)) type name[(sizex)*(sizey)]
 #endif
 
 
-#if !defined(SIZEOFRGB24)
-#define SIZEOFRGB24(cx, cy)	(3 * (cx) * (cy))
-#endif//SIZEOFRGB24
-
-#if !defined(SIZEOFRGB32)
-#define SIZEOFRGB32(cx, cy)	(4 * (cx) * (cy))
-#endif//SIZEOFRGB32
 #if 1
 #ifndef	WELS_ALIGN
 #define WELS_ALIGN(x, n)	(((x)+(n)-1)&~((n)-1))
@@ -244,70 +235,6 @@ return iY;
 	}
 #endif//#if WELS_VERIFY_RETURN_PROC_IF
 
-/*
- * Description:	to check variable validation and return
- *	case_if:	negtive condition to be verified
- *	return:		NONE
- */
-#ifndef WELS_VERIFY_IF
-#define WELS_VERIFY_IF(bCaseIf) \
-	if ( bCaseIf ){ \
-		return; \
-	}
-#endif//#if WELS_VERIFY_IF
-
-/*
- * Description:	to check variable validation and return with correspoinding process advance.
- *	case_if:	negtive condition to be verified
- *	proc:		process need preform
- *	return:		NONE
- */
-#ifndef WELS_VERIFY_PROC_IF
-#define WELS_VERIFY_PROC_IF(bCaseIf, fProc) \
-	if ( bCaseIf ){ \
-		fProc; \
-		return; \
-	}
-#endif//#if WELS_VERIFY_IF
-
-/*
- * Description: to safe free a ptr with free function pointer
- *  p:			pointer to be destroyed
- *	free_fn:	free function pointer used
- */
-#ifndef WELS_SAFE_FREE_P
-#define WELS_SAFE_FREE_P(pPtr, fFreeFunc) \
-	do{ \
-		if ( NULL != (pPtr) ){ \
-			fFreeFunc( (pPtr) ); \
-			(pPtr) = NULL; \
-		} \
-	}while( 0 );
-#endif//#if WELS_SAFE_FREE_P
-
-/*
- * Description: to safe free an array ptr with free function pointer
- *	arr:		pointer to an array, something like "**p";
- *	num:		number of elements in array
- *  free_fn:	free function pointer
- */
-#ifndef WELS_SAFE_FREE_ARR
-#define WELS_SAFE_FREE_ARR(pArray, iNum, fFreeFunc) \
-	do{ \
-		if ( NULL != (pArray) ){ \
-			int32_t iIdx = 0; \
-			while( iIdx < iNum ){ \
-				if ( NULL != (pArray)[iIdx] ){ \
-					fFreeFunc( (pArray)[iIdx] ); \
-					(pArray)[iIdx] = NULL; \
-				} \
-				++ iIdx; \
-			} \
-			fFreeFunc((pArray)); \
-			(pArray) = NULL; \
-		} \
-	}while( 0 );
-#endif//#if WELS_SAFE_FREE_ARR
 static inline int32_t WELS_LOG2 (uint32_t v) {
 int32_t r = 0;
 while (v >>= 1) {
