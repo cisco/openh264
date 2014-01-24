@@ -1628,7 +1628,7 @@ BOOL_T WelsMdFirstIntraMode (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCa
   return FALSE;
 }
 
-void WelsMdInterMb (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb) {
+void WelsMdInterMb (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pUnused) {
   sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pEnc;
   SWelsMD* pWelsMd				= (SWelsMD*)pMd;
   SDqLayer* pCurDqLayer			= pEncCtx->pCurDqLayer;

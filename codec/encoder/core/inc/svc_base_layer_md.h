@@ -69,7 +69,7 @@ int32_t WelsMdP8x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWe
 void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
 BOOL_T WelsMdFirstIntraMode (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache);
 //BOOL_T svc_md_first_intra_mode_constrained(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache);
-void WelsMdInterMb (void* pEncCtx, void* pWelsMd, SSlice* pSlice, SMB* pCurMb);
+void WelsMdInterMb (void* pEncCtx, void* pWelsMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pUnused);
 
 //both used in BL and EL
 //void wels_md_inter_init ( SWelsMD* pMd, const uint8_t ref_idx, const bool_t is_highest_dlayer_flag );
