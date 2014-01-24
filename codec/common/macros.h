@@ -232,14 +232,13 @@ return r;
 
 #define CLIP3_QP_0_51(q)		WELS_CLIP3(q, 0, 51)	// ((q) < (0) ? (0) : ((q) > (51) ? (51) : (q)))
 #define   CALC_BI_STRIDE(width,bitcount)  ((((width * bitcount) + 31) & ~31) >> 3)
-#ifdef    WORDS_BIGENDIAN
 
+
+#ifdef    WORDS_BIGENDIAN
 static inline uint32_t ENDIAN_FIX (uint32_t x) {
 return x;
 }
-
-#else
-
+#else //!WORDS_BIGENDIAN
 
 #if defined(_MSC_VER) && defined(_M_IX86)
 static inline uint32_t ENDIAN_FIX (uint32_t x) {
@@ -260,11 +259,11 @@ x = ((x & 0xff000000) >> 24) | ((x & 0xff0000) >> 8) |
 #endif
 return x;
 }
+#endif//GCC
+
+#endif//!WORDS_BIGENDIAN
 
 
-#endif
-
-#endif
 #ifndef BUTTERFLY1x2
 #define BUTTERFLY1x2(b) (((b)<<8) | (b))
 #endif//BUTTERFLY1x2
