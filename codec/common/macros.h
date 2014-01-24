@@ -94,10 +94,6 @@ __declspec(align(alignment)) type name[(sizex)*(sizey)]
 	__declspec(align(alignment)) type name[(size)]
 #endif//#if _MACH_PLATFORM
 
-#if defined(APPLE_IOS)
-#define inline  //For iOS platform
-#endif
-
 
 #ifndef	WELS_ALIGN
 #define WELS_ALIGN(x, n)	(((x)+(n)-1)&~((n)-1))
