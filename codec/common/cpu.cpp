@@ -44,9 +44,9 @@
 
 
 
-#define    CPU_Vender_AMD    "AuthenticAMD"
-#define    CPU_Vender_INTEL  "GenuineIntel"
-#define    CPU_Vender_CYRIX  "CyrixInstead"
+#define    CPU_Vendor_AMD    "AuthenticAMD"
+#define    CPU_Vendor_INTEL  "GenuineIntel"
+#define    CPU_Vendor_CYRIX  "CyrixInstead"
 
 #if defined(X86_ASM)
 
@@ -54,7 +54,7 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
   uint32_t uiCPU = 0;
   uint32_t uiFeatureA = 0, uiFeatureB = 0, uiFeatureC = 0, uiFeatureD = 0;
   int32_t  CacheLineSize = 0;
-  int8_t   chVenderName[16] = { 0 };
+  int8_t   chVendorName[16] = { 0 };
   uint32_t uiMaxCpuidLevel = 0;
 
   if (!WelsCPUIdVerify()) {
@@ -62,7 +62,7 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
     return 0;
   }
 
-  WelsCPUId (0, &uiFeatureA, (uint32_t*)&chVenderName[0], (uint32_t*)&chVenderName[8], (uint32_t*)&chVenderName[4]);
+  WelsCPUId (0, &uiFeatureA, (uint32_t*)&chVendorName[0], (uint32_t*)&chVendorName[8], (uint32_t*)&chVendorName[4]);
   uiMaxCpuidLevel = uiFeatureA;
   if (uiMaxCpuidLevel == 0) {
     /* maximum input value for basic cpuid information */
@@ -92,8 +92,8 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
     /* CMOV instruction checking */
     uiCPU |= WELS_CPU_CMOV;
   }
-  if ((!strcmp ((const str_t*)chVenderName, CPU_Vender_INTEL)) ||
-      (!strcmp((const str_t*)chVenderName, CPU_Vender_AMD)) ) {	// confirmed_safe_unsafe_usage
+  if ((!strcmp ((const str_t*)chVendorName, CPU_Vendor_INTEL)) ||
+      (!strcmp((const str_t*)chVendorName, CPU_Vendor_AMD)) ) {	// confirmed_safe_unsafe_usage
     if (uiFeatureD & 0x10000000) {
       /* Multi-Threading checking: contains of multiple logic processors */
       uiCPU |= WELS_CPU_HTT;
@@ -139,7 +139,7 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
     } else {
       *pNumberOfLogicProcessors = 1;
     }
-    if( !strcmp((const str_t*)chVenderName, CPU_Vender_INTEL) ){
+    if( !strcmp((const str_t*)chVendorName, CPU_Vendor_INTEL) ){
       if( uiMaxCpuidLevel >= 4 ){
         uiFeatureC = 0;
         WelsCPUId(0x4, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);
@@ -152,7 +152,7 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
 
   WelsCPUId (0x80000000, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);
 
-  if ((!strcmp ((const str_t*)chVenderName, CPU_Vender_AMD))
+  if ((!strcmp ((const str_t*)chVendorName, CPU_Vendor_AMD))
       && (uiFeatureA >= 0x80000001)) {	// confirmed_safe_unsafe_usage
     WelsCPUId (0x80000001, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);
     if (uiFeatureD & 0x00400000) {
@@ -163,7 +163,7 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
     }
   }
 
-  if (!strcmp ((const str_t*)chVenderName, CPU_Vender_INTEL)) {	// confirmed_safe_unsafe_usage
+  if (!strcmp ((const str_t*)chVendorName, CPU_Vendor_INTEL)) {	// confirmed_safe_unsafe_usage
     int32_t  family, model;
 
     WelsCPUId (1, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);
@@ -176,8 +176,8 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
   }
 
   // get cache line size
-  if ((!strcmp ((const str_t*)chVenderName, CPU_Vender_INTEL))
-      || ! (strcmp ((const str_t*)chVenderName, CPU_Vender_CYRIX))) {	// confirmed_safe_unsafe_usage
+  if ((!strcmp ((const str_t*)chVendorName, CPU_Vendor_INTEL))
+      || ! (strcmp ((const str_t*)chVendorName, CPU_Vendor_CYRIX))) {	// confirmed_safe_unsafe_usage
     WelsCPUId (1, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);
 
     CacheLineSize = (uiFeatureB & 0xff00) >>
