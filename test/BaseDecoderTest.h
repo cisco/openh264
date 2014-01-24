@@ -1,7 +1,7 @@
 #ifndef __BASEDECODERTEST_H__
 #define __BASEDECODERTEST_H__
 
-#include <stdint.h>
+#include "test_stdint.h"
 #include <limits.h>
 #include <fstream>
 #include "codec_api.h"
