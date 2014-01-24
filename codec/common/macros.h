@@ -72,16 +72,10 @@
 #define inline	__inline
 #endif
 
-#define __FASTCALL   __fastcall
 #define ALIGNED_DECLARE( type, var, n ) __declspec(align(n)) type var
 #define __align8(t,v) __declspec(align(8)) t v
 #define __align16(t,v) __declspec(align(16)) t v
 #elif defined(__GNUC__)
-#if !defined(MAC_POWERPC)
-#define __FASTCALL    __attribute__ ((fastcall))
-#else
-#define __FASTCALL	// mean NULL for mac ppc
-#endif//MAC_POWERPC
 #define ALIGNED_DECLARE( type, var, n ) type var __attribute__((aligned(n)))
 #define __align8(t,v) t v __attribute__ ((aligned (8)))
 #define __align16(t,v) t v __attribute__ ((aligned (16)))
@@ -107,15 +101,9 @@ __declspec(align(alignment)) type name[(sizex)*(sizey)]
 #if _MSC_VER < 1700
 #define inline	__inline
 #endif
-#define __FASTCALL   __fastcall
 //	#define __align8(t,v) __declspec(align(8)) t v
 #define __align16(t,v) __declspec(align(16)) t v
 #elif defined(__GNUC__)
-#if !defined(MAC_POWERPC) && !defined(UNIX) && !defined(ANDROID_NDK) && !defined(APPLE_IOS)
-#define __FASTCALL    __attribute__ ((fastcall))// linux, centos, mac_x86 can be used
-#else
-#define __FASTCALL	// mean NULL for mac_ppc, solaris(sparc/x86)
-#endif//MAC_POWERPC
 //	#define __align8(t,v) t v __attribute__ ((aligned (8)))
 #define __align16(t,v) t v __attribute__ ((aligned (16)))
 
