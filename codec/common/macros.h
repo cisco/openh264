@@ -65,7 +65,6 @@
 	_tp (*_nm)[(_cy)] = (_tp (*)[(_cy)])_nm ## _tEmP_al;
 
 
-///////////// from encoder
 #if defined(_MSC_VER)
 
 #if(_MSC_VER < 1700)
@@ -97,21 +96,9 @@ __declspec(align(alignment)) type name[(sizex)*(sizey)]
 	__declspec(align(alignment)) type name[(size)]
 #endif//#if _MACH_PLATFORM
 
-#if defined(_MSC_VER)
-#if _MSC_VER < 1700
-#define inline	__inline
-#endif
-//	#define __align8(t,v) __declspec(align(8)) t v
-#define __align16(t,v) __declspec(align(16)) t v
-#elif defined(__GNUC__)
-//	#define __align8(t,v) t v __attribute__ ((aligned (8)))
-#define __align16(t,v) t v __attribute__ ((aligned (16)))
-
 #if defined(APPLE_IOS)
 #define inline  //For iOS platform
 #endif
-
-#endif//_MSC_VER
 
 
 #if !defined(SIZEOFRGB24)
