@@ -276,14 +276,6 @@ return x;
 #define BUTTERFLY4x8(dw) (((uint64_t)(dw)<<32) | (dw))
 #endif//BUTTERFLY4x8
 
-static inline int32_t WELS_MEDIAN (int32_t x,  int32_t y, int32_t z) {
-int32_t t = (x - y) & ((x - y) >> 31);
-x -= t;
-y += t;
-y -= (y - z) & ((y - z) >> 31);
-y += (x - y) & ((x - y) >> 31);
-return y;
-}
 static inline BOOL_T WELS_POWER2_IF (uint32_t v) {
 return (v && ! (v & (v - 1)));
 }

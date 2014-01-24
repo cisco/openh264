@@ -83,8 +83,8 @@ void PredMv (const SMVComponentUnit* kpMvComp, int8_t iPartIdx, int8_t iPartW, i
     *sMvp = sMvC;
     break;
   default:
-    sMvp->iMvX = WELS_MEDIAN (sMvA.iMvX, sMvB.iMvX, sMvC.iMvX);
-    sMvp->iMvY = WELS_MEDIAN (sMvA.iMvY, sMvB.iMvY, sMvC.iMvY);
+    sMvp->iMvX = WelsMedian (sMvA.iMvX, sMvB.iMvX, sMvC.iMvX);
+    sMvp->iMvY = WelsMedian (sMvA.iMvY, sMvB.iMvY, sMvC.iMvY);
     break;
   }
 }
