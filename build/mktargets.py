@@ -76,7 +76,6 @@ if args.cpp_suffix is not None:
 
 
 f = open(OUTFILE, "w")
-f.write("%s_PREFIX=%s\n"%(PREFIX, PREFIX))
 f.write("%s_SRCDIR=%s\n"%(PREFIX, args.directory))
 
 f.write("%s_CPP_SRCS=\\\n"%(PREFIX))

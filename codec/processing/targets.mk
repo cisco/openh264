@@ -1,4 +1,3 @@
-PROCESSING_PREFIX=PROCESSING
 PROCESSING_SRCDIR=codec/processing
 PROCESSING_CPP_SRCS=\
 	$(PROCESSING_SRCDIR)/./src/adaptivequantization/AdaptiveQuantization.cpp\
