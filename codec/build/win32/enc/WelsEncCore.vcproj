@@ -724,6 +724,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\..\common\logging.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\encoder\core\src\mc.cpp"
 				>
 				<FileConfiguration

@@ -148,7 +148,6 @@ int32_t  LoadWelsTraceModule();
 int32_t  UnloadWelsTraceModule();
 
  private:
-void_t*   m_hTraceHandle;
 
 CM_WELS_TRACE m_fpDebugTrace;
 CM_WELS_TRACE m_fpInfoTrace;

@@ -931,6 +931,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\common\logging.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\decoder\core\src\manage_dec_ref.cpp"
 					>
 				</File>

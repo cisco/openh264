@@ -56,7 +56,6 @@ class welsCodecTrace {
  private:
 
   int32_t m_WelsTraceExistFlag;
-  void* m_hTraceHandle;
 
  public:
   static int32_t	m_iTraceLevel;
