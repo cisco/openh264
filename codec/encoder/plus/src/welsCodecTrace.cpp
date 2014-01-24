@@ -137,17 +137,10 @@ static void* GetProcessAddress (CFBundleRef bundle, const str_t* lpszprocname) {
 #endif
 
 int32_t	welsCodecTrace::m_iTraceLevel			= WELS_LOG_DEFAULT;
-#if defined(_WIN32)
 CM_WELS_TRACE welsCodecTrace::m_fpDebugTrace	= NULL;
 CM_WELS_TRACE welsCodecTrace::m_fpInfoTrace	= NULL;
 CM_WELS_TRACE welsCodecTrace::m_fpWarnTrace	= NULL;
 CM_WELS_TRACE welsCodecTrace::m_fpErrorTrace	= NULL;
-#else
-CM_WELS_TRACE2 welsCodecTrace::m_fpDebugTrace   = NULL;
-CM_WELS_TRACE2 welsCodecTrace::m_fpInfoTrace	= NULL;
-CM_WELS_TRACE2 welsCodecTrace::m_fpWarnTrace	= NULL;
-CM_WELS_TRACE2 welsCodecTrace::m_fpErrorTrace   = NULL;
-#endif//WIN32
 
 welsCodecTrace::welsCodecTrace() {
   m_hTraceHandle = NULL;
@@ -272,7 +265,6 @@ int32_t welsCodecTrace::WelsTraceModuleIsExist() {
 }
 
 void welsCodecTrace::TraceString (int32_t iLevel, const str_t* str) {
-#ifdef _WIN32
   switch (iLevel) {
   case WELS_LOG_ERROR:
     if (m_fpErrorTrace)
@@ -295,30 +287,6 @@ void welsCodecTrace::TraceString (int32_t iLevel, const str_t* str) {
       m_fpInfoTrace ("%s", str);
     break;
   }
-#else
-  switch (iLevel) {
-  case WELS_LOG_ERROR:
-    if (m_fpErrorTrace)
-      m_fpErrorTrace ("CODEC", "%s", str);
-    break;
-  case WELS_LOG_WARNING:
-    if (m_fpWarnTrace)
-      m_fpWarnTrace ("CODEC", "%s",  str);
-    break;
-  case WELS_LOG_INFO:
-    if (m_fpInfoTrace)
-      m_fpInfoTrace ("CODEC", "%s",  str);
-    break;
-  case WELS_LOG_DEBUG:
-    if (m_fpInfoTrace)
-      m_fpInfoTrace ("CODEC", "%s",  str);
-    break;
-  default:
-    if (m_fpInfoTrace)
-      m_fpInfoTrace ("CODEC", "%s",  str);
-    break;
-  }
-#endif
 }
 
 #define MAX_LOG_SIZE	1024

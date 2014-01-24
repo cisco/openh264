@@ -322,7 +322,6 @@ int32_t  CWelsCodecTrace::WriteString (int32_t iLevel, const str_t* pStr) {
   if (m_hTraceHandle)
 #endif
   {
-#ifdef _WIN32
     switch (iLevel) {
     case WELS_LOG_ERROR:
       if (m_fpErrorTrace)
@@ -345,30 +344,6 @@ int32_t  CWelsCodecTrace::WriteString (int32_t iLevel, const str_t* pStr) {
         m_fpDebugTrace ("%s", pStr);
       break;
     }
-#else
-    switch (iLevel) {
-    case WELS_LOG_ERROR:
-      if (m_fpErrorTrace)
-        m_fpErrorTrace ("CODEC", "%s", pStr);
-      break;
-    case WELS_LOG_WARNING:
-      if (m_fpWarnTrace)
-        m_fpWarnTrace ("CODEC", "%s",  pStr);
-      break;
-    case WELS_LOG_INFO:
-      if (m_fpInfoTrace)
-        m_fpInfoTrace ("CODEC", "%s",  pStr);
-      break;
-    case WELS_LOG_DEBUG:
-      if (m_fpInfoTrace)
-        m_fpInfoTrace ("CODEC", "%s",  pStr);
-      break;
-    default:
-      if (m_fpInfoTrace)
-        m_fpInfoTrace ("CODEC", "%s",  pStr);
-      break;
-    }
-#endif
   }
 
   return 0;
