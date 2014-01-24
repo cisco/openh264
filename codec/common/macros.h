@@ -73,26 +73,20 @@
 
 #define ALIGNED_DECLARE( type, var, n ) __declspec(align(n)) type var
 #define __align16(t,v) __declspec(align(16)) t v
-#elif defined(__GNUC__)
-#define ALIGNED_DECLARE( type, var, n ) type var __attribute__((aligned(n)))
-#define __align16(t,v) t v __attribute__ ((aligned (16)))
-#endif//_MSC_VER
-
-#if defined(_MACH_PLATFORM) || defined(__GNUC__)
-#define ALIGNED_DECLARE_MATRIX_2D(name,sizex,sizey,type,alignment) \
-	type name[(sizex)*(sizey)] __attribute__((aligned(alignment)))
-#else //_MSC_VER <= 1200
-#define ALIGNED_DECLARE_MATRIX_2D(name,sizex,sizey,type,alignment) \
-__declspec(align(alignment)) type name[(sizex)*(sizey)]
-#endif//#if _MACH_PLATFORM
-
-#if defined(_MACH_PLATFORM) || defined(__GNUC__)
-#define ALIGNED_DECLARE_MATRIX_1D(name,size,type,alignment) \
-	type name[size] __attribute__((aligned(alignment)))
-#else //_MSC_VER <= 1200
 #define ALIGNED_DECLARE_MATRIX_1D(name,size,type,alignment) \
 	__declspec(align(alignment)) type name[(size)]
-#endif//#if _MACH_PLATFORM
+#define ALIGNED_DECLARE_MATRIX_2D(name,sizex,sizey,type,alignment) \
+__declspec(align(alignment)) type name[(sizex)*(sizey)]
+
+#elif defined(__GNUC__)
+
+#define ALIGNED_DECLARE( type, var, n ) type var __attribute__((aligned(n)))
+#define __align16(t,v) t v __attribute__ ((aligned (16)))
+#define ALIGNED_DECLARE_MATRIX_1D(name,size,type,alignment) \
+	type name[size] __attribute__((aligned(alignment)))
+#define ALIGNED_DECLARE_MATRIX_2D(name,sizex,sizey,type,alignment) \
+	type name[(sizex)*(sizey)] __attribute__((aligned(alignment)))
+#endif//_MSC_VER
 
 
 #ifndef	WELS_ALIGN
