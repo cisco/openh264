@@ -99,11 +99,12 @@ __declspec(align(alignment)) type name[(sizex)*(sizey)]
 #endif
 
 
-#if 1
 #ifndef	WELS_ALIGN
 #define WELS_ALIGN(x, n)	(((x)+(n)-1)&~((n)-1))
 #endif//WELS_ALIGN
 
+
+#if 1 // Alternative implementation of WELS_MAX and WELS_MIN
 #ifndef WELS_MAX
 #define WELS_MAX(x, y)	((x) > (y) ? (x) : (y))
 #endif//WELS_MAX
@@ -111,12 +112,7 @@ __declspec(align(alignment)) type name[(sizex)*(sizey)]
 #ifndef WELS_MIN
 #define WELS_MIN(x, y)	((x) < (y) ? (x) : (y))
 #endif//WELS_MIN
-#else
-
-#ifndef	WELS_ALIGN
-#define WELS_ALIGN(x, n)	(((x)+(n)-1)&~((n)-1))
-#endif//WELS_ALIGN
-
+#else // Alternative implementation of WELS_MAX and WELS_MIN
 #ifndef WELS_MAX
 #define WELS_MAX(x, y)	((x) - (((x)-(y))&(((x)-(y))>>31)))
 #endif//WELS_MAX
@@ -124,8 +120,8 @@ __declspec(align(alignment)) type name[(sizex)*(sizey)]
 #ifndef WELS_MIN
 #define WELS_MIN(x, y)	((y) + (((x)-(y))&(((x)-(y))>>31)))
 #endif//WELS_MIN
+#endif // Alternative implementation of WELS_MAX and WELS_MIN
 
-#endif
 
 #ifndef WELS_CEIL
 #define WELS_CEIL(x)	ceil(x)	// FIXME: low complexity instead of math library used
