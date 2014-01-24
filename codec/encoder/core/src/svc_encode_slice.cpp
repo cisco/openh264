@@ -647,10 +647,10 @@ void WelsCodePSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
   //MD switch
   if (kbBaseAvail && kbHighestSpatial) {
     //initial pMd pointer
-    pEncCtx->pFuncList->pfInterMd			= (PInterMdFunc)WelsMdInterMbEnhancelayer;
+    pEncCtx->pFuncList->pfInterMd			= WelsMdInterMbEnhancelayer;
   } else {
     //initial pMd pointer
-    pEncCtx->pFuncList->pfInterMd            = (PInterMdFunc)WelsMdInterMb;
+    pEncCtx->pFuncList->pfInterMd            = WelsMdInterMb;
   }
   WelsPSliceMdEnc (pEncCtx, pSlice, kbHighestSpatial);
 }
@@ -665,10 +665,10 @@ void WelsCodePOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
   //MD switch
   if (kbBaseAvail && kbHighestSpatial) {
     //initial pMd pointer
-    pEncCtx->pFuncList->pfInterMd			= (PInterMdFunc)WelsMdInterMbEnhancelayer;
+    pEncCtx->pFuncList->pfInterMd			= WelsMdInterMbEnhancelayer;
   } else {
     //initial pMd pointer
-    pEncCtx->pFuncList->pfInterMd            = (PInterMdFunc)WelsMdInterMb;
+    pEncCtx->pFuncList->pfInterMd            = WelsMdInterMb;
   }
   WelsPSliceMdEncDynamic (pEncCtx, pSlice, kbHighestSpatial);
 }
