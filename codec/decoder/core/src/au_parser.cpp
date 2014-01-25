@@ -533,9 +533,6 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
       return iErr;
     }
 
-    if (ERR_NONE == iErr)
-      UpdateMaxPictureResolution (pCtx, iPicWidth, iPicHeight);
-
     break;
 
   case NAL_UNIT_PPS:

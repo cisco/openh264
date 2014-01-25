@@ -185,8 +185,6 @@ typedef struct TagWelsDecoderContext {
 
   int32_t				iImgWidthInPixel;	// width of image in pixel reconstruction picture to be output
   int32_t				iImgHeightInPixel;// height of image in pixel reconstruction picture to be output
-  int32_t				iMaxWidthInSps;	// maximal width of pixel in SPS sets
-  int32_t				iMaxHeightInSps;	// maximal height of pixel in SPS sets
 
   // Derived common elements
   SNalUnitHeader		sCurNalHead;
