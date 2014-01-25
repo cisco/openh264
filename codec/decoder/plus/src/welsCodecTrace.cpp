@@ -45,90 +45,10 @@
 #include "welsCodecTrace.h"
 #include "utils.h"
 #include "logging.h"
-#if defined LINUX || defined SOLARIS || defined UNIX || defined MACOS //LINUX/SOLARIS/UNIX
-#include <dlfcn.h>
-#endif
-
-#if defined(MACOS)
-#include <carbon/carbon.h>
-#include <CoreFoundation/CFBundle.h>
-#endif//MACOS
 
 //using namespace WelsDec;
 
 namespace WelsDec {
-
-#ifdef MACOS
-static CFBundleRef LoadLibrary (const char* lpszbundle) {
-  // 1.get bundle path
-  char cBundlePath[PATH_MAX];
-  memset (cBundlePath, 0, PATH_MAX);
-
-  Dl_info 	dlInfo;
-  static int  sDummy;
-  dladdr ((void_t*)&sDummy, &dlInfo);
-
-  strlcpy (cBundlePath, dlInfo.dli_fname, PATH_MAX);
-
-  char* pPath = NULL;
-  for (int i = 4; i > 0; i--) {
-    pPath = strrchr (cBundlePath, '/'); //confirmed_safe_unsafe_usage
-    if (pPath) {
-      *pPath = 0;
-    } else {
-      break;
-    }
-  }
-  if (pPath) {
-    strlcat (cBundlePath, "/", PATH_MAX);
-  } else {
-    return NULL;
-  }
-
-  strlcat (cBundlePath, lpszbundle, PATH_MAX);
-
-  FSRef bundlePath;
-  OSStatus iStatus = FSPathMakeRef ((unsigned char*)cBundlePath, &bundlePath, NULL);
-  if (noErr != iStatus)
-    return NULL;
-
-  CFURLRef bundleURL = CFURLCreateFromFSRef (kCFAllocatorSystemDefault, &bundlePath);
-  if (NULL == bundleURL)
-    return NULL;
-
-  // 2.get bundle ref
-  CFBundleRef bundleRef = CFBundleCreate (kCFAllocatorSystemDefault, bundleURL);
-  CFRelease (bundleURL);
-
-//	Boolean bReturn = FALSE;
-  if (NULL != bundleRef) {
-    //	bReturn = CFBundleLoadExecutable(bundleRef);
-  }
-
-  return bundleRef;
-}
-
-static Boolean FreeLibrary (CFBundleRef bundle) {
-  if (NULL != bundle) {
-    //	CFBundleUnloadExecutable(bundle);
-    CFRelease (bundle);
-  }
-
-  return TRUE;
-}
-
-static void_t* GetProcessAddress (CFBundleRef bundle, const char* lpszprocname) {
-  if (NULL == bundle)
-    return NULL;
-
-  CFStringRef cfprocname = CFStringCreateWithCString (NULL, lpszprocname, CFStringGetSystemEncoding());
-  void_t* processAddress = CFBundleGetFunctionPointerForName (bundle, cfprocname);
-  CFRelease (cfprocname);
-
-  return processAddress;
-}
-#endif
-
 
 
 int32_t  CWelsTraceBase::SetTraceLevel (int iLevel) {
@@ -191,7 +111,6 @@ int32_t CWelsTraceWinDgb::WriteString (int32_t iLevel, const str_t* pStr) {
 #endif
 
 CWelsCodecTrace::CWelsCodecTrace() {
-  m_hTraceHandle = NULL;
   m_fpDebugTrace = NULL;
   m_fpInfoTrace = NULL;
   m_fpWarnTrace = NULL;
@@ -205,111 +124,14 @@ CWelsCodecTrace::~CWelsCodecTrace() {
 }
 
 int32_t  CWelsCodecTrace::LoadWelsTraceModule() {
-#ifdef NO_DYNAMIC_VP
   m_fpDebugTrace = welsStderrTrace<WELS_LOG_DEBUG>;
   m_fpInfoTrace = welsStderrTrace<WELS_LOG_INFO>;
   m_fpWarnTrace = welsStderrTrace<WELS_LOG_WARNING>;
   m_fpErrorTrace = welsStderrTrace<WELS_LOG_ERROR>;
-#else
-#if defined _WIN32
-  HMODULE hHandle = ::LoadLibrary ("welstrace.dll");
-//	HMODULE handle = ::LoadLibrary("contrace.dll");  // for c7 trace
-  if (NULL == hHandle)
-    return -1;
-
-  CHAR chPath[ _MAX_PATH] = {0};
-  GetModuleFileName ((HMODULE)hHandle, chPath, _MAX_PATH);
-
-  m_hTraceHandle = ::LoadLibrary (chPath);
-
-  OutputDebugStringA (chPath);
-  if (m_hTraceHandle) {
-    m_fpDebugTrace = (CM_WELS_TRACE)::GetProcAddress ((HMODULE)m_hTraceHandle, "WELSDEBUGA");
-    m_fpInfoTrace = (CM_WELS_TRACE)::GetProcAddress ((HMODULE)m_hTraceHandle, "WELSINFOA");
-    m_fpWarnTrace = (CM_WELS_TRACE)::GetProcAddress ((HMODULE)m_hTraceHandle, "WELSWARNA");
-    m_fpErrorTrace = (CM_WELS_TRACE)::GetProcAddress ((HMODULE)m_hTraceHandle, "WELSERRORA");
-  }
-
-  // coverity scan uninitial
-  if (hHandle != NULL) {
-    ::FreeLibrary (hHandle);
-    hHandle = NULL;
-  }
-#elif defined MACOS
-  m_hTraceHandle = LoadLibrary ("welstrace.bundle");
-  if (m_hTraceHandle) {
-    m_fpDebugTrace = (CM_WELS_TRACE)GetProcessAddress ((CFBundleRef)m_hTraceHandle, "WELSDEBUG2");
-    m_fpInfoTrace = (CM_WELS_TRACE)GetProcessAddress ((CFBundleRef)m_hTraceHandle, "WELSINFO2");
-    m_fpWarnTrace = (CM_WELS_TRACE)GetProcessAddress ((CFBundleRef)m_hTraceHandle, "WELSWARN2");
-    m_fpErrorTrace = (CM_WELS_TRACE)GetProcessAddress ((CFBundleRef)m_hTraceHandle, "WELSERROR2");
-  }
-#elif defined LINUX || defined SOLARIS || defined UNIX
-//#else
-//	CCmString	cmPath;
-  str_t chPath[255] = {0};
-  Dl_info		sDlInfo;
-  static int	iMmTPAddress;
-  dladdr (&iMmTPAddress, &sDlInfo);
-
-  if (NULL == sDlInfo.dli_fname)
-    return -1;
-  WelsStrncpy (chPath, 255, (const str_t*)sDlInfo.dli_fname, WelsStrnlen ((const str_t*)sDlInfo.dli_fname, 255));
-  str_t* p = strrchr (chPath, '/'); //confirmed_safe_unsafe_usage
-  if (NULL == p)
-    return -1;
-  const int iLenTraceName = WelsStrnlen ((const str_t*)"/libwelstrace.so", 15);
-  const int iCurPos = p - chPath;
-  if (iCurPos + iLenTraceName < 255)
-    WelsStrncpy (p, 254 - iCurPos, (const str_t*)"/libwelstrace.so", iLenTraceName);
-  else
-    return -1;
-
-  m_hTraceHandle = dlopen (chPath, RTLD_LAZY);
-  if (m_hTraceHandle == NULL) {
-    WelsFileHandle* fp = WelsFopen ((const str_t*)"/tmp/trace.txt", (const str_t*)"a");
-    if (fp) {
-      fprintf (fp, "welsCodecTrace::welsCodecTrace ===> dlopen %s fail, %s\n", chPath, dlerror());
-      WelsFclose (fp);
-    }
-    return -1;
-  }
-  if (m_hTraceHandle) {
-    m_fpDebugTrace = (CM_WELS_TRACE)dlsym (m_hTraceHandle, "WELSDEBUG2");
-    m_fpInfoTrace = (CM_WELS_TRACE)dlsym (m_hTraceHandle, "WELSINFO2");
-    m_fpWarnTrace = (CM_WELS_TRACE)dlsym (m_hTraceHandle, "WELSWARN2");
-    m_fpErrorTrace = (CM_WELS_TRACE)dlsym (m_hTraceHandle, "WELSERROR2");
-    if (m_fpDebugTrace == NULL) {
-      WelsFileHandle* fp = WelsFopen ((const str_t*)"/tmp/trace.txt", (const str_t*)"a");
-      if (fp) {
-        printf ("welsCodecTrace::welsCodecTrace ===> dlsym failed (WELSDEBUG2) , dlerror = %s\n", dlerror());
-        WelsFclose (fp);
-      }
-      return -1;
-    }
-  }
-#endif
-#endif  // NO_DYNAMIC_VP
   return 0;
 }
 
 int32_t  CWelsCodecTrace::UnloadWelsTraceModule() {
-#ifndef NO_DYNAMIC_VP
-#if defined _WIN32
-  if (m_hTraceHandle) {
-    ::FreeLibrary ((HMODULE)m_hTraceHandle);
-  }
-#elif defined MACOS
-  if (m_hTraceHandle) {
-    FreeLibrary ((CFBundleRef)m_hTraceHandle);
-  }
-#elif defined LINUX || defined SOLARIS || defined UNIX
-  if (m_hTraceHandle) {
-    ::dlclose (m_hTraceHandle);
-  }
-#endif
-#endif
-
-  m_hTraceHandle = NULL;
   m_fpDebugTrace = NULL;
   m_fpInfoTrace = NULL;
   m_fpWarnTrace = NULL;
@@ -318,9 +140,6 @@ int32_t  CWelsCodecTrace::UnloadWelsTraceModule() {
 }
 
 int32_t  CWelsCodecTrace::WriteString (int32_t iLevel, const str_t* pStr) {
-#ifndef NO_DYNAMIC_VP
-  if (m_hTraceHandle)
-#endif
   {
     switch (iLevel) {
     case WELS_LOG_ERROR:
