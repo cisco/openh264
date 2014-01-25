@@ -473,7 +473,7 @@ void_t DeblockingInterMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint
   }
 }
 
-void_t /*__FASTCALL*/ FilteringEdgeLumaHV (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag) {
+void_t FilteringEdgeLumaHV (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag) {
   int32_t iMbXyIndex = pCurDqLayer->iMbXyIndex;
   int32_t iMbX      = pCurDqLayer->iMbX;
   int32_t iMbY      = pCurDqLayer->iMbY;
@@ -521,7 +521,7 @@ void_t /*__FASTCALL*/ FilteringEdgeLumaHV (PDqLayer pCurDqLayer, PDeblockingFilt
     pFilter->pLoopf->pfLumaDeblockingLT4Ver (&pDestY[ (3 << 2)*iLineSize], iLineSize, iAlpha, iBeta, iTc);
   }
 }
-void_t /*__FASTCALL*/ FilteringEdgeChromaHV (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag) {
+void_t FilteringEdgeChromaHV (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag) {
   int32_t iMbXyIndex     = pCurDqLayer->iMbXyIndex;
   int32_t iMbX      = pCurDqLayer->iMbX;
   int32_t iMbY      = pCurDqLayer->iMbY;

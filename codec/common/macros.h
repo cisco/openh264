@@ -65,79 +65,36 @@
 	_tp (*_nm)[(_cy)] = (_tp (*)[(_cy)])_nm ## _tEmP_al;
 
 
-///////////// from encoder
 #if defined(_MSC_VER)
 
 #if(_MSC_VER < 1700)
 #define inline	__inline
 #endif
 
-#define __FASTCALL   __fastcall
 #define ALIGNED_DECLARE( type, var, n ) __declspec(align(n)) type var
-#define __align8(t,v) __declspec(align(8)) t v
 #define __align16(t,v) __declspec(align(16)) t v
-#elif defined(__GNUC__)
-#if !defined(MAC_POWERPC)
-#define __FASTCALL    __attribute__ ((fastcall))
-#else
-#define __FASTCALL	// mean NULL for mac ppc
-#endif//MAC_POWERPC
-#define ALIGNED_DECLARE( type, var, n ) type var __attribute__((aligned(n)))
-#define __align8(t,v) t v __attribute__ ((aligned (8)))
-#define __align16(t,v) t v __attribute__ ((aligned (16)))
-#endif//_MSC_VER
-
-#if defined(_MACH_PLATFORM) || defined(__GNUC__)
-#define ALIGNED_DECLARE_MATRIX_2D(name,sizex,sizey,type,alignment) \
-	type name[(sizex)*(sizey)] __attribute__((aligned(alignment)))
-#else //_MSC_VER <= 1200
-#define ALIGNED_DECLARE_MATRIX_2D(name,sizex,sizey,type,alignment) \
-__declspec(align(alignment)) type name[(sizex)*(sizey)]
-#endif//#if _MACH_PLATFORM
-
-#if defined(_MACH_PLATFORM) || defined(__GNUC__)
-#define ALIGNED_DECLARE_MATRIX_1D(name,size,type,alignment) \
-	type name[size] __attribute__((aligned(alignment)))
-#else //_MSC_VER <= 1200
 #define ALIGNED_DECLARE_MATRIX_1D(name,size,type,alignment) \
 	__declspec(align(alignment)) type name[(size)]
-#endif//#if _MACH_PLATFORM
+#define ALIGNED_DECLARE_MATRIX_2D(name,sizex,sizey,type,alignment) \
+__declspec(align(alignment)) type name[(sizex)*(sizey)]
 
-#if defined(_MSC_VER)
-#if _MSC_VER < 1700
-#define inline	__inline
-#endif
-#define __FASTCALL   __fastcall
-//	#define __align8(t,v) __declspec(align(8)) t v
-#define __align16(t,v) __declspec(align(16)) t v
 #elif defined(__GNUC__)
-#if !defined(MAC_POWERPC) && !defined(UNIX) && !defined(ANDROID_NDK) && !defined(APPLE_IOS)
-#define __FASTCALL    __attribute__ ((fastcall))// linux, centos, mac_x86 can be used
-#else
-#define __FASTCALL	// mean NULL for mac_ppc, solaris(sparc/x86)
-#endif//MAC_POWERPC
-//	#define __align8(t,v) t v __attribute__ ((aligned (8)))
+
+#define ALIGNED_DECLARE( type, var, n ) type var __attribute__((aligned(n)))
 #define __align16(t,v) t v __attribute__ ((aligned (16)))
-
-#if defined(APPLE_IOS)
-#define inline  //For iOS platform
-#endif
-
+#define ALIGNED_DECLARE_MATRIX_1D(name,size,type,alignment) \
+	type name[size] __attribute__((aligned(alignment)))
+#define ALIGNED_DECLARE_MATRIX_2D(name,sizex,sizey,type,alignment) \
+	type name[(sizex)*(sizey)] __attribute__((aligned(alignment)))
 #endif//_MSC_VER
 
 
-#if !defined(SIZEOFRGB24)
-#define SIZEOFRGB24(cx, cy)	(3 * (cx) * (cy))
-#endif//SIZEOFRGB24
-
-#if !defined(SIZEOFRGB32)
-#define SIZEOFRGB32(cx, cy)	(4 * (cx) * (cy))
-#endif//SIZEOFRGB32
-#if 1
 #ifndef	WELS_ALIGN
 #define WELS_ALIGN(x, n)	(((x)+(n)-1)&~((n)-1))
 #endif//WELS_ALIGN
 
+
+#if 1 // Alternative implementation of WELS_MAX and WELS_MIN
 #ifndef WELS_MAX
 #define WELS_MAX(x, y)	((x) > (y) ? (x) : (y))
 #endif//WELS_MAX
@@ -145,12 +102,7 @@ __declspec(align(alignment)) type name[(sizex)*(sizey)]
 #ifndef WELS_MIN
 #define WELS_MIN(x, y)	((x) < (y) ? (x) : (y))
 #endif//WELS_MIN
-#else
-
-#ifndef	WELS_ALIGN
-#define WELS_ALIGN(x, n)	(((x)+(n)-1)&~((n)-1))
-#endif//WELS_ALIGN
-
+#else // Alternative implementation of WELS_MAX and WELS_MIN
 #ifndef WELS_MAX
 #define WELS_MAX(x, y)	((x) - (((x)-(y))&(((x)-(y))>>31)))
 #endif//WELS_MAX
@@ -158,8 +110,8 @@ __declspec(align(alignment)) type name[(sizex)*(sizey)]
 #ifndef WELS_MIN
 #define WELS_MIN(x, y)	((y) + (((x)-(y))&(((x)-(y))>>31)))
 #endif//WELS_MIN
+#endif // Alternative implementation of WELS_MAX and WELS_MIN
 
-#endif
 
 #ifndef WELS_CEIL
 #define WELS_CEIL(x)	ceil(x)	// FIXME: low complexity instead of math library used
@@ -269,70 +221,6 @@ return iY;
 	}
 #endif//#if WELS_VERIFY_RETURN_PROC_IF
 
-/*
- * Description:	to check variable validation and return
- *	case_if:	negtive condition to be verified
- *	return:		NONE
- */
-#ifndef WELS_VERIFY_IF
-#define WELS_VERIFY_IF(bCaseIf) \
-	if ( bCaseIf ){ \
-		return; \
-	}
-#endif//#if WELS_VERIFY_IF
-
-/*
- * Description:	to check variable validation and return with correspoinding process advance.
- *	case_if:	negtive condition to be verified
- *	proc:		process need preform
- *	return:		NONE
- */
-#ifndef WELS_VERIFY_PROC_IF
-#define WELS_VERIFY_PROC_IF(bCaseIf, fProc) \
-	if ( bCaseIf ){ \
-		fProc; \
-		return; \
-	}
-#endif//#if WELS_VERIFY_IF
-
-/*
- * Description: to safe free a ptr with free function pointer
- *  p:			pointer to be destroyed
- *	free_fn:	free function pointer used
- */
-#ifndef WELS_SAFE_FREE_P
-#define WELS_SAFE_FREE_P(pPtr, fFreeFunc) \
-	do{ \
-		if ( NULL != (pPtr) ){ \
-			fFreeFunc( (pPtr) ); \
-			(pPtr) = NULL; \
-		} \
-	}while( 0 );
-#endif//#if WELS_SAFE_FREE_P
-
-/*
- * Description: to safe free an array ptr with free function pointer
- *	arr:		pointer to an array, something like "**p";
- *	num:		number of elements in array
- *  free_fn:	free function pointer
- */
-#ifndef WELS_SAFE_FREE_ARR
-#define WELS_SAFE_FREE_ARR(pArray, iNum, fFreeFunc) \
-	do{ \
-		if ( NULL != (pArray) ){ \
-			int32_t iIdx = 0; \
-			while( iIdx < iNum ){ \
-				if ( NULL != (pArray)[iIdx] ){ \
-					fFreeFunc( (pArray)[iIdx] ); \
-					(pArray)[iIdx] = NULL; \
-				} \
-				++ iIdx; \
-			} \
-			fFreeFunc((pArray)); \
-			(pArray) = NULL; \
-		} \
-	}while( 0 );
-#endif//#if WELS_SAFE_FREE_ARR
 static inline int32_t WELS_LOG2 (uint32_t v) {
 int32_t r = 0;
 while (v >>= 1) {
@@ -344,14 +232,13 @@ return r;
 
 #define CLIP3_QP_0_51(q)		WELS_CLIP3(q, 0, 51)	// ((q) < (0) ? (0) : ((q) > (51) ? (51) : (q)))
 #define   CALC_BI_STRIDE(width,bitcount)  ((((width * bitcount) + 31) & ~31) >> 3)
-#ifdef    WORDS_BIGENDIAN
 
+
+#ifdef    WORDS_BIGENDIAN
 static inline uint32_t ENDIAN_FIX (uint32_t x) {
 return x;
 }
-
-#else
-
+#else //!WORDS_BIGENDIAN
 
 #if defined(_MSC_VER) && defined(_M_IX86)
 static inline uint32_t ENDIAN_FIX (uint32_t x) {
@@ -372,11 +259,11 @@ x = ((x & 0xff000000) >> 24) | ((x & 0xff0000) >> 8) |
 #endif
 return x;
 }
+#endif//GCC
+
+#endif//!WORDS_BIGENDIAN
 
 
-#endif
-
-#endif
 #ifndef BUTTERFLY1x2
 #define BUTTERFLY1x2(b) (((b)<<8) | (b))
 #endif//BUTTERFLY1x2
@@ -389,14 +276,6 @@ return x;
 #define BUTTERFLY4x8(dw) (((uint64_t)(dw)<<32) | (dw))
 #endif//BUTTERFLY4x8
 
-static inline int32_t WELS_MEDIAN (int32_t x,  int32_t y, int32_t z) {
-int32_t t = (x - y) & ((x - y) >> 31);
-x -= t;
-y += t;
-y -= (y - z) & ((y - z) >> 31);
-y += (x - y) & ((x - y) >> 31);
-return y;
-}
 static inline BOOL_T WELS_POWER2_IF (uint32_t v) {
 return (v && ! (v & (v - 1)));
 }

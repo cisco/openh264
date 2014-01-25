@@ -873,7 +873,7 @@ void PredictSad (int8_t* pRefIndexCache, int32_t* pSadCostCache, int32_t uiRef, 
       *pSadPred = iSadC;
       break;
     default:
-      *pSadPred = WELS_MEDIAN (kiSadA, kiSadB, iSadC);
+      *pSadPred = WelsMedian (kiSadA, kiSadB, iSadC);
       break;
     }
   }
@@ -920,7 +920,7 @@ void PredictSadSkip (int8_t* pRefIndexCache, bool_t* pMbSkipCache, int32_t* pSad
       *iSadPredSkip = iSadC;
       break;
     default:
-      *iSadPredSkip = WELS_MEDIAN (kiSadA, kiSadB, iSadC);
+      *iSadPredSkip = WelsMedian (kiSadA, kiSadB, iSadC);
       break;
     }
   }
