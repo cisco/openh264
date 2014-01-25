@@ -112,7 +112,7 @@ CWelsLib::CWelsLib (void* pEncCtx) {
   void* shModule = NULL;
   shModule = dlopen (WelsVPLib, RTLD_LAZY);
   if (shModule == NULL)
-    printf ("dlopen %s iRet=%x, err=%s\n", WelsVPLib, shModule, dlerror());
+    printf ("dlopen %s iRet=%p, err=%s\n", WelsVPLib, shModule, dlerror());
 #endif
 
   m_pVpLib = (void*)shModule;
@@ -156,7 +156,7 @@ void* CWelsLib::QueryFunction (const str_t* pName) {
     void* shModule = m_pVpLib;
     pFunc = (void*)dlsym (shModule, pName);
     if (pFunc == NULL)
-      printf ("dlsym %s iRet=%p, err=%s\n", shModule, pFunc, dlerror());
+      printf ("dlsym %p iRet=%p, err=%s\n", shModule, pFunc, dlerror());
 #endif
   }
 #endif
