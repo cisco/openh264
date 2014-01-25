@@ -68,8 +68,7 @@ DECODER_INCLUDES = \
 
 ENCODER_INCLUDES = \
     -Icodec/encoder/core/inc \
-    -Icodec/encoder/plus/inc \
-    -Icodec/WelsThreadLib/api
+    -Icodec/encoder/plus/inc
 
 PROCESSING_INCLUDES = \
     -Icodec/encoder/core/inc \
