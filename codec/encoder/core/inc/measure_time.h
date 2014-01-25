@@ -42,18 +42,14 @@
 
 #include <stdlib.h>
 
-#if !(defined(_MSC_VER) || defined(__MINGW32__))
+#ifndef _WIN32
 #include <sys/time.h>
 #else
 #include "typedefs.h"
-//#include <sys/types.h>
+#include <windows.h>
 #include <sys/timeb.h>
 #endif
 #include <time.h>
-#if defined(_WIN32)
-#include <windows.h>
-//#include <mmsystem.h>	// need static lib winmm.lib for link for such windows 95/98 mm timer
-#endif//#if _WIN32
 
 /*!
  * \brief	time cost measure utilization
@@ -62,13 +58,12 @@
  */
 
 static inline int64_t WelsTime() {
-#if !(defined(_MSC_VER) || defined(__MINGW32__))
+#ifndef _WIN32
 struct timeval tv_date;
 
 gettimeofday (&tv_date, NULL);
 return ((int64_t) tv_date.tv_sec * 1000000 + (int64_t) tv_date.tv_usec);
 #else
-#if defined (_WIN32)
 static int64_t iMeasureTimeFreq = 0;
 //	static BOOL_T support_high_resolution_perf_flag = TRUE;
 int64_t iMeasureTimeCur = 0;
@@ -94,13 +89,7 @@ iResult = (int64_t) ((double)iMeasureTimeCur * 1e6 / (double)iMeasureTimeFreq + 
 //	}
 return iResult;
 
-#else
-struct _timeb tb;
-
-_ftime (&tb);
-return ((int64_t)tb.time * (1000) + (int64_t)tb.millitm) * (1000);
 #endif//#if _WIN32
-#endif//!(defined(_MSC_VER) || defined(__MINGW32__))
 }
 
 #endif//WELS_TIME_COST_MEASURE_UTIL_H__
