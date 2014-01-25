@@ -38,12 +38,6 @@
  *************************************************************************************
  */
 #include <string.h>
-#include <assert.h>
-#include "svc_enc_slice_segment.h"
-#include "wels_const.h"
-#include "macros.h"
-#include "utils.h"
-#include "macros.h"
 #include "rc.h"
 
 namespace WelsSVCEnc {

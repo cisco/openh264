@@ -37,33 +37,20 @@
  *
  *************************************************************************************
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
 #include "encoder.h"
-#include "extern.h"
-#include "cpu.h"
 #include "cpu_core.h"
-#include "utils.h"
 
-#include "encode_mb_aux.h"
 #include "decode_mb_aux.h"
 #include "get_intra_predictor.h"
-#include "svc_encode_mb.h"
 
 #include "deblocking.h"
-#include "expand_pic.h"
 
 #include "mc.h"
 #include "sample.h"
 
-#include "svc_encode_slice.h"
 #include "svc_base_layer_md.h"
-#include "svc_mode_decision.h"
 #include "set_mb_syn_cavlc.h"
 #include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross_platforms
-#include "codec_def.h"
 #ifdef MT_ENABLED
 #include "slice_multi_threading.h"
 #endif//MT_ENABLED

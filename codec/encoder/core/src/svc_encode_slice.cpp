@@ -38,23 +38,14 @@
  *************************************************************************************
  */
 
-#include <string.h>
-#include <assert.h>
 #include "ls_defines.h"
 #include "svc_encode_slice.h"
 #include "svc_enc_golomb.h"
 #include "svc_base_layer_md.h"
 #include "svc_encode_mb.h"
-#include "mv_pred.h"
 #include "svc_set_mb_syn_cavlc.h"
-#include "encode_mb_aux.h"
 #include "decode_mb_aux.h"
 #include "svc_mode_decision.h"
-#include "cpu_core.h"
-#include "svc_motion_estimate.h"
-#include "sample.h"
-#include "wels_func_ptr_def.h"
-#include "utils.h"
 
 namespace WelsSVCEnc {
 //#define ENC_TRACE

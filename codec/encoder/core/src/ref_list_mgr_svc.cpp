@@ -32,13 +32,7 @@
 
 // ref_list_mgr_svc.c
 #include "ref_list_mgr_svc.h"
-#include "encoder_context.h"
-#include "svc_enc_frame.h"
-#include "picture.h"
-#include "expand_pic.h"
-#include <assert.h>
 #include "utils.h"
-#include "extern.h"
 namespace WelsSVCEnc {
 /*
  *	set picture as unreferenced

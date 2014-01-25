@@ -37,16 +37,11 @@
  *************************************************************************************
  */
 
-#include <stdio.h>	//test use for file operation
-#include <string.h>
 
 #include "svc_encode_mb.h"
 #include "encode_mb_aux.h"
 #include "decode_mb_aux.h"
 #include "ls_defines.h"
-#include "cpu_core.h"
-#include "as264_common.h"
-#include "mb_cache.h"
 #include "array_stack_align.h"
 
 namespace WelsSVCEnc {

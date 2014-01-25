@@ -37,8 +37,6 @@
  *
  *************************************************************************************
  */
-#include <string.h>
-#include <stdlib.h>
 #include "property.h"
 #include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross_platforms
 namespace WelsSVCEnc {

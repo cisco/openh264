@@ -38,16 +38,10 @@
  *************************************************************************************
  */
 
-#include <string.h>
 #include "ls_defines.h"
-#include "encoder_context.h"
-#include "svc_enc_slice_segment.h"
 #include "md.h"
-#include "mc.h"
-#include "mv_pred.h"
 #include "cpu_core.h"
 #include "svc_enc_golomb.h"
-#include "sample.h"
 #include "array_stack_align.h"
 
 namespace WelsSVCEnc {

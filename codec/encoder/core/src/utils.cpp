@@ -37,11 +37,6 @@
  *
  *************************************************************************************
  */
-#include <string.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <math.h>
-#include <time.h>
 #if defined(_WIN32)
 #include <windows.h>
 #include <sys/types.h>
@@ -54,12 +49,8 @@
 #endif
 
 #include "utils.h"
-#include "macros.h"
-#include "wels_const.h"
 #include "property.h"
-#include "cpu_core.h"
 #include "encoder_context.h"
-#include "as264_common.h"
 #include "property.h"
 #include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross platforms
 

@@ -39,12 +39,9 @@
  *
  *************************************************************************************
  */
-#include <string.h>
-#include "macros.h"
 #include "ls_defines.h"
 #include "cpu_core.h"
 #include "get_intra_predictor.h"
-#include "wels_common_basis.h"
 #include "array_stack_align.h"
 
 namespace WelsSVCEnc {

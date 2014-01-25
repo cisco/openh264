@@ -38,7 +38,6 @@
  *************************************************************************************
  */
 
-#include "svc_enc_golomb.h"
 #include "vlc_encoder.h"
 #include "ls_defines.h"
 #include "svc_set_mb_syn_cavlc.h"
