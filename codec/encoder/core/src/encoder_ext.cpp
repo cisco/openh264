@@ -69,8 +69,9 @@
 #include "set_mb_syn_cavlc.h"
 #include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross platforms
 #include "array_stack_align.h"
-// for MT, 4/22/2010
+#if defined(MT_ENABLED)
 #include "slice_multi_threading.h"
+#endif//MT_ENABLED
 #if defined(DYNAMIC_SLICE_ASSIGN) || defined(MT_DEBUG)
 #include "measure_time.h"
 #endif//DYNAMIC_SLICE_ASSIGN
