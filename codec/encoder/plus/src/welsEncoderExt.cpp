@@ -1115,12 +1115,7 @@ void CWelsH264SVCEncoder::DumpSrcPicture (const uint8_t* pSrc) {
   str_t strFileName[256] = {0};
   const int32_t iDataLength = m_iMaxPicWidth * m_iMaxPicHeight;
 
-#if defined(__GNUC__)
-  STRNCPY (strFileName, 256, "/tmp/pic_in_", STRNLEN ("/tmp/pic_in_", 255));	// confirmed_safe_unsafe_usage
-#else
-  STRNCPY (strFileName, 256, "d:\\incoming\\mosaic_st\\pic_in_", STRNLEN ("d:\\incoming\\mosaic_st\\pic_in_",
-           255));	// confirmed_safe_unsafe_usage
-#endif//__GNUC__
+  STRNCPY (strFileName, 256, "pic_in_", STRNLEN ("pic_in_", 255));	// confirmed_safe_unsafe_usage
 
   if (m_iMaxPicWidth == 640) {
     STRCAT (strFileName, 256, "360p.");	// confirmed_safe_unsafe_usage
