@@ -30,7 +30,6 @@
  *
  */
 #include "AdaptiveQuantization.h"
-#include "../common/cpu.h"
 
 WELSVP_NAMESPACE_BEGIN
 

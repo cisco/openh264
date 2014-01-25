@@ -38,8 +38,6 @@
  *
  *****************************************************************************/
 
-#include "../common/typedef.h"
-#include "../common/util.h"
 #include "downsample.h"
 
 

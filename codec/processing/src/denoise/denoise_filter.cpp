@@ -37,7 +37,6 @@
  */
 
 #include "denoise.h"
-#include "../common/typedef.h"
 
 WELSVP_NAMESPACE_BEGIN
 
