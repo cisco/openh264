@@ -59,9 +59,6 @@ INCLUDES = -Icodec/api/svc -Icodec/common
 #ASM_INCLUDES = -Iprocessing/src/asm/
 ASM_INCLUDES = -Icodec/common/
 
-COMMON_INCLUDES = \
-    -Icodec/decoder/core/inc
-
 DECODER_INCLUDES = \
     -Icodec/decoder/core/inc \
     -Icodec/decoder/plus/inc
