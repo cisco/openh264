@@ -132,7 +132,7 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
 
 
   iBufferLeft -= iBufferUsed;
-  if (iBufferLeft > iBufferUsed) {
+  if (iBufferLeft > 0) {
 #if defined(_GNUC__)
     iBufferUsed += strftime (&strStreamFileName[iBufferUsed], iBufferLeft, "%y%m%d%H%M%S", tTimeNow);
 #else
@@ -150,7 +150,7 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
   }
 
   iBufferLeftSize -= iBufferUsedSize;
-  if (iBufferLeftSize > iBufferUsedSize) {
+  if (iBufferLeftSize > 0) {
 #if defined(_GNUC__)
     iBufferUsedSize += strftime (&strLenFileName[iBufferUsedSize], iBufferLeftSize, "%y%m%d%H%M%S", tTimeNow);
 #else
@@ -167,7 +167,7 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
     iBufferLeftSize -= iBufferUsedSize;
   }
 
-  if (iBufferLeft > iBufferUsed) {
+  if (iBufferLeft > 0) {
 #ifdef _WIN32
 #if defined(_MSC_VER)
 #if _MSC_VER>=1500
@@ -182,7 +182,7 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
     iBufferLeft -= iBufferUsed;
   }
 
-  if (iBufferLeftSize > iBufferUsedSize) {
+  if (iBufferLeftSize > 0) {
 #ifdef _WIN32
 #if defined(_MSC_VER)
 #if _MSC_VER>=1500
