@@ -110,10 +110,14 @@ int32_t WelsGetTimeOfDay (SWelsTime* pTp) {
 
 int32_t WelsStrftime (str_t* pBuffer, int32_t iSize, const str_t* kpFormat, const SWelsTime* kpTp) {
   struct tm   sTimeNow;
+  int32_t iRc;
 
   localtime_s (&sTimeNow, &kpTp->time);
 
-  return strftime (pBuffer, iSize, kpFormat, &sTimeNow);
+  iRc = strftime (pBuffer, iSize, kpFormat, &sTimeNow);
+  if (iRc == 0)
+      pBuffer[0] = '\0';
+  return iRc;
 }
 
 #else
@@ -166,10 +170,14 @@ int32_t WelsGetTimeOfDay (SWelsTime* pTp) {
 
 int32_t WelsStrftime (str_t* pBuffer, int32_t iSize, const str_t* kpFormat, const SWelsTime* kpTp) {
   struct tm*   pTnow;
+  int32_t iRc;
 
   pTnow = localtime (&kpTp->time);
 
-  return strftime (pBuffer, iSize, kpFormat, pTnow);
+  iRc = strftime (pBuffer, iSize, kpFormat, pTnow);
+  if (iRc == 0)
+      pBuffer[0] = '\0';
+  return iRc;
 }
 
 
@@ -241,10 +249,14 @@ int32_t WelsGetTimeOfDay (SWelsTime* pTp) {
 
 int32_t WelsStrftime (str_t* pBuffer, int32_t iSize, const str_t* kpFormat, const SWelsTime* kpTp) {
   struct tm*   pTnow;
+  int32_t iRc;
 
   pTnow = localtime (&kpTp->time);
 
-  return strftime (pBuffer, iSize, kpFormat, pTnow);
+  iRc = strftime (pBuffer, iSize, kpFormat, pTnow);
+  if (iRc == 0)
+      pBuffer[0] = '\0';
+  return iRc;
 }
 
 #endif
