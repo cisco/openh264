@@ -2,6 +2,7 @@ COMMON_PREFIX=COMMON
 COMMON_SRCDIR=codec/common
 COMMON_CPP_SRCS=\
 	$(COMMON_SRCDIR)/./cpu.cpp\
+	$(COMMON_SRCDIR)/./crt_util_safe_x.cpp\
 	$(COMMON_SRCDIR)/./deblocking_common.cpp\
 	$(COMMON_SRCDIR)/./logging.cpp\
 	$(COMMON_SRCDIR)/./WelsThreadLib.cpp\

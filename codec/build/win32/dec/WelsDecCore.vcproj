@@ -891,6 +891,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\common\crt_util_safe_x.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\decoder\core\src\deblocking.cpp"
 					>
 				</File>

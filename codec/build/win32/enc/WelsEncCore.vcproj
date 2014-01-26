@@ -400,6 +400,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\common\crt_util_safe_x.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\encoder\core\src\deblocking.cpp"
 				>
 				<FileConfiguration
