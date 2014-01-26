@@ -90,7 +90,7 @@ int32_t                WelsFflush (WelsFileHandle* fp);
 
 int32_t                WelsGetTimeOfDay (SWelsTime* tp);
 int32_t                WelsStrftime (str_t* buffer, int32_t size, const str_t* format, const SWelsTime* tp);
-uint16_t               WelsGetMillsecond (const SWelsTime* tp);
+uint16_t               WelsGetMillisecond (const SWelsTime* tp);
 
 
 #ifdef __cplusplus
