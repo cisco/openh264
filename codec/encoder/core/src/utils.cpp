@@ -140,36 +140,9 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
     int32_t iBufLeft = kiBufSize - iBufUsed;
 
     if (pEncCtx) {
-      time_t l_time;
-#if defined(_WIN32) && defined(_MSC_VER)
-#if _MSC_VER >= 1500
-      struct tm t_now;
-#else//VC6
-      struct tm* t_now;
-#endif//_MSC_VER >= 1500
-#else//__GNUC__
-      struct tm* t_now;
-#endif//WIN32
+      SWelsTime tTime;
 
-#if defined( _WIN32 ) && defined(_MSC_VER)
-      struct _timeb tb;
-
-      time (&l_time);
-#if _MSC_VER >= 1500
-      LOCALTIME (&t_now, &l_time);
-#else
-      t_now = LOCALTIME (&l_time);
-      if (NULL == t_now) {
-        return;
-      }
-#endif//_MSC_VER >= 1500
-      FTIME (&tb);
-#elif defined( __GNUC__ )
-      struct timeval tv;
-      time (&l_time);
-      t_now = (struct tm*)LOCALTIME (&l_time);
-      gettimeofday (&tv, NULL);
-#endif//WIN32
+      WelsGetTimeOfDay(&tTime);
       iCurUsed = WelsSnprintf (&pBuf[iBufUsed], iBufLeft, "[0x%p @ ", pEncCtx);	// confirmed_safe_unsafe_usage
       if (iCurUsed >= 0) {
         iBufUsed += iCurUsed;
@@ -209,11 +182,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
       }
 
       if (iBufLeft > 0) {
-#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER >= 1500)
-        iCurUsed = strftime (&pBuf[iBufUsed], iBufLeft, "%y-%m-%d %H:%M:%S", &t_now);
-#else
-        iCurUsed = strftime (&pBuf[iBufUsed], iBufLeft, "%y-%m-%d %H:%M:%S", t_now);
-#endif//WIN32..
+        iCurUsed = WelsStrftime (&pBuf[iBufUsed], iBufLeft, "%y-%m-%d %H:%M:%S", &tTime);
         if (iCurUsed > 0) {
           iBufUsed += iCurUsed;
           iBufLeft -= iCurUsed;
@@ -223,12 +192,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
       }
 
       if (iBufLeft > 0) {
-#if defined (_WIN32)
-        iCurUsed = WelsSnprintf (&pBuf[iBufUsed], iBufLeft, ".%3.3u]: ", tb.millitm);	// confirmed_safe_unsafe_usage
-#elif defined (__GNUC__)
-        iCurUsed = WelsSnprintf (&pBuf[iBufUsed], iBufLeft, ".%3.3u]: ",
-                                 static_cast<unsigned int> (tv.tv_usec / 1000));	// confirmed_safe_unsafe_usage
-#endif//WIN32
+        iCurUsed = WelsSnprintf (&pBuf[iBufUsed], iBufLeft, ".%3.3u]: ", tTime.millitm);	// confirmed_safe_unsafe_usage
         if (iCurUsed >= 0) {
           iBufUsed += iCurUsed;
           iBufLeft -= iCurUsed;

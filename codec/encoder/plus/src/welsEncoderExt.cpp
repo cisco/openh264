@@ -86,36 +86,9 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
 #endif//OUTPUT_BIT_STREAM
 
 #ifdef OUTPUT_BIT_STREAM
-  time_t tTime;
+  SWelsTime tTime;
 
-#if defined( _WIN32 )
-#if defined(_MSC_VER)
-#if _MSC_VER>=1500
-  struct tm tTimeNow;
-#else
-  struct tm* tTimeNow;
-#endif//_MSC_VER>=1500
-#endif//_MSC_VER
-  struct _timeb tTimeb;
-
-  time (&tTime);
-#if defined(_MSC_VER)
-#if _MSC_VER>=1500
-  LOCALTIME (&tTimeNow, &tTime);
-#else
-  tTimeNow = LOCALTIME (&tTime);
-  if (NULL == tTimeNow)
-    return;
-#endif//_MSC_VER>=1500
-#endif//_MSC_VER
-  FTIME (&tTimeb);
-#elif defined( __GNUC__ )
-  struct tm* tTimeNow;
-  struct timeval tTimev;
-  time (&tTime);
-  tTimeNow = (struct tm*)localtime (&tTime);
-  gettimeofday (&tTimev, NULL);
-#endif//WIN32
+  WelsGetTimeOfDay(&tTime);
 
   iCurUsed      = WelsSnprintf (strStreamFileName, iBufferLeft, "enc_bs_0x%p_", (void*)this);
   iCurUsedSize  = WelsSnprintf (strLenFileName, iBufferLeftSize, "enc_size_0x%p_", (void*)this);
@@ -126,19 +99,7 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
     iBufferLeft -= iCurUsed;
   }
   if (iBufferLeft > 0) {
-#if defined(_GNUC__)
-    iCurUsed = strftime (&strStreamFileName[iBufferUsed], iBufferLeft, "%y%m%d%H%M%S", tTimeNow);
-#else
-#if defined(_MSC_VER)
-    iCurUsed = strftime (&strStreamFileName[iBufferUsed], iBufferLeft, "%y%m%d%H%M%S",
-#if _MSC_VER>=1500
-                             & tTimeNow
-#else
-                             tTimeNow
-#endif//_MSC_VER>=1500
-                            );
-#endif//_MSC_VER
-#endif//__GNUC__
+    iCurUsed = WelsStrftime (&strStreamFileName[iBufferUsed], iBufferLeft, "%y%m%d%H%M%S", &tTime);
     iBufferUsed += iCurUsed;
     iBufferLeft -= iCurUsed;
   }
@@ -148,29 +109,14 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
     iBufferLeftSize -= iCurUsedSize;
   }
   if (iBufferLeftSize > 0) {
-#if defined(_GNUC__)
-    iCurUsedSize = strftime (&strLenFileName[iBufferUsedSize], iBufferLeftSize, "%y%m%d%H%M%S", tTimeNow);
-#else
-#if defined(_MSC_VER)
-    iCurUsedSize = strftime (&strLenFileName[iBufferUsedSize], iBufferLeftSize, "%y%m%d%H%M%S",
-#if _MSC_VER>=1500
-                                 & tTimeNow
-#else
-                                 tTimeNow
-#endif//_MSC_VER>=1500
-                                );
-#endif//_MSC_VER
-#endif//__GNUC__
+    iCurUsedSize = WelsStrftime (&strLenFileName[iBufferUsedSize], iBufferLeftSize, "%y%m%d%H%M%S", &tTime);
     iBufferUsedSize += iCurUsedSize;
     iBufferLeftSize -= iCurUsedSize;
   }
 
   if (iBufferLeft > 0) {
-#ifdef _WIN32
-    iCurUsed = WelsSnprintf (&strStreamFileName[iBufferUsed], iBufferLeft, ".%03.3u.264", tTimeb.millitm);
-#else
-    iCurUsed = WelsSnprintf (&strStreamFileName[iBufferUsed], iBufferLeft, ".%03.3u.264", tTimev.tv_usec / 1000);
-#endif//WIN32
+    iCurUsed = WelsSnprintf (&strStreamFileName[iBufferUsed], iBufferLeft, ".%03.3u.264",
+                             WelsGetMillisecond(&tTime));
     if (iCurUsed > 0) {
       iBufferUsed += iCurUsed;
       iBufferLeft -= iCurUsed;
@@ -178,11 +124,8 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
   }
 
   if (iBufferLeftSize > 0) {
-#ifdef _WIN32
-    iCurUsedSize = WelsSnprintf (&strLenFileName[iBufferUsedSize], iBufferLeftSize, ".%03.3u.len", tTimeb.millitm);
-#else
-    iCurUsedSize = WelsSnprintf (&strLenFileName[iBufferUsedSize], iBufferLeftSize, ".%03.3u.len", tTimev.tv_usec / 1000);
-#endif//WIN32
+    iCurUsedSize = WelsSnprintf (&strLenFileName[iBufferUsedSize], iBufferLeftSize, ".%03.3u.len",
+                                 WelsGetMillisecond(&tTime));
     if (iCurUsedSize > 0) {
       iBufferUsedSize += iCurUsedSize;
       iBufferLeftSize -= iCurUsedSize;
