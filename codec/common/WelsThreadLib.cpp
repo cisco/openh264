@@ -44,6 +44,16 @@
 #define _GNU_SOURCE
 #endif
 #include <sched.h>
+#elif !defined(_WIN32)
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#include <sys/param.h>
+#include <unistd.h>
+#ifdef __APPLE__
+#define HW_NCPU_NAME "hw.logicalcpu"
+#else
+#define HW_NCPU_NAME "hw.ncpu"
+#endif
 #endif
 
 #include "WelsThreadLib.h"
@@ -181,12 +191,6 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* p
 }
 
 #elif   defined(__GNUC__)
-
-#ifdef __APPLE__
-#include <sys/sysctl.h>
-#include <sys/param.h>
-#include <unistd.h>
-#endif//__APPLE__
 
 void WelsSleep (uint32_t dwMilliseconds) {
   usleep (dwMilliseconds * 1000);	// microseconds
@@ -465,7 +469,7 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* p
 
   size_t len = sizeof (pInfo->ProcessorCount);
 
-  if (sysctlbyname ("hw.logicalcpu", &pInfo->ProcessorCount, &len, NULL, 0) == -1)
+  if (sysctlbyname (HW_NCPU_NAME, &pInfo->ProcessorCount, &len, NULL, 0) == -1)
     pInfo->ProcessorCount = 1;
 
   return WELS_THREAD_ERROR_OK;
