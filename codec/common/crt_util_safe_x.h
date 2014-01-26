@@ -420,7 +420,6 @@ static __inline int wels_strnlen_s (const char* dest, int dmax) {
 
 #if defined(WIN32) && defined(_MSC_VER)
 #if _MSC_VER >= 1500	// VS2008
-#define SNPRINTF	_snprintf_s
 #define LOCALTIME	localtime_s
 #define FTIME		_ftime_s
 #define STRNCPY		strncpy_s
@@ -428,7 +427,6 @@ static __inline int wels_strnlen_s (const char* dest, int dmax) {
 #define STRNLEN		strnlen_s
 #define VSPRINTF	vsprintf_s
 #else	// mainly for VC6
-#define SNPRINTF	_snprintf
 #define LOCALTIME	localtime
 #define FTIME		_ftime
 #define STRNCPY		wels_strncpy_s	// override s.t.r.n.c.p.y here for safe
@@ -439,7 +437,6 @@ static __inline int wels_strnlen_s (const char* dest, int dmax) {
 
 #else//__GNUC__
 
-#define SNPRINTF	snprintf
 #define LOCALTIME	localtime
 #define STRNCPY		wels_strncpy_s	// override s.t.r.n.c.p.y here for safe
 #define STRCAT		wels_strcat_s	// override s.t.r.c.a.t here for safe

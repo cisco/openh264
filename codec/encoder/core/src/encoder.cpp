@@ -327,11 +327,7 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const str_t* kpFileNam
       pDumpRecFile = WelsFopen (kpFileName, "ab");
     else {
       str_t sDependencyRecFileName[16] = {0};
-#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
-      SNPRINTF (sDependencyRecFileName, 16, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-#else
-      SNPRINTF (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-#endif//WIN32..
+      WelsSnprintf (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
       pDumpRecFile	= WelsFopen (sDependencyRecFileName, "ab");
     }
     if (NULL != pDumpRecFile)
@@ -341,11 +337,7 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const str_t* kpFileNam
       pDumpRecFile	= WelsFopen (kpFileName, "wb");
     } else {
       str_t sDependencyRecFileName[16] = {0};
-#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
-      SNPRINTF (sDependencyRecFileName, 16, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-#else
-      SNPRINTF (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-#endif//WIN32..
+      WelsSnprintf (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
       pDumpRecFile	= WelsFopen (sDependencyRecFileName, "wb");
     }
     bDependencyRecFlag[kiDid]	= true;
