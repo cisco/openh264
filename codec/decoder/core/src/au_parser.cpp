@@ -37,24 +37,13 @@
  *
  *************************************************************************************
  */
-#include <string.h>
 #include "codec_def.h"
-#include "ls_defines.h"
-#include "macros.h"
 #include "au_parser.h"
 #include "decoder.h"
 #include "error_code.h"
-#include "dec_frame.h"
-#include "dec_golomb.h"
-#include "bit_stream.h"
-#include "utils.h"
-#include "codec_app_def.h"
 #include "memmgr_nal_unit.h"
 #include "decoder_core.h"
-#include "wels_common_basis.h"
 #include "decoder_core.h"
-#include "manage_dec_ref.h"
-#include "mem_align.h"
 
 namespace WelsDec {
 /*!

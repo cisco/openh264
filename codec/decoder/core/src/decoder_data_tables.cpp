@@ -32,10 +32,8 @@
 
 // exp_data.c
 // export date cross various modules (.c)
-#include "typedefs.h"
 #include "wels_common_basis.h"
 #include "mb_cache.h"
-#include "utils.h"
 #include "vlc_decoder.h"
 
 namespace WelsDec {

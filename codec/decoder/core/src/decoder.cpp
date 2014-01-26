@@ -37,30 +37,19 @@
  *
  *************************************************************************************
  */
-#include <string.h>
-#include "macros.h"
 #include "codec_def.h"
 #include "decoder.h"
-#include "error_code.h"
 #include "cpu.h"
-#include "cpu_core.h"
 #include "au_parser.h"
-#include "utils.h"
-#include "nal_prefix.h"
-#include "dec_frame.h"
-#include "pic_queue.h"
-#include "vlc_decoder.h"
 #include "get_intra_predictor.h"
 #include "rec_mb.h"
 #include "mc.h"
 #include "decode_mb_aux.h"
 #include "manage_dec_ref.h"
-#include "codec_app_def.h"
 #include "decoder_core.h"
 #include "deblocking.h"
 #include "expand_pic.h"
 #include "decode_slice.h"
-#include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross platforms
 #include "mem_align.h"
 
 namespace WelsDec {

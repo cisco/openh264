@@ -31,7 +31,6 @@
  */
 
 #include "mem_align.h"
-#include "crt_util_safe_x.h"
 
 namespace WelsDec {
 

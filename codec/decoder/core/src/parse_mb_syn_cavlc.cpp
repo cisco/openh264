@@ -38,17 +38,10 @@
  *************************************************************************************
  */
 
-#include <string.h>
 
 #include "parse_mb_syn_cavlc.h"
 #include "error_code.h"
-#include "dec_golomb.h"
-#include "macros.h"
-#include "vlc_decoder.h"
-#include "bit_stream.h"
-#include "ls_defines.h"
 #include "mv_pred.h"
-#include "decode_slice.h"
 
 namespace WelsDec {
 

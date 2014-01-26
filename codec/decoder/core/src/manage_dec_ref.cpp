@@ -38,12 +38,9 @@
  *      07/21/2008 Created
  *
  *****************************************************************************/
-#include <string.h>
 
 #include "manage_dec_ref.h"
 #include "error_code.h"
-#include "utils.h"
-#include "as264_common.h" // for LTR macro can be delete later
 
 namespace WelsDec {
 

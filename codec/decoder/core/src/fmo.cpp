@@ -37,11 +37,8 @@
  *
  *************************************************************************************
  */
-#include <string.h>
 
 #include "fmo.h"
-#include "macros.h"
-#include "utils.h"
 #include "mem_align.h"
 
 namespace WelsDec {

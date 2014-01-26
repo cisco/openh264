@@ -37,14 +37,9 @@
  *
  *************************************************************************************
  */
-#include <memory.h>
 
-#include "macros.h"
 
 #include "rec_mb.h"
-#include "parse_mb_syn_cavlc.h"
-#include "get_intra_predictor.h"
-#include "decode_mb_aux.h"
 #include "decode_slice.h"
 
 namespace WelsDec {

@@ -31,25 +31,10 @@
  *	decoder_core.c:	Wels decoder framework core implementation
  */
 
-#include <string.h>
-#include "codec_def.h"
 #include "decoder_core.h"
-#include "typedefs.h"
-#include "wels_const.h"
-#include "wels_common_basis.h"
-#include "codec_app_def.h"
-#include "decoder_context.h"
-#include "dec_golomb.h"
-#include "bit_stream.h"
 #include "error_code.h"
-#include "parameter_sets.h"
-#include "fmo.h"
-#include "utils.h"
 #include "memmgr_nal_unit.h"
-#include "dec_frame.h"
 #include "au_parser.h"
-#include "pic_queue.h"
-#include "ls_defines.h"
 #include "decode_slice.h"
 #include "manage_dec_ref.h"
 #include "expand_pic.h"

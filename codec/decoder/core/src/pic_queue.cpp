@@ -37,11 +37,7 @@
  *
  *************************************************************************************
  */
-#include <string.h>
 #include "pic_queue.h"
-#include "wels_const.h"
-#include "utils.h"
-#include "macros.h"
 #include "decoder_context.h"
 #include "codec_def.h"
 #include "mem_align.h"
