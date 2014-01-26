@@ -88,7 +88,7 @@ int32_t WelsStrnlen (const str_t* kpStr,  int32_t iMaxlen) {
 }
 
 int32_t WelsVsprintf (str_t* pBuffer, int32_t iSizeOfBuffer, const str_t* kpFormat, va_list pArgPtr) {
-  return vsprintf_s (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr);
+  return vsnprintf_s (pBuffer, iSizeOfBuffer, _TRUNCATE, kpFormat, pArgPtr);
 }
 
 WelsFileHandle* WelsFopen (const str_t* kpFilename,  const str_t* kpMode) {
@@ -142,7 +142,7 @@ int32_t WelsStrnlen (const str_t* kpStr,  int32_t iMaxlen) {
 }
 
 int32_t WelsVsprintf (str_t* pBuffer, int32_t iSizeOfBuffer, const str_t* kpFormat, va_list pArgPtr) {
-  return vsprintf (pBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
+  return vsnprintf (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
 }
 
 
@@ -210,7 +210,7 @@ int32_t WelsStrnlen (const str_t* kpString, int32_t iMaxlen) {
 #endif
 
 int32_t WelsVsprintf (str_t* pBuffer, int32_t iSizeOfBuffer, const str_t* kpFormat, va_list pArgPtr) {
-  return vsprintf (pBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
+  return vsnprintf (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
 }
 
 WelsFileHandle* WelsFopen (const str_t* kpFilename,  const str_t* kpMode) {
