@@ -1,8 +1,6 @@
 UNAME=$(shell uname | tr A-Z a-z | tr -d \\-[:digit:].)
 LIBPREFIX=lib
 LIBSUFFIX=a
-CP=cp
-ROOTDIR=$(PWD)
 CXX_O=-o $@
 CXX_LINK_O=-o $@
 AR_OPTS=cr $@
@@ -61,17 +59,13 @@ INCLUDES = -Icodec/api/svc -Icodec/common
 #ASM_INCLUDES = -Iprocessing/src/asm/
 ASM_INCLUDES = -Icodec/common/
 
-COMMON_INCLUDES = \
-    -Icodec/decoder/core/inc
-
 DECODER_INCLUDES = \
     -Icodec/decoder/core/inc \
     -Icodec/decoder/plus/inc
 
 ENCODER_INCLUDES = \
     -Icodec/encoder/core/inc \
-    -Icodec/encoder/plus/inc \
-    -Icodec/WelsThreadLib/api
+    -Icodec/encoder/plus/inc
 
 PROCESSING_INCLUDES = \
     -Icodec/encoder/core/inc \
