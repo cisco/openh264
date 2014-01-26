@@ -119,19 +119,15 @@ void welsCodecTrace::CODEC_TRACE (void* ignore, const int32_t iLevel, const str_
     return;
   }
 
-  str_t WStr_Format[MAX_LOG_SIZE] = {0};
   str_t pBuf[MAX_LOG_SIZE] = {0};
-  str_t cResult[MAX_LOG_SIZE] = {0};
   const int32_t len	= STRNLEN ("[ENCODER]: ", MAX_LOG_SIZE);	// confirmed_safe_unsafe_usage
 
-  STRNCPY (WStr_Format, MAX_LOG_SIZE, Str_Format, STRNLEN (Str_Format, MAX_LOG_SIZE));	// confirmed_safe_unsafe_usage
 
   STRNCPY (pBuf, MAX_LOG_SIZE, "[ENCODER]: ", len);	// confirmed_safe_unsafe_usage
-  WelsVsnprintf (pBuf + len, MAX_LOG_SIZE - len, WStr_Format, vl);	// confirmed_safe_unsafe_usage
-  STRNCPY (cResult, MAX_LOG_SIZE, pBuf, STRNLEN (pBuf, MAX_LOG_SIZE));	// confirmed_safe_unsafe_usage
+  WelsVsnprintf (pBuf + len, MAX_LOG_SIZE - len, Str_Format, vl);	// confirmed_safe_unsafe_usage
 
-//		g_WelsCodecTrace.TraceString(iLevel, cResult);
-  welsCodecTrace::TraceString (iLevel, cResult);
+//		g_WelsCodecTrace.TraceString(iLevel, pBuf);
+  welsCodecTrace::TraceString (iLevel, pBuf);
 }
 
 void welsCodecTrace::SetTraceLevel (const int32_t iLevel) {
