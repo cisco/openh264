@@ -3786,7 +3786,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
     }
 
     if (iCurTid < pCtx->uiSpatialLayersInTemporal[d_idx] - 1 || pSvcParam->iDecompStages == 0) {
-      if ((iCurTid >= MAX_TEMPORAL_LEVEL) || (pCtx->uiSpatialLayersInTemporal[d_idx] - 1 >= MAX_TEMPORAL_LEVEL)) {
+      if ((iCurTid >= MAX_TEMPORAL_LEVEL) || (pCtx->uiSpatialLayersInTemporal[d_idx] - 1 > MAX_TEMPORAL_LEVEL)) {
         ForceCodingIDR (pCtx);	// some logic error
         return -1;
       }
