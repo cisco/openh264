@@ -427,7 +427,6 @@ static __inline int wels_strnlen_s (const char* dest, int dmax) {
 #define STRCAT		strcat_s
 #define STRNLEN		strnlen_s
 #define VSPRINTF	vsprintf_s
-#define FOPEN		fopen_s
 #else	// mainly for VC6
 #define SNPRINTF	_snprintf
 #define LOCALTIME	localtime
@@ -436,7 +435,6 @@ static __inline int wels_strnlen_s (const char* dest, int dmax) {
 #define STRCAT		wels_strcat_s	// override s.t.r.c.a.t here for safe
 #define STRNLEN		wels_strnlen_s	// override s.t.r.n.l.e.n here for safe
 #define VSPRINTF	vsprintf
-#define FOPEN		fopen
 #endif//_MSC_VER >= 1500
 
 #else//__GNUC__
@@ -447,7 +445,6 @@ static __inline int wels_strnlen_s (const char* dest, int dmax) {
 #define STRCAT		wels_strcat_s	// override s.t.r.c.a.t here for safe
 #define STRNLEN		wels_strnlen_s	// override s.t.r.n.l.e.n here for safe
 #define VSPRINTF	vsprintf
-#define FOPEN		fopen
 
 #endif//WIN32
 
