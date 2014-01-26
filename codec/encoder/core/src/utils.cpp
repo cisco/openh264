@@ -227,12 +227,12 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
 #ifdef ENABLE_TRACE_FILE
     if (NULL != pEncCtx && NULL != pEncCtx->pFileLog) {
       if (pEncCtx->uiSizeLog > MAX_TRACE_LOG_SIZE) {
-        if (0 == fseek (pEncCtx->pFileLog, 0L, SEEK_SET))
+        if (0 == WelsFseek (pEncCtx->pFileLog, 0L, SEEK_SET))
           pEncCtx->uiSizeLog = 0;
       }
       if (iBufUsed > 0 && iBufUsed < WELS_LOG_BUF_SIZE) {
-        iCurUsed = fwrite (pBuf, 1, iBufUsed, pEncCtx->pFileLog);
-        fflush (pEncCtx->pFileLog);
+        iCurUsed = WelsFwrite (pBuf, 1, iBufUsed, pEncCtx->pFileLog);
+        WelsFflush (pEncCtx->pFileLog);
         if (iCurUsed == iBufUsed)
           pEncCtx->uiSizeLog += iBufUsed;
       }
@@ -267,7 +267,7 @@ void WelsReopenTraceFile (void* pCtx, str_t* pCurPath) {
     str_t strTraceFile[MAX_FNAME_LEN] = {0};
     int32_t len = 0;
     if (pEncCtx->pFileLog != NULL) {
-      fclose (pEncCtx->pFileLog);
+      WelsFclose (pEncCtx->pFileLog);
       pEncCtx->pFileLog = NULL;
     }
     pEncCtx->uiSizeLog	= 0;

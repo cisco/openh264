@@ -164,11 +164,11 @@ CWelsH264SVCEncoder::~CWelsH264SVCEncoder() {
 
 #ifdef OUTPUT_BIT_STREAM
   if (m_pFileBs) {
-    fclose (m_pFileBs);
+    WelsFclose (m_pFileBs);
     m_pFileBs = NULL;
   }
   if (m_pFileBsSize) {
-    fclose (m_pFileBsSize);
+    WelsFclose (m_pFileBsSize);
     m_pFileBsSize = NULL;
   }
   m_bSwitch	= FALSE;
@@ -585,11 +585,11 @@ int CWelsH264SVCEncoder::EncodeFrame2 (const SSourcePicture**   pSrcPicList, int
 
     if (m_bSwitch) {
       if (m_pFileBs) {
-        fclose (m_pFileBs);
+        WelsFclose (m_pFileBs);
         m_pFileBs = NULL;
       }
       if (m_pFileBsSize) {
-        fclose (m_pFileBsSize);
+        WelsFclose (m_pFileBsSize);
         m_pFileBsSize = NULL;
       }
       str_t strStreamFileName[128] = {0};
@@ -613,11 +613,11 @@ int CWelsH264SVCEncoder::EncodeFrame2 (const SSourcePicture**   pSrcPicList, int
       }
       total_bits += iCurLayerBits;
       if (m_pFileBs != NULL)
-        fwrite (pLayer->pBsBuf, 1, iCurLayerBits, m_pFileBs);
+        WelsFwrite (pLayer->pBsBuf, 1, iCurLayerBits, m_pFileBs);
     }
 
     if (m_pFileBsSize != NULL)
-      fwrite (&total_bits, sizeof (int32_t), 1, m_pFileBsSize);
+      WelsFwrite (&total_bits, sizeof (int32_t), 1, m_pFileBsSize);
   }
 #endif //OUTPUT_BIT_STREAM
 #ifdef DUMP_SRC_PICTURE

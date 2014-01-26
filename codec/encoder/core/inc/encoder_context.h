@@ -52,6 +52,7 @@
 #include "as264_common.h"
 #include "wels_preprocess.h"
 #include "wels_func_ptr_def.h"
+#include "crt_util_safe_x.h"
 
 #ifdef MT_ENABLED
 #include "mt_defs.h"	// for multiple threadin,
@@ -214,7 +215,7 @@ typedef struct TagWelsEncCtx {
   CMemoryAlign*				pMemAlign;
 
 #ifdef ENABLE_TRACE_FILE
-  FILE*						pFileLog;		// log file for wels encoder
+  WelsFileHandle*				pFileLog;		// log file for wels encoder
   uint32_t					uiSizeLog;		// size of log have been written in file
 
 #endif//ENABLE_TRACE_FILE

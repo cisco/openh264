@@ -315,7 +315,7 @@ EFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum) {
  */
 
 extern "C" void DumpDependencyRec (SPicture* pCurPicture, const str_t* kpFileName, const int8_t kiDid) {
-  FILE* pDumpRecFile											= NULL;
+  WelsFileHandle* pDumpRecFile = NULL;
   static bool_t bDependencyRecFlag[MAX_DEPENDENCY_LAYER]	= {0};
   int32_t iWrittenSize											= 0;
 
@@ -331,7 +331,7 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const str_t* kpFileNam
       pDumpRecFile	= WelsFopen (sDependencyRecFileName, "ab");
     }
     if (NULL != pDumpRecFile)
-      fseek (pDumpRecFile, 0, SEEK_END);
+      WelsFseek (pDumpRecFile, 0, SEEK_END);
   } else {
     if (STRNLEN (kpFileName, MAX_FNAME_LEN) > 0) {	// confirmed_safe_unsafe_usage
       pDumpRecFile	= WelsFopen (kpFileName, "wb");
@@ -353,27 +353,27 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const str_t* kpFileNam
     const int32_t kiChromaHeight	= kiLumaHeight >> 1;
 
     for (j = 0; j < kiLumaHeight; ++ j) {
-      iWrittenSize = fwrite (&pCurPicture->pData[0][j * kiStrideY], 1, kiLumaWidth, pDumpRecFile);
+      iWrittenSize = WelsFwrite (&pCurPicture->pData[0][j * kiStrideY], 1, kiLumaWidth, pDumpRecFile);
       assert (iWrittenSize == kiLumaWidth);
       if (iWrittenSize < kiLumaWidth) {
         assert (0);	// make no sense for us if writing failed
-        fclose (pDumpRecFile);
+        WelsFclose (pDumpRecFile);
         return;
       }
     }
     for (i = 1; i < I420_PLANES; ++ i) {
       const int32_t kiStrideUV = pCurPicture->iLineSize[i];
       for (j = 0; j < kiChromaHeight; ++ j) {
-        iWrittenSize = fwrite (&pCurPicture->pData[i][j * kiStrideUV], 1, kiChromaWidth, pDumpRecFile);
+        iWrittenSize = WelsFwrite (&pCurPicture->pData[i][j * kiStrideUV], 1, kiChromaWidth, pDumpRecFile);
         assert (iWrittenSize == kiChromaWidth);
         if (iWrittenSize < kiChromaWidth) {
           assert (0);	// make no sense for us if writing failed
-          fclose (pDumpRecFile);
+          WelsFclose (pDumpRecFile);
           return;
         }
       }
     }
-    fclose (pDumpRecFile);
+    WelsFclose (pDumpRecFile);
     pDumpRecFile = NULL;
   }
 }
@@ -383,7 +383,7 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const str_t* kpFileNam
  */
 
 void DumpRecFrame (SPicture* pCurPicture, const str_t* kpFileName) {
-  FILE* pDumpRecFile				= NULL;
+  WelsFileHandle* pDumpRecFile				= NULL;
   static bool_t bRecFlag	= false;
   int32_t iWrittenSize			= 0;
 
@@ -397,7 +397,7 @@ void DumpRecFrame (SPicture* pCurPicture, const str_t* kpFileName) {
       pDumpRecFile	= WelsFopen ("rec.yuv", "ab");
     }
     if (NULL != pDumpRecFile)
-      fseek (pDumpRecFile, 0, SEEK_END);
+      WelsFseek (pDumpRecFile, 0, SEEK_END);
   } else {
     if (STRNLEN (kpFileName, MAX_FNAME_LEN) > 0) {	// confirmed_safe_unsafe_usage
       pDumpRecFile	= WelsFopen (kpFileName, "wb");
@@ -417,27 +417,27 @@ void DumpRecFrame (SPicture* pCurPicture, const str_t* kpFileName) {
     const int32_t kiChromaHeight	= kiLumaHeight >> 1;
 
     for (j = 0; j < kiLumaHeight; ++ j) {
-      iWrittenSize = fwrite (&pCurPicture->pData[0][j * kiStrideY], 1, kiLumaWidth, pDumpRecFile);
+      iWrittenSize = WelsFwrite (&pCurPicture->pData[0][j * kiStrideY], 1, kiLumaWidth, pDumpRecFile);
       assert (iWrittenSize == kiLumaWidth);
       if (iWrittenSize < kiLumaWidth) {
         assert (0);	// make no sense for us if writing failed
-        fclose (pDumpRecFile);
+        WelsFclose (pDumpRecFile);
         return;
       }
     }
     for (i = 1; i < I420_PLANES; ++ i) {
       const int32_t kiStrideUV = pCurPicture->iLineSize[i];
       for (j = 0; j < kiChromaHeight; ++ j) {
-        iWrittenSize = fwrite (&pCurPicture->pData[i][j * kiStrideUV], 1, kiChromaWidth, pDumpRecFile);
+        iWrittenSize = WelsFwrite (&pCurPicture->pData[i][j * kiStrideUV], 1, kiChromaWidth, pDumpRecFile);
         assert (iWrittenSize == kiChromaWidth);
         if (iWrittenSize < kiChromaWidth) {
           assert (0);	// make no sense for us if writing failed
-          fclose (pDumpRecFile);
+          WelsFclose (pDumpRecFile);
           return;
         }
       }
     }
-    fclose (pDumpRecFile);
+    WelsFclose (pDumpRecFile);
     pDumpRecFile = NULL;
   }
 }
