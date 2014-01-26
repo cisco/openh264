@@ -127,17 +127,7 @@ void welsCodecTrace::CODEC_TRACE (void* ignore, const int32_t iLevel, const str_
   STRNCPY (WStr_Format, MAX_LOG_SIZE, Str_Format, STRNLEN (Str_Format, MAX_LOG_SIZE));	// confirmed_safe_unsafe_usage
 
   STRNCPY (pBuf, MAX_LOG_SIZE, "[ENCODER]: ", len);	// confirmed_safe_unsafe_usage
-#if defined(_WIN32)
-#if defined(_MSC_VER)
-#if _MSC_VER>=1500
-  VSPRINTF (pBuf + len, MAX_LOG_SIZE - len, WStr_Format, vl);	// confirmed_safe_unsafe_usage
-#else
-  VSPRINTF (pBuf + len, WStr_Format, vl);	// confirmed_safe_unsafe_usage
-#endif//_MSC_VER>=1500
-#endif//_MSC_VER
-#else//__GNUC__
-  VSPRINTF (pBuf + len, WStr_Format, vl);	// confirmed_safe_unsafe_usage
-#endif//WIN32
+  WelsVsnprintf (pBuf + len, MAX_LOG_SIZE - len, WStr_Format, vl);	// confirmed_safe_unsafe_usage
   STRNCPY (cResult, MAX_LOG_SIZE, pBuf, STRNLEN (pBuf, MAX_LOG_SIZE));	// confirmed_safe_unsafe_usage
 
 //		g_WelsCodecTrace.TraceString(iLevel, cResult);

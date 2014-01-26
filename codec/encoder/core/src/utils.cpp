@@ -254,14 +254,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
       }
     }
     if (iBufLeft > 0) {
-#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER >= 1500)
-      int32_t len = 0;
-      len = _vscprintf (kpFmtStr, argv)  // _vscprintf doesn't count
-            + 1; // terminating '\0'
-      iCurUsed = VSPRINTF (&pBuf[iBufUsed], len, kpFmtStr, argv);	// confirmed_safe_unsafe_usage
-#else
-      iCurUsed = VSPRINTF (&pBuf[iBufUsed], kpFmtStr, argv);	// confirmed_safe_unsafe_usage
-#endif//WIN32..
+      iCurUsed = WelsVsnprintf (&pBuf[iBufUsed], iBufLeft, kpFmtStr, argv);	// confirmed_safe_unsafe_usage
       if (iCurUsed > 0) {
         iBufUsed += iCurUsed;
         iBufLeft -= iCurUsed;
