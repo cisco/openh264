@@ -124,7 +124,7 @@ int32_t WelsSnprintf (str_t* pBuffer,  int32_t iSizeOfBuffer, const str_t* kpFor
 
   va_start (pArgPtr, kpFormat);
 
-  iRc = vsprintf (pBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
+  iRc = vsnprintf (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
 
   va_end (pArgPtr);
 
