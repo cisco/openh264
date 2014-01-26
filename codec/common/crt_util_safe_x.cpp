@@ -125,6 +125,8 @@ int32_t WelsSnprintf (str_t* pBuffer,  int32_t iSizeOfBuffer, const str_t* kpFor
   va_start (pArgPtr, kpFormat);
 
   iRc = vsnprintf (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
+  if (iRc < 0)
+    pBuffer[iSizeOfBuffer - 1] = '\0';
 
   va_end (pArgPtr);
 
@@ -142,7 +144,10 @@ int32_t WelsStrnlen (const str_t* kpStr,  int32_t iMaxlen) {
 }
 
 int32_t WelsVsnprintf (str_t* pBuffer, int32_t iSizeOfBuffer, const str_t* kpFormat, va_list pArgPtr) {
-  return vsnprintf (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
+  int32_t iRc = vsnprintf (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
+  if (iRc < 0)
+    pBuffer[iSizeOfBuffer - 1] = '\0';
+  return iRc;
 }
 
 
