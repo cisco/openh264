@@ -345,8 +345,6 @@ void_t WelsOpenDecoder (PWelsDecoderContext pCtx) {
   if (ERR_NONE != WelsInitMemory (pCtx))
     return;
 
-  pCtx->iMaxWidthInSps	= 0;
-  pCtx->iMaxHeightInSps	= 0;
 #ifdef LONG_TERM_REF
   pCtx->bParamSetsLostFlag = true;
 #else
@@ -683,19 +681,6 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
   }
 
   return iErr;
-}
-
-/*!
- * \brief	update maximal picture width and height if applicable when receiving a SPS NAL
- */
-void_t UpdateMaxPictureResolution (PWelsDecoderContext pCtx, const int32_t kiCurWidth, const int32_t kiCurHeight) {
-  //any dimension larger than that of current dimension, should modify the max-dimension
-  if ((kiCurWidth * kiCurHeight) > (pCtx->iMaxWidthInSps * pCtx->iMaxHeightInSps)) {
-    pCtx->iMaxWidthInSps	= kiCurWidth;
-    pCtx->iMaxHeightInSps	= kiCurHeight;
-  }
-
-  return;
 }
 
 void_t AssignFuncPointerForRec (PWelsDecoderContext pCtx) {

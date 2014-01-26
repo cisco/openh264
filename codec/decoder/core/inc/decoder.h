@@ -130,11 +130,6 @@ int32_t DecoderSetCsp (PWelsDecoderContext pCtx, const int32_t kiColorFormat);
  */
 int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight);
 
-/*!
- * \brief	update maximal picture width and height if applicable when receiving a SPS NAL
- */
-void_t UpdateMaxPictureResolution (PWelsDecoderContext pCtx, const int32_t kiCurWidth, const int32_t kiCurHeight);
-
 void_t AssignFuncPointerForRec (PWelsDecoderContext pCtx);
 
 void_t ResetParameterSetsState (PWelsDecoderContext pCtx);
