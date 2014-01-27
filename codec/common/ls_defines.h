@@ -39,35 +39,27 @@
 #ifdef __GNUC__
 
 struct tagUnaligned_64 {
-uint64_t l;
+  uint64_t l;
 } __attribute__ ((packed));
 struct tagUnaligned_32 {
-uint32_t l;
+  uint32_t l;
 } __attribute__ ((packed));
 struct tagUnaligned_16 {
-uint16_t l;
+  uint16_t l;
 } __attribute__ ((packed));
 
 #define LD16(a) (((struct tagUnaligned_16 *) (a))->l)
 #define LD32(a) (((struct tagUnaligned_32 *) (a))->l)
-//#define LD64(a) (((struct tagUnaligned_64 *) (a))->l)
-inline uint64_t LD64 (const void* a) {
-uint64_t v;
-memcpy (&v, a, sizeof (v));	// confirmed_safe_unsafe_usage
-return v;
-}
+#define LD64(a) (((struct tagUnaligned_64 *) (a))->l)
 //#define _USE_STRUCT_INT_CVT
 //	#ifdef _USE_STRUCT_INT_CVT
 #define ST16(a, b) (((struct tagUnaligned_16 *) (a))->l) = (b)
 #define ST32(a, b) (((struct tagUnaligned_32 *) (a))->l) = (b)
-//#define ST64(a, b) (((struct tagUnaligned_64 *) (a))->l) = (b)
-inline void ST64 (void* a, uint64_t b) {
-  memcpy (a, &b, sizeof (b));	// confirmed_safe_unsafe_usage
-}
+#define ST64(a, b) (((struct tagUnaligned_64 *) (a))->l) = (b)
 //	#else
-//		inline void __ST16(void *dst, uint16_t v) { memcpy(dst, &v, 2); }
-//		inline void __ST32(void *dst, uint32_t v) { memcpy(dst, &v, 4); }
-//inline void __ST64(void *dst, uint64_t v) { memcpy(dst, &v, 8); }
+//		inline void_t __ST16(void_t *dst, uint16_t v) { memcpy(dst, &v, 2); }
+//		inline void_t __ST32(void_t *dst, uint32_t v) { memcpy(dst, &v, 4); }
+//inline void_t __ST64(void_t *dst, uint64_t v) { memcpy(dst, &v, 8); }
 //	#endif
 
 #else
@@ -98,4 +90,4 @@ inline void ST64 (void* a, uint64_t b) {
 #define INTD64	LD64
 #endif//INTD64
 
-#endif
+#endif//___LD_ST_MACROS___

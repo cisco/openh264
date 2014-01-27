@@ -786,7 +786,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\decoder\core\inc\ls_defines.h"
+					RelativePath="..\..\..\common\ls_defines.h"
 					>
 				</File>
 				<File
