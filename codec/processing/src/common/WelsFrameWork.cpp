@@ -31,7 +31,6 @@
  */
 
 #include "WelsFrameWork.h"
-#include "cpu.h"
 #include "../denoise/denoise.h"
 #include "../downsample/downsample.h"
 #include "../scenechangedetection/SceneChangeDetection.h"
