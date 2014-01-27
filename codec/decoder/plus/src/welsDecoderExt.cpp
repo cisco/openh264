@@ -132,7 +132,7 @@ CWelsDecoder::CWelsDecoder (void_t)
   }
 
   if (iBufLeft > 0) {
-    iCurUsed = WelsSnprintf (&chFileName[iBufUsed], iBufLeft, ".%03.3u.264", WelsGetMillsecond (&sCurTime));
+    iCurUsed = WelsSnprintf (&chFileName[iBufUsed], iBufLeft, ".%03.3u.264", WelsGetMillisecond (&sCurTime));
     if (iCurUsed > 0) {
       iBufUsed += iCurUsed;
       iBufLeft -= iCurUsed;
@@ -141,7 +141,7 @@ CWelsDecoder::CWelsDecoder (void_t)
 
   if (iBufLeftSize > 0) {
     iCurUsedSize = WelsSnprintf (&chFileNameSize[iBufUsedSize], iBufLeftSize, ".%03.3u.len",
-                                 WelsGetMillsecond (&sCurTime));
+                                 WelsGetMillisecond (&sCurTime));
     if (iCurUsedSize > 0) {
       iBufUsedSize += iCurUsedSize;
       iBufLeftSize -= iCurUsedSize;
