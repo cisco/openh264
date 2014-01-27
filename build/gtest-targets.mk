@@ -9,8 +9,8 @@ $(GTEST_SRCDIR)/%.o: $(GTEST_SRCDIR)/%.cc
 	$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(GTEST_CFLAGS) $(GTEST_INCLUDES) -c $(CXX_O) $<
 
 $(LIBPREFIX)gtest.$(LIBSUFFIX): $(GTEST_OBJS)
-	rm -f $(LIBPREFIX)gtest.$(LIBSUFFIX)
-	$(AR) $(AR_OPTS) $(GTEST_OBJS)
+	rm -f $@
+	$(AR) $(AR_OPTS) $+
 
 libraries: $(LIBPREFIX)gtest.$(LIBSUFFIX)
 LIBRARIES += $(LIBPREFIX)gtest.$(LIBSUFFIX)

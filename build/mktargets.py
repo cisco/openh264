@@ -112,8 +112,8 @@ if len(asm) > 0:
 
 if args.library is not None:
     f.write("$(LIBPREFIX)%s.$(LIBSUFFIX): $(%s_OBJS)\n"%(args.library, PREFIX))
-    f.write("\trm -f $(LIBPREFIX)%s.$(LIBSUFFIX)\n"%args.library)
-    f.write("\t$(AR) $(AR_OPTS) $(%s_OBJS)\n"%PREFIX)
+    f.write("\trm -f $@\n")
+    f.write("\t$(AR) $(AR_OPTS) $+\n")
     f.write("\n")
     f.write("libraries: $(LIBPREFIX)%s.$(LIBSUFFIX)\n"%args.library)
     f.write("LIBRARIES += $(LIBPREFIX)%s.$(LIBSUFFIX)\n"%args.library)
