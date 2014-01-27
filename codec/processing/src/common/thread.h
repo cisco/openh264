@@ -71,7 +71,7 @@ typedef   pthread_mutex_t   WELS_MUTEX;
 
 #endif
 
-typedef long_t WELS_THREAD_ERROR_CODE;
+typedef int32_t WELS_THREAD_ERROR_CODE;
 
 #define   WELS_THREAD_ERROR_OK					0
 #define   WELS_THREAD_ERROR_GENERAL			((unsigned long)(-1))

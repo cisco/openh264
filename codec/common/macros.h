@@ -131,7 +131,7 @@ __declspec(align(alignment)) type name[(sizex)*(sizey)]
 	nC += (uint8_t)(nA == -1 && nB == -1);           \
 }
 
-static __inline int32_t CeilLog2 (int32_t i) {
+static inline int32_t CeilLog2 (int32_t i) {
 int32_t s = 0;
 i--;
 while (i > 0) {

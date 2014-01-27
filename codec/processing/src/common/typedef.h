@@ -60,7 +60,7 @@ WELSVP_NAMESPACE_BEGIN
 
 #if defined(_MSC_VER)
 
-typedef char               int8_t   ;
+typedef signed char        int8_t   ;
 typedef unsigned char      uint8_t  ;
 typedef short              int16_t  ;
 typedef unsigned short     uint16_t ;
@@ -68,17 +68,14 @@ typedef int                int32_t  ;
 typedef unsigned int       uint32_t ;
 typedef __int64            int64_t  ;
 typedef unsigned __int64   uint64_t ;
-#define inline_t           _inline
-
-#else	// GCC
-
-#define inline_t           inline
+#if _MSC_VER < 1700
+#define inline            __inline
+#endif
 
 #endif
 
 typedef char    str_t    ; // [comment]: specific use plain char only for character parameters
-typedef long    long_t   ;
-typedef int32_t bool_t   ;
+typedef bool    bool_t   ;
 
 #if defined(_WIN32) || defined(_MACH_PLATFORM) || defined(__GNUC__)
 typedef float   float_t  ;

@@ -67,8 +67,8 @@ WELSVP_NAMESPACE_BEGIN
 
 #define WELS_MAX(x, y)	((x) > (y) ? (x) : (y))
 #define WELS_MIN(x, y)	((x) < (y) ? (x) : (y))
-#define WELS_SIGN(a)	((long_t)(a) >> 31)
-#define WELS_ABS(a)		((WELS_SIGN(a) ^ (long_t)(a)) - WELS_SIGN(a))
+#define WELS_SIGN(a)	((int32_t)(a) >> 31)
+#define WELS_ABS(a)		((WELS_SIGN(a) ^ (int32_t)(a)) - WELS_SIGN(a))
 #define WELS_CLAMP(x, minv, maxv)  WELS_MIN(WELS_MAX(x, minv), maxv)
 
 #define ALIGNBYTES         (16)       /* Worst case is requiring alignment to an 16 byte boundary */
@@ -84,7 +84,7 @@ WELSVP_NAMESPACE_BEGIN
 #define GET_METHOD(x)  ((x) & 0xff)          // mask method as the lowest 8bits
 #define GET_SPECIAL(x) (((x) >> 8) & 0xff)   // mask special flag as 8bits
 
-inline_t EMethods WelsVpGetValidMethod (int32_t a) {
+inline EMethods WelsVpGetValidMethod (int32_t a) {
   int32_t iMethod = GET_METHOD (a);
   return WelsStaticCast (EMethods, WELS_CLAMP (iMethod, METHOD_NULL + 1, METHOD_MASK - 1));
 }
