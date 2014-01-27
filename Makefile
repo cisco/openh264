@@ -129,6 +129,14 @@ include codec/processing/targets.mk
 include codec/console/dec/targets.mk
 include codec/console/enc/targets.mk
 
+libraries: $(LIBPREFIX)wels.$(LIBSUFFIX)
+LIBRARIES += $(LIBPREFIX)wels.$(LIBSUFFIX)
+
+$(LIBPREFIX)wels.$(LIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
+	rm -f $@
+	$(AR) $(AR_OPTS) $+
+
+
 ifeq ($(HAVE_GTEST),Yes)
 include build/gtest-targets.mk
 include test/targets.mk
