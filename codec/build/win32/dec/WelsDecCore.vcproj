@@ -790,7 +790,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\decoder\core\inc\macros.h"
+					RelativePath="..\..\..\common\macros.h"
 					>
 				</File>
 				<File

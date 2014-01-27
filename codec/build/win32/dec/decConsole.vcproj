@@ -505,10 +505,6 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 		</Filter>
-		<File
-			RelativePath="..\..\..\..\bin\win32\Release\welsdec.cfg"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>
