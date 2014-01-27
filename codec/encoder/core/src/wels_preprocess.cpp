@@ -43,6 +43,7 @@
 #include "wels_preprocess.h"
 #include "picture_handle.h"
 #include "encoder_context.h"
+#include "utils.h"
 
 #ifdef NO_DYNAMIC_VP
 EResult WELSAPI CreateVpInterface (void** ppCtx, int iVersion);
