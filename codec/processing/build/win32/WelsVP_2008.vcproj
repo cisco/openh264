@@ -446,7 +446,7 @@
 			Name="Header Files"
 			>
 			<File
-				RelativePath="..\..\src\common\cpu.h"
+				RelativePath="..\..\..\common\cpu.h"
 				>
 			</File>
 			<File
@@ -463,10 +463,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\common\util.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\common\version.h"
 				>
 			</File>
 			<File
