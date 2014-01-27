@@ -2085,8 +2085,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   if (wlog == WelsLogDefault) {
     str_t fname[MAX_FNAME_LEN] = {0};
 
-    WelsSnprintf (fname, MAX_FNAME_LEN, "%swels_svc_encoder_trace.txt",
-                  pCodingParam->sTracePath);		// confirmed_safe_unsafe_usage
+    WelsSnprintf (fname, MAX_FNAME_LEN, "wels_svc_encoder_trace.txt");
 
 
     pCtx->pFileLog	= WelsFopen (fname, "wt+");

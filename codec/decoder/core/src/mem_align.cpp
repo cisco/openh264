@@ -53,8 +53,8 @@ void_t* WelsMalloc (const uint32_t kuiSize, const str_t* kpTag) {
 
 #ifdef MEMORY_CHECK
   if (pMemCheckMalloc == NULL) {
-    pMemCheckMalloc = WelsFopen (".\\mem_check_malloc.txt", "at+");
-    pMemCheckFree   = WelsFopen (".\\mem_check_free.txt", "at+");
+    pMemCheckMalloc = WelsFopen ("mem_check_malloc.txt", "at+");
+    pMemCheckFree   = WelsFopen ("mem_check_free.txt", "at+");
   }
 
   if (kpTag != NULL) {

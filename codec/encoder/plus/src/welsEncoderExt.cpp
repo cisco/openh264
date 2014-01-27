@@ -407,20 +407,6 @@ int CWelsH264SVCEncoder::Initialize2 (void* argv, const INIT_TYPE iInitType) {
     InitPic (m_pSrcPicList[i], iColorspace, m_iMaxPicWidth, m_iMaxPicHeight);
   }
 
-#if defined(OUTPUT_BIT_STREAM) || defined(ENABLE_TRACE_FILE)
-  str_t fpath[MAX_FNAME_LEN] = {0};
-#if defined(__GNUC__)
-  WelsSnprintf (fpath, MAX_FNAME_LEN, "/tmp/");		// confirmed_safe_unsafe_usage
-
-#else//__GNUC__
-
-  WelsSnprintf (fpath, MAX_FNAME_LEN, ".\\");		// confirmed_safe_unsafe_usage
-#endif //__GNUC__
-
-  strcpy (pCfg->sTracePath, fpath);		// confirmed_safe_unsafe_usage
-
-#endif //#if defined(OUTPUT_BIT_STREAM) || defined(ENABLE_TRACE_FILE)
-
   if (WelsInitEncoderExt (&m_pEncContext, pCfg)) {
     WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::Initialize(), WelsInitEncoderExt failed.\n");
     Uninitialize();
