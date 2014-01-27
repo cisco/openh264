@@ -42,17 +42,14 @@
 
 #include <stdlib.h>
 
-#if !(defined(_MSC_VER) || defined(__MINGW32__))
+#ifndef _WIN32
 #include <sys/time.h>
 #else
 #include "typedefs.h"
-//#include <sys/types.h>
+#include <windows.h>
 #include <sys/timeb.h>
 #endif
 #include <time.h>
-#if defined(_WIN32)
-#include <windows.h>
-#endif//#if _WIN32
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,13 +62,12 @@ extern "C" {
  */
 
 int64_t WelsTime (void_t) {
-#if !(defined(_MSC_VER) || defined(__MINGW32__))
+#ifndef _WIN32
   struct timeval tv_date;
 
   gettimeofday (&tv_date, NULL);
   return ((int64_t) tv_date.tv_sec * 1000000 + (int64_t) tv_date.tv_usec);
 #else
-#if defined (_WIN32)
   static int64_t iMtimeFreq = 0;
   int64_t iMtimeCur = 0;
   int64_t iResult = 0;
@@ -83,13 +79,7 @@ int64_t WelsTime (void_t) {
   QueryPerformanceCounter ((LARGE_INTEGER*)&iMtimeCur);
   iResult = (int64_t) ((double)iMtimeCur * 1e6 / (double)iMtimeFreq + 0.5);
   return iResult;
-#else
-  struct _timeb sTime;
-
-  _ftime (&sTime);
-  return ((int64_t)sTime.time * (1000) + (int64_t)sTime.millitm) * (1000);
-#endif//#if _WIN32
-#endif//!(defined(_MSC_VER) || defined(__MINGW32__))
+#endif//WIN32
 }
 
 #ifdef __cplusplus
