@@ -264,7 +264,6 @@ void WelsReopenTraceFile (void* pCtx, str_t* pCurPath) {
 #ifdef ENABLE_TRACE_FILE
   sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pCtx;
   if (wlog == WelsLogDefault) {
-    str_t strTraceFile[MAX_FNAME_LEN] = {0};
     int32_t len = 0;
     if (pEncCtx->pFileLog != NULL) {
       fclose (pEncCtx->pFileLog);
@@ -274,14 +273,7 @@ void WelsReopenTraceFile (void* pCtx, str_t* pCurPath) {
     len = STRNLEN (pCurPath, MAX_FNAME_LEN - 1);	// confirmed_safe_unsafe_usage
     if (len >= MAX_FNAME_LEN)
       return;
-    STRNCPY (strTraceFile, MAX_FNAME_LEN, pCurPath, len);	// confirmed_safe_unsafe_usage
-#ifdef __GNUC__
-    STRCAT (strTraceFile, MAX_FNAME_LEN - len, "/wels_encoder_trace.txt");	// confirmed_safe_unsafe_usage
-#elif _WIN32
-    STRCAT (strTraceFile, MAX_FNAME_LEN - len, "\\wels_encoder_trace.txt"); // confirmed_safe_unsafe_usage
-#else
-#endif//__GNUC__
-    pEncCtx->pFileLog	= WelsFopen (strTraceFile, "wt+");	// confirmed_safe_unsafe_usage
+    pEncCtx->pFileLog	= WelsFopen ("wels_encoder_trace.txt", "wt+");	// confirmed_safe_unsafe_usage
   }
 #endif//ENABLE_TRACE_FILE
 }

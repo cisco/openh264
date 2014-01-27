@@ -408,16 +408,7 @@ int CWelsH264SVCEncoder::Initialize2 (void* argv, const INIT_TYPE iInitType) {
   }
 
 #if defined(OUTPUT_BIT_STREAM) || defined(ENABLE_TRACE_FILE)
-  str_t fpath[MAX_FNAME_LEN] = {0};
-#if defined(__GNUC__)
-  WelsSnprintf (fpath, MAX_FNAME_LEN, "/tmp/");		// confirmed_safe_unsafe_usage
-
-#else//__GNUC__
-
-  WelsSnprintf (fpath, MAX_FNAME_LEN, ".\\");		// confirmed_safe_unsafe_usage
-#endif //__GNUC__
-
-  strcpy (pCfg->sTracePath, fpath);		// confirmed_safe_unsafe_usage
+  pCfg->sTracePath[0] = '\0';
 
 #endif //#if defined(OUTPUT_BIT_STREAM) || defined(ENABLE_TRACE_FILE)
 

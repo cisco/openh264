@@ -428,11 +428,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
     fclose (pSmt->pFSliceDiff);
     pSmt->pFSliceDiff = NULL;
   }
-#ifdef _WIN32
-  pSmt->pFSliceDiff	= fopen (".\\slice_time.txt", "wt+");
-#else
-  pSmt->pFSliceDiff	= fopen ("/tmp/slice_time.txt", "wt+");
-#endif//_WIN32
+  pSmt->pFSliceDiff	= fopen ("slice_time.txt", "wt+");
 #endif//MT_DEBUG
 
 #if defined(ENABLE_TRACE_MT)
