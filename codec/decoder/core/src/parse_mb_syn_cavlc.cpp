@@ -537,7 +537,6 @@ static int32_t CavlcGetLevelVal (int32_t iLevel[16], SReadBitsCache* pBitsCache,
                                  uint8_t uiTrailingOnes) {
   int32_t i, iUsedBits = 0;
   int32_t iSuffixLength, iSuffixLengthSize, iLevelPrefix, iPrefixBits, iLevelCode, iThreshold;
-  uint32_t uiCache32Bit;
   for (i = 0; i < uiTrailingOnes; i++) {
     iLevel[i] = 1 - ((pBitsCache->uiCache32Bit >> (30 - i)) & 0x02);
   }
@@ -548,12 +547,7 @@ static int32_t CavlcGetLevelVal (int32_t iLevel[16], SReadBitsCache* pBitsCache,
 
   for (; i < uiTotalCoeff; i++) {
     if (pBitsCache->uiRemainBits <= 16)		SHIFT_BUFFER (pBitsCache);
-#if defined(_MSC_VER) && defined(_M_IX86)
-    uiCache32Bit = pBitsCache->uiCache32Bit;
-    WELS_GET_PREFIX_BITS (uiCache32Bit, iPrefixBits);
-#else
-    iPrefixBits = GetPrefixBits (pBitsCache->uiCache32Bit);
-#endif
+    WELS_GET_PREFIX_BITS (pBitsCache->uiCache32Bit, iPrefixBits);
     POP_BUFFER (pBitsCache, iPrefixBits);
     iUsedBits   += iPrefixBits;
     iLevelPrefix = iPrefixBits - 1;
