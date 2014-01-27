@@ -40,7 +40,6 @@
 
 #include "deblocking.h"
 #include "cpu_core.h"
-#include "fmo.h"
 
 namespace WelsDec {
 

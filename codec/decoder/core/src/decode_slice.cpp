@@ -37,26 +37,17 @@
  *      08/09/2013 Modified
  *
  *****************************************************************************/
-#include <memory.h>
 
-#include "typedefs.h"
-#include "dec_golomb.h"
 
-#include "fmo.h"
 #include "deblocking.h"
-#include "utils.h"
 
 #include "decode_slice.h"
 
-#include "error_code.h"
-#include "decode_mb_aux.h"
 #include "parse_mb_syn_cavlc.h"
 #include "rec_mb.h"
 #include "mv_pred.h"
 
-#include "as264_common.h"
 #include "cpu_core.h"
-#include "expand_pic.h"
 
 namespace WelsDec {
 
