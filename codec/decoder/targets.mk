@@ -1,4 +1,3 @@
-DECODER_PREFIX=DECODER
 DECODER_SRCDIR=codec/decoder
 DECODER_CPP_SRCS=\
 	$(DECODER_SRCDIR)/./core/src/au_parser.cpp\

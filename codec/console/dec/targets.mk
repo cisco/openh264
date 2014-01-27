@@ -1,4 +1,3 @@
-H264DEC_PREFIX=H264DEC
 H264DEC_SRCDIR=codec/console/dec
 H264DEC_CPP_SRCS=\
 	$(H264DEC_SRCDIR)/./src/d3d9_utils.cpp\

@@ -1,4 +1,3 @@
-GTEST_PREFIX=GTEST
 GTEST_SRCDIR=gtest
 GTEST_CPP_SRCS=\
 	$(GTEST_SRCDIR)/./src/gtest-all.cc\

@@ -1,4 +1,3 @@
-H264ENC_PREFIX=H264ENC
 H264ENC_SRCDIR=codec/console/enc
 H264ENC_CPP_SRCS=\
 	$(H264ENC_SRCDIR)/./src/read_config.cpp\
