@@ -324,39 +324,29 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const str_t* kpFileNam
 
   if (bDependencyRecFlag[kiDid]) {
     if (STRNLEN (kpFileName, MAX_FNAME_LEN) > 0)	// confirmed_safe_unsafe_usage
-#if defined(__GNUC__) || (defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER<1500))
-      pDumpRecFile	= FOPEN (kpFileName, "ab");
-#elif defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
-      FOPEN (&pDumpRecFile, kpFileName, "ab");
-#endif//__GNUC__..
+      pDumpRecFile = WelsFopen (kpFileName, "ab");
     else {
       str_t sDependencyRecFileName[16] = {0};
 #if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
       SNPRINTF (sDependencyRecFileName, 16, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-      FOPEN (&pDumpRecFile, sDependencyRecFileName, "ab");
 #else
       SNPRINTF (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-      pDumpRecFile	= FOPEN (sDependencyRecFileName, "ab");
 #endif//WIN32..
+      pDumpRecFile	= WelsFopen (sDependencyRecFileName, "ab");
     }
     if (NULL != pDumpRecFile)
       fseek (pDumpRecFile, 0, SEEK_END);
   } else {
     if (STRNLEN (kpFileName, MAX_FNAME_LEN) > 0) {	// confirmed_safe_unsafe_usage
-#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
-      FOPEN (&pDumpRecFile, kpFileName, "wb");
-#else
-      pDumpRecFile	= FOPEN (kpFileName, "wb");
-#endif//WIN32..
+      pDumpRecFile	= WelsFopen (kpFileName, "wb");
     } else {
       str_t sDependencyRecFileName[16] = {0};
 #if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
       SNPRINTF (sDependencyRecFileName, 16, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-      FOPEN (&pDumpRecFile, sDependencyRecFileName, "wb");
 #else
       SNPRINTF (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-      pDumpRecFile	= FOPEN (sDependencyRecFileName, "wb");
 #endif//WIN32..
+      pDumpRecFile	= WelsFopen (sDependencyRecFileName, "wb");
     }
     bDependencyRecFlag[kiDid]	= true;
   }
@@ -410,33 +400,17 @@ void DumpRecFrame (SPicture* pCurPicture, const str_t* kpFileName) {
 
   if (bRecFlag) {
     if (STRNLEN (kpFileName, MAX_FNAME_LEN) > 0) {	// confirmed_safe_unsafe_usage
-#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
-      FOPEN (&pDumpRecFile, kpFileName, "ab");
-#else
-      pDumpRecFile	= FOPEN (kpFileName, "ab");
-#endif//WIN32
+      pDumpRecFile	= WelsFopen (kpFileName, "ab");
     } else {
-#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
-      FOPEN (&pDumpRecFile, "rec.yuv", "ab");
-#else
-      pDumpRecFile	= FOPEN ("rec.yuv", "ab");
-#endif//WIN32
+      pDumpRecFile	= WelsFopen ("rec.yuv", "ab");
     }
     if (NULL != pDumpRecFile)
       fseek (pDumpRecFile, 0, SEEK_END);
   } else {
     if (STRNLEN (kpFileName, MAX_FNAME_LEN) > 0) {	// confirmed_safe_unsafe_usage
-#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
-      FOPEN (&pDumpRecFile, kpFileName, "wb");
-#else
-      pDumpRecFile	= FOPEN (kpFileName, "wb");
-#endif//WIN32
+      pDumpRecFile	= WelsFopen (kpFileName, "wb");
     } else {
-#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
-      FOPEN (&pDumpRecFile, "rec.yuv", "wb");
-#else
-      pDumpRecFile	= FOPEN ("rec.yuv", "wb");
-#endif//WIN32..
+      pDumpRecFile	= WelsFopen ("rec.yuv", "wb");
     }
     bRecFlag	= true;
   }

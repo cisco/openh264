@@ -2100,17 +2100,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
 #endif//_MSC_VER
 
 
-#if defined(__GNUC__)
-    pCtx->pFileLog	= FOPEN (fname, "wt+");
-#else//WIN32
-#if defined(_WIN32) && defined(_MSC_VER)
-#if _MSC_VER >= 1500
-    FOPEN (&pCtx->pFileLog, fname, "wt+");
-#else
-    pCtx->pFileLog	= FOPEN (fname, "wt+");
-#endif//_MSC_VER>=1500
-#endif//WIN32 && _MSC_VER
-#endif//__GNUC__
+    pCtx->pFileLog	= WelsFopen (fname, "wt+");
     pCtx->uiSizeLog	= 0;
   }
 #endif//ENABLE_TRACE_FILE
