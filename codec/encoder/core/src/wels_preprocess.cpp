@@ -40,17 +40,9 @@
 #endif
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
 #include "wels_preprocess.h"
-#include "memory_align.h"
-#include "encoder.h"
-#include "extern.h"
 #include "picture_handle.h"
 #include "encoder_context.h"
-#include "utils.h"
 
 #ifdef NO_DYNAMIC_VP
 EResult WELSAPI CreateVpInterface (void** ppCtx, int iVersion);

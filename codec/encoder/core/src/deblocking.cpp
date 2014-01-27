@@ -38,7 +38,6 @@
  *************************************************************************************
  */
 
-#include "as264_common.h"
 #include "deblocking.h"
 #include "cpu_core.h"
 #include "array_stack_align.h"

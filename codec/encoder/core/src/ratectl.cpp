@@ -41,9 +41,6 @@
  *
  *
  *************************************************************************/
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
 #include "rc.h"
 #include "encoder_context.h"
 #include "utils.h"

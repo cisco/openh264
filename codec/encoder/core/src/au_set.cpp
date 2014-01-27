@@ -38,8 +38,6 @@
  *************************************************************************************
  */
 
-#include <string.h>
-#include <assert.h>
 #include "au_set.h"
 #include "svc_enc_golomb.h"
 namespace WelsSVCEnc {

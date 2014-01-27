@@ -30,9 +30,7 @@
  *
  */
 
-#include <string.h>
 #include "decode_mb_aux.h"
-#include "wels_common_basis.h"
 #include "cpu_core.h"
 
 namespace WelsSVCEnc {

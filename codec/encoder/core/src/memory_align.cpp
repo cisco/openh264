@@ -32,7 +32,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include "memory_align.h"
 #include "macros.h"
 

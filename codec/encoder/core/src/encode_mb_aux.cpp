@@ -30,14 +30,10 @@
  *
  */
 
-#include <string.h>
 
-#include "macros.h"
 #include "ls_defines.h"
 #include "encode_mb_aux.h"
 #include "cpu_core.h"
-#include "as264_common.h"
-#include "svc_encode_mb.h"
 namespace WelsSVCEnc {
 
 __align16 (const int16_t, g_kiQuantInterFF[58][8]) = {
