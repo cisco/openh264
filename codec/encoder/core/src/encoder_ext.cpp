@@ -1789,7 +1789,7 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
 
 #ifdef ENABLE_TRACE_FILE
     if (NULL != pCtx->pFileLog) {
-      fclose (pCtx->pFileLog);
+      WelsFclose (pCtx->pFileLog);
       pCtx->pFileLog	= NULL;
     }
     pCtx->uiSizeLog	= 0;

@@ -270,6 +270,10 @@ uint16_t WelsGetMillisecond (const SWelsTime* kpTp) {
   return kpTp->millitm;
 }
 
+int32_t WelsFseek (WelsFileHandle* fp, int32_t offset, int32_t origin) {
+  return fseek(fp, offset, origin);
+}
+
 int32_t WelsFflush (WelsFileHandle* pFp) {
   return fflush (pFp);
 }
