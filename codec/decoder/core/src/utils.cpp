@@ -178,7 +178,8 @@ int32_t WelsFclose (WelsFileHandle* pFp) {
 }
 
 int32_t WelsGetTimeOfDay (SWelsTime* pTp) {
-  return _ftime (pTp);
+  _ftime (pTp);
+  return 0;
 }
 
 int32_t WelsStrftime (str_t* pBuffer, int32_t iSize, const str_t* kpFormat, const SWelsTime* kpTp) {
