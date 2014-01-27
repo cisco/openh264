@@ -1,5 +1,5 @@
 #!/bin/sh
-python build/mktargets.py --directory codec/decoder --library decoder --exclude StdAfx.cpp
+python build/mktargets.py --directory codec/decoder --library decoder
 python build/mktargets.py --directory codec/encoder --library encoder --exclude DllEntry.cpp
 python build/mktargets.py --directory codec/common --library common
 python build/mktargets.py --directory codec/processing --library processing
