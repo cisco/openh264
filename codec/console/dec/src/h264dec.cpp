@@ -46,7 +46,7 @@
 #include "codec_api.h"
 #include "read_config.h"
 #include "typedefs.h"
-#include "../../decoder/core/inc/measure_time.h"
+#include "measure_time.h"
 #include "d3d9_utils.h"
 #include "logging.h"
 
