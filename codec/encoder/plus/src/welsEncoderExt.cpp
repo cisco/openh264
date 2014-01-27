@@ -77,10 +77,12 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
   str_t strStreamFileName[1024] = { 0 };  //for .264
   int32_t iBufferUsed = 0;
   int32_t iBufferLeft = 1023;
+  int32_t iCurUsed;
 
   str_t strLenFileName[1024] = { 0 }; //for .len
   int32_t iBufferUsedSize = 0;
   int32_t iBufferLeftSize = 1023;
+  int32_t iCurUsedSize;
 #endif//OUTPUT_BIT_STREAM
 
 #ifdef OUTPUT_BIT_STREAM
@@ -118,26 +120,29 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
 #ifdef _WIN32
 #if defined(_MSC_VER)
 #if _MSC_VER>=1500
-  iBufferUsed      += SNPRINTF (strStreamFileName,      iBufferLeft, iBufferLeft,      "enc_bs_0x%p_", (void*)this);
-  iBufferUsedSize += SNPRINTF (strLenFileName, iBufferLeftSize, iBufferLeftSize, "enc_size_0x%p_", (void*)this);
+  iCurUsed      = SNPRINTF (strStreamFileName,      iBufferLeft, iBufferLeft,      "enc_bs_0x%p_", (void*)this);
+  iCurUsedSize  = SNPRINTF (strLenFileName, iBufferLeftSize, iBufferLeftSize, "enc_size_0x%p_", (void*)this);
 #else
-  iBufferUsed      += SNPRINTF (strStreamFileName,      iBufferLeft,      "enc_bs_0x%p_", (void*)this);
-  iBufferUsedSize += SNPRINTF (strLenFileName, iBufferLeftSize, "enc_size_0x%p_", (void*)this);
+  iCurUsed      = SNPRINTF (strStreamFileName,      iBufferLeft,      "enc_bs_0x%p_", (void*)this);
+  iCurUsedSize  = SNPRINTF (strLenFileName, iBufferLeftSize, "enc_size_0x%p_", (void*)this);
 #endif//_MSC_VER>=1500
 #endif//_MSC_VER
 #else
-  iBufferUsed      += SNPRINTF (strStreamFileName,      iBufferLeft,      "/tmp/enc_bs_0x%p_", (void*)this);
-  iBufferUsedSize += SNPRINTF (strLenFileName, iBufferLeftSize, "/tmp/enc_size_0x%p", (void*)this);
+  iCurUsed      = SNPRINTF (strStreamFileName,      iBufferLeft,      "/tmp/enc_bs_0x%p_", (void*)this);
+  iCurUsedSize  = SNPRINTF (strLenFileName, iBufferLeftSize, "/tmp/enc_size_0x%p", (void*)this);
 #endif//WIN32
 
 
-  iBufferLeft -= iBufferUsed;
-  if (iBufferLeft > iBufferUsed) {
+  if (iCurUsed > 0) {
+    iBufferUsed += iCurUsed;
+    iBufferLeft -= iCurUsed;
+  }
+  if (iBufferLeft > 0) {
 #if defined(_GNUC__)
-    iBufferUsed += strftime (&strStreamFileName[iBufferUsed], iBufferLeft, "%y%m%d%H%M%S", tTimeNow);
+    iCurUsed = strftime (&strStreamFileName[iBufferUsed], iBufferLeft, "%y%m%d%H%M%S", tTimeNow);
 #else
 #if defined(_MSC_VER)
-    iBufferUsed += strftime (&strStreamFileName[iBufferUsed], iBufferLeft, "%y%m%d%H%M%S",
+    iCurUsed = strftime (&strStreamFileName[iBufferUsed], iBufferLeft, "%y%m%d%H%M%S",
 #if _MSC_VER>=1500
                              & tTimeNow
 #else
@@ -146,16 +151,20 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
                             );
 #endif//_MSC_VER
 #endif//__GNUC__
-    iBufferLeft -= iBufferUsed;
+    iBufferUsed += iCurUsed;
+    iBufferLeft -= iCurUsed;
   }
 
-  iBufferLeftSize -= iBufferUsedSize;
-  if (iBufferLeftSize > iBufferUsedSize) {
+  if (iCurUsedSize > 0) {
+    iBufferUsedSize += iCurUsedSize;
+    iBufferLeftSize -= iCurUsedSize;
+  }
+  if (iBufferLeftSize > 0) {
 #if defined(_GNUC__)
-    iBufferUsedSize += strftime (&strLenFileName[iBufferUsedSize], iBufferLeftSize, "%y%m%d%H%M%S", tTimeNow);
+    iCurUsedSize = strftime (&strLenFileName[iBufferUsedSize], iBufferLeftSize, "%y%m%d%H%M%S", tTimeNow);
 #else
 #if defined(_MSC_VER)
-    iBufferUsedSize += strftime (&strLenFileName[iBufferUsedSize], iBufferLeftSize, "%y%m%d%H%M%S",
+    iCurUsedSize = strftime (&strLenFileName[iBufferUsedSize], iBufferLeftSize, "%y%m%d%H%M%S",
 #if _MSC_VER>=1500
                                  & tTimeNow
 #else
@@ -164,38 +173,45 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
                                 );
 #endif//_MSC_VER
 #endif//__GNUC__
-    iBufferLeftSize -= iBufferUsedSize;
+    iBufferUsedSize += iCurUsedSize;
+    iBufferLeftSize -= iCurUsedSize;
   }
 
-  if (iBufferLeft > iBufferUsed) {
+  if (iBufferLeft > 0) {
 #ifdef _WIN32
 #if defined(_MSC_VER)
 #if _MSC_VER>=1500
-    iBufferUsed += SNPRINTF (&strStreamFileName[iBufferUsed], iBufferLeft, iBufferLeft, ".%03.3u.264", tTimeb.millitm);
+    iCurUsed = SNPRINTF (&strStreamFileName[iBufferUsed], iBufferLeft, iBufferLeft, ".%03.3u.264", tTimeb.millitm);
 #else
-    iBufferUsed += SNPRINTF (&strStreamFileName[iBufferUsed], iBufferLeft, ".%03.3u.264", tTimeb.millitm);
+    iCurUsed = SNPRINTF (&strStreamFileName[iBufferUsed], iBufferLeft, ".%03.3u.264", tTimeb.millitm);
 #endif//_MSC_VER>=1500
 #endif//_MSC_VER
 #else
-    iBufferUsed += SNPRINTF (&strStreamFileName[iBufferUsed], iBufferLeft, ".%03.3u.264", tTimev.tv_usec / 1000);
+    iCurUsed = SNPRINTF (&strStreamFileName[iBufferUsed], iBufferLeft, ".%03.3u.264", tTimev.tv_usec / 1000);
 #endif//WIN32
-    iBufferLeft -= iBufferUsed;
+    if (iCurUsed > 0) {
+      iBufferUsed += iCurUsed;
+      iBufferLeft -= iCurUsed;
+    }
   }
 
-  if (iBufferLeftSize > iBufferUsedSize) {
+  if (iBufferLeftSize > 0) {
 #ifdef _WIN32
 #if defined(_MSC_VER)
 #if _MSC_VER>=1500
-    iBufferUsedSize += SNPRINTF (&strLenFileName[iBufferUsedSize], iBufferLeftSize, iBufferLeftSize, ".%03.3u.len",
+    iCurUsedSize = SNPRINTF (&strLenFileName[iBufferUsedSize], iBufferLeftSize, iBufferLeftSize, ".%03.3u.len",
                                  tTimeb.millitm);
 #else
-    iBufferUsedSize += SNPRINTF (&strLenFileName[iBufferUsedSize], iBufferLeftSize, ".%03.3u.len", tTimeb.millitm);
+    iCurUsedSize = SNPRINTF (&strLenFileName[iBufferUsedSize], iBufferLeftSize, ".%03.3u.len", tTimeb.millitm);
 #endif//_MSC_VER>=1500
 #endif//_MSC_VER
 #else
-    iBufferUsedSize += SNPRINTF (&strLenFileName[iBufferUsedSize], iBufferLeftSize, ".%03.3u.len", tTimev.tv_usec / 1000);
+    iCurUsedSize = SNPRINTF (&strLenFileName[iBufferUsedSize], iBufferLeftSize, ".%03.3u.len", tTimev.tv_usec / 1000);
 #endif//WIN32
-    iBufferLeftSize -= iBufferUsedSize;
+    if (iCurUsedSize > 0) {
+      iBufferUsedSize += iCurUsedSize;
+      iBufferLeftSize -= iCurUsedSize;
+    }
   }
 
 #if defined(__GNUC__)

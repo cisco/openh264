@@ -90,10 +90,12 @@ CWelsDecoder::CWelsDecoder (void_t)
   str_t chFileName[1024] = { 0 };  //for .264
   int iBufUsed = 0;
   int iBufLeft = 1023;
+  int iCurUsed;
 
   str_t chFileNameSize[1024] = { 0 }; //for .len
   int iBufUsedSize = 0;
   int iBufLeftSize = 1023;
+  int iCurUsedSize;
 #endif//OUTPUT_BIT_STREAM
 
   m_pTrace = CreateWelsTrace (Wels_Trace_Type);
@@ -106,30 +108,44 @@ CWelsDecoder::CWelsDecoder (void_t)
 
   WelsGetTimeOfDay (&sCurTime);
 
-  iBufUsed      += WelsSnprintf (chFileName,  iBufLeft,  "bs_0x%p_", (void_t*)this);
-  iBufUsedSize += WelsSnprintf (chFileNameSize, iBufLeftSize, "size_0x%p_", (void_t*)this);
+  iCurUsed     = WelsSnprintf (chFileName,  iBufLeft,  "bs_0x%p_", (void_t*)this);
+  iCurUsedSize = WelsSnprintf (chFileNameSize, iBufLeftSize, "size_0x%p_", (void_t*)this);
 
-  iBufLeft -= iBufUsed;
-  if (iBufLeft > iBufUsed) {
-    iBufUsed += WelsStrftime (&chFileName[iBufUsed], iBufLeft, "%y%m%d%H%M%S", &sCurTime);
-    iBufLeft -= iBufUsed;
+  if (iCurUsed > 0) {
+    iBufUsed += iCurUsed;
+    iBufLeft -= iCurUsed;
+  }
+  if (iBufLeft > 0) {
+    iCurUsed = WelsStrftime (&chFileName[iBufUsed], iBufLeft, "%y%m%d%H%M%S", &sCurTime);
+    iBufUsed += iCurUsed;
+    iBufLeft -= iCurUsed;
   }
 
-  iBufLeftSize -= iBufUsedSize;
-  if (iBufLeftSize > iBufUsedSize) {
-    iBufUsedSize += WelsStrftime (&chFileNameSize[iBufUsedSize], iBufLeftSize, "%y%m%d%H%M%S", &sCurTime);
-    iBufLeftSize -= iBufUsedSize;
+  if (iCurUsedSize > 0) {
+    iBufUsedSize += iCurUsedSize;
+    iBufLeftSize -= iCurUsedSize;
+  }
+  if (iBufLeftSize > 0) {
+    iCurUsedSize = WelsStrftime (&chFileNameSize[iBufUsedSize], iBufLeftSize, "%y%m%d%H%M%S", &sCurTime);
+    iBufUsedSize += iCurUsedSize;
+    iBufLeftSize -= iCurUsedSize;
   }
 
-  if (iBufLeft > iBufUsed) {
-    iBufUsed += WelsSnprintf (&chFileName[iBufUsed], iBufLeft, ".%03.3u.264", WelsGetMillsecond (&sCurTime));
-    iBufLeft -= iBufUsed;
+  if (iBufLeft > 0) {
+    iCurUsed = WelsSnprintf (&chFileName[iBufUsed], iBufLeft, ".%03.3u.264", WelsGetMillsecond (&sCurTime));
+    if (iCurUsed > 0) {
+      iBufUsed += iCurUsed;
+      iBufLeft -= iCurUsed;
+    }
   }
 
-  if (iBufLeftSize > iBufUsedSize) {
-    iBufUsedSize += WelsSnprintf (&chFileNameSize[iBufUsedSize], iBufLeftSize, ".%03.3u.len",
-                                  WelsGetMillsecond (&sCurTime));
-    iBufLeftSize -= iBufUsedSize;
+  if (iBufLeftSize > 0) {
+    iCurUsedSize = WelsSnprintf (&chFileNameSize[iBufUsedSize], iBufLeftSize, ".%03.3u.len",
+                                 WelsGetMillsecond (&sCurTime));
+    if (iCurUsedSize > 0) {
+      iBufUsedSize += iCurUsedSize;
+      iBufLeftSize -= iCurUsedSize;
+    }
   }
 
 
