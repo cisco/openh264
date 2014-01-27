@@ -205,7 +205,7 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
           }
         }
       }
-      if (i < 0)	{
+      if (i < iReorderingIndex)	{
         return ERR_INFO_REFERENCE_PIC_LOST;
       }
       pPic = ppRefList[i];
