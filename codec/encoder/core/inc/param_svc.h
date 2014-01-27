@@ -113,10 +113,6 @@ typedef struct TagWelsSvcCodingParam {
 SDLayerParam	sDependencyLayers[MAX_DEPENDENCY_LAYER];
 
 /* General */
-#ifdef ENABLE_TRACE_FILE
-str_t			sTracePath[MAX_FNAME_LEN];		// log file for wels encoder
-#endif
-
 uint32_t	uiGopSize;			// GOP size (at maximal frame rate: 16)
 uint32_t	uiIntraPeriod;		// intra period (multiple of GOP size as desired)
 int32_t		iNumRefFrame;		// number of reference frame used
