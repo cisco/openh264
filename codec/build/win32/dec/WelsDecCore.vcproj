@@ -806,7 +806,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\decoder\core\inc\measure_time.h"
+					RelativePath="..\..\..\common\measure_time.h"
 					>
 				</File>
 				<File
