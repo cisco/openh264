@@ -1,5 +1,5 @@
 ASM = nasm
-CFLAGS += -Werror -fPIC -DLINUX
+CFLAGS += -Werror -fPIC -DLINUX -DMT_ENABLED
 LDFLAGS += -lpthread
 ASMFLAGS += -DNOPREFIX
 ifeq ($(ENABLE64BIT), Yes)

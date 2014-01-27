@@ -1,6 +1,6 @@
 
 ASM = nasm
-CFLAGS += -Wno-deprecated-declarations -Werror -fPIC -DMACOS
+CFLAGS += -Wno-deprecated-declarations -Werror -fPIC -DMACOS -DMT_ENABLED
 LDFLAGS += -lpthread
 ASMFLAGS += --prefix _ -DNOPREFIX
 ifeq ($(ENABLE64BIT), Yes)
