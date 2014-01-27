@@ -87,8 +87,8 @@ int32_t WelsStrnlen (const str_t* kpStr,  int32_t iMaxlen) {
   return strnlen_s (kpStr, iMaxlen);
 }
 
-int32_t WelsVsprintf (str_t* pBuffer, int32_t iSizeOfBuffer, const str_t* kpFormat, va_list pArgPtr) {
-  return vsprintf_s (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr);
+int32_t WelsVsnprintf (str_t* pBuffer, int32_t iSizeOfBuffer, const str_t* kpFormat, va_list pArgPtr) {
+  return vsnprintf_s (pBuffer, iSizeOfBuffer, _TRUNCATE, kpFormat, pArgPtr);
 }
 
 WelsFileHandle* WelsFopen (const str_t* kpFilename,  const str_t* kpMode) {
@@ -110,10 +110,14 @@ int32_t WelsGetTimeOfDay (SWelsTime* pTp) {
 
 int32_t WelsStrftime (str_t* pBuffer, int32_t iSize, const str_t* kpFormat, const SWelsTime* kpTp) {
   struct tm   sTimeNow;
+  int32_t iRc;
 
   localtime_s (&sTimeNow, &kpTp->time);
 
-  return strftime (pBuffer, iSize, kpFormat, &sTimeNow);
+  iRc = strftime (pBuffer, iSize, kpFormat, &sTimeNow);
+  if (iRc == 0)
+      pBuffer[0] = '\0';
+  return iRc;
 }
 
 #else
@@ -124,7 +128,9 @@ int32_t WelsSnprintf (str_t* pBuffer,  int32_t iSizeOfBuffer, const str_t* kpFor
 
   va_start (pArgPtr, kpFormat);
 
-  iRc = vsprintf (pBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
+  iRc = vsnprintf (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
+  if (iRc < 0)
+    pBuffer[iSizeOfBuffer - 1] = '\0';
 
   va_end (pArgPtr);
 
@@ -141,8 +147,11 @@ int32_t WelsStrnlen (const str_t* kpStr,  int32_t iMaxlen) {
   return strlen (kpStr); //confirmed_safe_unsafe_usage
 }
 
-int32_t WelsVsprintf (str_t* pBuffer, int32_t iSizeOfBuffer, const str_t* kpFormat, va_list pArgPtr) {
-  return vsprintf (pBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
+int32_t WelsVsnprintf (str_t* pBuffer, int32_t iSizeOfBuffer, const str_t* kpFormat, va_list pArgPtr) {
+  int32_t iRc = vsnprintf (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
+  if (iRc < 0)
+    pBuffer[iSizeOfBuffer - 1] = '\0';
+  return iRc;
 }
 
 
@@ -161,10 +170,14 @@ int32_t WelsGetTimeOfDay (SWelsTime* pTp) {
 
 int32_t WelsStrftime (str_t* pBuffer, int32_t iSize, const str_t* kpFormat, const SWelsTime* kpTp) {
   struct tm*   pTnow;
+  int32_t iRc;
 
   pTnow = localtime (&kpTp->time);
 
-  return strftime (pBuffer, iSize, kpFormat, pTnow);
+  iRc = strftime (pBuffer, iSize, kpFormat, pTnow);
+  if (iRc == 0)
+      pBuffer[0] = '\0';
+  return iRc;
 }
 
 
@@ -209,8 +222,8 @@ int32_t WelsStrnlen (const str_t* kpString, int32_t iMaxlen) {
 }
 #endif
 
-int32_t WelsVsprintf (str_t* pBuffer, int32_t iSizeOfBuffer, const str_t* kpFormat, va_list pArgPtr) {
-  return vsprintf (pBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
+int32_t WelsVsnprintf (str_t* pBuffer, int32_t iSizeOfBuffer, const str_t* kpFormat, va_list pArgPtr) {
+  return vsnprintf (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
 }
 
 WelsFileHandle* WelsFopen (const str_t* kpFilename,  const str_t* kpMode) {
@@ -236,10 +249,14 @@ int32_t WelsGetTimeOfDay (SWelsTime* pTp) {
 
 int32_t WelsStrftime (str_t* pBuffer, int32_t iSize, const str_t* kpFormat, const SWelsTime* kpTp) {
   struct tm*   pTnow;
+  int32_t iRc;
 
   pTnow = localtime (&kpTp->time);
 
-  return strftime (pBuffer, iSize, kpFormat, pTnow);
+  iRc = strftime (pBuffer, iSize, kpFormat, pTnow);
+  if (iRc == 0)
+      pBuffer[0] = '\0';
+  return iRc;
 }
 
 #endif
