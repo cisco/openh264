@@ -78,7 +78,6 @@ typedef      struct timeb      SWelsTime;
 int32_t   WelsSnprintf (str_t* buffer,  int32_t sizeOfBuffer,  const str_t* format, ...);
 str_t*   WelsStrncpy (str_t* dest, int32_t sizeInBytes, const str_t* src, int32_t count);
 str_t*   WelsStrcat (str_t* dest, int32_t sizeInBytes, str_t* src);
-int32_t   WelsStrnlen (const str_t* str,  int32_t maxlen);
 int32_t   WelsVsnprintf (str_t* buffer, int32_t sizeOfBuffer, const str_t* format, va_list argptr);
 
 WelsFileHandle*        WelsFopen (const str_t* filename,  const str_t* mode);
@@ -387,53 +386,21 @@ static inline int wels_strcat_s (char* dest, int dmax, const char* src) {
   return (ESNOSPC);
 }
 
-static inline int wels_strnlen_s (const char* dest, int dmax) {
-  int count;
-
-  if (dest == NULL) {
-    return (0);
-  }
-
-  if (dmax <= 0) {
-//        invoke_safe_lib_constraint_handler("strnlen_s: dmax is 0",
-//                   NULL, ESZEROL);
-    return (0);
-  }
-
-//    if (dmax > RSIZE_MAX_STR) {
-//        invoke_safe_lib_constraint_handler("strnlen_s: dmax exceeds max",
-//                   NULL, ESLEMAX);
-//        return (0);
-//    }
-
-  count = 0;
-  while (*dest && dmax) {
-    count++;
-    dmax--;
-    dest++;
-  }
-
-  return (count);
-}
-
 #endif//(WIN32 && _MSC_VER && _MSC_VER<1500) || __GNUC__
 
 #if defined(WIN32) && defined(_MSC_VER)
 #if _MSC_VER >= 1500	// VS2008
 #define STRNCPY		strncpy_s
 #define STRCAT		strcat_s
-#define STRNLEN		strnlen_s
 #else	// mainly for VC6
 #define STRNCPY		wels_strncpy_s	// override s.t.r.n.c.p.y here for safe
 #define STRCAT		wels_strcat_s	// override s.t.r.c.a.t here for safe
-#define STRNLEN		wels_strnlen_s	// override s.t.r.n.l.e.n here for safe
 #endif//_MSC_VER >= 1500
 
 #else//__GNUC__
 
 #define STRNCPY		wels_strncpy_s	// override s.t.r.n.c.p.y here for safe
 #define STRCAT		wels_strcat_s	// override s.t.r.c.a.t here for safe
-#define STRNLEN		wels_strnlen_s	// override s.t.r.n.l.e.n here for safe
 
 #endif//WIN32
 

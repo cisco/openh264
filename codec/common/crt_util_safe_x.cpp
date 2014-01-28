@@ -48,9 +48,6 @@
 #include <sys/timeb.h>
 #ifndef _MSC_VER
 #include <sys/time.h>
-#ifndef HAVE_STRNLEN
-#define strnlen(a,b) strlen(a)
-#endif //!HAVE_STRNLEN
 #endif //!_MSC_VER
 #else
 #include <sys/time.h>
@@ -81,10 +78,6 @@ str_t* WelsStrncpy (str_t* pDest, int32_t iSizeInBytes, const str_t* kpSrc, int3
   strncpy_s (pDest, iSizeInBytes, kpSrc, iCount);
 
   return pDest;
-}
-
-int32_t WelsStrnlen (const str_t* kpStr,  int32_t iMaxlen) {
-  return strnlen_s (kpStr, iMaxlen);
 }
 
 int32_t WelsVsnprintf (str_t* pBuffer, int32_t iSizeOfBuffer, const str_t* kpFormat, va_list pArgPtr) {
@@ -143,10 +136,6 @@ str_t* WelsStrncpy (str_t* pDest, int32_t iSizeInBytes, const str_t* kpSrc, int3
   return pDest;
 }
 
-int32_t WelsStrnlen (const str_t* kpStr,  int32_t iMaxlen) {
-  return strlen (kpStr); //confirmed_safe_unsafe_usage
-}
-
 int32_t WelsVsnprintf (str_t* pBuffer, int32_t iSizeOfBuffer, const str_t* kpFormat, va_list pArgPtr) {
   int32_t iRc = vsnprintf (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
   if (iRc < 0)
@@ -201,26 +190,6 @@ int32_t WelsSnprintf (str_t* pBuffer,  int32_t iSizeOfBuffer, const str_t* kpFor
 str_t* WelsStrncpy (str_t* pDest, int32_t iSizeInBytes, const str_t* kpSrc, int32_t iCount) {
   return strncpy (pDest, kpSrc, iCount); //confirmed_safe_unsafe_usage
 }
-
-#if !defined(MACOS) && !defined(UNIX) && !defined(APPLE_IOS)
-int32_t WelsStrnlen (const str_t* kpStr,  int32_t iMaxlen) {
-  return strnlen (kpStr, iMaxlen); //confirmed_safe_unsafe_usage
-}
-#else
-int32_t WelsStrnlen (const str_t* kpString, int32_t iMaxlen) {
-  // In mac os, there is no strnlen in string.h, we can only use strlen instead of strnlen or
-  // implement strnlen by ourself
-
-#if 1
-  return strlen (kpString); //confirmed_safe_unsafe_usage
-#else
-  const str_t* kpSrc;
-  for (kpSrc = kpString; iMaxlen-- && *kpSrc != '\0'; ++kpSrc)
-    return kpSrc - kpString;
-#endif
-
-}
-#endif
 
 int32_t WelsVsnprintf (str_t* pBuffer, int32_t iSizeOfBuffer, const str_t* kpFormat, va_list pArgPtr) {
   return vsnprintf (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
