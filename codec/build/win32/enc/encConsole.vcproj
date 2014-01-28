@@ -169,7 +169,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/LTCG"
 				AdditionalDependencies="$(OutDir)\welsenc.lib"
 				OutputFile="$(OutDir)\encConsole.exe"
 				LinkIncremental="1"
@@ -361,7 +360,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/LTCG"
 				AdditionalDependencies="$(OutDir)\welsenc.lib"
 				OutputFile="$(OutDir)\encConsole.exe"
 				LinkIncremental="1"
