@@ -76,7 +76,7 @@ typedef      struct timeb      SWelsTime;
 #endif
 
 int32_t   WelsSnprintf (str_t* buffer,  int32_t sizeOfBuffer,  const str_t* format, ...);
-str_t*   WelsStrncpy (str_t* dest, int32_t sizeInBytes, const str_t* src, int32_t count);
+str_t*   WelsStrncpy (str_t* dest, int32_t sizeInBytes, const str_t* src);
 str_t*   WelsStrcat (str_t* dest, int32_t sizeInBytes, str_t* src);
 int32_t   WelsVsnprintf (str_t* buffer, int32_t sizeOfBuffer, const str_t* format, va_list argptr);
 

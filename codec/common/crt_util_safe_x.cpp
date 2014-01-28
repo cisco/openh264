@@ -74,7 +74,7 @@ int32_t WelsSnprintf (str_t* pBuffer,  int32_t iSizeOfBuffer, const str_t* kpFor
   return iRc;
 }
 
-str_t* WelsStrncpy (str_t* pDest, int32_t iSizeInBytes, const str_t* kpSrc, int32_t iCount) {
+str_t* WelsStrncpy (str_t* pDest, int32_t iSizeInBytes, const str_t* kpSrc) {
   strncpy_s (pDest, iSizeInBytes, kpSrc, _TRUNCATE);
 
   return pDest;
@@ -130,7 +130,7 @@ int32_t WelsSnprintf (str_t* pBuffer,  int32_t iSizeOfBuffer, const str_t* kpFor
   return iRc;
 }
 
-str_t* WelsStrncpy (str_t* pDest, int32_t iSizeInBytes, const str_t* kpSrc, int32_t iCount) {
+str_t* WelsStrncpy (str_t* pDest, int32_t iSizeInBytes, const str_t* kpSrc) {
   strncpy (pDest, kpSrc, iSizeInBytes); //confirmed_safe_unsafe_usage
   pDest[iSizeInBytes - 1] = '\0';
 
@@ -188,7 +188,7 @@ int32_t WelsSnprintf (str_t* pBuffer,  int32_t iSizeOfBuffer, const str_t* kpFor
   return iRc;
 }
 
-str_t* WelsStrncpy (str_t* pDest, int32_t iSizeInBytes, const str_t* kpSrc, int32_t iCount) {
+str_t* WelsStrncpy (str_t* pDest, int32_t iSizeInBytes, const str_t* kpSrc) {
   strncpy (pDest, kpSrc, iSizeInBytes); //confirmed_safe_unsafe_usage
   pDest[iSizeInBytes - 1] = '\0';
   return pDest;
