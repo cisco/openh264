@@ -997,17 +997,17 @@ void CWelsH264SVCEncoder::DumpSrcPicture (const uint8_t* pSrc) {
   WelsStrncpy (strFileName, 256, "pic_in_");	// confirmed_safe_unsafe_usage
 
   if (m_iMaxPicWidth == 640) {
-    STRCAT (strFileName, 256, "360p.");	// confirmed_safe_unsafe_usage
+    WelsStrcat (strFileName, 256, "360p.");	// confirmed_safe_unsafe_usage
   } else if (m_iMaxPicWidth == 320) {
-    STRCAT (strFileName, 256, "180p.");	// confirmed_safe_unsafe_usage
+    WelsStrcat (strFileName, 256, "180p.");	// confirmed_safe_unsafe_usage
   } else if (m_iMaxPicWidth == 160) {
-    STRCAT (strFileName, 256, "90p.");	// confirmed_safe_unsafe_usage
+    WelsStrcat (strFileName, 256, "90p.");	// confirmed_safe_unsafe_usage
   }
 
   switch (m_iCspInternal) {
   case videoFormatI420:
   case videoFormatYV12:
-    STRCAT (strFileName, 256, "yuv");	// confirmed_safe_unsafe_usage
+    WelsStrcat (strFileName, 256, "yuv");	// confirmed_safe_unsafe_usage
     pFile = WelsFopen (strFileName, "ab+");
     //				WelsLog( m_pEncContext, WELS_LOG_INFO, "WELS_CSP_I420, m_iCspInternal= 0x%x\n", m_iCspInternal);
     if (NULL != pFile) {
@@ -1017,7 +1017,7 @@ void CWelsH264SVCEncoder::DumpSrcPicture (const uint8_t* pSrc) {
     }
     break;
   case videoFormatRGB:
-    STRCAT (strFileName, 256, "rgb");	// confirmed_safe_unsafe_usage
+    WelsStrcat (strFileName, 256, "rgb");	// confirmed_safe_unsafe_usage
     pFile = WelsFopen (strFileName, "ab+");
     if (NULL != pFile) {
       fwrite (pSrc, sizeof (uint8_t), iDataLength * 3, pFile);
@@ -1025,7 +1025,7 @@ void CWelsH264SVCEncoder::DumpSrcPicture (const uint8_t* pSrc) {
       fclose (pFile);
     }
   case videoFormatBGR:
-    STRCAT (strFileName, 256, "bgr");	// confirmed_safe_unsafe_usage
+    WelsStrcat (strFileName, 256, "bgr");	// confirmed_safe_unsafe_usage
     pFile = WelsFopen (strFileName, "ab+");
     //				WelsLog( m_pEncContext, WELS_LOG_INFO, "WELS_CSP_BGR, m_iCspInternal= 0x%x\n", m_iCspInternal);
     if (NULL != pFile) {
@@ -1035,7 +1035,7 @@ void CWelsH264SVCEncoder::DumpSrcPicture (const uint8_t* pSrc) {
     }
     break;
   case videoFormatYUY2:
-    STRCAT (strFileName, 256, "yuy2");	// confirmed_safe_unsafe_usage
+    WelsStrcat (strFileName, 256, "yuy2");	// confirmed_safe_unsafe_usage
     pFile = WelsFopen (strFileName, "ab+");
     if (NULL != pFile) {
       fwrite (pSrc, sizeof (uint8_t), (CALC_BI_STRIDE (m_iMaxPicWidth,  16)) * m_iMaxPicHeight, pFile);
