@@ -16,6 +16,7 @@ COMMON_ASM_SRCS=\
 	$(COMMON_SRCDIR)/./mb_copy.asm\
 	$(COMMON_SRCDIR)/./mc_chroma.asm\
 	$(COMMON_SRCDIR)/./mc_luma.asm\
+	$(COMMON_SRCDIR)/./satd_sad.asm\
 	$(COMMON_SRCDIR)/./vaa.asm\
 
 COMMON_OBJS += $(COMMON_ASM_SRCS:.asm=.o)

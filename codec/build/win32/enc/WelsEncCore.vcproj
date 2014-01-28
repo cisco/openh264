@@ -2106,7 +2106,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\asm\satd_sad.asm"
+				RelativePath="..\..\..\common\satd_sad.asm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
