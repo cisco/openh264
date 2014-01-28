@@ -99,7 +99,7 @@ CODEC_UNITTEST_DEPS = $(LIBPREFIX)gtest.$(LIBSUFFIX) $(LIBPREFIX)decoder.$(LIBSU
 all:	libraries binaries
 
 clean:
-	rm -f $(OBJS) $(LIBRARIES) $(BINARIES)
+	rm -f $(OBJS) $(OBJS:.o=.d) $(LIBRARIES) $(BINARIES)
 
 gtest-bootstrap:
 	svn co https://googletest.googlecode.com/svn/trunk/ gtest
@@ -124,3 +124,5 @@ ifeq ($(HAVE_GTEST),Yes)
 include build/gtest-targets.mk
 include test/targets.mk
 endif
+
+-include $(OBJS:.o=.d)
