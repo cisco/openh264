@@ -119,146 +119,6 @@ uint16_t               WelsGetMillisecond (const SWelsTime* tp);
 
 #if (defined(WIN32) && defined(_MSC_VER) && (_MSC_VER<1500)) || defined(__GNUC__)
 
-static inline int wels_strncpy_s (char* dest, int dmax, const char* src, int slen) {
-int orig_dmax;
-char* orig_dest;
-const char* overlap_bumper;
-
-if (dest == NULL) {
-//        invoke_safe_lib_constraint_handler("strncpy_s: dest is null",
-//                   NULL, ESNULLP);
-  return (ESNULLP);
-}
-
-if (dmax <= 0) {
-//        invoke_safe_lib_constraint_handler("strncpy_s: dmax is 0",
-//                   NULL, ESZEROL);
-  return (ESZEROL);
-}
-
-//    if (dmax > RSIZE_MAX_STR) {
-//        invoke_safe_lib_constraint_handler("strncpy_s: dmax exceeds max",
-//                   NULL, ESLEMAX);
-//        return (ESLEMAX);
-//    }
-
-if (src == NULL) {
-//        handle_error(orig_dest, orig_dmax, "strncpy_s: src is null", ESNULLP);
-  return (ESNULLP);
-}
-
-if (slen <= 0) {
-//        handle_error(orig_dest, orig_dmax, "strncpy_s: slen is zero", ESZEROL);
-  return (ESZEROL);
-}
-
-//    if (slen > RSIZE_MAX_STR) {
-//        handle_error(orig_dest, orig_dmax, "strncpy_s: slen exceeds max", ESLEMAX);
-//        return (ESLEMAX);
-//    }
-
-/* hold base in case src was not copied */
-orig_dmax = dmax;
-orig_dest = dest;
-
-if (dest < src) {
-  overlap_bumper = src;
-
-  while (dmax > 0) {
-    if (dest == overlap_bumper) {
-//                handle_error(orig_dest, orig_dmax, "strncpy_s: overlapping objects", ESOVRLP);
-      return (ESOVRLP);
-    }
-
-    if (slen == 0) {
-      /*
-       * Copying truncated to slen chars.  Note that the TR says to
-       * copy slen chars plus the null char.  We null the slack.
-       */
-#ifdef SAFE_LIB_STR_NULL_SLACK
-      while (dmax) {
-        *dest = '\0';
-        dmax--;
-        dest++;
-      }
-#else
-      *dest = '\0';
-#endif
-      return (EOK);
-    }
-
-    *dest = *src;
-    if (*dest == '\0') {
-#ifdef SAFE_LIB_STR_NULL_SLACK
-      /* null slack */
-      while (dmax) {
-        *dest = '\0';
-        dmax--;
-        dest++;
-      }
-#endif
-      return (EOK);
-    }
-
-    dmax--;
-    slen--;
-    dest++;
-    src++;
-  }
-
-} else {
-  overlap_bumper = dest;
-
-  while (dmax > 0) {
-    if (src == overlap_bumper) {
-//                handle_error(orig_dest, orig_dmax, "strncpy_s: overlapping objects", ESOVRLP);
-      return (ESOVRLP);
-    }
-
-    if (slen == 0) {
-      /*
-       * Copying truncated to slen chars.  Note that the TR says to
-       * copy slen chars plus the null char.  We null the slack.
-       */
-#ifdef SAFE_LIB_STR_NULL_SLACK
-      while (dmax) {
-        *dest = '\0';
-        dmax--;
-        dest++;
-      }
-#else
-      *dest = '\0';
-#endif
-      return (EOK);
-    }
-
-    *dest = *src;
-    if (*dest == '\0') {
-#ifdef SAFE_LIB_STR_NULL_SLACK
-      /* null slack */
-      while (dmax) {
-        *dest = '\0';
-        dmax--;
-        dest++;
-      }
-#endif
-      return (EOK);
-    }
-
-    dmax--;
-    slen--;
-    dest++;
-    src++;
-  }
-}
-
-/*
- * the entire src was not copied, so zero the string
- */
-//    handle_error(orig_dest, orig_dmax, "strncpy_s: not enough space for src", ESNOSPC);
-return (ESNOSPC);
-}
-
 static inline int wels_strcat_s (char* dest, int dmax, const char* src) {
   int orig_dmax;
   char* orig_dest;
@@ -390,16 +250,13 @@ static inline int wels_strcat_s (char* dest, int dmax, const char* src) {
 
 #if defined(WIN32) && defined(_MSC_VER)
 #if _MSC_VER >= 1500	// VS2008
-#define STRNCPY		strncpy_s
 #define STRCAT		strcat_s
 #else	// mainly for VC6
-#define STRNCPY		wels_strncpy_s	// override s.t.r.n.c.p.y here for safe
 #define STRCAT		wels_strcat_s	// override s.t.r.c.a.t here for safe
 #endif//_MSC_VER >= 1500
 
 #else//__GNUC__
 
-#define STRNCPY		wels_strncpy_s	// override s.t.r.n.c.p.y here for safe
 #define STRCAT		wels_strcat_s	// override s.t.r.c.a.t here for safe
 
 #endif//WIN32
