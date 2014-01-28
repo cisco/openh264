@@ -69,7 +69,7 @@ int32_t GetCodeName (str_t* pBuf, int32_t iSize) {
     return 0;
 
   pBuf[iLen]	= '\0';
-  STRNCPY (pBuf, iSize, WELS_CODE_NAME, iLen);	// confirmed_safe_unsafe_usage
+  WelsStrncpy (pBuf, iSize, WELS_CODE_NAME, iLen);	// confirmed_safe_unsafe_usage
 
   return iLen;
 }
@@ -91,7 +91,7 @@ int32_t GetLibName (str_t* pBuf, int32_t iSize) {
     return 0;
 
   pBuf[iLen]	= '\0';
-  STRNCPY (pBuf, iSize, WELS_LIB_NAME, iLen);	// confirmed_safe_unsafe_usage
+  WelsStrncpy (pBuf, iSize, WELS_LIB_NAME, iLen);	// confirmed_safe_unsafe_usage
 
   return iLen;
 }
@@ -113,7 +113,7 @@ int32_t GetVerNum (str_t* pBuf, int32_t iSize) {
     return 0;
 
   pBuf[iLen]	= '\0';
-  STRNCPY (pBuf, iSize, WELS_VERSION_STR, iLen);	// confirmed_safe_unsafe_usage
+  WelsStrncpy (pBuf, iSize, WELS_VERSION_STR, iLen);	// confirmed_safe_unsafe_usage
 
   return iLen;
 }
@@ -135,7 +135,7 @@ int32_t GetIdentInfo (str_t* pBuf, int32_t iSize) {
     return 0;
 
   pBuf[iLen]	= '\0';
-  STRNCPY (pBuf, iSize, WELS_IDENT, iLen);	// confirmed_safe_unsafe_usage
+  WelsStrncpy (pBuf, iSize, WELS_IDENT, iLen);	// confirmed_safe_unsafe_usage
 
   return iLen;
 }
