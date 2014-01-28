@@ -562,8 +562,9 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
 #ifdef ENABLE_FRAME_DUMP
       SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
       pDLayer->sRecFileName[iLen] = '\0';
-      strncpy (pDLayer->sRecFileName, argv[n++], iLen);	// confirmed_safe_unsafe_usage
+      strncpy (pDLayer->sRecFileName, argv[n], iLen);	// confirmed_safe_unsafe_usage
 #endif//ENABLE_FRAME_DUMP
+      n++;
     }
 
     else if (!strcmp (pCommand, "-sw") && (n + 1 < argc)) {
