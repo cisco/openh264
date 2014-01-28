@@ -207,14 +207,12 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
       int32_t i_shift = 0;
       str_t* pStr = NULL;
       pStr	= GetLogTag (kiLevel, &i_shift);
-      if (NULL != pCtx) {
-        int32_t iLenTag = STRNLEN (pStr, 8);	// confirmed_safe_unsafe_usage
-        STRCAT (&pBuf[iBufUsed], iBufLeft, pStr);	// confirmed_safe_unsafe_usage
-        iBufUsed += iLenTag;
-        pBuf[iBufUsed] = ' ';
-        iBufUsed++;
-        ++iLenTag;
-        iBufLeft -= iLenTag;
+      if (NULL != pStr) {
+        iCurUsed = WelsSnprintf (&pBuf[iBufUsed], iBufLeft, "%s ", pStr);
+        if (iCurUsed >= 0) {
+          iBufUsed += iCurUsed;
+          iBufLeft -= iCurUsed;
+        }
       }
     }
     if (iBufLeft > 0) {
@@ -264,15 +262,11 @@ void WelsReopenTraceFile (void* pCtx, str_t* pCurPath) {
 #ifdef ENABLE_TRACE_FILE
   sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pCtx;
   if (wlog == WelsLogDefault) {
-    int32_t len = 0;
     if (pEncCtx->pFileLog != NULL) {
       WelsFclose (pEncCtx->pFileLog);
       pEncCtx->pFileLog = NULL;
     }
     pEncCtx->uiSizeLog	= 0;
-    len = STRNLEN (pCurPath, MAX_FNAME_LEN - 1);	// confirmed_safe_unsafe_usage
-    if (len >= MAX_FNAME_LEN)
-      return;
     pEncCtx->pFileLog	= WelsFopen ("wels_encoder_trace.txt", "wt+");	// confirmed_safe_unsafe_usage
   }
 #endif//ENABLE_TRACE_FILE
