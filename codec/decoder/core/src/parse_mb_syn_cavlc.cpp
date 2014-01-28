@@ -1019,7 +1019,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
 
   switch (pCurDqLayer->pMbType[iMbXy]) {
   case MB_TYPE_16x16: {
-    int8_t iRefIdx = 0;
+    int32_t iRefIdx = 0;
     if (pSlice->sSliceHeaderExt.bAdaptiveMotionPredFlag) {
       iMotionPredFlag[0] = BsGetOneBit (pBs);
     }
@@ -1111,7 +1111,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
   break;
   case MB_TYPE_8x8:
   case MB_TYPE_8x8_REF0: {
-    int8_t iRefIdx[4] = {0}, iSubPartCount[4], iPartWidth[4];
+    int32_t iRefIdx[4] = {0}, iSubPartCount[4], iPartWidth[4];
     uint32_t uiSubMbType;
 
     if (MB_TYPE_8x8_REF0 == pCurDqLayer->pMbType[iMbXy]) {

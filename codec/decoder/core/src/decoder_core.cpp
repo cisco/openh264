@@ -224,7 +224,6 @@ int32_t ParseDecRefPicMarking (PWelsDecoderContext pCtx, PBitStringAux pBs, PSli
                                const bool_t kbIdrFlag) {
   PRefPicMarking const kpRefMarking = &pSh->sRefMarking;
   PRefPic pRefPic = &pCtx->sRefPic;
-  uint32_t uiTmp;
   if (kbIdrFlag) {
     kpRefMarking->bNoOutputOfPriorPicsFlag	= !!BsGetOneBit (pBs);
     kpRefMarking->bLongTermRefFlag			= !!BsGetOneBit (pBs);
@@ -600,7 +599,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_NO_PARAM_SETS);
   }
   // check first_mb_in_slice
-  if (pSliceHead->iFirstMbInSlice > pSps->uiTotalMbCount) {
+  if ((uint32_t)(pSliceHead->iFirstMbInSlice) > pSps->uiTotalMbCount) {
     WelsLog (pCtx, WELS_LOG_ERROR, "first_mb_in_slice is greater than total mb counts.\n");
     return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_FIRST_MB_IN_SLICE);
   }

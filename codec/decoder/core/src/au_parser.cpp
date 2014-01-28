@@ -932,17 +932,26 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
 
   pSps->iNumRefFrames	= BsGetUe (pBs);		// max_num_ref_frames
   pSps->bGapsInFrameNumValueAllowedFlag	= !!BsGetOneBit (pBs);	// bGapsInFrameNumValueAllowedFlag
-  pSps->iMbWidth		= 1 + BsGetUe (pBs);		// pic_width_in_mbs_minus1
-  uiTmp = 8 * pSLevelLimits->iMaxFS;
-  if ((pSps->iMbWidth * pSps->iMbWidth) > uiTmp) {
+  uiTmp = BsGetUe (pBs); 		// pic_width_in_mbs_minus1
+  if(uiTmp == 0xffffffff) {
+    WelsLog (pCtx, WELS_LOG_ERROR, " pic_width_in_mbs read error!\n");
+    return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_MB_SIZE_INFO);
+  }
+  pSps->iMbWidth		= 1 + uiTmp;
+  if ((uint64_t)(pSps->iMbWidth * pSps->iMbWidth) > (8 * pSLevelLimits->iMaxFS)) {
     WelsLog (pCtx, WELS_LOG_WARNING, " the pic_width_in_mbs exceeds the level limits!\n");
   }
-  pSps->iMbHeight		= 1 + BsGetUe (pBs);		// pic_height_in_map_units_minus1
-  if ((pSps->iMbHeight * pSps->iMbHeight) > uiTmp) {
+  uiTmp = BsGetUe (pBs); 		// pic_height_in_map_units_minus1
+  if(uiTmp == 0xffffffff) {
+    WelsLog (pCtx, WELS_LOG_ERROR, " pic_height_in_mbs read error!\n");
+    return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_MB_SIZE_INFO);
+  }
+  pSps->iMbHeight		= 1 + uiTmp;
+  if ((uint64_t)(pSps->iMbHeight * pSps->iMbHeight) > (8 * pSLevelLimits->iMaxFS)) {
     WelsLog (pCtx, WELS_LOG_WARNING, " the pic_height_in_mbs exceeds the level limits!\n");
   }
   pSps->uiTotalMbCount	= pSps->iMbWidth * pSps->iMbHeight;
-  if (pSps->uiTotalMbCount > pSLevelLimits->iMaxFS) {
+  if (pSps->uiTotalMbCount > (uint32_t)pSLevelLimits->iMaxFS) {
     WelsLog (pCtx, WELS_LOG_WARNING, " the total count of mb exceeds the level limits!\n");
   }
   if (pSps->iNumRefFrames > SPS_MAX_NUM_REF_FRAMES_MAX) {
@@ -954,7 +963,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   uint32_t uiMaxDpbFrames = uiMaxDpbMbs / pSps->uiTotalMbCount;
   if (uiMaxDpbFrames > SPS_MAX_NUM_REF_FRAMES_MAX)
     uiMaxDpbFrames = SPS_MAX_NUM_REF_FRAMES_MAX;
-  if (pSps->iNumRefFrames > uiMaxDpbFrames) {
+  if ((uint32_t)pSps->iNumRefFrames > uiMaxDpbFrames) {
     WelsLog (pCtx, WELS_LOG_WARNING, " max_num_ref_frames exceeds level limits!\n");
   }
   pSps->bFrameMbsOnlyFlag	= !!BsGetOneBit (pBs);	// frame_mbs_only_flag
@@ -967,12 +976,12 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   if (pSps->bFrameCroppingFlag) {
     pSps->sFrameCrop.iLeftOffset	= BsGetUe (pBs);	// frame_crop_left_offset
     pSps->sFrameCrop.iRightOffset	= BsGetUe (pBs);	// frame_crop_right_offset
-    if ((pSps->sFrameCrop.iLeftOffset + pSps->sFrameCrop.iRightOffset) > (pSps->iMbWidth * 16 / 2)) {
+    if ((pSps->sFrameCrop.iLeftOffset + pSps->sFrameCrop.iRightOffset) > ((int32_t)pSps->iMbWidth * 16 / 2)) {
       WelsLog (pCtx, WELS_LOG_WARNING, "frame_crop_left_offset + frame_crop_right_offset exceeds limits!\n");
     }
     pSps->sFrameCrop.iTopOffset		= BsGetUe (pBs);	// frame_crop_top_offset
     pSps->sFrameCrop.iBottomOffset	= BsGetUe (pBs);	// frame_crop_bottom_offset
-    if ((pSps->sFrameCrop.iTopOffset + pSps->sFrameCrop.iBottomOffset) > (pSps->iMbHeight * 16 / 2)) {
+    if ((pSps->sFrameCrop.iTopOffset + pSps->sFrameCrop.iBottomOffset) > ((int32_t)pSps->iMbHeight * 16 / 2)) {
       WelsLog (pCtx, WELS_LOG_WARNING, "frame_crop_top_offset + frame_crop_right_offset exceeds limits!\n");
     }
   } else {
