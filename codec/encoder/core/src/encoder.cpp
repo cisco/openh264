@@ -323,7 +323,7 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const str_t* kpFileNam
     return;
 
   if (bDependencyRecFlag[kiDid]) {
-    if (STRNLEN (kpFileName, MAX_FNAME_LEN) > 0)	// confirmed_safe_unsafe_usage
+    if (strlen (kpFileName) > 0)	// confirmed_safe_unsafe_usage
       pDumpRecFile = WelsFopen (kpFileName, "ab");
     else {
       str_t sDependencyRecFileName[16] = {0};
@@ -333,7 +333,7 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const str_t* kpFileNam
     if (NULL != pDumpRecFile)
       WelsFseek (pDumpRecFile, 0, SEEK_END);
   } else {
-    if (STRNLEN (kpFileName, MAX_FNAME_LEN) > 0) {	// confirmed_safe_unsafe_usage
+    if (strlen (kpFileName) > 0) {	// confirmed_safe_unsafe_usage
       pDumpRecFile	= WelsFopen (kpFileName, "wb");
     } else {
       str_t sDependencyRecFileName[16] = {0};
@@ -391,7 +391,7 @@ void DumpRecFrame (SPicture* pCurPicture, const str_t* kpFileName) {
     return;
 
   if (bRecFlag) {
-    if (STRNLEN (kpFileName, MAX_FNAME_LEN) > 0) {	// confirmed_safe_unsafe_usage
+    if (strlen (kpFileName) > 0) {	// confirmed_safe_unsafe_usage
       pDumpRecFile	= WelsFopen (kpFileName, "ab");
     } else {
       pDumpRecFile	= WelsFopen ("rec.yuv", "ab");
@@ -399,7 +399,7 @@ void DumpRecFrame (SPicture* pCurPicture, const str_t* kpFileName) {
     if (NULL != pDumpRecFile)
       WelsFseek (pDumpRecFile, 0, SEEK_END);
   } else {
-    if (STRNLEN (kpFileName, MAX_FNAME_LEN) > 0) {	// confirmed_safe_unsafe_usage
+    if (strlen (kpFileName) > 0) {	// confirmed_safe_unsafe_usage
       pDumpRecFile	= WelsFopen (kpFileName, "wb");
     } else {
       pDumpRecFile	= WelsFopen ("rec.yuv", "wb");

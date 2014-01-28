@@ -87,7 +87,7 @@ int32_t CWelsTraceFile::WriteString (int32_t iLevel, const str_t* pStr) {
   int  iRC = 0;
   const static str_t chEnter[16] = "\n";
   if (m_pTraceFile) {
-    iRC += WelsFwrite (pStr, 1, WelsStrnlen (pStr, MAX_LOG_SIZE), m_pTraceFile);
+    iRC += WelsFwrite (pStr, 1, strlen (pStr), m_pTraceFile);
     iRC += WelsFwrite (chEnter, 1, strlen (chEnter), m_pTraceFile);
     WelsFflush (m_pTraceFile);
   }
@@ -100,7 +100,7 @@ int32_t CWelsTraceFile::WriteString (int32_t iLevel, const str_t* pStr) {
 int32_t CWelsTraceWinDgb::WriteString (int32_t iLevel, const str_t* pStr) {
   OutputDebugStringA (pStr);
 
-  return WelsStrnlen (pStr, MAX_LOG_SIZE); //strnlen(pStr, MAX_LOG_SIZE);
+  return strlen (pStr);
 }
 
 #endif
