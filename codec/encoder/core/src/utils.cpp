@@ -207,7 +207,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
       int32_t i_shift = 0;
       str_t* pStr = NULL;
       pStr	= GetLogTag (kiLevel, &i_shift);
-      if (NULL != pCtx) {
+      if (NULL != pStr) {
         int32_t iLenTag = strlen (pStr);	// confirmed_safe_unsafe_usage
         STRCAT (&pBuf[iBufUsed], iBufLeft, pStr);	// confirmed_safe_unsafe_usage
         iBufUsed += iLenTag;
