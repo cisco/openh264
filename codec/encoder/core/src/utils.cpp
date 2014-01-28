@@ -208,13 +208,11 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
       str_t* pStr = NULL;
       pStr	= GetLogTag (kiLevel, &i_shift);
       if (NULL != pStr) {
-        int32_t iLenTag = strlen (pStr);	// confirmed_safe_unsafe_usage
-        STRCAT (&pBuf[iBufUsed], iBufLeft, pStr);	// confirmed_safe_unsafe_usage
-        iBufUsed += iLenTag;
-        pBuf[iBufUsed] = ' ';
-        iBufUsed++;
-        ++iLenTag;
-        iBufLeft -= iLenTag;
+        iCurUsed = WelsSnprintf (&pBuf[iBufUsed], iBufLeft, "%s ", pStr);
+        if (iCurUsed >= 0) {
+          iBufUsed += iCurUsed;
+          iBufLeft -= iCurUsed;
+        }
       }
     }
     if (iBufLeft > 0) {
