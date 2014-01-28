@@ -634,7 +634,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\src\asm\sad.asm"
+				RelativePath="..\..\..\common\satd_sad.asm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"

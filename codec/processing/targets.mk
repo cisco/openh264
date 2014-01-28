@@ -24,7 +24,6 @@ PROCESSING_ASM_SRCS=\
 	$(PROCESSING_SRCDIR)/./src/asm/denoisefilter.asm\
 	$(PROCESSING_SRCDIR)/./src/asm/downsample_bilinear.asm\
 	$(PROCESSING_SRCDIR)/./src/asm/intra_pred.asm\
-	$(PROCESSING_SRCDIR)/./src/asm/sad.asm\
 	$(PROCESSING_SRCDIR)/./src/asm/vaa.asm\
 
 PROCESSING_OBJS += $(PROCESSING_ASM_SRCS:.asm=.o)

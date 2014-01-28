@@ -41,7 +41,6 @@ ENCODER_ASM_SRCS=\
 	$(ENCODER_SRCDIR)/./core/asm/intra_pred.asm\
 	$(ENCODER_SRCDIR)/./core/asm/memzero.asm\
 	$(ENCODER_SRCDIR)/./core/asm/quant.asm\
-	$(ENCODER_SRCDIR)/./core/asm/satd_sad.asm\
 	$(ENCODER_SRCDIR)/./core/asm/score.asm\
 
 ENCODER_OBJS += $(ENCODER_ASM_SRCS:.asm=.o)
