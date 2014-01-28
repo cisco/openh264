@@ -60,7 +60,7 @@ int32_t  CWelsTraceBase::SetTraceLevel (int iLevel) {
 int32_t  CWelsTraceBase::Trace (const int kLevel, const str_t* kpFormat, va_list pVl) {
   if (kLevel & m_iLevel) {
     str_t chBuf[MAX_LOG_SIZE] = {0};
-    const int32_t kLen	= WelsStrnlen ((const str_t*)"[DECODER]: ", MAX_LOG_SIZE);
+    const int32_t kLen	= strlen ("[DECODER]: ");
 
     WelsStrncpy (chBuf, MAX_LOG_SIZE, (const str_t*)"[DECODER]: ", kLen);
 
@@ -88,7 +88,7 @@ int32_t CWelsTraceFile::WriteString (int32_t iLevel, const str_t* pStr) {
   const static str_t chEnter[16] = "\n";
   if (m_pTraceFile) {
     iRC += WelsFwrite (pStr, 1, WelsStrnlen (pStr, MAX_LOG_SIZE), m_pTraceFile);
-    iRC += WelsFwrite (chEnter, 1, WelsStrnlen (chEnter,  16), m_pTraceFile);
+    iRC += WelsFwrite (chEnter, 1, strlen (chEnter), m_pTraceFile);
     WelsFflush (m_pTraceFile);
   }
   return iRC;

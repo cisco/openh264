@@ -120,7 +120,7 @@ void welsCodecTrace::CODEC_TRACE (void* ignore, const int32_t iLevel, const str_
   }
 
   str_t pBuf[MAX_LOG_SIZE] = {0};
-  const int32_t len	= STRNLEN ("[ENCODER]: ", MAX_LOG_SIZE);	// confirmed_safe_unsafe_usage
+  const int32_t len	= strlen ("[ENCODER]: ");	// confirmed_safe_unsafe_usage
 
 
   STRNCPY (pBuf, MAX_LOG_SIZE, "[ENCODER]: ", len);	// confirmed_safe_unsafe_usage
