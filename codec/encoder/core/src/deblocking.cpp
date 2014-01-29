@@ -242,21 +242,22 @@ uint32_t DeblockingBSMarginalMBAvcbase (SMB* pCurMb, SMB* pNeighMb, int32_t iEdg
   int32_t i;
   uint32_t uiBSx4;
   uint8_t* pBS = (uint8_t*) (&uiBSx4);
-  uint32_t uiBIdx  = * (uint32_t*) (&g_kuiTableBIdx[iEdge][0]);
-  uint32_t uiBnIdx = * (uint32_t*) (&g_kuiTableBIdx[iEdge][4]);
+  const uint8_t *pBIdx  = &g_kuiTableBIdx[iEdge][0];
+  const uint8_t *pBnIdx = &g_kuiTableBIdx[iEdge][4];
+
 
   for (i = 0; i < 4; i++) {
-    if (pCurMb->pNonZeroCount[uiBIdx & 0xff] | pNeighMb->pNonZeroCount[uiBnIdx & 0xff]) {
+    if (pCurMb->pNonZeroCount[*pBIdx] | pNeighMb->pNonZeroCount[*pBnIdx]) {
       pBS[i] = 2;
     } else {
       pBS[i] =
 #ifndef SINGLE_REF_FRAME
         (pCurMb->uiRefIndex[g_kiTableBlock8x8Idx[1][iEdge][i]] - pNeighMb->uiRefIndex[g_kiTableBlock8x8NIdx[1][iEdge][i]]) ||
 #endif
-        MB_BS_MV (pCurMb->sMv, pNeighMb->sMv, (uiBIdx & 0xff), (uiBnIdx & 0xff));
+        MB_BS_MV (pCurMb->sMv, pNeighMb->sMv, *pBIdx, *pBnIdx);
     }
-    uiBIdx  = uiBIdx  >> 8;
-    uiBnIdx = uiBnIdx >> 8;
+    pBIdx++;
+    pBnIdx++;
   }
   return uiBSx4;
 }

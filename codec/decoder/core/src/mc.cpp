@@ -326,11 +326,11 @@ static inline void_t McChromaWithFragMv_c (uint8_t* pSrc, int32_t iSrcStride, ui
   int32_t i, j;
   int32_t iA, iB, iC, iD;
   uint8_t* pSrcNext = pSrc + iSrcStride;
-  const uint32_t kuiABCD = * ((uint32_t*)g_kuiABCD[iMvY & 0x07][iMvX & 0x07]);
-  iA = (kuiABCD) & 0xff;
-  iB = (kuiABCD >>  8) & 0xff;
-  iC = (kuiABCD >> 16) & 0xff;
-  iD = (kuiABCD >> 24) & 0xff;
+  const uint8_t *pABCD = g_kuiABCD[iMvY & 0x07][iMvX & 0x07];
+  iA = pABCD[0];
+  iB = pABCD[1];
+  iC = pABCD[2];
+  iD = pABCD[3];
   for (i = 0; i < iHeight; i++) {
     for (j = 0; j < iWidth; j++) {
       pDst[j] = (iA * pSrc[j] + iB * pSrc[j + 1] + iC * pSrcNext[j] + iD * pSrcNext[j + 1] + 32) >> 6;

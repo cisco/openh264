@@ -233,18 +233,18 @@ uint32_t DeblockingBsMarginalMBAvcbase (PDqLayer pCurDqLayer, int32_t iEdge, int
   uint32_t uiBSx4;
   //uint8_t* bS = static_cast<uint8_t*>(&uiBSx4);
   uint8_t* pBS = (uint8_t*) (&uiBSx4);
-  uint32_t uiBIdx  = * (uint32_t*) (&g_kuiTableBIdx[iEdge][0]);
-  uint32_t uiBnIdx = * (uint32_t*) (&g_kuiTableBIdx[iEdge][4]);
+  const uint8_t *pBIdx  = &g_kuiTableBIdx[iEdge][0];
+  const uint8_t *pBnIdx = &g_kuiTableBIdx[iEdge][4];
 
   for (i = 0; i < 4; i++) {
-    if (pCurDqLayer->pNzc[iMbXy][uiBIdx & 0xff] | pCurDqLayer->pNzc[iNeighMb][uiBnIdx & 0xff]) {
+    if (pCurDqLayer->pNzc[iMbXy][*pBIdx] | pCurDqLayer->pNzc[iNeighMb][*pBnIdx]) {
       pBS[i] = 2;
     } else {
-      pBS[i] = MB_BS_MV (pCurDqLayer->pRefIndex[LIST_0], pCurDqLayer->pMv[LIST_0], iMbXy, iNeighMb, (uiBIdx & 0xff),
-                         (uiBnIdx & 0xff));
+      pBS[i] = MB_BS_MV (pCurDqLayer->pRefIndex[LIST_0], pCurDqLayer->pMv[LIST_0], iMbXy, iNeighMb, *pBIdx,
+                         *pBnIdx);
     }
-    uiBIdx  = uiBIdx  >> 8;
-    uiBnIdx = uiBnIdx >> 8;
+    pBIdx++;
+    pBnIdx++;
   }
   return uiBSx4;
 }
