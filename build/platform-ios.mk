@@ -1,5 +1,5 @@
 ARCH = armv7
-include build/platform-darwin.mk
+include $(SRC_PATH)build/platform-darwin.mk
 CXX = clang++
 CC = clang
 ifneq ($(filter %86 x86_64, $(ARCH)),)

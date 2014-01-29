@@ -1,3 +1,10 @@
+SRC_PATH=$(word 1, $(dir $(MAKEFILE_LIST)))
+vpath %.c $(SRC_PATH)
+vpath %.cc $(SRC_PATH)
+vpath %.cpp $(SRC_PATH)
+vpath %.asm $(SRC_PATH)
+vpath %.S $(SRC_PATH)
+
 OS=$(shell uname | tr A-Z a-z | tr -d \\-[:digit:].)
 ARCH=$(shell uname -m)
 LIBPREFIX=lib
@@ -20,13 +27,13 @@ MODULE_NAME=gmpopenh264
 GMP_API_BRANCH=master
 CCASFLAGS=$(CFLAGS)
 
-ifeq (,$(wildcard ./gmp-api))
+ifeq (,$(wildcard $(SRC_PATH)gmp-api))
 HAVE_GMP_API=No
 else
 HAVE_GMP_API=Yes
 endif
 
-ifeq (,$(wildcard ./gtest))
+ifeq (,$(wildcard $(SRC_PATH)gtest))
 HAVE_GTEST=No
 else
 HAVE_GTEST=Yes
@@ -46,7 +53,7 @@ CFLAGS += -fsanitize=address
 LDFLAGS += -fsanitize=address
 endif
 
-include build/platform-$(OS).mk
+include $(SRC_PATH)build/platform-$(OS).mk
 
 
 CFLAGS +=
@@ -68,49 +75,49 @@ ifneq ($(V),Yes)
 endif
 
 
-INCLUDES += -Icodec/api/svc -Icodec/common/inc
+INCLUDES += -I$(SRC_PATH)codec/api/svc -I$(SRC_PATH)codec/common/inc
 
 DECODER_INCLUDES += \
-    -Icodec/decoder/core/inc \
-    -Icodec/decoder/plus/inc
+    -I$(SRC_PATH)codec/decoder/core/inc \
+    -I$(SRC_PATH)codec/decoder/plus/inc
 
 ENCODER_INCLUDES += \
-    -Icodec/encoder/core/inc \
-    -Icodec/encoder/plus/inc \
-    -Icodec/processing/interface
+    -I$(SRC_PATH)codec/encoder/core/inc \
+    -I$(SRC_PATH)codec/encoder/plus/inc \
+    -I$(SRC_PATH)codec/processing/interface
 
 PROCESSING_INCLUDES += \
-    -Icodec/processing/interface \
-    -Icodec/processing/src/common \
-    -Icodec/processing/src/scrolldetection
+    -I$(SRC_PATH)codec/processing/interface \
+    -I$(SRC_PATH)codec/processing/src/common \
+    -I$(SRC_PATH)codec/processing/src/scrolldetection
 
 GTEST_INCLUDES += \
-    -Igtest \
-    -Igtest/include
+    -I$(SRC_PATH)gtest \
+    -I$(SRC_PATH)gtest/include
 
 CODEC_UNITTEST_INCLUDES += \
-    -Igtest/include \
-    -Icodec/common/inc \
+    -I$(SRC_PATH)gtest/include \
+    -I$(SRC_PATH)codec/common/inc \
 
 CONSOLE_COMMON_INCLUDES += \
-    -Icodec/console/common/inc
+    -I$(SRC_PATH)codec/console/common/inc
 
-H264DEC_INCLUDES += $(DECODER_INCLUDES) $(CONSOLE_COMMON_INCLUDES) -Icodec/console/dec/inc
+H264DEC_INCLUDES += $(DECODER_INCLUDES) $(CONSOLE_COMMON_INCLUDES) -I$(SRC_PATH)codec/console/dec/inc
 H264DEC_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,decoder) $(call LINK_LIB,common) $(call LINK_LIB,console_common)
 H264DEC_DEPS = $(LIBPREFIX)decoder.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX) $(LIBPREFIX)console_common.$(LIBSUFFIX)
 
-H264ENC_INCLUDES += $(ENCODER_INCLUDES) $(CONSOLE_COMMON_INCLUDES) -Icodec/console/enc/inc
+H264ENC_INCLUDES += $(ENCODER_INCLUDES) $(CONSOLE_COMMON_INCLUDES) -I$(SRC_PATH)codec/console/enc/inc
 H264ENC_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common) $(call LINK_LIB,console_common)
 H264ENC_DEPS = $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX) $(LIBPREFIX)console_common.$(LIBSUFFIX)
 
 CODEC_UNITTEST_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,gtest) $(call LINK_LIB,decoder) $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common) $(CODEC_UNITTEST_LDFLAGS_SUFFIX)
 CODEC_UNITTEST_DEPS = $(LIBPREFIX)gtest.$(LIBSUFFIX) $(LIBPREFIX)decoder.$(LIBSUFFIX) $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX)
-DECODER_UNITTEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) $(DECODER_INCLUDES) -Itest -Itest/decoder
-ENCODER_UNITTEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) $(ENCODER_INCLUDES) -Itest -Itest/encoder
-PROCESSING_UNITTEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) $(PROCESSING_INCLUDES) -Itest -Itest/processing
-API_TEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) -Itest -Itest/api
-COMMON_UNITTEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) $(DECODER_INCLUDES) -Itest -Itest/common
-MODULE_INCLUDES += -Igmp-api
+DECODER_UNITTEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) $(DECODER_INCLUDES) -I$(SRC_PATH)test -I$(SRC_PATH)test/decoder
+ENCODER_UNITTEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) $(ENCODER_INCLUDES) -I$(SRC_PATH)test -I$(SRC_PATH)test/encoder
+PROCESSING_UNITTEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) $(PROCESSING_INCLUDES) -I$(SRC_PATH)test -I$(SRC_PATH)test/processing
+API_TEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) -I$(SRC_PATH)test -I$(SRC_PATH)test/api
+COMMON_UNITTEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) $(DECODER_INCLUDES) -I$(SRC_PATH)test -I$(SRC_PATH)test/common
+MODULE_INCLUDES += -I$(SRC_PATH)gmp-api
 
 .PHONY: test gtest-bootstrap clean
 
@@ -144,20 +151,20 @@ test:
 	@echo "You do not have gtest. Run make gtest-bootstrap to get gtest"
 endif
 
-include codec/common/targets.mk
-include codec/decoder/targets.mk
-include codec/encoder/targets.mk
-include codec/processing/targets.mk
+include $(SRC_PATH)codec/common/targets.mk
+include $(SRC_PATH)codec/decoder/targets.mk
+include $(SRC_PATH)codec/encoder/targets.mk
+include $(SRC_PATH)codec/processing/targets.mk
 
 ifeq ($(HAVE_GMP_API),Yes)
-include module/targets.mk
+include $(SRC_PATH)module/targets.mk
 endif
 
 ifneq (android, $(OS))
 ifneq (ios, $(OS))
-include codec/console/dec/targets.mk
-include codec/console/enc/targets.mk
-include codec/console/common/targets.mk
+include $(SRC_PATH)codec/console/dec/targets.mk
+include $(SRC_PATH)codec/console/enc/targets.mk
+include $(SRC_PATH)codec/console/common/targets.mk
 endif
 endif
 
@@ -209,12 +216,12 @@ install: install-static install-shared
 	@:
 
 ifeq ($(HAVE_GTEST),Yes)
-include build/gtest-targets.mk
-include test/api/targets.mk
-include test/decoder/targets.mk
-include test/encoder/targets.mk
-include test/processing/targets.mk
-include test/common/targets.mk
+include $(SRC_PATH)build/gtest-targets.mk
+include $(SRC_PATH)test/api/targets.mk
+include $(SRC_PATH)test/decoder/targets.mk
+include $(SRC_PATH)test/encoder/targets.mk
+include $(SRC_PATH)test/processing/targets.mk
+include $(SRC_PATH)test/common/targets.mk
 
 LIBRARIES += $(LIBPREFIX)ut.$(LIBSUFFIX)
 $(LIBPREFIX)ut.$(LIBSUFFIX): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(PROCESSING_UNITTEST_OBJS) $(COMMON_UNITTEST_OBJS) $(API_TEST_OBJS)
@@ -235,6 +242,7 @@ codec_unittest$(EXEEXT): $(LIBPREFIX)ut.$(LIBSUFFIX) $(LIBPREFIX)gtest.$(LIBSUFF
 
 else
 ifeq (android,$(OS))
+ifeq (./,$(SRC_PATH))
 codec_unittest$(EXEEXT): $(LIBPREFIX)ut.$(SHAREDLIBSUFFIX)
 	cd ./test/build/android && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
 
@@ -243,9 +251,16 @@ clean_Android_ut:
 	-cd ./test/build/android && $(NDKROOT)/ndk-build APP_ABI=$(APP_ABI) clean && ant clean
 
 else
-codec_unittest$(EXEEXT): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(PROCESSING_UNITTEST_OBJS) $(API_TEST_OBJS) $(COMMON_UNITTEST_OBJS) $(CODEC_UNITTEST_DEPS)
+codec_unittest$(EXEEXT):
+	@:
+endif
+else
+codec_unittest$(EXEEXT): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(PROCESSING_UNITTEST_OBJS) $(API_TEST_OBJS) $(COMMON_UNITTEST_OBJS) $(CODEC_UNITTEST_DEPS) | res
 	$(QUIET)rm -f $@
 	$(QUIET_CXX)$(CXX) $(CXX_LINK_O) $+ $(CODEC_UNITTEST_LDFLAGS) $(LDFLAGS)
+
+res:
+	$(QUIET)if [ ! -e res ]; then ln -s $(SRC_PATH)res .; fi
 
 endif
 endif
@@ -256,3 +271,10 @@ binaries:
 endif
 
 -include $(OBJS:.$(OBJ)=.d)
+
+OBJDIRS = $(sort $(dir $(OBJS)))
+
+$(OBJDIRS):
+	$(QUIET)mkdir -p $@
+
+$(OBJS): | $(OBJDIRS)

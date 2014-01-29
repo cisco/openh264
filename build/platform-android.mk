@@ -1,5 +1,5 @@
 ARCH = arm
-include build/platform-arch.mk
+include $(SRC_PATH)build/platform-arch.mk
 SHAREDLIBSUFFIX = so
 NDKLEVEL = 12
 ifeq ($(ARCH), arm)
@@ -28,7 +28,7 @@ ifndef TARGET
 $(error TARGET is not set)
 endif
 
-TOOLCHAINPREFIX = $(shell NDK_PROJECT_PATH=./codec/build/android/dec make --no-print-dir -f $(NDKROOT)/build/core/build-local.mk DUMP_TOOLCHAIN_PREFIX APP_ABI=$(APP_ABI))
+TOOLCHAINPREFIX = $(shell NDK_PROJECT_PATH=$(SRC_PATH)/codec/build/android/dec make --no-print-dir -f $(NDKROOT)/build/core/build-local.mk DUMP_TOOLCHAIN_PREFIX APP_ABI=$(APP_ABI))
 
 SYSROOT = $(NDKROOT)/platforms/android-$(NDKLEVEL)/arch-$(ARCH)
 CXX = $(TOOLCHAINPREFIX)g++
@@ -50,6 +50,7 @@ CODEC_UNITTEST_LDFLAGS_SUFFIX = $(STL_LIB)
 MODULE_INCLUDES = $(STL_INCLUDES)
 MODULE_LDFLAGS = $(STL_LIB)
 
+ifeq (./,$(SRC_PATH))
 binaries : decdemo encdemo
 
 decdemo: libraries
@@ -64,6 +65,12 @@ clean_Android_dec:
 	-cd ./codec/build/android/dec && $(NDKROOT)/ndk-build APP_ABI=$(APP_ABI) clean && ant clean
 clean_Android_enc:
 	-cd ./codec/build/android/enc && $(NDKROOT)/ndk-build APP_ABI=$(APP_ABI) clean && ant clean
+else
+all:
+	@:
+clean_Android:
+	@:
+endif
 
 COMMON_INCLUDES += -I$(NDKROOT)/sources/android/cpufeatures
 COMMON_OBJS += $(COMMON_SRCDIR)/src/cpu-features.$(OBJ)
