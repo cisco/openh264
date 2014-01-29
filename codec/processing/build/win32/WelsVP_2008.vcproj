@@ -730,11 +730,11 @@
 			Name="BackgroundDetection"
 			>
 			<File
-				RelativePath="..\..\src\backgounddetection\BackgroundDetection.cpp"
+				RelativePath="..\..\src\backgrounddetection\BackgroundDetection.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\backgounddetection\BackgroundDetection.h"
+				RelativePath="..\..\src\backgrounddetection\BackgroundDetection.h"
 				>
 			</File>
 		</Filter>

@@ -35,7 +35,7 @@
 #include "../downsample/downsample.h"
 #include "../scenechangedetection/SceneChangeDetection.h"
 #include "../vaacalc/vaacalculation.h"
-#include "../backgounddetection/BackgroundDetection.h"
+#include "../backgrounddetection/BackgroundDetection.h"
 #include "../adaptivequantization/AdaptiveQuantization.h"
 #include "../complexityanalysis/ComplexityAnalysis.h"
 #include "../imagerotate/imagerotate.h"
