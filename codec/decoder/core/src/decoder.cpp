@@ -51,6 +51,7 @@
 #include "expand_pic.h"
 #include "decode_slice.h"
 #include "mem_align.h"
+#include "ls_defines.h"
 
 namespace WelsDec {
 
@@ -58,21 +59,9 @@ extern PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth
 
 extern void_t FreePicture (PPicture pPic);
 
-#ifdef WORDS_BIGENDIAN
 inline void_t GetValueOf4Bytes (uint8_t* pDstNal, int32_t iDdstIdx) {
-  pDstNal[0] = (iDdstIdx & 0xff000000) >> 24;
-  pDstNal[1] = (iDdstIdx & 0xff0000) >> 16;
-  pDstNal[2] = (iDdstIdx & 0xff00) >> 8;
-  pDstNal[3] = (iDdstIdx & 0xff);
+  ST32(pDstNal, iDdstIdx);
 }
-#else //WORDS_BIGENDIAN
-inline void_t GetValueOf4Bytes (uint8_t* pDstNal, int32_t iDdstIdx) {
-  pDstNal[0] = (iDdstIdx & 0xff);
-  pDstNal[1] = (iDdstIdx & 0xff00) >> 8;
-  pDstNal[2] = (iDdstIdx & 0xff0000) >> 16;
-  pDstNal[3] = (iDdstIdx & 0xff000000) >> 24;
-}
-#endif //WORDS_BIGENDIAN
 
 static int32_t CreatePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, const int32_t kiSize,
                               const int32_t kiPicWidth, const int32_t kiPicHeight) {
