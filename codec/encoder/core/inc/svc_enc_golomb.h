@@ -46,6 +46,12 @@
 
 namespace WelsSVCEnc {
 
+#define WRITE_BE_32(ptr, val) do { \
+        (ptr)[0] = (val) >> 24; \
+        (ptr)[1] = (val) >> 16; \
+        (ptr)[2] = (val) >>  8; \
+        (ptr)[3] = (val) >>  0; \
+    } while (0)
 /************************************************************************/
 /* GOLOMB CODIMG FOR WELS ENCODER                                       */
 /************************************************************************/
@@ -73,7 +79,7 @@ namespace WelsSVCEnc {
 	else {\
 	    (n) -= iLeftBits;\
 		uiCurBits = (uiCurBits<<iLeftBits) | ((v)>>(n));\
-		*((uint32_t*)pBufPtr) = ENDIAN_FIX(uiCurBits);\
+		WRITE_BE_32(pBufPtr, uiCurBits);\
 		pBufPtr += 4;\
 		uiCurBits = (v) & ((1<<(n))-1);\
 		iLeftBits = 32 - (n);\
@@ -141,7 +147,7 @@ if (n < pBs->iLeftBits) {
 } else {
   n -= pBs->iLeftBits;
   pBs->uiCurBits = (pBs->uiCurBits << pBs->iLeftBits) | (kuiValue >> n);
-  * ((uint32_t*)pBs->pBufPtr) = ENDIAN_FIX (pBs->uiCurBits);
+  WRITE_BE_32(pBs->pBufPtr, pBs->uiCurBits);
   pBs->pBufPtr += 4;
   pBs->uiCurBits = kuiValue & ((1 << n) - 1);
   pBs->iLeftBits = 32 - n;
@@ -160,7 +166,7 @@ return 0;
 
 
 static inline void BsFlush (SBitStringAux* pBs) {
-* (uint32_t*)pBs->pBufPtr = ENDIAN_FIX (pBs->uiCurBits << pBs->iLeftBits);
+WRITE_BE_32(pBs->pBufPtr, pBs->uiCurBits << pBs->iLeftBits);
 pBs->pBufPtr += 4 - pBs->iLeftBits / 8;
 pBs->iLeftBits = 32;
 pBs->uiCurBits = 0;	//  for future writing safe, 5/19/2010
