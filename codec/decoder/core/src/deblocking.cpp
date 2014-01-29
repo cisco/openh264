@@ -152,24 +152,24 @@ void_t inline DeblockingBSInsideMBAvsbase (int8_t* pNnzTab, uint8_t nBS[2][4][4]
   uiNnz32b2 = * (uint32_t*) (pNnzTab + 8);
   uiNnz32b3 = * (uint32_t*) (pNnzTab + 12);
 
-  * (uint32_t*)uiBsx3 = (uiNnz32b0 | (uiNnz32b0 >> 8)) << iLShiftFactor;
+  * (uint32_t*)uiBsx3 = DEBLOCK_BS_SHIFTED (uiNnz32b0) << iLShiftFactor;
   nBS[0][1][0] = uiBsx3[0];
   nBS[0][2][0] = uiBsx3[1];
   nBS[0][3][0] = uiBsx3[2];
 
-  * (uint32_t*)uiBsx3 = (uiNnz32b1 | (uiNnz32b1 >> 8)) << iLShiftFactor;
+  * (uint32_t*)uiBsx3 = DEBLOCK_BS_SHIFTED (uiNnz32b1) << iLShiftFactor;
   nBS[0][1][1] = uiBsx3[0];
   nBS[0][2][1] = uiBsx3[1];
   nBS[0][3][1] = uiBsx3[2];
   * (uint32_t*)nBS[1][1] = (uiNnz32b0 | uiNnz32b1) << iLShiftFactor;
 
-  * (uint32_t*)uiBsx3 = (uiNnz32b2 | (uiNnz32b2 >> 8)) << iLShiftFactor;
+  * (uint32_t*)uiBsx3 = DEBLOCK_BS_SHIFTED (uiNnz32b2) << iLShiftFactor;
   nBS[0][1][2] = uiBsx3[0];
   nBS[0][2][2] = uiBsx3[1];
   nBS[0][3][2] = uiBsx3[2];
   * (uint32_t*)nBS[1][2] = (uiNnz32b1 | uiNnz32b2) << iLShiftFactor;
 
-  * (uint32_t*)uiBsx3 = (uiNnz32b3 | (uiNnz32b3 >> 8)) << iLShiftFactor;
+  * (uint32_t*)uiBsx3 = DEBLOCK_BS_SHIFTED (uiNnz32b3) << iLShiftFactor;
   nBS[0][1][3] = uiBsx3[0];
   nBS[0][2][3] = uiBsx3[1];
   nBS[0][3][3] = uiBsx3[2];
@@ -188,22 +188,22 @@ void_t static inline DeblockingBSInsideMBNormal (PDqLayer pCurDqLayer, uint8_t n
   uiNnz32b2 = * (uint32_t*) (pNnzTab + 8);
   uiNnz32b3 = * (uint32_t*) (pNnzTab + 12);
 
-  * (uint32_t*)uiBsx4 = (uiNnz32b0 | (uiNnz32b0 >> 8));
+  * (uint32_t*)uiBsx4 = DEBLOCK_BS_SHIFTED (uiNnz32b0);
   nBS[0][1][0] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 1, 0);
   nBS[0][2][0] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 2, 1);
   nBS[0][3][0] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 3, 2);
 
-  * (uint32_t*)uiBsx4 = (uiNnz32b1 | (uiNnz32b1 >> 8));
+  * (uint32_t*)uiBsx4 = DEBLOCK_BS_SHIFTED (uiNnz32b1);
   nBS[0][1][1] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 5, 4);
   nBS[0][2][1] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 6, 5);
   nBS[0][3][1] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 7, 6);
 
-  * (uint32_t*)uiBsx4 = (uiNnz32b2 | (uiNnz32b2 >> 8));
+  * (uint32_t*)uiBsx4 = DEBLOCK_BS_SHIFTED (uiNnz32b2);
   nBS[0][1][2] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 9, 8);
   nBS[0][2][2] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 10, 9);
   nBS[0][3][2] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 11, 10);
 
-  * (uint32_t*)uiBsx4 = (uiNnz32b3 | (uiNnz32b3 >> 8));
+  * (uint32_t*)uiBsx4 = DEBLOCK_BS_SHIFTED (uiNnz32b3);
   nBS[0][1][3] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 13, 12);
   nBS[0][2][3] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 14, 13);
   nBS[0][3][3] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 15, 14);
@@ -233,18 +233,18 @@ uint32_t DeblockingBsMarginalMBAvcbase (PDqLayer pCurDqLayer, int32_t iEdge, int
   uint32_t uiBSx4;
   //uint8_t* bS = static_cast<uint8_t*>(&uiBSx4);
   uint8_t* pBS = (uint8_t*) (&uiBSx4);
-  uint32_t uiBIdx  = * (uint32_t*) (&g_kuiTableBIdx[iEdge][0]);
-  uint32_t uiBnIdx = * (uint32_t*) (&g_kuiTableBIdx[iEdge][4]);
+  const uint8_t *pBIdx  = &g_kuiTableBIdx[iEdge][0];
+  const uint8_t *pBnIdx = &g_kuiTableBIdx[iEdge][4];
 
   for (i = 0; i < 4; i++) {
-    if (pCurDqLayer->pNzc[iMbXy][uiBIdx & 0xff] | pCurDqLayer->pNzc[iNeighMb][uiBnIdx & 0xff]) {
+    if (pCurDqLayer->pNzc[iMbXy][*pBIdx] | pCurDqLayer->pNzc[iNeighMb][*pBnIdx]) {
       pBS[i] = 2;
     } else {
-      pBS[i] = MB_BS_MV (pCurDqLayer->pRefIndex[LIST_0], pCurDqLayer->pMv[LIST_0], iMbXy, iNeighMb, (uiBIdx & 0xff),
-                         (uiBnIdx & 0xff));
+      pBS[i] = MB_BS_MV (pCurDqLayer->pRefIndex[LIST_0], pCurDqLayer->pMv[LIST_0], iMbXy, iNeighMb, *pBIdx,
+                         *pBnIdx);
     }
-    uiBIdx  = uiBIdx  >> 8;
-    uiBnIdx = uiBnIdx >> 8;
+    pBIdx++;
+    pBnIdx++;
   }
   return uiBSx4;
 }

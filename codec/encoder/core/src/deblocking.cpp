@@ -163,24 +163,24 @@ void inline DeblockingBSInsideMBAvsbase (int8_t* pNnzTab, uint8_t uiBS[2][4][4],
   uiNnz32b2 = * (uint32_t*) (pNnzTab + 8);
   uiNnz32b3 = * (uint32_t*) (pNnzTab + 12);
 
-  * (uint32_t*)uiBsx3 = (uiNnz32b0 | (uiNnz32b0 >> 8)) << iLShiftFactor;
+  * (uint32_t*)uiBsx3 = DEBLOCK_BS_SHIFTED (uiNnz32b0) << iLShiftFactor;
   uiBS[0][1][0] = uiBsx3[0];
   uiBS[0][2][0] = uiBsx3[1];
   uiBS[0][3][0] = uiBsx3[2];
 
-  * (uint32_t*)uiBsx3 = (uiNnz32b1 | (uiNnz32b1 >> 8)) << iLShiftFactor;
+  * (uint32_t*)uiBsx3 = DEBLOCK_BS_SHIFTED (uiNnz32b1) << iLShiftFactor;
   uiBS[0][1][1] = uiBsx3[0];
   uiBS[0][2][1] = uiBsx3[1];
   uiBS[0][3][1] = uiBsx3[2];
   * (uint32_t*)uiBS[1][1] = (uiNnz32b0 | uiNnz32b1) << iLShiftFactor;
 
-  * (uint32_t*)uiBsx3 = (uiNnz32b2 | (uiNnz32b2 >> 8)) << iLShiftFactor;
+  * (uint32_t*)uiBsx3 = DEBLOCK_BS_SHIFTED (uiNnz32b2) << iLShiftFactor;
   uiBS[0][1][2] = uiBsx3[0];
   uiBS[0][2][2] = uiBsx3[1];
   uiBS[0][3][2] = uiBsx3[2];
   * (uint32_t*)uiBS[1][2] = (uiNnz32b1 | uiNnz32b2) << iLShiftFactor;
 
-  * (uint32_t*)uiBsx3 = (uiNnz32b3 | (uiNnz32b3 >> 8)) << iLShiftFactor;
+  * (uint32_t*)uiBsx3 = DEBLOCK_BS_SHIFTED (uiNnz32b3) << iLShiftFactor;
   uiBS[0][1][3] = uiBsx3[0];
   uiBS[0][2][3] = uiBsx3[1];
   uiBS[0][3][3] = uiBsx3[2];
@@ -197,22 +197,22 @@ void inline DeblockingBSInsideMBNormal (SMB* pCurMb, uint8_t uiBS[2][4][4], int8
   uiNnz32b2 = * (uint32_t*) (pNnzTab + 8);
   uiNnz32b3 = * (uint32_t*) (pNnzTab + 12);
 
-  * (uint32_t*)uiBsx4 = (uiNnz32b0 | (uiNnz32b0 >> 8));
+  * (uint32_t*)uiBsx4 = DEBLOCK_BS_SHIFTED (uiNnz32b0);
   uiBS[0][1][0] = BS_EDGE (uiBsx4[0], iRefIdx, pCurMb->sMv, 1, 0);
   uiBS[0][2][0] = BS_EDGE (uiBsx4[1], iRefIdx, pCurMb->sMv, 2, 1);
   uiBS[0][3][0] = BS_EDGE (uiBsx4[2], iRefIdx, pCurMb->sMv, 3, 2);
 
-  * (uint32_t*)uiBsx4 = (uiNnz32b1 | (uiNnz32b1 >> 8));
+  * (uint32_t*)uiBsx4 = DEBLOCK_BS_SHIFTED (uiNnz32b1);
   uiBS[0][1][1] = BS_EDGE (uiBsx4[0], iRefIdx, pCurMb->sMv, 5, 4);
   uiBS[0][2][1] = BS_EDGE (uiBsx4[1], iRefIdx, pCurMb->sMv, 6, 5);
   uiBS[0][3][1] = BS_EDGE (uiBsx4[2], iRefIdx, pCurMb->sMv, 7, 6);
 
-  * (uint32_t*)uiBsx4 = (uiNnz32b2 | (uiNnz32b2 >> 8));
+  * (uint32_t*)uiBsx4 = DEBLOCK_BS_SHIFTED (uiNnz32b2);
   uiBS[0][1][2] = BS_EDGE (uiBsx4[0], iRefIdx, pCurMb->sMv, 9, 8);
   uiBS[0][2][2] = BS_EDGE (uiBsx4[1], iRefIdx, pCurMb->sMv, 10, 9);
   uiBS[0][3][2] = BS_EDGE (uiBsx4[2], iRefIdx, pCurMb->sMv, 11, 10);
 
-  * (uint32_t*)uiBsx4 = (uiNnz32b3 | (uiNnz32b3 >> 8));
+  * (uint32_t*)uiBsx4 = DEBLOCK_BS_SHIFTED (uiNnz32b3);
   uiBS[0][1][3] = BS_EDGE (uiBsx4[0], iRefIdx, pCurMb->sMv, 13, 12);
   uiBS[0][2][3] = BS_EDGE (uiBsx4[1], iRefIdx, pCurMb->sMv, 14, 13);
   uiBS[0][3][3] = BS_EDGE (uiBsx4[2], iRefIdx, pCurMb->sMv, 15, 14);
@@ -241,21 +241,22 @@ uint32_t DeblockingBSMarginalMBAvcbase (SMB* pCurMb, SMB* pNeighMb, int32_t iEdg
   int32_t i;
   uint32_t uiBSx4;
   uint8_t* pBS = (uint8_t*) (&uiBSx4);
-  uint32_t uiBIdx  = * (uint32_t*) (&g_kuiTableBIdx[iEdge][0]);
-  uint32_t uiBnIdx = * (uint32_t*) (&g_kuiTableBIdx[iEdge][4]);
+  const uint8_t *pBIdx  = &g_kuiTableBIdx[iEdge][0];
+  const uint8_t *pBnIdx = &g_kuiTableBIdx[iEdge][4];
+
 
   for (i = 0; i < 4; i++) {
-    if (pCurMb->pNonZeroCount[uiBIdx & 0xff] | pNeighMb->pNonZeroCount[uiBnIdx & 0xff]) {
+    if (pCurMb->pNonZeroCount[*pBIdx] | pNeighMb->pNonZeroCount[*pBnIdx]) {
       pBS[i] = 2;
     } else {
       pBS[i] =
 #ifndef SINGLE_REF_FRAME
         (pCurMb->uiRefIndex[g_kiTableBlock8x8Idx[1][iEdge][i]] - pNeighMb->uiRefIndex[g_kiTableBlock8x8NIdx[1][iEdge][i]]) ||
 #endif
-        MB_BS_MV (pCurMb->sMv, pNeighMb->sMv, (uiBIdx & 0xff), (uiBnIdx & 0xff));
+        MB_BS_MV (pCurMb->sMv, pNeighMb->sMv, *pBIdx, *pBnIdx);
     }
-    uiBIdx  = uiBIdx  >> 8;
-    uiBnIdx = uiBnIdx >> 8;
+    pBIdx++;
+    pBnIdx++;
   }
   return uiBSx4;
 }
