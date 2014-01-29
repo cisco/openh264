@@ -72,7 +72,8 @@ Then add 'UNAME=msvc' to the make line of the 'For All Platforms' instructions.
 For All Platforms
 -------------------
 From the main project directory:
-'make' for 32bit builds
+'make' for automatically detecting 32/64bit and building accordingly
+'make ENABLE64BIT=No' for 32bit builds
 'make ENABLE64BIT=Yes' for 64bit builds
 
 The command line programs h264enc and h264dec will appear in the main project directory.
