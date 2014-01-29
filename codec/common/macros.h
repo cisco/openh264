@@ -45,16 +45,16 @@
 #include "typedefs.h"
 
 /*
-* FORCE_STACK_ALIGN_1D: force 1 dimension local data aligned in stack
+* ENFORCE_STACK_ALIGN_1D: force 1 dimension local data aligned in stack
 * _tp: type
 * _nm: var name
 * _sz: size
 * _al: align bytes
 * auxiliary var: _nm ## _tEmP
 */
-#define FORCE_STACK_ALIGN_1D(_tp, _nm, _sz, _al) \
+#define ENFORCE_STACK_ALIGN_1D(_tp, _nm, _sz, _al) \
 	_tp _nm ## _tEmP[(_sz)+(_al)-1]; \
-	_tp *_nm = _nm ## _tEmP + ((_al)-1) - (((uintptr_t)(_nm ## _tEmP + ((_al)-1)) & ((_al)-1))/sizeof(_tp))
+	_tp *_nm = _nm ## _tEmP + ((_al)-1) - (((uintptr_t)(_nm ## _tEmP + ((_al)-1)) & ((_al)-1))/sizeof(_tp));
 
 
 #define ENFORCE_STACK_ALIGN_2D(_tp, _nm, _cx, _cy, _al) \

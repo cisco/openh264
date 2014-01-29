@@ -42,7 +42,6 @@
 #include "encode_mb_aux.h"
 #include "decode_mb_aux.h"
 #include "ls_defines.h"
-#include "array_stack_align.h"
 
 namespace WelsSVCEnc {
 void WelsDctMb (int16_t* pRes, uint8_t* pEncMb, int32_t iEncStride, uint8_t* pBestPred, PDctFunc pfDctFourT4) {

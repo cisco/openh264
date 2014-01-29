@@ -40,7 +40,6 @@
 
 #include "mc.h"
 #include "cpu_core.h"
-#include "array_stack_align.h"
 
 namespace WelsSVCEnc {
 /*------------------weight for chroma fraction pixel interpolation------------------*/

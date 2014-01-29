@@ -42,7 +42,6 @@
 #include "ls_defines.h"
 #include "cpu_core.h"
 #include "get_intra_predictor.h"
-#include "array_stack_align.h"
 
 namespace WelsSVCEnc {
 #define I4x4_COUNT 4

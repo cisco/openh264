@@ -51,7 +51,6 @@
 #include "ref_list_mgr_svc.h"
 #include "ls_defines.h"
 #include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross platforms
-#include "array_stack_align.h"
 #if defined(MT_ENABLED)
 #include "slice_multi_threading.h"
 #endif//MT_ENABLED

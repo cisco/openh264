@@ -237,7 +237,7 @@ static inline void_t BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t 
   uint8_t* pDstV = pMCRefMem->pDstV;
   bool_t bExpand = false;
 
-  FORCE_STACK_ALIGN_1D (uint8_t, uiExpandBuf, (PADDING_LENGTH + 6) * (PADDING_LENGTH + 6), 16);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiExpandBuf, (PADDING_LENGTH + 6) * (PADDING_LENGTH + 6), 16);
 
   if (iFullMVx & 0x07) {
     iExpandWidth -= 3;

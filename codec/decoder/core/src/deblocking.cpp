@@ -145,7 +145,7 @@ static const uint8_t g_kuiTableBIdx[2][8] = {
 
 void_t inline DeblockingBSInsideMBAvsbase (int8_t* pNnzTab, uint8_t nBS[2][4][4], int32_t iLShiftFactor) {
   uint32_t uiNnz32b0, uiNnz32b1, uiNnz32b2, uiNnz32b3;
-  FORCE_STACK_ALIGN_1D (uint8_t, uiBsx3, 4, 4);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiBsx3, 4, 4);
 
   uiNnz32b0 = * (uint32_t*) (pNnzTab + 0);
   uiNnz32b1 = * (uint32_t*) (pNnzTab + 4);
@@ -181,7 +181,7 @@ void_t static inline DeblockingBSInsideMBNormal (PDqLayer pCurDqLayer, uint8_t n
     int32_t iMbXy) {
   uint32_t uiNnz32b0, uiNnz32b1, uiNnz32b2, uiNnz32b3;
   int8_t* iRefIndex = pCurDqLayer->pRefIndex[LIST_0][iMbXy];
-  FORCE_STACK_ALIGN_1D (uint8_t, uiBsx4, 4, 4);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiBsx4, 4, 4);
 
   uiNnz32b0 = * (uint32_t*) (pNnzTab + 0);
   uiNnz32b1 = * (uint32_t*) (pNnzTab + 4);
@@ -269,7 +269,7 @@ void_t FilteringEdgeLumaH (SDeblockingFilter* pFilter, uint8_t* pPix, int32_t iS
   int32_t iIndexA;
   int32_t iAlpha;
   int32_t iBeta;
-  FORCE_STACK_ALIGN_1D (int8_t, tc, 4, 16);
+  ENFORCE_STACK_ALIGN_1D (int8_t, tc, 4, 16);
 
   GET_ALPHA_BETA_FROM_QP (pFilter->iLumaQP, pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha,
                           iBeta);
@@ -286,7 +286,7 @@ void_t FilteringEdgeLumaV (SDeblockingFilter* pFilter, uint8_t* pPix, int32_t iS
   int32_t  iIndexA;
   int32_t  iAlpha;
   int32_t  iBeta;
-  FORCE_STACK_ALIGN_1D (int8_t, tc, 4, 16);
+  ENFORCE_STACK_ALIGN_1D (int8_t, tc, 4, 16);
 
   GET_ALPHA_BETA_FROM_QP (pFilter->iLumaQP, pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha,
                           iBeta);
@@ -331,7 +331,7 @@ void_t FilteringEdgeChromaH (SDeblockingFilter* pFilter, uint8_t* pPixCb, uint8_
   int32_t iIndexA;
   int32_t iAlpha;
   int32_t iBeta;
-  FORCE_STACK_ALIGN_1D (int8_t, tc, 4, 16);
+  ENFORCE_STACK_ALIGN_1D (int8_t, tc, 4, 16);
 
   GET_ALPHA_BETA_FROM_QP (pFilter->iChromaQP, pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha,
                           iBeta);
@@ -347,7 +347,7 @@ void_t FilteringEdgeChromaV (SDeblockingFilter* pFilter, uint8_t* pPixCb, uint8_
   int32_t iIndexA;
   int32_t iAlpha;
   int32_t iBeta;
-  FORCE_STACK_ALIGN_1D (int8_t, tc, 4, 16);
+  ENFORCE_STACK_ALIGN_1D (int8_t, tc, 4, 16);
 
   GET_ALPHA_BETA_FROM_QP (pFilter->iChromaQP, pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha,
                           iBeta);
@@ -483,8 +483,8 @@ void_t FilteringEdgeLumaHV (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, in
   int32_t  iCurQp;
   int32_t  iIndexA, iAlpha, iBeta;
 
-  FORCE_STACK_ALIGN_1D (int8_t,  iTc,   4, 16);
-  FORCE_STACK_ALIGN_1D (uint8_t, uiBSx4, 4, 4);
+  ENFORCE_STACK_ALIGN_1D (int8_t,  iTc,   4, 16);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiBSx4, 4, 4);
 
   pDestY  = pFilter->pCsData[0] + ((iMbY * iLineSize + iMbX) << 4);
   iCurQp  = pCurDqLayer->pLumaQp[iMbXyIndex];
@@ -531,8 +531,8 @@ void_t FilteringEdgeChromaHV (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, 
   int32_t  iCurQp;
   int32_t  iIndexA, iAlpha, iBeta;
 
-  FORCE_STACK_ALIGN_1D (int8_t,  iTc,   4, 16);
-  FORCE_STACK_ALIGN_1D (uint8_t, uiBSx4, 4, 4);
+  ENFORCE_STACK_ALIGN_1D (int8_t,  iTc,   4, 16);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiBSx4, 4, 4);
 
   pDestCb = pFilter->pCsData[1] + ((iMbY * iLineSize + iMbX) << 3);
   pDestCr = pFilter->pCsData[2] + ((iMbY * iLineSize + iMbX) << 3);

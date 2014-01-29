@@ -41,7 +41,6 @@
 
 
 #include "svc_motion_estimate.h"
-#include "array_stack_align.h"
 
 namespace WelsSVCEnc {
 /*!
