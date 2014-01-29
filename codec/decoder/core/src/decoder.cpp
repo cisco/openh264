@@ -52,17 +52,12 @@
 #include "decode_slice.h"
 #include "error_concealment.h"
 #include "mem_align.h"
-#include "ls_defines.h"
 
 namespace WelsDec {
 
 extern PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const int32_t kiPicHeight);
 
 extern void FreePicture (PPicture pPic);
-
-inline void GetValueOf4Bytes (uint8_t* pDstNal, int32_t iDdstIdx) {
-  ST32 (pDstNal, iDdstIdx);
-}
 
 static int32_t CreatePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, const int32_t kiSize,
                               const int32_t kiPicWidth, const int32_t kiPicHeight) {
@@ -447,7 +442,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 
     //copy raw data from source buffer (application) to raw data buffer (codec inside)
     //0x03 removal and extract all of NAL Unit from current raw data
-    pDstNal = pRawData->pCurPos + 4; //4-bytes used to write the length of current NAL rbsp
+    pDstNal = pRawData->pCurPos;
 
     while (iSrcConsumed < iSrcLength) {
       if ((2 + iSrcConsumed < iSrcLength) &&
@@ -459,7 +454,6 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
           iSrcIdx	+= 3;
           iSrcConsumed += 3;
         } else {
-          GetValueOf4Bytes (pDstNal - 4, iDstIdx);  //pDstNal-4 (non-aligned by 4) in Solaris10(SPARC). Given value by byte.
 
           iConsumedBytes = 0;
           pNalPayload	= ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
@@ -515,7 +509,6 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
     }
 
     //last NAL decoding
-    GetValueOf4Bytes (pDstNal - 4, iDstIdx); //pDstNal-4 (non-aligned by 4) in Solaris10(SPARC). Given value by byte.
 
     iConsumedBytes = 0;
     pNalPayload = ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
