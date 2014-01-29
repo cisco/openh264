@@ -1433,10 +1433,6 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\array_stack_align.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\encoder\core\inc\as264_common.h"
 				>
 			</File>

@@ -492,7 +492,7 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
   int32_t iNMbMode, i;
   uint32_t uiMbType = 0, uiCbp = 0, uiCbpL = 0, uiCbpC = 0;
 
-  FORCE_STACK_ALIGN_1D (uint8_t, pNonZeroCount, 48, 16);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pNonZeroCount, 48, 16);
 
   pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
   pCurLayer->pResidualPredFlag[iMbXy] = pSlice->sSliceHeaderExt.bDefaultResidualPredFlag;
@@ -553,7 +553,7 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
     memset (pCurLayer->pNzc[iMbXy], 16, sizeof (pCurLayer->pNzc[iMbXy]));   //JVT-x201wcm1.doc, page229, 2009.10.23
     return 0;
   } else if (0 == uiMbType) { //reference to JM
-    FORCE_STACK_ALIGN_1D (int8_t, pIntraPredMode, 48, 16);
+    ENFORCE_STACK_ALIGN_1D (int8_t, pIntraPredMode, 48, 16);
     pCurLayer->pMbType[iMbXy] = MB_TYPE_INTRA4x4;
     pCtx->pFillInfoCacheIntra4x4Func (&sNeighAvail, pNonZeroCount, pIntraPredMode, pCurLayer);
     if (pCtx->pParseIntra4x4ModeFunc (&sNeighAvail, pIntraPredMode, pBs, pCurLayer)) {
@@ -770,7 +770,7 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
   int32_t iNMbMode, i;
   uint32_t uiMbType = 0, uiCbp = 0, uiCbpL = 0, uiCbpC = 0;
 
-  FORCE_STACK_ALIGN_1D (uint8_t, pNonZeroCount, 48, 16);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pNonZeroCount, 48, 16);
   pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;//2009.10.23
 
   uiMbType = BsGetUe (pBs);
@@ -859,7 +859,7 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
       return 0;
     } else {
       if (0 == uiMbType) {
-        FORCE_STACK_ALIGN_1D (int8_t, pIntraPredMode, 48, 16);
+        ENFORCE_STACK_ALIGN_1D (int8_t, pIntraPredMode, 48, 16);
         pCurLayer->pMbType[iMbXy] = MB_TYPE_INTRA4x4;
         pCtx->pFillInfoCacheIntra4x4Func (&sNeighAvail, pNonZeroCount, pIntraPredMode, pCurLayer);
         if (pCtx->pParseIntra4x4ModeFunc (&sNeighAvail, pIntraPredMode, pBs, pCurLayer)) {

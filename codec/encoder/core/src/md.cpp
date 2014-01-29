@@ -42,7 +42,6 @@
 #include "md.h"
 #include "cpu_core.h"
 #include "svc_enc_golomb.h"
-#include "array_stack_align.h"
 
 namespace WelsSVCEnc {
 #define INTRA_VARIANCE_SAD_THRESHOLD 150

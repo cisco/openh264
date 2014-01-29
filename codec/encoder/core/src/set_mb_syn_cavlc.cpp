@@ -41,7 +41,6 @@
 #include "set_mb_syn_cavlc.h"
 #include "vlc_encoder.h"
 #include "cpu_core.h"
-#include "array_stack_align.h"
 
 namespace WelsSVCEnc {
 SCoeffFunc    sCoeffFunc;

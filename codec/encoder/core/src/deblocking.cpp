@@ -40,7 +40,6 @@
 
 #include "deblocking.h"
 #include "cpu_core.h"
-#include "array_stack_align.h"
 
 namespace WelsSVCEnc {
 
