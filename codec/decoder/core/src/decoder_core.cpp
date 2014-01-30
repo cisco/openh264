@@ -159,7 +159,7 @@ int32_t ParseRefPicListReordering (PBitStringAux pBs, PSliceHeader pSh) {
   int32_t iList = 0;
   const ESliceType keSt = pSh->eSliceType;
   PRefPicListReorderSyn pRefPicListReordering = &pSh->pRefPicListReordering;
-
+  PSps pSps = pSh->pSps;
   if (keSt == I_SLICE || keSt == SI_SLICE)
     return ERR_NONE;
 
@@ -170,7 +170,7 @@ int32_t ParseRefPicListReordering (PBitStringAux pBs, PSliceHeader pSh) {
     if (pRefPicListReordering->bRefPicListReorderingFlag[iList]) {
       int32_t iIdx = 0;
       do {
-        const uint8_t kuiIdc = BsGetUe (pBs);
+        const uint32_t kuiIdc = BsGetUe (pBs);
 
         //Fixed the referrence list reordering crash issue.(fault kIdc value > 3 case)---
         if ((iIdx >= MAX_REF_PIC_COUNT) || (kuiIdc > 3)) {
@@ -184,7 +184,12 @@ int32_t ParseRefPicListReordering (PBitStringAux pBs, PSliceHeader pSh) {
           return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_REF_REORDERING);
 
         if (kuiIdc == 0 || kuiIdc == 1) {
-          pRefPicListReordering->sReorderingSyn[iList][iIdx].uiAbsDiffPicNumMinus1 = BsGetUe (pBs);	// uiAbsDiffPicNumMinus1
+          // abs_diff_pic_num_minus1 should be in range 0 to MaxPicNum-1, MaxPicNum is derived as
+          // 2^(4+log2_max_frame_num_minus4)
+          uint32_t uiTmp = BsGetUe (pBs);
+          if (uiTmp > (1 << pSps->uiLog2MaxFrameNum))
+            return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_REF_REORDERING);
+          pRefPicListReordering->sReorderingSyn[iList][iIdx].uiAbsDiffPicNumMinus1 = uiTmp;	// uiAbsDiffPicNumMinus1
         } else if (kuiIdc == 2) {
           pRefPicListReordering->sReorderingSyn[iList][iIdx].uiLongTermPicNum = BsGetUe (pBs);
         }
@@ -203,7 +208,7 @@ int32_t ParseRefPicListReordering (PBitStringAux pBs, PSliceHeader pSh) {
 int32_t ParseDecRefPicMarking (PWelsDecoderContext pCtx, PBitStringAux pBs, PSliceHeader pSh, PSps pSps,
                                const bool_t kbIdrFlag) {
   PRefPicMarking const kpRefMarking = &pSh->sRefMarking;
-
+  PRefPic pRefPic = &pCtx->sRefPic;
   if (kbIdrFlag) {
     kpRefMarking->bNoOutputOfPriorPicsFlag	= !!BsGetOneBit (pBs);
     kpRefMarking->bLongTermRefFlag			= !!BsGetOneBit (pBs);
@@ -451,6 +456,13 @@ int32_t CheckSpsId (PWelsDecoderContext pCtx, PSubsetSps* ppSubsetSps, PSps* ppS
 }
 
 #endif
+
+#define SLICE_HEADER_IDR_PIC_ID_MAX 65535
+#define SLICE_HEADER_REDUNDANT_PIC_CNT_MAX 127
+#define SLICE_HEADER_ALPHAC0_BETA_OFFSET_MIN -12
+#define SLICE_HEADER_ALPHAC0_BETA_OFFSET_MAX 12
+#define SLICE_HEADER_INTER_LAYER_ALPHAC0_BETA_OFFSET_MIN -12
+#define SLICE_HEADER_INTER_LAYER_ALPHAC0_BETA_OFFSET_MAX 12
 /*
  *	decode_slice_header_avc
  *	Parse slice header of bitstream in avc for storing data structure
@@ -471,7 +483,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   uint8_t uiQualityId					= BASE_QUALITY_ID;
   bool_t	bIdrFlag					= false;
   bool_t	bSgChangeCycleInvolved	= false;	// involved slice group change cycle ?
-
+  uint32_t uiTmp;
   if (kpCurNal == NULL) {
     return ERR_INFO_OUT_OF_MEMORY;
   }
@@ -493,6 +505,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
 
   kpCurNal->sNalData.sVclNal.bSliceHeaderExtFlag	= kbExtensionFlag;
 
+  // first_mb_in_slice
   pSliceHead->iFirstMbInSlice	= BsGetUe (pBs);
 
   uiSliceType = BsGetUe (pBs);
@@ -504,7 +517,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   if (uiSliceType > 4)
     uiSliceType -= 5;
 
-  if((eNalType == NAL_UNIT_CODED_SLICE_IDR) && (uiSliceType != 2)){
+  if ((eNalType == NAL_UNIT_CODED_SLICE_IDR) && (uiSliceType != 2)) {
     WelsLog (pCtx, WELS_LOG_WARNING, "Invalid slice type(%d) in IDR picture. \n", uiSliceType);
     return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SLICE_TYPE);
   }
@@ -570,6 +583,11 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     WelsLog (pCtx, WELS_LOG_WARNING, "non existing SPS referenced\n");
     return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_NO_PARAM_SETS);
   }
+  // check first_mb_in_slice
+  if ((uint32_t)(pSliceHead->iFirstMbInSlice) > pSps->uiTotalMbCount) {
+    WelsLog (pCtx, WELS_LOG_ERROR, "first_mb_in_slice is greater than total mb counts.\n");
+    return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_FIRST_MB_IN_SLICE);
+  }
   pSliceHead->iFrameNum = BsGetBits (pBs, pSps->uiLog2MaxFrameNum);
 
   pSliceHead->bFieldPicFlag		= false;
@@ -588,7 +606,14 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
                pSliceHead->iFrameNum);
       return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_FRAME_NUM);
     }
-    pSliceHead->uiIdrPicId	= BsGetUe (pBs); /* uiIdrPicId */
+    uiTmp = BsGetUe (pBs);
+    // standard 7.4.3 idr_pic_id should be in range 0 to 65535, inclusive.
+    if (uiTmp > SLICE_HEADER_IDR_PIC_ID_MAX) {
+      WelsLog (pCtx, WELS_LOG_ERROR, "ParseSliceHeaderSyntaxs(), invaild idr_pic_id: %d due to IDR frame introduced!\n",
+               uiTmp);
+      return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_IDR_PIC_ID);
+    }
+    pSliceHead->uiIdrPicId	= uiTmp; /* uiIdrPicId */
 #ifdef LONG_TERM_REF
     pCtx->uiCurIdrPicId      = pSliceHead->uiIdrPicId;
 #endif
@@ -610,7 +635,14 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
 
   pSliceHead->iRedundantPicCnt	= 0;
   if (pPps->bRedundantPicCntPresentFlag) {
-    pSliceHead->iRedundantPicCnt = BsGetUe (pBs);
+    uiTmp = BsGetUe (pBs);
+    // standard section 7.4.3, redundant_pic_cnt should be in range 0 to 127, inclusive.
+    if (uiTmp > SLICE_HEADER_REDUNDANT_PIC_CNT_MAX) {
+      WelsLog (pCtx, WELS_LOG_ERROR, "ParseSliceHeaderSyntaxs(), redundant_pic_cnt: %d!\n",
+               uiTmp);
+      return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_REDUNDANT_PIC_CNT);
+    }
+    pSliceHead->iRedundantPicCnt = uiTmp;
   }
 
   //set defaults, might be overriden a few line later
@@ -699,7 +731,17 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     }
     if (pSliceHead->uiDisableDeblockingFilterIdc != 1) {
       pSliceHead->iSliceAlphaC0Offset	= BsGetSe (pBs) << 1;	// slice_alpha_c0_offset_div2
+      if ((pSliceHead->iSliceAlphaC0Offset < SLICE_HEADER_ALPHAC0_BETA_OFFSET_MIN)
+          || (pSliceHead->iSliceAlphaC0Offset > SLICE_HEADER_ALPHAC0_BETA_OFFSET_MAX)) {
+        WelsLog (pCtx, WELS_LOG_ERROR, "invalid slice_alpha_c0_offset_div2.\n");
+        return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SLICE_ALPHA_C0_OFFSET_DIV2);
+      }
       pSliceHead->iSliceBetaOffset		= BsGetSe (pBs) << 1;	// iSliceBetaOffset
+      if ((pSliceHead->iSliceBetaOffset < SLICE_HEADER_ALPHAC0_BETA_OFFSET_MIN)
+          || (pSliceHead->iSliceBetaOffset > SLICE_HEADER_ALPHAC0_BETA_OFFSET_MAX)) {
+        WelsLog (pCtx, WELS_LOG_ERROR, "invalid slice_beta_offset_div2.\n");
+        return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SLICE_BETA_OFFSET_DIV2);
+      }
     }
   }
 
@@ -735,7 +777,17 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
         }
         if (pSliceHeadExt->uiDisableInterLayerDeblockingFilterIdc != 1) {
           pSliceHeadExt->iInterLayerSliceAlphaC0Offset	= BsGetSe (pBs) << 1;
+          if ((pSliceHeadExt->iInterLayerSliceAlphaC0Offset < SLICE_HEADER_INTER_LAYER_ALPHAC0_BETA_OFFSET_MIN)
+              || (pSliceHeadExt->iInterLayerSliceAlphaC0Offset > SLICE_HEADER_INTER_LAYER_ALPHAC0_BETA_OFFSET_MAX)) {
+            WelsLog (pCtx, WELS_LOG_ERROR, "invalid inter_layer_slice_alpha_c0_offset_div2.\n");
+            return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SLICE_ALPHA_C0_OFFSET_DIV2);
+          }
           pSliceHeadExt->iInterLayerSliceBetaOffset		= BsGetSe (pBs) << 1;
+          if ((pSliceHeadExt->iInterLayerSliceBetaOffset <  SLICE_HEADER_INTER_LAYER_ALPHAC0_BETA_OFFSET_MIN)
+              || (pSliceHeadExt->iInterLayerSliceBetaOffset > SLICE_HEADER_INTER_LAYER_ALPHAC0_BETA_OFFSET_MAX)) {
+            WelsLog (pCtx, WELS_LOG_ERROR, "invalid inter_layer_slice_beta_offset_div2.\n");
+            return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SLICE_BETA_OFFSET_DIV2);
+          }
         }
       }
 
