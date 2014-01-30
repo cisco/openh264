@@ -75,6 +75,7 @@ From the main project directory:
 'make' for automatically detecting 32/64bit and building accordingly
 'make ENABLE64BIT=No' for 32bit builds
 'make ENABLE64BIT=Yes' for 64bit builds
+'make V=Yes' for a verbose build (showing all commands)
 
 The command line programs h264enc and h264dec will appear in the main project directory.
 
