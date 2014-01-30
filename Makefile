@@ -60,6 +60,14 @@ ASMFLAGS += $(ASMFLAGS_PLATFORM) -DNO_DYNAMIC_VP
 
 
 #### No user-serviceable parts below this line
+ifeq ($(V),)
+    QUIET_CXX = @printf "CXX\t$@\n";
+    QUIET_ASM = @printf "ASM\t$@\n";
+    QUIET_AR  = @printf "AR\t$@\n";
+    QUIET     = @
+endif
+
+
 INCLUDES = -Icodec/api/svc -Icodec/common
 #ASM_INCLUDES = -Iprocessing/src/asm/
 ASM_INCLUDES = -Icodec/common/
@@ -99,7 +107,7 @@ CODEC_UNITTEST_DEPS = $(LIBPREFIX)gtest.$(LIBSUFFIX) $(LIBPREFIX)decoder.$(LIBSU
 all:	libraries binaries
 
 clean:
-	rm -f $(OBJS) $(OBJS:.o=.d) $(LIBRARIES) $(BINARIES)
+	$(QUIET)rm -f $(OBJS) $(OBJS:.o=.d) $(LIBRARIES) $(BINARIES)
 
 gtest-bootstrap:
 	svn co https://googletest.googlecode.com/svn/trunk/ gtest
