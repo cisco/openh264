@@ -16,7 +16,7 @@ static void ReadFrame(std::ifstream* file, BufferedData* buf) {
     if (file->gcount() != 1) { // end of file
       return;
     }
-    if (!buf->Push(b)) {
+    if (!buf->PushBack(b)) {
       FAIL() << "unable to allocate memory";
     }
 
@@ -76,7 +76,7 @@ void BaseDecoderTest::DecodeFrame(const uint8_t* src, int sliceSize, Callback* c
   memset(data, 0, sizeof(data));
   memset(&bufInfo, 0, sizeof(SBufferInfo));
 
-  DECODING_STATE rv = decoder_->DecodeFrame(src, sliceSize, data, &bufInfo);
+  DECODING_STATE rv = decoder_->DecodeFrame2(src, sliceSize, data, &bufInfo);
   ASSERT_TRUE(rv == dsErrorFree);
 
   if (bufInfo.iBufferStatus == 1 && cbk != NULL) {
@@ -107,7 +107,8 @@ void BaseDecoderTest::DecodeFile(const char* fileName, Callback* cbk) {
   std::ifstream file(fileName, std::ios::in | std::ios::binary);
   ASSERT_TRUE(file.is_open());
 
-  for (BufferedData buf;;) {
+  BufferedData buf;
+  while (true) {
     ReadFrame(&file, &buf);
     if (::testing::Test::HasFatalFailure()) {
       return;

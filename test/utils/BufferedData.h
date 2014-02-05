@@ -13,7 +13,7 @@ class BufferedData {
     free(data_);
   }
 
-  bool Push(uint8_t c) {
+  bool PushBack(uint8_t c) {
     if (!EnsureCapacity(length_ + 1)) {
       return false;
     }
@@ -21,7 +21,7 @@ class BufferedData {
     return true;
   }
 
-  bool Push(const uint8_t* data, size_t len) {
+  bool PushBack(const uint8_t* data, size_t len) {
     if (!EnsureCapacity(length_ + len)) {
       return false;
     }
@@ -30,10 +30,10 @@ class BufferedData {
     return true;
   }
 
-  size_t Pop(uint8_t* ptr, size_t len) {
+  size_t PopFront(uint8_t* ptr, size_t len) {
     len = std::min(length_, len);
     memcpy(ptr, data_, len);
-    memcpy(data_, data_ + len, length_ - len);
+    memmove(data_, data_ + len, length_ - len);
     SetLength(length_ - len);
     return len;
   }

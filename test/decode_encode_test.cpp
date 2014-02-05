@@ -20,7 +20,7 @@ static void UpdateHashFromFrame(const SFrameBSInfo& info, SHA_CTX* ctx) {
 static void WritePlaneBuffer(BufferedData* buf, const uint8_t* plane,
     int width, int height, int stride) {
   for (int i = 0; i < height; i++) {
-    if (!buf->Push(plane, width)) {
+    if (!buf->PushBack(plane, width)) {
       FAIL() << "unable to allocate memory";
     }
     plane += stride;
@@ -83,7 +83,7 @@ class DecodeEncodeTest : public ::testing::TestWithParam<DecodeEncodeFileParam>,
         break;
       }
     }
-    return buf_.Pop(static_cast<uint8_t*>(ptr), len);
+    return buf_.PopFront(static_cast<uint8_t*>(ptr), len);
   }
 
  protected:

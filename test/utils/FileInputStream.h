@@ -11,8 +11,11 @@ class FileInputStream : public InputStream {
     return file_.is_open();
   }
   int read(void* ptr, size_t len) {
+    if (!file_.good()) {
+      return -1;
+    }
     file_.read(static_cast<char*>(ptr), len);
-    return file_.eof() ? -1 : file_.gcount();
+    return file_.gcount();
   }
  private:
   std::ifstream file_;
