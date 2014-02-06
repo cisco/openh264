@@ -163,6 +163,9 @@ bool BaseDecoderTest::DecodeNextFrame(Callback* cbk) {
     decodeStatus_ = End;
     break;
   }
+  case OpenFile:
+  case End:
+    break;
   }
   return false;
 }
