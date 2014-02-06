@@ -131,7 +131,7 @@ void BaseDecoderTest::DecodeFile(const char* fileName, Callback* cbk) {
 
 bool BaseDecoderTest::Open(const char* fileName) {
   if (decodeStatus_ == OpenFile) {
-    file_.open(fileName);
+    file_.open(fileName, std::ios_base::out | std::ios_base::binary);
     if (file_.is_open()) {
       decodeStatus_ = Decoding;
       return true;
