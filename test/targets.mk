@@ -1,8 +1,11 @@
 CODEC_UNITTEST_SRCDIR=test
 CODEC_UNITTEST_CPP_SRCS=\
-	$(CODEC_UNITTEST_SRCDIR)/./decoder_test.cpp\
+	$(CODEC_UNITTEST_SRCDIR)/./BaseDecoderTest.cpp\
 	$(CODEC_UNITTEST_SRCDIR)/./encoder_test.cpp\
+	$(CODEC_UNITTEST_SRCDIR)/./decode_encode_test.cpp\
 	$(CODEC_UNITTEST_SRCDIR)/./simple_test.cpp\
+	$(CODEC_UNITTEST_SRCDIR)/./decoder_test.cpp\
+	$(CODEC_UNITTEST_SRCDIR)/./BaseEncoderTest.cpp\
 
 CODEC_UNITTEST_OBJS += $(CODEC_UNITTEST_CPP_SRCS:.cpp=.o)
 OBJS += $(CODEC_UNITTEST_OBJS)

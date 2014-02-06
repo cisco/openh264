@@ -1,6 +1,9 @@
 #ifndef __BUFFEREDDATA_H__
 #define __BUFFEREDDATA_H__
 
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdint.h>
 
 class BufferedData {
  public:
@@ -10,12 +13,29 @@ class BufferedData {
     free(data_);
   }
 
-  bool Push(uint8_t c) {
+  bool PushBack(uint8_t c) {
     if (!EnsureCapacity(length_ + 1)) {
       return false;
     }
     data_[length_++] = c;
     return true;
+  }
+
+  bool PushBack(const uint8_t* data, size_t len) {
+    if (!EnsureCapacity(length_ + len)) {
+      return false;
+    }
+    memcpy(data_ + length_, data, len);
+    length_ += len;
+    return true;
+  }
+
+  size_t PopFront(uint8_t* ptr, size_t len) {
+    len = std::min(length_, len);
+    memcpy(ptr, data_, len);
+    memmove(data_, data_ + len, length_ - len);
+    SetLength(length_ - len);
+    return len;
   }
 
   void Clear() {

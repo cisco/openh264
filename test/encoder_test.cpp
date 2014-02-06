@@ -1,42 +1,6 @@
 #include <gtest/gtest.h>
-#include <stdint.h>
-#include <fstream>
-
-#include "codec_api.h"
-
-#include "utils/BufferedData.h"
 #include "utils/HashFunctions.h"
-
-static int InitWithParam(ISVCEncoder* encoder, int width,
-    int height, float frameRate) {
-  SVCEncodingParam param;
-  memset (&param, 0, sizeof(SVCEncodingParam));
-
-  param.sSpatialLayers[0].iVideoWidth  = width;
-  param.sSpatialLayers[0].iVideoHeight = height;
-  param.sSpatialLayers[0].fFrameRate = frameRate;
-  param.sSpatialLayers[0].iQualityLayerNum = 1;
-  param.sSpatialLayers[0].iSpatialBitrate = 600000;
-
-  SSliceConfig* sliceCfg = &param.sSpatialLayers[0].sSliceCfg;
-  sliceCfg->sSliceArgument.uiSliceNum = 1;
-  sliceCfg->sSliceArgument.uiSliceSizeConstraint = 1500;
-  sliceCfg->sSliceArgument.uiSliceMbNum[0] = 960;
-
-  param.fFrameRate = param.sSpatialLayers[0].fFrameRate;
-  param.iPicWidth = param.sSpatialLayers[0].iVideoWidth;
-  param.iPicHeight = param.sSpatialLayers[0].iVideoHeight;
-  param.iTargetBitrate = 5000000;
-  param.iTemporalLayerNum = 3;
-  param.iSpatialLayerNum = 1;
-  param.bEnableBackgroundDetection = true;
-  param.bEnableLongTermReference = true;
-  param.iLtrMarkPeriod = 30;
-  param.iInputCsp = videoFormatI420;
-  param.bEnableSpsPpsIdAddition = true;
-
-  return encoder->Initialize(&param, INIT_TYPE_PARAMETER_BASED);
-}
+#include "BaseEncoderTest.h"
 
 static void UpdateHashFromFrame(const SFrameBSInfo& info, SHA_CTX* ctx) {
   for (int i = 0; i < info.iLayerNum; ++i) {
@@ -49,68 +13,17 @@ static void UpdateHashFromFrame(const SFrameBSInfo& info, SHA_CTX* ctx) {
   }
 }
 
-static void CompareFileToHash(ISVCEncoder* encoder,
-    const char* fileName, const char* hashStr,
-    int width, int height, float frameRate) {
-  std::ifstream file(fileName, std::ios::in | std::ios::binary);
-  ASSERT_TRUE(file.is_open());
-
-  int rv = InitWithParam(encoder, width, height, frameRate);
-  ASSERT_TRUE(rv == cmResultSuccess);
-
-  // I420: 1(Y) + 1/4(U) + 1/4(V)
-  int frameSize = width * height * 3 / 2;
-
-  BufferedData buf;
-  buf.SetLength(frameSize);
-  ASSERT_TRUE(buf.Length() == frameSize);
-  char* data = reinterpret_cast<char*>(buf.data());
-
-  SFrameBSInfo info;
-  memset(&info, 0, sizeof(SFrameBSInfo));
-
-  unsigned char digest[SHA_DIGEST_LENGTH];
-  SHA_CTX ctx;
-  SHA1_Init(&ctx);
-
-  while (file.read(data, frameSize), file.gcount() == frameSize) {
-    rv = encoder->EncodeFrame(buf.data(), &info);
-    if (rv == videoFrameTypeInvalid) {
-      SHA1_Final(digest, &ctx);
-      FAIL() << "unable to encode frame";
-    }
-    if (rv != videoFrameTypeSkip) {
-      UpdateHashFromFrame(info, &ctx);
-    }
-  }
-
-  SHA1_Final(digest, &ctx);
-  ASSERT_TRUE(CompareHash(digest, hashStr));
-}
-
-class EncoderBaseTest : public ::testing::Test {
+class EncoderInitTest : public ::testing::Test, public BaseEncoderTest {
  public:
-  EncoderBaseTest() : encoder_(NULL) {}
-
   virtual void SetUp() {
-    int rv = CreateSVCEncoder(&encoder_);
-    ASSERT_EQ(0, rv);
-    ASSERT_TRUE(encoder_ != NULL);
+    BaseEncoderTest::SetUp();
   }
-
   virtual void TearDown() {
-    if (encoder_) {
-      encoder_->Uninitialize();
-      DestroySVCEncoder(encoder_);
-    }
+    BaseEncoderTest::TearDown();
   }
-
- protected:
-  ISVCEncoder* encoder_;
 };
 
-TEST_F(EncoderBaseTest, JustInit) {
-}
+TEST_F(EncoderInitTest, JustInit) {}
 
 struct EncodeFileParam {
   const char* fileName;
@@ -120,14 +33,33 @@ struct EncodeFileParam {
   float frameRate;
 };
 
-class EncoderOutputTest : public EncoderBaseTest ,
-    public ::testing::WithParamInterface<EncodeFileParam> {
+class EncoderOutputTest : public ::testing::WithParamInterface<EncodeFileParam>,
+    public EncoderInitTest , public BaseEncoderTest::Callback {
+ public:
+  virtual void SetUp() {
+    EncoderInitTest::SetUp();
+    if (HasFatalFailure()) {
+      return;
+    }
+    SHA1_Init(&ctx_);
+  }
+  virtual void onEncodeFrame(const SFrameBSInfo& frameInfo) {
+    UpdateHashFromFrame(frameInfo, &ctx_);
+  }
+ protected:
+  SHA_CTX ctx_;
 };
 
 
 TEST_P(EncoderOutputTest, CompareOutput) {
   EncodeFileParam p = GetParam();
-  CompareFileToHash(encoder_, p.fileName, p.hashStr, p.width, p.height, p.frameRate);
+  EncodeFile(p.fileName, p.width, p.height, p.frameRate, this);
+
+  unsigned char digest[SHA_DIGEST_LENGTH];
+  SHA1_Final(digest, &ctx_);
+  if (!HasFatalFailure()) {
+    ASSERT_TRUE(CompareHash(digest, p.hashStr));
+  }
 }
 
 static const EncodeFileParam kFileParamArray[] = {
