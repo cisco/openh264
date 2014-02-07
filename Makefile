@@ -12,6 +12,7 @@ CFLAGS_M32=-m32
 CFLAGS_M64=-m64
 BUILDTYPE=Release
 V=Yes
+PREFIX=/usr/local
 
 ifeq (, $(ENABLE64BIT))
 ifeq ($(ARCH), x86_64)
@@ -128,6 +129,19 @@ include codec/encoder/targets.mk
 include codec/processing/targets.mk
 include codec/console/dec/targets.mk
 include codec/console/enc/targets.mk
+
+libraries: $(LIBPREFIX)wels.$(LIBSUFFIX)
+LIBRARIES += $(LIBPREFIX)wels.$(LIBSUFFIX)
+
+$(LIBPREFIX)wels.$(LIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
+	rm -f $@
+	$(AR) $(AR_OPTS) $+
+
+install: $(LIBPREFIX)wels.$(LIBSUFFIX)
+	mkdir -p $(PREFIX)/lib
+	mkdir -p $(PREFIX)/include/wels
+	install -m 644 $(LIBPREFIX)wels.$(LIBSUFFIX) $(PREFIX)/lib
+	install -m 644 codec/api/svc/codec*.h $(PREFIX)/include/wels
 
 ifeq ($(HAVE_GTEST),Yes)
 include build/gtest-targets.mk
