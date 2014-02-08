@@ -255,7 +255,7 @@ int ParseConfig (CReadConfig& cRdCfg, SWelsSvcCodingParam& pSvcParam, SFilesSet&
 
     while (!cRdLayerCfg.EndOfFile()) {
       long iLayerRd = cRdLayerCfg.ReadLine (&strTag[0]);
-      bool_t bFound = false;
+      bool bFound = false;
       if (iLayerRd > 0) {
         if (strTag[0].empty())
           continue;
@@ -283,7 +283,7 @@ int ParseConfig (CReadConfig& cRdCfg, SWelsSvcCodingParam& pSvcParam, SFilesSet&
         } else if (strTag[0].compare ("ProfileIdc") == 0) {
           pDLayer->uiProfileIdc	= atoi (strTag[1].c_str());
         } else if (strTag[0].compare ("FRExt") == 0) {
-//					pDLayer->frext_mode	= (bool_t)atoi(strTag[1].c_str());
+//					pDLayer->frext_mode	= (bool)atoi(strTag[1].c_str());
         } else if (strTag[0].compare ("SpatialBitrate") == 0) {
           pDLayer->iSpatialBitrate	= 1000 * atoi (strTag[1].c_str());
           if (pSvcParam.bEnableRc && pDLayer->iSpatialBitrate <= 0) {
@@ -523,7 +523,7 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
             } else if (strTag[0].compare ("ProfileIdc") == 0) {
               pDLayer->uiProfileIdc	= atoi (strTag[1].c_str());
             } else if (strTag[0].compare ("FRExt") == 0) {
-//							pDLayer->frext_mode	= (bool_t)atoi(strTag[1].c_str());
+//							pDLayer->frext_mode	= (bool)atoi(strTag[1].c_str());
             } else if (strTag[0].compare ("SpatialBitrate") == 0) {
               pDLayer->iSpatialBitrate	= 1000 * atoi (strTag[1].c_str());
             } else if (strTag[0].compare ("InitialQP") == 0) {
@@ -1040,8 +1040,8 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   iFrameIdx = 0;
   while (iFrameIdx < iTotalFrameMax && (((int32_t)sSvcParam.uiFrameToBeCoded <= 0)
                                         || (iFrameIdx < (int32_t)sSvcParam.uiFrameToBeCoded))) {
-    bool_t bOnePicAvailableAtLeast = false;
-    bool_t bSomeSpatialUnavailable	  = false;
+    bool bOnePicAvailableAtLeast = false;
+    bool bSomeSpatialUnavailable	  = false;
 
 #ifdef ONLY_ENC_FRAMES_NUM
     // Only encoded some limited frames here
@@ -1057,7 +1057,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
       const int kiPicResSize = ((pDLayer->iActualWidth * pDLayer->iActualHeight) * 3) >> 1;
       uint32_t uiSkipIdx = (1 << pDLayer->iTemporalResolution);
 
-      bool_t bCanBeRead = false;
+      bool bCanBeRead = false;
 
       if (iFrameIdx % uiSkipIdx == 0) {	// such layer is enabled to encode indeed
         bCanBeRead = (fread (pYUV[iDlayerIdx], 1, kiPicResSize, pFileYUV[iDlayerIdx]) == kiPicResSize);

@@ -84,14 +84,14 @@ struct TagDqLayer {
   int16_t					iMbWidth;		// MB width of this picture, equal to pSps.iMbWidth
   int16_t					iMbHeight;		// MB height of this picture, equal to pSps.iMbHeight;
 
-  bool_t					bBaseLayerAvailableFlag;	// whether base layer is available for prediction?
+  bool					bBaseLayerAvailableFlag;	// whether base layer is available for prediction?
   uint8_t					iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries
   int8_t					iLoopFilterAlphaC0Offset;// AlphaOffset: valid range [-6, 6], default 0
   int8_t					iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0
   uint8_t				    uiDisableInterLayerDeblockingFilterIdc;
   int8_t					iInterLayerSliceAlphaC0Offset;
   int8_t					iInterLayerSliceBetaOffset;
-  bool_t					bDeblockingParallelFlag; //parallel_deblocking_flag
+  bool					bDeblockingParallelFlag; //parallel_deblocking_flag
 
   SPicture*				pRefPic;			// reference picture pointer
   SPicture*				pDecPic;			// reconstruction picture pointer for layer

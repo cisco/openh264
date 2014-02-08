@@ -44,7 +44,7 @@
 
 namespace WelsDec {
 void_t PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
-  bool_t bTopAvail, bLeftTopAvail, bRightTopAvail, bLeftAvail;
+  bool bTopAvail, bLeftTopAvail, bRightTopAvail, bLeftAvail;
 
   int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
   int32_t iLeftTopType, iRightTopType, iTopType, iLeftType;

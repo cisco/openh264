@@ -92,7 +92,7 @@ class IStrategy : public IWelsVP {
   EMethods       m_eMethod;
   EVideoFormat m_eFormat;
   int32_t           m_iIndex;
-  bool_t            m_bInit;
+  bool            m_bInit;
 };
 
 class CVpFrameWork : public IWelsVP {
@@ -116,7 +116,7 @@ class CVpFrameWork : public IWelsVP {
   EResult SpecialFeature (int32_t iType, void* pIn, void* pOut);
 
  private:
-  bool_t  CheckValid (EMethods eMethod, SPixMap& sSrc, SPixMap& sDst);
+  bool  CheckValid (EMethods eMethod, SPixMap& sSrc, SPixMap& sDst);
   IStrategy* CreateStrategy (EMethods eMethod, int32_t iCpuFlag);
 
  private:

@@ -110,19 +110,19 @@ typedef  void (*PSetNoneZeroCountZeroFunc) (int8_t* pNonZeroCount);
 
 typedef int32_t (*PIntraFineMdFunc) (void* pEncCtx, void* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
 typedef void (*PInterFineMdFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, int32_t bestCost);
-typedef bool_t (*PInterMdFirstIntraModeFunc) (void* pEncCtx, void* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
+typedef bool (*PInterMdFirstIntraModeFunc) (void* pEncCtx, void* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
 
 typedef void (*PMotionSearchFunc) (SWelsFuncPtrList* pFuncList, void* pCurDqLayer, void* pMe,
                                    void* pSlice);  // here after reset all function pointers, will set as right parameter type
 typedef void (*PFillInterNeighborCacheFunc) (SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth, int8_t* pVaaBgMbFlag);
 typedef void (*PAccumulateSadFunc) (uint32_t* pSumDiff, int32_t* pGomForegroundBlockNum, int32_t* iSad8x8,
                                     int8_t* pVaaBgMbFlag);//for RC
-typedef bool_t (*PDynamicSlicingStepBackFunc) (void* pEncCtx, void* pSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
+typedef bool (*PDynamicSlicingStepBackFunc) (void* pEncCtx, void* pSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
     SDynamicSlicingStack* pDynamicSlicingStack); // 2010.8.17
 
-typedef bool_t (*PInterMdBackgroundDecisionFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb,
-    SMbCache* pMbCache, bool_t* pKeepPskip);
-typedef void (*PInterMdBackgroundInfoUpdateFunc) (SDqLayer* pCurLayer,  SMB* pCurMb, const bool_t bFlag,
+typedef bool (*PInterMdBackgroundDecisionFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb,
+    SMbCache* pMbCache, bool* pKeepPskip);
+typedef void (*PInterMdBackgroundInfoUpdateFunc) (SDqLayer* pCurLayer,  SMB* pCurMb, const bool bFlag,
     const int32_t kiRefPictureType);
 
 typedef void (*PInterMdFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache);

@@ -177,11 +177,11 @@ void_t WelsDecoderDefaults (PWelsDecoderContext pCtx) {
  *	get size of reference picture list in target layer incoming, = (iNumRefFrames x 2)
  */
 static inline int32_t GetTargetRefListSize (PWelsDecoderContext pCtx) {
-  bool_t*  pSubsetSpsAvail = &pCtx->bSubspsAvailFlags[0];
-  bool_t*  pSpsAvail		= &pCtx->bSpsAvailFlags[0];
+  bool*  pSubsetSpsAvail = &pCtx->bSubspsAvailFlags[0];
+  bool*  pSpsAvail		= &pCtx->bSpsAvailFlags[0];
   int32_t iSubsetIdx		= -1;
   int32_t iSpsIdx			= -1;
-  bool_t  bExistSubsetSps = false;
+  bool  bExistSubsetSps = false;
   int32_t bExistSps		= false;
   int32_t iPos			= MAX_SPS_COUNT - 1;
   int32_t iNumRefFrames	= 0;
@@ -238,7 +238,7 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
 
   int32_t iListIdx			= 0;	//, mb_blocks	= 0;
   int32_t	iPicQueueSize		= 0;	// adaptive size of picture queue, = (pSps->iNumRefFrames x 2)
-  bool_t  bNeedChangePicQueue	= true;
+  bool  bNeedChangePicQueue	= true;
 
   WELS_VERIFY_RETURN_IF (ERR_INFO_INVALID_PARAM, (NULL == pCtx || kiPicWidth <= 0 || kiPicHeight <= 0))
 

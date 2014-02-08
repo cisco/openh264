@@ -180,8 +180,8 @@ typedef struct TagWelsDecoderContext {
 
   int32_t				iOutputColorFormat;		// color space format to be outputed
   VIDEO_BITSTREAM_TYPE eVideoType; //indicate the type of video to decide whether or not to do qp_delta error detection.
-  bool_t				bErrorResilienceFlag;		// error resilience flag
-  bool_t				bHaveGotMemory;	// global memory for decoder context related ever requested?
+  bool				bErrorResilienceFlag;		// error resilience flag
+  bool				bHaveGotMemory;	// global memory for decoder context related ever requested?
 
   int32_t				iImgWidthInPixel;	// width of image in pixel reconstruction picture to be output
   int32_t				iImgHeightInPixel;// height of image in pixel reconstruction picture to be output
@@ -191,7 +191,7 @@ typedef struct TagWelsDecoderContext {
   ESliceType			eSliceType;			// Slice type
   int32_t				iFrameNum;
   int32_t				iPrevFrameNum;		// frame number of previous frame well decoded for non-truncated mode yet
-  bool_t              bLastHasMmco5;      //
+  bool              bLastHasMmco5;      //
   int32_t				iErrorCode;			// error code return while decoding in case packets lost
   SFmo				sFmoList[MAX_PPS_COUNT];	// list for FMO storage
   PFmo				pFmo;				// current fmo context after parsed slice_header
@@ -270,25 +270,25 @@ typedef struct TagWelsDecoderContext {
   int32_t             iPicHeightReq;		// picture height have requested the memory
 
   uint8_t				uiTargetDqId;		// maximal DQ ID in current access unit, meaning target layer ID
-  bool_t				bAvcBasedFlag;		// For decoding bitstream:
-  bool_t				bEndOfStreamFlag;	// Flag on end of stream requested by external application layer
-  bool_t				bInitialDqLayersMem;	// dq layers related memory is available?
+  bool				bAvcBasedFlag;		// For decoding bitstream:
+  bool				bEndOfStreamFlag;	// Flag on end of stream requested by external application layer
+  bool				bInitialDqLayersMem;	// dq layers related memory is available?
 
-  bool_t              bOnlyOneLayerInCurAuFlag; //only one layer in current AU: 1
+  bool              bOnlyOneLayerInCurAuFlag; //only one layer in current AU: 1
 
   // for EC parameter sets
-  bool_t				bSpsExistAheadFlag;	// whether does SPS NAL exist ahead of sequence?
-  bool_t				bSubspsExistAheadFlag;// whether does Subset SPS NAL exist ahead of sequence?
-  bool_t				bPpsExistAheadFlag;	// whether does PPS NAL exist ahead of sequence?
+  bool				bSpsExistAheadFlag;	// whether does SPS NAL exist ahead of sequence?
+  bool				bSubspsExistAheadFlag;// whether does Subset SPS NAL exist ahead of sequence?
+  bool				bPpsExistAheadFlag;	// whether does PPS NAL exist ahead of sequence?
 
-  bool_t				bSpsAvailFlags[MAX_SPS_COUNT];
-  bool_t				bSubspsAvailFlags[MAX_SPS_COUNT];
-  bool_t				bPpsAvailFlags[MAX_PPS_COUNT];
-  bool_t				bReferenceLostAtT0Flag;
+  bool				bSpsAvailFlags[MAX_SPS_COUNT];
+  bool				bSubspsAvailFlags[MAX_SPS_COUNT];
+  bool				bPpsAvailFlags[MAX_PPS_COUNT];
+  bool				bReferenceLostAtT0Flag;
 #ifdef LONG_TERM_REF
-  bool_t				bParamSetsLostFlag;	//sps or pps do not exist or not correct
+  bool				bParamSetsLostFlag;	//sps or pps do not exist or not correct
 
-  bool_t
+  bool
   bCurAuContainLtrMarkSeFlag; //current AU has the LTR marking syntax element, mark the previous frame or self
   int32_t             iFrameNumOfAuMarkedLtr; //if bCurAuContainLtrMarkSeFlag==true, SHOULD set this variable
 
@@ -319,7 +319,7 @@ typedef struct TagWelsDecoderContext {
   int32_t iFeedbackVclNalInAu;
   int32_t iFeedbackTidInAu;
 
-  bool_t bAuReadyFlag;   // TRUE: one au is ready for decoding; FALSE: default value
+  bool bAuReadyFlag;   // TRUE: one au is ready for decoding; FALSE: default value
 
   //trace handle
   void_t*      pTraceHandle;

@@ -398,7 +398,7 @@ int32_t CheckIntra16x16PredMode (uint8_t uiSampleAvail, int8_t* pMode) {
       *pMode = I16_PRED_DC_128;
     }
   } else {
-    bool_t bModeAvail = CHECK_I16_MODE (*pMode, iLeftAvail, iTopAvail, bLeftTopAvail);
+    bool bModeAvail = CHECK_I16_MODE (*pMode, iLeftAvail, iTopAvail, bLeftTopAvail);
     if (0 == bModeAvail) {
       return ERR_INFO_INVALID_I16x16_PRED_MODE;
     }
@@ -423,7 +423,7 @@ int32_t CheckIntraChromaPredMode (uint8_t uiSampleAvail, int8_t* pMode) {
       *pMode = C_PRED_DC_128;
     }
   } else {
-    bool_t bModeAvail = CHECK_CHROMA_MODE (*pMode, iLeftAvail, iTopAvail, bLeftTopAvail);
+    bool bModeAvail = CHECK_CHROMA_MODE (*pMode, iLeftAvail, iTopAvail, bLeftTopAvail);
     if (0 == bModeAvail) {
       return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
     }
@@ -455,7 +455,7 @@ int32_t CheckIntra4x4PredMode (int32_t* pSampleAvail, int8_t* pMode, int32_t iIn
       iFinalMode = I4_PRED_DC_128;
     }
   } else {
-    bool_t bModeAvail = CHECK_I4_MODE (*pMode, iLeftAvail, iTopAvail, bLeftTopAvail);
+    bool bModeAvail = CHECK_I4_MODE (*pMode, iLeftAvail, iTopAvail, bLeftTopAvail);
     if (0 == bModeAvail) {
       return ERR_INVALID_INTRA4X4_MODE;
     }
@@ -486,7 +486,7 @@ void_t BsEndCavlc (PBitStringAux pBs) {
 
 // return: used bits
 static int32_t CavlcGetTrailingOnesAndTotalCoeff (uint8_t& uiTotalCoeff, uint8_t& uiTrailingOnes,
-    SReadBitsCache* pBitsCache, SVlcTable* pVlcTable, bool_t bChromaDc, int8_t nC) {
+    SReadBitsCache* pBitsCache, SVlcTable* pVlcTable, bool bChromaDc, int8_t nC) {
   const uint8_t* kpVlcTableMoreBitsCountList[3] = {g_kuiVlcTableMoreBitsCount0, g_kuiVlcTableMoreBitsCount1, g_kuiVlcTableMoreBitsCount2};
   int32_t iUsedBits = 0;
   int32_t iIndexVlc, iIndexValue, iNcMapIdx;
@@ -587,7 +587,7 @@ static int32_t CavlcGetLevelVal (int32_t iLevel[16], SReadBitsCache* pBitsCache,
 }
 
 static int32_t CavlcGetTotalZeros (int32_t& iZerosLeft, SReadBitsCache* pBitsCache, uint8_t uiTotalCoeff,
-                                   SVlcTable* pVlcTable, bool_t bChromaDc) {
+                                   SVlcTable* pVlcTable, bool bChromaDc) {
   int32_t iCount, iUsedBits = 0;
   const uint8_t* kpBitNumMap;
   uint32_t uiValue;
@@ -673,7 +673,7 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
   int32_t iUsedBits = 0;
   int32_t iCurIdx   = pBs->iIndex;
   uint8_t* pBuf     = ((uint8_t*)pBs->pStartBuf) + (iCurIdx >> 3);
-  bool_t  bChromaDc = (CHROMA_DC == iResidualProperty);
+  bool  bChromaDc = (CHROMA_DC == iResidualProperty);
   uint8_t bChroma   = (bChromaDc || CHROMA_AC == iResidualProperty);
   SReadBitsCache sReadBitsCache;
 

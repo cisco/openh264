@@ -89,13 +89,13 @@ void_t DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc);
  *	ParseSliceHeaderSyntaxs
  *	Parse slice header of bitstream
  */
-int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, const bool_t kbExtensionFlag);
+int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, const bool kbExtensionFlag);
 /*
  *	Copy relative syntax elements of NALUnitHeaderExt, sRefPicBaseMarking and bStoreRefBasePicFlag in prefix nal unit.
  *	pSrc:	mark as decoded prefix NAL
  *	pDst:	succeeded VCL NAL based AVC (I/P Slice)
  */
-bool_t PrefetchNalHeaderExtSyntax (PWelsDecoderContext pCtx, PNalUnit const kpDst, PNalUnit const kpSrc);
+bool PrefetchNalHeaderExtSyntax (PWelsDecoderContext pCtx, PNalUnit const kpDst, PNalUnit const kpSrc);
 
 
 /*

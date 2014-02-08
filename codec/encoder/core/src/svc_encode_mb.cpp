@@ -325,7 +325,7 @@ void    WelsRecPskip (SDqLayer* pCurLayer, SWelsFuncPtrList* pFuncList, SMB* pCu
   pFuncList->pfSetMemZeroSize8 (pCurMb->pNonZeroCount,	24);
 }
 
-bool_t WelsTryPYskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
+bool WelsTryPYskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
   int32_t iSingleCtrMb	= 0;
   int16_t* pRes = pMbCache->pCoeffLevel;
   const uint8_t kuiQp = pCurMb->uiLumaQp;
@@ -352,7 +352,7 @@ bool_t WelsTryPYskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
   return TRUE;
 }
 
-bool_t    WelsTryPUVskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, int32_t iUV) {
+bool    WelsTryPUVskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, int32_t iUV) {
   int16_t* pRes = ((iUV == 1) ? & (pMbCache->pCoeffLevel[256]) : & (pMbCache->pCoeffLevel[256 + 64]));
 
   const uint8_t kuiQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp +

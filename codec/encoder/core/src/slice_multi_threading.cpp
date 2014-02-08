@@ -81,10 +81,10 @@ void UpdateMbListNeighborParallel (SSliceCtx* pSliceCtx,
     const int32_t kiMbXY				= pMb->iMbXY;
     const int32_t kiMbX				= pMb->iMbX;
     const int32_t kiMbY				= pMb->iMbY;
-    bool_t     bLeft;
-    bool_t     bTop;
-    bool_t     bLeftTop;
-    bool_t     bRightTop;
+    bool     bLeft;
+    bool     bTop;
+    bool     bLeftTop;
+    bool     bRightTop;
     int32_t   iLeftXY, iTopXY, iLeftTopXY, iRightTopXY;
 
     iLeftXY = kiMbXY - 1;
@@ -688,7 +688,7 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
   SWelsSvcCodingParam* pCodingParam	= pCtx->pSvcParam;
   SDLayerParam* pDlp				= &pCodingParam->sDependencyLayers[pCtx->uiDependencyId];
   SWelsSliceBs* pSliceBs			= NULL;
-  const bool_t kbIsDynamicSlicingMode	= (pDlp->sMso.uiSliceMode == SM_DYN_SLICE);
+  const bool kbIsDynamicSlicingMode	= (pDlp->sMso.uiSliceMode == SM_DYN_SLICE);
   int32_t iLayerSize					= 0;
   int32_t iNalIdxBase				= pLbi->iNalCount;
   int32_t iSliceIdx					= 0;
@@ -897,7 +897,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
   int32_t iSliceIdx							= -1;
   int32_t iThreadIdx							= -1;
   int32_t iEventIdx							= -1;
-  bool_t bNeedPrefix							= false;
+  bool bNeedPrefix							= false;
   EWelsNalUnitType eNalType						= NAL_UNIT_UNSPEC_0;
   EWelsNalRefIdc eNalRefIdc						= NRI_PRI_LOWEST;
 
@@ -946,7 +946,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 
       if (pParamD->sMso.uiSliceMode != SM_DYN_SLICE) {
         int64_t iSliceStart	= 0;
-        bool_t bDsaFlag = false;
+        bool bDsaFlag = false;
         iSliceIdx		= pPrivateData->iSliceIndex;
         pSlice			= &pCurDq->sLayerInfo.pSliceInLayer[iSliceIdx];
         pSliceBs		= &pEncPEncCtx->pSliceBs[iSliceIdx];
@@ -1252,10 +1252,10 @@ void ResetCountBsSizeInPartitions (uint32_t* pCountBsSizeList, const int32_t iPa
 
 #ifdef _WIN32
 int32_t FiredSliceThreads (SSliceThreadPrivateData* pPriData, WELS_EVENT* pEventsList, SLayerBSInfo* pLbi,
-                           const uint32_t uiNumThreads, SSliceCtx* pSliceCtx, const bool_t bIsDynamicSlicingMode)
+                           const uint32_t uiNumThreads, SSliceCtx* pSliceCtx, const bool bIsDynamicSlicingMode)
 #else
 int32_t FiredSliceThreads (SSliceThreadPrivateData* pPriData, WELS_EVENT** pEventsList, SLayerBSInfo* pLbi,
-                           const uint32_t uiNumThreads, SSliceCtx* pSliceCtx, const bool_t bIsDynamicSlicingMode)
+                           const uint32_t uiNumThreads, SSliceCtx* pSliceCtx, const bool bIsDynamicSlicingMode)
 #endif//WIN32
 {
   int32_t iEndMbIdx	= 0;
@@ -1376,7 +1376,7 @@ int32_t AdjustEnhanceLayer (sWelsEncCtx* pCtx, int32_t iCurDid) {
   int32_t iNeedAdj = 1;
   // uiSliceMode of referencing spatial should be SM_FIXEDSLCNUM_SLICE
   // if using spatial base layer for complexity estimation
-  const bool_t kbModelingFromSpatial =	(pCtx->pCurDqLayer->pRefLayer != NULL && iCurDid > 0)
+  const bool kbModelingFromSpatial =	(pCtx->pCurDqLayer->pRefLayer != NULL && iCurDid > 0)
                                         && (pCtx->pSvcParam->sDependencyLayers[iCurDid - 1].sMso.uiSliceMode == SM_FIXEDSLCNUM_SLICE
                                             && pCtx->pSvcParam->iMultipleThreadIdc >= pCtx->pSvcParam->sDependencyLayers[iCurDid -
                                                 1].sMso.sSliceArgument.iSliceNum);

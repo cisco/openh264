@@ -446,7 +446,7 @@ int32_t WelsMdI4x4 (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
   const uint8_t* kpAvailMode;
   int32_t i, j, iCoordinateX, iCoordinateY, iIdxStrideEnc, iIdxStrideDec;
   int32_t lambda[2]						= {iLambda << 2, iLambda};
-  bool_t* pPrevIntra4x4PredModeFlag	= pMbCache->pPrevIntra4x4PredModeFlag;
+  bool* pPrevIntra4x4PredModeFlag	= pMbCache->pPrevIntra4x4PredModeFlag;
   int8_t* pRemIntra4x4PredModeFlag		= pMbCache->pRemIntra4x4PredModeFlag;
   const uint8_t* kpIntra4x4AvailCount		= &g_kiIntra4AvailCount[0];
   const uint8_t* kpCache48CountScan4		= &g_kuiCache48CountScan4Idx[0];
@@ -578,7 +578,7 @@ int32_t WelsMdI4x4Fast (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) 
   int32_t i, j, iCoordinateX, iCoordinateY, iIdxStrideEnc, iIdxStrideDec;
   int32_t iCostH, iCostV, iCostVR, iCostHD, iCostVL, iCostHU, iBestModeFake;
   int32_t lambda[2]						= {iLambda << 2, iLambda};
-  bool_t* pPrevIntra4x4PredModeFlag	= pMbCache->pPrevIntra4x4PredModeFlag;
+  bool* pPrevIntra4x4PredModeFlag	= pMbCache->pPrevIntra4x4PredModeFlag;
   int8_t* pRemIntra4x4PredModeFlag		= pMbCache->pRemIntra4x4PredModeFlag;
   const uint8_t* kpIntra4x4AvailCount		= &g_kiIntra4AvailCount[0];
   const uint8_t* kpCache48CountScan4		= &g_kuiCache48CountScan4Idx[0];
@@ -1235,7 +1235,7 @@ inline void VaaBackgroundMbDataUpdate (SWelsFuncPtrList* pFunc, SVAAFrameInfo* p
 }
 
 void WelsMdBackgroundMbEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache, SSlice* pSlice,
-                            bool_t bSkipMbFlag) {
+                            bool bSkipMbFlag) {
   sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pEnc;
   SDqLayer* pCurDqLayer	= pEncCtx->pCurDqLayer;
   SWelsMD* pWelsMd		= (SWelsMD*)pMd;
@@ -1307,7 +1307,7 @@ void WelsMdBackgroundMbEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCac
   pFunc->pfCopy8x8Aligned (pMbCache->SPicData.pCsMb[2], pCurDqLayer->iCsStride[1], pMbCache->pMemPredChroma + 64, 8);
 }
 
-bool_t WelsMdPSkipEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
+bool WelsMdPSkipEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
   sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pEnc;
   SDqLayer* pCurLayer				= pEncCtx->pCurDqLayer;
   SWelsMD* pWelsMd					= (SWelsMD*)pMd;
@@ -1586,7 +1586,7 @@ void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurM
     pWelsMd->iCostLuma = iBestSatdCost;
 
 }
-bool_t WelsMdFirstIntraMode (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
+bool WelsMdFirstIntraMode (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
   sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pEnc;
   SWelsFuncPtrList* pFunc	= pEncCtx->pFuncList;
   SWelsMD* pWelsMd		= (SWelsMD*)pMd;
@@ -1625,13 +1625,13 @@ void WelsMdInterMb (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache
   const uint32_t kuiNeighborAvail	= pCurMb->uiNeighborAvail;
   const int32_t kiMbWidth			= pCurDqLayer->iMbWidth;
   const  SMB* top_mb				= pCurMb - kiMbWidth;
-  const bool_t bMbLeftAvailPskip	= ((kuiNeighborAvail & LEFT_MB_POS) ? IS_SKIP ((pCurMb - 1)->uiMbType) : false);
-  const bool_t bMbTopAvailPskip		= ((kuiNeighborAvail & TOP_MB_POS) ? IS_SKIP (top_mb->uiMbType) : false);
-  const bool_t bMbTopLeftAvailPskip	= ((kuiNeighborAvail & TOPLEFT_MB_POS) ? IS_SKIP ((top_mb - 1)->uiMbType) : false);
-  const bool_t bMbTopRightAvailPskip = ((kuiNeighborAvail & TOPRIGHT_MB_POS) ? IS_SKIP ((top_mb + 1)->uiMbType) : false);
-  bool_t bTrySkip = bMbLeftAvailPskip || bMbTopAvailPskip || bMbTopLeftAvailPskip || bMbTopRightAvailPskip;
-  bool_t bKeepSkip = bMbLeftAvailPskip && bMbTopAvailPskip && bMbTopRightAvailPskip;
-  bool_t bSkip = FALSE;
+  const bool bMbLeftAvailPskip	= ((kuiNeighborAvail & LEFT_MB_POS) ? IS_SKIP ((pCurMb - 1)->uiMbType) : false);
+  const bool bMbTopAvailPskip		= ((kuiNeighborAvail & TOP_MB_POS) ? IS_SKIP (top_mb->uiMbType) : false);
+  const bool bMbTopLeftAvailPskip	= ((kuiNeighborAvail & TOPLEFT_MB_POS) ? IS_SKIP ((top_mb - 1)->uiMbType) : false);
+  const bool bMbTopRightAvailPskip = ((kuiNeighborAvail & TOPRIGHT_MB_POS) ? IS_SKIP ((top_mb + 1)->uiMbType) : false);
+  bool bTrySkip = bMbLeftAvailPskip || bMbTopAvailPskip || bMbTopLeftAvailPskip || bMbTopRightAvailPskip;
+  bool bKeepSkip = bMbLeftAvailPskip && bMbTopAvailPskip && bMbTopRightAvailPskip;
+  bool bSkip = FALSE;
 
   if (pEncCtx->pFuncList->pfInterMdBackgroundDecision (pEncCtx, pWelsMd, pSlice, pCurMb, pMbCache, &bKeepSkip)) {
     return;
@@ -1661,9 +1661,9 @@ void WelsMdInterMb (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache
 //////
 //  try the ordinary Pskip
 //////
-bool_t WelsMdInterJudgePskip (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
-                              bool_t bTrySkip) {
-  bool_t bRet = true;
+bool WelsMdInterJudgePskip (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
+                              bool bTrySkip) {
+  bool bRet = true;
   if (((pEncCtx->pRefPic->iPictureType == P_SLICE) && (pMbCache->uiRefMbType == MB_TYPE_SKIP
        || pMbCache->uiRefMbType == MB_TYPE_BACKGROUND)) ||
       bTrySkip) {
@@ -1743,8 +1743,8 @@ void WelsMdInterEncode (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb, SMbCa
 //////
 //  try the BGD Pskip
 //////
-bool_t WelsMdInterJudgeBGDPskip (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
-                                 bool_t* bKeepSkip) {
+bool WelsMdInterJudgeBGDPskip (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
+                                 bool* bKeepSkip) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   SWelsMD* pWelsMd = (SWelsMD*)pMd;
 
@@ -1775,8 +1775,8 @@ bool_t WelsMdInterJudgeBGDPskip (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCu
   return false;
 }
 
-bool_t WelsMdInterJudgeBGDPskipFalse (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
-                                      bool_t* bKeepSkip) {
+bool WelsMdInterJudgeBGDPskipFalse (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
+                                      bool* bKeepSkip) {
   return false;
 }
 
@@ -1785,7 +1785,7 @@ bool_t WelsMdInterJudgeBGDPskipFalse (void* pCtx, void* pMd, SSlice* pSlice, SMB
 //////
 //  update BGD related info
 //////
-void WelsMdInterUpdateBGDInfo (SDqLayer* pCurLayer,  SMB* pCurMb, const bool_t bCollocatedPredFlag,
+void WelsMdInterUpdateBGDInfo (SDqLayer* pCurLayer,  SMB* pCurMb, const bool bCollocatedPredFlag,
                                const int32_t iRefPictureType) {
   uint8_t* pTargetRefMbQpList = (pCurLayer->pDecPic->pRefMbQp);
   const int32_t kiMbXY = pCurMb->iMbXY;
@@ -1802,7 +1802,7 @@ void WelsMdInterUpdateBGDInfo (SDqLayer* pCurLayer,  SMB* pCurMb, const bool_t b
   }
 }
 
-void WelsMdInterUpdateBGDInfoNULL (SDqLayer* pCurLayer, SMB* pCurMb, const bool_t bCollocatedPredFlag,
+void WelsMdInterUpdateBGDInfoNULL (SDqLayer* pCurLayer, SMB* pCurMb, const bool bCollocatedPredFlag,
                                    const int32_t iRefPictureType) {
 }
 
@@ -1820,9 +1820,9 @@ void WelsMdInterSaveSadAndRefMbType (Mb_Type* pRefMbtypeList, SMbCache* pMbCache
 }
 
 void WelsMdInterSecondaryModesEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb,
-                                   SMbCache* pMbCache, const bool_t bSkip) {
+                                   SMbCache* pMbCache, const bool bSkip) {
   //step 2: Intra
-  const bool_t kbTrySkip = pEncCtx->pFuncList->pfFirstIntraMode (pEncCtx, pWelsMd, pCurMb, pMbCache);
+  const bool kbTrySkip = pEncCtx->pFuncList->pfFirstIntraMode (pEncCtx, pWelsMd, pCurMb, pMbCache);
   if (kbTrySkip)
     return;
 

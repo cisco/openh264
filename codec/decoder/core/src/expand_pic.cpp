@@ -144,7 +144,7 @@ void_t ExpandReferencingPicture (PPicture pPic, PExpandPictureFunc pExpLuma, PEx
   pExpLuma (pPicY, pPic->iLinesize[0], kiWidthY, kiHeightY);
   if (kiWidthUV >= 16) {
     // fix coding picture size as 16x16 issues 7/27/2010
-    const bool_t kbChrAligned = /*(kiWidthUV >= 16) && */ ((kiWidthUV & 0x0F) == 0);	// chroma planes: (16+kiWidthUV) & 15
+    const bool kbChrAligned = /*(kiWidthUV >= 16) && */ ((kiWidthUV & 0x0F) == 0);	// chroma planes: (16+kiWidthUV) & 15
     pExpChroma[kbChrAligned] (pPicCb, pPic->iLinesize[1], kiWidthUV, kiHeightUV);
     pExpChroma[kbChrAligned] (pPicCr, pPic->iLinesize[2], kiWidthUV, kiHeightUV);
   } else {

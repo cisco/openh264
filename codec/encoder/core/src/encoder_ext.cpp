@@ -636,10 +636,10 @@ static  void  InitMbInfo (sWelsEncCtx* pEnc, SMB*   pList, SDqLayer* pLayer, con
         &pEnc->pRefIndexBlock4x4[MB_BLOCK8x8_NUM * kiOffset]);
 
   for (iIdx = 0; iIdx < iMbNum; iIdx++) {
-    bool_t     bLeft;
-    bool_t     bTop;
-    bool_t     bLeftTop;
-    bool_t     bRightTop;
+    bool     bLeft;
+    bool     bTop;
+    bool     bLeftTop;
+    bool     bRightTop;
     int32_t  iLeftXY, iTopXY, iLeftTopXY, iRightTopXY;
     uint8_t  uiSliceIdc;
 
@@ -740,7 +740,7 @@ int32_t AllocMbCacheAligned (SMbCache* pMbCache, CMemoryAlign* pMa) {
   WELS_VERIFY_RETURN_IF (1, (NULL == pMbCache->pMemPredBlk4));
   pMbCache->pBufferInterPredMe = (uint8_t*)pMa->WelsMalloc (4 * 640 * sizeof (uint8_t), "pMbCache->pBufferInterPredMe");
   WELS_VERIFY_RETURN_IF (1, (NULL == pMbCache->pBufferInterPredMe));
-  pMbCache->pPrevIntra4x4PredModeFlag = (bool_t*)pMa->WelsMalloc (16 * sizeof (bool_t),
+  pMbCache->pPrevIntra4x4PredModeFlag = (bool*)pMa->WelsMalloc (16 * sizeof (bool),
                                         "pMbCache->pPrevIntra4x4PredModeFlag");
   WELS_VERIFY_RETURN_IF (1, (NULL == pMbCache->pPrevIntra4x4PredModeFlag));
   pMbCache->pRemIntra4x4PredModeFlag	= (int8_t*)pMa->WelsMalloc (16 * sizeof (int8_t),
@@ -1000,7 +1000,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
   iDlayerIndex	= 0;
   while (iDlayerIndex < iDlayerCount) {
     SDqIdc* pDqIdc		= & (*ppCtx)->pDqIdcMap[iDlayerIndex];
-    const bool_t bUseSubsetSps			= (iDlayerIndex > BASE_DEPENDENCY_ID);
+    const bool bUseSubsetSps			= (iDlayerIndex > BASE_DEPENDENCY_ID);
     SDLayerParam* pDlayerParam	= &pParam->sDependencyLayers[iDlayerIndex];
 
     pDqIdc->uiSpatialId	= iDlayerIndex;
@@ -1120,7 +1120,7 @@ int32_t AllocStrideTables (sWelsEncCtx** ppCtx, const int32_t kiNumSpatialLayers
   // Adaptive size_cs, size_fdec by implementation dependency
   iTemporalIdx = 0;
   while (iTemporalIdx < iCntTid) {
-    const bool_t kbBaseTemporalFlag	= (iTemporalIdx == 0);
+    const bool kbBaseTemporalFlag	= (iTemporalIdx == 0);
 
     iSpatialIdx = 0;
     while (iSpatialIdx < kiNumSpatialLayers) {
@@ -1153,7 +1153,7 @@ int32_t AllocStrideTables (sWelsEncCtx** ppCtx, const int32_t kiNumSpatialLayers
 
   iTemporalIdx = 0;
   while (iTemporalIdx < iCntTid) {
-    const bool_t kbBaseTemporalFlag	= (iTemporalIdx == 0);
+    const bool kbBaseTemporalFlag	= (iTemporalIdx == 0);
 
     iSpatialIdx = 0;
     while (iSpatialIdx < iCountLayersNeedCs[kbBaseTemporalFlag]) {
@@ -1172,13 +1172,13 @@ int32_t AllocStrideTables (sWelsEncCtx** ppCtx, const int32_t kiNumSpatialLayers
   }
   iTemporalIdx = 0;
   while (iTemporalIdx < iCntTid) {
-    const bool_t kbBaseTemporalFlag	= (iTemporalIdx == 0);
+    const bool kbBaseTemporalFlag	= (iTemporalIdx == 0);
 
     iSpatialIdx = 0;
     while (iSpatialIdx < kiNumSpatialLayers) {
       int32_t iMatchIndex = 0;
-      bool_t bInMap = false;
-      bool_t bMatchFlag = false;
+      bool bInMap = false;
+      bool bMatchFlag = false;
 
       i = 0;
       while (i < iCountLayersNeedCs[kbBaseTemporalFlag]) {
@@ -1667,7 +1667,7 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
       while (ilayer < pParam->iNumDependencyLayer) {
         SDqLayer* pDq	= pCtx->ppDqLayerList[ilayer];
         SDLayerParam* pDlp = &pCtx->pSvcParam->sDependencyLayers[ilayer];
-        const bool_t kbIsDynamicSlicing = (SM_DYN_SLICE == pDlp->sMso.uiSliceMode);
+        const bool kbIsDynamicSlicing = (SM_DYN_SLICE == pDlp->sMso.uiSliceMode);
 
         // pDq layers
         if (NULL != pDq) {
@@ -2312,10 +2312,10 @@ void DynslcUpdateMbNeighbourInfoListForAllSlices (SSliceCtx* pSliceCtx, SMB* pMb
     const int32_t kiMbXY				= pMb->iMbXY;
     const int32_t kiMbX				= pMb->iMbX;
     const int32_t kiMbY				= pMb->iMbY;
-    bool_t     bLeft;
-    bool_t     bTop;
-    bool_t     bLeftTop;
-    bool_t     bRightTop;
+    bool     bLeft;
+    bool     bTop;
+    bool     bLeftTop;
+    bool     bRightTop;
     int32_t  uiSliceIdc;
     int32_t   iLeftXY, iTopXY, iLeftTopXY, iRightTopXY;
 
@@ -2550,7 +2550,7 @@ void WelsInitCurrentLayer (sWelsEncCtx* pCtx,
   SSlice* pBaseSlice				= &pCurDq->sLayerInfo.pSliceInLayer[0];
   SSlice* pSlice					= NULL;
   const uint8_t kiCurDid			= pCtx->uiDependencyId;
-  const bool_t kbUseSubsetSpsFlag = (kiCurDid > BASE_DEPENDENCY_ID);
+  const bool kbUseSubsetSpsFlag = (kiCurDid > BASE_DEPENDENCY_ID);
   SDLayerParam* fDlp				= &pParam->sDependencyLayers[kiCurDid];
   SNalUnitHeaderExt* pNalHdExt	= &pCurDq->sLayerInfo.sNalHeaderExt;
   SNalUnitHeader* pNalHd			= &pNalHdExt->sNalHeader;
@@ -2638,7 +2638,7 @@ void WelsInitCurrentLayer (sWelsEncCtx* pCtx,
 
 void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
   SDqLayer* pCurLayer		= pCtx->pCurDqLayer;
-  const bool_t kbBaseAvail	= pCurLayer->bBaseLayerAvailableFlag;
+  const bool kbBaseAvail	= pCurLayer->bBaseLayerAvailableFlag;
 
   /* function pointers conditional assignment under sWelsEncCtx, layer_mb_enc_rec (in stack) is exclusive */
 
@@ -2766,7 +2766,7 @@ void ParasetIdAdditionIdAdjust (SParaSetOffsetVariable* sParaSetOffsetVariable, 
 
   const int32_t kiEncId			= kiCurEncoderParaSetId;
   const uint32_t kuiPrevIdInBs	= sParaSetOffsetVariable->iParaSetIdDelta[kiEncId] + kiEncId;//mark current_id
-  const bool_t* kpUsedIdPointer   = &sParaSetOffsetVariable->bUsedParaSetIdInBs[0];
+  const bool* kpUsedIdPointer   = &sParaSetOffsetVariable->bUsedParaSetIdInBs[0];
   uint32_t uiNextIdInBs			= sParaSetOffsetVariable->uiNextParaSetIdToUseInBs;
 
 #if _DEBUG
@@ -2817,7 +2817,7 @@ int32_t WelsWriteParameterSets (sWelsEncCtx* pCtx, int32_t* pNalLen, int32_t* pN
   while (iIdx < pCtx->iSpsNum) {
     SDqIdc* pDqIdc		= &pCtx->pDqIdcMap[iIdx];
     const int32_t kiDid	= pDqIdc->uiSpatialId;
-    const bool_t kbUsingSubsetSps = (kiDid > BASE_DEPENDENCY_ID);
+    const bool kbUsingSubsetSps = (kiDid > BASE_DEPENDENCY_ID);
 
     iNal	= pCtx->pOut->iNalIndex;
 
@@ -3009,7 +3009,7 @@ int32_t PostProcDynamicSlicingBsWriting (sWelsEncCtx* pCtx, SLayerBSInfo* pLayer
   // uiSliceIdx: 0 1 2 3 4 5 6 7 8 9 10
   iCheckingIdx = 0;
   while (true) {
-    bool_t bMatchFlag = false;
+    bool bMatchFlag = false;
     iPartitionIdx = 0;
     while (iPartitionIdx < kiPartitionCnt) {
       const int32_t coded_slice_cnt = pCurDq->pNumSliceCodedOfPartition[iPartitionIdx];
@@ -3124,7 +3124,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
   EWelsNalRefIdc eNalRefIdc			= NRI_PRI_LOWEST;
   int8_t iCurDid						= 0;
   int8_t iCurTid						= 0;
-  bool_t bAvcBased					= false;
+  bool bAvcBased					= false;
 #if defined(ENABLE_PSNR_CALC)
   float snr_y = .0f, snr_u = .0f, snr_v = .0f;
 #endif//ENABLE_PSNR_CALC
@@ -3531,7 +3531,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
       } else	// for non-dynamic-slicing mode single threading branch..
 #endif//MT_ENABLED
       {
-        const bool_t bNeedPrefix	= pCtx->bNeedPrefixNalFlag;
+        const bool bNeedPrefix	= pCtx->bNeedPrefixNalFlag;
         int32_t iSliceIdx			= 0;
 
         iSliceCount	= GetCurrentSliceNum (pCtx->pCurDqLayer->pSliceEncCtx);
@@ -3810,7 +3810,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
   SWelsSvcCodingParam* pOldParam		= NULL;
   int32_t iReturn = 0;
   int8_t iIndexD = 0;
-  bool_t bNeedReset = false;
+  bool bNeedReset = false;
 
   if (NULL == ppCtx || NULL == *ppCtx || NULL == pNewParam)	return 1;
 
@@ -4006,7 +4006,7 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
   int32_t iAnyMbLeftInPartition = iEndMbInPartition - iFirstMbInPartition;
   const EWelsNalUnitType keNalType	= pCtx->eNalType;
   const EWelsNalRefIdc keNalRefIdc	= pCtx->eNalPriority;
-  const bool_t kbNeedPrefix		= pCtx->bNeedPrefixNalFlag;
+  const bool kbNeedPrefix		= pCtx->bNeedPrefixNalFlag;
 
   //init
   {

@@ -92,7 +92,7 @@ void_t WelsResetRefPic (PWelsDecoderContext pCtx) {
  */
 int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
   int32_t i, j, iCount = 0;
-  const bool_t kbUseRefBasePicFlag = pCtx->pCurDqLayer->bUseRefBasePicFlag;
+  const bool kbUseRefBasePicFlag = pCtx->pCurDqLayer->bUseRefBasePicFlag;
   PPicture* ppShoreRefList = pCtx->sRefPic.pShortRefList[LIST_0];
   PPicture* ppLongRefList  = pCtx->sRefPic.pLongRefList[LIST_0];
   memset (pCtx->sRefPic.pRefList[LIST_0], 0, MAX_REF_PIC_COUNT * sizeof (PPicture));
@@ -215,12 +215,12 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
   return ERR_NONE;
 }
 
-int32_t WelsMarkAsRef (PWelsDecoderContext pCtx, const bool_t kbRefBaseMarkingFlag) {
+int32_t WelsMarkAsRef (PWelsDecoderContext pCtx, const bool kbRefBaseMarkingFlag) {
   PRefPic pRefPic = &pCtx->sRefPic;
   PRefPicMarking pRefPicMarking = pCtx->pCurDqLayer->pRefPicMarking;
   PRefBasePicMarking pRefPicBaseMarking = pCtx->pCurDqLayer->pRefPicBaseMarking;
   PAccessUnit pCurAU = pCtx->pAccessUnitList;
-  bool_t bIsIDRAU = FALSE;
+  bool bIsIDRAU = FALSE;
   uint32_t j;
 
   int32_t iRet = ERR_NONE;
@@ -322,7 +322,7 @@ static int32_t MMCO (PWelsDecoderContext pCtx, PRefPicMarking pRefPicMarking) {
 
   return ERR_NONE;
 }
-static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType, bool_t bRefBasePic,
+static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType, bool bRefBasePic,
                             int32_t iShortFrameNum, uint32_t uiLongTermPicNum , int32_t iLongTermFrameIdx, int32_t iMaxLongTermFrameIdx) {
   PRefPic pRefPic = &pCtx->sRefPic;
   PPicture pPic = NULL;

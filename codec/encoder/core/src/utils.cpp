@@ -89,7 +89,7 @@ int32_t			g_iSizeLogBuf	= 1024;			// pBuffer size for each log output
 static inline str_t* GetLogTag (const int32_t kiLevel, int32_t* pBit) {
   int32_t iShift	= 0;
   int32_t iVal		= 0;
-  bool_t	bFound	= false;
+  bool	bFound	= false;
 
   if (kiLevel <= 0 || kiLevel > (1 << (WELS_LOG_LEVEL_COUNT - 1)) || NULL == pBit)
     return NULL;

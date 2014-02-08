@@ -887,21 +887,21 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   }
   break;
   case ENCODER_OPTION_ENABLE_SSEI: {
-    bool_t iValue = * ((bool_t*)pOption);
+    bool iValue = * ((bool*)pOption);
     m_pEncContext->pSvcParam->bEnableSSEI = iValue;
     WelsLog (m_pEncContext, WELS_LOG_INFO, " CWelsH264SVCEncoder::SetOption enable SSEI = %d \n",
              m_pEncContext->pSvcParam->bEnableSSEI);
   }
   break;
   case ENCODER_OPTION_ENABLE_PREFIX_NAL_ADDING: {
-    bool_t iValue = * ((bool_t*)pOption);
+    bool iValue = * ((bool*)pOption);
     m_pEncContext->pSvcParam->bPrefixNalAddingCtrl = iValue;
     WelsLog (m_pEncContext, WELS_LOG_INFO, " CWelsH264SVCEncoder::SetOption bPrefixNalAddingCtrl = %d \n",
              m_pEncContext->pSvcParam->bPrefixNalAddingCtrl);
   }
   break;
   case ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION: {
-    bool_t iValue = * ((bool_t*)pOption);
+    bool iValue = * ((bool*)pOption);
 
     m_pEncContext->pSvcParam->bEnableSpsPpsIdAddition = iValue;
     WelsLog (m_pEncContext, WELS_LOG_INFO, " CWelsH264SVCEncoder::SetOption enable SPS/PPS ID = %d \n",

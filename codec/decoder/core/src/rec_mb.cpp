@@ -44,7 +44,7 @@
 
 namespace WelsDec {
 
-void_t WelsFillRecNeededMbInfo (PWelsDecoderContext pCtx, bool_t bOutput, PDqLayer pCurLayer) {
+void_t WelsFillRecNeededMbInfo (PWelsDecoderContext pCtx, bool bOutput, PDqLayer pCurLayer) {
   PPicture pCurPic = pCtx->pDec;
   int32_t iLumaStride   = pCurPic->iLinesize[0];
   int32_t iChromaStride = pCurPic->iLinesize[1];
@@ -235,7 +235,7 @@ static inline void_t BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t 
   uint8_t* pDstY = pMCRefMem->pDstY;
   uint8_t* pDstU = pMCRefMem->pDstU;
   uint8_t* pDstV = pMCRefMem->pDstV;
-  bool_t bExpand = false;
+  bool bExpand = false;
 
   ENFORCE_STACK_ALIGN_1D (uint8_t, uiExpandBuf, (PADDING_LENGTH + 6) * (PADDING_LENGTH + 6), 16);
 

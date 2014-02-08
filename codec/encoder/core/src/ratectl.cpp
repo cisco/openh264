@@ -108,7 +108,7 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
   int32_t j = 0;
   int32_t iMbWidth = 0;
 
-  bool_t bMultiSliceMode = FALSE;
+  bool bMultiSliceMode = FALSE;
   int32_t iGomRowMode0 = 1, iGomRowMode1 = 1;
 #ifdef _TEST_TEMP_RC_
   fp_test_rc = fopen ("testRC.dat", "w");
@@ -293,7 +293,7 @@ void RcInitRefreshParameter (sWelsEncCtx* pEncCtx) {
   RcInitVGop (pEncCtx);
 }
 
-bool_t RcJudgeBitrateFpsUpdate (sWelsEncCtx* pEncCtx) {
+bool RcJudgeBitrateFpsUpdate (sWelsEncCtx* pEncCtx) {
   int32_t iCurDid = pEncCtx->uiDependencyId;
   SWelsSvcRc* pWelsSvcRc       = &pEncCtx->pWelsSvcRc[iCurDid];
   SDLayerParam* pDLayerParam    = &pEncCtx->pSvcParam->sDependencyLayers[iCurDid];

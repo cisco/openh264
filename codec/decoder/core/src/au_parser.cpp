@@ -108,7 +108,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
   uint8_t* pNal     = pSrcRbsp;
   int32_t iNalSize  = iSrcRbspLen;
   PBitStringAux pBs = NULL;
-  bool_t bExtensionFlag = false;
+  bool bExtensionFlag = false;
   int32_t iErr	= ERR_NONE;
   int32_t iBitSize = 0;
 
@@ -362,7 +362,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 }
 
 
-bool_t CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeaderExt pCurNalHeaderExt,
+bool CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeaderExt pCurNalHeaderExt,
                                    PSliceHeader pLastSliceHeader, PSliceHeader pCurSliceHeader) {
   const PSps kpSps = pCurSliceHeader->pSps;
 
@@ -421,7 +421,7 @@ bool_t CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHea
 }
 
 
-bool_t CheckAccessUnitBoundary (const PNalUnit kpCurNal, const PNalUnit kpLastNal, const PSps kpSps) {
+bool CheckAccessUnitBoundary (const PNalUnit kpCurNal, const PNalUnit kpLastNal, const PSps kpSps) {
   const PNalUnitHeaderExt kpLastNalHeaderExt = &kpLastNal->sNalHeaderExt;
   const PNalUnitHeaderExt kpCurNalHeaderExt = &kpCurNal->sNalHeaderExt;
   const SSliceHeader* kpLastSliceHeader = &kpLastNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
@@ -560,7 +560,7 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
 }
 
 void_t ParseRefBasePicMarking (PBitStringAux pBs, PRefBasePicMarking pRefBasePicMarking) {
-  const bool_t kbAdaptiveMarkingModeFlag = !!BsGetOneBit (pBs);
+  const bool kbAdaptiveMarkingModeFlag = !!BsGetOneBit (pBs);
   pRefBasePicMarking->bAdaptiveRefBasePicMarkingModeFlag = kbAdaptiveMarkingModeFlag;
   if (kbAdaptiveMarkingModeFlag) {
     int32_t iIdx = 0;
@@ -670,7 +670,7 @@ static const SLevelLimits g_kSLevelLimits[17] = {
   {2073600, 36864, 184320, 240000, 240000, -2048, 2047, 2, 16} /* level 5.2 */
 };
 
-const SLevelLimits *GetLevelLimits(int32_t iLevelIdx, bool_t bConstraint3) {
+const SLevelLimits *GetLevelLimits(int32_t iLevelIdx, bool bConstraint3) {
   switch (iLevelIdx) {
   case 10:
     return &g_kSLevelLimits[0];
@@ -737,8 +737,8 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   ProfileIdc	uiProfileIdc;
   uint8_t	uiLevelIdc;
   int32_t iSpsId;
-  bool_t bConstraintSetFlags[6] = { false };
-  const bool_t kbUseSubsetFlag   = IS_SUBSET_SPS_NAL (pNalHead->eNalUnitType);
+  bool bConstraintSetFlags[6] = { false };
+  const bool kbUseSubsetFlag   = IS_SUBSET_SPS_NAL (pNalHead->eNalUnitType);
 
 
   if (kbUseSubsetFlag) {	// SubsetSps

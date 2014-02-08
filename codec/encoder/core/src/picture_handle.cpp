@@ -47,7 +47,7 @@ namespace WelsSVCEnc {
  * \pram	need_expand		need borders expanding
  * \return	successful if effective picture pointer returned, otherwise failed with NULL
  */
-SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth , const int32_t kiHeight, bool_t bNeedMbInfo) {
+SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth , const int32_t kiHeight, bool bNeedMbInfo) {
   SPicture* pPic = NULL;
   int32_t iPicWidth = 0;
   int32_t iPicHeight = 0;

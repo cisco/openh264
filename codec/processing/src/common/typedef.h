@@ -74,7 +74,6 @@ typedef unsigned __int64   uint64_t ;
 #endif
 
 typedef char    str_t    ; // [comment]: specific use plain char only for character parameters
-typedef bool    bool_t   ;
 
 enum {
   FALSE = 0,

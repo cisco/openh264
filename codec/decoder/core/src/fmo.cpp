@@ -119,7 +119,7 @@ static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const 
     const int32_t kiMbHeight) {
   int32_t iNumMb	= 0;
   int32_t iErr		= 0;
-  bool_t	bResolutionChanged = false;
+  bool	bResolutionChanged = false;
 
   // the cases we would not like
   WELS_VERIFY_RETURN_IF (1, (NULL == pFmo || NULL == kpPps))
@@ -238,7 +238,7 @@ void_t UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail) {
  *
  * \return	true - changed or not initialized yet; false - not change at all
  */
-bool_t FmoParamSetsChanged (PFmo pFmo, const int32_t kiCountNumMb, const int32_t kiSliceGroupType,
+bool FmoParamSetsChanged (PFmo pFmo, const int32_t kiCountNumMb, const int32_t kiSliceGroupType,
                             const int32_t kiSliceGroupCount) {
   WELS_VERIFY_RETURN_IF (false, (NULL == pFmo))
 
@@ -258,7 +258,7 @@ bool_t FmoParamSetsChanged (PFmo pFmo, const int32_t kiCountNumMb, const int32_t
  *
  * \return	true - update/insert successfully; false - failed;
  */
-bool_t FmoParamUpdate (PFmo pFmo, PSps pSps, PPps pPps, int32_t* pActiveFmoNum) {
+bool FmoParamUpdate (PFmo pFmo, PSps pSps, PPps pPps, int32_t* pActiveFmoNum) {
   const uint32_t kuiMbWidth = pSps->iMbWidth;
   const uint32_t kuiMbHeight = pSps->iMbHeight;
 

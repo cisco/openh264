@@ -222,7 +222,7 @@ int32_t WelsEncodeNalExt (SWelsNalRaw* pRawNal, void* pNalHeaderExt, void* pDst,
  * \brief	write prefix nal
  */
 int32_t WelsWriteSVCPrefixNal (SBitStringAux* pBitStringAux, const int32_t kiNalRefIdc,
-                               const bool_t kbIdrFlag) {
+                               const bool kbIdrFlag) {
   if (0 < kiNalRefIdc) {
     BsWriteOneBit (pBitStringAux, false/*bStoreRefBasePicFlag*/);
     BsWriteOneBit (pBitStringAux, false);

@@ -68,7 +68,7 @@ void WelsSpatialWriteMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb) 
   int32_t i = 0;
 
   SMVUnitXY sMvd[2];
-  bool_t* pPredFlag;
+  bool* pPredFlag;
   int8_t* pRemMode;
 
   int32_t iMbOffset = 0;
@@ -176,7 +176,7 @@ void WelsSpatialWriteSubMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurM
   int32_t iNumRefIdxl0ActiveMinus1 = pSliceHeadExt->sSliceHeader.uiNumRefIdxL0Active - 1;
   int32_t i;
 
-  bool_t bSubRef0 = false;
+  bool bSubRef0 = false;
   const uint8_t* kpScan4 = & (g_kuiMbCountScan4Idx[0]);
 
   /* mb type */

@@ -49,7 +49,7 @@
 
 namespace WelsDec {
 
-void_t WelsFillRecNeededMbInfo (PWelsDecoderContext pCtx, bool_t bOutput, PDqLayer pCurLayer);
+void_t WelsFillRecNeededMbInfo (PWelsDecoderContext pCtx, bool bOutput, PDqLayer pCurLayer);
 
 int32_t RecI4x4Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
 

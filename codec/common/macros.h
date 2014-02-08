@@ -276,7 +276,7 @@ return x;
 #define BUTTERFLY4x8(dw) (((uint64_t)(dw)<<32) | (dw))
 #endif//BUTTERFLY4x8
 
-static inline bool_t WELS_POWER2_IF (uint32_t v) {
+static inline bool WELS_POWER2_IF (uint32_t v) {
 return (v && ! (v & (v - 1)));
 }
 

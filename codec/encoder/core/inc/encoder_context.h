@@ -92,9 +92,9 @@ typedef struct TagLTRState {
   int32_t						iLastLtrIdx;
   uint32_t					uiLtrMarkInterval;// the interval from the last int32_t term pRef mark
 
-  bool_t						bLTRMarkingFlag;	//decide whether current frame marked as LTR
-  bool_t						bLTRMarkEnable; //when LTR is confirmed and the interval is no smaller than the marking period
-  bool_t						bReceivedT0LostFlag;	// indicate whether a t0 lost feedback is recieved, for LTR recovery
+  bool						bLTRMarkingFlag;	//decide whether current frame marked as LTR
+  bool						bLTRMarkEnable; //when LTR is confirmed and the interval is no smaller than the marking period
+  bool						bReceivedT0LostFlag;	// indicate whether a t0 lost feedback is recieved, for LTR recovery
 } SLTRState;
 
 typedef struct TagSpatialPicIndex {
@@ -162,8 +162,8 @@ typedef struct TagWelsEncCtx {
 
   uint8_t						uiDependencyId;	// Idc of dependecy layer to be coded
   uint8_t						uiTemporalId;	// Idc of temporal layer to be coded
-  bool_t						bNeedPrefixNalFlag;	// whether add prefix nal
-  bool_t                      bEncCurFrmAsIdrFlag;
+  bool						bNeedPrefixNalFlag;	// whether add prefix nal
+  bool                      bEncCurFrmAsIdrFlag;
 
   // Rate control routine
   SWelsSvcRc*					pWelsSvcRc;
@@ -198,7 +198,7 @@ typedef struct TagWelsEncCtx {
   uint8_t						uiSpatialLayersInTemporal[MAX_DEPENDENCY_LAYER];
 
   uint8_t                     uiSpatialPicNum[MAX_DEPENDENCY_LAYER];
-  bool_t						bLongTermRefFlag[MAX_DEPENDENCY_LAYER][MAX_TEMPORAL_LEVEL + 1/*+LONG_TERM_REF_NUM*/];
+  bool						bLongTermRefFlag[MAX_DEPENDENCY_LAYER][MAX_TEMPORAL_LEVEL + 1/*+LONG_TERM_REF_NUM*/];
 
   int16_t						iMaxSliceCount;// maximal count number of slices for all layers observation
   int16_t						iActiveThreadsNum;	// number of threads active so far

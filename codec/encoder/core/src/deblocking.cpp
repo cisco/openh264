@@ -396,8 +396,8 @@ void DeblockingInterMb (DeblockingFunc* pfDeblocking, SMB* pCurMb, SDeblockingFi
   int32_t iMbX = pCurMb->iMbX;
   int32_t iMbY = pCurMb->iMbY;
 
-  bool_t bLeftBsValid[2] = { (iMbX > 0), ((iMbX > 0) && (pCurMb->uiSliceIdc == (pCurMb - 1)->uiSliceIdc))};
-  bool_t bTopBsValid[2]  = { (iMbY > 0), ((iMbY > 0) && (pCurMb->uiSliceIdc == (pCurMb - iMbStride)->uiSliceIdc))};
+  bool bLeftBsValid[2] = { (iMbX > 0), ((iMbX > 0) && (pCurMb->uiSliceIdc == (pCurMb - 1)->uiSliceIdc))};
+  bool bTopBsValid[2]  = { (iMbY > 0), ((iMbY > 0) && (pCurMb->uiSliceIdc == (pCurMb - iMbStride)->uiSliceIdc))};
 
   int32_t iLeftFlag = bLeftBsValid[pFilter->uiFilterIdc];
   int32_t iTopFlag  = bTopBsValid[pFilter->uiFilterIdc];
@@ -482,8 +482,8 @@ void FilteringEdgeLumaHV (DeblockingFunc* pfDeblocking, SMB* pCurMb, SDeblocking
   int32_t iMbX = pCurMb->iMbX;
   int32_t iMbY = pCurMb->iMbY;
 
-  bool_t bLeftBsValid[2] = { (iMbX > 0), ((iMbX > 0) && (pCurMb->uiSliceIdc == (pCurMb - 1)->uiSliceIdc))};
-  bool_t bTopBsValid[2]  = { (iMbY > 0), ((iMbY > 0) && (pCurMb->uiSliceIdc == (pCurMb - iMbStride)->uiSliceIdc))};
+  bool bLeftBsValid[2] = { (iMbX > 0), ((iMbX > 0) && (pCurMb->uiSliceIdc == (pCurMb - 1)->uiSliceIdc))};
+  bool bTopBsValid[2]  = { (iMbY > 0), ((iMbY > 0) && (pCurMb->uiSliceIdc == (pCurMb - iMbStride)->uiSliceIdc))};
 
   int32_t iLeftFlag = bLeftBsValid[pFilter->uiFilterIdc];
   int32_t iTopFlag  = bTopBsValid[pFilter->uiFilterIdc];
@@ -537,8 +537,8 @@ void FilteringEdgeChromaHV (DeblockingFunc* pfDeblocking, SMB* pCurMb, SDeblocki
   int32_t iMbX = pCurMb->iMbX;
   int32_t iMbY = pCurMb->iMbY;
 
-  bool_t bLeftBsValid[2] = { (iMbX > 0), ((iMbX > 0) && (pCurMb->uiSliceIdc == (pCurMb - 1)->uiSliceIdc))};
-  bool_t bTopBsValid[2]  = { (iMbY > 0), ((iMbY > 0) && (pCurMb->uiSliceIdc == (pCurMb - iMbStride)->uiSliceIdc))};
+  bool bLeftBsValid[2] = { (iMbX > 0), ((iMbX > 0) && (pCurMb->uiSliceIdc == (pCurMb - 1)->uiSliceIdc))};
+  bool bTopBsValid[2]  = { (iMbY > 0), ((iMbY > 0) && (pCurMb->uiSliceIdc == (pCurMb - iMbStride)->uiSliceIdc))};
 
   int32_t iLeftFlag = bLeftBsValid[pFilter->uiFilterIdc];
   int32_t iTopFlag  = bTopBsValid[pFilter->uiFilterIdc];
@@ -593,8 +593,8 @@ void DeblockingMbAvcbase (SWelsFuncPtrList* pFunc, SMB* pCurMb, SDeblockingFilte
   int32_t iMbX = pCurMb->iMbX;
   int32_t iMbY = pCurMb->iMbY;
 
-  bool_t bLeftBsValid[2] = { (iMbX > 0), ((iMbX > 0) && (pCurMb->uiSliceIdc == (pCurMb - 1)->uiSliceIdc))};
-  bool_t bTopBsValid[2]  = { (iMbY > 0), ((iMbY > 0) && (pCurMb->uiSliceIdc == (pCurMb - iMbStride)->uiSliceIdc))};
+  bool bLeftBsValid[2] = { (iMbX > 0), ((iMbX > 0) && (pCurMb->uiSliceIdc == (pCurMb - 1)->uiSliceIdc))};
+  bool bTopBsValid[2]  = { (iMbY > 0), ((iMbY > 0) && (pCurMb->uiSliceIdc == (pCurMb - iMbStride)->uiSliceIdc))};
 
   int32_t iLeftFlag = bLeftBsValid[pFilter->uiFilterIdc];
   int32_t iTopFlag  = bTopBsValid[pFilter->uiFilterIdc];

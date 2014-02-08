@@ -135,7 +135,7 @@ int32_t InitPic (const void* kpSrc, const int32_t kiColorspace, const int32_t ki
 }
 
 
-void WelsInitBGDFunc (SWelsFuncPtrList* pFuncList, const bool_t kbEnableBackgroundDetection) {
+void WelsInitBGDFunc (SWelsFuncPtrList* pFuncList, const bool kbEnableBackgroundDetection) {
   if (kbEnableBackgroundDetection) {
     pFuncList->pfInterMdBackgroundDecision = WelsMdInterJudgeBGDPskip;
     pFuncList->pfInterMdBackgroundInfoUpdate = WelsMdInterUpdateBGDInfo;
@@ -283,7 +283,7 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EFrameType keFrameType) {
 EFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum) {
   SWelsSvcCodingParam* pSvcParam	= pEncCtx->pSvcParam;
   EFrameType iFrameType = WELS_FRAME_TYPE_AUTO;
-  bool_t bSceneChangeFlag = false;
+  bool bSceneChangeFlag = false;
 
   // perform scene change detection
   if ((!pSvcParam->bEnableSceneChangeDetect) || pEncCtx->pVaa->bIdrPeriodFlag ||
@@ -316,7 +316,7 @@ EFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum) {
 
 extern "C" void DumpDependencyRec (SPicture* pCurPicture, const str_t* kpFileName, const int8_t kiDid) {
   WelsFileHandle* pDumpRecFile = NULL;
-  static bool_t bDependencyRecFlag[MAX_DEPENDENCY_LAYER]	= {0};
+  static bool bDependencyRecFlag[MAX_DEPENDENCY_LAYER]	= {0};
   int32_t iWrittenSize											= 0;
 
   if (NULL == pCurPicture || NULL == kpFileName || kiDid >= MAX_DEPENDENCY_LAYER)
@@ -384,7 +384,7 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const str_t* kpFileNam
 
 void DumpRecFrame (SPicture* pCurPicture, const str_t* kpFileName) {
   WelsFileHandle* pDumpRecFile				= NULL;
-  static bool_t bRecFlag	= false;
+  static bool bRecFlag	= false;
   int32_t iWrittenSize			= 0;
 
   if (NULL == pCurPicture || NULL == kpFileName)

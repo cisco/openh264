@@ -48,12 +48,12 @@ typedef int32_t (*PWelsDecMbCavlcFunc) (PWelsDecoderContext pCtx, PNalUnit pNalC
 
 int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx); //construction based on slice
 
-int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool_t bFirstSliceInLayer, PNalUnit pNalCur);
+int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNalUnit pNalCur);
 
 
 int32_t WelsTargetMbConstruction (PWelsDecoderContext pCtx);
 
-int32_t WelsMbIntraPredictionConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer, bool_t bOutput);
+int32_t WelsMbIntraPredictionConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer, bool bOutput);
 int32_t WelsMbInterSampleConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer,
                                        uint8_t* pDstY, uint8_t* pDstU, uint8_t* pDstV, int32_t iStrideL, int32_t iStrideC);
 int32_t WelsMbInterConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer);

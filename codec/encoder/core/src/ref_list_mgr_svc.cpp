@@ -254,7 +254,7 @@ static inline void LTRMarkProcess (sWelsEncCtx* pCtx) {
   int32_t iMaxFrameNumPlus1 = (1 << pCtx->pSps->uiLog2MaxFrameNum);
   int32_t i = 0;
   int32_t j = 0;
-  bool_t bMoveLtrFromShortToLong = false;
+  bool bMoveLtrFromShortToLong = false;
 
   if (pCtx->eSliceType == I_SLICE)	{
     i = 0;
@@ -324,7 +324,7 @@ static inline void PrefetchNextBuffer (sWelsEncCtx* pCtx) {
 /*
  *	update reference picture list
  */
-bool_t WelsUpdateRefList (sWelsEncCtx* pCtx) {
+bool WelsUpdateRefList (sWelsEncCtx* pCtx) {
   SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SLTRState* pLtr			= &pCtx->pLtr[pCtx->uiDependencyId];
   SDLayerParam* pParamD	= &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
@@ -405,7 +405,7 @@ bool_t WelsUpdateRefList (sWelsEncCtx* pCtx) {
   return TRUE;
 }
 
-bool_t CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx) {
+bool CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx) {
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
   SRefList* pRefList	= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SPicture** pLongRefList = pRefList->pLongRefList;
@@ -532,7 +532,7 @@ void FilterLTRMarkingFeedback (sWelsEncCtx* pCtx, SLTRMarkingFeedback* pLTRMarki
 /*
  *	build reference picture list
  */
-bool_t WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC) {
+bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC) {
   SRefList* pRefList		=  pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SLTRState* pLtr			= &pCtx->pLtr[pCtx->uiDependencyId];
   const int32_t kiNumRef	= pCtx->pSvcParam->iNumRefFrame;

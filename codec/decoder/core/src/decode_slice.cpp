@@ -234,7 +234,7 @@ void_t WelsLumaDcDequantIdct (int16_t* pBlock, int32_t iQp) {
 #undef STRIDE
 }
 
-int32_t WelsMbIntraPredictionConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer, bool_t bOutput) {
+int32_t WelsMbIntraPredictionConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer, bool bOutput) {
 //seems IPCM should not enter this path
   int32_t iMbXy = pCurLayer->iMbXyIndex;
 
@@ -351,7 +351,7 @@ void_t WelsChromaDcIdct (int16_t* pBlock) {
   pBlk[iStride1] = (iE - iB) >> 1;
 }
 
-int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool_t bFirstSliceInLayer, PNalUnit pNalCur) {
+int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNalUnit pNalCur) {
   PDqLayer pCurLayer = pCtx->pCurDqLayer;
   PFmo pFmo = pCtx->pFmo;
   int32_t i, iRet;

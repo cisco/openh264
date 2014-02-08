@@ -79,8 +79,8 @@ typedef struct {
   uint8_t         uiValidLongTermPicIdx;
   uint8_t         uiMarkLongTermPicIdx;
 
-  bool_t          bSceneChangeFlag;
-  bool_t          bIdrPeriodFlag;
+  bool          bSceneChangeFlag;
+  bool          bIdrPeriodFlag;
 } SVAAFrameInfo;
 
 class CWelsLib {
@@ -119,16 +119,16 @@ class CWelsPreProcess {
   int32_t MultiLayerPreprocess (void* pEncCtx, const SSourcePicture** kppSrcPicList, const int32_t kiSpatialNum);
 
   void	BilateralDenoising (SPicture* pSrc, const int32_t iWidth, const int32_t iHeight);
-  bool_t  DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture);
+  bool  DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture);
   int32_t DownsamplePadding (SPicture* pSrc, SPicture* pDstPic,  int32_t iSrcWidth, int32_t iSrcHeight,
                              int32_t iShrinkWidth, int32_t iShrinkHeight, int32_t iTargetWidth, int32_t iTargetHeight);
 
-  void    VaaCalculation (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture, bool_t bCalculateSQDiff,
-                          bool_t bCalculateVar, bool_t bCalculateBGD);
-  void    BackgroundDetection (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture, bool_t bDetectFlag);
+  void    VaaCalculation (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture, bool bCalculateSQDiff,
+                          bool bCalculateVar, bool bCalculateBGD);
+  void    BackgroundDetection (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture, bool bDetectFlag);
   void    AdaptiveQuantCalculation (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture);
   void    AnalyzePictureComplexity (void* pCtx, SPicture* pCurPicture, SPicture* pRefPicture,
-                                    const int32_t kiDependencyId, const bool_t kbCalculateBGD);
+                                    const int32_t kiDependencyId, const bool kbCalculateBGD);
   void    Padding (uint8_t* pSrcY, uint8_t* pSrcU, uint8_t* pSrcV, int32_t iStrideY, int32_t iStrideUV,
                    int32_t iActualWidth, int32_t iPaddingWidth, int32_t iActualHeight, int32_t iPaddingHeight);
   void    SetRefMbType (void* pCtx, uint32_t** pRefMbTypeArray, int32_t iRefPicType);
@@ -144,8 +144,8 @@ class CWelsPreProcess {
   IWelsVP*         m_pInterfaceVp;
   CWelsLib*        m_pEncLib;
   void*            m_pEncCtx;
-  bool_t          m_bInitDone;
-  bool_t          m_bOfficialBranch;
+  bool          m_bInitDone;
+  bool          m_bOfficialBranch;
 };
 
 }

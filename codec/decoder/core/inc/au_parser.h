@@ -92,8 +92,8 @@ void_t ParseRefBasePicMarking (PBitStringAux pBs, PRefBasePicMarking pRefBasePic
 
 void_t ParsePrefixNalUnit (PWelsDecoderContext pCtx, PBitStringAux pBs);
 
-bool_t CheckAccessUnitBoundary (const PNalUnit kpCurNal, const PNalUnit kpLastNal, const PSps kpSps);
-bool_t CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeaderExt pCurNalHeaderExt,
+bool CheckAccessUnitBoundary (const PNalUnit kpCurNal, const PNalUnit kpLastNal, const PSps kpSps);
+bool CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeaderExt pCurNalHeaderExt,
                                    PSliceHeader pLastSliceHeader, PSliceHeader pCurSliceHeader);
 /*!
  *************************************************************************************

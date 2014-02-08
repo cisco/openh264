@@ -51,7 +51,7 @@ typedef struct TagRefPicListReorderSyntax {
     uint16_t    uiLongTermPicNum;
     uint16_t    uiReorderingOfPicNumsIdc;
   } sReorderingSyn[LIST_A][MAX_REF_PIC_COUNT];
-  bool_t		bRefPicListReorderingFlag[LIST_A];
+  bool		bRefPicListReorderingFlag[LIST_A];
 } SRefPicListReorderSyn, *PRefPicListReorderSyn;
 
 /*
@@ -65,8 +65,8 @@ typedef struct TagPredWeightTabSyntax {
     int32_t iLumaOffset[MAX_REF_PIC_COUNT];
     int32_t	iChromaWeight[MAX_REF_PIC_COUNT][2];
     int32_t iChromaOffset[MAX_REF_PIC_COUNT][2];
-    bool_t	bLumaWeightFlag;
-    bool_t	bChromaWeightFlag;
+    bool	bLumaWeightFlag;
+    bool	bChromaWeightFlag;
   } sPredList[LIST_A];
 } SPredWeightTabSyn;
 
@@ -81,9 +81,9 @@ typedef struct TagRefPicMarking {
     int32_t	    iMaxLongTermFrameIdx;
   } sMmcoRef[MAX_MMCO_COUNT];
 
-  bool_t		bNoOutputOfPriorPicsFlag;
-  bool_t		bLongTermRefFlag;
-  bool_t		bAdaptiveRefPicMarkingModeFlag;
+  bool		bNoOutputOfPriorPicsFlag;
+  bool		bLongTermRefFlag;
+  bool		bAdaptiveRefPicMarkingModeFlag;
 } SRefPicMarking, *PRefPicMarking;
 
 /* Decode reference base picture marking syntax in Page 396 of JVT X201wcm */
@@ -95,7 +95,7 @@ typedef struct TagRefBasePicMarkingSyn {
     uint32_t	uiLongTermPicNum; //should uint32_t, cover larger range of iFrameNum.
   } mmco_base[MAX_MMCO_COUNT];	// MAX_REF_PIC for reference picture based on frame
 
-  bool_t		bAdaptiveRefBasePicMarkingModeFlag;
+  bool		bAdaptiveRefBasePicMarkingModeFlag;
 } SRefBasePicMarking, *PRefBasePicMarking;
 
 /* Header of slice syntax elements, refer to Page 63 in JVT X201wcm */
@@ -131,11 +131,11 @@ typedef struct TagSliceHeaders {
 
   uint16_t    uiIdrPicId;
   ESliceType	eSliceType;
-  bool_t		bNumRefIdxActiveOverrideFlag;
-  bool_t		bFieldPicFlag;		//not supported in base profile
-  bool_t		bBottomFiledFlag;		//not supported in base profile
+  bool		bNumRefIdxActiveOverrideFlag;
+  bool		bFieldPicFlag;		//not supported in base profile
+  bool		bBottomFiledFlag;		//not supported in base profile
   uint8_t		uiPadding1Byte;
-  bool_t		bSpForSwitchFlag;			// For SP/SI slices
+  bool		bSpForSwitchFlag;			// For SP/SI slices
   int16_t		iPadding2Bytes;
 } SSliceHeader, *PSliceHeader;
 
@@ -155,18 +155,18 @@ typedef struct TagSliceHeaderExt {
   int32_t		iScaledRefLayerPicHeightInSampleLuma;
 
   SRefBasePicMarking	sRefBasePicMarking;
-  bool_t		bBasePredWeightTableFlag;
-  bool_t		bStoreRefBasePicFlag;
-  bool_t		bConstrainedIntraResamplingFlag;
-  bool_t		bSliceSkipFlag;
+  bool		bBasePredWeightTableFlag;
+  bool		bStoreRefBasePicFlag;
+  bool		bConstrainedIntraResamplingFlag;
+  bool		bSliceSkipFlag;
 
-  bool_t		bAdaptiveBaseModeFlag;
-  bool_t		bDefaultBaseModeFlag;
-  bool_t		bAdaptiveMotionPredFlag;
-  bool_t		bDefaultMotionPredFlag;
-  bool_t		bAdaptiveResidualPredFlag;
-  bool_t		bDefaultResidualPredFlag;
-  bool_t		bTCoeffLevelPredFlag;
+  bool		bAdaptiveBaseModeFlag;
+  bool		bDefaultBaseModeFlag;
+  bool		bAdaptiveMotionPredFlag;
+  bool		bDefaultMotionPredFlag;
+  bool		bAdaptiveResidualPredFlag;
+  bool		bDefaultResidualPredFlag;
+  bool		bTCoeffLevelPredFlag;
   uint8_t		uiRefLayerChromaPhaseXPlus1Flag;
 
   uint8_t		uiRefLayerChromaPhaseYPlus1;
@@ -192,7 +192,7 @@ typedef struct TagSlice {
   /*slice_data_ext() generate*/
 
   /*******************************misc use****************************/
-  bool_t		bSliceHeaderExtFlag; // Indicate which slice header is used, avc or ext?
+  bool		bSliceHeaderExtFlag; // Indicate which slice header is used, avc or ext?
   /*************got from other layer for effiency if possible***************/
   /*from lower layer: slice header*/
   uint8_t		eSliceType;

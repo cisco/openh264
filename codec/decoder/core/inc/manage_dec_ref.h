@@ -56,7 +56,7 @@ REMOVE_BASE_FIRST = 2
 void_t  WelsResetRefPic (PWelsDecoderContext pCtx);
 int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc);
 int32_t WelsReorderRefList (PWelsDecoderContext pCtx);
-int32_t WelsMarkAsRef (PWelsDecoderContext pCtx, const bool_t kbRefBaseMarkingFlag);
+int32_t WelsMarkAsRef (PWelsDecoderContext pCtx, const bool kbRefBaseMarkingFlag);
 
 static PPicture WelsDelShortFromList (PRefPic pRefPic, int32_t iFrameNum,           ERemoveFlag eRemoveFlag);
 static PPicture WelsDelLongFromList (PRefPic pRefPic, uint32_t uiLongTermFrameIdx, ERemoveFlag eRemoveFlag);
@@ -65,7 +65,7 @@ static PPicture WelsDelLongFromListSetUnref (PRefPic pRefPic, uint32_t uiLongTer
 
 static int32_t MMCOBase (PWelsDecoderContext pCtx, PRefBasePicMarking pRefPicBaseMarking);
 static int32_t MMCO (PWelsDecoderContext pCtx, PRefPicMarking pRefPicMarking);
-static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType, bool_t bRefBasePic,
+static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType, bool bRefBasePic,
                             int32_t iShortFrameNum, uint32_t uiLongTermPicNum, int32_t iLongTermFrameIdx, int32_t iMaxLongTermFrameIdx);
 static int32_t SlidingWindow (PWelsDecoderContext pCtx);
 
