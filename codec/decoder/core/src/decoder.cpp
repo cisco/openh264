@@ -723,6 +723,7 @@ void_t AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
     pCtx->pGetIChromaPredFunc[C_PRED_P ]      = WelsDecoderIChromaPredPlane_sse2;
     pCtx->pGetIChromaPredFunc[C_PRED_DC]      = WelsDecoderIChromaPredDc_sse2;
     pCtx->pGetIChromaPredFunc[C_PRED_DC_T]    = WelsDecoderIChromaPredDcTop_sse2;
+    pCtx->pGetI4x4LumaPredFunc[I4_PRED_H]     = WelsDecoderI4x4LumaPredH_sse2;
   }
 #endif
   DeblockingInit (&pCtx->sDeblockingFunc, pCtx->uiCpuFlag);
