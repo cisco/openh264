@@ -1,7 +1,7 @@
 H264ENC_SRCDIR=codec/console/enc
 H264ENC_CPP_SRCS=\
-	$(H264ENC_SRCDIR)/./src/read_config.cpp\
-	$(H264ENC_SRCDIR)/./src/welsenc.cpp\
+	$(H264ENC_SRCDIR)/src/read_config.cpp\
+	$(H264ENC_SRCDIR)/src/welsenc.cpp\
 
 H264ENC_OBJS += $(H264ENC_CPP_SRCS:.cpp=.o)
 OBJS += $(H264ENC_OBJS)

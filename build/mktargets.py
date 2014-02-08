@@ -47,9 +47,9 @@ def find_sources():
         for file in dir[2]:
             if (len(INCLUDE) == 0 and not file in EXCLUDE) or file in INCLUDE:
                 if os.path.splitext(file)[1] == CPP_SUFFIX:
-                    cpp_files.append(os.path.join(dir[0], file))
+                    cpp_files.append(os.path.join(dir[0].strip('./'), file))
                 if os.path.splitext(file)[1] == '.asm':
-                    asm_files.append(os.path.join(dir[0], file))
+                    asm_files.append(os.path.join(dir[0].strip('./'), file))
     return [cpp_files, asm_files]
 
 
