@@ -967,7 +967,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         InitBits (&pSliceBs->sBsWrite, pSliceBs->pBsBuffer, pSliceBs->uiSize);
 
 #if MT_DEBUG_BS_WR
-        pSliceBs->bSliceCodedFlag	= FALSE;
+        pSliceBs->bSliceCodedFlag	= false;
 #endif//MT_DEBUG_BS_WR
 
         if (bNeedPrefix) {
@@ -1041,7 +1041,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 #endif//SLICE_INFO_OUTPUT
 
 #if MT_DEBUG_BS_WR
-        pSliceBs->bSliceCodedFlag	= TRUE;
+        pSliceBs->bSliceCodedFlag	= true;
 #endif//MT_DEBUG_BS_WR
 
 #ifdef _WIN32

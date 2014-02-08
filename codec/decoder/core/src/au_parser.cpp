@@ -368,56 +368,56 @@ bool CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeade
 
   //Sub-clause 7.1.4.1.1 temporal_id
   if (pLastNalHdrExt->uiTemporalId != pCurNalHeaderExt->uiTemporalId) {
-    return TRUE;
+    return true;
   }
 
   // Subclause 7.4.1.2.5
   if (pLastSliceHeader->iRedundantPicCnt < pCurSliceHeader->iRedundantPicCnt)
-    return FALSE;
+    return false;
   else if (pLastSliceHeader->iRedundantPicCnt > pCurSliceHeader->iRedundantPicCnt)
-    return TRUE;
+    return true;
 
   // Subclause G7.4.1.2.4
   if (pLastNalHdrExt->uiDependencyId < pCurNalHeaderExt->uiDependencyId)
-    return FALSE;
+    return false;
   else if (pLastNalHdrExt->uiDependencyId > pCurNalHeaderExt->uiDependencyId)
-    return TRUE;
+    return true;
   if (pLastNalHdrExt->uiQualityId < pCurNalHeaderExt->uiQualityId)
-    return FALSE;
+    return false;
   else if (pLastNalHdrExt->uiQualityId > pCurNalHeaderExt->uiQualityId)
-    return TRUE;
+    return true;
 
   // Subclause 7.4.1.2.4
   if (pLastSliceHeader->iFrameNum != pCurSliceHeader->iFrameNum)
-    return TRUE;
+    return true;
   if (pLastSliceHeader->iPpsId != pCurSliceHeader->iPpsId)
-    return TRUE;
+    return true;
   if (pLastSliceHeader->bFieldPicFlag != pCurSliceHeader->bFieldPicFlag)
-    return TRUE;
+    return true;
   if (pLastSliceHeader->bBottomFiledFlag != pCurSliceHeader->bBottomFiledFlag)
-    return TRUE;
+    return true;
   if ((pLastNalHdrExt->sNalUnitHeader.uiNalRefIdc != NRI_PRI_LOWEST) != (pCurNalHeaderExt->sNalUnitHeader.uiNalRefIdc !=
       NRI_PRI_LOWEST))
-    return TRUE;
+    return true;
   if (pLastNalHdrExt->bIdrFlag != pCurNalHeaderExt->bIdrFlag)
-    return TRUE;
+    return true;
   if (pCurNalHeaderExt->bIdrFlag) {
     if (pLastSliceHeader->uiIdrPicId != pCurSliceHeader->uiIdrPicId)
-      return TRUE;
+      return true;
   }
   if (kpSps->uiPocType == 0) {
     if (pLastSliceHeader->iPicOrderCntLsb != pCurSliceHeader->iPicOrderCntLsb)
-      return TRUE;
+      return true;
     if (pLastSliceHeader->iDeltaPicOrderCntBottom != pCurSliceHeader->iDeltaPicOrderCntBottom)
-      return TRUE;
+      return true;
   } else if (kpSps->uiPocType == 1) {
     if (pLastSliceHeader->iDeltaPicOrderCnt[0] != pCurSliceHeader->iDeltaPicOrderCnt[0])
-      return TRUE;
+      return true;
     if (pLastSliceHeader->iDeltaPicOrderCnt[1] != pCurSliceHeader->iDeltaPicOrderCnt[1])
-      return TRUE;
+      return true;
   }
 
-  return FALSE;
+  return false;
 }
 
 
@@ -429,56 +429,56 @@ bool CheckAccessUnitBoundary (const PNalUnit kpCurNal, const PNalUnit kpLastNal,
 
   //Sub-clause 7.1.4.1.1 temporal_id
   if (kpLastNalHeaderExt->uiTemporalId != kpCurNalHeaderExt->uiTemporalId) {
-    return TRUE;
+    return true;
   }
 
   // Subclause 7.4.1.2.5
   if (kpLastSliceHeader->iRedundantPicCnt < kpCurSliceHeader->iRedundantPicCnt)
-    return FALSE;
+    return false;
   else if (kpLastSliceHeader->iRedundantPicCnt > kpCurSliceHeader->iRedundantPicCnt)
-    return TRUE;
+    return true;
 
   // Subclause G7.4.1.2.4
   if (kpLastNalHeaderExt->uiDependencyId < kpCurNalHeaderExt->uiDependencyId)
-    return FALSE;
+    return false;
   else if (kpLastNalHeaderExt->uiDependencyId > kpCurNalHeaderExt->uiDependencyId)
-    return TRUE;
+    return true;
   if (kpLastNalHeaderExt->uiQualityId < kpCurNalHeaderExt->uiQualityId)
-    return FALSE;
+    return false;
   else if (kpLastNalHeaderExt->uiQualityId > kpCurNalHeaderExt->uiQualityId)
-    return TRUE;
+    return true;
 
   // Subclause 7.4.1.2.4
   if (kpLastSliceHeader->iFrameNum != kpCurSliceHeader->iFrameNum)
-    return TRUE;
+    return true;
   if (kpLastSliceHeader->iPpsId != kpCurSliceHeader->iPpsId)
-    return TRUE;
+    return true;
   if (kpLastSliceHeader->bFieldPicFlag != kpCurSliceHeader->bFieldPicFlag)
-    return TRUE;
+    return true;
   if (kpLastSliceHeader->bBottomFiledFlag != kpCurSliceHeader->bBottomFiledFlag)
-    return TRUE;
+    return true;
   if ((kpLastNalHeaderExt->sNalUnitHeader.uiNalRefIdc != NRI_PRI_LOWEST) != (kpCurNalHeaderExt->sNalUnitHeader.uiNalRefIdc
       != NRI_PRI_LOWEST))
-    return TRUE;
+    return true;
   if (kpLastNalHeaderExt->bIdrFlag != kpCurNalHeaderExt->bIdrFlag)
-    return TRUE;
+    return true;
   if (kpCurNalHeaderExt->bIdrFlag) {
     if (kpLastSliceHeader->uiIdrPicId != kpCurSliceHeader->uiIdrPicId)
-      return TRUE;
+      return true;
   }
   if (kpSps->uiPocType == 0) {
     if (kpLastSliceHeader->iPicOrderCntLsb != kpCurSliceHeader->iPicOrderCntLsb)
-      return TRUE;
+      return true;
     if (kpLastSliceHeader->iDeltaPicOrderCntBottom != kpCurSliceHeader->iDeltaPicOrderCntBottom)
-      return TRUE;
+      return true;
   } else if (kpSps->uiPocType == 1) {
     if (kpLastSliceHeader->iDeltaPicOrderCnt[0] != kpCurSliceHeader->iDeltaPicOrderCnt[0])
-      return TRUE;
+      return true;
     if (kpLastSliceHeader->iDeltaPicOrderCnt[1] != kpCurSliceHeader->iDeltaPicOrderCnt[1])
-      return TRUE;
+      return true;
   }
 
-  return FALSE;
+  return false;
 }
 
 /*!

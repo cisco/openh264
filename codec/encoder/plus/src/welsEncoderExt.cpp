@@ -68,7 +68,7 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
     m_iMaxPicWidth (0),
     m_iMaxPicHeight (0),
     m_iCspInternal (0),
-    m_bInitialFlag (FALSE) {
+    m_bInitialFlag (false) {
 #ifdef REC_FRAME_COUNT
   int32_t m_uiCountFrameNum = 0;
 #endif//REC_FRAME_COUNT
@@ -135,7 +135,7 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
   m_pFileBs     = WelsFopen (strStreamFileName, "wb");
   m_pFileBsSize = WelsFopen (strLenFileName, "wb");
 
-  m_bSwitch	= FALSE;
+  m_bSwitch	= false;
   m_iSwitchTimes	= 0;
 #endif//OUTPUT_BIT_STREAM
 
@@ -171,7 +171,7 @@ CWelsH264SVCEncoder::~CWelsH264SVCEncoder() {
     WelsFclose (m_pFileBsSize);
     m_pFileBsSize = NULL;
   }
-  m_bSwitch	= FALSE;
+  m_bSwitch	= false;
   m_iSwitchTimes	= 0;
 #endif//OUTPUT_BIT_STREAM
 
@@ -414,7 +414,7 @@ int CWelsH264SVCEncoder::Initialize2 (void* argv, const INIT_TYPE iInitType) {
   }
 
   m_iCspInternal	= iColorspace;
-  m_bInitialFlag  = TRUE;
+  m_bInitialFlag  = true;
 
   return cmResultSuccess;
 }
@@ -458,7 +458,7 @@ int32_t CWelsH264SVCEncoder::Uninitialize() {
     m_pEncContext	= NULL;
   }
 
-  m_bInitialFlag = FALSE;
+  m_bInitialFlag = false;
 
   return 0;
 }
@@ -587,7 +587,7 @@ int CWelsH264SVCEncoder::EncodeFrame2 (const SSourcePicture**   pSrcPicList, int
       m_pFileBsSize = WelsFopen (strStreamFileName, "wb");
 
 
-      m_bSwitch = FALSE;
+      m_bSwitch = false;
     }
 
     for (i = 0; i < pBsInfo->iLayerNum; i++) {
@@ -665,7 +665,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     return cmInitParaError;
   }
 
-  if (NULL == m_pEncContext || FALSE == m_bInitialFlag) {
+  if (NULL == m_pEncContext || false == m_bInitialFlag) {
     return cmInitExpected;
   }
 
@@ -783,7 +783,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     if (sEncodingParam.sSpatialLayers[sEncodingParam.iSpatialLayerNum - 1].iVideoWidth !=
         m_pEncContext->pSvcParam->sDependencyLayers[m_pEncContext->pSvcParam->iNumDependencyLayer - 1].iFrameWidth) {
       ++ m_iSwitchTimes;
-      m_bSwitch = TRUE;
+      m_bSwitch = true;
     }
 #endif//OUTPUT_BIT_STREAM
     if (sEncodingParam.iSpatialLayerNum < 1
@@ -926,7 +926,7 @@ int CWelsH264SVCEncoder::GetOption (ENCODER_OPTION eOptionId, void* pOption) {
   if (NULL == pOption) {
     return cmInitParaError;
   }
-  if (NULL == m_pEncContext || FALSE == m_bInitialFlag) {
+  if (NULL == m_pEncContext || false == m_bInitialFlag) {
     return cmInitExpected;
   }
 

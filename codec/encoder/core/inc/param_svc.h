@@ -143,10 +143,10 @@ uint32_t    uiLtrMarkPeriod;	//the min distance of two int32_t references
 bool		bDeblockingParallelFlag;	// deblocking filter parallelization control flag
 bool		bMgsT0OnlyStrategy; //MGS_T0_only_strategy
 bool		bEnableSSEI;
-bool		bEnableFrameCroppingFlag;	// enable frame cropping flag: TRUE alwayse in application
+bool		bEnableFrameCroppingFlag;	// enable frame cropping flag: true alwayse in application
 
 bool		bEnableCropPic;			// enable cropping source picture. , 8/25/2010
-// FALSE: Streaming Video Sharing; TRUE: Video Conferencing Meeting;
+// false: Streaming Video Sharing; true: Video Conferencing Meeting;
 int8_t		iDecompStages;		// GOP size dependency
 
 /* Deblocking loop filter */
@@ -225,9 +225,9 @@ void FillDefault (const bool kbEnableRc) {
   bMgsT0OnlyStrategy			=
     true;	// Strategy of have MGS only at T0 frames (0: do not use this strategy; 1: use this strategy)
   bEnableSSEI					= true;
-  bEnableFrameCroppingFlag	= true;	// enable frame cropping flag: TRUE alwayse in application
+  bEnableFrameCroppingFlag	= true;	// enable frame cropping flag: true alwayse in application
   bEnableCropPic				= true;	// enable cropping source picture. , 8/25/2010
-  // FALSE: Streaming Video Sharing; TRUE: Video Conferencing Meeting;
+  // false: Streaming Video Sharing; true: Video Conferencing Meeting;
   iDecompStages				= 0;	// GOP size dependency, unknown here and be revised later
 
   /* Deblocking loop filter */

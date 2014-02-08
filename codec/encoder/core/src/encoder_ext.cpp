@@ -3359,7 +3359,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
           pCtx->iActiveThreadsNum	= iSliceCount;
           // to fire slice coding threads
           err = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
-                                   pLayerBsInfo, iSliceCount, pCtx->pCurDqLayer->pSliceEncCtx, FALSE);
+                                   pLayerBsInfo, iSliceCount, pCtx->pCurDqLayer->pSliceEncCtx, false);
           if (err) {
             WelsLog (pCtx, WELS_LOG_ERROR,
                      "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!\n",
@@ -3418,7 +3418,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
           iNumThreadsRunning		= iNumThreadsScheduled;
           // to fire slice coding threads
           err = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
-                                   pLayerBsInfo, iNumThreadsRunning, pCtx->pCurDqLayer->pSliceEncCtx, FALSE);
+                                   pLayerBsInfo, iNumThreadsRunning, pCtx->pCurDqLayer->pSliceEncCtx, false);
           if (err) {
             WelsLog (pCtx, WELS_LOG_ERROR,
                      "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!\n",
@@ -3510,7 +3510,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
 
         // to fire slice coding threads
         err = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
-                                 pLayerBsInfo, kiPartitionCnt, pCtx->pCurDqLayer->pSliceEncCtx, TRUE);
+                                 pLayerBsInfo, kiPartitionCnt, pCtx->pCurDqLayer->pSliceEncCtx, true);
         if (err) {
           WelsLog (pCtx, WELS_LOG_ERROR,
                    "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!\n",

@@ -208,7 +208,7 @@ CWelsPreProcess::CWelsPreProcess (void* pEncCtx) {
   m_pInterfaceVp = NULL;
   m_pEncLib = NULL;
   m_bInitDone = false;
-  m_bOfficialBranch  = FALSE;
+  m_bOfficialBranch  = false;
   m_pEncCtx = pEncCtx;
   memset (&m_sScaledPicture, 0, sizeof (m_sScaledPicture));
 }
@@ -281,12 +281,12 @@ int32_t CWelsPreProcess::WelsPreprocessStep1 (void* pCtx, const SSourcePicture**
       for (int32_t i = 0; i < iNumDependencyLayer; i++) {
         if (pSvcParam->sDependencyLayers[i].iFrameWidth != pic_queue[i]->iPicWidth ||
             pSvcParam->sDependencyLayers[i].iFrameHeight != pic_queue[i]->iPicHeight) {
-          m_bOfficialBranch = TRUE;
+          m_bOfficialBranch = true;
           break;
         }
       }
     }
-    m_bInitDone = TRUE;
+    m_bInitDone = true;
   }
 
   if (m_pInterfaceVp == NULL)

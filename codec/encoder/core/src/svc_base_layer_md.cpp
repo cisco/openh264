@@ -1342,15 +1342,15 @@ bool WelsMdPSkipEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
   SMVUnitXY sQpelMvp = { sMvp.iMvX >> 2, sMvp.iMvY >> 2 };
   n = (pCurMb->iMbX << 4) + sQpelMvp.iMvX;
   if (n < -29)
-    return FALSE;
+    return false;
   else if (n > (int32_t) ((pCurLayer->iMbWidth << 4) + 12))
-    return FALSE;
+    return false;
 
   n = (pCurMb->iMbY << 4) + sQpelMvp.iMvY;
   if (n < -29)
-    return FALSE;
+    return false;
   else if (n > (int32_t) ((pCurLayer->iMbHeight << 4) + 12))
-    return FALSE;
+    return false;
 
   //luma
   pRefLuma += sQpelMvp.iMvY * iLineSizeY + sQpelMvp.iMvX;
@@ -1395,7 +1395,7 @@ bool WelsMdPSkipEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
     pCurMb->sP16x16Mv = sMvp;
     pCurLayer->pDecPic->sMvList[pCurMb->iMbXY] = sMvp;
 
-    return TRUE;
+    return true;
   }
 
   WelsDctMb (pMbCache->pCoeffLevel,  pEncMb, iEncStride, pDstLuma, pEncCtx->pFuncList->pfDctFourT4);
@@ -1428,11 +1428,11 @@ bool WelsMdPSkipEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
         pCurMb->sP16x16Mv = sMvp;
         pCurLayer->pDecPic->sMvList[pCurMb->iMbXY] = sMvp;
 
-        return TRUE;
+        return true;
       }
     }
   }
-  return FALSE;
+  return false;
 }
 
 const int32_t g_kiPixStrideIdx8x8[4] = {  0,                                             ME_REFINE_BUF_WIDTH_BLK8,
@@ -1611,10 +1611,10 @@ bool WelsMdFirstIntraMode (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCach
     WelsIMbChromaEncode (pEncCtx, pCurMb, pMbCache);  //add pEnc&rec to MD--2010.3.15
 
     pCurMb->pSadCost[0] = 0;
-    return TRUE; //intra_mb_type is best
+    return true; //intra_mb_type is best
   }
 
-  return FALSE;
+  return false;
 }
 
 void WelsMdInterMb (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pUnused) {
@@ -1631,7 +1631,7 @@ void WelsMdInterMb (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache
   const bool bMbTopRightAvailPskip = ((kuiNeighborAvail & TOPRIGHT_MB_POS) ? IS_SKIP ((top_mb + 1)->uiMbType) : false);
   bool bTrySkip = bMbLeftAvailPskip || bMbTopAvailPskip || bMbTopLeftAvailPskip || bMbTopRightAvailPskip;
   bool bKeepSkip = bMbLeftAvailPskip && bMbTopAvailPskip && bMbTopRightAvailPskip;
-  bool bSkip = FALSE;
+  bool bSkip = false;
 
   if (pEncCtx->pFuncList->pfInterMdBackgroundDecision (pEncCtx, pWelsMd, pSlice, pCurMb, pMbCache, &bKeepSkip)) {
     return;

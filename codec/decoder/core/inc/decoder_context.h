@@ -319,7 +319,7 @@ typedef struct TagWelsDecoderContext {
   int32_t iFeedbackVclNalInAu;
   int32_t iFeedbackTidInAu;
 
-  bool bAuReadyFlag;   // TRUE: one au is ready for decoding; FALSE: default value
+  bool bAuReadyFlag;   // true: one au is ready for decoding; false: default value
 
   //trace handle
   void*      pTraceHandle;

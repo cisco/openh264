@@ -252,8 +252,8 @@ int32_t DeblockingAvailableNoInterlayer (PDqLayer pCurDqLayer, int32_t iFilterId
   int32_t iMbY = pCurDqLayer->iMbY;
   int32_t iMbX = pCurDqLayer->iMbX;
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
-  bool bLeftFlag = FALSE;
-  bool bTopFlag  = FALSE;
+  bool bLeftFlag = false;
+  bool bTopFlag  = false;
 
   if (2 == iFilterIdc) {
     bLeftFlag = (iMbX > 0) && (pCurDqLayer->pSliceIdc[iMbXy] == pCurDqLayer->pSliceIdc[iMbXy - 1]);

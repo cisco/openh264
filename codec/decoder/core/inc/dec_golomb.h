@@ -133,7 +133,7 @@ if (iValue) {
   return (g_kuiLeadingZeroTable[iValue] + 8);
 }
 
-//ASSERT(FALSE);  // should not go here
+//ASSERT(false);  // should not go here
 return -1;
 }
 

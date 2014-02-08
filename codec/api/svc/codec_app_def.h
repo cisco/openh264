@@ -211,7 +211,7 @@ typedef struct {
   bool    bEnableAdaptiveQuant; // adaptive quantization control
   bool    bEnableFrameSkip; // allow skipping frames to keep the bitrate within limits
   bool	bEnableCropPic;	// enable cropping source picture.  8/25/2010
-  // FALSE: Streaming Video Sharing; TRUE: Video Conferencing Meeting;
+  // false: Streaming Video Sharing; true: Video Conferencing Meeting;
   bool     bEnableLongTermReference; // 0: on, 1: off
   int     iLtrMarkPeriod;
 

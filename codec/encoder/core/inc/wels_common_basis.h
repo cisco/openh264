@@ -311,7 +311,7 @@ typedef uint32_t Mb_Type;
 #define MB_TYPE_UNAVAILABLE		0xFF000000
 #define REF_NOT_AVAIL    -2
 #define REF_NOT_IN_LIST -1    //intra
-#define	REF_PIC_REORDER_DEFAULT	TRUE
+#define	REF_PIC_REORDER_DEFAULT	true
 
 #define IS_INTRA4x4(type) ( MB_TYPE_INTRA4x4 == (type) )
 #define IS_INTRA16x16(type) ( MB_TYPE_INTRA16x16 == (type) )

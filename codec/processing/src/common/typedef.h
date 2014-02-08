@@ -73,11 +73,6 @@ typedef unsigned __int64   uint64_t ;
 
 #endif
 
-enum {
-  FALSE = 0,
-  TRUE  = !FALSE
-};
-
 WELSVP_NAMESPACE_END
 
 #endif

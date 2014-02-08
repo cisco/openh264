@@ -67,13 +67,5 @@ typedef unsigned __int64 uint64_t;
 #endif//EPSN
 #define EPSN	  (0.000001f) // (1e-6)	// desired float precision
 
-#ifndef FALSE
-#define FALSE   ((int32_t)0)
-#endif//FALSE
-
-#ifndef TRUE
-#define TRUE    ((int32_t)1)
-#endif//TRUE
-
 #endif //WELS_TYPE_DEFINES_H__
 

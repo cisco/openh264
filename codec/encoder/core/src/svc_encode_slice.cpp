@@ -874,7 +874,7 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
       WelsMutexUnlock (&pEncCtx->pSliceThreading->mutexSliceNumUpdate);
 #endif//MT_ENABLED
 
-    return TRUE;
+    return true;
   }
 
   if (
@@ -896,7 +896,7 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
     WelsMutexUnlock (&pEncCtx->pSliceThreading->mutexSliceNumUpdate);
 #endif//MT_ENABLED
 
-  return FALSE;
+  return false;
 }
 
 ///////////////

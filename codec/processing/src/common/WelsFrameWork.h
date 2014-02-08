@@ -62,7 +62,7 @@ class IStrategy : public IWelsVP {
     m_eMethod  = METHOD_NULL;
     m_eFormat  = VIDEO_FORMAT_I420;
     m_iIndex   = 0;
-    m_bInit    = FALSE;
+    m_bInit    = false;
   };
 
   virtual ~IStrategy() {}
