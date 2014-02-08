@@ -1485,6 +1485,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\common\expand_picture_common.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\encoder\core\inc\extern.h"
 				>
 			</File>

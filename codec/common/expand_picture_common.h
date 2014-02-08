@@ -33,25 +33,36 @@
  *
  * \brief		Interface for expanding reconstructed picture to be used for reference
  *
- * \date		06/08/2009 Created
+ * \date		06/08/2009
  *************************************************************************************
  */
 
-#ifndef WELS_EXPAND_PIC_H__
-#define WELS_EXPAND_PIC_H__
+#ifndef EXPAND_PICTURE_COMMON_H
+#define EXPAND_PICTURE_COMMON_H
 
-#include "decoder_context.h"
-#include "picture.h"
+#include "typedefs.h"
 
-#include "expand_picture_common.h"
+#if defined(__cplusplus)
+extern "C" {
+#endif//__cplusplus
 
-namespace WelsDec {
+#if defined(X86_ASM)
+void ExpandPictureLuma_sse2 (uint8_t* pDst,
+                             const int32_t kiStride,
+                             const int32_t kiPicW,
+                             const int32_t kiPicH);
+void ExpandPictureChromaAlign_sse2 (uint8_t* pDst,
+                                    const int32_t kiStride,
+                                    const int32_t kiPicW,
+                                    const int32_t kiPicH);
+void ExpandPictureChromaUnalign_sse2 (uint8_t* pDst,
+                                      const int32_t kiStride,
+                                      const int32_t kiPicW,
+                                      const int32_t kiPicH);
+#endif//X86_ASM
 
-void_t ExpandReferencingPicture (PPicture pPic, PExpandPictureFunc pExpandPictureLuma,
-                                 PExpandPictureFunc pExpandPictureChroma[2]);
+#if defined(__cplusplus)
+}
+#endif//__cplusplus
 
-void_t InitExpandPictureFunc (SExpandPicFunc* pExpandPicFunc, const uint32_t kuiCpuFlags);
-
-} // namespace WelsDec
-
-#endif//WELS_EXPAND_PIC_H__
+#endif
