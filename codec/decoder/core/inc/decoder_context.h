@@ -173,10 +173,6 @@ typedef struct TagWelsDecoderContext {
   // Configuration
   SDecodingParam*    	pParam;
   uint32_t			uiCpuFlag;			// CPU compatibility detected
-  int32_t 	   		iDecoderMode;		// indicate decoder running mode
-  int32_t				iSetMode;			// indicate decoder mode set from upper layer, this is read-only for decoder internal
-  int32_t 			iDecoderOutputProperty; // indicate the output buffer property
-  int32_t				iModeSwitchType;	// 1: optimal decision; 2: forced switch to the other mode; 0: no switch
 
   int32_t				iOutputColorFormat;		// color space format to be outputed
   VIDEO_BITSTREAM_TYPE eVideoType; //indicate the type of video to decide whether or not to do qp_delta error detection.

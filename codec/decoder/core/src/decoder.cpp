@@ -402,12 +402,6 @@ int32_t WelsInitDecoder (PWelsDecoderContext pCtx, void* pTraceHandle, PWelsLogC
   // open decoder
   WelsOpenDecoder (pCtx);
 
-  // decode mode setting
-  pCtx->iDecoderMode = SW_MODE;
-  pCtx->iSetMode = AUTO_MODE;
-  pCtx->iDecoderOutputProperty = BUFFER_HOST;
-  pCtx->iModeSwitchType = 0; // 0: do not do mode switch
-
 
   return ERR_NONE;
 }

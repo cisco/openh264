@@ -97,13 +97,10 @@ typedef enum {
   DECODER_OPTION_END_OF_STREAM,	/* Indicate bitstream of the final frame to be decoded */
   DECODER_OPTION_VCL_NAL,        //feedback whether or not have VCL NAL in current AU for application layer
   DECODER_OPTION_TEMPORAL_ID,      //feedback temporal id for application layer
-  DECODER_OPTION_MODE,             // indicates the decoding mode
-  DECODER_OPTION_OUTPUT_PROPERTY,
   DECODER_OPTION_FRAME_NUM,	//feedback current decoded frame number
   DECODER_OPTION_IDR_PIC_ID,	// feedback current frame belong to which IDR period
   DECODER_OPTION_LTR_MARKING_FLAG,	// feedback wether current frame mark a LTR
   DECODER_OPTION_LTR_MARKED_FRAME_NUM,	// feedback frame num marked by current Frame
-  DECODER_OPTION_DEVICE_INFO,
 
 } DECODER_OPTION;
 typedef enum { //feedback that whether or not have VCL NAL in current AU

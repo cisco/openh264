@@ -81,9 +81,6 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
   int32_t iColorFormat = videoFormatInternal;
   static int32_t iFrameNum = 0;
 
-  EDecodeMode     eDecoderMode    = SW_MODE;
-  EBufferProperty	eOutputProperty = BUFFER_DEVICE;
-
   CUtils cOutputModule;
   double dElapsed = 0;
 
@@ -150,16 +147,6 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     goto label_exit;
   }
 
-  if (pDecoder->SetOption (DECODER_OPTION_MODE,  &eDecoderMode)) {
-    fprintf (stderr, "SetOption() failed, opt_id : %d  ..\n", DECODER_OPTION_MODE);
-    goto label_exit;
-  }
-
-  // set the output buffer property
-  if (pYuvFile) {
-    pDecoder->SetOption (DECODER_OPTION_OUTPUT_PROPERTY,  &eOutputProperty);
-  }
-
 #if defined ( STICK_STREAM_SIZE )
   FILE* fpTrack = fopen ("3.len", "rb");
 
@@ -205,10 +192,6 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     pDecoder->GetOption (DECODER_OPTION_VCL_NAL, &iFeedbackVclNalInAu);
     int32_t iFeedbackTidInAu;
     pDecoder->GetOption (DECODER_OPTION_TEMPORAL_ID, &iFeedbackTidInAu);
-    int32_t iSetMode;
-    pDecoder->GetOption (DECODER_OPTION_MODE, &iSetMode);
-    int32_t iDeviceInfo;
-    pDecoder->GetOption (DECODER_OPTION_DEVICE_INFO, &iDeviceInfo);
 //~end for
 
     iStart = WelsTime();
@@ -229,13 +212,8 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     if (sDstBufInfo.iBufferStatus == 1) {
       iFrameNum++;
       cOutputModule.Process ((void**)pDst, &sDstBufInfo, pYuvFile);
-      if (sDstBufInfo.eBufferProperty == BUFFER_HOST) {
-        iWidth  = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
-        iHeight = sDstBufInfo.UsrData.sSystemBuffer.iHeight;
-      } else {
-        iWidth  = sDstBufInfo.UsrData.sVideoBuffer.iSurfaceWidth;
-        iHeight = sDstBufInfo.UsrData.sVideoBuffer.iSurfaceHeight;
-      }
+      iWidth  = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
+      iHeight = sDstBufInfo.UsrData.sSystemBuffer.iHeight;
 
       if (pOptionFile != NULL) {
         if (iWidth != iLastWidth && iHeight != iLastHeight) {
@@ -268,13 +246,8 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
 
   if (sDstBufInfo.iBufferStatus == 1) {
     cOutputModule.Process ((void**)pDst, &sDstBufInfo, pYuvFile);
-    if (sDstBufInfo.eBufferProperty == BUFFER_HOST) {
-      iWidth  = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
-      iHeight = sDstBufInfo.UsrData.sSystemBuffer.iHeight;
-    } else {
-      iWidth  = sDstBufInfo.UsrData.sVideoBuffer.iSurfaceWidth;
-      iHeight = sDstBufInfo.UsrData.sVideoBuffer.iSurfaceHeight;
-    }
+    iWidth  = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
+    iHeight = sDstBufInfo.UsrData.sSystemBuffer.iHeight;
 
     if (pOptionFile != NULL) {
       /* Anyway, we need write in case of final frame decoding */

@@ -57,7 +57,6 @@ typedef struct {
 #define SAFE_RELEASE(p) if(p) { (p)->Release(); (p) = NULL; }
 #define SAFE_FREE(p)    if(p) { free (p); (p) = NULL; }
 
-HRESULT Dump2YUV (void* pDst[3], void* pSurface, int iWidth, int iHeight, int iStride[2]);
 HRESULT Dump2Surface (void* pDst[3], void* pSurface, int iWidth, int iHeight, int iStride[2]);
 HRESULT InitWindow (HWND* hWnd);
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM);
@@ -122,7 +121,7 @@ HRESULT CD3D9Utils::Process (void* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
     return hResult;
 
   BOOL bWindowed = pFp ? FALSE : TRUE;
-  BOOL bNeedD3D9 = ! (!bWindowed && pInfo->eBufferProperty == BUFFER_HOST);
+  BOOL bNeedD3D9 = ! (!bWindowed);
   if (!m_bInitDone)
     m_bInitDone = !bNeedD3D9;
 
@@ -147,14 +146,11 @@ HRESULT CD3D9Utils::Process (void* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
 
 HRESULT CD3D9Utils::Render (void* pDst[3], SBufferInfo* pInfo) {
   HRESULT hResult = E_FAIL;
-  EBufferProperty eBufferProperty = pInfo->eBufferProperty;
 
-  if (eBufferProperty == BUFFER_HOST) {
     hResult = InitResource (NULL, pInfo);
     if (SUCCEEDED (hResult))
       hResult = Dump2Surface (pDst, m_lpD3D9RawSurfaceShare, pInfo->UsrData.sSystemBuffer.iWidth,
                               pInfo->UsrData.sSystemBuffer.iHeight, pInfo->UsrData.sSystemBuffer.iStride);
-  }
 
   if (SUCCEEDED (hResult)) {
     IDirect3DSurface9* pBackBuffer = NULL;
@@ -168,7 +164,6 @@ HRESULT CD3D9Utils::Render (void* pDst[3], SBufferInfo* pInfo) {
 
 HRESULT CD3D9Utils::Dump (void* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
   HRESULT hResult = E_FAIL;
-  EBufferProperty eBufferProperty = pInfo->eBufferProperty;
   int iStride[2];
   int iWidth;
   int iHeight;
@@ -223,12 +218,10 @@ HRESULT CD3D9Utils::InitResource (void* pSharedHandle, SBufferInfo* pInfo) {
     m_d3dpp.hDeviceWindow = m_hWnd;
     m_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
     hResult = m_lpD3D9->CreateDevice (uiAdapter, D3DDevType, NULL, dwBehaviorFlags, &m_d3dpp, &m_lpD3D9Device);
-    if (pInfo->eBufferProperty == BUFFER_HOST) {
       iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
       iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
       D3Dformat = (D3DFORMAT)NV12_FORMAT;
       D3Dpool = (D3DPOOL)D3DPOOL_DEFAULT;
-    }
 
     hResult = m_lpD3D9Device->CreateOffscreenPlainSurface (iWidth, iHeight, (D3DFORMAT)D3Dformat, (D3DPOOL)D3Dpool,
               &m_lpD3D9RawSurfaceShare, NULL);
@@ -297,7 +290,7 @@ HRESULT CD3D9ExUtils::Process (void* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
     return hResult;
 
   BOOL bWindowed = pFp ? FALSE : TRUE;
-  BOOL bNeedD3D9 = ! (!bWindowed && pInfo->eBufferProperty == BUFFER_HOST);
+  BOOL bNeedD3D9 = ! (!bWindowed);
   if (!m_bInitDone)
     m_bInitDone = !bNeedD3D9;
 
@@ -322,17 +315,11 @@ HRESULT CD3D9ExUtils::Process (void* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
 
 HRESULT CD3D9ExUtils::Render (void* pDst[3], SBufferInfo* pInfo) {
   HRESULT hResult = E_FAIL;
-  EBufferProperty eBufferProperty = pInfo->eBufferProperty;
 
-  if (eBufferProperty == BUFFER_HOST) {
     hResult = InitResource (NULL, pInfo);
     if (SUCCEEDED (hResult))
       hResult = Dump2Surface (pDst, m_lpD3D9RawSurfaceShare, pInfo->UsrData.sSystemBuffer.iWidth,
                               pInfo->UsrData.sSystemBuffer.iHeight, pInfo->UsrData.sSystemBuffer.iStride);
-  } else if (eBufferProperty == BUFFER_DEVICE) {
-    VOID* pSharedHandle = pDst[0];
-    hResult = InitResource (pSharedHandle, pInfo);
-  }
 
   if (SUCCEEDED (hResult)) {
     IDirect3DSurface9* pBackBuffer = NULL;
@@ -346,34 +333,14 @@ HRESULT CD3D9ExUtils::Render (void* pDst[3], SBufferInfo* pInfo) {
 
 HRESULT CD3D9ExUtils::Dump (void* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
   HRESULT hResult = E_FAIL;
-  EBufferProperty eBufferProperty = pInfo->eBufferProperty;
   int iStride[2];
   int iWidth;
   int iHeight;
 
-  if (eBufferProperty != BUFFER_HOST) {
-    iWidth = pInfo->UsrData.sVideoBuffer.iSurfaceWidth;
-    iHeight = pInfo->UsrData.sVideoBuffer.iSurfaceHeight;
-    iStride[0] = iWidth;
-    iStride[1] = iWidth / 2;
-
-    if (m_pDumpYUV == NULL) {
-      m_pDumpYUV = (unsigned char*)malloc (iWidth * iHeight * 3 / 2 * sizeof (unsigned char));
-    }
-
-    if (m_pDumpYUV) {
-      void* pSurface = pDst[1];
-      pDst[0] = m_pDumpYUV;
-      pDst[1] = m_pDumpYUV + iHeight * iStride[0] * sizeof (unsigned char);
-      pDst[2] = m_pDumpYUV + iHeight * iStride[0] * 5 / 4 * sizeof (unsigned char);
-      hResult = Dump2YUV (pDst, pSurface, iWidth, iHeight, iStride);
-    }
-  } else {
     iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
     iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
     iStride[0] = pInfo->UsrData.sSystemBuffer.iStride[0];
     iStride[1] = pInfo->UsrData.sSystemBuffer.iStride[1];
-  }
 
   if (pDst[0] && pDst[1] && pDst[2])
     Write2File (pFp, (unsigned char**)pDst, iStride, iWidth, iHeight);
@@ -419,17 +386,10 @@ HRESULT CD3D9ExUtils::InitResource (void* pSharedHandle, SBufferInfo* pInfo) {
     m_d3dpp.hDeviceWindow = m_hWnd;
     m_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
     hResult = m_lpD3D9->CreateDeviceEx (uiAdapter, D3DDevType, NULL, dwBehaviorFlags, &m_d3dpp, NULL, &m_lpD3D9Device);
-    if (pInfo->eBufferProperty == BUFFER_HOST) {
       iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
       iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
       D3Dformat = (D3DFORMAT)NV12_FORMAT;
       D3Dpool = (D3DPOOL)D3DPOOL_DEFAULT;
-    } else {
-      iWidth = pInfo->UsrData.sVideoBuffer.iSurfaceWidth;
-      iHeight = pInfo->UsrData.sVideoBuffer.iSurfaceHeight;
-      D3Dformat = (D3DFORMAT)pInfo->UsrData.sVideoBuffer.D3Dformat;
-      D3Dpool = (D3DPOOL)pInfo->UsrData.sVideoBuffer.D3DPool;
-    }
     hResult = m_lpD3D9Device->CreateOffscreenPlainSurface (iWidth, iHeight, (D3DFORMAT)D3Dformat, (D3DPOOL)D3Dpool,
               &m_lpD3D9RawSurfaceShare, &pSharedHandle);
   }
@@ -440,40 +400,6 @@ HRESULT CD3D9ExUtils::InitResource (void* pSharedHandle, SBufferInfo* pInfo) {
   return hResult;
 }
 
-
-HRESULT Dump2YUV (void* pDst[3], void* pSurface, int iWidth, int iHeight, int iStride[2]) {
-  HRESULT hResult = E_FAIL;
-
-  if (!pDst[0] || !pDst[1] || !pDst[2] || !pSurface)
-    return hResult;
-
-  IDirect3DSurface9* pSurfaceData = (IDirect3DSurface9*)pSurface;
-  D3DLOCKED_RECT sD3DLockedRect = {0};
-  hResult = pSurfaceData->LockRect (&sD3DLockedRect, NULL, 0);
-
-  unsigned char* pInY = (unsigned char*)sD3DLockedRect.pBits;
-  unsigned char* pOutY = (unsigned char*)pDst[0];
-  int iInStride = sD3DLockedRect.Pitch;
-  int iOutStride = iStride[0];
-
-  for (int j = 0; j < iHeight; j++)
-    memcpy (pOutY + j * iOutStride, pInY + j * iInStride, iWidth); //confirmed_safe_unsafe_usage
-
-  unsigned char* pOutV = (unsigned char*)pDst[1];
-  unsigned char* pOutU = (unsigned char*)pDst[2];
-  unsigned char* pInC = pInY + iInStride * iHeight;
-  iOutStride = iStride[1];
-  for (int i = 0; i < iHeight / 2; i++) {
-    for (int j = 0; j < iWidth; j += 2) {
-      pOutV[i * iOutStride + j / 2] = pInC[i * iInStride + j  ];
-      pOutU[i * iOutStride + j / 2] = pInC[i * iInStride + j + 1];
-    }
-  }
-
-  pSurfaceData->UnlockRect();
-
-  return hResult;
-}
 
 HRESULT Dump2Surface (void* pDst[3], void* pSurface, int iWidth, int iHeight, int iStride[2]) {
   HRESULT hResult = E_FAIL;
