@@ -53,7 +53,7 @@ WELS_EXTERN   WelsResBlockZero16x16_sse2
 
 ALIGN    16
 ;*******************************************************************************
-;  void_t WelsResBlockZero16x16_sse2(int16_t* pBlock,int32_t iStride)
+;  void WelsResBlockZero16x16_sse2(int16_t* pBlock,int32_t iStride)
 ;*******************************************************************************
 WelsResBlockZero16x16_sse2:
         ;push     r0
@@ -134,7 +134,7 @@ WELS_EXTERN   WelsResBlockZero8x8_sse2
 
 ALIGN    16
 ;*******************************************************************************
-;  void_t WelsResBlockZero8x8_sse2(int16_t * pBlock, int32_t iStride)
+;  void WelsResBlockZero8x8_sse2(int16_t * pBlock, int32_t iStride)
 ;*******************************************************************************
 WelsResBlockZero8x8_sse2:
 	  ;push      r0

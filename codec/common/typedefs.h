@@ -77,9 +77,5 @@ typedef char      str_t;
 #define TRUE    ((int32_t)1)
 #endif//TRUE
 
-#ifndef void_t
-#define void_t void
-#endif
-
 #endif //WELS_TYPE_DEFINES_H__
 

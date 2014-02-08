@@ -47,10 +47,10 @@
 
 namespace WelsDec {
 
-void_t ExpandReferencingPicture (PPicture pPic, PExpandPictureFunc pExpandPictureLuma,
+void ExpandReferencingPicture (PPicture pPic, PExpandPictureFunc pExpandPictureLuma,
                                  PExpandPictureFunc pExpandPictureChroma[2]);
 
-void_t InitExpandPictureFunc (SExpandPicFunc* pExpandPicFunc, const uint32_t kuiCpuFlags);
+void InitExpandPictureFunc (SExpandPicFunc* pExpandPicFunc, const uint32_t kuiCpuFlags);
 
 } // namespace WelsDec
 

@@ -44,7 +44,7 @@
 
 namespace WelsDec {
 
-static void_t SetUnRef (PPicture pRef) {
+static void SetUnRef (PPicture pRef) {
   if (NULL != pRef) {
     pRef->bUsedAsRef = false;
     pRef->bIsLongRef = false;
@@ -63,7 +63,7 @@ static void_t SetUnRef (PPicture pRef) {
 // 1.sps arrived that is new sequence starting
 // 2.IDR NAL i.e. 1st layer in IDR AU
 
-void_t WelsResetRefPic (PWelsDecoderContext pCtx) {
+void WelsResetRefPic (PWelsDecoderContext pCtx) {
   int32_t i = 0;
   PRefPic pRefPic = &pCtx->sRefPic;
   pCtx->sRefPic.uiLongRefCount[0] = pCtx->sRefPic.uiShortRefCount[0] = 0;

@@ -57,9 +57,9 @@ struct tagUnaligned_16 {
 #define ST32(a, b) (((struct tagUnaligned_32 *) (a))->l) = (b)
 #define ST64(a, b) (((struct tagUnaligned_64 *) (a))->l) = (b)
 //	#else
-//		inline void_t __ST16(void_t *dst, uint16_t v) { memcpy(dst, &v, 2); }
-//		inline void_t __ST32(void_t *dst, uint32_t v) { memcpy(dst, &v, 4); }
-//inline void_t __ST64(void_t *dst, uint64_t v) { memcpy(dst, &v, 8); }
+//		inline void __ST16(void *dst, uint16_t v) { memcpy(dst, &v, 2); }
+//		inline void __ST32(void *dst, uint32_t v) { memcpy(dst, &v, 4); }
+//inline void __ST64(void *dst, uint64_t v) { memcpy(dst, &v, 8); }
 //	#endif
 
 #else

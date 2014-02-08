@@ -47,7 +47,7 @@ inline uint32_t GetValue4Bytes (uint8_t* pDstNal) {
   return uiValue;
 }
 
-void_t InitReadBits (PBitStringAux pBitString) {
+void InitReadBits (PBitStringAux pBitString) {
   pBitString->uiCurBits  = GetValue4Bytes (pBitString->pCurBuf);
   pBitString->pCurBuf  += 4;
   pBitString->iLeftBits = -16;

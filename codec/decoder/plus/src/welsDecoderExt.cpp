@@ -83,7 +83,7 @@ namespace WelsDec {
 *
 *	return: none
 ***************************************************************************/
-CWelsDecoder::CWelsDecoder (void_t)
+CWelsDecoder::CWelsDecoder (void)
   :	m_pDecContext (NULL),
     m_pTrace (NULL) {
 #ifdef OUTPUT_BIT_STREAM
@@ -108,8 +108,8 @@ CWelsDecoder::CWelsDecoder (void_t)
 
   WelsGetTimeOfDay (&sCurTime);
 
-  iCurUsed     = WelsSnprintf (chFileName,  iBufLeft,  "bs_0x%p_", (void_t*)this);
-  iCurUsedSize = WelsSnprintf (chFileNameSize, iBufLeftSize, "size_0x%p_", (void_t*)this);
+  iCurUsed     = WelsSnprintf (chFileName,  iBufLeft,  "bs_0x%p_", (void*)this);
+  iCurUsedSize = WelsSnprintf (chFileNameSize, iBufLeftSize, "size_0x%p_", (void*)this);
 
   if (iCurUsed > 0) {
     iBufUsed += iCurUsed;
@@ -186,7 +186,7 @@ CWelsDecoder::~CWelsDecoder() {
   }
 }
 
-long CWelsDecoder::Initialize (void_t* pParam, const INIT_TYPE keInitType) {
+long CWelsDecoder::Initialize (void* pParam, const INIT_TYPE keInitType) {
   if (pParam == NULL || keInitType != INIT_TYPE_PARAMETER_BASED) {
     IWelsTrace::WelsVTrace (m_pTrace, IWelsTrace::WELS_LOG_INFO, "CWelsDecoder::Initialize(), invalid input argument.");
     return cmInitParaError;
@@ -206,7 +206,7 @@ long CWelsDecoder::Uninitialize() {
   return ERR_NONE;
 }
 
-void_t CWelsDecoder::UninitDecoder (void_t) {
+void CWelsDecoder::UninitDecoder (void) {
   if (NULL == m_pDecContext)
     return;
 
@@ -224,7 +224,7 @@ void_t CWelsDecoder::UninitDecoder (void_t) {
 }
 
 // the return value of this function is not suitable, it need report failure info to upper layer.
-void_t CWelsDecoder::InitDecoder (void_t) {
+void CWelsDecoder::InitDecoder (void) {
   IWelsTrace::WelsVTrace (m_pTrace, IWelsTrace::WELS_LOG_INFO, "CWelsDecoder::init_decoder()..");
 
   m_pDecContext	= (PWelsDecoderContext)WelsMalloc (sizeof (SWelsDecoderContext), "m_pDecContext");
@@ -237,7 +237,7 @@ void_t CWelsDecoder::InitDecoder (void_t) {
 /*
  * Set Option
  */
-long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void_t* pOption) {
+long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
   int iVal = 0;
 
   if (m_pDecContext == NULL)
@@ -294,7 +294,7 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void_t* pOption) {
 /*
  *	Get Option
  */
-long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void_t* pOption) {
+long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
   int iVal = 0;
 
   if (m_pDecContext == NULL)
@@ -359,7 +359,7 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void_t* pOption) {
 
 DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     const int kiSrcLen,
-    void_t** ppDst,
+    void** ppDst,
     SBufferInfo* pDstInfo) {
   if (kiSrcLen > MAX_ACCESS_UNIT_CAPACITY) {
     m_pDecContext->iErrorCode |= dsOutOfMemory;
@@ -449,7 +449,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame (const unsigned char* kpSrc,
   DstInfo.UsrData.sSystemBuffer.iHeight = iHeight;
   DstInfo.eBufferProperty = BUFFER_HOST;
 
-  eDecState = DecodeFrame2 (kpSrc, kiSrcLen, (void_t**)ppDst, &DstInfo);
+  eDecState = DecodeFrame2 (kpSrc, kiSrcLen, (void**)ppDst, &DstInfo);
   if (eDecState == dsErrorFree) {
     pStride[0] = DstInfo.UsrData.sSystemBuffer.iStride[0];
     pStride[1] = DstInfo.UsrData.sSystemBuffer.iStride[1];
@@ -503,7 +503,7 @@ long CreateDecoder (ISVCDecoder** ppDecoder) {
 /*
 *	DestroyDecoder
 */
-void_t DestroyDecoder (ISVCDecoder* pDecoder) {
+void DestroyDecoder (ISVCDecoder* pDecoder) {
   if (NULL != pDecoder) {
     delete (CWelsDecoder*)pDecoder;
   }

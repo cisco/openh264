@@ -48,7 +48,7 @@ PWelsLogCallbackFunc g_pLog	= NULL;
 
 
 
-void_t WelsLog (void_t* pPtr, int32_t iLevel, const char* kpFmt, ...) {
+void WelsLog (void* pPtr, int32_t iLevel, const char* kpFmt, ...) {
   va_list pVl;
 
   PWelsDecoderContext pCtx  = (PWelsDecoderContext)pPtr;

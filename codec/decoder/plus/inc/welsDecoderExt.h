@@ -56,10 +56,10 @@ namespace WelsDec {
 
 class CWelsDecoder : public ISVCDecoder {
  public:
-CWelsDecoder (void_t);
+CWelsDecoder (void);
 virtual ~CWelsDecoder();
 
-virtual long EXTAPI Initialize (void_t* pParam, const INIT_TYPE keInitType);
+virtual long EXTAPI Initialize (void* pParam, const INIT_TYPE keInitType);
 virtual long EXTAPI Uninitialize();
 
 /***************************************************************************
@@ -83,7 +83,7 @@ virtual DECODING_STATE EXTAPI DecodeFrame (const unsigned char* kpSrc,
 
 virtual DECODING_STATE EXTAPI DecodeFrame2 (const unsigned char* kpSrc,
                                             const int kiSrcLen,
-                                            void_t** ppDst,
+                                            void** ppDst,
                                             SBufferInfo* pDstInfo);
 virtual DECODING_STATE EXTAPI DecodeFrameEx (const unsigned char* kpSrc,
                                              const int kiSrcLen,
@@ -94,15 +94,15 @@ virtual DECODING_STATE EXTAPI DecodeFrameEx (const unsigned char* kpSrc,
                                              int& iHeight,
                                              int& color_format);
 
-virtual long EXTAPI SetOption (DECODER_OPTION eOptID, void_t* pOption);
-virtual long EXTAPI GetOption (DECODER_OPTION eOptID, void_t* pOption);
+virtual long EXTAPI SetOption (DECODER_OPTION eOptID, void* pOption);
+virtual long EXTAPI GetOption (DECODER_OPTION eOptID, void* pOption);
 
  private:
 PWelsDecoderContext 				m_pDecContext;
 IWelsTrace*							m_pTrace;
 
-void_t InitDecoder (void_t);
-void_t UninitDecoder (void_t);
+void InitDecoder (void);
+void UninitDecoder (void);
 
 XMMREG_PROTECT_DECLARE(CWelsH264Decoder);
 

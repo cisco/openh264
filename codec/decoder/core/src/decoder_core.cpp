@@ -118,7 +118,7 @@ inline uint8_t GetTargetDqId (uint8_t uiTargetDqId,  SDecodingParam* psParam) {
 }
 
 
-inline void_t    HandleReferenceLostL0 (PWelsDecoderContext pCtx, PNalUnit pCurNal) {
+inline void    HandleReferenceLostL0 (PWelsDecoderContext pCtx, PNalUnit pCurNal) {
   if (0 == pCurNal->sNalHeaderExt.uiTemporalId) {
     pCtx->bReferenceLostAtT0Flag = true;
   }
@@ -130,7 +130,7 @@ inline void_t    HandleReferenceLostL0 (PWelsDecoderContext pCtx, PNalUnit pCurN
   pCtx->iErrorCode |= dsBitstreamError;
 }
 
-inline void_t    HandleReferenceLost (PWelsDecoderContext pCtx, PNalUnit pCurNal) {
+inline void    HandleReferenceLost (PWelsDecoderContext pCtx, PNalUnit pCurNal) {
   if ((0 == pCurNal->sNalHeaderExt.uiTemporalId) || (1 == pCurNal->sNalHeaderExt.uiTemporalId)) {
     pCtx->bReferenceLostAtT0Flag = true;
   }
@@ -309,7 +309,7 @@ int32_t WelsInitMemory (PWelsDecoderContext pCtx) {
  * Free memory introduced in WelsInitMemory at destruction of decoder.
  *
  */
-void_t WelsFreeMemory (PWelsDecoderContext pCtx) {
+void WelsFreeMemory (PWelsDecoderContext pCtx) {
   if (pCtx == NULL)
     return;
 
@@ -337,7 +337,7 @@ void_t WelsFreeMemory (PWelsDecoderContext pCtx) {
  *	pNal:	target NALUnit ptr
  *	pSrc:	NAL Unit bitstream
  */
-void_t DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc) {
+void DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc) {
   PNalUnitHeaderExt pHeaderExt = &pNal->sNalHeaderExt;
 
   uint8_t uiCurByte = *pSrc;
@@ -1029,7 +1029,7 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
   return ERR_NONE;
 }
 
-void_t UninitialDqLayersContext (PWelsDecoderContext pCtx) {
+void UninitialDqLayersContext (PWelsDecoderContext pCtx) {
   int32_t i = 0;
   int32_t j = 0;
 
@@ -1183,7 +1183,7 @@ void_t UninitialDqLayersContext (PWelsDecoderContext pCtx) {
   pCtx->bInitialDqLayersMem	= false;
 }
 
-void_t ResetCurrentAccessUnit (PWelsDecoderContext pCtx) {
+void ResetCurrentAccessUnit (PWelsDecoderContext pCtx) {
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
 
   pCurAu->uiEndPos		= 0;
@@ -1211,7 +1211,7 @@ void_t ResetCurrentAccessUnit (PWelsDecoderContext pCtx) {
  * \author
  * \history	11/16/2009
  */
-void_t ForceResetCurrentAccessUnit (PAccessUnit pAu) {
+void ForceResetCurrentAccessUnit (PAccessUnit pAu) {
   uint32_t uiSucAuIdx	= pAu->uiEndPos + 1;
   uint32_t uiCurAuIdx	= 0;
 
@@ -1235,13 +1235,13 @@ void_t ForceResetCurrentAccessUnit (PAccessUnit pAu) {
 }
 
 //clear current corrupted NAL from pNalUnitsList
-void_t ForceClearCurrentNal (PAccessUnit pAu) {
+void ForceClearCurrentNal (PAccessUnit pAu) {
   if (pAu->uiAvailUnitsNum > 0)
     -- pAu->uiAvailUnitsNum;
 }
 
 
-void_t CheckAvailNalUnitsListContinuity (PWelsDecoderContext pCtx, int32_t iStartIdx, int32_t iEndIdx) {
+void CheckAvailNalUnitsListContinuity (PWelsDecoderContext pCtx, int32_t iStartIdx, int32_t iEndIdx) {
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
 
   uint8_t uiLastNuDependencyId, uiLastNuLayerDqId;
@@ -1284,7 +1284,7 @@ void_t CheckAvailNalUnitsListContinuity (PWelsDecoderContext pCtx, int32_t iStar
 
 //main purpose: to support multi-slice and to include all slice which have the same uiDependencyId, uiQualityId and frame_num
 //for single slice, pIdxNoInterLayerPred SHOULD NOT be modified
-void_t RefineIdxNoInterLayerPred (PAccessUnit pCurAu, int32_t* pIdxNoInterLayerPred) {
+void RefineIdxNoInterLayerPred (PAccessUnit pCurAu, int32_t* pIdxNoInterLayerPred) {
   int32_t iLastNalDependId  = pCurAu->pNalUnitsList[*pIdxNoInterLayerPred]->sNalHeaderExt.uiDependencyId;
   int32_t iLastNalQualityId = pCurAu->pNalUnitsList[*pIdxNoInterLayerPred]->sNalHeaderExt.uiQualityId;
   uint8_t uiLastNalTId       = pCurAu->pNalUnitsList[*pIdxNoInterLayerPred]->sNalHeaderExt.uiTemporalId;
@@ -1471,7 +1471,7 @@ bool CheckIntegrityNalUnitsList (PWelsDecoderContext pCtx) {
   return true;
 }
 
-void_t CheckOnlyOneLayerInAu (PWelsDecoderContext pCtx) {
+void CheckOnlyOneLayerInAu (PWelsDecoderContext pCtx) {
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
 
   int32_t iEndIdx = pCurAu->uiEndPos;
@@ -1524,7 +1524,7 @@ int32_t WelsDecodeAccessUnitStart (PWelsDecoderContext pCtx) {
   return ERR_NONE;
 }
 
-void_t WelsDecodeAccessUnitEnd (PWelsDecoderContext pCtx) {
+void WelsDecodeAccessUnitEnd (PWelsDecoderContext pCtx) {
   // uninitialize context of current access unit and rbsp buffer clean
   ResetCurrentAccessUnit (pCtx);
 }
@@ -1596,7 +1596,7 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
   return 0;
 }
 
-static inline void_t InitDqLayerInfo (PDqLayer pDqLayer, PLayerInfo pLayerInfo, PNalUnit pNalUnit, PPicture pPicDec) {
+static inline void InitDqLayerInfo (PDqLayer pDqLayer, PLayerInfo pLayerInfo, PNalUnit pNalUnit, PPicture pPicDec) {
   PNalUnitHeaderExt pNalHdrExt    = &pNalUnit->sNalHeaderExt;
   PSliceHeaderExt pShExt			= &pNalUnit->sNalData.sVclNal.sSliceHeaderExt;
   PSliceHeader        pSh			= &pShExt->sSliceHeader;
@@ -1634,7 +1634,7 @@ static inline void_t InitDqLayerInfo (PDqLayer pDqLayer, PLayerInfo pLayerInfo, 
   pDqLayer->bUseRefBasePicFlag	= pNalHdrExt->bUseRefBasePicFlag;
 }
 
-void_t WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pSps, PPps pPps) {
+void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pSps, PPps pPps) {
   SNalUnitHeader* pNalHdr = &pCurNal->sNalHeaderExt.sNalUnitHeader;
   PSliceHeader pSh = &pCurNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
 
@@ -1661,7 +1661,7 @@ int32_t InitRefPicList (PWelsDecoderContext pCtx, const uint8_t kuiNRi, const bo
   return iRet;
 }
 
-void_t InitCurDqLayerData (PWelsDecoderContext pCtx, PDqLayer pCurDq) {
+void InitCurDqLayerData (PWelsDecoderContext pCtx, PDqLayer pCurDq) {
   if (NULL != pCtx && NULL != pCurDq) {
     pCurDq->pCsData[0]		= pCtx->pCsListXchg[0][0];
     pCurDq->pCsData[1]		= pCtx->pCsListXchg[0][1];
@@ -1691,7 +1691,7 @@ void_t InitCurDqLayerData (PWelsDecoderContext pCtx, PDqLayer pCurDq) {
 
 // added to reset state of parameter sets to waiting successive incoming IDR, 6/4/2010
 // It will be called in case packets lost/ broken and decoded failed at temporal level 0
-void_t ResetParameterSetsState (PWelsDecoderContext pCtx) {
+void ResetParameterSetsState (PWelsDecoderContext pCtx) {
   pCtx->bSpsExistAheadFlag	   = false;
   pCtx->bSubspsExistAheadFlag = false;
   pCtx->bPpsExistAheadFlag	   = false;

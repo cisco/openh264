@@ -200,7 +200,7 @@ int32_t	InitFmo (PFmo pFmo, PPps pPps, const int32_t kiMbWidth, const int32_t ki
  *
  * \return	NONE
  */
-void_t UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail) {
+void UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail) {
   PFmo pIter = pFmo;
   int32_t i = 0;
   int32_t iFreeNodes = 0;

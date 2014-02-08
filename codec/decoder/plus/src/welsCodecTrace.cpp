@@ -164,7 +164,7 @@ int32_t  CWelsCodecTrace::WriteString (int32_t iLevel, const str_t* pStr) {
 }
 
 
-IWelsTrace*   CreateWelsTrace (EWelsTraceType  eType,  void_t* pParam) {
+IWelsTrace*   CreateWelsTrace (EWelsTraceType  eType,  void* pParam) {
   IWelsTrace*   pTrace = NULL;
   switch (eType) {
   case Wels_Trace_Type:

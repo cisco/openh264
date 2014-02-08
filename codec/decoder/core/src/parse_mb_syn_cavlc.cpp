@@ -45,7 +45,7 @@
 
 namespace WelsDec {
 
-void_t GetNeighborAvailMbType (PNeighAvail pNeighAvail, PDqLayer pCurLayer) {
+void GetNeighborAvailMbType (PNeighAvail pNeighAvail, PDqLayer pCurLayer) {
   int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
   int32_t iCurXy, iTopXy, iLeftXy, iLeftTopXy, iRightTopXy;
   int32_t iCurX, iCurY;
@@ -92,7 +92,7 @@ void_t GetNeighborAvailMbType (PNeighAvail pNeighAvail, PDqLayer pCurLayer) {
   pNeighAvail->iLeftTopType  = (pNeighAvail->iLeftTopAvail  ? pCurLayer->pMbType[iLeftTopXy]  : 0);
   pNeighAvail->iRightTopType = (pNeighAvail->iRightTopAvail ? pCurLayer->pMbType[iRightTopXy] : 0);
 }
-void_t WelsFillCacheNonZeroCount (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
+void WelsFillCacheNonZeroCount (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
                                   PDqLayer pCurLayer) { //no matter slice type, intra_pred_constrained_flag
   int32_t iCurXy  = pCurLayer->iMbXyIndex;
   int32_t iTopXy  = 0;
@@ -143,7 +143,7 @@ void_t WelsFillCacheNonZeroCount (PNeighAvail pNeighAvail, uint8_t* pNonZeroCoun
       pNonZeroCount[5 + 8 * 5] = -1;//unavailable
   }
 }
-void_t WelsFillCacheConstrain1Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int8_t* pIntraPredMode,
+void WelsFillCacheConstrain1Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int8_t* pIntraPredMode,
                                         PDqLayer pCurLayer) { //no matter slice type
   int32_t iCurXy  = pCurLayer->iMbXyIndex;
   int32_t iTopXy  = 0;
@@ -189,7 +189,7 @@ void_t WelsFillCacheConstrain1Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZe
   }
 }
 
-void_t WelsFillCacheConstrain0Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int8_t* pIntraPredMode,
+void WelsFillCacheConstrain0Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int8_t* pIntraPredMode,
                                         PDqLayer pCurLayer) { //no matter slice type
   int32_t iCurXy  = pCurLayer->iMbXyIndex;
   int32_t iTopXy  = 0;
@@ -235,7 +235,7 @@ void_t WelsFillCacheConstrain0Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZe
   }
 }
 
-void_t WelsFillCacheInter (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
+void WelsFillCacheInter (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
                            int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30], PDqLayer pCurLayer) {
   int32_t iCurXy      = pCurLayer->iMbXyIndex;
   int32_t iTopXy      = 0;
@@ -472,10 +472,10 @@ int32_t CheckIntra4x4PredMode (int32_t* pSampleAvail, int8_t* pMode, int32_t iIn
   return iFinalMode;
 }
 
-void_t BsStartCavlc (PBitStringAux pBs) {
+void BsStartCavlc (PBitStringAux pBs) {
   pBs->iIndex = ((pBs->pCurBuf - pBs->pStartBuf) << 3) - (16 - pBs->iLeftBits);
 }
-void_t BsEndCavlc (PBitStringAux pBs) {
+void BsEndCavlc (PBitStringAux pBs) {
   pBs->pCurBuf   = pBs->pStartBuf + (pBs->iIndex >> 3);
   pBs->uiCurBits = ((((pBs->pCurBuf[0] << 8) | pBs->pCurBuf[1]) << 16) | (pBs->pCurBuf[2] << 8) | pBs->pCurBuf[3]) <<
                    (pBs->iIndex & 0x07);

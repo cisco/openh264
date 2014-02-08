@@ -68,7 +68,7 @@ virtual ~IWelsTrace() {};
 virtual int32_t  SetTraceLevel (int32_t iLevel) = 0;
 virtual int32_t  Trace (const int32_t kLevel, const str_t* kpFormat,  va_list pVl) = 0;
 
-static void_t  WelsTrace (void_t* pObject, const int32_t kLevel, const str_t* kpFormat, va_list pVl) {
+static void  WelsTrace (void* pObject, const int32_t kLevel, const str_t* kpFormat, va_list pVl) {
   IWelsTrace*   pThis = (IWelsTrace*) (pObject);
 
   if (pThis) {
@@ -76,7 +76,7 @@ static void_t  WelsTrace (void_t* pObject, const int32_t kLevel, const str_t* kp
   }
 }
 
-static void_t WelsVTrace (void_t* pObject, const int32_t kLevel, const str_t* kpFormat, ...) {
+static void WelsVTrace (void* pObject, const int32_t kLevel, const str_t* kpFormat, ...) {
   IWelsTrace* pThis = (IWelsTrace*) (pObject);
 
   va_list  argptr;
@@ -152,7 +152,7 @@ CM_WELS_TRACE m_fpErrorTrace;
 };
 
 
-IWelsTrace*   CreateWelsTrace (EWelsTraceType  eType,  void_t* pParam = NULL);
+IWelsTrace*   CreateWelsTrace (EWelsTraceType  eType,  void* pParam = NULL);
 
 } // namespace WelsDec
 

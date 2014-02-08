@@ -43,7 +43,7 @@ uint8_t g_ClipTable[256 + 2 *
 
 
 /* init pClip table to pClip the final dct data */
-void_t InitDctClipTable (void_t) {
+void InitDctClipTable (void) {
   uint8_t* p		        = &g_ClipTable[0];
   const int32_t kiLength	= MAX_NEG_CROP * sizeof (uint8_t);
   int32_t i               = 0;
@@ -65,7 +65,7 @@ void_t InitDctClipTable (void_t) {
 
 //NOTE::: p_RS should NOT be modified and it will lead to mismatch with JSVM.
 //        so should allocate kA array to store the temporary value (idct).
-void_t IdctResAddPred_c (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) {
+void IdctResAddPred_c (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) {
   int16_t iSrc[16];
 
   uint8_t* pDst			= pPred;
@@ -103,7 +103,7 @@ void_t IdctResAddPred_c (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) {
   }
 }
 
-void_t GetI4LumaIChromaAddrTable (int32_t* pBlockOffset, const int32_t kiYStride, const int32_t kiUVStride) {
+void GetI4LumaIChromaAddrTable (int32_t* pBlockOffset, const int32_t kiYStride, const int32_t kiUVStride) {
   int32_t* pOffset	   = pBlockOffset;
   int32_t i;
   const uint8_t kuiScan0 = g_kuiScan8[0];

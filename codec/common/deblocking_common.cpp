@@ -1,7 +1,7 @@
 #include "deblocking_common.h"
 #include "macros.h"
 //  C code only
-void_t DeblockLumaLt4_c (uint8_t* pPix, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha, int32_t iBeta,
+void DeblockLumaLt4_c (uint8_t* pPix, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha, int32_t iBeta,
                          int8_t* pTc) {
   for (int32_t i = 0; i < 16; i++) {
     int32_t iTc0 = pTc[i >> 2];
@@ -35,7 +35,7 @@ void_t DeblockLumaLt4_c (uint8_t* pPix, int32_t iStrideX, int32_t iStrideY, int3
     pPix += iStrideY;
   }
 }
-void_t DeblockLumaEq4_c (uint8_t* pPix, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha, int32_t iBeta) {
+void DeblockLumaEq4_c (uint8_t* pPix, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha, int32_t iBeta) {
   int32_t p0, p1, p2, q0, q1, q2;
   int32_t iDetaP0Q0;
   bool bDetaP1P0, bDetaQ1Q0;
@@ -77,19 +77,19 @@ void_t DeblockLumaEq4_c (uint8_t* pPix, int32_t iStrideX, int32_t iStrideY, int3
     pPix += iStrideY;
   }
 }
-void_t DeblockLumaLt4V_c (uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* tc) {
+void DeblockLumaLt4V_c (uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* tc) {
   DeblockLumaLt4_c (pPix, iStride, 1, iAlpha, iBeta, tc);
 }
-void_t DeblockLumaLt4H_c (uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* tc) {
+void DeblockLumaLt4H_c (uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* tc) {
   DeblockLumaLt4_c (pPix, 1, iStride, iAlpha, iBeta, tc);
 }
-void_t DeblockLumaEq4V_c (uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
+void DeblockLumaEq4V_c (uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
   DeblockLumaEq4_c (pPix, iStride, 1, iAlpha, iBeta);
 }
-void_t DeblockLumaEq4H_c (uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
+void DeblockLumaEq4H_c (uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
   DeblockLumaEq4_c (pPix, 1, iStride, iAlpha, iBeta);
 }
-void_t DeblockChromaLt4_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha,
+void DeblockChromaLt4_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha,
                            int32_t iBeta, int8_t* pTc) {
   int32_t p0, p1, q0, q1, iDeta;
   bool bDetaP0Q0, bDetaP1P0, bDetaQ1Q0;
@@ -131,7 +131,7 @@ void_t DeblockChromaLt4_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, i
     pPixCr += iStrideY;
   }
 }
-void_t DeblockChromaEq4_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha,
+void DeblockChromaEq4_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha,
                            int32_t iBeta) {
   int32_t p0, p1, q0, q1;
   bool bDetaP0Q0, bDetaP1P0, bDetaQ1Q0;
@@ -165,18 +165,18 @@ void_t DeblockChromaEq4_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, i
     pPixCb += iStrideY;
   }
 }
-void_t DeblockChromaLt4V_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
+void DeblockChromaLt4V_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
                             int8_t* tc) {
   DeblockChromaLt4_c (pPixCb, pPixCr, iStride, 1, iAlpha, iBeta, tc);
 }
-void_t DeblockChromaLt4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
+void DeblockChromaLt4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
                             int8_t* tc) {
   DeblockChromaLt4_c (pPixCb, pPixCr, 1, iStride, iAlpha, iBeta, tc);
 }
-void_t DeblockChromaEq4V_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
+void DeblockChromaEq4V_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
   DeblockChromaEq4_c (pPixCb, pPixCr, iStride, 1, iAlpha, iBeta);
 }
-void_t DeblockChromaEq4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
+void DeblockChromaEq4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
   DeblockChromaEq4_c (pPixCb, pPixCr, 1, iStride, iAlpha, iBeta);
 }
 

@@ -51,7 +51,7 @@ namespace WelsDec {
 #define I8x8_COUNT 8
 #define I16x16_COUNT 16
 
-void_t WelsI4x4LumaPredV_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI4x4LumaPredV_c (uint8_t* pPred, const int32_t kiStride) {
   const uint32_t kuiVal = LD32 (pPred - kiStride);
 
   ST32 (pPred						    , kuiVal);
@@ -60,7 +60,7 @@ void_t WelsI4x4LumaPredV_c (uint8_t* pPred, const int32_t kiStride) {
   ST32 (pPred + (kiStride << 1) + kiStride	, kuiVal);
 }
 
-void_t WelsI4x4LumaPredH_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI4x4LumaPredH_c (uint8_t* pPred, const int32_t kiStride) {
   const int32_t kiStride2 = kiStride << 1;
   const int32_t kiStride3 = kiStride2 + kiStride;
   const uint32_t kuiL0 = 0x01010101U * pPred[-1          ];
@@ -74,7 +74,7 @@ void_t WelsI4x4LumaPredH_c (uint8_t* pPred, const int32_t kiStride) {
   ST32 (pPred + kiStride3, kuiL3);
 }
 
-void_t WelsI4x4LumaPredDc_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI4x4LumaPredDc_c (uint8_t* pPred, const int32_t kiStride) {
   const int32_t kiStride2	= kiStride << 1;
   const int32_t kiStride3	= kiStride2 + kiStride;
   const uint8_t kuiMean	= (pPred[-1] + pPred[-1 + kiStride] + pPred[-1 + kiStride2] + pPred[-1 + kiStride3] +
@@ -87,7 +87,7 @@ void_t WelsI4x4LumaPredDc_c (uint8_t* pPred, const int32_t kiStride) {
   ST32 (pPred + kiStride3, kuiMean32);
 }
 
-void_t WelsI4x4LumaPredDcLeft_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI4x4LumaPredDcLeft_c (uint8_t* pPred, const int32_t kiStride) {
   const int32_t kiStride2	= kiStride << 1;
   const int32_t kiStride3	= kiStride2 + kiStride;
   const uint8_t kuiMean	= (pPred[-1] + pPred[-1 + kiStride] + pPred[-1 + kiStride2] + pPred[-1 + kiStride3] + 2) >> 2;
@@ -99,7 +99,7 @@ void_t WelsI4x4LumaPredDcLeft_c (uint8_t* pPred, const int32_t kiStride) {
   ST32 (pPred + kiStride3, kuiMean32);
 }
 
-void_t WelsI4x4LumaPredDcTop_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI4x4LumaPredDcTop_c (uint8_t* pPred, const int32_t kiStride) {
   const int32_t kiStride2	= kiStride << 1;
   const int32_t kiStride3	= kiStride2 + kiStride;
   const uint8_t kuiMean	= (pPred[-kiStride] + pPred[-kiStride + 1] + pPred[-kiStride + 2] + pPred[-kiStride + 3] + 2) >>
@@ -112,7 +112,7 @@ void_t WelsI4x4LumaPredDcTop_c (uint8_t* pPred, const int32_t kiStride) {
   ST32 (pPred + kiStride3, kuiMean32);
 }
 
-void_t WelsI4x4LumaPredDcNA_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI4x4LumaPredDcNA_c (uint8_t* pPred, const int32_t kiStride) {
   const uint32_t kuiDC32		= 0x80808080U;
 
   ST32 (pPred                       , kuiDC32);
@@ -122,7 +122,7 @@ void_t WelsI4x4LumaPredDcNA_c (uint8_t* pPred, const int32_t kiStride) {
 }
 
 /*down pLeft*/
-void_t WelsI4x4LumaPredDDL_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI4x4LumaPredDDL_c (uint8_t* pPred, const int32_t kiStride) {
   const int32_t kiStride2	= kiStride << 1;
   const int32_t kiStride3	= kiStride + kiStride2;
   /*get pTop*/
@@ -151,7 +151,7 @@ void_t WelsI4x4LumaPredDDL_c (uint8_t* pPred, const int32_t kiStride) {
 }
 
 /*down pLeft*/
-void_t WelsI4x4LumaPredDDLTop_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI4x4LumaPredDDLTop_c (uint8_t* pPred, const int32_t kiStride) {
   const int32_t kiStride2	= kiStride << 1;
   const int32_t kiStride3	= kiStride + kiStride2;
   /*get pTop*/
@@ -178,7 +178,7 @@ void_t WelsI4x4LumaPredDDLTop_c (uint8_t* pPred, const int32_t kiStride) {
 
 
 /*down right*/
-void_t WelsI4x4LumaPredDDR_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI4x4LumaPredDDR_c (uint8_t* pPred, const int32_t kiStride) {
   const int32_t kiStride2	= kiStride << 1;
   const int32_t kiStride3	= kiStride + kiStride2;
   uint8_t* ptopleft		= &pPred[- (kiStride + 1)];
@@ -218,7 +218,7 @@ void_t WelsI4x4LumaPredDDR_c (uint8_t* pPred, const int32_t kiStride) {
 
 
 /*vertical pLeft*/
-void_t WelsI4x4LumaPredVL_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI4x4LumaPredVL_c (uint8_t* pPred, const int32_t kiStride) {
   const int32_t kiStride2	= kiStride << 1;
   const int32_t kiStride3	= kiStride + kiStride2;
   uint8_t* ptopleft		= &pPred[- (kiStride + 1)];
@@ -255,7 +255,7 @@ void_t WelsI4x4LumaPredVL_c (uint8_t* pPred, const int32_t kiStride) {
 }
 
 /*vertical pLeft*/
-void_t WelsI4x4LumaPredVLTop_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI4x4LumaPredVLTop_c (uint8_t* pPred, const int32_t kiStride) {
   const int32_t kiStride2	    = kiStride << 1;
   const int32_t kiStride3	    = kiStride + kiStride2;
   uint8_t* ptopleft		    = &pPred[- (kiStride + 1)];
@@ -286,7 +286,7 @@ void_t WelsI4x4LumaPredVLTop_c (uint8_t* pPred, const int32_t kiStride) {
 
 
 /*vertical right*/
-void_t WelsI4x4LumaPredVR_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI4x4LumaPredVR_c (uint8_t* pPred, const int32_t kiStride) {
   const int32_t kiStride2	    = kiStride << 1;
   const int32_t kiStride3	    = kiStride + kiStride2;
   const uint8_t kuiLT		    = pPred[-kiStride - 1];
@@ -317,7 +317,7 @@ void_t WelsI4x4LumaPredVR_c (uint8_t* pPred, const int32_t kiStride) {
 }
 
 /*horizontal up*/
-void_t WelsI4x4LumaPredHU_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI4x4LumaPredHU_c (uint8_t* pPred, const int32_t kiStride) {
   const int32_t kiStride2	    = kiStride << 1;
   const int32_t kiStride3	    = kiStride + kiStride2;
   /*get pLeft*/
@@ -343,7 +343,7 @@ void_t WelsI4x4LumaPredHU_c (uint8_t* pPred, const int32_t kiStride) {
 }
 
 /*horizontal down*/
-void_t WelsI4x4LumaPredHD_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI4x4LumaPredHD_c (uint8_t* pPred, const int32_t kiStride) {
   const int32_t kiStride2 	= kiStride << 1;
   const int32_t kiStride3	    = kiStride + kiStride2;
   const uint8_t kuiLT		    = pPred[- (kiStride + 1)];
@@ -380,7 +380,7 @@ void_t WelsI4x4LumaPredHD_c (uint8_t* pPred, const int32_t kiStride) {
   ST32 (pPred + kiStride3, LD32 (kuiList));
 }
 
-void_t WelsIChromaPredV_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsIChromaPredV_c (uint8_t* pPred, const int32_t kiStride) {
   const uint64_t kuiVal64	= LD64 (&pPred[-kiStride]);
   const int32_t kiStride2	= kiStride  << 1;
   const int32_t kiStride4 = kiStride2 << 1;
@@ -395,7 +395,7 @@ void_t WelsIChromaPredV_c (uint8_t* pPred, const int32_t kiStride) {
   ST64 (pPred + (kiStride << 3) - kiStride , kuiVal64);
 }
 
-void_t WelsIChromaPredH_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsIChromaPredH_c (uint8_t* pPred, const int32_t kiStride) {
   int32_t iTmp = (kiStride << 3) - kiStride;
   uint8_t i = 7;
 
@@ -410,7 +410,7 @@ void_t WelsIChromaPredH_c (uint8_t* pPred, const int32_t kiStride) {
 }
 
 
-void_t WelsIChromaPredPlane_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsIChromaPredPlane_c (uint8_t* pPred, const int32_t kiStride) {
   int32_t a = 0, b = 0, c = 0, H = 0, V = 0;
   int32_t i, j;
   uint8_t* pTop = &pPred[-kiStride];
@@ -436,7 +436,7 @@ void_t WelsIChromaPredPlane_c (uint8_t* pPred, const int32_t kiStride) {
 }
 
 
-void_t WelsIChromaPredDc_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsIChromaPredDc_c (uint8_t* pPred, const int32_t kiStride) {
   const int32_t kiL1		= kiStride - 1;
   const int32_t kiL2		= kiL1 + kiStride;
   const int32_t kiL3		= kiL2 + kiStride;
@@ -467,7 +467,7 @@ void_t WelsIChromaPredDc_c (uint8_t* pPred, const int32_t kiStride) {
   ST64 (pPred + kiL7 + 1, kuiDN64);
 }
 
-void_t WelsIChromaPredDcLeft_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsIChromaPredDcLeft_c (uint8_t* pPred, const int32_t kiStride) {
   const int32_t kiL1	=   -1 + kiStride;
   const int32_t kiL2	= kiL1 + kiStride;
   const int32_t kiL3	= kiL2 + kiStride;
@@ -491,7 +491,7 @@ void_t WelsIChromaPredDcLeft_c (uint8_t* pPred, const int32_t kiStride) {
   ST64 (pPred + kiL7 + 1, kuiDN64);
 }
 
-void_t WelsIChromaPredDcTop_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsIChromaPredDcTop_c (uint8_t* pPred, const int32_t kiStride) {
   int32_t iTmp			= (kiStride << 3) - kiStride;
   /*caculate the kMean value*/
   const uint8_t kuiM1	    = (pPred[-kiStride] + pPred[1 - kiStride] + pPred[2 - kiStride] + pPred[3 - kiStride] + 2) >> 2;
@@ -508,7 +508,7 @@ void_t WelsIChromaPredDcTop_c (uint8_t* pPred, const int32_t kiStride) {
   } while (i-- > 0);
 }
 
-void_t WelsIChromaPredDcNA_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsIChromaPredDcNA_c (uint8_t* pPred, const int32_t kiStride) {
   int32_t iTmp = (kiStride << 3) - kiStride;
   const uint64_t kuiDC64 = 0x8080808080808080ULL;
   uint8_t i = 7;
@@ -520,7 +520,7 @@ void_t WelsIChromaPredDcNA_c (uint8_t* pPred, const int32_t kiStride) {
   } while (i-- > 0);
 }
 
-void_t WelsI16x16LumaPredV_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI16x16LumaPredV_c (uint8_t* pPred, const int32_t kiStride) {
   int32_t iTmp			= (kiStride << 4) - kiStride;
   const uint64_t kuiTop1	= LD64 (pPred - kiStride);
   const uint64_t kuiTop2  = LD64 (pPred - kiStride + 8);
@@ -534,7 +534,7 @@ void_t WelsI16x16LumaPredV_c (uint8_t* pPred, const int32_t kiStride) {
   } while (i-- > 0);
 }
 
-void_t WelsI16x16LumaPredH_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI16x16LumaPredH_c (uint8_t* pPred, const int32_t kiStride) {
   int32_t iTmp = (kiStride << 4) - kiStride;
   uint8_t i = 15;
 
@@ -549,7 +549,7 @@ void_t WelsI16x16LumaPredH_c (uint8_t* pPred, const int32_t kiStride) {
   } while (i-- > 0);
 }
 
-void_t WelsI16x16LumaPredPlane_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI16x16LumaPredPlane_c (uint8_t* pPred, const int32_t kiStride) {
   int32_t a = 0, b = 0, c = 0, H = 0, V = 0;
   int32_t i, j;
   uint8_t* pTop = &pPred[-kiStride];
@@ -574,7 +574,7 @@ void_t WelsI16x16LumaPredPlane_c (uint8_t* pPred, const int32_t kiStride) {
   }
 }
 
-void_t WelsI16x16LumaPredDc_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI16x16LumaPredDc_c (uint8_t* pPred, const int32_t kiStride) {
   int32_t iTmp = (kiStride << 4) - kiStride;
   int32_t iSum = 0;
   uint8_t i = 15;
@@ -596,7 +596,7 @@ void_t WelsI16x16LumaPredDc_c (uint8_t* pPred, const int32_t kiStride) {
 }
 
 
-void_t WelsI16x16LumaPredDcTop_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI16x16LumaPredDcTop_c (uint8_t* pPred, const int32_t kiStride) {
   int32_t iTmp = (kiStride << 4) - kiStride;
   int32_t iSum = 0;
   uint8_t i = 15;
@@ -615,7 +615,7 @@ void_t WelsI16x16LumaPredDcTop_c (uint8_t* pPred, const int32_t kiStride) {
   } while (i-- > 0);
 }
 
-void_t WelsI16x16LumaPredDcLeft_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI16x16LumaPredDcLeft_c (uint8_t* pPred, const int32_t kiStride) {
   int32_t iTmp = (kiStride << 4) - kiStride;
   int32_t iSum = 0;
   uint64_t uiMean64 = 0;
@@ -640,7 +640,7 @@ void_t WelsI16x16LumaPredDcLeft_c (uint8_t* pPred, const int32_t kiStride) {
   } while (i-- > 0);
 }
 
-void_t WelsI16x16LumaPredDcNA_c (uint8_t* pPred, const int32_t kiStride) {
+void WelsI16x16LumaPredDcNA_c (uint8_t* pPred, const int32_t kiStride) {
   const uint64_t kuiDC64 = 0x8080808080808080ULL;
   int32_t iTmp = (kiStride << 4) - kiStride;
   uint8_t i = 15;

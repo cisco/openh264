@@ -57,8 +57,8 @@ using namespace std;
 
 //#define STICK_STREAM_SIZE	// For Demo interfaces test with track file of integrated frames
 
-void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, const char* kpOuputFileName,
-                           int32_t& iWidth, int32_t& iHeight, void_t* pOptionFileName) {
+void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, const char* kpOuputFileName,
+                           int32_t& iWidth, int32_t& iHeight, void* pOptionFileName) {
   FILE* pH264File	  = NULL;
   FILE* pYuvFile	  = NULL;
   FILE* pOptionFile = NULL;
@@ -68,7 +68,7 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
   uint8_t* pBuf = NULL;
   uint8_t uiStartCode[4] = {0, 0, 0, 1};
 
-  void_t* pData[3] = {NULL};
+  void* pData[3] = {NULL};
   uint8_t* pDst[3] = {NULL};
   SBufferInfo sDstBufInfo;
 
@@ -171,7 +171,7 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
     if (iBufPos >= iFileSize) {
       iEndOfStreamFlag = true;
       if (iEndOfStreamFlag)
-        pDecoder->SetOption (DECODER_OPTION_END_OF_STREAM, (void_t*)&iEndOfStreamFlag);
+        pDecoder->SetOption (DECODER_OPTION_END_OF_STREAM, (void*)&iEndOfStreamFlag);
       break;
     }
 
@@ -228,7 +228,7 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
     iTotal	+= iEnd - iStart;
     if (sDstBufInfo.iBufferStatus == 1) {
       iFrameNum++;
-      cOutputModule.Process ((void_t**)pDst, &sDstBufInfo, pYuvFile);
+      cOutputModule.Process ((void**)pDst, &sDstBufInfo, pYuvFile);
       if (sDstBufInfo.eBufferProperty == BUFFER_HOST) {
         iWidth  = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
         iHeight = sDstBufInfo.UsrData.sSystemBuffer.iHeight;
@@ -267,7 +267,7 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
   }
 
   if (sDstBufInfo.iBufferStatus == 1) {
-    cOutputModule.Process ((void_t**)pDst, &sDstBufInfo, pYuvFile);
+    cOutputModule.Process ((void**)pDst, &sDstBufInfo, pYuvFile);
     if (sDstBufInfo.eBufferProperty == BUFFER_HOST) {
       iWidth  = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
       iHeight = sDstBufInfo.UsrData.sSystemBuffer.iHeight;
@@ -446,7 +446,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
 
 
   H264DecodeInstance (pDecoder, strInputFile.c_str(), strOutputFile.c_str(), iWidth, iHeight,
-                      (!strOptionFile.empty() ? (void_t*) (const_cast<char*> (strOptionFile.c_str())) : NULL));
+                      (!strOptionFile.empty() ? (void*) (const_cast<char*> (strOptionFile.c_str())) : NULL));
 
   if (sDecParam.pFileNameRestructed != NULL) {
     delete []sDecParam.pFileNameRestructed;

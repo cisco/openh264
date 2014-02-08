@@ -53,7 +53,7 @@ REMOVE_BASE = 1,
 REMOVE_BASE_FIRST = 2
 } ERemoveFlag;
 
-void_t  WelsResetRefPic (PWelsDecoderContext pCtx);
+void  WelsResetRefPic (PWelsDecoderContext pCtx);
 int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc);
 int32_t WelsReorderRefList (PWelsDecoderContext pCtx);
 int32_t WelsMarkAsRef (PWelsDecoderContext pCtx, const bool kbRefBaseMarkingFlag);

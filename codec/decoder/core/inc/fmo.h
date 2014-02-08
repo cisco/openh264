@@ -84,7 +84,7 @@ int32_t	InitFmo (PFmo pFmo, PPps pPps, const int32_t kiMbWidth, const int32_t ki
  *
  * \return	NONE
  */
-void_t UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail);
+void UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail);
 
 /*!
  * \brief	update/insert FMO parameter unit

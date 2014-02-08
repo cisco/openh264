@@ -43,7 +43,7 @@
 #include "mb_cache.h"
 
 namespace WelsDec {
-void_t PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
+void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
   bool bTopAvail, bLeftTopAvail, bRightTopAvail, bLeftAvail;
 
   int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
@@ -194,7 +194,7 @@ void_t PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
 
 
 //basic iMVs prediction unit for iMVs partition width (4, 2, 1)
-void_t PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
+void PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
                int32_t iPartIdx, int32_t iPartWidth, int8_t iRef, int16_t iMVP[2]) {
   const uint8_t kuiLeftIdx	= g_kuiCache30ScanIdx[iPartIdx] - 1;
   const uint8_t kuiTopIdx		= g_kuiCache30ScanIdx[iPartIdx] - 6;
@@ -241,7 +241,7 @@ void_t PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A]
     iMVP[1] = WelsMedian (iAMV[1], iBMV[1], iCMV[1]);
   }
 }
-void_t PredInter8x16Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
+void PredInter8x16Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
                         int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]) {
   if (0 == iPartIdx) {
     const int8_t kiLeftRef = iRefIndex[0][6];
@@ -264,7 +264,7 @@ void_t PredInter8x16Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefInde
 
   PredMv (iMotionVector, iRefIndex, iPartIdx, 2, iRef, iMVP);
 }
-void_t PredInter16x8Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
+void PredInter16x8Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
                         int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]) {
   if (0 == iPartIdx) {
     const int8_t kiTopRef = iRefIndex[0][1];
@@ -285,7 +285,7 @@ void_t PredInter16x8Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefInde
 
 //update iMVs and iRefIndex cache for current MB, only for P_16*16 (SKIP inclusive)
 /* can be further optimized */
-void_t UpdateP16x16MotionInfo (PDqLayer pCurDqLayer, int8_t iRef, int16_t iMVs[2]) {
+void UpdateP16x16MotionInfo (PDqLayer pCurDqLayer, int8_t iRef, int16_t iMVs[2]) {
   const int16_t kiRef2		= (iRef << 8) | iRef;
   const int32_t kiMV32		= LD32 (iMVs);
   int32_t i;
@@ -308,7 +308,7 @@ void_t UpdateP16x16MotionInfo (PDqLayer pCurDqLayer, int8_t iRef, int16_t iMVs[2
 
 //update iRefIndex and iMVs of Mb, only for P16x8
 /*need further optimization, mb_cache not work */
-void_t UpdateP16x8MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][30][MV_A],
+void UpdateP16x8MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][30][MV_A],
                               int8_t iRefIndex[LIST_A][30],
                               int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]) {
   const int16_t kiRef2 = (iRef << 8) | iRef;
@@ -338,7 +338,7 @@ void_t UpdateP16x8MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A
   }
 }
 //update iRefIndex and iMVs of both Mb and Mb_cache, only for P8x16
-void_t UpdateP8x16MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][30][MV_A],
+void UpdateP8x16MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][30][MV_A],
                               int8_t iRefIndex[LIST_A][30],
                               int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]) {
   const int16_t kiRef2 = (iRef << 8) | iRef;

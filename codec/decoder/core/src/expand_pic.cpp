@@ -37,7 +37,7 @@
 namespace WelsDec {
 
 // rewrite it (split into luma & chroma) that is helpful for mmx/sse2 optimization perform, 9/27/2009
-static inline void_t ExpandPictureLuma_c (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicWidth,
+static inline void ExpandPictureLuma_c (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicWidth,
     const int32_t kiPicHeight) {
   uint8_t* pTmp				= pDst;
   uint8_t* pDstLastLine		= pTmp + (kiPicHeight - 1) * kiStride;
@@ -77,7 +77,7 @@ static inline void_t ExpandPictureLuma_c (uint8_t* pDst, const int32_t kiStride,
   } while (i < kiPicHeight);
 }
 
-static inline void_t ExpandPictureChroma_c (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicWidth,
+static inline void ExpandPictureChroma_c (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicWidth,
     const int32_t kiPicHeight) {
   uint8_t* pTmp				= pDst;
   uint8_t* pDstLastLine		= pTmp + (kiPicHeight - 1) * kiStride;
@@ -117,7 +117,7 @@ static inline void_t ExpandPictureChroma_c (uint8_t* pDst, const int32_t kiStrid
   } while (i < kiPicHeight);
 }
 
-void_t InitExpandPictureFunc (SExpandPicFunc* pExpandPicFunc, const uint32_t kuiCpuFlags) {
+void InitExpandPictureFunc (SExpandPicFunc* pExpandPicFunc, const uint32_t kuiCpuFlags) {
   pExpandPicFunc->pExpandLumaPicture	= ExpandPictureLuma_c;
   pExpandPicFunc->pExpandChromaPicture[0] = ExpandPictureChroma_c;
   pExpandPicFunc->pExpandChromaPicture[1] = ExpandPictureChroma_c;
@@ -131,7 +131,7 @@ void_t InitExpandPictureFunc (SExpandPicFunc* pExpandPicFunc, const uint32_t kui
 #endif//X86_ASM
 }
 
-void_t ExpandReferencingPicture (PPicture pPic, PExpandPictureFunc pExpLuma, PExpandPictureFunc pExpChroma[2]) {
+void ExpandReferencingPicture (PPicture pPic, PExpandPictureFunc pExpLuma, PExpandPictureFunc pExpChroma[2]) {
   /*local variable*/
   uint8_t* pPicY = pPic->pData[0];
   uint8_t* pPicCb = pPic->pData[1];

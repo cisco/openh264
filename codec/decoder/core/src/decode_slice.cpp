@@ -192,7 +192,7 @@ int32_t WelsMbInterConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer) {
   return 0;
 }
 
-void_t WelsLumaDcDequantIdct (int16_t* pBlock, int32_t iQp) {
+void WelsLumaDcDequantIdct (int16_t* pBlock, int32_t iQp) {
   const int32_t kiQMul = g_kuiDequantCoeff[iQp][0];
 #define STRIDE 16
   int32_t i;
@@ -270,7 +270,7 @@ int32_t WelsMbInterPrediction (PWelsDecoderContext pCtx, PDqLayer pCurLayer) {
   return 0;
 }
 
-void_t WelsMbCopy (uint8_t* pDst, int32_t iStrideDst, uint8_t* pSrc, int32_t iStrideSrc,
+void WelsMbCopy (uint8_t* pDst, int32_t iStrideDst, uint8_t* pSrc, int32_t iStrideSrc,
                    int32_t iHeight, int32_t iWidth) {
   int32_t i;
   int32_t iOffsetDst = 0, iOffsetSrc = 0;
@@ -328,7 +328,7 @@ int32_t WelsTargetMbConstruction (PWelsDecoderContext pCtx) {
   return 0;
 }
 
-void_t WelsChromaDcIdct (int16_t* pBlock) {
+void WelsChromaDcIdct (int16_t* pBlock) {
   int32_t iStride = 32;
   int32_t iXStride = 16;
   int32_t iStride1 = iXStride + iStride;
@@ -1111,7 +1111,7 @@ int32_t WelsDecodeMbCavlcPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur) {
   return 0;
 }
 
-void_t WelsBlockInit (int16_t* pBlock, int32_t iWidth, int32_t iHeight, int32_t iStride, uint8_t uiVal) {
+void WelsBlockInit (int16_t* pBlock, int32_t iWidth, int32_t iHeight, int32_t iStride, uint8_t uiVal) {
   int32_t i;
   int16_t* pDst = pBlock;
 
@@ -1121,7 +1121,7 @@ void_t WelsBlockInit (int16_t* pBlock, int32_t iWidth, int32_t iHeight, int32_t 
   }
 }
 
-void_t WelsBlockFuncInit (SBlockFunc*   pFunc,  int32_t iCpu) {
+void WelsBlockFuncInit (SBlockFunc*   pFunc,  int32_t iCpu) {
   pFunc->pWelsBlockZero16x16Func		= WelsBlockZero16x16_c;
   pFunc->pWelsBlockZero8x8Func	    = WelsBlockZero8x8_c;
   pFunc->pWelsSetNonZeroCountFunc	    = SetNonZeroCount_c;
@@ -1133,15 +1133,15 @@ void_t WelsBlockFuncInit (SBlockFunc*   pFunc,  int32_t iCpu) {
   }
 #endif
 }
-void_t WelsBlockZero16x16_c (int16_t* pBlock, int32_t iStride) {
+void WelsBlockZero16x16_c (int16_t* pBlock, int32_t iStride) {
   WelsBlockInit (pBlock, 16, 16, iStride, 0);
 }
 
-void_t WelsBlockZero8x8_c (int16_t* pBlock, int32_t iStride) {
+void WelsBlockZero8x8_c (int16_t* pBlock, int32_t iStride) {
   WelsBlockInit (pBlock, 8, 8, iStride, 0);
 }
 
-void_t SetNonZeroCount_c (int16_t* pBlock, int8_t* pNonZeroCount) {
+void SetNonZeroCount_c (int16_t* pBlock, int8_t* pNonZeroCount) {
   int32_t i;
   int32_t iIndex;
 

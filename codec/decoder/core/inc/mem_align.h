@@ -59,7 +59,7 @@ extern "C" {
 * \note	N/A
 *************************************************************************************
 */
-void_t* WelsMalloc (const uint32_t kuiSize, const str_t* kpTag);
+void* WelsMalloc (const uint32_t kuiSize, const str_t* kpTag);
 
 /*!
 *************************************************************************************
@@ -73,7 +73,7 @@ void_t* WelsMalloc (const uint32_t kuiSize, const str_t* kpTag);
 * \note	N/A
 *************************************************************************************
 */
-void_t WelsFree (void_t* pPtr, const str_t* kpTag);
+void WelsFree (void* pPtr, const str_t* kpTag);
 
 #define WELS_SAFE_FREE(pPtr, pTag)		if (pPtr) { WelsFree(pPtr, pTag); pPtr = NULL; }
 

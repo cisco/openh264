@@ -76,7 +76,7 @@ WELS_EXTERN McHorVer20WidthEq4_mmx
 
 ALIGN 16
 ;*******************************************************************************
-; void_t McHorVer20WidthEq4_mmx( uint8_t *pSrc,
+; void McHorVer20WidthEq4_mmx( uint8_t *pSrc,
 ;                       int iSrcStride,
 ;						uint8_t *pDst,
 ;						int iDstStride,
@@ -179,7 +179,7 @@ WELS_EXTERN McHorVer20WidthEq16_sse2
 
 ALIGN 16
 ;***********************************************************************
-; void_t McHorVer22Width8HorFirst_sse2(int16_t *pSrc,
+; void McHorVer22Width8HorFirst_sse2(int16_t *pSrc,
 ;                       int16_t iSrcStride,
 ;						uint8_t *pDst,
 ;						int32_t iDstStride
@@ -241,7 +241,7 @@ McHorVer22Width8HorFirst_sse2:
 
 ALIGN 16
 ;*******************************************************************************
-; void_t McHorVer20WidthEq8_sse2(  uint8_t *pSrc,
+; void McHorVer20WidthEq8_sse2(  uint8_t *pSrc,
 ;                       int iSrcStride,
 ;												uint8_t *pDst,
 ;												int iDstStride,
@@ -307,7 +307,7 @@ McHorVer20WidthEq8_sse2:
 
 ALIGN 16
 ;*******************************************************************************
-; void_t McHorVer20WidthEq16_sse2(  uint8_t *pSrc,
+; void McHorVer20WidthEq16_sse2(  uint8_t *pSrc,
 ;                       int iSrcStride,
 ;												uint8_t *pDst,
 ;												int iDstStride,
@@ -398,7 +398,7 @@ McHorVer20WidthEq16_sse2:
 
 
 ;*******************************************************************************
-; void_t McHorVer02WidthEq8_sse2( uint8_t *pSrc,
+; void McHorVer02WidthEq8_sse2( uint8_t *pSrc,
 ;                       int iSrcStride,
 ;                       uint8_t *pDst,
 ;                       int iDstStride,

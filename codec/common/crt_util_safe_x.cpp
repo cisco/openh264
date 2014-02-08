@@ -239,7 +239,7 @@ str_t* WelsStrcat (str_t* pDest, int32_t iSizeInBytes, const str_t* kpSrc) {
     return WelsStrncpy(pDest + iCurLen, iSizeInBytes - iCurLen, kpSrc);
 }
 
-int32_t WelsFwrite (const void_t* kpBuffer, int32_t iSize, int32_t iCount, WelsFileHandle* pFp) {
+int32_t WelsFwrite (const void* kpBuffer, int32_t iSize, int32_t iCount, WelsFileHandle* pFp) {
   return fwrite (kpBuffer, iSize, iCount, pFp);
 }
 

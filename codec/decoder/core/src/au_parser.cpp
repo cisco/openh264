@@ -559,7 +559,7 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
   return iErr;
 }
 
-void_t ParseRefBasePicMarking (PBitStringAux pBs, PRefBasePicMarking pRefBasePicMarking) {
+void ParseRefBasePicMarking (PBitStringAux pBs, PRefBasePicMarking pRefBasePicMarking) {
   const bool kbAdaptiveMarkingModeFlag = !!BsGetOneBit (pBs);
   pRefBasePicMarking->bAdaptiveRefBasePicMarkingModeFlag = kbAdaptiveMarkingModeFlag;
   if (kbAdaptiveMarkingModeFlag) {
@@ -583,7 +583,7 @@ void_t ParseRefBasePicMarking (PBitStringAux pBs, PRefBasePicMarking pRefBasePic
   }
 }
 
-void_t ParsePrefixNalUnit (PWelsDecoderContext pCtx, PBitStringAux pBs) {
+void ParsePrefixNalUnit (PWelsDecoderContext pCtx, PBitStringAux pBs) {
   PNalUnit pCurNal = &pCtx->sPrefixNal;
 
   if (pCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc != 0) {
@@ -1030,7 +1030,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux)
  * \note	Call it in case eNalUnitType is NAL_UNIT_SEI.
  *************************************************************************************
  */
-int32_t ParseSei (void_t* pSei, PBitStringAux pBsAux) {	// reserved Sei_Msg type
+int32_t ParseSei (void* pSei, PBitStringAux pBsAux) {	// reserved Sei_Msg type
 
 
   return ERR_NONE;
