@@ -71,13 +71,13 @@ typedef   pthread_mutex_t   WELS_MUTEX;
 
 #endif
 
-typedef long_t WELS_THREAD_ERROR_CODE;
+typedef int32_t WELS_THREAD_ERROR_CODE;
 
 #define   WELS_THREAD_ERROR_OK					0
-#define   WELS_THREAD_ERROR_GENERIAL			((unsigned long)(-1))
+#define   WELS_THREAD_ERROR_GENERAL			((unsigned long)(-1))
 #define   WELS_THREAD_ERROR_WAIT_OBJECT_0		0
 #define	  WELS_THREAD_ERROR_WAIT_TIMEOUT		((unsigned long)0x00000102L)
-#define	  WELS_THREAD_ERROR_WAIT_FAILED		    WELS_THREAD_ERROR_GENERIAL
+#define	  WELS_THREAD_ERROR_WAIT_FAILED		    WELS_THREAD_ERROR_GENERAL
 
 WELS_THREAD_ERROR_CODE   WelsMutexInit (WELS_MUTEX*    mutex);
 WELS_THREAD_ERROR_CODE   WelsMutexLock (WELS_MUTEX*    mutex);

@@ -66,8 +66,6 @@ int32_t InitBits (PBitStringAux pBitString, const uint8_t* kpBuf, const int32_t 
 
 void_t InitReadBits (PBitStringAux pBitString);
 
-uint32_t EndianFix (uint32_t uiX);
-
 
 
 } // namespace WelsDec

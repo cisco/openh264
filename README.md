@@ -53,23 +53,29 @@ NASM needed to be installed for assembly code: workable version 2.07 or above, n
 
 For Windows Builds
 ------------------
-Windows Visual Studio 2008/2010/2012 projects are available:
-    : build the decoder via the Visual Studio projects in codec/build/win32/dec
-    : build the encoder via the Visual Studio projects in codec/build/win32/enc
-    : build the encoder shared library via the Visual Studio projects in processing/build/win32/
 
-The command line programs will be bin/win32/decConsoled.exe and bin/win32/encConsole.exe.
+Our Windows builds use MinGW which can be found here - http://www.mingw.org/
 
-Windows batch files also exist for building:
-    : Visual Studio 2008 use testbin/AutoBuild_Windows_VS2008.bat
-    : Visual Studio 2010 use testbin/AutoBuild_Windows_VS2010.bat
-    : Visual Studio 2012 use testbin/AutoBuild_Windows_VS2012.bat
+To build with gcc, add the MinGW bin directory (e.g. /c/MinGW/bin) to your path and follow the 'For All Platforms' instructions below.
 
-For Other Platforms
+To build with Visual Studio you will need to set up your path to run cl.exe.  The easiest way is to start MSYS from a developer command line session - http://msdn.microsoft.com/en-us/library/ms229859(v=vs.110).aspx  If you need to do it by hand here is an example from a Windows 64bit install of VS2012:
+
+export PATH="$PATH:/c/Program Files (x86)/Microsoft Visual Studio 11.0/VC/bin:/c/Program Files (x86)/Microsoft Visual Studio 11.0/Common7/IDE"
+
+You will also need to set your INCLUDE and LIB paths to point to your VS and SDK installs.  Something like this, again from Win64 with VS2012 (note the use of Windows-style paths here).
+
+export INCLUDE="C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include;C:\Program Files (x86)\Windows Kits\8.0\Include\um;C:\Program Files (x86)\Windows Kits\8.0\Include\shared"
+export LIB="C:\Program Files (x86)\Windows Kits\8.0\Lib\Win8\um\x86;C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\lib"
+
+Then add 'UNAME=msvc' to the make line of the 'For All Platforms' instructions.
+
+For All Platforms
 -------------------
 From the main project directory:
-'make' for 32bit builds
+'make' for automatically detecting 32/64bit and building accordingly
+'make ENABLE64BIT=No' for 32bit builds
 'make ENABLE64BIT=Yes' for 64bit builds
+'make V=No' for a silent build (not showing the actual compiler commands)
 
 The command line programs h264enc and h264dec will appear in the main project directory.
 
@@ -80,19 +86,19 @@ Usage information can be found in testbin/CmdLineReadMe
 Using the Source
 ----------------
 codec - encoder, decoder, console (test app), build (makefile, vcproj)
-processing - raw pixel processing (used by encoder)
 build - scripts for Makefile build system.
 test - GTest unittest files.
-testbin - autobuild scripts, test app config files, yuv test files
-bin - binaries for library and test app
+testbin - autobuild scripts, test app config files
+res - yuv and bitstream test files
 
 Known Issues
 ------------
 See the issue tracker on https://github.com/cisco/openh264/issues
 - Encoder errors when resolution exceeds 3840x2160
 - Encoder errors when compressed frame size exceeds half uncompressed size
-- Encoder console app only support multiple of 16 width/height for now
 - Decoder errors when compressed frame size exceeds 1MB
+- Encoder RC requires frame skipping to be enabled to hit the target bitrate,
+  if frame skipping is disabled the target bitrate may be exceeded
 
 License
 -------

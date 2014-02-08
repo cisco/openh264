@@ -94,9 +94,7 @@ EResult CDownsampling::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDs
 
   if ((iSrcWidthY >> 1) == iDstWidthY && (iSrcHeightY >> 1) == iDstHeightY) {
     // use half average functions
-    uint8_t iAlignIndex = 3;
-
-    iAlignIndex = GetAlignedIndex (iSrcWidthY);
+    uint8_t iAlignIndex = GetAlignedIndex (iSrcWidthY);
     m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0],
         (uint8_t*)pSrcPixMap->pPixel[0], pSrcPixMap->iStride[0], iSrcWidthY, iSrcHeightY);
 
@@ -119,7 +117,7 @@ EResult CDownsampling::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDs
 }
 
 int32_t CDownsampling::GetAlignedIndex (const int32_t kiSrcWidth) {
-  int32_t iAlignIndex = 3;
+  int32_t iAlignIndex;
   if ((kiSrcWidth & 0x1f) == 0)	// x32
     iAlignIndex	= 0;
   else if ((kiSrcWidth & 0x0f) == 0)	// x16

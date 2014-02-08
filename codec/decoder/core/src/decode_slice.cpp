@@ -37,26 +37,17 @@
  *      08/09/2013 Modified
  *
  *****************************************************************************/
-#include <memory.h>
 
-#include "typedefs.h"
-#include "dec_golomb.h"
 
-#include "fmo.h"
 #include "deblocking.h"
-#include "utils.h"
 
 #include "decode_slice.h"
 
-#include "error_code.h"
-#include "decode_mb_aux.h"
 #include "parse_mb_syn_cavlc.h"
 #include "rec_mb.h"
 #include "mv_pred.h"
 
-#include "as264_common.h"
 #include "cpu_core.h"
-#include "expand_pic.h"
 
 namespace WelsDec {
 
@@ -403,7 +394,7 @@ int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool_t bFirstSliceInLayer, PN
 
   iNextMbXyIndex = pSliceHeader->iFirstMbInSlice;
 
-  if (iNextMbXyIndex >= kiCountNumMb) {
+  if ((iNextMbXyIndex < 0) || (iNextMbXyIndex >= kiCountNumMb)) {
     WelsLog (pCtx, WELS_LOG_ERROR,
              "WelsDecodeSlice()::iFirstMbInSlice(%d) > pSps->kiTotalMb(%d). ERROR!!! resolution change....\n",
              iNextMbXyIndex, kiCountNumMb);
@@ -501,7 +492,7 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
   int32_t iNMbMode, i;
   uint32_t uiMbType = 0, uiCbp = 0, uiCbpL = 0, uiCbpC = 0;
 
-  FORCE_STACK_ALIGN_1D (uint8_t, pNonZeroCount, 48, 16);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pNonZeroCount, 48, 16);
 
   pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
   pCurLayer->pResidualPredFlag[iMbXy] = pSlice->sSliceHeaderExt.bDefaultResidualPredFlag;
@@ -562,7 +553,7 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
     memset (pCurLayer->pNzc[iMbXy], 16, sizeof (pCurLayer->pNzc[iMbXy]));   //JVT-x201wcm1.doc, page229, 2009.10.23
     return 0;
   } else if (0 == uiMbType) { //reference to JM
-    FORCE_STACK_ALIGN_1D (int8_t, pIntraPredMode, 48, 16);
+    ENFORCE_STACK_ALIGN_1D (int8_t, pIntraPredMode, 48, 16);
     pCurLayer->pMbType[iMbXy] = MB_TYPE_INTRA4x4;
     pCtx->pFillInfoCacheIntra4x4Func (&sNeighAvail, pNonZeroCount, pIntraPredMode, pCurLayer);
     if (pCtx->pParseIntra4x4ModeFunc (&sNeighAvail, pIntraPredMode, pBs, pCurLayer)) {
@@ -779,7 +770,7 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
   int32_t iNMbMode, i;
   uint32_t uiMbType = 0, uiCbp = 0, uiCbpL = 0, uiCbpC = 0;
 
-  FORCE_STACK_ALIGN_1D (uint8_t, pNonZeroCount, 48, 16);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pNonZeroCount, 48, 16);
   pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;//2009.10.23
 
   uiMbType = BsGetUe (pBs);
@@ -868,7 +859,7 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
       return 0;
     } else {
       if (0 == uiMbType) {
-        FORCE_STACK_ALIGN_1D (int8_t, pIntraPredMode, 48, 16);
+        ENFORCE_STACK_ALIGN_1D (int8_t, pIntraPredMode, 48, 16);
         pCurLayer->pMbType[iMbXy] = MB_TYPE_INTRA4x4;
         pCtx->pFillInfoCacheIntra4x4Func (&sNeighAvail, pNonZeroCount, pIntraPredMode, pCurLayer);
         if (pCtx->pParseIntra4x4ModeFunc (&sNeighAvail, pIntraPredMode, pBs, pCurLayer)) {

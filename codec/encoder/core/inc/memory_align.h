@@ -41,8 +41,6 @@
 
 namespace WelsSVCEnc {
 
-#define MEMORY_REQUEST_ALIGN_BYTES	0 // or (1^n), i.e, 0x04
-
 class CMemoryAlign {
  public:
 CMemoryAlign (const uint32_t kuiCacheLineSize);

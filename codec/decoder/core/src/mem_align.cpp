@@ -31,7 +31,6 @@
  */
 
 #include "mem_align.h"
-#include "crt_util_safe_x.h"
 
 namespace WelsDec {
 
@@ -45,25 +44,17 @@ int32_t iCountMalloc = 0;
 #endif
 //
 
-/////////////////////////////////////////////////////////////////////////////////
-#define ALIGNBYTES (16)
-/////////////////////////////////////////////////////////////////////////////////
-
 void_t* WelsMalloc (const uint32_t kuiSize, const str_t* kpTag) {
   const int32_t kiSizeVoidPtr	= sizeof (void_t**);
   const int32_t kiSizeInt		= sizeof (int32_t);
-#ifdef HAVE_CACHE_LINE_ALIGN
-  const int32_t kiAlignBytes	= ALIGNBYTES - 1;
-#else
   const int32_t kiAlignBytes	= 15;
-#endif// HAVE_CACHE_LINE_ALIGN
   uint8_t* pBuf		= (uint8_t*) malloc (kuiSize + kiAlignBytes + kiSizeVoidPtr + kiSizeInt);
   uint8_t* pAlignBuf;
 
 #ifdef MEMORY_CHECK
   if (pMemCheckMalloc == NULL) {
-    pMemCheckMalloc = WelsFopen (".\\mem_check_malloc.txt", "at+");
-    pMemCheckFree   = WelsFopen (".\\mem_check_free.txt", "at+");
+    pMemCheckMalloc = WelsFopen ("mem_check_malloc.txt", "at+");
+    pMemCheckFree   = WelsFopen ("mem_check_free.txt", "at+");
   }
 
   if (kpTag != NULL) {

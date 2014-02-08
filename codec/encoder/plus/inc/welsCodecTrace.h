@@ -36,11 +36,7 @@
 #include <stdarg.h>
 #include "typedefs.h"
 
-#ifdef _WIN32
 typedef int32_t (*CM_WELS_TRACE) (const str_t* format, ...);
-#else
-typedef int32_t (*CM_WELS_TRACE2) (const str_t* dllname, const str_t* format, ...);
-#endif
 
 class welsCodecTrace {
  public:
@@ -56,21 +52,13 @@ class welsCodecTrace {
  private:
 
   int32_t m_WelsTraceExistFlag;
-  void* m_hTraceHandle;
 
  public:
   static int32_t	m_iTraceLevel;
-#if defined _WIN32
   static CM_WELS_TRACE m_fpDebugTrace;
   static CM_WELS_TRACE m_fpInfoTrace;
   static CM_WELS_TRACE m_fpWarnTrace;
   static CM_WELS_TRACE m_fpErrorTrace;
-#else
-  static CM_WELS_TRACE2 m_fpDebugTrace;
-  static CM_WELS_TRACE2 m_fpInfoTrace;
-  static CM_WELS_TRACE2 m_fpWarnTrace;
-  static CM_WELS_TRACE2 m_fpErrorTrace;
-#endif
 
 };
 

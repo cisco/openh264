@@ -52,8 +52,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;WELSVP_EXPORTS;X86_ASM;X86_32"
+				AdditionalIncludeDirectories="../../../common/"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;WELSVP_EXPORTS;X86_ASM"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -137,7 +137,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="../../../common/"
 				PreprocessorDefinitions="WIN64;_DEBUG;_WINDOWS;_USRDLL;WELSVP_EXPORTS;X86_ASM"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -224,7 +224,12 @@
 				Optimization="3"
 				EnableIntrinsicFunctions="false"
 				FavorSizeOrSpeed="1"
+<<<<<<< HEAD
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;WELSVP_EXPORTS;X86_ASM;X86_32"
+=======
+				AdditionalIncludeDirectories="../../../common/"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;WELSVP_EXPORTS;X86_ASM"
+>>>>>>> e366f5779b932c7412bca3357d47545b23682723
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="false"
 				UsePrecompiledHeader="0"
@@ -313,6 +318,7 @@
 				Optimization="3"
 				EnableIntrinsicFunctions="false"
 				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="../../../common/"
 				PreprocessorDefinitions="WIN64;NDEBUG;_WINDOWS;_USRDLL;WELSVP_EXPORTS;X86_ASM"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="false"
@@ -378,7 +384,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\common\cpu.cpp"
+				RelativePath="..\..\..\common\cpu.cpp"
 				>
 			</File>
 			<File
@@ -387,10 +393,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\common\thread.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\common\util.cpp"
 				>
 			</File>
 			<File
@@ -448,7 +450,7 @@
 			Name="Header Files"
 			>
 			<File
-				RelativePath="..\..\src\common\cpu.h"
+				RelativePath="..\..\..\common\cpu.h"
 				>
 			</File>
 			<File
@@ -465,10 +467,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\common\util.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\common\version.h"
 				>
 			</File>
 			<File
@@ -545,7 +543,11 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
+<<<<<<< HEAD
 						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/  -f win32 -O3 -DPREFIX   -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)"
+=======
+						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX  -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+>>>>>>> e366f5779b932c7412bca3357d47545b23682723
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -567,6 +569,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
+<<<<<<< HEAD
 						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/  -f win32 -O3 -DPREFIX   -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
@@ -608,6 +611,9 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/  -f win32 -O3 -DPREFIX   -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)"
+=======
+						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+>>>>>>> e366f5779b932c7412bca3357d47545b23682723
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -625,7 +631,11 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
+<<<<<<< HEAD
 						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/  -f win32 -O3 -DPREFIX   -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)"
+=======
+						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+>>>>>>> e366f5779b932c7412bca3357d47545b23682723
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -640,14 +650,18 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\src\asm\sad.asm"
+				RelativePath="..\..\..\common\satd_sad.asm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
+<<<<<<< HEAD
 						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/  -f win32 -O3 -DPREFIX   -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)"
+=======
+						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX  -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+>>>>>>> e366f5779b932c7412bca3357d47545b23682723
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -665,7 +679,11 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
+<<<<<<< HEAD
 						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/  -f win32 -O3 -DPREFIX   -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)"
+=======
+						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX  -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+>>>>>>> e366f5779b932c7412bca3357d47545b23682723
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -687,7 +705,11 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
+<<<<<<< HEAD
 						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/  -f win32 -O3 -DPREFIX   -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)"
+=======
+						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+>>>>>>> e366f5779b932c7412bca3357d47545b23682723
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -705,7 +727,11 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
+<<<<<<< HEAD
 						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/  -f win32 -O3 -DPREFIX   -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)"
+=======
+						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+>>>>>>> e366f5779b932c7412bca3357d47545b23682723
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -776,11 +802,11 @@
 			Name="BackgroundDetection"
 			>
 			<File
-				RelativePath="..\..\src\backgounddetection\BackgroundDetection.cpp"
+				RelativePath="..\..\src\backgrounddetection\BackgroundDetection.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\backgounddetection\BackgroundDetection.h"
+				RelativePath="..\..\src\backgrounddetection\BackgroundDetection.h"
 				>
 			</File>
 		</Filter>

@@ -90,46 +90,62 @@ CWelsDecoder::CWelsDecoder (void_t)
   str_t chFileName[1024] = { 0 };  //for .264
   int iBufUsed = 0;
   int iBufLeft = 1023;
+  int iCurUsed;
 
   str_t chFileNameSize[1024] = { 0 }; //for .len
   int iBufUsedSize = 0;
   int iBufLeftSize = 1023;
+  int iCurUsedSize;
 #endif//OUTPUT_BIT_STREAM
 
   m_pTrace = CreateWelsTrace (Wels_Trace_Type);
 
   IWelsTrace::WelsVTrace (m_pTrace, IWelsTrace::WELS_LOG_INFO, "CWelsDecoder::CWelsDecoder() entry");
-
+  XMMREG_PROTECT_INIT(CWelsH264Decoder);
 
 #ifdef OUTPUT_BIT_STREAM
   SWelsTime sCurTime;
 
   WelsGetTimeOfDay (&sCurTime);
 
-  iBufUsed      += WelsSnprintf (chFileName,  iBufLeft,  "bs_0x%p_", (void_t*)this);
-  iBufUsedSize += WelsSnprintf (chFileNameSize, iBufLeftSize, "size_0x%p_", (void_t*)this);
+  iCurUsed     = WelsSnprintf (chFileName,  iBufLeft,  "bs_0x%p_", (void_t*)this);
+  iCurUsedSize = WelsSnprintf (chFileNameSize, iBufLeftSize, "size_0x%p_", (void_t*)this);
 
-  iBufLeft -= iBufUsed;
-  if (iBufLeft > iBufUsed) {
-    iBufUsed += WelsStrftime (&chFileName[iBufUsed], iBufLeft, "%y%m%d%H%M%S", &sCurTime);
-    iBufLeft -= iBufUsed;
+  if (iCurUsed > 0) {
+    iBufUsed += iCurUsed;
+    iBufLeft -= iCurUsed;
+  }
+  if (iBufLeft > 0) {
+    iCurUsed = WelsStrftime (&chFileName[iBufUsed], iBufLeft, "%y%m%d%H%M%S", &sCurTime);
+    iBufUsed += iCurUsed;
+    iBufLeft -= iCurUsed;
   }
 
-  iBufLeftSize -= iBufUsedSize;
-  if (iBufLeftSize > iBufUsedSize) {
-    iBufUsedSize += WelsStrftime (&chFileNameSize[iBufUsedSize], iBufLeftSize, "%y%m%d%H%M%S", &sCurTime);
-    iBufLeftSize -= iBufUsedSize;
+  if (iCurUsedSize > 0) {
+    iBufUsedSize += iCurUsedSize;
+    iBufLeftSize -= iCurUsedSize;
+  }
+  if (iBufLeftSize > 0) {
+    iCurUsedSize = WelsStrftime (&chFileNameSize[iBufUsedSize], iBufLeftSize, "%y%m%d%H%M%S", &sCurTime);
+    iBufUsedSize += iCurUsedSize;
+    iBufLeftSize -= iCurUsedSize;
   }
 
-  if (iBufLeft > iBufUsed) {
-    iBufUsed += WelsSnprintf (&chFileName[iBufUsed], iBufLeft, ".%03.3u.264", WelsGetMillsecond (&sCurTime));
-    iBufLeft -= iBufUsed;
+  if (iBufLeft > 0) {
+    iCurUsed = WelsSnprintf (&chFileName[iBufUsed], iBufLeft, ".%03.3u.264", WelsGetMillisecond (&sCurTime));
+    if (iCurUsed > 0) {
+      iBufUsed += iCurUsed;
+      iBufLeft -= iCurUsed;
+    }
   }
 
-  if (iBufLeftSize > iBufUsedSize) {
-    iBufUsedSize += WelsSnprintf (&chFileNameSize[iBufUsedSize], iBufLeftSize, ".%03.3u.len",
-                                  WelsGetMillsecond (&sCurTime));
-    iBufLeftSize -= iBufUsedSize;
+  if (iBufLeftSize > 0) {
+    iCurUsedSize = WelsSnprintf (&chFileNameSize[iBufUsedSize], iBufLeftSize, ".%03.3u.len",
+                                 WelsGetMillisecond (&sCurTime));
+    if (iCurUsedSize > 0) {
+      iBufUsedSize += iCurUsedSize;
+      iBufLeftSize -= iCurUsedSize;
+    }
   }
 
 
@@ -151,6 +167,7 @@ CWelsDecoder::~CWelsDecoder() {
   IWelsTrace::WelsVTrace (m_pTrace, IWelsTrace::WELS_LOG_INFO, "CWelsDecoder::~CWelsDecoder()");
 
   UninitDecoder();
+  XMMREG_PROTECT_UNINIT(CWelsH264Decoder);
 
 #ifdef OUTPUT_BIT_STREAM
   if (m_pFBS) {
@@ -340,10 +357,17 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void_t* pOption) {
   return cmInitParaError;
 }
 
-DECODING_STATE CWelsDecoder::DecodeFrame (const unsigned char* kpSrc,
+DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     const int kiSrcLen,
     void_t** ppDst,
     SBufferInfo* pDstInfo) {
+  if (kiSrcLen > MAX_ACCESS_UNIT_CAPACITY) {
+    m_pDecContext->iErrorCode |= dsOutOfMemory;
+    IWelsTrace::WelsVTrace (m_pTrace, IWelsTrace::WELS_LOG_INFO,
+      "max AU size exceeded. Allowed size = %d, current size = %d",
+      MAX_ACCESS_UNIT_CAPACITY, kiSrcLen);
+    return dsOutOfMemory;
+  }
   if (kiSrcLen > 0 && kpSrc != NULL) {
 #ifdef OUTPUT_BIT_STREAM
     if (m_pFBS) {
@@ -377,8 +401,10 @@ DECODING_STATE CWelsDecoder::DecodeFrame (const unsigned char* kpSrc,
 
   m_pDecContext->iFeedbackTidInAu             = -1; //initialize
 
+  XMMREG_PROTECT_STORE(CWelsH264Decoder);
   WelsDecodeBs (m_pDecContext, kpSrc, kiSrcLen, (unsigned char**)ppDst,
                 pDstInfo); //iErrorCode has been modified in this function
+  XMMREG_PROTECT_LOAD(CWelsH264Decoder);
 
   pDstInfo->eWorkMode = (EDecodeMode)m_pDecContext->iDecoderMode;
 
@@ -423,7 +449,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame (const unsigned char* kpSrc,
   DstInfo.UsrData.sSystemBuffer.iHeight = iHeight;
   DstInfo.eBufferProperty = BUFFER_HOST;
 
-  eDecState = DecodeFrame (kpSrc, kiSrcLen, (void_t**)ppDst, &DstInfo);
+  eDecState = DecodeFrame2 (kpSrc, kiSrcLen, (void_t**)ppDst, &DstInfo);
   if (eDecState == dsErrorFree) {
     pStride[0] = DstInfo.UsrData.sSystemBuffer.iStride[0];
     pStride[1] = DstInfo.UsrData.sSystemBuffer.iStride[1];

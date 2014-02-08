@@ -42,8 +42,6 @@
 
 namespace WelsDec {
 
-//#define CACHE_LINE 64
-
 #ifdef __cplusplus
 extern "C" {
 #endif//__cplusplus

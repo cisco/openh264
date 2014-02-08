@@ -30,9 +30,7 @@
  *
  */
 
-#include <string.h>
 #include "decode_mb_aux.h"
-#include "wels_common_basis.h"
 #include "cpu_core.h"
 
 namespace WelsSVCEnc {
@@ -261,15 +259,15 @@ void WelsInitReconstructionFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFl
 
 #if defined(X86_ASM)
   if (uiCpuFlag & WELS_CPU_MMXEXT) {
-    //  pFuncList->pfIDctT4		= WelsIDctT4Rec_mmx;
+     pFuncList->pfIDctT4		= WelsIDctT4Rec_mmx;
   }
   if (uiCpuFlag & WELS_CPU_SSE2) {
-    /* pFuncList->pfDequantization4x4			= WelsDequant4x4_sse2;
+     pFuncList->pfDequantization4x4			= WelsDequant4x4_sse2;
      pFuncList->pfDequantizationFour4x4		= WelsDequantFour4x4_sse2;
      pFuncList->pfDequantizationIHadamard4x4	= WelsDequantIHadamard4x4_sse2;
 
      pFuncList->pfIDctFourT4		= WelsIDctFourT4Rec_sse2;
-     pFuncList->pfIDctI16x16Dc = WelsIDctRecI16x16Dc_sse2;*/
+     pFuncList->pfIDctI16x16Dc = WelsIDctRecI16x16Dc_sse2;
   }
 #endif//X86_ASM
 }

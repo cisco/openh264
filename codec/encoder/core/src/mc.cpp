@@ -38,15 +38,8 @@
  *************************************************************************************
  */
 
-#include <string.h>
-#include "as264_common.h"
-#include "typedefs.h"
-#include "wels_const.h"
-#include "macros.h"
 #include "mc.h"
-#include "sample.h"
 #include "cpu_core.h"
-#include "array_stack_align.h"
 
 namespace WelsSVCEnc {
 /*------------------weight for chroma fraction pixel interpolation------------------*/

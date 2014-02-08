@@ -37,33 +37,20 @@
  *
  *************************************************************************************
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
 #include "encoder.h"
-#include "extern.h"
-#include "cpu.h"
 #include "cpu_core.h"
-#include "utils.h"
 
-#include "encode_mb_aux.h"
 #include "decode_mb_aux.h"
 #include "get_intra_predictor.h"
-#include "svc_encode_mb.h"
 
 #include "deblocking.h"
-#include "expand_pic.h"
 
 #include "mc.h"
 #include "sample.h"
 
-#include "svc_encode_slice.h"
 #include "svc_base_layer_md.h"
-#include "svc_mode_decision.h"
 #include "set_mb_syn_cavlc.h"
 #include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross_platforms
-#include "codec_def.h"
 #ifdef MT_ENABLED
 #include "slice_multi_threading.h"
 #endif//MT_ENABLED
@@ -150,11 +137,11 @@ int32_t InitPic (const void* kpSrc, const int32_t kiColorspace, const int32_t ki
 
 void WelsInitBGDFunc (SWelsFuncPtrList* pFuncList, const bool_t kbEnableBackgroundDetection) {
   if (kbEnableBackgroundDetection) {
-    pFuncList->pfInterMdBackgroundDecision = (PInterMdBackgroundDecisionFunc)WelsMdInterJudgeBGDPskip;
-    pFuncList->pfInterMdBackgroundInfoUpdate = (PInterMdBackgroundInfoUpdateFunc)WelsMdInterUpdateBGDInfo;
+    pFuncList->pfInterMdBackgroundDecision = WelsMdInterJudgeBGDPskip;
+    pFuncList->pfInterMdBackgroundInfoUpdate = WelsMdInterUpdateBGDInfo;
   } else {
-    pFuncList->pfInterMdBackgroundDecision = (PInterMdBackgroundDecisionFunc)WelsMdInterJudgeBGDPskipFalse;
-    pFuncList->pfInterMdBackgroundInfoUpdate = (PInterMdBackgroundInfoUpdateFunc)WelsMdInterUpdateBGDInfoNULL;
+    pFuncList->pfInterMdBackgroundDecision = WelsMdInterJudgeBGDPskipFalse;
+    pFuncList->pfInterMdBackgroundInfoUpdate = WelsMdInterUpdateBGDInfoNULL;
   }
 }
 
@@ -328,7 +315,7 @@ EFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum) {
  */
 
 extern "C" void DumpDependencyRec (SPicture* pCurPicture, const str_t* kpFileName, const int8_t kiDid) {
-  FILE* pDumpRecFile											= NULL;
+  WelsFileHandle* pDumpRecFile = NULL;
   static bool_t bDependencyRecFlag[MAX_DEPENDENCY_LAYER]	= {0};
   int32_t iWrittenSize											= 0;
 
@@ -336,40 +323,22 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const str_t* kpFileNam
     return;
 
   if (bDependencyRecFlag[kiDid]) {
-    if (STRNLEN (kpFileName, MAX_FNAME_LEN) > 0)	// confirmed_safe_unsafe_usage
-#if defined(__GNUC__) || (defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER<1500))
-      pDumpRecFile	= FOPEN (kpFileName, "ab");
-#elif defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
-      FOPEN (&pDumpRecFile, kpFileName, "ab");
-#endif//__GNUC__..
+    if (strlen (kpFileName) > 0)	// confirmed_safe_unsafe_usage
+      pDumpRecFile = WelsFopen (kpFileName, "ab");
     else {
       str_t sDependencyRecFileName[16] = {0};
-#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
-      SNPRINTF (sDependencyRecFileName, 16, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-      FOPEN (&pDumpRecFile, sDependencyRecFileName, "ab");
-#else
-      SNPRINTF (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-      pDumpRecFile	= FOPEN (sDependencyRecFileName, "ab");
-#endif//WIN32..
+      WelsSnprintf (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
+      pDumpRecFile	= WelsFopen (sDependencyRecFileName, "ab");
     }
     if (NULL != pDumpRecFile)
-      fseek (pDumpRecFile, 0, SEEK_END);
+      WelsFseek (pDumpRecFile, 0, SEEK_END);
   } else {
-    if (STRNLEN (kpFileName, MAX_FNAME_LEN) > 0) {	// confirmed_safe_unsafe_usage
-#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
-      FOPEN (&pDumpRecFile, kpFileName, "wb");
-#else
-      pDumpRecFile	= FOPEN (kpFileName, "wb");
-#endif//WIN32..
+    if (strlen (kpFileName) > 0) {	// confirmed_safe_unsafe_usage
+      pDumpRecFile	= WelsFopen (kpFileName, "wb");
     } else {
       str_t sDependencyRecFileName[16] = {0};
-#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
-      SNPRINTF (sDependencyRecFileName, 16, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-      FOPEN (&pDumpRecFile, sDependencyRecFileName, "wb");
-#else
-      SNPRINTF (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-      pDumpRecFile	= FOPEN (sDependencyRecFileName, "wb");
-#endif//WIN32..
+      WelsSnprintf (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
+      pDumpRecFile	= WelsFopen (sDependencyRecFileName, "wb");
     }
     bDependencyRecFlag[kiDid]	= true;
   }
@@ -384,27 +353,27 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const str_t* kpFileNam
     const int32_t kiChromaHeight	= kiLumaHeight >> 1;
 
     for (j = 0; j < kiLumaHeight; ++ j) {
-      iWrittenSize = fwrite (&pCurPicture->pData[0][j * kiStrideY], 1, kiLumaWidth, pDumpRecFile);
+      iWrittenSize = WelsFwrite (&pCurPicture->pData[0][j * kiStrideY], 1, kiLumaWidth, pDumpRecFile);
       assert (iWrittenSize == kiLumaWidth);
       if (iWrittenSize < kiLumaWidth) {
         assert (0);	// make no sense for us if writing failed
-        fclose (pDumpRecFile);
+        WelsFclose (pDumpRecFile);
         return;
       }
     }
     for (i = 1; i < I420_PLANES; ++ i) {
       const int32_t kiStrideUV = pCurPicture->iLineSize[i];
       for (j = 0; j < kiChromaHeight; ++ j) {
-        iWrittenSize = fwrite (&pCurPicture->pData[i][j * kiStrideUV], 1, kiChromaWidth, pDumpRecFile);
+        iWrittenSize = WelsFwrite (&pCurPicture->pData[i][j * kiStrideUV], 1, kiChromaWidth, pDumpRecFile);
         assert (iWrittenSize == kiChromaWidth);
         if (iWrittenSize < kiChromaWidth) {
           assert (0);	// make no sense for us if writing failed
-          fclose (pDumpRecFile);
+          WelsFclose (pDumpRecFile);
           return;
         }
       }
     }
-    fclose (pDumpRecFile);
+    WelsFclose (pDumpRecFile);
     pDumpRecFile = NULL;
   }
 }
@@ -414,7 +383,7 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const str_t* kpFileNam
  */
 
 void DumpRecFrame (SPicture* pCurPicture, const str_t* kpFileName) {
-  FILE* pDumpRecFile				= NULL;
+  WelsFileHandle* pDumpRecFile				= NULL;
   static bool_t bRecFlag	= false;
   int32_t iWrittenSize			= 0;
 
@@ -422,34 +391,18 @@ void DumpRecFrame (SPicture* pCurPicture, const str_t* kpFileName) {
     return;
 
   if (bRecFlag) {
-    if (STRNLEN (kpFileName, MAX_FNAME_LEN) > 0) {	// confirmed_safe_unsafe_usage
-#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
-      FOPEN (&pDumpRecFile, kpFileName, "ab");
-#else
-      pDumpRecFile	= FOPEN (kpFileName, "ab");
-#endif//WIN32
+    if (strlen (kpFileName) > 0) {	// confirmed_safe_unsafe_usage
+      pDumpRecFile	= WelsFopen (kpFileName, "ab");
     } else {
-#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
-      FOPEN (&pDumpRecFile, "rec.yuv", "ab");
-#else
-      pDumpRecFile	= FOPEN ("rec.yuv", "ab");
-#endif//WIN32
+      pDumpRecFile	= WelsFopen ("rec.yuv", "ab");
     }
     if (NULL != pDumpRecFile)
-      fseek (pDumpRecFile, 0, SEEK_END);
+      WelsFseek (pDumpRecFile, 0, SEEK_END);
   } else {
-    if (STRNLEN (kpFileName, MAX_FNAME_LEN) > 0) {	// confirmed_safe_unsafe_usage
-#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
-      FOPEN (&pDumpRecFile, kpFileName, "wb");
-#else
-      pDumpRecFile	= FOPEN (kpFileName, "wb");
-#endif//WIN32
+    if (strlen (kpFileName) > 0) {	// confirmed_safe_unsafe_usage
+      pDumpRecFile	= WelsFopen (kpFileName, "wb");
     } else {
-#if defined(_WIN32) && defined(_MSC_VER) && (_MSC_VER>=1500)	// vs2008
-      FOPEN (&pDumpRecFile, "rec.yuv", "wb");
-#else
-      pDumpRecFile	= FOPEN ("rec.yuv", "wb");
-#endif//WIN32..
+      pDumpRecFile	= WelsFopen ("rec.yuv", "wb");
     }
     bRecFlag	= true;
   }
@@ -464,27 +417,27 @@ void DumpRecFrame (SPicture* pCurPicture, const str_t* kpFileName) {
     const int32_t kiChromaHeight	= kiLumaHeight >> 1;
 
     for (j = 0; j < kiLumaHeight; ++ j) {
-      iWrittenSize = fwrite (&pCurPicture->pData[0][j * kiStrideY], 1, kiLumaWidth, pDumpRecFile);
+      iWrittenSize = WelsFwrite (&pCurPicture->pData[0][j * kiStrideY], 1, kiLumaWidth, pDumpRecFile);
       assert (iWrittenSize == kiLumaWidth);
       if (iWrittenSize < kiLumaWidth) {
         assert (0);	// make no sense for us if writing failed
-        fclose (pDumpRecFile);
+        WelsFclose (pDumpRecFile);
         return;
       }
     }
     for (i = 1; i < I420_PLANES; ++ i) {
       const int32_t kiStrideUV = pCurPicture->iLineSize[i];
       for (j = 0; j < kiChromaHeight; ++ j) {
-        iWrittenSize = fwrite (&pCurPicture->pData[i][j * kiStrideUV], 1, kiChromaWidth, pDumpRecFile);
+        iWrittenSize = WelsFwrite (&pCurPicture->pData[i][j * kiStrideUV], 1, kiChromaWidth, pDumpRecFile);
         assert (iWrittenSize == kiChromaWidth);
         if (iWrittenSize < kiChromaWidth) {
           assert (0);	// make no sense for us if writing failed
-          fclose (pDumpRecFile);
+          WelsFclose (pDumpRecFile);
           return;
         }
       }
     }
-    fclose (pDumpRecFile);
+    WelsFclose (pDumpRecFile);
     pDumpRecFile = NULL;
   }
 }

@@ -30,9 +30,7 @@
  *
  */
 
-#include <string.h>
 
-#include "typedefs.h"
 #include "expand_pic.h"
 #include "cpu_core.h"
 

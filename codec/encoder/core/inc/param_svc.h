@@ -113,10 +113,6 @@ typedef struct TagWelsSvcCodingParam {
 SDLayerParam	sDependencyLayers[MAX_DEPENDENCY_LAYER];
 
 /* General */
-#ifdef ENABLE_TRACE_FILE
-str_t			sTracePath[MAX_FNAME_LEN];		// log file for wels encoder
-#endif
-
 uint32_t	uiGopSize;			// GOP size (at maximal frame rate: 16)
 uint32_t	uiIntraPeriod;		// intra period (multiple of GOP size as desired)
 int32_t		iNumRefFrame;		// number of reference frame used
@@ -175,6 +171,8 @@ bool_t      bEnableSceneChangeDetect;
 bool_t		bEnableBackgroundDetection;
 /* adaptive quantization control */
 bool_t		bEnableAdaptiveQuant;
+/* frame skipping */
+bool_t		bEnableFrameSkip;
 /* long term reference control */
 bool_t      bEnableLongTermReference;
 
@@ -249,11 +247,14 @@ void FillDefault (const bool_t kbEnableRc) {
   bEnableSceneChangeDetect	= true;		// scene change detection control
   bEnableBackgroundDetection	= true;		// background detection control
   bEnableAdaptiveQuant		= true;		// adaptive quantization control
+  bEnableFrameSkip		= true;		// frame skipping
   bEnableLongTermReference	= false;	// long term reference control
   bEnableSpsPpsIdAddition	= true;		// pSps pPps id addition control
   bPrefixNalAddingCtrl		= true;		// prefix NAL adding control
   iNumDependencyLayer		= 0;		// number of dependency(Spatial/CGS) layers used to be encoded
   iNumTemporalLayer			= 0;		// number of temporal layer specified
+
+  memset(sDependencyLayers,0,sizeof(SDLayerParam)*MAX_DEPENDENCY_LAYER);
 }
 
 int32_t ParamTranscode (SVCEncodingParam& pCodingParam, const bool_t kbEnableRc = true) {
@@ -305,6 +306,9 @@ int32_t ParamTranscode (SVCEncodingParam& pCodingParam, const bool_t kbEnableRc 
 
   /* Adaptive quantization control */
   bEnableAdaptiveQuant	= pCodingParam.bEnableAdaptiveQuant ? true : false;
+
+  /* Frame skipping */
+  bEnableFrameSkip	= pCodingParam.bEnableFrameSkip ? true : false;
 
   /* Enable cropping source picture */
   bEnableCropPic	= pCodingParam.bEnableCropPic ? true : false;

@@ -45,26 +45,12 @@
 
 //#define STICK_STREAM_SIZE
 
-#if defined(__GNUC__)
-#if !defined(MACOS)
-#if !defined(_MATH_H_MATHDEF)
-#define _MATH_H_MATHDEF
-//#else
-//#error "warning: have defined _MATH_H_MATHDEF!!"	// to check
-#endif//_MATH_H_MATHDEF
-#endif//MACOS
-#endif//__GNUC__
-
 #include "measure_time.h"
 #include "param_svc.h"
 //#include "layered_pic_buffer.h"
 #include "read_config.h"
 
-#if defined(MACOS)
-#include "bundlewelsenc.h"
-#else
 #include "typedefs.h"
-#endif//MACOS
 
 #ifdef _MSC_VER
 #include <io.h>     /* _setmode() */
@@ -82,6 +68,17 @@
 #include "mt_defs.h"
 #include "WelsThreadLib.h"
 #endif//MT_ENABLED
+
+#ifdef WIN32
+#ifdef WINAPI_FAMILY
+#include <winapifamily.h>
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#define HAVE_PROCESS_AFFINITY
+#endif
+#else /* defined(WINAPI_FAMILY) */
+#define HAVE_PROCESS_AFFINITY
+#endif
+#endif /* WIN32 */
 
 #include <iostream>
 using namespace std;
@@ -204,6 +201,8 @@ int ParseConfig (CReadConfig& cRdCfg, SWelsSvcCodingParam& pSvcParam, SFilesSet&
         pSvcParam.bEnableBackgroundDetection	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableAdaptiveQuantization") == 0) {
         pSvcParam.bEnableAdaptiveQuant	= atoi (strTag[1].c_str()) ? true : false;
+      } else if (strTag[0].compare ("EnableFrameSkip") == 0) {
+        pSvcParam.bEnableFrameSkip	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableLongTermReference") == 0) {
         pSvcParam.bEnableLongTermReference	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("LtrMarkPeriod") == 0) {
@@ -353,6 +352,9 @@ int ParseCommandLine (int argc, char** argv, SVCEncodingParam& sParam) {
     else if (!strcmp (pCmd, "-aq") && (i < argc))
       sParam.bEnableAdaptiveQuant = atoi (argv[i++]) ? true : false;
 
+    else if (!strcmp (pCmd, "-fs") && (i < argc))
+      sParam.bEnableFrameSkip = atoi (argv[i++]) ? true : false;
+
     else if (!strcmp (pCmd, "-ltr") && (i < argc))
       sParam.bEnableLongTermReference = atoi (argv[i++]) ? true : false;
 
@@ -452,6 +454,9 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
 
     else if (!strcmp (pCommand, "-aq") && (n < argc))
       pSvcParam.bEnableAdaptiveQuant = atoi (argv[n++]) ? true : false;
+
+    else if (!strcmp (pCommand, "-fs") && (n < argc))
+      pSvcParam.bEnableFrameSkip = atoi (argv[n++]) ? true : false;
 
     else if (!strcmp (pCommand, "-ltr") && (n < argc))
       pSvcParam.bEnableLongTermReference = atoi (argv[n++]) ? true : false;
@@ -557,8 +562,9 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
 #ifdef ENABLE_FRAME_DUMP
       SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
       pDLayer->sRecFileName[iLen] = '\0';
-      strncpy (pDLayer->sRecFileName, argv[n++], iLen);	// confirmed_safe_unsafe_usage
+      strncpy (pDLayer->sRecFileName, argv[n], iLen);	// confirmed_safe_unsafe_usage
 #endif//ENABLE_FRAME_DUMP
+      n++;
     }
 
     else if (!strcmp (pCommand, "-sw") && (n + 1 < argc)) {
@@ -655,6 +661,7 @@ int FillSpecificParameters (SVCEncodingParam& sParam) {
   sParam.bEnableDenoise    = 0;    // denoise control
   sParam.bEnableBackgroundDetection = 1; // background detection control
   sParam.bEnableAdaptiveQuant       = 1; // adaptive quantization control
+  sParam.bEnableFrameSkip           = 1; // frame skipping
   sParam.bEnableLongTermReference  = 0; // long term reference control
   sParam.iLtrMarkPeriod = 30;
 
@@ -748,6 +755,13 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   SFrameBSInfo sFbi;
   SVCEncodingParam sSvcParam;
   int64_t iStart = 0, iTotal = 0;
+  int32_t ret = 0;
+
+  int32_t iPicLumaSize = 0;
+  int32_t iFrameSize = 0;
+  uint8_t* pPlanes[3] = { 0 };
+  int32_t iFrame = 0;
+
 #if defined ( STICK_STREAM_SIZE )
   FILE* fTrackStream = fopen ("coding_size.stream", "wb");;
 #endif
@@ -770,20 +784,17 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   int iParsedNum = 3;
   if (ParseCommandLine (argc - iParsedNum, argv + iParsedNum, sSvcParam) != 0) {
     printf ("parse pCommand line failed\n");
-    fclose (pFpSrc);
-    return 1;
+    ret = 1;
+    goto ERROR_RET;
   }
 
   if (cmResultSuccess != pPtrEnc->Initialize (&sSvcParam, INIT_TYPE_PARAMETER_BASED)) {
     fprintf (stderr, "Encoder Initialization failed!\n");
-    fclose (pFpSrc);
-    return 1;
-  }
+	ret = 1;
+    goto ERROR_RET;
+   }
 
-  const int32_t iPicLumaSize = sSvcParam.iPicWidth * sSvcParam.iPicHeight;
-  int32_t iFrameSize = 0;
-  uint8_t* pPlanes[3] = { 0 };
-
+  iPicLumaSize = sSvcParam.iPicWidth * sSvcParam.iPicHeight;
   switch (sSvcParam.iInputCsp) {
     int iStride;
   case videoFormatI420:
@@ -815,10 +826,10 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     pPlanes[0]	= new uint8_t[iFrameSize];
     break;
   default:
-    return 1;
+    ret = 1;
+    goto ERROR_RET;
   }
 
-  int32_t iFrame = 0;
   while (true) {
     if (feof (pFpSrc))
       break;
@@ -866,7 +877,7 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     delete [] pPlanes[0];
     pPlanes[0] = NULL;
   }
-
+ERROR_RET:
   if (pFpBs) {
     fclose (pFpBs);
     pFpBs = NULL;
@@ -876,7 +887,7 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     pFpSrc = NULL;
   }
 
-  return 0;
+  return ret;
 }
 
 
@@ -958,7 +969,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   sSvcParam.sDependencyLayers[sSvcParam.iNumDependencyLayer - 1].iFrameHeight =
     WELS_ALIGN(sSvcParam.sDependencyLayers[sSvcParam.iNumDependencyLayer - 1].iActualHeight, MB_HEIGHT_LUMA);
 
-  if (cmResultSuccess != pPtrEnc->Initialize ((void*)&sSvcParam, INIT_TYPE_CONFIG_BASED)) {	// SVC encoder initialization
+  if (cmResultSuccess != pPtrEnc->Initialize2 ((void*)&sSvcParam, INIT_TYPE_CONFIG_BASED)) {	// SVC encoder initialization
     fprintf (stderr, "SVC encoder Initialize failed\n");
     iRet = 1;
     goto INSIDE_MEM_FREE;
@@ -1088,7 +1099,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
 
     // To encoder this frame
     iStart	= WelsTime();
-    int iEncFrames = pPtrEnc->EncodeFrame (const_cast<const SSourcePicture**> (pSrcPicList), nSpatialLayerNum, &sFbi);
+    int iEncFrames = pPtrEnc->EncodeFrame2 (const_cast<const SSourcePicture**> (pSrcPicList), nSpatialLayerNum, &sFbi);
     iTotal += WelsTime() - iStart;
 
     // fixed issue in case dismatch source picture introduced by frame skipped, 1/12/2010
@@ -1190,7 +1201,7 @@ INSIDE_MEM_FREE: {
           pSrcPicList[i] = NULL;
         }
       }
-      delete pSrcPicList;
+      delete []pSrcPicList;
       pSrcPicList = NULL;
     }
 
@@ -1207,9 +1218,9 @@ INSIDE_MEM_FREE: {
 
 //  Merge from Heifei's Wonder.  Lock process to a single core
 void LockToSingleCore() {
-#if defined(WIN32) && !defined(WIN64)
+#ifdef HAVE_PROCESS_AFFINITY
   //for 2005 compiler, change "DWORD" to "DWORD_PTR"
-  DWORD ProcessAffMask = 0, SystemAffMask = 0;
+  ULONG_PTR ProcessAffMask = 0, SystemAffMask = 0;
   HANDLE hProcess = GetCurrentProcess();
 
   GetProcessAffinityMask (hProcess, &ProcessAffMask, &SystemAffMask);
@@ -1232,22 +1243,13 @@ void LockToSingleCore() {
 
 long CreateSVCEncHandle (ISVCEncoder** ppEncoder) {
   long ret = 0;
-#if defined(MACOS)
-  ret = WelsEncBundleLoad();
-  WelsEncBundleCreateEncoder (ppEncoder);
-#else
   ret = CreateSVCEncoder (ppEncoder);
-#endif//MACOS
   return ret;
 }
 
 void DestroySVCEncHandle (ISVCEncoder* pEncoder) {
   if (pEncoder) {
-#if defined(MACOS)
-    WelsEncBundleDestroyEncoder (pEncoder);
-#else
     DestroySVCEncoder (pEncoder);
-#endif//MACOS
 
   }
 }
@@ -1255,11 +1257,7 @@ void DestroySVCEncHandle (ISVCEncoder* pEncoder) {
 /****************************************************************************
  * main:
  ****************************************************************************/
-#if (defined(MACOS))
-int main_demo (int argc, char** argv)
-#else
 int main (int argc, char** argv)
-#endif
 {
   ISVCEncoder* pSVCEncoder	= NULL;
   FILE* pFileOut					= NULL;

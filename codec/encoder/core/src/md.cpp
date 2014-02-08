@@ -38,17 +38,10 @@
  *************************************************************************************
  */
 
-#include <string.h>
 #include "ls_defines.h"
-#include "encoder_context.h"
-#include "svc_enc_slice_segment.h"
 #include "md.h"
-#include "mc.h"
-#include "mv_pred.h"
 #include "cpu_core.h"
 #include "svc_enc_golomb.h"
-#include "sample.h"
-#include "array_stack_align.h"
 
 namespace WelsSVCEnc {
 #define INTRA_VARIANCE_SAD_THRESHOLD 150
@@ -873,7 +866,7 @@ void PredictSad (int8_t* pRefIndexCache, int32_t* pSadCostCache, int32_t uiRef, 
       *pSadPred = iSadC;
       break;
     default:
-      *pSadPred = WELS_MEDIAN (kiSadA, kiSadB, iSadC);
+      *pSadPred = WelsMedian (kiSadA, kiSadB, iSadC);
       break;
     }
   }
@@ -920,7 +913,7 @@ void PredictSadSkip (int8_t* pRefIndexCache, bool_t* pMbSkipCache, int32_t* pSad
       *iSadPredSkip = iSadC;
       break;
     default:
-      *iSadPredSkip = WELS_MEDIAN (kiSadA, kiSadB, iSadC);
+      *iSadPredSkip = WelsMedian (kiSadA, kiSadB, iSadC);
       break;
     }
   }

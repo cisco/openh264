@@ -37,17 +37,11 @@
  *************************************************************************************
  */
 
-#include <stdio.h>	//test use for file operation
-#include <string.h>
 
 #include "svc_encode_mb.h"
 #include "encode_mb_aux.h"
 #include "decode_mb_aux.h"
 #include "ls_defines.h"
-#include "cpu_core.h"
-#include "as264_common.h"
-#include "mb_cache.h"
-#include "array_stack_align.h"
 
 namespace WelsSVCEnc {
 void WelsDctMb (int16_t* pRes, uint8_t* pEncMb, int32_t iEncStride, uint8_t* pBestPred, PDctFunc pfDctFourT4) {
@@ -71,7 +65,8 @@ void WelsEncRecI16x16Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
   uint8_t i, uiQp						    = pCurMb->uiLumaQp;
   uint32_t uiNoneZeroCount, uiNoneZeroCountMbAc				= 0, uiCountI16x16Dc;
 
-  int16_t* pMF = g_kiQuantMF[uiQp], *pFF	= g_iQuantIntraFF[uiQp];
+  const int16_t* pMF = g_kiQuantMF[uiQp];
+  const int16_t* pFF = g_iQuantIntraFF[uiQp];
 
   WelsDctMb (pRes,  pMbCache->SPicData.pEncMb[0], kiEncStride, pBestPred, pEncCtx->pFuncList->pfDctFourT4);
 
@@ -158,7 +153,8 @@ void WelsEncRecI4x4Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, uin
   uint8_t* pBestPred = pMbCache->pBestPredI4x4Blk4;
   int16_t* pBlock = pMbCache->pDct->iLumaBlock[uiI4x4Idx];
 
-  int16_t* pMF = g_kiQuantMF[uiQp], *pFF = g_iQuantIntraFF[uiQp];
+  const int16_t* pMF = g_kiQuantMF[uiQp];
+  const int16_t* pFF = g_iQuantIntraFF[uiQp];
 
   int32_t* pStrideEncBlockOffset = pEncCtx->pStrideTab->pStrideEncBlockOffset[pEncCtx->uiDependencyId];
   int32_t* pStrideDecBlockOffset = pEncCtx->pStrideTab->pStrideDecBlockOffset[pEncCtx->uiDependencyId][0 ==
@@ -193,7 +189,9 @@ void WelsEncInterY (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCache
   int32_t iSingleCtrMb		= 0, iSingleCtr8x8[4];
   int16_t* pBlock				= pMbCache->pDct->iLumaBlock[0];
   uint8_t uiQp					= pCurMb->uiLumaQp;
-  int16_t* pMF					= g_kiQuantMF[uiQp], *pFF = g_kiQuantInterFF[uiQp], aMax[16];
+  const int16_t* pMF = g_kiQuantMF[uiQp];
+  const int16_t* pFF = g_kiQuantInterFF[uiQp];
+  int16_t aMax[16];
   int32_t i, j, iNoneZeroCountMbDcAc	= 0, iNoneZeroCount = 0;
 
   for (i = 0; i < 4; i++) {
@@ -262,7 +260,8 @@ void    WelsEncRecUV (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCac
   int16_t* iChromaDc			= pMbCache->pDct->iChromaDc[iUV - 1], *pBlock = pMbCache->pDct->iChromaBlock[ (iUV - 1) << 2];
   int16_t aDct2x2[4], j, aMax[4];
   int32_t iSingleCtr8x8		= 0;
-  int16_t* pMF = g_kiQuantMF[kiQp], *pFF = g_kiQuantInterFF[ (!kiInterFlag) * 6 + kiQp];
+  const int16_t* pMF = g_kiQuantMF[kiQp];
+  const int16_t* pFF = g_kiQuantInterFF[ (!kiInterFlag) * 6 + kiQp];
 
   uiNoneZeroCountMbDc = pfQuantizationHadamard2x2 (pRes, pFF[0] << 1, pMF[0]>>1, aDct2x2, iChromaDc);
 
@@ -333,7 +332,8 @@ BOOL_T WelsTryPYskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
 
   int16_t* pBlock = pMbCache->pDct->iLumaBlock[0];
   uint16_t aMax[4], i, j;
-  int16_t* pMF = g_kiQuantMF[kuiQp], *pFF = g_kiQuantInterFF[kuiQp];
+  const int16_t* pMF = g_kiQuantMF[kuiQp];
+  const int16_t* pFF = g_kiQuantInterFF[kuiQp];
 
   for (i = 0; i < 4; i++) {
     pEncCtx->pFuncList->pfQuantizationFour4x4Max (pRes, pFF,  pMF, (int16_t*)aMax);
@@ -358,7 +358,8 @@ BOOL_T    WelsTryPUVskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache,
   const uint8_t kuiQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp +
                         pEncCtx->pCurDqLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset)];
 
-  int16_t* pMF = g_kiQuantMF[kuiQp], *pFF = g_kiQuantInterFF[kuiQp];
+  const int16_t* pMF = g_kiQuantMF[kuiQp];
+  const int16_t* pFF = g_kiQuantInterFF[kuiQp];
 
   if (pEncCtx->pFuncList->pfQuantizationHadamard2x2Skip (pRes, pFF[0] << 1, pMF[0]>>1))
     return FALSE;

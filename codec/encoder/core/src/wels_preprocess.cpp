@@ -30,6 +30,7 @@
  *
  */
 
+#ifndef NO_DYNAMIC_VP
 #if defined(_WIN32)
 #include <windows.h>
 #elif defined(MACOS)
@@ -37,15 +38,9 @@
 #elif defined(__GNUC__)
 #include <dlfcn.h>
 #endif
+#endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
 #include "wels_preprocess.h"
-#include "memory_align.h"
-#include "encoder.h"
-#include "extern.h"
 #include "picture_handle.h"
 #include "encoder_context.h"
 #include "utils.h"
@@ -74,7 +69,6 @@ const uint8_t g_kuiRefTemporalIdx[MAX_TEMPORAL_LEVEL][MAX_GOP_SIZE] = {
   {  0,  0, }, // 1
   {  0,  0,  0,  1, }, // 2
   {  0,  0,  0,  2,  0,  1,  1,  2, }, // 3
-  //{  0,  0,  0,  3,  0,  2,  2,  3,  0,  1,  1,  3,  1,  2,  2,  3 }  // 4
 };
 
 const int32_t g_kiPixMapSizeInBits = sizeof (uint8_t) * 8;
@@ -111,7 +105,7 @@ CWelsLib::CWelsLib (void* pEncCtx) {
   void* shModule = NULL;
   shModule = dlopen (WelsVPLib, RTLD_LAZY);
   if (shModule == NULL)
-    printf ("dlopen %s iRet=%x, err=%s\n", WelsVPLib, shModule, dlerror());
+    printf ("dlopen %s iRet=%p, err=%s\n", WelsVPLib, shModule, dlerror());
 #endif
 
   m_pVpLib = (void*)shModule;
@@ -155,7 +149,7 @@ void* CWelsLib::QueryFunction (const str_t* pName) {
     void* shModule = m_pVpLib;
     pFunc = (void*)dlsym (shModule, pName);
     if (pFunc == NULL)
-      printf ("dlsym %s iRet=%p, err=%s\n", shModule, pFunc, dlerror());
+      printf ("dlsym %p iRet=%p, err=%s\n", shModule, pFunc, dlerror());
 #endif
   }
 #endif
@@ -451,8 +445,6 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (void* pCtx, const SSourcePicture
       // spatial layer is able to encode indeed
       if ((iTemporalId != INVALID_TEMPORAL_ID)) {
         // down sampling performed
-        if (NULL == pSrcPic)
-          return -1;
 
         pDstPic	= pEncCtx->pSpatialPic[iDependencyId][iPicturePos];	// small
         iShrinkWidth = pScaledPicture->iScaledWidth[iDependencyId];

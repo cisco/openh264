@@ -32,7 +32,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include "memory_align.h"
 #include "macros.h"
 
@@ -83,15 +82,8 @@ void* CMemoryAlign::WelsMalloc (const uint32_t kuiSize, const str_t* kpTag) {
   const int32_t kiSizeOfInt				= sizeof (int32_t);
   const int32_t kiAlignedBytes		= m_nCacheLineSize - 1;
   const int32_t kiTrialRequestedSize	= kuiSize + kiAlignedBytes + kiSizeOfVoidPointer + kiSizeOfInt;
-#if MEMORY_REQUEST_ALIGN_BYTES
-  // ensure 4 bytes boundary aligned memory request, unused extra bytes padding in pData payload
-  const int32_t kiActualRequestedSize	= WELS_ALIGN (kiTrialRequestedSize, MEMORY_REQUEST_ALIGN_BYTES);
-  const uint32_t kiPayloadSize			= kuiSize + MEMORY_REQUEST_ALIGN_BYTES - (kiTrialRequestedSize &
-                                      (MEMORY_REQUEST_ALIGN_BYTES - 1));
-#else
   const int32_t kiActualRequestedSize	= kiTrialRequestedSize;
   const uint32_t kiPayloadSize			= kuiSize;
-#endif//MEMORY_REQUEST_ALIGN_BYTES
 
   uint8_t* pBuf		= (uint8_t*) malloc (kiActualRequestedSize);
 #ifdef MEMORY_CHECK

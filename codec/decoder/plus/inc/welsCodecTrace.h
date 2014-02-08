@@ -39,11 +39,7 @@
 //using namespace WelsDec;
 namespace WelsDec {
 
-#ifdef _WIN32
 typedef int (*CM_WELS_TRACE) (const char* kpFormat, ...);
-#else
-typedef int (*CM_WELS_TRACE) (const char* kpDllName, const char* kpFormat, ...);
-#endif
 
 
 typedef  enum {
@@ -148,7 +144,6 @@ int32_t  LoadWelsTraceModule();
 int32_t  UnloadWelsTraceModule();
 
  private:
-void_t*   m_hTraceHandle;
 
 CM_WELS_TRACE m_fpDebugTrace;
 CM_WELS_TRACE m_fpInfoTrace;

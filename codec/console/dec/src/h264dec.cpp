@@ -45,13 +45,10 @@
 #include "codec_app_def.h"
 #include "codec_api.h"
 #include "read_config.h"
-#include "../../decoder/core/inc/typedefs.h"
-#include "../../decoder/core/inc/measure_time.h"
+#include "typedefs.h"
+#include "measure_time.h"
 #include "d3d9_utils.h"
 #include "logging.h"
-
-typedef long (*PCreateDecoderFunc) (ISVCDecoder** ppDecoder);
-typedef void_t (*PDestroyDecoderFunc) (ISVCDecoder* pDecoder);
 
 
 using namespace std;
@@ -84,7 +81,7 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
   int32_t iColorFormat = videoFormatInternal;
   static int32_t iFrameNum = 0;
 
-  EDecodeMode     eDecoderMode    = AUTO_MODE;
+  EDecodeMode     eDecoderMode    = SW_MODE;
   EBufferProperty	eOutputProperty = BUFFER_DEVICE;
 
   CUtils cOutputModule;
@@ -220,7 +217,7 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
     pData[2] = NULL;
     memset (&sDstBufInfo, 0, sizeof (SBufferInfo));
 
-    pDecoder->DecodeFrame (pBuf + iBufPos, iSliceSize, pData, &sDstBufInfo);
+    pDecoder->DecodeFrame2 (pBuf + iBufPos, iSliceSize, pData, &sDstBufInfo);
 
     if (sDstBufInfo.iBufferStatus == 1) {
       pDst[0] = (uint8_t*)pData[0];
@@ -262,7 +259,7 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
   pData[2] = NULL;
   memset (&sDstBufInfo, 0, sizeof (SBufferInfo));
 
-  pDecoder->DecodeFrame (NULL, 0, pData, &sDstBufInfo);
+  pDecoder->DecodeFrame2 (NULL, 0, pData, &sDstBufInfo);
   if (sDstBufInfo.iBufferStatus == 1) {
     pDst[0] = (uint8_t*)pData[0];
     pDst[1] = (uint8_t*)pData[1];
@@ -433,40 +430,10 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
 
 
 
-#if defined(_MSC_VER)
-
-  HMODULE hModule = LoadLibraryA (".\\welsdec.dll");
-
-  PCreateDecoderFunc  pCreateDecoderFunc				= NULL;
-  PDestroyDecoderFunc pDestroyDecoderFunc				= NULL;
-
-
-  pCreateDecoderFunc  = (PCreateDecoderFunc)::GetProcAddress (hModule, "CreateDecoder");
-  pDestroyDecoderFunc = (PDestroyDecoderFunc)::GetProcAddress (hModule, "DestroyDecoder");
-
-  if ((hModule != NULL) && (pCreateDecoderFunc != NULL) && (pDestroyDecoderFunc != NULL)) {
-    printf ("load library sw function successfully\n");
-
-    if (pCreateDecoderFunc (&pDecoder)  || (NULL == pDecoder)) {
-      printf ("Create Decoder failed.\n");
-      return 1;
-    }
-  } else {
-    printf ("load library sw function failed\n");
-    return 1;
-  }
-
-
-#else
-
-
   if (CreateDecoder (&pDecoder)  || (NULL == pDecoder)) {
     printf ("Create Decoder failed.\n");
     return 1;
   }
-
-#endif
-
 
   if (pDecoder->Initialize (&sDecParam, INIT_TYPE_PARAMETER_BASED)) {
     printf ("Decoder initialization failed.\n");
@@ -489,11 +456,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
   if (pDecoder) {
     pDecoder->Uninitialize();
 
-#if defined(_MSC_VER)
-    pDestroyDecoderFunc (pDecoder);
-#else
     DestroyDecoder (pDecoder);
-#endif
   }
 
   return 0;

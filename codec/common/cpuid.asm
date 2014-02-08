@@ -81,16 +81,17 @@ ALIGN 16
 %ifdef       WIN64
 
 WelsCPUId:
-    push     rbx        
-    push     rdx    
- 
+    push     rbx
+    push     rdx
+
     mov      eax,     ecx
-    cpuid  
+    mov      rcx,     [r9]
+    cpuid
     mov      [r9],    ecx
     mov      [r8],    ebx
-    mov      rcx,    [rsp + 2*8 + 40]        
+    mov      rcx,    [rsp + 2*8 + 40]
     mov      [rcx],   edx
-    pop      rdx 
+    pop      rdx
     mov      [rdx],   eax
 
     pop      rbx
@@ -102,10 +103,11 @@ WelsCPUId:
     push     rcx
     push     rdx
 
-    mov      eax,     edi    
+    mov      eax,     edi
+    mov      rcx,     [rcx]
     cpuid
     mov      [r8],    edx
-    pop      rdx    
+    pop      rdx
     pop      r8
     mov      [r8],   ecx
     mov      [rdx],   ebx
@@ -121,6 +123,8 @@ WelsCPUId:
     push	edi
 
     mov     eax, [esp+12]	; operating index
+    mov     edi, [esp+24]
+    mov     ecx, [edi]
     cpuid					; cpuid
 
     ; processing various information return
@@ -152,9 +156,9 @@ WelsCPUSupportAVX:
 %elifdef   UNIX64
         mov eax, edi
         mov ecx, esi
-%else 
+%else
         mov eax, [esp+4]
-        mov ecx, [esp+8]  
+        mov ecx, [esp+8]
 %endif
 
         ; refer to detection of AVX addressed in INTEL AVX manual document
@@ -216,5 +220,44 @@ WelsEmms:
 	emms	; empty mmx technology states
 	ret
 
+
+%ifdef     WIN64
+
+WELS_EXTERN WelsXmmRegStore
+ALIGN 16
+;******************************************************************************************
+;   void WelsXmmRegStore(void *src)
+;******************************************************************************************
+WelsXmmRegStore:
+  movdqu [rcx], xmm6
+  movdqu [rcx+16], xmm7
+  movdqu [rcx+32], xmm8
+  movdqu [rcx+48], xmm9
+  movdqu [rcx+64], xmm10
+  movdqu [rcx+80], xmm11
+  movdqu [rcx+96], xmm12
+  movdqu [rcx+112], xmm13
+  movdqu [rcx+128], xmm14
+  movdqu [rcx+144], xmm15
+  ret
+
+WELS_EXTERN WelsXmmRegLoad
+ALIGN 16
+;******************************************************************************************
+;   void WelsXmmRegLoad(void *src)
+;******************************************************************************************
+WelsXmmRegLoad:
+  movdqu xmm6, [rcx]
+  movdqu xmm7, [rcx+16]
+  movdqu xmm8, [rcx+32]
+  movdqu xmm9, [rcx+48]
+  movdqu xmm10, [rcx+64]
+  movdqu xmm11, [rcx+80]
+  movdqu xmm12, [rcx+96]
+  movdqu xmm13, [rcx+112]
+  movdqu xmm14, [rcx+128]
+  movdqu xmm15, [rcx+144]
+  ret
+%endif
 
 

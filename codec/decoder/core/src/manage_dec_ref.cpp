@@ -38,12 +38,9 @@
  *      07/21/2008 Created
  *
  *****************************************************************************/
-#include <string.h>
 
 #include "manage_dec_ref.h"
 #include "error_code.h"
-#include "utils.h"
-#include "as264_common.h" // for LTR macro can be delete later
 
 namespace WelsDec {
 
@@ -205,7 +202,7 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
           }
         }
       }
-      if (i < 0)	{
+      if (i < iReorderingIndex)	{
         return ERR_INFO_REFERENCE_PIC_LOST;
       }
       pPic = ppRefList[i];

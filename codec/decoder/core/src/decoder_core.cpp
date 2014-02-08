@@ -31,25 +31,10 @@
  *	decoder_core.c:	Wels decoder framework core implementation
  */
 
-#include <string.h>
-#include "codec_def.h"
 #include "decoder_core.h"
-#include "typedefs.h"
-#include "wels_const.h"
-#include "wels_common_basis.h"
-#include "codec_app_def.h"
-#include "decoder_context.h"
-#include "dec_golomb.h"
-#include "bit_stream.h"
 #include "error_code.h"
-#include "parameter_sets.h"
-#include "fmo.h"
-#include "utils.h"
 #include "memmgr_nal_unit.h"
-#include "dec_frame.h"
 #include "au_parser.h"
-#include "pic_queue.h"
-#include "ls_defines.h"
 #include "decode_slice.h"
 #include "manage_dec_ref.h"
 #include "expand_pic.h"
@@ -303,13 +288,13 @@ int32_t WelsInitMemory (PWelsDecoderContext pCtx) {
   if (MemInitNalList (&pCtx->pAccessUnitList, MAX_NAL_UNIT_NUM_IN_AU) != 0)
     return ERR_INFO_OUT_OF_MEMORY;
 
-  if ((pCtx->sRawData.pHead = static_cast<uint8_t*> (WelsMalloc (MAX_ACCESS_UINT_CAPACITY,
+  if ((pCtx->sRawData.pHead = static_cast<uint8_t*> (WelsMalloc (MAX_ACCESS_UNIT_CAPACITY,
                               "pCtx->sRawData->pHead"))) == NULL) {
     return ERR_INFO_OUT_OF_MEMORY;
   }
   pCtx->sRawData.pStartPos               =
     pCtx->sRawData.pCurPos                 = pCtx->sRawData.pHead;
-  pCtx->sRawData.pEnd                     = pCtx->sRawData.pHead + MAX_ACCESS_UINT_CAPACITY;
+  pCtx->sRawData.pEnd                     = pCtx->sRawData.pHead + MAX_ACCESS_UNIT_CAPACITY;
 
   pCtx->uiTargetDqId			= (uint8_t) - 1;
   pCtx->bEndOfStreamFlag	= false;
@@ -518,6 +503,11 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   }
   if (uiSliceType > 4)
     uiSliceType -= 5;
+
+  if((eNalType == NAL_UNIT_CODED_SLICE_IDR) && (uiSliceType != 2)){
+    WelsLog (pCtx, WELS_LOG_WARNING, "Invalid slice type(%d) in IDR picture. \n", uiSliceType);
+    return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SLICE_TYPE);
+  }
 
   if (kbExtensionFlag) {
     if (uiSliceType > 2) {
@@ -768,7 +758,6 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     } else if (uiQualityId > BASE_QUALITY_ID) {
       WelsLog (pCtx, WELS_LOG_WARNING, "MGS not supported.\n");
       return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_UNSUPPORTED_MGS);
-      pSliceHeadExt->uiRefLayerDqId	= pNalHeaderExt->uiLayerDqId - 1;
     } else {
       pSliceHeadExt->uiRefLayerDqId	= (uint8_t) - 1;
     }
@@ -1541,24 +1530,6 @@ void_t WelsDecodeAccessUnitEnd (PWelsDecoderContext pCtx) {
 }
 
 
-int32_t CheckBSBound (int32_t iWidth, int32_t iHeight, int32_t sliceNum, int32_t ppsId) {
-  int32_t iRet = 0;
-
-#if defined(_WIN32)
-  iRet = ((iWidth == 80) && (iHeight = 45) && (sliceNum < 60));
-
-#elif defined(MACOS)
-  iRet = ((iWidth == 80) && (iHeight = 45) && (ppsId < 57));
-
-#elif defined(ANDROID)
-  iRet = ((iWidth == 40) && (iHeight = 22));
-
-#endif
-
-  return iRet;
-
-}
-
 
 
 /*
@@ -1600,7 +1571,7 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
   if (NAL_UNIT_CODED_SLICE_IDR == pCurAu->pNalUnitsList[pCurAu->uiStartPos]->sNalHeaderExt.sNalUnitHeader.eNalUnitType ||
       pCurAu->pNalUnitsList[pCurAu->uiStartPos]->sNalHeaderExt.bIdrFlag) {
     WelsResetRefPic (pCtx); //clear ref pPic when IDR NAL
-    iErr = SyncPictureResolutionExt (pCtx, (pCtx->iMaxWidthInSps + 15) >> 4, (pCtx->iMaxHeightInSps + 15) >> 4);
+	iErr = SyncPictureResolutionExt (pCtx, pCtx->pSps->iMbWidth, pCtx->pSps->iMbHeight);
 
     if (ERR_NONE != iErr) {
       WelsLog (pCtx, WELS_LOG_WARNING, "sync picture resolution ext failed,  the error is %d", iErr);
@@ -1793,7 +1764,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
     }
     GetI4LumaIChromaAddrTable (pCtx->iDecBlockOffsetArray, pCtx->pDec->iLinesize[0], pCtx->pDec->iLinesize[1]);
 
-    if (pNalCur->sNalHeaderExt.uiLayerDqId > kuiTargetLayerDqId) {
+    if (pNalCur->sNalHeaderExt.uiLayerDqId > kuiTargetLayerDqId) { // confirmed pNalCur will never be NULL
       break;	// Per formance it need not to decode the remaining bits any more due to given uiLayerDqId required, 9/2/2009
     }
 

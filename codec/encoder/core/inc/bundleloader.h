@@ -68,7 +68,7 @@ if (noErr == iStatus) {
   }
 }
 std::string strPath (cCurrentPath);
-int pos = std::string::npos;
+std::string::size_type pos = std::string::npos;
 for (int i = 0; i < locateNumber; i++) {
   pos = strPath.rfind ('/');
   if (std::string::npos == pos) {

@@ -32,13 +32,7 @@
 
 // exp_data.c
 // export date cross various modules (.c)
-#include "typedefs.h"
-#include "wels_common_basis.h"
-#include "mb_cache.h"
-#include "utils.h"
 #include "md.h"
-#include "sample.h"
-#include "svc_enc_golomb.h"
 #include "vlc_encoder.h"
 namespace WelsSVCEnc {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -470,7 +464,7 @@ const uint8_t   g_kuiTemporalIdListTable[MAX_TEMPORAL_LEVEL][MAX_GOP_SIZE + 1] =
   {
     0, 0, 0, 0, 0, 0, 0, 0,
     0
-  },  // gop size = 1
+  },  // uiGopSize = 1
   {
     0, 1, 0, 0, 0, 0, 0, 0,
     0

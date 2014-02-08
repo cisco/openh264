@@ -50,11 +50,16 @@
 #define WELSVP_NAMESPACE_BEGIN      namespace nsWelsVP {
 #define WELSVP_NAMESPACE_END        }
 
+#include <stddef.h>
+#ifndef _MSC_VER
+#include <stdint.h>
+#endif
+
 WELSVP_NAMESPACE_BEGIN
 
-#if ( defined(_WIN32) || defined(_WIN32) ) && defined(_MSC_VER)
+#if defined(_MSC_VER)
 
-typedef char               int8_t   ;
+typedef signed char        int8_t   ;
 typedef unsigned char      uint8_t  ;
 typedef short              int16_t  ;
 typedef unsigned short     uint16_t ;
@@ -62,34 +67,18 @@ typedef int                int32_t  ;
 typedef unsigned int       uint32_t ;
 typedef __int64            int64_t  ;
 typedef unsigned __int64   uint64_t ;
-#define inline_t           _inline
-
-#else	// GCC
-
-typedef signed char        int8_t
-; // [comment]: some compilers may identify the type "char" as "unsigned char" as default, so declare it explicit
-typedef unsigned char      uint8_t  ;
-typedef signed short       int16_t  ;
-typedef unsigned short     uint16_t ;
-typedef signed int         int32_t  ;
-typedef unsigned int       uint32_t ;
-typedef long long          int64_t  ;
-typedef unsigned long long uint64_t ;
-#define inline_t           inline
+#if _MSC_VER < 1700
+#define inline            __inline
+#endif
 
 #endif
 
 typedef char    str_t    ; // [comment]: specific use plain char only for character parameters
-typedef long    long_t   ;
-typedef int32_t bool_t   ;
+typedef bool    bool_t   ;
 
 #if defined(_WIN32) || defined(_MACH_PLATFORM) || defined(__GNUC__)
 typedef float   float_t  ;
 typedef double  double_t ;
-#endif
-
-#ifndef NULL
-#define NULL    0
 #endif
 
 enum {

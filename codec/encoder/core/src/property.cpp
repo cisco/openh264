@@ -37,8 +37,6 @@
  *
  *************************************************************************************
  */
-#include <string.h>
-#include <stdlib.h>
 #include "property.h"
 #include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross_platforms
 namespace WelsSVCEnc {
@@ -66,12 +64,11 @@ int32_t GetCodeName (str_t* pBuf, int32_t iSize) {
   if (NULL == pBuf)
     return 0;
 
-  iLen = STRNLEN (WELS_CODE_NAME, 4);	// confirmed_safe_unsafe_usage
+  iLen = strlen (WELS_CODE_NAME);	// confirmed_safe_unsafe_usage
   if (iSize <= iLen)
     return 0;
 
-  pBuf[iLen]	= '\0';
-  STRNCPY (pBuf, iSize, WELS_CODE_NAME, iLen);	// confirmed_safe_unsafe_usage
+  WelsStrncpy (pBuf, iSize, WELS_CODE_NAME);	// confirmed_safe_unsafe_usage
 
   return iLen;
 }
@@ -88,12 +85,11 @@ int32_t GetLibName (str_t* pBuf, int32_t iSize) {
   if (NULL == pBuf)
     return 0;
 
-  iLen	= STRNLEN (WELS_LIB_NAME, 7);	// confirmed_safe_unsafe_usage
+  iLen	= strlen (WELS_LIB_NAME);	// confirmed_safe_unsafe_usage
   if (iSize <= iLen)
     return 0;
 
-  pBuf[iLen]	= '\0';
-  STRNCPY (pBuf, iSize, WELS_LIB_NAME, iLen);	// confirmed_safe_unsafe_usage
+  WelsStrncpy (pBuf, iSize, WELS_LIB_NAME);	// confirmed_safe_unsafe_usage
 
   return iLen;
 }
@@ -110,12 +106,11 @@ int32_t GetVerNum (str_t* pBuf, int32_t iSize) {
   if (NULL == pBuf)
     return 0;
 
-  iLen	= STRNLEN (WELS_VERSION_STR, 5);	// confirmed_safe_unsafe_usage
+  iLen	= strlen (WELS_VERSION_STR);	// confirmed_safe_unsafe_usage
   if (iSize <= iLen)
     return 0;
 
-  pBuf[iLen]	= '\0';
-  STRNCPY (pBuf, iSize, WELS_VERSION_STR, iLen);	// confirmed_safe_unsafe_usage
+  WelsStrncpy (pBuf, iSize, WELS_VERSION_STR);	// confirmed_safe_unsafe_usage
 
   return iLen;
 }
@@ -132,12 +127,11 @@ int32_t GetIdentInfo (str_t* pBuf, int32_t iSize) {
   if (NULL == pBuf)
     return 0;
 
-  iLen	= STRNLEN (WELS_IDENT, 30);	// confirmed_safe_unsafe_usage
+  iLen	= strlen (WELS_IDENT);	// confirmed_safe_unsafe_usage
   if (iSize <= iLen)
     return 0;
 
-  pBuf[iLen]	= '\0';
-  STRNCPY (pBuf, iSize, WELS_IDENT, iLen);	// confirmed_safe_unsafe_usage
+  WelsStrncpy (pBuf, iSize, WELS_IDENT);	// confirmed_safe_unsafe_usage
 
   return iLen;
 }

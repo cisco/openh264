@@ -38,41 +38,8 @@
  *************************************************************************************
  */
 #include "bit_stream.h"
-#include "macros.h"
 
 namespace WelsDec {
-
-#ifdef WORDS_BIGENDIAN
-inline uint32_t EndianFix (uint32_t uiX) {
-  return uiX;
-}
-#else //WORDS_BIGENDIAN
-
-#if defined(_MSC_VER) && defined(_M_IX86)
-inline uint32_t EndianFix (uint32_t uiX) {
-  __asm {
-    mov   eax,  uiX
-    bswap   eax
-    mov   uiX,    eax
-  }
-  return uiX;
-}
-#else  //_MSC_VER
-
-inline uint32_t EndianFix (uint32_t uiX) {
-#ifdef ARM_ARCHv7
-  __asm__ __volatile__ ("rev %0, %0":"+r" (uiX)); //Just for the ARMv7
-#elif defined (X86_ARCH)
-  __asm__ __volatile__ ("bswap %0":"+r" (uiX));
-#else
-  uiX = ((uiX & 0xff000000) >> 24) | ((uiX & 0xff0000) >> 8) |
-        ((uiX & 0xff00) << 8) | ((uiX & 0xff) << 24);
-#endif
-  return uiX;
-}
-#endif //_MSC_VER
-
-#endif //WORDS_BIGENDIAN
 
 inline uint32_t GetValue4Bytes (uint8_t* pDstNal) {
   uint32_t uiValue = 0;

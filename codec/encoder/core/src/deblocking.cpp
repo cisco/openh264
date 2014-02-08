@@ -38,10 +38,8 @@
  *************************************************************************************
  */
 
-#include "as264_common.h"
 #include "deblocking.h"
 #include "cpu_core.h"
-#include "array_stack_align.h"
 
 namespace WelsSVCEnc {
 
@@ -165,24 +163,24 @@ void inline DeblockingBSInsideMBAvsbase (int8_t* pNnzTab, uint8_t uiBS[2][4][4],
   uiNnz32b2 = * (uint32_t*) (pNnzTab + 8);
   uiNnz32b3 = * (uint32_t*) (pNnzTab + 12);
 
-  * (uint32_t*)uiBsx3 = (uiNnz32b0 | (uiNnz32b0 >> 8)) << iLShiftFactor;
+  * (uint32_t*)uiBsx3 = DEBLOCK_BS_SHIFTED (uiNnz32b0) << iLShiftFactor;
   uiBS[0][1][0] = uiBsx3[0];
   uiBS[0][2][0] = uiBsx3[1];
   uiBS[0][3][0] = uiBsx3[2];
 
-  * (uint32_t*)uiBsx3 = (uiNnz32b1 | (uiNnz32b1 >> 8)) << iLShiftFactor;
+  * (uint32_t*)uiBsx3 = DEBLOCK_BS_SHIFTED (uiNnz32b1) << iLShiftFactor;
   uiBS[0][1][1] = uiBsx3[0];
   uiBS[0][2][1] = uiBsx3[1];
   uiBS[0][3][1] = uiBsx3[2];
   * (uint32_t*)uiBS[1][1] = (uiNnz32b0 | uiNnz32b1) << iLShiftFactor;
 
-  * (uint32_t*)uiBsx3 = (uiNnz32b2 | (uiNnz32b2 >> 8)) << iLShiftFactor;
+  * (uint32_t*)uiBsx3 = DEBLOCK_BS_SHIFTED (uiNnz32b2) << iLShiftFactor;
   uiBS[0][1][2] = uiBsx3[0];
   uiBS[0][2][2] = uiBsx3[1];
   uiBS[0][3][2] = uiBsx3[2];
   * (uint32_t*)uiBS[1][2] = (uiNnz32b1 | uiNnz32b2) << iLShiftFactor;
 
-  * (uint32_t*)uiBsx3 = (uiNnz32b3 | (uiNnz32b3 >> 8)) << iLShiftFactor;
+  * (uint32_t*)uiBsx3 = DEBLOCK_BS_SHIFTED (uiNnz32b3) << iLShiftFactor;
   uiBS[0][1][3] = uiBsx3[0];
   uiBS[0][2][3] = uiBsx3[1];
   uiBS[0][3][3] = uiBsx3[2];
@@ -199,22 +197,22 @@ void inline DeblockingBSInsideMBNormal (SMB* pCurMb, uint8_t uiBS[2][4][4], int8
   uiNnz32b2 = * (uint32_t*) (pNnzTab + 8);
   uiNnz32b3 = * (uint32_t*) (pNnzTab + 12);
 
-  * (uint32_t*)uiBsx4 = (uiNnz32b0 | (uiNnz32b0 >> 8));
+  * (uint32_t*)uiBsx4 = DEBLOCK_BS_SHIFTED (uiNnz32b0);
   uiBS[0][1][0] = BS_EDGE (uiBsx4[0], iRefIdx, pCurMb->sMv, 1, 0);
   uiBS[0][2][0] = BS_EDGE (uiBsx4[1], iRefIdx, pCurMb->sMv, 2, 1);
   uiBS[0][3][0] = BS_EDGE (uiBsx4[2], iRefIdx, pCurMb->sMv, 3, 2);
 
-  * (uint32_t*)uiBsx4 = (uiNnz32b1 | (uiNnz32b1 >> 8));
+  * (uint32_t*)uiBsx4 = DEBLOCK_BS_SHIFTED (uiNnz32b1);
   uiBS[0][1][1] = BS_EDGE (uiBsx4[0], iRefIdx, pCurMb->sMv, 5, 4);
   uiBS[0][2][1] = BS_EDGE (uiBsx4[1], iRefIdx, pCurMb->sMv, 6, 5);
   uiBS[0][3][1] = BS_EDGE (uiBsx4[2], iRefIdx, pCurMb->sMv, 7, 6);
 
-  * (uint32_t*)uiBsx4 = (uiNnz32b2 | (uiNnz32b2 >> 8));
+  * (uint32_t*)uiBsx4 = DEBLOCK_BS_SHIFTED (uiNnz32b2);
   uiBS[0][1][2] = BS_EDGE (uiBsx4[0], iRefIdx, pCurMb->sMv, 9, 8);
   uiBS[0][2][2] = BS_EDGE (uiBsx4[1], iRefIdx, pCurMb->sMv, 10, 9);
   uiBS[0][3][2] = BS_EDGE (uiBsx4[2], iRefIdx, pCurMb->sMv, 11, 10);
 
-  * (uint32_t*)uiBsx4 = (uiNnz32b3 | (uiNnz32b3 >> 8));
+  * (uint32_t*)uiBsx4 = DEBLOCK_BS_SHIFTED (uiNnz32b3);
   uiBS[0][1][3] = BS_EDGE (uiBsx4[0], iRefIdx, pCurMb->sMv, 13, 12);
   uiBS[0][2][3] = BS_EDGE (uiBsx4[1], iRefIdx, pCurMb->sMv, 14, 13);
   uiBS[0][3][3] = BS_EDGE (uiBsx4[2], iRefIdx, pCurMb->sMv, 15, 14);
@@ -243,21 +241,22 @@ uint32_t DeblockingBSMarginalMBAvcbase (SMB* pCurMb, SMB* pNeighMb, int32_t iEdg
   int32_t i;
   uint32_t uiBSx4;
   uint8_t* pBS = (uint8_t*) (&uiBSx4);
-  uint32_t uiBIdx  = * (uint32_t*) (&g_kuiTableBIdx[iEdge][0]);
-  uint32_t uiBnIdx = * (uint32_t*) (&g_kuiTableBIdx[iEdge][4]);
+  const uint8_t *pBIdx  = &g_kuiTableBIdx[iEdge][0];
+  const uint8_t *pBnIdx = &g_kuiTableBIdx[iEdge][4];
+
 
   for (i = 0; i < 4; i++) {
-    if (pCurMb->pNonZeroCount[uiBIdx & 0xff] | pNeighMb->pNonZeroCount[uiBnIdx & 0xff]) {
+    if (pCurMb->pNonZeroCount[*pBIdx] | pNeighMb->pNonZeroCount[*pBnIdx]) {
       pBS[i] = 2;
     } else {
       pBS[i] =
 #ifndef SINGLE_REF_FRAME
         (pCurMb->uiRefIndex[g_kiTableBlock8x8Idx[1][iEdge][i]] - pNeighMb->uiRefIndex[g_kiTableBlock8x8NIdx[1][iEdge][i]]) ||
 #endif
-        MB_BS_MV (pCurMb->sMv, pNeighMb->sMv, (uiBIdx & 0xff), (uiBnIdx & 0xff));
+        MB_BS_MV (pCurMb->sMv, pNeighMb->sMv, *pBIdx, *pBnIdx);
     }
-    uiBIdx  = uiBIdx  >> 8;
-    uiBnIdx = uiBnIdx >> 8;
+    pBIdx++;
+    pBnIdx++;
   }
   return uiBSx4;
 }
@@ -638,190 +637,6 @@ void DeblockingMbAvcbase (SWelsFuncPtrList* pFunc, SMB* pCurMb, SDeblockingFilte
   }
 }
 
-//  C code only
-
-void DeblockLumaLt4_c (uint8_t* pPix, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha, int32_t iBeta, int8_t* pTc) {
-  for (int32_t i = 0; i < 16; i++) {
-    int32_t iTc0 = pTc[i >> 2];
-    if (iTc0 >= 0) {
-      int32_t p0 = pPix[-iStrideX];
-      int32_t p1 = pPix[-2 * iStrideX];
-      int32_t p2 = pPix[-3 * iStrideX];
-      int32_t q0 = pPix[0];
-      int32_t q1 = pPix[iStrideX];
-      int32_t q2 = pPix[2 * iStrideX];
-      bool_t bDetaP0Q0 = WELS_ABS (p0 - q0) < iAlpha;
-      bool_t bDetaP1P0 = WELS_ABS (p1 - p0) < iBeta;
-      bool_t bDetaQ1Q0 = WELS_ABS (q1 - q0) < iBeta;
-      int32_t iTc = iTc0;
-      if (bDetaP0Q0 && bDetaP1P0 && bDetaQ1Q0) {
-        bool_t bDetaP2P0 =  WELS_ABS (p2 - p0) < iBeta;
-        bool_t bDetaQ2Q0 =  WELS_ABS (q2 - q0) < iBeta;
-        if (bDetaP2P0) {
-          pPix[-2 * iStrideX] = p1 + WELS_CLIP3 ((p2 + ((p0 + q0 + 1) >> 1) - (p1 << 1)) >> 1, -iTc0, iTc0);
-          iTc++;
-        }
-        if (bDetaQ2Q0) {
-          pPix[iStrideX] = q1 + WELS_CLIP3 ((q2 + ((p0 + q0 + 1) >> 1) - (q1 << 1)) >> 1, -iTc0, iTc0);
-          iTc++;
-        }
-        int32_t iDeta = WELS_CLIP3 ((((q0 - p0) << 2) + (p1 - q1) + 4) >> 3, -iTc, iTc);
-        pPix[-iStrideX] = WELS_CLIP1 (p0 + iDeta);     /* p0' */
-        pPix[0]  = WELS_CLIP1 (q0 - iDeta);     /* q0' */
-      }
-    }
-    pPix += iStrideY;
-  }
-}
-
-
-void DeblockLumaEq4_c (uint8_t* pPix, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha, int32_t iBeta) {
-  int32_t p0, p1, p2, q0, q1, q2;
-  int32_t iDetaP0Q0;
-  bool_t bDetaP1P0, bDetaQ1Q0;
-  for (int32_t i = 0; i < 16; i++) {
-    p0 = pPix[-iStrideX];
-    p1 = pPix[-2 * iStrideX];
-    p2 = pPix[-3 * iStrideX];
-    q0 = pPix[0];
-    q1 = pPix[iStrideX];
-    q2 = pPix[2 * iStrideX];
-    iDetaP0Q0 = WELS_ABS (p0 - q0);
-    bDetaP1P0 = WELS_ABS (p1 - p0) < iBeta;
-    bDetaQ1Q0 = WELS_ABS (q1 - q0) < iBeta;
-    if ((iDetaP0Q0 < iAlpha) && bDetaP1P0 && bDetaQ1Q0) {
-      if (iDetaP0Q0 < ((iAlpha >> 2) + 2)) {
-        bool_t bDetaP2P0 = WELS_ABS (p2 - p0) < iBeta;
-        bool_t bDetaQ2Q0 =  WELS_ABS (q2 - q0) < iBeta;
-        if (bDetaP2P0) {
-          const int32_t p3 = pPix[-4 * iStrideX];
-          pPix[-iStrideX] = (p2 + (p1 << 1) + (p0 << 1) + (q0 << 1) + q1 + 4) >> 3;	   //p0
-          pPix[-2 * iStrideX] = (p2 + p1 + p0 + q0 + 2) >> 2;	 //p1
-          pPix[-3 * iStrideX] = ((p3 << 1) + p2 + (p2 << 1) + p1 + p0 + q0 + 4) >> 3;//p2
-        } else {
-          pPix[-1 * iStrideX] = ((p1 << 1) + p0 + q1 + 2) >> 2;	//p0
-        }
-        if (bDetaQ2Q0) {
-          const int32_t q3 = pPix[3 * iStrideX];
-          pPix[0] = (p1 + (p0 << 1) + (q0 << 1) + (q1 << 1) + q2 + 4) >> 3;   //q0
-          pPix[iStrideX] = (p0 + q0 + q1 + q2 + 2) >> 2;   //q1
-          pPix[2 * iStrideX] = ((q3 << 1) + q2 + (q2 << 1) + q1 + q0 + p0 + 4) >> 3;//q2
-        } else {
-          pPix[0] = ((q1 << 1) + q0 + p1 + 2) >> 2;   //q0
-        }
-      } else {
-        pPix[-iStrideX] = ((p1 << 1) + p0 + q1 + 2) >> 2;   //p0
-        pPix[ 0] = ((q1 << 1) + q0 + p1 + 2) >> 2;   //q0
-      }
-    }
-    pPix += iStrideY;
-  }
-}
-void DeblockLumaLt4V_c (uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* iTc) {
-  DeblockLumaLt4_c (pPix, iStride, 1, iAlpha, iBeta, iTc);
-}
-void DeblockLumaLt4H_c (uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* iTc) {
-  DeblockLumaLt4_c (pPix, 1, iStride, iAlpha, iBeta, iTc);
-}
-void DeblockLumaEq4V_c (uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
-  DeblockLumaEq4_c (pPix, iStride, 1, iAlpha, iBeta);
-}
-void DeblockLumaEq4H_c (uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
-  DeblockLumaEq4_c (pPix, 1, iStride, iAlpha, iBeta);
-}
-void DeblockChromaLt4_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha,
-                         int32_t iBeta, int8_t* pTc) {
-  int32_t p0, p1, q0, q1, iDeta;
-  bool_t bDetaP0Q0, bDetaP1P0, bDetaQ1Q0;
-
-  for (int32_t i = 0; i < 8; i++) {
-    int32_t iTc0 = pTc[i >> 1];
-    if (iTc0 > 0) {
-      p0 = pPixCb[-iStrideX];
-      p1 = pPixCb[-2 * iStrideX];
-      q0 = pPixCb[0];
-      q1 = pPixCb[iStrideX];
-
-      bDetaP0Q0 =  WELS_ABS (p0 - q0) < iAlpha;
-      bDetaP1P0 =  WELS_ABS (p1 - p0) < iBeta;
-      bDetaQ1Q0 = WELS_ABS (q1 - q0) < iBeta;
-      if (bDetaP0Q0 && bDetaP1P0 &&	bDetaQ1Q0) {
-        iDeta = WELS_CLIP3 ((((q0 - p0) << 2) + (p1 - q1) + 4) >> 3, -iTc0, iTc0);
-        pPixCb[-iStrideX] = WELS_CLIP1 (p0 + iDeta);     /* p0' */
-        pPixCb[0]  = WELS_CLIP1 (q0 - iDeta);     /* q0' */
-      }
-
-
-      p0 = pPixCr[-iStrideX];
-      p1 = pPixCr[-2 * iStrideX];
-      q0 = pPixCr[0];
-      q1 = pPixCr[iStrideX];
-
-      bDetaP0Q0 =  WELS_ABS (p0 - q0) < iAlpha;
-      bDetaP1P0 =  WELS_ABS (p1 - p0) < iBeta;
-      bDetaQ1Q0 = WELS_ABS (q1 - q0) < iBeta;
-
-      if (bDetaP0Q0 && bDetaP1P0 &&	bDetaQ1Q0) {
-        iDeta = WELS_CLIP3 ((((q0 - p0) << 2) + (p1 - q1) + 4) >> 3, -iTc0, iTc0);
-        pPixCr[-iStrideX] = WELS_CLIP1 (p0 + iDeta);     /* p0' */
-        pPixCr[0]  = WELS_CLIP1 (q0 - iDeta);     /* q0' */
-      }
-    }
-    pPixCb += iStrideY;
-    pPixCr += iStrideY;
-  }
-}
-void DeblockChromaEq4_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha,
-                         int32_t iBeta) {
-  int32_t i = 0, d = 0;
-  int32_t p0, p1, q0, q1;
-  bool_t bDetaP0Q0, bDetaP1P0, bDetaQ1Q0;
-  for (int32_t i = 0; i < 8; i++) {
-    //cb
-    p0 = pPixCb[-iStrideX];
-    p1 = pPixCb[-2 * iStrideX];
-    q0 = pPixCb[0];
-    q1 = pPixCb[iStrideX];
-    bDetaP0Q0 = WELS_ABS (p0 - q0) < iAlpha;
-    bDetaP1P0 = WELS_ABS (p1 - p0) < iBeta;
-    bDetaQ1Q0 = WELS_ABS (q1 - q0) < iBeta;
-    if (bDetaP0Q0 && bDetaP1P0 && bDetaQ1Q0) {
-      pPixCb[-iStrideX] = ((p1 << 1) + p0 + q1 + 2) >> 2;     /* p0' */
-      pPixCb[0]  = ((q1 << 1) + q0 + p1 + 2) >> 2;     /* q0' */
-    }
-
-    //cr
-    p0 = pPixCr[-iStrideX];
-    p1 = pPixCr[-2 * iStrideX];
-    q0 = pPixCr[0];
-    q1 = pPixCr[iStrideX];
-    bDetaP0Q0 = WELS_ABS (p0 - q0) < iAlpha;
-    bDetaP1P0 = WELS_ABS (p1 - p0) < iBeta;
-    bDetaQ1Q0 = WELS_ABS (q1 - q0) < iBeta;
-    if (bDetaP0Q0 && bDetaP1P0 && bDetaQ1Q0) {
-      pPixCr[-iStrideX] = ((p1 << 1) + p0 + q1 + 2) >> 2;     /* p0' */
-      pPixCr[0]  = ((q1 << 1) + q0 + p1 + 2) >> 2;     /* q0' */
-    }
-    pPixCr += iStrideY;
-    pPixCb += iStrideY;
-  }
-}
-void DeblockChromaLt4V_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
-                          int8_t* iTc) {
-  DeblockChromaLt4_c (pPixCb, pPixCr, iStride, 1, iAlpha, iBeta, iTc);
-}
-void DeblockChromaLt4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
-                          int8_t* iTc) {
-  DeblockChromaLt4_c (pPixCb, pPixCr, 1, iStride, iAlpha, iBeta, iTc);
-}
-void DeblockChromaEq4V_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
-  DeblockChromaEq4_c (pPixCb, pPixCr, iStride, 1, iAlpha, iBeta);
-}
-void DeblockChromaEq4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
-  DeblockChromaEq4_c (pPixCb, pPixCr, 1, iStride, iAlpha, iBeta);
-}
-
-
 void  DeblockingFilterFrameAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc) {
   int32_t i, j;
   const int32_t kiMbWidth	= pCurDq->iMbWidth;
@@ -957,29 +772,6 @@ void WelsBlockFuncInit (PSetNoneZeroCountZeroFunc* pfSetNZCZero,  int32_t iCpu) 
 }
 
 
-#ifdef X86_ASM
-
-extern "C" {
-  void DeblockLumaLt4H_sse2 (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTc) {
-    ENFORCE_STACK_ALIGN_1D (uint8_t,  uiBuf,   16 * 8, 16);
-
-    DeblockLumaTransposeH2V_sse2 (pPixY - 4, iStride, &uiBuf[0]);
-    DeblockLumaLt4V_sse2 (&uiBuf[4 * 16], 16, iAlpha, iBeta, pTc);
-    DeblockLumaTransposeV2H_sse2 (pPixY - 4, iStride, &uiBuf[0]);
-  }
-
-  void DeblockLumaEq4H_sse2 (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
-    ENFORCE_STACK_ALIGN_1D (uint8_t,  uiBuf,   16 * 8, 16);
-
-    DeblockLumaTransposeH2V_sse2 (pPixY - 4, iStride, &uiBuf[0]);
-    DeblockLumaEq4V_sse2 (&uiBuf[4 * 16], 16, iAlpha, iBeta);
-    DeblockLumaTransposeV2H_sse2 (pPixY - 4, iStride, &uiBuf[0]);
-  }
-
-}
-
-#endif
-
 
 void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
   pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_c;
@@ -994,15 +786,15 @@ void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
 
 
 #ifdef X86_ASM
-  if (iCpu & WELS_CPU_SSE2) {
-    pFunc->pfLumaDeblockingLT4Ver	= DeblockLumaLt4V_sse2;
-    pFunc->pfLumaDeblockingEQ4Ver	= DeblockLumaEq4V_sse2;
-    pFunc->pfLumaDeblockingLT4Hor       = DeblockLumaLt4H_sse2;
-    pFunc->pfLumaDeblockingEQ4Hor       = DeblockLumaEq4H_sse2;
-    pFunc->pfChromaDeblockingLT4Ver	= DeblockChromaLt4V_sse2;
-    pFunc->pfChromaDeblockingEQ4Ver	= DeblockChromaEq4V_sse2;
-    pFunc->pfChromaDeblockingLT4Hor	= DeblockChromaLt4H_sse2;
-    pFunc->pfChromaDeblockinEQ4Hor	= DeblockChromaEq4H_sse2;
+  if (iCpu & WELS_CPU_SSSE3) {
+    pFunc->pfLumaDeblockingLT4Ver	= DeblockLumaLt4V_ssse3;
+    pFunc->pfLumaDeblockingEQ4Ver	= DeblockLumaEq4V_ssse3;
+    pFunc->pfLumaDeblockingLT4Hor       = DeblockLumaLt4H_ssse3;
+    pFunc->pfLumaDeblockingEQ4Hor       = DeblockLumaEq4H_ssse3;
+    pFunc->pfChromaDeblockingLT4Ver	= DeblockChromaLt4V_ssse3;
+    pFunc->pfChromaDeblockingEQ4Ver	= DeblockChromaEq4V_ssse3;
+    pFunc->pfChromaDeblockingLT4Hor	= DeblockChromaLt4H_ssse3;
+    pFunc->pfChromaDeblockinEQ4Hor	= DeblockChromaEq4H_ssse3;
   }
 #endif
 }

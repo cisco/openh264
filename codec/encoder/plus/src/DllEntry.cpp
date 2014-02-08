@@ -34,16 +34,10 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // DLL Entry Point
-HANDLE g_hInstDll;
 
 BOOL WINAPI DllEntryPoint (HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved) {
-  g_hInstDll = hInstance;
   if (DLL_PROCESS_ATTACH == dwReason) {
     DisableThreadLibraryCalls (hInstance);
   }
-//	else if (DLL_PROCESS_DETACH == dwReason)
-//	{
-//
-//	}
   return TRUE;
 }

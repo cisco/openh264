@@ -39,16 +39,8 @@
  */
 
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
 #include "svc_motion_estimate.h"
-#include "svc_enc_golomb.h"
-#include "macros.h"
-#include "sample.h"
-#include "array_stack_align.h"
-#include "cpu_core.h"	// WELS_CPU_SSE41
 
 namespace WelsSVCEnc {
 /*!

@@ -38,17 +38,10 @@
  *************************************************************************************
  */
 
-#include <string.h>
 
 #include "parse_mb_syn_cavlc.h"
 #include "error_code.h"
-#include "dec_golomb.h"
-#include "macros.h"
-#include "vlc_decoder.h"
-#include "bit_stream.h"
-#include "ls_defines.h"
 #include "mv_pred.h"
-#include "decode_slice.h"
 
 namespace WelsDec {
 
@@ -390,7 +383,7 @@ int32_t CheckIntra16x16PredMode (uint8_t uiSampleAvail, int8_t* pMode) {
   int32_t bLeftTopAvail  = uiSampleAvail & 0x02;
   int32_t iTopAvail      = uiSampleAvail & 0x01;
 
-  if (*pMode > MAX_PRED_MODE_ID_I16x16) {
+  if ((*pMode < 0) || (*pMode > MAX_PRED_MODE_ID_I16x16)) {
     return ERR_INFO_INVALID_I16x16_PRED_MODE;
   }
 
@@ -418,10 +411,6 @@ int32_t CheckIntraChromaPredMode (uint8_t uiSampleAvail, int8_t* pMode) {
   int32_t iLeftAvail     = uiSampleAvail & 0x04;
   int32_t bLeftTopAvail  = uiSampleAvail & 0x02;
   int32_t iTopAvail      = uiSampleAvail & 0x01;
-
-  if (*pMode > MAX_PRED_MODE_ID_CHROMA) {
-    return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
-  }
 
   if (C_PRED_DC == *pMode) {
     if (iLeftAvail && iTopAvail) {
@@ -451,8 +440,8 @@ int32_t CheckIntra4x4PredMode (int32_t* pSampleAvail, int8_t* pMode, int32_t iIn
 
   int8_t iFinalMode;
 
-  if (*pMode > MAX_PRED_MODE_ID_I4x4) {
-    return -1;
+  if ((*pMode < 0) || (*pMode > MAX_PRED_MODE_ID_I4x4)) {
+    return ERR_INVALID_INTRA4X4_MODE;
   }
 
   if (I4_PRED_DC == *pMode) {
@@ -468,7 +457,7 @@ int32_t CheckIntra4x4PredMode (int32_t* pSampleAvail, int8_t* pMode, int32_t iIn
   } else {
     bool_t bModeAvail = CHECK_I4_MODE (*pMode, iLeftAvail, iTopAvail, bLeftTopAvail);
     if (0 == bModeAvail) {
-      return -1;
+      return ERR_INVALID_INTRA4X4_MODE;
     }
 
     iFinalMode = *pMode;
@@ -548,7 +537,6 @@ static int32_t CavlcGetLevelVal (int32_t iLevel[16], SReadBitsCache* pBitsCache,
                                  uint8_t uiTrailingOnes) {
   int32_t i, iUsedBits = 0;
   int32_t iSuffixLength, iSuffixLengthSize, iLevelPrefix, iPrefixBits, iLevelCode, iThreshold;
-  uint32_t uiCache32Bit;
   for (i = 0; i < uiTrailingOnes; i++) {
     iLevel[i] = 1 - ((pBitsCache->uiCache32Bit >> (30 - i)) & 0x02);
   }
@@ -559,12 +547,7 @@ static int32_t CavlcGetLevelVal (int32_t iLevel[16], SReadBitsCache* pBitsCache,
 
   for (; i < uiTotalCoeff; i++) {
     if (pBitsCache->uiRemainBits <= 16)		SHIFT_BUFFER (pBitsCache);
-#if defined(_MSC_VER) && defined(_M_IX86)
-    uiCache32Bit = pBitsCache->uiCache32Bit;
-    WELS_GET_PREFIX_BITS (uiCache32Bit, iPrefixBits);
-#else
-    iPrefixBits = GetPrefixBits (pBitsCache->uiCache32Bit);
-#endif
+    WELS_GET_PREFIX_BITS (pBitsCache->uiCache32Bit, iPrefixBits);
     POP_BUFFER (pBitsCache, iPrefixBits);
     iUsedBits   += iPrefixBits;
     iLevelPrefix = iPrefixBits - 1;
@@ -586,8 +569,6 @@ static int32_t CavlcGetLevelVal (int32_t iLevel[16], SReadBitsCache* pBitsCache,
 
     if (iSuffixLengthSize > 0) {
       if (pBitsCache->uiRemainBits <= iSuffixLengthSize) SHIFT_BUFFER (pBitsCache);
-      if (pBitsCache->uiRemainBits <= iSuffixLengthSize)
-        return 0;
       iLevelCode += (pBitsCache->uiCache32Bit >> (32 - iSuffixLengthSize));
       POP_BUFFER (pBitsCache, iSuffixLengthSize);
       iUsedBits  += iSuffixLengthSize;
@@ -628,8 +609,6 @@ static int32_t CavlcGetTotalZeros (int32_t& iZerosLeft, SReadBitsCache* pBitsCac
   iCount = kpBitNumMap[iTotalZeroVlcIdx - 1];
   if (pBitsCache->uiRemainBits < iCount) SHIFT_BUFFER (
       pBitsCache); // if uiRemainBits+16 still smaller than iCount?? potential bug
-  if (pBitsCache->uiRemainBits < iCount)
-    return 0;
   uiValue    = pBitsCache->uiCache32Bit >> (32 - iCount);
   iCount     = pVlcTable->kpTotalZerosTable[uiTableType][iTotalZeroVlcIdx - 1][uiValue][1];
   POP_BUFFER (pBitsCache, iCount);
@@ -641,14 +620,12 @@ static int32_t CavlcGetTotalZeros (int32_t& iZerosLeft, SReadBitsCache* pBitsCac
 static int32_t	CavlcGetRunBefore (int32_t iRun[16], SReadBitsCache* pBitsCache, uint8_t uiTotalCoeff,
                                    SVlcTable* pVlcTable, int32_t iZerosLeft) {
   int32_t i, iUsedBits = 0;
-  uint32_t uiCount, uiValue, uiCache32Bit, iPrefixBits;
+  uint32_t uiCount, uiValue, iPrefixBits;
 
   for (i = 0; i < uiTotalCoeff - 1; i++) {
     if (iZerosLeft > 0) {
       uiCount = g_kuiZeroLeftBitNumMap[iZerosLeft];
       if (pBitsCache->uiRemainBits < uiCount) SHIFT_BUFFER (pBitsCache);
-      if (pBitsCache->uiRemainBits < uiCount)
-        return 0;
       uiValue = pBitsCache->uiCache32Bit >> (32 - uiCount);
       if (iZerosLeft < 7) {
         uiCount = pVlcTable->kpZeroTable[iZerosLeft - 1][uiValue][1];
@@ -662,13 +639,10 @@ static int32_t	CavlcGetRunBefore (int32_t iRun[16], SReadBitsCache* pBitsCache, 
           iRun[i] = pVlcTable->kpZeroTable[6][uiValue][0];
         } else {
           if (pBitsCache->uiRemainBits < 16) SHIFT_BUFFER (pBitsCache);
-#if defined(_MSC_VER) && defined(_M_IX86)
-          uiCache32Bit = pBitsCache->uiCache32Bit;
-          WELS_GET_PREFIX_BITS (uiCache32Bit, iPrefixBits);
-#else
-          iPrefixBits = GetPrefixBits (pBitsCache->uiCache32Bit);
-#endif
+          WELS_GET_PREFIX_BITS (pBitsCache->uiCache32Bit, iPrefixBits);
           iRun[i] = iPrefixBits + 6;
+          if (iRun[i] > iZerosLeft)
+            return -1;
           POP_BUFFER (pBitsCache, iPrefixBits);
           iUsedBits += iPrefixBits;
         }
@@ -739,8 +713,8 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
     pBs->iIndex += iUsedBits;
     return 0;
   }
-  if (uiTrailingOnes > 3 || uiTotalCoeff > 16) { /////////////////check uiTrailingOnes and uiTotalCoeff
-    return -1;
+  if ((uiTrailingOnes > 3) || (uiTotalCoeff > 16)) { /////////////////check uiTrailingOnes and uiTotalCoeff
+    return ERR_INFO_CAVLC_INVALID_TOTAL_COEFF_OR_TRAILING_ONES;
   }
   iUsedBits += CavlcGetLevelVal (iLevel, &sReadBitsCache, uiTotalCoeff, uiTrailingOnes);
 
@@ -750,11 +724,13 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
     iZerosLeft = 0;
   }
 
-  if (iZerosLeft < 0) {
+  if ((iZerosLeft < 0) || ((iZerosLeft + uiTotalCoeff) > iMaxNumCoeff)) {
     return ERR_INFO_CAVLC_INVALID_ZERO_LEFT;
   }
-  iUsedBits += CavlcGetRunBefore (iRun, &sReadBitsCache, uiTotalCoeff, pVlcTable, iZerosLeft);
-
+  if ((i = CavlcGetRunBefore (iRun, &sReadBitsCache, uiTotalCoeff, pVlcTable, iZerosLeft)) == -1) {
+    return ERR_INFO_CAVLC_INVALID_RUN_BEFORE;
+  }
+  iUsedBits += i;
   pBs->iIndex += iUsedBits;
   iCoeffNum = -1;
 
@@ -805,7 +781,7 @@ int32_t ParseIntra4x4ModeConstrain0 (PNeighAvail pNeighAvail, int8_t* pIntraPred
   int32_t iFinalMode, i;
 
   uint8_t uiNeighAvail = 0;
-
+  uint32_t uiTmp;
   if (pNeighAvail->iLeftAvail) {  //left
     iSampleAvail[ 6] =
       iSampleAvail[12] =
@@ -844,7 +820,7 @@ int32_t ParseIntra4x4ModeConstrain0 (PNeighAvail pNeighAvail, int8_t* pIntraPred
     }
 
     iFinalMode = CheckIntra4x4PredMode (&iSampleAvail[0], &iBestMode, i);
-    if (iFinalMode < 0) {
+    if (iFinalMode  == ERR_INVALID_INTRA4X4_MODE) {
       return ERR_INFO_INVALID_I4x4_PRED_MODE;
     }
 
@@ -858,9 +834,12 @@ int32_t ParseIntra4x4ModeConstrain0 (PNeighAvail pNeighAvail, int8_t* pIntraPred
   pCurDqLayer->pIntraPredMode[iMbXy][4] = pIntraPredMode[4 + 8 * 1];
   pCurDqLayer->pIntraPredMode[iMbXy][5] = pIntraPredMode[4 + 8 * 2];
   pCurDqLayer->pIntraPredMode[iMbXy][6] = pIntraPredMode[4 + 8 * 3];
-  pCurDqLayer->pChromaPredMode[iMbXy] = BsGetUe (pBs);
-  if (-1 == pCurDqLayer->pChromaPredMode[iMbXy]
-      || CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
+  uiTmp = BsGetUe (pBs);
+  if (uiTmp > MAX_PRED_MODE_ID_CHROMA) {
+    return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
+  }
+  pCurDqLayer->pChromaPredMode[iMbXy] = uiTmp;
+  if (CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
 
@@ -874,7 +853,7 @@ int32_t ParseIntra4x4ModeConstrain1 (PNeighAvail pNeighAvail, int8_t* pIntraPred
   int32_t iFinalMode, i;
 
   uint8_t uiNeighAvail = 0;
-
+  uint32_t uiTmp;
   if (pNeighAvail->iLeftAvail && IS_INTRA (pNeighAvail->iLeftType)) {   //left
     iSampleAvail[ 6] =
       iSampleAvail[12] =
@@ -913,7 +892,7 @@ int32_t ParseIntra4x4ModeConstrain1 (PNeighAvail pNeighAvail, int8_t* pIntraPred
     }
 
     iFinalMode = CheckIntra4x4PredMode (&iSampleAvail[0], &iBestMode, i);
-    if (iFinalMode < 0) {
+    if (iFinalMode  == ERR_INVALID_INTRA4X4_MODE) {
       return ERR_INFO_INVALID_I4x4_PRED_MODE;
     }
 
@@ -927,10 +906,12 @@ int32_t ParseIntra4x4ModeConstrain1 (PNeighAvail pNeighAvail, int8_t* pIntraPred
   pCurDqLayer->pIntraPredMode[iMbXy][4] = pIntraPredMode[4 + 8 * 1];
   pCurDqLayer->pIntraPredMode[iMbXy][5] = pIntraPredMode[4 + 8 * 2];
   pCurDqLayer->pIntraPredMode[iMbXy][6] = pIntraPredMode[4 + 8 * 3];
-
-  pCurDqLayer->pChromaPredMode[iMbXy] = BsGetUe (pBs);
-  if (-1 == pCurDqLayer->pChromaPredMode[iMbXy]
-      || CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
+  uiTmp = BsGetUe (pBs);
+  if (uiTmp > MAX_PRED_MODE_ID_CHROMA) {
+    return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
+  }
+  pCurDqLayer->pChromaPredMode[iMbXy] = uiTmp;
+  if (CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
 
@@ -940,7 +921,7 @@ int32_t ParseIntra4x4ModeConstrain1 (PNeighAvail pNeighAvail, int8_t* pIntraPred
 int32_t ParseIntra16x16ModeConstrain0 (PNeighAvail pNeighAvail, PBitStringAux pBs, PDqLayer pCurDqLayer) {
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
   uint8_t uiNeighAvail = 0; //0x07 = 0 1 1 1, means left, top-left, top avail or not. (1: avail, 0: unavail)
-
+  uint32_t uiTmp;
   if (pNeighAvail->iLeftAvail) {
     uiNeighAvail = (1 << 2);
   }
@@ -955,10 +936,13 @@ int32_t ParseIntra16x16ModeConstrain0 (PNeighAvail pNeighAvail, PBitStringAux pB
                                &pCurDqLayer->pIntraPredMode[iMbXy][7])) { //invalid iPredMode, must stop decoding
     return ERR_INFO_INVALID_I16x16_PRED_MODE;
   }
-  pCurDqLayer->pChromaPredMode[iMbXy] = BsGetUe (pBs);
+  uiTmp = BsGetUe (pBs);
+  if (uiTmp > MAX_PRED_MODE_ID_CHROMA) {
+    return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
+  }
+  pCurDqLayer->pChromaPredMode[iMbXy] = uiTmp;
 
-  if (-1 == pCurDqLayer->pChromaPredMode[iMbXy]
-      || CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
+  if (CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
 
@@ -968,7 +952,7 @@ int32_t ParseIntra16x16ModeConstrain0 (PNeighAvail pNeighAvail, PBitStringAux pB
 int32_t ParseIntra16x16ModeConstrain1 (PNeighAvail pNeighAvail, PBitStringAux pBs, PDqLayer pCurDqLayer) {
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
   uint8_t uiNeighAvail = 0; //0x07 = 0 1 1 1, means left, top-left, top avail or not. (1: avail, 0: unavail)
-
+  uint32_t uiTmp;
   if (pNeighAvail->iLeftAvail && IS_INTRA (pNeighAvail->iLeftType)) {
     uiNeighAvail = (1 << 2);
   }
@@ -983,10 +967,13 @@ int32_t ParseIntra16x16ModeConstrain1 (PNeighAvail pNeighAvail, PBitStringAux pB
                                &pCurDqLayer->pIntraPredMode[iMbXy][7])) { //invalid iPredMode, must stop decoding
     return ERR_INFO_INVALID_I16x16_PRED_MODE;
   }
-  pCurDqLayer->pChromaPredMode[iMbXy] = BsGetUe (pBs);
+  uiTmp = BsGetUe (pBs);
+  if (uiTmp > MAX_PRED_MODE_ID_CHROMA) {
+    return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
+  }
+  pCurDqLayer->pChromaPredMode[iMbXy] = uiTmp;
 
-  if (-1 == pCurDqLayer->pChromaPredMode[iMbXy]
-      || CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
+  if (CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
 

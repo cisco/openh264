@@ -244,7 +244,7 @@ WELS_EXTERN ExpandPictureChromaUnalign_sse2	; for chroma unalignment
 %macro exp_left_right_sse2	2	; iPaddingSize [luma(32)/chroma(16)], u/a
     ;r6 [height]
     ;r0 [pSrc+0]  r5[pSrc-32] r1[stride]
-    ;r3 [pSrc+(w-1)] r4[pSrc+w] 
+    ;r3 [pSrc+(w-1)] r4[pSrc+w]
 
 %if %1 == 32		; for luma
 .left_right_loops:
@@ -375,13 +375,13 @@ ExpandPictureLuma_sse2:
 
     %assign push_num 3
     LOAD_4_PARA
-    
+
     SIGN_EXTENTION r1, r1d
     SIGN_EXTENTION r2, r2d
     SIGN_EXTENTION r3, r3d
 
     ;also prepare for cross border pData top-left:xmm3
-    
+
     movzx r6d,byte[r0]
     SSE2_Copy16Times xmm3,r6d         ;xmm3: pSrc[0]
 
@@ -395,22 +395,22 @@ ExpandPictureLuma_sse2:
     dec r3                      ;h-1
     imul r3,r1                  ;(h-1)*stride
     lea  r3,[r0+r3]             ;pSrc[(h-1)*stride]  r3 = src bottom
-    
+
     mov r6,r1                    ;r6 = stride
     sal r6,05h                   ;r6 = 32*stride
     lea r4,[r3+r6]               ;r4 = dst bottom
-    
+
     ;also prepare for cross border data: bottom-left with xmm5,bottom-right xmm6
-    
+
     movzx r6d,byte [r3]             ;bottom-left
     SSE2_Copy16Times xmm5,r6d
-    
+
     lea r6,[r3+r2-1]
     movzx r6d,byte [r6]
     SSE2_Copy16Times xmm6,r6d ;bottom-right
-    
+
     neg r1  ;r1 = -stride
-    
+
     push r0
     push r1
     push r2
@@ -419,20 +419,20 @@ ExpandPictureLuma_sse2:
 
 	; for both left and right border
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    
+
     pop r2
     pop r1
     pop r0
 
     lea r5,[r0-32]                          ;left border dst  luma =32 chroma = -16
-    
+
     lea r3,[r0+r2-1]                        ;right border src
     lea r4,[r3+1]                           ;right border dst
 
     ;prepare for cross border data: top-rigth with xmm4
      movzx r6d,byte [r3]                         ;top -rigth
      SSE2_Copy16Times xmm4,r6d
-    
+
     neg r1   ;r1 = stride
 
 
@@ -444,7 +444,7 @@ ExpandPictureLuma_sse2:
     push r1
     push r2
     push r6
-    
+
     exp_left_right_sse2  32,a
 
     pop r6
@@ -455,33 +455,33 @@ ExpandPictureLuma_sse2:
 	; for cross border [top-left, top-right, bottom-left, bottom-right]
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ; have done xmm3,..,xmm6 cross pData initialization above, perform pading as below, To be continued..
-    
+
     neg r1  ;r1 = -stride
     lea r3,[r0-32]
     lea r3,[r3+r1]    ;last line of top-left border
-    
+
     lea r4,[r0+r2]    ;psrc +width
     lea r4,[r4+r1]    ;psrc +width -stride
-    
-    
+
+
     neg r1  ;r1 = stride
     add r6,32         ;height +32(16) ,luma = 32, chroma = 16
     imul r6,r1
-    
+
     lea r5,[r3+r6]    ;last line of bottom-left border
     lea r6,[r4+r6]    ;last line of botoom-right border
-    
+
     neg r1 ; r1 = -stride
 
     ; for left & right border expanding
     exp_cross_sse2 32,a
 
     LOAD_4_PARA_POP
-    
+
     pop r6
     pop r5
     pop r4
-    
+
     %assign push_num 0
 
 
@@ -495,7 +495,7 @@ ALIGN 16
 ;										const int32_t iHeight	);
 ;***********************************************************************----------------
 ExpandPictureChromaAlign_sse2:
-	
+
     push r4
     push r5
     push r6
@@ -508,7 +508,7 @@ ExpandPictureChromaAlign_sse2:
     SIGN_EXTENTION r3,r3d
 
     ;also prepare for cross border pData top-left:xmm3
-    
+
     movzx r6d,byte [r0]
     SSE2_Copy16Times xmm3,r6d         ;xmm3: pSrc[0]
 
@@ -522,44 +522,44 @@ ExpandPictureChromaAlign_sse2:
     dec r3                      ;h-1
     imul r3,r1                  ;(h-1)*stride
     lea  r3,[r0+r3]             ;pSrc[(h-1)*stride]  r3 = src bottom
-    
+
     mov r6,r1                    ;r6 = stride
     sal r6,04h                   ;r6 = 32*stride
-    lea r4,[r3+r6]               ;r4 = dst bottom 
-    
+    lea r4,[r3+r6]               ;r4 = dst bottom
+
     ;also prepare for cross border data: bottom-left with xmm5,bottom-right xmm6
-    
+
     movzx r6d,byte [r3]             ;bottom-left
     SSE2_Copy16Times xmm5,r6d
-    
+
     lea r6,[r3+r2-1]
     movzx r6d,byte [r6]
     SSE2_Copy16Times xmm6,r6d ;bottom-right
-    
+
     neg r1  ;r1 = -stride
-    
+
     push r0
-    push r1 
+    push r1
     push r2
 
     exp_top_bottom_sse2 16
 
 	; for both left and right border
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    
+
     pop r2
     pop r1
     pop r0
 
     lea r5,[r0-16]                          ;left border dst  luma =32 chroma = -16
-    
-    lea r3,[r0+r2-1]                        ;right border src 
+
+    lea r3,[r0+r2-1]                        ;right border src
     lea r4,[r3+1]                           ;right border dst
 
     ;prepare for cross border data: top-rigth with xmm4
     movzx r6d,byte [r3]                         ;top -rigth
     SSE2_Copy16Times xmm4,r6d
-    
+
     neg r1   ;r1 = stride
 
 
@@ -568,7 +568,7 @@ ExpandPictureChromaAlign_sse2:
 
 
     push r0
-    push r1 
+    push r1
     push r2
 	push r6
     exp_left_right_sse2 16,a
@@ -581,33 +581,33 @@ ExpandPictureChromaAlign_sse2:
 	; for cross border [top-left, top-right, bottom-left, bottom-right]
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ; have done xmm3,..,xmm6 cross pData initialization above, perform pading as below, To be continued..
-    
+
     neg r1  ;r1 = -stride
     lea r3,[r0-16]
     lea r3,[r3+r1]    ;last line of top-left border
-    
+
     lea r4,[r0+r2]    ;psrc +width
-    lea r4,[r4+r1]    ;psrc +width -stride  
-    
-    
+    lea r4,[r4+r1]    ;psrc +width -stride
+
+
     neg r1  ;r1 = stride
     add r6,16         ;height +32(16) ,luma = 32, chroma = 16
     imul r6,r1
-    
+
     lea r5,[r3+r6]    ;last line of bottom-left border
     lea r6,[r4+r6]    ;last line of botoom-right border
-    
+
     neg r1 ; r1 = -stride
 
     ; for left & right border expanding
     exp_cross_sse2 16,a
 
     LOAD_4_PARA_POP
-    
+
     pop r6
     pop r5
     pop r4
-    
+
     %assign push_num 0
 
 
@@ -633,7 +633,7 @@ ExpandPictureChromaUnalign_sse2:
     SIGN_EXTENTION r3,r3d
 
     ;also prepare for cross border pData top-left:xmm3
-    
+
     movzx r6d,byte [r0]
     SSE2_Copy16Times xmm3,r6d         ;xmm3: pSrc[0]
 
@@ -647,44 +647,44 @@ ExpandPictureChromaUnalign_sse2:
     dec r3                      ;h-1
     imul r3,r1                  ;(h-1)*stride
     lea  r3,[r0+r3]             ;pSrc[(h-1)*stride]  r3 = src bottom
-    
+
     mov r6,r1                    ;r6 = stride
     sal r6,04h                   ;r6 = 32*stride
-    lea r4,[r3+r6]               ;r4 = dst bottom 
-    
+    lea r4,[r3+r6]               ;r4 = dst bottom
+
     ;also prepare for cross border data: bottom-left with xmm5,bottom-right xmm6
-    
+
     movzx r6d,byte [r3]             ;bottom-left
     SSE2_Copy16Times xmm5,r6d
-    
+
     lea r6,[r3+r2-1]
     movzx r6d,byte [r6]
     SSE2_Copy16Times xmm6,r6d ;bottom-right
-    
+
     neg r1  ;r1 = -stride
-    
+
     push r0
-    push r1 
+    push r1
     push r2
 
     exp_top_bottom_sse2 16
 
 	; for both left and right border
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    
+
     pop r2
     pop r1
     pop r0
 
     lea r5,[r0-16]                          ;left border dst  luma =32 chroma = -16
-    
-    lea r3,[r0+r2-1]                        ;right border src 
+
+    lea r3,[r0+r2-1]                        ;right border src
     lea r4,[r3+1]                           ;right border dst
 
     ;prepare for cross border data: top-rigth with xmm4
     movzx r6d,byte [r3]                         ;top -rigth
     SSE2_Copy16Times xmm4,r6d
-    
+
     neg r1   ;r1 = stride
 
 
@@ -693,7 +693,7 @@ ExpandPictureChromaUnalign_sse2:
 
 
     push r0
-    push r1 
+    push r1
     push r2
 	push r6
     exp_left_right_sse2 16,u
@@ -706,35 +706,34 @@ ExpandPictureChromaUnalign_sse2:
 	; for cross border [top-left, top-right, bottom-left, bottom-right]
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ; have done xmm3,..,xmm6 cross pData initialization above, perform pading as below, To be continued..
-    
+
     neg r1  ;r1 = -stride
     lea r3,[r0-16]
     lea r3,[r3+r1]    ;last line of top-left border
-    
+
     lea r4,[r0+r2]    ;psrc +width
-    lea r4,[r4+r1]    ;psrc +width -stride  
-    
-    
+    lea r4,[r4+r1]    ;psrc +width -stride
+
+
     neg r1  ;r1 = stride
     add r6,16         ;height +32(16) ,luma = 32, chroma = 16
     imul r6,r1
-    
+
     lea r5,[r3+r6]    ;last line of bottom-left border
     lea r6,[r4+r6]    ;last line of botoom-right border
-    
+
     neg r1 ; r1 = -stride
 
     ; for left & right border expanding
     exp_cross_sse2 16,u
 
     LOAD_4_PARA_POP
-    
+
     pop r6
     pop r5
     pop r4
-    
+
     %assign push_num 0
 
 
 	ret
-    

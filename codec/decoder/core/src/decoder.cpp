@@ -37,31 +37,21 @@
  *
  *************************************************************************************
  */
-#include <string.h>
-#include "macros.h"
 #include "codec_def.h"
 #include "decoder.h"
-#include "error_code.h"
 #include "cpu.h"
-#include "cpu_core.h"
 #include "au_parser.h"
-#include "utils.h"
-#include "nal_prefix.h"
-#include "dec_frame.h"
-#include "pic_queue.h"
-#include "vlc_decoder.h"
 #include "get_intra_predictor.h"
 #include "rec_mb.h"
 #include "mc.h"
 #include "decode_mb_aux.h"
 #include "manage_dec_ref.h"
-#include "codec_app_def.h"
 #include "decoder_core.h"
 #include "deblocking.h"
 #include "expand_pic.h"
 #include "decode_slice.h"
-#include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross platforms
 #include "mem_align.h"
+#include "ls_defines.h"
 
 namespace WelsDec {
 
@@ -69,21 +59,9 @@ extern PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth
 
 extern void_t FreePicture (PPicture pPic);
 
-#ifdef WORDS_BIGENDIAN
 inline void_t GetValueOf4Bytes (uint8_t* pDstNal, int32_t iDdstIdx) {
-  pDstNal[0] = (iDdstIdx & 0xff000000) >> 24;
-  pDstNal[1] = (iDdstIdx & 0xff0000) >> 16;
-  pDstNal[2] = (iDdstIdx & 0xff00) >> 8;
-  pDstNal[3] = (iDdstIdx & 0xff);
+  ST32(pDstNal, iDdstIdx);
 }
-#else //WORDS_BIGENDIAN
-inline void_t GetValueOf4Bytes (uint8_t* pDstNal, int32_t iDdstIdx) {
-  pDstNal[0] = (iDdstIdx & 0xff);
-  pDstNal[1] = (iDdstIdx & 0xff00) >> 8;
-  pDstNal[2] = (iDdstIdx & 0xff0000) >> 16;
-  pDstNal[3] = (iDdstIdx & 0xff000000) >> 24;
-}
-#endif //WORDS_BIGENDIAN
 
 static int32_t CreatePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, const int32_t kiSize,
                               const int32_t kiPicWidth, const int32_t kiPicHeight) {
@@ -166,16 +144,8 @@ void_t WelsDecoderDefaults (PWelsDecoderContext pCtx) {
   pCtx->bAuReadyFlag				= 0; // au data is not ready
 
 
-  g_uiCacheLineSize				= 16;
 #if defined(X86_ASM)
   pCtx->uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores);
-#ifdef HAVE_CACHE_LINE_ALIGN
-  if (pCtx->uiCpuFlag & WELS_CPU_CACHELINE_64) {
-    g_uiCacheLineSize	= 64;
-  } else if (pCtx->uiCpuFlag & WELS_CPU_CACHELINE_32) {
-    g_uiCacheLineSize	= 32;
-  }
-#endif//HAVE_CACHE_LINE_ALIGN
 #endif//X86_ASM
 
   pCtx->iImgWidthInPixel		= 0;
@@ -353,8 +323,6 @@ void_t WelsOpenDecoder (PWelsDecoderContext pCtx) {
   if (ERR_NONE != WelsInitMemory (pCtx))
     return;
 
-  pCtx->iMaxWidthInSps	= 0;
-  pCtx->iMaxHeightInSps	= 0;
 #ifdef LONG_TERM_REF
   pCtx->bParamSetsLostFlag = true;
 #else
@@ -691,19 +659,6 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
   }
 
   return iErr;
-}
-
-/*!
- * \brief	update maximal picture width and height if applicable when receiving a SPS NAL
- */
-void_t UpdateMaxPictureResolution (PWelsDecoderContext pCtx, const int32_t kiCurWidth, const int32_t kiCurHeight) {
-  //any dimension larger than that of current dimension, should modify the max-dimension
-  if (kiCurWidth > pCtx->iMaxWidthInSps || kiCurHeight > pCtx->iMaxHeightInSps) {
-    pCtx->iMaxWidthInSps	= kiCurWidth;
-    pCtx->iMaxHeightInSps	= kiCurHeight;
-  }
-
-  return;
 }
 
 void_t AssignFuncPointerForRec (PWelsDecoderContext pCtx) {

@@ -45,6 +45,7 @@
 #include "../common/memory.h"
 #include "../common/WelsFrameWork.h"
 #include "../../interface/IWelsVP.h"
+#include "cpu.h"
 
 WELSVP_NAMESPACE_BEGIN
 
@@ -78,6 +79,7 @@ class CAdaptiveQuantization : public IStrategy {
   PVarFunc			                   m_pfVar;
   int32_t                                  m_CPUFlag;
   SAdaptiveQuantizationParam    m_sAdaptiveQuantParam;
+  XMMREG_PROTECT_DECLARE(AdaptiveQuantization);
 };
 
 WELSVP_NAMESPACE_END

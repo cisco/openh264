@@ -47,7 +47,14 @@
 #include "codec_def.h"
 
 #if defined(_MSC_VER) && (_MSC_VER>=1500) // vs2008 and upper
+#ifdef WINAPI_FAMILY
+#include <winapifamily.h>
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 #define ENABLE_DISPLAY_MODULE // enable/disable the render feature
+#endif
+#else /* defined(WINAPI_FAMILY) */
+#define ENABLE_DISPLAY_MODULE // enable/disable the render feature
+#endif
 #endif
 
 #ifdef ENABLE_DISPLAY_MODULE

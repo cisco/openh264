@@ -37,40 +37,23 @@
  *
  *************************************************************************************
  */
-#include <string.h>
-#include <stdlib.h>
-#include <assert.h>
 
 #include "encoder.h"
-#include "extern.h"
-#include "encoder_context.h"
-#include "typedefs.h"
-#include "wels_const.h"
-#include "wels_common_basis.h"
-#include "codec_def.h"
-#include "param_svc.h"
-#include "cpu_core.h"
 #include "cpu.h"
 #include "utils.h"
-#include "svc_enc_frame.h"
 #include "svc_enc_golomb.h"
-#include "svc_enc_slice_segment.h"
 #include "au_set.h"
 #include "picture_handle.h"
-#include "codec_app_def.h"
 #include "svc_base_layer_md.h"
 #include "svc_encode_slice.h"
 #include "decode_mb_aux.h"
 #include "deblocking.h"
-#include "rc.h"
 #include "ref_list_mgr_svc.h"
-#include "md.h"
 #include "ls_defines.h"
-#include "set_mb_syn_cavlc.h"
 #include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross platforms
-#include "array_stack_align.h"
-// for MT, 4/22/2010
+#if defined(MT_ENABLED)
 #include "slice_multi_threading.h"
+#endif//MT_ENABLED
 #if defined(DYNAMIC_SLICE_ASSIGN) || defined(MT_DEBUG)
 #include "measure_time.h"
 #endif//DYNAMIC_SLICE_ASSIGN
@@ -423,6 +406,53 @@ int32_t ParamValidationExt (void* pParam) {
   return ParamValidation (pCodingParam);
 }
 
+
+void WelsEncoderApplyFrameRate(SWelsSvcCodingParam* pParam)
+{
+  SDLayerParam* pLayerParam;
+  const float kfEpsn = 0.000001f;
+  const int32_t kiNumLayer = pParam->iNumDependencyLayer;
+  int32_t i;
+  const float kfMaxFrameRate = pParam->fMaxFrameRate;
+  float fRatio;
+  float fTargetOutputFrameRate;
+
+  //set input frame rate to each layer
+  for (i=0;i<kiNumLayer;i++) {
+    pLayerParam = &(pParam->sDependencyLayers[i]);
+
+    fRatio = pLayerParam->fOutputFrameRate / pLayerParam->fInputFrameRate;
+    if ( (kfMaxFrameRate - pLayerParam->fInputFrameRate) > kfEpsn
+        || (kfMaxFrameRate - pLayerParam->fInputFrameRate) < -kfEpsn ) {
+      pLayerParam->fInputFrameRate = kfMaxFrameRate;
+      fTargetOutputFrameRate = kfMaxFrameRate*fRatio;
+      pLayerParam->fOutputFrameRate = (fTargetOutputFrameRate>=6)?fTargetOutputFrameRate:(pLayerParam->fInputFrameRate);
+      //TODO:{Sijia} from design, there is no sense to have temporal layer when under 6fps even with such setting?
+    }
+  }
+}
+
+
+void WelsEncoderApplyBitRate(SWelsSvcCodingParam* pParam)
+{
+  //TODO (Sijia):  this is a temporary solution which keep the ratio between layers
+  //but it is also possible to fulfill the bitrate of lower layer first
+
+  SDLayerParam* pLayerParam;
+  const int32_t iNumLayers = pParam->iNumDependencyLayer;
+  int32_t i, iOrigTotalBitrate=0;
+  //read old BR
+  for (i=0;i<iNumLayers;i++) {
+    iOrigTotalBitrate += pParam->sDependencyLayers[i].iSpatialBitrate;
+  }
+  //write new BR
+  float fRatio = 0.0;
+  for (i=0;i<iNumLayers;i++) {
+    pLayerParam = &(pParam->sDependencyLayers[i]);
+    fRatio = pLayerParam->iSpatialBitrate/(static_cast<float>(iOrigTotalBitrate));
+    pLayerParam->iSpatialBitrate = static_cast<int32_t>(pParam->iTargetBitrate*fRatio);
+  }
+}
 /*!
  * \brief	acquire count number of layers and NALs based on configurable paramters dependency
  * \pParam	pCtx				sWelsEncCtx*
@@ -1758,7 +1788,7 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
 
 #ifdef ENABLE_TRACE_FILE
     if (NULL != pCtx->pFileLog) {
-      fclose (pCtx->pFileLog);
+      WelsFclose (pCtx->pFileLog);
       pCtx->pFileLog	= NULL;
     }
     pCtx->uiSizeLog	= 0;
@@ -1919,7 +1949,7 @@ void OutputCpuFeaturesLog (uint32_t uiCpuFeatureFlags, uint32_t uiCpuCores, int3
            uiCpuCores,
            iCacheLineSize);
 
-//#ifdef _DEBUG	// output at console & _debug
+#ifdef _DEBUG	// output at console & _debug
   fprintf (stderr, "WELS CPU features/capacities (0x%x) detected: \n"	\
            "HTT:      %c, "	\
            "MMX:      %c, "	\
@@ -1962,7 +1992,7 @@ void OutputCpuFeaturesLog (uint32_t uiCpuFeatureFlags, uint32_t uiCpuCores, int3
            (uiCpuFeatureFlags & WELS_CPU_AES) ? 'Y' : 'N',
            uiCpuCores,
            iCacheLineSize);
-//#endif//_DEBUG
+#endif//_DEBUG
 }
 
 /*!
@@ -2054,32 +2084,10 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   if (wlog == WelsLogDefault) {
     str_t fname[MAX_FNAME_LEN] = {0};
 
-#if defined (_MSC_VER)
-#if _MSC_VER>=1500
-    SNPRINTF (fname, MAX_FNAME_LEN, MAX_FNAME_LEN, "%swels_svc_encoder_trace.txt",
-              pCodingParam->sTracePath);		// confirmed_safe_unsafe_usage
-#else
-    SNPRINTF (fname, MAX_FNAME_LEN, "%swels_svc_encoder_trace.txt",
-              pCodingParam->sTracePath);		// confirmed_safe_unsafe_usage
-#endif//_MSC_VER>=1500
-#else
-    //GNUC/
-    SNPRINTF (fname,      MAX_FNAME_LEN,       "%swels_svc_encoder_trace.txt",
-              pCodingParam->sTracePath);		// confirmed_safe_unsafe_usage
-#endif//_MSC_VER
+    WelsSnprintf (fname, MAX_FNAME_LEN, "wels_svc_encoder_trace.txt");
 
 
-#if defined(__GNUC__)
-    pCtx->pFileLog	= FOPEN (fname, "wt+");
-#else//WIN32
-#if defined(_WIN32) && defined(_MSC_VER)
-#if _MSC_VER >= 1500
-    FOPEN (&pCtx->pFileLog, fname, "wt+");
-#else
-    pCtx->pFileLog	= FOPEN (fname, "wt+");
-#endif//_MSC_VER>=1500
-#endif//WIN32 && _MSC_VER
-#endif//__GNUC__
+    pCtx->pFileLog	= WelsFopen (fname, "wt+");
     pCtx->uiSizeLog	= 0;
   }
 #endif//ENABLE_TRACE_FILE
@@ -3042,6 +3050,37 @@ int32_t ForceCodingIDR (sWelsEncCtx* pCtx) {
 
   pCtx->bEncCurFrmAsIdrFlag = true;
   pCtx->iCodingIndex	= 0;
+
+  return 0;
+}
+
+int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst) {
+  SFrameBSInfo* pFbi          = (SFrameBSInfo*)pDst;
+  SLayerBSInfo* pLayerBsInfo  = &pFbi->sLayerInfo[0];
+  int32_t iNalLen[128]        = {0};
+  int32_t iCountNal           = 0;
+
+  pLayerBsInfo->pBsBuf = pCtx->pFrameBs;
+  InitBits (&pCtx->pOut->sBsWrite, pCtx->pOut->pBsBuffer, pCtx->pOut->uiSize);
+
+  WelsWriteParameterSets (pCtx, &iNalLen[0], &iCountNal);
+
+  pLayerBsInfo->uiPriorityId  = 0;
+  pLayerBsInfo->uiSpatialId   = 0;
+  pLayerBsInfo->uiTemporalId  = 0;
+  pLayerBsInfo->uiQualityId   = 0;
+  pLayerBsInfo->uiLayerType   = NON_VIDEO_CODING_LAYER;
+  pLayerBsInfo->iNalCount     = iCountNal;
+  for (int32_t iNalIndex      = 0; iNalIndex < iCountNal; ++ iNalIndex) {
+    pLayerBsInfo->iNalLengthInByte[iNalIndex] = iNalLen[iNalIndex];
+  }
+
+  pCtx->eLastNalPriority      = NRI_PRI_HIGHEST;
+  pFbi->iLayerNum             = 1;
+
+#if defined(X86_ASM)
+  WelsEmms();
+#endif //X86_ASM
 
   return 0;
 }

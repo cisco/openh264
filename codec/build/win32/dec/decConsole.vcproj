@@ -74,6 +74,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="$(OutDir)\welsdec.lib"
 				OutputFile="$(OutDir)\decConsole.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -142,7 +143,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\api\svc,..\..\..\common,..\..\..\encoder\core\inc"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN64;NDEBUG;_CONSOLE"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -166,10 +167,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="$(OutDir)\welsdec.lib"
 				OutputFile="$(OutDir)\decConsole.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\..\..\bin\win32"
+				AdditionalLibraryDirectories="..\..\..\..\bin\win64"
 				ProgramDatabaseFile="$(OutDir)\decConsole.pdb"
 				GenerateMapFile="false"
 				SubSystem="1"
@@ -258,6 +260,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="$(OutDir)\welsdec.lib"
 				OutputFile="$(OutDir)\decConsoled.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -351,10 +354,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="$(OutDir)\welsdec.lib"
 				OutputFile="$(OutDir)\decConsoled.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\..\..\bin\win32"
+				AdditionalLibraryDirectories="..\..\..\..\bin\win64"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\decConsoled.pdb"
 				SubSystem="1"
@@ -501,10 +505,6 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 		</Filter>
-		<File
-			RelativePath="..\..\..\..\bin\win32\Release\welsdec.cfg"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

@@ -37,25 +37,14 @@
  *
  *************************************************************************************
  */
-#include <string.h>
-#include <assert.h>
 #include "ls_defines.h"
-#include "encoder_context.h"
-#include "svc_enc_slice_segment.h"
-#include "md.h"
-#include "mc.h"
 #include "mv_pred.h"
-#include "cpu_core.h"
 #include "svc_enc_golomb.h"
 #include "svc_base_layer_md.h"
 #include "sample.h"
 #include "encoder.h"
 #include "svc_encode_mb.h"
 #include "svc_encode_slice.h"
-#include "svc_motion_estimate.h"
-#include "as264_common.h"
-#include "encode_mb_aux.h"
-#include "utils.h"
 namespace WelsSVCEnc {
 static const ALIGNED_DECLARE (int8_t, g_kiIntra16AvaliMode[8][5], 16) = {
   { I16_PRED_DC_128, I16_PRED_INVALID, I16_PRED_INVALID, I16_PRED_INVALID, 1 },
@@ -1628,7 +1617,7 @@ BOOL_T WelsMdFirstIntraMode (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCa
   return FALSE;
 }
 
-void WelsMdInterMb (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb) {
+void WelsMdInterMb (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pUnused) {
   sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pEnc;
   SWelsMD* pWelsMd				= (SWelsMD*)pMd;
   SDqLayer* pCurDqLayer			= pEncCtx->pCurDqLayer;

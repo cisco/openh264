@@ -121,7 +121,7 @@ WelsCopy16x16_sse2:
 	movdqa [r0+r4], xmm7
 	LOAD_4_PARA_POP
 	pop r5
-	pop r4	
+	pop r4
 	ret
 
 ;***********************************************************************
@@ -141,7 +141,7 @@ WelsCopy16x16NotAligned_sse2:
 	;mov eax, [esp+20]	; iStrideD
 	;mov esi, [esp+24]	; Src
 	;mov ecx, [esp+28]	; iStrideS
-	
+
 	push r4
 	push r5
 	%assign  push_num 2
@@ -213,7 +213,7 @@ WelsCopy16x8NotAligned_sse2:
 	;mov eax, [esp+20]	; iStrideD
 	;mov esi, [esp+24]	; Src
 	;mov ecx, [esp+28]	; iStrideS
-	
+
 	push r4
 	push r5
 	%assign  push_num 2
@@ -243,7 +243,7 @@ WelsCopy16x8NotAligned_sse2:
 	movdqa [r0+r4], xmm7
 	LOAD_4_PARA_POP
 	pop r5
-	pop r4	
+	pop r4
 	ret
 
 
@@ -261,7 +261,7 @@ WelsCopy8x16_mmx:
 	;mov ecx, [esp + 12]           ;iStrideD
 	;mov ebx, [esp + 16]           ;Src
 	;mov edx, [esp + 20]           ;iStrideS
-	
+
 	%assign  push_num 0
     LOAD_4_PARA
 
@@ -277,7 +277,7 @@ WelsCopy8x16_mmx:
 	movq mm6, [r2]
 	movq mm7, [r2+r3]
 	lea r2, [r2+2*r3]
-	
+
 	movq [r0], mm0
 	movq [r0+r1], mm1
 	lea r0, [r0+2*r1]
@@ -302,7 +302,7 @@ WelsCopy8x16_mmx:
 	lea r2, [r2+2*r3]
 	movq mm6, [r2]
 	movq mm7, [r2+r3]
-	
+
 	movq [r0], mm0
 	movq [r0+r1], mm1
 	lea r0, [r0+2*r1]
@@ -333,7 +333,7 @@ WelsCopy8x8_mmx:
 	;mov ecx, [esp + 16]           ;iStrideD
 	;mov esi, [esp + 20]           ;Src
 	;mov ebx, [esp + 24]           ;iStrideS
-	
+
 	push r4
 	%assign  push_num 1
     LOAD_4_PARA
@@ -374,7 +374,7 @@ WelsCopy8x8_mmx:
 
 	WELSEMMS
 	;pop esi
-	;pop ebx	
+	;pop ebx
 	LOAD_4_PARA_POP
 	pop r4
 	ret
@@ -388,11 +388,11 @@ UpdateMbMv_sse2:
 
     %assign  push_num 0
     LOAD_2_PARA
-    
+
 	;mov eax, [esp+4]	; mv_buffer
 	;movd xmm0, [esp+8]	; _mv
 	movd xmm0, r1d	; _mv
-	pshufd xmm1, xmm0, $0
+	pshufd xmm1, xmm0, $00
 	movdqa [r0     ], xmm1
 	movdqa [r0+0x10], xmm1
 	movdqa [r0+0x20], xmm1
@@ -438,7 +438,7 @@ ALIGN 16
 ;                           int iHeight );
 ;*******************************************************************************
 PixelAvgWidthEq4_mmx:
- 
+
     %assign  push_num 0
     LOAD_7_PARA
 
@@ -487,7 +487,7 @@ PixelAvgWidthEq8_mmx:
     ;mov         ebp, [esp+36]       ; pSrcB
     ;mov         edx, [esp+40]       ; iSrcBStride
     ;mov         ebx, [esp+44]       ; iHeight
-    
+
     %assign  push_num 0
     LOAD_7_PARA
 
@@ -497,7 +497,7 @@ PixelAvgWidthEq8_mmx:
 	movsx	r5, r5d
 	movsx	r6, r6d
 %endif
-    
+
 ALIGN 4
 .height_loop:
 	movq        mm0, [r2]
@@ -528,7 +528,7 @@ ALIGN 16
 ;                          int iHeight );
 ;*******************************************************************************
 PixelAvgWidthEq16_sse2:
-        
+
     %assign  push_num 0
     LOAD_7_PARA
 %ifndef X86_32
@@ -567,7 +567,7 @@ ALIGN 4
     lea         r2, [r2+2*r3]
     lea			r4, [r4+2*r5]
     lea			r0, [r0+2*r1]
-    
+
     sub         r6, 4
     jne         .height_loop
 
@@ -591,17 +591,17 @@ McCopyWidthEq4_mmx:
     ;mov edi,  [esp+24]
     ;mov ecx,  [esp+28]
     ;mov edx,  [esp+32]
-    
+
     push	r5
     %assign  push_num 1
     LOAD_5_PARA
-   
+
 %ifndef X86_32
 	movsx	r1, r1d
 	movsx	r3, r3d
 	movsx	r4, r4d
 %endif
-    
+
 ALIGN 4
 .height_loop:
 	mov r5d, [r0]
@@ -629,7 +629,7 @@ McCopyWidthEq8_mmx:
 	;mov edi, [esp+20]
 	;mov ecx, [esp+24]
 	;mov edx, [esp+28]
-	
+
     %assign  push_num 0
     LOAD_5_PARA
 

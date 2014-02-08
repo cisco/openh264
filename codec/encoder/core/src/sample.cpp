@@ -39,11 +39,9 @@
  */
 
 #include "sample.h"
-#include "macros.h"
 
 #include "mc.h"
 #include "cpu_core.h"
-#include "array_stack_align.h"
 
 namespace WelsSVCEnc {
 int32_t WelsSampleSad4x4_c (uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2) {

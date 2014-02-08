@@ -61,10 +61,10 @@ typedef void (*PScanFunc) (int16_t* pLevel, int16_t* pDct);
 typedef int32_t (*PCalculateSingleCtrFunc) (int16_t* pDct);
 
 typedef void (*PTransformHadamard4x4Func) (int16_t* pLumaDc, int16_t* pDct);
-typedef void (*PQuantizationFunc) (int16_t* pDct, int16_t* pFF,  int16_t* pMF);
-typedef void (*PQuantizationMaxFunc) (int16_t* pDct, int16_t* pFF,  int16_t* pMF, int16_t* pMax);
+typedef void (*PQuantizationFunc) (int16_t* pDct, const int16_t* pFF, const int16_t* pMF);
+typedef void (*PQuantizationMaxFunc) (int16_t* pDct, const int16_t* pFF, const int16_t* pMF, int16_t* pMax);
 typedef void (*PQuantizationDcFunc) (int16_t* pDct, int16_t iFF,  int16_t iMF);
-typedef BOOL_T (*PQuantizationSkipFunc) (int16_t* pDct, int16_t iFF,  int16_t iMF);
+typedef int32_t (*PQuantizationSkipFunc) (int16_t* pDct, int16_t iFF,  int16_t iMF);
 typedef int32_t (*PQuantizationHadamardFunc) (int16_t* pRes, const int16_t kiFF, int16_t iMF, int16_t* pDct,
     int16_t* pBlock);
 

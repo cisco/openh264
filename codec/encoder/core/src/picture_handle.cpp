@@ -36,12 +36,7 @@
  * \date	5/20/2009 Created
  *
  *************************************************************************************/
-#include <string.h>
-#include <assert.h>
 #include "picture_handle.h"
-#include "wels_const.h"
-#include "utils.h"
-#include "macros.h"
 
 namespace WelsSVCEnc {
 /*!
