@@ -92,7 +92,7 @@ class CWelsLib {
   int32_t DestroyIface (void* pEncCtx);
 
  protected:
-  void* QueryFunction (const str_t* pName);
+  void* QueryFunction (const char* pName);
 
  private:
   void* m_pVpLib;

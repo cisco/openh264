@@ -438,7 +438,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   iIdx = 0;
   while (iIdx < iThreadNum) {
 #if defined(__GNUC__) && !defined(_WIN32)	// for posix threading
-    str_t name[SEM_NAME_MAX] = {0};
+    char name[SEM_NAME_MAX] = {0};
     WELS_THREAD_ERROR_CODE err = 0;
 #endif//__GNUC__
     pSmt->pThreadPEncCtx[iIdx].pWelsPEncCtx	= (void*) (*ppCtx);
@@ -568,7 +568,7 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
       WelsEventDestroy (&pSmt->pFinUpdateMbListEvent[iIdx]);
 #endif//DYNAMIC_SLICE_ASSIGN && TRY_SLICING_BALANCE
 #else
-    str_t ename[SEM_NAME_MAX] = {0};
+    char ename[SEM_NAME_MAX] = {0};
     // length of semaphore name should be system constrained at least on mac 10.7
     WelsSnprintf (ename, SEM_NAME_MAX, "sc%d%p", iIdx, (void*) (*ppCtx));
     WelsEventClose (pSmt->pSliceCodedEvent[iIdx], ename);
@@ -1219,7 +1219,7 @@ int32_t CreateSliceThreads (sWelsEncCtx* pCtx) {
       if (dwAffinityMask & dwProcessAffinity) { // check if cpu is available
         dw = SetThreadAffinityMask (pCtx->pSliceThreading->pThreadHandles[iIdx], dwAffinityMask);  //1 << iIdx
         if (dw == 0) {
-          str_t str[64] = {0};
+          char str[64] = {0};
           WelsSnprintf (str, 64, "SetThreadAffinityMask iIdx:%d", iIdx);
         }
       }

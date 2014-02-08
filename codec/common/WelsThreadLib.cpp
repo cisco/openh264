@@ -268,7 +268,7 @@ WELS_THREAD_ERROR_CODE   WelsEventDestroy (WELS_EVENT* event) {
   return sem_destroy (event);	// match with sem_init
 }
 
-WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT** p_event, str_t* event_name) {
+WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT** p_event, char* event_name) {
   if (p_event == NULL || event_name == NULL)
     return WELS_THREAD_ERROR_GENERAL;
   *p_event = sem_open (event_name, O_CREAT, (S_IRUSR | S_IWUSR)/*0600*/, 0);
@@ -280,7 +280,7 @@ WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT** p_event, str_t* event_name
     return WELS_THREAD_ERROR_OK;
   }
 }
-WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, str_t* event_name) {
+WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, char* event_name) {
   WELS_THREAD_ERROR_CODE err = sem_close (event);	// match with sem_open
   if (event_name)
     sem_unlink (event_name);

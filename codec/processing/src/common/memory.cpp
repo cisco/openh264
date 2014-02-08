@@ -35,7 +35,7 @@
 WELSVP_NAMESPACE_BEGIN
 /////////////////////////////////////////////////////////////////////////////////
 
-void* WelsMalloc (const uint32_t kuiSize, str_t* pTag) {
+void* WelsMalloc (const uint32_t kuiSize, char* pTag) {
   const int32_t kiSizeVoidPointer	= sizeof (void**);
   const int32_t kiSizeInt32		= sizeof (int32_t);
   const int32_t kiAlignedBytes	= ALIGNBYTES - 1;
@@ -59,7 +59,7 @@ void* WelsMalloc (const uint32_t kuiSize, str_t* pTag) {
 
 /////////////////////////////////////////////////////////////////////////////
 
-void WelsFree (void* pPointer, str_t* pTag) {
+void WelsFree (void* pPointer, char* pTag) {
   if (pPointer) {
     ::free (* (((void**) pPointer) - 1));
   }
@@ -67,7 +67,7 @@ void WelsFree (void* pPointer, str_t* pTag) {
 
 /////////////////////////////////////////////////////////////////////////////
 
-void* InternalReallocate (void* pPointer, const uint32_t kuiSize, str_t* pTag) {
+void* InternalReallocate (void* pPointer, const uint32_t kuiSize, char* pTag) {
   uint32_t iOldSize = 0;
   uint8_t* pNew = NULL;
   if (pPointer != NULL)
@@ -91,7 +91,7 @@ void* InternalReallocate (void* pPointer, const uint32_t kuiSize, str_t* pTag) {
 
 /////////////////////////////////////////////////////////////////////////////
 
-void* WelsRealloc (void* pPointer, uint32_t* pRealSize, const uint32_t kuiSize, str_t* pTag) {
+void* WelsRealloc (void* pPointer, uint32_t* pRealSize, const uint32_t kuiSize, char* pTag) {
   const uint32_t kuiOldSize = *pRealSize;
   uint32_t kuiNewSize = 0;
   void* pLocalPointer = NULL;

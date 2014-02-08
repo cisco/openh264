@@ -57,14 +57,14 @@ int32_t  CWelsTraceBase::SetTraceLevel (int iLevel) {
   return 0;
 }
 
-int32_t  CWelsTraceBase::Trace (const int kLevel, const str_t* kpFormat, va_list pVl) {
+int32_t  CWelsTraceBase::Trace (const int kLevel, const char* kpFormat, va_list pVl) {
   if (kLevel & m_iLevel) {
-    str_t chBuf[MAX_LOG_SIZE] = {0};
+    char chBuf[MAX_LOG_SIZE] = {0};
     const int32_t kLen	= strlen ("[DECODER]: ");
 
-    WelsStrncpy (chBuf, MAX_LOG_SIZE, (const str_t*)"[DECODER]: ");
+    WelsStrncpy (chBuf, MAX_LOG_SIZE, (const char*)"[DECODER]: ");
 
-    WelsVsnprintf ((chBuf + kLen),  MAX_LOG_SIZE - kLen, (const str_t*)kpFormat, pVl);
+    WelsVsnprintf ((chBuf + kLen),  MAX_LOG_SIZE - kLen, (const char*)kpFormat, pVl);
 
     WriteString (kLevel, chBuf);
   }
@@ -72,8 +72,8 @@ int32_t  CWelsTraceBase::Trace (const int kLevel, const str_t* kpFormat, va_list
   return 0;
 }
 
-CWelsTraceFile::CWelsTraceFile (const str_t* pFileName) {
-  m_pTraceFile = WelsFopen (pFileName, (const str_t*)"wt");
+CWelsTraceFile::CWelsTraceFile (const char* pFileName) {
+  m_pTraceFile = WelsFopen (pFileName, (const char*)"wt");
 }
 
 CWelsTraceFile::~CWelsTraceFile() {
@@ -83,9 +83,9 @@ CWelsTraceFile::~CWelsTraceFile() {
   }
 }
 
-int32_t CWelsTraceFile::WriteString (int32_t iLevel, const str_t* pStr) {
+int32_t CWelsTraceFile::WriteString (int32_t iLevel, const char* pStr) {
   int  iRC = 0;
-  const static str_t chEnter[16] = "\n";
+  const static char chEnter[16] = "\n";
   if (m_pTraceFile) {
     iRC += WelsFwrite (pStr, 1, strlen (pStr), m_pTraceFile);
     iRC += WelsFwrite (chEnter, 1, strlen (chEnter), m_pTraceFile);
@@ -97,7 +97,7 @@ int32_t CWelsTraceFile::WriteString (int32_t iLevel, const str_t* pStr) {
 
 #ifdef _WIN32
 
-int32_t CWelsTraceWinDgb::WriteString (int32_t iLevel, const str_t* pStr) {
+int32_t CWelsTraceWinDgb::WriteString (int32_t iLevel, const char* pStr) {
   OutputDebugStringA (pStr);
 
   return strlen (pStr);
@@ -134,7 +134,7 @@ int32_t  CWelsCodecTrace::UnloadWelsTraceModule() {
   return 0;
 }
 
-int32_t  CWelsCodecTrace::WriteString (int32_t iLevel, const str_t* pStr) {
+int32_t  CWelsCodecTrace::WriteString (int32_t iLevel, const char* pStr) {
   {
     switch (iLevel) {
     case WELS_LOG_ERROR:

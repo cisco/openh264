@@ -74,12 +74,12 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
 #endif//REC_FRAME_COUNT
 
 #ifdef OUTPUT_BIT_STREAM
-  str_t strStreamFileName[1024] = { 0 };  //for .264
+  char strStreamFileName[1024] = { 0 };  //for .264
   int32_t iBufferUsed = 0;
   int32_t iBufferLeft = 1023;
   int32_t iCurUsed;
 
-  str_t strLenFileName[1024] = { 0 }; //for .len
+  char strLenFileName[1024] = { 0 }; //for .len
   int32_t iBufferUsedSize = 0;
   int32_t iBufferLeftSize = 1023;
   int32_t iCurUsedSize;
@@ -578,7 +578,7 @@ int CWelsH264SVCEncoder::EncodeFrame2 (const SSourcePicture**   pSrcPicList, int
         WelsFclose (m_pFileBsSize);
         m_pFileBsSize = NULL;
       }
-      str_t strStreamFileName[128] = {0};
+      char strStreamFileName[128] = {0};
       int32_t iLen = WelsSnprintf (strStreamFileName, 128, "adj%d_w%d.264", m_iSwitchTimes,
                                    m_pEncContext->pSvcParam->iActualPicWidth);
       m_pFileBs = WelsFopen (strStreamFileName, "wb");
@@ -910,7 +910,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   break;
   case ENCODER_OPTION_CURRENT_PATH: {
     if (m_pEncContext->pSvcParam != NULL) {
-      str_t* path = static_cast<str_t*> (pOption);
+      char* path = static_cast<char*> (pOption);
       m_pEncContext->pSvcParam->pCurPath = path;
     }
   }
@@ -991,7 +991,7 @@ int CWelsH264SVCEncoder::GetOption (ENCODER_OPTION eOptionId, void* pOption) {
 void CWelsH264SVCEncoder::DumpSrcPicture (const uint8_t* pSrc) {
 #ifdef DUMP_SRC_PICTURE
   FILE* pFile = NULL;
-  str_t strFileName[256] = {0};
+  char strFileName[256] = {0};
   const int32_t iDataLength = m_iMaxPicWidth * m_iMaxPicHeight;
 
   WelsStrncpy (strFileName, 256, "pic_in_");	// confirmed_safe_unsafe_usage

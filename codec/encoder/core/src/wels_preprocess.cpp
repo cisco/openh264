@@ -86,14 +86,14 @@ CWelsLib::CWelsLib (void* pEncCtx) {
 
 #ifndef NO_DYNAMIC_VP
 #if defined(_WIN32)
-  const str_t WelsVPLib[] = "welsvp.dll";
+  const char WelsVPLib[] = "welsvp.dll";
   HMODULE shModule = LoadLibrary (WelsVPLib);
   if (!shModule)
     WelsLog (pEncCtx, WELS_LOG_ERROR, "welsvp load lib dynamic failed module=%x\n", shModule);
 
 #elif defined(MACOS)
-  const str_t WelsVPLib[] = "welsvp.bundle";
-  str_t pCurPath[256];
+  const char WelsVPLib[] = "welsvp.bundle";
+  char pCurPath[256];
   GetCurrentModulePath (pCurPath, 256);
   strlcat (pCurPath, WelsVPLib, 256);
   CFBundleRef shModule = LoadBundle (pCurPath);
@@ -101,7 +101,7 @@ CWelsLib::CWelsLib (void* pEncCtx) {
     WelsLog (pEncCtx, WELS_LOG_ERROR, "welsvp load lib dynamic failed module=%x\n", shModule);
 
 #elif defined(__GNUC__)
-  const str_t WelsVPLib[] = "./libwelsvp.so";
+  const char WelsVPLib[] = "./libwelsvp.so";
   void* shModule = NULL;
   shModule = dlopen (WelsVPLib, RTLD_LAZY);
   if (shModule == NULL)
@@ -132,7 +132,7 @@ CWelsLib::~CWelsLib() {
 #endif
 }
 
-void* CWelsLib::QueryFunction (const str_t* pName) {
+void* CWelsLib::QueryFunction (const char* pName) {
   void* pFunc = NULL;
 
 #ifndef NO_DYNAMIC_VP

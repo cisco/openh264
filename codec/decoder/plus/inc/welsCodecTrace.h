@@ -66,9 +66,9 @@ enum {
 virtual ~IWelsTrace() {};
 
 virtual int32_t  SetTraceLevel (int32_t iLevel) = 0;
-virtual int32_t  Trace (const int32_t kLevel, const str_t* kpFormat,  va_list pVl) = 0;
+virtual int32_t  Trace (const int32_t kLevel, const char* kpFormat,  va_list pVl) = 0;
 
-static void  WelsTrace (void* pObject, const int32_t kLevel, const str_t* kpFormat, va_list pVl) {
+static void  WelsTrace (void* pObject, const int32_t kLevel, const char* kpFormat, va_list pVl) {
   IWelsTrace*   pThis = (IWelsTrace*) (pObject);
 
   if (pThis) {
@@ -76,7 +76,7 @@ static void  WelsTrace (void* pObject, const int32_t kLevel, const str_t* kpForm
   }
 }
 
-static void WelsVTrace (void* pObject, const int32_t kLevel, const str_t* kpFormat, ...) {
+static void WelsVTrace (void* pObject, const int32_t kLevel, const char* kpFormat, ...) {
   IWelsTrace* pThis = (IWelsTrace*) (pObject);
 
   va_list  argptr;
@@ -96,9 +96,9 @@ static void WelsVTrace (void* pObject, const int32_t kLevel, const str_t* kpForm
 class CWelsTraceBase : public IWelsTrace {
  public:
 virtual int32_t  SetTraceLevel (int32_t iLevel);
-virtual int32_t  Trace (const int32_t kLevel, const str_t* kpFormat,  va_list pVl);
+virtual int32_t  Trace (const int32_t kLevel, const char* kpFormat,  va_list pVl);
 
-virtual int32_t  WriteString (int32_t iLevel, const str_t* pStr) = 0;
+virtual int32_t  WriteString (int32_t iLevel, const char* pStr) = 0;
  protected:
 CWelsTraceBase() {
   m_iLevel = WELS_LOG_DEFAULT;
@@ -110,11 +110,11 @@ int32_t   m_iLevel;
 
 class CWelsTraceFile : public CWelsTraceBase {
  public:
-CWelsTraceFile (const str_t*   filename = (const str_t*)"wels_decoder_trace.txt");
+CWelsTraceFile (const char*   filename = (const char*)"wels_decoder_trace.txt");
 virtual ~CWelsTraceFile();
 
  public:
-virtual int32_t  WriteString (int32_t iLevel, const str_t* pStr);
+virtual int32_t  WriteString (int32_t iLevel, const char* pStr);
 
  private:
 WelsFileHandle* m_pTraceFile;
@@ -127,7 +127,7 @@ CWelsTraceWinDgb() {};
 virtual ~CWelsTraceWinDgb() {};
 
  public:
-virtual int32_t  WriteString (int32_t iLevel, const str_t* pStr);
+virtual int32_t  WriteString (int32_t iLevel, const char* pStr);
 };
 #endif
 
@@ -137,7 +137,7 @@ CWelsCodecTrace() ;
 virtual ~CWelsCodecTrace();
 
  public:
-virtual int32_t  WriteString (int32_t iLevel, const str_t* pStr);
+virtual int32_t  WriteString (int32_t iLevel, const char* pStr);
 
  protected:
 int32_t  LoadWelsTraceModule();

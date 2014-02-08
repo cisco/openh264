@@ -2082,7 +2082,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   // for logs
 #ifdef ENABLE_TRACE_FILE
   if (wlog == WelsLogDefault) {
-    str_t fname[MAX_FNAME_LEN] = {0};
+    char fname[MAX_FNAME_LEN] = {0};
 
     WelsSnprintf (fname, MAX_FNAME_LEN, "wels_svc_encoder_trace.txt");
 

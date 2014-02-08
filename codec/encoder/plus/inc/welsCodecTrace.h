@@ -36,15 +36,15 @@
 #include <stdarg.h>
 #include "typedefs.h"
 
-typedef int32_t (*CM_WELS_TRACE) (const str_t* format, ...);
+typedef int32_t (*CM_WELS_TRACE) (const char* format, ...);
 
 class welsCodecTrace {
  public:
   welsCodecTrace();
   ~welsCodecTrace();
 
-  static void TraceString (int32_t iLevel, const str_t* kpStrFormat);
-  static void CODEC_TRACE (void* pIgnore, const int32_t kiLevel, const str_t* kpStrFormat, va_list vl);
+  static void TraceString (int32_t iLevel, const char* kpStrFormat);
+  static void CODEC_TRACE (void* pIgnore, const int32_t kiLevel, const char* kpStrFormat, va_list vl);
 
   void SetTraceLevel (const int32_t kiLevel);
   int32_t WelsTraceModuleIsExist();

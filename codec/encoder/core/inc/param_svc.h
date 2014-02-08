@@ -102,7 +102,7 @@ float		fInputFrameRate;		// input frame rate
 float		fOutputFrameRate;		// output frame rate
 
 #ifdef ENABLE_FRAME_DUMP
-str_t		sRecFileName[MAX_FNAME_LEN];	// file to be constructed
+char		sRecFileName[MAX_FNAME_LEN];	// file to be constructed
 #endif//ENABLE_FRAME_DUMP
 } SDLayerParam;
 
@@ -127,7 +127,7 @@ struct {
   int32_t iHeight;
 } SUsedPicRect;	// the rect in input picture that encoder actually used
 
-str_t*       pCurPath; // record current lib path such as:/pData/pData/com.wels.enc/lib/
+char*       pCurPath; // record current lib path such as:/pData/pData/com.wels.enc/lib/
 
 float		fMaxFrameRate;		// maximal frame rate [Hz / fps]
 int32_t		iInputCsp;			// color space of input sequence

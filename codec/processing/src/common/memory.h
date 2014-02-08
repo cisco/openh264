@@ -70,7 +70,7 @@ inline int32_t WelsMemcmp (const void* kpBuf1, const void* kpBuf2, uint32_t uiSi
 * \note	N/A
 *************************************************************************************
 */
-void* WelsMalloc (const uint32_t kuiSize, str_t* pTag = NULL);
+void* WelsMalloc (const uint32_t kuiSize, char* pTag = NULL);
 
 /*!
 *************************************************************************************
@@ -84,7 +84,7 @@ void* WelsMalloc (const uint32_t kuiSize, str_t* pTag = NULL);
 * \note	N/A
 *************************************************************************************
 */
-void WelsFree (void* pPointer, str_t* pTag = NULL);
+void WelsFree (void* pPointer, char* pTag = NULL);
 
 /*!
 *************************************************************************************
@@ -100,7 +100,7 @@ void WelsFree (void* pPointer, str_t* pTag = NULL);
 * \note	N/A
 *************************************************************************************
 */
-void* WelsRealloc (void*  pPointer, uint32_t* pRealSize, const uint32_t kuiSize, str_t* pTag = NULL);
+void* WelsRealloc (void*  pPointer, uint32_t* pRealSize, const uint32_t kuiSize, char* pTag = NULL);
 
 //////////////////////////////////////////////////////////////////////////////////////
 WELSVP_NAMESPACE_END

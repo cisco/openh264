@@ -87,12 +87,12 @@ CWelsDecoder::CWelsDecoder (void)
   :	m_pDecContext (NULL),
     m_pTrace (NULL) {
 #ifdef OUTPUT_BIT_STREAM
-  str_t chFileName[1024] = { 0 };  //for .264
+  char chFileName[1024] = { 0 };  //for .264
   int iBufUsed = 0;
   int iBufLeft = 1023;
   int iCurUsed;
 
-  str_t chFileNameSize[1024] = { 0 }; //for .len
+  char chFileNameSize[1024] = { 0 }; //for .len
   int iBufUsedSize = 0;
   int iBufLeftSize = 1023;
   int iCurUsedSize;

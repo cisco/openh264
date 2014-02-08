@@ -40,10 +40,10 @@ void WelsStderrSetTraceLevel (int32_t level);
 
 
 // Internal details.
-int32_t welsStderrLevelTrace (int32_t level, const str_t* format, va_list ap);
+int32_t welsStderrLevelTrace (int32_t level, const char* format, va_list ap);
 
 template<int level> int32_t welsStderrTrace (
-  const str_t* format, ...) {
+  const char* format, ...) {
   va_list ap;
   va_start (ap, format);
   welsStderrLevelTrace (level, format, ap);

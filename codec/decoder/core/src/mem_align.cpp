@@ -44,7 +44,7 @@ int32_t iCountMalloc = 0;
 #endif
 //
 
-void* WelsMalloc (const uint32_t kuiSize, const str_t* kpTag) {
+void* WelsMalloc (const uint32_t kuiSize, const char* kpTag) {
   const int32_t kiSizeVoidPtr	= sizeof (void**);
   const int32_t kiSizeInt		= sizeof (int32_t);
   const int32_t kiAlignBytes	= 15;
@@ -84,7 +84,7 @@ void* WelsMalloc (const uint32_t kuiSize, const str_t* kpTag) {
 
 /////////////////////////////////////////////////////////////////////////////
 
-void WelsFree (void* pPtr, const str_t* kpTag) {
+void WelsFree (void* pPtr, const char* kpTag) {
   if (pPtr) {
 #ifdef MEMORY_CHECK
     if (NULL != pMemCheckFree && kpTag != NULL) {
