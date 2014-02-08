@@ -445,7 +445,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
   int32_t iHeight = 0;
 
 
-  H264DecodeInstance (pDecoder, strInputFile.c_str(), strOutputFile.c_str(), iWidth, iHeight,
+  H264DecodeInstance (pDecoder, strInputFile.c_str(), !strOutputFile.empty() ? strOutputFile.c_str() : NULL, iWidth, iHeight,
                       (!strOptionFile.empty() ? strOptionFile.c_str() : NULL));
 
   if (sDecParam.pFileNameRestructed != NULL) {
