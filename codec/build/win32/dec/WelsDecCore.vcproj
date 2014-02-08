@@ -810,6 +810,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\common\mc_common.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\common\measure_time.h"
 					>
 				</File>
