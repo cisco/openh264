@@ -645,45 +645,6 @@ width_loop:
 
 %endif
 
-ALIGN 16
-VAACalcSad_sse2:
-%define		cur_data			r0
-%define		ref_data			r1
-%define		iPicWidth			r2
-%define		iPicHeight		r3
-%define		iPicStride		r4
-%define		psadframe			r5
-%define		psad8x8				r6
-
-  push r12
-  push r13
-  %assign push_num 2
-  LOAD_7_PARA
-  SIGN_EXTENTION r2,r2d
-  SIGN_EXTENTION r3,r3d
-  SIGN_EXTENTION r4,r4d
-  
-    mov   r12,r4
-	shr		r2,	4					; iPicWidth/16
-	shr		r3,	4					; iPicHeight/16
-	
-	shl		r12,	4								; iPicStride*16
-	pxor	xmm0,	xmm0
-	pxor	xmm7,	xmm7		; iFrameSad
-height_loop:
-	mov		r13,	r2
-	push	r0
-	push	r1
-width_loop:
-	pxor	xmm6,	xmm6		
-	WELS_SAD_16x2_SSE2 r0,r1,r4
-	WELS_SAD_16x2_SSE2 r0,r1,r4
-	WELS_SAD_16x2_SSE2 r0,r1,r4
-	WELS_SAD_16x2_SSE2 r0,r1,r4
-	paddd	xmm7,		xmm6
-	movd	[r6],		xmm6
-	psrldq	xmm6,		8
-	movd	[r6+4],	xmm6
 
 %ifdef X86_32
 WELS_EXTERN VAACalcSadVar_sse2
@@ -826,7 +787,6 @@ WELS_EXTERN VAACalcSadVar_sse2
 ;*************************************************************************************************************
 ;void VAACalcSadVar_sse2( uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight
 ;               int32_t iPicStride, int32_t *psadframe, int32_t *psad8x8, int32_t *psum16x16, int32_t *psqsum16x16)
->>>>>>> e366f5779b932c7412bca3357d47545b23682723
 ;*************************************************************************************************************
 
 
@@ -856,7 +816,6 @@ VAACalcSadVar_sse2:
   SIGN_EXTENTION r2,r2d
   SIGN_EXTENTION r3,r3d
   SIGN_EXTENTION r4,r4d
-  
 
   mov   r13,r4
   shr   r2,4
@@ -1121,86 +1080,7 @@ sqdiff_width_loop:
   ret
 
 %else
-	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_16x1_SSE2 r0,r1,r4
-	paddd	xmm7,		xmm6
-	movd	[r14+8],	xmm6
-	psrldq	xmm6,		8
-	movd	[r14+12],	xmm6
 
-	mov		r15,	psum16x16
-	movdqa	xmm1,	xmm5
-	psrldq	xmm1,	8
-	paddd	xmm5,	xmm1
-	movd	[r15],	xmm5
-	add		dword psum16x16, 4
-
-	movdqa	xmm5,	xmm4
-	psrldq	xmm5,	8
-	paddd	xmm4,	xmm5
-	movdqa	xmm3,	xmm4
-	psrldq	xmm3,	4
-	paddd	xmm4,	xmm3
-
-	mov		r15,	psqsum16x16
-	movd	[r15],	xmm4
-	add		dword psqsum16x16, 4
-
-	add		r14,16
-	sub		r0,	r13
-	sub		r1,	r13
-	add		r0,	16
-	add		r1,	16
-
-	dec		r2
-	jnz		var_width_loop
-
-	pop     r2
-	%assign push_num push_num-1
-	mov		r0,	r11
-	mov		r1,	r12
-	add		r0,	r13
-	add		r1,	r13
-
-	dec	r3
-	jnz		var_height_loop
-
-	mov		r15,	psadframe
-	movdqa	xmm5,	xmm7
-	psrldq	xmm7,	8
-	paddd	xmm7,	xmm5
-	movd	[r15],	xmm7
-
-    pop r15
-    pop r14
-    pop r13
-    pop r12
-    %assign push_num 0
-  
-%undef		cur_data
-%undef		ref_data
-%undef		iPicWidth
-%undef		iPicHeight
-%undef		iPicStride
-%undef		psadframe
-%undef		psad8x8
-%undef		psum16x16
-%undef		psqsum16x16
-%undef		tmp_esi
-%undef		tmp_edi
-%undef		pushsize
-%undef		localsize
-	ret
-
-%endif
-
-%ifdef X86_32
 
 WELS_EXTERN VAACalcSadSsd_sse2
 ;*************************************************************************************************************
@@ -1544,171 +1424,6 @@ bgd_width_loop:
   ret
 
 
-%else
-
-
-WELS_EXTERN VAACalcSadSsd_sse2
-;*************************************************************************************************************
-;void VAACalcSadSsd_sse2(uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
-;	int32_t iPicStride,int32_t *psadframe, int32_t *psad8x8, int32_t *psum16x16, int32_t *psqsum16x16, int32_t *psqdiff16x16)
-;*************************************************************************************************************
-
-
-ALIGN 16
-VAACalcSadSsd_sse2:
-%define		localsize		12
-%define		cur_data			arg1;esp + pushsize + localsize + 4 r0
-%define		ref_data			arg2;esp + pushsize + localsize + 8 r1
-%define		iPicWidth			arg3;esp + pushsize + localsize + 12 r2
-%define		iPicHeight			arg4;esp + pushsize + localsize + 16 r3
-%define		iPicStride			arg5;esp + pushsize + localsize + 20
-%define		psadframe			arg6;esp + pushsize + localsize + 24
-%define		psad8x8				arg7;esp + pushsize + localsize + 28
-%define		psum16x16			arg8;esp + pushsize + localsize + 32
-%define		psqsum16x16			arg9;esp + pushsize + localsize + 36
-%define		psqdiff16x16		arg10;esp + pushsize + localsize + 40
-%define		tmp_esi				r10;esp + 0
-%define		tmp_edi				r11;esp + 4
-%define		pushsize		16
-
-	push r12
-	push r13
-	push r14
-	push r15
-	%assign push_num 4
-
-%ifdef WIN64
-    mov r4,arg5
-   ; mov r5,arg6
-%endif
-    mov r14,arg7
-	SIGN_EXTENTION r2,r2d
-	SIGN_EXTENTION r3,r3d
-	SIGN_EXTENTION r4,r4d
-	
-    mov        r13,r4			
-	shr     r2,4   ; iPicWidth/16
-	shr     r3,4   ; iPicHeight/16			
-	shl     r13,4   ; iPicStride*16
-	pxor	xmm0,	xmm0
-	pxor  xmm8, xmm8  ;framesad
-	pxor  xmm9, xmm9 
-sqdiff_height_loop:
-	;mov		ecx,	dword [iPicWidth]
-	;mov      r14,r2
-	push r2
-	%assign push_num push_num +1
-	mov		r10,	r0
-	mov		r11,	r1
-sqdiff_width_loop:
-	pxor	xmm7,	xmm7		; hiQuad_loQuad pSad8x8
-	pxor	xmm6,	xmm6		; pSum16x16
-	pxor	xmm5,	xmm5		; sqsum_16x16  four dword
-	pxor	xmm4,	xmm4		; sqdiff_16x16	four Dword
-	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
-	movdqa	xmm1,		xmm7
-	movd	[r14],		xmm7
-	psrldq	xmm7,		8
-	paddd	xmm1,		xmm7
-	movd	[r14+4],	xmm7
-	movd	r15d,		xmm1
-	movd  xmm9, r15d
-	paddd xmm8,xmm9
-	
-
-	pxor	xmm7,	xmm7
-	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
-	WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 r0,r1,r4
-	movdqa	xmm1,		xmm7
-	movd	[r14+8],	xmm7
-	psrldq	xmm7,		8
-	paddd	xmm1,		xmm7
-	movd	[r14+12],	xmm7
-	movd	r15d,		xmm1
-	movd  xmm9, r15d
-	paddd xmm8,xmm9
-
-	mov		r15,	psum16x16
-	movdqa	xmm1,	xmm6
-	psrldq	xmm1,	8
-	paddd	xmm6,	xmm1
-	movd	[r15],	xmm6
-	add		dword psum16x16, 4
-
-	mov		r15,	psqsum16x16
-	pshufd	xmm6,	xmm5,	14 ;00001110
-	paddd	xmm6,	xmm5
-	pshufd	xmm5,	xmm6,	1  ;00000001
-	paddd	xmm5,	xmm6
-	movd	[r15],	xmm5
-	add		dword psqsum16x16, 4
-
-	mov		r15,	psqdiff16x16
-	pshufd	xmm5,	xmm4,	14	; 00001110
-	paddd	xmm5,	xmm4
-	pshufd	xmm4,	xmm5,	1	; 00000001
-	paddd	xmm4,	xmm5
-	movd	[r15],	xmm4
-	add		dword	psqdiff16x16,	4
-
-	add		r14,16
-	sub		r0,	r13
-	sub		r1,	r13
-	add		r0,	16
-	add		r1,	16
-
-	dec		r2
-	jnz		sqdiff_width_loop
-
-    pop r2
-	%assign push_num push_num -1
-	
-	mov		r0,	r10
-	mov		r1,	r11
-	add		r0,	r13
-	add		r1,	r13
-
-	dec	r3
-	jnz		sqdiff_height_loop
-
-	mov		r13,	psadframe
-	movd	[r13],	xmm8
-    
-    pop r15
-    pop r14
-    pop r13
-    pop r12
-    %assign push_num 0
-    
-%undef		cur_data
-%undef		ref_data
-%undef		iPicWidth
-%undef		iPicHeight
-%undef		iPicStride
-%undef		psadframe
-%undef		psad8x8
-%undef		psum16x16
-%undef		psqsum16x16
-%undef		psqdiff16x16
-%undef		tmp_esi
-%undef		tmp_edi
-%undef		tmp_sadframe
-%undef		pushsize
-%undef		localsize
-	ret
 
 WELS_EXTERN VAACalcSadSsdBgd_sse2
 ;*************************************************************************************************************
@@ -1941,7 +1656,6 @@ sqdiff_bgd_width_loop:
    ret
 %else
 
-%ifdef X86_32
 WELS_EXTERN VAACalcSadBgd_sse2
 ;*************************************************************************************************************
 ;void VAACalcSadBgd_sse2(uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
