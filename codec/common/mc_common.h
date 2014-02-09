@@ -43,56 +43,56 @@ extern "C" {
 //***************************************************************************//
 //                       MMXEXT definition                                   //
 //***************************************************************************//
-void McHorVer20WidthEq4_mmx (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+void McHorVer20WidthEq4_mmx (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                              int32_t iHeight);
-void McChromaWidthEq4_mmx (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+void McChromaWidthEq4_mmx (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                            const uint8_t* kpABCD, int32_t iHeight);
-void McCopyWidthEq4_mmx (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+void McCopyWidthEq4_mmx (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                          int32_t iHeight);
-void McCopyWidthEq8_mmx (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+void McCopyWidthEq8_mmx (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                          int32_t iHeight);
-void PixelAvgWidthEq4_mmx (uint8_t* pDst, int32_t iDstStride, uint8_t* pSrcA, int32_t iSrcAStride,
-                           uint8_t* pSrcB, int32_t iSrcBStride, int32_t iHeight);
-void PixelAvgWidthEq8_mmx (uint8_t* pDst, int32_t iDstStride, uint8_t* pSrcA, int32_t iSrcAStride,
-                           uint8_t* pSrcB, int32_t iSrcBStride, int32_t iHeight);
+void PixelAvgWidthEq4_mmx (uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcAStride,
+                           const uint8_t* pSrcB, int32_t iSrcBStride, int32_t iHeight);
+void PixelAvgWidthEq8_mmx (uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcAStride,
+                           const uint8_t* pSrcB, int32_t iSrcBStride, int32_t iHeight);
 
 //***************************************************************************//
 //                       SSE2 definition                                     //
 //***************************************************************************//
-void McChromaWidthEq8_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+void McChromaWidthEq8_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                             const uint8_t* kpABCD, int32_t iHeight);
-void McCopyWidthEq16_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+void McCopyWidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                            int32_t iHeight);
-void McHorVer20WidthEq8_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+void McHorVer20WidthEq8_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                               int32_t iHeight);
-void McHorVer20WidthEq16_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+void McHorVer20WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                int32_t iHeight);
-void McHorVer02WidthEq8_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+void McHorVer02WidthEq8_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                               int32_t iHeight);
-void McHorVer22Width8HorFirst_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+void McHorVer22Width8HorFirst_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                     int32_t iHeight);
-void McHorVer22Width8VerLastAlign_sse2 (uint8_t* pTap, int32_t iTapStride, uint8_t* pDst, int32_t iDstStride,
+void McHorVer22Width8VerLastAlign_sse2 (const uint8_t* pTap, int32_t iTapStride, uint8_t* pDst, int32_t iDstStride,
                                         int32_t iWidth, int32_t iHeight);
-void McHorVer22Width8VerLastUnAlign_sse2 (uint8_t* pTap, int32_t iTapStride, uint8_t* pDst, int32_t iDstStride,
+void McHorVer22Width8VerLastUnAlign_sse2 (const uint8_t* pTap, int32_t iTapStride, uint8_t* pDst, int32_t iDstStride,
                                          int32_t iWidth, int32_t iHeight);
 
-void PixelAvgWidthEq16_sse2 (uint8_t* pDst, int32_t iDstStride, uint8_t* pSrcA, int32_t iSrcAStride,
-                             uint8_t* pSrcB, int32_t iSrcBStride, int32_t iHeight);
+void PixelAvgWidthEq16_sse2 (uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcAStride,
+                             const uint8_t* pSrcB, int32_t iSrcBStride, int32_t iHeight);
 
-void McHorVer20Width9Or17_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
+void McHorVer20Width9Or17_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
                                 int32_t iHeight);
 
-void McHorVer02Height9Or17_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
+void McHorVer02Height9Or17_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
                                  int32_t iHeight);
 
-void McHorVer22HorFirst_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pTap, int32_t iTapStride, int32_t iWidth,
+void McHorVer22HorFirst_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pTap, int32_t iTapStride, int32_t iWidth,
                               int32_t iHeight);
 
 //***************************************************************************//
 //                       SSSE3 definition                                    //
 //***************************************************************************//
 
-void McChromaWidthEq8_ssse3 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+void McChromaWidthEq8_ssse3 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                              const uint8_t* kpABCD, int32_t iHeight);
 
 #endif //X86_ASM

@@ -76,7 +76,7 @@ WELS_EXTERN McHorVer20WidthEq4_mmx
 
 ALIGN 16
 ;*******************************************************************************
-; void McHorVer20WidthEq4_mmx( uint8_t *pSrc,
+; void McHorVer20WidthEq4_mmx( const uint8_t *pSrc,
 ;                       int iSrcStride,
 ;						uint8_t *pDst,
 ;						int iDstStride,
@@ -179,7 +179,7 @@ WELS_EXTERN McHorVer20WidthEq16_sse2
 
 ALIGN 16
 ;***********************************************************************
-; void McHorVer22Width8HorFirst_sse2(int16_t *pSrc,
+; void McHorVer22Width8HorFirst_sse2(const int16_t *pSrc,
 ;                       int16_t iSrcStride,
 ;						uint8_t *pDst,
 ;						int32_t iDstStride
@@ -241,7 +241,7 @@ McHorVer22Width8HorFirst_sse2:
 
 ALIGN 16
 ;*******************************************************************************
-; void McHorVer20WidthEq8_sse2(  uint8_t *pSrc,
+; void McHorVer20WidthEq8_sse2(  const uint8_t *pSrc,
 ;                       int iSrcStride,
 ;												uint8_t *pDst,
 ;												int iDstStride,
@@ -307,7 +307,7 @@ McHorVer20WidthEq8_sse2:
 
 ALIGN 16
 ;*******************************************************************************
-; void McHorVer20WidthEq16_sse2(  uint8_t *pSrc,
+; void McHorVer20WidthEq16_sse2(  const uint8_t *pSrc,
 ;                       int iSrcStride,
 ;												uint8_t *pDst,
 ;												int iDstStride,
@@ -398,7 +398,7 @@ McHorVer20WidthEq16_sse2:
 
 
 ;*******************************************************************************
-; void McHorVer02WidthEq8_sse2( uint8_t *pSrc,
+; void McHorVer02WidthEq8_sse2( const uint8_t *pSrc,
 ;                       int iSrcStride,
 ;                       uint8_t *pDst,
 ;                       int iDstStride,
@@ -504,7 +504,7 @@ WELS_EXTERN McHorVer22HorFirst_sse2
 
 
 ;***********************************************************************
-; void McHorVer02Height9Or17_sse2(	uint8_t *pSrc,
+; void McHorVer02Height9Or17_sse2(	const uint8_t *pSrc,
 ;                       int32_t iSrcStride,
 ;                       uint8_t *pDst,
 ;                       int32_t iDstStride,
@@ -654,7 +654,7 @@ McHorVer02Height9Or17_sse2:
 
 ALIGN 16
 ;***********************************************************************
-; void McHorVer20Width9Or17_sse2(		uint8_t *pSrc,
+; void McHorVer20Width9Or17_sse2(		const uint8_t *pSrc,
 ;                       int32_t iSrcStride,
 ;						uint8_t *pDst,
 ;						int32_t iDstStride,
@@ -826,7 +826,7 @@ McHorVer20Width9Or17_sse2:
 ALIGN 16
 ;***********************************************************************
 ;void McHorVer22HorFirst_sse2
-;							(uint8_t *pSrc,
+;							(const uint8_t *pSrc,
 ;							int32_t iSrcStride,
 ;							uint8_t * pTap,
 ;							int32_t iTapStride,
@@ -1003,7 +1003,7 @@ McHorVer22HorFirst_sse2:
 %endmacro
 ;***********************************************************************
 ;void McHorVer22Width8VerLastAlign_sse2(
-;											uint8_t *pTap,
+;											const uint8_t *pTap,
 ;											int32_t iTapStride,
 ;											uint8_t * pDst,
 ;											int32_t iDstStride,
@@ -1149,7 +1149,7 @@ McHorVer22HorFirst_sse2:
 
 ;***********************************************************************
 ;void McHorVer22Width8VerLastUnAlign_sse2(
-;											uint8_t *pTap,
+;											const uint8_t *pTap,
 ;											int32_t iTapStride,
 ;											uint8_t * pDst,
 ;											int32_t iDstStride,
