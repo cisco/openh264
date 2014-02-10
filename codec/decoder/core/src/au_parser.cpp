@@ -108,7 +108,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
   uint8_t* pNal     = pSrcRbsp;
   int32_t iNalSize  = iSrcRbspLen;
   PBitStringAux pBs = NULL;
-  bool_t bExtensionFlag = false;
+  bool bExtensionFlag = false;
   int32_t iErr	= ERR_NONE;
   int32_t iBitSize = 0;
 
@@ -362,66 +362,66 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 }
 
 
-bool_t CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeaderExt pCurNalHeaderExt,
+bool CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeaderExt pCurNalHeaderExt,
                                    PSliceHeader pLastSliceHeader, PSliceHeader pCurSliceHeader) {
   const PSps kpSps = pCurSliceHeader->pSps;
 
   //Sub-clause 7.1.4.1.1 temporal_id
   if (pLastNalHdrExt->uiTemporalId != pCurNalHeaderExt->uiTemporalId) {
-    return TRUE;
+    return true;
   }
 
   // Subclause 7.4.1.2.5
   if (pLastSliceHeader->iRedundantPicCnt < pCurSliceHeader->iRedundantPicCnt)
-    return FALSE;
+    return false;
   else if (pLastSliceHeader->iRedundantPicCnt > pCurSliceHeader->iRedundantPicCnt)
-    return TRUE;
+    return true;
 
   // Subclause G7.4.1.2.4
   if (pLastNalHdrExt->uiDependencyId < pCurNalHeaderExt->uiDependencyId)
-    return FALSE;
+    return false;
   else if (pLastNalHdrExt->uiDependencyId > pCurNalHeaderExt->uiDependencyId)
-    return TRUE;
+    return true;
   if (pLastNalHdrExt->uiQualityId < pCurNalHeaderExt->uiQualityId)
-    return FALSE;
+    return false;
   else if (pLastNalHdrExt->uiQualityId > pCurNalHeaderExt->uiQualityId)
-    return TRUE;
+    return true;
 
   // Subclause 7.4.1.2.4
   if (pLastSliceHeader->iFrameNum != pCurSliceHeader->iFrameNum)
-    return TRUE;
+    return true;
   if (pLastSliceHeader->iPpsId != pCurSliceHeader->iPpsId)
-    return TRUE;
+    return true;
   if (pLastSliceHeader->bFieldPicFlag != pCurSliceHeader->bFieldPicFlag)
-    return TRUE;
+    return true;
   if (pLastSliceHeader->bBottomFiledFlag != pCurSliceHeader->bBottomFiledFlag)
-    return TRUE;
+    return true;
   if ((pLastNalHdrExt->sNalUnitHeader.uiNalRefIdc != NRI_PRI_LOWEST) != (pCurNalHeaderExt->sNalUnitHeader.uiNalRefIdc !=
       NRI_PRI_LOWEST))
-    return TRUE;
+    return true;
   if (pLastNalHdrExt->bIdrFlag != pCurNalHeaderExt->bIdrFlag)
-    return TRUE;
+    return true;
   if (pCurNalHeaderExt->bIdrFlag) {
     if (pLastSliceHeader->uiIdrPicId != pCurSliceHeader->uiIdrPicId)
-      return TRUE;
+      return true;
   }
   if (kpSps->uiPocType == 0) {
     if (pLastSliceHeader->iPicOrderCntLsb != pCurSliceHeader->iPicOrderCntLsb)
-      return TRUE;
+      return true;
     if (pLastSliceHeader->iDeltaPicOrderCntBottom != pCurSliceHeader->iDeltaPicOrderCntBottom)
-      return TRUE;
+      return true;
   } else if (kpSps->uiPocType == 1) {
     if (pLastSliceHeader->iDeltaPicOrderCnt[0] != pCurSliceHeader->iDeltaPicOrderCnt[0])
-      return TRUE;
+      return true;
     if (pLastSliceHeader->iDeltaPicOrderCnt[1] != pCurSliceHeader->iDeltaPicOrderCnt[1])
-      return TRUE;
+      return true;
   }
 
-  return FALSE;
+  return false;
 }
 
 
-bool_t CheckAccessUnitBoundary (const PNalUnit kpCurNal, const PNalUnit kpLastNal, const PSps kpSps) {
+bool CheckAccessUnitBoundary (const PNalUnit kpCurNal, const PNalUnit kpLastNal, const PSps kpSps) {
   const PNalUnitHeaderExt kpLastNalHeaderExt = &kpLastNal->sNalHeaderExt;
   const PNalUnitHeaderExt kpCurNalHeaderExt = &kpCurNal->sNalHeaderExt;
   const SSliceHeader* kpLastSliceHeader = &kpLastNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
@@ -429,56 +429,56 @@ bool_t CheckAccessUnitBoundary (const PNalUnit kpCurNal, const PNalUnit kpLastNa
 
   //Sub-clause 7.1.4.1.1 temporal_id
   if (kpLastNalHeaderExt->uiTemporalId != kpCurNalHeaderExt->uiTemporalId) {
-    return TRUE;
+    return true;
   }
 
   // Subclause 7.4.1.2.5
   if (kpLastSliceHeader->iRedundantPicCnt < kpCurSliceHeader->iRedundantPicCnt)
-    return FALSE;
+    return false;
   else if (kpLastSliceHeader->iRedundantPicCnt > kpCurSliceHeader->iRedundantPicCnt)
-    return TRUE;
+    return true;
 
   // Subclause G7.4.1.2.4
   if (kpLastNalHeaderExt->uiDependencyId < kpCurNalHeaderExt->uiDependencyId)
-    return FALSE;
+    return false;
   else if (kpLastNalHeaderExt->uiDependencyId > kpCurNalHeaderExt->uiDependencyId)
-    return TRUE;
+    return true;
   if (kpLastNalHeaderExt->uiQualityId < kpCurNalHeaderExt->uiQualityId)
-    return FALSE;
+    return false;
   else if (kpLastNalHeaderExt->uiQualityId > kpCurNalHeaderExt->uiQualityId)
-    return TRUE;
+    return true;
 
   // Subclause 7.4.1.2.4
   if (kpLastSliceHeader->iFrameNum != kpCurSliceHeader->iFrameNum)
-    return TRUE;
+    return true;
   if (kpLastSliceHeader->iPpsId != kpCurSliceHeader->iPpsId)
-    return TRUE;
+    return true;
   if (kpLastSliceHeader->bFieldPicFlag != kpCurSliceHeader->bFieldPicFlag)
-    return TRUE;
+    return true;
   if (kpLastSliceHeader->bBottomFiledFlag != kpCurSliceHeader->bBottomFiledFlag)
-    return TRUE;
+    return true;
   if ((kpLastNalHeaderExt->sNalUnitHeader.uiNalRefIdc != NRI_PRI_LOWEST) != (kpCurNalHeaderExt->sNalUnitHeader.uiNalRefIdc
       != NRI_PRI_LOWEST))
-    return TRUE;
+    return true;
   if (kpLastNalHeaderExt->bIdrFlag != kpCurNalHeaderExt->bIdrFlag)
-    return TRUE;
+    return true;
   if (kpCurNalHeaderExt->bIdrFlag) {
     if (kpLastSliceHeader->uiIdrPicId != kpCurSliceHeader->uiIdrPicId)
-      return TRUE;
+      return true;
   }
   if (kpSps->uiPocType == 0) {
     if (kpLastSliceHeader->iPicOrderCntLsb != kpCurSliceHeader->iPicOrderCntLsb)
-      return TRUE;
+      return true;
     if (kpLastSliceHeader->iDeltaPicOrderCntBottom != kpCurSliceHeader->iDeltaPicOrderCntBottom)
-      return TRUE;
+      return true;
   } else if (kpSps->uiPocType == 1) {
     if (kpLastSliceHeader->iDeltaPicOrderCnt[0] != kpCurSliceHeader->iDeltaPicOrderCnt[0])
-      return TRUE;
+      return true;
     if (kpLastSliceHeader->iDeltaPicOrderCnt[1] != kpCurSliceHeader->iDeltaPicOrderCnt[1])
-      return TRUE;
+      return true;
   }
 
-  return FALSE;
+  return false;
 }
 
 /*!
@@ -559,8 +559,8 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
   return iErr;
 }
 
-void_t ParseRefBasePicMarking (PBitStringAux pBs, PRefBasePicMarking pRefBasePicMarking) {
-  const bool_t kbAdaptiveMarkingModeFlag = !!BsGetOneBit (pBs);
+void ParseRefBasePicMarking (PBitStringAux pBs, PRefBasePicMarking pRefBasePicMarking) {
+  const bool kbAdaptiveMarkingModeFlag = !!BsGetOneBit (pBs);
   pRefBasePicMarking->bAdaptiveRefBasePicMarkingModeFlag = kbAdaptiveMarkingModeFlag;
   if (kbAdaptiveMarkingModeFlag) {
     int32_t iIdx = 0;
@@ -583,7 +583,7 @@ void_t ParseRefBasePicMarking (PBitStringAux pBs, PRefBasePicMarking pRefBasePic
   }
 }
 
-void_t ParsePrefixNalUnit (PWelsDecoderContext pCtx, PBitStringAux pBs) {
+void ParsePrefixNalUnit (PWelsDecoderContext pCtx, PBitStringAux pBs) {
   PNalUnit pCurNal = &pCtx->sPrefixNal;
 
   if (pCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc != 0) {
@@ -670,7 +670,7 @@ static const SLevelLimits g_kSLevelLimits[17] = {
   {2073600, 36864, 184320, 240000, 240000, -2048, 2047, 2, 16} /* level 5.2 */
 };
 
-const SLevelLimits *GetLevelLimits(int32_t iLevelIdx, bool_t bConstraint3) {
+const SLevelLimits *GetLevelLimits(int32_t iLevelIdx, bool bConstraint3) {
   switch (iLevelIdx) {
   case 10:
     return &g_kSLevelLimits[0];
@@ -737,8 +737,8 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   ProfileIdc	uiProfileIdc;
   uint8_t	uiLevelIdc;
   int32_t iSpsId;
-  bool_t bConstraintSetFlags[6] = { false };
-  const bool_t kbUseSubsetFlag   = IS_SUBSET_SPS_NAL (pNalHead->eNalUnitType);
+  bool bConstraintSetFlags[6] = { false };
+  const bool kbUseSubsetFlag   = IS_SUBSET_SPS_NAL (pNalHead->eNalUnitType);
 
 
   if (kbUseSubsetFlag) {	// SubsetSps
@@ -1030,7 +1030,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux)
  * \note	Call it in case eNalUnitType is NAL_UNIT_SEI.
  *************************************************************************************
  */
-int32_t ParseSei (void_t* pSei, PBitStringAux pBsAux) {	// reserved Sei_Msg type
+int32_t ParseSei (void* pSei, PBitStringAux pBsAux) {	// reserved Sei_Msg type
 
 
   return ERR_NONE;

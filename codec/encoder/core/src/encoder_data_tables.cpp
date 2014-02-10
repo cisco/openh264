@@ -86,7 +86,7 @@ const uint8_t g_kuiCache12_8x8RefIdx[4] = { //mv or uiRefIndex cache scan index,
 
 // extern at mb_cache.h
 
-const str_t* g_sWelsLogTags[] = {
+const char* g_sWelsLogTags[] = {
   "ERR",
   "WARN",
   "INFO",

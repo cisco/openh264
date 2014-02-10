@@ -38,23 +38,23 @@
 
 namespace WelsDec {
 
-void_t InitDctClipTable (void_t);
+void InitDctClipTable (void);
 
-void_t IdctResAddPred_c (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
+void IdctResAddPred_c (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
 
 #if defined(__cplusplus)
 extern "C" {
 #endif//__cplusplus
 
 #if defined(X86_ASM)
-void_t IdctResAddPred_mmx (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
+void IdctResAddPred_mmx (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
 #endif//X86_ASM
 
 #if defined(__cplusplus)
 }
 #endif//__cplusplus
 
-void_t GetI4LumaIChromaAddrTable (int32_t* pBlockOffset, const int32_t kiYStride, const int32_t kiUVStride);
+void GetI4LumaIChromaAddrTable (int32_t* pBlockOffset, const int32_t kiYStride, const int32_t kiUVStride);
 
 } // namespace WelsDec
 

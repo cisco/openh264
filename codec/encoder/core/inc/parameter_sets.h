@@ -67,24 +67,24 @@ uint8_t		iLevelIdc;
 //	uint8_t		uiBitDepthLuma;         //=8, only used in decoder, encoder in general_***; it can be removed when removed general up_sample
 //	uint8_t		uiBitDepthChroma;		//=8
 /* TO BE CONTINUE: POC type 1 */
-//	bool_t		bDeltaPicOrderAlwaysZeroFlag;
-//	bool_t		bGapsInFrameNumValueAllowedFlag;	//=true
+//	bool		bDeltaPicOrderAlwaysZeroFlag;
+//	bool		bGapsInFrameNumValueAllowedFlag;	//=true
 
-//	bool_t		bFrameMbsOnlyFlag;
-//	bool_t		bMbaffFlag;	// MB Adapative Frame Field
-//	bool_t		bDirect8x8InferenceFlag;
-bool_t		bFrameCroppingFlag;
+//	bool		bFrameMbsOnlyFlag;
+//	bool		bMbaffFlag;	// MB Adapative Frame Field
+//	bool		bDirect8x8InferenceFlag;
+bool		bFrameCroppingFlag;
 
-//	bool_t		bVuiParamPresentFlag;
-//	bool_t		bTimingInfoPresentFlag;
-//	bool_t		bFixedFrameRateFlag;
+//	bool		bVuiParamPresentFlag;
+//	bool		bTimingInfoPresentFlag;
+//	bool		bFixedFrameRateFlag;
 
-bool_t		bConstraintSet0Flag;
-bool_t		bConstraintSet1Flag;
-bool_t		bConstraintSet2Flag;
+bool		bConstraintSet0Flag;
+bool		bConstraintSet1Flag;
+bool		bConstraintSet2Flag;
 
-//	bool_t		bConstraintSet3Flag;		// reintroduce constrain_set3_flag instead of reserved filling bytes here
-//	bool_t		bSeparateColorPlaneFlag;  // =false,: only used in decoder, encoder in general_***; it can be removed when removed general up_sample
+//	bool		bConstraintSet3Flag;		// reintroduce constrain_set3_flag instead of reserved filling bytes here
+//	bool		bSeparateColorPlaneFlag;  // =false,: only used in decoder, encoder in general_***; it can be removed when removed general up_sample
 
 } SWelsSPS, *PWelsSPS;
 
@@ -98,10 +98,10 @@ uint8_t		iExtendedSpatialScalability;	// ESS
 //	uint8_t		uiChromaPhaseYPlus1;
 //	uint8_t		uiSeqRefLayerChromaPhaseXPlus1Flag;
 //	uint8_t		uiSeqRefLayerChromaPhaseYPlus1;
-//	bool_t		bInterLayerDeblockingFilterCtrlPresentFlag;
-bool_t		bSeqTcoeffLevelPredFlag;
-bool_t		bAdaptiveTcoeffLevelPredFlag;
-bool_t		bSliceHeaderRestrictionFlag;
+//	bool		bInterLayerDeblockingFilterCtrlPresentFlag;
+bool		bSeqTcoeffLevelPredFlag;
+bool		bAdaptiveTcoeffLevelPredFlag;
+bool		bSliceHeaderRestrictionFlag;
 } SSpsSvcExt, *PSpsSvcExt;
 
 /* Subset sequence parameter set syntax, refer to Page 391 in JVT X201wcm */
@@ -109,9 +109,9 @@ typedef struct TagSubsetSps {
 SWelsSPS		pSps;
 SSpsSvcExt	sSpsSvcExt;
 
-//	bool_t		bSvcVuiParamPresentFlag;
-//	bool_t		bAdditionalExtension2Flag;
-//	bool_t		bAdditionalExtension2DataFlag;
+//	bool		bSvcVuiParamPresentFlag;
+//	bool		bAdditionalExtension2Flag;
+//	bool		bAdditionalExtension2DataFlag;
 } SSubsetSps, *PSubsetSps;
 
 /* Picture parameter set syntax, refer to Page 59 in JVT X201wcm */
@@ -129,7 +129,7 @@ uint32_t	uiTopLeft[MAX_SLICEGROUP_IDS];
 uint32_t	uiBottomRight[MAX_SLICEGROUP_IDS];
 /* uiSliceGroupMapType = 3, 4 or 5 */
 /* uiSliceGroupMapType = 3, 4 or 5 */
-bool_t		bSliceGroupChangeDirectionFlag;
+bool		bSliceGroupChangeDirectionFlag;
 uint32_t	uiSliceGroupChangeRate;
 /* uiSliceGroupMapType = 6 */
 uint32_t	uiPicSizeInMapUnits;
@@ -147,13 +147,13 @@ uint8_t		uiChromaQpIndexOffset;
 //	int32_t		iSecondChromaQpIndexOffset;
 //	/* potential application for High profile */
 
-//	bool_t		bPicOrderPresentFlag;
+//	bool		bPicOrderPresentFlag;
 
-bool_t		bDeblockingFilterControlPresentFlag;
+bool		bDeblockingFilterControlPresentFlag;
 
-//	bool_t		bConstainedIntraPredFlag;
-//	bool_t		bRedundantPicCntPresentFlag;
-//	bool_t		bWeightedPredFlag;
+//	bool		bConstainedIntraPredFlag;
+//	bool		bRedundantPicCntPresentFlag;
+//	bool		bWeightedPredFlag;
 //	uint8_t		uiWeightedBiPredIdc;
 
 } SWelsPPS, *PWelsPPPS;

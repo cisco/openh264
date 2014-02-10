@@ -102,7 +102,7 @@ float		fInputFrameRate;		// input frame rate
 float		fOutputFrameRate;		// output frame rate
 
 #ifdef ENABLE_FRAME_DUMP
-str_t		sRecFileName[MAX_FNAME_LEN];	// file to be constructed
+char		sRecFileName[MAX_FNAME_LEN];	// file to be constructed
 #endif//ENABLE_FRAME_DUMP
 } SDLayerParam;
 
@@ -127,7 +127,7 @@ struct {
   int32_t iHeight;
 } SUsedPicRect;	// the rect in input picture that encoder actually used
 
-str_t*       pCurPath; // record current lib path such as:/pData/pData/com.wels.enc/lib/
+char*       pCurPath; // record current lib path such as:/pData/pData/com.wels.enc/lib/
 
 float		fMaxFrameRate;		// maximal frame rate [Hz / fps]
 int32_t		iInputCsp;			// color space of input sequence
@@ -140,13 +140,13 @@ int16_t		iCountThreadsNum;			//		# derived from disable_multiple_slice_idc (=0 o
 int32_t		iLTRRefNum;
 uint32_t    uiLtrMarkPeriod;	//the min distance of two int32_t references
 
-bool_t		bDeblockingParallelFlag;	// deblocking filter parallelization control flag
-bool_t		bMgsT0OnlyStrategy; //MGS_T0_only_strategy
-bool_t		bEnableSSEI;
-bool_t		bEnableFrameCroppingFlag;	// enable frame cropping flag: TRUE alwayse in application
+bool		bDeblockingParallelFlag;	// deblocking filter parallelization control flag
+bool		bMgsT0OnlyStrategy; //MGS_T0_only_strategy
+bool		bEnableSSEI;
+bool		bEnableFrameCroppingFlag;	// enable frame cropping flag: true alwayse in application
 
-bool_t		bEnableCropPic;			// enable cropping source picture. , 8/25/2010
-// FALSE: Streaming Video Sharing; TRUE: Video Conferencing Meeting;
+bool		bEnableCropPic;			// enable cropping source picture. , 8/25/2010
+// false: Streaming Video Sharing; true: Video Conferencing Meeting;
 int8_t		iDecompStages;		// GOP size dependency
 
 /* Deblocking loop filter */
@@ -159,39 +159,39 @@ int8_t		iInterLayerLoopFilterAlphaC0Offset;	// InterLayerLoopFilterAlphaC0Offset
 int8_t		iInterLayerLoopFilterBetaOffset;	// InterLayerLoopFilterBetaOffset
 
 /* Rate Control */
-bool_t		bEnableRc;
+bool		bEnableRc;
 int8_t		iRCMode;
 int8_t		iPaddingFlag;
 /* denoise control */
-bool_t      bEnableDenoise;
+bool      bEnableDenoise;
 
 /* scene change detection control */
-bool_t      bEnableSceneChangeDetect;
+bool      bEnableSceneChangeDetect;
 // background detection control
-bool_t		bEnableBackgroundDetection;
+bool		bEnableBackgroundDetection;
 /* adaptive quantization control */
-bool_t		bEnableAdaptiveQuant;
+bool		bEnableAdaptiveQuant;
 /* frame skipping */
-bool_t		bEnableFrameSkip;
+bool		bEnableFrameSkip;
 /* long term reference control */
-bool_t      bEnableLongTermReference;
+bool      bEnableLongTermReference;
 
 /* pSps pPps id addition control */
-bool_t      bEnableSpsPpsIdAddition;
+bool      bEnableSpsPpsIdAddition;
 /* Layer definition */
-bool_t		bPrefixNalAddingCtrl;
+bool		bPrefixNalAddingCtrl;
 int8_t		iNumDependencyLayer;	// number of dependency(Spatial/CGS) layers used to be encoded
 int8_t		iNumTemporalLayer;		// number of temporal layer specified
 
 
 
  public:
-TagWelsSvcCodingParam (const bool_t kbEnableRc = true) {
+TagWelsSvcCodingParam (const bool kbEnableRc = true) {
   FillDefault (kbEnableRc);
 }
 ~TagWelsSvcCodingParam()	{}
 
-void FillDefault (const bool_t kbEnableRc) {
+void FillDefault (const bool kbEnableRc) {
   uiGopSize			= 1;			// GOP size (at maximal frame rate: 16)
   uiIntraPeriod		= 0;			// intra period (multiple of GOP size as desired)
   iNumRefFrame		= MIN_REF_PIC_COUNT;	// number of reference frame used
@@ -225,9 +225,9 @@ void FillDefault (const bool_t kbEnableRc) {
   bMgsT0OnlyStrategy			=
     true;	// Strategy of have MGS only at T0 frames (0: do not use this strategy; 1: use this strategy)
   bEnableSSEI					= true;
-  bEnableFrameCroppingFlag	= true;	// enable frame cropping flag: TRUE alwayse in application
+  bEnableFrameCroppingFlag	= true;	// enable frame cropping flag: true alwayse in application
   bEnableCropPic				= true;	// enable cropping source picture. , 8/25/2010
-  // FALSE: Streaming Video Sharing; TRUE: Video Conferencing Meeting;
+  // false: Streaming Video Sharing; true: Video Conferencing Meeting;
   iDecompStages				= 0;	// GOP size dependency, unknown here and be revised later
 
   /* Deblocking loop filter */
@@ -257,7 +257,7 @@ void FillDefault (const bool_t kbEnableRc) {
   memset(sDependencyLayers,0,sizeof(SDLayerParam)*MAX_DEPENDENCY_LAYER);
 }
 
-int32_t ParamTranscode (SVCEncodingParam& pCodingParam, const bool_t kbEnableRc = true) {
+int32_t ParamTranscode (SVCEncodingParam& pCodingParam, const bool kbEnableRc = true) {
   pCodingParam.fFrameRate		= WELS_CLIP3 (pCodingParam.fFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
   iInputCsp		= pCodingParam.iInputCsp;		// color space of input sequence
   uiFrameToBeCoded	= (uint32_t) -

@@ -44,7 +44,7 @@
 
 // Miscellaneous sizing infos
 #ifndef MAX_FNAME_LEN
-#define MAX_FNAME_LEN		256	// maximal length of file name in str_t size
+#define MAX_FNAME_LEN		256	// maximal length of file name in char size
 #endif//MAX_FNAME_LEN
 
 #ifndef WELS_LOG_BUF_SIZE

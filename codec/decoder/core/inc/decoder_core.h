@@ -64,7 +64,7 @@ int32_t WelsInitMemory (PWelsDecoderContext pCtx);
  * Free memory introduced in WelsInitMemory at destruction of decoder.
  *
  */
-void_t WelsFreeMemory (PWelsDecoderContext pCtx);
+void WelsFreeMemory (PWelsDecoderContext pCtx);
 
 /*!
  * \brief	request memory when maximal picture width and height are available
@@ -74,7 +74,7 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
 /*!
  * \brief	free dq layer context memory related
  */
-void_t UninitialDqLayersContext (PWelsDecoderContext pCtx);
+void UninitialDqLayersContext (PWelsDecoderContext pCtx);
 
 /*
  *	DecodeNalHeaderExt
@@ -83,19 +83,19 @@ void_t UninitialDqLayersContext (PWelsDecoderContext pCtx);
  *	pNal:	target NALUnit ptr
  *	pSrc:	NAL Unit bitstream
  */
-void_t DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc);
+void DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc);
 
 /*
  *	ParseSliceHeaderSyntaxs
  *	Parse slice header of bitstream
  */
-int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, const bool_t kbExtensionFlag);
+int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, const bool kbExtensionFlag);
 /*
  *	Copy relative syntax elements of NALUnitHeaderExt, sRefPicBaseMarking and bStoreRefBasePicFlag in prefix nal unit.
  *	pSrc:	mark as decoded prefix NAL
  *	pDst:	succeeded VCL NAL based AVC (I/P Slice)
  */
-bool_t PrefetchNalHeaderExtSyntax (PWelsDecoderContext pCtx, PNalUnit const kpDst, PNalUnit const kpSrc);
+bool PrefetchNalHeaderExtSyntax (PWelsDecoderContext pCtx, PNalUnit const kpDst, PNalUnit const kpSrc);
 
 
 /*
@@ -123,14 +123,14 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
 /*
  *	Prepare current dq layer context initialization.
  */
-void_t WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pSps, PPps pPps);
+void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pSps, PPps pPps);
 
 
 int32_t WelsDecodeAccessUnitStart (PWelsDecoderContext pCtx);
-void_t WelsDecodeAccessUnitEnd (PWelsDecoderContext pCtx);
+void WelsDecodeAccessUnitEnd (PWelsDecoderContext pCtx);
 
-void_t ForceResetCurrentAccessUnit (PAccessUnit pAu);
-void_t ForceClearCurrentNal (PAccessUnit pAu);
+void ForceResetCurrentAccessUnit (PAccessUnit pAu);
+void ForceClearCurrentNal (PAccessUnit pAu);
 
 } // namespace WelsDec
 

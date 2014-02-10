@@ -68,7 +68,7 @@ namespace WelsDec {
 static inline int32_t ShowBits (PBitStringAux pBs, int32_t iNumBits) {
 return UBITS (pBs->uiCurBits, iNumBits);
 }
-static inline void_t FlushBits (PBitStringAux pBs, int32_t iNumBits) {
+static inline void FlushBits (PBitStringAux pBs, int32_t iNumBits) {
 DUMP_BITS (pBs->uiCurBits, pBs->pCurBuf, pBs->iLeftBits, iNumBits);
 }
 static inline int32_t BsGetBits (PBitStringAux pBs, int32_t iNumBits) {
@@ -133,7 +133,7 @@ if (iValue) {
   return (g_kuiLeadingZeroTable[iValue] + 8);
 }
 
-//ASSERT(FALSE);  // should not go here
+//ASSERT(false);  // should not go here
 return -1;
 }
 

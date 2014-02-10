@@ -81,12 +81,12 @@ EFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum);
  * \brief	Dump reconstruction for dependency layer
  */
 
-extern "C" void DumpDependencyRec (SPicture* pSrcPic, const str_t* kpFileName, const int8_t kiDid);
+extern "C" void DumpDependencyRec (SPicture* pSrcPic, const char* kpFileName, const int8_t kiDid);
 
 /*!
  * \brief	Dump the reconstruction pictures
  */
-void DumpRecFrame (SPicture* pSrcPic, const str_t* kpFileName);
+void DumpRecFrame (SPicture* pSrcPic, const char* kpFileName);
 
 
 /*!

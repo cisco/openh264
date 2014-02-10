@@ -60,7 +60,7 @@ typedef EResult (WELSAPI* pfnCreateVpInterface) (void**, int);
 typedef EResult (WELSAPI* pfnDestroyVpInterface) (void*, int);
 
 int32_t WelsInitScaledPic (SWelsSvcCodingParam* pParam,  Scaled_Picture*  pScaledPic, CMemoryAlign* pMemoryAlign);
-bool_t  JudgeNeedOfScaling (SWelsSvcCodingParam* pParam, Scaled_Picture* pScaledPic);
+bool  JudgeNeedOfScaling (SWelsSvcCodingParam* pParam, Scaled_Picture* pScaledPic);
 void    FreeScaledPic (Scaled_Picture*  pScaledPic, CMemoryAlign* pMemoryAlign);
 
 //******* table definition ***********************************************************************//
@@ -86,14 +86,14 @@ CWelsLib::CWelsLib (void* pEncCtx) {
 
 #ifndef NO_DYNAMIC_VP
 #if defined(_WIN32)
-  const str_t WelsVPLib[] = "welsvp.dll";
+  const char WelsVPLib[] = "welsvp.dll";
   HMODULE shModule = LoadLibrary (WelsVPLib);
   if (!shModule)
     WelsLog (pEncCtx, WELS_LOG_ERROR, "welsvp load lib dynamic failed module=%x\n", shModule);
 
 #elif defined(MACOS)
-  const str_t WelsVPLib[] = "welsvp.bundle";
-  str_t pCurPath[256];
+  const char WelsVPLib[] = "welsvp.bundle";
+  char pCurPath[256];
   GetCurrentModulePath (pCurPath, 256);
   strlcat (pCurPath, WelsVPLib, 256);
   CFBundleRef shModule = LoadBundle (pCurPath);
@@ -101,7 +101,7 @@ CWelsLib::CWelsLib (void* pEncCtx) {
     WelsLog (pEncCtx, WELS_LOG_ERROR, "welsvp load lib dynamic failed module=%x\n", shModule);
 
 #elif defined(__GNUC__)
-  const str_t WelsVPLib[] = "./libwelsvp.so";
+  const char WelsVPLib[] = "./libwelsvp.so";
   void* shModule = NULL;
   shModule = dlopen (WelsVPLib, RTLD_LAZY);
   if (shModule == NULL)
@@ -132,7 +132,7 @@ CWelsLib::~CWelsLib() {
 #endif
 }
 
-void* CWelsLib::QueryFunction (const str_t* pName) {
+void* CWelsLib::QueryFunction (const char* pName) {
   void* pFunc = NULL;
 
 #ifndef NO_DYNAMIC_VP
@@ -208,7 +208,7 @@ CWelsPreProcess::CWelsPreProcess (void* pEncCtx) {
   m_pInterfaceVp = NULL;
   m_pEncLib = NULL;
   m_bInitDone = false;
-  m_bOfficialBranch  = FALSE;
+  m_bOfficialBranch  = false;
   m_pEncCtx = pEncCtx;
   memset (&m_sScaledPicture, 0, sizeof (m_sScaledPicture));
 }
@@ -281,12 +281,12 @@ int32_t CWelsPreProcess::WelsPreprocessStep1 (void* pCtx, const SSourcePicture**
       for (int32_t i = 0; i < iNumDependencyLayer; i++) {
         if (pSvcParam->sDependencyLayers[i].iFrameWidth != pic_queue[i]->iPicWidth ||
             pSvcParam->sDependencyLayers[i].iFrameHeight != pic_queue[i]->iPicHeight) {
-          m_bOfficialBranch = TRUE;
+          m_bOfficialBranch = true;
           break;
         }
       }
     }
-    m_bInitDone = TRUE;
+    m_bInitDone = true;
   }
 
   if (m_pInterfaceVp == NULL)
@@ -313,8 +313,8 @@ int32_t CWelsPreProcess::WelsPreprocessStep1 (void* pCtx, const SSourcePicture**
 int32_t CWelsPreProcess::WelsPreprocessStep3 (void* pCtx, const int32_t kiDidx) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   SWelsSvcCodingParam* pSvcParam = pEncCtx->pSvcParam;
-  bool_t bNeededMbAq = (pSvcParam->bEnableAdaptiveQuant && (pEncCtx->eSliceType == P_SLICE));
-  bool_t bCalculateBGD = (pEncCtx->eSliceType == P_SLICE && pSvcParam->bEnableBackgroundDetection);
+  bool bNeededMbAq = (pSvcParam->bEnableAdaptiveQuant && (pEncCtx->eSliceType == P_SLICE));
+  bool bCalculateBGD = (pEncCtx->eSliceType == P_SLICE && pSvcParam->bEnableBackgroundDetection);
 
   int32_t iCurTemporalIdx  = pEncCtx->uiSpatialLayersInTemporal[kiDidx] - 1;
 
@@ -327,8 +327,8 @@ int32_t CWelsPreProcess::WelsPreprocessStep3 (void* pCtx, const int32_t kiDidx) 
   SPicture* pRefPic = pEncCtx->pSpatialPic[kiDidx][iRefTemporalIdx];
   {
     SPicture* pLastPic = m_pLastSpatialPicture[kiDidx][0];
-    bool_t bCalculateSQDiff = ((pLastPic->pData[0] == pRefPic->pData[0]) && bNeededMbAq);
-    bool_t bCalculateVar = (pSvcParam->iRCMode == RC_MODE1 && pEncCtx->eSliceType == I_SLICE);
+    bool bCalculateSQDiff = ((pLastPic->pData[0] == pRefPic->pData[0]) && bNeededMbAq);
+    bool bCalculateVar = (pSvcParam->iRCMode == RC_MODE1 && pEncCtx->eSliceType == I_SLICE);
 
     VaaCalculation (pEncCtx->pVaa, pCurPic, pRefPic, bCalculateSQDiff, bCalculateVar, bCalculateBGD);
   }
@@ -517,12 +517,12 @@ int32_t CWelsPreProcess::MultiLayerPreprocess (void* pCtx, const SSourcePicture*
 /*!
  * \brief	Whether input picture need be scaled?
  */
-bool_t JudgeNeedOfScaling (SWelsSvcCodingParam* pParam, Scaled_Picture* pScaledPicture) {
+bool JudgeNeedOfScaling (SWelsSvcCodingParam* pParam, Scaled_Picture* pScaledPicture) {
   const int32_t kiInputPicWidth	= pParam->SUsedPicRect.iWidth;
   const int32_t kiInputPicHeight = pParam->SUsedPicRect.iHeight;
   const int32_t kiDstPicWidth		= pParam->sDependencyLayers[pParam->iNumDependencyLayer - 1].iActualWidth;
   const int32_t kiDstPicHeight	= pParam->sDependencyLayers[pParam->iNumDependencyLayer - 1].iActualHeight;
-  bool_t bNeedDownsampling = true;
+  bool bNeedDownsampling = true;
 
   int32_t iSpatialIdx = pParam->iNumDependencyLayer - 1;
 
@@ -551,7 +551,7 @@ bool_t JudgeNeedOfScaling (SWelsSvcCodingParam* pParam, Scaled_Picture* pScaledP
 }
 
 int32_t  WelsInitScaledPic (SWelsSvcCodingParam* pParam,  Scaled_Picture*  pScaledPicture, CMemoryAlign* pMemoryAlign) {
-  bool_t bInputPicNeedScaling = JudgeNeedOfScaling (pParam, pScaledPicture);
+  bool bInputPicNeedScaling = JudgeNeedOfScaling (pParam, pScaledPicture);
   if (bInputPicNeedScaling) {
     pScaledPicture->pScaledInputPicture = AllocPicture (pMemoryAlign, pParam->SUsedPicRect.iWidth,
                                           pParam->SUsedPicRect.iHeight, false);
@@ -611,8 +611,8 @@ void CWelsPreProcess::BilateralDenoising (SPicture* pSrc, const int32_t kiWidth,
   m_pInterfaceVp->Process (iMethodIdx, &sSrcPixMap, NULL);
 }
 
-bool_t CWelsPreProcess::DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture) {
-  bool_t bSceneChangeFlag = false;
+bool CWelsPreProcess::DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture) {
+  bool bSceneChangeFlag = false;
   int32_t iMethodIdx = METHOD_SCENE_CHANGE_DETECTION;
   SSceneChangeResult sSceneChangeDetectResult = {0};
   SPixMap sSrcPixMap = {0};
@@ -688,7 +688,7 @@ int32_t CWelsPreProcess::DownsamplePadding (SPicture* pSrc, SPicture* pDstPic,  
 
 //*********************************************************************************************************/
 void CWelsPreProcess::VaaCalculation (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture,
-                                      bool_t bCalculateSQDiff, bool_t bCalculateVar, bool_t bCalculateBGD) {
+                                      bool bCalculateSQDiff, bool bCalculateVar, bool bCalculateBGD) {
   pVaaInfo->sVaaCalcInfo.pCurY = pCurPicture->pData[0];
   pVaaInfo->sVaaCalcInfo.pRefY = pRefPicture->pData[0];
   {
@@ -722,7 +722,7 @@ void CWelsPreProcess::VaaCalculation (SVAAFrameInfo* pVaaInfo, SPicture* pCurPic
 }
 
 void CWelsPreProcess::BackgroundDetection (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture,
-    bool_t bDetectFlag) {
+    bool bDetectFlag) {
   if (bDetectFlag) {
     pVaaInfo->iPicWidth     = pCurPicture->iWidthInPixel;
     pVaaInfo->iPicHeight    = pCurPicture->iHeightInPixel;
@@ -834,7 +834,7 @@ void CWelsPreProcess::SetRefMbType (void* pCtx, uint32_t** pRefMbTypeArray, int3
 
 
 void CWelsPreProcess::AnalyzePictureComplexity (void* pCtx, SPicture* pCurPicture, SPicture* pRefPicture,
-    const int32_t kiDependencyId, const bool_t bCalculateBGD) {
+    const int32_t kiDependencyId, const bool bCalculateBGD) {
   sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pCtx;
   SWelsSvcCodingParam* pSvcParam = pEncCtx->pSvcParam;
   SVAAFrameInfo* pVaaInfo			= pEncCtx->pVaa;

@@ -598,7 +598,7 @@ void WelsISliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice) { //pMd + enc
 //encapsulate two kinds of reconstruction:
 // first. store base or highest Dependency Layer with only one quality (without CS RS reconstruction)
 // second. lower than highest Dependency Layer, and for every Dependency Layer with one quality layer(single layer)
-void WelsPSliceMdEnc (sWelsEncCtx* pEncCtx, SSlice* pSlice,  const bool_t kbIsHighestDlayerFlag) { //pMd + encoding
+void WelsPSliceMdEnc (sWelsEncCtx* pEncCtx, SSlice* pSlice,  const bool kbIsHighestDlayerFlag) { //pMd + encoding
   const SSliceHeaderExt*	kpShExt				= &pSlice->sSliceHeaderExt;
   const SSliceHeader*		kpSh					= &kpShExt->sSliceHeader;
   const int32_t			kiSliceFirstMbXY	= kpSh->iFirstMbInSlice;
@@ -613,7 +613,7 @@ void WelsPSliceMdEnc (sWelsEncCtx* pEncCtx, SSlice* pSlice,  const bool_t kbIsHi
   WelsMdInterMbLoop (pEncCtx, pSlice, &sMd, kiSliceFirstMbXY);
 }
 
-void WelsPSliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice, const bool_t kbIsHighestDlayerFlag) {
+void WelsPSliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice, const bool kbIsHighestDlayerFlag) {
   const SSliceHeaderExt*	kpShExt				= &pSlice->sSliceHeaderExt;
   const SSliceHeader*		kpSh					= &kpShExt->sSliceHeader;
   const int32_t			kiSliceFirstMbXY	= kpSh->iFirstMbInSlice;
@@ -631,8 +631,8 @@ void WelsPSliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice, const bool_t 
 void WelsCodePSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
   //pSlice-level init should be outside and before this function
   SDqLayer* pCurLayer			= pEncCtx->pCurDqLayer;
-  const bool_t kbBaseAvail		= pCurLayer->bBaseLayerAvailableFlag;
-  const bool_t kbHighestSpatial = pEncCtx->pSvcParam->iNumDependencyLayer ==
+  const bool kbBaseAvail		= pCurLayer->bBaseLayerAvailableFlag;
+  const bool kbHighestSpatial = pEncCtx->pSvcParam->iNumDependencyLayer ==
                                   (pCurLayer->sLayerInfo.sNalHeaderExt.uiDependencyId + 1);
 
   //MD switch
@@ -649,8 +649,8 @@ void WelsCodePSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
 void WelsCodePOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
   //pSlice-level init should be outside and before this function
   SDqLayer* pCurLayer			= pEncCtx->pCurDqLayer;
-  const bool_t kbBaseAvail		= pCurLayer->bBaseLayerAvailableFlag;
-  const bool_t kbHighestSpatial = pEncCtx->pSvcParam->iNumDependencyLayer ==
+  const bool kbBaseAvail		= pCurLayer->bBaseLayerAvailableFlag;
+  const bool kbHighestSpatial = pEncCtx->pSvcParam->iNumDependencyLayer ==
                                   (pCurLayer->sLayerInfo.sNalHeaderExt.uiDependencyId + 1);
 
   //MD switch
@@ -738,10 +738,10 @@ void UpdateMbNeighbourInfoForNextSlice (SSliceCtx* pSliceCtx,
     const int32_t kiMbXY				= pMb->iMbXY;
     const int32_t kiMbX				= pMb->iMbX;
     const int32_t kiMbY				= pMb->iMbY;
-    BOOL_T     bLeft;
-    BOOL_T     bTop;
-    BOOL_T     bLeftTop;
-    BOOL_T     bRightTop;
+    bool     bLeft;
+    bool     bTop;
+    bool     bLeftTop;
+    bool     bRightTop;
     int32_t   iLeftXY, iTopXY, iLeftTopXY, iRightTopXY;
     const uint8_t  kuiSliceIdc		= WelsMbToSliceIdc (pSliceCtx, kiMbXY);
 
@@ -819,7 +819,7 @@ void AddSliceBoundary (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, SSliceCtx* pSlic
   UpdateMbNeighbourInfoForNextSlice (pSliceCtx, pMbList, iFirstMbIdxOfNextSlice, kiLastMbIdxInPartition);
 }
 
-BOOL_T DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
+bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
     SDynamicSlicingStack* pDss) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   SSlice* pCurSlice = (SSlice*)pSlice;
@@ -830,12 +830,12 @@ BOOL_T DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pS
   const int32_t  kiPartitaionId = pCurSlice->uiSliceIdx % kiActiveThreadsNum;
   const int32_t  kiLastMbIdxInPartition	= pEncCtx->pCurDqLayer->pLastMbIdxOfPartition[kiPartitaionId];
 
-  const BOOL_T    kbCurMbNotFirstMbOfCurSlice      = (pSliceCtx->pOverallMbMap[iCurMbIdx] ==
+  const bool    kbCurMbNotFirstMbOfCurSlice      = (pSliceCtx->pOverallMbMap[iCurMbIdx] ==
       pSliceCtx->pOverallMbMap[iCurMbIdx - 1]);
-  const BOOL_T    kbCurMbNotLastMbOfCurPartition = iCurMbIdx < kiLastMbIdxInPartition;
-  const BOOL_T    kbSliceNumNotExceedConstraint       = pSliceCtx->iSliceNumInFrame <
+  const bool    kbCurMbNotLastMbOfCurPartition = iCurMbIdx < kiLastMbIdxInPartition;
+  const bool    kbSliceNumNotExceedConstraint       = pSliceCtx->iSliceNumInFrame <
       pSliceCtx->iMaxSliceNumConstraint; /*tmp choice to avoid complex memory operation, 100520, to be modify*/
-  const BOOL_T    kbSliceNumReachConstraint               = (pSliceCtx->iSliceNumInFrame ==
+  const bool    kbSliceNumReachConstraint               = (pSliceCtx->iSliceNumInFrame ==
       pSliceCtx->iMaxSliceNumConstraint);
 
   if (pCurSlice->bDynamicSlicingSliceSizeCtrlFlag)
@@ -874,7 +874,7 @@ BOOL_T DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pS
       WelsMutexUnlock (&pEncCtx->pSliceThreading->mutexSliceNumUpdate);
 #endif//MT_ENABLED
 
-    return TRUE;
+    return true;
   }
 
   if (
@@ -896,7 +896,7 @@ BOOL_T DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pS
     WelsMutexUnlock (&pEncCtx->pSliceThreading->mutexSliceNumUpdate);
 #endif//MT_ENABLED
 
-  return FALSE;
+  return false;
 }
 
 ///////////////

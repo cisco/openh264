@@ -57,8 +57,8 @@
 
 namespace WelsSVCEnc {
 
-void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, va_list argv);
-void WelsLogNil (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, va_list argv);
+void WelsLogDefault (void* pCtx, const int32_t kiLevel, const char* kpFmtStr, va_list argv);
+void WelsLogNil (void* pCtx, const int32_t kiLevel, const char* kpFmtStr, va_list argv);
 
 float WelsCalcPsnr (const void* kpTarPic,
                     const int32_t kiTarStride,
@@ -86,10 +86,10 @@ int32_t			g_iSizeLogBuf	= 1024;			// pBuffer size for each log output
  * \param	kiLevel		log iLevel
  * \return  tag of log iLevel
  */
-static inline str_t* GetLogTag (const int32_t kiLevel, int32_t* pBit) {
+static inline char* GetLogTag (const int32_t kiLevel, int32_t* pBit) {
   int32_t iShift	= 0;
   int32_t iVal		= 0;
-  bool_t	bFound	= false;
+  bool	bFound	= false;
 
   if (kiLevel <= 0 || kiLevel > (1 << (WELS_LOG_LEVEL_COUNT - 1)) || NULL == pBit)
     return NULL;
@@ -107,7 +107,7 @@ static inline str_t* GetLogTag (const int32_t kiLevel, int32_t* pBit) {
 
   if (bFound) {
     *pBit	= iShift;
-    return (str_t*)g_sWelsLogTags[iShift];
+    return (char*)g_sWelsLogTags[iShift];
   }
   return NULL;
 }
@@ -126,14 +126,14 @@ static inline str_t* GetLogTag (const int32_t kiLevel, int32_t* pBit) {
  * \note	N/A
  *************************************************************************************
  */
-void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, va_list argv) {
+void WelsLogDefault (void* pCtx, const int32_t kiLevel, const char* kpFmtStr, va_list argv) {
   sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pCtx;
   iWelsLogLevel		 iVal	= (kiLevel & g_iLevelLog);
 
   if (0 == iVal || NULL == pEncCtx) {	// such iLevel not enabled
     return;
   } else {
-    str_t pBuf[WELS_LOG_BUF_SIZE + 1] = {0};
+    char pBuf[WELS_LOG_BUF_SIZE + 1] = {0};
     const int32_t kiBufSize = sizeof (pBuf) / sizeof (pBuf[0]) - 1;
     int32_t iCurUsed = 0;
     int32_t iBufUsed = 0;
@@ -205,7 +205,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
     // fixed stack corruption issue on vs2008
     if (iBufLeft > 0) {
       int32_t i_shift = 0;
-      str_t* pStr = NULL;
+      char* pStr = NULL;
       pStr	= GetLogTag (kiLevel, &i_shift);
       if (NULL != pStr) {
         iCurUsed = WelsSnprintf (&pBuf[iBufUsed], iBufLeft, "%s ", pStr);
@@ -242,7 +242,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, v
 #endif//ENABLE_TRACE_FILE
   }
 }
-void WelsLogNil (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, va_list argv) {
+void WelsLogNil (void* pCtx, const int32_t kiLevel, const char* kpFmtStr, va_list argv) {
   // NULL implementation
 }
 
@@ -258,7 +258,7 @@ void WelsLogNil (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, va_li
 * \note	N/A
 *************************************************************************************
 */
-void WelsReopenTraceFile (void* pCtx, str_t* pCurPath) {
+void WelsReopenTraceFile (void* pCtx, char* pCurPath) {
 #ifdef ENABLE_TRACE_FILE
   sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pCtx;
   if (wlog == WelsLogDefault) {
@@ -330,11 +330,11 @@ void WelsSetLogCallback (PWelsLogCallbackFunc _log) {
   wlog	= _log;
 }
 
-void WelsLogCall (void* pCtx, int32_t iLevel, const str_t* kpFmt, va_list vl) {
+void WelsLogCall (void* pCtx, int32_t iLevel, const char* kpFmt, va_list vl) {
   wlog (pCtx, iLevel, kpFmt, vl);
 }
 
-void WelsLog (void* pCtx, int32_t iLevel, const str_t* kpFmt, ...) {
+void WelsLog (void* pCtx, int32_t iLevel, const char* kpFmt, ...) {
   va_list vl;
   va_start (vl, kpFmt);
   WelsLogCall (pCtx, iLevel, kpFmt, vl);

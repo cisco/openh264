@@ -105,7 +105,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   return 0;
 }
 
-inline BOOL_T    CheckSliceNeedReconstruct (int16_t iCurDid, int16_t iCurQid, bool_t bStoreRefBasePicFlag,
+inline bool    CheckSliceNeedReconstruct (int16_t iCurDid, int16_t iCurQid, bool bStoreRefBasePicFlag,
     uint8_t uiDidMax, uint8_t uiLayerDqId, uint8_t uiTargetDqId) {
   return ((iCurDid == uiDidMax) && (iCurQid == BASE_QUALITY_ID) && (bStoreRefBasePicFlag))   // store base
          || (uiLayerDqId == uiTargetDqId); // target layer
@@ -118,7 +118,7 @@ inline uint8_t GetTargetDqId (uint8_t uiTargetDqId,  SDecodingParam* psParam) {
 }
 
 
-inline void_t    HandleReferenceLostL0 (PWelsDecoderContext pCtx, PNalUnit pCurNal) {
+inline void    HandleReferenceLostL0 (PWelsDecoderContext pCtx, PNalUnit pCurNal) {
   if (0 == pCurNal->sNalHeaderExt.uiTemporalId) {
     pCtx->bReferenceLostAtT0Flag = true;
   }
@@ -130,7 +130,7 @@ inline void_t    HandleReferenceLostL0 (PWelsDecoderContext pCtx, PNalUnit pCurN
   pCtx->iErrorCode |= dsBitstreamError;
 }
 
-inline void_t    HandleReferenceLost (PWelsDecoderContext pCtx, PNalUnit pCurNal) {
+inline void    HandleReferenceLost (PWelsDecoderContext pCtx, PNalUnit pCurNal) {
   if ((0 == pCurNal->sNalHeaderExt.uiTemporalId) || (1 == pCurNal->sNalHeaderExt.uiTemporalId)) {
     pCtx->bReferenceLostAtT0Flag = true;
   }
@@ -201,7 +201,7 @@ int32_t ParseRefPicListReordering (PBitStringAux pBs, PSliceHeader pSh) {
 }
 
 int32_t ParseDecRefPicMarking (PWelsDecoderContext pCtx, PBitStringAux pBs, PSliceHeader pSh, PSps pSps,
-                               const bool_t kbIdrFlag) {
+                               const bool kbIdrFlag) {
   PRefPicMarking const kpRefMarking = &pSh->sRefMarking;
 
   if (kbIdrFlag) {
@@ -238,7 +238,7 @@ int32_t ParseDecRefPicMarking (PWelsDecoderContext pCtx, PBitStringAux pBs, PSli
   return ERR_NONE;
 }
 
-bool_t FillDefaultSliceHeaderExt (PSliceHeaderExt pShExt, PNalUnitHeaderExt pNalExt) {
+bool FillDefaultSliceHeaderExt (PSliceHeaderExt pShExt, PNalUnitHeaderExt pNalExt) {
   if (pShExt == NULL || pNalExt == NULL)
     return false;
 
@@ -309,7 +309,7 @@ int32_t WelsInitMemory (PWelsDecoderContext pCtx) {
  * Free memory introduced in WelsInitMemory at destruction of decoder.
  *
  */
-void_t WelsFreeMemory (PWelsDecoderContext pCtx) {
+void WelsFreeMemory (PWelsDecoderContext pCtx) {
   if (pCtx == NULL)
     return;
 
@@ -337,7 +337,7 @@ void_t WelsFreeMemory (PWelsDecoderContext pCtx) {
  *	pNal:	target NALUnit ptr
  *	pSrc:	NAL Unit bitstream
  */
-void_t DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc) {
+void DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc) {
   PNalUnitHeaderExt pHeaderExt = &pNal->sNalHeaderExt;
 
   uint8_t uiCurByte = *pSrc;
@@ -392,7 +392,7 @@ int32_t CheckPpsId (PWelsDecoderContext pCtx, PPps* ppPps, uint32_t uiPpsId) {
 }
 
 int32_t CheckSpsId (PWelsDecoderContext pCtx, PSubsetSps* ppSubsetSps, PSps* ppSps, int32_t iSpsId,
-                    bool_t bExtensionFlag) {
+                    bool bExtensionFlag) {
   PSps pSpsList = pCtx->sSpsBuffer;
   PSubsetSps pSubspsList = pCtx->sSubsetSpsBuffer;
 
@@ -455,7 +455,7 @@ int32_t CheckSpsId (PWelsDecoderContext pCtx, PSubsetSps* ppSubsetSps, PSps* ppS
  *	decode_slice_header_avc
  *	Parse slice header of bitstream in avc for storing data structure
  */
-int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, const bool_t kbExtensionFlag) {
+int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, const bool kbExtensionFlag) {
   PNalUnit const kpCurNal				= pCtx->pAccessUnitList->pNalUnitsList[pCtx->pAccessUnitList->uiAvailUnitsNum - 1];
 
   PNalUnitHeaderExt pNalHeaderExt	= NULL;
@@ -469,8 +469,8 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   int32_t iRet						= ERR_NONE;
   uint8_t uiSliceType				= 0;
   uint8_t uiQualityId					= BASE_QUALITY_ID;
-  bool_t	bIdrFlag					= false;
-  bool_t	bSgChangeCycleInvolved	= false;	// involved slice group change cycle ?
+  bool	bIdrFlag					= false;
+  bool	bSgChangeCycleInvolved	= false;	// involved slice group change cycle ?
 
   if (kpCurNal == NULL) {
     return ERR_INFO_OUT_OF_MEMORY;
@@ -484,7 +484,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
 
   if (pSliceHeadExt) {
     SRefBasePicMarking sBaseMarking;
-    const bool_t kbStoreRefBaseFlag = pSliceHeadExt->bStoreRefBasePicFlag;
+    const bool kbStoreRefBaseFlag = pSliceHeadExt->bStoreRefBasePicFlag;
     memcpy (&sBaseMarking, &pSliceHeadExt->sRefBasePicMarking, sizeof (SRefBasePicMarking)); //confirmed_safe_unsafe_usage
     memset (pSliceHeadExt, 0, sizeof (SSliceHeaderExt));
     pSliceHeadExt->bStoreRefBasePicFlag	= kbStoreRefBaseFlag;
@@ -619,7 +619,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   if (kbExtensionFlag) {
     uiQualityId = pNalHeaderExt->uiQualityId;
   } else if (uiSliceType == P_SLICE || uiSliceType == SP_SLICE || uiSliceType == B_SLICE) {
-    const bool_t kbBipredFlag = (B_SLICE == uiSliceType);
+    const bool kbBipredFlag = (B_SLICE == uiSliceType);
     if (kbBipredFlag) {
       WelsLog (pCtx, WELS_LOG_WARNING, "ParseSliceHeaderSyntaxs(): kbBipredFlag = 1 not supported.\n");
       return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_UNSUPPORTED_BIPRED);
@@ -820,7 +820,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
  *	pSrc:	mark as decoded prefix NAL
  *	ppDst:	succeeded VCL NAL based AVC (I/P Slice)
  */
-bool_t PrefetchNalHeaderExtSyntax (PWelsDecoderContext pCtx, PNalUnit const kppDst, PNalUnit const kpSrc) {
+bool PrefetchNalHeaderExtSyntax (PWelsDecoderContext pCtx, PNalUnit const kppDst, PNalUnit const kpSrc) {
   PNalUnitHeaderExt pNalHdrExtD	= NULL, pNalHdrExtS = NULL;
   PSliceHeaderExt pShExtD = NULL;
   PPrefixNalUnit pPrefixS = NULL;
@@ -1029,7 +1029,7 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
   return ERR_NONE;
 }
 
-void_t UninitialDqLayersContext (PWelsDecoderContext pCtx) {
+void UninitialDqLayersContext (PWelsDecoderContext pCtx) {
   int32_t i = 0;
   int32_t j = 0;
 
@@ -1183,7 +1183,7 @@ void_t UninitialDqLayersContext (PWelsDecoderContext pCtx) {
   pCtx->bInitialDqLayersMem	= false;
 }
 
-void_t ResetCurrentAccessUnit (PWelsDecoderContext pCtx) {
+void ResetCurrentAccessUnit (PWelsDecoderContext pCtx) {
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
 
   pCurAu->uiEndPos		= 0;
@@ -1211,7 +1211,7 @@ void_t ResetCurrentAccessUnit (PWelsDecoderContext pCtx) {
  * \author
  * \history	11/16/2009
  */
-void_t ForceResetCurrentAccessUnit (PAccessUnit pAu) {
+void ForceResetCurrentAccessUnit (PAccessUnit pAu) {
   uint32_t uiSucAuIdx	= pAu->uiEndPos + 1;
   uint32_t uiCurAuIdx	= 0;
 
@@ -1235,13 +1235,13 @@ void_t ForceResetCurrentAccessUnit (PAccessUnit pAu) {
 }
 
 //clear current corrupted NAL from pNalUnitsList
-void_t ForceClearCurrentNal (PAccessUnit pAu) {
+void ForceClearCurrentNal (PAccessUnit pAu) {
   if (pAu->uiAvailUnitsNum > 0)
     -- pAu->uiAvailUnitsNum;
 }
 
 
-void_t CheckAvailNalUnitsListContinuity (PWelsDecoderContext pCtx, int32_t iStartIdx, int32_t iEndIdx) {
+void CheckAvailNalUnitsListContinuity (PWelsDecoderContext pCtx, int32_t iStartIdx, int32_t iEndIdx) {
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
 
   uint8_t uiLastNuDependencyId, uiLastNuLayerDqId;
@@ -1284,7 +1284,7 @@ void_t CheckAvailNalUnitsListContinuity (PWelsDecoderContext pCtx, int32_t iStar
 
 //main purpose: to support multi-slice and to include all slice which have the same uiDependencyId, uiQualityId and frame_num
 //for single slice, pIdxNoInterLayerPred SHOULD NOT be modified
-void_t RefineIdxNoInterLayerPred (PAccessUnit pCurAu, int32_t* pIdxNoInterLayerPred) {
+void RefineIdxNoInterLayerPred (PAccessUnit pCurAu, int32_t* pIdxNoInterLayerPred) {
   int32_t iLastNalDependId  = pCurAu->pNalUnitsList[*pIdxNoInterLayerPred]->sNalHeaderExt.uiDependencyId;
   int32_t iLastNalQualityId = pCurAu->pNalUnitsList[*pIdxNoInterLayerPred]->sNalHeaderExt.uiQualityId;
   uint8_t uiLastNalTId       = pCurAu->pNalUnitsList[*pIdxNoInterLayerPred]->sNalHeaderExt.uiTemporalId;
@@ -1297,7 +1297,7 @@ void_t RefineIdxNoInterLayerPred (PAccessUnit pCurAu, int32_t* pIdxNoInterLayerP
   int32_t iCurNalDependId, iCurNalQualityId, iCurNalTId, iCurNalFrameNum, iCurNalPoc, iCurNalFirstMb, iCurIdx,
           iFinalIdxNoInterLayerPred;
 
-  bool_t  bMultiSliceFind = false;
+  bool  bMultiSliceFind = false;
 
   iFinalIdxNoInterLayerPred = 0;
   iCurIdx = *pIdxNoInterLayerPred - 1;
@@ -1332,7 +1332,7 @@ void_t RefineIdxNoInterLayerPred (PAccessUnit pCurAu, int32_t* pIdxNoInterLayerP
   }
 }
 
-bool_t CheckPocOfCurValidNalUnits (PAccessUnit pCurAu, int32_t pIdxNoInterLayerPred) {
+bool CheckPocOfCurValidNalUnits (PAccessUnit pCurAu, int32_t pIdxNoInterLayerPred) {
   int32_t iEndIdx    = pCurAu->uiEndPos;
   int32_t iCurAuPoc =
     pCurAu->pNalUnitsList[pIdxNoInterLayerPred]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.iPicOrderCntLsb;
@@ -1347,7 +1347,7 @@ bool_t CheckPocOfCurValidNalUnits (PAccessUnit pCurAu, int32_t pIdxNoInterLayerP
   return true;
 }
 
-bool_t CheckIntegrityNalUnitsList (PWelsDecoderContext pCtx) {
+bool CheckIntegrityNalUnitsList (PWelsDecoderContext pCtx) {
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
   const int32_t kiEndPos = pCurAu->uiEndPos;
   int32_t iIdxNoInterLayerPred = 0;
@@ -1391,7 +1391,7 @@ bool_t CheckIntegrityNalUnitsList (PWelsDecoderContext pCtx) {
       pCurAu->pNalUnitsList[pCurAu->uiEndPos]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.iMbHeight << 4;
   } else { //P_SLICE
     //step 1: search uiDependencyId equal to pCtx->cur_seq_interval_target_dependency_id
-    bool_t bGetDependId = false;
+    bool bGetDependId = false;
     int32_t iIdxDependId = 0;
 
     iIdxDependId = kiEndPos;
@@ -1406,7 +1406,7 @@ bool_t CheckIntegrityNalUnitsList (PWelsDecoderContext pCtx) {
 
     //step 2: switch according to whether or not find the index of pNalUnit whose uiDependencyId equal to iCurSeqIntervalTargetDependId
     if (bGetDependId) { //get the index of pNalUnit whose uiDependencyId equal to iCurSeqIntervalTargetDependId
-      bool_t bGetNoInterPredFront = false;
+      bool bGetNoInterPredFront = false;
       //step 2a: search iNoInterLayerPredFlag [0....iIdxDependId]
       iIdxNoInterLayerPred = iIdxDependId;
       while (iIdxNoInterLayerPred >= 0) {
@@ -1471,7 +1471,7 @@ bool_t CheckIntegrityNalUnitsList (PWelsDecoderContext pCtx) {
   return true;
 }
 
-void_t CheckOnlyOneLayerInAu (PWelsDecoderContext pCtx) {
+void CheckOnlyOneLayerInAu (PWelsDecoderContext pCtx) {
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
 
   int32_t iEndIdx = pCurAu->uiEndPos;
@@ -1524,7 +1524,7 @@ int32_t WelsDecodeAccessUnitStart (PWelsDecoderContext pCtx) {
   return ERR_NONE;
 }
 
-void_t WelsDecodeAccessUnitEnd (PWelsDecoderContext pCtx) {
+void WelsDecodeAccessUnitEnd (PWelsDecoderContext pCtx) {
   // uninitialize context of current access unit and rbsp buffer clean
   ResetCurrentAccessUnit (pCtx);
 }
@@ -1596,7 +1596,7 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
   return 0;
 }
 
-static inline void_t InitDqLayerInfo (PDqLayer pDqLayer, PLayerInfo pLayerInfo, PNalUnit pNalUnit, PPicture pPicDec) {
+static inline void InitDqLayerInfo (PDqLayer pDqLayer, PLayerInfo pLayerInfo, PNalUnit pNalUnit, PPicture pPicDec) {
   PNalUnitHeaderExt pNalHdrExt    = &pNalUnit->sNalHeaderExt;
   PSliceHeaderExt pShExt			= &pNalUnit->sNalData.sVclNal.sSliceHeaderExt;
   PSliceHeader        pSh			= &pShExt->sSliceHeader;
@@ -1634,7 +1634,7 @@ static inline void_t InitDqLayerInfo (PDqLayer pDqLayer, PLayerInfo pLayerInfo, 
   pDqLayer->bUseRefBasePicFlag	= pNalHdrExt->bUseRefBasePicFlag;
 }
 
-void_t WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pSps, PPps pPps) {
+void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pSps, PPps pPps) {
   SNalUnitHeader* pNalHdr = &pCurNal->sNalHeaderExt.sNalUnitHeader;
   PSliceHeader pSh = &pCurNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
 
@@ -1650,7 +1650,7 @@ void_t WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps 
   }
 }
 
-int32_t InitRefPicList (PWelsDecoderContext pCtx, const uint8_t kuiNRi, const bool_t kbFirstSlice, int32_t iPoc) {
+int32_t InitRefPicList (PWelsDecoderContext pCtx, const uint8_t kuiNRi, const bool kbFirstSlice, int32_t iPoc) {
   int32_t iRet = ERR_NONE;
   if (kbFirstSlice)
     iRet = WelsInitRefList (pCtx, iPoc);
@@ -1661,7 +1661,7 @@ int32_t InitRefPicList (PWelsDecoderContext pCtx, const uint8_t kuiNRi, const bo
   return iRet;
 }
 
-void_t InitCurDqLayerData (PWelsDecoderContext pCtx, PDqLayer pCurDq) {
+void InitCurDqLayerData (PWelsDecoderContext pCtx, PDqLayer pCurDq) {
   if (NULL != pCtx && NULL != pCurDq) {
     pCurDq->pCsData[0]		= pCtx->pCsListXchg[0][0];
     pCurDq->pCsData[1]		= pCtx->pCsListXchg[0][1];
@@ -1691,7 +1691,7 @@ void_t InitCurDqLayerData (PWelsDecoderContext pCtx, PDqLayer pCurDq) {
 
 // added to reset state of parameter sets to waiting successive incoming IDR, 6/4/2010
 // It will be called in case packets lost/ broken and decoded failed at temporal level 0
-void_t ResetParameterSetsState (PWelsDecoderContext pCtx) {
+void ResetParameterSetsState (PWelsDecoderContext pCtx) {
   pCtx->bSpsExistAheadFlag	   = false;
   pCtx->bSubspsExistAheadFlag = false;
   pCtx->bPpsExistAheadFlag	   = false;
@@ -1718,7 +1718,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
   int16_t iLastIdD = -1, iLastIdQ = -1;
   int16_t iCurrIdD = 0, iCurrIdQ = 0;
   uint8_t uiNalRefIdc = 0;
-  bool_t	bFreshSliceAvailable =
+  bool	bFreshSliceAvailable =
     true;	// Another fresh slice comingup for given dq layer, for multiple slices in case of header parts of slices sometimes loss over error-prone channels, 8/14/2008
   PPicture  pStoreBasePic = NULL;
 
@@ -1774,7 +1774,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
      *	Loop decoding for slices (even FMO and/ multiple slices) within a dq layer
      */
     while (iIdx <= iEndIdx) {
-      BOOL_T         bReconstructSlice;
+      bool         bReconstructSlice;
       iCurrIdQ	= pNalCur->sNalHeaderExt.uiQualityId;
       iCurrIdD	= pNalCur->sNalHeaderExt.uiDependencyId;
       pSh		= &pNalCur->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
@@ -1823,7 +1823,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
         InitDqLayerInfo (dq_cur, &pLayerInfo, pNalCur, pCtx->pDec);
 
         if (!dq_cur->sLayerInfo.pSps->bGapsInFrameNumValueAllowedFlag) {
-          const bool_t kbIdrFlag = dq_cur->sLayerInfo.sNalHeaderExt.bIdrFlag
+          const bool kbIdrFlag = dq_cur->sLayerInfo.sNalHeaderExt.bIdrFlag
                                    || (dq_cur->sLayerInfo.sNalHeaderExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_IDR);
           // Subclause 8.2.5.2 Decoding process for gaps in frame_num
           if (!kbIdrFlag  &&

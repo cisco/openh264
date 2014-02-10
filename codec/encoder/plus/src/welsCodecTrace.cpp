@@ -86,7 +86,7 @@ int32_t welsCodecTrace::WelsTraceModuleIsExist() {
   return m_WelsTraceExistFlag;
 }
 
-void welsCodecTrace::TraceString (int32_t iLevel, const str_t* str) {
+void welsCodecTrace::TraceString (int32_t iLevel, const char* str) {
   switch (iLevel) {
   case WELS_LOG_ERROR:
     if (m_fpErrorTrace)
@@ -113,13 +113,13 @@ void welsCodecTrace::TraceString (int32_t iLevel, const str_t* str) {
 
 #define MAX_LOG_SIZE	1024
 
-void welsCodecTrace::CODEC_TRACE (void* ignore, const int32_t iLevel, const str_t* Str_Format, va_list vl) {
+void welsCodecTrace::CODEC_TRACE (void* ignore, const int32_t iLevel, const char* Str_Format, va_list vl) {
 //		if(g_traceLevel < iLevel)
   if (m_iTraceLevel < iLevel) {
     return;
   }
 
-  str_t pBuf[MAX_LOG_SIZE] = {0};
+  char pBuf[MAX_LOG_SIZE] = {0};
   const int32_t len	= strlen ("[ENCODER]: ");	// confirmed_safe_unsafe_usage
 
 

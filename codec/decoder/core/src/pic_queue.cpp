@@ -44,7 +44,7 @@
 
 namespace WelsDec {
 
-void_t FreePicture (PPicture pPic);
+void FreePicture (PPicture pPic);
 
 
 ///////////////////////////////////Recycled queue management for pictures///////////////////////////////////
@@ -106,7 +106,7 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
   return pPic;
 }
 
-void_t FreePicture (PPicture pPic) {
+void FreePicture (PPicture pPic) {
   if (NULL != pPic) {
 
     if (pPic->pBuffer[0]) {

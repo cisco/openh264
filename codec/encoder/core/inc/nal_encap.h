@@ -73,7 +73,7 @@ int32_t				iCountNals;			// count number of NAL in list
 // SVC: num_sps (MAX_D) + num_pps (MAX_D) + num_vcl (MAX_D * MAX_Q)
 int32_t				iNalIndex;			// coding NAL currently, 0 based
 
-//	BOOL_T				bAnnexBFlag;		// annexeb flag, to figure it pOut the packetization mode whether need 4 bytes (0 0 0 1) of start code prefix
+//	bool				bAnnexBFlag;		// annexeb flag, to figure it pOut the packetization mode whether need 4 bytes (0 0 0 1) of start code prefix
 } SWelsEncoderOutput;
 
 //#define MT_DEBUG_BS_WR	0	// for MT debugging if needed
@@ -91,9 +91,9 @@ SWelsNalRaw		sNalList[2];		// nal list, PREFIX NAL(if applicable) + SLICE NAL
 int32_t				iNalLen[2];
 int32_t				iNalIndex;			// coding NAL currently, 0 based
 
-//	BOOL_T				bAnnexBFlag;		// annexeb flag, to figure it pOut the packetization mode whether need 4 bytes (0 0 0 1) of start code prefix
+//	bool				bAnnexBFlag;		// annexeb flag, to figure it pOut the packetization mode whether need 4 bytes (0 0 0 1) of start code prefix
 #if MT_DEBUG_BS_WR
-BOOL_T				bSliceCodedFlag;
+bool				bSliceCodedFlag;
 #endif//MT_DEBUG_BS_WR
 } SWelsSliceBs;
 
@@ -145,6 +145,6 @@ int32_t WelsEncodeNalExt (SWelsNalRaw* pRawNal, void* pNalHeaderExt, void* pDst,
 /*!
  * \brief	write prefix nal
  */
-int32_t WelsWriteSVCPrefixNal (SBitStringAux* pBitStringAux, const int32_t keNalRefIdc, const bool_t kbIdrFlag);
+int32_t WelsWriteSVCPrefixNal (SBitStringAux* pBitStringAux, const int32_t keNalRefIdc, const bool kbIdrFlag);
 }
 #endif//WELS_NAL_UNIT_ENCAPSULATION_H__

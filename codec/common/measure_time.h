@@ -57,11 +57,11 @@ extern "C" {
 
 /*!
  * \brief	time cost measure utilization
- * \param	void_t
+ * \param	void
  * \return	time elapsed since run (unit: microsecond)
  */
 
-static inline int64_t WelsTime (void_t) {
+static inline int64_t WelsTime (void) {
 #ifndef _WIN32
   struct timeval tv_date;
 

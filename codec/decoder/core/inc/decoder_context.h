@@ -79,9 +79,9 @@ typedef struct TagDataBuffer {
 //typedef int32_t (*rec_mb) (Mb *cur_mb, PWelsDecoderContext pCtx);
 
 /*typedef for get intra predictor func pointer*/
-typedef void_t (*PGetIntraPredFunc) (uint8_t* pPred, const int32_t kiLumaStride);
-typedef void_t (*PIdctResAddPredFunc) (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
-typedef void_t (*PExpandPictureFunc) (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicWidth,
+typedef void (*PGetIntraPredFunc) (uint8_t* pPred, const int32_t kiLumaStride);
+typedef void (*PIdctResAddPredFunc) (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
+typedef void (*PExpandPictureFunc) (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicWidth,
                                       const int32_t kiPicHeight);
 
 /**/
@@ -95,7 +95,7 @@ typedef struct TagRefPic {
   int32_t				iMaxLongTermFrameIdx;
 } SRefPic, *PRefPic;
 
-typedef void_t (*PWelsMcFunc) (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+typedef void (*PWelsMcFunc) (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight);
 typedef struct TagMcFunc {
   PWelsMcFunc pMcLumaFunc;
@@ -116,13 +116,13 @@ typedef struct tagDeblockingFilter {
   struct TagDeblockingFunc*  pLoopf;
 } SDeblockingFilter, *PDeblockingFilter;
 
-typedef void_t (*PDeblockingFilterMbFunc) (PDqLayer pCurDqLayer, PDeblockingFilter  filter, int32_t boundry_flag);
-typedef void_t (*PLumaDeblockingLT4Func) (uint8_t* iSampleY, int32_t iStride, int32_t iAlpha, int32_t iBeta,
+typedef void (*PDeblockingFilterMbFunc) (PDqLayer pCurDqLayer, PDeblockingFilter  filter, int32_t boundry_flag);
+typedef void (*PLumaDeblockingLT4Func) (uint8_t* iSampleY, int32_t iStride, int32_t iAlpha, int32_t iBeta,
     int8_t* iTc);
-typedef void_t (*PLumaDeblockingEQ4Func) (uint8_t* iSampleY, int32_t iStride, int32_t iAlpha, int32_t iBeta);
-typedef void_t (*PChromaDeblockingLT4Func) (uint8_t* iSampleCb, uint8_t* iSampleCr, int32_t iStride, int32_t iAlpha,
+typedef void (*PLumaDeblockingEQ4Func) (uint8_t* iSampleY, int32_t iStride, int32_t iAlpha, int32_t iBeta);
+typedef void (*PChromaDeblockingLT4Func) (uint8_t* iSampleCb, uint8_t* iSampleCr, int32_t iStride, int32_t iAlpha,
     int32_t iBeta, int8_t* iTc);
-typedef void_t (*PChromaDeblockingEQ4Func) (uint8_t* iSampleCb, uint8_t* iSampleCr, int32_t iStride, int32_t iAlpha,
+typedef void (*PChromaDeblockingEQ4Func) (uint8_t* iSampleCb, uint8_t* iSampleCr, int32_t iStride, int32_t iAlpha,
     int32_t iBeta);
 
 typedef struct TagDeblockingFunc {
@@ -137,11 +137,11 @@ typedef struct TagDeblockingFunc {
   PChromaDeblockingEQ4Func  pfChromaDeblockinEQ4Hor;
 } SDeblockingFunc, *PDeblockingFunc;
 
-typedef void_t (*PWelsBlockAddStrideFunc) (uint8_t* pDest, uint8_t* pPred, int16_t* pRes, int32_t iPredStride,
+typedef void (*PWelsBlockAddStrideFunc) (uint8_t* pDest, uint8_t* pPred, int16_t* pRes, int32_t iPredStride,
     int32_t iResStride);
-typedef void_t (*PWelsBlockZeroFunc) (int16_t* pBlock, int32_t iStride);
-typedef void_t (*PWelsNonZeroCountFunc) (int16_t* pBlock, int8_t* pNonZeroCount);
-typedef void_t (*PWelsSimpleIdct4x4AddFunc) (int16_t* pDest, int16_t* pSrc, int32_t iStride);
+typedef void (*PWelsBlockZeroFunc) (int16_t* pBlock, int32_t iStride);
+typedef void (*PWelsNonZeroCountFunc) (int16_t* pBlock, int8_t* pNonZeroCount);
+typedef void (*PWelsSimpleIdct4x4AddFunc) (int16_t* pDest, int16_t* pSrc, int32_t iStride);
 
 typedef  struct  TagBlockFunc {
   PWelsBlockZeroFunc			pWelsBlockZero16x16Func;
@@ -149,7 +149,7 @@ typedef  struct  TagBlockFunc {
   PWelsNonZeroCountFunc		pWelsSetNonZeroCountFunc;
 } SBlockFunc;
 
-typedef void_t (*PWelsFillNeighborMbInfoIntra4x4Func) (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
+typedef void (*PWelsFillNeighborMbInfoIntra4x4Func) (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
     int8_t* pIntraPredMode, PDqLayer pCurLayer);
 typedef int32_t (*PWelsParseIntra4x4ModeFunc) (PNeighAvail pNeighAvail, int8_t* pIntraPredMode, PBitStringAux pBs,
     PDqLayer pCurDqLayer);
@@ -166,7 +166,7 @@ typedef struct TagExpandPicFunc {
 
 typedef struct TagWelsDecoderContext {
   // Input
-  void_t*				pArgDec;			// structured arguments for decoder, reserved here for extension in the future
+  void*				pArgDec;			// structured arguments for decoder, reserved here for extension in the future
 
   SDataBuffer       	sRawData;
 
@@ -180,8 +180,8 @@ typedef struct TagWelsDecoderContext {
 
   int32_t				iOutputColorFormat;		// color space format to be outputed
   VIDEO_BITSTREAM_TYPE eVideoType; //indicate the type of video to decide whether or not to do qp_delta error detection.
-  bool_t				bErrorResilienceFlag;		// error resilience flag
-  bool_t				bHaveGotMemory;	// global memory for decoder context related ever requested?
+  bool				bErrorResilienceFlag;		// error resilience flag
+  bool				bHaveGotMemory;	// global memory for decoder context related ever requested?
 
   int32_t				iImgWidthInPixel;	// width of image in pixel reconstruction picture to be output
   int32_t				iImgHeightInPixel;// height of image in pixel reconstruction picture to be output
@@ -191,7 +191,7 @@ typedef struct TagWelsDecoderContext {
   ESliceType			eSliceType;			// Slice type
   int32_t				iFrameNum;
   int32_t				iPrevFrameNum;		// frame number of previous frame well decoded for non-truncated mode yet
-  bool_t              bLastHasMmco5;      //
+  bool              bLastHasMmco5;      //
   int32_t				iErrorCode;			// error code return while decoding in case packets lost
   SFmo				sFmoList[MAX_PPS_COUNT];	// list for FMO storage
   PFmo				pFmo;				// current fmo context after parsed slice_header
@@ -270,25 +270,25 @@ typedef struct TagWelsDecoderContext {
   int32_t             iPicHeightReq;		// picture height have requested the memory
 
   uint8_t				uiTargetDqId;		// maximal DQ ID in current access unit, meaning target layer ID
-  bool_t				bAvcBasedFlag;		// For decoding bitstream:
-  bool_t				bEndOfStreamFlag;	// Flag on end of stream requested by external application layer
-  bool_t				bInitialDqLayersMem;	// dq layers related memory is available?
+  bool				bAvcBasedFlag;		// For decoding bitstream:
+  bool				bEndOfStreamFlag;	// Flag on end of stream requested by external application layer
+  bool				bInitialDqLayersMem;	// dq layers related memory is available?
 
-  bool_t              bOnlyOneLayerInCurAuFlag; //only one layer in current AU: 1
+  bool              bOnlyOneLayerInCurAuFlag; //only one layer in current AU: 1
 
   // for EC parameter sets
-  bool_t				bSpsExistAheadFlag;	// whether does SPS NAL exist ahead of sequence?
-  bool_t				bSubspsExistAheadFlag;// whether does Subset SPS NAL exist ahead of sequence?
-  bool_t				bPpsExistAheadFlag;	// whether does PPS NAL exist ahead of sequence?
+  bool				bSpsExistAheadFlag;	// whether does SPS NAL exist ahead of sequence?
+  bool				bSubspsExistAheadFlag;// whether does Subset SPS NAL exist ahead of sequence?
+  bool				bPpsExistAheadFlag;	// whether does PPS NAL exist ahead of sequence?
 
-  bool_t				bSpsAvailFlags[MAX_SPS_COUNT];
-  bool_t				bSubspsAvailFlags[MAX_SPS_COUNT];
-  bool_t				bPpsAvailFlags[MAX_PPS_COUNT];
-  bool_t				bReferenceLostAtT0Flag;
+  bool				bSpsAvailFlags[MAX_SPS_COUNT];
+  bool				bSubspsAvailFlags[MAX_SPS_COUNT];
+  bool				bPpsAvailFlags[MAX_PPS_COUNT];
+  bool				bReferenceLostAtT0Flag;
 #ifdef LONG_TERM_REF
-  bool_t				bParamSetsLostFlag;	//sps or pps do not exist or not correct
+  bool				bParamSetsLostFlag;	//sps or pps do not exist or not correct
 
-  bool_t
+  bool
   bCurAuContainLtrMarkSeFlag; //current AU has the LTR marking syntax element, mark the previous frame or self
   int32_t             iFrameNumOfAuMarkedLtr; //if bCurAuContainLtrMarkSeFlag==true, SHOULD set this variable
 
@@ -319,10 +319,10 @@ typedef struct TagWelsDecoderContext {
   int32_t iFeedbackVclNalInAu;
   int32_t iFeedbackTidInAu;
 
-  bool_t bAuReadyFlag;   // TRUE: one au is ready for decoding; FALSE: default value
+  bool bAuReadyFlag;   // true: one au is ready for decoding; false: default value
 
   //trace handle
-  void_t*      pTraceHandle;
+  void*      pTraceHandle;
 
 #ifdef NO_WAITING_AU
   //Save the last nal header info

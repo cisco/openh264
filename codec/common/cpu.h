@@ -55,12 +55,12 @@ extern "C" {
  */
 int32_t  WelsCPUIdVerify();
 
-void_t WelsCPUId (uint32_t uiIndex, uint32_t* pFeatureA, uint32_t* pFeatureB, uint32_t* pFeatureC, uint32_t* pFeatureD);
+void WelsCPUId (uint32_t uiIndex, uint32_t* pFeatureA, uint32_t* pFeatureB, uint32_t* pFeatureC, uint32_t* pFeatureD);
 
 int32_t WelsCPUSupportAVX (uint32_t eax, uint32_t ecx);
 int32_t WelsCPUSupportFMA (uint32_t eax, uint32_t ecx);
 
-void_t WelsEmms();
+void WelsEmms();
 
 uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors);
 

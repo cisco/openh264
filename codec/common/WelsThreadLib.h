@@ -110,8 +110,8 @@ WELS_THREAD_ERROR_CODE    WelsMutexUnlock (WELS_MUTEX* mutex);
 WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex);
 
 #ifdef __GNUC__
-WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT** p_event, str_t* event_name);
-WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, str_t* event_name);
+WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT** p_event, char* event_name);
+WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, char* event_name);
 #endif//__GNUC__
 WELS_THREAD_ERROR_CODE    WelsEventInit (WELS_EVENT* event);
 WELS_THREAD_ERROR_CODE    WelsEventDestroy (WELS_EVENT* event);

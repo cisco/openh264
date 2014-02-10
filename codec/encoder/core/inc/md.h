@@ -83,7 +83,7 @@ int32_t			iCostChroma;//satd+lambda(best_pred_mode) //i_sad_chroma;
 int32_t			iSadPredMb;
 
 uint8_t			uiRef; //uiRefIndex appointed by Encoder, used for MC
-bool_t			bMdUsingSad;
+bool			bMdUsingSad;
 uint16_t		uiReserved;
 
 int32_t			iCostSkipMb;
@@ -114,7 +114,7 @@ uint8_t* pQuarPixTmp;
 static void md_intra_init (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb);
 static void md_inter_init (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb);
 
-void FillNeighborCacheIntra (SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth/*, bool_t constrained_intra_pred_flag*/);
+void FillNeighborCacheIntra (SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth/*, bool constrained_intra_pred_flag*/);
 void FillNeighborCacheInterWithoutBGD (SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth,
                                        int8_t* pVaaBgMbFlag); //BGD spatial func
 void FillNeighborCacheInterWithBGD (SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth, int8_t* pVaaBgMbFlag);
@@ -125,12 +125,12 @@ void MvdCostInit (uint16_t* pMvdCostInter, const int32_t kiMvdSz);
 void PredictSad (int8_t* pRefIndexCache, int32_t* pSadCostCache, int32_t uiRef, int32_t* pSadPred);
 
 
-void PredictSadSkip (int8_t* pRefIndexCache, bool_t* pMbSkipCache, int32_t* pSadCostCache, int32_t uiRef,
+void PredictSadSkip (int8_t* pRefIndexCache, bool* pMbSkipCache, int32_t* pSadCostCache, int32_t uiRef,
                      int32_t* iSadPredSkip);
 
 //  for pfGetVarianceFromIntraVaa function ptr adaptive by CPU features, 6/7/2010
 void InitIntraAnalysisVaaInfo (SWelsFuncPtrList* pFuncList, const uint32_t kuiCpuFlag);
-BOOL_T MdIntraAnalysisVaaInfo (sWelsEncCtx* pEncCtx, uint8_t* pEncMb);
+bool MdIntraAnalysisVaaInfo (sWelsEncCtx* pEncCtx, uint8_t* pEncMb);
 
 uint8_t MdInterAnalysisVaaInfo_c (int32_t* pSad8x8);
 

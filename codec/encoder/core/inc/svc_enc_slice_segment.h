@@ -136,7 +136,7 @@ int32_t		iMbSkipRunStack;
  */
 int32_t InitSlicePEncCtx (SSliceCtx* pSliceCtx,
                           CMemoryAlign* pMa,
-                          bool_t bFmoUseFlag,
+                          bool bFmoUseFlag,
                           int32_t iMbWidth,
                           int32_t iMbHeight,
                           SMulSliceOption* pMulSliceOption,
@@ -212,9 +212,9 @@ int32_t GetCurrentSliceNum (const SSliceCtx* kpSliceCtx);
 //checking valid para
 int32_t DynamicMaxSliceNumConstraint (uint32_t uiMaximumNum, int32_t uiConsumedNum, uint32_t uiDulplicateTimes);
 
-bool_t CheckFixedSliceNumMultiSliceSetting (const int32_t kiMbNumInFrame,  SSliceArgument* pSliceArg);
-bool_t CheckRasterMultiSliceSetting (const int32_t kiMbNumInFrame, SSliceArgument* pSliceArg);
-bool_t CheckRowMbMultiSliceSetting (const int32_t kiMbWidth,  SSliceArgument* pSliceArg);
+bool CheckFixedSliceNumMultiSliceSetting (const int32_t kiMbNumInFrame,  SSliceArgument* pSliceArg);
+bool CheckRasterMultiSliceSetting (const int32_t kiMbNumInFrame, SSliceArgument* pSliceArg);
+bool CheckRowMbMultiSliceSetting (const int32_t kiMbWidth,  SSliceArgument* pSliceArg);
 
 void GomValidCheckSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, int32_t* pSliceNum);
 void GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,  SSliceArgument* pSliceArg);

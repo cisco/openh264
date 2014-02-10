@@ -107,14 +107,14 @@ struct TagDqLayer {
   PPicture				pRef;			// reference picture pointer
   PPicture				pDec;			// reconstruction picture pointer for layer
 
-  bool_t					bStoreRefBasePicFlag;				// iCurTid == 0 && iCurQid = 0 && bEncodeKeyPic = 1
-  bool_t					bTCoeffLevelPredFlag;
-  bool_t					bConstrainedIntraResamplingFlag;
+  bool					bStoreRefBasePicFlag;				// iCurTid == 0 && iCurQid = 0 && bEncodeKeyPic = 1
+  bool					bTCoeffLevelPredFlag;
+  bool					bConstrainedIntraResamplingFlag;
   uint8_t					uiRefLayerDqId;
   uint8_t					uiRefLayerChromaPhaseXPlus1Flag;
   uint8_t					uiRefLayerChromaPhaseYPlus1;
   uint8_t					uiLayerDqId;			// dq_id of current layer
-  bool_t					bUseRefBasePicFlag;	// whether reference pic or reference base pic is referred?
+  bool					bUseRefBasePicFlag;	// whether reference pic or reference base pic is referred?
 };
 
 typedef struct TagGpuAvcLayer {

@@ -51,7 +51,7 @@ namespace WelsSVCEnc {
  * \param	iSize	size of pBuffer overall
  * \return	actual size of pBuffer used; 0 returned in failure
  */
-int32_t GetCodeName (str_t* pBuf, int32_t iSize);
+int32_t GetCodeName (char* pBuf, int32_t iSize);
 
 /*!
  * \brief	get library/module name
@@ -59,7 +59,7 @@ int32_t GetCodeName (str_t* pBuf, int32_t iSize);
  * \param	iSize	size of pBuffer overall
  * \return	actual size of pBuffer used; 0 returned in failure
  */
-int32_t GetLibName (str_t* pBuf, int32_t iSize);
+int32_t GetLibName (char* pBuf, int32_t iSize);
 
 /*!
  * \brief	get version number
@@ -67,7 +67,7 @@ int32_t GetLibName (str_t* pBuf, int32_t iSize);
  * \param	iSize	size of pBuffer overall
  * \return	actual size of pBuffer used; 0 returned in failure
  */
-int32_t GetVerNum (str_t* pBuf, int32_t iSize);
+int32_t GetVerNum (char* pBuf, int32_t iSize);
 
 /*!
  * \brief	get identify information
@@ -75,6 +75,6 @@ int32_t GetVerNum (str_t* pBuf, int32_t iSize);
  * \param	iSize	size of pBuffer overall
  * \return	actual size of pBuffer used; 0 returned in failure
  */
-int32_t GetIdentInfo (str_t* pBuf, int32_t iSize);
+int32_t GetIdentInfo (char* pBuf, int32_t iSize);
 }
 #endif//WELS_DECODER_PROPERTY_H__

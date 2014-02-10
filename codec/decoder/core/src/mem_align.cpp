@@ -44,8 +44,8 @@ int32_t iCountMalloc = 0;
 #endif
 //
 
-void_t* WelsMalloc (const uint32_t kuiSize, const str_t* kpTag) {
-  const int32_t kiSizeVoidPtr	= sizeof (void_t**);
+void* WelsMalloc (const uint32_t kuiSize, const char* kpTag) {
+  const int32_t kiSizeVoidPtr	= sizeof (void**);
   const int32_t kiSizeInt		= sizeof (int32_t);
   const int32_t kiAlignBytes	= 15;
   uint8_t* pBuf		= (uint8_t*) malloc (kuiSize + kiAlignBytes + kiSizeVoidPtr + kiSizeInt);
@@ -59,7 +59,7 @@ void_t* WelsMalloc (const uint32_t kuiSize, const str_t* kpTag) {
 
   if (kpTag != NULL) {
     if (pMemCheckMalloc != NULL) {
-      fprintf (pMemCheckMalloc, "0x%x, size: %d       , malloc %s\n", (void_t*)pBuf,
+      fprintf (pMemCheckMalloc, "0x%x, size: %d       , malloc %s\n", (void*)pBuf,
                (kuiSize + kiAlignBytes + kiSizeVoidPtr + kiSizeInt), kpTag);
     }
     if (pMemCheckMalloc != NULL) {
@@ -76,7 +76,7 @@ void_t* WelsMalloc (const uint32_t kuiSize, const str_t* kpTag) {
 
   pAlignBuf = pBuf + kiAlignBytes + kiSizeVoidPtr + kiSizeInt;
   pAlignBuf -= (uintptr_t) pAlignBuf & kiAlignBytes;
-  * ((void_t**) (pAlignBuf - kiSizeVoidPtr)) = pBuf;
+  * ((void**) (pAlignBuf - kiSizeVoidPtr)) = pBuf;
   * ((int32_t*) (pAlignBuf - (kiSizeVoidPtr + kiSizeInt))) = kuiSize;
 
   return (pAlignBuf);
@@ -84,15 +84,15 @@ void_t* WelsMalloc (const uint32_t kuiSize, const str_t* kpTag) {
 
 /////////////////////////////////////////////////////////////////////////////
 
-void_t WelsFree (void_t* pPtr, const str_t* kpTag) {
+void WelsFree (void* pPtr, const char* kpTag) {
   if (pPtr) {
 #ifdef MEMORY_CHECK
     if (NULL != pMemCheckFree && kpTag != NULL) {
-      fprintf (pMemCheckFree, "0x%x, free %s\n", (void_t*) (* (((void_t**) pPtr) - 1)), kpTag);
+      fprintf (pMemCheckFree, "0x%x, free %s\n", (void*) (* (((void**) pPtr) - 1)), kpTag);
       fflush (pMemCheckFree);
     }
 #endif
-    free (* (((void_t**) pPtr) - 1));
+    free (* (((void**) pPtr) - 1));
   }
 }
 

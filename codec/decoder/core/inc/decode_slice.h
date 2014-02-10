@@ -37,7 +37,7 @@
 
 namespace WelsDec {
 
-void_t WelsBlockInit (int16_t* pBlock, int32_t iWidth, int32_t iHeight, int32_t iStride, uint8_t uiVal);
+void WelsBlockInit (int16_t* pBlock, int32_t iWidth, int32_t iHeight, int32_t iStride, uint8_t uiVal);
 
 int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx);
 int32_t WelsDecodeMbCavlcISlice (PWelsDecoderContext pCtx, PNalUnit pNalCur);
@@ -48,40 +48,40 @@ typedef int32_t (*PWelsDecMbCavlcFunc) (PWelsDecoderContext pCtx, PNalUnit pNalC
 
 int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx); //construction based on slice
 
-int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool_t bFirstSliceInLayer, PNalUnit pNalCur);
+int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNalUnit pNalCur);
 
 
 int32_t WelsTargetMbConstruction (PWelsDecoderContext pCtx);
 
-int32_t WelsMbIntraPredictionConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer, bool_t bOutput);
+int32_t WelsMbIntraPredictionConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer, bool bOutput);
 int32_t WelsMbInterSampleConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer,
                                        uint8_t* pDstY, uint8_t* pDstU, uint8_t* pDstV, int32_t iStrideL, int32_t iStrideC);
 int32_t WelsMbInterConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer);
-void_t WelsLumaDcDequantIdct (int16_t* pBlock, int32_t iQp);
+void WelsLumaDcDequantIdct (int16_t* pBlock, int32_t iQp);
 int32_t WelsMbInterPrediction (PWelsDecoderContext pCtx, PDqLayer pCurLayer);
-void_t WelsMbCopy (uint8_t* pDst, int32_t iStrideDst, uint8_t* pSrc, int32_t iStrideSrc,
+void WelsMbCopy (uint8_t* pDst, int32_t iStrideDst, uint8_t* pSrc, int32_t iStrideSrc,
                    int32_t iHeight, int32_t iWidth);
 
-void_t WelsChromaDcIdct (int16_t* pBlock);
+void WelsChromaDcIdct (int16_t* pBlock);
 
 #ifdef __cplusplus
 extern "C" {
 #endif//__cplusplus
 
 #ifdef  X86_ASM
-void_t WelsResBlockZero16x16_sse2 (int16_t* pBlock, int32_t iStride);
-void_t WelsResBlockZero8x8_sse2 (int16_t* pBlock, int32_t iStride);
+void WelsResBlockZero16x16_sse2 (int16_t* pBlock, int32_t iStride);
+void WelsResBlockZero8x8_sse2 (int16_t* pBlock, int32_t iStride);
 #endif
 
 #ifdef __cplusplus
 }
 #endif//__cplusplus
 
-void_t WelsBlockZero16x16_c (int16_t* pBlock, int32_t iStride);
-void_t WelsBlockZero8x8_c (int16_t* pBlock, int32_t iStride);
-void_t SetNonZeroCount_c (int16_t* pBlock, int8_t* pNonZeroCount);
+void WelsBlockZero16x16_c (int16_t* pBlock, int32_t iStride);
+void WelsBlockZero8x8_c (int16_t* pBlock, int32_t iStride);
+void SetNonZeroCount_c (int16_t* pBlock, int8_t* pNonZeroCount);
 
-void_t WelsBlockFuncInit (SBlockFunc* pFunc,  int32_t iCpu);
+void WelsBlockFuncInit (SBlockFunc* pFunc,  int32_t iCpu);
 
 } // namespace WelsDec
 

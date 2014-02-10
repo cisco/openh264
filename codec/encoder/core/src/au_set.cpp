@@ -262,7 +262,7 @@ int32_t WelsWriteSubsetSpsSyntax (SSubsetSps* pSubsetSps, SBitStringAux* pBitStr
 int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, SParaSetOffset* sPSOVector) {
   SBitStringAux* pLocalBitStringAux = pBitStringAux;
 
-  bool_t bUsedSubset    =  sPSOVector->bPpsIdMappingIntoSubsetsps[pPps->iPpsId];
+  bool bUsedSubset    =  sPSOVector->bPpsIdMappingIntoSubsetsps[pPps->iPpsId];
   int32_t iParameterSetType = (bUsedSubset ? PARA_SET_TYPE_SUBSETSPS : PARA_SET_TYPE_AVCSPS);
 
   BsWriteUE (pLocalBitStringAux, pPps->iPpsId +
@@ -348,7 +348,7 @@ int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, SParaS
   return 0;
 }
 
-static inline bool_t WelsGetPaddingOffset (int32_t iActualWidth, int32_t iActualHeight,  int32_t iWidth,
+static inline bool WelsGetPaddingOffset (int32_t iActualWidth, int32_t iActualHeight,  int32_t iWidth,
     int32_t iHeight, SCropOffset& pOffset) {
   if ((iWidth < iActualWidth) || (iHeight < iActualHeight))
     return false;
@@ -367,7 +367,7 @@ static inline bool_t WelsGetPaddingOffset (int32_t iActualWidth, int32_t iActual
 
 int32_t WelsInitSps (SWelsSPS* pSps, SDLayerParam* pLayerParam, const uint32_t kuiIntraPeriod,
                      const int32_t kiNumRefFrame,
-                     const uint32_t kuiSpsId, const bool_t kbEnableFrameCropping, bool_t bEnableRc) {
+                     const uint32_t kuiSpsId, const bool kbEnableFrameCropping, bool bEnableRc) {
   memset (pSps, 0, sizeof (SWelsSPS));
 
   pSps->uiSpsId		= kuiSpsId;
@@ -409,7 +409,7 @@ int32_t WelsInitSps (SWelsSPS* pSps, SDLayerParam* pLayerParam, const uint32_t k
 
 int32_t WelsInitSubsetSps (SSubsetSps* pSubsetSps, SDLayerParam* pLayerParam, const uint32_t kuiIntraPeriod,
                            const int32_t kiNumRefFrame,
-                           const uint32_t kuiSpsId, const bool_t kbEnableFrameCropping, bool_t bEnableRc) {
+                           const uint32_t kuiSpsId, const bool kbEnableFrameCropping, bool bEnableRc) {
   SWelsSPS* pSps = &pSubsetSps->pSps;
 
   memset (pSubsetSps, 0, sizeof (SSubsetSps));
@@ -431,8 +431,8 @@ int32_t WelsInitPps (SWelsPPS* pPps,
                      SWelsSPS* pSps,
                      SSubsetSps* pSubsetSps,
                      const uint32_t kuiPpsId,
-                     const bool_t kbDeblockingFilterPresentFlag,
-                     const bool_t kbUsingSubsetSps) {
+                     const bool kbDeblockingFilterPresentFlag,
+                     const bool kbUsingSubsetSps) {
   SWelsSPS* pUsedSps = NULL;
   if (pPps == NULL || (pSps == NULL && pSubsetSps == NULL))
     return 1;

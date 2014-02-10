@@ -134,13 +134,13 @@ static const SPartMbInfo g_ksInterSubMbTypeInfo[4] = {
   {SUB_MB_TYPE_4x4, 4, 1},
 };
 
-void_t GetNeighborAvailMbType (PNeighAvail pNeighAvail, PDqLayer pCurLayer);
-void_t WelsFillCacheNonZeroCount (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, PDqLayer pCurLayer);
-void_t WelsFillCacheConstrain0Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int8_t* pIntraPredMode,
+void GetNeighborAvailMbType (PNeighAvail pNeighAvail, PDqLayer pCurLayer);
+void WelsFillCacheNonZeroCount (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, PDqLayer pCurLayer);
+void WelsFillCacheConstrain0Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int8_t* pIntraPredMode,
                                         PDqLayer pCurLayer);
-void_t WelsFillCacheConstrain1Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int8_t* pIntraPredMode,
+void WelsFillCacheConstrain1Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int8_t* pIntraPredMode,
                                         PDqLayer pCurLayer);
-void_t WelsFillCacheInter (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
+void WelsFillCacheInter (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
                            int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30], PDqLayer pCurLayer);
 
 
@@ -173,8 +173,8 @@ int32_t CheckIntraChromaPredMode (uint8_t uiSampleAvail, int8_t* pMode);
 int32_t PredIntra4x4Mode (int8_t* pIntraPredMode, int32_t iIdx4);
 
 
-void_t BsStartCavlc (PBitStringAux pBs);
-void_t BsEndCavlc (PBitStringAux pBs);
+void BsStartCavlc (PBitStringAux pBs);
+void BsEndCavlc (PBitStringAux pBs);
 
 int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable,
                                 uint8_t* pNonZeroCountCache,
