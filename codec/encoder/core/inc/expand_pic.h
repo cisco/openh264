@@ -43,33 +43,12 @@
 #include "typedefs.h"
 #include "picture.h"
 
+#include "expand_picture_common.h"
+
 namespace WelsSVCEnc {
 typedef void (*PExpandPictureFunc) (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicW, const int32_t kiPicH);
 
 void ExpandReferencingPicture (SPicture* pPic, PExpandPictureFunc pExpLuma, PExpandPictureFunc pExpChrom[2]);
-
-#if defined(__cplusplus)
-extern "C" {
-#endif//__cplusplus
-
-#if defined(X86_ASM)
-void ExpandPictureLuma_sse2 (uint8_t* pDst,
-                             const int32_t kiStride,
-                             const int32_t kiPicW,
-                             const int32_t kiPicH);
-void ExpandPictureChromaAlign_sse2 (uint8_t* pDst,
-                                    const int32_t kiStride,
-                                    const int32_t kiPicW,
-                                    const int32_t kiPicH);
-void ExpandPictureChromaUnalign_sse2 (uint8_t* pDst,
-                                      const int32_t kiStride,
-                                      const int32_t kiPicW,
-                                      const int32_t kiPicH);
-#endif//X86_ASM
-
-#if defined(__cplusplus)
-}
-#endif//__cplusplus
 
 void InitExpandPictureFunc (void* pL, const uint32_t kuiCPUFlags);
 }

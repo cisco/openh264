@@ -1,6 +1,6 @@
 /*!
  * \copy
- *     Copyright (c)  2013, Cisco Systems
+ *     Copyright (c)  2009-2013, Cisco Systems
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -28,24 +28,41 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
+ *
+ * \file		expand_pic.h
+ *
+ * \brief		Interface for expanding reconstructed picture to be used for reference
+ *
+ * \date		06/08/2009
+ *************************************************************************************
  */
 
-//macroblock.h
-#ifndef WELS_MC_H__
-#define WELS_MC_H__
+#ifndef EXPAND_PICTURE_COMMON_H
+#define EXPAND_PICTURE_COMMON_H
 
-#include <string.h>
 #include "typedefs.h"
-#include "wels_const.h"
-#include "macros.h"
-#include "wels_func_ptr_def.h"
-#include "mc_common.h"
 
-/////////////////////luma MC//////////////////////////
-//x y means dx(mv[0] & 3) and dy(mv[1] & 3)
+#if defined(__cplusplus)
+extern "C" {
+#endif//__cplusplus
 
-namespace WelsSVCEnc {
-void WelsInitMcFuncs (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag);
+#if defined(X86_ASM)
+void ExpandPictureLuma_sse2 (uint8_t* pDst,
+                             const int32_t kiStride,
+                             const int32_t kiPicW,
+                             const int32_t kiPicH);
+void ExpandPictureChromaAlign_sse2 (uint8_t* pDst,
+                                    const int32_t kiStride,
+                                    const int32_t kiPicW,
+                                    const int32_t kiPicH);
+void ExpandPictureChromaUnalign_sse2 (uint8_t* pDst,
+                                      const int32_t kiStride,
+                                      const int32_t kiPicW,
+                                      const int32_t kiPicH);
+#endif//X86_ASM
 
+#if defined(__cplusplus)
 }
-#endif//WELS_MC_H__
+#endif//__cplusplus
+
+#endif

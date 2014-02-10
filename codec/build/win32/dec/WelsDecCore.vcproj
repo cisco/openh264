@@ -778,6 +778,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\common\expand_picture_common.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\decoder\core\inc\fmo.h"
 					>
 				</File>
@@ -803,6 +807,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\decoder\core\inc\mc.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\common\mc_common.h"
 					>
 				</File>
 				<File

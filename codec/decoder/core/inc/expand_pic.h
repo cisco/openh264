@@ -43,35 +43,13 @@
 #include "decoder_context.h"
 #include "picture.h"
 
+#include "expand_picture_common.h"
+
 namespace WelsDec {
 
 void_t ExpandReferencingPicture (PPicture pPic, PExpandPictureFunc pExpandPictureLuma,
                                  PExpandPictureFunc pExpandPictureChroma[2]);
 
-#if defined(__cplusplus)
-extern "C" {
-#endif//__cplusplus
-
-#if defined(X86_ASM)
-void_t ExpandPictureLuma_sse2 (uint8_t* pDst,
-                               const int32_t kiStride,
-                               const int32_t kiPicWidth,
-                               const int32_t kiPicHeight);
-void_t ExpandPictureChromaAlign_sse2 (uint8_t* pDst,
-                                      const int32_t kiStride,
-                                      const int32_t kiPicWidth,
-                                      const int32_t kiPicHeight);
-void_t ExpandPictureChromaUnalign_sse2 (uint8_t* pDst,
-                                        const int32_t kiStride,
-                                        const int32_t kiPicWidth,
-                                        const int32_t kiPicHeight);
-#endif//X86_ASM
-
-#if defined(__cplusplus)
-}
-#endif//__cplusplus
-
-//
 void_t InitExpandPictureFunc (SExpandPicFunc* pExpandPicFunc, const uint32_t kuiCpuFlags);
 
 } // namespace WelsDec
