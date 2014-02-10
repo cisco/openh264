@@ -85,7 +85,7 @@ void     WelsXmmRegEmptyOp(void * pSrc);
 typedef  void (*WelsXmmRegProtectFunc)(void * pSrc);
 
 
-#ifdef  WIN64
+#if defined(WIN64) && defined(X86_ASM)
 #define   XMMREG_PROTECT_DECLARE(name) \
   WelsXmmRegProtectFunc name##load;\
   WelsXmmRegProtectFunc name##store;\

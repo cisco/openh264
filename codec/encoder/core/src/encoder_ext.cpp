@@ -3126,7 +3126,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
   int8_t iCurTid						= 0;
   bool_t bAvcBased					= false;
 #if defined(ENABLE_PSNR_CALC)
-  real32_t snr_y = .0f, snr_u = .0f, snr_v = .0f;
+  float snr_y = .0f, snr_u = .0f, snr_v = .0f;
 #endif//ENABLE_PSNR_CALC
 
 #if defined(_DEBUG)

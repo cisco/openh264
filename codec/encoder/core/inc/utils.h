@@ -68,12 +68,12 @@ WELS_LOG_DEFAULT	= WELS_LOG_ERROR | WELS_LOG_WARNING | WELS_LOG_INFO | WELS_LOG_
 typedef void (*PWelsLogCallbackFunc) (void* pCtx, const int32_t iLevel, const str_t* kpFmt, va_list argv);
 
 // wels psnr calc
-typedef real32_t (*PWelsPsnrFunc) (const void* kpTarPic,
-                                   const int32_t kiTarStride,
-                                   const void* kpRefPic,
-                                   const int32_t kiRefStride,
-                                   const int32_t kiWidth,
-                                   const int32_t kiHeight);
+typedef float (*PWelsPsnrFunc) (const void* kpTarPic,
+                                const int32_t kiTarStride,
+                                const void* kpRefPic,
+                                const int32_t kiRefStride,
+                                const int32_t kiWidth,
+                                const int32_t kiHeight);
 
 extern PWelsLogCallbackFunc	wlog;
 
@@ -176,12 +176,12 @@ void WelsReopenTraceFile (void* pCtx, str_t* pCurPath);
  * \note	N/A
  *************************************************************************************
  */
-real32_t WelsCalcPsnr (const void* kpTarPic,
-                       const int32_t kiTarStride,
-                       const void* kpRefPic,
-                       const int32_t kiRefStride,
-                       const int32_t kiWidth,
-                       const int32_t kiHeight);
+float WelsCalcPsnr (const void* kpTarPic,
+                    const int32_t kiTarStride,
+                    const void* kpRefPic,
+                    const int32_t kiRefStride,
+                    const int32_t kiWidth,
+                    const int32_t kiHeight);
 
 }
 #endif//WELS_UTILS_H__

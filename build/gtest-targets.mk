@@ -1,6 +1,6 @@
 GTEST_SRCDIR=gtest
 GTEST_CPP_SRCS=\
-	$(GTEST_SRCDIR)/./src/gtest-all.cc\
+	$(GTEST_SRCDIR)/src/gtest-all.cc\
 
 GTEST_OBJS += $(GTEST_CPP_SRCS:.cc=.o)
 OBJS += $(GTEST_OBJS)

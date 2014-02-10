@@ -33,6 +33,10 @@
 #ifndef WELS_VIDEO_CODEC_SVC_API_H__
 #define WELS_VIDEO_CODEC_SVC_API_H__
 
+#ifndef __cplusplus
+#include <stdbool.h>
+#endif
+
 #include "codec_app_def.h"
 #include "codec_def.h"
 

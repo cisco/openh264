@@ -76,11 +76,6 @@ typedef unsigned __int64   uint64_t ;
 typedef char    str_t    ; // [comment]: specific use plain char only for character parameters
 typedef bool    bool_t   ;
 
-#if defined(_WIN32) || defined(_MACH_PLATFORM) || defined(__GNUC__)
-typedef float   float_t  ;
-typedef double  double_t ;
-#endif
-
 enum {
   FALSE = 0,
   TRUE  = !FALSE
