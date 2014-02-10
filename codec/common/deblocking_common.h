@@ -15,12 +15,6 @@ void_t DeblockChromaLt4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, i
                             int8_t* pTc);
 void_t DeblockChromaEq4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
 
-#ifdef WORDS_BIGENDIAN
-#define DEBLOCK_BS_SHIFTED(x) ((x) | ((x) << 8))
-#else
-#define DEBLOCK_BS_SHIFTED(x) ((x) | ((x) >> 8))
-#endif
-
 #if defined(__cplusplus)
 extern "C" {
 #endif//__cplusplus
