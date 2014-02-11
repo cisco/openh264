@@ -58,7 +58,7 @@ using namespace std;
 //#define STICK_STREAM_SIZE	// For Demo interfaces test with track file of integrated frames
 
 void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, const char* kpOuputFileName,
-                           int32_t& iWidth, int32_t& iHeight, void* pOptionFileName) {
+                         int32_t& iWidth, int32_t& iHeight, const char* pOptionFileName) {
   FILE* pH264File	  = NULL;
   FILE* pYuvFile	  = NULL;
   FILE* pOptionFile = NULL;
@@ -115,11 +115,11 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
   }
 
   if (pOptionFileName) {
-    pOptionFile = fopen ((char*)pOptionFileName, "wb");
+    pOptionFile = fopen (pOptionFileName, "wb");
     if (pOptionFile == NULL) {
       fprintf (stderr, "Can not open optional file for write..\n");
     } else
-      fprintf (stderr, "Extra optional file: %s..\n", (char*)pOptionFileName);
+      fprintf (stderr, "Extra optional file: %s..\n", pOptionFileName);
   }
 
   printf ("------------------------------------------------------\n");
@@ -445,8 +445,8 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
   int32_t iHeight = 0;
 
 
-  H264DecodeInstance (pDecoder, strInputFile.c_str(), strOutputFile.c_str(), iWidth, iHeight,
-                      (!strOptionFile.empty() ? (void*) (const_cast<char*> (strOptionFile.c_str())) : NULL));
+  H264DecodeInstance (pDecoder, strInputFile.c_str(), !strOutputFile.empty() ? strOutputFile.c_str() : NULL, iWidth, iHeight,
+                      (!strOptionFile.empty() ? strOptionFile.c_str() : NULL));
 
   if (sDecParam.pFileNameRestructed != NULL) {
     delete []sDecParam.pFileNameRestructed;
