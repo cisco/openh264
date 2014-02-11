@@ -50,15 +50,15 @@ namespace WelsSVCEnc {
 #define	BASE_MV_MB_NMB	((2*(MV_RANGE+ITERATIVE_TIMES)/MB_WIDTH_LUMA)-1)
 
 union SadPredISatdUnit {
-uint16_t	uiSadPred;
-uint16_t	uiSatd;    //reuse the sad_pred as a temp satd pData
+uint32_t	uiSadPred;
+uint32_t	uiSatd;    //reuse the sad_pred as a temp satd pData
 };
 typedef struct TagWelsME {
 /* input */
 uint16_t*					pMvdCost;
 union SadPredISatdUnit	uSadPredISatd; //reuse the sad_pred as a temp pData
-uint16_t					uiSadCost;  //used by ME and RC
-uint16_t					uiSatdCost; /* satd + lm * nbits */
+uint32_t					uiSadCost;  //used by ME and RC //max SAD should be max_delta*size+lambda*mvdsize = 255*256+91*33*2 = 65280 + 6006 = 71286 > (2^16)-1 = 65535
+uint32_t					uiSatdCost; /* satd + lm * nbits */
 uint8_t						uiPixel;   /* PIXEL_WxH */
 uint8_t						uiReserved;
 
