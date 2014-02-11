@@ -394,7 +394,7 @@ void PrintHelp() {
   printf ("\n Supported Options:\n");
   printf ("  -bf     Bit Stream File\n");
   printf ("  -frms   Number of total frames to be encoded\n");
-  printf ("  -gop    GOPSize - GOP size (2,4,8,16,32,64, default: 1)\n");
+  printf ("  -gop    GOPSize - GOP size (1,2,4,8, default: 1)\n");
   printf ("  -iper   Intra period (default: -1) : must be a power of 2 of GOP size (or -1)\n");
   printf ("  -spsid   Enable id adding in SPS/PPS per IDR \n");
   printf ("  -denois Control denoising  (default: 0)\n");
