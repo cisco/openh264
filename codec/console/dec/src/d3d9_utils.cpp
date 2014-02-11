@@ -492,13 +492,13 @@ HRESULT Dump2Surface (void* pDst[3], void* pSurface, int iWidth, int iHeight, in
   for (int j = 0; j < iHeight; j++)
     memcpy (pOutY + j * iOutStride, pInY + j * iStride[0], iWidth); //confirmed_safe_unsafe_usage
 
-  unsigned char* pInV = (unsigned char*)pDst[1];
-  unsigned char* pInU = (unsigned char*)pDst[2];
+  unsigned char* pInU = (unsigned char*)pDst[1];
+  unsigned char* pInV = (unsigned char*)pDst[2];
   unsigned char* pOutC = pOutY + iOutStride * iHeight;
   for (int i = 0; i < iHeight / 2; i++) {
     for (int j = 0; j < iWidth; j += 2) {
-      pOutC[i * iOutStride + j  ] = pInV[i * iStride[1] + j / 2];
-      pOutC[i * iOutStride + j + 1] = pInU[i * iStride[1] + j / 2];
+      pOutC[i * iOutStride + j  ] = pInU[i * iStride[1] + j / 2];
+      pOutC[i * iOutStride + j + 1] = pInV[i * iStride[1] + j / 2];
     }
   }
 
