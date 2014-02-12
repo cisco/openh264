@@ -30,6 +30,14 @@ def write_cpp_rule_pattern(f):
     f.write('\t$(QUIET_CXX)$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(' + PREFIX + '_CFLAGS) $(' + PREFIX + '_INCLUDES) -c $(CXX_O) $<\n')
     f.write("\n")
 
+def write_c_rule_pattern(f):
+    src = "$(%s_SRCDIR)/%%.c"%(PREFIX)
+    dst = "$(%s_SRCDIR)/%%.o"%(PREFIX)
+
+    f.write("%s: %s\n"%(dst, src))
+    f.write('\t$(QUIET_CC)$(CC) $(CFLAGS) $(INCLUDES) $(' + PREFIX + '_CFLAGS) $(' + PREFIX + '_INCLUDES) -c $(CXX_O) $<\n')
+    f.write("\n")
+
 def write_asm_rule_pattern(f):
     src = "$(%s_SRCDIR)/%%.asm"%(PREFIX)
     dst = "$(%s_SRCDIR)/%%.o"%(PREFIX)
@@ -42,6 +50,7 @@ def write_asm_rule_pattern(f):
 def find_sources():
     cpp_files = []
     asm_files = []
+    c_files = []
     print EXCLUDE
     for dir in os.walk("."):
         for file in dir[2]:
@@ -50,7 +59,9 @@ def find_sources():
                     cpp_files.append(os.path.join(dir[0].strip('./'), file))
                 if os.path.splitext(file)[1] == '.asm':
                     asm_files.append(os.path.join(dir[0].strip('./'), file))
-    return [cpp_files, asm_files]
+                if os.path.splitext(file)[1] == '.c':
+                    c_files.append(os.path.join(dir[0].strip('./'), file))
+    return [cpp_files, asm_files, c_files]
 
 
 args = parser.parse_args()
@@ -80,7 +91,7 @@ try:
 except:
     sys.exit(1)
 
-(cpp, asm) = find_sources()
+(cpp, asm, cfiles) = find_sources()
 
 
 
@@ -91,7 +102,14 @@ f.write("%s_CPP_SRCS=\\\n"%(PREFIX))
 for c in cpp:
     f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
 f.write("\n")
-f.write("%s_OBJS += $(%s_CPP_SRCS:%s=.o)\n"%(PREFIX, PREFIX, CPP_SUFFIX))
+f.write("%s_OBJS += $(%s_CPP_SRCS:%s=.o)\n\n"%(PREFIX, PREFIX, CPP_SUFFIX))
+
+if len(cfiles) > 0:
+    f.write("%s_C_SRCS=\\\n"%(PREFIX))
+    for cfile in cfiles:
+        f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, cfile))
+    f.write("\n")
+    f.write("%s_OBJS += $(%s_C_SRCS:.c=.o)\n\n"%(PREFIX, PREFIX))
 
 if len(asm) > 0:
     f.write("ifeq ($(USE_ASM), Yes)\n")
@@ -105,6 +123,9 @@ if len(asm) > 0:
 f.write("OBJS += $(%s_OBJS)\n"%PREFIX)
 
 write_cpp_rule_pattern(f)
+
+if len(cfiles) > 0:
+    write_c_rule_pattern(f)
 
 if len(asm) > 0:
     write_asm_rule_pattern(f)
