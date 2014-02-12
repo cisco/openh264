@@ -1,3 +1,4 @@
+CC=cl
 CXX=cl
 AR=lib
 CXX_O=-Fo$@

@@ -34,6 +34,7 @@ ENCODER_CPP_SRCS=\
 	$(ENCODER_SRCDIR)/plus/src/welsEncoderExt.cpp\
 
 ENCODER_OBJS += $(ENCODER_CPP_SRCS:.cpp=.o)
+
 ifeq ($(USE_ASM), Yes)
 ENCODER_ASM_SRCS=\
 	$(ENCODER_SRCDIR)/core/asm/coeff.asm\
