@@ -251,13 +251,26 @@ void FillDefault (const bool_t kbEnableRc) {
   bEnableLongTermReference	= false;	// long term reference control
   bEnableSpsPpsIdAddition	= true;		// pSps pPps id addition control
   bPrefixNalAddingCtrl		= true;		// prefix NAL adding control
-  iSpatialLayerNum		= 0;		// number of dependency(Spatial/CGS) layers used to be encoded
-  iTemporalLayerNum			= 0;		// number of temporal layer specified
+  iSpatialLayerNum		= 1;		// number of dependency(Spatial/CGS) layers used to be encoded
+  iTemporalLayerNum			= 1;		// number of temporal layer specified
 
   iMaxQp = 51;
   iMinQp = 0;
   iUsageType = 0;
   memset(sDependencyLayers,0,sizeof(SDLayerParam)*MAX_DEPENDENCY_LAYER);
+
+
+
+  //init multi-slice
+   sDependencyLayers[0].sSliceCfg.uiSliceMode = 0;
+   sDependencyLayers[0].sSliceCfg.sSliceArgument.uiSliceSizeConstraint    = 1500;
+   sDependencyLayers[0].sSliceCfg.sSliceArgument.uiSliceNum      = 1;
+
+    const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
+    memset (sDependencyLayers[0].sSliceCfg.sSliceArgument.uiSliceMbNum, 960,kiLesserSliceNum * sizeof (uint32_t)) ;
+    sDependencyLayers[0].iDLayerQp = SVC_QUALITY_BASE_QP;
+
+
 }
 
 int32_t ParamBaseTranscode (SEncParamBase& pCodingParam, const bool_t kbEnableRc = true) {
@@ -280,14 +293,44 @@ int32_t ParamBaseTranscode (SEncParamBase& pCodingParam, const bool_t kbEnableRc
     iRCMode = pCodingParam.iRCMode;    // rc mode
 
 
-  sDependencyLayers[iSpatialLayerNum - 1].iActualWidth = sSpatialLayers[iSpatialLayerNum - 1].iVideoWidth;
-  
-  sDependencyLayers[iSpatialLayerNum - 1].iFrameWidth = 
-  WELS_ALIGN(sDependencyLayers[iSpatialLayerNum - 1].iActualWidth, MB_WIDTH_LUMA);
 
-  sDependencyLayers[iSpatialLayerNum - 1].iActualHeight = sSpatialLayers[iSpatialLayerNum - 1].iVideoHeight;
-  sDependencyLayers[iSpatialLayerNum - 1].iFrameHeight =
-    WELS_ALIGN(sDependencyLayers[iSpatialLayerNum - 1].iActualHeight, MB_HEIGHT_LUMA);
+  int8_t iIdxSpatial	= 0;
+  uint8_t uiProfileIdc		= PRO_BASELINE;
+  SDLayerParam* pDlp		= &sDependencyLayers[0];
+
+  while (iIdxSpatial < iSpatialLayerNum) {
+
+    pDlp->uiProfileIdc		= uiProfileIdc;
+    sSpatialLayers[iIdxSpatial].fFrameRate	= WELS_CLIP3 (sSpatialLayers[iIdxSpatial].fFrameRate,
+        MIN_FRAME_RATE, pCodingParam.fMaxFrameRate);
+    pDlp->fInputFrameRate	=
+      pDlp->fOutputFrameRate	= WELS_CLIP3 (sSpatialLayers[iIdxSpatial].fFrameRate, MIN_FRAME_RATE,
+                                            MAX_FRAME_RATE);
+    
+#ifdef ENABLE_FRAME_DUMP
+    pDlp->sRecFileName[0]	= '\0';	// file to be constructed
+#endif//ENABLE_FRAME_DUMP
+   pDlp->iActualWidth = sSpatialLayers[iIdxSpatial].iVideoWidth = iPicWidth;
+  
+   pDlp->iFrameWidth = 
+  WELS_ALIGN(pDlp->iActualWidth, MB_WIDTH_LUMA);
+
+  pDlp->iActualHeight = sSpatialLayers[iIdxSpatial].iVideoHeight = iPicHeight;
+  pDlp->iFrameHeight =
+    WELS_ALIGN(pDlp->iActualHeight, MB_HEIGHT_LUMA);
+
+    pDlp->iSpatialBitrate	=
+		sSpatialLayers[iIdxSpatial].iSpatialBitrate = pCodingParam.iTargetBitrate;	// target bitrate for current spatial layer
+
+
+   pDlp->iDLayerQp = SVC_QUALITY_BASE_QP;
+
+    uiProfileIdc	= PRO_SCALABLE_BASELINE;
+    ++ pDlp;
+    ++ iIdxSpatial;
+  }
+
+ 
 
    SetActualPicResolution();
 
