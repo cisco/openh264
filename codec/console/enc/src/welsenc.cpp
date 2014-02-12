@@ -908,7 +908,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   int iParsedNum = 2;
 
   memset (&sFbi, 0, sizeof (SFrameBSInfo));
-  memset (&sSvcParam, 0, sizeof (SWelsSvcCodingParam));
+  memset (&sSvcParam, 0, sizeof (SEncParamExt));
 
   sSvcParam.iInputCsp	= videoFormatI420;	// I420 in default
   sSvcParam.sSpatialLayers[0].uiProfileIdc	= PRO_BASELINE;
@@ -943,7 +943,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   sSvcParam.iPicHeight = sSvcParam.sSpatialLayers[sSvcParam.iSpatialLayerNum - 1].iVideoHeight;
 
 
-  if (cmResultSuccess != pPtrEnc->Initialize ((void*)&sSvcParam, INIT_TYPE_PARAMETER_BASED)) {	// SVC encoder initialization
+  if (cmResultSuccess != pPtrEnc->Initialize ((void*)&sSvcParam, INIT_TYPE_PARAMETER_EXT)) {	// SVC encoder initialization
     fprintf (stderr, "SVC encoder Initialize failed\n");
     iRet = 1;
     goto INSIDE_MEM_FREE;
