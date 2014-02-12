@@ -264,7 +264,7 @@ int32_t CWelsPreProcess::WelsPreprocessStep1 (void* pCtx, const SSourcePicture**
     const int32_t kiConfiguredLayerNum) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   SWelsSvcCodingParam* pSvcParam = pEncCtx->pSvcParam;
-  int32_t	iNumDependencyLayer = (int32_t)pSvcParam->iNumDependencyLayer;
+  int32_t	iSpatialLayerNum = (int32_t)pSvcParam->iSpatialLayerNum;
   int32_t iSpatialNum = 0;
 
   if (!m_bInitDone) {
@@ -273,12 +273,12 @@ int32_t CWelsPreProcess::WelsPreprocessStep1 (void* pCtx, const SSourcePicture**
     if (WelsPreprocessReset (pEncCtx) != 0)
       return -1;
 
-    m_bOfficialBranch  = (iNumDependencyLayer != kiConfiguredLayerNum);
-    if (!m_bOfficialBranch && (iNumDependencyLayer == 1)) {
+    m_bOfficialBranch  = (iSpatialLayerNum != kiConfiguredLayerNum);
+    if (!m_bOfficialBranch && (iSpatialLayerNum == 1)) {
       // check the input source uiSize to decide if need switch to official branch
       // NOTICE: the layernum=1 case is confused in official/non-official cases!
       SSourcePicture** pic_queue = (SSourcePicture**)kppSrcPicList;
-      for (int32_t i = 0; i < iNumDependencyLayer; i++) {
+      for (int32_t i = 0; i < iSpatialLayerNum; i++) {
         if (pSvcParam->sDependencyLayers[i].iFrameWidth != pic_queue[i]->iPicWidth ||
             pSvcParam->sDependencyLayers[i].iFrameHeight != pic_queue[i]->iPicHeight) {
           m_bOfficialBranch = TRUE;
@@ -362,7 +362,7 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (void* pCtx, const SSourcePicture
     Scaled_Picture* pScaledPicture) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   SWelsSvcCodingParam* pSvcParam    = pEncCtx->pSvcParam;
-  int8_t	iDependencyId			= pSvcParam->iNumDependencyLayer - 1;
+  int8_t	iDependencyId			= pSvcParam->iSpatialLayerNum - 1;
   int32_t iPicturePos	                    = pEncCtx->uiSpatialLayersInTemporal[iDependencyId] - 1;
 
   SPicture* pSrcPic					= NULL;	// large
@@ -413,7 +413,7 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (void* pCtx, const SSourcePicture
     pEncCtx->pVaa->bSceneChangeFlag = DetectSceneChange (pDstPic, pRefPic);
   }
 
-  for (int32_t i = 0; i < pSvcParam->iNumDependencyLayer; i++) {
+  for (int32_t i = 0; i < pSvcParam->iSpatialLayerNum; i++) {
     if (pSvcParam->sDependencyLayers[i].uiCodingIdx2TemporalId[pEncCtx->iCodingIndex & (pSvcParam->uiGopSize - 1)]
         != INVALID_TEMPORAL_ID) {
       ++ iActualSpatialLayerNum;
@@ -433,7 +433,7 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (void* pCtx, const SSourcePicture
   // pSrc is
   //	-- padded input pic, if downsample should be applied to generate highest layer, [if] block above
   //	-- highest layer, if no downsampling, [else] block above
-  if (pSvcParam->iNumDependencyLayer > 1) {
+  if (pSvcParam->iSpatialLayerNum > 1) {
     while (iDependencyId >= 0) {
       pDlayerParam			= &pSvcParam->sDependencyLayers[iDependencyId];
       iTargetWidth	= pDlayerParam->iFrameWidth;
@@ -472,7 +472,7 @@ int32_t CWelsPreProcess::MultiLayerPreprocess (void* pCtx, const SSourcePicture*
   const SSourcePicture* pSrc			= NULL;
   SPicture* pDstPic						= NULL;
   const int32_t iSpatialLayersCfgCount =
-    pSvcParam->iNumDependencyLayer;	// count number of spatial layers to be encoded in cfg
+    pSvcParam->iSpatialLayerNum;	// count number of spatial layers to be encoded in cfg
   int32_t i							= 0;
   int32_t j							= -1;
 
@@ -502,7 +502,7 @@ int32_t CWelsPreProcess::MultiLayerPreprocess (void* pCtx, const SSourcePicture*
     ++ i;
   } while (i < kiSpatialNum);
 
-  if (pSvcParam->bEnableSceneChangeDetect && (kiSpatialNum == pSvcParam->iNumDependencyLayer)
+  if (pSvcParam->bEnableSceneChangeDetect && (kiSpatialNum == pSvcParam->iSpatialLayerNum)
       && !pEncCtx->pVaa->bIdrPeriodFlag && !pEncCtx->bEncCurFrmAsIdrFlag) {
     SPicture* pRef = pEncCtx->pLtr[0].bReceivedT0LostFlag ?
                      pEncCtx->pSpatialPic[0][pEncCtx->uiSpatialLayersInTemporal[0] + pEncCtx->pVaa->uiValidLongTermPicIdx] :
@@ -520,11 +520,11 @@ int32_t CWelsPreProcess::MultiLayerPreprocess (void* pCtx, const SSourcePicture*
 bool_t JudgeNeedOfScaling (SWelsSvcCodingParam* pParam, Scaled_Picture* pScaledPicture) {
   const int32_t kiInputPicWidth	= pParam->SUsedPicRect.iWidth;
   const int32_t kiInputPicHeight = pParam->SUsedPicRect.iHeight;
-  const int32_t kiDstPicWidth		= pParam->sDependencyLayers[pParam->iNumDependencyLayer - 1].iActualWidth;
-  const int32_t kiDstPicHeight	= pParam->sDependencyLayers[pParam->iNumDependencyLayer - 1].iActualHeight;
+  const int32_t kiDstPicWidth		= pParam->sDependencyLayers[pParam->iSpatialLayerNum - 1].iActualWidth;
+  const int32_t kiDstPicHeight	= pParam->sDependencyLayers[pParam->iSpatialLayerNum - 1].iActualHeight;
   bool_t bNeedDownsampling = true;
 
-  int32_t iSpatialIdx = pParam->iNumDependencyLayer - 1;
+  int32_t iSpatialIdx = pParam->iSpatialLayerNum - 1;
 
   if (kiDstPicWidth >= kiInputPicWidth && kiDstPicHeight >= kiInputPicHeight) {
     iSpatialIdx --;  // highest D layer do not need downsampling
@@ -571,7 +571,7 @@ void  FreeScaledPic (Scaled_Picture*  pScaledPicture, CMemoryAlign* pMemoryAlign
 int32_t CWelsPreProcess::InitLastSpatialPictures (void* pCtx) {
   sWelsEncCtx* pEncCtx         = (sWelsEncCtx*)pCtx;
   SWelsSvcCodingParam* pParam	= pEncCtx->pSvcParam;
-  const int32_t kiDlayerCount			= pParam->iNumDependencyLayer;
+  const int32_t kiDlayerCount			= pParam->iSpatialLayerNum;
   int32_t iDlayerIndex					= 0;
 
   for (; iDlayerIndex < kiDlayerCount; iDlayerIndex++) {

@@ -632,7 +632,7 @@ void WelsCodePSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
   //pSlice-level init should be outside and before this function
   SDqLayer* pCurLayer			= pEncCtx->pCurDqLayer;
   const bool_t kbBaseAvail		= pCurLayer->bBaseLayerAvailableFlag;
-  const bool_t kbHighestSpatial = pEncCtx->pSvcParam->iNumDependencyLayer ==
+  const bool_t kbHighestSpatial = pEncCtx->pSvcParam->iSpatialLayerNum ==
                                   (pCurLayer->sLayerInfo.sNalHeaderExt.uiDependencyId + 1);
 
   //MD switch
@@ -650,7 +650,7 @@ void WelsCodePOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
   //pSlice-level init should be outside and before this function
   SDqLayer* pCurLayer			= pEncCtx->pCurDqLayer;
   const bool_t kbBaseAvail		= pCurLayer->bBaseLayerAvailableFlag;
-  const bool_t kbHighestSpatial = pEncCtx->pSvcParam->iNumDependencyLayer ==
+  const bool_t kbHighestSpatial = pEncCtx->pSvcParam->iSpatialLayerNum ==
                                   (pCurLayer->sLayerInfo.sNalHeaderExt.uiDependencyId + 1);
 
   //MD switch
@@ -681,7 +681,7 @@ void WelsCodeOneSlice (sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx, const int
   SNalUnitHeaderExt* pNalHeadExt	= &pCurLayer->sLayerInfo.sNalHeaderExt;
   SSlice* pCurSlice					= &pCurLayer->sLayerInfo.pSliceInLayer[kiSliceIdx];
   SBitStringAux* pBs					= pCurSlice->pSliceBsa;
-  const int32_t kiDynamicSliceFlag	= (pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId].sMso.uiSliceMode ==
+  const int32_t kiDynamicSliceFlag	= (pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId].sSliceCfg.uiSliceMode ==
                                        SM_DYN_SLICE);
 
   assert (kiSliceIdx == pCurSlice->uiSliceIdx);
@@ -916,7 +916,7 @@ void WelsMdInterMbLoop (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pWelsMd, con
   int32_t	iCurMbIdx			= -1;
   int32_t	iMbSkipRun			= 0;
   const int32_t kiTotalNumMb	= pCurLayer->iMbWidth * pCurLayer->iMbHeight;
-  const int32_t kiMvdInterTableSize	= (pEncCtx->pSvcParam->iNumDependencyLayer == 1 ? 648 : 972);
+  const int32_t kiMvdInterTableSize	= (pEncCtx->pSvcParam->iSpatialLayerNum == 1 ? 648 : 972);
   const int32_t kiMvdInterTableStride = 1 + (kiMvdInterTableSize << 1);
   uint16_t* pMvdCostTableInter		= &pEncCtx->pMvdCostTableInter[kiMvdInterTableSize];
   const int32_t kiSliceIdx				= pSlice->uiSliceIdx;
@@ -999,7 +999,7 @@ void WelsMdInterMbLoopOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice, vo
   int32_t	iNextMbIdx			= kiSliceFirstMbXY;
   int32_t	iCurMbIdx			= -1;
   int32_t	iMbSkipRun			= 0;
-  const int32_t kiMvdInterTableSize	= (pEncCtx->pSvcParam->iNumDependencyLayer == 1 ? 648 : 972);
+  const int32_t kiMvdInterTableSize	= (pEncCtx->pSvcParam->iSpatialLayerNum == 1 ? 648 : 972);
   const int32_t kiMvdInterTableStride = 1 + (kiMvdInterTableSize << 1);
   uint16_t* pMvdCostTableInter		= &pEncCtx->pMvdCostTableInter[kiMvdInterTableSize];
   const int32_t kiSliceIdx				= pSlice->uiSliceIdx;

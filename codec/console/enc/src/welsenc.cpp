@@ -46,7 +46,7 @@
 //#define STICK_STREAM_SIZE
 
 #include "measure_time.h"
-#include "param_svc.h"
+//#include "param_svc.h"
 //#include "layered_pic_buffer.h"
 #include "read_config.h"
 
@@ -89,7 +89,7 @@ using namespace WelsSVCEnc;
  */
 typedef struct LayerpEncCtx_s {
   int32_t				iDLayerQp;
-  SMulSliceOption	sMso;
+  SSliceConfig	sSliceCfg;
 } SLayerPEncCtx;
 
 
@@ -100,7 +100,7 @@ static void    SigIntHandler (int a) {
   g_iCtrlC = 1;
 }
 
-int ParseConfig (CReadConfig& cRdCfg, SWelsSvcCodingParam& pSvcParam, SFilesSet& sFileSet) {
+int ParseConfig (CReadConfig& cRdCfg, SEncParamExt& pSvcParam, SFilesSet& sFileSet) {
   string strTag[4];
   int32_t iLeftTargetBitrate = 0;
   int32_t	iLeftSpatialBitrate[MAX_DEPENDENCY_LAYER] = { 0 };
@@ -206,11 +206,11 @@ int ParseConfig (CReadConfig& cRdCfg, SWelsSvcCodingParam& pSvcParam, SFilesSet&
       } else if (strTag[0].compare ("EnableLongTermReference") == 0) {
         pSvcParam.bEnableLongTermReference	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("LtrMarkPeriod") == 0) {
-        pSvcParam.uiLtrMarkPeriod	= (uint32_t)atoi (strTag[1].c_str());
+        pSvcParam.iLtrMarkPeriod	= (uint32_t)atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("NumLayers") == 0) {
-        pSvcParam.iNumDependencyLayer	= (int8_t)atoi (strTag[1].c_str());
-        if (pSvcParam.iNumDependencyLayer > MAX_DEPENDENCY_LAYER || pSvcParam.iNumDependencyLayer <= 0) {
-          fprintf (stderr, "Invalid parameter in iNumDependencyLayer: %d.\n", pSvcParam.iNumDependencyLayer);
+        pSvcParam.iSpatialLayerNum	= (int8_t)atoi (strTag[1].c_str());
+        if (pSvcParam.iSpatialLayerNum > MAX_DEPENDENCY_LAYER || pSvcParam.iSpatialLayerNum <= 0) {
+          fprintf (stderr, "Invalid parameter in iSpatialLayerNum: %d.\n", pSvcParam.iSpatialLayerNum);
           iRet = 1;
           break;
         }
@@ -230,10 +230,10 @@ int ParseConfig (CReadConfig& cRdCfg, SWelsSvcCodingParam& pSvcParam, SFilesSet&
     }
   }
 
-  const int8_t kiActualLayerNum = WELS_MIN (pSvcParam.iNumDependencyLayer, iLayerCount);
-  if (pSvcParam.iNumDependencyLayer >
+  const int8_t kiActualLayerNum = WELS_MIN (pSvcParam.iSpatialLayerNum, iLayerCount);
+  if (pSvcParam.iSpatialLayerNum >
       kiActualLayerNum) {	// fixed number of dependency layer due to parameter error in settings
-    pSvcParam.iNumDependencyLayer	= kiActualLayerNum;
+    pSvcParam.iSpatialLayerNum	= kiActualLayerNum;
   }
 
   assert (kiActualLayerNum <= MAX_DEPENDENCY_LAYER);
@@ -243,7 +243,7 @@ int ParseConfig (CReadConfig& cRdCfg, SWelsSvcCodingParam& pSvcParam, SFilesSet&
     int32_t iLayerArg = -2;
     int32_t iNumQualityBitrateLayerSet = 0;
 
-    SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
+    SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
     CReadConfig cRdLayerCfg (sFileSet.sSpatialLayers[iLayer].strLayerCfgFile);
 
     memset (&sLayerCtx, 0, sizeof (SLayerPEncCtx));
@@ -260,15 +260,11 @@ int ParseConfig (CReadConfig& cRdCfg, SWelsSvcCodingParam& pSvcParam, SFilesSet&
         if (strTag[0].empty())
           continue;
         if (strTag[0].compare ("SourceWidth") == 0) {
-          pDLayer->iFrameWidth	= atoi (strTag[1].c_str());
-          pDLayer->iActualWidth = pDLayer->iFrameWidth;
+			pDLayer->iVideoWidth	= atoi (strTag[1].c_str());
         } else if (strTag[0].compare ("SourceHeight") == 0) {
-          pDLayer->iFrameHeight	= atoi (strTag[1].c_str());
-          pDLayer->iActualHeight	= pDLayer->iFrameHeight;
-        } else if (strTag[0].compare ("FrameRateIn") == 0) {
-          pDLayer->fInputFrameRate	= (float)atof (strTag[1].c_str());
+          pDLayer->iVideoHeight	= atoi (strTag[1].c_str());
         } else if (strTag[0].compare ("FrameRateOut") == 0) {
-          pDLayer->fOutputFrameRate = (float)atof (strTag[1].c_str());
+          pDLayer->fFrameRate = (float)atof (strTag[1].c_str());
         } else if (strTag[0].compare ("InputFile") == 0) {
           if (strTag[1].length() > 0)
             sFileSet.sSpatialLayers[iLayer].strSeqFile	= strTag[1];
@@ -299,32 +295,32 @@ int ParseConfig (CReadConfig& cRdCfg, SWelsSvcCodingParam& pSvcParam, SFilesSet&
         } else if (strTag[0].compare ("InitialQP") == 0) {
           sLayerCtx.iDLayerQp	= atoi (strTag[1].c_str());
         } else if (strTag[0].compare ("SliceMode") == 0) {
-          sLayerCtx.sMso.uiSliceMode	= (SliceMode)atoi (strTag[1].c_str());
+          sLayerCtx.sSliceCfg.uiSliceMode	= (SliceMode)atoi (strTag[1].c_str());
         } else if (strTag[0].compare ("SliceSize") == 0) { //SM_DYN_SLICE
-          sLayerCtx.sMso.sSliceArgument.uiSliceSizeConstraint	= (SliceMode)atoi (strTag[1].c_str());
+          sLayerCtx.sSliceCfg.sSliceArgument.uiSliceSizeConstraint	= (SliceMode)atoi (strTag[1].c_str());
           continue;
         } else if (strTag[0].compare ("SliceNum") == 0) {
-          sLayerCtx.sMso.sSliceArgument.iSliceNum = atoi (strTag[1].c_str());
+          sLayerCtx.sSliceCfg.sSliceArgument.uiSliceNum = atoi (strTag[1].c_str());
         } else if (strTag[0].compare (0, kiSize, str_) == 0) {
           const char* kpString = strTag[0].c_str();
           int uiSliceIdx = atoi (&kpString[kiSize]);
           assert (uiSliceIdx < MAX_SLICES_NUM);
-          sLayerCtx.sMso.sSliceArgument.uiSliceMbNum[uiSliceIdx] = atoi (strTag[1].c_str());
+          sLayerCtx.sSliceCfg.sSliceArgument.uiSliceMbNum[uiSliceIdx] = atoi (strTag[1].c_str());
         }
       }
     }
     pDLayer->iDLayerQp	= sLayerCtx.iDLayerQp;
-    pDLayer->sMso.uiSliceMode		= sLayerCtx.sMso.uiSliceMode;
+    pDLayer->sSliceCfg.uiSliceMode		= sLayerCtx.sSliceCfg.uiSliceMode;
 
-    memcpy (&pDLayer->sMso, &sLayerCtx.sMso, sizeof (SMulSliceOption));	// confirmed_safe_unsafe_usage
-    memcpy (&pDLayer->sMso.sSliceArgument.uiSliceMbNum[0], &sLayerCtx.sMso.sSliceArgument.uiSliceMbNum[0],
-            sizeof (sLayerCtx.sMso.sSliceArgument.uiSliceMbNum));	// confirmed_safe_unsafe_usage
+    memcpy (&pDLayer->sSliceCfg, &sLayerCtx.sSliceCfg, sizeof (SSliceConfig));	// confirmed_safe_unsafe_usage
+    memcpy (&pDLayer->sSliceCfg.sSliceArgument.uiSliceMbNum[0], &sLayerCtx.sSliceCfg.sSliceArgument.uiSliceMbNum[0],
+            sizeof (sLayerCtx.sSliceCfg.sSliceArgument.uiSliceMbNum));	// confirmed_safe_unsafe_usage
   }
 
   return iRet;
 }
 
-int ParseCommandLine (int argc, char** argv, SVCEncodingParam& sParam) {
+int ParseCommandLine (int argc, char** argv, SEncParamExt& sParam) {
   char* pCmd;
   int i = 0;
 
@@ -338,7 +334,7 @@ int ParseCommandLine (int argc, char** argv, SVCEncodingParam& sParam) {
       sParam.iTemporalLayerNum = atoi (argv[i++]);
 
     else if (!strcmp (pCmd, "-iper") && (i < argc))
-      sParam.iIntraPeriod = atoi (argv[i++]);
+      sParam.uiIntraPeriod = atoi (argv[i++]);
 
     else if (!strcmp (pCmd, "-spsid") && (i < argc))
       sParam.bEnableSpsPpsIdAddition = atoi (argv[i++]) ? true : false;
@@ -418,7 +414,7 @@ void PrintHelp() {
   printf ("\n");
 }
 
-int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFilesSet& sFileSet) {
+int ParseCommandLine (int argc, char** argv, SEncParamExt& pSvcParam, SFilesSet& sFileSet) {
   char* pCommand = NULL;
   SLayerPEncCtx sLayerCtx[3];
   int n = 0;
@@ -462,7 +458,7 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
       pSvcParam.bEnableLongTermReference = atoi (argv[n++]) ? true : false;
 
     else if (!strcmp (pCommand, "-ltrper") && (n < argc))
-      pSvcParam.uiLtrMarkPeriod = atoi (argv[n++]);
+      pSvcParam.iLtrMarkPeriod = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-rc") && (n < argc))
       pSvcParam.bEnableRc = atoi (argv[n++]) ? true : false;
@@ -471,19 +467,19 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
       pSvcParam.iTargetBitrate = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-numl") && (n < argc)) {
-      pSvcParam.iNumDependencyLayer = atoi (argv[n++]);
-      for (int ln = 0 ; (ln < pSvcParam.iNumDependencyLayer) && (n < argc) ; ln++) {
+      pSvcParam.iSpatialLayerNum = atoi (argv[n++]);
+      for (int ln = 0 ; (ln < pSvcParam.iSpatialLayerNum) && (n < argc) ; ln++) {
 //				pSvcParam.sDependencyLayers[ln].uiDependencyId = ln;
         sFileSet.sSpatialLayers[ln].strLayerCfgFile.assign (argv[n++]);
       }
 
-      for (int8_t iLayer = 0; iLayer < pSvcParam.iNumDependencyLayer; ++ iLayer) {
+      for (int8_t iLayer = 0; iLayer < pSvcParam.iSpatialLayerNum; ++ iLayer) {
         SLayerPEncCtx sLayerCtx;
         string strTag[4];
         int32_t iLayerArg = -2;
         int32_t iNumQualityBitrateLayerSet = 0;
 
-        SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
+        SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
         CReadConfig cRdLayerCfg (sFileSet.sSpatialLayers[iLayer].strLayerCfgFile);
 
         memset (&sLayerCtx, 0, sizeof (SLayerPEncCtx));
@@ -500,15 +496,11 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
             if (strTag[0].empty())
               continue;
             if (strTag[0].compare ("SourceWidth") == 0) {
-              pDLayer->iFrameWidth	= atoi (strTag[1].c_str());
-              pDLayer->iActualWidth = pDLayer->iFrameWidth;
+				pDLayer->iVideoWidth	= atoi (strTag[1].c_str());
             } else if (strTag[0].compare ("SourceHeight") == 0) {
-              pDLayer->iFrameHeight	= atoi (strTag[1].c_str());
-              pDLayer->iActualHeight	= pDLayer->iFrameHeight;
-            } else if (strTag[0].compare ("FrameRateIn") == 0) {
-              pDLayer->fInputFrameRate	= (float)atof (strTag[1].c_str());
+				pDLayer->iVideoHeight	= atoi (strTag[1].c_str());
             } else if (strTag[0].compare ("FrameRateOut") == 0) {
-              pDLayer->fOutputFrameRate = (float)atof (strTag[1].c_str());
+				pDLayer->fFrameRate = (float)atof (strTag[1].c_str());
             } else if (strTag[0].compare ("InputFile") == 0) {
               if (strTag[1].length() > 0)
                 sFileSet.sSpatialLayers[iLayer].strSeqFile = strTag[1];
@@ -529,24 +521,24 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
             } else if (strTag[0].compare ("InitialQP") == 0) {
               sLayerCtx.iDLayerQp	= atoi (strTag[1].c_str());
             } else if (strTag[0].compare ("SliceMode") == 0) {
-              sLayerCtx.sMso.uiSliceMode	= (SliceMode)atoi (strTag[1].c_str());
+              sLayerCtx.sSliceCfg.uiSliceMode	= (SliceMode)atoi (strTag[1].c_str());
             } else if (strTag[0].compare ("SliceSize") == 0) { //SM_DYN_SLICE
-              sLayerCtx.sMso.sSliceArgument.uiSliceSizeConstraint	= (SliceMode)atoi (strTag[1].c_str());
+              sLayerCtx.sSliceCfg.sSliceArgument.uiSliceSizeConstraint	= (SliceMode)atoi (strTag[1].c_str());
             } else if (strTag[0].compare ("SliceNum") == 0) {
-              sLayerCtx.sMso.sSliceArgument.iSliceNum = atoi (strTag[1].c_str());
+              sLayerCtx.sSliceCfg.sSliceArgument.uiSliceNum = atoi (strTag[1].c_str());
             } else if (strTag[0].compare (0, kiSize, str_) == 0) {
               const char* kpString = strTag[0].c_str();
               int uiSliceIdx = atoi (&kpString[kiSize]);
               assert (uiSliceIdx < MAX_SLICES_NUM);
-              sLayerCtx.sMso.sSliceArgument.uiSliceMbNum[uiSliceIdx] = atoi (strTag[1].c_str());
+              sLayerCtx.sSliceCfg.sSliceArgument.uiSliceMbNum[uiSliceIdx] = atoi (strTag[1].c_str());
             }
           }
         }
         pDLayer->iDLayerQp		= sLayerCtx.iDLayerQp;
-        pDLayer->sMso.uiSliceMode		= sLayerCtx.sMso.uiSliceMode;
-        memcpy (&pDLayer->sMso, &sLayerCtx.sMso, sizeof (SMulSliceOption));	// confirmed_safe_unsafe_usage
-        memcpy (&pDLayer->sMso.sSliceArgument.uiSliceMbNum[0], &sLayerCtx.sMso.sSliceArgument.uiSliceMbNum[0],
-                sizeof (sLayerCtx.sMso.sSliceArgument.uiSliceMbNum));	// confirmed_safe_unsafe_usage
+        pDLayer->sSliceCfg.uiSliceMode		= sLayerCtx.sSliceCfg.uiSliceMode;
+        memcpy (&pDLayer->sSliceCfg, &sLayerCtx.sSliceCfg, sizeof (SSliceConfig));	// confirmed_safe_unsafe_usage
+        memcpy (&pDLayer->sSliceCfg.sSliceArgument.uiSliceMbNum[0], &sLayerCtx.sSliceCfg.sSliceArgument.uiSliceMbNum[0],
+                sizeof (sLayerCtx.sSliceCfg.sSliceArgument.uiSliceMbNum));	// confirmed_safe_unsafe_usage
 
       }
     }
@@ -569,79 +561,71 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
 
     else if (!strcmp (pCommand, "-sw") && (n + 1 < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
-      SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
-      pDLayer->iFrameWidth =  atoi (argv[n++]);
-      pDLayer->iActualWidth = pDLayer->iFrameWidth;
+      SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
+	  pDLayer->iVideoWidth =  atoi (argv[n++]);
     }
 
     else if (!strcmp (pCommand, "-sh") && (n + 1 < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
-      SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
-      pDLayer->iFrameHeight =  atoi (argv[n++]);
-      pDLayer->iActualHeight = pDLayer->iFrameHeight;
+      SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
+      pDLayer->iVideoHeight =  atoi (argv[n++]);
     }
 
-    else if (!strcmp (pCommand, "-frin") && (n + 1 < argc)) {
+     else if (!strcmp (pCommand, "-frout") && (n + 1 < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
-      SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
-      pDLayer->fInputFrameRate = (float)atof (argv[n++]);
-    }
-
-    else if (!strcmp (pCommand, "-frout") && (n + 1 < argc)) {
-      unsigned int	iLayer = atoi (argv[n++]);
-      SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
-      pDLayer->fOutputFrameRate = (float)atof (argv[n++]);
+      SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
+	  pDLayer->fFrameRate = (float)atof (argv[n++]);
     }
 
     else if (!strcmp (pCommand, "-lqp") && (n + 1 < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
-      SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
+      SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
       pDLayer->iDLayerQp = sLayerCtx[iLayer].iDLayerQp =  atoi (argv[n++]);
     }
     //sLayerCtx[iLayer].num_quality_layers = pDLayer->num_quality_layers = 1;
 
     else if (!strcmp (pCommand, "-ltarb") && (n + 1 < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
-      SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
+      SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
       pDLayer->iSpatialBitrate	= 1000 * atoi (argv[n++]);
     }
 
     else if (!strcmp (pCommand, "-slcmd") && (n + 1 < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
-      SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
+      SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
 
       switch (atoi (argv[n++])) {
       case 0:
-        pDLayer->sMso.uiSliceMode = SM_SINGLE_SLICE;
+        pDLayer->sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
         break;
       case 1:
-        pDLayer->sMso.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+        pDLayer->sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
         break;
       case 2:
-        pDLayer->sMso.uiSliceMode = SM_RASTER_SLICE;
+        pDLayer->sSliceCfg.uiSliceMode = SM_RASTER_SLICE;
         break;
       case 3:
-        pDLayer->sMso.uiSliceMode = SM_ROWMB_SLICE;
+        pDLayer->sSliceCfg.uiSliceMode = SM_ROWMB_SLICE;
         break;
       case 4:
-        pDLayer->sMso.uiSliceMode = SM_DYN_SLICE;
+        pDLayer->sSliceCfg.uiSliceMode = SM_DYN_SLICE;
         break;
       default:
-        pDLayer->sMso.uiSliceMode = SM_RESERVED;
+        pDLayer->sSliceCfg.uiSliceMode = SM_RESERVED;
         break;
       }
     }
 
     else if (!strcmp (pCommand, "-slcsize") && (n + 1 < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
-      SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
-      pDLayer->sMso.sSliceArgument.uiSliceSizeConstraint = atoi (argv[n++]);
+      SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
+      pDLayer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint = atoi (argv[n++]);
     }
 
     else if (!strcmp (pCommand, "-slcnum") && (n + 1 < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
-      SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
-      pDLayer->sMso.sSliceArgument.iSliceNum = atoi (argv[n++]);
+      SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
+      pDLayer->sSliceCfg.sSliceArgument.uiSliceNum = atoi (argv[n++]);
     }
   }
   return 0;
@@ -649,9 +633,9 @@ int ParseCommandLine (int argc, char** argv, SWelsSvcCodingParam& pSvcParam, SFi
 
 
 
-int FillSpecificParameters (SVCEncodingParam& sParam) {
+int FillSpecificParameters (SEncParamExt& sParam) {
   /* Test for temporal, spatial, SNR scalability */
-  sParam.fFrameRate	= 30.0f;		// input frame rate
+  sParam.fMaxFrameRate	= 30.0f;		// input frame rate
   sParam.iPicWidth		= 1280;			// width of picture in samples
   sParam.iPicHeight	= 720;			// height of picture in samples
   sParam.iTargetBitrate = 2500000;		// target bitrate desired
@@ -666,8 +650,7 @@ int FillSpecificParameters (SVCEncodingParam& sParam) {
   sParam.iLtrMarkPeriod = 30;
 
   sParam.iInputCsp			= videoFormatI420;			// color space of input sequence
-  sParam.iKeyPicCodingMode = 1; // mode of key picture coding
-  sParam.iIntraPeriod		= 320;		// period of Intra frame
+  sParam.uiIntraPeriod		= 320;		// period of Intra frame
   sParam.bEnableSpsPpsIdAddition = 1;
   sParam.bPrefixNalAddingCtrl = 1;
 
@@ -679,7 +662,6 @@ int FillSpecificParameters (SVCEncodingParam& sParam) {
   sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 64000;
   sParam.sSpatialLayers[iIndexLayer].iCgsSnrRefined		= 0;
 //	sParam.sSpatialLayers[iIndexLayer].iQualityBitrate[0]	= 0;
-//	memset(sParam.iTemporalBitrate, 0, sizeof(sParam.iTemporalBitrate));
   sParam.sSpatialLayers[iIndexLayer].iInterSpatialLayerPredFlag	= 0;
 #ifdef MT_ENABLED
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = 0;
@@ -737,7 +719,7 @@ int FillSpecificParameters (SVCEncodingParam& sParam) {
     if (sParam.sSpatialLayers[i].fFrameRate > fMaxFr + EPSN)
       fMaxFr = sParam.sSpatialLayers[i].fFrameRate;
   }
-  sParam.fFrameRate = fMaxFr;
+  sParam.fMaxFrameRate = fMaxFr;
 
   return 0;
 }
@@ -753,7 +735,7 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   FILE* pFpBs = NULL;
   FILE* pFpSrc = NULL;
   SFrameBSInfo sFbi;
-  SVCEncodingParam sSvcParam;
+  SEncParamExt sSvcParam;
   int64_t iStart = 0, iTotal = 0;
   int32_t ret = 0;
 
@@ -777,7 +759,7 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   }
 
   memset (&sFbi, 0, sizeof (SFrameBSInfo));
-  memset (&sSvcParam, 0, sizeof (SVCEncodingParam));
+  memset (&sSvcParam, 0, sizeof (SEncParamBase));
 
   FillSpecificParameters (sSvcParam);
 
@@ -898,7 +880,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     return 1;
 
   SFrameBSInfo sFbi;
-  SWelsSvcCodingParam sSvcParam;
+  SEncParamExt sSvcParam;
   int64_t iStart = 0, iTotal = 0;
 
   // Preparing encoding process
@@ -929,7 +911,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   memset (&sSvcParam, 0, sizeof (SWelsSvcCodingParam));
 
   sSvcParam.iInputCsp	= videoFormatI420;	// I420 in default
-  sSvcParam.sDependencyLayers[0].uiProfileIdc	= PRO_BASELINE;
+  sSvcParam.sSpatialLayers[0].uiProfileIdc	= PRO_BASELINE;
 //	svc_cfg->sDependencyLayers[0].frext_mode	= 0;
 
   // for configuration file
@@ -955,21 +937,13 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   }
 
   iTotalFrameMax = (int32_t)sSvcParam.uiFrameToBeCoded;
-  sSvcParam.SUsedPicRect.iLeft = 0;
-  sSvcParam.SUsedPicRect.iTop = 0;
-//	sSvcParam.max_pic_width	=
-  sSvcParam.iActualPicWidth =
-    sSvcParam.SUsedPicRect.iWidth = sSvcParam.sDependencyLayers[sSvcParam.iNumDependencyLayer - 1].iFrameWidth;
-//	pSvcParam.max_pic_height	=
-  sSvcParam.iActualPicHeight =
-    sSvcParam.SUsedPicRect.iHeight = sSvcParam.sDependencyLayers[sSvcParam.iNumDependencyLayer - 1].iFrameHeight;
+  
+ 
+  sSvcParam.iPicWidth = sSvcParam.sSpatialLayers[sSvcParam.iSpatialLayerNum - 1].iVideoWidth;
+  sSvcParam.iPicHeight = sSvcParam.sSpatialLayers[sSvcParam.iSpatialLayerNum - 1].iVideoHeight;
 
-  sSvcParam.sDependencyLayers[sSvcParam.iNumDependencyLayer - 1].iFrameWidth =
-    WELS_ALIGN(sSvcParam.sDependencyLayers[sSvcParam.iNumDependencyLayer - 1].iActualWidth, MB_WIDTH_LUMA);
-  sSvcParam.sDependencyLayers[sSvcParam.iNumDependencyLayer - 1].iFrameHeight =
-    WELS_ALIGN(sSvcParam.sDependencyLayers[sSvcParam.iNumDependencyLayer - 1].iActualHeight, MB_HEIGHT_LUMA);
 
-  if (cmResultSuccess != pPtrEnc->Initialize2 ((void*)&sSvcParam, INIT_TYPE_CONFIG_BASED)) {	// SVC encoder initialization
+  if (cmResultSuccess != pPtrEnc->Initialize ((void*)&sSvcParam, INIT_TYPE_PARAMETER_EXT)) {	// SVC encoder initialization
     fprintf (stderr, "SVC encoder Initialize failed\n");
     iRet = 1;
     goto INSIDE_MEM_FREE;
@@ -995,10 +969,10 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   }
 #endif
 
-  pSrcPicList = new SSourcePicture * [sSvcParam.iNumDependencyLayer];
-  while (iDlayerIdx < sSvcParam.iNumDependencyLayer) {
-    SDLayerParam* pDLayer = &sSvcParam.sDependencyLayers[iDlayerIdx];
-    const int kiPicResSize = pDLayer->iActualWidth * pDLayer->iActualHeight;
+  pSrcPicList = new SSourcePicture * [sSvcParam.iSpatialLayerNum];
+  while (iDlayerIdx < sSvcParam.iSpatialLayerNum) {
+    SSpatialLayerConfig* pDLayer = &sSvcParam.sSpatialLayers[iDlayerIdx];
+	const int kiPicResSize = pDLayer->iVideoWidth * pDLayer->iVideoHeight;
     SSourcePicture* pSrcPic = new SSourcePicture;
     if (pSrcPic == NULL) {
       iRet = 1;
@@ -1013,10 +987,10 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     }
 
     pSrcPic->iColorFormat = videoFormatI420;
-    pSrcPic->iPicWidth = pDLayer->iActualWidth;
-    pSrcPic->iPicHeight = pDLayer->iActualHeight;
-    pSrcPic->iStride[0] = pDLayer->iActualWidth;
-    pSrcPic->iStride[1] = pSrcPic->iStride[2] = pDLayer->iActualWidth >> 1;
+    pSrcPic->iPicWidth = pDLayer->iVideoWidth;
+    pSrcPic->iPicHeight = pDLayer->iVideoHeight;
+    pSrcPic->iStride[0] = pDLayer->iVideoWidth;
+    pSrcPic->iStride[1] = pSrcPic->iStride[2] = pDLayer->iVideoWidth >> 1;
 
     pSrcPicList[iDlayerIdx] = pSrcPic;
 
@@ -1052,10 +1026,10 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
 
     iDlayerIdx = 0;
     int  nSpatialLayerNum = 0;
-    while (iDlayerIdx < sSvcParam.iNumDependencyLayer) {
-      SDLayerParam* pDLayer = &sSvcParam.sDependencyLayers[iDlayerIdx];
-      const int kiPicResSize = ((pDLayer->iActualWidth * pDLayer->iActualHeight) * 3) >> 1;
-      uint32_t uiSkipIdx = (1 << pDLayer->iTemporalResolution);
+    while (iDlayerIdx < sSvcParam.iSpatialLayerNum) {
+      SSpatialLayerConfig* pDLayer = &sSvcParam.sSpatialLayers[iDlayerIdx];
+	  const int kiPicResSize = ((pDLayer->iVideoWidth * pDLayer->iVideoHeight) * 3) >> 1;
+      uint32_t uiSkipIdx = 1;//(1 << pDLayer->iTemporalResolution);
 
       bool_t bCanBeRead = false;
 
@@ -1067,15 +1041,15 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
 
           pSrcPicList[nSpatialLayerNum]->pData[0] = pYUV[iDlayerIdx];
           pSrcPicList[nSpatialLayerNum]->pData[1] = pSrcPicList[nSpatialLayerNum]->pData[0] +
-              (pDLayer->iActualWidth * pDLayer->iActualHeight);
+              (pDLayer->iVideoWidth * pDLayer->iVideoHeight);
           pSrcPicList[nSpatialLayerNum]->pData[2] = pSrcPicList[nSpatialLayerNum]->pData[1] +
-              ((pDLayer->iActualWidth * pDLayer->iActualHeight) >> 2);
+              ((pDLayer->iVideoWidth * pDLayer->iVideoHeight) >> 2);
 
-          pSrcPicList[nSpatialLayerNum]->iPicWidth = pDLayer->iActualWidth;
-          pSrcPicList[nSpatialLayerNum]->iPicHeight = pDLayer->iActualHeight;
-          pSrcPicList[nSpatialLayerNum]->iStride[0] = pDLayer->iActualWidth;
+          pSrcPicList[nSpatialLayerNum]->iPicWidth = pDLayer->iVideoWidth;
+          pSrcPicList[nSpatialLayerNum]->iPicHeight = pDLayer->iVideoHeight;
+          pSrcPicList[nSpatialLayerNum]->iStride[0] = pDLayer->iVideoWidth;
           pSrcPicList[nSpatialLayerNum]->iStride[1] = pSrcPicList[nSpatialLayerNum]->iStride[2]
-              = pDLayer->iActualWidth >> 1;
+              = pDLayer->iVideoWidth >> 1;
 
           ++ nSpatialLayerNum;
         } else {	// file end while reading
@@ -1161,7 +1135,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   if (iActualFrameEncodedCount > 0) {
     double dElapsed = iTotal / 1e6;
     printf ("Width:		%d\nHeight:		%d\nFrames:		%d\nencode time:	%f sec\nFPS:		%f fps\n",
-            sSvcParam.iActualPicWidth, sSvcParam.iActualPicHeight,
+		sSvcParam.iPicWidth, sSvcParam.iPicHeight,
             iActualFrameEncodedCount, dElapsed, (iActualFrameEncodedCount * 1.0) / dElapsed);
   }
 
@@ -1186,7 +1160,7 @@ INSIDE_MEM_FREE: {
 #endif
     // Destruction memory introduced in this routine
     iDlayerIdx = 0;
-    while (iDlayerIdx < sSvcParam.iNumDependencyLayer) {
+    while (iDlayerIdx < sSvcParam.iSpatialLayerNum) {
       if (pFileYUV[iDlayerIdx] != NULL) {
         fclose (pFileYUV[iDlayerIdx]);
         pFileYUV[iDlayerIdx] = NULL;
@@ -1195,7 +1169,7 @@ INSIDE_MEM_FREE: {
     }
 
     if (pSrcPicList) {
-      for (int32_t i = 0; i < sSvcParam.iNumDependencyLayer; i++) {
+      for (int32_t i = 0; i < sSvcParam.iSpatialLayerNum; i++) {
         if (pSrcPicList[i]) {
           delete pSrcPicList[i];
           pSrcPicList[i] = NULL;

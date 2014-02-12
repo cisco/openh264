@@ -287,15 +287,15 @@ EFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum) {
 
   // perform scene change detection
   if ((!pSvcParam->bEnableSceneChangeDetect) || pEncCtx->pVaa->bIdrPeriodFlag ||
-      (kiSpatialNum < pSvcParam->iNumDependencyLayer)
+      (kiSpatialNum < pSvcParam->iSpatialLayerNum)
       || (pEncCtx->uiFrameIdxRc < (VGOP_SIZE << 1))) { // avoid too frequent I frame coding, rc control
     bSceneChangeFlag = false;
   } else {
     bSceneChangeFlag = pEncCtx->pVaa->bSceneChangeFlag;
   }
 
-  //scene_changed_flag: RC enable && iSpatialNum == pSvcParam->iNumDependencyLayer
-  //bIdrPeriodFlag: RC disable || iSpatialNum != pSvcParam->iNumDependencyLayer
+  //scene_changed_flag: RC enable && iSpatialNum == pSvcParam->iSpatialLayerNum
+  //bIdrPeriodFlag: RC disable || iSpatialNum != pSvcParam->iSpatialLayerNum
   //pEncCtx->bEncCurFrmAsIdrFlag: 1. first frame should be IDR; 2. idr pause; 3. idr request
   iFrameType = (pEncCtx->pVaa->bIdrPeriodFlag || bSceneChangeFlag
                 || pEncCtx->bEncCurFrmAsIdrFlag) ? WELS_FRAME_TYPE_IDR : WELS_FRAME_TYPE_P;
