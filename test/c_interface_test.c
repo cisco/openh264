@@ -1,4 +1,5 @@
 #include "codec_api.h"
+#include <stddef.h>
 
 // Cast to this function type to ignore other parameters.
 typedef int (*Func)(void*);
@@ -29,4 +30,21 @@ void CheckDecoderInterface(ISVCDecoder* p, CheckFunc check) {
   CHECK(5, p, DecodeFrameEx);
   CHECK(6, p, SetOption);
   CHECK(7, p, GetOption);
+}
+
+struct bool_test_struct {
+  char c;
+  bool b;
+};
+
+size_t GetBoolSize(void) {
+  return sizeof(bool);
+}
+
+size_t GetBoolOffset(void) {
+  return offsetof(struct bool_test_struct, b);
+}
+
+size_t GetBoolStructSize(void) {
+  return sizeof(struct bool_test_struct);
 }
