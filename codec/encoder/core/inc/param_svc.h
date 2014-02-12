@@ -212,8 +212,9 @@ void FillDefault (const bool_t kbEnableRc) {
    sDependencyLayers[0].sSliceCfg.sSliceArgument.uiSliceSizeConstraint    = 1500;
    sDependencyLayers[0].sSliceCfg.sSliceArgument.uiSliceNum      = 1;
 
-    const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
-    memset (sDependencyLayers[0].sSliceCfg.sSliceArgument.uiSliceMbNum, 960,kiLesserSliceNum * sizeof (uint32_t)) ;
+   const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
+   for(int32_t idx = 0;idx <kiLesserSliceNum;idx++)
+		sDependencyLayers[0].sSliceCfg.sSliceArgument.uiSliceMbNum[idx] = 960;
     sDependencyLayers[0].iDLayerQp = SVC_QUALITY_BASE_QP;
 
 
