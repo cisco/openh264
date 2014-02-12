@@ -34,7 +34,11 @@
 #define WELS_VIDEO_CODEC_SVC_API_H__
 
 #ifndef __cplusplus
+#ifdef _MSC_VER
+typedef unsigned char bool;
+#else
 #include <stdbool.h>
+#endif
 #endif
 
 #include "codec_app_def.h"
