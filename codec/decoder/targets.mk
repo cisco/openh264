@@ -24,6 +24,7 @@ DECODER_CPP_SRCS=\
 	$(DECODER_SRCDIR)/plus/src/welsDecoderExt.cpp\
 
 DECODER_OBJS += $(DECODER_CPP_SRCS:.cpp=.o)
+
 ifeq ($(USE_ASM), Yes)
 DECODER_ASM_SRCS=\
 	$(DECODER_SRCDIR)/core/asm/block_add.asm\
