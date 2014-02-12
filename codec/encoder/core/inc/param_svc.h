@@ -114,12 +114,6 @@ SDLayerParam	sDependencyLayers[MAX_DEPENDENCY_LAYER];
 
 /* General */
 uint32_t	uiGopSize;			// GOP size (at maximal frame rate: 16)
-//uint32_t	uiIntraPeriod;		// intra period (multiple of GOP size as desired)
-//int32_t		iNumRefFrame;		// number of reference frame used
-
-//int32_t     iActualPicWidth;    //   actual input picture width
-//int32_t     iActualPicHeight;   //   actual input picture height
-
 struct {
   int32_t iLeft;
   int32_t iTop;
@@ -129,61 +123,13 @@ struct {
 
 str_t*       pCurPath; // record current lib path such as:/pData/pData/com.wels.enc/lib/
 
-//float		fMaxFrameRate;		// maximal frame rate [Hz / fps]
-//int32_t		iInputCsp;			// color space of input sequence
-//uint32_t	uiFrameToBeCoded;	// frame to be encoded (at input frame rate)
-
-//int32_t		iTargetBitrate;			// overall target bitrate introduced in RC module
-//int16_t		iMultipleThreadIdc;		// 1	# 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
-//int16_t		iCountThreadsNum;			//		# derived from disable_multiple_slice_idc (=0 or >1) means;
-
-//int32_t		iLTRRefNum;
-//uint32_t    iLtrMarkPeriod;	//the min distance of two int32_t references
-
 bool_t		bDeblockingParallelFlag;	// deblocking filter parallelization control flag
 bool_t		bMgsT0OnlyStrategy; //MGS_T0_only_strategy
-//bool_t		bEnableSSEI;
-//bool_t		bEnableFrameCroppingFlag;	// enable frame cropping flag: TRUE alwayse in application
 
-//bool_t		bEnableCropPic;			// enable cropping source picture. , 8/25/2010
 // FALSE: Streaming Video Sharing; TRUE: Video Conferencing Meeting;
 int8_t		iDecompStages;		// GOP size dependency
-
-/* Deblocking loop filter */
-//int8_t		iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries
-//int8_t		iLoopFilterAlphaC0Offset;// AlphaOffset: valid range [-6, 6], default 0
-
-//int8_t		iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0
-//int8_t		iInterLayerLoopFilterDisableIdc; // Employed based upon inter-layer, same comment as above
-//int8_t		iInterLayerLoopFilterAlphaC0Offset;	// InterLayerLoopFilterAlphaC0Offset
-//int8_t		iInterLayerLoopFilterBetaOffset;	// InterLayerLoopFilterBetaOffset
-
 /* Rate Control */
 bool_t		bEnableRc;
-//int8_t		iRCMode;
-//int8_t		iPaddingFlag;
-/* denoise control */
-//bool_t      bEnableDenoise;
-
-/* scene change detection control */
-//bool_t      bEnableSceneChangeDetect;
-// background detection control
-//bool_t		bEnableBackgroundDetection;
-/* adaptive quantization control */
-//bool_t		bEnableAdaptiveQuant;
-/* frame skipping */
-//bool_t		bEnableFrameSkip;
-/* long term reference control */
-//bool_t      bEnableLongTermReference;
-
-/* pSps pPps id addition control */
-//bool_t      bEnableSpsPpsIdAddition;
-/* Layer definition */
-//bool_t		bPrefixNalAddingCtrl;
-//int8_t		iSpatialLayerNum;	// number of dependency(Spatial/CGS) layers used to be encoded
-//int8_t		iTemporalLayerNum;		// number of temporal layer specified
-
-
 
  public:
 TagWelsSvcCodingParam (const bool_t kbEnableRc = true) {
