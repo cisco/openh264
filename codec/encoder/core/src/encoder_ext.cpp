@@ -573,8 +573,8 @@ static inline int32_t AcquireLayersNals (sWelsEncCtx** ppCtx, SWelsSvcCodingPara
 /*!
  * \brief	alloc spatial layers pictures (I420 based source pictures)
  */
-int32_t AllocSpatialPictures (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pParam) {
-  CMemoryAlign* pMa						= (*ppCtx)->pMemAlign;
+int32_t AllocSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCodingParam* pParam) {
+  CMemoryAlign* pMa						= pCtx->pMemAlign;
   const int32_t kiDlayerCount					= pParam->iNumDependencyLayer;
   int32_t iDlayerIndex							= 0;
 
@@ -589,13 +589,13 @@ int32_t AllocSpatialPictures (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pParam) 
 
     do {
       SPicture* pPic = AllocPicture (pMa, kiPicWidth, kiPicHeight, false);
-      WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pPic), FreeMemorySvc (ppCtx); *ppCtx = NULL)
-      (*ppCtx)->pSpatialPic[iDlayerIndex][i] = pPic;
+      WELS_VERIFY_RETURN_IF(1, (NULL == pPic))
+      pCtx->pSpatialPic[iDlayerIndex][i] = pPic;
       ++ i;
     } while (i < kuiRefNumInTemporal);
 
-    (*ppCtx)->uiSpatialLayersInTemporal[iDlayerIndex] = kuiLayerInTemporal;
-    (*ppCtx)->uiSpatialPicNum[iDlayerIndex] = kuiRefNumInTemporal;
+    pCtx->uiSpatialLayersInTemporal[iDlayerIndex] = kuiLayerInTemporal;
+    pCtx->uiSpatialPicNum[iDlayerIndex] = kuiRefNumInTemporal;
     ++ iDlayerIndex;
   } while (iDlayerIndex < kiDlayerCount);
 
@@ -847,7 +847,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
   }
 
   // for I420 based source spatial pictures
-  if (AllocSpatialPictures (ppCtx, pParam)) {
+  if (AllocSpatialPictures (*ppCtx, pParam)) {
     FreeMemorySvc (ppCtx);
     return 1;
   }
