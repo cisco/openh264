@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "codec_api.h"
+#include <stddef.h>
 
 static void CheckFunctionOrder(int expect, int actual, const char* name) {
   EXPECT_EQ(expect, actual) << "Wrong function order: " << name;
@@ -8,6 +9,9 @@ static void CheckFunctionOrder(int expect, int actual, const char* name) {
 typedef void(*CheckFunc)(int, int, const char*);
 extern "C" void CheckEncoderInterface(ISVCEncoder* p, CheckFunc);
 extern "C" void CheckDecoderInterface(ISVCDecoder* p, CheckFunc);
+extern "C" size_t GetBoolSize(void);
+extern "C" size_t GetBoolOffset(void);
+extern "C" size_t GetBoolStructSize(void);
 
 // Store the 'this' pointer to verify 'this' is received as expected from C code.
 static void* gThis;
@@ -113,4 +117,15 @@ TEST(ISVCDecoderTest, CheckFunctionOrder) {
   gThis = p;
   CheckDecoderInterface(p, CheckFunctionOrder);
   delete p;
+}
+
+struct bool_test_struct {
+  char c;
+  bool b;
+};
+
+TEST(ISVCDecoderEncoderTest, CheckCAbi) {
+  EXPECT_EQ(sizeof(bool), GetBoolSize()) << "Wrong size of bool type";
+  EXPECT_EQ(offsetof(bool_test_struct, b), GetBoolOffset()) << "Wrong alignment of bool in a struct";
+  EXPECT_EQ(sizeof(bool_test_struct), GetBoolStructSize()) << "Wrong size of struct with a bool";
 }
