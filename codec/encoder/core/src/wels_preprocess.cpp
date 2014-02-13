@@ -954,27 +954,6 @@ void  WelsMoveMemory_c (uint8_t* pDstY, uint8_t* pDstU, uint8_t* pDstV,  int32_t
     pSrcV += iSrcStrideUV;
   }
 }
-//vp's padding
-void  VPpadding (uint8_t* pSrcPtr, int32_t iCurWidth, int32_t iTargetWidth, int32_t iCurHeight, int32_t iTargetHeight,
-                 int32_t iStride, uint8_t uiStuffValue) {
-  uint8_t* pTmp;
-  if (iTargetWidth > iCurWidth) {
-    pTmp = pSrcPtr + iCurWidth;
-    for (int32_t i = 0; i < iCurHeight; i++) {
-      WelsMemset (pTmp, uiStuffValue, iTargetWidth - iCurWidth);
-      pTmp += iStride;
-    }
-  }
-
-  if (iTargetHeight > iCurHeight) {
-    pTmp = pSrcPtr + iCurHeight * iStride;
-    for (int32_t i = iCurHeight; i < iTargetHeight; i++) {
-      WelsMemset (pTmp, uiStuffValue, iTargetWidth);
-      pTmp += iStride;
-    }
-  }
-}
-
 
 void  CWelsPreProcess::WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SPicture* pDstPic,
     const SSourcePicture* kpSrc,
@@ -1037,15 +1016,7 @@ void  CWelsPreProcess::WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SP
 
     //in VP Process
     if (kiTargetWidth > iSrcWidth || kiTargetHeight > iSrcHeight) {
-      const int32_t kiTargetWidthC  = (kiTargetWidth >> 1);
-      const int32_t kiTargetHeightC = (kiTargetHeight >> 1);
-      const int32_t kiSrcWidthC        = (iSrcWidth >> 1);
-      const int32_t kiSrcHeightC       = (iSrcHeight >> 1);
-
-      // padding pDstPic I420
-      VPpadding ((uint8_t*)pDstY, iSrcWidth, kiTargetWidth, iSrcHeight, kiTargetHeight, kiDstStrideY, 0);
-      VPpadding ((uint8_t*)pDstU, kiSrcWidthC, kiTargetWidthC, kiSrcHeightC, kiTargetHeightC, kiDstStrideUV, 0x80);
-      VPpadding ((uint8_t*)pDstV, kiSrcWidthC, kiTargetWidthC, kiSrcHeightC, kiTargetHeightC, kiDstStrideUV, 0x80);
+      Padding(pDstY, pDstU, pDstV, kiDstStrideY, kiDstStrideUV, iSrcWidth, kiTargetWidth, iSrcHeight, kiTargetHeight);
     }
   }
 
