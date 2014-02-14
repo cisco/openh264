@@ -44,7 +44,7 @@
 #include "mv_pred.h"
 
 namespace WelsDec {
-
+#define MAX_LEVEL_PREFIX 15
 void GetNeighborAvailMbType (PNeighAvail pNeighAvail, PDqLayer pCurLayer) {
   int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
   int32_t iCurXy, iTopXy, iLeftXy, iLeftTopXy, iRightTopXy;
@@ -93,7 +93,7 @@ void GetNeighborAvailMbType (PNeighAvail pNeighAvail, PDqLayer pCurLayer) {
   pNeighAvail->iRightTopType = (pNeighAvail->iRightTopAvail ? pCurLayer->pMbType[iRightTopXy] : 0);
 }
 void WelsFillCacheNonZeroCount (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
-                                  PDqLayer pCurLayer) { //no matter slice type, intra_pred_constrained_flag
+                                PDqLayer pCurLayer) { //no matter slice type, intra_pred_constrained_flag
   int32_t iCurXy  = pCurLayer->iMbXyIndex;
   int32_t iTopXy  = 0;
   int32_t iLeftXy = 0;
@@ -144,7 +144,7 @@ void WelsFillCacheNonZeroCount (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
   }
 }
 void WelsFillCacheConstrain1Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int8_t* pIntraPredMode,
-                                        PDqLayer pCurLayer) { //no matter slice type
+                                      PDqLayer pCurLayer) { //no matter slice type
   int32_t iCurXy  = pCurLayer->iMbXyIndex;
   int32_t iTopXy  = 0;
   int32_t iLeftXy = 0;
@@ -190,7 +190,7 @@ void WelsFillCacheConstrain1Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZero
 }
 
 void WelsFillCacheConstrain0Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int8_t* pIntraPredMode,
-                                        PDqLayer pCurLayer) { //no matter slice type
+                                      PDqLayer pCurLayer) { //no matter slice type
   int32_t iCurXy  = pCurLayer->iMbXyIndex;
   int32_t iTopXy  = 0;
   int32_t iLeftXy = 0;
@@ -236,7 +236,7 @@ void WelsFillCacheConstrain0Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZero
 }
 
 void WelsFillCacheInter (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
-                           int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30], PDqLayer pCurLayer) {
+                         int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30], PDqLayer pCurLayer) {
   int32_t iCurXy      = pCurLayer->iMbXyIndex;
   int32_t iTopXy      = 0;
   int32_t iLeftXy     = 0;
@@ -548,23 +548,23 @@ static int32_t CavlcGetLevelVal (int32_t iLevel[16], SReadBitsCache* pBitsCache,
   for (; i < uiTotalCoeff; i++) {
     if (pBitsCache->uiRemainBits <= 16)		SHIFT_BUFFER (pBitsCache);
     WELS_GET_PREFIX_BITS (pBitsCache->uiCache32Bit, iPrefixBits);
+    if (iPrefixBits > MAX_LEVEL_PREFIX + 1) //iPrefixBits includes leading "0"s and first "1", should +1
+      return -1;
     POP_BUFFER (pBitsCache, iPrefixBits);
     iUsedBits   += iPrefixBits;
     iLevelPrefix = iPrefixBits - 1;
 
-    iLevelCode = (WELS_MIN (15, iLevelPrefix)) << iSuffixLength; //differ
+    iLevelCode = iLevelPrefix << iSuffixLength; //differ
     iSuffixLengthSize = iSuffixLength;
 
     if (iLevelPrefix >= 14) {
       if (14 == iLevelPrefix && 0 == iSuffixLength)
         iSuffixLengthSize = 4;
-      else if (15 == iLevelPrefix)
+      else if (15 == iLevelPrefix) {
         iSuffixLengthSize = 12;
-      else if (iLevelPrefix > 15)
-        iLevelCode += (1 << (iLevelPrefix - 3)) - 4096;
-
-      if (iLevelPrefix >= 15 && iSuffixLength == 0)
-        iLevelCode += 15;
+        if (iSuffixLength == 0)
+          iLevelCode += 15;
+      }
     }
 
     if (iSuffixLengthSize > 0) {
