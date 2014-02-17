@@ -361,7 +361,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     const int kiSrcLen,
     void** ppDst,
     SBufferInfo* pDstInfo) {
-  if (kiSrcLen > MAX_ACCESS_UNIT_CAPACITY) {
+  if (kiSrcLen > MAX_ACCESS_UNIT_CAPACITY - MAX_MACROBLOCK_CAPACITY) {//prevent from residual reading overflow
     m_pDecContext->iErrorCode |= dsOutOfMemory;
     IWelsTrace::WelsVTrace (m_pTrace, IWelsTrace::WELS_LOG_INFO,
       "max AU size exceeded. Allowed size = %d, current size = %d",
