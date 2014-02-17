@@ -3695,21 +3695,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
     }
 
     if (iCurTid < pCtx->uiSpatialLayersInTemporal[d_idx] - 1 || pSvcParam->iDecompStages == 0) {
-      if ((iCurTid >= MAX_TEMPORAL_LEVEL) || (pCtx->uiSpatialLayersInTemporal[d_idx] - 1 > MAX_TEMPORAL_LEVEL)) {
-        ForceCodingIDR (pCtx);	// some logic error
+      if( pCtx->pVpp->UpdateSpatialPictures(pCtx, pSvcParam, iCurTid, d_idx) != 0 ){
+        ForceCodingIDR(pCtx);
         return -1;
-      }
-
-      if (pSvcParam->bEnableLongTermReference && pCtx->bLongTermRefFlag[d_idx][iCurTid]) {
-        SPicture* tmp	= pCtx->pSpatialPic[d_idx][pCtx->uiSpatialLayersInTemporal[d_idx] + pCtx->pVaa->uiMarkLongTermPicIdx];
-        pCtx->pSpatialPic[d_idx][pCtx->uiSpatialLayersInTemporal[d_idx] + pCtx->pVaa->uiMarkLongTermPicIdx] =
-          pCtx->pSpatialPic[d_idx][iCurTid];
-        pCtx->pSpatialPic[d_idx][iCurTid] = pCtx->pSpatialPic[d_idx][pCtx->uiSpatialLayersInTemporal[d_idx] - 1];
-        pCtx->pSpatialPic[d_idx][pCtx->uiSpatialLayersInTemporal[d_idx] - 1] = tmp;
-        pCtx->bLongTermRefFlag[d_idx][iCurTid] = false;
-      } else {
-        WelsExchangeSpatialPictures (&pCtx->pSpatialPic[d_idx][pCtx->uiSpatialLayersInTemporal[d_idx] - 1],
-                                     &pCtx->pSpatialPic[d_idx][iCurTid]);
       }
     }
 

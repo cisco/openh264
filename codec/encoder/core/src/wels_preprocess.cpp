@@ -398,6 +398,25 @@ int32_t CWelsPreProcess::WelsPreprocessStep3 (sWelsEncCtx* pCtx, const int32_t k
   return 0;
 }
 
+int32_t CWelsPreProcess::UpdateSpatialPictures(sWelsEncCtx* pCtx, SWelsSvcCodingParam* pParam, 
+    const int8_t iCurTid, const int32_t d_idx) {
+  if ((iCurTid >= MAX_TEMPORAL_LEVEL) || (pCtx->uiSpatialLayersInTemporal[d_idx] - 1 > MAX_TEMPORAL_LEVEL)) {
+    return 1;
+  }
+  if (pParam->bEnableLongTermReference && pCtx->bLongTermRefFlag[d_idx][iCurTid]) {
+    SPicture* tmp	= pCtx->pSpatialPic[d_idx][pCtx->uiSpatialLayersInTemporal[d_idx] + pCtx->pVaa->uiMarkLongTermPicIdx];
+    pCtx->pSpatialPic[d_idx][pCtx->uiSpatialLayersInTemporal[d_idx] + pCtx->pVaa->uiMarkLongTermPicIdx] =
+    pCtx->pSpatialPic[d_idx][iCurTid];
+    pCtx->pSpatialPic[d_idx][iCurTid] = pCtx->pSpatialPic[d_idx][pCtx->uiSpatialLayersInTemporal[d_idx] - 1];
+    pCtx->pSpatialPic[d_idx][pCtx->uiSpatialLayersInTemporal[d_idx] - 1] = tmp;
+    pCtx->bLongTermRefFlag[d_idx][iCurTid] = false;
+  } else {
+    WelsExchangeSpatialPictures (&pCtx->pSpatialPic[d_idx][pCtx->uiSpatialLayersInTemporal[d_idx] - 1],
+                                 &pCtx->pSpatialPic[d_idx][iCurTid]);
+  }
+  return 0;
+}
+
 
 /*
 *	SingleLayerPreprocess: down sampling if applicable
