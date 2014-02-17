@@ -570,57 +570,6 @@ static inline int32_t AcquireLayersNals (sWelsEncCtx** ppCtx, SWelsSvcCodingPara
   return 0;
 }
 
-/*!
- * \brief	alloc spatial layers pictures (I420 based source pictures)
- */
-int32_t AllocSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCodingParam* pParam) {
-  CMemoryAlign* pMa						= pCtx->pMemAlign;
-  const int32_t kiDlayerCount					= pParam->iNumDependencyLayer;
-  int32_t iDlayerIndex							= 0;
-
-  // spatial pictures
-  iDlayerIndex = 0;
-  do {
-    const int32_t kiPicWidth = pParam->sDependencyLayers[iDlayerIndex].iFrameWidth;
-    const int32_t kiPicHeight   = pParam->sDependencyLayers[iDlayerIndex].iFrameHeight;
-    const uint8_t kuiLayerInTemporal = 2 + WELS_MAX (pParam->sDependencyLayers[iDlayerIndex].iHighestTemporalId, 1);
-    const uint8_t kuiRefNumInTemporal = kuiLayerInTemporal + pParam->iLTRRefNum;
-    uint8_t i = 0;
-
-    do {
-      SPicture* pPic = AllocPicture (pMa, kiPicWidth, kiPicHeight, false);
-      WELS_VERIFY_RETURN_IF(1, (NULL == pPic))
-      pCtx->pSpatialPic[iDlayerIndex][i] = pPic;
-      ++ i;
-    } while (i < kuiRefNumInTemporal);
-
-    pCtx->uiSpatialLayersInTemporal[iDlayerIndex] = kuiLayerInTemporal;
-    pCtx->uiSpatialPicNum[iDlayerIndex] = kuiRefNumInTemporal;
-    ++ iDlayerIndex;
-  } while (iDlayerIndex < kiDlayerCount);
-
-  return 0;
-}
-
-void FreeSpatialPictures (sWelsEncCtx* pCtx) {
-  CMemoryAlign* pMa	= pCtx->pMemAlign;
-  int32_t j = 0;
-  while (j < pCtx->pSvcParam->iNumDependencyLayer) {
-    uint8_t i = 0;
-    uint8_t uiRefNumInTemporal = pCtx->uiSpatialPicNum[j];
-
-    while (i < uiRefNumInTemporal) {
-      if (NULL != pCtx->pSpatialPic[j][i]) {
-        FreePicture (pMa, &pCtx->pSpatialPic[j][i]);
-      }
-      ++ i;
-    }
-    pCtx->uiSpatialLayersInTemporal[j]	= 0;
-    ++ j;
-  }
-
-}
-
 static  void  InitMbInfo (sWelsEncCtx* pEnc, SMB*   pList, SDqLayer* pLayer, const int32_t kiDlayerId,
                           const int32_t kiMaxMbNum) {
   int32_t  iMbWidth		= pLayer->iMbWidth;
@@ -844,12 +793,6 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
     pRefList->pNextBuffer = pRefList->pRef[0];
     (*ppCtx)->ppRefPicListExt[iDlayerIndex]	= pRefList;
     ++ iDlayerIndex;
-  }
-
-  // for I420 based source spatial pictures
-  if (AllocSpatialPictures (*ppCtx, pParam)) {
-    FreeMemorySvc (ppCtx);
-    return 1;
   }
 
   iDlayerIndex	= 0;
@@ -1702,8 +1645,6 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
       pMa->WelsFree (pCtx->ppDqLayerList, "ppDqLayerList");
       pCtx->ppDqLayerList = NULL;
     }
-    FreeSpatialPictures (pCtx);
-
     // reference picture list extension
     if (NULL != pCtx->ppRefPicListExt && pParam != NULL) {
       ilayer = 0;
@@ -2125,8 +2066,14 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
 
   pCtx->pVpp = new CWelsPreProcess (pCtx);
   if (pCtx->pVpp == NULL) {
+    iRet = 1;
     WelsLog (pCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), pOut of memory in case new CWelsPreProcess().\n");
     FreeMemorySvc (&pCtx);
+    return iRet;
+  }
+  if( (iRet = pCtx->pVpp->AllocSpatialPictures(pCtx, pCtx->pSvcParam)) != 0 ){
+    WelsLog( pCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), pVPP alloc spatial pictures failed\n");
+    FreeMemorySvc(&pCtx);
     return iRet;
   }
 
@@ -2285,6 +2232,7 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
 #endif//MT_ENABLED
 
   if ((*ppCtx)->pVpp) {
+    (*ppCtx)->pVpp->FreeSpatialPictures(*ppCtx);
     delete (*ppCtx)->pVpp;
     (*ppCtx)->pVpp = NULL;
   }

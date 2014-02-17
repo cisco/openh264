@@ -108,6 +108,8 @@ class CWelsPreProcess {
 
  public:
   int32_t WelsPreprocessReset (sWelsEncCtx* pEncCtx);
+  int32_t AllocSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCodingParam* pParam);
+  void    FreeSpatialPictures (sWelsEncCtx* pCtx);
   int32_t WelsPreprocessStep1 (sWelsEncCtx* pEncCtx, const SSourcePicture** kppSrcPicList, const int32_t kiConfiguredLayerNum);
   int32_t WelsPreprocessStep3 (sWelsEncCtx* pEncCtx, const int32_t kiDIdx);
 
