@@ -3694,11 +3694,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
       pCtx->bLongTermRefFlag[d_idx][0] = true;
     }
 
-    if (iCurTid < pCtx->uiSpatialLayersInTemporal[d_idx] - 1 || pSvcParam->iDecompStages == 0) {
-      if( pCtx->pVpp->UpdateSpatialPictures(pCtx, pSvcParam, iCurTid, d_idx) != 0 ){
-        ForceCodingIDR(pCtx);
-        return -1;
-      }
+    if( pCtx->pVpp->UpdateSpatialPictures(pCtx, pSvcParam, iCurTid, d_idx) != 0 ){
+      ForceCodingIDR(pCtx);
+      return -1;
     }
 
     if (pSvcParam->bEnableLongTermReference && ((pCtx->pLtr[pCtx->uiDependencyId].bLTRMarkingFlag
