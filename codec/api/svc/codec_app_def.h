@@ -72,7 +72,8 @@ typedef enum {
 typedef enum {
   ENCODER_OPTION_DATAFORMAT = 0,
   ENCODER_OPTION_IDR_INTERVAL,
-  ENCODER_OPTION_SVC_ENCODE_PARAM,
+  ENCODER_OPTION_SVC_ENCODE_PARAM_BASE,
+  ENCODER_OPTION_SVC_ENCODE_PARAM_EXT,
   ENCODER_OPTION_FRAME_RATE,
   ENCODER_OPTION_BITRATE,
   ENCODER_OPTION_INTER_SPATIAL_PRED,
@@ -129,7 +130,7 @@ typedef enum {
 /* SVC Encoder/Decoder Initializing Parameter Types */
 typedef enum {
   INIT_TYPE_PARAMETER_BASED = 0,	// For SVC DEMO Application
-  INIT_TYPE_CONFIG_BASED,			// For SVC CONSOLE Application
+  INIT_TYPE_PARAMETER_EXT,			// For SVC CONSOLE Application
 } INIT_TYPE;
 
 //enumerate the type of video bitstream which is provided to decoder
@@ -162,6 +163,13 @@ typedef struct {
 } SLTRMarkingFeedback;
 
 typedef struct {
+    unsigned int
+    uiSliceMbNum[MAX_SLICES_NUM_TMP];  //here we use a tmp fixed value since MAX_SLICES_NUM is not defined here and its definition may be changed;
+    unsigned int		uiSliceNum;
+    unsigned int		uiSliceSizeConstraint;
+  } SSliceArgument;//not all the elements in this argument will be used, how it will be used depends on uiSliceMode; see below
+
+typedef struct {
 
   //# 0 SM_SINGLE_SLICE			| SliceNum==1
   //# 1 SM_FIXEDSLCNUM_SLICE	| according to SliceNum			| Enabled dynamic slicing for multi-thread
@@ -169,12 +177,7 @@ typedef struct {
   //# 3 SM_ROWMB_SLICE			| according to PictureMBHeight	|  Typical of single row of mbs each slice?+ slice size constraint which including re-encoding
   //# 4 SM_DYN_SLICE			| according to SliceSize		| Dynamic slicing (have no idea about slice_nums until encoding current frame)
   unsigned int uiSliceMode; //by default, uiSliceMode will be 0
-  struct {
-    unsigned int
-    uiSliceMbNum[MAX_SLICES_NUM_TMP];  //here we use a tmp fixed value since MAX_SLICES_NUM is not defined here and its definition may be changed;
-    unsigned int		uiSliceNum;
-    unsigned int		uiSliceSizeConstraint;
-  } sSliceArgument;//not all the elements in this argument will be used, how it will be used depends on uiSliceMode; see below
+  SSliceArgument sSliceArgument;
 } SSliceConfig;
 
 typedef struct {
@@ -186,42 +189,149 @@ typedef struct {
   int	iCgsSnrRefined;	// 0: SNR layers all MGS; 1: SNR layers all CGS
   int	iInterSpatialLayerPredFlag;	// 0: diabled [independency spatial layer coding]; 1: enabled [base spatial layer dependency coding]
 
-  int	iQualityBitrate[MAX_QUALITY_LAYER_NUM];	// target bitrate for a quality layer
+  unsigned int	uiProfileIdc;			// value of profile IDC (0 for auto-detection)
+  int    iDLayerQp;
+  int	 iQualityBitrate[MAX_QUALITY_LAYER_NUM];	// target bitrate for a quality layer
 
   SSliceConfig sSliceCfg;
 } SSpatialLayerConfig;
 
+#ifdef __cplusplus
 /* SVC Encoding Parameters */
-typedef struct {
+typedef struct TagEncParamBase{
+
+  int       iUsageType;	//enable_screen_content_signal;// 0: //camera video signal; 1: screen content signal;
+  int		iInputCsp;	// color space of input sequence
+
   int		iPicWidth;			// width of picture in samples
   int		iPicHeight;			// height of picture in samples
   int		iTargetBitrate;		// target bitrate desired
+  int       iRCMode;                 // RC mode
+  float	    fMaxFrameRate;			// input maximal frame rate
+
+} SEncParamBase, *PEncParamBase;
+
+
+typedef struct TagEncParamExt:SEncParamBase
+{
   int		iTemporalLayerNum;	// layer number at temporal level
   int		iSpatialLayerNum;	// layer number at spatial level
 
-  float	fFrameRate;			// input maximal frame rate
-
-  int		iInputCsp;			// color space of input sequence
-  int		iKeyPicCodingMode;// mode of key picture coding
-  int		iIntraPeriod;		// period of Intra frame
+  unsigned int		uiIntraPeriod;		// period of Intra frame
   bool    bEnableSpsPpsIdAddition;
   bool    bPrefixNalAddingCtrl;
-  bool   	bEnableDenoise;	    // denoise control
-  bool    bEnableBackgroundDetection; 	// background detection control //VAA_BACKGROUND_DETECTION //BGD cmd
+  bool    bEnableDenoise;	    // denoise control
+  bool    bEnableBackgroundDetection;// background detection control //VAA_BACKGROUND_DETECTION //BGD cmd
   bool    bEnableAdaptiveQuant; // adaptive quantization control
   bool    bEnableFrameSkip; // allow skipping frames to keep the bitrate within limits
   bool	bEnableCropPic;	// enable cropping source picture.  8/25/2010
   // false: Streaming Video Sharing; true: Video Conferencing Meeting;
-  bool     bEnableLongTermReference; // 0: on, 1: off
-  int     iLtrMarkPeriod;
 
-  int iRCMode;                 // RC mode
-  int	iTemporalBitrate[MAX_TEMPORAL_LAYER_NUM];	// target bitrate specified for a temporal level
-  int iPaddingFlag;            // 0:disable padding;1:padding
+  bool     bEnableLongTermReference; // 0: on, 1: off
+  int      iLtrMarkPeriod;
+  int   iPaddingFlag;            // 0:disable padding;1:padding
+  int   iEtropyCodingModeFlag;
 
   SSpatialLayerConfig sSpatialLayers[MAX_SPATIAL_LAYER_NUM];
+  int		    iNumRefFrame;		// number of reference frame used
+  unsigned int	uiFrameToBeCoded;	// frame to be encoded (at input frame rate)
+  unsigned int  uiGopSize;
+  bool   bEnableRc;
+  short		iMultipleThreadIdc;		// 1	# 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
+  short		iCountThreadsNum;			//		# derived from disable_multiple_slice_idc (=0 or >1) means;
 
-} SVCEncodingParam, *PSVCEncodingParam;
+  int		iLTRRefNum;
+  bool		bEnableSSEI;
+  bool		bEnableFrameCroppingFlag;// enable frame cropping flag: TRUE alwayse in application
+
+  /* Deblocking loop filter */
+  int		iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries
+  int		iLoopFilterAlphaC0Offset;// AlphaOffset: valid range [-6, 6], default 0
+
+  int		iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0
+  int		iInterLayerLoopFilterDisableIdc; // Employed based upon inter-layer, same comment as above
+  int		iInterLayerLoopFilterAlphaC0Offset;	// InterLayerLoopFilterAlphaC0Offset
+  int		iInterLayerLoopFilterBetaOffset;	// InterLayerLoopFilterBetaOffset
+  bool      bEnableSceneChangeDetect;
+
+  //added
+  int iMaxQp;
+  int iMinQp;
+
+}SEncParamExt;
+#else
+/* SVC Encoding Parameters */
+typedef struct TagEncParamBase{
+    
+    int       iUsageType;	//enable_screen_content_signal;// 0: //camera video signal; 1: screen content signal;
+    int		iInputCsp;	// color space of input sequence
+    
+    int		iPicWidth;			// width of picture in samples
+    int		iPicHeight;			// height of picture in samples
+    int		iTargetBitrate;		// target bitrate desired
+    int       iRCMode;                 // RC mode
+    float	    fMaxFrameRate;			// input maximal frame rate
+    
+} SEncParamBase, *PEncParamBase;
+
+typedef struct TagEncParamExt
+{
+    int       iUsageType;	//enable_screen_content_signal;// 0: //camera video signal; 1: screen content signal;
+    int		iInputCsp;	// color space of input sequence
+    
+    int		iPicWidth;			// width of picture in samples
+    int		iPicHeight;			// height of picture in samples
+    int		iTargetBitrate;		// target bitrate desired
+    int       iRCMode;                 // RC mode
+    float	    fMaxFrameRate;			// input maximal frame rate
+    
+    int		iTemporalLayerNum;	// layer number at temporal level
+    int		iSpatialLayerNum;	// layer number at spatial level
+    
+    unsigned int		uiIntraPeriod;		// period of Intra frame
+    bool    bEnableSpsPpsIdAddition;
+    bool    bPrefixNalAddingCtrl;
+    bool    bEnableDenoise;	    // denoise control
+    bool    bEnableBackgroundDetection;// background detection control //VAA_BACKGROUND_DETECTION //BGD cmd
+    bool    bEnableAdaptiveQuant; // adaptive quantization control
+    bool    bEnableFrameSkip; // allow skipping frames to keep the bitrate within limits
+    bool	bEnableCropPic;	// enable cropping source picture.  8/25/2010
+    // false: Streaming Video Sharing; true: Video Conferencing Meeting;
+    
+    bool     bEnableLongTermReference; // 0: on, 1: off
+    int      iLtrMarkPeriod;
+    int   iPaddingFlag;            // 0:disable padding;1:padding
+    int   iEtropyCodingModeFlag;
+    
+    SSpatialLayerConfig sSpatialLayers[MAX_SPATIAL_LAYER_NUM];
+    int		    iNumRefFrame;		// number of reference frame used
+    unsigned int	uiFrameToBeCoded;	// frame to be encoded (at input frame rate)
+    unsigned int  uiGopSize;
+    bool   bEnableRc;
+    short		iMultipleThreadIdc;		// 1	# 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
+    short		iCountThreadsNum;			//		# derived from disable_multiple_slice_idc (=0 or >1) means;
+    
+    int		iLTRRefNum;
+    bool		bEnableSSEI;
+    bool		bEnableFrameCroppingFlag;// enable frame cropping flag: TRUE alwayse in application
+    
+    /* Deblocking loop filter */
+    int		iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries
+    int		iLoopFilterAlphaC0Offset;// AlphaOffset: valid range [-6, 6], default 0
+    
+    int		iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0
+    int		iInterLayerLoopFilterDisableIdc; // Employed based upon inter-layer, same comment as above
+    int		iInterLayerLoopFilterAlphaC0Offset;	// InterLayerLoopFilterAlphaC0Offset
+    int		iInterLayerLoopFilterBetaOffset;	// InterLayerLoopFilterBetaOffset
+    bool      bEnableSceneChangeDetect;
+    
+    //added
+    int iMaxQp;
+    int iMinQp;
+    
+}SEncParamExt;
+
+#endif
 
 //Define a new struct to show the property of video bitstream.
 typedef struct {

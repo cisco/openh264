@@ -353,7 +353,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 
   pMa	= (*ppCtx)->pMemAlign;
   pPara = pCodingParam;
-  iNumSpatialLayers	= pPara->iNumDependencyLayer;
+  iNumSpatialLayers	= pPara->iSpatialLayerNum;
   iThreadNum	= pPara->iCountThreadsNum;
   iMaxSliceNum = (*ppCtx)->iMaxSliceCount;
 
@@ -399,8 +399,8 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 #if defined(DYNAMIC_SLICE_ASSIGN) || defined(MT_DEBUG)
   iIdx = 0;
   while (iIdx < iNumSpatialLayers) {
-    SMulSliceOption* pMso	= &pPara->sDependencyLayers[iIdx].sMso;
-    const int32_t kiSliceNum = pMso->sSliceArgument.iSliceNum;
+    SSliceConfig* pMso	= &pPara->sDependencyLayers[iIdx].sSliceCfg;
+    const int32_t kiSliceNum = pMso->sSliceArgument.uiSliceNum;
     if (pMso->uiSliceMode == SM_FIXEDSLCNUM_SLICE && pPara->iMultipleThreadIdc > 1
         && pPara->iMultipleThreadIdc >= kiSliceNum) {
       pSmt->pSliceConsumeTime[iIdx]	= (uint32_t*)pMa->WelsMallocz (kiSliceNum * sizeof (uint32_t), "pSliceConsumeTime[]");
@@ -638,7 +638,7 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
   }
 #if defined(DYNAMIC_SLICE_ASSIGN) || defined(MT_DEBUG)
   iIdx = 0;
-  while (iIdx < pCodingParam->iNumDependencyLayer) {
+  while (iIdx < pCodingParam->iSpatialLayerNum) {
     if (pSmt->pSliceConsumeTime[iIdx]) {
       pMa->WelsFree (pSmt->pSliceConsumeTime[iIdx], "pSliceConsumeTime[]");
       pSmt->pSliceConsumeTime[iIdx] = NULL;
@@ -688,7 +688,8 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
   SWelsSvcCodingParam* pCodingParam	= pCtx->pSvcParam;
   SDLayerParam* pDlp				= &pCodingParam->sDependencyLayers[pCtx->uiDependencyId];
   SWelsSliceBs* pSliceBs			= NULL;
-  const bool kbIsDynamicSlicingMode	= (pDlp->sMso.uiSliceMode == SM_DYN_SLICE);
+  const bool kbIsDynamicSlicingMode	= (pDlp->sSliceCfg.uiSliceMode == SM_DYN_SLICE);
+
   int32_t iLayerSize					= 0;
   int32_t iNalIdxBase				= pLbi->iNalCount;
   int32_t iSliceIdx					= 0;
@@ -944,7 +945,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
       eNalRefIdc		= pEncPEncCtx->eNalPriority;
       bNeedPrefix		= pEncPEncCtx->bNeedPrefixNalFlag;
 
-      if (pParamD->sMso.uiSliceMode != SM_DYN_SLICE) {
+      if (pParamD->sSliceCfg.uiSliceMode != SM_DYN_SLICE) {
         int64_t iSliceStart	= 0;
         bool bDsaFlag = false;
         iSliceIdx		= pPrivateData->iSliceIndex;
@@ -952,9 +953,9 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         pSliceBs		= &pEncPEncCtx->pSliceBs[iSliceIdx];
 
 #if defined(DYNAMIC_SLICE_ASSIGN) || defined(MT_DEBUG)
-        bDsaFlag	= (pParamD->sMso.uiSliceMode == SM_FIXEDSLCNUM_SLICE &&
+        bDsaFlag	= (pParamD->sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE &&
                      pCodingParam->iMultipleThreadIdc > 1 &&
-                     pCodingParam->iMultipleThreadIdc >= pParamD->sMso.sSliceArgument.iSliceNum);
+                     pCodingParam->iMultipleThreadIdc >= pParamD->sSliceCfg.sSliceArgument.uiSliceNum);
         if (bDsaFlag)
           iSliceStart = WelsTime();
 #endif//DYNAMIC_SLICE_ASSIGN || MT_DEBUG
@@ -1376,10 +1377,11 @@ int32_t AdjustEnhanceLayer (sWelsEncCtx* pCtx, int32_t iCurDid) {
   int32_t iNeedAdj = 1;
   // uiSliceMode of referencing spatial should be SM_FIXEDSLCNUM_SLICE
   // if using spatial base layer for complexity estimation
+
   const bool kbModelingFromSpatial =	(pCtx->pCurDqLayer->pRefLayer != NULL && iCurDid > 0)
-                                        && (pCtx->pSvcParam->sDependencyLayers[iCurDid - 1].sMso.uiSliceMode == SM_FIXEDSLCNUM_SLICE
+                                        && (pCtx->pSvcParam->sDependencyLayers[iCurDid - 1].sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE
                                             && pCtx->pSvcParam->iMultipleThreadIdc >= pCtx->pSvcParam->sDependencyLayers[iCurDid -
-                                                1].sMso.sSliceArgument.iSliceNum);
+                                                1].sSliceCfg.sSliceArgument.uiSliceNum);
 
   if (kbModelingFromSpatial) {	// using spatial base layer for complexity estimation
 #ifdef TRY_SLICING_BALANCE
@@ -1457,7 +1459,7 @@ void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t 
   while (iSpatialIdx < iSpatialNum) {
     const int32_t kiDid		= pDidList[iSpatialIdx];
     SDLayerParam* pDlp		= &pPara->sDependencyLayers[kiDid];
-    SMulSliceOption* pMso	= &pDlp->sMso;
+    SMulSliceOption* pMso	= &pDlp->sSliceCfg;
     SDqLayer* pCurDq		= pCtx->ppDqLayerList[kiDid];
     SSliceCtx* pSliceCtx = pCurDq->pSliceEncCtx;
     const uint32_t kuiCountSliceNum = pSliceCtx->iSliceNumInFrame;

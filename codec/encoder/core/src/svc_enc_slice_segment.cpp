@@ -66,7 +66,7 @@ int32_t AssignMbMapSingleSlice (void* pMbMap, const int32_t kiCountMbNum, const 
  *
  * \return	0 - successful; none 0 - failed
  */
-int32_t AssignMbMapMultipleSlices (SSliceCtx* pSliceSeg, const SMulSliceOption* kpMso) {
+int32_t AssignMbMapMultipleSlices (SSliceCtx* pSliceSeg, const SSliceConfig* kpMso) {
   if (NULL == pSliceSeg || SM_SINGLE_SLICE == pSliceSeg->uiSliceMode)
     return 1;
 
@@ -123,7 +123,7 @@ int32_t AssignMbMapMultipleSlices (SSliceCtx* pSliceSeg, const SMulSliceOption* 
 //slice parameter check for SM_FIXEDSLCNUM_SLICE
 bool CheckFixedSliceNumMultiSliceSetting (const int32_t kiMbNumInFrame, SSliceArgument* pSliceArg) {
   int32_t* pSlicesAssignList		= (int32_t*) & (pSliceArg->uiSliceMbNum[0]);
-  const uint32_t kuiSliceNum			= pSliceArg->iSliceNum;
+  const uint32_t kuiSliceNum			= pSliceArg->uiSliceNum;
   uint32_t uiSliceIdx				= 0;
   const int32_t kiMbNumPerSlice	= kiMbNumInFrame / kuiSliceNum;
   int32_t iNumMbLeft				= kiMbNumInFrame;
@@ -143,7 +143,7 @@ bool CheckFixedSliceNumMultiSliceSetting (const int32_t kiMbNumInFrame, SSliceAr
 //slice parameter check for SM_ROWMB_SLICE
 bool CheckRowMbMultiSliceSetting (const int32_t kiMbWidth, SSliceArgument* pSliceArg) {
   int32_t* pSlicesAssignList = (int32_t*) & (pSliceArg->uiSliceMbNum[0]);
-  const uint32_t kuiSliceNum		= pSliceArg->iSliceNum;
+  const uint32_t kuiSliceNum		= pSliceArg->uiSliceNum;
   uint32_t uiSliceIdx			= 0;
 
   if (NULL == pSlicesAssignList)
@@ -202,7 +202,7 @@ bool CheckRasterMultiSliceSetting (const int32_t kiMbNumInFrame, SSliceArgument*
     return false;
   }
 
-  pSliceArg->iSliceNum = iActualSliceCount;
+  pSliceArg->uiSliceNum = iActualSliceCount;
   return true;
 
 }
@@ -247,7 +247,7 @@ void GomValidCheckSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, i
 // GOM based RC related for uiSliceMbNum decision, only used at SM_FIXEDSLCNUM_SLICE
 void GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceArgument* pSliceArg) {
   uint32_t* pSlicesAssignList		= & (pSliceArg->uiSliceMbNum[0]);
-  const uint32_t kuiSliceNum			= pSliceArg->iSliceNum;
+  const uint32_t kuiSliceNum			= pSliceArg->uiSliceNum;
   const int32_t kiMbNumInFrame	= kiMbWidth * kiMbHeight;
   const int32_t kiMbNumPerSlice	= kiMbNumInFrame / kuiSliceNum;
   int32_t iNumMbLeft				= kiMbNumInFrame;
@@ -300,7 +300,7 @@ void GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,
  *	Get slice count for multiple slice segment
  *
  */
-int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SMulSliceOption* pMso) {
+int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceConfig* pMso) {
   if (NULL == pMso)
     return -1;
 
@@ -309,7 +309,7 @@ int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, S
   case SM_FIXEDSLCNUM_SLICE:
   case SM_RASTER_SLICE:
   case SM_ROWMB_SLICE: {
-    return pMso->sSliceArgument.iSliceNum;
+    return pMso->sSliceArgument.uiSliceNum;
   }
   case SM_DYN_SLICE: {
     return AVERSLICENUM_CONSTRAINT;//at the beginning of dynamic slicing, set the uiSliceNum to be 1
@@ -336,7 +336,7 @@ int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, S
  */
 int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
                           CMemoryAlign* pMa,
-                          SMulSliceOption* pMso,
+                          SSliceConfig* pMso,
                           const int32_t kiMbWidth,
                           const int32_t kiMbHeight) {
   const int32_t kiCountMbNum = kiMbWidth * kiMbHeight;
@@ -497,7 +497,7 @@ int32_t InitSlicePEncCtx (SSliceCtx* pSliceCtx,
                           bool bFmoUseFlag,
                           int32_t iMbWidth,
                           int32_t iMbHeight,
-                          SMulSliceOption* pMso,
+                          SSliceConfig* pMso,
                           void* pPpsArg) {
   if (NULL == pSliceCtx)
     return 1;

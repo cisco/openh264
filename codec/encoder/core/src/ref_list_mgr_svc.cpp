@@ -430,7 +430,7 @@ void WelsMarkPic (sWelsEncCtx* pCtx) {
   int32_t iSliceIdx = 0;
 
   if (pCtx->pSvcParam->bEnableLongTermReference && pLtr->bLTRMarkEnable && pCtx->uiTemporalId == 0) {
-    if (!pLtr->bReceivedT0LostFlag && pLtr->uiLtrMarkInterval > pCtx->pSvcParam->uiLtrMarkPeriod
+    if (!pLtr->bReceivedT0LostFlag && pLtr->uiLtrMarkInterval > pCtx->pSvcParam->iLtrMarkPeriod
         && CheckCurMarkFrameNumUsed (pCtx)) {
       pLtr->bLTRMarkingFlag = true;
       pLtr->bLTRMarkEnable = false;

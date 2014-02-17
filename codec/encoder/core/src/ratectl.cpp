@@ -114,7 +114,7 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
   fp_test_rc = fopen ("testRC.dat", "w");
   fp_vgop = fopen ("vgop.dat", "w");
 #endif
-  for (j = 0; j < pEncCtx->pSvcParam->iNumDependencyLayer; j++) {
+  for (j = 0; j < pEncCtx->pSvcParam->iSpatialLayerNum; j++) {
     SSliceCtx* pSliceCtx = &pEncCtx->pSliceCtxList[j];
     pWelsSvcRc  = &pEncCtx->pWelsSvcRc[j];
     pDLayerParam = &pEncCtx->pSvcParam->sDependencyLayers[j];
@@ -167,9 +167,9 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
 
     RcInitLayerMemory (pWelsSvcRc, pEncCtx->pMemAlign, 1 + pDLayerParam->iHighestTemporalId);
 
-    bMultiSliceMode	= ((SM_RASTER_SLICE == pDLayerParam->sMso.uiSliceMode) ||
-                       (SM_ROWMB_SLICE	 == pDLayerParam->sMso.uiSliceMode) ||
-                       (SM_DYN_SLICE	 == pDLayerParam->sMso.uiSliceMode));
+    bMultiSliceMode	= ((SM_RASTER_SLICE == pDLayerParam->sSliceCfg.uiSliceMode) ||
+                       (SM_ROWMB_SLICE	 == pDLayerParam->sSliceCfg.uiSliceMode) ||
+                       (SM_DYN_SLICE	 == pDLayerParam->sSliceCfg.uiSliceMode));
     if (bMultiSliceMode)
       pWelsSvcRc->iNumberMbGom = pWelsSvcRc->iNumberMbFrame;
   }
@@ -810,7 +810,7 @@ void  WelsRcPictureInfoUpdateGom (void* pCtx, int32_t layer_size) {
 
 
   if (pEncCtx->pSvcParam->bEnableFrameSkip &&
-      pEncCtx->uiDependencyId == pEncCtx->pSvcParam->iNumDependencyLayer - 1) {
+      pEncCtx->uiDependencyId == pEncCtx->pSvcParam->iSpatialLayerNum - 1) {
     RcVBufferCalculationSkip (pEncCtx);
   }
 
@@ -939,7 +939,7 @@ void  WelsRcFreeMemory (void* pCtx) {
     fclose (fp_vgop);
   fp_vgop = NULL;
 #endif
-  for (i = 0; i < pEncCtx->pSvcParam->iNumDependencyLayer; i++) {
+  for (i = 0; i < pEncCtx->pSvcParam->iSpatialLayerNum; i++) {
     pWelsSvcRc  = &pEncCtx->pWelsSvcRc[i];
     RcFreeLayerMemory (pWelsSvcRc, pEncCtx->pMemAlign);
   }
