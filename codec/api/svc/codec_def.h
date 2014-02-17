@@ -160,32 +160,6 @@ typedef struct {
   int iSkipFrameStep;	//how many frames to skip
 } SRateThresholds, *PRateThresholds;
 
-/*new interface*/
-typedef struct WelsDeviceInfo {
-  int  bSupport;          /* a logic flag provided by decoder which indicates whether GPU decoder can work based on the following device info. */
-  char Vendor[128];   // vendor name
-  char Device[128];    // device name
-  char Driver[128];     // driver version
-  char DriverDate[128]; //  driver release date
-} Device_Info;
-
-typedef enum TagBufferProperty {
-  BUFFER_HOST	   = 0,   // host memory
-  BUFFER_DEVICE  = 1,	  // device memory including surface and shared handle
-  // for DXVA: shared handle
-  // for VDA : iosurface
-
-  //SURFACE_DEVICE ,	 // surface
-  //SHARED_HANDLE      // shared handle
-} EBufferProperty;
-
-typedef enum TagDecodeMode {
-  AUTO_MODE = 0,   // decided by decoder itself, dynamic mode switch, delayed switch
-  SW_MODE = 1,		// decoded by CPU, instant switch
-  GPU_MODE = 2,	// decoded by GPU, instant switch
-  SWITCH_MODE = 3	// switch to the other mode, forced mode switch, delayed switch
-} EDecodeMode;
-
 typedef struct TagSysMemBuffer {
   int	iWidth;			//width of decoded pic for display
   int iHeight;			//height of decoded pic for display
@@ -193,24 +167,10 @@ typedef struct TagSysMemBuffer {
   int iStride[2];		//stride of 2 component
 } SSysMEMBuffer;
 
-typedef struct TagVideoMemBuffer {
-  int iSurfaceWidth;   // used for surface create
-  int iSurfaceHeight;
-  int D3Dformat;  //type is "D3DFORMAT"
-  int D3DPool; // type is "D3DPOOL";
-  int iLeftTopX;
-  int iLeftTopY;
-  int iRightBottomX;
-  int iRightBottomY;
-} SVideoMemBuffer;
-
 typedef struct TagBufferInfo {
-  EBufferProperty eBufferProperty;	//0: host memory; 1: device memory;
   int iBufferStatus;  // 0: one frame data is not ready; 1: one frame data is ready
-  EDecodeMode eWorkMode;				//indicate what the real working mode in decoder
   union {
     SSysMEMBuffer sSystemBuffer;
-    SVideoMemBuffer sVideoBuffer;
   } UsrData;
 } SBufferInfo;
 
