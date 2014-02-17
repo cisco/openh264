@@ -3136,7 +3136,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
   pFbi->iLayerNum	= 0;	// for initialization
 
   // perform csc/denoise/downsample/padding, generate spatial layers
-  iSpatialNum = pCtx->pVpp->WelsPreprocessStep1 (pCtx, ppSrcList, iConfiguredLayerNum);
+  iSpatialNum = pCtx->pVpp->BuildSpatialPicList (pCtx, ppSrcList, iConfiguredLayerNum);
   if (iSpatialNum < 1) {	// skip due to temporal layer settings (different frame rate)
     ++ pCtx->iCodingIndex;
     return WELS_FRAME_TYPE_SKIP;
@@ -3184,7 +3184,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
     SDLayerParam* param_d		= &pSvcParam->sDependencyLayers[d_idx];
 
     pCtx->uiDependencyId	= iCurDid = (int8_t)d_idx;
-    pCtx->pVpp->WelsPreprocessStep3 (pCtx, d_idx);
+    pCtx->pVpp->AnalyzeSpatialPic (pCtx, d_idx);
 
     pCtx->pEncPic	 = pEncPic = (pSpatialIndexMap + iSpatialIdx)->pSrc;
     pCtx->pEncPic->iPictureType	= pCtx->eSliceType;
