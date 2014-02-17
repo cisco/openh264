@@ -260,7 +260,7 @@ int32_t CWelsPreProcess::WelsPreprocessReset (sWelsEncCtx* pCtx) {
   return iRet;
 }
 
-int32_t CWelsPreProcess::WelsPreprocessStep1 (sWelsEncCtx* pCtx, const SSourcePicture** kppSrcPicList,
+int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePicture** kppSrcPicList,
     const int32_t kiConfiguredLayerNum) {
   SWelsSvcCodingParam* pSvcParam = pCtx->pSvcParam;
   int32_t	iNumDependencyLayer = (int32_t)pSvcParam->iNumDependencyLayer;
@@ -309,7 +309,7 @@ int32_t CWelsPreProcess::WelsPreprocessStep1 (sWelsEncCtx* pCtx, const SSourcePi
   return iSpatialNum;
 }
 
-int32_t CWelsPreProcess::WelsPreprocessStep3 (sWelsEncCtx* pCtx, const int32_t kiDidx) {
+int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiDidx) {
   SWelsSvcCodingParam* pSvcParam = pCtx->pSvcParam;
   bool bNeededMbAq = (pSvcParam->bEnableAdaptiveQuant && (pCtx->eSliceType == P_SLICE));
   bool bCalculateBGD = (pCtx->eSliceType == P_SLICE && pSvcParam->bEnableBackgroundDetection);
