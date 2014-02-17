@@ -564,9 +564,9 @@ static inline int32_t AcquireLayersNals (sWelsEncCtx** ppCtx, SWelsSvcCodingPara
 #endif//!MT_ENABLED
 
   if (NULL != pCountLayers)
-    *pCountLayers	= iCountNumLayers;
+    *pCountLayers = iCountNumLayers;
   if (NULL != pCountNals)
-    *pCountNals 	= iCountNumNals;
+    *pCountNals	= iCountNumNals;
   return 0;
 }
 
