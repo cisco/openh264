@@ -94,7 +94,7 @@ class ISVCEncoder {
 
 class ISVCDecoder {
  public:
-  virtual long EXTAPI Initialize (void* pParam, const INIT_TYPE iInitType) = 0;
+  virtual long EXTAPI Initialize (void* pParam) = 0;
   virtual long EXTAPI Uninitialize() = 0;
 
   virtual DECODING_STATE EXTAPI DecodeFrame (const unsigned char* pSrc,
@@ -162,7 +162,7 @@ struct ISVCEncoderVtbl {
 typedef struct ISVCDecoderVtbl ISVCDecoderVtbl;
 typedef const ISVCDecoderVtbl* ISVCDecoder;
 struct ISVCDecoderVtbl {
-  long (*Initialize) (ISVCDecoder*, void* pParam, const INIT_TYPE iInitType);
+  long (*Initialize) (ISVCDecoder*, void* pParam);
   long (*Uninitialize) (ISVCDecoder*);
 
   DECODING_STATE (*DecodeFrame) (ISVCDecoder*, const unsigned char* pSrc,
