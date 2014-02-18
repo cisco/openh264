@@ -70,7 +70,7 @@ struct SVCEncoderImpl : public ISVCEncoder {
 
 struct SVCDecoderImpl : public ISVCDecoder {
   virtual ~SVCDecoderImpl() {}
-  virtual long EXTAPI Initialize(void* pParam) {
+  virtual long EXTAPI Initialize(const SDecodingParam* pParam) {
     EXPECT_TRUE(gThis == this);
     return 1;
   }

@@ -186,7 +186,7 @@ CWelsDecoder::~CWelsDecoder() {
   }
 }
 
-long CWelsDecoder::Initialize (void* pParam) {
+long CWelsDecoder::Initialize (const SDecodingParam* pParam) {
   if (pParam == NULL) {
     IWelsTrace::WelsVTrace (m_pTrace, IWelsTrace::WELS_LOG_INFO, "CWelsDecoder::Initialize(), invalid input argument.");
     return cmInitParaError;
