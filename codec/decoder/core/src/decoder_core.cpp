@@ -698,8 +698,8 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
       return ERR_INFO_INVALID_DBLOCKING_IDC;
     }
     if (pSliceHead->uiDisableDeblockingFilterIdc != 1) {
-      pSliceHead->iSliceAlphaC0Offset	= BsGetSe (pBs) << 1;	// slice_alpha_c0_offset_div2
-      pSliceHead->iSliceBetaOffset		= BsGetSe (pBs) << 1;	// iSliceBetaOffset
+      pSliceHead->iSliceAlphaC0Offset	= BsGetSe (pBs) * 2;	// slice_alpha_c0_offset_div2
+      pSliceHead->iSliceBetaOffset		= BsGetSe (pBs) * 2;	// iSliceBetaOffset
     }
   }
 
