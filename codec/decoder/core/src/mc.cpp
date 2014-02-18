@@ -220,88 +220,88 @@ static inline void McHorVer22_c (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDs
 /////////////////////luma MC//////////////////////////
 static inline void McHorVer01_c (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
                                    int32_t iHeight) {
-  uint8_t uiTmp[256] = { 0 };
+  uint8_t uiTmp[256];
   McHorVer02_c (pSrc, iSrcStride, uiTmp, 16, iWidth, iHeight);
   PixelAvg_c (pDst, iDstStride, pSrc, iSrcStride, uiTmp, 16, iWidth, iHeight);
 }
 static inline void McHorVer03_c (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
                                    int32_t iHeight) {
-  uint8_t uiTmp[256] = { 0 };
+  uint8_t uiTmp[256];
   McHorVer02_c (pSrc, iSrcStride, uiTmp, 16, iWidth, iHeight);
   PixelAvg_c (pDst, iDstStride, pSrc + iSrcStride, iSrcStride, uiTmp, 16, iWidth, iHeight);
 }
 static inline void McHorVer10_c (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
                                    int32_t iHeight) {
-  uint8_t uiTmp[256] = { 0 };
+  uint8_t uiTmp[256];
   McHorVer20_c (pSrc, iSrcStride, uiTmp, 16, iWidth, iHeight);
   PixelAvg_c (pDst, iDstStride, pSrc, iSrcStride, uiTmp, 16, iWidth, iHeight);
 }
 static inline void McHorVer11_c (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
                                    int32_t iHeight) {
-  uint8_t uiHorTmp[256] = { 0 };
-  uint8_t uiVerTmp[256] = { 0 };
+  uint8_t uiHorTmp[256];
+  uint8_t uiVerTmp[256];
   McHorVer20_c (pSrc, iSrcStride, uiHorTmp, 16, iWidth, iHeight);
   McHorVer02_c (pSrc, iSrcStride, uiVerTmp, 16, iWidth, iHeight);
   PixelAvg_c (pDst, iDstStride, uiHorTmp, 16, uiVerTmp, 16, iWidth, iHeight);
 }
 static inline void McHorVer12_c (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
                                    int32_t iHeight) {
-  uint8_t uiVerTmp[256] = { 0 };
-  uint8_t uiCtrTmp[256] = { 0 };
+  uint8_t uiVerTmp[256];
+  uint8_t uiCtrTmp[256];
   McHorVer02_c (pSrc, iSrcStride, uiVerTmp, 16, iWidth, iHeight);
   McHorVer22_c (pSrc, iSrcStride, uiCtrTmp, 16, iWidth, iHeight);
   PixelAvg_c (pDst, iDstStride, uiVerTmp, 16, uiCtrTmp, 16, iWidth, iHeight);
 }
 static inline void McHorVer13_c (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
                                    int32_t iHeight) {
-  uint8_t uiHorTmp[256] = { 0 };
-  uint8_t uiVerTmp[256] = { 0 };
+  uint8_t uiHorTmp[256];
+  uint8_t uiVerTmp[256];
   McHorVer20_c (pSrc + iSrcStride, iSrcStride, uiHorTmp, 16, iWidth, iHeight);
   McHorVer02_c (pSrc, iSrcStride, uiVerTmp, 16, iWidth, iHeight);
   PixelAvg_c (pDst, iDstStride, uiHorTmp, 16, uiVerTmp, 16, iWidth, iHeight);
 }
 static inline void McHorVer21_c (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
                                    int32_t iHeight) {
-  uint8_t uiHorTmp[256] = { 0 };
-  uint8_t uiCtrTmp[256] = { 0 };
+  uint8_t uiHorTmp[256];
+  uint8_t uiCtrTmp[256];
   McHorVer20_c (pSrc, iSrcStride, uiHorTmp, 16, iWidth, iHeight);
   McHorVer22_c (pSrc, iSrcStride, uiCtrTmp, 16, iWidth, iHeight);
   PixelAvg_c (pDst, iDstStride, uiHorTmp, 16, uiCtrTmp, 16, iWidth, iHeight);
 }
 static inline void McHorVer23_c (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
                                    int32_t iHeight) {
-  uint8_t uiHorTmp[256] = { 0 };
-  uint8_t uiCtrTmp[256] = { 0 };
+  uint8_t uiHorTmp[256];
+  uint8_t uiCtrTmp[256];
   McHorVer20_c (pSrc + iSrcStride, iSrcStride, uiHorTmp, 16, iWidth, iHeight);
   McHorVer22_c (pSrc, iSrcStride, uiCtrTmp, 16, iWidth, iHeight);
   PixelAvg_c (pDst, iDstStride, uiHorTmp, 16, uiCtrTmp, 16, iWidth, iHeight);
 }
 static inline void McHorVer30_c (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
                                    int32_t iHeight) {
-  uint8_t uiHorTmp[256] = { 0 };
+  uint8_t uiHorTmp[256];
   McHorVer20_c (pSrc, iSrcStride, uiHorTmp, 16, iWidth, iHeight);
   PixelAvg_c (pDst, iDstStride, pSrc + 1, iSrcStride, uiHorTmp, 16, iWidth, iHeight);
 }
 static inline void McHorVer31_c (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
                                    int32_t iHeight) {
-  uint8_t uiHorTmp[256] = { 0 };
-  uint8_t uiVerTmp[256] = { 0 };
+  uint8_t uiHorTmp[256];
+  uint8_t uiVerTmp[256];
   McHorVer20_c (pSrc, iSrcStride, uiHorTmp, 16, iWidth, iHeight);
   McHorVer02_c (pSrc + 1, iSrcStride, uiVerTmp, 16, iWidth, iHeight);
   PixelAvg_c (pDst, iDstStride, uiHorTmp, 16, uiVerTmp, 16, iWidth, iHeight);
 }
 static inline void McHorVer32_c (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
                                    int32_t iHeight) {
-  uint8_t uiVerTmp[256] = { 0 };
-  uint8_t uiCtrTmp[256] = { 0 };
+  uint8_t uiVerTmp[256];
+  uint8_t uiCtrTmp[256];
   McHorVer02_c (pSrc + 1, iSrcStride, uiVerTmp, 16, iWidth, iHeight);
   McHorVer22_c (pSrc, iSrcStride, uiCtrTmp, 16, iWidth, iHeight);
   PixelAvg_c (pDst, iDstStride, uiVerTmp, 16, uiCtrTmp, 16, iWidth, iHeight);
 }
 static inline void McHorVer33_c (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
                                    int32_t iHeight) {
-  uint8_t uiHorTmp[256] = { 0 };
-  uint8_t uiVerTmp[256] = { 0 };
+  uint8_t uiHorTmp[256];
+  uint8_t uiVerTmp[256];
   McHorVer20_c (pSrc + iSrcStride, iSrcStride, uiHorTmp, 16, iWidth, iHeight);
   McHorVer02_c (pSrc + 1, iSrcStride, uiVerTmp, 16, iWidth, iHeight);
   PixelAvg_c (pDst, iDstStride, uiHorTmp, 16, uiVerTmp, 16, iWidth, iHeight);
@@ -311,7 +311,7 @@ void McLuma_c (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStr
                  int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight)
 //pSrc has been added the offset of mv
 {
-  PWelsMcWidthHeightFunc pWelsMcFunc[4][4] = { //[x][y]
+  static const PWelsMcWidthHeightFunc pWelsMcFunc[4][4] = { //[x][y]
     {McCopy_c,      McHorVer01_c, McHorVer02_c, McHorVer03_c},
     {McHorVer10_c,  McHorVer11_c, McHorVer12_c, McHorVer13_c},
     {McHorVer20_c,  McHorVer21_c, McHorVer22_c, McHorVer23_c},
@@ -623,7 +623,7 @@ void McLuma_sse2 (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDst
                     int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight)
 //pSrc has been added the offset of mv
 {
-  PWelsMcWidthHeightFunc pWelsMcFunc[4][4] = { //[x][y]
+  static const PWelsMcWidthHeightFunc pWelsMcFunc[4][4] = { //[x][y]
     {McCopy_sse2,     McHorVer01_sse2, McHorVer02_sse2, McHorVer03_sse2},
     {McHorVer10_sse2, McHorVer11_sse2, McHorVer12_sse2, McHorVer13_sse2},
     {McHorVer20_sse2, McHorVer21_sse2, McHorVer22_sse2, McHorVer23_sse2},
