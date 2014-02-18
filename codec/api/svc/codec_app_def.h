@@ -109,14 +109,6 @@ typedef enum { //feedback that whether or not have VCL NAL in current AU
   FEEDBACK_VCL_NAL,
   FEEDBACK_UNKNOWN_NAL
 } FEEDBACK_VCL_NAL_IN_AU;
-typedef enum { //feedback the iTemporalId in current AU if have VCL NAL
-  FEEDBACK_TEMPORAL_ID_0 = 0,
-  FEEDBACK_TEMPORAL_ID_1,
-  FEEDBACK_TEMPORAL_ID_2,
-  FEEDBACK_TEMPORAL_ID_3,
-  FEEDBACK_TEMPORAL_ID_4,
-  FEEDBACK_UNKNOWN_TEMPORAL_ID
-} FEEDBACK_TEMPORAL_ID;
 
 /* Type of layer being encoded */
 typedef enum {
