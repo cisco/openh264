@@ -208,11 +208,6 @@ int CWelsH264SVCEncoder::Initialize (SEncParamBase* argv, const INIT_TYPE iInitT
              iInitType, (void*)argv);
     return cmInitParaError;
   }
- if (m_bInitialFlag) {
-    WelsLog (m_pEncContext, WELS_LOG_WARNING, "CWelsH264SVCEncoder::Initialize(), reinitialize, m_bInitialFlag= %d\n",
-             m_bInitialFlag);
-    Uninitialize();
-  }
 
   SWelsSvcCodingParam	sConfig (true);
   if(iInitType ==  INIT_TYPE_PARAMETER_BASED)
@@ -280,7 +275,6 @@ int CWelsH264SVCEncoder::Initialize (SEncParamBase* argv, const INIT_TYPE iInitT
     ++ i;
   }
 #endif//REC_FRAME_COUNT
-  m_iSrcListSize  = 1;
 
   return Initialize2 (&sConfig);
 }
