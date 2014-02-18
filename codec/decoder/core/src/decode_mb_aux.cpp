@@ -71,7 +71,6 @@ void IdctResAddPred_c (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) {
   uint8_t* pDst			= pPred;
   const int32_t kiStride2	= kiStride << 1;
   const int32_t kiStride3	= kiStride + kiStride2;
-  uint8_t* pClip			= &g_ClipTable[MAX_NEG_CROP];
   int32_t i;
 
   for (i = 0; i < 4; i++) {

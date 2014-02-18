@@ -79,7 +79,6 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
   int32_t iFrameCount = 0;
   int32_t iEndOfStreamFlag = 0;
   int32_t iColorFormat = videoFormatInternal;
-  static int32_t iFrameNum = 0;
 
   CUtils cOutputModule;
   double dElapsed = 0;
@@ -210,7 +209,6 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     iEnd	= WelsTime();
     iTotal	+= iEnd - iStart;
     if (sDstBufInfo.iBufferStatus == 1) {
-      iFrameNum++;
       cOutputModule.Process ((void**)pDst, &sDstBufInfo, pYuvFile);
       iWidth  = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
       iHeight = sDstBufInfo.UsrData.sSystemBuffer.iHeight;
