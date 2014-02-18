@@ -138,7 +138,7 @@ static inline int32_t HorFilterInput16bit_c (int16_t* pSrc) {
   int32_t iPix14 = pSrc[-1] + pSrc[2];
   int32_t iPix23 = pSrc[ 0] + pSrc[1];
 
-  return (iPix05 - ((iPix14 << 2) + iPix14) + (iPix23 << 4) + (iPix23 << 2));
+  return (iPix05 - (iPix14 * 5)+ (iPix23 * 20)); 
 }
 // h: iOffset=1 / v: iOffset=iSrcStride
 static inline int32_t FilterInput8bitWithStride_c (uint8_t* pSrc, const int32_t kiOffset) {

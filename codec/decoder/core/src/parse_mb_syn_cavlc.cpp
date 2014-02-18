@@ -477,8 +477,8 @@ void BsStartCavlc (PBitStringAux pBs) {
 }
 void BsEndCavlc (PBitStringAux pBs) {
   pBs->pCurBuf   = pBs->pStartBuf + (pBs->iIndex >> 3);
-  pBs->uiCurBits = ((((pBs->pCurBuf[0] << 8) | pBs->pCurBuf[1]) << 16) | (pBs->pCurBuf[2] << 8) | pBs->pCurBuf[3]) <<
-                   (pBs->iIndex & 0x07);
+  uint32_t uiCache32Bit = (uint32_t)((((pBs->pCurBuf[0] << 8) | pBs->pCurBuf[1]) << 16) | (pBs->pCurBuf[2] << 8) | pBs->pCurBuf[3]);
+  pBs->uiCurBits = uiCache32Bit << (pBs->iIndex & 0x07);
   pBs->pCurBuf  += 4;
   pBs->iLeftBits = -16 + (pBs->iIndex & 0x07);
 }
@@ -677,7 +677,8 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
   uint8_t bChroma   = (bChromaDc || CHROMA_AC == iResidualProperty);
   SReadBitsCache sReadBitsCache;
 
-  sReadBitsCache.uiCache32Bit = ((((pBuf[0] << 8) | pBuf[1]) << 16) | (pBuf[2] << 8) | pBuf[3]) << (iCurIdx & 0x07);
+  uint32_t uiCache32Bit = (uint32_t)((((pBuf[0] << 8) | pBuf[1]) << 16) | (pBuf[2] << 8) | pBuf[3]); 
+  sReadBitsCache.uiCache32Bit = uiCache32Bit << (iCurIdx & 0x07);
   sReadBitsCache.uiRemainBits = 32 - (iCurIdx & 0x07);
   sReadBitsCache.pBuf = pBuf;
   //////////////////////////////////////////////////////////////////////////
