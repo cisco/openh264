@@ -65,15 +65,15 @@ TEST_P(EncoderOutputTest, CompareOutput) {
 static const EncodeFileParam kFileParamArray[] = {
   {
       "res/CiscoVT2people_320x192_12fps.yuv",
-      "4df5751a59eb02153e086ade9b3ecfcb8845c30b", 320, 192, 12.0f
+      "06441376891cbc237a36e59b62131cd94ff9cb19", 320, 192, 12.0f
   },
   {
       "res/CiscoVT2people_160x96_6fps.yuv",
-      "6eb53b6bfdb95dfca0575bd3efe81aa58163951c", 160, 96, 6.0f
+      "4f3759fc44125b27a179ebff158dbba9e431bd0b", 160, 96, 6.0f
   },
   {
       "res/Static_152_100.yuv",
-      "c5af55647a5ead570bd5d96651e05ea699762b8e", 152, 100, 6.0f
+      "a004c7410a78bfe00af65ae7071ce1c485cf036e", 152, 100, 6.0f
   },
 };
 

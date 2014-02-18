@@ -263,7 +263,7 @@ int32_t CWelsPreProcess::WelsPreprocessReset (sWelsEncCtx* pCtx) {
 int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePicture** kppSrcPicList,
     const int32_t kiConfiguredLayerNum) {
   SWelsSvcCodingParam* pSvcParam = pCtx->pSvcParam;
-  int32_t	iNumDependencyLayer = (int32_t)pSvcParam->iNumDependencyLayer;
+  int32_t	iNumDependencyLayer = (int32_t)pSvcParam->iSpatialLayerNum;
   int32_t iSpatialNum = 0;
 
   if (!m_bInitDone) {
@@ -359,7 +359,7 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
 int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSourcePicture* kpSrc,
     Scaled_Picture* pScaledPicture) {
   SWelsSvcCodingParam* pSvcParam    = pCtx->pSvcParam;
-  int8_t	iDependencyId			= pSvcParam->iNumDependencyLayer - 1;
+  int8_t	iDependencyId			= pSvcParam->iSpatialLayerNum - 1;
   int32_t iPicturePos	                    = pCtx->uiSpatialLayersInTemporal[iDependencyId] - 1;
 
   SPicture* pSrcPic					= NULL;	// large
@@ -410,7 +410,7 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
     pCtx->pVaa->bSceneChangeFlag = DetectSceneChange (pDstPic, pRefPic);
   }
 
-  for (int32_t i = 0; i < pSvcParam->iNumDependencyLayer; i++) {
+  for (int32_t i = 0; i < pSvcParam->iSpatialLayerNum; i++) {
     if (pSvcParam->sDependencyLayers[i].uiCodingIdx2TemporalId[pCtx->iCodingIndex & (pSvcParam->uiGopSize - 1)]
         != INVALID_TEMPORAL_ID) {
       ++ iActualSpatialLayerNum;
@@ -430,7 +430,7 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
   // pSrc is
   //	-- padded input pic, if downsample should be applied to generate highest layer, [if] block above
   //	-- highest layer, if no downsampling, [else] block above
-  if (pSvcParam->iNumDependencyLayer > 1) {
+  if (pSvcParam->iSpatialLayerNum > 1) {
     while (iDependencyId >= 0) {
       pDlayerParam			= &pSvcParam->sDependencyLayers[iDependencyId];
       iTargetWidth	= pDlayerParam->iFrameWidth;
@@ -468,7 +468,7 @@ int32_t CWelsPreProcess::MultiLayerPreprocess (sWelsEncCtx* pCtx, const SSourceP
   const SSourcePicture* pSrc			= NULL;
   SPicture* pDstPic						= NULL;
   const int32_t iSpatialLayersCfgCount =
-    pSvcParam->iNumDependencyLayer;	// count number of spatial layers to be encoded in cfg
+    pSvcParam->iSpatialLayerNum;	// count number of spatial layers to be encoded in cfg
   int32_t i							= 0;
   int32_t j							= -1;
 
@@ -498,7 +498,7 @@ int32_t CWelsPreProcess::MultiLayerPreprocess (sWelsEncCtx* pCtx, const SSourceP
     ++ i;
   } while (i < kiSpatialNum);
 
-  if (pSvcParam->bEnableSceneChangeDetect && (kiSpatialNum == pSvcParam->iNumDependencyLayer)
+  if (pSvcParam->bEnableSceneChangeDetect && (kiSpatialNum == pSvcParam->iSpatialLayerNum)
       && !pCtx->pVaa->bIdrPeriodFlag && !pCtx->bEncCurFrmAsIdrFlag) {
     SPicture* pRef = pCtx->pLtr[0].bReceivedT0LostFlag ?
                      pCtx->pSpatialPic[0][pCtx->uiSpatialLayersInTemporal[0] + pCtx->pVaa->uiValidLongTermPicIdx] :
@@ -516,11 +516,11 @@ int32_t CWelsPreProcess::MultiLayerPreprocess (sWelsEncCtx* pCtx, const SSourceP
 bool JudgeNeedOfScaling (SWelsSvcCodingParam* pParam, Scaled_Picture* pScaledPicture) {
   const int32_t kiInputPicWidth	= pParam->SUsedPicRect.iWidth;
   const int32_t kiInputPicHeight = pParam->SUsedPicRect.iHeight;
-  const int32_t kiDstPicWidth		= pParam->sDependencyLayers[pParam->iNumDependencyLayer - 1].iActualWidth;
-  const int32_t kiDstPicHeight	= pParam->sDependencyLayers[pParam->iNumDependencyLayer - 1].iActualHeight;
+  const int32_t kiDstPicWidth		= pParam->sDependencyLayers[pParam->iSpatialLayerNum - 1].iActualWidth;
+  const int32_t kiDstPicHeight	= pParam->sDependencyLayers[pParam->iSpatialLayerNum - 1].iActualHeight;
   bool bNeedDownsampling = true;
 
-  int32_t iSpatialIdx = pParam->iNumDependencyLayer - 1;
+  int32_t iSpatialIdx = pParam->iSpatialLayerNum - 1;
 
   if (kiDstPicWidth >= kiInputPicWidth && kiDstPicHeight >= kiInputPicHeight) {
     iSpatialIdx --;  // highest D layer do not need downsampling
@@ -566,7 +566,7 @@ void  FreeScaledPic (Scaled_Picture*  pScaledPicture, CMemoryAlign* pMemoryAlign
 
 int32_t CWelsPreProcess::InitLastSpatialPictures (sWelsEncCtx* pCtx) {
   SWelsSvcCodingParam* pParam	= pCtx->pSvcParam;
-  const int32_t kiDlayerCount			= pParam->iNumDependencyLayer;
+  const int32_t kiDlayerCount			= pParam->iSpatialLayerNum;
   int32_t iDlayerIndex					= 0;
 
   for (; iDlayerIndex < kiDlayerCount; iDlayerIndex++) {
