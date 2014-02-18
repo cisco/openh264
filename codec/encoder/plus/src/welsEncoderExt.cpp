@@ -200,7 +200,7 @@ void CWelsH264SVCEncoder::InitEncoder (void) {
 /*
  *	SVC Encoder Initialization
  */
-int CWelsH264SVCEncoder::Initialize (const SEncParamBase* argv, const INIT_TYPE iInitType) {
+int CWelsH264SVCEncoder::Initialize (const void* argv, const INIT_TYPE iInitType) {
 
 
   if ((INIT_TYPE_PARAMETER_BASED != iInitType && INIT_TYPE_PARAMETER_EXT != iInitType)|| NULL == argv) {
@@ -213,7 +213,7 @@ int CWelsH264SVCEncoder::Initialize (const SEncParamBase* argv, const INIT_TYPE 
   if(iInitType ==  INIT_TYPE_PARAMETER_BASED)
   {
 	 // Convert SEncParamBase into WelsSVCParamConfig here..
-	 if (sConfig.ParamBaseTranscode (*argv, true)) {
+	 if (sConfig.ParamBaseTranscode (*(const SEncParamBase*)argv, true)) {
 		 WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::Initialize(), parameter_translation failed.\n");
 		 Uninitialize();
 		 return cmInitParaError;
