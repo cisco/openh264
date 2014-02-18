@@ -275,6 +275,15 @@ int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam, const bool kbEnab
 
    return 0;
 }
+void GetBaseParams (SEncParamBase* pCodingParam) {
+  pCodingParam->iUsageType     = iUsageType;
+  pCodingParam->iInputCsp      = iInputCsp;
+  pCodingParam->iPicWidth      = iPicWidth;
+  pCodingParam->iPicHeight     = iPicHeight;
+  pCodingParam->iTargetBitrate = iTargetBitrate;
+  pCodingParam->iRCMode        = iRCMode;
+  pCodingParam->fMaxFrameRate  = fMaxFrameRate;
+}
 int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   float fParamMaxFrameRate		= WELS_CLIP3 (pCodingParam.fMaxFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
 
