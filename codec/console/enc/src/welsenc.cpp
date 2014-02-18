@@ -122,8 +122,8 @@ int ParseConfig (CReadConfig& cRdCfg, SEncParamExt& pSvcParam, SFilesSet& sFileS
         pSvcParam.uiFrameToBeCoded	= atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("SourceSequenceInRGB24") == 0) {
         pSvcParam.iInputCsp	= atoi (strTag[1].c_str()) == 0 ? videoFormatI420 : videoFormatRGB;
-      } else if (strTag[0].compare ("GOPSize") == 0) {
-        pSvcParam.uiGopSize	= atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("TemporalLayerNum") == 0) {
+        pSvcParam.iTemporalLayerNum	= atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("IntraPeriod") == 0) {
         pSvcParam.uiIntraPeriod	= atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("EnableSpsPpsIDAddition") == 0) {
@@ -428,8 +428,8 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& pSvcParam, SFilesSet&
     else if (!strcmp (pCommand, "-frms") && (n < argc))
       pSvcParam.uiFrameToBeCoded = atoi (argv[n++]);
 
-    else if (!strcmp (pCommand, "-gop") && (n < argc))
-      pSvcParam.uiGopSize = atoi (argv[n++]);
+    else if (!strcmp (pCommand, "-numtl") && (n < argc))
+      pSvcParam.iTemporalLayerNum = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-iper") && (n < argc))
       pSvcParam.uiIntraPeriod = atoi (argv[n++]);

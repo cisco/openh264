@@ -224,7 +224,6 @@ typedef struct TagEncParamExt:SEncParamBase
   SSpatialLayerConfig sSpatialLayers[MAX_SPATIAL_LAYER_NUM];
   int		    iNumRefFrame;		// number of reference frame used
   unsigned int	uiFrameToBeCoded;	// frame to be encoded (at input frame rate)
-  unsigned int  uiGopSize;
   bool   bEnableRc;
   short		iMultipleThreadIdc;		// 1	# 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
   short		iCountThreadsNum;			//		# derived from disable_multiple_slice_idc (=0 or >1) means;
