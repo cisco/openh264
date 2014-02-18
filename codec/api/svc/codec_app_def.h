@@ -116,12 +116,6 @@ typedef enum {
   VIDEO_CODING_LAYER = 1
 } LAYER_TYPE;
 
-/* SVC Encoder/Decoder Initializing Parameter Types */
-typedef enum {
-  INIT_TYPE_PARAMETER_BASED = 0,	// For SVC DEMO Application
-  INIT_TYPE_PARAMETER_EXT,			// For SVC CONSOLE Application
-} INIT_TYPE;
-
 //enumerate the type of video bitstream which is provided to decoder
 typedef enum {
   VIDEO_BITSTREAM_AVC               = 0,
