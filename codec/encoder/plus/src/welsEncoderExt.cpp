@@ -234,6 +234,7 @@ int CWelsH264SVCEncoder::Initialize (SEncParamBase* argv, const INIT_TYPE iInitT
 	}
   }
 #ifdef REC_FRAME_COUNT
+  SWelsSvcCodingParam &sEncodingParam = sConfig;
   WelsLog (m_pEncContext, WELS_LOG_INFO, "CWelsH264SVCEncoder::Initialize, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x\n",
            m_uiCountFrameNum, m_iCspInternal);
   WelsLog (m_pEncContext, WELS_LOG_INFO,
@@ -244,9 +245,9 @@ int CWelsH264SVCEncoder::Initialize (SEncParamBase* argv, const INIT_TYPE iInitT
            sEncodingParam.iRCMode,
            sEncodingParam.iTemporalLayerNum,
            sEncodingParam.iSpatialLayerNum,
-           sEncodingParam.fFrameRate,
+           sEncodingParam.fMaxFrameRate,
            sEncodingParam.iInputCsp,
-           sEncodingParam.iIntraPeriod,
+           sEncodingParam.uiIntraPeriod,
            sEncodingParam.bEnableSpsPpsIdAddition,
            sEncodingParam.bPrefixNalAddingCtrl,
            sEncodingParam.bEnableDenoise,
