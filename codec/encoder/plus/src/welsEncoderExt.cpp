@@ -60,9 +60,7 @@ namespace WelsSVCEnc {
  */
 CWelsH264SVCEncoder::CWelsH264SVCEncoder()
   :	m_pEncContext (NULL),
-#if defined(_WIN32)||defined(_MACH_PLATFORM)||defined(__GNUC__)
     m_pWelsTrace (NULL),
-#endif
     m_pSrcPicList (NULL),
     m_iSrcListSize (0),
     m_iMaxPicWidth (0),
@@ -145,13 +143,11 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
 
 CWelsH264SVCEncoder::~CWelsH264SVCEncoder() {
   WelsLog (NULL, WELS_LOG_INFO, "CWelsH264SVCEncoder::~CWelsH264SVCEncoder()\n");
-#if defined(_WIN32)||defined(_MACH_PLATFORM)||defined(__GNUC__)
 
   if (m_pWelsTrace != NULL) {
     delete m_pWelsTrace;
     m_pWelsTrace = NULL;
   }
-#endif
 #ifdef REC_FRAME_COUNT
   WelsLog (m_pEncContext, WELS_LOG_INFO,
            "CWelsH264SVCEncoder::~CWelsH264SVCEncoder(), m_uiCountFrameNum= %d, m_iCspInternal= 0x%x\n", m_uiCountFrameNum,
@@ -180,7 +176,6 @@ CWelsH264SVCEncoder::~CWelsH264SVCEncoder() {
 }
 
 void CWelsH264SVCEncoder::InitEncoder (void) {
-#if defined(_WIN32)||defined(_MACH_PLATFORM)||defined(__GNUC__)
 
 #ifdef REC_FRAME_COUNT
   WelsLog (m_pEncContext, WELS_LOG_INFO,
@@ -198,7 +193,6 @@ void CWelsH264SVCEncoder::InitEncoder (void) {
 
   // initialization
   WelsSetLogLevel (WELS_LOG_DEFAULT);	// no output, WELS_LOG_QUIET
-#endif
 }
 
 /* Interfaces override from ISVCEncoder */

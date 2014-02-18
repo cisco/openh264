@@ -889,10 +889,8 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   int8_t  iDlayerIdx = 0;
   uint8_t* pYUV[MAX_DEPENDENCY_LAYER] = { 0 };
   SSourcePicture**    pSrcPicList = NULL;
-#if (defined(RUN_SIMULATOR) || defined(_WIN32)||defined(_MACH_PLATFORM) || (defined(__GNUC__)))
   // Inactive with sink with output file handler
   FILE* pFpBs = NULL;
-#endif
 #if defined(COMPARE_DATA)
   //For getting the golden file handle
   FILE* fpGolden = NULL;
@@ -944,7 +942,6 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     iRet = 1;
     goto INSIDE_MEM_FREE;
   }
-#if (defined(RUN_SIMULATOR) || defined(_WIN32)||defined(_MACH_PLATFORM) || (defined(__GNUC__)))
   // Inactive with sink with output file handler
   if (fs.strBsFile.length() > 0) {
     pFpBs = fopen (fs.strBsFile.c_str(), "wb");
@@ -954,7 +951,6 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
       goto INSIDE_MEM_FREE;
     }
   }
-#endif
 
 #if defined(COMPARE_DATA)
   //For getting the golden file handle
@@ -1108,9 +1104,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
             delete [] pUCArry;
           }
 #endif
-#if (defined(RUN_SIMULATOR) || defined(_WIN32)||defined(_MACH_PLATFORM) || (defined(__GNUC__)))
           fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs);	// write pure bit stream into file
-#endif
           iFrameSize += iLayerSize;
         }
         ++ iLayer;
@@ -1136,12 +1130,10 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   }
 
 INSIDE_MEM_FREE: {
-#if (defined(RUN_SIMULATOR) || defined(_WIN32)||defined(_MACH_PLATFORM) || (defined(__GNUC__)))
     if (pFpBs) {
       fclose (pFpBs);
       pFpBs = NULL;
     }
-#endif
 #if defined (STICK_STREAM_SIZE)
     if (fTrackStream) {
       fclose (fTrackStream);
