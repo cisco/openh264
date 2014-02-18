@@ -250,8 +250,8 @@ int32_t ParamBaseTranscode (SEncParamBase& pCodingParam, const bool kbEnableRc =
   while (iIdxSpatial < iSpatialLayerNum) {
 
     pDlp->uiProfileIdc		= uiProfileIdc;
-    sSpatialLayers[iIdxSpatial].fFrameRate	= WELS_CLIP3 (sSpatialLayers[iIdxSpatial].fFrameRate,
-        MIN_FRAME_RATE, pCodingParam.fMaxFrameRate);
+    sSpatialLayers[iIdxSpatial].fFrameRate	= WELS_CLIP3 (pCodingParam.fMaxFrameRate,
+        MIN_FRAME_RATE, MAX_FRAME_RATE);
     pDlp->fInputFrameRate	=
       pDlp->fOutputFrameRate	= WELS_CLIP3 (sSpatialLayers[iIdxSpatial].fFrameRate, MIN_FRAME_RATE,
                                             MAX_FRAME_RATE);
