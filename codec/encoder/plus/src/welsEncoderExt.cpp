@@ -212,11 +212,8 @@ int CWelsH264SVCEncoder::Initialize (SEncParamBase* argv, const INIT_TYPE iInitT
   SWelsSvcCodingParam	sConfig (true);
   if(iInitType ==  INIT_TYPE_PARAMETER_BASED)
   {
-	 SEncParamBase		sEncodingParam;
-	 memcpy (&sEncodingParam, argv, sizeof (SEncParamBase));	// confirmed_safe_unsafe_usage
-
 	 // Convert SEncParamBase into WelsSVCParamConfig here..
-	 if (sConfig.ParamBaseTranscode (sEncodingParam, true)) {
+	 if (sConfig.ParamBaseTranscode (*argv, true)) {
 		 WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::Initialize(), parameter_translation failed.\n");
 		 Uninitialize();
 		 return cmInitParaError;
@@ -224,10 +221,8 @@ int CWelsH264SVCEncoder::Initialize (SEncParamBase* argv, const INIT_TYPE iInitT
   }
   else if(iInitType ==  INIT_TYPE_PARAMETER_EXT)
   {
-	SEncParamExt		sEncodingParam;
-	memcpy (&sEncodingParam, argv, sizeof (SEncParamExt));	// confirmed_safe_unsafe_usage
-	// Convert SEncParamBase into WelsSVCParamConfig here..
-	if (sConfig.ParamTranscode (sEncodingParam, true)) {
+	// Convert SEncParamExt into WelsSVCParamConfig here..
+	if (sConfig.ParamTranscode (*(const SEncParamExt*)argv, true)) {
 		WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::Initialize(), parameter_translation failed.\n");
 		Uninitialize();
 		return cmInitParaError;
