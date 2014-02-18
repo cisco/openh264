@@ -200,7 +200,7 @@ void CWelsH264SVCEncoder::InitEncoder (void) {
 /*
  *	SVC Encoder Initialization
  */
-int CWelsH264SVCEncoder::Initialize (SEncParamBase* argv, const INIT_TYPE iInitType) {
+int CWelsH264SVCEncoder::Initialize (const SEncParamBase* argv, const INIT_TYPE iInitType) {
 
 
   if ((INIT_TYPE_PARAMETER_BASED != iInitType && INIT_TYPE_PARAMETER_EXT != iInitType)|| NULL == argv) {
