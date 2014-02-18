@@ -238,8 +238,6 @@ int ParseConfig (CReadConfig& cRdCfg, SEncParamExt& pSvcParam, SFilesSet& sFileS
 
   for (int8_t iLayer = 0; iLayer < kiActualLayerNum; ++ iLayer) {
     SLayerPEncCtx sLayerCtx;
-    int32_t iLayerArg = -2;
-    int32_t iNumQualityBitrateLayerSet = 0;
 
     SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
     CReadConfig cRdLayerCfg (sFileSet.sSpatialLayers[iLayer].strLayerCfgFile);
@@ -253,7 +251,6 @@ int ParseConfig (CReadConfig& cRdCfg, SEncParamExt& pSvcParam, SFilesSet& sFileS
 
     while (!cRdLayerCfg.EndOfFile()) {
       long iLayerRd = cRdLayerCfg.ReadLine (&strTag[0]);
-      bool bFound = false;
       if (iLayerRd > 0) {
         if (strTag[0].empty())
           continue;
@@ -474,8 +471,6 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& pSvcParam, SFilesSet&
       for (int8_t iLayer = 0; iLayer < pSvcParam.iSpatialLayerNum; ++ iLayer) {
         SLayerPEncCtx sLayerCtx;
         string strTag[4];
-        int32_t iLayerArg = -2;
-        int32_t iNumQualityBitrateLayerSet = 0;
 
         SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
         CReadConfig cRdLayerCfg (sFileSet.sSpatialLayers[iLayer].strLayerCfgFile);
@@ -1222,8 +1217,6 @@ void DestroySVCEncHandle (ISVCEncoder* pEncoder) {
 int main (int argc, char** argv)
 {
   ISVCEncoder* pSVCEncoder	= NULL;
-  FILE* pFileOut					= NULL;
-  FILE* pFileIn					= NULL;
   int iRet					= 0;
 
 #ifdef _MSC_VER

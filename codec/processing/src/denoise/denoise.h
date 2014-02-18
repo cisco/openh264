@@ -97,10 +97,8 @@ class CDenoiser : public IStrategy {
 
  private:
   float		 m_fSigmaGrey;			//sigma for grey scale similarity, suggestion 2.5-3
-  uint32_t  m_uiFilterWindow;				//filter window diameter
   uint16_t	 m_uiSpaceRadius;			//filter windows radius: 1-3x3, 2-5x5,3-7x7. Larger size, slower speed
   uint16_t	 m_uiType;					//do denoising on which component 1-Y, 2-U, 4-V; 7-YUV, 3-YU, 5-YV, 6-UV
-  uint32_t*  m_pGreyWeightTable;		//weight table for grey scale
 
   SDenoiseFuncs m_pfDenoise;
   int32_t      m_CPUFlag;
