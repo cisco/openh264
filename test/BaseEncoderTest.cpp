@@ -7,32 +7,14 @@
 
 static int InitWithParam(ISVCEncoder* encoder, int width,
     int height, float frameRate) {
-  SVCEncodingParam param;
-  memset (&param, 0, sizeof(SVCEncodingParam));
+  SEncParamBase param;
+  memset (&param, 0, sizeof(SEncParamBase));
 
-  param.sSpatialLayers[0].iVideoWidth  = width;
-  param.sSpatialLayers[0].iVideoHeight = height;
-  param.sSpatialLayers[0].fFrameRate = frameRate;
-  param.sSpatialLayers[0].iQualityLayerNum = 1;
-  param.sSpatialLayers[0].iSpatialBitrate = 600000;
-
-  SSliceConfig* sliceCfg = &param.sSpatialLayers[0].sSliceCfg;
-  sliceCfg->sSliceArgument.uiSliceNum = 1;
-  sliceCfg->sSliceArgument.uiSliceSizeConstraint = 1500;
-  sliceCfg->sSliceArgument.uiSliceMbNum[0] = 960;
-
-  param.fFrameRate = param.sSpatialLayers[0].fFrameRate;
-  param.iPicWidth = param.sSpatialLayers[0].iVideoWidth;
-  param.iPicHeight = param.sSpatialLayers[0].iVideoHeight;
+  param.fMaxFrameRate = frameRate;
+  param.iPicWidth = width;
+  param.iPicHeight = height;
   param.iTargetBitrate = 5000000;
-  param.iTemporalLayerNum = 3;
-  param.iSpatialLayerNum = 1;
-  param.bEnableBackgroundDetection = true;
-  param.bEnableLongTermReference = true;
-  param.iLtrMarkPeriod = 30;
   param.iInputCsp = videoFormatI420;
-  param.bEnableSpsPpsIdAddition = true;
-
   return encoder->Initialize(&param, INIT_TYPE_PARAMETER_BASED);
 }
 

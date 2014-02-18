@@ -80,18 +80,6 @@ SM_RESERVED				= 5
 #define JUMPPACKETSIZE_JUDGE(len,mb_idx,max_byte)	 ( (len) > JUMPPACKETSIZE_CONSTRAINT(max_byte) ) //( (mb_idx+1)%40/*16slice for compare*/ == 0 )	//
 //cur_mb_idx is for early tests, can be omit in optimization
 
-typedef struct TagSliceArgument {
-uint32_t			uiSliceMbNum[MAX_SLICES_NUM];   //will perform check on this array to decide specific slicing, see note
-uint32_t			uiSliceSizeConstraint;
-int16_t				iSliceNum;
-} SSliceArgument;
-
-typedef struct TagMulSliceOption { //interfaces about slicing from application layer
-SSliceArgument
-sSliceArgument; //according to uiSliceMode, decide which elements of this structure will actually takes effect
-SliceMode			uiSliceMode;
-} SMulSliceOption;
-
 /*!
  * \brief	SSlice context
  */
@@ -139,7 +127,7 @@ int32_t InitSlicePEncCtx (SSliceCtx* pSliceCtx,
                           bool bFmoUseFlag,
                           int32_t iMbWidth,
                           int32_t iMbHeight,
-                          SMulSliceOption* pMulSliceOption,
+                          SSliceConfig* pMulSliceOption,
                           void* pPpsArg);
 
 
@@ -206,7 +194,7 @@ int32_t WelsGetNumMbInSlice (SSliceCtx* pSliceCtx, const int32_t kiSliceIdc);
  *	Get slice count for multiple slice segment
  *
  */
-int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SMulSliceOption* pMso);
+int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceConfig* pMso);
 int32_t GetCurrentSliceNum (const SSliceCtx* kpSliceCtx);
 
 //checking valid para

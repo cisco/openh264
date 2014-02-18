@@ -259,32 +259,6 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
     m_pDecContext->bEndOfStreamFlag	= iVal ? true : false;
 
     return cmResultSuccess;
-  } else if (eOptID == DECODER_OPTION_MODE) {
-    if (pOption == NULL)
-      return cmInitParaError;
-
-    iVal = * ((int*)pOption);
-
-    m_pDecContext->iSetMode = iVal;
-    if (iVal == SW_MODE) {
-      m_pDecContext->iDecoderOutputProperty = BUFFER_HOST;
-    } else {
-#if !defined(__APPLE__)
-      m_pDecContext->iDecoderOutputProperty = BUFFER_DEVICE;
-#else
-      m_pDecContext->iDecoderOutputProperty = BUFFER_HOST;//BUFFER_HOST;//BUFFER_DEVICE;
-#endif
-
-    }
-
-    return cmResultSuccess;
-  } else if (eOptID == DECODER_OPTION_OUTPUT_PROPERTY) {
-    if (pOption == NULL)
-      return cmInitParaError;
-
-    iVal = * ((int*)pOption);
-    if (m_pDecContext->iSetMode != SW_MODE)
-      m_pDecContext->iDecoderOutputProperty = iVal;
   }
 
 
@@ -339,19 +313,6 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
     iVal = m_pDecContext->iFeedbackTidInAu;
     * ((int*)pOption) = iVal;
     return cmResultSuccess;
-  } else if (DECODER_OPTION_MODE == eOptID) {
-    if (pOption == NULL)
-      return cmInitParaError;
-
-    iVal = m_pDecContext->iSetMode;
-
-    * ((int*)pOption) = iVal;
-    return cmResultSuccess;
-  } else if (DECODER_OPTION_DEVICE_INFO == eOptID) {
-    if (pOption == NULL)
-      return cmInitParaError;
-
-    return cmResultSuccess;
   }
 
   return cmInitParaError;
@@ -390,7 +351,6 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
   m_pDecContext->iErrorCode             = dsErrorFree; //initialize at the starting of AU decoding.
   m_pDecContext->iFeedbackVclNalInAu = FEEDBACK_UNKNOWN_NAL; //initialize
   memset (pDstInfo, 0, sizeof (SBufferInfo));
-  pDstInfo->eBufferProperty = (EBufferProperty)m_pDecContext->iDecoderOutputProperty;
 
 #ifdef LONG_TERM_REF
   m_pDecContext->bReferenceLostAtT0Flag       = false; //initialize for LTR
@@ -405,8 +365,6 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
   WelsDecodeBs (m_pDecContext, kpSrc, kiSrcLen, (unsigned char**)ppDst,
                 pDstInfo); //iErrorCode has been modified in this function
   XMMREG_PROTECT_LOAD(CWelsH264Decoder);
-
-  pDstInfo->eWorkMode = (EDecodeMode)m_pDecContext->iDecoderMode;
 
   if (m_pDecContext->iErrorCode) {
     ENalUnitType eNalType =
@@ -447,7 +405,6 @@ DECODING_STATE CWelsDecoder::DecodeFrame (const unsigned char* kpSrc,
   DstInfo.UsrData.sSystemBuffer.iStride[1] = pStride[1];
   DstInfo.UsrData.sSystemBuffer.iWidth = iWidth;
   DstInfo.UsrData.sSystemBuffer.iHeight = iHeight;
-  DstInfo.eBufferProperty = BUFFER_HOST;
 
   eDecState = DecodeFrame2 (kpSrc, kiSrcLen, (void**)ppDst, &DstInfo);
   if (eDecState == dsErrorFree) {

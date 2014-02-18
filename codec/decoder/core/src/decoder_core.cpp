@@ -76,9 +76,6 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
              "DecodeFrameConstruction()::::output good I frame, %d x %d, crop_left:%d, crop_right:%d, crop_top:%d, crop_bottom:%d.\n",
              kiWidth, kiHeight, pCtx->sFrameCrop.iLeftOffset, pCtx->sFrameCrop.iRightOffset, pCtx->sFrameCrop.iTopOffset,
              pCtx->sFrameCrop.iBottomOffset);
-    WelsLog (pCtx, WELS_LOG_INFO, "After decoding, set_mode:[%s], eWorkMode:[%s], eBufferProperty:[%s]\n",
-             DECODER_MODE_NAME (pCtx->iSetMode), DECODER_MODE_NAME (pCtx->iDecoderMode),
-             OUTPUT_PROPERTY_NAME (pDstInfo->eBufferProperty));
   }
 
   //////output:::normal path
@@ -99,7 +96,6 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   ppDst[0] = ppDst[0] + pCtx->sFrameCrop.iTopOffset * 2 * pPic->iLinesize[0] + pCtx->sFrameCrop.iLeftOffset * 2;
   ppDst[1] = ppDst[1] + pCtx->sFrameCrop.iTopOffset  * pPic->iLinesize[1] + pCtx->sFrameCrop.iLeftOffset;
   ppDst[2] = ppDst[2] + pCtx->sFrameCrop.iTopOffset  * pPic->iLinesize[1] + pCtx->sFrameCrop.iLeftOffset;
-  pDstInfo->eBufferProperty = BUFFER_HOST;
   pDstInfo->iBufferStatus = 1;
 
   return 0;
@@ -935,7 +931,6 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
       return ERR_INFO_OUT_OF_MEMORY;
 
     memset (pDq, 0, sizeof (SDqLayer));
-    if (pCtx->iDecoderMode == SW_MODE) {
 
       do {
         const int32_t kiHshift	= iPlaneIdx ? 1 : 0;
@@ -1015,7 +1010,6 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
                               (NULL == pCtx->sMb.pInterPredictionDoneFlag[i])
                              )
                             )
-    } // end of if(pCtx->iDecoderMode == SW_MODE)
 
     pCtx->pDqLayersList[i] = pDq;
     ++ i;
@@ -1579,8 +1573,6 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
     }
   }
 
-
-  pDstInfo->eBufferProperty = (EBufferProperty)pCtx->iDecoderOutputProperty;
 
   iErr = DecodeCurrentAccessUnit (pCtx, ppDst, iStride, &iWidth, &iHeight, pDstInfo);
 
