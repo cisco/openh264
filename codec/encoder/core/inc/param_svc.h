@@ -129,8 +129,6 @@ bool		bMgsT0OnlyStrategy; //MGS_T0_only_strategy
 // FALSE: Streaming Video Sharing; TRUE: Video Conferencing Meeting;
 
 int8_t		iDecompStages;		// GOP size dependency
-/* Rate Control */
-bool		bEnableRc;
 
 
  public:
