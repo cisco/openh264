@@ -11,7 +11,6 @@ typedef void(*CheckFunc)(int, int, const char*);
 
 void CheckEncoderInterface(ISVCEncoder* p, CheckFunc check) {
   CHECK(1, p, Initialize);
-  CHECK(2, p, Initialize2);
   CHECK(3, p, Uninitialize);
   CHECK(4, p, EncodeFrame);
   CHECK(5, p, EncodeFrame2);

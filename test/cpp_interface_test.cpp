@@ -27,10 +27,6 @@ struct SVCEncoderImpl : public ISVCEncoder {
     EXPECT_TRUE(gThis == this);
     return 1;
   }
-  virtual int EXTAPI Initialize2(void* pParam, const INIT_TYPE kiInitType) {
-    EXPECT_TRUE(gThis == this);
-    return 2;
-  }
   virtual int EXTAPI Uninitialize() {
     EXPECT_TRUE(gThis == this);
     return 3;

@@ -57,7 +57,6 @@ class ISVCEncoder {
    * return: CM_RETURN: 0 - success; otherwise - failed;
    */
   virtual int EXTAPI Initialize (SEncParamBase* pParam, const INIT_TYPE kiInitType = INIT_TYPE_PARAMETER_BASED) = 0;
-  virtual int EXTAPI Initialize2 (void* pParam, const INIT_TYPE kiInitType = INIT_TYPE_PARAMETER_BASED) = 0;
 
   virtual int EXTAPI Uninitialize() = 0;
 
@@ -142,7 +141,6 @@ typedef const ISVCEncoderVtbl* ISVCEncoder;
 struct ISVCEncoderVtbl {
 
   int (*Initialize) (ISVCEncoder*, SEncParamBase* pParam, const INIT_TYPE kiInitType);
-  int (*Initialize2) (ISVCEncoder*, void* pParam, const INIT_TYPE kiInitType);
 
   int (*Uninitialize) (ISVCEncoder*);
 
