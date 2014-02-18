@@ -1838,7 +1838,7 @@ int32_t InitSliceSettings (SWelsSvcCodingParam* pCodingParam, const int32_t kiCp
                               pSlcArg->uiSliceNum; // uiSliceNum per input has been validated at ParamValidationExt()
 #endif//DYNAMIC_SLICE_ASSIGN
 #else//!MT_ENABLED
-    int16_t iSliceNum				= pSlcArg->iSliceNum; // uiSliceNum per input has been validated at ParamValidationExt()
+    int16_t iSliceNum				= pSlcArg->uiSliceNum; // uiSliceNum per input has been validated at ParamValidationExt()
 #endif//MT_ENABLED
 
     // NOTE: Per design, in case MT/DYNAMIC_SLICE_ASSIGN enabled, for SM_FIXEDSLCNUM_SLICE mode,
