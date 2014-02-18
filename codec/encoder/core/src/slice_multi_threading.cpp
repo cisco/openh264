@@ -1459,7 +1459,7 @@ void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t 
   while (iSpatialIdx < iSpatialNum) {
     const int32_t kiDid		= pDidList[iSpatialIdx];
     SDLayerParam* pDlp		= &pPara->sDependencyLayers[kiDid];
-    SMulSliceOption* pMso	= &pDlp->sSliceCfg;
+    SSliceConfig* pMso		= &pDlp->sSliceCfg;
     SDqLayer* pCurDq		= pCtx->ppDqLayerList[kiDid];
     SSliceCtx* pSliceCtx = pCurDq->pSliceEncCtx;
     const uint32_t kuiCountSliceNum = pSliceCtx->iSliceNumInFrame;
