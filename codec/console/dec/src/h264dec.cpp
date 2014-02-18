@@ -406,7 +406,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
     return 1;
   }
 
-  if (pDecoder->Initialize (&sDecParam, INIT_TYPE_PARAMETER_BASED)) {
+  if (pDecoder->Initialize (&sDecParam)) {
     printf ("Decoder initialization failed.\n");
     return 1;
   }

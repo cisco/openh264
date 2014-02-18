@@ -52,7 +52,7 @@ extern "C" {
 /*!
  * \brief	configure decoder parameters
  */
-int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const void* kpParam);
+int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpParam);
 
 /*!
  *************************************************************************************

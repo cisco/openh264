@@ -350,7 +350,7 @@ void WelsCloseDecoder (PWelsDecoderContext pCtx) {
 /*!
  * \brief	configure decoder parameters
  */
-int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const void* kpParam) {
+int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpParam) {
   if (NULL == pCtx || NULL == kpParam)
     return 1;
 

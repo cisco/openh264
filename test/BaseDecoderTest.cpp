@@ -58,7 +58,7 @@ void BaseDecoderTest::SetUp() {
   decParam.uiEcActiveFlag  = 1;
   decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
 
-  rv = decoder_->Initialize(&decParam, INIT_TYPE_PARAMETER_BASED);
+  rv = decoder_->Initialize(&decParam);
   ASSERT_EQ(0, rv);
 }
 
