@@ -985,6 +985,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
                         PBitStringAux pBs) {
   PSlice pSlice				= &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer;
   PSliceHeader pSliceHeader	= &pSlice->sSliceHeaderExt.sSliceHeader;
+  PPicture* ppRefPic = pCtx->sRefPic.pRefList[LIST_0];
   int32_t iNumRefFrames		= pSliceHeader->pSps->iNumRefFrames;
   int32_t iRefCount[2];
   PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
@@ -992,7 +993,8 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
   int32_t iMotionPredFlag[4];
   int16_t iMv[2] = {0};
-
+  int16_t iMinVmv = pSliceHeader->pSps->pSLevelLimits->iMinVmv;
+  int16_t iMaxVmv = pSliceHeader->pSps->pSLevelLimits->iMaxVmv;
   iMotionPredFlag[0] = iMotionPredFlag[1] = iMotionPredFlag[2] = iMotionPredFlag[3] =
                          pSlice->sSliceHeaderExt.bDefaultMotionPredFlag;
   iRefCount[0] = pSliceHeader->uiRefCount[0];
@@ -1000,13 +1002,15 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
 
   switch (pCurDqLayer->pMbType[iMbXy]) {
   case MB_TYPE_16x16: {
-    int8_t iRefIdx = 0;
+    int32_t iRefIdx = 0;
     if (pSlice->sSliceHeaderExt.bAdaptiveMotionPredFlag) {
       iMotionPredFlag[0] = BsGetOneBit (pBs);
     }
     if (iMotionPredFlag[0] == 0) {
       iRefIdx = BsGetTe0 (pBs, iRefCount[0]);
-      if (iRefIdx < 0 || iRefIdx >= iNumRefFrames) { //error ref_idx
+      // Security check: iRefIdx should be in range 0 to num_ref_idx_l0_active_minus1, includsive
+      // ref to standard section 7.4.5.1. iRefCount[0] is 1 + num_ref_idx_l0_active_minus1.
+      if ((iRefIdx < 0) || (iRefIdx >= iRefCount[0]) || (ppRefPic[iRefIdx] == NULL)) { //error ref_idx
         return ERR_INFO_INVALID_REF_INDEX;
       }
     } else {
@@ -1017,7 +1021,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
 
     iMv[0] += BsGetSe (pBs);
     iMv[1] += BsGetSe (pBs);
-
+    WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
     UpdateP16x16MotionInfo (pCurDqLayer, iRefIdx, iMv);
   }
   break;
@@ -1035,7 +1039,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
         return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_UNSUPPORTED_ILP);
       }
       iRefIdx[i] = BsGetTe0 (pBs, iRefCount[0]);
-      if (iRefIdx[i] < 0 || iRefIdx[i] >= iNumRefFrames) { //error ref_idx
+      if ((iRefIdx[i] < 0) || (iRefIdx[i] >= iRefCount[0]) || (ppRefPic[iRefIdx[i]] == NULL)) { //error ref_idx
         return ERR_INFO_INVALID_REF_INDEX;
       }
     }
@@ -1044,7 +1048,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
 
       iMv[0] += BsGetSe (pBs);
       iMv[1] += BsGetSe (pBs);
-
+      WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
       UpdateP16x8MotionInfo (pCurDqLayer, iMvArray, iRefIdxArray, i << 3, iRefIdx[i], iMv);
     }
   }
@@ -1060,7 +1064,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
     for (i = 0; i < 2; i++) {
       if (iMotionPredFlag[i] == 0) {
         iRefIdx[i] = BsGetTe0 (pBs, iRefCount[0]);
-        if (iRefIdx[i] < 0 || iRefIdx[i] >= iNumRefFrames) { //error ref_idx
+        if ((iRefIdx[i] < 0) || (iRefIdx[i] >= iRefCount[0]) || (ppRefPic[iRefIdx[i]] == NULL)) { //error ref_idx
           return ERR_INFO_INVALID_REF_INDEX;
         }
       } else {
@@ -1074,14 +1078,14 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
 
       iMv[0] += BsGetSe (pBs);
       iMv[1] += BsGetSe (pBs);
-
+      WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
       UpdateP8x16MotionInfo (pCurDqLayer, iMvArray, iRefIdxArray, i << 2, iRefIdx[i], iMv);
     }
   }
   break;
   case MB_TYPE_8x8:
   case MB_TYPE_8x8_REF0: {
-    int8_t iRefIdx[4] = {0}, iSubPartCount[4], iPartWidth[4];
+    int32_t iRefIdx[4] = {0}, iSubPartCount[4], iPartWidth[4];
     uint32_t uiSubMbType;
 
     if (MB_TYPE_8x8_REF0 == pCurDqLayer->pMbType[iMbXy]) {
@@ -1116,7 +1120,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
 
         if (iMotionPredFlag[i] == 0) {
           iRefIdx[i] = BsGetTe0 (pBs, iRefCount[0]);
-          if (iRefIdx[i] < 0 || iRefIdx[i] >= iNumRefFrames) { //error ref_idx
+          if ((iRefIdx[i] < 0) || (iRefIdx[i] >= iRefCount[0]) || (ppRefPic[iRefIdx[i]] == NULL)) { //error ref_idx
             return ERR_INFO_INVALID_REF_INDEX;
           }
 
@@ -1149,7 +1153,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
 
         iMv[0] += BsGetSe (pBs);
         iMv[1] += BsGetSe (pBs);
-
+        WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
         if (SUB_MB_TYPE_8x8 == uiSubMbType) {
           ST32 (pCurDqLayer->pMv[0][iMbXy][uiScan4Idx], LD32 (iMv));
           ST32 (pCurDqLayer->pMv[0][iMbXy][uiScan4Idx + 1], LD32 (iMv));

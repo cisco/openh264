@@ -211,6 +211,95 @@ do {
 
 return 0;
 }
+//define macros to check syntax elements
+#define WELS_CHECK_SE_BOTH_ERROR(val, lower_bound, upper_bound, syntax_name, ret_code) do {\
+if ((val < lower_bound) || (val > upper_bound)) {\
+  WelsLog(pCtx, WELS_LOG_ERROR, "invalid syntax " syntax_name " %d\n", val);\
+  return ret_code;\
+}\
+}while(0)
+
+#define WELS_CHECK_SE_LOWER_ERROR(val, lower_bound, syntax_name, ret_code) do {\
+if (val < lower_bound) {\
+  WelsLog(pCtx, WELS_LOG_ERROR, "invalid syntax " syntax_name " %d\n", val);\
+  return ret_code;\
+}\
+}while(0)
+
+#define WELS_CHECK_SE_UPPER_ERROR(val, upper_bound, syntax_name, ret_code) do {\
+if (val > upper_bound) {\
+  WelsLog(pCtx, WELS_LOG_ERROR, "invalid syntax " syntax_name " %d\n", val);\
+  return ret_code;\
+}\
+}while(0)
+
+#define WELS_CHECK_SE_BOTH_ERROR_NOLOG(val, lower_bound, upper_bound, syntax_name, ret_code) do {\
+if ((val < lower_bound) || (val > upper_bound)) {\
+  return ret_code;\
+}\
+}while(0)
+
+#define WELS_CHECK_SE_LOWER_ERROR_NOLOG(val, lower_bound, syntax_name, ret_code) do {\
+if (val < lower_bound) {\
+  return ret_code;\
+}\
+}while(0)
+
+#define WELS_CHECK_SE_UPPER_ERROR_NOLOG(val, upper_bound, syntax_name, ret_code) do {\
+if (val > upper_bound) {\
+  return ret_code;\
+}\
+}while(0)
+
+
+#define WELS_CHECK_SE_BOTH_WARNING(val, lower_bound, upper_bound, syntax_name) do {\
+if ((val < lower_bound) || (val > upper_bound)) {\
+  WelsLog(pCtx, WELS_LOG_WARNING, "invalid syntax " syntax_name " %d\n", val);\
+}\
+}while(0)
+
+#define WELS_CHECK_SE_LOWER_WARNING(val, lower_bound, syntax_name) do {\
+if (val < lower_bound) {\
+  WelsLog(pCtx, WELS_LOG_WARNING, "invalid syntax " syntax_name " %d\n", val);\
+}\
+}while(0)
+
+#define WELS_CHECK_SE_UPPER_WARNING(val, upper_bound, syntax_name) do {\
+if (val > upper_bound) {\
+  WelsLog(pCtx, WELS_LOG_WARNING, "invalid syntax " syntax_name " %d\n", val);\
+}\
+}while(0)
+// below define syntax element offset
+// for bit_depth_luma_minus8 and bit_depth_chroma_minus8
+#define BIT_DEPTH_LUMA_OFFSET 8
+#define BIT_DEPTH_CHROMA_OFFSET 8
+// for log2_max_frame_num_minus4
+#define LOG2_MAX_FRAME_NUM_OFFSET 4
+// for log2_max_pic_order_cnt_lsb_minus4
+#define LOG2_MAX_PIC_ORDER_CNT_LSB_OFFSET 4
+// for pic_width_in_mbs_minus1
+#define PIC_WIDTH_IN_MBS_OFFSET 1
+// for pic_height_in_map_units_minus1
+#define PIC_HEIGHT_IN_MAP_UNITS_OFFSET 1
+// for bit_depth_aux_minus8
+#define BIT_DEPTH_AUX_OFFSET 8
+// for num_slice_groups_minus1
+#define NUM_SLICE_GROUPS_OFFSET 1
+// for run_length_minus1
+#define RUN_LENGTH_OFFSET 1
+// for slice_group_change_rate_minus1
+#define SLICE_GROUP_CHANGE_RATE_OFFSET 1
+// for pic_size_in_map_units_minus1
+#define PIC_SIZE_IN_MAP_UNITS_OFFSET 1
+// for num_ref_idx_l0_default_active_minus1 and num_ref_idx_l1_default_active_minus1
+#define NUM_REF_IDX_L0_DEFAULT_ACTIVE_OFFSET 1
+#define NUM_REF_IDX_L1_DEFAULT_ACTIVE_OFFSET 1
+// for pic_init_qp_minus26 and pic_init_qs_minus26
+#define PIC_INIT_QP_OFFSET 26
+#define PIC_INIT_QS_OFFSET 26
+// for num_ref_idx_l0_active_minus1 and num_ref_idx_l1_active_minus1
+#define NUM_REF_IDX_L0_ACTIVE_OFFSET 1
+#define NUM_REF_IDX_L1_ACTIVE_OFFSET 1
 
 } // namespace WelsDec
 
