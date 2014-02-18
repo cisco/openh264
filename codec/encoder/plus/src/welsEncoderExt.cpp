@@ -282,13 +282,13 @@ int CWelsH264SVCEncoder::Initialize (SEncParamBase* argv, const INIT_TYPE iInitT
 #endif//REC_FRAME_COUNT
   m_iSrcListSize  = 1;
 
-  return Initialize2 ((void*)&sConfig, INIT_TYPE_PARAMETER_BASED);
+  return Initialize2 (&sConfig);
 }
 
-int CWelsH264SVCEncoder::Initialize2 (void* argv, const INIT_TYPE iInitType) {
-  if (INIT_TYPE_PARAMETER_BASED != iInitType || NULL == argv) {
-    WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::Initialize(), invalid iInitType= %d, argv= 0x%p.\n",
-             iInitType, (void*)argv);
+int CWelsH264SVCEncoder::Initialize2 (SWelsSvcCodingParam* pCfg) {
+  if (NULL == pCfg) {
+    WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::Initialize(), invalid argv= 0x%p.\n",
+             pCfg);
     return cmInitParaError;
   }
 
@@ -297,8 +297,6 @@ int CWelsH264SVCEncoder::Initialize2 (void* argv, const INIT_TYPE iInitType) {
              m_bInitialFlag);
     Uninitialize();
   }
-
-  SWelsSvcCodingParam*  pCfg = static_cast<SWelsSvcCodingParam*> (argv);
 
   const int32_t iColorspace = pCfg->iInputCsp;
   if (0 == iColorspace) {

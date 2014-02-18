@@ -67,7 +67,6 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
    * return: CM_RETURN: 0 - success; otherwise - failed;
    */
   virtual int EXTAPI Initialize (SEncParamBase* argv, const INIT_TYPE init_type);
-  virtual int EXTAPI Initialize2 (void* argv, const INIT_TYPE init_type);
 
   virtual int EXTAPI Uninitialize();
 
@@ -102,6 +101,8 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   virtual int EXTAPI GetOption (ENCODER_OPTION opt_id, void* option);
 
  private:
+  int Initialize2 (SWelsSvcCodingParam* argv);
+
   sWelsEncCtx*	m_pEncContext;
 
   welsCodecTrace*			m_pWelsTrace;
