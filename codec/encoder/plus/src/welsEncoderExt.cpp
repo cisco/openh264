@@ -222,7 +222,7 @@ int CWelsH264SVCEncoder::Initialize (const SEncParamBase* argv, const INIT_TYPE 
   else if(iInitType ==  INIT_TYPE_PARAMETER_EXT)
   {
 	// Convert SEncParamExt into WelsSVCParamConfig here..
-	if (sConfig.ParamTranscode (*(const SEncParamExt*)argv, true)) {
+	if (sConfig.ParamTranscode (*(const SEncParamExt*)argv)) {
 		WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::Initialize(), parameter_translation failed.\n");
 		Uninitialize();
 		return cmInitParaError;
@@ -785,7 +785,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     }
 
     iInputColorspace	= sEncodingParam.iInputCsp;
-    if (sConfig.ParamTranscode (sEncodingParam, true)) {
+    if (sConfig.ParamTranscode (sEncodingParam)) {
       return cmInitParaError;
     }
     if (sConfig.iSpatialLayerNum < 1) {

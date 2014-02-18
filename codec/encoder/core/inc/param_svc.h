@@ -275,7 +275,7 @@ int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam, const bool kbEnab
 
    return 0;
 }
-int32_t ParamTranscode (const SEncParamExt& pCodingParam, const bool kbEnableRc = true) {
+int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   float fParamMaxFrameRate		= WELS_CLIP3 (pCodingParam.fMaxFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
 
   iInputCsp		= pCodingParam.iInputCsp;		// color space of input sequence
@@ -305,7 +305,7 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam, const bool kbEnableRc 
   bEnableFrameCroppingFlag	= true;
 
   /* Rate Control */
-  bEnableRc			= kbEnableRc;
+  bEnableRc			= pCodingParam.bEnableRc;
   if (pCodingParam.iRCMode != RC_MODE0 && pCodingParam.iRCMode != RC_MODE1)
     iRCMode = RC_MODE1;
   else
