@@ -58,22 +58,6 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc);
 int32_t WelsReorderRefList (PWelsDecoderContext pCtx);
 int32_t WelsMarkAsRef (PWelsDecoderContext pCtx, const bool kbRefBaseMarkingFlag);
 
-static PPicture WelsDelShortFromList (PRefPic pRefPic, int32_t iFrameNum,           ERemoveFlag eRemoveFlag);
-static PPicture WelsDelLongFromList (PRefPic pRefPic, uint32_t uiLongTermFrameIdx, ERemoveFlag eRemoveFlag);
-static PPicture WelsDelShortFromListSetUnref (PRefPic pRefPic, int32_t iFrameNum,           ERemoveFlag eRemoveFlag);
-static PPicture WelsDelLongFromListSetUnref (PRefPic pRefPic, uint32_t uiLongTermFrameIdx, ERemoveFlag eRemoveFlag);
-
-static int32_t MMCOBase (PWelsDecoderContext pCtx, PRefBasePicMarking pRefPicBaseMarking);
-static int32_t MMCO (PWelsDecoderContext pCtx, PRefPicMarking pRefPicMarking);
-static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType, bool bRefBasePic,
-                            int32_t iShortFrameNum, uint32_t uiLongTermPicNum, int32_t iLongTermFrameIdx, int32_t iMaxLongTermFrameIdx);
-static int32_t SlidingWindow (PWelsDecoderContext pCtx);
-
-static int32_t AddShortTermToList (PRefPic pRefPic, PPicture pPic);
-static int32_t AddLongTermToList (PRefPic pRefPic, PPicture pPic, int32_t iLongTermFrameIdx);
-static int32_t AssignLongTermIdx (PRefPic pRefPic, int32_t iFrameNum, int32_t iLongTermFrameIdx);
-static int32_t MarkAsLongTerm (PRefPic pRefPic, int32_t iFrameNum, int32_t iLongTermFrameIdx);
-
 } // namespace WelsDec
 
 #endif//WELS_MANAGE_DEC_REF_H__
