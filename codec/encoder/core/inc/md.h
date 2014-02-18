@@ -111,9 +111,6 @@ uint8_t* pQuarPixTmp;
 
 } SMeRefinePointer;
 
-static void md_intra_init (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb);
-static void md_inter_init (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb);
-
 void FillNeighborCacheIntra (SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth/*, bool constrained_intra_pred_flag*/);
 void FillNeighborCacheInterWithoutBGD (SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth,
                                        int8_t* pVaaBgMbFlag); //BGD spatial func
