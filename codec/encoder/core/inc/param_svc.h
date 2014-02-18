@@ -222,9 +222,8 @@ void FillDefault (const bool kbEnableRc) {
 
 }
 
-int32_t ParamBaseTranscode (SEncParamBase& pCodingParam, const bool kbEnableRc = true) {
+int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam, const bool kbEnableRc = true) {
 
-  pCodingParam.fMaxFrameRate		= WELS_CLIP3 (pCodingParam.fMaxFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
   iInputCsp		= pCodingParam.iInputCsp;		// color space of input sequence
 
   iPicWidth   = pCodingParam.iPicWidth;
@@ -278,8 +277,8 @@ int32_t ParamBaseTranscode (SEncParamBase& pCodingParam, const bool kbEnableRc =
 
    return 0;
 }
-int32_t ParamTranscode (SEncParamExt& pCodingParam, const bool kbEnableRc = true) {
-  pCodingParam.fMaxFrameRate		= WELS_CLIP3 (pCodingParam.fMaxFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
+int32_t ParamTranscode (const SEncParamExt& pCodingParam, const bool kbEnableRc = true) {
+  float fParamMaxFrameRate		= WELS_CLIP3 (pCodingParam.fMaxFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
 
   iInputCsp		= pCodingParam.iInputCsp;		// color space of input sequence
   uiFrameToBeCoded	= (uint32_t) -
@@ -345,10 +344,7 @@ int32_t ParamTranscode (SEncParamExt& pCodingParam, const bool kbEnableRc = true
   /* Layer definition */
   iSpatialLayerNum	= (int8_t)WELS_CLIP3 (pCodingParam.iSpatialLayerNum, 1,
                         MAX_DEPENDENCY_LAYER); // number of dependency(Spatial/CGS) layers used to be encoded
-  pCodingParam.iTemporalLayerNum = (int8_t)WELS_CLIP3 (pCodingParam.iTemporalLayerNum, 1,
-                                   MAX_TEMPORAL_LEVEL);	// safe valid iTemporalLayerNum
-  iTemporalLayerNum		= (int8_t)
-                        pCodingParam.iTemporalLayerNum;//(int8_t)WELS_CLIP3(pCodingParam.iTemporalLayerNum, 1, MAX_TEMPORAL_LEVEL);// number of temporal layer specified
+  iTemporalLayerNum		= (int8_t)WELS_CLIP3(pCodingParam.iTemporalLayerNum, 1, MAX_TEMPORAL_LEVEL);// number of temporal layer specified
 
   uiGopSize			= 1 << (iTemporalLayerNum - 1);	// Override GOP size based temporal layer
   iDecompStages		= iTemporalLayerNum - 1;	// WELS_LOG2( uiGopSize );// GOP size dependency
@@ -377,11 +373,10 @@ int32_t ParamTranscode (SEncParamExt& pCodingParam, const bool kbEnableRc = true
   while (iIdxSpatial < iSpatialLayerNum) {
     pDlp->uiProfileIdc		= uiProfileIdc;
 
-    pCodingParam.sSpatialLayers[iIdxSpatial].fFrameRate	= WELS_CLIP3 (pCodingParam.sSpatialLayers[iIdxSpatial].fFrameRate,
-        MIN_FRAME_RATE, pCodingParam.fMaxFrameRate);
+    float fLayerFrameRate	= WELS_CLIP3 (pCodingParam.sSpatialLayers[iIdxSpatial].fFrameRate,
+        MIN_FRAME_RATE, fParamMaxFrameRate);
     pDlp->fInputFrameRate	=
-      pDlp->fOutputFrameRate	= WELS_CLIP3 (pCodingParam.sSpatialLayers[iIdxSpatial].fFrameRate, MIN_FRAME_RATE,
-                                            MAX_FRAME_RATE);
+      pDlp->fOutputFrameRate	= WELS_CLIP3 (fLayerFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
     if (pDlp->fInputFrameRate > fMaxFr + EPSN)
       fMaxFr = pDlp->fInputFrameRate;
 
