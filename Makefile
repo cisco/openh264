@@ -124,10 +124,11 @@ $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSIN
 	$(QUIET)rm -f $@
 	$(QUIET_CXX)$(CXX) -shared $(LDFLAGS) -o $@ $+
 
-install: $(LIBPREFIX)wels.$(LIBSUFFIX)
+install: $(LIBPREFIX)wels.$(LIBSUFFIX) $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX)
 	mkdir -p $(PREFIX)/lib
 	mkdir -p $(PREFIX)/include/wels
 	install -m 644 $(LIBPREFIX)wels.$(LIBSUFFIX) $(PREFIX)/lib
+	install -m 755 $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX) $(PREFIX)/lib
 	install -m 644 codec/api/svc/codec*.h $(PREFIX)/include/wels
 
 ifeq ($(HAVE_GTEST),Yes)
