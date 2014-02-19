@@ -83,10 +83,6 @@ ENCODER_INCLUDES = \
     -Icodec/encoder/core/inc \
     -Icodec/encoder/plus/inc
 
-PROCESSING_INCLUDES = \
-    -Icodec/encoder/core/inc \
-    -Icodec/encoder/plus/inc
-
 GTEST_INCLUDES = \
     -Igtest \
     -Igtest/include
