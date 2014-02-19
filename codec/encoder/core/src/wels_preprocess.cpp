@@ -46,8 +46,8 @@
 #include "utils.h"
 
 #ifdef NO_DYNAMIC_VP
-EResult WELSAPI CreateVpInterface (void** ppCtx, int iVersion);
-EResult WELSAPI DestroyVpInterface (void** ppCtx, int iVersion);
+EResult CreateVpInterface (void** ppCtx, int iVersion);
+EResult DestroyVpInterface (void** ppCtx, int iVersion);
 #endif
 
 namespace WelsSVCEnc {
@@ -56,8 +56,8 @@ namespace WelsSVCEnc {
 
 
 //***** entry API declaration ************************************************************************//
-typedef EResult (WELSAPI* pfnCreateVpInterface) (void**, int);
-typedef EResult (WELSAPI* pfnDestroyVpInterface) (void*, int);
+typedef EResult (* pfnCreateVpInterface) (void**, int);
+typedef EResult (* pfnDestroyVpInterface) (void*, int);
 
 int32_t WelsInitScaledPic (SWelsSvcCodingParam* pParam,  Scaled_Picture*  pScaledPic, CMemoryAlign* pMemoryAlign);
 bool  JudgeNeedOfScaling (SWelsSvcCodingParam* pParam, Scaled_Picture* pScaledPic);

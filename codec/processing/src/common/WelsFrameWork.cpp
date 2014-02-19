@@ -43,7 +43,7 @@
 
 /* interface API implement */
 
-EResult WELSAPI CreateVpInterface (void** ppCtx, int iVersion) {
+EResult CreateVpInterface (void** ppCtx, int iVersion) {
   if (iVersion & 0x8000)
     return nsWelsVP::CreateSpecificVpInterface ((IWelsVP**)ppCtx);
   else if (iVersion & 0x7fff)
@@ -52,7 +52,7 @@ EResult WELSAPI CreateVpInterface (void** ppCtx, int iVersion) {
     return RET_INVALIDPARAM;
 }
 
-EResult WELSAPI DestroyVpInterface (void* pCtx, int iVersion) {
+EResult DestroyVpInterface (void* pCtx, int iVersion) {
   if (iVersion & 0x8000)
     return nsWelsVP::DestroySpecificVpInterface ((IWelsVP*)pCtx);
   else if (iVersion & 0x7fff)
