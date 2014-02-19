@@ -504,10 +504,7 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
   }
 
   int32_t uiFrameType = videoFrameTypeInvalid;
-
- // if (RawData2SrcPic ((uint8_t*)pSrc) == 0) {
-    uiFrameType = EncodeFrame2 (&kpSrcPic, 1, pBsInfo);
- // }
+  uiFrameType = EncodeFrame2 (&kpSrcPic, 1, pBsInfo);
 
 #ifdef REC_FRAME_COUNT
   ++ m_uiCountFrameNum;
