@@ -1,3 +1,4 @@
+include build/platform-x86-common.mk
 include build/platform-msvc-common.mk
 ASM = nasm
 CFLAGS += -DMT_ENABLED
