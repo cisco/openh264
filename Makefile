@@ -130,6 +130,9 @@ install: $(LIBPREFIX)wels.$(LIBSUFFIX) $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX)
 	mkdir -p $(PREFIX)/include/wels
 	install -m 644 $(LIBPREFIX)wels.$(LIBSUFFIX) $(PREFIX)/lib
 	install -m 755 $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX) $(PREFIX)/lib
+ifneq ($(EXTRA_LIBRARY),)
+	install -m 644 $(EXTRA_LIBRARY) $(PREFIX)/lib
+endif
 	install -m 644 codec/api/svc/codec*.h $(PREFIX)/include/wels
 
 ifeq ($(HAVE_GTEST),Yes)

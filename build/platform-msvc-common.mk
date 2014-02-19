@@ -16,3 +16,4 @@ EXEEXT=.exe
 SHAREDLIBSUFFIX=dll
 SHARED=-LD
 SHLDFLAGS=-link -def:wels.def -implib:wels_dll.lib
+EXTRA_LIBRARY=wels_dll.lib
