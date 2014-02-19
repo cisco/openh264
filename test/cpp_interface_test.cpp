@@ -34,36 +34,31 @@ struct SVCEncoderImpl : public ISVCEncoder {
     EXPECT_TRUE(gThis == this);
     return 3;
   }
-  virtual int EXTAPI EncodeFrame(const unsigned char* kpSrc,
+  virtual int EXTAPI EncodeFrame(const SSourcePicture* kpSrcPic,
       SFrameBSInfo* pBsInfo) {
     EXPECT_TRUE(gThis == this);
     return 4;
   }
-  virtual int EXTAPI EncodeFrame2(const SSourcePicture** kppSrcPicList,
-      int nSrcPicNum, SFrameBSInfo* pBsInfo) {
-    EXPECT_TRUE(gThis == this);
-    return 5;
-  }
   virtual int EXTAPI EncodeParameterSets(SFrameBSInfo* pBsInfo) {
     EXPECT_TRUE(gThis == this);
-    return 6;
+    return 5;
   }
   virtual int EXTAPI PauseFrame(const unsigned char* kpSrc,
       SFrameBSInfo* pBsInfo) {
     EXPECT_TRUE(gThis == this);
-    return 7;
+    return 6;
   }
   virtual int EXTAPI ForceIntraFrame(bool bIDR) {
     EXPECT_TRUE(gThis == this);
-    return 8;
+    return 7;
   }
   virtual int EXTAPI SetOption(ENCODER_OPTION eOptionId, void* pOption) {
     EXPECT_TRUE(gThis == this);
-    return 9;
+    return 8;
   }
   virtual int EXTAPI GetOption(ENCODER_OPTION eOptionId, void* pOption) {
     EXPECT_TRUE(gThis == this);
-    return 10;
+    return 9;
   }
 };
 
