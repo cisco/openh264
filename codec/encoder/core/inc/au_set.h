@@ -105,7 +105,7 @@ int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, SParaS
  */
 int32_t WelsInitSps (SWelsSPS* pSps, SDLayerParam* pLayerParam, const uint32_t kuiIntraPeriod,
                      const int32_t kiNumRefFrame,
-                     const uint32_t kiSpsId, const bool_t kbEnableFrameCropping, bool_t bEnableRc);
+                     const uint32_t kiSpsId, const bool kbEnableFrameCropping, bool bEnableRc);
 
 /*!
  * \brief	initialize subset pSps based on configurable parameters in svc
@@ -117,16 +117,16 @@ int32_t WelsInitSps (SWelsSPS* pSps, SDLayerParam* pLayerParam, const uint32_t k
  */
 int32_t WelsInitSubsetSps (SSubsetSps* pSubsetSps, SDLayerParam* pLayerParam, const uint32_t kuiIntraPeriod,
                            const int32_t kiNumRefFrame,
-                           const uint32_t kiSpsId, const bool_t kbEnableFrameCropping, bool_t bEnableRc);
+                           const uint32_t kiSpsId, const bool kbEnableFrameCropping, bool bEnableRc);
 
 /*!
  * \brief	initialize pPps based on configurable parameters and pSps(subset pSps) in svc
  * \param	pPps							SWelsPPS*
  * \param	pSps							SWelsSPS*
  * \param	pSubsetSps					SSubsetSps*
- * \param   kbDeblockingFilterPresentFlag			bool_t
+ * \param   kbDeblockingFilterPresentFlag			bool
  * \param	kiPpsId						PPS Id
- * \param	kbUsingSubsetSps					bool_t
+ * \param	kbUsingSubsetSps					bool
  * \return	0 - successful
  *			1 - failed
  */
@@ -134,8 +134,8 @@ int32_t WelsInitPps (SWelsPPS* pPps,
                      SWelsSPS* pSps,
                      SSubsetSps* pSubsetSps,
                      const uint32_t kuiPpsId,
-                     const bool_t kbDeblockingFilterPresentFlag,
-                     const bool_t kbUsingSubsetSps);
+                     const bool kbDeblockingFilterPresentFlag,
+                     const bool kbUsingSubsetSps);
 
 }
 #endif//WELS_ACCESS_UNIT_PARSER_H__

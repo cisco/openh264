@@ -432,7 +432,7 @@ WELS_EXTERN McCopyWidthEq16_sse2
 
 ALIGN 16
 ;*******************************************************************************
-; void_t PixelAvgWidthEq4_mmx( uint8_t *pDst,  int iDstStride,
+; void PixelAvgWidthEq4_mmx( uint8_t *pDst,  int iDstStride,
 ;                           uint8_t *pSrcA, int iSrcAStride,
 ;                           uint8_t *pSrcB, int iSrcBStride,
 ;                           int iHeight );
@@ -468,7 +468,7 @@ ALIGN 4
 
 ALIGN 16
 ;*******************************************************************************
-; void_t PixelAvgWidthEq8_mmx( uint8_t *pDst,  int iDstStride,
+; void PixelAvgWidthEq8_mmx( uint8_t *pDst,  int iDstStride,
 ;                           uint8_t *pSrcA, int iSrcAStride,
 ;                           uint8_t *pSrcB, int iSrcBStride,
 ;                           int iHeight );
@@ -522,7 +522,7 @@ ALIGN 4
 
 ALIGN 16
 ;*******************************************************************************
-; void_t PixelAvgWidthEq16_sse2( uint8_t *pDst,  int iDstStride,
+; void PixelAvgWidthEq16_sse2( uint8_t *pDst,  int iDstStride,
 ;                          uint8_t *pSrcA, int iSrcAStride,
 ;                          uint8_t *pSrcB, int iSrcBStride,
 ;                          int iHeight );
@@ -577,7 +577,7 @@ ALIGN 4
 
 ALIGN 16
 ;*******************************************************************************
-;  void_t McCopyWidthEq4_mmx( uint8_t *pSrc, int iSrcStride,
+;  void McCopyWidthEq4_mmx( uint8_t *pSrc, int iSrcStride,
 ;                          uint8_t *pDst, int iDstStride, int iHeight )
 ;*******************************************************************************
 McCopyWidthEq4_mmx:
@@ -618,7 +618,7 @@ ALIGN 4
 
 ALIGN 16
 ;*******************************************************************************
-;   void_t McCopyWidthEq8_mmx( uint8_t *pSrc, int iSrcStride,
+;   void McCopyWidthEq8_mmx( uint8_t *pSrc, int iSrcStride,
 ;                           uint8_t *pDst, int iDstStride, int iHeight )
 ;*******************************************************************************
 McCopyWidthEq8_mmx:
@@ -655,7 +655,7 @@ ALIGN 4
 
 ALIGN 16
 ;*******************************************************************************
-;   void_t McCopyWidthEq16_sse2( uint8_t *pSrc, int iSrcStride, uint8_t *pDst, int iDstStride, int iHeight )
+;   void McCopyWidthEq16_sse2( uint8_t *pSrc, int iSrcStride, uint8_t *pDst, int iDstStride, int iHeight )
 ;*******************************************************************************
 ;read unaligned memory
 %macro SSE_READ_UNA 2

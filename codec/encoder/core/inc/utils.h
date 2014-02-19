@@ -65,7 +65,7 @@ WELS_LOG_DEFAULT	= WELS_LOG_ERROR | WELS_LOG_WARNING | WELS_LOG_INFO | WELS_LOG_
  *	Function pointer declaration for various tool sets
  */
 // wels log output
-typedef void (*PWelsLogCallbackFunc) (void* pCtx, const int32_t iLevel, const str_t* kpFmt, va_list argv);
+typedef void (*PWelsLogCallbackFunc) (void* pCtx, const int32_t iLevel, const char* kpFmt, va_list argv);
 
 // wels psnr calc
 typedef float (*PWelsPsnrFunc) (const void* kpTarPic,
@@ -78,13 +78,13 @@ typedef float (*PWelsPsnrFunc) (const void* kpTarPic,
 extern PWelsLogCallbackFunc	wlog;
 
 #ifdef __GNUC__
-extern void WelsLog (void* pCtx, int32_t iLevel, const str_t* kpFmt, ...) __attribute__ ((__format__ (__printf__, 3,
+extern void WelsLog (void* pCtx, int32_t iLevel, const char* kpFmt, ...) __attribute__ ((__format__ (__printf__, 3,
     4)));
 #else
-extern void WelsLog (void* pCtx, int32_t iLevel, const str_t* kpFmt, ...);
+extern void WelsLog (void* pCtx, int32_t iLevel, const char* kpFmt, ...);
 #endif
 
-extern const str_t* g_sWelsLogTags[];
+extern const char* g_sWelsLogTags[];
 
 /*!
  *************************************************************************************
@@ -100,8 +100,8 @@ extern const str_t* g_sWelsLogTags[];
  * \note	N/A
  *************************************************************************************
  */
-void WelsLogDefault (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, va_list argv);
-void WelsLogNil (void* pCtx, const int32_t kiLevel, const str_t* kpFmtStr, va_list argv);
+void WelsLogDefault (void* pCtx, const int32_t kiLevel, const char* kpFmtStr, va_list argv);
+void WelsLogNil (void* pCtx, const int32_t kiLevel, const char* kpFmtStr, va_list argv);
 
 
 /*!
@@ -155,7 +155,7 @@ void WelsSetLogCallback (PWelsLogCallbackFunc _log);
 * \note	N/A
 *************************************************************************************
 */
-void WelsReopenTraceFile (void* pCtx, str_t* pCurPath);
+void WelsReopenTraceFile (void* pCtx, char* pCurPath);
 
 /*
  *	PSNR calculation routines

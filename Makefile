@@ -64,6 +64,7 @@ ASMFLAGS += $(ASMFLAGS_PLATFORM) -DNO_DYNAMIC_VP
 #### No user-serviceable parts below this line
 ifneq ($(V),Yes)
     QUIET_CXX = @printf "CXX\t$@\n";
+    QUIET_CC  = @printf "CC\t$@\n";
     QUIET_ASM = @printf "ASM\t$@\n";
     QUIET_AR  = @printf "AR\t$@\n";
     QUIET     = @
@@ -134,8 +135,8 @@ libraries: $(LIBPREFIX)wels.$(LIBSUFFIX)
 LIBRARIES += $(LIBPREFIX)wels.$(LIBSUFFIX)
 
 $(LIBPREFIX)wels.$(LIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
-	rm -f $@
-	$(AR) $(AR_OPTS) $+
+	$(QUIET)rm -f $@
+	$(QUIET_AR)$(AR) $(AR_OPTS) $+
 
 install: $(LIBPREFIX)wels.$(LIBSUFFIX)
 	mkdir -p $(PREFIX)/lib

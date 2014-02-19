@@ -102,7 +102,7 @@ float		fInputFrameRate;		// input frame rate
 float		fOutputFrameRate;		// output frame rate
 
 #ifdef ENABLE_FRAME_DUMP
-str_t		sRecFileName[MAX_FNAME_LEN];	// file to be constructed
+char		sRecFileName[MAX_FNAME_LEN];	// file to be constructed
 #endif//ENABLE_FRAME_DUMP
 } SDLayerParam;
 
@@ -121,23 +121,23 @@ struct {
   int32_t iHeight;
 } SUsedPicRect;	// the rect in input picture that encoder actually used
 
-str_t*       pCurPath; // record current lib path such as:/pData/pData/com.wels.enc/lib/
+char*       pCurPath; // record current lib path such as:/pData/pData/com.wels.enc/lib/
 
-bool_t		bDeblockingParallelFlag;	// deblocking filter parallelization control flag
-bool_t		bMgsT0OnlyStrategy; //MGS_T0_only_strategy
+bool		bDeblockingParallelFlag;	// deblocking filter parallelization control flag
+bool		bMgsT0OnlyStrategy; //MGS_T0_only_strategy
 
 // FALSE: Streaming Video Sharing; TRUE: Video Conferencing Meeting;
+
 int8_t		iDecompStages;		// GOP size dependency
-/* Rate Control */
-bool_t		bEnableRc;
+
 
  public:
-TagWelsSvcCodingParam (const bool_t kbEnableRc = true) {
+TagWelsSvcCodingParam (const bool kbEnableRc = true) {
   FillDefault (kbEnableRc);
 }
 ~TagWelsSvcCodingParam()	{}
 
-void FillDefault (const bool_t kbEnableRc) {
+void FillDefault (const bool kbEnableRc) {
   uiGopSize			= 1;			// GOP size (at maximal frame rate: 16)
   uiIntraPeriod		= 0;			// intra period (multiple of GOP size as desired)
   iNumRefFrame		= MIN_REF_PIC_COUNT;	// number of reference frame used
@@ -171,9 +171,9 @@ void FillDefault (const bool_t kbEnableRc) {
   bMgsT0OnlyStrategy			=
     true;	// Strategy of have MGS only at T0 frames (0: do not use this strategy; 1: use this strategy)
   bEnableSSEI					= true;
-  bEnableFrameCroppingFlag	= true;	// enable frame cropping flag: TRUE alwayse in application
+  bEnableFrameCroppingFlag	= true;	// enable frame cropping flag: true alwayse in application
   bEnableCropPic				= true;	// enable cropping source picture. , 8/25/2010
-  // FALSE: Streaming Video Sharing; TRUE: Video Conferencing Meeting;
+  // false: Streaming Video Sharing; true: Video Conferencing Meeting;
   iDecompStages				= 0;	// GOP size dependency, unknown here and be revised later
 
   /* Deblocking loop filter */
@@ -220,9 +220,8 @@ void FillDefault (const bool_t kbEnableRc) {
 
 }
 
-int32_t ParamBaseTranscode (SEncParamBase& pCodingParam, const bool_t kbEnableRc = true) {
+int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam, const bool kbEnableRc = true) {
 
-  pCodingParam.fMaxFrameRate		= WELS_CLIP3 (pCodingParam.fMaxFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
   iInputCsp		= pCodingParam.iInputCsp;		// color space of input sequence
 
   iPicWidth   = pCodingParam.iPicWidth;
@@ -248,23 +247,19 @@ int32_t ParamBaseTranscode (SEncParamBase& pCodingParam, const bool_t kbEnableRc
   while (iIdxSpatial < iSpatialLayerNum) {
 
     pDlp->uiProfileIdc		= uiProfileIdc;
-    sSpatialLayers[iIdxSpatial].fFrameRate	= WELS_CLIP3 (sSpatialLayers[iIdxSpatial].fFrameRate,
-        MIN_FRAME_RATE, pCodingParam.fMaxFrameRate);
+    sSpatialLayers[iIdxSpatial].fFrameRate	= WELS_CLIP3 (pCodingParam.fMaxFrameRate,
+        MIN_FRAME_RATE, MAX_FRAME_RATE);
     pDlp->fInputFrameRate	=
       pDlp->fOutputFrameRate	= WELS_CLIP3 (sSpatialLayers[iIdxSpatial].fFrameRate, MIN_FRAME_RATE,
                                             MAX_FRAME_RATE);
-    
 #ifdef ENABLE_FRAME_DUMP
     pDlp->sRecFileName[0]	= '\0';	// file to be constructed
 #endif//ENABLE_FRAME_DUMP
    pDlp->iActualWidth = sSpatialLayers[iIdxSpatial].iVideoWidth = iPicWidth;
-  
-   pDlp->iFrameWidth = 
-  WELS_ALIGN(pDlp->iActualWidth, MB_WIDTH_LUMA);
+   pDlp->iFrameWidth =  WELS_ALIGN(pDlp->iActualWidth, MB_WIDTH_LUMA);
 
   pDlp->iActualHeight = sSpatialLayers[iIdxSpatial].iVideoHeight = iPicHeight;
-  pDlp->iFrameHeight =
-    WELS_ALIGN(pDlp->iActualHeight, MB_HEIGHT_LUMA);
+  pDlp->iFrameHeight =  WELS_ALIGN(pDlp->iActualHeight, MB_HEIGHT_LUMA);
 
     pDlp->iSpatialBitrate	=
 		sSpatialLayers[iIdxSpatial].iSpatialBitrate = pCodingParam.iTargetBitrate;	// target bitrate for current spatial layer
@@ -276,15 +271,22 @@ int32_t ParamBaseTranscode (SEncParamBase& pCodingParam, const bool_t kbEnableRc
     ++ pDlp;
     ++ iIdxSpatial;
   }
-
- 
-
    SetActualPicResolution();
 
    return 0;
 }
-int32_t ParamTranscode (SEncParamExt& pCodingParam, const bool_t kbEnableRc = true) {
-  pCodingParam.fMaxFrameRate		= WELS_CLIP3 (pCodingParam.fMaxFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
+void GetBaseParams (SEncParamBase* pCodingParam) {
+  pCodingParam->iUsageType     = iUsageType;
+  pCodingParam->iInputCsp      = iInputCsp;
+  pCodingParam->iPicWidth      = iPicWidth;
+  pCodingParam->iPicHeight     = iPicHeight;
+  pCodingParam->iTargetBitrate = iTargetBitrate;
+  pCodingParam->iRCMode        = iRCMode;
+  pCodingParam->fMaxFrameRate  = fMaxFrameRate;
+}
+int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
+  float fParamMaxFrameRate		= WELS_CLIP3 (pCodingParam.fMaxFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
+
   iInputCsp		= pCodingParam.iInputCsp;		// color space of input sequence
   uiFrameToBeCoded	= (uint32_t) -
                       1;		// frame to be encoded (at input frame rate), -1 dependents on length of input sequence
@@ -312,7 +314,7 @@ int32_t ParamTranscode (SEncParamExt& pCodingParam, const bool_t kbEnableRc = tr
   bEnableFrameCroppingFlag	= true;
 
   /* Rate Control */
-  bEnableRc			= kbEnableRc;
+  bEnableRc			= pCodingParam.bEnableRc;
   if (pCodingParam.iRCMode != RC_MODE0 && pCodingParam.iRCMode != RC_MODE1)
     iRCMode = RC_MODE1;
   else
@@ -349,10 +351,7 @@ int32_t ParamTranscode (SEncParamExt& pCodingParam, const bool_t kbEnableRc = tr
   /* Layer definition */
   iSpatialLayerNum	= (int8_t)WELS_CLIP3 (pCodingParam.iSpatialLayerNum, 1,
                         MAX_DEPENDENCY_LAYER); // number of dependency(Spatial/CGS) layers used to be encoded
-  pCodingParam.iTemporalLayerNum = (int8_t)WELS_CLIP3 (pCodingParam.iTemporalLayerNum, 1,
-                                   MAX_TEMPORAL_LEVEL);	// safe valid iTemporalLayerNum
-  iTemporalLayerNum		= (int8_t)
-                        pCodingParam.iTemporalLayerNum;//(int8_t)WELS_CLIP3(pCodingParam.iTemporalLayerNum, 1, MAX_TEMPORAL_LEVEL);// number of temporal layer specified
+  iTemporalLayerNum		= (int8_t)WELS_CLIP3(pCodingParam.iTemporalLayerNum, 1, MAX_TEMPORAL_LEVEL);// number of temporal layer specified
 
   uiGopSize			= 1 << (iTemporalLayerNum - 1);	// Override GOP size based temporal layer
   iDecompStages		= iTemporalLayerNum - 1;	// WELS_LOG2( uiGopSize );// GOP size dependency
@@ -375,18 +374,16 @@ int32_t ParamTranscode (SEncParamExt& pCodingParam, const bool_t kbEnableRc = tr
   //SHOULD enable this feature.
 
   SDLayerParam* pDlp		= &sDependencyLayers[0];
- // SDLayerParam	*pDlpInternal	= &sDependencyLayers[0]
   float fMaxFr			= .0f;
   uint8_t uiProfileIdc		= PRO_BASELINE;
   int8_t iIdxSpatial	= 0;
   while (iIdxSpatial < iSpatialLayerNum) {
     pDlp->uiProfileIdc		= uiProfileIdc;
 
-    pCodingParam.sSpatialLayers[iIdxSpatial].fFrameRate	= WELS_CLIP3 (pCodingParam.sSpatialLayers[iIdxSpatial].fFrameRate,
-        MIN_FRAME_RATE, pCodingParam.fMaxFrameRate);
+    float fLayerFrameRate	= WELS_CLIP3 (pCodingParam.sSpatialLayers[iIdxSpatial].fFrameRate,
+        MIN_FRAME_RATE, fParamMaxFrameRate);
     pDlp->fInputFrameRate	=
-      pDlp->fOutputFrameRate	= WELS_CLIP3 (pCodingParam.sSpatialLayers[iIdxSpatial].fFrameRate, MIN_FRAME_RATE,
-                                            MAX_FRAME_RATE);
+      pDlp->fOutputFrameRate	= WELS_CLIP3 (fLayerFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
     if (pDlp->fInputFrameRate > fMaxFr + EPSN)
       fMaxFr = pDlp->fInputFrameRate;
 

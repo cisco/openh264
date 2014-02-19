@@ -199,7 +199,7 @@ int8_t		iRefIndexCache[5 * 6];			// Luma only: 5 x 6 = 30 bytes
 typedef struct TagParaSetOffsetVariable {
 int32_t 	iParaSetIdDelta[MAX_DQ_LAYER_NUM/*+1*/];	//mark delta between SPS_ID_in_bs and sps_id_in_encoder, can be minus, for each dq-layer
 //need not extra +1 due no MGS and FMO case so far
-bool_t		bUsedParaSetIdInBs[MAX_PPS_COUNT];	//mark the used SPS_ID with 1
+bool		bUsedParaSetIdInBs[MAX_PPS_COUNT];	//mark the used SPS_ID with 1
 uint32_t	uiNextParaSetIdToUseInBs;					//mark the next SPS_ID_in_bs, for all layers
 } SParaSetOffsetVariable;
 
@@ -208,12 +208,12 @@ typedef struct TagParaSetOffset {
 SParaSetOffsetVariable
 sParaSetOffsetVariable[PARA_SET_TYPE]; //PARA_SET_TYPE=3; paraset_type = 0: AVC_SPS; =1: Subset_SPS; =2: PPS
 //in PSO design, "bPpsIdMappingIntoSubsetsps" uses the current para of current IDR period
-bool_t
+bool
 bPpsIdMappingIntoSubsetsps[MAX_DQ_LAYER_NUM/*+1*/];	// need not extra +1 due no MGS and FMO case so far
 uint16_t
 uiIdrPicId;		// IDR picture id: [0, 65535], this one is used for LTR!! Can we just NOT put this into the SParaSetOffset structure?!!
 #if _DEBUG
-bool_t                  bEnableSpsPpsIdAddition;
+bool                  bEnableSpsPpsIdAddition;
 #endif
 } SParaSetOffset;
 
@@ -311,7 +311,7 @@ typedef uint32_t Mb_Type;
 #define MB_TYPE_UNAVAILABLE		0xFF000000
 #define REF_NOT_AVAIL    -2
 #define REF_NOT_IN_LIST -1    //intra
-#define	REF_PIC_REORDER_DEFAULT	TRUE
+#define	REF_PIC_REORDER_DEFAULT	true
 
 #define IS_INTRA4x4(type) ( MB_TYPE_INTRA4x4 == (type) )
 #define IS_INTRA16x16(type) ( MB_TYPE_INTRA16x16 == (type) )

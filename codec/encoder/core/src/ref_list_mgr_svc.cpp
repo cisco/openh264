@@ -55,7 +55,7 @@ void SetUnref (SPicture* pRef) {
 *	reset LTR marking , recovery ,feedback state to default
 */
 void ResetLtrState (SLTRState* pLtr) {
-  pLtr->bReceivedT0LostFlag	= FALSE;
+  pLtr->bReceivedT0LostFlag	= false;
   pLtr->iLastRecoverFrameNum = 0;
   pLtr->iLastCorFrameNumDec = -1;
   pLtr->iCurFrameNumInDec = -1;
@@ -63,8 +63,8 @@ void ResetLtrState (SLTRState* pLtr) {
   // LTR mark
   pLtr->iLTRMarkMode = LTR_DIRECT_MARK;
   pLtr->iLTRMarkSuccessNum = 0; //successful marked num
-  pLtr->bLTRMarkingFlag = FALSE;	//decide whether current frame marked as LTR
-  pLtr->bLTRMarkEnable = FALSE; //when LTR is confirmed and the interval is no smaller than the marking period
+  pLtr->bLTRMarkingFlag = false;	//decide whether current frame marked as LTR
+  pLtr->bLTRMarkEnable = false; //when LTR is confirmed and the interval is no smaller than the marking period
   pLtr->iCurLtrIdx = 0;
   pLtr->iLastLtrIdx = 0;
   pLtr->uiLtrMarkInterval = 0;
@@ -165,7 +165,7 @@ static inline void DeleteInvalidLTR (sWelsEncCtx* pCtx) {
                  pLongRefList[i]->iLongTermPicNum, pLongRefList[i]->iFrameNum);
         SetUnref (pLongRefList[i]);
         DeleteLTRFromLongList (pCtx, i);
-        pLtr->bLTRMarkEnable = TRUE;
+        pLtr->bLTRMarkEnable = true;
         if (pRefList->uiLongRefCount == 0) 	{
           pCtx->bEncCurFrmAsIdrFlag = true;
         }
@@ -178,7 +178,7 @@ static inline void DeleteInvalidLTR (sWelsEncCtx* pCtx) {
                  pLongRefList[i]->iLongTermPicNum, pLongRefList[i]->iFrameNum);
         SetUnref (pLongRefList[i]);
         DeleteLTRFromLongList (pCtx, i);
-        pLtr->bLTRMarkEnable = TRUE;
+        pLtr->bLTRMarkEnable = true;
         if (pRefList->uiLongRefCount == 0) 	{
           pCtx->bEncCurFrmAsIdrFlag = true;
         }
@@ -221,7 +221,7 @@ static inline void HandleLTRMarkFeedback (sWelsEncCtx* pCtx) {
         pLtr->iCurLtrIdx = (pLtr->iCurLtrIdx+1)%LONG_TERM_REF_NUM;
         pLtr->iLTRMarkMode = (pLtr->iLTRMarkSuccessNum >= (LONG_TERM_REF_NUM)) ? (LTR_DELAY_MARK) : (LTR_DIRECT_MARK);
         WelsLog (pCtx, WELS_LOG_WARNING, "LTR mark mode =%d", pLtr->iLTRMarkMode);
-        pLtr->bLTRMarkEnable = TRUE;
+        pLtr->bLTRMarkEnable = true;
         break;
       }
     }
@@ -235,7 +235,7 @@ static inline void HandleLTRMarkFeedback (sWelsEncCtx* pCtx) {
       }
     }
     pLtr->uiLtrMarkState = NO_LTR_MARKING_FEEDBACK;
-    pLtr->bLTRMarkEnable = TRUE;
+    pLtr->bLTRMarkEnable = true;
 
     if (pLtr->iLTRMarkSuccessNum == 0) {
       pCtx->bEncCurFrmAsIdrFlag = true; // no LTR , means IDR recieve failed, force next frame IDR
@@ -254,7 +254,7 @@ static inline void LTRMarkProcess (sWelsEncCtx* pCtx) {
   int32_t iMaxFrameNumPlus1 = (1 << pCtx->pSps->uiLog2MaxFrameNum);
   int32_t i = 0;
   int32_t j = 0;
-  bool_t bMoveLtrFromShortToLong = false;
+  bool bMoveLtrFromShortToLong = false;
 
   if (pCtx->eSliceType == I_SLICE)	{
     i = 0;
@@ -324,7 +324,7 @@ static inline void PrefetchNextBuffer (sWelsEncCtx* pCtx) {
 /*
  *	update reference picture list
  */
-BOOL_T WelsUpdateRefList (sWelsEncCtx* pCtx) {
+bool WelsUpdateRefList (sWelsEncCtx* pCtx) {
   SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SLTRState* pLtr			= &pCtx->pLtr[pCtx->uiDependencyId];
   SDLayerParam* pParamD	= &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
@@ -339,10 +339,10 @@ BOOL_T WelsUpdateRefList (sWelsEncCtx* pCtx) {
   uint32_t i = 0;
   // Need update pRef list in case store base layer or target dependency layer construction
   if (NULL == pCtx->pCurDqLayer)
-    return FALSE;
+    return false;
 
   if (NULL == pRefList || NULL == pRefList->pRef[0] || NULL == pRefList->pRef[kiSwapIdx])
-    return FALSE;
+    return false;
 
   if (NULL != pCtx->pDecPic) {
 #if !defined(ENABLE_FRAME_DUMP)	// to save complexity, 1/6/2009
@@ -373,8 +373,8 @@ BOOL_T WelsUpdateRefList (sWelsEncCtx* pCtx) {
         DeleteInvalidLTR (pCtx);
         HandleLTRMarkFeedback (pCtx);
 
-        pLtr->bReceivedT0LostFlag = FALSE; // reset to false due to the recovery is finished
-        pLtr->bLTRMarkingFlag = FALSE;
+        pLtr->bReceivedT0LostFlag = false; // reset to false due to the recovery is finished
+        pLtr->bLTRMarkingFlag = false;
         ++pLtr->uiLtrMarkInterval;
       }
 
@@ -394,7 +394,7 @@ BOOL_T WelsUpdateRefList (sWelsEncCtx* pCtx) {
 
       pLtr->iCurLtrIdx = (pLtr->iCurLtrIdx+1)%LONG_TERM_REF_NUM;
       pLtr->iLTRMarkSuccessNum = 1; //IDR default suceess
-      pLtr->bLTRMarkEnable =  TRUE;
+      pLtr->bLTRMarkEnable =  true;
       pLtr->uiLtrMarkInterval = 0;
 
       pCtx->pVaa->uiValidLongTermPicIdx = 0;
@@ -402,10 +402,10 @@ BOOL_T WelsUpdateRefList (sWelsEncCtx* pCtx) {
     }
   }
   PrefetchNextBuffer (pCtx);
-  return TRUE;
+  return true;
 }
 
-bool_t CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx) {
+bool CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx) {
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
   SRefList* pRefList	= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SPicture** pLongRefList = pRefList->pLongRefList;
@@ -417,11 +417,11 @@ bool_t CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx) {
     if ((pCtx->iFrameNum == pLongRefList[i]->iFrameNum && pLtr->iLTRMarkMode == LTR_DIRECT_MARK) ||
         (CompareFrameNum (pCtx->iFrameNum + iGoPFrameNumInterval, pLongRefList[i]->iFrameNum,
                           iMaxFrameNumPlus1) == FRAME_NUM_EQUAL  && pLtr->iLTRMarkMode == LTR_DELAY_MARK)) {
-      return FALSE;
+      return false;
     }
   }
 
-  return TRUE;
+  return true;
 }
 void WelsMarkPic (sWelsEncCtx* pCtx) {
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
@@ -432,12 +432,12 @@ void WelsMarkPic (sWelsEncCtx* pCtx) {
   if (pCtx->pSvcParam->bEnableLongTermReference && pLtr->bLTRMarkEnable && pCtx->uiTemporalId == 0) {
     if (!pLtr->bReceivedT0LostFlag && pLtr->uiLtrMarkInterval > pCtx->pSvcParam->iLtrMarkPeriod
         && CheckCurMarkFrameNumUsed (pCtx)) {
-      pLtr->bLTRMarkingFlag = TRUE;
-      pLtr->bLTRMarkEnable = FALSE;
+      pLtr->bLTRMarkingFlag = true;
+      pLtr->bLTRMarkEnable = false;
       pLtr->uiLtrMarkInterval = 0;
       pLtr->iLastLtrIdx = pLtr->iCurLtrIdx;
     } else {
-      pLtr->bLTRMarkingFlag = FALSE;
+      pLtr->bLTRMarkingFlag = false;
     }
   }
 
@@ -478,10 +478,10 @@ int32_t FilterLTRRecoveryRequest (sWelsEncCtx* pCtx, SLTRRecoverRequest* pLTRRec
     if (pRequest->uiFeedbackType == LTR_RECOVERY_REQUEST &&  pRequest->uiIDRPicId == pCtx->sPSOVector.uiIdrPicId) {
       if (pRequest->iLastCorrectFrameNum == -1) {
         pCtx->bEncCurFrmAsIdrFlag = true;
-        return TRUE;
+        return true;
       } else if (pRequest->iCurrentFrameNum == -1) {
         pLtr->bReceivedT0LostFlag = true;
-        return TRUE;
+        return true;
       } else if ((CompareFrameNum (pLtr->iLastRecoverFrameNum , pRequest->iLastCorrectFrameNum,
                                    iMaxFrameNumPlus1) & (FRAME_NUM_EQUAL | FRAME_NUM_SMALLER)) // t0 lost
                  || ((CompareFrameNum (pLtr->iLastRecoverFrameNum , pRequest->iCurrentFrameNum,
@@ -502,9 +502,9 @@ int32_t FilterLTRRecoveryRequest (sWelsEncCtx* pCtx, SLTRRecoverRequest* pLTRRec
                , pRequest->uiFeedbackType, pRequest->uiIDRPicId, pRequest->iCurrentFrameNum, pRequest->iLastCorrectFrameNum);
     }
   } else if (!pCtx->pSvcParam->bEnableLongTermReference) {
-    pCtx->bEncCurFrmAsIdrFlag = TRUE;
+    pCtx->bEncCurFrmAsIdrFlag = true;
   }
-  return TRUE;
+  return true;
 }
 void FilterLTRMarkingFeedback (sWelsEncCtx* pCtx, SLTRMarkingFeedback* pLTRMarkingFeedback) {
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
@@ -532,7 +532,7 @@ void FilterLTRMarkingFeedback (sWelsEncCtx* pCtx, SLTRMarkingFeedback* pLTRMarki
 /*
  *	build reference picture list
  */
-BOOL_T WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC) {
+bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC) {
   SRefList* pRefList		=  pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SLTRState* pLtr			= &pCtx->pLtr[pCtx->uiDependencyId];
   const int32_t kiNumRef	= pCtx->pSvcParam->iNumRefFrame;
@@ -576,7 +576,7 @@ BOOL_T WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC) {
 
   if (pCtx->iNumRef0 > kiNumRef)
     pCtx->iNumRef0 = kiNumRef;
-  return (pCtx->iNumRef0 > 0 || pCtx->eSliceType == I_SLICE) ? (TRUE) : (FALSE);
+  return (pCtx->iNumRef0 > 0 || pCtx->eSliceType == I_SLICE) ? (true) : (false);
 }
 
 /*

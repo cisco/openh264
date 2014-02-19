@@ -52,6 +52,8 @@
 
 namespace WelsSVCEnc {
 
+typedef struct TagWelsEncCtx sWelsEncCtx;
+
 typedef  struct {
   SPicture*	pScaledInputPicture;
   int32_t		iScaledWidth[MAX_DEPENDENCY_LAYER];
@@ -79,20 +81,20 @@ typedef struct {
   uint8_t         uiValidLongTermPicIdx;
   uint8_t         uiMarkLongTermPicIdx;
 
-  bool_t          bSceneChangeFlag;
-  bool_t          bIdrPeriodFlag;
+  bool          bSceneChangeFlag;
+  bool          bIdrPeriodFlag;
 } SVAAFrameInfo;
 
 class CWelsLib {
  public:
-  CWelsLib (void* pEncCtx);
+  CWelsLib (sWelsEncCtx* pEncCtx);
   virtual  ~CWelsLib();
 
-  int32_t CreateIface (void** pEncCtx);
-  int32_t DestroyIface (void* pEncCtx);
+  int32_t CreateIface (IWelsVP** ppInterfaceVp);
+  int32_t DestroyIface (IWelsVP* pInterfaceVp);
 
  protected:
-  void* QueryFunction (const str_t* pName);
+  void* QueryFunction (const char* pName);
 
  private:
   void* m_pVpLib;
@@ -101,37 +103,37 @@ class CWelsLib {
 
 class CWelsPreProcess {
  public:
-  CWelsPreProcess (void* pEncCtx);
+  CWelsPreProcess (sWelsEncCtx* pEncCtx);
   virtual  ~CWelsPreProcess();
 
  public:
-  int32_t WelsPreprocessReset (void* pEncCtx);
-  int32_t WelsPreprocessStep1 (void* pEncCtx, const SSourcePicture** kppSrcPicList, const int32_t kiConfiguredLayerNum);
-  int32_t WelsPreprocessStep3 (void* pEncCtx, const int32_t kiDIdx);
+  int32_t WelsPreprocessReset (sWelsEncCtx* pEncCtx);
+  int32_t BuildSpatialPicList (sWelsEncCtx* pEncCtx, const SSourcePicture** kppSrcPicList, const int32_t kiConfiguredLayerNum);
+  int32_t AnalyzeSpatialPic (sWelsEncCtx* pEncCtx, const int32_t kiDIdx);
 
  private:
   int32_t WelsPreprocessCreate();
   int32_t WelsPreprocessDestroy();
-  int32_t InitLastSpatialPictures (void* pEncCtx);
+  int32_t InitLastSpatialPictures (sWelsEncCtx* pEncCtx);
 
  private:
-  int32_t SingleLayerPreprocess (void* pEncCtx, const SSourcePicture* kpSrc, Scaled_Picture* m_sScaledPicture);
-  int32_t MultiLayerPreprocess (void* pEncCtx, const SSourcePicture** kppSrcPicList, const int32_t kiSpatialNum);
+  int32_t SingleLayerPreprocess (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrc, Scaled_Picture* m_sScaledPicture);
+  int32_t MultiLayerPreprocess (sWelsEncCtx* pEncCtx, const SSourcePicture** kppSrcPicList, const int32_t kiSpatialNum);
 
   void	BilateralDenoising (SPicture* pSrc, const int32_t iWidth, const int32_t iHeight);
-  bool_t  DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture);
+  bool  DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture);
   int32_t DownsamplePadding (SPicture* pSrc, SPicture* pDstPic,  int32_t iSrcWidth, int32_t iSrcHeight,
                              int32_t iShrinkWidth, int32_t iShrinkHeight, int32_t iTargetWidth, int32_t iTargetHeight);
 
-  void    VaaCalculation (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture, bool_t bCalculateSQDiff,
-                          bool_t bCalculateVar, bool_t bCalculateBGD);
-  void    BackgroundDetection (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture, bool_t bDetectFlag);
+  void    VaaCalculation (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture, bool bCalculateSQDiff,
+                          bool bCalculateVar, bool bCalculateBGD);
+  void    BackgroundDetection (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture, bool bDetectFlag);
   void    AdaptiveQuantCalculation (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture);
-  void    AnalyzePictureComplexity (void* pCtx, SPicture* pCurPicture, SPicture* pRefPicture,
-                                    const int32_t kiDependencyId, const bool_t kbCalculateBGD);
+  void    AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCurPicture, SPicture* pRefPicture,
+                                    const int32_t kiDependencyId, const bool kbCalculateBGD);
   void    Padding (uint8_t* pSrcY, uint8_t* pSrcU, uint8_t* pSrcV, int32_t iStrideY, int32_t iStrideUV,
                    int32_t iActualWidth, int32_t iPaddingWidth, int32_t iActualHeight, int32_t iPaddingHeight);
-  void    SetRefMbType (void* pCtx, uint32_t** pRefMbTypeArray, int32_t iRefPicType);
+  void    SetRefMbType (sWelsEncCtx* pCtx, uint32_t** pRefMbTypeArray, int32_t iRefPicType);
 
   int32_t ColorspaceConvert (SWelsSvcCodingParam* pSvcParam, SPicture* pDstPic, const SSourcePicture* kpSrc,
                              const int32_t kiWidth, const int32_t kiHeight);
@@ -139,13 +141,13 @@ class CWelsPreProcess {
                               const int32_t kiWidth, const int32_t kiHeight);
 
  private:
-  Scaled_Picture  m_sScaledPicture;
-  SPicture*		m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];
+  Scaled_Picture   m_sScaledPicture;
+  SPicture*	   m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];
   IWelsVP*         m_pInterfaceVp;
   CWelsLib*        m_pEncLib;
-  void*            m_pEncCtx;
-  bool_t          m_bInitDone;
-  bool_t          m_bOfficialBranch;
+  sWelsEncCtx*     m_pEncCtx;
+  bool             m_bInitDone;
+  bool             m_bOfficialBranch;
 };
 
 }

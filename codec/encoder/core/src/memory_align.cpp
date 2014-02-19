@@ -66,7 +66,7 @@ CMemoryAlign::~CMemoryAlign() {
 #endif//MEMORY_CHECK
 }
 
-void* CMemoryAlign::WelsMallocz (const uint32_t kuiSize, const str_t* kpTag) {
+void* CMemoryAlign::WelsMallocz (const uint32_t kuiSize, const char* kpTag) {
   void* pPointer = WelsMalloc (kuiSize, kpTag);
   if (NULL == pPointer) {
     return NULL;
@@ -77,7 +77,7 @@ void* CMemoryAlign::WelsMallocz (const uint32_t kuiSize, const str_t* kpTag) {
   return pPointer;
 }
 
-void* CMemoryAlign::WelsMalloc (const uint32_t kuiSize, const str_t* kpTag) {
+void* CMemoryAlign::WelsMalloc (const uint32_t kuiSize, const char* kpTag) {
   const int32_t kiSizeOfVoidPointer	= sizeof (void**);
   const int32_t kiSizeOfInt				= sizeof (int32_t);
   const int32_t kiAlignedBytes		= m_nCacheLineSize - 1;
@@ -114,7 +114,7 @@ void* CMemoryAlign::WelsMalloc (const uint32_t kuiSize, const str_t* kpTag) {
   return pAlignedBuffer;
 }
 
-void CMemoryAlign::WelsFree (void* pPointer, const str_t* kpTag) {
+void CMemoryAlign::WelsFree (void* pPointer, const char* kpTag) {
   if (pPointer) {
 #ifdef MEMORY_MONITOR
     const int32_t kiMemoryLength = * ((int32_t*) ((uint8_t*)pPointer - sizeof (void**) - sizeof (

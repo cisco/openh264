@@ -7,6 +7,7 @@ COMMON_CPP_SRCS=\
 	$(COMMON_SRCDIR)/WelsThreadLib.cpp\
 
 COMMON_OBJS += $(COMMON_CPP_SRCS:.cpp=.o)
+
 ifeq ($(USE_ASM), Yes)
 COMMON_ASM_SRCS=\
 	$(COMMON_SRCDIR)/asm_inc.asm\

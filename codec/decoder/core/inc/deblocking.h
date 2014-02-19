@@ -54,7 +54,7 @@ namespace WelsDec {
  * \return	NONE
  */
 
-void_t  DeblockingInit (PDeblockingFunc pDeblockingFunc,  int32_t iCpu);
+void  DeblockingInit (PDeblockingFunc pDeblockingFunc,  int32_t iCpu);
 
 
 /*!
@@ -64,7 +64,7 @@ void_t  DeblockingInit (PDeblockingFunc pDeblockingFunc,  int32_t iCpu);
  *
  * \return	NONE
  */
-void_t WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFunc pDeblockMb);
+void WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFunc pDeblockMb);
 
 /*!
  * \brief	pixel deblocking filtering
@@ -81,10 +81,10 @@ uint32_t DeblockingBsMarginalMBAvcbase (PDqLayer pCurDqLayer, int32_t iEdge, int
 
 int32_t DeblockingAvailableNoInterlayer (PDqLayer pCurDqLayer, int32_t iFilterIdc);
 
-void_t DeblockingIntraMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag);
-void_t DeblockingInterMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint8_t nBS[2][4][4], int32_t iBoundryFlag);
+void DeblockingIntraMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag);
+void DeblockingInterMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint8_t nBS[2][4][4], int32_t iBoundryFlag);
 
-void_t WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag);
+void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag);
 
 } // namespace WelsDec
 

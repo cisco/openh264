@@ -58,16 +58,16 @@ int32_t		iHeightInPixel;// picture height in pixel
 int32_t		iFramePoc;		// frame POC
 
 /*******************************sef_definition for misc use****************************/
-bool_t		bUsedAsRef;							//for ref pic management
-bool_t		bIsLongRef;	// long term reference frame flag	//for ref pic management
+bool		bUsedAsRef;							//for ref pic management
+bool		bIsLongRef;	// long term reference frame flag	//for ref pic management
 uint8_t		uiRefCount;
-bool_t		bAvailableFlag;	// indicate whether it is available in this picture memory block.
+bool		bAvailableFlag;	// indicate whether it is available in this picture memory block.
 
 /*******************************for future use****************************/
 uint8_t		uiTemporalId;
 uint8_t		uiSpatialId;
 uint8_t		uiQualityId;
-bool_t		bRefBaseFlag;
+bool		bRefBaseFlag;
 
 int32_t		iFrameNum;		// frame number			//for ref pic management
 int32_t		iLongTermFrameIdx;					//id for long term ref pic

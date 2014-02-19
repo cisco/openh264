@@ -53,7 +53,7 @@ union {
     SBitStringAux	sSliceBitsRead;
     uint8_t*		 pNalPos;	  // save the address of slice nal for GPU function
     int32_t 		iNalLength;   // save the nal length for GPU function
-    bool_t			bSliceHeaderExtFlag;
+    bool			bSliceHeaderExtFlag;
   } sVclNal;
   SPrefixNalUnit	sPrefixNal;
 } sNalData;
@@ -71,7 +71,7 @@ uint32_t		uiActualUnitsNum;	// actual number of NAL units belong to current au
 uint32_t		uiCountUnitsNum;	// Count size number of malloced NAL Units in each AU list
 uint32_t		uiStartPos;
 uint32_t		uiEndPos;
-bool_t			bCompletedAuFlag;	// Indicate whether it is a completed AU
+bool			bCompletedAuFlag;	// Indicate whether it is a completed AU
 } SAccessUnit, *PAccessUnit;
 
 } // namespace WelsDec

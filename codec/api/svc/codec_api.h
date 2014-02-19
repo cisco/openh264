@@ -34,7 +34,11 @@
 #define WELS_VIDEO_CODEC_SVC_API_H__
 
 #ifndef __cplusplus
+#ifdef _MSC_VER
+typedef unsigned char bool;
+#else
 #include <stdbool.h>
+#endif
 #endif
 
 #include "codec_app_def.h"
@@ -52,8 +56,8 @@ class ISVCEncoder {
   /*
    * return: CM_RETURN: 0 - success; otherwise - failed;
    */
-  virtual int EXTAPI Initialize (void* pParam, const INIT_TYPE kiInitType = INIT_TYPE_PARAMETER_BASED) = 0;
-  virtual int EXTAPI Initialize2 (void* pParam, const INIT_TYPE kiInitType = INIT_TYPE_PARAMETER_BASED) = 0;
+  virtual int EXTAPI Initialize (const SEncParamBase* pParam) = 0;
+  virtual int EXTAPI InitializeExt (const SEncParamExt* pParam) = 0;
 
   virtual int EXTAPI Uninitialize() = 0;
 
@@ -90,7 +94,7 @@ class ISVCEncoder {
 
 class ISVCDecoder {
  public:
-  virtual long EXTAPI Initialize (void* pParam, const INIT_TYPE iInitType) = 0;
+  virtual long EXTAPI Initialize (const SDecodingParam* pParam) = 0;
   virtual long EXTAPI Uninitialize() = 0;
 
   virtual DECODING_STATE EXTAPI DecodeFrame (const unsigned char* pSrc,
@@ -137,8 +141,8 @@ typedef struct ISVCEncoderVtbl ISVCEncoderVtbl;
 typedef const ISVCEncoderVtbl* ISVCEncoder;
 struct ISVCEncoderVtbl {
 
-  int (*Initialize) (ISVCEncoder*, SEncParamBase* pParam, const INIT_TYPE kiInitType);
-  int (*Initialize2) (ISVCEncoder*, void* pParam, const INIT_TYPE kiInitType);
+  int (*Initialize) (ISVCEncoder*, const SEncParamBase* pParam);
+  int (*InitializeExt) (ISVCEncoder*, const SEncParamExt* pParam);
 
   int (*Uninitialize) (ISVCEncoder*);
 
@@ -158,7 +162,7 @@ struct ISVCEncoderVtbl {
 typedef struct ISVCDecoderVtbl ISVCDecoderVtbl;
 typedef const ISVCDecoderVtbl* ISVCDecoder;
 struct ISVCDecoderVtbl {
-  long (*Initialize) (ISVCDecoder*, void* pParam, const INIT_TYPE iInitType);
+  long (*Initialize) (ISVCDecoder*, const SDecodingParam* pParam);
   long (*Uninitialize) (ISVCDecoder*);
 
   DECODING_STATE (*DecodeFrame) (ISVCDecoder*, const unsigned char* pSrc,

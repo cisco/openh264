@@ -46,8 +46,6 @@
 //#define STICK_STREAM_SIZE
 
 #include "measure_time.h"
-//#include "param_svc.h"
-//#include "layered_pic_buffer.h"
 #include "read_config.h"
 
 #include "typedefs.h"
@@ -124,8 +122,8 @@ int ParseConfig (CReadConfig& cRdCfg, SEncParamExt& pSvcParam, SFilesSet& sFileS
         pSvcParam.uiFrameToBeCoded	= atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("SourceSequenceInRGB24") == 0) {
         pSvcParam.iInputCsp	= atoi (strTag[1].c_str()) == 0 ? videoFormatI420 : videoFormatRGB;
-      } else if (strTag[0].compare ("GOPSize") == 0) {
-        pSvcParam.uiGopSize	= atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("TemporalLayerNum") == 0) {
+        pSvcParam.iTemporalLayerNum	= atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("IntraPeriod") == 0) {
         pSvcParam.uiIntraPeriod	= atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("EnableSpsPpsIDAddition") == 0) {
@@ -240,8 +238,6 @@ int ParseConfig (CReadConfig& cRdCfg, SEncParamExt& pSvcParam, SFilesSet& sFileS
 
   for (int8_t iLayer = 0; iLayer < kiActualLayerNum; ++ iLayer) {
     SLayerPEncCtx sLayerCtx;
-    int32_t iLayerArg = -2;
-    int32_t iNumQualityBitrateLayerSet = 0;
 
     SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
     CReadConfig cRdLayerCfg (sFileSet.sSpatialLayers[iLayer].strLayerCfgFile);
@@ -255,7 +251,6 @@ int ParseConfig (CReadConfig& cRdCfg, SEncParamExt& pSvcParam, SFilesSet& sFileS
 
     while (!cRdLayerCfg.EndOfFile()) {
       long iLayerRd = cRdLayerCfg.ReadLine (&strTag[0]);
-      bool_t bFound = false;
       if (iLayerRd > 0) {
         if (strTag[0].empty())
           continue;
@@ -279,7 +274,7 @@ int ParseConfig (CReadConfig& cRdCfg, SEncParamExt& pSvcParam, SFilesSet& sFileS
         } else if (strTag[0].compare ("ProfileIdc") == 0) {
           pDLayer->uiProfileIdc	= atoi (strTag[1].c_str());
         } else if (strTag[0].compare ("FRExt") == 0) {
-//					pDLayer->frext_mode	= (bool_t)atoi(strTag[1].c_str());
+//					pDLayer->frext_mode	= (bool)atoi(strTag[1].c_str());
         } else if (strTag[0].compare ("SpatialBitrate") == 0) {
           pDLayer->iSpatialBitrate	= 1000 * atoi (strTag[1].c_str());
           if (pSvcParam.bEnableRc && pDLayer->iSpatialBitrate <= 0) {
@@ -390,7 +385,7 @@ void PrintHelp() {
   printf ("\n Supported Options:\n");
   printf ("  -bf     Bit Stream File\n");
   printf ("  -frms   Number of total frames to be encoded\n");
-  printf ("  -gop    GOPSize - GOP size (2,4,8,16,32,64, default: 1)\n");
+  printf ("  -gop    GOPSize - GOP size (1,2,4,8, default: 1)\n");
   printf ("  -iper   Intra period (default: -1) : must be a power of 2 of GOP size (or -1)\n");
   printf ("  -spsid   Enable id adding in SPS/PPS per IDR \n");
   printf ("  -denois Control denoising  (default: 0)\n");
@@ -430,8 +425,8 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& pSvcParam, SFilesSet&
     else if (!strcmp (pCommand, "-frms") && (n < argc))
       pSvcParam.uiFrameToBeCoded = atoi (argv[n++]);
 
-    else if (!strcmp (pCommand, "-gop") && (n < argc))
-      pSvcParam.uiGopSize = atoi (argv[n++]);
+    else if (!strcmp (pCommand, "-numtl") && (n < argc))
+      pSvcParam.iTemporalLayerNum = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-iper") && (n < argc))
       pSvcParam.uiIntraPeriod = atoi (argv[n++]);
@@ -476,8 +471,6 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& pSvcParam, SFilesSet&
       for (int8_t iLayer = 0; iLayer < pSvcParam.iSpatialLayerNum; ++ iLayer) {
         SLayerPEncCtx sLayerCtx;
         string strTag[4];
-        int32_t iLayerArg = -2;
-        int32_t iNumQualityBitrateLayerSet = 0;
 
         SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
         CReadConfig cRdLayerCfg (sFileSet.sSpatialLayers[iLayer].strLayerCfgFile);
@@ -515,7 +508,7 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& pSvcParam, SFilesSet&
             } else if (strTag[0].compare ("ProfileIdc") == 0) {
               pDLayer->uiProfileIdc	= atoi (strTag[1].c_str());
             } else if (strTag[0].compare ("FRExt") == 0) {
-//							pDLayer->frext_mode	= (bool_t)atoi(strTag[1].c_str());
+//							pDLayer->frext_mode	= (bool)atoi(strTag[1].c_str());
             } else if (strTag[0].compare ("SpatialBitrate") == 0) {
               pDLayer->iSpatialBitrate	= 1000 * atoi (strTag[1].c_str());
             } else if (strTag[0].compare ("InitialQP") == 0) {
@@ -759,7 +752,7 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   }
 
   memset (&sFbi, 0, sizeof (SFrameBSInfo));
-  memset (&sSvcParam, 0, sizeof (SEncParamBase));
+  memset (&sSvcParam, 0, sizeof (SEncParamExt));
 
   FillSpecificParameters (sSvcParam);
 
@@ -770,7 +763,7 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     goto ERROR_RET;
   }
 
-  if (cmResultSuccess != pPtrEnc->Initialize (&sSvcParam, INIT_TYPE_PARAMETER_BASED)) {
+  if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) {
     fprintf (stderr, "Encoder Initialization failed!\n");
 	ret = 1;
     goto ERROR_RET;
@@ -891,10 +884,8 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   int8_t  iDlayerIdx = 0;
   uint8_t* pYUV[MAX_DEPENDENCY_LAYER] = { 0 };
   SSourcePicture**    pSrcPicList = NULL;
-#if (defined(RUN_SIMULATOR) || defined(_WIN32)||defined(_MACH_PLATFORM) || (defined(__GNUC__)))
   // Inactive with sink with output file handler
   FILE* pFpBs = NULL;
-#endif
 #if defined(COMPARE_DATA)
   //For getting the golden file handle
   FILE* fpGolden = NULL;
@@ -937,18 +928,15 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   }
 
   iTotalFrameMax = (int32_t)sSvcParam.uiFrameToBeCoded;
-  
- 
   sSvcParam.iPicWidth = sSvcParam.sSpatialLayers[sSvcParam.iSpatialLayerNum - 1].iVideoWidth;
   sSvcParam.iPicHeight = sSvcParam.sSpatialLayers[sSvcParam.iSpatialLayerNum - 1].iVideoHeight;
 
 
-  if (cmResultSuccess != pPtrEnc->Initialize ((void*)&sSvcParam, INIT_TYPE_PARAMETER_EXT)) {	// SVC encoder initialization
+  if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) {	// SVC encoder initialization
     fprintf (stderr, "SVC encoder Initialize failed\n");
     iRet = 1;
     goto INSIDE_MEM_FREE;
   }
-#if (defined(RUN_SIMULATOR) || defined(_WIN32)||defined(_MACH_PLATFORM) || (defined(__GNUC__)))
   // Inactive with sink with output file handler
   if (fs.strBsFile.length() > 0) {
     pFpBs = fopen (fs.strBsFile.c_str(), "wb");
@@ -958,7 +946,6 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
       goto INSIDE_MEM_FREE;
     }
   }
-#endif
 
 #if defined(COMPARE_DATA)
   //For getting the golden file handle
@@ -1014,8 +1001,8 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   iFrameIdx = 0;
   while (iFrameIdx < iTotalFrameMax && (((int32_t)sSvcParam.uiFrameToBeCoded <= 0)
                                         || (iFrameIdx < (int32_t)sSvcParam.uiFrameToBeCoded))) {
-    bool_t bOnePicAvailableAtLeast = false;
-    bool_t bSomeSpatialUnavailable	  = false;
+    bool bOnePicAvailableAtLeast = false;
+    bool bSomeSpatialUnavailable	  = false;
 
 #ifdef ONLY_ENC_FRAMES_NUM
     // Only encoded some limited frames here
@@ -1031,7 +1018,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
 	  const int kiPicResSize = ((pDLayer->iVideoWidth * pDLayer->iVideoHeight) * 3) >> 1;
       uint32_t uiSkipIdx = 1;//(1 << pDLayer->iTemporalResolution);
 
-      bool_t bCanBeRead = false;
+      bool bCanBeRead = false;
 
       if (iFrameIdx % uiSkipIdx == 0) {	// such layer is enabled to encode indeed
         bCanBeRead = (fread (pYUV[iDlayerIdx], 1, kiPicResSize, pFileYUV[iDlayerIdx]) == kiPicResSize);
@@ -1112,9 +1099,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
             delete [] pUCArry;
           }
 #endif
-#if (defined(RUN_SIMULATOR) || defined(_WIN32)||defined(_MACH_PLATFORM) || (defined(__GNUC__)))
           fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs);	// write pure bit stream into file
-#endif
           iFrameSize += iLayerSize;
         }
         ++ iLayer;
@@ -1140,12 +1125,10 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   }
 
 INSIDE_MEM_FREE: {
-#if (defined(RUN_SIMULATOR) || defined(_WIN32)||defined(_MACH_PLATFORM) || (defined(__GNUC__)))
     if (pFpBs) {
       fclose (pFpBs);
       pFpBs = NULL;
     }
-#endif
 #if defined (STICK_STREAM_SIZE)
     if (fTrackStream) {
       fclose (fTrackStream);
@@ -1234,8 +1217,6 @@ void DestroySVCEncHandle (ISVCEncoder* pEncoder) {
 int main (int argc, char** argv)
 {
   ISVCEncoder* pSVCEncoder	= NULL;
-  FILE* pFileOut					= NULL;
-  FILE* pFileIn					= NULL;
   int iRet					= 0;
 
 #ifdef _MSC_VER

@@ -48,7 +48,6 @@
 ; Macros and other preprocessor constants
 ;***********************************************************************
 
-
 ; by comparing it outperforms than phaddw(SSSE3) sets
 %macro SUM_WORD_8x2_SSE2	2	; dst(pSrc), tmp
 	; @sum_8x2 begin
@@ -60,6 +59,7 @@
 	paddw %1, %2
 	; end of @sum_8x2
 %endmacro	; END of SUM_WORD_8x2_SSE2
+
 
 %macro VAA_AVG_BLOCK_SSE2 6 ; dst, t0, t1, t2, t3, t4
 	movdqa %1, [r0    ]	; line 0
@@ -423,7 +423,3 @@ MdInterAnalysisVaaInfo_sse2:
 .threshold_exit:
 	mov retrd, 15
 	ret
-
-
-
-

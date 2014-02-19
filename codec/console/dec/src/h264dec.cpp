@@ -57,8 +57,8 @@ using namespace std;
 
 //#define STICK_STREAM_SIZE	// For Demo interfaces test with track file of integrated frames
 
-void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, const char* kpOuputFileName,
-                           int32_t& iWidth, int32_t& iHeight, void_t* pOptionFileName) {
+void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, const char* kpOuputFileName,
+                         int32_t& iWidth, int32_t& iHeight, const char* pOptionFileName) {
   FILE* pH264File	  = NULL;
   FILE* pYuvFile	  = NULL;
   FILE* pOptionFile = NULL;
@@ -68,7 +68,7 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
   uint8_t* pBuf = NULL;
   uint8_t uiStartCode[4] = {0, 0, 0, 1};
 
-  void_t* pData[3] = {NULL};
+  void* pData[3] = {NULL};
   uint8_t* pDst[3] = {NULL};
   SBufferInfo sDstBufInfo;
 
@@ -79,10 +79,6 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
   int32_t iFrameCount = 0;
   int32_t iEndOfStreamFlag = 0;
   int32_t iColorFormat = videoFormatInternal;
-  static int32_t iFrameNum = 0;
-
-  EDecodeMode     eDecoderMode    = SW_MODE;
-  EBufferProperty	eOutputProperty = BUFFER_DEVICE;
 
   CUtils cOutputModule;
   double dElapsed = 0;
@@ -115,11 +111,11 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
   }
 
   if (pOptionFileName) {
-    pOptionFile = fopen ((char*)pOptionFileName, "wb");
+    pOptionFile = fopen (pOptionFileName, "wb");
     if (pOptionFile == NULL) {
       fprintf (stderr, "Can not open optional file for write..\n");
     } else
-      fprintf (stderr, "Extra optional file: %s..\n", (char*)pOptionFileName);
+      fprintf (stderr, "Extra optional file: %s..\n", pOptionFileName);
   }
 
   printf ("------------------------------------------------------\n");
@@ -150,16 +146,6 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
     goto label_exit;
   }
 
-  if (pDecoder->SetOption (DECODER_OPTION_MODE,  &eDecoderMode)) {
-    fprintf (stderr, "SetOption() failed, opt_id : %d  ..\n", DECODER_OPTION_MODE);
-    goto label_exit;
-  }
-
-  // set the output buffer property
-  if (pYuvFile) {
-    pDecoder->SetOption (DECODER_OPTION_OUTPUT_PROPERTY,  &eOutputProperty);
-  }
-
 #if defined ( STICK_STREAM_SIZE )
   FILE* fpTrack = fopen ("3.len", "rb");
 
@@ -171,7 +157,7 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
     if (iBufPos >= iFileSize) {
       iEndOfStreamFlag = true;
       if (iEndOfStreamFlag)
-        pDecoder->SetOption (DECODER_OPTION_END_OF_STREAM, (void_t*)&iEndOfStreamFlag);
+        pDecoder->SetOption (DECODER_OPTION_END_OF_STREAM, (void*)&iEndOfStreamFlag);
       break;
     }
 
@@ -205,10 +191,6 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
     pDecoder->GetOption (DECODER_OPTION_VCL_NAL, &iFeedbackVclNalInAu);
     int32_t iFeedbackTidInAu;
     pDecoder->GetOption (DECODER_OPTION_TEMPORAL_ID, &iFeedbackTidInAu);
-    int32_t iSetMode;
-    pDecoder->GetOption (DECODER_OPTION_MODE, &iSetMode);
-    int32_t iDeviceInfo;
-    pDecoder->GetOption (DECODER_OPTION_DEVICE_INFO, &iDeviceInfo);
 //~end for
 
     iStart = WelsTime();
@@ -227,15 +209,9 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
     iEnd	= WelsTime();
     iTotal	+= iEnd - iStart;
     if (sDstBufInfo.iBufferStatus == 1) {
-      iFrameNum++;
-      cOutputModule.Process ((void_t**)pDst, &sDstBufInfo, pYuvFile);
-      if (sDstBufInfo.eBufferProperty == BUFFER_HOST) {
-        iWidth  = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
-        iHeight = sDstBufInfo.UsrData.sSystemBuffer.iHeight;
-      } else {
-        iWidth  = sDstBufInfo.UsrData.sVideoBuffer.iSurfaceWidth;
-        iHeight = sDstBufInfo.UsrData.sVideoBuffer.iSurfaceHeight;
-      }
+      cOutputModule.Process ((void**)pDst, &sDstBufInfo, pYuvFile);
+      iWidth  = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
+      iHeight = sDstBufInfo.UsrData.sSystemBuffer.iHeight;
 
       if (pOptionFile != NULL) {
         if (iWidth != iLastWidth && iHeight != iLastHeight) {
@@ -267,14 +243,9 @@ void_t H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, co
   }
 
   if (sDstBufInfo.iBufferStatus == 1) {
-    cOutputModule.Process ((void_t**)pDst, &sDstBufInfo, pYuvFile);
-    if (sDstBufInfo.eBufferProperty == BUFFER_HOST) {
-      iWidth  = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
-      iHeight = sDstBufInfo.UsrData.sSystemBuffer.iHeight;
-    } else {
-      iWidth  = sDstBufInfo.UsrData.sVideoBuffer.iSurfaceWidth;
-      iHeight = sDstBufInfo.UsrData.sVideoBuffer.iSurfaceHeight;
-    }
+    cOutputModule.Process ((void**)pDst, &sDstBufInfo, pYuvFile);
+    iWidth  = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
+    iHeight = sDstBufInfo.UsrData.sSystemBuffer.iHeight;
 
     if (pOptionFile != NULL) {
       /* Anyway, we need write in case of final frame decoding */
@@ -435,7 +406,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
     return 1;
   }
 
-  if (pDecoder->Initialize (&sDecParam, INIT_TYPE_PARAMETER_BASED)) {
+  if (pDecoder->Initialize (&sDecParam)) {
     printf ("Decoder initialization failed.\n");
     return 1;
   }
@@ -445,8 +416,8 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
   int32_t iHeight = 0;
 
 
-  H264DecodeInstance (pDecoder, strInputFile.c_str(), strOutputFile.c_str(), iWidth, iHeight,
-                      (!strOptionFile.empty() ? (void_t*) (const_cast<char*> (strOptionFile.c_str())) : NULL));
+  H264DecodeInstance (pDecoder, strInputFile.c_str(), !strOutputFile.empty() ? strOutputFile.c_str() : NULL, iWidth, iHeight,
+                      (!strOptionFile.empty() ? strOptionFile.c_str() : NULL));
 
   if (sDecParam.pFileNameRestructed != NULL) {
     delete []sDecParam.pFileNameRestructed;

@@ -44,7 +44,7 @@
 
 namespace WelsDec {
 
-void_t WelsFillRecNeededMbInfo (PWelsDecoderContext pCtx, bool_t bOutput, PDqLayer pCurLayer) {
+void WelsFillRecNeededMbInfo (PWelsDecoderContext pCtx, bool bOutput, PDqLayer pCurLayer) {
   PPicture pCurPic = pCtx->pDec;
   int32_t iLumaStride   = pCurPic->iLinesize[0];
   int32_t iChromaStride = pCurPic->iLinesize[1];
@@ -183,7 +183,7 @@ typedef struct TagMCRefMember {
   int32_t iPicHeight;
 } sMCRefMember;
 //according to current 8*8 block ref_index to gain reference picture
-static inline void_t GetRefPic (sMCRefMember* pMCRefMem, PWelsDecoderContext pCtx, int8_t* pRefIdxList,
+static inline void GetRefPic (sMCRefMember* pMCRefMem, PWelsDecoderContext pCtx, int8_t* pRefIdxList,
                                 int32_t iIndex) {
   PPicture pRefPic;
 
@@ -202,7 +202,7 @@ static inline void_t GetRefPic (sMCRefMember* pMCRefMem, PWelsDecoderContext pCt
 #ifndef MC_FLOW_SIMPLE_JUDGE
 #define MC_FLOW_SIMPLE_JUDGE 1
 #endif //MC_FLOW_SIMPLE_JUDGE
-static inline void_t BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t iYOffset, SMcFunc* pMCFunc,
+static inline void BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t iYOffset, SMcFunc* pMCFunc,
                              int32_t iBlkWidth, int32_t iBlkHeight, int16_t iMVs[2]) {
   int32_t iExpandWidth = PADDING_LENGTH;
   int32_t	iExpandHeight = PADDING_LENGTH;
@@ -235,7 +235,7 @@ static inline void_t BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t 
   uint8_t* pDstY = pMCRefMem->pDstY;
   uint8_t* pDstU = pMCRefMem->pDstU;
   uint8_t* pDstV = pMCRefMem->pDstV;
-  bool_t bExpand = false;
+  bool bExpand = false;
 
   ENFORCE_STACK_ALIGN_1D (uint8_t, uiExpandBuf, (PADDING_LENGTH + 6) * (PADDING_LENGTH + 6), 16);
 
@@ -289,7 +289,7 @@ static inline void_t BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t 
   }
 }
 
-void_t GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDecoderContext pCtx) {
+void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDecoderContext pCtx) {
   sMCRefMember pMCRefMem;
   PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
   SMcFunc* pMCFunc = &pCtx->sMcFunc;
@@ -464,7 +464,7 @@ int32_t RecChroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLeve
   return ERR_NONE;
 }
 
-void_t FillBufForMc (uint8_t* pBuf, int32_t iBufStride, uint8_t* pSrc, int32_t iSrcStride, int32_t iSrcOffset,
+void FillBufForMc (uint8_t* pBuf, int32_t iBufStride, uint8_t* pSrc, int32_t iSrcStride, int32_t iSrcOffset,
                      int32_t iBlockWidth, int32_t iBlockHeight, int32_t iSrcX, int32_t iSrcY, int32_t iPicWidth, int32_t iPicHeight) {
   int32_t iY;
   int32_t iStartY, iStartX, iEndY, iEndX;

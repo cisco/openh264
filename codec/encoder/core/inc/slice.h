@@ -75,9 +75,9 @@ typedef struct TagRefPicMarking {
 
   //	int32_t		mmco_index;
   uint8_t		uiMmcoCount;
-  bool_t		bNoOutputOfPriorPicsFlag;
-  bool_t		bLongTermRefFlag;
-  bool_t		bAdaptiveRefPicMarkingModeFlag;
+  bool		bNoOutputOfPriorPicsFlag;
+  bool		bLongTermRefFlag;
+  bool		bAdaptiveRefPicMarkingModeFlag;
 } SRefPicMarking;
 
 
@@ -118,9 +118,9 @@ typedef struct TagSliceHeader {
   uint16_t    uiIdrPicId;
 //	uint8_t		color_plane_id;//from?
 
-  bool_t		bNumRefIdxActiveOverrideFlag;
-//	bool_t		field_pic_flag;		//not supported in base profile
-//	bool_t		bottom_field_flag;		//not supported in base profile
+  bool		bNumRefIdxActiveOverrideFlag;
+//	bool		field_pic_flag;		//not supported in base profile
+//	bool		bottom_field_flag;		//not supported in base profile
   uint8_t		uiPadding1Bytes;
 
   SRefPicMarking		sRefMarking;	// Decoded reference picture marking syntaxs
@@ -137,18 +137,18 @@ typedef struct TagSliceHeaderExt {
 
   uint32_t	uiNumMbsInSlice;
 
-  bool_t		bStoreRefBasePicFlag;
-  bool_t		bConstrainedIntraResamplingFlag;
-  bool_t		bSliceSkipFlag;
+  bool		bStoreRefBasePicFlag;
+  bool		bConstrainedIntraResamplingFlag;
+  bool		bSliceSkipFlag;
 
-  bool_t		bAdaptiveBaseModeFlag;
-  bool_t		bDefaultBaseModeFlag;
-  bool_t		bAdaptiveMotionPredFlag;
-  bool_t		bDefaultMotionPredFlag;
+  bool		bAdaptiveBaseModeFlag;
+  bool		bDefaultBaseModeFlag;
+  bool		bAdaptiveMotionPredFlag;
+  bool		bDefaultMotionPredFlag;
 
-  bool_t		bAdaptiveResidualPredFlag;
-  bool_t		bDefaultResidualPredFlag;
-  bool_t		bTcoeffLevelPredFlag;
+  bool		bAdaptiveResidualPredFlag;
+  bool		bDefaultResidualPredFlag;
+  bool		bTcoeffLevelPredFlag;
   uint8_t		uiDisableInterLayerDeblockingFilterIdc;
 
 } SSliceHeaderExt, *PSliceHeaderExt;
@@ -170,10 +170,10 @@ typedef struct TagSlice {
   uint8_t		sScaleShift;
 
   uint8_t		uiSliceIdx;
-  bool_t		bSliceHeaderExtFlag; // Indicate which slice header is used, avc or ext?
+  bool		bSliceHeaderExtFlag; // Indicate which slice header is used, avc or ext?
   uint8_t		uiLastMbQp;		// stored qp for last mb coded, maybe more efficient for mb skip detection etc.
 
-  bool_t		bDynamicSlicingSliceSizeCtrlFlag;
+  bool		bDynamicSlicingSliceSizeCtrlFlag;
   uint8_t		uiAssumeLog2BytePerMb;
   uint8_t		uiReservedFillByte;	// reserved to meet 4 bytes alignment
 } SSlice, *PSlice;

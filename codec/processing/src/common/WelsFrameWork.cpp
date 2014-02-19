@@ -220,8 +220,8 @@ EResult CVpFrameWork::SpecialFeature (int32_t iType, void* pIn, void* pOut) {
   return eReturn;
 }
 
-bool_t  CVpFrameWork::CheckValid (EMethods eMethod, SPixMap& pSrcPixMap, SPixMap& pDstPixMap) {
-  bool_t eReturn = FALSE;
+bool  CVpFrameWork::CheckValid (EMethods eMethod, SPixMap& pSrcPixMap, SPixMap& pDstPixMap) {
+  bool eReturn = false;
 
   if (eMethod == METHOD_NULL)
     goto exit;
@@ -253,7 +253,7 @@ bool_t  CVpFrameWork::CheckValid (EMethods eMethod, SPixMap& pSrcPixMap, SPixMap
         || pDstPixMap.sRect.iRectLeft >= pDstPixMap.sRect.iRectWidth || pDstPixMap.sRect.iRectWidth > pDstPixMap.iStride[0])
       goto exit;
   }
-  eReturn = TRUE;
+  eReturn = true;
 
 exit:
   return eReturn;

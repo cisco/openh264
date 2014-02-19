@@ -75,12 +75,12 @@ typedef      struct _timeb     SWelsTime;
 typedef      struct timeb      SWelsTime;
 #endif
 
-int32_t   WelsSnprintf (str_t* buffer,  int32_t sizeOfBuffer,  const str_t* format, ...);
-str_t*   WelsStrncpy (str_t* dest, int32_t sizeInBytes, const str_t* src);
-str_t*   WelsStrcat (str_t* dest, int32_t sizeInBytes, const str_t* src);
-int32_t   WelsVsnprintf (str_t* buffer, int32_t sizeOfBuffer, const str_t* format, va_list argptr);
+int32_t   WelsSnprintf (char* buffer,  int32_t sizeOfBuffer,  const char* format, ...);
+char*   WelsStrncpy (char* dest, int32_t sizeInBytes, const char* src);
+char*   WelsStrcat (char* dest, int32_t sizeInBytes, const char* src);
+int32_t   WelsVsnprintf (char* buffer, int32_t sizeOfBuffer, const char* format, va_list argptr);
 
-WelsFileHandle*        WelsFopen (const str_t* filename,  const str_t* mode);
+WelsFileHandle*        WelsFopen (const char* filename,  const char* mode);
 int32_t                WelsFclose (WelsFileHandle*   fp);
 int32_t                WelsFread (void* buffer, int32_t size, int32_t count, WelsFileHandle* fp);
 int32_t                WelsFwrite (const void* buffer, int32_t size, int32_t count, WelsFileHandle* fp);
@@ -88,7 +88,7 @@ int32_t                WelsFseek (WelsFileHandle* fp, int32_t offset, int32_t or
 int32_t                WelsFflush (WelsFileHandle* fp);
 
 int32_t                WelsGetTimeOfDay (SWelsTime* tp);
-int32_t                WelsStrftime (str_t* buffer, int32_t size, const str_t* format, const SWelsTime* tp);
+int32_t                WelsStrftime (char* buffer, int32_t size, const char* format, const SWelsTime* tp);
 uint16_t               WelsGetMillisecond (const SWelsTime* tp);
 
 

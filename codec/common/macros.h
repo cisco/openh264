@@ -234,34 +234,6 @@ return r;
 #define   CALC_BI_STRIDE(width,bitcount)  ((((width * bitcount) + 31) & ~31) >> 3)
 
 
-#ifdef    WORDS_BIGENDIAN
-static inline uint32_t ENDIAN_FIX (uint32_t x) {
-return x;
-}
-#else //!WORDS_BIGENDIAN
-
-#if defined(_MSC_VER) && defined(_M_IX86)
-static inline uint32_t ENDIAN_FIX (uint32_t x) {
-__asm {
-  mov   eax,  x
-  bswap   eax
-  mov   x,    eax
-}
-return x;
-}
-#else  // GCC
-static inline uint32_t ENDIAN_FIX (uint32_t x) {
-#ifdef X86_ARCH
-__asm__ __volatile__ ("bswap %0":"+r" (x));
-#else
-x = ((x & 0xff000000) >> 24) | ((x & 0xff0000) >> 8) |
-    ((x & 0xff00) << 8) | ((x & 0xff) << 24);
-#endif
-return x;
-}
-#endif//GCC
-
-#endif//!WORDS_BIGENDIAN
 
 
 #ifndef BUTTERFLY1x2
@@ -276,7 +248,7 @@ return x;
 #define BUTTERFLY4x8(dw) (((uint64_t)(dw)<<32) | (dw))
 #endif//BUTTERFLY4x8
 
-static inline BOOL_T WELS_POWER2_IF (uint32_t v) {
+static inline bool WELS_POWER2_IF (uint32_t v) {
 return (v && ! (v & (v - 1)));
 }
 

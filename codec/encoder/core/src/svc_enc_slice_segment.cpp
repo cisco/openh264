@@ -121,7 +121,7 @@ int32_t AssignMbMapMultipleSlices (SSliceCtx* pSliceSeg, const SSliceConfig* kpM
  */
 
 //slice parameter check for SM_FIXEDSLCNUM_SLICE
-bool_t CheckFixedSliceNumMultiSliceSetting (const int32_t kiMbNumInFrame, SSliceArgument* pSliceArg) {
+bool CheckFixedSliceNumMultiSliceSetting (const int32_t kiMbNumInFrame, SSliceArgument* pSliceArg) {
   int32_t* pSlicesAssignList		= (int32_t*) & (pSliceArg->uiSliceMbNum[0]);
   const uint32_t kuiSliceNum			= pSliceArg->uiSliceNum;
   uint32_t uiSliceIdx				= 0;
@@ -141,7 +141,7 @@ bool_t CheckFixedSliceNumMultiSliceSetting (const int32_t kiMbNumInFrame, SSlice
 }
 
 //slice parameter check for SM_ROWMB_SLICE
-bool_t CheckRowMbMultiSliceSetting (const int32_t kiMbWidth, SSliceArgument* pSliceArg) {
+bool CheckRowMbMultiSliceSetting (const int32_t kiMbWidth, SSliceArgument* pSliceArg) {
   int32_t* pSlicesAssignList = (int32_t*) & (pSliceArg->uiSliceMbNum[0]);
   const uint32_t kuiSliceNum		= pSliceArg->uiSliceNum;
   uint32_t uiSliceIdx			= 0;
@@ -157,7 +157,7 @@ bool_t CheckRowMbMultiSliceSetting (const int32_t kiMbWidth, SSliceArgument* pSl
 }
 
 //slice parameter check for SM_RASTER_SLICE
-bool_t CheckRasterMultiSliceSetting (const int32_t kiMbNumInFrame, SSliceArgument* pSliceArg) {
+bool CheckRasterMultiSliceSetting (const int32_t kiMbNumInFrame, SSliceArgument* pSliceArg) {
   int32_t*			pSlicesAssignList = (int32_t*) & (pSliceArg->uiSliceMbNum[0]);
   int32_t			iActualSliceCount	= 0;
 
@@ -494,7 +494,7 @@ void UninitSliceSegment (SSliceCtx* pSliceSeg, CMemoryAlign* pMa) {
  */
 int32_t InitSlicePEncCtx (SSliceCtx* pSliceCtx,
                           CMemoryAlign* pMa,
-                          bool_t bFmoUseFlag,
+                          bool bFmoUseFlag,
                           int32_t iMbWidth,
                           int32_t iMbHeight,
                           SSliceConfig* pMso,

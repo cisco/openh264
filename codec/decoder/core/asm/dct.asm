@@ -87,7 +87,7 @@ WELS_EXTERN IdctResAddPred_mmx
 
 ALIGN 16
 ;*******************************************************************************
-;   void_t __cdecl IdctResAddPred_mmx( uint8_t *pPred, const int32_t kiStride, int16_t *pRs )
+;   void __cdecl IdctResAddPred_mmx( uint8_t *pPred, const int32_t kiStride, int16_t *pRs )
 ;*******************************************************************************
 
 IdctResAddPred_mmx:

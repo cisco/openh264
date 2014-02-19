@@ -29,55 +29,40 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	bit_stream.cpp
+ * \file		expand_pic.h
  *
- * \brief	Reading / writing bit-stream
+ * \brief		Interface for expanding reconstructed picture to be used for reference
  *
- * \date	03/10/2009 Created
- *
+ * \date		06/08/2009
  *************************************************************************************
  */
-#include "bit_stream.h"
 
-namespace WelsDec {
+#ifndef EXPAND_PICTURE_COMMON_H
+#define EXPAND_PICTURE_COMMON_H
 
-inline uint32_t GetValue4Bytes (uint8_t* pDstNal) {
-  uint32_t uiValue = 0;
-  uiValue = (pDstNal[0] << 24) | (pDstNal[1] << 16) | (pDstNal[2] << 8) | (pDstNal[3]);
-  return uiValue;
+#include "typedefs.h"
+
+#if defined(__cplusplus)
+extern "C" {
+#endif//__cplusplus
+
+#if defined(X86_ASM)
+void ExpandPictureLuma_sse2 (uint8_t* pDst,
+                             const int32_t kiStride,
+                             const int32_t kiPicW,
+                             const int32_t kiPicH);
+void ExpandPictureChromaAlign_sse2 (uint8_t* pDst,
+                                    const int32_t kiStride,
+                                    const int32_t kiPicW,
+                                    const int32_t kiPicH);
+void ExpandPictureChromaUnalign_sse2 (uint8_t* pDst,
+                                      const int32_t kiStride,
+                                      const int32_t kiPicW,
+                                      const int32_t kiPicH);
+#endif//X86_ASM
+
+#if defined(__cplusplus)
 }
+#endif//__cplusplus
 
-void InitReadBits (PBitStringAux pBitString) {
-  pBitString->uiCurBits  = GetValue4Bytes (pBitString->pCurBuf);
-  pBitString->pCurBuf  += 4;
-  pBitString->iLeftBits = -16;
-}
-
-/*!
- * \brief	input bits for decoder or initialize bitstream writing in encoder
- *
- * \param	pBitString	Bit string auxiliary pointer
- * \param	kpBuf		bit-stream buffer
- * \param	kiSize	    size in bits for decoder; size in bytes for encoder
- *
- * \return	size of buffer data in byte; failed in -1 return
- */
-int32_t InitBits (PBitStringAux pBitString, const uint8_t* kpBuf, const int32_t kiSize) {
-  const int32_t kiSizeBuf = (kiSize + 7) >> 3;
-  uint8_t* pTmp = (uint8_t*)kpBuf;
-
-  if (NULL == pTmp)
-    return -1;
-
-  pBitString->pStartBuf   = pTmp;				// buffer to start position
-  pBitString->pEndBuf	    = pTmp + kiSizeBuf;	// buffer + length
-  pBitString->iBits	    = kiSize;				// count bits of overall bitstreaming inputindex;
-
-  pBitString->pCurBuf   = pBitString->pStartBuf;
-  InitReadBits (pBitString);
-
-  return kiSizeBuf;
-}
-
-} // namespace WelsDec
-
+#endif

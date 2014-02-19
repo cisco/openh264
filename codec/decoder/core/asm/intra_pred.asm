@@ -184,7 +184,7 @@ WELS_EXTERN WelsDecoderI16x16LumaPredPlane_sse2
 
 ALIGN 16
 ;*******************************************************************************
-;   void_t __cdecl WelsDecoderI4x4LumaPredH_sse2(uint8_t *pPred, const int32_t kiStride)
+;   void __cdecl WelsDecoderI4x4LumaPredH_sse2(uint8_t *pPred, const int32_t kiStride)
 ;
 ;	pPred must align to 16
 ;*******************************************************************************
@@ -224,7 +224,7 @@ WelsDecoderI4x4LumaPredH_sse2:
 	ret
 
 ;*******************************************************************************
-; void_t WelsDecoderI16x16LumaPredPlane_sse2(uint8_t *pPred, const int32_t kiStride);
+; void WelsDecoderI16x16LumaPredPlane_sse2(uint8_t *pPred, const int32_t kiStride);
 ;*******************************************************************************
 WelsDecoderI16x16LumaPredPlane_sse2:
 		;%define pushsize	4
@@ -325,7 +325,7 @@ get_i16x16_luma_pred_plane_sse2_1:
 
 
 ;*******************************************************************************
-; void_t WelsDecoderI16x16LumaPredH_sse2(uint8_t *pPred, const int32_t kiStride);
+; void WelsDecoderI16x16LumaPredH_sse2(uint8_t *pPred, const int32_t kiStride);
 ;*******************************************************************************
 
 %macro SSE2_PRED_H_16X16_TWO_LINE_DEC 2
@@ -363,7 +363,7 @@ WelsDecoderI16x16LumaPredH_sse2:
     ret
 
 ;*******************************************************************************
-; void_t WelsDecoderI16x16LumaPredV_sse2(uint8_t *pPred, const int32_t kiStride);
+; void WelsDecoderI16x16LumaPredV_sse2(uint8_t *pPred, const int32_t kiStride);
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI16x16LumaPredV_sse2
 WelsDecoderI16x16LumaPredV_sse2:
@@ -406,7 +406,7 @@ WelsDecoderI16x16LumaPredV_sse2:
     ret
 
 ;*******************************************************************************
-; void_t WelsDecoderIChromaPredPlane_sse2(uint8_t *pPred, const int32_t kiStride);
+; void WelsDecoderIChromaPredPlane_sse2(uint8_t *pPred, const int32_t kiStride);
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderIChromaPredPlane_sse2
 WelsDecoderIChromaPredPlane_sse2:
@@ -515,7 +515,7 @@ ALIGN 16
 ;	7 is the start pixel of current 4x4 block
 ;	pPred[7] = ([6]+[0]*2+[1]+2)/4
 ;
-;   void_t __cdecl WelsDecoderI4x4LumaPredDDR_mmx(uint8_t *pPred, const int32_t kiStride)
+;   void __cdecl WelsDecoderI4x4LumaPredDDR_mmx(uint8_t *pPred, const int32_t kiStride)
 ;
 ;*******************************************************************************
 WelsDecoderI4x4LumaPredDDR_mmx:
@@ -571,7 +571,7 @@ WelsDecoderI4x4LumaPredDDR_mmx:
 
 ALIGN 16
 ;*******************************************************************************
-;	void_t __cdecl WelsDecoderIChromaPredH_mmx(uint8_t *pPred, const int32_t kiStride)
+;	void __cdecl WelsDecoderIChromaPredH_mmx(uint8_t *pPred, const int32_t kiStride)
 ;   copy 8 pixel of 8 line from left
 ;*******************************************************************************
 %macro MMX_PRED_H_8X8_ONE_LINE 4
@@ -637,7 +637,7 @@ WelsDecoderIChromaPredH_mmx:
 
 ALIGN 16
 ;*******************************************************************************
-;	void_t __cdecl WelsDecoderIChromaPredV_mmx(uint8_t *pPred, const int32_t kiStride)
+;	void __cdecl WelsDecoderIChromaPredV_mmx(uint8_t *pPred, const int32_t kiStride)
 ;   copy 8 pixels from top 8 pixels
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderIChromaPredV_mmx
@@ -697,7 +697,7 @@ WelsDecoderIChromaPredV_mmx:
 ;   j = (2 + l3 + (l2<<1) + l1)>>2
 ;   [b a f e h g j i] + [d c b a] --> mov to memory
 ;
-;   void_t WelsDecoderI4x4LumaPredHD_mmx(uint8_t *pPred, const int32_t kiStride)
+;   void WelsDecoderI4x4LumaPredHD_mmx(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredHD_mmx
 WelsDecoderI4x4LumaPredHD_mmx:
@@ -786,7 +786,7 @@ ALIGN 16
 
 ;   [g g f e d c b a] + [g g g g] --> mov to memory
 ;
-;   void_t WelsDecoderI4x4LumaPredHU_mmx(uint8_t *pPred, const int32_t kiStride)
+;   void WelsDecoderI4x4LumaPredHU_mmx(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredHU_mmx
 WelsDecoderI4x4LumaPredHU_mmx:
@@ -878,7 +878,7 @@ ALIGN 16
 ;   i = (2 + lt + (l0<<1) + l1)>>2
 ;   j = (2 + l0 + (l1<<1) + l2)>>2
 ;
-;   void_t WelsDecoderI4x4LumaPredVR_mmx(uint8_t *pPred, const int32_t kiStride)
+;   void WelsDecoderI4x4LumaPredVR_mmx(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredVR_mmx
 WelsDecoderI4x4LumaPredVR_mmx:
@@ -971,7 +971,7 @@ ALIGN 16
 
 ;   [g f e d c b a] --> mov to memory
 ;
-;   void_t WelsDecoderI4x4LumaPredDDL_mmx(uint8_t *pPred, const int32_t kiStride)
+;   void WelsDecoderI4x4LumaPredDDL_mmx(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredDDL_mmx
 WelsDecoderI4x4LumaPredDDL_mmx:
@@ -1046,7 +1046,7 @@ ALIGN 16
 
 ;   [i d c b a] + [j h g f e] --> mov to memory
 ;
-;   void_t WelsDecoderI4x4LumaPredVL_mmx(uint8_t *pPred, const int32_t kiStride)
+;   void WelsDecoderI4x4LumaPredVL_mmx(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredVL_mmx
 WelsDecoderI4x4LumaPredVL_mmx:
@@ -1093,7 +1093,7 @@ WelsDecoderI4x4LumaPredVL_mmx:
 ALIGN 16
 ;*******************************************************************************
 ;
-;   void_t WelsDecoderIChromaPredDc_sse2(uint8_t *pPred, const int32_t kiStride)
+;   void WelsDecoderIChromaPredDc_sse2(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderIChromaPredDc_sse2
 WelsDecoderIChromaPredDc_sse2:
@@ -1198,7 +1198,7 @@ WelsDecoderIChromaPredDc_sse2:
 ALIGN 16
 ;*******************************************************************************
 ;
-;   void_t WelsDecoderI16x16LumaPredDc_sse2(uint8_t *pPred, const int32_t kiStride)
+;   void WelsDecoderI16x16LumaPredDc_sse2(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI16x16LumaPredDc_sse2
 WelsDecoderI16x16LumaPredDc_sse2:
@@ -1286,7 +1286,7 @@ WelsDecoderI16x16LumaPredDc_sse2:
 
 ALIGN 16
 ;*******************************************************************************
-;	void_t WelsDecoderI16x16LumaPredDcTop_sse2(uint8_t *pPred, const int32_t kiStride)
+;	void WelsDecoderI16x16LumaPredDcTop_sse2(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI16x16LumaPredDcTop_sse2
 WelsDecoderI16x16LumaPredDcTop_sse2:
@@ -1366,7 +1366,7 @@ WelsDecoderI16x16LumaPredDcTop_sse2:
 
 ALIGN 16
 ;*******************************************************************************
-;	void_t WelsDecoderI16x16LumaPredDcNA_sse2(uint8_t *pPred, const int32_t kiStride)
+;	void WelsDecoderI16x16LumaPredDcNA_sse2(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI16x16LumaPredDcNA_sse2
 WelsDecoderI16x16LumaPredDcNA_sse2:
@@ -1412,7 +1412,7 @@ WelsDecoderI16x16LumaPredDcNA_sse2:
 
 ALIGN 16
 ;*******************************************************************************
-;	void_t WelsDecoderIChromaPredDcLeft_mmx(uint8_t *pPred, const int32_t kiStride)
+;	void WelsDecoderIChromaPredDcLeft_mmx(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderIChromaPredDcLeft_mmx
 WelsDecoderIChromaPredDcLeft_mmx:
@@ -1495,7 +1495,7 @@ WelsDecoderIChromaPredDcLeft_mmx:
 
 ALIGN 16
 ;*******************************************************************************
-;	void_t WelsDecoderIChromaPredDcTop_sse2(uint8_t *pPred, const int32_t kiStride)
+;	void WelsDecoderIChromaPredDcTop_sse2(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderIChromaPredDcTop_sse2
 WelsDecoderIChromaPredDcTop_sse2:
@@ -1544,7 +1544,7 @@ WelsDecoderIChromaPredDcTop_sse2:
 
 ALIGN 16
 ;*******************************************************************************
-;	void_t WelsDecoderIChromaPredDcNA_mmx(uint8_t *pPred, const int32_t kiStride)
+;	void WelsDecoderIChromaPredDcNA_mmx(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderIChromaPredDcNA_mmx
 WelsDecoderIChromaPredDcNA_mmx:

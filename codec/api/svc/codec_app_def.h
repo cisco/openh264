@@ -98,13 +98,10 @@ typedef enum {
   DECODER_OPTION_END_OF_STREAM,	/* Indicate bitstream of the final frame to be decoded */
   DECODER_OPTION_VCL_NAL,        //feedback whether or not have VCL NAL in current AU for application layer
   DECODER_OPTION_TEMPORAL_ID,      //feedback temporal id for application layer
-  DECODER_OPTION_MODE,             // indicates the decoding mode
-  DECODER_OPTION_OUTPUT_PROPERTY,
   DECODER_OPTION_FRAME_NUM,	//feedback current decoded frame number
   DECODER_OPTION_IDR_PIC_ID,	// feedback current frame belong to which IDR period
   DECODER_OPTION_LTR_MARKING_FLAG,	// feedback wether current frame mark a LTR
   DECODER_OPTION_LTR_MARKED_FRAME_NUM,	// feedback frame num marked by current Frame
-  DECODER_OPTION_DEVICE_INFO,
 
 } DECODER_OPTION;
 typedef enum { //feedback that whether or not have VCL NAL in current AU
@@ -112,26 +109,12 @@ typedef enum { //feedback that whether or not have VCL NAL in current AU
   FEEDBACK_VCL_NAL,
   FEEDBACK_UNKNOWN_NAL
 } FEEDBACK_VCL_NAL_IN_AU;
-typedef enum { //feedback the iTemporalId in current AU if have VCL NAL
-  FEEDBACK_TEMPORAL_ID_0 = 0,
-  FEEDBACK_TEMPORAL_ID_1,
-  FEEDBACK_TEMPORAL_ID_2,
-  FEEDBACK_TEMPORAL_ID_3,
-  FEEDBACK_TEMPORAL_ID_4,
-  FEEDBACK_UNKNOWN_TEMPORAL_ID
-} FEEDBACK_TEMPORAL_ID;
 
 /* Type of layer being encoded */
 typedef enum {
   NON_VIDEO_CODING_LAYER = 0,
   VIDEO_CODING_LAYER = 1
 } LAYER_TYPE;
-
-/* SVC Encoder/Decoder Initializing Parameter Types */
-typedef enum {
-  INIT_TYPE_PARAMETER_BASED = 0,	// For SVC DEMO Application
-  INIT_TYPE_PARAMETER_EXT,			// For SVC CONSOLE Application
-} INIT_TYPE;
 
 //enumerate the type of video bitstream which is provided to decoder
 typedef enum {
@@ -205,15 +188,23 @@ typedef struct TagEncParamBase{
   int		iPicWidth;			// width of picture in samples
   int		iPicHeight;			// height of picture in samples
   int		iTargetBitrate;		// target bitrate desired
-	
   int       iRCMode;                 // RC mode
   float	    fMaxFrameRate;			// input maximal frame rate
 
 } SEncParamBase, *PEncParamBase;
 
 
-typedef struct TagEncParamExt: SEncParamBase
+typedef struct TagEncParamExt
 {
+  int       iUsageType;	//enable_screen_content_signal;// 0: //camera video signal; 1: screen content signal;
+  int		iInputCsp;	// color space of input sequence
+
+  int		iPicWidth;			// width of picture in samples
+  int		iPicHeight;			// height of picture in samples
+  int		iTargetBitrate;		// target bitrate desired
+  int       iRCMode;                 // RC mode
+  float	    fMaxFrameRate;			// input maximal frame rate
+
   int		iTemporalLayerNum;	// layer number at temporal level
   int		iSpatialLayerNum;	// layer number at spatial level
 
@@ -221,36 +212,28 @@ typedef struct TagEncParamExt: SEncParamBase
   bool    bEnableSpsPpsIdAddition;
   bool    bPrefixNalAddingCtrl;
   bool    bEnableDenoise;	    // denoise control
-  bool    bEnableBackgroundDetection; 	// background detection control //VAA_BACKGROUND_DETECTION //BGD cmd
+  bool    bEnableBackgroundDetection;// background detection control //VAA_BACKGROUND_DETECTION //BGD cmd
   bool    bEnableAdaptiveQuant; // adaptive quantization control
   bool    bEnableFrameSkip; // allow skipping frames to keep the bitrate within limits
-  bool    bEnableCropPic;	// enable cropping source picture.  8/25/2010
-  // FALSE: Streaming Video Sharing; TRUE: Video Conferencing Meeting;
+  bool	bEnableCropPic;	// enable cropping source picture.  8/25/2010
+  // false: Streaming Video Sharing; true: Video Conferencing Meeting;
+
   bool     bEnableLongTermReference; // 0: on, 1: off
   int      iLtrMarkPeriod;
-
   int   iPaddingFlag;            // 0:disable padding;1:padding
-
-			
-  int   iEtropyCodingModeFlag; 
-
+  int   iEtropyCodingModeFlag;
 
   SSpatialLayerConfig sSpatialLayers[MAX_SPATIAL_LAYER_NUM];
   int		    iNumRefFrame;		// number of reference frame used
   unsigned int	uiFrameToBeCoded;	// frame to be encoded (at input frame rate)
-  unsigned int  uiGopSize;
   bool   bEnableRc;
-  //it is enough to use iCountThreadsNum 
   short		iMultipleThreadIdc;		// 1	# 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
   short		iCountThreadsNum;			//		# derived from disable_multiple_slice_idc (=0 or >1) means;
 
   int		iLTRRefNum;
- 
   bool		bEnableSSEI;
-  bool		bEnableFrameCroppingFlag;	// enable frame cropping flag: TRUE alwayse in application
+  bool		bEnableFrameCroppingFlag;// enable frame cropping flag: TRUE always in application
 
-  // FALSE: Streaming Video Sharing; TRUE: Video Conferencing Meeting;
-  
   /* Deblocking loop filter */
   int		iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries
   int		iLoopFilterAlphaC0Offset;// AlphaOffset: valid range [-6, 6], default 0
@@ -266,7 +249,6 @@ typedef struct TagEncParamExt: SEncParamBase
   int iMinQp;
 
 }SEncParamExt;
-
 
 //Define a new struct to show the property of video bitstream.
 typedef struct {

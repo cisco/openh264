@@ -80,25 +80,25 @@ uint8_t		uiChromaArrayType;
 uint8_t		uiBitDepthLuma;
 uint8_t		uiBitDepthChroma;
 /* TO BE CONTINUE: POC type 1 */
-bool_t		bDeltaPicOrderAlwaysZeroFlag;
-bool_t		bGapsInFrameNumValueAllowedFlag;
+bool		bDeltaPicOrderAlwaysZeroFlag;
+bool		bGapsInFrameNumValueAllowedFlag;
 
-bool_t		bFrameMbsOnlyFlag;
-bool_t		bMbaffFlag;	// MB Adapative Frame Field
-bool_t		bDirect8x8InferenceFlag;
-bool_t		bFrameCroppingFlag;
+bool		bFrameMbsOnlyFlag;
+bool		bMbaffFlag;	// MB Adapative Frame Field
+bool		bDirect8x8InferenceFlag;
+bool		bFrameCroppingFlag;
 
-bool_t		bVuiParamPresentFlag;
-//	bool_t		bTimingInfoPresentFlag;
-//	bool_t		bFixedFrameRateFlag;
-bool_t		bConstraintSet0Flag;
-bool_t		bConstraintSet1Flag;
-bool_t		bConstraintSet2Flag;
-bool_t		bConstraintSet3Flag;
-bool_t		bSeparateColorPlaneFlag;
-bool_t		bQpPrimeYZeroTransfBypassFlag;
-bool_t		bSeqScalingMatrixPresentFlag;
-bool_t		bSeqScalingListPresentFlag[12];
+bool		bVuiParamPresentFlag;
+//	bool		bTimingInfoPresentFlag;
+//	bool		bFixedFrameRateFlag;
+bool		bConstraintSet0Flag;
+bool		bConstraintSet1Flag;
+bool		bConstraintSet2Flag;
+bool		bConstraintSet3Flag;
+bool		bSeparateColorPlaneFlag;
+bool		bQpPrimeYZeroTransfBypassFlag;
+bool		bSeqScalingMatrixPresentFlag;
+bool		bSeqScalingListPresentFlag[12];
 const SLevelLimits *pSLevelLimits;
 } SSps, *PSps;
 
@@ -111,8 +111,8 @@ const SLevelLimits *pSLevelLimits;
 //	int32_t		iAlphaTransparentValue;
 
 //	uint8_t		uiBitDepthAux;
-//	bool_t		bAlphaIncrFlag;
-//	bool_t		bAdditionalExtFlag;
+//	bool		bAlphaIncrFlag;
+//	bool		bAdditionalExtFlag;
 //}SSpsExt, *PSpsExt;
 
 /* Sequence Parameter Set extension syntax, refer to Page 391 in JVT X201wcm */
@@ -124,19 +124,19 @@ uint8_t		uiChromaPhaseXPlus1Flag;
 uint8_t		uiChromaPhaseYPlus1;
 uint8_t		uiSeqRefLayerChromaPhaseXPlus1Flag;
 uint8_t		uiSeqRefLayerChromaPhaseYPlus1;
-bool_t		bInterLayerDeblockingFilterCtrlPresentFlag;
-bool_t		bSeqTCoeffLevelPredFlag;
-bool_t		bAdaptiveTCoeffLevelPredFlag;
-bool_t		bSliceHeaderRestrictionFlag;
+bool		bInterLayerDeblockingFilterCtrlPresentFlag;
+bool		bSeqTCoeffLevelPredFlag;
+bool		bAdaptiveTCoeffLevelPredFlag;
+bool		bSliceHeaderRestrictionFlag;
 } SSpsSvcExt, *PSpsSvcExt;
 
 /* Subset sequence parameter set syntax, refer to Page 391 in JVT X201wcm */
 typedef struct TagSubsetSps {
 SSps		sSps;
 SSpsSvcExt	sSpsSvcExt;
-bool_t		bSvcVuiParamPresentFlag;
-bool_t		bAdditionalExtension2Flag;
-bool_t		bAdditionalExtension2DataFlag;
+bool		bSvcVuiParamPresentFlag;
+bool		bAdditionalExtension2Flag;
+bool		bAdditionalExtension2DataFlag;
 } SSubsetSps, *PSubsetSps;
 
 /* Picture parameter set syntax, refer to Page 59 in JVT X201wcm */
@@ -164,15 +164,15 @@ int32_t		iPicInitQp;
 int32_t		iPicInitQs;
 int32_t		iChromaQpIndexOffset;
 
-bool_t		bEntropyCodingModeFlag;
-bool_t		bPicOrderPresentFlag;
+bool		bEntropyCodingModeFlag;
+bool		bPicOrderPresentFlag;
 /* slice_group_map_type = 3, 4 or 5 */
-bool_t		bSliceGroupChangeDirectionFlag;
-bool_t		bDeblockingFilterControlPresentFlag;
+bool		bSliceGroupChangeDirectionFlag;
+bool		bDeblockingFilterControlPresentFlag;
 
-bool_t		bConstainedIntraPredFlag;
-bool_t		bRedundantPicCntPresentFlag;
-bool_t		bWeightedPredFlag;
+bool		bConstainedIntraPredFlag;
+bool		bRedundantPicCntPresentFlag;
+bool		bWeightedPredFlag;
 uint8_t		uiWeightedBipredIdc;
 
 } SPps, *PPps;

@@ -60,29 +60,12 @@ typedef unsigned __int64 uint64_t;
 
 #endif // _MSC_VER defined
 
-// FIXME:     all string type should be declared explicit as char.
-typedef char      str_t;
 // The 'float' type is portable and usable without any need for any extra typedefs.
 
 #ifdef EPSN
 #undef EPSN
 #endif//EPSN
 #define EPSN	  (0.000001f) // (1e-6)	// desired float precision
-
-typedef bool bool_t;
-typedef int32_t BOOL_T;
-
-#ifndef FALSE
-#define FALSE   ((int32_t)0)
-#endif//FALSE
-
-#ifndef TRUE
-#define TRUE    ((int32_t)1)
-#endif//TRUE
-
-#ifndef void_t
-#define void_t void
-#endif
 
 #endif //WELS_TYPE_DEFINES_H__
 

@@ -72,8 +72,8 @@ typedef struct TagPicture {
   int32_t		iMarkFrameNum;
   int32_t		iLongTermPicNum;
 
-  bool_t		bUsedAsRef;						//for pRef pic management
-  bool_t		bIsLongRef;	// long term reference frame flag	//for pRef pic management
+  bool		bUsedAsRef;						//for pRef pic management
+  bool		bIsLongRef;	// long term reference frame flag	//for pRef pic management
   uint8_t		uiRecieveConfirmed;
   uint8_t		uiTemporalId;
   uint8_t		uiSpatialId;

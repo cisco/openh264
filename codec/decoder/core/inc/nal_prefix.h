@@ -55,29 +55,29 @@ typedef struct TagNalUnitHeaderExt {
   SNalUnitHeader	sNalUnitHeader;
 
 //	uint8_t		reserved_one_bit;
-  bool_t		bIdrFlag;
+  bool		bIdrFlag;
   uint8_t		uiPriorityId;
   int8_t		iNoInterLayerPredFlag;	// change as int8_t to support 3 values probably in encoder
   uint8_t		uiDependencyId;
 
   uint8_t		uiQualityId;
   uint8_t		uiTemporalId;
-  bool_t		bUseRefBasePicFlag;
-  bool_t		bDiscardableFlag;
+  bool		bUseRefBasePicFlag;
+  bool		bDiscardableFlag;
 
-  bool_t		bOutputFlag;
+  bool		bOutputFlag;
   uint8_t		uiReservedThree2Bits;
   // Derived variable(s)
   uint8_t		uiLayerDqId;
-  bool_t		bNalExtFlag;
+  bool		bNalExtFlag;
 } SNalUnitHeaderExt, *PNalUnitHeaderExt;
 
 /* Prefix NAL Unix syntax, refer to Page 392 in JVT X201wcm */
 typedef struct TagPrefixNalUnit {
   SRefBasePicMarking	sRefPicBaseMarking;
-  bool_t		bStoreRefBasePicFlag;
-  bool_t		bPrefixNalUnitAdditionalExtFlag;
-  bool_t		bPrefixNalUnitExtFlag;
+  bool		bStoreRefBasePicFlag;
+  bool		bPrefixNalUnitAdditionalExtFlag;
+  bool		bPrefixNalUnitExtFlag;
 } SPrefixNalUnit, *PPrefixNalUnit;
 
 } // namespace WelsDec

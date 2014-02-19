@@ -155,7 +155,7 @@ void WelsMotionEstimateInitialPoint (SWelsFuncPtrList* pFuncList, SWelsME* pMe, 
   }
 }
 
-bool_t WelsMeSadCostSelect (int32_t* iSadCost, const uint16_t* kpMvdCost, int32_t* pBestCost, const int32_t kiDx,
+bool WelsMeSadCostSelect (int32_t* iSadCost, const uint16_t* kpMvdCost, int32_t* pBestCost, const int32_t kiDx,
                             const int32_t kiDy, int32_t* pIx, int32_t* pIy) {
   int32_t iTempSadCost[4];
   int32_t iInputSadCost = *pBestCost;
@@ -213,7 +213,7 @@ void WelsMotionEstimateIterativeSearch (SWelsFuncPtrList* pFuncList, SWelsME* pM
 
     int32_t iX, iY;
 
-    const bool_t kbIsBestCostWorse = WelsMeSadCostSelect (iSadCosts, kpMvdCost, &iBestCost, iMvDx, iMvDy, &iX, &iY);
+    const bool kbIsBestCostWorse = WelsMeSadCostSelect (iSadCosts, kpMvdCost, &iBestCost, iMvDx, iMvDy, &iX, &iY);
     if (kbIsBestCostWorse)
       break;
 

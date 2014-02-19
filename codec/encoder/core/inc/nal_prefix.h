@@ -53,10 +53,10 @@ typedef struct TagNalUnitHeader {
 typedef struct TagNalUnitHeaderExt {
   SNalUnitHeader	sNalHeader;
 
-  bool_t		bIdrFlag;
+  bool		bIdrFlag;
   uint8_t		uiDependencyId;
   uint8_t		uiTemporalId;
-  bool_t		bDiscardableFlag;
+  bool		bDiscardableFlag;
 
 
 } SNalUnitHeaderExt, *PNalUnitHeaderExt;

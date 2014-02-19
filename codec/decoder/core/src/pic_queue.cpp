@@ -44,7 +44,7 @@
 
 namespace WelsDec {
 
-void_t FreePicture (PPicture pPic);
+void FreePicture (PPicture pPic);
 
 
 ///////////////////////////////////Recycled queue management for pictures///////////////////////////////////
@@ -81,7 +81,6 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
 
   iLumaSize	= iPicWidth * iPicHeight;
   iChromaSize	= iPicChromaWidth * iPicChromaHeight;
-  if (pCtx->iDecoderMode == SW_MODE) {
     pPic->pBuffer[0]	= static_cast<uint8_t*> (WelsMalloc (iLumaSize /* luma */
                         + (iChromaSize << 1) /* Cb,Cr */, "_pic->buffer[0]"));
 
@@ -93,7 +92,6 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
     pPic->pData[0]	= pPic->pBuffer[0] + (1 + pPic->iLinesize[0]) * PADDING_LENGTH;
     pPic->pData[1]	= pPic->pBuffer[1] + /*WELS_ALIGN*/ (((1 + pPic->iLinesize[1]) * PADDING_LENGTH) >> 1);
     pPic->pData[2]	= pPic->pBuffer[2] + /*WELS_ALIGN*/ (((1 + pPic->iLinesize[2]) * PADDING_LENGTH) >> 1);
-  }
 
 
 
@@ -106,7 +104,7 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
   return pPic;
 }
 
-void_t FreePicture (PPicture pPic) {
+void FreePicture (PPicture pPic) {
   if (NULL != pPic) {
 
     if (pPic->pBuffer[0]) {

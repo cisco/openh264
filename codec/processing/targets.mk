@@ -19,6 +19,7 @@ PROCESSING_CPP_SRCS=\
 	$(PROCESSING_SRCDIR)/src/vaacalc/vaacalculation.cpp\
 
 PROCESSING_OBJS += $(PROCESSING_CPP_SRCS:.cpp=.o)
+
 ifeq ($(USE_ASM), Yes)
 PROCESSING_ASM_SRCS=\
 	$(PROCESSING_SRCDIR)/src/asm/denoisefilter.asm\

@@ -201,7 +201,7 @@ inline int32_t CBackgroundDetection::CalculateAsdChromaEdge (uint8_t* pOriRef, u
   return WELS_ABS (ASD);
 }
 
-inline bool_t CBackgroundDetection::ForegroundDilation23Luma (SBackgroundOU* pBackgroundOU,
+inline bool CBackgroundDetection::ForegroundDilation23Luma (SBackgroundOU* pBackgroundOU,
     SBackgroundOU* pOUNeighbours[]) {
   SBackgroundOU* pOU_L	= pOUNeighbours[0];
   SBackgroundOU* pOU_R	= pOUNeighbours[1];
@@ -234,7 +234,7 @@ inline bool_t CBackgroundDetection::ForegroundDilation23Luma (SBackgroundOU* pBa
   return 0;
 }
 
-inline bool_t CBackgroundDetection::ForegroundDilation23Chroma (int8_t iNeighbourForegroundFlags,
+inline bool CBackgroundDetection::ForegroundDilation23Chroma (int8_t iNeighbourForegroundFlags,
     int32_t iStartSamplePos, int32_t iPicStrideUV, vBGDParam* pBgdParam) {
   static const int8_t kaOUPos[4]	= {OU_LEFT, OU_RIGHT, OU_TOP, OU_BOTTOM};
   int32_t	aEdgeOffset[4]	= {0, BGD_OU_SIZE_UV - 1, 0, iPicStrideUV* (BGD_OU_SIZE_UV - 1)};

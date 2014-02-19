@@ -77,11 +77,11 @@ void WelsResetRefList (sWelsEncCtx* pCtx);
 /*
  *	update reference picture list
  */
-BOOL_T WelsUpdateRefList (sWelsEncCtx* pCtx);
+bool WelsUpdateRefList (sWelsEncCtx* pCtx);
 /*
  *	build reference picture list
  */
-BOOL_T WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t kiPOC);
+bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t kiPOC);
 
 /*
  *	update syntax for reference base related
@@ -92,7 +92,7 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t kiPOC, const int32_t 
 /*
 * check current mark iFrameNum used in LTR list or not
 */
-bool_t CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx);
+bool CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx);
 /*
 *	decide whether current frame include long term reference mark and update long term reference mark syntax
 */

@@ -41,7 +41,7 @@ void WelsStderrSetTraceLevel (int32_t level) {
   g_TraceLevel = level;
 }
 
-int32_t welsStderrLevelTrace (int32_t level, const str_t* format, va_list ap) {
+int32_t welsStderrLevelTrace (int32_t level, const char* format, va_list ap) {
   if (level < g_TraceLevel) {
     vfprintf (stderr, format, ap);
   }
