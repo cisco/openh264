@@ -190,14 +190,8 @@ typedef struct TagWelsEncCtx {
   int32_t						iFrameBsSize;	// count size of frame bs in bytes allocated
   int32_t						iPosBsBuffer;	// current writing position of frame bs pBuffer
 
-  /* For Downsampling & VAA I420 based source pictures */
-  SPicture*					pSpatialPic[MAX_DEPENDENCY_LAYER][MAX_TEMPORAL_LEVEL + 1 +
-      LONG_TERM_REF_NUM];	// need memory requirement with total number of (log2(uiGopSize)+1+1+long_term_ref_num)
-
   SSpatialPicIndex			sSpatialIndexMap[MAX_DEPENDENCY_LAYER];
-  uint8_t						uiSpatialLayersInTemporal[MAX_DEPENDENCY_LAYER];
 
-  uint8_t                     uiSpatialPicNum[MAX_DEPENDENCY_LAYER];
   bool						bLongTermRefFlag[MAX_DEPENDENCY_LAYER][MAX_TEMPORAL_LEVEL + 1/*+LONG_TERM_REF_NUM*/];
 
   int16_t						iMaxSliceCount;// maximal count number of slices for all layers observation
