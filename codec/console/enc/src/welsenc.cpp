@@ -546,6 +546,8 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& pSvcParam, SFilesSet&
       unsigned int	iLayer = atoi (argv[n++]);
       const int iLen = strlen (argv[n]);
       SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
+      if (iLen >= sizeof(pDLayer->sRecFileName))
+        return 1;
       pDLayer->sRecFileName[iLen] = '\0';
       strncpy (pDLayer->sRecFileName, argv[n++], iLen);	// confirmed_safe_unsafe_usage
 #else
