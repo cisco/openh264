@@ -67,11 +67,11 @@ SECTION .text
 
 ALIGN 16
 ;*******************************************************************************
-; void McChromaWidthEq4_mmx( uint8_t *src,
+; void McChromaWidthEq4_mmx( const uint8_t *src,
 ;							int32_t iSrcStride,
 ;							uint8_t *pDst,
 ;							int32_t iDstStride,
-;							uint8_t *pABCD,
+;							const uint8_t *pABCD,
 ;							int32_t iHeigh );
 ;*******************************************************************************
 WELS_EXTERN McChromaWidthEq4_mmx
@@ -159,11 +159,11 @@ McChromaWidthEq4_mmx:
 
 ALIGN 16
 ;*******************************************************************************
-; void McChromaWidthEq8_sse2( uint8_t *pSrc,
+; void McChromaWidthEq8_sse2( const uint8_t *pSrc,
 ;						int32_t iSrcStride,
 ;						uint8_t *pDst,
 ;						int32_t iDstStride,
-;						uint8_t *pABCD,
+;						const uint8_t *pABCD,
 ;						int32_t iheigh );
 ;*******************************************************************************
 WELS_EXTERN McChromaWidthEq8_sse2
@@ -254,11 +254,11 @@ McChromaWidthEq8_sse2:
 
 ALIGN 16
 ;***********************************************************************
-; void McChromaWidthEq8_ssse3( uint8_t *pSrc,
+; void McChromaWidthEq8_ssse3( const uint8_t *pSrc,
 ;						 int32_t iSrcStride,
 ;                        uint8_t *pDst,
 ;                        int32_t iDstStride,
-;                        uint8_t *pABCD,
+;                        const uint8_t *pABCD,
 ;					     int32_t iHeigh);
 ;***********************************************************************
 WELS_EXTERN McChromaWidthEq8_ssse3

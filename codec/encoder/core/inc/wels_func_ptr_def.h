@@ -68,14 +68,14 @@ typedef int32_t (*PQuantizationSkipFunc) (int16_t* pDct, int16_t iFF,  int16_t i
 typedef int32_t (*PQuantizationHadamardFunc) (int16_t* pRes, const int16_t kiFF, int16_t iMF, int16_t* pDct,
     int16_t* pBlock);
 
-typedef void (*PWelsMcFunc) (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+typedef void (*PWelsMcFunc) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                              SMVUnitXY mv, int32_t iWidth, int32_t iHeight);
 
-typedef void (*PWelsLumaHalfpelMcFunc) (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+typedef void (*PWelsLumaHalfpelMcFunc) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                         int32_t iWidth, int32_t iHeight);
-typedef void (*PWelsLumaQuarpelMcFunc) (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+typedef void (*PWelsLumaQuarpelMcFunc) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                         int32_t iHeight);
-typedef void (*PWelsSampleAveragingFunc) (uint8_t*, int32_t, uint8_t*, int32_t, uint8_t*, int32_t, int32_t);
+typedef void (*PWelsSampleAveragingFunc) (uint8_t*, int32_t, const uint8_t*, int32_t, const uint8_t*, int32_t, int32_t);
 
 typedef struct TagMcFunc {
   PWelsLumaHalfpelMcFunc      pfLumaHalfpelHor;
