@@ -40,7 +40,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-
+#if defined (ANDROID_NDK)
+#include <android/log.h>
+#endif
 #include "codec_def.h"
 #include "codec_app_def.h"
 #include "codec_api.h"
@@ -52,7 +54,12 @@
 
 
 using namespace std;
-
+#if defined(ANDROID_NDK)
+#define LOG_TAG "welsdec"
+#define LOGI(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define printf LOGI
+#define fprintf(a, ...) LOGI(__VA_ARGS__)
+#endif
 //using namespace WelsDec;
 
 //#define STICK_STREAM_SIZE	// For Demo interfaces test with track file of integrated frames
@@ -292,8 +299,11 @@ label_exit:
   }
 }
 
-
+#if defined(ANDROID_NDK)
+int32_t DecMain(int32_t iArgC, char* pArgV[]) {
+#else
 int32_t main (int32_t iArgC, char* pArgV[]) {
+#endif
   ISVCDecoder* pDecoder = NULL;
 
   SDecodingParam sDecParam = {0};

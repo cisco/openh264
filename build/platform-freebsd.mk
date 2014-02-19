@@ -1,4 +1,6 @@
+include build/platform-x86-common.mk
 ASM = nasm
+SHAREDLIBSUFFIX = so
 CFLAGS += -fPIC -DMT_ENABLED
 LDFLAGS += -lpthread
 ASMFLAGS += -DNOPREFIX
