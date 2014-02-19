@@ -35,14 +35,20 @@
 #include <assert.h>
 #include <signal.h>
 #include <stdarg.h>
-
+#if defined (ANDROID_NDK)
+#include <android/log.h>
+#endif
 #ifdef ONLY_ENC_FRAMES_NUM
 #undef ONLY_ENC_FRAMES_NUM
 #endif//ONLY_ENC_FRAMES_NUM
 #define ONLY_ENC_FRAMES_NUM		INT_MAX // 2, INT_MAX	// type the num you try to encode here, 2, 10, etc
 
-
-
+#if defined (ANDROID_NDK)
+#define LOG_TAG "welsenc"
+#define LOGI(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define printf(...) LOGI(__VA_ARGS__)
+#define fprintf(a, ...) LOGI(__VA_ARGS__)
+#endif
 //#define STICK_STREAM_SIZE
 
 #include "measure_time.h"
@@ -1214,7 +1220,11 @@ void DestroySVCEncHandle (ISVCEncoder* pEncoder) {
 /****************************************************************************
  * main:
  ****************************************************************************/
+#if defined(ANDROID_NDK)
+int EncMain(int argc, char **argv)
+#else
 int main (int argc, char** argv)
+#endif
 {
   ISVCEncoder* pSVCEncoder	= NULL;
   int iRet					= 0;

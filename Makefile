@@ -1,4 +1,4 @@
-UNAME=$(shell uname | tr A-Z a-z | tr -d \\-[:digit:].)
+OS=$(shell uname | tr A-Z a-z | tr -d \\-[:digit:].)
 ARCH=$(shell uname -m)
 LIBPREFIX=lib
 LIBSUFFIX=a
@@ -8,17 +8,9 @@ AR_OPTS=cr $@
 LINK_LIB=-l$(1)
 CFLAGS_OPT=-O3
 CFLAGS_DEBUG=-g
-CFLAGS_M32=-m32
-CFLAGS_M64=-m64
 BUILDTYPE=Release
 V=Yes
 PREFIX=/usr/local
-
-ifeq (, $(ENABLE64BIT))
-ifeq ($(ARCH), x86_64)
-ENABLE64BIT=Yes
-endif
-endif
 
 ifeq (,$(wildcard ./gtest))
 HAVE_GTEST=No
@@ -40,25 +32,11 @@ CFLAGS += -fsanitize=address
 LDFLAGS += -fsanitize=address
 endif
 
-ifeq ($(ENABLE64BIT), Yes)
-CFLAGS += $(CFLAGS_M64)
-LDFLAGS += $(CFLAGS_M64)
-ASMFLAGS_PLATFORM = -DUNIX64
-else
-CFLAGS += $(CFLAGS_M32)
-LDFLAGS += $(CFLAGS_M32)
-ASMFLAGS_PLATFORM = -DX86_32
-endif
+include build/platform-$(OS).mk
 
-include build/platform-$(UNAME).mk
-
-ifeq ($(USE_ASM),Yes)
-CFLAGS += -DX86_ASM
-endif
 
 CFLAGS += -DNO_DYNAMIC_VP
 LDFLAGS +=
-ASMFLAGS += $(ASMFLAGS_PLATFORM) -DNO_DYNAMIC_VP
 
 
 #### No user-serviceable parts below this line
@@ -128,15 +106,25 @@ include codec/common/targets.mk
 include codec/decoder/targets.mk
 include codec/encoder/targets.mk
 include codec/processing/targets.mk
+
+ifneq (android, $(OS))
 include codec/console/dec/targets.mk
 include codec/console/enc/targets.mk
+endif
 
-libraries: $(LIBPREFIX)wels.$(LIBSUFFIX)
-LIBRARIES += $(LIBPREFIX)wels.$(LIBSUFFIX)
+libraries: $(LIBPREFIX)wels.$(LIBSUFFIX) $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX)
+LIBRARIES += $(LIBPREFIX)wels.$(LIBSUFFIX) $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX)
 
 $(LIBPREFIX)wels.$(LIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
 	$(QUIET)rm -f $@
 	$(QUIET_AR)$(AR) $(AR_OPTS) $+
+
+$(LIBPREFIX)wels.$(SHAREDLIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
+	rm -f $@
+	@echo
+	@echo $+
+	@echo
+	$(CXX) -shared $(LDFLAGS) -o $@ $+
 
 install: $(LIBPREFIX)wels.$(LIBSUFFIX)
 	mkdir -p $(PREFIX)/lib

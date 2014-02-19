@@ -1,4 +1,6 @@
+include build/platform-x86-common.mk
 ASM = nasm
+SHAREDLIBSUFFIX = dll
 CFLAGS += -DMT_ENABLED -MMD -MP
 LDFLAGS +=
 ifeq ($(ENABLE64BIT), Yes)

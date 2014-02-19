@@ -51,6 +51,17 @@ Building the Library
 --------------------
 NASM needed to be installed for assembly code: workable version 2.07 or above, nasm can downloaded from http://www.nasm.us/
 
+For Android Builds
+------------------
+To build for android platform, You need to install android sdk and ndk. You also need to export <ANDROID_SDK>/tools to PATH. On Linux, this can be done by
+'export PATH=<ANDROID_SDK>/tools:$PATH'
+The codec and demo can be built by
+'make OS=android NDKROOT=<ANDROID_NDK>'
+You can also set ARCH, APILEVEL, GCCVERSION according to your device and NDK version.
+ARCH specifies the architecture of android device. Currently only arm and x86 are supported, the default is arm.
+APILEVEL specifies android api level, the api level can be 12-19, the default is 19.
+GCCVERSION specifies which gcc in NDK is used, the default is 4.8.
+
 For Windows Builds
 ------------------
 
@@ -67,7 +78,7 @@ You will also need to set your INCLUDE and LIB paths to point to your VS and SDK
 export INCLUDE="C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include;C:\Program Files (x86)\Windows Kits\8.0\Include\um;C:\Program Files (x86)\Windows Kits\8.0\Include\shared"
 export LIB="C:\Program Files (x86)\Windows Kits\8.0\Lib\Win8\um\x86;C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\lib"
 
-Then add 'UNAME=msvc' to the make line of the 'For All Platforms' instructions.
+Then add 'OS=msvc' to the make line of the 'For All Platforms' instructions.
 
 For All Platforms
 -------------------
