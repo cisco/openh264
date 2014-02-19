@@ -477,7 +477,8 @@ void BsStartCavlc (PBitStringAux pBs) {
 }
 void BsEndCavlc (PBitStringAux pBs) {
   pBs->pCurBuf   = pBs->pStartBuf + (pBs->iIndex >> 3);
-  uint32_t uiCache32Bit = (uint32_t)((((pBs->pCurBuf[0] << 8) | pBs->pCurBuf[1]) << 16) | (pBs->pCurBuf[2] << 8) | pBs->pCurBuf[3]);
+  uint32_t uiCache32Bit = (uint32_t) ((((pBs->pCurBuf[0] << 8) | pBs->pCurBuf[1]) << 16) |
+                                      (pBs->pCurBuf[2] << 8) | pBs->pCurBuf[3]);
   pBs->uiCurBits = uiCache32Bit << (pBs->iIndex & 0x07);
   pBs->pCurBuf  += 4;
   pBs->iLeftBits = -16 + (pBs->iIndex & 0x07);
@@ -677,7 +678,7 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
   uint8_t bChroma   = (bChromaDc || CHROMA_AC == iResidualProperty);
   SReadBitsCache sReadBitsCache;
 
-  uint32_t uiCache32Bit = (uint32_t)((((pBuf[0] << 8) | pBuf[1]) << 16) | (pBuf[2] << 8) | pBuf[3]); 
+  uint32_t uiCache32Bit = (uint32_t) ((((pBuf[0] << 8) | pBuf[1]) << 16) | (pBuf[2] << 8) | pBuf[3]);
   sReadBitsCache.uiCache32Bit = uiCache32Bit << (iCurIdx & 0x07);
   sReadBitsCache.uiRemainBits = 32 - (iCurIdx & 0x07);
   sReadBitsCache.pBuf = pBuf;
@@ -782,7 +783,7 @@ int32_t ParseIntra4x4ModeConstrain0 (PNeighAvail pNeighAvail, int8_t* pIntraPred
   int32_t iFinalMode, i;
 
   uint8_t uiNeighAvail = 0;
-  uint32_t uiTmp;
+  uint32_t uiCode;
   if (pNeighAvail->iLeftAvail) {  //left
     iSampleAvail[ 6] =
       iSampleAvail[12] =
@@ -805,14 +806,16 @@ int32_t ParseIntra4x4ModeConstrain0 (PNeighAvail pNeighAvail, int8_t* pIntraPred
   uiNeighAvail = (iSampleAvail[6] << 2) | (iSampleAvail[0] << 1) | (iSampleAvail[1]);
 
   for (i = 0; i < 16; i++) {
-    const int32_t kiPrevIntra4x4PredMode = BsGetOneBit (pBs); //1bit
+    WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //prev_intra4x4_pred_mode_flag[ luma4x4BlkIdx ]
+    const int32_t kiPrevIntra4x4PredMode = uiCode;
     const int32_t kiPredMode = PredIntra4x4Mode (pIntraPredMode, i);
 
     int8_t iBestMode;
     if (kiPrevIntra4x4PredMode) {
       iBestMode = kiPredMode;
     } else { //kPrevIntra4x4PredMode == 0
-      const int32_t kiRemIntra4x4PredMode = BsGetBits (pBs, 3); //3bits
+      WELS_READ_VERIFY (BsGetBits (pBs, 3, &uiCode)); //rem_intra4x4_pred_mode[ luma4x4BlkIdx ]
+      const int32_t kiRemIntra4x4PredMode = uiCode;
       if (kiRemIntra4x4PredMode < kiPredMode) {
         iBestMode = kiRemIntra4x4PredMode;
       } else {
@@ -835,11 +838,11 @@ int32_t ParseIntra4x4ModeConstrain0 (PNeighAvail pNeighAvail, int8_t* pIntraPred
   pCurDqLayer->pIntraPredMode[iMbXy][4] = pIntraPredMode[4 + 8 * 1];
   pCurDqLayer->pIntraPredMode[iMbXy][5] = pIntraPredMode[4 + 8 * 2];
   pCurDqLayer->pIntraPredMode[iMbXy][6] = pIntraPredMode[4 + 8 * 3];
-  uiTmp = BsGetUe (pBs);
-  if (uiTmp > MAX_PRED_MODE_ID_CHROMA) {
+  WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //intra_chroma_pred_mode
+  if (uiCode > MAX_PRED_MODE_ID_CHROMA) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
-  pCurDqLayer->pChromaPredMode[iMbXy] = uiTmp;
+  pCurDqLayer->pChromaPredMode[iMbXy] = uiCode;
   if (CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
@@ -854,7 +857,7 @@ int32_t ParseIntra4x4ModeConstrain1 (PNeighAvail pNeighAvail, int8_t* pIntraPred
   int32_t iFinalMode, i;
 
   uint8_t uiNeighAvail = 0;
-  uint32_t uiTmp;
+  uint32_t uiCode;
   if (pNeighAvail->iLeftAvail && IS_INTRA (pNeighAvail->iLeftType)) {   //left
     iSampleAvail[ 6] =
       iSampleAvail[12] =
@@ -877,14 +880,16 @@ int32_t ParseIntra4x4ModeConstrain1 (PNeighAvail pNeighAvail, int8_t* pIntraPred
   uiNeighAvail = (iSampleAvail[6] << 2) | (iSampleAvail[0] << 1) | (iSampleAvail[1]);
 
   for (i = 0; i < 16; i++) {
-    const int32_t kiPrevIntra4x4PredMode = BsGetOneBit (pBs); //1bit
+    WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //prev_intra4x4_pred_mode_flag[ luma4x4BlkIdx ]
+    const int32_t kiPrevIntra4x4PredMode = uiCode; //1bit
     const int32_t kiPredMode = PredIntra4x4Mode (pIntraPredMode, i);
 
     int8_t iBestMode;
     if (kiPrevIntra4x4PredMode) {
       iBestMode = kiPredMode;
     } else { //kPrevIntra4x4PredMode == 0
-      const int32_t kiRemIntra4x4PredMode = BsGetBits (pBs, 3); //3bits
+      WELS_READ_VERIFY (BsGetBits (pBs, 3, &uiCode)); //rem_intra4x4_pred_mode[ luma4x4BlkIdx ]
+      const int32_t kiRemIntra4x4PredMode = uiCode;
       if (kiRemIntra4x4PredMode < kiPredMode) {
         iBestMode = kiRemIntra4x4PredMode;
       } else {
@@ -907,11 +912,11 @@ int32_t ParseIntra4x4ModeConstrain1 (PNeighAvail pNeighAvail, int8_t* pIntraPred
   pCurDqLayer->pIntraPredMode[iMbXy][4] = pIntraPredMode[4 + 8 * 1];
   pCurDqLayer->pIntraPredMode[iMbXy][5] = pIntraPredMode[4 + 8 * 2];
   pCurDqLayer->pIntraPredMode[iMbXy][6] = pIntraPredMode[4 + 8 * 3];
-  uiTmp = BsGetUe (pBs);
-  if (uiTmp > MAX_PRED_MODE_ID_CHROMA) {
+  WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //intra_chroma_pred_mode
+  if (uiCode > MAX_PRED_MODE_ID_CHROMA) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
-  pCurDqLayer->pChromaPredMode[iMbXy] = uiTmp;
+  pCurDqLayer->pChromaPredMode[iMbXy] = uiCode;
   if (CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
@@ -922,7 +927,7 @@ int32_t ParseIntra4x4ModeConstrain1 (PNeighAvail pNeighAvail, int8_t* pIntraPred
 int32_t ParseIntra16x16ModeConstrain0 (PNeighAvail pNeighAvail, PBitStringAux pBs, PDqLayer pCurDqLayer) {
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
   uint8_t uiNeighAvail = 0; //0x07 = 0 1 1 1, means left, top-left, top avail or not. (1: avail, 0: unavail)
-  uint32_t uiTmp;
+  uint32_t uiCode;
   if (pNeighAvail->iLeftAvail) {
     uiNeighAvail = (1 << 2);
   }
@@ -937,11 +942,11 @@ int32_t ParseIntra16x16ModeConstrain0 (PNeighAvail pNeighAvail, PBitStringAux pB
                                &pCurDqLayer->pIntraPredMode[iMbXy][7])) { //invalid iPredMode, must stop decoding
     return ERR_INFO_INVALID_I16x16_PRED_MODE;
   }
-  uiTmp = BsGetUe (pBs);
-  if (uiTmp > MAX_PRED_MODE_ID_CHROMA) {
+  WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //intra_chroma_pred_mode
+  if (uiCode > MAX_PRED_MODE_ID_CHROMA) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
-  pCurDqLayer->pChromaPredMode[iMbXy] = uiTmp;
+  pCurDqLayer->pChromaPredMode[iMbXy] = uiCode;
 
   if (CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
@@ -953,7 +958,7 @@ int32_t ParseIntra16x16ModeConstrain0 (PNeighAvail pNeighAvail, PBitStringAux pB
 int32_t ParseIntra16x16ModeConstrain1 (PNeighAvail pNeighAvail, PBitStringAux pBs, PDqLayer pCurDqLayer) {
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
   uint8_t uiNeighAvail = 0; //0x07 = 0 1 1 1, means left, top-left, top avail or not. (1: avail, 0: unavail)
-  uint32_t uiTmp;
+  uint32_t uiCode;
   if (pNeighAvail->iLeftAvail && IS_INTRA (pNeighAvail->iLeftType)) {
     uiNeighAvail = (1 << 2);
   }
@@ -968,11 +973,11 @@ int32_t ParseIntra16x16ModeConstrain1 (PNeighAvail pNeighAvail, PBitStringAux pB
                                &pCurDqLayer->pIntraPredMode[iMbXy][7])) { //invalid iPredMode, must stop decoding
     return ERR_INFO_INVALID_I16x16_PRED_MODE;
   }
-  uiTmp = BsGetUe (pBs);
-  if (uiTmp > MAX_PRED_MODE_ID_CHROMA) {
+  WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //intra_chroma_pred_mode
+  if (uiCode > MAX_PRED_MODE_ID_CHROMA) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
-  pCurDqLayer->pChromaPredMode[iMbXy] = uiTmp;
+  pCurDqLayer->pChromaPredMode[iMbXy] = uiCode;
 
   if (CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
@@ -993,6 +998,8 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
   int32_t iMotionPredFlag[4];
   int16_t iMv[2] = {0};
+  uint32_t uiCode;
+  int32_t iCode;
   int16_t iMinVmv = pSliceHeader->pSps->pSLevelLimits->iMinVmv;
   int16_t iMaxVmv = pSliceHeader->pSps->pSLevelLimits->iMaxVmv;
   iMotionPredFlag[0] = iMotionPredFlag[1] = iMotionPredFlag[2] = iMotionPredFlag[3] =
@@ -1004,10 +1011,12 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
   case MB_TYPE_16x16: {
     int32_t iRefIdx = 0;
     if (pSlice->sSliceHeaderExt.bAdaptiveMotionPredFlag) {
-      iMotionPredFlag[0] = BsGetOneBit (pBs);
+      WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //motion_prediction_flag_l0[ mbPartIdx ]
+      iMotionPredFlag[0] = uiCode;
     }
     if (iMotionPredFlag[0] == 0) {
-      iRefIdx = BsGetTe0 (pBs, iRefCount[0]);
+      WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[0], &uiCode)); //motion_prediction_flag_l1[ mbPartIdx ]
+      iRefIdx = uiCode;
       // Security check: iRefIdx should be in range 0 to num_ref_idx_l0_active_minus1, includsive
       // ref to standard section 7.4.5.1. iRefCount[0] is 1 + num_ref_idx_l0_active_minus1.
       if ((iRefIdx < 0) || (iRefIdx >= iRefCount[0]) || (ppRefPic[iRefIdx] == NULL)) { //error ref_idx
@@ -1019,8 +1028,10 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
     }
     PredMv (iMvArray, iRefIdxArray, 0, 4, iRefIdx, iMv);
 
-    iMv[0] += BsGetSe (pBs);
-    iMv[1] += BsGetSe (pBs);
+    WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l0[ mbPartIdx ][ 0 ][ compIdx ]
+    iMv[0] += iCode;
+    WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l1[ mbPartIdx ][ 0 ][ compIdx ]
+    iMv[1] += iCode;
     WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
     UpdateP16x16MotionInfo (pCurDqLayer, iRefIdx, iMv);
   }
@@ -1029,7 +1040,8 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
     int32_t iRefIdx[2];
     for (i = 0; i < 2; i++) {
       if (pSlice->sSliceHeaderExt.bAdaptiveMotionPredFlag) {
-        iMotionPredFlag[i] = BsGetOneBit (pBs);
+        WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //motion_prediction_flag_l0[ mbPartIdx ]
+        iMotionPredFlag[i] = uiCode;
       }
     }
 
@@ -1038,7 +1050,8 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
         WelsLog (pCtx, WELS_LOG_WARNING, "inter parse: iMotionPredFlag = 1 not supported. \n");
         return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_UNSUPPORTED_ILP);
       }
-      iRefIdx[i] = BsGetTe0 (pBs, iRefCount[0]);
+      WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[0], &uiCode)); //ref_idx_l0[ mbPartIdx ]
+      iRefIdx[i] = uiCode;
       if ((iRefIdx[i] < 0) || (iRefIdx[i] >= iRefCount[0]) || (ppRefPic[iRefIdx[i]] == NULL)) { //error ref_idx
         return ERR_INFO_INVALID_REF_INDEX;
       }
@@ -1046,8 +1059,10 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
     for (i = 0; i < 2; i++) {
       PredInter16x8Mv (iMvArray, iRefIdxArray, i << 3, iRefIdx[i], iMv);
 
-      iMv[0] += BsGetSe (pBs);
-      iMv[1] += BsGetSe (pBs);
+      WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l0[ mbPartIdx ][ 0 ][ compIdx ]
+      iMv[0] += iCode;
+      WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l1[ mbPartIdx ][ 0 ][ compIdx ]
+      iMv[1] += iCode;
       WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
       UpdateP16x8MotionInfo (pCurDqLayer, iMvArray, iRefIdxArray, i << 3, iRefIdx[i], iMv);
     }
@@ -1057,13 +1072,15 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
     int32_t iRefIdx[2];
     for (i = 0; i < 2; i++) {
       if (pSlice->sSliceHeaderExt.bAdaptiveMotionPredFlag) {
-        iMotionPredFlag[i] = BsGetOneBit (pBs);
+        WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //motion_prediction_flag_l0[ mbPartIdx ]
+        iMotionPredFlag[i] = uiCode;
       }
     }
 
     for (i = 0; i < 2; i++) {
       if (iMotionPredFlag[i] == 0) {
-        iRefIdx[i] = BsGetTe0 (pBs, iRefCount[0]);
+        WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[0], &uiCode)); //ref_idx_l0[ mbPartIdx ]
+        iRefIdx[i] = uiCode;
         if ((iRefIdx[i] < 0) || (iRefIdx[i] >= iRefCount[0]) || (ppRefPic[iRefIdx[i]] == NULL)) { //error ref_idx
           return ERR_INFO_INVALID_REF_INDEX;
         }
@@ -1076,8 +1093,10 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
     for (i = 0; i < 2; i++) {
       PredInter8x16Mv (iMvArray, iRefIdxArray, i << 2, iRefIdx[i], iMv);
 
-      iMv[0] += BsGetSe (pBs);
-      iMv[1] += BsGetSe (pBs);
+      WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l0[ mbPartIdx ][ 0 ][ compIdx ]
+      iMv[0] += iCode;
+      WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l1[ mbPartIdx ][ 0 ][ compIdx ]
+      iMv[1] += iCode;
       WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
       UpdateP8x16MotionInfo (pCurDqLayer, iMvArray, iRefIdxArray, i << 2, iRefIdx[i], iMv);
     }
@@ -1095,7 +1114,8 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
 
     //uiSubMbType, partition
     for (i = 0; i < 4; i++) {
-      uiSubMbType = BsGetUe (pBs);
+      WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //sub_mb_type[ mbPartIdx ]
+      uiSubMbType = uiCode;
       if (uiSubMbType >= 4) { //invalid uiSubMbType
         return ERR_INFO_INVALID_SUB_MB_TYPE;
       }
@@ -1106,7 +1126,8 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
 
     if (pSlice->sSliceHeaderExt.bAdaptiveMotionPredFlag) {
       for (i = 0; i < 4; i++) {
-        iMotionPredFlag[i] = BsGetOneBit (pBs);
+        WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //motion_prediction_flag_l0[ mbPartIdx ]
+        iMotionPredFlag[i] = uiCode;
       }
     }
 
@@ -1119,7 +1140,8 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
         uint8_t uiScan4Idx = g_kuiScan4[iIndex8];
 
         if (iMotionPredFlag[i] == 0) {
-          iRefIdx[i] = BsGetTe0 (pBs, iRefCount[0]);
+          WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[0], &uiCode)); //ref_idx_l0[ mbPartIdx ]
+          iRefIdx[i] = uiCode;
           if ((iRefIdx[i] < 0) || (iRefIdx[i] >= iRefCount[0]) || (ppRefPic[iRefIdx[i]] == NULL)) { //error ref_idx
             return ERR_INFO_INVALID_REF_INDEX;
           }
@@ -1151,8 +1173,10 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
         uiCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
         PredMv (iMvArray, iRefIdxArray, iPartIdx, iBlockWidth, iRefIdx[i], iMv);
 
-        iMv[0] += BsGetSe (pBs);
-        iMv[1] += BsGetSe (pBs);
+        WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l0[ mbPartIdx ][ subMbPartIdx ][ compIdx ]
+        iMv[0] += iCode;
+        WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l1[ mbPartIdx ][ subMbPartIdx ][ compIdx ]
+        iMv[1] += iCode;
         WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
         if (SUB_MB_TYPE_8x8 == uiSubMbType) {
           ST32 (pCurDqLayer->pMv[0][iMbXy][uiScan4Idx], LD32 (iMv));

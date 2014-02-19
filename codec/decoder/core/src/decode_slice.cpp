@@ -271,7 +271,7 @@ int32_t WelsMbInterPrediction (PWelsDecoderContext pCtx, PDqLayer pCurLayer) {
 }
 
 void WelsMbCopy (uint8_t* pDst, int32_t iStrideDst, uint8_t* pSrc, int32_t iStrideSrc,
-                   int32_t iHeight, int32_t iWidth) {
+                 int32_t iHeight, int32_t iWidth) {
   int32_t i;
   int32_t iOffsetDst = 0, iOffsetSrc = 0;
   for (i = 0; i < iHeight; i++) {
@@ -491,13 +491,16 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
   int32_t iMbXy = pCurLayer->iMbXyIndex;
   int32_t iNMbMode, i;
   uint32_t uiMbType = 0, uiCbp = 0, uiCbpL = 0, uiCbpC = 0;
+  uint32_t uiCode;
+  int32_t iCode;
 
   ENFORCE_STACK_ALIGN_1D (uint8_t, pNonZeroCount, 48, 16);
 
   pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
   pCurLayer->pResidualPredFlag[iMbXy] = pSlice->sSliceHeaderExt.bDefaultResidualPredFlag;
 
-  uiMbType = BsGetUe (pBs);
+  WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //mb_type
+  uiMbType = uiCode;
   if (uiMbType > 25) {
     return ERR_INFO_INVALID_MB_TYPE;
   }
@@ -561,7 +564,8 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
     }
 
     //uiCbp
-    uiCbp = BsGetUe (pBs);
+    WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //coded_block_pattern
+    uiCbp = uiCode;
     //G.9.1 Alternative parsing process for coded pBlock pattern
     if (uiCbp > 47)
       return ERR_INFO_INVALID_CBP;
@@ -603,7 +607,8 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
   if (pCurLayer->pCbp[iMbXy] || MB_TYPE_INTRA16x16 == pCurLayer->pMbType[iMbXy]) {
     int32_t iQpDelta, iId8x8, iId4x4;
 
-    iQpDelta = BsGetSe (pBs);
+    WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mb_qp_delta
+    iQpDelta = iCode;
 
     if (iQpDelta > 25 || iQpDelta < -26) { //out of iQpDelta range
       return ERR_INFO_INVALID_QP;
@@ -732,9 +737,11 @@ int32_t WelsDecodeMbCavlcISlice (PWelsDecoderContext pCtx, PNalUnit pNalCur) {
   PSliceHeaderExt pSliceHeaderExt = &pCurLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt;
   int32_t iBaseModeFlag;
   int32_t iRet = 0; //should have the return value to indicate decoding error or not, It's NECESSARY--2010.4.15
+  uint32_t uiCode;
 
   if (pSliceHeaderExt->bAdaptiveBaseModeFlag == 1) {
-    iBaseModeFlag = BsGetOneBit (pBs);
+    WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //base_mode_flag
+    iBaseModeFlag = uiCode;
   } else {
     iBaseModeFlag = pSliceHeaderExt->bDefaultBaseModeFlag;
   }
@@ -769,11 +776,14 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
 
   int32_t iNMbMode, i;
   uint32_t uiMbType = 0, uiCbp = 0, uiCbpL = 0, uiCbpC = 0;
+  uint32_t uiCode;
+  int32_t iCode;
 
   ENFORCE_STACK_ALIGN_1D (uint8_t, pNonZeroCount, 48, 16);
   pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;//2009.10.23
 
-  uiMbType = BsGetUe (pBs);
+  WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //mb_type
+  uiMbType = uiCode;
   if (uiMbType < 5) { //inter MB type
     int16_t iMotionVector[LIST_A][30][MV_A];
 
@@ -785,7 +795,8 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
     }
 
     if (pSlice->sSliceHeaderExt.bAdaptiveResidualPredFlag == 1) {
-      pCurLayer->pResidualPredFlag[iMbXy] =  BsGetOneBit (pBs);
+      WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //residual_prediction_flag
+      pCurLayer->pResidualPredFlag[iMbXy] =  uiCode;
     } else {
       pCurLayer->pResidualPredFlag[iMbXy] = pSlice->sSliceHeaderExt.bDefaultResidualPredFlag;
     }
@@ -882,7 +893,8 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
   }
 
   if (MB_TYPE_INTRA16x16 != pCurLayer->pMbType[iMbXy]) {
-    uiCbp = BsGetUe (pBs);
+    WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //coded_block_pattern
+    uiCbp = uiCode;
     {
       if (uiCbp > 47)
         return ERR_INFO_INVALID_CBP;
@@ -918,7 +930,8 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
   if (pCurLayer->pCbp[iMbXy] || MB_TYPE_INTRA16x16 == pCurLayer->pMbType[iMbXy]) {
     int32_t iQpDelta, iId8x8, iId4x4;
 
-    iQpDelta = BsGetSe (pBs);
+    WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mb_qp_delta
+    iQpDelta = iCode;
 
     if (iQpDelta > 25 || iQpDelta < -26) { //out of iQpDelta range
       return ERR_INFO_INVALID_QP;
@@ -1048,9 +1061,11 @@ int32_t WelsDecodeMbCavlcPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur) {
   int32_t iMbXy = pCurLayer->iMbXyIndex;
   int32_t iBaseModeFlag, i;
   int32_t iRet = 0; //should have the return value to indicate decoding error or not, It's NECESSARY--2010.4.15
+  uint32_t uiCode;
 
   if (-1 == pSlice->iMbSkipRun) {
-    pSlice->iMbSkipRun = BsGetUe (pBs);
+    WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //mb_skip_run
+    pSlice->iMbSkipRun = uiCode;
     if (-1 == pSlice->iMbSkipRun) {
       return -1;
     }
@@ -1094,7 +1109,8 @@ int32_t WelsDecodeMbCavlcPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur) {
   }
 
   if (pSlice->sSliceHeaderExt.bAdaptiveBaseModeFlag == 1) {
-    iBaseModeFlag = BsGetOneBit (pBs);
+    WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //base_mode_flag
+    iBaseModeFlag = uiCode;
   } else {
     iBaseModeFlag = pSlice->sSliceHeaderExt.bDefaultBaseModeFlag;
   }
