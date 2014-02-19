@@ -45,11 +45,6 @@
 #include "encoder_context.h"
 #include "utils.h"
 
-#ifdef NO_DYNAMIC_VP
-EResult CreateVpInterface (void** ppCtx, int iVersion);
-EResult DestroyVpInterface (void** ppCtx, int iVersion);
-#endif
-
 namespace WelsSVCEnc {
 
 #define WelsSafeDelete(p) if(p){ delete (p); (p) = NULL; }
