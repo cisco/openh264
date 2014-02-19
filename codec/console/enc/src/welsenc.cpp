@@ -752,7 +752,7 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   }
 
   memset (&sFbi, 0, sizeof (SFrameBSInfo));
-  memset (&sSvcParam, 0, sizeof (SEncParamBase));
+  memset (&sSvcParam, 0, sizeof (SEncParamExt));
 
   FillSpecificParameters (sSvcParam);
 
@@ -763,7 +763,7 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     goto ERROR_RET;
   }
 
-  if (cmResultSuccess != pPtrEnc->Initialize (&sSvcParam, INIT_TYPE_PARAMETER_BASED)) {
+  if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) {
     fprintf (stderr, "Encoder Initialization failed!\n");
 	ret = 1;
     goto ERROR_RET;
@@ -932,7 +932,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   sSvcParam.iPicHeight = sSvcParam.sSpatialLayers[sSvcParam.iSpatialLayerNum - 1].iVideoHeight;
 
 
-  if (cmResultSuccess != pPtrEnc->Initialize (&sSvcParam, INIT_TYPE_PARAMETER_EXT)) {	// SVC encoder initialization
+  if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) {	// SVC encoder initialization
     fprintf (stderr, "SVC encoder Initialize failed\n");
     iRet = 1;
     goto INSIDE_MEM_FREE;
