@@ -542,14 +542,17 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& pSvcParam, SFilesSet&
     }
 
     else if (!strcmp (pCommand, "-drec") && (n + 1 < argc)) {
+#ifdef ENABLE_FRAME_DUMP
       unsigned int	iLayer = atoi (argv[n++]);
       const int iLen = strlen (argv[n]);
-#ifdef ENABLE_FRAME_DUMP
       SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
+      if (iLen >= sizeof(pDLayer->sRecFileName))
+        return 1;
       pDLayer->sRecFileName[iLen] = '\0';
-      strncpy (pDLayer->sRecFileName, argv[n], iLen);	// confirmed_safe_unsafe_usage
+      strncpy (pDLayer->sRecFileName, argv[n++], iLen);	// confirmed_safe_unsafe_usage
+#else
+      n += 2;
 #endif//ENABLE_FRAME_DUMP
-      n++;
     }
 
     else if (!strcmp (pCommand, "-sw") && (n + 1 < argc)) {
