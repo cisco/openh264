@@ -64,9 +64,7 @@ class ISVCEncoder {
   /*
    * return: EVideoFrameType [IDR: videoFrameTypeIDR; P: videoFrameTypeP; ERROR: videoFrameTypeInvalid]
    */
-  virtual int EXTAPI EncodeFrame (const unsigned char* kpSrc, SFrameBSInfo* pBsInfo) = 0;
-  virtual int EXTAPI EncodeFrame2 (const SSourcePicture**   kppSrcPicList, int nSrcPicNum, SFrameBSInfo* pBsInfo) = 0;
-
+  virtual int EXTAPI EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo) = 0;
   /*
    * return: 0 - success; otherwise - failed;
    */
@@ -146,9 +144,7 @@ struct ISVCEncoderVtbl {
 
   int (*Uninitialize) (ISVCEncoder*);
 
-  int (*EncodeFrame) (ISVCEncoder*, const unsigned char* kpSrc, SFrameBSInfo* pBsInfo);
-  int (*EncodeFrame2) (ISVCEncoder*, const SSourcePicture**   kppSrcPicList, int nSrcPicNum, SFrameBSInfo* pBsInfo);
-
+  int (*EncodeFrame) (ISVCEncoder*, const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo);
   int (*EncodeParameterSets) (ISVCEncoder*, SFrameBSInfo* pBsInfo);
 
   int (*PauseFrame) (ISVCEncoder*, const unsigned char* kpSrc, SFrameBSInfo* pBsInfo);
