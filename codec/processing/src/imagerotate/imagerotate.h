@@ -42,9 +42,9 @@
 #ifndef WELSVP_IMAGEROTATE_H
 #define WELSVP_IMAGEROTATE_H
 
-#include "../common/util.h"
-#include "../common/WelsFrameWork.h"
-#include "../../interface/IWelsVP.h"
+#include "util.h"
+#include "WelsFrameWork.h"
+#include "IWelsVP.h"
 
 WELSVP_NAMESPACE_BEGIN
 

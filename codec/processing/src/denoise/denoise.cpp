@@ -31,7 +31,7 @@
  */
 
 #include "denoise.h"
-#include "../common/cpu.h"
+#include "cpu.h"
 
 WELSVP_NAMESPACE_BEGIN
 

@@ -41,10 +41,10 @@
 #ifndef WELSVP_BACKGROUNDDETECTION_H
 #define WELSVP_BACKGROUNDDETECTION_H
 
-#include "../common/util.h"
-#include "../common/memory.h"
-#include "../common/WelsFrameWork.h"
-#include "../../interface/IWelsVP.h"
+#include "util.h"
+#include "memory.h"
+#include "WelsFrameWork.h"
+#include "IWelsVP.h"
 
 WELSVP_NAMESPACE_BEGIN
 

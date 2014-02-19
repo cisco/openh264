@@ -42,7 +42,7 @@
 #ifndef WELSVP_WELSFRAMEWORK_H
 #define WELSVP_WELSFRAMEWORK_H
 
-#include "../../interface/IWelsVP.h"
+#include "IWelsVP.h"
 #include "util.h"
 #include "thread.h"
 
