@@ -17,5 +17,4 @@ endif
 endif
 
 APP_STL := stlport_shared
-#APP_STL := gnustl_shared
 APP_PLATFORM := android-12

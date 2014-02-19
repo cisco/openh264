@@ -1,12 +1,6 @@
 # Generate the libwelsdecdemo.so file
 LOCAL_PATH := $(call my-dir)
 
-#include $(CLEAR_VARS)
-#LOCAL_MODULE := stlport
-#LOCAL_SRC_FILES := $(NDK_ROOT)/sources/cxx-stl/stlport/libs/$(TARGET_ARCH_ABI)/libstlport_static.a
-#LOCAL_EXPORT_C_INCLUDES := $(NDK_ROOT)/sources/cxx-stl/stlport/stlport
-#include $(PREBUILT_STATIC_LIBRARY)
-
 include $(CLEAR_VARS)
 LOCAL_MODULE    := wels
 LOCAL_SRC_FILES := $(LOCAL_PATH)/../../../../../libwels.so
@@ -52,9 +46,7 @@ ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
 LOCAL_ARM_MODE := arm
 endif
 
-#LOCAL_STATIC_LIBRARIES += stlport
 LOCAL_LDLIBS := -llog
-#LOCAL_LDLIBS += -L../../../ -lwels
 LOCAL_SHARED_LIBRARIES := wels
 
 include $(BUILD_SHARED_LIBRARY)
