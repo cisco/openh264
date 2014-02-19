@@ -50,7 +50,7 @@
 
 #include "typedef.h"
 #include "memory.h"
-#include "../../interface/IWelsVP.h"
+#include "IWelsVP.h"
 
 WELSVP_NAMESPACE_BEGIN
 

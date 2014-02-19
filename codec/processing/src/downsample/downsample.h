@@ -42,9 +42,9 @@
 #ifndef WELSVP_DOWNSAMPLE_H
 #define WELSVP_DOWNSAMPLE_H
 
-#include "../common/util.h"
-#include "../common/WelsFrameWork.h"
-#include "../../interface/IWelsVP.h"
+#include "util.h"
+#include "WelsFrameWork.h"
+#include "IWelsVP.h"
 
 WELSVP_NAMESPACE_BEGIN
 
