@@ -401,7 +401,7 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
   return 0;
 }
 
-int32_t CWelsPreProcess::UpdateSpatialPictures(sWelsEncCtx* pCtx, SWelsSvcCodingParam* pParam, 
+int32_t CWelsPreProcess::UpdateSpatialPictures(sWelsEncCtx* pCtx, SWelsSvcCodingParam* pParam,
     const int8_t iCurTid, const int32_t d_idx) {
   if (iCurTid < m_uiSpatialLayersInTemporal[d_idx] - 1 || pParam->iDecompStages == 0){
     if ((iCurTid >= MAX_TEMPORAL_LEVEL) || (m_uiSpatialLayersInTemporal[d_idx] - 1 > MAX_TEMPORAL_LEVEL)) {
