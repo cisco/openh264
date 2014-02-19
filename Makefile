@@ -81,7 +81,8 @@ DECODER_INCLUDES = \
 
 ENCODER_INCLUDES = \
     -Icodec/encoder/core/inc \
-    -Icodec/encoder/plus/inc
+    -Icodec/encoder/plus/inc \
+    -Icodec/processing/interface
 
 PROCESSING_INCLUDES = \
     -Icodec/processing/interface \
