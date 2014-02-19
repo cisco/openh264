@@ -39,6 +39,7 @@ LOCAL_C_INCLUDES := \
             $(LOCAL_PATH)/../../../../api/svc \
             $(LOCAL_PATH)/../../../../console/enc/inc \
             $(LOCAL_PATH)/../../../../encoder/core/inc \
+            $(LOCAL_PATH)/../../../../processing/interface \
             $(LOCAL_PATH)/../../../../common
 
   
