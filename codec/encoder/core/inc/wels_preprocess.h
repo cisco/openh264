@@ -108,8 +108,11 @@ class CWelsPreProcess {
 
  public:
   int32_t WelsPreprocessReset (sWelsEncCtx* pEncCtx);
+  int32_t AllocSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCodingParam* pParam);
+  void    FreeSpatialPictures (sWelsEncCtx* pCtx);
   int32_t BuildSpatialPicList (sWelsEncCtx* pEncCtx, const SSourcePicture** kppSrcPicList, const int32_t kiConfiguredLayerNum);
   int32_t AnalyzeSpatialPic (sWelsEncCtx* pEncCtx, const int32_t kiDIdx);
+  int32_t UpdateSpatialPictures(sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam, const int8_t iCurTid, const int32_t d_idx);
 
  private:
   int32_t WelsPreprocessCreate();
@@ -148,6 +151,11 @@ class CWelsPreProcess {
   sWelsEncCtx*     m_pEncCtx;
   bool             m_bInitDone;
   bool             m_bOfficialBranch;
+  /* For Downsampling & VAA I420 based source pictures */
+  SPicture*        m_pSpatialPic[MAX_DEPENDENCY_LAYER][MAX_TEMPORAL_LEVEL + 1 +
+      LONG_TERM_REF_NUM];	// need memory requirement with total number of (log2(uiGopSize)+1+1+long_term_ref_num)
+  uint8_t          m_uiSpatialLayersInTemporal[MAX_DEPENDENCY_LAYER];
+  uint8_t          m_uiSpatialPicNum[MAX_DEPENDENCY_LAYER];
 };
 
 }
