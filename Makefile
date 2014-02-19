@@ -121,11 +121,8 @@ $(LIBPREFIX)wels.$(LIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS
 	$(QUIET_AR)$(AR) $(AR_OPTS) $+
 
 $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
-	rm -f $@
-	@echo
-	@echo $+
-	@echo
-	$(CXX) -shared $(LDFLAGS) -o $@ $+
+	$(QUIET)rm -f $@
+	$(QUIET_CXX)$(CXX) -shared $(LDFLAGS) -o $@ $+
 
 install: $(LIBPREFIX)wels.$(LIBSUFFIX)
 	mkdir -p $(PREFIX)/lib
