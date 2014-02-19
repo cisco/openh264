@@ -11,6 +11,7 @@ CFLAGS_DEBUG=-g
 BUILDTYPE=Release
 V=Yes
 PREFIX=/usr/local
+SHARED=-shared
 
 ifeq (,$(wildcard ./gtest))
 HAVE_GTEST=No
@@ -121,16 +122,17 @@ $(LIBPREFIX)wels.$(LIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS
 	$(QUIET_AR)$(AR) $(AR_OPTS) $+
 
 $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
-	rm -f $@
-	@echo
-	@echo $+
-	@echo
-	$(CXX) -shared $(LDFLAGS) -o $@ $+
+	$(QUIET)rm -f $@
+	$(QUIET_CXX)$(CXX) $(SHARED) $(LDFLAGS) $(CXX_LINK_O) $+ $(SHLDFLAGS)
 
-install: $(LIBPREFIX)wels.$(LIBSUFFIX)
+install: $(LIBPREFIX)wels.$(LIBSUFFIX) $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX)
 	mkdir -p $(PREFIX)/lib
 	mkdir -p $(PREFIX)/include/wels
 	install -m 644 $(LIBPREFIX)wels.$(LIBSUFFIX) $(PREFIX)/lib
+	install -m 755 $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX) $(PREFIX)/lib
+ifneq ($(EXTRA_LIBRARY),)
+	install -m 644 $(EXTRA_LIBRARY) $(PREFIX)/lib
+endif
 	install -m 644 codec/api/svc/codec*.h $(PREFIX)/include/wels
 
 ifeq ($(HAVE_GTEST),Yes)

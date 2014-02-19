@@ -1,0 +1,5 @@
+EXPORTS
+	CreateDecoder
+	DestroyDecoder
+	CreateSVCEncoder
+	DestroySVCEncoder
