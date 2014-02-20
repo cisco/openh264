@@ -59,11 +59,12 @@ To build for android platform, You need to install android sdk and ndk. You also
 
 The codec and demo can be built by
 
-'make OS=android NDKROOT=**ANDROID_NDK**'
+'make OS=android NDKROOT=**ANDROID_NDK** TARGET= **ANDROID_TARGET**'
 
-You can also set ARCH, APILEVEL, GCCVERSION according to your device and NDK version.
+Valid **ANDROID_TARGET** can be found in **ANDROID_SDK**/platforms, such as android-12. 
+You can also set ARCH, NDKLEVEL, GCCVERSION according to your device and NDK version.
 ARCH specifies the architecture of android device. Currently only arm and x86 are supported, the default is arm.
-APILEVEL specifies android api level, the api level can be 12-19, the default is 19.
+NDKLEVEL specifies android api level, the api level can be 12-19, the default is 12.
 GCCVERSION specifies which gcc in NDK is used, the default is 4.8.
 
 For Windows Builds
