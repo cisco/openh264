@@ -43,7 +43,7 @@ struct SVCEncoderImpl : public ISVCEncoder {
     EXPECT_TRUE(gThis == this);
     return 5;
   }
-  virtual int EXTAPI PauseFrame(const unsigned char* kpSrc,
+  virtual int EXTAPI PauseFrame(const SSourcePicture* kpSrcPic,
       SFrameBSInfo* pBsInfo) {
     EXPECT_TRUE(gThis == this);
     return 6;

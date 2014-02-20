@@ -618,16 +618,15 @@ int CWelsH264SVCEncoder::EncodeParameterSets (SFrameBSInfo* pBsInfo) {
 /*
  * return: 0 - success; otherwise - failed;
  */
-int CWelsH264SVCEncoder::PauseFrame (const unsigned char* kpSrc, SFrameBSInfo* pBsInfo) {
+int CWelsH264SVCEncoder::PauseFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo) {
   int32_t  iReturn = 1;
 
   ForceIntraFrame (true);
-  if (RawData2SrcPic ((uint8_t*)kpSrc) == 0)
-  {
-	 if (EncodeFrame (m_pSrcPicList[0], pBsInfo) != videoFrameTypeInvalid) {
-	  iReturn = 0;
-	 }
+
+  if (EncodeFrame2 (&kpSrcPic, 1,pBsInfo) != videoFrameTypeInvalid) {
+	iReturn = 0;
   }
+ 
 
   // to avoid pause frame bitstream and
   // normal bitstream use different video channel.
