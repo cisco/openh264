@@ -405,6 +405,7 @@ int32_t CWelsPreProcess::UpdateSpatialPictures(sWelsEncCtx* pCtx, SWelsSvcCoding
     const int8_t iCurTid, const int32_t d_idx) {
   if (iCurTid < m_uiSpatialLayersInTemporal[d_idx] - 1 || pParam->iDecompStages == 0){
     if ((iCurTid >= MAX_TEMPORAL_LEVEL) || (m_uiSpatialLayersInTemporal[d_idx] - 1 > MAX_TEMPORAL_LEVEL)) {
+      InitLastSpatialPictures(pCtx);
       return 1;
     }
     if (pParam->bEnableLongTermReference && pCtx->bLongTermRefFlag[d_idx][iCurTid]) {
