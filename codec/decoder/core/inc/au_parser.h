@@ -88,13 +88,13 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
 int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t kiSrcLen);
 
-void ParseRefBasePicMarking (PBitStringAux pBs, PRefBasePicMarking pRefBasePicMarking);
+int32_t ParseRefBasePicMarking (PBitStringAux pBs, PRefBasePicMarking pRefBasePicMarking);
 
-void ParsePrefixNalUnit (PWelsDecoderContext pCtx, PBitStringAux pBs);
+int32_t ParsePrefixNalUnit (PWelsDecoderContext pCtx, PBitStringAux pBs);
 
 bool CheckAccessUnitBoundary (const PNalUnit kpCurNal, const PNalUnit kpLastNal, const PSps kpSps);
 bool CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeaderExt pCurNalHeaderExt,
-                                   PSliceHeader pLastSliceHeader, PSliceHeader pCurSliceHeader);
+                                 PSliceHeader pLastSliceHeader, PSliceHeader pCurSliceHeader);
 /*!
  *************************************************************************************
  * \brief	to parse Sequence Parameter Set (SPS)
