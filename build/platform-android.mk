@@ -11,6 +11,8 @@ ifeq ($(ARCH), arm)
     CFLAGS += -march=armv7-a -mfloat-abi=softfp
 ifeq (Yes, $(HAVE_NEON))
     CFLAGS += -mfpu=neon
+else
+    CFLAGS += -mfpu=vfpv3-d16
 endif
     LDFLAGS += -march=armv7-a -Wl,--fix-cortex-a8
     APP_ABI = armeabi-v7a
