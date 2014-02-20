@@ -93,6 +93,7 @@
 
 #define MAX_NAL_UNIT_NUM_IN_AU	32	// predefined maximal number of NAL Units in an access unit
 #define MAX_ACCESS_UNIT_CAPACITY	1048576	// Maximal AU capacity in bytes: (1<<20) = 1024 KB predefined
+#define MAX_MACROBLOCK_CAPACITY 5000 //Maximal legal MB capacity, 15000 bits is enough
 
 enum {
   BASE_MB = 0,
