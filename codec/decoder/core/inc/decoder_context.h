@@ -215,8 +215,8 @@ typedef struct TagWelsDecoderContext {
     int32_t* pSliceIdc[LAYER_NUM_EXCHANGEABLE];		// using int32_t for slice_idc
     int8_t*  pResidualPredFlag[LAYER_NUM_EXCHANGEABLE];
     int8_t*  pInterPredictionDoneFlag[LAYER_NUM_EXCHANGEABLE];
-    int16_t iMbWidth;
-    int16_t iMbHeight;
+    uint32_t iMbWidth;
+    uint32_t iMbHeight;
   } sMb;
 
 
