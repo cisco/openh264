@@ -41,7 +41,7 @@ LDFLAGS += --sysroot=$(SYSROOT) -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,rel
 binaries : decdemo encdemo
 
 decdemo: libraries
-	sh -c 'cd ./codec/build/android/dec/jni && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && cd .. && android update project -t $(TARGET) -p . && ant debug && cd ../../../..'
+	cd ./codec/build/android/dec/jni && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && cd .. && android update project -t $(TARGET) -p . && ant debug && cd ../../../..
 
 encdemo: libraries
-	sh -c 'cd ./codec/build/android/enc/jni && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && cd .. && android update project -t $(TARGET) -p . && ant debug && cd ../../../..'
+	cd ./codec/build/android/enc/jni && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && cd .. && android update project -t $(TARGET) -p . && ant debug && cd ../../../..
