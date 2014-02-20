@@ -18,6 +18,7 @@ else
     GCCPATHPREFIX = x86
     GCCPREFIX = i686-linux-android
     APP_ABI = x86
+    USE_ASM = Yes
 ifeq (Yes, $(USE_ASM))
     ASM = nasm
     CFLAGS += -DX86_ASM
