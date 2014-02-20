@@ -40,7 +40,8 @@ CC = $(NDKROOT)/toolchains/$(GCCPATHPREFIX)-$(GCCVERSION)/prebuilt/$(HOSTOS)-$(H
 AR = $(NDKROOT)/toolchains/$(GCCPATHPREFIX)-$(GCCVERSION)/prebuilt/$(HOSTOS)-$(HOSTARCH)/bin/$(GCCPREFIX)-ar
 CFLAGS += -DLINUX -fpic --sysroot=$(SYSROOT)
 CXXFLAGS += -fno-rtti -fno-exceptions
-LDFLAGS += --sysroot=$(SYSROOT) -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,-soname,libwels.so
+LDFLAGS += --sysroot=$(SYSROOT)
+SHLDFLAGS = -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,-soname,libwels.so
 
 STL_INCLUDES = \
     -I$(NDKROOT)/sources/cxx-stl/gnu-libstdc++/$(GCCVERSION)/include \
