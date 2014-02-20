@@ -53,20 +53,17 @@ NASM needed to be installed for assembly code: workable version 2.07 or above, n
 
 For Android Builds
 ------------------
-To build for android platform, You need to install android sdk and ndk. You also need to export **ANDROID_SDK>**/tools to PATH. On Linux, this can be done by
+To build for android platform, You need to install android sdk and ndk. You also need to export **ANDROID_SDK**/tools to PATH. On Linux, this can be done by
 
-'export PATH=**ANDROID_SDK>**/tools:$PATH'
+'export PATH=**ANDROID_SDK**/tools:$PATH'
 
 The codec and demo can be built by
 
-'make OS=android NDKROOT=**ANDROID_NDK>**'
+'make OS=android NDKROOT=**ANDROID_NDK**'
 
 You can also set ARCH, APILEVEL, GCCVERSION according to your device and NDK version.
-
 ARCH specifies the architecture of android device. Currently only arm and x86 are supported, the default is arm.
-
 APILEVEL specifies android api level, the api level can be 12-19, the default is 19.
-
 GCCVERSION specifies which gcc in NDK is used, the default is 4.8.
 
 For Windows Builds
