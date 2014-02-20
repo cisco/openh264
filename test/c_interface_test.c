@@ -14,12 +14,11 @@ void CheckEncoderInterface(ISVCEncoder* p, CheckFunc check) {
   CHECK(2, p, InitializeExt);
   CHECK(3, p, Uninitialize);
   CHECK(4, p, EncodeFrame);
-  CHECK(5, p, EncodeFrame2);
-  CHECK(6, p, EncodeParameterSets);
-  CHECK(7, p, PauseFrame);
-  CHECK(8, p, ForceIntraFrame);
-  CHECK(9, p, SetOption);
-  CHECK(10, p, GetOption);
+  CHECK(5, p, EncodeParameterSets);
+  CHECK(6, p, PauseFrame);
+  CHECK(7, p, ForceIntraFrame);
+  CHECK(8, p, SetOption);
+  CHECK(9, p, GetOption);
 }
 
 void CheckDecoderInterface(ISVCDecoder* p, CheckFunc check) {

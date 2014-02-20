@@ -498,16 +498,13 @@ int32_t CWelsH264SVCEncoder::RawData2SrcPic (const uint8_t* pSrc) {
 /*
  *	SVC core encoding
  */
-int CWelsH264SVCEncoder::EncodeFrame (const unsigned char* pSrc, SFrameBSInfo* pBsInfo) {
-  if (! (pSrc && m_pEncContext && m_bInitialFlag)) {
+int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo) {
+  if (! (kpSrcPic && m_pEncContext && m_bInitialFlag)) {
     return videoFrameTypeInvalid;
   }
 
   int32_t uiFrameType = videoFrameTypeInvalid;
-
-  if (RawData2SrcPic ((uint8_t*)pSrc) == 0) {
-    uiFrameType = EncodeFrame2 (const_cast<const SSourcePicture**> (m_pSrcPicList), 1, pBsInfo);
-  }
+  uiFrameType = EncodeFrame2 (&kpSrcPic, 1, pBsInfo);
 
 #ifdef REC_FRAME_COUNT
   ++ m_uiCountFrameNum;
@@ -621,14 +618,15 @@ int CWelsH264SVCEncoder::EncodeParameterSets (SFrameBSInfo* pBsInfo) {
 /*
  * return: 0 - success; otherwise - failed;
  */
-int CWelsH264SVCEncoder::PauseFrame (const unsigned char* kpSrc, SFrameBSInfo* pBsInfo) {
+int CWelsH264SVCEncoder::PauseFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo) {
   int32_t  iReturn = 1;
 
   ForceIntraFrame (true);
 
-  if (EncodeFrame (kpSrc, pBsInfo) != videoFrameTypeInvalid) {
-    iReturn = 0;
+  if (EncodeFrame2 (&kpSrcPic, 1,pBsInfo) != videoFrameTypeInvalid) {
+	iReturn = 0;
   }
+ 
 
   // to avoid pause frame bitstream and
   // normal bitstream use different video channel.
