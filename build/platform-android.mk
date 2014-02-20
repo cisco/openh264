@@ -18,6 +18,11 @@ else
     GCCPATHPREFIX = x86
     GCCPREFIX = i686-linux-android
     APP_ABI = x86
+ifeq (Yes, $(USE_ASM))
+    ASM = nasm
+    CFLAGS += -DX86_ASM
+    ASMFLAGS += -DNOPREFIX -f elf32 -DX86_32
+endif
 endif
 
 SYSROOT = $(NDKROOT)/platforms/android-$(APILEVEL)/arch-$(ARCH)
