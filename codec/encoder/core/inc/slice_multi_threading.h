@@ -80,7 +80,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pParam, con
 void ReleaseMtResource (sWelsEncCtx** ppCtx);
 
 int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32_t kiSliceCount);
-int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFrameBsBuffer, const int32_t kiSliceIdx);
+int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFrameBsBuffer, const int32_t iSliceIdx, int32_t& iSliceSize);
 
 #if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 #if defined(__GNUC__)

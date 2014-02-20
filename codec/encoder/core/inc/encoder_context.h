@@ -220,6 +220,11 @@ typedef struct TagWelsEncCtx {
   SStatSliceInfo				sPerInfo;
 #endif//STAT_OUTPUT
 
+  int32_t iEncoderError;
+#ifdef MT_ENABLED
+  WELS_MUTEX					mutexEncoderError;
+#endif
+
 } sWelsEncCtx/*, *PWelsEncCtx*/;
 }
 #endif//sWelsEncCtx_H__

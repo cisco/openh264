@@ -58,6 +58,13 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx);
 void FreeMemorySvc (sWelsEncCtx** ppCtx);
 
 /*!
+ * \brief	 allocate or reallocate the output bs buffer
+ * \return:		successful - 0; otherwise none 0 for failed
+ */
+int32_t AllocateBsOutputBuffer(CMemoryAlign*pMa, const int32_t iNeededLen, int32_t iOrigLen, const char* kpTag, uint8_t*& pOutputBuffer );
+//TODO: to finish this function and call it
+
+/*!
  * \brief	initialize function pointers that potentially used in Wels encoding
  * \param	pEncCtx		sWelsEncCtx*
  * \return	successful - 0; otherwise none 0 for failed

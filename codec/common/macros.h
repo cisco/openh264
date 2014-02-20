@@ -196,6 +196,18 @@ return iY;
 
 /*
  * Description: to check variable validation and return the specified result
+ *	iResult:	value to be checked
+ *	iExpected:	the expected value
+ */
+#ifndef WELS_VERIFY_RETURN_IFNEQ
+#define WELS_VERIFY_RETURN_IFNEQ(iResult, iExpected) \
+	if ( iResult != iExpected ){ \
+		return iResult; \
+	}
+#endif//#if WELS_VERIFY_RETURN_IF
+
+/*
+ * Description: to check variable validation and return the specified result
  *	iResult:	value to be return
  *	bCaseIf:	negative condition to be verified
  */
