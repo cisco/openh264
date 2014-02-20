@@ -11,6 +11,8 @@ ifeq ($(ARCH), arm)
     CFLAGS += -march=armv7-a -mfloat-abi=softfp
 ifeq (Yes, $(HAVE_NEON))
     CFLAGS += -mfpu=neon
+else
+    CFLAGS += -mfpu=vfpv3-d16
 endif
     LDFLAGS += -march=armv7-a -Wl,--fix-cortex-a8
     APP_ABI = armeabi-v7a
@@ -35,14 +37,24 @@ endif
 
 SYSROOT = $(NDKROOT)/platforms/android-$(NDKLEVEL)/arch-$(ARCH)
 CXX = $(NDKROOT)/toolchains/$(GCCPATHPREFIX)-$(GCCVERSION)/prebuilt/$(HOSTOS)-$(HOSTARCH)/bin/$(GCCPREFIX)-g++
-CFLAGS += -DLINUX -fpic --sysroot=$(SYSROOT) -fno-rtti -fno-exceptions
-LDFLAGS += --sysroot=$(SYSROOT) -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,-soname,libwels.so
+CC = $(NDKROOT)/toolchains/$(GCCPATHPREFIX)-$(GCCVERSION)/prebuilt/$(HOSTOS)-$(HOSTARCH)/bin/$(GCCPREFIX)-gcc
+AR = $(NDKROOT)/toolchains/$(GCCPATHPREFIX)-$(GCCVERSION)/prebuilt/$(HOSTOS)-$(HOSTARCH)/bin/$(GCCPREFIX)-ar
+CFLAGS += -DLINUX -fpic --sysroot=$(SYSROOT)
+CXXFLAGS += -fno-rtti -fno-exceptions
+LDFLAGS += --sysroot=$(SYSROOT)
+SHLDFLAGS = -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,-soname,libwels.so
 
+STL_INCLUDES = \
+    -I$(NDKROOT)/sources/cxx-stl/gnu-libstdc++/$(GCCVERSION)/include \
+    -I$(NDKROOT)/sources/cxx-stl/gnu-libstdc++/$(GCCVERSION)/libs/$(APP_ABI)/include
+
+GTEST_INCLUDES = $(STL_INCLUDES)
+CODEC_UNITTEST_INCLUDES = $(STL_INCLUDES)
 
 binaries : decdemo encdemo
 
 decdemo: libraries
-	sh -c 'cd ./codec/build/android/dec/jni; $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI); cd ..; android update project -t $(TARGET) -p . ; ant debug; cd ../../../..'
+	cd ./codec/build/android/dec && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
 
 encdemo: libraries
-	sh -c 'cd ./codec/build/android/enc/jni; $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI); cd ..; android update project -t $(TARGET) -p . ; ant debug; cd ../../../..'
+	cd ./codec/build/android/enc && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
