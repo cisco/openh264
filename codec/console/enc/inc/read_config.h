@@ -50,7 +50,6 @@ typedef struct tagFilesSet {
   string strSeqFile;	// for cmd lines
   struct {
     string strLayerCfgFile;
-    string strSeqFile;
   } sSpatialLayers[MAX_DEPENDENCY_LAYER];
 } SFilesSet;
 
