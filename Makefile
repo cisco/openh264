@@ -82,7 +82,7 @@ H264ENC_INCLUDES = $(ENCODER_INCLUDES) -Icodec/console/enc/inc
 H264ENC_LDFLAGS = -L. $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common)
 H264ENC_DEPS = $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX)
 
-CODEC_UNITTEST_LDFLAGS = -L. $(call LINK_LIB,gtest) $(call LINK_LIB,decoder) $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common)
+CODEC_UNITTEST_LDFLAGS = -L. $(call LINK_LIB,gtest) $(call LINK_LIB,decoder) $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common) $(CODEC_UNITTEST_LDFLAGS_SUFFIX)
 CODEC_UNITTEST_DEPS = $(LIBPREFIX)gtest.$(LIBSUFFIX) $(LIBPREFIX)decoder.$(LIBSUFFIX) $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX)
 
 .PHONY: test gtest-bootstrap clean
