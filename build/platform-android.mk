@@ -39,6 +39,12 @@ CXX = $(NDKROOT)/toolchains/$(GCCPATHPREFIX)-$(GCCVERSION)/prebuilt/$(HOSTOS)-$(
 CFLAGS += -DLINUX -fpic --sysroot=$(SYSROOT) -fno-rtti -fno-exceptions
 LDFLAGS += --sysroot=$(SYSROOT) -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,-soname,libwels.so
 
+STL_INCLUDES = \
+    -I$(NDKROOT)/sources/cxx-stl/gnu-libstdc++/$(GCCVERSION)/include \
+    -I$(NDKROOT)/sources/cxx-stl/gnu-libstdc++/$(GCCVERSION)/libs/$(APP_ABI)/include
+
+GTEST_INCLUDES = $(STL_INCLUDES)
+CODEC_UNITTEST_INCLUDES = $(STL_INCLUDES)
 
 binaries : decdemo encdemo
 

@@ -67,11 +67,11 @@ PROCESSING_INCLUDES = \
     -Icodec/processing/interface \
     -Icodec/processing/src/common
 
-GTEST_INCLUDES = \
+GTEST_INCLUDES += \
     -Igtest \
     -Igtest/include
 
-CODEC_UNITTEST_INCLUDES = \
+CODEC_UNITTEST_INCLUDES += \
     -Igtest/include
 
 H264DEC_INCLUDES = $(DECODER_INCLUDES) -Icodec/console/dec/inc
