@@ -40,6 +40,8 @@
 #if !defined(WELS_ENCODER_STATISTICAL_DATA_H__)
 #define WELS_ENCODER_STATISTICAL_DATA_H__
 
+namespace WelsSVCEnc {
+
 /*
  *	Stat quality
  */
@@ -94,5 +96,7 @@ typedef struct TagStatData {
   SStatSliceInfo		sSliceData;
 
 } SStatData;
+
+}
 
 #endif//WELS_ENCODER_STATISTICAL_DATA_H__

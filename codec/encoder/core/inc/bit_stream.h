@@ -35,6 +35,8 @@
 #define WELS_BIT_STREAM_H__
 
 #include "typedefs.h"
+
+namespace WelsSVCEnc {
 //#include "macros.h"
 
 /*
@@ -70,5 +72,6 @@ static inline int32_t InitBits (SBitStringAux* pBs, const uint8_t* kpBuf, const 
   return kiSize;
 }
 
+}
 
 #endif//WELS_BIT_STREAM_H__
