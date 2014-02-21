@@ -279,11 +279,10 @@ int CWelsH264SVCEncoder::Initialize2 (SWelsSvcCodingParam* pCfg) {
   while (i < sEncodingParam.iSpatialLayerNum) {
     SSpatialLayerConfig* spatial_cfg = &sEncodingParam.sSpatialLayers[i];
     WelsLog (m_pEncContext, WELS_LOG_INFO,
-             "coding_param->sSpatialLayers[%d]: .iVideoWidth= %d; .iVideoHeight= %d; .fFrameRate= %.6ff; .iQualityLayerNum= %d; .iSpatialBitrate= %d; .iCgsSnrRefined= %d; .iInterSpatialLayerPredFlag= %d; .sSliceCfg.uiSliceMode= %d; .sSliceCfg.sSliceArgument.uiSliceNum= %d; .sSliceCfg.sSliceArgument.uiSliceSizeConstraint= %d;\n",
+             "coding_param->sSpatialLayers[%d]: .iVideoWidth= %d; .iVideoHeight= %d; .fFrameRate= %.6ff; .iSpatialBitrate= %d; .iCgsSnrRefined= %d; .iInterSpatialLayerPredFlag= %d; .sSliceCfg.uiSliceMode= %d; .sSliceCfg.sSliceArgument.uiSliceNum= %d; .sSliceCfg.sSliceArgument.uiSliceSizeConstraint= %d;\n",
              i, spatial_cfg->iVideoWidth,
              spatial_cfg->iVideoHeight,
              spatial_cfg->fFrameRate,
-             spatial_cfg->iQualityLayerNum,
              spatial_cfg->iSpatialBitrate,
              spatial_cfg->iCgsSnrRefined,
              spatial_cfg->iInterSpatialLayerPredFlag,
@@ -772,11 +771,10 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     while (i < sEncodingParam.iSpatialLayerNum) {
       SSpatialLayerConfig* pSpatialCfg = &sEncodingParam.sSpatialLayers[i];
       WelsLog (m_pEncContext, WELS_LOG_INFO,
-               "coding_param->sSpatialLayers[%d]: .iVideoWidth= %d; .iVideoHeight= %d; .fFrameRate= %.6ff; .iQualityLayerNum= %d; .iSpatialBitrate= %d; .iCgsSnrRefined= %d; .iInterSpatialLayerPredFlag= %d; .sSliceCfg.uiSliceMode= %d; .sSliceCfg.sSliceArgument.iSliceNum= %d; .sSliceCfg.sSliceArgument.uiSliceSizeConstraint= %d;\n",
+               "coding_param->sSpatialLayers[%d]: .iVideoWidth= %d; .iVideoHeight= %d; .fFrameRate= %.6ff; .iSpatialBitrate= %d; .iCgsSnrRefined= %d; .iInterSpatialLayerPredFlag= %d; .sSliceCfg.uiSliceMode= %d; .sSliceCfg.sSliceArgument.iSliceNum= %d; .sSliceCfg.sSliceArgument.uiSliceSizeConstraint= %d;\n",
                i, pSpatialCfg->iVideoWidth,
                pSpatialCfg->iVideoHeight,
                pSpatialCfg->fFrameRate,
-               pSpatialCfg->iQualityLayerNum,
                pSpatialCfg->iSpatialBitrate,
                pSpatialCfg->iCgsSnrRefined,
                pSpatialCfg->iInterSpatialLayerPredFlag,
