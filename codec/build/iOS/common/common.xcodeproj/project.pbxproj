@@ -8,14 +8,17 @@
 
 /* Begin PBXBuildFile section */
 		4CE443D918B722CD0017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443D818B722CD0017DF25 /* Foundation.framework */; };
-		4CE443DE18B722CD0017DF25 /* common.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CE443DD18B722CD0017DF25 /* common.h */; };
-		4CE443E018B722CD0017DF25 /* common.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CE443DF18B722CD0017DF25 /* common.m */; };
 		4CE443E718B722CD0017DF25 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443E618B722CD0017DF25 /* XCTest.framework */; };
 		4CE443E818B722CD0017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443D818B722CD0017DF25 /* Foundation.framework */; };
 		4CE443EA18B722CD0017DF25 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443E918B722CD0017DF25 /* UIKit.framework */; };
 		4CE443ED18B722CD0017DF25 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443D518B722CD0017DF25 /* libcommon.a */; };
 		4CE443F318B722CD0017DF25 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4CE443F118B722CD0017DF25 /* InfoPlist.strings */; };
 		4CE443F518B722CD0017DF25 /* commonTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CE443F418B722CD0017DF25 /* commonTests.m */; };
+		4CE4441B18B722F00017DF25 /* cpu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4440018B722F00017DF25 /* cpu.cpp */; };
+		4CE4441D18B722F00017DF25 /* crt_util_safe_x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4440418B722F00017DF25 /* crt_util_safe_x.cpp */; };
+		4CE4441F18B722F00017DF25 /* deblocking_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4440718B722F00017DF25 /* deblocking_common.cpp */; };
+		4CE4442118B722F00017DF25 /* logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4440B18B722F00017DF25 /* logging.cpp */; };
+		4CE4442718B722F00017DF25 /* WelsThreadLib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4441818B722F00017DF25 /* WelsThreadLib.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,7 +38,6 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
-				4CE443DE18B722CD0017DF25 /* common.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -45,14 +47,29 @@
 		4CE443D518B722CD0017DF25 /* libcommon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE443D818B722CD0017DF25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4CE443DC18B722CD0017DF25 /* common-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "common-Prefix.pch"; sourceTree = "<group>"; };
-		4CE443DD18B722CD0017DF25 /* common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
-		4CE443DF18B722CD0017DF25 /* common.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = common.m; sourceTree = "<group>"; };
 		4CE443E518B722CD0017DF25 /* commonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = commonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE443E618B722CD0017DF25 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4CE443E918B722CD0017DF25 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		4CE443F018B722CD0017DF25 /* commonTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "commonTests-Info.plist"; sourceTree = "<group>"; };
 		4CE443F218B722CD0017DF25 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4CE443F418B722CD0017DF25 /* commonTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = commonTests.m; sourceTree = "<group>"; };
+		4CE4440018B722F00017DF25 /* cpu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cpu.cpp; sourceTree = "<group>"; };
+		4CE4440118B722F00017DF25 /* cpu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpu.h; sourceTree = "<group>"; };
+		4CE4440218B722F00017DF25 /* cpu_core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpu_core.h; sourceTree = "<group>"; };
+		4CE4440418B722F00017DF25 /* crt_util_safe_x.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crt_util_safe_x.cpp; sourceTree = "<group>"; };
+		4CE4440518B722F00017DF25 /* crt_util_safe_x.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crt_util_safe_x.h; sourceTree = "<group>"; };
+		4CE4440718B722F00017DF25 /* deblocking_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = deblocking_common.cpp; sourceTree = "<group>"; };
+		4CE4440818B722F00017DF25 /* deblocking_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = deblocking_common.h; sourceTree = "<group>"; };
+		4CE4440A18B722F00017DF25 /* expand_picture_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = expand_picture_common.h; sourceTree = "<group>"; };
+		4CE4440B18B722F00017DF25 /* logging.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = logging.cpp; sourceTree = "<group>"; };
+		4CE4440C18B722F00017DF25 /* logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logging.h; sourceTree = "<group>"; };
+		4CE4440D18B722F00017DF25 /* ls_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ls_defines.h; sourceTree = "<group>"; };
+		4CE4440E18B722F00017DF25 /* macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = macros.h; sourceTree = "<group>"; };
+		4CE4441118B722F00017DF25 /* mc_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mc_common.h; sourceTree = "<group>"; };
+		4CE4441318B722F00017DF25 /* measure_time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = measure_time.h; sourceTree = "<group>"; };
+		4CE4441618B722F00017DF25 /* typedefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = typedefs.h; sourceTree = "<group>"; };
+		4CE4441818B722F00017DF25 /* WelsThreadLib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WelsThreadLib.cpp; sourceTree = "<group>"; };
+		4CE4441918B722F00017DF25 /* WelsThreadLib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelsThreadLib.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,8 +127,7 @@
 		4CE443DA18B722CD0017DF25 /* common */ = {
 			isa = PBXGroup;
 			children = (
-				4CE443DD18B722CD0017DF25 /* common.h */,
-				4CE443DF18B722CD0017DF25 /* common.m */,
+				4CE443FE18B722F00017DF25 /* common */,
 				4CE443DB18B722CD0017DF25 /* Supporting Files */,
 			);
 			path = common;
@@ -141,6 +157,31 @@
 				4CE443F118B722CD0017DF25 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		4CE443FE18B722F00017DF25 /* common */ = {
+			isa = PBXGroup;
+			children = (
+				4CE4440018B722F00017DF25 /* cpu.cpp */,
+				4CE4440118B722F00017DF25 /* cpu.h */,
+				4CE4440218B722F00017DF25 /* cpu_core.h */,
+				4CE4440418B722F00017DF25 /* crt_util_safe_x.cpp */,
+				4CE4440518B722F00017DF25 /* crt_util_safe_x.h */,
+				4CE4440718B722F00017DF25 /* deblocking_common.cpp */,
+				4CE4440818B722F00017DF25 /* deblocking_common.h */,
+				4CE4440A18B722F00017DF25 /* expand_picture_common.h */,
+				4CE4440B18B722F00017DF25 /* logging.cpp */,
+				4CE4440C18B722F00017DF25 /* logging.h */,
+				4CE4440D18B722F00017DF25 /* ls_defines.h */,
+				4CE4440E18B722F00017DF25 /* macros.h */,
+				4CE4441118B722F00017DF25 /* mc_common.h */,
+				4CE4441318B722F00017DF25 /* measure_time.h */,
+				4CE4441618B722F00017DF25 /* typedefs.h */,
+				4CE4441818B722F00017DF25 /* WelsThreadLib.cpp */,
+				4CE4441918B722F00017DF25 /* WelsThreadLib.h */,
+			);
+			name = common;
+			path = ../../../../common;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -224,7 +265,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4CE443E018B722CD0017DF25 /* common.m in Sources */,
+				4CE4441F18B722F00017DF25 /* deblocking_common.cpp in Sources */,
+				4CE4441B18B722F00017DF25 /* cpu.cpp in Sources */,
+				4CE4442118B722F00017DF25 /* logging.cpp in Sources */,
+				4CE4442718B722F00017DF25 /* WelsThreadLib.cpp in Sources */,
+				4CE4441D18B722F00017DF25 /* crt_util_safe_x.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -331,9 +376,23 @@
 		4CE443F918B722CD0017DF25 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DSTROOT = /tmp/common.dst;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "common/common-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = "";
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = (
+					APPLE_IOS,
+					HAVE_NEON,
+				);
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -343,9 +402,20 @@
 		4CE443FA18B722CD0017DF25 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DSTROOT = /tmp/common.dst;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "common/common-Prefix.pch";
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = (
+					APPLE_IOS,
+					HAVE_NEON,
+				);
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
