@@ -168,12 +168,10 @@ typedef struct {
   int	iVideoHeight;		// video size in cy specified for a layer
   float	fFrameRate;		// frame rate specified for a layer
   int	iSpatialBitrate;	// target bitrate for a spatial layer
-  int	iCgsSnrRefined;	// 0: SNR layers all MGS; 1: SNR layers all CGS
   int	iInterSpatialLayerPredFlag;	// 0: diabled [independency spatial layer coding]; 1: enabled [base spatial layer dependency coding]
 
   unsigned int	uiProfileIdc;			// value of profile IDC (0 for auto-detection)
   int    iDLayerQp;
-  int	 iQualityBitrate[MAX_QUALITY_LAYER_NUM];	// target bitrate for a quality layer
 
   SSliceConfig sSliceCfg;
 } SSpatialLayerConfig;
