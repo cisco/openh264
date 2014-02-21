@@ -47,12 +47,6 @@
 #ifndef IWELSVP_H_
 #define IWELSVP_H_
 
-#ifdef _WIN32
-#define WELSAPI __stdcall
-#else
-#define WELSAPI
-#endif
-
 #define WELSVP_MAJOR_VERSION   1
 #define WELSVP_MINOR_VERSION   1
 #define WELSVP_VERSION         ((WELSVP_MAJOR_VERSION << 8) + WELSVP_MINOR_VERSION)
@@ -276,8 +270,8 @@ class IWelsVP {
 #endif
 
 WELSVP_EXTERNC_BEGIN
-EResult WELSAPI CreateVpInterface (void** ppCtx, int iVersion /*= WELSVP_INTERFACE_VERION*/);
-EResult WELSAPI DestroyVpInterface (void* pCtx , int iVersion /*= WELSVP_INTERFACE_VERION*/);
+EResult CreateVpInterface (void** ppCtx, int iVersion /*= WELSVP_INTERFACE_VERION*/);
+EResult DestroyVpInterface (void* pCtx , int iVersion /*= WELSVP_INTERFACE_VERION*/);
 WELSVP_EXTERNC_END
 
 //////////////////////////////////////////////////////////////////////////////////////////////
