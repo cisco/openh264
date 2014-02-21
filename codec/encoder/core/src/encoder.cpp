@@ -151,7 +151,7 @@ void WelsInitBGDFunc (SWelsFuncPtrList* pFuncList, const bool kbEnableBackground
  * \return	successful - 0; otherwise none 0 for failed
  */
 int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* pParam, uint32_t uiCpuFlag) {
-  int32_t iReturn = 0;
+  int32_t iReturn = ENC_RETURN_SUCCESS;
 
   /* Functionality utilization of CPU instructions dependency */
   pFuncList->pfSetMemZeroSize8	= WelsSetMemZero_c;		// confirmed_safe_unsafe_usage

@@ -347,6 +347,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   int32_t iIdx					= 0;
   int32_t iSliceBsBufferSize = 0;
   int16_t iMaxSliceNum		= 1;
+  int32_t iReturn = ENC_RETURN_SUCCESS;
 
   if (NULL == ppCtx || NULL == pCodingParam || NULL == *ppCtx || iCountBsLen <= 0)
     return 1;
@@ -492,8 +493,6 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pCountBsSizeInPartition), FreeMemorySvc (ppCtx))
 #endif//PACKING_ONE_SLICE_PER_LAYER
 
-  WelsMutexInit (&pSmt->mutexSliceNumUpdate);
-
   (*ppCtx)->pSliceBs	= (SWelsSliceBs*)pMa->WelsMalloc (sizeof (SWelsSliceBs) * iMaxSliceNum, "pSliceBs");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pSliceBs), FreeMemorySvc (ppCtx))
 
@@ -502,7 +501,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   iSliceBsBufferSize	= iTargetSpatialBsSize;
   iIdx = 0;
   while (iIdx < iMaxSliceNum) {
-    pSliceB->pBsBuffer	= (uint8_t*)pMa->WelsMalloc (iSliceBsBufferSize, "pSliceB->pBsBuffer");
+    pSliceB->pBsBuffer  = (uint8_t*)pMa->WelsMalloc (iSliceBsBufferSize, "pSliceB->pBsBuffer");
 
     WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSliceB->pBsBuffer), FreeMemorySvc (ppCtx))
     pSliceB->uiSize	= iSliceBsBufferSize;
@@ -518,6 +517,12 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
     ++ pSliceB;
     ++ iIdx;
   }
+
+  iReturn = WelsMutexInit (&pSmt->mutexSliceNumUpdate);
+  WELS_VERIFY_RETURN_PROC_IF (1, (WELS_THREAD_ERROR_OK != iReturn), FreeMemorySvc (ppCtx))
+
+  iReturn = WelsMutexInit (&(*ppCtx)->mutexEncoderError);
+  WELS_VERIFY_RETURN_PROC_IF (1, (WELS_THREAD_ERROR_OK != iReturn), FreeMemorySvc (ppCtx))
 
 #if defined(ENABLE_TRACE_MT)
   WelsLog ((*ppCtx), WELS_LOG_INFO, "RequestMtResource(), iThreadNum=%d, iCountSliceNum= %d\n", pPara->iCountThreadsNum,
@@ -610,7 +615,9 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
     pSmt->pCountBsSizeInPartition = NULL;
   }
 #endif//PACKING_ONE_SLICE_PER_LAYER
+
   WelsMutexDestroy (&pSmt->mutexSliceNumUpdate);
+  WelsMutexDestroy (&((*ppCtx)->mutexEncoderError));
 
   if (pSmt->pThreadPEncCtx != NULL) {
     pMa->WelsFree (pSmt->pThreadPEncCtx, "pThreadPEncCtx");
@@ -766,25 +773,32 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
   return iLayerSize;
 }
 
-int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFrameBsBuffer, const int32_t iSliceIdx) {
+int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFrameBsBuffer, const int32_t iSliceIdx, int32_t& iSliceSize) {
   SWelsSliceBs* pSliceBs			= &pCtx->pSliceBs[iSliceIdx];
   SNalUnitHeaderExt* pNalHdrExt = &pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt;
   uint8_t* pDst					= pFrameBsBuffer;
   int32_t pNalLen[2];
-  int32_t iSliceSize				= 0;
   const int32_t kiNalCnt			= pSliceBs->iNalIndex;
   int32_t iNalIdx					= 0;
+  int32_t iNalSize = 0;
 #if !defined(PACKING_ONE_SLICE_PER_LAYER)
   const int32_t iFirstSlice		= (iSliceIdx == 0);
   int32_t iNalBase				= iFirstSlice ? 0 : pLbi->iNalCount;
 #else
   int32_t iNalBase				= 0;
 #endif//!PACKING_ONE_SLICE_PER_LAYER
+  int32_t iReturn = ENC_RETURN_SUCCESS;
+  const int32_t kiWrittenLength = pCtx->iPosBsBuffer;
+  iSliceSize				= 0;
 
   while (iNalIdx < kiNalCnt) {
-    iSliceSize += WelsEncodeNalExt (&pSliceBs->sNalList[iNalIdx], pNalHdrExt, pDst, &pNalLen[iNalIdx]);
-    pDst += pNalLen[iNalIdx];
-    pLbi->iNalLengthInByte[iNalBase + iNalIdx]	= pNalLen[iNalIdx];
+    iNalSize = 0;
+    iReturn = WelsEncodeNal (&pSliceBs->sNalList[iNalIdx], pNalHdrExt, pCtx->iFrameBsSize-kiWrittenLength-iSliceSize, pDst, &iNalSize);
+    WELS_VERIFY_RETURN_IFNEQ(iReturn, ENC_RETURN_SUCCESS)
+    pNalLen[iNalIdx] = iNalSize;
+    iSliceSize += iNalSize;
+    pDst += iNalSize;
+    pLbi->iNalLengthInByte[iNalBase + iNalIdx]	= iNalSize;
 
     ++ iNalIdx;
   }
@@ -811,31 +825,37 @@ int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFr
   pLbi->iNalCount		= kiNalCnt;
 #endif//PACKING_ONE_SLICE_PER_LAYER
 
-  return iSliceSize;
+  return ENC_RETURN_SUCCESS;
 }
 
-int32_t WriteSliceBs (sWelsEncCtx* pCtx, uint8_t* pSliceBsBuf, const int32_t iSliceIdx) {
+int32_t WriteSliceBs (sWelsEncCtx* pCtx, uint8_t* pSliceBsBuf, const int32_t iSliceIdx, int32_t& iSliceSize) {
   SWelsSliceBs* pSliceBs			= &pCtx->pSliceBs[iSliceIdx];
   SNalUnitHeaderExt* pNalHdrExt = &pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt;
   uint8_t* pDst					= pSliceBsBuf;
   int32_t* pNalLen				= &pSliceBs->iNalLen[0];
-  int32_t iSliceSize				= 0;
   const int32_t kiNalCnt			= pSliceBs->iNalIndex;
   int32_t iNalIdx					= 0;
+  int32_t iNalSize					= 0;
+  int32_t iReturn = ENC_RETURN_SUCCESS;
+  const int32_t kiWrittenLength = pSliceBs->sBsWrite.pBufPtr - pSliceBs->sBsWrite.pBuf;
 
+  iSliceSize				= 0;
   assert (kiNalCnt <= 2);
   if (kiNalCnt > 2)
     return 0;
 
   while (iNalIdx < kiNalCnt) {
-    iSliceSize += WelsEncodeNalExt (&pSliceBs->sNalList[iNalIdx], pNalHdrExt, pDst, &pNalLen[iNalIdx]);
-    pDst += pNalLen[iNalIdx];
-
+    iNalSize = 0;
+    iReturn = WelsEncodeNal (&pSliceBs->sNalList[iNalIdx], pNalHdrExt, pSliceBs->uiSize-kiWrittenLength-iSliceSize, pDst, &iNalSize);
+    WELS_VERIFY_RETURN_IFNEQ(iReturn, ENC_RETURN_SUCCESS)
+    pNalLen[iNalIdx] = iNalSize;
+    iSliceSize += iNalSize;
+    pDst += iNalSize;
     ++ iNalIdx;
   }
   pSliceBs->uiBsPos	= iSliceSize;
 
-  return iSliceSize;
+  return iReturn;
 }
 
 #if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
@@ -901,6 +921,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
   bool bNeedPrefix							= false;
   EWelsNalUnitType eNalType						= NAL_UNIT_UNSPEC_0;
   EWelsNalRefIdc eNalRefIdc						= NRI_PRI_LOWEST;
+  int32_t iReturn = ENC_RETURN_SUCCESS;
 
   if (NULL == pPrivateData)
     WELS_THREAD_ROUTINE_RETURN (1);
@@ -985,25 +1006,47 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 
         WelsLoadNalForSlice (pSliceBs, eNalType, eNalRefIdc);
 
-        WelsCodeOneSlice (pEncPEncCtx, iSliceIdx, eNalType);
+        iReturn = WelsCodeOneSlice (pEncPEncCtx, iSliceIdx, eNalType);
+        if (ENC_RETURN_SUCCESS!=iReturn) {
+          uiThrdRet = iReturn;
+          break;
+        }
 
         WelsUnloadNalForSlice (pSliceBs);
 
 #if !defined(PACKING_ONE_SLICE_PER_LAYER)
         if (0 == iSliceIdx) {
           pLbi->pBsBuf	= pEncPEncCtx->pFrameBs + pEncPEncCtx->iPosBsBuffer;
-          iSliceSize = WriteSliceToFrameBs (pEncPEncCtx, pLbi, pLbi->pBsBuf, iSliceIdx);
+          iReturn = WriteSliceToFrameBs (pEncPEncCtx, pLbi, pLbi->pBsBuf, iSliceIdx, iSliceSize);
+          if (ENC_RETURN_SUCCESS!=iReturn) {
+            uiThrdRet = iReturn;
+            break;
+          }
           pEncPEncCtx->iPosBsBuffer += iSliceSize;
         } else
-          iSliceSize = WriteSliceBs (pEncPEncCtx, pSliceBs->pBs, iSliceIdx);
+        {
+          iReturn = WriteSliceBs (pEncPEncCtx, pSliceBs->pBs, iSliceIdx, iSliceSize);
+          if (ENC_RETURN_SUCCESS!=iReturn) {
+            uiThrdRet = iReturn;
+            break;
+          }
+        }
 #else// PACKING_ONE_SLICE_PER_LAYER
         if (0 == iSliceIdx) {
           pLbi->pBsBuf	= pEncPEncCtx->pFrameBs + pEncPEncCtx->iPosBsBuffer;
-          iSliceSize = WriteSliceToFrameBs (pEncPEncCtx, pLbi, pLbi->pBsBuf, iSliceIdx);
+          iReturn = WriteSliceToFrameBs (pEncPEncCtx, pLbi, pLbi->pBsBuf, iSliceIdx, &iSliceSize);
+          if (ENC_RETURN_SUCCESS!=iReturn) {
+            uiThrdRet = iReturn;
+            break;
+          }
           pEncPEncCtx->iPosBsBuffer += iSliceSize;
         } else {
           pLbi->pBsBuf	= pSliceBs->bs + pSliceBs->uiBsPos;
-          iSliceSize = WriteSliceToFrameBs (pEncPEncCtx, pLbi, pLbi->pBsBuf, iSliceIdx);
+          iReturn = WriteSliceToFrameBs (pEncPEncCtx, pLbi, pLbi->pBsBuf, iSliceIdx, &iSliceSize);
+          if (ENC_RETURN_SUCCESS!=iReturn) {
+            uiThrdRet = iReturn;
+            break;
+          }
           pSliceBs->uiBsPos += iSliceSize;
         }
 #endif//!PACKING_ONE_SLICE_PER_LAYER
@@ -1101,7 +1144,11 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 
           WelsLoadNalForSlice (pSliceBs, eNalType, eNalRefIdc);
 
-          WelsCodeOneSlice (pEncPEncCtx, iSliceIdx, eNalType);
+          iReturn = WelsCodeOneSlice (pEncPEncCtx, iSliceIdx, eNalType);
+          if (ENC_RETURN_SUCCESS!=iReturn) {
+            uiThrdRet = iReturn;
+            break;
+          }
 
           WelsUnloadNalForSlice (pSliceBs);
 
@@ -1109,20 +1156,38 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
           if (0 == kiPartitionId) {
             if (0 == iSliceIdx)
               pLbi->pBsBuf	= pEncPEncCtx->pFrameBs + pEncPEncCtx->iPosBsBuffer;
-            iSliceSize = WriteSliceToFrameBs (pEncPEncCtx, pLbi, pEncPEncCtx->pFrameBs + pEncPEncCtx->iPosBsBuffer, iSliceIdx);
+            iReturn = WriteSliceToFrameBs (pEncPEncCtx, pLbi, pEncPEncCtx->pFrameBs + pEncPEncCtx->iPosBsBuffer, iSliceIdx, iSliceSize);
+            if (ENC_RETURN_SUCCESS!=iReturn) {
+              uiThrdRet = iReturn;
+              break;
+            }
             pEncPEncCtx->iPosBsBuffer += iSliceSize;
           } else
-            iSliceSize = WriteSliceBs (pEncPEncCtx, pSliceBs->pBs, iSliceIdx);
+          {
+            iSliceSize = WriteSliceBs (pEncPEncCtx, pSliceBs->pBs, iSliceIdx, iSliceSize);
+            if (ENC_RETURN_SUCCESS!=iReturn) {
+              uiThrdRet = iReturn;
+              break;
+            }
+          }
 #else// PACKING_ONE_SLICE_PER_LAYER
           pLbiPacking	= pLbi + (iSliceIdx - kiPartitionId);
 
           if (0 == kiPartitionId) {
             pLbiPacking->pBsBuf	= pEncPEncCtx->pFrameBs + pEncPEncCtx->iPosBsBuffer;
-            iSliceSize = WriteSliceToFrameBs (pEncPEncCtx, pLbiPacking, pLbiPacking->pBsBuf, iSliceIdx);
+            iReturn = WriteSliceToFrameBs (pEncPEncCtx, pLbiPacking, pLbiPacking->pBsBuf, iSliceIdx, iSliceSize);
+            if (ENC_RETURN_SUCCESS!=iReturn) {
+              uiThrdRet = iReturn;
+              break;
+            }
             pEncPEncCtx->iPosBsBuffer += iSliceSize;
           } else {
             pLbiPacking->pBsBuf	= pSliceBs->bs + pSliceBs->uiBsPos;
-            iSliceSize = WriteSliceToFrameBs (pEncPEncCtx, pLbiPacking, pLbiPacking->pBsBuf, iSliceIdx);
+            iReturn = WriteSliceToFrameBs (pEncPEncCtx, pLbiPacking, pLbiPacking->pBsBuf, iSliceIdx, iSliceSize);
+            if (ENC_RETURN_SUCCESS!=iReturn) {
+              uiThrdRet = iReturn;
+              break;
+            }
             pSliceBs->uiBsPos += iSliceSize;
           }
           pEncPEncCtx->pSliceThreading->pCountBsSizeInPartition[kiPartitionId] += iSliceSize;
@@ -1197,6 +1262,11 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
   WelsEventSignal (&pEncPEncCtx->pSliceThreading->pFinSliceCodingEvent[iEventIdx]);	// notify to mother encoding threading
 #endif//WIN32
 
+  //sync multi-threading error
+  WelsMutexLock (&pEncPEncCtx->mutexEncoderError);
+  if (uiThrdRet) pEncPEncCtx->iEncoderError |= uiThrdRet;
+  WelsMutexUnlock (&pEncPEncCtx->mutexEncoderError);
+
   WELS_THREAD_ROUTINE_RETURN (uiThrdRet);
 }
 
@@ -1235,6 +1305,7 @@ int32_t CreateSliceThreads (sWelsEncCtx* pCtx) {
                       &pCtx->pSliceThreading->pThreadPEncCtx[iIdx], 0);
 #endif//__GNUC__
 #endif//#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
+
     ++ iIdx;
   }
 #if defined(ENABLE_TRACE_MT)

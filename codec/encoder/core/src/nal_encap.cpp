@@ -55,6 +55,7 @@ void WelsLoadNal (SWelsEncoderOutput* pEncoderOuput, const int32_t/*EWelsNalUnit
   sNalHeader->uiForbiddenZeroBit	= 0;
 
   pRawNal->pRawData		= &pWelsEncoderOuput->pBsBuffer[kiStartPos];
+  pRawNal->iStartPos	 = kiStartPos;
   pRawNal->iPayloadSize	= 0;
 }
 
@@ -68,7 +69,7 @@ void WelsUnloadNal (SWelsEncoderOutput* pEncoderOuput) {
   const int32_t kiEndPos		= (BsGetBitsPos (&pWelsEncoderOuput->sBsWrite) >> 3);
 
   /* count payload size of pRawNal NAL */
-  pRawNal->iPayloadSize	= &pWelsEncoderOuput->pBsBuffer[kiEndPos] - pRawNal->pRawData;
+  pRawNal->iPayloadSize	= kiEndPos - pRawNal->iStartPos;
 
   ++ (*pIdx);
 }
@@ -89,6 +90,7 @@ void WelsLoadNalForSlice (SWelsSliceBs* pSliceBsIn, const int32_t/*EWelsNalUnitT
   sNalHeader->uiForbiddenZeroBit	= 0;
 
   pRawNal->pRawData		= &pSliceBs->pBsBuffer[kiStartPos];
+  pRawNal->iStartPos	 = kiStartPos;
   pRawNal->iPayloadSize	= 0;
 }
 
@@ -103,7 +105,7 @@ void WelsUnloadNalForSlice (SWelsSliceBs* pSliceBsIn) {
   const int32_t kiEndPos		        = (BsGetBitsPos (pBitStringAux) >> 3);
 
   /* count payload size of pRawNal NAL */
-  pRawNal->iPayloadSize	= &pSliceBs->pBsBuffer[kiEndPos] - pRawNal->pRawData;
+  pRawNal->iPayloadSize	= kiEndPos - pRawNal->iStartPos;
 
   ++ (*pIdx);
 }
@@ -114,25 +116,54 @@ void WelsUnloadNalForSlice (SWelsSliceBs* pSliceBsIn) {
  * \param	pDstLen		length of pDst NAL output
  * \param	annexeb		annexeb flag
  * \param	pRawNal			pRawNal NAL pData
- * \return	length of pDst NAL
+ * \return	ERRCODE
  */
-int32_t WelsEncodeNal (SWelsNalRaw* pRawNal, void* pDst, int32_t* pDstLen) {
+//TODO 1: refactor the calling of this func in multi-thread
+//TODO 2: complete the realloc&copy
+int32_t WelsEncodeNal (SWelsNalRaw* pRawNal, void* pNalHeaderExt, const int32_t kiDstBufferLen, void* pDst, int32_t* pDstLen) {
+  const bool kbNALExt = pRawNal->sNalExt.sNalHeader.eNalUnitType == NAL_UNIT_PREFIX
+                                        || pRawNal->sNalExt.sNalHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_EXT;
+  int32_t iAssumedNeededLength		= NAL_HEADER_SIZE+(kbNALExt?3:0)+pRawNal->iPayloadSize+1;
+  WELS_VERIFY_RETURN_IF(ENC_RETURN_UNEXPECTED, (iAssumedNeededLength<=0))
+
+  //since for each 0x000 need a 0x03, so the needed length will not exceed (iAssumeNeedLenth + iAssumeNeedLength/3), here adjust to >>1 to omit division
+  if (kiDstBufferLen < (iAssumedNeededLength + (iAssumedNeededLength>>1)) ) {
+    return ENC_RETURN_MEMALLOCERR;
+    //TODO: call the realloc&copy instead
+  }
   uint8_t* pDstStart	    = (uint8_t*)pDst;
   uint8_t* pDstPointer	= pDstStart;
   uint8_t* pSrcPointer	= pRawNal->pRawData;
   uint8_t* pSrcEnd		= pRawNal->pRawData + pRawNal->iPayloadSize;
   int32_t iZeroCount		= 0;
   int32_t iNalLength		= 0;
+  *pDstLen = 0;
 
-  static const uint8_t kuiStartCodePrefix[4] = { 0, 0, 0, 1 };
+  static const uint8_t kuiStartCodePrefix[NAL_HEADER_SIZE] = { 0, 0, 0, 1 };
   ST32 (pDstPointer, LD32 (&kuiStartCodePrefix[0]));
   pDstPointer += 4;
 
   /* NAL Unit Header */
   *pDstPointer++	= (pRawNal->sNalExt.sNalHeader.uiNalRefIdc << 5) | (pRawNal->sNalExt.sNalHeader.eNalUnitType & 0x1f);
 
+  if (kbNALExt) {
+    SNalUnitHeaderExt* sNalExt	= (SNalUnitHeaderExt*)pNalHeaderExt;
+
+    /* NAL UNIT Extension Header */
+    *pDstPointer++ =	(0x80) |
+      (sNalExt->bIdrFlag << 6);
+
+    *pDstPointer++ =	(0x80) |
+      (sNalExt->uiDependencyId << 4);
+
+    *pDstPointer++ =	(sNalExt->uiTemporalId << 5) |
+      (sNalExt->bDiscardableFlag << 3) |
+      (0x07);
+  }
+
   while (pSrcPointer < pSrcEnd) {
     if (iZeroCount == 2 && *pSrcPointer <= 3) {
+      //add the code 03
       *pDstPointer++	= 3;
       iZeroCount		= 0;
     }
@@ -149,73 +180,7 @@ int32_t WelsEncodeNal (SWelsNalRaw* pRawNal, void* pDst, int32_t* pDstLen) {
   if (NULL != pDstLen)
     *pDstLen	= iNalLength;
 
-  return iNalLength;
-}
-
-/*!
- * \brief	encode a nal into a pBuffer for any type of NAL, involved WelsEncodeNal introduced in AVC
- *
- * \param	pDst			pDst NAL pData
- * \param	pDstLen		length of pDst NAL output
- * \param	annexeb		annexeb flag
- * \param	pRawNal			pRawNal NAL pData
- * \param	pNalHeaderExt	pointer of SNalUnitHeaderExt
- *
- * \return	length of pDst NAL
- */
-int32_t WelsEncodeNalExt (SWelsNalRaw* pRawNal, void* pNalHeaderExt, void* pDst, int32_t* pDstLen) {
-  SNalUnitHeaderExt* sNalExt	= (SNalUnitHeaderExt*)pNalHeaderExt;
-  uint8_t* pDstStart				    = (uint8_t*)pDst;
-  uint8_t* pDstPointer				= pDstStart;
-  uint8_t* pSrcPointer				= pRawNal->pRawData;
-  uint8_t* pSrcEnd					= pRawNal->pRawData + pRawNal->iPayloadSize;
-  int32_t iZeroCount					= 0;
-  int32_t iNalLength					= 0;
-
-  if (pRawNal->sNalExt.sNalHeader.eNalUnitType != NAL_UNIT_PREFIX
-      && pRawNal->sNalExt.sNalHeader.eNalUnitType != NAL_UNIT_CODED_SLICE_EXT) {
-    return WelsEncodeNal (pRawNal, pDst, pDstLen);
-  }
-
-  /* FIXME this code doesn't check overflow */
-
-  static const uint8_t kuiStartCodePrefixExt[4] = { 0, 0, 0, 1 };
-  ST32 (pDstPointer, LD32 (&kuiStartCodePrefixExt[0]));
-  pDstPointer += 4;
-
-  /* NAL Unit Header */
-  *pDstPointer++	= (pRawNal->sNalExt.sNalHeader.uiNalRefIdc << 5) | (pRawNal->sNalExt.sNalHeader.eNalUnitType & 0x1f);
-
-  /* NAL UNIT Extension Header */
-  *pDstPointer++ =	(0x80) |
-                    (sNalExt->bIdrFlag << 6);
-
-  *pDstPointer++ =	(0x80) |
-                    (sNalExt->uiDependencyId << 4);
-
-  *pDstPointer++ =	(sNalExt->uiTemporalId << 5) |
-                    (sNalExt->bDiscardableFlag << 3) |
-                    (0x07);
-
-  while (pSrcPointer < pSrcEnd) {
-    if (iZeroCount == 2 && *pSrcPointer <= 3) {
-      *pDstPointer++	= 3;
-      iZeroCount		= 0;
-    }
-    if (*pSrcPointer == 0) {
-      ++ iZeroCount;
-    } else {
-      iZeroCount		= 0;
-    }
-    *pDstPointer++ = *pSrcPointer++;
-  }
-
-  /* count length of NAL Unit */
-  iNalLength	= pDstPointer - pDstStart;
-  if (NULL != pDstLen)
-    *pDstLen	= iNalLength;
-
-  return iNalLength;
+  return ENC_RETURN_SUCCESS;
 }
 
 /*!

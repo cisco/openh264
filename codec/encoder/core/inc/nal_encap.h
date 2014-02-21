@@ -47,6 +47,7 @@
 //SBitStringAux
 namespace WelsSVCEnc {
 
+#define NAL_HEADER_SIZE (4)
 /*
  *	Raw payload pData for NAL unit, AVC/SVC compatible
  */
@@ -56,6 +57,7 @@ int32_t				iPayloadSize;		// size of pRawNal pData
 
 SNalUnitHeaderExt		sNalExt;		// NAL header information
 
+int32_t iStartPos; //NAL start position in buffer
 } SWelsNalRaw;
 
 /*
@@ -125,22 +127,9 @@ void WelsUnloadNalForSlice (SWelsSliceBs* pSliceBs);
  * \param	pDstLen		length of pDst NAL output
  * \param	annexeb		annexeb flag
  * \param	pRawNal			pRawNal NAL pData
- * \return	length of pDst NAL
+ * \return	ERR_CODE
  */
-int32_t WelsEncodeNal (SWelsNalRaw* pRawNal, void* pDst, int32_t* pDstLen);
-
-/*!
- * \brief	encode a nal into a pBuffer for any type of NAL, involved WelsEncodeNal introduced in AVC
- *
- * \param	pDst			pDst NAL pData
- * \param	pDstLen		length of pDst NAL output
- * \param	annexeb		annexeb flag
- * \param	pRawNal			pRawNal NAL pData
- * \param	pNalHeaderExt	pointer of SNalUnitHeaderExt
- *
- * \return	length of pDst NAL
- */
-int32_t WelsEncodeNalExt (SWelsNalRaw* pRawNal, void* pNalHeaderExt, void* pDst, int32_t* pDstLen);
+int32_t WelsEncodeNal (SWelsNalRaw* pRawNal, void* pNalHeaderExt, const int32_t kiDstBufferLen, void* pDst, int32_t* pDstLen);
 
 /*!
  * \brief	write prefix nal
