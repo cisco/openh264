@@ -223,6 +223,8 @@ void FillDefault (const bool kbEnableRc) {
 int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam, const bool kbEnableRc = true) {
 
   iInputCsp		= pCodingParam.iInputCsp;		// color space of input sequence
+  fMaxFrameRate		= WELS_CLIP3 (pCodingParam.fMaxFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
+  iTargetBitrate	= pCodingParam.iTargetBitrate;
 
   iPicWidth   = pCodingParam.iPicWidth;
   iPicHeight  = pCodingParam.iPicHeight;
