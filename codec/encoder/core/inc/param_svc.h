@@ -409,7 +409,7 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
             pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.sSliceArgument.uiSliceMbNum,	// confirmed_safe_unsafe_usage
             kiLesserSliceNum * sizeof (uint32_t)) ;
 
-    pDlp->iDLayerQp = SVC_QUALITY_BASE_QP;
+    pDlp->iDLayerQp = pCodingParam.sSpatialLayers[iIdxSpatial].iDLayerQp;
 
     uiProfileIdc	= PRO_SCALABLE_BASELINE;
     ++ pDlp;
