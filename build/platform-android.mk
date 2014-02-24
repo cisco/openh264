@@ -50,6 +50,8 @@ STL_INCLUDES = \
 
 GTEST_INCLUDES = $(STL_INCLUDES)
 CODEC_UNITTEST_INCLUDES = $(STL_INCLUDES)
+CODEC_UNITTEST_LDFLAGS_SUFFIX = \
+    $(NDKROOT)/sources/cxx-stl/gnu-libstdc++/$(GCCVERSION)/libs/$(APP_ABI)/libgnustl_static.a
 
 binaries : decdemo encdemo
 
