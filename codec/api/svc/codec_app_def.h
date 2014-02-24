@@ -212,6 +212,8 @@ typedef struct TagEncParamExt
   bool    bEnableSpsPpsIdAddition;
   bool    bPrefixNalAddingCtrl;
   bool	  bEnableSSEI;
+  int      iPaddingFlag;            // 0:disable padding;1:padding
+  int      iEtropyCodingModeFlag;
 
   /* rc control */
   bool    bEnableRc;
@@ -223,9 +225,8 @@ typedef struct TagEncParamExt
   bool     bEnableLongTermReference; // 0: on, 1: off
   int	   iLTRRefNum;
   int      iLtrMarkPeriod;
-  int      iPaddingFlag;            // 0:disable padding;1:padding
-  int      iEtropyCodingModeFlag;
 
+  /* multi-thread settings*/
   short		iMultipleThreadIdc;		// 1	# 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
   short		iCountThreadsNum;			//		# derived from disable_multiple_slice_idc (=0 or >1) means;
 
