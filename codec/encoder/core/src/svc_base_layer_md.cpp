@@ -1339,7 +1339,7 @@ bool WelsMdPSkipEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
   PredSkipMv (pMbCache, &sMvp);
 
   // Special case, need to clip the vector //
-  SMVUnitXY sQpelMvp = { sMvp.iMvX >> 2, sMvp.iMvY >> 2 };
+  SMVUnitXY sQpelMvp = { static_cast<int16_t>(sMvp.iMvX >> 2), static_cast<int16_t>(sMvp.iMvY >> 2) };
   n = (pCurMb->iMbX << 4) + sQpelMvp.iMvX;
   if (n < -29)
     return false;
