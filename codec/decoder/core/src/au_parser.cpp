@@ -833,11 +833,11 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   WELS_READ_VERIFY (BsGetBits (pBs, 8, &uiCode)); // level_idc
   uiLevelIdc	= uiCode;
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //seq_parameter_set_id
-  iSpsId		= uiCode;
-  if (iSpsId >= MAX_SPS_COUNT || iSpsId < 0) {	// Modified to check invalid negative iSpsId, 12/1/2009
+  if (uiCode >= MAX_SPS_COUNT) {	// Modified to check invalid negative iSpsId, 12/1/2009
     WelsLog (pCtx, WELS_LOG_WARNING, " iSpsId is out of range! \n");
     return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_SPS_ID_OVERFLOW);
   }
+  iSpsId		= uiCode;
 
   if (kbUseSubsetFlag) {
 #ifdef MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
@@ -871,8 +871,6 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   } else pSps->pSLevelLimits = pSLevelLimits;
   // syntax elements in default
   pSps->uiChromaFormatIdc	= 1;
-  pSps->uiBitDepthLuma		=
-    pSps->uiBitDepthChroma	= 8;
 
   pSps->uiProfileIdc	= uiProfileIdc;
   pSps->uiLevelIdc	= uiLevelIdc;
@@ -891,18 +889,19 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     }
     pSps->uiChromaArrayType = pSps->uiChromaFormatIdc;
     WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //bit_depth_luma_minus8
-    pSps->uiBitDepthLuma		= 8 + uiCode;
-    if (pSps->uiBitDepthLuma != 8) {
-      WelsLog (pCtx, WELS_LOG_WARNING, "ParseSps(): bit_depth_luma (%d) Only 8 bit supported.\n", pSps->uiBitDepthLuma);
+    if (uiCode != 0) {
+      WelsLog (pCtx, WELS_LOG_WARNING, "ParseSps(): bit_depth_luma (%d) Only 8 bit supported.\n", 8 + uiCode);
       return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_NON_BASELINE);
     }
+    pSps->uiBitDepthLuma		= 8;
 
     WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //bit_depth_chroma_minus8
-    pSps->uiBitDepthChroma	= 8 + uiCode;
-    if (pSps->uiBitDepthChroma != 8) {
-      WelsLog (pCtx, WELS_LOG_WARNING, "ParseSps(): bit_depth_chroma (%d). Only 8 bit supported.\n", pSps->uiBitDepthChroma);
+    if (uiCode != 0) {
+      WelsLog (pCtx, WELS_LOG_WARNING, "ParseSps(): bit_depth_chroma (%d). Only 8 bit supported.\n", 8 + uiCode);
       return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_NON_BASELINE);
     }
+    pSps->uiBitDepthChroma	= 8;
+
     WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //qpprime_y_zero_transform_bypass_flag
     pSps->bQpPrimeYZeroTransfBypassFlag	= !!uiCode;
     WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //seq_scaling_matrix_present_flag
@@ -956,27 +955,28 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //gaps_in_frame_num_value_allowed_flag
   pSps->bGapsInFrameNumValueAllowedFlag	= !!uiCode;
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //pic_width_in_mbs_minus1
-  if (uiCode == 0xffffffff) {
-    WelsLog (pCtx, WELS_LOG_ERROR, " pic_width_in_mbs read error!\n");
-    return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_MB_SIZE_INFO);
-  }
   pSps->iMbWidth		= PIC_WIDTH_IN_MBS_OFFSET + uiCode;
-  if ((uint64_t) (pSps->iMbWidth * pSps->iMbWidth) > (8 * pSLevelLimits->iMaxFS)) {
+  if (pSps->iMbWidth > MAX_MB_SIZE) {
+    WelsLog (pCtx, WELS_LOG_ERROR, "pic_width_in_mbs(%d) exceeds the maximum allowed!\n", pSps->iMbWidth);
+    return  GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_MAX_MB_SIZE);
+  }
+  if (((uint64_t)pSps->iMbWidth * (uint64_t)pSps->iMbWidth) > (8 * pSLevelLimits->iMaxFS)) {
     WelsLog (pCtx, WELS_LOG_WARNING, " the pic_width_in_mbs exceeds the level limits!\n");
   }
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //pic_height_in_map_units_minus1
-  if (uiCode == 0xffffffff) {
-    WelsLog (pCtx, WELS_LOG_ERROR, " pic_height_in_mbs read error!\n");
-    return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_MB_SIZE_INFO);
-  }
   pSps->iMbHeight		= PIC_HEIGHT_IN_MAP_UNITS_OFFSET + uiCode;
-  if ((uint64_t) (pSps->iMbHeight * pSps->iMbHeight) > (8 * pSLevelLimits->iMaxFS)) {
+  if (pSps->iMbHeight > MAX_MB_SIZE) {
+    WelsLog (pCtx, WELS_LOG_ERROR, "pic_height_in_mbs(%d) exceeds the maximum allowed!\n", pSps->iMbHeight);
+    return  GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_MAX_MB_SIZE);
+  }
+  if (((uint64_t)pSps->iMbHeight * (uint64_t)pSps->iMbHeight) > (8 * pSLevelLimits->iMaxFS)) {
     WelsLog (pCtx, WELS_LOG_WARNING, " the pic_height_in_mbs exceeds the level limits!\n");
   }
-  pSps->uiTotalMbCount	= pSps->iMbWidth * pSps->iMbHeight;
-  if (pSps->uiTotalMbCount > (uint32_t)pSLevelLimits->iMaxFS) {
+  uint32_t uiTmp32 = pSps->iMbWidth * pSps->iMbHeight;
+  if (uiTmp32 > (uint32_t)pSLevelLimits->iMaxFS) {
     WelsLog (pCtx, WELS_LOG_WARNING, " the total count of mb exceeds the level limits!\n");
   }
+  pSps->uiTotalMbCount	= uiTmp32;
   WELS_CHECK_SE_UPPER_ERROR (pSps->iNumRefFrames, SPS_MAX_NUM_REF_FRAMES_MAX, "max_num_ref_frames",
                              GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_MAX_NUM_REF_FRAMES));
   // here we check max_num_ref_frames
