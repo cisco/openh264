@@ -972,11 +972,11 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   if (((uint64_t)pSps->iMbHeight * (uint64_t)pSps->iMbHeight) > (8 * pSLevelLimits->iMaxFS)) {
     WelsLog (pCtx, WELS_LOG_WARNING, " the pic_height_in_mbs exceeds the level limits!\n");
   }
-  uint64_t uiTmp64 = (uint64_t)pSps->iMbWidth * (uint64_t)pSps->iMbHeight;
-  if (uiTmp64 > (uint32_t)pSLevelLimits->iMaxFS) {
+  uint32_t uiTmp32 = pSps->iMbWidth * pSps->iMbHeight;
+  if (uiTmp32 > (uint32_t)pSLevelLimits->iMaxFS) {
     WelsLog (pCtx, WELS_LOG_WARNING, " the total count of mb exceeds the level limits!\n");
   }
-  pSps->uiTotalMbCount	= uiTmp64;
+  pSps->uiTotalMbCount	= uiTmp32;
   WELS_CHECK_SE_UPPER_ERROR (pSps->iNumRefFrames, SPS_MAX_NUM_REF_FRAMES_MAX, "max_num_ref_frames",
                              GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_MAX_NUM_REF_FRAMES));
   // here we check max_num_ref_frames
