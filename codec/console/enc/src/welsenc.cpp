@@ -416,6 +416,7 @@ void PrintHelp() {
   printf ("  -lqp		(Layer) (base quality layer qp : must work with -ldeltaqp or -lqparr)\n");
   printf ("  -ltarb	    (Layer) (spatial layer target bitrate)\n");
   printf ("  -slcmd   (Layer) (spatial layer slice mode): pls refer to layerX.cfg for details ( -slcnum: set target slice num; -slcsize: set target slice size constraint ) \n");
+  printf ("  -trace   (Level)\n");
   printf ("\n");
 }
 
@@ -468,6 +469,9 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& pSvcParam, SFilesSet&
 
     else if (!strcmp (pCommand, "-rc") && (n < argc))
       pSvcParam.bEnableRc = atoi (argv[n++]) ? true : false;
+
+    else if (!strcmp (pCommand, "-trace") && (n < argc))
+      WelsStderrSetTraceLevel (atoi (argv[n++]));
 
     else if (!strcmp (pCommand, "-tarb") && (n < argc))
       pSvcParam.iTargetBitrate = atoi (argv[n++]);
