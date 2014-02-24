@@ -554,15 +554,18 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DSTROOT = /tmp/welsdec.dst;
 				GCC_OPTIMIZATION_LEVEL = 3;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "welsdec/welsdec-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = (
 					APPLE_IOS,
 					HAVE_NEON,
 				);
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../../../common\"";
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../../../common\"",
+					"$(SRCROOT)/../../../../decoder/core/inc",
+					"$(SRCROOT)/../../../../decoder/plus/inc",
+					"$(SRCROOT)/../../../../api/svc",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -579,14 +582,17 @@
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DSTROOT = /tmp/welsdec.dst;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "welsdec/welsdec-Prefix.pch";
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = (
 					APPLE_IOS,
 					HAVE_NEON,
 				);
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../../../common\"";
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../../../common\"",
+					"$(SRCROOT)/../../../../decoder/core/inc",
+					"$(SRCROOT)/../../../../decoder/plus/inc",
+					"$(SRCROOT)/../../../../api/svc",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";

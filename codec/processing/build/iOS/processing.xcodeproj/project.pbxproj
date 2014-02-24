@@ -522,11 +522,11 @@
 				DSTROOT = /tmp/processing.dst;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_OPTIMIZATION_LEVEL = 3;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "processing/processing-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"\"$(SRCROOT)/../../../common\"",
+					"$(SRCROOT)/../../src/common",
+					"$(SRCROOT)/../../interface",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				ONLY_ACTIVE_ARCH = NO;
@@ -546,11 +546,11 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DSTROOT = /tmp/processing.dst;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "processing/processing-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"\"$(SRCROOT)/../../../common\"",
+					"$(SRCROOT)/../../src/common",
+					"$(SRCROOT)/../../interface",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";
