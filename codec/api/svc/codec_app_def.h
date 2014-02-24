@@ -193,7 +193,7 @@ typedef struct TagEncParamBase{
 
 typedef struct TagEncParamExt
 {
-  int       iUsageType;	//enable_screen_content_signal;// 0: //camera video signal; 1: screen content signal;
+  int       iUsageType;	//application type;// 0: //camera video signal; 1: screen content signal;
   int		iInputCsp;	// color space of input sequence
 
   int		iPicWidth;			// width of picture in samples
@@ -204,47 +204,45 @@ typedef struct TagEncParamExt
 
   int		iTemporalLayerNum;	// layer number at temporal level
   int		iSpatialLayerNum;	// layer number at spatial level
+  SSpatialLayerConfig sSpatialLayers[MAX_SPATIAL_LAYER_NUM];
 
   unsigned int		uiIntraPeriod;		// period of Intra frame
+  int		        iNumRefFrame;		// number of reference frame used
+  unsigned int	    uiFrameToBeCoded;	// frame to be encoded (at input frame rate)
   bool    bEnableSpsPpsIdAddition;
   bool    bPrefixNalAddingCtrl;
-  bool    bEnableDenoise;	    // denoise control
-  bool    bEnableBackgroundDetection;// background detection control //VAA_BACKGROUND_DETECTION //BGD cmd
-  bool    bEnableAdaptiveQuant; // adaptive quantization control
+  bool	  bEnableSSEI;
+
+  /* rc control */
+  bool    bEnableRc;
   bool    bEnableFrameSkip; // allow skipping frames to keep the bitrate within limits
-  bool	bEnableCropPic;	// enable cropping source picture.  8/25/2010
-  // false: Streaming Video Sharing; true: Video Conferencing Meeting;
+  int     iMaxQp;
+  int     iMinQp;
 
+  /*LTR settings*/
   bool     bEnableLongTermReference; // 0: on, 1: off
+  int	   iLTRRefNum;
   int      iLtrMarkPeriod;
-  int   iPaddingFlag;            // 0:disable padding;1:padding
-  int   iEtropyCodingModeFlag;
+  int      iPaddingFlag;            // 0:disable padding;1:padding
+  int      iEtropyCodingModeFlag;
 
-  SSpatialLayerConfig sSpatialLayers[MAX_SPATIAL_LAYER_NUM];
-  int		    iNumRefFrame;		// number of reference frame used
-  unsigned int	uiFrameToBeCoded;	// frame to be encoded (at input frame rate)
-  bool   bEnableRc;
   short		iMultipleThreadIdc;		// 1	# 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
   short		iCountThreadsNum;			//		# derived from disable_multiple_slice_idc (=0 or >1) means;
 
-  int		iLTRRefNum;
-  bool		bEnableSSEI;
-  bool		bEnableFrameCroppingFlag;// enable frame cropping flag: TRUE always in application
-
-  /* Deblocking loop filter */
+   /* Deblocking loop filter */
   int		iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries
   int		iLoopFilterAlphaC0Offset;// AlphaOffset: valid range [-6, 6], default 0
-
   int		iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0
   int		iInterLayerLoopFilterDisableIdc; // Employed based upon inter-layer, same comment as above
   int		iInterLayerLoopFilterAlphaC0Offset;	// InterLayerLoopFilterAlphaC0Offset
   int		iInterLayerLoopFilterBetaOffset;	// InterLayerLoopFilterBetaOffset
-  bool      bEnableSceneChangeDetect;
 
-  //added
-  int iMaxQp;
-  int iMinQp;
-
+  /*pre-processing feature*/
+  bool    bEnableDenoise;	    // denoise control
+  bool    bEnableBackgroundDetection;// background detection control //VAA_BACKGROUND_DETECTION //BGD cmd
+  bool    bEnableAdaptiveQuant; // adaptive quantization control
+  bool	  bEnableFrameCroppingFlag;// enable frame cropping flag: TRUE always in application
+  bool    bEnableSceneChangeDetect;
 }SEncParamExt;
 
 //Define a new struct to show the property of video bitstream.

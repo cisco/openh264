@@ -172,7 +172,6 @@ void FillDefault (const bool kbEnableRc) {
     true;	// Strategy of have MGS only at T0 frames (0: do not use this strategy; 1: use this strategy)
   bEnableSSEI					= true;
   bEnableFrameCroppingFlag	= true;	// enable frame cropping flag: true alwayse in application
-  bEnableCropPic				= true;	// enable cropping source picture. , 8/25/2010
   // false: Streaming Video Sharing; true: Video Conferencing Meeting;
   iDecompStages				= 0;	// GOP size dependency, unknown here and be revised later
 
@@ -339,9 +338,6 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
 
   /* Frame skipping */
   bEnableFrameSkip	= pCodingParam.bEnableFrameSkip ? true : false;
-
-  /* Enable cropping source picture */
-  bEnableCropPic	= pCodingParam.bEnableCropPic ? true : false;
 
   /* Enable int32_t term reference */
   bEnableLongTermReference	= pCodingParam.bEnableLongTermReference ? true : false;
