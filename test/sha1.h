@@ -72,7 +72,7 @@ typedef struct SHA1Context
  *  Function Prototypes
  */
 void SHA1Reset(SHA1Context *);
-int SHA1Result(SHA1Context *);
+int SHA1Result(SHA1Context *, unsigned char *);
 void SHA1Input( SHA1Context *,
                 const unsigned char *,
                 unsigned);

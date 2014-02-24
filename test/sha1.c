@@ -111,11 +111,13 @@ void SHA1Reset(SHA1Context *context)
  *
  *  Description:
  *      This function will return the 160-bit message digest into the
- *      Message_Digest array within the SHA1Context provided
+ *      digest array provided as a parameter.
  *
  *  Parameters:
  *      context: [in/out]
  *          The context to use to calculate the SHA-1 hash.
+ *      digest: [out]
+ *          An array of characters where the digest is written.
  *
  *  Returns:
  *      1 if successful, 0 if it failed.
@@ -123,8 +125,9 @@ void SHA1Reset(SHA1Context *context)
  *  Comments:
  *
  */
-int SHA1Result(SHA1Context *context)
+int SHA1Result(SHA1Context *context, unsigned char *digest)
 {
+    int i;
 
     if (context->Corrupted)
     {
@@ -136,6 +139,9 @@ int SHA1Result(SHA1Context *context)
         SHA1PadMessage(context);
         context->Computed = 1;
     }
+
+    for (i = 0; i < SHA_DIGEST_LENGTH; i++)
+        digest[i] = context->Message_Digest[i / 4] >> (8 * (3 - (i % 4)));
 
     return 1;
 }
