@@ -223,6 +223,8 @@ void FillDefault (const bool kbEnableRc) {
 int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam, const bool kbEnableRc = true) {
 
   iInputCsp		= pCodingParam.iInputCsp;		// color space of input sequence
+  fMaxFrameRate		= WELS_CLIP3 (pCodingParam.fMaxFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
+  iTargetBitrate	= pCodingParam.iTargetBitrate;
 
   iPicWidth   = pCodingParam.iPicWidth;
   iPicHeight  = pCodingParam.iPicHeight;
@@ -300,10 +302,10 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   SUsedPicRect.iHeight = ((iPicHeight >> 1) << 1);
 
   /* Deblocking loop filter */
+  iLoopFilterDisableIdc	= pCodingParam.iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries,
 #ifdef MT_ENABLED
-  iLoopFilterDisableIdc	= 2;//pCodingParam.iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries,
-#else
-  iLoopFilterDisableIdc	= 0;	// 0: on, 1: off, 2: on except for slice boundaries
+  if (iLoopFilterDisableIdc == 0) // Loop filter requested to be enabled
+    iLoopFilterDisableIdc = 2; // Disable loop filter on slice boundaries since that's not possible with multithreading
 #endif
   iLoopFilterAlphaC0Offset = 0;	// AlphaOffset: valid range [-6, 6], default 0
   iLoopFilterBetaOffset	= 0;	// BetaOffset:	valid range [-6, 6], default 0
@@ -407,7 +409,7 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
             pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.sSliceArgument.uiSliceMbNum,	// confirmed_safe_unsafe_usage
             kiLesserSliceNum * sizeof (uint32_t)) ;
 
-    pDlp->iDLayerQp = SVC_QUALITY_BASE_QP;
+    pDlp->iDLayerQp = pCodingParam.sSpatialLayers[iIdxSpatial].iDLayerQp;
 
     uiProfileIdc	= PRO_SCALABLE_BASELINE;
     ++ pDlp;
