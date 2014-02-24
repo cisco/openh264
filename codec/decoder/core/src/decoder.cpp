@@ -174,49 +174,15 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx) {
 
 
 /*
- *	get size of reference picture list in target layer incoming, = (iNumRefFrames x 2)
+ *	get size of reference picture list in target layer incoming, = (iNumRefFrames 
  */
 static inline int32_t GetTargetRefListSize (PWelsDecoderContext pCtx) {
-  bool*  pSubsetSpsAvail = &pCtx->bSubspsAvailFlags[0];
-  bool*  pSpsAvail		= &pCtx->bSpsAvailFlags[0];
-  int32_t iSubsetIdx		= -1;
-  int32_t iSpsIdx			= -1;
-  bool  bExistSubsetSps = false;
-  int32_t bExistSps		= false;
-  int32_t iPos			= MAX_SPS_COUNT - 1;
   int32_t iNumRefFrames	= 0;
-
-  while (iPos >= 0) {
-    if (pSubsetSpsAvail[iPos]) {
-      bExistSubsetSps	= true;
-      iSubsetIdx		= iPos;
-      break;
-    }
-    -- iPos;
-  }
-
-  if (!bExistSubsetSps) {
-    iPos = MAX_SPS_COUNT - 1;
-    while (iPos >= 0) {
-      if (pSpsAvail[iPos]) {
-        bExistSps	= true;
-        iSpsIdx		= iPos;
-        break;
-      }
-      -- iPos;
-    }
-  }
-
-  if (! (bExistSubsetSps || bExistSps)) {
+  if ((pCtx == NULL) || (pCtx->pSps == NULL)) {
     iNumRefFrames = MAX_REF_PIC_COUNT;
   } else {
-    PSps pSps = bExistSubsetSps ? (&pCtx->sSubsetSpsBuffer[iSubsetIdx].sSps) : (&pCtx->sSpsBuffer[iSpsIdx]);
-
-    iNumRefFrames	= (pSps->iNumRefFrames) + 1;
+    iNumRefFrames = pCtx->pSps->iNumRefFrames + 1;
   }
-
-  if (0 == iNumRefFrames)
-    iNumRefFrames	= (MIN_REF_PIC_COUNT);
 
 #ifdef LONG_TERM_REF
   //pic_queue size minimum set 2
