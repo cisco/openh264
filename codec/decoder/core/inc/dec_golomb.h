@@ -57,7 +57,7 @@ namespace WelsDec {
   if (iReadBytes > iAllowedBytes+1) { \
     return ERR_INFO_READ_OVERFLOW; \
   } \
-	iCurBits |= ((pBufPtr[0] << 8) | pBufPtr[1]) << (iLeftBits); \
+	iCurBits |= ((uint32_t)((pBufPtr[0] << 8) | pBufPtr[1])) << (iLeftBits); \
 	iLeftBits -= 16; \
 	pBufPtr +=2; \
 }
