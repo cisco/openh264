@@ -4,8 +4,6 @@ compiler:
   - clang
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq nasm g++-4.6-multilib gcc-multilib libc6-dev-i386 lib32z1-dev libssl1.0.0:i386
-#link libcrypto for 32bit
-  - sudo ln -s /lib/i386-linux-gnu/libcrypto.so.1.0.0 /lib/i386-linux-gnu/libcrypto.so
+  - sudo apt-get install -qq nasm g++-4.6-multilib gcc-multilib libc6-dev-i386 lib32z1-dev
 install: make gtest-bootstrap
 script: make -B ENABLE64BIT=Yes && make test && make -B ENABLE64BIT=Yes BUILDTYPE=Debug && make test && make -B ENABLE64BIT=No && make test && make -B ENABLE64BIT=No BUILDTYPE=Debug && make test
