@@ -212,13 +212,13 @@ void PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][3
 
   int16_t iAMV[2], iBMV[2], iCMV[2];
 
-  * (int32_t*)iAMV = INTD32 (iMotionVector[0][     kuiLeftIdx]);
-  * (int32_t*)iBMV = INTD32 (iMotionVector[0][      kuiTopIdx]);
-  * (int32_t*)iCMV = INTD32 (iMotionVector[0][kuiRightTopIdx]);
+  ST32 (iAMV, LD32 (iMotionVector[0][     kuiLeftIdx]));
+  ST32 (iBMV, LD32 (iMotionVector[0][      kuiTopIdx]));
+  ST32 (iCMV, LD32 (iMotionVector[0][kuiRightTopIdx]));
 
   if (REF_NOT_AVAIL == iDiagonalRef) {
     iDiagonalRef = kiLeftTopRef;
-    * (int32_t*)iCMV = INTD32 (iMotionVector[0][kuiLeftTopIdx]);
+    ST32 (iCMV, LD32 (iMotionVector[0][kuiLeftTopIdx]));
   }
 
   iMatchRef = (iRef == kiLeftRef) + (iRef == kiTopRef) + (iRef == iDiagonalRef);
