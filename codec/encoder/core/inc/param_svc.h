@@ -201,7 +201,6 @@ void FillDefault (const bool kbEnableRc) {
 
   iMaxQp = 51;
   iMinQp = 0;
-  iUsageType = 0;
   memset(sDependencyLayers,0,sizeof(SDLayerParam)*MAX_DEPENDENCY_LAYER);
 
 
@@ -277,7 +276,6 @@ int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam, const bool kbEnab
    return 0;
 }
 void GetBaseParams (SEncParamBase* pCodingParam) {
-  pCodingParam->iUsageType     = iUsageType;
   pCodingParam->iInputCsp      = iInputCsp;
   pCodingParam->iPicWidth      = iPicWidth;
   pCodingParam->iPicHeight     = iPicHeight;

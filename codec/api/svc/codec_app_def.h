@@ -177,7 +177,6 @@ typedef struct {
 /* SVC Encoding Parameters */
 typedef struct TagEncParamBase{
 
-  int       iUsageType;	//enable_screen_content_signal;// 0: //camera video signal; 1: screen content signal;
   int		iInputCsp;	// color space of input sequence
 
   int		iPicWidth;			// width of picture in samples
@@ -191,7 +190,6 @@ typedef struct TagEncParamBase{
 
 typedef struct TagEncParamExt
 {
-  int       iUsageType;	//application type;// 0: //camera video signal; 1: screen content signal;
   int		iInputCsp;	// color space of input sequence
 
   int		iPicWidth;			// width of picture in samples
