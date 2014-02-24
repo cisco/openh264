@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
-#include <stdint.h>
+#include "../test_stdint.h"
 #include <algorithm>
 
 class BufferedData {
