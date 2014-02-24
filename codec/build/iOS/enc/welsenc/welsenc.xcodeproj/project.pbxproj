@@ -639,6 +639,9 @@
 				HEADER_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../../../../common\"",
 					"\"$(SRCROOT)/../../../../processing/interface\"",
+					"$(SRCROOT)/../../../../encoder/core/inc",
+					"$(SRCROOT)/../../../../encoder/plus/inc",
+					"$(SRCROOT)/../../../../api/svc",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				ONLY_ACTIVE_ARCH = NO;
@@ -668,6 +671,9 @@
 				HEADER_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../../../../common\"",
 					"\"$(SRCROOT)/../../../../processing/interface\"",
+					"$(SRCROOT)/../../../../encoder/core/inc",
+					"$(SRCROOT)/../../../../encoder/plus/inc",
+					"$(SRCROOT)/../../../../api/svc",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";

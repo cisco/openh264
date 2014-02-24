@@ -562,7 +562,12 @@
 					HAVE_NEON,
 				);
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../../../common\"";
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../../../common\"",
+					"$(SRCROOT)/../../../../decoder/core/inc",
+					"$(SRCROOT)/../../../../decoder/plus/inc",
+					"$(SRCROOT)/../../../../api/svc",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -586,7 +591,12 @@
 					HAVE_NEON,
 				);
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../../../common\"";
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../../../common\"",
+					"$(SRCROOT)/../../../../decoder/core/inc",
+					"$(SRCROOT)/../../../../decoder/plus/inc",
+					"$(SRCROOT)/../../../../api/svc",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
