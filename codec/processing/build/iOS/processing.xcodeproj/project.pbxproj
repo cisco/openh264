@@ -14,23 +14,23 @@
 		4CE4444918B724B60017DF25 /* libprocessing.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4443118B724B60017DF25 /* libprocessing.a */; };
 		4CE4444F18B724B60017DF25 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4CE4444D18B724B60017DF25 /* InfoPlist.strings */; };
 		4CE4445118B724B60017DF25 /* processingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4445018B724B60017DF25 /* processingTests.m */; };
-		4CE444D218B726E80017DF25 /* AdaptiveQuantization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444A418B726E70017DF25 /* AdaptiveQuantization.cpp */; };
-		4CE444D618B726E80017DF25 /* BackgroundDetection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444AB18B726E70017DF25 /* BackgroundDetection.cpp */; };
-		4CE444D718B726E80017DF25 /* memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444AE18B726E70017DF25 /* memory.cpp */; };
-		4CE444D818B726E80017DF25 /* thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444B118B726E70017DF25 /* thread.cpp */; };
-		4CE444D918B726E80017DF25 /* WelsFrameWork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444B518B726E70017DF25 /* WelsFrameWork.cpp */; };
-		4CE444DA18B726E80017DF25 /* WelsFrameWorkEx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444B718B726E70017DF25 /* WelsFrameWorkEx.cpp */; };
-		4CE444DB18B726E80017DF25 /* ComplexityAnalysis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444BB18B726E70017DF25 /* ComplexityAnalysis.cpp */; };
-		4CE444DC18B726E80017DF25 /* denoise.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444BE18B726E70017DF25 /* denoise.cpp */; };
-		4CE444DD18B726E80017DF25 /* denoise_filter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444C018B726E70017DF25 /* denoise_filter.cpp */; };
-		4CE444DE18B726E80017DF25 /* downsample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444C218B726E70017DF25 /* downsample.cpp */; };
-		4CE444DF18B726E80017DF25 /* downsamplefuncs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444C418B726E70017DF25 /* downsamplefuncs.cpp */; };
-		4CE444E018B726E80017DF25 /* imagerotate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444C618B726E70017DF25 /* imagerotate.cpp */; };
-		4CE444E118B726E80017DF25 /* imagerotatefuncs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444C818B726E80017DF25 /* imagerotatefuncs.cpp */; };
-		4CE444E218B726E80017DF25 /* SceneChangeDetection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444CA18B726E80017DF25 /* SceneChangeDetection.cpp */; };
-		4CE444E318B726E80017DF25 /* SceneChangeDetectionCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444CC18B726E80017DF25 /* SceneChangeDetectionCommon.cpp */; };
-		4CE444E418B726E80017DF25 /* vaacalcfuncs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444CF18B726E80017DF25 /* vaacalcfuncs.cpp */; };
-		4CE444E518B726E80017DF25 /* vaacalculation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE444D018B726E80017DF25 /* vaacalculation.cpp */; };
+		4CE4478B18BC62960017DF25 /* AdaptiveQuantization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4475D18BC62960017DF25 /* AdaptiveQuantization.cpp */; };
+		4CE4478F18BC62960017DF25 /* BackgroundDetection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4476418BC62960017DF25 /* BackgroundDetection.cpp */; };
+		4CE4479018BC62960017DF25 /* memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4476718BC62960017DF25 /* memory.cpp */; };
+		4CE4479118BC62960017DF25 /* thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4476A18BC62960017DF25 /* thread.cpp */; };
+		4CE4479218BC62960017DF25 /* WelsFrameWork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4476E18BC62960017DF25 /* WelsFrameWork.cpp */; };
+		4CE4479318BC62960017DF25 /* WelsFrameWorkEx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4477018BC62960017DF25 /* WelsFrameWorkEx.cpp */; };
+		4CE4479418BC62960017DF25 /* ComplexityAnalysis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4477418BC62960017DF25 /* ComplexityAnalysis.cpp */; };
+		4CE4479518BC62960017DF25 /* denoise.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4477718BC62960017DF25 /* denoise.cpp */; };
+		4CE4479618BC62960017DF25 /* denoise_filter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4477918BC62960017DF25 /* denoise_filter.cpp */; };
+		4CE4479718BC62960017DF25 /* downsample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4477B18BC62960017DF25 /* downsample.cpp */; };
+		4CE4479818BC62960017DF25 /* downsamplefuncs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4477D18BC62960017DF25 /* downsamplefuncs.cpp */; };
+		4CE4479918BC62960017DF25 /* imagerotate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4477F18BC62960017DF25 /* imagerotate.cpp */; };
+		4CE4479A18BC62960017DF25 /* imagerotatefuncs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4478118BC62960017DF25 /* imagerotatefuncs.cpp */; };
+		4CE4479B18BC62960017DF25 /* SceneChangeDetection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4478318BC62960017DF25 /* SceneChangeDetection.cpp */; };
+		4CE4479C18BC62960017DF25 /* SceneChangeDetectionCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4478518BC62960017DF25 /* SceneChangeDetectionCommon.cpp */; };
+		4CE4479D18BC62960017DF25 /* vaacalcfuncs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4478818BC62960017DF25 /* vaacalcfuncs.cpp */; };
+		4CE4479E18BC62960017DF25 /* vaacalculation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4478918BC62960017DF25 /* vaacalculation.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,47 +58,45 @@
 /* Begin PBXFileReference section */
 		4CE4443118B724B60017DF25 /* libprocessing.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libprocessing.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE4443418B724B60017DF25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		4CE4443818B724B60017DF25 /* processing-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "processing-Prefix.pch"; sourceTree = "<group>"; };
 		4CE4444118B724B60017DF25 /* processingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = processingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE4444218B724B60017DF25 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4CE4444518B724B60017DF25 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		4CE4444C18B724B60017DF25 /* processingTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "processingTests-Info.plist"; sourceTree = "<group>"; };
 		4CE4444E18B724B60017DF25 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4CE4445018B724B60017DF25 /* processingTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = processingTests.m; sourceTree = "<group>"; };
-		4CE444A118B726E70017DF25 /* IWelsVP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IWelsVP.h; sourceTree = "<group>"; };
-		4CE444A418B726E70017DF25 /* AdaptiveQuantization.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AdaptiveQuantization.cpp; sourceTree = "<group>"; };
-		4CE444A518B726E70017DF25 /* AdaptiveQuantization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdaptiveQuantization.h; sourceTree = "<group>"; };
-		4CE444AB18B726E70017DF25 /* BackgroundDetection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BackgroundDetection.cpp; sourceTree = "<group>"; };
-		4CE444AC18B726E70017DF25 /* BackgroundDetection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackgroundDetection.h; sourceTree = "<group>"; };
-		4CE444AE18B726E70017DF25 /* memory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = memory.cpp; sourceTree = "<group>"; };
-		4CE444AF18B726E70017DF25 /* memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
-		4CE444B018B726E70017DF25 /* resource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = resource.h; sourceTree = "<group>"; };
-		4CE444B118B726E70017DF25 /* thread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread.cpp; sourceTree = "<group>"; };
-		4CE444B218B726E70017DF25 /* thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = thread.h; sourceTree = "<group>"; };
-		4CE444B318B726E70017DF25 /* typedef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = typedef.h; sourceTree = "<group>"; };
-		4CE444B418B726E70017DF25 /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
-		4CE444B518B726E70017DF25 /* WelsFrameWork.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WelsFrameWork.cpp; sourceTree = "<group>"; };
-		4CE444B618B726E70017DF25 /* WelsFrameWork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelsFrameWork.h; sourceTree = "<group>"; };
-		4CE444B718B726E70017DF25 /* WelsFrameWorkEx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WelsFrameWorkEx.cpp; sourceTree = "<group>"; };
-		4CE444B818B726E70017DF25 /* WelsVP.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = WelsVP.def; sourceTree = "<group>"; };
-		4CE444BB18B726E70017DF25 /* ComplexityAnalysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ComplexityAnalysis.cpp; sourceTree = "<group>"; };
-		4CE444BC18B726E70017DF25 /* ComplexityAnalysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComplexityAnalysis.h; sourceTree = "<group>"; };
-		4CE444BE18B726E70017DF25 /* denoise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = denoise.cpp; sourceTree = "<group>"; };
-		4CE444BF18B726E70017DF25 /* denoise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = denoise.h; sourceTree = "<group>"; };
-		4CE444C018B726E70017DF25 /* denoise_filter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = denoise_filter.cpp; sourceTree = "<group>"; };
-		4CE444C218B726E70017DF25 /* downsample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = downsample.cpp; sourceTree = "<group>"; };
-		4CE444C318B726E70017DF25 /* downsample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = downsample.h; sourceTree = "<group>"; };
-		4CE444C418B726E70017DF25 /* downsamplefuncs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = downsamplefuncs.cpp; sourceTree = "<group>"; };
-		4CE444C618B726E70017DF25 /* imagerotate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imagerotate.cpp; sourceTree = "<group>"; };
-		4CE444C718B726E70017DF25 /* imagerotate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imagerotate.h; sourceTree = "<group>"; };
-		4CE444C818B726E80017DF25 /* imagerotatefuncs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imagerotatefuncs.cpp; sourceTree = "<group>"; };
-		4CE444CA18B726E80017DF25 /* SceneChangeDetection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SceneChangeDetection.cpp; sourceTree = "<group>"; };
-		4CE444CB18B726E80017DF25 /* SceneChangeDetection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneChangeDetection.h; sourceTree = "<group>"; };
-		4CE444CC18B726E80017DF25 /* SceneChangeDetectionCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SceneChangeDetectionCommon.cpp; sourceTree = "<group>"; };
-		4CE444CD18B726E80017DF25 /* SceneChangeDetectionCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneChangeDetectionCommon.h; sourceTree = "<group>"; };
-		4CE444CF18B726E80017DF25 /* vaacalcfuncs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vaacalcfuncs.cpp; sourceTree = "<group>"; };
-		4CE444D018B726E80017DF25 /* vaacalculation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vaacalculation.cpp; sourceTree = "<group>"; };
-		4CE444D118B726E80017DF25 /* vaacalculation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vaacalculation.h; sourceTree = "<group>"; };
+		4CE4475A18BC62960017DF25 /* IWelsVP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IWelsVP.h; sourceTree = "<group>"; };
+		4CE4475D18BC62960017DF25 /* AdaptiveQuantization.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AdaptiveQuantization.cpp; sourceTree = "<group>"; };
+		4CE4475E18BC62960017DF25 /* AdaptiveQuantization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdaptiveQuantization.h; sourceTree = "<group>"; };
+		4CE4476418BC62960017DF25 /* BackgroundDetection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BackgroundDetection.cpp; sourceTree = "<group>"; };
+		4CE4476518BC62960017DF25 /* BackgroundDetection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackgroundDetection.h; sourceTree = "<group>"; };
+		4CE4476718BC62960017DF25 /* memory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = memory.cpp; sourceTree = "<group>"; };
+		4CE4476818BC62960017DF25 /* memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
+		4CE4476918BC62960017DF25 /* resource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = resource.h; sourceTree = "<group>"; };
+		4CE4476A18BC62960017DF25 /* thread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread.cpp; sourceTree = "<group>"; };
+		4CE4476B18BC62960017DF25 /* thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = thread.h; sourceTree = "<group>"; };
+		4CE4476C18BC62960017DF25 /* typedef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = typedef.h; sourceTree = "<group>"; };
+		4CE4476D18BC62960017DF25 /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
+		4CE4476E18BC62960017DF25 /* WelsFrameWork.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WelsFrameWork.cpp; sourceTree = "<group>"; };
+		4CE4476F18BC62960017DF25 /* WelsFrameWork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelsFrameWork.h; sourceTree = "<group>"; };
+		4CE4477018BC62960017DF25 /* WelsFrameWorkEx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WelsFrameWorkEx.cpp; sourceTree = "<group>"; };
+		4CE4477418BC62960017DF25 /* ComplexityAnalysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ComplexityAnalysis.cpp; sourceTree = "<group>"; };
+		4CE4477518BC62960017DF25 /* ComplexityAnalysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComplexityAnalysis.h; sourceTree = "<group>"; };
+		4CE4477718BC62960017DF25 /* denoise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = denoise.cpp; sourceTree = "<group>"; };
+		4CE4477818BC62960017DF25 /* denoise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = denoise.h; sourceTree = "<group>"; };
+		4CE4477918BC62960017DF25 /* denoise_filter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = denoise_filter.cpp; sourceTree = "<group>"; };
+		4CE4477B18BC62960017DF25 /* downsample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = downsample.cpp; sourceTree = "<group>"; };
+		4CE4477C18BC62960017DF25 /* downsample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = downsample.h; sourceTree = "<group>"; };
+		4CE4477D18BC62960017DF25 /* downsamplefuncs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = downsamplefuncs.cpp; sourceTree = "<group>"; };
+		4CE4477F18BC62960017DF25 /* imagerotate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imagerotate.cpp; sourceTree = "<group>"; };
+		4CE4478018BC62960017DF25 /* imagerotate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imagerotate.h; sourceTree = "<group>"; };
+		4CE4478118BC62960017DF25 /* imagerotatefuncs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imagerotatefuncs.cpp; sourceTree = "<group>"; };
+		4CE4478318BC62960017DF25 /* SceneChangeDetection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SceneChangeDetection.cpp; sourceTree = "<group>"; };
+		4CE4478418BC62960017DF25 /* SceneChangeDetection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneChangeDetection.h; sourceTree = "<group>"; };
+		4CE4478518BC62960017DF25 /* SceneChangeDetectionCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SceneChangeDetectionCommon.cpp; sourceTree = "<group>"; };
+		4CE4478618BC62960017DF25 /* SceneChangeDetectionCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneChangeDetectionCommon.h; sourceTree = "<group>"; };
+		4CE4478818BC62960017DF25 /* vaacalcfuncs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vaacalcfuncs.cpp; sourceTree = "<group>"; };
+		4CE4478918BC62960017DF25 /* vaacalculation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vaacalculation.cpp; sourceTree = "<group>"; };
+		4CE4478A18BC62960017DF25 /* vaacalculation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vaacalculation.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,7 +125,8 @@
 		4CE4442818B724B60017DF25 = {
 			isa = PBXGroup;
 			children = (
-				4CE4443618B724B60017DF25 /* processing */,
+				4CE4475918BC62960017DF25 /* interface */,
+				4CE4475B18BC62960017DF25 /* src */,
 				4CE4444A18B724B60017DF25 /* processingTests */,
 				4CE4443318B724B60017DF25 /* Frameworks */,
 				4CE4443218B724B60017DF25 /* Products */,
@@ -153,24 +152,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		4CE4443618B724B60017DF25 /* processing */ = {
-			isa = PBXGroup;
-			children = (
-				4CE444A018B726E70017DF25 /* interface */,
-				4CE444A218B726E70017DF25 /* src */,
-				4CE4443718B724B60017DF25 /* Supporting Files */,
-			);
-			path = processing;
-			sourceTree = "<group>";
-		};
-		4CE4443718B724B60017DF25 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				4CE4443818B724B60017DF25 /* processing-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 		4CE4444A18B724B60017DF25 /* processingTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -189,124 +170,123 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		4CE444A018B726E70017DF25 /* interface */ = {
+		4CE4475918BC62960017DF25 /* interface */ = {
 			isa = PBXGroup;
 			children = (
-				4CE444A118B726E70017DF25 /* IWelsVP.h */,
+				4CE4475A18BC62960017DF25 /* IWelsVP.h */,
 			);
 			name = interface;
-			path = ../../../interface;
+			path = ../../interface;
 			sourceTree = "<group>";
 		};
-		4CE444A218B726E70017DF25 /* src */ = {
+		4CE4475B18BC62960017DF25 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				4CE444A318B726E70017DF25 /* adaptivequantization */,
-				4CE444AA18B726E70017DF25 /* backgrounddetection */,
-				4CE444AD18B726E70017DF25 /* common */,
-				4CE444BA18B726E70017DF25 /* complexityanalysis */,
-				4CE444BD18B726E70017DF25 /* denoise */,
-				4CE444C118B726E70017DF25 /* downsample */,
-				4CE444C518B726E70017DF25 /* imagerotate */,
-				4CE444C918B726E80017DF25 /* scenechangedetection */,
-				4CE444CE18B726E80017DF25 /* vaacalc */,
+				4CE4475C18BC62960017DF25 /* adaptivequantization */,
+				4CE4476318BC62960017DF25 /* backgrounddetection */,
+				4CE4476618BC62960017DF25 /* common */,
+				4CE4477318BC62960017DF25 /* complexityanalysis */,
+				4CE4477618BC62960017DF25 /* denoise */,
+				4CE4477A18BC62960017DF25 /* downsample */,
+				4CE4477E18BC62960017DF25 /* imagerotate */,
+				4CE4478218BC62960017DF25 /* scenechangedetection */,
+				4CE4478718BC62960017DF25 /* vaacalc */,
 			);
 			name = src;
-			path = ../../../src;
+			path = ../../src;
 			sourceTree = "<group>";
 		};
-		4CE444A318B726E70017DF25 /* adaptivequantization */ = {
+		4CE4475C18BC62960017DF25 /* adaptivequantization */ = {
 			isa = PBXGroup;
 			children = (
-				4CE444A418B726E70017DF25 /* AdaptiveQuantization.cpp */,
-				4CE444A518B726E70017DF25 /* AdaptiveQuantization.h */,
+				4CE4475D18BC62960017DF25 /* AdaptiveQuantization.cpp */,
+				4CE4475E18BC62960017DF25 /* AdaptiveQuantization.h */,
 			);
 			path = adaptivequantization;
 			sourceTree = "<group>";
 		};
-		4CE444AA18B726E70017DF25 /* backgrounddetection */ = {
+		4CE4476318BC62960017DF25 /* backgrounddetection */ = {
 			isa = PBXGroup;
 			children = (
-				4CE444AB18B726E70017DF25 /* BackgroundDetection.cpp */,
-				4CE444AC18B726E70017DF25 /* BackgroundDetection.h */,
+				4CE4476418BC62960017DF25 /* BackgroundDetection.cpp */,
+				4CE4476518BC62960017DF25 /* BackgroundDetection.h */,
 			);
 			path = backgrounddetection;
 			sourceTree = "<group>";
 		};
-		4CE444AD18B726E70017DF25 /* common */ = {
+		4CE4476618BC62960017DF25 /* common */ = {
 			isa = PBXGroup;
 			children = (
-				4CE444AE18B726E70017DF25 /* memory.cpp */,
-				4CE444AF18B726E70017DF25 /* memory.h */,
-				4CE444B018B726E70017DF25 /* resource.h */,
-				4CE444B118B726E70017DF25 /* thread.cpp */,
-				4CE444B218B726E70017DF25 /* thread.h */,
-				4CE444B318B726E70017DF25 /* typedef.h */,
-				4CE444B418B726E70017DF25 /* util.h */,
-				4CE444B518B726E70017DF25 /* WelsFrameWork.cpp */,
-				4CE444B618B726E70017DF25 /* WelsFrameWork.h */,
-				4CE444B718B726E70017DF25 /* WelsFrameWorkEx.cpp */,
-				4CE444B818B726E70017DF25 /* WelsVP.def */,
+				4CE4476718BC62960017DF25 /* memory.cpp */,
+				4CE4476818BC62960017DF25 /* memory.h */,
+				4CE4476918BC62960017DF25 /* resource.h */,
+				4CE4476A18BC62960017DF25 /* thread.cpp */,
+				4CE4476B18BC62960017DF25 /* thread.h */,
+				4CE4476C18BC62960017DF25 /* typedef.h */,
+				4CE4476D18BC62960017DF25 /* util.h */,
+				4CE4476E18BC62960017DF25 /* WelsFrameWork.cpp */,
+				4CE4476F18BC62960017DF25 /* WelsFrameWork.h */,
+				4CE4477018BC62960017DF25 /* WelsFrameWorkEx.cpp */,
 			);
 			path = common;
 			sourceTree = "<group>";
 		};
-		4CE444BA18B726E70017DF25 /* complexityanalysis */ = {
+		4CE4477318BC62960017DF25 /* complexityanalysis */ = {
 			isa = PBXGroup;
 			children = (
-				4CE444BB18B726E70017DF25 /* ComplexityAnalysis.cpp */,
-				4CE444BC18B726E70017DF25 /* ComplexityAnalysis.h */,
+				4CE4477418BC62960017DF25 /* ComplexityAnalysis.cpp */,
+				4CE4477518BC62960017DF25 /* ComplexityAnalysis.h */,
 			);
 			path = complexityanalysis;
 			sourceTree = "<group>";
 		};
-		4CE444BD18B726E70017DF25 /* denoise */ = {
+		4CE4477618BC62960017DF25 /* denoise */ = {
 			isa = PBXGroup;
 			children = (
-				4CE444BE18B726E70017DF25 /* denoise.cpp */,
-				4CE444BF18B726E70017DF25 /* denoise.h */,
-				4CE444C018B726E70017DF25 /* denoise_filter.cpp */,
+				4CE4477718BC62960017DF25 /* denoise.cpp */,
+				4CE4477818BC62960017DF25 /* denoise.h */,
+				4CE4477918BC62960017DF25 /* denoise_filter.cpp */,
 			);
 			path = denoise;
 			sourceTree = "<group>";
 		};
-		4CE444C118B726E70017DF25 /* downsample */ = {
+		4CE4477A18BC62960017DF25 /* downsample */ = {
 			isa = PBXGroup;
 			children = (
-				4CE444C218B726E70017DF25 /* downsample.cpp */,
-				4CE444C318B726E70017DF25 /* downsample.h */,
-				4CE444C418B726E70017DF25 /* downsamplefuncs.cpp */,
+				4CE4477B18BC62960017DF25 /* downsample.cpp */,
+				4CE4477C18BC62960017DF25 /* downsample.h */,
+				4CE4477D18BC62960017DF25 /* downsamplefuncs.cpp */,
 			);
 			path = downsample;
 			sourceTree = "<group>";
 		};
-		4CE444C518B726E70017DF25 /* imagerotate */ = {
+		4CE4477E18BC62960017DF25 /* imagerotate */ = {
 			isa = PBXGroup;
 			children = (
-				4CE444C618B726E70017DF25 /* imagerotate.cpp */,
-				4CE444C718B726E70017DF25 /* imagerotate.h */,
-				4CE444C818B726E80017DF25 /* imagerotatefuncs.cpp */,
+				4CE4477F18BC62960017DF25 /* imagerotate.cpp */,
+				4CE4478018BC62960017DF25 /* imagerotate.h */,
+				4CE4478118BC62960017DF25 /* imagerotatefuncs.cpp */,
 			);
 			path = imagerotate;
 			sourceTree = "<group>";
 		};
-		4CE444C918B726E80017DF25 /* scenechangedetection */ = {
+		4CE4478218BC62960017DF25 /* scenechangedetection */ = {
 			isa = PBXGroup;
 			children = (
-				4CE444CA18B726E80017DF25 /* SceneChangeDetection.cpp */,
-				4CE444CB18B726E80017DF25 /* SceneChangeDetection.h */,
-				4CE444CC18B726E80017DF25 /* SceneChangeDetectionCommon.cpp */,
-				4CE444CD18B726E80017DF25 /* SceneChangeDetectionCommon.h */,
+				4CE4478318BC62960017DF25 /* SceneChangeDetection.cpp */,
+				4CE4478418BC62960017DF25 /* SceneChangeDetection.h */,
+				4CE4478518BC62960017DF25 /* SceneChangeDetectionCommon.cpp */,
+				4CE4478618BC62960017DF25 /* SceneChangeDetectionCommon.h */,
 			);
 			path = scenechangedetection;
 			sourceTree = "<group>";
 		};
-		4CE444CE18B726E80017DF25 /* vaacalc */ = {
+		4CE4478718BC62960017DF25 /* vaacalc */ = {
 			isa = PBXGroup;
 			children = (
-				4CE444CF18B726E80017DF25 /* vaacalcfuncs.cpp */,
-				4CE444D018B726E80017DF25 /* vaacalculation.cpp */,
-				4CE444D118B726E80017DF25 /* vaacalculation.h */,
+				4CE4478818BC62960017DF25 /* vaacalcfuncs.cpp */,
+				4CE4478918BC62960017DF25 /* vaacalculation.cpp */,
+				4CE4478A18BC62960017DF25 /* vaacalculation.h */,
 			);
 			path = vaacalc;
 			sourceTree = "<group>";
@@ -392,23 +372,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4CE444DE18B726E80017DF25 /* downsample.cpp in Sources */,
-				4CE444D218B726E80017DF25 /* AdaptiveQuantization.cpp in Sources */,
-				4CE444E018B726E80017DF25 /* imagerotate.cpp in Sources */,
-				4CE444DA18B726E80017DF25 /* WelsFrameWorkEx.cpp in Sources */,
-				4CE444D718B726E80017DF25 /* memory.cpp in Sources */,
-				4CE444E118B726E80017DF25 /* imagerotatefuncs.cpp in Sources */,
-				4CE444DC18B726E80017DF25 /* denoise.cpp in Sources */,
-				4CE444D918B726E80017DF25 /* WelsFrameWork.cpp in Sources */,
-				4CE444E218B726E80017DF25 /* SceneChangeDetection.cpp in Sources */,
-				4CE444E418B726E80017DF25 /* vaacalcfuncs.cpp in Sources */,
-				4CE444DF18B726E80017DF25 /* downsamplefuncs.cpp in Sources */,
-				4CE444E318B726E80017DF25 /* SceneChangeDetectionCommon.cpp in Sources */,
-				4CE444DB18B726E80017DF25 /* ComplexityAnalysis.cpp in Sources */,
-				4CE444E518B726E80017DF25 /* vaacalculation.cpp in Sources */,
-				4CE444D818B726E80017DF25 /* thread.cpp in Sources */,
-				4CE444D618B726E80017DF25 /* BackgroundDetection.cpp in Sources */,
-				4CE444DD18B726E80017DF25 /* denoise_filter.cpp in Sources */,
+				4CE4479718BC62960017DF25 /* downsample.cpp in Sources */,
+				4CE4478B18BC62960017DF25 /* AdaptiveQuantization.cpp in Sources */,
+				4CE4479918BC62960017DF25 /* imagerotate.cpp in Sources */,
+				4CE4479318BC62960017DF25 /* WelsFrameWorkEx.cpp in Sources */,
+				4CE4479018BC62960017DF25 /* memory.cpp in Sources */,
+				4CE4479A18BC62960017DF25 /* imagerotatefuncs.cpp in Sources */,
+				4CE4479518BC62960017DF25 /* denoise.cpp in Sources */,
+				4CE4479218BC62960017DF25 /* WelsFrameWork.cpp in Sources */,
+				4CE4479B18BC62960017DF25 /* SceneChangeDetection.cpp in Sources */,
+				4CE4479D18BC62960017DF25 /* vaacalcfuncs.cpp in Sources */,
+				4CE4479818BC62960017DF25 /* downsamplefuncs.cpp in Sources */,
+				4CE4479C18BC62960017DF25 /* SceneChangeDetectionCommon.cpp in Sources */,
+				4CE4479418BC62960017DF25 /* ComplexityAnalysis.cpp in Sources */,
+				4CE4479E18BC62960017DF25 /* vaacalculation.cpp in Sources */,
+				4CE4479118BC62960017DF25 /* thread.cpp in Sources */,
+				4CE4478F18BC62960017DF25 /* BackgroundDetection.cpp in Sources */,
+				4CE4479618BC62960017DF25 /* denoise_filter.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
