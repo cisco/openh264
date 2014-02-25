@@ -1,4 +1,4 @@
-include build/platform-x86-common.mk
+include build/platform-arch.mk
 ASM = nasm
 SHAREDLIBSUFFIX = so
 CFLAGS += -fPIC -DMT_ENABLED
