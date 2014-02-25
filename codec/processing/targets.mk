@@ -21,12 +21,14 @@ PROCESSING_CPP_SRCS=\
 PROCESSING_OBJS += $(PROCESSING_CPP_SRCS:.cpp=.o)
 
 ifeq ($(USE_ASM), Yes)
+ifeq ($(ASM_ARCH), x86)
 PROCESSING_ASM_SRCS=\
 	$(PROCESSING_SRCDIR)/src/asm/denoisefilter.asm\
 	$(PROCESSING_SRCDIR)/src/asm/downsample_bilinear.asm\
 	$(PROCESSING_SRCDIR)/src/asm/vaa.asm\
 
 PROCESSING_OBJS += $(PROCESSING_ASM_SRCS:.asm=.o)
+endif
 endif
 
 OBJS += $(PROCESSING_OBJS)

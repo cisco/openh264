@@ -23,6 +23,7 @@ else
     USE_ASM = Yes
   ifeq (Yes, $(USE_ASM))
     ASM = nasm
+    ASM_ARCH = x86
     CFLAGS += -DX86_ASM
     ASMFLAGS += -DNOPREFIX -f elf32 -DX86_32
   endif
