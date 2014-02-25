@@ -1,4 +1,3 @@
-USE_ASM = No
 ARCH = arm
 SHAREDLIBSUFFIX = so
 GCCVERSION = 4.8
@@ -20,7 +19,6 @@ else
     GCCPATHPREFIX = x86
     GCCPREFIX = i686-linux-android
     APP_ABI = x86
-    USE_ASM = Yes
   ifeq (Yes, $(USE_ASM))
     ASM = nasm
     ASM_ARCH = x86
