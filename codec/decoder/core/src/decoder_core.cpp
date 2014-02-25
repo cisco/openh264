@@ -473,6 +473,7 @@ int32_t CheckSpsId (PWelsDecoderContext pCtx, PSubsetSps* ppSubsetSps, PSps* ppS
 #define SLICE_HEADER_ALPHAC0_BETA_OFFSET_MAX 12
 #define SLICE_HEADER_INTER_LAYER_ALPHAC0_BETA_OFFSET_MIN -12
 #define SLICE_HEADER_INTER_LAYER_ALPHAC0_BETA_OFFSET_MAX 12
+#define MAX_NUM_REF_IDX_L0_ACTIVE_MINUS1 15
 /*
  *	decode_slice_header_avc
  *	Parse slice header of bitstream in avc for storing data structure
@@ -673,6 +674,8 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     pSliceHead->bNumRefIdxActiveOverrideFlag	= !!uiCode;
     if (pSliceHead->bNumRefIdxActiveOverrideFlag) {
       WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //num_ref_idx_l0_active_minus1
+      WELS_CHECK_SE_UPPER_ERROR (uiCode, MAX_NUM_REF_IDX_L0_ACTIVE_MINUS1, "num_ref_idx_l0_active_minus1",
+                                 GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_NUM_REF_IDX_L0_ACTIVE_MINUS1));
       pSliceHead->uiRefCount[0]	= 1 + uiCode;
     }
   }
