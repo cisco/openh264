@@ -69,6 +69,8 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   virtual int EXTAPI Initialize (const SEncParamBase* argv);
   virtual int EXTAPI InitializeExt (const SEncParamExt* argv);
 
+  virtual int EXTAPI GetDefaultParams (SEncParamExt* argv);
+
   virtual int EXTAPI Uninitialize();
 
   /*

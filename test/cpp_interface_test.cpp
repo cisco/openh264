@@ -30,6 +30,10 @@ struct SVCEncoderImpl : public ISVCEncoder {
     EXPECT_TRUE(gThis == this);
     return 2;
   }
+  virtual int EXTAPI GetDefaultParams(SEncParamExt* pParam) {
+    EXPECT_TRUE(gThis == this);
+    return 10;
+  }
   virtual int EXTAPI Uninitialize() {
     EXPECT_TRUE(gThis == this);
     return 3;
