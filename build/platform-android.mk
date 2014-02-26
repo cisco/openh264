@@ -15,6 +15,11 @@ ifeq ($(ARCH), arm)
   endif
     LDFLAGS += -march=armv7-a -Wl,--fix-cortex-a8
     APP_ABI = armeabi-v7a
+  ifeq (Yes, $(USE_ASM))
+    ASM_ARCH = arm
+    CFLAGS += -DHAVE_NEON
+    ASMFLAGS += -march=armv7-a -mfpu=neon
+  endif
 else
     GCCPATHPREFIX = x86
     GCCPREFIX = i686-linux-android
