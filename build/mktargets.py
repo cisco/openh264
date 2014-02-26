@@ -46,11 +46,20 @@ def write_asm_rule_pattern(f):
     f.write('\t$(QUIET_ASM)$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(' + PREFIX + '_ASMFLAGS) $(' + PREFIX + '_ASM_INCLUDES) -o $@ $<\n')
     f.write("\n")
 
+def write_asm_s_rule_pattern(f):
+    src = "$(%s_SRCDIR)/%%.S"%(PREFIX)
+    dst = "$(%s_SRCDIR)/%%.o"%(PREFIX)
+
+    f.write("%s: %s\n"%(dst, src))
+    f.write('\t$(QUIET_CCAS)$(CCAS) $(CFLAGS) $(ASMFLAGS) $(INCLUDES) $(' + PREFIX + '_CFLAGS) $(' + PREFIX + '_INCLUDES) -c -o $@ $<\n')
+    f.write("\n")
+
 
 def find_sources():
     cpp_files = []
     asm_files = []
     c_files = []
+    s_files = []
     print EXCLUDE
     for dir in os.walk("."):
         for file in dir[2]:
@@ -61,7 +70,9 @@ def find_sources():
                     asm_files.append(os.path.join(dir[0].strip('./'), file))
                 if os.path.splitext(file)[1] == '.c':
                     c_files.append(os.path.join(dir[0].strip('./'), file))
-    return [cpp_files, asm_files, c_files]
+                if os.path.splitext(file)[1] == '.S':
+                    s_files.append(os.path.join(dir[0].strip('./'), file))
+    return [cpp_files, asm_files, c_files, s_files]
 
 
 args = parser.parse_args()
@@ -91,7 +102,7 @@ try:
 except:
     sys.exit(1)
 
-(cpp, asm, cfiles) = find_sources()
+(cpp, asm, cfiles, sfiles) = find_sources()
 
 
 
@@ -120,6 +131,15 @@ if len(asm) > 0:
     f.write("%s_OBJS += $(%s_ASM_SRCS:.asm=.o)\n"%(PREFIX, PREFIX))
     f.write("endif\n\n")
 
+if len(sfiles) > 0:
+    f.write("ifeq ($(ASM_ARCH), arm)\n")
+    f.write("%s_ASM_S_SRCS=\\\n"%(PREFIX))
+    for c in sfiles:
+        f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
+    f.write("\n")
+    f.write("%s_OBJS += $(%s_ASM_S_SRCS:.S=.o)\n"%(PREFIX, PREFIX))
+    f.write("endif\n\n")
+
 f.write("OBJS += $(%s_OBJS)\n"%PREFIX)
 
 write_cpp_rule_pattern(f)
@@ -129,6 +149,9 @@ if len(cfiles) > 0:
 
 if len(asm) > 0:
     write_asm_rule_pattern(f)
+
+if len(sfiles) > 0:
+    write_asm_s_rule_pattern(f)
 
 if args.library is not None:
     f.write("$(LIBPREFIX)%s.$(LIBSUFFIX): $(%s_OBJS)\n"%(args.library, PREFIX))

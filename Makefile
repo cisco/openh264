@@ -2,6 +2,7 @@ OS=$(shell uname | tr A-Z a-z | tr -d \\-[:digit:].)
 ARCH=$(shell uname -m)
 LIBPREFIX=lib
 LIBSUFFIX=a
+CCAS=$(CC)
 CXX_O=-o $@
 CXX_LINK_O=-o $@
 AR_OPTS=cr $@
@@ -44,6 +45,7 @@ LDFLAGS +=
 ifneq ($(V),Yes)
     QUIET_CXX = @printf "CXX\t$@\n";
     QUIET_CC  = @printf "CC\t$@\n";
+    QUIET_CCAS = @printf "CCAS\t$@\n";
     QUIET_ASM = @printf "ASM\t$@\n";
     QUIET_AR  = @printf "AR\t$@\n";
     QUIET     = @
