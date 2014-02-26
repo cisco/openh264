@@ -376,10 +376,10 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& sParam) {
     else if (!strcmp (pCmd, "-trace") && (i < argc))
       WelsStderrSetTraceLevel (atoi (argv[i++]));
 
-    else if (!strcmp (pCmd, "-sw") && (i < argc))
+    else if (!strcmp (pCmd, "-dw") && (i < argc))
       sParam.iPicWidth = atoi (argv[i++]);
 
-    else if (!strcmp (pCmd, "-sh") && (i < argc))
+    else if (!strcmp (pCmd, "-dh") && (i < argc))
       sParam.iPicHeight = atoi (argv[i++]);
   }
 
@@ -394,6 +394,7 @@ void PrintHelp() {
 
   printf ("\n Supported Options:\n");
   printf ("  -bf     Bit Stream File\n");
+  printf ("  -org	  Original file, example: -org src.yuv\n");
   printf ("  -frms   Number of total frames to be encoded\n");
   printf ("  -gop    GOPSize - GOP size (1,2,4,8, default: 1)\n");
   printf ("  -iper   Intra period (default: -1) : must be a power of 2 of GOP size (or -1)\n");
@@ -407,11 +408,9 @@ void PrintHelp() {
   printf ("  -tarb	  Overall target bitrate\n");
   printf ("  -numl   Number Of Layers: Must exist with layer_cfg file and the number of input layer_cfg file must equal to the value set by this command\n");
   printf ("  The options below are layer-based: (need to be set with layer id)\n");
-  printf ("  -org		(Layer) (original file); example: -org 0 src.yuv\n");
   printf ("  -drec		(Layer) (reconstruction file); Setting the reconstruction file, this will only functioning when dumping reconstruction is enabled\n");
-  printf ("  -sw		(Layer) (source width)\n");
-  printf ("  -sh		(Layer) (source height)\n");
-  printf ("  -frin		(Layer) (input frame rate)\n");
+  printf ("  -dw		(Layer) (output width)\n");
+  printf ("  -dh		(Layer) (output height)\n");
   printf ("  -frout  	(Layer) (output frame rate)\n");
   printf ("  -lqp		(Layer) (base quality layer qp : must work with -ldeltaqp or -lqparr)\n");
   printf ("  -ltarb	    (Layer) (spatial layer target bitrate)\n");
@@ -561,13 +560,13 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& pSvcParam, SFilesSet&
 #endif//ENABLE_FRAME_DUMP
     }
 
-    else if (!strcmp (pCommand, "-sw") && (n + 1 < argc)) {
+    else if (!strcmp (pCommand, "-dw") && (n + 1 < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
       SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
 	  pDLayer->iVideoWidth =  atoi (argv[n++]);
     }
 
-    else if (!strcmp (pCommand, "-sh") && (n + 1 < argc)) {
+    else if (!strcmp (pCommand, "-dh") && (n + 1 < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
       SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
       pDLayer->iVideoHeight =  atoi (argv[n++]);
