@@ -408,7 +408,7 @@ void PrintHelp() {
   printf ("  -tarb	  Overall target bitrate\n");
   printf ("  -numl   Number Of Layers: Must exist with layer_cfg file and the number of input layer_cfg file must equal to the value set by this command\n");
   printf ("  The options below are layer-based: (need to be set with layer id)\n");
-  printf ("  -drec		(Layer) (reconstruction file); Setting the reconstruction file, this will only functioning when dumping reconstruction is enabled\n");
+  printf ("  -drec		(Layer) (reconstruction file);example: -drec 0 rec.yuv.  Setting the reconstruction file, this will only functioning when dumping reconstruction is enabled\n");
   printf ("  -dw		(Layer) (output width)\n");
   printf ("  -dh		(Layer) (output height)\n");
   printf ("  -frout  	(Layer) (output frame rate)\n");
