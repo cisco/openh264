@@ -87,7 +87,7 @@ EResult DestroySpecificVpInterface (IWelsVP* pCtx) {
 
 CVpFrameWork::CVpFrameWork (uint32_t uiThreadsNum, EResult& eReturn) {
   int32_t iCoreNum = 1;
-#ifndef X86_ASM
+#if !defined(X86_ASM) && !defined(ARM_ASM)
   uint32_t uiCPUFlag = 0;
 #else
   uint32_t uiCPUFlag = WelsCPUFeatureDetect (&iCoreNum);

@@ -144,7 +144,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx) {
   pCtx->bAuReadyFlag				= 0; // au data is not ready
 
 
-#if defined(X86_ASM)
+#if defined(X86_ASM) || defined(ARM_ASM)
   pCtx->uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores);
 #endif//X86_ASM
 
