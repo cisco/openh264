@@ -383,7 +383,7 @@ void FilteringEdgeChromaIntraV (SDeblockingFilter* pFilter, uint8_t* pPixCb, uin
                           iBeta);
 
   if (iAlpha | iBeta) {
-    pFilter->pLoopf->pfChromaDeblockinEQ4Hor (pPixCb, pPixCr, iStride, iAlpha, iBeta);
+    pFilter->pLoopf->pfChromaDeblockingEQ4Hor (pPixCb, pPixCr, iStride, iAlpha, iBeta);
   }
   return;
 }
@@ -703,7 +703,7 @@ void  DeblockingInit (SDeblockingFunc*  pFunc,  int32_t iCpu) {
   pFunc->pfChromaDeblockingLT4Ver	    = DeblockChromaLt4V_c;
   pFunc->pfChromaDeblockingEQ4Ver	    = DeblockChromaEq4V_c;
   pFunc->pfChromaDeblockingLT4Hor	    = DeblockChromaLt4H_c;
-  pFunc->pfChromaDeblockinEQ4Hor	    = DeblockChromaEq4H_c;
+  pFunc->pfChromaDeblockingEQ4Hor	    = DeblockChromaEq4H_c;
 
 #ifdef X86_ASM
   if (iCpu & WELS_CPU_SSSE3) {
@@ -714,7 +714,7 @@ void  DeblockingInit (SDeblockingFunc*  pFunc,  int32_t iCpu) {
     pFunc->pfChromaDeblockingLT4Ver	= DeblockChromaLt4V_ssse3;
     pFunc->pfChromaDeblockingEQ4Ver	= DeblockChromaEq4V_ssse3;
     pFunc->pfChromaDeblockingLT4Hor	= DeblockChromaLt4H_ssse3;
-    pFunc->pfChromaDeblockinEQ4Hor	= DeblockChromaEq4H_ssse3;
+    pFunc->pfChromaDeblockingEQ4Hor	= DeblockChromaEq4H_ssse3;
   }
 #endif
 
