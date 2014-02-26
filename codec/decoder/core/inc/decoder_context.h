@@ -93,6 +93,7 @@ typedef struct TagRefPic {
   uint8_t				uiShortRefCount[LIST_A];
   uint8_t				uiLongRefCount[LIST_A];	// dependend on ref pic module
   int32_t				iMaxLongTermFrameIdx;
+  uint32_t          uiMaxNumRef; // from active sps
 } SRefPic, *PRefPic;
 
 typedef void (*PWelsMcFunc) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,

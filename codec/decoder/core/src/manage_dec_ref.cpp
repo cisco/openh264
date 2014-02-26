@@ -493,11 +493,15 @@ static int32_t AddShortTermToList (PRefPic pRefPic, PPicture pPic) {
   pPic->bUsedAsRef = true;
   pPic->bIsLongRef = false;
   pPic->iLongTermFrameIdx = -1;
-  if (pRefPic->uiShortRefCount[LIST_0] > 0)	{
+  if (pRefPic->uiShortRefCount[LIST_0] == 0) {
+    pRefPic->pShortRefList[LIST_0][0] = pPic;
+  } else if (pRefPic->uiShortRefCount[LIST_0] < pRefPic->uiMaxNumRef) {
     memmove (&pRefPic->pShortRefList[LIST_0][1], &pRefPic->pShortRefList[LIST_0][0],
              pRefPic->uiShortRefCount[LIST_0]*sizeof (PPicture));//confirmed_safe_unsafe_usage
+	pRefPic->pShortRefList[LIST_0][0] = pPic;
+  } else {
+    return ERR_INFO_REF_COUNT_OVERFLOW;
   }
-  pRefPic->pShortRefList[LIST_0][0] = pPic;
   pRefPic->uiShortRefCount[LIST_0]++;
   return ERR_NONE;
 }
@@ -510,7 +514,7 @@ static int32_t AddLongTermToList (PRefPic pRefPic, PPicture pPic, int32_t iLongT
   pPic->iLongTermFrameIdx = iLongTermFrameIdx;
   if (pRefPic->uiLongRefCount[LIST_0] == 0) {
     pRefPic->pLongRefList[LIST_0][pRefPic->uiLongRefCount[LIST_0]] = pPic;
-  } else if (pRefPic->uiLongRefCount[LIST_0] > 0) {
+  } else if (pRefPic->uiLongRefCount[LIST_0] < pRefPic->uiMaxNumRef) {
     for (i = 0; i < pRefPic->uiLongRefCount[LIST_0]; i++) {
       if (pRefPic->pLongRefList[LIST_0][i]->iLongTermFrameIdx > pPic->iLongTermFrameIdx)	{
         break;
