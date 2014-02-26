@@ -103,7 +103,7 @@ typedef struct tagDeblockingFunc {
   PChromaDeblockingLT4Func  pfChromaDeblockingLT4Ver;
   PChromaDeblockingEQ4Func  pfChromaDeblockingEQ4Ver;
   PChromaDeblockingLT4Func  pfChromaDeblockingLT4Hor;
-  PChromaDeblockingEQ4Func  pfChromaDeblockinEQ4Hor;
+  PChromaDeblockingEQ4Func  pfChromaDeblockingEQ4Hor;
 } DeblockingFunc;
 
 typedef  void (*PSetNoneZeroCountZeroFunc) (int8_t* pNonZeroCount);
