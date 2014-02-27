@@ -197,6 +197,11 @@ void CWelsH264SVCEncoder::InitEncoder (void) {
 
 /* Interfaces override from ISVCEncoder */
 
+int CWelsH264SVCEncoder::GetDefaultParams (SEncParamExt* argv) {
+  SWelsSvcCodingParam::FillDefault(*argv, true);
+  return cmResultSuccess;
+}
+
 /*
  *	SVC Encoder Initialization
  */

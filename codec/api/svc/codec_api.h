@@ -59,6 +59,8 @@ class ISVCEncoder {
   virtual int EXTAPI Initialize (const SEncParamBase* pParam) = 0;
   virtual int EXTAPI InitializeExt (const SEncParamExt* pParam) = 0;
 
+  virtual int EXTAPI GetDefaultParams (SEncParamExt* pParam) = 0;
+
   virtual int EXTAPI Uninitialize() = 0;
 
   /*
@@ -141,6 +143,8 @@ struct ISVCEncoderVtbl {
 
   int (*Initialize) (ISVCEncoder*, const SEncParamBase* pParam);
   int (*InitializeExt) (ISVCEncoder*, const SEncParamExt* pParam);
+
+  int (*GetDefaultParams) (ISVCEncoder*, SEncParamExt* pParam);
 
   int (*Uninitialize) (ISVCEncoder*);
 

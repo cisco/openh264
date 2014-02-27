@@ -137,13 +137,67 @@ TagWelsSvcCodingParam (const bool kbEnableRc = true) {
 }
 ~TagWelsSvcCodingParam()	{}
 
-void FillDefault (const bool kbEnableRc) {
-  uiGopSize			= 1;			// GOP size (at maximal frame rate: 16)
-  uiIntraPeriod		= 0;			// intra period (multiple of GOP size as desired)
-  iNumRefFrame		= MIN_REF_PIC_COUNT;	// number of reference frame used
+static void FillDefault (SEncParamExt& param, const bool kbEnableRc) {
+  memset(&param, 0, sizeof(param));
+  param.uiIntraPeriod		= 0;			// intra period (multiple of GOP size as desired)
+  param.iNumRefFrame		= MIN_REF_PIC_COUNT;	// number of reference frame used
 
-  iPicWidth	= 0;    //   actual input picture width
-  iPicHeight	= 0;	//   actual input picture height
+  param.iPicWidth	= 0;    //   actual input picture width
+  param.iPicHeight	= 0;	//   actual input picture height
+
+  param.fMaxFrameRate		= MAX_FRAME_RATE;	// maximal frame rate [Hz / fps]
+  param.iInputCsp			= videoFormatI420;	// input sequence color space in default
+  param.uiFrameToBeCoded	= (uint32_t) - 1;		// frame to be encoded (at input frame rate)
+
+  param.iTargetBitrate			= 0;	// overall target bitrate introduced in RC module
+#ifdef MT_ENABLED
+  param.iMultipleThreadIdc		= 0;	// auto to detect cpu cores inside
+#else
+  param.iMultipleThreadIdc		=
+    1;	// 1 # 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
+#endif//MT_ENABLED
+  param.iCountThreadsNum		= 1;	//		# derived from disable_multiple_slice_idc (=0 or >1) means;
+
+  param.iLTRRefNum				= 0;
+  param.iLtrMarkPeriod			= 30;	//the min distance of two int32_t references
+
+  param.bEnableSSEI					= true;
+  param.bEnableFrameCroppingFlag	= true;	// enable frame cropping flag: true alwayse in application
+  // false: Streaming Video Sharing; true: Video Conferencing Meeting;
+
+  /* Deblocking loop filter */
+  param.iLoopFilterDisableIdc		= 1;	// 0: on, 1: off, 2: on except for slice boundaries
+  param.iLoopFilterAlphaC0Offset	= 0;	// AlphaOffset: valid range [-6, 6], default 0
+  param.iLoopFilterBetaOffset		= 0;	// BetaOffset:	valid range [-6, 6], default 0
+  param.iInterLayerLoopFilterDisableIdc		= 1;	// Employed based upon inter-layer, same comment as above
+  param.iInterLayerLoopFilterAlphaC0Offset	= 0;	// InterLayerLoopFilterAlphaC0Offset
+  param.iInterLayerLoopFilterBetaOffset		= 0;	// InterLayerLoopFilterBetaOffset
+
+  /* Rate Control */
+  param.bEnableRc		= kbEnableRc;
+  param.iRCMode			= 0;
+  param.iPaddingFlag	= 0;
+
+  param.bEnableDenoise				= false;	// denoise control
+  param.bEnableSceneChangeDetect	= true;		// scene change detection control
+  param.bEnableBackgroundDetection	= true;		// background detection control
+  param.bEnableAdaptiveQuant		= true;		// adaptive quantization control
+  param.bEnableFrameSkip		= true;		// frame skipping
+  param.bEnableLongTermReference	= false;	// long term reference control
+  param.bEnableSpsPpsIdAddition	= true;		// pSps pPps id addition control
+  param.bPrefixNalAddingCtrl		= true;		// prefix NAL adding control
+  param.iSpatialLayerNum		= 1;		// number of dependency(Spatial/CGS) layers used to be encoded
+  param.iTemporalLayerNum			= 1;		// number of temporal layer specified
+
+  param.iMaxQp = 51;
+  param.iMinQp = 0;
+  param.iUsageType = 0;
+}
+
+void FillDefault (const bool kbEnableRc) {
+  FillDefault(*this, kbEnableRc);
+  uiGopSize			= 1;			// GOP size (at maximal frame rate: 16)
+
   SUsedPicRect.iLeft	=
     SUsedPicRect.iTop	=
       SUsedPicRect.iWidth	=
@@ -151,57 +205,12 @@ void FillDefault (const bool kbEnableRc) {
 
   pCurPath			= NULL; // record current lib path such as:/pData/pData/com.wels.enc/lib/
 
-  fMaxFrameRate		= MAX_FRAME_RATE;	// maximal frame rate [Hz / fps]
-  iInputCsp			= videoFormatI420;	// input sequence color space in default
-  uiFrameToBeCoded	= (uint32_t) - 1;		// frame to be encoded (at input frame rate)
-
-  iTargetBitrate			= 0;	// overall target bitrate introduced in RC module
   bDeblockingParallelFlag = false;	// deblocking filter parallelization control flag
-#ifdef MT_ENABLED
-  iMultipleThreadIdc		= 0;	// auto to detect cpu cores inside
-#else
-  iMultipleThreadIdc		=
-    1;	// 1 # 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
-#endif//MT_ENABLED
-  iCountThreadsNum		= 1;	//		# derived from disable_multiple_slice_idc (=0 or >1) means;
-
-  iLTRRefNum				= 0;
-  iLtrMarkPeriod			= 30;	//the min distance of two int32_t references
 
   bMgsT0OnlyStrategy			=
     true;	// Strategy of have MGS only at T0 frames (0: do not use this strategy; 1: use this strategy)
-  bEnableSSEI					= true;
-  bEnableFrameCroppingFlag	= true;	// enable frame cropping flag: true alwayse in application
-  // false: Streaming Video Sharing; true: Video Conferencing Meeting;
   iDecompStages				= 0;	// GOP size dependency, unknown here and be revised later
 
-  /* Deblocking loop filter */
-  iLoopFilterDisableIdc		= 1;	// 0: on, 1: off, 2: on except for slice boundaries
-  iLoopFilterAlphaC0Offset	= 0;	// AlphaOffset: valid range [-6, 6], default 0
-  iLoopFilterBetaOffset		= 0;	// BetaOffset:	valid range [-6, 6], default 0
-  iInterLayerLoopFilterDisableIdc		= 1;	// Employed based upon inter-layer, same comment as above
-  iInterLayerLoopFilterAlphaC0Offset	= 0;	// InterLayerLoopFilterAlphaC0Offset
-  iInterLayerLoopFilterBetaOffset		= 0;	// InterLayerLoopFilterBetaOffset
-
-  /* Rate Control */
-  bEnableRc		= kbEnableRc;
-  iRCMode			= 0;
-  iPaddingFlag	= 0;
-
-  bEnableDenoise				= false;	// denoise control
-  bEnableSceneChangeDetect	= true;		// scene change detection control
-  bEnableBackgroundDetection	= true;		// background detection control
-  bEnableAdaptiveQuant		= true;		// adaptive quantization control
-  bEnableFrameSkip		= true;		// frame skipping
-  bEnableLongTermReference	= false;	// long term reference control
-  bEnableSpsPpsIdAddition	= true;		// pSps pPps id addition control
-  bPrefixNalAddingCtrl		= true;		// prefix NAL adding control
-  iSpatialLayerNum		= 1;		// number of dependency(Spatial/CGS) layers used to be encoded
-  iTemporalLayerNum			= 1;		// number of temporal layer specified
-
-  iMaxQp = 51;
-  iMinQp = 0;
-  iUsageType = 0;
   memset(sDependencyLayers,0,sizeof(SDLayerParam)*MAX_DEPENDENCY_LAYER);
 
 
