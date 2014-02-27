@@ -502,9 +502,9 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& pSvcParam, SFilesSet&
           if (iLayerRd > 0) {
             if (strTag[0].empty())
               continue;
-            if (strTag[0].compare ("SourceWidth") == 0) {
+            if (strTag[0].compare ("FrameWidth") == 0) {
 				pDLayer->iVideoWidth	= atoi (strTag[1].c_str());
-            } else if (strTag[0].compare ("SourceHeight") == 0) {
+            } else if (strTag[0].compare ("FrameHeight") == 0) {
 				pDLayer->iVideoHeight	= atoi (strTag[1].c_str());
             } else if (strTag[0].compare ("FrameRateOut") == 0) {
 				pDLayer->fFrameRate = (float)atof (strTag[1].c_str());
@@ -1150,8 +1150,8 @@ void DestroySVCEncHandle (ISVCEncoder* pEncoder) {
 /****************************************************************************
  * main:
  ****************************************************************************/
-#if defined(ANDROID_NDK)
-int EncMain(int argc, char **argv)
+#if defined(ANDROID_NDK) || defined(APPLE_IOS)
+extern "C" int EncMain(int argc, char **argv)
 #else
 int main (int argc, char** argv)
 #endif

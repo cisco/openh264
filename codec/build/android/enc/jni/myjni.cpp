@@ -6,7 +6,7 @@
 #define LOG_TAG "welsdec"
 #define LOGI(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 
-extern int EncMain (int argc, char* argv[]);
+extern "C" int EncMain (int argc, char* argv[]);
 extern "C"
 JNIEXPORT void JNICALL Java_com_wels_enc_WelsEncTest_DoEncoderTest
 (JNIEnv* env, jobject thiz, jstring jsFileNameIn) {
