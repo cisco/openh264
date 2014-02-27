@@ -45,14 +45,12 @@ extern int EncMain(int argc, char **argv);
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
     statusText_.text = @"Status: Ready for Go";
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 - (IBAction) buttonPressed:(id)sender
