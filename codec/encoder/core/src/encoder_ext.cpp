@@ -1948,7 +1948,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   int32_t	iRet					= 0;
   uint32_t uiCpuFeatureFlags		= 0;	// CPU features
   int32_t uiCpuCores				=
-    1;	// number of logic processors on physical processor package, one logic processor means HTT not supported
+    0;	// number of logic processors on physical processor package, zero logic processors means HTT not supported
   int32_t iCacheLineSize			= 16;	// on chip cache line size in byte
   int16_t iSliceNum				= 1;	// number of slices used
 
@@ -1986,8 +1986,8 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   if (pCodingParam->iMultipleThreadIdc > 0)
     uiCpuCores = pCodingParam->iMultipleThreadIdc;
   else {
-    if (uiCpuFeatureFlags ==
-        0)	// cpuid not supported, use high level system API as followed to detect number of pysical/logic processor
+    if (uiCpuCores ==
+        0)	// cpuid not supported or doesn't expose the number of cores, use high level system API as followed to detect number of pysical/logic processor
       uiCpuCores = DynamicDetectCpuCores();
     // So far so many cpu cores up to MAX_THREADS_NUM mean for server platforms,
     // for client application here it is constrained by maximal to MAX_THREADS_NUM
