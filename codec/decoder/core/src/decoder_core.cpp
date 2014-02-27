@@ -101,10 +101,8 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   return 0;
 }
 
-inline bool    CheckSliceNeedReconstruct (int16_t iCurDid, int16_t iCurQid, bool bStoreRefBasePicFlag,
-    uint8_t uiDidMax, uint8_t uiLayerDqId, uint8_t uiTargetDqId) {
-  return ((iCurDid == uiDidMax) && (iCurQid == BASE_QUALITY_ID) && (bStoreRefBasePicFlag))   // store base
-         || (uiLayerDqId == uiTargetDqId); // target layer
+inline bool    CheckSliceNeedReconstruct (uint8_t uiLayerDqId, uint8_t uiTargetDqId) {
+  return (uiLayerDqId == uiTargetDqId); // target layer
 }
 
 inline uint8_t GetTargetDqId (uint8_t uiTargetDqId,  SDecodingParam* psParam) {
@@ -1863,8 +1861,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
       pSh		= &pNalCur->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
       pShExt	= &pNalCur->sNalData.sVclNal.sSliceHeaderExt;
 
-      bReconstructSlice = CheckSliceNeedReconstruct (iCurrIdD, iCurrIdQ, pShExt->bStoreRefBasePicFlag,
-                          kuiDependencyIdMax, pNalCur->sNalHeaderExt.uiLayerDqId, kuiTargetLayerDqId);
+      bReconstructSlice = CheckSliceNeedReconstruct (pNalCur->sNalHeaderExt.uiLayerDqId, kuiTargetLayerDqId);
 
       memcpy (&pLayerInfo.sNalHeaderExt, &pNalCur->sNalHeaderExt, sizeof (SNalUnitHeaderExt)); //confirmed_safe_unsafe_usage
 
@@ -1995,25 +1992,15 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
 #endif
 
       }
-      if ((uiNalRefIdc > 0) && (iCurrIdQ || (!dq_cur->bStoreRefBasePicFlag))) {
-        WelsMarkAsRef (pCtx, false);
-        ExpandReferencingPicture (pCtx->pDec, pCtx->sExpandPicFunc.pExpandLumaPicture,
-                                  pCtx->sExpandPicFunc.pExpandChromaPicture);
-        pCtx->pDec = NULL;
-      }
-    }
-
-    if ((iCurrIdD == kuiDependencyIdMax) && (iCurrIdQ == BASE_QUALITY_ID) && (dq_cur->bStoreRefBasePicFlag)) {
-      pStoreBasePic = pCtx->pDec;
-
       if (uiNalRefIdc > 0) {
-        WelsMarkAsRef (pCtx, true);
+        WelsMarkAsRef (pCtx);
         ExpandReferencingPicture (pCtx->pDec, pCtx->sExpandPicFunc.pExpandLumaPicture,
                                   pCtx->sExpandPicFunc.pExpandChromaPicture);
         pCtx->pDec = NULL;
       }
     }
-    // need update frame_num due current frame is well decoded
+
+   // need update frame_num due current frame is well decoded
     pCtx->iPrevFrameNum	= pSh->iFrameNum;
     if (pCtx->bLastHasMmco5)
       pCtx->iPrevFrameNum = 0;

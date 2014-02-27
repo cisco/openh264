@@ -47,16 +47,10 @@
 
 namespace WelsDec {
 
-typedef enum TagRemoveFlag {
-REMOVE_TARGET = 0,
-REMOVE_BASE = 1,
-REMOVE_BASE_FIRST = 2
-} ERemoveFlag;
-
 void  WelsResetRefPic (PWelsDecoderContext pCtx);
 int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc);
 int32_t WelsReorderRefList (PWelsDecoderContext pCtx);
-int32_t WelsMarkAsRef (PWelsDecoderContext pCtx, const bool kbRefBaseMarkingFlag);
+int32_t WelsMarkAsRef (PWelsDecoderContext pCtx);
 
 } // namespace WelsDec
 
