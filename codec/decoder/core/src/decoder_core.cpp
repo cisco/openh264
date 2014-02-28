@@ -1993,7 +1993,11 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
 
       }
       if (uiNalRefIdc > 0) {
-        WelsMarkAsRef (pCtx);
+        iRet = WelsMarkAsRef (pCtx);
+        if (iRet != ERR_NONE) {
+          pCtx->pDec = NULL;
+          return iRet;
+        }
         ExpandReferencingPicture (pCtx->pDec, pCtx->sExpandPicFunc.pExpandLumaPicture,
                                   pCtx->sExpandPicFunc.pExpandChromaPicture);
         pCtx->pDec = NULL;
