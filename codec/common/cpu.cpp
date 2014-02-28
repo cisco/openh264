@@ -38,6 +38,7 @@
  *************************************************************************************
  */
 #include <string.h>
+#include <stdio.h>
 
 #include "cpu.h"
 #include "cpu_core.h"
@@ -209,4 +210,34 @@ void WelsXmmRegEmptyOp(void * pSrc) {
 
 #endif
 
+#if defined(ARM_ASM)
+
+uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
+#ifdef __linux__
+  FILE *f = fopen("/proc/cpuinfo", "r");
+
+  if (!f)
+    return 0;
+
+  char buf[200];
+  int flags = 0;
+  while (fgets(buf, sizeof(buf), f)) {
+    if (!strncmp(buf, "Features", strlen("Features"))) {
+      if (strstr(buf, " neon "))
+        flags |= WELS_CPU_NEON;
+      break;
+    }
+  }
+  fclose(f);
+  return flags;
+
+#else /* !defined(__linux__) */
+#ifdef HAVE_NEON
+  return WELS_CPU_NEON;
+#else
+  return 0;
+#endif
+#endif /* !defined(__linux__) */
+}
+#endif
 

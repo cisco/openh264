@@ -76,6 +76,10 @@ void     WelsXmmRegLoad(void * src);
 
 #endif
 
+#if defined(ARM_ASM)
+uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors);
+#endif
+
 void     WelsXmmRegEmptyOp(void * pSrc);
 
 #if defined(__cplusplus)
