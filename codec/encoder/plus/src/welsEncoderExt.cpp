@@ -506,7 +506,7 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
   }
 
   int32_t uiFrameType = videoFrameTypeInvalid;
-  uiFrameType = EncodeFrame2 (&kpSrcPic, 1, pBsInfo);
+  uiFrameType = EncodeFrameInternal(kpSrcPic, pBsInfo);
 
 #ifdef REC_FRAME_COUNT
   ++ m_uiCountFrameNum;
@@ -522,15 +522,15 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
 }
 
 
-int CWelsH264SVCEncoder::EncodeFrame2 (const SSourcePicture**   pSrcPicList, int nSrcPicNum, SFrameBSInfo* pBsInfo) {
-  if (!(pSrcPicList && m_pEncContext && m_bInitialFlag) || (nSrcPicNum<=0) ){
+int CWelsH264SVCEncoder::EncodeFrameInternal(const SSourcePicture*  pSrcPic, SFrameBSInfo* pBsInfo) {
+  if (!(pSrcPic && m_pEncContext && m_bInitialFlag) ){
     return videoFrameTypeInvalid;
   }
 
   int32_t iFrameTypeReturned = 0;
   int32_t iFrameType = videoFrameTypeInvalid;
   XMMREG_PROTECT_STORE(CWelsH264SVCEncoder);
-  const int32_t kiEncoderReturn = WelsEncoderEncodeExt (m_pEncContext, pBsInfo, pSrcPicList, nSrcPicNum);
+  const int32_t kiEncoderReturn = WelsEncoderEncodeExt (m_pEncContext, pBsInfo, &pSrcPic, 1);
   XMMREG_PROTECT_LOAD(CWelsH264SVCEncoder);
 
   switch (kiEncoderReturn) {
@@ -635,10 +635,10 @@ int CWelsH264SVCEncoder::PauseFrame (const SSourcePicture* kpSrcPic, SFrameBSInf
 
   ForceIntraFrame (true);
 
-  if (EncodeFrame2 (&kpSrcPic, 1,pBsInfo) != videoFrameTypeInvalid) {
+  if (EncodeFrameInternal (kpSrcPic, pBsInfo) != videoFrameTypeInvalid) {
 	iReturn = 0;
   }
- 
+
 
   // to avoid pause frame bitstream and
   // normal bitstream use different video channel.
