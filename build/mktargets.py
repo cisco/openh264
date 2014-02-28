@@ -113,11 +113,13 @@ if len(cfiles) > 0:
 
 if len(asm) > 0:
     f.write("ifeq ($(USE_ASM), Yes)\n")
+    f.write("ifeq ($(ASM_ARCH), x86)\n")
     f.write("%s_ASM_SRCS=\\\n"%(PREFIX))
     for c in asm:
         f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
     f.write("\n")
     f.write("%s_OBJS += $(%s_ASM_SRCS:.asm=.o)\n"%(PREFIX, PREFIX))
+    f.write("endif\n")
     f.write("endif\n\n")
 
 f.write("OBJS += $(%s_OBJS)\n"%PREFIX)

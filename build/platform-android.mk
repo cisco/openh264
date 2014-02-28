@@ -1,4 +1,3 @@
-USE_ASM = No
 ARCH = arm
 SHAREDLIBSUFFIX = so
 GCCVERSION = 4.8
@@ -9,23 +8,22 @@ ifeq ($(ARCH), arm)
     GCCPATHPREFIX = arm-linux-androideabi
     GCCPREFIX = arm-linux-androideabi
     CFLAGS += -march=armv7-a -mfloat-abi=softfp
-ifeq (Yes, $(HAVE_NEON))
+  ifeq (Yes, $(HAVE_NEON))
     CFLAGS += -mfpu=neon
-else
+  else
     CFLAGS += -mfpu=vfpv3-d16
-endif
+  endif
     LDFLAGS += -march=armv7-a -Wl,--fix-cortex-a8
     APP_ABI = armeabi-v7a
 else
     GCCPATHPREFIX = x86
     GCCPREFIX = i686-linux-android
     APP_ABI = x86
-    USE_ASM = Yes
-ifeq (Yes, $(USE_ASM))
-    ASM = nasm
+  ifeq (Yes, $(USE_ASM))
+    ASM_ARCH = x86
     CFLAGS += -DX86_ASM
     ASMFLAGS += -DNOPREFIX -f elf32 -DX86_32
-endif
+  endif
 endif
 
 ifndef NDKROOT

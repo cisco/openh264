@@ -26,12 +26,14 @@ DECODER_CPP_SRCS=\
 DECODER_OBJS += $(DECODER_CPP_SRCS:.cpp=.o)
 
 ifeq ($(USE_ASM), Yes)
+ifeq ($(ASM_ARCH), x86)
 DECODER_ASM_SRCS=\
 	$(DECODER_SRCDIR)/core/asm/block_add.asm\
 	$(DECODER_SRCDIR)/core/asm/dct.asm\
 	$(DECODER_SRCDIR)/core/asm/intra_pred.asm\
 
 DECODER_OBJS += $(DECODER_ASM_SRCS:.asm=.o)
+endif
 endif
 
 OBJS += $(DECODER_OBJS)

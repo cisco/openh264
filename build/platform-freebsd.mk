@@ -1,5 +1,4 @@
-include build/platform-x86-common.mk
-ASM = nasm
+include build/platform-arch.mk
 SHAREDLIBSUFFIX = so
 CFLAGS += -fPIC -DMT_ENABLED
 LDFLAGS += -lpthread
