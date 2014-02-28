@@ -1148,6 +1148,12 @@ void WelsBlockFuncInit (SBlockFunc*   pFunc,  int32_t iCpu) {
     pFunc->pWelsBlockZero8x8Func	    = WelsResBlockZero8x8_sse2;
   }
 #endif
+
+#ifdef	HAVE_NEON
+  pFunc->pWelsBlockZero16x16Func		= WelsResBlockZero16x16_neon;
+  pFunc->pWelsBlockZero8x8Func			= WelsResBlockZero8x8_neon;
+  pFunc->pWelsSetNonZeroCountFunc			= SetNonZeroCount_neon;
+#endif
 }
 void WelsBlockZero16x16_c (int16_t* pBlock, int32_t iStride) {
   WelsBlockInit (pBlock, 16, 16, iStride, 0);

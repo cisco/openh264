@@ -636,7 +636,7 @@ void McLuma_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_
 void McChroma_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                       int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
   static const PMcChromaWidthExtFunc kpMcChromaWidthFuncs[2] = {
-    McChromaWidthEq4_mmx,
+				McChromaWidthEq4_mmx,
     McChromaWidthEq8_sse2
   };
   const int32_t kiD8x = iMvX & 0x07;
@@ -651,17 +651,334 @@ void McChroma_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int3
     McChromaWithFragMv_c (pSrc, iSrcStride, pDst, iDstStride, iMvX, iMvY, iWidth, iHeight);
 }
 
-
 #endif //X86_ASM
-
+//***************************************************************************//
+//                       NEON implementation                      //
+//***************************************************************************//
+#if defined(HAVE_NEON)
+void McCopy_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+																						int32_t iWidth, int32_t iHeight)
+{
+  if (16 == iWidth)
+				McCopyWidthEq16_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+		else if(8 == iWidth)
+				McCopyWidthEq8_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+		else
+				McCopyWidthEq4_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+		}
+void McHorVer20_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+																				int32_t iWidth, int32_t iHeight)
+{
+		if (iWidth == 16)
+				McHorVer20WidthEq16_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+		else if (iWidth == 8)
+				McHorVer20WidthEq8_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+		else if (iWidth == 4)
+				McHorVer20WidthEq4_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+}
+void McHorVer02_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+																				int32_t iWidth, int32_t iHeight)
+{
+		if (iWidth == 16)
+				McHorVer02WidthEq16_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+		else if (iWidth == 8)
+				McHorVer02WidthEq8_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+		else if (iWidth == 4)
+				McHorVer02WidthEq4_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+}
+void McHorVer22_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+																				int32_t iWidth, int32_t iHeight)
+{
+		if (iWidth == 16)
+				McHorVer22WidthEq16_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+		else if (iWidth == 8)
+				McHorVer22WidthEq8_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+		else if (iWidth == 4)
+				McHorVer22WidthEq4_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+}
+		
+void McHorVer01_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+																							int32_t iWidth, int32_t iHeight)
+{
+  if (iWidth == 16)
+				McHorVer01WidthEq16_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  else if (iWidth == 8)
+				McHorVer01WidthEq8_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  else if (iWidth == 4)
+				McHorVer01WidthEq4_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+}
+void McHorVer03_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+																							int32_t iWidth, int32_t iHeight)
+{
+  if (iWidth == 16)
+				McHorVer03WidthEq16_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+		else if (iWidth == 8)
+				McHorVer03WidthEq8_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+		else if (iWidth == 4)
+				McHorVer03WidthEq4_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+}
+void McHorVer10_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+																							int32_t iWidth, int32_t iHeight)
+{
+  if (iWidth == 16)
+				McHorVer10WidthEq16_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+		else if (iWidth == 8)
+				McHorVer10WidthEq8_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+		else if (iWidth == 4)
+				McHorVer10WidthEq4_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+}
+void McHorVer11_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+																							int32_t iWidth, int32_t iHeight)
+{
+  ENFORCE_STACK_ALIGN_1D( uint8_t, pHorTmp, 256, 16 );
+  ENFORCE_STACK_ALIGN_1D( uint8_t, pVerTmp, 256, 16 );
+  if (iWidth == 16)
+		{
+				McHorVer20WidthEq16_neon(pSrc, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer02WidthEq16_neon(pSrc, iSrcStride, pVerTmp, 16, iHeight);
+				PixelAvgWidthEq16_neon(pDst, iDstStride, pHorTmp, pVerTmp, iHeight);
+		}
+		else if (iWidth == 8)
+		{
+				McHorVer20WidthEq8_neon(pSrc, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer02WidthEq8_neon(pSrc, iSrcStride, pVerTmp, 16, iHeight);
+				PixelAvgWidthEq8_neon(pDst, iDstStride, pHorTmp, pVerTmp, iHeight);
+  }
+		else if (iWidth == 4)
+		{
+				McHorVer20WidthEq4_neon(pSrc, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer02WidthEq4_neon(pSrc, iSrcStride, pVerTmp, 16, iHeight);
+				PixelAvgWidthEq4_neon(pDst, iDstStride, pHorTmp, pVerTmp, iHeight);
+		}
+}
+void McHorVer12_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+																							int32_t iWidth, int32_t iHeight)
+{
+  ENFORCE_STACK_ALIGN_1D( uint8_t, pVerTmp, 256, 16 );
+  ENFORCE_STACK_ALIGN_1D( uint8_t, pCtrTmp, 256, 16 );
+  if (iWidth == 16)
+		{
+				McHorVer02WidthEq16_neon(pSrc, iSrcStride, pVerTmp, 16, iHeight);
+				McHorVer22WidthEq16_neon(pSrc, iSrcStride, pCtrTmp, 16, iHeight);
+				PixelAvgWidthEq16_neon(pDst, iDstStride, pVerTmp, pCtrTmp, iHeight);
+  }
+		else if (iWidth == 8)
+		{
+				McHorVer02WidthEq8_neon(pSrc, iSrcStride, pVerTmp, 16, iHeight);
+				McHorVer22WidthEq8_neon(pSrc, iSrcStride, pCtrTmp, 16, iHeight);
+				PixelAvgWidthEq8_neon(pDst, iDstStride, pVerTmp, pCtrTmp, iHeight);
+  }
+		else if (iWidth == 4)
+		{
+				McHorVer02WidthEq4_neon(pSrc, iSrcStride, pVerTmp, 16, iHeight);
+				McHorVer22WidthEq4_neon(pSrc, iSrcStride, pCtrTmp, 16, iHeight);
+				PixelAvgWidthEq4_neon(pDst, iDstStride, pVerTmp, pCtrTmp, iHeight);
+  }
+}
+void McHorVer13_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+																							int32_t iWidth, int32_t iHeight)
+{
+  ENFORCE_STACK_ALIGN_1D( uint8_t, pHorTmp, 256, 16 );
+  ENFORCE_STACK_ALIGN_1D( uint8_t, pVerTmp, 256, 16 );
+  if (iWidth == 16)
+  {
+				McHorVer20WidthEq16_neon(pSrc+iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer02WidthEq16_neon(pSrc, iSrcStride, pVerTmp, 16, iHeight);
+				PixelAvgWidthEq16_neon(pDst, iDstStride, pHorTmp, pVerTmp, iHeight);
+		}
+		else if (iWidth == 8)
+		{
+				McHorVer20WidthEq8_neon(pSrc+iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer02WidthEq8_neon(pSrc, iSrcStride, pVerTmp, 16, iHeight);
+				PixelAvgWidthEq8_neon(pDst, iDstStride, pHorTmp, pVerTmp, iHeight);
+		}
+		else if (iWidth == 4)
+		{
+				McHorVer20WidthEq4_neon(pSrc+iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer02WidthEq4_neon(pSrc, iSrcStride, pVerTmp, 16, iHeight);
+				PixelAvgWidthEq4_neon(pDst, iDstStride, pHorTmp, pVerTmp, iHeight);
+		}
+}
+void McHorVer21_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+																							int32_t iWidth, int32_t iHeight)
+{
+  ENFORCE_STACK_ALIGN_1D( uint8_t, pHorTmp, 256, 16 );
+  ENFORCE_STACK_ALIGN_1D( uint8_t, pCtrTmp, 256, 16 );
+  if (iWidth == 16)
+		{
+				McHorVer20WidthEq16_neon(pSrc, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer22WidthEq16_neon(pSrc, iSrcStride, pCtrTmp, 16, iHeight);
+				PixelAvgWidthEq16_neon(pDst, iDstStride, pHorTmp, pCtrTmp, iHeight);
+		}
+		else if (iWidth == 8)
+		{
+				McHorVer20WidthEq8_neon(pSrc, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer22WidthEq8_neon(pSrc, iSrcStride, pCtrTmp, 16, iHeight);
+				PixelAvgWidthEq8_neon(pDst, iDstStride, pHorTmp, pCtrTmp, iHeight);
+		}
+		else if (iWidth == 4)
+		{
+				McHorVer20WidthEq4_neon(pSrc, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer22WidthEq4_neon(pSrc, iSrcStride, pCtrTmp, 16, iHeight);
+				PixelAvgWidthEq4_neon(pDst, iDstStride, pHorTmp, pCtrTmp, iHeight);
+		}
+}
+void McHorVer23_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+																							int32_t iWidth, int32_t iHeight)
+{
+  ENFORCE_STACK_ALIGN_1D( uint8_t, pHorTmp, 256, 16 );
+  ENFORCE_STACK_ALIGN_1D( uint8_t, pCtrTmp, 256, 16 );
+  if (iWidth == 16)
+		{
+				McHorVer20WidthEq16_neon(pSrc+iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer22WidthEq16_neon(pSrc, iSrcStride, pCtrTmp, 16, iHeight);
+				PixelAvgWidthEq16_neon(pDst, iDstStride, pHorTmp, pCtrTmp, iHeight);
+		}
+  else if (iWidth == 8)
+		{
+				McHorVer20WidthEq8_neon(pSrc+iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer22WidthEq8_neon(pSrc, iSrcStride, pCtrTmp, 16, iHeight);
+				PixelAvgWidthEq8_neon(pDst, iDstStride, pHorTmp, pCtrTmp, iHeight);
+		}
+		else if (iWidth == 4)
+		{
+				McHorVer20WidthEq4_neon(pSrc+iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer22WidthEq4_neon(pSrc, iSrcStride, pCtrTmp, 16, iHeight);
+				PixelAvgWidthEq4_neon(pDst, iDstStride, pHorTmp, pCtrTmp, iHeight);
+		}
+}
+void McHorVer30_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+																							int32_t iWidth, int32_t iHeight)
+{
+  if (iWidth == 16)
+				McHorVer30WidthEq16_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+		else if (iWidth == 8)
+				McHorVer30WidthEq8_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+		else if (iWidth == 4)
+				McHorVer30WidthEq4_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+}
+void McHorVer31_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+																							int32_t iWidth, int32_t iHeight)
+{
+  ENFORCE_STACK_ALIGN_1D( uint8_t, pHorTmp, 256, 16 );
+  ENFORCE_STACK_ALIGN_1D( uint8_t, pVerTmp, 256, 16 );
+  if (iWidth == 16) {
+				McHorVer20WidthEq16_neon(pSrc, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer02WidthEq16_neon(pSrc+1, iSrcStride, pVerTmp, 16, iHeight);
+				PixelAvgWidthEq16_neon(pDst, iDstStride, pHorTmp, pVerTmp, iHeight);
+		}
+		else if (iWidth == 8){
+				McHorVer20WidthEq8_neon(pSrc, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer02WidthEq8_neon(pSrc+1, iSrcStride, pVerTmp, 16, iHeight);
+				PixelAvgWidthEq8_neon(pDst, iDstStride, pHorTmp, pVerTmp, iHeight);
+		}
+		else if (iWidth == 4)
+		{
+				McHorVer20WidthEq4_neon(pSrc, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer02WidthEq4_neon(pSrc+1, iSrcStride, pVerTmp, 16, iHeight);
+				PixelAvgWidthEq4_neon(pDst, iDstStride, pHorTmp, pVerTmp, iHeight);
+		}
+}
+void McHorVer32_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+																							int32_t iWidth, int32_t iHeight)
+{
+  ENFORCE_STACK_ALIGN_1D( uint8_t, pVerTmp, 256, 16 );
+  ENFORCE_STACK_ALIGN_1D( uint8_t, pCtrTmp, 256, 16 );
+  if (iWidth == 16)
+		{
+				McHorVer02WidthEq16_neon(pSrc+1, iSrcStride, pVerTmp, 16, iHeight);
+				McHorVer22WidthEq16_neon(pSrc, iSrcStride, pCtrTmp, 16, iHeight);
+				PixelAvgWidthEq16_neon(pDst, iDstStride, pVerTmp, pCtrTmp, iHeight);
+		}
+		else if (iWidth == 8)
+		{
+				McHorVer02WidthEq8_neon(pSrc+1, iSrcStride, pVerTmp, 16, iHeight);
+				McHorVer22WidthEq8_neon(pSrc, iSrcStride, pCtrTmp, 16, iHeight);
+				PixelAvgWidthEq8_neon(pDst, iDstStride, pVerTmp, pCtrTmp, iHeight);
+		}
+		else if (iWidth == 4)
+		{
+				McHorVer02WidthEq4_neon(pSrc+1, iSrcStride, pVerTmp, 16, iHeight);
+				McHorVer22WidthEq4_neon(pSrc, iSrcStride, pCtrTmp, 16, iHeight);
+				PixelAvgWidthEq4_neon(pDst, iDstStride, pVerTmp, pCtrTmp, iHeight);
+		}
+}
+void McHorVer33_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+																							int32_t iWidth, int32_t iHeight)
+{
+  ENFORCE_STACK_ALIGN_1D( uint8_t, pHorTmp, 256, 16 );
+  ENFORCE_STACK_ALIGN_1D( uint8_t, pVerTmp, 256, 16 );
+  if (iWidth == 16)
+		{
+				McHorVer20WidthEq16_neon(pSrc+iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer02WidthEq16_neon(pSrc+1, iSrcStride, pVerTmp, 16, iHeight);
+				PixelAvgWidthEq16_neon(pDst, iDstStride, pHorTmp, pVerTmp, iHeight);
+		}
+		else if (iWidth == 8)
+		{
+				McHorVer20WidthEq8_neon(pSrc+iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer02WidthEq8_neon(pSrc+1, iSrcStride, pVerTmp, 16, iHeight);
+				PixelAvgWidthEq8_neon(pDst, iDstStride, pHorTmp, pVerTmp, iHeight);
+		}
+		else if (iWidth == 4)
+		{
+				McHorVer20WidthEq4_neon(pSrc+iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+				McHorVer02WidthEq4_neon(pSrc+1, iSrcStride, pVerTmp, 16, iHeight);
+				PixelAvgWidthEq4_neon(pDst, iDstStride, pHorTmp, pVerTmp, iHeight);
+		}
+}
+		
+void McLuma_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+											int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight)
+{
+  static PWelsMcWidthHeightFunc pWelsMcFunc[4][4] =  //[x][y]
+  {
+				{McCopy_neon,  McHorVer01_neon, McHorVer02_neon,    McHorVer03_neon},
+				{McHorVer10_neon, McHorVer11_neon, McHorVer12_neon, McHorVer13_neon},
+				{McHorVer20_neon,    McHorVer21_neon, McHorVer22_neon,    McHorVer23_neon},
+				{McHorVer30_neon, McHorVer31_neon, McHorVer32_neon, McHorVer33_neon},
+		};
+  //	pSrc += (iMvY >> 2) * iSrcStride + (iMvX >> 2);
+  pWelsMcFunc[iMvX&0x03][iMvY&0x03](pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
+}
+void McChroma_neon(const uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst, int32_t iDstStride,
+												int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight)
+{
+  if (0 == iMvX && 0 == iMvY)
+		{
+				if(8 == iWidth)
+				  McCopyWidthEq8_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+				else if(iWidth == 4)
+				  McCopyWidthEq4_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+				else //here iWidth == 2
+				  McCopyWidthEq2_c(pSrc,iSrcStride,pDst,iDstStride,iHeight);
+		}
+		else
+		{
+				const int32_t kiD8x = iMvX & 0x07;
+				const int32_t kiD8y = iMvY & 0x07;
+				if(8 == iWidth)
+				  McChromaWidthEq8_neon(pSrc, iSrcStride, pDst, iDstStride, (int32_t*)(g_kuiABCD[kiD8y][kiD8x]), iHeight);
+				else if(4 == iWidth)
+				  McChromaWidthEq4_neon(pSrc, iSrcStride, pDst, iDstStride, (int32_t*)(g_kuiABCD[kiD8y][kiD8x]), iHeight);
+				else //here iWidth == 2
+				  McChromaWithFragMv_c(pSrc, iSrcStride, pDst, iDstStride, iMvX, iMvY, iWidth, iHeight);
+		}
+}
+#endif
 void InitMcFunc (SMcFunc* pMcFunc, int32_t iCpu) {
   pMcFunc->pMcLumaFunc   = McLuma_c;
   pMcFunc->pMcChromaFunc = McChroma_c;
 
+#ifdef	HAVE_NEON
+	 pMcFunc->pMcLumaFunc	  = McLuma_neon;
+	 pMcFunc->pMcChromaFunc  = McChroma_neon;
+#endif
+
 #if defined (X86_ASM)
   if (iCpu & WELS_CPU_SSE2) {
-    pMcFunc->pMcLumaFunc   = McLuma_sse2;
-    pMcFunc->pMcChromaFunc = McChroma_sse2;
+  pMcFunc->pMcLumaFunc   = McLuma_sse2;
+  pMcFunc->pMcChromaFunc = McChroma_sse2;
   }
 #endif //(X86_ASM)
 }

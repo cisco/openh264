@@ -39,6 +39,7 @@
  */
 
 #include "deblocking.h"
+#include "deblocking_common.h"
 #include "cpu_core.h"
 
 namespace WelsDec {
@@ -718,6 +719,19 @@ void  DeblockingInit (SDeblockingFunc*  pFunc,  int32_t iCpu) {
   }
 #endif
 
+#if defined(HAVE_NEON)
+	{
+		pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_neon;
+		pFunc->pfLumaDeblockingEQ4Ver		= DeblockLumaEq4V_neon;
+		pFunc->pfLumaDeblockingLT4Hor		= DeblockLumaLt4H_neon;
+		pFunc->pfLumaDeblockingEQ4Hor		= DeblockLumaEq4H_neon;
+		
+		pFunc->pfChromaDeblockingLT4Ver     = DeblockChromaLt4V_neon;
+		pFunc->pfChromaDeblockingEQ4Ver     = DeblockChromaEq4V_neon;
+		pFunc->pfChromaDeblockingLT4Hor     = DeblockChromaLt4H_neon;
+		pFunc->pfChromaDeblockinEQ4Hor      = DeblockChromaEq4H_neon;
+	}
+#endif
 }
 
 } // namespace WelsDec

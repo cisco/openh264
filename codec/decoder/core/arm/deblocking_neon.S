@@ -1,0 +1,1341 @@
+/*!
+ * \copy
+ *     Copyright (c)  2013, Cisco Systems
+ *     All rights reserved.
+ *
+ *     Redistribution and use in source and binary forms, with or without
+ *     modification, are permitted provided that the following conditions
+ *     are met:
+ *
+ *        * Redistributions of source code must retain the above copyright
+ *          notice, this list of conditions and the following disclaimer.
+ *
+ *        * Redistributions in binary form must reproduce the above copyright
+ *          notice, this list of conditions and the following disclaimer in
+ *          the documentation and/or other materials provided with the
+ *          distribution.
+ *
+ *     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *     FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *     COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *     INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *     BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *     CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *     POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+ 
+#ifdef HAVE_NEON
+.text
+
+#include "arm_arch_common_macro.S"
+
+#ifdef APPLE_IOS
+.macro	JMP_IF_128BITS_IS_ZERO
+//	{
+		vorr.s16	$2, $0, $1
+		vmov		r3, r2, $2
+		orr			r3, r3, r2
+		cmp			r3, #0
+//	}
+.endm
+
+//	if( abs( p0 - q0 ) < alpha && abs( p1 - p0 ) < beta && abs( q1 - q0 ) < beta )	
+.macro	MASK_MATRIX
+//	{	input: p1, p0, q0, q1, alpha(be modified), beta; output: mask
+		vabd.u8	$6, $1, $2		// abs( p0 - q0 )
+		vcgt.u8	$6, $4, $6		//	mask = abs( p0 - q0 ) < alpha
+	
+		vabd.u8	$4, $0, $1		// abs( p1 - p0 )
+		vclt.u8	$4, $4, $5		//	abs( p1 - p0 ) < beta
+		vand.u8	$6, $6, $4		//	2nd mask &		
+	
+		vabd.u8	$4, $3, $2		// abs( q1 - q0 )		
+		vclt.u8	$4, $4, $5		//	abs( q1 - q0 ) < beta
+		vand.u8	$6, $6, $4		//	3rd mask &
+//	}
+.endm
+
+//if( abs( p2 - p0 ) < beta )
+//{
+//	pix[-2*xstride] = p1 + x264_clip3( (( p2 + ((p0 + q0 + 1)>> 1)) >> 1) - p1, -tc0[i], tc0[i] );
+//	tc++;
+//}
+.macro	DIFF_LUMA_LT4_P1_Q1
+//	{	input: p2, p1, p0, q0, beta, -tc0[i], tc0[i], mask_matrx; output: _clip3(p1'), tc++;
+		vabd.u8	$9, $0, $2				//	abs( p2 - p0 )
+		vclt.u8	$9, $9, $4				//	abs( p2 - p0 ) < beta
+		vrhadd.u8	$8, $2, $3				//	((p0 + q0 + 1)>> 1)	
+		vhadd.u8	$8, $0, $8				//	(( p2 + ((p0 + q0 + 1)>> 1)) >> 1)
+		vsub.s8	$8, $8, $1				//	(( p2 + ((p0 + q0 + 1)>> 1)) >> 1) - p1
+		vmax.s8	$8, $8, $5				// >= -tc0[i]
+		vmin.s8	$8, $8, $6				// <= tc0[i]
+		vand.s8	$8, $8, $9				// mask, only [abs( p2 - p0 ) < beta] avail _clip3
+		vand.s8	$8, $8, $7
+		vadd.u8	$8, $1, $8
+		vabs.s8	$9, $9					// if( abs( p2 - p0 ) < beta ) tc++;
+//	}
+.endm
+
+//delta = x264_clip3( (((q0 - p0 ) << 2) + (p1 - q1) + 4) >> 3,-tc, tc );
+.macro	DIFF_LUMA_LT4_P0_Q0
+//	{	input: p1, p0, q0, q1; output: _clip3(p0'); working q12,q13
+		vsubl.u8	$5, $0, $3			// (p1 - q1)
+		vsubl.u8	$6, $2, $1			// (q0 - p0)
+		vshl.s16	$6, $6, #2
+		vadd.s16	$5, $5, $6			// (p1 - q1) += ( q0 - p0 )	<<2
+		vrshrn.s16		$4, $5, #3
+//	}
+.endm
+
+//if( abs( p2 - p0 ) < beta ) /* p0', p1', p2' */
+//{
+//		const int p3 = pix[-4*xstride];
+//		pix[-1*xstride] = ( p2 + 2*p1 + 2*p0 + 2*q0 + q1 + 4 ) >> 3;
+//		pix[-2*xstride] = ( p2 + p1 + p0 + q0 + 2 ) >> 2;
+//		pix[-3*xstride] = ( 2*p3 + 3*p2 + p1 + p0 + q0 + 4 ) >> 3;
+//}
+//else /* p0' */
+//		pix[-1*xstride] = ( 2*p1 + p0 + q1 + 2 ) >> 2;
+.macro	DIFF_LUMA_EQ4_P2P1P0
+//	{	input: p3(output p1'), p2, p1, p0, q0, q1, select_matrix(output p0'), output p2'; 
+//		workin q4~q5; after filtered then p3/p2 useless!
+		vaddl.u8	q4, $1, $2			// (p2 + p1)
+		vaddl.u8	q5, $3, $4			// (p0 + q0)		
+		vadd.u16	q5, q4, q5			// p1'=(p2 + p1)+(p0 + q0)
+		
+		vaddl.u8	q4, $0, $1			// (p3 + p2)		
+		vshl.u16	q4, q4, #1
+		vadd.u16	q4, q5, q4			// p2'=2*(p3 + p2)+(p2 + p1)+(p0 + q0)
+		
+		vrshrn.u16		$0, q5, #2		//	p1', prev p3 useless now
+		vrshrn.u16		$7, q4, #3		//	p2'
+						
+		vshl.u16	q5, q5, #1			//	((p2 + p1)+(p0 + q0))*2
+		vsubl.u8	q4, $5, $1			// (q1 - p2)			
+		vadd.u16	q5, q4,q5			// 5tags p0'=(q1 - p2)+((p2 + p1)+(p0 + q0))*2
+		
+		vaddl.u8	q4, $2, $5			// (p1 + q1)		
+		vaddw.u8	q4, q4, $2
+		vaddw.u8	q4, q4, $3			// 3tags p0'=2*p1+(p0 + q1)
+		
+		vrshrn.u16		d10,q5, #3		//	5tags
+		vrshrn.u16		d8, q4, #2		//	3tags
+		vbsl.u8		$6, d10, d8		//	p0'			
+//	}
+.endm
+
+.macro	DIFF_LUMA_EQ4_MASK
+//	{	input: px', px, mask_matrix; working q4
+		vmov	$3, $2
+		vbsl.u8	$3, $0, $1
+//	}
+.endm
+
+//	( (p1 << 1) + p0 + q1 + 2 ) >> 2
+.macro	DIFF_CHROMA_EQ4_P0Q0	
+//	{	input: p1, p0, q0, q1; working q4/q5/q6; output: p0'_d, q0'_d
+		vaddl.u8	$4, $0, $3			// (p1 + q1)		
+		vaddw.u8	$5, $4, $1
+		vaddw.u8	$6, $4, $2		
+		vaddw.u8	$5, $5, $0			// p0'=(p1 + q1)+(p0+p1)
+//		vaddw.u8	$6, $4, $2
+		vaddw.u8	$6, $6, $3			// q0'=(p1 + q1)+(q0+q1)		
+		vrshrn.u16		$7, $5, #2		
+		vrshrn.u16		$8, $6, #2
+//	}
+.endm
+
+.macro	LORD_CHROMA_DATA_4
+//	{	input: 4xCb_addr, 4xCr_addr, working r0~r2	
+		vld4.u8	{$0[$8],$1[$8],$2[$8],$3[$8]}, [r0], r2	// Cb
+		vld4.u8	{$4[$8],$5[$8],$6[$8],$7[$8]}, [r1], r2	// Cr
+//	}
+.endm
+
+.macro	STORE_CHROMA_DATA_4
+//	{	input: 4xCb_addr, 4xCr_addr, working r0~r2	
+		vst4.u8	{$0[$8],$1[$8],$2[$8],$3[$8]}, [r0], r2	// Cb
+		vst4.u8	{$4[$8],$5[$8],$6[$8],$7[$8]}, [r1], r2	// Cr
+//	}
+.endm
+
+.macro	LORD_LUMA_DATA_3
+//	{	input: 3xluma_addr, working r0~r2	
+		vld3.u8	{$0[$6],$1[$6],$2[$6]}, [r2], r1	//	0::pix[-3];1::pix[-2];2::pix[-1];
+		vld3.u8	{$3[$6],$4[$6],$5[$6]}, [r0], r1	//	3::pix[0]; 4::pix[1]; 5::pix[2];
+//	}
+.endm
+
+.macro	STORE_LUMA_DATA_4
+//	{	input: 4xluma, working r0~r2	
+		vst4.u8	{$0[$4],$1[$4],$2[$4],$3[$4]}, [r0], r1	//	0::pix[-2];1::pix[-1];2::pix[0]; 3::pix[1]
+		vst4.u8	{$0[$5],$1[$5],$2[$5],$3[$5]}, [r2], r1
+//	}
+.endm
+
+.macro	LORD_LUMA_DATA_4
+//	{	input: 4xluma_addr, working r0r1r3	
+		vld4.u8	{$0[$8],$1[$8],$2[$8],$3[$8]}, [r3], r1	//	0::pix[-4];1::pix[-3];2::pix[-2];3::pix[-1]
+		vld4.u8	{$4[$8],$5[$8],$6[$8],$7[$8]}, [r0], r1	//	4::pix[0]; 5::pix[1]; 6::pix[2]; 7::pix[3];
+//	}
+.endm
+
+.macro	STORE_LUMA_DATA_3
+//	{	input: 3xluma_addr, working r0~r2	
+		vst3.u8	{$0[$6],$1[$6],$2[$6]}, [r3], r1	//	0::pix[-3];1::pix[-2];2::pix[-1];
+		vst3.u8	{$3[$6],$4[$6],$5[$6]}, [r0], r1	//	3::pix[0]; 4::pix[1]; 5::pix[2];
+//	}
+.endm
+
+.macro	EXTRACT_DELTA_INTO_TWO_PART
+//	{	input: delta (output abs minus part), working (output plus part)	
+		vcge.s8	$1, $0, #0
+		vand	$1, $0, $1				// select original (+part)
+		vsub.s8	$0, $1, $0				// select original -(-part)
+//	}
+.endm
+#else
+.macro	JMP_IF_128BITS_IS_ZERO arg0, arg1, arg2
+//	{
+		vorr.s16	\arg2, \arg0, \arg1
+		vmov		r3, r2, \arg2
+		orr			r3, r3, r2
+		cmp			r3, #0
+//	}
+.endm
+
+//	if( abs( p0 - q0 ) < alpha && abs( p1 - p0 ) < beta && abs( q1 - q0 ) < beta )	
+.macro	MASK_MATRIX arg0, arg1, arg2, arg3, arg4, arg5, arg6
+//	{	input: p1, p0, q0, q1, alpha(be modified), beta; output: mask
+		vabd.u8	\arg6, \arg1, \arg2		// abs( p0 - q0 )
+		vcgt.u8	\arg6, \arg4, \arg6		//	mask = abs( p0 - q0 ) < alpha
+	
+		vabd.u8	\arg4, \arg0, \arg1		// abs( p1 - p0 )
+		vclt.u8	\arg4, \arg4, \arg5		//	abs( p1 - p0 ) < beta
+		vand.u8	\arg6, \arg6, \arg4		//	2nd mask &		
+	
+		vabd.u8	\arg4, \arg3, \arg2		// abs( q1 - q0 )		
+		vclt.u8	\arg4, \arg4, \arg5		//	abs( q1 - q0 ) < beta
+		vand.u8	\arg6, \arg6, \arg4		//	3rd mask &
+//	}
+.endm
+
+//if( abs( p2 - p0 ) < beta )
+//{
+//	pix[-2*xstride] = p1 + x264_clip3( (( p2 + ((p0 + q0 + 1)>> 1)) >> 1) - p1, -tc0[i], tc0[i] );
+//	tc++;
+//}
+.macro	DIFF_LUMA_LT4_P1_Q1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
+//	{	input: p2, p1, p0, q0, beta, -tc0[i], tc0[i], mask_matrx; output: _clip3(p1'), tc++;
+		vabd.u8	\arg9, \arg0, \arg2				//	abs( p2 - p0 )
+		vclt.u8	\arg9, \arg9, \arg4				//	abs( p2 - p0 ) < beta
+		vrhadd.u8	\arg8, \arg2, \arg3				//	((p0 + q0 + 1)>> 1)	
+		vhadd.u8	\arg8, \arg0, \arg8				//	(( p2 + ((p0 + q0 + 1)>> 1)) >> 1)
+		vsub.s8	\arg8, \arg8, \arg1				//	(( p2 + ((p0 + q0 + 1)>> 1)) >> 1) - p1
+		vmax.s8	\arg8, \arg8, \arg5				// >= -tc0[i]
+		vmin.s8	\arg8, \arg8, \arg6				// <= tc0[i]
+		vand.s8	\arg8, \arg8, \arg9				// mask, only [abs( p2 - p0 ) < beta] avail _clip3
+		vand.s8	\arg8, \arg8, \arg7
+		vadd.u8	\arg8, \arg1, \arg8
+		vabs.s8	\arg9, \arg9					// if( abs( p2 - p0 ) < beta ) tc++;
+//	}
+.endm
+
+//delta = x264_clip3( (((q0 - p0 ) << 2) + (p1 - q1) + 4) >> 3,-tc, tc );
+.macro	DIFF_LUMA_LT4_P0_Q0 arg0, arg1, arg2, arg3, arg4, arg5, arg6
+//	{	input: p1, p0, q0, q1; output: _clip3(p0'); working q12,q13
+		vsubl.u8	\arg5, \arg0, \arg3			// (p1 - q1)
+		vsubl.u8	\arg6, \arg2, \arg1			// (q0 - p0)
+		vshl.s16	\arg6, \arg6, #2
+		vadd.s16	\arg5, \arg5, \arg6			// (p1 - q1) += ( q0 - p0 )	<<2
+		vrshrn.s16		\arg4, \arg5, #3
+//	}
+.endm
+
+//if( abs( p2 - p0 ) < beta ) /* p0', p1', p2' */
+//{
+//		const int p3 = pix[-4*xstride];
+//		pix[-1*xstride] = ( p2 + 2*p1 + 2*p0 + 2*q0 + q1 + 4 ) >> 3;
+//		pix[-2*xstride] = ( p2 + p1 + p0 + q0 + 2 ) >> 2;
+//		pix[-3*xstride] = ( 2*p3 + 3*p2 + p1 + p0 + q0 + 4 ) >> 3;
+//}
+//else /* p0' */
+//		pix[-1*xstride] = ( 2*p1 + p0 + q1 + 2 ) >> 2;
+.macro	DIFF_LUMA_EQ4_P2P1P0 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 
+//	{	input: p3(output p1'), p2, p1, p0, q0, q1, select_matrix(output p0'), output p2'; 
+//		workin q4~q5; after filtered then p3/p2 useless!
+		vaddl.u8	q4, \arg1, \arg2			// (p2 + p1)
+		vaddl.u8	q5, \arg3, \arg4			// (p0 + q0)		
+		vadd.u16	q5, q4, q5			// p1'=(p2 + p1)+(p0 + q0)
+		
+		vaddl.u8	q4, \arg0, \arg1			// (p3 + p2)		
+		vshl.u16	q4, q4, #1
+		vadd.u16	q4, q5, q4			// p2'=2*(p3 + p2)+(p2 + p1)+(p0 + q0)
+		
+		vrshrn.u16		\arg0, q5, #2		//	p1', prev p3 useless now
+		vrshrn.u16		\arg7, q4, #3		//	p2'
+						
+		vshl.u16	q5, q5, #1			//	((p2 + p1)+(p0 + q0))*2
+		vsubl.u8	q4, \arg5, \arg1			// (q1 - p2)			
+		vadd.u16	q5, q4,q5			// 5tags p0'=(q1 - p2)+((p2 + p1)+(p0 + q0))*2
+		
+		vaddl.u8	q4, \arg2, \arg5			// (p1 + q1)		
+		vaddw.u8	q4, q4, \arg2
+		vaddw.u8	q4, q4, \arg3			// 3tags p0'=2*p1+(p0 + q1)
+		
+		vrshrn.u16		d10,q5, #3		//	5tags
+		vrshrn.u16		d8, q4, #2		//	3tags
+		vbsl.u8		\arg6, d10, d8		//	p0'			
+//	}
+.endm
+
+.macro	DIFF_LUMA_EQ4_MASK arg0, arg1, arg2, arg3
+//	{	input: px', px, mask_matrix; working q4
+		vmov	\arg3, \arg2
+		vbsl.u8	\arg3, \arg0, \arg1
+//	}
+.endm
+
+//	( (p1 << 1) + p0 + q1 + 2 ) >> 2
+.macro	DIFF_CHROMA_EQ4_P0Q0 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8	
+//	{	input: p1, p0, q0, q1; working q4/q5/q6; output: p0'_d, q0'_d
+		vaddl.u8	\arg4, \arg0, \arg3			// (p1 + q1)		
+		vaddw.u8	\arg5, \arg4, \arg1
+		vaddw.u8	\arg6, \arg4, \arg2		
+		vaddw.u8	\arg5, \arg5, \arg0			// p0'=(p1 + q1)+(p0+p1)
+//		vaddw.u8	\arg6, \arg4, \arg2
+		vaddw.u8	\arg6, \arg6, \arg3			// q0'=(p1 + q1)+(q0+q1)		
+		vrshrn.u16		\arg7, \arg5, #2		
+		vrshrn.u16		\arg8, \arg6, #2
+//	}
+.endm		
+
+.macro	LORD_CHROMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8	
+//	{	input: 4xCb_addr, 4xCr_addr, working r0~r2	
+		vld4.u8	{\arg0[\arg8],\arg1[\arg8],\arg2[\arg8],\arg3[\arg8]}, [r0], r2	// Cb
+		vld4.u8	{\arg4[\arg8],\arg5[\arg8],\arg6[\arg8],\arg7[\arg8]}, [r1], r2	// Cr
+//	}
+.endm	
+
+.macro	STORE_CHROMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
+//	{	input: 4xCb_addr, 4xCr_addr, working r0~r2	
+		vst4.u8	{\arg0[\arg8],\arg1[\arg8],\arg2[\arg8],\arg3[\arg8]}, [r0], r2	// Cb
+		vst4.u8	{\arg4[\arg8],\arg5[\arg8],\arg6[\arg8],\arg7[\arg8]}, [r1], r2	// Cr
+//	}
+.endm
+
+.macro	LORD_LUMA_DATA_3 arg0, arg1, arg2, arg3, arg4, arg5, arg6
+//	{	input: 3xluma_addr, working r0~r2	
+		vld3.u8	{\arg0[\arg6],\arg1[\arg6],\arg2[\arg6]}, [r2], r1	//	0::pix[-3];1::pix[-2];2::pix[-1];
+		vld3.u8	{\arg3[\arg6],\arg4[\arg6],\arg5[\arg6]}, [r0], r1	//	3::pix[0]; 4::pix[1]; 5::pix[2];
+//	}
+.endm
+
+.macro	STORE_LUMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5
+//	{	input: 4xluma, working r0~r2	
+		vst4.u8	{\arg0[\arg4],\arg1[\arg4],\arg2[\arg4],\arg3[\arg4]}, [r0], r1	//	0::pix[-2];1::pix[-1];2::pix[0]; 3::pix[1]
+		vst4.u8	{\arg0[\arg5],\arg1[\arg5],\arg2[\arg5],\arg3[\arg5]}, [r2], r1
+//	}
+.endm
+
+.macro	LORD_LUMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
+//	{	input: 4xluma_addr, working r0r1r3	
+		vld4.u8	{\arg0[\arg8],\arg1[\arg8],\arg2[\arg8],\arg3[\arg8]}, [r3], r1	//	0::pix[-4];1::pix[-3];2::pix[-2];3::pix[-1]
+		vld4.u8	{\arg4[\arg8],\arg5[\arg8],\arg6[\arg8],\arg7[\arg8]}, [r0], r1	//	4::pix[0]; 5::pix[1]; 6::pix[2]; 7::pix[3];
+//	}
+.endm
+
+.macro	STORE_LUMA_DATA_3 arg0, arg1, arg2, arg3, arg4, arg5, arg6
+//	{	input: 3xluma_addr, working r0~r2	
+		vst3.u8	{\arg0[\arg6],\arg1[\arg6],\arg2[\arg6]}, [r3], r1	//	0::pix[-3];1::pix[-2];2::pix[-1];
+		vst3.u8	{\arg3[\arg6],\arg4[\arg6],\arg5[\arg6]}, [r0], r1	//	3::pix[0]; 4::pix[1]; 5::pix[2];
+//	}
+.endm
+
+.macro	EXTRACT_DELTA_INTO_TWO_PART arg0, arg1
+//	{	input: delta (output abs minus part), working (output plus part)	
+		vcge.s8	\arg1, \arg0, #0
+		vand	\arg1, \arg0, \arg1				// select original (+part)
+		vsub.s8	\arg0, \arg1, \arg0				// select original -(-part)
+//	}
+.endm
+
+#endif
+//uint8_t *pix, int32_t stride, int32_t alpha, int32_t beta, uint8_t *tc
+  WELS_ASM_FUNC_BEGIN DeblockLumaLt4V_neon
+
+	vdup.u8	q11, r2				// alpha [0~255]
+	vdup.u8	q9, r3					// q9:: beta [0~18]
+		
+	add			r2, r1, r1, lsl #1
+	sub			r2, r0, r2				//	pix -= 3*src_stride]	
+	vld1.u8	{q0}, [r2], r1		//	q0::p2 = pix[-3*xstride];
+	vld1.u8	{q3}, [r0], r1		//	q3::q0 = pix[ 0*xstride];
+	vld1.u8	{q1}, [r2], r1		//	q1::p1 = pix[-2*xstride];
+	vld1.u8	{q4}, [r0], r1		//	q4::q1 = pix[ 1*xstride];
+	vld1.u8	{q2}, [r2]				//	q2::p0 = pix[-1*xstride];
+	vld1.u8	{q5}, [r0]				//	q5::q2 = pix[ 2*xstride];
+	sub			r2, r2, r1				//	r2 = pix-2*xstride
+
+//	if( tc0[i] < 0 )	 continue; else filter					
+	ldr			r3, [sp, #0]
+	vld1.s8	{d31}, [r3]			//	load 4 tc0[i]
+	vdup.s8	d28, d31[0]    
+	vdup.s8	d30, d31[1]
+	vdup.s8	d29, d31[2] 
+	vdup.s8	d31, d31[3]
+	vtrn.32	d28, d30
+	vtrn.32	d29, d31				//	q14::each 32 bits is 4x tc0[i]
+	vcge.s8	q10, q14, #0			//	q10::tc0[i] >= 0
+
+//	if( abs( p0 - q0 ) < alpha && abs( p1 - p0 ) < beta && abs( q1 - q0 ) < beta )	
+	MASK_MATRIX	q1, q2, q3, q4, q11, q9, q15	// q15::mask matrix
+	vand.u8	q10, q10, q15			//	two mask
+//	JMP_IF_128BITS_IS_ZERO	d20, d21, d31
+//	beq		lt4_end
+
+	veor		q15, q15
+	vsub.i8	q15,q15,q14			// q15::4x -tc0[i], min	
+
+//	input: p2, p1, p0, q0, beta, -tc0[i], tc0[i]; mask_matrx, output: _clip3(p1'), tc++;	
+	DIFF_LUMA_LT4_P1_Q1	q0, q1, q2, q3, q9, q15, q14, q10, q6, q12	//	q6 = _clip3(p1')
+	vst1.u8	{q6}, [r2], r1
+	
+	DIFF_LUMA_LT4_P1_Q1	q5, q4, q3, q2, q9, q15, q14, q10, q7, q13	//	q7 = _clip3(q1')
+		
+	vabs.s8	q12, q12
+	vabs.s8	q13, q13					// if( abs( p2 - p0 ) < beta ) tc++;					
+	vadd.u8	q14,q14,q12
+	vadd.u8	q14,q14,q13			// updated  tc
+	veor		q15, q15
+	vsub.i8	q15,q15,q14			// updated -tc
+	
+//	input: p1, p0, q0, q1; output: _clip3(p0'); working q12,q13
+	DIFF_LUMA_LT4_P0_Q0	d2, d4, d6, d8, d16, q12, q13
+	DIFF_LUMA_LT4_P0_Q0	d3, d5, d7, d9, d17, q12, q13	//q8::delta		
+	vmax.s8	q8, q8, q15			// >= -tc0[i]
+	vmin.s8	q8, q8, q14			// <= tc0[i]
+	vand.s8	q8, q8, q10
+	EXTRACT_DELTA_INTO_TWO_PART	q8, q9
+	vqadd.u8	q2, q2, q9		// clip_uint8( p0 + [+delta] ); p0'
+	vqsub.u8	q2, q2, q8		// clip_uint8( p0 - [-delta] ); p0'
+	vst1.u8	{q2}, [r2], r1
+	vqsub.u8	q3, q3, q9		// clip_uint8( q0 - [+delta] ); q0'	
+	vqadd.u8	q3, q3, q8		// clip_uint8( q0 + [-delta] ); q0'
+	vst1.u8	{q3}, [r2]	, r1
+	vst1.u8	{q7}, [r2]
+
+//lt4_end:
+  WELS_ASM_FUNC_END
+	
+//uint8_t *pix, int32_t stride, int32_t alpha, int32_t beta
+  WELS_ASM_FUNC_BEGIN DeblockLumaEq4V_neon
+
+	vdup.u8	q5, r2				// alpha [0~255]
+	vdup.u8	q4, r3				// beta [0~18]
+	
+	sub			r3, r0, r1, lsl #2	//	pix -= 4*src_stride
+	vld1.u8	{q8},  [r3], r1		//	q8::p3 = pix[-4*xstride];
+	vld1.u8	{q12}, [r0], r1		//	q12::q0 = pix[ 0*xstride];	
+	vld1.u8	{q9},  [r3], r1		//	q9::p2 = pix[-3*xstride];
+	vld1.u8	{q13}, [r0], r1		//	q13::q1 = pix[ 1*xstride];
+	vld1.u8	{q10}, [r3], r1		//	q10::p1 = pix[-2*xstride];
+	vld1.u8	{q14}, [r0], r1		//	q14::q2 = pix[ 2*xstride];
+	vld1.u8	{q11}, [r3]			//	q11::p0 = pix[-1*xstride];
+	vld1.u8	{q15}, [r0]			//	q15::q3 = pix[ 3*xstride];
+	sub			r3, r3, r1	, lsl #1	//	r3 = pix-3*xstride
+		
+//	if( abs( p0 - q0 ) < alpha && abs( p1 - p0 ) < beta && abs( q1 - q0 ) < beta )		
+	MASK_MATRIX	q10, q11, q12, q13, q5, q4, q6	// q6::mask matrix
+//	JMP_IF_128BITS_IS_ZERO	d12, d13, d0
+//	beq		eq4_end
+
+//	if(abs( p0 - q0 ) < ((alpha >> 2) + 2) )
+	mov			r2, r2, lsr #2
+	add			r2, r2, #2
+	vdup.u8	q5, r2
+	vabd.u8	q0, q11, q12	
+	vclt.u8	q7, q0, q5				// q7::indicate
+//	if( abs( p2 - p0 ) < beta )
+	vabd.u8	q1, q9, q11	
+	vclt.u8	q1, q1, q4
+	vand.s8	q1, q1, q7				//	q1::indicate [p0', p1', p2'] or [p0']
+//	if( abs( q2 - q0 ) < beta )
+	vabd.u8	q2, q14,q12	
+	vclt.u8	q2, q2, q4
+	vand.s8	q2, q2, q7				//	q2::indicate [q0', q1', q2'] or [q0']
+	vand.u8	q7, q7, q6
+	
+	vmov		q3, q1
+//	input: p3(output p1'), p2, p1, p0, q0, q1, select_matrix(output p0'), output p2'; 
+//	workin q4~q5; after filtered then p3/p2 useless!
+	DIFF_LUMA_EQ4_P2P1P0		d16, d18, d20, d22, d24, d26, d2, d0
+	DIFF_LUMA_EQ4_P2P1P0		d17, d19, d21, d23, d25, d27, d3, d1
+	
+//	q1(p0') q2(q0') only need ::if( abs( p0 - q0 ) < alpha && abs( p1 - p0 ) < beta && abs( q1 - q0 ) < beta )
+//	q0(p2') q8(p1') q15(q1') q3(q2'); need more &&if(abs( p0 - q0 ) < ((alpha >> 2) + 2) )&&if( abs( p2 - p0 ) < beta )
+	vand.u8	q3, q7, q3
+	DIFF_LUMA_EQ4_MASK	q0, q9, q3, q4
+	vst1.u8	{q4}, [r3], r1
+	DIFF_LUMA_EQ4_MASK	q8,q10, q3, q4
+	vst1.u8	{q4}, [r3], r1
+	DIFF_LUMA_EQ4_MASK	q1,q11, q6, q4
+	vst1.u8	{q4}, [r3], r1
+	
+	vmov		q0, q2			
+	DIFF_LUMA_EQ4_P2P1P0		d30, d28, d26, d24, d22, d20, d4, d6
+	DIFF_LUMA_EQ4_P2P1P0		d31, d29, d27, d25, d23, d21, d5, d7
+
+	vand.u8	q0, q7, q0
+	DIFF_LUMA_EQ4_MASK	q2,  q12, q6, q4
+	vst1.u8	{q4}, [r3], r1	
+	DIFF_LUMA_EQ4_MASK	q15, q13, q0, q4
+	vst1.u8	{q4}, [r3], r1
+	DIFF_LUMA_EQ4_MASK	q3,  q14, q0, q4
+	vst1.u8	{q4}, [r3], r1
+			
+//eq4_end:
+  WELS_ASM_FUNC_END	
+
+
+
+//uint8_t *pix, int32_t stride, int32_t alpha, int32_t beta, uint8_t *tc
+  WELS_ASM_FUNC_BEGIN DeblockLumaLt4H_neon
+
+	vdup.u8	q11, r2				// alpha [0~255]
+	vdup.u8	q9, r3					// q9:: beta [0~18]
+
+	sub			r2, r0, #3				//	pix -= 3	
+	LORD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 0
+	LORD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 1
+	LORD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 2
+	LORD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 3
+	LORD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 4
+	LORD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 5
+	LORD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 6
+	LORD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 7
+
+	LORD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 0
+	LORD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 1
+	LORD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 2
+	LORD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 3
+	LORD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 4
+	LORD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 5
+	LORD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 6
+	LORD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 7		
+//	d0d1d2d6d7d8+d3d4d5d9d10d11
+	vswp		d1, d2
+	vswp		d3, d4
+	vswp		d1, d4	
+	vswp		d7, d8
+	vswp		d9, d10
+	vswp		d7, d10	
+//	q0::p2 = pix[-3*xstride];
+//	q1::p1 = pix[-2*xstride];
+//	q2::p0 = pix[-1*xstride];
+//	q3::q0 = pix[ 0*xstride];
+//	q4::q1 = pix[ 1*xstride];
+//	q5::q2 = pix[ 2*xstride];
+	sub			r0, r0, r1, lsl #4	//	pix -= 16*src_stride
+
+//	if( tc0[i] < 0 )	 continue; else filter					
+	ldr			r3, [sp, #0]
+	vld1.s8	{d31}, [r3]			//	load 4 tc0[i]
+	vdup.s8	d28, d31[0]    
+	vdup.s8	d30, d31[1]
+	vdup.s8	d29, d31[2] 
+	vdup.s8	d31, d31[3]
+	vtrn.32	d28, d30
+	vtrn.32	d29, d31				//	q14::each 32 bits is 4x tc0[i]
+	vcge.s8	q10, q14, #0			//	q10::tc0[i] >= 0
+
+//	if( abs( p0 - q0 ) < alpha && abs( p1 - p0 ) < beta && abs( q1 - q0 ) < beta )	
+	MASK_MATRIX	q1, q2, q3, q4, q11, q9, q15	// q15::mask matrix
+	vand.u8	q10, q10, q15			//	two mask
+//	JMP_IF_128BITS_IS_ZERO	d20, d21, d31
+//	beq		lt4_end
+
+	veor		q15, q15
+	vsub.i8	q15,q15,q14			// q15::4x -tc0[i], min	
+
+//	input: p2, p1, p0, q0, beta, -tc0[i], tc0[i]; mask_matrx, output: _clip3(p1'), tc++;	
+	DIFF_LUMA_LT4_P1_Q1	q0, q1, q2, q3, q9, q15, q14, q10, q6, q12	//	q6 = _clip3(p1')
+	
+	DIFF_LUMA_LT4_P1_Q1	q5, q4, q3, q2, q9, q15, q14, q10, q7, q13	//	q7 = _clip3(q1')
+		
+	vabs.s8	q12, q12
+	vabs.s8	q13, q13					// if( abs( p2 - p0 ) < beta ) tc++;					
+	vadd.u8	q14,q14,q12
+	vadd.u8	q14,q14,q13			// updated  tc
+	veor		q15, q15
+	vsub.i8	q15,q15,q14			// updated -tc
+	
+//	input: p1, p0, q0, q1; output: _clip3(p0'); working q12,q13
+	DIFF_LUMA_LT4_P0_Q0	d2, d4, d6, d8, d16, q12, q13
+	DIFF_LUMA_LT4_P0_Q0	d3, d5, d7, d9, d17, q12, q13	//q8::delta		
+	vmax.s8	q8, q8, q15			// >= -tc0[i]
+	vmin.s8	q8, q8, q14			// <= tc0[i]
+	vand.s8	q8, q8, q10
+	EXTRACT_DELTA_INTO_TWO_PART	q8, q9
+	vqadd.u8	q2, q2, q9		// clip_uint8( p0 + [+delta] ); p0'
+	vqsub.u8	q2, q2, q8		// clip_uint8( p0 - [-delta] ); p0'
+
+	vqsub.u8	q3, q3, q9		// clip_uint8( q0 - [+delta] ); q0'	
+	vqadd.u8	q3, q3, q8		// clip_uint8( q0 + [-delta] ); q0'
+
+	sub		r0, #2
+	add		r2, r0, r1
+	lsl		r1, #1
+	
+	vmov		q1, q6
+	vmov		q4, q7
+//	q1,q2,q3,q4
+	vswp		q2, q3
+	vswp		d3, d6
+	vswp		d5, d8
+//	d2~d5, d6~d7
+	STORE_LUMA_DATA_4		d2, d3, d4, d5, 0, 1
+	STORE_LUMA_DATA_4		d2, d3, d4, d5, 2, 3
+	STORE_LUMA_DATA_4		d2, d3, d4, d5, 4, 5
+	STORE_LUMA_DATA_4		d2, d3, d4, d5, 6, 7	
+	
+	STORE_LUMA_DATA_4		d6, d7, d8, d9, 0, 1
+	STORE_LUMA_DATA_4		d6, d7, d8, d9, 2, 3
+	STORE_LUMA_DATA_4		d6, d7, d8, d9, 4, 5
+	STORE_LUMA_DATA_4		d6, d7, d8, d9, 6, 7		
+//lt4_end:
+  WELS_ASM_FUNC_END
+
+
+//uint8_t *pix, int32_t stride, int32_t alpha, int32_t beta
+  WELS_ASM_FUNC_BEGIN DeblockLumaEq4H_neon
+
+	vdup.u8	q5, r2				// alpha [0~255]
+	vdup.u8	q4, r3				// beta [0~18]
+	
+	sub			r3, r0, #4				//	pix -= 4
+	LORD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,0
+	LORD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,1
+	LORD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,2
+	LORD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,3		
+	LORD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,4
+	LORD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,5
+	LORD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,6
+	LORD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,7
+	
+	LORD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,0
+	LORD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,1
+	LORD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,2
+	LORD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,3		
+	LORD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,4
+	LORD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,5
+	LORD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,6
+	LORD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,7
+	
+	vswp		q9, q10
+	vswp		d17,d18
+	vswp		d21,d22
+	vswp		q13,q14
+	vswp		d25,d26
+	vswp		d29,d30	
+	sub			r0, r0, r1	, lsl #4	//	r0 -= 16*xstride	
+//	q8::p3 = pix[-4*xstride];
+//	q9::p2 = pix[-3*xstride];
+//	q10::p1 = pix[-2*xstride];
+//	q11::p0 = pix[-1*xstride];
+//	q12::q0 = pix[ 0*xstride];
+//	q13::q1 = pix[ 1*xstride];
+//	q14::q2 = pix[ 2*xstride];
+//	q15::q3 = pix[ 3*xstride];
+		
+//	if( abs( p0 - q0 ) < alpha && abs( p1 - p0 ) < beta && abs( q1 - q0 ) < beta )		
+	MASK_MATRIX	q10, q11, q12, q13, q5, q4, q6	// q6::mask matrix
+//	JMP_IF_128BITS_IS_ZERO	d12, d13, d0
+//	beq		eq4_end
+
+//	if(abs( p0 - q0 ) < ((alpha >> 2) + 2) )
+	mov			r2, r2, lsr #2
+	add			r2, r2, #2
+	vdup.u8	q5, r2
+	vabd.u8	q0, q11, q12	
+	vclt.u8	q7, q0, q5				// q7::indicate
+//	if( abs( p2 - p0 ) < beta )
+	vabd.u8	q1, q9, q11	
+	vclt.u8	q1, q1, q4
+	vand.s8	q1, q1, q7				//	q1::indicate [p0', p1', p2'] or [p0']
+//	if( abs( q2 - q0 ) < beta )
+	vabd.u8	q2, q14,q12	
+	vclt.u8	q2, q2, q4
+	vand.s8	q2, q2, q7				//	q2::indicate [q0', q1', q2'] or [q0']
+	vand.u8	q7, q7, q6
+	
+	vmov		q3, q1
+//	input: p3(output p1'), p2, p1, p0, q0, q1, select_matrix(output p0'), output p2'; 
+//	workin q4~q5; after filtered then p3/p2 useless!
+	DIFF_LUMA_EQ4_P2P1P0		d16, d18, d20, d22, d24, d26, d2, d0
+	DIFF_LUMA_EQ4_P2P1P0		d17, d19, d21, d23, d25, d27, d3, d1
+	
+//	q1(p0') q2(q0') only need ::if( abs( p0 - q0 ) < alpha && abs( p1 - p0 ) < beta && abs( q1 - q0 ) < beta )
+//	q0(p2') q8(p1') q15(q1') q3(q2'); need more &&if(abs( p0 - q0 ) < ((alpha >> 2) + 2) )&&if( abs( p2 - p0 ) < beta )
+	vand.u8	q3, q7, q3
+	DIFF_LUMA_EQ4_MASK	q0, q9, q3, q4	//	p2'
+	vmov		q9, q4
+
+//	DIFF_LUMA_EQ4_MASK	q8,q10, q3, q4	//	p1'
+	vbsl.u8	q3, q8, q10	
+		
+	DIFF_LUMA_EQ4_MASK	q1,q11, q6, q8	//	p0'
+	
+	vand.u8	q7, q7, q2			
+//	input: q3(output q1'), q2, q1, q0, p0, p1, select_matrix(output q0'), output q2'; 
+//	workin q4~q5; after filtered then q3/q2 useless!		
+	DIFF_LUMA_EQ4_P2P1P0		d30, d28, d26, d24, d22, d20, d4, d0
+	DIFF_LUMA_EQ4_P2P1P0		d31, d29, d27, d25, d23, d21, d5, d1
+
+//	DIFF_LUMA_EQ4_MASK	q2,  q12, q6, q4
+	vbsl.u8	q6, q2, q12	
+		
+	DIFF_LUMA_EQ4_MASK	q15, q13, q7, q4
+
+//	DIFF_LUMA_EQ4_MASK	q0,  q14, q7, q4
+	vbsl.u8	q7, q0, q14
+	
+//	q9,q3,q8,q6,q4,q7
+	vmov		q5, q6
+	vmov		q2, q9
+	vmov		q6, q4	
+	vmov		q4, q8
+//	q2,q3,q4,q5,q6,q7
+	
+	vswp	d8, d6
+	vswp	d5, d7
+	vswp	d5, d8
+	vswp	d14, d12
+	vswp	d11, d13
+	vswp	d11, d14
+		
+	sub		r3, r0, #3
+	STORE_LUMA_DATA_3		d4,d5,d6,d10,d11,d12,0
+	STORE_LUMA_DATA_3		d4,d5,d6,d10,d11,d12,1
+	STORE_LUMA_DATA_3		d4,d5,d6,d10,d11,d12,2
+	STORE_LUMA_DATA_3		d4,d5,d6,d10,d11,d12,3
+	STORE_LUMA_DATA_3		d4,d5,d6,d10,d11,d12,4
+	STORE_LUMA_DATA_3		d4,d5,d6,d10,d11,d12,5
+	STORE_LUMA_DATA_3		d4,d5,d6,d10,d11,d12,6
+	STORE_LUMA_DATA_3		d4,d5,d6,d10,d11,d12,7
+	
+	STORE_LUMA_DATA_3		d7,d8,d9,d13,d14,d15,0
+	STORE_LUMA_DATA_3		d7,d8,d9,d13,d14,d15,1
+	STORE_LUMA_DATA_3		d7,d8,d9,d13,d14,d15,2
+	STORE_LUMA_DATA_3		d7,d8,d9,d13,d14,d15,3
+	STORE_LUMA_DATA_3		d7,d8,d9,d13,d14,d15,4
+	STORE_LUMA_DATA_3		d7,d8,d9,d13,d14,d15,5
+	STORE_LUMA_DATA_3		d7,d8,d9,d13,d14,d15,6
+	STORE_LUMA_DATA_3		d7,d8,d9,d13,d14,d15,7							
+	
+//eq4_end:
+  WELS_ASM_FUNC_END	
+
+//uint8_t *pix_cb, uint8_t *pix_cr, int32_t stride, int32_t alpha, int32_t beta, uint8_t *tc
+  WELS_ASM_FUNC_BEGIN DeblockChromaLt4V_neon
+
+	vdup.u8	q11, r3				// alpha [0~255]
+	ldr			r3, [sp, #0]
+
+	sub			r0, r0, r2	, lsl #1	//	pix -= 2*src_stride	
+	sub			r1, r1, r2, lsl #1
+	vdup.u8	q9, r3					// q9:: beta [0~18]
+	ldr			r3, [sp, #4]
+			
+	vld1.u8	{d0}, [r0], r2		//	q0::p1
+	vld1.u8	{d1}, [r1], r2
+	vld1.u8	{d2}, [r0], r2		//	q1::p0
+	vld1.u8	{d3}, [r1], r2
+	vld1.u8	{d4}, [r0], r2		//	q2::q0
+	vld1.u8	{d5}, [r1], r2
+	vld1.u8	{d6}, [r0]				//	q3::q1
+	vld1.u8	{d7}, [r1]	
+
+	sub			r0, r0, r2, lsl #1	//	pix = [-1*src_stride]	
+	sub			r1, r1, r2, lsl #1
+//	if( tc0[i] < 0 )	 continue; else filter
+	vld1.s8	{d15}, [r3]		//	load 4 tc0[i], each tc0[i] 2 bytes; d[x] Cb && d[x+1] Cr
+	vmovl.u8	q6, d15
+	vshl.u64	d13,d12,#8
+	vorr		d12,d13
+	vmov		d13, d12			//	q6::each 64 bits is 2x tc0[i]
+	veor		q7, q7
+	vsub.i8	q7,q7,q6			//	q7::4x -tc0[i], min
+	
+//	if( abs( p0 - q0 ) < alpha && abs( p1 - p0 ) < beta && abs( q1 - q0 ) < beta )	
+	MASK_MATRIX	q0, q1, q2, q3, q11, q9, q5	// q5::mask matrix
+//	JMP_IF_128BITS_IS_ZERO	d20, d21, d31
+//	beq		lt4_end
+
+	
+//	input: p1, p0, q0, q1; output: _clip3(p0'); working q12,q13
+	DIFF_LUMA_LT4_P0_Q0	d0, d2, d4, d6, d8, q12, q13
+	DIFF_LUMA_LT4_P0_Q0	d1, d3, d5, d7, d9, q12, q13	//q4::delta		
+	vmax.s8	q4, q4, q7				// >= -tc0[i]
+	vmin.s8	q4, q4, q6				// <= tc0[i]
+	
+	vand.s8	q4, q4, q5	
+	vcge.s8	q6, q6, #0				//	q6::tc0[i] >= 0
+	vand.s8	q4, q4, q6
+	EXTRACT_DELTA_INTO_TWO_PART	q4, q5
+	vqadd.u8	q1, q1, q5			// clip_uint8( p0 + [+delta] ); p0'
+	vqsub.u8	q1, q1, q4			// clip_uint8( p0 - [-delta] ); p0'
+	vst1.u8	{d2}, [r0], r2
+	vst1.u8	{d3}, [r1], r2	
+	vqsub.u8	q2, q2, q5			// clip_uint8( q0 - [+delta] ); q0'	
+	vqadd.u8	q2, q2, q4			// clip_uint8( q0 + [-delta] ); q0'
+	vst1.u8	{d4}, [r0]
+	vst1.u8	{d5}, [r1]
+
+//lt4_end:
+  WELS_ASM_FUNC_END
+
+//	uint8_t *pix_cb, uint8_t *pix_cr, int32_t stride, int32_t alpha, int32_t beta
+  WELS_ASM_FUNC_BEGIN DeblockChromaEq4V_neon
+
+	vdup.u8	q11, r3				// alpha [0~255]
+	ldr			r3, [sp, #0]
+
+	sub			r0, r0, r2	, lsl #1	//	pix -= 2*src_stride	
+	sub			r1, r1, r2, lsl #1
+	vdup.u8	q9, r3					// q9:: beta [0~18]
+			
+	vld1.u8	{d0}, [r0], r2		//	q0::p1
+	vld1.u8	{d1}, [r1], r2
+	vld1.u8	{d2}, [r0], r2		//	q1::p0
+	vld1.u8	{d3}, [r1], r2
+	vld1.u8	{d4}, [r0], r2		//	q2::q0
+	vld1.u8	{d5}, [r1], r2
+	vld1.u8	{d6}, [r0]				//	q3::q1
+	vld1.u8	{d7}, [r1]	
+
+	sub			r0, r0, r2, lsl #1	//	pix = [-1*src_stride]	
+	sub			r1, r1, r2, lsl #1
+	
+//	if( abs( p0 - q0 ) < alpha && abs( p1 - p0 ) < beta && abs( q1 - q0 ) < beta )	
+	MASK_MATRIX	q0, q1, q2, q3, q11, q9, q10	// q10::mask matrix, d20:Cb d21:Cr
+//	JMP_IF_128BITS_IS_ZERO	d20, d21, d31
+//	beq		eq4_end
+	vmov			q11, q10
+
+//	( (p1 << 1) + p0 + q1 + 2 ) >> 2
+//	( (q1 << 1) + q0 + p1 + 2 ) >> 2
+	DIFF_CHROMA_EQ4_P0Q0		d0, d2, d4, d6, q4, q5, q6, d14, d0		// Cb::p0' q0'
+	DIFF_CHROMA_EQ4_P0Q0		d1, d3, d5, d7, q12, q13, q14, d15, d1	// Cr::p0' q0'
+
+	vbsl.u8	q10, q7, q1		//	p0'	
+	vst1.u8	{d20}, [r0], r2
+	vst1.u8	{d21}, [r1], r2
+		
+	vbsl.u8	q11, q0, q2		//	q0'	
+	vst1.u8	{d22}, [r0]
+	vst1.u8	{d23}, [r1]
+
+//eq4_end:
+  WELS_ASM_FUNC_END
+	
+//uint8_t *pix_cb, uint8_t *pix_cr, int32_t stride, int32_t alpha, int32_t beta, uint8_t *tc
+  WELS_ASM_FUNC_BEGIN DeblockChromaLt4H_neon
+
+	vdup.u8	q11, r3				// alpha [0~255]
+	ldr			r3, [sp, #0]	
+	
+	sub			r0, r0, #2				//	pix [-2]
+	vdup.u8	q9, r3					// q9:: beta [0~18]
+	ldr			r3, [sp, #4]		
+	sub			r1, r1, #2
+	vld1.s8	{d15}, [r3]			//	load 4 tc0[i], each tc0[i] 2 bytes; d[x] Cb && d[x+1] Cr	
+
+	LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 0
+	LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 1
+	LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 2
+	LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 3
+	LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 4
+	LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 5
+	LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 6
+	LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 7
+//	Cb:d0d1d2d3, Cr:d4d5d6d7
+	vswp		q1, q2
+	vswp		d1, d2		
+	vswp		d6, d5
+//	Cb:d0d2d4d6, Cr:d1d3d5d7
+	
+
+//	if( tc0[i] < 0 )	 continue; else filter
+
+	vmovl.u8	q6, d15
+	vshl.u64	d13,d12,#8
+	vorr		d12,d13
+	vmov		d13, d12			//	q6::each 64 bits is 2x tc0[i]
+	veor		q7, q7
+	vsub.i8	q7,q7,q6			//	q7::4x -tc0[i], min
+	
+//	if( abs( p0 - q0 ) < alpha && abs( p1 - p0 ) < beta && abs( q1 - q0 ) < beta )	
+	MASK_MATRIX	q0, q1, q2, q3, q11, q9, q5	// q5::mask matrix
+//	JMP_IF_128BITS_IS_ZERO	d20, d21, d31
+//	beq		lt4_end
+
+//	input: p1, p0, q0, q1; output: _clip3(p0'); working q12,q13
+	DIFF_LUMA_LT4_P0_Q0	d0, d2, d4, d6, d8, q12, q13
+	DIFF_LUMA_LT4_P0_Q0	d1, d3, d5, d7, d9, q12, q13	//q4::delta		
+	vmax.s8	q4, q4, q7				// >= -tc0[i]
+	vmin.s8	q4, q4, q6				// <= tc0[i]
+	
+	vand.s8	q4, q4, q5	
+	vcge.s8	q6, q6, #0				//	q6::tc0[i] >= 0
+	vand.s8	q4, q4, q6
+	EXTRACT_DELTA_INTO_TWO_PART	q4, q5
+	vqadd.u8	q1, q1, q5			// clip_uint8( p0 + [+delta] ); p0'
+	vqsub.u8	q1, q1, q4			// clip_uint8( p0 - [-delta] ); p0'
+	vqsub.u8	q2, q2, q5			// clip_uint8( q0 - [+delta] ); q0'	
+	vqadd.u8	q2, q2, q4			// clip_uint8( q0 + [-delta] ); q0'
+
+	sub			r0, r0, r2, lsl #3	//	pix: 0th row	[-2]
+	sub			r1, r1, r2, lsl #3
+	vswp		d1, d2		
+	vswp		d6, d5
+	vswp		q1, q2
+//	Cb:d0d1d2d3, Cr:d4d5d6d7
+		
+	STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 0
+	STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 1
+	STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 2
+	STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 3
+	STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 4
+	STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 5
+	STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 6
+	STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 7
+				
+//lt4_end:
+  WELS_ASM_FUNC_END
+
+//	uint8_t *pix_cb, uint8_t *pix_cr, int32_t stride, int32_t alpha, int32_t beta
+  WELS_ASM_FUNC_BEGIN DeblockChromaEq4H_neon
+
+	vdup.u8	q11, r3				// alpha [0~255]
+	ldr			r3, [sp, #0]
+	
+	sub			r0, r0, #2				//	pix [-2]
+	sub			r1, r1, #2
+	
+	LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 0
+	LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 1
+	LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 2
+	LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 3
+	LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 4
+	LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 5
+	LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 6
+	LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 7
+//	Cb:d0d1d2d3, Cr:d4d5d6d7
+	vswp		q1, q2
+	vswp		d1, d2		
+	vswp		d6, d5
+//	Cb:d0d2d4d6, Cr:d1d3d5d7
+
+
+//	if( abs( p0 - q0 ) < alpha && abs( p1 - p0 ) < beta && abs( q1 - q0 ) < beta )	
+	vdup.u8	q9, r3					// q9:: beta [0~18]
+	MASK_MATRIX	q0, q1, q2, q3, q11, q9, q10	// q10::mask matrix, d20:Cb d21:Cr
+//	JMP_IF_128BITS_IS_ZERO	d20, d21, d31
+//	beq		eq4_end
+	vmov			q11, q10
+
+//	( (p1 << 1) + p0 + q1 + 2 ) >> 2
+//	( (q1 << 1) + q0 + p1 + 2 ) >> 2
+	DIFF_CHROMA_EQ4_P0Q0		d0, d2, d4, d6, q8, q9, q12, d8, d10		// Cb::p0' q0'
+	DIFF_CHROMA_EQ4_P0Q0		d1, d3, d5, d7, q13, q14, q15, d9, d11	// Cr::p0' q0'
+
+	vbsl.u8	q10, q4, q1		//	p0'			
+	vbsl.u8	q11, q5, q2		//	q0'	
+//	q0 q10 q11 q3
+
+	sub			r0, r0, r2, lsl #3	//	pix: 0th row	[-2]
+	sub			r1, r1, r2, lsl #3
+
+	vmov		q1, q10
+	vmov		q2, q11
+	vswp		d1, d2		
+	vswp		d6, d5
+	vswp		q1, q2
+//	Cb:d0d1d2d3, Cr:d4d5d6d7
+		
+	STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 0
+	STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 1
+	STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 2
+	STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 3
+	STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 4
+	STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 5
+	STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 6
+	STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 7
+
+//eq4_end:
+  WELS_ASM_FUNC_END
+  
+#ifdef APPLE_IOS
+//in: $0(const) $1 $2; out:$3 $4
+//used register: r6, r7, q0, q1
+.macro BS_NZC_CHECK 
+    //vld1.8   {d0,d1}, [$0] 
+    vld1.8   {d0,d1}, [$0, :64] 
+    /* Arrenge the input data --- TOP */
+	ands     r6, $1, #2
+	beq      bs_nzc_check_jump0
+	
+    sub      r6, $0, $2, lsl #4
+	sub      r6, $2, lsl #3
+    add      r6, #12
+    vld1.32  d3[1], [r6]
+	
+bs_nzc_check_jump0:	
+    vext.8   q1, q1, q0, #12
+	vadd.u8  $3, q0, q1
+
+    
+    /* Arrenge the input data --- LEFT */
+	ands     r6, $1, #1
+	beq      bs_nzc_check_jump1
+	
+    sub      r6, $0, #21
+	add      r7, r6, #4 
+    vld1.8   d3[4], [r6]
+	add      r6, r7, #4
+    vld1.8   d3[5], [r7]
+	add      r7, r6, #4
+    vld1.8   d3[6], [r6]
+    vld1.8   d3[7], [r7]
+	
+bs_nzc_check_jump1:
+	vzip.8   d0, d1	
+	vzip.8   d0, d1
+    vext.8   q1, q1, q0, #12
+	vadd.u8  $4, q0, q1
+
+.endm
+
+
+//in: $0(const) $1 $2; out:$3 $4
+//used register: r6, r7, q0, q1
+.macro BS_REF_INDEX_CHECK 
+    //vld1.8   {d0,d1}, [$0] 
+	vld1.8   {d0,d1}, [$0, :128] 
+    /* Arrenge the input data --- TOP */
+	ands     r6, $1, #2
+	beq      bs_ref_index_check_jump0
+	
+    sub      r6, $0, $2, lsl #4
+    add      r6, #12
+    vld1.32  d3[1], [r6]
+	
+bs_ref_index_check_jump0:
+    vext.8   q1, q1, q0, #12
+    vabd.u8  $3, q0, q1
+
+    
+    /* Arrenge the input data --- LEFT */
+	ands     r6, $1, #1
+	beq      bs_ref_index_check_jump1
+	
+    sub      r6, $0, #13
+	add      r7, r6, #4 
+    vld1.8   d3[4], [r6]
+	add      r6, r7, #4
+    vld1.8   d3[5], [r7]
+	add      r7, r6, #4
+    vld1.8   d3[6], [r6]
+    vld1.8   d3[7], [r7]
+	
+bs_ref_index_check_jump1:
+	vzip.8   d0, d1
+	vzip.8   d0, d1
+    vext.8   q1, q1, q0, #12
+	vabd.u8  $4, q0, q1
+.endmacro
+
+.macro BS_COMPARE_MV //in: $0,$1(const),$2(const),$3(const),$4(const); out:$5, $6
+    mov       r6, #4
+    vabd.s16  q5, $0, $1
+    vabd.s16  q6, $1, $2
+	vdup.s16  $0, r6
+    vabd.s16  q7, $2, $3	
+    vabd.s16  q8, $3, $4	    
+    
+    vcge.s16  q5, $0
+    vcge.s16  q6, $0
+    vcge.s16  q7, $0
+    vcge.s16  q8, $0 
+	
+	vpadd.i16 d10, d10, d11
+    vpadd.i16 d11, d12, d13
+    vpadd.i16 d12, d14, d15
+    vpadd.i16 d13, d16, d17  
+   
+    vaddhn.i16  $5, q5, q5
+    vaddhn.i16  $6, q6, q6
+.endmacro
+
+//in: $0(const) $1 $2; out:$3 $4 $5 $6
+//used register: r6, r7, q0, q1, q2, q3, q4
+.macro BS_MV_CHECK 
+    //vldm   $0, {q0,q1,q2,q3}
+    vld1.32  {q0,q1}, [$0, :128]
+	add      r6, $0, #32
+	vld1.32  {q2,q3}, [r6, :128]
+
+    /* Arrenge the input data --- TOP */
+	ands     r6, $1, #2
+	beq      bs_mv_check_jump0
+		
+    sub      r6, $0, $2, lsl #6
+    add      r6, #48
+    vld1.8   {d8, d9}, [r6]
+	
+bs_mv_check_jump0:
+    BS_COMPARE_MV  q4, q0, q1, q2, q3, $3, $4
+    
+    /* Arrenge the input data --- LEFT */
+	ands     r6, $1, #1
+	beq      bs_mv_check_jump1
+	
+    sub      r6, $0, #52
+    //mov      r7, #16
+    add      r7, r6, #16
+	vld1.32   d8[0], [r6]
+	add      r6, r7, #16
+    vld1.32   d8[1], [r7]
+	add      r7, r6, #16
+    vld1.32   d9[0], [r6]
+    vld1.32   d9[1], [r7]
+	
+bs_mv_check_jump1:
+	vzip.32   q0, q2
+	vzip.32   q1, q3
+	vzip.32   q0, q1
+    vzip.32   q2, q3
+    BS_COMPARE_MV  q4, q0, q1, q2, q3, $5, $6
+.endmacro
+#else
+//in: $0(const) $1 $2; out:$3 $4
+//used register: r6, r7, q0, q1
+.macro BS_NZC_CHECK arg0, arg1, arg2, arg3, arg4 
+    //vld1.8   {d0,d1}, [\arg0] 
+    vld1.8   {d0,d1}, [\arg0, :64] 
+    /* Arrenge the input data --- TOP */
+	ands     r6, \arg1, #2
+	beq      bs_nzc_check_jump0
+	
+    sub      r6, \arg0, \arg2, lsl #4
+	sub      r6, \arg2, lsl #3
+    add      r6, #12
+    vld1.32  d3[1], [r6]
+	
+bs_nzc_check_jump0:	
+    vext.8   q1, q1, q0, #12
+	vadd.u8  \arg3, q0, q1
+
+    
+    /* Arrenge the input data --- LEFT */
+	ands     r6, \arg1, #1
+	beq      bs_nzc_check_jump1
+	
+    sub      r6, \arg0, #21
+	add      r7, r6, #4 
+    vld1.8   d3[4], [r6]
+	add      r6, r7, #4
+    vld1.8   d3[5], [r7]
+	add      r7, r6, #4
+    vld1.8   d3[6], [r6]
+    vld1.8   d3[7], [r7]
+	
+bs_nzc_check_jump1:
+	vzip.8   d0, d1	
+	vzip.8   d0, d1
+    vext.8   q1, q1, q0, #12
+	vadd.u8  \arg4, q0, q1
+
+.endm
+
+
+//in: \arg0(const) \arg1 \arg2; out:\arg3 \arg4
+//used register: r6, r7, q0, q1
+.macro BS_REF_INDEX_CHECK arg0, arg1, arg2, arg3, arg4  
+    //vld1.8   {d0,d1}, [\arg0] 
+	vld1.8   {d0,d1}, [\arg0, :128] 
+    /* Arrenge the input data --- TOP */
+	ands     r6, \arg1, #2
+	beq      bs_ref_index_check_jump0
+	
+    sub      r6, \arg0, \arg2, lsl #4
+    add      r6, #12
+    vld1.32  d3[1], [r6]
+	
+bs_ref_index_check_jump0:
+    vext.8   q1, q1, q0, #12
+    vabd.u8  \arg3, q0, q1
+
+    
+    /* Arrenge the input data --- LEFT */
+	ands     r6, \arg1, #1
+	beq      bs_ref_index_check_jump1
+	
+    sub      r6, \arg0, #13
+	add      r7, r6, #4 
+    vld1.8   d3[4], [r6]
+	add      r6, r7, #4
+    vld1.8   d3[5], [r7]
+	add      r7, r6, #4
+    vld1.8   d3[6], [r6]
+    vld1.8   d3[7], [r7]
+	
+bs_ref_index_check_jump1:
+	vzip.8   d0, d1
+	vzip.8   d0, d1
+    vext.8   q1, q1, q0, #12
+	vabd.u8  \arg4, q0, q1
+.endm
+
+//in: \arg0,\arg1(const),\arg2(const),\arg3(const),\arg4(const); out:\arg5, \arg6
+.macro BS_COMPARE_MV arg0, arg1, arg2, arg3, arg4, arg5, arg6  
+
+    mov       r6, #4
+    vabd.s16  q5, \arg0, \arg1
+    vabd.s16  q6, \arg1, \arg2
+	vdup.s16  \arg0, r6
+    vabd.s16  q7, \arg2, \arg3	
+    vabd.s16  q8, \arg3, \arg4	    
+    
+    vcge.s16  q5, \arg0
+    vcge.s16  q6, \arg0
+    vcge.s16  q7, \arg0
+    vcge.s16  q8, \arg0 
+	
+	vpadd.i16 d10, d10, d11
+    vpadd.i16 d11, d12, d13
+    vpadd.i16 d12, d14, d15
+    vpadd.i16 d13, d16, d17  
+   
+    vaddhn.i16  \arg5, q5, q5
+    vaddhn.i16  \arg6, q6, q6
+.endm
+
+//in: \arg0(const) \arg1 \arg2; out:\arg3 \arg4 \arg5 \arg6
+//used register: r6, r7, q0, q1, q2, q3, q4
+.macro BS_MV_CHECK arg0, arg1, arg2, arg3, arg4, arg5, arg6 
+    //vldm   \arg0, {q0,q1,q2,q3}
+    vld1.32  {q0,q1}, [\arg0, :128]
+	add      r6, \arg0, #32
+	vld1.32  {q2,q3}, [r6, :128]
+
+    /* Arrenge the input data --- TOP */
+	ands     r6, \arg1, #2
+	beq      bs_mv_check_jump0
+		
+    sub      r6, \arg0, \arg2, lsl #6
+    add      r6, #48
+    vld1.8   {d8, d9}, [r6]
+	
+bs_mv_check_jump0:
+    BS_COMPARE_MV  q4, q0, q1, q2, q3, \arg3, \arg4
+    
+    /* Arrenge the input data --- LEFT */
+	ands     r6, \arg1, #1
+	beq      bs_mv_check_jump1
+	
+    sub      r6, \arg0, #52
+    //mov      r7, #16
+    add      r7, r6, #16
+	vld1.32   d8[0], [r6]
+	add      r6, r7, #16
+    vld1.32   d8[1], [r7]
+	add      r7, r6, #16
+    vld1.32   d9[0], [r6]
+    vld1.32   d9[1], [r7]
+	
+bs_mv_check_jump1:
+	vzip.32   q0, q2
+	vzip.32   q1, q3
+	vzip.32   q0, q1
+    vzip.32   q2, q3
+    BS_COMPARE_MV  q4, q0, q1, q2, q3, \arg5, \arg6
+.endm
+#endif
+/*
+ * void	deblocking_BS_calc_neon(int8_t  *pNzc, 
+ *								int8_t  *pRef_index, 
+ *								int16_t *pMv[], 
+ *                              int32_t boundry_flag,
+ *								int32_t mb_width,
+ *								uint8_t *bS);
+ *
+ * r0 = cur_layer->nzc[cur_mb_xy]
+ * r1 = cur_layer->ref_index[0][cur_mb_xy]
+ * r2 = cur_layer->mv[0][cur_mb_xy]
+ * r3 = boundry_flag (LEFT_FLAG/TOP_FLAG)
+ * r4 = cur_layer->mb_width
+ * r5 = BS[8][4] save all of the BS value for whole MB(16*16)
+ */
+ 
+	WELS_ASM_FUNC_BEGIN deblocking_BS_calc_neon
+	
+	stmdb sp!, {r4-r7}
+	
+	ldr  r4, [sp, #16]  //Save mb_width to r4
+	ldr  r5, [sp, #20]	//Save BS to r5
+	
+	/* Checking the nzc status */
+	BS_NZC_CHECK r0, r3, r4, q14, q15 //q14,q15 save the nzc status
+        
+	/* Checking the nzc_rs status */
+	//BS_NZC_CHECK r1, r4, q12, q13 //q12,q13 save the mzc_rs status
+	
+	/* For checking bS[I] = 2 */
+	mov      r6, #2
+	//vqadd.u8 q14, q12
+	//vqadd.u8 q15, q13
+	vcgt.s8  q14, q14, #0
+	vdup.u8  q0, r6
+	vcgt.s8  q15, q15, #0
+	
+	vand.u8  q14, q14, q0 //q14 save the nzc check result all the time --- for dir is top
+	vand.u8  q15, q15, q0 //q15 save the nzc check result all the time --- for dir is left
+	
+	
+	/* Checking the ref_index status*/
+	BS_REF_INDEX_CHECK r1, r3, r4, q12, q13 //q12,q13 save the ref_index status
+	
+	vcgt.s8  q12, q12, #0
+	vcgt.s8  q13, q13, #0
+		
+	/* Checking the mv status*/
+	BS_MV_CHECK r2, r3, r4, d20, d21, d22, d23//q10, q11 save the mv status
+
+	/* For checking bS[I] = 1 */
+	mov      r6, #1
+	vqadd.u8 q12, q10
+	vdup.u8  q0, r6
+	vqadd.u8 q13, q11
+
+	vand.u8  q12, q12, q0 //q12 save the nzc check result all the time --- for dir is top
+	vand.u8  q13, q13, q0 //q13 save the nzc check result all the time --- for dir is left
+	
+	
+	/* Check bS[I] is '1' or '2' */
+	vmax.u8 q1, q12, q14
+	vmax.u8 q0, q13, q15
+	
+	//vstm r5, {q0, q1}
+    vst1.32 {q0, q1}, [r5]
+	ldmia sp!, {r4-r7}
+    WELS_ASM_FUNC_END
+/*====== deblocking_BS_calc_neon End ======*/
+#endif
