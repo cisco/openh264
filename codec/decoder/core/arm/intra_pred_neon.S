@@ -35,7 +35,7 @@
 .text
 #include "arm_arch_common_macro.S"
 
-#ifdef APPLE_IOS
+#ifdef __APPLE__
 //Global macro
 .macro GET_8BYTE_DATA
 	vld1.8 {$0[0]}, [$1], $2

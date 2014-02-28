@@ -34,7 +34,7 @@
 .text
 #include "arm_arch_common_macro.S"
 
-#ifdef APPLE_IOS
+#ifdef __APPLE__
 
 .macro ABS_SUB_SUM_16BYTES
 	vld1.32 {q15}, [$0], $2
@@ -160,7 +160,7 @@ vaa_calc_sad_loop1:
 WELS_ASM_FUNC_END
 
 
-#ifdef APPLE_IOS
+#ifdef __APPLE__
 .macro  SAD_SD_MAD_16BYTES
 	vld1.32 {q0}, [$0], $2
 	vld1.32 {q1}, [$1], $2
@@ -314,7 +314,7 @@ vaa_calc_sad_bgd_loop1:
 WELS_ASM_FUNC_END
 
 
-#ifdef APPLE_IOS
+#ifdef __APPLE__
 .macro  SSD_MUL_SUM_16BYTES_RESET
 	vmull.u8 $3, $0, $0
 	vpaddl.u16 $2, $3
@@ -712,7 +712,7 @@ bne vaa_calc_sad_ssd_bgd_height_loop
 WELS_ASM_FUNC_END
 
 
-#ifdef APPLE_IOS
+#ifdef __APPLE__
 .macro SAD_VAR_16
 	vld1.8 {q0}, [$0], $2 //load cur_row
 
@@ -971,7 +971,7 @@ bne vaa_calc_sad_var_height_loop
 WELS_ASM_FUNC_END
 
 
-#ifdef APPLE_IOS
+#ifdef __APPLE__
 .macro SAD_SSD_16
 	SAD_VAR_16 $0, $1, $2, $3
 

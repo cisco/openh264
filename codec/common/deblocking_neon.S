@@ -35,7 +35,7 @@
 
 #include "arm_arch_common_macro.S"
 
-#ifdef APPLE_IOS
+#ifdef __APPLE__
 .macro	JMP_IF_128BITS_IS_ZERO
     vorr.s16	$2, $0, $1
     vmov		r3, r2, $2
@@ -821,7 +821,7 @@ WELS_ASM_FUNC_BEGIN WelsNonZeroCount_neon
     vst1.64	{d0-d2}, [r0]
 WELS_ASM_FUNC_END
 
-#ifdef APPLE_IOS
+#ifdef __APPLE__
 .macro BS_NZC_CHECK
     vld1.8   {d0,d1}, [$0]
     /* Arrenge the input data --- TOP */

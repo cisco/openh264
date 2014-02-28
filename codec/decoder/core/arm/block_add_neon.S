@@ -33,7 +33,7 @@
 #ifdef HAVE_NEON
 .text
 #include "arm_arch_common_macro.S"
-#ifdef APPLE_IOS
+#ifdef __APPLE__
 
 .macro	ROW_TRANSFORM_1_STEP
 //	{	//	input: src_d[0]~[3], output: e_q[0]~[3]; working: $8 $9
