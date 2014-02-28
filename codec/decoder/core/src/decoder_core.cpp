@@ -371,100 +371,6 @@ void DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc) {
 }
 
 
-#ifdef MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
-int32_t CheckPpsId (PWelsDecoderContext pCtx, PPps* ppPps, uint32_t uiPpsId) {
-  PPps pPpsList = pCtx->sPpsBuffer;
-  int32_t iPpsNum = pCtx->iPpsTotalNum;
-  int32_t i = 0;
-
-  if (iPpsNum <= 0) {
-    pCtx->iErrorCode |= dsNoParamSets;
-
-    WelsLog (pCtx, WELS_LOG_WARNING, "CheckPpsId():::::PPS list is empty...NO PPS!!!\n");
-    return dsNoParamSets;
-  }
-
-  while (i < iPpsNum) {
-    if (uiPpsId == pPpsList[i].iPpsId) {
-      *ppPps = &pPpsList[i];
-      break;
-    } else {
-      ++i;
-    }
-  }
-
-  if (i == iPpsNum) {
-    pCtx->iErrorCode |= dsNoParamSets;
-
-    WelsLog (pCtx, WELS_LOG_WARNING, "CheckPpsId()::::::CAN NOT find the matching from the PPS List.  iPpsId:%d\n",
-             uiPpsId);
-    return dsNoParamSets;
-  }
-
-  return 0;
-}
-
-int32_t CheckSpsId (PWelsDecoderContext pCtx, PSubsetSps* ppSubsetSps, PSps* ppSps, int32_t iSpsId,
-                    bool bExtensionFlag) {
-  PSps pSpsList = pCtx->sSpsBuffer;
-  PSubsetSps pSubspsList = pCtx->sSubsetSpsBuffer;
-
-  int32_t iSpsNum    = pCtx->iSpsTotalNum;
-  int32_t iSubspsNum = pCtx->iSubspsTotalNum;
-  int32_t i = 0;
-
-  if (bExtensionFlag) {
-    if (iSubspsNum <= 0) {
-      pCtx->iErrorCode |= dsNoParamSets;
-
-      WelsLog (pCtx, WELS_LOG_WARNING, "CheckSpsId()::::SUBSPS list is empty....NO SUBSPS\n");
-      return dsNoParamSets;
-    }
-    while (i < iSubspsNum) {
-      if (iSpsId == pSubspsList[i].sSps.iSpsId) {
-        *ppSubsetSps = &pSubspsList[i];
-        *ppSps       = &pSubspsList[i].sSps;
-        break;
-      } else {
-        ++i;
-      }
-    }
-    if (i == iSubspsNum) {
-      pCtx->iErrorCode |= dsNoParamSets;
-
-      WelsLog (pCtx, WELS_LOG_WARNING, "CheckSpsId()::::::CAN NOT find the matching from the SUBSPS List.  iSpsId:%d\n",
-               iSpsId);
-      return dsNoParamSets;
-    }
-  } else {
-    if (iSpsNum <= 0) {
-      pCtx->iErrorCode |= dsNoParamSets;
-
-      WelsLog (pCtx, WELS_LOG_WARNING, "CheckSpsId()::::SPS list is empty....NO SPS\n");
-      return dsNoParamSets;
-    }
-    while (i < iSpsNum) {
-      if (iSpsId == pSpsList[i].iSpsId) {
-        *ppSubsetSps = NULL;
-        *ppSps       = &pSpsList[i];
-        break;
-      } else {
-        ++i;
-      }
-    }
-    if (i == iSpsNum) {
-      pCtx->iErrorCode |= dsNoParamSets;
-
-      WelsLog (pCtx, WELS_LOG_WARNING, "CheckSpsId()::::::CAN NOT find the matching from the SPS List.  iSpsId:%d\n", iSpsId);
-      return dsNoParamSets;
-    }
-  }
-
-  return 0;
-}
-
-#endif
-
 #define SLICE_HEADER_IDR_PIC_ID_MAX 65535
 #define SLICE_HEADER_REDUNDANT_PIC_CNT_MAX 127
 #define SLICE_HEADER_ALPHAC0_BETA_OFFSET_MIN -12
@@ -552,13 +458,9 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_PPS_ID_OVERFLOW);
   }
 
-#ifdef MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
-  if (CheckPpsId (pCtx, &pPps, iPpsId)) {
-    return dsNoParamSets;
-  }
-#else
+  //add check PPS available here
+
   pPps    = &pCtx->sPpsBuffer[iPpsId];
-#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
 
   if (pPps->uiNumSliceGroups == 0) {
     WelsLog (pCtx, WELS_LOG_WARNING, "non existing PPS referenced\n");
@@ -570,12 +472,8 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_SPS_ID_OVERFLOW);
   }
 
+  //add check SPS available here
 
-#ifdef MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
-  if (CheckSpsId (pCtx, &pSubsetSps, &pSps, pPps->iSpsId, kExtensionFlag)) {
-    return dsNoParamSets;
-  }
-#else
   if (kbExtensionFlag) {
     pSubsetSps	= &pCtx->sSubsetSpsBuffer[pPps->iSpsId];
     pSps		= &pSubsetSps->sSps;
@@ -583,7 +481,6 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     pSps		= &pCtx->sSpsBuffer[pPps->iSpsId];
   }
   pCtx->pSps			= pSps;
-#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
   pSliceHead->iPpsId = iPpsId;
   pSliceHead->iSpsId = pPps->iSpsId;
   pSliceHead->pPps   = pPps;
