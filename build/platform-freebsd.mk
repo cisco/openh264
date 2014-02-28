@@ -1,5 +1,4 @@
 include build/platform-arch.mk
-ASM = nasm
 SHAREDLIBSUFFIX = so
 CFLAGS += -fPIC -DMT_ENABLED
 LDFLAGS += -lpthread

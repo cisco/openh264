@@ -20,7 +20,6 @@ else
     GCCPREFIX = i686-linux-android
     APP_ABI = x86
   ifeq (Yes, $(USE_ASM))
-    ASM = nasm
     ASM_ARCH = x86
     CFLAGS += -DX86_ASM
     ASMFLAGS += -DNOPREFIX -f elf32 -DX86_32

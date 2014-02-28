@@ -1,5 +1,4 @@
 include build/platform-arch.mk
-ASM = nasm
 SHAREDLIBSUFFIX = dylib
 SHARED = -dynamiclib
 CFLAGS += -Werror -fPIC -DMACOS -DMT_ENABLED -MMD -MP
