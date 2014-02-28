@@ -88,15 +88,11 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx);
  * \brief	core svc encoding process
  *
  * \param	h			sWelsEncCtx*, encoder context
- * \param	dst			FrameBSInfo*
- * \param	pSrc			SSourcePicture* for need_ds = true or SSourcePicture** for need_ds = false
- * \param	kiConfiguredLayerNum	=1 in case need_ds = true or >1 in case need_ds = false
- * \param	need_ds		Indicate whether need down sampling desired
- *						[NO in picture list case, YES in console aplication based]
+ * \param	pFbi			FrameBSInfo*
+ * \param	kpSrcPic		Source picture
  * \return	EFrameType (WELS_FRAME_TYPE_IDR/WELS_FRAME_TYPE_I/WELS_FRAME_TYPE_P)
  */
-int32_t WelsEncoderEncodeExt (sWelsEncCtx*, void* pDst, const SSourcePicture** kppSrcList,
-                              const int32_t kiConfiguredLayerNum);
+int32_t WelsEncoderEncodeExt (sWelsEncCtx*, SFrameBSInfo * pFbi, const SSourcePicture* kpSrcPic);
 
 int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst);
 

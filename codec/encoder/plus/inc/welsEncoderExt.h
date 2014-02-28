@@ -77,7 +77,7 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
    * return: EVideoFrameType [IDR: videoFrameTypeIDR; P: videoFrameTypeP; ERROR: videoFrameTypeInvalid]
    */
   virtual int EXTAPI EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo);
-  virtual int EXTAPI EncodeFrameInternal (const SSourcePicture* kppSrcPicList, SFrameBSInfo* pBsInfo);
+  virtual int        EncodeFrameInternal (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo);
 
   /*
    * return: 0 - success; otherwise - failed;
