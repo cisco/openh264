@@ -15,12 +15,7 @@ static int InitWithParam(ISVCEncoder* encoder, int width,
   param.iPicHeight = height;
   param.iTargetBitrate = 5000000;
   param.iInputCsp = videoFormatI420;
-<<<<<<< HEAD
-  
-  return encoder->Initialize(&param, INIT_TYPE_PARAMETER_BASED);
-=======
   return encoder->Initialize(&param);
->>>>>>> e79769fb881f399e171a7d0121a8868576b02d77
 }
 
 BaseEncoderTest::BaseEncoderTest() : encoder_(NULL) {}
