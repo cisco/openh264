@@ -971,8 +971,10 @@ void InitMcFunc (SMcFunc* pMcFunc, int32_t iCpu) {
   pMcFunc->pMcChromaFunc = McChroma_c;
 
 #ifdef	HAVE_NEON
-	 pMcFunc->pMcLumaFunc	  = McLuma_neon;
-	 pMcFunc->pMcChromaFunc  = McChroma_neon;
+  if ( iCpu & WELS_CPU_NEON ) {
+	   pMcFunc->pMcLumaFunc	  = McLuma_neon;
+	   pMcFunc->pMcChromaFunc  = McChroma_neon;
+		}
 #endif
 
 #if defined (X86_ASM)

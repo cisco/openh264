@@ -19,6 +19,8 @@
 		4CE4475018BC61650017DF25 /* deblocking_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4473818BC61650017DF25 /* deblocking_common.cpp */; };
 		4CE4475218BC61650017DF25 /* logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4473C18BC61650017DF25 /* logging.cpp */; };
 		4CE4475818BC61650017DF25 /* WelsThreadLib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4474918BC61650017DF25 /* WelsThreadLib.cpp */; };
+		4CE447BD18C085320017DF25 /* deblocking_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CE447BC18C085320017DF25 /* deblocking_neon.S */; };
+		4CE447BF18C085900017DF25 /* arm_arch_common_macro.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CE447BE18C085900017DF25 /* arm_arch_common_macro.S */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +71,8 @@
 		4CE4474718BC61650017DF25 /* typedefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = typedefs.h; sourceTree = "<group>"; };
 		4CE4474918BC61650017DF25 /* WelsThreadLib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WelsThreadLib.cpp; sourceTree = "<group>"; };
 		4CE4474A18BC61650017DF25 /* WelsThreadLib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelsThreadLib.h; sourceTree = "<group>"; };
+		4CE447BC18C085320017DF25 /* deblocking_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = deblocking_neon.S; sourceTree = "<group>"; };
+		4CE447BE18C085900017DF25 /* arm_arch_common_macro.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = arm_arch_common_macro.S; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,6 +148,8 @@
 		4CE4472F18BC61650017DF25 /* common */ = {
 			isa = PBXGroup;
 			children = (
+				4CE447BE18C085900017DF25 /* arm_arch_common_macro.S */,
+				4CE447BC18C085320017DF25 /* deblocking_neon.S */,
 				4CE4473118BC61650017DF25 /* cpu.cpp */,
 				4CE4473218BC61650017DF25 /* cpu.h */,
 				4CE4473318BC61650017DF25 /* cpu_core.h */,
@@ -247,9 +253,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4CE447BF18C085900017DF25 /* arm_arch_common_macro.S in Sources */,
 				4CE4475018BC61650017DF25 /* deblocking_common.cpp in Sources */,
 				4CE4474C18BC61650017DF25 /* cpu.cpp in Sources */,
 				4CE4475218BC61650017DF25 /* logging.cpp in Sources */,
+				4CE447BD18C085320017DF25 /* deblocking_neon.S in Sources */,
 				4CE4475818BC61650017DF25 /* WelsThreadLib.cpp in Sources */,
 				4CE4474E18BC61650017DF25 /* crt_util_safe_x.cpp in Sources */,
 			);

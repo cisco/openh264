@@ -720,6 +720,7 @@ void  DeblockingInit (SDeblockingFunc*  pFunc,  int32_t iCpu) {
 #endif
 
 #if defined(HAVE_NEON)
+    if ( iCpu & WELS_CPU_NEON )
 	{
 		pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_neon;
 		pFunc->pfLumaDeblockingEQ4Ver		= DeblockLumaEq4V_neon;

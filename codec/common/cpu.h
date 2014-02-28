@@ -78,6 +78,16 @@ void     WelsXmmRegLoad(void * src);
 
 void     WelsXmmRegEmptyOp(void * pSrc);
 
+#if defined(HAVE_NEON)
+#if defined(ANDROID_NDK)
+	uint32_t WelsCPUFeatureDetectAndroid();
+#endif
+	
+#if defined(APPLE_IOS)
+	uint32_t WelsCPUFeatureDetectIOS();
+#endif
+#endif
+    
 #if defined(__cplusplus)
 }
 #endif//__cplusplus
