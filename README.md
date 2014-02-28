@@ -39,7 +39,7 @@ OS Support
 - Mac OS X 64-bit and 32-bit
 - Linux 64-bit and 32-bit
 - Android 32-bit
-- iOS 64-bit and 32-bit (not supported yet, may be added in the future)
+- iOS 64-bit and 32-bit
 
 Processor Support
 -----------------
