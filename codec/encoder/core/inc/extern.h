@@ -95,8 +95,7 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx);
  *						[NO in picture list case, YES in console aplication based]
  * \return	EFrameType (WELS_FRAME_TYPE_IDR/WELS_FRAME_TYPE_I/WELS_FRAME_TYPE_P)
  */
-int32_t WelsEncoderEncodeExt (sWelsEncCtx*, void* pDst, const SSourcePicture** kppSrcList,
-                              const int32_t kiConfiguredLayerNum);
+int32_t WelsEncoderEncodeExt (sWelsEncCtx*, SFrameBSInfo * pFbi, const SSourcePicture* kpSrcPic);
 
 int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst);
 

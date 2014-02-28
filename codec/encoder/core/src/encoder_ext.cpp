@@ -3067,9 +3067,7 @@ int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst) {
  *						[NO in picture list case, YES in console aplication based]
  * \return	EFrameType (WELS_FRAME_TYPE_IDR/WELS_FRAME_TYPE_I/WELS_FRAME_TYPE_P)
  */
-int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePicture** ppSrcList,
-                              const int32_t iConfiguredLayerNum) {
-  SFrameBSInfo* pFbi					= (SFrameBSInfo*)pDst;
+int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSourcePicture* pSrcPic) {
   SLayerBSInfo* pLayerBsInfo					= &pFbi->sLayerInfo[0];
   SWelsSvcCodingParam* pSvcParam	= pCtx->pSvcParam;
   SSpatialPicIndex* pSpatialIndexMap = &pCtx->sSpatialIndexMap[0];
@@ -3108,7 +3106,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, void* pDst, const SSourcePictur
   pFbi->iLayerNum	= 0;	// for initialization
 
   // perform csc/denoise/downsample/padding, generate spatial layers
-  iSpatialNum = pCtx->pVpp->BuildSpatialPicList (pCtx, ppSrcList, iConfiguredLayerNum);
+  iSpatialNum = pCtx->pVpp->BuildSpatialPicList (pCtx, &pSrcPic, 1);
   if (iSpatialNum < 1) {	// skip due to temporal layer settings (different frame rate)
     ++ pCtx->iCodingIndex;
     pFbi->eOutputFrameType = WELS_FRAME_TYPE_SKIP;
