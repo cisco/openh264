@@ -38,6 +38,7 @@
  *************************************************************************************
  */
 #include <string.h>
+#include <stdio.h>
 #ifdef ANDROID_NDK
 #include <cpu-features.h>
 #endif
@@ -258,9 +259,39 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors)
     }
     return uiCPU;
 }
-#else /* HAVE_NEON enabled but no runtime detection */
+#elif defined(__linux__)
+
+/* Generic arm/linux cpu feature detection */
 uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
-  return 0;
+  FILE *f = fopen("/proc/cpuinfo", "r");
+
+  if (!f)
+    return 0;
+
+  char buf[200];
+  int flags = 0;
+  while (fgets(buf, sizeof(buf), f)) {
+    if (!strncmp(buf, "Features", strlen("Features"))) {
+      if (strstr(buf, " neon "))
+        flags |= WELS_CPU_NEON;
+      if (strstr(buf, " vfpv3 "))
+        flags |= WELS_CPU_VFPv3;
+      break;
+    }
+  }
+  fclose(f);
+  return flags;
+}
+
+#else /* HAVE_NEON enabled but no runtime detection */
+
+/* No runtime feature detection available, but built with HAVE_NEON - assume
+ * that NEON and all associated features are available. */
+
+uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
+  return WELS_CPU_ARMv7 |
+         WELS_CPU_VFPv3 |
+         WELS_CPU_NEON;
 }
 #endif
 #else /* Neither X86_ASM nor HAVE_NEON */
