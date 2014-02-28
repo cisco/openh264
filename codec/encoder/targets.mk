@@ -35,7 +35,6 @@ ENCODER_CPP_SRCS=\
 
 ENCODER_OBJS += $(ENCODER_CPP_SRCS:.cpp=.o)
 
-ifeq ($(USE_ASM), Yes)
 ifeq ($(ASM_ARCH), x86)
 ENCODER_ASM_SRCS=\
 	$(ENCODER_SRCDIR)/core/asm/coeff.asm\
@@ -46,7 +45,6 @@ ENCODER_ASM_SRCS=\
 	$(ENCODER_SRCDIR)/core/asm/score.asm\
 
 ENCODER_OBJS += $(ENCODER_ASM_SRCS:.asm=.o)
-endif
 endif
 
 OBJS += $(ENCODER_OBJS)
