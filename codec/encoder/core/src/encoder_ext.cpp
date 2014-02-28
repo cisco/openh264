@@ -3060,11 +3060,8 @@ int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst) {
  * \brief	core svc encoding process
  *
  * \pParam	pCtx			sWelsEncCtx*, encoder context
- * \pParam	pDst			FrameBSInfo*
- * \pParam	pSrc			SSourcePicture* for need_ds = true or SSourcePicture** for need_ds = false
- * \pParam	iConfiguredLayerNum	=1 in case need_ds = true or >1 in case need_ds = false
- * \pParam	need_ds		Indicate whether need down sampling desired
- *						[NO in picture list case, YES in console aplication based]
+ * \pParam	pFbi			FrameBSInfo*
+ * \pParam	pSrcPic			Source Picture
  * \return	EFrameType (WELS_FRAME_TYPE_IDR/WELS_FRAME_TYPE_I/WELS_FRAME_TYPE_P)
  */
 int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSourcePicture* pSrcPic) {
