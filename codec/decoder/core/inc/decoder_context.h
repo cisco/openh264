@@ -56,10 +56,6 @@
 
 namespace WelsDec {
 
-#ifndef MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
-//#define MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
-#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
-
 typedef struct TagDataBuffer {
   uint8_t* pHead;
   uint8_t* pEnd;
@@ -233,12 +229,6 @@ typedef struct TagWelsDecoderContext {
   /* Global memory external */
 
   SPosOffset	sFrameCrop;
-
-#ifdef MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
-  int32_t             iSpsTotalNum;  //the number of SPS in current IDR interval
-  int32_t             iSubspsTotalNum; //the number of subsps in current IDR interval
-  int32_t             iPpsTotalNum; //the number of PPS in current IDR interval.
-#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
 
   SSps				sSpsBuffer[MAX_SPS_COUNT];
   SPps				sPpsBuffer[MAX_PPS_COUNT];

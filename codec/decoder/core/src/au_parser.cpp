@@ -322,26 +322,8 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
       if (uiAvailNalNum > 1) {
         pCurAu->uiEndPos = uiAvailNalNum - 2;
         pCtx->bAuReadyFlag = true;
-
-
       }
-#ifdef MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
-      if (dsNoParamSets & pCtx->iErrorCode) {
-        if (uiAvailNalNum <= 1) { //no any data to decode and SPS/PPS ID mismatch, SHOULD request IDR
-#ifdef LONG_TERM_REF
-          pCtx->bParamSetsLostFlag = true;
-#else
-          pCtx->bReferenceLostAtT0Flag = true;
-#endif
-          ResetParameterSetsState (pCtx);
-        }
-        return NULL;
-      } else {
-        return NULL;
-      }
-#else
       return NULL;
-#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
     }
 
     if ((uiAvailNalNum > 1) &&
@@ -602,7 +584,7 @@ int32_t ParsePrefixNalUnit (PWelsDecoderContext pCtx, PBitStringAux pBs) {
       WELS_READ_VERIFY (ParseRefBasePicMarking (pBs, &sPrefixNal->sRefPicBaseMarking));
     }
     WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //additional_prefix_nal_unit_extension_flag
-    sPrefixNal->bPrefixNalUnitAdditionalExtFlag = uiCode;
+    sPrefixNal->bPrefixNalUnitAdditionalExtFlag = !!uiCode;
     if (sPrefixNal->bPrefixNalUnitAdditionalExtFlag) {
       WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //additional_prefix_nal_unit_extension_data_flag
       sPrefixNal->bPrefixNalUnitExtFlag	= !!uiCode;
@@ -807,12 +789,6 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     memset (&pCtx->bSpsAvailFlags[0], 0, sizeof (pCtx->bSpsAvailFlags));
     memset (&pCtx->bSubspsAvailFlags[0], 0, sizeof (pCtx->bSubspsAvailFlags));
     memset (&pCtx->bPpsAvailFlags[0], 0, sizeof (pCtx->bPpsAvailFlags));
-
-#ifdef MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
-    pCtx->iSpsTotalNum    = 0;
-    pCtx->iSubspsTotalNum = 0;
-    pCtx->iPpsTotalNum    = 0;
-#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
   }
 
   WELS_READ_VERIFY (BsGetBits (pBs, 8, &uiCode)); //profile_idc
@@ -840,29 +816,12 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   iSpsId		= uiCode;
 
   if (kbUseSubsetFlag) {
-#ifdef MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
-    pSubsetSps = &pCtx->sSubsetSpsBuffer[pCtx->iSubspsTotalNum];
-    pCtx->bSubspsAvailFlags[pCtx->iSubspsTotalNum] = true;
-
-    pSubsetSps->sSps.iSpsId = iSpsId;
-    pSps = &pSubsetSps->sSps;
-    ++pCtx->iSubspsTotalNum;
-#else
     pSubsetSps	= &pCtx->sSubsetSpsBuffer[iSpsId];
     pSps		= &pSubsetSps->sSps;
     pCtx->bSubspsAvailFlags[iSpsId]	= true; // added for EC, 10/28/2009
-#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
   } else {
-#ifdef MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
-    pSps = &pCtx->sSpsBuffer[pCtx->iSpsTotalNum];
-    pCtx->bSpsAvailFlags[pCtx->iSpsTotalNum] = true;
-
-    pSps->iSpsId = iSpsId;
-    ++pCtx->iSpsTotalNum;
-#else
     pSps = &pCtx->sSpsBuffer[iSpsId];
     pCtx->bSpsAvailFlags[iSpsId] = true; // added for EC, 10/28/2009
-#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
   }
   const SLevelLimits* pSLevelLimits = GetLevelLimits (uiLevelIdc, bConstraintSetFlags[3]);
   if (NULL == pSLevelLimits) {
@@ -1073,12 +1032,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux)
     return ERR_INFO_PPS_ID_OVERFLOW;
   }
 
-#ifdef MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
-  pPps = &pPpsList[pCtx->iPpsTotalNum];
-#else
   pPps = &pPpsList[uiPpsId];
-#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
-
 
   pPps->iPpsId = uiPpsId;
   WELS_READ_VERIFY (BsGetUe (pBsAux, &uiCode)); //seq_parameter_set_id
@@ -1160,13 +1114,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux)
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //redundant_pic_cnt_present_flag
   pPps->bRedundantPicCntPresentFlag           = !!uiCode;
 
-
-#ifdef MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
-  pCtx->bPpsAvailFlags[pCtx->iPpsTotalNum] = true;
-  ++pCtx->iPpsTotalNum;
-#else
   pCtx->bPpsAvailFlags[uiPpsId] = true; // added for EC, 10/28/2009
-#endif //MOSAIC_AVOID_BASED_ON_SPS_PPS_ID
 
   return ERR_NONE;
 }
