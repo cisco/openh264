@@ -212,9 +212,7 @@ void WelsCPURestore (const uint32_t kuiCPU) {
 void WelsXmmRegEmptyOp(void * pSrc) {
 }
 
-#endif
-
-#if defined(HAVE_NEON)//For supporting both android platform and iOS platform
+#elif defined(HAVE_NEON) //For supporting both android platform and iOS platform
 #if defined(ANDROID_NDK)
 uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors)
 {
@@ -242,10 +240,8 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors)
   return uiCPU;
 }
 
-#endif
-
-#if defined(APPLE_IOS)
-uint32_t WelsCPUFeatureDetectIOS() //Need to be updated for the new device of APPLE
+#elif defined(APPLE_IOS)
+uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors)
 {
     uint32_t       uiCPU = 0;
     struct utsname sSystemInfo;
@@ -262,7 +258,17 @@ uint32_t WelsCPUFeatureDetectIOS() //Need to be updated for the new device of AP
     }
     return uiCPU;
 }
+#else /* HAVE_NEON enabled but no runtime detection */
+uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
+  return 0;
+}
 #endif
+#else /* Neither X86_ASM nor HAVE_NEON */
+
+uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
+  return 0;
+}
+
 #endif
 
 
