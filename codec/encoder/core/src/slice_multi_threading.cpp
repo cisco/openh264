@@ -63,9 +63,7 @@
 #include "cpu.h"
 #endif//X86_ASM
 
-#if defined(DYNAMIC_SLICE_ASSIGN) || defined(MT_DEBUG)
 #include "measure_time.h"
-#endif//DYNAMIC_SLICE_ASSIGN
 namespace WelsSVCEnc {
 void UpdateMbListNeighborParallel (SSliceCtx* pSliceCtx,
                                    SMB* pMbList,
@@ -144,12 +142,8 @@ void CalcSliceComplexRatio (void* pRatio, SSliceCtx* pSliceCtx, uint32_t* pSlice
   }
 }
 
-#if defined(MT_ENABLED) && defined(DYNAMIC_SLICE_ASSIGN) && defined(NOT_ABSOLUTE_BALANCING)
+#if defined(MT_ENABLED)
 int32_t NeedDynamicAdjust (void* pConsumeTime, const int32_t iSliceNum) {
-#if !defined(USE_RMSE_SLICE_COMPLEXITY_RATIO_FOR_BALANCING)
-  const float fRatioLower	= TOLERANT_BALANCING_RATIO_LOWER (uiSliceNum);
-  const float fRatioUpper	= TOLERANT_BALANCING_RATIO_UPPER (uiSliceNum);
-#endif//USE_RMSE_SLICE_COMPLEXITY_RATIO_FOR_BALANCING
   uint32_t* pSliceConsume	= (uint32_t*)pConsumeTime;
   uint32_t uiTotalConsume	= 0;
   int32_t iSliceIdx		= 0;
@@ -172,7 +166,6 @@ int32_t NeedDynamicAdjust (void* pConsumeTime, const int32_t iSliceNum) {
   }
 
   iSliceIdx = 0;
-#if defined(USE_RMSE_SLICE_COMPLEXITY_RATIO_FOR_BALANCING)
   float fThr				= EPSN;	// threshold for various cores cases
   float fRmse				= .0f;	// root mean square error of pSlice consume ratios
   const float kfMeanRatio	= 1.0f / iSliceNum;
@@ -198,27 +191,11 @@ int32_t NeedDynamicAdjust (void* pConsumeTime, const int32_t iSliceNum) {
            "[MT] NeedDynamicAdjust(), herein adjustment decision is made (iNeedAdj= %d) by: fRmse of pSlice complexity ratios %.6f, the corresponding threshold %.6f, iCountSliceNum %d\n",
            iNeedAdj, fRmse, fThr, iSliceNum);
 #endif//ENABLE_TRACE_MT
-#else
-  do {
-    const float kfRatio = 1.0f * pSliceConsume[uiSliceIdx] / uiTotalConsume;
-    if (kfRatio + EPSN < fRatioLower || kfRatio > ratio_upper + EPSN) {
-#if defined(ENABLE_TRACE_MT)
-      WelsLog (NULL, WELS_LOG_DEBUG,
-               "[MT] NeedDynamicAdjust(), herein adjustment decision is made by pSlice consume time not balanced at all, uiSliceIdx= %d, comp_ratio= %.6f, pSliceConsumeTime= %d, total_consume_time= %d, iCountSliceNum= %d\n",
-               uiSliceIdx, kfRatio, pSliceConsume[uiSliceIdx], uiTotalConsume, uiSliceNum);
-#endif//ENABLE_TRACE_MT
-      iNeedAdj = true;
-      break;
-    }
-    ++ uiSliceIdx;
-  } while (uiSliceIdx + 1 < uiSliceNum);
-#endif//USE_RMSE_SLICE_COMPLEXITY_RATIO_FOR_BALANCING
 
   return iNeedAdj;
 }
-#endif//..
+#endif
 
-#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
                            SDqLayer* pCurDqLayer,
                            void* pComplexRatio,
@@ -320,20 +297,7 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
     WelsMultipleEventsWaitAllBlocking (kiThreadNum, &pCtx->pSliceThreading->pFinUpdateMbListEvent[0]);
   }
 }
-#endif//#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 
-#ifdef PACKING_ONE_SLICE_PER_LAYER
-void ResetEnvMt (sWelsEncCtx* pCtx) {
-  const int16_t kiSliceCount = pCtx->iMaxSliceCount;
-  int32_t iIdx = 0;
-
-  while (iIdx < kiSliceCount) {
-    SWelsSliceBs* pSliceBs	= &pCtx->pSliceBs[iIdx];
-    pSliceBs->uiBsPos		= 0;
-    ++ iIdx;
-  }
-}
-#endif//PACKING_ONE_SLICE_PER_LAYER
 
 int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingParam, const int32_t iCountBsLen,
                            const int32_t iTargetSpatialBsSize) {
@@ -378,7 +342,6 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pFinSliceCodingEvent), FreeMemorySvc (ppCtx))
 #endif//_WIN32
 
-#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 #if defined(__GNUC__)
   pSmt->pUpdateMbListThrdHandles	= (WELS_THREAD_HANDLE*)pMa->WelsMalloc (sizeof (WELS_THREAD_HANDLE) * iThreadNum,
                                     "pUpdateMbListThrdHandles");
@@ -390,14 +353,12 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   pSmt->pFinUpdateMbListEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pFinUpdateMbListEvent");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pFinUpdateMbListEvent), FreeMemorySvc (ppCtx))
 #endif//_WIN32
-#endif//#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 
 #ifdef _WIN32
   pSmt->pExitEncodeEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pExitEncodeEvent");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pExitEncodeEvent), FreeMemorySvc (ppCtx))
 #endif//_WIN32
 
-#if defined(DYNAMIC_SLICE_ASSIGN) || defined(MT_DEBUG)
   iIdx = 0;
   while (iIdx < iNumSpatialLayers) {
     SSliceConfig* pMso	= &pPara->sDependencyLayers[iIdx].sSliceCfg;
@@ -406,20 +367,15 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
         && pPara->iMultipleThreadIdc >= kiSliceNum) {
       pSmt->pSliceConsumeTime[iIdx]	= (uint32_t*)pMa->WelsMallocz (kiSliceNum * sizeof (uint32_t), "pSliceConsumeTime[]");
       WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pSliceConsumeTime[iIdx]), FreeMemorySvc (ppCtx))
-#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
       pSmt->pSliceComplexRatio[iIdx]	= (float*)pMa->WelsMalloc (kiSliceNum * sizeof (float), "pSliceComplexRatio[]");
       WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pSliceComplexRatio[iIdx]), FreeMemorySvc (ppCtx))
-#endif//TRY_SLICING_BALANCE
     } else {
       pSmt->pSliceConsumeTime[iIdx]	= NULL;
-#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
       pSmt->pSliceComplexRatio[iIdx]	= NULL;
-#endif//TRY_SLICING_BALANCE
     }
     ++ iIdx;
   }
   // NULL for pSliceConsumeTime[iIdx]: iIdx from iNumSpatialLayers to MAX_DEPENDENCY_LAYERS
-#endif//#if defined(DYNAMIC_SLICE_ASSIGN) || defined(MT_DEBUG)
 
 #ifdef MT_DEBUG
   // file handle for MT debug
@@ -447,7 +403,6 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
     pSmt->pThreadPEncCtx[iIdx].iThreadIndex	= iIdx;
     pSmt->pThreadHandles[iIdx]				= 0;
 
-#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 #ifdef _WIN32
     WelsEventInit (&pSmt->pUpdateMbListEvent[iIdx]);
     WelsEventInit (&pSmt->pFinUpdateMbListEvent[iIdx]);
@@ -464,7 +419,6 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
     WelsLog ((*ppCtx), WELS_LOG_INFO, "[MT] Open pFinUpdateMbListEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
 #endif
 #endif//_WIN32
-#endif//#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 
 #ifdef _WIN32
     WelsEventInit (&pSmt->pSliceCodedEvent[iIdx]);
@@ -487,11 +441,6 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 
     ++ iIdx;
   }
-
-#ifdef PACKING_ONE_SLICE_PER_LAYER
-  pSmt->pCountBsSizeInPartition	= (uint32_t*)pMa->WelsMalloc (sizeof (uint32_t) * iThreadNum, "pCountBsSizeInPartition");
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pCountBsSizeInPartition), FreeMemorySvc (ppCtx))
-#endif//PACKING_ONE_SLICE_PER_LAYER
 
   (*ppCtx)->pSliceBs	= (SWelsSliceBs*)pMa->WelsMalloc (sizeof (SWelsSliceBs) * iMaxSliceNum, "pSliceBs");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pSliceBs), FreeMemorySvc (ppCtx))
@@ -566,12 +515,10 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
       WelsEventDestroy (&pSmt->pFinSliceCodingEvent[iIdx]);
     if (pSmt->pExitEncodeEvent != NULL)
       WelsEventDestroy (&pSmt->pExitEncodeEvent[iIdx]);
-#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
     if (pSmt->pUpdateMbListEvent != NULL)
       WelsEventDestroy (&pSmt->pUpdateMbListEvent[iIdx]);
     if (pSmt->pFinUpdateMbListEvent != NULL)
       WelsEventDestroy (&pSmt->pFinUpdateMbListEvent[iIdx]);
-#endif//DYNAMIC_SLICE_ASSIGN && TRY_SLICING_BALANCE
 #else
     char ename[SEM_NAME_MAX] = {0};
     // length of semaphore name should be system constrained at least on mac 10.7
@@ -579,12 +526,10 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
     WelsEventClose (pSmt->pSliceCodedEvent[iIdx], ename);
     WelsSnprintf (ename, SEM_NAME_MAX, "rc%d%p", iIdx, (void*) (*ppCtx));
     WelsEventClose (pSmt->pReadySliceCodingEvent[iIdx], ename);
-#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
     WelsSnprintf (ename, SEM_NAME_MAX, "ud%d%p", iIdx, (void*) (*ppCtx));
     WelsEventClose (pSmt->pUpdateMbListEvent[iIdx], ename);
     WelsSnprintf (ename, SEM_NAME_MAX, "fu%d%p", iIdx, (void*) (*ppCtx));
     WelsEventClose (pSmt->pFinUpdateMbListEvent[iIdx], ename);
-#endif//DYNAMIC_SLICE_ASSIGN && TRY_SLICING_BALANCE
 #endif//_WIN32
 
     ++ iIdx;
@@ -608,13 +553,6 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
     pSmt->pFinSliceCodingEvent = NULL;
   }
 #endif//_WIN32
-
-#ifdef PACKING_ONE_SLICE_PER_LAYER
-  if (NULL != pSmt->pCountBsSizeInPartition) {
-    pMa->WelsFree (pSmt->pCountBsSizeInPartition, "pCountBsSizeInPartition");
-    pSmt->pCountBsSizeInPartition = NULL;
-  }
-#endif//PACKING_ONE_SLICE_PER_LAYER
 
   WelsMutexDestroy (&pSmt->mutexSliceNumUpdate);
   WelsMutexDestroy (&((*ppCtx)->mutexEncoderError));
@@ -643,24 +581,18 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
     pMa->WelsFree ((*ppCtx)->pSliceBs, "pSliceBs");
     (*ppCtx)->pSliceBs = NULL;
   }
-#if defined(DYNAMIC_SLICE_ASSIGN) || defined(MT_DEBUG)
   iIdx = 0;
   while (iIdx < pCodingParam->iSpatialLayerNum) {
     if (pSmt->pSliceConsumeTime[iIdx]) {
       pMa->WelsFree (pSmt->pSliceConsumeTime[iIdx], "pSliceConsumeTime[]");
       pSmt->pSliceConsumeTime[iIdx] = NULL;
     }
-#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
     if (pSmt->pSliceComplexRatio[iIdx] != NULL) {
       pMa->WelsFree (pSmt->pSliceComplexRatio[iIdx], "pSliceComplexRatio[]");
       pSmt->pSliceComplexRatio[iIdx] = NULL;
     }
-#endif//TRY_SLICING_BALANCE
     ++ iIdx;
   }
-#endif//#if defined(DYNAMIC_SLICE_ASSIGN) || defined(MT_DEBUG)
-
-#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 
 #ifdef _WIN32
   if (pSmt->pUpdateMbListEvent != NULL) {
@@ -677,8 +609,6 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
     pSmt->pUpdateMbListThrdHandles = NULL;
   }
 #endif//_WIN32
-
-#endif//#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 
 #ifdef MT_DEBUG
   // file handle for debug
@@ -781,12 +711,8 @@ int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFr
   const int32_t kiNalCnt			= pSliceBs->iNalIndex;
   int32_t iNalIdx					= 0;
   int32_t iNalSize = 0;
-#if !defined(PACKING_ONE_SLICE_PER_LAYER)
   const int32_t iFirstSlice		= (iSliceIdx == 0);
   int32_t iNalBase				= iFirstSlice ? 0 : pLbi->iNalCount;
-#else
-  int32_t iNalBase				= 0;
-#endif//!PACKING_ONE_SLICE_PER_LAYER
   int32_t iReturn = ENC_RETURN_SUCCESS;
   const int32_t kiWrittenLength = pCtx->iPosBsBuffer;
   iSliceSize				= 0;
@@ -803,7 +729,6 @@ int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFr
     ++ iNalIdx;
   }
 
-#if !defined(PACKING_ONE_SLICE_PER_LAYER)
   pSliceBs->uiBsPos	= iSliceSize;
   if (iFirstSlice) {
     // pBsBuffer has been updated at coding_slice_0_in_encoder_mother_thread()
@@ -816,14 +741,6 @@ int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFr
   } else {
     pLbi->iNalCount		+= kiNalCnt;
   }
-#else
-  pLbi->uiLayerType		= VIDEO_CODING_LAYER;
-  pLbi->uiSpatialId		= pNalHdrExt->uiDependencyId;
-  pLbi->uiTemporalId	= pNalHdrExt->uiTemporalId;
-  pLbi->uiQualityId		= 0;
-  pLbi->uiPriorityId	= 0;
-  pLbi->iNalCount		= kiNalCnt;
-#endif//PACKING_ONE_SLICE_PER_LAYER
 
   return ENC_RETURN_SUCCESS;
 }
@@ -858,7 +775,6 @@ int32_t WriteSliceBs (sWelsEncCtx* pCtx, uint8_t* pSliceBsBuf, const int32_t iSl
   return iReturn;
 }
 
-#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 #if defined(__GNUC__) && !defined(_WIN32)
 WELS_THREAD_ROUTINE_TYPE UpdateMbListThreadProc (void* arg) {
   SSliceThreadPrivateData* pPrivateData	= (SSliceThreadPrivateData*)arg;
@@ -899,7 +815,6 @@ WELS_THREAD_ROUTINE_TYPE UpdateMbListThreadProc (void* arg) {
   WELS_THREAD_ROUTINE_RETURN (uiThrdRet);
 }
 #endif//__GNUC__
-#endif//#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 
 // thread process for coding one pSlice
 WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
@@ -936,9 +851,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 #ifdef _WIN32
   pEventsList[iEventCount++]	= pEncPEncCtx->pSliceThreading->pReadySliceCodingEvent[iEventIdx];
   pEventsList[iEventCount++]	= pEncPEncCtx->pSliceThreading->pExitEncodeEvent[iEventIdx];
-#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
   pEventsList[iEventCount++] = pEncPEncCtx->pSliceThreading->pUpdateMbListEvent[iEventIdx];
-#endif//#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 #endif//_WIN32
 
   do {
@@ -973,17 +886,13 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         pSlice			= &pCurDq->sLayerInfo.pSliceInLayer[iSliceIdx];
         pSliceBs		= &pEncPEncCtx->pSliceBs[iSliceIdx];
 
-#if defined(DYNAMIC_SLICE_ASSIGN) || defined(MT_DEBUG)
         bDsaFlag	= (pParamD->sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE &&
                      pCodingParam->iMultipleThreadIdc > 1 &&
                      pCodingParam->iMultipleThreadIdc >= pParamD->sSliceCfg.sSliceArgument.uiSliceNum);
         if (bDsaFlag)
           iSliceStart = WelsTime();
-#endif//DYNAMIC_SLICE_ASSIGN || MT_DEBUG
 
-#if !defined(PACKING_ONE_SLICE_PER_LAYER)
         pSliceBs->uiBsPos	= 0;
-#endif//!PACKING_ONE_SLICE_PER_LAYER
         pSliceBs->iNalIndex	= 0;
         assert ((void*) (&pSliceBs->sBsWrite) == (void*)pSlice->pSliceBsa);
         InitBits (&pSliceBs->sBsWrite, pSliceBs->pBsBuffer, pSliceBs->uiSize);
@@ -1014,7 +923,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 
         WelsUnloadNalForSlice (pSliceBs);
 
-#if !defined(PACKING_ONE_SLICE_PER_LAYER)
         if (0 == iSliceIdx) {
           pLbi->pBsBuf	= pEncPEncCtx->pFrameBs + pEncPEncCtx->iPosBsBuffer;
           iReturn = WriteSliceToFrameBs (pEncPEncCtx, pLbi, pLbi->pBsBuf, iSliceIdx, iSliceSize);
@@ -1031,25 +939,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
             break;
           }
         }
-#else// PACKING_ONE_SLICE_PER_LAYER
-        if (0 == iSliceIdx) {
-          pLbi->pBsBuf	= pEncPEncCtx->pFrameBs + pEncPEncCtx->iPosBsBuffer;
-          iReturn = WriteSliceToFrameBs (pEncPEncCtx, pLbi, pLbi->pBsBuf, iSliceIdx, &iSliceSize);
-          if (ENC_RETURN_SUCCESS!=iReturn) {
-            uiThrdRet = iReturn;
-            break;
-          }
-          pEncPEncCtx->iPosBsBuffer += iSliceSize;
-        } else {
-          pLbi->pBsBuf	= pSliceBs->bs + pSliceBs->uiBsPos;
-          iReturn = WriteSliceToFrameBs (pEncPEncCtx, pLbi, pLbi->pBsBuf, iSliceIdx, &iSliceSize);
-          if (ENC_RETURN_SUCCESS!=iReturn) {
-            uiThrdRet = iReturn;
-            break;
-          }
-          pSliceBs->uiBsPos += iSliceSize;
-        }
-#endif//!PACKING_ONE_SLICE_PER_LAYER
 
         if (pCurDq->bDeblockingParallelFlag && pSlice->sSliceHeaderExt.sSliceHeader.uiDisableDeblockingFilterIdc != 1
 #if !defined(ENABLE_FRAME_DUMP)
@@ -1060,7 +949,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
           DeblockingFilterSliceAvcbase (pCurDq, pEncPEncCtx->pFuncList, iSliceIdx);
         }
 
-#if defined(DYNAMIC_SLICE_ASSIGN) || defined(MT_DEBUG)
         if (bDsaFlag) {
           pEncPEncCtx->pSliceThreading->pSliceConsumeTime[pEncPEncCtx->uiDependencyId][iSliceIdx] = (uint32_t) (
                 WelsTime() - iSliceStart);
@@ -1072,7 +960,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
                    pCurDq->pSliceEncCtx->pFirstMbInSlice[iSliceIdx], pCurDq->pSliceEncCtx->pCountMbNumInSlice[iSliceIdx]);
 #endif//ENABLE_TRACE_MT
         }
-#endif//DYNAMIC_SLICE_ASSIGN || MT_DEBUG
 
 #if defined(SLICE_INFO_OUTPUT)
         fprintf (stderr,
@@ -1095,9 +982,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         WelsEventSignal (pEncPEncCtx->pSliceThreading->pSliceCodedEvent[iEventIdx]);	// mean finished coding current pSlice
 #endif//WIN32
       } else {	// for SM_DYN_SLICE parallelization
-#ifdef PACKING_ONE_SLICE_PER_LAYER
-        SLayerBSInfo* pLbiPacking			= NULL;
-#endif//PACKING_ONE_SLICE_PER_LAYER
         SSliceCtx* pSliceCtx			= pCurDq->pSliceEncCtx;
         const int32_t kiPartitionId			= iThreadIdx;
         const int32_t kiSliceIdxStep		= pEncPEncCtx->iActiveThreadsNum;
@@ -1124,9 +1008,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
           pSlice			= &pCurDq->sLayerInfo.pSliceInLayer[iSliceIdx];
           pSliceBs		= &pEncPEncCtx->pSliceBs[iSliceIdx];
 
-#if !defined(PACKING_ONE_SLICE_PER_LAYER)
           pSliceBs->uiBsPos	= 0;
-#endif//!PACKING_ONE_SLICE_PER_LAYER
           pSliceBs->iNalIndex	= 0;
           InitBits (&pSliceBs->sBsWrite, pSliceBs->pBsBuffer, pSliceBs->uiSize);
 
@@ -1152,7 +1034,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 
           WelsUnloadNalForSlice (pSliceBs);
 
-#if !defined(PACKING_ONE_SLICE_PER_LAYER)
           if (0 == kiPartitionId) {
             if (0 == iSliceIdx)
               pLbi->pBsBuf	= pEncPEncCtx->pFrameBs + pEncPEncCtx->iPosBsBuffer;
@@ -1170,28 +1051,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
               break;
             }
           }
-#else// PACKING_ONE_SLICE_PER_LAYER
-          pLbiPacking	= pLbi + (iSliceIdx - kiPartitionId);
-
-          if (0 == kiPartitionId) {
-            pLbiPacking->pBsBuf	= pEncPEncCtx->pFrameBs + pEncPEncCtx->iPosBsBuffer;
-            iReturn = WriteSliceToFrameBs (pEncPEncCtx, pLbiPacking, pLbiPacking->pBsBuf, iSliceIdx, iSliceSize);
-            if (ENC_RETURN_SUCCESS!=iReturn) {
-              uiThrdRet = iReturn;
-              break;
-            }
-            pEncPEncCtx->iPosBsBuffer += iSliceSize;
-          } else {
-            pLbiPacking->pBsBuf	= pSliceBs->bs + pSliceBs->uiBsPos;
-            iReturn = WriteSliceToFrameBs (pEncPEncCtx, pLbiPacking, pLbiPacking->pBsBuf, iSliceIdx, iSliceSize);
-            if (ENC_RETURN_SUCCESS!=iReturn) {
-              uiThrdRet = iReturn;
-              break;
-            }
-            pSliceBs->uiBsPos += iSliceSize;
-          }
-          pEncPEncCtx->pSliceThreading->pCountBsSizeInPartition[kiPartitionId] += iSliceSize;
-#endif//!PACKING_ONE_SLICE_PER_LAYER
 
           if (pCurDq->bDeblockingParallelFlag && pSlice->sSliceHeaderExt.sSliceHeader.uiDisableDeblockingFilterIdc != 1
 #if !defined(ENABLE_FRAME_DUMP)
@@ -1238,7 +1097,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
       uiThrdRet	= 0;
       break;
     }
-#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
     else if (WELS_THREAD_ERROR_WAIT_OBJECT_0 + 2 == iWaitRet) {	// update pMb list singal
       iSliceIdx		=
         iEventIdx;	// pPrivateData->iSliceIndex; old threads can not be terminated, pPrivateData is not correct for applicable
@@ -1247,7 +1105,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
       WelsEventSignal (
         &pEncPEncCtx->pSliceThreading->pFinUpdateMbListEvent[iEventIdx]);	// mean finished update pMb list for this pSlice
     }
-#endif//#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 #endif//WIN32
     else { // WELS_THREAD_ERROR_WAIT_TIMEOUT, or WELS_THREAD_ERROR_WAIT_FAILED
       WelsLog (pEncPEncCtx, WELS_LOG_WARNING,
@@ -1299,12 +1156,10 @@ int32_t CreateSliceThreads (sWelsEncCtx* pCtx) {
     // We need extra threads for update_mb_list_proc on __GNUC__ like OS (mac/linux)
     // due to WelsMultipleEventsWaitSingleBlocking implememtation can not work well
     // in case waiting pUpdateMbListEvent and pReadySliceCodingEvent events at the same time
-#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 #if defined(__GNUC__) && !defined(_WIN32)
     WelsThreadCreate (&pCtx->pSliceThreading->pUpdateMbListThrdHandles[iIdx], UpdateMbListThreadProc,
                       &pCtx->pSliceThreading->pThreadPEncCtx[iIdx], 0);
 #endif//__GNUC__
-#endif//#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
 
     ++ iIdx;
   }
@@ -1313,14 +1168,6 @@ int32_t CreateSliceThreads (sWelsEncCtx* pCtx) {
 #endif
   return 0;
 }
-
-#ifdef PACKING_ONE_SLICE_PER_LAYER
-void ResetCountBsSizeInPartitions (uint32_t* pCountBsSizeList, const int32_t iPartitionCnt) {
-  if (pCountBsSizeList != NULL && iPartitionCnt > 0) {
-    memset (pCountBsSizeList, 0, sizeof (pCountBsSizeList[0]) * iPartitionCnt);
-  }
-}
-#endif//PACKING_ONE_SLICE_PER_LAYER
 
 #ifdef _WIN32
 int32_t FiredSliceThreads (SSliceThreadPrivateData* pPriData, WELS_EVENT* pEventsList, SLayerBSInfo* pLbi,
@@ -1341,33 +1188,6 @@ int32_t FiredSliceThreads (SSliceThreadPrivateData* pPriData, WELS_EVENT** pEven
     return 1;
   }
 
-#if defined(PACKING_ONE_SLICE_PER_LAYER)
-  ////////////////////////////////////////
-  if (bIsDynamicSlicingMode) {
-    iEndMbIdx	= pSliceCtx->iMbNumInFrame;
-    for (iIdx = kiEventCnt - 1; iIdx >= 0; --iIdx) {
-      const int32_t kiFirstMbIdx		= pSliceCtx->pFirstMbInSlice[iIdx];
-      pPriData[iIdx].iStartMbIndex	= kiFirstMbIdx;
-      pPriData[iIdx].iEndMbIndex		= iEndMbIdx;
-      iEndMbIdx						= kiFirstMbIdx;
-    }
-  }
-
-  iIdx = 0;
-  while (iIdx < kiEventCnt) {
-    pPriData[iIdx].pLayerBs = pLbi;
-    pPriData[iIdx].iSliceIndex	= iIdx;
-#ifdef _WIN32
-    if (pEventsList[iIdx])
-      WelsEventSignal (&pEventsList[iIdx]);
-#else
-    WelsEventSignal (pEventsList[iIdx]);
-#endif//WIN32
-    ++ pLbi;
-    ++ iIdx;
-  }
-  ////////////////////////////////////////
-#else
   ////////////////////////////////////////
   if (bIsDynamicSlicingMode) {
     iEndMbIdx	= pSliceCtx->iMbNumInFrame;
@@ -1391,8 +1211,6 @@ int32_t FiredSliceThreads (SSliceThreadPrivateData* pPriData, WELS_EVENT** pEven
 #endif//WIN32
     ++ iIdx;
   }
-  ////////////////////////////////////////
-#endif//PACKING_ONE_SLICE_PER_LAYER
 
   return 0;
 }
@@ -1403,28 +1221,23 @@ int32_t DynamicDetectCpuCores() {
   return info.ProcessorCount;
 }
 
-#if defined(MT_ENABLED) && defined(DYNAMIC_SLICE_ASSIGN)
-
+#if defined(MT_ENABLED)
 int32_t AdjustBaseLayer (sWelsEncCtx* pCtx) {
   SDqLayer* pCurDq	= pCtx->ppDqLayerList[0];
   int32_t iNeedAdj	= 1;
 #ifdef MT_DEBUG
   int64_t iT0 = WelsTime();
 #endif//MT_DEBUG
-#ifdef TRY_SLICING_BALANCE
 
   pCtx->pCurDqLayer	= pCurDq;
 
-#ifdef NOT_ABSOLUTE_BALANCING
   // do not need adjust due to not different at both slices of consumed time
   iNeedAdj	= NeedDynamicAdjust (pCtx->pSliceThreading->pSliceConsumeTime[0], pCurDq->pSliceEncCtx->iSliceNumInFrame);
   if (iNeedAdj)
-#endif//NOT_ABSOLUTE_BALANCING
     DynamicAdjustSlicing (pCtx,
                           pCurDq,
                           pCtx->pSliceThreading->pSliceComplexRatio[0],
                           0);
-#endif//TRY_SLICING_BALANCE
 #ifdef MT_DEBUG
   iT0 = WelsTime() - iT0;
   if (pCtx->pSliceThreading->pFSliceDiff) {
@@ -1455,33 +1268,25 @@ int32_t AdjustEnhanceLayer (sWelsEncCtx* pCtx, int32_t iCurDid) {
                                                 1].sSliceCfg.sSliceArgument.uiSliceNum);
 
   if (kbModelingFromSpatial) {	// using spatial base layer for complexity estimation
-#ifdef TRY_SLICING_BALANCE
-#ifdef NOT_ABSOLUTE_BALANCING
     // do not need adjust due to not different at both slices of consumed time
     iNeedAdj = NeedDynamicAdjust (pCtx->pSliceThreading->pSliceConsumeTime[iCurDid - 1],
                                   pCtx->pCurDqLayer->pSliceEncCtx->iSliceNumInFrame);
     if (iNeedAdj)
-#endif//NOT_ABSOLUTE_BALANCING
       DynamicAdjustSlicing (pCtx,
                             pCtx->pCurDqLayer,
                             pCtx->pSliceThreading->pSliceComplexRatio[iCurDid - 1],
                             iCurDid
                            );
-#endif//TRY_SLICING_BALANCE
   } else {	// use temporal layer for complexity estimation
-#ifdef TRY_SLICING_BALANCE
-#ifdef NOT_ABSOLUTE_BALANCING
     // do not need adjust due to not different at both slices of consumed time
     iNeedAdj = NeedDynamicAdjust (pCtx->pSliceThreading->pSliceConsumeTime[iCurDid],
                                   pCtx->pCurDqLayer->pSliceEncCtx->iSliceNumInFrame);
     if (iNeedAdj)
-#endif//NOT_ABSOLUTE_BALANCING
       DynamicAdjustSlicing (pCtx,
                             pCtx->pCurDqLayer,
                             pCtx->pSliceThreading->pSliceComplexRatio[iCurDid],
                             iCurDid
                            );
-#endif//TRY_SLICING_BALANCE
   }
 
 #ifdef MT_DEBUG
@@ -1500,11 +1305,11 @@ int32_t AdjustEnhanceLayer (sWelsEncCtx* pCtx, int32_t iCurDid) {
   return iNeedAdj;
 }
 
-#endif//#if defined(MT_ENABLED) && defined(DYNAMIC_SLICE_ASSIGN)
+#endif//#if defined(MT_ENABLED)
 
 #if defined(MT_ENABLED)
 
-#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE) && defined(MT_DEBUG)
+#if defined(MT_DEBUG)
 void TrackSliceComplexities (sWelsEncCtx* pCtx, const int32_t iCurDid) {
   const int32_t kiCountSliceNum = pCtx->pCurDqLayer->pSliceEncCtx->iSliceNumInFrame;
   if (kiCountSliceNum > 0) {
@@ -1516,9 +1321,9 @@ void TrackSliceComplexities (sWelsEncCtx* pCtx, const int32_t iCurDid) {
     } while (iSliceIdx < kiCountSliceNum);
   }
 }
-#endif//#if defined(DYNAMIC_SLICE_ASSIGN) && defined(TRY_SLICING_BALANCE)
+#endif
 
-#if defined(DYNAMIC_SLICE_ASSIGN) && defined(MT_DEBUG)
+#if defined(MT_DEBUG)
 void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t iSpatialNum) {
   SWelsSvcCodingParam* pPara = NULL;
   int32_t iSpatialIdx = 0;
@@ -1557,7 +1362,7 @@ void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t 
     ++ iSpatialIdx;
   }
 }
-#endif//#if defined(DYNAMIC_SLICE_ASSIGN) || defined(MT_DEBUG)
+#endif//#if defined(MT_DEBUG)
 
 #endif//MT_ENABLED
 }

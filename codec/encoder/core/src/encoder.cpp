@@ -273,11 +273,6 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EFrameType keFrameType) {
 #if defined(STAT_OUTPUT)
   memset (&pEncCtx->sPerInfo, 0, sizeof (SStatSliceInfo));
 #endif//FRAME_INFO_OUTPUT
-
-#if defined(MT_ENABLED) && defined(PACKING_ONE_SLICE_PER_LAYER)
-  if (pEncCtx->pSvcParam->iMultipleThreadIdc > 1)
-    reset_env_mt (pEncCtx);
-#endif
 }
 
 EFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum) {
