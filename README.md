@@ -67,6 +67,24 @@ ARCH specifies the architecture of android device. Currently only arm and x86 ar
 NDKLEVEL specifies android api level, the api level can be 12-19, the default is 12.
 GCCVERSION specifies which gcc in NDK is used, the default is 4.8.
 
+For iOS Builds
+--------------
+You can build the libraries and demo applications using xcode project files
+located in codec/build/iOS/dec and codec/build/iOS/enc.
+
+You can also build the libraries (but not the demo applications) using the
+make based build system from the command line. Build with
+
+'make OS=ios ARCH=**ARCH**'
+
+Valid values for **ARCH** are the normal iOS architecture names such as
+armv7, armv7s, arm64, and i386 and x86_64 for the simulator. Additionally,
+one might need to add 'SDK=X.Y' to the make command line in case the default
+SDK version isn't available. Another settable iOS specific parameter
+is SDK_MIN, specifying the minimum deployment target for the built library.
+For other details on building using make on the command line, see
+'For All Platforms' below.
+
 For Windows Builds
 ------------------
 
