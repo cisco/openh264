@@ -299,7 +299,7 @@ label_exit:
   }
 }
 
-#if (defined(ANDROID_NDK)||defined(APPLE_IOS))
+#if defined(RENAME_MAIN_FUNC)
 int32_t DecMain(int32_t iArgC, char* pArgV[]) {
 #else
 int32_t main (int32_t iArgC, char* pArgV[]) {
