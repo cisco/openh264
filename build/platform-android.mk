@@ -4,10 +4,12 @@ SHAREDLIBSUFFIX = so
 GCCVERSION = 4.8
 NDKLEVEL = 12
 ifeq ($(ARCH), arm)
+  ifneq ($(APP_ABI), armeabi)
     CFLAGS += -march=armv7-a -mfloat-abi=softfp
     CFLAGS += -mfpu=vfpv3-d16
     LDFLAGS += -march=armv7-a -Wl,--fix-cortex-a8
     APP_ABI = armeabi-v7a
+  endif
     TOOLCHAINPREFIX = $(shell NDK_PROJECT_PATH=./codec/build/android/dec make --no-print-dir -f $(NDKROOT)/build/core/build-local.mk DUMP_TOOLCHAIN_PREFIX APP_ABI=armeabi)
   ifeq (Yes, $(USE_ASM))
     ASMFLAGS += -march=armv7-a -mfpu=neon
