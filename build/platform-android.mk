@@ -42,7 +42,7 @@ SYSROOT = $(NDKROOT)/platforms/android-$(NDKLEVEL)/arch-$(ARCH)
 CXX = $(NDKROOT)/toolchains/$(GCCPATHPREFIX)-$(GCCVERSION)/prebuilt/$(HOSTOS)-$(HOSTARCH)/bin/$(GCCPREFIX)-g++
 CC = $(NDKROOT)/toolchains/$(GCCPATHPREFIX)-$(GCCVERSION)/prebuilt/$(HOSTOS)-$(HOSTARCH)/bin/$(GCCPREFIX)-gcc
 AR = $(NDKROOT)/toolchains/$(GCCPATHPREFIX)-$(GCCVERSION)/prebuilt/$(HOSTOS)-$(HOSTARCH)/bin/$(GCCPREFIX)-ar
-CFLAGS += -DLINUX -fpic --sysroot=$(SYSROOT)
+CFLAGS += -DLINUX -DANDROID_NDK -fpic --sysroot=$(SYSROOT)
 CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS += --sysroot=$(SYSROOT)
 SHLDFLAGS = -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,-soname,libwels.so
@@ -63,3 +63,9 @@ decdemo: libraries
 
 encdemo: libraries
 	cd ./codec/build/android/enc && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
+
+COMMON_INCLUDES += -I$(NDKROOT)/sources/android/cpufeatures
+COMMON_OBJS += $(COMMON_SRCDIR)/cpu-features.o
+
+codec/common/cpu-features.o: $(NDKROOT)/sources/android/cpufeatures/cpu-features.c
+	$(QUIET_CC)$(CC) $(CFLAGS) $(INCLUDES) $(COMMON_CFLAGS) $(COMMON_INCLUDES) -c $(CXX_O) $<
