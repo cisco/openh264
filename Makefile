@@ -112,8 +112,10 @@ include codec/encoder/targets.mk
 include codec/processing/targets.mk
 
 ifneq (android, $(OS))
+ifneq (ios, $(OS))
 include codec/console/dec/targets.mk
 include codec/console/enc/targets.mk
+endif
 endif
 
 libraries: $(LIBPREFIX)wels.$(LIBSUFFIX) $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX)
