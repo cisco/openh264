@@ -2948,9 +2948,7 @@ int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst) {
   pCtx->eLastNalPriority      = NRI_PRI_HIGHEST;
   pFbi->iLayerNum             = 1;
 
-#if defined(X86_ASM)
   WelsEmms();
-#endif //X86_ASM
 
   return ENC_RETURN_SUCCESS;
 }
@@ -3609,9 +3607,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
   pCtx->eLastNalPriority	= eNalRefIdc;
   pFbi->iLayerNum			= iLayerNum;
 
-#if defined(X86_ASM)
   WelsEmms();
-#endif //X86_ASM
 
   pFbi->eOutputFrameType = eFrameType;
   return ENC_RETURN_SUCCESS;

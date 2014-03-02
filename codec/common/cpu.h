@@ -74,6 +74,8 @@ void     WelsXmmRegStore(void * src);
 void     WelsXmmRegLoad(void * src);
 #endif
 
+#else
+#define WelsEmms()
 #endif
 
 void     WelsXmmRegEmptyOp(void * pSrc);
