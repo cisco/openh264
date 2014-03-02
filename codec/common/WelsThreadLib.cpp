@@ -258,7 +258,7 @@ WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex) {
   return pthread_mutex_destroy (mutex);
 }
 
-// unnamed semaphores can not work well for posix threading models under not root users
+// unnamed semaphores aren't supported on OS X
 
 WELS_THREAD_ERROR_CODE    WelsEventInit (WELS_EVENT* event) {
   return sem_init (event, 0, 0);
