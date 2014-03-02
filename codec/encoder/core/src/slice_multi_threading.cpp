@@ -43,11 +43,11 @@
 #include <assert.h>
 #if !defined(_WIN32)
 #include <semaphore.h>
+#endif//!_WIN32
 #ifndef SEM_NAME_MAX
 // length of semaphore name should be system constrained at least on mac 10.7
 #define  SEM_NAME_MAX 32
 #endif//SEM_NAME_MAX
-#endif//!_WIN32
 #include "slice_multi_threading.h"
 #include "mt_defs.h"
 #include "nal_encap.h"
@@ -352,23 +352,25 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 
   iIdx = 0;
   while (iIdx < iThreadNum) {
-#if !defined(_WIN32)	// for posix threading
     char name[SEM_NAME_MAX] = {0};
     WELS_THREAD_ERROR_CODE err = 0;
-#endif//!_WIN32
     pSmt->pThreadPEncCtx[iIdx].pWelsPEncCtx	= (void*) (*ppCtx);
     pSmt->pThreadPEncCtx[iIdx].iSliceIndex	= iIdx;
     pSmt->pThreadPEncCtx[iIdx].iThreadIndex	= iIdx;
     pSmt->pThreadHandles[iIdx]				= 0;
 
 #ifdef _WIN32
-    WelsEventInit (&pSmt->pUpdateMbListEvent[iIdx]);
-    WelsEventInit (&pSmt->pFinUpdateMbListEvent[iIdx]);
-    WelsEventInit (&pSmt->pSliceCodedEvent[iIdx]);
-    WelsEventInit (&pSmt->pReadySliceCodingEvent[iIdx]);
-    WelsEventInit (&pSmt->pFinSliceCodingEvent[iIdx]);
-    WelsEventInit (&pSmt->pExitEncodeEvent[iIdx]);
-#else
+    WelsSnprintf (name, SEM_NAME_MAX, "fs%d%p", iIdx, (void*) (*ppCtx));
+    err = WelsEventOpen (&pSmt->pFinSliceCodingEvent[iIdx], name);
+#if defined(ENABLE_TRACE_MT)
+    WelsLog ((*ppCtx), WELS_LOG_INFO, "[MT] Open pFinSliceCodingEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
+#endif
+    WelsSnprintf (name, SEM_NAME_MAX, "ee%d%p", iIdx, (void*) (*ppCtx));
+    err = WelsEventOpen (&pSmt->pExitEncodeEvent[iIdx], name);
+#if defined(ENABLE_TRACE_MT)
+    WelsLog ((*ppCtx), WELS_LOG_INFO, "[MT] Open pExitEncodeEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
+#endif
+#endif//_WIN32
     // length of semaphore name should be system constrained at least on mac 10.7
     WelsSnprintf (name, SEM_NAME_MAX, "ud%d%p", iIdx, (void*) (*ppCtx));
     err = WelsEventOpen (&pSmt->pUpdateMbListEvent[iIdx], name);
@@ -391,7 +393,6 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
     WelsLog ((*ppCtx), WELS_LOG_INFO, "[MT] Open pReadySliceCodingEvent%d = 0x%p named(%s) ret%d err%d\n", iIdx,
              (void*)pSmt->pReadySliceCodingEvent[iIdx], name, err, errno);
 #endif
-#endif//_WIN32
 
     ++ iIdx;
   }
@@ -457,25 +458,17 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
     return;
 
   while (iIdx < iThreadNum) {
+    char ename[SEM_NAME_MAX] = {0};
+    // length of semaphore name should be system constrained at least on mac 10.7
 #ifdef _WIN32
     if (pSmt->pThreadHandles != NULL && pSmt->pThreadHandles[iIdx] != NULL)
       WelsThreadDestroy (&pSmt->pThreadHandles[iIdx]);
 
-    if (pSmt->pSliceCodedEvent != NULL)
-      WelsEventDestroy (&pSmt->pSliceCodedEvent[iIdx]);
-    if (pSmt->pReadySliceCodingEvent != NULL)
-      WelsEventDestroy (&pSmt->pReadySliceCodingEvent[iIdx]);
-    if (pSmt->pFinSliceCodingEvent != NULL)
-      WelsEventDestroy (&pSmt->pFinSliceCodingEvent[iIdx]);
-    if (pSmt->pExitEncodeEvent != NULL)
-      WelsEventDestroy (&pSmt->pExitEncodeEvent[iIdx]);
-    if (pSmt->pUpdateMbListEvent != NULL)
-      WelsEventDestroy (&pSmt->pUpdateMbListEvent[iIdx]);
-    if (pSmt->pFinUpdateMbListEvent != NULL)
-      WelsEventDestroy (&pSmt->pFinUpdateMbListEvent[iIdx]);
-#else
-    char ename[SEM_NAME_MAX] = {0};
-    // length of semaphore name should be system constrained at least on mac 10.7
+    WelsSnprintf (ename, SEM_NAME_MAX, "fs%d%p", iIdx, (void*) (*ppCtx));
+    WelsEventClose (&pSmt->pFinSliceCodingEvent[iIdx], ename);
+    WelsSnprintf (ename, SEM_NAME_MAX, "ee%d%p", iIdx, (void*) (*ppCtx));
+    WelsEventClose (&pSmt->pExitEncodeEvent[iIdx], ename);
+#endif//_WIN32
     WelsSnprintf (ename, SEM_NAME_MAX, "sc%d%p", iIdx, (void*) (*ppCtx));
     WelsEventClose (&pSmt->pSliceCodedEvent[iIdx], ename);
     WelsSnprintf (ename, SEM_NAME_MAX, "rc%d%p", iIdx, (void*) (*ppCtx));
@@ -484,7 +477,6 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
     WelsEventClose (&pSmt->pUpdateMbListEvent[iIdx], ename);
     WelsSnprintf (ename, SEM_NAME_MAX, "fu%d%p", iIdx, (void*) (*ppCtx));
     WelsEventClose (&pSmt->pFinUpdateMbListEvent[iIdx], ename);
-#endif//_WIN32
 
     ++ iIdx;
   }

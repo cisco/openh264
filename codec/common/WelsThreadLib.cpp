@@ -91,7 +91,7 @@ WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex) {
   return WELS_THREAD_ERROR_OK;
 }
 
-WELS_THREAD_ERROR_CODE    WelsEventInit (WELS_EVENT*    event) {
+WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* event, const char* event_name) {
   WELS_EVENT   h = CreateEvent (NULL, FALSE, FALSE, NULL);
 
   if (h == NULL) {
@@ -126,7 +126,7 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WE
   return WaitForMultipleObjects (nCount, event_list, TRUE, INFINITE);
 }
 
-WELS_THREAD_ERROR_CODE    WelsEventDestroy (WELS_EVENT* event) {
+WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_name) {
   CloseHandle (*event);
 
   *event = NULL;

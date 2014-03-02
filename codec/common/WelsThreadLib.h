@@ -105,12 +105,8 @@ WELS_THREAD_ERROR_CODE    WelsMutexLock (WELS_MUTEX*    mutex);
 WELS_THREAD_ERROR_CODE    WelsMutexUnlock (WELS_MUTEX* mutex);
 WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex);
 
-#ifndef _WIN32
 WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* p_event, const char* event_name);
 WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_name);
-#endif//!_WIN32
-WELS_THREAD_ERROR_CODE    WelsEventInit (WELS_EVENT* event);
-WELS_THREAD_ERROR_CODE    WelsEventDestroy (WELS_EVENT* event);
 WELS_THREAD_ERROR_CODE    WelsEventSignal (WELS_EVENT* event);
 WELS_THREAD_ERROR_CODE    WelsEventWait (WELS_EVENT* event);
 WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t dwMilliseconds);
