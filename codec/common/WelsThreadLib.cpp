@@ -330,8 +330,9 @@ WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t 
 
     gettimeofday (&tv, 0);
 
-    ts.tv_sec = tv.tv_sec + dwMilliseconds / 1000;
-    ts.tv_nsec = tv.tv_usec * 1000 + (dwMilliseconds % 1000) * 1000000;
+    ts.tv_nsec = tv.tv_usec * 1000 + dwMilliseconds * 1000000;
+    ts.tv_sec = tv.tv_sec + ts.tv_nsec / 1000000000;
+    ts.tv_nsec %= 1000000000;
 
     return sem_timedwait (event, &ts);
 #endif//__APPLE__
