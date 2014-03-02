@@ -102,9 +102,9 @@ WELS_EVENT*					pSliceCodedEvent[MAX_THREADS_NUM];// events for slice coded stat
 WELS_EVENT*					pReadySliceCodingEvent[MAX_THREADS_NUM];	// events for slice coding ready, [iThreadIdx]
 #endif//_WIN32
 
-#if defined(__GNUC__)
+#if !defined(_WIN32)
 WELS_THREAD_HANDLE*			pUpdateMbListThrdHandles;	// thread handles for update mb list thread, [iThreadIdx]
-#endif//__GNUC__
+#endif//!_WIN32
 #ifdef _WIN32
 WELS_EVENT*					pUpdateMbListEvent;		// signal to update mb list neighbor for various slices
 WELS_EVENT*					pFinUpdateMbListEvent;	// signal to indicate finish updating mb list

@@ -75,9 +75,9 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx);
 int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32_t kiSliceCount);
 int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFrameBsBuffer, const int32_t iSliceIdx, int32_t& iSliceSize);
 
-#if defined(__GNUC__)
+#if !defined(_WIN32)
 WELS_THREAD_ROUTINE_TYPE UpdateMbListThreadProc (void* arg);
-#endif//__GNUC__
+#endif//!_WIN32
 
 WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg);
 

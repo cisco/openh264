@@ -2171,7 +2171,7 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
       WelsMultipleEventsWaitAllBlocking (iThreadCount, & (*ppCtx)->pSliceThreading->pFinSliceCodingEvent[0]);
 
     }
-#elif defined(__GNUC__)
+#else
     while (iThreadIdx < iThreadCount) {
       int res = 0;
       if ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx]) {
@@ -3300,7 +3300,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
             } else {
               WelsSleep (1);
             }
-#else//__GNUC__
+#else
             // TODO for pthread platforms
             // alternate implementation using blocking due non-blocking with timeout mode not support at wels thread lib, tune back if available
             WelsMultipleEventsWaitAllBlocking (iNumThreadsRunning, &pCtx->pSliceThreading->pSliceCodedEvent[0]);
