@@ -108,12 +108,6 @@ WELS_THREAD_ERROR_CODE    WelsEventSignal (WELS_EVENT* event) {
   return WELS_THREAD_ERROR_GENERAL;
 }
 
-WELS_THREAD_ERROR_CODE    WelsEventReset (WELS_EVENT* event) {
-  if (ResetEvent (*event))
-    return WELS_THREAD_ERROR_OK;
-  return WELS_THREAD_ERROR_GENERAL;
-}
-
 WELS_THREAD_ERROR_CODE    WelsEventWait (WELS_EVENT* event) {
   return WaitForSingleObject (*event, INFINITE);
 }
@@ -296,11 +290,6 @@ WELS_THREAD_ERROR_CODE   WelsEventSignal (WELS_EVENT* event) {
 //	sem_getvalue(event, &val);
 //	fprintf( stderr, "after signal it, val= %d..\n",val );
   return err;
-}
-WELS_THREAD_ERROR_CODE    WelsEventReset (WELS_EVENT* event) {
-  // FIXME for posix event reset, seems not be supported for pthread??
-  sem_close (event);
-  return sem_init (event, 0, 0);
 }
 
 WELS_THREAD_ERROR_CODE   WelsEventWait (WELS_EVENT* event) {

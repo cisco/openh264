@@ -116,7 +116,6 @@ WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, char* event_name);
 WELS_THREAD_ERROR_CODE    WelsEventInit (WELS_EVENT* event);
 WELS_THREAD_ERROR_CODE    WelsEventDestroy (WELS_EVENT* event);
 WELS_THREAD_ERROR_CODE    WelsEventSignal (WELS_EVENT* event);
-WELS_THREAD_ERROR_CODE    WelsEventReset (WELS_EVENT* event);
 WELS_THREAD_ERROR_CODE    WelsEventWait (WELS_EVENT* event);
 WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t dwMilliseconds);
 #ifdef _WIN32
