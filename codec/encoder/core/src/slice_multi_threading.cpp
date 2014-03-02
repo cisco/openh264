@@ -320,19 +320,20 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
                           "pThreadHandles");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pThreadHandles), FreeMemorySvc (ppCtx))
 
-#ifdef _WIN32
   pSmt->pSliceCodedEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pSliceCodedEvent");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pSliceCodedEvent), FreeMemorySvc (ppCtx))
   pSmt->pReadySliceCodingEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum,
                                   "pReadySliceCodingEvent");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pReadySliceCodingEvent), FreeMemorySvc (ppCtx))
-  pSmt->pFinSliceCodingEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pFinSliceCodingEvent");
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pFinSliceCodingEvent), FreeMemorySvc (ppCtx))
 
   pSmt->pUpdateMbListEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pUpdateMbListEvent");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pUpdateMbListEvent), FreeMemorySvc (ppCtx))
   pSmt->pFinUpdateMbListEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pFinUpdateMbListEvent");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pFinUpdateMbListEvent), FreeMemorySvc (ppCtx))
+
+#ifdef _WIN32
+  pSmt->pFinSliceCodingEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pFinSliceCodingEvent");
+  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pFinSliceCodingEvent), FreeMemorySvc (ppCtx))
 
   pSmt->pExitEncodeEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pExitEncodeEvent");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pExitEncodeEvent), FreeMemorySvc (ppCtx))
@@ -514,11 +515,6 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
     ++ iIdx;
   }
 
-#ifdef _WIN32
-  if (pSmt->pExitEncodeEvent != NULL) {
-    pMa->WelsFree (pSmt->pExitEncodeEvent, "pExitEncodeEvent");
-    pSmt->pExitEncodeEvent = NULL;
-  }
   if (pSmt->pSliceCodedEvent != NULL) {
     pMa->WelsFree (pSmt->pSliceCodedEvent, "pSliceCodedEvent");
     pSmt->pSliceCodedEvent = NULL;
@@ -526,6 +522,11 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
   if (pSmt->pReadySliceCodingEvent != NULL) {
     pMa->WelsFree (pSmt->pReadySliceCodingEvent, "pReadySliceCodingEvent");
     pSmt->pReadySliceCodingEvent = NULL;
+  }
+#ifdef _WIN32
+  if (pSmt->pExitEncodeEvent != NULL) {
+    pMa->WelsFree (pSmt->pExitEncodeEvent, "pExitEncodeEvent");
+    pSmt->pExitEncodeEvent = NULL;
   }
   if (pSmt->pFinSliceCodingEvent != NULL) {
     pMa->WelsFree (pSmt->pFinSliceCodingEvent, "pFinSliceCodingEvent");
@@ -573,7 +574,6 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
     ++ iIdx;
   }
 
-#ifdef _WIN32
   if (pSmt->pUpdateMbListEvent != NULL) {
     pMa->WelsFree (pSmt->pUpdateMbListEvent, "pUpdateMbListEvent");
     pSmt->pUpdateMbListEvent = NULL;
@@ -582,12 +582,12 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
     pMa->WelsFree (pSmt->pFinUpdateMbListEvent, "pFinUpdateMbListEvent");
     pSmt->pFinUpdateMbListEvent = NULL;
   }
-#else
+#ifndef _WIN32
   if (pSmt->pUpdateMbListThrdHandles) {
     pMa->WelsFree (pSmt->pUpdateMbListThrdHandles, "pUpdateMbListThrdHandles");
     pSmt->pUpdateMbListThrdHandles = NULL;
   }
-#endif//_WIN32
+#endif//!_WIN32
 
 #ifdef MT_DEBUG
   // file handle for debug
