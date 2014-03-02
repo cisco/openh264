@@ -435,7 +435,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
     err = WelsEventOpen (&pSmt->pReadySliceCodingEvent[iIdx], name);
 #if defined(ENABLE_TRACE_MT)
     WelsLog ((*ppCtx), WELS_LOG_INFO, "[MT] Open pReadySliceCodingEvent%d = 0x%p named(%s) ret%d err%d\n", iIdx,
-             (void*)pSmt->pReadySliceCodingEvent[iIdx], (void*) (*ppCtx), err, errno);
+             (void*)pSmt->pReadySliceCodingEvent[iIdx], name, err, errno);
 #endif
 #endif//_WIN32
 
