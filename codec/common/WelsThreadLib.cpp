@@ -255,14 +255,14 @@ WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex) {
 // unnamed semaphores aren't supported on OS X
 
 WELS_THREAD_ERROR_CODE    WelsEventInit (WELS_EVENT* event) {
-  return sem_init (event, 0, 0);
+  return sem_init (*event, 0, 0);
 }
 
 WELS_THREAD_ERROR_CODE   WelsEventDestroy (WELS_EVENT* event) {
-  return sem_destroy (event);	// match with sem_init
+  return sem_destroy (*event);	// match with sem_init
 }
 
-WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT** p_event, const char* event_name) {
+WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* p_event, const char* event_name) {
   if (p_event == NULL || event_name == NULL)
     return WELS_THREAD_ERROR_GENERAL;
   *p_event = sem_open (event_name, O_CREAT, (S_IRUSR | S_IWUSR)/*0600*/, 0);
@@ -275,7 +275,7 @@ WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT** p_event, const char* event
   }
 }
 WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_name) {
-  WELS_THREAD_ERROR_CODE err = sem_close (event);	// match with sem_open
+  WELS_THREAD_ERROR_CODE err = sem_close (*event);	// match with sem_open
   if (event_name)
     sem_unlink (event_name);
   return err;
@@ -286,25 +286,25 @@ WELS_THREAD_ERROR_CODE   WelsEventSignal (WELS_EVENT* event) {
 //	int32_t val = 0;
 //	sem_getvalue(event, &val);
 //	fprintf( stderr, "before signal it, val= %d..\n",val );
-  err = sem_post (event);
+  err = sem_post (*event);
 //	sem_getvalue(event, &val);
 //	fprintf( stderr, "after signal it, val= %d..\n",val );
   return err;
 }
 
 WELS_THREAD_ERROR_CODE   WelsEventWait (WELS_EVENT* event) {
-  return sem_wait (event);	// blocking until signaled
+  return sem_wait (*event);	// blocking until signaled
 }
 
 WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t dwMilliseconds) {
   if (dwMilliseconds != (uint32_t) - 1) {
-    return sem_wait (event);
+    return sem_wait (*event);
   } else {
 #if defined(__APPLE__)
     int32_t err = 0;
     int32_t wait_count = 0;
     do {
-      err = sem_trywait (event);
+      err = sem_trywait (*event);
       if (WELS_THREAD_ERROR_OK == err)
         break;// WELS_THREAD_ERROR_OK;
       else if (wait_count > 0)
@@ -323,13 +323,13 @@ WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t 
     ts.tv_sec = tv.tv_sec + ts.tv_nsec / 1000000000;
     ts.tv_nsec %= 1000000000;
 
-    return sem_timedwait (event, &ts);
+    return sem_timedwait (*event, &ts);
 #endif//__APPLE__
   }
 }
 
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount,
-    WELS_EVENT** event_list,
+    WELS_EVENT* event_list,
     uint32_t dwMilliseconds) {
   // bWaitAll = FALSE && blocking
   uint32_t nIdx = 0;
@@ -401,7 +401,7 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount,
   return WELS_THREAD_ERROR_WAIT_FAILED;
 }
 
-WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WELS_EVENT** event_list) {
+WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WELS_EVENT* event_list) {
   // bWaitAll = TRUE && blocking
   uint32_t nIdx = 0;
 //	const uint32_t kuiAccessTime = (uint32_t)-1;// 1 ms once

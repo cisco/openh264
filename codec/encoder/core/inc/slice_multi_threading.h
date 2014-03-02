@@ -83,13 +83,8 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg);
 
 int32_t CreateSliceThreads (sWelsEncCtx* pCtx);
 
-#ifdef _WIN32
 int32_t FiredSliceThreads (SSliceThreadPrivateData* pPriData, WELS_EVENT* pEventsList, SLayerBSInfo* pLayerBsInfo,
                            const uint32_t kuiNumThreads/*, int32_t *iLayerNum*/, SSliceCtx* pSliceCtx, const bool kbIsDynamicSlicingMode);
-#else
-int32_t FiredSliceThreads (SSliceThreadPrivateData* pPriData, WELS_EVENT** ppEventsList, SLayerBSInfo* pLayerBsInfo,
-                           const uint32_t kuiNumThreads/*, int32_t *iLayerNum*/, SSliceCtx* pSliceCtx, const bool kbIsDynamicSlicingMode);
-#endif//_WIN32
 
 int32_t DynamicDetectCpuCores();
 

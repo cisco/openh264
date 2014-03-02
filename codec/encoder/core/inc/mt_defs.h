@@ -100,12 +100,12 @@ WELS_EVENT*					pExitEncodeEvent;			// event for exit encoding event
 WELS_EVENT*					pUpdateMbListEvent;		// signal to update mb list neighbor for various slices
 WELS_EVENT*					pFinUpdateMbListEvent;	// signal to indicate finish updating mb list
 #else
-WELS_EVENT*					pSliceCodedEvent[MAX_THREADS_NUM];// events for slice coded state, [iThreadIdx]
-WELS_EVENT*					pReadySliceCodingEvent[MAX_THREADS_NUM];	// events for slice coding ready, [iThreadIdx]
+WELS_EVENT					pSliceCodedEvent[MAX_THREADS_NUM];// events for slice coded state, [iThreadIdx]
+WELS_EVENT					pReadySliceCodingEvent[MAX_THREADS_NUM];	// events for slice coding ready, [iThreadIdx]
 
 WELS_THREAD_HANDLE*			pUpdateMbListThrdHandles;	// thread handles for update mb list thread, [iThreadIdx]
-WELS_EVENT*					pUpdateMbListEvent[MAX_THREADS_NUM];		// signal to update mb list neighbor for various slices
-WELS_EVENT*					pFinUpdateMbListEvent[MAX_THREADS_NUM];	// signal to indicate finish updating mb list
+WELS_EVENT					pUpdateMbListEvent[MAX_THREADS_NUM];		// signal to update mb list neighbor for various slices
+WELS_EVENT					pFinUpdateMbListEvent[MAX_THREADS_NUM];	// signal to indicate finish updating mb list
 #endif//_WIN32
 
 WELS_MUTEX					mutexSliceNumUpdate;	// for dynamic slicing mode MT

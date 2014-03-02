@@ -3308,7 +3308,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
                 if (iIndexOfSliceToBeCoded >= iSliceCount)
                   break;
                 pCtx->pSliceThreading->pThreadPEncCtx[iThreadIdx].iSliceIndex = iIndexOfSliceToBeCoded;
-                WelsEventSignal (pCtx->pSliceThreading->pReadySliceCodingEvent[iThreadIdx]);
+                WelsEventSignal (&pCtx->pSliceThreading->pReadySliceCodingEvent[iThreadIdx]);
 
                 ++ iIndexOfSliceToBeCoded;
                 ++ iThreadIdx;
