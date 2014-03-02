@@ -332,22 +332,19 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pReadySliceCodingEvent), FreeMemorySvc (ppCtx))
   pSmt->pFinSliceCodingEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pFinSliceCodingEvent");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pFinSliceCodingEvent), FreeMemorySvc (ppCtx))
+
+  pSmt->pUpdateMbListEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pUpdateMbListEvent");
+  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pUpdateMbListEvent), FreeMemorySvc (ppCtx))
+  pSmt->pFinUpdateMbListEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pFinUpdateMbListEvent");
+  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pFinUpdateMbListEvent), FreeMemorySvc (ppCtx))
+
+  pSmt->pExitEncodeEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pExitEncodeEvent");
+  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pExitEncodeEvent), FreeMemorySvc (ppCtx))
 #else
   pSmt->pUpdateMbListThrdHandles	= (WELS_THREAD_HANDLE*)pMa->WelsMalloc (sizeof (WELS_THREAD_HANDLE) * iThreadNum,
                                     "pUpdateMbListThrdHandles");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pUpdateMbListThrdHandles), FreeMemorySvc (ppCtx))
 #endif//!_WIN32
-#ifdef _WIN32
-  pSmt->pUpdateMbListEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pUpdateMbListEvent");
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pUpdateMbListEvent), FreeMemorySvc (ppCtx))
-  pSmt->pFinUpdateMbListEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pFinUpdateMbListEvent");
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pFinUpdateMbListEvent), FreeMemorySvc (ppCtx))
-#endif//_WIN32
-
-#ifdef _WIN32
-  pSmt->pExitEncodeEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pExitEncodeEvent");
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pExitEncodeEvent), FreeMemorySvc (ppCtx))
-#endif//_WIN32
 
   iIdx = 0;
   while (iIdx < iNumSpatialLayers) {
@@ -396,6 +393,10 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 #ifdef _WIN32
     WelsEventInit (&pSmt->pUpdateMbListEvent[iIdx]);
     WelsEventInit (&pSmt->pFinUpdateMbListEvent[iIdx]);
+    WelsEventInit (&pSmt->pSliceCodedEvent[iIdx]);
+    WelsEventInit (&pSmt->pReadySliceCodingEvent[iIdx]);
+    WelsEventInit (&pSmt->pFinSliceCodingEvent[iIdx]);
+    WelsEventInit (&pSmt->pExitEncodeEvent[iIdx]);
 #else
     // length of semaphore name should be system constrained at least on mac 10.7
     WelsSnprintf (name, SEM_NAME_MAX, "ud%d%p", iIdx, (void*) (*ppCtx));
@@ -408,14 +409,6 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 #if defined(ENABLE_TRACE_MT)
     WelsLog ((*ppCtx), WELS_LOG_INFO, "[MT] Open pFinUpdateMbListEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
 #endif
-#endif//_WIN32
-
-#ifdef _WIN32
-    WelsEventInit (&pSmt->pSliceCodedEvent[iIdx]);
-    WelsEventInit (&pSmt->pReadySliceCodingEvent[iIdx]);
-    WelsEventInit (&pSmt->pFinSliceCodingEvent[iIdx]);
-    WelsEventInit (&pSmt->pExitEncodeEvent[iIdx]);
-#else
     WelsSnprintf (name, SEM_NAME_MAX, "sc%d%p", iIdx, (void*) (*ppCtx));
     err = WelsEventOpen (&pSmt->pSliceCodedEvent[iIdx], name);
 #if defined(ENABLE_TRACE_MT)
