@@ -783,12 +783,6 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     pCtx->bSubspsExistAheadFlag	= true;
   } else {	// Sps
     pCtx->bSpsExistAheadFlag		= true;
-
-    // added for EC, 10/28/2009
-    // for safe
-    memset (&pCtx->bSpsAvailFlags[0], 0, sizeof (pCtx->bSpsAvailFlags));
-    memset (&pCtx->bSubspsAvailFlags[0], 0, sizeof (pCtx->bSubspsAvailFlags));
-    memset (&pCtx->bPpsAvailFlags[0], 0, sizeof (pCtx->bPpsAvailFlags));
   }
 
   WELS_READ_VERIFY (BsGetBits (pBs, 8, &uiCode)); //profile_idc
@@ -818,10 +812,10 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   if (kbUseSubsetFlag) {
     pSubsetSps	= &pCtx->sSubsetSpsBuffer[iSpsId];
     pSps		= &pSubsetSps->sSps;
-    pCtx->bSubspsAvailFlags[iSpsId]	= true; // added for EC, 10/28/2009
+    pCtx->bSubspsAvailFlags[iSpsId]	= false;
   } else {
     pSps = &pCtx->sSpsBuffer[iSpsId];
-    pCtx->bSpsAvailFlags[iSpsId] = true; // added for EC, 10/28/2009
+    pCtx->bSpsAvailFlags[iSpsId] = false;
   }
   const SLevelLimits* pSLevelLimits = GetLevelLimits (uiLevelIdc, bConstraintSetFlags[3]);
   if (NULL == pSLevelLimits) {
@@ -1000,7 +994,11 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
 
   *pPicWidth	= pSps->iMbWidth << 4;
   *pPicHeight	= pSps->iMbHeight << 4;
-
+  if (kbUseSubsetFlag) {
+    pCtx->bSubspsAvailFlags[iSpsId]	= true;
+  } else {
+    pCtx->bSpsAvailFlags[iSpsId] = true;
+  }
   return 0;
 }
 
@@ -1032,6 +1030,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux)
     return ERR_INFO_PPS_ID_OVERFLOW;
   }
 
+  pCtx->bPpsAvailFlags[uiPpsId] = false;
   pPps = &pPpsList[uiPpsId];
 
   pPps->iPpsId = uiPpsId;
@@ -1114,7 +1113,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux)
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //redundant_pic_cnt_present_flag
   pPps->bRedundantPicCntPresentFlag           = !!uiCode;
 
-  pCtx->bPpsAvailFlags[uiPpsId] = true; // added for EC, 10/28/2009
+  pCtx->bPpsAvailFlags[uiPpsId] = true;
 
   return ERR_NONE;
 }

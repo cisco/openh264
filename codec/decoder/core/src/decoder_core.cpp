@@ -459,6 +459,10 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   }
 
   //add check PPS available here
+  if (pCtx->bPpsAvailFlags[iPpsId] == false) {
+    WelsLog (pCtx, WELS_LOG_ERROR, "PPS id is invalid!\n");
+    return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_PPS_ID);
+  }
 
   pPps    = &pCtx->sPpsBuffer[iPpsId];
 
@@ -473,11 +477,18 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   }
 
   //add check SPS available here
-
   if (kbExtensionFlag) {
     pSubsetSps	= &pCtx->sSubsetSpsBuffer[pPps->iSpsId];
     pSps		= &pSubsetSps->sSps;
+    if (pCtx->bSubspsAvailFlags[pPps->iSpsId] == false) {
+      WelsLog (pCtx, WELS_LOG_ERROR, "SPS id is invalid!\n");
+      return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SPS_ID);
+    }
   } else {
+    if (pCtx->bSpsAvailFlags[pPps->iSpsId] == false) {
+      WelsLog (pCtx, WELS_LOG_ERROR, "SPS id is invalid!\n");
+      return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SPS_ID);
+    }
     pSps		= &pCtx->sSpsBuffer[pPps->iSpsId];
   }
   pCtx->pSps			= pSps;
