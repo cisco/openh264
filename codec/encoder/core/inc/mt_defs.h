@@ -100,9 +100,6 @@ WELS_EVENT					pUpdateMbListEvent[MAX_THREADS_NUM];		// signal to update mb list
 WELS_EVENT					pFinUpdateMbListEvent[MAX_THREADS_NUM];	// signal to indicate finish updating mb list
 WELS_EVENT					pExitEncodeEvent[MAX_THREADS_NUM];			// event for exit encoding event
 WELS_EVENT					pThreadMasterEvent[MAX_THREADS_NUM];	// event for indicating that some event has been signalled to the thread
-#ifdef _WIN32
-WELS_EVENT					pFinSliceCodingEvent[MAX_THREADS_NUM];	// notify slice coding thread is done
-#endif//_WIN32
 
 WELS_MUTEX					mutexSliceNumUpdate;	// for dynamic slicing mode MT
 
