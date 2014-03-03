@@ -44,7 +44,9 @@
 
 #ifndef  _MSC_VER
 
+#define __STDC_FORMAT_MACROS
 #include <stdint.h>
+#include <inttypes.h>
 
 #else
 
@@ -57,6 +59,7 @@ typedef int              int32_t ;
 typedef unsigned int     uint32_t;
 typedef __int64          int64_t ;
 typedef unsigned __int64 uint64_t;
+#define PRId64 "I64d"
 
 #endif // _MSC_VER defined
 

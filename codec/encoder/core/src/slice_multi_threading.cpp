@@ -1232,11 +1232,7 @@ int32_t AdjustBaseLayer (sWelsEncCtx* pCtx) {
   iT0 = WelsTime() - iT0;
   if (pCtx->pSliceThreading->pFSliceDiff) {
     fprintf (pCtx->pSliceThreading->pFSliceDiff,
-#ifdef _WIN32
-             "%6I64d us adjust time at base spatial layer, iNeedAdj %d, DynamicAdjustSlicing()\n",
-#else
-             "%6lld us adjust time at base spatial layer, iNeedAdj %d, DynamicAdjustSlicing()\n",
-#endif//WIN32
+             "%6"PRId64" us adjust time at base spatial layer, iNeedAdj %d, DynamicAdjustSlicing()\n",
              iT0, iNeedAdj);
   }
 #endif//MT_DEBUG
@@ -1283,11 +1279,7 @@ int32_t AdjustEnhanceLayer (sWelsEncCtx* pCtx, int32_t iCurDid) {
   iT1 = WelsTime() - iT1;
   if (pCtx->pSliceThreading->pFSliceDiff) {
     fprintf (pCtx->pSliceThreading->pFSliceDiff,
-#ifdef _WIN32
-             "%6I64d us adjust time at spatial layer %d, iNeedAdj %d, DynamicAdjustSlicing()\n",
-#else
-             "%6lld us adjust time at spatial layer %d, iNeedAdj %d, DynamicAdjustSlicing()\n",
-#endif//WIN32
+             "%6"PRId64" us adjust time at spatial layer %d, iNeedAdj %d, DynamicAdjustSlicing()\n",
              iT1, iCurDid, iNeedAdj);
   }
 #endif//MT_DEBUG
