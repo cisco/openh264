@@ -184,7 +184,7 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* p
   return WELS_THREAD_ERROR_OK;
 }
 
-#elif   defined(__GNUC__)
+#else
 
 void WelsSleep (uint32_t dwMilliseconds) {
   usleep (dwMilliseconds * 1000);	// microseconds

@@ -62,8 +62,6 @@ typedef    HANDLE                    WELS_EVENT;
 
 #else	// NON-WINDOWS
 
-#if defined(__GNUC__) // LINUX, MACOS etc
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
@@ -86,8 +84,6 @@ typedef   sem_t                     WELS_EVENT;
 #define   WELS_THREAD_ROUTINE_TYPE         void *
 #define   WELS_THREAD_ROUTINE_RETURN(rc)   return (void*)(intptr_t)rc;
 
-#endif//__GNUC__
-
 #endif//_WIN32
 
 typedef    int32_t        WELS_THREAD_ERROR_CODE;
@@ -109,10 +105,10 @@ WELS_THREAD_ERROR_CODE    WelsMutexLock (WELS_MUTEX*    mutex);
 WELS_THREAD_ERROR_CODE    WelsMutexUnlock (WELS_MUTEX* mutex);
 WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex);
 
-#ifdef __GNUC__
+#ifndef _WIN32
 WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT** p_event, const char* event_name);
 WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_name);
-#endif//__GNUC__
+#endif//!_WIN32
 WELS_THREAD_ERROR_CODE    WelsEventInit (WELS_EVENT* event);
 WELS_THREAD_ERROR_CODE    WelsEventDestroy (WELS_EVENT* event);
 WELS_THREAD_ERROR_CODE    WelsEventSignal (WELS_EVENT* event);
