@@ -40,72 +40,44 @@ extern "C" {
 #endif//__cplusplus
 
 #if defined(HAVE_NEON)
-/*
-void McCopy_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                      int32_t iWidth, int32_t iHeight);
-void McHorVer20_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                    int32_t iWidth, int32_t iHeight);
-void McHorVer02_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                    int32_t iWidth, int32_t iHeight);
-void McHorVer22_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                    int32_t iWidth, int32_t iHeight);
-    
-void McHorVer01_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth, int32_t iHeight);
-void McHorVer03_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth, int32_t iHeight);
-void McHorVer10_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth, int32_t iHeight);
-void McHorVer11_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth, int32_t iHeight);
-void McHorVer12_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth, int32_t iHeight);
-void McHorVer13_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth, int32_t iHeight);
-void McHorVer21_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth, int32_t iHeight);
-void McHorVer23_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth, int32_t iHeight);
-void McHorVer30_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth, int32_t iHeight);
-void McHorVer31_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth, int32_t iHeight);
-void McHorVer32_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth, int32_t iHeight);
-void McHorVer33_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth, int32_t iHeight);
-    
-void McLuma_neon(uint8_t* pSrc, int32_t src_stride, uint8_t* dst, int32_t dst_stride,
-                        int16_t iMvX, int16_t iMvY, int32_t width, int32_t height);
-void McChroma_neon(uint8_t* pSrc, int32_t src_stride, uint8_t* dst, int32_t dst_stride,
-                          int16_t iMvX, int16_t iMvY, int32_t width, int32_t height);
- */
 void McCopyWidthEq4_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
-    
+
 void McCopyWidthEq8_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
-    
+
 void McCopyWidthEq16_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
-    
+
 void McChromaWidthEq8_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t* pWeights, int32_t iHeight);
-    
+
 void McChromaWidthEq4_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t* pWeights, int32_t iHeight);
-    
+
 void PixelAvgWidthEq16_neon(uint8_t* pDst, int32_t iDstStride, uint8_t* pSrcA, uint8_t* pSrcB, int32_t iHeight);
 void PixelAvgWidthEq8_neon(uint8_t* pDst, int32_t iDstStride, uint8_t* pSrcA, uint8_t* pSrcB, int32_t iHeight);
 void PixelAvgWidthEq4_neon(uint8_t* pDst, int32_t iDstStride, uint8_t* pSrcA, uint8_t* pSrcB, int32_t iHeight);
-    
+
 void McHorVer01WidthEq16_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer01WidthEq8_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer01WidthEq4_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer03WidthEq16_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer03WidthEq8_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer03WidthEq4_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
-    
+
 void McHorVer10WidthEq16_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer10WidthEq8_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer10WidthEq4_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer30WidthEq16_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer30WidthEq8_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer30WidthEq4_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
-    
+
     //horizontal filter to gain half sample, that is (2, 0) location in quarter sample
 void McHorVer20WidthEq16_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer20WidthEq8_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer20WidthEq4_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
-    
+
     //vertical filter to gain half sample, that is (0, 2) location in quarter sample
 void McHorVer02WidthEq16_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer02WidthEq8_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer02WidthEq4_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
-    
+
     //horizontal and vertical filter to gain half sample, that is (2, 2) location in quarter sample
 void McHorVer22WidthEq16_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer22WidthEq8_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);

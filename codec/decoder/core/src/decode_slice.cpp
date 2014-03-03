@@ -1152,8 +1152,8 @@ void WelsBlockFuncInit (SBlockFunc*   pFunc,  int32_t iCpu) {
 #ifdef	HAVE_NEON
   if ( iCpu & WELS_CPU_NEON ) {
     pFunc->pWelsBlockZero16x16Func		= WelsResBlockZero16x16_neon;
-    pFunc->pWelsBlockZero8x8Func			= WelsResBlockZero8x8_neon;
-    pFunc->pWelsSetNonZeroCountFunc			= SetNonZeroCount_neon;
+    pFunc->pWelsBlockZero8x8Func		= WelsResBlockZero8x8_neon;
+    pFunc->pWelsSetNonZeroCountFunc		= SetNonZeroCount_neon;
   }
 #endif
 }

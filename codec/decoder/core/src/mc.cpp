@@ -669,8 +669,8 @@ void McCopy_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t
 void McHorVer20_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
 																				int32_t iWidth, int32_t iHeight)
 {
-		if (iWidth == 16)
-				McHorVer20WidthEq16_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  if (iWidth == 16)
+	   McHorVer20WidthEq16_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
 		else if (iWidth == 8)
 				McHorVer20WidthEq8_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
 		else if (iWidth == 4)
@@ -690,13 +690,13 @@ void McHorVer22_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int
 																				int32_t iWidth, int32_t iHeight)
 {
 		if (iWidth == 16)
-				McHorVer22WidthEq16_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
+    McHorVer22WidthEq16_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
 		else if (iWidth == 8)
 				McHorVer22WidthEq8_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
 		else if (iWidth == 4)
 				McHorVer22WidthEq4_neon(pSrc, iSrcStride, pDst, iDstStride, iHeight);
 }
-		
+
 void McHorVer01_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
 																							int32_t iWidth, int32_t iHeight)
 {
@@ -927,7 +927,7 @@ void McHorVer33_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int
 				PixelAvgWidthEq4_neon(pDst, iDstStride, pHorTmp, pVerTmp, iHeight);
 		}
 }
-		
+
 void McLuma_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
 											int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight)
 {

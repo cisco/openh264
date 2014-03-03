@@ -71,7 +71,7 @@
 		4CE4474718BC61650017DF25 /* typedefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = typedefs.h; sourceTree = "<group>"; };
 		4CE4474918BC61650017DF25 /* WelsThreadLib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WelsThreadLib.cpp; sourceTree = "<group>"; };
 		4CE4474A18BC61650017DF25 /* WelsThreadLib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelsThreadLib.h; sourceTree = "<group>"; };
-		4CE447BC18C085320017DF25 /* deblocking_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = deblocking_neon.S; sourceTree = "<group>"; };
+		4CE447BC18C085320017DF25 /* deblocking_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.asm; path = deblocking_neon.S; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		4CE447BE18C085900017DF25 /* arm_arch_common_macro.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = arm_arch_common_macro.S; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 

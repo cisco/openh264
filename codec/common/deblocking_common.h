@@ -37,13 +37,13 @@ void DeblockChromaLt4H_ssse3 (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride,
 #if defined(HAVE_NEON)
 void DeblockLumaLt4V_neon(uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTc);
 void DeblockLumaEq4V_neon(uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta);
-    
+
 void DeblockLumaLt4H_neon(uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTc);
 void DeblockLumaEq4H_neon(uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta);
-    
+
 void DeblockChromaLt4V_neon(uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTC);
 void DeblockChromaEq4V_neon(uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
-    
+
 void DeblockChromaLt4H_neon(uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTC);
 void DeblockChromaEq4H_neon(uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
 #endif
