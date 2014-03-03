@@ -73,7 +73,7 @@ static const EncodeFileParam kFileParamArray[] = {
   },
   {
       "res/Static_152_100.yuv",
-      "a004c7410a78bfe00af65ae7071ce1c485cf036e", 152, 100, 6.0f
+      "af5c6a41b567ce1b2cb6fd427f4379473d3b829f", 152, 100, 6.0f
   },
 };
 
