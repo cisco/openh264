@@ -705,8 +705,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
   if (NULL == pPrivateData)
     WELS_THREAD_ROUTINE_RETURN (1);
 
-  WelsSetThreadCancelable();
-
   pEncPEncCtx	= (sWelsEncCtx*)pPrivateData->pWelsPEncCtx;
 
   iThreadIdx		= pPrivateData->iThreadIndex;

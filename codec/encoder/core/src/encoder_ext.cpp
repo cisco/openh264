@@ -2165,18 +2165,19 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
 
     }
 #else
-    while (iThreadIdx < iThreadCount) {
-      int res = 0;
-      if ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx]) {
-        res = WelsThreadCancel ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx]);
-        WelsLog (*ppCtx, WELS_LOG_INFO, "WelsUninitEncoderExt(), WelsThreadCancel(pThreadHandles%d) return %d..\n", iThreadIdx,
-                 res);
-        res = WelsThreadJoin ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx]);	// waiting thread exit
-        WelsLog (*ppCtx, WELS_LOG_INFO, "WelsUninitEncoderExt(), pthread_join(pThreadHandles%d) return %d..\n", iThreadIdx,
-                 res);
-        (*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx] = 0;
+    if ((*ppCtx)->pSliceThreading->pExitEncodeEvent != NULL) {
+      while (iThreadIdx < iThreadCount) {
+        int res = 0;
+        if ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx]) {
+          WelsEventSignal (& (*ppCtx)->pSliceThreading->pExitEncodeEvent[iThreadIdx]);
+          WelsEventSignal (& (*ppCtx)->pSliceThreading->pThreadMasterEvent[iThreadIdx]);
+          res = WelsThreadJoin ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx]);	// waiting thread exit
+          WelsLog (*ppCtx, WELS_LOG_INFO, "WelsUninitEncoderExt(), pthread_join(pThreadHandles%d) return %d..\n", iThreadIdx,
+                   res);
+          (*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx] = 0;
+        }
+        ++ iThreadIdx;
       }
-      ++ iThreadIdx;
     }
 #endif//WIN32
   }
