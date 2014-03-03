@@ -95,7 +95,7 @@ TEST_P(DecodeEncodeTest, CompareOutput) {
   DecodeEncodeFileParam p = GetParam();
 
   ASSERT_TRUE(Open(p.fileName));
-  EncodeStream(this, p.width, p.height, p.frameRate, this);
+  EncodeStream(this, p.width, p.height, p.frameRate, false, this);
   unsigned char digest[SHA_DIGEST_LENGTH];
   SHA1Result(&ctx_, digest);
   if (!HasFatalFailure()) {

@@ -6,16 +6,37 @@
 #include "BaseEncoderTest.h"
 
 static int InitWithParam(ISVCEncoder* encoder, int width,
-    int height, float frameRate) {
-  SEncParamBase param;
-  memset (&param, 0, sizeof(SEncParamBase));
+    int height, float frameRate, bool slices) {
+  if (!slices) {
+    SEncParamBase param;
+    memset (&param, 0, sizeof(SEncParamBase));
 
-  param.fMaxFrameRate = frameRate;
-  param.iPicWidth = width;
-  param.iPicHeight = height;
-  param.iTargetBitrate = 5000000;
-  param.iInputCsp = videoFormatI420;
-  return encoder->Initialize(&param);
+    param.fMaxFrameRate = frameRate;
+    param.iPicWidth = width;
+    param.iPicHeight = height;
+    param.iTargetBitrate = 5000000;
+    param.iInputCsp = videoFormatI420;
+
+    return encoder->Initialize(&param);
+  } else {
+    SEncParamExt param;
+    encoder->GetDefaultParams(&param);
+
+    param.fMaxFrameRate = frameRate;
+    param.iPicWidth = width;
+    param.iPicHeight = height;
+    param.iTargetBitrate = 5000000;
+    param.iInputCsp = videoFormatI420;
+
+    param.sSpatialLayers[0].iVideoWidth = width;
+    param.sSpatialLayers[0].iVideoHeight = height;
+    param.sSpatialLayers[0].fFrameRate = frameRate;
+    param.sSpatialLayers[0].iSpatialBitrate = param.iTargetBitrate;
+
+    param.sSpatialLayers[0].sSliceCfg.uiSliceMode = 3; // One slice per MB row
+
+    return encoder->InitializeExt(&param);
+  }
 }
 
 BaseEncoderTest::BaseEncoderTest() : encoder_(NULL) {}
@@ -34,8 +55,8 @@ void BaseEncoderTest::TearDown() {
 }
 
 void BaseEncoderTest::EncodeStream(InputStream* in, int width, int height,
-    float frameRate, Callback* cbk) {
-  int rv = InitWithParam(encoder_, width, height, frameRate);
+    float frameRate, bool slices, Callback* cbk) {
+  int rv = InitWithParam(encoder_, width, height, frameRate, slices);
   ASSERT_TRUE(rv == cmResultSuccess);
 
   // I420: 1(Y) + 1/4(U) + 1/4(V)
@@ -68,8 +89,8 @@ void BaseEncoderTest::EncodeStream(InputStream* in, int width, int height,
 }
 
 void BaseEncoderTest::EncodeFile(const char* fileName, int width, int height,
-    float frameRate, Callback* cbk) {
+    float frameRate, bool slices, Callback* cbk) {
   FileInputStream fileStream;
   ASSERT_TRUE(fileStream.Open(fileName));
-  EncodeStream(&fileStream, width, height, frameRate, cbk);
+  EncodeStream(&fileStream, width, height, frameRate, slices, cbk);
 }
