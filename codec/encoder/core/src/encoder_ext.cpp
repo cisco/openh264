@@ -3225,7 +3225,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
             return ENC_RETURN_UNEXPECTED;
           }
 
-          WelsMultipleEventsWaitAllBlocking (iSliceCount, &pCtx->pSliceThreading->pSliceCodedEvent[0]);
+          WelsMultipleEventsWaitAllBlocking (iSliceCount, &pCtx->pSliceThreading->pSliceCodedEvent[0], &pCtx->pSliceThreading->pSliceCodedMasterEvent);
 
 
           // all slices are finished coding here
@@ -3266,12 +3266,12 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
           while (1) {
             if (iIndexOfSliceToBeCoded >= iSliceCount && iNumThreadsRunning <= 0)
               break;
-#ifdef _WIN32
             WELS_THREAD_ERROR_CODE lwait	= 0;
             int32_t iEventId				= -1;
 
             lwait = WelsMultipleEventsWaitSingleBlocking (iNumThreadsScheduled,
-                    &pCtx->pSliceThreading->pSliceCodedEvent[0]);
+                    &pCtx->pSliceThreading->pSliceCodedEvent[0],
+                    &pCtx->pSliceThreading->pSliceCodedMasterEvent);
             iEventId = (int32_t) (lwait - WELS_THREAD_ERROR_WAIT_OBJECT_0);
             if (iEventId >= 0 && iEventId < iNumThreadsScheduled) {
               if (iIndexOfSliceToBeCoded < iSliceCount) {
@@ -3285,29 +3285,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
                 -- iNumThreadsRunning;
               }
             }
-#else
-            // TODO for pthread platforms
-            // alternate implementation using blocking due non-blocking with timeout mode not support at wels thread lib, tune back if available
-            WelsMultipleEventsWaitAllBlocking (iNumThreadsRunning, &pCtx->pSliceThreading->pSliceCodedEvent[0]);
-            WELS_VERIFY_RETURN_IFNEQ(pCtx->iEncoderError, ENC_RETURN_SUCCESS)
-            if (iIndexOfSliceToBeCoded < iSliceCount) {
-              int32_t iThreadIdx = 0;
-              // pick up succeeding slices for threading if left
-              while (iThreadIdx < iNumThreadsScheduled) {
-                if (iIndexOfSliceToBeCoded >= iSliceCount)
-                  break;
-                pCtx->pSliceThreading->pThreadPEncCtx[iThreadIdx].iSliceIndex = iIndexOfSliceToBeCoded;
-                WelsEventSignal (&pCtx->pSliceThreading->pReadySliceCodingEvent[iThreadIdx]);
-
-                ++ iIndexOfSliceToBeCoded;
-                ++ iThreadIdx;
-              }
-              // update iNumThreadsRunning
-              iNumThreadsRunning		= iThreadIdx;
-            } else {
-              iNumThreadsRunning = 0;
-            }
-#endif//_WIN32
           }//while(1)
 
           // all slices are finished coding here
@@ -3329,7 +3306,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
           return ENC_RETURN_UNEXPECTED;
         }
 
-        WelsMultipleEventsWaitAllBlocking (kiPartitionCnt, &pCtx->pSliceThreading->pSliceCodedEvent[0]);
+        WelsMultipleEventsWaitAllBlocking (kiPartitionCnt, &pCtx->pSliceThreading->pSliceCodedEvent[0], &pCtx->pSliceThreading->pSliceCodedMasterEvent);
         WELS_VERIFY_RETURN_IFNEQ(pCtx->iEncoderError, ENC_RETURN_SUCCESS)
 
         iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, kiPartitionCnt);
