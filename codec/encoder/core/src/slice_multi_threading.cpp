@@ -451,11 +451,6 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
   char ename[SEM_NAME_MAX] = {0};
   while (iIdx < iThreadNum) {
     // length of semaphore name should be system constrained at least on mac 10.7
-#ifdef _WIN32
-    if (pSmt->pThreadHandles != NULL && pSmt->pThreadHandles[iIdx] != NULL)
-      WelsThreadDestroy (&pSmt->pThreadHandles[iIdx]);
-
-#endif//_WIN32
     WelsSnprintf (ename, SEM_NAME_MAX, "ee%d%s", iIdx, pSmt->eventNamespace);
     WelsEventClose (&pSmt->pExitEncodeEvent[iIdx], ename);
     WelsSnprintf (ename, SEM_NAME_MAX, "tm%d%s", iIdx, pSmt->eventNamespace);

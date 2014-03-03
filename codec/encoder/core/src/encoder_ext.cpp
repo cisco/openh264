@@ -2152,18 +2152,6 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
     const int32_t iThreadCount = (*ppCtx)->pSvcParam->iCountThreadsNum;
     int32_t iThreadIdx = 0;
 
-#if defined(_WIN32)
-    if ((*ppCtx)->pSliceThreading->pExitEncodeEvent != NULL) {
-      do {
-        if ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx] != NULL)	// iThreadIdx is already created successfully
-          WelsEventSignal (& (*ppCtx)->pSliceThreading->pExitEncodeEvent[iThreadIdx]);
-          WelsEventSignal (& (*ppCtx)->pSliceThreading->pThreadMasterEvent[iThreadIdx]);
-          WelsThreadJoin ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx]);	// waiting thread exit
-        ++ iThreadIdx;
-      } while (iThreadIdx < iThreadCount);
-
-    }
-#else
     if ((*ppCtx)->pSliceThreading->pExitEncodeEvent != NULL) {
       while (iThreadIdx < iThreadCount) {
         int res = 0;
@@ -2178,7 +2166,6 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
         ++ iThreadIdx;
       }
     }
-#endif//WIN32
   }
 #endif//MT_ENABLED
 

@@ -120,8 +120,6 @@ WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_
 
 WELS_THREAD_ERROR_CODE    WelsThreadJoin (WELS_THREAD_HANDLE  thread);
 
-WELS_THREAD_ERROR_CODE    WelsThreadDestroy (WELS_THREAD_HANDLE* thread);
-
 WELS_THREAD_HANDLE        WelsThreadSelf();
 
 WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* pInfo);

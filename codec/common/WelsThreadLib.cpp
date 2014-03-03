@@ -154,18 +154,11 @@ WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_
 
 WELS_THREAD_ERROR_CODE    WelsThreadJoin (WELS_THREAD_HANDLE  thread) {
   WaitForSingleObject (thread, INFINITE);
+  CloseHandle (thread);
 
   return WELS_THREAD_ERROR_OK;
 }
 
-
-WELS_THREAD_ERROR_CODE    WelsThreadDestroy (WELS_THREAD_HANDLE* thread) {
-  if (thread != NULL) {
-    CloseHandle (*thread);
-    *thread = NULL;
-  }
-  return WELS_THREAD_ERROR_OK;
-}
 
 WELS_THREAD_HANDLE        WelsThreadSelf() {
   return GetCurrentThread();
@@ -210,10 +203,6 @@ WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_
 
 WELS_THREAD_ERROR_CODE    WelsThreadJoin (WELS_THREAD_HANDLE  thread) {
   return pthread_join (thread, NULL);
-}
-
-WELS_THREAD_ERROR_CODE    WelsThreadDestroy (WELS_THREAD_HANDLE* thread) {
-  return WELS_THREAD_ERROR_OK;
 }
 
 WELS_THREAD_HANDLE        WelsThreadSelf() {
