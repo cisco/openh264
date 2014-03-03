@@ -266,10 +266,10 @@ int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam, const bool kbEnab
     pDlp->sRecFileName[0]	= '\0';	// file to be constructed
 #endif//ENABLE_FRAME_DUMP
    pDlp->iActualWidth = sSpatialLayers[iIdxSpatial].iVideoWidth = iPicWidth;
-   pDlp->iFrameWidth =  WELS_ALIGN(pDlp->iActualWidth, MB_WIDTH_LUMA);
+   pDlp->iFrameWidth = pDlp->iActualWidth;
 
   pDlp->iActualHeight = sSpatialLayers[iIdxSpatial].iVideoHeight = iPicHeight;
-  pDlp->iFrameHeight =  WELS_ALIGN(pDlp->iActualHeight, MB_HEIGHT_LUMA);
+  pDlp->iFrameHeight = pDlp->iActualHeight;
 
     pDlp->iSpatialBitrate	=
 		sSpatialLayers[iIdxSpatial].iSpatialBitrate = pCodingParam.iTargetBitrate;	// target bitrate for current spatial layer
