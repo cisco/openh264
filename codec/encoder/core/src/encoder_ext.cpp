@@ -2157,6 +2157,7 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
       do {
         if ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx] != NULL)	// iThreadIdx is already created successfully
           WelsEventSignal (& (*ppCtx)->pSliceThreading->pExitEncodeEvent[iThreadIdx]);
+          WelsEventSignal (& (*ppCtx)->pSliceThreading->pThreadMasterEvent[iThreadIdx]);
         ++ iThreadIdx;
       } while (iThreadIdx < iThreadCount);
 
@@ -2174,15 +2175,6 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
         WelsLog (*ppCtx, WELS_LOG_INFO, "WelsUninitEncoderExt(), pthread_join(pThreadHandles%d) return %d..\n", iThreadIdx,
                  res);
         (*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx] = 0;
-      }
-      if ((*ppCtx)->pSliceThreading->pUpdateMbListThrdHandles[iThreadIdx]) {
-        res = WelsThreadCancel ((*ppCtx)->pSliceThreading->pUpdateMbListThrdHandles[iThreadIdx]);
-        WelsLog (*ppCtx, WELS_LOG_INFO, "WelsUninitEncoderExt(), WelsThreadCancel(pUpdateMbListThrdHandles%d) return %d..\n",
-                 iThreadIdx, res);
-        res = WelsThreadJoin ((*ppCtx)->pSliceThreading->pUpdateMbListThrdHandles[iThreadIdx]);	// waiting thread exit
-        WelsLog (*ppCtx, WELS_LOG_INFO, "WelsUninitEncoderExt(), pthread_join(pUpdateMbListThrdHandles%d) return %d..\n",
-                 iThreadIdx, res);
-        (*ppCtx)->pSliceThreading->pUpdateMbListThrdHandles[iThreadIdx] = 0;
       }
       ++ iThreadIdx;
     }
@@ -3217,6 +3209,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
           pCtx->iActiveThreadsNum	= iSliceCount;
           // to fire slice coding threads
           err = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
+                                   &pCtx->pSliceThreading->pThreadMasterEvent[0],
                                    pLayerBsInfo, iSliceCount, pCtx->pCurDqLayer->pSliceEncCtx, false);
           if (err) {
             WelsLog (pCtx, WELS_LOG_ERROR,
@@ -3254,6 +3247,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
           iNumThreadsRunning		= iNumThreadsScheduled;
           // to fire slice coding threads
           err = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
+                                   &pCtx->pSliceThreading->pThreadMasterEvent[0],
                                    pLayerBsInfo, iNumThreadsRunning, pCtx->pCurDqLayer->pSliceEncCtx, false);
           if (err) {
             WelsLog (pCtx, WELS_LOG_ERROR,
@@ -3279,6 +3273,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
                 // thread_id equal to iEventId per implementation here
                 pCtx->pSliceThreading->pThreadPEncCtx[iEventId].iSliceIndex	= iIndexOfSliceToBeCoded;
                 WelsEventSignal (&pCtx->pSliceThreading->pReadySliceCodingEvent[iEventId]);
+                WelsEventSignal (&pCtx->pSliceThreading->pThreadMasterEvent[iEventId]);
 
                 ++ iIndexOfSliceToBeCoded;
               } else {	// no other slices left for coding
@@ -3298,6 +3293,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
 
         // to fire slice coding threads
         err = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
+                                 &pCtx->pSliceThreading->pThreadMasterEvent[0],
                                  pLayerBsInfo, kiPartitionCnt, pCtx->pCurDqLayer->pSliceEncCtx, true);
         if (err) {
           WelsLog (pCtx, WELS_LOG_ERROR,
