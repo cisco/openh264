@@ -287,6 +287,7 @@ typedef struct {
   SLayerBSInfo	sLayerInfo[MAX_LAYER_NUM_OF_FRAME];
 
   int eOutputFrameType;
+  long long uiTimeStamp;
 } SFrameBSInfo, *PFrameBSInfo;
 
 typedef struct Source_Picture_s {
@@ -295,6 +296,7 @@ typedef struct Source_Picture_s {
   unsigned char*  pData[4];		// plane pData
   int  		iPicWidth;				// luma picture width in x coordinate
   int 		iPicHeight;				// luma picture height in y coordinate
+  long long uiTimeStamp;
 } SSourcePicture;
 
 

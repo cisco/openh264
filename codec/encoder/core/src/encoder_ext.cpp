@@ -2998,7 +2998,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
 
   pCtx->iEncoderError						= ENC_RETURN_SUCCESS;
   pFbi->iLayerNum	= 0;	// for initialization
-
+  pFbi->uiTimeStamp = pSrcPic->uiTimeStamp;
   // perform csc/denoise/downsample/padding, generate spatial layers
   iSpatialNum = pCtx->pVpp->BuildSpatialPicList (pCtx, &pSrcPic, 1);
   if (iSpatialNum < 1) {	// skip due to temporal layer settings (different frame rate)
