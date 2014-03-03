@@ -58,7 +58,7 @@ TEST_P(EncoderOutputTest, CompareOutput) {
   unsigned char digest[SHA_DIGEST_LENGTH];
   SHA1Result(&ctx_, digest);
   if (!HasFatalFailure()) {
-    ASSERT_TRUE(CompareHash(digest, p.hashStr));
+    CompareHash(digest, p.hashStr);
   }
 }
 
