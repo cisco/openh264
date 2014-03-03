@@ -316,32 +316,6 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   pSmt->pThreadPEncCtx	= (SSliceThreadPrivateData*)pMa->WelsMalloc (sizeof (SSliceThreadPrivateData) * iThreadNum,
                           "pThreadPEncCtx");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pThreadPEncCtx), FreeMemorySvc (ppCtx))
-  pSmt->pThreadHandles	= (WELS_THREAD_HANDLE*)pMa->WelsMalloc (sizeof (WELS_THREAD_HANDLE) * iThreadNum,
-                          "pThreadHandles");
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pThreadHandles), FreeMemorySvc (ppCtx))
-
-  pSmt->pSliceCodedEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pSliceCodedEvent");
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pSliceCodedEvent), FreeMemorySvc (ppCtx))
-  pSmt->pReadySliceCodingEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum,
-                                  "pReadySliceCodingEvent");
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pReadySliceCodingEvent), FreeMemorySvc (ppCtx))
-
-  pSmt->pUpdateMbListEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pUpdateMbListEvent");
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pUpdateMbListEvent), FreeMemorySvc (ppCtx))
-  pSmt->pFinUpdateMbListEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pFinUpdateMbListEvent");
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pFinUpdateMbListEvent), FreeMemorySvc (ppCtx))
-
-#ifdef _WIN32
-  pSmt->pFinSliceCodingEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pFinSliceCodingEvent");
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pFinSliceCodingEvent), FreeMemorySvc (ppCtx))
-
-  pSmt->pExitEncodeEvent	= (WELS_EVENT*)pMa->WelsMalloc (sizeof (WELS_EVENT) * iThreadNum, "pExitEncodeEvent");
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pExitEncodeEvent), FreeMemorySvc (ppCtx))
-#else
-  pSmt->pUpdateMbListThrdHandles	= (WELS_THREAD_HANDLE*)pMa->WelsMalloc (sizeof (WELS_THREAD_HANDLE) * iThreadNum,
-                                    "pUpdateMbListThrdHandles");
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pUpdateMbListThrdHandles), FreeMemorySvc (ppCtx))
-#endif//!_WIN32
 
   iIdx = 0;
   while (iIdx < iNumSpatialLayers) {
@@ -515,35 +489,12 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
     ++ iIdx;
   }
 
-  if (pSmt->pSliceCodedEvent != NULL) {
-    pMa->WelsFree (pSmt->pSliceCodedEvent, "pSliceCodedEvent");
-    pSmt->pSliceCodedEvent = NULL;
-  }
-  if (pSmt->pReadySliceCodingEvent != NULL) {
-    pMa->WelsFree (pSmt->pReadySliceCodingEvent, "pReadySliceCodingEvent");
-    pSmt->pReadySliceCodingEvent = NULL;
-  }
-#ifdef _WIN32
-  if (pSmt->pExitEncodeEvent != NULL) {
-    pMa->WelsFree (pSmt->pExitEncodeEvent, "pExitEncodeEvent");
-    pSmt->pExitEncodeEvent = NULL;
-  }
-  if (pSmt->pFinSliceCodingEvent != NULL) {
-    pMa->WelsFree (pSmt->pFinSliceCodingEvent, "pFinSliceCodingEvent");
-    pSmt->pFinSliceCodingEvent = NULL;
-  }
-#endif//_WIN32
-
   WelsMutexDestroy (&pSmt->mutexSliceNumUpdate);
   WelsMutexDestroy (&((*ppCtx)->mutexEncoderError));
 
   if (pSmt->pThreadPEncCtx != NULL) {
     pMa->WelsFree (pSmt->pThreadPEncCtx, "pThreadPEncCtx");
     pSmt->pThreadPEncCtx = NULL;
-  }
-  if (pSmt->pThreadHandles != NULL) {
-    pMa->WelsFree (pSmt->pThreadHandles, "pThreadHandles");
-    pSmt->pThreadHandles = NULL;
   }
 
   pSliceB = (*ppCtx)->pSliceBs;
@@ -573,21 +524,6 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
     }
     ++ iIdx;
   }
-
-  if (pSmt->pUpdateMbListEvent != NULL) {
-    pMa->WelsFree (pSmt->pUpdateMbListEvent, "pUpdateMbListEvent");
-    pSmt->pUpdateMbListEvent = NULL;
-  }
-  if (pSmt->pFinUpdateMbListEvent != NULL) {
-    pMa->WelsFree (pSmt->pFinUpdateMbListEvent, "pFinUpdateMbListEvent");
-    pSmt->pFinUpdateMbListEvent = NULL;
-  }
-#ifndef _WIN32
-  if (pSmt->pUpdateMbListThrdHandles) {
-    pMa->WelsFree (pSmt->pUpdateMbListThrdHandles, "pUpdateMbListThrdHandles");
-    pSmt->pUpdateMbListThrdHandles = NULL;
-  }
-#endif//!_WIN32
 
 #ifdef MT_DEBUG
   // file handle for debug
