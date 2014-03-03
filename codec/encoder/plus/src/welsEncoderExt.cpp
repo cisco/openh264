@@ -758,7 +758,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     int32_t iTargetWidth = 0;
     int32_t iTargetHeight = 0;
 
-    memcpy (&sEncodingParam, pOption, sizeof (SEncParamBase));	// confirmed_safe_unsafe_usage
+    memcpy (&sEncodingParam, pOption, sizeof (SEncParamExt));	// confirmed_safe_unsafe_usage
     WelsLog (m_pEncContext, WELS_LOG_INFO, "ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, sEncodingParam.iInputCsp= 0x%x\n",
              sEncodingParam.iInputCsp);
     WelsLog (m_pEncContext, WELS_LOG_INFO,
