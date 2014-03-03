@@ -863,7 +863,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 #if defined(ENABLE_TRACE_MT)
     WelsLog (pEncPEncCtx, WELS_LOG_INFO,
              "[MT] CodingSliceThreadProc(), try to call WelsEventWait(pReadySliceCodingEvent[%d]= 0x%p), pEncPEncCtx= 0x%p!\n",
-             iEventIdx, (void*) (pEncPEncCtx->pReadySliceCodingEvent[iEventIdx]), (void*)pEncPEncCtx);
+             iEventIdx, (void*) (pEncPEncCtx->pSliceThreading->pReadySliceCodingEvent[iEventIdx]), (void*)pEncPEncCtx);
 #endif
     iWaitRet = WelsEventWait (pEncPEncCtx->pSliceThreading->pReadySliceCodingEvent[iEventIdx]);
 #endif//WIN32
