@@ -83,22 +83,22 @@
     vaddl.u8	q4, $1, $2
     vaddl.u8	q5, $3, $4
     vadd.u16	q5, q4, q5
-    
+
     vaddl.u8	q4, $0, $1
     vshl.u16	q4, q4, #1
     vadd.u16	q4, q5, q4
-    
+
     vrshrn.u16		$0, q5, #2
     vrshrn.u16		$7, q4, #3
-                    
+
     vshl.u16	q5, q5, #1
     vsubl.u8	q4, $5, $1
     vadd.u16	q5, q4,q5
-    
+
     vaddl.u8	q4, $2, $5
     vaddw.u8	q4, q4, $2
     vaddw.u8	q4, q4, $3
-    
+
     vrshrn.u16		d10,q5, #3
     vrshrn.u16		d8, q4, #2
     vbsl.u8		$6, d10, d8
@@ -237,12 +237,12 @@
     vaddw.u8	\arg6, \arg6, \arg3
     vrshrn.u16		\arg7, \arg5, #2
     vrshrn.u16		\arg8, \arg6, #2
-.endm		
+.endm
 
 .macro	LORD_CHROMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
     vld4.u8	{\arg0[\arg8],\arg1[\arg8],\arg2[\arg8],\arg3[\arg8]}, [r0], r2
     vld4.u8	{\arg4[\arg8],\arg5[\arg8],\arg6[\arg8],\arg7[\arg8]}, [r1], r2
-.endm	
+.endm
 
 .macro	STORE_CHROMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
     vst4.u8	{\arg0[\arg8],\arg1[\arg8],\arg2[\arg8],\arg3[\arg8]}, [r0], r2
@@ -359,11 +359,11 @@ WELS_ASM_FUNC_BEGIN DeblockLumaEq4V_neon
     vabd.u8	q0, q11, q12
     vclt.u8	q7, q0, q5
 
-    vabd.u8	q1, q9, q11	
+    vabd.u8	q1, q9, q11
     vclt.u8	q1, q1, q4
     vand.s8	q1, q1, q7
 
-    vabd.u8	q2, q14,q12	
+    vabd.u8	q2, q14,q12
     vclt.u8	q2, q2, q4
     vand.s8	q2, q2, q7
     vand.u8	q7, q7, q6
