@@ -118,9 +118,8 @@ WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t 
 }
 
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount,
-    WELS_EVENT* event_list,
-    uint32_t dwMilliseconds) {
-  return WaitForMultipleObjects (nCount, event_list, FALSE, dwMilliseconds);
+    WELS_EVENT* event_list) {
+  return WaitForMultipleObjects (nCount, event_list, FALSE, INFINITE);
 }
 
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WELS_EVENT* event_list) {
@@ -339,8 +338,7 @@ WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t 
 }
 
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount,
-    WELS_EVENT* event_list,
-    uint32_t dwMilliseconds) {
+    WELS_EVENT* event_list) {
   uint32_t nIdx = 0;
   const uint32_t kuiAccessTime = 2;	// 2 us once
 

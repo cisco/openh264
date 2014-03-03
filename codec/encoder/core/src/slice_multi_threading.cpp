@@ -749,8 +749,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
   do {
 #ifdef _WIN32
     iWaitRet = WelsMultipleEventsWaitSingleBlocking (iEventCount,
-               &pEventsList[0],
-               (uint32_t) - 1);	// blocking until at least one event is
+               &pEventsList[0]); // blocking until at least one event is
 #else
     MT_TRACE_LOG (pEncPEncCtx, WELS_LOG_INFO,
                   "[MT] CodingSliceThreadProc(), try to call WelsEventWait(pReadySliceCodingEvent[%d]= 0x%p), pEncPEncCtx= 0x%p!\n",
