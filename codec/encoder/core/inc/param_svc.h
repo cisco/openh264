@@ -192,6 +192,16 @@ static void FillDefault (SEncParamExt& param, const bool kbEnableRc) {
   param.iMaxQp = 51;
   param.iMinQp = 0;
   param.iUsageType = 0;
+
+  param.sSpatialLayers[0].iDLayerQp = SVC_QUALITY_BASE_QP;
+  param.sSpatialLayers[0].fFrameRate = param.fMaxFrameRate;
+  param.sSpatialLayers[0].sSliceCfg.uiSliceMode = 0;
+  param.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 1500;
+  param.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = 1;
+
+  const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
+  for (int32_t idx = 0; idx < kiLesserSliceNum; idx++)
+    param.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceMbNum[idx] = 960;
 }
 
 void FillDefault (const bool kbEnableRc) {
