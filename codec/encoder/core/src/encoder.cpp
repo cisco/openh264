@@ -78,6 +78,10 @@ int32_t InitPic (const void* kpSrc, const int32_t kiColorspace, const int32_t ki
   pSrcPic->iPicWidth		= kiWidth;
   pSrcPic->iPicHeight		= kiHeight;
 
+  //currently encoder only supports videoFormatI420. 
+  if((kiColorspace & (~videoFormatVFlip))!= videoFormatI420)
+      return 2;
+    
   switch (kiColorspace & (~videoFormatVFlip)) {
   case videoFormatI420:
   case videoFormatYV12:
