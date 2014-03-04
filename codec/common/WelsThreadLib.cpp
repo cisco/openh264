@@ -123,7 +123,7 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount,
 }
 
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WELS_EVENT* event_list) {
-  return WaitForMultipleObjects (nCount, event_list, TRUE, (uint32_t) - 1);
+  return WaitForMultipleObjects (nCount, event_list, TRUE, INFINITE);
 }
 
 WELS_THREAD_ERROR_CODE    WelsEventDestroy (WELS_EVENT* event) {
