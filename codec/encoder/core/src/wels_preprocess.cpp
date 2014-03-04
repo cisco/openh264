@@ -305,8 +305,7 @@ void CWelsPreProcess::FreeSpatialPictures (sWelsEncCtx* pCtx) {
   }
 }
 
-int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePicture** kppSrcPicList,
-    const int32_t kiConfiguredLayerNum) {
+int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePicture* kpSrcPic) {
   SWelsSvcCodingParam* pSvcParam = pCtx->pSvcParam;
   int32_t	iNumDependencyLayer = (int32_t)pSvcParam->iSpatialLayerNum;
   int32_t iSpatialNum = 0;
@@ -317,17 +316,11 @@ int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePi
     if (WelsPreprocessReset (pCtx) != 0)
       return -1;
 
-    m_bOfficialBranch  = (iNumDependencyLayer != kiConfiguredLayerNum);
-    if (!m_bOfficialBranch && (iNumDependencyLayer == 1)) {
-      // check the input source uiSize to decide if need switch to official branch
-      // NOTICE: the layernum=1 case is confused in official/non-official cases!
-      SSourcePicture** pic_queue = (SSourcePicture**)kppSrcPicList;
-      for (int32_t i = 0; i < iNumDependencyLayer; i++) {
-        if (pSvcParam->sDependencyLayers[i].iFrameWidth != pic_queue[i]->iPicWidth ||
-            pSvcParam->sDependencyLayers[i].iFrameHeight != pic_queue[i]->iPicHeight) {
-          m_bOfficialBranch = true;
-          break;
-        }
+    m_bOfficialBranch  = (iNumDependencyLayer != 1);
+    if ( iNumDependencyLayer == 1 ) {
+      if (pSvcParam->sDependencyLayers[0].iFrameWidth != kpSrcPic->iPicWidth ||
+          pSvcParam->sDependencyLayers[0].iFrameHeight != kpSrcPic->iPicHeight) {
+        m_bOfficialBranch = true;
       }
     }
     m_bInitDone = true;
@@ -336,19 +329,15 @@ int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePi
   if (m_pInterfaceVp == NULL)
     return -1;
 
-  if (kiConfiguredLayerNum <= 0)
-    return -1;
-
   pCtx->pVaa->bSceneChangeFlag = pCtx->pVaa->bIdrPeriodFlag = false;
   if (pSvcParam->uiIntraPeriod)
     pCtx->pVaa->bIdrPeriodFlag = (1 + pCtx->iFrameIndex >= (int32_t)pSvcParam->uiIntraPeriod) ? true : false;
 
   if (m_bOfficialBranch) {	// Perform Down Sampling potentially due to application
-    assert (kiConfiguredLayerNum == 1);
-    iSpatialNum	= SingleLayerPreprocess (pCtx, kppSrcPicList[0], &m_sScaledPicture);
+    iSpatialNum	= SingleLayerPreprocess (pCtx, kpSrcPic, &m_sScaledPicture);
   } else { // for console each spatial pictures are available there
-    iSpatialNum	= kiConfiguredLayerNum;
-    MultiLayerPreprocess (pCtx, kppSrcPicList, iSpatialNum);
+    iSpatialNum = 1;
+    MultiLayerPreprocess (pCtx, &kpSrcPic, iSpatialNum);
   }
 
   return iSpatialNum;
