@@ -36,6 +36,9 @@
 		4CE4469D18BC5EAB0017DF25 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4467A18BC5EAA0017DF25 /* utils.cpp */; };
 		4CE4469E18BC5EAB0017DF25 /* welsCodecTrace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4468418BC5EAB0017DF25 /* welsCodecTrace.cpp */; };
 		4CE4469F18BC5EAB0017DF25 /* welsDecoderExt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4468518BC5EAB0017DF25 /* welsDecoderExt.cpp */; };
+		4CE447AC18BC6BE90017DF25 /* block_add_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CE447A718BC6BE90017DF25 /* block_add_neon.S */; };
+		4CE447AE18BC6BE90017DF25 /* intra_pred_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CE447A918BC6BE90017DF25 /* intra_pred_neon.S */; };
+		4CE447AF18BC6BE90017DF25 /* mc_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CE447AA18BC6BE90017DF25 /* mc_neon.S */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,9 +84,9 @@
 		4CE4464E18BC5EAA0017DF25 /* decoder_context.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = decoder_context.h; sourceTree = "<group>"; };
 		4CE4464F18BC5EAA0017DF25 /* decoder_core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = decoder_core.h; sourceTree = "<group>"; };
 		4CE4465018BC5EAA0017DF25 /* error_code.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = error_code.h; sourceTree = "<group>"; };
-		4CE4465118BC5EAA0017DF25 /* expand_pic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = expand_pic.h; sourceTree = "<group>"; };
-		4CE4465218BC5EAA0017DF25 /* fmo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fmo.h; sourceTree = "<group>"; };
-		4CE4465318BC5EAA0017DF25 /* get_intra_predictor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = get_intra_predictor.h; sourceTree = "<group>"; };
+		4CE4465118BC5EAA0017DF25 /* expand_pic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = expand_pic.h; sourceTree = "<group>"; usesTabs = 1; };
+		4CE4465218BC5EAA0017DF25 /* fmo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fmo.h; sourceTree = "<group>"; usesTabs = 1; };
+		4CE4465318BC5EAA0017DF25 /* get_intra_predictor.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = get_intra_predictor.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		4CE4465418BC5EAA0017DF25 /* manage_dec_ref.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = manage_dec_ref.h; sourceTree = "<group>"; };
 		4CE4465518BC5EAA0017DF25 /* mb_cache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mb_cache.h; sourceTree = "<group>"; };
 		4CE4465618BC5EAA0017DF25 /* mc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mc.h; sourceTree = "<group>"; };
@@ -102,19 +105,19 @@
 		4CE4466318BC5EAA0017DF25 /* vlc_decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vlc_decoder.h; sourceTree = "<group>"; };
 		4CE4466418BC5EAA0017DF25 /* wels_common_basis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wels_common_basis.h; sourceTree = "<group>"; };
 		4CE4466518BC5EAA0017DF25 /* wels_const.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wels_const.h; sourceTree = "<group>"; };
-		4CE4466718BC5EAA0017DF25 /* au_parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = au_parser.cpp; sourceTree = "<group>"; };
-		4CE4466818BC5EAA0017DF25 /* bit_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bit_stream.cpp; sourceTree = "<group>"; };
-		4CE4466918BC5EAA0017DF25 /* deblocking.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = deblocking.cpp; sourceTree = "<group>"; };
+		4CE4466718BC5EAA0017DF25 /* au_parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = au_parser.cpp; sourceTree = "<group>"; usesTabs = 0; };
+		4CE4466818BC5EAA0017DF25 /* bit_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bit_stream.cpp; sourceTree = "<group>"; usesTabs = 0; };
+		4CE4466918BC5EAA0017DF25 /* deblocking.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = deblocking.cpp; sourceTree = "<group>"; tabWidth = 2; };
 		4CE4466A18BC5EAA0017DF25 /* decode_mb_aux.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = decode_mb_aux.cpp; sourceTree = "<group>"; };
-		4CE4466B18BC5EAA0017DF25 /* decode_slice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = decode_slice.cpp; sourceTree = "<group>"; };
-		4CE4466C18BC5EAA0017DF25 /* decoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = decoder.cpp; sourceTree = "<group>"; };
+		4CE4466B18BC5EAA0017DF25 /* decode_slice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = decode_slice.cpp; sourceTree = "<group>"; usesTabs = 0; };
+		4CE4466C18BC5EAA0017DF25 /* decoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = decoder.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		4CE4466D18BC5EAA0017DF25 /* decoder_core.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = decoder_core.cpp; sourceTree = "<group>"; };
 		4CE4466E18BC5EAA0017DF25 /* decoder_data_tables.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = decoder_data_tables.cpp; sourceTree = "<group>"; };
 		4CE4466F18BC5EAA0017DF25 /* expand_pic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = expand_pic.cpp; sourceTree = "<group>"; };
 		4CE4467018BC5EAA0017DF25 /* fmo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fmo.cpp; sourceTree = "<group>"; };
 		4CE4467118BC5EAA0017DF25 /* get_intra_predictor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = get_intra_predictor.cpp; sourceTree = "<group>"; };
 		4CE4467218BC5EAA0017DF25 /* manage_dec_ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = manage_dec_ref.cpp; sourceTree = "<group>"; };
-		4CE4467318BC5EAA0017DF25 /* mc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mc.cpp; sourceTree = "<group>"; };
+		4CE4467318BC5EAA0017DF25 /* mc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mc.cpp; sourceTree = "<group>"; tabWidth = 1; usesTabs = 0; wrapsLines = 1; };
 		4CE4467418BC5EAA0017DF25 /* mem_align.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mem_align.cpp; sourceTree = "<group>"; };
 		4CE4467518BC5EAA0017DF25 /* memmgr_nal_unit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = memmgr_nal_unit.cpp; sourceTree = "<group>"; };
 		4CE4467618BC5EAA0017DF25 /* mv_pred.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mv_pred.cpp; sourceTree = "<group>"; };
@@ -127,6 +130,9 @@
 		4CE4468318BC5EAB0017DF25 /* wels_dec_export.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = wels_dec_export.def; sourceTree = "<group>"; };
 		4CE4468418BC5EAB0017DF25 /* welsCodecTrace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = welsCodecTrace.cpp; sourceTree = "<group>"; };
 		4CE4468518BC5EAB0017DF25 /* welsDecoderExt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = welsDecoderExt.cpp; sourceTree = "<group>"; };
+		4CE447A718BC6BE90017DF25 /* block_add_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = block_add_neon.S; sourceTree = "<group>"; };
+		4CE447A918BC6BE90017DF25 /* intra_pred_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = intra_pred_neon.S; sourceTree = "<group>"; };
+		4CE447AA18BC6BE90017DF25 /* mc_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = mc_neon.S; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -212,6 +218,7 @@
 		4CE4463F18BC5EAA0017DF25 /* core */ = {
 			isa = PBXGroup;
 			children = (
+				4CE447A518BC6BE90017DF25 /* arm */,
 				4CE4464418BC5EAA0017DF25 /* inc */,
 				4CE4466618BC5EAA0017DF25 /* src */,
 			);
@@ -313,6 +320,16 @@
 			path = src;
 			sourceTree = "<group>";
 		};
+		4CE447A518BC6BE90017DF25 /* arm */ = {
+			isa = PBXGroup;
+			children = (
+				4CE447A718BC6BE90017DF25 /* block_add_neon.S */,
+				4CE447A918BC6BE90017DF25 /* intra_pred_neon.S */,
+				4CE447AA18BC6BE90017DF25 /* mc_neon.S */,
+			);
+			path = arm;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -394,6 +411,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4CE447AF18BC6BE90017DF25 /* mc_neon.S in Sources */,
 				4CE4469B18BC5EAB0017DF25 /* pic_queue.cpp in Sources */,
 				4CE4469F18BC5EAB0017DF25 /* welsDecoderExt.cpp in Sources */,
 				4CE4469318BC5EAB0017DF25 /* fmo.cpp in Sources */,
@@ -404,9 +422,11 @@
 				4CE4468A18BC5EAB0017DF25 /* au_parser.cpp in Sources */,
 				4CE4469218BC5EAB0017DF25 /* expand_pic.cpp in Sources */,
 				4CE4469918BC5EAB0017DF25 /* mv_pred.cpp in Sources */,
+				4CE447AC18BC6BE90017DF25 /* block_add_neon.S in Sources */,
 				4CE4469418BC5EAB0017DF25 /* get_intra_predictor.cpp in Sources */,
 				4CE4469018BC5EAB0017DF25 /* decoder_core.cpp in Sources */,
 				4CE4469E18BC5EAB0017DF25 /* welsCodecTrace.cpp in Sources */,
+				4CE447AE18BC6BE90017DF25 /* intra_pred_neon.S in Sources */,
 				4CE4469618BC5EAB0017DF25 /* mc.cpp in Sources */,
 				4CE4469C18BC5EAB0017DF25 /* rec_mb.cpp in Sources */,
 				4CE4468B18BC5EAB0017DF25 /* bit_stream.cpp in Sources */,

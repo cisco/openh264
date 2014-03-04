@@ -68,6 +68,12 @@ void WelsChromaDcIdct (int16_t* pBlock);
 extern "C" {
 #endif//__cplusplus
 
+#if defined(HAVE_NEON)
+void WelsResBlockZero16x16_neon(int16_t* pBlock, int32_t iStride);
+void WelsResBlockZero8x8_neon(int16_t* pBlock, int32_t iStride);
+void SetNonZeroCount_neon(int16_t* pBlock, int8_t* pNonZeroCount);
+#endif
+
 #ifdef  X86_ASM
 void WelsResBlockZero16x16_sse2 (int16_t* pBlock, int32_t iStride);
 void WelsResBlockZero8x8_sse2 (int16_t* pBlock, int32_t iStride);

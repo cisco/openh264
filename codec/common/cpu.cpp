@@ -38,7 +38,12 @@
  *************************************************************************************
  */
 #include <string.h>
-
+#ifdef ANDROID_NDK
+#include <cpu-features.h>
+#endif
+#ifdef APPLE_IOS
+#include <sys/utsname.h>
+#endif
 #include "cpu.h"
 #include "cpu_core.h"
 
@@ -207,6 +212,52 @@ void WelsCPURestore (const uint32_t kuiCPU) {
 void WelsXmmRegEmptyOp(void * pSrc) {
 }
 
+#endif
+
+#if defined(HAVE_NEON)//For supporting both android platform and iOS platform
+#if defined(ANDROID_NDK)
+uint32_t WelsCPUFeatureDetectAndroid()
+{
+  uint32_t         uiCPU = 0;
+  AndroidCpuFamily cpuFamily = ANDROID_CPU_FAMILY_UNKNOWN;
+  uint64_t         uiFeatures = 0;
+  cpuFamily = android_getCpuFamily();
+  if (cpuFamily == ANDROID_CPU_FAMILY_ARM)	{
+    uiFeatures = android_getCpuFeatures();
+    if (uiFeatures & ANDROID_CPU_ARM_FEATURE_ARMv7){
+      uiCPU |= WELS_CPU_ARMv7;
+    }
+    if (uiFeatures & ANDROID_CPU_ARM_FEATURE_VFPv3){
+      uiCPU |= WELS_CPU_VFPv3;
+    }
+    if (uiFeatures & ANDROID_CPU_ARM_FEATURE_NEON){
+      uiCPU |= WELS_CPU_NEON;
+    }
+  }
+  return uiCPU;
+}
+
+#endif
+
+#if defined(APPLE_IOS)
+uint32_t WelsCPUFeatureDetectIOS() //Need to be updated for the new device of APPLE
+{
+    uint32_t       uiCPU = 0;
+    struct utsname sSystemInfo;
+    uname (&sSystemInfo);
+
+    if ((0 != strcmp(sSystemInfo.machine, "iPhone1,1")) && //iPhone 2G
+        (0 != strcmp(sSystemInfo.machine, "iPhone1,2")) && //iPhone 3G
+        (0 != strcmp(sSystemInfo.machine, "iPod1,1")) &&   //iPod 1G
+        (0 != strcmp(sSystemInfo.machine, "iPod2,1")))     //iPod 2G
+    {
+        uiCPU |= WELS_CPU_ARMv7;
+        uiCPU |= WELS_CPU_VFPv3;
+        uiCPU |= WELS_CPU_NEON;
+    }
+    return uiCPU;
+}
+#endif
 #endif
 
 
