@@ -40,28 +40,4 @@
 #define WELS_AS264_COMMON_H__
 #define  NO_WAITING_AU //slice level decoding
 #define  LONG_TERM_REF //for app
-
-#if defined(__cplusplus)
-extern "C" {
-#endif//__cplusplus
-
-#ifdef X86_ASM
-
-void MemZeroUnalign32Bytes (void* pSrc);
-void MemZeroAlign32Bytes (void* pSrc);
-void MemZeroUnalign16Bytes (void* pSrc);
-void MemZeroAlign16Bytes (void* pSrc);
-void MemZeroAlign128Bytes (void* pSrc);
-void MemZeroUnalign128Bytes (void* pSrc);
-void MemZeroAlign256Bytes (void* pSrc);
-void MemZeroAlign240Bytes (void* pSrc);
-void MmPrefetch0 (char const* kpA);
-
-#endif// X86_ASM
-
-#if defined(__cplusplus)
-}
-#endif//__cplusplus
-
-
 #endif // WELS_AS264_COMMON_H__
