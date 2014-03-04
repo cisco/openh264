@@ -213,11 +213,7 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EFrameType keFrameType) {
   InitBits (&pEncCtx->pOut->sBsWrite, pEncCtx->pOut->pBsBuffer, pEncCtx->pOut->uiSize);
 
   if (keFrameType == WELS_FRAME_TYPE_P) {
-    if (pEncCtx->pSvcParam->uiIntraPeriod) {
-      ++pEncCtx->iFrameIndex;
-    }
-
-    ++pEncCtx->uiFrameIdxRc;
+    ++pEncCtx->iFrameIndex;
 
     if (pEncCtx->iPOC < (1 << pEncCtx->pSps->iLog2MaxPocLsb) - 2)     // if iPOC type is no 0, this need be modification
       pEncCtx->iPOC			+= 2;	// for POC type 0
@@ -237,10 +233,7 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EFrameType keFrameType) {
     pEncCtx->iFrameNum		= 0;
     pEncCtx->iPOC			= 0;
     pEncCtx->bEncCurFrmAsIdrFlag = false;
-    if (pEncCtx->pSvcParam->uiIntraPeriod) {
-      pEncCtx->iFrameIndex = 0;
-    }
-    pEncCtx->uiFrameIdxRc = 0;
+    pEncCtx->iFrameIndex = 0;
 
     pEncCtx->eNalType		= NAL_UNIT_CODED_SLICE_IDR;
     pEncCtx->eSliceType	= I_SLICE;
@@ -286,7 +279,7 @@ EFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum) {
   // perform scene change detection
   if ((!pSvcParam->bEnableSceneChangeDetect) || pEncCtx->pVaa->bIdrPeriodFlag ||
       (kiSpatialNum < pSvcParam->iSpatialLayerNum)
-      || (pEncCtx->uiFrameIdxRc < (VGOP_SIZE << 1))) { // avoid too frequent I frame coding, rc control
+      || (pEncCtx->iFrameIndex < (VGOP_SIZE << 1))) { // avoid too frequent I frame coding, rc control
     bSceneChangeFlag = false;
   } else {
     bSceneChangeFlag = pEncCtx->pVaa->bSceneChangeFlag;
