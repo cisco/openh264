@@ -82,7 +82,9 @@ void     WelsXmmRegEmptyOp(void * pSrc);
 
 #if defined(HAVE_NEON)
 #if defined(ANDROID_NDK)
-	uint32_t WelsCPUFeatureDetectAndroid();
+
+uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors);
+
 #endif
 
 #if defined(APPLE_IOS)

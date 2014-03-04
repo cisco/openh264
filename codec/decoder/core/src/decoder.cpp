@@ -148,7 +148,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx) {
   pCtx->uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores);
 #elif defined(HAVE_NEON)
 #if defined(ANDROID_NDK)
-  pCtx->uiCpuFlag	= WelsCPUFeatureDetectAndroid();
+  pCtx->uiCpuFlag	= WelsCPUFeatureDetect(&iCpuCores);
 #endif
 #if defined(APPLE_IOS)
   pCtx->uiCpuFlag	= WelsCPUFeatureDetectIOS();
