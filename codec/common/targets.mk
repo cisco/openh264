@@ -8,7 +8,6 @@ COMMON_CPP_SRCS=\
 
 COMMON_OBJS += $(COMMON_CPP_SRCS:.cpp=.o)
 
-ifeq ($(USE_ASM), Yes)
 ifeq ($(ASM_ARCH), x86)
 COMMON_ASM_SRCS=\
 	$(COMMON_SRCDIR)/asm_inc.asm\
@@ -22,7 +21,6 @@ COMMON_ASM_SRCS=\
 	$(COMMON_SRCDIR)/vaa.asm\
 
 COMMON_OBJS += $(COMMON_ASM_SRCS:.asm=.o)
-endif
 endif
 
 OBJS += $(COMMON_OBJS)
