@@ -216,7 +216,7 @@ void WelsXmmRegEmptyOp(void * pSrc) {
 
 #if defined(HAVE_NEON)//For supporting both android platform and iOS platform
 #if defined(ANDROID_NDK)
-uint32_t WelsCPUFeatureDetectAndroid()
+uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors)
 {
   uint32_t         uiCPU = 0;
   AndroidCpuFamily cpuFamily = ANDROID_CPU_FAMILY_UNKNOWN;
@@ -234,6 +234,11 @@ uint32_t WelsCPUFeatureDetectAndroid()
       uiCPU |= WELS_CPU_NEON;
     }
   }
+
+  if( pNumberOfLogicProcessors != NULL ){
+    *pNumberOfLogicProcessors = android_getCpuCount();
+  }
+
   return uiCPU;
 }
 
