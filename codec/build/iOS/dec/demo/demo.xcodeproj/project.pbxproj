@@ -426,6 +426,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					APPLE_IOS,
+					RENAME_MAIN_FUNC,
 				);
 				HEADER_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../../../../api/svc\"",
@@ -445,7 +446,10 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
-				GCC_PREPROCESSOR_DEFINITIONS = APPLE_IOS;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					APPLE_IOS,
+					RENAME_MAIN_FUNC,
+				);
 				HEADER_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../../../../api/svc\"",
 					"\"$(SRCROOT)/../../../../common\"",

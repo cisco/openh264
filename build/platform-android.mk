@@ -37,7 +37,7 @@ SYSROOT = $(NDKROOT)/platforms/android-$(NDKLEVEL)/arch-$(ARCH)
 CXX = $(NDKROOT)/toolchains/$(GCCPATHPREFIX)-$(GCCVERSION)/prebuilt/$(HOSTOS)-$(HOSTARCH)/bin/$(GCCPREFIX)-g++
 CC = $(NDKROOT)/toolchains/$(GCCPATHPREFIX)-$(GCCVERSION)/prebuilt/$(HOSTOS)-$(HOSTARCH)/bin/$(GCCPREFIX)-gcc
 AR = $(NDKROOT)/toolchains/$(GCCPATHPREFIX)-$(GCCVERSION)/prebuilt/$(HOSTOS)-$(HOSTARCH)/bin/$(GCCPREFIX)-ar
-CFLAGS += -DLINUX -fpic --sysroot=$(SYSROOT)
+CFLAGS += -DLINUX -DANDROID_NDK -fpic --sysroot=$(SYSROOT)
 CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS += --sysroot=$(SYSROOT)
 SHLDFLAGS = -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,-soname,libwels.so
@@ -45,11 +45,17 @@ SHLDFLAGS = -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,-s
 STL_INCLUDES = \
     -I$(NDKROOT)/sources/cxx-stl/gnu-libstdc++/$(GCCVERSION)/include \
     -I$(NDKROOT)/sources/cxx-stl/gnu-libstdc++/$(GCCVERSION)/libs/$(APP_ABI)/include
+STL_LDFLAGS = \
+    $(NDKROOT)/sources/cxx-stl/gnu-libstdc++/$(GCCVERSION)/libs/$(APP_ABI)/libgnustl_static.a
 
+H264ENC_INCLUDES = $(STL_INCLUDES)
+H264DEC_INCLUDES = $(STL_INCLUDES)
 GTEST_INCLUDES = $(STL_INCLUDES)
 CODEC_UNITTEST_INCLUDES = $(STL_INCLUDES)
-CODEC_UNITTEST_LDFLAGS_SUFFIX = \
-    $(NDKROOT)/sources/cxx-stl/gnu-libstdc++/$(GCCVERSION)/libs/$(APP_ABI)/libgnustl_static.a
+
+CODEC_UNITTEST_LDFLAGS_SUFFIX = $(STL_LDFLAGS)
+H264DEC_LDFLAGS_SUFFIX = $(STL_LDFLAGS) -llog
+H264ENC_LDFLAGS_SUFFIX = $(STL_LDFLAGS) -llog
 
 binaries : decdemo encdemo
 
