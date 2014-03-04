@@ -1,7 +1,7 @@
 #!/bin/sh
 python build/mktargets.py --directory codec/decoder --library decoder
 python build/mktargets.py --directory codec/encoder --library encoder --exclude DllEntry.cpp
-python build/mktargets.py --directory codec/common --library common
+python build/mktargets.py --directory codec/common --library common --exclude asm_inc.asm
 python build/mktargets.py --directory codec/processing --library processing
 
 python build/mktargets.py --directory codec/console/dec --binary h264dec
