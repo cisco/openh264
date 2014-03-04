@@ -45,6 +45,7 @@ _$0:
 .align 2
 .arm
 .global \funcName
+.type \funcName, %function
 \funcName:
 .endm
 
