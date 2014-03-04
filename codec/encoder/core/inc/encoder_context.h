@@ -151,7 +151,6 @@ typedef struct TagWelsEncCtx {
   // Derived
   int32_t						iCodingIndex;
   int32_t						iFrameIndex;			// count how many frames elapsed during coding context currently
-  uint32_t					uiFrameIdxRc;           //only for RC
   int32_t						iFrameNum;				// current frame number coding
   int32_t						iPOC;					// frame iPOC
   EWelsSliceType				eSliceType;			// currently coding slice type

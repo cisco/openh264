@@ -678,7 +678,7 @@ void RcTraceFrameBits (sWelsEncCtx* pEncCtx) {
 
   WelsLog (pEncCtx, WELS_LOG_INFO,
            "[Rc] encoding_qp%d, qp = %3d, index = %8d, iTid = %1d, used = %8d, target = %8d, remaingbits = %8d\n",
-           pEncCtx->uiDependencyId, pWelsSvcRc->iAverageFrameQp, pEncCtx->uiFrameIdxRc, pEncCtx->uiTemporalId,
+           pEncCtx->uiDependencyId, pWelsSvcRc->iAverageFrameQp, pEncCtx->iFrameIndex, pEncCtx->uiTemporalId,
            pWelsSvcRc->iFrameDqBits,
            pWelsSvcRc->iTargetBits, pWelsSvcRc->iRemainingBits);
 }
