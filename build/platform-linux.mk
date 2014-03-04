@@ -10,4 +10,7 @@ else
 ASMFLAGS += -f elf32
 endif
 endif
+ifeq ($(ASM_ARCH), arm)
+ASMFLAGS += -march=armv7-a -mfpu=neon
+endif
 
