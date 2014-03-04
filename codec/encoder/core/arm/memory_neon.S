@@ -1,6 +1,6 @@
 /*!
  * \copy
- *     Copyright (c)  2009-2013, Cisco Systems
+ *     Copyright (c)  2013, Cisco Systems
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -28,45 +28,36 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- *
- * \file		expand_pic.h
- *
- * \brief		Interface for expanding reconstructed picture to be used for reference
- *
- * \date		06/08/2009
- *************************************************************************************
  */
 
-#ifndef EXPAND_PICTURE_COMMON_H
-#define EXPAND_PICTURE_COMMON_H
+#ifdef  HAVE_NEON
+.text
+#include "arm_arch_common_macro.S"
 
-#include "typedefs.h"
 
-#if defined(__cplusplus)
-extern "C" {
-#endif//__cplusplus
+WELS_ASM_FUNC_BEGIN WelsSetMemZero_neon
+    veor q0, q0
+    cmp r1, #32
+    beq mem_zero_32_neon_start
+    blt mem_zero_24_neon_start
 
-#if defined(X86_ASM)
-void ExpandPictureLuma_sse2 (uint8_t* pDst,
-                             const int32_t kiStride,
-                             const int32_t kiPicW,
-                             const int32_t kiPicH);
-void ExpandPictureChromaAlign_sse2 (uint8_t* pDst,
-                                    const int32_t kiStride,
-                                    const int32_t kiPicW,
-                                    const int32_t kiPicH);
-void ExpandPictureChromaUnalign_sse2 (uint8_t* pDst,
-                                      const int32_t kiStride,
-                                      const int32_t kiPicW,
-                                      const int32_t kiPicH);
-#endif//X86_ASM
+mem_zero_loop:
+    subs r1, r1, #64
+    vst1.64 {q0}, [r0]!
+    vst1.64 {q0}, [r0]!
+    vst1.64 {q0}, [r0]!
+    vst1.64 {q0}, [r0]!
+    bne mem_zero_loop
+WELS_ASM_FUNC_END
 
-#if defined(HAVE_NEON)
-void ExpandPictureLuma_neon(uint8_t *pDst, const int32_t kiStride, const int32_t kiPicW, const int32_t kiPicH);
-void ExpandPictureChroma_neon(uint8_t *pDst, const int32_t kiStride, const int32_t kiPicW, const int32_t kiPicH);
-#endif
-#if defined(__cplusplus)
-}
-#endif//__cplusplus
+mem_zero_32_neon_start:
+    vst1.64 {q0}, [r0]!
+    vst1.64 {q0}, [r0]!
+WELS_ASM_FUNC_END
+
+mem_zero_24_neon_start:
+    vst1.64 {q0}, [r0]!
+    vst1.64 {d0}, [r0]!
+WELS_ASM_FUNC_END
 
 #endif

@@ -605,6 +605,23 @@ void DeblockingMbAvcbase (SWelsFuncPtrList* pFunc, SMB* pCurMb, SDeblockingFilte
     DeblockingIntraMb (&pFunc->pfDeblocking, pCurMb, pFilter);
     break;
   default:
+#if (defined(HAVE_NEON) && defined(SINGLE_REF_FRAME))
+    DeblockingBSCalcEnc_neon(pCurMb->pNonZeroCount, pCurMb->sMv, pCurMb->uiNeighborAvail, iMbStride, uiBS);
+    if (iLeftFlag){
+      if (IS_INTRA((pCurMb-1)->uiMbType)) {
+        *(uint32_t*)uiBS[0][0] = 0x04040404;
+      }
+    } else {
+      *(uint32_t*)uiBS[0][0] = 0;
+    }
+    if (iTopFlag) {
+      if (IS_INTRA((pCurMb-iMbStride)->uiMbType)) {
+        *(uint32_t*)uiBS[1][0] = 0x04040404;
+      }
+    } else {
+      *(uint32_t*)uiBS[1][0] = 0;
+    }
+#else
     if (iLeftFlag) {
       * (uint32_t*)uiBS[0][0] = IS_INTRA ((pCurMb - 1)->uiMbType) ? 0x04040404 : DeblockingBSMarginalMBAvcbase (pCurMb,
                                 pCurMb - 1, 0);
@@ -630,7 +647,7 @@ void DeblockingMbAvcbase (SWelsFuncPtrList* pFunc, SMB* pCurMb, SDeblockingFilte
       * (uint32_t*)uiBS[0][1] = * (uint32_t*)uiBS[0][2] = * (uint32_t*)uiBS[0][3] =
                                   * (uint32_t*)uiBS[1][1] = * (uint32_t*)uiBS[1][2] = * (uint32_t*)uiBS[1][3] = 0;
     }
-
+#endif
     DeblockingInterMb (&pFunc->pfDeblocking, pCurMb, pFilter, uiBS);
     break;
   }
@@ -768,9 +785,12 @@ void WelsNonZeroCount_c (int8_t* pNonZeroCount) {
 }
 void WelsBlockFuncInit (PSetNoneZeroCountZeroFunc* pfSetNZCZero,  int32_t iCpu) {
   *pfSetNZCZero = WelsNonZeroCount_c;
+#ifdef	HAVE_NEON
+  if( iCpu & WELS_CPU_NEON ) {
+    *pfSetNZCZero = WelsNonZeroCount_neon;
+  }
+#endif
 }
-
-
 
 void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
   pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_c;
@@ -794,6 +814,20 @@ void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
     pFunc->pfChromaDeblockingEQ4Ver	= DeblockChromaEq4V_ssse3;
     pFunc->pfChromaDeblockingLT4Hor	= DeblockChromaLt4H_ssse3;
     pFunc->pfChromaDeblockingEQ4Hor	= DeblockChromaEq4H_ssse3;
+  }
+#endif
+
+#if defined(HAVE_NEON)
+  if (iCpu & WELS_CPU_NEON ) {
+    pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_neon;
+    pFunc->pfLumaDeblockingEQ4Ver		= DeblockLumaEq4V_neon;
+    pFunc->pfLumaDeblockingLT4Hor		= DeblockLumaLt4H_neon;
+    pFunc->pfLumaDeblockingEQ4Hor		= DeblockLumaEq4H_neon;
+        
+    pFunc->pfChromaDeblockingLT4Ver     = DeblockChromaLt4V_neon;
+    pFunc->pfChromaDeblockingEQ4Ver     = DeblockChromaEq4V_neon;
+    pFunc->pfChromaDeblockingLT4Hor     = DeblockChromaLt4H_neon;
+    pFunc->pfChromaDeblockingEQ4Hor     = DeblockChromaEq4H_neon;
   }
 #endif
 }

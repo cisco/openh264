@@ -1,6 +1,6 @@
 /*!
  * \copy
- *     Copyright (c)  2009-2013, Cisco Systems
+ *     Copyright (c)  2013, Cisco Systems
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -28,45 +28,41 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- *
- * \file		expand_pic.h
- *
- * \brief		Interface for expanding reconstructed picture to be used for reference
- *
- * \date		06/08/2009
- *************************************************************************************
  */
 
-#ifndef EXPAND_PICTURE_COMMON_H
-#define EXPAND_PICTURE_COMMON_H
+#ifdef HAVE_NEON
+.text
+#include "arm_arch_common_macro.S"
 
-#include "typedefs.h"
 
-#if defined(__cplusplus)
-extern "C" {
-#endif//__cplusplus
+WELS_ASM_FUNC_BEGIN pixel_sad_8x8_neon
+    stmdb sp!, {lr}
+	//Loading a horizontal line data (8 bytes)
+	vld1.8 {d0}, [r0], r1 
+	vld1.8 {d1}, [r2], r3
+    
+	//Do the SAD for 8 bytes
+	vabdl.u8  q1, d0, d1
+	
+	mov lr, #7
+pixel_sad_8x8_loop0:
 
-#if defined(X86_ASM)
-void ExpandPictureLuma_sse2 (uint8_t* pDst,
-                             const int32_t kiStride,
-                             const int32_t kiPicW,
-                             const int32_t kiPicH);
-void ExpandPictureChromaAlign_sse2 (uint8_t* pDst,
-                                    const int32_t kiStride,
-                                    const int32_t kiPicW,
-                                    const int32_t kiPicH);
-void ExpandPictureChromaUnalign_sse2 (uint8_t* pDst,
-                                      const int32_t kiStride,
-                                      const int32_t kiPicW,
-                                      const int32_t kiPicH);
-#endif//X86_ASM
+    //Loading a horizontal line data (8 bytes)
+	vld1.8 {d0}, [r0], r1 
+	vld1.8 {d1}, [r2], r3
 
-#if defined(HAVE_NEON)
-void ExpandPictureLuma_neon(uint8_t *pDst, const int32_t kiStride, const int32_t kiPicW, const int32_t kiPicH);
-void ExpandPictureChroma_neon(uint8_t *pDst, const int32_t kiStride, const int32_t kiPicW, const int32_t kiPicH);
-#endif
-#if defined(__cplusplus)
-}
-#endif//__cplusplus
+	subs lr, #1
+	
+	//Do the SAD for 8 bytes
+	vabal.u8  q1, d0, d1
+	bne pixel_sad_8x8_loop0
+
+	vadd.u16   d2, d3
+	vpaddl.u16 d2, d2
+	vpaddl.u32 d2, d2
+	vmov.u32   r0, d2[0]//TBO...
+
+	ldmia sp!, {lr}
+WELS_ASM_FUNC_END
 
 #endif
