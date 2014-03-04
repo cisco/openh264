@@ -24,7 +24,6 @@ endif
 
 ifeq ($(ASM_ARCH), arm)
 COMMON_ASM_S_SRCS=\
-	$(COMMON_SRCDIR)/arm_arch_common_macro.S\
 	$(COMMON_SRCDIR)/deblocking_neon.S\
 
 COMMON_OBJS += $(COMMON_ASM_S_SRCS:.S=.o)
