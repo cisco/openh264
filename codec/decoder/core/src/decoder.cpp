@@ -144,16 +144,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx) {
   pCtx->bAuReadyFlag				= 0; // au data is not ready
 
 
-#if defined(X86_ASM)
   pCtx->uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores);
-#elif defined(HAVE_NEON)
-#if defined(ANDROID_NDK)
-  pCtx->uiCpuFlag	= WelsCPUFeatureDetect(&iCpuCores);
-#endif
-#if defined(APPLE_IOS)
-  pCtx->uiCpuFlag	= WelsCPUFeatureDetectIOS();
-#endif
-#endif
 
   pCtx->iImgWidthInPixel		= 0;
   pCtx->iImgHeightInPixel		= 0;		// alloc picture data when picture size is available

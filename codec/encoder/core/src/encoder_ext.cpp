@@ -1933,8 +1933,8 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   }
 
   // for cpu features detection, Only detect once??
-#ifdef X86_ASM
   uiCpuFeatureFlags	= WelsCPUFeatureDetect (&uiCpuCores);	// detect cpu capacity features
+#ifdef X86_ASM
   if (uiCpuFeatureFlags & WELS_CPU_CACHELINE_128)
     iCacheLineSize = 128;
   else if (uiCpuFeatureFlags & WELS_CPU_CACHELINE_64)

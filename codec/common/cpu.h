@@ -62,8 +62,6 @@ int32_t WelsCPUSupportFMA (uint32_t eax, uint32_t ecx);
 
 void WelsEmms();
 
-uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors);
-
 /*
  *	clear FPU registers states for potential float based calculation if support
  */
@@ -80,17 +78,7 @@ void     WelsXmmRegLoad(void * src);
 
 void     WelsXmmRegEmptyOp(void * pSrc);
 
-#if defined(HAVE_NEON)
-#if defined(ANDROID_NDK)
-
 uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors);
-
-#endif
-
-#if defined(APPLE_IOS)
-	uint32_t WelsCPUFeatureDetectIOS();
-#endif
-#endif
 
 #if defined(__cplusplus)
 }

@@ -87,11 +87,7 @@ EResult DestroySpecificVpInterface (IWelsVP* pCtx) {
 
 CVpFrameWork::CVpFrameWork (uint32_t uiThreadsNum, EResult& eReturn) {
   int32_t iCoreNum = 1;
-#ifndef X86_ASM
-  uint32_t uiCPUFlag = 0;
-#else
   uint32_t uiCPUFlag = WelsCPUFeatureDetect (&iCoreNum);
-#endif
 
   for (int32_t i = 0; i < MAX_STRATEGY_NUM; i++) {
     IStrategy* pStrategy = m_pStgChain[i];
