@@ -1944,13 +1944,6 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   else if (uiCpuFeatureFlags & WELS_CPU_CACHELINE_16)
     iCacheLineSize	= 16;
   OutputCpuFeaturesLog (uiCpuFeatureFlags, uiCpuCores, iCacheLineSize);
-#elif defined(HAVE_NEON)
-#if defined(ANDROID_NDK)
-  uiCpuFeatureFlags	= WelsCPUFeatureDetectAndroid();
-#endif
-#if defined(APPLE_IOS)
-  uiCpuFeatureFlags	= WelsCPUFeatureDetectIOS();
-#endif
 #else
   iCacheLineSize	= 16;	// 16 bytes aligned in default
 #endif//X86_ASM

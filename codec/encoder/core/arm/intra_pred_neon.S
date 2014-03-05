@@ -62,7 +62,7 @@
 #endif
 
  
-WELS_ASM_FUNC_BEGIN enc_get_i16x16_luma_pred_v_neon
+WELS_ASM_FUNC_BEGIN WelsI16x16LumaPredV_neon
 	//Get the top line data to 'q0'
 	sub  r3, r1, r2
 	vldm r3, {d0, d1}
@@ -80,7 +80,7 @@ loop_0_get_i16x16_luma_pred_v:
 WELS_ASM_FUNC_END
 
  
-WELS_ASM_FUNC_BEGIN enc_get_i16x16_luma_pred_h_neon
+WELS_ASM_FUNC_BEGIN WelsI16x16LumaPredH_neon
     //stmdb sp!, {r4, lr}
 	sub  r1, r1, #1
 	mov  r3, #4
@@ -107,7 +107,7 @@ loop_0_get_i16x16_luma_pred_h:
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN enc_get_i16x16_luma_pred_dc_both_neon
+WELS_ASM_FUNC_BEGIN WelsI16x16LumaPredDc_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Get the left vertical line data
 	sub r3, r1, #1
@@ -150,7 +150,7 @@ CONST0_GET_I16X16_LUMA_PRED_PLANE: .long 0x191e2328, 0x050a0f14
 CONST1_GET_I16X16_LUMA_PRED_PLANE: .long 0xfcfbfaf9, 0x00fffefd
                   
 
-WELS_ASM_FUNC_BEGIN enc_get_i16x16_luma_pred_plane_neon
+WELS_ASM_FUNC_BEGIN WelsI16x16LumaPredPlane_neon
 	//stmdb sp!, { r4, lr}
         
 	//Load the table {(8,7,6,5,4,3,2,1) * 5}
@@ -241,7 +241,7 @@ loop_0_get_i16x16_luma_pred_plane:
 WELS_ASM_FUNC_END
 
  
-WELS_ASM_FUNC_BEGIN enc_get_i4x4_luma_pred_v_neon
+WELS_ASM_FUNC_BEGIN WelsI4x4LumaPredV_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Load the top row (4 bytes)
 	sub  r3, r1, r2
@@ -256,7 +256,7 @@ WELS_ASM_FUNC_BEGIN enc_get_i4x4_luma_pred_v_neon
 WELS_ASM_FUNC_END
 
  
-WELS_ASM_FUNC_BEGIN enc_get_i4x4_luma_pred_h_neon
+WELS_ASM_FUNC_BEGIN WelsI4x4LumaPredH_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Load the left column (4 bytes)
 	sub  r3, r1, #1
@@ -274,7 +274,7 @@ WELS_ASM_FUNC_BEGIN enc_get_i4x4_luma_pred_h_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN enc_get_i4x4_luma_pred_d_l_neon
+WELS_ASM_FUNC_BEGIN WelsI4x4LumaPredDDL_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Load the top row data(8 bytes)
 	sub    r3,  r1, r2
@@ -312,7 +312,7 @@ WELS_ASM_FUNC_BEGIN enc_get_i4x4_luma_pred_d_l_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN enc_get_i4x4_luma_pred_d_r_neon
+WELS_ASM_FUNC_BEGIN WelsI4x4LumaPredDDR_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Load the top row (4 bytes)
 	sub    r3,  r1, r2
@@ -352,7 +352,7 @@ WELS_ASM_FUNC_BEGIN enc_get_i4x4_luma_pred_d_r_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN enc_get_i4x4_luma_pred_v_l_neon
+WELS_ASM_FUNC_BEGIN WelsI4x4LumaPredVL_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Load the top row (8 bytes)
 	sub    r3,  r1, r2
@@ -382,7 +382,7 @@ WELS_ASM_FUNC_BEGIN enc_get_i4x4_luma_pred_v_l_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN enc_get_i4x4_luma_pred_v_r_neon
+WELS_ASM_FUNC_BEGIN WelsI4x4LumaPredVR_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Load the top row (4 bytes)
 	sub       r3,  r1, r2
@@ -419,7 +419,7 @@ WELS_ASM_FUNC_BEGIN enc_get_i4x4_luma_pred_v_r_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN enc_get_i4x4_luma_pred_h_u_neon
+WELS_ASM_FUNC_BEGIN WelsI4x4LumaPredHU_neon
 	//stmdb sp!, { r4, lr}
 	//Load the left column data
 	sub       r3,  r1, #1
@@ -452,7 +452,7 @@ WELS_ASM_FUNC_BEGIN enc_get_i4x4_luma_pred_h_u_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN enc_get_i4x4_luma_pred_h_d_neon
+WELS_ASM_FUNC_BEGIN WelsI4x4LumaPredHD_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Load the data
 	sub       r3,  r1, r2
@@ -487,7 +487,7 @@ WELS_ASM_FUNC_BEGIN enc_get_i4x4_luma_pred_h_d_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN enc_get_i_chroma_pred_v_neon
+WELS_ASM_FUNC_BEGIN WelsIChromaPredV_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Get the top row (8 byte)
 	sub  r3, r1, r2
@@ -506,7 +506,7 @@ WELS_ASM_FUNC_BEGIN enc_get_i_chroma_pred_v_neon
 WELS_ASM_FUNC_END
 
  
-WELS_ASM_FUNC_BEGIN enc_get_i_chroma_pred_h_neon
+WELS_ASM_FUNC_BEGIN WelsIChromaPredH_neon
 	//stmdb sp!, { r2-r5, lr}
 	////Get the left column (8 byte)
 	sub  r3, r1, #1
@@ -532,7 +532,7 @@ WELS_ASM_FUNC_BEGIN enc_get_i_chroma_pred_h_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN enc_get_i_chroma_pred_dc_both_neon
+WELS_ASM_FUNC_BEGIN WelsIChromaPredDc_neon
     //stmdb sp!, { r2-r5, lr}
     //Load the left column data (8 bytes)
     sub r3, r1, #1
@@ -574,7 +574,7 @@ CONST0_GET_I_CHROMA_PRED_PLANE: .long 0x44332211, 0x44332211//0x140f0a05, 0x2823
 //Table {-3,-2,-1,0,1,2,3,4}
 CONST1_GET_I_CHROMA_PRED_PLANE: .long 0xfffefffd, 0x0000ffff,0x00020001,0x00040003
 
-WELS_ASM_FUNC_BEGIN enc_get_i_chroma_pred_plane_neon
+WELS_ASM_FUNC_BEGIN WelsIChromaPredPlane_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Load the top row data
 	sub  r3, r1, #1
