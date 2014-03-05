@@ -47,12 +47,27 @@ ENCODER_ASM_SRCS=\
 ENCODER_OBJS += $(ENCODER_ASM_SRCS:.asm=.o)
 endif
 
+ifeq ($(ASM_ARCH), arm)
+ENCODER_ASM_S_SRCS=\
+	$(ENCODER_SRCDIR)/core/arm/intra_pred_neon.S\
+	$(ENCODER_SRCDIR)/core/arm/intra_pred_sad_3_opt_neon.S\
+	$(ENCODER_SRCDIR)/core/arm/mc_neon.S\
+	$(ENCODER_SRCDIR)/core/arm/memory_neon.S\
+	$(ENCODER_SRCDIR)/core/arm/pixel_neon.S\
+	$(ENCODER_SRCDIR)/core/arm/reconstruct_neon.S\
+
+ENCODER_OBJS += $(ENCODER_ASM_S_SRCS:.S=.o)
+endif
+
 OBJS += $(ENCODER_OBJS)
 $(ENCODER_SRCDIR)/%.o: $(ENCODER_SRCDIR)/%.cpp
 	$(QUIET_CXX)$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(ENCODER_CFLAGS) $(ENCODER_INCLUDES) -c $(CXX_O) $<
 
 $(ENCODER_SRCDIR)/%.o: $(ENCODER_SRCDIR)/%.asm
 	$(QUIET_ASM)$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $@ $<
+
+$(ENCODER_SRCDIR)/%.o: $(ENCODER_SRCDIR)/%.S
+	$(QUIET_CCAS)$(CCAS) $(CFLAGS) $(ASMFLAGS) $(INCLUDES) $(ENCODER_CFLAGS) $(ENCODER_INCLUDES) -c -o $@ $<
 
 $(LIBPREFIX)encoder.$(LIBSUFFIX): $(ENCODER_OBJS)
 	$(QUIET)rm -f $@
