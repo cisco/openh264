@@ -35,73 +35,73 @@
 #include "arm_arch_common_macro.S"
 
 .macro SATD_16x4
-    vld1.64     {q0}, [r0,:128], r1   
-    vld1.64     {q1}, [r2], r3   
+    vld1.64     {q0}, [r0,:128], r1
+    vld1.64     {q1}, [r2], r3
 
-    vsubl.u8    q4,  d0,  d2        
-    vld1.64     {q2}, [r0,:128], r1  
+    vsubl.u8    q4,  d0,  d2
+    vld1.64     {q2}, [r0,:128], r1
 
-    vsubl.u8    q6, d1,  d3       
-    vld1.64     {q3}, [r2], r3   
+    vsubl.u8    q6, d1,  d3
+    vld1.64     {q3}, [r2], r3
 
-    vsubl.u8    q5,  d4,  d6        
-    vld1.64     {q0}, [r0,:128], r1  
+    vsubl.u8    q5,  d4,  d6
+    vld1.64     {q0}, [r0,:128], r1
 
-    vsubl.u8    q7, d5,  d7	
+    vsubl.u8    q7, d5,  d7
     vld1.64     {q1}, [r2], r3
 
     vsubl.u8    q8, d0,  d2
-    vld1.64     {q2}, [r0,:128], r1 
+    vld1.64     {q2}, [r0,:128], r1
 
     vsubl.u8    q10, d1,  d3
-    vadd.s16    q0,  q4,  q5  
+    vadd.s16    q0,  q4,  q5
 
-    vld1.64     {q3}, [r2], r3  
-    vsub.s16    q1,  q4,  q5     
+    vld1.64     {q3}, [r2], r3
+    vsub.s16    q1,  q4,  q5
 
-    vsubl.u8    q9, d4,  d6     
-    vsubl.u8    q11, d5,  d7    
+    vsubl.u8    q9, d4,  d6
+    vsubl.u8    q11, d5,  d7
 
-    vadd.s16    q2, q8, q9       
-    vsub.s16    q3, q8, q9		
+    vadd.s16    q2, q8, q9
+    vsub.s16    q3, q8, q9
 
-    vadd.s16    q4, q6, q7			
+    vadd.s16    q4, q6, q7
     vsub.s16	q5, q6, q7
 
-    vadd.s16    q6, q10, q11	
-    vsub.s16	q7, q10, q11	
+    vadd.s16    q6, q10, q11
+    vsub.s16	q7, q10, q11
 
-    vadd.s16    q8, q0, q2      
-    vsub.s16    q10, q0, q2 
+    vadd.s16    q8, q0, q2
+    vsub.s16    q10, q0, q2
 
-    vadd.s16    q9, q4, q6  
-    vsub.s16    q11, q4, q6 	
+    vadd.s16    q9, q4, q6
+    vsub.s16    q11, q4, q6
 
-    vsub.s16    q0, q1, q3		
-    vadd.s16    q2, q1, q3     
+    vsub.s16    q0, q1, q3
+    vadd.s16    q2, q1, q3
 
-    vsub.s16    q1, q5, q7		
-    vadd.s16    q3, q5, q7    
+    vsub.s16    q1, q5, q7
+    vadd.s16    q3, q5, q7
 
-    vtrn.16 q8, q10  
-    vtrn.16 q9, q11	
+    vtrn.16 q8, q10
+    vtrn.16 q9, q11
 
-    vadd.s16 q4, q8, q10		
-    vabd.s16 q6, q8, q10	
+    vadd.s16 q4, q8, q10
+    vabd.s16 q6, q8, q10
 
-    vadd.s16 q5, q9, q11		
-    vabd.s16 q7, q9, q11	
+    vadd.s16 q5, q9, q11
+    vabd.s16 q7, q9, q11
 
     vabs.s16 q4, q4
     vabs.s16 q5, q5
 
-    vtrn.16 q0, q2			
-    vtrn.16 q1, q3			
+    vtrn.16 q0, q2
+    vtrn.16 q1, q3
 
-    vadd.s16 q8, q0, q2			  
-    vabd.s16 q10, q0, q2		 
+    vadd.s16 q8, q0, q2
+    vabd.s16 q10, q0, q2
 
-    vadd.s16 q9, q1, q3			  
+    vadd.s16 q9, q1, q3
     vabd.s16 q11, q1, q3
 
     vabs.s16 q8, q8
@@ -128,31 +128,31 @@
     vld1.64     {d1}, [r2], r3
 
     vld1.64     {d2}, [r0,:64], r1
-    vsubl.u8    q4, d0, d1            
+    vsubl.u8    q4, d0, d1
 
     vld1.64     {d3}, [r2], r3
-    vsubl.u8    q5, d2, d3         
+    vsubl.u8    q5, d2, d3
 
     vld1.64     {d4}, [r0,:64], r1
     vld1.64     {d5}, [r2], r3
 
-    vadd.s16    q8, q4, q5                 
-    vsubl.u8    q6, d4, d5             
+    vadd.s16    q8, q4, q5
+    vsubl.u8    q6, d4, d5
 
     vld1.64     {d6}, [r0,:64], r1
     vld1.64     {d7}, [r2], r3
 
-    vsubl.u8    q7, d6,  d7               
-    vsub.s16    q9, q4, q5       
+    vsubl.u8    q7, d6,  d7
+    vsub.s16    q9, q4, q5
 
-    vadd.s16    q10, q6, q7         
-    vsub.s16    q11, q6, q7         
+    vadd.s16    q10, q6, q7
+    vsub.s16    q11, q6, q7
 
-    vadd.s16    q0, q8, q10               
-    vsub.s16    q1, q8, q10      
+    vadd.s16    q0, q8, q10
+    vsub.s16    q1, q8, q10
 
-    vsub.s16    q2, q9, q11            
-    vadd.s16    q3, q9, q11        
+    vsub.s16    q2, q9, q11
+    vadd.s16    q3, q9, q11
 
     vtrn.16     q0, q1
     vtrn.16     q2, q3
@@ -220,7 +220,7 @@
 .endm
 
 
-WELS_ASM_FUNC_BEGIN pixel_sad_16x16_neon
+WELS_ASM_FUNC_BEGIN WelsSampleSad16x16_neon
 
     vld1.64 {q0}, [r0, :128], r1
     vld1.64 {q1}, [r2], r3
@@ -260,7 +260,7 @@ WELS_ASM_FUNC_BEGIN pixel_sad_16x16_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN pixel_sad_16x8_neon
+WELS_ASM_FUNC_BEGIN WelsSampleSad16x8_neon
 
     vld1.64 {q0}, [r0, :128], r1
     vld1.64 {q1}, [r2], r3
@@ -298,7 +298,7 @@ WELS_ASM_FUNC_BEGIN pixel_sad_16x8_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN pixel_sad_8x16_neon
+WELS_ASM_FUNC_BEGIN WelsSampleSad8x16_neon
 
     vld1.64 {d0}, [r0, :64], r1
     vld1.64 {d1}, [r2], r3
@@ -332,7 +332,7 @@ WELS_ASM_FUNC_BEGIN pixel_sad_8x16_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN pixel_sad_8x8_neon
+WELS_ASM_FUNC_BEGIN WelsSampleSad8x8_neon
 
     vld1.64 {d0}, [r0, :64], r1
     vld1.64 {d1}, [r2], r3
@@ -364,7 +364,7 @@ WELS_ASM_FUNC_BEGIN pixel_sad_8x8_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN pixel_sad_4x4_neon
+WELS_ASM_FUNC_BEGIN WelsSampleSad4x4_neon
     stmdb sp!, {r4-r5, lr}
 
 	//Loading a horizontal line data (4 bytes)
@@ -376,23 +376,23 @@ WELS_ASM_FUNC_BEGIN pixel_sad_4x4_neon
     //line 1
 	ldr r4, [r0], r1
 	ldr r5, [r2], r3
-	usada8  lr, r4, r5, lr	
+	usada8  lr, r4, r5, lr
 
-    //line 2	
+    //line 2
 	ldr r4, [r0], r1
 	ldr r5, [r2], r3
-	usada8  lr, r4, r5, lr	
-	
+	usada8  lr, r4, r5, lr
+
 	//line 3
 	ldr r4, [r0]
 	ldr r5, [r2]
-	usada8  r0, r4, r5, lr	
+	usada8  r0, r4, r5, lr
 
 	ldmia sp!, {r4-r5, lr}
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN pixel_sad_4_16x16_neon
+WELS_ASM_FUNC_BEGIN WelsSampleSadFour16x16_neon
 
     stmdb sp!, {r4-r5, lr}
 
@@ -400,30 +400,30 @@ WELS_ASM_FUNC_BEGIN pixel_sad_4_16x16_neon
 	sub   r4, r2, #1
 	add   r5, r2, #1
 	sub   r2, r3
-			
+
     //Loading a horizontal line data (16 bytes)
 	vld1.8 {q0}, [r0], r1 //save pix1
-	
+
 	vld1.8 {q1}, [r2], r3 //save pix2 - stride
 	vld1.8 {q6}, [r2], r3 //save pix2
 	vld1.8 {q2}, [r2], r3 //save pix2 + stride
-	
+
 	vld1.8 {q3}, [r4], r3 //save pix2 - 1
-	vld1.8 {q4}, [r5], r3 //save pix2 + 1	
-		    
+	vld1.8 {q4}, [r5], r3 //save pix2 + 1
+
 	//Do the SAD for 16 bytes
 	vabdl.u8  q15, d0, d2
 	vabal.u8  q15, d1, d3
-	
+
 	vabdl.u8  q13, d0, d4
 	vabal.u8  q13, d1, d5
-	
+
 	vabdl.u8  q11, d0, d6
 	vabal.u8  q11, d1, d7
-	
+
 	vabdl.u8  q9, d0, d8
-	vabal.u8  q9, d1, d9			
-	
+	vabal.u8  q9, d1, d9
+
 	mov lr, #15
 pixel_sad_4_16x16_loop_0:
 
@@ -436,13 +436,13 @@ pixel_sad_4_16x16_loop_0:
 	vabal.u8  q15, d1, d3
 	vld1.8 {q3}, [r4], r3 //save pix2 - 1
 	vabal.u8  q13, d0, d4
-	vld1.8 {q4}, [r5], r3 //save pix2 + 1	
+	vld1.8 {q4}, [r5], r3 //save pix2 + 1
     vabal.u8  q13, d1, d5
 	subs lr, #1
 
 	vabal.u8  q11, d0, d6
 	vabal.u8  q11, d1, d7
-	
+
 	vabal.u8  q9, d0, d8
 	vabal.u8  q9, d1, d9
 
@@ -451,18 +451,18 @@ pixel_sad_4_16x16_loop_0:
 
     //Save SAD to 'r0'
 	ldr   r0, [sp, #12]
-	
+
 	vadd.u16   d0, d30, d31
 	vadd.u16   d1, d26, d27
 	vadd.u16   d2, d22, d23
 	vadd.u16   d3, d18, d19
-	
+
 	vpaddl.u16 q0, q0
 	vpaddl.u16 q1, q1
-	
+
 	vpaddl.u32 q0, q0
 	vpaddl.u32 q1, q1
-		
+
 	vshl.u32   q0, #4
 	vshl.u32   q1, #4
 	vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
@@ -471,37 +471,37 @@ pixel_sad_4_16x16_loop_0:
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN pixel_sad_4_16x8_neon
+WELS_ASM_FUNC_BEGIN WelsSampleSadFour16x8_neon
     stmdb sp!, {r4-r5, lr}
-	
+
 	//Generate the pix2 start addr
 	sub   r4, r2, #1
 	add   r5, r2, #1
 	sub   r2, r3
-			
+
     //Loading a horizontal line data (16 bytes)
 	vld1.8 {q0}, [r0], r1 //save pix1
-	
+
 	vld1.8 {q1}, [r2], r3 //save pix2 - stride
 	vld1.8 {q6}, [r2], r3 //save pix2
 	vld1.8 {q2}, [r2], r3 //save pix2 + stride
-	
+
 	vld1.8 {q3}, [r4], r3 //save pix2 - 1
-	vld1.8 {q4}, [r5], r3 //save pix2 + 1	
-		    
+	vld1.8 {q4}, [r5], r3 //save pix2 + 1
+
 	//Do the SAD for 16 bytes
 	vabdl.u8  q15, d0, d2
 	vabal.u8  q15, d1, d3
-	
+
 	vabdl.u8  q13, d0, d4
 	vabal.u8  q13, d1, d5
-	
+
 	vabdl.u8  q11, d0, d6
 	vabal.u8  q11, d1, d7
-	
+
 	vabdl.u8  q9, d0, d8
-	vabal.u8  q9, d1, d9			
-	
+	vabal.u8  q9, d1, d9
+
 	mov lr, #7
 pixel_sad_4_16x8_loop_0:
 
@@ -514,67 +514,67 @@ pixel_sad_4_16x8_loop_0:
 	vabal.u8  q15, d1, d3
 	vld1.8 {q3}, [r4], r3 //save pix2 - 1
 	vabal.u8  q13, d0, d4
-	vld1.8 {q4}, [r5], r3 //save pix2 + 1	
+	vld1.8 {q4}, [r5], r3 //save pix2 + 1
     vabal.u8  q13, d1, d5
 	subs lr, #1
 
 	vabal.u8  q11, d0, d6
 	vabal.u8  q11, d1, d7
-	
+
 	vabal.u8  q9, d0, d8
 	vabal.u8  q9, d1, d9
-	
+
 	bne pixel_sad_4_16x8_loop_0
 
     //Save SAD to 'r0'
 	ldr   r0, [sp, #12]
-	
+
 	vadd.u16   d0, d30, d31
 	vadd.u16   d1, d26, d27
 	vadd.u16   d2, d22, d23
 	vadd.u16   d3, d18, d19
-	
+
 	vpaddl.u16 q0, q0
 	vpaddl.u16 q1, q1
-	
+
 	vpaddl.u32 q0, q0
 	vpaddl.u32 q1, q1
-		
+
 	vshl.u32   q0, #4
 	vshl.u32   q1, #4
 	vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
-	
+
 	ldmia sp!, {r4-r5, lr}
 WELS_ASM_FUNC_END
 
- 
-WELS_ASM_FUNC_BEGIN pixel_sad_4_8x16_neon
+
+WELS_ASM_FUNC_BEGIN WelsSampleSadFour8x16_neon
     stmdb sp!, {r4-r5, lr}
-	
+
 	//Generate the pix2 start addr
 	sub   r4, r2, #1
 	add   r5, r2, #1
 	sub   r2, r3
-			
+
     //Loading a horizontal line data (8 bytes)
 	vld1.8 {d0}, [r0], r1 //save pix1
-	
+
 	vld1.8 {d1}, [r2], r3 //save pix2 - stride
 	vld1.8 {d6}, [r2], r3 //save pix2
 	vld1.8 {d2}, [r2], r3 //save pix2 + stride
-	
+
 	vld1.8 {d3}, [r4], r3 //save pix2 - 1
-	vld1.8 {d4}, [r5], r3 //save pix2 + 1	
-		    
+	vld1.8 {d4}, [r5], r3 //save pix2 + 1
+
 	//Do the SAD for 8 bytes
 	vabdl.u8  q15, d0, d1
 	vabdl.u8  q14, d0, d2
 	vabdl.u8  q13, d0, d3
-	vabdl.u8  q12, d0, d4		
-	
+	vabdl.u8  q12, d0, d4
+
 	mov lr, #15
 pixel_sad_4_8x16_loop_0:
-	
+
     //Loading a horizontal line data (8 bytes)
 	vld1.8 {d0}, [r0], r1 //save pix1
 	vmov.8 d1,   d6       //save pix2 - stride
@@ -582,7 +582,7 @@ pixel_sad_4_8x16_loop_0:
 	vld1.8 {d2}, [r2], r3 //save pix2 + stride
 	vld1.8 {d3}, [r4], r3 //save pix2 - 1
 	vabal.u8  q15, d0, d1
-	
+
 	vld1.8 {d4}, [r5], r3 //save pix2 + 1
 	//Do the SAD for 8 bytes
 	vabal.u8  q14, d0, d2
@@ -594,50 +594,50 @@ pixel_sad_4_8x16_loop_0:
 
     //Save SAD to 'r0'
 	ldr   r0, [sp, #12]
-	
+
 	vadd.u16   d0, d30, d31
 	vadd.u16   d1, d28, d29
 	vadd.u16   d2, d26, d27
 	vadd.u16   d3, d24, d25
-	
+
 	vpaddl.u16 q0, q0
 	vpaddl.u16 q1, q1
-	
+
 	vpaddl.u32 q0, q0
 	vpaddl.u32 q1, q1
-		
+
 	vshl.u32   q0, #4
 	vshl.u32   q1, #4
 	vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
-	
+
 	ldmia sp!, {r4-r5, lr}
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN pixel_sad_4_8x8_neon
+WELS_ASM_FUNC_BEGIN WelsSampleSadFour8x8_neon
 	stmdb sp!, {r4-r5, lr}
-	
+
 	//Generate the pix2 start addr
 	sub   r4, r2, #1
 	add   r5, r2, #1
 	sub   r2, r3
-			
+
     //Loading a horizontal line data (8 bytes)
 	vld1.8 {d0}, [r0], r1 //save pix1
-	
+
 	vld1.8 {d1}, [r2], r3 //save pix2 - stride
 	vld1.8 {d6}, [r2], r3 //save pix2
 	vld1.8 {d2}, [r2], r3 //save pix2 + stride
-	
+
 	vld1.8 {d3}, [r4], r3 //save pix2 - 1
-	vld1.8 {d4}, [r5], r3 //save pix2 + 1	
-		    
+	vld1.8 {d4}, [r5], r3 //save pix2 + 1
+
 	//Do the SAD for 8 bytes
 	vabdl.u8  q15, d0, d1
 	vabdl.u8  q14, d0, d2
 	vabdl.u8  q13, d0, d3
-	vabdl.u8  q12, d0, d4		
-	
+	vabdl.u8  q12, d0, d4
+
 	mov lr, #7
 pixel_sad_4_8x8_loop_0:
 
@@ -648,7 +648,7 @@ pixel_sad_4_8x8_loop_0:
 	vld1.8 {d2}, [r2], r3 //save pix2 + stride
 	vld1.8 {d3}, [r4], r3 //save pix2 - 1
 	vabal.u8  q15, d0, d1
-	
+
 	vld1.8 {d4}, [r5], r3 //save pix2 + 1
 	//Do the SAD for 8 bytes
 	vabal.u8  q14, d0, d2
@@ -659,84 +659,84 @@ pixel_sad_4_8x8_loop_0:
 
     //Save SAD to 'r0'
 	ldr   r0, [sp, #12]
-	
+
 	vadd.u16   d0, d30, d31
 	vadd.u16   d1, d28, d29
 	vadd.u16   d2, d26, d27
 	vadd.u16   d3, d24, d25
-	
+
 	vpaddl.u16 q0, q0
 	vpaddl.u16 q1, q1
-	
+
 	vpaddl.u32 q0, q0
 	vpaddl.u32 q1, q1
-		
+
 	vshl.u32   q0, #4
 	vshl.u32   q1, #4
 	vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
-	
+
 	ldmia sp!, {r4-r5, lr}
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN pixel_sad_4_4x4_neon
+WELS_ASM_FUNC_BEGIN WelsSampleSadFour4x4_neon
 
 	vld1.32  {d0[0]}, [r0], r1
 	vld1.32  {d0[1]}, [r0], r1
 	vld1.32  {d1[0]}, [r0], r1
 	vld1.32  {d1[1]}, [r0]
-	
-	
+
+
 	sub   r0, r2, r3
 	vld1.32  {d2[0]}, [r0], r3
 	vld1.32  {d2[1]}, [r0], r3
 	vld1.32  {d3[0]}, [r0], r3
 	vld1.32  {d3[1]}, [r0], r3
 	vld1.32  {d4[0]}, [r0], r3
-	vld1.32  {d4[1]}, [r0]		
-					
-	sub   r0,  r2, #1				
+	vld1.32  {d4[1]}, [r0]
+
+	sub   r0,  r2, #1
 	vld1.32  {d5[0]}, [r0], r3
 	vld1.32  {d5[1]}, [r0], r3
 	vld1.32  {d6[0]}, [r0], r3
-	vld1.32  {d6[1]}, [r0]	
-	
-	add   r0,  r2, #1				
+	vld1.32  {d6[1]}, [r0]
+
+	add   r0,  r2, #1
 	vld1.32  {d7[0]}, [r0], r3
 	vld1.32  {d7[1]}, [r0], r3
 	vld1.32  {d8[0]}, [r0], r3
 	vld1.32  {d8[1]}, [r0]
-	
+
 	vabdl.u8  q15, d0, d2
 	vabdl.u8  q14, d1, d3
-	
+
 	vabdl.u8  q13, d0, d3
 	vabdl.u8  q12, d1, d4
-	
+
 	vabdl.u8  q11, d0, d5
 	vabdl.u8  q10, d1, d6
-	
+
 	vabdl.u8  q9, d0, d7
 	vabdl.u8  q8, d1, d8
-	
+
 	//Save SAD to 'r4'
 	ldr   r0, [sp]
 	vadd.u16   q0, q14, q15
 	vadd.u16   q1, q12, q13
 	vadd.u16   q2, q10, q11
 	vadd.u16   q3, q8 , q9
-	
+
 	vadd.u16   d0, d1
 	vadd.u16   d1, d2, d3
 	vadd.u16   d2, d4, d5
 	vadd.u16   d3, d6, d7
-	
+
 	vpaddl.u16 q0, q0
 	vpaddl.u16 q1, q1
-	
+
 	vpaddl.u32 q0, q0
 	vpaddl.u32 q1, q1
-		
+
 	vshl.u32   q0, #4
 	vshl.u32   q1, #4
 	vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
@@ -744,7 +744,7 @@ WELS_ASM_FUNC_BEGIN pixel_sad_4_4x4_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN pixel_satd_16x16_neon
+WELS_ASM_FUNC_BEGIN WelsSampleSatd16x16_neon
 
     SATD_16x4
     vadd.u16    q15,  q0, q2
@@ -769,7 +769,7 @@ WELS_ASM_FUNC_BEGIN pixel_satd_16x16_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN pixel_satd_16x8_neon
+WELS_ASM_FUNC_BEGIN WelsSampleSatd16x8_neon
 
     SATD_16x4
     vadd.u16    q15,  q0, q2
@@ -786,7 +786,7 @@ WELS_ASM_FUNC_BEGIN pixel_satd_16x8_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN pixel_satd_8x16_neon
+WELS_ASM_FUNC_BEGIN WelsSampleSatd8x16_neon
 
     SATD_8x4
     vadd.u16    q15,  q0, q1
@@ -811,7 +811,7 @@ WELS_ASM_FUNC_BEGIN pixel_satd_8x16_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN pixel_satd_8x8_neon
+WELS_ASM_FUNC_BEGIN WelsSampleSatd8x8_neon
 
     SATD_8x4
     vadd.u16    q15,  q0, q1
@@ -828,7 +828,7 @@ WELS_ASM_FUNC_BEGIN pixel_satd_8x8_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN pixel_satd_4x4_neon
+WELS_ASM_FUNC_BEGIN WelsSampleSatd4x4_neon
 
     //Load the pix1 data --- 16 bytes
 	vld1.32  {d0[0]}, [r0], r1
@@ -836,11 +836,11 @@ WELS_ASM_FUNC_BEGIN pixel_satd_4x4_neon
 	vld1.32  {d1[0]}, [r0], r1
 	vld1.32  {d1[1]}, [r0]
 
-    //Load the pix2 data --- 16 bytes	
+    //Load the pix2 data --- 16 bytes
 	vld1.32  {d2[0]}, [r2], r3
 	vld1.32  {d2[1]}, [r2], r3
 	vld1.32  {d3[0]}, [r2], r3
-	vld1.32  {d3[1]}, [r2]	
+	vld1.32  {d3[1]}, [r2]
 
     //Get the difference
     vsubl.u8 q15, d0, d2 //{0,1,2,3,4,5,6,7}
@@ -861,15 +861,15 @@ WELS_ASM_FUNC_BEGIN pixel_satd_4x4_neon
     vtrn.16 q13, q12
     vadd.s16 q15, q13, q12
 
-    //Do the SAD	
-    vabs.s16 q15, q15	
+    //Do the SAD
+    vabs.s16 q15, q15
     vabd.s16 q14, q13, q12
 
     vadd.u16 q0, q15, q14
 
     vrhadd.u16 d0, d1
-	vpaddl.u16 d0, d0
-	vpaddl.u32 d0, d0
+    vpaddl.u16 d0, d0
+    vpaddl.u32 d0, d0
 
 	vmov.u32   r0, d0[0]
 

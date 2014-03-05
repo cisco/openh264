@@ -35,24 +35,24 @@
 #include "arm_arch_common_macro.S"
 
 
-WELS_ASM_FUNC_BEGIN pixel_sad_8x8_neon
+WELS_ASM_FUNC_BEGIN WelsSampleSad8x8_neon
     stmdb sp!, {lr}
 	//Loading a horizontal line data (8 bytes)
-	vld1.8 {d0}, [r0], r1 
+	vld1.8 {d0}, [r0], r1
 	vld1.8 {d1}, [r2], r3
-    
+
 	//Do the SAD for 8 bytes
 	vabdl.u8  q1, d0, d1
-	
+
 	mov lr, #7
 pixel_sad_8x8_loop0:
 
     //Loading a horizontal line data (8 bytes)
-	vld1.8 {d0}, [r0], r1 
+	vld1.8 {d0}, [r0], r1
 	vld1.8 {d1}, [r2], r3
 
 	subs lr, #1
-	
+
 	//Do the SAD for 8 bytes
 	vabal.u8  q1, d0, d1
 	bne pixel_sad_8x8_loop0

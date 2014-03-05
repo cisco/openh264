@@ -35,29 +35,29 @@
 #include "arm_arch_common_macro.S"
 
 
-WELS_ASM_FUNC_BEGIN	comp_ds_bilinear_neon
+WELS_ASM_FUNC_BEGIN	DyadicBilinearDownsampler_neon
 	stmdb	sp!, {r4-r8, lr}
-	
+
 	//Get	the	width	and	height
 	ldr	 r4, [sp,	#24]	//src_width
 	ldr	 r5, [sp,	#28]	//src_height
-	
+
 	//Initialize the register
 	mov	r6,	r2
 	mov	r8,	r0
 	mov	lr,	#0
-	lsr	r5,	#1	
-	
+	lsr	r5,	#1
+
 	//Save the tailer	for	the	unasigned	size
 	mla	 r7, r1, r5, r0
 	vld1.32	{q15}, [r7]
-	
+
 	add	r7,	r2,	r3
 	//processing a colume	data
-comp_ds_bilinear_loop0:	
+comp_ds_bilinear_loop0:
 
 	vld1.8 {q0,q1},	[r2]!
-	vld1.8 {q2,q3},	[r7]!			
+	vld1.8 {q2,q3},	[r7]!
 	vpaddl.u8	q0,	q0
 	vpaddl.u8	q1,	q1
 	vpaddl.u8	q2,	q2
@@ -70,9 +70,9 @@ comp_ds_bilinear_loop0:
 	vrhadd.u16 q1, q3
 	vmovn.u16	d0,	q0
 	vmovn.u16	d1,	q1
-	vst1.32	{q0},	[r0]!	
+	vst1.32	{q0},	[r0]!
 	add	lr,	#32
-	
+
 	cmp	lr,	r4
 	movcs	lr,	#0
 	addcs	r6,	r3,	lsl	#1
@@ -82,10 +82,10 @@ comp_ds_bilinear_loop0:
 	movcs	r0,	r8
 	subscs r5, #1
 	bne	comp_ds_bilinear_loop0
-	
+
 	//restore	the	tailer for the unasigned size
 	vst1.32	{q15}, [r0]
-	
+
 	ldmia	sp!, {r4-r8,lr}
 WELS_ASM_FUNC_END
 
@@ -96,29 +96,29 @@ WELS_ASM_FUNC_BEGIN	comp_ds_bilinear_w_x8_neon
     //Get	the	width	and	height
 	ldr	 r4, [sp,	#20]	//src_width
 	ldr	 r5, [sp,	#24]	//src_height
-	
+
 	//Get	the	difference
-	sub	lr,	r3,	r4 
+	sub	lr,	r3,	r4
 	sub	r1,	r1,	r4,	lsr	#1
-	
+
 	lsr	r5,	#1
-	
+
 	//processing a colume	data
-comp_ds_bilinear_w_x8_loop0:	
-	
+comp_ds_bilinear_w_x8_loop0:
+
 	lsr	r6,	r4,	#3
 	add	r7,	r2,	r3
 	//processing a line	data
 comp_ds_bilinear_w_x8_loop1:
-		
+
 	vld1.8 {d0}, [r2]!
-	vld1.8 {d1}, [r7]!			
+	vld1.8 {d1}, [r7]!
 	vpaddl.u8	q0,	q0
 	vrshr.u16	q0,	#1
 	vrhadd.u16 d0, d1
-	
+
 	vmovn.u16	d0,	q0
-	vst1.32	{d0[0]}, [r0]!		
+	vst1.32	{d0[0]}, [r0]!
 	subs r6, #1
 	bne	comp_ds_bilinear_w_x8_loop1
 
@@ -126,7 +126,7 @@ comp_ds_bilinear_w_x8_loop1:
 	add	r0,	r1
 	subs r5, #1
 	bne	comp_ds_bilinear_w_x8_loop0
-	
+
     ldmia	sp!, {r4-r7,lr}
 WELS_ASM_FUNC_END
 
@@ -137,31 +137,31 @@ WELS_ASM_FUNC_BEGIN	comp_ds_bilinear_w_x16_neon
     //Get	the	width	and	height
 	ldr	 r4, [sp,	#20]	//src_width
 	ldr	 r5, [sp,	#24]	//src_height
-	
+
 	//Get	the	difference
-	sub	lr,	r3,	r4 
+	sub	lr,	r3,	r4
 	sub	r1,	r1,	r4,	lsr	#1
-	
+
 	lsr	r5,	#1
-	
+
 	//processing a colume	data
-comp_ds_bilinear_w_x16_loop0:	
-	
+comp_ds_bilinear_w_x16_loop0:
+
 	lsr	r6,	r4,	#4
 	add	r7,	r2,	r3
 	//processing a line	data
 comp_ds_bilinear_w_x16_loop1:
-		
+
 	vld1.8 {q0}, [r2]!
-	vld1.8 {q1}, [r7]!			
+	vld1.8 {q1}, [r7]!
 	vpaddl.u8	q0,	q0
 	vpaddl.u8	q1,	q1
 	vrshr.u16	q0,	#1
 	vrshr.u16	q1,	#1
 	vrhadd.u16 q0, q1
-	
+
 	vmovn.u16	d0,	q0
-	vst1.32	{d0},	[r0]!		
+	vst1.32	{d0},	[r0]!
 	subs r6, #1
 	bne	comp_ds_bilinear_w_x16_loop1
 
@@ -169,34 +169,34 @@ comp_ds_bilinear_w_x16_loop1:
 	add	r0,	r1
 	subs r5, #1
 	bne	comp_ds_bilinear_w_x16_loop0
-	
+
 	ldmia	sp!, {r4-r7,lr}
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN	comp_ds_bilinear_w_x32_neon
+WELS_ASM_FUNC_BEGIN	DyadicBilinearDownsamplerWidthx32_neon
 	stmdb	sp!, {r4-r7, lr}
 
 	//Get	the	width	and	height
 	ldr	 r4, [sp,	#20]	//src_width
 	ldr	 r5, [sp,	#24]	//src_height
-	
+
 	//Get	the	difference
-	sub	lr,	r3,	r4 
+	sub	lr,	r3,	r4
 	sub	r1,	r1,	r4,	lsr	#1
-	
+
 	lsr	r5,	#1
-	
+
 	//processing a colume	data
-comp_ds_bilinear_w_x32_loop0:	
-	
+comp_ds_bilinear_w_x32_loop0:
+
 	lsr	r6,	r4,	#5
 	add	r7,	r2,	r3
 	//processing a line	data
 comp_ds_bilinear_w_x32_loop1:
-		
+
 	vld1.8 {q0,q1},	[r2]!
-	vld1.8 {q2,q3},	[r7]!			
+	vld1.8 {q2,q3},	[r7]!
 	vpaddl.u8	q0,	q0
 	vpaddl.u8	q1,	q1
 	vpaddl.u8	q2,	q2
@@ -207,10 +207,10 @@ comp_ds_bilinear_w_x32_loop1:
 	vrshr.u16	q3,	#1
 	vrhadd.u16 q0, q2
 	vrhadd.u16 q1, q3
-		
+
 	vmovn.u16	d0,	q0
 	vmovn.u16	d1,	q1
-	vst1.32	{q0},	[r0]!		
+	vst1.32	{q0},	[r0]!
 	subs r6, #1
 	bne	comp_ds_bilinear_w_x32_loop1
 
@@ -218,14 +218,14 @@ comp_ds_bilinear_w_x32_loop1:
 	add	r0,	r1
 	subs r5, #1
 	bne	comp_ds_bilinear_w_x32_loop0
-	
+
 	ldmia	sp!, {r4-r7,lr}
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN general_ds_bilinear_accurate_neon
+WELS_ASM_FUNC_BEGIN GeneralBilinearAccurateDownsampler_neon
     stmdb sp!, {r4-r12, lr}
-    
+
 	//Get the data from stack
 	ldr r4, [sp, #40] //the addr of src
 	ldr r5, [sp, #44] //the value of src_stride
@@ -245,11 +245,11 @@ WELS_ASM_FUNC_BEGIN general_ds_bilinear_accurate_neon
 	and		r9, r7, r10			// r9 vinc(scaleY mod 32767)
     mov     r11, #-1
 	mul		r11, r9			// r11 -vinc
-	
+
 	vdup.s16 d2, r9
 	vdup.s16 d3, r11
 	vext.8   d5, d3, d2, #4		// vinc vinc -vinc -vinc
-	
+
     mov		 r11, #0x40000000
     mov      r12, #0x4000
     sub      r12, #1
@@ -261,13 +261,13 @@ WELS_ASM_FUNC_BEGIN general_ds_bilinear_accurate_neon
     sub      r11, #1
 	vdup.s16 d9, r11
 	vext.8	 d7, d9, d8, #4		//init v  16384 16384 16383 16383
-	
-	veor    q14,     q14	
-	sub		r1,		r2			// stride - width			
+
+	veor    q14,     q14
+	sub		r1,		r2			// stride - width
 	mov		r8,		#16384		// yInverse
 	sub		r3,		#1
-	
-_HEIGHT:	
+
+_HEIGHT:
     ldr     r4, [sp, #40]           //the addr of src
     mov		r11,	r8
     lsr		r11,	#15
@@ -275,8 +275,8 @@ _HEIGHT:
 	add		r11,	r4					// get current row address
 	mov		r12,	r11
 	add		r12,	r5
-	
-	mov		r9,		#16384				// xInverse	
+
+	mov		r9,		#16384				// xInverse
 	sub		r10, r2, #1
     vmov.s16 d6, d1
 
@@ -288,21 +288,21 @@ _WIDTH:
     add     r4,     r12,lr
 	vld2.8	{d28[4],d29[4]},	[r4]		//q14: 000d000b000c000a;
 	vzip.32		d28, d29					//q14: 000d000c000b000a;
-	
-	vmull.u16	q13, d6, d7			//q13: init u  *  init  v	
+
+	vmull.u16	q13, d6, d7			//q13: init u  *  init  v
 	vmull.u32	q12, d26,d28
 	vmlal.u32	q12, d27,d29
 	vqadd.u64	d24, d24,d25
 	vrshr.u64	d24, #30
 
 	vst1.8	{d24[0]},	[r0]!
-	add		r9,	r6	
+	add		r9,	r6
 	vadd.u16	d6, d0				// inc u
 	vshl.u16	d6, #1
 	vshr.u16	d6, #1
 	subs	r10, #1
 	bne		_WIDTH
-	
+
 WIDTH_END:
     lsr		r9,		#15
     add     r4,r11,r9
@@ -317,25 +317,25 @@ WIDTH_END:
 	subs	r3,		#1
 	bne		_HEIGHT
 
-LAST_ROW:	
+LAST_ROW:
     ldr     r4, [sp, #40]           //the addr of src
     lsr		r8,	#15
 	mul		r8, r5
-	add		r4,	r8					// get current row address	
+	add		r4,	r8					// get current row address
 	mov		r9,		#16384
 
 _LAST_ROW_WIDTH:
 	mov		r11,	r9
     lsr		r11,	#15
-    
+
 	add     r3,     r4,r11
 	vld1.8	{d0[0]},	[r3]
-	vst1.8	{d0[0]},	[r0]	
-	add		r0,		#1	
-	add		r9,		r6	
+	vst1.8	{d0[0]},	[r0]
+	add		r0,		#1
+	add		r9,		r6
 	subs	r2,		#1
 	bne		_LAST_ROW_WIDTH
-	
+
 	ldmia sp!, {r4-r12, lr}
 WELS_ASM_FUNC_END
 

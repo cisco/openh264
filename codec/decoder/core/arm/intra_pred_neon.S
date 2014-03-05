@@ -533,7 +533,7 @@ WELS_ASM_FUNC_BEGIN WelsDecoderIChromaPredH_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN WelsDecoderIChromaPredDC_neon
+WELS_ASM_FUNC_BEGIN WelsDecoderIChromaPredDc_neon
     //stmdb sp!, { r2-r5, lr}
     //Load the left column data (8 bytes)
     sub r2, r0, #1

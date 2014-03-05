@@ -60,6 +60,12 @@ SadFunc      WelsSampleSad8x8_sse21;
 WELSVP_EXTERN_C_END
 #endif
 
+#ifdef HAVE_NEON
+WELSVP_EXTERN_C_BEGIN
+SadFunc      WelsSampleSad8x8_neon;
+WELSVP_EXTERN_C_END
+#endif
+
 WELSVP_NAMESPACE_END
 
 #endif

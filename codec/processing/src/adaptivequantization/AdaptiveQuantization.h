@@ -62,6 +62,11 @@ VarFunc      SampleVariance16x16_sse2;
 WELSVP_EXTERN_C_END
 #endif
 
+#ifdef HAVE_NEON
+WELSVP_EXTERN_C_BEGIN
+VarFunc      SampleVariance16x16_neon;
+WELSVP_EXTERN_C_END
+#endif
 
 class CAdaptiveQuantization : public IStrategy {
  public:

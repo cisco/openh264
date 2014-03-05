@@ -795,7 +795,7 @@ WELS_ASM_FUNC_BEGIN DeblockChromaEq4H_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN enc_avc_non_zero_count_neon
+WELS_ASM_FUNC_BEGIN WelsNonZeroCount_neon
 
     vld1.64	{d0-d2}, [r0]
 
@@ -810,38 +810,37 @@ WELS_ASM_FUNC_BEGIN enc_avc_non_zero_count_neon
 WELS_ASM_FUNC_END
 
 #ifdef APPLE_IOS
-
-.macro BS_NZC_CHECK 
+.macro BS_NZC_CHECK
     vld1.8   {d0,d1}, [$0]
     /* Arrenge the input data --- TOP */
 	ands     r6, $1, #2
 	beq      bs_nzc_check_jump0
-	
+
     sub      r6, $0, $2, lsl #4
 	sub      r6, $2, lsl #3
     add      r6, #12
     vld1.32  d3[1], [r6]
-	
-bs_nzc_check_jump0:	
+
+bs_nzc_check_jump0:
     vext.8   q1, q1, q0, #12
 	vadd.u8  $3, q0, q1
 
-    
+
     /* Arrenge the input data --- LEFT */
 	ands     r6, $1, #1
 	beq      bs_nzc_check_jump1
-	
+
     sub      r6, $0, #21
-	add      r7, r6, #4 
+	add      r7, r6, #4
     vld1.8   d3[4], [r6]
 	add      r6, r7, #4
     vld1.8   d3[5], [r7]
 	add      r7, r6, #4
     vld1.8   d3[6], [r6]
     vld1.8   d3[7], [r7]
-	
+
 bs_nzc_check_jump1:
-	vzip.8   d0, d1	
+	vzip.8   d0, d1
 	vzip.8   d0, d1
     vext.8   q1, q1, q0, #12
 	vadd.u8  $4, q0, q1
@@ -852,41 +851,41 @@ bs_nzc_check_jump1:
     vabd.s16  q5, $0, $1
     vabd.s16  q6, $1, $2
 	vdup.s16  $0, r6
-    vabd.s16  q7, $2, $3	
-    vabd.s16  q8, $3, $4	    
-    
+    vabd.s16  q7, $2, $3
+    vabd.s16  q8, $3, $4
+
     vcge.s16  q5, $0
     vcge.s16  q6, $0
     vcge.s16  q7, $0
-    vcge.s16  q8, $0 
-	
+    vcge.s16  q8, $0
+
 	vpadd.i16 d10, d10, d11
     vpadd.i16 d11, d12, d13
     vpadd.i16 d12, d14, d15
-    vpadd.i16 d13, d16, d17  
-   
+    vpadd.i16 d13, d16, d17
+
     vaddhn.i16  $5, q5, q5
     vaddhn.i16  $6, q6, q6
 .endm
 
-.macro BS_MV_CHECK 
+.macro BS_MV_CHECK
     vldm   $0, {q0,q1,q2,q3}
 
     /* Arrenge the input data --- TOP */
 	ands     r6, $1, #2
 	beq      bs_mv_check_jump0
-		
+
     sub      r6, $0, $2, lsl #6
     add      r6, #48
     vld1.8   {d8, d9}, [r6]
-	
+
 bs_mv_check_jump0:
     BS_COMPARE_MV  q4, q0, q1, q2, q3, $3, $4
-    
+
     /* Arrenge the input data --- LEFT */
 	ands     r6, $1, #1
 	beq      bs_mv_check_jump1
-	
+
     sub      r6, $0, #52
     add      r7, r6, #16
 	vld1.32   d8[0], [r6]
@@ -895,7 +894,7 @@ bs_mv_check_jump0:
 	add      r7, r6, #16
     vld1.32   d9[0], [r6]
     vld1.32   d9[1], [r7]
-	
+
 bs_mv_check_jump1:
 	vzip.32   q0, q2
 	vzip.32   q1, q3
@@ -904,7 +903,6 @@ bs_mv_check_jump1:
     BS_COMPARE_MV  q4, q0, q1, q2, q3, $5, $6
 .endm
 #else
-
 .macro BS_NZC_CHECK  arg0, arg1, arg2, arg3, arg4
     vld1.8   {d0,d1}, [\arg0]
     /* Arrenge the input data --- TOP */
@@ -999,40 +997,40 @@ bs_mv_check_jump1:
 .endm
 #endif
 
- 
+
 WELS_ASM_FUNC_BEGIN DeblockingBSCalcEnc_neon
-	
+
 	stmdb sp!, {r5-r7}
-	
+
 	ldr  r5, [sp, #12]	//Save BS to r5
-	
+
 	/* Checking the nzc status */
 	BS_NZC_CHECK r0, r2, r3, q14, q15 //q14,q15 save the nzc status
-        
+
 	/* For checking bS[I] = 2 */
 	mov      r6, #2
 	vcgt.s8  q14, q14, #0
 	vdup.u8  q0, r6
 	vcgt.s8  q15, q15, #0
-	
+
 	vand.u8  q14, q14, q0 //q14 save the nzc check result all the time --- for dir is top
 	vand.u8  q15, q15, q0 //q15 save the nzc check result all the time --- for dir is left
-	
+
 	/* Checking the mv status*/
 	BS_MV_CHECK r1, r2, r3, d24, d25, d26, d27//q12, q13 save the mv status
-	
+
 	/* For checking bS[I] = 1 */
     mov      r6, #1
 	vdup.u8  q0, r6
 
 	vand.u8  q12, q12, q0 //q12 save the nzc check result all the time --- for dir is top
 	vand.u8  q13, q13, q0 //q13 save the nzc check result all the time --- for dir is left
-	
-	
+
+
 	/* Check bS[I] is '1' or '2' */
 	vmax.u8 q1, q12, q14
 	vmax.u8 q0, q13, q15
-	
+
 	//vstm r5, {q0, q1}
     vst1.32 {q0, q1}, [r5]
 	ldmia sp!, {r5-r7}

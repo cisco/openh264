@@ -110,6 +110,33 @@ int32_t WelsIntraChroma8x8Combined3Satd_sse41 (uint8_t*, int32_t, uint8_t*, int3
 
 #endif//X86_ASM
 
+#if defined (HAVE_NEON)
+
+int32_t WelsSampleSad4x4_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad16x16_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad16x8_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad8x16_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad8x8_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+
+void WelsSampleSadFour16x16_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+void WelsSampleSadFour16x8_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+void WelsSampleSadFour8x16_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+void WelsSampleSadFour8x8_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+void WelsSampleSadFour4x4_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+
+int32_t WelsSampleSatd8x8_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd16x8_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd8x16_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd16x16_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd4x4_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+
+int32_t WelsIntra16x16Combined3Satd_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*);
+int32_t WelsIntra16x16Combined3Sad_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*);
+int32_t WelsIntra8x8Combined3Satd_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*, uint8_t*, uint8_t*);
+int32_t WelsIntra8x8Combined3Sad_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*, uint8_t*, uint8_t*);
+int32_t WelsIntra4x4Combined3Satd_neon (uint8_t*, int32_t, uint8_t*, int32_t, uint8_t*, int32_t*, int32_t, int32_t, int32_t);
+
+#endif
 
 #if defined(__cplusplus)
 }

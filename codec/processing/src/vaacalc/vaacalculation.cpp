@@ -65,6 +65,15 @@ void CVAACalculation::InitVaaFuncs (SVaaFuncs& sVaaFuncs, int32_t iCpuFlag) {
     sVaaFuncs.pfVAACalcSadVar		= VAACalcSadVar_sse2;
   }
 #endif//X86_ASM
+#ifdef HAVE_NEON
+  if ((iCpuFlag & WELS_CPU_NEON) == WELS_CPU_NEON) {
+    sVaaFuncs.pfVAACalcSad			= VAACalcSad_neon;
+    sVaaFuncs.pfVAACalcSadBgd		= VAACalcSadBgd_neon;
+    sVaaFuncs.pfVAACalcSadSsd		= VAACalcSadSsd_neon;
+    sVaaFuncs.pfVAACalcSadSsdBgd = VAACalcSadSsdBgd_neon;
+    sVaaFuncs.pfVAACalcSadVar		= VAACalcSadVar_neon;
+    }
+#endif//X86_ASM
 }
 
 EResult CVAACalculation::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap) {

@@ -34,13 +34,13 @@
 .text
 #include "arm_arch_common_macro.S"
 
- 
+
 WELS_ASM_FUNC_BEGIN ExpandPictureLuma_neon
     stmdb sp!, {r4-r8}
 	//Save the dst
 	mov r7, r0
 	mov r8, r3
-	
+
 	add r4, r7, r2
 	sub r4, #1
     //For the left and right expand
@@ -58,40 +58,40 @@ _expand_picture_luma_loop2:
 	subs r8, #1
 	bne	_expand_picture_luma_loop2
 
-	//for the top and bottom expand              
+	//for the top and bottom expand
 	add r2, #64
 	sub r0, #32
 	mla r4, r1, r3, r0
 	sub r4, r1
 _expand_picture_luma_loop0:
-	mov r5, #32 
-    mls r5, r5, r1, r0 
+	mov r5, #32
+    mls r5, r5, r1, r0
 	add r6, r4, r1
 	vld1.8 {q0}, [r0]!
 	vld1.8 {q1}, [r4]!
-	
+
 	mov r8, #32
-_expand_picture_luma_loop1:	
-	vst1.8 {q0}, [r5], r1 
-	vst1.8 {q1}, [r6], r1 
+_expand_picture_luma_loop1:
+	vst1.8 {q0}, [r5], r1
+	vst1.8 {q1}, [r6], r1
 	subs r8, #1
     bne _expand_picture_luma_loop1
-	 
+
 	subs r2, #16
 	bne	_expand_picture_luma_loop0
 
     //vldreq.32 d0, [r0]
-	
+
 	ldmia sp!, {r4-r8}
 WELS_ASM_FUNC_END
 
- 
+
 WELS_ASM_FUNC_BEGIN ExpandPictureChroma_neon
     stmdb sp!, {r4-r8}
 	//Save the dst
 	mov r7, r0
 	mov r8, r3
-	
+
 	add r4, r7, r2
 	sub r4, #1
     //For the left and right expand
@@ -107,30 +107,30 @@ _expand_picture_chroma_loop2:
 	subs r8, #1
 	bne	_expand_picture_chroma_loop2
 
-	//for the top and bottom expand              
+	//for the top and bottom expand
 	add r2, #32
 	sub r0, #16
 	mla r4, r1, r3, r0
 	sub r4, r1
 _expand_picture_chroma_loop0:
-	mov r5, #16 
-    mls r5, r5, r1, r0 
+	mov r5, #16
+    mls r5, r5, r1, r0
 	add r6, r4, r1
 	vld1.8 {q0}, [r0]!
 	vld1.8 {q1}, [r4]!
-	
+
 	mov r8, #16
-_expand_picture_chroma_loop1:	
-	vst1.8 {q0}, [r5], r1 
-	vst1.8 {q1}, [r6], r1 
+_expand_picture_chroma_loop1:
+	vst1.8 {q0}, [r5], r1
+	vst1.8 {q1}, [r6], r1
 	subs r8, #1
     bne _expand_picture_chroma_loop1
-	 
+
 	subs r2, #16
 	bne	_expand_picture_chroma_loop0
 
     //vldreq.32 d0, [r0]
-	
+
 	ldmia sp!, {r4-r8}
 WELS_ASM_FUNC_END
 
