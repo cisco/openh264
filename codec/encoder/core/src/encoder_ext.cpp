@@ -3280,7 +3280,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
 
             lwait = WelsMultipleEventsWaitSingleBlocking (iNumThreadsScheduled,
                     &pCtx->pSliceThreading->pSliceCodedEvent[0],
-                    2);	// 2 ms for one tick
+                    (uint32_t) -1);
             iEventId = (int32_t) (lwait - WELS_THREAD_ERROR_WAIT_OBJECT_0);
             if (iEventId >= 0 && iEventId < iNumThreadsScheduled) {
               if (iIndexOfSliceToBeCoded < iSliceCount) {
@@ -3293,8 +3293,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
               } else {	// no other slices left for coding
                 -- iNumThreadsRunning;
               }
-            } else {
-              WelsSleep (1);
             }
 #else
             // TODO for pthread platforms
