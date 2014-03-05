@@ -71,8 +71,6 @@ uint8_t		uiQualityId;
 int32_t		iFrameNum;		// frame number			//for ref pic management
 int32_t		iLongTermFrameIdx;					//id for long term ref pic
 
-int32_t     iTotalNumMbRec; //show how many MB constructed
-
 int32_t     iSpsId; //against mosaic caused by cross-IDR interval reference.
 int32_t     iPpsId;
 } SPicture, *PPicture;	// "Picture" declaration is comflict with Mac system

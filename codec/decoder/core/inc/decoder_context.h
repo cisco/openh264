@@ -271,6 +271,7 @@ typedef struct TagWelsDecoderContext {
   bool				bSubspsAvailFlags[MAX_SPS_COUNT];
   bool				bPpsAvailFlags[MAX_PPS_COUNT];
   bool				bReferenceLostAtT0Flag;
+  int32_t     iTotalNumMbRec; //record current number of decoded MB
 #ifdef LONG_TERM_REF
   bool				bParamSetsLostFlag;	//sps or pps do not exist or not correct
 
