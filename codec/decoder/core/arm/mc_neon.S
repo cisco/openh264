@@ -499,7 +499,7 @@ WELS_ASM_FUNC_BEGIN McHorVer01WidthEq16_neon
 	push		{r4}
 	ldr			r4, [sp, #4]
 
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -581,7 +581,7 @@ WELS_ASM_FUNC_BEGIN McHorVer01WidthEq8_neon
 	push		{r4}
 	ldr			r4, [sp, #4]
 
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -633,7 +633,7 @@ WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN McHorVer01WidthEq4_neon
 	push		{r4, r5, r6, r7}
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -694,7 +694,7 @@ WELS_ASM_FUNC_BEGIN McHorVer03WidthEq16_neon
 	push		{r4}
 	ldr			r4, [sp, #4]
 
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -776,7 +776,7 @@ WELS_ASM_FUNC_BEGIN McHorVer03WidthEq8_neon
 	push		{r4}
 	ldr			r4, [sp, #4]
 
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -828,7 +828,7 @@ WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN McHorVer03WidthEq4_neon
 	push		{r4, r5, r6, r7}
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -889,7 +889,7 @@ WELS_ASM_FUNC_BEGIN McHorVer02WidthEq16_neon
 	push		{r4}
 	ldr			r4, [sp, #4]
 
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -971,7 +971,7 @@ WELS_ASM_FUNC_BEGIN McHorVer02WidthEq8_neon
 	push		{r4}
 	ldr			r4, [sp, #4]
 
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -1023,7 +1023,7 @@ WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN McHorVer02WidthEq4_neon
 	push		{r4, r5, r6, r7}
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -1085,7 +1085,7 @@ WELS_ASM_FUNC_BEGIN McHorVer22WidthEq16_neon
 	ldr			r4, [sp, #4]
 
 	sub			r0, #2					//src[-2]
-	sub			r0, r1, lsl #1		//src[-2*src_stride-2]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride-2]
 	pld			[r0]
 	pld			[r0, r1]
 
@@ -1197,7 +1197,7 @@ WELS_ASM_FUNC_BEGIN McHorVer22WidthEq8_neon
 	ldr			r4, [sp, #4]
 
 	sub			r0, #2				//src[-2]
-	sub			r0, r1, lsl #1	//src[-2*src_stride-2]
+	sub			r0, r0, r1, lsl #1	//src[-2*src_stride-2]
 	pld			[r0]
 	pld			[r0, r1]
 
@@ -1279,7 +1279,7 @@ WELS_ASM_FUNC_BEGIN McHorVer22WidthEq4_neon
 	ldr			r6, [sp, #12]
 
 	sub			r0, #2				//src[-2]
-	sub			r0, r1, lsl #1	//src[-2*src_stride-2]
+	sub			r0, r0, r1, lsl #1	//src[-2*src_stride-2]
 	pld			[r0]
 	pld			[r0, r1]
 

@@ -612,7 +612,7 @@ WELS_ASM_FUNC_BEGIN enc_mc_luma_w16_xy_01_neon
 	push		{r4}
 	ldr			r4, [sp, #4]
 
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -694,7 +694,7 @@ WELS_ASM_FUNC_BEGIN enc_mc_luma_w8_xy_01_neon
 	push		{r4}
 	ldr			r4, [sp, #4]
 
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -746,7 +746,7 @@ WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN enc_mc_luma_w4_xy_01_neon
 	push		{r4, r5, r6, r7}
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -806,7 +806,7 @@ WELS_ASM_FUNC_BEGIN enc_mc_luma_w16_xy_03_neon
 	push		{r4}
 	ldr			r4, [sp, #4]
 
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -888,7 +888,7 @@ WELS_ASM_FUNC_BEGIN enc_mc_luma_w8_xy_03_neon
 	push		{r4}
 	ldr			r4, [sp, #4]
 
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -939,7 +939,7 @@ w8_xy_03_mc_luma_loop:
 
     WELS_ASM_FUNC_BEGIN enc_mc_luma_w4_xy_03_neon
 	push		{r4, r5, r6, r7}
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -999,7 +999,7 @@ WELS_ASM_FUNC_BEGIN enc_mc_luma_w16_v_neon
 	push		{r4}
 	ldr			r4, [sp, #4]
 
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -1080,7 +1080,7 @@ w16_v_mc_luma_loop:
 	push		{r4}
 	ldr			r4, [sp, #4]
 
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -1168,7 +1168,7 @@ WELS_ASM_FUNC_BEGIN enc_mc_luma_w9_v_neon
 	push		{r4}
 	ldr			r4, [sp, #4]
 
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -1223,7 +1223,7 @@ WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN enc_mc_luma_w4_v_neon
 	push		{r4, r5, r6, r7}
-	sub			r0, r1, lsl #1		//src[-2*src_stride]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride]
 	pld			[r0]
 	pld			[r0, r1]
 	vmov.u16	q14, #0x0014			// 20
@@ -1285,7 +1285,7 @@ WELS_ASM_FUNC_BEGIN enc_mc_luma_w16_hv_neon
 	ldr			r4, [sp, #4]
 
 	sub			r0, #2					//src[-2]
-	sub			r0, r1, lsl #1		//src[-2*src_stride-2]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride-2]
 	pld			[r0]
 	pld			[r0, r1]
 
@@ -1393,7 +1393,7 @@ WELS_ASM_FUNC_BEGIN enc_mc_luma_w17_hv_neon
 	ldr			r4, [sp, #4]
 
 	sub			r0, #2					//src[-2]
-	sub			r0, r1, lsl #1		//src[-2*src_stride-2]
+	sub			r0, r0, r1, lsl #1		//src[-2*src_stride-2]
 	pld			[r0]
 	pld			[r0, r1]
 
@@ -1526,7 +1526,7 @@ WELS_ASM_FUNC_BEGIN enc_mc_luma_w9_hv_neon
 	ldr			r4, [sp, #4]
 
 	sub			r0, #2				//src[-2]
-	sub			r0, r1, lsl #1	//src[-2*src_stride-2]
+	sub			r0, r0, r1, lsl #1	//src[-2*src_stride-2]
 	pld			[r0]
 	pld			[r0, r1]
 
@@ -1628,7 +1628,7 @@ WELS_ASM_FUNC_BEGIN enc_mc_luma_w4_hv_neon
 	ldr			r6, [sp, #12]
 
 	sub			r0, #2				//src[-2]
-	sub			r0, r1, lsl #1	//src[-2*src_stride-2]
+	sub			r0, r0, r1, lsl #1	//src[-2*src_stride-2]
 	pld			[r0]
 	pld			[r0, r1]
 
