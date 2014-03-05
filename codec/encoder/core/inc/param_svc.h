@@ -169,9 +169,6 @@ static void FillDefault (SEncParamExt& param, const bool kbEnableRc) {
   param.iLoopFilterDisableIdc		= 1;	// 0: on, 1: off, 2: on except for slice boundaries
   param.iLoopFilterAlphaC0Offset	= 0;	// AlphaOffset: valid range [-6, 6], default 0
   param.iLoopFilterBetaOffset		= 0;	// BetaOffset:	valid range [-6, 6], default 0
-  param.iInterLayerLoopFilterDisableIdc		= 1;	// Employed based upon inter-layer, same comment as above
-  param.iInterLayerLoopFilterAlphaC0Offset	= 0;	// InterLayerLoopFilterAlphaC0Offset
-  param.iInterLayerLoopFilterBetaOffset		= 0;	// InterLayerLoopFilterBetaOffset
 
   /* Rate Control */
   param.bEnableRc		= kbEnableRc;
@@ -327,9 +324,6 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
 #endif
   iLoopFilterAlphaC0Offset = 0;	// AlphaOffset: valid range [-6, 6], default 0
   iLoopFilterBetaOffset	= 0;	// BetaOffset:	valid range [-6, 6], default 0
-  iInterLayerLoopFilterDisableIdc	= iLoopFilterDisableIdc;	// Employed based upon inter-layer, same comment as above
-  iInterLayerLoopFilterAlphaC0Offset = 0;
-  iInterLayerLoopFilterBetaOffset	= 0;
 
   bEnableFrameCroppingFlag	= true;
 

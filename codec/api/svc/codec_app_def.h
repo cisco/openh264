@@ -207,17 +207,17 @@ typedef struct TagEncParamExt
   unsigned int		uiIntraPeriod;		// period of Intra frame
   int		        iNumRefFrame;		// number of reference frame used
   unsigned int	    uiFrameToBeCoded;	// frame to be encoded (at input frame rate)
-  bool    bEnableSpsPpsIdAddition;
-  bool    bPrefixNalAddingCtrl;
-  bool	  bEnableSSEI;
+  bool     bEnableSpsPpsIdAddition;
+  bool     bPrefixNalAddingCtrl;
+  bool	   bEnableSSEI;
   int      iPaddingFlag;            // 0:disable padding;1:padding
   int      iEtropyCodingModeFlag;
 
   /* rc control */
-  bool    bEnableRc;
-  bool    bEnableFrameSkip; // allow skipping frames to keep the bitrate within limits
-  int     iMaxQp;
-  int     iMinQp;
+  bool     bEnableRc;
+  bool     bEnableFrameSkip; // allow skipping frames to keep the bitrate within limits
+  int      iMaxQp;
+  int      iMinQp;
 
   /*LTR settings*/
   bool     bEnableLongTermReference; // 0: on, 1: off
@@ -232,16 +232,12 @@ typedef struct TagEncParamExt
   int		iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries
   int		iLoopFilterAlphaC0Offset;// AlphaOffset: valid range [-6, 6], default 0
   int		iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0
-  int		iInterLayerLoopFilterDisableIdc; // Employed based upon inter-layer, same comment as above
-  int		iInterLayerLoopFilterAlphaC0Offset;	// InterLayerLoopFilterAlphaC0Offset
-  int		iInterLayerLoopFilterBetaOffset;	// InterLayerLoopFilterBetaOffset
-
   /*pre-processing feature*/
-  bool    bEnableDenoise;	    // denoise control
-  bool    bEnableBackgroundDetection;// background detection control //VAA_BACKGROUND_DETECTION //BGD cmd
-  bool    bEnableAdaptiveQuant; // adaptive quantization control
-  bool	  bEnableFrameCroppingFlag;// enable frame cropping flag: TRUE always in application
-  bool    bEnableSceneChangeDetect;
+  bool      bEnableDenoise;	    // denoise control
+  bool      bEnableBackgroundDetection;// background detection control //VAA_BACKGROUND_DETECTION //BGD cmd
+  bool      bEnableAdaptiveQuant; // adaptive quantization control
+  bool	    bEnableFrameCroppingFlag;// enable frame cropping flag: TRUE always in application
+  bool      bEnableSceneChangeDetect;
 }SEncParamExt;
 
 //Define a new struct to show the property of video bitstream.
