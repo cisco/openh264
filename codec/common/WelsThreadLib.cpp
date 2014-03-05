@@ -209,8 +209,6 @@ WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_
   pthread_attr_destroy (&at);
 
   return err;
-
-//	return pthread_create(thread, NULL, routine, arg);
 }
 
 WELS_THREAD_ERROR_CODE	  WelsSetThreadCancelable() {
@@ -331,10 +329,8 @@ WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t 
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount,
     WELS_EVENT* event_list,
     uint32_t dwMilliseconds) {
-  // bWaitAll = FALSE && blocking
   uint32_t nIdx = 0;
   const uint32_t kuiAccessTime = 2;	// 2 us once
-//	uint32_t uiSleepMs = 0;
 
   if (nCount == 0)
     return WELS_THREAD_ERROR_WAIT_FAILED;
@@ -343,14 +339,7 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount,
     nIdx = 0;	// access each event by order
     while (nIdx < nCount) {
       int32_t err = 0;
-//#if defined(__APPLE__)	// clock_gettime(CLOCK_REALTIME) & sem_timedwait not supported on mac, so have below impl
       int32_t wait_count = 0;
-//			struct timespec ts;
-//			struct timeval tv;
-//
-//			gettimeofday(&tv,0);
-//			ts.tv_sec = tv.tv_sec/*+ kuiAccessTime / 1000*/;		// second
-//			ts.tv_nsec = (tv.tv_usec + kuiAccessTime) * 1000;	// nano-second
 
       /*
        * although such interface is not used in __GNUC__ like platform, to use
@@ -365,46 +354,17 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount,
         usleep (kuiAccessTime);
         ++ wait_count;
       } while (1);
-//#else
-//			struct timespec ts;
-//
-//			if ( clock_gettime(CLOCK_REALTIME, &ts) == -1 )
-//				return WELS_THREAD_ERROR_WAIT_FAILED;
-//			ts.tv_nsec += kuiAccessTime/*(kuiAccessTime % 1000)*/ * 1000;
-//
-////			fprintf( stderr, "sem_timedwait(): start to wait event %d..\n", nIdx );
-//			err = sem_timedwait(event_list[nIdx], &ts);
-////			if ( err == -1 )
-////			{
-////				sem_getvalue(&event_list[nIdx], &val);
-////				fprintf( stderr, "sem_timedwait() errno(%d) semaphore %d..\n", errno, val);
-////				return WELS_THREAD_ERROR_WAIT_FAILED;
-////			}
-////			fprintf( stderr, "sem_timedwait(): wait event %d result %d errno %d..\n", nIdx, err, errno );
-//			if ( WELS_THREAD_ERROR_OK == err ) // non-blocking mode
-//			{
-////				int32_t val = 0;
-////				sem_getvalue(&event_list[nIdx], &val);
-////				fprintf( stderr, "after sem_timedwait(), event_list[%d] semaphore value= %d..\n", nIdx, val);
-////				fprintf( stderr, "WelsMultipleEventsWaitSingleBlocking sleep %d us\n", uiSleepMs);
-//				return WELS_THREAD_ERROR_WAIT_OBJECT_0 + nIdx;
-//			}
-//#endif
       // we do need access next event next time
       ++ nIdx;
-//			uiSleepMs += kuiAccessTime;
     }
     usleep (1);	// switch to working threads
-//		++ uiSleepMs;
   }
 
   return WELS_THREAD_ERROR_WAIT_FAILED;
 }
 
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WELS_EVENT* event_list) {
-  // bWaitAll = TRUE && blocking
   uint32_t nIdx = 0;
-//	const uint32_t kuiAccessTime = (uint32_t)-1;// 1 ms once
   uint32_t uiCountSignals = 0;
   uint32_t uiSignalFlag	= 0;	// UGLY: suppose maximal event number up to 32
 
