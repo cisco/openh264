@@ -48,12 +48,12 @@ mem_zero_loop:
     vst1.64 {q0}, [r0]!
     vst1.64 {q0}, [r0]!
     bne mem_zero_loop
-WELS_ASM_FUNC_END
+    bx lr
 
 mem_zero_32_neon_start:
     vst1.64 {q0}, [r0]!
     vst1.64 {q0}, [r0]!
-WELS_ASM_FUNC_END
+    bx lr
 
 mem_zero_24_neon_start:
     vst1.64 {q0}, [r0]!
