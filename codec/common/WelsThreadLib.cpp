@@ -55,6 +55,9 @@
 #define HW_NCPU_NAME "hw.ncpu"
 #endif
 #endif
+#ifdef ANDROID_NDK
+#include <cpu-features.h>
+#endif
 
 #include "WelsThreadLib.h"
 #include <stdio.h>
@@ -414,7 +417,10 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WE
 }
 
 WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* pInfo) {
-#ifdef LINUX
+#ifdef ANDROID_NDK
+  pInfo->ProcessorCount = android_getCpuCount();
+  return WELS_THREAD_ERROR_OK;
+#elif defined(LINUX)
 
   cpu_set_t cpuset;
 
