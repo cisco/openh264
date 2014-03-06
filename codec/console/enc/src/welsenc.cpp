@@ -207,7 +207,7 @@ int ParseConfig (CReadConfig& cRdCfg, SEncParamExt& pSvcParam, SFilesSet& sFileS
         }
       } else if (strTag[0].compare ("LayerCfg") == 0) {
         if (strTag[1].length() > 0)
-          sFileSet.sSpatialLayers[iLayerCount].strLayerCfgFile	= strTag[1];
+          sFileSet.strLayerCfgFile[iLayerCount]	= strTag[1];
 //				pSvcParam.sDependencyLayers[iLayerCount].uiDependencyId	= iLayerCount;
         ++ iLayerCount;
       } else if (strTag[0].compare ("PrefixNALAddingCtrl") == 0) {
@@ -233,7 +233,7 @@ int ParseConfig (CReadConfig& cRdCfg, SEncParamExt& pSvcParam, SFilesSet& sFileS
     SLayerPEncCtx sLayerCtx;
 
     SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
-    CReadConfig cRdLayerCfg (sFileSet.sSpatialLayers[iLayer].strLayerCfgFile);
+    CReadConfig cRdLayerCfg (sFileSet.strLayerCfgFile[iLayer]);
 
     memset (&sLayerCtx, 0, sizeof (SLayerPEncCtx));
 
@@ -257,10 +257,8 @@ int ParseConfig (CReadConfig& cRdCfg, SEncParamExt& pSvcParam, SFilesSet& sFileS
           const int kiLen = strTag[1].length();
           if (kiLen >= MAX_FNAME_LEN)
             return 1;
-#ifdef ENABLE_FRAME_DUMP
-          pDLayer->sRecFileName[kiLen] = '\0';
-          strncpy (pDLayer->sRecFileName, strTag[1].c_str(), kiLen);	// confirmed_safe_unsafe_usage
-#endif//ENABLE_FRAME_DUMP
+          sFileSet.sRecFileName[iLayer][kiLen] = '\0';
+          strncpy (sFileSet.sRecFileName[iLayer], strTag[1].c_str(), kiLen);	// confirmed_safe_unsafe_usage
         } else if (strTag[0].compare ("ProfileIdc") == 0) {
           pDLayer->uiProfileIdc	= atoi (strTag[1].c_str());
         } else if (strTag[0].compare ("FRExt") == 0) {
@@ -459,7 +457,7 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& pSvcParam, SFilesSet&
       pSvcParam.iSpatialLayerNum = atoi (argv[n++]);
       for (int ln = 0 ; (ln < pSvcParam.iSpatialLayerNum) && (n < argc) ; ln++) {
 //				pSvcParam.sDependencyLayers[ln].uiDependencyId = ln;
-        sFileSet.sSpatialLayers[ln].strLayerCfgFile.assign (argv[n++]);
+        sFileSet.strLayerCfgFile[ln].assign (argv[n++]);
       }
 
       for (int8_t iLayer = 0; iLayer < pSvcParam.iSpatialLayerNum; ++ iLayer) {
@@ -467,7 +465,7 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& pSvcParam, SFilesSet&
         string strTag[4];
 
         SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
-        CReadConfig cRdLayerCfg (sFileSet.sSpatialLayers[iLayer].strLayerCfgFile);
+        CReadConfig cRdLayerCfg (sFileSet.strLayerCfgFile[iLayer]);
 
         memset (&sLayerCtx, 0, sizeof (SLayerPEncCtx));
 
@@ -489,13 +487,11 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& pSvcParam, SFilesSet&
             } else if (strTag[0].compare ("FrameRateOut") == 0) {
 				pDLayer->fFrameRate = (float)atof (strTag[1].c_str());
             } else if (strTag[0].compare ("ReconFile") == 0) {
-#ifdef ENABLE_FRAME_DUMP
               const int kiLen = strTag[1].length();
               if (kiLen >= MAX_FNAME_LEN)
                 return 1;
-              pDLayer->sRecFileName[kiLen] = '\0';
-              strncpy (pDLayer->sRecFileName, strTag[1].c_str(), kiLen);	// confirmed_safe_unsafe_usage
-#endif//ENABLE_FRAME_DUMP
+              sFileSet.sRecFileName[iLayer][kiLen] = '\0';
+              strncpy (sFileSet.sRecFileName[iLayer], strTag[1].c_str(), kiLen);	// confirmed_safe_unsafe_usage
             } else if (strTag[0].compare ("ProfileIdc") == 0) {
               pDLayer->uiProfileIdc	= atoi (strTag[1].c_str());
             } else if (strTag[0].compare ("FRExt") == 0) {
@@ -527,19 +523,13 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& pSvcParam, SFilesSet&
       }
     }
     else if (!strcmp (pCommand, "-drec") && (n + 1 < argc)) {
-#ifdef ENABLE_FRAME_DUMP
       unsigned int	iLayer = atoi (argv[n++]);
       const int iLen = strlen (argv[n]);
-      SDLayerParam* pDLayer = &pSvcParam.sDependencyLayers[iLayer];
-      if (iLen >= sizeof(pDLayer->sRecFileName))
+      if (iLen >= sizeof(sFileSet.sRecFileName[iLayer]))
         return 1;
-      pDLayer->sRecFileName[iLen] = '\0';
-      strncpy (pDLayer->sRecFileName, argv[n++], iLen);	// confirmed_safe_unsafe_usage
-#else
-      n += 2;
-#endif//ENABLE_FRAME_DUMP
+      sFileSet.sRecFileName[iLayer][iLen] = '\0';
+      strncpy (sFileSet.sRecFileName[iLayer], argv[n++], iLen);	// confirmed_safe_unsafe_usage
     }
-
     else if (!strcmp (pCommand, "-dw") && (n + 1 < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
       SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
@@ -734,7 +724,6 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
 	ret = 1;
     goto ERROR_RET;
    }
-
   iPicLumaSize = sSvcParam.iPicWidth * sSvcParam.iPicHeight;
   switch (sSvcParam.iInputCsp) {
     int iStride;
@@ -886,7 +875,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
 
   memset (&sFbi, 0, sizeof (SFrameBSInfo));
   memset (&sSvcParam, 0, sizeof (SEncParamExt));
-
+  memset (&fs,0,sizeof(SFilesSet));
   sSvcParam.iInputCsp	= videoFormatI420;	// I420 in default
   sSvcParam.sSpatialLayers[0].uiProfileIdc	= PRO_BASELINE;
 //	svc_cfg->sDependencyLayers[0].frext_mode	= 0;
@@ -919,6 +908,20 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     fprintf (stderr, "SVC encoder Initialize failed\n");
     iRet = 1;
     goto INSIDE_MEM_FREE;
+  }
+  for(int iLayer = 0;iLayer<MAX_DEPENDENCY_LAYER;iLayer++)
+  {
+	  if(fs.sRecFileName[iLayer][0]!=NULL)
+	  {
+		  SDumpLayer sDumpLayer;
+		  sDumpLayer.iLayer = iLayer;
+		  sDumpLayer.pFileName = fs.sRecFileName[iLayer];
+		  if(cmResultSuccess!=pPtrEnc->SetOption(ENCODER_OPTION_DUMP_FILE,&sDumpLayer)){
+			  fprintf (stderr, "SetOption ENCODER_OPTION_DUMP_FILE failed!\n");
+			  iRet = 1;
+			  goto INSIDE_MEM_FREE;
+		  }
+	  }
   }
   // Inactive with sink with output file handler
   if (fs.strBsFile.length() > 0) {

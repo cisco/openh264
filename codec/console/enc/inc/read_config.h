@@ -48,9 +48,8 @@ using namespace std;
 typedef struct tagFilesSet {
   string strBsFile;
   string strSeqFile;	// for cmd lines
-  struct {
-    string strLayerCfgFile;
-  } sSpatialLayers[MAX_DEPENDENCY_LAYER];
+  string strLayerCfgFile[MAX_DEPENDENCY_LAYER];
+  char	 sRecFileName[MAX_DEPENDENCY_LAYER][MAX_FNAME_LEN];
 } SFilesSet;
 
 
