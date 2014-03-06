@@ -252,9 +252,6 @@ typedef struct TagWelsDecoderContext {
   int32_t				iCsStride[3];		// strides for Cs
   int32_t				iRsStride[3];		// strides for Rs
 
-  int32_t             iPicWidthReq;		// picture width have requested the memory
-  int32_t             iPicHeightReq;		// picture height have requested the memory
-
   uint8_t				uiTargetDqId;		// maximal DQ ID in current access unit, meaning target layer ID
   bool				bAvcBasedFlag;		// For decoding bitstream:
   bool				bEndOfStreamFlag;	// Flag on end of stream requested by external application layer
