@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4C34067818C5A4AD00DFA14A /* adaptive_quantization.S in Sources */ = {isa = PBXBuildFile; fileRef = 4C34067418C5A4AD00DFA14A /* adaptive_quantization.S */; };
+		4C34067918C5A4AD00DFA14A /* down_sample_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4C34067518C5A4AD00DFA14A /* down_sample_neon.S */; };
+		4C34067A18C5A4AD00DFA14A /* pixel_sad_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4C34067618C5A4AD00DFA14A /* pixel_sad_neon.S */; };
+		4C34067B18C5A4AD00DFA14A /* vaa_calc_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4C34067718C5A4AD00DFA14A /* vaa_calc_neon.S */; };
 		4CE4443518B724B60017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4443418B724B60017DF25 /* Foundation.framework */; };
 		4CE4444318B724B60017DF25 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4444218B724B60017DF25 /* XCTest.framework */; };
 		4CE4444418B724B60017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4443418B724B60017DF25 /* Foundation.framework */; };
@@ -56,6 +60,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4C34067418C5A4AD00DFA14A /* adaptive_quantization.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = adaptive_quantization.S; sourceTree = "<group>"; };
+		4C34067518C5A4AD00DFA14A /* down_sample_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = down_sample_neon.S; sourceTree = "<group>"; };
+		4C34067618C5A4AD00DFA14A /* pixel_sad_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = pixel_sad_neon.S; sourceTree = "<group>"; };
+		4C34067718C5A4AD00DFA14A /* vaa_calc_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = vaa_calc_neon.S; sourceTree = "<group>"; };
 		4CE4443118B724B60017DF25 /* libprocessing.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libprocessing.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE4443418B724B60017DF25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4CE4444118B724B60017DF25 /* processingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = processingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -122,6 +130,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4C34067318C5A4AD00DFA14A /* arm */ = {
+			isa = PBXGroup;
+			children = (
+				4C34067418C5A4AD00DFA14A /* adaptive_quantization.S */,
+				4C34067518C5A4AD00DFA14A /* down_sample_neon.S */,
+				4C34067618C5A4AD00DFA14A /* pixel_sad_neon.S */,
+				4C34067718C5A4AD00DFA14A /* vaa_calc_neon.S */,
+			);
+			path = arm;
+			sourceTree = "<group>";
+		};
 		4CE4442818B724B60017DF25 = {
 			isa = PBXGroup;
 			children = (
@@ -182,6 +201,7 @@
 		4CE4475B18BC62960017DF25 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				4C34067318C5A4AD00DFA14A /* arm */,
 				4CE4475C18BC62960017DF25 /* adaptivequantization */,
 				4CE4476318BC62960017DF25 /* backgrounddetection */,
 				4CE4476618BC62960017DF25 /* common */,
@@ -372,6 +392,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C34067918C5A4AD00DFA14A /* down_sample_neon.S in Sources */,
+				4C34067818C5A4AD00DFA14A /* adaptive_quantization.S in Sources */,
 				4CE4479718BC62960017DF25 /* downsample.cpp in Sources */,
 				4CE4478B18BC62960017DF25 /* AdaptiveQuantization.cpp in Sources */,
 				4CE4479918BC62960017DF25 /* imagerotate.cpp in Sources */,
@@ -380,6 +402,7 @@
 				4CE4479A18BC62960017DF25 /* imagerotatefuncs.cpp in Sources */,
 				4CE4479518BC62960017DF25 /* denoise.cpp in Sources */,
 				4CE4479218BC62960017DF25 /* WelsFrameWork.cpp in Sources */,
+				4C34067B18C5A4AD00DFA14A /* vaa_calc_neon.S in Sources */,
 				4CE4479B18BC62960017DF25 /* SceneChangeDetection.cpp in Sources */,
 				4CE4479D18BC62960017DF25 /* vaacalcfuncs.cpp in Sources */,
 				4CE4479818BC62960017DF25 /* downsamplefuncs.cpp in Sources */,
@@ -387,6 +410,7 @@
 				4CE4479418BC62960017DF25 /* ComplexityAnalysis.cpp in Sources */,
 				4CE4479E18BC62960017DF25 /* vaacalculation.cpp in Sources */,
 				4CE4479118BC62960017DF25 /* thread.cpp in Sources */,
+				4C34067A18C5A4AD00DFA14A /* pixel_sad_neon.S in Sources */,
 				4CE4478F18BC62960017DF25 /* BackgroundDetection.cpp in Sources */,
 				4CE4479618BC62960017DF25 /* denoise_filter.cpp in Sources */,
 			);
@@ -502,6 +526,11 @@
 				DSTROOT = /tmp/processing.dst;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_OPTIMIZATION_LEVEL = 3;
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = (
+					APPLE_IOS,
+					HAVE_NEON,
+				);
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"\"$(SRCROOT)/../../../common\"",
@@ -526,6 +555,11 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DSTROOT = /tmp/processing.dst;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = (
+					APPLE_IOS,
+					HAVE_NEON,
+				);
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"\"$(SRCROOT)/../../../common\"",

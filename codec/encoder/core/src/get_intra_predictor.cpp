@@ -709,6 +709,29 @@ void WelsInitIntraPredFuncs (SWelsFuncPtrList* pFuncList, const uint32_t kuiCpuF
   pFuncList->pfGetChromaPred[C_PRED_DC_L] = WelsIChormaPredDcLeft_c;
   pFuncList->pfGetChromaPred[C_PRED_DC_T] = WelsIChormaPredDcTop_c;
   pFuncList->pfGetChromaPred[C_PRED_DC_128] = WelsIChormaPredDcNA_c;
+#ifdef HAVE_NEON
+  if (kuiCpuFlag & WELS_CPU_NEON) {
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_DDR] = WelsI4x4LumaPredDDR_neon;
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_HD]  = WelsI4x4LumaPredHD_neon;
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_HU]  = WelsI4x4LumaPredHU_neon;
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_VR]  = WelsI4x4LumaPredVR_neon;
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_DDL] = WelsI4x4LumaPredDDL_neon;
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_VL]  = WelsI4x4LumaPredVL_neon;
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_H] = WelsI4x4LumaPredH_neon;
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_V] = WelsI4x4LumaPredV_neon;
+
+    pFuncList->pfGetLumaI16x16Pred[I16_PRED_V] = WelsI16x16LumaPredV_neon;
+    pFuncList->pfGetLumaI16x16Pred[I16_PRED_H] = WelsI16x16LumaPredH_neon;
+    pFuncList->pfGetLumaI16x16Pred[I16_PRED_DC] = WelsI16x16LumaPredDc_neon;
+    pFuncList->pfGetLumaI16x16Pred[I16_PRED_P] = WelsI16x16LumaPredPlane_neon;
+
+    pFuncList->pfGetChromaPred[C_PRED_DC]	= WelsIChromaPredDc_neon;
+    pFuncList->pfGetChromaPred[C_PRED_V]	= WelsIChromaPredV_neon;
+    pFuncList->pfGetChromaPred[C_PRED_P]	= WelsIChromaPredPlane_neon;
+    pFuncList->pfGetChromaPred[C_PRED_H]    = WelsIChromaPredH_neon;
+    }
+#endif
+
 #ifdef X86_ASM
   if (kuiCpuFlag & WELS_CPU_MMXEXT) {
     pFuncList->pfGetLumaI4x4Pred[I4_PRED_DDR] = WelsI4x4LumaPredDDR_mmx;

@@ -129,6 +129,13 @@ void InitExpandPictureFunc (void* pL, const uint32_t kuiCPUFlag) {
     pFuncList->pfExpandChromaPicture[1] = ExpandPictureChromaAlign_sse2;
   }
 #endif//X86_ASM
+#if defined(HAVE_NEON)
+  if (kuiCPUFlag & WELS_CPU_NEON) {
+    pFuncList->pfExpandLumaPicture	= ExpandPictureLuma_neon;
+    pFuncList->pfExpandChromaPicture[0] = ExpandPictureChroma_c;
+    pFuncList->pfExpandChromaPicture[1] = ExpandPictureChroma_neon;
+  }
+#endif//X86_ASM
 }
 
 

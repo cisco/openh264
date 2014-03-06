@@ -124,7 +124,7 @@ void WelsDecoderI4x4LumaPredHD_neon(uint8_t *pPred, const int32_t kiStride);
 
 void WelsDecoderIChromaPredV_neon(uint8_t *pPred, const int32_t kiStride);
 void WelsDecoderIChromaPredH_neon(uint8_t *pPred, const int32_t kiStride);
-void WelsDecoderIChromaPredDC_neon(uint8_t *pPred, const int32_t kiStride);
+void WelsDecoderIChromaPredDc_neon(uint8_t *pPred, const int32_t kiStride);
 void WelsDecoderIChromaPredPlane_neon(uint8_t *pPred, const int32_t kiStride);
 #endif//HAVE_NEON
 
