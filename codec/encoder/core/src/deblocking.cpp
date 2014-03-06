@@ -823,7 +823,7 @@ void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
     pFunc->pfLumaDeblockingEQ4Ver		= DeblockLumaEq4V_neon;
     pFunc->pfLumaDeblockingLT4Hor		= DeblockLumaLt4H_neon;
     pFunc->pfLumaDeblockingEQ4Hor		= DeblockLumaEq4H_neon;
-        
+
     pFunc->pfChromaDeblockingLT4Ver     = DeblockChromaLt4V_neon;
     pFunc->pfChromaDeblockingEQ4Ver     = DeblockChromaEq4V_neon;
     pFunc->pfChromaDeblockingLT4Hor     = DeblockChromaLt4H_neon;
