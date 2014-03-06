@@ -912,11 +912,6 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
   pCtx->sMb.iMbWidth		= (kiMaxWidth + 15) >> 4;
   pCtx->sMb.iMbHeight		= (kiMaxHeight + 15) >> 4;
 
-  if (pCtx->bInitialDqLayersMem && kiMaxWidth <= pCtx->iPicWidthReq
-      && kiMaxHeight <= pCtx->iPicHeightReq)	// have same dimension memory, skipped
-    return ERR_NONE;
-
-
   UninitialDqLayersContext (pCtx);
 
   do {
@@ -1014,8 +1009,6 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
 
 
   pCtx->bInitialDqLayersMem	= true;
-  pCtx->iPicWidthReq			= kiMaxWidth;
-  pCtx->iPicHeightReq			= kiMaxHeight;
 
   return ERR_NONE;
 }
@@ -1169,8 +1162,6 @@ void UninitialDqLayersContext (PWelsDecoderContext pCtx) {
     ++ i;
   } while (i < LAYER_NUM_EXCHANGEABLE);
 
-  pCtx->iPicWidthReq			= 0;
-  pCtx->iPicHeightReq			= 0;
   pCtx->bInitialDqLayersMem	= false;
 }
 
