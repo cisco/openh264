@@ -104,7 +104,7 @@ int32_t RecI4x4Luma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLe
 
 
 int32_t RecI4x4Chroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
-  int32_t iChromaStride = pCtx->pCurDqLayer->iCsStride[1];
+  int32_t iChromaStride = pCtx->pCurDqLayer->pDec->iLinesize[1];
 
   int8_t iChromaPredMode = pDqLayer->pChromaPredMode[iMBXY];
 
@@ -128,7 +128,7 @@ int32_t RecI16x16Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLe
   int8_t iChromaPredMode = pDqLayer->pChromaPredMode[iMBXY];
   PGetIntraPredFunc* pGetIChromaPredFunc = pCtx->pGetIChromaPredFunc;
   PGetIntraPredFunc* pGetI16x16LumaPredFunc = pCtx->pGetI16x16LumaPredFunc;
-  int32_t iUVStride = pCtx->pCurDqLayer->iCsStride[1];
+  int32_t iUVStride = pCtx->pCurDqLayer->pDec->iLinesize[1];
 
   /*common use by decoder&encoder*/
   int32_t iYStride = pDqLayer->iLumaStride;
@@ -435,7 +435,7 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
 }
 
 int32_t RecChroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
-  int32_t iChromaStride = pCtx->pCurDqLayer->iCsStride[1];
+  int32_t iChromaStride = pCtx->pCurDqLayer->pDec->iLinesize[1];
   PIdctResAddPredFunc pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc;
 
   uint8_t i = 0, j = 0;

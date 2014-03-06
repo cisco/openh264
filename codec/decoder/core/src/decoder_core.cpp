@@ -903,9 +903,6 @@ int32_t UpdateAccessUnit (PWelsDecoderContext pCtx) {
 }
 
 int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWidth, const int32_t kiMaxHeight) {
-  const int32_t kiPicStride		= ((kiMaxWidth + 15) & 0xfffff0) + (PADDING_LENGTH << 1);
-  const int32_t kiPicLines		= ((kiMaxHeight + 15) & 0xfffff0);
-
   int32_t i = 0;
 
   WELS_VERIFY_RETURN_IF (ERR_INFO_INVALID_PARAM, (NULL == pCtx || kiMaxWidth <= 0 || kiMaxHeight <= 0))
@@ -922,34 +919,10 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
   do {
     PDqLayer pDq = (PDqLayer)WelsMalloc (sizeof (SDqLayer), "PDqLayer");
 
-    int32_t iPlaneIdx = 0;
-
     if (pDq == NULL)
       return ERR_INFO_OUT_OF_MEMORY;
 
     memset (pDq, 0, sizeof (SDqLayer));
-
-    do {
-      const int32_t kiHshift	= iPlaneIdx ? 1 : 0;
-      const int32_t kiVshift	= kiHshift;
-      const int32_t kiStride	= WELS_ALIGN ((kiPicStride >> kiHshift), (16 << (1 - kiHshift)));
-      const int32_t kiLine	= (kiPicLines + (PADDING_LENGTH << 1)) >> kiVshift;
-      const int32_t kiSize	= kiStride * kiLine;
-
-      pCtx->pCsListXchg[i][iPlaneIdx]	= (uint8_t*)WelsMalloc (kiSize * sizeof (uint8_t), "pCtx->pCsListXchg[][]");
-
-      WELS_VERIFY_RETURN_IF (ERR_INFO_OUT_OF_MEMORY, (NULL == pCtx->pCsListXchg[i][iPlaneIdx]))
-      pCtx->iCsStride[iPlaneIdx]	= kiStride;
-
-
-      pCtx->pRsListXchg[i][iPlaneIdx]	= (int16_t*)WelsMalloc (kiSize * sizeof (int16_t), "pCtx->pRsListXchg[][]");
-
-      WELS_VERIFY_RETURN_IF (ERR_INFO_OUT_OF_MEMORY , (NULL == pCtx->pRsListXchg[i][iPlaneIdx]))
-      pCtx->iRsStride[iPlaneIdx]	= kiStride;
-
-      ++ iPlaneIdx;
-    } while (iPlaneIdx < 3);
-
 
     pCtx->sMb.pMbType[i] = (int8_t*)WelsMalloc (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
                            "pCtx->sMb.pMbType[]");
@@ -1029,34 +1002,6 @@ void UninitialDqLayersContext (PWelsDecoderContext pCtx) {
     if (pDq == NULL) {
       ++ i;
       continue;
-    }
-
-    if (pCtx->pCsListXchg[i]) {	// cs picture
-      j = 0;
-      do {
-        if (NULL != pCtx->pCsListXchg[i][j]) {
-          WelsFree (pCtx->pCsListXchg[i][j], "pCtx->pCsListXchg[][]");
-
-          pCtx->pCsListXchg[i][j] = NULL;
-        }
-        pCtx->iCsStride[j]	= 0;
-        ++ j;
-      } while (j < 3);
-
-      pDq->pCsData[i]		= NULL;	// for safe
-      pDq->iCsStride[i]	= 0;
-    }
-    if (pCtx->pRsListXchg[i]) {
-      j = 0;
-      do {
-        if (NULL != pCtx->pRsListXchg[i][j]) {
-          WelsFree (pCtx->pRsListXchg[i][j], "pCtx->pRsListXchg[][]");
-
-          pCtx->pRsListXchg[i][j]	= NULL;
-        }
-        pCtx->iRsStride[j]	= 0;
-        ++ j;
-      } while (j < 3);
     }
 
     if (pCtx->sMb.pMbType[i]) {
@@ -1652,13 +1597,6 @@ int32_t InitRefPicList (PWelsDecoderContext pCtx, const uint8_t kuiNRi, const bo
 
 void InitCurDqLayerData (PWelsDecoderContext pCtx, PDqLayer pCurDq) {
   if (NULL != pCtx && NULL != pCurDq) {
-    pCurDq->pCsData[0]		= pCtx->pCsListXchg[0][0];
-    pCurDq->pCsData[1]		= pCtx->pCsListXchg[0][1];
-    pCurDq->pCsData[2]		= pCtx->pCsListXchg[0][2];
-    pCurDq->iCsStride[0]	= pCtx->iCsStride[0];
-    pCurDq->iCsStride[1]	= pCtx->iCsStride[1];
-    pCurDq->iCsStride[2]	= pCtx->iCsStride[2];
-
     pCurDq->pMbType			= pCtx->sMb.pMbType[0];
     pCurDq->pSliceIdc		= pCtx->sMb.pSliceIdc[0];
     pCurDq->pMv[0]			= pCtx->sMb.pMv[0][0];

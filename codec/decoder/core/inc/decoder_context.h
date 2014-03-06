@@ -246,11 +246,6 @@ typedef struct TagWelsDecoderContext {
   // Memory for pAccessUnitList is dynamically held till decoder destruction.
   PDqLayer			pCurDqLayer;		// current DQ layer representation, also carry reference base layer if applicable
   PDqLayer			pDqLayersList[LAYER_NUM_EXCHANGEABLE];	// DQ layers list with memory allocated
-  uint8_t*				pCsListXchg[LAYER_NUM_EXCHANGEABLE][3];	// Constructed picture buffer: 0- cur layer, 1- ref layer;
-  int16_t*				pRsListXchg[LAYER_NUM_EXCHANGEABLE][3];// Residual picture buffer: 0- cur layer, 1- ref layer;
-
-  int32_t				iCsStride[3];		// strides for Cs
-  int32_t				iRsStride[3];		// strides for Rs
 
   int32_t             iPicWidthReq;		// picture width have requested the memory
   int32_t             iPicHeightReq;		// picture height have requested the memory
