@@ -270,18 +270,6 @@ int32_t WelsMbInterPrediction (PWelsDecoderContext pCtx, PDqLayer pCurLayer) {
   return 0;
 }
 
-void WelsMbCopy (uint8_t* pDst, int32_t iStrideDst, uint8_t* pSrc, int32_t iStrideSrc,
-                 int32_t iHeight, int32_t iWidth) {
-  int32_t i;
-  int32_t iOffsetDst = 0, iOffsetSrc = 0;
-  for (i = 0; i < iHeight; i++) {
-    memcpy (pDst + iOffsetDst, pSrc + iOffsetSrc, iWidth);
-    iOffsetDst += iStrideDst;
-    iOffsetSrc += iStrideSrc;
-  }
-}
-
-
 int32_t WelsTargetMbConstruction (PWelsDecoderContext pCtx) {
   PDqLayer pCurLayer = pCtx->pCurDqLayer;
   if (MB_TYPE_INTRA_PCM == pCurLayer->pMbType[pCurLayer->iMbXyIndex]) {
