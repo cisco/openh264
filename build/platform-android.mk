@@ -1,7 +1,6 @@
 ARCH = arm
 include build/platform-arch.mk
 SHAREDLIBSUFFIX = so
-GCCVERSION = 4.8
 NDKLEVEL = 12
 ifeq ($(ARCH), arm)
     CFLAGS += -march=armv7-a -mfloat-abi=softfp
@@ -37,13 +36,12 @@ LDFLAGS += --sysroot=$(SYSROOT)
 SHLDFLAGS = -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,-soname,libwels.so
 
 STL_INCLUDES = \
-    -I$(NDKROOT)/sources/cxx-stl/gnu-libstdc++/$(GCCVERSION)/include \
-    -I$(NDKROOT)/sources/cxx-stl/gnu-libstdc++/$(GCCVERSION)/libs/$(APP_ABI)/include
+    -I$(NDKROOT)/sources/cxx-stl/stlport/stlport
 
 GTEST_INCLUDES = $(STL_INCLUDES)
 CODEC_UNITTEST_INCLUDES = $(STL_INCLUDES)
 CODEC_UNITTEST_LDFLAGS_SUFFIX = \
-    $(NDKROOT)/sources/cxx-stl/gnu-libstdc++/$(GCCVERSION)/libs/$(APP_ABI)/libgnustl_static.a
+    $(NDKROOT)/sources/cxx-stl/stlport/libs/$(APP_ABI)/libstlport_static.a
 
 binaries : decdemo encdemo
 
