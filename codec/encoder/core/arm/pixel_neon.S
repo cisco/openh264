@@ -463,8 +463,6 @@ pixel_sad_4_16x16_loop_0:
 	vpaddl.u32 q0, q0
 	vpaddl.u32 q1, q1
 
-	vshl.u32   q0, #4
-	vshl.u32   q1, #4
 	vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
 
 	ldmia sp!, {r4-r5, lr}
@@ -540,8 +538,6 @@ pixel_sad_4_16x8_loop_0:
 	vpaddl.u32 q0, q0
 	vpaddl.u32 q1, q1
 
-	vshl.u32   q0, #4
-	vshl.u32   q1, #4
 	vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
 
 	ldmia sp!, {r4-r5, lr}
@@ -606,8 +602,6 @@ pixel_sad_4_8x16_loop_0:
 	vpaddl.u32 q0, q0
 	vpaddl.u32 q1, q1
 
-	vshl.u32   q0, #4
-	vshl.u32   q1, #4
 	vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
 
 	ldmia sp!, {r4-r5, lr}
@@ -671,8 +665,6 @@ pixel_sad_4_8x8_loop_0:
 	vpaddl.u32 q0, q0
 	vpaddl.u32 q1, q1
 
-	vshl.u32   q0, #4
-	vshl.u32   q1, #4
 	vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
 
 	ldmia sp!, {r4-r5, lr}
@@ -737,8 +729,6 @@ WELS_ASM_FUNC_BEGIN WelsSampleSadFour4x4_neon
 	vpaddl.u32 q0, q0
 	vpaddl.u32 q1, q1
 
-	vshl.u32   q0, #4
-	vshl.u32   q1, #4
 	vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
 
 WELS_ASM_FUNC_END
