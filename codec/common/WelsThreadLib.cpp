@@ -58,6 +58,7 @@
 
 #include "WelsThreadLib.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef MT_ENABLED
 
@@ -91,7 +92,7 @@ WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex) {
   return WELS_THREAD_ERROR_OK;
 }
 
-WELS_THREAD_ERROR_CODE    WelsEventInit (WELS_EVENT*    event) {
+WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* event, const char* event_name) {
   WELS_EVENT   h = CreateEvent (NULL, FALSE, FALSE, NULL);
 
   if (h == NULL) {
@@ -126,7 +127,7 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WE
   return WaitForMultipleObjects (nCount, event_list, TRUE, INFINITE);
 }
 
-WELS_THREAD_ERROR_CODE    WelsEventDestroy (WELS_EVENT* event) {
+WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_name) {
   CloseHandle (*event);
 
   *event = NULL;
@@ -252,15 +253,8 @@ WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex) {
 
 // unnamed semaphores aren't supported on OS X
 
-WELS_THREAD_ERROR_CODE    WelsEventInit (WELS_EVENT* event) {
-  return sem_init (*event, 0, 0);
-}
-
-WELS_THREAD_ERROR_CODE   WelsEventDestroy (WELS_EVENT* event) {
-  return sem_destroy (*event);	// match with sem_init
-}
-
 WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* p_event, const char* event_name) {
+#ifdef __APPLE__
   if (p_event == NULL || event_name == NULL)
     return WELS_THREAD_ERROR_GENERAL;
   *p_event = sem_open (event_name, O_CREAT, (S_IRUSR | S_IWUSR)/*0600*/, 0);
@@ -271,12 +265,30 @@ WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* p_event, const char* event_
   } else {
     return WELS_THREAD_ERROR_OK;
   }
+#else
+  WELS_EVENT event = (WELS_EVENT) malloc(sizeof(*event));
+  if (event == NULL)
+    return WELS_THREAD_ERROR_GENERAL;
+  WELS_THREAD_ERROR_CODE err = sem_init(event, 0, 0);
+  if (!err) {
+    *p_event = event;
+    return err;
+  }
+  free(event);
+  return err;
+#endif
 }
 WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_name) {
+#ifdef __APPLE__
   WELS_THREAD_ERROR_CODE err = sem_close (*event);	// match with sem_open
   if (event_name)
     sem_unlink (event_name);
   return err;
+#else
+  WELS_THREAD_ERROR_CODE err = sem_destroy (*event);	// match with sem_init
+  free(*event);
+  return err;
+#endif
 }
 
 WELS_THREAD_ERROR_CODE   WelsEventSignal (WELS_EVENT* event) {
