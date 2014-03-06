@@ -124,9 +124,6 @@ struct {
 char*       pCurPath; // record current lib path such as:/pData/pData/com.wels.enc/lib/
 
 bool		bDeblockingParallelFlag;	// deblocking filter parallelization control flag
-bool		bMgsT0OnlyStrategy; //MGS_T0_only_strategy
-
-// FALSE: Streaming Video Sharing; TRUE: Video Conferencing Meeting;
 
 int8_t		iDecompStages;		// GOP size dependency
 
@@ -214,8 +211,6 @@ void FillDefault (const bool kbEnableRc) {
 
   bDeblockingParallelFlag = false;	// deblocking filter parallelization control flag
 
-  bMgsT0OnlyStrategy			=
-    true;	// Strategy of have MGS only at T0 frames (0: do not use this strategy; 1: use this strategy)
   iDecompStages				= 0;	// GOP size dependency, unknown here and be revised later
 
   memset(sDependencyLayers,0,sizeof(SDLayerParam)*MAX_DEPENDENCY_LAYER);
