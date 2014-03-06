@@ -164,26 +164,6 @@ int ParseConfig (CReadConfig& cRdCfg, SEncParamExt& pSvcParam, SFilesSet& sFileS
           pSvcParam.iLoopFilterBetaOffset	= -6;
         else if (pSvcParam.iLoopFilterBetaOffset > 6)
           pSvcParam.iLoopFilterBetaOffset	= 6;
-      } else if (strTag[0].compare ("InterLayerLoopFilterDisableIDC") == 0) {
-        pSvcParam.iInterLayerLoopFilterDisableIdc = (int8_t)atoi (strTag[1].c_str());
-        if (pSvcParam.iInterLayerLoopFilterDisableIdc > 6 || pSvcParam.iInterLayerLoopFilterDisableIdc < 0) {
-          fprintf (stderr, "Invalid parameter in iInterLayerLoopFilterDisableIdc: %d.\n",
-                   pSvcParam.iInterLayerLoopFilterDisableIdc);
-          iRet = 1;
-          break;
-        }
-      } else if (strTag[0].compare ("InterLayerLoopFilterAlphaC0Offset") == 0) {
-        pSvcParam.iInterLayerLoopFilterAlphaC0Offset	= (int8_t)atoi (strTag[1].c_str());
-        if (pSvcParam.iInterLayerLoopFilterAlphaC0Offset < -6)
-          pSvcParam.iInterLayerLoopFilterAlphaC0Offset	= -6;
-        else if (pSvcParam.iInterLayerLoopFilterAlphaC0Offset > 6)
-          pSvcParam.iInterLayerLoopFilterAlphaC0Offset	= 6;
-      } else if (strTag[0].compare ("InterLayerLoopFilterBetaOffset") == 0) {
-        pSvcParam.iInterLayerLoopFilterBetaOffset	= (int8_t)atoi (strTag[1].c_str());
-        if (pSvcParam.iInterLayerLoopFilterBetaOffset < -6)
-          pSvcParam.iInterLayerLoopFilterBetaOffset	= -6;
-        else if (pSvcParam.iInterLayerLoopFilterBetaOffset > 6)
-          pSvcParam.iInterLayerLoopFilterBetaOffset	= 6;
       } else if (strTag[0].compare ("MultipleThreadIdc") == 0) {
         // # 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
         pSvcParam.iMultipleThreadIdc	= atoi (strTag[1].c_str());

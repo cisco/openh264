@@ -232,10 +232,6 @@ typedef struct TagEncParamExt
   int		iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries
   int		iLoopFilterAlphaC0Offset;// AlphaOffset: valid range [-6, 6], default 0
   int		iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0
-  int		iInterLayerLoopFilterDisableIdc; // Employed based upon inter-layer, same comment as above
-  int		iInterLayerLoopFilterAlphaC0Offset;	// InterLayerLoopFilterAlphaC0Offset
-  int		iInterLayerLoopFilterBetaOffset;	// InterLayerLoopFilterBetaOffset
-
   /*pre-processing feature*/
   bool    bEnableDenoise;	    // denoise control
   bool    bEnableBackgroundDetection;// background detection control //VAA_BACKGROUND_DETECTION //BGD cmd
