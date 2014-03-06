@@ -97,13 +97,13 @@ int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx) {
     }
 
     ++iCountNumMb;
-    ++pCurLayer->pDec->iTotalNumMbRec;
+    ++pCtx->iTotalNumMbRec;
     if (iCountNumMb >= iTotalNumMb) {
       break;
     }
-    if (pCurLayer->pDec->iTotalNumMbRec > iTotalMbTargetLayer) {
-      WelsLog (pCtx, WELS_LOG_WARNING, "WelsTargetSliceConstruction():::fdec->iTotalNumMbRec:%d, iTotalMbTargetLayer:%d\n",
-               pCurLayer->pDec->iTotalNumMbRec, iTotalMbTargetLayer);
+    if (pCtx->iTotalNumMbRec > iTotalMbTargetLayer) {
+      WelsLog (pCtx, WELS_LOG_WARNING, "WelsTargetSliceConstruction():::pCtx->iTotalNumMbRec:%d, iTotalMbTargetLayer:%d\n",
+               pCtx->iTotalNumMbRec, iTotalMbTargetLayer);
 
       return -1;
     }

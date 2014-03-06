@@ -1,4 +1,5 @@
 ARCH = arm
+include build/platform-arch.mk
 SHAREDLIBSUFFIX = so
 GCCVERSION = 4.8
 NDKLEVEL = 12
@@ -12,8 +13,6 @@ ifeq ($(ARCH), arm)
     LDFLAGS += -march=armv7-a -Wl,--fix-cortex-a8
     APP_ABI = armeabi-v7a
   ifeq (Yes, $(USE_ASM))
-    ASM_ARCH = arm
-    CFLAGS += -DHAVE_NEON
     ASMFLAGS += -march=armv7-a -mfpu=neon
   endif
 else
@@ -21,9 +20,7 @@ else
     GCCPREFIX = i686-linux-android
     APP_ABI = x86
   ifeq (Yes, $(USE_ASM))
-    ASM_ARCH = x86
-    CFLAGS += -DX86_ASM
-    ASMFLAGS += -DNOPREFIX -f elf32 -DX86_32
+    ASMFLAGS += -DNOPREFIX -f elf32
   endif
 endif
 

@@ -39,6 +39,9 @@
 _$0:
 .endm
 
+.macro WELS_ASM_FUNC_END
+mov pc, lr
+.endm
 #else
 
 .macro WELS_ASM_FUNC_BEGIN funcName
@@ -46,11 +49,12 @@ _$0:
 .arm
 .global \funcName
 .type \funcName, %function
+.func \funcName
 \funcName:
 .endm
 
-#endif
-
 .macro WELS_ASM_FUNC_END
 mov pc, lr
+.endfunc
 .endm
+#endif

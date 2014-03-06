@@ -79,7 +79,7 @@ typedef   pthread_t    WELS_THREAD_HANDLE;
 typedef  void* (*LPWELS_THREAD_ROUTINE) (void*);
 
 typedef   pthread_mutex_t           WELS_MUTEX;
-typedef   sem_t                     WELS_EVENT;
+typedef   sem_t*                    WELS_EVENT;
 
 #define   WELS_THREAD_ROUTINE_TYPE         void *
 #define   WELS_THREAD_ROUTINE_RETURN(rc)   return (void*)(intptr_t)rc;
@@ -105,24 +105,14 @@ WELS_THREAD_ERROR_CODE    WelsMutexLock (WELS_MUTEX*    mutex);
 WELS_THREAD_ERROR_CODE    WelsMutexUnlock (WELS_MUTEX* mutex);
 WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex);
 
-#ifndef _WIN32
-WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT** p_event, const char* event_name);
+WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* p_event, const char* event_name);
 WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_name);
-#endif//!_WIN32
-WELS_THREAD_ERROR_CODE    WelsEventInit (WELS_EVENT* event);
-WELS_THREAD_ERROR_CODE    WelsEventDestroy (WELS_EVENT* event);
 WELS_THREAD_ERROR_CODE    WelsEventSignal (WELS_EVENT* event);
 WELS_THREAD_ERROR_CODE    WelsEventWait (WELS_EVENT* event);
 WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t dwMilliseconds);
-#ifdef _WIN32
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount, WELS_EVENT* event_list,
     uint32_t dwMilliseconds);
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WELS_EVENT* event_list);
-#else
-WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount, WELS_EVENT** event_list,
-    uint32_t dwMilliseconds);
-WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WELS_EVENT** event_list);
-#endif//_WIN32
 
 WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_THREAD_ROUTINE  routine,
     void* arg, WELS_THREAD_ATTR attr);

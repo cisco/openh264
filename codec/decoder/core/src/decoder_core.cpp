@@ -54,14 +54,14 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
 
   const int32_t kiTotalNumMbInCurLayer = pCurDq->iMbWidth * pCurDq->iMbHeight;
 
-  if (pPic->iTotalNumMbRec != kiTotalNumMbInCurLayer) {
+  if (pCtx->iTotalNumMbRec != kiTotalNumMbInCurLayer) {
     WelsLog (pCtx, WELS_LOG_WARNING,
              "DecodeFrameConstruction():::iTotalNumMbRec:%d, total_num_mb_sps:%d, cur_layer_mb_width:%d, cur_layer_mb_height:%d \n",
-             pPic->iTotalNumMbRec, kiTotalNumMbInCurLayer, pCurDq->iMbWidth, pCurDq->iMbHeight);
+             pCtx->iTotalNumMbRec, kiTotalNumMbInCurLayer, pCurDq->iMbWidth, pCurDq->iMbHeight);
     return -1;
   }
 #ifdef NO_WAITING_AU
-  pPic->iTotalNumMbRec = 0;
+  pCtx->iTotalNumMbRec = 0;
 #endif
 
   if (I_SLICE == pCurDq->sLayerInfo.sSliceInLayer.eSliceType) {
@@ -1738,16 +1738,16 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
 
 #ifdef NO_WAITING_AU
     //For fixing the nal lossing issue
-    if ((pCtx->pDec->iTotalNumMbRec != 0) &&
+    if ((pCtx->iTotalNumMbRec != 0) &&
         (CheckAccessUnitBoundaryExt (&pCtx->sLastNalHdrExt, &pNalCur->sNalHeaderExt, &pCtx->sLastSliceHeader,
                                      &pNalCur->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader))) {
-      pCtx->pDec->iTotalNumMbRec = 0;
+      pCtx->iTotalNumMbRec = 0;
     }
 #else
     //initialize at the starting of AU.
-    pCtx->pDec->iTotalNumMbRec = 0;
+    pCtx->iTotalNumMbRec = 0;
 #endif
-    if (pCtx->pDec->iTotalNumMbRec == 0) { //Picture start to decode
+    if (pCtx->iTotalNumMbRec == 0) { //Picture start to decode
       for (int32_t i = 0; i < LAYER_NUM_EXCHANGEABLE; ++ i)
         memset (pCtx->sMb.pSliceIdc[i], 0xff, (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int32_t)));
     }

@@ -121,7 +121,7 @@ class CWelsPreProcess {
 
  private:
   int32_t SingleLayerPreprocess (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrc, Scaled_Picture* m_sScaledPicture);
-  int32_t MultiLayerPreprocess (sWelsEncCtx* pEncCtx, const SSourcePicture** kppSrcPicList, const int32_t kiSpatialNum);
+  int32_t MultiLayerPreprocess (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrcPic);
 
   void	BilateralDenoising (SPicture* pSrc, const int32_t iWidth, const int32_t iHeight);
   bool  DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture);
