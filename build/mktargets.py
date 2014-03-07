@@ -104,6 +104,11 @@ except:
 
 (cpp, asm, cfiles, sfiles) = find_sources()
 
+cpp = sorted(cpp, key=lambda s: s.lower())
+asm = sorted(asm, key=lambda s: s.lower())
+cfiles = sorted(cfiles, key=lambda s: s.lower())
+sfiles = sorted(sfiles, key=lambda s: s.lower())
+
 
 
 f = open(OUTFILE, "w")
