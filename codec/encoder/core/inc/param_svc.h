@@ -125,6 +125,8 @@ char*       pCurPath; // record current lib path such as:/pData/pData/com.wels.e
 
 bool		bDeblockingParallelFlag;	// deblocking filter parallelization control flag
 
+short         iCountThreadsNum;                       //              # derived from disable_multiple_slice_idc (=0 or >1) means;
+
 int8_t		iDecompStages;		// GOP size dependency
 
 
@@ -153,7 +155,6 @@ static void FillDefault (SEncParamExt& param, const bool kbEnableRc) {
   param.iMultipleThreadIdc		=
     1;	// 1 # 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
 #endif//MT_ENABLED
-  param.iCountThreadsNum		= 1;	//		# derived from disable_multiple_slice_idc (=0 or >1) means;
 
   param.iLTRRefNum				= 0;
   param.iLtrMarkPeriod			= 30;	//the min distance of two int32_t references
@@ -210,6 +211,8 @@ void FillDefault (const bool kbEnableRc) {
   pCurPath			= NULL; // record current lib path such as:/pData/pData/com.wels.enc/lib/
 
   bDeblockingParallelFlag = false;	// deblocking filter parallelization control flag
+
+  iCountThreadsNum		= 1;	//		# derived from disable_multiple_slice_idc (=0 or >1) means;
 
   iDecompStages				= 0;	// GOP size dependency, unknown here and be revised later
 
