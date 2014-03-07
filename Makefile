@@ -129,15 +129,23 @@ $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSIN
 	$(QUIET)rm -f $@
 	$(QUIET_CXX)$(CXX) $(SHARED) $(LDFLAGS) $(CXX_LINK_O) $+ $(SHLDFLAGS)
 
-install: $(LIBPREFIX)wels.$(LIBSUFFIX) $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX)
-	mkdir -p $(PREFIX)/lib
+install-headers:
 	mkdir -p $(PREFIX)/include/wels
+	install -m 644 codec/api/svc/codec*.h $(PREFIX)/include/wels
+
+install-static: $(LIBPREFIX)wels.$(LIBSUFFIX) install-headers
+	mkdir -p $(PREFIX)/lib
 	install -m 644 $(LIBPREFIX)wels.$(LIBSUFFIX) $(PREFIX)/lib
+
+install-shared: $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX) install-headers
+	mkdir -p $(PREFIX)/lib
 	install -m 755 $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX) $(PREFIX)/lib
 ifneq ($(EXTRA_LIBRARY),)
 	install -m 644 $(EXTRA_LIBRARY) $(PREFIX)/lib
 endif
-	install -m 644 codec/api/svc/codec*.h $(PREFIX)/include/wels
+
+install: install-static install-shared
+	@:
 
 ifeq ($(HAVE_GTEST),Yes)
 include build/gtest-targets.mk
