@@ -911,19 +911,17 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     iRet = 1;
     goto INSIDE_MEM_FREE;
   }
-  for(int iLayer = 0;iLayer<MAX_DEPENDENCY_LAYER;iLayer++)
-  {
-	  if(fs.sRecFileName[iLayer][0]!=0)
-	  {
-		  SDumpLayer sDumpLayer;
-		  sDumpLayer.iLayer = iLayer;
-		  sDumpLayer.pFileName = fs.sRecFileName[iLayer];
-		  if(cmResultSuccess!=pPtrEnc->SetOption(ENCODER_OPTION_DUMP_FILE,&sDumpLayer)){
-			  fprintf (stderr, "SetOption ENCODER_OPTION_DUMP_FILE failed!\n");
-			  iRet = 1;
-			  goto INSIDE_MEM_FREE;
-		  }
-	  }
+  for(int iLayer = 0;iLayer<MAX_DEPENDENCY_LAYER;iLayer++){
+    if(fs.sRecFileName[iLayer][0]!=0){
+      SDumpLayer sDumpLayer;
+      sDumpLayer.iLayer = iLayer;
+      sDumpLayer.pFileName = fs.sRecFileName[iLayer];
+      if(cmResultSuccess!=pPtrEnc->SetOption(ENCODER_OPTION_DUMP_FILE,&sDumpLayer)){
+        fprintf (stderr, "SetOption ENCODER_OPTION_DUMP_FILE failed!\n");
+        iRet = 1;
+        goto INSIDE_MEM_FREE;
+      }
+    }
   }
   // Inactive with sink with output file handler
   if (fs.strBsFile.length() > 0) {
