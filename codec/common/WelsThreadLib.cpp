@@ -63,13 +63,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef MT_ENABLED
 
 #ifdef  _WIN32
 
-void WelsSleep (uint32_t dwMilliseconds) {
-  Sleep (dwMilliseconds);
-}
+#ifdef WINAPI_FAMILY
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#define InitializeCriticalSection(x) InitializeCriticalSectionEx(x, 0, 0)
+#endif
+#endif
 
 WELS_THREAD_ERROR_CODE    WelsMutexInit (WELS_MUTEX*    mutex) {
   InitializeCriticalSection (mutex);
@@ -93,6 +94,35 @@ WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex) {
   DeleteCriticalSection (mutex);
 
   return WELS_THREAD_ERROR_OK;
+}
+
+#else /* _WIN32 */
+
+WELS_THREAD_ERROR_CODE    WelsMutexInit (WELS_MUTEX*    mutex) {
+  return pthread_mutex_init (mutex, NULL);
+}
+
+WELS_THREAD_ERROR_CODE    WelsMutexLock (WELS_MUTEX*    mutex) {
+  return pthread_mutex_lock (mutex);
+}
+
+WELS_THREAD_ERROR_CODE    WelsMutexUnlock (WELS_MUTEX* mutex) {
+  return pthread_mutex_unlock (mutex);
+}
+
+WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex) {
+  return pthread_mutex_destroy (mutex);
+}
+
+#endif /* !_WIN32 */
+
+
+#ifdef MT_ENABLED
+
+#ifdef _WIN32
+
+void WelsSleep (uint32_t dwMilliseconds) {
+  Sleep (dwMilliseconds);
 }
 
 WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* event, const char* event_name) {
@@ -207,22 +237,6 @@ WELS_THREAD_ERROR_CODE    WelsThreadJoin (WELS_THREAD_HANDLE  thread) {
 
 WELS_THREAD_HANDLE        WelsThreadSelf() {
   return pthread_self();
-}
-
-WELS_THREAD_ERROR_CODE    WelsMutexInit (WELS_MUTEX*    mutex) {
-  return pthread_mutex_init (mutex, NULL);
-}
-
-WELS_THREAD_ERROR_CODE    WelsMutexLock (WELS_MUTEX*    mutex) {
-  return pthread_mutex_lock (mutex);
-}
-
-WELS_THREAD_ERROR_CODE    WelsMutexUnlock (WELS_MUTEX* mutex) {
-  return pthread_mutex_unlock (mutex);
-}
-
-WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex) {
-  return pthread_mutex_destroy (mutex);
 }
 
 // unnamed semaphores aren't supported on OS X
