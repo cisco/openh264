@@ -675,7 +675,7 @@ void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
     pCtx->pGetIChromaPredFunc[C_PRED_H]       = WelsDecoderIChromaPredH_neon;
     pCtx->pGetIChromaPredFunc[C_PRED_V]       = WelsDecoderIChromaPredV_neon;
     pCtx->pGetIChromaPredFunc[C_PRED_P ]      = WelsDecoderIChromaPredPlane_neon;
-    pCtx->pGetIChromaPredFunc[C_PRED_DC]      = WelsDecoderIChromaPredDC_neon;
+    pCtx->pGetIChromaPredFunc[C_PRED_DC]      = WelsDecoderIChromaPredDc_neon;
   }
 #endif//HAVE_NEON
 

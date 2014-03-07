@@ -1,6 +1,6 @@
 /*!
  * \copy
- *     Copyright (c)  2011-2013, Cisco Systems
+ *     Copyright (c)  2013, Cisco Systems
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -28,44 +28,41 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	        :  SceneChangeDetectionCommon.h
- *
- * \brief	    :  scene change detection class of wels video processor class
- *
- * \date         :  2011/03/14
- *
- * \description  :  1. rewrite the package code of scene change detection class
- *
  */
 
-#ifndef WELSVP_SCENECHANGEDETECTIONCOMMON_H
-#define WELSVP_SCENECHANGEDETECTIONCOMMON_H
-
-#include "util.h"
-#include "memory.h"
-#include "WelsFrameWork.h"
-#include "IWelsVP.h"
-
-WELSVP_NAMESPACE_BEGIN
-
-typedef  int32_t (SadFunc) (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY);
-
-typedef SadFunc*   SadFuncPtr;
-
-SadFunc      WelsSampleSad8x8_c;
-
-#ifdef X86_ASM
-WELSVP_EXTERN_C_BEGIN
-SadFunc      WelsSampleSad8x8_sse21;
-WELSVP_EXTERN_C_END
-#endif
-
 #ifdef HAVE_NEON
-WELSVP_EXTERN_C_BEGIN
-SadFunc      WelsSampleSad8x8_neon;
-WELSVP_EXTERN_C_END
-#endif
+.text
+#include "arm_arch_common_macro.S"
 
-WELSVP_NAMESPACE_END
+
+WELS_ASM_FUNC_BEGIN WelsSampleSad8x8_neon
+    stmdb sp!, {lr}
+	//Loading a horizontal line data (8 bytes)
+	vld1.8 {d0}, [r0], r1
+	vld1.8 {d1}, [r2], r3
+
+	//Do the SAD for 8 bytes
+	vabdl.u8  q1, d0, d1
+
+	mov lr, #7
+pixel_sad_8x8_loop0:
+
+    //Loading a horizontal line data (8 bytes)
+	vld1.8 {d0}, [r0], r1
+	vld1.8 {d1}, [r2], r3
+
+	subs lr, #1
+
+	//Do the SAD for 8 bytes
+	vabal.u8  q1, d0, d1
+	bne pixel_sad_8x8_loop0
+
+	vadd.u16   d2, d3
+	vpaddl.u16 d2, d2
+	vpaddl.u32 d2, d2
+	vmov.u32   r0, d2[0]//TBO...
+
+	ldmia sp!, {lr}
+WELS_ASM_FUNC_END
 
 #endif

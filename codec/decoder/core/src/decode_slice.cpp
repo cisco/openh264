@@ -270,46 +270,10 @@ int32_t WelsMbInterPrediction (PWelsDecoderContext pCtx, PDqLayer pCurLayer) {
   return 0;
 }
 
-void WelsMbCopy (uint8_t* pDst, int32_t iStrideDst, uint8_t* pSrc, int32_t iStrideSrc,
-                 int32_t iHeight, int32_t iWidth) {
-  int32_t i;
-  int32_t iOffsetDst = 0, iOffsetSrc = 0;
-  for (i = 0; i < iHeight; i++) {
-    memcpy (pDst + iOffsetDst, pSrc + iOffsetSrc, iWidth);
-    iOffsetDst += iStrideDst;
-    iOffsetSrc += iStrideSrc;
-  }
-}
-
-
 int32_t WelsTargetMbConstruction (PWelsDecoderContext pCtx) {
   PDqLayer pCurLayer = pCtx->pCurDqLayer;
   if (MB_TYPE_INTRA_PCM == pCurLayer->pMbType[pCurLayer->iMbXyIndex]) {
-    //copy cs into fdec
-    int32_t iCsStrideL = pCurLayer->iCsStride[0];
-    int32_t iCsStrideC = pCurLayer->iCsStride[1];
-
-    int32_t iDecStrideL = pCurLayer->pDec->iLinesize[0];
-    int32_t iDecStrideC = pCurLayer->pDec->iLinesize[1];
-
-    int32_t iCsOffsetL = (pCurLayer->iMbX + pCurLayer->iMbY * iCsStrideL) << 4;
-    int32_t iCsOffsetC = (pCurLayer->iMbX + pCurLayer->iMbY * iCsStrideC) << 3;
-
-    int32_t iDecOffsetL = (pCurLayer->iMbX + pCurLayer->iMbY * iDecStrideL) << 4;
-    int32_t iDecOffsetC = (pCurLayer->iMbX + pCurLayer->iMbY * iDecStrideC) << 3;
-
-    uint8_t* pSrcY = pCurLayer->pCsData[0] + iCsOffsetL;
-    uint8_t* pSrcU = pCurLayer->pCsData[1] + iCsOffsetC;
-    uint8_t* pSrcV = pCurLayer->pCsData[2] + iCsOffsetC;
-
-    uint8_t* pDecY = pCurLayer->pDec->pData[0] + iDecOffsetL;
-    uint8_t* pDecU = pCurLayer->pDec->pData[1] + iDecOffsetC;
-    uint8_t* pDecV = pCurLayer->pDec->pData[2] + iDecOffsetC;
-
-    WelsMbCopy (pDecY, iDecStrideL, pSrcY, iCsStrideL, 16, 16);
-    WelsMbCopy (pDecU, iDecStrideC, pSrcU, iCsStrideC, 8, 8);
-    WelsMbCopy (pDecV, iDecStrideC, pSrcV, iCsStrideC, 8, 8);
-
+    //already decoded and reconstructed when parsing
     return 0;
   } else if (IS_INTRA (pCurLayer->pMbType[pCurLayer->iMbXyIndex])) {
     WelsMbIntraPredictionConstruction (pCtx, pCurLayer, 1);
@@ -512,9 +476,9 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
     int32_t iOffsetL = (iMbX + iMbY * iDecStrideL) << 4;
     int32_t iOffsetC = (iMbX + iMbY * iDecStrideC) << 3;
 
-    uint8_t* pDecY = pCurLayer->pCsData[0] + iOffsetL;
-    uint8_t* pDecU = pCurLayer->pCsData[1] + iOffsetC;
-    uint8_t* pDecV = pCurLayer->pCsData[2] + iOffsetC;
+    uint8_t* pDecY = pCurLayer->pDec->pData[0] + iOffsetL;
+    uint8_t* pDecU = pCurLayer->pDec->pData[1] + iOffsetC;
+    uint8_t* pDecV = pCurLayer->pDec->pData[2] + iOffsetC;
 
     uint8_t* pTmpBsBuf;
 
@@ -821,9 +785,9 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
       int32_t iOffsetL = (iMbX + iMbY * iDecStrideL) << 4;
       int32_t iOffsetC = (iMbX + iMbY * iDecStrideC) << 3;
 
-      uint8_t* pDecY = pCurLayer->pCsData[0] + iOffsetL;
-      uint8_t* pDecU = pCurLayer->pCsData[1] + iOffsetC;
-      uint8_t* pDecV = pCurLayer->pCsData[2] + iOffsetC;
+      uint8_t* pDecY = pCurLayer->pDec->pData[0] + iOffsetL;
+      uint8_t* pDecU = pCurLayer->pDec->pData[1] + iOffsetC;
+      uint8_t* pDecV = pCurLayer->pDec->pData[2] + iOffsetC;
 
       uint8_t* pTmpBsBuf;
 

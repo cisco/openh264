@@ -75,6 +75,16 @@ void CDownsampling::InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc,  int
   }
 #endif//X86_ASM
 
+#if defined(HAVE_NEON)
+  if (iCpuFlag & WELS_CPU_NEON) {
+    sDownsampleFunc.pfHalfAverage[0] = DyadicBilinearDownsamplerWidthx32_neon;
+    sDownsampleFunc.pfHalfAverage[1] = DyadicBilinearDownsampler_neon;
+    sDownsampleFunc.pfHalfAverage[2] = DyadicBilinearDownsampler_neon;
+    sDownsampleFunc.pfHalfAverage[3] = DyadicBilinearDownsampler_neon;
+    sDownsampleFunc.pfGeneralRatioChroma = GeneralBilinearAccurateDownsamplerWrap_neon;
+    sDownsampleFunc.pfGeneralRatioLuma	 = GeneralBilinearAccurateDownsamplerWrap_neon;
+  }
+#endif
 }
 
 EResult CDownsampling::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDstPixMap) {

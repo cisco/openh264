@@ -61,8 +61,6 @@ typedef struct TagLayerInfo {
 struct TagDqLayer {
   SLayerInfo			sLayerInfo;
 
-  uint8_t*				pCsData[3];	// pointer to reconstructed picture data
-  int32_t				iCsStride[3];	// Cs stride
   PBitStringAux		pBitStringAux;	// pointer to SBitStringAux
   PFmo				pFmo;		// Current fmo context pointer used
   int8_t*  pMbType;

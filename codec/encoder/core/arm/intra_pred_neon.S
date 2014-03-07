@@ -31,8 +31,8 @@
  */
 
 #ifdef  HAVE_NEON
-//Global macro
 .text
+
 #include "arm_arch_common_macro.S"
 
 #ifdef APPLE_IOS
@@ -46,7 +46,7 @@
 	vld1.8 {$0[5]}, [$1], $2
 	vld1.8 {$0[6]}, [$1], $2
 	vld1.8 {$0[7]}, [$1], $2
-.endmacro
+.endm
 #else
 //Global macro
 .macro GET_8BYTE_DATA arg0, arg1, arg2
@@ -62,41 +62,44 @@
 #endif
 
 
-WELS_ASM_FUNC_BEGIN WelsDecoderI16x16LumaPredV_neon
+WELS_ASM_FUNC_BEGIN WelsI16x16LumaPredV_neon
 	//Get the top line data to 'q0'
-	sub  r2, r0, r1
-	vldm r2, {d0, d1}
+	sub  r3, r1, r2
+	vldm r3, {d0, d1}
 
-	mov  r2, r0
+	//mov  r2, #16
 	mov  r3, #4
 	//Set the top line to the each line of MB(16*16)
 loop_0_get_i16x16_luma_pred_v:
-	vst1.8 {d0,d1}, [r2], r1
-	vst1.8 {d0,d1}, [r2], r1
-	vst1.8 {d0,d1}, [r2], r1
-	vst1.8 {d0,d1}, [r2], r1
+	vst1.8 {d0,d1}, [r0]!
+	vst1.8 {d0,d1}, [r0]!
+	vst1.8 {d0,d1}, [r0]!
+	vst1.8 {d0,d1}, [r0]!
 	subs  r3, #1
 	bne  loop_0_get_i16x16_luma_pred_v
-
 WELS_ASM_FUNC_END
 
 
-
-WELS_ASM_FUNC_BEGIN WelsDecoderI16x16LumaPredH_neon
-	sub  r2, r0, #1
+WELS_ASM_FUNC_BEGIN WelsI16x16LumaPredH_neon
+    //stmdb sp!, {r4, lr}
+	sub  r1, r1, #1
 	mov  r3, #4
 loop_0_get_i16x16_luma_pred_h:
 	//Get one byte data from left side
-	vld1.8 {d0[],d1[]}, [r2], r1
-	vld1.8 {d2[],d3[]}, [r2], r1
-	vld1.8 {d4[],d5[]}, [r2], r1
-	vld1.8 {d6[],d7[]}, [r2], r1
+	vld1.8 {d0[],d1[]}, [r1], r2
+	vld1.8 {d2[],d3[]}, [r1], r2
+	vld1.8 {d4[],d5[]}, [r1], r2
+	vld1.8 {d6[],d7[]}, [r1], r2
 
 	//Set the line of MB using the left side byte data
-	vst1.8 {d0,d1}, [r0], r1
-	vst1.8 {d2,d3}, [r0], r1
-	vst1.8 {d4,d5}, [r0], r1
-	vst1.8 {d6,d7}, [r0], r1
+	vst1.8 {d0,d1}, [r0]!
+	//add r0, #16
+	vst1.8 {d2,d3}, [r0]!
+	//add r0, #16
+	vst1.8 {d4,d5}, [r0]!
+	//add r0, #16
+	vst1.8 {d6,d7}, [r0]!
+	//add r0, #16
 
 	subs  r3, #1
 	bne  loop_0_get_i16x16_luma_pred_h
@@ -104,16 +107,16 @@ loop_0_get_i16x16_luma_pred_h:
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN WelsDecoderI16x16LumaPredDc_neon
+WELS_ASM_FUNC_BEGIN WelsI16x16LumaPredDc_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Get the left vertical line data
-	sub r2, r0, #1
-	GET_8BYTE_DATA d0, r2, r1
-	GET_8BYTE_DATA d1, r2, r1
+	sub r3, r1, #1
+	GET_8BYTE_DATA d0, r3, r2
+	GET_8BYTE_DATA d1, r3, r2
 
 	//Get the top horizontal line data
-	sub  r2, r0, r1
-	vldm r2, {d2, d3}
+	sub  r3, r1, r2
+	vldm r3, {d2, d3}
 
 	//Calculate the sum of top horizontal line data and vertical line data
 	vpaddl.u8 q0, q0
@@ -128,17 +131,16 @@ WELS_ASM_FUNC_BEGIN WelsDecoderI16x16LumaPredDc_neon
 	vdup.8     q0, d0[0]
 
 	//Set the mean value to the all of member of MB
-	mov  r2, #4
+	mov  r3, #4
 loop_0_get_i16x16_luma_pred_dc_both:
-	vst1.8 {d0,d1}, [r0], r1
-	vst1.8 {d0,d1}, [r0], r1
-	vst1.8 {d0,d1}, [r0], r1
-	vst1.8 {d0,d1}, [r0], r1
-	subs  r2, #1
+	vst1.8 {d0,d1}, [r0]!
+	vst1.8 {d0,d1}, [r0]!
+	vst1.8 {d0,d1}, [r0]!
+	vst1.8 {d0,d1}, [r0]!
+	subs  r3, #1
 	bne  loop_0_get_i16x16_luma_pred_dc_both
 
 WELS_ASM_FUNC_END
-
 
 
 //The table for SIMD instruction {(8,7,6,5,4,3,2,1) * 5}
@@ -148,32 +150,32 @@ CONST0_GET_I16X16_LUMA_PRED_PLANE: .long 0x191e2328, 0x050a0f14
 CONST1_GET_I16X16_LUMA_PRED_PLANE: .long 0xfcfbfaf9, 0x00fffefd
 
 
-WELS_ASM_FUNC_BEGIN WelsDecoderI16x16LumaPredPlane_neon
-	//stmdb sp!, { r2-r5, lr}
+WELS_ASM_FUNC_BEGIN WelsI16x16LumaPredPlane_neon
+	//stmdb sp!, { r4, lr}
 
 	//Load the table {(8,7,6,5,4,3,2,1) * 5}
-	adr r2, CONST0_GET_I16X16_LUMA_PRED_PLANE
-	vldr    d0, [r2]
+	adr r3, CONST0_GET_I16X16_LUMA_PRED_PLANE
+	vldr    d0, [r3]
 
 	//Pack the top[-1] ~ top[6] to d1
-	sub       r2,  r0, r1
-	sub       r3,  r2, #1
-	vld1.8    d1, [r3]
+	sub       r3,  r1, r2
+	sub       r1,  r3, #1
+	vld1.8    d1, [r1]
 
 	//Pack the top[8] ~ top[15] to d2
-	add       r3, #9
-	vld1.8    d2, [r3]
+	add       r1, #9
+	vld1.8    d2, [r1]
 
 	//Save the top[15] to d6 for next step
 	vdup.u8   d6,   d2[7]
 
 	//Get and pack left[-1] ~ left[6] to d4
-	sub       r3,  r2, #1
-	GET_8BYTE_DATA d4, r3, r1
+	sub       r1,  r3, #1
+	GET_8BYTE_DATA d4, r1, r2
 
 	//Get and pack left[8] ~ left[15] to d3
-	add       r3,  r1
-	GET_8BYTE_DATA d3, r3, r1
+	add       r1,  r2
+	GET_8BYTE_DATA d3, r1, r2
 
 	//Save the left[15] to d7 for next step
 	vdup.u8   d7,   d3[7]
@@ -201,8 +203,8 @@ WELS_ASM_FUNC_BEGIN WelsDecoderI16x16LumaPredPlane_neon
 	vdup.s16   q2, d1[0]
 
 	//Load the table {-7,-6,-5,-4,-3,-2,-1,0} to d0
-	adr r2, CONST1_GET_I16X16_LUMA_PRED_PLANE
-	vld1.32   {d0}, [r2]
+	adr r3, CONST1_GET_I16X16_LUMA_PRED_PLANE
+	vld1.32   {d0}, [r3]
 
 	//Get the value of 'a' and save to q3
 	vaddl.u8  q3, d6, d7
@@ -222,61 +224,61 @@ WELS_ASM_FUNC_BEGIN WelsDecoderI16x16LumaPredPlane_neon
 	vqrshrun.s16 d1, q5, #5
 
 	//Set the line of MB
-	vst1.u32  {d0,d1}, [r0], r1
+	vst1.u32  {d0,d1}, [r0]!
 
 
 	//Do the same processing for setting other lines
-	mov  r2, #15
+	mov  r3, #15
 loop_0_get_i16x16_luma_pred_plane:
 	vadd.s16  q3, q2
 	vadd.s16  q5, q2
 	vqrshrun.s16 d0, q3, #5
 	vqrshrun.s16 d1, q5, #5
-	vst1.u32  {d0,d1}, [r0], r1
-	subs  r2, #1
+	vst1.u32  {d0,d1}, [r0]!
+	subs  r3, #1
 	bne  loop_0_get_i16x16_luma_pred_plane
 
 WELS_ASM_FUNC_END
 
-WELS_ASM_FUNC_BEGIN WelsDecoderI4x4LumaPredV_neon
+
+WELS_ASM_FUNC_BEGIN WelsI4x4LumaPredV_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Load the top row (4 bytes)
-	sub  r2, r0, r1
-	ldr  r2, [r2]
+	sub  r3, r1, r2
+	ldr  r3, [r3]
 
 	//Set the luma MB using top line
-	str  r2, [r0], r1
-	str  r2, [r0], r1
-	str  r2, [r0], r1
-	str  r2, [r0]
+	str  r3, [r0], #4
+	str  r3, [r0], #4
+	str  r3, [r0], #4
+	str  r3, [r0]
 
 WELS_ASM_FUNC_END
 
 
-
-WELS_ASM_FUNC_BEGIN WelsDecoderI4x4LumaPredH_neon
+WELS_ASM_FUNC_BEGIN WelsI4x4LumaPredH_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Load the left column (4 bytes)
-	sub  r2, r0, #1
-	vld1.8 {d0[]}, [r2], r1
-	vld1.8 {d1[]}, [r2], r1
-	vld1.8 {d2[]}, [r2], r1
-	vld1.8 {d3[]}, [r2]
+	sub  r3, r1, #1
+	vld1.8 {d0[]}, [r3], r2
+	vld1.8 {d1[]}, [r3], r2
+	vld1.8 {d2[]}, [r3], r2
+	vld1.8 {d3[]}, [r3]
 
 	//Set the luma MB using the left side byte
-	vst1.32 {d0[0]}, [r0], r1
-	vst1.32 {d1[0]}, [r0], r1
-	vst1.32 {d2[0]}, [r0], r1
+	vst1.32 {d0[0]}, [r0]!
+	vst1.32 {d1[0]}, [r0]!
+	vst1.32 {d2[0]}, [r0]!
 	vst1.32 {d3[0]}, [r0]
 
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN WelsDecoderI4x4LumaPredDDL_neon
+WELS_ASM_FUNC_BEGIN WelsI4x4LumaPredDDL_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Load the top row data(8 bytes)
-	sub    r2,  r0, r1
-	vld1.32  {d0}, [r2]
+	sub    r3,  r1, r2
+	vld1.32  {d0}, [r3]
 
 	//For "t7 + (t7<<1)"
 	vdup.8   d1,  d0[7]
@@ -294,15 +296,15 @@ WELS_ASM_FUNC_BEGIN WelsDecoderI4x4LumaPredDDL_neon
 
 	//Save "ddl0, ddl1, ddl2, ddl3"
 	vext.8   d1, d0, d0, #1
-	vst1.32  d1[0], [r0], r1
+	vst1.32  d1[0], [r0]!
 
 	//Save "ddl1, ddl2, ddl3, ddl4"
 	vext.8   d1, d0, d0, #2
-	vst1.32  d1[0], [r0], r1
+	vst1.32  d1[0], [r0]!
 
 	//Save "ddl2, ddl3, ddl4, ddl5"
 	vext.8   d1, d0, d0, #3
-	vst1.32  d1[0], [r0], r1
+	vst1.32  d1[0], [r0]!
 
 	//Save "ddl3, ddl4, ddl5, ddl6"
 	vst1.32  d0[1], [r0]
@@ -310,19 +312,19 @@ WELS_ASM_FUNC_BEGIN WelsDecoderI4x4LumaPredDDL_neon
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN WelsDecoderI4x4LumaPredDDR_neon
+WELS_ASM_FUNC_BEGIN WelsI4x4LumaPredDDR_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Load the top row (4 bytes)
-	sub    r2,  r0, r1
-	vld1.32  {d0[1]}, [r2]
+	sub    r3,  r1, r2
+	vld1.32  {d0[1]}, [r3]
 
 	//Load the left column (5 bytes)
-	sub    r2,  #1
-	vld1.8 {d0[3]}, [r2], r1
-	vld1.8 {d0[2]}, [r2], r1
-	vld1.8 {d0[1]}, [r2], r1
-	vld1.8 {d0[0]}, [r2], r1
-	vld1.8 {d1[7]}, [r2] //For packing the right sequence to do SIMD processing
+	sub    r3,  #1
+	vld1.8 {d0[3]}, [r3], r2
+	vld1.8 {d0[2]}, [r3], r2
+	vld1.8 {d0[1]}, [r3], r2
+	vld1.8 {d0[0]}, [r3], r2
+	vld1.8 {d1[7]}, [r3] //For packing the right sequence to do SIMD processing
 
 
 	vext.8   d2, d1, d0, #7   //d0:{L2,L1,L0,LT,T0,T1,T2,T3}
@@ -339,23 +341,22 @@ WELS_ASM_FUNC_BEGIN WelsDecoderI4x4LumaPredDDR_neon
 	vqrshrn.u16 d0, q1, #2
 
 	//Adjust the data sequence for setting luma MB of 'pred'
-	vst1.32   d0[1], [r0], r1
+	vst1.32   d0[1], [r0]!
 	vext.8    d0, d0, d0, #7
-	vst1.32   d0[1], [r0], r1
+	vst1.32   d0[1], [r0]!
 	vext.8    d0, d0, d0, #7
-	vst1.32   d0[1], [r0], r1
+	vst1.32   d0[1], [r0]!
 	vext.8    d0, d0, d0, #7
 	vst1.32   d0[1], [r0]
 
 WELS_ASM_FUNC_END
 
 
-
-WELS_ASM_FUNC_BEGIN WelsDecoderI4x4LumaPredVL_neon
+WELS_ASM_FUNC_BEGIN WelsI4x4LumaPredVL_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Load the top row (8 bytes)
-	sub    r2,  r0, r1
-	vld1.32  {d0}, [r2]
+	sub    r3,  r1, r2
+	vld1.32  {d0}, [r3]
 
 
 	vext.8   d1,  d0, d0, #1
@@ -371,29 +372,28 @@ WELS_ASM_FUNC_BEGIN WelsDecoderI4x4LumaPredVL_neon
 	vqrshrn.u16  d1,  q2, #2
 
 	//Adjust the data sequence for setting the luma MB
-	vst1.32  d0[0], [r0], r1
-	vst1.32  d1[0], [r0], r1
+	vst1.32  d0[0], [r0]!
+	vst1.32  d1[0], [r0]!
 	vext.8   d0,  d0, d0, #1
 	vext.8   d1,  d1, d1, #1
-	vst1.32  d0[0], [r0], r1
+	vst1.32  d0[0], [r0]!
 	vst1.32  d1[0], [r0]
 
 WELS_ASM_FUNC_END
 
 
-
-WELS_ASM_FUNC_BEGIN WelsDecoderI4x4LumaPredVR_neon
+WELS_ASM_FUNC_BEGIN WelsI4x4LumaPredVR_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Load the top row (4 bytes)
-	sub       r2,  r0, r1
-	vld1.32   {d0[1]}, [r2]
+	sub       r3,  r1, r2
+	vld1.32   {d0[1]}, [r3]
 
 	//Load the left column (4 bytes)
-	sub       r2,  #1
-	vld1.8    {d0[3]}, [r2], r1
-	vld1.8    {d0[2]}, [r2], r1
-	vld1.8    {d0[1]}, [r2], r1
-	vld1.8    {d0[0]}, [r2]
+	sub       r3,  #1
+	vld1.8    {d0[3]}, [r3], r2
+	vld1.8    {d0[2]}, [r3], r2
+	vld1.8    {d0[1]}, [r3], r2
+	vld1.8    {d0[0]}, [r3]
 
 
 	vext.8    d1, d0, d0, #7
@@ -407,30 +407,29 @@ WELS_ASM_FUNC_BEGIN WelsDecoderI4x4LumaPredVR_neon
 	vqrshrn.u16 d0, q1, #1
 
 	//Adjust the data sequence for setting the luma MB
-	vst1.32  d0[1], [r0], r1
-	vst1.32  d1[1], [r0], r1
-	add    r2, r0, r1
+	vst1.32  d0[1], [r0]!
+	vst1.32  d1[1], [r0]!
+	//add    r2, r0, r1
 	vst1.8   d1[3], [r0]!
 	vst1.16  d0[2], [r0]!
 	vst1.8   d0[6], [r0]!
-	vst1.8   d1[2], [r2]!
-	vst1.16  d1[2], [r2]!
-	vst1.8   d1[6], [r2]
+	vst1.8   d1[2], [r0]!
+	vst1.16  d1[2], [r0]!
+	vst1.8   d1[6], [r0]
 WELS_ASM_FUNC_END
 
 
-
-WELS_ASM_FUNC_BEGIN WelsDecoderI4x4LumaPredHU_neon
-	//stmdb sp!, { r2-r5, lr}
+WELS_ASM_FUNC_BEGIN WelsI4x4LumaPredHU_neon
+	//stmdb sp!, { r4, lr}
 	//Load the left column data
-	sub       r2,  r0, #1
-	mov       r3,  #3
-	mul       r3,  r1
-	add       r3,  r2
-	vld1.8    {d0[]},  [r3]
-	vld1.8    {d0[4]}, [r2], r1
-	vld1.8    {d0[5]}, [r2], r1
-	vld1.8    {d0[6]}, [r2], r1 //d0:{L3,L3,L3,L3,L0,L1,L2,L3}
+	sub       r3,  r1, #1
+	mov       r1,  #3
+	mul       r1,  r2
+	add       r1,  r3
+	vld1.8    {d0[]},  [r1]
+	vld1.8    {d0[4]}, [r3], r2
+	vld1.8    {d0[5]}, [r3], r2
+	vld1.8    {d0[6]}, [r3], r2 //d0:{L3,L3,L3,L3,L0,L1,L2,L3}
 
 	vext.8    d1, d0, d0, #1
 	vaddl.u8  q2, d0, d1        //q2:{L3+L3,L3+L3,L3+L3,L3+L0,L0+L1,L1+L2,L2+L3,L3+L3}
@@ -444,25 +443,25 @@ WELS_ASM_FUNC_BEGIN WelsDecoderI4x4LumaPredHU_neon
 
 	//Adjust the data sequence for setting the luma MB
 	vzip.8   d2, d1
-	vst1.32  d1[0], [r0], r1
+	vst1.32  d1[0], [r0]!
 	vext.8   d2, d1, d1, #2
-	vst1.32  d2[0], [r0], r1
-	vst1.32  d1[1], [r0], r1
+	vst1.32  d2[0], [r0]!
+	vst1.32  d1[1], [r0]!
 	vst1.32  d0[0], [r0]
 
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN WelsDecoderI4x4LumaPredHD_neon
+WELS_ASM_FUNC_BEGIN WelsI4x4LumaPredHD_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Load the data
-	sub       r2,  r0, r1
-	sub       r2,  #1
-	vld1.32   {d0[1]}, [r2], r1
-	vld1.8    {d0[3]}, [r2], r1
-	vld1.8    {d0[2]}, [r2], r1
-	vld1.8    {d0[1]}, [r2], r1
-	vld1.8    {d0[0]}, [r2]	    //d0:{L3,L2,L1,L0,LT,T0,T1,T2}
+	sub       r3,  r1, r2
+	sub       r3,  #1
+	vld1.32   {d0[1]}, [r3], r2
+	vld1.8    {d0[3]}, [r3], r2
+	vld1.8    {d0[2]}, [r3], r2
+	vld1.8    {d0[1]}, [r3], r2
+	vld1.8    {d0[0]}, [r3]	    //d0:{L3,L2,L1,L0,LT,T0,T1,T2}
 
 
 	vext.8    d1, d0, d0, #7
@@ -479,69 +478,69 @@ WELS_ASM_FUNC_BEGIN WelsDecoderI4x4LumaPredHD_neon
 	vmov      d3, d1
 	vtrn.8    d0, d1
 	vext.u8   d2, d1, d1, #6
-	vst2.16  {d2[3], d3[3]}, [r0], r1
-	vst2.16  {d0[2], d1[2]}, [r0], r1
+	vst2.16  {d2[3], d3[3]}, [r0]!
+	vst2.16  {d0[2], d1[2]}, [r0]!
 	vmov     d3, d0
-	vst2.16  {d2[2], d3[2]}, [r0], r1
+	vst2.16  {d2[2], d3[2]}, [r0]!
 	vst2.16  {d0[1], d1[1]}, [r0]
 
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN WelsDecoderIChromaPredV_neon
+WELS_ASM_FUNC_BEGIN WelsIChromaPredV_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Get the top row (8 byte)
-	sub  r2, r0, r1
-	vldr d0, [r2]
+	sub  r3, r1, r2
+	vldr d0, [r3]
 
 	//Set the chroma MB using top row data
-	vst1.8 {d0}, [r0], r1
-	vst1.8 {d0}, [r0], r1
-	vst1.8 {d0}, [r0], r1
-	vst1.8 {d0}, [r0], r1
-	vst1.8 {d0}, [r0], r1
-	vst1.8 {d0}, [r0], r1
-	vst1.8 {d0}, [r0], r1
+	vst1.8 {d0}, [r0]!
+	vst1.8 {d0}, [r0]!
+	vst1.8 {d0}, [r0]!
+	vst1.8 {d0}, [r0]!
+	vst1.8 {d0}, [r0]!
+	vst1.8 {d0}, [r0]!
+	vst1.8 {d0}, [r0]!
 	vst1.8 {d0}, [r0]
 
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN WelsDecoderIChromaPredH_neon
+WELS_ASM_FUNC_BEGIN WelsIChromaPredH_neon
 	//stmdb sp!, { r2-r5, lr}
 	////Get the left column (8 byte)
-	sub  r2, r0, #1
-	vld1.8 {d0[]}, [r2], r1
-	vld1.8 {d1[]}, [r2], r1
-	vld1.8 {d2[]}, [r2], r1
-	vld1.8 {d3[]}, [r2], r1
-	vld1.8 {d4[]}, [r2], r1
-	vld1.8 {d5[]}, [r2], r1
-	vld1.8 {d6[]}, [r2], r1
-	vld1.8 {d7[]}, [r2]
+	sub  r3, r1, #1
+	vld1.8 {d0[]}, [r3], r2
+	vld1.8 {d1[]}, [r3], r2
+	vld1.8 {d2[]}, [r3], r2
+	vld1.8 {d3[]}, [r3], r2
+	vld1.8 {d4[]}, [r3], r2
+	vld1.8 {d5[]}, [r3], r2
+	vld1.8 {d6[]}, [r3], r2
+	vld1.8 {d7[]}, [r3]
 
 	//Set the chroma MB using left column data
-	vst1.8 {d0}, [r0], r1
-	vst1.8 {d1}, [r0], r1
-	vst1.8 {d2}, [r0], r1
-	vst1.8 {d3}, [r0], r1
-	vst1.8 {d4}, [r0], r1
-	vst1.8 {d5}, [r0], r1
-	vst1.8 {d6}, [r0], r1
+	vst1.8 {d0}, [r0]!
+	vst1.8 {d1}, [r0]!
+	vst1.8 {d2}, [r0]!
+	vst1.8 {d3}, [r0]!
+	vst1.8 {d4}, [r0]!
+	vst1.8 {d5}, [r0]!
+	vst1.8 {d6}, [r0]!
 	vst1.8 {d7}, [r0]
 
 WELS_ASM_FUNC_END
 
 
-WELS_ASM_FUNC_BEGIN WelsDecoderIChromaPredDc_neon
+WELS_ASM_FUNC_BEGIN WelsIChromaPredDc_neon
     //stmdb sp!, { r2-r5, lr}
     //Load the left column data (8 bytes)
-    sub r2, r0, #1
-    GET_8BYTE_DATA d0, r2, r1
+    sub r3, r1, #1
+    GET_8BYTE_DATA d0, r3, r2
 
     //Load the top row data (8 bytes)
-    sub  r2, r0, r1
-    vldr d1, [r2]
+    sub  r3, r1, r2
+    vldr d1, [r3]
 
     //Calculate the sum of left column and top row
     vpaddl.u8  q0, q0
@@ -558,13 +557,13 @@ WELS_ASM_FUNC_BEGIN WelsDecoderIChromaPredDc_neon
     vdup.8     d7, d2[4]
 
     //Set the chroma MB
-    vst2.32 {d4[0],d5[0]}, [r0], r1
-    vst2.32 {d4[0],d5[0]}, [r0], r1
-    vst2.32 {d4[0],d5[0]}, [r0], r1
-    vst2.32 {d4[0],d5[0]}, [r0], r1
-    vst2.32 {d6[0],d7[0]}, [r0], r1
-    vst2.32 {d6[0],d7[0]}, [r0], r1
-    vst2.32 {d6[0],d7[0]}, [r0], r1
+    vst2.32 {d4[0],d5[0]}, [r0]!
+    vst2.32 {d4[0],d5[0]}, [r0]!
+    vst2.32 {d4[0],d5[0]}, [r0]!
+    vst2.32 {d4[0],d5[0]}, [r0]!
+    vst2.32 {d6[0],d7[0]}, [r0]!
+    vst2.32 {d6[0],d7[0]}, [r0]!
+    vst2.32 {d6[0],d7[0]}, [r0]!
     vst2.32 {d6[0],d7[0]}, [r0]
 
 WELS_ASM_FUNC_END
@@ -575,26 +574,26 @@ CONST0_GET_I_CHROMA_PRED_PLANE: .long 0x44332211, 0x44332211//0x140f0a05, 0x2823
 //Table {-3,-2,-1,0,1,2,3,4}
 CONST1_GET_I_CHROMA_PRED_PLANE: .long 0xfffefffd, 0x0000ffff,0x00020001,0x00040003
 
-WELS_ASM_FUNC_BEGIN WelsDecoderIChromaPredPlane_neon
+WELS_ASM_FUNC_BEGIN WelsIChromaPredPlane_neon
 	//stmdb sp!, { r2-r5, lr}
 	//Load the top row data
-	sub  r2, r0, #1
-	sub  r2, r1
-	vld1.32 {d1[0]}, [r2]
-	add  r2, #5
-	vld1.32 {d0[0]}, [r2]
+	sub  r3, r1, #1
+	sub  r3, r2
+	vld1.32 {d1[0]}, [r3]
+	add  r3, #5
+	vld1.32 {d0[0]}, [r3]
 
 	//Load the left column data
-	sub  r2, #5
-	vld1.8 {d1[4]}, [r2], r1
-	vld1.8 {d1[5]}, [r2], r1
-	vld1.8 {d1[6]}, [r2], r1
-	vld1.8 {d1[7]}, [r2], r1 //d1:{LT,T0,T1,T2,LT,L0,L1,L2}
-	add  r2, r1
-	vld1.8 {d0[4]}, [r2], r1
-	vld1.8 {d0[5]}, [r2], r1
-	vld1.8 {d0[6]}, [r2], r1
-	vld1.8 {d0[7]}, [r2]     //d0:{T4,T5,T6,T7,L4,L5,L6.L7}
+	sub  r3, #5
+	vld1.8 {d1[4]}, [r3], r2
+	vld1.8 {d1[5]}, [r3], r2
+	vld1.8 {d1[6]}, [r3], r2
+	vld1.8 {d1[7]}, [r3], r2 //d1:{LT,T0,T1,T2,LT,L0,L1,L2}
+	add  r3, r2
+	vld1.8 {d0[4]}, [r3], r2
+	vld1.8 {d0[5]}, [r3], r2
+	vld1.8 {d0[6]}, [r3], r2
+	vld1.8 {d0[7]}, [r3]     //d0:{T4,T5,T6,T7,L4,L5,L6.L7}
 
 
 	//Save T7 to d3 for next step
@@ -607,8 +606,8 @@ WELS_ASM_FUNC_BEGIN WelsDecoderIChromaPredPlane_neon
 	vshl.u16  q2, #4
 
 	//Load the table {{1,2,3,4,1,2,3,4}*17}
-	adr r2, CONST0_GET_I_CHROMA_PRED_PLANE
-	vld1.32   {d2}, [r2]
+	adr r3, CONST0_GET_I_CHROMA_PRED_PLANE
+	vld1.32   {d2}, [r3]
 
 	//Calculate the 'b','c', and save to q0
 	vrev32.8  d1, d1
@@ -620,8 +619,8 @@ WELS_ASM_FUNC_BEGIN WelsDecoderIChromaPredPlane_neon
 	vrshr.s64  q0, #5
 
 	//Load the table {-3,-2,-1,0,1,2,3,4} to q3
-	adr r2, CONST1_GET_I_CHROMA_PRED_PLANE
-	vld1.32   {d6, d7}, [r2]
+	adr r3, CONST1_GET_I_CHROMA_PRED_PLANE
+	vld1.32   {d6, d7}, [r3]
 
 	//Duplicate the 'b','c' to q0, q1 for SIMD instruction
 	vdup.s16   q1, d1[0]
@@ -633,15 +632,15 @@ WELS_ASM_FUNC_BEGIN WelsDecoderIChromaPredPlane_neon
 	vqrshrun.s16 d0, q2, #5
 
 	//Set a line of chroma MB
-	vst1.u32  {d0}, [r0], r1
+	vst1.u32  {d0}, [r0]!
 
 	//Do the same processing for each line.
-	mov  r2, #7
+	mov  r3, #7
 loop_0_get_i_chroma_pred_plane:
 	vadd.s16   q2, q1
 	vqrshrun.s16 d0, q2, #5
-	vst1.u32  {d0}, [r0], r1
-	subs  r2, #1
+	vst1.u32  {d0}, [r0]!
+	subs  r3, #1
 	bne  loop_0_get_i_chroma_pred_plane
 
 WELS_ASM_FUNC_END

@@ -171,6 +171,14 @@ int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* 
   }
 #endif//X86_ASM
 
+#if defined(HAVE_NEON)
+  if (uiCpuFlag & WELS_CPU_NEON) {
+    pFuncList->pfSetMemZeroSize8	= WelsSetMemZero_neon;
+    pFuncList->pfSetMemZeroSize64Aligned16	= WelsSetMemZero_neon;
+    pFuncList->pfSetMemZeroSize64	= WelsSetMemZero_neon;
+  }
+#endif
+
   InitExpandPictureFunc (pFuncList, uiCpuFlag);
 
   /* Intra_Prediction_fn*/

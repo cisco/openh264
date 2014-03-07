@@ -1,6 +1,6 @@
 /*!
  * \copy
- *     Copyright (c)  2011-2013, Cisco Systems
+ *     Copyright (c)  2013, Cisco Systems
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -28,44 +28,36 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	        :  SceneChangeDetectionCommon.h
- *
- * \brief	    :  scene change detection class of wels video processor class
- *
- * \date         :  2011/03/14
- *
- * \description  :  1. rewrite the package code of scene change detection class
- *
  */
 
-#ifndef WELSVP_SCENECHANGEDETECTIONCOMMON_H
-#define WELSVP_SCENECHANGEDETECTIONCOMMON_H
+#ifdef  HAVE_NEON
+.text
+#include "arm_arch_common_macro.S"
 
-#include "util.h"
-#include "memory.h"
-#include "WelsFrameWork.h"
-#include "IWelsVP.h"
 
-WELSVP_NAMESPACE_BEGIN
+WELS_ASM_FUNC_BEGIN WelsSetMemZero_neon
+    veor q0, q0
+    cmp r1, #32
+    beq mem_zero_32_neon_start
+    blt mem_zero_24_neon_start
 
-typedef  int32_t (SadFunc) (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY);
+mem_zero_loop:
+    subs r1, r1, #64
+    vst1.64 {q0}, [r0]!
+    vst1.64 {q0}, [r0]!
+    vst1.64 {q0}, [r0]!
+    vst1.64 {q0}, [r0]!
+    bne mem_zero_loop
+WELS_ASM_FUNC_END
 
-typedef SadFunc*   SadFuncPtr;
+mem_zero_32_neon_start:
+    vst1.64 {q0}, [r0]!
+    vst1.64 {q0}, [r0]!
+WELS_ASM_FUNC_END
 
-SadFunc      WelsSampleSad8x8_c;
-
-#ifdef X86_ASM
-WELSVP_EXTERN_C_BEGIN
-SadFunc      WelsSampleSad8x8_sse21;
-WELSVP_EXTERN_C_END
-#endif
-
-#ifdef HAVE_NEON
-WELSVP_EXTERN_C_BEGIN
-SadFunc      WelsSampleSad8x8_neon;
-WELSVP_EXTERN_C_END
-#endif
-
-WELSVP_NAMESPACE_END
+mem_zero_24_neon_start:
+    vst1.64 {q0}, [r0]!
+    vst1.64 {d0}, [r0]!
+WELS_ASM_FUNC_END
 
 #endif

@@ -61,6 +61,16 @@ uint8_t     uiFilterIdc;
 uint8_t     uiReserved;
 } SDeblockingFilter;
 
+#if defined(__cplusplus)
+extern "C" {
+#endif//__cplusplus
+#if defined(HAVE_NEON)
+void WelsNonZeroCount_neon(int8_t * pNonZeroCount);
+void DeblockingBSCalcEnc_neon(int8_t *pNzc, SMVUnitXY *pMv, int32_t iBoundryFlag, int32_t iMbStride, uint8_t (*pBS)[4][4]);
+#endif
+#if defined(__cplusplus)
+}
+#endif//__cplusplus
 void DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu);
 
 void WelsNonZeroCount_c (int8_t* pNonZeroCount);
