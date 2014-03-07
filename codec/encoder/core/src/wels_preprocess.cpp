@@ -204,7 +204,6 @@ CWelsPreProcess::CWelsPreProcess (sWelsEncCtx* pEncCtx) {
   m_pInterfaceVp = NULL;
   m_pEncLib = NULL;
   m_bInitDone = false;
-  m_bOfficialBranch  = false;
   m_pEncCtx = pEncCtx;
   memset (&m_sScaledPicture, 0, sizeof (m_sScaledPicture));
   memset (m_pSpatialPic, 0, sizeof(m_pSpatialPic));
@@ -316,13 +315,6 @@ int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePi
     if (WelsPreprocessReset (pCtx) != 0)
       return -1;
 
-    m_bOfficialBranch  = (iNumDependencyLayer != 1);
-    if ( iNumDependencyLayer == 1 ) {
-      if (pSvcParam->sDependencyLayers[0].iFrameWidth != kpSrcPic->iPicWidth ||
-          pSvcParam->sDependencyLayers[0].iFrameHeight != kpSrcPic->iPicHeight) {
-        m_bOfficialBranch = true;
-      }
-    }
     m_bInitDone = true;
   }
 
@@ -333,12 +325,7 @@ int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePi
   if (pSvcParam->uiIntraPeriod)
     pCtx->pVaa->bIdrPeriodFlag = (1 + pCtx->iFrameIndex >= (int32_t)pSvcParam->uiIntraPeriod) ? true : false;
 
-  if (m_bOfficialBranch) {	// Perform Down Sampling potentially due to application
-    iSpatialNum	= SingleLayerPreprocess (pCtx, kpSrcPic, &m_sScaledPicture);
-  } else { // for console each spatial pictures are available there
-    iSpatialNum = 1;
-    MultiLayerPreprocess (pCtx, kpSrcPic);
-  }
+  iSpatialNum = SingleLayerPreprocess (pCtx, kpSrcPic, &m_sScaledPicture);
 
   return iSpatialNum;
 }
@@ -518,46 +505,6 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
   return iSpatialNum;
 }
 
-int32_t CWelsPreProcess::MultiLayerPreprocess (sWelsEncCtx* pCtx, const SSourcePicture* kpSrcPic) {
-  SWelsSvcCodingParam* pSvcParam	= pCtx->pSvcParam;
-  const SSourcePicture* pSrc			= NULL;
-  SPicture* pDstPic						= NULL;
-  const int32_t iSpatialLayersCfgCount =
-    pSvcParam->iSpatialLayerNum;	// count number of spatial layers to be encoded in cfg
-  int32_t j							= -1;
-
-  // do not clear j, just let it continue to save complexity
-  do {
-    ++ j;
-    if (pSvcParam->sDependencyLayers[j].iFrameWidth == kpSrcPic->iPicWidth &&
-        pSvcParam->sDependencyLayers[j].iFrameHeight == kpSrcPic->iPicHeight) {
-      break;
-    }
-  } while (j < iSpatialLayersCfgCount);
-
-  assert (j < iSpatialLayersCfgCount);
-  pDstPic = m_pSpatialPic[j][m_uiSpatialLayersInTemporal[j] - 1];
-
-  WelsUpdateSpatialIdxMap (pCtx, 0, pDstPic, j);
-
-  WelsMoveMemoryWrapper (pSvcParam, pDstPic, kpSrcPic, kpSrcPic->iPicWidth, kpSrcPic->iPicHeight);
-
-  if (pSvcParam->bEnableDenoise)
-    BilateralDenoising (pDstPic, kpSrcPic->iPicWidth, kpSrcPic->iPicHeight);
-
-  m_pLastSpatialPicture[j][1]	= pDstPic;
-
-  if (pSvcParam->bEnableSceneChangeDetect && (1 == pSvcParam->iSpatialLayerNum)
-      && !pCtx->pVaa->bIdrPeriodFlag && !pCtx->bEncCurFrmAsIdrFlag) {
-    SPicture* pRef = pCtx->pLtr[0].bReceivedT0LostFlag ?
-                     m_pSpatialPic[0][m_uiSpatialLayersInTemporal[0] + pCtx->pVaa->uiValidLongTermPicIdx] :
-                     m_pLastSpatialPicture[0][0];
-
-    pCtx->pVaa->bSceneChangeFlag = DetectSceneChange (pDstPic, pRef);
-  }
-
-  return 0;
-}
 
 /*!
  * \brief	Whether input picture need be scaled?

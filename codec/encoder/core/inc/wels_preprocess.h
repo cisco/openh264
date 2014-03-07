@@ -121,7 +121,6 @@ class CWelsPreProcess {
 
  private:
   int32_t SingleLayerPreprocess (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrc, Scaled_Picture* m_sScaledPicture);
-  int32_t MultiLayerPreprocess (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrcPic);
 
   void	BilateralDenoising (SPicture* pSrc, const int32_t iWidth, const int32_t iHeight);
   bool  DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture);
@@ -150,7 +149,6 @@ class CWelsPreProcess {
   CWelsLib*        m_pEncLib;
   sWelsEncCtx*     m_pEncCtx;
   bool             m_bInitDone;
-  bool             m_bOfficialBranch;
   /* For Downsampling & VAA I420 based source pictures */
   SPicture*        m_pSpatialPic[MAX_DEPENDENCY_LAYER][MAX_TEMPORAL_LEVEL + 1 +
       LONG_TERM_REF_NUM];	// need memory requirement with total number of (log2(uiGopSize)+1+1+long_term_ref_num)
