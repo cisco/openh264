@@ -153,13 +153,16 @@ typedef struct {
     unsigned int		uiSliceSizeConstraint;
   } SSliceArgument;//not all the elements in this argument will be used, how it will be used depends on uiSliceMode; see below
 
-typedef struct {
+typedef enum {
+  SM_SINGLE_SLICE         = 0, //	| SliceNum==1
+  SM_FIXEDSLCNUM_SLICE    = 1, //	| according to SliceNum		| Enabled dynamic slicing for multi-thread
+  SM_RASTER_SLICE         = 2, //	| according to SlicesAssign	| Need input of MB numbers each slice. In addition, if other constraint in SSliceArgument is presented, need to follow the constraints. Typically if MB num and slice size are both constrained, re-encoding may be involved.
+  SM_ROWMB_SLICE          = 3, //	| according to PictureMBHeight	| Typical of single row of mbs each slice?+ slice size constraint which including re-encoding
+  SM_DYN_SLICE            = 4, //	| according to SliceSize	| Dynamic slicing (have no idea about slice_nums until encoding current frame)
+  SM_RESERVED             = 5
+} SliceModeEnum;
 
-  //# 0 SM_SINGLE_SLICE			| SliceNum==1
-  //# 1 SM_FIXEDSLCNUM_SLICE	| according to SliceNum			| Enabled dynamic slicing for multi-thread
-  //# 2 SM_RASTER_SLICE			| according to SlicesAssign		| Need input of MB numbers each slice. In addition, if other constraint in SSliceArgument is presented, need to follow the constraints. Typically if MB num and slice size are both constrained, re-encoding may be involved.
-  //# 3 SM_ROWMB_SLICE			| according to PictureMBHeight	|  Typical of single row of mbs each slice?+ slice size constraint which including re-encoding
-  //# 4 SM_DYN_SLICE			| according to SliceSize		| Dynamic slicing (have no idea about slice_nums until encoding current frame)
+typedef struct {
   unsigned int uiSliceMode; //by default, uiSliceMode will be 0
   SSliceArgument sSliceArgument;
 } SSliceConfig;

@@ -51,14 +51,6 @@ namespace WelsSVCEnc {
  * \brief	SSlice mode
  */
 typedef uint16_t SliceMode;
-typedef enum {
-SM_SINGLE_SLICE         = 0,
-SM_FIXEDSLCNUM_SLICE	= 1,
-SM_RASTER_SLICE			= 2,
-SM_ROWMB_SLICE			= 3,
-SM_DYN_SLICE			= 4,
-SM_RESERVED				= 5
-} SliceModeEnum;
 
 
 // NOTE:
