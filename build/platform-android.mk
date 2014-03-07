@@ -30,7 +30,7 @@ SYSROOT = $(NDKROOT)/platforms/android-$(NDKLEVEL)/arch-$(ARCH)
 CXX = $(TOOLCHAINPREFIX)g++
 CC = $(TOOLCHAINPREFIX)gcc
 AR = $(TOOLCHAINPREFIX)ar
-CFLAGS += -DLINUX -DANDROID_NDK -fpic --sysroot=$(SYSROOT)
+CFLAGS += -DLINUX -DANDROID_NDK -DMT_ENABLED -fpic --sysroot=$(SYSROOT)
 CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS += --sysroot=$(SYSROOT)
 SHLDFLAGS = -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,-soname,libwels.so

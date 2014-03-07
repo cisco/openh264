@@ -362,11 +362,6 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
     pSmt->pThreadPEncCtx[iIdx].iThreadIndex	= iIdx;
     pSmt->pThreadHandles[iIdx]				= 0;
 
-#ifdef _WIN32
-    WelsSnprintf (name, SEM_NAME_MAX, "fs%d%s", iIdx, pSmt->eventNamespace);
-    err = WelsEventOpen (&pSmt->pFinSliceCodingEvent[iIdx], name);
-    MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "[MT] Open pFinSliceCodingEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
-#endif//_WIN32
     WelsSnprintf (name, SEM_NAME_MAX, "ee%d%s", iIdx, pSmt->eventNamespace);
     err = WelsEventOpen (&pSmt->pExitEncodeEvent[iIdx], name);
     MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "[MT] Open pExitEncodeEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
@@ -456,13 +451,6 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
   char ename[SEM_NAME_MAX] = {0};
   while (iIdx < iThreadNum) {
     // length of semaphore name should be system constrained at least on mac 10.7
-#ifdef _WIN32
-    if (pSmt->pThreadHandles != NULL && pSmt->pThreadHandles[iIdx] != NULL)
-      WelsThreadDestroy (&pSmt->pThreadHandles[iIdx]);
-
-    WelsSnprintf (ename, SEM_NAME_MAX, "fs%d%s", iIdx, pSmt->eventNamespace);
-    WelsEventClose (&pSmt->pFinSliceCodingEvent[iIdx], ename);
-#endif//_WIN32
     WelsSnprintf (ename, SEM_NAME_MAX, "ee%d%s", iIdx, pSmt->eventNamespace);
     WelsEventClose (&pSmt->pExitEncodeEvent[iIdx], ename);
     WelsSnprintf (ename, SEM_NAME_MAX, "tm%d%s", iIdx, pSmt->eventNamespace);
@@ -704,8 +692,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 
   if (NULL == pPrivateData)
     WELS_THREAD_ROUTINE_RETURN (1);
-
-  WelsSetThreadCancelable();
 
   pEncPEncCtx	= (sWelsEncCtx*)pPrivateData->pWelsPEncCtx;
 
@@ -958,10 +944,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
       break;
     }
   } while (1);
-
-#ifdef _WIN32
-  WelsEventSignal (&pEncPEncCtx->pSliceThreading->pFinSliceCodingEvent[iEventIdx]);	// notify to mother encoding threading
-#endif//WIN32
 
   //sync multi-threading error
   WelsMutexLock (&pEncPEncCtx->mutexEncoderError);

@@ -152,29 +152,13 @@ WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_
   return WELS_THREAD_ERROR_OK;
 }
 
-WELS_THREAD_ERROR_CODE	  WelsSetThreadCancelable() {
-  // nil implementation for WIN32
-  return WELS_THREAD_ERROR_OK;
-}
-
 WELS_THREAD_ERROR_CODE    WelsThreadJoin (WELS_THREAD_HANDLE  thread) {
   WaitForSingleObject (thread, INFINITE);
+  CloseHandle (thread);
 
   return WELS_THREAD_ERROR_OK;
 }
 
-WELS_THREAD_ERROR_CODE    WelsThreadCancel (WELS_THREAD_HANDLE  thread) {
-  return WELS_THREAD_ERROR_OK;
-}
-
-
-WELS_THREAD_ERROR_CODE    WelsThreadDestroy (WELS_THREAD_HANDLE* thread) {
-  if (thread != NULL) {
-    CloseHandle (*thread);
-    *thread = NULL;
-  }
-  return WELS_THREAD_ERROR_OK;
-}
 
 WELS_THREAD_HANDLE        WelsThreadSelf() {
   return GetCurrentThread();
@@ -217,23 +201,8 @@ WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_
   return err;
 }
 
-WELS_THREAD_ERROR_CODE	  WelsSetThreadCancelable() {
-  WELS_THREAD_ERROR_CODE err = pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, NULL);
-  if (0 == err)
-    err = pthread_setcanceltype (PTHREAD_CANCEL_DEFERRED, NULL);
-  return err;
-}
-
 WELS_THREAD_ERROR_CODE    WelsThreadJoin (WELS_THREAD_HANDLE  thread) {
   return pthread_join (thread, NULL);
-}
-
-WELS_THREAD_ERROR_CODE    WelsThreadCancel (WELS_THREAD_HANDLE  thread) {
-  return pthread_cancel (thread);
-}
-
-WELS_THREAD_ERROR_CODE    WelsThreadDestroy (WELS_THREAD_HANDLE* thread) {
-  return WELS_THREAD_ERROR_OK;
 }
 
 WELS_THREAD_HANDLE        WelsThreadSelf() {
