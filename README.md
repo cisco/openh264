@@ -44,7 +44,7 @@ OS Support
 Processor Support
 -----------------
 - Intel x86 optionally with MMX/SSE (no AVX yet, help is welcome)
-- ARMv7 optionally with NEON (initial release does not include this target, will follow later)
+- ARMv7 optionally with NEON
 - Any architecture using C/C++ fallback functions
 
 Building the Library
