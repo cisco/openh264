@@ -174,21 +174,12 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
   switch (pNalUnitHeader->eNalUnitType) {
   case NAL_UNIT_SEI:
-
-    if (pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
-      pCtx->pAccessUnitList->uiEndPos = pCtx->pAccessUnitList->uiAvailUnitsNum - 1;
-      pCtx->bAuReadyFlag = true;
-    }
-
-    break;
-
   case NAL_UNIT_SPS:
-
+  case NAL_UNIT_PPS:
     if (pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
       pCtx->pAccessUnitList->uiEndPos = pCtx->pAccessUnitList->uiAvailUnitsNum - 1;
       pCtx->bAuReadyFlag = true;
     }
-
     break;
 
   case NAL_UNIT_PREFIX:
