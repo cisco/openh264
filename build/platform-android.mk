@@ -11,12 +11,15 @@ ifeq ($(ARCH), arm)
   ifeq (Yes, $(USE_ASM))
     ASMFLAGS += -march=armv7-a -mfpu=neon
   endif
-else
+else ifeq ($(ARCH), x86)
     APP_ABI = x86
     TOOLCHAINPREFIX = $(shell NDK_PROJECT_PATH=./codec/build/android/dec make --no-print-dir -f $(NDKROOT)/build/core/build-local.mk DUMP_TOOLCHAIN_PREFIX APP_ABI=x86)
   ifeq (Yes, $(USE_ASM))
     ASMFLAGS += -DNOPREFIX -f elf32
   endif
+else
+    APP_ABI = $(ARCH)
+    TOOLCHAINPREFIX = $(shell NDK_PROJECT_PATH=./codec/build/android/dec make --no-print-dir -f $(NDKROOT)/build/core/build-local.mk DUMP_TOOLCHAIN_PREFIX APP_ABI=$(APP_ABI))
 endif
 
 ifndef NDKROOT
