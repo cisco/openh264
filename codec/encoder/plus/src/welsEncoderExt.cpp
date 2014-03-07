@@ -938,6 +938,15 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     }
   }
   break;
+  case ENCODER_OPTION_DUMP_FILE:{
+#ifdef ENABLE_FRAME_DUMP
+	  if(m_pEncContext->pSvcParam!=NULL){
+	  SDumpLayer*pDump = (static_cast<SDumpLayer *>(pOption));
+	  WelsStrncpy(m_pEncContext->pSvcParam->sDependencyLayers[pDump->iLayer].sRecFileName, pDump->pFileName, sizeof(m_pEncContext->pSvcParam->sDependencyLayers[pDump->iLayer].sRecFileName))
+	  }
+#endif
+	}
+  break;
   default:
     return cmInitParaError;
   }

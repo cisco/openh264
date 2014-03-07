@@ -89,7 +89,8 @@ typedef enum {
   ENCODER_OPTION_ENABLE_PREFIX_NAL_ADDING,   //enable prefix: true--enable prefix; false--disable prefix
   ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, //disable pSps/pPps id addition: true--disable pSps/pPps id; false--enable pSps/pPps id addistion
 
-  ENCODER_OPTION_CURRENT_PATH
+  ENCODER_OPTION_CURRENT_PATH,
+  ENCODER_OPTION_DUMP_FILE
 } ENCODER_OPTION;
 
 /* Option types introduced in decoder application */
@@ -295,5 +296,8 @@ typedef struct Source_Picture_s {
   long long uiTimeStamp;
 } SSourcePicture;
 
-
+typedef struct Dump_Layer_s{
+	int iLayer;
+	char *pFileName;
+}SDumpLayer;
 #endif//WELS_VIDEO_CODEC_APPLICATION_DEFINITION_H__
