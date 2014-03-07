@@ -131,8 +131,7 @@ int32_t ParamValidation (SWelsSvcCodingParam* pCfg) {
   return 0;
 }
 
-int32_t ParamValidationExt (void* pParam) {
-  SWelsSvcCodingParam* pCodingParam = (SWelsSvcCodingParam*)pParam;
+int32_t ParamValidationExt (SWelsSvcCodingParam* pCodingParam) {
   int8_t i = 0;
   int32_t iIdx = 0;
 
