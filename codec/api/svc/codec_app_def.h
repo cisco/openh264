@@ -230,7 +230,6 @@ typedef struct TagEncParamExt
 
   /* multi-thread settings*/
   short		iMultipleThreadIdc;		// 1	# 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
-  short		iCountThreadsNum;			//		# derived from disable_multiple_slice_idc (=0 or >1) means;
 
    /* Deblocking loop filter */
   int		iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries
