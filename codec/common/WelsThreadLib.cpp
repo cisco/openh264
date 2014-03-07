@@ -121,12 +121,14 @@ WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t 
 }
 
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount,
-    WELS_EVENT* event_list,
-    uint32_t dwMilliseconds) {
-  return WaitForMultipleObjects (nCount, event_list, FALSE, dwMilliseconds);
+    WELS_EVENT* event_list, WELS_EVENT* master_event) {
+  // Don't need/use the master event for anything, since windows has got WaitForMultipleObjects
+  return WaitForMultipleObjects (nCount, event_list, FALSE, INFINITE);
 }
 
-WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WELS_EVENT* event_list) {
+WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount,
+    WELS_EVENT* event_list, WELS_EVENT* master_event) {
+  // Don't need/use the master event for anything, since windows has got WaitForMultipleObjects
   return WaitForMultipleObjects (nCount, event_list, TRUE, INFINITE);
 }
 
@@ -342,13 +344,24 @@ WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t 
 }
 
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount,
-    WELS_EVENT* event_list,
-    uint32_t dwMilliseconds) {
+    WELS_EVENT* event_list, WELS_EVENT* master_event) {
   uint32_t nIdx = 0;
-  const uint32_t kuiAccessTime = 2;	// 2 us once
+  uint32_t uiAccessTime = 2;	// 2 us once
 
   if (nCount == 0)
     return WELS_THREAD_ERROR_WAIT_FAILED;
+
+  if (master_event != NULL) {
+    // This design relies on the events actually being semaphores;
+    // if multiple events in the list have been signalled, the master
+    // event should have a similar count (events in windows can't keep
+    // track of the actual count, but the master event isn't needed there
+    // since it uses WaitForMultipleObjects).
+    int32_t err = sem_wait (*master_event);
+    if (err != WELS_THREAD_ERROR_OK)
+      return err;
+    uiAccessTime = 0; // no blocking, just quickly loop through all to find the one that was signalled
+  }
 
   while (1) {
     nIdx = 0;	// access each event by order
@@ -364,21 +377,30 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount,
         err = sem_trywait (event_list[nIdx]);
         if (WELS_THREAD_ERROR_OK == err)
           return WELS_THREAD_ERROR_WAIT_OBJECT_0 + nIdx;
-        else if (wait_count > 0)
+        else if (wait_count > 0 || uiAccessTime == 0)
           break;
-        usleep (kuiAccessTime);
+        usleep (uiAccessTime);
         ++ wait_count;
       } while (1);
       // we do need access next event next time
       ++ nIdx;
     }
     usleep (1);	// switch to working threads
+    if (master_event != NULL) {
+      // A master event was used and was signalled, but none of the events in the
+      // list was found to be signalled, thus wait a little more when rechecking
+      // the list to avoid busylooping here.
+      // If we ever hit this codepath it's mostly a bug in the code that signals
+      // the events.
+      uiAccessTime = 2;
+    }
   }
 
   return WELS_THREAD_ERROR_WAIT_FAILED;
 }
 
-WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WELS_EVENT* event_list) {
+WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount,
+    WELS_EVENT* event_list, WELS_EVENT* master_event) {
   uint32_t nIdx = 0;
   uint32_t uiCountSignals = 0;
   uint32_t uiSignalFlag	= 0;	// UGLY: suppose maximal event number up to 32
@@ -394,7 +416,21 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WE
       if ((uiSignalFlag & kuiBitwiseFlag) != kuiBitwiseFlag) { // non-blocking mode
         int32_t err = 0;
 //				fprintf( stderr, "sem_wait(): start to wait event %d..\n", nIdx );
-        err = sem_wait (event_list[nIdx]);
+        if (master_event == NULL) {
+          err = sem_wait (event_list[nIdx]);
+        } else {
+          err = sem_wait (*master_event);
+          if (err == WELS_THREAD_ERROR_OK) {
+            err = sem_wait (event_list[nIdx]);
+            if (err != WELS_THREAD_ERROR_OK) {
+              // We successfully waited for the master event,
+              // but waiting for the individual event failed (e.g. EINTR?).
+              // Increase the master event count so that the next retry will
+              // work as intended.
+              sem_post (*master_event);
+            }
+          }
+        }
 //				fprintf( stderr, "sem_wait(): wait event %d result %d errno %d..\n", nIdx, err, errno );
         if (WELS_THREAD_ERROR_OK == err) {
 //					int32_t val = 0;

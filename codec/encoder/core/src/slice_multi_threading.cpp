@@ -275,6 +275,7 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
     int32_t iThreadIdx			= 0;
     do {
       WelsEventSignal (&pCtx->pSliceThreading->pUpdateMbListEvent[iThreadIdx]);
+      WelsEventSignal (&pCtx->pSliceThreading->pThreadMasterEvent[iThreadIdx]);
       ++ iThreadIdx;
     } while (iThreadIdx < kiThreadNum);
 
@@ -351,10 +352,11 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 
   MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "encpEncCtx= 0x%p\n", (void*) (*ppCtx));
 
+  char name[SEM_NAME_MAX] = {0};
+  WELS_THREAD_ERROR_CODE err = 0;
+
   iIdx = 0;
   while (iIdx < iThreadNum) {
-    char name[SEM_NAME_MAX] = {0};
-    WELS_THREAD_ERROR_CODE err = 0;
     pSmt->pThreadPEncCtx[iIdx].pWelsPEncCtx	= (void*) (*ppCtx);
     pSmt->pThreadPEncCtx[iIdx].iSliceIndex	= iIdx;
     pSmt->pThreadPEncCtx[iIdx].iThreadIndex	= iIdx;
@@ -364,10 +366,13 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
     WelsSnprintf (name, SEM_NAME_MAX, "fs%d%s", iIdx, pSmt->eventNamespace);
     err = WelsEventOpen (&pSmt->pFinSliceCodingEvent[iIdx], name);
     MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "[MT] Open pFinSliceCodingEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
+#endif//_WIN32
     WelsSnprintf (name, SEM_NAME_MAX, "ee%d%s", iIdx, pSmt->eventNamespace);
     err = WelsEventOpen (&pSmt->pExitEncodeEvent[iIdx], name);
     MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "[MT] Open pExitEncodeEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
-#endif//_WIN32
+    WelsSnprintf (name, SEM_NAME_MAX, "tm%d%s", iIdx, pSmt->eventNamespace);
+    err = WelsEventOpen (&pSmt->pThreadMasterEvent[iIdx], name);
+    MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "[MT] Open pThreadMasterEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
     // length of semaphore name should be system constrained at least on mac 10.7
     WelsSnprintf (name, SEM_NAME_MAX, "ud%d%s", iIdx, pSmt->eventNamespace);
     err = WelsEventOpen (&pSmt->pUpdateMbListEvent[iIdx], name);
@@ -385,6 +390,10 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 
     ++ iIdx;
   }
+
+  WelsSnprintf (name, SEM_NAME_MAX, "scm%s", pSmt->eventNamespace);
+  err = WelsEventOpen (&pSmt->pSliceCodedMasterEvent, name);
+  MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "[MT] Open pSliceCodedMasterEvent named(%s) ret%d err%d\n", name, err, errno);
 
   (*ppCtx)->pSliceBs	= (SWelsSliceBs*)pMa->WelsMalloc (sizeof (SWelsSliceBs) * iMaxSliceNum, "pSliceBs");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pSliceBs), FreeMemorySvc (ppCtx))
@@ -444,8 +453,8 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
   if (NULL == pSmt)
     return;
 
+  char ename[SEM_NAME_MAX] = {0};
   while (iIdx < iThreadNum) {
-    char ename[SEM_NAME_MAX] = {0};
     // length of semaphore name should be system constrained at least on mac 10.7
 #ifdef _WIN32
     if (pSmt->pThreadHandles != NULL && pSmt->pThreadHandles[iIdx] != NULL)
@@ -453,9 +462,11 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
 
     WelsSnprintf (ename, SEM_NAME_MAX, "fs%d%s", iIdx, pSmt->eventNamespace);
     WelsEventClose (&pSmt->pFinSliceCodingEvent[iIdx], ename);
+#endif//_WIN32
     WelsSnprintf (ename, SEM_NAME_MAX, "ee%d%s", iIdx, pSmt->eventNamespace);
     WelsEventClose (&pSmt->pExitEncodeEvent[iIdx], ename);
-#endif//_WIN32
+    WelsSnprintf (ename, SEM_NAME_MAX, "tm%d%s", iIdx, pSmt->eventNamespace);
+    WelsEventClose (&pSmt->pThreadMasterEvent[iIdx], ename);
     WelsSnprintf (ename, SEM_NAME_MAX, "sc%d%s", iIdx, pSmt->eventNamespace);
     WelsEventClose (&pSmt->pSliceCodedEvent[iIdx], ename);
     WelsSnprintf (ename, SEM_NAME_MAX, "rc%d%s", iIdx, pSmt->eventNamespace);
@@ -467,6 +478,8 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
 
     ++ iIdx;
   }
+  WelsSnprintf (ename, SEM_NAME_MAX, "scm%s", pSmt->eventNamespace);
+  WelsEventClose (&pSmt->pSliceCodedMasterEvent, ename);
 
   WelsMutexDestroy (&pSmt->mutexSliceNumUpdate);
   WelsMutexDestroy (&((*ppCtx)->mutexEncoderError));
@@ -669,45 +682,6 @@ int32_t WriteSliceBs (sWelsEncCtx* pCtx, uint8_t* pSliceBsBuf, const int32_t iSl
   return iReturn;
 }
 
-#if !defined(_WIN32)
-WELS_THREAD_ROUTINE_TYPE UpdateMbListThreadProc (void* arg) {
-  SSliceThreadPrivateData* pPrivateData	= (SSliceThreadPrivateData*)arg;
-  sWelsEncCtx* pEncPEncCtx			= NULL;
-  SDqLayer* pCurDq							= NULL;
-  int32_t iSliceIdx							= -1;
-  int32_t iEventIdx							= -1;
-  WELS_THREAD_ERROR_CODE iWaitRet				= WELS_THREAD_ERROR_GENERAL;
-  uint32_t uiThrdRet							= 0;
-
-  if (NULL == pPrivateData)
-    WELS_THREAD_ROUTINE_RETURN (1);
-
-  pEncPEncCtx	= (sWelsEncCtx*)pPrivateData->pWelsPEncCtx;
-  iSliceIdx		= pPrivateData->iSliceIndex;
-  iEventIdx		= pPrivateData->iThreadIndex;
-
-  do {
-    MT_TRACE_LOG (pEncPEncCtx, WELS_LOG_INFO, "[MT] UpdateMbListThreadProc(), try to wait (pUpdateMbListEvent[%d])!\n",
-                  iEventIdx);
-    iWaitRet = WelsEventWait (&pEncPEncCtx->pSliceThreading->pUpdateMbListEvent[iEventIdx]);
-    if (WELS_THREAD_ERROR_WAIT_OBJECT_0 == iWaitRet) {
-      pCurDq			= pEncPEncCtx->pCurDqLayer;
-      UpdateMbListNeighborParallel (pCurDq->pSliceEncCtx, pCurDq->sMbDataP, iSliceIdx);
-      WelsEventSignal (
-        &pEncPEncCtx->pSliceThreading->pFinUpdateMbListEvent[iEventIdx]);	// mean finished update pMb list for this pSlice
-    } else {
-      WelsLog (pEncPEncCtx, WELS_LOG_WARNING,
-               "[MT] UpdateMbListThreadProc(), waiting pUpdateMbListEvent[%d] failed(%d) and thread%d terminated!\n", iEventIdx,
-               iWaitRet, iEventIdx);
-      uiThrdRet = 1;
-      break;
-    }
-  } while (1);
-
-  WELS_THREAD_ROUTINE_RETURN (uiThrdRet);
-}
-#endif//!_WIN32
-
 // thread process for coding one pSlice
 WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
   SSliceThreadPrivateData* pPrivateData	= (SSliceThreadPrivateData*)arg;
@@ -715,10 +689,8 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
   SDqLayer* pCurDq							= NULL;
   SSlice* pSlice								= NULL;
   SWelsSliceBs* pSliceBs						= NULL;
-#ifdef _WIN32
   WELS_EVENT pEventsList[3];
   int32_t iEventCount						= 0;
-#endif
   WELS_THREAD_ERROR_CODE iWaitRet				= WELS_THREAD_ERROR_GENERAL;
   uint32_t uiThrdRet							= 0;
   int32_t iSliceSize							= 0;
@@ -740,23 +712,16 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
   iThreadIdx		= pPrivateData->iThreadIndex;
   iEventIdx		= iThreadIdx;
 
-#ifdef _WIN32
   pEventsList[iEventCount++]	= pEncPEncCtx->pSliceThreading->pReadySliceCodingEvent[iEventIdx];
   pEventsList[iEventCount++]	= pEncPEncCtx->pSliceThreading->pExitEncodeEvent[iEventIdx];
   pEventsList[iEventCount++] = pEncPEncCtx->pSliceThreading->pUpdateMbListEvent[iEventIdx];
-#endif//_WIN32
 
   do {
-#ifdef _WIN32
-    iWaitRet = WelsMultipleEventsWaitSingleBlocking (iEventCount,
-               &pEventsList[0],
-               (uint32_t) - 1);	// blocking until at least one event is
-#else
     MT_TRACE_LOG (pEncPEncCtx, WELS_LOG_INFO,
-                  "[MT] CodingSliceThreadProc(), try to call WelsEventWait(pReadySliceCodingEvent[%d]= 0x%p), pEncPEncCtx= 0x%p!\n",
-                  iEventIdx, (void*) (pEncPEncCtx->pSliceThreading->pReadySliceCodingEvent[iEventIdx]), (void*)pEncPEncCtx);
-    iWaitRet = WelsEventWait (&pEncPEncCtx->pSliceThreading->pReadySliceCodingEvent[iEventIdx]);
-#endif//WIN32
+                  "[MT] CodingSliceThreadProc(), try to call WelsMultipleEventsWaitSingleBlocking(pEventsList= %p %p %p), pEncPEncCtx= %p!\n",
+                  pEventsList[0], pEventsList[1], pEventsList[1], (void*)pEncPEncCtx);
+    iWaitRet = WelsMultipleEventsWaitSingleBlocking (iEventCount,
+               &pEventsList[0], &pEncPEncCtx->pSliceThreading->pThreadMasterEvent[iEventIdx]); // blocking until at least one event is signalled
     if (WELS_THREAD_ERROR_WAIT_OBJECT_0 == iWaitRet) {	// start pSlice coding signal waited
       SLayerBSInfo* pLbi = pPrivateData->pLayerBs;
       const int32_t kiCurDid			= pEncPEncCtx->uiDependencyId;
@@ -865,6 +830,8 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 
         WelsEventSignal (
           &pEncPEncCtx->pSliceThreading->pSliceCodedEvent[iEventIdx]);	// mean finished coding current pSlice
+        WelsEventSignal (
+          &pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent);
       } else {	// for SM_DYN_SLICE parallelization
         SSliceCtx* pSliceCtx			= pCurDq->pSliceEncCtx;
         const int32_t kiPartitionId			= iThreadIdx;
@@ -968,9 +935,9 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
           break;
 
         WelsEventSignal (&pEncPEncCtx->pSliceThreading->pSliceCodedEvent[iEventIdx]);	// mean finished coding current pSlice
+        WelsEventSignal (&pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent);
       }
     }
-#ifdef _WIN32
     else if (WELS_THREAD_ERROR_WAIT_OBJECT_0 + 1 == iWaitRet) {	// exit thread signal
       uiThrdRet	= 0;
       break;
@@ -983,7 +950,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
       WelsEventSignal (
         &pEncPEncCtx->pSliceThreading->pFinUpdateMbListEvent[iEventIdx]);	// mean finished update pMb list for this pSlice
     }
-#endif//WIN32
     else { // WELS_THREAD_ERROR_WAIT_TIMEOUT, or WELS_THREAD_ERROR_WAIT_FAILED
       WelsLog (pEncPEncCtx, WELS_LOG_WARNING,
                "[MT] CodingSliceThreadProc(), waiting pReadySliceCodingEvent[%d] failed(%d) and thread%d terminated!\n", iEventIdx,
@@ -1031,13 +997,6 @@ int32_t CreateSliceThreads (sWelsEncCtx* pCtx) {
       }
     }
 #endif//WIN32 && BIND_CPU_CORES_TO_THREADS
-    // We need extra threads for update_mb_list_proc on __GNUC__ like OS (mac/linux)
-    // due to WelsMultipleEventsWaitSingleBlocking implememtation can not work well
-    // in case waiting pUpdateMbListEvent and pReadySliceCodingEvent events at the same time
-#if !defined(_WIN32)
-    WelsThreadCreate (&pCtx->pSliceThreading->pUpdateMbListThrdHandles[iIdx], UpdateMbListThreadProc,
-                      &pCtx->pSliceThreading->pThreadPEncCtx[iIdx], 0);
-#endif//!_WIN32
 
     ++ iIdx;
   }
@@ -1045,7 +1004,7 @@ int32_t CreateSliceThreads (sWelsEncCtx* pCtx) {
   return 0;
 }
 
-int32_t FiredSliceThreads (SSliceThreadPrivateData* pPriData, WELS_EVENT* pEventsList, SLayerBSInfo* pLbi,
+int32_t FiredSliceThreads (SSliceThreadPrivateData* pPriData, WELS_EVENT* pEventsList, WELS_EVENT* pMasterEventsList, SLayerBSInfo* pLbi,
                            const uint32_t uiNumThreads, SSliceCtx* pSliceCtx, const bool bIsDynamicSlicingMode)
 {
   int32_t iEndMbIdx	= 0;
@@ -1076,6 +1035,8 @@ int32_t FiredSliceThreads (SSliceThreadPrivateData* pPriData, WELS_EVENT* pEvent
     pPriData[iIdx].iSliceIndex	= iIdx;
     if (pEventsList[iIdx])
       WelsEventSignal (&pEventsList[iIdx]);
+    if (pMasterEventsList[iIdx])
+      WelsEventSignal (&pMasterEventsList[iIdx]);
     ++ iIdx;
   }
 
