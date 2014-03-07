@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4C34067D18C5C94C00DFA14A /* expand_picture.S in Sources */ = {isa = PBXBuildFile; fileRef = 4C34067C18C5C94C00DFA14A /* expand_picture.S */; };
+		4C34067D18C5C94C00DFA14A /* expand_picture_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4C34067C18C5C94C00DFA14A /* expand_picture_neon.S */; };
 		4CE443D918B722CD0017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443D818B722CD0017DF25 /* Foundation.framework */; };
 		4CE443E718B722CD0017DF25 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443E618B722CD0017DF25 /* XCTest.framework */; };
 		4CE443E818B722CD0017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443D818B722CD0017DF25 /* Foundation.framework */; };
@@ -47,7 +47,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		4C34067C18C5C94C00DFA14A /* expand_picture.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = expand_picture.S; sourceTree = "<group>"; };
+		4C34067C18C5C94C00DFA14A /* expand_picture_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = expand_picture_neon.S; sourceTree = "<group>"; };
 		4CE443D518B722CD0017DF25 /* libcommon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE443D818B722CD0017DF25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4CE443E518B722CD0017DF25 /* commonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = commonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -150,7 +150,7 @@
 		4CE4472F18BC61650017DF25 /* common */ = {
 			isa = PBXGroup;
 			children = (
-				4C34067C18C5C94C00DFA14A /* expand_picture.S */,
+				4C34067C18C5C94C00DFA14A /* expand_picture_neon.S */,
 				4CE447BE18C085900017DF25 /* arm_arch_common_macro.S */,
 				4CE447BC18C085320017DF25 /* deblocking_neon.S */,
 				4CE4473118BC61650017DF25 /* cpu.cpp */,
@@ -260,7 +260,7 @@
 				4CE4475018BC61650017DF25 /* deblocking_common.cpp in Sources */,
 				4CE4474C18BC61650017DF25 /* cpu.cpp in Sources */,
 				4CE4475218BC61650017DF25 /* logging.cpp in Sources */,
-				4C34067D18C5C94C00DFA14A /* expand_picture.S in Sources */,
+				4C34067D18C5C94C00DFA14A /* expand_picture_neon.S in Sources */,
 				4CE447BD18C085320017DF25 /* deblocking_neon.S in Sources */,
 				4CE4475818BC61650017DF25 /* WelsThreadLib.cpp in Sources */,
 				4CE4474E18BC61650017DF25 /* crt_util_safe_x.cpp in Sources */,

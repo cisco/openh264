@@ -44,6 +44,8 @@ mov pc, lr
 .endm
 #else
 
+.syntax unified
+
 .macro WELS_ASM_FUNC_BEGIN funcName
 .align 2
 .arm

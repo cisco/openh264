@@ -133,7 +133,7 @@ void CSceneChangeDetection::InitSadFuncs (SadFuncPtr& pfSad,  int32_t iCpuFlag) 
 
 #ifdef HAVE_NEON
   if (iCpuFlag & WELS_CPU_NEON) {
-    pfSad = WelsSampleSad8x8_neon;
+    pfSad = WelsProcessingSampleSad8x8_neon;
   }
 #endif
 }

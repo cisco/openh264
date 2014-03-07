@@ -272,14 +272,14 @@ WELS_ASM_FUNC_BEGIN WelsIntra16x16Combined3Satd_neon
 	vpaddl.u16 d16, d16
 	vpaddl.u32 d16, d16
 	vmov.u32   r1, d16[0]
-	add  r1, r6, lsl #1
+	add  r1, r1, r6, lsl #1
 
 	//vadd.u16   d20, d21
 	vrshr.u16  d17, #1
 	vpaddl.u16 d17, d17
 	vpaddl.u32 d17, d17
 	vmov.u32   r2, d17[0]
-	add  r2, r6, lsl #1
+	add  r2, r2, r6, lsl #1
 
     mov r4, #0
     cmp r1, r0
@@ -362,13 +362,13 @@ sad_intra_16x16_x3_opt_loop0:
 	vpaddl.u16 d22, d22
 	vpaddl.u32 d22, d22
 	vmov.u32   r1, d22[0]
-	add  r1, r6, lsl #1
+	add  r1, r1, r6, lsl #1
 
 	vadd.u16   d20, d21
 	vpaddl.u16 d20, d20
 	vpaddl.u32 d20, d20
 	vmov.u32   r2, d20[0]
-	add  r2, r6, lsl #1
+	add  r2, r2, r6, lsl #1
 
     mov r4, #0
     cmp r1, r0
@@ -506,13 +506,13 @@ sad_intra_8x8_x3_opt_loop1:
 	vpaddl.u16 d22, d22
 	vpaddl.u32 d22, d22
 	vmov.u32   r0, d22[0]
-	add  r0, r6, lsl #1
+	add  r0, r0, r6, lsl #1
 
 	vadd.u16   d20, d21
 	vpaddl.u16 d20, d20
 	vpaddl.u32 d20, d20
 	vmov.u32   r1, d20[0]
-	add  r1, r6, lsl #1
+	add  r1, r1, r6, lsl #1
 
 	vadd.u16   d18, d19
 	vpaddl.u16 d18, d18
@@ -644,13 +644,13 @@ WELS_ASM_FUNC_BEGIN WelsIntra8x8Combined3Satd_neon
 	vpaddl.u16 d11, d11
 	vpaddl.u32 d11, d11
 	vmov.u32   lr, d11[0]
-	add  lr, r6, lsl #1
+	add  lr, lr, r6, lsl #1
 
 	vrshr.u16  d10, #1
 	vpaddl.u16 d10, d10
 	vpaddl.u32 d10, d10
 	vmov.u32   r3, d10[0]
-	add  r3, r6, lsl #1
+	add  r3, r3, r6, lsl #1
 
 	vrshr.u16  d28, #1
 	vpaddl.u16 d28, d28
