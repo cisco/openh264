@@ -99,7 +99,6 @@ typedef  struct _WelsLogicalProcessorInfo {
 #define	   WELS_THREAD_ERROR_WAIT_TIMEOUT		((uint32_t)0x00000102L)
 #define	   WELS_THREAD_ERROR_WAIT_FAILED		WELS_THREAD_ERROR_GENERAL
 
-void WelsSleep (uint32_t dwMilliseconds);
 WELS_THREAD_ERROR_CODE    WelsMutexInit (WELS_MUTEX*    mutex);
 WELS_THREAD_ERROR_CODE    WelsMutexLock (WELS_MUTEX*    mutex);
 WELS_THREAD_ERROR_CODE    WelsMutexUnlock (WELS_MUTEX* mutex);

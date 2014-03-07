@@ -118,10 +118,6 @@ WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex) {
 
 #ifdef _WIN32
 
-void WelsSleep (uint32_t dwMilliseconds) {
-  Sleep (dwMilliseconds);
-}
-
 WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* event, const char* event_name) {
   WELS_EVENT   h = CreateEvent (NULL, FALSE, FALSE, NULL);
 
@@ -202,10 +198,6 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* p
 }
 
 #else
-
-void WelsSleep (uint32_t dwMilliseconds) {
-  usleep (dwMilliseconds * 1000);	// microseconds
-}
 
 WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_THREAD_ROUTINE  routine,
     void* arg, WELS_THREAD_ATTR attr) {
