@@ -38,7 +38,6 @@ ifeq ($(ASM_ARCH), arm)
 DECODER_ASM_S_SRCS=\
 	$(DECODER_SRCDIR)/core/arm/block_add_neon.S\
 	$(DECODER_SRCDIR)/core/arm/intra_pred_neon.S\
-	$(DECODER_SRCDIR)/core/arm/mc_neon.S\
 
 DECODER_OBJS += $(DECODER_ASM_S_SRCS:.S=.o)
 endif
