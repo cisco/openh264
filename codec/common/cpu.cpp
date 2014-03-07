@@ -42,9 +42,6 @@
 #ifdef ANDROID_NDK
 #include <cpu-features.h>
 #endif
-#ifdef APPLE_IOS
-#include <sys/utsname.h>
-#endif
 #include "cpu.h"
 #include "cpu_core.h"
 
@@ -245,18 +242,12 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors)
 uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors)
 {
     uint32_t       uiCPU = 0;
-    struct utsname sSystemInfo;
-    uname (&sSystemInfo);
 
-    if ((0 != strcmp(sSystemInfo.machine, "iPhone1,1")) && //iPhone 2G
-        (0 != strcmp(sSystemInfo.machine, "iPhone1,2")) && //iPhone 3G
-        (0 != strcmp(sSystemInfo.machine, "iPod1,1")) &&   //iPod 1G
-        (0 != strcmp(sSystemInfo.machine, "iPod2,1")))     //iPod 2G
-    {
-        uiCPU |= WELS_CPU_ARMv7;
-        uiCPU |= WELS_CPU_VFPv3;
-        uiCPU |= WELS_CPU_NEON;
-    }
+#if defined(__ARM_NEON__)
+    uiCPU |= WELS_CPU_ARMv7;
+    uiCPU |= WELS_CPU_VFPv3;
+    uiCPU |= WELS_CPU_NEON;
+#endif
     return uiCPU;
 }
 #elif defined(__linux__)
