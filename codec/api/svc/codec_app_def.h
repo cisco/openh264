@@ -153,6 +153,15 @@ typedef struct {
     unsigned int		uiSliceSizeConstraint;
   } SSliceArgument;//not all the elements in this argument will be used, how it will be used depends on uiSliceMode; see below
 
+typedef enum {
+  SM_SINGLE_SLICE         = 0,
+  SM_FIXEDSLCNUM_SLICE    = 1,
+  SM_RASTER_SLICE         = 2,
+  SM_ROWMB_SLICE          = 3,
+  SM_DYN_SLICE            = 4,
+  SM_RESERVED             = 5
+} SliceModeEnum;
+
 typedef struct {
 
   //# 0 SM_SINGLE_SLICE			| SliceNum==1
