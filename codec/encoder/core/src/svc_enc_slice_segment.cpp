@@ -340,7 +340,7 @@ int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
                           const int32_t kiMbWidth,
                           const int32_t kiMbHeight) {
   const int32_t kiCountMbNum = kiMbWidth * kiMbHeight;
-  SliceMode uiSliceMode = SM_SINGLE_SLICE;
+  SliceModeEnum uiSliceMode = SM_SINGLE_SLICE;
 
   if (NULL == pSliceSeg || NULL == pMso || kiMbWidth == 0 || kiMbHeight == 0)
     return 1;
