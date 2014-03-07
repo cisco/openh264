@@ -942,9 +942,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
 #ifdef ENABLE_FRAME_DUMP
 	  if(m_pEncContext->pSvcParam!=NULL){
 	  SDumpLayer*pDump = (static_cast<SDumpLayer *>(pOption));
-	  if(strlen(pDump->pFileName)>MAX_FNAME_LEN)
-		  return cmInitParaError;
-	  strncpy(m_pEncContext->pSvcParam->sDependencyLayers[pDump->iLayer].sRecFileName,pDump->pFileName,strlen(pDump->pFileName));
+	  WelsStrncpy(m_pEncContext->pSvcParam->sDependencyLayers[pDump->iLayer].sRecFileName, pDump->pFileName, sizeof(m_pEncContext->pSvcParam->sDependencyLayers[pDump->iLayer].sRecFileName))
 	  }
 #endif
 	}

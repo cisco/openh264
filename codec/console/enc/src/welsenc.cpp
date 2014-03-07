@@ -911,7 +911,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   }
   for(int iLayer = 0;iLayer<MAX_DEPENDENCY_LAYER;iLayer++)
   {
-	  if(fs.sRecFileName[iLayer][0]!=NULL)
+	  if(fs.sRecFileName[iLayer][0]!=0)
 	  {
 		  SDumpLayer sDumpLayer;
 		  sDumpLayer.iLayer = iLayer;
