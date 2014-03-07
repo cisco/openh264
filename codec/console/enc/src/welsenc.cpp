@@ -166,7 +166,7 @@ int ParseLayerConfig( CReadConfig cRdLayerCfg, const int iLayer, SEncParamExt& p
       } else if (strTag[0].compare ("SliceMode") == 0) {
         sLayerCtx.sSliceCfg.uiSliceMode	= (SliceMode)atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("SliceSize") == 0) { //SM_DYN_SLICE
-        sLayerCtx.sSliceCfg.sSliceArgument.uiSliceSizeConstraint	= (SliceMode)atoi (strTag[1].c_str());
+        sLayerCtx.sSliceCfg.sSliceArgument.uiSliceSizeConstraint	= atoi (strTag[1].c_str());
         continue;
       } else if (strTag[0].compare ("SliceNum") == 0) {
         sLayerCtx.sSliceCfg.sSliceArgument.uiSliceNum = atoi (strTag[1].c_str());
