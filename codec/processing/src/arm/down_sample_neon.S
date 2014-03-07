@@ -75,7 +75,7 @@ comp_ds_bilinear_loop0:
 
 	cmp	lr,	r4
 	movcs	lr,	#0
-	addcs	r6,	r3,	lsl	#1
+	addcs	r6,	r6,	r3,	lsl	#1
 	movcs	r2,	r6
 	addcs	r7,	r2,	r3
 	addcs	r8,	r1

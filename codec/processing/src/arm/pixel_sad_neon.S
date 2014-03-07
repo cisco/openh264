@@ -35,7 +35,7 @@
 #include "arm_arch_common_macro.S"
 
 
-WELS_ASM_FUNC_BEGIN WelsSampleSad8x8_neon
+WELS_ASM_FUNC_BEGIN WelsProcessingSampleSad8x8_neon
     stmdb sp!, {lr}
 	//Loading a horizontal line data (8 bytes)
 	vld1.8 {d0}, [r0], r1
