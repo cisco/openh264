@@ -33,7 +33,7 @@ static int InitWithParam(ISVCEncoder* encoder, int width,
     param.sSpatialLayers[0].fFrameRate = frameRate;
     param.sSpatialLayers[0].iSpatialBitrate = param.iTargetBitrate;
 
-    param.sSpatialLayers[0].sSliceCfg.uiSliceMode = 3; // One slice per MB row
+    param.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_ROWMB_SLICE;
 
     return encoder->InitializeExt(&param);
   }
