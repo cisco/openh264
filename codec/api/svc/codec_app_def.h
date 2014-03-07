@@ -155,7 +155,7 @@ typedef struct {
 
 typedef enum {
   SM_SINGLE_SLICE         = 0, //	| SliceNum==1
-  SM_FIXEDSLCNUM_SLICE    = 1, //	| according to SliceNum		| Enabled dynamic slicing for multi-thread
+  SM_FIXEDSLCNUM_SLICE    = 1, //	| according to CountThreadsNum	| Enabled dynamic slicing for multi-thread
   SM_RASTER_SLICE         = 2, //	| according to SlicesAssign	| Need input of MB numbers each slice. In addition, if other constraint in SSliceArgument is presented, need to follow the constraints. Typically if MB num and slice size are both constrained, re-encoding may be involved.
   SM_ROWMB_SLICE          = 3, //	| according to PictureMBHeight	| Typical of single row of mbs each slice?+ slice size constraint which including re-encoding
   SM_DYN_SLICE            = 4, //	| according to SliceSize	| Dynamic slicing (have no idea about slice_nums until encoding current frame)
