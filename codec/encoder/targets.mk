@@ -51,7 +51,6 @@ ifeq ($(ASM_ARCH), arm)
 ENCODER_ASM_S_SRCS=\
 	$(ENCODER_SRCDIR)/core/arm/intra_pred_neon.S\
 	$(ENCODER_SRCDIR)/core/arm/intra_pred_sad_3_opt_neon.S\
-	$(ENCODER_SRCDIR)/core/arm/mc_neon.S\
 	$(ENCODER_SRCDIR)/core/arm/memory_neon.S\
 	$(ENCODER_SRCDIR)/core/arm/pixel_neon.S\
 	$(ENCODER_SRCDIR)/core/arm/reconstruct_neon.S\

@@ -26,6 +26,7 @@ ifeq ($(ASM_ARCH), arm)
 COMMON_ASM_S_SRCS=\
 	$(COMMON_SRCDIR)/deblocking_neon.S\
 	$(COMMON_SRCDIR)/expand_picture_neon.S\
+        $(COMMON_SRCDIR)/mc_neon.S\
 
 COMMON_OBJS += $(COMMON_ASM_S_SRCS:.S=.o)
 endif
