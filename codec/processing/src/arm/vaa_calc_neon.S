@@ -973,7 +973,7 @@ WELS_ASM_FUNC_END
 .endm
 
 .macro SAD_SSD_16_END
-	SAD_VAR_16_END $0, $1, $2, $3
+	SAD_VAR_16_END $0, $1, $2
 
 	SSD_MUL_SUM_16BYTES d4,d5,q8, q11			//q8 for l_sqiff	reset for every 16x16
 .endm
@@ -1027,8 +1027,8 @@ WELS_ASM_FUNC_END
 	SSD_MUL_SUM_16BYTES d4,d5,q8, q11
 .endm
 
-.macro SAD_SSD_16_END arg0, arg1, arg2, arg3
-	SAD_VAR_16_END \arg0, \arg1, \arg2, \arg3
+.macro SAD_SSD_16_END arg0, arg1, arg2
+	SAD_VAR_16_END \arg0, \arg1, \arg2
 
 	SSD_MUL_SUM_16BYTES d4,d5,q8, q11			//q8 for l_sqiff	reset for every 16x16
 .endm
