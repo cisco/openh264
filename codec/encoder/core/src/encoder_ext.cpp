@@ -267,7 +267,7 @@ int32_t ParamValidationExt (SWelsSvcCodingParam* pCodingParam) {
       }
       if (pCodingParam->bEnableRc) {	// multiple slices verify with gom
         //check uiSliceNum
-        GomValidCheckSliceNum (iMbWidth, iMbHeight, (int32_t*)&fDlp->sSliceCfg.sSliceArgument.uiSliceNum);
+        GomValidCheckSliceNum (iMbWidth, iMbHeight, &fDlp->sSliceCfg.sSliceArgument.uiSliceNum);
         assert (fDlp->sSliceCfg.sSliceArgument.uiSliceNum > 1);
         //set uiSliceMbNum with current uiSliceNum
         GomValidCheckSliceMbNum (iMbWidth, iMbHeight, &fDlp->sSliceCfg.sSliceArgument);
