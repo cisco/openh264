@@ -759,6 +759,7 @@ const SLevelLimits* GetLevelLimits (int32_t iLevelIdx, bool bConstraint3) {
 
 int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicWidth, int32_t* pPicHeight) {
   PBitStringAux pBs		= pBsAux;
+  SSubsetSps sTempSubsetSps;
   PSps pSps				= NULL;
   PSubsetSps pSubsetSps	= NULL;
   SNalUnitHeader* pNalHead = &pCtx->sCurNalHead;
@@ -769,12 +770,6 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   int32_t iCode;
   bool bConstraintSetFlags[6] = { false };
   const bool kbUseSubsetFlag   = IS_SUBSET_SPS_NAL (pNalHead->eNalUnitType);
-
-  if (kbUseSubsetFlag) {	// SubsetSps
-    pCtx->bSubspsExistAheadFlag	= true;
-  } else {	// Sps
-    pCtx->bSpsExistAheadFlag		= true;
-  }
 
   WELS_READ_VERIFY (BsGetBits (pBs, 8, &uiCode)); //profile_idc
   uiProfileIdc	= uiCode;
@@ -801,13 +796,13 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   iSpsId		= uiCode;
 
   if (kbUseSubsetFlag) {
-    pSubsetSps	= &pCtx->sSubsetSpsBuffer[iSpsId];
-    pSps		= &pSubsetSps->sSps;
     pCtx->bSubspsAvailFlags[iSpsId]	= false;
   } else {
-    pSps = &pCtx->sSpsBuffer[iSpsId];
     pCtx->bSpsAvailFlags[iSpsId] = false;
   }
+  pSubsetSps = &sTempSubsetSps;
+  pSps = &sTempSubsetSps.sSps;
+  memset (pSubsetSps, 0, sizeof(SSubsetSps));
   const SLevelLimits* pSLevelLimits = GetLevelLimits (uiLevelIdc, bConstraintSetFlags[3]);
   if (NULL == pSLevelLimits) {
     WelsLog (pCtx, WELS_LOG_WARNING, "ParseSps(): level_idx (%d).\n", uiLevelIdc);
@@ -986,9 +981,13 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   *pPicWidth	= pSps->iMbWidth << 4;
   *pPicHeight	= pSps->iMbHeight << 4;
   if (kbUseSubsetFlag) {
+    memcpy (&pCtx->sSubsetSpsBuffer[iSpsId], pSubsetSps, sizeof(SSubsetSps));
     pCtx->bSubspsAvailFlags[iSpsId]	= true;
+    pCtx->bSubspsExistAheadFlag	= true;
   } else {
+    memcpy (&pCtx->sSpsBuffer[iSpsId], pSps, sizeof(SSps));
     pCtx->bSpsAvailFlags[iSpsId] = true;
+    pCtx->bSpsExistAheadFlag		= true;
   }
   return 0;
 }
@@ -1010,6 +1009,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
 int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux) {
 
   PPps pPps = NULL;
+  SPps sTempPps;
   uint32_t uiPpsId = 0;
   uint32_t iTmp;
   uint32_t uiCode;
@@ -1022,7 +1022,8 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux)
   }
 
   pCtx->bPpsAvailFlags[uiPpsId] = false;
-  pPps = &pPpsList[uiPpsId];
+  pPps = &sTempPps;
+  memset (pPps, 0, sizeof(SPps));
 
   pPps->iPpsId = uiPpsId;
   WELS_READ_VERIFY (BsGetUe (pBsAux, &uiCode)); //seq_parameter_set_id
@@ -1104,6 +1105,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux)
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //redundant_pic_cnt_present_flag
   pPps->bRedundantPicCntPresentFlag           = !!uiCode;
 
+  memcpy (&pCtx->sPpsBuffer[uiPpsId], pPps, sizeof(SPps));
   pCtx->bPpsAvailFlags[uiPpsId] = true;
 
   return ERR_NONE;
