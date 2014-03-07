@@ -38,7 +38,6 @@
 		4CE4469F18BC5EAB0017DF25 /* welsDecoderExt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4468518BC5EAB0017DF25 /* welsDecoderExt.cpp */; };
 		4CE447AC18BC6BE90017DF25 /* block_add_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CE447A718BC6BE90017DF25 /* block_add_neon.S */; };
 		4CE447AE18BC6BE90017DF25 /* intra_pred_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CE447A918BC6BE90017DF25 /* intra_pred_neon.S */; };
-		4CE447AF18BC6BE90017DF25 /* mc_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CE447AA18BC6BE90017DF25 /* mc_neon.S */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -132,7 +131,6 @@
 		4CE4468518BC5EAB0017DF25 /* welsDecoderExt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = welsDecoderExt.cpp; sourceTree = "<group>"; };
 		4CE447A718BC6BE90017DF25 /* block_add_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = block_add_neon.S; sourceTree = "<group>"; };
 		4CE447A918BC6BE90017DF25 /* intra_pred_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = intra_pred_neon.S; sourceTree = "<group>"; };
-		4CE447AA18BC6BE90017DF25 /* mc_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = mc_neon.S; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -325,7 +323,6 @@
 			children = (
 				4CE447A718BC6BE90017DF25 /* block_add_neon.S */,
 				4CE447A918BC6BE90017DF25 /* intra_pred_neon.S */,
-				4CE447AA18BC6BE90017DF25 /* mc_neon.S */,
 			);
 			path = arm;
 			sourceTree = "<group>";
@@ -411,7 +408,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4CE447AF18BC6BE90017DF25 /* mc_neon.S in Sources */,
 				4CE4469B18BC5EAB0017DF25 /* pic_queue.cpp in Sources */,
 				4CE4469F18BC5EAB0017DF25 /* welsDecoderExt.cpp in Sources */,
 				4CE4469318BC5EAB0017DF25 /* fmo.cpp in Sources */,

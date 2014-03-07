@@ -82,6 +82,18 @@ void McHorVer02WidthEq4_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* p
 void McHorVer22WidthEq16_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer22WidthEq8_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
 void McHorVer22WidthEq4_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
+
+void PixStrideAvgWidthEq16_neon(uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcStrideA, const uint8_t* pSrcB, int32_t iSrcStrideB, int32_t iHeight);
+void PixStrideAvgWidthEq8_neon(uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcStrideA, const uint8_t* pSrcB, int32_t iSrcStrideB, int32_t iHeight);
+
+void McHorVer20Width17_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);// width+1
+void McHorVer20Width9_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);// width+1
+
+void McHorVer02Height17_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);// height+1
+void McHorVer02Height9_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);// height+1
+
+void McHorVer22Width17_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);//width+1&&height+1
+void McHorVer22Width9_neon(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);//width+1&&height+1
 #endif
 
 #if defined(X86_ASM)
