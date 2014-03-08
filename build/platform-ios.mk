@@ -1,3 +1,4 @@
+ARCH = armv7
 include build/platform-darwin.mk
 CXX = clang++
 CC = clang
