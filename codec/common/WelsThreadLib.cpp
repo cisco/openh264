@@ -188,12 +188,14 @@ WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_
   err = pthread_attr_init (&at);
   if (err)
     return err;
+#ifndef __ANDROID__
   err = pthread_attr_setscope (&at, PTHREAD_SCOPE_SYSTEM);
   if (err)
     return err;
   err = pthread_attr_setschedpolicy (&at, SCHED_FIFO);
   if (err)
     return err;
+#endif
   err = pthread_create (thread, &at, routine, arg);
 
   pthread_attr_destroy (&at);
