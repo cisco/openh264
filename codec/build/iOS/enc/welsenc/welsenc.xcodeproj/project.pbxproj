@@ -637,7 +637,10 @@
 					NO_DYNAMIC_VP,
 					HAVE_NEON,
 				);
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = (
+					APPLE_IOS,
+					NO_DYNAMIC_VP,
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../../../common",
 					"$(SRCROOT)/../../../../processing/interface",
@@ -667,7 +670,10 @@
 					NO_DYNAMIC_VP,
 					HAVE_NEON,
 				);
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = (
+					APPLE_IOS,
+					NO_DYNAMIC_VP,
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../../../common",
 					"$(SRCROOT)/../../../../processing/interface",
