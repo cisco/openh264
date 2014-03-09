@@ -2297,7 +2297,7 @@ WELS_EXTERN WelsSampleSad4x4_mmx
 
 align 16
 ;***********************************************************************
-;   int32_t __cdecl WelsSampleSad4x4_mmx (uint8_t *, int32_t, uint8_t *, int32_t )
+;   int32_t WelsSampleSad4x4_mmx (uint8_t *, int32_t, uint8_t *, int32_t )
 ;***********************************************************************
 WelsSampleSad4x4_mmx:
     ;push    ebx

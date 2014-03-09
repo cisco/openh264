@@ -49,7 +49,7 @@ SECTION .text
 
 ALIGN 16
 ;***********************************************************************
-;_inline void __cdecl WelsPrefetchZero_mmx(int8_t const*_A);
+;_inline void WelsPrefetchZero_mmx(int8_t const*_A);
 ;***********************************************************************
 WELS_EXTERN WelsPrefetchZero_mmx
 WelsPrefetchZero_mmx:

@@ -195,7 +195,7 @@ WELS_EXTERN WelsI16x16LumaPredPlane_sse2
 
 ALIGN 16
 ;***********************************************************************
-;   void __cdecl WelsI4x4LumaPredH_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride)
+;   void WelsI4x4LumaPredH_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride)
 ;
 ;	pred must align to 16
 ;***********************************************************************
@@ -508,7 +508,7 @@ ALIGN 16
 ;	7 is the start pixel of current 4x4 block
 ;	pred[7] = ([6]+[0]*2+[1]+2)/4
 ;
-;   void __cdecl WelsI4x4LumaPredDDR_mmx(uint8_t *pred,uint8_t *pRef,int32_t stride)
+;   void WelsI4x4LumaPredDDR_mmx(uint8_t *pred,uint8_t *pRef,int32_t stride)
 ;
 ;***********************************************************************
 WelsI4x4LumaPredDDR_mmx:
@@ -567,7 +567,7 @@ ALIGN 16
 ;	6 is the start pixel of current 4x4 block
 ;	pred[6] = ([1]+[2]+[3]+[4]+[5]+[10]+[15]+[20]+4)/8
 ;
-;   void __cdecl WelsI4x4LumaPredDc_sse2(uint8_t *pred,uint8_t *pRef,int32_t stride)
+;   void WelsI4x4LumaPredDc_sse2(uint8_t *pred,uint8_t *pRef,int32_t stride)
 ;
 ;***********************************************************************
 WelsI4x4LumaPredDc_sse2:
@@ -608,7 +608,7 @@ WelsI4x4LumaPredDc_sse2:
 
 ALIGN 16
 ;***********************************************************************
-;	void __cdecl WelsIChromaPredH_mmx(uint8_t *pred, uint8_t *pRef, int32_t stride)
+;	void WelsIChromaPredH_mmx(uint8_t *pred, uint8_t *pRef, int32_t stride)
 ;   copy 8 pixel of 8 line from left
 ;***********************************************************************
 %macro MMX_PRED_H_8X8_ONE_LINE 4
@@ -670,7 +670,7 @@ WelsIChromaPredH_mmx:
 
 ALIGN 16
 ;***********************************************************************
-;	void __cdecl WelsI4x4LumaPredV_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride)
+;	void WelsI4x4LumaPredV_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride)
 ;   copy pixels from top 4 pixels
 ;***********************************************************************
 WELS_EXTERN WelsI4x4LumaPredV_sse2
@@ -688,7 +688,7 @@ WelsI4x4LumaPredV_sse2:
 
 ALIGN 16
 ;***********************************************************************
-;	void __cdecl WelsIChromaPredV_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride)
+;	void WelsIChromaPredV_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride)
 ;   copy 8 pixels from top 8 pixels
 ;***********************************************************************
 WELS_EXTERN WelsIChromaPredV_sse2
