@@ -120,7 +120,7 @@
     vrshrn.u16		$8, $6, #2
 .endm
 
-.macro	LORD_CHROMA_DATA_4
+.macro	LOAD_CHROMA_DATA_4
     vld4.u8	{$0[$8],$1[$8],$2[$8],$3[$8]}, [r0], r2
     vld4.u8	{$4[$8],$5[$8],$6[$8],$7[$8]}, [r1], r2
 .endm
@@ -130,7 +130,7 @@
     vst4.u8	{$4[$8],$5[$8],$6[$8],$7[$8]}, [r1], r2
 .endm
 
-.macro	LORD_LUMA_DATA_3
+.macro	LOAD_LUMA_DATA_3
     vld3.u8	{$0[$6],$1[$6],$2[$6]}, [r2], r1
     vld3.u8	{$3[$6],$4[$6],$5[$6]}, [r0], r1
 .endm
@@ -140,7 +140,7 @@
     vst4.u8	{$0[$5],$1[$5],$2[$5],$3[$5]}, [r2], r1
 .endm
 
-.macro	LORD_LUMA_DATA_4
+.macro	LOAD_LUMA_DATA_4
     vld4.u8	{$0[$8],$1[$8],$2[$8],$3[$8]}, [r3], r1
     vld4.u8	{$4[$8],$5[$8],$6[$8],$7[$8]}, [r0], r1
 .endm
@@ -239,7 +239,7 @@
     vrshrn.u16		\arg8, \arg6, #2
 .endm
 
-.macro	LORD_CHROMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
+.macro	LOAD_CHROMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
     vld4.u8	{\arg0[\arg8],\arg1[\arg8],\arg2[\arg8],\arg3[\arg8]}, [r0], r2
     vld4.u8	{\arg4[\arg8],\arg5[\arg8],\arg6[\arg8],\arg7[\arg8]}, [r1], r2
 .endm
@@ -249,7 +249,7 @@
     vst4.u8	{\arg4[\arg8],\arg5[\arg8],\arg6[\arg8],\arg7[\arg8]}, [r1], r2
 .endm
 
-.macro	LORD_LUMA_DATA_3 arg0, arg1, arg2, arg3, arg4, arg5, arg6
+.macro	LOAD_LUMA_DATA_3 arg0, arg1, arg2, arg3, arg4, arg5, arg6
     vld3.u8	{\arg0[\arg6],\arg1[\arg6],\arg2[\arg6]}, [r2], r1
     vld3.u8	{\arg3[\arg6],\arg4[\arg6],\arg5[\arg6]}, [r0], r1
 .endm
@@ -259,7 +259,7 @@
     vst4.u8	{\arg0[\arg5],\arg1[\arg5],\arg2[\arg5],\arg3[\arg5]}, [r2], r1
 .endm
 
-.macro	LORD_LUMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
+.macro	LOAD_LUMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
     vld4.u8	{\arg0[\arg8],\arg1[\arg8],\arg2[\arg8],\arg3[\arg8]}, [r3], r1
     vld4.u8	{\arg4[\arg8],\arg5[\arg8],\arg6[\arg8],\arg7[\arg8]}, [r0], r1
 .endm
@@ -402,23 +402,23 @@ WELS_ASM_FUNC_END
     vdup.u8	q9, r3
 
     sub			r2, r0, #3
-    LORD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 0
-    LORD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 1
-    LORD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 2
-    LORD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 3
-    LORD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 4
-    LORD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 5
-    LORD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 6
-    LORD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 7
+    LOAD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 0
+    LOAD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 1
+    LOAD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 2
+    LOAD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 3
+    LOAD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 4
+    LOAD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 5
+    LOAD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 6
+    LOAD_LUMA_DATA_3		d0, d1, d2, d6, d7, d8, 7
 
-    LORD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 0
-    LORD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 1
-    LORD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 2
-    LORD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 3
-    LORD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 4
-    LORD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 5
-    LORD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 6
-    LORD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 7
+    LOAD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 0
+    LOAD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 1
+    LOAD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 2
+    LOAD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 3
+    LOAD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 4
+    LOAD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 5
+    LOAD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 6
+    LOAD_LUMA_DATA_3		d3, d4, d5, d9, d10, d11, 7
 
     vswp		d1, d2
     vswp		d3, d4
@@ -496,23 +496,23 @@ WELS_ASM_FUNC_BEGIN DeblockLumaEq4H_neon
     vdup.u8	q4, r3
 
     sub			r3, r0, #4				//	pix -= 4
-    LORD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,0
-    LORD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,1
-    LORD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,2
-    LORD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,3
-    LORD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,4
-    LORD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,5
-    LORD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,6
-    LORD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,7
+    LOAD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,0
+    LOAD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,1
+    LOAD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,2
+    LOAD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,3
+    LOAD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,4
+    LOAD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,5
+    LOAD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,6
+    LOAD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,7
 
-    LORD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,0
-    LORD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,1
-    LORD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,2
-    LORD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,3
-    LORD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,4
-    LORD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,5
-    LORD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,6
-    LORD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,7
+    LOAD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,0
+    LOAD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,1
+    LOAD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,2
+    LOAD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,3
+    LOAD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,4
+    LOAD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,5
+    LOAD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,6
+    LOAD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,7
 
     vswp		q9, q10
     vswp		d17,d18
@@ -694,14 +694,14 @@ WELS_ASM_FUNC_BEGIN DeblockChromaLt4H_neon
     sub			r1, r1, #2
     vld1.s8	{d15}, [r3]
 
-    LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 0
-    LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 1
-    LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 2
-    LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 3
-    LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 4
-    LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 5
-    LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 6
-    LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 7
+    LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 0
+    LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 1
+    LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 2
+    LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 3
+    LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 4
+    LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 5
+    LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 6
+    LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 7
     vswp		q1, q2
     vswp		d1, d2
     vswp		d6, d5
@@ -753,14 +753,14 @@ WELS_ASM_FUNC_BEGIN DeblockChromaEq4H_neon
     sub			r0, r0, #2
     sub			r1, r1, #2
 
-    LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 0
-    LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 1
-    LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 2
-    LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 3
-    LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 4
-    LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 5
-    LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 6
-    LORD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 7
+    LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 0
+    LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 1
+    LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 2
+    LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 3
+    LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 4
+    LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 5
+    LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 6
+    LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 7
     vswp		q1, q2
     vswp		d1, d2
     vswp		d6, d5
