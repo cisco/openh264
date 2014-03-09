@@ -1140,7 +1140,8 @@ WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN McHorVer22WidthEq16_neon
 	push		{r4}
-	ldr			r4, [sp, #4]
+	vpush		{q4-q7}
+	ldr			r4, [sp, #68]
 
 	sub			r0, #2					//src[-2]
 	sub			r0, r0, r1, lsl #1		//src[-2*src_stride-2]
@@ -1246,13 +1247,15 @@ w16_hv_mc_luma_loop:
 	sub		r4, #4
 	cmp		r4, #0
 	bne		w16_hv_mc_luma_loop
+	vpop		{q4-q7}
 	pop		{r4}
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN McHorVer22WidthEq8_neon
 	push		{r4}
-	ldr			r4, [sp, #4]
+	vpush		{q4}
+	ldr			r4, [sp, #20]
 
 	sub			r0, #2				//src[-2]
 	sub			r0, r0, r1, lsl #1	//src[-2*src_stride-2]
@@ -1275,66 +1278,68 @@ WELS_ASM_FUNC_BEGIN McHorVer22WidthEq8_neon
 
 w8_hv_mc_luma_loop:
 
-	vld1.u8	{q5}, [r0], r1	//use 13(8+5), =src[3]
+	vld1.u8	{q8}, [r0], r1	//use 13(8+5), =src[3]
 	//the 1st row
 	pld			[r0]
-	// vertical filtered into q6/q7
-	FILTER_6TAG_8BITS_TO_16BITS 	d0, d2, d4, d6, d8, d10, q6, q14, q15	// 8 avail
-	FILTER_6TAG_8BITS_TO_16BITS 	d1, d3, d5, d7, d9, d11, q7, q14, q15	// 5 avail
+	// vertical filtered into q9/q10
+	FILTER_6TAG_8BITS_TO_16BITS 	d0, d2, d4, d6, d8, d16, q9, q14, q15	// 8 avail
+	FILTER_6TAG_8BITS_TO_16BITS 	d1, d3, d5, d7, d9, d17, q10, q14, q15	// 5 avail
 	// horizon filtered
-	UNPACK_2_16BITS_TO_ABC	q6, q7, q11, q12, q13
-	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d12	//output to q6[0]
-	vst1.u8	d12, [r2], r3			//write 8Byte
+	UNPACK_2_16BITS_TO_ABC	q9, q10, q11, q12, q13
+	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d18	//output to q9[0]
+	vst1.u8	d18, [r2], r3			//write 8Byte
 
 	vld1.u8	{q0}, [r0], r1		//read 2nd row
 	//the 2nd row
 	pld			[r0]
-	// vertical filtered into q6/q7
-	FILTER_6TAG_8BITS_TO_16BITS 	d2, d4, d6, d8, d10, d0, q6, q14, q15	// 8 avail
-	FILTER_6TAG_8BITS_TO_16BITS 	d3, d5, d7, d9, d11, d1, q7, q14, q15	// 5 avail
+	// vertical filtered into q9/q10
+	FILTER_6TAG_8BITS_TO_16BITS 	d2, d4, d6, d8, d16, d0, q9, q14, q15	// 8 avail
+	FILTER_6TAG_8BITS_TO_16BITS 	d3, d5, d7, d9, d17, d1, q10, q14, q15	// 5 avail
 	// horizon filtered
-	UNPACK_2_16BITS_TO_ABC	q6, q7, q11, q12, q13
-	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d12	//output to q6[0]
-	vst1.u8	d12, [r2], r3		//write 8Byte
+	UNPACK_2_16BITS_TO_ABC	q9, q10, q11, q12, q13
+	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d18	//output to q9[0]
+	vst1.u8	d18, [r2], r3		//write 8Byte
 
 	vld1.u8	{q1}, [r0], r1		//read 3rd row
 	//the 3rd row
 	pld			[r0]
-	// vertical filtered into q6/q7
-	FILTER_6TAG_8BITS_TO_16BITS 	d4, d6, d8, d10, d0, d2, q6, q14, q15	// 8 avail
-	FILTER_6TAG_8BITS_TO_16BITS 	d5, d7, d9, d11, d1, d3, q7, q14, q15	// 5 avail
+	// vertical filtered into q9/q10
+	FILTER_6TAG_8BITS_TO_16BITS 	d4, d6, d8, d16, d0, d2, q9, q14, q15	// 8 avail
+	FILTER_6TAG_8BITS_TO_16BITS 	d5, d7, d9, d17, d1, d3, q10, q14, q15	// 5 avail
 	// horizon filtered
-	UNPACK_2_16BITS_TO_ABC	q6, q7, q11, q12, q13
-	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d12	//output to q6[0]
-	vst1.u8	d12, [r2], r3			//write 8Byte
+	UNPACK_2_16BITS_TO_ABC	q9, q10, q11, q12, q13
+	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d18	//output to q9[0]
+	vst1.u8	d18, [r2], r3			//write 8Byte
 
 	vld1.u8	{q2}, [r0], r1		//read 4th row
 	//the 4th row
 	pld			[r0]
-	// vertical filtered into q6/q7
-	FILTER_6TAG_8BITS_TO_16BITS 	d6, d8, d10, d0, d2, d4, q6, q14, q15	// 8 avail
-	FILTER_6TAG_8BITS_TO_16BITS 	d7, d9, d11, d1, d3, d5, q7, q14, q15	// 5 avail
+	// vertical filtered into q9/q10
+	FILTER_6TAG_8BITS_TO_16BITS 	d6, d8, d16, d0, d2, d4, q9, q14, q15	// 8 avail
+	FILTER_6TAG_8BITS_TO_16BITS 	d7, d9, d17, d1, d3, d5, q10, q14, q15	// 5 avail
 	// horizon filtered
-	UNPACK_2_16BITS_TO_ABC	q6, q7, q11, q12, q13
-	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d12	//output to q6[0]
-	vst1.u8	d12, [r2], r3			//write 8Byte
+	UNPACK_2_16BITS_TO_ABC	q9, q10, q11, q12, q13
+	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d18	//output to q9[0]
+	vst1.u8	d18, [r2], r3			//write 8Byte
 
 	//q4~q5, q0~q2, --> q0~q4
 	vswp	q0, q4
 	vswp	q2, q4
 	vmov	q3, q1
-	vmov	q1, q5
+	vmov	q1, q8
 
 	sub		r4, #4
 	cmp		r4, #0
 	bne		w8_hv_mc_luma_loop
+	vpop		{q4}
 	pop		{r4}
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN McHorVer22WidthEq4_neon
 	push		{r4 ,r5, r6}
-	ldr			r6, [sp, #12]
+	vpush		{q4-q7}
+	ldr			r6, [sp, #76]
 
 	sub			r0, #2				//src[-2]
 	sub			r0, r0, r1, lsl #1	//src[-2*src_stride-2]
@@ -1417,6 +1422,7 @@ w4_hv_mc_luma_loop:
 	cmp		r6, #0
 	bne		w4_hv_mc_luma_loop
 
+	vpop		{q4-q7}
 	pop		{r4, r5, r6}
 WELS_ASM_FUNC_END
 
@@ -1889,7 +1895,8 @@ WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN McHorVer22Width17_neon
 	push		{r4}
-	ldr			r4, [sp, #4]
+	vpush		{q4-q7}
+	ldr			r4, [sp, #68]
 
 	sub			r0, #2					//src[-2]
 	sub			r0, r0, r1, lsl #1		//src[-2*src_stride-2]
@@ -2016,13 +2023,15 @@ w17_hv_mc_luma_loop:
 	UNPACK_1_IN_8x16BITS_TO_8BITS	d2, d22, d23, q11 //output to d2[0]
 	vst1.u8	{d2[0]}, [r2], r3		//write 16th Byte
 
+	vpop		{q4-q7}
 	pop		{r4}
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN McHorVer22Width9_neon
 	push		{r4}
-	ldr			r4, [sp, #4]
+	vpush		{q4}
+	ldr			r4, [sp, #20]
 
 	sub			r0, #2				//src[-2]
 	sub			r0, r0, r1, lsl #1	//src[-2*src_stride-2]
@@ -2046,78 +2055,79 @@ WELS_ASM_FUNC_BEGIN McHorVer22Width9_neon
 
 w9_hv_mc_luma_loop:
 
-	vld1.u8	{q5}, [r0], r1	//use 14(9+5), =src[3]
+	vld1.u8	{q8}, [r0], r1	//use 14(9+5), =src[3]
 	//the 1st row
 	pld			[r0]
-	// vertical filtered into q6/q7
-	FILTER_6TAG_8BITS_TO_16BITS 	d0, d2, d4, d6, d8, d10, q6, q14, q15	// 8 avail
-	FILTER_6TAG_8BITS_TO_16BITS 	d1, d3, d5, d7, d9, d11, q7, q14, q15	// 6 avail
+	// vertical filtered into q9/q10
+	FILTER_6TAG_8BITS_TO_16BITS 	d0, d2, d4, d6, d8, d16, q9, q14, q15	// 8 avail
+	FILTER_6TAG_8BITS_TO_16BITS 	d1, d3, d5, d7, d9, d17, q10, q14, q15	// 6 avail
 	// horizon filtered
-	UNPACK_2_16BITS_TO_ABC	q6, q7, q11, q12, q13
-	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d12	//output to q6[0]
-	vst1.u8	d12, [r2]!				//write 8Byte
-	UNPACK_1_IN_8x16BITS_TO_8BITS	d13, d14, d15, q7 //output to d13[0]
-	vst1.u8	{d13[0]}, [r2], r3	//write 8th Byte
+	UNPACK_2_16BITS_TO_ABC	q9, q10, q11, q12, q13
+	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d18	//output to q9[0]
+	vst1.u8	d18, [r2]!				//write 8Byte
+	UNPACK_1_IN_8x16BITS_TO_8BITS	d19, d20, d21, q10 //output to d19[0]
+	vst1.u8	{d19[0]}, [r2], r3	//write 8th Byte
 
 	vld1.u8	{q0}, [r0], r1		//read 2nd row
 	//the 2nd row
 	pld			[r0]
-	// vertical filtered into q6/q7
-	FILTER_6TAG_8BITS_TO_16BITS 	d2, d4, d6, d8, d10, d0, q6, q14, q15	// 8 avail
-	FILTER_6TAG_8BITS_TO_16BITS 	d3, d5, d7, d9, d11, d1, q7, q14, q15	// 6 avail
+	// vertical filtered into q9/q10
+	FILTER_6TAG_8BITS_TO_16BITS 	d2, d4, d6, d8, d16, d0, q9, q14, q15	// 8 avail
+	FILTER_6TAG_8BITS_TO_16BITS 	d3, d5, d7, d9, d17, d1, q10, q14, q15	// 6 avail
 	// horizon filtered
-	UNPACK_2_16BITS_TO_ABC	q6, q7, q11, q12, q13
-	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d12	//output to q6[0]
-	vst1.u8	d12, [r2]!				//write 8Byte
-	UNPACK_1_IN_8x16BITS_TO_8BITS	d13, d14, d15, q7 //output to d13[0]
-	vst1.u8	{d13[0]}, [r2], r3	//write 8th Byte
+	UNPACK_2_16BITS_TO_ABC	q9, q10, q11, q12, q13
+	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d18	//output to q9[0]
+	vst1.u8	d18, [r2]!				//write 8Byte
+	UNPACK_1_IN_8x16BITS_TO_8BITS	d19, d20, d21, q10 //output to d19[0]
+	vst1.u8	{d19[0]}, [r2], r3	//write 8th Byte
 
 	vld1.u8	{q1}, [r0], r1		//read 3rd row
 	//the 3rd row
 	pld			[r0]
-	// vertical filtered into q6/q7
-	FILTER_6TAG_8BITS_TO_16BITS 	d4, d6, d8, d10, d0, d2, q6, q14, q15	// 8 avail
-	FILTER_6TAG_8BITS_TO_16BITS 	d5, d7, d9, d11, d1, d3, q7, q14, q15	// 6 avail
+	// vertical filtered into q9/q10
+	FILTER_6TAG_8BITS_TO_16BITS 	d4, d6, d8, d16, d0, d2, q9, q14, q15	// 8 avail
+	FILTER_6TAG_8BITS_TO_16BITS 	d5, d7, d9, d17, d1, d3, q10, q14, q15	// 6 avail
 	// horizon filtered
-	UNPACK_2_16BITS_TO_ABC	q6, q7, q11, q12, q13
-	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d12	//output to q6[0]
-	vst1.u8	d12, [r2]!				//write 8Byte
-	UNPACK_1_IN_8x16BITS_TO_8BITS	d13, d14, d15, q7 //output to d13[0]
-	vst1.u8	{d13[0]}, [r2], r3	//write 8th Byte
+	UNPACK_2_16BITS_TO_ABC	q9, q10, q11, q12, q13
+	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d18	//output to q9[0]
+	vst1.u8	d18, [r2]!				//write 8Byte
+	UNPACK_1_IN_8x16BITS_TO_8BITS	d19, d20, d21, q10 //output to d19[0]
+	vst1.u8	{d19[0]}, [r2], r3	//write 8th Byte
 
 	vld1.u8	{q2}, [r0], r1		//read 4th row
 	//the 4th row
 	pld			[r0]
-	// vertical filtered into q6/q7
-	FILTER_6TAG_8BITS_TO_16BITS 	d6, d8, d10, d0, d2, d4, q6, q14, q15	// 8 avail
-	FILTER_6TAG_8BITS_TO_16BITS 	d7, d9, d11, d1, d3, d5, q7, q14, q15	// 6 avail
+	// vertical filtered into q9/q10
+	FILTER_6TAG_8BITS_TO_16BITS 	d6, d8, d16, d0, d2, d4, q9, q14, q15	// 8 avail
+	FILTER_6TAG_8BITS_TO_16BITS 	d7, d9, d17, d1, d3, d5, q10, q14, q15	// 6 avail
 	// horizon filtered
-	UNPACK_2_16BITS_TO_ABC	q6, q7, q11, q12, q13
-	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d12	//output to q6[0]
-	vst1.u8	d12, [r2]!			//write 8Byte
-	UNPACK_1_IN_8x16BITS_TO_8BITS	d13, d14, d15, q7 //output to d13[0]
-	vst1.u8	{d13[0]}, [r2], r3	//write 8th Byte
+	UNPACK_2_16BITS_TO_ABC	q9, q10, q11, q12, q13
+	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d18	//output to q9[0]
+	vst1.u8	d18, [r2]!			//write 8Byte
+	UNPACK_1_IN_8x16BITS_TO_8BITS	d19, d20, d21, q10 //output to d19[0]
+	vst1.u8	{d19[0]}, [r2], r3	//write 8th Byte
 
-	//q4~q5, q0~q2, --> q0~q4
+	//q4~q8, q0~q2, --> q0~q4
 	vswp	q0, q4
 	vswp	q2, q4
 	vmov	q3, q1
-	vmov	q1, q5
+	vmov	q1, q8
 
 	sub		r4, #4
 	cmp		r4, #1
 	bne		w9_hv_mc_luma_loop
 	//the last row
-	vld1.u8	{q5}, [r0], r1	//use 14(9+5), =src[3]
-	// vertical filtered into q6/q7
-	FILTER_6TAG_8BITS_TO_16BITS 	d0, d2, d4, d6, d8, d10, q6, q14, q15	// 8 avail
-	FILTER_6TAG_8BITS_TO_16BITS 	d1, d3, d5, d7, d9, d11, q7, q14, q15	// 6 avail
+	vld1.u8	{q8}, [r0], r1	//use 14(9+5), =src[3]
+	// vertical filtered into q9/q10
+	FILTER_6TAG_8BITS_TO_16BITS 	d0, d2, d4, d6, d8, d16, q9, q14, q15	// 8 avail
+	FILTER_6TAG_8BITS_TO_16BITS 	d1, d3, d5, d7, d9, d17, q10, q14, q15	// 6 avail
 	// horizon filtered
-	UNPACK_2_16BITS_TO_ABC	q6, q7, q11, q12, q13
-	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d12	//output to q6[0]
-	vst1.u8	d12, [r2]!				//write 8Byte
-	UNPACK_1_IN_8x16BITS_TO_8BITS	d13, d14, d15, q7 //output to d13[0]
-	vst1.u8	{d13[0]}, [r2], r3	//write 8th Byte
+	UNPACK_2_16BITS_TO_ABC	q9, q10, q11, q12, q13
+	FILTER_3_IN_16BITS_TO_8BITS q11, q12, q13, d18	//output to q9[0]
+	vst1.u8	d18, [r2]!				//write 8Byte
+	UNPACK_1_IN_8x16BITS_TO_8BITS	d19, d20, d21, q10 //output to d19[0]
+	vst1.u8	{d19[0]}, [r2], r3	//write 8th Byte
+	vpop		{q4}
 	pop		{r4}
 WELS_ASM_FUNC_END
 

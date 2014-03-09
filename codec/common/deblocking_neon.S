@@ -277,6 +277,7 @@
 #endif
 
 WELS_ASM_FUNC_BEGIN DeblockLumaLt4V_neon
+    vpush	{q4-q7}
     vdup.u8	q11, r2
     vdup.u8	q9, r3
 
@@ -290,7 +291,7 @@ WELS_ASM_FUNC_BEGIN DeblockLumaLt4V_neon
     vld1.u8	{q5}, [r0]
     sub			r2, r2, r1
 
-    ldr			r3, [sp, #0]
+    ldr			r3, [sp, #64]
     vld1.s8	{d31}, [r3]
     vdup.s8	d28, d31[0]
     vdup.s8	d30, d31[1]
@@ -332,10 +333,12 @@ WELS_ASM_FUNC_BEGIN DeblockLumaLt4V_neon
     vst1.u8	{q3}, [r2]	, r1
     vst1.u8	{q7}, [r2]
 
+    vpop	{q4-q7}
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN DeblockLumaEq4V_neon
+    vpush	{q4-q7}
 
     vdup.u8	q5, r2
     vdup.u8	q4, r3
@@ -393,10 +396,12 @@ WELS_ASM_FUNC_BEGIN DeblockLumaEq4V_neon
     DIFF_LUMA_EQ4_MASK	q3,  q14, q0, q4
     vst1.u8	{q4}, [r3], r1
 
+    vpop	{q4-q7}
 WELS_ASM_FUNC_END
 
 
     WELS_ASM_FUNC_BEGIN DeblockLumaLt4H_neon
+    vpush	{q4-q7}
 
     vdup.u8	q11, r2
     vdup.u8	q9, r3
@@ -429,7 +434,7 @@ WELS_ASM_FUNC_END
 
     sub			r0, r0, r1, lsl #4
 
-    ldr			r3, [sp, #0]
+    ldr			r3, [sp, #64]
     vld1.s8	{d31}, [r3]
     vdup.s8	d28, d31[0]
     vdup.s8	d30, d31[1]
@@ -488,10 +493,12 @@ WELS_ASM_FUNC_END
     STORE_LUMA_DATA_4		d6, d7, d8, d9, 4, 5
     STORE_LUMA_DATA_4		d6, d7, d8, d9, 6, 7
 
+    vpop	{q4-q7}
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN DeblockLumaEq4H_neon
+    vpush	{q4-q7}
     vdup.u8	q5, r2
     vdup.u8	q4, r3
 
@@ -591,6 +598,7 @@ WELS_ASM_FUNC_BEGIN DeblockLumaEq4H_neon
     STORE_LUMA_DATA_3		d7,d8,d9,d13,d14,d15,6
     STORE_LUMA_DATA_3		d7,d8,d9,d13,d14,d15,7
 
+    vpop	{q4-q7}
 WELS_ASM_FUNC_END
 
 
@@ -647,9 +655,10 @@ WELS_ASM_FUNC_END
 
 
     WELS_ASM_FUNC_BEGIN DeblockChromaEq4V_neon
+    vpush	{q4-q5}
 
     vdup.u8	q11, r3
-    ldr			r3, [sp, #0]
+    ldr			r3, [sp, #32]
 
     sub			r0, r0, r2	, lsl #1
     sub			r1, r1, r2, lsl #1
@@ -670,10 +679,10 @@ WELS_ASM_FUNC_END
 
     vmov			q11, q10
 
-    DIFF_CHROMA_EQ4_P0Q0		d0, d2, d4, d6, q4, q5, q6, d14, d0		// Cb::p0' q0'
-    DIFF_CHROMA_EQ4_P0Q0		d1, d3, d5, d7, q12, q13, q14, d15, d1	// Cr::p0' q0'
+    DIFF_CHROMA_EQ4_P0Q0		d0, d2, d4, d6, q4, q5, q8, d30, d0		// Cb::p0' q0'
+    DIFF_CHROMA_EQ4_P0Q0		d1, d3, d5, d7, q12, q13, q14, d31, d1	// Cr::p0' q0'
 
-    vbsl.u8	q10, q7, q1
+    vbsl.u8	q10, q15, q1
     vst1.u8	{d20}, [r0], r2
     vst1.u8	{d21}, [r1], r2
 
@@ -681,6 +690,7 @@ WELS_ASM_FUNC_END
     vst1.u8	{d22}, [r0]
     vst1.u8	{d23}, [r1]
 
+    vpop	{q4-q5}
 WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN DeblockChromaLt4H_neon
@@ -747,8 +757,9 @@ WELS_ASM_FUNC_BEGIN DeblockChromaLt4H_neon
 WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN DeblockChromaEq4H_neon
+    vpush	{q4-q5}
     vdup.u8	q11, r3
-    ldr			r3, [sp, #0]
+    ldr			r3, [sp, #32]
 
     sub			r0, r0, #2
     sub			r1, r1, #2
@@ -792,6 +803,7 @@ WELS_ASM_FUNC_BEGIN DeblockChromaEq4H_neon
     STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 6
     STORE_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 7
 
+    vpop	{q4-q5}
 WELS_ASM_FUNC_END
 
 

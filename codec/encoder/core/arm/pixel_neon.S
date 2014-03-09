@@ -38,85 +38,85 @@
     vld1.64     {q0}, [r0,:128], r1
     vld1.64     {q1}, [r2], r3
 
-    vsubl.u8    q4,  d0,  d2
-    vld1.64     {q2}, [r0,:128], r1
-
-    vsubl.u8    q6, d1,  d3
-    vld1.64     {q3}, [r2], r3
-
-    vsubl.u8    q5,  d4,  d6
-    vld1.64     {q0}, [r0,:128], r1
-
-    vsubl.u8    q7, d5,  d7
-    vld1.64     {q1}, [r2], r3
-
-    vsubl.u8    q8, d0,  d2
+    vsubl.u8    q8,  d0,  d2
     vld1.64     {q2}, [r0,:128], r1
 
     vsubl.u8    q10, d1,  d3
-    vadd.s16    q0,  q4,  q5
+    vld1.64     {q3}, [r2], r3
+
+    vsubl.u8    q9,  d4,  d6
+    vld1.64     {q0}, [r0,:128], r1
+
+    vsubl.u8    q11, d5,  d7
+    vld1.64     {q1}, [r2], r3
+
+    vsubl.u8    q12, d0,  d2
+    vld1.64     {q2}, [r0,:128], r1
+
+    vsubl.u8    q14, d1,  d3
+    vadd.s16    q0,  q8,  q9
 
     vld1.64     {q3}, [r2], r3
-    vsub.s16    q1,  q4,  q5
+    vsub.s16    q1,  q8,  q9
 
-    vsubl.u8    q9, d4,  d6
-    vsubl.u8    q11, d5,  d7
+    vsubl.u8    q13, d4,  d6
+    vsubl.u8    q15, d5,  d7
 
-    vadd.s16    q2, q8, q9
-    vsub.s16    q3, q8, q9
+    vadd.s16    q2, q12, q13
+    vsub.s16    q3, q12, q13
 
-    vadd.s16    q4, q6, q7
-    vsub.s16	q5, q6, q7
+    vadd.s16    q8, q10, q11
+    vsub.s16	q9, q10, q11
 
-    vadd.s16    q6, q10, q11
-    vsub.s16	q7, q10, q11
+    vadd.s16    q10, q14, q15
+    vsub.s16	q11, q14, q15
 
-    vadd.s16    q8, q0, q2
-    vsub.s16    q10, q0, q2
+    vadd.s16    q12, q0, q2
+    vsub.s16    q14, q0, q2
 
-    vadd.s16    q9, q4, q6
-    vsub.s16    q11, q4, q6
+    vadd.s16    q13, q8, q10
+    vsub.s16    q15, q8, q10
 
     vsub.s16    q0, q1, q3
     vadd.s16    q2, q1, q3
 
-    vsub.s16    q1, q5, q7
-    vadd.s16    q3, q5, q7
+    vsub.s16    q1, q9, q11
+    vadd.s16    q3, q9, q11
 
-    vtrn.16 q8, q10
-    vtrn.16 q9, q11
+    vtrn.16 q12, q14
+    vtrn.16 q13, q15
 
-    vadd.s16 q4, q8, q10
-    vabd.s16 q6, q8, q10
+    vadd.s16 q8, q12, q14
+    vabd.s16 q10, q12, q14
 
-    vadd.s16 q5, q9, q11
-    vabd.s16 q7, q9, q11
-
-    vabs.s16 q4, q4
-    vabs.s16 q5, q5
-
-    vtrn.16 q0, q2
-    vtrn.16 q1, q3
-
-    vadd.s16 q8, q0, q2
-    vabd.s16 q10, q0, q2
-
-    vadd.s16 q9, q1, q3
-    vabd.s16 q11, q1, q3
+    vadd.s16 q9, q13, q15
+    vabd.s16 q11, q13, q15
 
     vabs.s16 q8, q8
     vabs.s16 q9, q9
 
-    vtrn.32 q4, q6
-    vtrn.32 q5, q7
+    vtrn.16 q0, q2
+    vtrn.16 q1, q3
+
+    vadd.s16 q12, q0, q2
+    vabd.s16 q14, q0, q2
+
+    vadd.s16 q13, q1, q3
+    vabd.s16 q15, q1, q3
+
+    vabs.s16 q12, q12
+    vabs.s16 q13, q13
 
     vtrn.32 q8, q10
     vtrn.32 q9, q11
 
-    vmax.s16    q0, q4,  q6
-    vmax.s16    q1, q5,  q7
-    vmax.s16    q2, q8,  q10
-    vmax.s16    q3, q9,  q11
+    vtrn.32 q12, q14
+    vtrn.32 q13, q15
+
+    vmax.s16    q0, q8,  q10
+    vmax.s16    q1, q9,  q11
+    vmax.s16    q2, q12,  q14
+    vmax.s16    q3, q13,  q15
 
     vadd.u16 q0, q0, q1
     vadd.u16 q2, q2, q3
@@ -128,49 +128,49 @@
     vld1.64     {d1}, [r2], r3
 
     vld1.64     {d2}, [r0,:64], r1
-    vsubl.u8    q4, d0, d1
+    vsubl.u8    q8, d0, d1
 
     vld1.64     {d3}, [r2], r3
-    vsubl.u8    q5, d2, d3
+    vsubl.u8    q9, d2, d3
 
     vld1.64     {d4}, [r0,:64], r1
     vld1.64     {d5}, [r2], r3
 
-    vadd.s16    q8, q4, q5
-    vsubl.u8    q6, d4, d5
+    vadd.s16    q12, q8, q9
+    vsubl.u8    q10, d4, d5
 
     vld1.64     {d6}, [r0,:64], r1
     vld1.64     {d7}, [r2], r3
 
-    vsubl.u8    q7, d6,  d7
-    vsub.s16    q9, q4, q5
+    vsubl.u8    q11, d6,  d7
+    vsub.s16    q13, q8, q9
 
-    vadd.s16    q10, q6, q7
-    vsub.s16    q11, q6, q7
+    vadd.s16    q14, q10, q11
+    vsub.s16    q15, q10, q11
 
-    vadd.s16    q0, q8, q10
-    vsub.s16    q1, q8, q10
+    vadd.s16    q0, q12, q14
+    vsub.s16    q1, q12, q14
 
-    vsub.s16    q2, q9, q11
-    vadd.s16    q3, q9, q11
+    vsub.s16    q2, q13, q15
+    vadd.s16    q3, q13, q15
 
     vtrn.16     q0, q1
     vtrn.16     q2, q3
 
-    vadd.s16    q4, q0, q1
-    vabd.s16    q5, q0, q1
+    vadd.s16    q8, q0, q1
+    vabd.s16    q9, q0, q1
 
-    vabs.s16    q4, q4
-    vadd.s16    q6, q2, q3
+    vabs.s16    q8, q8
+    vadd.s16    q10, q2, q3
 
-    vabd.s16    q7, q2, q3
-    vabs.s16    q6, q6
+    vabd.s16    q11, q2, q3
+    vabs.s16    q10, q10
 
-    vtrn.32     q4, q5
-    vtrn.32     q6, q7
+    vtrn.32     q8, q9
+    vtrn.32     q10, q11
 
-    vmax.s16    q0, q4, q5
-    vmax.s16    q1, q6, q7
+    vmax.s16    q0, q8, q9
+    vmax.s16    q1, q10, q11
 .endm
 
 .macro SAD_16x4
@@ -221,6 +221,7 @@
 
 
 WELS_ASM_FUNC_BEGIN WelsSampleSad16x16_neon
+    vpush {q4-q7}
 
     vld1.64 {q0}, [r0, :128], r1
     vld1.64 {q1}, [r2], r3
@@ -257,10 +258,13 @@ WELS_ASM_FUNC_BEGIN WelsSampleSad16x16_neon
     vpaddl.u16 d0, d0
     vpaddl.u32 d0, d0
     vmov.u32   r0, d0[0]
+
+    vpop {q4-q7}
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN WelsSampleSad16x8_neon
+    vpush {q4-q7}
 
     vld1.64 {q0}, [r0, :128], r1
     vld1.64 {q1}, [r2], r3
@@ -295,6 +299,7 @@ WELS_ASM_FUNC_BEGIN WelsSampleSad16x8_neon
     vpaddl.u16 d0, d0
     vpaddl.u32 d0, d0
     vmov.u32   r0, d0[0]
+    vpop {q4-q7}
 WELS_ASM_FUNC_END
 
 
@@ -735,86 +740,94 @@ WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN WelsSampleSatd16x16_neon
+    vpush       {q7}
 
     SATD_16x4
-    vadd.u16    q15,  q0, q2
+    vadd.u16    q7,  q0, q2
 
     SATD_16x4
-    vadd.u16    q15,  q15, q0
-    vadd.u16    q15,  q15, q2
+    vadd.u16    q7,  q7, q0
+    vadd.u16    q7,  q7, q2
 
     SATD_16x4
-    vadd.u16    q15,  q15, q0
-    vadd.u16    q15,  q15, q2
+    vadd.u16    q7,  q7, q0
+    vadd.u16    q7,  q7, q2
 
     SATD_16x4
-    vadd.u16    q15,  q15, q0
-    vadd.u16    q15,  q15, q2
+    vadd.u16    q7,  q7, q0
+    vadd.u16    q7,  q7, q2
 
-    vadd.u16  d0, d30, d31
+    vadd.u16  d0, d14, d15
     vpaddl.u16  d0, d0
     vpaddl.u32  d0, d0
 
     vmov.32     r0,  d0[0]
+    vpop        {q7}
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN WelsSampleSatd16x8_neon
+    vpush       {q7}
 
     SATD_16x4
-    vadd.u16    q15,  q0, q2
+    vadd.u16    q7,  q0, q2
 
     SATD_16x4
-    vadd.u16    q15,  q15, q0
-    vadd.u16    q15,  q15, q2
+    vadd.u16    q7,  q7, q0
+    vadd.u16    q7,  q7, q2
 
-    vadd.u16  d0, d30, d31
+    vadd.u16  d0, d14, d15
     vpaddl.u16  d0, d0
     vpaddl.u32  d0, d0
 
     vmov.32     r0,  d0[0]
+    vpop        {q7}
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN WelsSampleSatd8x16_neon
+    vpush       {q7}
 
     SATD_8x4
-    vadd.u16    q15,  q0, q1
+    vadd.u16    q7,  q0, q1
 
     SATD_8x4
-    vadd.u16    q15,  q15, q0
-    vadd.u16    q15,  q15, q1
+    vadd.u16    q7,  q7, q0
+    vadd.u16    q7,  q7, q1
 
     SATD_8x4
-    vadd.u16    q15,  q15, q0
-    vadd.u16    q15,  q15, q1
+    vadd.u16    q7,  q7, q0
+    vadd.u16    q7,  q7, q1
 
     SATD_8x4
-    vadd.u16    q15,  q15, q0
-    vadd.u16    q15,  q15, q1
+    vadd.u16    q7,  q7, q0
+    vadd.u16    q7,  q7, q1
 
-    vadd.u16  d0, d30, d31
+    vadd.u16  d0, d14, d15
     vpaddl.u16  d0, d0
     vpaddl.u32  d0, d0
 
     vmov.32     r0,  d0[0]
+    vpop        {q7}
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN WelsSampleSatd8x8_neon
+    vpush       {q7}
 
     SATD_8x4
-    vadd.u16    q15,  q0, q1
+    vadd.u16    q7,  q0, q1
 
     SATD_8x4
-    vadd.u16    q15,  q15, q0
-    vadd.u16    q15,  q15, q1
+    vadd.u16    q7,  q7, q0
+    vadd.u16    q7,  q7, q1
 
-    vadd.u16  d0, d30, d31
+    vadd.u16  d0, d14, d15
     vpaddl.u16  d0, d0
     vpaddl.u32  d0, d0
 
     vmov.32     r0,  d0[0]
+    vpop        {q7}
 WELS_ASM_FUNC_END
 
 

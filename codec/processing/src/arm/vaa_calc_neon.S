@@ -635,8 +635,9 @@ WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN VAACalcSadSsdBgd_neon
 	stmdb sp!, {r0-r12, r14}
+	vpush {q4-q7}
 
-	ldr r4, [sp, #56] //r4 keeps the pic_stride
+	ldr r4, [sp, #120] //r4 keeps the pic_stride
 
 	sub r5, r4, #1
 	lsl r5, r5, #4 //r5 keeps the little step
@@ -645,12 +646,12 @@ WELS_ASM_FUNC_BEGIN VAACalcSadSsdBgd_neon
 	sub r6, r2, r6	//r6 keeps the big step
 
 
-	ldr r8, [sp, #64]//psad8x8
-	ldr r9, [sp, #68]//psum16x16
-	ldr r10, [sp, #72]//psqsum16x16
-	ldr r11, [sp, #76]//psqdiff16x16
-	ldr r12, [sp, #80]//p_sd8x8
-	ldr r14, [sp, #84]//p_mad8x8
+	ldr r8, [sp, #128]//psad8x8
+	ldr r9, [sp, #132]//psum16x16
+	ldr r10, [sp, #136]//psqsum16x16
+	ldr r11, [sp, #140]//psqdiff16x16
+	ldr r12, [sp, #144]//p_sd8x8
+	ldr r14, [sp, #148]//p_mad8x8
 
 	vmov.i8 q12, #0
 
@@ -700,11 +701,12 @@ vaa_calc_sad_ssd_bgd_width_loop:
 bne vaa_calc_sad_ssd_bgd_height_loop
 
 	//psadframe
-	ldr r7, [sp, #60]//psadframe
+	ldr r7, [sp, #124]//psadframe
 
 	vadd.i32 d24, d24, d25
 	vst1.32 {d24[0]}, [r7]
 
+	vpop {q4-q7}
 	ldmia sp!, {r0-r12, r14}
 
 WELS_ASM_FUNC_END
@@ -912,8 +914,10 @@ WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN VAACalcSadVar_neon
 	stmdb sp!, {r4-r11}
+	vpush {q4}
+	vpush {q6-q7}
 
-	ldr r4, [sp, #32] //r4 keeps the pic_stride
+	ldr r4, [sp, #80] //r4 keeps the pic_stride
 
 	sub r5, r4, #1
 	lsl r5, r5, #4 //r5 keeps the little step
@@ -921,10 +925,10 @@ WELS_ASM_FUNC_BEGIN VAACalcSadVar_neon
 	lsl r6, r4, #4
 	sub r6, r2, r6	//r6 keeps the big step
 
-	ldr r7,		[sp, #36]	//psadframe
-	ldr r8,		[sp, #40]	//psad8x8
-	ldr r9,		[sp, #44]	//psum16x16
-	ldr r10,	[sp, #48]	//psqsum16x16
+	ldr r7,		[sp, #84]	//psadframe
+	ldr r8,		[sp, #88]	//psad8x8
+	ldr r9,		[sp, #92]	//psum16x16
+	ldr r10,	[sp, #96]	//psqsum16x16
 
 	vmov.i8 q12, #0
 vaa_calc_sad_var_height_loop:
@@ -961,6 +965,8 @@ bne vaa_calc_sad_var_height_loop
 	vadd.i32 d24, d24, d25
 	vst1.32 {d24[0]}, [r7]
 
+	vpop {q6-q7}
+	vpop {q4}
 	ldmia sp!, {r4-r11}
 WELS_ASM_FUNC_END
 
@@ -1080,8 +1086,10 @@ WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN VAACalcSadSsd_neon
 	stmdb sp!, {r4-r12}
+	vpush {q4}
+	vpush {q6-q7}
 
-	ldr r4, [sp, #36] //r4 keeps the pic_stride
+	ldr r4, [sp, #84] //r4 keeps the pic_stride
 
 	sub r5, r4, #1
 	lsl r5, r5, #4 //r5 keeps the little step
@@ -1089,11 +1097,11 @@ WELS_ASM_FUNC_BEGIN VAACalcSadSsd_neon
 	lsl r6, r4, #4
 	sub r6, r2, r6	//r6 keeps the big step
 
-	ldr r7,		[sp, #40]	//psadframe
-	ldr r8,		[sp, #44]	//psad8x8
-	ldr r9,		[sp, #48]	//psum16x16
-	ldr r10,	[sp, #52]	//psqsum16x16
-	ldr r11,	[sp, #56]	//psqdiff16x16
+	ldr r7,		[sp, #88]	//psadframe
+	ldr r8,		[sp, #92]	//psad8x8
+	ldr r9,		[sp, #96]	//psum16x16
+	ldr r10,	[sp, #100]	//psqsum16x16
+	ldr r11,	[sp, #104]	//psqdiff16x16
 
 	vmov.i8 q12, #0
 vaa_calc_sad_ssd_height_loop:
@@ -1137,6 +1145,8 @@ vaa_calc_sad_ssd_width_loop:
 	vadd.i32 d24, d24, d25
 	vst1.32 {d24[0]}, [r7]
 
+	vpop {q6-q7}
+	vpop {q4}
 	ldmia sp!, {r4-r12}
 WELS_ASM_FUNC_END
 
