@@ -616,17 +616,17 @@ WELS_ASM_FUNC_BEGIN WelsCopy16x16_neon
 
 	STORE_ALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r0, r1
 
-	LOAD_ALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r2, r3
+	LOAD_ALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r2, r3
 
-	STORE_ALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r0, r1
+	STORE_ALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r0, r1
 
 	LOAD_ALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
 
 	STORE_ALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r0, r1
 
-	LOAD_ALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r2, r3
+	LOAD_ALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r2, r3
 
-	STORE_ALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r0, r1
+	STORE_ALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r0, r1
 
 WELS_ASM_FUNC_END
 
@@ -637,17 +637,17 @@ WELS_ASM_FUNC_BEGIN WelsCopy16x16NotAligned_neon
 
 	STORE_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r0, r1
 
-	LOAD_UNALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r2, r3
+	LOAD_UNALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r2, r3
 
-	STORE_UNALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r0, r1
+	STORE_UNALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r0, r1
 
 	LOAD_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
 
 	STORE_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r0, r1
 
-	LOAD_UNALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r2, r3
+	LOAD_UNALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r2, r3
 
-	STORE_UNALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r0, r1
+	STORE_UNALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r0, r1
 
 WELS_ASM_FUNC_END
 
@@ -658,9 +658,9 @@ WELS_ASM_FUNC_BEGIN WelsCopy16x8NotAligned_neon
 
 	STORE_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r0, r1
 
-	LOAD_UNALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r2, r3
+	LOAD_UNALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r2, r3
 
-	STORE_UNALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r0, r1
+	STORE_UNALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r0, r1
 
 WELS_ASM_FUNC_END
 
@@ -720,22 +720,22 @@ WELS_ASM_FUNC_BEGIN WelsDctFourT4_neon
 	push		{r4}
 	ldr			r4, [sp, #4]
 
-	LOAD_8x8_DATA_FOR_DCT	d8, d9, d10, d11, d12, d13, d14, d15, r1, r3
+	LOAD_8x8_DATA_FOR_DCT	d16, d17, d18, d19, d20, d21, d22, d23, r1, r3
 
-	vsubl.u8	q0,  d8, d12
-	vsubl.u8	q1,  d9, d13
-	vsubl.u8	q2, d10, d14
-	vsubl.u8	q3, d11, d15
+	vsubl.u8	q0, d16, d20
+	vsubl.u8	q1, d17, d21
+	vsubl.u8	q2, d18, d22
+	vsubl.u8	q3, d19, d23
 	MATRIX_TRANSFORM_EACH_16BITS	q0, q1, q2, q3
 
 	// horizontal transform
-	DCT_ROW_TRANSFORM_TOTAL_16BITS		q0, q1, q2, q3, q4, q5, q6, q7
+	DCT_ROW_TRANSFORM_TOTAL_16BITS		q0, q1, q2, q3, q8, q9, q10, q11
 
 	// transform element
 	MATRIX_TRANSFORM_EACH_16BITS	q0, q1, q2, q3
 
 	//	vertical transform
-	DCT_ROW_TRANSFORM_TOTAL_16BITS		q0, q1, q2, q3, q4, q5, q6, q7
+	DCT_ROW_TRANSFORM_TOTAL_16BITS		q0, q1, q2, q3, q8, q9, q10, q11
 
 	vswp		d1, d2
 	vswp		d5, d6
@@ -744,22 +744,22 @@ WELS_ASM_FUNC_BEGIN WelsDctFourT4_neon
 	vst1.s16		{q2, q3}, [r0]!
 
 	////////////////
-	LOAD_8x8_DATA_FOR_DCT	d8, d9, d10, d11, d12, d13, d14, d15, r1, r3
+	LOAD_8x8_DATA_FOR_DCT	d16, d17, d18, d19, d20, d21, d22, d23, r1, r3
 
-	vsubl.u8	q0,  d8, d12
-	vsubl.u8	q1,  d9, d13
-	vsubl.u8	q2, d10, d14
-	vsubl.u8	q3, d11, d15
+	vsubl.u8	q0, d16, d20
+	vsubl.u8	q1, d17, d21
+	vsubl.u8	q2, d18, d22
+	vsubl.u8	q3, d19, d23
 	MATRIX_TRANSFORM_EACH_16BITS	q0, q1, q2, q3
 
 	// horizontal transform
-	DCT_ROW_TRANSFORM_TOTAL_16BITS		q0, q1, q2, q3, q4, q5, q6, q7
+	DCT_ROW_TRANSFORM_TOTAL_16BITS		q0, q1, q2, q3, q8, q9, q10, q11
 
 	// transform element
 	MATRIX_TRANSFORM_EACH_16BITS	q0, q1, q2, q3
 
 	//	vertical transform
-	DCT_ROW_TRANSFORM_TOTAL_16BITS		q0, q1, q2, q3, q4, q5, q6, q7
+	DCT_ROW_TRANSFORM_TOTAL_16BITS		q0, q1, q2, q3, q8, q9, q10, q11
 
 	vswp		d1, d2
 	vswp		d5, d6
@@ -776,13 +776,13 @@ WELS_ASM_FUNC_BEGIN WelsQuant4x4_neon
 	vld1.s16		{q0, q1}, [r0]
 	vld1.s16		{q3}, [r2]
 
-	vmov			q4, q2
+	vmov			q8, q2
 
-	NEWQUANT_COEF_EACH_16BITS	q0, q2, d4, d5, d6, d7, q5, q6, q7
+	NEWQUANT_COEF_EACH_16BITS	q0, q2, d4, d5, d6, d7, q9, q10, q11
 	vst1.s16		{q2}, [r0]!
 
-	NEWQUANT_COEF_EACH_16BITS	q1, q4, d8, d9, d6, d7, q5, q6, q7
-	vst1.s16		{q4}, [r0]!
+	NEWQUANT_COEF_EACH_16BITS	q1, q8, d16, d17, d6, d7, q9, q10, q11
+	vst1.s16		{q8}, [r0]!
 
 WELS_ASM_FUNC_END
 
@@ -793,13 +793,13 @@ WELS_ASM_FUNC_BEGIN WelsQuant4x4Dc_neon
 	vdup.s16		q2, r1		// even ff range [0, 768]
 	vdup.s16		q3, r2
 
-	vmov			q4, q2
+	vmov			q8, q2
 
-	NEWQUANT_COEF_EACH_16BITS	q0, q2, d4, d5, d6, d7, q5, q6, q7
+	NEWQUANT_COEF_EACH_16BITS	q0, q2, d4, d5, d6, d7, q9, q10, q11
 	vst1.s16		{q2}, [r0]!
 
-	NEWQUANT_COEF_EACH_16BITS	q1, q4, d8, d9, d6, d7, q5, q6, q7
-	vst1.s16		{q4}, [r0]!
+	NEWQUANT_COEF_EACH_16BITS	q1, q8, d16, d17, d6, d7, q9, q10, q11
+	vst1.s16		{q8}, [r0]!
 
 WELS_ASM_FUNC_END
 
@@ -810,36 +810,36 @@ WELS_ASM_FUNC_BEGIN WelsQuantFour4x4_neon
 	mov				r1, r0
 
 	vld1.s16		{q0, q1}, [r0]!
-	vmov			q4, q2
-	NEWQUANT_COEF_EACH_16BITS	q0, q4, d8, d9, d6, d7, q5, q6, q7
-	vst1.s16		{q4}, [r1]!
-	vmov			q4, q2
-	NEWQUANT_COEF_EACH_16BITS	q1, q4, d8, d9, d6, d7, q5, q6, q7
-	vst1.s16		{q4}, [r1]!
+	vmov			q8, q2
+	NEWQUANT_COEF_EACH_16BITS	q0, q8, d16, d17, d6, d7, q9, q10, q11
+	vst1.s16		{q8}, [r1]!
+	vmov			q8, q2
+	NEWQUANT_COEF_EACH_16BITS	q1, q8, d16, d17, d6, d7, q9, q10, q11
+	vst1.s16		{q8}, [r1]!
 
 	vld1.s16		{q0, q1}, [r0]!
-	vmov			q4, q2
-	NEWQUANT_COEF_EACH_16BITS	q0, q4, d8, d9, d6, d7, q5, q6, q7
-	vst1.s16		{q4}, [r1]!
-	vmov			q4, q2
-	NEWQUANT_COEF_EACH_16BITS	q1, q4, d8, d9, d6, d7, q5, q6, q7
-	vst1.s16		{q4}, [r1]!
+	vmov			q8, q2
+	NEWQUANT_COEF_EACH_16BITS	q0, q8, d16, d17, d6, d7, q9, q10, q11
+	vst1.s16		{q8}, [r1]!
+	vmov			q8, q2
+	NEWQUANT_COEF_EACH_16BITS	q1, q8, d16, d17, d6, d7, q9, q10, q11
+	vst1.s16		{q8}, [r1]!
 
 	vld1.s16		{q0, q1}, [r0]!
-	vmov			q4, q2
-	NEWQUANT_COEF_EACH_16BITS	q0, q4, d8, d9, d6, d7, q5, q6, q7
-	vst1.s16		{q4}, [r1]!
-	vmov			q4, q2
-	NEWQUANT_COEF_EACH_16BITS	q1, q4, d8, d9, d6, d7, q5, q6, q7
-	vst1.s16		{q4}, [r1]!
+	vmov			q8, q2
+	NEWQUANT_COEF_EACH_16BITS	q0, q8, d16, d17, d6, d7, q9, q10, q11
+	vst1.s16		{q8}, [r1]!
+	vmov			q8, q2
+	NEWQUANT_COEF_EACH_16BITS	q1, q8, d16, d17, d6, d7, q9, q10, q11
+	vst1.s16		{q8}, [r1]!
 
 	vld1.s16		{q0, q1}, [r0]!
-	vmov			q4, q2
-	NEWQUANT_COEF_EACH_16BITS	q0, q4, d8, d9, d6, d7, q5, q6, q7
-	vst1.s16		{q4}, [r1]!
-	vmov			q4, q2
-	NEWQUANT_COEF_EACH_16BITS	q1, q4, d8, d9, d6, d7, q5, q6, q7
-	vst1.s16		{q4}, [r1]!
+	vmov			q8, q2
+	NEWQUANT_COEF_EACH_16BITS	q0, q8, d16, d17, d6, d7, q9, q10, q11
+	vst1.s16		{q8}, [r1]!
+	vmov			q8, q2
+	NEWQUANT_COEF_EACH_16BITS	q1, q8, d16, d17, d6, d7, q9, q10, q11
+	vst1.s16		{q8}, [r1]!
 
 WELS_ASM_FUNC_END
 
@@ -850,42 +850,42 @@ WELS_ASM_FUNC_BEGIN WelsQuantFour4x4Max_neon
 	mov				r1, r0
 
 	vld1.s16		{q0, q1}, [r0]!
-	vmov			q4, q2
-	NEWQUANT_COEF_EACH_16BITS_MAX	q0, q4, d8, d9, d6, d7, q5, q6, q7, d18
-	vst1.s16		{q4}, [r1]!
 	vmov			q8, q2
-	NEWQUANT_COEF_EACH_16BITS_MAX	q1, q8, d16, d17, d6, d7, q5, q6, q7, d20
-	vst1.s16		{q8}, [r1]!		// then 1st 16 elem in d18 & d20
+	NEWQUANT_COEF_EACH_16BITS_MAX	q0, q8, d16, d17, d6, d7, q9, q10, q11, d26
+	vst1.s16		{q8}, [r1]!
+	vmov			q12, q2
+	NEWQUANT_COEF_EACH_16BITS_MAX	q1, q12, d24, d25, d6, d7, q9, q10, q11, d28
+	vst1.s16		{q12}, [r1]!		// then 1st 16 elem in d26 & d28
 
 	vld1.s16		{q0, q1}, [r0]!
-	vmov			q4, q2
-	NEWQUANT_COEF_EACH_16BITS_MAX	q0, q4, d8, d9, d6, d7, q5, q6, q7, d19
-	vst1.s16		{q4}, [r1]!
 	vmov			q8, q2
-	NEWQUANT_COEF_EACH_16BITS_MAX	q1, q8, d16, d17, d6, d7, q5, q6, q7, d21
-	vst1.s16		{q8}, [r1]!	// then 2nd 16 elem in d19 & d21
+	NEWQUANT_COEF_EACH_16BITS_MAX	q0, q8, d16, d17, d6, d7, q9, q10, q11, d27
+	vst1.s16		{q8}, [r1]!
+	vmov			q12, q2
+	NEWQUANT_COEF_EACH_16BITS_MAX	q1, q12, d24, d25, d6, d7, q9, q10, q11, d29
+	vst1.s16		{q12}, [r1]!	// then 2nd 16 elem in d27 & d29
 
-	SELECT_MAX_IN_ABS_COEF	q9, q10, q0, d0, d1
+	SELECT_MAX_IN_ABS_COEF	q13, q14, q0, d0, d1
 	vst1.s32		{d0[0]}, [r3]!
 
 	///////////
 	vld1.s16		{q0, q1}, [r0]!
-	vmov			q4, q2
-	NEWQUANT_COEF_EACH_16BITS_MAX	q0, q4, d8, d9, d6, d7, q5, q6, q7, d18
-	vst1.s16		{q4}, [r1]!
 	vmov			q8, q2
-	NEWQUANT_COEF_EACH_16BITS_MAX	q1, q8, d16, d17, d6, d7, q5, q6, q7, d20
-	vst1.s16		{q8}, [r1]!		// then 3rd 16 elem in d18 & d20
+	NEWQUANT_COEF_EACH_16BITS_MAX	q0, q8, d16, d17, d6, d7, q9, q10, q11, d26
+	vst1.s16		{q8}, [r1]!
+	vmov			q12, q2
+	NEWQUANT_COEF_EACH_16BITS_MAX	q1, q12, d24, d25, d6, d7, q9, q10, q11, d28
+	vst1.s16		{q12}, [r1]!		// then 3rd 16 elem in d26 & d28
 
 	vld1.s16		{q0, q1}, [r0]!
-	vmov			q4, q2
-	NEWQUANT_COEF_EACH_16BITS_MAX	q0, q4, d8, d9, d6, d7, q5, q6, q7, d19
-	vst1.s16		{q4}, [r1]!
 	vmov			q8, q2
-	NEWQUANT_COEF_EACH_16BITS_MAX	q1, q8, d16, d17, d6, d7, q5, q6, q7, d21
-	vst1.s16		{q8}, [r1]!	// then 4th 16 elem in d19 & d21
+	NEWQUANT_COEF_EACH_16BITS_MAX	q0, q8, d16, d17, d6, d7, q9, q10, q11, d27
+	vst1.s16		{q8}, [r1]!
+	vmov			q12, q2
+	NEWQUANT_COEF_EACH_16BITS_MAX	q1, q12, d24, d25, d6, d7, q9, q10, q11, d29
+	vst1.s16		{q12}, [r1]!	// then 4th 16 elem in d27 & d29
 
-	SELECT_MAX_IN_ABS_COEF	q9, q10, q0, d0, d1
+	SELECT_MAX_IN_ABS_COEF	q13, q14, q0, d0, d1
 	vst1.s32		{d0[0]}, [r3]!
 
 WELS_ASM_FUNC_END
@@ -907,23 +907,23 @@ WELS_ASM_FUNC_BEGIN WelsHadamardT4Dc_neon
 	vtrn.16		q0, q2		// d0[0 4], d1[1 5]
 	vtrn.16		q1, q3		// d2[2 6], d3[3 7]
 
-	vld1.s16		{d8}, [r1], r2
-	vld1.s16		{d9}, [r3], r2
-	vld1.s16		{d12}, [r1], r2
-	vld1.s16		{d13}, [r3], r2
-	vld1.s16		{d10}, [r1], r2
-	vld1.s16		{d11}, [r3], r2
-	vld1.s16		{d14}, [r1], r2
-	vld1.s16		{d15}, [r3], r2
-	vtrn.16		q4, q6		// d8[08 12], d9[09 13]
-	vtrn.16		q5, q7		//d10[10 14],d11[11 15]
+	vld1.s16		{d16}, [r1], r2
+	vld1.s16		{d17}, [r3], r2
+	vld1.s16		{d20}, [r1], r2
+	vld1.s16		{d21}, [r3], r2
+	vld1.s16		{d18}, [r1], r2
+	vld1.s16		{d19}, [r3], r2
+	vld1.s16		{d22}, [r1], r2
+	vld1.s16		{d23}, [r3], r2
+	vtrn.16		q8, q10		//d16[08 12],d17[09 13]
+	vtrn.16		q9, q11		//d18[10 14],d19[11 15]
 
-	vtrn.32		q0, q4		// d0 [0 4 08 12] = dct[idx],		d1[1 5 09 13] = dct[idx+16]
-	vtrn.32		q1, q5		// d2 [2 6 10 14] = dct[idx+64],	d3[3 7 11 15] = dct[idx+80]
+	vtrn.32		q0, q8		// d0 [0 4 08 12] = dct[idx],		d1[1 5 09 13] = dct[idx+16]
+	vtrn.32		q1, q9		// d2 [2 6 10 14] = dct[idx+64],	d3[3 7 11 15] = dct[idx+80]
 
-	ROW_TRANSFORM_0_STEP	d0, d1, d3, d2, q4, q7, q6, q5
+	ROW_TRANSFORM_0_STEP	d0, d1, d3, d2, q8, q11, q10, q9
 
-	TRANSFORM_4BYTES		q0, q1, q3, q2, q4, q7, q6, q5
+	TRANSFORM_4BYTES		q0, q1, q3, q2, q8, q11, q10, q9
 
 	// transform element 32bits
 	vtrn.s32		q0, q1				//[0 1 2 3]+[4 5 6 7]-->[0 4 2 6]+[1 5 3 7]
@@ -931,15 +931,15 @@ WELS_ASM_FUNC_BEGIN WelsHadamardT4Dc_neon
 	vswp			d1, d4				//[0 4 2 6]+[8 12 10 14]-->[0 4 8 12]+[2 6 10 14]
 	vswp			d3, d6				//[1 5 3 7]+[9 13 11 15]-->[1 5 9 13]+[3 7 11 15]
 
-	COL_TRANSFORM_0_STEP	q0, q1, q3, q2, q4, q7, q6, q5
+	COL_TRANSFORM_0_STEP	q0, q1, q3, q2, q8, q11, q10, q9
 
-	TRANSFORM_4BYTES		q0, q1, q3, q2, q4, q7, q6, q5
+	TRANSFORM_4BYTES		q0, q1, q3, q2, q8, q11, q10, q9
 
-	vrshrn.s32		d8, q0, #1
-	vrshrn.s32		d9, q1, #1
-	vrshrn.s32		d10, q2, #1
-	vrshrn.s32		d11, q3, #1
-	vst1.16	{q4, q5}, [r0]	//store
+	vrshrn.s32		d16, q0, #1
+	vrshrn.s32		d17, q1, #1
+	vrshrn.s32		d18, q2, #1
+	vrshrn.s32		d19, q3, #1
+	vst1.16	{q8, q9}, [r0]	//store
 
 	pop		{r2,r3}
 WELS_ASM_FUNC_END
@@ -1020,35 +1020,35 @@ WELS_ASM_FUNC_BEGIN WelsDequant4x4_neon
 	vld1.s16	{q0, q1}, [r0]
 	vld1.u16	{q2}, [r1]
 
-	vmul.s16	q4, q0, q2
-	vmul.s16	q5, q1, q2
+	vmul.s16	q8, q0, q2
+	vmul.s16	q9, q1, q2
 
-	vst1.s16	{q4, q5}, [r0]
+	vst1.s16	{q8, q9}, [r0]
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN WelsDequantFour4x4_neon
-	vld1.u16	{q8}, [r1]
+	vld1.u16	{q12}, [r1]
 	mov		r1, r0
 	vld1.s16	{q0, q1}, [r0]!
 	vld1.s16	{q2, q3}, [r0]!
-	vmul.s16	q0, q0, q8
-	vld1.s16	{q4, q5}, [r0]!
-	vmul.s16	q1, q1, q8
-	vld1.s16	{q6, q7}, [r0]!
+	vmul.s16	q0, q0, q12
+	vld1.s16	{q8, q9}, [r0]!
+	vmul.s16	q1, q1, q12
+	vld1.s16	{q10, q11}, [r0]!
 
 	vst1.s16	{q0, q1}, [r1]!
 
-	vmul.s16	q2, q2, q8
-	vmul.s16	q3, q3, q8
-	vmul.s16	q4, q4, q8
+	vmul.s16	q2, q2, q12
+	vmul.s16	q3, q3, q12
+	vmul.s16	q8, q8, q12
 	vst1.s16	{q2, q3}, [r1]!
 
-	vmul.s16	q5, q5, q8
-	vmul.s16	q6, q6, q8
-	vmul.s16	q7, q7, q8
-	vst1.s16	{q4, q5}, [r1]!
-	vst1.s16	{q6, q7}, [r1]!
+	vmul.s16	q9, q9, q12
+	vmul.s16	q10, q10, q12
+	vmul.s16	q11, q11, q12
+	vst1.s16	{q8, q9}, [r1]!
+	vst1.s16	{q10, q11}, [r1]!
 
 WELS_ASM_FUNC_END
 
@@ -1056,7 +1056,7 @@ WELS_ASM_FUNC_END
 WELS_ASM_FUNC_BEGIN WelsDequantIHadamard4x4_neon
 
 	vld1.s16	{q0, q1}, [r0]
-	vdup.s16	q4, r1
+	vdup.s16	q8, r1
 
 	IHDM_4x4_TOTAL_16BITS	q0, q2, q3
 	IHDM_4x4_TOTAL_16BITS	q1, q2, q3
@@ -1064,10 +1064,10 @@ WELS_ASM_FUNC_BEGIN WelsDequantIHadamard4x4_neon
 	MATRIX_TRANSFORM_EACH_16BITS	d0, d1, d2, d3
 
 	IHDM_4x4_TOTAL_16BITS	q0, q2, q3
-	vmul.s16	q0, q4
+	vmul.s16	q0, q8
 
 	IHDM_4x4_TOTAL_16BITS	q1, q2, q3
-	vmul.s16	q1, q4
+	vmul.s16	q1, q8
 
 	MATRIX_TRANSFORM_EACH_16BITS	d0, d1, d2, d3
 	vst1.s16	{q0, q1}, [r0]
@@ -1075,14 +1075,14 @@ WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN WelsIDctT4Rec_neon
-	vld1.u32		{d14[0]}, [r2], r3
+	vld1.u32		{d16[0]}, [r2], r3
 	push			{r4}
 	ldr				r4, [sp, #4]
-	vld1.u32		{d14[1]}, [r2], r3
+	vld1.u32		{d16[1]}, [r2], r3
 
 	vld4.s16		{d0, d1, d2, d3}, [r4]		// cost 3 cycles!
-	vld1.u32		{d15[0]}, [r2], r3
-	vld1.u32		{d15[1]}, [r2], r3			// q7 is pred
+	vld1.u32		{d17[0]}, [r2], r3
+	vld1.u32		{d17[1]}, [r2], r3			// q7 is pred
 
 	ROW_TRANSFORM_1_STEP_TOTAL_16BITS		d0, d1, d2, d3, d4, d5, d6, d7
 
@@ -1099,17 +1099,17 @@ WELS_ASM_FUNC_BEGIN WelsIDctT4Rec_neon
 	vrshr.s16		d3, d3, #6
 
 	//after rounding 6, clip into [0, 255]
-	vmovl.u8		q2,d14
+	vmovl.u8		q2,d16
 	vadd.s16		q0,q2
-	vqmovun.s16	d14,q0
-	vst1.32		{d14[0]},[r0],r1
-	vst1.32		{d14[1]},[r0],r1
+	vqmovun.s16	d16,q0
+	vst1.32		{d16[0]},[r0],r1
+	vst1.32		{d16[1]},[r0],r1
 
-	vmovl.u8		q2,d15
+	vmovl.u8		q2,d17
 	vadd.s16		q1,q2
-	vqmovun.s16	d15,q1
-	vst1.32		{d15[0]},[r0],r1
-	vst1.32		{d15[1]},[r0]
+	vqmovun.s16	d17,q1
+	vst1.32		{d17[0]},[r0],r1
+	vst1.32		{d17[1]},[r0]
 
 	pop			{r4}
 WELS_ASM_FUNC_END
@@ -1117,99 +1117,99 @@ WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN WelsIDctFourT4Rec_neon
 
-	vld1.u64		{d16}, [r2], r3
+	vld1.u64		{d24}, [r2], r3
 	push			{r4}
 	ldr				r4, [sp, #4]
-	vld1.u64		{d17}, [r2], r3
+	vld1.u64		{d25}, [r2], r3
 
 	vld4.s16		{d0, d1, d2, d3}, [r4]!		// cost 3 cycles!
-	vld1.u64		{d18}, [r2], r3
-	vld1.u64		{d19}, [r2], r3
+	vld1.u64		{d26}, [r2], r3
+	vld1.u64		{d27}, [r2], r3
 	vld4.s16		{d4, d5, d6, d7}, [r4]!		// cost 3 cycles!
 	vswp			d1, d4
 	vswp			d3, d6
 	vswp			q1, q2						// q0~q3
 
-	ROW_TRANSFORM_1_STEP_TOTAL_16BITS		q0, q1, q2, q3, q4, q5, q6, q7
+	ROW_TRANSFORM_1_STEP_TOTAL_16BITS		q0, q1, q2, q3, q8, q9, q10, q11
 
-	TRANSFORM_TOTAL_16BITS		q0, q1, q2, q3, q4, q5, q6, q7
+	TRANSFORM_TOTAL_16BITS		q0, q1, q2, q3, q8, q9, q10, q11
 
 	MATRIX_TRANSFORM_EACH_16BITS	q0, q1, q2, q3
 
-	ROW_TRANSFORM_1_STEP_TOTAL_16BITS		q0, q1, q2, q3, q4, q5, q6, q7
+	ROW_TRANSFORM_1_STEP_TOTAL_16BITS		q0, q1, q2, q3, q8, q9, q10, q11
 
-	TRANSFORM_TOTAL_16BITS		q0, q1, q2, q3, q4, q5, q6, q7
+	TRANSFORM_TOTAL_16BITS		q0, q1, q2, q3, q8, q9, q10, q11
 	vrshr.s16		q0, q0, #6
 	vrshr.s16		q1, q1, #6
 	vrshr.s16		q2, q2, #6
 	vrshr.s16		q3, q3, #6
 
 	//after rounding 6, clip into [0, 255]
-	vmovl.u8		q4,d16
-	vadd.s16		q0,q4
-	vqmovun.s16	d16,q0
-	vst1.u8		{d16},[r0],r1
+	vmovl.u8		q8,d24
+	vadd.s16		q0,q8
+	vqmovun.s16	d24,q0
+	vst1.u8		{d24},[r0],r1
 
-	vmovl.u8		q4,d17
-	vadd.s16		q1,q4
-	vqmovun.s16	d17,q1
-	vst1.u8		{d17},[r0],r1
+	vmovl.u8		q8,d25
+	vadd.s16		q1,q8
+	vqmovun.s16	d25,q1
+	vst1.u8		{d25},[r0],r1
 
-	vmovl.u8		q4,d18
-	vadd.s16		q2,q4
-	vqmovun.s16	d18,q2
-	vst1.u8		{d18},[r0],r1
+	vmovl.u8		q8,d26
+	vadd.s16		q2,q8
+	vqmovun.s16	d26,q2
+	vst1.u8		{d26},[r0],r1
 
-	vmovl.u8		q4,d19
-	vadd.s16		q3,q4
-	vqmovun.s16	d19,q3
-	vst1.u8		{d19},[r0],r1
+	vmovl.u8		q8,d27
+	vadd.s16		q3,q8
+	vqmovun.s16	d27,q3
+	vst1.u8		{d27},[r0],r1
 
-	vld1.u64		{d16}, [r2], r3
-	vld1.u64		{d17}, [r2], r3
+	vld1.u64		{d24}, [r2], r3
+	vld1.u64		{d25}, [r2], r3
 
 	vld4.s16		{d0, d1, d2, d3}, [r4]!		// cost 3 cycles!
-	vld1.u64		{d18}, [r2], r3
-	vld1.u64		{d19}, [r2], r3
+	vld1.u64		{d26}, [r2], r3
+	vld1.u64		{d27}, [r2], r3
 	vld4.s16		{d4, d5, d6, d7}, [r4]!		// cost 3 cycles!
 	vswp			d1, d4
 	vswp			d3, d6
 	vswp			q1, q2						// q0~q3
 
-	ROW_TRANSFORM_1_STEP_TOTAL_16BITS		q0, q1, q2, q3, q4, q5, q6, q7
+	ROW_TRANSFORM_1_STEP_TOTAL_16BITS		q0, q1, q2, q3, q8, q9, q10, q11
 
-	TRANSFORM_TOTAL_16BITS		q0, q1, q2, q3, q4, q5, q6, q7
+	TRANSFORM_TOTAL_16BITS		q0, q1, q2, q3, q8, q9, q10, q11
 
 	MATRIX_TRANSFORM_EACH_16BITS	q0, q1, q2, q3
 
-	ROW_TRANSFORM_1_STEP_TOTAL_16BITS		q0, q1, q2, q3, q4, q5, q6, q7
+	ROW_TRANSFORM_1_STEP_TOTAL_16BITS		q0, q1, q2, q3, q8, q9, q10, q11
 
-	TRANSFORM_TOTAL_16BITS		q0, q1, q2, q3, q4, q5, q6, q7
+	TRANSFORM_TOTAL_16BITS		q0, q1, q2, q3, q8, q9, q10, q11
 	vrshr.s16		q0, q0, #6
 	vrshr.s16		q1, q1, #6
 	vrshr.s16		q2, q2, #6
 	vrshr.s16		q3, q3, #6
 
 	//after rounding 6, clip into [0, 255]
-	vmovl.u8		q4,d16
-	vadd.s16		q0,q4
-	vqmovun.s16	d16,q0
-	vst1.u8		{d16},[r0],r1
+	vmovl.u8		q8,d24
+	vadd.s16		q0,q8
+	vqmovun.s16	d24,q0
+	vst1.u8		{d24},[r0],r1
 
-	vmovl.u8		q4,d17
-	vadd.s16		q1,q4
-	vqmovun.s16	d17,q1
-	vst1.u8		{d17},[r0],r1
+	vmovl.u8		q8,d25
+	vadd.s16		q1,q8
+	vqmovun.s16	d25,q1
+	vst1.u8		{d25},[r0],r1
 
-	vmovl.u8		q4,d18
-	vadd.s16		q2,q4
-	vqmovun.s16	d18,q2
-	vst1.u8		{d18},[r0],r1
+	vmovl.u8		q8,d26
+	vadd.s16		q2,q8
+	vqmovun.s16	d26,q2
+	vst1.u8		{d26},[r0],r1
 
-	vmovl.u8		q4,d19
-	vadd.s16		q3,q4
-	vqmovun.s16	d19,q3
-	vst1.u8		{d19},[r0],r1
+	vmovl.u8		q8,d27
+	vadd.s16		q3,q8
+	vqmovun.s16	d27,q3
+	vst1.u8		{d27},[r0],r1
 
 	pop			{r4}
 WELS_ASM_FUNC_END

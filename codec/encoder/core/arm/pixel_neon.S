@@ -405,11 +405,11 @@ WELS_ASM_FUNC_BEGIN WelsSampleSadFour16x16_neon
 	vld1.8 {q0}, [r0], r1 //save pix1
 
 	vld1.8 {q1}, [r2], r3 //save pix2 - stride
-	vld1.8 {q6}, [r2], r3 //save pix2
+	vld1.8 {q10}, [r2], r3 //save pix2
 	vld1.8 {q2}, [r2], r3 //save pix2 + stride
 
 	vld1.8 {q3}, [r4], r3 //save pix2 - 1
-	vld1.8 {q4}, [r5], r3 //save pix2 + 1
+	vld1.8 {q8}, [r5], r3 //save pix2 + 1
 
 	//Do the SAD for 16 bytes
 	vabdl.u8  q15, d0, d2
@@ -421,30 +421,30 @@ WELS_ASM_FUNC_BEGIN WelsSampleSadFour16x16_neon
 	vabdl.u8  q11, d0, d6
 	vabal.u8  q11, d1, d7
 
-	vabdl.u8  q9, d0, d8
-	vabal.u8  q9, d1, d9
+	vabdl.u8  q9, d0, d16
+	vabal.u8  q9, d1, d17
 
 	mov lr, #15
 pixel_sad_4_16x16_loop_0:
 
     //Loading a horizontal line data (16 bytes)
 	vld1.8 {q0}, [r0], r1 //save pix1
-	vmov.8 q1,   q6       //save pix2 - stride
-	vmov.8 q6,   q2
+	vmov.8 q1,   q10      //save pix2 - stride
+	vmov.8 q10,  q2
 	vabal.u8  q15, d0, d2
 	vld1.8 {q2}, [r2], r3 //save pix2 + stride
 	vabal.u8  q15, d1, d3
 	vld1.8 {q3}, [r4], r3 //save pix2 - 1
 	vabal.u8  q13, d0, d4
-	vld1.8 {q4}, [r5], r3 //save pix2 + 1
+	vld1.8 {q8}, [r5], r3 //save pix2 + 1
     vabal.u8  q13, d1, d5
 	subs lr, #1
 
 	vabal.u8  q11, d0, d6
 	vabal.u8  q11, d1, d7
 
-	vabal.u8  q9, d0, d8
-	vabal.u8  q9, d1, d9
+	vabal.u8  q9, d0, d16
+	vabal.u8  q9, d1, d17
 
 	bne pixel_sad_4_16x16_loop_0
 
@@ -481,11 +481,11 @@ WELS_ASM_FUNC_BEGIN WelsSampleSadFour16x8_neon
 	vld1.8 {q0}, [r0], r1 //save pix1
 
 	vld1.8 {q1}, [r2], r3 //save pix2 - stride
-	vld1.8 {q6}, [r2], r3 //save pix2
+	vld1.8 {q10}, [r2], r3 //save pix2
 	vld1.8 {q2}, [r2], r3 //save pix2 + stride
 
 	vld1.8 {q3}, [r4], r3 //save pix2 - 1
-	vld1.8 {q4}, [r5], r3 //save pix2 + 1
+	vld1.8 {q8}, [r5], r3 //save pix2 + 1
 
 	//Do the SAD for 16 bytes
 	vabdl.u8  q15, d0, d2
@@ -497,30 +497,30 @@ WELS_ASM_FUNC_BEGIN WelsSampleSadFour16x8_neon
 	vabdl.u8  q11, d0, d6
 	vabal.u8  q11, d1, d7
 
-	vabdl.u8  q9, d0, d8
-	vabal.u8  q9, d1, d9
+	vabdl.u8  q9, d0, d16
+	vabal.u8  q9, d1, d17
 
 	mov lr, #7
 pixel_sad_4_16x8_loop_0:
 
     //Loading a horizontal line data (16 bytes)
 	vld1.8 {q0}, [r0], r1 //save pix1
-	vmov.8 q1,   q6       //save pix2 - stride
-	vmov.8 q6,   q2
+	vmov.8 q1,   q10      //save pix2 - stride
+	vmov.8 q10,  q2
 	vabal.u8  q15, d0, d2
 	vld1.8 {q2}, [r2], r3 //save pix2 + stride
 	vabal.u8  q15, d1, d3
 	vld1.8 {q3}, [r4], r3 //save pix2 - 1
 	vabal.u8  q13, d0, d4
-	vld1.8 {q4}, [r5], r3 //save pix2 + 1
+	vld1.8 {q8}, [r5], r3 //save pix2 + 1
     vabal.u8  q13, d1, d5
 	subs lr, #1
 
 	vabal.u8  q11, d0, d6
 	vabal.u8  q11, d1, d7
 
-	vabal.u8  q9, d0, d8
-	vabal.u8  q9, d1, d9
+	vabal.u8  q9, d0, d16
+	vabal.u8  q9, d1, d17
 
 	bne pixel_sad_4_16x8_loop_0
 

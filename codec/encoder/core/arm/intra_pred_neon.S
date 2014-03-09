@@ -216,12 +216,12 @@ WELS_ASM_FUNC_BEGIN WelsI16x16LumaPredPlane_neon
 	vmla.s16  q3, q2, d0[0]
 
 	//Calculate a+'b'*{1,2,3,4,5,6,7,8} + c*{-7}
-	vshl.s16  q5, q1, #3
-	vadd.s16  q5, q3
+	vshl.s16  q8, q1, #3
+	vadd.s16  q8, q3
 
 	//right shift 5 bits and rounding
 	vqrshrun.s16 d0, q3, #5
-	vqrshrun.s16 d1, q5, #5
+	vqrshrun.s16 d1, q8, #5
 
 	//Set the line of MB
 	vst1.u32  {d0,d1}, [r0]!
@@ -231,9 +231,9 @@ WELS_ASM_FUNC_BEGIN WelsI16x16LumaPredPlane_neon
 	mov  r3, #15
 loop_0_get_i16x16_luma_pred_plane:
 	vadd.s16  q3, q2
-	vadd.s16  q5, q2
+	vadd.s16  q8, q2
 	vqrshrun.s16 d0, q3, #5
-	vqrshrun.s16 d1, q5, #5
+	vqrshrun.s16 d1, q8, #5
 	vst1.u32  {d0,d1}, [r0]!
 	subs  r3, #1
 	bne  loop_0_get_i16x16_luma_pred_plane

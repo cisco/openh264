@@ -615,31 +615,31 @@ WELS_ASM_FUNC_BEGIN DeblockChromaLt4V_neon
     sub			r0, r0, r2, lsl #1
     sub			r1, r1, r2, lsl #1
 
-    vld1.s8	{d15}, [r3]
-    vmovl.u8	q6, d15
-    vshl.u64	d13,d12,#8
-    vorr		d12,d13
-    vmov		d13, d12
-    veor		q7, q7
-    vsub.i8	q7,q7,q6
+    vld1.s8	{d31}, [r3]
+    vmovl.u8	q14,d31
+    vshl.u64	d29,d28,#8
+    vorr		d28,d29
+    vmov		d29, d28
+    veor		q15, q15
+    vsub.i8	q15,q15,q14
 
-    MASK_MATRIX	q0, q1, q2, q3, q11, q9, q5
+    MASK_MATRIX	q0, q1, q2, q3, q11, q9, q10
 
-    DIFF_LUMA_LT4_P0_Q0	d0, d2, d4, d6, d8, q12, q13
-    DIFF_LUMA_LT4_P0_Q0	d1, d3, d5, d7, d9, q12, q13
-    vmax.s8	q4, q4, q7
-    vmin.s8	q4, q4, q6
+    DIFF_LUMA_LT4_P0_Q0	d0, d2, d4, d6, d16, q12, q13
+    DIFF_LUMA_LT4_P0_Q0	d1, d3, d5, d7, d17, q12, q13
+    vmax.s8	q8, q8, q15
+    vmin.s8	q8, q8, q14
 
-    vand.s8	q4, q4, q5
-    vcge.s8	q6, q6, #0
-    vand.s8	q4, q4, q6
-    EXTRACT_DELTA_INTO_TWO_PART	q4, q5
-    vqadd.u8	q1, q1, q5
-    vqsub.u8	q1, q1, q4
+    vand.s8	q8, q8, q10
+    vcge.s8	q14, q14, #0
+    vand.s8	q8, q8, q14
+    EXTRACT_DELTA_INTO_TWO_PART	q8, q10
+    vqadd.u8	q1, q1, q10
+    vqsub.u8	q1, q1, q8
     vst1.u8	{d2}, [r0], r2
     vst1.u8	{d3}, [r1], r2
-    vqsub.u8	q2, q2, q5
-    vqadd.u8	q2, q2, q4
+    vqsub.u8	q2, q2, q10
+    vqadd.u8	q2, q2, q8
     vst1.u8	{d4}, [r0]
     vst1.u8	{d5}, [r1]
 
@@ -692,7 +692,7 @@ WELS_ASM_FUNC_BEGIN DeblockChromaLt4H_neon
     vdup.u8	q9, r3
     ldr			r3, [sp, #4]
     sub			r1, r1, #2
-    vld1.s8	{d15}, [r3]
+    vld1.s8	{d31}, [r3]
 
     LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 0
     LOAD_CHROMA_DATA_4	d0, d1, d2, d3, d4, d5, d6, d7, 1
@@ -706,28 +706,28 @@ WELS_ASM_FUNC_BEGIN DeblockChromaLt4H_neon
     vswp		d1, d2
     vswp		d6, d5
 
-    vmovl.u8	q6, d15
-    vshl.u64	d13,d12,#8
-    vorr		d12,d13
-    vmov		d13, d12
-    veor		q7, q7
-    vsub.i8	q7,q7,q6
+    vmovl.u8	q14, d31
+    vshl.u64	d29,d28,#8
+    vorr		d28,d29
+    vmov		d29, d28
+    veor		q15, q15
+    vsub.i8	q15,q15,q14
 
-    MASK_MATRIX	q0, q1, q2, q3, q11, q9, q5
+    MASK_MATRIX	q0, q1, q2, q3, q11, q9, q10
 
-    DIFF_LUMA_LT4_P0_Q0	d0, d2, d4, d6, d8, q12, q13
-    DIFF_LUMA_LT4_P0_Q0	d1, d3, d5, d7, d9, q12, q13
-    vmax.s8	q4, q4, q7
-    vmin.s8	q4, q4, q6
+    DIFF_LUMA_LT4_P0_Q0	d0, d2, d4, d6, d16, q12, q13
+    DIFF_LUMA_LT4_P0_Q0	d1, d3, d5, d7, d17, q12, q13
+    vmax.s8	q8, q8, q15
+    vmin.s8	q8, q8, q14
 
-    vand.s8	q4, q4, q5
-    vcge.s8	q6, q6, #0
-    vand.s8	q4, q4, q6
-    EXTRACT_DELTA_INTO_TWO_PART	q4, q5
-    vqadd.u8	q1, q1, q5
-    vqsub.u8	q1, q1, q4
-    vqsub.u8	q2, q2, q5
-    vqadd.u8	q2, q2, q4
+    vand.s8	q8, q8, q10
+    vcge.s8	q14, q14, #0
+    vand.s8	q8, q8, q14
+    EXTRACT_DELTA_INTO_TWO_PART	q8, q10
+    vqadd.u8	q1, q1, q10
+    vqsub.u8	q1, q1, q8
+    vqsub.u8	q2, q2, q10
+    vqadd.u8	q2, q2, q8
 
     sub			r0, r0, r2, lsl #3
     sub			r1, r1, r2, lsl #3

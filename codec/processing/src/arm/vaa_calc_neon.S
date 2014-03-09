@@ -103,8 +103,8 @@ WELS_ASM_FUNC_BEGIN VAACalcSad_neon
 	ldr r4, [sp, #20] //load pic_stride
 	ldr r5, [sp, #28] //load psad8x8
 
-	//Initial the Q4 register for save the "psadframe"
-	vmov.s64 q4, #0
+	//Initial the Q8 register for save the "psadframe"
+	vmov.s64 q8, #0
 
 	//Get the jump distance to use on loop codes
 	lsl r8, r4, #4
@@ -140,7 +140,7 @@ vaa_calc_sad_loop1:
 
 	//Save to calculate "psadframe"
 	vadd.u32 q0, q1
-	vadd.u32 q4, q0
+	vadd.u32 q8, q0
 
 	bne vaa_calc_sad_loop1
 
@@ -152,8 +152,8 @@ vaa_calc_sad_loop1:
 	bne vaa_calc_sad_loop0
 
 	ldr r6, [sp, #24] //load psadframe
-	vadd.u32 d8, d9
-	vst1.32 {d8[0]}, [r6]
+	vadd.u32 d16, d17
+	vst1.32 {d16[0]}, [r6]
 
 	ldmia sp!, {r4-r8}
 
