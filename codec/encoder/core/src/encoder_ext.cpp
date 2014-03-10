@@ -131,7 +131,8 @@ int32_t ParamValidation (SWelsSvcCodingParam* pCfg) {
   return 0;
 }
 
-int32_t ParamValidationExt (SWelsSvcCodingParam* pCodingParam) {
+
+int32_t ParamValidationExt (sWelsEncCtx*pCtx,SWelsSvcCodingParam* pCodingParam) {
   int8_t i = 0;
   int32_t iIdx = 0;
 
@@ -140,44 +141,33 @@ int32_t ParamValidationExt (SWelsSvcCodingParam* pCodingParam) {
     return ENC_RETURN_INVALIDINPUT;
 
   if (pCodingParam->iSpatialLayerNum < 1 || pCodingParam->iSpatialLayerNum > MAX_DEPENDENCY_LAYER) {
-#if defined (_DEBUG)
-    fprintf (stderr, "ParamValidationExt(), monitor invalid pCodingParam->iSpatialLayerNum: %d!\n",
+    WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), monitor invalid pCodingParam->iSpatialLayerNum: %d!\n",
              pCodingParam->iSpatialLayerNum);
-#endif//#if _DEBUG
-
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
 
   if (pCodingParam->iTemporalLayerNum < 1 || pCodingParam->iTemporalLayerNum > MAX_TEMPORAL_LEVEL) {
-#if defined (_DEBUG)
-    fprintf (stderr, "ParamValidationExt(), monitor invalid pCodingParam->iTemporalLayerNum: %d!\n",
+    WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), monitor invalid pCodingParam->iTemporalLayerNum: %d!\n",
              pCodingParam->iTemporalLayerNum);
-#endif//#if _DEBUG
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
 
   if (pCodingParam->uiGopSize < 1 || pCodingParam->uiGopSize > MAX_GOP_SIZE) {
-#if defined (_DEBUG)
-    fprintf (stderr, "ParamValidationExt(), monitor invalid pCodingParam->uiGopSize: %d!\n", pCodingParam->uiGopSize);
-#endif//#if _DEBUG
+    WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), monitor invalid pCodingParam->uiGopSize: %d!\n", pCodingParam->uiGopSize);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
 
 
   if (pCodingParam->uiIntraPeriod && pCodingParam->uiIntraPeriod < pCodingParam->uiGopSize) {
-#if defined (_DEBUG)
-    fprintf (stderr,
+    WelsLog (pCtx, WELS_LOG_ERROR,
              "ParamValidationExt(), uiIntraPeriod(%d) should be not less than that of uiGopSize(%d) or -1 specified!\n",
              pCodingParam->uiIntraPeriod, pCodingParam->uiGopSize);
-#endif//#if _DEBUG
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
 
   if (pCodingParam->uiIntraPeriod && (pCodingParam->uiIntraPeriod & (pCodingParam->uiGopSize - 1)) != 0) {
-#if defined (_DEBUG)
-    fprintf (stderr, "ParamValidationExt(), uiIntraPeriod(%d) should be multiple of uiGopSize(%d) or -1 specified!\n",
+    WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), uiIntraPeriod(%d) should be multiple of uiGopSize(%d) or -1 specified!\n",
              pCodingParam->uiIntraPeriod, pCodingParam->uiGopSize);
-#endif//#if _DEBUG
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
 
@@ -207,24 +197,18 @@ int32_t ParamValidationExt (SWelsSvcCodingParam* pCodingParam) {
     int32_t iMbNumInFrame		= 0;
     int32_t iMaxSliceNum		= MAX_SLICES_NUM;
     if (kiPicWidth <= 0 || kiPicHeight <= 0) {
-#if defined (_DEBUG)
-      fprintf (stderr, "ParamValidationExt(), invalid %d x %d in dependency layer settings!\n", kiPicWidth, kiPicHeight);
-#endif//#if _DEBUG
+      WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid %d x %d in dependency layer settings!\n", kiPicWidth, kiPicHeight);
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
     if ((kiPicWidth & 0x0F) != 0 || (kiPicHeight & 0x0F) != 0) {
-#if defined (_DEBUG)
-      fprintf (stderr,
+      WelsLog (pCtx, WELS_LOG_ERROR,
                "ParamValidationExt(), in layer #%d iWidth x iHeight(%d x %d) both should be multiple of 16, can not support with arbitrary size currently!\n",
                i, kiPicWidth, kiPicHeight);
-#endif//#if _DEBUG
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
 
     if (fDlp->sSliceCfg.uiSliceMode >= SM_RESERVED) {
-#if defined (_DEBUG)
-      fprintf (stderr, "ParamValidationExt(), invalid uiSliceMode (%d) settings!\n", fDlp->sSliceCfg.uiSliceMode);
-#endif//#if _DEBUG
+      WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMode (%d) settings!\n", fDlp->sSliceCfg.uiSliceMode);
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
 
@@ -251,17 +235,13 @@ int32_t ParamValidationExt (SWelsSvcCodingParam* pCodingParam) {
       iMaxSliceNum = MAX_SLICES_NUM;
       if (fDlp->sSliceCfg.sSliceArgument.uiSliceNum <= 0
           || fDlp->sSliceCfg.sSliceArgument.uiSliceNum > iMaxSliceNum) {
-#if defined (_DEBUG)
-        fprintf (stderr, "ParamValidationExt(), invalid uiSliceNum (%d) settings!\n", fDlp->sSliceCfg.sSliceArgument.uiSliceNum);
-#endif//#if _DEBUG
+        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceNum (%d) settings!\n", fDlp->sSliceCfg.sSliceArgument.uiSliceNum);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
       if (fDlp->sSliceCfg.sSliceArgument.uiSliceNum == 1) {
-#if defined (_DEBUG)
-        fprintf (stderr,
+        WelsLog (pCtx, WELS_LOG_DEBUG,
                  "ParamValidationExt(), uiSliceNum(%d) you set for SM_FIXEDSLCNUM_SLICE, now turn to SM_SINGLE_SLICE type!\n",
                  fDlp->sSliceCfg.sSliceArgument.uiSliceNum);
-#endif//#if _DEBUG
         fDlp->sSliceCfg.uiSliceMode	= SM_SINGLE_SLICE;
         break;
       }
@@ -274,10 +254,8 @@ int32_t ParamValidationExt (SWelsSvcCodingParam* pCodingParam) {
       } else if (!CheckFixedSliceNumMultiSliceSetting (iMbNumInFrame,
                  &fDlp->sSliceCfg.sSliceArgument)) {	// verify interleave mode settings
         //check uiSliceMbNum with current uiSliceNum
-#if defined (_DEBUG)
-        fprintf (stderr, "ParamValidationExt(), invalid uiSliceMbNum (%d) settings!\n",
+         WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMbNum (%d) settings!\n",
                  fDlp->sSliceCfg.sSliceArgument.uiSliceMbNum[0]);
-#endif//#if _DEBUG
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
       // considering the coding efficient and performance, iCountMbNum constraint by MIN_NUM_MB_PER_SLICE condition of multi-pSlice mode settting
@@ -296,40 +274,30 @@ int32_t ParamValidationExt (SWelsSvcCodingParam* pCodingParam) {
       iMbNumInFrame = iMbWidth * iMbHeight;
       iMaxSliceNum = MAX_SLICES_NUM;
       if (fDlp->sSliceCfg.sSliceArgument.uiSliceMbNum[0] <= 0) {
-#if defined (_DEBUG)
-        fprintf (stderr, "ParamValidationExt(), invalid uiSliceMbNum (%d) settings!\n",
+        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMbNum (%d) settings!\n",
                  fDlp->sSliceCfg.sSliceArgument.uiSliceMbNum[0]);
-#endif//#if _DEBUG
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
 
       if (!CheckRasterMultiSliceSetting (iMbNumInFrame, &fDlp->sSliceCfg.sSliceArgument)) {	// verify interleave mode settings
-#if defined (_DEBUG)
-        fprintf (stderr, "ParamValidationExt(), invalid uiSliceMbNum (%d) settings!\n",
+        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMbNum (%d) settings!\n",
                  fDlp->sSliceCfg.sSliceArgument.uiSliceMbNum[0]);
-#endif//#if _DEBUG
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
       if (fDlp->sSliceCfg.sSliceArgument.uiSliceNum <= 0
           || fDlp->sSliceCfg.sSliceArgument.uiSliceNum > iMaxSliceNum) {	// verify interleave mode settings
-#if defined (_DEBUG)
-        fprintf (stderr, "ParamValidationExt(), invalid uiSliceNum (%d) in SM_RASTER_SLICE settings!\n",
+        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceNum (%d) in SM_RASTER_SLICE settings!\n",
                  fDlp->sSliceCfg.sSliceArgument.uiSliceNum);
-#endif//#if _DEBUG
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
       if (fDlp->sSliceCfg.sSliceArgument.uiSliceNum == 1) {
-#if defined (_DEBUG)
-        fprintf (stderr, "ParamValidationExt(), pSlice setting for SM_RASTER_SLICE now turn to SM_SINGLE_SLICE!\n");
-#endif//#if _DEBUG
+        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), pSlice setting for SM_RASTER_SLICE now turn to SM_SINGLE_SLICE!\n");
         fDlp->sSliceCfg.uiSliceMode	= SM_SINGLE_SLICE;
         break;
       }
 #ifdef MT_ENABLED
       if (pCodingParam->bEnableRc && fDlp->sSliceCfg.sSliceArgument.uiSliceNum > 1) {
-#if defined (_DEBUG)
-        fprintf (stderr, "ParamValidationExt(), WARNING: GOM based RC do not support SM_RASTER_SLICE!\n");
-#endif//#if _DEBUG
+        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), WARNING: GOM based RC do not support SM_RASTER_SLICE!\n");
       }
 #endif
       // considering the coding efficient and performance, iCountMbNum constraint by MIN_NUM_MB_PER_SLICE condition of multi-pSlice mode settting
@@ -347,24 +315,18 @@ int32_t ParamValidationExt (SWelsSvcCodingParam* pCodingParam) {
       iMbHeight	= (kiPicHeight + 15) >> 4;
       iMaxSliceNum = MAX_SLICES_NUM;
       if (iMbHeight > iMaxSliceNum) {
-#if defined (_DEBUG)
-        fprintf (stderr, "ParamValidationExt(), invalid uiSliceNum (%d) settings more than MAX!\n", iMbHeight);
-#endif//#if _DEBUG
+        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceNum (%d) settings more than MAX!\n", iMbHeight);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
       fDlp->sSliceCfg.sSliceArgument.uiSliceNum	= iMbHeight;
 
       if (fDlp->sSliceCfg.sSliceArgument.uiSliceNum <= 0) {
-#if defined (_DEBUG)
-        fprintf (stderr, "ParamValidationExt(), invalid uiSliceNum (%d) settings!\n", fDlp->sSliceCfg.sSliceArgument.uiSliceNum);
-#endif//#if _DEBUG
+        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceNum (%d) settings!\n", fDlp->sSliceCfg.sSliceArgument.uiSliceNum);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
       if (!CheckRowMbMultiSliceSetting (iMbWidth, &fDlp->sSliceCfg.sSliceArgument)) {	// verify interleave mode settings
-#if defined (_DEBUG)
-        fprintf (stderr, "ParamValidationExt(), invalid uiSliceMbNum (%d) settings!\n",
+        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMbNum (%d) settings!\n",
                  fDlp->sSliceCfg.sSliceArgument.uiSliceMbNum[0]);
-#endif//#if _DEBUG
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
     }
@@ -373,10 +335,8 @@ int32_t ParamValidationExt (SWelsSvcCodingParam* pCodingParam) {
       iMbWidth	= (kiPicWidth + 15) >> 4;
       iMbHeight	= (kiPicHeight + 15) >> 4;
       if (fDlp->sSliceCfg.sSliceArgument.uiSliceSizeConstraint <= 0) {
-#if defined (_DEBUG)
-        fprintf (stderr, "ParamValidationExt(), invalid iSliceSize (%d) settings!\n",
+        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid iSliceSize (%d) settings!\n",
                  fDlp->sSliceCfg.sSliceArgument.uiSliceSizeConstraint);
-#endif//#if _DEBUG
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
       // considering the coding efficient and performance, iCountMbNum constraint by MIN_NUM_MB_PER_SLICE condition of multi-pSlice mode settting
@@ -388,11 +348,8 @@ int32_t ParamValidationExt (SWelsSvcCodingParam* pCodingParam) {
     }
     break;
     default: {
-
-#if defined (_DEBUG)
-      fprintf (stderr, "ParamValidationExt(), invalid uiSliceMode (%d) settings!\n",
+      WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMode (%d) settings!\n",
                pCodingParam->sDependencyLayers[0].sSliceCfg.uiSliceMode);
-#endif//#if _DEBUG
       return ENC_RETURN_UNSUPPORTED_PARA;
 
     }
@@ -1849,51 +1806,6 @@ void OutputCpuFeaturesLog (uint32_t uiCpuFeatureFlags, uint32_t uiCpuCores, int3
            (uiCpuFeatureFlags & WELS_CPU_AES) ? 'Y' : 'N',
            uiCpuCores,
            iCacheLineSize);
-
-#ifdef _DEBUG	// output at console & _debug
-  fprintf (stderr, "WELS CPU features/capacities (0x%x) detected: \n"	\
-           "HTT:      %c, "	\
-           "MMX:      %c, "	\
-           "MMXEX:    %c, "	\
-           "SSE:      %c, "	\
-           "SSE2:     %c, "	\
-           "SSE3:     %c, "	\
-           "SSSE3:    %c, "	\
-           "SSE4.1:   %c, "	\
-           "SSE4.2:   %c, "	\
-           "AVX:      %c, "	\
-           "FMA:      %c, "	\
-           "X87-FPU:  %c, "	\
-           "3DNOW:    %c, "	\
-           "3DNOWEX:  %c, "	\
-           "ALTIVEC:  %c, "	\
-           "CMOV:     %c, "	\
-           "MOVBE:    %c, "	\
-           "AES:      %c, "	\
-           "NUMBER OF LOGIC PROCESSORS ON CHIP: %d, "	\
-           "CPU CACHE LINE SIZE (BYTES):        %d\n",
-           uiCpuFeatureFlags,
-           (uiCpuFeatureFlags & WELS_CPU_HTT) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_MMX) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_MMXEXT) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_SSE) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_SSE2) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_SSE3) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_SSSE3) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_SSE41) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_SSE42) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_AVX) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_FMA) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_FPU) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_3DNOW) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_3DNOWEXT) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_ALTIVEC) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_CMOV) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_MOVBE) ? 'Y' : 'N',
-           (uiCpuFeatureFlags & WELS_CPU_AES) ? 'Y' : 'N',
-           uiCpuCores,
-           iCacheLineSize);
-#endif//_DEBUG
 }
 
 /*!
@@ -1917,7 +1829,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
     return 1;
   }
 
-  iRet	=	ParamValidationExt (pCodingParam);
+  iRet	=	ParamValidationExt (*ppCtx,pCodingParam);
   if (iRet != 0) {
     WelsLog (NULL, WELS_LOG_ERROR, "WelsInitEncoderExt(), ParamValidationExt failed return %d.\n", iRet);
     return iRet;
@@ -3569,7 +3481,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
   if (NULL == ppCtx || NULL == *ppCtx || NULL == pNewParam)	return 1;
 
   /* Check validation in new parameters */
-  iReturn	= ParamValidationExt (pNewParam);
+  iReturn	= ParamValidationExt (*ppCtx,pNewParam);
   if (iReturn != ENC_RETURN_SUCCESS)	return iReturn;
 
   pOldParam	= (*ppCtx)->pSvcParam;

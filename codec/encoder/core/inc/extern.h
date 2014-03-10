@@ -64,7 +64,7 @@ int32_t InitPic (const void* kpSrc, const int32_t kiCsp, const int32_t kiWidth, 
  * \pParam	pParam		SWelsSvcCodingParam*
  * \return	successful - 0; otherwise none 0 for failed
  */
-int32_t ParamValidationExt (SWelsSvcCodingParam* pParam);
+int32_t ParamValidationExt (sWelsEncCtx* pCtx,SWelsSvcCodingParam* pParam);
 
 // GOM based RC related for uiSliceNum decision
 void GomValidCheck (const int32_t kiMbWidth, const int32_t kiMbHeight, int32_t* pSliceNum);
