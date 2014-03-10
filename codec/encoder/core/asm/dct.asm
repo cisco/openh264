@@ -132,7 +132,7 @@ SSE2_DeQuant8 dw  10, 13, 10, 13, 13, 16, 13, 16,
 SECTION .text
 ALIGN 16
 ;***********************************************************************
-;   void __cdecl WelsDctT4_mmx( int16_t *pDct[4], uint8_t *pix1, int32_t i_pix1, uint8_t *pix2, int32_t i_pix2 )
+;   void WelsDctT4_mmx( int16_t *pDct[4], uint8_t *pix1, int32_t i_pix1, uint8_t *pix2, int32_t i_pix2 )
 ;***********************************************************************
 WELS_EXTERN WelsDctT4_mmx
 WelsDctT4_mmx:
@@ -169,7 +169,7 @@ WelsDctT4_mmx:
 
 
 ;***********************************************************************
-;   void __cdecl WelsIDctT4Rec_mmx(uint8_t *rec, int32_t stride, uint8_t *pred, int32_t pred_stride, int16_t *rs)
+;   void WelsIDctT4Rec_mmx(uint8_t *rec, int32_t stride, uint8_t *pred, int32_t pred_stride, int16_t *rs)
 ;***********************************************************************
 WELS_EXTERN WelsIDctT4Rec_mmx
 WelsIDctT4Rec_mmx:
