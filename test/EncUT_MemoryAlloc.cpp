@@ -1,5 +1,6 @@
 #include "../gtest/include/gtest/gtest.h"
 #include <string.h>		// use memset/memcmp
+#include <time.h>
 #include "../codec/encoder/core/inc/memory_align.h"
 
 using namespace WelsSVCEnc;
