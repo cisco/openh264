@@ -49,10 +49,11 @@
 
 namespace WelsDec {
 
-#define WELS_READ_VERIFY(uiRet) { \
-  if( uiRet != ERR_NONE ) \
-    return uiRet; \
-}
+#define WELS_READ_VERIFY(uiRet) do{ \
+  uint32_t uiRetTmp = (uint32_t)uiRet; \
+  if( uiRetTmp != ERR_NONE ) \
+    return uiRetTmp; \
+}while(0)
 #define GET_WORD(iCurBits, pBufPtr, iLeftBits, iAllowedBytes, iReadBytes) { \
   if (iReadBytes > iAllowedBytes+1) { \
     return ERR_INFO_READ_OVERFLOW; \
