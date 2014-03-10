@@ -35,7 +35,7 @@
 #include "arm_arch_common_macro.S"
 
 #ifdef APPLE_IOS
-.macro	LORD_ALIGNED_DATA_WITH_STRIDE
+.macro	LOAD_ALIGNED_DATA_WITH_STRIDE
 //	{	//	input: $0~$3, src*, src_stride
     vld1.64	{$0}, [$4,:128], $5
     vld1.64	{$1}, [$4,:128], $5
@@ -53,7 +53,7 @@
 //	}
 .endm
 
-.macro	LORD_UNALIGNED_DATA_WITH_STRIDE
+.macro	LOAD_UNALIGNED_DATA_WITH_STRIDE
 //	{	//	input: $0~$3, src*, src_stride
     vld1.64	{$0}, [$4], $5
     vld1.64	{$1}, [$4], $5
@@ -315,7 +315,7 @@
 //	}
 .endm
 #else
-.macro	LORD_ALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
+.macro	LOAD_ALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
 //	{	//	input: \arg0~\arg3, src*, src_stride
     vld1.64	{\arg0}, [\arg4,:128], \arg5
     vld1.64	{\arg1}, [\arg4,:128], \arg5
@@ -333,7 +333,7 @@
 //	}
 .endm
 
-.macro	LORD_UNALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
+.macro	LOAD_UNALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
 //	{	//	input: \arg0~\arg3, src*, src_stride
     vld1.64	{\arg0}, [\arg4], \arg5
     vld1.64	{\arg1}, [\arg4], \arg5
@@ -599,11 +599,11 @@
 
 WELS_ASM_FUNC_BEGIN WelsCopy8x8_neon
 
-	LORD_UNALIGNED_DATA_WITH_STRIDE	d0, d1, d2, d3, r2, r3
+	LOAD_UNALIGNED_DATA_WITH_STRIDE	d0, d1, d2, d3, r2, r3
 
 	STORE_UNALIGNED_DATA_WITH_STRIDE	d0, d1, d2, d3, r0, r1
 
-	LORD_UNALIGNED_DATA_WITH_STRIDE	d4, d5, d6, d7, r2, r3
+	LOAD_UNALIGNED_DATA_WITH_STRIDE	d4, d5, d6, d7, r2, r3
 
 	STORE_UNALIGNED_DATA_WITH_STRIDE	d4, d5, d6, d7, r0, r1
 
@@ -612,19 +612,19 @@ WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN WelsCopy16x16_neon
 
-	LORD_ALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
+	LOAD_ALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
 
 	STORE_ALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r0, r1
 
-	LORD_ALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r2, r3
+	LOAD_ALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r2, r3
 
 	STORE_ALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r0, r1
 
-	LORD_ALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
+	LOAD_ALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
 
 	STORE_ALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r0, r1
 
-	LORD_ALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r2, r3
+	LOAD_ALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r2, r3
 
 	STORE_ALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r0, r1
 
@@ -633,19 +633,19 @@ WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN WelsCopy16x16NotAligned_neon
 
-	LORD_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
+	LOAD_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
 
 	STORE_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r0, r1
 
-	LORD_UNALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r2, r3
+	LOAD_UNALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r2, r3
 
 	STORE_UNALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r0, r1
 
-	LORD_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
+	LOAD_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
 
 	STORE_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r0, r1
 
-	LORD_UNALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r2, r3
+	LOAD_UNALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r2, r3
 
 	STORE_UNALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r0, r1
 
@@ -654,11 +654,11 @@ WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN WelsCopy16x8NotAligned_neon
 
-	LORD_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
+	LOAD_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
 
 	STORE_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r0, r1
 
-	LORD_UNALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r2, r3
+	LOAD_UNALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r2, r3
 
 	STORE_UNALIGNED_DATA_WITH_STRIDE	q4, q5, q6, q7, r0, r1
 
@@ -667,19 +667,19 @@ WELS_ASM_FUNC_END
 
 WELS_ASM_FUNC_BEGIN WelsCopy8x16_neon
 
-	LORD_UNALIGNED_DATA_WITH_STRIDE	d0, d1, d2, d3, r2, r3
+	LOAD_UNALIGNED_DATA_WITH_STRIDE	d0, d1, d2, d3, r2, r3
 
 	STORE_UNALIGNED_DATA_WITH_STRIDE	d0, d1, d2, d3, r0, r1
 
-	LORD_UNALIGNED_DATA_WITH_STRIDE	d4, d5, d6, d7, r2, r3
+	LOAD_UNALIGNED_DATA_WITH_STRIDE	d4, d5, d6, d7, r2, r3
 
 	STORE_UNALIGNED_DATA_WITH_STRIDE	d4, d5, d6, d7, r0, r1
 
-	LORD_UNALIGNED_DATA_WITH_STRIDE	d0, d1, d2, d3, r2, r3
+	LOAD_UNALIGNED_DATA_WITH_STRIDE	d0, d1, d2, d3, r2, r3
 
 	STORE_UNALIGNED_DATA_WITH_STRIDE	d0, d1, d2, d3, r0, r1
 
-	LORD_UNALIGNED_DATA_WITH_STRIDE	d4, d5, d6, d7, r2, r3
+	LOAD_UNALIGNED_DATA_WITH_STRIDE	d4, d5, d6, d7, r2, r3
 
 	STORE_UNALIGNED_DATA_WITH_STRIDE	d4, d5, d6, d7, r0, r1
 

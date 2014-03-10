@@ -39,13 +39,13 @@ void VAACalcSadSsd_c (uint8_t* pCurData, uint8_t* pRefData, int32_t iPicWidth, i
   uint8_t* tmp_ref = pRefData;
   uint8_t* tmp_cur = pCurData;
   int32_t iMbWidth = (iPicWidth >> 4);
-  int32_t mb_heigth = (iPicHeight >> 4);
+  int32_t mb_height = (iPicHeight >> 4);
   int32_t mb_index = 0;
   int32_t pic_stride_x8 = iPicStride << 3;
   int32_t step = (iPicStride << 4) - iPicWidth;
 
   *pFrameSad = 0;
-  for (int32_t i = 0; i < mb_heigth; i ++) {
+  for (int32_t i = 0; i < mb_height; i ++) {
     for (int32_t j = 0; j < iMbWidth; j ++) {
       int32_t k, l;
       int32_t l_sad, l_sqdiff, l_sum, l_sqsum;
@@ -150,13 +150,13 @@ void VAACalcSadVar_c (uint8_t* pCurData, uint8_t* pRefData, int32_t iPicWidth, i
   uint8_t* tmp_ref = pRefData;
   uint8_t* tmp_cur = pCurData;
   int32_t iMbWidth = (iPicWidth >> 4);
-  int32_t mb_heigth = (iPicHeight >> 4);
+  int32_t mb_height = (iPicHeight >> 4);
   int32_t mb_index = 0;
   int32_t pic_stride_x8 = iPicStride << 3;
   int32_t step = (iPicStride << 4) - iPicWidth;
 
   *pFrameSad = 0;
-  for (int32_t i = 0; i < mb_heigth; i ++) {
+  for (int32_t i = 0; i < mb_height; i ++) {
     for (int32_t j = 0; j < iMbWidth; j ++) {
       int32_t k, l;
       int32_t l_sad, l_sum, l_sqsum;
@@ -254,13 +254,13 @@ void VAACalcSad_c (uint8_t* pCurData, uint8_t* pRefData, int32_t iPicWidth, int3
   uint8_t* tmp_ref = pRefData;
   uint8_t* tmp_cur = pCurData;
   int32_t iMbWidth = (iPicWidth >> 4);
-  int32_t mb_heigth = (iPicHeight >> 4);
+  int32_t mb_height = (iPicHeight >> 4);
   int32_t mb_index = 0;
   int32_t pic_stride_x8 = iPicStride << 3;
   int32_t step = (iPicStride << 4) - iPicWidth;
 
   *pFrameSad = 0;
-  for (int32_t i = 0; i < mb_heigth; i ++) {
+  for (int32_t i = 0; i < mb_height; i ++) {
     for (int32_t j = 0; j < iMbWidth; j ++) {
       int32_t k, l;
       int32_t l_sad;
@@ -341,13 +341,13 @@ void VAACalcSadSsdBgd_c (uint8_t* pCurData, uint8_t* pRefData, int32_t iPicWidth
   uint8_t* tmp_ref = pRefData;
   uint8_t* tmp_cur = pCurData;
   int32_t iMbWidth = (iPicWidth >> 4);
-  int32_t mb_heigth = (iPicHeight >> 4);
+  int32_t mb_height = (iPicHeight >> 4);
   int32_t mb_index = 0;
   int32_t pic_stride_x8 = iPicStride << 3;
   int32_t step = (iPicStride << 4) - iPicWidth;
 
   *pFrameSad = 0;
-  for (int32_t i = 0; i < mb_heigth; i ++) {
+  for (int32_t i = 0; i < mb_height; i ++) {
     for (int32_t j = 0; j < iMbWidth; j ++) {
       int32_t k, l;
       int32_t l_sad, l_sqdiff, l_sum, l_sqsum, l_sd, l_mad;
@@ -485,13 +485,13 @@ void VAACalcSadBgd_c (uint8_t* pCurData, uint8_t* pRefData, int32_t iPicWidth, i
   uint8_t* tmp_ref = pRefData;
   uint8_t* tmp_cur = pCurData;
   int32_t iMbWidth = (iPicWidth >> 4);
-  int32_t mb_heigth = (iPicHeight >> 4);
+  int32_t mb_height = (iPicHeight >> 4);
   int32_t mb_index = 0;
   int32_t pic_stride_x8 = iPicStride << 3;
   int32_t step = (iPicStride << 4) - iPicWidth;
 
   *pFrameSad = 0;
-  for (int32_t i = 0; i < mb_heigth; i ++) {
+  for (int32_t i = 0; i < mb_height; i ++) {
     for (int32_t j = 0; j < iMbWidth; j ++) {
       int32_t k, l;
       int32_t l_sad, l_sd, l_mad;
