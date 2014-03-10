@@ -190,7 +190,7 @@ static void FillDefault (SEncParamExt& param, const bool kbEnableRc) {
 
   param.sSpatialLayers[0].iDLayerQp = SVC_QUALITY_BASE_QP;
   param.sSpatialLayers[0].fFrameRate = param.fMaxFrameRate;
-  param.sSpatialLayers[0].sSliceCfg.uiSliceMode = 0;
+  param.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
   param.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 1500;
   param.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = 1;
 
@@ -221,7 +221,7 @@ void FillDefault (const bool kbEnableRc) {
 
 
   //init multi-slice
-   sDependencyLayers[0].sSliceCfg.uiSliceMode = 0;
+   sDependencyLayers[0].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
    sDependencyLayers[0].sSliceCfg.sSliceArgument.uiSliceSizeConstraint    = 1500;
    sDependencyLayers[0].sSliceCfg.sSliceArgument.uiSliceNum      = 1;
 
@@ -406,7 +406,7 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
 
 
     //multi slice
-    pDlp->sSliceCfg.uiSliceMode = (SliceMode)pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.uiSliceMode;
+    pDlp->sSliceCfg.uiSliceMode = pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.uiSliceMode;
     pDlp->sSliceCfg.sSliceArgument.uiSliceSizeConstraint
       = (uint32_t) (pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.sSliceArgument.uiSliceSizeConstraint);
     pDlp->sSliceCfg.sSliceArgument.uiSliceNum

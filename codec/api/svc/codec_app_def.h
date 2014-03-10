@@ -163,7 +163,7 @@ typedef enum {
 } SliceModeEnum;
 
 typedef struct {
-  unsigned int uiSliceMode; //by default, uiSliceMode will be 0
+  SliceModeEnum uiSliceMode; //by default, uiSliceMode will be SM_SINGLE_SLICE
   SSliceArgument sSliceArgument;
 } SSliceConfig;
 

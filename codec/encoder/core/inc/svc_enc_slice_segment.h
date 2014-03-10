@@ -47,10 +47,6 @@
 
 #include "codec_app_def.h"
 namespace WelsSVCEnc {
-/*!
- * \brief	SSlice mode
- */
-typedef uint16_t SliceMode;
 
 
 // NOTE:
@@ -77,7 +73,7 @@ typedef uint16_t SliceMode;
  */
 /* Single/multiple slices */
 typedef struct SlicepEncCtx_s {
-SliceMode		uiSliceMode;			/* 0: single slice in frame; 1: multiple slices in frame; */
+SliceModeEnum		uiSliceMode;			/* 0: single slice in frame; 1: multiple slices in frame; */
 int16_t			iMbWidth;			/* width of picture size in mb */
 int16_t			iMbHeight;			/* height of picture size in mb */
 int16_t			iSliceNumInFrame;	/* count number of slices in frame; */
