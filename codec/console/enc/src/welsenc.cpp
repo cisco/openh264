@@ -204,7 +204,7 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
         pSrcPic->iPicWidth = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("SourceHeight") == 0) {
         pSrcPic->iPicHeight = atoi (strTag[1].c_str());
-      }else if (strTag[0].compare ("InputFile") == 0) {
+      } else if (strTag[0].compare ("InputFile") == 0) {
 	    if (strTag[1].length() > 0)
           sFileSet.strSeqFile	= strTag[1];
       } else if (strTag[0].compare ("OutputFile") == 0) {
