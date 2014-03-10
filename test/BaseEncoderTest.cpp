@@ -6,8 +6,8 @@
 #include "BaseEncoderTest.h"
 
 static int InitWithParam(ISVCEncoder* encoder, int width,
-    int height, float frameRate, bool slices) {
-  if (!slices) {
+    int height, float frameRate, SliceModeEnum sliceMode) {
+  if (SM_SINGLE_SLICE == sliceMode) {
     SEncParamBase param;
     memset (&param, 0, sizeof(SEncParamBase));
 
@@ -33,7 +33,7 @@ static int InitWithParam(ISVCEncoder* encoder, int width,
     param.sSpatialLayers[0].fFrameRate = frameRate;
     param.sSpatialLayers[0].iSpatialBitrate = param.iTargetBitrate;
 
-    param.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_ROWMB_SLICE;
+    param.sSpatialLayers[0].sSliceCfg.uiSliceMode = sliceMode;
 
     return encoder->InitializeExt(&param);
   }
@@ -55,7 +55,7 @@ void BaseEncoderTest::TearDown() {
 }
 
 void BaseEncoderTest::EncodeStream(InputStream* in, int width, int height,
-    float frameRate, bool slices, Callback* cbk) {
+    float frameRate, SliceModeEnum slices, Callback* cbk) {
   int rv = InitWithParam(encoder_, width, height, frameRate, slices);
   ASSERT_TRUE(rv == cmResultSuccess);
 
@@ -89,7 +89,7 @@ void BaseEncoderTest::EncodeStream(InputStream* in, int width, int height,
 }
 
 void BaseEncoderTest::EncodeFile(const char* fileName, int width, int height,
-    float frameRate, bool slices, Callback* cbk) {
+    float frameRate, SliceModeEnum slices, Callback* cbk) {
   FileInputStream fileStream;
   ASSERT_TRUE(fileStream.Open(fileName));
   EncodeStream(&fileStream, width, height, frameRate, slices, cbk);
