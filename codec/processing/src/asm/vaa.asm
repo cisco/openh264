@@ -359,7 +359,7 @@ SampleVariance16x16_sse2:
 
 WELS_EXTERN VAACalcSad_sse2
 ;*************************************************************************************************************
-;void VAACalcSad_sse2( uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight
+;void VAACalcSad_sse2( const uint8_t *cur_data, const uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight
 ;                                                               int32_t iPicStride, int32_t *psadframe, int32_t *psad8x8)
 ;*************************************************************************************************************
 
@@ -551,7 +551,7 @@ SampleVariance16x16_sse2:
 
 WELS_EXTERN VAACalcSad_sse2
 ;*************************************************************************************************************
-;void VAACalcSad_sse2( uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight
+;void VAACalcSad_sse2( const uint8_t *cur_data, const uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight
 ;                                                               int32_t iPicStride, int32_t *psadframe, int32_t *psad8x8)
 ;*************************************************************************************************************
 
@@ -649,7 +649,7 @@ width_loop:
 %ifdef X86_32
 WELS_EXTERN VAACalcSadVar_sse2
 ;*************************************************************************************************************
-;void VAACalcSadVar_sse2( uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight
+;void VAACalcSadVar_sse2( const uint8_t *cur_data, const uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight
 ;               int32_t iPicStride, int32_t *psadframe, int32_t *psad8x8, int32_t *psum16x16, int32_t *psqsum16x16)
 ;*************************************************************************************************************
 
@@ -785,7 +785,7 @@ var_width_loop:
 
 WELS_EXTERN VAACalcSadVar_sse2
 ;*************************************************************************************************************
-;void VAACalcSadVar_sse2( uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight
+;void VAACalcSadVar_sse2( const uint8_t *cur_data, const uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight
 ;               int32_t iPicStride, int32_t *psadframe, int32_t *psad8x8, int32_t *psum16x16, int32_t *psqsum16x16)
 ;*************************************************************************************************************
 
@@ -928,7 +928,7 @@ var_width_loop:
 
 WELS_EXTERN VAACalcSadSsd_sse2
 ;*************************************************************************************************************
-;void VAACalcSadSsd_sse2(uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
+;void VAACalcSadSsd_sse2(const uint8_t *cur_data, const uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
 ;       int32_t iPicStride,int32_t *psadframe, int32_t *psad8x8, int32_t *psum16x16, int32_t *psqsum16x16, int32_t *psqdiff16x16)
 ;*************************************************************************************************************
 
@@ -1084,7 +1084,7 @@ sqdiff_width_loop:
 
 WELS_EXTERN VAACalcSadSsd_sse2
 ;*************************************************************************************************************
-;void VAACalcSadSsd_sse2(uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
+;void VAACalcSadSsd_sse2(const uint8_t *cur_data, const uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
 ;       int32_t iPicStride,int32_t *psadframe, int32_t *psad8x8, int32_t *psum16x16, int32_t *psqsum16x16, int32_t *psqdiff16x16)
 ;*************************************************************************************************************
 
@@ -1248,7 +1248,7 @@ sqdiff_width_loop:
 %ifdef X86_32
 WELS_EXTERN VAACalcSadBgd_sse2
 ;*************************************************************************************************************
-;void VAACalcSadBgd_sse2(uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
+;void VAACalcSadBgd_sse2(const uint8_t *cur_data, const uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
 ;                               int32_t iPicStride, int32_t *psadframe, int32_t *psad8x8, int32_t *p_sd8x8, uint8_t *p_mad8x8)
 ;*************************************************************************************************************
 
@@ -1427,7 +1427,7 @@ bgd_width_loop:
 
 WELS_EXTERN VAACalcSadSsdBgd_sse2
 ;*************************************************************************************************************
-;void VAACalcSadSsdBgd_sse2(uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
+;void VAACalcSadSsdBgd_sse2(const uint8_t *cur_data, const uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
 ;                int32_t iPicStride, int32_t *psadframe, int32_t *psad8x8, int32_t *psum16x16, int32_t *psqsum16x16,
 ;                       int32_t *psqdiff16x16, int32_t *p_sd8x8, uint8_t *p_mad8x8)
 ;*************************************************************************************************************
@@ -1658,7 +1658,7 @@ sqdiff_bgd_width_loop:
 
 WELS_EXTERN VAACalcSadBgd_sse2
 ;*************************************************************************************************************
-;void VAACalcSadBgd_sse2(uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
+;void VAACalcSadBgd_sse2(const uint8_t *cur_data, const uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
 ;                               int32_t iPicStride, int32_t *psadframe, int32_t *psad8x8, int32_t *p_sd8x8, uint8_t *p_mad8x8)
 ;*************************************************************************************************************
 
@@ -1829,7 +1829,7 @@ bgd_width_loop:
 
 WELS_EXTERN VAACalcSadSsdBgd_sse2
 ;*************************************************************************************************************
-;void VAACalcSadSsdBgd_sse2(uint8_t *cur_data, uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
+;void VAACalcSadSsdBgd_sse2(const uint8_t *cur_data, const uint8_t *ref_data, int32_t iPicWidth, int32_t iPicHeight,
 ;                int32_t iPicStride, int32_t *psadframe, int32_t *psad8x8, int32_t *psum16x16, int32_t *psqsum16x16,
 ;                       int32_t *psqdiff16x16, int32_t *p_sd8x8, uint8_t *p_mad8x8)
 ;*************************************************************************************************************
