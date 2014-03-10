@@ -354,6 +354,8 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   bEnableLongTermReference	= pCodingParam.bEnableLongTermReference ? true : false;
   iLtrMarkPeriod = pCodingParam.iLtrMarkPeriod;
 
+  iMultipleThreadIdc = pCodingParam.iMultipleThreadIdc;
+
   /* For ssei information */
   bEnableSSEI		= true;
 
