@@ -436,7 +436,11 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   if (uiSliceType > 4)
     uiSliceType -= 5;
 
-  if ((eNalType == NAL_UNIT_CODED_SLICE_IDR) && (uiSliceType != 2)) {
+  if (B_SLICE == uiSliceType) {
+    WelsLog (pCtx, WELS_LOG_WARNING, "ParseSliceHeaderSyntaxs(): B slice not supported.\n");
+    return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_UNSUPPORTED_BIPRED);
+  }
+  if ((NAL_UNIT_CODED_SLICE_IDR == eNalType) && (I_SLICE != uiSliceType)) {
     WelsLog (pCtx, WELS_LOG_WARNING, "Invalid slice type(%d) in IDR picture. \n", uiSliceType);
     return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SLICE_TYPE);
   }
@@ -568,14 +572,12 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   //set defaults, might be overriden a few line later
   pSliceHead->uiRefCount[0]	= pPps->uiNumRefIdxL0Active;
   pSliceHead->uiRefCount[1]	= pPps->uiNumRefIdxL1Active;
+
+  bool bReadNumRefFlag = (P_SLICE == uiSliceType);
   if (kbExtensionFlag) {
-    uiQualityId = pNalHeaderExt->uiQualityId;
-  } else if (uiSliceType == P_SLICE || uiSliceType == SP_SLICE || uiSliceType == B_SLICE) {
-    const bool kbBipredFlag = (B_SLICE == uiSliceType);
-    if (kbBipredFlag) {
-      WelsLog (pCtx, WELS_LOG_WARNING, "ParseSliceHeaderSyntaxs(): kbBipredFlag = 1 not supported.\n");
-      return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_UNSUPPORTED_BIPRED);
-    }
+    bReadNumRefFlag &= (BASE_QUALITY_ID == pNalHeaderExt->uiQualityId);
+  } 
+  if (bReadNumRefFlag) {
     WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //num_ref_idx_active_override_flag
     pSliceHead->bNumRefIdxActiveOverrideFlag	= !!uiCode;
     if (pSliceHead->bNumRefIdxActiveOverrideFlag) {
