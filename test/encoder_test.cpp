@@ -31,7 +31,7 @@ struct EncodeFileParam {
   int width;
   int height;
   float frameRate;
-  bool slices;
+  SliceModeEnum slices;
 };
 
 class EncoderOutputTest : public ::testing::WithParamInterface<EncodeFileParam>,
@@ -66,19 +66,19 @@ TEST_P(EncoderOutputTest, CompareOutput) {
 static const EncodeFileParam kFileParamArray[] = {
   {
       "res/CiscoVT2people_320x192_12fps.yuv",
-      "06441376891cbc237a36e59b62131cd94ff9cb19", 320, 192, 12.0f, false
+      "06441376891cbc237a36e59b62131cd94ff9cb19", 320, 192, 12.0f, SM_SINGLE_SLICE
   },
   {
       "res/CiscoVT2people_160x96_6fps.yuv",
-      "4f3759fc44125b27a179ebff158dbba9e431bd0b", 160, 96, 6.0f, false
+      "4f3759fc44125b27a179ebff158dbba9e431bd0b", 160, 96, 6.0f, SM_SINGLE_SLICE
   },
   {
       "res/Static_152_100.yuv",
-      "af5c6a41b567ce1b2cb6fd427f4379473d3b829f", 152, 100, 6.0f, false
+      "af5c6a41b567ce1b2cb6fd427f4379473d3b829f", 152, 100, 6.0f, SM_SINGLE_SLICE
   },
   {
       "res/CiscoVT2people_320x192_12fps.yuv",
-      "be0079b022b18fdce04570db24e4327ca26a0ecb", 320, 192, 12.0f, true
+      "be0079b022b18fdce04570db24e4327ca26a0ecb", 320, 192, 12.0f, SM_ROWMB_SLICE // One slice per MB row
   },
 };
 
