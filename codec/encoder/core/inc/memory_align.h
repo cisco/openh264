@@ -50,9 +50,7 @@ void* WelsMallocz (const uint32_t kuiSize, const char* kpTag);
 void* WelsMalloc (const uint32_t kuiSize, const char* kpTag);
 void WelsFree (void* pPointer, const char* kpTag);
 const uint32_t WelsGetCacheLineSize() const;
-#if defined(MEMORY_MONITOR)
 const uint32_t WelsGetMemoryUsage() const;
-#endif//MEMORY_MONITOR
 
  private:
 // private copy & assign constructors adding to fix klocwork scan issues

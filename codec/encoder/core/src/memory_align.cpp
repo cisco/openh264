@@ -139,10 +139,8 @@ const uint32_t CMemoryAlign::WelsGetCacheLineSize() const {
   return m_nCacheLineSize;
 }
 
-#if defined(MEMORY_MONITOR)
 const uint32_t CMemoryAlign::WelsGetMemoryUsage() const {
   return m_nMemoryUsageInBytes;
 }
-#endif//MEMORY_MONITOR
 
 } // end of namespace WelsSVCEnc

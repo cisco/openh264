@@ -7,6 +7,7 @@ CODEC_UNITTEST_CPP_SRCS=\
 	$(CODEC_UNITTEST_SRCDIR)/decoder_test.cpp\
 	$(CODEC_UNITTEST_SRCDIR)/encoder_test.cpp\
 	$(CODEC_UNITTEST_SRCDIR)/simple_test.cpp\
+	$(CODEC_UNITTEST_SRCDIR)/EncUT_MemoryAlloc.cpp\
 
 CODEC_UNITTEST_OBJS += $(CODEC_UNITTEST_CPP_SRCS:.cpp=.o)
 
