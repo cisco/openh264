@@ -67,6 +67,10 @@ ARCH specifies the architecture of android device. Currently only arm and x86 ar
 NDKLEVEL specifies android api level, the api level can be 12-19, the default is 12.
 GCCVERSION specifies which gcc in NDK is used, the default is 4.8.
 
+By default these commands build for the armeabi-v7a ABI. To build for the other android
+ABIs, add "ARCH=mips" or "ARCH=x86". To build for the older armeabi ABI (which has
+armv5te as baseline), add "APP_ABI=armeabi" (ARCH=arm is implicit).
+
 For iOS Builds
 --------------
 You can build the libraries and demo applications using xcode project files
