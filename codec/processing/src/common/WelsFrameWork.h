@@ -44,7 +44,7 @@
 
 #include "IWelsVP.h"
 #include "util.h"
-#include "thread.h"
+#include "WelsThreadLib.h"
 
 WELSVP_NAMESPACE_BEGIN
 

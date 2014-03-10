@@ -388,7 +388,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\common\thread.cpp"
+				RelativePath="..\..\..\common\WelsThreadLib.cpp"
 				>
 			</File>
 			<File
@@ -454,7 +454,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\common\thread.h"
+				RelativePath="..\..\..\common\WelsThreadLib.h"
 				>
 			</File>
 			<File

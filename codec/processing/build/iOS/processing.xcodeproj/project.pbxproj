@@ -21,7 +21,6 @@
 		4CE4478B18BC62960017DF25 /* AdaptiveQuantization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4475D18BC62960017DF25 /* AdaptiveQuantization.cpp */; };
 		4CE4478F18BC62960017DF25 /* BackgroundDetection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4476418BC62960017DF25 /* BackgroundDetection.cpp */; };
 		4CE4479018BC62960017DF25 /* memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4476718BC62960017DF25 /* memory.cpp */; };
-		4CE4479118BC62960017DF25 /* thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4476A18BC62960017DF25 /* thread.cpp */; };
 		4CE4479218BC62960017DF25 /* WelsFrameWork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4476E18BC62960017DF25 /* WelsFrameWork.cpp */; };
 		4CE4479318BC62960017DF25 /* WelsFrameWorkEx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4477018BC62960017DF25 /* WelsFrameWorkEx.cpp */; };
 		4CE4479418BC62960017DF25 /* ComplexityAnalysis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4477418BC62960017DF25 /* ComplexityAnalysis.cpp */; };
@@ -80,8 +79,6 @@
 		4CE4476718BC62960017DF25 /* memory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = memory.cpp; sourceTree = "<group>"; };
 		4CE4476818BC62960017DF25 /* memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
 		4CE4476918BC62960017DF25 /* resource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = resource.h; sourceTree = "<group>"; };
-		4CE4476A18BC62960017DF25 /* thread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread.cpp; sourceTree = "<group>"; };
-		4CE4476B18BC62960017DF25 /* thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = thread.h; sourceTree = "<group>"; };
 		4CE4476C18BC62960017DF25 /* typedef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = typedef.h; sourceTree = "<group>"; };
 		4CE4476D18BC62960017DF25 /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
 		4CE4476E18BC62960017DF25 /* WelsFrameWork.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WelsFrameWork.cpp; sourceTree = "<group>"; };
@@ -240,8 +237,6 @@
 				4CE4476718BC62960017DF25 /* memory.cpp */,
 				4CE4476818BC62960017DF25 /* memory.h */,
 				4CE4476918BC62960017DF25 /* resource.h */,
-				4CE4476A18BC62960017DF25 /* thread.cpp */,
-				4CE4476B18BC62960017DF25 /* thread.h */,
 				4CE4476C18BC62960017DF25 /* typedef.h */,
 				4CE4476D18BC62960017DF25 /* util.h */,
 				4CE4476E18BC62960017DF25 /* WelsFrameWork.cpp */,
@@ -409,7 +404,6 @@
 				4CE4479C18BC62960017DF25 /* SceneChangeDetectionCommon.cpp in Sources */,
 				4CE4479418BC62960017DF25 /* ComplexityAnalysis.cpp in Sources */,
 				4CE4479E18BC62960017DF25 /* vaacalculation.cpp in Sources */,
-				4CE4479118BC62960017DF25 /* thread.cpp in Sources */,
 				4C34067A18C5A4AD00DFA14A /* pixel_sad_neon.S in Sources */,
 				4CE4478F18BC62960017DF25 /* BackgroundDetection.cpp in Sources */,
 				4CE4479618BC62960017DF25 /* denoise_filter.cpp in Sources */,
