@@ -1,4 +1,3 @@
-## yongzxu: refine mk files for android platform
 
 LOCAL_PATH := $(call my-dir)
 MY_LOCAL_PATH := $(LOCAL_PATH)
