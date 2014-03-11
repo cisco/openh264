@@ -1,9 +1,5 @@
 ## yongzxu: refine mk files for android platform
 
-#To fix the bug that Intel NDK can't creat directory
-$(shell mkdir -p $(TARGET_OBJS)/cpufeatures)
-$(shell mkdir -p $(TARGET_OBJS)/welsdecdemo)
-
 LOCAL_PATH := $(call my-dir)
 MY_LOCAL_PATH := $(LOCAL_PATH)
 
