@@ -45,6 +45,8 @@ mov pc, lr
 #else
 
 .syntax unified
+.section .note.GNU-stack,"",%progbits // Mark stack as non-executable
+.text
 
 .macro WELS_ASM_FUNC_BEGIN funcName
 .align 2
