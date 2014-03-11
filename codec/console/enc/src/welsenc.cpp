@@ -552,6 +552,9 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       case 4:
         pDLayer->sSliceCfg.uiSliceMode = SM_DYN_SLICE;
         break;
+      case 5:
+        pDLayer->sSliceCfg.uiSliceMode = SM_AUTO_SLICE;
+        break;
       default:
         pDLayer->sSliceCfg.uiSliceMode = SM_RESERVED;
         break;

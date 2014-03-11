@@ -226,7 +226,8 @@ int32_t ParamValidationExt (sWelsEncCtx*pCtx,SWelsSvcCodingParam* pCodingParam) 
         fDlp->sSliceCfg.sSliceArgument.uiSliceMbNum[iIdx] = 0;
       }
       break;
-    case SM_FIXEDSLCNUM_SLICE: {
+    case SM_FIXEDSLCNUM_SLICE:
+    case SM_AUTO_SLICE:{
       fDlp->sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 0;
 
       iMbWidth	= (kiPicWidth + 15) >> 4;
@@ -1690,14 +1691,7 @@ int32_t InitSliceSettings (SWelsSvcCodingParam* pCodingParam, const int32_t kiCp
     const int32_t kiMbWidth			= (pDlp->iFrameWidth + 15) >> 4;
     const int32_t kiMbHeight			= (pDlp->iFrameHeight + 15) >> 4;
     const int32_t kiMbNumInFrame	= kiMbWidth * kiMbHeight;
-#if defined(MT_ENABLED)
-    int32_t iSliceNum				= (SM_FIXEDSLCNUM_SLICE == pMso->uiSliceMode
-                               || SM_DYN_SLICE == pMso->uiSliceMode) ? kiCpuCores :
-                              pSlcArg->uiSliceNum; // uiSliceNum per input has been validated at ParamValidationExt()
-#else//!MT_ENABLED
-    int16_t iSliceNum				= pSlcArg->uiSliceNum; // uiSliceNum per input has been validated at ParamValidationExt()
-#endif//MT_ENABLED
-
+    int32_t iSliceNum				= (SM_AUTO_SLICE == pMso->uiSliceMode)? kiCpuCores :pSlcArg->uiSliceNum;
     // NOTE: Per design, in case MT/DYNAMIC_SLICE_ASSIGN enabled, for SM_FIXEDSLCNUM_SLICE mode,
     // uiSliceNum of current spatial layer settings equals to uiCpuCores number; SM_DYN_SLICE mode,
     // uiSliceNum intials as uiCpuCores also, stay tuned dynamically slicing in future
@@ -1710,6 +1704,7 @@ int32_t InitSliceSettings (SWelsSvcCodingParam* pCodingParam, const int32_t kiCp
       break;	// go through for MT_ENABLED & SM_DYN_SLICE?
 //#endif//MT_ENABLED
     case SM_FIXEDSLCNUM_SLICE:
+    case SM_AUTO_SLICE:
       if (iSliceNum > iMaxSliceCount)
         iMaxSliceCount = iSliceNum;
       // need perform check due uiSliceNum might change, although has been initialized somewhere outside
@@ -2950,7 +2945,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
     // Encoding this picture might mulitiple sQualityStat layers potentially be encoded as followed
 
     switch (param_d->sSliceCfg.uiSliceMode) {
-    case SM_FIXEDSLCNUM_SLICE: {
+    case SM_FIXEDSLCNUM_SLICE:
+    case SM_AUTO_SLICE:{
 #if defined(MT_ENABLED)
       if ((iCurDid > 0) && (pSvcParam->iMultipleThreadIdc > 1) &&
           (pSvcParam->sDependencyLayers[iCurDid].sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE
@@ -3403,7 +3399,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
     }
 
 #if defined(MT_ENABLED)
-    if (param_d->sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE && pSvcParam->iMultipleThreadIdc > 1 &&
+    if ((param_d->sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE||param_d->sSliceCfg.uiSliceMode == SM_AUTO_SLICE) && pSvcParam->iMultipleThreadIdc > 1 &&
         pSvcParam->iMultipleThreadIdc >= param_d->sSliceCfg.sSliceArgument.uiSliceNum) {
       CalcSliceComplexRatio (pCtx->pSliceThreading->pSliceComplexRatio[iCurDid], pCtx->pCurDqLayer->pSliceEncCtx,
                              pCtx->pSliceThreading->pSliceConsumeTime[iCurDid]);
@@ -3444,9 +3440,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
 
 #if defined(MT_ENABLED)
   if (pSvcParam->iMultipleThreadIdc > 1 && did_list[0] == BASE_DEPENDENCY_ID
-      && pSvcParam->sDependencyLayers[0].sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE
+      && ((pSvcParam->sDependencyLayers[0].sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE)||(pSvcParam->sDependencyLayers[0].sSliceCfg.uiSliceMode == SM_AUTO_SLICE))
       && pSvcParam->iMultipleThreadIdc >= pSvcParam->sDependencyLayers[0].sSliceCfg.sSliceArgument.uiSliceNum
-      && pSvcParam->sDependencyLayers[did_list[iSpatialNum - 1]].sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE
+      && ((pSvcParam->sDependencyLayers[did_list[iSpatialNum - 1]].sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE)||(pSvcParam->sDependencyLayers[did_list[iSpatialNum - 1]].sSliceCfg.uiSliceMode == SM_AUTO_SLICE))
       && pSvcParam->iMultipleThreadIdc >= pSvcParam->sDependencyLayers[did_list[iSpatialNum -
           1]].sSliceCfg.sSliceArgument.uiSliceNum) {
     AdjustBaseLayer (pCtx);
