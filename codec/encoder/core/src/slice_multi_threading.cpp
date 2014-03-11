@@ -325,7 +325,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   while (iIdx < iNumSpatialLayers) {
     SSliceConfig* pMso	= &pPara->sDependencyLayers[iIdx].sSliceCfg;
     const int32_t kiSliceNum = pMso->sSliceArgument.uiSliceNum;
-    if (pMso->uiSliceMode == SM_FIXEDSLCNUM_SLICE && pPara->iMultipleThreadIdc > 1
+    if (((pMso->uiSliceMode == SM_FIXEDSLCNUM_SLICE)||(pMso->uiSliceMode == SM_AUTO_SLICE)) && pPara->iMultipleThreadIdc > 1
         && pPara->iMultipleThreadIdc >= kiSliceNum) {
       pSmt->pSliceConsumeTime[iIdx]	= (uint32_t*)pMa->WelsMallocz (kiSliceNum * sizeof (uint32_t), "pSliceConsumeTime[]");
       WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pSliceConsumeTime[iIdx]), FreeMemorySvc (ppCtx))
@@ -727,7 +727,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         pSlice			= &pCurDq->sLayerInfo.pSliceInLayer[iSliceIdx];
         pSliceBs		= &pEncPEncCtx->pSliceBs[iSliceIdx];
 
-        bDsaFlag	= (pParamD->sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE &&
+        bDsaFlag	= (((pParamD->sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE)||(pParamD->sSliceCfg.uiSliceMode == SM_AUTO_SLICE)) &&
                      pCodingParam->iMultipleThreadIdc > 1 &&
                      pCodingParam->iMultipleThreadIdc >= pParamD->sSliceCfg.sSliceArgument.uiSliceNum);
         if (bDsaFlag)
@@ -1142,7 +1142,9 @@ void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t 
     SSliceCtx* pSliceCtx = pCurDq->pSliceEncCtx;
     const uint32_t kuiCountSliceNum = pSliceCtx->iSliceNumInFrame;
     if (pCtx->pSliceThreading) {
-      if (pCtx->pSliceThreading->pFSliceDiff && pMso->uiSliceMode == SM_FIXEDSLCNUM_SLICE && pPara->iMultipleThreadIdc > 1
+      if (pCtx->pSliceThreading->pFSliceDiff
+          && ((pMso->uiSliceMode == SM_FIXEDSLCNUM_SLICE)||(pMso->uiSliceMode == SM_AUTO_SLICE))
+          && pPara->iMultipleThreadIdc > 1
           && pPara->iMultipleThreadIdc >= kuiCountSliceNum) {
         uint32_t i = 0;
         uint32_t uiMaxT = 0;
