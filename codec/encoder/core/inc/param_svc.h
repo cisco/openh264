@@ -369,7 +369,7 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   uiIntraPeriod		= pCodingParam.uiIntraPeriod;// intra period (multiple of GOP size as desired)
   if (uiIntraPeriod == (uint32_t) (-1))
     uiIntraPeriod = 0;
-  else if (uiIntraPeriod & uiGopSize)	// none multiple of GOP size
+  else if (uiIntraPeriod & (uiGopSize-1))	// none multiple of GOP size
     uiIntraPeriod = ((uiIntraPeriod + uiGopSize - 1) / uiGopSize) * uiGopSize;
 
   iLTRRefNum = bEnableLongTermReference ? LONG_TERM_REF_NUM : 0;
