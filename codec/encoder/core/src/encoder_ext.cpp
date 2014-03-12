@@ -226,8 +226,7 @@ int32_t ParamValidationExt (sWelsEncCtx*pCtx,SWelsSvcCodingParam* pCodingParam) 
         fDlp->sSliceCfg.sSliceArgument.uiSliceMbNum[iIdx] = 0;
       }
       break;
-    case SM_FIXEDSLCNUM_SLICE:
-    case SM_AUTO_SLICE:{
+    case SM_FIXEDSLCNUM_SLICE:{
       fDlp->sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 0;
 
       iMbWidth	= (kiPicWidth + 15) >> 4;
@@ -235,7 +234,7 @@ int32_t ParamValidationExt (sWelsEncCtx*pCtx,SWelsSvcCodingParam* pCodingParam) 
       iMbNumInFrame = iMbWidth * iMbHeight;
       iMaxSliceNum = MAX_SLICES_NUM;
       if (fDlp->sSliceCfg.sSliceArgument.uiSliceNum <= 0
-          || fDlp->sSliceCfg.sSliceArgument.uiSliceNum > iMaxSliceNum) {
+        || fDlp->sSliceCfg.sSliceArgument.uiSliceNum > iMaxSliceNum) {
         WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceNum (%d) settings!\n", fDlp->sSliceCfg.sSliceArgument.uiSliceNum);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
@@ -265,6 +264,10 @@ int32_t ParamValidationExt (sWelsEncCtx*pCtx,SWelsSvcCodingParam* pCodingParam) 
         fDlp->sSliceCfg.sSliceArgument.uiSliceNum	= 1;
         break;
       }
+    }
+    break;
+    case SM_AUTO_SLICE:{
+      fDlp->sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 0;
     }
     break;
     case SM_RASTER_SLICE: {
@@ -1704,7 +1707,6 @@ int32_t InitSliceSettings (SWelsSvcCodingParam* pCodingParam, const int32_t kiCp
       break;	// go through for MT_ENABLED & SM_DYN_SLICE?
 //#endif//MT_ENABLED
     case SM_FIXEDSLCNUM_SLICE:
-    case SM_AUTO_SLICE:
       if (iSliceNum > iMaxSliceCount)
         iMaxSliceCount = iSliceNum;
       // need perform check due uiSliceNum might change, although has been initialized somewhere outside
@@ -1725,6 +1727,40 @@ int32_t InitSliceSettings (SWelsSvcCodingParam* pCodingParam, const int32_t kiCp
     case SM_ROWMB_SLICE:
       if (iSliceNum > iMaxSliceCount)
         iMaxSliceCount = iSliceNum;
+      break;
+    case SM_AUTO_SLICE:
+      iMaxSliceCount = MAX_SLICES_NUM;
+	  pDlp->sSliceCfg.sSliceArgument.uiSliceNum = kiCpuCores;
+	  if (pDlp->sSliceCfg.sSliceArgument.uiSliceNum > iMaxSliceCount){
+        pDlp->sSliceCfg.sSliceArgument.uiSliceNum = iMaxSliceCount;
+      }
+      if (pDlp->sSliceCfg.sSliceArgument.uiSliceNum == 1) {
+        WelsLog (NULL, WELS_LOG_DEBUG,
+                 "InitSliceSettings(), uiSliceNum(%d) you set for SM_AUTO_SLICE, now turn to SM_SINGLE_SLICE type!\n",
+                 pDlp->sSliceCfg.sSliceArgument.uiSliceNum);
+        pDlp->sSliceCfg.uiSliceMode	= SM_SINGLE_SLICE;
+        break;
+      }
+      if (pCodingParam->bEnableRc) {	// multiple slices verify with gom
+        //check uiSliceNum
+        GomValidCheckSliceNum (kiMbWidth, kiMbHeight, &pDlp->sSliceCfg.sSliceArgument.uiSliceNum);
+        assert (pDlp->sSliceCfg.sSliceArgument.uiSliceNum > 1);
+        //set uiSliceMbNum with current uiSliceNum
+        GomValidCheckSliceMbNum (kiMbWidth, kiMbHeight, &pDlp->sSliceCfg.sSliceArgument);
+      } else if (!CheckFixedSliceNumMultiSliceSetting (kiMbNumInFrame,
+                 &pDlp->sSliceCfg.sSliceArgument)) {	// verify interleave mode settings
+        //check uiSliceMbNum with current uiSliceNum
+         WelsLog (NULL, WELS_LOG_ERROR, "InitSliceSettings(), invalid uiSliceMbNum (%d) settings!,now turn to SM_SINGLE_SLICE type\n",
+                 pDlp->sSliceCfg.sSliceArgument.uiSliceMbNum[0]);
+         pDlp->sSliceCfg.uiSliceMode	= SM_SINGLE_SLICE;
+         pDlp->sSliceCfg.sSliceArgument.uiSliceNum	= 1;
+      }
+      // considering the coding efficient and performance, iCountMbNum constraint by MIN_NUM_MB_PER_SLICE condition of multi-pSlice mode settting
+      if (kiMbNumInFrame <= MIN_NUM_MB_PER_SLICE) {
+        pDlp->sSliceCfg.uiSliceMode	= SM_SINGLE_SLICE;
+        pDlp->sSliceCfg.sSliceArgument.uiSliceNum	= 1;
+        break;
+      }
       break;
     default:
       break;
