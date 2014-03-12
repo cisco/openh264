@@ -105,7 +105,7 @@ static void    SigIntHandler (int a) {
 }
 static int     g_LevelSetting = 0;
 
-int ParseLayerConfig( CReadConfig cRdLayerCfg, const int iLayer, SEncParamExt& pSvcParam )
+int ParseLayerConfig( CReadConfig & cRdLayerCfg, const int iLayer, SEncParamExt& pSvcParam )
 {
   if (!cRdLayerCfg.ExistFile()) {
     fprintf (stderr, "Unabled to open layer #%d configuration file: %s.\n", iLayer, cRdLayerCfg.GetFileName().c_str());
