@@ -914,7 +914,7 @@ bs_mv_check_jump1:
     add      r6, #12
     vld1.32  d3[1], [r6]
 
-    bs_nzc_check_jump0:
+bs_nzc_check_jump0:
     vext.8   q1, q1, q0, #12
     vadd.u8  \arg3, q0, q1
 
@@ -932,7 +932,7 @@ bs_mv_check_jump1:
     vld1.8   d3[6], [r6]
     vld1.8   d3[7], [r7]
 
-    bs_nzc_check_jump1:
+bs_nzc_check_jump1:
     vzip.8   d0, d1
     vzip.8   d0, d1
     vext.8   q1, q1, q0, #12
@@ -972,7 +972,7 @@ bs_mv_check_jump1:
     add      r6, #48
     vld1.8   {d8, d9}, [r6]
 
-    bs_mv_check_jump0:
+bs_mv_check_jump0:
     BS_COMPARE_MV  q4, q0, q1, q2, q3, \arg3, \arg4
 
     /* Arrenge the input data --- LEFT */
@@ -988,7 +988,7 @@ bs_mv_check_jump1:
     vld1.32   d9[0], [r6]
     vld1.32   d9[1], [r7]
 
-    bs_mv_check_jump1:
+bs_mv_check_jump1:
     vzip.32   q0, q2
     vzip.32   q1, q3
     vzip.32   q0, q1
