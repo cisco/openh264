@@ -359,18 +359,7 @@ void WelsMdInterInit (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb, const i
   ST32 (&pCurMb->sP16x16Mv, 0);
   ST32 (&pCurLayer->pDecPic->sMvList[kiMbXY], 0);
 
-  pSlice->sMvMin.iMvX = -16 * (kiMbX + 1) + INTPEL_NEEDED_MARGIN;
-  if (pSlice->sMvMin.iMvX < -MV_RANGE)
-    pSlice->sMvMin.iMvX = -MV_RANGE;
-  pSlice->sMvMin.iMvY = -16 * (kiMbY + 1) + INTPEL_NEEDED_MARGIN;
-  if (pSlice->sMvMin.iMvY < -MV_RANGE)
-    pSlice->sMvMin.iMvY = -MV_RANGE;
-  pSlice->sMvMax.iMvX = 16 * (kiMbWidth - kiMbX) - INTPEL_NEEDED_MARGIN;
-  if (pSlice->sMvMax.iMvX > MV_RANGE)
-    pSlice->sMvMax.iMvX = MV_RANGE;
-  pSlice->sMvMax.iMvY = 16 * (kiMbHeight - kiMbY) - INTPEL_NEEDED_MARGIN;
-  if (pSlice->sMvMax.iMvY > MV_RANGE)
-    pSlice->sMvMax.iMvY = MV_RANGE;
+  SetMvWithinMvRange( kiMbWidth, kiMbHeight, kiMbX, kiMbY, MV_RANGE, &(pSlice->sMvMin), &(pSlice->sMvMax));
 }
 
 int32_t WelsMdI16x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SMbCache* pMbCache, int32_t iLambda) {

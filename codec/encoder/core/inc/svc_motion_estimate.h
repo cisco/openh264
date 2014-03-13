@@ -130,5 +130,16 @@ void WelsMotionEstimateIterativeSearch (SWelsFuncPtrList* pFuncList, SWelsME* pM
 bool WelsMeSadCostSelect (int32_t* pSadCost, const uint16_t* kpMvdCost, int32_t* pBestCost, const int32_t kiDx,
                             const int32_t kiDy, int32_t* pIx, int32_t* pIy);
 
+inline void SetMvWithinMvRange( const int32_t kiMbWidth, const int32_t kiMbHeight, const int32_t kiMbX, const int32_t kiMbY,
+                        const int32_t kiMaxMvRange,
+                        SMVUnitXY* pMvMin, SMVUnitXY* pMvMax)
+{
+  pMvMin->iMvX = WELS_MAX(-1*((kiMbX + 1)<<4) + INTPEL_NEEDED_MARGIN, -1*kiMaxMvRange);
+  pMvMin->iMvY = WELS_MAX(-1*((kiMbY + 1)<<4) + INTPEL_NEEDED_MARGIN, -1*kiMaxMvRange);
+  pMvMax->iMvX = WELS_MIN( ((kiMbWidth - kiMbX)<<4) - INTPEL_NEEDED_MARGIN, kiMaxMvRange);
+  pMvMax->iMvY = WELS_MIN( ((kiMbHeight - kiMbY)<<4) - INTPEL_NEEDED_MARGIN, kiMaxMvRange);
+}
+
+
 }
 #endif
