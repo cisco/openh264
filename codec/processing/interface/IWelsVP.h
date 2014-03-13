@@ -136,15 +136,15 @@ typedef enum {
 //  Algorithm parameters define
 //-----------------------------------------------------------------//
 
-typedef struct {
-  int bSceneChangeFlag; // 0:false ; 1:true
-} SSceneChangeResult;
-
 typedef enum {
-  SIMILAR_SCENE,      //similar scene
+  SIMILAR_SCENE,   //similar scene
   MEDIUM_CHANGED_SCENE,   //medium changed scene
-  LARGE_CHANGED_SCENE,   //large changed scene
+  LARGE_CHANGED_SCENE,    //large changed scene
 } ESceneChangeIdc;
+
+typedef struct {
+  ESceneChangeIdc eSceneChangeIdc; // 0:false ; 1:true
+} SSceneChangeResult;
 
 typedef struct {
   unsigned char* pCurY;					// Y data of current frame

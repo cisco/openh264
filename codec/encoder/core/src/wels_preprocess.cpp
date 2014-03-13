@@ -605,7 +605,7 @@ void CWelsPreProcess::BilateralDenoising (SPicture* pSrc, const int32_t kiWidth,
 bool CWelsPreProcess::DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture) {
   bool bSceneChangeFlag = false;
   int32_t iMethodIdx = METHOD_SCENE_CHANGE_DETECTION;
-  SSceneChangeResult sSceneChangeDetectResult = {0};
+  SSceneChangeResult sSceneChangeDetectResult = { SIMILAR_SCENE };
   SPixMap sSrcPixMap = {0};
   SPixMap sRefPixMap = {0};
 
@@ -627,7 +627,7 @@ bool CWelsPreProcess::DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPi
   int32_t iRet = m_pInterfaceVp->Process (iMethodIdx, &sSrcPixMap, &sRefPixMap);
   if (iRet == 0) {
     m_pInterfaceVp->Get (iMethodIdx, (void*)&sSceneChangeDetectResult);
-    bSceneChangeFlag = sSceneChangeDetectResult.bSceneChangeFlag ? true : false;
+    bSceneChangeFlag = (sSceneChangeDetectResult.eSceneChangeIdc != LARGE_CHANGED_SCENE) ? true : false;
   }
 
   return bSceneChangeFlag;
