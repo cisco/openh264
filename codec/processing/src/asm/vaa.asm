@@ -1847,13 +1847,8 @@ VAACalcSadSsdBgd_sse2:
 %define         psum16x16                       arg8;
 %define         psqsum16x16                     arg9;
 %define         psqdiff16x16                    arg10;
-%ifdef WIN64
-%define         p_sd8x8                         [rsp + push_num*8 + 88];
-%define         p_mad8x8                        [rsp + push_num*8 + 96];
-%else ;linux
-%define         p_sd8x8                         [rsp + push_num*8 + 40];
-%define         p_mad8x8                        [rsp + push_num*8 + 48];
-%endif
+%define         p_sd8x8                         arg11
+%define         p_mad8x8                        arg12
 
   push r12
   push r13
