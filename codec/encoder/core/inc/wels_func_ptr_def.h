@@ -112,8 +112,6 @@ typedef int32_t (*PIntraFineMdFunc) (void* pEncCtx, void* pWelsMd, SMB* pCurMb, 
 typedef void (*PInterFineMdFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, int32_t bestCost);
 typedef bool (*PInterMdFirstIntraModeFunc) (void* pEncCtx, void* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
 
-typedef void (*PMotionSearchFunc) (SWelsFuncPtrList* pFuncList, void* pCurDqLayer, void* pMe,
-                                   void* pSlice);  // here after reset all function pointers, will set as right parameter type
 typedef void (*PFillInterNeighborCacheFunc) (SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth, int8_t* pVaaBgMbFlag);
 typedef void (*PAccumulateSadFunc) (uint32_t* pSumDiff, int32_t* pGomForegroundBlockNum, int32_t* iSad8x8,
                                     int8_t* pVaaBgMbFlag);//for RC
@@ -134,6 +132,11 @@ typedef int32_t (*PIntraPred4x4Combined3Func) (uint8_t*, int32_t, uint8_t*, int3
 typedef int32_t (*PIntraPred16x16Combined3Func) (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*);
 typedef int32_t (*PIntraPred8x8Combined3Func) (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*,
     uint8_t*, uint8_t*);
+
+typedef void (*PMotionSearchFunc) (SWelsFuncPtrList* pFuncList, void* pCurDqLayer, void* pMe,
+                                   void* pSlice);  // here after reset all function pointers, will set as right parameter type
+typedef void (*PCalculateSatdFunc) ( PSampleSadSatdCostFunc pSatd, void * vpMe, const int32_t kiEncStride, const int32_t kiRefStride );
+
 #define     MAX_BLOCK_TYPE 5 // prev 7
 typedef struct TagSampleDealingFunc {
   PSampleSadSatdCostFunc            pfSampleSad[MAX_BLOCK_TYPE];
@@ -181,8 +184,10 @@ struct TagWelsFuncPointerList {
   PGetIntraPredFunc 		pfGetLumaI16x16Pred[I16_PRED_DC_A];
   PGetIntraPredFunc 		pfGetLumaI4x4Pred[I4_PRED_A];
   PGetIntraPredFunc 		pfGetChromaPred[C_PRED_A];
+
   PMotionSearchFunc
   pfMotionSearch; //svc_encode_slice.c svc_mode_decision.c svc_enhance_layer_md.c svc_base_layer_md.c
+  PCalculateSatdFunc pfCalculateSatd;
 
   PCopyFunc      pfCopy16x16Aligned;		//svc_encode_slice.c svc_mode_decision.c svc_base_layer_md.c
   PCopyFunc      pfCopy16x16NotAligned;	//md.c
