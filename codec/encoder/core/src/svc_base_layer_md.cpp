@@ -473,7 +473,7 @@ int32_t WelsMdI4x4 (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
     iBestCost = INT_MAX;
     iBestMode = kpAvailMode[0];
 
-    if (pFunc->sSampleDealingFuncs.pfIntra4x4Combined3Satd && (iAvailCount >= 6)) {
+    if (pFunc->sSampleDealingFuncs.pfIntra4x4Combined3 && (iAvailCount >= 6)) {
       pDst = &pMbCache->pMemPredBlk4[iBestPredBufferNum << 4];
 
       iBestCost = pFunc->sSampleDealingFuncs.pfIntra4x4Combined3 (pCurDec, kiLineSizeDec, pCurEnc, kiLineSizeEnc, pDst,
