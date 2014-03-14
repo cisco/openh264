@@ -89,7 +89,7 @@ TEST_F(MotionEstimateTest, TestDiamondSearch)
   uint8_t *pRefPicCenter = m_pRefPic+(m_iHeight/2)*m_iWidth+(m_iWidth/2);
   bool bDataGeneratorSucceed = false;
   bool bFoundMatch = false;
-  int32_t i,j,iTryTimes;
+  int32_t i, iTryTimes;
   for (i=0;i<TEST_POS;i++) {
     sTargetMv.iMvX = kiPositionToCheck[i][0];
     sTargetMv.iMvY = kiPositionToCheck[i][1];
