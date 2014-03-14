@@ -166,8 +166,8 @@ WelsSampleSatd4x4_sse2:
 
 	%assign  push_num 0
 	LOAD_4_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
     movd      xmm0, [r0]
     movd      xmm1, [r0+r1]
     lea       r0 , [r0+2*r1]
@@ -246,8 +246,8 @@ align 16
 
 	%assign  push_num 0
 	LOAD_4_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	pxor   xmm6,   xmm6
     pxor   xmm7,   xmm7
     SSE2_GetSatd8x8
@@ -273,8 +273,8 @@ align 16
 
 	 %assign  push_num 0
 	 LOAD_4_PARA
-	 SIGN_EXTENTION r1, r1d
-	 SIGN_EXTENTION r3, r3d
+	 SIGN_EXTENSION r1, r1d
+	 SIGN_EXTENSION r3, r3d
 	 pxor   xmm6,   xmm6
      pxor   xmm7,   xmm7
 
@@ -305,8 +305,8 @@ WelsSampleSatd16x8_sse2:
 
 	%assign  push_num 0
 	LOAD_4_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	push r0
 	push r2
 	pxor   xmm6,   xmm6
@@ -344,8 +344,8 @@ WelsSampleSatd16x16_sse2:
 
 	%assign  push_num 0
 	LOAD_4_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	push r0
 	push r2
 	pxor   xmm6,   xmm6
@@ -1030,8 +1030,8 @@ WelsSampleSatd4x4_sse41:
 
 	%assign  push_num 0
 	LOAD_4_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	movdqa      xmm4,[HSwapSumSubDB1]
 	movd        xmm2,[r2]
 	movd        xmm5,[r2+r3]
@@ -1095,8 +1095,8 @@ WelsSampleSatd8x8_sse41:
 %endif
 	%assign  push_num 2
 	LOAD_4_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	movdqa      xmm7, [HSumSubDB1]
 	lea         r4,  [r1+r1*2]
 	lea         r5,  [r3+r3*2]
@@ -1137,8 +1137,8 @@ WelsSampleSatd8x16_sse41:
 %endif
 	%assign  push_num 3
 	LOAD_4_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	movdqa      xmm7, [HSumSubDB1]
 	lea         r4,  [r1+r1*2]
 	lea         r5,  [r3+r3*2]
@@ -1181,8 +1181,8 @@ WelsSampleSatd16x8_sse41:
 %endif
 	%assign  push_num 2
 	LOAD_4_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	push  r0
 	push  r2
 
@@ -1238,8 +1238,8 @@ WelsSampleSatd16x16_sse41:
 %endif
 	%assign  push_num 3
 	LOAD_4_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 
 	push  r0
 	push  r2
@@ -1370,8 +1370,8 @@ WelsSampleSad16x16_sse2:
 
 	%assign  push_num 2
 	LOAD_4_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	lea r4, [3*r1]
 	lea r5, [3*r3]
 
@@ -1414,8 +1414,8 @@ WelsSampleSad16x8_sse2:
 
 	%assign  push_num 0
 	LOAD_4_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	movdqu xmm0,   [r2]
 	MOVDQ  xmm2,   [r0]
 	psadbw xmm0,   xmm2
@@ -1446,8 +1446,8 @@ WelsSampleSad8x16_sse2:
 
 	%assign  push_num 0
 	LOAD_4_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
     pxor   xmm6,   xmm6
 
 	SSE2_GetSad8x4
@@ -1498,7 +1498,7 @@ WelsSampleSad8x8_sse21:
 	%assign  push_num 3
 	mov		r0,  arg1
 	mov		r1,  arg2
-	SIGN_EXTENTION r1, r1d
+	SIGN_EXTENSION r1, r1d
     pxor   xmm7,   xmm7
 
     ;ecx r2, edx r4, edi r5
@@ -1516,7 +1516,7 @@ WelsSampleSad8x8_sse21:
 	mov    r5,    8
 	add    r5,    r2
     mov    r3,    arg4
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r3, r3d
     movq   xmm0,   [r0]
 	movhps xmm0,   [r0+r1]
 
@@ -1604,8 +1604,8 @@ WelsSampleSad8x8_sse21:
 	pop r2
 	%assign  push_num 0
 	LOAD_4_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	pxor   xmm6,   xmm6
 	SSE2_GetSad8x4
     lea    r0,    [r0+2*r1]
@@ -1655,8 +1655,8 @@ WelsSampleSadFour16x16_sse2:
 
 	%assign  push_num 0
 	LOAD_5_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	pxor   xmm4,   xmm4    ;sad pRefMb-i_stride_ref
 	pxor   xmm5,   xmm5    ;sad pRefMb+i_stride_ref
 	pxor   xmm6,   xmm6    ;sad pRefMb-1
@@ -1781,8 +1781,8 @@ WelsSampleSadFour16x8_sse2:
 
 	%assign  push_num 0
 	LOAD_5_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	pxor   xmm4,   xmm4    ;sad pRefMb-i_stride_ref
 	pxor   xmm5,   xmm5    ;sad pRefMb+i_stride_ref
 	pxor   xmm6,   xmm6    ;sad pRefMb-1
@@ -1874,8 +1874,8 @@ WelsSampleSadFour8x16_sse2:
 
 	%assign  push_num 0
 	LOAD_5_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	pxor   xmm4,   xmm4    ;sad pRefMb-i_stride_ref
 	pxor   xmm5,   xmm5    ;sad pRefMb+i_stride_ref
 	pxor   xmm6,   xmm6    ;sad pRefMb-1
@@ -2094,8 +2094,8 @@ WelsSampleSadFour8x8_sse2:
 
 	%assign  push_num 0
 	LOAD_5_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	pxor   xmm4,   xmm4    ;sad pRefMb-i_stride_ref
 	pxor   xmm5,   xmm5    ;sad pRefMb+i_stride_ref
 	pxor   xmm6,   xmm6    ;sad pRefMb-1
@@ -2222,8 +2222,8 @@ WelsSampleSadFour4x4_sse2:
 
 	%assign  push_num 0
 	LOAD_5_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	movd   xmm0,   [r0]
 	movd   xmm1,   [r0+r1]
 	lea        r0,    [r0+2*r1]
@@ -2313,8 +2313,8 @@ WelsSampleSad4x4_mmx:
 
     %assign  push_num 0
 	LOAD_4_PARA
-	SIGN_EXTENTION r1, r1d
-	SIGN_EXTENTION r3, r3d
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	movd	  mm0, [r0]
 	movd	  mm1, [r0+r1]
 	punpckldq mm0, mm1

@@ -161,7 +161,7 @@ AnalysisVaaInfoIntra_sse2:
 
     %assign push_num 0
     LOAD_2_PARA
-    SIGN_EXTENTION r1,r1d
+    SIGN_EXTENSION r1,r1d
 
 %ifdef X86_32
     push r3
@@ -256,7 +256,7 @@ AnalysisVaaInfoIntra_ssse3:
 
     %assign push_num 0
     LOAD_2_PARA
-    SIGN_EXTENTION r1,r1d
+    SIGN_EXTENSION r1,r1d
 
 %ifdef X86_32
     push r3

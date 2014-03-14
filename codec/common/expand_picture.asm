@@ -376,9 +376,9 @@ ExpandPictureLuma_sse2:
     %assign push_num 3
     LOAD_4_PARA
 
-    SIGN_EXTENTION r1, r1d
-    SIGN_EXTENTION r2, r2d
-    SIGN_EXTENTION r3, r3d
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r2, r2d
+    SIGN_EXTENSION r3, r3d
 
     ;also prepare for cross border pData top-left:xmm3
 
@@ -503,9 +503,9 @@ ExpandPictureChromaAlign_sse2:
     %assign push_num 3
     LOAD_4_PARA
 
-    SIGN_EXTENTION r1,r1d
-    SIGN_EXTENTION r2,r2d
-    SIGN_EXTENTION r3,r3d
+    SIGN_EXTENSION r1,r1d
+    SIGN_EXTENSION r2,r2d
+    SIGN_EXTENSION r3,r3d
 
     ;also prepare for cross border pData top-left:xmm3
 
@@ -628,9 +628,9 @@ ExpandPictureChromaUnalign_sse2:
     %assign push_num 3
     LOAD_4_PARA
 
-    SIGN_EXTENTION r1,r1d
-    SIGN_EXTENTION r2,r2d
-    SIGN_EXTENTION r3,r3d
+    SIGN_EXTENSION r1,r1d
+    SIGN_EXTENSION r2,r2d
+    SIGN_EXTENSION r3,r3d
 
     ;also prepare for cross border pData top-left:xmm3
 
