@@ -78,7 +78,10 @@ GTEST_INCLUDES += \
     -Igtest/include
 
 CODEC_UNITTEST_INCLUDES += \
-    -Igtest/include
+    -Igtest/include \
+    -Icodec/processing/interface \
+    -Icodec/common \
+    -Icodec/encoder/core/inc
 
 H264DEC_INCLUDES = $(DECODER_INCLUDES) -Icodec/console/dec/inc
 H264DEC_LDFLAGS = -L. $(call LINK_LIB,decoder) $(call LINK_LIB,common)

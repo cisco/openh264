@@ -1,7 +1,5 @@
-#include "../gtest/include/gtest/gtest.h"
-#include <string.h>		// use memset/memcmp
-#include <time.h>
-#include "../codec/encoder/core/inc/memory_align.h"
+#include "gtest/gtest.h"
+#include "memory_align.h"
 
 using namespace WelsSVCEnc;
 
@@ -46,7 +44,7 @@ TEST(MemoryAlignTest, WelsMallocAndFreeOnceFunctionVerify)
     const uint32_t kuiExpectedSize	= sizeof( void ** ) + sizeof( int32_t ) + kuiExtraAlignSize + uiSize;
     uint8_t *pUnitTestData = static_cast<uint8_t *>(cTestMa.WelsMalloc(uiSize, strUnitTestTag));
     if ( pUnitTestData != NULL ) {
-      ASSERT_TRUE( (((int64_t)(static_cast<void *>(pUnitTestData))) & kuiExtraAlignSize) == 0 );
+      ASSERT_TRUE( (((uintptr_t)(pUnitTestData)) & kuiExtraAlignSize) == 0 );
       EXPECT_EQ( kuiExpectedSize, cTestMa.WelsGetMemoryUsage() );
       cTestMa.WelsFree( pUnitTestData, strUnitTestTag );
       EXPECT_EQ( 0, cTestMa.WelsGetMemoryUsage() );

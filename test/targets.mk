@@ -3,11 +3,13 @@ CODEC_UNITTEST_CPP_SRCS=\
 	$(CODEC_UNITTEST_SRCDIR)/BaseDecoderTest.cpp\
 	$(CODEC_UNITTEST_SRCDIR)/BaseEncoderTest.cpp\
 	$(CODEC_UNITTEST_SRCDIR)/cpp_interface_test.cpp\
+	$(CODEC_UNITTEST_SRCDIR)/DataGenerator.cpp\
 	$(CODEC_UNITTEST_SRCDIR)/decode_encode_test.cpp\
 	$(CODEC_UNITTEST_SRCDIR)/decoder_test.cpp\
 	$(CODEC_UNITTEST_SRCDIR)/encoder_test.cpp\
-	$(CODEC_UNITTEST_SRCDIR)/simple_test.cpp\
 	$(CODEC_UNITTEST_SRCDIR)/EncUT_MemoryAlloc.cpp\
+	$(CODEC_UNITTEST_SRCDIR)/EncUT_MotionEstimate.cpp\
+	$(CODEC_UNITTEST_SRCDIR)/simple_test.cpp\
 
 CODEC_UNITTEST_OBJS += $(CODEC_UNITTEST_CPP_SRCS:.cpp=.o)
 
