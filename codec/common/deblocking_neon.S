@@ -860,24 +860,24 @@ bs_nzc_check_jump1:
 
 .macro BS_COMPARE_MV //in: $0,$1(const),$2(const),$3(const),$4(const); out:$5, $6
     mov       r6, #4
-    vabd.s16  q5, $0, $1
-    vabd.s16  q6, $1, $2
+    vabd.s16  q8, $0, $1
+    vabd.s16  q9, $1, $2
 	vdup.s16  $0, r6
-    vabd.s16  q7, $2, $3
-    vabd.s16  q8, $3, $4
+    vabd.s16  q10, $2, $3
+    vabd.s16  q11, $3, $4
 
-    vcge.s16  q5, $0
-    vcge.s16  q6, $0
-    vcge.s16  q7, $0
     vcge.s16  q8, $0
+    vcge.s16  q9, $0
+    vcge.s16  q10, $0
+    vcge.s16  q11, $0
 
-	vpadd.i16 d10, d10, d11
-    vpadd.i16 d11, d12, d13
-    vpadd.i16 d12, d14, d15
-    vpadd.i16 d13, d16, d17
+	vpadd.i16 d16, d16, d17
+    vpadd.i16 d17, d18, d19
+    vpadd.i16 d18, d20, d21
+    vpadd.i16 d19, d22, d23
 
-    vaddhn.i16  $5, q5, q5
-    vaddhn.i16  $6, q6, q6
+    vaddhn.i16  $5, q8, q8
+    vaddhn.i16  $6, q9, q9
 .endm
 
 .macro BS_MV_CHECK
@@ -953,24 +953,24 @@ bs_nzc_check_jump1:
 
 .macro BS_COMPARE_MV  arg0, arg1, arg2, arg3, arg4, arg5, arg6 //in: $0,$1(const),$2(const),$3(const),$4(const); out:$5, $6
     mov       r6, #4
-    vabd.s16  q5, \arg0, \arg1
-    vabd.s16  q6, \arg1, \arg2
+    vabd.s16  q8, \arg0, \arg1
+    vabd.s16  q9, \arg1, \arg2
     vdup.s16  \arg0, r6
-    vabd.s16  q7, \arg2, \arg3
-    vabd.s16  q8, \arg3, \arg4
+    vabd.s16  q10, \arg2, \arg3
+    vabd.s16  q11, \arg3, \arg4
 
-    vcge.s16  q5, \arg0
-    vcge.s16  q6, \arg0
-    vcge.s16  q7, \arg0
     vcge.s16  q8, \arg0
+    vcge.s16  q9, \arg0
+    vcge.s16  q10, \arg0
+    vcge.s16  q11, \arg0
 
-    vpadd.i16 d10, d10, d11
-    vpadd.i16 d11, d12, d13
-    vpadd.i16 d12, d14, d15
-    vpadd.i16 d13, d16, d17
+    vpadd.i16 d16, d16, d17
+    vpadd.i16 d17, d18, d19
+    vpadd.i16 d18, d20, d21
+    vpadd.i16 d19, d22, d23
 
-    vaddhn.i16  \arg5, q5, q5
-    vaddhn.i16  \arg6, q6, q6
+    vaddhn.i16  \arg5, q8, q8
+    vaddhn.i16  \arg6, q9, q9
 .endm
 
 .macro BS_MV_CHECK  arg0, arg1, arg2, arg3, arg4, arg5, arg6
@@ -1013,8 +1013,9 @@ bs_mv_check_jump1:
 WELS_ASM_FUNC_BEGIN DeblockingBSCalcEnc_neon
 
 	stmdb sp!, {r5-r7}
+	vpush {q4}
 
-	ldr  r5, [sp, #12]	//Save BS to r5
+	ldr  r5, [sp, #28]	//Save BS to r5
 
 	/* Checking the nzc status */
 	BS_NZC_CHECK r0, r2, r3, q14, q15 //q14,q15 save the nzc status
@@ -1045,6 +1046,7 @@ WELS_ASM_FUNC_BEGIN DeblockingBSCalcEnc_neon
 
 	//vstm r5, {q0, q1}
     vst1.32 {q0, q1}, [r5]
+	vpop {q4}
 	ldmia sp!, {r5-r7}
 WELS_ASM_FUNC_END
 #endif
