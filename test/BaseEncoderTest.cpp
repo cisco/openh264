@@ -6,8 +6,8 @@
 #include "BaseEncoderTest.h"
 
 static int InitWithParam(ISVCEncoder* encoder, int width,
-    int height, float frameRate, SliceModeEnum sliceMode, bool denoise, int deblock) {
-  if (SM_SINGLE_SLICE == sliceMode && !denoise && deblock == 1) {
+    int height, float frameRate, SliceModeEnum sliceMode, bool denoise, int deblock, int layers) {
+  if (SM_SINGLE_SLICE == sliceMode && !denoise && deblock == 1 && layers == 1) {
     SEncParamBase param;
     memset (&param, 0, sizeof(SEncParamBase));
 
@@ -29,13 +29,16 @@ static int InitWithParam(ISVCEncoder* encoder, int width,
     param.iInputCsp = videoFormatI420;
     param.bEnableDenoise = denoise;
     param.iLoopFilterDisableIdc = deblock;
+    param.iSpatialLayerNum = layers;
 
-    param.sSpatialLayers[0].iVideoWidth = width;
-    param.sSpatialLayers[0].iVideoHeight = height;
-    param.sSpatialLayers[0].fFrameRate = frameRate;
-    param.sSpatialLayers[0].iSpatialBitrate = param.iTargetBitrate;
+    for (int i = 0; i < param.iSpatialLayerNum; i++) {
+      param.sSpatialLayers[i].iVideoWidth = width >> (param.iSpatialLayerNum - 1 - i);
+      param.sSpatialLayers[i].iVideoHeight = height >> (param.iSpatialLayerNum - 1 - i);
+      param.sSpatialLayers[i].fFrameRate = frameRate;
+      param.sSpatialLayers[i].iSpatialBitrate = param.iTargetBitrate;
 
-    param.sSpatialLayers[0].sSliceCfg.uiSliceMode = sliceMode;
+      param.sSpatialLayers[i].sSliceCfg.uiSliceMode = sliceMode;
+    }
 
     return encoder->InitializeExt(&param);
   }
@@ -57,8 +60,8 @@ void BaseEncoderTest::TearDown() {
 }
 
 void BaseEncoderTest::EncodeStream(InputStream* in, int width, int height,
-    float frameRate, SliceModeEnum slices, bool denoise, int deblock, Callback* cbk) {
-  int rv = InitWithParam(encoder_, width, height, frameRate, slices, denoise, deblock);
+    float frameRate, SliceModeEnum slices, bool denoise, int deblock, int layers, Callback* cbk) {
+  int rv = InitWithParam(encoder_, width, height, frameRate, slices, denoise, deblock, layers);
   ASSERT_TRUE(rv == cmResultSuccess);
 
   // I420: 1(Y) + 1/4(U) + 1/4(V)
@@ -91,8 +94,8 @@ void BaseEncoderTest::EncodeStream(InputStream* in, int width, int height,
 }
 
 void BaseEncoderTest::EncodeFile(const char* fileName, int width, int height,
-    float frameRate, SliceModeEnum slices, bool denoise, int deblock, Callback* cbk) {
+    float frameRate, SliceModeEnum slices, bool denoise, int deblock, int layers, Callback* cbk) {
   FileInputStream fileStream;
   ASSERT_TRUE(fileStream.Open(fileName));
-  EncodeStream(&fileStream, width, height, frameRate, slices, denoise, deblock, cbk);
+  EncodeStream(&fileStream, width, height, frameRate, slices, denoise, deblock, layers, cbk);
 }
