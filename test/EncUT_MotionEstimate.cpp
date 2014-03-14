@@ -1,10 +1,10 @@
-#include <gtest/gtest.h>
 #include <stdlib.h>
+#include "gtest/gtest.h"
+#include "utils/DataGenerator.h"
 #include "md.h"
 #include "sample.h"
 #include "svc_motion_estimate.h"
 #include "wels_func_ptr_def.h"
-#include "utils/DataGenerator.h"
 
 using namespace WelsSVCEnc;
 
