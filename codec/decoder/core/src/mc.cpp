@@ -181,7 +181,8 @@ static inline void McHorVer20_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_
   int32_t i, j;
   for (i = 0; i < iHeight; i++) {
     for (j = 0; j < iWidth; j++) {
-      pDst[j] = WELS_CLIP1 ((FilterInput8bitWithStride_c (pSrc + j, 1) + 16) >> 5);
+      int32_t iTmp = (FilterInput8bitWithStride_c (pSrc + j, 1) + 16) >> 5;
+      pDst[j] = WELS_CLIP1 (iTmp);
     }
     pDst += iDstStride;
     pSrc += iSrcStride;
@@ -193,7 +194,8 @@ static inline void McHorVer02_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_
   int32_t i, j;
   for (i = 0; i < iHeight; i++) {
     for (j = 0; j < iWidth; j++) {
-      pDst[j] = WELS_CLIP1 ((FilterInput8bitWithStride_c (pSrc + j, iSrcStride) + 16) >> 5);
+      int32_t iTmp = (FilterInput8bitWithStride_c (pSrc + j, iSrcStride) + 16) >> 5;
+      pDst[j] = WELS_CLIP1 (iTmp);
     }
     pDst += iDstStride;
     pSrc += iSrcStride;
@@ -210,7 +212,8 @@ static inline void McHorVer22_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_
       iTmp[j] = FilterInput8bitWithStride_c (pSrc - 2 + j, iSrcStride);
     }
     for (k = 0; k < iWidth; k++) {
-      pDst[k] = WELS_CLIP1 ((HorFilterInput16bit_c (&iTmp[2 + k]) + 512) >> 10);
+      int32_t iHorTmp = (HorFilterInput16bit_c (&iTmp[2 + k]) + 512) >> 10;
+      pDst[k] = WELS_CLIP1 (iHorTmp);
     }
     pSrc += iSrcStride;
     pDst += iDstStride;
