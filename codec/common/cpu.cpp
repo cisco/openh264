@@ -207,9 +207,6 @@ void WelsCPURestore (const uint32_t kuiCPU) {
   }
 }
 
-void WelsXmmRegEmptyOp(void * pSrc) {
-}
-
 #elif defined(HAVE_NEON) //For supporting both android platform and iOS platform
 #if defined(ANDROID_NDK)
 uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors)

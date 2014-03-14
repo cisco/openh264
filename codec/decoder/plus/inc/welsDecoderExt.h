@@ -104,8 +104,6 @@ IWelsTrace*							m_pTrace;
 void InitDecoder (void);
 void UninitDecoder (void);
 
-XMMREG_PROTECT_DECLARE(CWelsH264Decoder);
-
 #ifdef OUTPUT_BIT_STREAM
 WelsFileHandle* m_pFBS;
 WelsFileHandle* m_pFBSSize;

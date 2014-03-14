@@ -132,8 +132,6 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   void    InitEncoder (void);
   int32_t RawData2SrcPic (const uint8_t* pSrc);
   void    DumpSrcPicture (const uint8_t* pSrc);
-
-  XMMREG_PROTECT_DECLARE(CWelsH264SVCEncoder);
 };
 }
 #endif // !defined(AFX_WELSH264ENCODER_H__D9FAA1D1_5403_47E1_8E27_78F11EE65F02__INCLUDED_)

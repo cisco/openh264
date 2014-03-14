@@ -67,60 +67,14 @@ void WelsEmms();
  */
 void     WelsCPURestore (const uint32_t kuiCPU);
 
-#ifdef  WIN64
-void     WelsXmmRegStore(void * src);
-void     WelsXmmRegLoad(void * src);
-#endif
-
 #else
 #define WelsEmms()
 #endif
-
-void     WelsXmmRegEmptyOp(void * pSrc);
 
 uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors);
 
 #if defined(__cplusplus)
 }
 #endif//__cplusplus
-
-typedef  void (*WelsXmmRegProtectFunc)(void * pSrc);
-
-
-#if defined(WIN64) && defined(X86_ASM)
-#define   XMMREG_PROTECT_DECLARE(name) \
-  WelsXmmRegProtectFunc name##load;\
-  WelsXmmRegProtectFunc name##store;\
-  uint8_t               name##Buffer[160];
-
-#define   XMMREG_PROTECT_INIT(name) \
-  { \
-    uint32_t uiCpuFlag = WelsCPUFeatureDetect(NULL);\
-    if( uiCpuFlag & WELS_CPU_SSE2 ){\
-      name##load = WelsXmmRegLoad;\
-      name##store = WelsXmmRegStore; \
-    } else { \
-      name##load = WelsXmmRegEmptyOp; \
-      name##store = WelsXmmRegEmptyOp; \
-    } \
-  }
-
-#define   XMMREG_PROTECT_UNINIT(name) \
-
-#define   XMMREG_PROTECT_STORE(name) \
-  name##store(name##Buffer);
-
-#define   XMMREG_PROTECT_LOAD(name) \
-  name##load(name##Buffer);
-
-#else
-
-#define   XMMREG_PROTECT_DECLARE(name)
-#define   XMMREG_PROTECT_INIT(name)
-#define   XMMREG_PROTECT_UNINIT(name)
-#define   XMMREG_PROTECT_STORE(name)
-#define   XMMREG_PROTECT_LOAD(name)
-
-#endif
 
 #endif//WELS_CPU_DETECTION_H__
