@@ -143,7 +143,7 @@ typedef enum {
 } ESceneChangeIdc;
 
 typedef struct {
-  ESceneChangeIdc eSceneChangeIdc; // 0:false ; 1:true
+  ESceneChangeIdc eSceneChangeIdc; // SIMILAR_SCENE, MEDIUM_CHANGED_SCENE, LARGE_CHANGED_SCENE
 } SSceneChangeResult;
 
 typedef struct {
