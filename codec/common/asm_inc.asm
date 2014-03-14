@@ -329,7 +329,7 @@ BITS 32
     %endif
 %endmacro
 
-%macro SIGN_EXTENTION 2
+%macro SIGN_EXTENSION 2
     %ifndef X86_32
             movsx %1, %2
     %endif

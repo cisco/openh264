@@ -69,7 +69,7 @@ WelsSetMemZeroAligned64_sse2:
 
 		%assign  push_num 0
 		LOAD_2_PARA
-		SIGN_EXTENTION r1, r1d
+		SIGN_EXTENSION r1, r1d
 		neg		r1
 
 		pxor	xmm0,		xmm0
@@ -94,7 +94,7 @@ WelsSetMemZeroSize64_mmx:
 
 		%assign  push_num 0
 		LOAD_2_PARA
-		SIGN_EXTENTION r1, r1d
+		SIGN_EXTENSION r1, r1d
 		neg		r1
 
 		pxor	mm0,		mm0
@@ -124,7 +124,7 @@ WelsSetMemZeroSize8_mmx:
 
 		%assign  push_num 0
 		LOAD_2_PARA
-		SIGN_EXTENTION r1, r1d
+		SIGN_EXTENSION r1, r1d
 		neg		r1
 		pxor	mm0,		mm0
 

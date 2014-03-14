@@ -468,8 +468,8 @@ SampleVariance16x16_sse2:
   push r15
   %assign push_num 4
   LOAD_5_PARA
-  SIGN_EXTENTION r1,r1d
-  SIGN_EXTENTION r3,r3d
+  SIGN_EXTENSION r1,r1d
+  SIGN_EXTENSION r3,r3d
 
   mov r12,010h
   pxor xmm7, xmm7
@@ -570,9 +570,9 @@ VAACalcSad_sse2:
   push r13
   %assign push_num 2
   LOAD_7_PARA
-  SIGN_EXTENTION r2,r2d
-  SIGN_EXTENTION r3,r3d
-  SIGN_EXTENTION r4,r4d
+  SIGN_EXTENSION r2,r2d
+  SIGN_EXTENSION r3,r3d
+  SIGN_EXTENSION r4,r4d
 
   mov   r12,r4
   shr           r2,     4                                       ; iPicWidth/16
@@ -813,9 +813,9 @@ VAACalcSadVar_sse2:
   mov r5, arg6  ;psad8x8
 %endif
   mov r14,arg7
-  SIGN_EXTENTION r2,r2d
-  SIGN_EXTENTION r3,r3d
-  SIGN_EXTENTION r4,r4d
+  SIGN_EXTENSION r2,r2d
+  SIGN_EXTENSION r3,r3d
+  SIGN_EXTENSION r4,r4d
 
   mov   r13,r4
   shr   r2,4
@@ -1113,9 +1113,9 @@ VAACalcSadSsd_sse2:
   mov r4,arg5
 %endif
   mov r14,arg7
-  SIGN_EXTENTION r2,r2d
-  SIGN_EXTENTION r3,r3d
-  SIGN_EXTENTION r4,r4d
+  SIGN_EXTENSION r2,r2d
+  SIGN_EXTENSION r3,r3d
+  SIGN_EXTENSION r4,r4d
 
   mov        r13,r4
   shr     r2,4   ; iPicWidth/16
@@ -1685,9 +1685,9 @@ VAACalcSadBgd_sse2:
   ;  mov r5,arg6
 %endif
   mov r14,arg7
-  SIGN_EXTENTION r2,r2d
-  SIGN_EXTENTION r3,r3d
-  SIGN_EXTENTION r4,r4d
+  SIGN_EXTENSION r2,r2d
+  SIGN_EXTENSION r3,r3d
+  SIGN_EXTENSION r4,r4d
 
 
   mov     r13,r4
@@ -1864,9 +1864,9 @@ VAACalcSadSsdBgd_sse2:
   mov r4,arg5
   ;mov r5,arg6
 %endif
-  SIGN_EXTENTION r2,r2d
-  SIGN_EXTENTION r3,r3d
-  SIGN_EXTENTION r4,r4d
+  SIGN_EXTENSION r2,r2d
+  SIGN_EXTENSION r3,r3d
+  SIGN_EXTENSION r4,r4d
 
   mov     r13,r4
   shr             r2,     4                                       ; iPicWidth/16

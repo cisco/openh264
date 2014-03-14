@@ -5185,7 +5185,7 @@ DeblockLumaTransposeH2V_sse2:
 %assign   push_num   3
     LOAD_3_PARA
 
-    SIGN_EXTENTION   r1, r1d
+    SIGN_EXTENSION   r1, r1d
 
     mov      r5,    r7
     mov      r3,    r7
@@ -5263,7 +5263,7 @@ DeblockLumaTransposeV2H_sse2:
 %assign  push_num 2
     LOAD_3_PARA
 
-    SIGN_EXTENTION   r1, r1d
+    SIGN_EXTENSION   r1, r1d
 
     mov      r4,    r7
     mov      r3,    r7
