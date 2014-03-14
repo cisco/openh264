@@ -617,11 +617,6 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
         ST32 (&pCurLayer->pNzc[iMbXy][4], LD32 (&pNonZeroCount[1 + 8 * 2]));
         ST32 (&pCurLayer->pNzc[iMbXy][8], LD32 (&pNonZeroCount[1 + 8 * 3]));
         ST32 (&pCurLayer->pNzc[iMbXy][12], LD32 (&pNonZeroCount[1 + 8 * 4]));
-      } else { //pNonZeroCount = 0
-        ST32 (&pCurLayer->pNzc[iMbXy][0], 0);
-        ST32 (&pCurLayer->pNzc[iMbXy][4], 0);
-        ST32 (&pCurLayer->pNzc[iMbXy][8], 0);
-        ST32 (&pCurLayer->pNzc[iMbXy][12], 0);
       }
     } else { //non-MB_TYPE_INTRA16x16
       for (iId8x8 = 0; iId8x8 < 4; iId8x8++) {
@@ -676,11 +671,6 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
       ST16 (&pCurLayer->pNzc[iMbXy][20], LD16 (&pNonZeroCount[6 + 8 * 2]));
       ST16 (&pCurLayer->pNzc[iMbXy][18], LD16 (&pNonZeroCount[6 + 8 * 4]));
       ST16 (&pCurLayer->pNzc[iMbXy][22], LD16 (&pNonZeroCount[6 + 8 * 5]));
-    } else {
-      ST16 (&pCurLayer->pNzc[iMbXy][16], 0);
-      ST16 (&pCurLayer->pNzc[iMbXy][20], 0);
-      ST16 (&pCurLayer->pNzc[iMbXy][18], 0);
-      ST16 (&pCurLayer->pNzc[iMbXy][22], 0);
     }
     BsEndCavlc (pBs);
   }
@@ -936,11 +926,6 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
         ST32 (&pCurLayer->pNzc[iMbXy][4], LD32 (&pNonZeroCount[1 + 8 * 2]));
         ST32 (&pCurLayer->pNzc[iMbXy][8], LD32 (&pNonZeroCount[1 + 8 * 3]));
         ST32 (&pCurLayer->pNzc[iMbXy][12], LD32 (&pNonZeroCount[1 + 8 * 4]));
-      } else { //pNonZeroCount = 0
-        ST32 (&pCurLayer->pNzc[iMbXy][0], 0);
-        ST32 (&pCurLayer->pNzc[iMbXy][4], 0);
-        ST32 (&pCurLayer->pNzc[iMbXy][8], 0);
-        ST32 (&pCurLayer->pNzc[iMbXy][12], 0);
       }
     } else { //non-MB_TYPE_INTRA16x16
       for (iId8x8 = 0; iId8x8 < 4; iId8x8++) {
@@ -996,9 +981,6 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
       ST16 (&pCurLayer->pNzc[iMbXy][20], LD16 (&pNonZeroCount[6 + 8 * 2]));
       ST16 (&pCurLayer->pNzc[iMbXy][18], LD16 (&pNonZeroCount[6 + 8 * 4]));
       ST16 (&pCurLayer->pNzc[iMbXy][22], LD16 (&pNonZeroCount[6 + 8 * 5]));
-    } else {
-      ST32 (&pCurLayer->pNzc[iMbXy][16], 0);
-      ST32 (&pCurLayer->pNzc[iMbXy][20], 0);
     }
     BsEndCavlc (pBs);
   }
