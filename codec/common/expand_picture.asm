@@ -375,6 +375,7 @@ ExpandPictureLuma_sse2:
 
     %assign push_num 3
     LOAD_4_PARA
+    PUSH_XMM 7
 
     SIGN_EXTENSION r1, r1d
     SIGN_EXTENSION r2, r2d
@@ -476,6 +477,7 @@ ExpandPictureLuma_sse2:
     ; for left & right border expanding
     exp_cross_sse2 32,a
 
+    POP_XMM
     LOAD_4_PARA_POP
 
     pop r6
@@ -502,6 +504,7 @@ ExpandPictureChromaAlign_sse2:
 
     %assign push_num 3
     LOAD_4_PARA
+    PUSH_XMM 7
 
     SIGN_EXTENSION r1,r1d
     SIGN_EXTENSION r2,r2d
@@ -602,6 +605,7 @@ ExpandPictureChromaAlign_sse2:
     ; for left & right border expanding
     exp_cross_sse2 16,a
 
+    POP_XMM
     LOAD_4_PARA_POP
 
     pop r6
@@ -627,6 +631,7 @@ ExpandPictureChromaUnalign_sse2:
 
     %assign push_num 3
     LOAD_4_PARA
+    PUSH_XMM 7
 
     SIGN_EXTENSION r1,r1d
     SIGN_EXTENSION r2,r2d
@@ -727,6 +732,7 @@ ExpandPictureChromaUnalign_sse2:
     ; for left & right border expanding
     exp_cross_sse2 16,u
 
+    POP_XMM
     LOAD_4_PARA_POP
 
     pop r6

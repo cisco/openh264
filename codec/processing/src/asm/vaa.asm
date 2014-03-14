@@ -468,6 +468,7 @@ SampleVariance16x16_sse2:
   push r15
   %assign push_num 4
   LOAD_5_PARA
+  PUSH_XMM 8
   SIGN_EXTENSION r1,r1d
   SIGN_EXTENSION r3,r3d
 
@@ -537,6 +538,7 @@ SampleVariance16x16_sse2:
   sub r1, r0
   mov [r4+2], r1w                               ; to store uiTextureIndex
 
+  POP_XMM
   LOAD_5_PARA_POP
   pop r15
   pop r14
@@ -570,6 +572,7 @@ VAACalcSad_sse2:
   push r13
   %assign push_num 2
   LOAD_7_PARA
+  PUSH_XMM 8
   SIGN_EXTENSION r2,r2d
   SIGN_EXTENSION r3,r3d
   SIGN_EXTENSION r4,r4d
@@ -637,6 +640,7 @@ width_loop:
 %undef          psadframe
 %undef          psad8x8
 %undef          pushsize
+  POP_XMM
   LOAD_7_PARA_POP
   pop r13
   pop r12
@@ -807,6 +811,7 @@ VAACalcSadVar_sse2:
   push r14
   push r15
   %assign push_num 4
+  PUSH_XMM 8
 
 %ifdef WIN64
   mov r4, arg5  ;iPicStride
@@ -902,6 +907,7 @@ var_width_loop:
   paddd   xmm7,   xmm5
   movd    [r15],  xmm7
 
+  POP_XMM
   pop r15
   pop r14
   pop r13
@@ -1108,6 +1114,7 @@ VAACalcSadSsd_sse2:
   push r14
   push r15
   %assign push_num 4
+  PUSH_XMM 10
 
 %ifdef WIN64
   mov r4,arg5
@@ -1218,6 +1225,7 @@ sqdiff_width_loop:
   mov             r13,    psadframe
   movd    [r13],  xmm8
 
+  POP_XMM
   pop r15
   pop r14
   pop r13
@@ -1680,6 +1688,7 @@ VAACalcSadBgd_sse2:
   push r14
   push r15
 %assign push_num 4
+  PUSH_XMM 10
 %ifdef WIN64
   mov r4,arg5
   ;  mov r5,arg6
@@ -1805,6 +1814,7 @@ bgd_width_loop:
   mov             r13,    psadframe
   movd    [r13],  xmm8
 
+  POP_XMM
   pop r15
   pop r14
   pop r13
@@ -1855,6 +1865,7 @@ VAACalcSadSsdBgd_sse2:
   push r14
   push r15
 %assign push_num 4
+  PUSH_XMM 10
 %ifdef WIN64
   mov r4,arg5
   ;mov r5,arg6
@@ -2027,6 +2038,7 @@ sqdiff_bgd_width_loop:
   mov             r14,    psadframe
   movd    [r14],  xmm8
 
+  POP_XMM
   pop r15
   pop r14
   pop r13

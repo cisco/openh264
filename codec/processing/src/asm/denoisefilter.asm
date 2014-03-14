@@ -178,6 +178,7 @@ BilateralLumaFilter8_sse2:
         push r3
         %assign push_num 1
         LOAD_2_PARA
+        PUSH_XMM 8
 
 		pxor		xmm7,	xmm7
 
@@ -214,6 +215,7 @@ BilateralLumaFilter8_sse2:
 		movq		[r3],	xmm5
 
 
+		POP_XMM
 		pop r3
 		%assign push_num 0
 
