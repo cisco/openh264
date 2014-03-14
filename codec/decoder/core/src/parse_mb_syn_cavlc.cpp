@@ -662,7 +662,7 @@ static int32_t	CavlcGetRunBefore (int32_t iRun[16], SReadBitsCache* pBitsCache, 
 
 int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCache, PBitStringAux pBs, int32_t iIndex,
                                 int32_t iMaxNumCoeff,
-                                const uint8_t* kpZigzagTable, int32_t iResidualProperty, int16_t* pTCoeff, int32_t iMbMode, uint8_t uiQp,
+                                const uint8_t* kpZigzagTable, int32_t iResidualProperty, int16_t* pTCoeff, uint8_t uiQp,
                                 PWelsDecoderContext pCtx) {
   int32_t iLevel[16], iZerosLeft, iCoeffNum;
   int32_t  iRun[16] = {0};
@@ -740,18 +740,12 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
 
   if (iResidualProperty == CHROMA_DC) {
     //chroma dc scaling process, is kpDequantCoeff[0]? LevelScale(qPdc%6,0,0))<<(qPdc/6-6), the transform is done at construction.
-    switch (iMbMode) {
-    case BASE_MB:
-      for (i = uiTotalCoeff - 1; i >= 0; --i) {
-        //FIXME merge into rundecode?
-        int32_t j;
-        iCoeffNum += iRun[i] + 1; //FIXME add 1 earlier ?
-        j          = kpZigzagTable[ iCoeffNum ];
-        pTCoeff[j] = iLevel[i] * kpDequantCoeff[0];
-      }
-      break;
-    default:
-      break;
+    for (i = uiTotalCoeff - 1; i >= 0; --i) {
+      //FIXME merge into rundecode?
+      int32_t j;
+      iCoeffNum += iRun[i] + 1; //FIXME add 1 earlier ?
+      j          = kpZigzagTable[ iCoeffNum ];
+      pTCoeff[j] = iLevel[i] * kpDequantCoeff[0];
     }
   } else if (iResidualProperty == I16_LUMA_DC) { //DC coefficent, only call in Intra_16x16, base_mode_flag = 0
     for (i = uiTotalCoeff - 1; i >= 0; --i) { //FIXME merge into rundecode?
@@ -761,17 +755,11 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
       pTCoeff[j] = iLevel[i];
     }
   } else {
-    switch (iMbMode) {
-    case BASE_MB:
-      for (i = uiTotalCoeff - 1; i >= 0; --i) { //FIXME merge into  rundecode?
-        int32_t j;
-        iCoeffNum += iRun[i] + 1; //FIXME add 1 earlier ?
-        j          = kpZigzagTable[ iCoeffNum ];
-        pTCoeff[j] = iLevel[i] * kpDequantCoeff[j & 0x07];
-      }
-      break;
-    default:
-      break;
+    for (i = uiTotalCoeff - 1; i >= 0; --i) { //FIXME merge into  rundecode?
+      int32_t j;
+      iCoeffNum += iRun[i] + 1; //FIXME add 1 earlier ?
+      j          = kpZigzagTable[ iCoeffNum ];
+      pTCoeff[j] = iLevel[i] * kpDequantCoeff[j & 0x07];
     }
   }
 

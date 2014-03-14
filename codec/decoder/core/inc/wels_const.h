@@ -95,11 +95,4 @@
 #define MAX_ACCESS_UNIT_CAPACITY	1048576	// Maximal AU capacity in bytes: (1<<20) = 1024 KB predefined
 #define MAX_MACROBLOCK_CAPACITY 5000 //Maximal legal MB capacity, 15000 bits is enough
 
-enum {
-  BASE_MB = 0,
-  NON_AVC_REWRITE_ENHANCE_MB = 1,
-  AVC_REWRITE_ENHANCE_MB = 2
-
-};
-
 #endif//WELS_CONSTANCE_H__
