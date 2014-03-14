@@ -475,12 +475,6 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_NO_PARAM_SETS);
   }
 
-  if (pPps->iSpsId >= MAX_SPS_COUNT) {
-    WelsLog (pCtx, WELS_LOG_WARNING, "iSpsId out of range\n");
-    return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_SPS_ID_OVERFLOW);
-  }
-
-  //add check SPS available here
   if (kbExtensionFlag) {
     pSubsetSps	= &pCtx->sSubsetSpsBuffer[pPps->iSpsId];
     pSps		= &pSubsetSps->sSps;
@@ -495,7 +489,6 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     }
     pSps		= &pCtx->sSpsBuffer[pPps->iSpsId];
   }
-  pCtx->pSps			= pSps;
   pSliceHead->iPpsId = iPpsId;
   pSliceHead->iSpsId = pPps->iSpsId;
   pSliceHead->pPps   = pPps;
