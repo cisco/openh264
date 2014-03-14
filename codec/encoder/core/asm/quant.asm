@@ -87,12 +87,9 @@ align 16
 WelsQuant4x4_sse2:
 		%assign push_num 0
                 LOAD_3_PARA
-		;mov		eax,  [ff]
-		;mov		ecx,  [mf]
 		movdqa	xmm2, [r1]
 		movdqa	xmm3, [r2]
 
-		;mov		edx,  [pDct]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x10]
 
@@ -108,13 +105,10 @@ WelsQuant4x4Dc_sse2:
 		LOAD_3_PARA
 		SIGN_EXTENSION r1, r1w
 		SIGN_EXTENSION r2, r2w
-		;mov		ax,		[mf]
 		SSE2_Copy8Times xmm3, r2d
 
-		;mov		cx, [ff]
 		SSE2_Copy8Times xmm2, r1d
 
-		;mov		edx,  [pDct]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x10]
 
@@ -128,12 +122,9 @@ align 16
 WelsQuantFour4x4_sse2:
 		%assign push_num 0
 		LOAD_3_PARA
-		;mov		eax,  [ff]
-		;mov		ecx,  [mf]
 		MOVDQ	xmm2, [r1]
 		MOVDQ	xmm3, [r2]
 
-		;mov		edx,  [pDct]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x10]
 		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x20]
@@ -153,12 +144,9 @@ align 16
 WelsQuantFour4x4Max_sse2:
 		%assign push_num 0
 		LOAD_4_PARA
-		;mov		eax,  [ff]
-		;mov		ecx,  [mf]
 		MOVDQ	xmm2, [r1]
 		MOVDQ	xmm3, [r2]
 
-		;mov		edx,  [pDct]
 		pxor	xmm4, xmm4
 		pxor	xmm5, xmm5
 		pxor	xmm6, xmm6
@@ -180,7 +168,6 @@ WelsQuantFour4x4Max_sse2:
 		punpckhqdq	xmm0, xmm1
 		pmaxsw	xmm0, xmm1
 
-		;mov		r0,  [r3]
 		movq	[r3], xmm0
 		LOAD_4_PARA_POP
 		ret
@@ -204,8 +191,6 @@ SECTION .text
 		psubw	%1, %2
 %endmacro
 
-%define dct2x2				esp + 16
-%define iChromaDc			esp + 20
 ;***********************************************************************
 ;int32_t WelsHadamardQuant2x2_mmx(int16_t *rs, const int16_t ff, int16_t mf, int16_t * pDct, int16_t * block);
 ;***********************************************************************
@@ -216,7 +201,6 @@ WelsHadamardQuant2x2_mmx:
 		LOAD_5_PARA
 		SIGN_EXTENSION r1, r1w
 		SIGN_EXTENSION r2, r2w
-		;mov			eax,			[pDct]
 		movd		mm0,			[r0]
 		movd		mm1,			[r0 + 0x20]
 		punpcklwd	mm0,			mm1
@@ -237,16 +221,12 @@ WelsHadamardQuant2x2_mmx:
 		punpcklwd	mm1,			mm3
 
 		;quant_2x2_dc
-		;mov			ax,				[mf]
 		MMX_Copy4Times	mm3,		r2d
-		;mov			cx,				[ff]
 		MMX_Copy4Times	mm2,		r1d
 		MMX_Quant4		mm1,	mm0,	mm2,	mm3
 
 		; store dct_2x2
-		;mov			edx,			[dct2x2]
 		movq		[r3],			mm1
-		;mov			ecx,			[iChromaDc]
 		movq		[r4],			mm1
 
 		; pNonZeroCount of dct_2x2
@@ -279,7 +259,6 @@ WelsHadamardQuant2x2Skip_mmx:
 		LOAD_3_PARA
 		SIGN_EXTENSION r1, r1w
 		SIGN_EXTENSION r2, r2w
-		;mov			eax,			[pDct]
 		movd		mm0,			[r0]
 		movd		mm1,			[r0 + 0x20]
 		punpcklwd	mm0,			mm1
@@ -300,9 +279,7 @@ WelsHadamardQuant2x2Skip_mmx:
 		punpcklwd	mm1,			mm3
 
 		;quant_2x2_dc
-		;mov			ax,				[mf]
 		MMX_Copy4Times	mm3,		r2d
-		;mov			cx,				[ff]
 		MMX_Copy4Times	mm2,		r1d
 		MMX_Quant4		mm1,	mm0,	mm2,	mm3
 
@@ -333,11 +310,8 @@ ALIGN  16
 align 16
 WELS_EXTERN WelsDequant4x4_sse2
 WelsDequant4x4_sse2:
-	;ecx = dequant_mf[qp], edx = pDct
 	%assign push_num 0
 	LOAD_2_PARA
-	;mov		ecx,  [esp + 8]
-	;mov		edx,  [esp + 4]
 
 	movdqa  xmm1, [r1]
 	SSE2_DeQuant8 [r0	],  xmm0, xmm1
@@ -353,11 +327,8 @@ align 16
 
 WELS_EXTERN WelsDequantFour4x4_sse2
 WelsDequantFour4x4_sse2:
-    ;ecx = dequant_mf[qp], edx = pDct
 	%assign push_num 0
 	LOAD_2_PARA
-	;mov		ecx,  [esp + 8]
-	;mov		edx,  [esp + 4]
 
 	movdqa  xmm1, [r1]
 	SSE2_DeQuant8 [r0	],  xmm0, xmm1
@@ -382,8 +353,6 @@ WelsDequantIHadamard4x4_sse2:
 		%ifndef X86_32
 		movzx r1, r1w
 		%endif
-		;mov			eax,			[esp + 4]
-		;mov			cx,				[esp + 8]
 
 		; WelsDequantLumaDc4x4
 		SSE2_Copy8Times	xmm1,		r1d
