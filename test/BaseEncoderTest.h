@@ -14,8 +14,8 @@ class BaseEncoderTest {
   BaseEncoderTest();
   void SetUp();
   void TearDown();
-  void EncodeFile(const char* fileName, int width, int height, float frameRate, SliceModeEnum slices, Callback* cbk);
-  void EncodeStream(InputStream* in, int width, int height, float frameRate, SliceModeEnum slices, Callback* cbk);
+  void EncodeFile(const char* fileName, int width, int height, float frameRate, SliceModeEnum slices, bool denoise, int deblock, Callback* cbk);
+  void EncodeStream(InputStream* in, int width, int height, float frameRate, SliceModeEnum slices, bool denoise, int deblock, Callback* cbk);
 
  private:
   ISVCEncoder* encoder_;
