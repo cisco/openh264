@@ -445,12 +445,12 @@ WelsIDctFourT4Rec_sse2:
    ; pop		ebx
     ret
 
-  %macro SSE2_StoreDiff4x8p 8
+%macro SSE2_StoreDiff4x8p 8
    	SSE2_StoreDiff8p    %1, %3, %4, [%5],			[%6]
 	SSE2_StoreDiff8p    %1, %3, %4, [%5 + %7],		[%6 + %8]
 	SSE2_StoreDiff8p    %2, %3, %4, [%5 + 8],		[%6 + 8]
 	SSE2_StoreDiff8p    %2, %3, %4, [%5 + %7 + 8],	[%6 + %8 + 8]
- %endmacro
+%endmacro
 
  ;***********************************************************************
 ; void WelsIDctRecI16x16Dc_sse2(uint8_t *rec, int32_t stride, uint8_t *pred, int32_t pred_stride, int16_t *dct_dc)
@@ -528,7 +528,7 @@ WelsIDctRecI16x16Dc_sse2:
 	movdqa	%4, %1
 	psubd	%4, %2
 %endmacro
- %macro		SSE2_Load4Col	5
+%macro		SSE2_Load4Col	5
 	movsx		r2,		WORD[%5]
  	movd		%1,			r2d
  	movsx		r2,		WORD[%5 + 0x20]
@@ -540,7 +540,7 @@ WelsIDctRecI16x16Dc_sse2:
  	movd		%4,			r2d
 	punpckldq	%3,			%4
 	punpcklqdq	%1,			%3
- %endmacro
+%endmacro
 
 ;***********************************************************************
 ;void WelsHadamardT4Dc_sse2( int16_t *luma_dc, int16_t *pDct)
