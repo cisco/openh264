@@ -357,15 +357,6 @@ int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNal
   }
 
   iNextMbXyIndex = pSliceHeader->iFirstMbInSlice;
-
-  if ((iNextMbXyIndex < 0) || (iNextMbXyIndex >= kiCountNumMb)) {
-    WelsLog (pCtx, WELS_LOG_ERROR,
-             "WelsDecodeSlice()::iFirstMbInSlice(%d) > pSps->kiTotalMb(%d). ERROR!!! resolution change....\n",
-             iNextMbXyIndex, kiCountNumMb);
-    pCtx->iErrorCode |= dsNoParamSets;
-    return dsNoParamSets;
-  }
-
   iMbX = iNextMbXyIndex % pCurLayer->iMbWidth;
   iMbY = iNextMbXyIndex / pCurLayer->iMbWidth; // error is introduced by multiple slices case, 11/23/2009
   pSlice->iMbSkipRun = -1;
