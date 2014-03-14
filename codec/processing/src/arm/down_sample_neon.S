@@ -257,10 +257,10 @@ WELS_ASM_FUNC_BEGIN GeneralBilinearAccurateDownsampler_neon
 	vdup.s32 d1, r11;			//init u  16384 16383 16384 16383
 
 	mov		 r11, #16384
-    vdup.s16 d8, r11
+    vdup.s16 d16, r11
     sub      r11, #1
-	vdup.s16 d9, r11
-	vext.8	 d7, d9, d8, #4		//init v  16384 16384 16383 16383
+	vdup.s16 d17, r11
+	vext.8	 d7, d17, d16, #4		//init v  16384 16384 16383 16383
 
 	veor    q14,     q14
 	sub		r1,		r2			// stride - width
