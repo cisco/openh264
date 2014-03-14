@@ -93,9 +93,7 @@ ALIGN 16
 IdctResAddPred_mmx:
     %assign push_num 0
     LOAD_3_PARA
-	%ifndef X86_32
-	movsx r1, r1d
-	%endif
+    SIGN_EXTENSION r1, r1d
     movq    mm0, [r2+ 0]
     movq    mm1, [r2+ 8]
     movq    mm2, [r2+16]

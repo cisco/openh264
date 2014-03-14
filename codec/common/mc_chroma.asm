@@ -82,11 +82,9 @@ McChromaWidthEq4_mmx:
 
 	%assign  push_num 0
 	LOAD_6_PARA
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r5, r5d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r5, r5d
 
 	;mov eax, [esp +12 + 20]
 
@@ -174,11 +172,9 @@ McChromaWidthEq8_sse2:
 
 	%assign  push_num 0
 	LOAD_6_PARA
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r5, r5d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r5, r5d
 
 	;mov eax, [esp +12 + 20]
 	movd xmm3, [r4]
@@ -268,11 +264,9 @@ McChromaWidthEq8_ssse3:
 	;push edi
 	%assign  push_num 0
 	LOAD_6_PARA
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r5, r5d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r5, r5d
 
 	;mov eax, [esp + 12 + 20]
 

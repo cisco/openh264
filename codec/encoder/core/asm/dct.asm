@@ -143,10 +143,8 @@ WelsDctT4_mmx:
     ;mov     edx, [esp+24]   ; i_pix2
     %assign push_num 0
     LOAD_5_PARA
-	%ifndef X86_32
-	movsx r2, r2d
-	movsx r4, r4d
-	%endif
+    SIGN_EXTENSION r2, r2d
+    SIGN_EXTENSION r4, r4d
     WELS_Zero    mm7
 
     MMX_LoadDiff4x4P mm1, mm2, mm3, mm4, r1, r2, r3, r4, mm0, mm7
@@ -182,10 +180,8 @@ WelsIDctT4Rec_mmx:
 ;%define     pDct        esp+pushsize+20
     %assign push_num 0
     LOAD_5_PARA
-	%ifndef X86_32
-	movsx r1, r1d
-	movsx r3, r3d
-	%endif
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
 ;	mov     eax, [pDct   ]
     movq    mm0, [r4+ 0]
     movq    mm1, [r4+ 8]
@@ -332,10 +328,8 @@ WelsDctFourT4_sse2:
     ;mov     edx, [esp+28]   ; i_pix2
     %assign push_num 0
     LOAD_5_PARA
-	%ifndef X86_32
-	movsx r2, r2d
-	movsx r4, r4d
-	%endif
+    SIGN_EXTENSION r2, r2d
+    SIGN_EXTENSION r4, r4d
     pxor    xmm7, xmm7
 	;Load 4x8
 	SSE2_LoadDiff8P    xmm0, xmm6, xmm7, [r1], [r3]
@@ -399,10 +393,8 @@ WelsIDctFourT4Rec_sse2:
 ;    mov			esi,		[rs]
 	%assign push_num 0
 	LOAD_5_PARA
-	%ifndef X86_32
-	movsx r1, r1d
-	movsx r3, r3d
-	%endif
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
 	;Load 4x8
 	SSE2_Load4x8p  r4, xmm0, xmm1, xmm4, xmm2, xmm5
 
@@ -462,10 +454,8 @@ ALIGN 16
 WelsIDctRecI16x16Dc_sse2:
 	%assign push_num 0
 	LOAD_5_PARA
-	%ifndef X86_32
-	movsx r1, r1d
-	movsx r3, r3d
-	%endif
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
    ; push		esi
    ; push		edi
 
