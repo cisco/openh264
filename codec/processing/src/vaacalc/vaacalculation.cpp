@@ -73,7 +73,7 @@ void CVAACalculation::InitVaaFuncs (SVaaFuncs& sVaaFuncs, int32_t iCpuFlag) {
     sVaaFuncs.pfVAACalcSadSsdBgd = VAACalcSadSsdBgd_neon;
     sVaaFuncs.pfVAACalcSadVar		= VAACalcSadVar_neon;
     }
-#endif//X86_ASM
+#endif//HAVE_NEON
 }
 
 EResult CVAACalculation::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap) {
