@@ -1,3 +1,5 @@
+#include <time.h>
+
 #include "gtest/gtest.h"
 #include "memory_align.h"
 
