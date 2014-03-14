@@ -43,6 +43,22 @@
 #include "svc_motion_estimate.h"
 
 namespace WelsSVCEnc {
+
+inline void UpdateMeResults( const SMVUnitXY ksBestMv, const uint32_t kiBestSadCost, uint8_t* pRef, SWelsME * pMe )
+{
+  pMe->sMv = ksBestMv;
+  pMe->pRefMb = pRef;
+  pMe->uiSadCost = kiBestSadCost;
+}
+inline void SvcMeEndSearch( SWelsME * pMe, const uint32_t kuiBestSadCost )
+{
+    /* -> qpel mv */
+    pMe->sMv.iMvX <<= 2;
+    pMe->sMv.iMvY <<= 2;
+    pMe->uiSatdCost = kuiBestSadCost;
+}
+
+
 /*!
  * \brief	BL mb motion estimate search
  *
@@ -52,7 +68,7 @@ namespace WelsSVCEnc {
  * \return	NONE
  */
 
-void WelsMotionEstimateSearchSatd (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice) {
+void WelsMotionEstimateSearch (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice) {
   SDqLayer* pCurDqLayer			= (SDqLayer*)pLplayer;
   SWelsME* pMe						= (SWelsME*)pLpme;
   SSlice* pSlice					= (SSlice*)pLpslice;
@@ -60,24 +76,11 @@ void WelsMotionEstimateSearchSatd (SWelsFuncPtrList* pFuncList, void* pLplayer, 
   int32_t iStrideRef = pCurDqLayer->pRefPic->iLineSize[0];
 
   //  Step 1: Initial point prediction
-  WelsMotionEstimateInitialPoint (pFuncList, pMe, pSlice, iStrideEnc, iStrideRef);
+  if ( !WelsMotionEstimateInitialPoint (pFuncList, pMe, pSlice, iStrideEnc, iStrideRef) ) {
+    WelsMotionEstimateIterativeSearch (pFuncList, pMe, iStrideEnc, iStrideRef, pMe->pRefMb);
+  }
 
-  pMe->uSadPredISatd.uiSatd = pFuncList->sSampleDealingFuncs.pfSampleSatd[pMe->uiPixel] (pMe->pEncMb, iStrideEnc,
-                              pMe->pRefMb, iStrideRef);
-  pMe->uiSatdCost = pMe->uSadPredISatd.uiSatd + COST_MVD (pMe->pMvdCost, pMe->sMv.iMvX - pMe->sMvp.iMvX,
-                    pMe->sMv.iMvY - pMe->sMvp.iMvY);
-}
-
-
-void WelsMotionEstimateSearchSad (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice) {
-  SDqLayer* pCurDqLayer			= (SDqLayer*)pLplayer;
-  SWelsME* pMe						= (SWelsME*)pLpme;
-  SSlice* slice					= (SSlice*)pLpslice;
-  int32_t iStrideEnc			= pCurDqLayer->iEncStride[0];
-  int32_t iStrideRef			= pCurDqLayer->pRefPic->iLineSize[0];
-
-  //  Step 1: Initial point prediction
-  WelsMotionEstimateInitialPoint (pFuncList, pMe, slice, iStrideEnc, iStrideRef);
+  pFuncList->pfCalculateSatd( pFuncList->sSampleDealingFuncs.pfSampleSatd[pMe->uiPixel], pMe, iStrideEnc, iStrideRef );
 }
 
 /*!
@@ -90,7 +93,7 @@ void WelsMotionEstimateSearchSad (SWelsFuncPtrList* pFuncList, void* pLplayer, v
  *
  * \return	NONE
  */
-void WelsMotionEstimateInitialPoint (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlice, int32_t iStrideEnc,
+bool WelsMotionEstimateInitialPoint (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlice, int32_t iStrideEnc,
                                      int32_t iStrideRef) {
   PSampleSadSatdCostFunc pSad		= pFuncList->sSampleDealingFuncs.pfSampleSad[pMe->uiPixel];
   const uint16_t* kpMvdCost	= pMe->pMvdCost;
@@ -138,21 +141,13 @@ void WelsMotionEstimateInitialPoint (SWelsFuncPtrList* pFuncList, SWelsME* pMe, 
     }
   }
 
-  pMe->sMv = sMv;
-  pMe->uiSadCost = iBestSadCost;
-  if (iBestSadCost < pMe->uSadPredISatd.uiSadPred) {
-    //  Step 2: Initial early Stop
-    /* -> qpel mv */
-    pMe->sMv.iMvX <<= 2;
-    pMe->sMv.iMvY <<= 2;
-    /* -> pRef */
-    pMe->pRefMb = pRefMb;
-    /* compute the real cost */
-    pMe->uiSatdCost = iBestSadCost;
-  } else {
-    //  Step 3: Fast search pattern
-    WelsMotionEstimateIterativeSearch (pFuncList, pMe, iStrideEnc, iStrideRef, pRefMb);
+  UpdateMeResults( sMv, iBestSadCost, pRefMb, pMe );
+  if ( iBestSadCost < static_cast<int32_t>(pMe->uSadPredISatd.uiSadPred) ) {
+    //Initial point early Stop
+    SvcMeEndSearch(pMe, iBestSadCost);
+    return true;
   }
+  return false;
 }
 
 bool WelsMeSadCostSelect (int32_t* iSadCost, const uint16_t* kpMvdCost, int32_t* pBestCost, const int32_t kiDx,
@@ -229,6 +224,17 @@ void WelsMotionEstimateIterativeSearch (SWelsFuncPtrList* pFuncList, SWelsME* pM
   pMe->sMv.iMvY = (iMvDy + pMe->sMvp.iMvY) & 0xFFFC;
   pMe->uiSatdCost = pMe->uiSadCost = (iBestCost);
   pMe->pRefMb = pRefMb;
+}
+
+void CalculateSatdCost( PSampleSadSatdCostFunc pSatd, void * vpMe, const int32_t kiEncStride, const int32_t kiRefStride )
+{
+  SWelsME* pMe						 = static_cast<SWelsME *>(vpMe);
+  pMe->uSadPredISatd.uiSatd = pSatd(pMe->pEncMb, kiEncStride, pMe->pRefMb, kiRefStride);
+  pMe->uiSatdCost = pMe->uSadPredISatd.uiSatd + COST_MVD (pMe->pMvdCost, pMe->sMv.iMvX - pMe->sMvp.iMvX,
+                                                            pMe->sMv.iMvY - pMe->sMvp.iMvY);
+}
+void NotCalculateSatdCost( PSampleSadSatdCostFunc pSatd, void * vpMe, const int32_t kiEncStride, const int32_t kiRefStride )
+{
 }
 
 } // namespace WelsSVCEnc
