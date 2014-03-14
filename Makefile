@@ -40,6 +40,10 @@ include build/platform-$(OS).mk
 CFLAGS += -DNO_DYNAMIC_VP
 LDFLAGS +=
 
+ifeq (Yes, $(GCOV))
+CFLAGS += -fprofile-arcs -ftest-coverage
+LDFLAGS += -lgcov
+endif
 
 #### No user-serviceable parts below this line
 ifneq ($(V),Yes)
