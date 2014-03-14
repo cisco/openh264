@@ -1,4 +1,5 @@
 #include <string.h>//memset/memcpy
+#include <time.h>
 #include "utils/DataGenerator.h"
 #include "utils/BufferedData.h"
 #include "utils/FileInputStream.h"
