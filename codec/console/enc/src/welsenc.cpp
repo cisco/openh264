@@ -105,7 +105,7 @@ static void    SigIntHandler (int a) {
 }
 static int     g_LevelSetting = 0;
 
-int ParseLayerConfig( CReadConfig & cRdLayerCfg, const int iLayer, SEncParamExt& pSvcParam )
+int ParseLayerConfig( CReadConfig & cRdLayerCfg, const int iLayer, SEncParamExt& pSvcParam,SFilesSet& sFileSet)
 {
   if (!cRdLayerCfg.ExistFile()) {
     fprintf (stderr, "Unabled to open layer #%d configuration file: %s.\n", iLayer, cRdLayerCfg.GetFileName().c_str());
@@ -137,13 +137,11 @@ int ParseLayerConfig( CReadConfig & cRdLayerCfg, const int iLayer, SEncParamExt&
       } else if (strTag[0].compare ("FrameRateOut") == 0) {
         pDLayer->fFrameRate = (float)atof (strTag[1].c_str());
       }else if (strTag[0].compare ("ReconFile") == 0) {
-#ifdef ENABLE_FRAME_DUMP
         const int kiLen = strTag[1].length();
-        if (kiLen >= MAX_FNAME_LEN)
+        if (kiLen >= sizeof(sFileSet.sRecFileName[iLayer]))
           return -1;
-        pDLayer->sRecFileName[kiLen] = '\0';
-        strncpy (pDLayer->sRecFileName, strTag[1].c_str(), kiLen);	// confirmed_safe_unsafe_usage
-#endif//ENABLE_FRAME_DUMP
+        sFileSet.sRecFileName[iLayer][kiLen] = '\0';
+        strncpy (sFileSet.sRecFileName[iLayer], strTag[1].c_str(), kiLen);	// confirmed_safe_unsafe_usage
       } else if (strTag[0].compare ("ProfileIdc") == 0) {
         pDLayer->uiProfileIdc	= atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("FRExt") == 0) {
@@ -307,7 +305,7 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
   for (int8_t iLayer = 0; iLayer < kiActualLayerNum; ++ iLayer) {
     SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
     CReadConfig cRdLayerCfg (sFileSet.strLayerCfgFile[iLayer]);
-    if (-1==ParseLayerConfig( cRdLayerCfg, iLayer, pSvcParam ))
+    if (-1==ParseLayerConfig( cRdLayerCfg, iLayer, pSvcParam,sFileSet ))
     {
       iRet = 1;
       break;
@@ -483,7 +481,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
 
       for (int8_t iLayer = 0; iLayer < pSvcParam.iSpatialLayerNum; ++ iLayer) {
         CReadConfig cRdLayerCfg (sFileSet.strLayerCfgFile[iLayer]);
-        if (-1==ParseLayerConfig( cRdLayerCfg, iLayer, pSvcParam ))
+        if (-1==ParseLayerConfig( cRdLayerCfg, iLayer, pSvcParam,sFileSet ))
         {
           return 1;
         }
