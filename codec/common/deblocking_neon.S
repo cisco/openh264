@@ -400,7 +400,7 @@ WELS_ASM_FUNC_BEGIN DeblockLumaEq4V_neon
 WELS_ASM_FUNC_END
 
 
-    WELS_ASM_FUNC_BEGIN DeblockLumaLt4H_neon
+WELS_ASM_FUNC_BEGIN DeblockLumaLt4H_neon
     vpush	{q4-q7}
 
     vdup.u8	q11, r2
@@ -654,7 +654,7 @@ WELS_ASM_FUNC_BEGIN DeblockChromaLt4V_neon
 WELS_ASM_FUNC_END
 
 
-    WELS_ASM_FUNC_BEGIN DeblockChromaEq4V_neon
+WELS_ASM_FUNC_BEGIN DeblockChromaEq4V_neon
     vpush	{q4-q5}
 
     vdup.u8	q11, r3

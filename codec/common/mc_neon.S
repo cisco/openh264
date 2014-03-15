@@ -1748,7 +1748,7 @@ w9_h_mc_luma_loop:
 WELS_ASM_FUNC_END
 
 
-    WELS_ASM_FUNC_BEGIN McHorVer02Height17_neon
+WELS_ASM_FUNC_BEGIN McHorVer02Height17_neon
 	push		{r4}
 	ldr			r4, [sp, #4]
 
