@@ -337,6 +337,12 @@ BITS 32
 
 %macro SIGN_EXTENSION 2
     %ifndef X86_32
+            movsxd %1, %2
+    %endif
+%endmacro
+
+%macro SIGN_EXTENSIONW 2
+    %ifndef X86_32
             movsx %1, %2
     %endif
 %endmacro
