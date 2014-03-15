@@ -47,9 +47,9 @@
 ;*******************************************************************************
 %macro MMX_SumSubDiv2 3
     movq    %3, %2
-    psraw   %3, $1
+    psraw   %3, $01
     paddw   %3, %1
-    psraw   %1, $1
+    psraw   %1, $01
     psubw   %1, %2
 %endmacro
 
@@ -71,7 +71,7 @@
     movd       %2, %5
     punpcklbw  %2, %4
     paddw      %1, %3
-    psraw      %1, $6
+    psraw      %1, $06
     paddsw     %1, %2
     packuswb   %1, %2
     movd       %5, %1
