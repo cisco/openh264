@@ -177,18 +177,14 @@ sse2_wd_0x02: times 8 dw 0x02
 ;*******************************************************************************
 
 SECTION .text
-WELS_EXTERN WelsDecoderI4x4LumaPredH_sse2
-WELS_EXTERN WelsDecoderI4x4LumaPredDDR_mmx
-WELS_EXTERN WelsDecoderI16x16LumaPredPlane_sse2
 
 
-ALIGN 16
 ;*******************************************************************************
 ;   void WelsDecoderI4x4LumaPredH_sse2(uint8_t *pPred, const int32_t kiStride)
 ;
 ;	pPred must align to 16
 ;*******************************************************************************
-WelsDecoderI4x4LumaPredH_sse2:
+WELS_EXTERN WelsDecoderI4x4LumaPredH_sse2
 	%assign push_num 0
 	LOAD_2_PARA
 	SIGN_EXTENSION r1, r1d
@@ -222,7 +218,7 @@ WelsDecoderI4x4LumaPredH_sse2:
 ;*******************************************************************************
 ; void WelsDecoderI16x16LumaPredPlane_sse2(uint8_t *pPred, const int32_t kiStride);
 ;*******************************************************************************
-WelsDecoderI16x16LumaPredPlane_sse2:
+WELS_EXTERN WelsDecoderI16x16LumaPredPlane_sse2
 		push r3
 		push r4
 		%assign push_num 2
@@ -326,7 +322,6 @@ get_i16x16_luma_pred_plane_sse2_1:
 %endmacro
 
 WELS_EXTERN WelsDecoderI16x16LumaPredH_sse2
-WelsDecoderI16x16LumaPredH_sse2:
 	%assign push_num 0
 	LOAD_2_PARA
 	SIGN_EXTENSION r1, r1d
@@ -350,7 +345,6 @@ WelsDecoderI16x16LumaPredH_sse2:
 ; void WelsDecoderI16x16LumaPredV_sse2(uint8_t *pPred, const int32_t kiStride);
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI16x16LumaPredV_sse2
-WelsDecoderI16x16LumaPredV_sse2:
 	%assign push_num 0
 	LOAD_2_PARA
 	SIGN_EXTENSION r1, r1d
@@ -389,7 +383,6 @@ WelsDecoderI16x16LumaPredV_sse2:
 ; void WelsDecoderIChromaPredPlane_sse2(uint8_t *pPred, const int32_t kiStride);
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderIChromaPredPlane_sse2
-WelsDecoderIChromaPredPlane_sse2:
 		push r3
 		push r4
 		%assign push_num 2
@@ -477,7 +470,6 @@ get_i_chroma_pred_plane_sse2_1:
 		WELSEMMS
 		ret
 
-ALIGN 16
 ;*******************************************************************************
 ;	0 |1 |2 |3 |4 |
 ;	6 |7 |8 |9 |10|
@@ -490,7 +482,7 @@ ALIGN 16
 ;   void WelsDecoderI4x4LumaPredDDR_mmx(uint8_t *pPred, const int32_t kiStride)
 ;
 ;*******************************************************************************
-WelsDecoderI4x4LumaPredDDR_mmx:
+WELS_EXTERN WelsDecoderI4x4LumaPredDDR_mmx
 	%assign push_num 0
 	LOAD_2_PARA
 	SIGN_EXTENSION r1, r1d
@@ -536,7 +528,6 @@ WelsDecoderI4x4LumaPredDDR_mmx:
 	ret
 
 
-ALIGN 16
 ;*******************************************************************************
 ;	void WelsDecoderIChromaPredH_mmx(uint8_t *pPred, const int32_t kiStride)
 ;   copy 8 pixel of 8 line from left
@@ -560,7 +551,6 @@ ALIGN 16
 %endmacro
 
 WELS_EXTERN WelsDecoderIChromaPredH_mmx
-WelsDecoderIChromaPredH_mmx:
 	%assign push_num 0
 	LOAD_2_PARA
 	SIGN_EXTENSION r1, r1d
@@ -597,13 +587,11 @@ WelsDecoderIChromaPredH_mmx:
 	ret
 
 
-ALIGN 16
 ;*******************************************************************************
 ;	void WelsDecoderIChromaPredV_mmx(uint8_t *pPred, const int32_t kiStride)
 ;   copy 8 pixels from top 8 pixels
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderIChromaPredV_mmx
-WelsDecoderIChromaPredV_mmx:
 	%assign push_num 0
 	LOAD_2_PARA
 	SIGN_EXTENSION r1, r1d
@@ -627,7 +615,6 @@ WelsDecoderIChromaPredV_mmx:
 	ret
 
 
-	ALIGN 16
 ;*******************************************************************************
 ;	lt|t0|t1|t2|t3|
 ;	l0|
@@ -658,7 +645,6 @@ WelsDecoderIChromaPredV_mmx:
 ;   void WelsDecoderI4x4LumaPredHD_mmx(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredHD_mmx
-WelsDecoderI4x4LumaPredHD_mmx:
 	%assign push_num 0
 	LOAD_2_PARA
 	SIGN_EXTENSION r1, r1d
@@ -714,7 +700,6 @@ WelsDecoderI4x4LumaPredHD_mmx:
 
 
 
-ALIGN 16
 ;*******************************************************************************
 ;	lt|t0|t1|t2|t3|
 ;	l0|
@@ -742,7 +727,6 @@ ALIGN 16
 ;   void WelsDecoderI4x4LumaPredHU_mmx(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredHU_mmx
-WelsDecoderI4x4LumaPredHU_mmx:
 	%assign push_num 0
 	LOAD_2_PARA
 	SIGN_EXTENSION r1, r1d
@@ -799,7 +783,6 @@ WelsDecoderI4x4LumaPredHU_mmx:
 
 
 
-ALIGN 16
 ;*******************************************************************************
 ;	lt|t0|t1|t2|t3|
 ;	l0|
@@ -829,7 +812,6 @@ ALIGN 16
 ;   void WelsDecoderI4x4LumaPredVR_mmx(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredVR_mmx
-WelsDecoderI4x4LumaPredVR_mmx:
 	%assign push_num 0
 	LOAD_2_PARA
 	SIGN_EXTENSION r1, r1d
@@ -889,7 +871,6 @@ WelsDecoderI4x4LumaPredVR_mmx:
 	WELSEMMS
 	ret
 
-ALIGN 16
 ;*******************************************************************************
 ;	lt|t0|t1|t2|t3|t4|t5|t6|t7
 ;	l0|
@@ -917,7 +898,6 @@ ALIGN 16
 ;   void WelsDecoderI4x4LumaPredDDL_mmx(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredDDL_mmx
-WelsDecoderI4x4LumaPredDDL_mmx:
 	%assign push_num 0
 	LOAD_2_PARA
 	SIGN_EXTENSION r1, r1d
@@ -956,7 +936,6 @@ WelsDecoderI4x4LumaPredDDL_mmx:
 	ret
 
 
-ALIGN 16
 ;*******************************************************************************
 ;	lt|t0|t1|t2|t3|t4|t5|t6|t7
 ;	l0|
@@ -987,7 +966,6 @@ ALIGN 16
 ;   void WelsDecoderI4x4LumaPredVL_mmx(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredVL_mmx
-WelsDecoderI4x4LumaPredVL_mmx:
 	%assign push_num 0
 	LOAD_2_PARA
 	SIGN_EXTENSION r1, r1d
@@ -1023,13 +1001,11 @@ WelsDecoderI4x4LumaPredVL_mmx:
 	WELSEMMS
 	ret
 
-ALIGN 16
 ;*******************************************************************************
 ;
 ;   void WelsDecoderIChromaPredDc_sse2(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderIChromaPredDc_sse2
-WelsDecoderIChromaPredDc_sse2:
 	push 	r3
 	push 	r4
 	%assign push_num 2
@@ -1120,13 +1096,11 @@ WelsDecoderIChromaPredDc_sse2:
 
 
 
-ALIGN 16
 ;*******************************************************************************
 ;
 ;   void WelsDecoderI16x16LumaPredDc_sse2(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI16x16LumaPredDc_sse2
-WelsDecoderI16x16LumaPredDc_sse2:
 	push 	r3
 	push 	r4
 	%assign push_num 2
@@ -1201,12 +1175,10 @@ WelsDecoderI16x16LumaPredDc_sse2:
 ; for intra prediction as follows, 11/19/2010
 ;*******************************************************************************
 
-ALIGN 16
 ;*******************************************************************************
 ;	void WelsDecoderI16x16LumaPredDcTop_sse2(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI16x16LumaPredDcTop_sse2
-WelsDecoderI16x16LumaPredDcTop_sse2:
 	%assign push_num 0
 	LOAD_2_PARA
 	SIGN_EXTENSION r1, r1d
@@ -1273,12 +1245,10 @@ WelsDecoderI16x16LumaPredDcTop_sse2:
 
 	ret
 
-ALIGN 16
 ;*******************************************************************************
 ;	void WelsDecoderI16x16LumaPredDcNA_sse2(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI16x16LumaPredDcNA_sse2
-WelsDecoderI16x16LumaPredDcNA_sse2:
 	%assign push_num 0
 	LOAD_2_PARA
 	SIGN_EXTENSION r1, r1d
@@ -1308,12 +1278,10 @@ WelsDecoderI16x16LumaPredDcNA_sse2:
 
 	ret
 
-ALIGN 16
 ;*******************************************************************************
 ;	void WelsDecoderIChromaPredDcLeft_mmx(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderIChromaPredDcLeft_mmx
-WelsDecoderIChromaPredDcLeft_mmx:
 	push r3
 	push r4
 	%assign push_num 2
@@ -1381,12 +1349,10 @@ WelsDecoderIChromaPredDcLeft_mmx:
 	emms
 	ret
 
-ALIGN 16
 ;*******************************************************************************
 ;	void WelsDecoderIChromaPredDcTop_sse2(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderIChromaPredDcTop_sse2
-WelsDecoderIChromaPredDcTop_sse2:
 	%assign push_num 0
 	LOAD_2_PARA
 	SIGN_EXTENSION r1, r1d
@@ -1420,12 +1386,10 @@ WelsDecoderIChromaPredDcTop_sse2:
 	movq [r0+r2], xmm0
 	ret
 
-ALIGN 16
 ;*******************************************************************************
 ;	void WelsDecoderIChromaPredDcNA_mmx(uint8_t *pPred, const int32_t kiStride)
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderIChromaPredDcNA_mmx
-WelsDecoderIChromaPredDcNA_mmx:
 	%assign push_num 0
 	LOAD_2_PARA
 	SIGN_EXTENSION r1, r1d

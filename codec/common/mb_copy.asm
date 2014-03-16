@@ -54,12 +54,6 @@
 
 SECTION .text
 
-WELS_EXTERN WelsCopy16x16_sse2
-WELS_EXTERN WelsCopy16x16NotAligned_sse2
-WELS_EXTERN WelsCopy8x8_mmx
-WELS_EXTERN WelsCopy16x8NotAligned_sse2	;
-WELS_EXTERN WelsCopy8x16_mmx		;
-WELS_EXTERN UpdateMbMv_sse2		;
 
 ;***********************************************************************
 ; void WelsCopy16x16_sse2(	uint8_t* Dst,
@@ -67,8 +61,7 @@ WELS_EXTERN UpdateMbMv_sse2		;
 ;							uint8_t* Src,
 ;							int32_t  iStrideS )
 ;***********************************************************************
-ALIGN 16
-WelsCopy16x16_sse2:
+WELS_EXTERN WelsCopy16x16_sse2
 
 	push r4
 	push r5
@@ -130,9 +123,8 @@ WelsCopy16x16_sse2:
 ;							uint8_t* Src,
 ;							int32_t  iStrideS )
 ;***********************************************************************
-ALIGN 16
 ; dst can be align with 16 bytes, but not sure about pSrc, 12/29/2011
-WelsCopy16x16NotAligned_sse2:
+WELS_EXTERN WelsCopy16x16NotAligned_sse2
 	push r4
 	push r5
 	%assign  push_num 2
@@ -194,8 +186,7 @@ WelsCopy16x16NotAligned_sse2:
 ;							uint8_t* Src,
 ;							int32_t  iStrideS )
 ;***********************************************************************
-ALIGN 16
-WelsCopy16x8NotAligned_sse2:
+WELS_EXTERN WelsCopy16x8NotAligned_sse2
 	push r4
 	push r5
 	%assign  push_num 2
@@ -235,8 +226,7 @@ WelsCopy16x8NotAligned_sse2:
 ;                       uint8_t* Src,
 ;                       int32_t  iStrideS )
 ;***********************************************************************
-ALIGN 16
-WelsCopy8x16_mmx:
+WELS_EXTERN WelsCopy8x16_mmx
 	%assign  push_num 0
     LOAD_4_PARA
 
@@ -300,8 +290,7 @@ WelsCopy8x16_mmx:
 ;                        uint8_t* Src,
 ;                        int32_t  iStrideS )
 ;***********************************************************************
-ALIGN 16
-WelsCopy8x8_mmx:
+WELS_EXTERN WelsCopy8x8_mmx
 	push r4
 	%assign  push_num 1
     LOAD_4_PARA
@@ -349,8 +338,7 @@ WelsCopy8x8_mmx:
 ;***********************************************************************
 ; void UpdateMbMv_sse2( SMVUnitXY *pMvBuffer, const SMVUnitXY sMv )
 ;***********************************************************************
-ALIGN 16
-UpdateMbMv_sse2:
+WELS_EXTERN UpdateMbMv_sse2
 
     %assign  push_num 0
     LOAD_2_PARA
@@ -385,23 +373,16 @@ ALIGN 16
 
 SECTION .text
 
-WELS_EXTERN PixelAvgWidthEq4_mmx
-WELS_EXTERN PixelAvgWidthEq8_mmx
-WELS_EXTERN PixelAvgWidthEq16_sse2
-
-WELS_EXTERN McCopyWidthEq4_mmx
-WELS_EXTERN McCopyWidthEq8_mmx
-WELS_EXTERN McCopyWidthEq16_sse2
 
 
-ALIGN 16
+
 ;*******************************************************************************
 ; void PixelAvgWidthEq4_mmx( uint8_t *pDst,  int iDstStride,
 ;                           uint8_t *pSrcA, int iSrcAStride,
 ;                           uint8_t *pSrcB, int iSrcBStride,
 ;                           int iHeight );
 ;*******************************************************************************
-PixelAvgWidthEq4_mmx:
+WELS_EXTERN PixelAvgWidthEq4_mmx
 
     %assign  push_num 0
     LOAD_7_PARA
@@ -428,14 +409,13 @@ ALIGN 4
     ret
 
 
-ALIGN 16
 ;*******************************************************************************
 ; void PixelAvgWidthEq8_mmx( uint8_t *pDst,  int iDstStride,
 ;                           uint8_t *pSrcA, int iSrcAStride,
 ;                           uint8_t *pSrcB, int iSrcBStride,
 ;                           int iHeight );
 ;*******************************************************************************
-PixelAvgWidthEq8_mmx:
+WELS_EXTERN PixelAvgWidthEq8_mmx
     %assign  push_num 0
     LOAD_7_PARA
 
@@ -466,14 +446,13 @@ ALIGN 4
 
 
 
-ALIGN 16
 ;*******************************************************************************
 ; void PixelAvgWidthEq16_sse2( uint8_t *pDst,  int iDstStride,
 ;                          uint8_t *pSrcA, int iSrcAStride,
 ;                          uint8_t *pSrcB, int iSrcBStride,
 ;                          int iHeight );
 ;*******************************************************************************
-PixelAvgWidthEq16_sse2:
+WELS_EXTERN PixelAvgWidthEq16_sse2
 
     %assign  push_num 0
     LOAD_7_PARA
@@ -519,12 +498,11 @@ ALIGN 4
 	LOAD_7_PARA_POP
     ret
 
-ALIGN 16
 ;*******************************************************************************
 ;  void McCopyWidthEq4_mmx( uint8_t *pSrc, int iSrcStride,
 ;                          uint8_t *pDst, int iDstStride, int iHeight )
 ;*******************************************************************************
-McCopyWidthEq4_mmx:
+WELS_EXTERN McCopyWidthEq4_mmx
     push	r5
     %assign  push_num 1
     LOAD_5_PARA
@@ -547,12 +525,11 @@ ALIGN 4
     pop	   r5
     ret
 
-ALIGN 16
 ;*******************************************************************************
 ;   void McCopyWidthEq8_mmx( uint8_t *pSrc, int iSrcStride,
 ;                           uint8_t *pDst, int iDstStride, int iHeight )
 ;*******************************************************************************
-McCopyWidthEq8_mmx:
+WELS_EXTERN McCopyWidthEq8_mmx
     %assign  push_num 0
     LOAD_5_PARA
 
@@ -574,7 +551,6 @@ ALIGN 4
     ret
 
 
-ALIGN 16
 ;*******************************************************************************
 ;   void McCopyWidthEq16_sse2( uint8_t *pSrc, int iSrcStride, uint8_t *pDst, int iDstStride, int iHeight )
 ;*******************************************************************************
@@ -589,7 +565,7 @@ ALIGN 16
 	movq	[%1],	%2
 	movhps	[%1+8], %2
 %endmacro
-McCopyWidthEq16_sse2:
+WELS_EXTERN McCopyWidthEq16_sse2
     %assign  push_num 0
     LOAD_5_PARA
 	SIGN_EXTENSION	r1, r1d

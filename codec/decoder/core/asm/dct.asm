@@ -83,14 +83,11 @@
 
 SECTION .text
 
-WELS_EXTERN IdctResAddPred_mmx
-
-ALIGN 16
 ;*******************************************************************************
 ;   void IdctResAddPred_mmx( uint8_t *pPred, const int32_t kiStride, int16_t *pRs )
 ;*******************************************************************************
 
-IdctResAddPred_mmx:
+WELS_EXTERN IdctResAddPred_mmx
     %assign push_num 0
     LOAD_3_PARA
     SIGN_EXTENSION r1, r1d

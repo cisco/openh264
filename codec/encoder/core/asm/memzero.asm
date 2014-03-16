@@ -47,24 +47,20 @@
 
 SECTION .text
 
-ALIGN 16
 ;***********************************************************************
 ;void WelsPrefetchZero_mmx(int8_t const*_A);
 ;***********************************************************************
 WELS_EXTERN WelsPrefetchZero_mmx
-WelsPrefetchZero_mmx:
 	%assign  push_num 0
 	LOAD_1_PARA
 	prefetchnta [r0]
 	ret
 
 
-ALIGN 16
 ;***********************************************************************
 ;   void WelsSetMemZeroAligned64_sse2(void *dst, int32_t size)
 ;***********************************************************************
 WELS_EXTERN WelsSetMemZeroAligned64_sse2
-WelsSetMemZeroAligned64_sse2:
 
 		%assign  push_num 0
 		LOAD_2_PARA
@@ -84,12 +80,10 @@ WelsSetMemZeroAligned64_sse2:
 
 		ret
 
-ALIGN 16
 ;***********************************************************************
 ;   void WelsSetMemZeroSize64_mmx(void *dst, int32_t size)
 ;***********************************************************************
 WELS_EXTERN WelsSetMemZeroSize64_mmx
-WelsSetMemZeroSize64_mmx:
 
 		%assign  push_num 0
 		LOAD_2_PARA
@@ -114,12 +108,10 @@ WelsSetMemZeroSize64_mmx:
 		WELSEMMS
 		ret
 
-ALIGN 16
 ;***********************************************************************
 ;   void WelsSetMemZeroSize8_mmx(void *dst, int32_t size)
 ;***********************************************************************
 WELS_EXTERN WelsSetMemZeroSize8_mmx
-WelsSetMemZeroSize8_mmx:
 
 		%assign  push_num 0
 		LOAD_2_PARA

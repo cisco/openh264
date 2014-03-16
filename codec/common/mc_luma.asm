@@ -71,10 +71,8 @@ h264_mc_hc_32:
 
 SECTION .text
 
-WELS_EXTERN McHorVer20WidthEq4_mmx
 
 
-ALIGN 16
 ;*******************************************************************************
 ; void McHorVer20WidthEq4_mmx( const uint8_t *pSrc,
 ;                       int iSrcStride,
@@ -82,7 +80,7 @@ ALIGN 16
 ;						int iDstStride,
 ;						int iHeight)
 ;*******************************************************************************
-McHorVer20WidthEq4_mmx:
+WELS_EXTERN McHorVer20WidthEq4_mmx
     %assign  push_num 0
     LOAD_5_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -161,12 +159,7 @@ McHorVer20WidthEq4_mmx:
 ;*******************************************************************************
 
 SECTION .text
-WELS_EXTERN McHorVer22Width8HorFirst_sse2
-WELS_EXTERN McHorVer02WidthEq8_sse2
-WELS_EXTERN McHorVer20WidthEq8_sse2
-WELS_EXTERN McHorVer20WidthEq16_sse2
 
-ALIGN 16
 ;***********************************************************************
 ; void McHorVer22Width8HorFirst_sse2(const int16_t *pSrc,
 ;                       int16_t iSrcStride,
@@ -175,7 +168,7 @@ ALIGN 16
 ;						int32_t iHeight
 ;                       )
 ;***********************************************************************
-McHorVer22Width8HorFirst_sse2:
+WELS_EXTERN McHorVer22Width8HorFirst_sse2
 	%assign  push_num 0
     LOAD_5_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -217,7 +210,6 @@ McHorVer22Width8HorFirst_sse2:
 	LOAD_5_PARA_POP
 	ret
 
-ALIGN 16
 ;*******************************************************************************
 ; void McHorVer20WidthEq8_sse2(  const uint8_t *pSrc,
 ;                       int iSrcStride,
@@ -226,7 +218,7 @@ ALIGN 16
 ;												int iHeight,
 ;                      );
 ;*******************************************************************************
-McHorVer20WidthEq8_sse2:
+WELS_EXTERN McHorVer20WidthEq8_sse2
 	%assign  push_num 0
     LOAD_5_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -272,7 +264,6 @@ McHorVer20WidthEq8_sse2:
 	LOAD_5_PARA_POP
 	ret
 
-ALIGN 16
 ;*******************************************************************************
 ; void McHorVer20WidthEq16_sse2(  const uint8_t *pSrc,
 ;                       int iSrcStride,
@@ -281,7 +272,7 @@ ALIGN 16
 ;												int iHeight,
 ;                      );
 ;*******************************************************************************
-McHorVer20WidthEq16_sse2:
+WELS_EXTERN McHorVer20WidthEq16_sse2
 	%assign  push_num 0
     LOAD_5_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -361,8 +352,7 @@ McHorVer20WidthEq16_sse2:
 ;                       int iDstStride,
 ;                       int iHeight )
 ;*******************************************************************************
-ALIGN 16
-McHorVer02WidthEq8_sse2:
+WELS_EXTERN McHorVer02WidthEq8_sse2
 	%assign  push_num 0
     LOAD_5_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -443,11 +433,6 @@ McHorVer02WidthEq8_sse2:
 
 SECTION .text
 
-WELS_EXTERN McHorVer20Width9Or17_sse2
-WELS_EXTERN McHorVer02Height9Or17_sse2
-WELS_EXTERN McHorVer22Width8VerLastAlign_sse2
-WELS_EXTERN McHorVer22Width8VerLastUnAlign_sse2
-WELS_EXTERN McHorVer22HorFirst_sse2
 
 
 ;***********************************************************************
@@ -458,8 +443,7 @@ WELS_EXTERN McHorVer22HorFirst_sse2
 ;						int32_t iWidth,
 ;                       int32_t iHeight )
 ;***********************************************************************
-ALIGN 16
-McHorVer02Height9Or17_sse2:
+WELS_EXTERN McHorVer02Height9Or17_sse2
 	%assign  push_num 0
     LOAD_6_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -583,7 +567,6 @@ McHorVer02Height9Or17_sse2:
 	ret
 
 
-ALIGN 16
 ;***********************************************************************
 ; void McHorVer20Width9Or17_sse2(		const uint8_t *pSrc,
 ;                       int32_t iSrcStride,
@@ -593,7 +576,7 @@ ALIGN 16
 ;						int32_t iHeight
 ;                      );
 ;***********************************************************************
-McHorVer20Width9Or17_sse2:
+WELS_EXTERN McHorVer20Width9Or17_sse2
 	%assign  push_num 0
     LOAD_6_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -742,7 +725,6 @@ McHorVer20Width9Or17_sse2:
 
 
 
-ALIGN 16
 ;***********************************************************************
 ;void McHorVer22HorFirst_sse2
 ;							(const uint8_t *pSrc,
@@ -751,7 +733,7 @@ ALIGN 16
 ;							int32_t iTapStride,
 ;							int32_t iWidth,int32_t iHeight);
 ;***********************************************************************
-McHorVer22HorFirst_sse2:
+WELS_EXTERN McHorVer22HorFirst_sse2
 	%assign  push_num 0
     LOAD_6_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -918,7 +900,7 @@ McHorVer22HorFirst_sse2:
 ;											int32_t iHeight);
 ;***********************************************************************
 
- McHorVer22Width8VerLastAlign_sse2:
+WELS_EXTERN McHorVer22Width8VerLastAlign_sse2
 	%assign  push_num 0
     LOAD_6_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -1047,7 +1029,7 @@ McHorVer22HorFirst_sse2:
 ;											int32_t iHeight);
 ;***********************************************************************
 
- McHorVer22Width8VerLastUnAlign_sse2:
+WELS_EXTERN McHorVer22Width8VerLastUnAlign_sse2
 	%assign  push_num 0
     LOAD_6_PARA
 	SIGN_EXTENSION	r1, r1d

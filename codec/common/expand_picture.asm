@@ -67,9 +67,6 @@
 
 SECTION .text
 
-WELS_EXTERN ExpandPictureLuma_sse2
-WELS_EXTERN ExpandPictureChromaAlign_sse2	; for chroma alignment
-WELS_EXTERN ExpandPictureChromaUnalign_sse2	; for chroma unalignment
 
 ;;;;;;;expanding result;;;;;;;
 
@@ -360,14 +357,13 @@ WELS_EXTERN ExpandPictureChromaUnalign_sse2	; for chroma unalignment
 %endif
 %endmacro
 
-ALIGN 16
 ;***********************************************************************----------------
 ; void ExpandPictureLuma_sse2(	uint8_t *pDst,
 ;									const int32_t iStride,
 ;									const int32_t iWidth,
 ;									const int32_t iHeight	);
 ;***********************************************************************----------------
-ExpandPictureLuma_sse2:
+WELS_EXTERN ExpandPictureLuma_sse2
 
     push r4
     push r5
@@ -487,14 +483,13 @@ ExpandPictureLuma_sse2:
 
 	ret
 
-ALIGN 16
 ;***********************************************************************----------------
 ; void ExpandPictureChromaAlign_sse2(	uint8_t *pDst,
 ;										const int32_t iStride,
 ;										const int32_t iWidth,
 ;										const int32_t iHeight	);
 ;***********************************************************************----------------
-ExpandPictureChromaAlign_sse2:
+WELS_EXTERN ExpandPictureChromaAlign_sse2
 
     push r4
     push r5
@@ -613,14 +608,13 @@ ExpandPictureChromaAlign_sse2:
 
 	ret
 
-ALIGN 16
 ;***********************************************************************----------------
 ; void ExpandPictureChromaUnalign_sse2(	uint8_t *pDst,
 ;										const int32_t iStride,
 ;										const int32_t iWidth,
 ;										const int32_t iHeight	);
 ;***********************************************************************----------------
-ExpandPictureChromaUnalign_sse2:
+WELS_EXTERN ExpandPictureChromaUnalign_sse2
 	push r4
     push r5
     push r6

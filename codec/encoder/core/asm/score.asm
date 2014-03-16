@@ -166,9 +166,7 @@ SECTION .text
 ;***********************************************************************
 ;void WelsScan4x4DcAc_sse2( int16_t level[16], int16_t *pDct )
 ;***********************************************************************
-ALIGN 16
 WELS_EXTERN WelsScan4x4DcAc_sse2
-WelsScan4x4DcAc_sse2:
 	%ifdef X86_32
 	push r3
 	%assign push_num 1
@@ -200,9 +198,7 @@ WelsScan4x4DcAc_sse2:
 ;***********************************************************************
 ;void WelsScan4x4DcAc_ssse3( int16_t level[16], int16_t *pDct )
 ;***********************************************************************
-ALIGN 16
 WELS_EXTERN WelsScan4x4DcAc_ssse3
-WelsScan4x4DcAc_ssse3:
 	%assign push_num 0
 	LOAD_2_PARA
 	movdqa     xmm0, [r1]
@@ -220,9 +216,7 @@ WelsScan4x4DcAc_ssse3:
 ;***********************************************************************
 ;void WelsScan4x4Ac_sse2( int16_t* zig_value, int16_t* pDct )
 ;***********************************************************************
-ALIGN 16
 WELS_EXTERN WelsScan4x4Ac_sse2
-WelsScan4x4Ac_sse2:
 	%assign push_num 0
 	LOAD_2_PARA
 	movdqa     xmm0, [r1]
@@ -259,9 +253,7 @@ WelsScan4x4Ac_sse2:
 ;***********************************************************************
 ;void int32_t WelsCalculateSingleCtr4x4_sse2( int16_t *pDct );
 ;***********************************************************************
-ALIGN 16
 WELS_EXTERN WelsCalculateSingleCtr4x4_sse2
-WelsCalculateSingleCtr4x4_sse2:
 	%ifdef X86_32
 	push r3
 	%assign push_num 1
@@ -319,9 +311,7 @@ WelsCalculateSingleCtr4x4_sse2:
 ;***********************************************************************
 ; int32_t WelsGetNoneZeroCount_sse2(int16_t* level);
 ;***********************************************************************
-ALIGN 16
 WELS_EXTERN WelsGetNoneZeroCount_sse2
-WelsGetNoneZeroCount_sse2:
 	%assign push_num 0
 	LOAD_1_PARA
 	movdqa    xmm0, [r0]

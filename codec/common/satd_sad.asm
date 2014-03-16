@@ -156,8 +156,6 @@ SECTION .text
 ;
 ;***********************************************************************
 WELS_EXTERN WelsSampleSatd4x4_sse2
-align 16
-WelsSampleSatd4x4_sse2:
 	%assign  push_num 0
 	LOAD_4_PARA
 	SIGN_EXTENSION r1, r1d
@@ -229,9 +227,7 @@ WelsSampleSatd4x4_sse2:
  ;int32_t WelsSampleSatd8x8_sse2( uint8_t *, int32_t, uint8_t *, int32_t, );
  ;
  ;***********************************************************************
- WELS_EXTERN WelsSampleSatd8x8_sse2
-align 16
- WelsSampleSatd8x8_sse2:
+WELS_EXTERN WelsSampleSatd8x8_sse2
 	%assign  push_num 0
 	LOAD_4_PARA
 	SIGN_EXTENSION r1, r1d
@@ -250,9 +246,7 @@ align 16
  ;int32_t WelsSampleSatd8x16_sse2( uint8_t *, int32_t, uint8_t *, int32_t, );
  ;
  ;***********************************************************************
- WELS_EXTERN WelsSampleSatd8x16_sse2
-align 16
- WelsSampleSatd8x16_sse2:
+WELS_EXTERN WelsSampleSatd8x16_sse2
 	 %assign  push_num 0
 	 LOAD_4_PARA
 	 SIGN_EXTENSION r1, r1d
@@ -277,8 +271,6 @@ align 16
 ;
 ;***********************************************************************
 WELS_EXTERN WelsSampleSatd16x8_sse2
-align 16
-WelsSampleSatd16x8_sse2:
 	%assign  push_num 0
 	LOAD_4_PARA
 	SIGN_EXTENSION r1, r1d
@@ -308,8 +300,6 @@ WelsSampleSatd16x8_sse2:
 ;
 ;***********************************************************************
 WELS_EXTERN WelsSampleSatd16x16_sse2
-align 16
-WelsSampleSatd16x16_sse2:
 	%assign  push_num 0
 	LOAD_4_PARA
 	SIGN_EXTENSION r1, r1d
@@ -484,7 +474,6 @@ WelsSampleSatd16x16_sse2:
 
 %ifdef X86_32
 WELS_EXTERN WelsIntra16x16Combined3Satd_sse41
-WelsIntra16x16Combined3Satd_sse41:
 	push   ebx
 	push   esi
 	push   edi
@@ -678,7 +667,6 @@ loop_chroma_satdx3_cb_cr:
 ;for reduce the code size of WelsIntraChroma8x8Combined3Satd_sse41
 
 WELS_EXTERN WelsIntraChroma8x8Combined3Satd_sse41
-WelsIntraChroma8x8Combined3Satd_sse41:
 	push   ebx
 	push   esi
 	push   edi
@@ -782,7 +770,6 @@ ret
 ;
 ;***********************************************************************
 WELS_EXTERN WelsIntra16x16Combined3Sad_ssse3
-WelsIntra16x16Combined3Sad_ssse3:
 	push   ebx
 	push   esi
 	push   edi
@@ -987,7 +974,6 @@ return_sad_intra_16x16_x3:
 ;
 ;***********************************************************************
 WELS_EXTERN WelsSampleSatd4x4_sse41
-WelsSampleSatd4x4_sse41:
 	%assign  push_num 0
 	LOAD_4_PARA
 	SIGN_EXTENSION r1, r1d
@@ -1040,8 +1026,6 @@ WelsSampleSatd4x4_sse41:
 ;
 ;***********************************************************************
 WELS_EXTERN WelsSampleSatd8x8_sse41
-align 16
-WelsSampleSatd8x8_sse41:
 %ifdef X86_32
 	push  r4
 	push  r5
@@ -1072,8 +1056,6 @@ WelsSampleSatd8x8_sse41:
 ;
 ;***********************************************************************
 WELS_EXTERN WelsSampleSatd8x16_sse41
-align 16
-WelsSampleSatd8x16_sse41:
 %ifdef X86_32
 	push  r4
 	push  r5
@@ -1110,8 +1092,6 @@ loop_get_satd_8x16:
 ;
 ;***********************************************************************
 WELS_EXTERN WelsSampleSatd16x8_sse41
-align 16
-WelsSampleSatd16x8_sse41:
 %ifdef X86_32
 	push  r4
 	push  r5
@@ -1155,8 +1135,6 @@ WelsSampleSatd16x8_sse41:
 ;***********************************************************************
 
 WELS_EXTERN WelsSampleSatd16x16_sse41
-align 16
-WelsSampleSatd16x16_sse41:
 %ifdef X86_32
 	push  r4
 	push  r5
@@ -1276,8 +1254,6 @@ loop_get_satd_16x16_right:
 ;
 ;***********************************************************************
 WELS_EXTERN WelsSampleSad16x16_sse2
-align 16
-WelsSampleSad16x16_sse2:
 %ifdef X86_32
 	push  r4
 	push  r5
@@ -1319,8 +1295,6 @@ WelsSampleSad16x16_sse2:
 ;
 ;***********************************************************************
 WELS_EXTERN WelsSampleSad16x8_sse2
-align 16
-WelsSampleSad16x8_sse2:
 	%assign  push_num 0
 	LOAD_4_PARA
 	SIGN_EXTENSION r1, r1d
@@ -1346,7 +1320,6 @@ WelsSampleSad16x8_sse2:
 
 
 WELS_EXTERN WelsSampleSad8x16_sse2
-WelsSampleSad8x16_sse2:
 	%assign  push_num 0
 	LOAD_4_PARA
 	SIGN_EXTENSION r1, r1d
@@ -1377,7 +1350,6 @@ cmp    %1,  (32-%2)|(%3>>1)
 %endmacro
 
 WELS_EXTERN WelsSampleSad8x8_sse21
-WelsSampleSad8x8_sse21:
 	%assign  push_num 0
 	mov		r2,  arg3
 	push	r2
@@ -1536,7 +1508,6 @@ WelsSampleSad8x8_sse21:
 	paddw  xmm7, %4
 %endmacro
 WELS_EXTERN WelsSampleSadFour16x16_sse2
-WelsSampleSadFour16x16_sse2:
 	%assign  push_num 0
 	LOAD_5_PARA
 	SIGN_EXTENSION r1, r1d
@@ -1654,7 +1625,6 @@ WelsSampleSadFour16x16_sse2:
 
 
 WELS_EXTERN WelsSampleSadFour16x8_sse2
-WelsSampleSadFour16x8_sse2:
 	%assign  push_num 0
 	LOAD_5_PARA
 	SIGN_EXTENSION r1, r1d
@@ -1739,7 +1709,6 @@ WelsSampleSadFour16x8_sse2:
 	ret
 
 WELS_EXTERN WelsSampleSadFour8x16_sse2
-WelsSampleSadFour8x16_sse2:
 	%assign  push_num 0
 	LOAD_5_PARA
 	SIGN_EXTENSION r1, r1d
@@ -1951,7 +1920,6 @@ WelsSampleSadFour8x16_sse2:
 
 
 WELS_EXTERN WelsSampleSadFour8x8_sse2
-WelsSampleSadFour8x8_sse2:
 	%assign  push_num 0
 	LOAD_5_PARA
 	SIGN_EXTENSION r1, r1d
@@ -2071,7 +2039,6 @@ WelsSampleSadFour8x8_sse2:
 	ret
 
 WELS_EXTERN WelsSampleSadFour4x4_sse2
-WelsSampleSadFour4x4_sse2:
 	%assign  push_num 0
 	LOAD_5_PARA
 	SIGN_EXTENSION r1, r1d
@@ -2144,13 +2111,10 @@ WelsSampleSadFour4x4_sse2:
 ;
 ;***********************************************************************
 
-WELS_EXTERN WelsSampleSad4x4_mmx
-
-align 16
 ;***********************************************************************
 ;   int32_t WelsSampleSad4x4_mmx (uint8_t *, int32_t, uint8_t *, int32_t )
 ;***********************************************************************
-WelsSampleSad4x4_mmx:
+WELS_EXTERN WelsSampleSad4x4_mmx
     %assign  push_num 0
 	LOAD_4_PARA
 	SIGN_EXTENSION r1, r1d

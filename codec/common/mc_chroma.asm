@@ -65,7 +65,6 @@ h264_d0x20_mmx:
 
 SECTION .text
 
-ALIGN 16
 ;*******************************************************************************
 ; void McChromaWidthEq4_mmx( const uint8_t *src,
 ;							int32_t iSrcStride,
@@ -75,7 +74,6 @@ ALIGN 16
 ;							int32_t iHeigh );
 ;*******************************************************************************
 WELS_EXTERN McChromaWidthEq4_mmx
-McChromaWidthEq4_mmx:
 	%assign  push_num 0
 	LOAD_6_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -140,7 +138,6 @@ McChromaWidthEq4_mmx:
 	ret
 
 
-ALIGN 16
 ;*******************************************************************************
 ; void McChromaWidthEq8_sse2( const uint8_t *pSrc,
 ;						int32_t iSrcStride,
@@ -150,7 +147,6 @@ ALIGN 16
 ;						int32_t iheigh );
 ;*******************************************************************************
 WELS_EXTERN McChromaWidthEq8_sse2
-McChromaWidthEq8_sse2:
 	%assign  push_num 0
 	LOAD_6_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -219,7 +215,6 @@ McChromaWidthEq8_sse2:
 
 
 
-ALIGN 16
 ;***********************************************************************
 ; void McChromaWidthEq8_ssse3( const uint8_t *pSrc,
 ;						 int32_t iSrcStride,
@@ -229,7 +224,6 @@ ALIGN 16
 ;					     int32_t iHeigh);
 ;***********************************************************************
 WELS_EXTERN McChromaWidthEq8_ssse3
-McChromaWidthEq8_ssse3:
 	%assign  push_num 0
 	LOAD_6_PARA
 	SIGN_EXTENSION	r1, r1d
