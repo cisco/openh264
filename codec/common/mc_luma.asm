@@ -44,11 +44,7 @@
 ;*******************************************************************************
 ; Local Data (Read Only)
 ;*******************************************************************************
-%ifdef FORMAT_COFF
-SECTION .rodata pData
-%else
 SECTION .rodata align=16
-%endif
 
 ;*******************************************************************************
 ; Various memory constants (trigonometric values or rounding values)
