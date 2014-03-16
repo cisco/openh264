@@ -94,8 +94,8 @@ int32_t WelsSampleSatd16x8_sse2 (uint8_t*, int32_t, uint8_t*, int32_t);
 int32_t WelsSampleSatd8x16_sse2 (uint8_t*, int32_t, uint8_t*, int32_t);
 int32_t WelsSampleSatd16x16_sse2 (uint8_t*, int32_t, uint8_t*, int32_t);
 int32_t WelsSampleSatd4x4_sse2 (uint8_t*, int32_t, uint8_t*, int32_t);
-int32_t WelsSmpleSatdThree4x4_sse2 (uint8_t*, int32_t, uint8_t*, int32_t, uint8_t*, int32_t*, int32_t, int32_t,
-                                    int32_t);
+int32_t WelsSampleSatdThree4x4_sse2 (uint8_t*, int32_t, uint8_t*, int32_t, uint8_t*, int32_t*, int32_t, int32_t,
+                                     int32_t);
 
 int32_t WelsSampleSatd8x8_sse41 (uint8_t*, int32_t, uint8_t*, int32_t);
 int32_t WelsSampleSatd8x16_sse41 (uint8_t*, int32_t, uint8_t*, int32_t);
