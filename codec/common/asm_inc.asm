@@ -76,6 +76,8 @@ BITS 64
 %define arg8 [rsp + push_num*8 + 64]
 %define arg9 [rsp + push_num*8 + 72]
 %define arg10 [rsp + push_num*8 + 80]
+%define arg11 [rsp + push_num*8 + 88]
+%define arg12 [rsp + push_num*8 + 96]
 
 %define r0 rcx
 %define r1 rdx
@@ -123,6 +125,8 @@ BITS 64
 %define arg8 [rsp + push_num*8 + 16]
 %define arg9 [rsp + push_num*8 + 24]
 %define arg10 [rsp + push_num*8 + 32]
+%define arg11 [rsp + push_num*8 + 40]
+%define arg12 [rsp + push_num*8 + 48]
 
 %define r0 rdi
 %define r1 rsi
@@ -170,6 +174,8 @@ BITS 32
 %define arg8 [esp + push_num*4 + 32]
 %define arg9 [esp + push_num*4 + 36]
 %define arg10 [esp + push_num*4 + 40]
+%define arg11 [esp + push_num*4 + 44]
+%define arg12 [esp + push_num*4 + 48]
 
 %define r0 eax
 %define r1 ecx
