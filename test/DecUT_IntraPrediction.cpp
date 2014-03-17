@@ -3,7 +3,6 @@
 #include "typedefs.h"
 #include "ls_defines.h"
 using namespace WelsDec;
-// Reference functions for intra prediction
 #define GENERATE_4x4_UT(pred, ref) \
   TEST(DecoderIntraPredictionTest, pred) { \
   const int32_t kiStride = 32; \
@@ -371,11 +370,11 @@ GENERATE_4x4_UT (WelsI4x4LumaPredHD_c, WelsI4x4LumaPredHD_ref)
 TEST(DecoderIntraPredictionTest, pred) {\
 const int32_t kiStride = 32; \
 int iRunTimes = 1000; \
-uint8_t _pRefBuffer[18 * kiStride + 32]; \
-uint8_t _pPredBuffer[18 * kiStride + 32]; \
+uint8_t _pRefBuffer[18 * kiStride + 64]; \
+uint8_t _pPredBuffer[18 * kiStride + 64]; \
 uint8_t *pRefBuffer, *pPredBuffer; \
-pRefBuffer = (uint8_t*)((((unsigned long)(&_pRefBuffer[15])) >> 4) << 4); \
-pPredBuffer = (uint8_t*)((((unsigned long)(&_pPredBuffer[15])) >> 4) << 4); \
+pRefBuffer = (uint8_t*)((((intptr_t)(&_pRefBuffer[31])) >> 4) << 4); \
+pPredBuffer = (uint8_t*)((((intptr_t)(&_pPredBuffer[31])) >> 4) << 4); \
 srand((unsigned int)time(NULL)); \
 while(iRunTimes--) {\
 for (int i = 0; i < 17; i ++) {\
@@ -491,27 +490,25 @@ void WelsIChromaPredDcTop_ref (uint8_t* pPred, const int32_t kiStride) {
     iTmp -= kiStride;
   } while (i-- > 0);
 }
-
 PREDV (8)
-GENERATE_8x8_UT (WelsIChromaPredV_c, LumaI8x8PredV)
 PREDH (8)
-GENERATE_8x8_UT (WelsIChromaPredH_c, LumaI8x8PredH)
 PREDDCNone (8, 3)
 GENERATE_8x8_UT (WelsIChromaPredDcNA_c, LumaI8x8PredDCNone)
 GENERATE_8x8_UT (WelsIChromaPredPlane_c, WelsIChromaPredPlane_ref)
 GENERATE_8x8_UT (WelsIChromaPredDc_c, WelsIChromaPredDc_ref)
 GENERATE_8x8_UT (WelsIChromaPredDcTop_c, WelsIChromaPredDcTop_ref)
 GENERATE_8x8_UT (WelsIChromaPredDcLeft_c, WelsIChromaPredDcLeft_ref)
-
+GENERATE_8x8_UT (WelsIChromaPredH_c, LumaI8x8PredH)
+GENERATE_8x8_UT (WelsIChromaPredV_c, LumaI8x8PredV)
 #define GENERATE_16x16_UT(pred, ref) \
 TEST(DecoderIntraPredictionTest, pred) {\
 const int32_t kiStride = 32; \
 int32_t iRunTimes = 1000; \
-uint8_t _pRefBuffer[18 * kiStride + 32]; \
-uint8_t _pPredBuffer[18 * kiStride + 32]; \
+uint8_t _pRefBuffer[18 * kiStride + 64]; \
+uint8_t _pPredBuffer[18 * kiStride + 64]; \
 uint8_t *pRefBuffer, *pPredBuffer; \
-pRefBuffer = (uint8_t*)((((unsigned long)(&_pRefBuffer[15])) >> 4) << 4); \
-pPredBuffer = (uint8_t*)((((unsigned long)(&_pPredBuffer[15])) >> 4) << 4); \
+pRefBuffer = (uint8_t*)((((intptr_t)(&_pRefBuffer[31])) >> 4) << 4); \
+pPredBuffer = (uint8_t*)((((intptr_t)(&_pPredBuffer[31])) >> 4) << 4); \
 srand((unsigned int)time(NULL)); \
 while(iRunTimes--) {\
 for (int i = 0; i < 17; i ++) {\
@@ -555,19 +552,19 @@ void WelsI16x16LumaPredPlane_ref (uint8_t* pPred, const int32_t kiStride) {
 }
 
 PREDV (16)
-GENERATE_16x16_UT (WelsI16x16LumaPredV_c, LumaI16x16PredV)
 PREDH (16)
-GENERATE_16x16_UT (WelsI16x16LumaPredH_c, LumaI16x16PredH)
 PREDDC (16, 4)
-GENERATE_16x16_UT (WelsI16x16LumaPredDc_c, LumaI16x16PredDC)
 PREDDCTop (16, 4)
-GENERATE_16x16_UT (WelsI16x16LumaPredDcTop_c, LumaI16x16PredDCTop)
 PREDDCLeft (16, 4)
-GENERATE_16x16_UT (WelsI16x16LumaPredDcLeft_c, LumaI16x16PredDCLeft)
 PREDDCNone (16, 4)
+
 GENERATE_16x16_UT (WelsI16x16LumaPredDcNA_c, LumaI16x16PredDCNone)
 GENERATE_16x16_UT (WelsI16x16LumaPredPlane_c, WelsI16x16LumaPredPlane_ref)
-
+GENERATE_16x16_UT (WelsI16x16LumaPredDcLeft_c, LumaI16x16PredDCLeft)
+GENERATE_16x16_UT (WelsI16x16LumaPredDcTop_c, LumaI16x16PredDCTop)
+GENERATE_16x16_UT (WelsI16x16LumaPredDc_c, LumaI16x16PredDC)
+GENERATE_16x16_UT (WelsI16x16LumaPredH_c, LumaI16x16PredH)
+GENERATE_16x16_UT (WelsI16x16LumaPredV_c, LumaI16x16PredV)
 #if defined(X86_ASM)
 GENERATE_4x4_UT (WelsDecoderI4x4LumaPredH_sse2, LumaI4x4PredH)
 GENERATE_4x4_UT (WelsDecoderI4x4LumaPredDDR_mmx, WelsI4x4LumaPredDDR_ref)
