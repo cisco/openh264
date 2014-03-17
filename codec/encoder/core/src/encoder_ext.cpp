@@ -1730,8 +1730,8 @@ int32_t InitSliceSettings (SWelsSvcCodingParam* pCodingParam, const int32_t kiCp
       break;
     case SM_AUTO_SLICE:
       iMaxSliceCount = MAX_SLICES_NUM;
-	  pDlp->sSliceCfg.sSliceArgument.uiSliceNum = kiCpuCores;
-	  if (pDlp->sSliceCfg.sSliceArgument.uiSliceNum > iMaxSliceCount){
+      pDlp->sSliceCfg.sSliceArgument.uiSliceNum = kiCpuCores;
+      if (pDlp->sSliceCfg.sSliceArgument.uiSliceNum > iMaxSliceCount){
         pDlp->sSliceCfg.sSliceArgument.uiSliceNum = iMaxSliceCount;
       }
       if (pDlp->sSliceCfg.sSliceArgument.uiSliceNum == 1) {

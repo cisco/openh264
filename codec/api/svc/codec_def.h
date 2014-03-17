@@ -75,6 +75,7 @@ typedef enum {
   cmUnkonwReason,
   cmMallocMemeError,                /*Malloc a memory error*/
   cmInitExpected,			  /*Initial action is expected*/
+  cmUnsupportedData,
 } CM_RETURN;
 
 

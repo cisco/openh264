@@ -64,7 +64,7 @@ class ISVCEncoder {
   virtual int EXTAPI Uninitialize() = 0;
 
   /*
-   * return: EVideoFrameType [IDR: videoFrameTypeIDR; P: videoFrameTypeP; ERROR: videoFrameTypeInvalid]
+   * return: 0 - success; otherwise -failed;
    */
   virtual int EXTAPI EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo) = 0;
   /*
