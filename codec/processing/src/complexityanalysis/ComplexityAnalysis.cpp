@@ -178,7 +178,6 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaSad (SPixMap* pSrcPixMap, SPixM
 
   int32_t iGomMbStartIndex = 0, iGomMbEndIndex = 0, iGomMbRowNum = 0;
   int32_t iMbStartIndex = 0, iMbEndIndex = 0;
-  int32_t iStartSampleIndex = 0;
 
   uint8_t* pBackgroundMbFlag = (uint8_t*)m_sComplexityAnalysisParam.pBackgroundMbFlag;
   uint32_t* uiRefMbType = (uint32_t*)m_sComplexityAnalysisParam.uiRefMbType;
@@ -186,17 +185,8 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaSad (SPixMap* pSrcPixMap, SPixM
   int32_t*  pGomForegroundBlockNum = (int32_t*)m_sComplexityAnalysisParam.pGomForegroundBlockNum;
   int32_t*  pGomComplexity = (int32_t*)m_sComplexityAnalysisParam.pGomComplexity;
 
-  uint8_t* pRefY = NULL, *pSrcY = NULL;
-  int32_t iRefStride = 0, iCurStride = 0;
 
-  uint8_t* pRefTmp = NULL, *pCurTmp = NULL;
   uint32_t uiGomSad = 0, uiFrameSad = 0;
-
-  pRefY = (uint8_t*)pRefPixMap->pPixel[0];
-  pSrcY = (uint8_t*)pSrcPixMap->pPixel[0];
-
-  iRefStride  = pRefPixMap->iStride[0];
-  iCurStride  = pSrcPixMap->iStride[0];
 
   InitGomSadFunc (m_pfGomSad, m_sComplexityAnalysisParam.iCalcBgd);
 
@@ -210,13 +200,7 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaSad (SPixMap* pSrcPixMap, SPixM
     iMbStartIndex = iGomMbStartIndex;
     iMbEndIndex = WELS_MIN ((iMbStartIndex / iMbWidth + 1) * iMbWidth, iGomMbEndIndex);
 
-    iStartSampleIndex  = (iMbStartIndex / iMbWidth) * MB_WIDTH_LUMA * iRefStride + (iMbStartIndex % iMbWidth) *
-                         MB_WIDTH_LUMA;
-
     do {
-      pRefTmp = pRefY + iStartSampleIndex;
-      pCurTmp = pSrcY + iStartSampleIndex;
-
       for (int32_t i = iMbStartIndex; i < iMbEndIndex; i ++) {
         m_pfGomSad (&uiGomSad, pGomForegroundBlockNum + j, pVaaCalcResults->pSad8x8[i], pBackgroundMbFlag[i]
                     && !IS_INTRA (uiRefMbType[i]));
@@ -224,9 +208,6 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaSad (SPixMap* pSrcPixMap, SPixM
 
       iMbStartIndex = iMbEndIndex;
       iMbEndIndex = WELS_MIN (iMbEndIndex + iMbWidth , iGomMbEndIndex);
-
-      iStartSampleIndex  = (iMbStartIndex / iMbWidth) * MB_WIDTH_LUMA * iRefStride + (iMbStartIndex % iMbWidth) *
-                           MB_WIDTH_LUMA;
 
     } while (--iGomMbRowNum);
 
@@ -251,19 +232,12 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaVar (SPixMap* pSrcPixMap, SPixM
 
   int32_t iGomMbStartIndex = 0, iGomMbEndIndex = 0, iGomMbRowNum = 0;
   int32_t iMbStartIndex = 0, iMbEndIndex = 0;
-  int32_t iStartSampleIndex = 0;
 
   SVAACalcResult* pVaaCalcResults = m_sComplexityAnalysisParam.pCalcResult;
   int32_t*  pGomComplexity = (int32_t*)m_sComplexityAnalysisParam.pGomComplexity;
 
-  uint8_t* pSrcY = NULL;
-  int32_t iCurStride = 0;
 
-  uint8_t* pCurTmp = NULL;
   uint32_t uiSampleSum = 0, uiSquareSum = 0;
-
-  pSrcY = (uint8_t*)pSrcPixMap->pPixel[0];
-  iCurStride  = pSrcPixMap->iStride[0];
 
   for (int32_t j = 0; j < iGomMbNum; j ++) {
     uiSampleSum = 0;
@@ -276,13 +250,9 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaVar (SPixMap* pSrcPixMap, SPixM
     iMbStartIndex = iGomMbStartIndex;
     iMbEndIndex = WELS_MIN ((iMbStartIndex / iMbWidth + 1) * iMbWidth, iGomMbEndIndex);
 
-    iStartSampleIndex  = (iMbStartIndex / iMbWidth) * MB_WIDTH_LUMA * iCurStride + (iMbStartIndex % iMbWidth) *
-                         MB_WIDTH_LUMA;
     iGomSampleNum = (iMbEndIndex - iMbStartIndex) * MB_WIDTH_LUMA * MB_WIDTH_LUMA;
 
     do {
-      pCurTmp = pSrcY + iStartSampleIndex;
-
       for (int32_t i = iMbStartIndex; i < iMbEndIndex; i ++) {
         uiSampleSum += pVaaCalcResults->pSum16x16[i];
         uiSquareSum += pVaaCalcResults->pSumOfSquare16x16[i];
@@ -291,8 +261,6 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaVar (SPixMap* pSrcPixMap, SPixM
       iMbStartIndex = iMbEndIndex;
       iMbEndIndex = WELS_MIN (iMbEndIndex + iMbWidth, iGomMbEndIndex);
 
-      iStartSampleIndex  = (iMbStartIndex / iMbWidth) * MB_WIDTH_LUMA * iCurStride + (iMbStartIndex % iMbWidth) *
-                           MB_WIDTH_LUMA;
     } while (--iGomMbRowNum);
 
     pGomComplexity[j] = uiSquareSum - (uiSampleSum * uiSampleSum / iGomSampleNum);

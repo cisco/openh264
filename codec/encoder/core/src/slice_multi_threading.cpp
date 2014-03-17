@@ -353,7 +353,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "encpEncCtx= 0x%p\n", (void*) (*ppCtx));
 
   char name[SEM_NAME_MAX] = {0};
-  WELS_THREAD_ERROR_CODE err = 0;
+  WELS_GCC_UNUSED WELS_THREAD_ERROR_CODE err = 0;
 
   iIdx = 0;
   while (iIdx < iThreadNum) {
@@ -602,7 +602,6 @@ int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFr
   SWelsSliceBs* pSliceBs			= &pCtx->pSliceBs[iSliceIdx];
   SNalUnitHeaderExt* pNalHdrExt = &pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt;
   uint8_t* pDst					= pFrameBsBuffer;
-  int32_t pNalLen[2];
   const int32_t kiNalCnt			= pSliceBs->iNalIndex;
   int32_t iNalIdx					= 0;
   int32_t iNalSize = 0;
@@ -616,7 +615,6 @@ int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFr
     iNalSize = 0;
     iReturn = WelsEncodeNal (&pSliceBs->sNalList[iNalIdx], pNalHdrExt, pCtx->iFrameBsSize-kiWrittenLength-iSliceSize, pDst, &iNalSize);
     WELS_VERIFY_RETURN_IFNEQ(iReturn, ENC_RETURN_SUCCESS)
-    pNalLen[iNalIdx] = iNalSize;
     iSliceSize += iNalSize;
     pDst += iNalSize;
     pLbi->iNalLengthInByte[iNalBase + iNalIdx]	= iNalSize;

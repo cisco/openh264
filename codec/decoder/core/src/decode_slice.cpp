@@ -52,8 +52,6 @@
 namespace WelsDec {
 
 int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx) {
-  int32_t iPreQP = 0;
-
   PDqLayer pCurLayer = pCtx->pCurDqLayer;
   PSlice pCurSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
   PSliceHeader pSliceHeader = &pCurSlice->sSliceHeaderExt.sSliceHeader;
@@ -87,8 +85,6 @@ int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx) {
   }
 
   do {
-    iPreQP = pCurLayer->pLumaQp[pCurLayer->iMbXyIndex];
-
     if (WelsTargetMbConstruction (pCtx)) {
       WelsLog (pCtx, WELS_LOG_WARNING, "WelsTargetSliceConstruction():::MB(%d, %d) construction error. pCurSlice_type:%d\n",
                pCurLayer->iMbX, pCurLayer->iMbY, pCurSlice->eSliceType);

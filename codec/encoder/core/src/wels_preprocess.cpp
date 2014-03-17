@@ -306,7 +306,6 @@ void CWelsPreProcess::FreeSpatialPictures (sWelsEncCtx* pCtx) {
 
 int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePicture* kpSrcPic) {
   SWelsSvcCodingParam* pSvcParam = pCtx->pSvcParam;
-  int32_t	iNumDependencyLayer = (int32_t)pSvcParam->iSpatialLayerNum;
   int32_t iSpatialNum = 0;
 
   if (!m_bInitDone) {

@@ -598,7 +598,6 @@ int32_t ParsePrefixNalUnit (PWelsDecoderContext pCtx, PBitStringAux pBs) {
 
 int32_t DecodeSpsSvcExt (PWelsDecoderContext pCtx, PSubsetSps pSpsExt, PBitStringAux pBs) {
   PSpsSvcExt  pExt			= NULL;
-  uint8_t uiChromaArrayType	= 1;
   uint32_t uiCode;
   int32_t iCode;
 
@@ -617,7 +616,6 @@ int32_t DecodeSpsSvcExt (PWelsDecoderContext pCtx, PSubsetSps pSpsExt, PBitStrin
   pExt->uiChromaPhaseXPlus1Flag	=
     0;	// FIXME: Incoherent with JVT X201 standard (= 1), but conformance to JSVM (= 0) implementation.
   pExt->uiChromaPhaseYPlus1		= 1;
-  uiChromaArrayType = pSpsExt->sSps.uiChromaArrayType;
 
   WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //chroma_phase_x_plus1_flag
   pExt->uiChromaPhaseXPlus1Flag	= uiCode;

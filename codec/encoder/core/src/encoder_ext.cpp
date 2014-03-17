@@ -78,11 +78,6 @@ int32_t ParamValidation (SWelsSvcCodingParam* pCfg) {
   float fMaxFrameRate = 0.0f;
   const float fEpsn = 0.000001f;
   int32_t i = 0;
-  int32_t iLastSpatialWidth	= 0;
-  int32_t	iLastSpatialHeight	= 0;
-  float fLastFrameRateIn	= 0.0f;
-  float fLastFrameRateOut	= 0.0f;
-  SDLayerParam* pLastSpatialParam = NULL;
 
   assert (pCfg != NULL);
 
@@ -116,16 +111,6 @@ int32_t ParamValidation (SWelsSvcCodingParam* pCfg) {
   if (fMaxFrameRate > fEpsn && (fMaxFrameRate - pCfg->fMaxFrameRate > fEpsn
                                 || fMaxFrameRate - pCfg->fMaxFrameRate < -fEpsn)) {
     pCfg->fMaxFrameRate	= fMaxFrameRate;
-  }
-
-  for (i = 0; i < pCfg->iSpatialLayerNum; ++ i) {
-    SDLayerParam* fDlp = &pCfg->sDependencyLayers[i];
-
-    pLastSpatialParam	= fDlp;
-    iLastSpatialWidth	= fDlp->iFrameWidth;
-    iLastSpatialHeight	= fDlp->iFrameHeight;
-    fLastFrameRateIn	= fDlp->fInputFrameRate;
-    fLastFrameRateOut	= fDlp->fOutputFrameRate;
   }
 
   return 0;
@@ -680,7 +665,6 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
   SSubsetSps* pSubsetSps			= NULL;
   SWelsPPS* pPps						= NULL;
   CMemoryAlign* pMa				= NULL;
-  SStrideTables* pStrideTab		= NULL;
   int32_t iDlayerCount					= 0;
   int32_t iDlayerIndex					= 0;
   uint32_t iSpsId					= 0;
@@ -696,7 +680,6 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
   iDlayerCount	= pParam->iSpatialLayerNum;
   iNumRef	= pParam->iNumRefFrame;
 //	highest_layers_in_temporal = 1 + WELS_MAX(pParam->iDecompStages, 1);
-  pStrideTab	= (*ppCtx)->pStrideTab;
 
   iDlayerIndex			= 0;
   while (iDlayerIndex < iDlayerCount) {
