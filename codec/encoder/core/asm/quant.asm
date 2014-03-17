@@ -106,10 +106,8 @@ align 16
 WelsQuant4x4Dc_sse2:
  		%assign push_num 0
 		LOAD_3_PARA
-		%ifndef X86_32
-		movsx r1, r1w
-		movsx r2, r2w
-		%endif
+		SIGN_EXTENSION r1, r1w
+		SIGN_EXTENSION r2, r2w
 		;mov		ax,		[mf]
 		SSE2_Copy8Times xmm3, r2d
 
@@ -216,10 +214,8 @@ align 16
 WelsHadamardQuant2x2_mmx:
 		%assign push_num 0
 		LOAD_5_PARA
-		%ifndef X86_32
-		movsx r1, r1w
-		movsx r2, r2w
-		%endif
+		SIGN_EXTENSION r1, r1w
+		SIGN_EXTENSION r2, r2w
 		;mov			eax,			[pDct]
 		movd		mm0,			[r0]
 		movd		mm1,			[r0 + 0x20]
@@ -281,10 +277,8 @@ align 16
 WelsHadamardQuant2x2Skip_mmx:
 		%assign push_num 0
 		LOAD_3_PARA
-		%ifndef X86_32
-		movsx r1, r1w
-		movsx r2, r2w
-		%endif
+		SIGN_EXTENSION r1, r1w
+		SIGN_EXTENSION r2, r2w
 		;mov			eax,			[pDct]
 		movd		mm0,			[r0]
 		movd		mm1,			[r0 + 0x20]

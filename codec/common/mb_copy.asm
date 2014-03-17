@@ -442,12 +442,10 @@ PixelAvgWidthEq4_mmx:
     %assign  push_num 0
     LOAD_7_PARA
 
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r5, r5d
-	movsx	r6, r6d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r5, r5d
+	SIGN_EXTENSION	r6, r6d
 
 ALIGN 4
 .height_loop:
@@ -491,12 +489,10 @@ PixelAvgWidthEq8_mmx:
     %assign  push_num 0
     LOAD_7_PARA
 
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r5, r5d
-	movsx	r6, r6d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r5, r5d
+	SIGN_EXTENSION	r6, r6d
 
 ALIGN 4
 .height_loop:
@@ -531,12 +527,10 @@ PixelAvgWidthEq16_sse2:
 
     %assign  push_num 0
     LOAD_7_PARA
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r5, r5d
-	movsx	r6, r6d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r5, r5d
+	SIGN_EXTENSION	r6, r6d
 ALIGN 4
 .height_loop:
 	movdqu      xmm0, [r2]
@@ -596,11 +590,9 @@ McCopyWidthEq4_mmx:
     %assign  push_num 1
     LOAD_5_PARA
 
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r4, r4d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r4, r4d
 
 ALIGN 4
 .height_loop:
@@ -633,11 +625,9 @@ McCopyWidthEq8_mmx:
     %assign  push_num 0
     LOAD_5_PARA
 
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r4, r4d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r4, r4d
 
 ALIGN 4
 .height_loop:
@@ -680,11 +670,9 @@ McCopyWidthEq16_sse2:
 
     %assign  push_num 0
     LOAD_5_PARA
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r4, r4d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r4, r4d
 ALIGN 4
 .height_loop:
     SSE_READ_UNA	xmm0, r0

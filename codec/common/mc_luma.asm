@@ -94,11 +94,9 @@ McHorVer20WidthEq4_mmx:
 
     %assign  push_num 0
     LOAD_5_PARA
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r4, r4d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r4, r4d
 
 	sub r0, 2
 	WELS_Zero mm7
@@ -198,11 +196,9 @@ McHorVer22Width8HorFirst_sse2:
 
 	%assign  push_num 0
     LOAD_5_PARA
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r4, r4d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r4, r4d
 	pxor xmm7, xmm7
 
 	sub r0, r1				;;;;;;;;need more 5 lines.
@@ -260,11 +256,9 @@ McHorVer20WidthEq8_sse2:
 
 	%assign  push_num 0
     LOAD_5_PARA
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r4, r4d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r4, r4d
 	lea r0, [r0-2]            ;pSrc -= 2;
 
 	pxor xmm7, xmm7
@@ -325,11 +319,9 @@ McHorVer20WidthEq16_sse2:
 
 	%assign  push_num 0
     LOAD_5_PARA
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r4, r4d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r4, r4d
 	lea r0, [r0-2]            ;pSrc -= 2;
 
 	pxor xmm7, xmm7
@@ -416,11 +408,9 @@ McHorVer02WidthEq8_sse2:
 
 	%assign  push_num 0
     LOAD_5_PARA
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r4, r4d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r4, r4d
 	sub r0, r1
 	sub r0, r1
 
@@ -526,12 +516,10 @@ McHorVer02Height9Or17_sse2:
 
 	%assign  push_num 0
     LOAD_6_PARA
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r4, r4d
-	movsx	r5, r5d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r4, r4d
+	SIGN_EXTENSION	r5, r5d
 
 %ifndef X86_32
 	push r12
@@ -675,12 +663,10 @@ McHorVer20Width9Or17_sse2:
 
 	%assign  push_num 0
     LOAD_6_PARA
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r4, r4d
-	movsx	r5, r5d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r4, r4d
+	SIGN_EXTENSION	r5, r5d
 	sub r0, 2
 	pxor xmm7, xmm7
 
@@ -845,12 +831,10 @@ McHorVer22HorFirst_sse2:
 
 	%assign  push_num 0
     LOAD_6_PARA
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r4, r4d
-	movsx	r5, r5d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r4, r4d
+	SIGN_EXTENSION	r5, r5d
 	pxor xmm7, xmm7
 	sub r0, r1				;;;;;;;;need more 5 lines.
 	sub r0, r1
@@ -1026,12 +1010,10 @@ McHorVer22HorFirst_sse2:
 
 	%assign  push_num 0
     LOAD_6_PARA
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r4, r4d
-	movsx	r5, r5d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r4, r4d
+	SIGN_EXTENSION	r5, r5d
 %ifndef X86_32
 	push r12
 	push r13
@@ -1172,12 +1154,10 @@ McHorVer22HorFirst_sse2:
 
 	%assign  push_num 0
     LOAD_6_PARA
-%ifndef X86_32
-	movsx	r1, r1d
-	movsx	r3, r3d
-	movsx	r4, r4d
-	movsx	r5, r5d
-%endif
+	SIGN_EXTENSION	r1, r1d
+	SIGN_EXTENSION	r3, r3d
+	SIGN_EXTENSION	r4, r4d
+	SIGN_EXTENSION	r5, r5d
 %ifndef X86_32
 	push r12
 	push r13

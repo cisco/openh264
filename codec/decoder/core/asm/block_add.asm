@@ -59,9 +59,7 @@ WelsResBlockZero16x16_sse2:
         ;push     r0
         %assign push_num 0
         LOAD_2_PARA
-		%ifndef X86_32
-		movsx r1, r1d
-		%endif
+	SIGN_EXTENSION r1, r1d
 	;mov      r0,        [esp+08h]
 	;mov      r1,        [esp+0ch]
 	;lea      r1,        [r1*2]
@@ -140,9 +138,7 @@ WelsResBlockZero8x8_sse2:
 	  ;push      r0
 	  %assign push_num 0
           LOAD_2_PARA
-		  %ifndef X86_32
-		  movsx r1, r1d
-		  %endif
+	  SIGN_EXTENSION r1, r1d
       	  ;mov       r0,     [esp+08h]
 	  ;mov       r1,     [esp+0ch]
 	  lea       r1,     [r1*2]
