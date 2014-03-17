@@ -81,7 +81,7 @@ EResult CSceneChangeDetection::Process (int32_t iType, SPixMap* pSrcPixMap, SPix
   iRefRowStride  = pRefPixMap->iStride[0] << 3;
   iCurRowStride  = pSrcPixMap->iStride[0] << 3;
 
-  m_sSceneChangeParam.bSceneChangeFlag = 0;
+  m_sSceneChangeParam.eSceneChangeIdc = SIMILAR_SCENE;
 
   for (int32_t j = 0; j < iBlock8x8Height; j ++) {
     pRefTmp	= pRefY;
@@ -101,7 +101,7 @@ EResult CSceneChangeDetection::Process (int32_t iType, SPixMap* pSrcPixMap, SPix
   }
 
   if (iMotionBlockNum >= iSceneChangeThreshold) {
-    m_sSceneChangeParam.bSceneChangeFlag = 1;
+    m_sSceneChangeParam.eSceneChangeIdc = LARGE_CHANGED_SCENE;
   }
 
   eReturn = RET_SUCCESS;
