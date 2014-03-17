@@ -81,8 +81,8 @@ void BaseEncoderTest::EncodeStream(InputStream* in, int width, int height,
   pic.pData[2] = pic.pData[1] + (width*height>>2);
   while (in->read(buf.data(), frameSize) == frameSize) {
     rv = encoder_->EncodeFrame(&pic, &info);
-    ASSERT_TRUE(rv != videoFrameTypeInvalid);
-    if (rv != videoFrameTypeSkip && cbk != NULL) {
+    ASSERT_TRUE(rv == cmResultSuccess);
+    if (info.eOutputFrameType != videoFrameTypeSkip && cbk != NULL) {
       cbk->onEncodeFrame(info);
     }
   }
