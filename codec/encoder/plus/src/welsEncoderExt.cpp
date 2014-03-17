@@ -512,7 +512,7 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
   }
 
   const int32_t kiEncoderReturn = EncodeFrameInternal(kpSrcPic, pBsInfo);
- 
+
   switch (kiEncoderReturn) {
   case ENC_RETURN_MEMALLOCERR:
     WelsUninitEncoderExt (&m_pEncContext);
