@@ -136,11 +136,6 @@ ALIGN 16
 ;***********************************************************************
 WELS_EXTERN WelsDctT4_mmx
 WelsDctT4_mmx:
-    ;push    ebx
-    ;mov     eax, [esp+12]   ; pix1
-    ;mov     ebx, [esp+16]   ; i_pix1
-    ;mov     ecx, [esp+20]   ; pix2
-    ;mov     edx, [esp+24]   ; i_pix2
     %assign push_num 0
     LOAD_5_PARA
     SIGN_EXTENSION r2, r2d
@@ -155,14 +150,12 @@ WelsDctT4_mmx:
     MMX_DCT			mm3, mm5, mm2 ,mm4, mm1, mm6
     MMX_Trans4x4W	mm2, mm3, mm4, mm1, mm5
 
-    ;mov     eax, [esp+ 8]   ; pDct
     movq    [r0+ 0],   mm2
     movq    [r0+ 8],   mm1
     movq    [r0+16],   mm5
     movq    [r0+24],   mm4
     WELSEMMS
     LOAD_5_PARA_POP
-    ;pop     ebx
     ret
 
 
@@ -171,26 +164,14 @@ WelsDctT4_mmx:
 ;***********************************************************************
 WELS_EXTERN WelsIDctT4Rec_mmx
 WelsIDctT4Rec_mmx:
-	;push   ebx
-;%define	pushsize	4
-;%define     p_dst       esp+pushsize+4
-;%define     i_dst       esp+pushsize+8
-;%define     p_pred      esp+pushsize+12
-;%define     i_pred      esp+pushsize+16
-;%define     pDct        esp+pushsize+20
     %assign push_num 0
     LOAD_5_PARA
     SIGN_EXTENSION r1, r1d
     SIGN_EXTENSION r3, r3d
-;	mov     eax, [pDct   ]
     movq    mm0, [r4+ 0]
     movq    mm1, [r4+ 8]
     movq    mm2, [r4+16]
     movq    mm3, [r4+24]
-    ;mov     edx, [p_dst ] ; r0
-    ;mov     ecx, [i_dst ] ; r1
-    ;mov     eax, [p_pred] ; r2
-    ;mov     ebx, [i_pred] ; r3
 
 	MMX_Trans4x4W		mm0, mm1, mm2, mm3, mm4
 	MMX_IDCT			mm1, mm2, mm3, mm4, mm0, mm6
@@ -209,13 +190,6 @@ WelsIDctT4Rec_mmx:
 
 	WELSEMMS
     LOAD_5_PARA_POP
-;%undef	pushsize
-;%undef  p_dst
-;%undef  i_dst
-;%undef  p_pred
-;%undef  i_pred
-;%undef  pDct
-;    pop ebx
     ret
 
 
@@ -319,13 +293,6 @@ WelsIDctT4Rec_mmx:
 WELS_EXTERN WelsDctFourT4_sse2
 ALIGN 16
 WelsDctFourT4_sse2:
-    ;push    ebx
-    ;push	esi
-    ;mov		esi, [esp+12]
-    ;mov     eax, [esp+16]   ; pix1
-    ;mov     ebx, [esp+20]   ; i_pix1
-    ;mov     ecx, [esp+24]   ; pix2
-    ;mov     edx, [esp+28]   ; i_pix2
     %assign push_num 0
     LOAD_5_PARA
     SIGN_EXTENSION r2, r2d
@@ -365,32 +332,16 @@ WelsDctFourT4_sse2:
 	lea		r0, [r0+64]
 	SSE2_Store4x8p r0, xmm4, xmm2, xmm3, xmm0, xmm5
 
-    ;pop esi
-    ;pop ebx
 	LOAD_5_PARA_POP
     ret
 
 
-;%define		rec			esp + pushsize + 4
-;%define		stride		esp + pushsize + 8
-;%define		pred		esp + pushsize + 12
-;%define		pred_stride	esp + pushsize + 16
-;%define		rs			esp + pushsize + 20
 ;***********************************************************************
 ; void WelsIDctFourT4Rec_sse2(uint8_t *rec, int32_t stride, uint8_t *pred, int32_t pred_stride, int16_t *rs);
 ;***********************************************************************
 WELS_EXTERN WelsIDctFourT4Rec_sse2
 ALIGN 16
 WelsIDctFourT4Rec_sse2:
-;%define	pushsize	8
-;    push		ebx
-;    push		esi
-
-;    mov			eax,		[rec]
-;    mov			ebx,		[stride]
-;    mov			ecx,		[pred]
-;    mov			edx,		[pred_stride]
-;    mov			esi,		[rs]
 	%assign push_num 0
 	LOAD_5_PARA
 	SIGN_EXTENSION r1, r1d
@@ -449,21 +400,11 @@ WelsIDctFourT4Rec_sse2:
 ;***********************************************************************
 WELS_EXTERN WelsIDctRecI16x16Dc_sse2
 ALIGN 16
-;%define		pushsize	8
-;%define		luma_dc		esp + pushsize + 20
 WelsIDctRecI16x16Dc_sse2:
 	%assign push_num 0
 	LOAD_5_PARA
 	SIGN_EXTENSION r1, r1d
 	SIGN_EXTENSION r3, r3d
-   ; push		esi
-   ; push		edi
-
-   ;mov			ecx,		[luma_dc] ; r4
-    ;mov			eax,		[rec] ; r0
-    ;mov			edx,		[stride] ; r1
-    ;mov			esi,		[pred]; r2
-    ;mov			edi,		[pred_stride]; r3
 	pxor		xmm7,		xmm7
     WELS_DW32	xmm6
 
@@ -499,8 +440,6 @@ WelsIDctRecI16x16Dc_sse2:
 	lea			r2,		[r2 + 2 * r3]
 	SSE2_StoreDiff4x8p		xmm2, xmm3, xmm5, xmm7, r0, r2, r1, r3
 	LOAD_5_PARA_POP
-    ;pop		edi
-    ;pop		esi
     ret
 
 
@@ -537,8 +476,6 @@ WelsIDctRecI16x16Dc_sse2:
 ;***********************************************************************
 WELS_EXTERN WelsHadamardT4Dc_sse2
 WelsHadamardT4Dc_sse2:
-		;mov			eax,		[esp + 4]	; luma_dc
-		;mov			ecx,		[esp + 8]	; pDct
 		%assign push_num 0
 		LOAD_2_PARA
 		SSE2_Load4Col	    xmm1, xmm5, xmm6, xmm0, r1

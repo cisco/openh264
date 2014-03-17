@@ -55,7 +55,6 @@ WELS_EXTERN WelsPrefetchZero_mmx
 WelsPrefetchZero_mmx:
 	%assign  push_num 0
 	LOAD_1_PARA
-	;mov  eax,[esp+4]
 	prefetchnta [r0]
 	ret
 

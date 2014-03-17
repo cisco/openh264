@@ -83,15 +83,6 @@ ALIGN 16
 ;						int iHeight)
 ;*******************************************************************************
 McHorVer20WidthEq4_mmx:
-	;push esi
-	;push edi
-
-	;mov esi, [esp+12]
-	;mov eax, [esp+16]
-	;mov edi, [esp+20]
-	;mov ecx, [esp+24]
-	;mov edx, [esp+28]
-
     %assign  push_num 0
     LOAD_5_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -185,15 +176,6 @@ ALIGN 16
 ;                       )
 ;***********************************************************************
 McHorVer22Width8HorFirst_sse2:
-	;push esi
-	;push edi
-	;push ebx
-	;mov esi, [esp+16]     ;pSrc
-	;mov eax, [esp+20]	;iSrcStride
-	;mov edi, [esp+24]		;pDst
-	;mov edx, [esp+28]	;iDstStride
-	;mov ebx, [esp+32]	;iHeight
-
 	%assign  push_num 0
     LOAD_5_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -245,15 +227,6 @@ ALIGN 16
 ;                      );
 ;*******************************************************************************
 McHorVer20WidthEq8_sse2:
-	;push	esi
-	;push	edi
-
-	;mov esi, [esp + 12]         ;pSrc
-	;mov eax, [esp + 16]         ;iSrcStride
-	;mov edi, [esp + 20]         ;pDst
-	;mov ecx, [esp + 28]         ;iHeight
-	;mov edx, [esp + 24]			;iDstStride
-
 	%assign  push_num 0
     LOAD_5_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -309,14 +282,6 @@ ALIGN 16
 ;                      );
 ;*******************************************************************************
 McHorVer20WidthEq16_sse2:
-	;push	esi
-	;push	edi
-	;mov esi, [esp + 12]         ;pSrc
-	;mov eax, [esp + 16]         ;iSrcStride
-	;mov edi, [esp + 20]         ;pDst
-	;mov ecx, [esp + 28]         ;iHeight
-	;mov edx, [esp + 24]			;iDstStride
-
 	%assign  push_num 0
     LOAD_5_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -398,14 +363,6 @@ McHorVer20WidthEq16_sse2:
 ;*******************************************************************************
 ALIGN 16
 McHorVer02WidthEq8_sse2:
-	;push esi
-	;push edi
-	;mov esi, [esp + 12]           ;pSrc
-	;mov edx, [esp + 16]	          ;iSrcStride
-	;mov edi, [esp + 20]           ;pDst
-	;mov eax, [esp + 24]           ;iDstStride
-	;mov ecx, [esp + 28]           ;iHeight
-
 	%assign  push_num 0
     LOAD_5_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -503,17 +460,6 @@ WELS_EXTERN McHorVer22HorFirst_sse2
 ;***********************************************************************
 ALIGN 16
 McHorVer02Height9Or17_sse2:
-	;push esi
-	;push edi
-	;push ebx
-
-	;mov esi, [esp + 16]
-	;mov edx, [esp + 20]
-	;mov edi, [esp + 24]
-	;mov eax, [esp + 28]
-	;mov ecx, [esp + 36]
-	;mov ebx, [esp + 32]
-
 	%assign  push_num 0
     LOAD_6_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -612,9 +558,6 @@ McHorVer02Height9Or17_sse2:
 .x_loop_dec:
 	dec r4
 	jz  near .xx_exit
-	;mov esi, [esp + 16]
-	;mov edi, [esp + 24]
-	;mov ecx, [esp + 36]
 %ifdef X86_32
 	mov	r0, arg1
 	mov r2, arg3
@@ -651,16 +594,6 @@ ALIGN 16
 ;                      );
 ;***********************************************************************
 McHorVer20Width9Or17_sse2:
-	;push esi
-	;push edi
-	;push ebx
-	;mov esi, [esp+16]
-	;mov eax, [esp+20]
-	;mov edi, [esp+24]
-	;mov edx, [esp+28]
-	;mov ecx, [esp+32]
-	;mov ebx, [esp+36]
-
 	%assign  push_num 0
     LOAD_6_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -819,16 +752,6 @@ ALIGN 16
 ;							int32_t iWidth,int32_t iHeight);
 ;***********************************************************************
 McHorVer22HorFirst_sse2:
-	;push esi
-	;push edi
-	;push ebx
-	;mov esi, [esp+16]
-	;mov eax, [esp+20]
-	;mov edi, [esp+24]
-	;mov edx, [esp+28]
-	;mov ecx, [esp+32]
-	;mov ebx, [esp+36]
-
 	%assign  push_num 0
     LOAD_6_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -996,18 +919,6 @@ McHorVer22HorFirst_sse2:
 ;***********************************************************************
 
  McHorVer22Width8VerLastAlign_sse2:
-	;push esi
-	;push edi
-	;push ebx
-	;push ebp
-
-	;mov esi, [esp+20]
-	;mov eax, [esp+24]
-	;mov edi, [esp+28]
-	;mov edx, [esp+32]
-	;mov ebx, [esp+36]
-	;mov ecx, [esp+40]
-
 	%assign  push_num 0
     LOAD_6_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -1104,9 +1015,6 @@ McHorVer22HorFirst_sse2:
 .x_loop_dec:
 	dec r4
 	jz near .exit
-	;mov esi, [esp+20]
-	;mov edi, [esp+28]
-	;mov ecx, [esp+40]
 %ifdef X86_32
 	mov	r0, arg1
 	mov r2, arg3
@@ -1140,18 +1048,6 @@ McHorVer22HorFirst_sse2:
 ;***********************************************************************
 
  McHorVer22Width8VerLastUnAlign_sse2:
-	;push esi
-	;push edi
-	;push ebx
-	;push ebp
-
-	;mov esi, [esp+20]
-	;mov eax, [esp+24]
-	;mov edi, [esp+28]
-	;mov edx, [esp+32]
-	;mov ebx, [esp+36]
-	;mov ecx, [esp+40]
-
 	%assign  push_num 0
     LOAD_6_PARA
 	SIGN_EXTENSION	r1, r1d
@@ -1247,9 +1143,6 @@ McHorVer22HorFirst_sse2:
 .x_loop_dec:
 	dec r4
 	jz near .exit
-	;mov esi, [esp+20]
-	;mov edi, [esp+28]
-	;mov ecx, [esp+40]
 %ifdef X86_32
 	mov	r0, arg1
 	mov r2, arg3

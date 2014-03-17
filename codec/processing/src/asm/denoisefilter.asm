@@ -172,11 +172,6 @@ WELS_EXTERN BilateralLumaFilter8_sse2
 ;	4	0	5
 ;	6	7	8
 ;	0:	the center point
-%define		pushsize	4
-;%define		pixel		esp + pushsize + 4
-;%define		stride		esp + pushsize + 8
-;%define         pixel  r0
-;%define         stride r1
 
 BilateralLumaFilter8_sse2:
 

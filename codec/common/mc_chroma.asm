@@ -76,17 +76,11 @@ ALIGN 16
 ;*******************************************************************************
 WELS_EXTERN McChromaWidthEq4_mmx
 McChromaWidthEq4_mmx:
-	;push esi
-	;push edi
-	;push ebx
-
 	%assign  push_num 0
 	LOAD_6_PARA
 	SIGN_EXTENSION	r1, r1d
 	SIGN_EXTENSION	r3, r3d
 	SIGN_EXTENSION	r5, r5d
-
-	;mov eax, [esp +12 + 20]
 
 	movd mm3, [r4];	[eax]
 	WELS_Zero mm7
@@ -102,12 +96,6 @@ McChromaWidthEq4_mmx:
 	movq	  mm6, mm4
 	punpcklbw mm4, mm7
 	punpckhbw mm6, mm7
-
-	;mov esi, [esp +12+ 4]
-	;mov eax, [esp + 12 + 8]
-	;mov edi, [esp + 12 + 12]
-	;mov edx, [esp + 12 + 16]
-    ;mov ecx, [esp + 12 + 24]
 
 	lea r4, [r0 + r1] ;lea ebx, [esi + eax]
 	movd mm0, [r0]
@@ -149,9 +137,6 @@ McChromaWidthEq4_mmx:
 	jnz near .xloop
 	WELSEMMS
 	LOAD_6_PARA_POP
-	;pop ebx
-	;pop edi
-	;pop esi
 	ret
 
 
@@ -166,17 +151,12 @@ ALIGN 16
 ;*******************************************************************************
 WELS_EXTERN McChromaWidthEq8_sse2
 McChromaWidthEq8_sse2:
-	;push esi
-	;push edi
-	;push ebx
-
 	%assign  push_num 0
 	LOAD_6_PARA
 	SIGN_EXTENSION	r1, r1d
 	SIGN_EXTENSION	r3, r3d
 	SIGN_EXTENSION	r5, r5d
 
-	;mov eax, [esp +12 + 20]
 	movd xmm3, [r4]
 	WELS_Zero xmm7
 	punpcklbw  xmm3, xmm3
@@ -192,12 +172,6 @@ McChromaWidthEq8_sse2:
 	punpckhbw  xmm5, xmm7
 	punpcklbw  xmm4, xmm7
 	punpckhbw  xmm6, xmm7
-
-	;mov esi, [esp +12+ 4]
-	;mov eax, [esp + 12 + 8]
-	;mov edi, [esp + 12 + 12]
-	;mov edx, [esp + 12 + 16]
-    ;mov ecx, [esp + 12 + 24]
 
 	lea r4, [r0 + r1] ;lea ebx, [esi + eax]
 	movq xmm0, [r0]
@@ -240,9 +214,6 @@ McChromaWidthEq8_sse2:
 
 	LOAD_6_PARA_POP
 
-	;pop ebx
-	;pop edi
-	;pop esi
 	ret
 
 
@@ -259,16 +230,11 @@ ALIGN 16
 ;***********************************************************************
 WELS_EXTERN McChromaWidthEq8_ssse3
 McChromaWidthEq8_ssse3:
-	;push ebx
-	;push esi
-	;push edi
 	%assign  push_num 0
 	LOAD_6_PARA
 	SIGN_EXTENSION	r1, r1d
 	SIGN_EXTENSION	r3, r3d
 	SIGN_EXTENSION	r5, r5d
-
-	;mov eax, [esp + 12 + 20]
 
     pxor      xmm7, xmm7
     movd   xmm5, [r4]
@@ -277,12 +243,6 @@ McChromaWidthEq8_ssse3:
     movdqa    xmm6, xmm5
     punpcklqdq xmm5, xmm5
     punpckhqdq xmm6, xmm6
-
-	;mov eax, [esp + 12 + 4]
-	;mov edx, [esp + 12 + 8]
-	;mov esi, [esp + 12 + 12]
-	;mov edi, [esp + 12 + 16]
-    ;mov ecx, [esp + 12 + 24]
 
     sub r2, r3 ;sub esi, edi
     sub r2, r3
@@ -329,10 +289,6 @@ McChromaWidthEq8_ssse3:
 	jnz .hloop_chroma
 
 	LOAD_6_PARA_POP
-
-	;pop edi
-	;pop esi
-	;pop ebx
 
 	ret
 

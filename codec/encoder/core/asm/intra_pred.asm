@@ -234,10 +234,6 @@ WelsI4x4LumaPredH_sse2:
 ; void WelsI16x16LumaPredPlane_sse2(uint8_t *pred, uint8_t *pRef, int32_t stride);
 ;***********************************************************************
 WelsI16x16LumaPredPlane_sse2:
-		;%define pushsize	4
-		;push	esi
-		;mov		esi,	[esp + pushsize + 8]
-		;mov		ecx,	[esp + pushsize + 12]
 		push r3
 		push r4
 		%assign push_num 2
@@ -293,7 +289,6 @@ WelsI16x16LumaPredPlane_sse2:
 		sar		r3,	6				; c = (5 * V + 32) >> 6;
 		SSE2_Copy8Times	xmm4, r3d		; xmm4 = c,c,c,c,c,c,c,c
 
-		;mov		esi,	[esp + pushsize + 4]
 		add		r4,	16
 		imul	r3,	-7
 		add		r3,	r4				; s = a + 16 + (-7)*c
@@ -367,9 +362,6 @@ WelsI16x16LumaPredH_sse2:
 ;***********************************************************************
 WELS_EXTERN WelsI16x16LumaPredV_sse2
 WelsI16x16LumaPredV_sse2:
-    ;mov     edx, [esp+4]    ; pred
-    ;mov     eax, [esp+8]	; pRef
-    ;mov     ecx, [esp+12]   ; stride
     %assign push_num 0
     LOAD_3_PARA
     SIGN_EXTENSION r2, r2d
@@ -400,10 +392,6 @@ WelsI16x16LumaPredV_sse2:
 ;***********************************************************************
 WELS_EXTERN WelsIChromaPredPlane_sse2
 WelsIChromaPredPlane_sse2:
-		;%define pushsize	4
-		;push	esi
-		;mov		esi,	[esp + pushsize + 8]	;pRef
-		;mov		ecx,	[esp + pushsize + 12]	;stride
 		push r3
 		push r4
 		%assign push_num 2
@@ -462,7 +450,6 @@ WelsIChromaPredPlane_sse2:
 		sar		r3,	5				; c = (17 * V + 16) >> 5;
 		SSE2_Copy8Times	xmm4, r3d	; mm4 = c,c,c,c,c,c,c,c
 
-		;mov		esi,	[esp + pushsize + 4]
 		add		r4,	16
 		imul	r3,	-3
 		add		r3,	r4		; s = a + 16 + (-3)*c
@@ -502,9 +489,6 @@ ALIGN 16
 ;
 ;***********************************************************************
 WelsI4x4LumaPredDDR_mmx:
-	;mov			edx,[esp+4]			;pred
-	;mov         eax,[esp+8]			;pRef
-	;mov			ecx,[esp+12]		;stride
 	%assign push_num 0
 	LOAD_3_PARA
 	SIGN_EXTENSION r2, r2d
@@ -619,9 +603,6 @@ ALIGN 16
 
 WELS_EXTERN WelsIChromaPredH_mmx
 WelsIChromaPredH_mmx:
-	;mov			edx,	[esp+4]			;pred
-	;mov         eax,	[esp+8]			;pRef
-	;mov			ecx,	[esp+12]		;stride
 	%assign push_num 0
 	LOAD_3_PARA
 	SIGN_EXTENSION r2, r2d
