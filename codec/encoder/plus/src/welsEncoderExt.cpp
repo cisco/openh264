@@ -508,11 +508,28 @@ int32_t CWelsH264SVCEncoder::RawData2SrcPic (const uint8_t* pSrc) {
  */
 int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo) {
   if (! (kpSrcPic && m_pEncContext && m_bInitialFlag)) {
-    return videoFrameTypeInvalid;
+    return cmInitParaError;
   }
 
-  int32_t uiFrameType = videoFrameTypeInvalid;
-  uiFrameType = EncodeFrameInternal(kpSrcPic, pBsInfo);
+  const int32_t kiEncoderReturn = EncodeFrameInternal(kpSrcPic, pBsInfo);
+
+  switch (kiEncoderReturn) {
+  case ENC_RETURN_MEMALLOCERR:
+    WelsUninitEncoderExt (&m_pEncContext);
+    return cmMallocMemeError;
+  case ENC_RETURN_SUCCESS:
+  case ENC_RETURN_CORRECTED:
+    break;//continue processing
+  case ENC_RETURN_UNSUPPORTED_PARA:
+    return cmUnsupportedData;
+	break;
+  case ENC_RETURN_UNEXPECTED:
+    return cmUnkonwReason;
+  default:
+    WelsLog (m_pEncContext, WELS_LOG_ERROR, "unexpected return(%d) from WelsEncoderEncodeExt()!\n", kiEncoderReturn);
+    return cmUnkonwReason;
+  }
+
 
 #ifdef REC_FRAME_COUNT
   ++ m_uiCountFrameNum;
@@ -524,7 +541,7 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
   DumpSrcPicture (pSrc);
 #endif // DUMP_SRC_PICTURE
 
-  return uiFrameType;
+  return cmResultSuccess;
 }
 
 
