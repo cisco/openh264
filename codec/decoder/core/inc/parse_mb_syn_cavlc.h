@@ -186,7 +186,6 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable,
                                 int32_t iResidualProperty,
                                 /*short *tCoeffLevel,*/
                                 int16_t* pTCoeff,
-                                int32_t iMbMode,
                                 uint8_t uiQp,
                                 PWelsDecoderContext pCtx);
 

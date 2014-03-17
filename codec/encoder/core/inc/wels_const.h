@@ -176,12 +176,6 @@ enum {
 };
 
 enum {
-  BASE_MB = 0,
-  AVC_REWRITE_ENHANCE_MB = 1,
-  NON_AVC_REWRITE_ENHANCE_MB = 2
-};
-
-enum {
   ENC_RETURN_SUCCESS = 0,
   ENC_RETURN_MEMALLOCERR = 0x01, //will free memory and uninit
   ENC_RETURN_UNSUPPORTED_PARA = 0x02, //unsupported setting
