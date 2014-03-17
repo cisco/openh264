@@ -66,10 +66,6 @@ sse2_plane_mul_b_c dw -3, -2, -1, 0, 1, 2, 3, 4
 
 align 16
 mmx_01bytes:		times 16	db 1
-;align 16
-;sse_0x0004bytes:	times 8		dw 4
-;ALIGN 16
-;sse_f000 db  255,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 align 16
 mmx_0x02: dw 0x02, 0x00, 0x00, 0x00
