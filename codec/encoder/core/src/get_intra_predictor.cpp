@@ -468,7 +468,7 @@ void WelsIChormaPredPlane_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStri
 
   for (i = 0 ; i < 8 ; i ++) {
     for (j = 0 ; j < 8 ; j ++) {
-      pPred[j] = (uint8_t)WelsClip1 ((iLTshift + iTopshift * (j - 3) + iLeftshift * (i - 3) + 16) >> 5);
+      pPred[j] = WelsClip1 ((iLTshift + iTopshift * (j - 3) + iLeftshift * (i - 3) + 16) >> 5);
     }
     pPred += I8x8_PRED_STRIDE;
   }
@@ -622,7 +622,7 @@ void WelsI16x16LumaPredPlane_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiS
 
   for (i = 0 ; i < 16 ; i ++) {
     for (j = 0 ; j < 16 ; j ++) {
-      pPred[j] = (uint8_t)WelsClip1 ((iLTshift + iTopshift * (j - 7) + iLeftshift * (i - 7) + 16) >> 5);
+      pPred[j] = WelsClip1 ((iLTshift + iTopshift * (j - 7) + iLeftshift * (i - 7) + 16) >> 5);
     }
     pPred += iPredStride;
   }
