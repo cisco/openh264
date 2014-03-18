@@ -977,6 +977,8 @@ int32_t WelsMdP16x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurLayer, SWelsMD* pWe
   const int32_t kiMbWidth	= pCurLayer->iMbWidth;	// for assign once
   const int32_t kiMbHeight	= pCurLayer->iMbHeight;
 
+  sMe16x16->iCurMeBlockPixX = pWelsMd->iMbPixX;
+  sMe16x16->iCurMeBlockPixY = pWelsMd->iMbPixY;
   sMe16x16->uiPixel = BLOCK_16x16;
   sMe16x16->pMvdCost = pWelsMd->pMvdCost;
 
@@ -1078,18 +1080,22 @@ int32_t WelsMdP8x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWe
   int32_t iLineSizeEnc = pCurDqLayer->iEncStride[0];
   int32_t iLineSizeRef = pCurDqLayer->pRefPic->iLineSize[0];
   SWelsME* sMe8x8;
-  int32_t i, iIdxX, iIdxY, iStrideEnc, iStrideRef;
+  int32_t i, iIdxX, iIdxY, iPixelX, iPixelY, iStrideEnc, iStrideRef;
   int32_t iCostP8x8 = 0;
   for (i = 0; i < 4; i++) {
     iIdxX = i & 1;
     iIdxY = i >> 1;
-    iStrideEnc = (iIdxX << 3) + ((iIdxY << 3) * iLineSizeEnc);
-    iStrideRef = (iIdxX << 3) + ((iIdxY << 3) * iLineSizeRef);
+    iPixelX = (iIdxX << 3);
+    iPixelY = (iIdxY << 3);
+    iStrideEnc = iPixelX + ( iPixelY * iLineSizeEnc);
+    iStrideRef = iPixelX + ( iPixelY * iLineSizeRef);
 
     sMe8x8 = &pWelsMd->sMe.sMe8x8[i];
 
+    sMe8x8->iCurMeBlockPixX = pWelsMd->iMbPixX + iPixelX;
+    sMe8x8->iCurMeBlockPixY = pWelsMd->iMbPixY + iPixelY;
     sMe8x8->uiPixel = BLOCK_8x8;
-    sMe8x8->pMvdCost     = pWelsMd->pMvdCost;
+    sMe8x8->pMvdCost = pWelsMd->pMvdCost;
 
     sMe8x8->pEncMb       = pMbCache->SPicData.pEncMb[0] + iStrideEnc;
     sMe8x8->pRefMb       = pMbCache->SPicData.pRefMb[0] + iStrideRef;

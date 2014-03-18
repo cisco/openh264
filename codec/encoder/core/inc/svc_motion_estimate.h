@@ -59,14 +59,20 @@ uint16_t*					pMvdCost;
 union SadPredISatdUnit	uSadPredISatd; //reuse the sad_pred as a temp pData
 uint32_t					uiSadCost;  //used by ME and RC //max SAD should be max_delta*size+lambda*mvdsize = 255*256+91*33*2 = 65280 + 6006 = 71286 > (2^16)-1 = 65535
 uint32_t					uiSatdCost; /* satd + lm * nbits */
+uint32_t					uiSadCostThreshold;
+int32_t						iCurMeBlockPixX;
+int32_t						iCurMeBlockPixY;
 uint8_t						uiPixel;   /* PIXEL_WxH */
 uint8_t						uiReserved;
 
 uint8_t*						pEncMb;
 uint8_t*						pRefMb;
+uint8_t*						pColoRefMb;
 
 SMVUnitXY					sMvp;
 SMVUnitXY					sMvBase;
+SMVUnitXY					sDirectionalMv;
+
 /* output */
 SMVUnitXY					sMv;
 } SWelsME;
