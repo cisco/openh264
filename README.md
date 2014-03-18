@@ -51,6 +51,8 @@ Building the Library
 --------------------
 NASM needed to be installed for assembly code: workable version 2.07 or above, nasm can downloaded from http://www.nasm.us/
 
+To build the arm assembly for Windows Phone, gas-preprocessor is required. It can be downloaded from git://git.libav.org/gas-preprocessor.git
+
 For Android Builds
 ------------------
 To build for android platform, You need to install android sdk and ndk. You also need to export **ANDROID_SDK**/tools to PATH. On Linux, this can be done by
