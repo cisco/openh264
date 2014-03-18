@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <time.h>
 #include "macros.h"
 #include "../codec/decoder/core/inc/decode_mb_aux.h"
 using namespace WelsDec;
