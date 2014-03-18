@@ -99,8 +99,8 @@ WELS_EXTERN WelsQuant4x4_sse2
 WELS_EXTERN WelsQuant4x4Dc_sse2
  		%assign push_num 0
 		LOAD_3_PARA
-		SIGN_EXTENSION r1, r1w
-		SIGN_EXTENSION r2, r2w
+		SIGN_EXTENSIONW r1, r1w
+		SIGN_EXTENSIONW r2, r2w
 		SSE2_Copy8Times xmm3, r2d
 
 		SSE2_Copy8Times xmm2, r1d
@@ -189,8 +189,8 @@ SECTION .text
 WELS_EXTERN WelsHadamardQuant2x2_mmx
 		%assign push_num 0
 		LOAD_5_PARA
-		SIGN_EXTENSION r1, r1w
-		SIGN_EXTENSION r2, r2w
+		SIGN_EXTENSIONW r1, r1w
+		SIGN_EXTENSIONW r2, r2w
 		movd		mm0,			[r0]
 		movd		mm1,			[r0 + 0x20]
 		punpcklwd	mm0,			mm1
@@ -245,8 +245,8 @@ WELS_EXTERN WelsHadamardQuant2x2_mmx
 WELS_EXTERN WelsHadamardQuant2x2Skip_mmx
 		%assign push_num 0
 		LOAD_3_PARA
-		SIGN_EXTENSION r1, r1w
-		SIGN_EXTENSION r2, r2w
+		SIGN_EXTENSIONW r1, r1w
+		SIGN_EXTENSIONW r2, r2w
 		movd		mm0,			[r0]
 		movd		mm1,			[r0 + 0x20]
 		punpcklwd	mm0,			mm1
