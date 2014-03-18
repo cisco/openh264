@@ -154,6 +154,7 @@
 
 WELS_ASM_FUNC_BEGIN WelsIntra16x16Combined3Satd_neon
     stmdb sp!, {r4-r7, lr}
+    vpush {q4-q7}
 
 	//Get the top line data to 'q15'(16 bytes)
 	sub  r7, r0, r1
@@ -258,8 +259,8 @@ WELS_ASM_FUNC_BEGIN WelsIntra16x16Combined3Satd_neon
     HDM_TRANSFORM_4X4_L0 d9, d13, d23, d19, d27, d15, d16, d17, d14
 
 	//Get the data from stack
-	ldr r5, [sp, #20] //the addr of Best_mode
-	ldr r6, [sp, #24] //the value of i_lambda
+	ldr r5, [sp, #84] //the addr of Best_mode
+	ldr r6, [sp, #88] //the value of i_lambda
 
 	//vadd.u16   d24, d25
 	vrshr.u16  d15, #1
@@ -291,6 +292,7 @@ WELS_ASM_FUNC_BEGIN WelsIntra16x16Combined3Satd_neon
 
     str r4, [r5]
 
+    vpop {q4-q7}
     ldmia sp!, {r4-r7, lr}
 WELS_ASM_FUNC_END
 
