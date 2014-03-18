@@ -192,7 +192,8 @@ static inline void McHorVer20WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStrid
   int32_t i, j;
   for (i = 0; i < iHeight; i++) {
     for (j = 0; j < 16; j++) {
-      pDst[j] = WELS_CLIP1 ((fpHorFilter (pSrc + j) + 16) >> 5);
+      int32_t iTmp = (fpHorFilter (pSrc + j) + 16) >> 5;
+      pDst[j] = WELS_CLIP1 (iTmp);
     }
     pDst += iDstStride;
     pSrc += iSrcStride;
@@ -204,7 +205,8 @@ static inline void McHorVer02WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStrid
   int32_t i, j;
   for (i = 0; i < iHeight; i++) {
     for (j = 0; j < 16; j++) {
-      pDst[j] = WELS_CLIP1 ((fpVerFilter (pSrc + j, iSrcStride) + 16) >> 5);
+      int32_t iTmp = (fpVerFilter (pSrc + j, iSrcStride) + 16) >> 5;
+      pDst[j] = WELS_CLIP1 (iTmp);
     }
     pDst += iDstStride;
     pSrc += iSrcStride;
@@ -221,7 +223,8 @@ static inline void McHorVer22WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStrid
       pTmp[j] = fpVerFilter (pSrc - 2 + j, iSrcStride);
     }
     for (k = 0; k < 16; k++) {
-      pDst[k] = WELS_CLIP1 ((fpHorFilterInput16Bits (&pTmp[2 + k]) + 512) >> 10);
+      int32_t iTmp = (fpHorFilterInput16Bits (&pTmp[2 + k]) + 512) >> 10;
+      pDst[k] = WELS_CLIP1 (iTmp);
     }
     pSrc += iSrcStride;
     pDst += iDstStride;
@@ -328,7 +331,8 @@ static inline void McHorVer20_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_
   int32_t i, j;
   for (i = 0; i < iHeight; i++) {
     for (j = 0; j < iWidth; j++) {
-      pDst[j] = WELS_CLIP1 ((fpHorFilter (pSrc + j) + 16) >> 5);
+      int32_t iTmp = (fpHorFilter (pSrc + j) + 16) >> 5;
+      pDst[j] = WELS_CLIP1 (iTmp);
     }
     pDst += iDstStride;
     pSrc += iSrcStride;
@@ -340,7 +344,8 @@ static inline void McHorVer02_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_
   int32_t i, j;
   for (i = 0; i < iHeight; i++) {
     for (j = 0; j < iWidth; j++) {
-      pDst[j] = WELS_CLIP1 ((fpVerFilter (pSrc + j, iSrcStride) + 16) >> 5);
+      int32_t iTmp = (fpVerFilter (pSrc + j, iSrcStride) + 16) >> 5;
+      pDst[j] = WELS_CLIP1 (iTmp);
     }
     pDst += iDstStride;
     pSrc += iSrcStride;
@@ -357,7 +362,8 @@ static inline void McHorVer22_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_
       pTmp[j] = fpVerFilter (pSrc - 2 + j, iSrcStride);
     }
     for (k = 0; k < iWidth; k++) {
-      pDst[k] = WELS_CLIP1 ((fpHorFilterInput16Bits (&pTmp[2 + k]) + 512) >> 10);
+      int32_t iTmp = (fpHorFilterInput16Bits (&pTmp[2 + k]) + 512) >> 10;
+      pDst[k] = WELS_CLIP1 (iTmp);
     }
     pSrc += iSrcStride;
     pDst += iDstStride;
