@@ -514,7 +514,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\src\asm\denoisefilter.asm"
+				RelativePath="..\..\src\x86\denoisefilter.asm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -554,7 +554,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\src\asm\downsample_bilinear.asm"
+				RelativePath="..\..\src\x86\downsample_bilinear.asm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -634,7 +634,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\src\asm\vaa.asm"
+				RelativePath="..\..\src\x86\vaa.asm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"

@@ -37,12 +37,12 @@ ENCODER_OBJS += $(ENCODER_CPP_SRCS:.cpp=.$(OBJ))
 
 ifeq ($(ASM_ARCH), x86)
 ENCODER_ASM_SRCS=\
-	$(ENCODER_SRCDIR)/core/asm/coeff.asm\
-	$(ENCODER_SRCDIR)/core/asm/dct.asm\
-	$(ENCODER_SRCDIR)/core/asm/intra_pred.asm\
-	$(ENCODER_SRCDIR)/core/asm/memzero.asm\
-	$(ENCODER_SRCDIR)/core/asm/quant.asm\
-	$(ENCODER_SRCDIR)/core/asm/score.asm\
+	$(ENCODER_SRCDIR)/core/x86/coeff.asm\
+	$(ENCODER_SRCDIR)/core/x86/dct.asm\
+	$(ENCODER_SRCDIR)/core/x86/intra_pred.asm\
+	$(ENCODER_SRCDIR)/core/x86/memzero.asm\
+	$(ENCODER_SRCDIR)/core/x86/quant.asm\
+	$(ENCODER_SRCDIR)/core/x86/score.asm\
 
 ENCODER_OBJS += $(ENCODER_ASM_SRCS:.asm=.$(OBJ))
 endif

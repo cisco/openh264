@@ -349,7 +349,7 @@
 				Filter="*.asm;*.inc"
 				>
 				<File
-					RelativePath="..\..\..\decoder\core\asm\block_add.asm"
+					RelativePath="..\..\..\decoder\core\x86\block_add.asm"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -429,7 +429,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\..\decoder\core\asm\dct.asm"
+					RelativePath="..\..\..\decoder\core\x86\dct.asm"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -549,7 +549,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\..\decoder\core\asm\intra_pred.asm"
+					RelativePath="..\..\..\decoder\core\x86\intra_pred.asm"
 					>
 					<FileConfiguration
 						Name="Release|Win32"

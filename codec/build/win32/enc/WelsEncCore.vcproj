@@ -1670,7 +1670,7 @@
 			Filter="*.asm;*.inc"
 			>
 			<File
-				RelativePath="..\..\..\encoder\core\asm\coeff.asm"
+				RelativePath="..\..\..\encoder\core\x86\coeff.asm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1750,7 +1750,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\asm\dct.asm"
+				RelativePath="..\..\..\encoder\core\x86\dct.asm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1870,7 +1870,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\asm\intra_pred.asm"
+				RelativePath="..\..\..\encoder\core\x86\intra_pred.asm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -2030,7 +2030,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\asm\memzero.asm"
+				RelativePath="..\..\..\encoder\core\x86\memzero.asm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -2070,7 +2070,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\asm\quant.asm"
+				RelativePath="..\..\..\encoder\core\x86\quant.asm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -2150,7 +2150,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\asm\score.asm"
+				RelativePath="..\..\..\encoder\core\x86\score.asm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
