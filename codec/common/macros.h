@@ -264,5 +264,12 @@ static inline bool WELS_POWER2_IF (uint32_t v) {
 return (v && ! (v & (v - 1)));
 }
 
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
+#define WELS_GCC_UNUSED  __attribute__((__unused__))
+#else
+#define WELS_GCC_UNUSED
+#endif
+
+
 
 #endif//WELS_MACRO_UTILIZATIONS_H__
