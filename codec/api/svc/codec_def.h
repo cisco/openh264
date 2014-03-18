@@ -69,9 +69,6 @@ typedef enum {
 typedef enum {
   cmResultSuccess,
   cmInitParaError,                  /*Parameters are invalid */
-  cmMachPerfIsBad,                  /*The performance of machine is not enough to support
-									    H264 CODEC, in this case, suggestion user use h263
-										or set fps to low like 5fps or more low*/
   cmUnkonwReason,
   cmMallocMemeError,                /*Malloc a memory error*/
   cmInitExpected,			  /*Initial action is expected*/
