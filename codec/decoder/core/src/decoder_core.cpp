@@ -184,7 +184,7 @@ int32_t ParseRefPicListReordering (PBitStringAux pBs, PSliceHeader pSh) {
           // abs_diff_pic_num_minus1 should be in range 0 to MaxPicNum-1, MaxPicNum is derived as
           // 2^(4+log2_max_frame_num_minus4)
           WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //abs_diff_pic_num_minus1
-          WELS_CHECK_SE_UPPER_ERROR_NOLOG (uiCode, (1 << pSps->uiLog2MaxFrameNum), "abs_diff_pic_num_minus1",
+          WELS_CHECK_SE_UPPER_ERROR_NOLOG (uiCode, (uint32_t) (1 << pSps->uiLog2MaxFrameNum), "abs_diff_pic_num_minus1",
                                            GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_REF_REORDERING));
           pRefPicListReordering->sReorderingSyn[iList][iIdx].uiAbsDiffPicNumMinus1 = uiCode;	// uiAbsDiffPicNumMinus1
         } else if (kuiIdc == 2) {
