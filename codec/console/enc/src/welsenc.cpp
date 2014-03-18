@@ -761,13 +761,13 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     iStart	= WelsTime();
     long iEncode = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
     iTotal += WelsTime() - iStart;
-    if (videoFrameTypeInvalid == iEncode) {
+    if (cmResultSuccess != iEncode) {
       fprintf (stderr, "EncodeFrame() failed: %ld.\n", iEncode);
       break;
     }
 
     /* Write bit-stream */
-    if (pFpBs != NULL && videoFrameTypeSkip != iEncode) {	// file handler to write bit stream
+    if (pFpBs != NULL && videoFrameTypeSkip != sFbi.eOutputFrameType) {	// file handler to write bit stream
       int iLayer = 0;
       while (iLayer < sFbi.iLayerNum) {
         SLayerBSInfo* pLayerBsInfo = &sFbi.sLayerInfo[iLayer];
@@ -981,11 +981,11 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     iTotal += WelsTime() - iStart;
 
     // fixed issue in case dismatch source picture introduced by frame skipped, 1/12/2010
-    if (videoFrameTypeSkip == iEncFrames) {
+    if (videoFrameTypeSkip == sFbi.eOutputFrameType) {
       continue;
     }
 
-    if (iEncFrames != videoFrameTypeInvalid && iEncFrames != videoFrameTypeSkip) {
+    if (iEncFrames == cmResultSuccess) {
       int iLayer = 0;
       int iFrameSize = 0;
       while (iLayer < sFbi.iLayerNum) {
