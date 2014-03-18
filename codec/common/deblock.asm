@@ -45,11 +45,7 @@
 ; Macros and other preprocessor constants
 ;*******************************************************************************
 
-%ifdef FORMAT_COFF
-SECTION .rodata pData
-%else
 SECTION .rodata align=16
-%endif
 
 ALIGN   16
 FOUR_16B_SSE2:   dw   4, 4, 4, 4, 4, 4, 4, 4

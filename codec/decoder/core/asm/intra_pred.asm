@@ -49,11 +49,7 @@
 ; Local Data (Read Only)
 ;*******************************************************************************
 
-%ifdef FORMAT_COFF
-SECTION .rodata data
-%else
 SECTION .rodata align=16
-%endif
 %if 1
 	%define WELSEMMS	emms
 %else
