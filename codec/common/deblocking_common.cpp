@@ -28,8 +28,8 @@ void DeblockLumaLt4_c (uint8_t* pPix, int32_t iStrideX, int32_t iStrideY, int32_
           iTc++;
         }
         int32_t iDeta = WELS_CLIP3 ((((q0 - p0) << 2) + (p1 - q1) + 4) >> 3, -iTc, iTc);
-        pPix[-iStrideX] = WELS_CLIP1 (p0 + iDeta);     /* p0' */
-        pPix[0]  = WELS_CLIP1 (q0 - iDeta);     /* q0' */
+        pPix[-iStrideX] = WelsClip1 (p0 + iDeta);     /* p0' */
+        pPix[0]  = WelsClip1 (q0 - iDeta);     /* q0' */
       }
     }
     pPix += iStrideY;
@@ -107,8 +107,8 @@ void DeblockChromaLt4_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int
       bDetaQ1Q0 = WELS_ABS (q1 - q0) < iBeta;
       if (bDetaP0Q0 && bDetaP1P0 &&	bDetaQ1Q0) {
         iDeta = WELS_CLIP3 ((((q0 - p0) << 2) + (p1 - q1) + 4) >> 3, -iTc0, iTc0);
-        pPixCb[-iStrideX] = WELS_CLIP1 (p0 + iDeta);     /* p0' */
-        pPixCb[0]  = WELS_CLIP1 (q0 - iDeta);     /* q0' */
+        pPixCb[-iStrideX] = WelsClip1 (p0 + iDeta);     /* p0' */
+        pPixCb[0]  = WelsClip1 (q0 - iDeta);     /* q0' */
       }
 
 
@@ -123,8 +123,8 @@ void DeblockChromaLt4_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int
 
       if (bDetaP0Q0 && bDetaP1P0 &&	bDetaQ1Q0) {
         iDeta = WELS_CLIP3 ((((q0 - p0) << 2) + (p1 - q1) + 4) >> 3, -iTc0, iTc0);
-        pPixCr[-iStrideX] = WELS_CLIP1 (p0 + iDeta);     /* p0' */
-        pPixCr[0]  = WELS_CLIP1 (q0 - iDeta);     /* q0' */
+        pPixCr[-iStrideX] = WelsClip1 (p0 + iDeta);     /* p0' */
+        pPixCr[0]  = WelsClip1 (q0 - iDeta);     /* q0' */
       }
     }
     pPixCb += iStrideY;

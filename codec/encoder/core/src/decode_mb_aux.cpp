@@ -189,10 +189,10 @@ void WelsIDctT4Rec_c (uint8_t* pRec, int32_t iStride, uint8_t* pPred, int32_t iP
     const int32_t kiVerDelR   = (iTemp[4 + i] >> 1) - iTemp[12 + i];
     const int32_t kiVerSumR = iTemp[4 + i]             + (iTemp[12 + i] >> 1);
 
-    pRec[i				]         = WELS_CLIP1 (pPred[i              ]         + ((kiVerSumL + kiVerSumR + 32) >> 6));
-    pRec[iStride + i		]     = WELS_CLIP1 (pPred[iPredStride + i  ]  + ((kiVerDelL + kiVerDelR + 32) >> 6));
-    pRec[iDstStridex2 + i] = WELS_CLIP1 (pPred[iPredStridex2 + i] + ((kiVerDelL - kiVerDelR + 32) >> 6));
-    pRec[iDstStridex3 + i] = WELS_CLIP1 (pPred[iPredStridex3 + i] + ((kiVerSumL - kiVerSumR + 32) >> 6));
+    pRec[i				]         = WelsClip1 (pPred[i              ]         + ((kiVerSumL + kiVerSumR + 32) >> 6));
+    pRec[iStride + i		]     = WelsClip1 (pPred[iPredStride + i  ]  + ((kiVerDelL + kiVerDelR + 32) >> 6));
+    pRec[iDstStridex2 + i] = WelsClip1 (pPred[iPredStridex2 + i] + ((kiVerDelL - kiVerDelR + 32) >> 6));
+    pRec[iDstStridex3 + i] = WelsClip1 (pPred[iPredStridex3 + i] + ((kiVerSumL - kiVerSumR + 32) >> 6));
   }
 }
 
@@ -225,7 +225,7 @@ void WelsIDctRecI16x16Dc_c (uint8_t* pRec, int32_t iStride, uint8_t* pPred, int3
 
   for (i = 0; i < 16; i ++) {
     for (j = 0; j < 16; j++) {
-      pRec[j] = WELS_CLIP1 (pPred[j] + ((pDctDc[ (i & 0x0C) + (j >> 2)] + 32) >> 6));
+      pRec[j] = WelsClip1 (pPred[j] + ((pDctDc[ (i & 0x0C) + (j >> 2)] + 32) >> 6));
     }
     pRec += iStride;
     pPred += iPredStride;

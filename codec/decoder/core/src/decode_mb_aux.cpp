@@ -92,13 +92,13 @@ void IdctResAddPred_c (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) {
     int32_t kT3	= (32 + kT1 + kT2) >> 6;
     int32_t kT4	= (32 + kT1 - kT2) >> 6;
 
-    pDst[i] = WELS_CLIP1( kT3 + pPred[i] );
-    pDst[i + kiStride3] = WELS_CLIP1( kT4 + pPred[i + kiStride3] );
+    pDst[i] = WelsClip1( kT3 + pPred[i] );
+    pDst[i + kiStride3] = WelsClip1( kT4 + pPred[i + kiStride3] );
 
     kT1	= iSrc[i] - iSrc[i + 8];
     kT2	= (iSrc[i + 4] >> 1) - iSrc[i + 12];
-    pDst[i + kiStride] = WELS_CLIP1( ((32 + kT1 + kT2) >> 6) + pDst[i + kiStride] );
-    pDst[i + kiStride2] = WELS_CLIP1( ((32 + kT1 - kT2) >> 6) + pDst[i + kiStride2] );
+    pDst[i + kiStride] = WelsClip1( ((32 + kT1 + kT2) >> 6) + pDst[i + kiStride] );
+    pDst[i + kiStride2] = WelsClip1( ((32 + kT1 - kT2) >> 6) + pDst[i + kiStride2] );
   }
 }
 

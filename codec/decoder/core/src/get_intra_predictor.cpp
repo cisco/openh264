@@ -428,7 +428,7 @@ void WelsIChromaPredPlane_c (uint8_t* pPred, const int32_t kiStride) {
   for (i = 0 ; i < 8 ; i ++) {
     for (j = 0 ; j < 8 ; j ++) {
       int32_t iTmp = (a + b * (j - 3) + c * (i - 3) + 16) >> 5;
-      iTmp = WELS_CLIP1 (iTmp);
+      iTmp = WelsClip1 (iTmp);
       pPred[j] = iTmp;
     }
     pPred += kiStride;
@@ -567,7 +567,7 @@ void WelsI16x16LumaPredPlane_c (uint8_t* pPred, const int32_t kiStride) {
   for (i = 0 ; i < 16 ; i ++) {
     for (j = 0 ; j < 16 ; j ++) {
       int32_t iTmp = (a + b * (j - 7) + c * (i - 7) + 16) >> 5;
-      iTmp = WELS_CLIP1 (iTmp);
+      iTmp = WelsClip1 (iTmp);
       pPred[j] = iTmp;
     }
     pPred += kiStride;
