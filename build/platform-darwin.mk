@@ -1,7 +1,7 @@
 include build/platform-arch.mk
 SHAREDLIBSUFFIX = dylib
 SHARED = -dynamiclib
-CFLAGS += -Werror -fPIC -DMACOS -DMT_ENABLED -MMD -MP
+CFLAGS += -Wall -fPIC -DMACOS -DMT_ENABLED -MMD -MP
 LDFLAGS += -lpthread
 ifeq ($(ASM_ARCH), x86)
 ASMFLAGS += --prefix _
