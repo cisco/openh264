@@ -342,12 +342,14 @@ BITS 32
 %endmacro
 
 %macro WELS_EXTERN 1
+    ALIGN 16
     %ifdef PREFIX
         global _%1
         %define %1 _%1
     %else
         global %1
     %endif
+    %1:
 %endmacro
 
 %macro WELS_AbsW 2

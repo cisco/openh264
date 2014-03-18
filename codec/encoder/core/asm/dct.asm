@@ -130,12 +130,10 @@ SSE2_DeQuant8 dw  10, 13, 10, 13, 13, 16, 13, 16,
     movd       %5, %1
 %endmacro
 SECTION .text
-ALIGN 16
 ;***********************************************************************
 ;   void WelsDctT4_mmx( int16_t *pDct[4], uint8_t *pix1, int32_t i_pix1, uint8_t *pix2, int32_t i_pix2 )
 ;***********************************************************************
 WELS_EXTERN WelsDctT4_mmx
-WelsDctT4_mmx:
     %assign push_num 0
     LOAD_5_PARA
     SIGN_EXTENSION r2, r2d
@@ -163,7 +161,6 @@ WelsDctT4_mmx:
 ;   void WelsIDctT4Rec_mmx(uint8_t *rec, int32_t stride, uint8_t *pred, int32_t pred_stride, int16_t *rs)
 ;***********************************************************************
 WELS_EXTERN WelsIDctT4Rec_mmx
-WelsIDctT4Rec_mmx:
     %assign push_num 0
     LOAD_5_PARA
     SIGN_EXTENSION r1, r1d
@@ -291,8 +288,6 @@ WelsIDctT4Rec_mmx:
 ; void WelsDctFourT4_sse2(int16_t *pDct, uint8_t *pix1, int32_t i_pix1, uint8_t *pix2, int32_t i_pix2 )
 ;***********************************************************************
 WELS_EXTERN WelsDctFourT4_sse2
-ALIGN 16
-WelsDctFourT4_sse2:
     %assign push_num 0
     LOAD_5_PARA
     SIGN_EXTENSION r2, r2d
@@ -340,8 +335,6 @@ WelsDctFourT4_sse2:
 ; void WelsIDctFourT4Rec_sse2(uint8_t *rec, int32_t stride, uint8_t *pred, int32_t pred_stride, int16_t *rs);
 ;***********************************************************************
 WELS_EXTERN WelsIDctFourT4Rec_sse2
-ALIGN 16
-WelsIDctFourT4Rec_sse2:
 	%assign push_num 0
 	LOAD_5_PARA
 	SIGN_EXTENSION r1, r1d
@@ -399,8 +392,6 @@ WelsIDctFourT4Rec_sse2:
 ; void WelsIDctRecI16x16Dc_sse2(uint8_t *rec, int32_t stride, uint8_t *pred, int32_t pred_stride, int16_t *dct_dc)
 ;***********************************************************************
 WELS_EXTERN WelsIDctRecI16x16Dc_sse2
-ALIGN 16
-WelsIDctRecI16x16Dc_sse2:
 	%assign push_num 0
 	LOAD_5_PARA
 	SIGN_EXTENSION r1, r1d
@@ -475,7 +466,6 @@ WelsIDctRecI16x16Dc_sse2:
 ;void WelsHadamardT4Dc_sse2( int16_t *luma_dc, int16_t *pDct)
 ;***********************************************************************
 WELS_EXTERN WelsHadamardT4Dc_sse2
-WelsHadamardT4Dc_sse2:
 		%assign push_num 0
 		LOAD_2_PARA
 		SSE2_Load4Col	    xmm1, xmm5, xmm6, xmm0, r1

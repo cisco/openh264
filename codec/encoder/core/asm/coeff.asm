@@ -323,7 +323,6 @@ SECTION .text
 ;int32_t CavlcParamCal_sse2(int16_t*coffLevel, uint8_t* run, int16_t *Level, int32_t* total_coeffs , int32_t endIdx);
 ;***********************************************************************
 WELS_EXTERN CavlcParamCal_sse2
-CavlcParamCal_sse2:
 	push ebx
 	push edi
 	push esi

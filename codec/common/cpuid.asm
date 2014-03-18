@@ -55,12 +55,10 @@ SECTION .text
 ; refer to "The IA-32 Intel(R) Architecture Software Developers Manual, Volume 2A A-M"
 ; section CPUID - CPU Identification
 
-WELS_EXTERN WelsCPUIdVerify
-ALIGN 16
 ;******************************************************************************************
 ;   int32_t WelsCPUIdVerify()
 ;******************************************************************************************
-WelsCPUIdVerify:
+WELS_EXTERN WelsCPUIdVerify
     push    r1
     PUSHRFLAGS
     PUSHRFLAGS
@@ -73,14 +71,12 @@ WelsCPUIdVerify:
     pop      r1
     ret
 
-WELS_EXTERN WelsCPUId
-ALIGN 16
 ;****************************************************************************************************
 ;   void WelsCPUId( int32_t uiIndex, int32_t *pFeatureA, int32_t *pFeatureB, int32_t *pFeatureC, int32_t *pFeatureD )
 ;****************************************************************************************************
 %ifdef       WIN64
 
-WelsCPUId:
+WELS_EXTERN WelsCPUId
     push     rbx
     push     rdx
 
@@ -98,7 +94,7 @@ WelsCPUId:
     ret
 
 %elifdef     UNIX64
-WelsCPUId:
+WELS_EXTERN WelsCPUId
     push     rbx
     push     rcx
     push     rdx
@@ -118,7 +114,7 @@ WelsCPUId:
 
 %elifdef     X86_32
 
-WelsCPUId:
+WELS_EXTERN WelsCPUId
     push	ebx
     push	edi
 
@@ -143,13 +139,11 @@ WelsCPUId:
 
 %endif
 
-WELS_EXTERN WelsCPUSupportAVX
 ; need call after cpuid=1 and eax, ecx flag got then
-ALIGN 16
 ;****************************************************************************************************
 ;   int32_t WelsCPUSupportAVX( uint32_t eax, uint32_t ecx )
 ;****************************************************************************************************
-WelsCPUSupportAVX:
+WELS_EXTERN WelsCPUSupportAVX
 %ifdef     WIN64
         mov   eax,    ecx
         mov   ecx,    edx
@@ -178,13 +172,11 @@ avx_not_supported:
         ret
 
 
-WELS_EXTERN  WelsCPUSupportFMA
 ; need call after cpuid=1 and eax, ecx flag got then
-ALIGN 16
 ;****************************************************************************************************
 ;   int32_t WelsCPUSupportFMA( uint32_t eax, uint32_t ecx )
 ;****************************************************************************************************
-WelsCPUSupportFMA:
+WELS_EXTERN  WelsCPUSupportFMA
 %ifdef     WIN64
         mov   eax,   ecx
         mov   ecx,   edx
@@ -211,12 +203,10 @@ fma_not_supported:
 	mov eax, 0
 	ret
 
-WELS_EXTERN WelsEmms
-ALIGN 16
 ;******************************************************************************************
 ;   void WelsEmms()
 ;******************************************************************************************
-WelsEmms:
+WELS_EXTERN WelsEmms
 	emms	; empty mmx technology states
 	ret
 

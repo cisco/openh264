@@ -66,22 +66,18 @@ shufb_mask_high:
 	db 01h, 80h, 03h, 80h, 05h, 80h, 07h, 80h, 09h, 80h, 0bh, 80h, 0dh, 80h, 0fh, 80h
 
 
-ALIGN 16
-
 ;***********************************************************************
 ; Code
 ;***********************************************************************
 
 SECTION .text
 
-WELS_EXTERN DyadicBilinearDownsamplerWidthx32_sse
 ;***********************************************************************
 ;	void DyadicBilinearDownsamplerWidthx32_sse(	unsigned char* pDst, const int iDstStride,
 ;					unsigned char* pSrc, const int iSrcStride,
 ;					const int iSrcWidth, const int iSrcHeight );
 ;***********************************************************************
-ALIGN 16
-DyadicBilinearDownsamplerWidthx32_sse:
+WELS_EXTERN DyadicBilinearDownsamplerWidthx32_sse
 	push ebx
 	push edx
 	push esi
@@ -227,14 +223,12 @@ DyadicBilinearDownsamplerWidthx32_sse:
 	pop ebx
 	ret
 
-WELS_EXTERN DyadicBilinearDownsamplerWidthx16_sse
 ;***********************************************************************
 ;	void DyadicBilinearDownsamplerWidthx16_sse( unsigned char* pDst, const int iDstStride,
 ;					  unsigned char* pSrc, const int iSrcStride,
 ;					  const int iSrcWidth, const int iSrcHeight );
 ;***********************************************************************
-ALIGN 16
-DyadicBilinearDownsamplerWidthx16_sse:
+WELS_EXTERN DyadicBilinearDownsamplerWidthx16_sse
 	push ebx
 	push edx
 	push esi
@@ -331,14 +325,12 @@ DyadicBilinearDownsamplerWidthx16_sse:
 	pop ebx
 	ret
 
-WELS_EXTERN DyadicBilinearDownsamplerWidthx8_sse
 ;***********************************************************************
 ;	void DyadicBilinearDownsamplerWidthx8_sse( unsigned char* pDst, const int iDstStride,
 ;					  unsigned char* pSrc, const int iSrcStride,
 ;					  const int iSrcWidth, const int iSrcHeight );
 ;***********************************************************************
-ALIGN 16
-DyadicBilinearDownsamplerWidthx8_sse:
+WELS_EXTERN DyadicBilinearDownsamplerWidthx8_sse
 	push ebx
 	push edx
 	push esi
@@ -422,14 +414,12 @@ DyadicBilinearDownsamplerWidthx8_sse:
 
 
 ; got about 50% improvement over DyadicBilinearDownsamplerWidthx32_sse
-WELS_EXTERN DyadicBilinearDownsamplerWidthx32_ssse3
 ;***********************************************************************
 ;	void DyadicBilinearDownsamplerWidthx32_ssse3(	unsigned char* pDst, const int iDstStride,
 ;					unsigned char* pSrc, const int iSrcStride,
 ;					const int iSrcWidth, const int iSrcHeight );
 ;***********************************************************************
-ALIGN 16
-DyadicBilinearDownsamplerWidthx32_ssse3:
+WELS_EXTERN DyadicBilinearDownsamplerWidthx32_ssse3
 	push ebx
 	push edx
 	push esi
@@ -533,14 +523,12 @@ DyadicBilinearDownsamplerWidthx32_ssse3:
 	pop ebx
 	ret
 
-WELS_EXTERN DyadicBilinearDownsamplerWidthx16_ssse3
 ;***********************************************************************
 ;	void DyadicBilinearDownsamplerWidthx16_ssse3( unsigned char* pDst, const int iDstStride,
 ;					  unsigned char* pSrc, const int iSrcStride,
 ;					  const int iSrcWidth, const int iSrcHeight );
 ;***********************************************************************
-ALIGN 16
-DyadicBilinearDownsamplerWidthx16_ssse3:
+WELS_EXTERN DyadicBilinearDownsamplerWidthx16_ssse3
 	push ebx
 	push edx
 	push esi
@@ -623,14 +611,12 @@ DyadicBilinearDownsamplerWidthx16_ssse3:
 	ret
 
 ; got about 65% improvement over DyadicBilinearDownsamplerWidthx32_sse
-WELS_EXTERN DyadicBilinearDownsamplerWidthx32_sse4
 ;***********************************************************************
 ;	void DyadicBilinearDownsamplerWidthx32_sse4(	unsigned char* pDst, const int iDstStride,
 ;					unsigned char* pSrc, const int iSrcStride,
 ;					const int iSrcWidth, const int iSrcHeight );
 ;***********************************************************************
-ALIGN 16
-DyadicBilinearDownsamplerWidthx32_sse4:
+WELS_EXTERN DyadicBilinearDownsamplerWidthx32_sse4
 	push ebx
 	push edx
 	push esi
@@ -733,14 +719,12 @@ DyadicBilinearDownsamplerWidthx32_sse4:
 	pop ebx
 	ret
 
-WELS_EXTERN DyadicBilinearDownsamplerWidthx16_sse4
 ;***********************************************************************
 ;	void DyadicBilinearDownsamplerWidthx16_sse4( unsigned char* pDst, const int iDstStride,
 ;					  unsigned char* pSrc, const int iSrcStride,
 ;					  const int iSrcWidth, const int iSrcHeight );
 ;***********************************************************************
-ALIGN 16
-DyadicBilinearDownsamplerWidthx16_sse4:
+WELS_EXTERN DyadicBilinearDownsamplerWidthx16_sse4
 	push ebx
 	push edx
 	push esi
@@ -825,7 +809,6 @@ DyadicBilinearDownsamplerWidthx16_sse4:
 
 
 
-WELS_EXTERN	GeneralBilinearAccurateDownsampler_sse2
 ;**************************************************************************************************************
 ;int GeneralBilinearAccurateDownsampler_sse2(   unsigned char* pDst, const int iDstStride, const int iDstWidth, const int iDstHeight,
 ;							unsigned char* pSrc, const int iSrcStride, const int iSrcWidth, const int iSrcHeight,
@@ -833,8 +816,7 @@ WELS_EXTERN	GeneralBilinearAccurateDownsampler_sse2
 ;{
 ;**************************************************************************************************************
 
-ALIGN 16
-GeneralBilinearAccurateDownsampler_sse2:
+WELS_EXTERN	GeneralBilinearAccurateDownsampler_sse2
 	push	ebp
 	push	esi
 	push	edi
@@ -1029,7 +1011,6 @@ LAST_ROW_END:
 
 
 
-WELS_EXTERN	GeneralBilinearFastDownsampler_sse2
 ;**************************************************************************************************************
 ;int GeneralBilinearFastDownsampler_sse2(   unsigned char* pDst, const int iDstStride, const int iDstWidth, const int iDstHeight,
 ;				unsigned char* pSrc, const int iSrcStride, const int iSrcWidth, const int iSrcHeight,
@@ -1037,8 +1018,7 @@ WELS_EXTERN	GeneralBilinearFastDownsampler_sse2
 ;{
 ;**************************************************************************************************************
 
-ALIGN 16
-GeneralBilinearFastDownsampler_sse2:
+WELS_EXTERN	GeneralBilinearFastDownsampler_sse2
 	push	ebp
 	push	esi
 	push	edi

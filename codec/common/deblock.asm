@@ -61,8 +61,6 @@ SECTION .text
 
 
 WELS_EXTERN   DeblockLumaLt4V_ssse3
-
-DeblockLumaLt4V_ssse3:
   push        rbp
   mov         r11,[rsp + 16 + 20h]  ; pTC
   sub         rsp,1B0h
@@ -318,9 +316,6 @@ DeblockLumaLt4V_ssse3:
 
 
 WELS_EXTERN   DeblockLumaEq4V_ssse3
-
-ALIGN  16
-DeblockLumaEq4V_ssse3:
   mov         rax,rsp
   push        rbx
   push        rbp
@@ -781,9 +776,6 @@ DeblockLumaEq4V_ssse3:
 
 
 WELS_EXTERN  DeblockChromaLt4V_ssse3
-
-ALIGN  16
-DeblockChromaLt4V_ssse3:
   mov         rax,rsp
   push        rbx
   push        rdi
@@ -943,8 +935,6 @@ DeblockChromaLt4V_ssse3:
 
 
 WELS_EXTERN   DeblockChromaEq4V_ssse3
-ALIGN 16
-DeblockChromaEq4V_ssse3:
   mov         rax,rsp
   push        rbx
   sub         rsp,90h
@@ -1097,8 +1087,6 @@ DeblockChromaEq4V_ssse3:
 
 
 WELS_EXTERN   DeblockChromaEq4H_ssse3
-ALIGN  16
-DeblockChromaEq4H_ssse3:
   mov         rax,rsp
   mov         [rax+20h],rbx
   push        rdi
@@ -1361,8 +1349,6 @@ DeblockChromaEq4H_ssse3:
 
 
 WELS_EXTERN DeblockChromaLt4H_ssse3
-ALIGN  16
-DeblockChromaLt4H_ssse3:
   mov         rax,rsp
   push        rbx
   push        rbp
@@ -1647,8 +1633,6 @@ DeblockChromaLt4H_ssse3:
 
 
 WELS_EXTERN   DeblockLumaLt4V_ssse3
-
-DeblockLumaLt4V_ssse3:
   push        rbp
   mov         r11,r8  ; pTC
   sub         rsp,1B0h
@@ -1904,9 +1888,6 @@ DeblockLumaLt4V_ssse3:
 
 
 WELS_EXTERN DeblockLumaEq4V_ssse3
-
-ALIGN  16
-DeblockLumaEq4V_ssse3:
   mov         rax,rsp
   push        rbx
   push        rbp
@@ -2366,8 +2347,6 @@ DeblockLumaEq4V_ssse3:
   ret
 
 WELS_EXTERN  DeblockChromaLt4V_ssse3
-ALIGN  16
-DeblockChromaLt4V_ssse3:
   mov         rax,rsp
   push        rbx
   push        rbp
@@ -2534,8 +2513,6 @@ DeblockChromaLt4V_ssse3:
   ret
 
 WELS_EXTERN DeblockChromaEq4V_ssse3
-
-DeblockChromaEq4V_ssse3:
   mov         rax,rsp
   push        rbx
   push        rbp
@@ -2685,9 +2662,6 @@ DeblockChromaEq4V_ssse3:
   ret
 
 WELS_EXTERN DeblockChromaEq4H_ssse3
-
-ALIGN  16
-DeblockChromaEq4H_ssse3:
   mov         rax,rsp
   push        rbx
   push        rbp
@@ -2960,8 +2934,6 @@ DeblockChromaEq4H_ssse3:
 
 
 WELS_EXTERN DeblockChromaLt4H_ssse3
-ALIGN  16
-DeblockChromaLt4H_ssse3:
   mov         rax,rsp
   push        rbx
   push        rbp
@@ -3256,9 +3228,6 @@ DeblockChromaLt4H_ssse3:
 ;                             int32_t iAlpha, int32_t iBeta)
 ;********************************************************************************
 WELS_EXTERN   DeblockChromaEq4V_ssse3
-
-ALIGN  16
-DeblockChromaEq4V_ssse3:
   push        ebp
   mov         ebp,esp
   and         esp,0FFFFFFF0h
@@ -3426,8 +3395,6 @@ DeblockChromaEq4V_ssse3:
 ;*******************************************************************************
 
 WELS_EXTERN  DeblockChromaLt4V_ssse3
-
-DeblockChromaLt4V_ssse3:
   push        ebp
   mov         ebp,esp
   and         esp,0FFFFFFF0h
@@ -3629,10 +3596,6 @@ DeblockChromaLt4V_ssse3:
 ;***************************************************************************
 
 WELS_EXTERN     DeblockChromaEq4H_ssse3
-
-ALIGN  16
-
-DeblockChromaEq4H_ssse3:
   push        ebp
   mov         ebp,esp
   and         esp,0FFFFFFF0h
@@ -3914,10 +3877,6 @@ DeblockChromaEq4H_ssse3:
 ;*******************************************************************************
 
 WELS_EXTERN  DeblockChromaLt4H_ssse3
-
-ALIGN  16
-
-DeblockChromaLt4H_ssse3:
   push        ebp
   mov         ebp,esp
   and         esp,0FFFFFFF0h
@@ -4230,10 +4189,6 @@ DeblockChromaLt4H_ssse3:
 
 
 WELS_EXTERN  DeblockLumaLt4V_ssse3
-
-ALIGN  16
-
-DeblockLumaLt4V_ssse3:
     push	ebp
 	mov	ebp, esp
 	and	esp, -16				; fffffff0H
@@ -4620,11 +4575,8 @@ DeblockLumaLt4V_ssse3:
 ;                                 int32_t iBeta)
 ;*******************************************************************************
 
+
 WELS_EXTERN  DeblockLumaEq4V_ssse3
-
-ALIGN  16
-
-DeblockLumaEq4V_ssse3:
 
 	push	ebp
 	mov	ebp, esp
@@ -5174,10 +5126,6 @@ DeblockLumaEq4V_ssse3:
 ;********************************************************************************
 
 WELS_EXTERN  DeblockLumaTransposeH2V_sse2
-
-ALIGN  16
-
-DeblockLumaTransposeH2V_sse2:
     push     r3
     push     r4
     push     r5
@@ -5253,10 +5201,6 @@ DeblockLumaTransposeH2V_sse2:
 ;*******************************************************************************************
 
 WELS_EXTERN   DeblockLumaTransposeV2H_sse2
-
-ALIGN  16
-
-DeblockLumaTransposeV2H_sse2:
     push     r3
     push     r4
 
