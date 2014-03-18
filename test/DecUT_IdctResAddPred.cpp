@@ -42,7 +42,7 @@ void IdctResAddPred_ref (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) {
 #define GENERATE_IDCTRESADDPRED(pred) \
 TEST(DecoderDecodeMbAux, pred) {\
   const int32_t kiStride = 32;\
-  const int iBits = 13;\
+  const int iBits = 12;\
   const int iMask = (1 << iBits) - 1;\
   const int iOffset = 1 << (iBits - 1);\
   int16_t iRS[16];\
