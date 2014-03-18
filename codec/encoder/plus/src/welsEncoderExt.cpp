@@ -581,7 +581,7 @@ int CWelsH264SVCEncoder::EncodeFrameInternal(const SSourcePicture*  pSrcPic, SFr
   default:
     break;
   }
-
+  pBsInfo->eOutputFrameType = iFrameType;
   ///////////////////for test
 #ifdef OUTPUT_BIT_STREAM
   if (iFrameType != videoFrameTypeInvalid && iFrameType != videoFrameTypeSkip) {
