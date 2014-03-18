@@ -57,7 +57,7 @@ encdemo: libraries
 	cd ./codec/build/android/enc && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
 
 COMMON_INCLUDES += -I$(NDKROOT)/sources/android/cpufeatures
-COMMON_OBJS += $(COMMON_SRCDIR)/cpu-features.o
+COMMON_OBJS += $(COMMON_SRCDIR)/cpu-features.$(OBJ)
 
-codec/common/cpu-features.o: $(NDKROOT)/sources/android/cpufeatures/cpu-features.c
+codec/common/cpu-features.$(OBJ): $(NDKROOT)/sources/android/cpufeatures/cpu-features.c
 	$(QUIET_CC)$(CC) $(CFLAGS) $(INCLUDES) $(COMMON_CFLAGS) $(COMMON_INCLUDES) -c $(CXX_O) $<

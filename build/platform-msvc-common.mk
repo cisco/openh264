@@ -13,6 +13,7 @@ LINK_LIB=$(1).lib
 LIBSUFFIX=lib
 LIBPREFIX=
 EXEEXT=.exe
+OBJ=obj
 SHAREDLIBSUFFIX=dll
 SHARED=-LD
 SHLDFLAGS=-link -def:wels.def -implib:wels_dll.lib

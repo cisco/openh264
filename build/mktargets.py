@@ -20,11 +20,11 @@ OUTFILE="targets.mk"
 CPP_SUFFIX=".cpp"
 
 def make_o(x):
-    return os.path.splitext(x)[0] + ".o"
+    return os.path.splitext(x)[0] + ".$(OBJ)"
 
 def write_cpp_rule_pattern(f):
     src = "$(%s_SRCDIR)/%%%s"%(PREFIX, CPP_SUFFIX)
-    dst = "$(%s_SRCDIR)/%%.o"%(PREFIX)
+    dst = "$(%s_SRCDIR)/%%.$(OBJ)"%(PREFIX)
 
     f.write("%s: %s\n"%(dst, src))
     f.write('\t$(QUIET_CXX)$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(' + PREFIX + '_CFLAGS) $(' + PREFIX + '_INCLUDES) -c $(CXX_O) $<\n')
@@ -32,7 +32,7 @@ def write_cpp_rule_pattern(f):
 
 def write_c_rule_pattern(f):
     src = "$(%s_SRCDIR)/%%.c"%(PREFIX)
-    dst = "$(%s_SRCDIR)/%%.o"%(PREFIX)
+    dst = "$(%s_SRCDIR)/%%.$(OBJ)"%(PREFIX)
 
     f.write("%s: %s\n"%(dst, src))
     f.write('\t$(QUIET_CC)$(CC) $(CFLAGS) $(INCLUDES) $(' + PREFIX + '_CFLAGS) $(' + PREFIX + '_INCLUDES) -c $(CXX_O) $<\n')
@@ -40,7 +40,7 @@ def write_c_rule_pattern(f):
 
 def write_asm_rule_pattern(f):
     src = "$(%s_SRCDIR)/%%.asm"%(PREFIX)
-    dst = "$(%s_SRCDIR)/%%.o"%(PREFIX)
+    dst = "$(%s_SRCDIR)/%%.$(OBJ)"%(PREFIX)
 
     f.write("%s: %s\n"%(dst, src))
     f.write('\t$(QUIET_ASM)$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(' + PREFIX + '_ASMFLAGS) $(' + PREFIX + '_ASM_INCLUDES) -o $@ $<\n')
@@ -48,7 +48,7 @@ def write_asm_rule_pattern(f):
 
 def write_asm_s_rule_pattern(f):
     src = "$(%s_SRCDIR)/%%.S"%(PREFIX)
-    dst = "$(%s_SRCDIR)/%%.o"%(PREFIX)
+    dst = "$(%s_SRCDIR)/%%.$(OBJ)"%(PREFIX)
 
     f.write("%s: %s\n"%(dst, src))
     f.write('\t$(QUIET_CCAS)$(CCAS) $(CFLAGS) $(ASMFLAGS) $(INCLUDES) $(' + PREFIX + '_CFLAGS) $(' + PREFIX + '_INCLUDES) -c -o $@ $<\n')
@@ -118,14 +118,14 @@ f.write("%s_CPP_SRCS=\\\n"%(PREFIX))
 for c in cpp:
     f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
 f.write("\n")
-f.write("%s_OBJS += $(%s_CPP_SRCS:%s=.o)\n\n"%(PREFIX, PREFIX, CPP_SUFFIX))
+f.write("%s_OBJS += $(%s_CPP_SRCS:%s=.$(OBJ))\n\n"%(PREFIX, PREFIX, CPP_SUFFIX))
 
 if len(cfiles) > 0:
     f.write("%s_C_SRCS=\\\n"%(PREFIX))
     for cfile in cfiles:
         f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, cfile))
     f.write("\n")
-    f.write("%s_OBJS += $(%s_C_SRCS:.c=.o)\n\n"%(PREFIX, PREFIX))
+    f.write("%s_OBJS += $(%s_C_SRCS:.c=.$(OBJ))\n\n"%(PREFIX, PREFIX))
 
 if len(asm) > 0:
     f.write("ifeq ($(ASM_ARCH), x86)\n")
@@ -133,7 +133,7 @@ if len(asm) > 0:
     for c in asm:
         f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
     f.write("\n")
-    f.write("%s_OBJS += $(%s_ASM_SRCS:.asm=.o)\n"%(PREFIX, PREFIX))
+    f.write("%s_OBJS += $(%s_ASM_SRCS:.asm=.$(OBJ))\n"%(PREFIX, PREFIX))
     f.write("endif\n\n")
 
 if len(sfiles) > 0:
@@ -142,7 +142,7 @@ if len(sfiles) > 0:
     for c in sfiles:
         f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
     f.write("\n")
-    f.write("%s_OBJS += $(%s_ASM_S_SRCS:.S=.o)\n"%(PREFIX, PREFIX))
+    f.write("%s_OBJS += $(%s_ASM_S_SRCS:.S=.$(OBJ))\n"%(PREFIX, PREFIX))
     f.write("endif\n\n")
 
 f.write("OBJS += $(%s_OBJS)\n"%PREFIX)
