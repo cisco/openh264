@@ -105,7 +105,6 @@ void WelsResetRefPic (PWelsDecoderContext pCtx) {
  */
 int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
   int32_t i, iCount = 0;
-  const bool kbUseRefBasePicFlag = pCtx->pCurDqLayer->bUseRefBasePicFlag;
   PPicture* ppShoreRefList = pCtx->sRefPic.pShortRefList[LIST_0];
   PPicture* ppLongRefList  = pCtx->sRefPic.pLongRefList[LIST_0];
   memset (pCtx->sRefPic.pRefList[LIST_0], 0, MAX_REF_PIC_COUNT * sizeof (PPicture));
@@ -206,7 +205,6 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
 int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
   PRefPic pRefPic = &pCtx->sRefPic;
   PRefPicMarking pRefPicMarking = pCtx->pCurDqLayer->pRefPicMarking;
-  PRefBasePicMarking pRefPicBaseMarking = pCtx->pCurDqLayer->pRefPicBaseMarking;
   PAccessUnit pCurAU = pCtx->pAccessUnitList;
   bool bIsIDRAU = false;
   uint32_t j;

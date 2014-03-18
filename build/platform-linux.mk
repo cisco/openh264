@@ -1,6 +1,6 @@
 include build/platform-arch.mk
 SHAREDLIBSUFFIX = so
-CFLAGS += -Werror -fPIC -DLINUX -DMT_ENABLED -MMD -MP
+CFLAGS += -Wall -fPIC -DLINUX -DMT_ENABLED -MMD -MP
 LDFLAGS += -lpthread
 ifeq ($(ASM_ARCH), x86)
 ifeq ($(ENABLE64BIT), Yes)

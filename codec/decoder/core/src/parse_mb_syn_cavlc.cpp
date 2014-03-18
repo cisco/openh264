@@ -666,7 +666,6 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
                                 PWelsDecoderContext pCtx) {
   int32_t iLevel[16], iZerosLeft, iCoeffNum;
   int32_t  iRun[16] = {0};
-  const uint8_t* kpBitNumMap;
   int32_t iCurNonZeroCacheIdx, i;
   const uint16_t* kpDequantCoeff = g_kuiDequantCoeff[uiQp];
   int8_t nA, nB, nC;
@@ -688,18 +687,10 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
     iCurNonZeroCacheIdx = g_kuiCacheNzcScanIdx[iIndex];
     nA = pNonZeroCountCache[iCurNonZeroCacheIdx - 1];
     nB = pNonZeroCountCache[iCurNonZeroCacheIdx - 8];
-
-    if (bChromaDc) {
-      kpBitNumMap = g_kuiTotalZerosBitNumChromaMap;
-    } else {
-      kpBitNumMap = g_kuiTotalZerosBitNumMap;
-    }
   } else { //luma
     iCurNonZeroCacheIdx = g_kuiCacheNzcScanIdx[iIndex];
     nA = pNonZeroCountCache[iCurNonZeroCacheIdx - 1];
     nB = pNonZeroCountCache[iCurNonZeroCacheIdx - 8];
-
-    kpBitNumMap = g_kuiTotalZerosBitNumMap;
   }
 
   WELS_NON_ZERO_COUNT_AVERAGE (nC, nA, nB);
@@ -981,7 +972,6 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
   PSlice pSlice				= &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer;
   PSliceHeader pSliceHeader	= &pSlice->sSliceHeaderExt.sSliceHeader;
   PPicture* ppRefPic = pCtx->sRefPic.pRefList[LIST_0];
-  int32_t iNumRefFrames		= pSliceHeader->pSps->iNumRefFrames;
   int32_t iRefCount[2];
   PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
   int32_t i, j;

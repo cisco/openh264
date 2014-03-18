@@ -303,7 +303,6 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
   assert (kiActualLayerNum <= MAX_DEPENDENCY_LAYER);
 
   for (int8_t iLayer = 0; iLayer < kiActualLayerNum; ++ iLayer) {
-    SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
     CReadConfig cRdLayerCfg (sFileSet.strLayerCfgFile[iLayer]);
     if (-1==ParseLayerConfig( cRdLayerCfg, iLayer, pSvcParam,sFileSet ))
     {
@@ -414,7 +413,6 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
   SLayerPEncCtx sLayerCtx[3];
   int n = 0;
   string str_ ("SlicesAssign");
-  const int kiSize = str_.size();
 
   while (n < argc) {
     pCommand = argv[n++];
@@ -827,7 +825,6 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   int32_t iActualFrameEncodedCount = 0;
   int32_t iFrameIdx = 0;
   int32_t	iTotalFrameMax = -1;
-  int8_t  iDlayerIdx = 0;
   uint8_t* pYUV= NULL;
   SSourcePicture* pSrcPic = NULL;
   int32_t iSourceWidth, iSourceHeight, kiPicResSize;
@@ -961,8 +958,6 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   iFrameIdx = 0;
   while (iFrameIdx < iTotalFrameMax && (((int32_t)sSvcParam.uiFrameToBeCoded <= 0)
                                         || (iFrameIdx < (int32_t)sSvcParam.uiFrameToBeCoded))) {
-    bool bOnePicAvailableAtLeast = false;
-    bool bSomeSpatialUnavailable	  = false;
 
 #ifdef ONLY_ENC_FRAMES_NUM
     // Only encoded some limited frames here

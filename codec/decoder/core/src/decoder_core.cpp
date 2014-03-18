@@ -184,7 +184,7 @@ int32_t ParseRefPicListReordering (PBitStringAux pBs, PSliceHeader pSh) {
           // abs_diff_pic_num_minus1 should be in range 0 to MaxPicNum-1, MaxPicNum is derived as
           // 2^(4+log2_max_frame_num_minus4)
           WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //abs_diff_pic_num_minus1
-          WELS_CHECK_SE_UPPER_ERROR_NOLOG (uiCode, (1 << pSps->uiLog2MaxFrameNum), "abs_diff_pic_num_minus1",
+          WELS_CHECK_SE_UPPER_ERROR_NOLOG (uiCode, (uint32_t) (1 << pSps->uiLog2MaxFrameNum), "abs_diff_pic_num_minus1",
                                            GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_REF_REORDERING));
           pRefPicListReordering->sReorderingSyn[iList][iIdx].uiAbsDiffPicNumMinus1 = uiCode;	// uiAbsDiffPicNumMinus1
         } else if (kuiIdc == 2) {
@@ -206,7 +206,6 @@ int32_t ParseRefPicListReordering (PBitStringAux pBs, PSliceHeader pSh) {
 int32_t ParseDecRefPicMarking (PWelsDecoderContext pCtx, PBitStringAux pBs, PSliceHeader pSh, PSps pSps,
                                const bool kbIdrFlag) {
   PRefPicMarking const kpRefMarking = &pSh->sRefMarking;
-  PRefPic pRefPic = &pCtx->sRefPic;
   uint32_t uiCode;
   if (kbIdrFlag) {
     WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //no_output_of_prior_pics_flag
@@ -990,7 +989,6 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
 
 void UninitialDqLayersContext (PWelsDecoderContext pCtx) {
   int32_t i = 0;
-  int32_t j = 0;
 
   do {
     PDqLayer pDq = pCtx->pDqLayersList[i];
@@ -1642,7 +1640,6 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
   uint8_t uiNalRefIdc = 0;
   bool	bFreshSliceAvailable =
     true;	// Another fresh slice comingup for given dq layer, for multiple slices in case of header parts of slices sometimes loss over error-prone channels, 8/14/2008
-  PPicture  pStoreBasePic = NULL;
 
   //update pCurDqLayer at the starting of AU decoding
   if (pCtx->bInitialDqLayersMem) {
