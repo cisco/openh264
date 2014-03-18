@@ -74,7 +74,7 @@ public:
   virtual int32_t operator () (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY) {
     return m_pfSad(pSrcY, iSrcStrideY, pRefY, iSrcStrideY);
   }
-private:
+protected:
   SadFuncPtr m_pfSad;
 };
 
@@ -87,7 +87,7 @@ class CSceneChangeDetection : public IStrategy {
   }
 
   ~CSceneChangeDetection(){
-  }  
+  }
 
   EResult Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap){
     EResult eReturn = RET_INVALIDPARAM;
@@ -117,7 +117,7 @@ class CSceneChangeDetection : public IStrategy {
 
     for (int32_t j = 0; j < iBlock8x8Height; j ++) {
       pRefTmp	= pRefY;
-      pCurTmp 	= pCurY;
+      pCurTmp   = pCurY;
 
       for (int32_t i = 0; i < iBlock8x8Width; i++) {
         iBlockSad = m_cDetector(pRefTmp, iRefStride, pCurTmp, iCurStride);

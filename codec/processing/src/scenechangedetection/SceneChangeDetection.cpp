@@ -39,7 +39,7 @@ IStrategy * BuildSceneChangeDetection(EMethods eMethod, int32_t iCpuFlag){
   switch(eMethod){
   case METHOD_SCENE_CHANGE_DETECTION_VIDEO:
     return new CSceneChangeDetection<CSceneChangeDetectorVideo>(eMethod, iCpuFlag);
-    break;  
+    break;
   case METHOD_SCENE_CHANGE_DETECTION_SCREEN:
   default:
     // not support yet
