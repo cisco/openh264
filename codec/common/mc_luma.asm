@@ -171,6 +171,7 @@ SECTION .text
 WELS_EXTERN McHorVer22Width8HorFirst_sse2
 	%assign  push_num 0
     LOAD_5_PARA
+    PUSH_XMM 8
 	SIGN_EXTENSION	r1, r1d
 	SIGN_EXTENSION	r3, r3d
 	SIGN_EXTENSION	r4, r4d
@@ -207,6 +208,7 @@ WELS_EXTERN McHorVer22Width8HorFirst_sse2
 	add r2, r3
 	dec r4
 	jnz .yloop_width_8
+	POP_XMM
 	LOAD_5_PARA_POP
 	ret
 
@@ -221,6 +223,7 @@ WELS_EXTERN McHorVer22Width8HorFirst_sse2
 WELS_EXTERN McHorVer20WidthEq8_sse2
 	%assign  push_num 0
     LOAD_5_PARA
+    PUSH_XMM 8
 	SIGN_EXTENSION	r1, r1d
 	SIGN_EXTENSION	r3, r3d
 	SIGN_EXTENSION	r4, r4d
@@ -261,6 +264,7 @@ WELS_EXTERN McHorVer20WidthEq8_sse2
 	dec r4
 	jnz near .y_loop
 
+	POP_XMM
 	LOAD_5_PARA_POP
 	ret
 
@@ -275,6 +279,7 @@ WELS_EXTERN McHorVer20WidthEq8_sse2
 WELS_EXTERN McHorVer20WidthEq16_sse2
 	%assign  push_num 0
     LOAD_5_PARA
+    PUSH_XMM 8
 	SIGN_EXTENSION	r1, r1d
 	SIGN_EXTENSION	r3, r3d
 	SIGN_EXTENSION	r4, r4d
@@ -341,6 +346,7 @@ WELS_EXTERN McHorVer20WidthEq16_sse2
 	dec r4
 	jnz near .y_loop
 
+	POP_XMM
 	LOAD_5_PARA_POP
 	ret
 
@@ -355,6 +361,7 @@ WELS_EXTERN McHorVer20WidthEq16_sse2
 WELS_EXTERN McHorVer02WidthEq8_sse2
 	%assign  push_num 0
     LOAD_5_PARA
+    PUSH_XMM 8
 	SIGN_EXTENSION	r1, r1d
 	SIGN_EXTENSION	r3, r3d
 	SIGN_EXTENSION	r4, r4d
@@ -424,6 +431,7 @@ WELS_EXTERN McHorVer02WidthEq8_sse2
 	jmp near .start
 
 .xx_exit:
+	POP_XMM
 	LOAD_5_PARA_POP
 	ret
 
@@ -446,6 +454,7 @@ SECTION .text
 WELS_EXTERN McHorVer02Height9Or17_sse2
 	%assign  push_num 0
     LOAD_6_PARA
+    PUSH_XMM 8
 	SIGN_EXTENSION	r1, r1d
 	SIGN_EXTENSION	r3, r3d
 	SIGN_EXTENSION	r4, r4d
@@ -563,6 +572,7 @@ WELS_EXTERN McHorVer02Height9Or17_sse2
 	pop r13
 	pop r12
 %endif
+	POP_XMM
 	LOAD_6_PARA_POP
 	ret
 
@@ -579,6 +589,7 @@ WELS_EXTERN McHorVer02Height9Or17_sse2
 WELS_EXTERN McHorVer20Width9Or17_sse2
 	%assign  push_num 0
     LOAD_6_PARA
+    PUSH_XMM 8
 	SIGN_EXTENSION	r1, r1d
 	SIGN_EXTENSION	r3, r3d
 	SIGN_EXTENSION	r4, r4d
@@ -639,6 +650,7 @@ WELS_EXTERN McHorVer20Width9Or17_sse2
 	add r2, r3
 	dec r5
 	jnz .yloop_width_9
+	POP_XMM
 	LOAD_6_PARA_POP
 	ret
 
@@ -720,6 +732,7 @@ WELS_EXTERN McHorVer20Width9Or17_sse2
 	add r2, r3
 	dec r5
 	jnz .yloop_width_17
+	POP_XMM
 	LOAD_6_PARA_POP
 	ret
 
@@ -736,6 +749,7 @@ WELS_EXTERN McHorVer20Width9Or17_sse2
 WELS_EXTERN McHorVer22HorFirst_sse2
 	%assign  push_num 0
     LOAD_6_PARA
+    PUSH_XMM 8
 	SIGN_EXTENSION	r1, r1d
 	SIGN_EXTENSION	r3, r3d
 	SIGN_EXTENSION	r4, r4d
@@ -792,6 +806,7 @@ WELS_EXTERN McHorVer22HorFirst_sse2
 	add r2, r3
 	dec r5
 	jnz .yloop_width_9
+	POP_XMM
 	LOAD_6_PARA_POP
 	ret
 
@@ -866,6 +881,7 @@ WELS_EXTERN McHorVer22HorFirst_sse2
 	add r2, r3
 	dec r5
 	jnz .yloop_width_17
+	POP_XMM
 	LOAD_6_PARA_POP
 	ret
 
@@ -903,6 +919,7 @@ WELS_EXTERN McHorVer22HorFirst_sse2
 WELS_EXTERN McHorVer22Width8VerLastAlign_sse2
 	%assign  push_num 0
     LOAD_6_PARA
+    PUSH_XMM 8
 	SIGN_EXTENSION	r1, r1d
 	SIGN_EXTENSION	r3, r3d
 	SIGN_EXTENSION	r4, r4d
@@ -1016,6 +1033,7 @@ WELS_EXTERN McHorVer22Width8VerLastAlign_sse2
 	pop r13
 	pop r12
 %endif
+	POP_XMM
 	LOAD_6_PARA_POP
 	ret
 
@@ -1032,6 +1050,7 @@ WELS_EXTERN McHorVer22Width8VerLastAlign_sse2
 WELS_EXTERN McHorVer22Width8VerLastUnAlign_sse2
 	%assign  push_num 0
     LOAD_6_PARA
+    PUSH_XMM 8
 	SIGN_EXTENSION	r1, r1d
 	SIGN_EXTENSION	r3, r3d
 	SIGN_EXTENSION	r4, r4d
@@ -1144,5 +1163,6 @@ WELS_EXTERN McHorVer22Width8VerLastUnAlign_sse2
 	pop r13
 	pop r12
 %endif
+	POP_XMM
 	LOAD_6_PARA_POP
 	ret

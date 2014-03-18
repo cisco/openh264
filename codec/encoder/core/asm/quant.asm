@@ -136,6 +136,7 @@ WELS_EXTERN WelsQuantFour4x4_sse2
 WELS_EXTERN WelsQuantFour4x4Max_sse2
 		%assign push_num 0
 		LOAD_4_PARA
+		PUSH_XMM 8
 		MOVDQ	xmm2, [r1]
 		MOVDQ	xmm3, [r2]
 
@@ -161,6 +162,7 @@ WELS_EXTERN WelsQuantFour4x4Max_sse2
 		pmaxsw	xmm0, xmm1
 
 		movq	[r3], xmm0
+		POP_XMM
 		LOAD_4_PARA_POP
 		ret
 

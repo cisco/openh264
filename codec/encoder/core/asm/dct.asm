@@ -290,6 +290,7 @@ WELS_EXTERN WelsIDctT4Rec_mmx
 WELS_EXTERN WelsDctFourT4_sse2
     %assign push_num 0
     LOAD_5_PARA
+    PUSH_XMM 8
     SIGN_EXTENSION r2, r2d
     SIGN_EXTENSION r4, r4d
     pxor    xmm7, xmm7
@@ -327,6 +328,7 @@ WELS_EXTERN WelsDctFourT4_sse2
 	lea		r0, [r0+64]
 	SSE2_Store4x8p r0, xmm4, xmm2, xmm3, xmm0, xmm5
 
+	POP_XMM
 	LOAD_5_PARA_POP
     ret
 
@@ -337,6 +339,7 @@ WELS_EXTERN WelsDctFourT4_sse2
 WELS_EXTERN WelsIDctFourT4Rec_sse2
 	%assign push_num 0
 	LOAD_5_PARA
+	PUSH_XMM 8
 	SIGN_EXTENSION r1, r1d
 	SIGN_EXTENSION r3, r3d
 	;Load 4x8
@@ -376,6 +379,7 @@ WELS_EXTERN WelsIDctFourT4Rec_sse2
 	lea		r2, [r2 + 2 * r3]
 	SSE2_StoreDiff8p   xmm1, xmm5, xmm6, xmm7, [r0],			[r2]
 	SSE2_StoreDiff8p   xmm2, xmm5, xmm6, xmm7, [r0 + r1],	[r2 + r3]
+	POP_XMM
 	LOAD_5_PARA_POP
    ; pop		esi
    ; pop		ebx
@@ -394,6 +398,7 @@ WELS_EXTERN WelsIDctFourT4Rec_sse2
 WELS_EXTERN WelsIDctRecI16x16Dc_sse2
 	%assign push_num 0
 	LOAD_5_PARA
+	PUSH_XMM 8
 	SIGN_EXTENSION r1, r1d
 	SIGN_EXTENSION r3, r3d
 	pxor		xmm7,		xmm7
@@ -430,6 +435,7 @@ WELS_EXTERN WelsIDctRecI16x16Dc_sse2
 	lea			r0,		[r0 + 2 * r1]
 	lea			r2,		[r2 + 2 * r3]
 	SSE2_StoreDiff4x8p		xmm2, xmm3, xmm5, xmm7, r0, r2, r1, r3
+	POP_XMM
 	LOAD_5_PARA_POP
     ret
 
@@ -468,6 +474,7 @@ WELS_EXTERN WelsIDctRecI16x16Dc_sse2
 WELS_EXTERN WelsHadamardT4Dc_sse2
 		%assign push_num 0
 		LOAD_2_PARA
+		PUSH_XMM 8
 		SSE2_Load4Col	    xmm1, xmm5, xmm6, xmm0, r1
 		SSE2_Load4Col	    xmm2, xmm5, xmm6, xmm0, r1 + 0x40
 		SSE2_Load4Col	    xmm3, xmm5, xmm6, xmm0, r1 + 0x100
@@ -493,4 +500,5 @@ WELS_EXTERN WelsHadamardT4Dc_sse2
 		movdqa	[r0+ 0],   xmm3
 		movdqa	[r0+16],   xmm2
 
+		POP_XMM
 		ret

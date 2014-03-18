@@ -335,6 +335,82 @@ BITS 32
     %endif
 %endmacro
 
+%macro PUSH_XMM 1
+    %ifdef WIN64
+        %assign xmm_num_regs %1
+        %if xmm_num_regs > 6
+            %ifdef push_num
+                %assign push_num push_num+2*(%1-6)
+            %endif
+            sub rsp, 16*(%1 - 6)
+            movdqu [rsp], xmm6
+        %endif
+        %if xmm_num_regs > 7
+            movdqu [rsp+16], xmm7
+        %endif
+        %if xmm_num_regs > 8
+            movdqu [rsp+32], xmm8
+        %endif
+        %if xmm_num_regs > 9
+            movdqu [rsp+48], xmm9
+        %endif
+        %if xmm_num_regs > 10
+            movdqu [rsp+64], xmm10
+        %endif
+        %if xmm_num_regs > 11
+            movdqu [rsp+80], xmm11
+        %endif
+        %if xmm_num_regs > 12
+            movdqu [rsp+96], xmm12
+        %endif
+        %if xmm_num_regs > 13
+            movdqu [rsp+112], xmm13
+        %endif
+        %if xmm_num_regs > 14
+            movdqu [rsp+128], xmm14
+        %endif
+        %if xmm_num_regs > 15
+            movdqu [rsp+144], xmm15
+        %endif
+    %endif
+%endmacro
+
+%macro POP_XMM 0
+    %ifdef WIN64
+        %if xmm_num_regs > 15
+            movdqu xmm15, [rsp+144]
+        %endif
+        %if xmm_num_regs > 14
+            movdqu xmm14, [rsp+128]
+        %endif
+        %if xmm_num_regs > 13
+            movdqu xmm13, [rsp+112]
+        %endif
+        %if xmm_num_regs > 12
+            movdqu xmm12, [rsp+96]
+        %endif
+        %if xmm_num_regs > 11
+            movdqu xmm11, [rsp+80]
+        %endif
+        %if xmm_num_regs > 10
+            movdqu xmm10, [rsp+64]
+        %endif
+        %if xmm_num_regs > 9
+            movdqu xmm9, [rsp+48]
+        %endif
+        %if xmm_num_regs > 8
+            movdqu xmm8, [rsp+32]
+        %endif
+        %if xmm_num_regs > 7
+            movdqu xmm7, [rsp+16]
+        %endif
+        %if xmm_num_regs > 6
+            movdqu xmm6, [rsp]
+            add rsp, 16*(xmm_num_regs - 6)
+        %endif
+    %endif
+%endmacro
+
 %macro SIGN_EXTENSION 2
     %ifndef X86_32
             movsxd %1, %2

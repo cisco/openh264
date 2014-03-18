@@ -149,6 +149,7 @@ WELS_EXTERN AnalysisVaaInfoIntra_sse2
 
     %assign push_num 0
     LOAD_2_PARA
+    PUSH_XMM 8
     SIGN_EXTENSION r1,r1d
 
 %ifdef X86_32
@@ -232,6 +233,7 @@ WELS_EXTERN AnalysisVaaInfoIntra_sse2
 	pop r4
 	pop r3
 %endif
+	POP_XMM
 
 	ret
 
@@ -242,6 +244,7 @@ WELS_EXTERN AnalysisVaaInfoIntra_ssse3
 
     %assign push_num 0
     LOAD_2_PARA
+    PUSH_XMM 8
     SIGN_EXTENSION r1,r1d
 
 %ifdef X86_32
@@ -325,6 +328,7 @@ WELS_EXTERN AnalysisVaaInfoIntra_ssse3
 	pop r4
 	pop r3
 %endif
+	POP_XMM
 
 	ret
 

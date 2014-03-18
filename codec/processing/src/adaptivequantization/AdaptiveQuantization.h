@@ -84,7 +84,6 @@ class CAdaptiveQuantization : public IStrategy {
   PVarFunc			                   m_pfVar;
   int32_t                                  m_CPUFlag;
   SAdaptiveQuantizationParam    m_sAdaptiveQuantParam;
-  XMMREG_PROTECT_DECLARE(AdaptiveQuantization);
 };
 
 WELSVP_NAMESPACE_END

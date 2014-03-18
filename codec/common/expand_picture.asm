@@ -360,6 +360,7 @@ WELS_EXTERN ExpandPictureLuma_sse2
 
     %assign push_num 3
     LOAD_4_PARA
+    PUSH_XMM 7
 
     SIGN_EXTENSION r1, r1d
     SIGN_EXTENSION r2, r2d
@@ -461,6 +462,7 @@ WELS_EXTERN ExpandPictureLuma_sse2
     ; for left & right border expanding
     exp_cross_sse2 32,a
 
+    POP_XMM
     LOAD_4_PARA_POP
 
     pop r6
@@ -486,6 +488,7 @@ WELS_EXTERN ExpandPictureChromaAlign_sse2
 
     %assign push_num 3
     LOAD_4_PARA
+    PUSH_XMM 7
 
     SIGN_EXTENSION r1,r1d
     SIGN_EXTENSION r2,r2d
@@ -586,6 +589,7 @@ WELS_EXTERN ExpandPictureChromaAlign_sse2
     ; for left & right border expanding
     exp_cross_sse2 16,a
 
+    POP_XMM
     LOAD_4_PARA_POP
 
     pop r6
@@ -610,6 +614,7 @@ WELS_EXTERN ExpandPictureChromaUnalign_sse2
 
     %assign push_num 3
     LOAD_4_PARA
+    PUSH_XMM 7
 
     SIGN_EXTENSION r1,r1d
     SIGN_EXTENSION r2,r2d
@@ -710,6 +715,7 @@ WELS_EXTERN ExpandPictureChromaUnalign_sse2
     ; for left & right border expanding
     exp_cross_sse2 16,u
 
+    POP_XMM
     LOAD_4_PARA_POP
 
     pop r6

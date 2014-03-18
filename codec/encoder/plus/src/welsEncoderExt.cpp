@@ -138,7 +138,6 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
 #endif//OUTPUT_BIT_STREAM
 
   InitEncoder();
-  XMMREG_PROTECT_INIT(CWelsH264SVCEncoder);
 }
 
 CWelsH264SVCEncoder::~CWelsH264SVCEncoder() {
@@ -172,7 +171,6 @@ CWelsH264SVCEncoder::~CWelsH264SVCEncoder() {
 #endif//OUTPUT_BIT_STREAM
 
   Uninitialize();
-  XMMREG_PROTECT_UNINIT(CWelsH264SVCEncoder);
 }
 
 void CWelsH264SVCEncoder::InitEncoder (void) {
@@ -551,9 +549,7 @@ int CWelsH264SVCEncoder::EncodeFrameInternal(const SSourcePicture*  pSrcPic, SFr
 
   int32_t iFrameTypeReturned = 0;
   int32_t iFrameType = videoFrameTypeInvalid;
-  XMMREG_PROTECT_STORE(CWelsH264SVCEncoder);
   const int32_t kiEncoderReturn = WelsEncoderEncodeExt (m_pEncContext, pBsInfo, pSrcPic);
-  XMMREG_PROTECT_LOAD(CWelsH264SVCEncoder);
 
   if(kiEncoderReturn == ENC_RETURN_MEMALLOCERR) {
     WelsUninitEncoderExt (&m_pEncContext);

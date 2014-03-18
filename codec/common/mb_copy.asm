@@ -67,6 +67,7 @@ WELS_EXTERN WelsCopy16x16_sse2
 	push r5
 	%assign  push_num 2
     LOAD_4_PARA
+    PUSH_XMM 8
 
 	lea r4, [r1+2*r1]	;ebx, [eax+2*eax]	; x3
 	lea r5, [r3+2*r3]	;edx, [ecx+2*ecx]	; x3
@@ -112,6 +113,7 @@ WELS_EXTERN WelsCopy16x16_sse2
 	movdqa [r0+r1], xmm5
 	movdqa [r0+2*r1], xmm6
 	movdqa [r0+r4], xmm7
+	POP_XMM
 	LOAD_4_PARA_POP
 	pop r5
 	pop r4
@@ -129,6 +131,7 @@ WELS_EXTERN WelsCopy16x16NotAligned_sse2
 	push r5
 	%assign  push_num 2
     LOAD_4_PARA
+    PUSH_XMM 8
 
 	lea r4, [r1+2*r1]	;ebx, [eax+2*eax]	; x3
 	lea r5, [r3+2*r3]	;edx, [ecx+2*ecx]	; x3
@@ -174,6 +177,7 @@ WELS_EXTERN WelsCopy16x16NotAligned_sse2
 	movdqa [r0+r1], xmm5
 	movdqa [r0+2*r1], xmm6
 	movdqa [r0+r4], xmm7
+	POP_XMM
 	LOAD_4_PARA_POP
 	pop r5
 	pop r4
@@ -191,6 +195,7 @@ WELS_EXTERN WelsCopy16x8NotAligned_sse2
 	push r5
 	%assign  push_num 2
     LOAD_4_PARA
+    PUSH_XMM 8
 
 	lea r4, [r1+2*r1]	;ebx, [eax+2*eax]	; x3
 	lea r5, [r3+2*r3]	;edx, [ecx+2*ecx]	; x3
@@ -214,6 +219,7 @@ WELS_EXTERN WelsCopy16x8NotAligned_sse2
 	movdqa [r0+r1], xmm5
 	movdqa [r0+2*r1], xmm6
 	movdqa [r0+r4], xmm7
+	POP_XMM
 	LOAD_4_PARA_POP
 	pop r5
 	pop r4

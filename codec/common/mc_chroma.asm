@@ -149,6 +149,7 @@ WELS_EXTERN McChromaWidthEq4_mmx
 WELS_EXTERN McChromaWidthEq8_sse2
 	%assign  push_num 0
 	LOAD_6_PARA
+	PUSH_XMM 8
 	SIGN_EXTENSION	r1, r1d
 	SIGN_EXTENSION	r3, r3d
 	SIGN_EXTENSION	r5, r5d
@@ -208,6 +209,7 @@ WELS_EXTERN McChromaWidthEq8_sse2
 	dec r5
 	jnz near .xloop
 
+	POP_XMM
 	LOAD_6_PARA_POP
 
 	ret
@@ -226,6 +228,7 @@ WELS_EXTERN McChromaWidthEq8_sse2
 WELS_EXTERN McChromaWidthEq8_ssse3
 	%assign  push_num 0
 	LOAD_6_PARA
+	PUSH_XMM 8
 	SIGN_EXTENSION	r1, r1d
 	SIGN_EXTENSION	r3, r3d
 	SIGN_EXTENSION	r5, r5d
@@ -282,6 +285,7 @@ WELS_EXTERN McChromaWidthEq8_ssse3
 	sub r5, 2
 	jnz .hloop_chroma
 
+	POP_XMM
 	LOAD_6_PARA_POP
 
 	ret
