@@ -767,7 +767,7 @@ int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
     }
 
     /* Write bit-stream */
-    if (pFpBs != NULL && videoFrameTypeSkip == sFbi.eOutputFrameType) {	// file handler to write bit stream
+    if (pFpBs != NULL && videoFrameTypeSkip != sFbi.eOutputFrameType) {	// file handler to write bit stream
       int iLayer = 0;
       while (iLayer < sFbi.iLayerNum) {
         SLayerBSInfo* pLayerBsInfo = &sFbi.sLayerInfo[iLayer];
