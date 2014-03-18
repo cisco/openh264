@@ -89,6 +89,10 @@ uint16_t		uiReserved;
 int32_t			iCostSkipMb;
 int32_t			iSadPredSkip;
 
+int32_t			iMbPixX;		// pixel position of MB in horizontal axis
+int32_t			iMbPixY;		// pixel position of MB in vertical axis
+int32_t			iBlock8x8StaticIdc[4];
+
 //NO B frame in our Wels, we can ignore list1
 
 struct {

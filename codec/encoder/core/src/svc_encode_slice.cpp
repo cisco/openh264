@@ -918,6 +918,14 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
 ///////////////
 //  pMb loop
 ///////////////
+inline void WelsInitInterMDStruc(const SMB* pCurMb, uint16_t *pMvdCostTableInter, const int32_t kiMvdInterTableStride, SWelsMD* pMd )
+{
+  pMd->iLambda = g_kiQpCostTable[pCurMb->uiLumaQp];
+  pMd->pMvdCost = &pMvdCostTableInter[pCurMb->uiLumaQp * kiMvdInterTableStride];
+  pMd->	iMbPixX = (pCurMb->iMbX<<4);
+  pMd->	iMbPixY = (pCurMb->iMbY<<4);
+  memset( &pMd->iBlock8x8StaticIdc[0], 0, sizeof(pMd->iBlock8x8StaticIdc) );
+}
 // for inter non-dynamic pSlice
 int32_t WelsMdInterMbLoop (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pWelsMd, const int32_t kiSliceFirstMbXY) {
   SWelsMD* pMd					= (SWelsMD*)pWelsMd;
@@ -948,10 +956,9 @@ int32_t WelsMdInterMbLoop (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pWelsMd, 
     pEncCtx->pFuncList->pfRc.pfWelsRcMbInit (pEncCtx, pCurMb, pSlice);
 
     //step (2). save some vale for future use, initial pWelsMd
-    pMd->iLambda = g_kiQpCostTable[pCurMb->uiLumaQp];
-    pMd->pMvdCost = &pMvdCostTableInter[pCurMb->uiLumaQp * kiMvdInterTableStride];
     WelsMdIntraInit (pEncCtx, pCurMb, pMbCache, kiSliceFirstMbXY);
     WelsMdInterInit (pEncCtx, pSlice, pCurMb, kiSliceFirstMbXY);
+    WelsInitInterMDStruc(pCurMb, pMvdCostTableInter, kiMvdInterTableStride, pMd );
     pEncCtx->pFuncList->pfInterMd (pEncCtx, pMd, pSlice, pCurMb, pMbCache);
     //mb_qp
 
@@ -1047,11 +1054,9 @@ int32_t WelsMdInterMbLoopOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice,
     }
 
     //step (2). save some vale for future use, initial pWelsMd
-    pMd->iLambda = g_kiQpCostTable[pCurMb->uiLumaQp];
-    pMd->pMvdCost = &pMvdCostTableInter[pCurMb->uiLumaQp * kiMvdInterTableStride];
-
     WelsMdIntraInit (pEncCtx, pCurMb, pMbCache, kiSliceFirstMbXY);
     WelsMdInterInit (pEncCtx, pSlice, pCurMb, kiSliceFirstMbXY);
+    WelsInitInterMDStruc(pCurMb, pMvdCostTableInter, kiMvdInterTableStride, pMd );
     pEncCtx->pFuncList->pfInterMd (pEncCtx, pMd, pSlice, pCurMb, pMbCache);
     //mb_qp
 
