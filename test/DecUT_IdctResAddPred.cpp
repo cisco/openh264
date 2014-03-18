@@ -29,22 +29,22 @@ void IdctResAddPred_ref (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) {
     int32_t kT3	= (32 + kT1 + kT2) >> 6;
     int32_t kT4	= (32 + kT1 - kT2) >> 6;
 
-    pDst[i] = WELS_CLIP1( kT3 + pPred[i] );
-    pDst[i + kiStride3] = WELS_CLIP1( kT4 + pPred[i + kiStride3] );
+    pDst[i] = WELS_CLIP1 (kT3 + pPred[i]);
+    pDst[i + kiStride3] = WELS_CLIP1 (kT4 + pPred[i + kiStride3]);
 
     kT1	= iSrc[i] - iSrc[i + 8];
     kT2	= (iSrc[i + 4] >> 1) - iSrc[i + 12];
-    pDst[i + kiStride] = WELS_CLIP1( ((32 + kT1 + kT2) >> 6) + pDst[i + kiStride] );
-    pDst[i + kiStride2] = WELS_CLIP1( ((32 + kT1 - kT2) >> 6) + pDst[i + kiStride2] );
+    pDst[i + kiStride] = WELS_CLIP1 (((32 + kT1 + kT2) >> 6) + pDst[i + kiStride]);
+    pDst[i + kiStride2] = WELS_CLIP1 (((32 + kT1 - kT2) >> 6) + pDst[i + kiStride2]);
   }
 }
 
 #define GENERATE_IDCTRESADDPRED(pred) \
 TEST(DecoderDecodeMbAux, pred) {\
   const int32_t kiStride = 32;\
-  const int bits = 13;\
-  const int mask = (1 << bits) - 1;\
-  const int offset = 1 << (bits - 1);\
+  const int iBits = 13;\
+  const int iMask = (1 << iBits) - 1;\
+  const int iOffset = 1 << (iBits - 1);\
   int16_t iRS[16];\
   uint8_t uiPred[16*kiStride];\
   int16_t iRefRS[16];\
@@ -54,7 +54,7 @@ TEST(DecoderDecodeMbAux, pred) {\
   while(iRunTimes--) {\
     for(int i = 0; i < 4; i++)\
       for(int j = 0; j < 4; j++)\
-        iRefRS[i*4+j] = iRS[i*4+j] = (rand() & mask) - offset;\
+        iRefRS[i*4+j] = iRS[i*4+j] = (rand() & iMask) - iOffset;\
     for(int i = 0; i < 4; i++)\
       for(int j = 0; j < 4; j++)\
         uiRefPred[i * kiStride + j] = uiPred[i * kiStride + j] = rand() & 255;\
@@ -72,11 +72,11 @@ TEST(DecoderDecodeMbAux, pred) {\
   }\
 }
 
-GENERATE_IDCTRESADDPRED(IdctResAddPred_c)
+GENERATE_IDCTRESADDPRED (IdctResAddPred_c)
 #if defined(X86_ASM)
-GENERATE_IDCTRESADDPRED(IdctResAddPred_mmx)
+GENERATE_IDCTRESADDPRED (IdctResAddPred_mmx)
 #endif
 
 #if defined(HAVE_NEON)
-GENERATE_IDCTRESADDPRED(IdctResAddPred_neon)
+GENERATE_IDCTRESADDPRED (IdctResAddPred_neon)
 #endif
