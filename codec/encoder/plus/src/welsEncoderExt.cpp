@@ -295,6 +295,10 @@ int CWelsH264SVCEncoder::Initialize2 (SWelsSvcCodingParam* pCfg) {
   }
 #endif//REC_FRAME_COUNT
 
+/*  pCfg->iRCMode = RC_MODE1;
+  if(pCfg->bEnableRc && !pCfg->bEnableFrameSkip)
+	pCfg->iRCMode = RC_MODE_BITLIMIT;
+*/
   const int32_t iColorspace = pCfg->iInputCsp;
   if (0 == iColorspace) {
     WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::Initialize(), invalid iInputCsp= %d.\n", iColorspace);
@@ -881,7 +885,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     WelsEncoderApplyBitRate (m_pEncContext->pSvcParam);
   }
   break;
-  case ENCODER_OPTION_RC_MODE: {	// 0:quality mode;1:bit-rate mode
+  case ENCODER_OPTION_RC_MODE: {	// 0:quality mode;1:bit-rate mode;2:bitrate limited mode
     int32_t iValue = * ((int32_t*)pOption);
     m_pEncContext->pSvcParam->iRCMode	= iValue;
   }

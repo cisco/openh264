@@ -346,7 +346,7 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
   {
     SPicture* pLastPic = m_pLastSpatialPicture[kiDidx][0];
     bool bCalculateSQDiff = ((pLastPic->pData[0] == pRefPic->pData[0]) && bNeededMbAq);
-    bool bCalculateVar = (pSvcParam->iRCMode == RC_MODE1 && pCtx->eSliceType == I_SLICE);
+    bool bCalculateVar = (pSvcParam->iRCMode >= RC_MODE1 && pCtx->eSliceType == I_SLICE);
 
     VaaCalculation (pCtx->pVaa, pCurPic, pRefPic, bCalculateSQDiff, bCalculateVar, bCalculateBGD);
   }
@@ -833,9 +833,9 @@ void CWelsPreProcess::AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCu
 
   if (pSvcParam->iRCMode == RC_MODE0 && pCtx->eSliceType == P_SLICE) {
     iComplexityAnalysisMode = FRAME_SAD;
-  } else if (pSvcParam->iRCMode == RC_MODE1 && pCtx->eSliceType == P_SLICE) {
+  } else if (pSvcParam->iRCMode >= RC_MODE1 && pCtx->eSliceType == P_SLICE) {
     iComplexityAnalysisMode = GOM_SAD;
-  } else if (pSvcParam->iRCMode == RC_MODE1 && pCtx->eSliceType == I_SLICE) {
+  } else if (pSvcParam->iRCMode >= RC_MODE1 && pCtx->eSliceType == I_SLICE) {
     iComplexityAnalysisMode = GOM_VAR;
   } else {
     return;
