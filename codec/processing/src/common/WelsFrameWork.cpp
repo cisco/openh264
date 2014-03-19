@@ -265,8 +265,9 @@ IStrategy* CVpFrameWork::CreateStrategy (EMethods m_eMethod, int32_t iCpuFlag) {
   case METHOD_DENOISE:
     pStrategy = WelsDynamicCast (IStrategy*, new CDenoiser (iCpuFlag));
     break;
-  case METHOD_SCENE_CHANGE_DETECTION:
-    pStrategy = WelsDynamicCast (IStrategy*, new CSceneChangeDetection (iCpuFlag));
+  case METHOD_SCENE_CHANGE_DETECTION_VIDEO:
+  case METHOD_SCENE_CHANGE_DETECTION_SCREEN:
+    pStrategy = BuildSceneChangeDetection(m_eMethod, iCpuFlag);
     break;
   case METHOD_DOWNSAMPLE:
     pStrategy = WelsDynamicCast (IStrategy*, new CDownsampling (iCpuFlag));

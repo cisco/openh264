@@ -603,7 +603,7 @@ void CWelsPreProcess::BilateralDenoising (SPicture* pSrc, const int32_t kiWidth,
 
 bool CWelsPreProcess::DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture) {
   bool bSceneChangeFlag = false;
-  int32_t iMethodIdx = METHOD_SCENE_CHANGE_DETECTION;
+  int32_t iMethodIdx = METHOD_SCENE_CHANGE_DETECTION_VIDEO;
   SSceneChangeResult sSceneChangeDetectResult = { SIMILAR_SCENE };
   SPixMap sSrcPixMap = {0};
   SPixMap sRefPixMap = {0};

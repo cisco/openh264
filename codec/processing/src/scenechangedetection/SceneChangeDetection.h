@@ -44,28 +44,116 @@
 
 #include "util.h"
 #include "memory.h"
+#include "cpu.h"
 #include "WelsFrameWork.h"
 #include "IWelsVP.h"
 #include "SceneChangeDetectionCommon.h"
 
+#define HIGH_MOTION_BLOCK_THRESHOLD 320
+#define SCENE_CHANGE_MOTION_RATIO   0.85f
+
 WELSVP_NAMESPACE_BEGIN
 
+class CSceneChangeDetectorVideo {
+public:
+  CSceneChangeDetectorVideo(int32_t iCpuFlag) {
+    m_pfSad = WelsSampleSad8x8_c;
+#ifdef X86_ASM
+    if (iCpuFlag & WELS_CPU_SSE2){
+      m_pfSad = WelsSampleSad8x8_sse21;
+    }
+#endif
+#ifdef HAVE_NEON
+    if (iCpuFlag & WELS_CPU_NEON){
+      m_pfSad = WelsProcessingSampleSad8x8_neon;
+    }
+#endif
+  }
+  virtual ~CSceneChangeDetectorVideo() {
+  }
+  virtual int32_t operator () (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY) {
+    return m_pfSad(pSrcY, iSrcStrideY, pRefY, iSrcStrideY);
+  }
+protected:
+  SadFuncPtr m_pfSad;
+};
+
+template<typename T>
 class CSceneChangeDetection : public IStrategy {
  public:
-  CSceneChangeDetection (int32_t iCpuFlag);
-  ~CSceneChangeDetection();
+  CSceneChangeDetection (EMethods eMethod, int32_t iCpuFlag): m_cDetector(iCpuFlag) {
+    m_eMethod   = eMethod;
+    WelsMemset (&m_sSceneChangeParam, 0, sizeof (m_sSceneChangeParam));
+  }
 
-  EResult Process (int32_t iType, SPixMap* pSrc, SPixMap* pRef);
-  EResult Get (int32_t iType, void* pParam);
+  ~CSceneChangeDetection(){
+  }
+
+  EResult Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap){
+    EResult eReturn = RET_INVALIDPARAM;
+    int32_t iWidth                  = pSrcPixMap->sRect.iRectWidth;
+    int32_t iHeight                 = pSrcPixMap->sRect.iRectHeight;
+    int32_t iBlock8x8Width      = iWidth  >> 3;
+    int32_t iBlock8x8Height	 = iHeight >> 3;
+    int32_t iBlock8x8Num       = iBlock8x8Width * iBlock8x8Height;
+    int32_t iSceneChangeThreshold = WelsStaticCast (int32_t, SCENE_CHANGE_MOTION_RATIO * iBlock8x8Num + 0.5f + PESN);
+    int32_t iBlockSad = 0;
+    int32_t iMotionBlockNum = 0;
+    uint8_t* pRefY = NULL, *pCurY = NULL;
+    int32_t iRefStride = 0, iCurStride = 0;
+    int32_t iRefRowStride = 0, iCurRowStride = 0;
+    uint8_t* pRefTmp = NULL, *pCurTmp = NULL;
+
+    pRefY = (uint8_t*)pRefPixMap->pPixel[0];
+    pCurY = (uint8_t*)pSrcPixMap->pPixel[0];
+
+    iRefStride  = pRefPixMap->iStride[0];
+    iCurStride  = pSrcPixMap->iStride[0];
+
+    iRefRowStride  = pRefPixMap->iStride[0] << 3;
+    iCurRowStride  = pSrcPixMap->iStride[0] << 3;
+
+    m_sSceneChangeParam.eSceneChangeIdc = SIMILAR_SCENE;
+
+    for (int32_t j = 0; j < iBlock8x8Height; j ++) {
+      pRefTmp	= pRefY;
+      pCurTmp   = pCurY;
+
+      for (int32_t i = 0; i < iBlock8x8Width; i++) {
+        iBlockSad = m_cDetector(pRefTmp, iRefStride, pCurTmp, iCurStride);
+        iMotionBlockNum += (iBlockSad > HIGH_MOTION_BLOCK_THRESHOLD);
+
+        pRefTmp += 8;
+        pCurTmp += 8;
+      }
+
+      pRefY += iRefRowStride;
+      pCurY += iCurRowStride;
+    }
+
+    if (iMotionBlockNum >= iSceneChangeThreshold) {
+      m_sSceneChangeParam.eSceneChangeIdc = LARGE_CHANGED_SCENE;
+    }
+
+    eReturn = RET_SUCCESS;
+
+    return eReturn;
+  }
+
+  EResult Get (int32_t iType, void* pParam) {
+    if (pParam == NULL) {
+      return RET_INVALIDPARAM;
+    }
+    * (SSceneChangeResult*)pParam = m_sSceneChangeParam;
+    return RET_SUCCESS;
+  }
 
  private:
-  void InitSadFuncs (SadFuncPtr& pfSadFunc, int32_t iCpuFlag);
-
- private:
-  SadFuncPtr m_pfSad;
-  int32_t    m_iCpuFlag;
   SSceneChangeResult m_sSceneChangeParam;
+  T          m_cDetector;
 };
+
+IStrategy * BuildSceneChangeDetection(EMethods eMethod, int32_t iCpuFlag);
 
 WELSVP_NAMESPACE_END
 
