@@ -50,13 +50,14 @@
 #include "SceneChangeDetectionCommon.h"
 
 #define HIGH_MOTION_BLOCK_THRESHOLD 320
-#define SCENE_CHANGE_MOTION_RATIO   0.85f
+#define SCENE_CHANGE_MOTION_RATIO_LARGE   0.85f
+#define SCENE_CHANGE_MOTION_RATIO_MEDIUM  0.50f
 
 WELSVP_NAMESPACE_BEGIN
 
 class CSceneChangeDetectorVideo {
 public:
-  CSceneChangeDetectorVideo(int32_t iCpuFlag) {
+  CSceneChangeDetectorVideo(SSceneChangeResult & sParam, int32_t iCpuFlag) : m_sParam(sParam) {
     m_pfSad = WelsSampleSad8x8_c;
 #ifdef X86_ASM
     if (iCpuFlag & WELS_CPU_SSE2){
@@ -71,17 +72,37 @@ public:
   }
   virtual ~CSceneChangeDetectorVideo() {
   }
-  virtual int32_t operator () (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY) {
-    return m_pfSad(pSrcY, iSrcStrideY, pRefY, iSrcStrideY);
+  virtual void operator () (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY, uint8_t *& pStaticBlockIdc) {
+    int32_t iSad = m_pfSad(pSrcY, iSrcStrideY, pRefY, iSrcStrideY);
+    m_sParam.iMotionBlockNum += iSad > HIGH_MOTION_BLOCK_THRESHOLD;    
   }
 protected:
   SadFuncPtr m_pfSad;
+  SSceneChangeResult &m_sParam;
+};
+
+class CSceneChangeDetectorScreen : public CSceneChangeDetectorVideo{
+public:
+  CSceneChangeDetectorScreen(SSceneChangeResult & sParam, int32_t iCpuFlag) : CSceneChangeDetectorVideo(sParam, iCpuFlag) {
+  }
+  virtual ~CSceneChangeDetectorScreen() {
+  }
+  virtual void operator() (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY, uint8_t *& pStaticBlockIdc) {
+    int32_t iSad = m_pfSad(pSrcY, iSrcStrideY, pRefY, iSrcStrideY);
+    if( iSad == 0 ){
+      *pStaticBlockIdc ++ = NO_STATIC;
+    } else {
+      m_sParam.iFrameComplexity += iSad;
+      m_sParam.iMotionBlockNum += iSad > HIGH_MOTION_BLOCK_THRESHOLD;
+      *pStaticBlockIdc ++ = COLLOCATED_STATIC;
+    }
+  }
 };
 
 template<typename T>
 class CSceneChangeDetection : public IStrategy {
  public:
-  CSceneChangeDetection (EMethods eMethod, int32_t iCpuFlag): m_cDetector(iCpuFlag) {
+  CSceneChangeDetection (EMethods eMethod, int32_t iCpuFlag): m_cDetector(m_sSceneChangeParam, iCpuFlag) {
     m_eMethod   = eMethod;
     WelsMemset (&m_sSceneChangeParam, 0, sizeof (m_sSceneChangeParam));
   }
@@ -96,13 +117,14 @@ class CSceneChangeDetection : public IStrategy {
     int32_t iBlock8x8Width      = iWidth  >> 3;
     int32_t iBlock8x8Height	 = iHeight >> 3;
     int32_t iBlock8x8Num       = iBlock8x8Width * iBlock8x8Height;
-    int32_t iSceneChangeThreshold = WelsStaticCast (int32_t, SCENE_CHANGE_MOTION_RATIO * iBlock8x8Num + 0.5f + PESN);
+    int32_t iSceneChangeThresholdLarge = WelsStaticCast (int32_t, SCENE_CHANGE_MOTION_RATIO_LARGE * iBlock8x8Num + 0.5f + PESN);
+    int32_t iSceneChangeThresholdMedium	= WelsStaticCast(int32_t, SCENE_CHANGE_MOTION_RATIO_MEDIUM * iBlock8x8Num + 0.5f + PESN);
     int32_t iBlockSad = 0;
-    int32_t iMotionBlockNum = 0;
     uint8_t* pRefY = NULL, *pCurY = NULL;
     int32_t iRefStride = 0, iCurStride = 0;
     int32_t iRefRowStride = 0, iCurRowStride = 0;
     uint8_t* pRefTmp = NULL, *pCurTmp = NULL;
+    uint8_t * pStaticBlockIdc = m_sSceneChangeParam.pStaticBlockIdc;
 
     pRefY = (uint8_t*)pRefPixMap->pPixel[0];
     pCurY = (uint8_t*)pSrcPixMap->pPixel[0];
@@ -113,6 +135,8 @@ class CSceneChangeDetection : public IStrategy {
     iRefRowStride  = pRefPixMap->iStride[0] << 3;
     iCurRowStride  = pSrcPixMap->iStride[0] << 3;
 
+    m_sSceneChangeParam.iMotionBlockNum = 0;
+    m_sSceneChangeParam.iFrameComplexity = 0;
     m_sSceneChangeParam.eSceneChangeIdc = SIMILAR_SCENE;
 
     for (int32_t j = 0; j < iBlock8x8Height; j ++) {
@@ -120,9 +144,7 @@ class CSceneChangeDetection : public IStrategy {
       pCurTmp   = pCurY;
 
       for (int32_t i = 0; i < iBlock8x8Width; i++) {
-        iBlockSad = m_cDetector(pRefTmp, iRefStride, pCurTmp, iCurStride);
-        iMotionBlockNum += (iBlockSad > HIGH_MOTION_BLOCK_THRESHOLD);
-
+        m_cDetector(pRefTmp, iRefStride, pCurTmp, iCurStride, pStaticBlockIdc);
         pRefTmp += 8;
         pCurTmp += 8;
       }
@@ -131,8 +153,10 @@ class CSceneChangeDetection : public IStrategy {
       pCurY += iCurRowStride;
     }
 
-    if (iMotionBlockNum >= iSceneChangeThreshold) {
+    if (m_sSceneChangeParam.iMotionBlockNum >= iSceneChangeThresholdLarge) {
       m_sSceneChangeParam.eSceneChangeIdc = LARGE_CHANGED_SCENE;
+    } else if( m_sSceneChangeParam.iMotionBlockNum >= iSceneChangeThresholdMedium ){
+      m_sSceneChangeParam.eSceneChangeIdc = MEDIUM_CHANGED_SCENE;
     }
 
     eReturn = RET_SUCCESS;

@@ -143,8 +143,17 @@ typedef enum {
   LARGE_CHANGED_SCENE,    //large changed scene
 } ESceneChangeIdc;
 
+typedef enum {
+  NO_STATIC,  // motion block
+  COLLOCATED_STATIC, // collocated static block
+  SCROLLED_STATIC,  // scrolled static block
+} EStaticBlockIdc;
+
 typedef struct {
   ESceneChangeIdc eSceneChangeIdc; // SIMILAR_SCENE, MEDIUM_CHANGED_SCENE, LARGE_CHANGED_SCENE
+  int             iMotionBlockNum; // Number of motion blocks
+  int             iFrameComplexity; // frame complexity
+  unsigned char * pStaticBlockIdc;  // static block idc
 } SSceneChangeResult;
 
 typedef struct {
