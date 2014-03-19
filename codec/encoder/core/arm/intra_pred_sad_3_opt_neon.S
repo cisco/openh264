@@ -35,7 +35,7 @@
 #include "arm_arch_common_macro.S"
 
 
-#ifdef APPLE_IOS
+#ifdef __APPLE__
  //The data sequence will be used
 .macro GET_8BYTE_DATA_L0
 	vld1.8 {$0[0]}, [$1], $2

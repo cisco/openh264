@@ -34,7 +34,7 @@
 .text
 #include "arm_arch_common_macro.S"
 
-#ifdef APPLE_IOS
+#ifdef __APPLE__
 .macro	LOAD_ALIGNED_DATA_WITH_STRIDE
 //	{	//	input: $0~$3, src*, src_stride
     vld1.64	{$0}, [$4,:128], $5

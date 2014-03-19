@@ -34,7 +34,7 @@
 .text
 #include "arm_arch_common_macro.S"
 
-#ifdef APPLE_IOS
+#ifdef __APPLE__
 .macro SQR_ADD_16BYTES
 	vmull.u8 q3, $0, $0
 	vmull.u8 q8, $1, $1

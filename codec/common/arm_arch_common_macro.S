@@ -30,7 +30,7 @@
  *
  */
 
-#ifdef APPLE_IOS
+#ifdef __APPLE__
 
 .macro WELS_ASM_FUNC_BEGIN
 .align 2

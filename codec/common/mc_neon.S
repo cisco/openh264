@@ -34,7 +34,7 @@
 .text
 #include "arm_arch_common_macro.S"
 
-#ifdef APPLE_IOS
+#ifdef __APPLE__
 .macro	AVERAGE_TWO_8BITS
 //	{	// input:dst_d, src_d A and B; working: q13
     vaddl.u8	q13, $2, $1

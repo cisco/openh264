@@ -235,7 +235,7 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors)
   return uiCPU;
 }
 
-#elif defined(APPLE_IOS)
+#elif defined(__APPLE__)
 uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors)
 {
     uint32_t       uiCPU = 0;
