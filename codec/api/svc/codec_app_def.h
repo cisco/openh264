@@ -228,10 +228,10 @@ typedef struct TagEncParamExt
   /*LTR settings*/
   bool     bEnableLongTermReference; // 0: on, 1: off
   int	   iLTRRefNum;
-  int      iLtrMarkPeriod;
+  unsigned int      iLtrMarkPeriod;
 
   /* multi-thread settings*/
-  short		iMultipleThreadIdc;		// 1	# 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
+  unsigned short		iMultipleThreadIdc;		// 1	# 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
 
    /* Deblocking loop filter */
   int		iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries

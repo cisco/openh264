@@ -141,7 +141,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     goto label_exit;
   }
 
-  if (fread (pBuf, 1, iFileSize, pH264File) != iFileSize) {
+  if (fread (pBuf, 1, iFileSize, pH264File) != (uint32_t)iFileSize) {
     fprintf (stderr, "Unable to read whole file\n");
     goto label_exit;
   }

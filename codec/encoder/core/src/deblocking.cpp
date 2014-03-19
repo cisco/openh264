@@ -117,32 +117,32 @@ static const uint8_t g_kuiTableBIdx[2][8] = {
 
 static const ALIGNED_DECLARE (int32_t, g_kiTableBlock8x8Idx[2][4][4], 16) = {
   {
-    0, 0, 2, 2,
-    0, 0, 2, 2,
-    1, 1, 3, 3,
-    1, 1, 3, 3
+    {0, 0, 2, 2},
+    {0, 0, 2, 2},
+    {1, 1, 3, 3},
+    {1, 1, 3, 3}
   },
 
   {
-    0, 0, 1, 1,
-    0, 0, 1, 1,
-    2, 2, 3, 3,
-    2, 2, 3, 3
+    {0, 0, 1, 1},
+    {0, 0, 1, 1},
+    {2, 2, 3, 3},
+    {2, 2, 3, 3}
   }
 };
 static const ALIGNED_DECLARE (int32_t, g_kiTableBlock8x8NIdx[2][4][4], 16) = {
   {
-    1, 1, 3, 3,
-    0, 0, 2, 2,
-    0, 0, 2, 2,
-    1, 1, 3, 3
+    {1, 1, 3, 3},
+    {0, 0, 2, 2},
+    {0, 0, 2, 2},
+    {1, 1, 3, 3}
   },
 
   {
-    2, 2, 3, 3,
-    0, 0, 1, 1,
-    0, 0, 1, 1,
-    2, 2, 3, 3
+    {2, 2, 3, 3},
+    {0, 0, 1, 1},
+    {0, 0, 1, 1},
+    {2, 2, 3, 3}
   }
 };
 
@@ -584,7 +584,7 @@ void DeblockingIntraMb (DeblockingFunc* pfDeblocking, SMB* pCurMb, SDeblockingFi
 }
 
 void DeblockingMbAvcbase (SWelsFuncPtrList* pFunc, SMB* pCurMb, SDeblockingFilter* pFilter) {
-  uint8_t uiBS[2][4][4] = { 0 };
+  uint8_t uiBS[2][4][4] = {{{ 0 }}};
 
   Mb_Type uiCurMbType = pCurMb->uiMbType;
   int32_t iMbStride  = pFilter->iMbStride;

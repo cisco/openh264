@@ -110,7 +110,7 @@ int32_t WelsSampleSad16x16_c (uint8_t* pSample1, int32_t iStride1, uint8_t* pSam
 
 int32_t WelsSampleSatd4x4_c (uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2) {
   int32_t iSatdSum = 0;
-  int32_t pSampleMix[4][4] = { 0 };
+  int32_t pSampleMix[4][4] = {{ 0 }};
   int32_t iSample0, iSample1, iSample2, iSample3;
   int32_t i = 0;
   uint8_t* pSrc1 = pSample1;

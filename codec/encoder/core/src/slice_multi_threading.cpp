@@ -206,7 +206,7 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
   int32_t iRunLen[MAX_THREADS_NUM]	= {0};
   int32_t iSliceIdx					= 0;
 
-  int32_t iNumMbInEachGom;
+  int32_t iNumMbInEachGom = 0;
   SWelsSvcRc* pWelsSvcRc = &pCtx->pWelsSvcRc[iCurDid];
   if (pCtx->pSvcParam->bEnableRc) {
     iNumMbInEachGom = pWelsSvcRc->iNumberMbGom;
