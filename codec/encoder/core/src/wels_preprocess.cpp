@@ -585,8 +585,8 @@ int32_t CWelsPreProcess::ColorspaceConvert (SWelsSvcCodingParam* pSvcParam, SPic
 
 void CWelsPreProcess::BilateralDenoising (SPicture* pSrc, const int32_t kiWidth, const int32_t kiHeight) {
   int32_t iMethodIdx = METHOD_DENOISE;
-  SPixMap sSrcPixMap = {0};
-
+  SPixMap sSrcPixMap;
+  memset (&sSrcPixMap, 0, sizeof(sSrcPixMap));
   sSrcPixMap.pPixel[0] = pSrc->pData[0];
   sSrcPixMap.pPixel[1] = pSrc->pData[1];
   sSrcPixMap.pPixel[2] = pSrc->pData[2];
@@ -605,9 +605,10 @@ bool CWelsPreProcess::DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPi
   bool bSceneChangeFlag = false;
   int32_t iMethodIdx = METHOD_SCENE_CHANGE_DETECTION;
   SSceneChangeResult sSceneChangeDetectResult = { SIMILAR_SCENE };
-  SPixMap sSrcPixMap = {0};
-  SPixMap sRefPixMap = {0};
-
+  SPixMap sSrcPixMap;
+  SPixMap sRefPixMap;
+  memset (&sSrcPixMap, 0, sizeof(sSrcPixMap));
+  memset (&sRefPixMap, 0, sizeof(sRefPixMap));
   sSrcPixMap.pPixel[0] = pCurPicture->pData[0];
   sSrcPixMap.iSizeInBits = g_kiPixMapSizeInBits;
   sSrcPixMap.iStride[0] = pCurPicture->iLineSize[0];
@@ -635,9 +636,10 @@ bool CWelsPreProcess::DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPi
 int32_t CWelsPreProcess::DownsamplePadding (SPicture* pSrc, SPicture* pDstPic,  int32_t iSrcWidth, int32_t iSrcHeight,
     int32_t iShrinkWidth, int32_t iShrinkHeight, int32_t iTargetWidth, int32_t iTargetHeight) {
   int32_t iRet = 0;
-  SPixMap sSrcPixMap = {0};
-  SPixMap sDstPicMap = {0};
-
+  SPixMap sSrcPixMap;
+  SPixMap sDstPicMap;
+  memset (&sSrcPixMap, 0, sizeof(sSrcPixMap));
+  memset (&sDstPicMap, 0, sizeof(sDstPicMap));
   sSrcPixMap.pPixel[0]   = pSrc->pData[0];
   sSrcPixMap.pPixel[1]   = pSrc->pData[1];
   sSrcPixMap.pPixel[2]   = pSrc->pData[2];
@@ -683,8 +685,10 @@ void CWelsPreProcess::VaaCalculation (SVAAFrameInfo* pVaaInfo, SPicture* pCurPic
   pVaaInfo->sVaaCalcInfo.pRefY = pRefPicture->pData[0];
   {
     int32_t iMethodIdx = METHOD_VAA_STATISTICS;
-    SPixMap sCurPixMap = {0};
-    SPixMap sRefPixMap = {0};
+    SPixMap sCurPixMap;
+    SPixMap sRefPixMap;
+    memset (&sCurPixMap, 0, sizeof(sCurPixMap));
+    memset (&sRefPixMap, 0, sizeof(sRefPixMap));
     SVAACalcParam calc_param = {0};
 
     sCurPixMap.pPixel[0] = pCurPicture->pData[0];
@@ -727,8 +731,10 @@ void CWelsPreProcess::BackgroundDetection (SVAAFrameInfo* pVaaInfo, SPicture* pC
     pVaaInfo->pRefV			= pRefPicture->pData[2];
 
     int32_t iMethodIdx = METHOD_BACKGROUND_DETECTION;
-    SPixMap sSrcPixMap = {0};
-    SPixMap sRefPixMap = {0};
+    SPixMap sSrcPixMap;
+    SPixMap sRefPixMap;
+    memset (&sSrcPixMap, 0, sizeof(sSrcPixMap));
+    memset (&sRefPixMap, 0, sizeof(sRefPixMap));
     SBGDInterface BGDParam = {0};
 
     sSrcPixMap.pPixel[0] = pCurPicture->pData[0];
@@ -770,8 +776,10 @@ void CWelsPreProcess::AdaptiveQuantCalculation (SVAAFrameInfo* pVaaInfo, SPictur
 
   {
     int32_t iMethodIdx = METHOD_ADAPTIVE_QUANT;
-    SPixMap pSrc = {0};
-    SPixMap pRef = {0};
+    SPixMap pSrc;
+    SPixMap pRef;
+    memset (&pSrc, 0, sizeof(pSrc));
+    memset (&pRef, 0, sizeof(pRef));
     int32_t iRet = 0;
 
     pSrc.pPixel[0] = pCurPicture->pData[0];
@@ -858,8 +866,10 @@ void CWelsPreProcess::AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCu
 
   {
     int32_t iMethodIdx = METHOD_COMPLEXITY_ANALYSIS;
-    SPixMap sSrcPixMap = {0};
-    SPixMap sRefPixMap = {0};
+    SPixMap sSrcPixMap;
+    SPixMap sRefPixMap;
+    memset (&sSrcPixMap, 0, sizeof(SPixMap));
+    memset (&sRefPixMap, 0, sizeof(SPixMap));
     int32_t iRet = 0;
 
     sSrcPixMap.pPixel[0] = pCurPicture->pData[0];

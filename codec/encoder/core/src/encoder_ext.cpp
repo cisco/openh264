@@ -177,10 +177,10 @@ int32_t ParamValidationExt (sWelsEncCtx*pCtx,SWelsSvcCodingParam* pCodingParam) 
     SDLayerParam* fDlp = &pCodingParam->sDependencyLayers[i];
     const int32_t kiPicWidth = fDlp->iFrameWidth;
     const int32_t kiPicHeight = fDlp->iFrameHeight;
-    int32_t iMbWidth		= 0;
-    int32_t iMbHeight		= 0;
+    uint32_t iMbWidth		= 0;
+    uint32_t iMbHeight		= 0;
     int32_t iMbNumInFrame		= 0;
-    int32_t iMaxSliceNum		= MAX_SLICES_NUM;
+    uint32_t iMaxSliceNum		= MAX_SLICES_NUM;
     if (kiPicWidth <= 0 || kiPicHeight <= 0) {
       WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid %d x %d in dependency layer settings!\n", kiPicWidth, kiPicHeight);
       return ENC_RETURN_UNSUPPORTED_PARA;
@@ -924,10 +924,10 @@ int32_t AllocStrideTables (sWelsEncCtx** ppCtx, const int32_t kiNumSpatialLayers
     int32_t iMbWidth;
     int32_t iCountMbNum;				// count number of SMB in each spatial
     int32_t iSizeAllMbAlignCache;	// cache line size aligned in each spatial
-  } sMbSizeMap[MAX_DEPENDENCY_LAYER] = {0};
-  int32_t iLineSizeY[MAX_DEPENDENCY_LAYER][2] = {0};
-  int32_t iLineSizeUV[MAX_DEPENDENCY_LAYER][2] = {0};
-  int32_t iMapSpatialIdx[MAX_DEPENDENCY_LAYER][2] = {0};
+  } sMbSizeMap[MAX_DEPENDENCY_LAYER] = {{ 0 }};
+  int32_t iLineSizeY[MAX_DEPENDENCY_LAYER][2] = {{ 0 }};
+  int32_t iLineSizeUV[MAX_DEPENDENCY_LAYER][2] = {{ 0 }};
+  int32_t iMapSpatialIdx[MAX_DEPENDENCY_LAYER][2] = {{ 0 }};
   int32_t iSizeDec		= 0;
   int32_t iSizeEnc		= 0;
   int32_t iCountLayersNeedCs[2]	= {0};
@@ -1668,7 +1668,7 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
 
 int32_t InitSliceSettings (SWelsSvcCodingParam* pCodingParam, const int32_t kiCpuCores, int16_t* pMaxSliceCount) {
   int32_t iSpatialIdx = 0, iSpatialNum = pCodingParam->iSpatialLayerNum;
-  int16_t iMaxSliceCount = 0;
+  uint16_t iMaxSliceCount = 0;
 
   do {
     SDLayerParam* pDlp				= &pCodingParam->sDependencyLayers[iSpatialIdx];

@@ -131,7 +131,7 @@ static const uint8_t g_kuiTableBIdx[2][8] = {
   },
 
   {
-    0,  1,  2,  3 ,
+    0,  1,  2,  3,
     12, 13, 14, 15
   },
 };
@@ -573,7 +573,7 @@ void DeblockingIntraMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_
 }
 
 void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag) {
-  uint8_t nBS[2][4][4] = { 0 };
+  uint8_t nBS[2][4][4] = {{{ 0 }}};
 
   int32_t iMbXyIndex	= pCurDqLayer->iMbXyIndex;
   int32_t iCurMbType  = pCurDqLayer->pMbType[iMbXyIndex];
@@ -630,8 +630,8 @@ void WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFun
   int32_t iMbWidth  = pCurDqLayer->iMbWidth;
   int32_t iTotalMbCount = pSliceHeaderExt->sSliceHeader.pSps->uiTotalMbCount;
 
-  SDeblockingFilter pFilter = {0};
-
+  SDeblockingFilter pFilter;
+  memset (&pFilter, 0, sizeof(pFilter));
   PFmo pFmo = pCtx->pFmo;
   int32_t iNextMbXyIndex = 0;
   int32_t iTotalNumMb = pCurDqLayer->sLayerInfo.sSliceInLayer.iTotalMbInCurSlice;

@@ -137,7 +137,7 @@ int ParseLayerConfig( CReadConfig & cRdLayerCfg, const int iLayer, SEncParamExt&
       } else if (strTag[0].compare ("FrameRateOut") == 0) {
         pDLayer->fFrameRate = (float)atof (strTag[1].c_str());
       }else if (strTag[0].compare ("ReconFile") == 0) {
-        const int kiLen = strTag[1].length();
+        const unsigned int kiLen = strTag[1].length();
         if (kiLen >= sizeof(sFileSet.sRecFileName[iLayer]))
           return -1;
         sFileSet.sRecFileName[iLayer][kiLen] = '\0';
@@ -487,7 +487,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
     }
     else if (!strcmp (pCommand, "-drec") && (n + 1 < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
-      const int iLen = strlen (argv[n]);
+      const unsigned int iLen = strlen (argv[n]);
       if (iLen >= sizeof(sFileSet.sRecFileName[iLayer]))
         return 1;
       sFileSet.sRecFileName[iLayer][iLen] = '\0';
