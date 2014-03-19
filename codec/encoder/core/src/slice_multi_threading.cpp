@@ -316,9 +316,9 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 
 #ifdef _WIN32
   // Dummy event namespace, the windows events don't actually use this
-  WelsSnprintf (pSmt->eventNamespace, sizeof(pSmt->eventNamespace), "%p", (void*) (*ppCtx));
+  WelsSnprintf (pSmt->eventNamespace, sizeof(pSmt->eventNamespace), "%p", (void*) *ppCtx);
 #else
-  WelsSnprintf (pSmt->eventNamespace, sizeof(pSmt->eventNamespace), "%p%x", (void*) (*ppCtx), getpid());
+  WelsSnprintf (pSmt->eventNamespace, sizeof(pSmt->eventNamespace), "%p%x", (void*) *ppCtx, getpid());
 #endif//!_WIN32
 
   iIdx = 0;
@@ -350,37 +350,37 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   pSmt->pFSliceDiff	= fopen ("slice_time.txt", "wt+");
 #endif//MT_DEBUG
 
-  MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "encpEncCtx= 0x%p\n", (void*) (*ppCtx));
+  MT_TRACE_LOG (*ppCtx, WELS_LOG_INFO, "encpEncCtx= 0x%p\n", (void*) *ppCtx);
 
   char name[SEM_NAME_MAX] = {0};
   WELS_GCC_UNUSED WELS_THREAD_ERROR_CODE err = 0;
 
   iIdx = 0;
   while (iIdx < iThreadNum) {
-    pSmt->pThreadPEncCtx[iIdx].pWelsPEncCtx	= (void*) (*ppCtx);
+    pSmt->pThreadPEncCtx[iIdx].pWelsPEncCtx	= (void*) *ppCtx;
     pSmt->pThreadPEncCtx[iIdx].iSliceIndex	= iIdx;
     pSmt->pThreadPEncCtx[iIdx].iThreadIndex	= iIdx;
     pSmt->pThreadHandles[iIdx]				= 0;
 
     WelsSnprintf (name, SEM_NAME_MAX, "ee%d%s", iIdx, pSmt->eventNamespace);
     err = WelsEventOpen (&pSmt->pExitEncodeEvent[iIdx], name);
-    MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "[MT] Open pExitEncodeEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
+    MT_TRACE_LOG (*ppCtx, WELS_LOG_INFO, "[MT] Open pExitEncodeEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
     WelsSnprintf (name, SEM_NAME_MAX, "tm%d%s", iIdx, pSmt->eventNamespace);
     err = WelsEventOpen (&pSmt->pThreadMasterEvent[iIdx], name);
-    MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "[MT] Open pThreadMasterEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
+    MT_TRACE_LOG (*ppCtx, WELS_LOG_INFO, "[MT] Open pThreadMasterEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
     // length of semaphore name should be system constrained at least on mac 10.7
     WelsSnprintf (name, SEM_NAME_MAX, "ud%d%s", iIdx, pSmt->eventNamespace);
     err = WelsEventOpen (&pSmt->pUpdateMbListEvent[iIdx], name);
-    MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "[MT] Open pUpdateMbListEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
+    MT_TRACE_LOG (*ppCtx, WELS_LOG_INFO, "[MT] Open pUpdateMbListEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
     WelsSnprintf (name, SEM_NAME_MAX, "fu%d%s", iIdx, pSmt->eventNamespace);
     err = WelsEventOpen (&pSmt->pFinUpdateMbListEvent[iIdx], name);
-    MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "[MT] Open pFinUpdateMbListEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
+    MT_TRACE_LOG (*ppCtx, WELS_LOG_INFO, "[MT] Open pFinUpdateMbListEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
     WelsSnprintf (name, SEM_NAME_MAX, "sc%d%s", iIdx, pSmt->eventNamespace);
     err = WelsEventOpen (&pSmt->pSliceCodedEvent[iIdx], name);
-    MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "[MT] Open pSliceCodedEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
+    MT_TRACE_LOG (*ppCtx, WELS_LOG_INFO, "[MT] Open pSliceCodedEvent%d named(%s) ret%d err%d\n", iIdx, name, err, errno);
     WelsSnprintf (name, SEM_NAME_MAX, "rc%d%s", iIdx, pSmt->eventNamespace);
     err = WelsEventOpen (&pSmt->pReadySliceCodingEvent[iIdx], name);
-    MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "[MT] Open pReadySliceCodingEvent%d = 0x%p named(%s) ret%d err%d\n", iIdx,
+    MT_TRACE_LOG (*ppCtx, WELS_LOG_INFO, "[MT] Open pReadySliceCodingEvent%d = 0x%p named(%s) ret%d err%d\n", iIdx,
                   (void*)pSmt->pReadySliceCodingEvent[iIdx], name, err, errno);
 
     ++ iIdx;
@@ -388,7 +388,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 
   WelsSnprintf (name, SEM_NAME_MAX, "scm%s", pSmt->eventNamespace);
   err = WelsEventOpen (&pSmt->pSliceCodedMasterEvent, name);
-  MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "[MT] Open pSliceCodedMasterEvent named(%s) ret%d err%d\n", name, err, errno);
+  MT_TRACE_LOG (*ppCtx, WELS_LOG_INFO, "[MT] Open pSliceCodedMasterEvent named(%s) ret%d err%d\n", name, err, errno);
 
   (*ppCtx)->pSliceBs	= (SWelsSliceBs*)pMa->WelsMalloc (sizeof (SWelsSliceBs) * iMaxSliceNum, "pSliceBs");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pSliceBs), FreeMemorySvc (ppCtx))
@@ -421,7 +421,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   iReturn = WelsMutexInit (&(*ppCtx)->mutexEncoderError);
   WELS_VERIFY_RETURN_PROC_IF (1, (WELS_THREAD_ERROR_OK != iReturn), FreeMemorySvc (ppCtx))
 
-  MT_TRACE_LOG ((*ppCtx), WELS_LOG_INFO, "RequestMtResource(), iThreadNum=%d, iCountSliceNum= %d\n", pPara->iCountThreadsNum,
+  MT_TRACE_LOG (*ppCtx, WELS_LOG_INFO, "RequestMtResource(), iThreadNum=%d, iCountSliceNum= %d\n", pPara->iCountThreadsNum,
                 iMaxSliceNum);
 
   return 0;
