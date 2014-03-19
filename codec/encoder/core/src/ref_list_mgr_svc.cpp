@@ -621,7 +621,7 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
     }
 
     /*syntax for dec_ref_pic_marking()*/
-    if (WELS_FRAME_TYPE_IDR == uiFrameType)		{
+    if (videoFrameTypeIDR == uiFrameType)		{
       pRefPicMark->bNoOutputOfPriorPicsFlag = false;
       pRefPicMark->bLongTermRefFlag = pCtx->pSvcParam->bEnableLongTermReference;
     } else {

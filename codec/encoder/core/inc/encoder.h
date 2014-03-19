@@ -81,9 +81,9 @@ int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* 
 /*!
  * \brief	initialize frame coding
  */
-void InitFrameCoding (sWelsEncCtx* pEncCtx, const EFrameType keFrameType);
+void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType);
 
-EFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum);
+EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum);
 /*!
  * \brief	Dump reconstruction for dependency layer
  */

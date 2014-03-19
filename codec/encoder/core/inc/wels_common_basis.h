@@ -137,17 +137,6 @@ extern const EVclType g_keTypeMap[32][2];
 #define IS_VCL_NAL_AVC_BASE(t)			( (t) == NAL_UNIT_CODED_SLICE || (t) == NAL_UNIT_CODED_SLICE_IDR )
 #define IS_NEW_INTRODUCED_SVC_NAL(t)	( (t) == NAL_UNIT_PREFIX || (t) == NAL_UNIT_CODED_SLICE_EXT )
 
-/*
- *	Frame types used in internal encoder (logic level based)
- */
-enum EFrameType {
-WELS_FRAME_TYPE_AUTO	= 0x0000,	/* Let encoder engine choose the proper type, RDO or scene change based */
-WELS_FRAME_TYPE_IDR		= 0x0001,	/* IDR, I frame with parameter sets */
-WELS_FRAME_TYPE_I		= 0x0002,	/* I Frame */
-WELS_FRAME_TYPE_P		= 0x0003,	/* P Frame */
-WELS_FRAME_TYPE_B		= 0x0004,	/* B Frame */
-WELS_FRAME_TYPE_SKIP	= 0x0008
-};
 
 /* Base SSlice Types
  * Invalid in case of eSliceType exceeds 9,
