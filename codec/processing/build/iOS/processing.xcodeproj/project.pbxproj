@@ -527,9 +527,10 @@
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"\"$(SRCROOT)/../../../common\"",
+					"$(SRCROOT)/../../../common/inc",
 					"$(SRCROOT)/../../src/common",
 					"$(SRCROOT)/../../interface",
+					"$(SRCROOT)/../../../common/arm",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				ONLY_ACTIVE_ARCH = NO;
@@ -556,9 +557,10 @@
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"\"$(SRCROOT)/../../../common\"",
+					"$(SRCROOT)/../../../common/inc",
 					"$(SRCROOT)/../../src/common",
 					"$(SRCROOT)/../../interface",
+					"$(SRCROOT)/../../../common/arm",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";
