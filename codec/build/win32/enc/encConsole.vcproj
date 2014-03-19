@@ -48,7 +48,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api,..\..\..\encoder\core\inc,..\..\..\common,..\..\..\processing\interface"
+				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;MT_ENABLED;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -143,7 +143,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api,..\..\..\encoder\core\inc,..\..\..\common,..\..\..\processing\interface"
+				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;X86_ASM;MT_ENABLED;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -238,7 +238,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api,..\..\..\encoder\core\inc,..\..\..\common,..\..\..\processing\interface"
+				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
 				PreprocessorDefinitions="WIN64;_DEBUG;_CONSOLE;MT_ENABLED"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -334,7 +334,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api,..\..\..\encoder\core\inc,..\..\..\common,..\..\..\processing\interface"
+				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
 				PreprocessorDefinitions="WIN64;NDEBUG;_CONSOLE;MT_ENABLED"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -407,7 +407,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="..\..\..\common\logging.cpp"
+				RelativePath="..\..\..\common\src\logging.cpp"
 				>
 			</File>
 			<File
