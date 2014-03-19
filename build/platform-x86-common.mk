@@ -1,5 +1,6 @@
 CFLAGS_M32=-m32
 CFLAGS_M64=-m64
+ASM_INCLUDES = -Icodec/common/x86/
 ifeq (, $(ENABLE64BIT))
 ifeq ($(ARCH), x86_64)
 ENABLE64BIT=Yes
