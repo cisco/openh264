@@ -23,7 +23,7 @@ CONSOLE_ENC_PATH := ../../../../console/enc
 LOCAL_SRC_FILES := \
             $(CONSOLE_ENC_PATH)/src/welsenc.cpp \
             $(CONSOLE_ENC_PATH)/src/read_config.cpp \
-            $(CODEC_PATH)/common/logging.cpp \
+            $(CODEC_PATH)/common/src/logging.cpp \
             myjni.cpp
 
 #
@@ -34,7 +34,7 @@ LOCAL_C_INCLUDES := \
             $(LOCAL_PATH)/../../../../console/enc/inc \
             $(LOCAL_PATH)/../../../../encoder/core/inc \
             $(LOCAL_PATH)/../../../../processing/interface \
-            $(LOCAL_PATH)/../../../../common
+            $(LOCAL_PATH)/../../../../common/inc
 
   
 #

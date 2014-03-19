@@ -53,7 +53,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc"
+				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;X86_ASM;HAVE_CACHE_LINE_ALIGN"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -133,7 +133,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc"
+				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc"
 				PreprocessorDefinitions="WIN64;NDEBUG;_LIB;HAVE_CACHE_LINE_ALIGN;X86_ASM"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -211,7 +211,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc"
+				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;X86_ASM;HAVE_CACHE_LINE_ALIGN"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -290,7 +290,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc"
+				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc"
 				PreprocessorDefinitions="WIN64;_DEBUG;_LIB;HAVE_CACHE_LINE_ALIGN;X86_ASM"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -356,7 +356,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -365,7 +365,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -374,7 +374,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -383,20 +383,20 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\..\common\cpuid.asm"
+					RelativePath="..\..\..\common\x86\cpuid.asm"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -405,7 +405,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -414,7 +414,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -423,7 +423,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -436,7 +436,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -445,7 +445,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -454,7 +454,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -463,20 +463,20 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\..\common\deblock.asm"
+					RelativePath="..\..\..\common\x86\deblock.asm"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -485,7 +485,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -494,7 +494,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -503,20 +503,20 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\..\common\expand_picture.asm"
+					RelativePath="..\..\..\common\x86\expand_picture.asm"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -525,7 +525,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -534,7 +534,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -543,7 +543,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -556,7 +556,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -565,7 +565,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -574,7 +574,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -583,20 +583,20 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\..\common\mb_copy.asm"
+					RelativePath="..\..\..\common\x86\mb_copy.asm"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -605,7 +605,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -614,7 +614,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -623,20 +623,20 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\..\common\mc_chroma.asm"
+					RelativePath="..\..\..\common\x86\mc_chroma.asm"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -645,7 +645,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -654,7 +654,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -663,20 +663,20 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\..\common\mc_luma.asm"
+					RelativePath="..\..\..\common\x86\mc_luma.asm"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -685,7 +685,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -694,7 +694,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -703,7 +703,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
+							CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -O3 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 							Outputs="$(IntDir)\$(InputName).obj"
 						/>
 					</FileConfiguration>
@@ -726,11 +726,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\common\cpu.h"
+					RelativePath="..\..\..\common\inc\cpu.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\common\cpu_core.h"
+					RelativePath="..\..\..\common\inc\cpu_core.h"
 					>
 				</File>
 				<File
@@ -738,7 +738,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\common\deblocking_common.h"
+					RelativePath="..\..\..\common\inc\deblocking_common.h"
 					>
 				</File>
 				<File
@@ -778,7 +778,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\common\expand_picture_common.h"
+					RelativePath="..\..\..\common\inc\expand_picture_common.h"
 					>
 				</File>
 				<File
@@ -790,11 +790,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\common\ls_defines.h"
+					RelativePath="..\..\..\common\inc\ls_defines.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\common\macros.h"
+					RelativePath="..\..\..\common\inc\macros.h"
 					>
 				</File>
 				<File
@@ -810,11 +810,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\common\mc_common.h"
+					RelativePath="..\..\..\common\inc\mc_common.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\common\measure_time.h"
+					RelativePath="..\..\..\common\inc\measure_time.h"
 					>
 				</File>
 				<File
@@ -862,7 +862,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\common\typedefs.h"
+					RelativePath="..\..\..\common\inc\typedefs.h"
 					>
 				</File>
 				<File
@@ -895,11 +895,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\common\cpu.cpp"
+					RelativePath="..\..\..\common\src\cpu.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\common\crt_util_safe_x.cpp"
+					RelativePath="..\..\..\common\src\crt_util_safe_x.cpp"
 					>
 				</File>
 				<File
@@ -907,7 +907,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\common\deblocking_common.cpp"
+					RelativePath="..\..\..\common\src\deblocking_common.cpp"
 					>
 				</File>
 				<File
@@ -943,7 +943,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\common\logging.cpp"
+					RelativePath="..\..\..\common\src\logging.cpp"
 					>
 				</File>
 				<File
