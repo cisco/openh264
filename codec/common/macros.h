@@ -176,11 +176,10 @@ return iY;
 #define NEG_NUM(iX) (1+(~(iX)))
 #endif// NEG_NUM
 
-#ifndef WELS_CLIP1
-//#define WELS_CLIP1(x) (x & ~255) ? (-x >> 31) : x
-#define WELS_CLIP1(iX) (((iX) & ~255) ? (-(iX) >> 31) : (iX)) //iX not only a value but also can be an expression
-#endif//WELS_CLIP1
-
+static inline uint8_t WelsClip1(int32_t iX) {
+  uint8_t uiTmp = (uint8_t)(((iX) & ~255) ? (-(iX) >> 31) : (iX));
+  return uiTmp;
+}
 
 #ifndef WELS_SIGN
 #define WELS_SIGN(iX) ((int32_t)(iX) >> 31)
