@@ -57,9 +57,7 @@ ifneq ($(V),Yes)
 endif
 
 
-INCLUDES = -Icodec/api/svc -Icodec/common
-#ASM_INCLUDES = -Iprocessing/src/asm/
-ASM_INCLUDES = -Icodec/common/
+INCLUDES = -Icodec/api/svc -Icodec/common/inc
 
 DECODER_INCLUDES = \
     -Icodec/decoder/core/inc \
@@ -81,7 +79,7 @@ GTEST_INCLUDES += \
 CODEC_UNITTEST_INCLUDES += \
     -Igtest/include \
     -Icodec/processing/interface \
-    -Icodec/common \
+    -Icodec/common/inc \
     -Icodec/encoder/core/inc
 
 H264DEC_INCLUDES = $(DECODER_INCLUDES) -Icodec/console/dec/inc
