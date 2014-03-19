@@ -21,9 +21,9 @@ PROCESSING_OBJS += $(PROCESSING_CPP_SRCS:.cpp=.$(OBJ))
 
 ifeq ($(ASM_ARCH), x86)
 PROCESSING_ASM_SRCS=\
-	$(PROCESSING_SRCDIR)/src/asm/denoisefilter.asm\
-	$(PROCESSING_SRCDIR)/src/asm/downsample_bilinear.asm\
-	$(PROCESSING_SRCDIR)/src/asm/vaa.asm\
+	$(PROCESSING_SRCDIR)/src/x86/denoisefilter.asm\
+	$(PROCESSING_SRCDIR)/src/x86/downsample_bilinear.asm\
+	$(PROCESSING_SRCDIR)/src/x86/vaa.asm\
 
 PROCESSING_OBJS += $(PROCESSING_ASM_SRCS:.asm=.$(OBJ))
 endif

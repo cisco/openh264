@@ -27,9 +27,9 @@ DECODER_OBJS += $(DECODER_CPP_SRCS:.cpp=.$(OBJ))
 
 ifeq ($(ASM_ARCH), x86)
 DECODER_ASM_SRCS=\
-	$(DECODER_SRCDIR)/core/asm/block_add.asm\
-	$(DECODER_SRCDIR)/core/asm/dct.asm\
-	$(DECODER_SRCDIR)/core/asm/intra_pred.asm\
+	$(DECODER_SRCDIR)/core/x86/block_add.asm\
+	$(DECODER_SRCDIR)/core/x86/dct.asm\
+	$(DECODER_SRCDIR)/core/x86/intra_pred.asm\
 
 DECODER_OBJS += $(DECODER_ASM_SRCS:.asm=.$(OBJ))
 endif
