@@ -213,14 +213,14 @@ int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* 
 /*!
  * \brief	initialize frame coding
  */
-void InitFrameCoding (sWelsEncCtx* pEncCtx, const EFrameType keFrameType) {
+void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType) {
   // for bitstream writing
   pEncCtx->iPosBsBuffer		= 0;	// reset bs pBuffer position
   pEncCtx->pOut->iNalIndex		= 0;	// reset NAL index
 
   InitBits (&pEncCtx->pOut->sBsWrite, pEncCtx->pOut->pBsBuffer, pEncCtx->pOut->uiSize);
 
-  if (keFrameType == WELS_FRAME_TYPE_P) {
+  if (keFrameType == videoFrameTypeP) {
     ++pEncCtx->iFrameIndex;
 
     if (pEncCtx->iPOC < (1 << pEncCtx->pSps->iLog2MaxPocLsb) - 2)     // if iPOC type is no 0, this need be modification
@@ -237,7 +237,7 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EFrameType keFrameType) {
     pEncCtx->eNalType		= NAL_UNIT_CODED_SLICE;
     pEncCtx->eSliceType	= P_SLICE;
     pEncCtx->eNalPriority	= NRI_PRI_HIGH;
-  } else if (keFrameType == WELS_FRAME_TYPE_IDR) {
+  } else if (keFrameType == videoFrameTypeIDR) {
     pEncCtx->iFrameNum		= 0;
     pEncCtx->iPOC			= 0;
     pEncCtx->bEncCurFrmAsIdrFlag = false;
@@ -252,7 +252,7 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EFrameType keFrameType) {
     // reset_ref_list
 
     // rc_init_gop
-  } else if (keFrameType == WELS_FRAME_TYPE_I) {
+  } else if (keFrameType == videoFrameTypeI) {
     if (pEncCtx->iPOC < (1 << pEncCtx->pSps->iLog2MaxPocLsb) - 2)     // if iPOC type is no 0, this need be modification
       pEncCtx->iPOC			+= 2;	// for POC type 0
     else
@@ -279,9 +279,9 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EFrameType keFrameType) {
 #endif//FRAME_INFO_OUTPUT
 }
 
-EFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum) {
+EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum) {
   SWelsSvcCodingParam* pSvcParam	= pEncCtx->pSvcParam;
-  EFrameType iFrameType = WELS_FRAME_TYPE_AUTO;
+  EVideoFrameType iFrameType = videoFrameTypeInvalid;
   bool bSceneChangeFlag = false;
 
   // perform scene change detection
@@ -297,12 +297,12 @@ EFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum) {
   //bIdrPeriodFlag: RC disable || iSpatialNum != pSvcParam->iSpatialLayerNum
   //pEncCtx->bEncCurFrmAsIdrFlag: 1. first frame should be IDR; 2. idr pause; 3. idr request
   iFrameType = (pEncCtx->pVaa->bIdrPeriodFlag || bSceneChangeFlag
-                || pEncCtx->bEncCurFrmAsIdrFlag) ? WELS_FRAME_TYPE_IDR : WELS_FRAME_TYPE_P;
+                || pEncCtx->bEncCurFrmAsIdrFlag) ? videoFrameTypeIDR : videoFrameTypeP;
 
-  if (WELS_FRAME_TYPE_P == iFrameType && pEncCtx->iSkipFrameFlag > 0) {  // for frame skip, 1/5/2010
+  if (videoFrameTypeP == iFrameType && pEncCtx->iSkipFrameFlag > 0) {  // for frame skip, 1/5/2010
     -- pEncCtx->iSkipFrameFlag;
-    iFrameType = WELS_FRAME_TYPE_SKIP;
-  } else if (WELS_FRAME_TYPE_IDR == iFrameType) {
+    iFrameType = videoFrameTypeSkip;
+  } else if (videoFrameTypeIDR == iFrameType) {
     pEncCtx->iCodingIndex = 0;
   }
 

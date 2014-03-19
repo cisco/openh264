@@ -510,25 +510,8 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
   }
 
   const int32_t kiEncoderReturn = EncodeFrameInternal(kpSrcPic, pBsInfo);
-
-  switch (kiEncoderReturn) {
-  case ENC_RETURN_MEMALLOCERR:
-    WelsUninitEncoderExt (&m_pEncContext);
-    return cmMallocMemeError;
-  case ENC_RETURN_SUCCESS:
-  case ENC_RETURN_CORRECTED:
-    break;//continue processing
-  case ENC_RETURN_UNSUPPORTED_PARA:
-    return cmUnsupportedData;
-	break;
-  case ENC_RETURN_UNEXPECTED:
-    return cmUnkonwReason;
-  default:
-    WelsLog (m_pEncContext, WELS_LOG_ERROR, "unexpected return(%d) from WelsEncoderEncodeExt()!\n", kiEncoderReturn);
-    return cmUnkonwReason;
-  }
-
-
+  if(kiEncoderReturn != cmResultSuccess)
+    return kiEncoderReturn;
 #ifdef REC_FRAME_COUNT
   ++ m_uiCountFrameNum;
   WelsLog (m_pEncContext, WELS_LOG_INFO,
@@ -544,47 +527,23 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
 
 int CWelsH264SVCEncoder::EncodeFrameInternal(const SSourcePicture*  pSrcPic, SFrameBSInfo* pBsInfo) {
   if (!(pSrcPic && m_pEncContext && m_bInitialFlag) ){
-    return videoFrameTypeInvalid;
+    return cmInitParaError;
   }
 
-  int32_t iFrameTypeReturned = 0;
-  int32_t iFrameType = videoFrameTypeInvalid;
   const int32_t kiEncoderReturn = WelsEncoderEncodeExt (m_pEncContext, pBsInfo, pSrcPic);
 
   if(kiEncoderReturn == ENC_RETURN_MEMALLOCERR) {
     WelsUninitEncoderExt (&m_pEncContext);
-    return videoFrameTypeInvalid;
+    return cmMallocMemeError;
   }
   else if((kiEncoderReturn != ENC_RETURN_SUCCESS)&&(kiEncoderReturn == ENC_RETURN_CORRECTED)){
     WelsLog (m_pEncContext, WELS_LOG_ERROR, "unexpected return(%d) from EncodeFrameInternal()!\n", kiEncoderReturn);
-    return videoFrameTypeInvalid;
+    return cmUnkonwReason;
   }
 
-  iFrameTypeReturned = pBsInfo->eOutputFrameType;
-  switch (iFrameTypeReturned) {
-  case WELS_FRAME_TYPE_P:
-    iFrameType	= videoFrameTypeP;
-    break;
-  case WELS_FRAME_TYPE_IDR:
-    iFrameType	= videoFrameTypeIDR;
-    break;
-  case WELS_FRAME_TYPE_SKIP:
-    iFrameType	= videoFrameTypeSkip;
-    break;
-  case WELS_FRAME_TYPE_I:
-    iFrameType	= videoFrameTypeI;
-    break;
-  case WELS_FRAME_TYPE_AUTO:
-  case WELS_FRAME_TYPE_B: // not support B pictures
-    iFrameType	= videoFrameTypeInvalid;
-    break;
-  default:
-    break;
-  }
-  pBsInfo->eOutputFrameType = iFrameType;
   ///////////////////for test
 #ifdef OUTPUT_BIT_STREAM
-  if (iFrameType != videoFrameTypeInvalid && iFrameType != videoFrameTypeSkip) {
+  if (pBsInfo->eOutputFrameType != videoFrameTypeInvalid && pBsInfo->eOutputFrameType != videoFrameTypeSkip) {
     SLayerBSInfo* pLayer = NULL;
     int32_t i = 0, j = 0, iCurLayerBits = 0, total_bits = 0;
 
@@ -629,7 +588,7 @@ int CWelsH264SVCEncoder::EncodeFrameInternal(const SSourcePicture*  pSrcPic, SFr
   DumpSrcPicture (pSrcPicList[0]->pData[0]);
 #endif // DUMP_SRC_PICTURE
 
-  return kiEncoderReturn;
+  return cmResultSuccess;
 
 }
 
