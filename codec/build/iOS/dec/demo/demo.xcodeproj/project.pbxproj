@@ -429,7 +429,7 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../../../../api/svc\"",
-					"\"$(SRCROOT)/../../../../common\"",
+					"\"$(SRCROOT)/../../../../common/inc\"",
 				);
 				INFOPLIST_FILE = "demo/demo-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -448,7 +448,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../../../../api/svc\"",
-					"\"$(SRCROOT)/../../../../common\"",
+					"\"$(SRCROOT)/../../../../common/inc\"",
 				);
 				INFOPLIST_FILE = "demo/demo-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
