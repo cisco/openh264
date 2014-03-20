@@ -106,15 +106,15 @@ bool WelsMotionEstimateInitialPoint (SWelsFuncPtrList* pFuncList, SWelsME* pMe, 
   uint32_t i;
   const uint32_t kuiMvcNum		= pSlice->uiMvcNum;
   const SMVUnitXY* kpMvcList	= &pSlice->sMvc[0];
-  const SMVUnitXY ksMvMin		= pSlice->sMvMin;
-  const SMVUnitXY ksMvMax		= pSlice->sMvMax;
+  const SMVUnitXY ksMvStartMin		= pSlice->sMvStartMin;
+  const SMVUnitXY ksMvStartMax		= pSlice->sMvStartMax;
   const SMVUnitXY ksMvp		= pMe->sMvp;
   SMVUnitXY sMv;
 
   //  Step 1: Initial point prediction
   // init with sMvp
-  sMv.iMvX	= WELS_CLIP3 ((2 + ksMvp.iMvX) >> 2, ksMvMin.iMvX, ksMvMax.iMvX);
-  sMv.iMvY	= WELS_CLIP3 ((2 + ksMvp.iMvY) >> 2, ksMvMin.iMvY, ksMvMax.iMvY);
+  sMv.iMvX	= WELS_CLIP3 ((2 + ksMvp.iMvX) >> 2, ksMvStartMin.iMvX, ksMvStartMax.iMvX);
+  sMv.iMvY	= WELS_CLIP3 ((2 + ksMvp.iMvY) >> 2, ksMvStartMin.iMvY, ksMvStartMax.iMvY);
 
   pRefMb = &pMe->pRefMb[sMv.iMvY * iStrideRef + sMv.iMvX];
 
@@ -123,8 +123,8 @@ bool WelsMotionEstimateInitialPoint (SWelsFuncPtrList* pFuncList, SWelsME* pMe, 
 
   for (i = 0; i < kuiMvcNum; i++) {
     //clipping here is essential since some pOut-of-range MVC may happen here (i.e., refer to baseMV)
-    iMvc0 = WELS_CLIP3 ((2 + kpMvcList[i].iMvX) >> 2, ksMvMin.iMvX, ksMvMax.iMvX);
-    iMvc1 = WELS_CLIP3 ((2 + kpMvcList[i].iMvY) >> 2, ksMvMin.iMvY, ksMvMax.iMvY);
+    iMvc0 = WELS_CLIP3 ((2 + kpMvcList[i].iMvX) >> 2, ksMvStartMin.iMvX, ksMvStartMax.iMvX);
+    iMvc1 = WELS_CLIP3 ((2 + kpMvcList[i].iMvY) >> 2, ksMvStartMin.iMvY, ksMvStartMax.iMvY);
 
     if (((iMvc0 - sMv.iMvX) || (iMvc1 - sMv.iMvY))) {
       pFref2 = &pMe->pRefMb[iMvc1 * iStrideRef + iMvc0];

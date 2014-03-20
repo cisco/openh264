@@ -163,8 +163,8 @@ typedef struct TagSlice {
   SSliceHeaderExt	sSliceHeaderExt;
 
 
-  SMVUnitXY	sMvMin;
-  SMVUnitXY	sMvMax;
+  SMVUnitXY	sMvStartMin;
+  SMVUnitXY	sMvStartMax;
   SMVUnitXY	sMvc[5];
   uint8_t		uiMvcNum;
   uint8_t		sScaleShift;
