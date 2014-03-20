@@ -91,7 +91,7 @@ int32_t		iDecompositionStages;
 uint8_t     uiCodingIdx2TemporalId[ (1 << MAX_TEMPORAL_LEVEL) + 1];
 
 uint8_t		uiProfileIdc;			// value of profile IDC (0 for auto-detection)
-
+uint8_t		uiLevelIdc;
 int8_t		iHighestTemporalId;
 //	uint8_t		uiDependencyId;
 int8_t      iDLayerQp;
@@ -187,17 +187,21 @@ static void FillDefault (SEncParamExt& param, const bool kbEnableRc) {
 
   param.iMaxQp = 51;
   param.iMinQp = 0;
-  param.iUsageType = 0;
+  param.iUsageType = CAMERA_VIDEO_REAL_TIME;
 
-  param.sSpatialLayers[0].iDLayerQp = SVC_QUALITY_BASE_QP;
-  param.sSpatialLayers[0].fFrameRate = param.fMaxFrameRate;
-  param.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
-  param.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 1500;
-  param.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = 1;
+  for(int32_t iLayer = 0;iLayer< MAX_SPATIAL_LAYER_NUM;iLayer++){
+    param.sSpatialLayers[iLayer].uiProfileIdc = PRO_BASELINE;
+    param.sSpatialLayers[iLayer].uiLevelIdc = LEVEL_5_0;
+    param.sSpatialLayers[iLayer].iDLayerQp = SVC_QUALITY_BASE_QP;
+    param.sSpatialLayers[iLayer].fFrameRate = param.fMaxFrameRate;
+    param.sSpatialLayers[iLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
+    param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 1500;
+    param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceNum = 1;
 
-  const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
-  for (int32_t idx = 0; idx < kiLesserSliceNum; idx++)
-    param.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceMbNum[idx] = 960;
+    const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
+    for (int32_t idx = 0; idx < kiLesserSliceNum; idx++)
+      param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceMbNum[idx] = 960;
+  }
 }
 
 void FillDefault (const bool kbEnableRc) {
@@ -258,6 +262,7 @@ int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam, const bool kbEnab
 
   int8_t iIdxSpatial	= 0;
   uint8_t uiProfileIdc		= PRO_BASELINE;
+
   SDLayerParam* pDlp		= &sDependencyLayers[0];
 
   while (iIdxSpatial < iSpatialLayerNum) {
@@ -390,7 +395,8 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   uint8_t uiProfileIdc		= PRO_BASELINE;
   int8_t iIdxSpatial	= 0;
   while (iIdxSpatial < iSpatialLayerNum) {
-    pDlp->uiProfileIdc		= uiProfileIdc;
+    pDlp->uiProfileIdc		= (pCodingParam.sSpatialLayers[iIdxSpatial].uiProfileIdc == PRO_UNKNOWN)?uiProfileIdc:pCodingParam.sSpatialLayers[iIdxSpatial].uiProfileIdc;
+    pDlp->uiLevelIdc        = (pCodingParam.sSpatialLayers[iIdxSpatial].uiLevelIdc == LEVEL_UNKNOWN)?LEVEL_5_0:pCodingParam.sSpatialLayers[iIdxSpatial].uiLevelIdc;
 
     float fLayerFrameRate	= WELS_CLIP3 (pCodingParam.sSpatialLayers[iIdxSpatial].fFrameRate,
         MIN_FRAME_RATE, fParamMaxFrameRate);

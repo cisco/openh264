@@ -173,6 +173,42 @@ typedef enum {
   SM_RESERVED             = 6
 } SliceModeEnum;
 
+typedef enum {
+  PRO_UNKNOWN     = 0,
+  PRO_BASELINE	= 66,
+  PRO_MAIN		= 77,
+  PRO_EXTENDED	= 88,
+  PRO_HIGH		= 100,
+  PRO_HIGH10		= 110,
+  PRO_HIGH422		= 122,
+  PRO_HIGH444		= 144,
+  PRO_CAVLC444	= 244,
+
+  PRO_SCALABLE_BASELINE	= 83,
+  PRO_SCALABLE_HIGH		= 86,
+}EProfileIdc;
+
+typedef enum {
+  LEVEL_UNKNOWN,
+  LEVEL_1_0,
+  LEVEL_1_B,
+  LEVEL_1_1,
+  LEVEL_1_2,
+  LEVEL_1_3,
+  LEVEL_2_0,
+  LEVEL_2_1,
+  LEVEL_2_2,
+  LEVEL_3_0,
+  LEVEL_3_1,
+  LEVEL_3_2,
+  LEVEL_4_0,
+  LEVEL_4_1,
+  LEVEL_4_2,
+  LEVEL_5_0,
+  LEVEL_5_1,
+  LEVEL_5_2
+}ELevelIdc;
+
 typedef struct {
   SliceModeEnum uiSliceMode; //by default, uiSliceMode will be SM_SINGLE_SLICE
   SSliceArgument sSliceArgument;
@@ -184,16 +220,20 @@ typedef struct {
   float	fFrameRate;		// frame rate specified for a layer
   int	iSpatialBitrate;	// target bitrate for a spatial layer
   int   iMaxSpatialBitrate;
-  unsigned int	uiProfileIdc;	// value of profile IDC (0 for auto-detection)
+  EProfileIdc    uiProfileIdc;	// value of profile IDC (PRO_UNKNOWN for auto-detection)
+  ELevelIdc    uiLevelIdc;
   int    iDLayerQp;
 
   SSliceConfig sSliceCfg;
 } SSpatialLayerConfig;
 
+typedef enum {
+  CAMERA_VIDEO_REAL_TIME, //camera video signal
+  SCREEN_CONTENT_REAL_TIME,//screen content signal
+}EUsageType;
 /* SVC Encoding Parameters */
 typedef struct TagEncParamBase{
-
-  int       iUsageType;	//enable_screen_content_signal;// 0: //camera video signal; 1: screen content signal;
+  EUsageType    iUsageType;	//application type;// CAMERA_VIDEO_REAL_TIME: //camera video signal; SCREEN_CONTENT_REAL_TIME: screen content signal;
   int		iInputCsp;	// color space of input sequence
 
   int		iPicWidth;			// width of picture in samples
@@ -207,7 +247,7 @@ typedef struct TagEncParamBase{
 
 typedef struct TagEncParamExt
 {
-  int       iUsageType;	//application type;// 0: //camera video signal; 1: screen content signal;
+  EUsageType    iUsageType;	//application type;// CAMERA_VIDEO_REAL_TIME: //camera video signal; SCREEN_CONTENT_REAL_TIME: screen content signal;
   int		iInputCsp;	// color space of input sequence
 
   int		iPicWidth;			// width of picture in samples

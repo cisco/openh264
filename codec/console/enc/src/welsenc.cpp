@@ -143,7 +143,7 @@ int ParseLayerConfig( CReadConfig & cRdLayerCfg, const int iLayer, SEncParamExt&
         sFileSet.sRecFileName[iLayer][kiLen] = '\0';
         strncpy (sFileSet.sRecFileName[iLayer], strTag[1].c_str(), kiLen);	// confirmed_safe_unsafe_usage
       } else if (strTag[0].compare ("ProfileIdc") == 0) {
-        pDLayer->uiProfileIdc	= atoi (strTag[1].c_str());
+        pDLayer->uiProfileIdc	= (EProfileIdc)atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("FRExt") == 0) {
         //					pDLayer->frext_mode	= (bool)atoi(strTag[1].c_str());
       } else if (strTag[0].compare ("SpatialBitrate") == 0) {
