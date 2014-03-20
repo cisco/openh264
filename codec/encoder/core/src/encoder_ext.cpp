@@ -1187,8 +1187,9 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
   int32_t iResult					= 0;
   float	fCompressRatioThr		= .5f;
   const int32_t kiNumDependencyLayers	= pParam->iSpatialLayerNum;
-  const uint32_t kuiMvdInterTableSize	= (kiNumDependencyLayers == 1 ? (1 + (648 << 1)) : (1 + (972 << 1)));
-  const uint32_t kuiMvdCacheAlginedSize	= kuiMvdInterTableSize * sizeof (uint16_t);
+  (*ppCtx)->iMvRange = (pParam->iUsageType?EXPANDED_MV_RANGE:((kiNumDependencyLayers == 1)?CAMERA_MV_RANGE:CAMERA_HIGHLAYER_MV_RANGE));
+  const uint32_t kuiMvdInterTableSize	=  (1 + (((*ppCtx)->iMvRange +1) << 4));//<<4 in total: intepel*4=qpel; mvd=qpel_mv_range*2; qpel_mv_range*2=(+/-);
+  const uint32_t kuiMvdCacheAlignedSize	= kuiMvdInterTableSize * sizeof (uint16_t);
   int32_t iVclLayersBsSizeCount		= 0;
   int32_t iNonVclLayersBsSizeCount	= 0;
 #if defined(MT_ENABLED)
@@ -1387,7 +1388,7 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
     return 1;
   }
 
-  (*ppCtx)->pMvdCostTableInter = (uint16_t*)pMa->WelsMallocz (52 * kuiMvdCacheAlginedSize, "pMvdCostTableInter");
+  (*ppCtx)->pMvdCostTableInter = (uint16_t*)pMa->WelsMallocz (52 * kuiMvdCacheAlignedSize, "pMvdCostTableInter");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pMvdCostTableInter), FreeMemorySvc (ppCtx))
   MvdCostInit ((*ppCtx)->pMvdCostTableInter, kuiMvdInterTableSize);  //should put to a better place?
 
