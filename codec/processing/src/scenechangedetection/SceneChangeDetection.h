@@ -172,6 +172,13 @@ class CSceneChangeDetection : public IStrategy {
     return RET_SUCCESS;
   }
 
+  EResult Set(int32_t iType, void * pParam) {
+    if( pParam == NULL ){
+      return RET_INVALIDPARAM;
+    }
+    m_sSceneChangeParam = *(SSceneChangeResult*)pParam;
+    return RET_SUCCESS;
+  }
  private:
   SSceneChangeResult m_sSceneChangeParam;
   T          m_cDetector;
