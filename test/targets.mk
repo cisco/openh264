@@ -8,6 +8,7 @@ CODEC_UNITTEST_CPP_SRCS=\
 	$(CODEC_UNITTEST_SRCDIR)/decoder_test.cpp\
 	$(CODEC_UNITTEST_SRCDIR)/DecUT_IdctResAddPred.cpp\
 	$(CODEC_UNITTEST_SRCDIR)/DecUT_IntraPrediction.cpp\
+	$(CODEC_UNITTEST_SRCDIR)/DecUT_MotionCompensation.cpp\
 	$(CODEC_UNITTEST_SRCDIR)/encoder_test.cpp\
 	$(CODEC_UNITTEST_SRCDIR)/EncUT_MemoryAlloc.cpp\
 	$(CODEC_UNITTEST_SRCDIR)/EncUT_MotionEstimate.cpp\
