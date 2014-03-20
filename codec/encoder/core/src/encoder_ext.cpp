@@ -376,7 +376,7 @@ void WelsEncoderApplyFrameRate(SWelsSvcCodingParam* pParam)
 }
 
 
-void WelsEncoderApplyBitRate(SWelsSvcCodingParam* pParam)
+void WelsEncoderApplyBitRate(SWelsSvcCodingParam* pParam,int iLayer)
 {
   //TODO (Sijia):  this is a temporary solution which keep the ratio between layers
   //but it is also possible to fulfill the bitrate of lower layer first
@@ -384,16 +384,30 @@ void WelsEncoderApplyBitRate(SWelsSvcCodingParam* pParam)
   SDLayerParam* pLayerParam;
   const int32_t iNumLayers = pParam->iSpatialLayerNum;
   int32_t i, iOrigTotalBitrate=0;
-  //read old BR
-  for (i=0;i<iNumLayers;i++) {
-    iOrigTotalBitrate += pParam->sDependencyLayers[i].iSpatialBitrate;
-  }
-  //write new BR
-  float fRatio = 0.0;
-  for (i=0;i<iNumLayers;i++) {
-    pLayerParam = &(pParam->sDependencyLayers[i]);
-    fRatio = pLayerParam->iSpatialBitrate/(static_cast<float>(iOrigTotalBitrate));
-    pLayerParam->iSpatialBitrate = static_cast<int32_t>(pParam->iTargetBitrate*fRatio);
+  if(iLayer == SPATIAL_LAYER_ALL){
+    if(pParam->iMaxBitrate <pParam->iTargetBitrate){
+      WelsLog (NULL, WELS_LOG_WARNING,"CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE,overall settting,TargetBitrate = %d,iMaxBitrate = %d\n",
+        pParam->iTargetBitrate,pParam->iMaxBitrate);
+      pParam->iMaxBitrate  = pParam->iTargetBitrate;
+    }
+    //read old BR
+    for (i=0;i<iNumLayers;i++) {
+     iOrigTotalBitrate += pParam->sDependencyLayers[i].iSpatialBitrate;
+    }
+    //write new BR
+    float fRatio = 0.0;
+    for (i=0;i<iNumLayers;i++) {
+      pLayerParam = &(pParam->sDependencyLayers[i]);
+      fRatio = pLayerParam->iSpatialBitrate/(static_cast<float>(iOrigTotalBitrate));
+      pLayerParam->iSpatialBitrate = static_cast<int32_t>(pParam->iTargetBitrate*fRatio);
+    }
+  }else{
+    if(pParam->sSpatialLayers[iLayer].iMaxSpatialBitrate <pParam->sSpatialLayers[iLayer].iSpatialBitrate){
+      WelsLog (NULL, WELS_LOG_WARNING,"CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE,iLayer = %d,iTargetBitrate = %d,iMaxBitrate = %d\n",
+        iLayer,pParam->sSpatialLayers[iLayer].iSpatialBitrate,pParam->sSpatialLayers[iLayer].iMaxSpatialBitrate);
+      pParam->sSpatialLayers[iLayer].iMaxSpatialBitrate = pParam->sSpatialLayers[iLayer].iSpatialBitrate;
+    }
+
   }
 }
 /*!
