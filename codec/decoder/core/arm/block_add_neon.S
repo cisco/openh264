@@ -116,46 +116,6 @@ WELS_ASM_FUNC_BEGIN SetNonZeroCount_neon
 WELS_ASM_FUNC_END
 
 
-//	r0 int16_t * block,
-//	r1	int32_t stride
-WELS_ASM_FUNC_BEGIN WelsResBlockZero16x16_neon// can use for 256*sizeof(int16_t)
-	push		{r2}
-	mov			r2, #16
-// each row 16 elements, 16*sizeof(int16_t)
-//	memset(ptr_dest, 0, 16*sizeof(int16_t));
-//	ptr_dest += stride;
-	lsl			r1, r1, #1	// r1 = 2*r1
-	veor.i16	q0, q0, q0
-	veor.i16	q1, q1, q1
-
-block_zero_16x16_luma_loop:
-	vst1.i16	{q0, q1}, [r0], r1
-	subs		r2,	r2, #2
-	vst1.i16	{q0, q1}, [r0], r1
-	bne			block_zero_16x16_luma_loop
-
-	pop		{r2}
-WELS_ASM_FUNC_END
-
-WELS_ASM_FUNC_BEGIN WelsResBlockZero8x8_neon// can use for 64*sizeof(int16_t)
-	push		{r2}
-	mov			r2, #8
-// each row 8 elements, 8*sizeof(int16_t)
-//	memset(ptr_dest, 0, 8*sizeof(int16_t));
-//	ptr_dest += stride;
-	lsl			r1, r1, #1
-	veor.i16	q0, q0, q0
-
-block_zero_8x8_chma_loop:
-	vst1.i16	{q0}, [r0], r1
-	subs		r2,	r2, #2
-	vst1.i16	{q0}, [r0], r1
-	bne			block_zero_8x8_chma_loop
-
-	pop		{r2}
-WELS_ASM_FUNC_END
-
-
 //	uint8_t *pred, const int32_t stride, int16_t *rs
 WELS_ASM_FUNC_BEGIN IdctResAddPred_neon
 
