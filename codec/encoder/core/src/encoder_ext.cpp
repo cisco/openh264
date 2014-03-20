@@ -2445,14 +2445,14 @@ void WelsInitCurrentLayer (sWelsEncCtx* pCtx,
   }
 }
 
-inline void SetFastCodingFunc(SWelsFuncPtrList* pFuncList)
+static inline void SetFastCodingFunc(SWelsFuncPtrList* pFuncList)
 {
   pFuncList->pfIntraFineMd = WelsMdIntraFinePartitionVaa;
   pFuncList->sSampleDealingFuncs.pfMdCost = pFuncList->sSampleDealingFuncs.pfSampleSad;
   pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3 = pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3Sad;
   pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3 = pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3Sad;
 }
-inline void SetNormalCodingFunc(SWelsFuncPtrList* pFuncList)
+static inline void SetNormalCodingFunc(SWelsFuncPtrList* pFuncList)
 {
   pFuncList->pfIntraFineMd = WelsMdIntraFinePartition;
   pFuncList->sSampleDealingFuncs.pfMdCost = pFuncList->sSampleDealingFuncs.pfSampleSatd;
