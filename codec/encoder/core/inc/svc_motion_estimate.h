@@ -45,9 +45,14 @@
 #include "wels_func_ptr_def.h"
 
 namespace WelsSVCEnc {
-#define MV_RANGE (64)
+#define CAMERA_STARTMV_RANGE (64)
 #define	ITERATIVE_TIMES	(16)
-#define	BASE_MV_MB_NMB	((2*(MV_RANGE+ITERATIVE_TIMES)/MB_WIDTH_LUMA)-1)
+#define CAMERA_MV_RANGE (CAMERA_STARTMV_RANGE+ITERATIVE_TIMES)
+#define CAMERA_MVD_RANGE  ((CAMERA_MV_RANGE+1)<<1) //mvd=mv_range*2;
+#define	BASE_MV_MB_NMB	((2*CAMERA_MV_RANGE/MB_WIDTH_LUMA)-1)
+#define CAMERA_HIGHLAYER_MVD_RANGE (243)//mvd range;
+#define EXPANDED_MV_RANGE (504) //=512-8 rather than 511 to sacrifice same edge point but save complexity in assemblys
+#define EXPANDED_MVD_RANGE ((504+1)<<1)
 
 union SadPredISatdUnit {
 uint32_t	uiSadPred;

@@ -359,7 +359,7 @@ void WelsMdInterInit (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb, const i
   ST32 (&pCurMb->sP16x16Mv, 0);
   ST32 (&pCurLayer->pDecPic->sMvList[kiMbXY], 0);
 
-  SetMvWithinMvRange( kiMbWidth, kiMbHeight, kiMbX, kiMbY, MV_RANGE, &(pSlice->sMvMin), &(pSlice->sMvMax));
+  SetMvWithinMvRange( kiMbWidth, kiMbHeight, kiMbX, kiMbY, CAMERA_STARTMV_RANGE, &(pSlice->sMvStartMin), &(pSlice->sMvStartMax));
 }
 
 int32_t WelsMdI16x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SMbCache* pMbCache, int32_t iLambda) {
