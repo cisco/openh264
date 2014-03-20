@@ -2445,77 +2445,50 @@ void WelsInitCurrentLayer (sWelsEncCtx* pCtx,
   }
 }
 
+inline void SetFastCodingFunc(SWelsFuncPtrList* pFuncList)
+{
+  pFuncList->pfIntraFineMd = WelsMdIntraFinePartitionVaa;
+  pFuncList->sSampleDealingFuncs.pfMdCost = pFuncList->sSampleDealingFuncs.pfSampleSad;
+  pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3 = pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3Sad;
+  pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3 = pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3Sad;
+}
+inline void SetNormalCodingFunc(SWelsFuncPtrList* pFuncList)
+{
+  pFuncList->pfIntraFineMd = WelsMdIntraFinePartition;
+  pFuncList->sSampleDealingFuncs.pfMdCost = pFuncList->sSampleDealingFuncs.pfSampleSatd;
+  pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3 =
+    pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3Satd;
+  pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3 =
+    pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3Satd;
+  pFuncList->sSampleDealingFuncs.pfIntra4x4Combined3 =
+    pFuncList->sSampleDealingFuncs.pfIntra4x4Combined3Satd;
+}
+
+
 void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
   SDqLayer* pCurLayer		= pCtx->pCurDqLayer;
   const bool kbBaseAvail	= pCurLayer->bBaseLayerAvailableFlag;
+  const bool kbHighestSpatialLayer	=
+    (pCtx->pSvcParam->iSpatialLayerNum == (pCurLayer->sLayerInfo.sNalHeaderExt.uiDependencyId + 1));
+  SWelsFuncPtrList* pFuncList = pCtx->pFuncList;
 
   /* function pointers conditional assignment under sWelsEncCtx, layer_mb_enc_rec (in stack) is exclusive */
+  if (kbHighestSpatialLayer) {
+    SetFastCodingFunc(pFuncList);
+  } else {
+    SetNormalCodingFunc(pFuncList);
+  }
 
   if (P_SLICE == pCtx->eSliceType) {
-    if (kbBaseAvail) {
-      if (pCtx->pSvcParam->iSpatialLayerNum == (pCurLayer->sLayerInfo.sNalHeaderExt.uiDependencyId + 1)) { //
-        pCtx->pFuncList->pfMotionSearch = WelsMotionEstimateSearch;
-        pCtx->pFuncList->pfCalculateSatd = NotCalculateSatdCost;
-        pCtx->pFuncList->pfFirstIntraMode = WelsMdFirstIntraMode;
-        pCtx->pFuncList->pfIntraFineMd = WelsMdIntraFinePartitionVaa;
-        pCtx->pFuncList->pfInterFineMd = WelsMdInterFinePartitionVaa;
-        pCtx->pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3 = pCtx->pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3Sad;
-        pCtx->pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3 =
-          pCtx->pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3Sad;
-        pCtx->pFuncList->sSampleDealingFuncs.pfMdCost = pCtx->pFuncList->sSampleDealingFuncs.pfSampleSad;
-      } else {
-        pCtx->pFuncList->pfMotionSearch  = WelsMotionEstimateSearch;
-        pCtx->pFuncList->pfCalculateSatd = CalculateSatdCost;
-        pCtx->pFuncList->pfFirstIntraMode = WelsMdFirstIntraMode;
-        pCtx->pFuncList->pfIntraFineMd = WelsMdIntraFinePartition;
-        pCtx->pFuncList->pfInterFineMd = WelsMdInterFinePartition;
-        pCtx->pFuncList->sSampleDealingFuncs.pfMdCost = pCtx->pFuncList->sSampleDealingFuncs.pfSampleSatd;
-        pCtx->pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3 =
-          pCtx->pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3Satd;
-        pCtx->pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3 = pCtx->pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3Satd;
-        pCtx->pFuncList->sSampleDealingFuncs.pfIntra4x4Combined3 = pCtx->pFuncList->sSampleDealingFuncs.pfIntra4x4Combined3Satd;
-      }
-      pCtx->pFuncList->sSampleDealingFuncs.pfMeCost = pCtx->pFuncList->sSampleDealingFuncs.pfSampleSatd;
+    pFuncList->pfMotionSearch  = WelsMotionEstimateSearch;
+    pFuncList->pfFirstIntraMode = WelsMdFirstIntraMode;
+    pFuncList->sSampleDealingFuncs.pfMeCost = pCtx->pFuncList->sSampleDealingFuncs.pfSampleSatd;
+    if (kbHighestSpatialLayer) {
+      pFuncList->pfCalculateSatd = NotCalculateSatdCost;
+      pFuncList->pfInterFineMd = WelsMdInterFinePartitionVaa;
     } else {
-      //case 3: pBase layer MD + encoding
-      if (pCurLayer->sLayerInfo.sNalHeaderExt.uiDependencyId + 1 == pCtx->pSvcParam->iSpatialLayerNum) {
-        pCtx->pFuncList->pfMotionSearch  = WelsMotionEstimateSearch;
-        pCtx->pFuncList->pfCalculateSatd = NotCalculateSatdCost;
-        pCtx->pFuncList->pfFirstIntraMode = WelsMdFirstIntraMode;
-        pCtx->pFuncList->pfIntraFineMd = WelsMdIntraFinePartitionVaa;
-        pCtx->pFuncList->pfInterFineMd = WelsMdInterFinePartitionVaa;
-        pCtx->pFuncList->sSampleDealingFuncs.pfMdCost = pCtx->pFuncList->sSampleDealingFuncs.pfSampleSad;
-        pCtx->pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3 =
-          pCtx->pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3Sad;
-        pCtx->pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3 = pCtx->pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3Sad;
-      } else {
-        pCtx->pFuncList->pfMotionSearch  = WelsMotionEstimateSearch;
-        pCtx->pFuncList->pfCalculateSatd = CalculateSatdCost;
-        pCtx->pFuncList->pfFirstIntraMode = WelsMdFirstIntraMode;
-        pCtx->pFuncList->pfIntraFineMd = WelsMdIntraFinePartition;
-        pCtx->pFuncList->pfInterFineMd = WelsMdInterFinePartition;
-        pCtx->pFuncList->sSampleDealingFuncs.pfMdCost = pCtx->pFuncList->sSampleDealingFuncs.pfSampleSatd;
-        pCtx->pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3 =
-          pCtx->pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3Satd;
-        pCtx->pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3 = pCtx->pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3Satd;
-        pCtx->pFuncList->sSampleDealingFuncs.pfIntra4x4Combined3 = pCtx->pFuncList->sSampleDealingFuncs.pfIntra4x4Combined3Satd;
-      }
-      pCtx->pFuncList->sSampleDealingFuncs.pfMeCost = pCtx->pFuncList->sSampleDealingFuncs.pfSampleSatd;
-    }
-  } else if (I_SLICE == pCtx->eSliceType) {
-    if (pCurLayer->sLayerInfo.sNalHeaderExt.uiDependencyId + 1 == pCtx->pSvcParam->iSpatialLayerNum) {
-      pCtx->pFuncList->sSampleDealingFuncs.pfMdCost = pCtx->pFuncList->sSampleDealingFuncs.pfSampleSad;
-      pCtx->pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3 =
-        pCtx->pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3Sad;
-      pCtx->pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3 = pCtx->pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3Sad;
-      pCtx->pFuncList->pfIntraFineMd = WelsMdIntraFinePartitionVaa;
-    } else {
-      pCtx->pFuncList->sSampleDealingFuncs.pfMdCost = pCtx->pFuncList->sSampleDealingFuncs.pfSampleSatd;
-      pCtx->pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3 =
-        pCtx->pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3Satd;
-      pCtx->pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3 = pCtx->pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3Satd;
-      pCtx->pFuncList->sSampleDealingFuncs.pfIntra4x4Combined3 = pCtx->pFuncList->sSampleDealingFuncs.pfIntra4x4Combined3Satd;
-      pCtx->pFuncList->pfIntraFineMd = WelsMdIntraFinePartition;
+      pFuncList->pfCalculateSatd = CalculateSatdCost;
+      pFuncList->pfInterFineMd = WelsMdInterFinePartition;
     }
   }
 }
