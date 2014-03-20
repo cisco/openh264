@@ -58,7 +58,14 @@ namespace WelsSVCEnc {
 typedef enum {
   RC_MODE0,	//Quality mode
   RC_MODE1,   //Bitrate mode
+  RC_MODE_LOWBR, //bitrate limited mode
 } RC_MODES;
+
+enum{
+  BITS_NORMAL,
+  BITS_LIMITED,
+  BITS_EXCEEDED,
+};
 
 enum {
   //virtual gop size
@@ -160,6 +167,7 @@ typedef struct TagWelsRc {
   // bits allocation and status
   int32_t   iRemainingBits;
   int32_t   iTargetBits;
+  int32_t   iCurrentBitsLevel;//0:normal; 1:limited; 2:exceeded.
 
   int32_t   iIdrNum;
   int32_t   iIntraComplexity;
@@ -170,14 +178,14 @@ typedef struct TagWelsRc {
   int32_t   iFrameDqBits;
 
   double*    pGomComplexity;
-  int32_t*  	pGomForegroundBlockNum;
+  int32_t*   pGomForegroundBlockNum;
   int32_t*   pCurrentFrameGomSad;
   int32_t*   pGomCost;
 
   int32_t   iAverageFrameQp;
   int32_t   iNumberMbFrame;
   int32_t   iNumberMbGom;
-  int32_t	  iSliceNum;
+  int32_t	iSliceNum;
   int32_t   iGomSize;
 
   int32_t   iSkipFrameNum;

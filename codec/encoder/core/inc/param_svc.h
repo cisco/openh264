@@ -247,13 +247,8 @@ int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam, const bool kbEnab
   SUsedPicRect.iWidth = ((iPicWidth >> 1) << 1);
   SUsedPicRect.iHeight = ((iPicHeight >> 1) << 1);
 
-   bEnableRc			= kbEnableRc;
-  if (pCodingParam.iRCMode != RC_MODE0 && pCodingParam.iRCMode != RC_MODE1)
-    iRCMode = RC_MODE1;
-  else
-    iRCMode = pCodingParam.iRCMode;    // rc mode
-
-
+  bEnableRc			= kbEnableRc;
+  iRCMode = pCodingParam.iRCMode;    // rc mode
 
   int8_t iIdxSpatial	= 0;
   uint8_t uiProfileIdc		= PRO_BASELINE;
@@ -327,10 +322,7 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
 
   /* Rate Control */
   bEnableRc			= pCodingParam.bEnableRc;
-  if (pCodingParam.iRCMode != RC_MODE0 && pCodingParam.iRCMode != RC_MODE1)
-    iRCMode = RC_MODE1;
-  else
-    iRCMode = pCodingParam.iRCMode;    // rc mode
+  iRCMode = pCodingParam.iRCMode;    // rc mode
   iPaddingFlag = pCodingParam.iPaddingFlag;
 
   iTargetBitrate		= pCodingParam.iTargetBitrate;	// target bitrate
