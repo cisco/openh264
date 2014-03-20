@@ -149,6 +149,7 @@ static void FillDefault (SEncParamExt& param, const bool kbEnableRc) {
   param.uiFrameToBeCoded	= (uint32_t) - 1;		// frame to be encoded (at input frame rate)
 
   param.iTargetBitrate			= 0;	// overall target bitrate introduced in RC module
+  param.iMaxBitrate             = MAX_BIT_RATE;
 #ifdef MT_ENABLED
   param.iMultipleThreadIdc		= 0;	// auto to detect cpu cores inside
 #else
@@ -279,7 +280,6 @@ int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam, const bool kbEnab
     pDlp->iSpatialBitrate	=
 		sSpatialLayers[iIdxSpatial].iSpatialBitrate = pCodingParam.iTargetBitrate;	// target bitrate for current spatial layer
 
-
    pDlp->iDLayerQp = SVC_QUALITY_BASE_QP;
 
     uiProfileIdc	= PRO_SCALABLE_BASELINE;
@@ -334,6 +334,7 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   iPaddingFlag = pCodingParam.iPaddingFlag;
 
   iTargetBitrate		= pCodingParam.iTargetBitrate;	// target bitrate
+  iMaxBitrate           = pCodingParam.iMaxBitrate;
 
   /* Denoise Control */
   bEnableDenoise = pCodingParam.bEnableDenoise ? true : false;    // Denoise Control  // only support 0 or 1 now
@@ -405,7 +406,6 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
     pDlp->iFrameHeight		= pCodingParam.sSpatialLayers[iIdxSpatial].iVideoHeight;// frame height
     pDlp->iSpatialBitrate	=
       pCodingParam.sSpatialLayers[iIdxSpatial].iSpatialBitrate;	// target bitrate for current spatial layer
-
 
     //multi slice
     pDlp->sSliceCfg.uiSliceMode = pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.uiSliceMode;

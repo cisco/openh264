@@ -76,6 +76,7 @@ typedef enum {
   ENCODER_OPTION_SVC_ENCODE_PARAM_EXT,
   ENCODER_OPTION_FRAME_RATE,
   ENCODER_OPTION_BITRATE,
+  ENCODER_OPTION_MAX_BITRATE,
   ENCODER_OPTION_INTER_SPATIAL_PRED,
   ENCODER_OPTION_RC_MODE,
   ENCODER_PADDING_PADDING,
@@ -117,6 +118,14 @@ typedef enum {
   NON_VIDEO_CODING_LAYER = 0,
   VIDEO_CODING_LAYER = 1
 } LAYER_TYPE;
+
+typedef enum {
+    SPATIAL_LAYER_0 = 0,
+    SPATIAL_LAYER_1 = 1,
+    SPATIAL_LAYER_2 = 2,
+    SPATIAL_LAYER_3 = 3,
+    SPATIAL_LAYER_ALL = 4,
+} LAYER_NUM;
 
 //enumerate the type of video bitstream which is provided to decoder
 typedef enum {
@@ -174,6 +183,7 @@ typedef struct {
   int	iVideoHeight;		// video size in cy specified for a layer
   float	fFrameRate;		// frame rate specified for a layer
   int	iSpatialBitrate;	// target bitrate for a spatial layer
+  int   iMaxSpatialBitrate;
   unsigned int	uiProfileIdc;	// value of profile IDC (0 for auto-detection)
   int    iDLayerQp;
 
@@ -222,6 +232,7 @@ typedef struct TagEncParamExt
   /* rc control */
   bool    bEnableRc;
   bool    bEnableFrameSkip; // allow skipping frames to keep the bitrate within limits
+  int     iMaxBitrate;        // max bitrate desired
   int     iMaxQp;
   int     iMinQp;
 
@@ -299,6 +310,11 @@ typedef struct Source_Picture_s {
   int 		iPicHeight;				// luma picture height in y coordinate
   long long uiTimeStamp;
 } SSourcePicture;
+
+typedef struct Bitrate_Info_s{
+  LAYER_NUM iLayer;
+  int iBitrate;    //the maximum bitrate
+}SBitrateInfo;
 
 typedef struct Dump_Layer_s{
 	int iLayer;
