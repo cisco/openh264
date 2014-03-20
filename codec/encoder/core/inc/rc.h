@@ -56,9 +56,9 @@ namespace WelsSVCEnc {
 #define    WELS_RC_GOM            1
 
 typedef enum {
-  RC_MODE0,	//Quality mode
-  RC_MODE1,   //Bitrate mode
-  RC_MODE_LOWBR, //bitrate limited mode
+  RC_QUALITY_MODE,	//Quality mode
+  RC_BITRATE_MODE,   //Bitrate mode
+  RC_LOW_BW_MODE, //bitrate limited mode
 } RC_MODES;
 
 enum{
@@ -74,6 +74,7 @@ enum {
   //qp information
   GOM_MIN_QP_MODE       = 12,
   GOM_MAX_QP_MODE       = 36,
+  MAX_LOW_BR_QP			= 42,
   MIN_IDR_QP            = 26,
   MAX_IDR_QP            = 32,
   DELTA_QP              = 2,
