@@ -37,8 +37,6 @@
 
 namespace WelsDec {
 
-void WelsBlockInit (int16_t* pBlock, int32_t iWidth, int32_t iHeight, int32_t iStride, uint8_t uiVal);
-
 int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx);
 int32_t WelsDecodeMbCavlcISlice (PWelsDecoderContext pCtx, PNalUnit pNalCur);
 
@@ -66,22 +64,13 @@ extern "C" {
 #endif//__cplusplus
 
 #if defined(HAVE_NEON)
-void WelsResBlockZero16x16_neon(int16_t* pBlock, int32_t iStride);
-void WelsResBlockZero8x8_neon(int16_t* pBlock, int32_t iStride);
 void SetNonZeroCount_neon(int16_t* pBlock, int8_t* pNonZeroCount);
-#endif
-
-#ifdef  X86_ASM
-void WelsResBlockZero16x16_sse2 (int16_t* pBlock, int32_t iStride);
-void WelsResBlockZero8x8_sse2 (int16_t* pBlock, int32_t iStride);
 #endif
 
 #ifdef __cplusplus
 }
 #endif//__cplusplus
 
-void WelsBlockZero16x16_c (int16_t* pBlock, int32_t iStride);
-void WelsBlockZero8x8_c (int16_t* pBlock, int32_t iStride);
 void SetNonZeroCount_c (int16_t* pBlock, int8_t* pNonZeroCount);
 
 void WelsBlockFuncInit (SBlockFunc* pFunc,  int32_t iCpu);

@@ -842,9 +842,7 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
     uiCbpL = pCurLayer->pCbp[iMbXy] & 15;
   }
 
-  pCtx->sBlockFunc.pWelsBlockZero16x16Func (pCurLayer->pScaledTCoeff[iMbXy], 16);
-  pCtx->sBlockFunc.pWelsBlockZero8x8Func (pCurLayer->pScaledTCoeff[iMbXy] + 256, 8);
-  pCtx->sBlockFunc.pWelsBlockZero8x8Func (pCurLayer->pScaledTCoeff[iMbXy] + 256 + 64, 8);
+  memset(pCurLayer->pScaledTCoeff[iMbXy], 0, MB_COEFF_LIST_SIZE * sizeof(int16_t));
 
   ST32 (&pCurLayer->pNzc[iMbXy][0], 0);
   ST32 (&pCurLayer->pNzc[iMbXy][4], 0);
@@ -1043,42 +1041,14 @@ int32_t WelsDecodeMbCavlcPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur) {
   return 0;
 }
 
-void WelsBlockInit (int16_t* pBlock, int32_t iWidth, int32_t iHeight, int32_t iStride, uint8_t uiVal) {
-  int32_t i;
-  int16_t* pDst = pBlock;
-
-  for (i = 0; i < iHeight; i++) {
-    memset (pDst, uiVal, iWidth * sizeof (int16_t));
-    pDst += iStride;
-  }
-}
-
 void WelsBlockFuncInit (SBlockFunc*   pFunc,  int32_t iCpu) {
-  pFunc->pWelsBlockZero16x16Func		= WelsBlockZero16x16_c;
-  pFunc->pWelsBlockZero8x8Func	    = WelsBlockZero8x8_c;
   pFunc->pWelsSetNonZeroCountFunc	    = SetNonZeroCount_c;
-
-#ifdef  X86_ASM
-  if (iCpu & WELS_CPU_SSE2) {
-    pFunc->pWelsBlockZero16x16Func		= WelsResBlockZero16x16_sse2;
-    pFunc->pWelsBlockZero8x8Func	    = WelsResBlockZero8x8_sse2;
-  }
-#endif
 
 #ifdef	HAVE_NEON
   if ( iCpu & WELS_CPU_NEON ) {
-    pFunc->pWelsBlockZero16x16Func		= WelsResBlockZero16x16_neon;
-    pFunc->pWelsBlockZero8x8Func		= WelsResBlockZero8x8_neon;
     pFunc->pWelsSetNonZeroCountFunc		= SetNonZeroCount_neon;
   }
 #endif
-}
-void WelsBlockZero16x16_c (int16_t* pBlock, int32_t iStride) {
-  WelsBlockInit (pBlock, 16, 16, iStride, 0);
-}
-
-void WelsBlockZero8x8_c (int16_t* pBlock, int32_t iStride) {
-  WelsBlockInit (pBlock, 8, 8, iStride, 0);
 }
 
 void SetNonZeroCount_c (int16_t* pBlock, int8_t* pNonZeroCount) {
