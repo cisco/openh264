@@ -250,7 +250,7 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
       } else if (strTag[0].compare ("EnableRC") == 0) {
         pSvcParam.bEnableRc	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("RCMode") == 0) {
-        pSvcParam.iRCMode	= atoi (strTag[1].c_str());
+        pSvcParam.iRCMode	= (RC_MODES) atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("TargetBitrate") == 0) {
         pSvcParam.iTargetBitrate	= 1000 * atoi (strTag[1].c_str());
         if (pSvcParam.bEnableRc && pSvcParam.iTargetBitrate <= 0) {
@@ -352,7 +352,7 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& sParam) {
       sParam.iLtrMarkPeriod = atoi (argv[i++]);
 
     else if (!strcmp (pCmd, "-rcm") && (i < argc))
-      sParam.iRCMode = atoi (argv[i++]);
+      sParam.iRCMode = (RC_MODES) atoi (argv[i++]);
 
     else if (!strcmp (pCmd, "-tarb") && (i < argc))
       sParam.iTargetBitrate = atoi (argv[i++]);
@@ -580,7 +580,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.iPicWidth		= 1280;			// width of picture in samples
   sParam.iPicHeight	= 720;			// height of picture in samples
   sParam.iTargetBitrate = 2500000;		// target bitrate desired
-  sParam.iRCMode       = 0;            //  rc mode control
+  sParam.iRCMode       = RC_QUALITY_MODE;       //  rc mode control
   sParam.iTemporalLayerNum = 3;	// layer number at temporal level
   sParam.iSpatialLayerNum	= 4;	// layer number at spatial level
   sParam.bEnableDenoise    = 0;    // denoise control

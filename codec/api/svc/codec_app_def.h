@@ -245,7 +245,7 @@ typedef struct TagEncParamBase{
   int		iPicWidth;			// width of picture in samples
   int		iPicHeight;			// height of picture in samples
   int		iTargetBitrate;		// target bitrate desired
-  int       iRCMode;                 // RC mode
+  RC_MODES      iRCMode;                 // RC mode
   float	    fMaxFrameRate;			// input maximal frame rate
 
 } SEncParamBase, *PEncParamBase;
@@ -259,7 +259,7 @@ typedef struct TagEncParamExt
   int		iPicWidth;			// width of picture in samples
   int		iPicHeight;			// height of picture in samples
   int		iTargetBitrate;		// target bitrate desired
-  int       iRCMode;                 // RC mode
+  RC_MODES      iRCMode;                 // RC mode
   float	    fMaxFrameRate;			// input maximal frame rate
 
   int		iTemporalLayerNum;	// layer number at temporal level
