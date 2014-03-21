@@ -56,9 +56,16 @@ namespace WelsSVCEnc {
 #define    WELS_RC_GOM            1
 
 typedef enum {
-  RC_MODE0,	//Quality mode
-  RC_MODE1,   //Bitrate mode
+  RC_QUALITY_MODE,	//Quality mode
+  RC_BITRATE_MODE,   //Bitrate mode
+  RC_LOW_BW_MODE, //bitrate limited mode
 } RC_MODES;
+
+enum{
+  BITS_NORMAL,
+  BITS_LIMITED,
+  BITS_EXCEEDED,
+};
 
 enum {
   //virtual gop size
@@ -67,6 +74,7 @@ enum {
   //qp information
   GOM_MIN_QP_MODE       = 12,
   GOM_MAX_QP_MODE       = 36,
+  MAX_LOW_BR_QP			= 42,
   MIN_IDR_QP            = 26,
   MAX_IDR_QP            = 32,
   DELTA_QP              = 2,
@@ -160,6 +168,7 @@ typedef struct TagWelsRc {
   // bits allocation and status
   int32_t   iRemainingBits;
   int32_t   iTargetBits;
+  int32_t   iCurrentBitsLevel;//0:normal; 1:limited; 2:exceeded.
 
   int32_t   iIdrNum;
   int32_t   iIntraComplexity;
@@ -170,14 +179,14 @@ typedef struct TagWelsRc {
   int32_t   iFrameDqBits;
 
   double*    pGomComplexity;
-  int32_t*  	pGomForegroundBlockNum;
+  int32_t*   pGomForegroundBlockNum;
   int32_t*   pCurrentFrameGomSad;
   int32_t*   pGomCost;
 
   int32_t   iAverageFrameQp;
   int32_t   iNumberMbFrame;
   int32_t   iNumberMbGom;
-  int32_t	  iSliceNum;
+  int32_t	iSliceNum;
   int32_t   iGomSize;
 
   int32_t   iSkipFrameNum;

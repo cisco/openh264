@@ -903,7 +903,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
 	WelsEncoderApplyBitRate (m_pEncContext->pSvcParam,pInfo->iLayer);
   }
   break;
-  case ENCODER_OPTION_RC_MODE: {	// 0:quality mode;1:bit-rate mode
+  case ENCODER_OPTION_RC_MODE: {	// 0:quality mode;1:bit-rate mode;2:bitrate limited mode
     int32_t iValue = * ((int32_t*)pOption);
     m_pEncContext->pSvcParam->iRCMode	= iValue;
   }
