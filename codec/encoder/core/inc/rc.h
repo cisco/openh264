@@ -55,12 +55,6 @@ namespace WelsSVCEnc {
 #define    WELS_RC_DISABLE        0
 #define    WELS_RC_GOM            1
 
-typedef enum {
-  RC_QUALITY_MODE,	//Quality mode
-  RC_BITRATE_MODE,   //Bitrate mode
-  RC_LOW_BW_MODE, //bitrate limited mode
-} RC_MODES;
-
 enum{
   BITS_NORMAL,
   BITS_LIMITED,

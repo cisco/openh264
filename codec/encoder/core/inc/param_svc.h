@@ -171,7 +171,7 @@ static void FillDefault (SEncParamExt& param, const bool kbEnableRc) {
  
   /* Rate Control */
   param.bEnableRc		= kbEnableRc;
-  param.iRCMode			= 0;
+  param.iRCMode			= RC_QUALITY_MODE;
   param.iPaddingFlag	= 0;
 
   param.bEnableDenoise				= false;	// denoise control

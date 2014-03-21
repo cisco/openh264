@@ -174,6 +174,12 @@ typedef enum {
 } SliceModeEnum;
 
 typedef enum {
+  RC_QUALITY_MODE,      //Quality mode
+  RC_BITRATE_MODE,   //Bitrate mode
+  RC_LOW_BW_MODE, //bitrate limited mode
+} RC_MODES;
+
+typedef enum {
   PRO_UNKNOWN     = 0,
   PRO_BASELINE	= 66,
   PRO_MAIN		= 77,
@@ -239,7 +245,7 @@ typedef struct TagEncParamBase{
   int		iPicWidth;			// width of picture in samples
   int		iPicHeight;			// height of picture in samples
   int		iTargetBitrate;		// target bitrate desired
-  int       iRCMode;                 // RC mode
+  RC_MODES      iRCMode;                 // RC mode
   float	    fMaxFrameRate;			// input maximal frame rate
 
 } SEncParamBase, *PEncParamBase;
@@ -253,7 +259,7 @@ typedef struct TagEncParamExt
   int		iPicWidth;			// width of picture in samples
   int		iPicHeight;			// height of picture in samples
   int		iTargetBitrate;		// target bitrate desired
-  int       iRCMode;                 // RC mode
+  RC_MODES      iRCMode;                 // RC mode
   float	    fMaxFrameRate;			// input maximal frame rate
 
   int		iTemporalLayerNum;	// layer number at temporal level
