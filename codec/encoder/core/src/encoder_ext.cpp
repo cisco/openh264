@@ -196,7 +196,10 @@ int32_t ParamValidationExt (sWelsEncCtx*pCtx,SWelsSvcCodingParam* pCodingParam) 
       WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMode (%d) settings!\n", fDlp->sSliceCfg.uiSliceMode);
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
-
+    if((pCodingParam->uiMaxNalSize != 0) && (fDlp->sSliceCfg.uiSliceMode != SM_DYN_SLICE)){
+      WelsLog (pCtx, WELS_LOG_ERROR,"ParamValidationExt(), invalid uiSliceMode (%d) settings!,MaxNalSize = %d\n", fDlp->sSliceCfg.uiSliceMode,pCodingParam->uiMaxNalSize);
+      return ENC_RETURN_UNSUPPORTED_PARA;
+    }
     //check pSlice settings under multi-pSlice
     if (kiPicWidth <= 16 && kiPicHeight <= 16) {
       //only have one MB, set to single_slice
@@ -328,6 +331,19 @@ int32_t ParamValidationExt (sWelsEncCtx*pCtx,SWelsSvcCodingParam* pCodingParam) 
                  fDlp->sSliceCfg.sSliceArgument.uiSliceSizeConstraint);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
+
+     if( pCodingParam->uiMaxNalSize <= NAL_HEADER_ADD_0X30BYTES) {
+       WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiMaxNalSize (%d) settings!\n",
+                pCodingParam->uiMaxNalSize);
+       return ENC_RETURN_UNSUPPORTED_PARA;
+      }
+
+      if( fDlp->sSliceCfg.sSliceArgument.uiSliceSizeConstraint > (pCodingParam->uiMaxNalSize - NAL_HEADER_ADD_0X30BYTES)){
+        WelsLog (pCtx, WELS_LOG_WARNING, "ParamValidationExt(), slice mode = SM_DYN_SLICE, uiSliceSizeConstraint = %d ,uiMaxNalsize = %d!\n",
+                 fDlp->sSliceCfg.sSliceArgument.uiSliceSizeConstraint,pCodingParam->uiMaxNalSize);
+        fDlp->sSliceCfg.sSliceArgument.uiSliceSizeConstraint =  pCodingParam->uiMaxNalSize - NAL_HEADER_ADD_0X30BYTES;
+      }
+
       // considering the coding efficient and performance, iCountMbNum constraint by MIN_NUM_MB_PER_SLICE condition of multi-pSlice mode settting
       if (iMbWidth * iMbHeight <= MIN_NUM_MB_PER_SLICE) {
         fDlp->sSliceCfg.uiSliceMode	= SM_SINGLE_SLICE;
