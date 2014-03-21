@@ -275,6 +275,7 @@ typedef struct TagEncParamExt
   int     iMaxBitrate;        // max bitrate desired
   int     iMaxQp;
   int     iMinQp;
+  unsigned int uiMaxNalSize;
 
   /*LTR settings*/
   bool     bEnableLongTermReference; // 0: on, 1: off

@@ -188,6 +188,7 @@ static void FillDefault (SEncParamExt& param, const bool kbEnableRc) {
   param.iMaxQp = 51;
   param.iMinQp = 0;
   param.iUsageType = CAMERA_VIDEO_REAL_TIME;
+  param.uiMaxNalSize = 0;
 
   for(int32_t iLayer = 0;iLayer< MAX_SPATIAL_LAYER_NUM;iLayer++){
     param.sSpatialLayers[iLayer].uiProfileIdc = PRO_BASELINE;
@@ -333,6 +334,7 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   iTargetBitrate		= pCodingParam.iTargetBitrate;	// target bitrate
   iMaxBitrate           = pCodingParam.iMaxBitrate;
 
+  uiMaxNalSize          = pCodingParam.uiMaxNalSize;
   /* Denoise Control */
   bEnableDenoise = pCodingParam.bEnableDenoise ? true : false;    // Denoise Control  // only support 0 or 1 now
 
