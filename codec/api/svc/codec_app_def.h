@@ -174,6 +174,12 @@ typedef enum {
 } SliceModeEnum;
 
 typedef enum {
+  RC_QUALITY_MODE,      //Quality mode
+  RC_BITRATE_MODE,   //Bitrate mode
+  RC_LOW_BW_MODE, //bitrate limited mode
+} RC_MODES;
+
+typedef enum {
   PRO_UNKNOWN     = 0,
   PRO_BASELINE	= 66,
   PRO_MAIN		= 77,
