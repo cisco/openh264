@@ -99,7 +99,8 @@ if args.cpp_suffix is not None:
 OUTFILE = os.path.abspath(OUTFILE)
 try:
     os.chdir(args.directory)
-except:
+except OSError as e:
+    sys.stderr.write("Error changing directory to %s\n" % e.filename)
     sys.exit(1)
 
 (cpp, asm, cfiles, sfiles) = find_sources()
