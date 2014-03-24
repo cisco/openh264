@@ -72,7 +72,7 @@ public:
   }
   virtual ~CSceneChangeDetectorVideo() {
   }
-  virtual void operator () (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY, uint8_t *& pStaticBlockIdc) {
+  void operator () (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY, uint8_t *& pStaticBlockIdc) {
     int32_t iSad = m_pfSad(pSrcY, iSrcStrideY, pRefY, iSrcStrideY);
     m_sParam.iMotionBlockNum += iSad > HIGH_MOTION_BLOCK_THRESHOLD;
   }
@@ -87,7 +87,7 @@ public:
   }
   virtual ~CSceneChangeDetectorScreen() {
   }
-  virtual void operator() (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY, uint8_t *& pStaticBlockIdc) {
+  void operator() (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY, uint8_t *& pStaticBlockIdc) {
     int32_t iSad = m_pfSad(pSrcY, iSrcStrideY, pRefY, iSrcStrideY);
     if( iSad == 0 ){
       *pStaticBlockIdc ++ = NO_STATIC;
