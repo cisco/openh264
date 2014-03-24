@@ -136,6 +136,9 @@ typedef int32_t (*PIntraPred8x8Combined3Func) (uint8_t*, int32_t, uint8_t*, int3
 typedef void (*PMotionSearchFunc) (SWelsFuncPtrList* pFuncList, void* pCurDqLayer, void* pMe,
                                    void* pSlice);  // here after reset all function pointers, will set as right parameter type
 typedef void (*PCalculateSatdFunc) ( PSampleSadSatdCostFunc pSatd, void * vpMe, const int32_t kiEncStride, const int32_t kiRefStride );
+typedef bool (*PCheckDirectionalMv) (PSampleSadSatdCostFunc pSad, void * vpMe,
+                      const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
+                      int32_t& iBestSadCost);
 
 #define     MAX_BLOCK_TYPE 5 // prev 7
 typedef struct TagSampleDealingFunc {
@@ -188,6 +191,7 @@ struct TagWelsFuncPointerList {
   PMotionSearchFunc
   pfMotionSearch; //svc_encode_slice.c svc_mode_decision.c svc_enhance_layer_md.c svc_base_layer_md.c
   PCalculateSatdFunc pfCalculateSatd;
+  PCheckDirectionalMv pfCheckDirectionalMv;
 
   PCopyFunc      pfCopy16x16Aligned;		//svc_encode_slice.c svc_mode_decision.c svc_base_layer_md.c
   PCopyFunc      pfCopy16x16NotAligned;	//md.c

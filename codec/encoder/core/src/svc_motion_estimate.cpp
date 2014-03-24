@@ -39,7 +39,7 @@
  */
 
 
-
+#include "sample.h"
 #include "svc_motion_estimate.h"
 
 namespace WelsSVCEnc {
@@ -141,6 +141,13 @@ bool WelsMotionEstimateInitialPoint (SWelsFuncPtrList* pFuncList, SWelsME* pMe, 
     }
   }
 
+  if ( pFuncList->pfCheckDirectionalMv
+    (pSad, pMe, ksMvStartMin, ksMvStartMax, iStrideEnc, iStrideRef, iSadCost) ) {
+      sMv = pMe->sDirectionalMv;
+      pRefMb =  &pMe->pColoRefMb[sMv.iMvY * iStrideRef + sMv.iMvX];
+      iBestSadCost = iSadCost;
+  }
+
   UpdateMeResults( sMv, iBestSadCost, pRefMb, pMe );
   if ( iBestSadCost < static_cast<int32_t>(pMe->uSadPredISatd.uiSadPred) ) {
     //Initial point early Stop
@@ -235,6 +242,39 @@ void CalculateSatdCost( PSampleSadSatdCostFunc pSatd, void * vpMe, const int32_t
 }
 void NotCalculateSatdCost( PSampleSadSatdCostFunc pSatd, void * vpMe, const int32_t kiEncStride, const int32_t kiRefStride )
 {
+}
+
+
+bool CheckDirectionalMv(PSampleSadSatdCostFunc pSad, void * vpMe,
+                      const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
+                      int32_t& iBestSadCost)
+{
+  SWelsME* pMe						 = static_cast<SWelsME *>(vpMe);
+  const int16_t kiMvX = pMe->sDirectionalMv.iMvX;
+  const int16_t kiMvY = pMe->sDirectionalMv.iMvY;
+
+  //Check MV from scrolling detection
+  if ( (BLOCK_16x16!=pMe->uiPixel) //scrolled_MV with P16x16 is checked SKIP checking function
+    && ( kiMvX | kiMvY ) //(0,0) checked in ordinary initial point checking
+    && CheckMvInRange( pMe->sDirectionalMv, ksMinMv, ksMaxMv ) )
+  {
+    uint8_t* pRef = &pMe->pColoRefMb[kiMvY * kiRefStride + kiMvX];
+    uint32_t uiCurrentSadCost = pSad( pMe->pEncMb, kiEncStride,  pRef, kiRefStride ) +
+      COST_MVD(pMe->pMvdCost, (kiMvX<<2) - pMe->sMvp.iMvX, (kiMvY<<2) - pMe->sMvp.iMvY );
+    if( uiCurrentSadCost < pMe->uiSadCost )
+    {
+      iBestSadCost = uiCurrentSadCost;
+      return true;
+    }
+  }
+  return false;
+}
+
+bool CheckDirectionalMvFalse(PSampleSadSatdCostFunc pSad, void * vpMe,
+                      const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
+                      int32_t& iBestSadCost)
+{
+  return false;
 }
 
 } // namespace WelsSVCEnc
