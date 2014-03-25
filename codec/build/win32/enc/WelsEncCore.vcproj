@@ -1056,6 +1056,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\..\common\src\sad_common.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\encoder\core\src\sample.cpp"
 				>
 			</File>
@@ -1570,6 +1574,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\encoder\core\inc\ref_list_mgr_svc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\inc\sad_common.h"
 				>
 			</File>
 			<File

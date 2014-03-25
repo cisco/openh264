@@ -47,7 +47,7 @@
 #include "cpu.h"
 #include "WelsFrameWork.h"
 #include "IWelsVP.h"
-#include "SceneChangeDetectionCommon.h"
+#include "common.h"
 
 #define HIGH_MOTION_BLOCK_THRESHOLD 320
 #define SCENE_CHANGE_MOTION_RATIO_LARGE   0.85f
