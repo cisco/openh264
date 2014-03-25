@@ -206,6 +206,13 @@ typedef enum {
   GOM_VAR       = -2
 } EComplexityAnalysisMode;
 
+typedef struct
+{
+  int iScrollMvX;
+  int iScrollMvY;
+  bool bScrollDetectFlag; // 0:false ; 1:ltr; 2: scene change
+} SScrollDetectionResult;
+
 typedef struct {
   int  iComplexityAnalysisMode;
   int  iCalcBgd;
@@ -218,6 +225,15 @@ typedef struct {
   SVAACalcResult*  pCalcResult;
 } SComplexityAnalysisParam;
 
+typedef struct
+{
+  int  iMbRowInGom;
+  int  *pGomComplexity;
+  int  iGomNumInFrame;
+  int  iFrameComplexity;
+  int  iIdrFlag;
+  SScrollDetectionResult sScrollResult;
+} SComplexityAnalysisScreenParam;
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 typedef struct {
