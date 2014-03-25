@@ -2523,6 +2523,8 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
       pFuncList->pfCalculateSatd = CalculateSatdCost;
       pFuncList->pfInterFineMd = WelsMdInterFinePartition;
     }
+
+
   }
 }
 
