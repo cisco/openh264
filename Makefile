@@ -160,9 +160,9 @@ include test/decoder/targets.mk
 include test/encoder/targets.mk
 endif
 
-binaries: codec_unittest
-BINARIES += codec_unittest
-codec_unittest: $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(API_TEST_OBJS)
+binaries: codec_unittest$(EXEEXT)
+BINARIES += codec_unittest$(EXEEXT)
+codec_unittest$(EXEEXT): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(API_TEST_OBJS) $(CODEC_UNITTEST_DEPS)
 	$(QUIET)rm -f $@
 	$(QUIET_CXX)$(CXX) -o $@ $+ $(CODEC_UNITTEST_LDFLAGS) $(LDFLAGS)
 -include $(OBJS:.$(OBJ)=.d)
