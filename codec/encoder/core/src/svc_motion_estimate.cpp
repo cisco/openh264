@@ -44,18 +44,18 @@
 
 namespace WelsSVCEnc {
 
-inline void UpdateMeResults( const SMVUnitXY ksBestMv, const uint32_t kiBestSadCost, uint8_t* pRef, SWelsME * pMe )
+static inline void UpdateMeResults( const SMVUnitXY ksBestMv, const uint32_t kiBestSadCost, uint8_t* pRef, SWelsME * pMe )
 {
   pMe->sMv = ksBestMv;
   pMe->pRefMb = pRef;
   pMe->uiSadCost = kiBestSadCost;
 }
-inline void SvcMeEndSearch( SWelsME * pMe, const uint32_t kuiBestSadCost )
+static inline void MeEndIntepelSearch( SWelsME * pMe )
 {
     /* -> qpel mv */
     pMe->sMv.iMvX <<= 2;
     pMe->sMv.iMvY <<= 2;
-    pMe->uiSatdCost = kuiBestSadCost;
+    pMe->uiSatdCost = pMe->uiSadCost;
 }
 
 
@@ -78,6 +78,7 @@ void WelsMotionEstimateSearch (SWelsFuncPtrList* pFuncList, void* pLplayer, void
   //  Step 1: Initial point prediction
   if ( !WelsMotionEstimateInitialPoint (pFuncList, pMe, pSlice, iStrideEnc, iStrideRef) ) {
     WelsMotionEstimateIterativeSearch (pFuncList, pMe, iStrideEnc, iStrideRef, pMe->pRefMb);
+    MeEndIntepelSearch(pMe);
   }
 
   pFuncList->pfCalculateSatd( pFuncList->sSampleDealingFuncs.pfSampleSatd[pMe->uiPixel], pMe, iStrideEnc, iStrideRef );
@@ -151,7 +152,7 @@ bool WelsMotionEstimateInitialPoint (SWelsFuncPtrList* pFuncList, SWelsME* pMe, 
   UpdateMeResults( sMv, iBestSadCost, pRefMb, pMe );
   if ( iBestSadCost < static_cast<int32_t>(pMe->uSadPredISatd.uiSadPred) ) {
     //Initial point early Stop
-    SvcMeEndSearch(pMe, iBestSadCost);
+    MeEndIntepelSearch(pMe);
     return true;
   }
   return false;
@@ -226,9 +227,9 @@ void WelsMotionEstimateIterativeSearch (SWelsFuncPtrList* pFuncList, SWelsME* pM
 
   }
 
-  /* -> qpel mv */
-  pMe->sMv.iMvX = (iMvDx + pMe->sMvp.iMvX) & 0xFFFC;
-  pMe->sMv.iMvY = (iMvDy + pMe->sMvp.iMvY) & 0xFFFC;
+  /* integer-pel mv */
+  pMe->sMv.iMvX = (iMvDx + pMe->sMvp.iMvX) >>2;
+  pMe->sMv.iMvY = (iMvDy + pMe->sMvp.iMvY) >>2;
   pMe->uiSatdCost = pMe->uiSadCost = (iBestCost);
   pMe->pRefMb = pRefMb;
 }

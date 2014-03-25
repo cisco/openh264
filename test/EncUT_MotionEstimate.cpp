@@ -114,7 +114,7 @@ TEST_F(MotionEstimateTest, TestDiamondSearch)
 
       //the last selection may be affected by MVDcost, that is when (0,0) will be better
       //when comparing (1,1) and (1,0), due to the difference between MVD cost, it is possible that (1,0) is selected while the best match is (1,1)
-      bFoundMatch = ((sMe.sMv.iMvX==(sTargetMv.iMvX*4))||(sMe.sMv.iMvX==0)) && ((sMe.sMv.iMvY==(sTargetMv.iMvY*4))||(sMe.sMv.iMvY==0));
+      bFoundMatch = ((sMe.sMv.iMvX==(sTargetMv.iMvX))||(sMe.sMv.iMvX==0)) && ((sMe.sMv.iMvY==(sTargetMv.iMvY))||(sMe.sMv.iMvY==0));
     }
     if (bDataGeneratorSucceed) {
       //if DataGenerator never succeed, there is no meaning to check iTryTimes
