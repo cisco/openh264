@@ -163,6 +163,6 @@ endif
 binaries: codec_unittest
 BINARIES += codec_unittest
 codec_unittest: $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(API_TEST_OBJS)
-	$(QUIE)rm -f $@
+	$(QUIET)rm -f $@
 	$(QUIET_CXX)$(CXX) -o $@ $+ $(CODEC_UNITTEST_LDFLAGS) $(LDFLAGS)
 -include $(OBJS:.$(OBJ)=.d)
