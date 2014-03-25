@@ -164,5 +164,6 @@ binaries: codec_unittest$(EXEEXT)
 BINARIES += codec_unittest$(EXEEXT)
 codec_unittest$(EXEEXT): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(API_TEST_OBJS) $(CODEC_UNITTEST_DEPS)
 	$(QUIET)rm -f $@
-	$(QUIET_CXX)$(CXX) -o $@ $+ $(CODEC_UNITTEST_LDFLAGS) $(LDFLAGS)
+	$(QUIET_CXX)$(CXX) $(CXX_LINK_O) $+ $(CODEC_UNITTEST_LDFLAGS) $(LDFLAGS)
+
 -include $(OBJS:.$(OBJ)=.d)
