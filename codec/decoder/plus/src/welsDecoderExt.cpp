@@ -435,10 +435,10 @@ using namespace WelsDec;
 /* WINAPI is indeed in prefix due to sync to application layer callings!! */
 
 /*
-*	CreateDecoder
+*	WelsCreateDecoder
 *	@return:	success in return 0, otherwise failed.
 */
-long CreateDecoder (ISVCDecoder** ppDecoder) {
+long WelsCreateDecoder (ISVCDecoder** ppDecoder) {
 
   if (NULL == ppDecoder) {
     return ERR_INVALID_PARAMETERS;
@@ -454,9 +454,9 @@ long CreateDecoder (ISVCDecoder** ppDecoder) {
 }
 
 /*
-*	DestroyDecoder
+*	WelsDestroyDecoder
 */
-void DestroyDecoder (ISVCDecoder* pDecoder) {
+void WelsDestroyDecoder (ISVCDecoder* pDecoder) {
   if (NULL != pDecoder) {
     delete (CWelsDecoder*)pDecoder;
   }

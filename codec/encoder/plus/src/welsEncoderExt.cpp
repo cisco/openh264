@@ -1151,7 +1151,7 @@ void CWelsH264SVCEncoder::DumpSrcPicture (const uint8_t* pSrc) {
 
 using namespace WelsSVCEnc;
 
-int32_t CreateSVCEncoder (ISVCEncoder** ppEncoder) {
+int32_t WelsCreateSVCEncoder (ISVCEncoder** ppEncoder) {
   if ((*ppEncoder = new CWelsH264SVCEncoder()) != NULL) {
     return 0;
   }
@@ -1159,7 +1159,7 @@ int32_t CreateSVCEncoder (ISVCEncoder** ppEncoder) {
   return 1;
 }
 
-void DestroySVCEncoder (ISVCEncoder* pEncoder) {
+void WelsDestroySVCEncoder (ISVCEncoder* pEncoder) {
   CWelsH264SVCEncoder* pSVCEncoder = (CWelsH264SVCEncoder*)pEncoder;
 
   if (pSVCEncoder) {

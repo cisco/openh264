@@ -1095,13 +1095,13 @@ void LockToSingleCore() {
 
 long CreateSVCEncHandle (ISVCEncoder** ppEncoder) {
   long ret = 0;
-  ret = CreateSVCEncoder (ppEncoder);
+  ret = WelsCreateSVCEncoder (ppEncoder);
   return ret;
 }
 
 void DestroySVCEncHandle (ISVCEncoder* pEncoder) {
   if (pEncoder) {
-    DestroySVCEncoder (pEncoder);
+    WelsDestroySVCEncoder (pEncoder);
 
   }
 }
@@ -1131,7 +1131,7 @@ int main (int argc, char** argv)
 
   iRet = CreateSVCEncHandle (&pSVCEncoder);
   if (iRet) {
-    cout << "CreateSVCEncoder() failed!!" << endl;
+    cout << "WelsCreateSVCEncoder() failed!!" << endl;
     goto exit;
   }
 
