@@ -171,8 +171,8 @@ if args.library is not None:
     f.write("LIBRARIES += $(LIBPREFIX)%s.$(LIBSUFFIX)\n"%args.library)
 
 if args.binary is not None:
-    f.write("%s$(EXEEXT): $(%s_OBJS) $(LIBS) $(%s_LIBS) $(%s_DEPS)\n"%(args.binary, PREFIX, PREFIX, PREFIX))
-    f.write("\t$(QUIET_CXX)$(CXX) $(CXX_LINK_O) $(%s_OBJS) $(%s_LDFLAGS) $(%s_LIBS) $(LDFLAGS) $(LIBS)\n\n"%(PREFIX, PREFIX, PREFIX))
+    f.write("%s$(EXEEXT): $(%s_OBJS) $(%s_DEPS)\n"%(args.binary, PREFIX, PREFIX))
+    f.write("\t$(QUIET_CXX)$(CXX) $(CXX_LINK_O) $(%s_OBJS) $(%s_LDFLAGS) $(LDFLAGS)\n\n"%(PREFIX, PREFIX))
     f.write("binaries: %s$(EXEEXT)\n"%args.binary)
     f.write("BINARIES += %s$(EXEEXT)\n"%args.binary)
 
