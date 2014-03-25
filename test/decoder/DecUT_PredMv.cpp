@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "../codec/decoder/core/inc/wels_common_basis.h"
-#include "../codec/decoder/core/inc/mem_align.h"
-#include "../codec/decoder/core/inc/mv_pred.h"
+#include "wels_common_basis.h"
+#include "mem_align.h"
+#include "mv_pred.h"
 #include "ls_defines.h"
 
 using namespace WelsDec;

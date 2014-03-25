@@ -1,7 +1,7 @@
 #include<gtest/gtest.h>
-#include "../codec/api/svc/codec_def.h"
-#include "../codec/decoder/core/inc/expand_pic.h"
-#include "../codec/decoder/core/inc/mem_align.h"
+#include "codec_def.h"
+#include "expand_pic.h"
+#include "mem_align.h"
 using namespace WelsDec;
 #define EXPAND_PIC_TEST_NUM 10
 namespace WelsDec {
