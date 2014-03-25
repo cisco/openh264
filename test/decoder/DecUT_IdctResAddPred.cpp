@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <time.h>
 #include "macros.h"
-#include "../codec/decoder/core/inc/decode_mb_aux.h"
+#include "decode_mb_aux.h"
 using namespace WelsDec;
 void IdctResAddPred_ref (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) {
   int16_t iSrc[16];

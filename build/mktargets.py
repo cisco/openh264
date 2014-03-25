@@ -7,6 +7,7 @@ parser = argparse.ArgumentParser(description="Make helper parser")
 parser.add_argument("--directory", dest="directory", required=True)
 parser.add_argument("--library", dest="library", help="Make a library")
 parser.add_argument("--binary", dest="binary", help="Make a binary")
+parser.add_argument("--prefix", dest="prefix", help="Make a set of objs")
 parser.add_argument("--exclude", dest="exclude", help="Exclude file", action="append")
 parser.add_argument("--include", dest="include", help="Include file", action="append")
 parser.add_argument("--out", dest="out", help="Output file")
@@ -81,8 +82,10 @@ if args.library is not None:
     PREFIX=args.library.upper()
 elif args.binary is not None:
     PREFIX=args.binary.upper()
+elif args.prefix is not None:
+    PREFIX=args.prefix.upper()
 else:
-    sys.stderr.write("Must provide either library or binary")
+    sys.stderr.write("Must provide either library, binary or prefix")
     sys.exit(1)
 
 if args.exclude is not None:
