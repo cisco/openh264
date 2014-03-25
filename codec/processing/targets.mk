@@ -2,6 +2,7 @@ PROCESSING_SRCDIR=codec/processing
 PROCESSING_CPP_SRCS=\
 	$(PROCESSING_SRCDIR)/src/adaptivequantization/AdaptiveQuantization.cpp\
 	$(PROCESSING_SRCDIR)/src/backgrounddetection/BackgroundDetection.cpp\
+	$(PROCESSING_SRCDIR)/src/common/common.cpp\
 	$(PROCESSING_SRCDIR)/src/common/memory.cpp\
 	$(PROCESSING_SRCDIR)/src/common/WelsFrameWork.cpp\
 	$(PROCESSING_SRCDIR)/src/common/WelsFrameWorkEx.cpp\
@@ -13,7 +14,6 @@ PROCESSING_CPP_SRCS=\
 	$(PROCESSING_SRCDIR)/src/imagerotate/imagerotate.cpp\
 	$(PROCESSING_SRCDIR)/src/imagerotate/imagerotatefuncs.cpp\
 	$(PROCESSING_SRCDIR)/src/scenechangedetection/SceneChangeDetection.cpp\
-	$(PROCESSING_SRCDIR)/src/scenechangedetection/SceneChangeDetectionCommon.cpp\
 	$(PROCESSING_SRCDIR)/src/vaacalc/vaacalcfuncs.cpp\
 	$(PROCESSING_SRCDIR)/src/vaacalc/vaacalculation.cpp\
 
