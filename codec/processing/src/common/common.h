@@ -63,6 +63,11 @@ typedef GetIntraPred  *GetIntraPredPtr;
 GetIntraPred     WelsI16x16LumaPredV_c;
 GetIntraPred     WelsI16x16LumaPredH_c;
 
+#ifdef HAVE_NEON
+WELSVP_EXTERN_C_BEGIN
+int32_t WelsProcessingSampleSad8x8_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+WELSVP_EXTERN_C_END
+#endif
 
 WELSVP_NAMESPACE_END
 
