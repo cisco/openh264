@@ -24,7 +24,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\..\..\..\bin\win32\Debug"
+			OutputDirectory=".\..\..\..\..\bin\win32\Debug"
 			IntermediateDirectory=".\..\..\..\obj\vp\Debug"
 			ConfigurationType="2"
 			CharacterSet="1"
@@ -193,7 +193,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\..\..\..\bin\win32\Release"
+			OutputDirectory=".\..\..\..\..\bin\win32\Release"
 			IntermediateDirectory=".\..\..\..\obj\vp\Release"
 			ConfigurationType="2"
 			CharacterSet="1"
