@@ -104,13 +104,13 @@ TEST_F(MotionEstimateTest, TestDiamondSearch)
       CopyTargetBlock( m_pSrcBlock, 16, sTargetMv, m_iWidth, pRefPicCenter);
 
       //clean the sMe status
-      sMe.uiPixel = rand()%5;
+      sMe.uiBlockSize = rand()%5;
       sMe.pEncMb = m_pSrcBlock;
       sMe.pRefMb = pRefPicCenter;
       sMe.sMv.iMvX = sMe.sMv.iMvY = 0;
       sMe.uiSadCost = sMe.uiSatdCost = kiMaxBlock16Sad;
       WelsMotionEstimateIterativeSearch (&sFuncList, &sMe, m_iMaxSearchBlock,
-        m_iWidth, pRefPicCenter);
+                                         m_iWidth, pRefPicCenter);
 
       //the last selection may be affected by MVDcost, that is when (0,0) will be better
       //when comparing (1,1) and (1,0), due to the difference between MVD cost, it is possible that (1,0) is selected while the best match is (1,1)
@@ -121,5 +121,131 @@ TEST_F(MotionEstimateTest, TestDiamondSearch)
       ASSERT_TRUE(iTryTimes > 0);
       //it is possible that ref at differnt position is identical, but that should be under a low probability
     }
+  }
+}
+
+
+TEST_F(MotionEstimateTest, TestVerticalSearch)
+{
+  const int32_t kiMaxBlock16Sad = 72000;//a rough number
+  SWelsFuncPtrList sFuncList;
+  SWelsME sMe;
+
+  srand((uint32_t)time(NULL));
+  const uint8_t kuiQp = rand()%52;
+  InitMe(kuiQp, 648, m_uiMvdTableSize, m_pMvdCostTable, &sMe);
+
+  SMVUnitXY sTargetMv;
+  WelsInitSampleSadFunc( &sFuncList, 0 );//test c functions
+
+  uint8_t *pRefPicCenter = m_pRefPic+(m_iHeight/2)*m_iWidth+(m_iWidth/2);
+  sMe.iCurMeBlockPixX = (m_iWidth/2);
+  sMe.iCurMeBlockPixY = (m_iHeight/2);
+
+  bool bDataGeneratorSucceed = false;
+  bool bFoundMatch = false;
+  int32_t iTryTimes=100;
+
+  sTargetMv.iMvX = 0;
+  sTargetMv.iMvY = WELS_MAX(INTPEL_NEEDED_MARGIN, rand()%m_iHeight-INTPEL_NEEDED_MARGIN);
+  bDataGeneratorSucceed = false;
+  bFoundMatch = false;
+  while (!bFoundMatch && (iTryTimes--)>0) {
+    if (!YUVPixelDataGenerator( m_pRefPic, m_iWidth, m_iHeight, m_iWidth ))
+      continue;
+
+    bDataGeneratorSucceed = true;
+    CopyTargetBlock( m_pSrcBlock, 16, sTargetMv, m_iWidth, pRefPicCenter);
+
+    //clean the sMe status
+    sMe.uiBlockSize = rand()%5;
+    sMe.pEncMb = m_pSrcBlock;
+    sMe.pRefMb = pRefPicCenter;
+    sMe.pColoRefMb = pRefPicCenter;
+    sMe.sMv.iMvX = sMe.sMv.iMvY = 0;
+    sMe.uiSadCost = sMe.uiSatdCost = kiMaxBlock16Sad;
+    const int32_t iCurMeBlockPixX = sMe.iCurMeBlockPixX;
+    const int32_t iCurMeBlockQpelPixX = ((iCurMeBlockPixX)<<2);
+    const int32_t iCurMeBlockPixY = sMe.iCurMeBlockPixY;
+    const int32_t iCurMeBlockQpelPixY = ((iCurMeBlockPixY)<<2);
+    uint16_t* pMvdCostX = sMe.pMvdCost - iCurMeBlockQpelPixX - sMe.sMvp.iMvX;	//do the offset here
+    uint16_t* pMvdCostY = sMe.pMvdCost - iCurMeBlockQpelPixY - sMe.sMvp.iMvY;
+    LineFullSearch_c ( sFuncList.sSampleDealingFuncs.pfSampleSad[sMe.uiBlockSize], &sMe,
+                      pMvdCostY, pMvdCostX[ iCurMeBlockQpelPixX ],
+                      m_iMaxSearchBlock, m_iWidth,
+                      INTPEL_NEEDED_MARGIN,
+                      m_iHeight-INTPEL_NEEDED_MARGIN, true );
+
+    //the last selection may be affected by MVDcost, that is when smaller MvY will be better
+    bFoundMatch = (sMe.sMv.iMvX==0
+                   &&(sMe.sMv.iMvY==sTargetMv.iMvY||abs(sMe.sMv.iMvY)<abs(sTargetMv.iMvY)));
+    //printf("TestVerticalSearch Target: %d,%d\n", sTargetMv.iMvX, sTargetMv.iMvY);
+  }
+  if (bDataGeneratorSucceed) {
+    //if DataGenerator never succeed, there is no meaning to check iTryTimes
+    ASSERT_TRUE(iTryTimes > 0);
+    //it is possible that ref at differnt position is identical, but that should be under a low probability
+  }
+}
+TEST_F(MotionEstimateTest, TestHorizontalSearch)
+{
+  const int32_t kiMaxBlock16Sad = 72000;//a rough number
+  SWelsFuncPtrList sFuncList;
+  SWelsME sMe;
+
+  srand((uint32_t)time(NULL));
+  const uint8_t kuiQp = rand()%52;
+  InitMe(kuiQp, 648, m_uiMvdTableSize, m_pMvdCostTable, &sMe);
+
+  SMVUnitXY sTargetMv;
+  WelsInitSampleSadFunc( &sFuncList, 0 );//test c functions
+
+  uint8_t *pRefPicCenter = m_pRefPic+(m_iHeight/2)*m_iWidth+(m_iWidth/2);
+  sMe.iCurMeBlockPixX = (m_iWidth/2);
+  sMe.iCurMeBlockPixY = (m_iHeight/2);
+
+  bool bDataGeneratorSucceed = false;
+  bool bFoundMatch = false;
+  int32_t iTryTimes=100;
+
+  sTargetMv.iMvX = WELS_MAX(INTPEL_NEEDED_MARGIN, rand()%m_iWidth-INTPEL_NEEDED_MARGIN);
+  sTargetMv.iMvY = 0;
+  bDataGeneratorSucceed = false;
+  bFoundMatch = false;
+  while (!bFoundMatch && (iTryTimes--)>0) {
+    if (!YUVPixelDataGenerator( m_pRefPic, m_iWidth, m_iHeight, m_iWidth ))
+      continue;
+
+    bDataGeneratorSucceed = true;
+    CopyTargetBlock( m_pSrcBlock, 16, sTargetMv, m_iWidth, pRefPicCenter);
+
+    //clean the sMe status
+    sMe.uiBlockSize = rand()%5;
+    sMe.pEncMb = m_pSrcBlock;
+    sMe.pRefMb = pRefPicCenter;
+    sMe.pColoRefMb = pRefPicCenter;
+    sMe.sMv.iMvX = sMe.sMv.iMvY = 0;
+    sMe.uiSadCost = sMe.uiSatdCost = kiMaxBlock16Sad;
+    const int32_t iCurMeBlockPixX = sMe.iCurMeBlockPixX;
+    const int32_t iCurMeBlockQpelPixX = ((iCurMeBlockPixX)<<2);
+    const int32_t iCurMeBlockPixY = sMe.iCurMeBlockPixY;
+    const int32_t iCurMeBlockQpelPixY = ((iCurMeBlockPixY)<<2);
+    uint16_t* pMvdCostX = sMe.pMvdCost - iCurMeBlockQpelPixX - sMe.sMvp.iMvX;	//do the offset here
+    uint16_t* pMvdCostY = sMe.pMvdCost - iCurMeBlockQpelPixY - sMe.sMvp.iMvY;
+    LineFullSearch_c ( sFuncList.sSampleDealingFuncs.pfSampleSad[sMe.uiBlockSize], &sMe,
+                      pMvdCostX, pMvdCostY[ iCurMeBlockQpelPixY ],
+                      m_iMaxSearchBlock, m_iWidth,
+                      INTPEL_NEEDED_MARGIN,
+                      m_iWidth-INTPEL_NEEDED_MARGIN, false );
+
+    //the last selection may be affected by MVDcost, that is when smaller MvY will be better
+    bFoundMatch = (sMe.sMv.iMvY==0
+                   &&(sMe.sMv.iMvX==sTargetMv.iMvX||abs(sMe.sMv.iMvX)<abs(sTargetMv.iMvX)));
+    //printf("TestHorizontalSearch Target: %d,%d\n", sTargetMv.iMvX, sTargetMv.iMvY);
+  }
+  if (bDataGeneratorSucceed) {
+    //if DataGenerator never succeed, there is no meaning to check iTryTimes
+    ASSERT_TRUE(iTryTimes > 0);
+    //it is possible that ref at differnt position is identical, but that should be under a low probability
   }
 }
