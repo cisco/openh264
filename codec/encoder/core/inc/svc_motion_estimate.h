@@ -147,11 +147,16 @@ bool CheckDirectionalMvFalse(PSampleSadSatdCostFunc pSad, void * vpMe,
                       const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
                       int32_t& iBestSadCost);
 
-void LineFullSearch_c(	PSampleSadSatdCostFunc pSad, void *vpMe,
+void LineFullSearch_c(	 void *pFunc, void *vpMe,
                         uint16_t* pMvdTable, const int32_t kiFixedMvd,
                         const int32_t kiEncStride, const int32_t kiRefStride,
                         const int32_t kiMinPos, const int32_t kiMaxPos,
                         const bool bVerticalSearch );
+void VerticalFullSearchUsingSSE41( void *pFunc, void *vpMe,
+														uint16_t* pMvdTable, const int32_t kiFixedMvd,
+														const int32_t kiEncStride, const int32_t kiRefStride,
+													const int32_t kiMinPos, const int32_t kiMaxPos,
+                          const bool bVerticalSearch );
 void WelsMotionCrossSearch(SWelsFuncPtrList *pFuncList,  SDqLayer* pCurLayer, SWelsME * pMe, const SSlice* pSlice);
 
 inline void SetMvWithinIntegerMvRange( const int32_t kiMbWidth, const int32_t kiMbHeight, const int32_t kiMbX, const int32_t kiMbY,

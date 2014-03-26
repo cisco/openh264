@@ -170,7 +170,7 @@ TEST_F(MotionEstimateTest, TestVerticalSearch)
     const int32_t iCurMeBlockQpelPixY = ((iCurMeBlockPixY)<<2);
     uint16_t* pMvdCostX = sMe.pMvdCost - iCurMeBlockQpelPixX - sMe.sMvp.iMvX;	//do the offset here
     uint16_t* pMvdCostY = sMe.pMvdCost - iCurMeBlockQpelPixY - sMe.sMvp.iMvY;
-    LineFullSearch_c ( sFuncList.sSampleDealingFuncs.pfSampleSad[sMe.uiBlockSize], &sMe,
+    LineFullSearch_c ( &sFuncList, &sMe,
                       pMvdCostY, pMvdCostX[ iCurMeBlockQpelPixX ],
                       m_iMaxSearchBlock, m_iWidth,
                       INTPEL_NEEDED_MARGIN,
@@ -232,7 +232,7 @@ TEST_F(MotionEstimateTest, TestHorizontalSearch)
     const int32_t iCurMeBlockQpelPixY = ((iCurMeBlockPixY)<<2);
     uint16_t* pMvdCostX = sMe.pMvdCost - iCurMeBlockQpelPixX - sMe.sMvp.iMvX;	//do the offset here
     uint16_t* pMvdCostY = sMe.pMvdCost - iCurMeBlockQpelPixY - sMe.sMvp.iMvY;
-    LineFullSearch_c ( sFuncList.sSampleDealingFuncs.pfSampleSad[sMe.uiBlockSize], &sMe,
+    LineFullSearch_c ( &sFuncList, &sMe,
                       pMvdCostX, pMvdCostY[ iCurMeBlockQpelPixY ],
                       m_iMaxSearchBlock, m_iWidth,
                       INTPEL_NEEDED_MARGIN,

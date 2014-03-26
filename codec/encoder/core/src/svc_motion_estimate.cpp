@@ -278,13 +278,24 @@ bool CheckDirectionalMvFalse(PSampleSadSatdCostFunc pSad, void * vpMe,
   return false;
 }
 
-void LineFullSearch_c(	PSampleSadSatdCostFunc pSad, void *vpMe,
+void VerticalFullSearchUsingSSE41( void *pFunc, void *vpMe,
+														uint16_t* pMvdTable, const int32_t kiFixedMvd,
+														const int32_t kiEncStride, const int32_t kiRefStride,
+													const int32_t kiMinPos, const int32_t kiMaxPos,
+                          const bool bVerticalSearch )
+{
+  SWelsFuncPtrList *pFuncList      = static_cast<SWelsFuncPtrList *>(pFunc);
+  SWelsME *pMe				                    = static_cast<SWelsME *>(vpMe);
+}
+void LineFullSearch_c(	void *pFunc, void *vpMe,
 													uint16_t* pMvdTable, const int32_t kiFixedMvd,
 													const int32_t kiEncStride, const int32_t kiRefStride,
 													const int32_t kiMinPos, const int32_t kiMaxPos,
                           const bool bVerticalSearch )
 {
+  SWelsFuncPtrList *pFuncList      = static_cast<SWelsFuncPtrList *>(pFunc);
   SWelsME *pMe				                    = static_cast<SWelsME *>(vpMe);
+  PSampleSadSatdCostFunc pSad = pFuncList->sSampleDealingFuncs.pfSampleSad[pMe->uiBlockSize];
   const int32_t kiCurMeBlockPix	= bVerticalSearch?pMe->iCurMeBlockPixY:pMe->iCurMeBlockPixX;
   const int32_t kiStride = bVerticalSearch?kiRefStride:1;
   uint8_t* pRef			      = &pMe->pColoRefMb[(kiMinPos - kiCurMeBlockPix)*kiStride];
@@ -328,7 +339,7 @@ void WelsMotionCrossSearch(SWelsFuncPtrList *pFuncList,  SDqLayer* pCurLayer, SW
   uint16_t* pMvdCostY = pMe->pMvdCost - iCurMeBlockQpelPixY - pMe->sMvp.iMvY;//do the offset here instead of in the search
 
   //vertical search
-  LineFullSearch_c( pFuncList->sSampleDealingFuncs.pfSampleSad[pMe->uiBlockSize], pMe,
+  LineFullSearch_c( pFuncList, pMe,
     pMvdCostY, pMvdCostX[ iCurMeBlockQpelPixX ],
     kiEncStride, kiRefStride,
     iCurMeBlockPixY + pSlice->sMvStartMin.iMvY,
@@ -336,7 +347,7 @@ void WelsMotionCrossSearch(SWelsFuncPtrList *pFuncList,  SDqLayer* pCurLayer, SW
 
   //horizontal search
   if (pMe->uiSadCost >= pMe->uiSadCostThreshold) {
-    LineFullSearch_c( pFuncList->sSampleDealingFuncs.pfSampleSad[pMe->uiBlockSize], pMe,
+    LineFullSearch_c( pFuncList, pMe,
       pMvdCostX, pMvdCostY[ iCurMeBlockQpelPixY ],
       kiEncStride, kiRefStride,
       iCurMeBlockPixX + pSlice->sMvStartMin.iMvX,
