@@ -46,6 +46,7 @@
 #include "memory.h"
 #include "WelsFrameWork.h"
 #include "IWelsVP.h"
+#include "common.h"
 
 WELSVP_NAMESPACE_BEGIN
 
@@ -77,6 +78,30 @@ class CComplexityAnalysis : public IStrategy {
   PGOMSadFunc m_pfGomSad;
   SComplexityAnalysisParam m_sComplexityAnalysisParam;
 };
+
+
+//for screen content
+
+class CComplexityAnalysisScreen : public IStrategy
+{
+public:
+  CComplexityAnalysisScreen(int32_t cpu_flag);
+  ~CComplexityAnalysisScreen();
+
+  EResult Process(int32_t nType, SPixMap *src, SPixMap *ref);
+  EResult Set(int32_t nType, void *pParam);
+  EResult Get(int32_t nType, void *pParam);
+
+private:
+  void GomComplexityAnalysisIntra( SPixMap *pSrc );
+  void GomComplexityAnalysisInter( SPixMap *pSrc, SPixMap *pRef,bool bScrollFlag);
+
+private:
+  PSad16x16Func m_pSadFunc;
+  GetIntraPredPtr m_pIntraFunc[2];
+  SComplexityAnalysisScreenParam m_ComplexityAnalysisParam;
+};
+
 
 WELSVP_NAMESPACE_END
 
