@@ -284,6 +284,9 @@ IStrategy* CVpFrameWork::CreateStrategy (EMethods m_eMethod, int32_t iCpuFlag) {
   case METHOD_COMPLEXITY_ANALYSIS:
     pStrategy = WelsDynamicCast (IStrategy*, new CComplexityAnalysis (iCpuFlag));
     break;
+  case METHOD_COMPLEXITY_ANALYSIS_SCREEN:
+    pStrategy = WelsDynamicCast (IStrategy*, new CComplexityAnalysisScreen (iCpuFlag));
+    break;
   case METHOD_IMAGE_ROTATE:
     pStrategy = WelsDynamicCast (IStrategy*, new CImageRotating (iCpuFlag));
     break;
