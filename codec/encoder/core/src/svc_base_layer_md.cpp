@@ -359,7 +359,7 @@ void WelsMdInterInit (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb, const i
   ST32 (&pCurMb->sP16x16Mv, 0);
   ST32 (&pCurLayer->pDecPic->sMvList[kiMbXY], 0);
 
-  SetMvWithinMvRange( kiMbWidth, kiMbHeight, kiMbX, kiMbY, CAMERA_STARTMV_RANGE, &(pSlice->sMvStartMin), &(pSlice->sMvStartMax));
+  SetMvWithinIntegerMvRange( kiMbWidth, kiMbHeight, kiMbX, kiMbY, CAMERA_STARTMV_RANGE, &(pSlice->sMvStartMin), &(pSlice->sMvStartMax));
 }
 
 int32_t WelsMdI16x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SMbCache* pMbCache, int32_t iLambda) {
@@ -975,7 +975,7 @@ static inline void InitMe(const SWelsMD& sWelsMd, const int32_t iBlockSize, uint
 {
   sWelsMe.iCurMeBlockPixX = sWelsMd.iMbPixX;
   sWelsMe.iCurMeBlockPixY = sWelsMd.iMbPixY;
-  sWelsMe.uiPixel = iBlockSize;
+  sWelsMe.uiBlockSize = iBlockSize;
   sWelsMe.pMvdCost = sWelsMd.pMvdCost;
 
   sWelsMe.pEncMb = pEnc;

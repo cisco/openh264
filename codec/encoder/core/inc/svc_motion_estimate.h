@@ -67,7 +67,7 @@ uint32_t					uiSatdCost; /* satd + lm * nbits */
 uint32_t					uiSadCostThreshold;
 int32_t						iCurMeBlockPixX;
 int32_t						iCurMeBlockPixY;
-uint8_t						uiPixel;   /* PIXEL_WxH */
+uint8_t						uiBlockSize;   /* BLOCK_WxH */
 uint8_t						uiReserved;
 
 uint8_t*						pEncMb;
@@ -147,7 +147,14 @@ bool CheckDirectionalMvFalse(PSampleSadSatdCostFunc pSad, void * vpMe,
                       const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
                       int32_t& iBestSadCost);
 
-inline void SetMvWithinMvRange( const int32_t kiMbWidth, const int32_t kiMbHeight, const int32_t kiMbX, const int32_t kiMbY,
+void LineFullSearch_c(	PSampleSadSatdCostFunc pSad, void *vpMe,
+                        uint16_t* pMvdTable, const int32_t kiFixedMvd,
+                        const int32_t kiEncStride, const int32_t kiRefStride,
+                        const int32_t kiMinPos, const int32_t kiMaxPos,
+                        const bool bVerticalSearch );
+void WelsMotionCrossSearch(SWelsFuncPtrList *pFuncList,  SDqLayer* pCurLayer, SWelsME * pMe, const SSlice* pSlice);
+
+inline void SetMvWithinIntegerMvRange( const int32_t kiMbWidth, const int32_t kiMbHeight, const int32_t kiMbX, const int32_t kiMbY,
                         const int32_t kiMaxMvRange,
                         SMVUnitXY* pMvMin, SMVUnitXY* pMvMax)
 {
