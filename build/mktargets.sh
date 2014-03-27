@@ -11,4 +11,3 @@ python build/mktargets.py --directory test/encoder --prefix encoder_unittest
 python build/mktargets.py --directory test/decoder --prefix decoder_unittest
 python build/mktargets.py --directory test/api --prefix api_test
 python build/mktargets.py --directory gtest --library gtest --out build/gtest-targets.mk --cpp-suffix .cc --include gtest-all.cc
-cd - >/dev/null 2>&1
