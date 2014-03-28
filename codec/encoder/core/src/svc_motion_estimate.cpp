@@ -323,57 +323,58 @@ void VerticalFullSearchUsingSSE41( void *pFunc, void *vpMe,
   PTransposeMatrixBlockFunc	transps_matrix_block = kIsBlock8x8 ? transpose_matrix_block_8x8_mmx : transpose_matrix_block_16x16_sse2;
   PTransposeMatrixBlocksFunc	transps_matrix_blocks= kIsBlock8x8 ? transpose_matrix_blocks_x8_mmx : transpose_matrix_blocks_x16_sse2;
 
-	const int32_t kiDiff			= kiMaxPos - kiMinPos;
-	const int32_t kiRowNum		= WELS_ALIGN((kiDiff - kiEdgeBlocks + 1), kiEdgeBlocks);
-	const int32_t kiBlocksNum		= kIsBlock8x8 ? (kiRowNum>>3) : (kiRowNum>>4);
-	int32_t iCountLoop8		= (kiRowNum-kiEdgeBlocks) >> 3;
-	const int32_t kiRemainingVectors		= kiDiff - (iCountLoop8<<3);
-	const int32_t kiMatrixStride		= MAX_VERTICAL_MV_RANGE;
-	ENFORCE_STACK_ALIGN_2D( uint8_t, uiMatrixRef, 16, kiMatrixStride, 16 );	// transpose matrix result for ref
-	ENFORCE_STACK_ALIGN_2D( uint8_t, uiMatrixEnc, 16, 16, 16 );				// transpose matrix result for enc
-	assert(kiRowNum <= kiMatrixStride);	// make sure effective memory
-    
-	transps_matrix_block( &uiMatrixEnc[0][0], 16, kpEncMb, kiEncStride );
-	transps_matrix_blocks( &uiMatrixRef[0][0], kiMatrixStride, pRef, kiRefStride, kiBlocksNum );
-    ENFORCE_STACK_ALIGN_1D( uint16_t, uiBaseCost, 8, 16 );
-    int32_t iTargetPos			= kiMinPos;
-    int16_t iBestPos				= pMe->sMv.iMvX;
-    uint32_t uiBestCost			= pMe->uiSadCost;
-    uint32_t uiCostMin;
-    int32_t iIndexMinPos;
-	kpEncMb	= &uiMatrixEnc[0][0];
-	pRef	= &uiMatrixRef[0][0];
-    while(iCountLoop8 > 0) {
-        CalcMvdCostx8_c(uiBaseCost, iTargetPos, pMvdTable, kiFixedMvd);
-        uiCostMin = pSampleSadHor8( kpEncMb, 16, pRef, kiMatrixStride, uiBaseCost, &iIndexMinPos );
-        if (uiCostMin < uiBestCost) {
-            uiBestCost	= uiCostMin;
-            iBestPos		= iTargetPos+iIndexMinPos;
-        }
-        iTargetPos	+= 8;
-        pRef += 8;
-        -- iCountLoop8;
+  const int32_t kiDiff			= kiMaxPos - kiMinPos;
+  const int32_t kiRowNum		= WELS_ALIGN((kiDiff - kiEdgeBlocks + 1), kiEdgeBlocks);
+  const int32_t kiBlocksNum		= kIsBlock8x8 ? (kiRowNum>>3) : (kiRowNum>>4);
+  int32_t iCountLoop8		= (kiRowNum-kiEdgeBlocks) >> 3;
+  const int32_t kiRemainingVectors		= kiDiff - (iCountLoop8<<3);
+  const int32_t kiMatrixStride		= MAX_VERTICAL_MV_RANGE;
+  ENFORCE_STACK_ALIGN_2D( uint8_t, uiMatrixRef, 16, kiMatrixStride, 16 );	// transpose matrix result for ref
+  ENFORCE_STACK_ALIGN_2D( uint8_t, uiMatrixEnc, 16, 16, 16 );				// transpose matrix result for enc
+  assert(kiRowNum <= kiMatrixStride);	// make sure effective memory
+
+  transps_matrix_block( &uiMatrixEnc[0][0], 16, kpEncMb, kiEncStride );
+  transps_matrix_blocks( &uiMatrixRef[0][0], kiMatrixStride, pRef, kiRefStride, kiBlocksNum );
+  ENFORCE_STACK_ALIGN_1D( uint16_t, uiBaseCost, 8, 16 );
+  int32_t iTargetPos			= kiMinPos;
+  int16_t iBestPos				= pMe->sMv.iMvX;
+  uint32_t uiBestCost			= pMe->uiSadCost;
+  uint32_t uiCostMin;
+  int32_t iIndexMinPos;
+  kpEncMb	= &uiMatrixEnc[0][0];
+  pRef	= &uiMatrixRef[0][0];
+
+  while(iCountLoop8 > 0) {
+    CalcMvdCostx8_c(uiBaseCost, iTargetPos, pMvdTable, kiFixedMvd);
+    uiCostMin = pSampleSadHor8( kpEncMb, 16, pRef, kiMatrixStride, uiBaseCost, &iIndexMinPos );
+    if (uiCostMin < uiBestCost) {
+      uiBestCost	= uiCostMin;
+      iBestPos		= iTargetPos+iIndexMinPos;
     }
-    if (kiRemainingVectors > 0) {
-        kpEncMb	= pMe->pEncMb;
-        pRef	= &pMe->pColoRefMb[(iTargetPos - kiCurMeBlockPix)*kiRefStride];
-        while (iTargetPos < kiMaxPos) {
-            const uint16_t pMvdCost	= pMvdTable[iTargetPos<<2];
-            uint32_t uiSadCost	= pSad( kpEncMb, kiEncStride, pRef, kiRefStride ) + (kiFixedMvd + pMvdCost);
-            if (uiSadCost < uiBestCost) {
-                uiBestCost	= uiSadCost;
-                iBestPos	= iTargetPos;
-            }
-            pRef += kiRefStride;
-            ++iTargetPos;
-        }
+    iTargetPos	+= 8;
+    pRef += 8;
+    -- iCountLoop8;
+  }
+  if (kiRemainingVectors > 0) {
+    kpEncMb	= pMe->pEncMb;
+    pRef	= &pMe->pColoRefMb[(iTargetPos - kiCurMeBlockPix)*kiRefStride];
+    while (iTargetPos < kiMaxPos) {
+      const uint16_t pMvdCost	= pMvdTable[iTargetPos<<2];
+      uint32_t uiSadCost	= pSad( kpEncMb, kiEncStride, pRef, kiRefStride ) + (kiFixedMvd + pMvdCost);
+      if (uiSadCost < uiBestCost) {
+        uiBestCost	= uiSadCost;
+        iBestPos	= iTargetPos;
+      }
+      pRef += kiRefStride;
+      ++iTargetPos;
     }
-    if (uiBestCost < pMe->uiSadCost) {
-        SMVUnitXY sBestMv;
-        sBestMv.iMvX = 0;
-        sBestMv.iMvY = iBestPos - kiCurMeBlockPix;
-        UpdateMeResults( sBestMv, uiBestCost, &pMe->pColoRefMb[sBestMv.iMvY*kiRefStride], pMe );
-    }
+  }
+  if (uiBestCost < pMe->uiSadCost) {
+    SMVUnitXY sBestMv;
+    sBestMv.iMvX = 0;
+    sBestMv.iMvY = iBestPos - kiCurMeBlockPix;
+    UpdateMeResults( sBestMv, uiBestCost, &pMe->pColoRefMb[sBestMv.iMvY*kiRefStride], pMe );
+  }
 }
 
 void HorizontalFullSearchUsingSSE41( void *pFunc, void *vpMe,
