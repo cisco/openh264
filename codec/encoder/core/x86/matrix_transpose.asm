@@ -135,13 +135,13 @@ WELS_EXTERN transpose_matrix_blocks_x16_sse2
 
 	;mov	[tmp_num_blk],	ecx
 	push r5
-        push r6
-        %assign push_num 2
-        LOAD_5_PARA
+	push r6
+	%assign push_num 2
+	LOAD_5_PARA
 	PUSH_XMM 8
-        SIGN_EXTENSION  r1, r1d
-        SIGN_EXTENSION  r3, r3d
-        SIGN_EXTENSION  r4, r4d
+	SIGN_EXTENSION  r1, r1d
+	SIGN_EXTENSION  r3, r3d
+	SIGN_EXTENSION  r4, r4d
 	mov r5, r7
 	and r5, 0Fh
 	sub r7, 10h
@@ -197,10 +197,10 @@ TRANSPOSE_LOOP_SSE2:
 	
 	add r7, r5
 	add r7, 10h
-        POP_XMM
-        LOAD_5_PARA_POP
-        pop r6
-        pop r5
+	POP_XMM
+	LOAD_5_PARA_POP
+	pop r6
+	pop r5
 	ret
 
 WELS_EXTERN transpose_matrix_block_8x8_mmx
@@ -211,10 +211,10 @@ WELS_EXTERN transpose_matrix_block_8x8_mmx
 	;mov ebx, [esp+12]	; dst_stride
 	;mov eax, [esp+16]	; src
 	;mov ecx, [esp+20]	; src_stride
-        %assign push_num 0
-        LOAD_4_PARA
-        SIGN_EXTENSION  r1, r1d
-        SIGN_EXTENSION  r3, r3d
+	%assign push_num 0
+	LOAD_4_PARA
+	SIGN_EXTENSION  r1, r1d
+	SIGN_EXTENSION  r3, r3d
 	sub	r7, 8
 
 	movq mm0, [r2]
@@ -253,11 +253,11 @@ WELS_EXTERN transpose_matrix_blocks_x8_mmx
 	;mov eax, [esp+_PUSH+16]	; src_stride
 	;mov ecx, [esp+_PUSH+20]	; num_blocks_x8
 	push r5
-        push r6
-        %assign push_num 2
-        LOAD_5_PARA
-        SIGN_EXTENSION  r1, r1d
-        SIGN_EXTENSION  r3, r3d
+	push r6
+	%assign push_num 2
+	LOAD_5_PARA
+	SIGN_EXTENSION  r1, r1d
+	SIGN_EXTENSION  r3, r3d
 	SIGN_EXTENSION  r4, r4d	
 	sub	r7, 8
 
