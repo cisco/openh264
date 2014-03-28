@@ -161,6 +161,7 @@ class CWelsPreProcess {
   void WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SPicture* pDstPic, const SSourcePicture* kpSrc,
                               const int32_t kiWidth, const int32_t kiHeight);
 
+  ESceneChangeIdc DetectSceneChangeScreen(sWelsEncCtx* pCtx,SPicture* pCurPicture);
  private:
   Scaled_Picture   m_sScaledPicture;
   SPicture*	   m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];
