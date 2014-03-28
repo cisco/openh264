@@ -2515,7 +2515,6 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
     pFuncList->pfMotionSearch  = WelsMotionEstimateSearch;
     pFuncList->pfFirstIntraMode = WelsMdFirstIntraMode;
     pFuncList->sSampleDealingFuncs.pfMeCost = pCtx->pFuncList->sSampleDealingFuncs.pfSampleSatd;
-    pFuncList->pfCheckDirectionalMv = CheckDirectionalMvFalse;
     if (kbHighestSpatialLayer) {
       pFuncList->pfCalculateSatd = NotCalculateSatdCost;
       pFuncList->pfInterFineMd = WelsMdInterFinePartitionVaa;

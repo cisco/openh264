@@ -185,6 +185,9 @@ int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* 
   WelsInitFillingPredFuncs (uiCpuFlag);
   WelsInitIntraPredFuncs (pFuncList, uiCpuFlag);
 
+  /* ME func */
+  WelsInitMeFunc(pFuncList, uiCpuFlag, SCREEN_CONTENT_REAL_TIME==pParam->iUsageType);
+
   /* sad, satd, average */
   WelsInitSampleSadFunc (pFuncList, uiCpuFlag);
 
