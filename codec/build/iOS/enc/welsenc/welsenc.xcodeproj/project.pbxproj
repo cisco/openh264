@@ -81,6 +81,7 @@
 		4C34066918C57D0400DFA14A /* memory_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = memory_neon.S; sourceTree = "<group>"; };
 		4C34066A18C57D0400DFA14A /* pixel_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = pixel_neon.S; sourceTree = "<group>"; };
 		4C34066B18C57D0400DFA14A /* reconstruct_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = reconstruct_neon.S; sourceTree = "<group>"; };
+		4CDBFB9D18E5068D0025A767 /* wels_transpose_matrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wels_transpose_matrix.h; sourceTree = "<group>"; };
 		4CE4431118B6FFA00017DF25 /* libwelsenc.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libwelsenc.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE4431418B6FFA00017DF25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4CE4432118B6FFA00017DF25 /* welsencTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = welsencTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -281,6 +282,7 @@
 		4CE446A918BC605C0017DF25 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				4CDBFB9D18E5068D0025A767 /* wels_transpose_matrix.h */,
 				4CE446AA18BC605C0017DF25 /* as264_common.h */,
 				4CE446AB18BC605C0017DF25 /* au_set.h */,
 				4CE446AC18BC605C0017DF25 /* bit_stream.h */,
