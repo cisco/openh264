@@ -84,7 +84,9 @@ SMVUnitXY					sMv;
 
 #define  COST_MVD(table, mx, my)  (table[mx] + table[my])
 
+// Function definitions below
 
+void WelsInitMeFunc( SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag, bool bScreenContent );
 
 /*!
  * \brief	BL mb motion estimate search

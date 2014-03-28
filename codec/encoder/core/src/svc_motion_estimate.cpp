@@ -38,7 +38,7 @@
  *************************************************************************************
  */
 
-
+#include "cpu_core.h"
 #include "sample.h"
 #include "svc_motion_estimate.h"
 
@@ -58,6 +58,19 @@ static inline void MeEndIntepelSearch( SWelsME * pMe )
     pMe->uiSatdCost = pMe->uiSadCost;
 }
 
+void WelsInitMeFunc( SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag, bool bScreenContent ) {
+  if (!bScreenContent) {
+    pFuncList->pfCheckDirectionalMv = CheckDirectionalMvFalse;
+  } else {
+    pFuncList->pfCheckDirectionalMv = CheckDirectionalMv;
+
+    //for cross serarch
+    pFuncList->pfLineFullSearch = LineFullSearch_c;
+    pFuncList->pfLineFullSearch = LineFullSearch_c;
+    if ( uiCpuFlag & WELS_CPU_SSE41 ) {
+    }
+  }
+}
 
 /*!
  * \brief	BL mb motion estimate search
@@ -234,22 +247,21 @@ void WelsMotionEstimateIterativeSearch (SWelsFuncPtrList* pFuncList, SWelsME* pM
   pMe->pRefMb = pRefMb;
 }
 
-void CalculateSatdCost( PSampleSadSatdCostFunc pSatd, void * vpMe, const int32_t kiEncStride, const int32_t kiRefStride )
-{
+void CalculateSatdCost( PSampleSadSatdCostFunc pSatd, void * vpMe,
+                       const int32_t kiEncStride, const int32_t kiRefStride ) {
   SWelsME* pMe						 = static_cast<SWelsME *>(vpMe);
   pMe->uSadPredISatd.uiSatd = pSatd(pMe->pEncMb, kiEncStride, pMe->pRefMb, kiRefStride);
   pMe->uiSatdCost = pMe->uSadPredISatd.uiSatd + COST_MVD (pMe->pMvdCost, pMe->sMv.iMvX - pMe->sMvp.iMvX,
                                                             pMe->sMv.iMvY - pMe->sMvp.iMvY);
 }
-void NotCalculateSatdCost( PSampleSadSatdCostFunc pSatd, void * vpMe, const int32_t kiEncStride, const int32_t kiRefStride )
-{
+void NotCalculateSatdCost( PSampleSadSatdCostFunc pSatd, void * vpMe,
+                          const int32_t kiEncStride, const int32_t kiRefStride ) {
 }
 
 
 bool CheckDirectionalMv(PSampleSadSatdCostFunc pSad, void * vpMe,
                       const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
-                      int32_t& iBestSadCost)
-{
+                      int32_t& iBestSadCost) {
   SWelsME* pMe						 = static_cast<SWelsME *>(vpMe);
   const int16_t kiMvX = pMe->sDirectionalMv.iMvX;
   const int16_t kiMvY = pMe->sDirectionalMv.iMvY;
@@ -257,13 +269,11 @@ bool CheckDirectionalMv(PSampleSadSatdCostFunc pSad, void * vpMe,
   //Check MV from scrolling detection
   if ( (BLOCK_16x16!=pMe->uiBlockSize) //scrolled_MV with P16x16 is checked SKIP checking function
     && ( kiMvX | kiMvY ) //(0,0) checked in ordinary initial point checking
-    && CheckMvInRange( pMe->sDirectionalMv, ksMinMv, ksMaxMv ) )
-  {
+    && CheckMvInRange( pMe->sDirectionalMv, ksMinMv, ksMaxMv ) ) {
     uint8_t* pRef = &pMe->pColoRefMb[kiMvY * kiRefStride + kiMvX];
     uint32_t uiCurrentSadCost = pSad( pMe->pEncMb, kiEncStride,  pRef, kiRefStride ) +
       COST_MVD(pMe->pMvdCost, (kiMvX<<2) - pMe->sMvp.iMvX, (kiMvY<<2) - pMe->sMvp.iMvY );
-    if( uiCurrentSadCost < pMe->uiSadCost )
-    {
+    if( uiCurrentSadCost < pMe->uiSadCost ) {
       iBestSadCost = uiCurrentSadCost;
       return true;
     }
@@ -273,8 +283,7 @@ bool CheckDirectionalMv(PSampleSadSatdCostFunc pSad, void * vpMe,
 
 bool CheckDirectionalMvFalse(PSampleSadSatdCostFunc pSad, void * vpMe,
                       const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
-                      int32_t& iBestSadCost)
-{
+                      int32_t& iBestSadCost) {
   return false;
 }
 
@@ -282,8 +291,7 @@ void VerticalFullSearchUsingSSE41( void *pFunc, void *vpMe,
 														uint16_t* pMvdTable, const int32_t kiFixedMvd,
 														const int32_t kiEncStride, const int32_t kiRefStride,
 													const int32_t kiMinPos, const int32_t kiMaxPos,
-                          const bool bVerticalSearch )
-{
+                          const bool bVerticalSearch ) {
   SWelsFuncPtrList *pFuncList      = static_cast<SWelsFuncPtrList *>(pFunc);
   SWelsME *pMe				                    = static_cast<SWelsME *>(vpMe);
 }
@@ -291,8 +299,7 @@ void LineFullSearch_c(	void *pFunc, void *vpMe,
 													uint16_t* pMvdTable, const int32_t kiFixedMvd,
 													const int32_t kiEncStride, const int32_t kiRefStride,
 													const int32_t kiMinPos, const int32_t kiMaxPos,
-                          const bool bVerticalSearch )
-{
+                          const bool bVerticalSearch ) {
   SWelsFuncPtrList *pFuncList      = static_cast<SWelsFuncPtrList *>(pFunc);
   SWelsME *pMe				                    = static_cast<SWelsME *>(vpMe);
   PSampleSadSatdCostFunc pSad = pFuncList->sSampleDealingFuncs.pfSampleSad[pMe->uiBlockSize];
@@ -323,11 +330,9 @@ void LineFullSearch_c(	void *pFunc, void *vpMe,
 }
 
 void WelsMotionCrossSearch(SWelsFuncPtrList *pFuncList,  SDqLayer* pCurLayer, SWelsME * pMe,
-											const SSlice* pSlice)
-{
-  //TODO:
-  //PMOTION_VERFULL_SEARCH VerticalFullSearchFunc	= pFuncList->VerticalFullSearch_c;
-  //PMOTION_HORFULL_SEARCH HorizontalFullSearchFunc	= pFuncList->HorizontalFullSearch_c;
+											const SSlice* pSlice) {
+  PLineFullSearchFunc pfVerticalFullSearchFunc	= pFuncList->pfLineFullSearch;
+  PLineFullSearchFunc pfHorizontalFullSearchFunc	= pFuncList->pfLineFullSearch;
   const int32_t kiEncStride = pCurLayer->iEncStride[0];
   const int32_t kiRefStride = pCurLayer->pRefPic->iLineSize[0];
 
@@ -339,7 +344,7 @@ void WelsMotionCrossSearch(SWelsFuncPtrList *pFuncList,  SDqLayer* pCurLayer, SW
   uint16_t* pMvdCostY = pMe->pMvdCost - iCurMeBlockQpelPixY - pMe->sMvp.iMvY;//do the offset here instead of in the search
 
   //vertical search
-  LineFullSearch_c( pFuncList, pMe,
+  pfVerticalFullSearchFunc( pFuncList, pMe,
     pMvdCostY, pMvdCostX[ iCurMeBlockQpelPixX ],
     kiEncStride, kiRefStride,
     iCurMeBlockPixY + pSlice->sMvStartMin.iMvY,
@@ -347,7 +352,7 @@ void WelsMotionCrossSearch(SWelsFuncPtrList *pFuncList,  SDqLayer* pCurLayer, SW
 
   //horizontal search
   if (pMe->uiSadCost >= pMe->uiSadCostThreshold) {
-    LineFullSearch_c( pFuncList, pMe,
+    pfHorizontalFullSearchFunc( pFuncList, pMe,
       pMvdCostX, pMvdCostY[ iCurMeBlockQpelPixY ],
       kiEncStride, kiRefStride,
       iCurMeBlockPixX + pSlice->sMvStartMin.iMvX,
