@@ -150,6 +150,7 @@
 #define MAX_LONG_REF_COUNT		2 // 16 in standard, maximal count number of long reference pictures
 #define MAX_REF_PIC_COUNT		16 // 32 in standard, maximal Short + Long reference pictures
 #define MIN_REF_PIC_COUNT		1		// minimal count number of reference pictures, 1 short + 2 key reference based?
+#define MAX_MULTI_REF_PIC_COUNT	1	//maximum multi-reference number
 //#define TOTAL_REF_MINUS_HALF_GOP	1	// last t0 in last gop
 #define MAX_MMCO_COUNT			66
 

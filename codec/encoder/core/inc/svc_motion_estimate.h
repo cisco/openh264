@@ -82,9 +82,44 @@ SMVUnitXY					sDirectionalMv;
 SMVUnitXY					sMv;
 } SWelsME;
 
+typedef struct TagFeatureSearchIn{
+    PSampleSadSatdCostFunc pSad;
+
+    uint32_t* pTimesOfFeature;
+    uint16_t** pQpelLocationOfFeature;
+    uint16_t *pMvdCostX;
+    uint16_t *pMvdCostY;
+
+    uint8_t* pEnc;
+    uint8_t* pColoRef;
+    int32_t iEncStride;
+    int32_t iRefStride;
+    uint16_t uiSadCostThresh;
+
+    int32_t iFeatureOfCurrent;
+
+    int32_t iCurPixX;
+    int32_t iCurPixY;
+    int32_t iCurPixXQpel;
+    int32_t iCurPixYQpel;
+
+    int32_t iMinQpelX;
+    int32_t iMinQpelY;
+    int32_t iMaxQpelX;
+    int32_t iMaxQpelY;
+}SFeatureSearchIn;
+
+typedef struct TagFeatureSearchOut{
+    SMVUnitXY sBestMv;
+    uint32_t uiBestSadCost;
+    uint8_t* pBestRef;
+}SFeatureSearchOut;
+
 #define  COST_MVD(table, mx, my)  (table[mx] + table[my])
 
+// Function definitions below
 
+void WelsInitMeFunc( SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag, bool bScreenContent );
 
 /*!
  * \brief	BL mb motion estimate search
