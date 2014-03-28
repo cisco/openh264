@@ -442,14 +442,22 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
   }
   DownsamplePadding (pSrcPic, pDstPic, iSrcWidth, iSrcHeight, iShrinkWidth, iShrinkHeight, iTargetWidth, iTargetHeight);
 
-  if (pSvcParam->bEnableSceneChangeDetect && !pCtx->pVaa->bIdrPeriodFlag
-      && !pCtx->bEncCurFrmAsIdrFlag
-      && ! (pCtx->iCodingIndex & (pSvcParam->uiGopSize - 1))) {
-    SPicture* pRefPic = pCtx->pLtr[iDependencyId].bReceivedT0LostFlag ?
+  if (pSvcParam->bEnableSceneChangeDetect && !pCtx->pVaa->bIdrPeriodFlag){
+    if(pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME)
+    {
+        pCtx->pVaa->eSceneChangeIdc = (pCtx->bEncCurFrmAsIdrFlag ? LARGE_CHANGED_SCENE: DetectSceneChangeScreen(pCtx,pDstPic));
+        pCtx->pVaa->bSceneChangeFlag = ( LARGE_CHANGED_SCENE == pCtx->pVaa->eSceneChangeIdc);
+    }
+    else
+    {
+      if((!pCtx->bEncCurFrmAsIdrFlag )&& ! (pCtx->iCodingIndex & (pSvcParam->uiGopSize - 1))) {
+        SPicture* pRefPic = pCtx->pLtr[iDependencyId].bReceivedT0LostFlag ?
                         m_pSpatialPic[iDependencyId][m_uiSpatialLayersInTemporal[iDependencyId] +
                             pCtx->pVaa->uiValidLongTermPicIdx] : m_pLastSpatialPicture[iDependencyId][0];
 
-    pCtx->pVaa->bSceneChangeFlag = DetectSceneChange (pDstPic, pRefPic);
+        pCtx->pVaa->bSceneChangeFlag = DetectSceneChange (pDstPic, pRefPic);
+      }
+    }
   }
 
   for (int32_t i = 0; i < pSvcParam->iSpatialLayerNum; i++) {
@@ -893,6 +901,33 @@ void CWelsPreProcess::AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCu
   }
 }
 
+
+ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen(sWelsEncCtx* pCtx,SPicture* pCurPicture)
+{
+#define STATIC_SCENE_MOTION_RATIO 0.01f
+    SWelsSvcCodingParam* pSvcParam = pCtx->pSvcParam;
+	  SVAAFrameInfoExt *pVaaExt			= static_cast<SVAAFrameInfoExt *>(pCtx->pVaa);
+    if ( NULL==pCtx || NULL == pVaaExt || NULL== pCurPicture)
+    {
+        return LARGE_CHANGED_SCENE;
+    }
+
+    const int32_t iTargetDid = pSvcParam->iSpatialLayerNum-1;
+    if ( 0!= iTargetDid )
+    {
+        return LARGE_CHANGED_SCENE;
+    }
+
+    ESceneChangeIdc iVaaFrameSceneChangeIdc = LARGE_CHANGED_SCENE;
+
+    SPicture **pSrcPicList = &m_pSpatialPic[iTargetDid][1];
+     if ( NULL==pSrcPicList )
+    {
+        return LARGE_CHANGED_SCENE;
+    }
+
+    return static_cast<ESceneChangeIdc>(iVaaFrameSceneChangeIdc);
+}
 void  CWelsPreProcess::Padding (uint8_t* pSrcY, uint8_t* pSrcU, uint8_t* pSrcV, int32_t iStrideY, int32_t iStrideUV,
                                 int32_t iActualWidth, int32_t iPaddingWidth, int32_t iActualHeight, int32_t iPaddingHeight) {
   int32_t i;
