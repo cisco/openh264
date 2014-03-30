@@ -176,11 +176,11 @@ pBs->uiCurBits = 0;	//  for future writing safe, 5/19/2010
  *	Write unsigned exp golomb codes
  */
 static inline void BsWriteUE (SBitStringAux* pBs, const uint32_t kuiValue) {
+uint32_t iTmpValue = kuiValue + 1;
 if (256 > kuiValue)	{
   BsWriteBits (pBs, g_uiGolombUELength[kuiValue], kuiValue + 1);
 } else {
   uint32_t n = 0;
-  uint32_t iTmpValue = kuiValue + 1;
 
   if (iTmpValue & 0xffff0000) {
     iTmpValue >>= 16;

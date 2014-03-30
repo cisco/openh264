@@ -827,7 +827,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   int32_t	iTotalFrameMax = -1;
   uint8_t* pYUV= NULL;
   SSourcePicture* pSrcPic = NULL;
-  int32_t iSourceWidth, iSourceHeight, kiPicResSize;
+  uint32_t iSourceWidth, iSourceHeight, kiPicResSize;
   // Inactive with sink with output file handler
   FILE* pFpBs = NULL;
 #if defined(COMPARE_DATA)
