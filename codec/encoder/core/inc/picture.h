@@ -95,9 +95,11 @@ typedef struct TagPicture {
 
   bool		bUsedAsRef;						//for pRef pic management
   bool		bIsLongRef;	// long term reference frame flag	//for pRef pic management
+  bool    bIsSceneLTR;  //long term reference & large scene change
   uint8_t		uiRecieveConfirmed;
   uint8_t		uiTemporalId;
   uint8_t		uiSpatialId;
+  int32_t   iFrameAverageQp;
 } SPicture;
 
 /*

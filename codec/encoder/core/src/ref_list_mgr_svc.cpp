@@ -66,7 +66,7 @@ void ResetLtrState (SLTRState* pLtr) {
   pLtr->bLTRMarkingFlag = false;	//decide whether current frame marked as LTR
   pLtr->bLTRMarkEnable = false; //when LTR is confirmed and the interval is no smaller than the marking period
   pLtr->iCurLtrIdx = 0;
-  pLtr->iLastLtrIdx = 0;
+  memset(&pLtr->iLastLtrIdx , 0 , sizeof(pLtr->iLastLtrIdx)) ;
   pLtr->uiLtrMarkInterval = 0;
 
   // LTR mark feedback
@@ -435,7 +435,11 @@ void WelsMarkPic (sWelsEncCtx* pCtx) {
       pLtr->bLTRMarkingFlag = true;
       pLtr->bLTRMarkEnable = false;
       pLtr->uiLtrMarkInterval = 0;
-      pLtr->iLastLtrIdx = pLtr->iCurLtrIdx;
+      for(int32_t i = 0 ; i< MAX_TEMPORAL_LAYER_NUM; ++i){
+        if (pCtx->uiTemporalId<i || pCtx->uiTemporalId ==0){
+          pLtr->iLastLtrIdx[i] = pLtr->iCurLtrIdx;
+        }
+      }
     } else {
       pLtr->bLTRMarkingFlag = false;
     }
