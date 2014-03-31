@@ -162,7 +162,6 @@ typedef struct TagSlice {
   /*******************************sSliceHeader****************************/
   SSliceHeaderExt	sSliceHeaderExt;
 
-
   SMVUnitXY	sMvStartMin;
   SMVUnitXY	sMvStartMax;
   SMVUnitXY	sMvc[5];
@@ -175,8 +174,12 @@ typedef struct TagSlice {
 
   bool		bDynamicSlicingSliceSizeCtrlFlag;
   uint8_t		uiAssumeLog2BytePerMb;
+
+  uint32_t     uiSliceFMECostDown;//TODO: for FME switch under MT, to opt after ME final?
+
   uint8_t		uiReservedFillByte;	// reserved to meet 4 bytes alignment
 } SSlice, *PSlice;
 
 }
 #endif//WELS_SLICE_H__
+

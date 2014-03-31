@@ -41,7 +41,6 @@
 #include "mv_pred.h"
 #include "svc_enc_golomb.h"
 #include "svc_base_layer_md.h"
-#include "sample.h"
 #include "encoder.h"
 #include "svc_encode_mb.h"
 #include "svc_encode_slice.h"

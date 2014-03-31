@@ -173,6 +173,18 @@
 #define MAX_NAL_UNIT_NUM_IN_AU	256	// predefined maximal number of NAL Units in an access unit
 #define MAX_ACCESS_UINT_CAPACITY	(1<<20)	// Maximal AU capacity in bytes: 1024 KB predefined
 #define MAX_ACCESS_UNIT_CACHE_NUM	2	// Maximal Access Unit(AU) cache number to be processed, denote current AU and the next coming AU.
+
+enum {
+  BLOCK_16x16 = 0,
+  BLOCK_16x8  = 1,
+  BLOCK_8x16  = 2,
+  BLOCK_8x8   = 3,
+  BLOCK_4x4   = 4,
+//    BLOCK_8x4   = 5,
+//    BLOCK_4x8   = 6,
+  BLOCK_SIZE_ALL = 5
+};
+
 enum {
   CUR_AU_IDX	= 0,			// index symbol for current access unit
   SUC_AU_IDX	= 1				// index symbol for successive access unit
