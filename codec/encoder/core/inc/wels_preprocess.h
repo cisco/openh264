@@ -60,6 +60,12 @@ typedef  struct {
   int32_t     iScaledHeight[MAX_DEPENDENCY_LAYER];
 } Scaled_Picture;
 
+
+typedef struct {
+  int32_t    iBestRefSrcListIdx;   //idx in  h->spatial_pic[base_did];
+  bool       bSceneLtrFlag;
+}SRefInfoParam;
+
 typedef struct {
   SVAACalcResult		sVaaCalcInfo;
   SAdaptiveQuantizationParam sAdaptiveQuantParam;
@@ -81,9 +87,22 @@ typedef struct {
   uint8_t         uiValidLongTermPicIdx;
   uint8_t         uiMarkLongTermPicIdx;
 
+  ESceneChangeIdc eSceneChangeIdc;
   bool          bSceneChangeFlag;
   bool          bIdrPeriodFlag;
 } SVAAFrameInfo;
+
+typedef struct SVAAFrameInfoExt_t: public SVAAFrameInfo
+{
+  SComplexityAnalysisScreenParam    sComplexityScreenParam;
+  SScrollDetectionResult    sScrollDetectInfo;
+    //TOP3_BEST_REF_NO_TID
+  SRefInfoParam    sVaaStrBestRefCandidate[MAX_REF_PIC_COUNT];
+  int32_t    iNumOfAvailableRef;
+
+  int32_t    *pVaaBestBlockStaticIdc;//pointer
+  int32_t    *pVaaBlockStaticIdc[16];//real memory,
+}SVAAFrameInfoExt;
 
 class CWelsLib {
  public:
@@ -142,6 +161,7 @@ class CWelsPreProcess {
   void WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SPicture* pDstPic, const SSourcePicture* kpSrc,
                               const int32_t kiWidth, const int32_t kiHeight);
 
+  ESceneChangeIdc DetectSceneChangeScreen(sWelsEncCtx* pCtx,SPicture* pCurPicture);
  private:
   Scaled_Picture   m_sScaledPicture;
   SPicture*	   m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];

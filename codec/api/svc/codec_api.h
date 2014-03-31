@@ -192,11 +192,11 @@ struct ISVCDecoderVtbl {
 #endif
 
 
-  int  CreateSVCEncoder (ISVCEncoder** ppEncoder);
-  void DestroySVCEncoder (ISVCEncoder* pEncoder);
+  int  WelsCreateSVCEncoder (ISVCEncoder** ppEncoder);
+  void WelsDestroySVCEncoder (ISVCEncoder* pEncoder);
 
-  long CreateDecoder (ISVCDecoder** ppDecoder);
-  void DestroyDecoder (ISVCDecoder* pDecoder);
+  long WelsCreateDecoder (ISVCDecoder** ppDecoder);
+  void WelsDestroyDecoder (ISVCDecoder* pDecoder);
 
 #ifdef __cplusplus
 }

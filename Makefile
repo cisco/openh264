@@ -78,9 +78,7 @@ GTEST_INCLUDES += \
 
 CODEC_UNITTEST_INCLUDES += \
     -Igtest/include \
-    -Icodec/processing/interface \
     -Icodec/common/inc \
-    -Icodec/encoder/core/inc
 
 H264DEC_INCLUDES = $(DECODER_INCLUDES) -Icodec/console/dec/inc
 H264DEC_LDFLAGS = -L. $(call LINK_LIB,decoder) $(call LINK_LIB,common)
@@ -92,7 +90,9 @@ H264ENC_DEPS = $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFF
 
 CODEC_UNITTEST_LDFLAGS = -L. $(call LINK_LIB,gtest) $(call LINK_LIB,decoder) $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common) $(CODEC_UNITTEST_LDFLAGS_SUFFIX)
 CODEC_UNITTEST_DEPS = $(LIBPREFIX)gtest.$(LIBSUFFIX) $(LIBPREFIX)decoder.$(LIBSUFFIX) $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX)
-
+DECODER_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(DECODER_INCLUDES) -Itest -Itest/decoder
+ENCODER_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(ENCODER_INCLUDES) -Itest -Itest/encoder
+API_TEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) -Itest -Itest/api
 .PHONY: test gtest-bootstrap clean
 
 all:	libraries binaries
@@ -155,7 +155,14 @@ install: install-static install-shared
 
 ifeq ($(HAVE_GTEST),Yes)
 include build/gtest-targets.mk
-include test/targets.mk
+include test/api/targets.mk
+include test/decoder/targets.mk
+include test/encoder/targets.mk
+binaries: codec_unittest$(EXEEXT)
+BINARIES += codec_unittest$(EXEEXT)
+codec_unittest$(EXEEXT): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(API_TEST_OBJS) $(CODEC_UNITTEST_DEPS)
+	$(QUIET)rm -f $@
+	$(QUIET_CXX)$(CXX) $(CXX_LINK_O) $+ $(CODEC_UNITTEST_LDFLAGS) $(LDFLAGS)
 endif
 
 -include $(OBJS:.$(OBJ)=.d)

@@ -24,7 +24,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\..\..\..\bin\win32\Debug"
+			OutputDirectory=".\..\..\..\..\bin\win32\Debug"
 			IntermediateDirectory=".\..\..\..\obj\vp\Debug"
 			ConfigurationType="2"
 			CharacterSet="1"
@@ -193,7 +193,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\..\..\..\bin\win32\Release"
+			OutputDirectory=".\..\..\..\..\bin\win32\Release"
 			IntermediateDirectory=".\..\..\..\obj\vp\Release"
 			ConfigurationType="2"
 			CharacterSet="1"
@@ -380,6 +380,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\src\common\common.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\common\src\cpu.cpp"
 				>
 			</File>
@@ -388,7 +392,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\common\src\WelsThreadLib.cpp"
+				RelativePath="..\..\..\common\src\sad_common.cpp"
 				>
 			</File>
 			<File
@@ -397,6 +401,10 @@
 			</File>
 			<File
 				RelativePath="..\..\src\common\WelsFrameWorkEx.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\src\WelsThreadLib.cpp"
 				>
 			</File>
 		</Filter>
@@ -446,6 +454,10 @@
 			Name="Header Files"
 			>
 			<File
+				RelativePath="..\..\src\common\common.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\common\inc\cpu.h"
 				>
 			</File>
@@ -454,7 +466,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\common\inc\WelsThreadLib.h"
+				RelativePath="..\..\..\common\inc\sad_common.h"
 				>
 			</File>
 			<File
@@ -467,6 +479,10 @@
 			</File>
 			<File
 				RelativePath="..\..\src\common\WelsFrameWork.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\inc\WelsThreadLib.h"
 				>
 			</File>
 		</Filter>
@@ -683,14 +699,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\scenechangedetection\SceneChangeDetection.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\scenechangedetection\SceneChangeDetectionCommon.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\scenechangedetection\SceneChangeDetectionCommon.h"
 				>
 			</File>
 		</Filter>

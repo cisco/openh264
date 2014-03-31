@@ -46,22 +46,6 @@ namespace WelsSVCEnc {
 extern const  ALIGNED_DECLARE (uint16_t, g_kuiDequantCoeff[52][8], 16);
 extern const uint8_t g_kuiChromaQpTable[52];
 
-/* Profile IDC */
-
-enum EProfileIdc {
-PRO_BASELINE	= 66,
-PRO_MAIN		= 77,
-PRO_EXTENDED	= 88,
-PRO_HIGH		= 100,
-PRO_HIGH10		= 110,
-PRO_HIGH422		= 122,
-PRO_HIGH444		= 144,
-PRO_CAVLC444	= 244,
-
-PRO_SCALABLE_BASELINE	= 83,
-PRO_SCALABLE_HIGH		= 86,
-};
-
 /*
  *	NAL Unit Type (5 Bits)
  */

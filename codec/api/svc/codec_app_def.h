@@ -76,6 +76,7 @@ typedef enum {
   ENCODER_OPTION_SVC_ENCODE_PARAM_EXT,
   ENCODER_OPTION_FRAME_RATE,
   ENCODER_OPTION_BITRATE,
+  ENCODER_OPTION_MAX_BITRATE,
   ENCODER_OPTION_INTER_SPATIAL_PRED,
   ENCODER_OPTION_RC_MODE,
   ENCODER_PADDING_PADDING,
@@ -117,6 +118,14 @@ typedef enum {
   NON_VIDEO_CODING_LAYER = 0,
   VIDEO_CODING_LAYER = 1
 } LAYER_TYPE;
+
+typedef enum {
+    SPATIAL_LAYER_0 = 0,
+    SPATIAL_LAYER_1 = 1,
+    SPATIAL_LAYER_2 = 2,
+    SPATIAL_LAYER_3 = 3,
+    SPATIAL_LAYER_ALL = 4,
+} LAYER_NUM;
 
 //enumerate the type of video bitstream which is provided to decoder
 typedef enum {
@@ -164,6 +173,48 @@ typedef enum {
   SM_RESERVED             = 6
 } SliceModeEnum;
 
+typedef enum {
+  RC_QUALITY_MODE,      //Quality mode
+  RC_BITRATE_MODE,   //Bitrate mode
+  RC_LOW_BW_MODE, //bitrate limited mode
+} RC_MODES;
+
+typedef enum {
+  PRO_UNKNOWN     = 0,
+  PRO_BASELINE	= 66,
+  PRO_MAIN		= 77,
+  PRO_EXTENDED	= 88,
+  PRO_HIGH		= 100,
+  PRO_HIGH10		= 110,
+  PRO_HIGH422		= 122,
+  PRO_HIGH444		= 144,
+  PRO_CAVLC444	= 244,
+
+  PRO_SCALABLE_BASELINE	= 83,
+  PRO_SCALABLE_HIGH		= 86,
+}EProfileIdc;
+
+typedef enum {
+  LEVEL_UNKNOWN,
+  LEVEL_1_0,
+  LEVEL_1_B,
+  LEVEL_1_1,
+  LEVEL_1_2,
+  LEVEL_1_3,
+  LEVEL_2_0,
+  LEVEL_2_1,
+  LEVEL_2_2,
+  LEVEL_3_0,
+  LEVEL_3_1,
+  LEVEL_3_2,
+  LEVEL_4_0,
+  LEVEL_4_1,
+  LEVEL_4_2,
+  LEVEL_5_0,
+  LEVEL_5_1,
+  LEVEL_5_2
+}ELevelIdc;
+
 typedef struct {
   SliceModeEnum uiSliceMode; //by default, uiSliceMode will be SM_SINGLE_SLICE
   SSliceArgument sSliceArgument;
@@ -174,22 +225,27 @@ typedef struct {
   int	iVideoHeight;		// video size in cy specified for a layer
   float	fFrameRate;		// frame rate specified for a layer
   int	iSpatialBitrate;	// target bitrate for a spatial layer
-  unsigned int	uiProfileIdc;	// value of profile IDC (0 for auto-detection)
+  int   iMaxSpatialBitrate;
+  EProfileIdc    uiProfileIdc;	// value of profile IDC (PRO_UNKNOWN for auto-detection)
+  ELevelIdc    uiLevelIdc;
   int    iDLayerQp;
 
   SSliceConfig sSliceCfg;
 } SSpatialLayerConfig;
 
+typedef enum {
+  CAMERA_VIDEO_REAL_TIME, //camera video signal
+  SCREEN_CONTENT_REAL_TIME,//screen content signal
+}EUsageType;
 /* SVC Encoding Parameters */
 typedef struct TagEncParamBase{
-
-  int       iUsageType;	//enable_screen_content_signal;// 0: //camera video signal; 1: screen content signal;
+  EUsageType    iUsageType;	//application type;// CAMERA_VIDEO_REAL_TIME: //camera video signal; SCREEN_CONTENT_REAL_TIME: screen content signal;
   int		iInputCsp;	// color space of input sequence
 
   int		iPicWidth;			// width of picture in samples
   int		iPicHeight;			// height of picture in samples
   int		iTargetBitrate;		// target bitrate desired
-  int       iRCMode;                 // RC mode
+  RC_MODES      iRCMode;                 // RC mode
   float	    fMaxFrameRate;			// input maximal frame rate
 
 } SEncParamBase, *PEncParamBase;
@@ -197,13 +253,13 @@ typedef struct TagEncParamBase{
 
 typedef struct TagEncParamExt
 {
-  int       iUsageType;	//application type;// 0: //camera video signal; 1: screen content signal;
+  EUsageType    iUsageType;	//application type;// CAMERA_VIDEO_REAL_TIME: //camera video signal; SCREEN_CONTENT_REAL_TIME: screen content signal;
   int		iInputCsp;	// color space of input sequence
 
   int		iPicWidth;			// width of picture in samples
   int		iPicHeight;			// height of picture in samples
   int		iTargetBitrate;		// target bitrate desired
-  int       iRCMode;                 // RC mode
+  RC_MODES      iRCMode;                 // RC mode
   float	    fMaxFrameRate;			// input maximal frame rate
 
   int		iTemporalLayerNum;	// layer number at temporal level
@@ -222,8 +278,10 @@ typedef struct TagEncParamExt
   /* rc control */
   bool    bEnableRc;
   bool    bEnableFrameSkip; // allow skipping frames to keep the bitrate within limits
+  int     iMaxBitrate;        // max bitrate desired
   int     iMaxQp;
   int     iMinQp;
+  unsigned int uiMaxNalSize;
 
   /*LTR settings*/
   bool     bEnableLongTermReference; // 0: on, 1: off
@@ -299,6 +357,11 @@ typedef struct Source_Picture_s {
   int 		iPicHeight;				// luma picture height in y coordinate
   long long uiTimeStamp;
 } SSourcePicture;
+
+typedef struct Bitrate_Info_s{
+  LAYER_NUM iLayer;
+  int iBitrate;    //the maximum bitrate
+}SBitrateInfo;
 
 typedef struct Dump_Layer_s{
 	int iLayer;

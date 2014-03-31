@@ -47,7 +47,7 @@ BaseDecoderTest::BaseDecoderTest()
   : decoder_(NULL), decodeStatus_(OpenFile) {}
 
 void BaseDecoderTest::SetUp() {
-  long rv = CreateDecoder(&decoder_);
+  long rv = WelsCreateDecoder(&decoder_);
   ASSERT_EQ(0, rv);
   ASSERT_TRUE(decoder_ != NULL);
 
@@ -65,7 +65,7 @@ void BaseDecoderTest::SetUp() {
 void BaseDecoderTest::TearDown() {
   if (decoder_ != NULL) {
     decoder_->Uninitialize();
-    DestroyDecoder(decoder_);
+    WelsDestroyDecoder(decoder_);
   }
 }
 

@@ -150,6 +150,7 @@
 #define MAX_LONG_REF_COUNT		2 // 16 in standard, maximal count number of long reference pictures
 #define MAX_REF_PIC_COUNT		16 // 32 in standard, maximal Short + Long reference pictures
 #define MIN_REF_PIC_COUNT		1		// minimal count number of reference pictures, 1 short + 2 key reference based?
+#define MAX_MULTI_REF_PIC_COUNT	1	//maximum multi-reference number
 //#define TOTAL_REF_MINUS_HALF_GOP	1	// last t0 in last gop
 #define MAX_MMCO_COUNT			66
 
@@ -166,6 +167,8 @@
 
 #define UNAVAILABLE_DQ_ID		((uint8_t)(-1))
 #define LAYER_NUM_EXCHANGEABLE	2
+
+#define NAL_HEADER_ADD_0X30BYTES 50
 
 #define MAX_NAL_UNIT_NUM_IN_AU	256	// predefined maximal number of NAL Units in an access unit
 #define MAX_ACCESS_UINT_CAPACITY	(1<<20)	// Maximal AU capacity in bytes: 1024 KB predefined

@@ -1,6 +1,6 @@
 /*!
  * \copy
- *     Copyright (c)  2013, Cisco Systems
+ *     Copyright (c)  2011-2013, Cisco Systems
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -28,32 +28,47 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
+ * \file	        :  SceneChangeDetectionCommon.h
+ *
+ * \brief	    :  scene change detection class of wels video processor class
+ *
+ * \date         :  2011/03/14
+ *
+ * \description  :  1. rewrite the package code of scene change detection class
+ *
  */
 
-#include "SceneChangeDetectionCommon.h"
+#ifndef WELSVP_SCENECHANGEDETECTIONCOMMON_H
+#define WELSVP_SCENECHANGEDETECTIONCOMMON_H
+
+#include "util.h"
+#include "memory.h"
+#include "WelsFrameWork.h"
+#include "IWelsVP.h"
+#include "sad_common.h"
 
 WELSVP_NAMESPACE_BEGIN
 
+typedef  int32_t (SadFunc) (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY);
 
-int32_t WelsSampleSad8x8_c (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY) {
-  int32_t iSadSum = 0;
-  uint8_t* pSrcA = pSrcY;
-  uint8_t* pSrcB = pRefY;
-  for (int32_t i = 0; i < 8; i++) {
-    iSadSum += WELS_ABS ((pSrcA[0] - pSrcB[0]));
-    iSadSum += WELS_ABS ((pSrcA[1] - pSrcB[1]));
-    iSadSum += WELS_ABS ((pSrcA[2] - pSrcB[2]));
-    iSadSum += WELS_ABS ((pSrcA[3] - pSrcB[3]));
-    iSadSum += WELS_ABS ((pSrcA[4] - pSrcB[4]));
-    iSadSum += WELS_ABS ((pSrcA[5] - pSrcB[5]));
-    iSadSum += WELS_ABS ((pSrcA[6] - pSrcB[6]));
-    iSadSum += WELS_ABS ((pSrcA[7] - pSrcB[7]));
+typedef SadFunc*   SadFuncPtr;
 
-    pSrcA += iSrcStrideY;
-    pSrcB += iRefStrideY;
-  }
+typedef int32_t (Sad16x16Func) ( uint8_t * pSrcY, int32_t iSrcStrideY, uint8_t *pRefY, int32_t iRefStrideY );
+typedef Sad16x16Func      *PSad16x16Func;
 
-  return iSadSum;
-}
+typedef void (GetIntraPred)(uint8_t *pPred, uint8_t *pRef, const int32_t kiStride);
+
+typedef GetIntraPred  *GetIntraPredPtr;
+
+GetIntraPred     WelsI16x16LumaPredV_c;
+GetIntraPred     WelsI16x16LumaPredH_c;
+
+#ifdef HAVE_NEON
+WELSVP_EXTERN_C_BEGIN
+int32_t WelsProcessingSampleSad8x8_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+WELSVP_EXTERN_C_END
+#endif
 
 WELSVP_NAMESPACE_END
+
+#endif

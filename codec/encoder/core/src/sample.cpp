@@ -39,75 +39,12 @@
  */
 
 #include "sample.h"
+#include "sad_common.h"
 
 #include "mc.h"
 #include "cpu_core.h"
 
 namespace WelsSVCEnc {
-int32_t WelsSampleSad4x4_c (uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2) {
-  int32_t iSadSum = 0;
-  int32_t i = 0;
-  uint8_t* pSrc1 = pSample1;
-  uint8_t* pSrc2 = pSample2;
-  for (i = 0; i < 4; i++) {
-    iSadSum += WELS_ABS ((pSrc1[0] - pSrc2[0]));
-    iSadSum += WELS_ABS ((pSrc1[1] - pSrc2[1]));
-    iSadSum += WELS_ABS ((pSrc1[2] - pSrc2[2]));
-    iSadSum += WELS_ABS ((pSrc1[3] - pSrc2[3]));
-
-    pSrc1 += iStride1;
-    pSrc2 += iStride2;
-  }
-
-  return iSadSum;
-}
-
-int32_t WelsSampleSad8x8_c (uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2) {
-  int32_t iSadSum = 0;
-  int32_t i = 0;
-  uint8_t* pSrc1 = pSample1;
-  uint8_t* pSrc2 = pSample2;
-  for (i = 0; i < 8; i++) {
-    iSadSum += WELS_ABS ((pSrc1[0] - pSrc2[0]));
-    iSadSum += WELS_ABS ((pSrc1[1] - pSrc2[1]));
-    iSadSum += WELS_ABS ((pSrc1[2] - pSrc2[2]));
-    iSadSum += WELS_ABS ((pSrc1[3] - pSrc2[3]));
-    iSadSum += WELS_ABS ((pSrc1[4] - pSrc2[4]));
-    iSadSum += WELS_ABS ((pSrc1[5] - pSrc2[5]));
-    iSadSum += WELS_ABS ((pSrc1[6] - pSrc2[6]));
-    iSadSum += WELS_ABS ((pSrc1[7] - pSrc2[7]));
-
-    pSrc1 += iStride1;
-    pSrc2 += iStride2;
-  }
-
-  return iSadSum;
-}
-int32_t WelsSampleSad16x8_c (uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2) {
-  int32_t iSadSum = 0;
-
-  iSadSum += WelsSampleSad8x8_c (pSample1,     iStride1, pSample2,     iStride2);
-  iSadSum += WelsSampleSad8x8_c (pSample1 + 8, iStride1, pSample2 + 8, iStride2);
-
-  return iSadSum;
-}
-int32_t WelsSampleSad8x16_c (uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2) {
-  int32_t iSadSum = 0;
-  iSadSum += WelsSampleSad8x8_c (pSample1,                   iStride1, pSample2,                   iStride2);
-  iSadSum += WelsSampleSad8x8_c (pSample1 + (iStride1 << 3), iStride1, pSample2 + (iStride2 << 3), iStride2);
-
-  return iSadSum;
-}
-int32_t WelsSampleSad16x16_c (uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2) {
-  int32_t iSadSum = 0;
-  iSadSum += WelsSampleSad8x8_c (pSample1,                     iStride1, pSample2,                     iStride2);
-  iSadSum += WelsSampleSad8x8_c (pSample1 + 8,                   iStride1, pSample2 + 8,                   iStride2);
-  iSadSum += WelsSampleSad8x8_c (pSample1 + (iStride1 << 3),   iStride1, pSample2 + (iStride2 << 3),   iStride2);
-  iSadSum += WelsSampleSad8x8_c (pSample1 + (iStride1 << 3) + 8, iStride1, pSample2 + (iStride2 << 3) + 8, iStride2);
-
-  return iSadSum;
-}
-
 int32_t WelsSampleSatd4x4_c (uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2) {
   int32_t iSatdSum = 0;
   int32_t pSampleMix[4][4] = {{ 0 }};

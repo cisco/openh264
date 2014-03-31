@@ -116,6 +116,7 @@ typedef struct TagWelsEncCtx {
 
   int32_t*					pSadCostMb;
   /* MVD cost tables for Inter MB */
+  int32_t              iMvRange;
   uint16_t*					pMvdCostTableInter; //[52];	// adaptive to spatial layers
   SMVUnitXY*
   pMvUnitBlock4x4;	// (*pMvUnitBlock4x4[2])[MB_BLOCK4x4_NUM];	    // for store each 4x4 blocks' mv unit, the two swap after different d layer

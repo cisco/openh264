@@ -1,6 +1,6 @@
 /*!
  * \copy
- *     Copyright (c)  2011-2013, Cisco Systems
+ *     Copyright (c)  2013, Cisco Systems
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -28,44 +28,46 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	        :  SceneChangeDetectionCommon.h
- *
- * \brief	    :  scene change detection class of wels video processor class
- *
- * \date         :  2011/03/14
- *
- * \description  :  1. rewrite the package code of scene change detection class
- *
  */
 
-#ifndef WELSVP_SCENECHANGEDETECTIONCOMMON_H
-#define WELSVP_SCENECHANGEDETECTIONCOMMON_H
-
-#include "util.h"
-#include "memory.h"
-#include "WelsFrameWork.h"
-#include "IWelsVP.h"
+#include "common.h"
+#include "ls_defines.h"
 
 WELSVP_NAMESPACE_BEGIN
 
-typedef  int32_t (SadFunc) (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY);
+void WelsI16x16LumaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
+  uint8_t i = 15;
+  const int8_t* kpSrc = (int8_t*)&pRef[-kiStride];
+  const uint64_t kuiT1 = LD64 (kpSrc);
+  const uint64_t kuiT2 = LD64 (kpSrc + 8);
+  uint8_t* pDst = pPred;
 
-typedef SadFunc*   SadFuncPtr;
+  do {
+    ST64 (pDst  , kuiT1);
+	ST64 (pDst + 8, kuiT2);
+	pDst += 16;
+  } while (i-- > 0);
+}
 
-SadFunc      WelsSampleSad8x8_c;
+void WelsI16x16LumaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
+  int32_t iStridex15 = (kiStride << 4) - kiStride;
+  int32_t iPredStride = 16;
+  int32_t iPredStridex15 = 240;	//(iPredStride<<4)-iPredStride;
+  uint8_t i = 15;
 
-#ifdef X86_ASM
-WELSVP_EXTERN_C_BEGIN
-SadFunc      WelsSampleSad8x8_sse21;
-WELSVP_EXTERN_C_END
+  do {
+    const uint8_t kuiSrc8	= pRef[iStridex15 - 1];
+#ifdef _MSC_VER
+	const uint64_t kuiV64	= (uint64_t) (0x0101010101010101U * kuiSrc8);
+#else
+	const uint64_t kuiV64	= (uint64_t) (0x0101010101010101LL * kuiSrc8);
 #endif
+	ST64 (&pPred[iPredStridex15], kuiV64);
+	ST64 (&pPred[iPredStridex15 + 8], kuiV64);
 
-#ifdef HAVE_NEON
-WELSVP_EXTERN_C_BEGIN
-SadFunc      WelsProcessingSampleSad8x8_neon;
-WELSVP_EXTERN_C_END
-#endif
+	iStridex15 -= kiStride;
+	iPredStridex15 -= iPredStride;
+  } while (i-- > 0);
+}
 
 WELSVP_NAMESPACE_END
-
-#endif

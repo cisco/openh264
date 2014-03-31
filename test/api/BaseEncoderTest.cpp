@@ -47,7 +47,7 @@ static int InitWithParam(ISVCEncoder* encoder, int width,
 BaseEncoderTest::BaseEncoderTest() : encoder_(NULL) {}
 
 void BaseEncoderTest::SetUp() {
-  int rv = CreateSVCEncoder(&encoder_);
+  int rv = WelsCreateSVCEncoder(&encoder_);
   ASSERT_EQ(0, rv);
   ASSERT_TRUE(encoder_ != NULL);
 }
@@ -55,7 +55,7 @@ void BaseEncoderTest::SetUp() {
 void BaseEncoderTest::TearDown() {
   if (encoder_) {
     encoder_->Uninitialize();
-    DestroySVCEncoder(encoder_);
+    WelsDestroySVCEncoder(encoder_);
   }
 }
 

@@ -133,15 +133,9 @@ typedef struct TagDeblockingFunc {
   PChromaDeblockingEQ4Func  pfChromaDeblockingEQ4Hor;
 } SDeblockingFunc, *PDeblockingFunc;
 
-typedef void (*PWelsBlockAddStrideFunc) (uint8_t* pDest, uint8_t* pPred, int16_t* pRes, int32_t iPredStride,
-    int32_t iResStride);
-typedef void (*PWelsBlockZeroFunc) (int16_t* pBlock, int32_t iStride);
 typedef void (*PWelsNonZeroCountFunc) (int16_t* pBlock, int8_t* pNonZeroCount);
-typedef void (*PWelsSimpleIdct4x4AddFunc) (int16_t* pDest, int16_t* pSrc, int32_t iStride);
 
 typedef  struct  TagBlockFunc {
-  PWelsBlockZeroFunc			pWelsBlockZero16x16Func;
-  PWelsBlockZeroFunc			pWelsBlockZero8x8Func;
   PWelsNonZeroCountFunc		pWelsSetNonZeroCountFunc;
 } SBlockFunc;
 

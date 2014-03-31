@@ -536,7 +536,7 @@ inline void MeRefineQuarPixel (SWelsFuncPtrList* pFunc, SWelsME* pMe, SMeRefineP
   int32_t iCurCost;
   uint8_t* pEncMb				= pMe->pEncMb;
   uint8_t* pTmp				= NULL;
-  const uint8_t kuiPixel		= pMe->uiPixel;
+  const uint8_t kuiPixel		= pMe->uiBlockSize;
 
   pSampleAvg[kiAvgIndex] (pMeRefine->pQuarPixTmp, ME_REFINE_BUF_STRIDE, pParams->pSrcA[0], ME_REFINE_BUF_STRIDE,
                           pParams->pSrcB[0], pParams->iStrideA, kiHeight);
@@ -603,7 +603,7 @@ void MeRefineFracPixel (sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME*
       && (pFunc->sSampleDealingFuncs.pfMdCost == pFunc->sSampleDealingFuncs.pfSampleSatd)) {
     iBestCost = pMe->uSadPredISatd.uiSatd + COST_MVD (pMe->pMvdCost, iMvx - pMe->sMvp.iMvX, iMvy - pMe->sMvp.iMvY);
   } else {
-    iBestCost = pFunc->sSampleDealingFuncs.pfMeCost[pMe->uiPixel] (pEncData, kiStrideEnc, pRef, kiStrideRef) +
+    iBestCost = pFunc->sSampleDealingFuncs.pfMeCost[pMe->uiBlockSize] (pEncData, kiStrideEnc, pRef, kiStrideRef) +
                 COST_MVD (pMe->pMvdCost, iMvx - pMe->sMvp.iMvX, iMvy - pMe->sMvp.iMvY);
   }
 
@@ -614,7 +614,7 @@ void MeRefineFracPixel (sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME*
 
   //step 1: get [iWidth][iHeight+1] half pixel from vertical filter
   //===========================(0, -2)==============================//
-  iCurCost = pFunc->sSampleDealingFuncs.pfMeCost[pMe->uiPixel] (pEncData, kiStrideEnc, pMeRefine->pHalfPixV,
+  iCurCost = pFunc->sSampleDealingFuncs.pfMeCost[pMe->uiBlockSize] (pEncData, kiStrideEnc, pMeRefine->pHalfPixV,
              ME_REFINE_BUF_STRIDE) +
              COST_MVD (pMe->pMvdCost, iMvx - pMe->sMvp.iMvX, iMvy - 2 - pMe->sMvp.iMvY);
   if (iCurCost < iBestCost) {
@@ -623,7 +623,7 @@ void MeRefineFracPixel (sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME*
     pBestPredInter = pMeRefine->pHalfPixV;
   }
   //===========================(0, 2)==============================//
-  iCurCost = pFunc->sSampleDealingFuncs.pfMeCost[pMe->uiPixel] (pEncData, kiStrideEnc,
+  iCurCost = pFunc->sSampleDealingFuncs.pfMeCost[pMe->uiBlockSize] (pEncData, kiStrideEnc,
              pMeRefine->pHalfPixV + ME_REFINE_BUF_STRIDE, ME_REFINE_BUF_STRIDE) +
              COST_MVD (pMe->pMvdCost, iMvx - pMe->sMvp.iMvX, iMvy + 2 - pMe->sMvp.iMvY);
   if (iCurCost < iBestCost) {
@@ -636,7 +636,7 @@ void MeRefineFracPixel (sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME*
   //step 2: get [iWidth][iHeight+1] half pixel from horizon filter
 
   //===========================(-2, 0)==============================//
-  iCurCost = pFunc->sSampleDealingFuncs.pfMeCost[pMe->uiPixel] (pEncData, kiStrideEnc, pMeRefine->pHalfPixH,
+  iCurCost = pFunc->sSampleDealingFuncs.pfMeCost[pMe->uiBlockSize] (pEncData, kiStrideEnc, pMeRefine->pHalfPixH,
              ME_REFINE_BUF_STRIDE) +
              COST_MVD (pMe->pMvdCost, iMvx - 2 - pMe->sMvp.iMvX, iMvy - pMe->sMvp.iMvY);
   if (iCurCost < iBestCost) {
@@ -645,7 +645,7 @@ void MeRefineFracPixel (sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME*
     pBestPredInter = pMeRefine->pHalfPixH;
   }
   //===========================(2, 0)===============================//
-  iCurCost = pFunc->sSampleDealingFuncs.pfMeCost[pMe->uiPixel] (pEncData, kiStrideEnc, pMeRefine->pHalfPixH + 1,
+  iCurCost = pFunc->sSampleDealingFuncs.pfMeCost[pMe->uiBlockSize] (pEncData, kiStrideEnc, pMeRefine->pHalfPixH + 1,
              ME_REFINE_BUF_STRIDE) +
              COST_MVD (pMe->pMvdCost, iMvx + 2 - pMe->sMvp.iMvX, iMvy - pMe->sMvp.iMvY);
   if (iCurCost < iBestCost) {

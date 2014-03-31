@@ -411,7 +411,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
 
 
 
-  if (CreateDecoder (&pDecoder)  || (NULL == pDecoder)) {
+  if (WelsCreateDecoder (&pDecoder)  || (NULL == pDecoder)) {
     printf ("Create Decoder failed.\n");
     return 1;
   }
@@ -437,7 +437,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
   if (pDecoder) {
     pDecoder->Uninitialize();
 
-    DestroyDecoder (pDecoder);
+    WelsDestroyDecoder (pDecoder);
   }
 
   return 0;

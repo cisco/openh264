@@ -1,6 +1,6 @@
 #include<gtest/gtest.h>
 #include <time.h>
-#include "../codec/decoder/core/inc/get_intra_predictor.h"
+#include "get_intra_predictor.h"
 #include "typedefs.h"
 #include "ls_defines.h"
 using namespace WelsDec;

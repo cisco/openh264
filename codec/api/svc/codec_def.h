@@ -75,7 +75,6 @@ typedef enum {
   cmUnsupportedData,
 } CM_RETURN;
 
-
 /* nal unit type */
 enum ENalUnitType {
   NAL_UNKNOWN = 0,
