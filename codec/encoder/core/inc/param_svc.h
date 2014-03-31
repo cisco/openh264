@@ -244,7 +244,7 @@ int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam, const bool kbEnab
   iInputCsp		= pCodingParam.iInputCsp;		// color space of input sequence
   fMaxFrameRate		= WELS_CLIP3 (pCodingParam.fMaxFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
   iTargetBitrate	= pCodingParam.iTargetBitrate;
-
+  iUsageType = pCodingParam.iUsageType;
   iPicWidth   = pCodingParam.iPicWidth;
   iPicHeight  = pCodingParam.iPicHeight;
 
@@ -306,7 +306,7 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   iInputCsp		= pCodingParam.iInputCsp;		// color space of input sequence
   uiFrameToBeCoded	= (uint32_t) -
                       1;		// frame to be encoded (at input frame rate), -1 dependents on length of input sequence
-
+  iUsageType = pCodingParam.iUsageType;
   iPicWidth   = pCodingParam.iPicWidth;
   iPicHeight  = pCodingParam.iPicHeight;
 

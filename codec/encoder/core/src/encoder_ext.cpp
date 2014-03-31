@@ -81,6 +81,10 @@ int32_t ParamValidation (SWelsSvcCodingParam* pCfg) {
 
   assert (pCfg != NULL);
 
+  if((pCfg->iUsageType != CAMERA_VIDEO_REAL_TIME)&&(pCfg->iUsageType != SCREEN_CONTENT_REAL_TIME)){
+    WelsLog (NULL, WELS_LOG_ERROR, "ParamValidation(),Invalid usage type = %d",pCfg->iUsageType);
+    return ENC_RETURN_UNSUPPORTED_PARA;
+  }
   for (i = 0; i < pCfg->iSpatialLayerNum; ++ i) {
     SDLayerParam* fDlp = &pCfg->sDependencyLayers[i];
     if (fDlp->fOutputFrameRate > fDlp->fInputFrameRate || (fDlp->fInputFrameRate >= -fEpsn
@@ -125,6 +129,10 @@ int32_t ParamValidationExt (sWelsEncCtx*pCtx,SWelsSvcCodingParam* pCodingParam) 
   if (NULL == pCodingParam)
     return ENC_RETURN_INVALIDINPUT;
 
+  if((pCodingParam->iUsageType != CAMERA_VIDEO_REAL_TIME)&&(pCodingParam->iUsageType != SCREEN_CONTENT_REAL_TIME)){
+    WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(),Invalid usage type = %d",pCodingParam->iUsageType);
+    return ENC_RETURN_UNSUPPORTED_PARA;
+  }
   if (pCodingParam->iSpatialLayerNum < 1 || pCodingParam->iSpatialLayerNum > MAX_DEPENDENCY_LAYER) {
     WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), monitor invalid pCodingParam->iSpatialLayerNum: %d!\n",
              pCodingParam->iSpatialLayerNum);
