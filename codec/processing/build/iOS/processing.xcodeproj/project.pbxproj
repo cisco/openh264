@@ -31,9 +31,9 @@
 		4CE4479918BC62960017DF25 /* imagerotate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4477F18BC62960017DF25 /* imagerotate.cpp */; };
 		4CE4479A18BC62960017DF25 /* imagerotatefuncs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4478118BC62960017DF25 /* imagerotatefuncs.cpp */; };
 		4CE4479B18BC62960017DF25 /* SceneChangeDetection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4478318BC62960017DF25 /* SceneChangeDetection.cpp */; };
-		4CE4479C18BC62960017DF25 /* SceneChangeDetectionCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4478518BC62960017DF25 /* SceneChangeDetectionCommon.cpp */; };
 		4CE4479D18BC62960017DF25 /* vaacalcfuncs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4478818BC62960017DF25 /* vaacalcfuncs.cpp */; };
 		4CE4479E18BC62960017DF25 /* vaacalculation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4478918BC62960017DF25 /* vaacalculation.cpp */; };
+		FAABAA1B18E93DCB00D4186F /* common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAABAA1918E93DCB00D4186F /* common.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,11 +97,11 @@
 		4CE4478118BC62960017DF25 /* imagerotatefuncs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imagerotatefuncs.cpp; sourceTree = "<group>"; };
 		4CE4478318BC62960017DF25 /* SceneChangeDetection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SceneChangeDetection.cpp; sourceTree = "<group>"; };
 		4CE4478418BC62960017DF25 /* SceneChangeDetection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneChangeDetection.h; sourceTree = "<group>"; };
-		4CE4478518BC62960017DF25 /* SceneChangeDetectionCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SceneChangeDetectionCommon.cpp; sourceTree = "<group>"; };
-		4CE4478618BC62960017DF25 /* SceneChangeDetectionCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneChangeDetectionCommon.h; sourceTree = "<group>"; };
 		4CE4478818BC62960017DF25 /* vaacalcfuncs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vaacalcfuncs.cpp; sourceTree = "<group>"; };
 		4CE4478918BC62960017DF25 /* vaacalculation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vaacalculation.cpp; sourceTree = "<group>"; };
 		4CE4478A18BC62960017DF25 /* vaacalculation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vaacalculation.h; sourceTree = "<group>"; };
+		FAABAA1918E93DCB00D4186F /* common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = common.cpp; sourceTree = "<group>"; };
+		FAABAA1A18E93DCB00D4186F /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -234,6 +234,8 @@
 		4CE4476618BC62960017DF25 /* common */ = {
 			isa = PBXGroup;
 			children = (
+				FAABAA1918E93DCB00D4186F /* common.cpp */,
+				FAABAA1A18E93DCB00D4186F /* common.h */,
 				4CE4476718BC62960017DF25 /* memory.cpp */,
 				4CE4476818BC62960017DF25 /* memory.h */,
 				4CE4476918BC62960017DF25 /* resource.h */,
@@ -290,8 +292,6 @@
 			children = (
 				4CE4478318BC62960017DF25 /* SceneChangeDetection.cpp */,
 				4CE4478418BC62960017DF25 /* SceneChangeDetection.h */,
-				4CE4478518BC62960017DF25 /* SceneChangeDetectionCommon.cpp */,
-				4CE4478618BC62960017DF25 /* SceneChangeDetectionCommon.h */,
 			);
 			path = scenechangedetection;
 			sourceTree = "<group>";
@@ -391,6 +391,7 @@
 				4C34067818C5A4AD00DFA14A /* adaptive_quantization.S in Sources */,
 				4CE4479718BC62960017DF25 /* downsample.cpp in Sources */,
 				4CE4478B18BC62960017DF25 /* AdaptiveQuantization.cpp in Sources */,
+				FAABAA1B18E93DCB00D4186F /* common.cpp in Sources */,
 				4CE4479918BC62960017DF25 /* imagerotate.cpp in Sources */,
 				4CE4479318BC62960017DF25 /* WelsFrameWorkEx.cpp in Sources */,
 				4CE4479018BC62960017DF25 /* memory.cpp in Sources */,
@@ -401,7 +402,6 @@
 				4CE4479B18BC62960017DF25 /* SceneChangeDetection.cpp in Sources */,
 				4CE4479D18BC62960017DF25 /* vaacalcfuncs.cpp in Sources */,
 				4CE4479818BC62960017DF25 /* downsamplefuncs.cpp in Sources */,
-				4CE4479C18BC62960017DF25 /* SceneChangeDetectionCommon.cpp in Sources */,
 				4CE4479418BC62960017DF25 /* ComplexityAnalysis.cpp in Sources */,
 				4CE4479E18BC62960017DF25 /* vaacalculation.cpp in Sources */,
 				4C34067A18C5A4AD00DFA14A /* pixel_sad_neon.S in Sources */,
