@@ -87,7 +87,7 @@
 //#define BASE_DEPENDENCY_ID		0
 #define BASE_DQ_ID				0
 #define MAX_DQ_ID				((uint8_t)-1)
-//#define MAX_LAYER_NUM			(MAX_DEPENDENCY_LAYER * MAX_TEMPORAL_LEVEL * MAX_QUALITY_LEVEL)	// Layer number of Three-tuple
+#define MAX_LAYER_NUM   8
 
 #define LAYER_NUM_EXCHANGEABLE	1
 
