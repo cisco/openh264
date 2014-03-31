@@ -198,7 +198,10 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
     if (iRd > 0) {
       if (strTag[0].empty())
         continue;
-	  if (strTag[0].compare ("SourceWidth") == 0) {
+
+      if(strTag[0].compare ("UsageType") == 0){
+        pSvcParam.iUsageType = (EUsageType)atoi (strTag[1].c_str());
+      }else if (strTag[0].compare ("SourceWidth") == 0) {
         pSrcPic->iPicWidth = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("SourceHeight") == 0) {
         pSrcPic->iPicHeight = atoi (strTag[1].c_str());
@@ -419,6 +422,9 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
 
     if (!strcmp (pCommand, "-bf") && (n < argc))
       sFileSet.strBsFile.assign (argv[n++]);
+    else if (!strcmp (pCommand, "utype") && (n < argc))
+      pSvcParam.iUsageType = (EUsageType)atoi (argv[n++]);
+
     else if (!strcmp (pCommand, "-org") && (n < argc))
       sFileSet.strSeqFile.assign (argv[n++]);
 
@@ -576,6 +582,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
 
 int FillSpecificParameters (SEncParamExt& sParam) {
   /* Test for temporal, spatial, SNR scalability */
+  sParam.iUsageType = CAMERA_VIDEO_REAL_TIME;
   sParam.fMaxFrameRate	= 30.0f;		// input frame rate
   sParam.iPicWidth		= 1280;			// width of picture in samples
   sParam.iPicHeight	= 720;			// height of picture in samples
