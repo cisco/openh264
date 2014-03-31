@@ -89,7 +89,9 @@ typedef struct TagLTRState {
   int32_t						iLTRMarkMode; // direct mark or delay mark
   int32_t						iLTRMarkSuccessNum; //successful marked num, for mark mode switch
   int32_t						iCurLtrIdx;// current int32_t term reference index to mark
-  int32_t						iLastLtrIdx;
+  int32_t						iLastLtrIdx[MAX_TEMPORAL_LAYER_NUM];
+  int32_t						iSceneLtrIdx;// related to Scene LTR, used by screen content
+
   uint32_t					uiLtrMarkInterval;// the interval from the last int32_t term pRef mark
 
   bool						bLTRMarkingFlag;	//decide whether current frame marked as LTR
@@ -148,7 +150,7 @@ typedef struct TagWelsEncCtx {
   SRefList**					ppRefPicListExt;		// reference picture list for SVC
   SPicture*					pRefList0[16];
   SLTRState*					pLtr;//[MAX_DEPENDENCY_LAYER];
-
+  bool                          bCurFrameMarkedAsSceneLtr;
   // Derived
   int32_t						iCodingIndex;
   int32_t						iFrameIndex;			// count how many frames elapsed during coding context currently

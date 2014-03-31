@@ -2138,7 +2138,7 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
 /*!
  * \brief	get temporal level due to configuration and coding context
  */
-static inline int32_t GetTemporalLevel (SDLayerParam* fDlp, const int32_t kiFrameNum, const int32_t kiGopSize) {
+int32_t GetTemporalLevel (SDLayerParam* fDlp, const int32_t kiFrameNum, const int32_t kiGopSize) {
   const int32_t kiCodingIdx	= kiFrameNum & (kiGopSize - 1);
 
   return fDlp->uiCodingIdx2TemporalId[kiCodingIdx];
