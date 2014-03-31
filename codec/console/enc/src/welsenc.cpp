@@ -422,7 +422,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
 
     if (!strcmp (pCommand, "-bf") && (n < argc))
       sFileSet.strBsFile.assign (argv[n++]);
-    else if (!strcmp (pCommand, "utype") && (n < argc))
+    else if (!strcmp (pCommand, "-utype") && (n < argc))
       pSvcParam.iUsageType = (EUsageType)atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-org") && (n < argc))
