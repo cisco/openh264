@@ -47,7 +47,7 @@ namespace WelsDec {
 #define MAX_LEVEL_PREFIX 15
 void GetNeighborAvailMbType (PNeighAvail pNeighAvail, PDqLayer pCurLayer) {
   int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
-  int32_t iCurXy, iTopXy, iLeftXy, iLeftTopXy, iRightTopXy;
+  int32_t iCurXy, iTopXy = 0, iLeftXy = 0, iLeftTopXy = 0, iRightTopXy = 0;
   int32_t iCurX, iCurY;
 
   iCurXy = pCurLayer->iMbXyIndex;
