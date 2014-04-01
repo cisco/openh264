@@ -6,8 +6,7 @@
 
 using namespace WelsSVCEnc;
 
-TEST(ExpandPicTest, TestExpand_picture_luma_c)
-{
+TEST(ExpandPicTest, TestExpand_picture_luma_c) {
   SWelsFuncPtrList sFuncList;
   InitExpandPictureFunc( &sFuncList, 0 );
 
@@ -78,8 +77,7 @@ TEST(ExpandPicTest, TestExpand_picture_luma_c)
   delete []pRef;
 }
 
-TEST(ExpandPicTest, TestExpand_picture_chroma_c)
-{
+TEST(ExpandPicTest, TestExpand_picture_chroma_c) {
   SWelsFuncPtrList sFuncList;
   InitExpandPictureFunc( &sFuncList, 0 );
 

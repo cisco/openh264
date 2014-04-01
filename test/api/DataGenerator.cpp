@@ -44,9 +44,10 @@ bool YUVPixelDataGenerator( uint8_t* pPointer, int32_t iWidth, int32_t iHeight, 
   return false;
 }
 
-void RandomPixelDataGenerator( uint8_t* pPointer, int32_t iWidth, int32_t iHeight, int32_t iStride )
+void RandomPixelDataGenerator( uint8_t* pPointer, int32_t iWidth, int32_t iHeight, int32_t iStride, int32_t iIdx )
 {
   uint8_t* pLocalPointer = pPointer;
+	srand((uint32_t)(time(NULL)+iIdx));
   for (int32_t j=0;j<iHeight;j++) {
     for (int32_t i=0;i<iWidth;i++) {
       pLocalPointer[i] = rand()%256;

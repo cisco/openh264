@@ -5,7 +5,7 @@
 
 bool YUVPixelDataGenerator( uint8_t* pPointer, int32_t iWidth, int32_t iHeight, int32_t iStride );
 
-void RandomPixelDataGenerator( uint8_t* pPointer, int32_t iWidth, int32_t iHeight, int32_t iStride );
+void RandomPixelDataGenerator( uint8_t* pPointer, int32_t iWidth, int32_t iHeight, int32_t iStride, int32_t iIdx );
 
 void RandomResidueDataGenerator( uint16_t* pPointer, int32_t iWidth, int32_t iHeight, int32_t iStride );
 
