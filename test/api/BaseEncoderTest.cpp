@@ -31,6 +31,9 @@ static int InitWithParam(ISVCEncoder* encoder, int width,
     param.iLoopFilterDisableIdc = deblock;
     param.iSpatialLayerNum = layers;
 
+    if (sliceMode != SM_SINGLE_SLICE)
+      param.iMultipleThreadIdc = 2;
+
     for (int i = 0; i < param.iSpatialLayerNum; i++) {
       param.sSpatialLayers[i].iVideoWidth = width >> (param.iSpatialLayerNum - 1 - i);
       param.sSpatialLayers[i].iVideoHeight = height >> (param.iSpatialLayerNum - 1 - i);
