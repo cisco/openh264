@@ -150,12 +150,7 @@ static void FillDefault (SEncParamExt& param, const bool kbEnableRc) {
 
   param.iTargetBitrate			= 0;	// overall target bitrate introduced in RC module
   param.iMaxBitrate             = MAX_BIT_RATE;
-#ifdef MT_ENABLED
-  param.iMultipleThreadIdc		= 0;	// auto to detect cpu cores inside
-#else
-  param.iMultipleThreadIdc		=
-    1;	// 1 # 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads;
-#endif//MT_ENABLED
+  param.iMultipleThreadIdc		= 1;
 
   param.iLTRRefNum				= 0;
   param.iLtrMarkPeriod			= 30;	//the min distance of two int32_t references
@@ -317,10 +312,8 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
 
   /* Deblocking loop filter */
   iLoopFilterDisableIdc	= pCodingParam.iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries,
-#ifdef MT_ENABLED
   if (iLoopFilterDisableIdc == 0) // Loop filter requested to be enabled
-    iLoopFilterDisableIdc = 2; // Disable loop filter on slice boundaries since that's not possible with multithreading
-#endif
+    iLoopFilterDisableIdc = 2; // Disable loop filter on slice boundaries since that's not allowed with multithreading
   iLoopFilterAlphaC0Offset = 0;	// AlphaOffset: valid range [-6, 6], default 0
   iLoopFilterBetaOffset	= 0;	// BetaOffset:	valid range [-6, 6], default 0
 

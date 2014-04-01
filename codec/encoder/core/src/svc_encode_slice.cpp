@@ -823,11 +823,6 @@ void AddSliceBoundary (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, SSliceCtx* pSlic
 
   pSliceCtx->pFirstMbInSlice[iNextSliceIdc] = iFirstMbIdxOfNextSlice;
 
-#if !defined(MT_ENABLED)
-  pNextSlice->uiSliceIdx = iNextSliceIdc;
-  pNextSlice->pSliceBsa = & (pEncCtx->pOut->sBsWrite);
-#endif//!MT_ENABLED
-
   memset (pSliceCtx->pOverallMbMap + iFirstMbIdxOfNextSlice, (uint8_t)iNextSliceIdc,
           (kiLastMbIdxInPartition - iFirstMbIdxOfNextSlice + 1)*sizeof (uint8_t));
 
@@ -863,10 +858,8 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
 #endif
   uiLen = ((iPosBitOffset >> 3) + ((iPosBitOffset & 0x07) ? 1 : 0));
 
-#ifdef MT_ENABLED
   if (pEncCtx->pSvcParam->iMultipleThreadIdc > 1)
     WelsMutexLock (&pEncCtx->pSliceThreading->mutexSliceNumUpdate);
-#endif//MT_ENABLED
 
   //DYNAMIC_SLICING_ONE_THREAD: judge jump_avoiding_pack_exceed
   if (
@@ -874,9 +867,7 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
       && JUMPPACKETSIZE_JUDGE (uiLen, iCurMbIdx, pSliceCtx->uiSliceSizeConstraint)) /*jump_avoiding_pack_exceed*/
      && kbCurMbNotLastMbOfCurPartition) //decide to add new pSlice
     && (kbSliceNumNotExceedConstraint
-#ifdef MT_ENABLED
         && ((pCurSlice->uiSliceIdx + kiActiveThreadsNum) < pSliceCtx->iMaxSliceNumConstraint)
-#endif//MT_ENABLED
        )//able to add new pSlice
 
   ) {
@@ -885,19 +876,15 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
 
     ++ pSliceCtx->iSliceNumInFrame;
 
-#ifdef MT_ENABLED
     if (pEncCtx->pSvcParam->iMultipleThreadIdc > 1)
       WelsMutexUnlock (&pEncCtx->pSliceThreading->mutexSliceNumUpdate);
-#endif//MT_ENABLED
 
     return true;
   }
 
   if (
     (kbSliceNumReachConstraint
-#ifdef MT_ENABLED
      || ((pCurSlice->uiSliceIdx + kiActiveThreadsNum) >= pSliceCtx->iMaxSliceNumConstraint)
-#endif//MT_ENABLED
     )
     && ((JUMPPACKETSIZE_JUDGE (uiLen,	iCurMbIdx,
                                pSliceCtx->uiSliceSizeConstraint - ((kiLastMbIdxInPartition - iCurMbIdx) <<
@@ -907,10 +894,8 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
     pCurSlice->bDynamicSlicingSliceSizeCtrlFlag = true;
   }
 
-#ifdef MT_ENABLED
   if (pEncCtx->pSvcParam->iMultipleThreadIdc > 1)
     WelsMutexUnlock (&pEncCtx->pSliceThreading->mutexSliceNumUpdate);
-#endif//MT_ENABLED
 
   return false;
 }
