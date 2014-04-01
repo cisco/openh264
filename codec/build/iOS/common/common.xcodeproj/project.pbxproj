@@ -415,11 +415,9 @@
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = (
 					APPLE_IOS,
 					HAVE_NEON,
-					MT_ENABLED,
 				);
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = (
 					APPLE_IOS,
-					MT_ENABLED,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				ONLY_ACTIVE_ARCH = NO;
@@ -441,11 +439,9 @@
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = (
 					APPLE_IOS,
 					HAVE_NEON,
-					MT_ENABLED,
 				);
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = (
 					APPLE_IOS,
-					MT_ENABLED,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";
