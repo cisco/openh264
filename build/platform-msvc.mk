@@ -1,6 +1,5 @@
 include build/platform-x86-common.mk
 include build/platform-msvc-common.mk
-CFLAGS += -DMT_ENABLED
 LDFLAGS += user32.lib
 ifeq ($(ENABLE64BIT), Yes)
 ASMFLAGS += -f win64

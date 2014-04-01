@@ -54,10 +54,8 @@
 #include "wels_func_ptr_def.h"
 #include "crt_util_safe_x.h"
 
-#ifdef MT_ENABLED
 #include "mt_defs.h"	// for multiple threadin,
 #include "WelsThreadLib.h"
-#endif//MT_ENALBED
 
 namespace WelsSVCEnc {
 
@@ -132,9 +130,7 @@ typedef struct TagWelsEncCtx {
   SStrideTables*				pStrideTab;	// stride tables for internal coding used
   SWelsFuncPtrList*			pFuncList;
 
-#if defined(MT_ENABLED)
   SSliceThreading*				pSliceThreading;
-#endif//MT_ENABLED
 
   // SSlice context
   SSliceCtx*				pSliceCtxList;// slice context table for each dependency quality layer
@@ -223,9 +219,7 @@ typedef struct TagWelsEncCtx {
 #endif//STAT_OUTPUT
 
   int32_t iEncoderError;
-#ifdef MT_ENABLED
   WELS_MUTEX					mutexEncoderError;
-#endif
 
 } sWelsEncCtx/*, *PWelsEncCtx*/;
 }

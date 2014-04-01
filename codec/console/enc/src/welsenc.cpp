@@ -68,10 +68,8 @@
 #include "wels_const.h"
 #include "logging.h"
 
-#ifdef MT_ENABLED
 #include "mt_defs.h"
 #include "WelsThreadLib.h"
-#endif//MT_ENABLED
 
 #ifdef WIN32
 #ifdef WINAPI_FAMILY
@@ -607,38 +605,30 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 90;
   sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 7.5f;
   sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 64000;
-#ifdef MT_ENABLED
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
-#endif
 
   ++ iIndexLayer;
   sParam.sSpatialLayers[iIndexLayer].iVideoWidth	= 320;
   sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 180;
   sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 15.0f;
   sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 160000;
-#ifdef MT_ENABLED
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
-#endif
 
   ++ iIndexLayer;
   sParam.sSpatialLayers[iIndexLayer].iVideoWidth	= 640;
   sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 360;
   sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 30.0f;
   sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 512000;
-#ifdef MT_ENABLED
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.sSliceArgument.uiSliceNum = 1;
-#endif
 
   ++ iIndexLayer;
   sParam.sSpatialLayers[iIndexLayer].iVideoWidth	= 1280;
   sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 720;
   sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 30.0f;
   sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 1500000;
-#ifdef MT_ENABLED
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.sSliceArgument.uiSliceNum = 1;
-#endif
 
   float fMaxFr = sParam.sSpatialLayers[sParam.iSpatialLayerNum - 1].fFrameRate;
   for (int32_t i = sParam.iSpatialLayerNum - 2; i >= 0; -- i) {

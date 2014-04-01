@@ -38,7 +38,6 @@
  *************************************************************************************
  */
 
-#if defined(MT_ENABLED)
 
 #include <assert.h>
 #if !defined(_WIN32)
@@ -144,7 +143,6 @@ void CalcSliceComplexRatio (void* pRatio, SSliceCtx* pSliceCtx, uint32_t* pSlice
   }
 }
 
-#if defined(MT_ENABLED)
 int32_t NeedDynamicAdjust (void* pConsumeTime, const int32_t iSliceNum) {
   uint32_t* pSliceConsume	= (uint32_t*)pConsumeTime;
   uint32_t uiTotalConsume	= 0;
@@ -190,7 +188,6 @@ int32_t NeedDynamicAdjust (void* pConsumeTime, const int32_t iSliceNum) {
 
   return iNeedAdj;
 }
-#endif
 
 void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
                            SDqLayer* pCurDqLayer,
@@ -1029,7 +1026,6 @@ int32_t DynamicDetectCpuCores() {
   return info.ProcessorCount;
 }
 
-#if defined(MT_ENABLED)
 int32_t AdjustBaseLayer (sWelsEncCtx* pCtx) {
   SDqLayer* pCurDq	= pCtx->ppDqLayerList[0];
   int32_t iNeedAdj	= 1;
@@ -1105,9 +1101,7 @@ int32_t AdjustEnhanceLayer (sWelsEncCtx* pCtx, int32_t iCurDid) {
   return iNeedAdj;
 }
 
-#endif//#if defined(MT_ENABLED)
 
-#if defined(MT_ENABLED)
 
 #if defined(MT_DEBUG)
 void TrackSliceComplexities (sWelsEncCtx* pCtx, const int32_t iCurDid) {
@@ -1166,7 +1160,5 @@ void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t 
 }
 #endif//#if defined(MT_DEBUG)
 
-#endif//MT_ENABLED
 }
-#endif//MT_ENABLED
 
