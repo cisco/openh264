@@ -145,7 +145,7 @@ void AssignMvInputData (SAnchorMvPred* pAncMvPred) {
   }
 }
 
-void CopyMvInputData (SAnchorMvPred* pDstMvPred, SWelsMvPred* pSrcMvPred) {
+void CopyMvInputData (SWelsMvPred* pDstMvPred, SAnchorMvPred* pSrcMvPred) {
   int32_t i, j, k;
   //fill MV data and refIdx
   for (i = 0; i < 2; ++i) {
@@ -160,7 +160,7 @@ void CopyMvInputData (SAnchorMvPred* pDstMvPred, SWelsMvPred* pSrcMvPred) {
 
 #define INIT_MV_DATA \
   AssignMvInputData (&sAncMvPred); \
-  CopyMvInputData (&sAncMvPred, &sWelsMvPred);
+  CopyMvInputData (&sWelsMvPred, &sAncMvPred);
 
 #define TEST_MV_PRED \
   AnchorPredMv (sAncMvPred.iMvArray,  sAncMvPred.iRefIdxArray, iIndex, iBlockWidth, iRef,  sAncMvPred.iMvp); \
