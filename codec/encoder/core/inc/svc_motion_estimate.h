@@ -54,6 +54,18 @@ namespace WelsSVCEnc {
 #define EXPANDED_MV_RANGE (504) //=512-8 rather than 511 to sacrifice same edge point but save complexity in assemblys
 #define EXPANDED_MVD_RANGE ((504+1)<<1)
 
+enum
+{
+  ME_DIA		= 0x01,	// LITTLE DIAMOND= 0x01
+  ME_CROSS	= 0x02,	// CROSS=  0x02
+  ME_FME		= 0x04,	// FME = 0x04
+  ME_FULL		= 0x10,	// FULL
+
+  // derived ME methods combination
+  ME_DIA_CROSS		=	(ME_DIA|ME_CROSS),		// DIA+CROSS
+  ME_DIA_CROSS_FME	=	(ME_DIA_CROSS|ME_FME),	// DIA+CROSS+FME
+};
+
 union SadPredISatdUnit {
 uint32_t	uiSadPred;
 uint32_t	uiSatd;    //reuse the sad_pred as a temp satd pData
