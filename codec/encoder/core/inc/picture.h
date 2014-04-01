@@ -42,25 +42,26 @@ namespace WelsSVCEnc {
 #define LIST_SIZE			0x10000		//(256*256)
 typedef struct TagScreenBlockFeatureStorage
 {
-	uint16_t*	pFeatureOfBlock;		// Feature of every block (8x8), begin with the point
 	uint32_t*	pTimesOfFeatureValue;		// times of every value in Feature
 	uint16_t**	pLocationOfFeature;			// uint16_t *pLocationOfFeature[LIST_SIZE], pLocationOfFeature[i] saves all the location(x,y) whose Feature = i;
 	uint16_t*	pLocationPointer;	// buffer of position array
-	int32_t		iActualListSize;			// actual list size (8x8 based)
-} SScreenBlockFeatureStorage;
+  int32_t		iActualListSize;			// actual list size
 
-typedef struct TagScreenContentStorage{
-  SScreenBlockFeatureStorage	sRefBlockFeature[MAX_MULTI_REF_PIC_COUNT];
-  uint32_t                    uiSadCostThreshold[BLOCK_SIZE_ALL];
+  uint32_t uiSadCostThreshold[BLOCK_SIZE_ALL];
+  bool						bRefBlockFeatureCalculated; // flag of whether pre-process is done
+} SScreenBlockFeatureStorage; //should be stored with RefPic, one for each frame
 
-	bool					bRefBlockFeatureCalculated; // flag of whether pre-process is done
-	uint8_t				uiFeatureStrategyIndex;// index of hash strategy
+typedef struct TagFeatureSearchPreparation{
+  SScreenBlockFeatureStorage*	pRefBlockFeature;//point the the ref frame storage
+
+  uint16_t*	pFeatureOfBlock;		// Feature of every block (8x8), begin with the point
+	uint8_t      uiFeatureStrategyIndex;// index of hash strategy
 
 	/* for FME frame-level switch */
-	bool    bFMESwitchFlag;
+	bool bFMESwitchFlag;
 	uint8_t uiFMEGoodFrameCount;
 	int32_t iHighFreMbCount;
-}SScreenContentStorage;
+}SFeatureSearchPreparation;//maintain only one
 
 
 /*
