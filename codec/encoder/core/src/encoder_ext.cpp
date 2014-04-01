@@ -90,19 +90,15 @@ int32_t ParamValidation (SWelsSvcCodingParam* pCfg) {
     if (fDlp->fOutputFrameRate > fDlp->fInputFrameRate || (fDlp->fInputFrameRate >= -fEpsn
         && fDlp->fInputFrameRate <= fEpsn)
         || (fDlp->fOutputFrameRate >= -fEpsn && fDlp->fOutputFrameRate <= fEpsn)) {
-#if defined (_DEBUG)
-      fprintf (stderr, "Invalid settings in input frame rate(%.6f) or output frame rate(%.6f) of layer #%d config file..\n",
+      WelsLog (NULL, WELS_LOG_ERROR,"Invalid settings in input frame rate(%.6f) or output frame rate(%.6f) of layer #%d config file..\n",
                fDlp->fInputFrameRate, fDlp->fOutputFrameRate, i);
-#endif
-      return 1;
+      return ENC_RETURN_INVALIDINPUT;
     }
     if (UINT_MAX == GetLogFactor (fDlp->fOutputFrameRate, fDlp->fInputFrameRate)) {
-#if defined (_DEBUG)
-      fprintf (stderr,
+      WelsLog (NULL,WELS_LOG_ERROR,
                "Invalid settings in input frame rate(%.6f) and output frame rate(%.6f) of layer #%d config file: iResult of output frame rate divided by input frame rate should be power of 2(i.e,in/pOut=2^n)..\n",
                fDlp->fInputFrameRate, fDlp->fOutputFrameRate, i);
-#endif
-      return 1;
+      return ENC_RETURN_INVALIDINPUT;
     }
   }
 
@@ -117,7 +113,7 @@ int32_t ParamValidation (SWelsSvcCodingParam* pCfg) {
     pCfg->fMaxFrameRate	= fMaxFrameRate;
   }
 
-  return 0;
+  return ENC_RETURN_SUCCESS;
 }
 
 
