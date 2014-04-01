@@ -37,15 +37,6 @@
 #include "wels_func_ptr_def.h"
 
 namespace WelsSVCEnc {
-enum {
-  BLOCK_16x16 = 0,
-  BLOCK_16x8  = 1,
-  BLOCK_8x16  = 2,
-  BLOCK_8x8   = 3,
-  BLOCK_4x4   = 4,
-//    BLOCK_8x4   = 5,
-//    BLOCK_4x8   = 6,
-};
 
 //======================SATD======================//
 int32_t WelsSampleSatd16x16_c (uint8_t*, int32_t, uint8_t*, int32_t);
