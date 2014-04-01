@@ -235,6 +235,8 @@ typedef struct TagWelsDecoderContext {
   SNalUnit            sPrefixNal;
 
   PAccessUnit			pAccessUnitList;	// current access unit list to be performed
+  PSps        pActiveLayerSps[MAX_LAYER_NUM];
+  PPps        pActiveLayerPps[MAX_LAYER_NUM];
   PSps				pSps;	// used by current AU
   PPps				pPps;	// used by current AU
   // Memory for pAccessUnitList is dynamically held till decoder destruction.

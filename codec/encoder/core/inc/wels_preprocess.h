@@ -62,8 +62,18 @@ typedef  struct {
 
 
 typedef struct {
-  int32_t    iBestRefSrcListIdx;   //idx in  h->spatial_pic[base_did];
-  bool       bSceneLtrFlag;
+	int32_t iMinFrameComplexity;
+  int32_t iMinFrameComplexity08;
+  int32_t iMinFrameComplexity11;
+
+  int32_t iMinFrameNumGap;
+  int32_t iMinFrameQp;
+}SRefJudgement;
+
+typedef struct {
+  SPicture   *pRefPicture;
+  int32_t     iSrcListIdx;   //idx in  h->spatial_pic[base_did];
+  bool        bSceneLtrFlag;
 }SRefInfoParam;
 
 typedef struct {
@@ -100,8 +110,8 @@ typedef struct SVAAFrameInfoExt_t: public SVAAFrameInfo
   SRefInfoParam    sVaaStrBestRefCandidate[MAX_REF_PIC_COUNT];
   int32_t    iNumOfAvailableRef;
 
-  int32_t    *pVaaBestBlockStaticIdc;//pointer
-  int32_t    *pVaaBlockStaticIdc[16];//real memory,
+  uint8_t    *pVaaBestBlockStaticIdc;//pointer
+  uint8_t    *pVaaBlockStaticIdc[16];//real memory,
 }SVAAFrameInfoExt;
 
 class CWelsLib {
@@ -162,7 +172,16 @@ class CWelsPreProcess {
                               const int32_t kiWidth, const int32_t kiHeight);
 
   ESceneChangeIdc DetectSceneChangeScreen(sWelsEncCtx* pCtx,SPicture* pCurPicture);
- private:
+  void InitPixMap( const SPicture *pPicture, SPixMap *pPixMap );
+  void GetAvailableRefList(SPicture ** pSrcPicList,uint8_t iCurTid, const int32_t iClosestLtrFrameNum,
+                           SRefInfoParam* pAvailableRefList, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum);
+  void InitRefJudgement( SRefJudgement *pRefJudgement );
+  bool JudgeBestRef(SPicture* pRefPic,const SRefJudgement& sRefJudgement, const int32_t iFrameComplexity, const bool bIsClosestLtrFrame);
+  void SaveBestRefToJudgement(const int32_t iRefPictureAvQP, const int32_t iComplexity, SRefJudgement* pRefJudgement);
+  void SaveBestRefToLocal(SRefInfoParam *pRefPicInfo,const SSceneChangeResult& sSceneChangeResult, SRefInfoParam* pRefSaved);
+  void SaveBestRefToVaa(SRefInfoParam& sRefSaved,SRefInfoParam* pVaaBestRef);
+
+private:
   Scaled_Picture   m_sScaledPicture;
   SPicture*	   m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];
   IWelsVP*         m_pInterfaceVp;

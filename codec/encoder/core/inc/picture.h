@@ -51,11 +51,13 @@ typedef struct TagScreenBlockFeatureStorage
 
 typedef struct TagScreenContentStorage{
   SScreenBlockFeatureStorage	sRefBlockFeature[MAX_MULTI_REF_PIC_COUNT];
-	bool						bRefBlockFeatureCalculated; // flag of whether pre-process is done
+  uint32_t                    uiSadCostThreshold[BLOCK_SIZE_ALL];
+
+	bool					bRefBlockFeatureCalculated; // flag of whether pre-process is done
 	uint8_t				uiFeatureStrategyIndex;// index of hash strategy
 
 	/* for FME frame-level switch */
-	bool bFMESwitchFlag;
+	bool    bFMESwitchFlag;
 	uint8_t uiFMEGoodFrameCount;
 	int32_t iHighFreMbCount;
 }SScreenContentStorage;
@@ -95,9 +97,11 @@ typedef struct TagPicture {
 
   bool		bUsedAsRef;						//for pRef pic management
   bool		bIsLongRef;	// long term reference frame flag	//for pRef pic management
+  bool    bIsSceneLTR;  //long term reference & large scene change
   uint8_t		uiRecieveConfirmed;
   uint8_t		uiTemporalId;
   uint8_t		uiSpatialId;
+  int32_t   iFrameAverageQp;
 } SPicture;
 
 /*
@@ -114,3 +118,4 @@ typedef struct TagPicture {
 }	// end of namespace WelsSVCEnc {
 
 #endif//WELS_PICTURE_H__
+

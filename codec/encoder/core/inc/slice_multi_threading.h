@@ -40,7 +40,6 @@
 #ifndef SVC_SLICE_MULTIPLE_THREADING_H__
 #define SVC_SLICE_MULTIPLE_THREADING_H__
 
-#if defined(MT_ENABLED)
 
 #include "typedefs.h"
 #include "codec_app_def.h"
@@ -58,9 +57,7 @@ void UpdateMbListNeighborParallel (SSliceCtx* pSliceCtx,
 
 void CalcSliceComplexRatio (void* pRatio, SSliceCtx* pSliceCtx, uint32_t* pSliceConsume);
 
-#if defined(MT_ENABLED)
 int32_t NeedDynamicAdjust (void* pConsumeTime, const int32_t kiSliceNum);
-#endif
 
 void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
                            SDqLayer* pCurDqLayer,
@@ -88,14 +85,11 @@ int32_t FiredSliceThreads (SSliceThreadPrivateData* pPriData, WELS_EVENT* pEvent
 
 int32_t DynamicDetectCpuCores();
 
-#if defined(MT_ENABLED)
 
 int32_t AdjustBaseLayer (sWelsEncCtx* pCtx);
 int32_t AdjustEnhanceLayer (sWelsEncCtx* pCtx, int32_t iCurDid);
 
-#endif//MT_ENABLED
 
-#if defined(MT_ENABLED)
 
 #if defined(MT_DEBUG)
 void TrackSliceComplexities (sWelsEncCtx* pCtx, const int32_t kiCurDid);
@@ -104,9 +98,7 @@ void TrackSliceComplexities (sWelsEncCtx* pCtx, const int32_t kiCurDid);
 void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t kiSpatialNum);
 #endif//defined(MT_DEBUG)
 
-#endif//MT_ENABLED
 }
-#endif//MT_ENABLED
 
 #endif//SVC_SLICE_MULTIPLE_THREADING_H__
 

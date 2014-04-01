@@ -116,9 +116,6 @@ WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex) {
 
 #endif /* !_WIN32 */
 
-
-#ifdef MT_ENABLED
-
 #ifdef _WIN32
 
 void WelsSleep (uint32_t dwMilliseconds) {
@@ -468,6 +465,4 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* p
 
 #endif
 
-
-#endif // MT_ENABLED
 

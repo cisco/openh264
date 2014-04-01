@@ -51,28 +51,12 @@
 //#define MT_DEBUG
 //#define ENABLE_TRACE_MT
 
-#ifdef MT_ENABLED
 
 #define DYNAMIC_DETECT_CPU_CORES
 
 //#if defined(WIN32)
 //#define BIND_CPU_CORES_TO_THREADS	// if it is not defined here mean cross cpu cores load balance automatically
 //#endif//WIN32
-
-#else
-
-#endif//MT_ENABLED
-
-#if !defined(MT_ENABLED)
-
-#if defined(MT_DEBUG)
-#undef MT_DEBUG
-#endif//MT_DEBUG
-#if defined(ENABLE_TRACE_MT)
-#undef ENABLE_TRACE_MT
-#endif//ENABLE_TRACE_MT
-
-#endif//!MT_ENABLED
 
 #define THRESHOLD_RMSE_CORE8	0.0320f	// v1.1: 0.0320f; v1.0: 0.02f
 #define THRESHOLD_RMSE_CORE4	0.0215f	// v1.1: 0.0215f; v1.0: 0.03f

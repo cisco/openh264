@@ -39,7 +39,6 @@
  */
 
 #include "cpu_core.h"
-#include "sample.h"
 #include "svc_motion_estimate.h"
 
 namespace WelsSVCEnc {
@@ -183,7 +182,7 @@ void NotCalculateSatdCost( PSampleSadSatdCostFunc pSatd, void * vpMe,
 
 
 /////////////////////////
-// Diamond Search Related
+// Diamond Search Basics
 /////////////////////////
 bool WelsMeSadCostSelect (int32_t* iSadCost, const uint16_t* kpMvdCost, int32_t* pBestCost, const int32_t kiDx,
                             const int32_t kiDy, int32_t* pIx, int32_t* pIy) {
@@ -260,7 +259,7 @@ void WelsMotionEstimateIterativeSearch (SWelsFuncPtrList* pFuncList, SWelsME* pM
 }
 
 /////////////////////////
-// DirectionalMv Related
+// DirectionalMv Basics
 /////////////////////////
 bool CheckDirectionalMv(PSampleSadSatdCostFunc pSad, void * vpMe,
                       const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
@@ -291,7 +290,7 @@ bool CheckDirectionalMvFalse(PSampleSadSatdCostFunc pSad, void * vpMe,
 }
 
 /////////////////////////
-// Cross Search Related
+// Cross Search Basics
 /////////////////////////
 void VerticalFullSearchUsingSSE41( void *pFunc, void *vpMe,
 														uint16_t* pMvdTable, const int32_t kiFixedMvd,
@@ -368,7 +367,7 @@ void WelsMotionCrossSearch(SWelsFuncPtrList *pFuncList,  SDqLayer* pCurLayer, SW
 }
 
 /////////////////////////
-// Feature Search Related
+// Feature Search Basics
 /////////////////////////
 void SetFeatureSearchIn( SWelsFuncPtrList *pFunc,  const SWelsME& sMe,
                         const SSlice *pSlice, SScreenBlockFeatureStorage* pRefFeatureStorage,
@@ -473,23 +472,63 @@ bool FeatureSearchOne( SFeatureSearchIn &sFeatureSearchIn, const int32_t iFeatur
   return (i < iSearchTimesx2);
 }
 
-
-void MotionEstimateFeatureFullSearchScc( SFeatureSearchIn &sFeatureSearchIn,
-                                        const uint32_t kiMaxSearchPoint,
+void MotionEstimateFeatureFullSearch( SFeatureSearchIn &sFeatureSearchIn,
+                                        const uint32_t kuiMaxSearchPoint,
                                         SWelsME* pMe) {
-  SFeatureSearchOut sFeatureSearchOut = {0};
+  SFeatureSearchOut sFeatureSearchOut = {0};//TODO: this can be refactored and removed
   sFeatureSearchOut.uiBestSadCost = pMe->uiSadCost;
   sFeatureSearchOut.sBestMv = pMe->sMv;
   sFeatureSearchOut.pBestRef = pMe->pRefMb;
 
-  FeatureSearchOne( sFeatureSearchIn, 0, kiMaxSearchPoint, &sFeatureSearchOut );
-  if ( sFeatureSearchOut.uiBestSadCost < pMe->uiSadCost ) {
+  int32_t iFeatureDifference = 0;//TODO: change it according to computational-complexity setting when needed
+  FeatureSearchOne( sFeatureSearchIn, iFeatureDifference, kuiMaxSearchPoint, &sFeatureSearchOut );
+  if ( sFeatureSearchOut.uiBestSadCost < pMe->uiSadCost ) {//TODO: this may be refactored and removed
     UpdateMeResults(sFeatureSearchOut.sBestMv,
       sFeatureSearchOut.uiBestSadCost, sFeatureSearchOut.pBestRef,
       pMe);
   }
 }
 
+/////////////////////////
+// Search function option
+/////////////////////////
+void WelsDiamondCrossSearch(SWelsFuncPtrList *pFunc, void* vpLayer, void* vpMe, void* vpSlice) {
+    SDqLayer* pCurLayer = static_cast<SDqLayer *>(vpLayer);
+    SWelsME* pMe			 = static_cast<SWelsME *>(vpMe);
+    SSlice* pSlice				 = static_cast<SSlice *>(vpSlice);
 
+    //  Step 1: diamond search
+    WelsMotionEstimateIterativeSearch(pFunc, pMe, pCurLayer->iEncStride[0], pCurLayer->pRefPic->iLineSize[0], pMe->pRefMb);
+
+    //  Step 2: CROSS search
+    SScreenContentStorage tmpScreenContentStorage; //TODO: use this structure from Ref
+    pMe->uiSadCostThreshold = tmpScreenContentStorage.uiSadCostThreshold[pMe->uiBlockSize];
+    if (pMe->uiSadCost >= pMe->uiSadCostThreshold) {
+      WelsMotionCrossSearch(pFunc, pCurLayer, pMe, pSlice);
+    }
+}
+void WelsDiamondCrossFeatureSearch(SWelsFuncPtrList *pFunc, void* vpLayer, void* vpMe, void* vpSlice) {
+    SDqLayer* pCurLayer = static_cast<SDqLayer *>(vpLayer);
+    SWelsME* pMe			 = static_cast<SWelsME *>(vpMe);
+    SSlice* pSlice				 = static_cast<SSlice *>(vpSlice);
+
+    //  Step 1: diamond search + cross
+    WelsDiamondCrossSearch(pFunc, pCurLayer, pMe, pSlice);
+
+    // Step 2: FeatureSearch
+    if (pMe->uiSadCost >= pMe->uiSadCostThreshold) {
+        pSlice->uiSliceFMECostDown += pMe->uiSadCost;
+
+        SScreenBlockFeatureStorage tmpScreenBlockFeatureStorage; //TODO: use this structure from Ref
+        uint32_t uiMaxSearchPoint = INT_MAX;//TODO: change it according to computational-complexity setting
+        SFeatureSearchIn sFeatureSearchIn = {0};
+        SetFeatureSearchIn(pFunc, *pMe, pSlice, &tmpScreenBlockFeatureStorage,
+          pCurLayer->iEncStride[0], pCurLayer->pRefPic->iLineSize[0],
+          &sFeatureSearchIn);
+        MotionEstimateFeatureFullSearch( sFeatureSearchIn, uiMaxSearchPoint, pMe);
+
+        pSlice->uiSliceFMECostDown -= pMe->uiSadCost;
+    }
+}
 } // namespace WelsSVCEnc
 

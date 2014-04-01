@@ -6,8 +6,7 @@
 using namespace WelsSVCEnc;
 
 //Tests of WelsGetCacheLineSize Begin
-TEST(MemoryAlignTest, GetCacheLineSize_LoopWithin16K)
-{
+TEST(MemoryAlignTest, GetCacheLineSize_LoopWithin16K) {
   const unsigned int kuiTestBoundary16K = 16 * 1024;
 	unsigned int uiTargetAlign = 1;
 	while (uiTargetAlign < kuiTestBoundary16K) {
@@ -17,20 +16,17 @@ TEST(MemoryAlignTest, GetCacheLineSize_LoopWithin16K)
 	}
 }
 
-TEST(MemoryAlignTest, GetCacheLineSize_Zero)
-{
+TEST(MemoryAlignTest, GetCacheLineSize_Zero) {
   CMemoryAlign cTestMa(0);
   ASSERT_EQ(  16, cTestMa.WelsGetCacheLineSize() );
 }
-TEST(MemoryAlignTest, GetCacheLineSize_MaxUINT)
-{
+TEST(MemoryAlignTest, GetCacheLineSize_MaxUINT) {
 	CMemoryAlign cTestMa(0xFFFFFFFF);
 	ASSERT_EQ( 16, cTestMa.WelsGetCacheLineSize() );
 }
 //Tests of WelsGetCacheLineSize End
 //Tests of WelsMallocAndFree Begin
-TEST(MemoryAlignTest, WelsMallocAndFreeOnceFunctionVerify)
-{
+TEST(MemoryAlignTest, WelsMallocAndFreeOnceFunctionVerify) {
   const uint32_t kuiTargetAlignSize[4] = {32, 16, 64, 8};
   srand((uint32_t)time(NULL));
 
@@ -59,5 +55,3 @@ TEST(MemoryAlignTest, WelsMallocAndFreeOnceFunctionVerify)
     }
   }
 }
-
-

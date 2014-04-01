@@ -44,16 +44,14 @@
 #include "get_intra_predictor.h"
 
 #include "deblocking.h"
-
+#include "ref_list_mgr_svc.h"
 #include "mc.h"
 #include "sample.h"
 
 #include "svc_base_layer_md.h"
 #include "set_mb_syn_cavlc.h"
 #include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross_platforms
-#ifdef MT_ENABLED
 #include "slice_multi_threading.h"
-#endif//MT_ENABLED
 
 //  global   function  pointers  definition
 namespace WelsSVCEnc {
@@ -209,7 +207,7 @@ int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* 
   WelsBlockFuncInit (&pFuncList->pfSetNZCZero, uiCpuFlag);
 
   InitFillNeighborCacheInterFunc (pFuncList, pParam->bEnableBackgroundDetection);
-
+  InitRefListMgrFunc(pFuncList,pParam->iUsageType);
   return iReturn;
 }
 

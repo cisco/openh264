@@ -10,8 +10,7 @@
 using namespace WelsSVCEnc;
 
 void CopyTargetBlock( uint8_t* pSrcBlock, const int32_t kiBlockSize, SMVUnitXY sTargetMv, const int32_t kiRefPicStride,
-                     uint8_t* pRefPic)
-{
+                     uint8_t* pRefPic) {
   uint8_t* pTargetPos = pRefPic+sTargetMv.iMvY*kiRefPicStride+sTargetMv.iMvX;
   uint8_t* pSourcePos = pSrcBlock;
 
@@ -24,8 +23,7 @@ void CopyTargetBlock( uint8_t* pSrcBlock, const int32_t kiBlockSize, SMVUnitXY s
 
 
 void InitMe( const uint8_t kuiQp, const uint32_t kuiMvdTableMiddle, const uint32_t kuiMvdTableStride,
-            uint16_t* pMvdCostTable, SWelsME* pMe)
-{
+            uint16_t* pMvdCostTable, SWelsME* pMe) {
   MvdCostInit( pMvdCostTable, kuiMvdTableStride );
   pMe->pMvdCost = &pMvdCostTable[kuiQp*kuiMvdTableStride + kuiMvdTableMiddle];
   pMe->sMvp.iMvX = pMe->sMvp.iMvY = 0;
@@ -71,8 +69,7 @@ public:
 };
 
 
-TEST_F(MotionEstimateTest, TestDiamondSearch)
-{
+TEST_F(MotionEstimateTest, TestDiamondSearch) {
 #define TEST_POS (5)
   const int32_t kiPositionToCheck[TEST_POS][2] = {{0,0}, {0,1}, {1,0}, {0,-1}, {-1,0}};
   const int32_t kiMaxBlock16Sad = 72000;//a rough number
@@ -125,8 +122,7 @@ TEST_F(MotionEstimateTest, TestDiamondSearch)
 }
 
 
-TEST_F(MotionEstimateTest, TestVerticalSearch)
-{
+TEST_F(MotionEstimateTest, TestVerticalSearch) {
   const int32_t kiMaxBlock16Sad = 72000;//a rough number
   SWelsFuncPtrList sFuncList;
   SWelsME sMe;
@@ -187,8 +183,7 @@ TEST_F(MotionEstimateTest, TestVerticalSearch)
     //it is possible that ref at differnt position is identical, but that should be under a low probability
   }
 }
-TEST_F(MotionEstimateTest, TestHorizontalSearch)
-{
+TEST_F(MotionEstimateTest, TestHorizontalSearch) {
   const int32_t kiMaxBlock16Sad = 72000;//a rough number
   SWelsFuncPtrList sFuncList;
   SWelsME sMe;

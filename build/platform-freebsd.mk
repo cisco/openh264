@@ -1,6 +1,6 @@
 include build/platform-arch.mk
 SHAREDLIBSUFFIX = so
-CFLAGS += -fPIC -DMT_ENABLED
+CFLAGS += -fPIC
 LDFLAGS += -lpthread
 ifeq ($(ASM_ARCH), x86)
 ifeq ($(ENABLE64BIT), Yes)

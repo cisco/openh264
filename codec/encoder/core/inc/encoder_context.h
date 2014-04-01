@@ -54,10 +54,8 @@
 #include "wels_func_ptr_def.h"
 #include "crt_util_safe_x.h"
 
-#ifdef MT_ENABLED
 #include "mt_defs.h"	// for multiple threadin,
 #include "WelsThreadLib.h"
-#endif//MT_ENALBED
 
 namespace WelsSVCEnc {
 
@@ -89,7 +87,9 @@ typedef struct TagLTRState {
   int32_t						iLTRMarkMode; // direct mark or delay mark
   int32_t						iLTRMarkSuccessNum; //successful marked num, for mark mode switch
   int32_t						iCurLtrIdx;// current int32_t term reference index to mark
-  int32_t						iLastLtrIdx;
+  int32_t						iLastLtrIdx[MAX_TEMPORAL_LAYER_NUM];
+  int32_t						iSceneLtrIdx;// related to Scene LTR, used by screen content
+
   uint32_t					uiLtrMarkInterval;// the interval from the last int32_t term pRef mark
 
   bool						bLTRMarkingFlag;	//decide whether current frame marked as LTR
@@ -130,9 +130,7 @@ typedef struct TagWelsEncCtx {
   SStrideTables*				pStrideTab;	// stride tables for internal coding used
   SWelsFuncPtrList*			pFuncList;
 
-#if defined(MT_ENABLED)
   SSliceThreading*				pSliceThreading;
-#endif//MT_ENABLED
 
   // SSlice context
   SSliceCtx*				pSliceCtxList;// slice context table for each dependency quality layer
@@ -148,7 +146,7 @@ typedef struct TagWelsEncCtx {
   SRefList**					ppRefPicListExt;		// reference picture list for SVC
   SPicture*					pRefList0[16];
   SLTRState*					pLtr;//[MAX_DEPENDENCY_LAYER];
-
+  bool                          bCurFrameMarkedAsSceneLtr;
   // Derived
   int32_t						iCodingIndex;
   int32_t						iFrameIndex;			// count how many frames elapsed during coding context currently
@@ -221,9 +219,7 @@ typedef struct TagWelsEncCtx {
 #endif//STAT_OUTPUT
 
   int32_t iEncoderError;
-#ifdef MT_ENABLED
   WELS_MUTEX					mutexEncoderError;
-#endif
 
 } sWelsEncCtx/*, *PWelsEncCtx*/;
 }

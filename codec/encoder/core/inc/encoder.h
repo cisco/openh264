@@ -84,6 +84,8 @@ int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* 
 void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType);
 
 EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum);
+
+int32_t GetTemporalLevel (SDLayerParam* fDlp, const int32_t kiFrameNum, const int32_t kiGopSize);
 /*!
  * \brief	Dump reconstruction for dependency layer
  */
