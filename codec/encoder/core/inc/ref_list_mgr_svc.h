@@ -77,11 +77,11 @@ void WelsResetRefList (sWelsEncCtx* pCtx);
 /*
  *	update reference picture list
  */
-bool WelsUpdateRefList (sWelsEncCtx* pCtx);
+bool WelsUpdateRefList (void* pCtx);
 /*
  *	build reference picture list
  */
-bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t kiPOC);
+bool WelsBuildRefList (void* pCtx, const int32_t kiPOC,int32_t iBestLtrRefIdx);
 
 /*
  *	update syntax for reference base related
@@ -96,7 +96,9 @@ bool CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx);
 /*
 *	decide whether current frame include long term reference mark and update long term reference mark syntax
 */
-void WelsMarkPic (sWelsEncCtx* pCtx);
+void WelsMarkPic (void* pCtx);
+
+void InitRefListMgrFunc(SWelsFuncPtrList* pFuncList,EUsageType eUsageType);
 
 #ifdef LONG_TERM_REF_DUMP
 void dump_ref (sWelsEncCtx* ctx);

@@ -324,7 +324,8 @@ static inline void PrefetchNextBuffer (sWelsEncCtx* pCtx) {
 /*
  *	update reference picture list
  */
-bool WelsUpdateRefList (sWelsEncCtx* pCtx) {
+bool WelsUpdateRefList (void* pEncCtx) {
+  sWelsEncCtx* pCtx     = (sWelsEncCtx*)pEncCtx;
   SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SLTRState* pLtr			= &pCtx->pLtr[pCtx->uiDependencyId];
   SDLayerParam* pParamD	= &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
@@ -423,7 +424,8 @@ bool CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx) {
 
   return true;
 }
-void WelsMarkPic (sWelsEncCtx* pCtx) {
+void WelsMarkPic (void* pEncCtx) {
+  sWelsEncCtx* pCtx = (sWelsEncCtx* )pEncCtx;
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
   const int32_t kiCountSliceNum			= GetCurrentSliceNum (pCtx->pCurDqLayer->pSliceEncCtx);
   int32_t iGoPFrameNumInterval = ((pCtx->pSvcParam->uiGopSize >> 1) > 1) ? (pCtx->pSvcParam->uiGopSize >> 1) : (1);
@@ -536,7 +538,8 @@ void FilterLTRMarkingFeedback (sWelsEncCtx* pCtx, SLTRMarkingFeedback* pLTRMarki
 /*
  *	build reference picture list
  */
-bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC) {
+bool WelsBuildRefList (void* pEncCtx, const int32_t iPOC,int32_t iBestLtrRefIdx) {
+  sWelsEncCtx* pCtx     = (sWelsEncCtx*)pEncCtx;
   SRefList* pRefList		=  pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SLTRState* pLtr			= &pCtx->pLtr[pCtx->uiDependencyId];
   const int32_t kiNumRef	= pCtx->pSvcParam->iNumRefFrame;
@@ -634,5 +637,32 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
     }
   }
 }
-
+bool WelsUpdateRefListScreen (void* pCtx)
+{
+  return true;
+}
+bool WelsBuildRefListScreen (void* pCtx, const int32_t iPOC,int32_t iBestLtrRefIdx)
+{
+  return true;
+}
+void WelsMarkPicScreen (void* pCtx)
+{
+  return;
+}
+void InitRefListMgrFunc(SWelsFuncPtrList* pFuncList,EUsageType eUsageType)
+{
+   if(eUsageType == SCREEN_CONTENT_REAL_TIME)
+   {
+     pFuncList->pBuildRefList =   WelsBuildRefListScreen;
+     pFuncList->pMarkPic      =   WelsMarkPicScreen;
+     pFuncList->pUpdateRefList=   WelsUpdateRefListScreen;
+   }
+   else
+   {
+     pFuncList->pBuildRefList =   WelsBuildRefList;
+     pFuncList->pMarkPic      =   WelsMarkPic;
+     pFuncList->pUpdateRefList=   WelsUpdateRefList;
+   }
+}
 } // namespace WelsSVCEnc
+

@@ -44,7 +44,7 @@
 #include "get_intra_predictor.h"
 
 #include "deblocking.h"
-
+#include "ref_list_mgr_svc.h"
 #include "mc.h"
 #include "sample.h"
 
@@ -207,7 +207,7 @@ int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* 
   WelsBlockFuncInit (&pFuncList->pfSetNZCZero, uiCpuFlag);
 
   InitFillNeighborCacheInterFunc (pFuncList, pParam->bEnableBackgroundDetection);
-
+  InitRefListMgrFunc(pFuncList,pParam->iUsageType);
   return iReturn;
 }
 
