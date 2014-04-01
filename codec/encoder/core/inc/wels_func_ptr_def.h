@@ -168,6 +168,10 @@ typedef int32_t (*PGetVarianceFromIntraVaaFunc) (uint8_t* pSampelY, const int32_
 typedef uint8_t (*PGetMbSignFromInterVaaFunc) (int32_t* pSad8x8);
 typedef void (*PUpdateMbMvFunc) (SMVUnitXY* pMvUnit, const SMVUnitXY ksMv);
 
+typedef bool (*PBuildRefListFunc)(void* pCtx, const int32_t iPOC,int32_t iBestLtrRefIdx);
+typedef void (*PMarkPicFunc)(void* pCtx);
+typedef bool (*PUpdateRefListFunc) (void* pCtx);
+
 struct TagWelsFuncPointerList {
   PExpandPictureFunc			pfExpandLumaPicture;
   PExpandPictureFunc
@@ -247,6 +251,10 @@ struct TagWelsFuncPointerList {
   PSetMemoryZero				pfSetMemZeroSize8;			// for size is times to 8
   PSetMemoryZero				pfSetMemZeroSize64Aligned16;			// for size is times of 64, and address is align to 16
   PSetMemoryZero				pfSetMemZeroSize64;			// for size is times of 64, and don't know address is align to 16 or not
+
+  PBuildRefListFunc     pBuildRefList;
+  PMarkPicFunc          pMarkPic;
+  PUpdateRefListFunc    pUpdateRefList;
 };
 
 }	//end of namespace WelsSVCEnc {
