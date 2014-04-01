@@ -547,7 +547,7 @@ bool FeatureSearchOne( SFeatureSearchIn &sFeatureSearchIn, const int32_t iFeatur
 void MotionEstimateFeatureFullSearch( SFeatureSearchIn &sFeatureSearchIn,
                                         const uint32_t kuiMaxSearchPoint,
                                         SWelsME* pMe) {
-  SFeatureSearchOut sFeatureSearchOut = {0};//TODO: this can be refactored and removed
+  SFeatureSearchOut sFeatureSearchOut = { { 0 } };//TODO: this can be refactored and removed
   sFeatureSearchOut.uiBestSadCost = pMe->uiSadCost;
   sFeatureSearchOut.sBestMv = pMe->sMv;
   sFeatureSearchOut.pBestRef = pMe->pRefMb;
