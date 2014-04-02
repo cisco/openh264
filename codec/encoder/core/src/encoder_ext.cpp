@@ -1314,7 +1314,11 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
   //End of Rate control module memory allocation
 
   //pVaa memory allocation
-  (*ppCtx)->pVaa	= (SVAAFrameInfo*)pMa->WelsMallocz (sizeof (SVAAFrameInfo), "pVaa");
+  if(pParam->iUsageType == SCREEN_CONTENT_REAL_TIME)
+    (*ppCtx)->pVaa	= (SVAAFrameInfoExt*)pMa->WelsMallocz (sizeof (SVAAFrameInfoExt), "pVaa");
+  else
+    (*ppCtx)->pVaa	= (SVAAFrameInfo*)pMa->WelsMallocz (sizeof (SVAAFrameInfo), "pVaa");
+
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pVaa), FreeMemorySvc (ppCtx))
 
   if ((*ppCtx)->pSvcParam->bEnableAdaptiveQuant) { //malloc mem
