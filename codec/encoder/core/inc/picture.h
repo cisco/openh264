@@ -30,7 +30,7 @@
  *
  */
 
-//picture.h	-	reconstruction picture/ reference picture/ residual picture are declared here
+//picture.h  -  reconstruction picture/ reference picture/ residual picture are declared here
 #ifndef WELS_PICTURE_H__
 #define WELS_PICTURE_H__
 
@@ -39,84 +39,89 @@
 #include "wels_common_basis.h"
 
 namespace WelsSVCEnc {
-#define LIST_SIZE			0x10000		//(256*256)
+#define LIST_SIZE      0x10000    //(256*256)
 typedef struct TagScreenBlockFeatureStorage
 {
-	uint32_t*	pTimesOfFeatureValue;		// times of every value in Feature
-	uint16_t**	pLocationOfFeature;			// uint16_t *pLocationOfFeature[LIST_SIZE], pLocationOfFeature[i] saves all the location(x,y) whose Feature = i;
-	uint16_t*	pLocationPointer;	// buffer of position array
-  int32_t		iActualListSize;			// actual list size
+  //Input
+  uint16_t*  pFeatureOfBlockPointer;    // Pointer to pFeatureOfBlock
+  int32_t    iIs16x16;      //Feature block size
+  uint8_t      uiFeatureStrategyIndex;// index of hash strategy
 
+  //Modify
+  uint32_t*  pTimesOfFeatureValue;    // times of every value in Feature
+  uint16_t**  pLocationOfFeature;      // uint16_t *pLocationOfFeature[LIST_SIZE], pLocationOfFeature[i] saves all the location(x,y) whose Feature = i;
+  uint16_t*  pLocationPointer;  // buffer of position array
+  int32_t    iActualListSize;      // actual list size
   uint32_t uiSadCostThreshold[BLOCK_SIZE_ALL];
-  bool						bRefBlockFeatureCalculated; // flag of whether pre-process is done
+  bool      bRefBlockFeatureCalculated; // flag of whether pre-process is done
 } SScreenBlockFeatureStorage; //should be stored with RefPic, one for each frame
 
 typedef struct TagFeatureSearchPreparation{
-  SScreenBlockFeatureStorage*	pRefBlockFeature;//point the the ref frame storage
+  SScreenBlockFeatureStorage*  pRefBlockFeature;//point the the ref frame storage
 
-  uint16_t*	pFeatureOfBlock;		// Feature of every block (8x8), begin with the point
-	uint8_t      uiFeatureStrategyIndex;// index of hash strategy
+  uint16_t*  pFeatureOfBlock;    // Feature of every block (8x8), begin with the point
+  uint8_t      uiFeatureStrategyIndex;// index of hash strategy
 
-	/* for FME frame-level switch */
-	bool bFMESwitchFlag;
-	uint8_t uiFMEGoodFrameCount;
-	int32_t iHighFreMbCount;
+  /* for FME frame-level switch */
+  bool bFMESwitchFlag;
+  uint8_t uiFMEGoodFrameCount;
+  int32_t iHighFreMbCount;
 }SFeatureSearchPreparation;//maintain only one
 
 
 /*
- *	Reconstructed Picture definition
- *	It is used to express reference picture, also consequent reconstruction picture for output
+ *  Reconstructed Picture definition
+ *  It is used to express reference picture, also consequent reconstruction picture for output
  */
 typedef struct TagPicture {
   /************************************payload pData*********************************/
-  uint8_t*		pBuffer;		// pointer to the first allocated byte, basical offset of pBuffer, dimension:
-  uint8_t*		pData[3];		// pointer to picture planes respectively
-  int32_t		iLineSize[3];	// iLineSize of picture planes respectively
+  uint8_t*    pBuffer;    // pointer to the first allocated byte, basical offset of pBuffer, dimension:
+  uint8_t*    pData[3];    // pointer to picture planes respectively
+  int32_t    iLineSize[3];  // iLineSize of picture planes respectively
 
   // picture information
   /*******************************from other standard syntax****************************/
   /*from pSps*/
-  int32_t		iWidthInPixel;	// picture width in pixel
-  int32_t		iHeightInPixel;// picture height in pixel
-  int32_t		iPictureType;	// got from sSliceHeader(): eSliceType
-  int32_t		iFramePoc;		// frame POC
+  int32_t    iWidthInPixel;  // picture width in pixel
+  int32_t    iHeightInPixel;// picture height in pixel
+  int32_t    iPictureType;  // got from sSliceHeader(): eSliceType
+  int32_t    iFramePoc;    // frame POC
 
-  float			fFrameRate;   // MOVE
-  int32_t		iFrameNum;		// frame number			//for pRef pic management
+  float      fFrameRate;   // MOVE
+  int32_t    iFrameNum;    // frame number      //for pRef pic management
 
-  uint32_t*	uiRefMbType;	// for iMbWidth*iMbHeight
-  uint8_t*		pRefMbQp;		// for iMbWidth*iMbHeight
+  uint32_t*  uiRefMbType;  // for iMbWidth*iMbHeight
+  uint8_t*    pRefMbQp;    // for iMbWidth*iMbHeight
 
   int32_t*     pMbSkipSad;   //for iMbWidth*iMbHeight
 
-  SMVUnitXY*	sMvList;
+  SMVUnitXY*  sMvList;
 
   /*******************************sef_definition for misc use****************************/
-  int32_t		iMarkFrameNum;
-  int32_t		iLongTermPicNum;
+  int32_t    iMarkFrameNum;
+  int32_t    iLongTermPicNum;
 
-  bool		bUsedAsRef;						//for pRef pic management
-  bool		bIsLongRef;	// long term reference frame flag	//for pRef pic management
+  bool    bUsedAsRef;            //for pRef pic management
+  bool    bIsLongRef;  // long term reference frame flag  //for pRef pic management
   bool    bIsSceneLTR;  //long term reference & large scene change
-  uint8_t		uiRecieveConfirmed;
-  uint8_t		uiTemporalId;
-  uint8_t		uiSpatialId;
+  uint8_t    uiRecieveConfirmed;
+  uint8_t    uiTemporalId;
+  uint8_t    uiSpatialId;
   int32_t   iFrameAverageQp;
 } SPicture;
 
 /*
- *	Residual Picture
+ *  Residual Picture
  */
 //typedef struct Rs_Picture_s{
-//	int16_t		*pBuffer[4];		// base pBuffer
-//	int16_t		*pData[4];		// pData pBuffer
-//	int32_t		real_linesize[4];// actual iLineSize of picture planes respectively
-//	int32_t		used_linesize[4];// iLineSize of picture planes respectively used currently
-//	int32_t		planes;			// planes of YUV
+//  int16_t    *pBuffer[4];    // base pBuffer
+//  int16_t    *pData[4];    // pData pBuffer
+//  int32_t    real_linesize[4];// actual iLineSize of picture planes respectively
+//  int32_t    used_linesize[4];// iLineSize of picture planes respectively used currently
+//  int32_t    planes;      // planes of YUV
 //}Rs_Picture_t;
 
-}	// end of namespace WelsSVCEnc {
+}  // end of namespace WelsSVCEnc {
 
 #endif//WELS_PICTURE_H__
 

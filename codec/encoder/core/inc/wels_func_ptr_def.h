@@ -141,11 +141,14 @@ typedef void (*PCalculateSatdFunc) ( PSampleSadSatdCostFunc pSatd, void * vpMe, 
 typedef bool (*PCheckDirectionalMv) (PSampleSadSatdCostFunc pSad, void * vpMe,
                       const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
                       int32_t& iBestSadCost);
-typedef void (*PLineFullSearchFunc) (	void *pFunc, void *vpMe,
-													uint16_t* pMvdTable, const int32_t kiFixedMvd,
-													const int32_t kiEncStride, const int32_t kiRefStride,
-													const int32_t kiMinPos, const int32_t kiMaxPos,
+typedef void (*PLineFullSearchFunc) (  void *pFunc, void *vpMe,
+                          uint16_t* pMvdTable, const int32_t kiFixedMvd,
+                          const int32_t kiEncStride, const int32_t kiRefStride,
+                          const int32_t kiMinPos, const int32_t kiMaxPos,
                           const bool bVerticalSearch );
+typedef void (*PCalculateBlockFeatureOfFrame)(uint8_t *pRef, const int32_t kiWidth, const int32_t kiHeight, const int32_t kiRefStride,
+                                              uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+typedef int32_t (*PCalculateSingleBlockFeature)(uint8_t *pRef, const int32_t kiRefStride);
 
 #define     MAX_BLOCK_TYPE 5 // prev 7
 typedef struct TagSampleDealingFunc {
@@ -175,15 +178,15 @@ typedef void (*PMarkPicFunc)(void* pCtx);
 typedef bool (*PUpdateRefListFunc) (void* pCtx);
 
 struct TagWelsFuncPointerList {
-  PExpandPictureFunc			pfExpandLumaPicture;
+  PExpandPictureFunc      pfExpandLumaPicture;
   PExpandPictureFunc
   pfExpandChromaPicture[2];// 0: for chroma unalignment && width_uv >= 16; 1: for chroma alignment && width_uv >= 16;
 
   PFillInterNeighborCacheFunc       pfFillInterNeighborCache;
 
-  PGetVarianceFromIntraVaaFunc	pfGetVarianceFromIntraVaa;
-  PGetMbSignFromInterVaaFunc	pfGetMbSignFromInterVaa;
-  PUpdateMbMvFunc					    pfUpdateMbMv;
+  PGetVarianceFromIntraVaaFunc  pfGetVarianceFromIntraVaa;
+  PGetMbSignFromInterVaaFunc  pfGetMbSignFromInterVaa;
+  PUpdateMbMvFunc              pfUpdateMbMv;
   PInterMdFirstIntraModeFunc      pfFirstIntraMode; //svc_encode_slice.c svc_mode_decision.c svc_base_layer_md.c
   PIntraFineMdFunc
   pfIntraFineMd;          //svc_encode_slice.c svc_mode_decision.c svc_base_layer_md.c
@@ -193,11 +196,11 @@ struct TagWelsFuncPointerList {
   PInterMdBackgroundDecisionFunc          pfInterMdBackgroundDecision;
   PInterMdBackgroundInfoUpdateFunc      pfInterMdBackgroundInfoUpdate;
 
-  SMcFunc				        sMcFuncs;
+  SMcFunc                sMcFuncs;
   SSampleDealingFunc     sSampleDealingFuncs;
-  PGetIntraPredFunc 		pfGetLumaI16x16Pred[I16_PRED_DC_A];
-  PGetIntraPredFunc 		pfGetLumaI4x4Pred[I4_PRED_A];
-  PGetIntraPredFunc 		pfGetChromaPred[C_PRED_A];
+  PGetIntraPredFunc     pfGetLumaI16x16Pred[I16_PRED_DC_A];
+  PGetIntraPredFunc     pfGetLumaI4x4Pred[I4_PRED_A];
+  PGetIntraPredFunc     pfGetChromaPred[C_PRED_A];
 
   PMotionSearchFunc
   pfMotionSearch[BLOCK_STATIC_IDC_ALL]; //svc_encode_slice.c svc_mode_decision.c svc_enhance_layer_md.c svc_base_layer_md.c
@@ -205,61 +208,63 @@ struct TagWelsFuncPointerList {
   PCalculateSatdFunc pfCalculateSatd;
   PCheckDirectionalMv pfCheckDirectionalMv;
   PLineFullSearchFunc pfLineFullSearch;
+  PCalculateBlockFeatureOfFrame pfCalculateBlockFeatureOfFrame[2];//0 - for 8x8, 1 for 16x16
+  PCalculateSingleBlockFeature pfCalculateSingleBlockFeature[2];//0 - for 8x8, 1 for 16x16
 
-  PCopyFunc      pfCopy16x16Aligned;		//svc_encode_slice.c svc_mode_decision.c svc_base_layer_md.c
-  PCopyFunc      pfCopy16x16NotAligned;	//md.c
-  PCopyFunc      pfCopy8x8Aligned;		//svc_encode_slice.c svc_mode_decision.c svc_base_layer_md.c md.c
-  PCopyFunc	  pfCopy16x8NotAligned;	//for MeRefineFracPixel 16x8 based
-  PCopyFunc	  pfCopy8x16Aligned;		//for MeRefineFracPixel 8x16 based
+  PCopyFunc      pfCopy16x16Aligned;    //svc_encode_slice.c svc_mode_decision.c svc_base_layer_md.c
+  PCopyFunc      pfCopy16x16NotAligned;  //md.c
+  PCopyFunc      pfCopy8x8Aligned;    //svc_encode_slice.c svc_mode_decision.c svc_base_layer_md.c md.c
+  PCopyFunc    pfCopy16x8NotAligned;  //for MeRefineFracPixel 16x8 based
+  PCopyFunc    pfCopy8x16Aligned;    //for MeRefineFracPixel 8x16 based
 
   //svc_encode_mb.c encode_mb_aux.c
-  PDctFunc					pfDctT4;
-  PDctFunc    		        pfDctFourT4;
+  PDctFunc          pfDctT4;
+  PDctFunc                pfDctFourT4;
 
-  PCalculateSingleCtrFunc				pfCalculateSingleCtr4x4;
-  PScanFunc				pfScan4x4;		//DC/AC
-  PScanFunc				pfScan4x4Ac;
+  PCalculateSingleCtrFunc        pfCalculateSingleCtr4x4;
+  PScanFunc        pfScan4x4;    //DC/AC
+  PScanFunc        pfScan4x4Ac;
 
-  PQuantizationFunc				        pfQuantization4x4;
-  PQuantizationFunc				        pfQuantizationFour4x4;
-  PQuantizationDcFunc			        pfQuantizationDc4x4;
-  PQuantizationMaxFunc		        pfQuantizationFour4x4Max;
-  PQuantizationHadamardFunc		pfQuantizationHadamard2x2;
-  PQuantizationSkipFunc		        pfQuantizationHadamard2x2Skip;
+  PQuantizationFunc                pfQuantization4x4;
+  PQuantizationFunc                pfQuantizationFour4x4;
+  PQuantizationDcFunc              pfQuantizationDc4x4;
+  PQuantizationMaxFunc            pfQuantizationFour4x4Max;
+  PQuantizationHadamardFunc    pfQuantizationHadamard2x2;
+  PQuantizationSkipFunc            pfQuantizationHadamard2x2Skip;
 
-  PTransformHadamard4x4Func	 pfTransformHadamard4x4Dc;
+  PTransformHadamard4x4Func   pfTransformHadamard4x4Dc;
 
-  PGetNoneZeroCountFunc		      pfGetNoneZeroCount;
+  PGetNoneZeroCountFunc          pfGetNoneZeroCount;
 
-  PDeQuantizationFunc				      pfDequantization4x4;
-  PDeQuantizationFunc			          pfDequantizationFour4x4;
-  PDeQuantizationHadamardFunc	  pfDequantizationIHadamard4x4;
-  PIDctFunc				                      pfIDctFourT4;
-  PIDctFunc				                      pfIDctT4;
-  PIDctFunc				                      pfIDctI16x16Dc;
+  PDeQuantizationFunc              pfDequantization4x4;
+  PDeQuantizationFunc                pfDequantizationFour4x4;
+  PDeQuantizationHadamardFunc    pfDequantizationIHadamard4x4;
+  PIDctFunc                              pfIDctFourT4;
+  PIDctFunc                              pfIDctT4;
+  PIDctFunc                              pfIDctI16x16Dc;
 
 
 
   // OPTI: if MT under diff uiSliceMode, need change here
-  //PDynamicSlicingStepBackFunc	dynslc_funcpointer_stepback;//svc_encode_slice.c
-  //DYNSLC_LNGTH_CRTL		dynslc_funcpointer_slcsize_ctrl;
+  //PDynamicSlicingStepBackFunc  dynslc_funcpointer_stepback;//svc_encode_slice.c
+  //DYNSLC_LNGTH_CRTL    dynslc_funcpointer_slcsize_ctrl;
 
   /* For Deblocking */
   DeblockingFunc                         pfDeblocking;
   PSetNoneZeroCountZeroFunc     pfSetNZCZero;
 
-  SWelsRcFunc					    pfRc;
+  SWelsRcFunc              pfRc;
   PAccumulateSadFunc         pfAccumulateSadForRc;
 
-  PSetMemoryZero				pfSetMemZeroSize8;			// for size is times to 8
-  PSetMemoryZero				pfSetMemZeroSize64Aligned16;			// for size is times of 64, and address is align to 16
-  PSetMemoryZero				pfSetMemZeroSize64;			// for size is times of 64, and don't know address is align to 16 or not
+  PSetMemoryZero        pfSetMemZeroSize8;      // for size is times to 8
+  PSetMemoryZero        pfSetMemZeroSize64Aligned16;      // for size is times of 64, and address is align to 16
+  PSetMemoryZero        pfSetMemZeroSize64;      // for size is times of 64, and don't know address is align to 16 or not
 
   PBuildRefListFunc     pBuildRefList;
   PMarkPicFunc          pMarkPic;
   PUpdateRefListFunc    pUpdateRefList;
 };
 
-}	//end of namespace WelsSVCEnc {
+}  //end of namespace WelsSVCEnc {
 
 #endif//WELS_ENCODER_FUNCTION_POINTERS_DEFINITION_H_
