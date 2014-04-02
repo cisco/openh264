@@ -22,7 +22,7 @@ TEST(UeExpGolombTest, TestBsSizeUeRangeFrom256To65534) {
 	for (; uiInVal < 0xFFFF; ++ uiInVal) {
 		const uint32_t uiActVal = BsSizeUE( uiInVal );
 		const int32_t m = static_cast<int32_t>(log( (uiInVal+1) * 1.0 ) * g_kdLog2Factor + 1e-6);
-		const uint32_t uiExpVal = (m<<1)+1;	
+		const uint32_t uiExpVal = (m<<1)+1;
 		EXPECT_EQ(uiActVal, uiExpVal);
 	}
 }
