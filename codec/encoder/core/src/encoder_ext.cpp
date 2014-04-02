@@ -2366,7 +2366,12 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
   }
 
   if (P_SLICE == pCtx->eSliceType) {
-    pFuncList->pfMotionSearch  = WelsMotionEstimateSearch;
+    pFuncList->pfMotionSearch[0]  = WelsMotionEstimateSearch;
+    pFuncList->pfSearchMethod[BLOCK_16x16]  =
+      pFuncList->pfSearchMethod[BLOCK_16x8] =
+      pFuncList->pfSearchMethod[BLOCK_8x16] =
+      pFuncList->pfSearchMethod[BLOCK_8x8] =
+      pFuncList->pfSearchMethod[BLOCK_4x4] = WelsDiamondSearch;
     pFuncList->pfFirstIntraMode = WelsMdFirstIntraMode;
     pFuncList->sSampleDealingFuncs.pfMeCost = pCtx->pFuncList->sSampleDealingFuncs.pfSampleSatd;
     if (kbHighestSpatialLayer) {

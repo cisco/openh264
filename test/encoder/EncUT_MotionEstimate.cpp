@@ -75,6 +75,7 @@ TEST_F(MotionEstimateTest, TestDiamondSearch) {
   const int32_t kiMaxBlock16Sad = 72000;//a rough number
   SWelsFuncPtrList sFuncList;
   SWelsME sMe;
+  SSlice sSlice;
 
   srand((uint32_t)time(NULL));
   const uint8_t kuiQp = rand()%52;
@@ -106,8 +107,7 @@ TEST_F(MotionEstimateTest, TestDiamondSearch) {
       sMe.pRefMb = pRefPicCenter;
       sMe.sMv.iMvX = sMe.sMv.iMvY = 0;
       sMe.uiSadCost = sMe.uiSatdCost = kiMaxBlock16Sad;
-      WelsMotionEstimateIterativeSearch (&sFuncList, &sMe, m_iMaxSearchBlock,
-                                         m_iWidth, pRefPicCenter);
+      WelsDiamondSearch (&sFuncList, &sMe, &sSlice, m_iMaxSearchBlock, m_iWidth);
 
       //the last selection may be affected by MVDcost, that is when (0,0) will be better
       //when comparing (1,1) and (1,0), due to the difference between MVD cost, it is possible that (1,0) is selected while the best match is (1,1)
