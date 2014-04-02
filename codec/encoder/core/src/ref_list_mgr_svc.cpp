@@ -115,6 +115,18 @@ static inline void DeleteSTRFromShortList (sWelsEncCtx* pCtx, int32_t iIdx) {
   pRefList->uiShortRefCount--;
 
 }
+static void DeleteNonSceneLTR (sWelsEncCtx* pCtx) {
+  SRefList* pRefList = pCtx->ppRefPicListExt[pCtx->uiDependencyId];
+  for (int32_t i = 0; i < pCtx->pSvcParam->iNumRefFrame; ++i) {
+    SPicture* pRef = pRefList->pLongRefList[i];
+    if (pRef != NULL &&  pRef->bUsedAsRef && pRef->bIsLongRef && (!pRef->bIsSceneLTR) &&
+        (pCtx->uiTemporalId < pRef->uiTemporalId || pCtx->bCurFrameMarkedAsSceneLtr)) {
+      SetUnref (pRef);
+      DeleteLTRFromLongList (pCtx, i);
+    }
+  }
+}
+
 static inline int32_t CompareFrameNum (int32_t iFrameNumA, int32_t iFrameNumB, int32_t iMaxFrameNumPlus1) {
   int64_t iNumA, iNumB, iDiffAB, iDiffMin;
   if (iFrameNumA > iMaxFrameNumPlus1 || iFrameNumB > iMaxFrameNumPlus1) {
@@ -300,6 +312,21 @@ static inline void LTRMarkProcess (sWelsEncCtx* pCtx) {
     DeleteSTRFromShortList (pCtx, i);
   }
 }
+
+static inline void LTRMarkProcessScreen (sWelsEncCtx* pCtx) {
+  SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
+  SPicture** pLongRefList = pRefList->pLongRefList;
+  int32_t iLtrIdx =  pCtx->pDecPic->iLongTermPicNum;
+  pCtx->pVaa->uiMarkLongTermPicIdx = pCtx->pDecPic->iLongTermPicNum;
+
+  if (pLongRefList[iLtrIdx] != NULL) {
+    SetUnref (pLongRefList[iLtrIdx]);
+    DeleteLTRFromLongList (pCtx, iLtrIdx);
+  }
+  pLongRefList[iLtrIdx] = pCtx->pDecPic;
+  pRefList->uiLongRefCount;
+}
+
 static inline void PrefetchNextBuffer (sWelsEncCtx* pCtx) {
   SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   const int32_t kiNumRef	= pCtx->pSvcParam->iNumRefFrame;
@@ -669,11 +696,12 @@ bool WelsUpdateRefListScreen (void* pEncCtx) {
     pCtx->pDecPic->iLongTermPicNum = pLtr->iCurLtrIdx;
   }
   if (pCtx->eSliceType == P_SLICE) {
-    //TBD LTR mark
+    DeleteNonSceneLTR (pCtx);
+    LTRMarkProcessScreen (pCtx);
     pLtr->bLTRMarkingFlag = false;
     ++pLtr->uiLtrMarkInterval;
   } else {	// in case IDR currently coding
-    //TBD LTR mark
+    LTRMarkProcessScreen (pCtx);
     pLtr->iCurLtrIdx = 1;
     pLtr->iSceneLtrIdx = 1;
     pLtr->uiLtrMarkInterval = 0;
