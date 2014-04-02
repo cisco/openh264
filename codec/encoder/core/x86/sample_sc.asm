@@ -38,7 +38,7 @@ SECTION .text
 ;	uint32_t pixel_sad_16x16_hor8_sse41( uint8_t *src, int32_t stride_src, uint8_t *ref, int32_t stride_ref, uint16 base_cost[8], int32_t *index_min_cost )
 ;
 ;	\note:
-;		src meed align with 16 bytes, ref is optional
+;		src need align with 16 bytes, ref is optional
 ;	\return value:
 ;		return minimal SAD cost, according index carried by index_min_cost
 ;**********************************************************************************************************************************

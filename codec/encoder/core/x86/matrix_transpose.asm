@@ -31,6 +31,158 @@
 
 %include "asm_inc.asm"
 
+;in:  m0, m1, m2, m3, m4, m5, m6, m7
+;out: m0, m3, m5, m2, m7, m1, m6, m4
+%macro TRANSPOSE_8x8B_MMX 10
+	MMX_XSwap bw,  %1, %2, %8
+	MMX_XSwap bw,  %3, %4, %2
+	MMX_XSwap bw,  %5, %6, %4
+	movq	%6, %9
+	movq	%10, %4
+	MMX_XSwap bw,  %7, %6, %4
+	
+	MMX_XSwap wd,  %1, %3, %6	
+	MMX_XSwap wd,  %8, %2, %3
+	MMX_XSwap wd,  %5, %7, %2
+	movq	%7, %10
+	movq	%10, %3	
+	MMX_XSwap wd,  %7, %4, %3
+	
+	MMX_XSwap dq,  %1, %5, %4	
+	MMX_XSwap dq,  %6, %2, %5
+	MMX_XSwap dq,  %8, %7, %2
+	movq	%7, %10
+	movq	%10, %5		
+	MMX_XSwap dq,  %7, %3, %5
+	
+	movq	%3, %10
+%endmacro
+
+;in: m0, m3, m5, m2, m7, m1, m6, m4
+%macro TRANSPOSE8x8_WRITE_MMX 2	; dst, dst_stride
+	movq [%1], mm0			; result of line 1, x8 bytes
+	movq [%1+%2], mm3		; result of line 2
+	lea %1, [%1+2*%2]
+	movq [%1], mm5			; result of line 3
+	movq [%1+%2], mm2		; result of line 4	
+	lea %1, [%1+2*%2]
+	movq [%1], mm7			; result of line 5
+	movq [%1+%2], mm1		; result of line 6
+	lea %1, [%1+2*%2]
+	movq [%1], mm6			; result of line 7
+	movq [%1+%2], mm4		; result of line 8
+%endmacro
+
+;in: m0, m3, m5, m2, m7, m1, m6, m4
+%macro TRANSPOSE8x8_WRITE_ALT_MMX 3	; dst, dst_stride, reg32
+	movq [%1], mm0			; result of line 1, x8 bytes
+	movq [%1+%2], mm3		; result of line 2
+	lea %3, [%1+2*%2]
+	movq [%3], mm5			; result of line 3
+	movq [%3+%2], mm2		; result of line 4	
+	lea %3, [%3+2*%2]
+	movq [%3], mm7			; result of line 5
+	movq [%3+%2], mm1		; result of line 6
+	lea %3, [%3+2*%2]
+	movq [%3], mm6			; result of line 7
+	movq [%3+%2], mm4		; result of line 8
+%endmacro	; end of TRANSPOSE8x8_WRITE_ALT_MMX
+
+; for transpose 16x8
+
+;in:  m0, m1, m2, m3, m4, m5, m6, m7
+;out: m4, m2, m3, m7, m5, m1, m6, m0
+%macro TRANSPOSE_8x16B_SSE2		10
+	SSE2_XSawp bw,  %1, %2, %8
+	SSE2_XSawp bw,  %3, %4, %2
+	SSE2_XSawp bw,  %5, %6, %4
+	movdqa	%6, %9
+	movdqa	%10, %4
+	SSE2_XSawp bw,  %7, %6, %4
+	
+	SSE2_XSawp wd,  %1, %3, %6	
+	SSE2_XSawp wd,  %8, %2, %3
+	SSE2_XSawp wd,  %5, %7, %2
+	movdqa	%7, %10
+	movdqa	%10, %3	
+	SSE2_XSawp wd,  %7, %4, %3
+	
+	SSE2_XSawp dq,  %1, %5, %4	
+	SSE2_XSawp dq,  %6, %2, %5
+	SSE2_XSawp dq,  %8, %7, %2
+	movdqa	%7, %10
+	movdqa	%10, %5		
+	SSE2_XSawp dq,  %7, %3, %5
+	
+	SSE2_XSawp qdq,  %1, %8, %3
+	SSE2_XSawp qdq,  %4, %2, %8
+	SSE2_XSawp qdq,  %6, %7, %2
+	movdqa	%7, %10
+	movdqa	%10, %1		
+	SSE2_XSawp qdq,  %7, %5, %1
+	movdqa	%5, %10
+%endmacro	; end of TRANSPOSE_8x16B_SSE2
+
+
+%macro TRANSPOSE8x16_WRITE_SSE2	2	; dst, dst_stride
+	movq [%1], xmm4			; result of line 1, x8 bytes
+	movq [%1+%2], xmm2		; result of line 2
+	lea %1, [%1+2*%2]
+	movq [%1], xmm3			; result of line 3
+	movq [%1+%2], xmm7		; result of line 4
+	
+	lea %1, [%1+2*%2]
+	movq [%1], xmm5			; result of line 5
+	movq [%1+%2], xmm1		; result of line 6
+	lea %1, [%1+2*%2]
+	movq [%1], xmm6			; result of line 7
+	movq [%1+%2], xmm0		; result of line 8
+	
+	lea %1, [%1+2*%2]
+	movhpd [%1], xmm4		; result of line 9
+	movhpd [%1+%2], xmm2	; result of line 10
+	lea %1, [%1+2*%2]
+	movhpd [%1], xmm3		; result of line 11
+	movhpd [%1+%2], xmm7	; result of line 12
+	
+	lea %1, [%1+2*%2]
+	movhpd [%1], xmm5		; result of line 13
+	movhpd [%1+%2], xmm1	; result of line 14
+	lea %1, [%1+2*%2]
+	movhpd [%1], xmm6		; result of line 15
+	movhpd [%1+%2], xmm0	; result of line 16
+%endmacro	; end of TRANSPOSE_WRITE_RESULT_SSE2
+
+%macro TRANSPOSE8x16_WRITE_ALT_SSE2	3	; dst, dst_stride, reg32
+	movq [%1], xmm4			; result of line 1, x8 bytes
+	movq [%1+%2], xmm2		; result of line 2
+	lea %3, [%1+2*%2]
+	movq [%3], xmm3			; result of line 3
+	movq [%3+%2], xmm7		; result of line 4
+	
+	lea %3, [%3+2*%2]
+	movq [%3], xmm5			; result of line 5
+	movq [%3+%2], xmm1		; result of line 6
+	lea %3, [%3+2*%2]
+	movq [%3], xmm6			; result of line 7
+	movq [%3+%2], xmm0		; result of line 8
+	
+	lea %3, [%3+2*%2]
+	movhpd [%3], xmm4		; result of line 9
+	movhpd [%3+%2], xmm2	; result of line 10
+	lea %3, [%3+2*%2]
+	movhpd [%3], xmm3		; result of line 11
+	movhpd [%3+%2], xmm7	; result of line 12
+	
+	lea %3, [%3+2*%2]
+	movhpd [%3], xmm5		; result of line 13
+	movhpd [%3+%2], xmm1	; result of line 14
+	lea %3, [%3+2*%2]
+	movhpd [%3], xmm6		; result of line 15
+	movhpd [%3+%2], xmm0	; result of line 16
+%endmacro	; end of TRANSPOSE8x16_WRITE_ALT_SSE2
+
+
 SECTION .text
 
 WELS_EXTERN transpose_matrix_block_16x16_sse2
