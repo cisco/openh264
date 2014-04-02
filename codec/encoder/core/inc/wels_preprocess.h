@@ -142,7 +142,7 @@ class CWelsPreProcess {
   int32_t BuildSpatialPicList (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrcPic);
   int32_t AnalyzeSpatialPic (sWelsEncCtx* pEncCtx, const int32_t kiDIdx);
   int32_t UpdateSpatialPictures(sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam, const int8_t iCurTid, const int32_t d_idx);
-
+  int32_t GetRefCandidateLtrIndex(int32_t iRefIdx);
  private:
   int32_t WelsPreprocessCreate();
   int32_t WelsPreprocessDestroy();
