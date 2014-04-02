@@ -1018,8 +1018,7 @@ int32_t WelsMdP16x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurLayer, SWelsMD* pWe
   }
 
   PredMv (&pMbCache->sMvComponents, 0, 4, 0, & (pMe16x16->sMvp));
-  pFunc->pfMotionSearch (pFunc, pCurLayer, pMe16x16, pSlice);
-//	update_p16x16_motion2cache(pMbCache, pWelsMd->uiRef, &(pMe16x16->mv));
+  pFunc->pfMotionSearch[0] (pFunc, pCurLayer, pMe16x16, pSlice);
 
   pCurMb->sP16x16Mv = pMe16x16->sMv;
   pCurLayer->pDecPic->sMvList[pCurMb->iMbXY] = pMe16x16->sMv;
@@ -1048,7 +1047,7 @@ int32_t WelsMdP16x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pW
     pSlice->uiMvcNum = 1;
 
     PredInter16x8Mv (pMbCache, i << 3, 0, & (sMe16x8->sMvp));
-    pFunc->pfMotionSearch (pFunc, pCurDqLayer, sMe16x8, pSlice);
+    pFunc->pfMotionSearch[0] (pFunc, pCurDqLayer, sMe16x8, pSlice);
     UpdateP16x8Motion2Cache (pMbCache, i << 3, pWelsMd->uiRef, & (sMe16x8->sMv));
     iCostP16x8 += sMe16x8->uiSatdCost;
     ++i;
@@ -1075,10 +1074,9 @@ int32_t WelsMdP8x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurLayer, SWelsMD* pWel
     pSlice->uiMvcNum = 1;
 
     PredInter8x16Mv (pMbCache, i << 2, 0, & (sMe8x16->sMvp));
-    pFunc->pfMotionSearch (pFunc, pCurLayer, sMe8x16, pSlice);
+    pFunc->pfMotionSearch[0] (pFunc, pCurLayer, sMe8x16, pSlice);
     UpdateP8x16Motion2Cache (pMbCache, i << 2, pWelsMd->uiRef, & (sMe8x16->sMv));
     iCostP8x16 += sMe8x16->uiSatdCost;
-//		sMe8x16++;
     ++i;
   } while (i < 2);
   return iCostP8x16;
@@ -1113,7 +1111,7 @@ int32_t WelsMdP8x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWe
     pSlice->uiMvcNum = 1;
 
     PredMv (&pMbCache->sMvComponents, i << 2, 2, pWelsMd->uiRef, & (sMe8x8->sMvp));
-    pFunc->pfMotionSearch (pFunc, pCurDqLayer, sMe8x8, pSlice);
+    pFunc->pfMotionSearch[0] (pFunc, pCurDqLayer, sMe8x8, pSlice);
     UpdateP8x8Motion2Cache (pMbCache, i << 2, pWelsMd->uiRef, & (sMe8x8->sMv));
     iCostP8x8 += sMe8x8->uiSatdCost;
 //		sMe8x8++;

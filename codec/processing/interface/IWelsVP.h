@@ -148,6 +148,7 @@ typedef enum {
   NO_STATIC,  // motion block
   COLLOCATED_STATIC, // collocated static block
   SCROLLED_STATIC,  // scrolled static block
+  BLOCK_STATIC_IDC_ALL,
 } EStaticBlockIdc;
 
 typedef struct {

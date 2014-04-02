@@ -83,16 +83,16 @@ void WelsMotionEstimateSearch (SWelsFuncPtrList* pFuncList, void* pLplayer, void
   SDqLayer* pCurDqLayer			= (SDqLayer*)pLplayer;
   SWelsME* pMe						= (SWelsME*)pLpme;
   SSlice* pSlice					= (SSlice*)pLpslice;
-  int32_t iStrideEnc = pCurDqLayer->iEncStride[0];
-  int32_t iStrideRef = pCurDqLayer->pRefPic->iLineSize[0];
+  const int32_t kiStrideEnc = pCurDqLayer->iEncStride[0];
+  const int32_t kiStrideRef = pCurDqLayer->pRefPic->iLineSize[0];
 
   //  Step 1: Initial point prediction
-  if ( !WelsMotionEstimateInitialPoint (pFuncList, pMe, pSlice, iStrideEnc, iStrideRef) ) {
-    WelsMotionEstimateIterativeSearch (pFuncList, pMe, iStrideEnc, iStrideRef, pMe->pRefMb);
+  if ( !WelsMotionEstimateInitialPoint (pFuncList, pMe, pSlice, kiStrideEnc, kiStrideRef) ) {
+    pFuncList->pfSearchMethod[pMe->uiBlockSize] (pFuncList, pMe, pSlice, kiStrideEnc, kiStrideRef);
     MeEndIntepelSearch(pMe);
   }
 
-  pFuncList->pfCalculateSatd( pFuncList->sSampleDealingFuncs.pfSampleSatd[pMe->uiBlockSize], pMe, iStrideEnc, iStrideRef );
+  pFuncList->pfCalculateSatd( pFuncList->sSampleDealingFuncs.pfSampleSatd[pMe->uiBlockSize], pMe, kiStrideEnc, kiStrideRef );
 }
 
 /*!
@@ -219,10 +219,12 @@ bool WelsMeSadCostSelect (int32_t* iSadCost, const uint16_t* kpMvdCost, int32_t*
   return (*pBestCost == iInputSadCost);
 }
 
-void WelsMotionEstimateIterativeSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, const int32_t kiStrideEnc,
-                                        const int32_t kiStrideRef, uint8_t* pFref) {
+void WelsDiamondSearch (SWelsFuncPtrList* pFuncList, void* pLpme, void* pLpslice,
+                        const int32_t kiStrideEnc,  const int32_t kiStrideRef) {
+  SWelsME* pMe						= (SWelsME*)pLpme;
   PSample4SadCostFunc			pSad					=  pFuncList->sSampleDealingFuncs.pfSample4Sad[pMe->uiBlockSize];
 
+  uint8_t* pFref = pMe->pRefMb;
   uint8_t* const kpEncMb = pMe->pEncMb;
   const uint16_t* kpMvdCost = pMe->pMvdCost;
 
@@ -334,12 +336,10 @@ void LineFullSearch_c(	void *pFunc, void *vpMe,
   }
 }
 
-void WelsMotionCrossSearch(SWelsFuncPtrList *pFuncList,  SDqLayer* pCurLayer, SWelsME * pMe,
-											const SSlice* pSlice) {
+void WelsMotionCrossSearch(SWelsFuncPtrList *pFuncList,  SWelsME * pMe,
+											const SSlice* pSlice, const int32_t kiEncStride,  const int32_t kiRefStride) {
   PLineFullSearchFunc pfVerticalFullSearchFunc	= pFuncList->pfLineFullSearch;
   PLineFullSearchFunc pfHorizontalFullSearchFunc	= pFuncList->pfLineFullSearch;
-  const int32_t kiEncStride = pCurLayer->iEncStride[0];
-  const int32_t kiRefStride = pCurLayer->pRefPic->iLineSize[0];
 
   const int32_t iCurMeBlockPixX = pMe->iCurMeBlockPixX;
   const int32_t iCurMeBlockQpelPixX = ((iCurMeBlockPixX)<<2);
@@ -564,28 +564,26 @@ void MotionEstimateFeatureFullSearch( SFeatureSearchIn &sFeatureSearchIn,
 /////////////////////////
 // Search function options
 /////////////////////////
-void WelsDiamondCrossSearch(SWelsFuncPtrList *pFunc, void* vpLayer, void* vpMe, void* vpSlice) {
-    SDqLayer* pCurLayer = static_cast<SDqLayer *>(vpLayer);
+void WelsDiamondCrossSearch(SWelsFuncPtrList *pFunc, void* vpMe, void* vpSlice, const int32_t kiEncStride,  const int32_t kiRefStride) {
     SWelsME* pMe			 = static_cast<SWelsME *>(vpMe);
     SSlice* pSlice				 = static_cast<SSlice *>(vpSlice);
 
     //  Step 1: diamond search
-    WelsMotionEstimateIterativeSearch(pFunc, pMe, pCurLayer->iEncStride[0], pCurLayer->pRefPic->iLineSize[0], pMe->pRefMb);
+    WelsDiamondSearch(pFunc, vpMe, vpSlice, kiEncStride, kiRefStride);
 
     //  Step 2: CROSS search
     SScreenBlockFeatureStorage pRefBlockFeature; //TODO: use this structure from Ref
     pMe->uiSadCostThreshold = pRefBlockFeature.uiSadCostThreshold[pMe->uiBlockSize];
     if (pMe->uiSadCost >= pMe->uiSadCostThreshold) {
-      WelsMotionCrossSearch(pFunc, pCurLayer, pMe, pSlice);
+      WelsMotionCrossSearch(pFunc, pMe, pSlice, kiEncStride, kiRefStride);
     }
 }
-void WelsDiamondCrossFeatureSearch(SWelsFuncPtrList *pFunc, void* vpLayer, void* vpMe, void* vpSlice) {
-    SDqLayer* pCurLayer = static_cast<SDqLayer *>(vpLayer);
+void WelsDiamondCrossFeatureSearch(SWelsFuncPtrList *pFunc, void* vpMe, void* vpSlice, const int32_t kiEncStride, const int32_t kiRefStride) {
     SWelsME* pMe			 = static_cast<SWelsME *>(vpMe);
     SSlice* pSlice				 = static_cast<SSlice *>(vpSlice);
 
     //  Step 1: diamond search + cross
-    WelsDiamondCrossSearch(pFunc, pCurLayer, pMe, pSlice);
+    WelsDiamondCrossSearch(pFunc, pMe, pSlice, kiEncStride, kiRefStride);
 
     // Step 2: FeatureSearch
     if (pMe->uiSadCost >= pMe->uiSadCostThreshold) {
@@ -595,7 +593,7 @@ void WelsDiamondCrossFeatureSearch(SWelsFuncPtrList *pFunc, void* vpLayer, void*
         uint32_t uiMaxSearchPoint = INT_MAX;//TODO: change it according to computational-complexity setting
         SFeatureSearchIn sFeatureSearchIn = {0};
         SetFeatureSearchIn(pFunc, *pMe, pSlice, &tmpScreenBlockFeatureStorage,
-          pCurLayer->iEncStride[0], pCurLayer->pRefPic->iLineSize[0],
+          kiEncStride, kiRefStride,
           &sFeatureSearchIn);
         MotionEstimateFeatureFullSearch( sFeatureSearchIn, uiMaxSearchPoint, pMe);
 
