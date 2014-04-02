@@ -1123,6 +1123,15 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
   pVaaExt->iNumOfAvailableRef = 1;
   return static_cast<ESceneChangeIdc> (iVaaFrameSceneChangeIdc);
 }
+
+int32_t CWelsPreProcess::GetRefCandidateLtrIndex(int32_t iRefIdx)
+{
+  const int32_t iTargetDid = m_pEncCtx->pSvcParam->iSpatialLayerNum - 1;
+  SVAAFrameInfoExt* pVaaExt			= static_cast<SVAAFrameInfoExt*> (m_pEncCtx->pVaa);
+  SRefInfoParam* BestRefCandidateParam =&(pVaaExt->sVaaStrBestRefCandidate[iRefIdx]);
+	int32_t iLtrRefIdx = m_pSpatialPic[iTargetDid][BestRefCandidateParam->iSrcListIdx]->iLongTermPicNum;
+  return iLtrRefIdx;
+}
 void  CWelsPreProcess::Padding (uint8_t* pSrcY, uint8_t* pSrcU, uint8_t* pSrcV, int32_t iStrideY, int32_t iStrideUV,
                                 int32_t iActualWidth, int32_t iPaddingWidth, int32_t iActualHeight, int32_t iPaddingHeight) {
   int32_t i;
