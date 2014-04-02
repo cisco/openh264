@@ -111,7 +111,7 @@ int ParseLayerConfig( CReadConfig & cRdLayerCfg, const int iLayer, SEncParamExt&
   }
 
   SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
-  int iLeftTargetBitrate = (pSvcParam.bEnableRc)?pSvcParam.iTargetBitrate:0;
+  int iLeftTargetBitrate = (pSvcParam.iRCMode!=RC_OFF_MODE)?pSvcParam.iTargetBitrate:0;
   SLayerPEncCtx sLayerCtx;
   memset (&sLayerCtx, 0, sizeof (SLayerPEncCtx));
 
@@ -146,7 +146,7 @@ int ParseLayerConfig( CReadConfig & cRdLayerCfg, const int iLayer, SEncParamExt&
         //					pDLayer->frext_mode	= (bool)atoi(strTag[1].c_str());
       } else if (strTag[0].compare ("SpatialBitrate") == 0) {
         pDLayer->iSpatialBitrate	= 1000 * atoi (strTag[1].c_str());
-        if (pSvcParam.bEnableRc) {
+        if (pSvcParam.iRCMode!=RC_OFF_MODE) {
           if (pDLayer->iSpatialBitrate <= 0) {
             fprintf (stderr, "Invalid spatial bitrate(%d) in dependency layer #%d.\n", pDLayer->iSpatialBitrate, iLayer);
             return -1;
@@ -248,13 +248,11 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
           pSvcParam.iMultipleThreadIdc = 0;
         else if (pSvcParam.iMultipleThreadIdc > MAX_THREADS_NUM)
           pSvcParam.iMultipleThreadIdc = MAX_THREADS_NUM;
-      } else if (strTag[0].compare ("EnableRC") == 0) {
-        pSvcParam.bEnableRc	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("RCMode") == 0) {
         pSvcParam.iRCMode	= (RC_MODES) atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("TargetBitrate") == 0) {
         pSvcParam.iTargetBitrate	= 1000 * atoi (strTag[1].c_str());
-        if (pSvcParam.bEnableRc && pSvcParam.iTargetBitrate <= 0) {
+        if ((pSvcParam.iRCMode!=RC_OFF_MODE) && pSvcParam.iTargetBitrate <= 0) {
           fprintf (stderr, "Invalid target bitrate setting due to RC enabled. Check TargetBitrate field please!\n");
           return 1;
         }
@@ -394,7 +392,7 @@ void PrintHelp() {
   printf ("  -bgd    Control background detection (default: 0)\n");
   printf ("  -aq     Control adaptive quantization (default: 0)\n");
   printf ("  -ltr    Control long term reference (default: 0)\n");
-  printf ("  -rc	  Control rate control: 0-disable; 1-enable \n");
+  printf ("  -rc	  rate control mode: 0-quality mode; 1-bitrate mode; 2-bitrate limited mode; -1-rc off \n");
   printf ("  -tarb	  Overall target bitrate\n");
   printf ("  -numl   Number Of Layers: Must exist with layer_cfg file and the number of input layer_cfg file must equal to the value set by this command\n");
   printf ("  The options below are layer-based: (need to be set with layer id)\n");
@@ -466,7 +464,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       pSvcParam.iLtrMarkPeriod = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-rc") && (n < argc))
-      pSvcParam.bEnableRc = atoi (argv[n++]) ? true : false;
+      pSvcParam.iRCMode = static_cast<RC_MODES>(atoi(argv[n++]));
 
     else if (!strcmp (pCommand, "-trace") && (n < argc))
       g_LevelSetting = atoi (argv[n++]);

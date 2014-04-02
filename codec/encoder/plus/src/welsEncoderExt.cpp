@@ -196,7 +196,7 @@ void CWelsH264SVCEncoder::InitEncoder (void) {
 /* Interfaces override from ISVCEncoder */
 
 int CWelsH264SVCEncoder::GetDefaultParams (SEncParamExt* argv) {
-  SWelsSvcCodingParam::FillDefault(*argv, true);
+  SWelsSvcCodingParam::FillDefault(*argv);
   return cmResultSuccess;
 }
 
@@ -211,9 +211,9 @@ int CWelsH264SVCEncoder::Initialize (const SEncParamBase* argv) {
     return cmInitParaError;
   }
 
-  SWelsSvcCodingParam	sConfig (true);
+  SWelsSvcCodingParam	sConfig;
   // Convert SEncParamBase into WelsSVCParamConfig here..
-  if (sConfig.ParamBaseTranscode (*argv, true)) {
+  if (sConfig.ParamBaseTranscode (*argv)) {
     WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::Initialize(), parameter_translation failed.\n");
     Uninitialize();
     return cmInitParaError;
@@ -230,7 +230,7 @@ int CWelsH264SVCEncoder::InitializeExt (const SEncParamExt* argv) {
     return cmInitParaError;
   }
 
-  SWelsSvcCodingParam	sConfig (true);
+  SWelsSvcCodingParam	sConfig;
   // Convert SEncParamExt into WelsSVCParamConfig here..
   if (sConfig.ParamTranscode (*argv)) {
     WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::InitializeExt(), parameter_translation failed.\n");
@@ -717,7 +717,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   break;
   case ENCODER_OPTION_SVC_ENCODE_PARAM_EXT: {	// SVC Encoding Parameter
     SEncParamExt		sEncodingParam;
-    SWelsSvcCodingParam	sConfig (true);
+    SWelsSvcCodingParam	sConfig;
     int32_t iInputColorspace = 0;
     int32_t iTargetWidth = 0;
     int32_t iTargetHeight = 0;

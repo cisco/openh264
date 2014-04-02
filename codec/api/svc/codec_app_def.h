@@ -174,9 +174,10 @@ typedef enum {
 } SliceModeEnum;
 
 typedef enum {
-  RC_QUALITY_MODE,      //Quality mode
-  RC_BITRATE_MODE,   //Bitrate mode
-  RC_LOW_BW_MODE, //bitrate limited mode
+  RC_QUALITY_MODE = 0,      //Quality mode
+  RC_BITRATE_MODE = 1,   //Bitrate mode
+  RC_LOW_BW_MODE = 2, //bitrate limited mode
+  RC_OFF_MODE = -1,    // rate control off mode
 } RC_MODES;
 
 typedef enum {
@@ -276,7 +277,6 @@ typedef struct TagEncParamExt
   int      iEtropyCodingModeFlag;
 
   /* rc control */
-  bool    bEnableRc;
   bool    bEnableFrameSkip; // allow skipping frames to keep the bitrate within limits
   int     iMaxBitrate;        // max bitrate desired
   int     iMaxQp;

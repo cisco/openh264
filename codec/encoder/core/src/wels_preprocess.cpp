@@ -363,7 +363,7 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
     AdaptiveQuantCalculation (pCtx->pVaa, pCurPic, pRefPic);
   }
 
-  if (pSvcParam->bEnableRc) {
+  if (pSvcParam->iRCMode != RC_OFF_MODE) {
     AnalyzePictureComplexity (pCtx, pCurPic, pRefPic, kiDidx, bCalculateBGD);
   }
 
