@@ -139,10 +139,10 @@ typedef enum {
 //  Algorithm parameters define
 //-----------------------------------------------------------------//
 typedef struct{
-	SRect sMaskRect;
-	int iScrollMvX;
-	int iScrollMvY;
-	bool bScrollDetectFlag; // 0:false ; 1:ltr; 2: scene change
+  SRect sMaskRect;
+  int iScrollMvX;
+  int iScrollMvY;
+  bool bScrollDetectFlag; // 0:false ; 1:ltr; 2: scene change
 } SScrollDetectionParam;
 
 typedef enum {
