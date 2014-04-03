@@ -951,29 +951,10 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 int32_t CreateSliceThreads (sWelsEncCtx* pCtx) {
   const int32_t kiThreadCount = pCtx->pSvcParam->iCountThreadsNum;
   int32_t iIdx = 0;
-#if defined(_WIN32) && defined(BIND_CPU_CORES_TO_THREADS)
-  DWORD  dwProcessAffinity;
-  DWORD  dwSystemAffinity;
-  GetProcessAffinityMask (GetCurrentProcess(), &dwProcessAffinity, &dwSystemAffinity);
-#endif//WIN32 && BIND_CPU_CORES_TO_THREADS
 
   while (iIdx < kiThreadCount) {
     WelsThreadCreate (&pCtx->pSliceThreading->pThreadHandles[iIdx], CodingSliceThreadProc,
                       &pCtx->pSliceThreading->pThreadPEncCtx[iIdx], 0);
-#if defined(_WIN32) && defined(BIND_CPU_CORES_TO_THREADS)
-    if (dwProcessAffinity > 1
-        && pCtx->pSliceThreading->pThreadHandles[iIdx] != NULL) {	// multiple cores and thread created successfully
-      DWORD  dw = 0;
-      DWORD  dwAffinityMask = 1 << iIdx;
-      if (dwAffinityMask & dwProcessAffinity) { // check if cpu is available
-        dw = SetThreadAffinityMask (pCtx->pSliceThreading->pThreadHandles[iIdx], dwAffinityMask);  //1 << iIdx
-        if (dw == 0) {
-          char str[64] = {0};
-          WelsSnprintf (str, 64, "SetThreadAffinityMask iIdx:%d", iIdx);
-        }
-      }
-    }
-#endif//WIN32 && BIND_CPU_CORES_TO_THREADS
 
     ++ iIdx;
   }
