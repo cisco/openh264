@@ -53,21 +53,21 @@ WELSVP_EXTERN_C_END
 
 class CScrollDetection : public IStrategy{
 public:
-	CScrollDetection(int32_t iCpuFlag){
-		m_eMethod = METHOD_SCROLL_DETECTION;
-		WelsMemset (&m_sScrollDetectionParam, 0, sizeof (m_sScrollDetectionParam));
-	};
-	~CScrollDetection(){
-	}
-	EResult Process(int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap);
-	EResult Set(int32_t iType, void *pParam);
-	EResult Get(int32_t iType, void *pParam);
+  CScrollDetection(int32_t iCpuFlag){
+    m_eMethod = METHOD_SCROLL_DETECTION;
+    WelsMemset (&m_sScrollDetectionParam, 0, sizeof (m_sScrollDetectionParam));
+  };
+  ~CScrollDetection(){
+  }
+  EResult Process(int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap);
+  EResult Set(int32_t iType, void *pParam);
+  EResult Get(int32_t iType, void *pParam);
 
 private:
-	void ScrollDetectionWithMask(SPixMap* pSrcPixMap, SPixMap* pRefPixMap);
-	void ScrollDetectionWithoutMask(SPixMap* pSrcPixMap, SPixMap* pRefPixMap);
+  void ScrollDetectionWithMask(SPixMap* pSrcPixMap, SPixMap* pRefPixMap);
+  void ScrollDetectionWithoutMask(SPixMap* pSrcPixMap, SPixMap* pRefPixMap);
 private:
-	SScrollDetectionParam m_sScrollDetectionParam;
+  SScrollDetectionParam m_sScrollDetectionParam;
 };
 
 WELSVP_NAMESPACE_END
