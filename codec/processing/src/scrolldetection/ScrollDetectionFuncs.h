@@ -28,7 +28,7 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
-* \file	        :  ScrollDetectionFuncs.h 
+* \file	        :  ScrollDetectionFuncs.h
 *
 * \brief	    :  scroll detection class of wels video processor class
 *
