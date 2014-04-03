@@ -131,12 +131,20 @@ typedef enum {
   METHOD_COMPLEXITY_ANALYSIS   ,
   METHOD_COMPLEXITY_ANALYSIS_SCREEN,
   METHOD_IMAGE_ROTATE		  ,
+  METHOD_SCROLL_DETECTION_WITHMASK,
+  METHOD_SCROLL_DETECTION_WITHOUTMASK,
   METHOD_MASK
 } EMethods;
 
 //-----------------------------------------------------------------//
 //  Algorithm parameters define
 //-----------------------------------------------------------------//
+typedef struct{
+	SRect sMaskRect;
+	int iScrollMvX;
+	int iScrollMvY;
+	bool bScrollDetectFlag; // 0:false ; 1:ltr; 2: scene change
+} SScrollDetectionParam;
 
 typedef enum {
   SIMILAR_SCENE,   //similar scene

@@ -802,6 +802,26 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="scrolldetection"
+			>
+			<File
+				RelativePath="..\..\src\scrolldetection\ScrollDetection.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\scrolldetection\ScrollDetection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\scrolldetection\ScrollDetectionFuncs.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\scrolldetection\ScrollDetectionFuncs.h"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
