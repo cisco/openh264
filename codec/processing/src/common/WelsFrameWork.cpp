@@ -268,7 +268,7 @@ IStrategy* CVpFrameWork::CreateStrategy (EMethods m_eMethod, int32_t iCpuFlag) {
     break;
   case METHOD_SCROLL_DETECTION:
 	pStrategy = WelsDynamicCast (IStrategy*, new CScrollDetection(iCpuFlag));
-	break;	
+	break;
   case METHOD_SCENE_CHANGE_DETECTION_VIDEO:
   case METHOD_SCENE_CHANGE_DETECTION_SCREEN:
     pStrategy = BuildSceneChangeDetection(m_eMethod, iCpuFlag);
