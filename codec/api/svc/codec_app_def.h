@@ -273,7 +273,7 @@ typedef struct TagEncParamExt
   bool    bPrefixNalAddingCtrl;
   bool	  bEnableSSEI;
   int      iPaddingFlag;            // 0:disable padding;1:padding
-  int      iEtropyCodingModeFlag;
+  int      iEntropyCodingModeFlag;
 
   /* rc control */
   bool    bEnableRc;
