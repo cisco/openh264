@@ -249,6 +249,7 @@ TEST_F(MotionEstimateTest, TestHorizontalSearch) {
   }
 }
 
+#ifdef X86_ASM
 TEST_F(MotionEstimateTest, TestVerticalSearch_SSE41)
 {
   const int32_t kiMaxBlock16Sad = 72000;//a rough number
@@ -376,3 +377,4 @@ TEST_F(MotionEstimateTest, TestHorizontalSearch_SSE41)
     //it is possible that ref at differnt position is identical, but that should be under a low probability
   }
 }
+#endif
