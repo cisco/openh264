@@ -46,11 +46,9 @@ public:
 
     pMa = new CMemoryAlign(0);
     m_pRefPic = static_cast<uint8_t *>
-    //(malloc(m_iWidth*m_iHeight));
     (pMa->WelsMalloc(m_iWidth*m_iHeight, "RefPic"));
     ASSERT_TRUE( NULL != m_pRefPic );
     m_pSrcBlock = static_cast<uint8_t *>
-    //(malloc(m_iMaxSearchBlock*m_iMaxSearchBlock));
     (pMa->WelsMalloc(m_iMaxSearchBlock*m_iMaxSearchBlock, "SrcBlock"));
     ASSERT_TRUE( NULL != m_pSrcBlock );
     m_pMvdCostTable=new uint16_t[52*m_uiMvdTableSize];
