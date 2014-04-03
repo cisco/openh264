@@ -257,8 +257,14 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
     m_pDecContext->bEndOfStreamFlag	= iVal ? true : false;
 
     return cmResultSuccess;
+  } else if (eOptID == DECODER_OPTION_ERROR_CON_IDC) { // Indicate error concealment status
+    if (pOption == NULL) //Default: SLICE_COPY, enable
+      iVal = ERROR_CON_SLICE_COPY;
+    else
+      iVal = * ((int*)pOption); //EC method
+    m_pDecContext->iErrorConMethod = iVal;
+    return cmResultSuccess;
   }
-
 
   return cmInitParaError;
 }
@@ -309,6 +315,10 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
     return cmResultSuccess;
   } else if (DECODER_OPTION_TEMPORAL_ID == eOptID) { //if have VCL NAL in current AU, then feedback the temporal ID
     iVal = m_pDecContext->iFeedbackTidInAu;
+    * ((int*)pOption) = iVal;
+    return cmResultSuccess;
+  } else if (DECODER_OPTION_ERROR_CON_IDC == eOptID) {
+    iVal = m_pDecContext->iErrorConMethod;
     * ((int*)pOption) = iVal;
     return cmResultSuccess;
   }

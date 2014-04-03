@@ -105,8 +105,16 @@ typedef enum {
   DECODER_OPTION_IDR_PIC_ID,	// feedback current frame belong to which IDR period
   DECODER_OPTION_LTR_MARKING_FLAG,	// feedback wether current frame mark a LTR
   DECODER_OPTION_LTR_MARKED_FRAME_NUM,	// feedback frame num marked by current Frame
+  DECODER_OPTION_ERROR_CON_IDC, //not finished yet, indicate decoder error concealment status, in progress
 
 } DECODER_OPTION;
+
+//enuerate the types of error concealment methods
+typedef enum {
+  ERROR_CON_DISABLE = 0,
+  ERROR_CON_SLICE_COPY,
+} ERROR_CON_IDC;
+
 typedef enum { //feedback that whether or not have VCL NAL in current AU
   FEEDBACK_NON_VCL_NAL = 0,
   FEEDBACK_VCL_NAL,
