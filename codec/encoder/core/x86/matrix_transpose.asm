@@ -40,21 +40,21 @@
 	movq	%6, %9
 	movq	%10, %4
 	MMX_XSwap bw,  %7, %6, %4
-	
-	MMX_XSwap wd,  %1, %3, %6	
+
+	MMX_XSwap wd,  %1, %3, %6
 	MMX_XSwap wd,  %8, %2, %3
 	MMX_XSwap wd,  %5, %7, %2
 	movq	%7, %10
-	movq	%10, %3	
+	movq	%10, %3
 	MMX_XSwap wd,  %7, %4, %3
-	
-	MMX_XSwap dq,  %1, %5, %4	
+
+	MMX_XSwap dq,  %1, %5, %4
 	MMX_XSwap dq,  %6, %2, %5
 	MMX_XSwap dq,  %8, %7, %2
 	movq	%7, %10
-	movq	%10, %5		
+	movq	%10, %5
 	MMX_XSwap dq,  %7, %3, %5
-	
+
 	movq	%3, %10
 %endmacro
 
@@ -64,7 +64,7 @@
 	movq [%1+%2], mm3		; result of line 2
 	lea %1, [%1+2*%2]
 	movq [%1], mm5			; result of line 3
-	movq [%1+%2], mm2		; result of line 4	
+	movq [%1+%2], mm2		; result of line 4
 	lea %1, [%1+2*%2]
 	movq [%1], mm7			; result of line 5
 	movq [%1+%2], mm1		; result of line 6
@@ -79,7 +79,7 @@
 	movq [%1+%2], mm3		; result of line 2
 	lea %3, [%1+2*%2]
 	movq [%3], mm5			; result of line 3
-	movq [%3+%2], mm2		; result of line 4	
+	movq [%3+%2], mm2		; result of line 4
 	lea %3, [%3+2*%2]
 	movq [%3], mm7			; result of line 5
 	movq [%3+%2], mm1		; result of line 6
@@ -99,26 +99,26 @@
 	movdqa	%6, %9
 	movdqa	%10, %4
 	SSE2_XSawp bw,  %7, %6, %4
-	
-	SSE2_XSawp wd,  %1, %3, %6	
+
+	SSE2_XSawp wd,  %1, %3, %6
 	SSE2_XSawp wd,  %8, %2, %3
 	SSE2_XSawp wd,  %5, %7, %2
 	movdqa	%7, %10
-	movdqa	%10, %3	
+	movdqa	%10, %3
 	SSE2_XSawp wd,  %7, %4, %3
-	
-	SSE2_XSawp dq,  %1, %5, %4	
+
+	SSE2_XSawp dq,  %1, %5, %4
 	SSE2_XSawp dq,  %6, %2, %5
 	SSE2_XSawp dq,  %8, %7, %2
 	movdqa	%7, %10
-	movdqa	%10, %5		
+	movdqa	%10, %5
 	SSE2_XSawp dq,  %7, %3, %5
-	
+
 	SSE2_XSawp qdq,  %1, %8, %3
 	SSE2_XSawp qdq,  %4, %2, %8
 	SSE2_XSawp qdq,  %6, %7, %2
 	movdqa	%7, %10
-	movdqa	%10, %1		
+	movdqa	%10, %1
 	SSE2_XSawp qdq,  %7, %5, %1
 	movdqa	%5, %10
 %endmacro	; end of TRANSPOSE_8x16B_SSE2
@@ -130,21 +130,21 @@
 	lea %1, [%1+2*%2]
 	movq [%1], xmm3			; result of line 3
 	movq [%1+%2], xmm7		; result of line 4
-	
+
 	lea %1, [%1+2*%2]
 	movq [%1], xmm5			; result of line 5
 	movq [%1+%2], xmm1		; result of line 6
 	lea %1, [%1+2*%2]
 	movq [%1], xmm6			; result of line 7
 	movq [%1+%2], xmm0		; result of line 8
-	
+
 	lea %1, [%1+2*%2]
 	movhpd [%1], xmm4		; result of line 9
 	movhpd [%1+%2], xmm2	; result of line 10
 	lea %1, [%1+2*%2]
 	movhpd [%1], xmm3		; result of line 11
 	movhpd [%1+%2], xmm7	; result of line 12
-	
+
 	lea %1, [%1+2*%2]
 	movhpd [%1], xmm5		; result of line 13
 	movhpd [%1+%2], xmm1	; result of line 14
@@ -159,21 +159,21 @@
 	lea %3, [%1+2*%2]
 	movq [%3], xmm3			; result of line 3
 	movq [%3+%2], xmm7		; result of line 4
-	
+
 	lea %3, [%3+2*%2]
 	movq [%3], xmm5			; result of line 5
 	movq [%3+%2], xmm1		; result of line 6
 	lea %3, [%3+2*%2]
 	movq [%3], xmm6			; result of line 7
 	movq [%3+%2], xmm0		; result of line 8
-	
+
 	lea %3, [%3+2*%2]
 	movhpd [%3], xmm4		; result of line 9
 	movhpd [%3+%2], xmm2	; result of line 10
 	lea %3, [%3+2*%2]
 	movhpd [%3], xmm3		; result of line 11
 	movhpd [%3+%2], xmm7	; result of line 12
-	
+
 	lea %3, [%3+2*%2]
 	movhpd [%3], xmm5		; result of line 13
 	movhpd [%3+%2], xmm1	; result of line 14
@@ -185,15 +185,8 @@
 
 SECTION .text
 
-WELS_EXTERN transpose_matrix_block_16x16_sse2
-; void transpose_matrix_block_16x16_sse2( void *dst/*16x16*/, const int32_t dst_stride, void *src/*16x16*/, const int32_t src_stride );
-	;push ebx
-	;push esi
-	;push edi
-	;mov edi, [esp+16]	; dst
-	;mov edx, [esp+20]	; dst_stride
-	;mov esi, [esp+24]	; src
-	;mov ebx, [esp+28]	; src_stride
+WELS_EXTERN TransposeMatrixBlock16x16_sse2
+; void TransposeMatrixBlock16x16_sse2( void *dst/*16x16*/, const int32_t dst_stride, void *src/*16x16*/, const int32_t src_stride );
 	push r4
 	push r5
 	%assign push_num 2
@@ -202,11 +195,6 @@ WELS_EXTERN transpose_matrix_block_16x16_sse2
 	SIGN_EXTENSION	r1, r1d
 	SIGN_EXTENSION	r3, r3d
 
-	;mov eax, esp
-	;and eax, 0Fh
-	;sub esp, 10h
-	;sub esp, eax
-	;lea ecx, [ebx+ebx*2]	; src_stride * 3
 	mov r4, r7
 	and r4, 0Fh
 	sub r7, 10h
@@ -214,31 +202,31 @@ WELS_EXTERN transpose_matrix_block_16x16_sse2
 	lea r5, [r3+r3*2]
 	; top 8x16 block
 	movdqa xmm0, [r2]
-	movdqa xmm1, [r2+r3]	
+	movdqa xmm1, [r2+r3]
 	movdqa xmm2, [r2+r3*2]
 	movdqa xmm3, [r2+r5]
 	lea r2, [r2+r3*4]
 	movdqa xmm4, [r2]
-	movdqa xmm5, [r2+r3]	
+	movdqa xmm5, [r2+r3]
 	movdqa xmm6, [r2+r3*2]
-	
+
 	;in:  m0, m1, m2, m3, m4, m5, m6, m7
 	;out: m4, m2, m3, m7, m5, m1, m6, m0
-	TRANSPOSE_8x16B_SSE2	xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [r2+r5], [r7]	
-	
+	TRANSPOSE_8x16B_SSE2	xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [r2+r5], [r7]
+
 	TRANSPOSE8x16_WRITE_SSE2		r0, r1
 
 	; bottom 8x16 block
-	lea	r2, [r2+r3*4]	
+	lea	r2, [r2+r3*4]
 	movdqa xmm0, [r2]
-	movdqa xmm1, [r2+r3]	
+	movdqa xmm1, [r2+r3]
 	movdqa xmm2, [r2+r3*2]
 	movdqa xmm3, [r2+r5]
 	lea r2, [r2+r3*4]
 	movdqa xmm4, [r2]
-	movdqa xmm5, [r2+r3]	
+	movdqa xmm5, [r2+r3]
 	movdqa xmm6, [r2+r3*2]
-	
+
 	;in:  m0, m1, m2, m3, m4, m5, m6, m7
 	;out: m4, m2, m3, m7, m5, m1, m6, m0
 	TRANSPOSE_8x16B_SSE2	xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [r2+r5], [r7]
@@ -257,35 +245,8 @@ WELS_EXTERN transpose_matrix_block_16x16_sse2
 	pop r4
 	ret
 
-WELS_EXTERN transpose_matrix_blocks_x16_sse2
-; void transpose_matrix_blocks_x16_sse2( void *dst/*W16x16*/, const int32_t dst_stride, void *src/*16xW16*/, const int32_t src_stride, const int32_t num_blocks );
-	;%define		push_size		16
-	;%define		local_size		4+16
-	;%define		dst				esp+eax+push_size+local_size+4
-	;%define		dst_stride		esp+eax+push_size+local_size+8
-	;%define		src				esp+eax+push_size+local_size+12
-	;%define		src_stride		esp+eax+push_size+local_size+16
-	;%define		num_blk			esp+eax+push_size+local_size+20
-	;%define		alg_mem			esp
-	;%define		tmp_num_blk		esp+16
-	;push ebx
-	;push esi
-	;push edi
-	;push ebp
-
-	;sub	esp,	local_size
-
-	;mov eax, esp
-	;and eax, 0Fh
-	;sub esp, eax
-	
-	;mov edi, [dst]			; dst
-	;mov edx, [dst_stride]	; dst_stride
-	;mov esi, [src]			; src
-	;mov ebx, [src_stride]	; src_stride
-	;mov ecx, [num_blk]		; num_blocks_16x16
-
-	;mov	[tmp_num_blk],	ecx
+WELS_EXTERN TransposeMatrixBlocksx16_sse2
+; void TransposeMatrixBlocksx16_sse2( void *dst/*W16x16*/, const int32_t dst_stride, void *src/*16xW16*/, const int32_t src_stride, const int32_t num_blocks );
 	push r5
 	push r6
 	%assign push_num 2
@@ -299,9 +260,9 @@ WELS_EXTERN transpose_matrix_blocks_x16_sse2
 	sub r7, 10h
 	sub r7, r5
 TRANSPOSE_LOOP_SSE2:
-	; explictly loading next loop data	
+	; explictly loading next loop data
 	lea	r6, [r2+r3*8]
-	push r4	
+	push r4
 %rep 8
 	mov	r4, [r6]
 	mov	r4, [r6+r3]
@@ -310,7 +271,7 @@ TRANSPOSE_LOOP_SSE2:
 	pop r4
 	; top 8x16 block
 	movdqa xmm0, [r2]
-	movdqa xmm1, [r2+r3]	
+	movdqa xmm1, [r2+r3]
 	lea r2, [r2+r3*2]
 	movdqa xmm2, [r2]
 	movdqa xmm3, [r2+r3]
@@ -319,14 +280,14 @@ TRANSPOSE_LOOP_SSE2:
 	movdqa xmm5, [r2+r3]
 	lea r2, [r2+r3*2]
 	movdqa xmm6, [r2]
-	
+
 	;in:  m0, m1, m2, m3, m4, m5, m6, m7
 	;out: m4, m2, m3, m7, m5, m1, m6, m0
-	TRANSPOSE_8x16B_SSE2	xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [r2+r3], [r7]		
+	TRANSPOSE_8x16B_SSE2	xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [r2+r3], [r7]
 	TRANSPOSE8x16_WRITE_ALT_SSE2		r0, r1, r6
 	lea	r2, [r2+r3*2]
 
-	; bottom 8x16 block	
+	; bottom 8x16 block
 	movdqa xmm0, [r2]
 	movdqa xmm1, [r2+r3]
 	lea	r2, [r2+r3*2]
@@ -337,16 +298,16 @@ TRANSPOSE_LOOP_SSE2:
 	movdqa xmm5, [r2+r3]
 	lea	r2, [r2+r3*2]
 	movdqa xmm6, [r2]
-	
+
 	;in:  m0, m1, m2, m3, m4, m5, m6, m7
 	;out: m4, m2, m3, m7, m5, m1, m6, m0
-	TRANSPOSE_8x16B_SSE2	xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [r2+r3], [r7]	
+	TRANSPOSE_8x16B_SSE2	xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [r2+r3], [r7]
 	TRANSPOSE8x16_WRITE_ALT_SSE2		r0+8, r1, r6
 	lea	r2, [r2+r3*2]
 	lea r0, [r0+16]
 	dec r4
 	jg near TRANSPOSE_LOOP_SSE2
-	
+
 	add r7, r5
 	add r7, 10h
 	POP_XMM
@@ -355,14 +316,8 @@ TRANSPOSE_LOOP_SSE2:
 	pop r5
 	ret
 
-WELS_EXTERN transpose_matrix_block_8x8_mmx
-; void transpose_matrix_block_8x8_mmx( void *dst/*8x8*/, const int32_t dst_stride, void *src/*8x8*/, const int32_t src_stride );
-	;push ebx
-
-	;mov edx, [esp+8]	; dst
-	;mov ebx, [esp+12]	; dst_stride
-	;mov eax, [esp+16]	; src
-	;mov ecx, [esp+20]	; src_stride
+WELS_EXTERN TransposeMatrixBlock8x8_mmx
+; void TransposeMatrixBlock8x8_mmx( void *dst/*8x8*/, const int32_t dst_stride, void *src/*8x8*/, const int32_t src_stride );
 	%assign push_num 0
 	LOAD_4_PARA
 	SIGN_EXTENSION  r1, r1d
@@ -378,39 +333,28 @@ WELS_EXTERN transpose_matrix_block_8x8_mmx
 	movq mm4, [r2]
 	movq mm5, [r2+r3]
 	lea r2, [r2+2*r3]
-	movq mm6, [r2]	
-	
+	movq mm6, [r2]
+
 	;in:  m0, m1, m2, m3, m4, m5, m6, m7
 	;out: m0, m3, m5, m2, m7, m1, m6, m4
 	TRANSPOSE_8x8B_MMX mm0, mm1, mm2, mm3, mm4, mm5, mm6, mm7, [r2+r3], [r7]
-	
+
 	TRANSPOSE8x8_WRITE_MMX r0, r1
-	
+
 	emms
 	add r7, 8
 	LOAD_4_PARA_POP
 	ret
 
-WELS_EXTERN transpose_matrix_blocks_x8_mmx
-; void transpose_matrix_blocks_x8_mmx( void *dst/*8xW8*/, const int32_t dst_stride, void *src/*W8x8*/, const int32_t src_stride, const int32_t num_blocks );
-	;%define _PUSH	16
-	;push ebx	
-	;push esi
-	;push edi
-	;push ebp
-	
-	;mov edi, [esp+_PUSH+4]	; dst
-	;mov ebx, [esp+_PUSH+8]	; dst_stride
-	;mov esi, [esp+_PUSH+12]	; src
-	;mov eax, [esp+_PUSH+16]	; src_stride
-	;mov ecx, [esp+_PUSH+20]	; num_blocks_x8
+WELS_EXTERN TransposeMatrixBlocksx8_mmx
+; void TransposeMatrixBlocksx8_mmx( void *dst/*8xW8*/, const int32_t dst_stride, void *src/*W8x8*/, const int32_t src_stride, const int32_t num_blocks );
 	push r5
 	push r6
 	%assign push_num 2
 	LOAD_5_PARA
 	SIGN_EXTENSION  r1, r1d
 	SIGN_EXTENSION  r3, r3d
-	SIGN_EXTENSION  r4, r4d	
+	SIGN_EXTENSION  r4, r4d
 	sub	r7, 8
 
 	lea	r5, [r2+r3*8]
@@ -431,18 +375,18 @@ TRANSPOSE_BLOCKS_X8_LOOP_MMX:
 	movq mm4, [r2]
 	movq mm5, [r2+r3]
 	lea r2, [r2+2*r3]
-	movq mm6, [r2]	
-	
+	movq mm6, [r2]
+
 	;in:  m0, m1, m2, m3, m4, m5, m6, m7
 	;out: m0, m3, m5, m2, m7, m1, m6, m4
 	TRANSPOSE_8x8B_MMX mm0, mm1, mm2, mm3, mm4, mm5, mm6, mm7, [r2+r3], [r7]
-	
+
 	TRANSPOSE8x8_WRITE_ALT_MMX r0, r1, r6
 	lea r0, [r0+8]
 	lea r2, [r2+2*r3]
 	dec r4
 	jg near TRANSPOSE_BLOCKS_X8_LOOP_MMX
-	
+
 	emms
 	add r7, 8
 	LOAD_5_PARA_POP

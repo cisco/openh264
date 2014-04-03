@@ -206,7 +206,8 @@ struct TagWelsFuncPointerList {
   PSearchMethodFunc pfSearchMethod[BLOCK_SIZE_ALL];
   PCalculateSatdFunc pfCalculateSatd;
   PCheckDirectionalMv pfCheckDirectionalMv;
-  PLineFullSearchFunc pfLineFullSearch;
+  PLineFullSearchFunc pfVerticalFullSearch;
+  PLineFullSearchFunc pfHorizontalFullSearch;
 
   PCopyFunc      pfCopy16x16Aligned;		//svc_encode_slice.c svc_mode_decision.c svc_base_layer_md.c
   PCopyFunc      pfCopy16x16NotAligned;	//md.c

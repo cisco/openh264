@@ -35,7 +35,7 @@ SECTION .text
 
 ;**********************************************************************************************************************************
 ;
-;	uint32_t pixel_sad_16x16_hor8_sse41( uint8_t *src, int32_t stride_src, uint8_t *ref, int32_t stride_ref, uint16 base_cost[8], int32_t *index_min_cost )
+;	uint32_t SampleSad16x16Hor8_sse41( uint8_t *src, int32_t stride_src, uint8_t *ref, int32_t stride_ref, uint16 base_cost[8], int32_t *index_min_cost )
 ;
 ;	\note:
 ;		src need align with 16 bytes, ref is optional
@@ -50,21 +50,21 @@ SECTION .text
     movdqu		xmm2, [%2+8h]
     movdqa		xmm3, xmm1
     movdqa		xmm4, xmm2
-    
+
     mpsadbw		xmm1, xmm0, 0	; 000 B
     paddw		xmm7, xmm1		; accumulate cost
-    
+
     mpsadbw		xmm3, xmm0, 5	; 101 B
     paddw		xmm7, xmm3		; accumulate cost
-     
+
     mpsadbw		xmm2, xmm0, 2	; 010 B
     paddw		xmm7, xmm2		; accumulate cost
-    
-    mpsadbw		xmm4, xmm0, 7	; 111 B    
+
+    mpsadbw		xmm4, xmm0, 7	; 111 B
     paddw		xmm7, xmm4		; accumulate cost
-    
+
     add			%1, %3
-    add			%2, %4               
+    add			%2, %4
 %endmacro	; end of SAD_16x16_LINE_SSE41
 %macro   SAD_16x16_LINE_SSE41E  4	; src, ref, stride_src, stride_ref
     movdqa		xmm0, [%1]
@@ -72,23 +72,23 @@ SECTION .text
     movdqu		xmm2, [%2+8h]
     movdqa		xmm3, xmm1
     movdqa		xmm4, xmm2
-    
+
     mpsadbw		xmm1, xmm0, 0	; 000 B
     paddw		xmm7, xmm1		; accumulate cost
-    
+
     mpsadbw		xmm3, xmm0, 5	; 101 B
     paddw		xmm7, xmm3		; accumulate cost
-     
+
     mpsadbw		xmm2, xmm0, 2	; 010 B
     paddw		xmm7, xmm2		; accumulate cost
-    
-    mpsadbw		xmm4, xmm0, 7	; 111 B    
-    paddw		xmm7, xmm4		; accumulate cost                   
+
+    mpsadbw		xmm4, xmm0, 7	; 111 B
+    paddw		xmm7, xmm4		; accumulate cost
 %endmacro	; end of SAD_16x16_LINE_SSE41E
 
-WELS_EXTERN pixel_sad_16x16_hor8_sse41
+WELS_EXTERN SampleSad16x16Hor8_sse41
     ;push ebx
-    ;push esi	
+    ;push esi
     ;mov eax, [esp+12]	;   src
     ;mov ecx, [esp+16]	;   stride_src
     ;mov ebx, [esp+20]	;   ref
@@ -100,22 +100,22 @@ WELS_EXTERN pixel_sad_16x16_hor8_sse41
     SIGN_EXTENSION	r1, r1d
     SIGN_EXTENSION	r3, r3d
     pxor	xmm7,	xmm7
-    
+
     SAD_16x16_LINE_SSE41	r0, r2, r1, r3
     SAD_16x16_LINE_SSE41	r0, r2, r1, r3
     SAD_16x16_LINE_SSE41	r0, r2, r1, r3
     SAD_16x16_LINE_SSE41	r0, r2, r1, r3
-    
+
     SAD_16x16_LINE_SSE41	r0, r2, r1, r3
     SAD_16x16_LINE_SSE41	r0, r2, r1, r3
     SAD_16x16_LINE_SSE41	r0, r2, r1, r3
     SAD_16x16_LINE_SSE41	r0, r2, r1, r3
-    
+
     SAD_16x16_LINE_SSE41	r0, r2, r1, r3
     SAD_16x16_LINE_SSE41	r0, r2, r1, r3
     SAD_16x16_LINE_SSE41	r0, r2, r1, r3
     SAD_16x16_LINE_SSE41	r0, r2, r1, r3
-    
+
     SAD_16x16_LINE_SSE41	r0, r2, r1, r3
     SAD_16x16_LINE_SSE41	r0, r2, r1, r3
     SAD_16x16_LINE_SSE41	r0, r2, r1, r3
@@ -141,24 +141,24 @@ WELS_EXTERN pixel_sad_16x16_hor8_sse41
     pminud	xmm2,	xmm3
     movd	retrd,	xmm2
     pcmpeqd 	xmm4,	xmm2
-    movmskps	r2d, xmm4	
+    movmskps	r2d, xmm4
     bsf		r1d,	r2d
     jnz	near WRITE_INDEX
 
     pcmpeqd 	xmm5,	xmm2
-    movmskps	r2d, xmm5	
+    movmskps	r2d, xmm5
     bsf		r1d,	r2d
     add		r1d,	4
 
-WRITE_INDEX:	
+WRITE_INDEX:
     mov		[r5],	r1d
     POP_XMM
-    LOAD_6_PARA_POP	
+    LOAD_6_PARA_POP
     ret
 
 ;**********************************************************************************************************************************
 ;
-;	uint32_t pixel_sad_8x8_hor8_sse41( uint8_t *src, int32_t stride_src, uint8_t *ref, int32_t stride_ref, uint16_t base_cost[8], int32_t *index_min_cost )
+;	uint32_t SampleSad8x8Hor8_sse41( uint8_t *src, int32_t stride_src, uint8_t *ref, int32_t stride_ref, uint16_t base_cost[8], int32_t *index_min_cost )
 ;
 ;	\note:
 ;		src and ref is optional to align with 16 due inter 8x8
@@ -172,54 +172,54 @@ WRITE_INDEX:
     movdqu		xmm0, [%1]
     movdqu		xmm1, [%2]
     movdqa		xmm2, xmm1
-    
+
     mpsadbw		xmm1, xmm0, 0	; 000 B
     paddw		xmm7, xmm1		; accumulate cost
-    
+
     mpsadbw		xmm2, xmm0, 5	; 101 B
     paddw		xmm7, xmm2		; accumulate cost
-    
+
     add			%1, %3
-    add			%2, %4               
+    add			%2, %4
 %endmacro	; end of SAD_8x8_LINE_SSE41
 %macro   SAD_8x8_LINE_SSE41E  4	; src, ref, stride_src, stride_ref
     movdqu		xmm0, [%1]
     movdqu		xmm1, [%2]
     movdqa		xmm2, xmm1
-    
+
     mpsadbw		xmm1, xmm0, 0	; 000 B
     paddw		xmm7, xmm1		; accumulate cost
-    
+
     mpsadbw		xmm2, xmm0, 5	; 101 B
-    paddw		xmm7, xmm2		; accumulate cost    
+    paddw		xmm7, xmm2		; accumulate cost
 %endmacro	; end of SAD_8x8_LINE_SSE41E
 
-WELS_EXTERN pixel_sad_8x8_hor8_sse41	
+WELS_EXTERN SampleSad8x8Hor8_sse41
     %assign  push_num 0
     LOAD_6_PARA
     PUSH_XMM 8
     SIGN_EXTENSION	r1, r1d
-    SIGN_EXTENSION	r3, r3d   
-    movdqa xmm7, [r4]	;	load base cost list    
-    
+    SIGN_EXTENSION	r3, r3d
+    movdqa xmm7, [r4]	;	load base cost list
+
     SAD_8x8_LINE_SSE41	r0, r2, r1, r3
     SAD_8x8_LINE_SSE41	r0, r2, r1, r3
     SAD_8x8_LINE_SSE41	r0, r2, r1, r3
     SAD_8x8_LINE_SSE41	r0, r2, r1, r3
-    
+
     SAD_8x8_LINE_SSE41	r0, r2, r1, r3
     SAD_8x8_LINE_SSE41	r0, r2, r1, r3
     SAD_8x8_LINE_SSE41	r0, r2, r1, r3
     SAD_8x8_LINE_SSE41E	r0, r2, r1, r3
-    
+
     phminposuw	xmm0, xmm7	; horizon search the minimal sad cost and its index
     movd	retrd, xmm0	; for return: DEST[15:0] <- MIN, DEST[31:16] <- INDEX
     mov		r1d, retrd
     and		retrd, 0xFFFF
     sar		r1d, 16
     mov		[r5], r1d
-        
+
     POP_XMM
-    LOAD_6_PARA_POP	
+    LOAD_6_PARA_POP
     ret
 

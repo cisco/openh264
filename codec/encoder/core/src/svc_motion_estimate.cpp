@@ -65,9 +65,16 @@ void WelsInitMeFunc( SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag, bool bScre
     pFuncList->pfCheckDirectionalMv = CheckDirectionalMv;
 
     //for cross serarch
-    pFuncList->pfLineFullSearch = LineFullSearch_c;
+    pFuncList->pfVerticalFullSearch = LineFullSearch_c;
+    pFuncList->pfHorizontalFullSearch = LineFullSearch_c;
+#if defined (X86_ASM)
     if ( uiCpuFlag & WELS_CPU_SSE41 ) {
+      pFuncList->pfSampleSadHor8[0] = SampleSad16x16Hor8_sse41;
+      pFuncList->pfSampleSadHor8[1] = SampleSad8x8Hor8_sse41;
+      pFuncList->pfVerticalFullSearch = VerticalFullSearchUsingSSE41;
+      pFuncList->pfHorizontalFullSearch = HorizontalFullSearchUsingSSE41;
     }
+#endif
   }
 }
 
@@ -296,6 +303,7 @@ bool CheckDirectionalMvFalse(PSampleSadSatdCostFunc pSad, void * vpMe,
 // Cross Search Basics
 /////////////////////////
     
+#if defined (X86_ASM)
 void CalcMvdCostx8_c( uint16_t *pMvdCost, const int32_t kiStartMv, uint16_t* pMvdTable, const uint16_t kiFixedCost )
 {
   uint16_t *pBaseCost		= pMvdCost;
@@ -320,8 +328,8 @@ void VerticalFullSearchUsingSSE41( void *pFunc, void *vpMe,
   const int32_t kiEdgeBlocks	= kIsBlock8x8 ? 8 : 16;
   PSampleSadHor8Func pSampleSadHor8 = pFuncList->pfSampleSadHor8[kIsBlock8x8];
   PSampleSadSatdCostFunc pSad = pFuncList->sSampleDealingFuncs.pfSampleSad[pMe->uiBlockSize];
-  PTransposeMatrixBlockFunc	transps_matrix_block = kIsBlock8x8 ? transpose_matrix_block_8x8_mmx : transpose_matrix_block_16x16_sse2;
-  PTransposeMatrixBlocksFunc	transps_matrix_blocks= kIsBlock8x8 ? transpose_matrix_blocks_x8_mmx : transpose_matrix_blocks_x16_sse2;
+  PTransposeMatrixBlockFunc	TransposeMatrixBlock = kIsBlock8x8 ? TransposeMatrixBlock8x8_mmx : TransposeMatrixBlock16x16_sse2;
+  PTransposeMatrixBlocksFunc	TransposeMatrixBlocks= kIsBlock8x8 ? TransposeMatrixBlocksx8_mmx : TransposeMatrixBlocksx16_sse2;
 
   const int32_t kiDiff			= kiMaxPos - kiMinPos;
   const int32_t kiRowNum		= WELS_ALIGN((kiDiff - kiEdgeBlocks + 1), kiEdgeBlocks);
@@ -333,8 +341,8 @@ void VerticalFullSearchUsingSSE41( void *pFunc, void *vpMe,
   ENFORCE_STACK_ALIGN_2D( uint8_t, uiMatrixEnc, 16, 16, 16 );				// transpose matrix result for enc
   assert(kiRowNum <= kiMatrixStride);	// make sure effective memory
 
-  transps_matrix_block( &uiMatrixEnc[0][0], 16, kpEncMb, kiEncStride );
-  transps_matrix_blocks( &uiMatrixRef[0][0], kiMatrixStride, pRef, kiRefStride, kiBlocksNum );
+  TransposeMatrixBlock( &uiMatrixEnc[0][0], 16, kpEncMb, kiEncStride );
+  TransposeMatrixBlocks( &uiMatrixRef[0][0], kiMatrixStride, pRef, kiRefStride, kiBlocksNum );
   ENFORCE_STACK_ALIGN_1D( uint16_t, uiBaseCost, 8, 16 );
   int32_t iTargetPos			= kiMinPos;
   int16_t iBestPos				= pMe->sMv.iMvX;
@@ -431,7 +439,7 @@ void HorizontalFullSearchUsingSSE41( void *pFunc, void *vpMe,
     UpdateMeResults( sBestMv, uiBestCost, &pMe->pColoRefMb[sBestMv.iMvY], pMe );
   }
 }
-
+#endif
 void LineFullSearch_c(	void *pFunc, void *vpMe,
 													uint16_t* pMvdTable, const int32_t kiFixedMvd,
 													const int32_t kiEncStride, const int32_t kiRefStride,
@@ -468,8 +476,8 @@ void LineFullSearch_c(	void *pFunc, void *vpMe,
 
 void WelsMotionCrossSearch(SWelsFuncPtrList *pFuncList,  SWelsME * pMe,
 											const SSlice* pSlice, const int32_t kiEncStride,  const int32_t kiRefStride) {
-  PLineFullSearchFunc pfVerticalFullSearchFunc	= pFuncList->pfLineFullSearch;
-  PLineFullSearchFunc pfHorizontalFullSearchFunc	= pFuncList->pfLineFullSearch;
+  PLineFullSearchFunc pfVerticalFullSearchFunc	= pFuncList->pfVerticalFullSearch;
+  PLineFullSearchFunc pfHorizontalFullSearchFunc	= pFuncList->pfHorizontalFullSearch;
 
   const int32_t iCurMeBlockPixX = pMe->iCurMeBlockPixX;
   const int32_t iCurMeBlockQpelPixX = ((iCurMeBlockPixX)<<2);

@@ -5,6 +5,7 @@
 #include "sample.h"
 #include "svc_motion_estimate.h"
 #include "wels_func_ptr_def.h"
+#include "cpu.h"
 
 
 using namespace WelsSVCEnc;
@@ -262,6 +263,7 @@ TEST_F(MotionEstimateTest, TestVerticalSearch_SSE41)
 
   SMVUnitXY sTargetMv;
   WelsInitSampleSadFunc( &sFuncList, 0 );//test c functions
+  WelsInitMeFunc(&sFuncList, WELS_CPU_SSE41, 1);
 
   uint8_t *pRefPicCenter = m_pRefPic+(m_iHeight/2)*m_iWidth+(m_iWidth/2);
   sMe.iCurMeBlockPixX = (m_iWidth/2);
@@ -325,6 +327,7 @@ TEST_F(MotionEstimateTest, TestHorizontalSearch_SSE41)
 
   SMVUnitXY sTargetMv;
   WelsInitSampleSadFunc( &sFuncList, 0 );//test c functions
+  WelsInitMeFunc(&sFuncList, WELS_CPU_SSE41, 1);
 
   uint8_t *pRefPicCenter = m_pRefPic+(m_iHeight/2)*m_iWidth+(m_iWidth/2);
   sMe.iCurMeBlockPixX = (m_iWidth/2);
