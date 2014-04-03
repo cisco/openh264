@@ -302,7 +302,6 @@ bool CheckDirectionalMvFalse(PSampleSadSatdCostFunc pSad, void * vpMe,
 /////////////////////////
 // Cross Search Basics
 /////////////////////////
-    
 #if defined (X86_ASM)
 void CalcMvdCostx8_c( uint16_t *pMvdCost, const int32_t kiStartMv, uint16_t* pMvdTable, const uint16_t kiFixedCost )
 {

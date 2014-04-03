@@ -40,11 +40,11 @@ ENCODER_ASM_SRCS=\
 	$(ENCODER_SRCDIR)/core/x86/coeff.asm\
 	$(ENCODER_SRCDIR)/core/x86/dct.asm\
 	$(ENCODER_SRCDIR)/core/x86/intra_pred.asm\
+	$(ENCODER_SRCDIR)/core/x86/matrix_transpose.asm\
 	$(ENCODER_SRCDIR)/core/x86/memzero.asm\
 	$(ENCODER_SRCDIR)/core/x86/quant.asm\
+	$(ENCODER_SRCDIR)/core/x86/sample_sc.asm\
 	$(ENCODER_SRCDIR)/core/x86/score.asm\
-        $(ENCODER_SRCDIR)/core/x86/matrix_transpose.asm\
-        $(ENCODER_SRCDIR)/core/x86/sample_sc.asm\
 
 ENCODER_OBJS += $(ENCODER_ASM_SRCS:.asm=.$(OBJ))
 endif
