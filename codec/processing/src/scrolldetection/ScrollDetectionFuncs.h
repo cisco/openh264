@@ -28,7 +28,7 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
-* \file	        :  ScrollDetectionFuncs.h.h 
+* \file	        :  ScrollDetectionFuncs.h 
 *
 * \brief	    :  scroll detection class of wels video processor class
 *
@@ -55,7 +55,7 @@ int32_t CheckLine(uint8_t* pData, int32_t iWidth);
 int32_t SelectTestLine(uint8_t* pY, int32_t iWidth, int32_t iHeight, int32_t iPicHeight,
 					   int32_t iStride, int32_t iOffsetX, int32_t iOffsetY);
 int32_t CompareLine(uint8_t *pYSrc, uint8_t *pYRef, const int32_t kiWidth);
-void ScrollDetectionCore(SPixMap* pSrcPixMap, SPixMap* pRefPixMap, int32_t iWidth, int32_t iHeight, 
+void ScrollDetectionCore(SPixMap* pSrcPixMap, SPixMap* pRefPixMap, int32_t iWidth, int32_t iHeight,
 						 int32_t iOffsetX, int32_t iOffsetY, SScrollDetectionParam &sScrollDetectionParam);
 
 WELSVP_NAMESPACE_END

@@ -28,7 +28,7 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
-* \file	        :  ScrollDectection.h 
+* \file	        :  ScrollDectection.h
 *
 * \brief	    :  scroll detection class of wels video processor class
 *
@@ -51,16 +51,14 @@ WELSVP_EXTERN_C_BEGIN
 WELSVP_EXTERN_C_END
 #endif
 
-class CScrollDetection : public IStrategy{	  
+class CScrollDetection : public IStrategy{
 public:
 	CScrollDetection(EMethods eMethod, int32_t iCpuFlag){
 		m_eMethod   = eMethod;
 		WelsMemset (&m_sScrollDetectionParam, 0, sizeof (m_sScrollDetectionParam));
 	};
 	~CScrollDetection(){
-
 	}
-	
 	EResult Process(int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap);
 	EResult Set(int32_t iType, void *pParam);
 	EResult Get(int32_t iType, void *pParam);
@@ -70,6 +68,6 @@ private:
 	void ScrollDetectionWithoutMask(SPixMap* pSrcPixMap, SPixMap* pRefPixMap);
 private:
 	SScrollDetectionParam m_sScrollDetectionParam;
-};	
+};
 
 WELSVP_NAMESPACE_END

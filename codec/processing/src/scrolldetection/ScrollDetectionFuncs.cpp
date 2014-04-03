@@ -67,7 +67,7 @@ int32_t CheckLine(uint8_t* pData, int32_t iWidth){
 }
 
 int32_t SelectTestLine(uint8_t* pY, int32_t iWidth, int32_t iHeight, int32_t iPicHeight,
-						 int32_t iStride, int32_t iOffsetX, int32_t iOffsetY){	
+						 int32_t iStride, int32_t iOffsetX, int32_t iOffsetY){
 	const int32_t kiHalfHeight	= iHeight >> 1;
 	const int32_t kiMidPos		= iOffsetY + kiHalfHeight;
 	int32_t TestPos			= kiMidPos;
@@ -107,7 +107,7 @@ int32_t CompareLine(uint8_t *pYSrc, uint8_t *pYRef, const int32_t kiWidth)
 	return iCmp;
 }
 
-void ScrollDetectionCore(SPixMap* pSrcPixMap, SPixMap* pRefPixMap, int32_t iWidth, int32_t iHeight, 
+void ScrollDetectionCore(SPixMap* pSrcPixMap, SPixMap* pRefPixMap, int32_t iWidth, int32_t iHeight,
 						 int32_t iOffsetX, int32_t iOffsetY, SScrollDetectionParam &sScrollDetectionParam){
 	bool bScrollDetected = 0;
 	uint8_t* pYLine;
@@ -154,7 +154,7 @@ void ScrollDetectionCore(SPixMap* pSrcPixMap, SPixMap* pRefPixMap, int32_t iWidt
 					pYLineUpper += iYStride;
 				}
 				if (i == iCheckedLines){
-					bScrollDetected=1; 
+					bScrollDetected=1;
 					break;
 				}
 			}
@@ -182,7 +182,7 @@ void ScrollDetectionCore(SPixMap* pSrcPixMap, SPixMap* pRefPixMap, int32_t iWidt
 					pYLineUpper += iYStride;
 				}
 				if (i == iCheckedLines){
-					bScrollDetected=1; 
+					bScrollDetected=1;
 					break;
 				}
 			}
