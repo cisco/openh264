@@ -53,8 +53,8 @@ WELSVP_EXTERN_C_END
 
 class CScrollDetection : public IStrategy{
 public:
-	CScrollDetection(EMethods eMethod, int32_t iCpuFlag){
-		m_eMethod   = eMethod;
+	CScrollDetection(int32_t iCpuFlag){
+		m_eMethod = METHOD_SCROLL_DETECTION;
 		WelsMemset (&m_sScrollDetectionParam, 0, sizeof (m_sScrollDetectionParam));
 	};
 	~CScrollDetection(){

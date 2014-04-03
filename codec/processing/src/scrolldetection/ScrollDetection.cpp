@@ -44,13 +44,11 @@ EResult CScrollDetection::Process(int32_t iType, SPixMap* pSrcPixMap, SPixMap* p
 		return RET_INVALIDPARAM;
 	}
 
-	if (m_eMethod==METHOD_SCROLL_DETECTION_WITHMASK){
-		ScrollDetectionWithMask(pSrcPixMap, pRefPixMap);
-	}
-	else if(m_eMethod==METHOD_SCROLL_DETECTION_WITHOUTMASK){
+	bool iMask = m_bInit;
+	if (!iMask)
 		ScrollDetectionWithoutMask(pSrcPixMap, pRefPixMap);
-	}
-	else return RET_NOTSUPPORTED;
+	else
+		ScrollDetectionWithMask(pSrcPixMap, pRefPixMap);
 
 	return RET_SUCCESS;
 }
