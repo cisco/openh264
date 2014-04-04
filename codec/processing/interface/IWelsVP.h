@@ -140,6 +140,7 @@ typedef enum {
 //-----------------------------------------------------------------//
 typedef struct{
   SRect sMaskRect;
+  bool bMaskInfoAvailable;
   int iScrollMvX;
   int iScrollMvY;
   bool bScrollDetectFlag; // 0:false ; 1:ltr; 2: scene change

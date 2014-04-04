@@ -44,8 +44,7 @@ EResult CScrollDetection::Process(int32_t iType, SPixMap* pSrcPixMap, SPixMap* p
   return RET_INVALIDPARAM;
   }
 
-  bool iMask = m_bInit;
-  if (!iMask)
+  if (!m_sScrollDetectionParam.bMaskInfoAvailable)
     ScrollDetectionWithoutMask(pSrcPixMap, pRefPixMap);
   else
     ScrollDetectionWithMask(pSrcPixMap, pRefPixMap);
@@ -85,7 +84,7 @@ void CScrollDetection::ScrollDetectionWithMask(SPixMap* pSrcPixMap, SPixMap* pRe
   m_sScrollDetectionParam.bScrollDetectFlag = false;
 
   if(iStartX >= 0 && iWidth > MINIMUM_DETECT_WIDTH && iHeight > 2 * CHECK_OFFSET){
-    ScrollDetectionCore(pRefPixMap, pSrcPixMap, iWidth, iHeight, iStartX, iStartY, m_sScrollDetectionParam);
+    ScrollDetectionCore(pSrcPixMap, pRefPixMap,iWidth, iHeight, iStartX, iStartY, m_sScrollDetectionParam);
   }
 }
 
@@ -110,7 +109,7 @@ void CScrollDetection::ScrollDetectionWithoutMask(SPixMap* pSrcPixMap, SPixMap* 
     m_sScrollDetectionParam.iScrollMvY = 0;
     m_sScrollDetectionParam.bScrollDetectFlag = false;
 
-    ScrollDetectionCore(pRefPixMap, pSrcPixMap, iWidth, iHeight, iStartX, iStartY, m_sScrollDetectionParam);
+    ScrollDetectionCore(pSrcPixMap, pRefPixMap, iWidth, iHeight, iStartX, iStartY, m_sScrollDetectionParam);
 
     if (m_sScrollDetectionParam.bScrollDetectFlag && m_sScrollDetectionParam.iScrollMvY)
       break;
