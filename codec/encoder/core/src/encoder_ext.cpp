@@ -2135,8 +2135,6 @@ int32_t PicPartitionNumDecision (sWelsEncCtx* pCtx) {
   int32_t iPartitionNum	= 1;
   if (pCtx->pSvcParam->iMultipleThreadIdc > 1) {
     iPartitionNum	= pCtx->pSvcParam->iCountThreadsNum;
-    if (P_SLICE == pCtx->eSliceType)
-      iPartitionNum	= 1;
   }
   return iPartitionNum;
 }
