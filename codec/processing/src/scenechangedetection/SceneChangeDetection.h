@@ -90,11 +90,11 @@ public:
   void operator() (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY, uint8_t *& pStaticBlockIdc) {
     int32_t iSad = m_pfSad(pSrcY, iSrcStrideY, pRefY, iSrcStrideY);
     if( iSad == 0 ){
-      *pStaticBlockIdc ++ = NO_STATIC;
+      *pStaticBlockIdc ++ = COLLOCATED_STATIC;
     } else {
       m_sParam.iFrameComplexity += iSad;
       m_sParam.iMotionBlockNum += iSad > HIGH_MOTION_BLOCK_THRESHOLD;
-      *pStaticBlockIdc ++ = COLLOCATED_STATIC;
+      *pStaticBlockIdc ++ = NO_STATIC;
     }
   }
 };
