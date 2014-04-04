@@ -14,6 +14,8 @@ PROCESSING_CPP_SRCS=\
 	$(PROCESSING_SRCDIR)/src/imagerotate/imagerotate.cpp\
 	$(PROCESSING_SRCDIR)/src/imagerotate/imagerotatefuncs.cpp\
 	$(PROCESSING_SRCDIR)/src/scenechangedetection/SceneChangeDetection.cpp\
+	$(PROCESSING_SRCDIR)/src/scrolldetection/ScrollDetection.cpp\
+	$(PROCESSING_SRCDIR)/src/scrolldetection/ScrollDetectionFuncs.cpp\
 	$(PROCESSING_SRCDIR)/src/vaacalc/vaacalcfuncs.cpp\
 	$(PROCESSING_SRCDIR)/src/vaacalc/vaacalculation.cpp\
 
