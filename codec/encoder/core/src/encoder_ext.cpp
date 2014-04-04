@@ -1892,7 +1892,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
 #endif//ENABLE_TRACE_FILE
 
   pCodingParam->DetermineTemporalSettings();
-  iRet = AllocCodingParam (&pCtx->pSvcParam, pCtx->pMemAlign, pCodingParam->iSpatialLayerNum);
+  iRet = AllocCodingParam (&pCtx->pSvcParam, pCtx->pMemAlign);
   if (iRet != 0) {
     FreeMemorySvc (&pCtx);
     return iRet;
