@@ -1314,7 +1314,11 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
   //End of Rate control module memory allocation
 
   //pVaa memory allocation
-  (*ppCtx)->pVaa	= (SVAAFrameInfo*)pMa->WelsMallocz (sizeof (SVAAFrameInfo), "pVaa");
+  if(pParam->iUsageType == SCREEN_CONTENT_REAL_TIME)
+    (*ppCtx)->pVaa	= (SVAAFrameInfoExt*)pMa->WelsMallocz (sizeof (SVAAFrameInfoExt), "pVaa");
+  else
+    (*ppCtx)->pVaa	= (SVAAFrameInfo*)pMa->WelsMallocz (sizeof (SVAAFrameInfo), "pVaa");
+
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pVaa), FreeMemorySvc (ppCtx))
 
   if ((*ppCtx)->pSvcParam->bEnableAdaptiveQuant) { //malloc mem
@@ -1892,7 +1896,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
 #endif//ENABLE_TRACE_FILE
 
   pCodingParam->DetermineTemporalSettings();
-  iRet = AllocCodingParam (&pCtx->pSvcParam, pCtx->pMemAlign, pCodingParam->iSpatialLayerNum);
+  iRet = AllocCodingParam (&pCtx->pSvcParam, pCtx->pMemAlign);
   if (iRet != 0) {
     FreeMemorySvc (&pCtx);
     return iRet;
@@ -2135,8 +2139,6 @@ int32_t PicPartitionNumDecision (sWelsEncCtx* pCtx) {
   int32_t iPartitionNum	= 1;
   if (pCtx->pSvcParam->iMultipleThreadIdc > 1) {
     iPartitionNum	= pCtx->pSvcParam->iCountThreadsNum;
-    if (P_SLICE == pCtx->eSliceType)
-      iPartitionNum	= 1;
   }
   return iPartitionNum;
 }

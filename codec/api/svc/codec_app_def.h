@@ -274,7 +274,7 @@ typedef struct TagEncParamExt
   bool    bPrefixNalAddingCtrl;
   bool	  bEnableSSEI;
   int      iPaddingFlag;            // 0:disable padding;1:padding
-  int      iEtropyCodingModeFlag;
+  int      iEntropyCodingModeFlag;
 
   /* rc control */
   bool    bEnableFrameSkip; // allow skipping frames to keep the bitrate within limits

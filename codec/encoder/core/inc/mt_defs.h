@@ -54,10 +54,6 @@
 
 #define DYNAMIC_DETECT_CPU_CORES
 
-//#if defined(WIN32)
-//#define BIND_CPU_CORES_TO_THREADS	// if it is not defined here mean cross cpu cores load balance automatically
-//#endif//WIN32
-
 #define THRESHOLD_RMSE_CORE8	0.0320f	// v1.1: 0.0320f; v1.0: 0.02f
 #define THRESHOLD_RMSE_CORE4	0.0215f	// v1.1: 0.0215f; v1.0: 0.03f
 #define THRESHOLD_RMSE_CORE2	0.0200f	// v1.1: 0.0200f; v1.0: 0.04f
