@@ -279,7 +279,11 @@ int32_t CWelsPreProcess::AllocSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCoding
       ++ i;
     } while (i < kuiRefNumInTemporal);
 
-    m_uiSpatialLayersInTemporal[iDlayerIndex] = kuiLayerInTemporal;
+    if(pParam->iUsageType == SCREEN_CONTENT_REAL_TIME)
+      m_uiSpatialLayersInTemporal[iDlayerIndex] = 1;
+    else
+      m_uiSpatialLayersInTemporal[iDlayerIndex] = kuiLayerInTemporal;
+
     m_uiSpatialPicNum[iDlayerIndex] = kuiRefNumInTemporal;
     ++ iDlayerIndex;
   } while (iDlayerIndex < kiDlayerCount);
@@ -363,12 +367,12 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
     AdaptiveQuantCalculation (pCtx->pVaa, pCurPic, pRefPic);
   }
 
-  if (pSvcParam->bEnableRc) {
-    AnalyzePictureComplexity (pCtx, pCurPic, pRefPic, kiDidx, bCalculateBGD);
+  if(pSvcParam->iUsageType != SCREEN_CONTENT_REAL_TIME){
+    if (pSvcParam->bEnableRc) {
+      AnalyzePictureComplexity (pCtx, pCurPic, pRefPic, kiDidx, bCalculateBGD);
   }
-
-  WelsExchangeSpatialPictures (&m_pLastSpatialPicture[kiDidx][1], &m_pLastSpatialPicture[kiDidx][0]);
-
+    WelsExchangeSpatialPictures (&m_pLastSpatialPicture[kiDidx][1], &m_pLastSpatialPicture[kiDidx][0]);
+  }
   return 0;
 }
 

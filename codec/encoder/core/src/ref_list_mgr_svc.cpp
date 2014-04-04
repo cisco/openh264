@@ -707,6 +707,20 @@ bool WelsUpdateRefListScreen (void* pEncCtx) {
     pLtr->uiLtrMarkInterval = 0;
     pCtx->pVaa->uiValidLongTermPicIdx = 0;
   }
+
+  //update info in src list
+  if (pCtx->pEncPic) {
+    pCtx->pEncPic->iPictureType	    = pCtx->pDecPic->iPictureType;
+    pCtx->pEncPic->iFramePoc		= pCtx->pDecPic->iFramePoc;
+    pCtx->pEncPic->iFrameNum		= pCtx->pDecPic->iFrameNum;
+    pCtx->pEncPic->uiSpatialId		= pCtx->pDecPic->uiSpatialId;
+    pCtx->pEncPic->uiTemporalId	    = pCtx->pDecPic->uiTemporalId;
+    pCtx->pEncPic->iLongTermPicNum  = pCtx->pDecPic->iLongTermPicNum;
+    pCtx->pEncPic->bUsedAsRef       = pCtx->pDecPic->bUsedAsRef;
+    pCtx->pEncPic->bIsLongRef       = pCtx->pDecPic->bIsLongRef;
+    pCtx->pEncPic->bIsSceneLTR      = pCtx->pDecPic->bIsSceneLTR;
+    pCtx->pEncPic->iFrameAverageQp  = pCtx->pDecPic->iFrameAverageQp;
+  }
   return true;
 }
 bool WelsBuildRefListScreen (void* pEncCtx, const int32_t iPOC, int32_t iBestLtrRefIdx) {
