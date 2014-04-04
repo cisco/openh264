@@ -134,6 +134,7 @@ typedef int32_t (*PIntraPred16x16Combined3Func) (uint8_t*, int32_t, uint8_t*, in
 typedef int32_t (*PIntraPred8x8Combined3Func) (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*,
     uint8_t*, uint8_t*);
 
+typedef uint32_t (*PSampleSadHor8Func)( uint8_t*, int32_t, uint8_t*, int32_t, uint16_t*, int32_t* );
 typedef void (*PMotionSearchFunc) (SWelsFuncPtrList* pFuncList, void* pCurDqLayer, void* pMe,
                                    void* pSlice);
 typedef void (*PSearchMethodFunc) (SWelsFuncPtrList* pFuncList, void* pMe, void* pSlice, const int32_t kiEncStride, const int32_t kiRefStride);
@@ -199,12 +200,14 @@ struct TagWelsFuncPointerList {
   PGetIntraPredFunc 		pfGetLumaI4x4Pred[I4_PRED_A];
   PGetIntraPredFunc 		pfGetChromaPred[C_PRED_A];
 
+  PSampleSadHor8Func	pfSampleSadHor8[2];	// 0: for 16x16 square; 1: for 8x8 square
   PMotionSearchFunc
   pfMotionSearch[BLOCK_STATIC_IDC_ALL]; //svc_encode_slice.c svc_mode_decision.c svc_enhance_layer_md.c svc_base_layer_md.c
   PSearchMethodFunc pfSearchMethod[BLOCK_SIZE_ALL];
   PCalculateSatdFunc pfCalculateSatd;
   PCheckDirectionalMv pfCheckDirectionalMv;
-  PLineFullSearchFunc pfLineFullSearch;
+  PLineFullSearchFunc pfVerticalFullSearch;
+  PLineFullSearchFunc pfHorizontalFullSearch;
 
   PCopyFunc      pfCopy16x16Aligned;		//svc_encode_slice.c svc_mode_decision.c svc_base_layer_md.c
   PCopyFunc      pfCopy16x16NotAligned;	//md.c
