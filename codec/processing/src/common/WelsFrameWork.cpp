@@ -33,6 +33,7 @@
 #include "WelsFrameWork.h"
 #include "../denoise/denoise.h"
 #include "../downsample/downsample.h"
+#include "../scrolldetection/ScrollDetection.h"
 #include "../scenechangedetection/SceneChangeDetection.h"
 #include "../vaacalc/vaacalculation.h"
 #include "../backgrounddetection/BackgroundDetection.h"
@@ -265,6 +266,9 @@ IStrategy* CVpFrameWork::CreateStrategy (EMethods m_eMethod, int32_t iCpuFlag) {
   case METHOD_DENOISE:
     pStrategy = WelsDynamicCast (IStrategy*, new CDenoiser (iCpuFlag));
     break;
+  case METHOD_SCROLL_DETECTION:
+	pStrategy = WelsDynamicCast (IStrategy*, new CScrollDetection(iCpuFlag));
+	break;
   case METHOD_SCENE_CHANGE_DETECTION_VIDEO:
   case METHOD_SCENE_CHANGE_DETECTION_SCREEN:
     pStrategy = BuildSceneChangeDetection(m_eMethod, iCpuFlag);
