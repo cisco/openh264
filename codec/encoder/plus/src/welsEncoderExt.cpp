@@ -219,7 +219,7 @@ int CWelsH264SVCEncoder::Initialize (const SEncParamBase* argv) {
     return cmInitParaError;
   }
 
-  return Initialize2 (&sConfig);
+  return InitializeInternal(&sConfig);
 }
 
 int CWelsH264SVCEncoder::InitializeExt (const SEncParamExt* argv) {
@@ -238,10 +238,10 @@ int CWelsH264SVCEncoder::InitializeExt (const SEncParamExt* argv) {
     return cmInitParaError;
   }
 
-  return Initialize2 (&sConfig);
+  return InitializeInternal(&sConfig);
 }
 
-int CWelsH264SVCEncoder::Initialize2 (SWelsSvcCodingParam* pCfg) {
+int CWelsH264SVCEncoder::InitializeInternal(SWelsSvcCodingParam* pCfg) {
   if (NULL == pCfg) {
     WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::Initialize(), invalid argv= 0x%p.\n",
              pCfg);
