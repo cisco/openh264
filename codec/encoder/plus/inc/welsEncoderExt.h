@@ -130,7 +130,6 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
 #endif//REC_FRAME_COUNT
 
   void    InitEncoder (void);
-  int32_t RawData2SrcPic (const uint8_t* pSrc);
   void    DumpSrcPicture (const uint8_t* pSrc);
 };
 }
