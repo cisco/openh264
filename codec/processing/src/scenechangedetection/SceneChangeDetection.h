@@ -28,16 +28,16 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
-* \file	        :  SceneChangeDetection.h
-*
-* \brief	    :  scene change detection class of wels video processor class
-*
-* \date         :  2011/03/14
-*
-* \description  :  1. rewrite the package code of scene change detection class
-*
-*************************************************************************************
-*/
+ * \file	        :  SceneChangeDetection.h
+ *
+ * \brief	    :  scene change detection class of wels video processor class
+ *
+ * \date         :  2011/03/14
+ *
+ * \description  :  1. rewrite the package code of scene change detection class
+ *
+ *************************************************************************************
+ */
 
 #ifndef WELSVP_SCENECHANGEDETECTION_H
 #define WELSVP_SCENECHANGEDETECTION_H

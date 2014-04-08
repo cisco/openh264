@@ -1,6 +1,6 @@
 /*!
  * \copy
- *     Copyright (c)  2011-2013, Cisco Systems
+ *     Copyright (c)  2009-2013, Cisco Systems
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -28,16 +28,16 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
-* \file	        :  ScrollDetectionFuncs.h
-*
-* \brief	    :  scroll detection class of wels video processor class
-*
-* \date         :  2011/04/26
-*
-* \description  :  rewrite the package code of scroll detection class
-*
-*************************************************************************************
-*/
+ * \file	        :  ScrollDetectionFuncs.h
+ *
+ * \brief	    :  scroll detection class of wels video processor class
+ *
+ * \date         :  2011/04/26
+ *
+ * \description  :  rewrite the package code of scroll detection class
+ *
+ *************************************************************************************
+ */
 
 WELSVP_NAMESPACE_BEGIN
 
