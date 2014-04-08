@@ -33,6 +33,7 @@
 // ref_list_mgr_svc.c
 #include "ref_list_mgr_svc.h"
 #include "utils.h"
+#include "picture_handle.h"
 namespace WelsSVCEnc {
 /*
  *	set picture as unreferenced
@@ -664,6 +665,40 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
     }
   }
 }
+
+static int32_t UpdateSrcPicList (sWelsEncCtx* pCtx) {
+  int32_t iDIdx = pCtx->uiDependencyId;
+  SPicture** pLongRefList = pCtx->ppRefPicListExt[iDIdx]->pLongRefList;
+  SPicture** pLongRefSrcList = &pCtx->pVpp->m_pSpatialPic[iDIdx][0];
+  for (int32_t i = 0; i < MAX_REF_PIC_COUNT; ++i) {
+    if (NULL == pLongRefSrcList[i + 1] || (NULL != pLongRefList[i] && pLongRefList[i]->bUsedAsRef
+                                           && pLongRefList[i]->bIsLongRef)) {
+      continue;
+    } else {
+      SetUnref (pLongRefSrcList[i + 1]);
+    }
+  }
+  WelsExchangeSpatialPictures (&pCtx->pVpp->m_pSpatialPic[iDIdx][0],
+                               &pCtx->pVpp->m_pSpatialPic[iDIdx][1 + pCtx->pVaa->uiMarkLongTermPicIdx]);
+  SetUnref (pCtx->pVpp->m_pSpatialPic[iDIdx][0]);
+
+
+  //update info in src list
+  if (pCtx->pEncPic) {
+    pCtx->pEncPic->iPictureType	    = pCtx->pDecPic->iPictureType;
+    pCtx->pEncPic->iFramePoc		    = pCtx->pDecPic->iFramePoc;
+    pCtx->pEncPic->iFrameNum		    = pCtx->pDecPic->iFrameNum;
+    pCtx->pEncPic->uiSpatialId		  = pCtx->pDecPic->uiSpatialId;
+    pCtx->pEncPic->uiTemporalId	    = pCtx->pDecPic->uiTemporalId;
+    pCtx->pEncPic->iLongTermPicNum  = pCtx->pDecPic->iLongTermPicNum;
+    pCtx->pEncPic->bUsedAsRef       = pCtx->pDecPic->bUsedAsRef;
+    pCtx->pEncPic->bIsLongRef       = pCtx->pDecPic->bIsLongRef;
+    pCtx->pEncPic->bIsSceneLTR      = pCtx->pDecPic->bIsSceneLTR;
+    pCtx->pEncPic->iFrameAverageQp  = pCtx->pDecPic->iFrameAverageQp;
+  }
+  return 0;
+}
+
 bool WelsUpdateRefListScreen (void* pEncCtx) {
   sWelsEncCtx* pCtx     = (sWelsEncCtx*)pEncCtx;
   SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
@@ -708,19 +743,7 @@ bool WelsUpdateRefListScreen (void* pEncCtx) {
     pCtx->pVaa->uiValidLongTermPicIdx = 0;
   }
 
-  //update info in src list
-  if (pCtx->pEncPic) {
-    pCtx->pEncPic->iPictureType	    = pCtx->pDecPic->iPictureType;
-    pCtx->pEncPic->iFramePoc		= pCtx->pDecPic->iFramePoc;
-    pCtx->pEncPic->iFrameNum		= pCtx->pDecPic->iFrameNum;
-    pCtx->pEncPic->uiSpatialId		= pCtx->pDecPic->uiSpatialId;
-    pCtx->pEncPic->uiTemporalId	    = pCtx->pDecPic->uiTemporalId;
-    pCtx->pEncPic->iLongTermPicNum  = pCtx->pDecPic->iLongTermPicNum;
-    pCtx->pEncPic->bUsedAsRef       = pCtx->pDecPic->bUsedAsRef;
-    pCtx->pEncPic->bIsLongRef       = pCtx->pDecPic->bIsLongRef;
-    pCtx->pEncPic->bIsSceneLTR      = pCtx->pDecPic->bIsSceneLTR;
-    pCtx->pEncPic->iFrameAverageQp  = pCtx->pDecPic->iFrameAverageQp;
-  }
+  UpdateSrcPicList (pCtx);
   return true;
 }
 bool WelsBuildRefListScreen (void* pEncCtx, const int32_t iPOC, int32_t iBestLtrRefIdx) {
