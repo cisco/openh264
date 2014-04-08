@@ -239,9 +239,9 @@ TEST(EncodeMbAuxTest, function) { \
   const int iSStride = 64;  \
   const int iDStride = 64;  \
   uint8_t _ref_src[64*64], _ref_dst[64*64], _dst[64*64]; \
-  uint8_t *ref_src = (uint8_t*)((((unsigned long)(_ref_src + 15)) >> 4) << 4); \
-  uint8_t *ref_dst = (uint8_t*)((((unsigned long)(_ref_dst + 15)) >> 4) << 4); \
-  uint8_t *dst = (uint8_t*)((((unsigned long)(_dst + 15)) >> 4) << 4); \
+  uint8_t *ref_src = (uint8_t*)((((uintptr_t)(_ref_src + 15)) >> 4) << 4); \
+  uint8_t *ref_dst = (uint8_t*)((((uintptr_t)(_ref_dst + 15)) >> 4) << 4); \
+  uint8_t *dst = (uint8_t*)((((uintptr_t)(_dst + 15)) >> 4) << 4); \
   srand((unsigned int)time(NULL)); \
   for(int i = 0; i < height; i++) \
     for(int j = 0; j < width; j++) \
@@ -265,7 +265,7 @@ GENERATE_UT_FOR_COPY(16, 16, WelsCopy16x16_sse2);
 #endif
 TEST(EncodeMbAuxTest, WelsGetNoneZeroCount_c) {
   int16_t _iLevel[32];
-  int16_t *pLevel = (int16_t*) (((((unsigned long)_iLevel) + 15) >> 4) << 4);
+  int16_t *pLevel = (int16_t*) (((((uintptr_t)_iLevel) + 15) >> 4) << 4);
   srand((unsigned int)time(NULL));
   int32_t result = 0;
   for(int i = 0; i < 16; i++) {
@@ -278,7 +278,7 @@ TEST(EncodeMbAuxTest, WelsGetNoneZeroCount_c) {
 #ifdef X86_ASM
 TEST(EncodeMbAuxTest, WelsGetNoneZeroCount_sse2) {
   int16_t _iLevel[32];
-  int16_t *pLevel = (int16_t*) (((((unsigned long)_iLevel) + 15) >> 4) << 4);
+  int16_t *pLevel = (int16_t*) (((((uintptr_t)_iLevel) + 15) >> 4) << 4);
   srand((unsigned int)time(NULL));
   int32_t result = 0;
   for(int i = 0; i < 16; i++) {
