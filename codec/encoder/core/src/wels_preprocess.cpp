@@ -30,16 +30,6 @@
  *
  */
 
-#ifndef NO_DYNAMIC_VP
-#if defined(_WIN32)
-#include <windows.h>
-#elif defined(MACOS)
-#include "bundleloader.h"
-#elif defined(__GNUC__)
-#include <dlfcn.h>
-#endif
-#endif
-
 #include "wels_preprocess.h"
 #include "picture_handle.h"
 #include "encoder_context.h"
@@ -52,8 +42,6 @@ namespace WelsSVCEnc {
 
 
 //***** entry API declaration ************************************************************************//
-typedef EResult (* pfnCreateVpInterface) (void**, int);
-typedef EResult (* pfnDestroyVpInterface) (void*, int);
 
 int32_t WelsInitScaledPic (SWelsSvcCodingParam* pParam,  Scaled_Picture*  pScaledPic, CMemoryAlign* pMemoryAlign);
 bool  JudgeNeedOfScaling (SWelsSvcCodingParam* pParam, Scaled_Picture* pScaledPic);
@@ -76,125 +64,6 @@ inline  void   WelsUpdateSpatialIdxMap (sWelsEncCtx* pEncCtx, int32_t iPos, SPic
 }
 
 
-//***************************************************************************************************//
-CWelsLib::CWelsLib (sWelsEncCtx* pEncCtx) {
-  m_pInterface[0] = m_pInterface[1] = NULL;
-
-#ifndef NO_DYNAMIC_VP
-#if defined(_WIN32)
-  const char WelsVPLib[] = "welsvp.dll";
-  HMODULE shModule = LoadLibrary (WelsVPLib);
-  if (!shModule)
-    WelsLog (pEncCtx, WELS_LOG_ERROR, "welsvp load lib dynamic failed module=%x\n", shModule);
-
-#elif defined(MACOS)
-  const char WelsVPLib[] = "welsvp.bundle";
-  char pCurPath[256];
-  GetCurrentModulePath (pCurPath, 256);
-  strlcat (pCurPath, WelsVPLib, 256);
-  CFBundleRef shModule = LoadBundle (pCurPath);
-  if (!shModule)
-    WelsLog (pEncCtx, WELS_LOG_ERROR, "welsvp load lib dynamic failed module=%x\n", shModule);
-
-#elif defined(__GNUC__)
-  const char WelsVPLib[] = "./libwelsvp.so";
-  void* shModule = NULL;
-  shModule = dlopen (WelsVPLib, RTLD_LAZY);
-  if (shModule == NULL)
-    printf ("dlopen %s iRet=%p, err=%s\n", WelsVPLib, shModule, dlerror());
-#endif
-
-  m_pVpLib = (void*)shModule;
-#endif
-}
-
-CWelsLib::~CWelsLib() {
-#ifndef NO_DYNAMIC_VP
-  if (m_pVpLib) {
-#if defined(_WIN32)
-    HMODULE shModule = (HMODULE)m_pVpLib;
-    FreeLibrary (shModule);
-
-#elif defined(MACOS)
-    CFBundleRef shModule = (CFBundleRef)m_pVpLib;
-    FreeBundle (shModule);
-
-#elif defined(__GNUC__)
-    void* shModule = m_pVpLib;
-    dlclose (shModule);
-#endif
-    m_pVpLib = NULL;
-  }
-#endif
-}
-
-void* CWelsLib::QueryFunction (const char* pName) {
-  void* pFunc = NULL;
-
-#ifndef NO_DYNAMIC_VP
-  if (m_pVpLib) {
-#if defined(_WIN32)
-    HMODULE shModule = (HMODULE)m_pVpLib;
-    pFunc = (void*)GetProcAddress (shModule, pName);
-
-#elif defined(MACOS)
-    CFBundleRef shModule = (CFBundleRef)m_pVpLib;
-    pFunc = (void*)GetProcessAddress (shModule, pName);
-
-#elif defined(__GNUC__)
-    void* shModule = m_pVpLib;
-    pFunc = (void*)dlsym (shModule, pName);
-    if (pFunc == NULL)
-      printf ("dlsym %p iRet=%p, err=%s\n", shModule, pFunc, dlerror());
-#endif
-  }
-#endif
-  return pFunc;
-}
-
-int32_t CWelsLib::CreateIface (IWelsVP** ppInterfaceVp) {
-  *ppInterfaceVp = NULL;
-#ifndef NO_DYNAMIC_VP
-  if (m_pVpLib) {
-
-#endif
-    pfnCreateVpInterface  pCreateVpInterface  = NULL;
-    pfnDestroyVpInterface pDestroyVpInterface = NULL;
-
-#ifndef NO_DYNAMIC_VP
-    pCreateVpInterface  = (pfnCreateVpInterface)  QueryFunction ("CreateVpInterface");
-    pDestroyVpInterface = (pfnDestroyVpInterface) QueryFunction ("DestroyVpInterface");
-#else
-    pCreateVpInterface  = CreateVpInterface;
-    // TODO(ekr@rtfm.com): This cast corrects a signature difference... This is a potential real problem
-    pDestroyVpInterface = (pfnDestroyVpInterface)DestroyVpInterface;
-#endif
-
-    m_pInterface[0] = (void*)pCreateVpInterface;
-    m_pInterface[1] = (void*)pDestroyVpInterface;
-
-    if (m_pInterface[0] && m_pInterface[1])
-      pCreateVpInterface ((void**)ppInterfaceVp, WELSVP_INTERFACE_VERION);
-#ifndef NO_DYNAMIC_VP
-  } else {
-  }
-#endif
-
-  return (*ppInterfaceVp) ? 0 : 1;
-}
-
-int32_t CWelsLib::DestroyIface (IWelsVP* pInterfaceVp) {
-  if (pInterfaceVp) {
-    pfnDestroyVpInterface pDestroyVpInterface = (pfnDestroyVpInterface) m_pInterface[1];
-    if (pDestroyVpInterface) {
-      pDestroyVpInterface (pInterfaceVp, WELSVP_INTERFACE_VERION);
-    } else {
-    }
-  }
-
-  return 0;
-}
-
 /***************************************************************************
 *
 *	implement of the interface
@@ -203,7 +72,6 @@ int32_t CWelsLib::DestroyIface (IWelsVP* pInterfaceVp) {
 
 CWelsPreProcess::CWelsPreProcess (sWelsEncCtx* pEncCtx) {
   m_pInterfaceVp = NULL;
-  m_pEncLib = NULL;
   m_bInitDone = false;
   m_pEncCtx = pEncCtx;
   memset (&m_sScaledPicture, 0, sizeof (m_sScaledPicture));
@@ -218,12 +86,8 @@ CWelsPreProcess::~CWelsPreProcess() {
 }
 
 int32_t CWelsPreProcess::WelsPreprocessCreate() {
-  if (m_pEncLib == NULL && m_pInterfaceVp == NULL) {
-    m_pEncLib  = new CWelsLib (m_pEncCtx);
-    if (!m_pEncLib)
-      goto exit;
-
-    m_pEncLib->CreateIface (&m_pInterfaceVp);
+  if (m_pInterfaceVp == NULL) {
+    CreateVpInterface ((void**) &m_pInterfaceVp, WELSVP_INTERFACE_VERION);
     if (!m_pInterfaceVp)
       goto exit;
   } else
@@ -237,11 +101,8 @@ exit:
 }
 
 int32_t CWelsPreProcess::WelsPreprocessDestroy() {
-  if (m_pEncLib) {
-    m_pEncLib->DestroyIface (m_pInterfaceVp);
-    m_pInterfaceVp = NULL;
-    WelsSafeDelete (m_pEncLib);
-  }
+  DestroyVpInterface (m_pInterfaceVp, WELSVP_INTERFACE_VERION);
+  m_pInterfaceVp = NULL;
 
   return 0;
 }

@@ -215,7 +215,7 @@
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="..\..\..\common\inc;..\..\..\encoder\core\inc,..\..\..\api\svc;..\..\..\processing\interface"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;X86_ASM;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;X86_ASM"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
