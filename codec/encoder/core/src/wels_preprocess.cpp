@@ -363,9 +363,7 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
      if (bNeededMbAq) {
      AdaptiveQuantCalculation (pCtx->pVaa, pCurPic, pRefPic);
      }
-  }
-  else
-  {
+  }else{
     SPicture* pRefPic = m_pSpatialPic[kiDidx][iRefTemporalIdx];
     SPicture* pLastPic = m_pLastSpatialPicture[kiDidx][0];
     bool bCalculateSQDiff = ((pLastPic->pData[0] == pRefPic->pData[0]) && bNeededMbAq);
