@@ -347,30 +347,47 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
     iRefTemporalIdx = m_uiSpatialLayersInTemporal[kiDidx] + pCtx->pVaa->uiValidLongTermPicIdx;
 
   SPicture* pCurPic = m_pSpatialPic[kiDidx][iCurTemporalIdx];
-  SPicture* pRefPic = m_pSpatialPic[kiDidx][iRefTemporalIdx];
+  bool bCalculateVar = (pSvcParam->iRCMode >= RC_BITRATE_MODE && pCtx->eSliceType == I_SLICE);
+
+  if(pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME){
+     SVAAFrameInfoExt* pVaaExt			= static_cast<SVAAFrameInfoExt*> (m_pEncCtx->pVaa);
+     SRefInfoParam* BestRefCandidateParam =&(pVaaExt->sVaaStrBestRefCandidate[0]);
+	   SPicture *pRefPic= m_pSpatialPic[0][BestRefCandidateParam->iSrcListIdx];
+
+     VaaCalculation (pCtx->pVaa, pCurPic, pRefPic, false, bCalculateVar, bCalculateBGD);
+
+     if (pSvcParam->bEnableBackgroundDetection) {
+       BackgroundDetection (pCtx->pVaa, pCurPic, pRefPic, bCalculateBGD && pRefPic->iPictureType != I_SLICE);
+     }
+
+     if (bNeededMbAq) {
+     AdaptiveQuantCalculation (pCtx->pVaa, pCurPic, pRefPic);
+     }
+  }
+  else
   {
+    SPicture* pRefPic = m_pSpatialPic[kiDidx][iRefTemporalIdx];
     SPicture* pLastPic = m_pLastSpatialPicture[kiDidx][0];
     bool bCalculateSQDiff = ((pLastPic->pData[0] == pRefPic->pData[0]) && bNeededMbAq);
     bool bCalculateVar = (pSvcParam->iRCMode >= RC_BITRATE_MODE && pCtx->eSliceType == I_SLICE);
 
     VaaCalculation (pCtx->pVaa, pCurPic, pRefPic, bCalculateSQDiff, bCalculateVar, bCalculateBGD);
-  }
 
-  if (pSvcParam->bEnableBackgroundDetection) {
-    BackgroundDetection (pCtx->pVaa, pCurPic, pRefPic, bCalculateBGD && pRefPic->iPictureType != I_SLICE);
-  }
+    if (pSvcParam->bEnableBackgroundDetection) {
+      BackgroundDetection (pCtx->pVaa, pCurPic, pRefPic, bCalculateBGD && pRefPic->iPictureType != I_SLICE);
+    }
 
-  if (bNeededMbAq) {
-    SPicture* pCurPic = m_pLastSpatialPicture[kiDidx][1];
-    SPicture* pRefPic = m_pLastSpatialPicture[kiDidx][0];
+    if (bNeededMbAq) {
+      SPicture* pCurPic = m_pLastSpatialPicture[kiDidx][1];
+      SPicture* pRefPic = m_pLastSpatialPicture[kiDidx][0];
 
-    AdaptiveQuantCalculation (pCtx->pVaa, pCurPic, pRefPic);
-  }
+      AdaptiveQuantCalculation (pCtx->pVaa, pCurPic, pRefPic);
+    }
 
-  if(pSvcParam->iUsageType != SCREEN_CONTENT_REAL_TIME){
     if (pSvcParam->bEnableRc) {
       AnalyzePictureComplexity (pCtx, pCurPic, pRefPic, kiDidx, bCalculateBGD);
-  }
+    }
+
     WelsExchangeSpatialPictures (&m_pLastSpatialPicture[kiDidx][1], &m_pLastSpatialPicture[kiDidx][0]);
   }
   return 0;
