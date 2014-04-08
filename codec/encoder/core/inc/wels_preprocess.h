@@ -188,11 +188,13 @@ private:
   CWelsLib*        m_pEncLib;
   sWelsEncCtx*     m_pEncCtx;
   bool             m_bInitDone;
+  uint8_t          m_uiSpatialLayersInTemporal[MAX_DEPENDENCY_LAYER];
+  uint8_t          m_uiSpatialPicNum[MAX_DEPENDENCY_LAYER];
+public:
   /* For Downsampling & VAA I420 based source pictures */
   SPicture*        m_pSpatialPic[MAX_DEPENDENCY_LAYER][MAX_TEMPORAL_LEVEL + 1 +
       LONG_TERM_REF_NUM];	// need memory requirement with total number of (log2(uiGopSize)+1+1+long_term_ref_num)
-  uint8_t          m_uiSpatialLayersInTemporal[MAX_DEPENDENCY_LAYER];
-  uint8_t          m_uiSpatialPicNum[MAX_DEPENDENCY_LAYER];
+
 };
 
 }

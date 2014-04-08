@@ -2913,6 +2913,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo * pFbi, const SSou
     pCtx->pFuncList->pfRc.pfWelsRcPictureInit (pCtx);
     PreprocessSliceCoding (pCtx);	// MUST be called after pfWelsRcPictureInit() and WelsInitCurrentLayer()
 
+    //TODO Complexity Calculation here for screen content
     iLayerSize	= 0;
 
     if (SM_SINGLE_SLICE == param_d->sSliceCfg.uiSliceMode) {	// only one slice within a sQualityStat layer
