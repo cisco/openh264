@@ -109,9 +109,6 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   sWelsEncCtx*	m_pEncContext;
 
   welsCodecTrace*			m_pWelsTrace;
-  SSourcePicture**			m_pSrcPicList;
-  int32_t						m_iSrcListSize;
-
   int32_t						m_iMaxPicWidth;
   int32_t						m_iMaxPicHeight;
 
