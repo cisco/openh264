@@ -126,7 +126,6 @@ class CWelsLib {
   void* QueryFunction (const char* pName);
 
  private:
-  void* m_pVpLib;
   void* m_pInterface[2];
 };
 

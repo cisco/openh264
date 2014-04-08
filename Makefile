@@ -38,7 +38,7 @@ endif
 include build/platform-$(OS).mk
 
 
-CFLAGS += -DNO_DYNAMIC_VP
+CFLAGS +=
 LDFLAGS +=
 
 ifeq (Yes, $(GCOV))
