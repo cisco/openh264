@@ -131,12 +131,12 @@ int8_t		iDecompStages;		// GOP size dependency
 
 
  public:
-TagWelsSvcCodingParam (const bool kbEnableRc = true) {
-  FillDefault (kbEnableRc);
+TagWelsSvcCodingParam () {
+  FillDefault ();
 }
 ~TagWelsSvcCodingParam()	{}
 
-static void FillDefault (SEncParamExt& param, const bool kbEnableRc) {
+static void FillDefault (SEncParamExt& param) {
   memset(&param, 0, sizeof(param));
   param.uiIntraPeriod		= 0;			// intra period (multiple of GOP size as desired)
   param.iNumRefFrame		= MIN_REF_PIC_COUNT;	// number of reference frame used
@@ -165,7 +165,6 @@ static void FillDefault (SEncParamExt& param, const bool kbEnableRc) {
   param.iLoopFilterBetaOffset		= 0;	// BetaOffset:	valid range [-6, 6], default 0
  
   /* Rate Control */
-  param.bEnableRc		= kbEnableRc;
   param.iRCMode			= RC_QUALITY_MODE;
   param.iPaddingFlag	= 0;
 
@@ -200,8 +199,8 @@ static void FillDefault (SEncParamExt& param, const bool kbEnableRc) {
   }
 }
 
-void FillDefault (const bool kbEnableRc) {
-  FillDefault(*this, kbEnableRc);
+void FillDefault () {
+  FillDefault(*this);
   uiGopSize			= 1;			// GOP size (at maximal frame rate: 16)
 
   SUsedPicRect.iLeft	=
@@ -234,7 +233,7 @@ void FillDefault (const bool kbEnableRc) {
 
 }
 
-int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam, const bool kbEnableRc = true) {
+int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam) {
 
   iInputCsp		= pCodingParam.iInputCsp;		// color space of input sequence
   fMaxFrameRate		= WELS_CLIP3 (pCodingParam.fMaxFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
@@ -248,7 +247,6 @@ int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam, const bool kbEnab
   SUsedPicRect.iWidth = ((iPicWidth >> 1) << 1);
   SUsedPicRect.iHeight = ((iPicHeight >> 1) << 1);
 
-  bEnableRc			= kbEnableRc;
   iRCMode = pCodingParam.iRCMode;    // rc mode
 
   int8_t iIdxSpatial	= 0;
@@ -320,7 +318,6 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   bEnableFrameCroppingFlag	= true;
 
   /* Rate Control */
-  bEnableRc			= pCodingParam.bEnableRc;
   iRCMode = pCodingParam.iRCMode;    // rc mode
   iPaddingFlag = pCodingParam.iPaddingFlag;
 
