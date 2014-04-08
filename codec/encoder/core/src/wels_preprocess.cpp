@@ -86,8 +86,7 @@ int32_t CWelsLib::CreateIface (IWelsVP** ppInterfaceVp) {
     pfnDestroyVpInterface pDestroyVpInterface = NULL;
 
     pCreateVpInterface  = CreateVpInterface;
-    // TODO(ekr@rtfm.com): This cast corrects a signature difference... This is a potential real problem
-    pDestroyVpInterface = (pfnDestroyVpInterface)DestroyVpInterface;
+    pDestroyVpInterface = DestroyVpInterface;
 
     m_pInterface[0] = (void*)pCreateVpInterface;
     m_pInterface[1] = (void*)pDestroyVpInterface;
