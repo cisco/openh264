@@ -368,9 +368,9 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
   }
 
   if(pSvcParam->iUsageType != SCREEN_CONTENT_REAL_TIME){
-    if (pSvcParam->bEnableRc) {
+    if (pSvcParam->iRCMode != RC_OFF_MODE) {
       AnalyzePictureComplexity (pCtx, pCurPic, pRefPic, kiDidx, bCalculateBGD);
-  }
+    }
     WelsExchangeSpatialPictures (&m_pLastSpatialPicture[kiDidx][1], &m_pLastSpatialPicture[kiDidx][0]);
   }
   return 0;
