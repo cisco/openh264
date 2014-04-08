@@ -163,7 +163,7 @@ static void FillDefault (SEncParamExt& param) {
   param.iLoopFilterDisableIdc		= 1;	// 0: on, 1: off, 2: on except for slice boundaries
   param.iLoopFilterAlphaC0Offset	= 0;	// AlphaOffset: valid range [-6, 6], default 0
   param.iLoopFilterBetaOffset		= 0;	// BetaOffset:	valid range [-6, 6], default 0
- 
+
   /* Rate Control */
   param.iRCMode			= RC_QUALITY_MODE;
   param.iPaddingFlag	= 0;

@@ -568,7 +568,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   bool bReadNumRefFlag = (P_SLICE == uiSliceType);
   if (kbExtensionFlag) {
     bReadNumRefFlag &= (BASE_QUALITY_ID == pNalHeaderExt->uiQualityId);
-  } 
+  }
   if (bReadNumRefFlag) {
     WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //num_ref_idx_active_override_flag
     pSliceHead->bNumRefIdxActiveOverrideFlag	= !!uiCode;

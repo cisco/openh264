@@ -36,7 +36,7 @@ LOCAL_C_INCLUDES := \
             $(LOCAL_PATH)/../../../../processing/interface \
             $(LOCAL_PATH)/../../../../common/inc
 
-  
+
 #
 # Compile Flags and Link Libraries
 #

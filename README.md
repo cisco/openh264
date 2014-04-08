@@ -63,7 +63,7 @@ The codec and demo can be built by
 
 'make OS=android NDKROOT=**ANDROID_NDK** TARGET= **ANDROID_TARGET**'
 
-Valid **ANDROID_TARGET** can be found in **ANDROID_SDK**/platforms, such as android-12. 
+Valid **ANDROID_TARGET** can be found in **ANDROID_SDK**/platforms, such as android-12.
 You can also set ARCH, NDKLEVEL, GCCVERSION according to your device and NDK version.
 ARCH specifies the architecture of android device. Currently only arm and x86 are supported, the default is arm.
 NDKLEVEL specifies android api level, the api level can be 12-19, the default is 12.
