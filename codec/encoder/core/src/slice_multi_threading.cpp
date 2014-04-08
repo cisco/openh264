@@ -205,7 +205,7 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
 
   int32_t iNumMbInEachGom = 0;
   SWelsSvcRc* pWelsSvcRc = &pCtx->pWelsSvcRc[iCurDid];
-  if (pCtx->pSvcParam->bEnableRc) {
+  if (pCtx->pSvcParam->iRCMode != RC_OFF_MODE) {
     iNumMbInEachGom = pWelsSvcRc->iNumberMbGom;
 
     if (iNumMbInEachGom <= 0) {
@@ -237,7 +237,7 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
     int32_t iNumMbAssigning = (int32_t) (kiCountNumMb * pSliceComplexRatio[iSliceIdx] + EPSN);
 
     // GOM boundary aligned
-    if (pCtx->pSvcParam->bEnableRc) {
+    if (pCtx->pSvcParam->iRCMode != RC_OFF_MODE) {
       iNumMbAssigning = (int32_t) (1.0f * iNumMbAssigning / iNumMbInEachGom + 0.5f + EPSN) * iNumMbInEachGom;
     }
 

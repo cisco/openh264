@@ -231,7 +231,7 @@ int32_t ParamValidationExt (sWelsEncCtx*pCtx,SWelsSvcCodingParam* pCodingParam) 
         fDlp->sSliceCfg.uiSliceMode	= SM_SINGLE_SLICE;
         break;
       }
-      if (pCodingParam->bEnableRc) {	// multiple slices verify with gom
+      if (pCodingParam->iRCMode != RC_OFF_MODE) {	// multiple slices verify with gom
         //check uiSliceNum
         GomValidCheckSliceNum (iMbWidth, iMbHeight, &fDlp->sSliceCfg.sSliceArgument.uiSliceNum);
         assert (fDlp->sSliceCfg.sSliceArgument.uiSliceNum > 1);
@@ -285,7 +285,7 @@ int32_t ParamValidationExt (sWelsEncCtx*pCtx,SWelsSvcCodingParam* pCodingParam) 
         fDlp->sSliceCfg.uiSliceMode	= SM_SINGLE_SLICE;
         break;
       }
-      if (pCodingParam->bEnableRc && fDlp->sSliceCfg.sSliceArgument.uiSliceNum > 1) {
+      if ((pCodingParam->iRCMode!=RC_OFF_MODE) && fDlp->sSliceCfg.sSliceArgument.uiSliceNum > 1) {
         WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), WARNING: GOM based RC do not support SM_RASTER_SLICE!\n");
       }
       // considering the coding efficient and performance, iCountMbNum constraint by MIN_NUM_MB_PER_SLICE condition of multi-pSlice mode settting
@@ -853,7 +853,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
     // Need port pSps/pPps initialization due to spatial scalability changed
     if (!bUseSubsetSps) {
       WelsInitSps (pSps, pDlayerParam, pParam->uiIntraPeriod, pParam->iNumRefFrame, iSpsId,
-                   pParam->bEnableFrameCroppingFlag, pParam->bEnableRc);
+                   pParam->bEnableFrameCroppingFlag, pParam->iRCMode != RC_OFF_MODE);
 
       if (iDlayerCount > 1) {
         pSps->bConstraintSet0Flag = true;
@@ -862,7 +862,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
       }
     } else {
       WelsInitSubsetSps (pSubsetSps, pDlayerParam, pParam->uiIntraPeriod, pParam->iNumRefFrame, iSpsId,
-                         pParam->bEnableFrameCroppingFlag, pParam->bEnableRc);
+                         pParam->bEnableFrameCroppingFlag, pParam->iRCMode!=RC_OFF_MODE);
     }
 
     // initialize pPps
@@ -1674,7 +1674,7 @@ int32_t InitSliceSettings (SWelsSvcCodingParam* pCodingParam, const int32_t kiCp
       if (iSliceNum > iMaxSliceCount)
         iMaxSliceCount = iSliceNum;
       // need perform check due uiSliceNum might change, although has been initialized somewhere outside
-      if (pCodingParam->bEnableRc) {
+      if (pCodingParam->iRCMode!=RC_OFF_MODE) {
         GomValidCheckSliceMbNum (kiMbWidth, kiMbHeight, pSlcArg);
       } else {
         CheckFixedSliceNumMultiSliceSetting (kiMbNumInFrame, pSlcArg);
@@ -1705,7 +1705,7 @@ int32_t InitSliceSettings (SWelsSvcCodingParam* pCodingParam, const int32_t kiCp
         pDlp->sSliceCfg.uiSliceMode	= SM_SINGLE_SLICE;
         break;
       }
-      if (pCodingParam->bEnableRc) {	// multiple slices verify with gom
+      if (pCodingParam->iRCMode != RC_OFF_MODE) {	// multiple slices verify with gom
         //check uiSliceNum
         GomValidCheckSliceNum (kiMbWidth, kiMbHeight, &pDlp->sSliceCfg.sSliceArgument.uiSliceNum);
         assert (pDlp->sSliceCfg.sSliceArgument.uiSliceNum > 1);
@@ -1922,7 +1922,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   if (pCodingParam->iMultipleThreadIdc > 1)
     iRet = CreateSliceThreads (pCtx);
 
-  WelsRcInitModule (pCtx,  pCtx->pSvcParam->bEnableRc ? WELS_RC_GOM : WELS_RC_DISABLE);
+  WelsRcInitModule (pCtx,  pCtx->pSvcParam->iRCMode!=RC_OFF_MODE ? WELS_RC_GOM : WELS_RC_DISABLE);
 
   pCtx->pVpp = new CWelsPreProcess (pCtx);
   if (pCtx->pVpp == NULL) {
@@ -2194,7 +2194,7 @@ void WelsInitCurrentDlayerMltslc (sWelsEncCtx* pCtx, int32_t iPartitionNum) {
     uint8_t		iCurDid = pCtx->uiDependencyId;
     uint32_t	uiFrmByte = 0;
 
-    if (pCtx->pSvcParam->bEnableRc) {
+    if (pCtx->pSvcParam->iRCMode != RC_OFF_MODE) {
       //RC case
       uiFrmByte = (
                     ((uint32_t) (pCtx->pSvcParam->sDependencyLayers[iCurDid].iSpatialBitrate)
@@ -3475,7 +3475,6 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     pOldParam->iLoopFilterBetaOffset		= pNewParam->iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0
    
     /* Rate Control */
-    pOldParam->bEnableRc			= pNewParam->bEnableRc;
     pOldParam->iRCMode	    	= pNewParam->iRCMode;
     pOldParam->iTargetBitrate	= pNewParam->iTargetBitrate;			// overall target bitrate introduced in RC module
     pOldParam->iPaddingFlag	    = pNewParam->iPaddingFlag;
