@@ -203,7 +203,7 @@ struct TagWelsFuncPointerList {
   PGetIntraPredFunc     pfGetLumaI4x4Pred[I4_PRED_A];
   PGetIntraPredFunc     pfGetChromaPred[C_PRED_A];
 
-  PSampleSadHor8Func	pfSampleSadHor8[2];	// 0: for 16x16 square; 1: for 8x8 square
+  PSampleSadHor8Func	pfSampleSadHor8[2];	// 1: for 16x16 square; 0: for 8x8 square
   PMotionSearchFunc
   pfMotionSearch[BLOCK_STATIC_IDC_ALL]; //svc_encode_slice.c svc_mode_decision.c svc_enhance_layer_md.c svc_base_layer_md.c
   PSearchMethodFunc pfSearchMethod[BLOCK_SIZE_ALL];
