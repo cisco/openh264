@@ -42,8 +42,6 @@ namespace WelsSVCEnc {
 
 
 //***** entry API declaration ************************************************************************//
-typedef EResult (* pfnCreateVpInterface) (void**, int);
-typedef EResult (* pfnDestroyVpInterface) (void*, int);
 
 int32_t WelsInitScaledPic (SWelsSvcCodingParam* pParam,  Scaled_Picture*  pScaledPic, CMemoryAlign* pMemoryAlign);
 bool  JudgeNeedOfScaling (SWelsSvcCodingParam* pParam, Scaled_Picture* pScaledPic);
@@ -66,49 +64,6 @@ inline  void   WelsUpdateSpatialIdxMap (sWelsEncCtx* pEncCtx, int32_t iPos, SPic
 }
 
 
-//***************************************************************************************************//
-CWelsLib::CWelsLib (sWelsEncCtx* pEncCtx) {
-  m_pInterface[0] = m_pInterface[1] = NULL;
-}
-
-CWelsLib::~CWelsLib() {
-}
-
-void* CWelsLib::QueryFunction (const char* pName) {
-  void* pFunc = NULL;
-
-  return pFunc;
-}
-
-int32_t CWelsLib::CreateIface (IWelsVP** ppInterfaceVp) {
-  *ppInterfaceVp = NULL;
-    pfnCreateVpInterface  pCreateVpInterface  = NULL;
-    pfnDestroyVpInterface pDestroyVpInterface = NULL;
-
-    pCreateVpInterface  = CreateVpInterface;
-    pDestroyVpInterface = DestroyVpInterface;
-
-    m_pInterface[0] = (void*)pCreateVpInterface;
-    m_pInterface[1] = (void*)pDestroyVpInterface;
-
-    if (m_pInterface[0] && m_pInterface[1])
-      pCreateVpInterface ((void**)ppInterfaceVp, WELSVP_INTERFACE_VERION);
-
-  return (*ppInterfaceVp) ? 0 : 1;
-}
-
-int32_t CWelsLib::DestroyIface (IWelsVP* pInterfaceVp) {
-  if (pInterfaceVp) {
-    pfnDestroyVpInterface pDestroyVpInterface = (pfnDestroyVpInterface) m_pInterface[1];
-    if (pDestroyVpInterface) {
-      pDestroyVpInterface (pInterfaceVp, WELSVP_INTERFACE_VERION);
-    } else {
-    }
-  }
-
-  return 0;
-}
-
 /***************************************************************************
 *
 *	implement of the interface
@@ -117,7 +72,6 @@ int32_t CWelsLib::DestroyIface (IWelsVP* pInterfaceVp) {
 
 CWelsPreProcess::CWelsPreProcess (sWelsEncCtx* pEncCtx) {
   m_pInterfaceVp = NULL;
-  m_pEncLib = NULL;
   m_bInitDone = false;
   m_pEncCtx = pEncCtx;
   memset (&m_sScaledPicture, 0, sizeof (m_sScaledPicture));
@@ -132,12 +86,8 @@ CWelsPreProcess::~CWelsPreProcess() {
 }
 
 int32_t CWelsPreProcess::WelsPreprocessCreate() {
-  if (m_pEncLib == NULL && m_pInterfaceVp == NULL) {
-    m_pEncLib  = new CWelsLib (m_pEncCtx);
-    if (!m_pEncLib)
-      goto exit;
-
-    m_pEncLib->CreateIface (&m_pInterfaceVp);
+  if (m_pInterfaceVp == NULL) {
+    CreateVpInterface ((void**) &m_pInterfaceVp, WELSVP_INTERFACE_VERION);
     if (!m_pInterfaceVp)
       goto exit;
   } else
@@ -151,11 +101,8 @@ exit:
 }
 
 int32_t CWelsPreProcess::WelsPreprocessDestroy() {
-  if (m_pEncLib) {
-    m_pEncLib->DestroyIface (m_pInterfaceVp);
-    m_pInterfaceVp = NULL;
-    WelsSafeDelete (m_pEncLib);
-  }
+  DestroyVpInterface (m_pInterfaceVp, WELSVP_INTERFACE_VERION);
+  m_pInterfaceVp = NULL;
 
   return 0;
 }
