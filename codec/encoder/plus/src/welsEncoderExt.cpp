@@ -219,7 +219,7 @@ int CWelsH264SVCEncoder::Initialize (const SEncParamBase* argv) {
     return cmInitParaError;
   }
 
-  return Initialize2 (&sConfig);
+  return InitializeInternal(&sConfig);
 }
 
 int CWelsH264SVCEncoder::InitializeExt (const SEncParamExt* argv) {
@@ -238,10 +238,10 @@ int CWelsH264SVCEncoder::InitializeExt (const SEncParamExt* argv) {
     return cmInitParaError;
   }
 
-  return Initialize2 (&sConfig);
+  return InitializeInternal(&sConfig);
 }
 
-int CWelsH264SVCEncoder::Initialize2 (SWelsSvcCodingParam* pCfg) {
+int CWelsH264SVCEncoder::InitializeInternal(SWelsSvcCodingParam* pCfg) {
   if (NULL == pCfg) {
     WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::Initialize(), invalid argv= 0x%p.\n",
              pCfg);
@@ -465,37 +465,6 @@ int32_t CWelsH264SVCEncoder::Uninitialize() {
   }
 
   m_bInitialFlag = false;
-
-  return 0;
-}
-
-
-int32_t CWelsH264SVCEncoder::RawData2SrcPic (const uint8_t* pSrc) {
-  assert (m_iSrcListSize > 0);
-
-  int32_t y_length = m_iMaxPicWidth * m_iMaxPicHeight;
-  m_pSrcPicList[0]->pData[0] = const_cast<uint8_t*> (pSrc);
-
-  switch (m_iCspInternal & (~videoFormatVFlip)) {
-  case videoFormatYVYU:
-  case videoFormatUYVY:
-  case videoFormatYUY2:
-  case videoFormatRGB:
-  case videoFormatBGR:
-  case videoFormatBGRA:
-  case videoFormatRGBA:
-  case videoFormatARGB:
-  case videoFormatABGR:
-    m_pSrcPicList[0]->pData[1] = m_pSrcPicList[0]->pData[2] = NULL;
-    break;
-  case videoFormatI420:
-  case videoFormatYV12:
-    m_pSrcPicList[0]->pData[1] = m_pSrcPicList[0]->pData[0] + y_length;
-    m_pSrcPicList[0]->pData[2] = m_pSrcPicList[0]->pData[1] + (y_length >> 2);
-    break;
-  default:
-    return 1;
-  }
 
   return 0;
 }

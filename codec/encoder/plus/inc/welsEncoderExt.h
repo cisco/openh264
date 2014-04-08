@@ -104,7 +104,7 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   virtual int EXTAPI GetOption (ENCODER_OPTION opt_id, void* option);
 
  private:
-  int Initialize2 (SWelsSvcCodingParam* argv);
+  int InitializeInternal (SWelsSvcCodingParam* argv);
 
   sWelsEncCtx*	m_pEncContext;
 
@@ -130,7 +130,6 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
 #endif//REC_FRAME_COUNT
 
   void    InitEncoder (void);
-  int32_t RawData2SrcPic (const uint8_t* pSrc);
   void    DumpSrcPicture (const uint8_t* pSrc);
 };
 }
