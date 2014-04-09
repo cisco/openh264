@@ -1,15 +1,24 @@
 #include<gtest/gtest.h>
 #include <time.h>
+#include "cpu.h"
+#include "cpu_core.h"
 #include "get_intra_predictor.h"
 #include "typedefs.h"
 #include "ls_defines.h"
 using namespace WelsDec;
-#define GENERATE_4x4_UT(pred, ref) \
+#define GENERATE_4x4_UT(pred, ref, ASM, CPUFLAGS) \
   TEST(DecoderIntraPredictionTest, pred) { \
   const int32_t kiStride = 32; \
   int32_t iRunTimes = 1000; \
   uint8_t pPredBuffer[9 * kiStride]; \
   uint8_t pRefBuffer[9 * kiStride]; \
+if (ASM) {\
+  int32_t  iNumberofCPUCore = 1; \
+  uint32_t uiCPUFlags = WelsCPUFeatureDetect( &iNumberofCPUCore); \
+  if ((uiCPUFlags & CPUFLAGS) == 0) {\
+    return; \
+  } \
+}\
   srand((unsigned int)time(NULL)); \
   while(iRunTimes--) {\
   for (int i = 0; i < 9; i++) {\
@@ -342,38 +351,45 @@ void WelsI4x4LumaPredHD_ref (uint8_t* pPred, const int32_t kiStride) {
 }
 // Unit test for Luma 4x4 cases
 PREDV (4)
-GENERATE_4x4_UT (WelsI4x4LumaPredV_c, LumaI4x4PredV)
+GENERATE_4x4_UT (WelsI4x4LumaPredV_c, LumaI4x4PredV, 0, 0)
 
 PREDH (4)
-GENERATE_4x4_UT (WelsI4x4LumaPredH_c, LumaI4x4PredH)
+GENERATE_4x4_UT (WelsI4x4LumaPredH_c, LumaI4x4PredH, 0, 0)
 
 PREDDC (4, 2)
-GENERATE_4x4_UT (WelsI4x4LumaPredDc_c, LumaI4x4PredDC)
+GENERATE_4x4_UT (WelsI4x4LumaPredDc_c, LumaI4x4PredDC, 0, 0)
 
 PREDDCLeft (4, 2)
-GENERATE_4x4_UT (WelsI4x4LumaPredDcLeft_c, LumaI4x4PredDCLeft)
+GENERATE_4x4_UT (WelsI4x4LumaPredDcLeft_c, LumaI4x4PredDCLeft, 0, 0)
 
 PREDDCTop (4, 2)
-GENERATE_4x4_UT (WelsI4x4LumaPredDcTop_c, LumaI4x4PredDCTop)
+GENERATE_4x4_UT (WelsI4x4LumaPredDcTop_c, LumaI4x4PredDCTop, 0, 0)
 
 PREDDCNone (4, 2)
-GENERATE_4x4_UT (WelsI4x4LumaPredDcNA_c, LumaI4x4PredDCNone)
-GENERATE_4x4_UT (WelsI4x4LumaPredDDL_c, WelsI4x4LumaPredDDL_ref)
-GENERATE_4x4_UT (WelsI4x4LumaPredDDLTop_c, WelsI4x4LumaPredDDLTop_ref)
-GENERATE_4x4_UT (WelsI4x4LumaPredDDR_c, WelsI4x4LumaPredDDR_ref)
-GENERATE_4x4_UT (WelsI4x4LumaPredVR_c, WelsI4x4LumaPredVR_ref)
-GENERATE_4x4_UT (WelsI4x4LumaPredVL_c, WelsI4x4LumaPredVL_ref)
-GENERATE_4x4_UT (WelsI4x4LumaPredVLTop_c, WelsI4x4LumaPredVLTop_ref)
-GENERATE_4x4_UT (WelsI4x4LumaPredHU_c, WelsI4x4LumaPredHU_ref)
-GENERATE_4x4_UT (WelsI4x4LumaPredHD_c, WelsI4x4LumaPredHD_ref)
+GENERATE_4x4_UT (WelsI4x4LumaPredDcNA_c, LumaI4x4PredDCNone, 0, 0)
+GENERATE_4x4_UT (WelsI4x4LumaPredDDL_c, WelsI4x4LumaPredDDL_ref, 0, 0)
+GENERATE_4x4_UT (WelsI4x4LumaPredDDLTop_c, WelsI4x4LumaPredDDLTop_ref, 0, 0)
+GENERATE_4x4_UT (WelsI4x4LumaPredDDR_c, WelsI4x4LumaPredDDR_ref, 0, 0)
+GENERATE_4x4_UT (WelsI4x4LumaPredVR_c, WelsI4x4LumaPredVR_ref, 0, 0)
+GENERATE_4x4_UT (WelsI4x4LumaPredVL_c, WelsI4x4LumaPredVL_ref, 0, 0)
+GENERATE_4x4_UT (WelsI4x4LumaPredVLTop_c, WelsI4x4LumaPredVLTop_ref, 0, 0)
+GENERATE_4x4_UT (WelsI4x4LumaPredHU_c, WelsI4x4LumaPredHU_ref, 0, 0)
+GENERATE_4x4_UT (WelsI4x4LumaPredHD_c, WelsI4x4LumaPredHD_ref, 0, 0)
 
-#define GENERATE_8x8_UT(pred, ref) \
+#define GENERATE_8x8_UT(pred, ref, ASM, CPUFLAGS) \
 TEST(DecoderIntraPredictionTest, pred) {\
 const int32_t kiStride = 32; \
 int iRunTimes = 1000; \
 uint8_t _pRefBuffer[18 * kiStride + 64]; \
 uint8_t _pPredBuffer[18 * kiStride + 64]; \
 uint8_t *pRefBuffer, *pPredBuffer; \
+if (ASM) { \
+  int32_t iTmp = 1; \
+  uint32_t uiCPUFlags = WelsCPUFeatureDetect(&iTmp); \
+  if ((uiCPUFlags & CPUFLAGS) == 0) {\
+    return; \
+  } \
+} \
 pRefBuffer = (uint8_t*)((((intptr_t)(&_pRefBuffer[31])) >> 4) << 4); \
 pPredBuffer = (uint8_t*)((((intptr_t)(&_pPredBuffer[31])) >> 4) << 4); \
 srand((unsigned int)time(NULL)); \
@@ -494,20 +510,27 @@ void WelsIChromaPredDcTop_ref (uint8_t* pPred, const int32_t kiStride) {
 PREDV (8)
 PREDH (8)
 PREDDCNone (8, 3)
-GENERATE_8x8_UT (WelsIChromaPredDcNA_c, LumaI8x8PredDCNone)
-GENERATE_8x8_UT (WelsIChromaPredPlane_c, WelsIChromaPredPlane_ref)
-GENERATE_8x8_UT (WelsIChromaPredDc_c, WelsIChromaPredDc_ref)
-GENERATE_8x8_UT (WelsIChromaPredDcTop_c, WelsIChromaPredDcTop_ref)
-GENERATE_8x8_UT (WelsIChromaPredDcLeft_c, WelsIChromaPredDcLeft_ref)
-GENERATE_8x8_UT (WelsIChromaPredH_c, LumaI8x8PredH)
-GENERATE_8x8_UT (WelsIChromaPredV_c, LumaI8x8PredV)
-#define GENERATE_16x16_UT(pred, ref) \
+GENERATE_8x8_UT (WelsIChromaPredDcNA_c, LumaI8x8PredDCNone, 0, 0)
+GENERATE_8x8_UT (WelsIChromaPredPlane_c, WelsIChromaPredPlane_ref, 0, 0)
+GENERATE_8x8_UT (WelsIChromaPredDc_c, WelsIChromaPredDc_ref, 0, 0)
+GENERATE_8x8_UT (WelsIChromaPredDcTop_c, WelsIChromaPredDcTop_ref, 0, 0)
+GENERATE_8x8_UT (WelsIChromaPredDcLeft_c, WelsIChromaPredDcLeft_ref, 0, 0)
+GENERATE_8x8_UT (WelsIChromaPredH_c, LumaI8x8PredH, 0, 0)
+GENERATE_8x8_UT (WelsIChromaPredV_c, LumaI8x8PredV, 0, 0)
+#define GENERATE_16x16_UT(pred, ref, ASM, CPUFLAGS) \
 TEST(DecoderIntraPredictionTest, pred) {\
 const int32_t kiStride = 32; \
 int32_t iRunTimes = 1000; \
 uint8_t _pRefBuffer[18 * kiStride + 64]; \
 uint8_t _pPredBuffer[18 * kiStride + 64]; \
 uint8_t *pRefBuffer, *pPredBuffer; \
+if (ASM) { \
+  int32_t iTmp = 1; \
+  uint32_t uiCPUFlags = WelsCPUFeatureDetect( &iTmp); \
+  if ((uiCPUFlags & CPUFLAGS) == 0) {\
+    return ; \
+  } \
+}\
 pRefBuffer = (uint8_t*)((((intptr_t)(&_pRefBuffer[31])) >> 4) << 4); \
 pPredBuffer = (uint8_t*)((((intptr_t)(&_pPredBuffer[31])) >> 4) << 4); \
 srand((unsigned int)time(NULL)); \
@@ -559,53 +582,53 @@ PREDDCTop (16, 4)
 PREDDCLeft (16, 4)
 PREDDCNone (16, 4)
 
-GENERATE_16x16_UT (WelsI16x16LumaPredDcNA_c, LumaI16x16PredDCNone)
-GENERATE_16x16_UT (WelsI16x16LumaPredPlane_c, WelsI16x16LumaPredPlane_ref)
-GENERATE_16x16_UT (WelsI16x16LumaPredDcLeft_c, LumaI16x16PredDCLeft)
-GENERATE_16x16_UT (WelsI16x16LumaPredDcTop_c, LumaI16x16PredDCTop)
-GENERATE_16x16_UT (WelsI16x16LumaPredDc_c, LumaI16x16PredDC)
-GENERATE_16x16_UT (WelsI16x16LumaPredH_c, LumaI16x16PredH)
-GENERATE_16x16_UT (WelsI16x16LumaPredV_c, LumaI16x16PredV)
+GENERATE_16x16_UT (WelsI16x16LumaPredDcNA_c, LumaI16x16PredDCNone, 0, 0)
+GENERATE_16x16_UT (WelsI16x16LumaPredPlane_c, WelsI16x16LumaPredPlane_ref, 0, 0)
+GENERATE_16x16_UT (WelsI16x16LumaPredDcLeft_c, LumaI16x16PredDCLeft, 0, 0)
+GENERATE_16x16_UT (WelsI16x16LumaPredDcTop_c, LumaI16x16PredDCTop, 0, 0)
+GENERATE_16x16_UT (WelsI16x16LumaPredDc_c, LumaI16x16PredDC, 0, 0)
+GENERATE_16x16_UT (WelsI16x16LumaPredH_c, LumaI16x16PredH, 0, 0)
+GENERATE_16x16_UT (WelsI16x16LumaPredV_c, LumaI16x16PredV, 0, 0)
 #if defined(X86_ASM)
-GENERATE_4x4_UT (WelsDecoderI4x4LumaPredH_sse2, LumaI4x4PredH)
-GENERATE_4x4_UT (WelsDecoderI4x4LumaPredDDR_mmx, WelsI4x4LumaPredDDR_ref)
-GENERATE_4x4_UT (WelsDecoderI4x4LumaPredHD_mmx, WelsI4x4LumaPredHD_ref)
-GENERATE_4x4_UT (WelsDecoderI4x4LumaPredHU_mmx, WelsI4x4LumaPredHU_ref)
-GENERATE_4x4_UT (WelsDecoderI4x4LumaPredVR_mmx, WelsI4x4LumaPredVR_ref)
-GENERATE_4x4_UT (WelsDecoderI4x4LumaPredDDL_mmx, WelsI4x4LumaPredDDL_ref)
-GENERATE_4x4_UT (WelsDecoderI4x4LumaPredVL_mmx, WelsI4x4LumaPredVL_ref)
-GENERATE_8x8_UT (WelsDecoderIChromaPredDcTop_sse2, WelsIChromaPredDcTop_ref)
-GENERATE_8x8_UT (WelsDecoderIChromaPredDc_sse2, WelsIChromaPredDc_ref)
-GENERATE_8x8_UT (WelsDecoderIChromaPredPlane_sse2, WelsIChromaPredPlane_ref)
-GENERATE_8x8_UT (WelsDecoderIChromaPredH_mmx, LumaI8x8PredH)
-GENERATE_8x8_UT (WelsDecoderIChromaPredV_mmx, LumaI8x8PredV)
-GENERATE_8x8_UT (WelsDecoderIChromaPredDcLeft_mmx, WelsIChromaPredDcLeft_ref)
-GENERATE_8x8_UT (WelsDecoderIChromaPredDcNA_mmx, LumaI8x8PredDCNone)
-GENERATE_16x16_UT (WelsDecoderI16x16LumaPredPlane_sse2, WelsI16x16LumaPredPlane_ref)
-GENERATE_16x16_UT (WelsDecoderI16x16LumaPredH_sse2, LumaI16x16PredH)
-GENERATE_16x16_UT (WelsDecoderI16x16LumaPredV_sse2, LumaI16x16PredV)
-GENERATE_16x16_UT (WelsDecoderI16x16LumaPredDc_sse2, LumaI16x16PredDC)
-GENERATE_16x16_UT (WelsDecoderI16x16LumaPredDcTop_sse2, LumaI16x16PredDCTop)
-GENERATE_16x16_UT (WelsDecoderI16x16LumaPredDcNA_sse2, LumaI16x16PredDCNone)
+GENERATE_4x4_UT (WelsDecoderI4x4LumaPredH_sse2, LumaI4x4PredH, 1, WELS_CPU_SSE2)
+GENERATE_4x4_UT (WelsDecoderI4x4LumaPredDDR_mmx, WelsI4x4LumaPredDDR_ref, 1, WELS_CPU_MMX)
+GENERATE_4x4_UT (WelsDecoderI4x4LumaPredHD_mmx, WelsI4x4LumaPredHD_ref, 1, WELS_CPU_MMX)
+GENERATE_4x4_UT (WelsDecoderI4x4LumaPredHU_mmx, WelsI4x4LumaPredHU_ref, 1, WELS_CPU_MMX)
+GENERATE_4x4_UT (WelsDecoderI4x4LumaPredVR_mmx, WelsI4x4LumaPredVR_ref, 1, WELS_CPU_MMX)
+GENERATE_4x4_UT (WelsDecoderI4x4LumaPredDDL_mmx, WelsI4x4LumaPredDDL_ref, 1, WELS_CPU_MMX)
+GENERATE_4x4_UT (WelsDecoderI4x4LumaPredVL_mmx, WelsI4x4LumaPredVL_ref, 1, WELS_CPU_MMX)
+GENERATE_8x8_UT (WelsDecoderIChromaPredDcTop_sse2, WelsIChromaPredDcTop_ref, 1, WELS_CPU_SSE2)
+GENERATE_8x8_UT (WelsDecoderIChromaPredDc_sse2, WelsIChromaPredDc_ref, 1, WELS_CPU_SSE2)
+GENERATE_8x8_UT (WelsDecoderIChromaPredPlane_sse2, WelsIChromaPredPlane_ref, 1, WELS_CPU_SSE2)
+GENERATE_8x8_UT (WelsDecoderIChromaPredH_mmx, LumaI8x8PredH, 1, WELS_CPU_MMX)
+GENERATE_8x8_UT (WelsDecoderIChromaPredV_mmx, LumaI8x8PredV, 1, WELS_CPU_MMX)
+GENERATE_8x8_UT (WelsDecoderIChromaPredDcLeft_mmx, WelsIChromaPredDcLeft_ref, 1, WELS_CPU_MMX)
+GENERATE_8x8_UT (WelsDecoderIChromaPredDcNA_mmx, LumaI8x8PredDCNone, 1, WELS_CPU_MMX)
+GENERATE_16x16_UT (WelsDecoderI16x16LumaPredPlane_sse2, WelsI16x16LumaPredPlane_ref, 1, WELS_CPU_SSE2)
+GENERATE_16x16_UT (WelsDecoderI16x16LumaPredH_sse2, LumaI16x16PredH, 1, WELS_CPU_SSE2)
+GENERATE_16x16_UT (WelsDecoderI16x16LumaPredV_sse2, LumaI16x16PredV, 1, WELS_CPU_SSE2)
+GENERATE_16x16_UT (WelsDecoderI16x16LumaPredDc_sse2, LumaI16x16PredDC, 1, WELS_CPU_SSE2)
+GENERATE_16x16_UT (WelsDecoderI16x16LumaPredDcTop_sse2, LumaI16x16PredDCTop, 1, WELS_CPU_SSE2)
+GENERATE_16x16_UT (WelsDecoderI16x16LumaPredDcNA_sse2, LumaI16x16PredDCNone, 1, WELS_CPU_SSE2)
 #endif
 
 #if defined(HAVE_NEON)
-GENERATE_16x16_UT (WelsDecoderI16x16LumaPredV_neon, LumaI16x16PredV)
-GENERATE_16x16_UT (WelsDecoderI16x16LumaPredH_neon, LumaI16x16PredH)
-GENERATE_16x16_UT (WelsDecoderI16x16LumaPredDc_neon, LumaI16x16PredDC)
-GENERATE_16x16_UT (WelsDecoderI16x16LumaPredPlane_neon, WelsI16x16LumaPredPlane_ref)
+GENERATE_16x16_UT (WelsDecoderI16x16LumaPredV_neon, LumaI16x16PredV, 1, WELS_CPU_NEON)
+GENERATE_16x16_UT (WelsDecoderI16x16LumaPredH_neon, LumaI16x16PredH, 1, WELS_CPU_NEON)
+GENERATE_16x16_UT (WelsDecoderI16x16LumaPredDc_neon, LumaI16x16PredDC, 1, WELS_CPU_NEON)
+GENERATE_16x16_UT (WelsDecoderI16x16LumaPredPlane_neon, WelsI16x16LumaPredPlane_ref, 1, WELS_CPU_NEON)
 
-GENERATE_4x4_UT (WelsDecoderI4x4LumaPredV_neon, LumaI4x4PredV)
-GENERATE_4x4_UT (WelsDecoderI4x4LumaPredH_neon, LumaI4x4PredH)
-GENERATE_4x4_UT (WelsDecoderI4x4LumaPredDDL_neon, WelsI4x4LumaPredDDL_ref)
-GENERATE_4x4_UT (WelsDecoderI4x4LumaPredDDR_neon, WelsI4x4LumaPredDDR_ref)
-GENERATE_4x4_UT (WelsDecoderI4x4LumaPredVL_neon, WelsI4x4LumaPredVL_ref)
-GENERATE_4x4_UT (WelsDecoderI4x4LumaPredVR_neon, WelsI4x4LumaPredVR_ref)
-GENERATE_4x4_UT (WelsDecoderI4x4LumaPredHU_neon, WelsI4x4LumaPredHU_ref)
-GENERATE_4x4_UT (WelsDecoderI4x4LumaPredHD_neon, WelsI4x4LumaPredHD_ref)
+GENERATE_4x4_UT (WelsDecoderI4x4LumaPredV_neon, LumaI4x4PredV, 1, WELS_CPU_NEON)
+GENERATE_4x4_UT (WelsDecoderI4x4LumaPredH_neon, LumaI4x4PredH, 1, WELS_CPU_NEON)
+GENERATE_4x4_UT (WelsDecoderI4x4LumaPredDDL_neon, WelsI4x4LumaPredDDL_ref, 1, WELS_CPU_NEON)
+GENERATE_4x4_UT (WelsDecoderI4x4LumaPredDDR_neon, WelsI4x4LumaPredDDR_ref, 1, WELS_CPU_NEON)
+GENERATE_4x4_UT (WelsDecoderI4x4LumaPredVL_neon, WelsI4x4LumaPredVL_ref, 1, WELS_CPU_NEON)
+GENERATE_4x4_UT (WelsDecoderI4x4LumaPredVR_neon, WelsI4x4LumaPredVR_ref, 1, WELS_CPU_NEON)
+GENERATE_4x4_UT (WelsDecoderI4x4LumaPredHU_neon, WelsI4x4LumaPredHU_ref, 1, WELS_CPU_NEON)
+GENERATE_4x4_UT (WelsDecoderI4x4LumaPredHD_neon, WelsI4x4LumaPredHD_ref, 1, WELS_CPU_NEON)
 
-GENERATE_8x8_UT (WelsDecoderIChromaPredV_neon, LumaI8x8PredV)
-GENERATE_8x8_UT (WelsDecoderIChromaPredH_neon, LumaI8x8PredH)
-GENERATE_8x8_UT (WelsDecoderIChromaPredDc_neon, WelsIChromaPredDc_ref)
-GENERATE_8x8_UT (WelsDecoderIChromaPredPlane_neon, WelsIChromaPredPlane_ref)
+GENERATE_8x8_UT (WelsDecoderIChromaPredV_neon, LumaI8x8PredV, 1, WELS_CPU_NEON)
+GENERATE_8x8_UT (WelsDecoderIChromaPredH_neon, LumaI8x8PredH, 1, WELS_CPU_NEON)
+GENERATE_8x8_UT (WelsDecoderIChromaPredDc_neon, WelsIChromaPredDc_ref, 1, WELS_CPU_NEON)
+GENERATE_8x8_UT (WelsDecoderIChromaPredPlane_neon, WelsIChromaPredPlane_ref, 1, WELS_CPU_NEON)
 #endif
