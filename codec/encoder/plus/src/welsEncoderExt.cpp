@@ -474,7 +474,7 @@ int32_t CWelsH264SVCEncoder::Uninitialize() {
  *	SVC core encoding
  */
 int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo) {
-  if (! (kpSrcPic && m_pEncContext && m_bInitialFlag)) {
+  if (! (kpSrcPic && m_bInitialFlag && pBsInfo)) {
     return cmInitParaError;
   }
 
@@ -497,10 +497,6 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
 
 
 int CWelsH264SVCEncoder::EncodeFrameInternal(const SSourcePicture*  pSrcPic, SFrameBSInfo* pBsInfo) {
-  if (!(pSrcPic && m_pEncContext && m_bInitialFlag) ){
-    return cmInitParaError;
-  }
-
   const int32_t kiEncoderReturn = WelsEncoderEncodeExt (m_pEncContext, pBsInfo, pSrcPic);
 
   if(kiEncoderReturn == ENC_RETURN_MEMALLOCERR) {
