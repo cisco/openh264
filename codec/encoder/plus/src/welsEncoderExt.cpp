@@ -296,7 +296,7 @@ int CWelsH264SVCEncoder::InitializeInternal(SWelsSvcCodingParam* pCfg) {
 #endif//REC_FRAME_COUNT
 
   const int32_t iColorspace = pCfg->iInputCsp;
-  if (0 == iColorspace) {
+  if (videoFormatI420 != iColorspace) {
     WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::Initialize(), invalid iInputCsp= %d.\n", iColorspace);
     Uninitialize();
     return cmInitParaError;
