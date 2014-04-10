@@ -362,10 +362,20 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   else if (uiIntraPeriod & (uiGopSize-1))	// none multiple of GOP size
     uiIntraPeriod = ((uiIntraPeriod + uiGopSize - 1) / uiGopSize) * uiGopSize;
 
-  iLTRRefNum = bEnableLongTermReference ? LONG_TERM_REF_NUM : 0;
-  iNumRefFrame		= ((uiGopSize >> 1) > 1) ? ((uiGopSize >> 1) + iLTRRefNum) : (MIN_REF_PIC_COUNT + iLTRRefNum);
-  iNumRefFrame		= WELS_CLIP3 (iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM);
-
+  if (iUsageType == SCREEN_CONTENT_REAL_TIME) {
+    bEnableLongTermReference &= (pCodingParam.iLTRRefNum > 0);
+    if (bEnableLongTermReference) {
+       iLTRRefNum = pCodingParam.iLTRRefNum;
+       iNumRefFrame = 1 + WELS_LOG2 (uiGopSize) + iLTRRefNum;
+     } else {
+       iLTRRefNum = 0;
+       iNumRefFrame = 1;
+     }
+  } else {
+    iLTRRefNum = bEnableLongTermReference ? LONG_TERM_REF_NUM : 0;
+    iNumRefFrame		= ((uiGopSize >> 1) > 1) ? ((uiGopSize >> 1) + iLTRRefNum) : (MIN_REF_PIC_COUNT + iLTRRefNum);
+    iNumRefFrame		= WELS_CLIP3 (iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM);
+  }
   iLtrMarkPeriod  = pCodingParam.iLtrMarkPeriod;
 
   bPrefixNalAddingCtrl	= pCodingParam.bPrefixNalAddingCtrl;

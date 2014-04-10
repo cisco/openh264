@@ -325,7 +325,7 @@ static inline void LTRMarkProcessScreen (sWelsEncCtx* pCtx) {
     DeleteLTRFromLongList (pCtx, iLtrIdx);
   }
   pLongRefList[iLtrIdx] = pCtx->pDecPic;
-  pRefList->uiLongRefCount;
+  pRefList->uiLongRefCount++;
 }
 
 static inline void PrefetchNextBuffer (sWelsEncCtx* pCtx) {
@@ -638,7 +638,7 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
     /*syntax for num_ref_idx_l0_active_minus1*/
     pSliceHdr->uiRefCount = pCtx->iNumRef0;
     if (pCtx->iNumRef0 > 0) {
-      if (!pCtx->pRefList0[0]->bIsLongRef) {
+      if ((!pCtx->pRefList0[0]->bIsLongRef)||(!pCtx->pSvcParam->bEnableLongTermReference)) {
         if (iAbsDiffPicNumMinus1 < 0) {
           WelsLog (pCtx, WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1:%d\n", iAbsDiffPicNumMinus1);
           iAbsDiffPicNumMinus1 += (1 << (pCtx->pSps->uiLog2MaxFrameNum));
@@ -670,18 +670,6 @@ static int32_t UpdateSrcPicList (sWelsEncCtx* pCtx) {
   int32_t iDIdx = pCtx->uiDependencyId;
   SPicture** pLongRefList = pCtx->ppRefPicListExt[iDIdx]->pLongRefList;
   SPicture** pLongRefSrcList = &pCtx->pVpp->m_pSpatialPic[iDIdx][0];
-  for (int32_t i = 0; i < MAX_REF_PIC_COUNT; ++i) {
-    if (NULL == pLongRefSrcList[i + 1] || (NULL != pLongRefList[i] && pLongRefList[i]->bUsedAsRef
-                                           && pLongRefList[i]->bIsLongRef)) {
-      continue;
-    } else {
-      SetUnref (pLongRefSrcList[i + 1]);
-    }
-  }
-  WelsExchangeSpatialPictures (&pCtx->pVpp->m_pSpatialPic[iDIdx][0],
-                               &pCtx->pVpp->m_pSpatialPic[iDIdx][1 + pCtx->pVaa->uiMarkLongTermPicIdx]);
-  SetUnref (pCtx->pVpp->m_pSpatialPic[iDIdx][0]);
-
 
   //update info in src list
   if (pCtx->pEncPic) {
@@ -696,6 +684,18 @@ static int32_t UpdateSrcPicList (sWelsEncCtx* pCtx) {
     pCtx->pEncPic->bIsSceneLTR      = pCtx->pDecPic->bIsSceneLTR;
     pCtx->pEncPic->iFrameAverageQp  = pCtx->pDecPic->iFrameAverageQp;
   }
+  PrefetchNextBuffer(pCtx);
+  for (int32_t i = 0; i < MAX_REF_PIC_COUNT; ++i) {
+    if (NULL == pLongRefSrcList[i + 1] || (NULL != pLongRefList[i] && pLongRefList[i]->bUsedAsRef&& pLongRefList[i]->bIsLongRef)) {
+      continue;
+      } else {
+        SetUnref (pLongRefSrcList[i + 1]);
+      }
+    }
+    WelsExchangeSpatialPictures (&pCtx->pVpp->m_pSpatialPic[iDIdx][0],
+                                 &pCtx->pVpp->m_pSpatialPic[iDIdx][1 + pCtx->pVaa->uiMarkLongTermPicIdx]);
+    SetUnref (pCtx->pVpp->m_pSpatialPic[iDIdx][0]);
+
   return 0;
 }
 
