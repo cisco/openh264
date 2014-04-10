@@ -259,6 +259,9 @@ TEST_F(MotionEstimateTest, TestVerticalSearch_SSE41)
   srand((uint32_t)time(NULL));
   const uint8_t kuiQp = rand()%52;
   InitMe(kuiQp, 648, m_uiMvdTableSize, m_pMvdCostTable, &sMe);
+  int32_t iTmp = 1;
+  uint32_t uiCPUFlags = WelsCPUFeatureDetect( &iTmp);
+  if ((uiCPUFlags & WELS_CPU_SSE41) == 0) return ;
 
   SMVUnitXY sTargetMv;
   WelsInitSampleSadFunc( &sFuncList, 0 );//test c functions
@@ -323,7 +326,9 @@ TEST_F(MotionEstimateTest, TestHorizontalSearch_SSE41)
   srand((uint32_t)time(NULL));
   const uint8_t kuiQp = rand()%52;
   InitMe(kuiQp, 648, m_uiMvdTableSize, m_pMvdCostTable, &sMe);
-
+  int32_t iTmp = 1;
+  uint32_t uiCPUFlags = WelsCPUFeatureDetect( &iTmp);
+  if ((uiCPUFlags & WELS_CPU_SSE41) == 0) return ;
   SMVUnitXY sTargetMv;
   WelsInitSampleSadFunc( &sFuncList, 0 );//test c functions
   WelsInitMeFunc(&sFuncList, WELS_CPU_SSE41, 1);
