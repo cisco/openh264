@@ -255,6 +255,8 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
 
 int32_t CWelsPreProcess::UpdateSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCodingParam* pParam,
     const int8_t iCurTid, const int32_t d_idx) {
+  if(pCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME)
+      return 0;
   if (iCurTid < m_uiSpatialLayersInTemporal[d_idx] - 1 || pParam->iDecompStages == 0) {
     if ((iCurTid >= MAX_TEMPORAL_LEVEL) || (m_uiSpatialLayersInTemporal[d_idx] - 1 > MAX_TEMPORAL_LEVEL)) {
       InitLastSpatialPictures (pCtx);
