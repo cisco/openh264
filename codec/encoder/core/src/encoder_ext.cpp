@@ -1179,7 +1179,7 @@ int32_t RequestMemoryVaaScreen (SVAAFrameInfo* pVaa,  CMemoryAlign* pMa,  const 
   }
   return 0;
 }
-int32_t ReleaseMemoryVaaScreen (SVAAFrameInfo* pVaa,  CMemoryAlign* pMa, const int32_t iNumRef) {
+void ReleaseMemoryVaaScreen (SVAAFrameInfo* pVaa,  CMemoryAlign* pMa, const int32_t iNumRef) {
   SVAAFrameInfoExt* pVaaExt = static_cast<SVAAFrameInfoExt*> (pVaa);
   if (pVaaExt && pMa && pVaaExt->pVaaBlockStaticIdc[0]) {
     pMa->WelsFree (pVaaExt->pVaaBlockStaticIdc[0], "pVaa->pVaaBlockStaticIdc");
@@ -1188,7 +1188,6 @@ int32_t ReleaseMemoryVaaScreen (SVAAFrameInfo* pVaa,  CMemoryAlign* pMa, const i
       pVaaExt->pVaaBlockStaticIdc[idx] = NULL;
     }
   }
-  return 0;
 }
 /*!
  * \brief	request specific memory for SVC
