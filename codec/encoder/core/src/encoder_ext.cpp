@@ -1169,7 +1169,7 @@ int32_t RequestMemoryVaaScreen (SVAAFrameInfo* pVaa,  CMemoryAlign* pMa,  const 
   SVAAFrameInfoExt* pVaaExt = static_cast<SVAAFrameInfoExt*> (pVaa);
 
   pVaaExt->pVaaBlockStaticIdc[0] = (static_cast<uint8_t*> (pMa->WelsMallocz (iNumRef * iCountMax8x8BNum * sizeof (
-                                      int32_t), "pVaa->pVaaBlockStaticIdc[0]")));
+                                      uint8_t), "pVaa->pVaaBlockStaticIdc[0]")));
   if (NULL == pVaaExt->pVaaBlockStaticIdc[0]) {
     return 1;
   }
@@ -1187,9 +1187,8 @@ int32_t ReleaseMemoryVaaScreen (SVAAFrameInfo* pVaa,  CMemoryAlign* pMa, const i
     for (int32_t idx = 0; idx < iNumRef; idx++) {
       pVaaExt->pVaaBlockStaticIdc[idx] = NULL;
     }
-    return 0;
   }
-  return 1;
+  return 0;
 }
 /*!
  * \brief	request specific memory for SVC
@@ -1351,9 +1350,13 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
 
     //pVaa memory allocation
     if (pParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
-        (*ppCtx)->pVaa	= (SVAAFrameInfoExt*)pMa->WelsMallocz (sizeof (SVAAFrameInfoExt), "pVaa");
-        WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pVaa), FreeMemorySvc (ppCtx))
-        RequestMemoryVaaScreen ((*ppCtx)->pVaa, pMa, (*ppCtx)->pSvcParam->iNumRefFrame, iCountMaxMbNum << 2);
+      (*ppCtx)->pVaa	= (SVAAFrameInfoExt*)pMa->WelsMallocz (sizeof (SVAAFrameInfoExt), "pVaa");
+      WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pVaa), FreeMemorySvc (ppCtx))
+      if(RequestMemoryVaaScreen ((*ppCtx)->pVaa, pMa, (*ppCtx)->pSvcParam->iNumRefFrame, iCountMaxMbNum << 2)){
+        WelsLog (*ppCtx, WELS_LOG_WARNING, "RequestMemorySvc(), RequestMemoryVaaScreen failed!");
+        FreeMemorySvc (ppCtx);
+        return 1;
+      }
     } else {
         (*ppCtx)->pVaa	= (SVAAFrameInfo*)pMa->WelsMallocz (sizeof (SVAAFrameInfo), "pVaa");
         WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pVaa), FreeMemorySvc (ppCtx))
