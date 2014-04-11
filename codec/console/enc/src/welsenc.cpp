@@ -268,6 +268,8 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
         pSvcParam.bEnableFrameSkip	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableLongTermReference") == 0) {
         pSvcParam.bEnableLongTermReference	= atoi (strTag[1].c_str()) ? true : false;
+      } else if (strTag[0].compare ("LongTermReferenceNumber") == 0) {
+        pSvcParam.iLTRRefNum = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("LtrMarkPeriod") == 0) {
         pSvcParam.iLtrMarkPeriod	= (uint32_t)atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("NumLayers") == 0) {
@@ -347,6 +349,9 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& sParam) {
     else if (!strcmp (pCmd, "-ltr") && (i < argc))
       sParam.bEnableLongTermReference = atoi (argv[i++]) ? true : false;
 
+    else if (!strcmp (pCmd, "-ltrnum") && (i< argc))
+      sParam.iLTRRefNum = atoi (argv[i++]);
+
     else if (!strcmp (pCmd, "-ltrper") && (i < argc))
       sParam.iLtrMarkPeriod = atoi (argv[i++]);
 
@@ -392,6 +397,7 @@ void PrintHelp() {
   printf ("  -bgd    Control background detection (default: 0)\n");
   printf ("  -aq     Control adaptive quantization (default: 0)\n");
   printf ("  -ltr    Control long term reference (default: 0)\n");
+  printf ("  -ltrnum Control the number of long term reference((1-4):screen LTR,(1-2):video LTR \n");
   printf ("  -rc	  rate control mode: 0-quality mode; 1-bitrate mode; 2-bitrate limited mode; -1-rc off \n");
   printf ("  -tarb	  Overall target bitrate\n");
   printf ("  -numl   Number Of Layers: Must exist with layer_cfg file and the number of input layer_cfg file must equal to the value set by this command\n");
@@ -459,6 +465,9 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
 
     else if (!strcmp (pCommand, "-ltr") && (n < argc))
       pSvcParam.bEnableLongTermReference = atoi (argv[n++]) ? true : false;
+
+    else if (!strcmp (pCommand, "-ltrnum") && (n < argc))
+      pSvcParam.iLTRRefNum = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-ltrper") && (n < argc))
       pSvcParam.iLtrMarkPeriod = atoi (argv[n++]);
