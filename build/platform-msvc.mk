@@ -1,6 +1,7 @@
 include build/platform-x86-common.mk
 include build/platform-msvc-common.mk
 LDFLAGS += user32.lib
+CFLAGS_OPT += -MT
 ifeq ($(ENABLE64BIT), Yes)
 ASMFLAGS += -f win64
 ASMFLAGS_PLATFORM = -DWIN64
