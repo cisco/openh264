@@ -1,10 +1,8 @@
+ARCH = arm
 include build/platform-msvc-common.mk
 CFLAGS_OPT += -MD
 CFLAGS_DEBUG += -MDd
-ARCH=arm
-include build/platform-arch.mk
-CFLAGS += -DWINAPI_FAMILY=WINAPI_FAMILY_PHONE_APP -DWIN32
+CFLAGS += -DWINAPI_FAMILY=WINAPI_FAMILY_PHONE_APP
 CXXFLAGS += -ZW
 LDFLAGS +=
-CCAS = gas-preprocessor.pl -as-type armasm -force-thumb -- armasm
 
