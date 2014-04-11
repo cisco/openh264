@@ -103,9 +103,8 @@ class ISVCDecoder {
                                              int* pStride,
                                              int& iWidth,
                                              int& iHeight) = 0;
-
   /*
-   *  src must be 4 byte aligned,   recommend 16 byte aligned.    the available src size must be multiple of 4.
+   * return: 0 - success; otherwise -failed;
    */
   virtual DECODING_STATE EXTAPI DecodeFrame2 (const unsigned char* pSrc,
                                               const int iSrcLen,
@@ -113,7 +112,6 @@ class ISVCDecoder {
                                               SBufferInfo* pDstInfo) = 0;
 
   /*
-   *  src must be 4 byte aligned,   recommend 16 byte aligned.    the available src size must be multiple of 4.
    *  this API does not work for now!! This is for future use to support non-I420 color format output.
    */
   virtual DECODING_STATE EXTAPI DecodeFrameEx (const unsigned char* pSrc,
@@ -126,7 +124,7 @@ class ISVCDecoder {
                                                int& iColorFormat) = 0;
 
   /*************************************************************************
-   * OutDataFormat
+   * OutDataFormat, Eos Flag, EC method, ...
    *************************************************************************/
   virtual long EXTAPI SetOption (DECODER_OPTION eOptionId, void* pOption) = 0;
   virtual long EXTAPI GetOption (DECODER_OPTION eOptionId, void* pOption) = 0;
