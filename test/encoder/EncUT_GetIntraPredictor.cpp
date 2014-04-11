@@ -477,15 +477,16 @@ TEST(GetIntraPredictorTest, TestGetIChormaPredV) {
 TEST(GetIntraPredictorTest, TestGetI16x16LumaPredPlane) {
   const int32_t kiStride = rand()%16+16;
 
+  int32_t i, j;
+
   uint8_t *pPred = new uint8_t[16*kiStride];
   uint8_t *pRef  = new uint8_t[16*kiStride+1];
-  for (int i=0; i<16*kiStride+1; i++)
+  for (i=0; i<16*kiStride+1; i++)
     pRef[i]=rand()%256+1;
 
   pRef += kiStride + 1;
 
   int32_t iA=0, iB=0, iC=0, iH=0, iV=0;
-  int32_t i, j;
   uint8_t *pTop = &pRef[-kiStride];
   uint8_t *pLeft = &pRef[-1];
   int32_t iPredStride = 16;
@@ -514,16 +515,18 @@ TEST(GetIntraPredictorTest, TestGetI16x16LumaPredPlane) {
 TEST(GetIntraPredictorTest, TestGetI16x16LumaPredDc) {
   const int32_t kiStride = rand()%16+16;
 
+  int i;
+
   uint8_t *pPred = new uint8_t[256];
   uint8_t *pRef  = new uint8_t[16*kiStride];
-  for (int i=0; i<16*kiStride; i++)
+  for (i=0; i<16*kiStride; i++)
     pRef[i] = rand() % 256 + 1;
 
   pRef += kiStride;
 
   int32_t iTmp = (kiStride << 4) - kiStride;
   int32_t iSum = 0;
-  uint8_t i = 15;
+  i = 15;
   uint8_t uiMean = 0;
 
   do {
@@ -533,7 +536,7 @@ TEST(GetIntraPredictorTest, TestGetI16x16LumaPredDc) {
   uiMean = ( 16 + iSum ) >> 5;
 
   WelsI16x16LumaPredDc_c(pPred, pRef, kiStride);
-  for (int i=0; i<256; i++)
+  for (i=0; i<256; i++)
     EXPECT_EQ(pPred[i],uiMean);
 
   pRef -= kiStride;
@@ -545,15 +548,17 @@ TEST(GetIntraPredictorTest, TestGetI16x16LumaPredDc) {
 TEST(GetIntraPredictorTest, TestGetI16x16LumaPredDcTop) {
   const int32_t kiStride = rand()%16+16;
 
+  int i;
+
   uint8_t *pPred = new uint8_t[256];
   uint8_t *pRef  = new uint8_t[16*kiStride];
-  for (int i=0; i<16*kiStride; i++)
+  for (i=0; i<16*kiStride; i++)
     pRef[i] = rand() % 256 + 1;
 
   pRef += kiStride;
 
   int32_t iSum = 0;
-  uint8_t i = 15;
+  i = 15;
   uint8_t uiMean = 0;
   do {
     iSum += pRef[-kiStride+i];
@@ -561,7 +566,7 @@ TEST(GetIntraPredictorTest, TestGetI16x16LumaPredDcTop) {
   uiMean = ( 8 + iSum ) >> 4;
 
   WelsI16x16LumaPredDcTop_c(pPred, pRef, kiStride);
-  for (int i=0; i<256; i++)
+  for (i=0; i<256; i++)
     EXPECT_EQ(pPred[i],uiMean);
 
   pRef -= kiStride;
