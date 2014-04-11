@@ -707,7 +707,12 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
   pParam	= (*ppCtx)->pSvcParam;
   iDlayerCount	= pParam->iSpatialLayerNum;
   iNumRef	= pParam->iNumRefFrame;
-//	highest_layers_in_temporal = 1 + WELS_MAX(pParam->iDecompStages, 1);
+
+  const int32_t kiFeatureStrategyIndex = 0;
+  const int32_t kiMe16x16 = ME_DIA_CROSS;
+  const int32_t kiMe8x8 = ME_DIA_CROSS_FME;
+  const int32_t kiNeedFeatureStorage = (pParam->iUsageType != SCREEN_CONTENT_REAL_TIME)?0:
+    ((kiFeatureStrategyIndex<<16) +  ((kiMe16x16 & 0x00FF)<<8) + (kiMe8x8 & 0x00FF));
 
   iDlayerIndex			= 0;
   while (iDlayerIndex < iDlayerCount) {
@@ -727,9 +732,8 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
     // pRef list
     pRefList		= (SRefList*)pMa->WelsMallocz (sizeof (SRefList), "pRefList");
     WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pRefList), FreeMemorySvc (ppCtx))
-
     do {
-      pRefList->pRef[i]	= AllocPicture (pMa, kiWidth, kiHeight, true);	// to use actual size of current layer
+      pRefList->pRef[i]	= AllocPicture (pMa, kiWidth, kiHeight, true, kiNeedFeatureStorage);	// to use actual size of current layer
       WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pRefList->pRef[i]), FreeMemorySvc (ppCtx))
       ++ i;
     } while (i < 1 + iNumRef);

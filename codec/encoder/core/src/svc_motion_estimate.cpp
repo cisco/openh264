@@ -96,9 +96,9 @@ void WelsInitMeFunc( SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag, bool bScre
  */
 
 void WelsMotionEstimateSearch (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice) {
-  SDqLayer* pCurDqLayer			= (SDqLayer*)pLplayer;
-  SWelsME* pMe						= (SWelsME*)pLpme;
-  SSlice* pSlice					= (SSlice*)pLpslice;
+  SDqLayer* pCurDqLayer      = (SDqLayer*)pLplayer;
+  SWelsME* pMe            = (SWelsME*)pLpme;
+  SSlice* pSlice          = (SSlice*)pLpslice;
   const int32_t kiStrideEnc = pCurDqLayer->iEncStride[0];
   const int32_t kiStrideRef = pCurDqLayer->pRefPic->iLineSize[0];
 
@@ -237,8 +237,8 @@ bool WelsMeSadCostSelect (int32_t* iSadCost, const uint16_t* kpMvdCost, int32_t*
 
 void WelsDiamondSearch (SWelsFuncPtrList* pFuncList, void* pLpme, void* pLpslice,
                         const int32_t kiStrideEnc,  const int32_t kiStrideRef) {
-  SWelsME* pMe						= (SWelsME*)pLpme;
-  PSample4SadCostFunc			pSad					=  pFuncList->sSampleDealingFuncs.pfSample4Sad[pMe->uiBlockSize];
+  SWelsME* pMe            = (SWelsME*)pLpme;
+  PSample4SadCostFunc      pSad          =  pFuncList->sSampleDealingFuncs.pfSample4Sad[pMe->uiBlockSize];
 
   uint8_t* pFref = pMe->pRefMb;
   uint8_t* const kpEncMb = pMe->pEncMb;
@@ -542,18 +542,19 @@ int32_t ReleaseFeatureSearchPreparation( CMemoryAlign *pMa, uint16_t*& pFeatureO
   }
   return ENC_RETURN_UNEXPECTED;
 }
-int32_t RequestScreenBlockFeatureStorage( CMemoryAlign *pMa, const int32_t kiFeatureStrategyIndex,
-                                         const int32_t kiFrameWidth,  const int32_t kiFrameHeight, const int32_t kiMe16x16,  const int32_t kiMe8x8,
-                                         SScreenBlockFeatureStorage* pScreenBlockFeatureStorage) {
-#define LIST_SIZE_SUM_16x16  0x0FF01    //(256*255+1)
-#define LIST_SIZE_SUM_8x8      0x03FC1    //(64*255+1)
 
-  if (((kiMe8x8&ME_FME)==ME_FME) && ((kiMe16x16&ME_FME)==ME_FME)) {
+int32_t RequestScreenBlockFeatureStorage( CMemoryAlign *pMa, const int32_t kiFrameWidth,  const int32_t kiFrameHeight, const int32_t iNeedFeatureStorage,
+                                         SScreenBlockFeatureStorage* pScreenBlockFeatureStorage) {
+
+  const int32_t kiFeatureStrategyIndex = iNeedFeatureStorage>>16;
+  const int32_t kiMe8x8FME = iNeedFeatureStorage & 0x0000FF & ME_FME;
+  const int32_t kiMe16x16FME = ((iNeedFeatureStorage & 0x00FF00)>>8) & ME_FME;
+  if ((kiMe8x8FME==ME_FME) && (kiMe16x16FME==ME_FME)) {
     return ENC_RETURN_UNSUPPORTED_PARA;
     //the following memory allocation cannot support when FME at both size
   }
 
-  const bool bIsBlock8x8 = ((kiMe8x8 & ME_FME)==ME_FME);
+  const bool bIsBlock8x8 = (kiMe8x8FME==ME_FME);
   const int32_t kiMarginSize = bIsBlock8x8?8:16;
   const int32_t kiFrameSize = (kiFrameWidth-kiMarginSize) * (kiFrameHeight-kiMarginSize);
   const int32_t kiListSize  = (0==kiFeatureStrategyIndex)?(bIsBlock8x8 ? LIST_SIZE_SUM_8x8 : LIST_SIZE_SUM_16x16):256;
@@ -749,6 +750,7 @@ void SaveFeatureSearchOut( const SMVUnitXY sBestMv, const uint32_t uiBestSadCost
   pFeatureSearchOut->uiBestSadCost = uiBestSadCost;
   pFeatureSearchOut->pBestRef = pRef;
 }
+
 bool FeatureSearchOne( SFeatureSearchIn &sFeatureSearchIn, const int32_t iFeatureDifference, const uint32_t kuiExpectedSearchTimes,
                       SFeatureSearchOut* pFeatureSearchOut) {
   const int32_t iFeatureOfRef = (sFeatureSearchIn.iFeatureOfCurrent + iFeatureDifference);
@@ -819,6 +821,7 @@ bool FeatureSearchOne( SFeatureSearchIn &sFeatureSearchIn, const int32_t iFeatur
   return (i < iSearchTimesx2);
 }
 
+
 void MotionEstimateFeatureFullSearch( SFeatureSearchIn &sFeatureSearchIn,
                                         const uint32_t kuiMaxSearchPoint,
                                         SWelsME* pMe) {
@@ -840,8 +843,8 @@ void MotionEstimateFeatureFullSearch( SFeatureSearchIn &sFeatureSearchIn,
 // Search function options
 /////////////////////////
 void WelsDiamondCrossSearch(SWelsFuncPtrList *pFunc, void* vpMe, void* vpSlice, const int32_t kiEncStride,  const int32_t kiRefStride) {
-    SWelsME* pMe			 = static_cast<SWelsME *>(vpMe);
-    SSlice* pSlice				 = static_cast<SSlice *>(vpSlice);
+    SWelsME* pMe       = static_cast<SWelsME *>(vpMe);
+    SSlice* pSlice         = static_cast<SSlice *>(vpSlice);
 
     //  Step 1: diamond search
     WelsDiamondSearch(pFunc, vpMe, vpSlice, kiEncStride, kiRefStride);
@@ -854,8 +857,8 @@ void WelsDiamondCrossSearch(SWelsFuncPtrList *pFunc, void* vpMe, void* vpSlice, 
     }
 }
 void WelsDiamondCrossFeatureSearch(SWelsFuncPtrList *pFunc, void* vpMe, void* vpSlice, const int32_t kiEncStride, const int32_t kiRefStride) {
-    SWelsME* pMe			 = static_cast<SWelsME *>(vpMe);
-    SSlice* pSlice				 = static_cast<SSlice *>(vpSlice);
+    SWelsME* pMe       = static_cast<SWelsME *>(vpMe);
+    SSlice* pSlice         = static_cast<SSlice *>(vpSlice);
 
     //  Step 1: diamond search + cross
     WelsDiamondCrossSearch(pFunc, pMe, pSlice, kiEncStride, kiRefStride);
@@ -875,5 +878,6 @@ void WelsDiamondCrossFeatureSearch(SWelsFuncPtrList *pFunc, void* vpMe, void* vp
         pSlice->uiSliceFMECostDown -= pMe->uiSadCost;
     }
 }
+
 } // namespace WelsSVCEnc
 

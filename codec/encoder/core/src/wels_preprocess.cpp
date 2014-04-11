@@ -134,7 +134,7 @@ int32_t CWelsPreProcess::AllocSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCoding
     uint8_t i = 0;
 
     do {
-      SPicture* pPic = AllocPicture (pMa, kiPicWidth, kiPicHeight, false);
+      SPicture* pPic = AllocPicture (pMa, kiPicWidth, kiPicHeight, false, 0);
       WELS_VERIFY_RETURN_IF (1, (NULL == pPic))
       m_pSpatialPic[iDlayerIndex][i] = pPic;
       ++ i;
@@ -435,7 +435,7 @@ int32_t  WelsInitScaledPic (SWelsSvcCodingParam* pParam,  Scaled_Picture*  pScal
   bool bInputPicNeedScaling = JudgeNeedOfScaling (pParam, pScaledPicture);
   if (bInputPicNeedScaling) {
     pScaledPicture->pScaledInputPicture = AllocPicture (pMemoryAlign, pParam->SUsedPicRect.iWidth,
-                                          pParam->SUsedPicRect.iHeight, false);
+                                          pParam->SUsedPicRect.iHeight, false, 0);
     if (pScaledPicture->pScaledInputPicture == NULL)
       return -1;
   }

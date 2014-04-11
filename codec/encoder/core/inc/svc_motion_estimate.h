@@ -54,8 +54,7 @@ namespace WelsSVCEnc {
 #define EXPANDED_MV_RANGE (504) //=512-8 rather than 511 to sacrifice same edge point but save complexity in assemblys
 #define EXPANDED_MVD_RANGE ((504+1)<<1)
 
-enum
-{
+enum {
   ME_DIA    = 0x01,  // LITTLE DIAMOND= 0x01
   ME_CROSS  = 0x02,  // CROSS=  0x02
   ME_FME    = 0x04,  // FME = 0x04
@@ -229,6 +228,9 @@ void SumOf8x8BlockOfFrame_c(uint8_t *pRefPicture, const int32_t kiWidth, const i
                                               uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
 void SumOf16x16BlockOfFrame_c(uint8_t *pRefPicture, const int32_t kiWidth, const int32_t kiHeight, const int32_t kiRefStride,
                                               uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+int32_t RequestScreenBlockFeatureStorage( CMemoryAlign *pMa, const int32_t kiFrameWidth,  const int32_t kiFrameHeight, const int32_t iNeedFeatureStorage,
+                                         SScreenBlockFeatureStorage* pScreenBlockFeatureStorage);
+int32_t ReleaseScreenBlockFeatureStorage( CMemoryAlign *pMa, SScreenBlockFeatureStorage* pScreenBlockFeatureStorage );
 //inline functions
 inline void SetMvWithinIntegerMvRange( const int32_t kiMbWidth, const int32_t kiMbHeight, const int32_t kiMbX, const int32_t kiMbY,
                         const int32_t kiMaxMvRange,

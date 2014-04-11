@@ -68,7 +68,6 @@ typedef struct TagFeatureSearchPreparation{
   int32_t iHighFreMbCount;
 }SFeatureSearchPreparation;//maintain only one
 
-
 /*
  *  Reconstructed Picture definition
  *  It is used to express reference picture, also consequent reconstruction picture for output
@@ -108,6 +107,9 @@ typedef struct TagPicture {
   uint8_t    uiTemporalId;
   uint8_t    uiSpatialId;
   int32_t   iFrameAverageQp;
+
+  /*******************************for screen reference frames****************************/
+  SScreenBlockFeatureStorage* pScreenBlockFeatureStorage;
 } SPicture;
 
 /*

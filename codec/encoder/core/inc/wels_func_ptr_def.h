@@ -138,14 +138,14 @@ typedef uint32_t (*PSampleSadHor8Func)( uint8_t*, int32_t, uint8_t*, int32_t, ui
 typedef void (*PMotionSearchFunc) (SWelsFuncPtrList* pFuncList, void* pCurDqLayer, void* pMe,
                                    void* pSlice);
 typedef void (*PSearchMethodFunc) (SWelsFuncPtrList* pFuncList, void* pMe, void* pSlice, const int32_t kiEncStride, const int32_t kiRefStride);
-typedef void (*PCalculateSatdFunc) ( PSampleSadSatdCostFunc pSatd, void * vpMe, const int32_t kiEncStride, const int32_t kiRefStride);
+typedef void (*PCalculateSatdFunc) ( PSampleSadSatdCostFunc pSatd, void * vpMe, const int32_t kiEncStride, const int32_t kiRefStride );
 typedef bool (*PCheckDirectionalMv) (PSampleSadSatdCostFunc pSad, void * vpMe,
                       const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
                       int32_t& iBestSadCost);
-typedef void (*PLineFullSearchFunc) (  void *pFunc, void *vpMe,
-                          uint16_t* pMvdTable, const int32_t kiFixedMvd,
-                          const int32_t kiEncStride, const int32_t kiRefStride,
-                          const int32_t kiMinPos, const int32_t kiMaxPos,
+typedef void (*PLineFullSearchFunc) (	void *pFunc, void *vpMe,
+													uint16_t* pMvdTable, const int32_t kiFixedMvd,
+													const int32_t kiEncStride, const int32_t kiRefStride,
+													const int32_t kiMinPos, const int32_t kiMaxPos,
                           const bool bVerticalSearch );
 typedef void (*PCalculateBlockFeatureOfFrame)(uint8_t *pRef, const int32_t kiWidth, const int32_t kiHeight, const int32_t kiRefStride,
                                               uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
