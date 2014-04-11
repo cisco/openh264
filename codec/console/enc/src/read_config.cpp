@@ -38,14 +38,10 @@
  *
  *****************************************************************************/
 
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
 #include "read_config.h"
-
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable:4996)
-#endif
 
 CReadConfig::CReadConfig()
   : m_pCfgFile (NULL)
@@ -141,7 +137,3 @@ const bool CReadConfig::ExistFile() {
 const string& CReadConfig::GetFileName() {
   return m_strCfgFileName;
 }
-
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
