@@ -691,7 +691,6 @@ void CalculateFeatureOfBlock( SWelsFuncPtrList *pFunc, SPicture* pRef,
   uint8_t* pRefData = pRef->pData[0];
   const int32_t iRefStride = pRef->iLineSize[0];
   int32_t iIs16x16 = pScreenBlockFeatureStorage->iIs16x16;
-  bool bUseSum = (pScreenBlockFeatureStorage->uiFeatureStrategyIndex == 0);
   const int32_t iEdgeDiscard = (iIs16x16?16:8);//this is to save complexity of padding on pRef
   const int32_t iWidth = pRef->iWidthInPixel - iEdgeDiscard;
   const int32_t kiHeight = pRef->iHeightInPixel - iEdgeDiscard;
