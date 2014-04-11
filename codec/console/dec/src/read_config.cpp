@@ -37,10 +37,9 @@
  *      08/18/2008 Created
  *
  *****************************************************************************/
-#if !defined(_WIN32) || !defined(_MSC_VER)
+
 #include <string.h>
 #include <stdio.h>
-#endif
 
 
 
