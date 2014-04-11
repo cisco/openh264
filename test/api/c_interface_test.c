@@ -2,7 +2,7 @@
 #include <stddef.h>
 
 // Cast to this function type to ignore other parameters.
-typedef int (*Func)(void*);
+typedef int (*Func)(const void*);
 #define CALL(p, m) (((Func)((*p)->m))(p))
 // Check if the function return an expected number.
 #define CHECK(n, p, m) check(n, CALL(p, m), #m)
