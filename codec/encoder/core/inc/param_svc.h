@@ -363,16 +363,15 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
     uiIntraPeriod = ((uiIntraPeriod + uiGopSize - 1) / uiGopSize) * uiGopSize;
 
   if (iUsageType == SCREEN_CONTENT_REAL_TIME) {
-    bEnableLongTermReference &= (pCodingParam.iLTRRefNum > 0);
     if (bEnableLongTermReference) {
-       iLTRRefNum = pCodingParam.iLTRRefNum;
-       iNumRefFrame = 1 + WELS_LOG2 (uiGopSize) + iLTRRefNum;
-     } else {
-       iLTRRefNum = 0;
-       iNumRefFrame = 1;
-     }
+      iLTRRefNum = WELS_CLIP3(pCodingParam.iLTRRefNum,1,LONG_TERM_REF_NUM_SCREEN);
+      iNumRefFrame = WELS_MAX(1, WELS_LOG2 (uiGopSize)) + iLTRRefNum;
+    } else {
+      iLTRRefNum = 0;
+      iNumRefFrame = 1;
+    }
   } else {
-    iLTRRefNum = bEnableLongTermReference ? LONG_TERM_REF_NUM : 0;
+    iLTRRefNum = bEnableLongTermReference ? WELS_CLIP3(pCodingParam.iLTRRefNum,1,LONG_TERM_REF_NUM) : 0;
     iNumRefFrame		= ((uiGopSize >> 1) > 1) ? ((uiGopSize >> 1) + iLTRRefNum) : (MIN_REF_PIC_COUNT + iLTRRefNum);
     iNumRefFrame		= WELS_CLIP3 (iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM);
   }
