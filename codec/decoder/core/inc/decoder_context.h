@@ -236,7 +236,6 @@ typedef struct TagWelsDecoderContext {
 
   PAccessUnit			pAccessUnitList;	// current access unit list to be performed
   PSps        pActiveLayerSps[MAX_LAYER_NUM];
-  PPps        pActiveLayerPps[MAX_LAYER_NUM];
   PSps				pSps;	// used by current AU
   PPps				pPps;	// used by current AU
   // Memory for pAccessUnitList is dynamically held till decoder destruction.
@@ -272,7 +271,7 @@ typedef struct TagWelsDecoderContext {
 
   uint16_t            uiCurIdrPicId;
 #endif
-
+  bool       bNewSeqBegin;
   int32_t iErrorConMethod; //
   PGetIntraPredFunc pGetI16x16LumaPredFunc[7];		//h264_predict_copy_16x16;
   PGetIntraPredFunc pGetI4x4LumaPredFunc[14];		// h264_predict_4x4_t
@@ -311,6 +310,11 @@ typedef struct TagWelsDecoderContext {
 
 } SWelsDecoderContext, *PWelsDecoderContext;
 
+static inline void ResetActiveSPSForEachLayer(PWelsDecoderContext pCtx) {
+  for(int i = 0; i < MAX_LAYER_NUM; i++) {
+    pCtx->pActiveLayerSps[i] = NULL;
+  }
+}
 //#ifdef __cplusplus
 //}
 //#endif//__cplusplus

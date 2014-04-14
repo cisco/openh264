@@ -866,9 +866,9 @@ int32_t UpdateAccessUnit (PWelsDecoderContext pCtx) {
 
   // Added for mosaic avoidance, 11/19/2009
 #ifdef LONG_TERM_REF
-  if (pCtx->bParamSetsLostFlag)
+  if (pCtx->bParamSetsLostFlag || pCtx->bNewSeqBegin)
 #else
-  if (pCtx->bReferenceLostAtT0Flag)
+  if (pCtx->bReferenceLostAtT0Flag || pCtx->bNewSeqBegin)
 #endif
   {
     uint32_t uiActualIdx = 0;
@@ -1458,8 +1458,51 @@ void WelsDecodeAccessUnitEnd (PWelsDecoderContext pCtx) {
   ResetCurrentAccessUnit (pCtx);
 }
 
-
-
+/* CheckNewSeqBeginAndUpdateActiveLayerSps
+ * return:
+ * true - the AU to be construct is the start of new sequence; false - not
+ */
+static bool CheckNewSeqBeginAndUpdateActiveLayerSps(PWelsDecoderContext pCtx) {
+  bool bNewSeq = false;
+  PAccessUnit pCurAu = pCtx->pAccessUnitList;
+  PSps pTmpLayerSps[MAX_LAYER_NUM];
+  for(int i = 0; i < MAX_LAYER_NUM; i++) {
+    pTmpLayerSps[i] = NULL;
+  }
+  // track the layer sps for the current au
+  for(int i = pCurAu->uiStartPos; i <= pCurAu->uiEndPos; i++) {
+    uint32_t uiDid = pCurAu->pNalUnitsList[i]->sNalHeaderExt.uiDependencyId;
+    pTmpLayerSps[uiDid] = pCurAu->pNalUnitsList[i]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
+  }
+  int iMaxActiveLayer, iMaxCurrentLayer;
+  for(int i = MAX_LAYER_NUM - 1; i >= 0; i--) {
+    if (pCtx->pActiveLayerSps[i] != NULL) {
+      iMaxActiveLayer = i;
+      break;
+    }
+  }
+  for(int i = MAX_LAYER_NUM - 1; i >= 0; i--) {
+    if (pTmpLayerSps[i] != NULL) {
+      iMaxCurrentLayer = i;
+      break;
+    }
+  }
+  if (iMaxCurrentLayer != iMaxActiveLayer) {
+    bNewSeq = true;
+  }
+  // fill active sps if the current sps is not null while active layer is null
+  if (!bNewSeq) {
+    for(int i = 0; i < MAX_LAYER_NUM; i++) {
+      if (pCtx->pActiveLayerSps[i] == NULL && pTmpLayerSps[i] != NULL) {
+        pCtx->pActiveLayerSps[i] = pTmpLayerSps[i];
+      }
+    }
+  } else {
+    // UpdateActiveLayerSps if new sequence start
+    memcpy(&pCtx->pActiveLayerSps[0], &pTmpLayerSps[0], MAX_LAYER_NUM * sizeof(PSps));
+  }
+  return bNewSeq;
+}
 
 /*
  * ConstructAccessUnit
@@ -1483,7 +1526,7 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
 
   pCtx->bAuReadyFlag = false;
   pCtx->bLastHasMmco5 = false;
-
+  pCtx->bNewSeqBegin = CheckNewSeqBeginAndUpdateActiveLayerSps(pCtx);
   iErr = WelsDecodeAccessUnitStart (pCtx);
   GetVclNalTemporalId (pCtx);
 
@@ -1512,7 +1555,7 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
   iErr = DecodeCurrentAccessUnit (pCtx, ppDst, iStride, &iWidth, &iHeight, pDstInfo);
 
   WelsDecodeAccessUnitEnd (pCtx);
-
+  pCtx->bNewSeqBegin = false;
   if (ERR_NONE != iErr) {
     WelsLog (pCtx, WELS_LOG_INFO, "returned error from decoding:[0x%x]\n", iErr);
 
