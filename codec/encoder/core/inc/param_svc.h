@@ -160,7 +160,7 @@ static void FillDefault (SEncParamExt& param) {
   // false: Streaming Video Sharing; true: Video Conferencing Meeting;
 
   /* Deblocking loop filter */
-  param.iLoopFilterDisableIdc		= 1;	// 0: on, 1: off, 2: on except for slice boundaries
+  param.iLoopFilterDisableIdc		= 0;	// 0: on, 1: off, 2: on except for slice boundaries
   param.iLoopFilterAlphaC0Offset	= 0;	// AlphaOffset: valid range [-6, 6], default 0
   param.iLoopFilterBetaOffset		= 0;	// BetaOffset:	valid range [-6, 6], default 0
 
@@ -175,7 +175,7 @@ static void FillDefault (SEncParamExt& param) {
   param.bEnableFrameSkip		= true;		// frame skipping
   param.bEnableLongTermReference	= false;	// long term reference control
   param.bEnableSpsPpsIdAddition	= true;		// pSps pPps id addition control
-  param.bPrefixNalAddingCtrl		= true;		// prefix NAL adding control
+  param.bPrefixNalAddingCtrl		= false;		// prefix NAL adding control
   param.iSpatialLayerNum		= 1;		// number of dependency(Spatial/CGS) layers used to be encoded
   param.iTemporalLayerNum			= 1;		// number of temporal layer specified
 
