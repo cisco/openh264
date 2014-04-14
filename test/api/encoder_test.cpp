@@ -69,27 +69,27 @@ TEST_P(EncoderOutputTest, CompareOutput) {
 static const EncodeFileParam kFileParamArray[] = {
   {
       "res/CiscoVT2people_320x192_12fps.yuv",
-      "06441376891cbc237a36e59b62131cd94ff9cb19", 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1, 1
+      "8d4c87f48e8a679c1ccbf5fe1ee040fed4776b30", 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1, 1
   },
   {
       "res/CiscoVT2people_160x96_6fps.yuv",
-      "4f3759fc44125b27a179ebff158dbba9e431bd0b", 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1, 1
+      "75334dc69d95b8ac2e0a52977bba0179df4f151f", 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1, 1
   },
   {
       "res/Static_152_100.yuv",
-      "af5c6a41b567ce1b2cb6fd427f4379473d3b829f", 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1, 1
+      "3467201e18a934e7f8c50f3c8f3e05f4334ad12c", 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1, 1
   },
   {
       "res/CiscoVT2people_320x192_12fps.yuv",
-      "be0079b022b18fdce04570db24e4327ca26a0ecb", 320, 192, 12.0f, SM_ROWMB_SLICE, false, 1, 1 // One slice per MB row
+      "592d9cb28dbd3e6d9e04febadf62b075c1c012b7", 320, 192, 12.0f, SM_ROWMB_SLICE, false, 1, 1 // One slice per MB row
   },
   {
       "res/CiscoVT2people_320x192_12fps.yuv",
-      "f4649601ca15f9693671d7e161e9daa8efd3a7a1", 320, 192, 12.0f, SM_SINGLE_SLICE, true, 1, 1
+      "49d392e826ba77cb8cd0b3f701f102a72623c1cf", 320, 192, 12.0f, SM_SINGLE_SLICE, true, 1, 1
   },
   {
       "res/CiscoVT2people_320x192_12fps.yuv",
-      "e4bcd744d2e6f885f6c0dbe5d52818ba64d986d9", 320, 192, 12.0f, SM_SINGLE_SLICE, false, 0, 1
+      "8d4c87f48e8a679c1ccbf5fe1ee040fed4776b30", 320, 192, 12.0f, SM_SINGLE_SLICE, false, 0, 1
   },
   {
       "res/CiscoVT2people_320x192_12fps.yuv",
