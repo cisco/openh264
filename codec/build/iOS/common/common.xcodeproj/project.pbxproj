@@ -412,13 +412,16 @@
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = (
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=arm64]" = APPLE_IOS;
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=armv7]" = (
 					APPLE_IOS,
 					HAVE_NEON,
 				);
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = (
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=armv7s]" = (
 					APPLE_IOS,
+					HAVE_NEON,
 				);
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-ObjC";
@@ -436,13 +439,16 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DSTROOT = /tmp/common.dst;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = (
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=arm64]" = APPLE_IOS;
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=armv7]" = (
 					APPLE_IOS,
 					HAVE_NEON,
 				);
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = (
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=armv7s]" = (
 					APPLE_IOS,
+					HAVE_NEON,
 				);
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
