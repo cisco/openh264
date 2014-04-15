@@ -368,7 +368,7 @@ TEST(DecodeMbAuxTest, WelsIDctRecI16x16Dc_sse2) {
         iRefDst[i*FDEC_STRIDE+j] = iPred[i*FDEC_STRIDE+j] = rand() & 255;
     for(int i = 0; i < 4; i++)
       for(int j = 0; j < 4; j++)
-        iRefDct[i][j] = iDct[i*4+j] = (rand() & 65535) - 32768;
+        iRefDct[i][j] = iDct[i*4+j] = (rand() & ((1<<15)-1)) - (1<<14); //2^14 limit, (2^15+32) will cause overflow for SSE2.
     WelsIDctRecI16x16DcAnchor(iRefDst, iRefDct);
     WelsIDctRecI16x16Dc_sse2(iRec, FDEC_STRIDE, iPred, FDEC_STRIDE, iDct);
     int ok = -1;
