@@ -56,18 +56,6 @@ typedef struct TagScreenBlockFeatureStorage
   bool      bRefBlockFeatureCalculated; // flag of whether pre-process is done
 } SScreenBlockFeatureStorage; //should be stored with RefPic, one for each frame
 
-typedef struct TagFeatureSearchPreparation{
-  SScreenBlockFeatureStorage*  pRefBlockFeature;//point the the ref frame storage
-
-  uint16_t*  pFeatureOfBlock;    // Feature of every block (8x8), begin with the point
-  uint8_t      uiFeatureStrategyIndex;// index of hash strategy
-
-  /* for FME frame-level switch */
-  bool bFMESwitchFlag;
-  uint8_t uiFMEGoodFrameCount;
-  int32_t iHighFreMbCount;
-}SFeatureSearchPreparation;//maintain only one
-
 /*
  *  Reconstructed Picture definition
  *  It is used to express reference picture, also consequent reconstruction picture for output

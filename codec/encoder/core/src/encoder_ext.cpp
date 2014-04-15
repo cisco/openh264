@@ -708,7 +708,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
   iDlayerCount	= pParam->iSpatialLayerNum;
   iNumRef	= pParam->iNumRefFrame;
 
-  const int32_t kiFeatureStrategyIndex = 0;
+  const int32_t kiFeatureStrategyIndex = FME_DEFAULT_FEATURE_INDEX;
   const int32_t kiMe16x16 = ME_DIA_CROSS;
   const int32_t kiMe8x8 = ME_DIA_CROSS_FME;
   const int32_t kiNeedFeatureStorage = (pParam->iUsageType != SCREEN_CONTENT_REAL_TIME)?0:
@@ -733,7 +733,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
     pRefList		= (SRefList*)pMa->WelsMallocz (sizeof (SRefList), "pRefList");
     WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pRefList), FreeMemorySvc (ppCtx))
     do {
-      pRefList->pRef[i]	= AllocPicture (pMa, kiWidth, kiHeight, true, kiNeedFeatureStorage);	// to use actual size of current layer
+      pRefList->pRef[i]	= AllocPicture (pMa, kiWidth, kiHeight, true, (iDlayerIndex == iDlayerCount-1)?kiNeedFeatureStorage:0);	// to use actual size of current layer
       WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pRefList->pRef[i]), FreeMemorySvc (ppCtx))
       ++ i;
     } while (i < 1 + iNumRef);
@@ -828,6 +828,18 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
       if (0 == pDqLayer->iLoopFilterDisableIdc) {
         pDqLayer->bDeblockingParallelFlag	= false;
       }
+    }
+
+    //
+    if (kiNeedFeatureStorage && iDlayerIndex==iDlayerCount-1)
+    {
+      pDqLayer->pFeatureSearchPreparation	= static_cast<SFeatureSearchPreparation*> (pMa->WelsMallocz (sizeof (SFeatureSearchPreparation), "pFeatureSearchPreparation"));
+      WELS_VERIFY_RETURN_PROC_IF (1, NULL==pDqLayer->pFeatureSearchPreparation, FreeMemorySvc (ppCtx));
+      int32_t iReturn = RequestFeatureSearchPreparation(pMa, pDlayer->iFrameWidth, pDlayer->iFrameHeight, kiNeedFeatureStorage,
+        pDqLayer->pFeatureSearchPreparation);
+      WELS_VERIFY_RETURN_PROC_IF (1, ENC_RETURN_SUCCESS!=iReturn, FreeMemorySvc (ppCtx));
+    } else {
+      pDqLayer->pFeatureSearchPreparation = NULL;
     }
 
     (*ppCtx)->ppDqLayerList[iDlayerIndex]	= pDqLayer;
@@ -1570,6 +1582,12 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
             pDq->pLastCodedMbIdxOfPartition	= NULL;
             pMa->WelsFree (pDq->pLastMbIdxOfPartition, "pLastMbIdxOfPartition");
             pDq->pLastMbIdxOfPartition = NULL;
+          }
+
+          if (pDq->pFeatureSearchPreparation) {
+            ReleaseFeatureSearchPreparation(pMa, pDq->pFeatureSearchPreparation->pFeatureOfBlock);
+            pMa->WelsFree (pDq->pFeatureSearchPreparation, "pFeatureSearchPreparation");
+            pDq->pFeatureSearchPreparation = NULL;
           }
 
           pMa->WelsFree (pDq, "pDq");
@@ -2427,8 +2445,41 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
       pFuncList->pfCalculateSatd = CalculateSatdCost;
       pFuncList->pfInterFineMd = WelsMdInterFinePartition;
     }
+  }
 
+  //to init at each frame will be needed when dealing with hybrid content (camera+screen)
+  if (pCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
+    SFeatureSearchPreparation* pFeatureSearchPreparation = pCurLayer->pFeatureSearchPreparation;
+    if (pFeatureSearchPreparation) {
+      pFeatureSearchPreparation->iHighFreMbCount = 0;
 
+      if (P_SLICE == pCtx->eSliceType) {
+        //calculate bFMESwitchFlag
+        SVAAFrameInfoExt *pVaaExt		= static_cast<SVAAFrameInfoExt *>(pCtx->pVaa);
+        const int32_t kiMbSize = pCurLayer->iMbHeight*pCurLayer->iMbWidth;
+        pFeatureSearchPreparation->bFMESwitchFlag = CalcFMESwitchFlag( pFeatureSearchPreparation->uiFMEGoodFrameCount,
+          pFeatureSearchPreparation->iHighFreMbCount*100/kiMbSize, pCtx->pVaa->sVaaCalcInfo.iFrameSad/kiMbSize,
+          pVaaExt->sScrollDetectInfo.bScrollDetectFlag);
+
+        //PerformFMEPreprocess
+        SScreenBlockFeatureStorage* pScreenBlockFeatureStorage = pCurLayer->pRefPic->pScreenBlockFeatureStorage;
+        pFeatureSearchPreparation->pRefBlockFeature = pScreenBlockFeatureStorage;
+        if (pFeatureSearchPreparation->bFMESwitchFlag
+          && !pScreenBlockFeatureStorage->bRefBlockFeatureCalculated) {
+            pScreenBlockFeatureStorage->pFeatureOfBlockPointer = pFeatureSearchPreparation->pFeatureOfBlock;
+            PerformFMEPreprocess( pFuncList, pCurLayer->pRefPic, pScreenBlockFeatureStorage );
+        }
+
+        //assign ME pointer
+        if (pScreenBlockFeatureStorage->bRefBlockFeatureCalculated) {
+          //TBC int32_t iIs16x16 = pScreenBlockFeatureStorage->iIs16x16;
+        }
+      } else {
+        //reset some status when at I_SLICE
+        pFeatureSearchPreparation->bFMESwitchFlag = true;
+        pFeatureSearchPreparation->uiFMEGoodFrameCount = FME_DEFAULT_GOOD_FRAME_NUM;
+      }
+    }
   }
 }
 

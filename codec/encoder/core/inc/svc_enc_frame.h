@@ -56,7 +56,19 @@ namespace WelsSVCEnc {
 ///////////////////////////////////DQ Layer level///////////////////////////////////
 
 typedef struct TagDqLayer	SDqLayer;
-typedef SDqLayer* 			pDqLayer;
+typedef SDqLayer*            pDqLayer;
+
+typedef struct TagFeatureSearchPreparation{
+  SScreenBlockFeatureStorage*	pRefBlockFeature;//point the the ref frame storage
+
+  uint16_t*	pFeatureOfBlock;		// Feature of every block (8x8), begin with the point
+	uint8_t      uiFeatureStrategyIndex;// index of hash strategy
+
+	/* for FME frame-level switch */
+	bool bFMESwitchFlag;
+	uint8_t uiFMEGoodFrameCount;
+	int32_t iHighFreMbCount;
+}SFeatureSearchPreparation;//maintain only one
 
 typedef struct TagLayerInfo {
   SNalUnitHeaderExt		sNalHeaderExt;
@@ -97,6 +109,8 @@ struct TagDqLayer {
   int32_t*					pNumSliceCodedOfPartition;		// for dynamic slicing mode
   int32_t*					pLastCodedMbIdxOfPartition;	// for dynamic slicing mode
   int32_t*					pLastMbIdxOfPartition;			// for dynamic slicing mode
+
+  SFeatureSearchPreparation* pFeatureSearchPreparation;
 
   SDqLayer*				pRefLayer;		// pointer to referencing dq_layer of current layer to be decoded
 
