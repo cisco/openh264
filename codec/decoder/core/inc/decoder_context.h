@@ -98,6 +98,12 @@ typedef struct TagMcFunc {
   PWelsMcFunc pMcChromaFunc;
 } SMcFunc;
 
+typedef void (*PCopyFunc) (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS);
+typedef struct TagCopyFunc {
+  PCopyFunc pCopyLumaFunc;
+  PCopyFunc pCopyChromaFunc;
+} SCopyFunc;
+
 //deblock module defination
 struct TagDeblockingFunc;
 
@@ -278,6 +284,9 @@ typedef struct TagWelsDecoderContext {
   PGetIntraPredFunc pGetIChromaPredFunc[7];		// h264_predict_8x8_t
   PIdctResAddPredFunc	pIdctResAddPredFunc;
   SMcFunc				sMcFunc;
+
+  //For error concealment
+  SCopyFunc sCopyFunc;
   /* For Deblocking */
   SDeblockingFunc     sDeblockingFunc;
   SExpandPicFunc	    sExpandPicFunc;

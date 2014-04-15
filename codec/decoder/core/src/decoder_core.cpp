@@ -41,6 +41,7 @@
 #include "decoder.h"
 #include "decode_mb_aux.h"
 #include "mem_align.h"
+#include "error_concealment.h"
 
 namespace WelsDec {
 
@@ -1549,6 +1550,7 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
       WelsLog (pCtx, WELS_LOG_WARNING, "sync picture resolution ext failed,  the error is %d", iErr);
       return iErr;
     }
+    InitErrorCon (pCtx); //Do EC initialization here, for sequence start
   }
 
 

@@ -685,6 +685,10 @@
 					RelativePath="..\..\..\decoder\core\inc\bit_stream.h"
 					>
 				</File>
+                                <File
+                                        RelativePath="..\..\..\common\inc\copy_mb.h"
+                                        >
+                                </File>
 				<File
 					RelativePath="..\..\..\common\inc\cpu.h"
 					>
@@ -733,6 +737,10 @@
 					RelativePath="..\..\..\decoder\core\inc\error_code.h"
 					>
 				</File>
+                                <File
+                                        RelativePath="..\..\..\decoder\core\inc\error_concealment.h"
+                                        >
+                                </File>
 				<File
 					RelativePath="..\..\..\decoder\core\inc\expand_pic.h"
 					>
@@ -854,6 +862,10 @@
 					RelativePath="..\..\..\decoder\core\src\bit_stream.cpp"
 					>
 				</File>
+                                <File
+                                        RelativePath="..\..\..\common\src\copy_mb.cpp"
+                                        >
+                                </File>
 				<File
 					RelativePath="..\..\..\common\src\cpu.cpp"
 					>
@@ -890,6 +902,10 @@
 					RelativePath="..\..\..\decoder\core\src\decoder_data_tables.cpp"
 					>
 				</File>
+                                <File
+                                        RelativePath="..\..\..\decoder\core\src\error_concealment.cpp"
+                                        >
+                                </File>
 				<File
 					RelativePath="..\..\..\decoder\core\src\expand_pic.cpp"
 					>

@@ -50,6 +50,7 @@
 #include "deblocking.h"
 #include "expand_pic.h"
 #include "decode_slice.h"
+#include "error_concealment.h"
 #include "mem_align.h"
 #include "ls_defines.h"
 
@@ -476,6 +477,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
                 return pCtx->iErrorCode;
               }
             }
+            //Do error concealment here
+            ImplementErrorCon (pCtx);
           }
 
           if ((IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType) || IS_SEI_NAL (pCtx->sCurNalHead.eNalUnitType)) &&
@@ -530,9 +533,9 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
         ResetParameterSetsState (pCtx);
         return pCtx->iErrorCode;
       }
+      //Do error concealment here
+      ImplementErrorCon (pCtx);
     }
-
-    //TODO error concealment here
 
     if ((IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType) || IS_SEI_NAL (pCtx->sCurNalHead.eNalUnitType))
         && pNalPayload) {
@@ -571,7 +574,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
         ResetParameterSetsState (pCtx);
         return pCtx->iErrorCode;
       }
-
+      //Do error concealment here
+      ImplementErrorCon (pCtx);
     }
   }
 

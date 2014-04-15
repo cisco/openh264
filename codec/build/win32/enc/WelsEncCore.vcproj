@@ -395,6 +395,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+                        <File
+                                RelativePath="..\..\..\common\src\copy_mb.cpp"
+                                >
+                        </File>
 			<File
 				RelativePath="..\..\..\common\src\cpu.cpp"
 				>
@@ -1448,6 +1452,10 @@
 				RelativePath="..\..\..\encoder\core\inc\bit_stream.h"
 				>
 			</File>
+                        <File
+                                RelativePath="..\..\..\common\inc\copy_mb.h"
+                                >
+                        </File>
 			<File
 				RelativePath="..\..\..\common\inc\cpu.h"
 				>
