@@ -23,6 +23,7 @@
 		4CE443ED18B722CD0017DF25 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443D518B722CD0017DF25 /* libcommon.a */; };
 		4CE443F318B722CD0017DF25 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4CE443F118B722CD0017DF25 /* InfoPlist.strings */; };
 		4CE443F518B722CD0017DF25 /* commonTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CE443F418B722CD0017DF25 /* commonTests.m */; };
+		F0B204F918FD23BF005DA23F /* copy_mb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F0B204F818FD23BF005DA23F /* copy_mb.cpp */; };
 		FAABAA1818E9354A00D4186F /* sad_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAABAA1718E9354A00D4186F /* sad_common.cpp */; };
 /* End PBXBuildFile section */
 
@@ -78,6 +79,8 @@
 		4CE443F018B722CD0017DF25 /* commonTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "commonTests-Info.plist"; sourceTree = "<group>"; };
 		4CE443F218B722CD0017DF25 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4CE443F418B722CD0017DF25 /* commonTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = commonTests.m; sourceTree = "<group>"; };
+		F0B204F718FD23B6005DA23F /* copy_mb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = copy_mb.h; sourceTree = "<group>"; };
+		F0B204F818FD23BF005DA23F /* copy_mb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = copy_mb.cpp; sourceTree = "<group>"; };
 		FAABAA1618E9353F00D4186F /* sad_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sad_common.h; sourceTree = "<group>"; };
 		FAABAA1718E9354A00D4186F /* sad_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sad_common.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -119,6 +122,7 @@
 		4C3406B618D96EA600DFA14A /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				F0B204F718FD23B6005DA23F /* copy_mb.h */,
 				FAABAA1618E9353F00D4186F /* sad_common.h */,
 				4C3406B718D96EA600DFA14A /* cpu.h */,
 				4C3406B818D96EA600DFA14A /* cpu_core.h */,
@@ -139,6 +143,7 @@
 		4C3406C318D96EA600DFA14A /* src */ = {
 			isa = PBXGroup;
 			children = (
+				F0B204F818FD23BF005DA23F /* copy_mb.cpp */,
 				FAABAA1718E9354A00D4186F /* sad_common.cpp */,
 				4C3406C418D96EA600DFA14A /* cpu.cpp */,
 				4C3406C518D96EA600DFA14A /* crt_util_safe_x.cpp */,
@@ -297,6 +302,7 @@
 				4C3406CB18D96EA600DFA14A /* expand_picture_neon.S in Sources */,
 				4C3406CD18D96EA600DFA14A /* cpu.cpp in Sources */,
 				4C3406CA18D96EA600DFA14A /* deblocking_neon.S in Sources */,
+				F0B204F918FD23BF005DA23F /* copy_mb.cpp in Sources */,
 				FAABAA1818E9354A00D4186F /* sad_common.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -416,9 +422,7 @@
 					APPLE_IOS,
 					HAVE_NEON,
 				);
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = (
-					APPLE_IOS,
-				);
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-ObjC";
@@ -440,9 +444,7 @@
 					APPLE_IOS,
 					HAVE_NEON,
 				);
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = (
-					APPLE_IOS,
-				);
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";

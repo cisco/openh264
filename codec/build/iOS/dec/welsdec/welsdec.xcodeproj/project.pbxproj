@@ -38,6 +38,7 @@
 		4CE4469F18BC5EAB0017DF25 /* welsDecoderExt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4468518BC5EAB0017DF25 /* welsDecoderExt.cpp */; };
 		4CE447AC18BC6BE90017DF25 /* block_add_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CE447A718BC6BE90017DF25 /* block_add_neon.S */; };
 		4CE447AE18BC6BE90017DF25 /* intra_pred_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CE447A918BC6BE90017DF25 /* intra_pred_neon.S */; };
+		F0B204FC18FD23D8005DA23F /* error_concealment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F0B204FB18FD23D8005DA23F /* error_concealment.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -131,6 +132,8 @@
 		4CE4468518BC5EAB0017DF25 /* welsDecoderExt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = welsDecoderExt.cpp; sourceTree = "<group>"; };
 		4CE447A718BC6BE90017DF25 /* block_add_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = block_add_neon.S; sourceTree = "<group>"; };
 		4CE447A918BC6BE90017DF25 /* intra_pred_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = intra_pred_neon.S; sourceTree = "<group>"; };
+		F0B204FA18FD23CF005DA23F /* error_concealment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = error_concealment.h; sourceTree = "<group>"; };
+		F0B204FB18FD23D8005DA23F /* error_concealment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = error_concealment.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -226,6 +229,7 @@
 		4CE4464418BC5EAA0017DF25 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				F0B204FA18FD23CF005DA23F /* error_concealment.h */,
 				4CE4464518BC5EAA0017DF25 /* as264_common.h */,
 				4CE4464618BC5EAA0017DF25 /* au_parser.h */,
 				4CE4464718BC5EAA0017DF25 /* bit_stream.h */,
@@ -266,6 +270,7 @@
 		4CE4466618BC5EAA0017DF25 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				F0B204FB18FD23D8005DA23F /* error_concealment.cpp */,
 				4CE4466718BC5EAA0017DF25 /* au_parser.cpp */,
 				4CE4466818BC5EAA0017DF25 /* bit_stream.cpp */,
 				4CE4466918BC5EAA0017DF25 /* deblocking.cpp */,
@@ -420,6 +425,7 @@
 				4CE4469918BC5EAB0017DF25 /* mv_pred.cpp in Sources */,
 				4CE447AC18BC6BE90017DF25 /* block_add_neon.S in Sources */,
 				4CE4469418BC5EAB0017DF25 /* get_intra_predictor.cpp in Sources */,
+				F0B204FC18FD23D8005DA23F /* error_concealment.cpp in Sources */,
 				4CE4469018BC5EAB0017DF25 /* decoder_core.cpp in Sources */,
 				4CE4469E18BC5EAB0017DF25 /* welsCodecTrace.cpp in Sources */,
 				4CE447AE18BC6BE90017DF25 /* intra_pred_neon.S in Sources */,
