@@ -66,33 +66,130 @@ void InitErrorCon (PWelsDecoderContext pCtx) {
 
 //Do error concealment using frame copy method
 void DoErrorConFrameCopy (PWelsDecoderContext pCtx) {
-  //TODO
+  PPicture pDstPic = pCtx->pDec;
+  PPicture pSrcPic = pCtx->pPreviousDecodedPictureInDpb;
+  uint32_t uiHeightInPixelY = (pCtx->pSps->iMbHeight) << 4;
+  int32_t iStrideY = pDstPic->iLinesize[0];
+  int32_t iStrideUV = pDstPic->iLinesize[1];
+  if (pSrcPic == NULL) { //no ref pic, assign specific data to picture
+    memset (pDstPic->pData[0], 0, uiHeightInPixelY * iStrideY);
+    memset (pDstPic->pData[1], 0, (uiHeightInPixelY >> 1) * iStrideUV);
+    memset (pDstPic->pData[2], 0, (uiHeightInPixelY >> 1) * iStrideUV);
+  } else { //has ref pic here
+    memcpy (pDstPic->pData[0], pSrcPic->pData[0], uiHeightInPixelY * iStrideY);
+    memcpy (pDstPic->pData[1], pSrcPic->pData[1], (uiHeightInPixelY >> 1) * iStrideUV);
+    memcpy (pDstPic->pData[2], pSrcPic->pData[2], (uiHeightInPixelY >> 1) * iStrideUV);
+  }
 }
 
 
 //Do error concealment using slice copy method
 void DoErrorConSliceCopy (PWelsDecoderContext pCtx) {
-  //TODO
+  int32_t iMbWidth = (int32_t) pCtx->pSps->iMbWidth;
+  int32_t iMbHeight = (int32_t) pCtx->pSps->iMbHeight;
+  PPicture pDstPic = pCtx->pDec;
+  PPicture pSrcPic = pCtx->pPreviousDecodedPictureInDpb;
+
+  //uint8_t *pDstData[3], *pSrcData[3];
+  bool* pMbCorrectlyDecodedFlag = pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag;
+
+  //Do slice copy late
+  int32_t iMbXyIndex;
+  uint8_t* pSrcData, *pDstData;
+  uint32_t iSrcStride; // = pSrcPic->iLinesize[0];
+  uint32_t iDstStride = pDstPic->iLinesize[0];
+  for (int32_t iMbY = 0; iMbY < iMbHeight; ++iMbY) {
+    for (int32_t iMbX = 0; iMbX < iMbWidth; ++iMbX) {
+      iMbXyIndex = iMbY * iMbWidth + iMbX;
+      if (!pMbCorrectlyDecodedFlag[iMbXyIndex]) {
+        if (pSrcPic != NULL) {
+          iSrcStride = pSrcPic->iLinesize[0];
+          //Y component
+          pDstData = pDstPic->pData[0] + iMbY * 16 * iDstStride + iMbX * 16;;
+          pSrcData = pSrcPic->pData[0] + iMbY * 16 * iSrcStride + iMbX * 16;
+          pCtx->sCopyFunc.pCopyLumaFunc (pDstData, iDstStride, pSrcData, iSrcStride);
+          //U component
+          pDstData = pDstPic->pData[1] + iMbY * 8 * iDstStride / 2 + iMbX * 8;
+          pSrcData = pSrcPic->pData[1] + iMbY * 8 * iSrcStride / 2 + iMbX * 8;
+          pCtx->sCopyFunc.pCopyChromaFunc (pDstData, iDstStride / 2, pSrcData, iSrcStride / 2);
+          //V component
+          pDstData = pDstPic->pData[2] + iMbY * 8 * iDstStride / 2 + iMbX * 8;
+          pSrcData = pSrcPic->pData[2] + iMbY * 8 * iSrcStride / 2 + iMbX * 8;
+          pCtx->sCopyFunc.pCopyChromaFunc (pDstData, iDstStride / 2, pSrcData, iSrcStride / 2);
+        } else { //pSrcPic == NULL
+          //Y component
+          pDstData = pDstPic->pData[0] + iMbY * 16 * iDstStride + iMbX * 16;
+          for (int32_t i = 0; i < 16; ++i) {
+            memset (pDstData, 0, 16);
+            pDstData += iDstStride;
+          }
+          //U component
+          pDstData = pDstPic->pData[1] + iMbY * 8 * iDstStride / 2 + iMbX * 8;
+          for (int32_t i = 0; i < 8; ++i) {
+            memset (pDstData, 0, 8);
+            pDstData += iDstStride / 2;
+          }
+          //V component
+          pDstData = pDstPic->pData[2] + iMbY * 8 * iDstStride / 2 + iMbX * 8;
+          for (int32_t i = 0; i < 8; ++i) {
+            memset (pDstData, 0, 8);
+            pDstData += iDstStride / 2;
+          }
+        } //
+      } //!pMbCorrectlyDecodedFlag[iMbXyIndex]
+    } //iMbX
+  } //iMbY
 }
+
 
 //Mark erroneous frame as Ref Pic into DPB
 int32_t MarkECFrameAsRef (PWelsDecoderContext pCtx) {
-  //TODO
+  int32_t iRet = WelsMarkAsRef (pCtx);
+  if (iRet != ERR_NONE) {
+    pCtx->pDec = NULL;
+    return iRet;
+  }
+  ExpandReferencingPicture (pCtx->pDec, pCtx->sExpandPicFunc.pExpandLumaPicture,
+                            pCtx->sExpandPicFunc.pExpandChromaPicture);
+  pCtx->pDec = NULL;
+
   return ERR_NONE;
 }
 
 bool NeedErrorCon (PWelsDecoderContext pCtx) {
   bool bNeedEC = false;
-  //TODO
+  int32_t iMbNum = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
+  for (int32_t i = 0; i < iMbNum; ++i) {
+    if (!pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag[i]) {
+      bNeedEC = true;
+      break;
+    }
+  }
   return bNeedEC;
 }
 
 // ImplementErrorConceal
 // Do actual error concealment
-int32_t ImplementErrorCon (PWelsDecoderContext pCtx) {
-  int32_t iRet = ERR_NONE;
-  //TODO
-  return iRet;
+void ImplementErrorCon (PWelsDecoderContext pCtx) {
+  if (!NeedErrorCon (pCtx))
+    return;
+
+  if (ERROR_CON_DISABLE == pCtx->iErrorConMethod) {
+    pCtx->iErrorCode |= dsBitstreamError;
+    return;
+  } else if (ERROR_CON_FRAME_COPY == pCtx->iErrorConMethod) {
+    DoErrorConFrameCopy (pCtx);
+  } else if (ERROR_CON_SLICE_COPY == pCtx->iErrorConMethod) {
+    DoErrorConSliceCopy (pCtx);
+  } //TODO add other EC methods here in the future
+
+  //mark the erroneous frame as Ref pic in DPB
+  MarkECFrameAsRef (pCtx);
+  //need update frame_num due current frame is well decoded
+  pCtx->iPrevFrameNum	= pCtx->pSliceHeader->iFrameNum;
+  if (pCtx->bLastHasMmco5)
+    pCtx->iPrevFrameNum = 0;
+
 }
 
 } // namespace WelsDec

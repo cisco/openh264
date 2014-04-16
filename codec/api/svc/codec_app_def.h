@@ -112,6 +112,7 @@ typedef enum {
 //enuerate the types of error concealment methods
 typedef enum {
   ERROR_CON_DISABLE = 0,
+  ERROR_CON_FRAME_COPY,
   ERROR_CON_SLICE_COPY,
 } ERROR_CON_IDC;
 

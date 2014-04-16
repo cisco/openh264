@@ -164,7 +164,8 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx) {
   pCtx->pPicBuff[LIST_1]		= NULL;
 
   pCtx->bAvcBasedFlag			= true;
-  pCtx->iErrorConMethod = ERROR_CON_DISABLE;
+  pCtx->iErrorConMethod = ERROR_CON_SLICE_COPY;
+  pCtx->pPreviousDecodedPictureInDpb = NULL;
 
 }
 

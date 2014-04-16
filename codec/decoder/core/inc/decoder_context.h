@@ -211,6 +211,7 @@ typedef struct TagWelsDecoderContext {
     int32_t* pSliceIdc[LAYER_NUM_EXCHANGEABLE];		// using int32_t for slice_idc
     int8_t*  pResidualPredFlag[LAYER_NUM_EXCHANGEABLE];
     int8_t*  pInterPredictionDoneFlag[LAYER_NUM_EXCHANGEABLE];
+    bool*    pMbCorrectlyDecodedFlag[LAYER_NUM_EXCHANGEABLE];
     uint32_t iMbWidth;
     uint32_t iMbHeight;
   } sMb;
@@ -279,6 +280,7 @@ typedef struct TagWelsDecoderContext {
 #endif
   bool       bNewSeqBegin;
   int32_t iErrorConMethod; //
+  PPicture pPreviousDecodedPictureInDpb; //pointer to previously decoded picture in DPB for error concealment
   PGetIntraPredFunc pGetI16x16LumaPredFunc[7];		//h264_predict_copy_16x16;
   PGetIntraPredFunc pGetI4x4LumaPredFunc[14];		// h264_predict_4x4_t
   PGetIntraPredFunc pGetIChromaPredFunc[7];		// h264_predict_8x8_t
@@ -293,7 +295,7 @@ typedef struct TagWelsDecoderContext {
 
   /* For Block */
   SBlockFunc          sBlockFunc;
-  /* For EC */
+
   int32_t iCurSeqIntervalTargetDependId;
   int32_t iCurSeqIntervalMaxPicWidth;
   int32_t iCurSeqIntervalMaxPicHeight;
