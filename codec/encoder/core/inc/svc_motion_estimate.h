@@ -222,6 +222,8 @@ void WelsMotionCrossSearch(SWelsFuncPtrList *pFuncList,  SDqLayer* pCurLayer, SW
 #define LIST_SIZE_SUM_16x16  0x0FF01    //(256*255+1)
 #define LIST_SIZE_SUM_8x8      0x03FC1    //(64*255+1)
 #define LIST_SIZE_MSE_16x16  0x00878    //(avg+mse)/2, max= (255+16*255)/2
+#define FMESWITCH_MBSAD_THRESHOLD   30 // empirically set.
+
 int32_t SumOf8x8SingleBlock_c(uint8_t* pRef, const int32_t kiRefStride);
 int32_t SumOf16x16SingleBlock_c(uint8_t* pRef, const int32_t kiRefStride);
 void SumOf8x8BlockOfFrame_c(uint8_t *pRefPicture, const int32_t kiWidth, const int32_t kiHeight, const int32_t kiRefStride,
@@ -231,6 +233,13 @@ void SumOf16x16BlockOfFrame_c(uint8_t *pRefPicture, const int32_t kiWidth, const
 int32_t RequestScreenBlockFeatureStorage( CMemoryAlign *pMa, const int32_t kiFrameWidth,  const int32_t kiFrameHeight, const int32_t iNeedFeatureStorage,
                                          SScreenBlockFeatureStorage* pScreenBlockFeatureStorage);
 int32_t ReleaseScreenBlockFeatureStorage( CMemoryAlign *pMa, SScreenBlockFeatureStorage* pScreenBlockFeatureStorage );
+int32_t RequestFeatureSearchPreparation( CMemoryAlign *pMa, const int32_t kiFrameWidth,  const int32_t kiFrameHeight, const int32_t iNeedFeatureStorage,
+                                         SFeatureSearchPreparation* pFeatureSearchPreparation);
+int32_t ReleaseFeatureSearchPreparation( CMemoryAlign *pMa, uint16_t*& pFeatureOfBlock);
+#define FME_DEFAULT_GOOD_FRAME_NUM (2)
+#define FME_DEFAULT_FEATURE_INDEX (0)
+void PerformFMEPreprocess( SWelsFuncPtrList *pFunc, SPicture* pRef,
+                          SScreenBlockFeatureStorage* pScreenBlockFeatureStorage);
 //inline functions
 inline void SetMvWithinIntegerMvRange( const int32_t kiMbWidth, const int32_t kiMbHeight, const int32_t kiMbX, const int32_t kiMbY,
                         const int32_t kiMaxMvRange,
@@ -250,6 +259,15 @@ inline bool CheckMvInRange( const SMVUnitXY ksCurrentMv, const SMVUnitXY ksMinMv
 {
   return (CheckMvInRange(ksCurrentMv.iMvX, ksMinMv.iMvX, ksMaxMv.iMvX)
     && CheckMvInRange(ksCurrentMv.iMvY, ksMinMv.iMvY, ksMaxMv.iMvY));
+}
+//FME switch related
+inline bool CalcFMESwitchFlag(const uint8_t uiFMEGoodFrameCount, const int32_t iHighFreMbPrecentage,
+       const int32_t iAvgMbSAD, const bool bScrollingDetected ) {
+  return ( bScrollingDetected ||( uiFMEGoodFrameCount>0 && iAvgMbSAD > FMESWITCH_MBSAD_THRESHOLD ) );
+  //TODO: add the logic of iHighFreMbPrecentage
+  //return ( iHighFreMbPrecentage > 2
+  //            && ( bScrollingDetected || iHighFreMbPrecentage >15
+  //            ||( uiFMEGoodFrameCount>0 && iFrameSAD > FMESWITCH_FRAMESAD_THRESHOLD ) ) );
 }
 }
 #endif

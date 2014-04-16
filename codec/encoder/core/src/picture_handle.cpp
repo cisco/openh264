@@ -113,7 +113,6 @@ SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth , const int32_t
     pPic->pScreenBlockFeatureStorage = static_cast<SScreenBlockFeatureStorage*> (pMa->WelsMallocz (sizeof (SScreenBlockFeatureStorage), "pScreenBlockFeatureStorage"));
     int32_t iReturn = RequestScreenBlockFeatureStorage(pMa, kiWidth,  kiHeight, iNeedFeatureStorage,
       pPic->pScreenBlockFeatureStorage );
-
     WELS_VERIFY_RETURN_PROC_IF (NULL, ENC_RETURN_SUCCESS != iReturn, FreePicture (pMa, &pPic));
   } else {
     pPic->pScreenBlockFeatureStorage = NULL;

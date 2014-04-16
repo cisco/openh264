@@ -45,6 +45,18 @@
 
 namespace WelsSVCEnc {
 
+const int32_t QStepx16ByQp[52] = {  /* save QStep<<4 for int32_t */
+    10,  11,  13,  14,  16,  18,  /* 0~5   */
+    20,  22,  26,  28,  32,  36,  /* 6~11  */
+    40,  44,  52,  56,  64,  72,  /* 12~17 */
+    80,  88,  104, 112, 128, 144, /* 18~23 */
+    160, 176, 208, 224, 256, 288, /* 24~29 */
+    320, 352, 416, 448, 512, 576, /* 30~35 */
+    640, 704, 832, 896, 1024, 1152, /* 36~41 */
+    1280, 1408, 1664, 1792, 2048, 2304, /* 42~47 */
+    2560, 2816, 3328, 3584     /* 48~51 */
+};
+
 static inline void UpdateMeResults( const SMVUnitXY ksBestMv, const uint32_t kiBestSadCost, uint8_t* pRef, SWelsME * pMe )
 {
   pMe->sMv = ksBestMv;
@@ -313,9 +325,9 @@ bool CheckDirectionalMvFalse(PSampleSadSatdCostFunc pSad, void * vpMe,
 #if defined (X86_ASM)
 void CalcMvdCostx8_c( uint16_t *pMvdCost, const int32_t kiStartMv, uint16_t* pMvdTable, const uint16_t kiFixedCost )
 {
-  uint16_t *pBaseCost		= pMvdCost;
-  const int32_t kiOffset	= (kiStartMv<<2);
-  uint16_t *pMvd		= pMvdTable+kiOffset;
+  uint16_t *pBaseCost  = pMvdCost;
+  const int32_t kiOffset = (kiStartMv<<2);
+  uint16_t *pMvd  = pMvdTable+kiOffset;
   for (int32_t i = 0; i < 8; ++ i) {
     pBaseCost[i] = ((*pMvd) + kiFixedCost);
     pMvd += 4;
@@ -327,58 +339,58 @@ void VerticalFullSearchUsingSSE41( void *pFunc, void *vpMe,
                           const int32_t kiMinPos, const int32_t kiMaxPos,
                           const bool bVerticalSearch ) {
   SWelsFuncPtrList *pFuncList      = static_cast<SWelsFuncPtrList *>(pFunc);
-  SWelsME *pMe				                    = static_cast<SWelsME *>(vpMe);
-  uint8_t*  kpEncMb	= pMe->pEncMb;
-  const int32_t kiCurMeBlockPix	= pMe->iCurMeBlockPixY;
-  uint8_t* pRef			      = &pMe->pColoRefMb[(kiMinPos - kiCurMeBlockPix)*kiRefStride];
-  const int32_t kIsBlock16x16	= pMe->uiBlockSize == BLOCK_16x16;
-  const int32_t kiEdgeBlocks	= kIsBlock16x16 ? 16 : 8;
+  SWelsME *pMe                        = static_cast<SWelsME *>(vpMe);
+  uint8_t*  kpEncMb = pMe->pEncMb;
+  const int32_t kiCurMeBlockPix = pMe->iCurMeBlockPixY;
+  uint8_t* pRef         = &pMe->pColoRefMb[(kiMinPos - kiCurMeBlockPix)*kiRefStride];
+  const int32_t kIsBlock16x16 = pMe->uiBlockSize == BLOCK_16x16;
+  const int32_t kiEdgeBlocks = kIsBlock16x16 ? 16 : 8;
   PSampleSadHor8Func pSampleSadHor8 = pFuncList->pfSampleSadHor8[kIsBlock16x16];
   PSampleSadSatdCostFunc pSad = pFuncList->sSampleDealingFuncs.pfSampleSad[pMe->uiBlockSize];
-  PTransposeMatrixBlockFunc	TransposeMatrixBlock = kIsBlock16x16 ? TransposeMatrixBlock16x16_sse2 : TransposeMatrixBlock8x8_mmx;
-  PTransposeMatrixBlocksFunc	TransposeMatrixBlocks= kIsBlock16x16 ? TransposeMatrixBlocksx16_sse2 : TransposeMatrixBlocksx8_mmx;
+  PTransposeMatrixBlockFunc TransposeMatrixBlock = kIsBlock16x16 ? TransposeMatrixBlock16x16_sse2 : TransposeMatrixBlock8x8_mmx;
+  PTransposeMatrixBlocksFunc TransposeMatrixBlocks= kIsBlock16x16 ? TransposeMatrixBlocksx16_sse2 : TransposeMatrixBlocksx8_mmx;
 
-  const int32_t kiDiff			= kiMaxPos - kiMinPos;
-  const int32_t kiRowNum		= WELS_ALIGN((kiDiff - kiEdgeBlocks + 1), kiEdgeBlocks);
-  const int32_t kiBlocksNum		= kIsBlock16x16 ? (kiRowNum>>4) : (kiRowNum>>3);
-  int32_t iCountLoop8		= (kiRowNum-kiEdgeBlocks) >> 3;
-  const int32_t kiRemainingVectors		= kiDiff - (iCountLoop8<<3);
-  const int32_t kiMatrixStride		= MAX_VERTICAL_MV_RANGE;
-  ENFORCE_STACK_ALIGN_2D( uint8_t, uiMatrixRef, 16, kiMatrixStride, 16 );	// transpose matrix result for ref
-  ENFORCE_STACK_ALIGN_2D( uint8_t, uiMatrixEnc, 16, 16, 16 );				// transpose matrix result for enc
-  assert(kiRowNum <= kiMatrixStride);	// make sure effective memory
+  const int32_t kiDiff   = kiMaxPos - kiMinPos;
+  const int32_t kiRowNum  = WELS_ALIGN((kiDiff - kiEdgeBlocks + 1), kiEdgeBlocks);
+  const int32_t kiBlocksNum  = kIsBlock16x16 ? (kiRowNum>>4) : (kiRowNum>>3);
+  int32_t iCountLoop8  = (kiRowNum-kiEdgeBlocks) >> 3;
+  const int32_t kiRemainingVectors  = kiDiff - (iCountLoop8<<3);
+  const int32_t kiMatrixStride  = MAX_VERTICAL_MV_RANGE;
+  ENFORCE_STACK_ALIGN_2D( uint8_t, uiMatrixRef, 16, kiMatrixStride, 16 ); // transpose matrix result for ref
+  ENFORCE_STACK_ALIGN_2D( uint8_t, uiMatrixEnc, 16, 16, 16 );    // transpose matrix result for enc
+  assert(kiRowNum <= kiMatrixStride); // make sure effective memory
 
   TransposeMatrixBlock( &uiMatrixEnc[0][0], 16, kpEncMb, kiEncStride );
   TransposeMatrixBlocks( &uiMatrixRef[0][0], kiMatrixStride, pRef, kiRefStride, kiBlocksNum );
   ENFORCE_STACK_ALIGN_1D( uint16_t, uiBaseCost, 8, 16 );
-  int32_t iTargetPos			= kiMinPos;
-  int16_t iBestPos				= pMe->sMv.iMvX;
-  uint32_t uiBestCost			= pMe->uiSadCost;
+  int32_t iTargetPos   = kiMinPos;
+  int16_t iBestPos    = pMe->sMv.iMvX;
+  uint32_t uiBestCost   = pMe->uiSadCost;
   uint32_t uiCostMin;
   int32_t iIndexMinPos;
-  kpEncMb	= &uiMatrixEnc[0][0];
-  pRef	= &uiMatrixRef[0][0];
+  kpEncMb = &uiMatrixEnc[0][0];
+  pRef = &uiMatrixRef[0][0];
 
   while(iCountLoop8 > 0) {
     CalcMvdCostx8_c(uiBaseCost, iTargetPos, pMvdTable, kiFixedMvd);
     uiCostMin = pSampleSadHor8( kpEncMb, 16, pRef, kiMatrixStride, uiBaseCost, &iIndexMinPos );
     if (uiCostMin < uiBestCost) {
-      uiBestCost	= uiCostMin;
-      iBestPos		= iTargetPos+iIndexMinPos;
+      uiBestCost = uiCostMin;
+      iBestPos  = iTargetPos+iIndexMinPos;
     }
-    iTargetPos	+= 8;
+    iTargetPos += 8;
     pRef += 8;
     -- iCountLoop8;
   }
   if (kiRemainingVectors > 0) {
-    kpEncMb	= pMe->pEncMb;
-    pRef	= &pMe->pColoRefMb[(iTargetPos - kiCurMeBlockPix)*kiRefStride];
+    kpEncMb = pMe->pEncMb;
+    pRef = &pMe->pColoRefMb[(iTargetPos - kiCurMeBlockPix)*kiRefStride];
     while (iTargetPos < kiMaxPos) {
-      const uint16_t pMvdCost	= pMvdTable[iTargetPos<<2];
-      uint32_t uiSadCost	= pSad( kpEncMb, kiEncStride, pRef, kiRefStride ) + (kiFixedMvd + pMvdCost);
+      const uint16_t pMvdCost = pMvdTable[iTargetPos<<2];
+      uint32_t uiSadCost = pSad( kpEncMb, kiEncStride, pRef, kiRefStride ) + (kiFixedMvd + pMvdCost);
       if (uiSadCost < uiBestCost) {
-        uiBestCost	= uiSadCost;
-        iBestPos	= iTargetPos;
+        uiBestCost = uiSadCost;
+        iBestPos = iTargetPos;
       }
       pRef += kiRefStride;
       ++iTargetPos;
@@ -399,20 +411,20 @@ void HorizontalFullSearchUsingSSE41( void *pFunc, void *vpMe,
                                       const bool bVerticalSearch )
 {
   SWelsFuncPtrList *pFuncList      = static_cast<SWelsFuncPtrList *>(pFunc);
-  SWelsME *pMe				                    = static_cast<SWelsME *>(vpMe);
-  uint8_t *kpEncMb	= pMe->pEncMb;
-  const int32_t kiCurMeBlockPix	= pMe->iCurMeBlockPixX;
-  uint8_t *pRef			      = &pMe->pColoRefMb[kiMinPos - kiCurMeBlockPix];
-  const int32_t kIsBlock16x16	= pMe->uiBlockSize == BLOCK_16x16;
+  SWelsME *pMe                        = static_cast<SWelsME *>(vpMe);
+  uint8_t *kpEncMb = pMe->pEncMb;
+  const int32_t kiCurMeBlockPix = pMe->iCurMeBlockPixX;
+  uint8_t *pRef         = &pMe->pColoRefMb[kiMinPos - kiCurMeBlockPix];
+  const int32_t kIsBlock16x16 = pMe->uiBlockSize == BLOCK_16x16;
   PSampleSadHor8Func pSampleSadHor8 = pFuncList->pfSampleSadHor8[kIsBlock16x16];
   PSampleSadSatdCostFunc pSad = pFuncList->sSampleDealingFuncs.pfSampleSad[pMe->uiBlockSize];
   ENFORCE_STACK_ALIGN_1D( uint16_t, uiBaseCost, 8, 16 );
-  const int32_t kiNumVector	= kiMaxPos - kiMinPos;
-  int32_t iCountLoop8	= kiNumVector >> 3;
-  const int32_t kiRemainingLoop8	= kiNumVector & 7;
-  int32_t iTargetPos			= kiMinPos;
-  int16_t iBestPos				= pMe->sMv.iMvX;
-  uint32_t uiBestCost			= pMe->uiSadCost;
+  const int32_t kiNumVector = kiMaxPos - kiMinPos;
+  int32_t iCountLoop8 = kiNumVector >> 3;
+  const int32_t kiRemainingLoop8 = kiNumVector & 7;
+  int32_t iTargetPos   = kiMinPos;
+  int16_t iBestPos    = pMe->sMv.iMvX;
+  uint32_t uiBestCost   = pMe->uiSadCost;
   uint32_t uiCostMin;
   int32_t iIndexMinPos;
 
@@ -420,20 +432,20 @@ void HorizontalFullSearchUsingSSE41( void *pFunc, void *vpMe,
     CalcMvdCostx8_c(uiBaseCost, iTargetPos, pMvdTable, kiFixedMvd);
     uiCostMin = pSampleSadHor8( kpEncMb, kiEncStride, pRef, kiRefStride, uiBaseCost, &iIndexMinPos );
     if (uiCostMin < uiBestCost) {
-      uiBestCost	= uiCostMin;
-      iBestPos		= iTargetPos+iIndexMinPos;
+      uiBestCost = uiCostMin;
+      iBestPos  = iTargetPos+iIndexMinPos;
     }
-    iTargetPos	+= 8;
+    iTargetPos += 8;
     pRef += 8;
     -- iCountLoop8;
   }
   if ( kiRemainingLoop8 > 0 ) {
     while (iTargetPos < kiMaxPos) {
-      const uint16_t pMvdCost	= pMvdTable[iTargetPos<<2];
-      uint32_t uiSadCost	= pSad( kpEncMb, kiEncStride, pRef, kiRefStride ) + (kiFixedMvd + pMvdCost);
+      const uint16_t pMvdCost = pMvdTable[iTargetPos<<2];
+      uint32_t uiSadCost = pSad( kpEncMb, kiEncStride, pRef, kiRefStride ) + (kiFixedMvd + pMvdCost);
       if (uiSadCost < uiBestCost) {
-        uiBestCost	= uiSadCost;
-        iBestPos	= iTargetPos;
+        uiBestCost = uiSadCost;
+        iBestPos = iTargetPos;
       }
       ++pRef;
       ++iTargetPos;
@@ -447,10 +459,10 @@ void HorizontalFullSearchUsingSSE41( void *pFunc, void *vpMe,
   }
 }
 #endif
-void LineFullSearch_c(	void *pFunc, void *vpMe,
-													uint16_t* pMvdTable, const int32_t kiFixedMvd,
-													const int32_t kiEncStride, const int32_t kiRefStride,
-													const int32_t kiMinPos, const int32_t kiMaxPos,
+void LineFullSearch_c( void *pFunc, void *vpMe,
+             uint16_t* pMvdTable, const int32_t kiFixedMvd,
+             const int32_t kiEncStride, const int32_t kiRefStride,
+             const int32_t kiMinPos, const int32_t kiMaxPos,
                           const bool bVerticalSearch ) {
   SWelsFuncPtrList *pFuncList      = static_cast<SWelsFuncPtrList *>(pFunc);
   SWelsME *pMe                            = static_cast<SWelsME *>(vpMe);
@@ -482,9 +494,9 @@ void LineFullSearch_c(	void *pFunc, void *vpMe,
 }
 
 void WelsMotionCrossSearch(SWelsFuncPtrList *pFuncList,  SWelsME * pMe,
-											const SSlice* pSlice, const int32_t kiEncStride,  const int32_t kiRefStride) {
-  PLineFullSearchFunc pfVerticalFullSearchFunc	= pFuncList->pfVerticalFullSearch;
-  PLineFullSearchFunc pfHorizontalFullSearchFunc	= pFuncList->pfHorizontalFullSearch;
+           const SSlice* pSlice, const int32_t kiEncStride,  const int32_t kiRefStride) {
+  PLineFullSearchFunc pfVerticalFullSearchFunc = pFuncList->pfVerticalFullSearch;
+  PLineFullSearchFunc pfHorizontalFullSearchFunc = pFuncList->pfHorizontalFullSearch;
 
   const int32_t iCurMeBlockPixX = pMe->iCurMeBlockPixX;
   const int32_t iCurMeBlockQpelPixX = ((iCurMeBlockPixX)<<2);
@@ -515,9 +527,10 @@ void WelsMotionCrossSearch(SWelsFuncPtrList *pFuncList,  SWelsME * pMe,
 // Feature Search Basics
 /////////////////////////
 //memory related
-int32_t RequestFeatureSearchPreparation( CMemoryAlign *pMa, const int32_t kiFeatureStrategyIndex,
-                                         const int32_t kiFrameWidth,  const int32_t kiFrameHeight, const bool bFme8x8,
-                                         uint16_t*& pFeatureOfBlock) {
+int32_t RequestFeatureSearchPreparation( CMemoryAlign *pMa, const int32_t kiFrameWidth,  const int32_t kiFrameHeight, const int32_t iNeedFeatureStorage,
+                                        SFeatureSearchPreparation* pFeatureSearchPreparation) {
+  const int32_t kiFeatureStrategyIndex = iNeedFeatureStorage>>16;
+  const bool bFme8x8 = ((iNeedFeatureStorage & 0x0000FF & ME_FME)==ME_FME);
   const int32_t kiMarginSize = bFme8x8?8:16;
   const int32_t kiFrameSize = (kiFrameWidth-kiMarginSize) * (kiFrameHeight-kiMarginSize);
   int32_t iListOfFeatureOfBlock;
@@ -528,9 +541,14 @@ int32_t RequestFeatureSearchPreparation( CMemoryAlign *pMa, const int32_t kiFeat
     iListOfFeatureOfBlock = sizeof(uint16_t) * kiFrameSize +
       (kiFrameWidth-kiMarginSize) * sizeof(uint32_t) + kiFrameWidth * 8 * sizeof(uint8_t);
   }
-  pFeatureOfBlock =
+  pFeatureSearchPreparation->pFeatureOfBlock =
     (uint16_t *)pMa->WelsMalloc(iListOfFeatureOfBlock, "pFeatureOfBlock");
-  WELS_VERIFY_RETURN_IF(ENC_RETURN_MEMALLOCERR, NULL == pFeatureOfBlock)
+  WELS_VERIFY_RETURN_IF(ENC_RETURN_MEMALLOCERR, NULL == (pFeatureSearchPreparation->pFeatureOfBlock) )
+
+  pFeatureSearchPreparation->uiFeatureStrategyIndex = kiFeatureStrategyIndex;
+  pFeatureSearchPreparation->bFMESwitchFlag = true;
+  pFeatureSearchPreparation->uiFMEGoodFrameCount = FME_DEFAULT_GOOD_FRAME_NUM;
+  pFeatureSearchPreparation->iHighFreMbCount = 0;
 
   return ENC_RETURN_SUCCESS;
 }
@@ -568,7 +586,13 @@ int32_t RequestScreenBlockFeatureStorage( CMemoryAlign *pMa, const int32_t kiFra
   pScreenBlockFeatureStorage->pLocationPointer = (uint16_t*)pMa->WelsMalloc(2*kiFrameSize*sizeof(uint16_t), "pScreenBlockFeatureStorage->pLocationPointer");
   WELS_VERIFY_RETURN_IF(ENC_RETURN_MEMALLOCERR, NULL == pScreenBlockFeatureStorage->pLocationPointer)
 
-  pScreenBlockFeatureStorage->iActualListSize  = kiListSize;
+  pScreenBlockFeatureStorage->pFeatureOfBlockPointer = NULL;
+  pScreenBlockFeatureStorage->iIs16x16 = !bIsBlock8x8;
+  pScreenBlockFeatureStorage->uiFeatureStrategyIndex = kiFeatureStrategyIndex;
+  pScreenBlockFeatureStorage->iActualListSize = kiListSize;
+  memset(pScreenBlockFeatureStorage->uiSadCostThreshold, UINT_MAX, BLOCK_SIZE_ALL*sizeof(uint32_t));
+  pScreenBlockFeatureStorage->bRefBlockFeatureCalculated = false;
+
   return ENC_RETURN_SUCCESS;
 }
 int32_t ReleaseScreenBlockFeatureStorage( CMemoryAlign *pMa, SScreenBlockFeatureStorage* pScreenBlockFeatureStorage ) {
@@ -588,22 +612,18 @@ int32_t ReleaseScreenBlockFeatureStorage( CMemoryAlign *pMa, SScreenBlockFeature
 }
 
 //preprocess related
-int32_t SumOf8x8SingleBlock_c(uint8_t* pRef, const int32_t kiRefStride)
-{
+int32_t SumOf8x8SingleBlock_c(uint8_t* pRef, const int32_t kiRefStride) {
   int32_t iSum = 0, i;
-  for(i = 0; i < 8; i++)
-  {
+  for(i = 0; i < 8; i++) {
     iSum +=  pRef[0]    + pRef[1]  + pRef[2]  + pRef[3];
     iSum +=  pRef[4]    + pRef[5]  + pRef[6]  + pRef[7];
     pRef += kiRefStride;
   }
   return iSum;
 }
-int32_t SumOf16x16SingleBlock_c(uint8_t* pRef, const int32_t kiRefStride)
-{
+int32_t SumOf16x16SingleBlock_c(uint8_t* pRef, const int32_t kiRefStride) {
   int32_t iSum = 0, i;
-  for(i = 0; i < 16; i++)
-  {
+  for(i = 0; i < 16; i++) {
     iSum +=  pRef[0]    + pRef[1]  + pRef[2]  + pRef[3];
     iSum +=  pRef[4]    + pRef[5]  + pRef[6]  + pRef[7];
     iSum    +=  pRef[8]    + pRef[9]  + pRef[10]  + pRef[11];
@@ -681,6 +701,7 @@ void FillQpelLocationByFeatureValue_c( uint16_t* pFeatureOfBlock, const int32_t 
     pSrcPointer += kiWidth;
   }
 }
+
 void CalculateFeatureOfBlock( SWelsFuncPtrList *pFunc, SPicture* pRef,
                          SScreenBlockFeatureStorage* pScreenBlockFeatureStorage)
 {
@@ -710,10 +731,17 @@ void CalculateFeatureOfBlock( SWelsFuncPtrList *pFunc, SPicture* pRef,
 }
 
 void PerformFMEPreprocess( SWelsFuncPtrList *pFunc, SPicture* pRef,
-                          SScreenBlockFeatureStorage* pScreenBlockFeatureStorage)
-{
+                          SScreenBlockFeatureStorage* pScreenBlockFeatureStorage) {
     CalculateFeatureOfBlock(pFunc, pRef, pScreenBlockFeatureStorage );
     pScreenBlockFeatureStorage->bRefBlockFeatureCalculated = true;
+
+    uint32_t uiRefPictureAvgQstepx16 = QStepx16ByQp[WelsMedian(0, pRef->iFrameAverageQp, 51)];
+    uint32_t uiSadCostThreshold16x16 = ((30 * (uiRefPictureAvgQstepx16 + 160))>>3);
+    pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_16x16] = uiSadCostThreshold16x16;
+    pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_8x8] = (uiSadCostThreshold16x16>>2);
+    pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_16x8]
+    = pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_8x16]
+    = pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_4x4] = UINT_MAX;
 }
 
 //search related
