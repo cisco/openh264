@@ -69,7 +69,7 @@ TEST_F(SadSatdCFuncTest, WelsSampleSad4x4_c) {
     pPixA += m_iStrideA;
     pPixB += m_iStrideB;
   }
-  EXOECT_EQ(WelsSampleSad4x4_c(m_pPixSrcA, m_iStrideA, m_pPixSrcB, m_iStrideB), iSumSad);
+  EXPECT_EQ(WelsSampleSad4x4_c(m_pPixSrcA, m_iStrideA, m_pPixSrcB, m_iStrideB), iSumSad);
 }
 
 TEST_F(SadSatdCFuncTest, WelsSampleSad8x8_c) {
@@ -89,7 +89,7 @@ TEST_F(SadSatdCFuncTest, WelsSampleSad8x8_c) {
     pPixA += m_iStrideA;
     pPixB += m_iStrideB;
   }
-  EXOECT_EQ(WelsSampleSad8x8_c(m_pPixSrcA, m_iStrideA, m_pPixSrcB, m_iStrideB), iSumSad);
+  EXPECT_EQ(WelsSampleSad8x8_c(m_pPixSrcA, m_iStrideA, m_pPixSrcB, m_iStrideB), iSumSad);
 }
 
 TEST_F(SadSatdCFuncTest, WelsSampleSad16x8_c) {
@@ -109,7 +109,7 @@ TEST_F(SadSatdCFuncTest, WelsSampleSad16x8_c) {
     pPixA += m_iStrideA;
     pPixB += m_iStrideB;
   }
-  EXOECT_EQ(WelsSampleSad16x8_c(m_pPixSrcA, m_iStrideA, m_pPixSrcB, m_iStrideB), iSumSad);
+  EXPECT_EQ(WelsSampleSad16x8_c(m_pPixSrcA, m_iStrideA, m_pPixSrcB, m_iStrideB), iSumSad);
 }
 
 TEST_F(SadSatdCFuncTest, WelsSampleSad8x16_c) {
@@ -129,7 +129,7 @@ TEST_F(SadSatdCFuncTest, WelsSampleSad8x16_c) {
     pPixA += m_iStrideA;
     pPixB += m_iStrideB;
   }
-  EXOECT_EQ(WelsSampleSad8x16_c(m_pPixSrcA, m_iStrideA, m_pPixSrcB, m_iStrideB), iSumSad);
+  EXPECT_EQ(WelsSampleSad8x16_c(m_pPixSrcA, m_iStrideA, m_pPixSrcB, m_iStrideB), iSumSad);
 }
 
 TEST_F(SadSatdCFuncTest, WelsSampleSad16x16_c) {
@@ -149,7 +149,7 @@ TEST_F(SadSatdCFuncTest, WelsSampleSad16x16_c) {
     pPixA += m_iStrideA;
     pPixB += m_iStrideB;
   }
-  EXOECT_EQ(WelsSampleSad16x16_c(m_pPixSrcA, m_iStrideA, m_pPixSrcB, m_iStrideB), iSumSad);
+  EXPECT_EQ(WelsSampleSad16x16_c(m_pPixSrcA, m_iStrideA, m_pPixSrcB, m_iStrideB), iSumSad);
 }
 
 TEST_F(SadSatdCFuncTest, WelsSampleSatd4x4_c) {
@@ -213,7 +213,7 @@ TEST_F(SadSatdCFuncTest, WelsSampleSatd4x4_c) {
   for(int i=0; i<16; i++)
     iSumSatd+=abs(Y[i]);
 
-  EXOECT_EQ(WelsSampleSatd4x4_c(m_pPixSrcA, m_iStrideA, m_pPixSrcB, m_iStrideB), (iSumSatd+1)>>1);
+  EXPECT_EQ(WelsSampleSatd4x4_c(m_pPixSrcA, m_iStrideA, m_pPixSrcB, m_iStrideB), (iSumSatd+1)>>1);
 }
 
 TEST_F(SadSatdCFuncTest, WelsSampleSadFour16x16_c) {
