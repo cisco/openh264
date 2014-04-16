@@ -24,6 +24,14 @@
 		4CE443F318B722CD0017DF25 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4CE443F118B722CD0017DF25 /* InfoPlist.strings */; };
 		4CE443F518B722CD0017DF25 /* commonTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CE443F418B722CD0017DF25 /* commonTests.m */; };
 		F0B204F918FD23BF005DA23F /* copy_mb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F0B204F818FD23BF005DA23F /* copy_mb.cpp */; };
+		FA31B4D618FE6474009E5AA1 /* crt_util_safe_x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406C518D96EA600DFA14A /* crt_util_safe_x.cpp */; };
+		FA31B4D718FE6474009E5AA1 /* deblocking_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406C618D96EA600DFA14A /* deblocking_common.cpp */; };
+		FA31B4D818FE6474009E5AA1 /* logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406C718D96EA600DFA14A /* logging.cpp */; };
+		FA31B4D918FE6474009E5AA1 /* WelsThreadLib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406C818D96EA600DFA14A /* WelsThreadLib.cpp */; };
+		FA31B4DC18FE6474009E5AA1 /* cpu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406C418D96EA600DFA14A /* cpu.cpp */; };
+		FA31B4DE18FE6474009E5AA1 /* copy_mb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F0B204F818FD23BF005DA23F /* copy_mb.cpp */; };
+		FA31B4DF18FE6474009E5AA1 /* sad_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAABAA1718E9354A00D4186F /* sad_common.cpp */; };
+		FA31B4E118FE6474009E5AA1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443D818B722CD0017DF25 /* Foundation.framework */; };
 		FAABAA1818E9354A00D4186F /* sad_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAABAA1718E9354A00D4186F /* sad_common.cpp */; };
 /* End PBXBuildFile section */
 
@@ -39,6 +47,15 @@
 
 /* Begin PBXCopyFilesBuildPhase section */
 		4CE443D318B722CD0017DF25 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA31B4E218FE6474009E5AA1 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "include/$(PRODUCT_NAME)";
@@ -81,6 +98,7 @@
 		4CE443F418B722CD0017DF25 /* commonTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = commonTests.m; sourceTree = "<group>"; };
 		F0B204F718FD23B6005DA23F /* copy_mb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = copy_mb.h; sourceTree = "<group>"; };
 		F0B204F818FD23BF005DA23F /* copy_mb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = copy_mb.cpp; sourceTree = "<group>"; };
+		FA31B4E618FE6474009E5AA1 /* libcommon_64.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcommon_64.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FAABAA1618E9353F00D4186F /* sad_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sad_common.h; sourceTree = "<group>"; };
 		FAABAA1718E9354A00D4186F /* sad_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sad_common.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -102,6 +120,14 @@
 				4CE443EA18B722CD0017DF25 /* UIKit.framework in Frameworks */,
 				4CE443ED18B722CD0017DF25 /* libcommon.a in Frameworks */,
 				4CE443E818B722CD0017DF25 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA31B4E018FE6474009E5AA1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA31B4E118FE6474009E5AA1 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -169,6 +195,7 @@
 			children = (
 				4CE443D518B722CD0017DF25 /* libcommon.a */,
 				4CE443E518B722CD0017DF25 /* commonTests.xctest */,
+				FA31B4E618FE6474009E5AA1 /* libcommon_64.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -250,6 +277,23 @@
 			productReference = 4CE443E518B722CD0017DF25 /* commonTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		FA31B4D318FE6474009E5AA1 /* common_64 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA31B4E318FE6474009E5AA1 /* Build configuration list for PBXNativeTarget "common_64" */;
+			buildPhases = (
+				FA31B4D418FE6474009E5AA1 /* Sources */,
+				FA31B4E018FE6474009E5AA1 /* Frameworks */,
+				FA31B4E218FE6474009E5AA1 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = common_64;
+			productName = common;
+			productReference = FA31B4E618FE6474009E5AA1 /* libcommon_64.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -273,6 +317,7 @@
 			targets = (
 				4CE443D418B722CD0017DF25 /* common */,
 				4CE443E418B722CD0017DF25 /* commonTests */,
+				FA31B4D318FE6474009E5AA1 /* common_64 */,
 			);
 		};
 /* End PBXProject section */
@@ -312,6 +357,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				4CE443F518B722CD0017DF25 /* commonTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA31B4D418FE6474009E5AA1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA31B4D618FE6474009E5AA1 /* crt_util_safe_x.cpp in Sources */,
+				FA31B4D718FE6474009E5AA1 /* deblocking_common.cpp in Sources */,
+				FA31B4D818FE6474009E5AA1 /* logging.cpp in Sources */,
+				FA31B4D918FE6474009E5AA1 /* WelsThreadLib.cpp in Sources */,
+				FA31B4DC18FE6474009E5AA1 /* cpu.cpp in Sources */,
+				FA31B4DE18FE6474009E5AA1 /* copy_mb.cpp in Sources */,
+				FA31B4DF18FE6474009E5AA1 /* sad_common.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -410,7 +469,7 @@
 		4CE443F918B722CD0017DF25 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -418,10 +477,7 @@
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = (
-					APPLE_IOS,
-					HAVE_NEON,
-				);
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = APPLE_IOS;
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				ONLY_ACTIVE_ARCH = NO;
@@ -434,16 +490,13 @@
 		4CE443FA18B722CD0017DF25 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DSTROOT = /tmp/common.dst;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = (
-					APPLE_IOS,
-					HAVE_NEON,
-				);
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = APPLE_IOS;
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";
@@ -490,6 +543,51 @@
 			};
 			name = Release;
 		};
+		FA31B4E418FE6474009E5AA1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DSTROOT = /tmp/common.dst;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = (
+					APPLE_IOS,
+					HAVE_NEON,
+				);
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = common_64;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		FA31B4E518FE6474009E5AA1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DSTROOT = /tmp/common.dst;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = (
+					APPLE_IOS,
+					HAVE_NEON,
+				);
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = common_64;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -516,6 +614,15 @@
 			buildConfigurations = (
 				4CE443FC18B722CD0017DF25 /* Debug */,
 				4CE443FD18B722CD0017DF25 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FA31B4E318FE6474009E5AA1 /* Build configuration list for PBXNativeTarget "common_64" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA31B4E418FE6474009E5AA1 /* Debug */,
+				FA31B4E518FE6474009E5AA1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

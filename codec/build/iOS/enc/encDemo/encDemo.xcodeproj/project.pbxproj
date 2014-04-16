@@ -7,6 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FA31B4B218FE6345009E5AA1 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FAFB4FC118BC8DD700315438 /* ViewController.m */; };
+		FA31B4B318FE6345009E5AA1 /* read_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAFB502E18BCA50900315438 /* read_config.cpp */; };
+		FA31B4B418FE6345009E5AA1 /* welsenc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAFB500A18BC8F6C00315438 /* welsenc.cpp */; };
+		FA31B4B518FE6345009E5AA1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FAFB4FB818BC8DD700315438 /* AppDelegate.m */; };
+		FA31B4B618FE6345009E5AA1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FAFB4FB418BC8DD700315438 /* main.m */; };
+		FA31B4BB18FE6345009E5AA1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAFB4FAA18BC8DD700315438 /* CoreGraphics.framework */; };
+		FA31B4BC18FE6345009E5AA1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAFB4FAC18BC8DD700315438 /* UIKit.framework */; };
+		FA31B4BD18FE6345009E5AA1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAFB4FA818BC8DD700315438 /* Foundation.framework */; };
+		FA31B4BF18FE6345009E5AA1 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FAFB4FBD18BC8DD700315438 /* Main_iPad.storyboard */; };
+		FA31B4C018FE6345009E5AA1 /* welsenc_ios.cfg in Resources */ = {isa = PBXBuildFile; fileRef = FAA3D9D218BD729500BCD52D /* welsenc_ios.cfg */; };
+		FA31B4C118FE6345009E5AA1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FAFB4FC318BC8DD700315438 /* Images.xcassets */; };
+		FA31B4C218FE6345009E5AA1 /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FAFB4FBA18BC8DD700315438 /* Main_iPhone.storyboard */; };
+		FA31B4C318FE6345009E5AA1 /* layer2.cfg in Resources */ = {isa = PBXBuildFile; fileRef = FAA3D9DC18BD8A5600BCD52D /* layer2.cfg */; };
+		FA31B4C418FE6345009E5AA1 /* CiscoVT2people_320x192_12fps.yuv in Resources */ = {isa = PBXBuildFile; fileRef = FAA3D9D718BD777100BCD52D /* CiscoVT2people_320x192_12fps.yuv */; };
+		FA31B4C518FE6345009E5AA1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = FAFB4FB118BC8DD700315438 /* InfoPlist.strings */; };
+		FA31B51018FE689C009E5AA1 /* libcommon_64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA31B50A18FE6524009E5AA1 /* libcommon_64.a */; };
+		FA31B51118FE689C009E5AA1 /* libprocessing_64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA31B50D18FE6524009E5AA1 /* libprocessing_64.a */; };
+		FA31B51218FE689C009E5AA1 /* libwelsenc_64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA31B4D018FE6345009E5AA1 /* libwelsenc_64.a */; };
 		FAA3D9D318BD729500BCD52D /* welsenc_ios.cfg in Resources */ = {isa = PBXBuildFile; fileRef = FAA3D9D218BD729500BCD52D /* welsenc_ios.cfg */; };
 		FAA3D9D818BD777100BCD52D /* CiscoVT2people_320x192_12fps.yuv in Resources */ = {isa = PBXBuildFile; fileRef = FAA3D9D718BD777100BCD52D /* CiscoVT2people_320x192_12fps.yuv */; };
 		FAA3D9DD18BD8A5600BCD52D /* layer2.cfg in Resources */ = {isa = PBXBuildFile; fileRef = FAA3D9DC18BD8A5600BCD52D /* layer2.cfg */; };
@@ -28,6 +46,48 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		FA31B4CF18FE6345009E5AA1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FAFB4FE218BC8E7C00315438 /* welsenc.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FA31B4A918FE6270009E5AA1;
+			remoteInfo = "welsenc 64";
+		};
+		FA31B4D118FE6398009E5AA1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FAFB4FE218BC8E7C00315438 /* welsenc.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = FA31B47C18FE6270009E5AA1;
+			remoteInfo = welsenc_64;
+		};
+		FA31B50618FE6524009E5AA1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FAFB4FF418BC8E9A00315438 /* processing.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = FA31B4E718FE64E4009E5AA1;
+			remoteInfo = processing_64;
+		};
+		FA31B50918FE6524009E5AA1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FAFB4FEB18BC8E8600315438 /* common.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FA31B4E618FE6474009E5AA1;
+			remoteInfo = common_64;
+		};
+		FA31B50C18FE6524009E5AA1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FAFB4FF418BC8E9A00315438 /* processing.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FA31B50518FE64E4009E5AA1;
+			remoteInfo = processing_64;
+		};
+		FA31B50E18FE6527009E5AA1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FAFB4FEB18BC8E8600315438 /* common.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = FA31B4D318FE6474009E5AA1;
+			remoteInfo = common_64;
+		};
 		FAFB4FE718BC8E7D00315438 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FAFB4FE218BC8E7C00315438 /* welsenc.xcodeproj */;
@@ -94,6 +154,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		FA31B4C918FE6345009E5AA1 /* encDemo_64.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = encDemo_64.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA31B4CA18FE6345009E5AA1 /* encDemo_64-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "encDemo_64-Info.plist"; path = "/Users/video/projects/openh264/openh264/codec/build/iOS/enc/encDemo/encDemo_64-Info.plist"; sourceTree = "<absolute>"; };
 		FAA3D9D218BD729500BCD52D /* welsenc_ios.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = welsenc_ios.cfg; path = ../../../../../../testbin/welsenc_ios.cfg; sourceTree = "<group>"; };
 		FAA3D9D718BD777100BCD52D /* CiscoVT2people_320x192_12fps.yuv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CiscoVT2people_320x192_12fps.yuv; path = ../../../../../../res/CiscoVT2people_320x192_12fps.yuv; sourceTree = "<group>"; };
 		FAA3D9DC18BD8A5600BCD52D /* layer2.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = layer2.cfg; path = ../../../../../../testbin/layer2.cfg; sourceTree = "<group>"; };
@@ -122,6 +184,19 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		FA31B4B718FE6345009E5AA1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA31B51018FE689C009E5AA1 /* libcommon_64.a in Frameworks */,
+				FA31B51118FE689C009E5AA1 /* libprocessing_64.a in Frameworks */,
+				FA31B51218FE689C009E5AA1 /* libwelsenc_64.a in Frameworks */,
+				FA31B4BB18FE6345009E5AA1 /* CoreGraphics.framework in Frameworks */,
+				FA31B4BC18FE6345009E5AA1 /* UIKit.framework in Frameworks */,
+				FA31B4BD18FE6345009E5AA1 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FAFB4FA218BC8DD700315438 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -151,6 +226,7 @@
 			isa = PBXGroup;
 			children = (
 				FAFB4FA518BC8DD700315438 /* encDemo.app */,
+				FA31B4C918FE6345009E5AA1 /* encDemo_64.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -188,13 +264,14 @@
 		FAFB4FAF18BC8DD700315438 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				FAA3D9DC18BD8A5600BCD52D /* layer2.cfg */,
 				FAA3D9D718BD777100BCD52D /* CiscoVT2people_320x192_12fps.yuv */,
-				FAA3D9D218BD729500BCD52D /* welsenc_ios.cfg */,
 				FAFB4FB018BC8DD700315438 /* encDemo-Info.plist */,
-				FAFB4FB118BC8DD700315438 /* InfoPlist.strings */,
-				FAFB4FB418BC8DD700315438 /* main.m */,
 				FAFB4FB618BC8DD700315438 /* encDemo-Prefix.pch */,
+				FA31B4CA18FE6345009E5AA1 /* encDemo_64-Info.plist */,
+				FAFB4FB118BC8DD700315438 /* InfoPlist.strings */,
+				FAA3D9DC18BD8A5600BCD52D /* layer2.cfg */,
+				FAFB4FB418BC8DD700315438 /* main.m */,
+				FAA3D9D218BD729500BCD52D /* welsenc_ios.cfg */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -204,6 +281,7 @@
 			children = (
 				FAFB4FE818BC8E7D00315438 /* libwelsenc.a */,
 				FAFB4FEA18BC8E7D00315438 /* welsencTests.xctest */,
+				FA31B4D018FE6345009E5AA1 /* libwelsenc_64.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -213,6 +291,7 @@
 			children = (
 				FAFB4FF118BC8E8600315438 /* libcommon.a */,
 				FAFB4FF318BC8E8600315438 /* commonTests.xctest */,
+				FA31B50A18FE6524009E5AA1 /* libcommon_64.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -222,6 +301,7 @@
 			children = (
 				FAFB4FFA18BC8E9A00315438 /* libprocessing.a */,
 				FAFB4FFC18BC8E9A00315438 /* processingTests.xctest */,
+				FA31B50D18FE6524009E5AA1 /* libprocessing_64.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -256,6 +336,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		FA31B4AA18FE6345009E5AA1 /* encDemo_64 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA31B4C618FE6345009E5AA1 /* Build configuration list for PBXNativeTarget "encDemo_64" */;
+			buildPhases = (
+				FA31B4B118FE6345009E5AA1 /* Sources */,
+				FA31B4B718FE6345009E5AA1 /* Frameworks */,
+				FA31B4BE18FE6345009E5AA1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FA31B50F18FE6527009E5AA1 /* PBXTargetDependency */,
+				FA31B50718FE6524009E5AA1 /* PBXTargetDependency */,
+				FA31B4D218FE6398009E5AA1 /* PBXTargetDependency */,
+			);
+			name = encDemo_64;
+			productName = encDemo;
+			productReference = FA31B4C918FE6345009E5AA1 /* encDemo_64.app */;
+			productType = "com.apple.product-type.application";
+		};
 		FAFB4FA418BC8DD700315438 /* encDemo */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = FAFB4FDA18BC8DD700315438 /* Build configuration list for PBXNativeTarget "encDemo" */;
@@ -313,11 +413,33 @@
 			projectRoot = "";
 			targets = (
 				FAFB4FA418BC8DD700315438 /* encDemo */,
+				FA31B4AA18FE6345009E5AA1 /* encDemo_64 */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		FA31B4D018FE6345009E5AA1 /* libwelsenc_64.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libwelsenc_64.a;
+			remoteRef = FA31B4CF18FE6345009E5AA1 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FA31B50A18FE6524009E5AA1 /* libcommon_64.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libcommon_64.a;
+			remoteRef = FA31B50918FE6524009E5AA1 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FA31B50D18FE6524009E5AA1 /* libprocessing_64.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libprocessing_64.a;
+			remoteRef = FA31B50C18FE6524009E5AA1 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		FAFB4FE818BC8E7D00315438 /* libwelsenc.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -363,6 +485,20 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		FA31B4BE18FE6345009E5AA1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA31B4BF18FE6345009E5AA1 /* Main_iPad.storyboard in Resources */,
+				FA31B4C018FE6345009E5AA1 /* welsenc_ios.cfg in Resources */,
+				FA31B4C118FE6345009E5AA1 /* Images.xcassets in Resources */,
+				FA31B4C218FE6345009E5AA1 /* Main_iPhone.storyboard in Resources */,
+				FA31B4C318FE6345009E5AA1 /* layer2.cfg in Resources */,
+				FA31B4C418FE6345009E5AA1 /* CiscoVT2people_320x192_12fps.yuv in Resources */,
+				FA31B4C518FE6345009E5AA1 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FAFB4FA318BC8DD700315438 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -380,6 +516,18 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		FA31B4B118FE6345009E5AA1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA31B4B218FE6345009E5AA1 /* ViewController.m in Sources */,
+				FA31B4B318FE6345009E5AA1 /* read_config.cpp in Sources */,
+				FA31B4B418FE6345009E5AA1 /* welsenc.cpp in Sources */,
+				FA31B4B518FE6345009E5AA1 /* AppDelegate.m in Sources */,
+				FA31B4B618FE6345009E5AA1 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FAFB4FA118BC8DD700315438 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -395,6 +543,21 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		FA31B4D218FE6398009E5AA1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = welsenc_64;
+			targetProxy = FA31B4D118FE6398009E5AA1 /* PBXContainerItemProxy */;
+		};
+		FA31B50718FE6524009E5AA1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = processing_64;
+			targetProxy = FA31B50618FE6524009E5AA1 /* PBXContainerItemProxy */;
+		};
+		FA31B50F18FE6527009E5AA1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = common_64;
+			targetProxy = FA31B50E18FE6527009E5AA1 /* PBXContainerItemProxy */;
+		};
 		FAFB4FFE18BC8EAA00315438 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = common;
@@ -440,6 +603,44 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		FA31B4C718FE6345009E5AA1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PREPROCESSOR_DEFINITIONS = APPLE_IOS;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Applications/Xcode\\ 5.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
+					"\"$(SRCROOT)/../../../../api/svc\"",
+					"\"$(SRCROOT)/../../../../common/inc\"",
+				);
+				INFOPLIST_FILE = "encDemo_64-Info.plist";
+				PRODUCT_NAME = encDemo_64;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		FA31B4C818FE6345009E5AA1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PREPROCESSOR_DEFINITIONS = APPLE_IOS;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Applications/Xcode\\ 5.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
+					"\"$(SRCROOT)/../../../../api/svc\"",
+					"\"$(SRCROOT)/../../../../common/inc\"",
+				);
+				INFOPLIST_FILE = "encDemo_64-Info.plist";
+				PRODUCT_NAME = encDemo_64;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
 		FAFB4FD818BC8DD700315438 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -533,7 +734,7 @@
 		FAFB4FDB18BC8DD700315438 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PREPROCESSOR_DEFINITIONS = APPLE_IOS;
@@ -552,7 +753,7 @@
 		FAFB4FDC18BC8DD700315438 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PREPROCESSOR_DEFINITIONS = APPLE_IOS;
@@ -571,6 +772,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		FA31B4C618FE6345009E5AA1 /* Build configuration list for PBXNativeTarget "encDemo_64" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA31B4C718FE6345009E5AA1 /* Debug */,
+				FA31B4C818FE6345009E5AA1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		FAFB4FA018BC8DD700315438 /* Build configuration list for PBXProject "encDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
