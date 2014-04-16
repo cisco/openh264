@@ -474,7 +474,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSad4x4_mmx) {
   const int32_t kiStridePixA = rand()%256+4;
   const int32_t kiStridePixB = rand()%256+4;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<2,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<2,"Sad_pSrcB");
@@ -499,7 +499,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSad8x8_sse21) {
   const int32_t kiStridePixA = rand()%256+8;
   const int32_t kiStridePixB = rand()%256+8;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<3,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<3,"Sad_pSrcB");
@@ -522,7 +522,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSad8x16_sse2) {
   const int32_t kiStridePixA = 32;
   const int32_t kiStridePixB = 32;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<4,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<4,"Sad_pSrcB");
@@ -545,7 +545,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSad16x8_sse2) {
   const int32_t kiStridePixA = 32;
   const int32_t kiStridePixB = 32;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<3,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<3,"Sad_pSrcB");
@@ -568,7 +568,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSad16x16_sse2) {
   const int32_t kiStridePixA = 32;
   const int32_t kiStridePixB = 32;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<4,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<4,"Sad_pSrcB");
@@ -591,7 +591,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSatd4x4_sse2) {
   const int32_t kiStridePixA = rand()%256+4;
   const int32_t kiStridePixB = rand()%256+4;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<2,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<2,"Sad_pSrcB");
@@ -615,7 +615,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSatd8x8_sse2) {
   const int32_t kiStridePixA = rand()%256+8;
   const int32_t kiStridePixB = rand()%256+8;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<3,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<3,"Sad_pSrcB");
@@ -638,7 +638,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSatd8x16_sse2) {
   const int32_t kiStridePixA = rand()%256+16;
   const int32_t kiStridePixB = rand()%256+16;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<4,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<4,"Sad_pSrcB");
@@ -661,7 +661,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSatd16x8_sse2) {
   const int32_t kiStridePixA = rand()%256+16;
   const int32_t kiStridePixB = rand()%256+16;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<3,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<3,"Sad_pSrcB");
@@ -684,7 +684,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSatd16x16_sse2) {
   const int32_t kiStridePixA = rand()%256+16;
   const int32_t kiStridePixB = rand()%256+16;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<4,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<4,"Sad_pSrcB");
@@ -707,7 +707,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSatd4x4_sse41) {
   const int32_t kiStridePixA = rand()%256+4;
   const int32_t kiStridePixB = rand()%256+4;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<2,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<2,"Sad_pSrcB");
@@ -731,7 +731,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSatd8x8_sse41) {
   const int32_t kiStridePixA = rand()%256+8;
   const int32_t kiStridePixB = rand()%256+8;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<3,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<3,"Sad_pSrcB");
@@ -754,7 +754,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSatd8x16_sse41) {
   const int32_t kiStridePixA = rand()%256+16;
   const int32_t kiStridePixB = rand()%256+16;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<4,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<4,"Sad_pSrcB");
@@ -777,7 +777,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSatd16x8_sse41) {
   const int32_t kiStridePixA = rand()%256+16;
   const int32_t kiStridePixB = rand()%256+16;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<3,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<3,"Sad_pSrcB");
@@ -800,7 +800,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSatd16x16_sse41) {
   const int32_t kiStridePixA = rand()%256+16;
   const int32_t kiStridePixB = rand()%256+16;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<4,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<4,"Sad_pSrcB");
@@ -826,7 +826,7 @@ TEST_F(SadSatdAssemblyFuncTest, TestPixel_sad_4_16x16_mmxext) {
   const int32_t kiStridePixA = rand()%256+32;
   const int32_t kiStridePixB = rand()%256+32;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<5,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<5,"Sad_pSrcB");
@@ -869,7 +869,7 @@ TEST_F(SadSatdAssemblyFuncTest, TestPixel_sad_4_16x8_mmxext) {
   const int32_t kiStridePixA = rand()%256+32;
   const int32_t kiStridePixB = rand()%256+32;
 ;
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<5,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<5,"Sad_pSrcB");
@@ -912,7 +912,7 @@ TEST_F(SadSatdAssemblyFuncTest, TestPixel_sad_4_8x16_mmxext) {
   const int32_t kiStridePixA = rand()%256+32;
   const int32_t kiStridePixB = rand()%256+32;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<5,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<5,"Sad_pSrcB");
@@ -955,7 +955,7 @@ TEST_F(SadSatdAssemblyFuncTest, TestPixel_sad_4_8x8_mmxext) {
   const int32_t kiStridePixA = rand()%256+16;
   const int32_t kiStridePixB = rand()%256+16;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<4,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<4,"Sad_pSrcB");
@@ -999,7 +999,7 @@ TEST_F(SadSatdAssemblyFuncTest, TestPixel_sad_4_4x4_mmxext) {
   const int32_t kiStridePixA = rand()%256+8;
   const int32_t kiStridePixB = rand()%256+8;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<3,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<3,"Sad_pSrcB");
@@ -1042,7 +1042,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSadFour16x16_sse2) {
   const int32_t kiStridePixA = 32;
   const int32_t kiStridePixB = 32;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<5,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<5,"Sad_pSrcB");
@@ -1086,7 +1086,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSadFour16x8_sse2) {
   const int32_t kiStridePixA = 32;
   const int32_t kiStridePixB = 32;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<5,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<5,"Sad_pSrcB");
@@ -1129,7 +1129,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSadFour8x16_sse2) {
   const int32_t kiStridePixA = rand()%256+32;
   const int32_t kiStridePixB = rand()%256+32;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<5,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<5,"Sad_pSrcB");
@@ -1172,7 +1172,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSadFour8x8_sse2) {
   const int32_t kiStridePixA = rand()%256+16;
   const int32_t kiStridePixB = rand()%256+16;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<4,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<4,"Sad_pSrcB");
@@ -1216,7 +1216,7 @@ TEST_F(SadSatdAssemblyFuncTest, WelsSampleSadFour4x4_sse2) {
   const int32_t kiStridePixA = rand()%256+8;
   const int32_t kiStridePixB = rand()%256+8;
 
-  CMemoryAlign cMemoryAlign(0);
+  CMemoryAlign cMemoryAlign(16);
   uint8_t* pSrcA = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixA<<3,"Sad_pSrcA");
   ASSERT_TRUE(NULL != pSrcA);
   uint8_t* pSrcB = (uint8_t *)cMemoryAlign.WelsMalloc(kiStridePixB<<3,"Sad_pSrcB");
