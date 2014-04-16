@@ -389,6 +389,8 @@ void PrintHelp() {
   printf ("\n Supported Options:\n");
   printf ("  -bf     Bit Stream File\n");
   printf ("  -org	  Original file, example: -org src.yuv\n");
+  printf ("  -sw     the source width\n");
+  printf ("  -sh     the source height\n");
   printf ("  -frms   Number of total frames to be encoded\n");
   printf ("  -gop    GOPSize - GOP size (1,2,4,8, default: 1)\n");
   printf ("  -iper   Intra period (default: -1) : must be a power of 2 of GOP size (or -1)\n");
