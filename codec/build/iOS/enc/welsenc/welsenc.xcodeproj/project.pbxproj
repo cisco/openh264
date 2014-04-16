@@ -51,6 +51,39 @@
 		4CE4472B18BC605C0017DF25 /* wels_preprocess.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446FA18BC605C0017DF25 /* wels_preprocess.cpp */; };
 		4CE4472D18BC605C0017DF25 /* welsCodecTrace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4470518BC605C0017DF25 /* welsCodecTrace.cpp */; };
 		4CE4472E18BC605C0017DF25 /* welsEncoderExt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4470618BC605C0017DF25 /* welsEncoderExt.cpp */; };
+		FA31B47E18FE6270009E5AA1 /* set_mb_syn_cavlc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446F018BC605C0017DF25 /* set_mb_syn_cavlc.cpp */; };
+		FA31B47F18FE6270009E5AA1 /* encode_mb_aux.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E018BC605C0017DF25 /* encode_mb_aux.cpp */; };
+		FA31B48018FE6270009E5AA1 /* svc_mode_decision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446F618BC605C0017DF25 /* svc_mode_decision.cpp */; };
+		FA31B48118FE6270009E5AA1 /* svc_motion_estimate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446F718BC605C0017DF25 /* svc_motion_estimate.cpp */; };
+		FA31B48218FE6270009E5AA1 /* property.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446EC18BC605C0017DF25 /* property.cpp */; };
+		FA31B48318FE6270009E5AA1 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446F918BC605C0017DF25 /* utils.cpp */; };
+		FA31B48418FE6270009E5AA1 /* decode_mb_aux.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446DF18BC605C0017DF25 /* decode_mb_aux.cpp */; };
+		FA31B48518FE6270009E5AA1 /* sample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446EF18BC605C0017DF25 /* sample.cpp */; };
+		FA31B48618FE6270009E5AA1 /* welsCodecTrace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4470518BC605C0017DF25 /* welsCodecTrace.cpp */; };
+		FA31B48718FE6270009E5AA1 /* encoder_data_tables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E218BC605C0017DF25 /* encoder_data_tables.cpp */; };
+		FA31B48918FE6270009E5AA1 /* ref_list_mgr_svc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446EE18BC605C0017DF25 /* ref_list_mgr_svc.cpp */; };
+		FA31B48A18FE6270009E5AA1 /* slice_multi_threading.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446F118BC605C0017DF25 /* slice_multi_threading.cpp */; };
+		FA31B48B18FE6270009E5AA1 /* expand_pic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E418BC605C0017DF25 /* expand_pic.cpp */; };
+		FA31B48D18FE6270009E5AA1 /* deblocking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446DE18BC605C0017DF25 /* deblocking.cpp */; };
+		FA31B48E18FE6270009E5AA1 /* svc_encode_mb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446F418BC605C0017DF25 /* svc_encode_mb.cpp */; };
+		FA31B48F18FE6270009E5AA1 /* mv_pred.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E918BC605C0017DF25 /* mv_pred.cpp */; };
+		FA31B49118FE6270009E5AA1 /* wels_preprocess.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446FA18BC605C0017DF25 /* wels_preprocess.cpp */; };
+		FA31B49218FE6270009E5AA1 /* au_set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446DD18BC605C0017DF25 /* au_set.cpp */; };
+		FA31B49318FE6270009E5AA1 /* mc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E618BC605C0017DF25 /* mc.cpp */; };
+		FA31B49418FE6270009E5AA1 /* svc_set_mb_syn_cavlc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446F818BC605C0017DF25 /* svc_set_mb_syn_cavlc.cpp */; };
+		FA31B49518FE6270009E5AA1 /* md.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E718BC605C0017DF25 /* md.cpp */; };
+		FA31B49618FE6270009E5AA1 /* nal_encap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446EA18BC605C0017DF25 /* nal_encap.cpp */; };
+		FA31B49718FE6270009E5AA1 /* memory_align.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E818BC605C0017DF25 /* memory_align.cpp */; };
+		FA31B49818FE6270009E5AA1 /* svc_enc_slice_segment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446F318BC605C0017DF25 /* svc_enc_slice_segment.cpp */; };
+		FA31B49918FE6270009E5AA1 /* svc_base_layer_md.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446F218BC605C0017DF25 /* svc_base_layer_md.cpp */; };
+		FA31B49A18FE6270009E5AA1 /* ratectl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446ED18BC605C0017DF25 /* ratectl.cpp */; };
+		FA31B49C18FE6270009E5AA1 /* picture_handle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446EB18BC605C0017DF25 /* picture_handle.cpp */; };
+		FA31B49D18FE6270009E5AA1 /* svc_encode_slice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446F518BC605C0017DF25 /* svc_encode_slice.cpp */; };
+		FA31B49E18FE6270009E5AA1 /* encoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E118BC605C0017DF25 /* encoder.cpp */; };
+		FA31B49F18FE6270009E5AA1 /* get_intra_predictor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E518BC605C0017DF25 /* get_intra_predictor.cpp */; };
+		FA31B4A018FE6270009E5AA1 /* welsEncoderExt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4470618BC605C0017DF25 /* welsEncoderExt.cpp */; };
+		FA31B4A118FE6270009E5AA1 /* encoder_ext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E318BC605C0017DF25 /* encoder_ext.cpp */; };
+		FA31B4A418FE6270009E5AA1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4431418B6FFA00017DF25 /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +98,15 @@
 
 /* Begin PBXCopyFilesBuildPhase section */
 		4CE4430F18B6FFA00017DF25 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA31B4A518FE6270009E5AA1 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "include/$(PRODUCT_NAME)";
@@ -174,6 +216,7 @@
 		4CE4470418BC605C0017DF25 /* wels_enc_export.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = wels_enc_export.def; sourceTree = "<group>"; };
 		4CE4470518BC605C0017DF25 /* welsCodecTrace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = welsCodecTrace.cpp; sourceTree = "<group>"; };
 		4CE4470618BC605C0017DF25 /* welsEncoderExt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = welsEncoderExt.cpp; sourceTree = "<group>"; };
+		FA31B4A918FE6270009E5AA1 /* libwelsenc_64.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libwelsenc_64.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -193,6 +236,14 @@
 				4CE4432618B6FFA00017DF25 /* UIKit.framework in Frameworks */,
 				4CE4432418B6FFA00017DF25 /* Foundation.framework in Frameworks */,
 				4CE4432918B6FFA00017DF25 /* libwelsenc.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA31B4A318FE6270009E5AA1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA31B4A418FE6270009E5AA1 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -226,6 +277,7 @@
 			children = (
 				4CE4431118B6FFA00017DF25 /* libwelsenc.a */,
 				4CE4432118B6FFA00017DF25 /* welsencTests.xctest */,
+				FA31B4A918FE6270009E5AA1 /* libwelsenc_64.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -438,6 +490,23 @@
 			productReference = 4CE4432118B6FFA00017DF25 /* welsencTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		FA31B47C18FE6270009E5AA1 /* welsenc_64 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA31B4A618FE6270009E5AA1 /* Build configuration list for PBXNativeTarget "welsenc_64" */;
+			buildPhases = (
+				FA31B47D18FE6270009E5AA1 /* Sources */,
+				FA31B4A318FE6270009E5AA1 /* Frameworks */,
+				FA31B4A518FE6270009E5AA1 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = welsenc_64;
+			productName = welsenc;
+			productReference = FA31B4A918FE6270009E5AA1 /* libwelsenc_64.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -461,6 +530,7 @@
 			targets = (
 				4CE4431018B6FFA00017DF25 /* welsenc */,
 				4CE4432018B6FFA00017DF25 /* welsencTests */,
+				FA31B47C18FE6270009E5AA1 /* welsenc_64 */,
 			);
 		};
 /* End PBXProject section */
@@ -529,6 +599,45 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FA31B47D18FE6270009E5AA1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA31B47E18FE6270009E5AA1 /* set_mb_syn_cavlc.cpp in Sources */,
+				FA31B47F18FE6270009E5AA1 /* encode_mb_aux.cpp in Sources */,
+				FA31B48018FE6270009E5AA1 /* svc_mode_decision.cpp in Sources */,
+				FA31B48118FE6270009E5AA1 /* svc_motion_estimate.cpp in Sources */,
+				FA31B48218FE6270009E5AA1 /* property.cpp in Sources */,
+				FA31B48318FE6270009E5AA1 /* utils.cpp in Sources */,
+				FA31B48418FE6270009E5AA1 /* decode_mb_aux.cpp in Sources */,
+				FA31B48518FE6270009E5AA1 /* sample.cpp in Sources */,
+				FA31B48618FE6270009E5AA1 /* welsCodecTrace.cpp in Sources */,
+				FA31B48718FE6270009E5AA1 /* encoder_data_tables.cpp in Sources */,
+				FA31B48918FE6270009E5AA1 /* ref_list_mgr_svc.cpp in Sources */,
+				FA31B48A18FE6270009E5AA1 /* slice_multi_threading.cpp in Sources */,
+				FA31B48B18FE6270009E5AA1 /* expand_pic.cpp in Sources */,
+				FA31B48D18FE6270009E5AA1 /* deblocking.cpp in Sources */,
+				FA31B48E18FE6270009E5AA1 /* svc_encode_mb.cpp in Sources */,
+				FA31B48F18FE6270009E5AA1 /* mv_pred.cpp in Sources */,
+				FA31B49118FE6270009E5AA1 /* wels_preprocess.cpp in Sources */,
+				FA31B49218FE6270009E5AA1 /* au_set.cpp in Sources */,
+				FA31B49318FE6270009E5AA1 /* mc.cpp in Sources */,
+				FA31B49418FE6270009E5AA1 /* svc_set_mb_syn_cavlc.cpp in Sources */,
+				FA31B49518FE6270009E5AA1 /* md.cpp in Sources */,
+				FA31B49618FE6270009E5AA1 /* nal_encap.cpp in Sources */,
+				FA31B49718FE6270009E5AA1 /* memory_align.cpp in Sources */,
+				FA31B49818FE6270009E5AA1 /* svc_enc_slice_segment.cpp in Sources */,
+				FA31B49918FE6270009E5AA1 /* svc_base_layer_md.cpp in Sources */,
+				FA31B49A18FE6270009E5AA1 /* ratectl.cpp in Sources */,
+				FA31B49C18FE6270009E5AA1 /* picture_handle.cpp in Sources */,
+				FA31B49D18FE6270009E5AA1 /* svc_encode_slice.cpp in Sources */,
+				FA31B49E18FE6270009E5AA1 /* encoder.cpp in Sources */,
+				FA31B49F18FE6270009E5AA1 /* get_intra_predictor.cpp in Sources */,
+				FA31B4A018FE6270009E5AA1 /* welsEncoderExt.cpp in Sources */,
+				FA31B4A118FE6270009E5AA1 /* encoder_ext.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -555,7 +664,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -593,7 +702,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -624,7 +733,7 @@
 		4CE4433518B6FFA00017DF25 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -636,9 +745,7 @@
 					APPLE_IOS,
 					HAVE_NEON,
 				);
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = (
-					APPLE_IOS,
-				);
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../../../common/inc",
 					"$(SRCROOT)/../../../../processing/interface",
@@ -657,7 +764,7 @@
 		4CE4433618B6FFA00017DF25 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -668,9 +775,7 @@
 					APPLE_IOS,
 					HAVE_NEON,
 				);
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = (
-					APPLE_IOS,
-				);
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../../../common/inc",
 					"$(SRCROOT)/../../../../processing/interface",
@@ -688,7 +793,6 @@
 		4CE4433818B6FFA00017DF25 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -709,7 +813,6 @@
 		4CE4433918B6FFA00017DF25 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -720,6 +823,59 @@
 				INFOPLIST_FILE = "welsencTests/welsencTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+		FA31B4A718FE6270009E5AA1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DSTROOT = /tmp/welsenc.dst;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*]" = APPLE_IOS;
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../../../common/inc",
+					"$(SRCROOT)/../../../../processing/interface",
+					"$(SRCROOT)/../../../../api/svc",
+					"$(SRCROOT)/../../../../common/arm",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = welsenc_64;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		FA31B4A818FE6270009E5AA1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DSTROOT = /tmp/welsenc.dst;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				GCC_PREPROCESSOR_DEFINITIONS = "";
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../../../common/inc",
+					"$(SRCROOT)/../../../../processing/interface",
+					"$(SRCROOT)/../../../../api/svc",
+					"$(SRCROOT)/../../../../common/arm",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = welsenc_64;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -749,6 +905,15 @@
 			buildConfigurations = (
 				4CE4433818B6FFA00017DF25 /* Debug */,
 				4CE4433918B6FFA00017DF25 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FA31B4A618FE6270009E5AA1 /* Build configuration list for PBXNativeTarget "welsenc_64" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA31B4A718FE6270009E5AA1 /* Debug */,
+				FA31B4A818FE6270009E5AA1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
