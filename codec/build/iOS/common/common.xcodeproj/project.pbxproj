@@ -16,6 +16,7 @@
 		4C3406CF18D96EA600DFA14A /* deblocking_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406C618D96EA600DFA14A /* deblocking_common.cpp */; };
 		4C3406D018D96EA600DFA14A /* logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406C718D96EA600DFA14A /* logging.cpp */; };
 		4C3406D118D96EA600DFA14A /* WelsThreadLib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406C818D96EA600DFA14A /* WelsThreadLib.cpp */; };
+		4CC61F0918FF6B4B00E56EAB /* copy_mb_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CC61F0818FF6B4B00E56EAB /* copy_mb_neon.S */; };
 		4CE443D918B722CD0017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443D818B722CD0017DF25 /* Foundation.framework */; };
 		4CE443E718B722CD0017DF25 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443E618B722CD0017DF25 /* XCTest.framework */; };
 		4CE443E818B722CD0017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443D818B722CD0017DF25 /* Foundation.framework */; };
@@ -71,6 +72,7 @@
 		4C3406C618D96EA600DFA14A /* deblocking_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = deblocking_common.cpp; sourceTree = "<group>"; };
 		4C3406C718D96EA600DFA14A /* logging.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = logging.cpp; sourceTree = "<group>"; };
 		4C3406C818D96EA600DFA14A /* WelsThreadLib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WelsThreadLib.cpp; sourceTree = "<group>"; };
+		4CC61F0818FF6B4B00E56EAB /* copy_mb_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = copy_mb_neon.S; sourceTree = "<group>"; };
 		4CE443D518B722CD0017DF25 /* libcommon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE443D818B722CD0017DF25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4CE443E518B722CD0017DF25 /* commonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = commonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -111,6 +113,7 @@
 		4C3406B118D96EA600DFA14A /* arm */ = {
 			isa = PBXGroup;
 			children = (
+				4CC61F0818FF6B4B00E56EAB /* copy_mb_neon.S */,
 				4C3406B218D96EA600DFA14A /* arm_arch_common_macro.S */,
 				4C3406B318D96EA600DFA14A /* deblocking_neon.S */,
 				4C3406B418D96EA600DFA14A /* expand_picture_neon.S */,
@@ -300,6 +303,7 @@
 				4C3406D118D96EA600DFA14A /* WelsThreadLib.cpp in Sources */,
 				4C3406CC18D96EA600DFA14A /* mc_neon.S in Sources */,
 				4C3406CB18D96EA600DFA14A /* expand_picture_neon.S in Sources */,
+				4CC61F0918FF6B4B00E56EAB /* copy_mb_neon.S in Sources */,
 				4C3406CD18D96EA600DFA14A /* cpu.cpp in Sources */,
 				4C3406CA18D96EA600DFA14A /* deblocking_neon.S in Sources */,
 				F0B204F918FD23BF005DA23F /* copy_mb.cpp in Sources */,
