@@ -728,9 +728,9 @@ void CWelsPreProcess::AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCu
     SWelsSvcRc* pWelsSvcRc = &pCtx->pWelsSvcRc[kiDependencyId];
 
     if (pCtx->eSliceType == P_SLICE)
-      iComplexityAnalysisMode == GOM_SAD;
+      iComplexityAnalysisMode = GOM_SAD;
     else if (pCtx->eSliceType == I_SLICE)
-      iComplexityAnalysisMode == GOM_VAR;
+      iComplexityAnalysisMode = GOM_VAR;
     else
       return;
 
