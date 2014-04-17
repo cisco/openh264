@@ -1,6 +1,6 @@
 COMMON_SRCDIR=codec/common
 COMMON_CPP_SRCS=\
-        $(COMMON_SRCDIR)/src/copy_mb.cpp\
+	$(COMMON_SRCDIR)/src/copy_mb.cpp\
 	$(COMMON_SRCDIR)/src/cpu.cpp\
 	$(COMMON_SRCDIR)/src/crt_util_safe_x.cpp\
 	$(COMMON_SRCDIR)/src/deblocking_common.cpp\
@@ -26,6 +26,7 @@ endif
 
 ifeq ($(ASM_ARCH), arm)
 COMMON_ASM_S_SRCS=\
+	$(COMMON_SRCDIR)/arm/copy_mb_neon.S\
 	$(COMMON_SRCDIR)/arm/deblocking_neon.S\
 	$(COMMON_SRCDIR)/arm/expand_picture_neon.S\
 	$(COMMON_SRCDIR)/arm/mc_neon.S\
