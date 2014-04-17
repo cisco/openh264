@@ -1988,7 +1988,7 @@ w17_hv_mc_luma_loop:
 	// horizon filtered
 	UNPACK_2_16BITS_TO_ABC	q10, q11, q9, q12, q13
 	FILTER_3_IN_16BITS_TO_8BITS q9, q12, q13, d10	//output to d10
-	vst1.u8	{d9, d10}, [r2], r3		//write 16Byte
+	vst1.u8	{d9, d10}, [r2]!		//write 16Byte
 	UNPACK_1_IN_8x16BITS_TO_8BITS	d11, d22, d23, q11 //output to d11[0]
 	vst1.u8	{d11[0]}, [r2], r3		//write 16th Byte
 
