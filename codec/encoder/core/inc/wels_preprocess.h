@@ -127,6 +127,9 @@ class CWelsPreProcess {
   int32_t AnalyzeSpatialPic (sWelsEncCtx* pEncCtx, const int32_t kiDIdx);
   int32_t UpdateSpatialPictures(sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam, const int8_t iCurTid, const int32_t d_idx);
   int32_t GetRefCandidateLtrIndex(int32_t iRefIdx);
+  void    AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCurPicture, SPicture* pRefPicture,
+                                    const int32_t kiDependencyId, const bool kbCalculateBGD);
+
  private:
   int32_t WelsPreprocessCreate();
   int32_t WelsPreprocessDestroy();
@@ -144,8 +147,6 @@ class CWelsPreProcess {
                           bool bCalculateVar, bool bCalculateBGD);
   void    BackgroundDetection (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture, bool bDetectFlag);
   void    AdaptiveQuantCalculation (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture);
-  void    AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCurPicture, SPicture* pRefPicture,
-                                    const int32_t kiDependencyId, const bool kbCalculateBGD);
   void    Padding (uint8_t* pSrcY, uint8_t* pSrcU, uint8_t* pSrcV, int32_t iStrideY, int32_t iStrideUV,
                    int32_t iActualWidth, int32_t iPaddingWidth, int32_t iActualHeight, int32_t iPaddingHeight);
   void    SetRefMbType (sWelsEncCtx* pCtx, uint32_t** pRefMbTypeArray, int32_t iRefPicType);

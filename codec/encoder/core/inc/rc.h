@@ -51,7 +51,7 @@
 namespace WelsSVCEnc {
 //trace
 #define GOM_TRACE_FLAG 1
-
+#define GOM_H_SCC               8
 #define    WELS_RC_DISABLE        0
 #define    WELS_RC_GOM            1
 
