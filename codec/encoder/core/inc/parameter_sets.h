@@ -82,8 +82,7 @@ bool		bFrameCroppingFlag;
 bool		bConstraintSet0Flag;
 bool		bConstraintSet1Flag;
 bool		bConstraintSet2Flag;
-
-//	bool		bConstraintSet3Flag;		// reintroduce constrain_set3_flag instead of reserved filling bytes here
+bool		bConstraintSet3Flag;
 //	bool		bSeparateColorPlaneFlag;  // =false,: only used in decoder, encoder in general_***; it can be removed when removed general up_sample
 
 } SWelsSPS, *PWelsSPS;

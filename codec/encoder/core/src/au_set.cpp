@@ -144,7 +144,7 @@ int32_t WelsWriteSpsSyntax (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_
   BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet0Flag);	// bConstraintSet0Flag
   BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet1Flag);	// bConstraintSet1Flag
   BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet2Flag);	// bConstraintSet2Flag
-  BsWriteOneBit (pLocalBitStringAux, 0/*pSps->bConstraintSet3Flag*/);	// bConstraintSet3Flag
+  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet3Flag);	// bConstraintSet3Flag
   BsWriteBits (pLocalBitStringAux, 4, 0);							// reserved_zero_4bits, equal to 0
   BsWriteBits (pLocalBitStringAux, 8, pSps->iLevelIdc);				// iLevelIdc
   BsWriteUE (pLocalBitStringAux, pSps->uiSpsId + pSpsIdDelta[pSps->uiSpsId]);					     // seq_parameter_set_id
@@ -364,7 +364,6 @@ static inline bool WelsGetPaddingOffset (int32_t iActualWidth, int32_t iActualHe
 
   return (iWidth > iActualWidth) || (iHeight > iActualHeight);
 }
-
 int32_t WelsInitSps (SWelsSPS* pSps, SDLayerParam* pLayerParam, const uint32_t kuiIntraPeriod,
                      const int32_t kiNumRefFrame,
                      const uint32_t kuiSpsId, const bool kbEnableFrameCropping, bool bEnableRc) {
@@ -403,6 +402,13 @@ int32_t WelsInitSps (SWelsSPS* pSps, SDLayerParam* pLayerParam, const uint32_t k
     pSps->iLevelIdc  = WelsGetLevelIdc (pSps, pLayerParam->fOutputFrameRate,
                                         0); // Set tar_br = 0 to remove the bitrate constraint; a better way is to set actual tar_br as 0
 
+  //for Scalable Baseline, Scalable High, and Scalable High Intra profiles.If level_idc is equal to 9, the indicated level is level 1b.
+  //for the Baseline, Constrained Baseline, Main, and Extended profiles,If level_idc is equal to 11 and constraint_set3_flag is equal to 1, the indicated level is level 1b.
+  if((pSps->iLevelIdc == 9)&&
+    ((pSps->uiProfileIdc == PRO_BASELINE) ||(pSps->uiProfileIdc == PRO_MAIN)||(pSps->uiProfileIdc == PRO_EXTENDED))) {
+    pSps->iLevelIdc = 11;
+    pSps->bConstraintSet3Flag = true;
+  }
   return 0;
 }
 
