@@ -394,6 +394,7 @@ int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNal
     }
 
     ++pSlice->iTotalMbInCurSlice;
+    pCurLayer->pMbCorrectlyDecodedFlag[iNextMbXyIndex] = true;
 
     if (pSliceHeader->pPps->uiNumSliceGroups > 1) {
       iNextMbXyIndex = FmoNextMb (pFmo, iNextMbXyIndex);

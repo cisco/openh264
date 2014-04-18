@@ -54,7 +54,7 @@ int32_t MarkECFrameAsRef (PWelsDecoderContext pCtx);
 bool NeedErrorCon (PWelsDecoderContext pCtx);
 // ImplementErrorConceal
 // Do actual error concealment
-int32_t ImplementErrorCon (PWelsDecoderContext pCtx);
+void ImplementErrorCon (PWelsDecoderContext pCtx);
 
 } // namespace WelsDec
 
