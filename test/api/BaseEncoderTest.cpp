@@ -5,12 +5,13 @@
 #include "utils/FileInputStream.h"
 #include "BaseEncoderTest.h"
 
-static int InitWithParam(ISVCEncoder* encoder, int width,
+static int InitWithParam(ISVCEncoder* encoder, EUsageType usageType,int width,
     int height, float frameRate, SliceModeEnum sliceMode, bool denoise, int layers) {
   if (SM_SINGLE_SLICE == sliceMode && !denoise && layers == 1) {
     SEncParamBase param;
     memset (&param, 0, sizeof(SEncParamBase));
-
+    
+    param.iUsageType = usageType;
     param.fMaxFrameRate = frameRate;
     param.iPicWidth = width;
     param.iPicHeight = height;
@@ -22,6 +23,7 @@ static int InitWithParam(ISVCEncoder* encoder, int width,
     SEncParamExt param;
     encoder->GetDefaultParams(&param);
 
+    param.iUsageType = usageType;
     param.fMaxFrameRate = frameRate;
     param.iPicWidth = width;
     param.iPicHeight = height;
@@ -61,9 +63,9 @@ void BaseEncoderTest::TearDown() {
   }
 }
 
-void BaseEncoderTest::EncodeStream(InputStream* in, int width, int height,
+void BaseEncoderTest::EncodeStream(InputStream* in, EUsageType usageType, int width, int height,
     float frameRate, SliceModeEnum slices, bool denoise, int layers, Callback* cbk) {
-  int rv = InitWithParam(encoder_, width, height, frameRate, slices, denoise, layers);
+  int rv = InitWithParam(encoder_, usageType, width, height, frameRate, slices, denoise, layers);
   ASSERT_TRUE(rv == cmResultSuccess);
 
   // I420: 1(Y) + 1/4(U) + 1/4(V)
@@ -95,9 +97,9 @@ void BaseEncoderTest::EncodeStream(InputStream* in, int width, int height,
   }
 }
 
-void BaseEncoderTest::EncodeFile(const char* fileName, int width, int height,
+void BaseEncoderTest::EncodeFile(const char* fileName, EUsageType usageType, int width, int height,
     float frameRate, SliceModeEnum slices, bool denoise, int layers, Callback* cbk) {
   FileInputStream fileStream;
   ASSERT_TRUE(fileStream.Open(fileName));
-  EncodeStream(&fileStream, width, height, frameRate, slices, denoise, layers, cbk);
+  EncodeStream(&fileStream, usageType, width, height, frameRate, slices, denoise, layers, cbk);
 }
