@@ -2832,7 +2832,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   SPicture* fsnr						= NULL;
 #endif//ENABLE_FRAME_DUMP || ENABLE_PSNR_CALC
   SPicture* pEncPic						= NULL;	// to be decided later
-  int32_t did_list[MAX_DEPENDENCY_LAYER]	= {0};
+  int32_t iDidList[MAX_DEPENDENCY_LAYER]	= {0};
   int32_t iLayerNum					= 0;
   int32_t iLayerSize					= 0;
   int32_t iSpatialNum					= 0; // available count number of spatial layers due to frame size changed in this given frame
@@ -2850,7 +2850,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   int8_t iCurTid						= 0;
   bool bAvcBased					= false;
 #if defined(ENABLE_PSNR_CALC)
-  float snr_y = .0f, snr_u = .0f, snr_v = .0f;
+  float fSnrY = .0f, fSnrU = .0f, fSnrV = .0f;
 #endif//ENABLE_PSNR_CALC
 
 #if defined(_DEBUG)
@@ -2909,24 +2909,24 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   pCtx->pCurDqLayer->pRefLayer	= NULL;
 
   while (iSpatialIdx < iSpatialNum) {
-    const int32_t d_idx			= (pSpatialIndexMap + iSpatialIdx)->iDid;	// get iDid
-    SDLayerParam* param_d		= &pSvcParam->sDependencyLayers[d_idx];
+    const int32_t iDidIdx			= (pSpatialIndexMap + iSpatialIdx)->iDid;	// get iDid
+    SDLayerParam* pParam		= &pSvcParam->sDependencyLayers[iDidIdx];
 
-    pCtx->uiDependencyId	= iCurDid = (int8_t)d_idx;
-    pCtx->pVpp->AnalyzeSpatialPic (pCtx, d_idx);
+    pCtx->uiDependencyId	= iCurDid = (int8_t)iDidIdx;
+    pCtx->pVpp->AnalyzeSpatialPic (pCtx, iDidIdx);
 
     pCtx->pEncPic	 = pEncPic = (pSpatialIndexMap + iSpatialIdx)->pSrc;
     pCtx->pEncPic->iPictureType	= pCtx->eSliceType;
     pCtx->pEncPic->iFramePoc		= pCtx->iPOC;
 
-    iCurWidth	= param_d->iFrameWidth;
-    iCurHeight	= param_d->iFrameHeight;
+    iCurWidth	= pParam->iFrameWidth;
+    iCurHeight	= pParam->iFrameHeight;
 
-    did_list[iSpatialIdx]	= iCurDid;
+    iDidList[iSpatialIdx]	= iCurDid;
 
     // Encoding this picture might mulitiple sQualityStat layers potentially be encoded as followed
 
-    switch (param_d->sSliceCfg.uiSliceMode) {
+    switch (pParam->sSliceCfg.uiSliceMode) {
     case SM_FIXEDSLCNUM_SLICE:
     case SM_AUTO_SLICE: {
       if ((iCurDid > 0) && (pSvcParam->iMultipleThreadIdc > 1) &&
@@ -3000,7 +3000,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       return ENC_RETURN_CORRECTED;
     }
 #ifdef LONG_TERM_REF_DUMP
-    dump_ref (pCtx);
+    DumpRef (pCtx);
 #endif
     if((pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME)&&(pSvcParam->iRCMode != RC_OFF_MODE))
       pCtx->pVpp->AnalyzePictureComplexity(pCtx,pCtx->pEncPic,((pCtx->eSliceType == P_SLICE)&&(pCtx->iNumRef0>0))?pCtx->pRefList0[0]:NULL,
@@ -3016,7 +3016,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     //TODO Complexity Calculation here for screen content
     iLayerSize	= 0;
 
-    if (SM_SINGLE_SLICE == param_d->sSliceCfg.uiSliceMode) {	// only one slice within a sQualityStat layer
+    if (SM_SINGLE_SLICE == pParam->sSliceCfg.uiSliceMode) {	// only one slice within a sQualityStat layer
       int32_t iSliceSize = 0;
       int32_t iPayloadSize	= 0;
 
@@ -3053,20 +3053,20 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       pLayerBsInfo->iNalCount		= ++ iNalIdxInLayer;
     }
     // for dynamic slicing single threading..
-    else if ((SM_DYN_SLICE == param_d->sSliceCfg.uiSliceMode) && (pSvcParam->iMultipleThreadIdc <= 1)) {
+    else if ((SM_DYN_SLICE == pParam->sSliceCfg.uiSliceMode) && (pSvcParam->iMultipleThreadIdc <= 1)) {
       const int32_t kiLastMbInFrame = pCtx->pCurDqLayer->pSliceEncCtx->iMbNumInFrame;
       pCtx->iEncoderError = WelsCodeOnePicPartition (pCtx, pLayerBsInfo, &iNalIdxInLayer, &iLayerSize, 0, kiLastMbInFrame, 0);
       WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
     } else {
       //other multi-slice uiSliceMode
-      int err = 0;
+      int32_t iRet = 0;
       // THREAD_FULLY_FIRE_MODE/THREAD_PICK_UP_MODE for any mode of non-SM_DYN_SLICE
-      if ((SM_DYN_SLICE != param_d->sSliceCfg.uiSliceMode) && (pSvcParam->iMultipleThreadIdc > 1)) {
+      if ((SM_DYN_SLICE != pParam->sSliceCfg.uiSliceMode) && (pSvcParam->iMultipleThreadIdc > 1)) {
         iSliceCount	= GetCurrentSliceNum (pCtx->pCurDqLayer->pSliceEncCtx);
         if (iLayerNum + 1 >= MAX_LAYER_NUM_OF_FRAME) {	// check available layer_bs_info for further writing as followed
           WelsLog (pCtx, WELS_LOG_ERROR,
                    "WelsEncoderEncodeExt(), iLayerNum(%d) overflow(max:%d) at iDid= %d uiSliceMode= %d, iSliceCount= %d!",
-                   iLayerNum, MAX_LAYER_NUM_OF_FRAME, iCurDid, param_d->sSliceCfg.uiSliceMode, iSliceCount);
+                   iLayerNum, MAX_LAYER_NUM_OF_FRAME, iCurDid, pParam->sSliceCfg.uiSliceMode, iSliceCount);
           return ENC_RETURN_UNSUPPORTED_PARA;
         }
         if (iSliceCount <= 1) {
@@ -3083,13 +3083,13 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
           pCtx->iActiveThreadsNum	= iSliceCount;
           // to fire slice coding threads
-          err = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
+          iRet = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
                                    &pCtx->pSliceThreading->pThreadMasterEvent[0],
                                    pLayerBsInfo, iSliceCount, pCtx->pCurDqLayer->pSliceEncCtx, false);
-          if (err) {
+          if (iRet) {
             WelsLog (pCtx, WELS_LOG_ERROR,
                      "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!\n",
-                     err, pSvcParam->iCountThreadsNum, iSliceCount, param_d->sSliceCfg.uiSliceMode, pSvcParam->iMultipleThreadIdc);
+                     iRet, pSvcParam->iCountThreadsNum, iSliceCount, pParam->sSliceCfg.uiSliceMode, pSvcParam->iMultipleThreadIdc);
             return ENC_RETURN_UNEXPECTED;
           }
 
@@ -3122,13 +3122,13 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
           iNumThreadsScheduled	= pCtx->iActiveThreadsNum;
           iNumThreadsRunning		= iNumThreadsScheduled;
           // to fire slice coding threads
-          err = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
+          iRet = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
                                    &pCtx->pSliceThreading->pThreadMasterEvent[0],
                                    pLayerBsInfo, iNumThreadsRunning, pCtx->pCurDqLayer->pSliceEncCtx, false);
-          if (err) {
+          if (iRet) {
             WelsLog (pCtx, WELS_LOG_ERROR,
                      "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!\n",
-                     err, pSvcParam->iCountThreadsNum, iSliceCount, param_d->sSliceCfg.uiSliceMode, pSvcParam->iMultipleThreadIdc);
+                     iRet, pSvcParam->iCountThreadsNum, iSliceCount, pParam->sSliceCfg.uiSliceMode, pSvcParam->iMultipleThreadIdc);
             return ENC_RETURN_UNEXPECTED;
           }
 
@@ -3164,17 +3164,17 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         }
       }
       // THREAD_FULLY_FIRE_MODE && SM_DYN_SLICE
-      else if ((SM_DYN_SLICE == param_d->sSliceCfg.uiSliceMode) && (pSvcParam->iMultipleThreadIdc > 1)) {
+      else if ((SM_DYN_SLICE == pParam->sSliceCfg.uiSliceMode) && (pSvcParam->iMultipleThreadIdc > 1)) {
         const int32_t kiPartitionCnt	= pCtx->iActiveThreadsNum; //pSvcParam->iCountThreadsNum;
 
         // to fire slice coding threads
-        err = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
+        iRet = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
                                  &pCtx->pSliceThreading->pThreadMasterEvent[0],
                                  pLayerBsInfo, kiPartitionCnt, pCtx->pCurDqLayer->pSliceEncCtx, true);
-        if (err) {
+        if (iRet) {
           WelsLog (pCtx, WELS_LOG_ERROR,
                    "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!\n",
-                   err, pSvcParam->iCountThreadsNum, iSliceCount, param_d->sSliceCfg.uiSliceMode, pSvcParam->iMultipleThreadIdc);
+                   iRet, pSvcParam->iCountThreadsNum, iSliceCount, pParam->sSliceCfg.uiSliceMode, pSvcParam->iMultipleThreadIdc);
           return ENC_RETURN_UNEXPECTED;
         }
 
@@ -3240,7 +3240,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     if (
       (!pCtx->pCurDqLayer->bDeblockingParallelFlag) &&
 #if !defined(ENABLE_FRAME_DUMP)
-      ((eNalRefIdc != NRI_PRI_LOWEST) && (param_d->iHighestTemporalId == 0 || iCurTid < param_d->iHighestTemporalId)) &&
+      ((eNalRefIdc != NRI_PRI_LOWEST) && (pParam->iHighestTemporalId == 0 || iCurTid < pParam->iHighestTemporalId)) &&
 #endif//!ENABLE_FRAME_DUMP
       true
     ) {
@@ -3266,23 +3266,23 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 #ifdef ENABLE_FRAME_DUMP
     // Dump reconstruction picture for each sQualityStat layer
     if (iCurDid + 1 < pSvcParam->iSpatialLayerNum)
-      DumpDependencyRec (fsnr, &param_d->sRecFileName[0], iCurDid);
+      DumpDependencyRec (fsnr, &pParam->sRecFileName[0], iCurDid);
 #endif//ENABLE_FRAME_DUMP
 
 #if defined(ENABLE_PSNR_CALC)
-    snr_y	= WelsCalcPsnr (fsnr->pData[0],
+    fSnrY	= WelsCalcPsnr (fsnr->pData[0],
                           fsnr->iLineSize[0],
                           pEncPic->pData[0],
                           pEncPic->iLineSize[0],
                           iCurWidth,
                           iCurHeight);
-    snr_u	= WelsCalcPsnr (fsnr->pData[1],
+    fSnrU	= WelsCalcPsnr (fsnr->pData[1],
                           fsnr->iLineSize[1],
                           pEncPic->pData[1],
                           pEncPic->iLineSize[1],
                           (iCurWidth >> 1),
                           (iCurHeight >> 1));
-    snr_v	= WelsCalcPsnr (fsnr->pData[2],
+    fSnrV	= WelsCalcPsnr (fsnr->pData[2],
                           fsnr->iLineSize[2],
                           pEncPic->pData[2],
                           pEncPic->iLineSize[2],
@@ -3300,9 +3300,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
              iCurDid,
              0,
              pCtx->pWelsSvcRc[pCtx->uiDependencyId].iAverageFrameQp,
-             snr_y,
-             snr_u,
-             snr_v,
+             fSnrY,
+             fSnrU,
+             fSnrV,
              (iLayerSize << 3));
 #endif//LAYER_INFO_OUTPUT
 
@@ -3310,9 +3310,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
 #if defined(ENABLE_PSNR_CALC)
     {
-      pCtx->sStatData[iCurDid][0].sQualityStat.rYPsnr[pCtx->eSliceType]	+= snr_y;
-      pCtx->sStatData[iCurDid][0].sQualityStat.rUPsnr[pCtx->eSliceType]	+= snr_u;
-      pCtx->sStatData[iCurDid][0].sQualityStat.rVPsnr[pCtx->eSliceType]	+= snr_v;
+      pCtx->sStatData[iCurDid][0].sQualityStat.rYPsnr[pCtx->eSliceType]	+= fSnrY;
+      pCtx->sStatData[iCurDid][0].sQualityStat.rUPsnr[pCtx->eSliceType]	+= fSnrU;
+      pCtx->sStatData[iCurDid][0].sQualityStat.rVPsnr[pCtx->eSliceType]	+= fSnrV;
     }
 #endif//ENABLE_PSNR_CALC
 
@@ -3378,9 +3378,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       ++ iLayerNum;
     }
 
-    if ((param_d->sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE || param_d->sSliceCfg.uiSliceMode == SM_AUTO_SLICE)
+    if ((pParam->sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE || pParam->sSliceCfg.uiSliceMode == SM_AUTO_SLICE)
         && pSvcParam->iMultipleThreadIdc > 1 &&
-        pSvcParam->iMultipleThreadIdc >= param_d->sSliceCfg.sSliceArgument.uiSliceNum) {
+        pSvcParam->iMultipleThreadIdc >= pParam->sSliceCfg.sSliceArgument.uiSliceNum) {
       CalcSliceComplexRatio (pCtx->pSliceThreading->pSliceComplexRatio[iCurDid], pCtx->pCurDqLayer->pSliceEncCtx,
                              pCtx->pSliceThreading->pSliceConsumeTime[iCurDid]);
 #if defined(MT_DEBUG)
@@ -3396,10 +3396,10 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
     if (pSvcParam->bEnableLongTermReference && (pCtx->pLtr[pCtx->uiDependencyId].bLTRMarkingFlag
         && (pCtx->pLtr[pCtx->uiDependencyId].iLTRMarkMode == LTR_DELAY_MARK))) {
-      pCtx->bLongTermRefFlag[d_idx][0] = true;
+      pCtx->bLongTermRefFlag[iDidIdx][0] = true;
     }
 
-    if (pCtx->pVpp->UpdateSpatialPictures (pCtx, pSvcParam, iCurTid, d_idx) != 0) {
+    if (pCtx->pVpp->UpdateSpatialPictures (pCtx, pSvcParam, iCurTid, iDidIdx) != 0) {
       ForceCodingIDR (pCtx);
       WelsLog (pCtx, WELS_LOG_WARNING, "WelsEncoderEncodeExt(), Logic Error Found in temporal level. ForceCodingIDR!\n");
       //the above is to set the next frame IDR
@@ -3409,21 +3409,21 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
     if (pSvcParam->bEnableLongTermReference && ((pCtx->pLtr[pCtx->uiDependencyId].bLTRMarkingFlag
         && (pCtx->pLtr[pCtx->uiDependencyId].iLTRMarkMode == LTR_DIRECT_MARK)) || eFrameType == videoFrameTypeIDR)) {
-      pCtx->bLongTermRefFlag[d_idx][iCurTid] = true;
+      pCtx->bLongTermRefFlag[iDidIdx][iCurTid] = true;
     }
   }
 
 #if defined(MT_DEBUG)
-  TrackSliceConsumeTime (pCtx, did_list, iSpatialNum);
+  TrackSliceConsumeTime (pCtx, iDidList, iSpatialNum);
 #endif//MT_DEBUG
 
-  if (pSvcParam->iMultipleThreadIdc > 1 && did_list[0] == BASE_DEPENDENCY_ID
+  if (pSvcParam->iMultipleThreadIdc > 1 && iDidList[0] == BASE_DEPENDENCY_ID
       && ((pSvcParam->sDependencyLayers[0].sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE)
           || (pSvcParam->sDependencyLayers[0].sSliceCfg.uiSliceMode == SM_AUTO_SLICE))
       && pSvcParam->iMultipleThreadIdc >= pSvcParam->sDependencyLayers[0].sSliceCfg.sSliceArgument.uiSliceNum
-      && ((pSvcParam->sDependencyLayers[did_list[iSpatialNum - 1]].sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE)
-          || (pSvcParam->sDependencyLayers[did_list[iSpatialNum - 1]].sSliceCfg.uiSliceMode == SM_AUTO_SLICE))
-      && pSvcParam->iMultipleThreadIdc >= pSvcParam->sDependencyLayers[did_list[iSpatialNum -
+      && ((pSvcParam->sDependencyLayers[iDidList[iSpatialNum - 1]].sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE)
+          || (pSvcParam->sDependencyLayers[iDidList[iSpatialNum - 1]].sSliceCfg.uiSliceMode == SM_AUTO_SLICE))
+      && pSvcParam->iMultipleThreadIdc >= pSvcParam->sDependencyLayers[iDidList[iSpatialNum -
           1]].sSliceCfg.sSliceArgument.uiSliceNum) {
     AdjustBaseLayer (pCtx);
   }
