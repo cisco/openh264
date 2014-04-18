@@ -65,22 +65,22 @@ TEST(ScrollDetectionTest,TestScroll)
     SScrollDetectionParam m_sScrollDetectionParam;
 
     for (int32_t i=0; i< 9;i++){
-    iStartX = kiPicBorderWidth+(i%3)*kiRegionWidth;
-    iStartY = -sSrcMap.sRect.iRectHeight*7/48+ (int)(i/3)*(kiHieghtStride);
-    iWidth = kiRegionWidth;
-    iHeight = kiRegionHeight;
+      iStartX = kiPicBorderWidth+(i%3)*kiRegionWidth;
+      iStartY = -sSrcMap.sRect.iRectHeight*7/48+ (int)(i/3)*(kiHieghtStride);
+      iWidth = kiRegionWidth;
+      iHeight = kiRegionHeight;
 
-    iWidth /= 2;
-    iStartX += iWidth/2;
+      iWidth /= 2;
+      iStartX += iWidth/2;
 
-    m_sScrollDetectionParam.iScrollMvX = 0;
-    m_sScrollDetectionParam.iScrollMvY = 0;
-    m_sScrollDetectionParam.bScrollDetectFlag = false;
+      m_sScrollDetectionParam.iScrollMvX = 0;
+      m_sScrollDetectionParam.iScrollMvY = 0;
+      m_sScrollDetectionParam.bScrollDetectFlag = false;
 
-    ScrollDetectionCore(&sSrcMap, &sRefMap, iWidth, iHeight, iStartX, iStartY, m_sScrollDetectionParam);
+      ScrollDetectionCore(&sSrcMap, &sRefMap, iWidth, iHeight, iStartX, iStartY, m_sScrollDetectionParam);
 
-    if (m_sScrollDetectionParam.bScrollDetectFlag && m_sScrollDetectionParam.iScrollMvY)
-      break;
+      if (m_sScrollDetectionParam.bScrollDetectFlag && m_sScrollDetectionParam.iScrollMvY)
+        break;
    }
 
     EXPECT_EQ(m_sScrollDetectionParam.bScrollDetectFlag,1);
