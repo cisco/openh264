@@ -2446,7 +2446,8 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
       pFuncList->pfInterFineMd = WelsMdInterFinePartition;
     }
   }
-
+  
+  return;
   //to init at each frame will be needed when dealing with hybrid content (camera+screen)
   if (pCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
     SFeatureSearchPreparation* pFeatureSearchPreparation = pCurLayer->pFeatureSearchPreparation;
