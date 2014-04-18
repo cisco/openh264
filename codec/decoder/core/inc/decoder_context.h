@@ -156,6 +156,13 @@ typedef struct TagExpandPicFunc {
   PExpandPictureFunc pExpandChromaPicture[2];
 } SExpandPicFunc;
 
+enum {
+  OVERWRITE_NONE = 0,
+  OVERWRITE_PPS = 1,
+  OVERWRITE_SPS = 1 << 1,
+  OVERWRITE_SUBSETSPS = 1 << 2
+};
+
 /*
  *	SWelsDecoderContext: to maintail all modules data over decoder@framework
  */
@@ -231,14 +238,14 @@ typedef struct TagWelsDecoderContext {
 
   SPosOffset	sFrameCrop;
 
-  SSps				sSpsBuffer[MAX_SPS_COUNT];
-  SPps				sPpsBuffer[MAX_PPS_COUNT];
+  SSps				sSpsBuffer[MAX_SPS_COUNT + 1];
+  SPps				sPpsBuffer[MAX_PPS_COUNT + 1];
   PSliceHeader		pSliceHeader;
 
   PPicBuff	        pPicBuff[LIST_A];	// Initially allocated memory for pictures which are used in decoding.
   int32_t				iPicQueueNumber;
 
-  SSubsetSps			sSubsetSpsBuffer[MAX_SPS_COUNT];
+  SSubsetSps			sSubsetSpsBuffer[MAX_SPS_COUNT + 1];
   SNalUnit            sPrefixNal;
 
   PAccessUnit			pAccessUnitList;	// current access unit list to be performed
@@ -279,6 +286,7 @@ typedef struct TagWelsDecoderContext {
   uint16_t            uiCurIdrPicId;
 #endif
   bool       bNewSeqBegin;
+  int        iOverwriteFlags;
   int32_t iErrorConMethod; //
   PPicture pPreviousDecodedPictureInDpb; //pointer to previously decoded picture in DPB for error concealment
   PGetIntraPredFunc pGetI16x16LumaPredFunc[7];		//h264_predict_copy_16x16;

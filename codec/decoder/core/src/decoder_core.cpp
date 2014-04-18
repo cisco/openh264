@@ -1531,6 +1531,20 @@ static bool CheckNewSeqBeginAndUpdateActiveLayerSps(PWelsDecoderContext pCtx) {
   return bNewSeq;
 }
 
+static void WriteBackActiveParameters(PWelsDecoderContext pCtx) {
+  if (pCtx->iOverwriteFlags & OVERWRITE_PPS) {
+    memcpy(&pCtx->sPpsBuffer[pCtx->sPpsBuffer[MAX_PPS_COUNT].iPpsId], &pCtx->sPpsBuffer[MAX_PPS_COUNT], sizeof(SPps));
+    pCtx->bNewSeqBegin = true;
+  }
+  if (pCtx->iOverwriteFlags & OVERWRITE_SPS) {
+    memcpy(&pCtx->sSpsBuffer[pCtx->sSpsBuffer[MAX_SPS_COUNT].iSpsId], &pCtx->sSpsBuffer[MAX_SPS_COUNT], sizeof(SSps));
+    pCtx->bNewSeqBegin = true;
+  }
+  if (pCtx->iOverwriteFlags & OVERWRITE_SUBSETSPS) {
+    memcpy(&pCtx->sSubsetSpsBuffer[pCtx->sSubsetSpsBuffer[MAX_SPS_COUNT].sSps.iSpsId], &pCtx->sSubsetSpsBuffer[MAX_SPS_COUNT], sizeof(SSubsetSps));
+  }
+  pCtx->iOverwriteFlags = OVERWRITE_NONE;
+}
 /*
  * ConstructAccessUnit
  * construct an access unit for given input bitstream, maybe partial NAL Unit, one or more Units are involved to
@@ -1548,12 +1562,12 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
   int32_t iWidth;
   int32_t iHeight;
   int32_t iStride[2] = { 0 };
-
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
 
   pCtx->bAuReadyFlag = false;
   pCtx->bLastHasMmco5 = false;
-  pCtx->bNewSeqBegin = CheckNewSeqBeginAndUpdateActiveLayerSps(pCtx);
+  bool bTmpNewSeqBegin = CheckNewSeqBeginAndUpdateActiveLayerSps(pCtx);
+  pCtx->bNewSeqBegin = pCtx->bNewSeqBegin && bTmpNewSeqBegin;
   iErr = WelsDecodeAccessUnitStart (pCtx);
   GetVclNalTemporalId (pCtx);
 
@@ -1584,6 +1598,7 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
 
   WelsDecodeAccessUnitEnd (pCtx);
   pCtx->bNewSeqBegin = false;
+  WriteBackActiveParameters(pCtx);
   if (ERR_NONE != iErr) {
     WelsLog (pCtx, WELS_LOG_INFO, "returned error from decoding:[0x%x]\n", iErr);
     return iErr;
