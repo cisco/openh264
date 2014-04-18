@@ -7,6 +7,13 @@
 #include "utils/DataGenerator.h"
 
 using namespace nsWelsVP;
+
+#define ASSERT_MEMORY_FAIL2X(A, B)     \
+  if (NULL == B) {                     \
+  delete []A;\
+  ASSERT_TRUE(0);                    \
+  }
+
 TEST(ScrollDetectionTest,TestScroll)
 {
   uint8_t* pSrc, *pRef;
@@ -16,14 +23,14 @@ TEST(ScrollDetectionTest,TestScroll)
   int32_t iStride = 0;
   int32_t iIdx = 0;
 
-  for(int32_t i=0; i<4; i++)
-  {
+  for(int32_t i=0; i<4; i++){
     int32_t iWidth = iWidthSets[i];
     int32_t iHeight = iHeightSets[i];
     iStride = iWidth + 16;
     pSrc = new uint8_t[iHeight*iStride];
+    ASSERT_TRUE(NULL != pSrc);
     pRef = new uint8_t[iHeight*iStride];
-
+    ASSERT_MEMORY_FAIL2X(pSrc, pRef)
     RandomPixelDataGenerator(pRef, iWidth, iHeight, iStride, iIdx );
 
     int32_t iScrollMv = rand()%128;
@@ -34,8 +41,7 @@ TEST(ScrollDetectionTest,TestScroll)
       if ((j+iScrollMv)>=0 && (j+iScrollMv)<iHeight)
         for (int32_t i=0;i<iWidth;i++) {
           pSrcTmp[i] = pRefTmp[(j+iScrollMv)*iStride+i];
-      }
-      else{
+      } else {
         for (int32_t i=0;i<iWidth;i++)
           pSrcTmp[i] = rand()%256;
       }
