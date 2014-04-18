@@ -13,6 +13,7 @@ BUILDTYPE=Release
 V=Yes
 PREFIX=/usr/local
 SHARED=-shared
+
 OBJ=o
 
 ifeq (,$(wildcard ./gtest))
