@@ -51,11 +51,36 @@ struct tagUnaligned_16 {
 #define LD16(a) (((struct tagUnaligned_16 *) (a))->l)
 #define LD32(a) (((struct tagUnaligned_32 *) (a))->l)
 #define LD64(a) (((struct tagUnaligned_64 *) (a))->l)
+
+#define STRUCTA(size, align) struct tagUnaligned_##size##_##align {\
+    uint##size##_t l; \
+} __attribute__ ((aligned(align)))
+STRUCTA(16,2);
+STRUCTA(32,2);
+STRUCTA(32,4);
+STRUCTA(64,2);
+STRUCTA(64,4);
+STRUCTA(64,8);
 //#define _USE_STRUCT_INT_CVT
 //	#ifdef _USE_STRUCT_INT_CVT
 #define ST16(a, b) (((struct tagUnaligned_16 *) (a))->l) = (b)
 #define ST32(a, b) (((struct tagUnaligned_32 *) (a))->l) = (b)
 #define ST64(a, b) (((struct tagUnaligned_64 *) (a))->l) = (b)
+
+#define LDA(a, size, align) (((struct tagUnaligned_##size##_##align *) (a))->l)
+#define STA(a, b, size, align) (((struct tagUnaligned_##size##_##align *) (a))->l) = (b)
+#define LD16A2(a) LDA(a, 16, 2)
+#define LD32A2(a) LDA(a, 32, 2)
+#define LD32A4(a) LDA(a, 32, 4)
+#define LD64A2(a) LDA(a, 64, 2)
+#define LD64A4(a) LDA(a, 64, 4)
+#define LD64A8(a) LDA(a, 64, 8)
+#define ST16A2(a, b) STA(a, b, 16, 2)
+#define ST32A2(a, b) STA(a, b, 32, 2)
+#define ST32A4(a, b) STA(a, b, 32, 4)
+#define ST64A2(a, b) STA(a, b, 64, 2)
+#define ST64A4(a, b) STA(a, b, 64, 4)
+#define ST64A8(a, b) STA(a, b, 64, 8)
 //	#else
 //		inline void __ST16(void *dst, uint16_t v) { memcpy(dst, &v, 2); }
 //		inline void __ST32(void *dst, uint32_t v) { memcpy(dst, &v, 4); }
@@ -75,6 +100,18 @@ struct tagUnaligned_16 {
 #define ST16(a, b) *((uint16_t*)(a)) = (b)
 #define ST32(a, b) *((uint32_t*)(a)) = (b)
 #define ST64(a, b) *((uint64_t*)(a)) = (b)
+#define LD16A2 LD16
+#define LD32A2 LD32
+#define LD32A4 LD32
+#define LD64A2 LD64
+#define LD64A4 LD64
+#define LD64A8 LD64
+#define ST16A2 ST16
+#define ST32A2 ST32
+#define ST32A4 ST32
+#define ST64A2 ST64
+#define ST64A4 ST64
+#define ST64A8 ST64
 
 #endif /* !__GNUC__ */
 
