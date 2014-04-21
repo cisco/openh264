@@ -17,7 +17,6 @@ using namespace nsWelsVP;
 TEST(ScrollDetectionTest,TestScroll)
 {
   uint8_t* pSrc, *pRef;
-//  uint8_t* src_a = new uint8_t[stride_pix_a<<3];
   int32_t iWidthSets[4] = {640,1024,1280,1980};
   int32_t iHeightSets[4] = {360,768,720,1080};
   int32_t iStride = 0;
@@ -33,7 +32,8 @@ TEST(ScrollDetectionTest,TestScroll)
     ASSERT_MEMORY_FAIL2X(pSrc, pRef)
     RandomPixelDataGenerator(pRef, iWidth, iHeight, iStride, iIdx );
 
-    int32_t iScrollMv = rand()%128;
+    int32_t iMvRange = WELS_MIN(iHeight/2,512);
+    int32_t iScrollMv = rand()%(iMvRange<<1) - iMvRange;
     uint8_t* pSrcTmp = pSrc;
     uint8_t* pRefTmp = pRef;
 
