@@ -193,7 +193,7 @@ bool CheckDirectionalMvFalse(PSampleSadSatdCostFunc pSad, void * vpMe,
                       int32_t& iBestSadCost);
 
 // Cross Search Basics
-void LineFullSearch_c(   void *pFunc, void *vpMe,
+void LineFullSearch_c(  void *pFunc, void *vpMe,
                         uint16_t* pMvdTable, const int32_t kiFixedMvd,
                         const int32_t kiEncStride, const int32_t kiRefStride,
                         const int32_t kiMinPos, const int32_t kiMaxPos,
@@ -219,9 +219,12 @@ void HorizontalFullSearchUsingSSE41( void *pFunc, void *vpMe,
 void WelsMotionCrossSearch(SWelsFuncPtrList *pFuncList,  SDqLayer* pCurLayer, SWelsME * pMe, const SSlice* pSlice);
 
 // Feature Search Basics
-#define LIST_SIZE_SUM_16x16  0x0FF01    //(256*255+1)
-#define LIST_SIZE_SUM_8x8      0x03FC1    //(64*255+1)
-#define LIST_SIZE_MSE_16x16  0x00878    //(avg+mse)/2, max= (255+16*255)/2
+#define LIST_SIZE_SUM_16x16 0x0FF01  //(256*255+1)
+#define LIST_SIZE_SUM_8x8     0x03FC1  //(64*255+1)
+#define LIST_SIZE_MSE_16x16 0x00878  //(avg+mse)/2, max= (255+16*255)/2
+
+#define FME_DEFAULT_FEATURE_INDEX (0)
+#define FMESWITCH_DEFAULT_GOODFRAME_NUM (2)
 #define FMESWITCH_MBSAD_THRESHOLD   30 // empirically set.
 
 int32_t SumOf8x8SingleBlock_c(uint8_t* pRef, const int32_t kiRefStride);
@@ -236,10 +239,15 @@ int32_t ReleaseScreenBlockFeatureStorage( CMemoryAlign *pMa, SScreenBlockFeature
 int32_t RequestFeatureSearchPreparation( CMemoryAlign *pMa, const int32_t kiFrameWidth,  const int32_t kiFrameHeight, const int32_t iNeedFeatureStorage,
                                          SFeatureSearchPreparation* pFeatureSearchPreparation);
 int32_t ReleaseFeatureSearchPreparation( CMemoryAlign *pMa, uint16_t*& pFeatureOfBlock);
-#define FME_DEFAULT_GOOD_FRAME_NUM (2)
+
+#define FMESWITCH_DEFAULT_GOODFRAME_NUM (2)
 #define FME_DEFAULT_FEATURE_INDEX (0)
 void PerformFMEPreprocess( SWelsFuncPtrList *pFunc, SPicture* pRef,
                           SScreenBlockFeatureStorage* pScreenBlockFeatureStorage);
+
+void UpdateFMESwitch(SDqLayer* pCurLayer);
+void UpdateFMESwitchNull(SDqLayer* pCurLayer);
+
 //inline functions
 inline void SetMvWithinIntegerMvRange( const int32_t kiMbWidth, const int32_t kiMbHeight, const int32_t kiMbX, const int32_t kiMbY,
                         const int32_t kiMaxMvRange,
@@ -262,7 +270,8 @@ inline bool CheckMvInRange( const SMVUnitXY ksCurrentMv, const SMVUnitXY ksMinMv
 }
 //FME switch related
 inline bool CalcFMESwitchFlag(const uint8_t uiFMEGoodFrameCount, const int32_t iHighFreMbPrecentage,
-       const int32_t iAvgMbSAD, const bool bScrollingDetected ) {
+       const int32_t iAvgMbSAD, const bool bScrollingDetected )
+{
   return ( bScrollingDetected ||( uiFMEGoodFrameCount>0 && iAvgMbSAD > FMESWITCH_MBSAD_THRESHOLD ) );
   //TODO: add the logic of iHighFreMbPrecentage
   //return ( iHighFreMbPrecentage > 2

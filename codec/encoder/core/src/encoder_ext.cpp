@@ -2468,6 +2468,7 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
         if (pFeatureSearchPreparation->bFMESwitchFlag
           && !pScreenBlockFeatureStorage->bRefBlockFeatureCalculated) {
             pScreenBlockFeatureStorage->pFeatureOfBlockPointer = pFeatureSearchPreparation->pFeatureOfBlock;
+            //TODO: use ORIGIN of reference when preprocessing is ready
             PerformFMEPreprocess( pFuncList, pCurLayer->pRefPic, pScreenBlockFeatureStorage );
         }
 
@@ -2475,10 +2476,17 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
         if (pScreenBlockFeatureStorage->bRefBlockFeatureCalculated) {
           //TBC int32_t iIs16x16 = pScreenBlockFeatureStorage->iIs16x16;
         }
+
+        //assign UpdateFMESwitch pointer
+        if (pFeatureSearchPreparation->bFMESwitchFlag) {
+          pFuncList->pfUpdateFMESwitch = UpdateFMESwitch;
+        } else {
+          pFuncList->pfUpdateFMESwitch = UpdateFMESwitchNull;
+        }
       } else {
         //reset some status when at I_SLICE
         pFeatureSearchPreparation->bFMESwitchFlag = true;
-        pFeatureSearchPreparation->uiFMEGoodFrameCount = FME_DEFAULT_GOOD_FRAME_NUM;
+        pFeatureSearchPreparation->uiFMEGoodFrameCount = FMESWITCH_DEFAULT_GOODFRAME_NUM;
       }
     }
   }
