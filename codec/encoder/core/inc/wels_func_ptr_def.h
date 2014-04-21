@@ -150,6 +150,7 @@ typedef void (*PLineFullSearchFunc) (	void *pFunc, void *vpMe,
 typedef void (*PCalculateBlockFeatureOfFrame)(uint8_t *pRef, const int32_t kiWidth, const int32_t kiHeight, const int32_t kiRefStride,
                                               uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
 typedef int32_t (*PCalculateSingleBlockFeature)(uint8_t *pRef, const int32_t kiRefStride);
+typedef void (*PUpdateFMESwitch)(SDqLayer* pCurLayer);
 
 #define     MAX_BLOCK_TYPE 5 // prev 7
 typedef struct TagSampleDealingFunc {
@@ -209,10 +210,12 @@ struct TagWelsFuncPointerList {
   PSearchMethodFunc pfSearchMethod[BLOCK_SIZE_ALL];
   PCalculateSatdFunc pfCalculateSatd;
   PCheckDirectionalMv pfCheckDirectionalMv;
+
   PCalculateBlockFeatureOfFrame pfCalculateBlockFeatureOfFrame[2];//0 - for 8x8, 1 for 16x16
   PCalculateSingleBlockFeature pfCalculateSingleBlockFeature[2];//0 - for 8x8, 1 for 16x16
   PLineFullSearchFunc pfVerticalFullSearch;
   PLineFullSearchFunc pfHorizontalFullSearch;
+  PUpdateFMESwitch pfUpdateFMESwitch;
 
   PCopyFunc      pfCopy16x16Aligned;    //svc_encode_slice.c svc_mode_decision.c svc_base_layer_md.c
   PCopyFunc      pfCopy16x16NotAligned;  //md.c
