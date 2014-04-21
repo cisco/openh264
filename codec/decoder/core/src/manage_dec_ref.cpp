@@ -333,15 +333,15 @@ static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType,
     if (iLongTermFrameIdx > pRefPic->iMaxLongTermFrameIdx) {
       return ERR_INFO_INVALID_MMCO_LONG_TERM_IDX_EXCEED_MAX;
     }
+    WelsDelLongFromListSetUnref (pRefPic, iLongTermFrameIdx);
+    if (pRefPic->uiLongRefCount[LIST_0] + pRefPic->uiShortRefCount[LIST_0] >= WELS_MAX(1,pCtx->pSps->iNumRefFrames)) {
+      return ERR_INFO_INVALID_MMCO_REF_NUM_OVERFLOW;
+    }
 #ifdef LONG_TERM_REF
     pCtx->bCurAuContainLtrMarkSeFlag = true;
     pCtx->iFrameNumOfAuMarkedLtr      = pCtx->iFrameNum;
     WelsLog (pCtx, WELS_LOG_INFO, "ex_mark_avc():::MMCO_LONG:::LTR marking....iFrameNum: %d\n", pCtx->iFrameNum);
 #endif
-    WelsDelLongFromListSetUnref (pRefPic, iLongTermFrameIdx);
-    if (pRefPic->uiLongRefCount[LIST_0] + pRefPic->uiShortRefCount[LIST_0] >= WELS_MAX(1,pCtx->pSps->iNumRefFrames)) {
-      return ERR_INFO_INVALID_MMCO_REF_NUM_OVERFLOW;
-    }
     iRet = AddLongTermToList (pRefPic, pCtx->pDec, iLongTermFrameIdx);
     break;
   default :
