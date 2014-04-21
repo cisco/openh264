@@ -471,8 +471,8 @@ int CWelsH264SVCEncoder::EncodeFrameInternal(const SSourcePicture*  pSrcPic, SFr
         m_pFileBsSize = NULL;
       }
       char strStreamFileName[128] = {0};
-      int32_t iLen = WelsSnprintf (strStreamFileName, 128, "adj%d_w%d.264", m_iSwitchTimes,
-                                   m_pEncContext->pSvcParam->iPicWidth);
+      WelsSnprintf (strStreamFileName, 128, "adj%d_w%d.264", m_iSwitchTimes,
+                    m_pEncContext->pSvcParam->iPicWidth);
       m_pFileBs = WelsFopen (strStreamFileName, "wb");
       WelsSnprintf (strStreamFileName, 128, "adj%d_w%d_size.iLen", m_iSwitchTimes,
                     m_pEncContext->pSvcParam->iPicWidth);
