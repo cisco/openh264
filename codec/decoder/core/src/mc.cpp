@@ -94,7 +94,7 @@ static inline void McCopyWidthEq2_c (const uint8_t* pSrc, int32_t iSrcStride, ui
                                        int32_t iHeight) {
   int32_t i;
   for (i = 0; i < iHeight; i++) { // iWidth == 2 only for chroma
-    ST16 (pDst, LD16 (pSrc));
+    ST16A2 (pDst, LD16 (pSrc));
     pDst += iDstStride;
     pSrc += iSrcStride;
   }
@@ -104,7 +104,7 @@ static inline void McCopyWidthEq4_c (const uint8_t* pSrc, int32_t iSrcStride, ui
                                        int32_t iHeight) {
   int32_t i;
   for (i = 0; i < iHeight; i++) {
-    ST32 (pDst, LD32 (pSrc));
+    ST32A4 (pDst, LD32 (pSrc));
     pDst += iDstStride;
     pSrc += iSrcStride;
   }
@@ -114,7 +114,7 @@ static inline void McCopyWidthEq8_c (const uint8_t* pSrc, int32_t iSrcStride, ui
                                        int32_t iHeight) {
   int32_t i;
   for (i = 0; i < iHeight; i++) {
-    ST64 (pDst, LD64 (pSrc));
+    ST64A8 (pDst, LD64 (pSrc));
     pDst += iDstStride;
     pSrc += iSrcStride;
   }
@@ -124,8 +124,8 @@ static inline void McCopyWidthEq16_c (const uint8_t* pSrc, int32_t iSrcStride, u
                                         int32_t iHeight) {
   int32_t i;
   for (i = 0; i < iHeight; i++) {
-    ST64 (pDst  , LD64 (pSrc));
-    ST64 (pDst + 8, LD64 (pSrc + 8));
+    ST64A8 (pDst  , LD64 (pSrc));
+    ST64A8 (pDst + 8, LD64 (pSrc + 8));
     pDst += iDstStride;
     pSrc += iSrcStride;
   }
@@ -202,7 +202,7 @@ static inline void McHorVer02_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_
 
 static inline void McHorVer22_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
                                    int32_t iHeight) {
-  int16_t iTmp[16 + 5] = {0}; //16
+  int16_t iTmp[16 + 5]; //16
   int32_t i, j, k;
 
   for (i = 0; i < iHeight; i++) {
