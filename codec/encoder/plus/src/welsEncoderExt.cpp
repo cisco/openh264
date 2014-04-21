@@ -90,20 +90,16 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
   iCurUsedSize  = WelsSnprintf (strLenFileName, iBufferLeftSize, "enc_size_0x%p_", (void*)this);
 
 
-  if (iCurUsed > 0) {
-    iBufferUsed += iCurUsed;
-    iBufferLeft -= iCurUsed;
-  }
+  iBufferUsed += iCurUsed;
+  iBufferLeft -= iCurUsed;
   if (iBufferLeft > 0) {
     iCurUsed = WelsStrftime (&strStreamFileName[iBufferUsed], iBufferLeft, "%y%m%d%H%M%S", &tTime);
     iBufferUsed += iCurUsed;
     iBufferLeft -= iCurUsed;
   }
 
-  if (iCurUsedSize > 0) {
-    iBufferUsedSize += iCurUsedSize;
-    iBufferLeftSize -= iCurUsedSize;
-  }
+  iBufferUsedSize += iCurUsedSize;
+  iBufferLeftSize -= iCurUsedSize;
   if (iBufferLeftSize > 0) {
     iCurUsedSize = WelsStrftime (&strLenFileName[iBufferUsedSize], iBufferLeftSize, "%y%m%d%H%M%S", &tTime);
     iBufferUsedSize += iCurUsedSize;
@@ -113,19 +109,15 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
   if (iBufferLeft > 0) {
     iCurUsed = WelsSnprintf (&strStreamFileName[iBufferUsed], iBufferLeft, ".%03.3u.264",
                              WelsGetMillisecond(&tTime));
-    if (iCurUsed > 0) {
-      iBufferUsed += iCurUsed;
-      iBufferLeft -= iCurUsed;
-    }
+    iBufferUsed += iCurUsed;
+    iBufferLeft -= iCurUsed;
   }
 
   if (iBufferLeftSize > 0) {
     iCurUsedSize = WelsSnprintf (&strLenFileName[iBufferUsedSize], iBufferLeftSize, ".%03.3u.len",
                                  WelsGetMillisecond(&tTime));
-    if (iCurUsedSize > 0) {
-      iBufferUsedSize += iCurUsedSize;
-      iBufferLeftSize -= iCurUsedSize;
-    }
+    iBufferUsedSize += iCurUsedSize;
+    iBufferLeftSize -= iCurUsedSize;
   }
 
   m_pFileBs     = WelsFopen (strStreamFileName, "wb");
