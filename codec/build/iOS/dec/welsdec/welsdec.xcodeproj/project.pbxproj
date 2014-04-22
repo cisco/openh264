@@ -551,7 +551,10 @@
 				DSTROOT = /tmp/welsdec.dst;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=arm64]" = APPLE_IOS;
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=arm64]" = (
+					APPLE_IOS,
+					HAVE_NEON_AARCH64,
+				);
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=armv7]" = (
 					APPLE_IOS,
 					HAVE_NEON,
@@ -582,7 +585,10 @@
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DSTROOT = /tmp/welsdec.dst;
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=arm64]" = APPLE_IOS;
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=arm64]" = (
+					APPLE_IOS,
+					HAVE_NEON_AARCH64,
+				);
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=armv7]" = (
 					APPLE_IOS,
 					HAVE_NEON,

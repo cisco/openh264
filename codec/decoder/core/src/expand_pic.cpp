@@ -129,6 +129,20 @@ void InitExpandPictureFunc (SExpandPicFunc* pExpandPicFunc, const uint32_t kuiCp
     pExpandPicFunc->pExpandChromaPicture[1] = ExpandPictureChromaAlign_sse2;
   }
 #endif//X86_ASM
+#if defined(HAVE_NEON)
+  if ((kuiCpuFlags & WELS_CPU_NEON) == WELS_CPU_NEON) {
+    pExpandPicFunc->pExpandLumaPicture	   = ExpandPictureLuma_neon;
+    pExpandPicFunc->pExpandChromaPicture[0] = ExpandPictureChroma_neon;
+    pExpandPicFunc->pExpandChromaPicture[1] = ExpandPictureChroma_neon;
+  }
+#endif//HAVE_NEON
+#if defined(HAVE_NEON_AARCH64)
+  if ((kuiCpuFlags & WELS_CPU_NEON) == WELS_CPU_NEON) {
+    pExpandPicFunc->pExpandLumaPicture	   = ExpandPictureLuma_AArch64_neon;
+    pExpandPicFunc->pExpandChromaPicture[0] = ExpandPictureChroma_AArch64_neon;
+    pExpandPicFunc->pExpandChromaPicture[1] = ExpandPictureChroma_AArch64_neon;
+  }
+#endif//HAVE_NEON_AARCH64
 }
 
 void ExpandReferencingPicture (PPicture pPic, PExpandPictureFunc pExpLuma, PExpandPictureFunc pExpChroma[2]) {

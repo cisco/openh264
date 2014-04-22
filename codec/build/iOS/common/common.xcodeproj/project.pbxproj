@@ -25,6 +25,8 @@
 		4CE443F318B722CD0017DF25 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4CE443F118B722CD0017DF25 /* InfoPlist.strings */; };
 		4CE443F518B722CD0017DF25 /* commonTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CE443F418B722CD0017DF25 /* commonTests.m */; };
 		F0B204F918FD23BF005DA23F /* copy_mb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F0B204F818FD23BF005DA23F /* copy_mb.cpp */; };
+		F556A8241906673900E156A8 /* arm_arch64_common_macro.S in Sources */ = {isa = PBXBuildFile; fileRef = F556A8221906673900E156A8 /* arm_arch64_common_macro.S */; };
+		F556A8251906673900E156A8 /* expand_picture_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F556A8231906673900E156A8 /* expand_picture_aarch64_neon.S */; };
 		FAABAA1818E9354A00D4186F /* sad_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAABAA1718E9354A00D4186F /* sad_common.cpp */; };
 /* End PBXBuildFile section */
 
@@ -83,6 +85,8 @@
 		4CE443F418B722CD0017DF25 /* commonTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = commonTests.m; sourceTree = "<group>"; };
 		F0B204F718FD23B6005DA23F /* copy_mb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = copy_mb.h; sourceTree = "<group>"; };
 		F0B204F818FD23BF005DA23F /* copy_mb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = copy_mb.cpp; sourceTree = "<group>"; };
+		F556A8221906673900E156A8 /* arm_arch64_common_macro.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = arm_arch64_common_macro.S; path = arm64/arm_arch64_common_macro.S; sourceTree = "<group>"; };
+		F556A8231906673900E156A8 /* expand_picture_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = expand_picture_aarch64_neon.S; path = arm64/expand_picture_aarch64_neon.S; sourceTree = "<group>"; };
 		FAABAA1618E9353F00D4186F /* sad_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sad_common.h; sourceTree = "<group>"; };
 		FAABAA1718E9354A00D4186F /* sad_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sad_common.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -207,12 +211,22 @@
 		4CE4472F18BC61650017DF25 /* common */ = {
 			isa = PBXGroup;
 			children = (
+				F556A81D1906669F00E156A8 /* arm64 */,
 				4C3406B118D96EA600DFA14A /* arm */,
 				4C3406B618D96EA600DFA14A /* inc */,
 				4C3406C318D96EA600DFA14A /* src */,
 			);
 			name = common;
 			path = ../../../common;
+			sourceTree = "<group>";
+		};
+		F556A81D1906669F00E156A8 /* arm64 */ = {
+			isa = PBXGroup;
+			children = (
+				F556A8221906673900E156A8 /* arm_arch64_common_macro.S */,
+				F556A8231906673900E156A8 /* expand_picture_aarch64_neon.S */,
+			);
+			name = arm64;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -297,6 +311,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4C3406C918D96EA600DFA14A /* arm_arch_common_macro.S in Sources */,
+				F556A8241906673900E156A8 /* arm_arch64_common_macro.S in Sources */,
 				4C3406CE18D96EA600DFA14A /* crt_util_safe_x.cpp in Sources */,
 				4C3406CF18D96EA600DFA14A /* deblocking_common.cpp in Sources */,
 				4C3406D018D96EA600DFA14A /* logging.cpp in Sources */,
@@ -305,6 +320,7 @@
 				4C3406CB18D96EA600DFA14A /* expand_picture_neon.S in Sources */,
 				4CC61F0918FF6B4B00E56EAB /* copy_mb_neon.S in Sources */,
 				4C3406CD18D96EA600DFA14A /* cpu.cpp in Sources */,
+				F556A8251906673900E156A8 /* expand_picture_aarch64_neon.S in Sources */,
 				4C3406CA18D96EA600DFA14A /* deblocking_neon.S in Sources */,
 				F0B204F918FD23BF005DA23F /* copy_mb.cpp in Sources */,
 				FAABAA1818E9354A00D4186F /* sad_common.cpp in Sources */,
@@ -422,7 +438,10 @@
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=arm64]" = APPLE_IOS;
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=arm64]" = (
+					APPLE_IOS,
+					HAVE_NEON_AARCH64,
+				);
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=armv7]" = (
 					APPLE_IOS,
 					HAVE_NEON,
@@ -449,7 +468,10 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DSTROOT = /tmp/common.dst;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=arm64]" = APPLE_IOS;
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=arm64]" = (
+					APPLE_IOS,
+					HAVE_NEON_AARCH64,
+				);
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphoneos*][arch=armv7]" = (
 					APPLE_IOS,
 					HAVE_NEON,
