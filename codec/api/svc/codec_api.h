@@ -90,6 +90,7 @@ class ISVCEncoder {
    */
   virtual int EXTAPI SetOption (ENCODER_OPTION eOptionId, void* pOption) = 0;
   virtual int EXTAPI GetOption (ENCODER_OPTION eOptionId, void* pOption) = 0;
+  virtual ~ISVCEncoder() {}
 };
 
 class ISVCDecoder {
@@ -128,6 +129,7 @@ class ISVCDecoder {
    *************************************************************************/
   virtual long EXTAPI SetOption (DECODER_OPTION eOptionId, void* pOption) = 0;
   virtual long EXTAPI GetOption (DECODER_OPTION eOptionId, void* pOption) = 0;
+  virtual ~ISVCDecoder() {}
 };
 
 
