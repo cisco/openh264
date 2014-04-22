@@ -70,7 +70,8 @@ ENCODER_INCLUDES = \
 
 PROCESSING_INCLUDES = \
     -Icodec/processing/interface \
-    -Icodec/processing/src/common
+    -Icodec/processing/src/common \
+    -Icodec/processing/src/scrolldetection
 
 GTEST_INCLUDES += \
     -Igtest \
@@ -92,6 +93,7 @@ CODEC_UNITTEST_LDFLAGS = -L. $(call LINK_LIB,gtest) $(call LINK_LIB,decoder) $(c
 CODEC_UNITTEST_DEPS = $(LIBPREFIX)gtest.$(LIBSUFFIX) $(LIBPREFIX)decoder.$(LIBSUFFIX) $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX)
 DECODER_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(DECODER_INCLUDES) -Itest -Itest/decoder
 ENCODER_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(ENCODER_INCLUDES) -Itest -Itest/encoder
+PROCESSING_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(PROCESSING_INCLUDES) -Itest -Itest/processing
 API_TEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) -Itest -Itest/api
 .PHONY: test gtest-bootstrap clean
 
@@ -158,9 +160,10 @@ include build/gtest-targets.mk
 include test/api/targets.mk
 include test/decoder/targets.mk
 include test/encoder/targets.mk
+include test/processing/targets.mk
 binaries: codec_unittest$(EXEEXT)
 BINARIES += codec_unittest$(EXEEXT)
-codec_unittest$(EXEEXT): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(API_TEST_OBJS) $(CODEC_UNITTEST_DEPS)
+codec_unittest$(EXEEXT): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(PROCESSING_UNITTEST_OBJS) $(API_TEST_OBJS) $(CODEC_UNITTEST_DEPS)
 	$(QUIET)rm -f $@
 	$(QUIET_CXX)$(CXX) $(CXX_LINK_O) $+ $(CODEC_UNITTEST_LDFLAGS) $(LDFLAGS)
 endif
