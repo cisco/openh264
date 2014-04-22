@@ -1856,7 +1856,9 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
             HandleReferenceLost (pCtx, pNalCur);
             WelsLog (pCtx, WELS_LOG_WARNING, "reference picture introduced by this frame is lost during transmission! uiTId: %d\n",
                      pNalCur->sNalHeaderExt.uiTemporalId);
-            return iRet;
+            if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
+              return iRet;
+            }
           }
         }
 
@@ -1867,7 +1869,9 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
           WelsLog (pCtx, WELS_LOG_WARNING, "DecodeCurrentAccessUnit() failed (%d) in frame: %d uiDId: %d uiQId: %d\n",
                    iRet, pSh->iFrameNum, iCurrIdD, iCurrIdQ);
           HandleReferenceLostL0 (pCtx, pNalCur);
-          return iRet;
+          if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
+            return iRet;
+          }
         }
         if (bReconstructSlice)	{
           if (WelsDecodeConstructSlice (pCtx, pNalCur)) {
@@ -1923,8 +1927,10 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
       if (uiNalRefIdc > 0) {
         iRet = WelsMarkAsRef (pCtx);
         if (iRet != ERR_NONE) {
-          pCtx->pDec = NULL;
-          return iRet;
+          if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
+            pCtx->pDec = NULL;
+            return iRet;
+          }
         }
         ExpandReferencingPicture (pCtx->pDec, pCtx->sExpandPicFunc.pExpandLumaPicture,
                                   pCtx->sExpandPicFunc.pExpandChromaPicture);
