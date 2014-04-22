@@ -1497,11 +1497,11 @@ static bool CheckNewSeqBeginAndUpdateActiveLayerSps(PWelsDecoderContext pCtx) {
     pTmpLayerSps[i] = NULL;
   }
   // track the layer sps for the current au
-  for(int i = pCurAu->uiStartPos; i <= pCurAu->uiEndPos; i++) {
+  for(unsigned int i = pCurAu->uiStartPos; i <= pCurAu->uiEndPos; i++) {
     uint32_t uiDid = pCurAu->pNalUnitsList[i]->sNalHeaderExt.uiDependencyId;
     pTmpLayerSps[uiDid] = pCurAu->pNalUnitsList[i]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
   }
-  int iMaxActiveLayer, iMaxCurrentLayer;
+  int iMaxActiveLayer = 0, iMaxCurrentLayer = 0;
   for(int i = MAX_LAYER_NUM - 1; i >= 0; i--) {
     if (pCtx->pActiveLayerSps[i] != NULL) {
       iMaxActiveLayer = i;
