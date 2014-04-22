@@ -144,26 +144,20 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const char* kpFmtStr, va
 
       WelsGetTimeOfDay(&tTime);
       iCurUsed = WelsSnprintf (&pBuf[iBufUsed], iBufLeft, "[0x%p @ ", pEncCtx);	// confirmed_safe_unsafe_usage
-      if (iCurUsed >= 0) {
-        iBufUsed += iCurUsed;
-        iBufLeft -= iCurUsed;
-      }
+      iBufUsed += iCurUsed;
+      iBufLeft -= iCurUsed;
 
       if (iBufLeft > 0) {
         iCurUsed = GetCodeName (&pBuf[iBufUsed], iBufLeft);
-        if (iCurUsed > 0) {
-          iBufUsed += iCurUsed;
-          iBufLeft -= iCurUsed;
-        }
+        iBufUsed += iCurUsed;
+        iBufLeft -= iCurUsed;
         pBuf[iBufUsed] = ' ';
         ++ iBufUsed;
         -- iBufLeft;
 
         iCurUsed = GetLibName (&pBuf[iBufUsed], iBufLeft);
-        if (iCurUsed > 0) {
-          iBufUsed += iCurUsed;
-          iBufLeft -= iCurUsed;
-        }
+        iBufUsed += iCurUsed;
+        iBufLeft -= iCurUsed;
         pBuf[iBufUsed] = ' ';
         ++ iBufUsed;
         -- iBufLeft;
@@ -172,10 +166,8 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const char* kpFmtStr, va
         ++ iBufUsed;
         -- iBufLeft;
         iCurUsed = GetVerNum (&pBuf[iBufUsed], iBufLeft);
-        if (iCurUsed > 0) {
-          iBufUsed += iCurUsed;
-          iBufLeft -= iCurUsed;
-        }
+        iBufUsed += iCurUsed;
+        iBufLeft -= iCurUsed;
         pBuf[iBufUsed] = ' ';
         ++ iBufUsed;
         -- iBufLeft;
@@ -183,20 +175,16 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const char* kpFmtStr, va
 
       if (iBufLeft > 0) {
         iCurUsed = WelsStrftime (&pBuf[iBufUsed], iBufLeft, "%y-%m-%d %H:%M:%S", &tTime);
-        if (iCurUsed > 0) {
-          iBufUsed += iCurUsed;
-          iBufLeft -= iCurUsed;
-        }
+        iBufUsed += iCurUsed;
+        iBufLeft -= iCurUsed;
       } else {
         return;
       }
 
       if (iBufLeft > 0) {
         iCurUsed = WelsSnprintf (&pBuf[iBufUsed], iBufLeft, ".%3.3u]: ", tTime.millitm);	// confirmed_safe_unsafe_usage
-        if (iCurUsed >= 0) {
-          iBufUsed += iCurUsed;
-          iBufLeft -= iCurUsed;
-        }
+        iBufUsed += iCurUsed;
+        iBufLeft -= iCurUsed;
       } else {
         return;
       }
@@ -209,18 +197,14 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const char* kpFmtStr, va
       pStr	= GetLogTag (kiLevel, &i_shift);
       if (NULL != pStr) {
         iCurUsed = WelsSnprintf (&pBuf[iBufUsed], iBufLeft, "%s ", pStr);
-        if (iCurUsed >= 0) {
-          iBufUsed += iCurUsed;
-          iBufLeft -= iCurUsed;
-        }
+        iBufUsed += iCurUsed;
+        iBufLeft -= iCurUsed;
       }
     }
     if (iBufLeft > 0) {
       iCurUsed = WelsVsnprintf (&pBuf[iBufUsed], iBufLeft, kpFmtStr, argv);	// confirmed_safe_unsafe_usage
-      if (iCurUsed > 0) {
-        iBufUsed += iCurUsed;
-        iBufLeft -= iCurUsed;
-      }
+      iBufUsed += iCurUsed;
+      iBufLeft -= iCurUsed;
     }
 #ifdef ENABLE_TRACE_FILE
     if (NULL != pEncCtx && NULL != pEncCtx->pFileLog) {

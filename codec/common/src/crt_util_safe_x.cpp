@@ -68,6 +68,8 @@ int32_t WelsSnprintf (char* pBuffer,  int32_t iSizeOfBuffer, const char* kpForma
   va_start (pArgPtr, kpFormat);
 
   iRc = vsnprintf_s (pBuffer, iSizeOfBuffer, _TRUNCATE, kpFormat, pArgPtr);
+  if (iRc < 0)
+    iRc = iSizeOfBuffer;
 
   va_end (pArgPtr);
 
@@ -81,7 +83,10 @@ char* WelsStrncpy (char* pDest, int32_t iSizeInBytes, const char* kpSrc) {
 }
 
 int32_t WelsVsnprintf (char* pBuffer, int32_t iSizeOfBuffer, const char* kpFormat, va_list pArgPtr) {
-  return vsnprintf_s (pBuffer, iSizeOfBuffer, _TRUNCATE, kpFormat, pArgPtr);
+  int32_t iRc = vsnprintf_s (pBuffer, iSizeOfBuffer, _TRUNCATE, kpFormat, pArgPtr);
+  if (iRc < 0)
+    iRc = iSizeOfBuffer;
+  return iRc;
 }
 
 WelsFileHandle* WelsFopen (const char* kpFilename,  const char* kpMode) {
@@ -122,8 +127,10 @@ int32_t WelsSnprintf (char* pBuffer,  int32_t iSizeOfBuffer, const char* kpForma
   va_start (pArgPtr, kpFormat);
 
   iRc = vsnprintf (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
-  if (iRc < 0)
+  if (iRc < 0) {
     pBuffer[iSizeOfBuffer - 1] = '\0';
+    iRc = iSizeOfBuffer;
+  }
 
   va_end (pArgPtr);
 
@@ -139,8 +146,10 @@ char* WelsStrncpy (char* pDest, int32_t iSizeInBytes, const char* kpSrc) {
 
 int32_t WelsVsnprintf (char* pBuffer, int32_t iSizeOfBuffer, const char* kpFormat, va_list pArgPtr) {
   int32_t iRc = vsnprintf (pBuffer, iSizeOfBuffer, kpFormat, pArgPtr); //confirmed_safe_unsafe_usage
-  if (iRc < 0)
+  if (iRc < 0) {
     pBuffer[iSizeOfBuffer - 1] = '\0';
+    iRc = iSizeOfBuffer;
+  }
   return iRc;
 }
 
