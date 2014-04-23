@@ -39,7 +39,7 @@ _$0:
 .endm
 
 .macro WELS_ASM_ARCH64_FUNC_END
-ret lr
+ret
 .endm
 #else
 
@@ -55,7 +55,7 @@ ret lr
 .endm
 
 .macro WELS_ASM_ARCH64_FUNC_END
-ret lr
+ret
 .endfunc
 .endm
 #endif
