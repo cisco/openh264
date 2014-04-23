@@ -142,11 +142,11 @@ if len(asm) > 0:
 
 if len(sfiles) > 0:
     f.write("ifeq ($(ASM_ARCH), arm)\n")
-    f.write("%s_ASM_S_SRCS=\\\n"%(PREFIX))
+    f.write("%s_ASM_ARM_SRCS=\\\n"%(PREFIX))
     for c in sfiles:
         f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
     f.write("\n")
-    f.write("%s_OBJS += $(%s_ASM_S_SRCS:.S=.$(OBJ))\n"%(PREFIX, PREFIX))
+    f.write("%s_OBJS += $(%s_ASM_ARM_SRCS:.S=.$(OBJ))\n"%(PREFIX, PREFIX))
     f.write("endif\n\n")
 
 f.write("OBJS += $(%s_OBJS)\n"%PREFIX)

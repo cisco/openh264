@@ -31,13 +31,13 @@ PROCESSING_OBJS += $(PROCESSING_ASM_SRCS:.asm=.$(OBJ))
 endif
 
 ifeq ($(ASM_ARCH), arm)
-PROCESSING_ASM_S_SRCS=\
+PROCESSING_ASM_ARM_SRCS=\
 	$(PROCESSING_SRCDIR)/src/arm/adaptive_quantization.S\
 	$(PROCESSING_SRCDIR)/src/arm/down_sample_neon.S\
 	$(PROCESSING_SRCDIR)/src/arm/pixel_sad_neon.S\
 	$(PROCESSING_SRCDIR)/src/arm/vaa_calc_neon.S\
 
-PROCESSING_OBJS += $(PROCESSING_ASM_S_SRCS:.S=.$(OBJ))
+PROCESSING_OBJS += $(PROCESSING_ASM_ARM_SRCS:.S=.$(OBJ))
 endif
 
 OBJS += $(PROCESSING_OBJS)

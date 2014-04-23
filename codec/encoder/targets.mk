@@ -50,14 +50,14 @@ ENCODER_OBJS += $(ENCODER_ASM_SRCS:.asm=.$(OBJ))
 endif
 
 ifeq ($(ASM_ARCH), arm)
-ENCODER_ASM_S_SRCS=\
+ENCODER_ASM_ARM_SRCS=\
 	$(ENCODER_SRCDIR)/core/arm/intra_pred_neon.S\
 	$(ENCODER_SRCDIR)/core/arm/intra_pred_sad_3_opt_neon.S\
 	$(ENCODER_SRCDIR)/core/arm/memory_neon.S\
 	$(ENCODER_SRCDIR)/core/arm/pixel_neon.S\
 	$(ENCODER_SRCDIR)/core/arm/reconstruct_neon.S\
 
-ENCODER_OBJS += $(ENCODER_ASM_S_SRCS:.S=.$(OBJ))
+ENCODER_OBJS += $(ENCODER_ASM_ARM_SRCS:.S=.$(OBJ))
 endif
 
 OBJS += $(ENCODER_OBJS)
