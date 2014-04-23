@@ -371,8 +371,8 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 
 .macro	UNPACK_FILTER_SINGLE_TAG_16BITS arg0, arg1, arg2, arg3, arg4, arg5
 //	{	// each 16bits; input: d_dst, d_src[0:5], para, working, working, d(low part of d_dst)
-    ext.16b \arg3, \arg1, \arg1, #14       // X[0][1][2][3][4][5]O
-    ext.16b \arg4, \arg3, \arg3, #8      // [3][4][5]OX[0][1][2]
+    ext \arg3\().16b, \arg1\().16b, \arg1\().16b, #14       // X[0][1][2][3][4][5]O
+    ext \arg4\().16b, \arg3\().16b, \arg3\().16b, #8      // [3][4][5]OX[0][1][2]
     rev64  \arg4\().8h, \arg4\().8h			// X[5][4][3][2][1][0]O
     add   \arg3\().8h, \arg3\().8h, \arg4\().8h    // each 16bits, *[50][41][32][23][14][05]*
     smull \arg3\().4s, \arg3\().4h, \arg2\().4h			// 0+1*[50]-5*[41]+20[32]
