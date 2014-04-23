@@ -35,11 +35,11 @@ DECODER_OBJS += $(DECODER_ASM_SRCS:.asm=.$(OBJ))
 endif
 
 ifeq ($(ASM_ARCH), arm)
-DECODER_ASM_S_SRCS=\
+DECODER_ASM_ARM_SRCS=\
 	$(DECODER_SRCDIR)/core/arm/block_add_neon.S\
 	$(DECODER_SRCDIR)/core/arm/intra_pred_neon.S\
 
-DECODER_OBJS += $(DECODER_ASM_S_SRCS:.S=.$(OBJ))
+DECODER_OBJS += $(DECODER_ASM_ARM_SRCS:.S=.$(OBJ))
 endif
 
 OBJS += $(DECODER_OBJS)

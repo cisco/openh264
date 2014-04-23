@@ -25,13 +25,21 @@ COMMON_OBJS += $(COMMON_ASM_SRCS:.asm=.$(OBJ))
 endif
 
 ifeq ($(ASM_ARCH), arm)
-COMMON_ASM_S_SRCS=\
+COMMON_ASM_ARM_SRCS=\
 	$(COMMON_SRCDIR)/arm/copy_mb_neon.S\
 	$(COMMON_SRCDIR)/arm/deblocking_neon.S\
 	$(COMMON_SRCDIR)/arm/expand_picture_neon.S\
 	$(COMMON_SRCDIR)/arm/mc_neon.S\
 
-COMMON_OBJS += $(COMMON_ASM_S_SRCS:.S=.$(OBJ))
+COMMON_OBJS += $(COMMON_ASM_ARM_SRCS:.S=.$(OBJ))
+endif
+
+ifeq ($(ASM_ARCH), arm64)
+COMMON_ASM_ARM64_SRCS=\
+	$(COMMON_SRCDIR)/arm64/expand_picture_aarch64_neon.S\
+	$(COMMON_SRCDIR)/arm64/mc_aarch64_neon.S\
+
+COMMON_OBJS += $(COMMON_ASM_ARM64_SRCS:.S=.$(OBJ))
 endif
 
 OBJS += $(COMMON_OBJS)
