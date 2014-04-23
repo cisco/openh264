@@ -112,6 +112,14 @@ cpp = sorted(cpp, key=lambda s: s.lower())
 asm = sorted(asm, key=lambda s: s.lower())
 cfiles = sorted(cfiles, key=lambda s: s.lower())
 sfiles = sorted(sfiles, key=lambda s: s.lower())
+armfiles = []
+arm64files = []
+for file in sfiles:
+    c = file.split('/')
+    if 'arm64' in c:
+        arm64files.append(file)
+    elif 'arm' in c:
+        armfiles.append(file)
 
 
 
@@ -140,13 +148,22 @@ if len(asm) > 0:
     f.write("%s_OBJS += $(%s_ASM_SRCS:.asm=.$(OBJ))\n"%(PREFIX, PREFIX))
     f.write("endif\n\n")
 
-if len(sfiles) > 0:
+if len(armfiles) > 0:
     f.write("ifeq ($(ASM_ARCH), arm)\n")
     f.write("%s_ASM_ARM_SRCS=\\\n"%(PREFIX))
-    for c in sfiles:
+    for c in armfiles:
         f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
     f.write("\n")
     f.write("%s_OBJS += $(%s_ASM_ARM_SRCS:.S=.$(OBJ))\n"%(PREFIX, PREFIX))
+    f.write("endif\n\n")
+
+if len(arm64files) > 0:
+    f.write("ifeq ($(ASM_ARCH), arm64)\n")
+    f.write("%s_ASM_ARM64_SRCS=\\\n"%(PREFIX))
+    for c in arm64files:
+        f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
+    f.write("\n")
+    f.write("%s_OBJS += $(%s_ASM_ARM64_SRCS:.S=.$(OBJ))\n"%(PREFIX, PREFIX))
     f.write("endif\n\n")
 
 f.write("OBJS += $(%s_OBJS)\n"%PREFIX)
