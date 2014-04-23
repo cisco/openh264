@@ -38,7 +38,7 @@
 WELSVP_NAMESPACE_BEGIN
 
 EResult CScrollDetection::Process(int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap){
-  if (pRefPixMap->pPixel[0] == NULL || pSrcPixMap->pPixel[0] == NULL || 
+  if (pRefPixMap->pPixel[0] == NULL || pSrcPixMap->pPixel[0] == NULL ||
     pRefPixMap->sRect.iRectWidth != pSrcPixMap->sRect.iRectWidth || pRefPixMap->sRect.iRectHeight != pSrcPixMap->sRect.iRectHeight){
   return RET_INVALIDPARAM;
   }
