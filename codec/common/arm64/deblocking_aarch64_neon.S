@@ -212,7 +212,7 @@
     ld1      {v1.s} [3], [x6]
 
     bs_nzc_check_jump0:
-    ext.16b  v1, v1, v0, #12
+    ext      v1.16b, v1.16b, v0.16b, #12
     add      $3.16b, v0.16b, v1.16b
 
     // Arrange the input data --- LEFT
@@ -233,7 +233,7 @@ bs_nzc_check_jump1:
     zip1     v0.16b, v0.16b, v2.16b
     ins      v2.d[0], v0.d[1]
     zip1     v0.16b, v0.16b, v2.16b
-    ext.16b  v1, v1, v0, #12
+    ext      v1.16b, v1.16b, v0.16b, #12
     add      $4.16b, v0.16b, v1.16b
 .endm
 
@@ -470,7 +470,7 @@ bs_mv_check_jump1:
     ld1      {v1.s} [3], [x6]
 
 bs_nzc_check_jump0:
-    ext.16b  v1, v1, v0, #12
+    ext      v1.16b, v1.16b, v0.16b, #12
     add      \arg3\().16b, v0.16b, v1.16b
 
     // Arrange the input data --- LEFT
@@ -491,7 +491,7 @@ bs_nzc_check_jump1:
     zip1     v0.16b, v0.16b, v2.16b
     ins      v2.d[0], v0.d[1]
     zip1     v0.16b, v0.16b, v2.16b
-    ext.16b  v1, v1, v0, #12
+    ext      v1.16b, v1.16b, v0.16b, #12
     add      \arg4\().16b, v0.16b, v1.16b
 .endm
 
