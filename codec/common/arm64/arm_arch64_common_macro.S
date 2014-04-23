@@ -59,12 +59,4 @@ ret
 .endfunc
 .endm
 
-.macro mov.16b arg0, arg1
-    mov \arg0\().16b, \arg1\().16b
-.endm
-
-.macro mov.8b arg0, arg1
-    mov \arg0\().8b, \arg1\().8b
-.endm
-
 #endif

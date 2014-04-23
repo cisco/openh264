@@ -288,7 +288,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN FillQpelLocationByFeatureValue_AArch64_neon
 
 _hash_height_loop:
     mov x7, x1
-    mov.16b v2, v5 //mx_x_offset_x4
+    mov v2.16b, v5.16b //mx_x_offset_x4
 
 _hash_width_loop:
     ld1 {v0.d}[0], [x0], #8

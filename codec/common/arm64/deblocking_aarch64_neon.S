@@ -162,7 +162,7 @@
 .endm
 
 .macro DIFF_LUMA_EQ4_MASK
-    mov.16b   $3, $2
+    mov   $3.16b, $2.16b
     bsl   $3.16b, $0.16b, $1.16b
 .endm
 
@@ -420,7 +420,7 @@ bs_mv_check_jump1:
 .endm
 
 .macro DIFF_LUMA_EQ4_MASK arg0, arg1, arg2, arg3
-    mov.16b   \arg3, \arg2
+    mov   \arg3\().16b, \arg2\().16b
     bsl   \arg3\().16b, \arg0\().16b, \arg1\().16b
 .endm
 
@@ -652,10 +652,10 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaEq4V_AArch64_neon
     and     v22.16b, v22.16b, v20.16b //(iDetaP0Q0 < ((iAlpha >> 2) + 2))&&bDetaQ2Q0
     and     v20.16b, v20.16b, v18.16b //(iDetaP0Q0 < iAlpha) && bDetaP1P0 && bDetaQ1Q0&&(iDetaP0Q0 < ((iAlpha >> 2) + 2))
 
-    mov.16b v23, v21
-    mov.16b v24, v21
+    mov v23.16b, v21.16b
+    mov v24.16b, v21.16b
 
-    mov.16b v25, v0
+    mov v25.16b, v0.16b
     DIFF_LUMA_EQ4_P2P1P0_1        v0, v1, v2, v3, v4, v5, v23, v19, v17, v16
     DIFF_LUMA_EQ4_P2P1P0_2        v25, v1, v2, v3, v4, v5, v24, v19, v17, v16
     ins v0.d[1], v25.d[1]
@@ -669,9 +669,9 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaEq4V_AArch64_neon
     st1   {v17.16b}, [x3], x1
 
 
-    mov.16b v23, v22
-    mov.16b v24, v22
-    mov.16b v25, v7
+    mov v23.16b, v22.16b
+    mov v24.16b, v22.16b
+    mov v25.16b, v7.16b
     DIFF_LUMA_EQ4_P2P1P0_1        v7, v6, v5, v4, v3, v2, v23, v19, v17, v16
     DIFF_LUMA_EQ4_P2P1P0_2        v25, v6, v5, v4, v3, v2, v24, v19, v17, v16
     ins v7.d[1], v25.d[1]
@@ -728,7 +728,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaLt4H_AArch64_neon //uint8_t* pPix, int32_
     sub v18.16b, v18.16b, v6.16b // -iTc0: 0000, 1111, 2222, 3333
 
     DIFF_LUMA_LT4_P1_Q1   v0, v1, v2, v3, v17, v18, v6, v7, v19, v20 //Use Tmp v23,v24
-    mov.16b v25, v19
+    mov v25.16b, v19.16b
 
     DIFF_LUMA_LT4_P1_Q1   v5, v4, v3, v2, v17, v18, v6, v7, v21, v22 //Use Tmp v23,v24
 
@@ -749,11 +749,11 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaLt4H_AArch64_neon //uint8_t* pPix, int32_
     EXTRACT_DELTA_INTO_TWO_PART   v19, v20
     uqadd v2.16b, v2.16b, v20.16b
     uqsub v2.16b, v2.16b, v19.16b
-    mov.16b v26, v2
+    mov v26.16b, v2.16b
     uqsub v3.16b, v3.16b, v20.16b
     uqadd v3.16b, v3.16b, v19.16b
-    mov.16b v27, v3
-    mov.16b v28, v21
+    mov v27.16b, v3.16b
+    mov v28.16b, v21.16b
 
     sub   x0, x0, #2
     add   x2, x0, x1
@@ -816,37 +816,37 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaEq4H_AArch64_neon
     and     v22.16b, v22.16b, v20.16b //(iDetaP0Q0 < ((iAlpha >> 2) + 2))&&bDetaQ2Q0
     and     v20.16b, v20.16b, v18.16b //(iDetaP0Q0 < iAlpha) && bDetaP1P0 && bDetaQ1Q0&&(iDetaP0Q0 < ((iAlpha >> 2) + 2))
 
-    mov.16b v23, v21
-    mov.16b v24, v21
+    mov v23.16b, v21.16b
+    mov v24.16b, v21.16b
 
-    mov.16b v25, v0
+    mov v25.16b, v0.16b
     DIFF_LUMA_EQ4_P2P1P0_1        v0, v1, v2, v3, v4, v5, v23, v19, v17, v16
     DIFF_LUMA_EQ4_P2P1P0_2        v25, v1, v2, v3, v4, v5, v24, v19, v17, v16
     ins v0.d[1], v25.d[1]
     ins v23.d[1], v24.d[1]
     and   v21.16b, v20.16b, v21.16b
     DIFF_LUMA_EQ4_MASK    v19, v1, v21, v17
-    mov.16b v26, v17
+    mov v26.16b, v17.16b
     DIFF_LUMA_EQ4_MASK    v0, v2, v21, v17
-    mov.16b v27, v17
+    mov v27.16b, v17.16b
     DIFF_LUMA_EQ4_MASK    v23, v3, v18, v17
-    mov.16b v28, v17
+    mov v28.16b, v17.16b
 
 
-    mov.16b v23, v22
-    mov.16b v24, v22
-    mov.16b v25, v7
+    mov v23.16b, v22.16b
+    mov v24.16b, v22.16b
+    mov v25.16b, v7.16b
     DIFF_LUMA_EQ4_P2P1P0_1        v7, v6, v5, v4, v3, v2, v23, v19, v17, v16
     DIFF_LUMA_EQ4_P2P1P0_2        v25, v6, v5, v4, v3, v2, v24, v19, v17, v16
     ins v7.d[1], v25.d[1]
     ins v23.d[1], v24.d[1]
     and   v22.16b, v20.16b, v22.16b
     DIFF_LUMA_EQ4_MASK    v23, v4, v18, v17
-    mov.16b v29, v17
+    mov v29.16b, v17.16b
     DIFF_LUMA_EQ4_MASK    v7, v5, v22, v17
-    mov.16b v30, v17
+    mov v30.16b, v17.16b
     DIFF_LUMA_EQ4_MASK    v19, v6, v22, v17
-    mov.16b v31, v17
+    mov v31.16b, v17.16b
 
     STORE_LUMA_DATA_3     v26, v27, v28, v29, v30, v31, 0
     STORE_LUMA_DATA_3     v26, v27, v28, v29, v30, v31, 1
@@ -1013,7 +1013,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockChromaEq4V_AArch64_neon //uint8_t* pPixCb, ui
     DIFF_CHROMA_EQ4_P0Q0_1 v0, v1, v2, v3, v18, v19, v20, v21
     DIFF_CHROMA_EQ4_P0Q0_2 v0, v1, v2, v3, v18, v19, v20, v21
 
-    mov.16b v6, v7
+    mov v6.16b, v7.16b
     bsl v6.16b, v20.16b, v1.16b
     bsl v7.16b, v21.16b, v2.16b
 
@@ -1059,7 +1059,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockChromaEq4H_AArch64_neon //uint8_t* pPixCb, ui
     DIFF_CHROMA_EQ4_P0Q0_1 v0, v1, v2, v3, v18, v19, v20, v21
     DIFF_CHROMA_EQ4_P0Q0_2 v0, v1, v2, v3, v18, v19, v20, v21
 
-    mov.16b v6, v7
+    mov v6.16b, v7.16b
     bsl v6.16b, v20.16b, v1.16b
     bsl v7.16b, v21.16b, v2.16b
 
