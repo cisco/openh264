@@ -369,7 +369,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	UNPACK_FILTER_SINGLE_TAG_16BITS // v0, v1, v22, v23
+.macro	UNPACK_FILTER_SINGLE_TAG_16BITS arg0, arg1, arg2, arg3, arg4, arg5
 //	{	// each 16bits; input: d_dst, d_src[0:5], para, working, working, d(low part of d_dst)
     ext.16b \arg3, \arg1, \arg1, #14       // X[0][1][2][3][4][5]O
     ext.16b \arg4, \arg3, \arg3, #8      // [3][4][5]OX[0][1][2]
