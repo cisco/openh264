@@ -67,7 +67,7 @@ TEST(ScrollDetectionTest,TestScroll)
     pTest->Set(iMethodIdx, (void*)(&m_sScrollDetectionParam));
     int32_t ret = pTest->Process(iMethodIdx,&sSrcMap, &sRefMap);
     EXPECT_EQ(ret,0);
-	  pTest->Get(iMethodIdx, (void*)(&m_sScrollDetectionParam));
+    pTest->Get(iMethodIdx, (void*)(&m_sScrollDetectionParam));
 
     EXPECT_EQ(m_sScrollDetectionParam.bScrollDetectFlag,1);
     EXPECT_EQ(m_sScrollDetectionParam.iScrollMvY,iScrollMv);
