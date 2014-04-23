@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <math.h>
+#include <string.h>
 #include "typedef.h"
 #include "IWelsVP.h"
 #include "ScrollDetection.h"
@@ -40,13 +41,14 @@ TEST(ScrollDetectionTest,TestScroll)
     for (int32_t j=0;j<iHeight;j++) {
       if ((j+iScrollMv)>=0 && (j+iScrollMv)<iHeight)
         for (int32_t i=0;i<iWidth;i++) {
-          pSrcTmp[i] = pRefTmp[(j+iScrollMv)*iStride+i];
+            memcpy(pSrcTmp , &pRefTmp[(j+iScrollMv)*iStride], iWidth*sizeof(uint8_t));
       } else {
         for (int32_t i=0;i<iWidth;i++)
           pSrcTmp[i] = rand()%256;
       }
       pSrcTmp += iStride;
     }
+
 
     SPixMap sSrcMap = { { 0 } };
     SPixMap sRefMap = { { 0 } };
@@ -57,31 +59,15 @@ TEST(ScrollDetectionTest,TestScroll)
     sSrcMap.sRect.iRectWidth = sRefMap.sRect.iRectWidth = iWidth;
     sSrcMap.sRect.iRectHeight = sRefMap.sRect.iRectHeight = iHeight;
 
-    int32_t iStartX, iStartY;
-    const int32_t kiPicBorderWidth= sSrcMap.sRect.iRectHeight>>4;
-    const int32_t kiRegionWidth = (int) (sSrcMap.sRect.iRectWidth-(kiPicBorderWidth<<1))/3;
-    const int32_t kiRegionHeight = (sSrcMap.sRect.iRectHeight*7)>>3;
-    const int32_t kiHieghtStride = (int) sSrcMap.sRect.iRectHeight*5/24;
     SScrollDetectionParam m_sScrollDetectionParam;
 
-    for (int32_t i=0; i< 9;i++){
-      iStartX = kiPicBorderWidth+(i%3)*kiRegionWidth;
-      iStartY = -sSrcMap.sRect.iRectHeight*7/48+ (int)(i/3)*(kiHieghtStride);
-      iWidth = kiRegionWidth;
-      iHeight = kiRegionHeight;
+    CScrollDetection *pTest =new CScrollDetection(0);
+    int32_t iMethodIdx = METHOD_SCROLL_DETECTION;
 
-      iWidth /= 2;
-      iStartX += iWidth/2;
-
-      m_sScrollDetectionParam.iScrollMvX = 0;
-      m_sScrollDetectionParam.iScrollMvY = 0;
-      m_sScrollDetectionParam.bScrollDetectFlag = false;
-
-      ScrollDetectionCore(&sSrcMap, &sRefMap, iWidth, iHeight, iStartX, iStartY, m_sScrollDetectionParam);
-
-      if (m_sScrollDetectionParam.bScrollDetectFlag && m_sScrollDetectionParam.iScrollMvY)
-        break;
-   }
+    pTest->Set(iMethodIdx, (void*)(&m_sScrollDetectionParam));
+    int32_t ret = pTest->Process(iMethodIdx,&sSrcMap, &sRefMap);
+    EXPECT_EQ(ret,0);
+	  pTest->Get(iMethodIdx, (void*)(&m_sScrollDetectionParam));
 
     EXPECT_EQ(m_sScrollDetectionParam.bScrollDetectFlag,1);
     EXPECT_EQ(m_sScrollDetectionParam.iScrollMvY,iScrollMv);
