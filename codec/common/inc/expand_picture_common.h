@@ -65,6 +65,10 @@ void ExpandPictureChromaUnalign_sse2 (uint8_t* pDst,
 void ExpandPictureLuma_neon(uint8_t *pDst, const int32_t kiStride, const int32_t kiPicW, const int32_t kiPicH);
 void ExpandPictureChroma_neon(uint8_t *pDst, const int32_t kiStride, const int32_t kiPicW, const int32_t kiPicH);
 #endif
+#if defined(HAVE_NEON_AARCH64)
+    void ExpandPictureLuma_AArch64_neon(uint8_t *pDst, const int32_t kiStride, const int32_t kiPicW, const int32_t kiPicH);
+    void ExpandPictureChroma_AArch64_neon(uint8_t *pDst, const int32_t kiStride, const int32_t kiPicW, const int32_t kiPicH);
+#endif
 #if defined(__cplusplus)
 }
 #endif//__cplusplus
