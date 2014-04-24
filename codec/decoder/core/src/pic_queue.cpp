@@ -135,7 +135,7 @@ PPicture PrefetchPic (PPicBuff pPicBuf) {
     pPicBuf->iCurrentIdx = iPicIdx;
     return pPic;
   }
-  for (iPicIdx = 0 ; iPicIdx < pPicBuf->iCurrentIdx ; ++iPicIdx) {
+  for (iPicIdx = 0 ; iPicIdx <= pPicBuf->iCurrentIdx ; ++iPicIdx) {
     if (pPicBuf->ppPic[iPicIdx] != NULL && pPicBuf->ppPic[iPicIdx]->bAvailableFlag
         && !pPicBuf->ppPic[iPicIdx]->bUsedAsRef) {
       pPic = pPicBuf->ppPic[iPicIdx];

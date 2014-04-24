@@ -134,11 +134,13 @@ inline void    HandleReferenceLostL0 (PWelsDecoderContext pCtx, PNalUnit pCurNal
   if (0 == pCurNal->sNalHeaderExt.uiTemporalId) {
     pCtx->bReferenceLostAtT0Flag = true;
   }
+  if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
 #ifndef LONG_TERM_REF
-  if (pCtx->bReferenceLostAtT0Flag) {
-    ResetParameterSetsState (pCtx);
-  }
+    if (pCtx->bReferenceLostAtT0Flag) {
+      ResetParameterSetsState (pCtx);
+    }
 #endif
+  }
   pCtx->iErrorCode |= dsBitstreamError;
 }
 
@@ -146,11 +148,13 @@ inline void    HandleReferenceLost (PWelsDecoderContext pCtx, PNalUnit pCurNal) 
   if ((0 == pCurNal->sNalHeaderExt.uiTemporalId) || (1 == pCurNal->sNalHeaderExt.uiTemporalId)) {
     pCtx->bReferenceLostAtT0Flag = true;
   }
+  if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
 #ifndef LONG_TERM_REF
-  if (pCtx->bReferenceLostAtT0Flag) {
-    ResetParameterSetsState (pCtx);
-  }
+    if (pCtx->bReferenceLostAtT0Flag) {
+      ResetParameterSetsState (pCtx);
+    }
 #endif
+  }
   pCtx->iErrorCode |= dsRefLost;
 }
 
@@ -901,13 +905,15 @@ int32_t UpdateAccessUnit (PWelsDecoderContext pCtx) {
     if (uiActualIdx ==
         pCurAu->uiActualUnitsNum) {	// no found IDR nal within incoming AU, need exit to avoid mosaic issue, 11/19/2009
       WelsLog (pCtx, WELS_LOG_WARNING, "UpdateAccessUnit():::::Key frame lost.....CAN NOT find IDR from current AU.\n");
+      if (pCtx->iErrorCode == ERROR_CON_DISABLE) {
 #ifdef LONG_TERM_REF
-      pCtx->iErrorCode |= dsNoParamSets;
-      return dsNoParamSets;
+        pCtx->iErrorCode |= dsNoParamSets;
+        return dsNoParamSets;
 #else
-      pCtx->iErrorCode |= dsRefLost;
-      return ERR_INFO_REFERENCE_PIC_LOST;
+        pCtx->iErrorCode |= dsRefLost;
+        return ERR_INFO_REFERENCE_PIC_LOST;
 #endif
+      }
     }
   }
 
@@ -1580,9 +1586,8 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
   pCtx->pSps = pCurAu->pNalUnitsList[pCurAu->uiStartPos]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
   pCtx->pPps = pCurAu->pNalUnitsList[pCurAu->uiStartPos]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pPps;
 
-  //try to allocate or relocate DPB memory only when IDR arrival.
-  if (NAL_UNIT_CODED_SLICE_IDR == pCurAu->pNalUnitsList[pCurAu->uiStartPos]->sNalHeaderExt.sNalUnitHeader.eNalUnitType ||
-      pCurAu->pNalUnitsList[pCurAu->uiStartPos]->sNalHeaderExt.bIdrFlag) {
+  //try to allocate or relocate DPB memory only when new sequence is coming.
+  if (pCtx->bNewSeqBegin) {
     WelsResetRefPic (pCtx); //clear ref pPic when IDR NAL
     iErr = SyncPictureResolutionExt (pCtx, pCtx->pSps->iMbWidth, pCtx->pSps->iMbHeight);
 
