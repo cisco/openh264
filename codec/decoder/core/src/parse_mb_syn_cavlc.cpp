@@ -980,7 +980,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
   int32_t i, j;
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
   int32_t iMotionPredFlag[4];
-  int16_t iMv[2] = {0};
+  int16_t iMv[2];
   uint32_t uiCode;
   int32_t iCode;
   int16_t iMinVmv = pSliceHeader->pSps->pSLevelLimits->iMinVmv;
