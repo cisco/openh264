@@ -286,6 +286,7 @@ typedef struct TagWelsDecoderContext {
   uint16_t            uiCurIdrPicId;
 #endif
   bool       bNewSeqBegin;
+  bool       bNextNewSeqBegin;
   int        iOverwriteFlags;
   int32_t iErrorConMethod; //
   PPicture pPreviousDecodedPictureInDpb; //pointer to previously decoded picture in DPB for error concealment

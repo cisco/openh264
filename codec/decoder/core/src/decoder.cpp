@@ -295,6 +295,7 @@ void WelsOpenDecoder (PWelsDecoderContext pCtx) {
 #else
   pCtx->bReferenceLostAtT0Flag	= true;	// should be true to waiting IDR at incoming AU bits following, 6/4/2010
 #endif //LONG_TERM_REF
+  pCtx->bNewSeqBegin = true;
 }
 
 /*!
