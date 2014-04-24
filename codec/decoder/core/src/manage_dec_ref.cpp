@@ -109,6 +109,26 @@ void WelsResetRefPic (PWelsDecoderContext pCtx) {
  */
 int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
   int32_t i, iCount = 0;
+
+  if ((pCtx->bNewSeqBegin) && (pCtx->sRefPic.uiRefCount[LIST_0] <= 0) && (pCtx->eSliceType != I_SLICE && pCtx->eSliceType != SI_SLICE)) {
+    if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) { //IDR lost!, recover it for future decoding with data all set to 0
+      PPicture pRef = PrefetchPic (pCtx->pPicBuff[0]);
+      if (pRef != NULL) {
+        memset (pRef->pData[0], 0, pRef->iLinesize[0] * pRef->iHeightInPixel);
+        memset (pRef->pData[1], 0, pRef->iLinesize[1] * pRef->iHeightInPixel / 2);
+        memset (pRef->pData[2], 0, pRef->iLinesize[2] * pRef->iHeightInPixel / 2);
+        pRef->iFrameNum = 0;
+        pRef->iFramePoc = 0;
+        pRef->uiTemporalId = pRef->uiQualityId = 0;
+        AddShortTermToList (&pCtx->sRefPic, pRef);
+      } else {
+        WelsLog (pCtx, WELS_LOG_ERROR, "WelsInitRefList()::PrefetchPic for EC errors.\n");
+        pCtx->iErrorCode |= dsOutOfMemory;
+        return ERR_INFO_REF_COUNT_OVERFLOW;
+      }
+    }
+  }
+
   PPicture* ppShoreRefList = pCtx->sRefPic.pShortRefList[LIST_0];
   PPicture* ppLongRefList  = pCtx->sRefPic.pLongRefList[LIST_0];
   memset (pCtx->sRefPic.pRefList[LIST_0], 0, MAX_REF_PIC_COUNT * sizeof (PPicture));
