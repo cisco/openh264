@@ -1,5 +1,6 @@
 DECODER_UNITTEST_SRCDIR=test/decoder
 DECODER_UNITTEST_CPP_SRCS=\
+        $(DECODER_UNITTEST_SRCDIR)/DecUT_ErrorConcealment.cpp\
 	$(DECODER_UNITTEST_SRCDIR)/DecUT_ExpandPicture.cpp\
 	$(DECODER_UNITTEST_SRCDIR)/DecUT_IdctResAddPred.cpp\
 	$(DECODER_UNITTEST_SRCDIR)/DecUT_IntraPrediction.cpp\
