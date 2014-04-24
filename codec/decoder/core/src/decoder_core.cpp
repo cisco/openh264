@@ -1534,7 +1534,6 @@ static bool CheckNewSeqBeginAndUpdateActiveLayerSps(PWelsDecoderContext pCtx) {
 static void WriteBackActiveParameters(PWelsDecoderContext pCtx) {
   if (pCtx->iOverwriteFlags & OVERWRITE_PPS) {
     memcpy(&pCtx->sPpsBuffer[pCtx->sPpsBuffer[MAX_PPS_COUNT].iPpsId], &pCtx->sPpsBuffer[MAX_PPS_COUNT], sizeof(SPps));
-    pCtx->bNewSeqBegin = true;
   }
   if (pCtx->iOverwriteFlags & OVERWRITE_SPS) {
     memcpy(&pCtx->sSpsBuffer[pCtx->sSpsBuffer[MAX_SPS_COUNT].iSpsId], &pCtx->sSpsBuffer[MAX_SPS_COUNT], sizeof(SSps));
@@ -1542,6 +1541,7 @@ static void WriteBackActiveParameters(PWelsDecoderContext pCtx) {
   }
   if (pCtx->iOverwriteFlags & OVERWRITE_SUBSETSPS) {
     memcpy(&pCtx->sSubsetSpsBuffer[pCtx->sSubsetSpsBuffer[MAX_SPS_COUNT].sSps.iSpsId], &pCtx->sSubsetSpsBuffer[MAX_SPS_COUNT], sizeof(SSubsetSps));
+    pCtx->bNewSeqBegin = true;
   }
   pCtx->iOverwriteFlags = OVERWRITE_NONE;
 }
@@ -1567,7 +1567,7 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
   pCtx->bAuReadyFlag = false;
   pCtx->bLastHasMmco5 = false;
   bool bTmpNewSeqBegin = CheckNewSeqBeginAndUpdateActiveLayerSps(pCtx);
-  pCtx->bNewSeqBegin = pCtx->bNewSeqBegin && bTmpNewSeqBegin;
+  pCtx->bNewSeqBegin = pCtx->bNewSeqBegin || bTmpNewSeqBegin;
   iErr = WelsDecodeAccessUnitStart (pCtx);
   GetVclNalTemporalId (pCtx);
 
@@ -1599,6 +1599,10 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
   WelsDecodeAccessUnitEnd (pCtx);
   pCtx->bNewSeqBegin = false;
   WriteBackActiveParameters(pCtx);
+  pCtx->bNewSeqBegin = pCtx->bNewSeqBegin || pCtx->bNextNewSeqBegin;
+  pCtx->bNextNewSeqBegin = false; // reset it
+  if (pCtx->bNewSeqBegin)
+    ResetActiveSPSForEachLayer(pCtx);
   if (ERR_NONE != iErr) {
     WelsLog (pCtx, WELS_LOG_INFO, "returned error from decoding:[0x%x]\n", iErr);
     return iErr;

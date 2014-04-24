@@ -392,7 +392,7 @@ bool CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeade
 }
 
 
-bool CheckAccessUnitBoundary (const PWelsDecoderContext pCtx, const PNalUnit kpCurNal, const PNalUnit kpLastNal, const PSps kpSps) {
+bool CheckAccessUnitBoundary (PWelsDecoderContext pCtx, const PNalUnit kpCurNal, const PNalUnit kpLastNal, const PSps kpSps) {
   const PNalUnitHeaderExt kpLastNalHeaderExt = &kpLastNal->sNalHeaderExt;
   const PNalUnitHeaderExt kpCurNalHeaderExt = &kpCurNal->sNalHeaderExt;
   const SSliceHeader* kpLastSliceHeader = &kpLastNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
@@ -405,6 +405,7 @@ bool CheckAccessUnitBoundary (const PWelsDecoderContext pCtx, const PNalUnit kpC
   if (kpLastSliceHeader->iFrameNum != kpCurSliceHeader->iFrameNum)
     return true;
   if (pCtx->pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != NULL && pCtx->pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != kpSps) {
+    pCtx->bNextNewSeqBegin = true;
     return true; // the active sps changed, new sequence begins, so the current au is ready
   }
   // Subclause 7.4.1.2.5
