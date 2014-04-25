@@ -94,6 +94,7 @@ typedef void (*PChromaDeblockingLT4Func) (uint8_t* iSampleCb, uint8_t* iSampleCr
     int32_t iBeta, int8_t* iTc);
 typedef void (*PChromaDeblockingEQ4Func) (uint8_t* iSampleCb, uint8_t* iSampleCr, int32_t iStride, int32_t iAlpha,
     int32_t iBeta);
+typedef void (*PDeblockingBSCalc) (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2][4][4], Mb_Type uiCurMbType, int32_t iMbStride, int32_t iLeftFlag, int32_t iTopFlag);
 
 typedef struct tagDeblockingFunc {
   PLumaDeblockingLT4Func    pfLumaDeblockingLT4Ver;
@@ -105,6 +106,8 @@ typedef struct tagDeblockingFunc {
   PChromaDeblockingEQ4Func  pfChromaDeblockingEQ4Ver;
   PChromaDeblockingLT4Func  pfChromaDeblockingLT4Hor;
   PChromaDeblockingEQ4Func  pfChromaDeblockingEQ4Hor;
+
+  PDeblockingBSCalc         pfDeblockingBSCalc;
 } DeblockingFunc;
 
 typedef  void (*PSetNoneZeroCountZeroFunc) (int8_t* pNonZeroCount);

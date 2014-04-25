@@ -583,6 +583,56 @@ void DeblockingIntraMb (DeblockingFunc* pfDeblocking, SMB* pCurMb, SDeblockingFi
   FilteringEdgeChromaHV (pfDeblocking, pCurMb, pFilter);
 }
 
+#if defined(HAVE_NEON) && defined(SINGLE_REF_FRAME)
+void DeblockingBSCalc_neon (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2][4][4], Mb_Type uiCurMbType,
+                            int32_t iMbStride, int32_t iLeftFlag, int32_t iTopFlag) {
+  DeblockingBSCalcEnc_neon (pCurMb->pNonZeroCount, pCurMb->sMv, pCurMb->uiNeighborAvail, iMbStride, uiBS);
+  if (iLeftFlag) {
+    if (IS_INTRA ((pCurMb - 1)->uiMbType)) {
+      * (uint32_t*)uiBS[0][0] = 0x04040404;
+    }
+  } else {
+    * (uint32_t*)uiBS[0][0] = 0;
+  }
+  if (iTopFlag) {
+    if (IS_INTRA ((pCurMb - iMbStride)->uiMbType)) {
+      * (uint32_t*)uiBS[1][0] = 0x04040404;
+    }
+  } else {
+    * (uint32_t*)uiBS[1][0] = 0;
+  }
+}
+#endif
+
+void DeblockingBSCalc_c (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2][4][4], Mb_Type uiCurMbType,
+                         int32_t iMbStride, int32_t iLeftFlag, int32_t iTopFlag) {
+  if (iLeftFlag) {
+    * (uint32_t*)uiBS[0][0] = IS_INTRA ((pCurMb - 1)->uiMbType) ? 0x04040404 : DeblockingBSMarginalMBAvcbase (pCurMb,
+                              pCurMb - 1, 0);
+  } else {
+    * (uint32_t*)uiBS[0][0] = 0;
+  }
+  if (iTopFlag) {
+    * (uint32_t*)uiBS[1][0] = IS_INTRA ((pCurMb - iMbStride)->uiMbType) ? 0x04040404 : DeblockingBSMarginalMBAvcbase (
+                                pCurMb, (pCurMb - iMbStride), 1);
+  } else {
+    * (uint32_t*)uiBS[1][0] = 0;
+  }
+  //SKIP MB_16x16 or others
+  if (uiCurMbType != MB_TYPE_SKIP) {
+    pFunc->pfSetNZCZero (pCurMb->pNonZeroCount); // set all none-zero nzc to 1; dbk can be opti!
+
+    if (uiCurMbType == MB_TYPE_16x16) {
+      DeblockingBSInsideMBAvsbase (pCurMb->pNonZeroCount, uiBS, 1);
+    } else {
+      DeblockingBSInsideMBNormal (pCurMb, uiBS, pCurMb->pNonZeroCount);
+    }
+  } else {
+    * (uint32_t*)uiBS[0][1] = * (uint32_t*)uiBS[0][2] = * (uint32_t*)uiBS[0][3] =
+                                * (uint32_t*)uiBS[1][1] = * (uint32_t*)uiBS[1][2] = * (uint32_t*)uiBS[1][3] = 0;
+  }
+}
+
 void DeblockingMbAvcbase (SWelsFuncPtrList* pFunc, SMB* pCurMb, SDeblockingFilter* pFilter) {
   uint8_t uiBS[2][4][4] = {{{ 0 }}};
 
@@ -605,49 +655,7 @@ void DeblockingMbAvcbase (SWelsFuncPtrList* pFunc, SMB* pCurMb, SDeblockingFilte
     DeblockingIntraMb (&pFunc->pfDeblocking, pCurMb, pFilter);
     break;
   default:
-#if (defined(HAVE_NEON) && defined(SINGLE_REF_FRAME))
-    DeblockingBSCalcEnc_neon(pCurMb->pNonZeroCount, pCurMb->sMv, pCurMb->uiNeighborAvail, iMbStride, uiBS);
-    if (iLeftFlag){
-      if (IS_INTRA((pCurMb-1)->uiMbType)) {
-        *(uint32_t*)uiBS[0][0] = 0x04040404;
-      }
-    } else {
-      *(uint32_t*)uiBS[0][0] = 0;
-    }
-    if (iTopFlag) {
-      if (IS_INTRA((pCurMb-iMbStride)->uiMbType)) {
-        *(uint32_t*)uiBS[1][0] = 0x04040404;
-      }
-    } else {
-      *(uint32_t*)uiBS[1][0] = 0;
-    }
-#else
-    if (iLeftFlag) {
-      * (uint32_t*)uiBS[0][0] = IS_INTRA ((pCurMb - 1)->uiMbType) ? 0x04040404 : DeblockingBSMarginalMBAvcbase (pCurMb,
-                                pCurMb - 1, 0);
-    } else {
-      * (uint32_t*)uiBS[0][0] = 0;
-    }
-    if (iTopFlag) {
-      * (uint32_t*)uiBS[1][0] = IS_INTRA ((pCurMb - iMbStride)->uiMbType) ? 0x04040404 : DeblockingBSMarginalMBAvcbase (
-                                  pCurMb, (pCurMb - iMbStride), 1);
-    } else {
-      * (uint32_t*)uiBS[1][0] = 0;
-    }
-    //SKIP MB_16x16 or others
-    if (uiCurMbType != MB_TYPE_SKIP) {
-      pFunc->pfSetNZCZero (pCurMb->pNonZeroCount); // set all none-zero nzc to 1; dbk can be opti!
-
-      if (uiCurMbType == MB_TYPE_16x16) {
-        DeblockingBSInsideMBAvsbase (pCurMb->pNonZeroCount, uiBS, 1);
-      } else {
-        DeblockingBSInsideMBNormal (pCurMb, uiBS, pCurMb->pNonZeroCount);
-      }
-    } else {
-      * (uint32_t*)uiBS[0][1] = * (uint32_t*)uiBS[0][2] = * (uint32_t*)uiBS[0][3] =
-                                  * (uint32_t*)uiBS[1][1] = * (uint32_t*)uiBS[1][2] = * (uint32_t*)uiBS[1][3] = 0;
-    }
-#endif
+    pFunc->pfDeblocking.pfDeblockingBSCalc (pFunc, pCurMb, uiBS, uiCurMbType, iMbStride, iLeftFlag, iTopFlag);
     DeblockingInterMb (&pFunc->pfDeblocking, pCurMb, pFilter, uiBS);
     break;
   }
@@ -803,6 +811,8 @@ void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
   pFunc->pfChromaDeblockingLT4Hor	= DeblockChromaLt4H_c;
   pFunc->pfChromaDeblockingEQ4Hor	= DeblockChromaEq4H_c;
 
+  pFunc->pfDeblockingBSCalc             = DeblockingBSCalc_c;
+
 
 #ifdef X86_ASM
   if (iCpu & WELS_CPU_SSSE3) {
@@ -828,6 +838,10 @@ void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
     pFunc->pfChromaDeblockingEQ4Ver     = DeblockChromaEq4V_neon;
     pFunc->pfChromaDeblockingLT4Hor     = DeblockChromaLt4H_neon;
     pFunc->pfChromaDeblockingEQ4Hor     = DeblockChromaEq4H_neon;
+
+#if defined(SINGLE_REF_FRAME)
+    pFunc->pfDeblockingBSCalc           = DeblockingBSCalc_neon;
+#endif
   }
 #endif
 }
