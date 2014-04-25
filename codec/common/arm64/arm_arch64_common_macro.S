@@ -39,11 +39,10 @@ _$0:
 .endm
 
 .macro WELS_ASM_ARCH64_FUNC_END
-ret lr
+ret
 .endm
 #else
 
-.syntax unified
 .section .note.GNU-stack,"",%progbits // Mark stack as non-executable
 .text
 
@@ -56,7 +55,23 @@ ret lr
 .endm
 
 .macro WELS_ASM_ARCH64_FUNC_END
-ret lr
+ret
 .endfunc
+.endm
+
+.macro mov.16b arg0, arg1
+    mov \arg0\().16b, \arg1\().16b
+.endm
+
+.macro mov.8b arg0, arg1
+    mov \arg0\().8b, \arg1\().8b
+.endm
+
+.macro ext.16b arg0, arg1, arg2, arg3
+    ext \arg0\().16b, \arg1\().16b, \arg2\().16b, \arg3
+.endm
+
+.macro ext.8b arg0, arg1, arg2, arg3
+    ext \arg0\().8b, \arg1\().8b, \arg2\().8b, \arg3
 .endm
 #endif
