@@ -1520,7 +1520,7 @@ static bool CheckNewSeqBeginAndUpdateActiveLayerSps(PWelsDecoderContext pCtx) {
       break;
     }
   }
-  if (iMaxCurrentLayer != iMaxActiveLayer) {
+  if ((iMaxCurrentLayer != iMaxActiveLayer) || (pTmpLayerSps[iMaxCurrentLayer]  != pCtx->pActiveLayerSps[iMaxActiveLayer])) {
     bNewSeq = true;
   }
   // fill active sps if the current sps is not null while active layer is null
