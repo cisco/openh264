@@ -140,11 +140,6 @@
     vst4.u8	{$0[$5],$1[$5],$2[$5],$3[$5]}, [r2], r1
 .endm
 
-.macro	LOAD_LUMA_DATA_4
-    vld4.u8	{$0[$8],$1[$8],$2[$8],$3[$8]}, [r3], r1
-    vld4.u8	{$4[$8],$5[$8],$6[$8],$7[$8]}, [r0], r1
-.endm
-
 .macro	STORE_LUMA_DATA_3
     vst3.u8	{$0[$6],$1[$6],$2[$6]}, [r3], r1
     vst3.u8	{$3[$6],$4[$6],$5[$6]}, [r0], r1
@@ -257,11 +252,6 @@
 .macro	STORE_LUMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5
     vst4.u8	{\arg0[\arg4],\arg1[\arg4],\arg2[\arg4],\arg3[\arg4]}, [r0], r1
     vst4.u8	{\arg0[\arg5],\arg1[\arg5],\arg2[\arg5],\arg3[\arg5]}, [r2], r1
-.endm
-
-.macro	LOAD_LUMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
-    vld4.u8	{\arg0[\arg8],\arg1[\arg8],\arg2[\arg8],\arg3[\arg8]}, [r3], r1
-    vld4.u8	{\arg4[\arg8],\arg5[\arg8],\arg6[\arg8],\arg7[\arg8]}, [r0], r1
 .endm
 
 .macro	STORE_LUMA_DATA_3 arg0, arg1, arg2, arg3, arg4, arg5, arg6
@@ -503,31 +493,61 @@ WELS_ASM_FUNC_BEGIN DeblockLumaEq4H_neon
     vdup.u8	q4, r3
 
     sub			r3, r0, #4				//	pix -= 4
-    LOAD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,0
-    LOAD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,1
-    LOAD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,2
-    LOAD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,3
-    LOAD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,4
-    LOAD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,5
-    LOAD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,6
-    LOAD_LUMA_DATA_4		d16,d17,d18,d19,d24,d25,d26,d27,7
 
-    LOAD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,0
-    LOAD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,1
-    LOAD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,2
-    LOAD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,3
-    LOAD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,4
-    LOAD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,5
-    LOAD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,6
-    LOAD_LUMA_DATA_4		d20,d21,d22,d23,d28,d29,d30,d31,7
+    vld1.u8	{d16}, [r3], r1
+    vld1.u8	{d17}, [r3], r1
+    vld1.u8	{d18}, [r3], r1
+    vld1.u8	{d19}, [r3], r1
+    vld1.u8	{d20}, [r3], r1
+    vld1.u8	{d21}, [r3], r1
+    vld1.u8	{d22}, [r3], r1
+    vld1.u8	{d23}, [r3], r1
+    vld1.u8	{d24}, [r3], r1
+    vld1.u8	{d25}, [r3], r1
+    vld1.u8	{d26}, [r3], r1
+    vld1.u8	{d27}, [r3], r1
+    vld1.u8	{d28}, [r3], r1
+    vld1.u8	{d29}, [r3], r1
+    vld1.u8	{d30}, [r3], r1
+    vld1.u8	{d31}, [r3], r1
 
-    vswp		q9, q10
-    vswp		d17,d18
-    vswp		d21,d22
-    vswp		q13,q14
-    vswp		d25,d26
-    vswp		d29,d30
-    sub			r0, r0, r1	, lsl #4
+    vtrn.u32	d16, d20
+    vtrn.u32	d17, d21
+    vtrn.u32	d18, d22
+    vtrn.u32	d19, d23
+    vtrn.u32	d24, d28
+    vtrn.u32	d25, d29
+    vtrn.u32	d26, d30
+    vtrn.u32	d27, d31
+
+    vtrn.u16	d16, d18
+    vtrn.u16	d17, d19
+    vtrn.u16	d20, d22
+    vtrn.u16	d21, d23
+    vtrn.u16	d24, d26
+    vtrn.u16	d25, d27
+    vtrn.u16	d28, d30
+    vtrn.u16	d29, d31
+
+    vtrn.u8	d16, d17
+    vtrn.u8	d18, d19
+    vtrn.u8	d20, d21
+    vtrn.u8	d22, d23
+    vtrn.u8	d24, d25
+    vtrn.u8	d26, d27
+    vtrn.u8	d28, d29
+    vtrn.u8	d30, d31
+
+    vswp	d17, d24
+    vswp	d19, d26
+    vswp	d21, d28
+    vswp	d23, d30
+
+    vswp	q12, q9
+    vswp	q14, q11
+
+    vswp	q12, q10
+    vswp	q13, q11
 
     MASK_MATRIX	q10, q11, q12, q13, q5, q4, q6
 
