@@ -1493,6 +1493,8 @@ static bool CheckNewSeqBeginAndUpdateActiveLayerSps(PWelsDecoderContext pCtx) {
   for(unsigned int i = pCurAu->uiStartPos; i <= pCurAu->uiEndPos; i++) {
     uint32_t uiDid = pCurAu->pNalUnitsList[i]->sNalHeaderExt.uiDependencyId;
     pTmpLayerSps[uiDid] = pCurAu->pNalUnitsList[i]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
+    if ((pCurAu->pNalUnitsList[i]->sNalHeaderExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_IDR) || (pCurAu->pNalUnitsList[i]->sNalHeaderExt.bIdrFlag))
+      bNewSeq = true;
   }
   int iMaxActiveLayer = 0, iMaxCurrentLayer = 0;
   for(int i = MAX_LAYER_NUM - 1; i >= 0; i--) {
@@ -1642,19 +1644,12 @@ static inline void InitDqLayerInfo (PDqLayer pDqLayer, PLayerInfo pLayerInfo, PN
 }
 
 void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pSps, PPps pPps) {
-  SNalUnitHeader* pNalHdr = &pCurNal->sNalHeaderExt.sNalUnitHeader;
   PSliceHeader pSh = &pCurNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
 
   pCtx->eSliceType			= pSh->eSliceType;
   pCtx->pSliceHeader			= pSh;
 
   pCtx->iFrameNum			= pSh->iFrameNum;
-
-  if ((pNalHdr->eNalUnitType == NAL_UNIT_CODED_SLICE_IDR ||
-       (pCurNal->sNalHeaderExt.uiQualityId == BASE_QUALITY_ID && pCurNal->sNalHeaderExt.bIdrFlag)) &&
-      pSh->iFrameNum == 0) { //pSh->iFrameNum == 0 this condition can deleted??????
-    WelsResetRefPic (pCtx);	// Reset decoded picture buffer lists due to an IDR frame incomes
-  }
 }
 
 int32_t InitRefPicList (PWelsDecoderContext pCtx, const uint8_t kuiNRi, const bool kbFirstSlice, int32_t iPoc) {

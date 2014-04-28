@@ -110,7 +110,7 @@ void WelsResetRefPic (PWelsDecoderContext pCtx) {
 int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
   int32_t i, iCount = 0;
 
-  if ((pCtx->bNewSeqBegin) && (pCtx->sRefPic.uiRefCount[LIST_0] <= 0) && (pCtx->eSliceType != I_SLICE && pCtx->eSliceType != SI_SLICE)) {
+  if ((pCtx->sRefPic.uiShortRefCount[LIST_0] + pCtx->sRefPic.uiLongRefCount[LIST_0] <= 0) && (pCtx->eSliceType != I_SLICE && pCtx->eSliceType != SI_SLICE)) {
     if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) { //IDR lost!, recover it for future decoding with data all set to 0
       PPicture pRef = PrefetchPic (pCtx->pPicBuff[0]);
       if (pRef != NULL) {
