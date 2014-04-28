@@ -242,9 +242,9 @@ int32_t ReleaseFeatureSearchPreparation( CMemoryAlign *pMa, uint16_t*& pFeatureO
 
 #define FMESWITCH_DEFAULT_GOODFRAME_NUM (2)
 #define FME_DEFAULT_FEATURE_INDEX (0)
-void PerformFMEPreprocess( SWelsFuncPtrList *pFunc, SPicture* pRef,
-                          SScreenBlockFeatureStorage* pScreenBlockFeatureStorage);
 
+void PerformFMEPreprocess( SWelsFuncPtrList *pFunc, SPicture* pRef, uint16_t* pFeatureOfBlock,
+                          SScreenBlockFeatureStorage* pScreenBlockFeatureStorage);
 void UpdateFMESwitch(SDqLayer* pCurLayer);
 void UpdateFMESwitchNull(SDqLayer* pCurLayer);
 
