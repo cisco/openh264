@@ -57,14 +57,6 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   bool bFrameCompleteFlag = true;
 
   if (pCtx->iTotalNumMbRec != kiTotalNumMbInCurLayer) {
-    if ((pCtx->iTotalNumMbRec != 0) && (I_SLICE == pCurDq->sLayerInfo.sSliceInLayer.eSliceType)) { //TODO should be IDR instead of I_SLICE!
-      memcpy (& (pCtx->sFrameCrop), & (pCurDq->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.pSps->sFrameCrop), sizeof (SPosOffset));
-#ifdef LONG_TERM_REF
-      pCtx->bParamSetsLostFlag = false;
-#else
-      pCtx->bReferenceLostAtT0Flag = false;
-#endif //LONG_TERM_REF
-    }
     WelsLog (pCtx, WELS_LOG_WARNING,
              "DecodeFrameConstruction():::iTotalNumMbRec:%d, total_num_mb_sps:%d, cur_layer_mb_width:%d, cur_layer_mb_height:%d \n",
              pCtx->iTotalNumMbRec, kiTotalNumMbInCurLayer, pCurDq->iMbWidth, pCurDq->iMbHeight);
@@ -74,16 +66,16 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   pCtx->iTotalNumMbRec = 0;
 #endif
 
-  if (I_SLICE == pCurDq->sLayerInfo.sSliceInLayer.eSliceType) {
+  if (pCtx->bNewSeqBegin) {
     memcpy (& (pCtx->sFrameCrop), & (pCurDq->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.pSps->sFrameCrop),
             sizeof (SPosOffset)); //confirmed_safe_unsafe_usage
 #ifdef LONG_TERM_REF
     pCtx->bParamSetsLostFlag      = false;
 #else
-    pCtx->bReferenceLostAtT0Flag = false;	// need initialize it due I_SLICE, 6/4/2010
+    pCtx->bReferenceLostAtT0Flag = false;	// need initialize it due new seq, 6/4/2010
 #endif //LONG_TERM_REF
     WelsLog (pCtx, WELS_LOG_INFO,
-             "DecodeFrameConstruction()::::output good I frame, %d x %d, crop_left:%d, crop_right:%d, crop_top:%d, crop_bottom:%d.\n",
+             "DecodeFrameConstruction()::::output first frame of new sequence, %d x %d, crop_left:%d, crop_right:%d, crop_top:%d, crop_bottom:%d.\n",
              kiWidth, kiHeight, pCtx->sFrameCrop.iLeftOffset, pCtx->sFrameCrop.iRightOffset, pCtx->sFrameCrop.iTopOffset,
              pCtx->sFrameCrop.iBottomOffset);
   }
@@ -1313,16 +1305,11 @@ bool CheckIntegrityNalUnitsList (PWelsDecoderContext pCtx) {
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
   const int32_t kiEndPos = pCurAu->uiEndPos;
   int32_t iIdxNoInterLayerPred = 0;
-  int32_t iCurNalUnitIdx = kiEndPos;
-
-  ESliceType eSliceType = static_cast<ESliceType> (0);//EC 2009.11.12
 
   if (!pCurAu->bCompletedAuFlag)
     return false;
 
-  eSliceType = pCurAu->pNalUnitsList[iCurNalUnitIdx]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.eSliceType;
-
-  if (I_SLICE == eSliceType) {
+  if (pCtx->bNewSeqBegin) {
     pCurAu->uiStartPos = 0;
     //step1: search the pNalUnit whose iNoInterLayerPredFlag equal to 1 backwards (from uiEndPos to 0)
     iIdxNoInterLayerPred = kiEndPos;
