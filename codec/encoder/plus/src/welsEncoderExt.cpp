@@ -350,7 +350,7 @@ int CWelsH264SVCEncoder::InitializeInternal(SWelsSvcCodingParam* pCfg) {
       pCfg->iNumRefFrame = WELS_MAX(1,WELS_LOG2 (pCfg->uiGopSize)) + pCfg->iLTRRefNum;
     } else {
       pCfg->iLTRRefNum = 0;
-      pCfg->iNumRefFrame = 1;
+      pCfg->iNumRefFrame = WELS_MAX(1, pCfg->uiGopSize>>1);
     }
    } else {
      pCfg->iLTRRefNum = pCfg->bEnableLongTermReference ? WELS_CLIP3(pCfg->iLTRRefNum,1,LONG_TERM_REF_NUM) : 0;

@@ -2867,6 +2867,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 #endif//_DEBUG
 
   pCtx->iEncoderError						= ENC_RETURN_SUCCESS;
+  pCtx->bCurFrameMarkedAsSceneLtr   = false;
   pFbi->iLayerNum	= 0;	// for initialization
   pFbi->uiTimeStamp = pSrcPic->uiTimeStamp;
   // perform csc/denoise/downsample/padding, generate spatial layers
