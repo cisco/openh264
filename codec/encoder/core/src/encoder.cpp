@@ -292,7 +292,6 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
     } else {
       bSceneChangeFlag = pEncCtx->pVaa->bSceneChangeFlag;
     }
-    pEncCtx->bCurFrameMarkedAsSceneLtr   = false;
     if (pEncCtx->pVaa->bIdrPeriodFlag || pEncCtx->bEncCurFrmAsIdrFlag || (!pSvcParam->bEnableLongTermReference
         && bSceneChangeFlag)) {
       iFrameType = videoFrameTypeIDR;

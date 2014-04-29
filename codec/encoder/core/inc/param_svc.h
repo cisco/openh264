@@ -369,8 +369,9 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
         iNumRefFrame = WELS_MAX(1, WELS_LOG2 (uiGopSize)) + iLTRRefNum;
     } else {
       iLTRRefNum = 0;
+
       if( iNumRefFrame == AUTO_REF_PIC_COUNT)
-        iNumRefFrame = 1;
+        iNumRefFrame = WELS_MAX(1, uiGopSize>>1);
     }
   } else {
     iLTRRefNum = bEnableLongTermReference ? WELS_CLIP3(pCodingParam.iLTRRefNum,1,LONG_TERM_REF_NUM) : 0;
