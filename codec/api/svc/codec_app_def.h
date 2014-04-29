@@ -50,6 +50,7 @@
 #define SAVED_NALUNIT_NUM_TMP		( (MAX_SPATIAL_LAYER_NUM*MAX_QUALITY_LAYER_NUM) + 1 + MAX_SPATIAL_LAYER_NUM ) //SPS/PPS + SEI/SSEI + PADDING_NAL
 #define MAX_SLICES_NUM_TMP			( ( MAX_NAL_UNITS_IN_LAYER - SAVED_NALUNIT_NUM_TMP ) / 3 )
 
+#define AUTO_REF_PIC_COUNT  -1  // encoder selects the number of reference frame automatically
 typedef enum {
   /* Errors derived from bitstream parsing */
   dsErrorFree			= 0x00,	/* Bitstream error-free */

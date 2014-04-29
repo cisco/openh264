@@ -139,7 +139,7 @@ TagWelsSvcCodingParam () {
 static void FillDefault (SEncParamExt& param) {
   memset(&param, 0, sizeof(param));
   param.uiIntraPeriod		= 0;			// intra period (multiple of GOP size as desired)
-  param.iNumRefFrame		= MIN_REF_PIC_COUNT;	// number of reference frame used
+  param.iNumRefFrame		= AUTO_REF_PIC_COUNT;// number of reference frame used
 
   param.iPicWidth	= 0;    //   actual input picture width
   param.iPicHeight	= 0;	//   actual input picture height
@@ -312,10 +312,10 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   iLoopFilterDisableIdc	= pCodingParam.iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries,
   if (iLoopFilterDisableIdc == 0) // Loop filter requested to be enabled
     iLoopFilterDisableIdc = 2; // Disable loop filter on slice boundaries since that's not allowed with multithreading
-  iLoopFilterAlphaC0Offset = 0;	// AlphaOffset: valid range [-6, 6], default 0
-  iLoopFilterBetaOffset	= 0;	// BetaOffset:	valid range [-6, 6], default 0
+  iLoopFilterAlphaC0Offset = pCodingParam.iLoopFilterAlphaC0Offset;	// AlphaOffset: valid range [-6, 6], default 0
+  iLoopFilterBetaOffset = pCodingParam.iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0
 
-  bEnableFrameCroppingFlag	= true;
+  bEnableFrameCroppingFlag	= pCodingParam.bEnableFrameCroppingFlag;
 
   /* Rate Control */
   iRCMode = pCodingParam.iRCMode;    // rc mode
@@ -329,7 +329,7 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   bEnableDenoise = pCodingParam.bEnableDenoise ? true : false;    // Denoise Control  // only support 0 or 1 now
 
   /* Scene change detection control */
-  bEnableSceneChangeDetect	= true;
+  bEnableSceneChangeDetect	= pCodingParam.bEnableSceneChangeDetect;
 
   /* Background detection Control */
   bEnableBackgroundDetection = pCodingParam.bEnableBackgroundDetection ? true : false;
@@ -347,7 +347,7 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   iMultipleThreadIdc = pCodingParam.iMultipleThreadIdc;
 
   /* For ssei information */
-  bEnableSSEI		= true;
+  bEnableSSEI		= pCodingParam.bEnableSSEI;
 
   /* Layer definition */
   iSpatialLayerNum	= (int8_t)WELS_CLIP3 (pCodingParam.iSpatialLayerNum, 1,
@@ -365,15 +365,19 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   if (iUsageType == SCREEN_CONTENT_REAL_TIME) {
     if (bEnableLongTermReference) {
       iLTRRefNum = WELS_CLIP3(pCodingParam.iLTRRefNum,1,LONG_TERM_REF_NUM_SCREEN);
-      iNumRefFrame = WELS_MAX(1, WELS_LOG2 (uiGopSize)) + iLTRRefNum;
+      if( iNumRefFrame == AUTO_REF_PIC_COUNT)
+        iNumRefFrame = WELS_MAX(1, WELS_LOG2 (uiGopSize)) + iLTRRefNum;
     } else {
       iLTRRefNum = 0;
-      iNumRefFrame = 1;
+      if( iNumRefFrame == AUTO_REF_PIC_COUNT)
+        iNumRefFrame = 1;
     }
   } else {
     iLTRRefNum = bEnableLongTermReference ? WELS_CLIP3(pCodingParam.iLTRRefNum,1,LONG_TERM_REF_NUM) : 0;
-    iNumRefFrame		= ((uiGopSize >> 1) > 1) ? ((uiGopSize >> 1) + iLTRRefNum) : (MIN_REF_PIC_COUNT + iLTRRefNum);
-    iNumRefFrame		= WELS_CLIP3 (iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM);
+    if( iNumRefFrame == AUTO_REF_PIC_COUNT){
+      iNumRefFrame		= ((uiGopSize >> 1) > 1) ? ((uiGopSize >> 1) + iLTRRefNum) : (MIN_REF_PIC_COUNT + iLTRRefNum);
+      iNumRefFrame		= WELS_CLIP3 (iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM);
+    }
   }
   iLtrMarkPeriod  = pCodingParam.iLtrMarkPeriod;
 
