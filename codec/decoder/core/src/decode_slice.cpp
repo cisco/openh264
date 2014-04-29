@@ -1056,11 +1056,9 @@ void WelsBlockFuncInit (SBlockFunc*   pFunc,  int32_t iCpu) {
 
 void SetNonZeroCount_c (int16_t* pBlock, int8_t* pNonZeroCount) {
   int32_t i;
-  int32_t iIndex;
 
   for (i = 0; i < 24; i++) {
-    iIndex = g_kuiMbNonZeroCountIdx[i];
-    pNonZeroCount[iIndex] = !!pNonZeroCount[iIndex];
+    pNonZeroCount[i] = !!pNonZeroCount[i];
   }
 }
 

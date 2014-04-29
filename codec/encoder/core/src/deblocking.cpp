@@ -784,11 +784,9 @@ void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
 
 void WelsNonZeroCount_c (int8_t* pNonZeroCount) {
   int32_t i;
-  int32_t iIndex;
 
   for (i = 0; i < 24; i++) {
-    iIndex = g_kuiMbCountScan4Idx[i];
-    pNonZeroCount[iIndex] = !!pNonZeroCount[iIndex];
+    pNonZeroCount[i] = !!pNonZeroCount[i];
   }
 }
 void WelsBlockFuncInit (PSetNoneZeroCountZeroFunc* pfSetNZCZero,  int32_t iCpu) {
