@@ -71,7 +71,7 @@ int32_t InitAndAllocInputData (PECInputCtx& pECCtx) {
   pECCtx->sAncPic.pData[2] = pECCtx->sAncPic.pData[1] + (kiLumaSize >> 2);
 
   pECCtx->sSrcPic.pData[0] = (uint8_t*) WelsMalloc (kiLumaSize * 3 / 2 * sizeof (uint8_t), "pECCtx->sSrcPic.pData");
-  if (pECCtx->sAncPic.pData[0] == NULL)
+  if (pECCtx->sSrcPic.pData[0] == NULL)
     return 1;
   pECCtx->sSrcPic.pData[1] = pECCtx->sSrcPic.pData[0] + kiLumaSize;
   pECCtx->sSrcPic.pData[2] = pECCtx->sSrcPic.pData[1] + (kiLumaSize >> 2);
@@ -152,33 +152,33 @@ void DoAncErrorConSliceCopy (PECInputCtx pECCtx) {
           pSrcData = pSrcPic->pData[1] + iMbY * 8 * iSrcStride / 2 + iMbX * 8;
           for (i = 0; i < 8; ++i) {
             memcpy (pDstData, pSrcData, 8);
-            pDstData += iDstStride;
-            pSrcData += iSrcStride;
+            pDstData += iDstStride / 2;
+            pSrcData += iSrcStride / 2;
           }
           //V component
           pDstData = pDstPic->pData[2] + iMbY * 8 * iDstStride / 2 + iMbX * 8;
           pSrcData = pSrcPic->pData[2] + iMbY * 8 * iSrcStride / 2 + iMbX * 8;
           for (i = 0; i < 8; ++i) {
             memcpy (pDstData, pSrcData, 8);
-            pDstData += iDstStride;
-            pSrcData += iSrcStride;
+            pDstData += iDstStride / 2;
+            pSrcData += iSrcStride / 2;
           }
         } else { //pSrcPic == NULL
           //Y component
           pDstData = pDstPic->pData[0] + iMbY * 16 * iDstStride + iMbX * 16;
-          for (int32_t i = 0; i < 16; ++i) {
+          for (i = 0; i < 16; ++i) {
             memset (pDstData, 0, 16);
             pDstData += iDstStride;
           }
           //U component
           pDstData = pDstPic->pData[1] + iMbY * 8 * iDstStride / 2 + iMbX * 8;
-          for (int32_t i = 0; i < 8; ++i) {
+          for (i = 0; i < 8; ++i) {
             memset (pDstData, 0, 8);
             pDstData += iDstStride / 2;
           }
           //V component
           pDstData = pDstPic->pData[2] + iMbY * 8 * iDstStride / 2 + iMbX * 8;
-          for (int32_t i = 0; i < 8; ++i) {
+          for (i = 0; i < 8; ++i) {
             memset (pDstData, 0, 8);
             pDstData += iDstStride / 2;
           }
@@ -279,7 +279,7 @@ TEST (ErrorConTest, DoErrorConSliceCopy) {
   EXPECT_EQ (bOK, true);
 
   //case 2: with reference picture
-  pECCtx->pCtx->pPreviousDecodedPictureInDpb = &pECCtx->sAncPic;
+  pECCtx->pCtx->pPreviousDecodedPictureInDpb = &pECCtx->sSrcPic;
   DoAncErrorConSliceCopy (pECCtx);
   DoErrorConSliceCopy (pECCtx->pCtx);
 
