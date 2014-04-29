@@ -3,7 +3,6 @@
 #include <string.h>
 #include "cpu.h"
 #include "cpu_core.h"
-#include "typedef.h"
 #include "IWelsVP.h"
 #include "ScrollDetection.h"
 #include "ScrollDetectionFuncs.h"
