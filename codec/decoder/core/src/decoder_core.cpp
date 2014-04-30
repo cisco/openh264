@@ -1591,6 +1591,9 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
   iErr = DecodeCurrentAccessUnit (pCtx, ppDst, iStride, &iWidth, &iHeight, pDstInfo);
 
   WelsDecodeAccessUnitEnd (pCtx);
+  //Do error concealment here
+  ImplementErrorCon (pCtx);
+
   pCtx->bNewSeqBegin = false;
   WriteBackActiveParameters(pCtx);
   pCtx->bNewSeqBegin = pCtx->bNewSeqBegin || pCtx->bNextNewSeqBegin;
