@@ -71,7 +71,7 @@ TEST(IntraSadSatdFuncTest, WelsIntra16x16Combined3Satd_sse41){
   cMemoryAlign.WelsFree(pDst,"pDst");
 }
 
-TEST(IntraSadSatdFuncTest, WelsSmpleSatdThree4x4_sse2){
+TEST(IntraSadSatdFuncTest, WelsSampleSatdThree4x4_sse2){
   const int32_t iLineSizeDec = 32;
   const int32_t iLineSizeEnc = 32;
   int32_t tmpa, tmpb;
@@ -94,7 +94,7 @@ TEST(IntraSadSatdFuncTest, WelsSmpleSatdThree4x4_sse2){
   for(int i=0;i<512;i++)
     pDst[i]=rand()%256;
   tmpa = WelsSampleSatdIntra4x4Combined3_c(pDec+128, iLineSizeDec, pEnc,iLineSizeEnc, pDst, &iBestMode_c, lambda[iPredMode == 2], lambda[iPredMode == 1], lambda[iPredMode == 0]);
-  tmpb = WelsSmpleSatdThree4x4_sse2(pDec+128, iLineSizeDec, pEnc,iLineSizeEnc, pDst, &iBestMode_a, lambda[iPredMode == 2], lambda[iPredMode == 1], lambda[iPredMode == 0]);
+  tmpb = WelsSampleSatdThree4x4_sse2(pDec+128, iLineSizeDec, pEnc,iLineSizeEnc, pDst, &iBestMode_a, lambda[iPredMode == 2], lambda[iPredMode == 1], lambda[iPredMode == 0]);
   ASSERT_EQ(tmpa, tmpb);
   ASSERT_EQ(iBestMode_c, iBestMode_a);
   cMemoryAlign.WelsFree(pDec,"pDec");

@@ -362,11 +362,11 @@ WELS_EXTERN WelsSampleSatd16x16_sse2
 
 ;***********************************************************************
 ;
-;int32_t WelsSmpleSatdThree4x4_sse2( uint8_t *pDec, int32_t iLineSizeDec, uint8_t *pEnc, int32_t iLinesizeEnc,
+;int32_t WelsSampleSatdThree4x4_sse2( uint8_t *pDec, int32_t iLineSizeDec, uint8_t *pEnc, int32_t iLinesizeEnc,
 ;                             uint8_t* pRed, int32_t* pBestMode, int32_t, int32_t, int32_t);
 ;
 ;***********************************************************************
-WELS_EXTERN WelsSmpleSatdThree4x4_sse2
+WELS_EXTERN WelsSampleSatdThree4x4_sse2
 
 %ifdef X86_32
 	push r3
