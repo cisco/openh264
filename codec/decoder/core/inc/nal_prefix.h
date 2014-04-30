@@ -78,6 +78,7 @@ typedef struct TagPrefixNalUnit {
   bool		bStoreRefBasePicFlag;
   bool		bPrefixNalUnitAdditionalExtFlag;
   bool		bPrefixNalUnitExtFlag;
+  bool          bPrefixNalCorrectFlag;
 } SPrefixNalUnit, *PPrefixNalUnit;
 
 } // namespace WelsDec

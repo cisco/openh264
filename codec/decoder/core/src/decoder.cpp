@@ -481,8 +481,6 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
                 return pCtx->iErrorCode;
               }
             }
-            //Do error concealment here
-            ImplementErrorCon (pCtx);
           }
           if (iRet) {
             iRet = 0;
@@ -536,8 +534,6 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
         ResetParameterSetsState (pCtx);
         return pCtx->iErrorCode;
       }
-      //Do error concealment here
-      ImplementErrorCon (pCtx);
     }
     if (iRet) {
       iRet = 0;
@@ -573,7 +569,6 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
         ResetParameterSetsState (pCtx);
         return pCtx->iErrorCode;
       }
-      ImplementErrorCon (pCtx);
     }
   }
 

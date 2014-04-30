@@ -188,12 +188,14 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
       PAccessUnit pCurAu	   = pCtx->pAccessUnitList;
       uint32_t uiAvailNalNum = pCurAu->uiAvailUnitsNum;
-      ForceClearCurrentNal (pCurAu);
 
-      if (uiAvailNalNum > 1) {
-        pCurAu->uiEndPos = uiAvailNalNum - 2;
-        pCtx->bAuReadyFlag = true;
+      if (uiAvailNalNum > 0) {
+        pCurAu->uiEndPos = uiAvailNalNum - 1;
+        if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
+          pCtx->bAuReadyFlag = true;
+        }
       }
+      pCurNal->sNalData.sPrefixNal.bPrefixNalCorrectFlag = false;
       return NULL;
     }
 
@@ -204,12 +206,14 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
                pCurNal->sNalHeaderExt.uiQualityId, pCurNal->sNalHeaderExt.bUseRefBasePicFlag);
       PAccessUnit pCurAu	   = pCtx->pAccessUnitList;
       uint32_t uiAvailNalNum = pCurAu->uiAvailUnitsNum;
-      ForceClearCurrentNal (pCurAu);
 
-      if (uiAvailNalNum > 1) {
-        pCurAu->uiEndPos = uiAvailNalNum - 2;
-        pCtx->bAuReadyFlag = true;
+      if (uiAvailNalNum > 0) {
+        pCurAu->uiEndPos = uiAvailNalNum - 1;
+        if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
+          pCtx->bAuReadyFlag = true;
+        }
       }
+      pCurNal->sNalData.sPrefixNal.bPrefixNalCorrectFlag = false;
       pCtx->iErrorCode |= dsInvalidArgument;
       return NULL;
     }
@@ -229,6 +233,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
     InitBits (pBs, pNal, iBitSize);
 
     ParsePrefixNalUnit (pCtx, pBs);
+    pCurNal->sNalData.sPrefixNal.bPrefixNalCorrectFlag = true;
 
     break;
   case NAL_UNIT_CODED_SLICE_EXT:
@@ -291,7 +296,9 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
 
       if (NAL_UNIT_PREFIX == pCtx->sPrefixNal.sNalHeaderExt.sNalUnitHeader.eNalUnitType) {
-        PrefetchNalHeaderExtSyntax (pCtx, pCurNal, &pCtx->sPrefixNal);
+        if (pCtx->sPrefixNal.sNalData.sPrefixNal.bPrefixNalCorrectFlag) {
+          PrefetchNalHeaderExtSyntax (pCtx, pCurNal, &pCtx->sPrefixNal);
+        }
       }
 
       pCurNal->sNalHeaderExt.bIdrFlag = (NAL_UNIT_CODED_SLICE_IDR == pNalUnitHeader->eNalUnitType) ? true :
