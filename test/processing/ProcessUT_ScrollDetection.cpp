@@ -18,33 +18,33 @@ using namespace nsWelsVP;
 
 TEST(ScrollDetectionTest,TestScroll)
 {
-  uint8_t* pSrc, *pRef;
-  int32_t iWidthSets[4] = {640,1024,1280,1980};
-  int32_t iHeightSets[4] = {360,768,720,1080};
-  int32_t iStride = 0;
-  int32_t iIdx = 0;
+  unsigned char* pSrc, *pRef;
+  int iWidthSets[4] = {640,1024,1280,1980};
+  int iHeightSets[4] = {360,768,720,1080};
+  int iStride = 0;
+  int iIdx = 0;
 
-  for(int32_t i=0; i<4; i++){
-    int32_t iWidth = iWidthSets[i];
-    int32_t iHeight = iHeightSets[i];
+  for(int i=0; i<4; i++){
+    int iWidth = iWidthSets[i];
+    int iHeight = iHeightSets[i];
     iStride = iWidth + 16;
-    pSrc = new uint8_t[iHeight*iStride];
+    pSrc = new unsigned char[iHeight*iStride];
     ASSERT_TRUE(NULL != pSrc);
-    pRef = new uint8_t[iHeight*iStride];
+    pRef = new unsigned char[iHeight*iStride];
     ASSERT_MEMORY_FAIL2X(pSrc, pRef)
     RandomPixelDataGenerator(pRef, iWidth, iHeight, iStride, iIdx );
 
-    int32_t iMvRange = iHeight/3;
-    int32_t iScrollMv = rand()%(iMvRange<<1) - iMvRange;
-    uint8_t* pSrcTmp = pSrc;
-    uint8_t* pRefTmp = pRef;
+    int iMvRange = iHeight/3;
+    int iScrollMv = rand()%(iMvRange<<1) - iMvRange;
+    unsigned char* pSrcTmp = pSrc;
+    unsigned char* pRefTmp = pRef;
 
-    for (int32_t j=0;j<iHeight;j++) {
+    for (int j=0;j<iHeight;j++) {
       if ((j+iScrollMv)>=0 && (j+iScrollMv)<iHeight)
-        for (int32_t i=0;i<iWidth;i++) {
-            memcpy(pSrcTmp , &pRefTmp[(j+iScrollMv)*iStride], iWidth*sizeof(uint8_t));
+        for (int i=0;i<iWidth;i++) {
+            memcpy(pSrcTmp , &pRefTmp[(j+iScrollMv)*iStride], iWidth*sizeof(unsigned char));
       } else {
-        for (int32_t i=0;i<iWidth;i++)
+        for (int i=0;i<iWidth;i++)
           pSrcTmp[i] = rand()%256;
       }
       pSrcTmp += iStride;
@@ -62,14 +62,14 @@ TEST(ScrollDetectionTest,TestScroll)
 
     SScrollDetectionParam sScrollDetectionResult;
     WelsMemset (&sScrollDetectionResult, 0, sizeof (sScrollDetectionResult));
-    int32_t iCoreNum = 1;
-    uint32_t uiCPUFlag = WelsCPUFeatureDetect (&iCoreNum);
+    int iCoreNum = 1;
+    unsigned int uiCPUFlag = WelsCPUFeatureDetect (&iCoreNum);
 
     CScrollDetection *pTest =new CScrollDetection(uiCPUFlag);
-    int32_t iMethodIdx = METHOD_SCROLL_DETECTION;
+    int iMethodIdx = METHOD_SCROLL_DETECTION;
 
     pTest->Set(iMethodIdx, (&sScrollDetectionResult));
-    int32_t ret = pTest->Process(iMethodIdx,&sSrcMap, &sRefMap);
+    int ret = pTest->Process(iMethodIdx,&sSrcMap, &sRefMap);
     EXPECT_EQ(ret,0);
     pTest->Get(iMethodIdx, (&sScrollDetectionResult));
 
