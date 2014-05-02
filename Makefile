@@ -14,6 +14,7 @@ V=Yes
 PREFIX=/usr/local
 SHARED=-shared
 OBJ=o
+PROJECT_NAME=openh264
 
 ifeq (,$(wildcard ./gtest))
 HAVE_GTEST=No
@@ -126,14 +127,14 @@ include codec/console/enc/targets.mk
 endif
 endif
 
-libraries: $(LIBPREFIX)wels.$(LIBSUFFIX) $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX)
-LIBRARIES += $(LIBPREFIX)wels.$(LIBSUFFIX) $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX)
+libraries: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX)
+LIBRARIES += $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX)
 
-$(LIBPREFIX)wels.$(LIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
+$(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
 	$(QUIET)rm -f $@
 	$(QUIET_AR)$(AR) $(AR_OPTS) $+
 
-$(LIBPREFIX)wels.$(SHAREDLIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
+$(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
 	$(QUIET)rm -f $@
 	$(QUIET_CXX)$(CXX) $(SHARED) $(LDFLAGS) $(CXX_LINK_O) $+ $(SHLDFLAGS)
 
@@ -141,13 +142,13 @@ install-headers:
 	mkdir -p $(PREFIX)/include/wels
 	install -m 644 codec/api/svc/codec*.h $(PREFIX)/include/wels
 
-install-static: $(LIBPREFIX)wels.$(LIBSUFFIX) install-headers
+install-static: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) install-headers
 	mkdir -p $(PREFIX)/lib
-	install -m 644 $(LIBPREFIX)wels.$(LIBSUFFIX) $(PREFIX)/lib
+	install -m 644 $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(PREFIX)/lib
 
-install-shared: $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX) install-headers
+install-shared: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) install-headers
 	mkdir -p $(PREFIX)/lib
-	install -m 755 $(LIBPREFIX)wels.$(SHAREDLIBSUFFIX) $(PREFIX)/lib
+	install -m 755 $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) $(PREFIX)/lib
 ifneq ($(EXTRA_LIBRARY),)
 	install -m 644 $(EXTRA_LIBRARY) $(PREFIX)/lib
 endif
