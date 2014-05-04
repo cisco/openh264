@@ -418,7 +418,7 @@ WELS_EXTERN WelsSampleSatdThree4x4_sse2
 
 	SSE2_XSawp  qdq,  xmm0, xmm7, xmm1
 
-  	; Hadamard transform results are saved in xmm0 and xmm2
+	; Hadamard transform results are saved in xmm0 and xmm2
 	movdqa    xmm2, xmm0
 	paddw     xmm0, xmm1
 	psubw     xmm2, xmm1
@@ -611,7 +611,7 @@ not_dc:
 %endif
 	ret
 not_dc_h:
- 	sub        r0, r1
+	sub        r0, r1
 	sub        r0, r1
 	sub        r0, r1
 	movd	  xmm0,	[r0]
