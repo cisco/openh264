@@ -9,7 +9,136 @@
 #include "sad_common.h"
 
 using namespace WelsSVCEnc;
+#ifdef X86_ASM
+TEST(IntraSadSatdFuncTest, WelsIntra16x16Combined3Sad_ssse3){
+  const int32_t iLineSizeDec = 32;
+  const int32_t iLineSizeEnc = 32;
+  int32_t tmpa, tmpb;
+  int32_t iBestMode_c, iBestMode_a, iLambda = 50;
+  CMemoryAlign cMemoryAlign(0);
+  int32_t iCpuCores = 0;
+  uint32_t m_uiCpuFeatureFlag = WelsCPUFeatureDetect(&iCpuCores);
+  if (0 == (m_uiCpuFeatureFlag & WELS_CPU_SSSE3))
+    return;
+  uint8_t* pDec = (uint8_t *)cMemoryAlign.WelsMalloc(iLineSizeDec<<5,"pDec");
+  uint8_t* pEnc = (uint8_t *)cMemoryAlign.WelsMalloc(iLineSizeEnc<<5,"pEnc");
+  uint8_t* pDst = (uint8_t *)cMemoryAlign.WelsMalloc(512,"pDst");
+  srand((uint32_t)time(NULL));
+  for(int i=0;i<(iLineSizeDec<<5);i++)
+    pDec[i]=rand()%256;
+  for(int i=0;i<(iLineSizeEnc<<5);i++)
+    pEnc[i]=rand()%256;
 
+  for(int i=0;i<512;i++)
+    pDst[i]=rand()%256;
+  tmpa = WelsSampleSadIntra16x16Combined3_c(pDec+128, iLineSizeDec, pEnc,iLineSizeEnc,&iBestMode_c, iLambda, pDst);
+  tmpb = WelsIntra16x16Combined3Sad_ssse3(pDec+128, iLineSizeDec, pEnc,iLineSizeEnc,&iBestMode_a, iLambda, pDst);
+
+  ASSERT_EQ(tmpa, tmpb);
+  ASSERT_EQ(iBestMode_c, iBestMode_a);
+
+  cMemoryAlign.WelsFree(pDec,"pDec");
+  cMemoryAlign.WelsFree(pEnc,"pEnc");
+  cMemoryAlign.WelsFree(pDst,"pDst");
+}
+
+TEST(IntraSadSatdFuncTest, WelsIntra16x16Combined3Satd_sse41){
+  const int32_t iLineSizeDec = 32;
+  const int32_t iLineSizeEnc = 32;
+  int32_t tmpa, tmpb;
+  int32_t iBestMode_c, iBestMode_a, iLambda = 50;
+  CMemoryAlign cMemoryAlign(0);
+  int32_t iCpuCores = 0;
+  uint32_t m_uiCpuFeatureFlag = WelsCPUFeatureDetect(&iCpuCores);
+  if (0 == (m_uiCpuFeatureFlag & WELS_CPU_SSE41))
+    return;
+  uint8_t* pDec = (uint8_t *)cMemoryAlign.WelsMalloc(iLineSizeDec<<5,"pDec");
+  uint8_t* pEnc = (uint8_t *)cMemoryAlign.WelsMalloc(iLineSizeEnc<<5,"pEnc");
+  uint8_t* pDst = (uint8_t *)cMemoryAlign.WelsMalloc(512,"pDst");
+  srand((uint32_t)time(NULL));
+  for(int i=0;i<(iLineSizeDec<<5);i++)
+    pDec[i]=rand()%256;
+  for(int i=0;i<(iLineSizeEnc<<5);i++)
+    pEnc[i]=rand()%256;
+  for(int i=0;i<512;i++)
+    pDst[i]=rand()%256;
+  tmpa = WelsSampleSatdIntra16x16Combined3_c(pDec+128, iLineSizeDec, pEnc,iLineSizeEnc,&iBestMode_c, iLambda, pDst);
+  tmpb = WelsIntra16x16Combined3Satd_sse41(pDec+128, iLineSizeDec, pEnc,iLineSizeEnc,&iBestMode_a, iLambda, pDst);
+  ASSERT_EQ(tmpa, tmpb);
+  ASSERT_EQ(iBestMode_c, iBestMode_a);
+  cMemoryAlign.WelsFree(pDec,"pDec");
+  cMemoryAlign.WelsFree(pEnc,"pEnc");
+  cMemoryAlign.WelsFree(pDst,"pDst");
+}
+
+TEST(IntraSadSatdFuncTest, WelsSampleSatdThree4x4_sse2){
+  const int32_t iLineSizeDec = 32;
+  const int32_t iLineSizeEnc = 32;
+  int32_t tmpa, tmpb;
+  int32_t iBestMode_c, iBestMode_a, iLambda = 50;
+  int32_t lambda[2]						= {iLambda << 2, iLambda};
+  int32_t iPredMode = rand()%3;
+  CMemoryAlign cMemoryAlign(0);
+  int32_t iCpuCores = 0;
+  uint32_t m_uiCpuFeatureFlag = WelsCPUFeatureDetect(&iCpuCores);
+  if (0 == (m_uiCpuFeatureFlag & WELS_CPU_SSE2))
+    return;
+  uint8_t* pDec = (uint8_t *)cMemoryAlign.WelsMalloc(iLineSizeDec<<5,"pDec");
+  uint8_t* pEnc = (uint8_t *)cMemoryAlign.WelsMalloc(iLineSizeEnc<<5,"pEnc");
+  uint8_t* pDst = (uint8_t *)cMemoryAlign.WelsMalloc(512,"pDst");
+  srand((uint32_t)time(NULL));
+  for(int i=0;i<(iLineSizeDec<<5);i++)
+    pDec[i]=rand()%256;
+  for(int i=0;i<(iLineSizeEnc<<5);i++)
+    pEnc[i]=rand()%256;
+  for(int i=0;i<512;i++)
+    pDst[i]=rand()%256;
+  tmpa = WelsSampleSatdIntra4x4Combined3_c(pDec+128, iLineSizeDec, pEnc,iLineSizeEnc, pDst, &iBestMode_c, lambda[iPredMode == 2], lambda[iPredMode == 1], lambda[iPredMode == 0]);
+  tmpb = WelsSampleSatdThree4x4_sse2(pDec+128, iLineSizeDec, pEnc,iLineSizeEnc, pDst, &iBestMode_a, lambda[iPredMode == 2], lambda[iPredMode == 1], lambda[iPredMode == 0]);
+  ASSERT_EQ(tmpa, tmpb);
+  ASSERT_EQ(iBestMode_c, iBestMode_a);
+  cMemoryAlign.WelsFree(pDec,"pDec");
+  cMemoryAlign.WelsFree(pEnc,"pEnc");
+  cMemoryAlign.WelsFree(pDst,"pDst");
+}
+
+TEST(IntraSadSatdFuncTest, WelsIntraChroma8x8Combined3Satd_sse41){
+  const int32_t iLineSizeDec = 32;
+  const int32_t iLineSizeEnc = 32;
+  int32_t tmpa, tmpb;
+  int32_t iBestMode_c, iBestMode_a, iLambda = 50;
+  CMemoryAlign cMemoryAlign(0);
+  int32_t iCpuCores = 0;
+  uint32_t m_uiCpuFeatureFlag = WelsCPUFeatureDetect(&iCpuCores);
+  if (0 == (m_uiCpuFeatureFlag & WELS_CPU_SSE41))
+    return;
+  uint8_t* pDecCb = (uint8_t *)cMemoryAlign.WelsMalloc(iLineSizeDec<<5,"pDecCb");
+  uint8_t* pEncCb = (uint8_t *)cMemoryAlign.WelsMalloc(iLineSizeEnc<<5,"pEncCb");
+  uint8_t* pDecCr = (uint8_t *)cMemoryAlign.WelsMalloc(iLineSizeDec<<5,"pDecCr");
+  uint8_t* pEncCr = (uint8_t *)cMemoryAlign.WelsMalloc(iLineSizeEnc<<5,"pEncCr");
+  uint8_t* pDstChma = (uint8_t *)cMemoryAlign.WelsMalloc(512,"pDstChma");
+  srand((uint32_t)time(NULL));
+  for(int i=0;i<(iLineSizeDec<<5);i++){
+    pDecCb[i]=rand()%256;
+    pDecCr[i]=rand()%256;
+  }
+  for(int i=0;i<(iLineSizeEnc<<5);i++){
+    pEncCb[i]=rand()%256;
+    pEncCr[i]=rand()%256;
+  }
+  for(int i=0;i<512;i++)
+    pDstChma[i]=rand()%256;
+  tmpa = WelsSampleSatdIntra8x8Combined3_c(pDecCb+128, iLineSizeDec, pEncCb,iLineSizeEnc,&iBestMode_c, iLambda, pDstChma, pDecCr+128, pEncCr);
+  tmpb = WelsIntraChroma8x8Combined3Satd_sse41(pDecCb+128, iLineSizeDec, pEncCb,iLineSizeEnc,&iBestMode_a, iLambda, pDstChma, pDecCr+128, pEncCr);
+  ASSERT_EQ(tmpa, tmpb);
+  ASSERT_EQ(iBestMode_c, iBestMode_a);
+  cMemoryAlign.WelsFree(pDecCb,"pDecCb");
+  cMemoryAlign.WelsFree(pEncCb,"pEncCb");
+  cMemoryAlign.WelsFree(pDecCr,"pDecCr");
+  cMemoryAlign.WelsFree(pEncCr,"pEncCr");
+  cMemoryAlign.WelsFree(pDstChma,"pDstChma");
+}
+#endif
 #define ASSERT_MEMORY_FAIL2X(A, B)     \
   if (NULL == B) {                     \
     pMemAlign->WelsFree(A, "Sad_SrcA");\

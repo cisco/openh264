@@ -100,6 +100,7 @@ BITS 64
 %define r1w  dx
 %define r2w  r8w
 %define r3w  r9w
+%define r6w  r11w
 
 %define r0b  cl
 %define r1b  dl
@@ -149,6 +150,7 @@ BITS 64
 %define r1w  si
 %define r2w  dx
 %define r3w  cx
+%define r6w  r10w
 
 %define r0b  dil
 %define r1b  sil
@@ -198,6 +200,7 @@ BITS 32
 %define r1w cx
 %define r2w dx
 %define r3w bx
+%define r6w bp
 
 %define r0b al
 %define r1b cl
