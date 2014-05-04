@@ -33,5 +33,5 @@ EXEEXT=.exe
 OBJ=obj
 SHAREDLIBSUFFIX=dll
 SHARED=-LD
-SHLDFLAGS=-link -def:wels.def -implib:wels_dll.lib
-EXTRA_LIBRARY=wels_dll.lib
+SHLDFLAGS=-link -def:wels.def -implib:$(PROJECT_NAME)_dll.lib
+EXTRA_LIBRARY=$(PROJECT_NAME)_dll.lib
