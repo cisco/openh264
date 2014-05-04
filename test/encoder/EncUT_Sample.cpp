@@ -9,7 +9,7 @@
 #include "sad_common.h"
 
 using namespace WelsSVCEnc;
-
+#ifdef X86_ASM
 TEST(IntraSadSatdFuncTest, WelsIntra16x16Combined3Sad_ssse3){
   const int32_t iLineSizeDec = 32;
   const int32_t iLineSizeEnc = 32;
@@ -138,7 +138,7 @@ TEST(IntraSadSatdFuncTest, WelsIntraChroma8x8Combined3Satd_sse41){
   cMemoryAlign.WelsFree(pEncCr,"pEncCr");
   cMemoryAlign.WelsFree(pDstChma,"pDstChma");
 }
-
+#endif
 #define ASSERT_MEMORY_FAIL2X(A, B)     \
   if (NULL == B) {                     \
     pMemAlign->WelsFree(A, "Sad_SrcA");\
