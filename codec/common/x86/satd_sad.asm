@@ -2367,6 +2367,7 @@ WELS_EXTERN WelsSampleSadFour8x8_sse2
 WELS_EXTERN WelsSampleSadFour4x4_sse2
 	%assign  push_num 0
 	LOAD_5_PARA
+	PUSH_XMM 8
 	SIGN_EXTENSION r1, r1d
 	SIGN_EXTENSION r3, r3d
 	movd   xmm0,   [r0]
@@ -2428,6 +2429,7 @@ WELS_EXTERN WelsSampleSadFour4x4_sse2
 	punpckldq  xmm2, xmm3
 	punpcklqdq xmm1, xmm2
 	movdqa     [r4],xmm1
+	POP_XMM
 	LOAD_5_PARA_POP
 	ret
 
