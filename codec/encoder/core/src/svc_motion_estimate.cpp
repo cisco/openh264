@@ -339,13 +339,11 @@ void CalcMvdCostx8_c( uint16_t *pMvdCost, const int32_t kiStartMv, uint16_t* pMv
     pMvd += 4;
   }
 }
-void VerticalFullSearchUsingSSE41( void *pFunc, void *vpMe,
+void VerticalFullSearchUsingSSE41( SWelsFuncPtrList *pFuncList, SWelsME *pMe,
                             uint16_t* pMvdTable, const int32_t kiFixedMvd,
                             const int32_t kiEncStride, const int32_t kiRefStride,
                           const int32_t kiMinPos, const int32_t kiMaxPos,
                           const bool bVerticalSearch ) {
-  SWelsFuncPtrList *pFuncList      = static_cast<SWelsFuncPtrList *>(pFunc);
-  SWelsME *pMe                        = static_cast<SWelsME *>(vpMe);
   uint8_t*  kpEncMb = pMe->pEncMb;
   const int32_t kiCurMeBlockPix = pMe->iCurMeBlockPixY;
   uint8_t* pRef         = &pMe->pColoRefMb[(kiMinPos - kiCurMeBlockPix)*kiRefStride];
@@ -410,14 +408,12 @@ void VerticalFullSearchUsingSSE41( void *pFunc, void *vpMe,
   }
 }
 
-void HorizontalFullSearchUsingSSE41( void *pFunc, void *vpMe,
+void HorizontalFullSearchUsingSSE41( SWelsFuncPtrList *pFuncList, SWelsME *pMe,
                                       uint16_t* pMvdTable, const int32_t kiFixedMvd,
                                       const int32_t kiEncStride, const int32_t kiRefStride,
                                       const int32_t kiMinPos, const int32_t kiMaxPos,
                                       const bool bVerticalSearch )
 {
-  SWelsFuncPtrList *pFuncList      = static_cast<SWelsFuncPtrList *>(pFunc);
-  SWelsME *pMe                        = static_cast<SWelsME *>(vpMe);
   uint8_t *kpEncMb = pMe->pEncMb;
   const int32_t kiCurMeBlockPix = pMe->iCurMeBlockPixX;
   uint8_t *pRef         = &pMe->pColoRefMb[kiMinPos - kiCurMeBlockPix];
@@ -465,13 +461,11 @@ void HorizontalFullSearchUsingSSE41( void *pFunc, void *vpMe,
   }
 }
 #endif
-void LineFullSearch_c( void *pFunc, void *vpMe,
+void LineFullSearch_c( SWelsFuncPtrList *pFuncList, SWelsME *pMe,
              uint16_t* pMvdTable, const int32_t kiFixedMvd,
              const int32_t kiEncStride, const int32_t kiRefStride,
              const int32_t kiMinPos, const int32_t kiMaxPos,
                           const bool bVerticalSearch ) {
-  SWelsFuncPtrList *pFuncList      = static_cast<SWelsFuncPtrList *>(pFunc);
-  SWelsME *pMe                            = static_cast<SWelsME *>(vpMe);
   PSampleSadSatdCostFunc pSad = pFuncList->sSampleDealingFuncs.pfSampleSad[pMe->uiBlockSize];
   const int32_t kiCurMeBlockPix  = bVerticalSearch?pMe->iCurMeBlockPixY:pMe->iCurMeBlockPixX;
   const int32_t kiStride = bVerticalSearch?kiRefStride:1;

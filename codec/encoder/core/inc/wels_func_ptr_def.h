@@ -49,6 +49,8 @@ namespace WelsSVCEnc {
 
 typedef struct TagWelsFuncPointerList SWelsFuncPtrList;
 
+typedef struct TagWelsME SWelsME;
+
 typedef void (*PSetMemoryZero) (void* pDst, int32_t iSize);
 typedef void (*PDctFunc) (int16_t* pDct, uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2);
 
@@ -148,7 +150,7 @@ typedef void (*PCalculateSatdFunc) ( PSampleSadSatdCostFunc pSatd, void * vpMe, 
 typedef bool (*PCheckDirectionalMv) (PSampleSadSatdCostFunc pSad, void * vpMe,
                       const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
                       int32_t& iBestSadCost);
-typedef void (*PLineFullSearchFunc) (	void *pFunc, void *vpMe,
+typedef void (*PLineFullSearchFunc) (	SWelsFuncPtrList *pFuncList, SWelsME *pMe,
 													uint16_t* pMvdTable, const int32_t kiFixedMvd,
 													const int32_t kiEncStride, const int32_t kiRefStride,
 													const int32_t kiMinPos, const int32_t kiMaxPos,
