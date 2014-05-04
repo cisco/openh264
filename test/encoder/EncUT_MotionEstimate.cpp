@@ -174,7 +174,7 @@ TEST_F(MotionEstimateTest, TestVerticalSearch) {
                       pMvdCostY, pMvdCostX[ iCurMeBlockQpelPixX ],
                       m_iMaxSearchBlock, m_iWidth,
                       INTPEL_NEEDED_MARGIN,
-                      m_iHeight-INTPEL_NEEDED_MARGIN, true );
+                      m_iHeight-INTPEL_NEEDED_MARGIN-16, true );
 
     //the last selection may be affected by MVDcost, that is when smaller MvY will be better
     bFoundMatch = (sMe.sMv.iMvX==0
@@ -235,7 +235,7 @@ TEST_F(MotionEstimateTest, TestHorizontalSearch) {
                       pMvdCostX, pMvdCostY[ iCurMeBlockQpelPixY ],
                       m_iMaxSearchBlock, m_iWidth,
                       INTPEL_NEEDED_MARGIN,
-                      m_iWidth-INTPEL_NEEDED_MARGIN, false );
+                      m_iWidth-INTPEL_NEEDED_MARGIN-16, false );
 
     //the last selection may be affected by MVDcost, that is when smaller MvY will be better
     bFoundMatch = (sMe.sMv.iMvY==0
@@ -303,7 +303,7 @@ TEST_F(MotionEstimateTest, TestVerticalSearch_SSE41)
                       pMvdCostY, pMvdCostX[ iCurMeBlockQpelPixX ],
                       m_iMaxSearchBlock, m_iWidth,
                       INTPEL_NEEDED_MARGIN,
-                      m_iHeight-INTPEL_NEEDED_MARGIN, true );
+                      m_iHeight-INTPEL_NEEDED_MARGIN-16, true );
 
     //the last selection may be affected by MVDcost, that is when smaller MvY will be better
     bFoundMatch = (sMe.sMv.iMvX==0
@@ -369,7 +369,7 @@ TEST_F(MotionEstimateTest, TestHorizontalSearch_SSE41)
                       pMvdCostX, pMvdCostY[ iCurMeBlockQpelPixY ],
                       m_iMaxSearchBlock, m_iWidth,
                       INTPEL_NEEDED_MARGIN,
-                      m_iWidth-INTPEL_NEEDED_MARGIN, false );
+                      m_iWidth-INTPEL_NEEDED_MARGIN-16, false );
 
     //the last selection may be affected by MVDcost, that is when smaller MvY will be better
     bFoundMatch = (sMe.sMv.iMvY==0
