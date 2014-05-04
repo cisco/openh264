@@ -127,6 +127,7 @@ typedef struct TagFeatureSearchOut{
 }SFeatureSearchOut;
 
 #define  COST_MVD(table, mx, my)  (table[mx] + table[my])
+extern const int32_t QStepx16ByQp[52];
 
 // Function definitions below
 
@@ -242,36 +243,32 @@ int32_t ReleaseFeatureSearchPreparation( CMemoryAlign *pMa, uint16_t*& pFeatureO
 
 #define FMESWITCH_DEFAULT_GOODFRAME_NUM (2)
 #define FME_DEFAULT_FEATURE_INDEX (0)
-void PerformFMEPreprocess( SWelsFuncPtrList *pFunc, SPicture* pRef,
-                          SScreenBlockFeatureStorage* pScreenBlockFeatureStorage);
 
+void PerformFMEPreprocess( SWelsFuncPtrList *pFunc, SPicture* pRef, uint16_t* pFeatureOfBlock,
+                          SScreenBlockFeatureStorage* pScreenBlockFeatureStorage);
 void UpdateFMESwitch(SDqLayer* pCurLayer);
 void UpdateFMESwitchNull(SDqLayer* pCurLayer);
 
 //inline functions
 inline void SetMvWithinIntegerMvRange( const int32_t kiMbWidth, const int32_t kiMbHeight, const int32_t kiMbX, const int32_t kiMbY,
                         const int32_t kiMaxMvRange,
-                        SMVUnitXY* pMvMin, SMVUnitXY* pMvMax)
-{
+                        SMVUnitXY* pMvMin, SMVUnitXY* pMvMax) {
   pMvMin->iMvX = WELS_MAX(-1*((kiMbX + 1)<<4) + INTPEL_NEEDED_MARGIN, -1*kiMaxMvRange);
   pMvMin->iMvY = WELS_MAX(-1*((kiMbY + 1)<<4) + INTPEL_NEEDED_MARGIN, -1*kiMaxMvRange);
   pMvMax->iMvX = WELS_MIN( ((kiMbWidth - kiMbX)<<4) - INTPEL_NEEDED_MARGIN, kiMaxMvRange);
   pMvMax->iMvY = WELS_MIN( ((kiMbHeight - kiMbY)<<4) - INTPEL_NEEDED_MARGIN, kiMaxMvRange);
 }
 
-inline bool CheckMvInRange( const int16_t kiCurrentMv, const int16_t kiMinMv, const int16_t kiMaxMv )
-{
+inline bool CheckMvInRange( const int16_t kiCurrentMv, const int16_t kiMinMv, const int16_t kiMaxMv ) {
   return ((kiCurrentMv >= kiMinMv) && (kiCurrentMv < kiMaxMv));
 }
-inline bool CheckMvInRange( const SMVUnitXY ksCurrentMv, const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv )
-{
+inline bool CheckMvInRange( const SMVUnitXY ksCurrentMv, const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv ) {
   return (CheckMvInRange(ksCurrentMv.iMvX, ksMinMv.iMvX, ksMaxMv.iMvX)
     && CheckMvInRange(ksCurrentMv.iMvY, ksMinMv.iMvY, ksMaxMv.iMvY));
 }
 //FME switch related
 inline bool CalcFMESwitchFlag(const uint8_t uiFMEGoodFrameCount, const int32_t iHighFreMbPrecentage,
-       const int32_t iAvgMbSAD, const bool bScrollingDetected )
-{
+       const int32_t iAvgMbSAD, const bool bScrollingDetected ) {
   return ( bScrollingDetected ||( uiFMEGoodFrameCount>0 && iAvgMbSAD > FMESWITCH_MBSAD_THRESHOLD ) );
   //TODO: add the logic of iHighFreMbPrecentage
   //return ( iHighFreMbPrecentage > 2

@@ -57,14 +57,12 @@ const int32_t QStepx16ByQp[52] = {  /* save QStep<<4 for int32_t */
     2560, 2816, 3328, 3584     /* 48~51 */
 };
 
-static inline void UpdateMeResults( const SMVUnitXY ksBestMv, const uint32_t kiBestSadCost, uint8_t* pRef, SWelsME * pMe )
-{
+static inline void UpdateMeResults( const SMVUnitXY ksBestMv, const uint32_t kiBestSadCost, uint8_t* pRef, SWelsME * pMe ) {
   pMe->sMv = ksBestMv;
   pMe->pRefMb = pRef;
   pMe->uiSadCost = kiBestSadCost;
 }
-static inline void MeEndIntepelSearch( SWelsME * pMe )
-{
+static inline void MeEndIntepelSearch( SWelsME * pMe ) {
     /* -> qpel mv */
     pMe->sMv.iMvX <<= 2;
     pMe->sMv.iMvY <<= 2;
@@ -603,14 +601,20 @@ int32_t RequestScreenBlockFeatureStorage( CMemoryAlign *pMa, const int32_t kiFra
 }
 int32_t ReleaseScreenBlockFeatureStorage( CMemoryAlign *pMa, SScreenBlockFeatureStorage* pScreenBlockFeatureStorage ) {
   if ( pMa && pScreenBlockFeatureStorage ) {
-    pMa->WelsFree( pScreenBlockFeatureStorage->pTimesOfFeatureValue, "pScreenBlockFeatureStorage->pTimesOfFeatureValue");
-    pScreenBlockFeatureStorage->pTimesOfFeatureValue=NULL;
+    if (pScreenBlockFeatureStorage->pTimesOfFeatureValue) {
+      pMa->WelsFree( pScreenBlockFeatureStorage->pTimesOfFeatureValue, "pScreenBlockFeatureStorage->pTimesOfFeatureValue");
+      pScreenBlockFeatureStorage->pTimesOfFeatureValue=NULL;
+    }
 
-    pMa->WelsFree( pScreenBlockFeatureStorage->pLocationOfFeature, "pScreenBlockFeatureStorage->pLocationOfFeature");
-    pScreenBlockFeatureStorage->pLocationOfFeature=NULL;
+    if (pScreenBlockFeatureStorage->pLocationOfFeature) {
+      pMa->WelsFree( pScreenBlockFeatureStorage->pLocationOfFeature, "pScreenBlockFeatureStorage->pLocationOfFeature");
+      pScreenBlockFeatureStorage->pLocationOfFeature=NULL;
+    }
 
-    pMa->WelsFree( pScreenBlockFeatureStorage->pLocationPointer, "pScreenBlockFeatureStorage->pLocationPointer");
-    pScreenBlockFeatureStorage->pLocationPointer=NULL;
+    if (pScreenBlockFeatureStorage->pLocationPointer) {
+      pMa->WelsFree( pScreenBlockFeatureStorage->pLocationPointer, "pScreenBlockFeatureStorage->pLocationPointer");
+      pScreenBlockFeatureStorage->pLocationPointer=NULL;
+    }
 
     return ENC_RETURN_SUCCESS;
   }
@@ -730,8 +734,10 @@ void CalculateFeatureOfBlock( SWelsFuncPtrList *pFunc, SPicture* pRef,
   FillQpelLocationByFeatureValue_c(pFeatureOfBlock, iWidth, kiHeight, pFeatureValuePointerList);
 }
 
-void PerformFMEPreprocess( SWelsFuncPtrList *pFunc, SPicture* pRef,
-                          SScreenBlockFeatureStorage* pScreenBlockFeatureStorage) {
+void PerformFMEPreprocess( SWelsFuncPtrList *pFunc, SPicture* pRef, uint16_t*	pFeatureOfBlock,
+                          SScreenBlockFeatureStorage* pScreenBlockFeatureStorage)
+{
+    pScreenBlockFeatureStorage->pFeatureOfBlockPointer = pFeatureOfBlock;
     CalculateFeatureOfBlock(pFunc, pRef, pScreenBlockFeatureStorage );
     pScreenBlockFeatureStorage->bRefBlockFeatureCalculated = true;
 
