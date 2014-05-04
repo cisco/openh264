@@ -353,6 +353,283 @@ WELS_EXTERN WelsSampleSatd16x16_sse2
 ;
 ;***********************************************************************
 
+
+%macro SSE_DB_1_2REG 2
+      pxor %1, %1
+      pcmpeqw %2, %2
+      psubb %1, %2
+%endmacro
+
+;***********************************************************************
+;
+;int32_t WelsSampleSatdThree4x4_sse2( uint8_t *pDec, int32_t iLineSizeDec, uint8_t *pEnc, int32_t iLinesizeEnc,
+;                             uint8_t* pRed, int32_t* pBestMode, int32_t, int32_t, int32_t);
+;
+;***********************************************************************
+WELS_EXTERN WelsSampleSatdThree4x4_sse2
+
+%ifdef X86_32
+	push r3
+	push r4
+	push r5
+	push r6
+	%assign  push_num 4
+%else
+	%assign  push_num 0
+%endif
+	PUSH_XMM 8
+
+	mov  r2, arg3
+	mov  r3, arg4
+	SIGN_EXTENSION r3, r3d
+
+	; load source 4x4 samples and Hadamard transform
+	movd      xmm0, [r2]
+	movd      xmm1, [r2+r3]
+	lea       r2 , [r2+2*r3]
+	movd      xmm2, [r2]
+	movd      xmm3, [r2+r3]
+	punpckldq xmm0, xmm2
+	punpckldq xmm1, xmm3
+
+	pxor      xmm6, xmm6
+	punpcklbw xmm0, xmm6
+	punpcklbw xmm1, xmm6
+
+	movdqa    xmm2, xmm0
+	paddw     xmm0, xmm1
+	psubw     xmm2, xmm1
+	SSE2_XSawp  qdq, xmm0, xmm2, xmm3
+
+	movdqa    xmm4, xmm0
+	paddw     xmm0, xmm3
+	psubw     xmm4, xmm3
+
+	movdqa    xmm2, xmm0
+	punpcklwd xmm0, xmm4
+	punpckhwd xmm4, xmm2
+
+	SSE2_XSawp  dq,  xmm0, xmm4, xmm3
+	SSE2_XSawp  qdq, xmm0, xmm3, xmm5
+
+	movdqa    xmm7, xmm0
+	paddw     xmm0, xmm5
+	psubw     xmm7, xmm5
+
+	SSE2_XSawp  qdq,  xmm0, xmm7, xmm1
+
+	; Hadamard transform results are saved in xmm0 and xmm2
+	movdqa    xmm2, xmm0
+	paddw     xmm0, xmm1
+	psubw     xmm2, xmm1
+
+	;load top boundary samples: [a b c d]
+	mov r0, arg1
+	mov r1, arg2
+	SIGN_EXTENSION r1, r1d
+	sub r0, r1
+%ifdef UNIX64
+	push r4
+	push r5
+%endif
+
+	movzx     r2d,  byte [r0]
+	movzx     r3d,  byte [r0+1]
+	movzx     r4d,  byte [r0+2]
+	movzx     r5d,  byte [r0+3]
+
+	; get the transform results of top boundary samples: [a b c d]
+	add       r3d, r2d ; r3d = a + b
+	add       r5d, r4d ; r5d = c + d
+	add       r2d, r2d ; r2d = a + a
+	add       r4d, r4d ; r4d = c + c
+	sub       r2d, r3d ; r2d = a + a - a - b = a - b
+	sub       r4d, r5d ; r4d = c + c - c - d = c - d
+	add       r5d, r3d ; r5d = (a + b) + (c + d)
+	add       r3d, r3d
+	sub       r3d, r5d ; r3d = (a + b) - (c + d)
+	add       r4d, r2d ; r4d = (a - b) + (c - d)
+	add       r2d, r2d
+	sub       r2d, r4d ; r2d = (a - b) - (c - d) ; [r5d r3d r2d r4d]
+
+	movdqa    xmm6, xmm0
+	movdqa    xmm7, xmm2
+	movd      xmm5, r5d ; store the edi for DC mode
+	pxor      xmm3, xmm3
+	pxor      xmm4, xmm4
+	pinsrw    xmm3, r5d, 0
+	pinsrw    xmm3, r4d, 4
+	psllw     xmm3, 2
+	pinsrw    xmm4, r3d, 0
+	pinsrw    xmm4, r2d, 4
+	psllw     xmm4, 2
+
+	; get the satd of H
+	psubw     xmm0, xmm3
+	psubw     xmm2, xmm4
+
+	WELS_AbsW  xmm0, xmm1
+	WELS_AbsW  xmm2, xmm1
+	paddusw        xmm0, xmm2
+	SSE2_SumWHorizon1  xmm0, xmm1 ; satd of V is stored in xmm0
+
+	;load left boundary samples: [a b c d]'
+	add r0, r1
+
+	movzx     r2d,  byte [r0-1]
+	movzx     r3d,  byte [r0+r1-1]
+	lea       r0 , [r0+2*r1]
+	movzx     r4d,  byte [r0-1]
+	movzx     r5d,  byte [r0+r1-1]
+
+	; get the transform results of left boundary samples: [a b c d]'
+	add       r3d, r2d ; r3d = a + b
+	add       r5d, r4d ; r5d = c + d
+	add       r2d, r2d ; r2d = a + a
+	add       r4d, r4d ; r4d = c + c
+	sub       r2d, r3d ; r2d = a + a - a - b = a - b
+	sub       r4d, r5d ; r4d = c + c - c - d = c - d
+	add       r5d, r3d ; r5d = (a + b) + (c + d)
+	add       r3d, r3d
+	sub       r3d, r5d ; r3d = (a + b) - (c + d)
+	add       r4d, r2d ; r4d = (a - b) + (c - d)
+	add       r2d, r2d
+	sub       r2d, r4d ; r2d = (a - b) - (c - d) ; [r5d r3d r2d r4d]
+
+	; store the transform results in xmm3
+	movd      xmm3, r5d
+	pinsrw    xmm3, r3d, 1
+	pinsrw    xmm3, r2d, 2
+	pinsrw    xmm3, r4d, 3
+	psllw     xmm3, 2
+
+	; get the satd of V
+	movdqa    xmm2, xmm6
+	movdqa    xmm4, xmm7
+	psubw     xmm2, xmm3
+	WELS_AbsW  xmm2, xmm1
+	WELS_AbsW  xmm4, xmm1
+	paddusw        xmm2, xmm4
+	SSE2_SumWHorizon1  xmm2, xmm1 ; satd of H is stored in xmm2
+
+	; DC result is stored in xmm1
+	add       r5d, 4
+	movd      xmm1, r5d
+	paddw     xmm1, xmm5
+	psrlw     xmm1, 3
+	movdqa    xmm5, xmm1
+	psllw     xmm1, 4
+
+	; get the satd of DC
+	psubw          xmm6, xmm1
+	WELS_AbsW  xmm6, xmm1
+	WELS_AbsW  xmm7, xmm1
+	paddusw        xmm6, xmm7
+	SSE2_SumWHorizon1  xmm6, xmm1 ; satd of DC is stored in xmm6
+%ifdef UNIX64
+	pop r5
+	pop r4
+%endif
+	; comparing order: DC H V
+
+	mov  r4, arg5
+	movd      r2d, xmm6
+	movd      r3d, xmm2
+	movd      r6d, xmm0
+
+	and       r2d, 0xffff
+	shr       r2d, 1
+	and       r3d, 0xffff
+	shr       r3d, 1
+	and       r6d, 0xffff
+	shr       r6d, 1
+	add       r2d, dword arg7
+	add       r3d, dword arg8
+	add       r6d, dword arg9
+	cmp       r2w, r3w
+	jg near   not_dc
+	cmp       r2w, r6w
+	jg near   not_dc_h
+
+	; for DC mode
+	movd      r3d, xmm5
+	imul      r3d, 0x01010101
+	movd	  xmm5, r3d
+	pshufd    xmm5, xmm5, 0
+	movdqa    [r4], xmm5
+	mov r5, arg6
+	mov       dword [r5], 0x02
+	mov retrd, r2d
+	POP_XMM
+%ifdef X86_32
+	pop r6
+	pop r5
+	pop r4
+	pop r3
+%endif
+	ret
+
+not_dc:
+	cmp       r3w, r6w
+	jg near   not_dc_h
+
+	; for H mode
+	SSE_DB_1_2REG  xmm6, xmm7
+	sub        r0, r1
+	sub        r0, r1
+	movzx      r6d,  byte [r0-1]
+	movd       xmm0, r6d
+	pmuludq    xmm0, xmm6
+
+	movzx     r6d,  byte [r0+r1-1]
+	movd      xmm1, r6d
+	pmuludq   xmm1, xmm6
+	punpckldq xmm0, xmm1
+
+	lea       r0,	[r0+r1*2]
+	movzx	  r6d,	byte [r0-1]
+	movd	  xmm2,	r6d
+	pmuludq   xmm2, xmm6
+
+	movzx	  r6d,	byte [r0+r1-1]
+	movd	  xmm3,	r6d
+	pmuludq   xmm3, xmm6
+	punpckldq  xmm2, xmm3
+	punpcklqdq xmm0, xmm2
+
+	movdqa	  [r4],xmm0
+
+	mov       retrd, r3d
+	mov r5, arg6
+	mov       dword [r5], 0x01
+	POP_XMM
+%ifdef X86_32
+	pop r6
+	pop r5
+	pop r4
+	pop r3
+%endif
+	ret
+not_dc_h:
+	sub        r0, r1
+	sub        r0, r1
+	sub        r0, r1
+	movd	  xmm0,	[r0]
+	pshufd	  xmm0,	xmm0, 0
+	movdqa	  [r4],xmm0
+	mov       retrd, r6d
+	mov r5, arg6
+	mov       dword [r5], 0x00
+	POP_XMM
+%ifdef X86_32
+	pop r6
+	pop r5
+	pop r4
+	pop r3
+%endif
+	ret
+
+
 %macro SSE41_I16x16Get8WSumSub 3 ;xmm5 HSumSubDB1, xmm6 HSumSubDW1, xmm7 PDW1 : in %1, pOut %1, %3
 	pmaddubsw    %1, xmm5
 	movdqa       %2, %1
@@ -390,12 +667,12 @@ WELS_EXTERN WelsSampleSatd16x16_sse2
 
 %macro SSE41_GetX38x4SatdDec 0
 	pxor        xmm7,   xmm7
-	movq        xmm0,   [eax]
-	movq        xmm1,   [eax+ebx]
-	lea         eax,    [eax+2*ebx]
-	movq        xmm2,   [eax]
-	movq        xmm3,   [eax+ebx]
-	lea         eax,    [eax+2*ebx]
+	movq        xmm0,   [r2]
+	movq        xmm1,   [r2+r3]
+	lea         r2,    [r2+2*r3]
+	movq        xmm2,   [r2]
+	movq        xmm3,   [r2+r3]
+	lea         r2,    [r2+2*r3]
 	punpcklbw   xmm0,   xmm7
 	punpcklbw   xmm1,   xmm7
 	punpcklbw   xmm2,   xmm7
@@ -405,34 +682,35 @@ WELS_EXTERN WelsSampleSatd16x16_sse2
 	SSE2_HDMTwo4x4       xmm3,xmm1,xmm2,xmm7,xmm0 ;pOut xmm7,xmm1,xmm3,xmm2
 	;doesn't need another transpose
 %endmacro
+
 %macro SSE41_GetX38x4SatdV 2
 	pxor        xmm0,   xmm0
-	pinsrw      xmm0,   word[esi+%2],   0
-	pinsrw      xmm0,   word[esi+%2+8], 4
+	pinsrw      xmm0,   word[r6+%2],   0
+	pinsrw      xmm0,   word[r6+%2+8], 4
 	psubsw      xmm0,   xmm7
 	pabsw       xmm0,   xmm0
 	paddw       xmm4,   xmm0
 	pxor        xmm0,   xmm0
-	pinsrw      xmm0,   word[esi+%2+2],  0
-	pinsrw      xmm0,   word[esi+%2+10], 4
+	pinsrw      xmm0,   word[r6+%2+2],  0
+	pinsrw      xmm0,   word[r6+%2+10], 4
 	psubsw      xmm0,   xmm1
 	pabsw       xmm0,   xmm0
 	paddw       xmm4,   xmm0
 	pxor        xmm0,   xmm0
-	pinsrw      xmm0,   word[esi+%2+4],  0
-	pinsrw      xmm0,   word[esi+%2+12], 4
+	pinsrw      xmm0,   word[r6+%2+4],  0
+	pinsrw      xmm0,   word[r6+%2+12], 4
 	psubsw      xmm0,   xmm3
 	pabsw       xmm0,   xmm0
 	paddw       xmm4,   xmm0
 	pxor        xmm0,   xmm0
-	pinsrw      xmm0,   word[esi+%2+6],  0
-	pinsrw      xmm0,   word[esi+%2+14], 4
+	pinsrw      xmm0,   word[r6+%2+6],  0
+	pinsrw      xmm0,   word[r6+%2+14], 4
 	psubsw      xmm0,   xmm2
 	pabsw       xmm0,   xmm0
 	paddw       xmm4,   xmm0
 %endmacro
 %macro SSE41_GetX38x4SatdH  3
-	movq        xmm0,   [esi+%3+8*%1]
+	movq        xmm0,   [r6+%3+8*%1]
 	punpcklqdq  xmm0,   xmm0
 	psubsw      xmm0,   xmm7
 	pabsw       xmm0,   xmm0
@@ -455,7 +733,7 @@ WELS_EXTERN WelsSampleSatd16x16_sse2
 %endmacro
 %macro SSE41_ChromaGetX38x4SatdDC 1
 	shl         %1,     4
-	movdqa      xmm0,   [esi+32+%1]
+	movdqa      xmm0,   [r6+32+%1]
 	psubsw      xmm0,   xmm7
 	pabsw       xmm0,   xmm0
 	paddw       xmm6,   xmm0
@@ -481,83 +759,93 @@ WELS_EXTERN WelsSampleSatd16x16_sse2
 	paddd       %1, %3
 %endmacro
 
-
-%ifdef X86_32
 WELS_EXTERN WelsIntra16x16Combined3Satd_sse41
-	push   ebx
-	push   esi
-	push   edi
-	mov    ecx,    [esp+16]
-	mov    edx,    [esp+20]
-	mov    eax,    [esp+24]
-	mov    ebx,    [esp+28]
-	mov    esi,    [esp+40] ;temp_satd
+	%assign  push_num 0
+	LOAD_7_PARA
+	PUSH_XMM 8
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
+	SIGN_EXTENSION r5, r5d
+
+%ifndef X86_32
+	push r12
+	mov  r12, r2
+%endif
+
 	pxor        xmm4,   xmm4
 	movdqa      xmm5,   [HSumSubDB1]
 	movdqa      xmm6,   [HSumSubDW1]
 	movdqa      xmm7,   [PDW1]
-	sub         ecx,    edx
-	movdqu 		xmm0,   [ecx]
+	sub         r0,    r1
+	movdqu		xmm0,   [r0]
 	movhlps		xmm1,   xmm0
 	punpcklqdq  xmm0,   xmm0
 	punpcklqdq  xmm1,   xmm1
 	SSE41_I16x16Get8WSumSub xmm0, xmm2, xmm3
 	SSE41_I16x16Get8WSumSub xmm1, xmm2, xmm3
-	movdqa      [esi],  xmm0 ;V
-	movdqa      [esi+16], xmm1
-	add         ecx,    edx
-	pinsrb      xmm0,   byte[ecx-1], 0
-	pinsrb      xmm0,   byte[ecx+edx-1], 1
-	lea         ecx,    [ecx+2*edx]
-	pinsrb      xmm0,   byte[ecx-1],     2
-	pinsrb      xmm0,   byte[ecx+edx-1], 3
-	lea         ecx,    [ecx+2*edx]
-	pinsrb      xmm0,   byte[ecx-1],     4
-	pinsrb      xmm0,   byte[ecx+edx-1], 5
-	lea         ecx,    [ecx+2*edx]
-	pinsrb      xmm0,   byte[ecx-1],     6
-	pinsrb      xmm0,   byte[ecx+edx-1], 7
-	lea         ecx,    [ecx+2*edx]
-	pinsrb      xmm0,   byte[ecx-1],     8
-	pinsrb      xmm0,   byte[ecx+edx-1], 9
-	lea         ecx,    [ecx+2*edx]
-	pinsrb      xmm0,   byte[ecx-1],     10
-	pinsrb      xmm0,   byte[ecx+edx-1], 11
-	lea         ecx,    [ecx+2*edx]
-	pinsrb      xmm0,   byte[ecx-1],     12
-	pinsrb      xmm0,   byte[ecx+edx-1], 13
-	lea         ecx,    [ecx+2*edx]
-	pinsrb      xmm0,   byte[ecx-1],     14
-	pinsrb      xmm0,   byte[ecx+edx-1], 15
+	movdqa      [r6],  xmm0 ;V
+	movdqa      [r6+16], xmm1
+	add         r0,    r1
+	pinsrb      xmm0,   byte[r0-1], 0
+	pinsrb      xmm0,   byte[r0+r1-1], 1
+	lea         r0,    [r0+2*r1]
+	pinsrb      xmm0,   byte[r0-1],     2
+	pinsrb      xmm0,   byte[r0+r1-1], 3
+	lea         r0,    [r0+2*r1]
+	pinsrb      xmm0,   byte[r0-1],     4
+	pinsrb      xmm0,   byte[r0+r1-1], 5
+	lea         r0,    [r0+2*r1]
+	pinsrb      xmm0,   byte[r0-1],     6
+	pinsrb      xmm0,   byte[r0+r1-1], 7
+	lea         r0,    [r0+2*r1]
+	pinsrb      xmm0,   byte[r0-1],     8
+	pinsrb      xmm0,   byte[r0+r1-1], 9
+	lea         r0,    [r0+2*r1]
+	pinsrb      xmm0,   byte[r0-1],     10
+	pinsrb      xmm0,   byte[r0+r1-1], 11
+	lea         r0,    [r0+2*r1]
+	pinsrb      xmm0,   byte[r0-1],     12
+	pinsrb      xmm0,   byte[r0+r1-1], 13
+	lea         r0,    [r0+2*r1]
+	pinsrb      xmm0,   byte[r0-1],     14
+	pinsrb      xmm0,   byte[r0+r1-1], 15
 	movhlps		xmm1,   xmm0
 	punpcklqdq  xmm0,   xmm0
 	punpcklqdq  xmm1,   xmm1
 	SSE41_I16x16Get8WSumSub xmm0, xmm2, xmm3
 	SSE41_I16x16Get8WSumSub xmm1, xmm2, xmm3
-	movdqa      [esi+32], xmm0 ;H
-	movdqa      [esi+48], xmm1
-	movd        ecx,    xmm4 ;dc
-	add         ecx,    16   ;(sum+16)
-	shr         ecx,    5    ;((sum+16)>>5)
-	shl         ecx,    4    ;
-	movd        mm4,    ecx  ; mm4 copy DC
+	movdqa      [r6+32], xmm0 ;H
+	movdqa      [r6+48], xmm1
+	movd        r0d,    xmm4 ;dc
+	add         r0d,    16   ;(sum+16)
+	shr         r0d,    5    ;((sum+16)>>5)
+	shl         r0d,    4    ;
+	movd        mm4,    r0d  ; mm4 copy DC
 	pxor        xmm4,   xmm4 ;V
 	pxor        xmm5,   xmm5 ;H
 	pxor        xmm6,   xmm6 ;DC
-	mov         ecx,    0
-	mov         edi,    0
+%ifdef UNIX64
+	push r4
+%endif
+	mov         r0,    0
+	mov         r4,    0
+
 .loop16x16_get_satd:
 .loopStart1:
-	SSE41_I16x16GetX38x4Satd ecx, edi
-	inc          ecx
-	cmp         ecx, 4
+	SSE41_I16x16GetX38x4Satd r0, r4
+	inc          r0
+	cmp         r0, 4
 	jl          .loopStart1
-	cmp         edi, 16
+	cmp         r4, 16
 	je          .loop16x16_get_satd_end
-	mov         eax, [esp+24]
-	add         eax, 8
-	mov         ecx, 0
-	add         edi, 16
+%ifdef X86_32
+	mov r2, arg3
+%else
+	mov r2, r12
+%endif
+	add         r2, 8
+	mov         r0, 0
+	add         r4, 16
 	jmp         .loop16x16_get_satd
  .loop16x16_get_satd_end:
 	MMX_DW_1_2REG    xmm0, xmm1
@@ -568,66 +856,70 @@ WELS_EXTERN WelsIntra16x16Combined3Satd_sse41
 	SSE41_HSum8W     xmm5, xmm0, xmm1
 	SSE41_HSum8W     xmm6, xmm0, xmm1
 
+%ifdef UNIX64
+	pop r4
+%endif
 	; comparing order: DC H V
-	movd      ebx, xmm6 ;DC
-	movd      edi, xmm5 ;H
-	movd      ecx, xmm4 ;V
-	mov      edx, [esp+36]
-	shl       edx, 1
-	add       edi, edx
-	add       ebx, edx
-	mov       edx, [esp+32]
-	cmp       ebx, edi
+	movd      r3d, xmm6 ;DC
+	movd      r1d, xmm5 ;H
+	movd      r0d, xmm4 ;V
+%ifndef X86_32
+	pop r12
+%endif
+	shl       r5d, 1
+	add       r1d, r5d
+	add       r3d, r5d
+	mov       r4, arg5
+	cmp       r3d, r1d
 	jge near   not_dc_16x16
-	cmp        ebx, ecx
+	cmp        r3d, r0d
 	jge near   not_dc_h_16x16
 
 	; for DC mode
-	mov       dword[edx], 2;I16_PRED_DC
-	mov       eax, ebx
+	mov       dword[r4], 2;I16_PRED_DC
+	mov       retrd, r3d
 	jmp near return_satd_intra_16x16_x3
 not_dc_16x16:
 	; for H mode
-	cmp       edi, ecx
+	cmp       r1d, r0d
 	jge near   not_dc_h_16x16
-	mov       dword[edx], 1;I16_PRED_H
-	mov       eax, edi
+	mov       dword[r4], 1;I16_PRED_H
+	mov       retrd, r1d
 	jmp near return_satd_intra_16x16_x3
 not_dc_h_16x16:
 	; for V mode
-	mov       dword[edx], 0;I16_PRED_V
-	mov       eax, ecx
+	mov       dword[r4], 0;I16_PRED_V
+	mov       retrd, r0d
 return_satd_intra_16x16_x3:
 	WELSEMMS
-	pop         edi
-	pop         esi
-	pop         ebx
+	POP_XMM
+	LOAD_7_PARA_POP
 ret
 
 %macro SSE41_ChromaGetX38x8Satd 0
 	movdqa      xmm5,   [HSumSubDB1]
 	movdqa      xmm6,   [HSumSubDW1]
 	movdqa      xmm7,   [PDW1]
-	sub         ecx,    edx
-	movq 		xmm0,   [ecx]
+	sub         r0,    r1
+	movq		xmm0,   [r0]
 	punpcklqdq  xmm0,   xmm0
 	SSE41_ChromaGet8WSumSub xmm0, xmm2, xmm3, xmm4
-	movdqa      [esi],  xmm0 ;V
-	add         ecx,    edx
-	pinsrb      xmm0,   byte[ecx-1], 0
-	pinsrb      xmm0,   byte[ecx+edx-1], 1
-	lea         ecx,    [ecx+2*edx]
-	pinsrb      xmm0,   byte[ecx-1],     2
-	pinsrb      xmm0,   byte[ecx+edx-1], 3
-	lea         ecx,    [ecx+2*edx]
-	pinsrb      xmm0,   byte[ecx-1],     4
-	pinsrb      xmm0,   byte[ecx+edx-1], 5
-	lea         ecx,    [ecx+2*edx]
-	pinsrb      xmm0,   byte[ecx-1],     6
-	pinsrb      xmm0,   byte[ecx+edx-1], 7
+	movdqa      [r6],  xmm0 ;V
+	add         r0,    r1
+	pinsrb      xmm0,   byte[r0-1], 0
+	pinsrb      xmm0,   byte[r0+r1-1], 1
+	lea         r0,    [r0+2*r1]
+	pinsrb      xmm0,   byte[r0-1],     2
+	pinsrb      xmm0,   byte[r0+r1-1], 3
+	lea         r0,    [r0+2*r1]
+	pinsrb      xmm0,   byte[r0-1],     4
+	pinsrb      xmm0,   byte[r0+r1-1], 5
+	lea         r0,    [r0+2*r1]
+	pinsrb      xmm0,   byte[r0-1],     6
+	pinsrb      xmm0,   byte[r0+r1-1], 7
 	punpcklqdq  xmm0,   xmm0
 	SSE41_ChromaGet8WSumSub xmm0, xmm2, xmm3, xmm1
-	movdqa      [esi+16], xmm0 ;H
+	movdqa      [r6+16], xmm0 ;H
 ;(sum+2)>>2
 	movdqa      xmm6,   [PDQ2]
 	movdqa      xmm5,   xmm4
@@ -647,21 +939,19 @@ ret
 	punpcklqdq  xmm4,   xmm5
 	psllq       xmm4,   32
 	psrlq       xmm4,   32
-	movdqa      [esi+32], xmm4
+	movdqa      [r6+32], xmm4
 	punpckhqdq  xmm5,   xmm6
 	psllq       xmm5,   32
 	psrlq       xmm5,   32
-	movdqa      [esi+48], xmm5
+	movdqa      [r6+48], xmm5
 
 	pxor        xmm4,   xmm4 ;V
 	pxor        xmm5,   xmm5 ;H
 	pxor        xmm6,   xmm6 ;DC
-	mov         ecx,    0
-loop_chroma_satdx3_cb_cr:
-	SSE41_ChromaGetX38x4Satd ecx, 0
-	inc             ecx
-	cmp             ecx, 2
-	jl              loop_chroma_satdx3_cb_cr
+	mov         r0,    0
+	SSE41_ChromaGetX38x4Satd r0, 0
+	inc             r0
+	SSE41_ChromaGetX38x4Satd r0, 0
 %endmacro
 
 %macro SSEReg2MMX 3
@@ -677,27 +967,22 @@ loop_chroma_satdx3_cb_cr:
 ;for reduce the code size of WelsIntraChroma8x8Combined3Satd_sse41
 
 WELS_EXTERN WelsIntraChroma8x8Combined3Satd_sse41
-	push   ebx
-	push   esi
-	push   edi
-	mov    ecx,    [esp+16]
-	mov    edx,    [esp+20]
-	mov    eax,    [esp+24]
-	mov    ebx,    [esp+28]
-	mov    esi,    [esp+40] ;temp_satd
-	xor    edi,    edi
+	%assign  push_num 0
+	LOAD_7_PARA
+	PUSH_XMM 8
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
+	SIGN_EXTENSION r5, r5d
 loop_chroma_satdx3:
 	SSE41_ChromaGetX38x8Satd
-	cmp             edi, 1
-	je              loop_chroma_satdx3end
-	inc             edi
 	SSEReg2MMX  xmm4, mm0,mm1
 	SSEReg2MMX  xmm5, mm2,mm3
 	SSEReg2MMX  xmm6, mm5,mm6
-	mov         ecx,  [esp+44]
-	mov         eax,  [esp+48]
-	jmp         loop_chroma_satdx3
-loop_chroma_satdx3end:
+	mov r0,     arg8
+	mov r2,     arg9
+
+	SSE41_ChromaGetX38x8Satd
+
 	MMXReg2SSE  xmm0, xmm3, mm0, mm1
 	MMXReg2SSE  xmm1, xmm3, mm2, mm3
 	MMXReg2SSE  xmm2, xmm3, mm5, mm6
@@ -714,39 +999,38 @@ loop_chroma_satdx3end:
 	SSE41_HSum8W     xmm5, xmm0, xmm1
 	SSE41_HSum8W     xmm6, xmm0, xmm1
 	; comparing order: DC H V
-	movd      ebx, xmm6 ;DC
-	movd      edi, xmm5 ;H
-	movd      ecx, xmm4 ;V
-	mov       edx, [esp+36]
-	shl       edx, 1
-	add       edi, edx
-	add       ecx, edx
-	mov       edx, [esp+32]
-	cmp       ebx, edi
+	movd      r3d, xmm6 ;DC
+	movd      r1d, xmm5 ;H
+	movd      r0d, xmm4 ;V
+
+
+	shl       r5d, 1
+	add       r1d, r5d
+	add       r0d, r5d
+	cmp       r3d, r1d
 	jge near   not_dc_8x8
-	cmp        ebx, ecx
+	cmp        r3d, r0d
 	jge near   not_dc_h_8x8
 
 	; for DC mode
-	mov       dword[edx], 0;I8_PRED_DC
-	mov       eax, ebx
+	mov       dword[r4], 0;I8_PRED_DC
+	mov       retrd, r3d
 	jmp near return_satd_intra_8x8_x3
 not_dc_8x8:
 	; for H mode
-	cmp       edi, ecx
+	cmp       r1d, r0d
 	jge near   not_dc_h_8x8
-	mov       dword[edx], 1;I8_PRED_H
-	mov       eax, edi
+	mov       dword[r4], 1;I8_PRED_H
+	mov       retrd, r1d
 	jmp near return_satd_intra_8x8_x3
 not_dc_h_8x8:
 	; for V mode
-	mov       dword[edx], 2;I8_PRED_V
-	mov       eax, ecx
+	mov       dword[r4], 2;I8_PRED_V
+	mov       retrd, r0d
 return_satd_intra_8x8_x3:
 	WELSEMMS
-	pop         edi
-	pop         esi
-	pop         ebx
+	POP_XMM
+	LOAD_7_PARA_POP
 ret
 
 
@@ -769,9 +1053,9 @@ ret
   paddw       xmm3,xmm6
 %endmacro
 %macro WelsAddDCValue 4
-    movzx   %2, byte %1
-    mov    %3, %2
-    add     %4, %2
+  movzx   %2, byte %1
+  mov    %3, %2
+  add     %4, %2
 %endmacro
 
 ;***********************************************************************
@@ -780,133 +1064,139 @@ ret
 ;
 ;***********************************************************************
 WELS_EXTERN WelsIntra16x16Combined3Sad_ssse3
-	push   ebx
-	push   esi
-	push   edi
-	mov    ecx,    [esp+16]
-	mov    edx,    [esp+20]
-	mov    edi,    [esp+40] ;temp_sad
-	sub    ecx,    edx
-    movdqa      xmm5,[ecx]
-    pxor        xmm0,xmm0
-    psadbw      xmm0,xmm5
-    movhlps     xmm1,xmm0
-    paddw       xmm0,xmm1
-    movd        eax,xmm0
+	%assign  push_num 0
+	LOAD_7_PARA
+	PUSH_XMM 8
+	SIGN_EXTENSION r1, r1d
+	SIGN_EXTENSION r3, r3d
+	SIGN_EXTENSION r5, r5d
 
-    add         ecx,edx
-    lea         ebx, [edx+2*edx]
-    WelsAddDCValue [ecx-1      ], esi, [edi   ], eax
-    WelsAddDCValue [ecx-1+edx  ], esi, [edi+16], eax
-    WelsAddDCValue [ecx-1+edx*2], esi, [edi+32], eax
-    WelsAddDCValue [ecx-1+ebx  ], esi, [edi+48], eax
-    lea         ecx, [ecx+4*edx]
-    add         edi, 64
-    WelsAddDCValue [ecx-1      ], esi, [edi   ], eax
-    WelsAddDCValue [ecx-1+edx  ], esi, [edi+16], eax
-    WelsAddDCValue [ecx-1+edx*2], esi, [edi+32], eax
-    WelsAddDCValue [ecx-1+ebx  ], esi, [edi+48], eax
-    lea         ecx, [ecx+4*edx]
-    add         edi, 64
-    WelsAddDCValue [ecx-1      ], esi, [edi   ], eax
-    WelsAddDCValue [ecx-1+edx  ], esi, [edi+16], eax
-    WelsAddDCValue [ecx-1+edx*2], esi, [edi+32], eax
-    WelsAddDCValue [ecx-1+ebx  ], esi, [edi+48], eax
-    lea         ecx, [ecx+4*edx]
-    add         edi, 64
-    WelsAddDCValue [ecx-1      ], esi, [edi   ], eax
-    WelsAddDCValue [ecx-1+edx  ], esi, [edi+16], eax
-    WelsAddDCValue [ecx-1+edx*2], esi, [edi+32], eax
-    WelsAddDCValue [ecx-1+ebx  ], esi, [edi+48], eax
-    sub        edi, 192
-    add         eax,10h
-    shr         eax,5
-    movd        xmm7,eax
-    pxor        xmm1,xmm1
-    pshufb      xmm7,xmm1
-    pxor        xmm4,xmm4
-    pxor        xmm3,xmm3
-    pxor        xmm2,xmm2
-;sad begin
-	mov    eax,    [esp+24]
-	mov    ebx,    [esp+28]
-    lea         esi, [ebx+2*ebx]
-    SSSE3_Get16BSadHVDC [edi], [eax]
-    SSSE3_Get16BSadHVDC [edi+16], [eax+ebx]
-    SSSE3_Get16BSadHVDC [edi+32], [eax+2*ebx]
-    SSSE3_Get16BSadHVDC [edi+48], [eax+esi]
-    add         edi, 64
-    lea         eax, [eax+4*ebx]
-    SSSE3_Get16BSadHVDC [edi], [eax]
-    SSSE3_Get16BSadHVDC [edi+16], [eax+ebx]
-    SSSE3_Get16BSadHVDC [edi+32], [eax+2*ebx]
-    SSSE3_Get16BSadHVDC [edi+48], [eax+esi]
-    add         edi, 64
-    lea         eax, [eax+4*ebx]
-    SSSE3_Get16BSadHVDC [edi], [eax]
-    SSSE3_Get16BSadHVDC [edi+16], [eax+ebx]
-    SSSE3_Get16BSadHVDC [edi+32], [eax+2*ebx]
-    SSSE3_Get16BSadHVDC [edi+48], [eax+esi]
-    add         edi, 64
-    lea         eax, [eax+4*ebx]
-    SSSE3_Get16BSadHVDC [edi], [eax]
-    SSSE3_Get16BSadHVDC [edi+16], [eax+ebx]
-    SSSE3_Get16BSadHVDC [edi+32], [eax+2*ebx]
-    SSSE3_Get16BSadHVDC [edi+48], [eax+esi]
+	push  r5
+	push  r4
+	push  r3
 
-    pslldq      xmm3,4
-    por         xmm3,xmm2
-    movhlps     xmm1,xmm3
-    paddw       xmm3,xmm1
-    movhlps     xmm0,xmm4
-    paddw       xmm4,xmm0
-; comparing order: DC H V
-	movd        ebx, xmm4 ;DC
-	movd        ecx, xmm3 ;V
+	sub    r0,    r1
+	movdqa      xmm5,[r0]
+	pxor        xmm0,xmm0
+	psadbw      xmm0,xmm5
+	movhlps     xmm1,xmm0
+	paddw       xmm0,xmm1
+	movd        r5d, xmm0
+
+	add         r0,r1
+	lea         r3,[r1+2*r1]    ;ebx r3
+	WelsAddDCValue [r0-1     ], r4d, [r6   ], r5d    ; esi r4d, eax r5d
+	WelsAddDCValue [r0-1+r1  ], r4d, [r6+16], r5d
+	WelsAddDCValue [r0-1+r1*2], r4d, [r6+32], r5d
+	WelsAddDCValue [r0-1+r3  ], r4d, [r6+48], r5d
+	lea         r0, [r0+4*r1]
+	add         r6, 64
+	WelsAddDCValue [r0-1     ], r4d, [r6   ], r5d
+	WelsAddDCValue [r0-1+r1  ], r4d, [r6+16], r5d
+	WelsAddDCValue [r0-1+r1*2], r4d, [r6+32], r5d
+	WelsAddDCValue [r0-1+r3  ], r4d, [r6+48], r5d
+	lea         r0, [r0+4*r1]
+	add         r6, 64
+	WelsAddDCValue [r0-1     ], r4d, [r6   ], r5d
+	WelsAddDCValue [r0-1+r1  ], r4d, [r6+16], r5d
+	WelsAddDCValue [r0-1+r1*2], r4d, [r6+32], r5d
+	WelsAddDCValue [r0-1+r3  ], r4d, [r6+48], r5d
+	lea         r0, [r0+4*r1]
+	add         r6, 64
+	WelsAddDCValue [r0-1     ], r4d, [r6   ], r5d
+	WelsAddDCValue [r0-1+r1  ], r4d, [r6+16], r5d
+	WelsAddDCValue [r0-1+r1*2], r4d, [r6+32], r5d
+	WelsAddDCValue [r0-1+r3  ], r4d, [r6+48], r5d
+	sub         r6, 192
+	add         r5d,10h
+	shr         r5d,5
+	movd        xmm7,r5d
+	pxor        xmm1,xmm1
+	pshufb      xmm7,xmm1
+	pxor        xmm4,xmm4
+	pxor        xmm3,xmm3
+	pxor        xmm2,xmm2
+	;sad begin
+	pop   r3
+	lea         r4, [r3+2*r3] ;esi r4
+	SSSE3_Get16BSadHVDC [r6], [r2]
+	SSSE3_Get16BSadHVDC [r6+16], [r2+r3]
+	SSSE3_Get16BSadHVDC [r6+32], [r2+2*r3]
+	SSSE3_Get16BSadHVDC [r6+48], [r2+r4]
+	add         r6, 64
+	lea         r2, [r2+4*r3]
+	SSSE3_Get16BSadHVDC [r6], [r2]
+	SSSE3_Get16BSadHVDC [r6+16], [r2+r3]
+	SSSE3_Get16BSadHVDC [r6+32], [r2+2*r3]
+	SSSE3_Get16BSadHVDC [r6+48], [r2+r4]
+	add         r6, 64
+	lea         r2, [r2+4*r3]
+	SSSE3_Get16BSadHVDC [r6], [r2]
+	SSSE3_Get16BSadHVDC [r6+16], [r2+r3]
+	SSSE3_Get16BSadHVDC [r6+32], [r2+2*r3]
+	SSSE3_Get16BSadHVDC [r6+48], [r2+r4]
+	add         r6, 64
+	lea         r2, [r2+4*r3]
+	SSSE3_Get16BSadHVDC [r6], [r2]
+	SSSE3_Get16BSadHVDC [r6+16], [r2+r3]
+	SSSE3_Get16BSadHVDC [r6+32], [r2+2*r3]
+	SSSE3_Get16BSadHVDC [r6+48], [r2+r4]
+
+	pop r4
+	pop r5
+	pslldq      xmm3,4
+	por         xmm3,xmm2
+	movhlps     xmm1,xmm3
+	paddw       xmm3,xmm1
+	movhlps     xmm0,xmm4
+	paddw       xmm4,xmm0
+	; comparing order: DC H V
+	movd        r1d, xmm4 ;DC   ;ebx r1d
+	movd        r0d, xmm3 ;V    ;ecx r0d
 	psrldq      xmm3, 4
-	movd        esi, xmm3 ;H
-	mov         eax, [esp+36] ;lamda
-	shl         eax, 1
-	add         esi, eax
-	add         ebx, eax
-	mov         edx, [esp+32]
-	cmp         ebx, esi
+	movd        r2d, xmm3 ;H    ;esi r2d
+
+	;mov         eax, [esp+36] ;lamda ;eax r5
+	shl         r5d, 1
+	add         r2d, r5d
+	add         r1d, r5d
+	;mov         edx, [esp+32]  ;edx r4
+	cmp         r1d, r2d
 	jge near   not_dc_16x16_sad
-	cmp        ebx, ecx
+	cmp        r1d, r0d
 	jge near   not_dc_h_16x16_sad
 	; for DC mode
-	mov       dword[edx], 2;I16_PRED_DC
-	mov       eax, ebx
-    sub        edi, 192
+	mov       dword[r4], 2;I16_PRED_DC
+	mov       retrd, r1d
+	sub        r6, 192
 %assign x 0
 %rep 16
-    movdqa    [edi+16*x], xmm7
+	movdqa    [r6+16*x], xmm7
 %assign x x+1
 %endrep
 	jmp near return_sad_intra_16x16_x3
 not_dc_16x16_sad:
 	; for H mode
-	cmp       esi, ecx
+	cmp       r2d, r0d
 	jge near   not_dc_h_16x16_sad
-	mov       dword[edx], 1;I16_PRED_H
-	mov       eax, esi
+	mov       dword[r4], 1;I16_PRED_H
+	mov       retrd, r2d
 	jmp near return_sad_intra_16x16_x3
 not_dc_h_16x16_sad:
 	; for V mode
-	mov       dword[edx], 0;I16_PRED_V
-	mov       eax, ecx
-    sub       edi, 192
+	mov       dword[r4], 0;I16_PRED_V
+	mov       retrd, r0d
+	sub       r6, 192
 %assign x 0
 %rep 16
-    movdqa    [edi+16*x], xmm5
+	movdqa    [r6+16*x], xmm5
 %assign x x+1
 %endrep
 return_sad_intra_16x16_x3:
-	pop    edi
-	pop    esi
-	pop    ebx
+	POP_XMM
+	LOAD_7_PARA_POP
 	ret
-%endif
+
 ;***********************************************************************
 ;
 ;Pixel_sad_intra_ssse3 END
