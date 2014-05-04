@@ -31,7 +31,9 @@
  *
  * \file	svc_mode_decision.c
  *
- * \brief	SVC Spatial Enhancement Layer MD
+ * \brief Algorithmetic MD for:
+ * - multi-spatial Enhancement Layer MD;
+ * - Scrolling PSkip Decision for screen content
  *
  * \date	2009.7.29
  *
@@ -157,6 +159,25 @@ void SetMvBaseEnhancelayer (SWelsMD* pMd, SMB* pCurMb, const SMB* kpRefMb) {
   }
 }
 
+///////////////////////
+// Scrolling PSkip Decision for screen content
+////////////////////////
+bool WelsMdInterJudgeScrollingPskip(void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache) {
+  //TBD
+  return false;
+}
+bool WelsMdInterJudgeScrollingPskipFalse(void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache) {
+  return false;
+}
+
+
+void WelsInitScrollingSkipFunc (SWelsFuncPtrList* pFuncList, const bool bScrollingDetection) {
+  if (bScrollingDetection) {
+    pFuncList->pfScrollingPSkipDecision = WelsMdInterJudgeScrollingPskip;
+  } else {
+    pFuncList->pfScrollingPSkipDecision = WelsMdInterJudgeScrollingPskipFalse;
+  }
+}
 
 
 } // namespace WelsSVCEnc

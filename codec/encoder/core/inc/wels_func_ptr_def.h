@@ -127,6 +127,9 @@ typedef bool (*PInterMdBackgroundDecisionFunc) (void* pEncCtx, void* pWelsMd, SS
 typedef void (*PInterMdBackgroundInfoUpdateFunc) (SDqLayer* pCurLayer,  SMB* pCurMb, const bool bFlag,
     const int32_t kiRefPictureType);
 
+typedef bool (*PInterMdScrollingPSkipDecisionFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb,
+    SMbCache* pMbCache);
+
 typedef void (*PInterMdFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache);
 
 typedef int32_t (*PSampleSadSatdCostFunc) (uint8_t*, int32_t, uint8_t*, int32_t);
@@ -200,6 +203,8 @@ struct TagWelsFuncPointerList {
 
   PInterMdBackgroundDecisionFunc          pfInterMdBackgroundDecision;
   PInterMdBackgroundInfoUpdateFunc      pfInterMdBackgroundInfoUpdate;
+
+  PInterMdScrollingPSkipDecisionFunc pfScrollingPSkipDecision;
 
   SMcFunc                sMcFuncs;
   SSampleDealingFunc     sSampleDealingFuncs;
