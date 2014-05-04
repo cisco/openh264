@@ -147,7 +147,7 @@ TEST_F(MotionEstimateTest, TestVerticalSearch) {
   int32_t iTryTimes=100;
 
   sTargetMv.iMvX = 0;
-  sTargetMv.iMvY = WELS_MAX(INTPEL_NEEDED_MARGIN, rand()%m_iHeight-INTPEL_NEEDED_MARGIN);
+  sTargetMv.iMvY = -sMe.iCurMeBlockPixY + INTPEL_NEEDED_MARGIN + rand()%(m_iHeight - 16 - 2*INTPEL_NEEDED_MARGIN);
   bDataGeneratorSucceed = false;
   bFoundMatch = false;
   while (!bFoundMatch && (iTryTimes--)>0) {
@@ -207,7 +207,7 @@ TEST_F(MotionEstimateTest, TestHorizontalSearch) {
   bool bFoundMatch = false;
   int32_t iTryTimes=100;
 
-  sTargetMv.iMvX = WELS_MAX(INTPEL_NEEDED_MARGIN, rand()%m_iWidth-INTPEL_NEEDED_MARGIN);
+  sTargetMv.iMvX = -sMe.iCurMeBlockPixX + INTPEL_NEEDED_MARGIN + rand()%(m_iWidth - 16 - 2*INTPEL_NEEDED_MARGIN);
   sTargetMv.iMvY = 0;
   bDataGeneratorSucceed = false;
   bFoundMatch = false;
@@ -276,7 +276,7 @@ TEST_F(MotionEstimateTest, TestVerticalSearch_SSE41)
   int32_t iTryTimes=100;
 
   sTargetMv.iMvX = 0;
-  sTargetMv.iMvY = WELS_MAX(INTPEL_NEEDED_MARGIN, rand()%m_iHeight-INTPEL_NEEDED_MARGIN);
+  sTargetMv.iMvY = -sMe.iCurMeBlockPixY + INTPEL_NEEDED_MARGIN + rand()%(m_iHeight - 16 - 2*INTPEL_NEEDED_MARGIN);
   bDataGeneratorSucceed = false;
   bFoundMatch = false;
   while (!bFoundMatch && (iTryTimes--)>0) {
@@ -341,7 +341,7 @@ TEST_F(MotionEstimateTest, TestHorizontalSearch_SSE41)
   bool bFoundMatch = false;
   int32_t iTryTimes=100;
 
-  sTargetMv.iMvX = WELS_MAX(INTPEL_NEEDED_MARGIN, rand()%m_iWidth-INTPEL_NEEDED_MARGIN);
+  sTargetMv.iMvX = -sMe.iCurMeBlockPixX + INTPEL_NEEDED_MARGIN + rand()%(m_iWidth - 16 - 2*INTPEL_NEEDED_MARGIN);
   sTargetMv.iMvY = 0;
   bDataGeneratorSucceed = false;
   bFoundMatch = false;
