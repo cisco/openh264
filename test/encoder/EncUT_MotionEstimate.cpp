@@ -147,7 +147,7 @@ TEST_F(MotionEstimateTest, TestVerticalSearch) {
   int32_t iTryTimes=100;
 
   sTargetMv.iMvX = 0;
-  sTargetMv.iMvY = WELS_MAX(INTPEL_NEEDED_MARGIN, rand()%m_iHeight-INTPEL_NEEDED_MARGIN);
+  sTargetMv.iMvY = -sMe.iCurMeBlockPixY + INTPEL_NEEDED_MARGIN + rand()%(m_iHeight - 16 - 2*INTPEL_NEEDED_MARGIN);
   bDataGeneratorSucceed = false;
   bFoundMatch = false;
   while (!bFoundMatch && (iTryTimes--)>0) {
@@ -174,7 +174,7 @@ TEST_F(MotionEstimateTest, TestVerticalSearch) {
                       pMvdCostY, pMvdCostX[ iCurMeBlockQpelPixX ],
                       m_iMaxSearchBlock, m_iWidth,
                       INTPEL_NEEDED_MARGIN,
-                      m_iHeight-INTPEL_NEEDED_MARGIN, true );
+                      m_iHeight-INTPEL_NEEDED_MARGIN-16, true );
 
     //the last selection may be affected by MVDcost, that is when smaller MvY will be better
     bFoundMatch = (sMe.sMv.iMvX==0
@@ -207,7 +207,7 @@ TEST_F(MotionEstimateTest, TestHorizontalSearch) {
   bool bFoundMatch = false;
   int32_t iTryTimes=100;
 
-  sTargetMv.iMvX = WELS_MAX(INTPEL_NEEDED_MARGIN, rand()%m_iWidth-INTPEL_NEEDED_MARGIN);
+  sTargetMv.iMvX = -sMe.iCurMeBlockPixX + INTPEL_NEEDED_MARGIN + rand()%(m_iWidth - 16 - 2*INTPEL_NEEDED_MARGIN);
   sTargetMv.iMvY = 0;
   bDataGeneratorSucceed = false;
   bFoundMatch = false;
@@ -235,7 +235,7 @@ TEST_F(MotionEstimateTest, TestHorizontalSearch) {
                       pMvdCostX, pMvdCostY[ iCurMeBlockQpelPixY ],
                       m_iMaxSearchBlock, m_iWidth,
                       INTPEL_NEEDED_MARGIN,
-                      m_iWidth-INTPEL_NEEDED_MARGIN, false );
+                      m_iWidth-INTPEL_NEEDED_MARGIN-16, false );
 
     //the last selection may be affected by MVDcost, that is when smaller MvY will be better
     bFoundMatch = (sMe.sMv.iMvY==0
@@ -276,7 +276,7 @@ TEST_F(MotionEstimateTest, TestVerticalSearch_SSE41)
   int32_t iTryTimes=100;
 
   sTargetMv.iMvX = 0;
-  sTargetMv.iMvY = WELS_MAX(INTPEL_NEEDED_MARGIN, rand()%m_iHeight-INTPEL_NEEDED_MARGIN);
+  sTargetMv.iMvY = -sMe.iCurMeBlockPixY + INTPEL_NEEDED_MARGIN + rand()%(m_iHeight - 16 - 2*INTPEL_NEEDED_MARGIN);
   bDataGeneratorSucceed = false;
   bFoundMatch = false;
   while (!bFoundMatch && (iTryTimes--)>0) {
@@ -303,7 +303,7 @@ TEST_F(MotionEstimateTest, TestVerticalSearch_SSE41)
                       pMvdCostY, pMvdCostX[ iCurMeBlockQpelPixX ],
                       m_iMaxSearchBlock, m_iWidth,
                       INTPEL_NEEDED_MARGIN,
-                      m_iHeight-INTPEL_NEEDED_MARGIN, true );
+                      m_iHeight-INTPEL_NEEDED_MARGIN-16, true );
 
     //the last selection may be affected by MVDcost, that is when smaller MvY will be better
     bFoundMatch = (sMe.sMv.iMvX==0
@@ -316,7 +316,7 @@ TEST_F(MotionEstimateTest, TestVerticalSearch_SSE41)
     //it is possible that ref at differnt position is identical, but that should be under a low probability
   }
 }
-/*
+
 TEST_F(MotionEstimateTest, TestHorizontalSearch_SSE41)
 {
   const int32_t kiMaxBlock16Sad = 72000;//a rough number
@@ -341,7 +341,7 @@ TEST_F(MotionEstimateTest, TestHorizontalSearch_SSE41)
   bool bFoundMatch = false;
   int32_t iTryTimes=100;
 
-  sTargetMv.iMvX = WELS_MAX(INTPEL_NEEDED_MARGIN, rand()%m_iWidth-INTPEL_NEEDED_MARGIN);
+  sTargetMv.iMvX = -sMe.iCurMeBlockPixX + INTPEL_NEEDED_MARGIN + rand()%(m_iWidth - 16 - 2*INTPEL_NEEDED_MARGIN);
   sTargetMv.iMvY = 0;
   bDataGeneratorSucceed = false;
   bFoundMatch = false;
@@ -369,7 +369,7 @@ TEST_F(MotionEstimateTest, TestHorizontalSearch_SSE41)
                       pMvdCostX, pMvdCostY[ iCurMeBlockQpelPixY ],
                       m_iMaxSearchBlock, m_iWidth,
                       INTPEL_NEEDED_MARGIN,
-                      m_iWidth-INTPEL_NEEDED_MARGIN, false );
+                      m_iWidth-INTPEL_NEEDED_MARGIN-16, false );
 
     //the last selection may be affected by MVDcost, that is when smaller MvY will be better
     bFoundMatch = (sMe.sMv.iMvY==0
@@ -382,5 +382,4 @@ TEST_F(MotionEstimateTest, TestHorizontalSearch_SSE41)
     //it is possible that ref at differnt position is identical, but that should be under a low probability
   }
 }
-*/
 #endif
