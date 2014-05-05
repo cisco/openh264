@@ -193,7 +193,7 @@ bool CheckDirectionalMvFalse(PSampleSadSatdCostFunc pSad, void * vpMe,
                       int32_t& iBestSadCost);
 
 // Cross Search Basics
-void LineFullSearch_c(  void *pFunc, void *vpMe,
+void LineFullSearch_c(  SWelsFuncPtrList *pFuncList, SWelsME *pMe,
                         uint16_t* pMvdTable, const int32_t kiFixedMvd,
                         const int32_t kiEncStride, const int32_t kiRefStride,
                         const int32_t kiMinPos, const int32_t kiMaxPos,
@@ -205,12 +205,12 @@ uint32_t SampleSad8x8Hor8_sse41 (uint8_t*, int32_t, uint8_t*, int32_t, uint16_t*
 uint32_t SampleSad16x16Hor8_sse41 (uint8_t*, int32_t, uint8_t*, int32_t, uint16_t*, int32_t*);
 }
 
-void VerticalFullSearchUsingSSE41( void *pFunc, void *vpMe,
+void VerticalFullSearchUsingSSE41( SWelsFuncPtrList *pFuncList, SWelsME *pMe,
                             uint16_t* pMvdTable, const int32_t kiFixedMvd,
                             const int32_t kiEncStride, const int32_t kiRefStride,
                           const int32_t kiMinPos, const int32_t kiMaxPos,
                           const bool bVerticalSearch );
-void HorizontalFullSearchUsingSSE41( void *pFunc, void *vpMe,
+void HorizontalFullSearchUsingSSE41( SWelsFuncPtrList *pFuncList, SWelsME *pMe,
                                       uint16_t* pMvdTable, const int32_t kiFixedMvd,
                                       const int32_t kiEncStride, const int32_t kiRefStride,
                                       const int32_t kiMinPos, const int32_t kiMaxPos,
