@@ -2446,7 +2446,7 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
       pFuncList->pfInterFineMd = WelsMdInterFinePartition;
     }
   }
-  
+
   return;
   //to init at each frame will be needed when dealing with hybrid content (camera+screen)
   if (pCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
@@ -2467,9 +2467,8 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
         pFeatureSearchPreparation->pRefBlockFeature = pScreenBlockFeatureStorage;
         if (pFeatureSearchPreparation->bFMESwitchFlag
           && !pScreenBlockFeatureStorage->bRefBlockFeatureCalculated) {
-            pScreenBlockFeatureStorage->pFeatureOfBlockPointer = pFeatureSearchPreparation->pFeatureOfBlock;
             //TODO: use ORIGIN of reference when preprocessing is ready
-            PerformFMEPreprocess( pFuncList, pCurLayer->pRefPic, pScreenBlockFeatureStorage );
+            PerformFMEPreprocess( pFuncList, pCurLayer->pRefPic,pFeatureSearchPreparation->pFeatureOfBlock,pScreenBlockFeatureStorage);
         }
 
         //assign ME pointer
