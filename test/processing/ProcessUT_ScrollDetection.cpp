@@ -73,7 +73,7 @@ TEST(ScrollDetectionTest,TestScroll)
     EXPECT_EQ(ret,0);
     pTest->Get(iMethodIdx, (&sScrollDetectionResult));
 
-    EXPECT_EQ(sScrollDetectionResult.bScrollDetectFlag,1);
+    EXPECT_EQ(sScrollDetectionResult.bScrollDetectFlag,true);
     EXPECT_EQ(sScrollDetectionResult.iScrollMvY,iScrollMv);
 
     delete pTest;
