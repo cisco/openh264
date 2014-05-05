@@ -41,10 +41,6 @@ void InitMe( const uint8_t kuiQp, const uint32_t kuiMvdTableMiddle, const uint32
   pMe->sMv.iMvX = pMe->sMv.iMvY = 0;
 }
 
-static inline int GetRandomMv(int32_t iMin, int32_t iMax) {
-  return (rand()%(iMax-iMin)-(iMax-iMin)/2);
-}
-
 class MotionEstimateTest : public ::testing::Test {
 public:
   virtual void SetUp() {
