@@ -120,14 +120,15 @@ void WelsUnloadNalForSlice (SWelsSliceBs* pSliceBsIn) {
  */
 //TODO 1: refactor the calling of this func in multi-thread
 //TODO 2: complete the realloc&copy
-int32_t WelsEncodeNal (SWelsNalRaw* pRawNal, void* pNalHeaderExt, const int32_t kiDstBufferLen, void* pDst, int32_t* pDstLen) {
+int32_t WelsEncodeNal (SWelsNalRaw* pRawNal, void* pNalHeaderExt, const int32_t kiDstBufferLen, void* pDst,
+                       int32_t* pDstLen) {
   const bool kbNALExt = pRawNal->sNalExt.sNalHeader.eNalUnitType == NAL_UNIT_PREFIX
-                                        || pRawNal->sNalExt.sNalHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_EXT;
-  int32_t iAssumedNeededLength		= NAL_HEADER_SIZE+(kbNALExt?3:0)+pRawNal->iPayloadSize+1;
-  WELS_VERIFY_RETURN_IF(ENC_RETURN_UNEXPECTED, (iAssumedNeededLength<=0))
+                        || pRawNal->sNalExt.sNalHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_EXT;
+  int32_t iAssumedNeededLength		= NAL_HEADER_SIZE + (kbNALExt ? 3 : 0) + pRawNal->iPayloadSize + 1;
+  WELS_VERIFY_RETURN_IF (ENC_RETURN_UNEXPECTED, (iAssumedNeededLength <= 0))
 
   //since for each 0x000 need a 0x03, so the needed length will not exceed (iAssumeNeedLenth + iAssumeNeedLength/3), here adjust to >>1 to omit division
-  if (kiDstBufferLen < (iAssumedNeededLength + (iAssumedNeededLength>>1)) ) {
+  if (kiDstBufferLen < (iAssumedNeededLength + (iAssumedNeededLength >> 1))) {
     return ENC_RETURN_MEMALLOCERR;
     //TODO: call the realloc&copy instead
   }
@@ -151,14 +152,14 @@ int32_t WelsEncodeNal (SWelsNalRaw* pRawNal, void* pNalHeaderExt, const int32_t 
 
     /* NAL UNIT Extension Header */
     *pDstPointer++ =	(0x80) |
-      (sNalExt->bIdrFlag << 6);
+                      (sNalExt->bIdrFlag << 6);
 
     *pDstPointer++ =	(0x80) |
-      (sNalExt->uiDependencyId << 4);
+                      (sNalExt->uiDependencyId << 4);
 
     *pDstPointer++ =	(sNalExt->uiTemporalId << 5) |
-      (sNalExt->bDiscardableFlag << 3) |
-      (0x07);
+                      (sNalExt->bDiscardableFlag << 3) |
+                      (0x07);
   }
 
   while (pSrcPointer < pSrcEnd) {

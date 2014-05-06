@@ -82,21 +82,20 @@ class CComplexityAnalysis : public IStrategy {
 
 //for screen content
 
-class CComplexityAnalysisScreen : public IStrategy
-{
-public:
-  CComplexityAnalysisScreen(int32_t cpu_flag);
+class CComplexityAnalysisScreen : public IStrategy {
+ public:
+  CComplexityAnalysisScreen (int32_t cpu_flag);
   ~CComplexityAnalysisScreen();
 
-  EResult Process(int32_t nType, SPixMap *src, SPixMap *ref);
-  EResult Set(int32_t nType, void *pParam);
-  EResult Get(int32_t nType, void *pParam);
+  EResult Process (int32_t nType, SPixMap* src, SPixMap* ref);
+  EResult Set (int32_t nType, void* pParam);
+  EResult Get (int32_t nType, void* pParam);
 
-private:
-  void GomComplexityAnalysisIntra( SPixMap *pSrc );
-  void GomComplexityAnalysisInter( SPixMap *pSrc, SPixMap *pRef,bool bScrollFlag);
+ private:
+  void GomComplexityAnalysisIntra (SPixMap* pSrc);
+  void GomComplexityAnalysisInter (SPixMap* pSrc, SPixMap* pRef, bool bScrollFlag);
 
-private:
+ private:
   PSad16x16Func m_pSadFunc;
   GetIntraPredPtr m_pIntraFunc[2];
   SComplexityAnalysisScreenParam m_ComplexityAnalysisParam;

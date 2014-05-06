@@ -106,20 +106,20 @@ void WelsQuantFour4x4Max_sse2 (int16_t* pDct, const int16_t* pFF, const int16_t*
 #endif
 
 #ifdef	HAVE_NEON
-void WelsHadamardT4Dc_neon(int16_t* pLumaDc, int16_t* pDct);
-int32_t WelsHadamardQuant2x2_neon(int16_t* pRes, const int16_t kiFF, int16_t iMF, int16_t* pDct, int16_t* pBlock);
-int32_t WelsHadamardQuant2x2Skip_neon(int16_t* pRes, int16_t iFF,  int16_t iMF);
-int32_t WelsHadamardQuant2x2SkipKernel_neon(int16_t *pRes, int16_t iThreshold);// avoid divide operator
+void WelsHadamardT4Dc_neon (int16_t* pLumaDc, int16_t* pDct);
+int32_t WelsHadamardQuant2x2_neon (int16_t* pRes, const int16_t kiFF, int16_t iMF, int16_t* pDct, int16_t* pBlock);
+int32_t WelsHadamardQuant2x2Skip_neon (int16_t* pRes, int16_t iFF,  int16_t iMF);
+int32_t WelsHadamardQuant2x2SkipKernel_neon (int16_t* pRes, int16_t iThreshold); // avoid divide operator
 
-void WelsDctT4_neon(int16_t* pDct,  uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2);
-void WelsDctFourT4_neon(int16_t* pDct,  uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2);
+void WelsDctT4_neon (int16_t* pDct,  uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2);
+void WelsDctFourT4_neon (int16_t* pDct,  uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2);
 
-int32_t WelsGetNoneZeroCount_neon(int16_t* pLevel);
+int32_t WelsGetNoneZeroCount_neon (int16_t* pLevel);
 
-void WelsQuant4x4_neon(int16_t* pDct, const int16_t* pFF, const int16_t* pMF);
-void WelsQuant4x4Dc_neon(int16_t* pDct, int16_t iFF, int16_t iMF);
-void WelsQuantFour4x4_neon(int16_t* pDct, const int16_t* pFF, const int16_t* pMF);
-void WelsQuantFour4x4Max_neon(int16_t* pDct, const int16_t* pFF, const int16_t* pMF, int16_t* pMax);
+void WelsQuant4x4_neon (int16_t* pDct, const int16_t* pFF, const int16_t* pMF);
+void WelsQuant4x4Dc_neon (int16_t* pDct, int16_t iFF, int16_t iMF);
+void WelsQuantFour4x4_neon (int16_t* pDct, const int16_t* pFF, const int16_t* pMF);
+void WelsQuantFour4x4Max_neon (int16_t* pDct, const int16_t* pFF, const int16_t* pMF, int16_t* pMax);
 #endif
 
 #if defined(__cplusplus)

@@ -404,8 +404,8 @@ int32_t WelsInitSps (SWelsSPS* pSps, SDLayerParam* pLayerParam, const uint32_t k
 
   //for Scalable Baseline, Scalable High, and Scalable High Intra profiles.If level_idc is equal to 9, the indicated level is level 1b.
   //for the Baseline, Constrained Baseline, Main, and Extended profiles,If level_idc is equal to 11 and constraint_set3_flag is equal to 1, the indicated level is level 1b.
-  if((pSps->iLevelIdc == 9)&&
-    ((pSps->uiProfileIdc == PRO_BASELINE) ||(pSps->uiProfileIdc == PRO_MAIN)||(pSps->uiProfileIdc == PRO_EXTENDED))) {
+  if ((pSps->iLevelIdc == 9) &&
+      ((pSps->uiProfileIdc == PRO_BASELINE) || (pSps->uiProfileIdc == PRO_MAIN) || (pSps->uiProfileIdc == PRO_EXTENDED))) {
     pSps->iLevelIdc = 11;
     pSps->bConstraintSet3Flag = true;
   }

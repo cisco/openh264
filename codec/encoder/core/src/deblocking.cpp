@@ -193,25 +193,25 @@ void inline DeblockingBSInsideMBNormal (SMB* pCurMb, uint8_t uiBS[2][4][4], int8
   uiNnz32b3 = * (uint32_t*) (pNnzTab + 12);
 
   for (int i = 0; i < 3; i++)
-      uiBsx4[i] = pNnzTab[i] | pNnzTab[i + 1];
+    uiBsx4[i] = pNnzTab[i] | pNnzTab[i + 1];
   uiBS[0][1][0] = BS_EDGE (uiBsx4[0], iRefIdx, pCurMb->sMv, 1, 0);
   uiBS[0][2][0] = BS_EDGE (uiBsx4[1], iRefIdx, pCurMb->sMv, 2, 1);
   uiBS[0][3][0] = BS_EDGE (uiBsx4[2], iRefIdx, pCurMb->sMv, 3, 2);
 
   for (int i = 0; i < 3; i++)
-      uiBsx4[i] = pNnzTab[4 + i] | pNnzTab[4 + i + 1];
+    uiBsx4[i] = pNnzTab[4 + i] | pNnzTab[4 + i + 1];
   uiBS[0][1][1] = BS_EDGE (uiBsx4[0], iRefIdx, pCurMb->sMv, 5, 4);
   uiBS[0][2][1] = BS_EDGE (uiBsx4[1], iRefIdx, pCurMb->sMv, 6, 5);
   uiBS[0][3][1] = BS_EDGE (uiBsx4[2], iRefIdx, pCurMb->sMv, 7, 6);
 
   for (int i = 0; i < 3; i++)
-      uiBsx4[i] = pNnzTab[8 + i] | pNnzTab[8 + i + 1];
+    uiBsx4[i] = pNnzTab[8 + i] | pNnzTab[8 + i + 1];
   uiBS[0][1][2] = BS_EDGE (uiBsx4[0], iRefIdx, pCurMb->sMv, 9, 8);
   uiBS[0][2][2] = BS_EDGE (uiBsx4[1], iRefIdx, pCurMb->sMv, 10, 9);
   uiBS[0][3][2] = BS_EDGE (uiBsx4[2], iRefIdx, pCurMb->sMv, 11, 10);
 
   for (int i = 0; i < 3; i++)
-      uiBsx4[i] = pNnzTab[12 + i] | pNnzTab[12 + i + 1];
+    uiBsx4[i] = pNnzTab[12 + i] | pNnzTab[12 + i + 1];
   uiBS[0][1][3] = BS_EDGE (uiBsx4[0], iRefIdx, pCurMb->sMv, 13, 12);
   uiBS[0][2][3] = BS_EDGE (uiBsx4[1], iRefIdx, pCurMb->sMv, 14, 13);
   uiBS[0][3][3] = BS_EDGE (uiBsx4[2], iRefIdx, pCurMb->sMv, 15, 14);
@@ -240,8 +240,8 @@ uint32_t DeblockingBSMarginalMBAvcbase (SMB* pCurMb, SMB* pNeighMb, int32_t iEdg
   int32_t i;
   uint32_t uiBSx4;
   uint8_t* pBS = (uint8_t*) (&uiBSx4);
-  const uint8_t *pBIdx  = &g_kuiTableBIdx[iEdge][0];
-  const uint8_t *pBnIdx = &g_kuiTableBIdx[iEdge][4];
+  const uint8_t* pBIdx  = &g_kuiTableBIdx[iEdge][0];
+  const uint8_t* pBnIdx = &g_kuiTableBIdx[iEdge][4];
 
 
   for (i = 0; i < 4; i++) {
@@ -792,7 +792,7 @@ void WelsNonZeroCount_c (int8_t* pNonZeroCount) {
 void WelsBlockFuncInit (PSetNoneZeroCountZeroFunc* pfSetNZCZero,  int32_t iCpu) {
   *pfSetNZCZero = WelsNonZeroCount_c;
 #ifdef	HAVE_NEON
-  if( iCpu & WELS_CPU_NEON ) {
+  if (iCpu & WELS_CPU_NEON) {
     *pfSetNZCZero = WelsNonZeroCount_neon;
   }
 #endif
@@ -826,7 +826,7 @@ void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
 #endif
 
 #if defined(HAVE_NEON)
-  if (iCpu & WELS_CPU_NEON ) {
+  if (iCpu & WELS_CPU_NEON) {
     pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_neon;
     pFunc->pfLumaDeblockingEQ4Ver		= DeblockLumaEq4V_neon;
     pFunc->pfLumaDeblockingLT4Hor		= DeblockLumaLt4H_neon;

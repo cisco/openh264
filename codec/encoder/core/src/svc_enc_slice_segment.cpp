@@ -84,7 +84,7 @@ int32_t AssignMbMapMultipleSlices (SSliceCtx* pSliceSeg, const SSliceConfig* kpM
 
     return 0;
   } else if (SM_RASTER_SLICE  == pSliceSeg->uiSliceMode ||
-             SM_FIXEDSLCNUM_SLICE == pSliceSeg->uiSliceMode||
+             SM_FIXEDSLCNUM_SLICE == pSliceSeg->uiSliceMode ||
              SM_AUTO_SLICE == pSliceSeg->uiSliceMode) {
     const int32_t* kpSlicesAssignList				= (int32_t*) & (kpMso->sSliceArgument.uiSliceMbNum[0]);
     const int32_t kiCountNumMbInFrame		= pSliceSeg->iMbNumInFrame;
@@ -310,7 +310,7 @@ int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, S
   case SM_FIXEDSLCNUM_SLICE:
   case SM_RASTER_SLICE:
   case SM_ROWMB_SLICE:
-  case SM_AUTO_SLICE:{
+  case SM_AUTO_SLICE: {
     return pMso->sSliceArgument.uiSliceNum;
   }
   case SM_DYN_SLICE: {
@@ -400,7 +400,7 @@ int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
     return AssignMbMapSingleSlice (pSliceSeg->pOverallMbMap, kiCountMbNum, sizeof (pSliceSeg->pOverallMbMap[0]));
   } else { //if ( SM_MULTIPLE_SLICE == uiSliceMode )
     if (uiSliceMode != SM_FIXEDSLCNUM_SLICE && uiSliceMode != SM_ROWMB_SLICE && uiSliceMode != SM_RASTER_SLICE
-        && uiSliceMode != SM_DYN_SLICE&& uiSliceMode != SM_AUTO_SLICE)
+        && uiSliceMode != SM_DYN_SLICE && uiSliceMode != SM_AUTO_SLICE)
       return 1;
 
     pSliceSeg->pOverallMbMap	= (uint8_t*)pMa->WelsMalloc (kiCountMbNum * sizeof (uint8_t), "pSliceSeg->pOverallMbMap");

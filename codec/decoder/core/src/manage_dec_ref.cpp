@@ -110,7 +110,8 @@ void WelsResetRefPic (PWelsDecoderContext pCtx) {
 int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
   int32_t i, iCount = 0;
 
-  if ((pCtx->sRefPic.uiShortRefCount[LIST_0] + pCtx->sRefPic.uiLongRefCount[LIST_0] <= 0) && (pCtx->eSliceType != I_SLICE && pCtx->eSliceType != SI_SLICE)) {
+  if ((pCtx->sRefPic.uiShortRefCount[LIST_0] + pCtx->sRefPic.uiLongRefCount[LIST_0] <= 0) && (pCtx->eSliceType != I_SLICE
+      && pCtx->eSliceType != SI_SLICE)) {
     if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) { //IDR lost!, recover it for future decoding with data all set to 0
       PPicture pRef = PrefetchPic (pCtx->pPicBuff[0]);
       if (pRef != NULL) {
@@ -281,7 +282,7 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
   }
 
   if (!pCtx->pDec->bIsLongRef) {
-    if (pRefPic->uiLongRefCount[LIST_0] + pRefPic->uiShortRefCount[LIST_0] >= WELS_MAX(1,pCtx->pSps->iNumRefFrames)) {
+    if (pRefPic->uiLongRefCount[LIST_0] + pRefPic->uiShortRefCount[LIST_0] >= WELS_MAX (1, pCtx->pSps->iNumRefFrames)) {
       if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) {
         iRet = RemainOneBufferInDpbForEC (pCtx);
       } else {
@@ -372,7 +373,7 @@ static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType,
       return ERR_INFO_INVALID_MMCO_LONG_TERM_IDX_EXCEED_MAX;
     }
     WelsDelLongFromListSetUnref (pRefPic, iLongTermFrameIdx);
-    if (pRefPic->uiLongRefCount[LIST_0] + pRefPic->uiShortRefCount[LIST_0] >= WELS_MAX(1,pCtx->pSps->iNumRefFrames)) {
+    if (pRefPic->uiLongRefCount[LIST_0] + pRefPic->uiShortRefCount[LIST_0] >= WELS_MAX (1, pCtx->pSps->iNumRefFrames)) {
       return ERR_INFO_INVALID_MMCO_REF_NUM_OVERFLOW;
     }
 #ifdef LONG_TERM_REF
@@ -561,7 +562,8 @@ static int32_t RemainOneBufferInDpbForEC (PWelsDecoderContext pCtx) {
       uiLongTermFrameIdx++;
     }
   }
-  if (pRefPic->uiShortRefCount[0] + pRefPic->uiLongRefCount[0] >= pCtx->pSps->iNumRefFrames) { //fail to remain one empty buffer in DPB
+  if (pRefPic->uiShortRefCount[0] + pRefPic->uiLongRefCount[0] >=
+      pCtx->pSps->iNumRefFrames) { //fail to remain one empty buffer in DPB
     WelsLog (pCtx, WELS_LOG_WARNING, "RemainOneBufferInDpbForEC(): empty one DPB failed for EC!\n");
     iRet = ERR_INFO_REF_COUNT_OVERFLOW;
   }

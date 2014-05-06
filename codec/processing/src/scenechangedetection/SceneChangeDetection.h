@@ -56,40 +56,41 @@
 WELSVP_NAMESPACE_BEGIN
 
 class CSceneChangeDetectorVideo {
-public:
-  CSceneChangeDetectorVideo(SSceneChangeResult & sParam, int32_t iCpuFlag) : m_sParam(sParam) {
+ public:
+  CSceneChangeDetectorVideo (SSceneChangeResult& sParam, int32_t iCpuFlag) : m_sParam (sParam) {
     m_pfSad = WelsSampleSad8x8_c;
 #ifdef X86_ASM
-    if (iCpuFlag & WELS_CPU_SSE2){
+    if (iCpuFlag & WELS_CPU_SSE2) {
       m_pfSad = WelsSampleSad8x8_sse21;
     }
 #endif
 #ifdef HAVE_NEON
-    if (iCpuFlag & WELS_CPU_NEON){
+    if (iCpuFlag & WELS_CPU_NEON) {
       m_pfSad = WelsProcessingSampleSad8x8_neon;
     }
 #endif
   }
   virtual ~CSceneChangeDetectorVideo() {
   }
-  void operator () (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY, uint8_t *& pStaticBlockIdc) {
-    int32_t iSad = m_pfSad(pSrcY, iSrcStrideY, pRefY, iSrcStrideY);
+  void operator() (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY, uint8_t*& pStaticBlockIdc) {
+    int32_t iSad = m_pfSad (pSrcY, iSrcStrideY, pRefY, iSrcStrideY);
     m_sParam.iMotionBlockNum += iSad > HIGH_MOTION_BLOCK_THRESHOLD;
   }
-protected:
+ protected:
   SadFuncPtr m_pfSad;
-  SSceneChangeResult &m_sParam;
+  SSceneChangeResult& m_sParam;
 };
 
-class CSceneChangeDetectorScreen : public CSceneChangeDetectorVideo{
-public:
-  CSceneChangeDetectorScreen(SSceneChangeResult & sParam, int32_t iCpuFlag) : CSceneChangeDetectorVideo(sParam, iCpuFlag) {
+class CSceneChangeDetectorScreen : public CSceneChangeDetectorVideo {
+ public:
+  CSceneChangeDetectorScreen (SSceneChangeResult& sParam, int32_t iCpuFlag) : CSceneChangeDetectorVideo (sParam,
+        iCpuFlag) {
   }
   virtual ~CSceneChangeDetectorScreen() {
   }
-  void operator() (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY, uint8_t *& pStaticBlockIdc) {
-    int32_t iSad = m_pfSad(pSrcY, iSrcStrideY, pRefY, iSrcStrideY);
-    if( iSad == 0 ){
+  void operator() (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY, uint8_t*& pStaticBlockIdc) {
+    int32_t iSad = m_pfSad (pSrcY, iSrcStrideY, pRefY, iSrcStrideY);
+    if (iSad == 0) {
       *pStaticBlockIdc ++ = COLLOCATED_STATIC;
     } else {
       m_sParam.iFrameComplexity += iSad;
@@ -102,28 +103,30 @@ public:
 template<typename T>
 class CSceneChangeDetection : public IStrategy {
  public:
-  CSceneChangeDetection (EMethods eMethod, int32_t iCpuFlag): m_cDetector(m_sSceneChangeParam, iCpuFlag) {
+  CSceneChangeDetection (EMethods eMethod, int32_t iCpuFlag): m_cDetector (m_sSceneChangeParam, iCpuFlag) {
     m_eMethod   = eMethod;
     WelsMemset (&m_sSceneChangeParam, 0, sizeof (m_sSceneChangeParam));
   }
 
-  ~CSceneChangeDetection(){
+  ~CSceneChangeDetection() {
   }
 
-  EResult Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap){
+  EResult Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap) {
     EResult eReturn = RET_INVALIDPARAM;
     int32_t iWidth                  = pSrcPixMap->sRect.iRectWidth;
     int32_t iHeight                 = pSrcPixMap->sRect.iRectHeight;
     int32_t iBlock8x8Width      = iWidth  >> 3;
     int32_t iBlock8x8Height	 = iHeight >> 3;
     int32_t iBlock8x8Num       = iBlock8x8Width * iBlock8x8Height;
-    int32_t iSceneChangeThresholdLarge = WelsStaticCast (int32_t, SCENE_CHANGE_MOTION_RATIO_LARGE * iBlock8x8Num + 0.5f + PESN);
-    int32_t iSceneChangeThresholdMedium	= WelsStaticCast(int32_t, SCENE_CHANGE_MOTION_RATIO_MEDIUM * iBlock8x8Num + 0.5f + PESN);
+    int32_t iSceneChangeThresholdLarge = WelsStaticCast (int32_t,
+                                         SCENE_CHANGE_MOTION_RATIO_LARGE * iBlock8x8Num + 0.5f + PESN);
+    int32_t iSceneChangeThresholdMedium	= WelsStaticCast (int32_t,
+                                          SCENE_CHANGE_MOTION_RATIO_MEDIUM * iBlock8x8Num + 0.5f + PESN);
     uint8_t* pRefY = NULL, *pCurY = NULL;
     int32_t iRefStride = 0, iCurStride = 0;
     int32_t iRefRowStride = 0, iCurRowStride = 0;
     uint8_t* pRefTmp = NULL, *pCurTmp = NULL;
-    uint8_t * pStaticBlockIdc = m_sSceneChangeParam.pStaticBlockIdc;
+    uint8_t* pStaticBlockIdc = m_sSceneChangeParam.pStaticBlockIdc;
 
     pRefY = (uint8_t*)pRefPixMap->pPixel[0];
     pCurY = (uint8_t*)pSrcPixMap->pPixel[0];
@@ -143,7 +146,7 @@ class CSceneChangeDetection : public IStrategy {
       pCurTmp   = pCurY;
 
       for (int32_t i = 0; i < iBlock8x8Width; i++) {
-        m_cDetector(pRefTmp, iRefStride, pCurTmp, iCurStride, pStaticBlockIdc);
+        m_cDetector (pRefTmp, iRefStride, pCurTmp, iCurStride, pStaticBlockIdc);
         pRefTmp += 8;
         pCurTmp += 8;
       }
@@ -154,7 +157,7 @@ class CSceneChangeDetection : public IStrategy {
 
     if (m_sSceneChangeParam.iMotionBlockNum >= iSceneChangeThresholdLarge) {
       m_sSceneChangeParam.eSceneChangeIdc = LARGE_CHANGED_SCENE;
-    } else if( m_sSceneChangeParam.iMotionBlockNum >= iSceneChangeThresholdMedium ){
+    } else if (m_sSceneChangeParam.iMotionBlockNum >= iSceneChangeThresholdMedium) {
       m_sSceneChangeParam.eSceneChangeIdc = MEDIUM_CHANGED_SCENE;
     }
 
@@ -171,11 +174,11 @@ class CSceneChangeDetection : public IStrategy {
     return RET_SUCCESS;
   }
 
-  EResult Set(int32_t iType, void * pParam) {
-    if( pParam == NULL ){
+  EResult Set (int32_t iType, void* pParam) {
+    if (pParam == NULL) {
       return RET_INVALIDPARAM;
     }
-    m_sSceneChangeParam = *(SSceneChangeResult*)pParam;
+    m_sSceneChangeParam = * (SSceneChangeResult*)pParam;
     return RET_SUCCESS;
   }
  private:
@@ -183,7 +186,7 @@ class CSceneChangeDetection : public IStrategy {
   T          m_cDetector;
 };
 
-IStrategy * BuildSceneChangeDetection(EMethods eMethod, int32_t iCpuFlag);
+IStrategy* BuildSceneChangeDetection (EMethods eMethod, int32_t iCpuFlag);
 
 WELSVP_NAMESPACE_END
 

@@ -138,7 +138,7 @@ typedef enum {
 //-----------------------------------------------------------------//
 //  Algorithm parameters define
 //-----------------------------------------------------------------//
-typedef struct{
+typedef struct {
   SRect sMaskRect;
   bool bMaskInfoAvailable;
   int iScrollMvX;
@@ -163,7 +163,7 @@ typedef struct {
   ESceneChangeIdc eSceneChangeIdc; // SIMILAR_SCENE, MEDIUM_CHANGED_SCENE, LARGE_CHANGED_SCENE
   int             iMotionBlockNum; // Number of motion blocks
   int             iFrameComplexity; // frame complexity
-  unsigned char * pStaticBlockIdc;  // static block idc
+  unsigned char* pStaticBlockIdc;   // static block idc
 } SSceneChangeResult;
 
 typedef struct {
@@ -216,8 +216,7 @@ typedef enum {
   GOM_VAR       = -2
 } EComplexityAnalysisMode;
 
-typedef struct
-{
+typedef struct {
   int iScrollMvX;
   int iScrollMvY;
   bool bScrollDetectFlag; // 0:false ; 1:ltr; 2: scene change
@@ -235,10 +234,9 @@ typedef struct {
   SVAACalcResult*  pCalcResult;
 } SComplexityAnalysisParam;
 
-typedef struct
-{
+typedef struct {
   int  iMbRowInGom;
-  int  *pGomComplexity;
+  int*  pGomComplexity;
   int  iGomNumInFrame;
   int  iFrameComplexity;
   int  iIdrFlag;

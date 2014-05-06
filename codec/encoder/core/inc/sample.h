@@ -47,11 +47,12 @@ int32_t WelsSampleSatd8x8_c (uint8_t*, int32_t, uint8_t*, int32_t);
 //int32_t WelsSampleSatd4x8( uint8_t *, int32_t, uint8_t *, int32_t );
 int32_t WelsSampleSatd4x4_c (uint8_t*, int32_t, uint8_t*, int32_t);
 
-int32_t WelsSampleSatdIntra4x4Combined3_c (uint8_t*, int32_t, uint8_t*, int32_t, uint8_t*, int32_t*, int32_t, int32_t, int32_t);
+int32_t WelsSampleSatdIntra4x4Combined3_c (uint8_t*, int32_t, uint8_t*, int32_t, uint8_t*, int32_t*, int32_t, int32_t,
+    int32_t);
 int32_t WelsSampleSatdIntra16x16Combined3_c (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*);
 int32_t WelsSampleSadIntra16x16Combined3_c (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*);
 int32_t WelsSampleSatdIntra8x8Combined3_c (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*,
-                                                   uint8_t*, uint8_t*);
+    uint8_t*, uint8_t*);
 
 #if defined(__cplusplus)
 extern "C" {
@@ -92,9 +93,12 @@ int32_t WelsSampleSatd4x4_neon (uint8_t*, int32_t, uint8_t*, int32_t);
 
 int32_t WelsIntra16x16Combined3Satd_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*);
 int32_t WelsIntra16x16Combined3Sad_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*);
-int32_t WelsIntra8x8Combined3Satd_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*, uint8_t*, uint8_t*);
-int32_t WelsIntra8x8Combined3Sad_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*, uint8_t*, uint8_t*);
-int32_t WelsIntra4x4Combined3Satd_neon (uint8_t*, int32_t, uint8_t*, int32_t, uint8_t*, int32_t*, int32_t, int32_t, int32_t);
+int32_t WelsIntra8x8Combined3Satd_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*, uint8_t*,
+                                        uint8_t*);
+int32_t WelsIntra8x8Combined3Sad_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*, uint8_t*,
+                                       uint8_t*);
+int32_t WelsIntra4x4Combined3Satd_neon (uint8_t*, int32_t, uint8_t*, int32_t, uint8_t*, int32_t*, int32_t, int32_t,
+                                        int32_t);
 
 #endif
 

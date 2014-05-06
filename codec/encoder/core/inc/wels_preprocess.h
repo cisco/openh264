@@ -62,19 +62,19 @@ typedef  struct {
 
 
 typedef struct {
-	int32_t iMinFrameComplexity;
+  int32_t iMinFrameComplexity;
   int32_t iMinFrameComplexity08;
   int32_t iMinFrameComplexity11;
 
   int32_t iMinFrameNumGap;
   int32_t iMinFrameQp;
-}SRefJudgement;
+} SRefJudgement;
 
 typedef struct {
-  SPicture   *pRefPicture;
+  SPicture*   pRefPicture;
   int32_t     iSrcListIdx;   //idx in  h->spatial_pic[base_did];
   bool        bSceneLtrFlag;
-}SRefInfoParam;
+} SRefInfoParam;
 
 typedef struct {
   SVAACalcResult		sVaaCalcInfo;
@@ -102,17 +102,16 @@ typedef struct {
   bool          bIdrPeriodFlag;
 } SVAAFrameInfo;
 
-typedef struct SVAAFrameInfoExt_t: public SVAAFrameInfo
-{
+typedef struct SVAAFrameInfoExt_t: public SVAAFrameInfo {
   SComplexityAnalysisScreenParam    sComplexityScreenParam;
   SScrollDetectionResult    sScrollDetectInfo;
-    //TOP3_BEST_REF_NO_TID
+  //TOP3_BEST_REF_NO_TID
   SRefInfoParam    sVaaStrBestRefCandidate[MAX_REF_PIC_COUNT];
   int32_t    iNumOfAvailableRef;
 
-  uint8_t    *pVaaBestBlockStaticIdc;//pointer
-  uint8_t    *pVaaBlockStaticIdc[16];//real memory,
-}SVAAFrameInfoExt;
+  uint8_t*    pVaaBestBlockStaticIdc;//pointer
+  uint8_t*    pVaaBlockStaticIdc[16];//real memory,
+} SVAAFrameInfoExt;
 
 class CWelsPreProcess {
  public:
@@ -125,8 +124,9 @@ class CWelsPreProcess {
   void    FreeSpatialPictures (sWelsEncCtx* pCtx);
   int32_t BuildSpatialPicList (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrcPic);
   int32_t AnalyzeSpatialPic (sWelsEncCtx* pEncCtx, const int32_t kiDIdx);
-  int32_t UpdateSpatialPictures(sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam, const int8_t iCurTid, const int32_t d_idx);
-  int32_t GetRefCandidateLtrIndex(int32_t iRefIdx);
+  int32_t UpdateSpatialPictures (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam, const int8_t iCurTid,
+                                 const int32_t d_idx);
+  int32_t GetRefCandidateLtrIndex (int32_t iRefIdx);
   void    AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCurPicture, SPicture* pRefPicture,
                                     const int32_t kiDependencyId, const bool kbCalculateBGD);
 
@@ -156,17 +156,19 @@ class CWelsPreProcess {
   void WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SPicture* pDstPic, const SSourcePicture* kpSrc,
                               const int32_t kiWidth, const int32_t kiHeight);
 
-  ESceneChangeIdc DetectSceneChangeScreen(sWelsEncCtx* pCtx,SPicture* pCurPicture);
-  void InitPixMap( const SPicture *pPicture, SPixMap *pPixMap );
-  void GetAvailableRefList(SPicture ** pSrcPicList,uint8_t iCurTid, const int32_t iClosestLtrFrameNum,
-                           SRefInfoParam* pAvailableRefList, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum);
-  void InitRefJudgement( SRefJudgement *pRefJudgement );
-  bool JudgeBestRef(SPicture* pRefPic,const SRefJudgement& sRefJudgement, const int32_t iFrameComplexity, const bool bIsClosestLtrFrame);
-  void SaveBestRefToJudgement(const int32_t iRefPictureAvQP, const int32_t iComplexity, SRefJudgement* pRefJudgement);
-  void SaveBestRefToLocal(SRefInfoParam *pRefPicInfo,const SSceneChangeResult& sSceneChangeResult, SRefInfoParam* pRefSaved);
-  void SaveBestRefToVaa(SRefInfoParam& sRefSaved,SRefInfoParam* pVaaBestRef);
+  ESceneChangeIdc DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPicture* pCurPicture);
+  void InitPixMap (const SPicture* pPicture, SPixMap* pPixMap);
+  void GetAvailableRefList (SPicture** pSrcPicList, uint8_t iCurTid, const int32_t iClosestLtrFrameNum,
+                            SRefInfoParam* pAvailableRefList, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum);
+  void InitRefJudgement (SRefJudgement* pRefJudgement);
+  bool JudgeBestRef (SPicture* pRefPic, const SRefJudgement& sRefJudgement, const int32_t iFrameComplexity,
+                     const bool bIsClosestLtrFrame);
+  void SaveBestRefToJudgement (const int32_t iRefPictureAvQP, const int32_t iComplexity, SRefJudgement* pRefJudgement);
+  void SaveBestRefToLocal (SRefInfoParam* pRefPicInfo, const SSceneChangeResult& sSceneChangeResult,
+                           SRefInfoParam* pRefSaved);
+  void SaveBestRefToVaa (SRefInfoParam& sRefSaved, SRefInfoParam* pVaaBestRef);
 
-private:
+ private:
   Scaled_Picture   m_sScaledPicture;
   SPicture*	   m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];
   IWelsVP*         m_pInterfaceVp;
@@ -174,7 +176,7 @@ private:
   bool             m_bInitDone;
   uint8_t          m_uiSpatialLayersInTemporal[MAX_DEPENDENCY_LAYER];
   uint8_t          m_uiSpatialPicNum[MAX_DEPENDENCY_LAYER];
-public:
+ public:
   /* For Downsampling & VAA I420 based source pictures */
   SPicture*        m_pSpatialPic[MAX_DEPENDENCY_LAYER][MAX_TEMPORAL_LEVEL + 1 +
       LONG_TERM_REF_NUM];	// need memory requirement with total number of (log2(uiGopSize)+1+1+long_term_ref_num)

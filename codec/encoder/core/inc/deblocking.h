@@ -50,23 +50,24 @@ namespace WelsSVCEnc {
 //struct tagDeblockingFunc;
 
 typedef struct TagDeblockingFilter {
-uint8_t*		pCsData[3];	// pointer to reconstructed picture pData
-int32_t		iCsStride[3];	// Cs iStride
-int16_t     iMbStride;
-int8_t		iSliceAlphaC0Offset;
-int8_t		iSliceBetaOffset;
-uint8_t     uiLumaQP;
-uint8_t     uiChromaQP;
-uint8_t     uiFilterIdc;
-uint8_t     uiReserved;
+  uint8_t*		pCsData[3];	// pointer to reconstructed picture pData
+  int32_t		iCsStride[3];	// Cs iStride
+  int16_t     iMbStride;
+  int8_t		iSliceAlphaC0Offset;
+  int8_t		iSliceBetaOffset;
+  uint8_t     uiLumaQP;
+  uint8_t     uiChromaQP;
+  uint8_t     uiFilterIdc;
+  uint8_t     uiReserved;
 } SDeblockingFilter;
 
 #if defined(__cplusplus)
 extern "C" {
 #endif//__cplusplus
 #if defined(HAVE_NEON)
-void WelsNonZeroCount_neon(int8_t * pNonZeroCount);
-void DeblockingBSCalcEnc_neon(int8_t *pNzc, SMVUnitXY *pMv, int32_t iBoundryFlag, int32_t iMbStride, uint8_t (*pBS)[4][4]);
+void WelsNonZeroCount_neon (int8_t* pNonZeroCount);
+void DeblockingBSCalcEnc_neon (int8_t* pNzc, SMVUnitXY* pMv, int32_t iBoundryFlag, int32_t iMbStride,
+                               uint8_t (*pBS)[4][4]);
 #endif
 #if defined(__cplusplus)
 }

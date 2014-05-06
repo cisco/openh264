@@ -98,7 +98,7 @@ void WelsDecoderIChromaPredDcNA_mmx (uint8_t* pPred, const int32_t kiStride);
 
 
 
-void WelsDecoderI4x4LumaPredH_sse2(uint8_t *pPred, const int32_t kiStride);
+void WelsDecoderI4x4LumaPredH_sse2 (uint8_t* pPred, const int32_t kiStride);
 void WelsDecoderI4x4LumaPredDDR_mmx (uint8_t* pPred, const int32_t kiStride);
 void WelsDecoderI4x4LumaPredHD_mmx (uint8_t* pPred, const int32_t kiStride);
 void WelsDecoderI4x4LumaPredHU_mmx (uint8_t* pPred, const int32_t kiStride);
@@ -108,24 +108,24 @@ void WelsDecoderI4x4LumaPredVL_mmx (uint8_t* pPred, const int32_t kiStride);
 #endif//X86_ASM
 
 #if defined(HAVE_NEON)
-void WelsDecoderI16x16LumaPredV_neon(uint8_t *pPred, const int32_t kiStride);
-void WelsDecoderI16x16LumaPredH_neon(uint8_t *pPred, const int32_t kiStride);
-void WelsDecoderI16x16LumaPredDc_neon(uint8_t *pPred, const int32_t kiStride);
-void WelsDecoderI16x16LumaPredPlane_neon(uint8_t *pPred, const int32_t kiStride);
+void WelsDecoderI16x16LumaPredV_neon (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderI16x16LumaPredH_neon (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderI16x16LumaPredDc_neon (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderI16x16LumaPredPlane_neon (uint8_t* pPred, const int32_t kiStride);
 
-void WelsDecoderI4x4LumaPredV_neon(uint8_t *pPred, const int32_t kiStride);
-void WelsDecoderI4x4LumaPredH_neon(uint8_t *pPred, const int32_t kiStride);
-void WelsDecoderI4x4LumaPredDDL_neon(uint8_t *pPred, const int32_t kiStride);
-void WelsDecoderI4x4LumaPredDDR_neon(uint8_t *pPred, const int32_t kiStride);
-void WelsDecoderI4x4LumaPredVL_neon(uint8_t *pPred, const int32_t kiStride);
-void WelsDecoderI4x4LumaPredVR_neon(uint8_t *pPred, const int32_t kiStride);
-void WelsDecoderI4x4LumaPredHU_neon(uint8_t *pPred, const int32_t kiStride);
-void WelsDecoderI4x4LumaPredHD_neon(uint8_t *pPred, const int32_t kiStride);
+void WelsDecoderI4x4LumaPredV_neon (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderI4x4LumaPredH_neon (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderI4x4LumaPredDDL_neon (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderI4x4LumaPredDDR_neon (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderI4x4LumaPredVL_neon (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderI4x4LumaPredVR_neon (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderI4x4LumaPredHU_neon (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderI4x4LumaPredHD_neon (uint8_t* pPred, const int32_t kiStride);
 
-void WelsDecoderIChromaPredV_neon(uint8_t *pPred, const int32_t kiStride);
-void WelsDecoderIChromaPredH_neon(uint8_t *pPred, const int32_t kiStride);
-void WelsDecoderIChromaPredDc_neon(uint8_t *pPred, const int32_t kiStride);
-void WelsDecoderIChromaPredPlane_neon(uint8_t *pPred, const int32_t kiStride);
+void WelsDecoderIChromaPredV_neon (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderIChromaPredH_neon (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderIChromaPredDc_neon (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderIChromaPredPlane_neon (uint8_t* pPred, const int32_t kiStride);
 #endif//HAVE_NEON
 
 #if defined(__cplusplus)

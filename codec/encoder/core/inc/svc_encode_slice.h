@@ -83,7 +83,7 @@ int32_t WelsCodePSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice);
 int32_t WelsCodePOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice);
 
 int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx,
-                       const int32_t keNalType);
+                          const int32_t keNalType);
 
 void WelsInitSliceEncodingFuncs (uint32_t uiCpuFlag);
 
@@ -94,12 +94,12 @@ void UpdateMbNeighbourInfoForNextSlice (SSliceCtx* pSliceCtx,
 void AddSliceBoundary (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
                        int32_t iNextSliceFirstMbIdx, const int32_t kiLastMbIdxInPartition);
 int32_t WelsMdInterMbLoop (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pMd,
-                        const int32_t kiSliceFirstMbXY);	// for inter non-dynamic slice
+                           const int32_t kiSliceFirstMbXY);	// for inter non-dynamic slice
 int32_t WelsMdInterMbLoopOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pMd,
-                                        const int32_t kiSliceFirstMbXY);	// for inter dynamic slice
+    const int32_t kiSliceFirstMbXY);	// for inter dynamic slice
 
 
 bool DynSlcJudgeSliceBoundaryStepBack (void* pEncCtx, void* pSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
-    SDynamicSlicingStack* pDss);
+                                       SDynamicSlicingStack* pDss);
 }
 #endif //SVC_ENCODE_SLICE_H__

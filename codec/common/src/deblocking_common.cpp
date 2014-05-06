@@ -2,7 +2,7 @@
 #include "macros.h"
 //  C code only
 void DeblockLumaLt4_c (uint8_t* pPix, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha, int32_t iBeta,
-                         int8_t* pTc) {
+                       int8_t* pTc) {
   for (int32_t i = 0; i < 16; i++) {
     int32_t iTc0 = pTc[i >> 2];
     if (iTc0 >= 0) {
@@ -90,7 +90,7 @@ void DeblockLumaEq4H_c (uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t 
   DeblockLumaEq4_c (pPix, 1, iStride, iAlpha, iBeta);
 }
 void DeblockChromaLt4_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha,
-                           int32_t iBeta, int8_t* pTc) {
+                         int32_t iBeta, int8_t* pTc) {
   int32_t p0, p1, q0, q1, iDeta;
   bool bDetaP0Q0, bDetaP1P0, bDetaQ1Q0;
 
@@ -132,7 +132,7 @@ void DeblockChromaLt4_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int
   }
 }
 void DeblockChromaEq4_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha,
-                           int32_t iBeta) {
+                         int32_t iBeta) {
   int32_t p0, p1, q0, q1;
   bool bDetaP0Q0, bDetaP1P0, bDetaQ1Q0;
   for (int32_t i = 0; i < 8; i++) {
@@ -166,11 +166,11 @@ void DeblockChromaEq4_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int
   }
 }
 void DeblockChromaLt4V_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
-                            int8_t* tc) {
+                          int8_t* tc) {
   DeblockChromaLt4_c (pPixCb, pPixCr, iStride, 1, iAlpha, iBeta, tc);
 }
 void DeblockChromaLt4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
-                            int8_t* tc) {
+                          int8_t* tc) {
   DeblockChromaLt4_c (pPixCb, pPixCr, 1, iStride, iAlpha, iBeta, tc);
 }
 void DeblockChromaEq4V_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta) {

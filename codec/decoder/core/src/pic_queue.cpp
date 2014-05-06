@@ -81,17 +81,17 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
 
   iLumaSize	= iPicWidth * iPicHeight;
   iChromaSize	= iPicChromaWidth * iPicChromaHeight;
-    pPic->pBuffer[0]	= static_cast<uint8_t*> (WelsMalloc (iLumaSize /* luma */
-                        + (iChromaSize << 1) /* Cb,Cr */, "_pic->buffer[0]"));
+  pPic->pBuffer[0]	= static_cast<uint8_t*> (WelsMalloc (iLumaSize /* luma */
+                      + (iChromaSize << 1) /* Cb,Cr */, "_pic->buffer[0]"));
 
-    WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pBuffer[0], FreePicture (pPic));
-    pPic->iLinesize[0] = iPicWidth;
-    pPic->iLinesize[1] = pPic->iLinesize[2] = iPicChromaWidth;
-    pPic->pBuffer[1]	= pPic->pBuffer[0] + iLumaSize;
-    pPic->pBuffer[2]	= pPic->pBuffer[1] + iChromaSize;
-    pPic->pData[0]	= pPic->pBuffer[0] + (1 + pPic->iLinesize[0]) * PADDING_LENGTH;
-    pPic->pData[1]	= pPic->pBuffer[1] + /*WELS_ALIGN*/ (((1 + pPic->iLinesize[1]) * PADDING_LENGTH) >> 1);
-    pPic->pData[2]	= pPic->pBuffer[2] + /*WELS_ALIGN*/ (((1 + pPic->iLinesize[2]) * PADDING_LENGTH) >> 1);
+  WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pBuffer[0], FreePicture (pPic));
+  pPic->iLinesize[0] = iPicWidth;
+  pPic->iLinesize[1] = pPic->iLinesize[2] = iPicChromaWidth;
+  pPic->pBuffer[1]	= pPic->pBuffer[0] + iLumaSize;
+  pPic->pBuffer[2]	= pPic->pBuffer[1] + iChromaSize;
+  pPic->pData[0]	= pPic->pBuffer[0] + (1 + pPic->iLinesize[0]) * PADDING_LENGTH;
+  pPic->pData[1]	= pPic->pBuffer[1] + /*WELS_ALIGN*/ (((1 + pPic->iLinesize[1]) * PADDING_LENGTH) >> 1);
+  pPic->pData[2]	= pPic->pBuffer[2] + /*WELS_ALIGN*/ (((1 + pPic->iLinesize[2]) * PADDING_LENGTH) >> 1);
 
 
 

@@ -970,7 +970,8 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
     pCtx->sMb.pInterPredictionDoneFlag[i] = (int8_t*) WelsMalloc (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
         int8_t), "pCtx->sMb.pInterPredictionDoneFlag[]");
 
-    pCtx->sMb.pMbCorrectlyDecodedFlag[i] = (bool*) WelsMalloc (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (bool), "pCtx->sMb.pMbCorrectlyDecodedFlag[]");
+    pCtx->sMb.pMbCorrectlyDecodedFlag[i] = (bool*) WelsMalloc (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (bool),
+                                           "pCtx->sMb.pMbCorrectlyDecodedFlag[]");
 
     // check memory block valid due above allocated..
     WELS_VERIFY_RETURN_IF (ERR_INFO_OUT_OF_MEMORY,
@@ -1482,60 +1483,63 @@ void WelsDecodeAccessUnitEnd (PWelsDecoderContext pCtx) {
  * return:
  * true - the AU to be construct is the start of new sequence; false - not
  */
-static bool CheckNewSeqBeginAndUpdateActiveLayerSps(PWelsDecoderContext pCtx) {
+static bool CheckNewSeqBeginAndUpdateActiveLayerSps (PWelsDecoderContext pCtx) {
   bool bNewSeq = false;
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
   PSps pTmpLayerSps[MAX_LAYER_NUM];
-  for(int i = 0; i < MAX_LAYER_NUM; i++) {
+  for (int i = 0; i < MAX_LAYER_NUM; i++) {
     pTmpLayerSps[i] = NULL;
   }
   // track the layer sps for the current au
-  for(unsigned int i = pCurAu->uiStartPos; i <= pCurAu->uiEndPos; i++) {
+  for (unsigned int i = pCurAu->uiStartPos; i <= pCurAu->uiEndPos; i++) {
     uint32_t uiDid = pCurAu->pNalUnitsList[i]->sNalHeaderExt.uiDependencyId;
     pTmpLayerSps[uiDid] = pCurAu->pNalUnitsList[i]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
-    if ((pCurAu->pNalUnitsList[i]->sNalHeaderExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_IDR) || (pCurAu->pNalUnitsList[i]->sNalHeaderExt.bIdrFlag))
+    if ((pCurAu->pNalUnitsList[i]->sNalHeaderExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_IDR)
+        || (pCurAu->pNalUnitsList[i]->sNalHeaderExt.bIdrFlag))
       bNewSeq = true;
   }
   int iMaxActiveLayer = 0, iMaxCurrentLayer = 0;
-  for(int i = MAX_LAYER_NUM - 1; i >= 0; i--) {
+  for (int i = MAX_LAYER_NUM - 1; i >= 0; i--) {
     if (pCtx->pActiveLayerSps[i] != NULL) {
       iMaxActiveLayer = i;
       break;
     }
   }
-  for(int i = MAX_LAYER_NUM - 1; i >= 0; i--) {
+  for (int i = MAX_LAYER_NUM - 1; i >= 0; i--) {
     if (pTmpLayerSps[i] != NULL) {
       iMaxCurrentLayer = i;
       break;
     }
   }
-  if ((iMaxCurrentLayer != iMaxActiveLayer) || (pTmpLayerSps[iMaxCurrentLayer]  != pCtx->pActiveLayerSps[iMaxActiveLayer])) {
+  if ((iMaxCurrentLayer != iMaxActiveLayer)
+      || (pTmpLayerSps[iMaxCurrentLayer]  != pCtx->pActiveLayerSps[iMaxActiveLayer])) {
     bNewSeq = true;
   }
   // fill active sps if the current sps is not null while active layer is null
   if (!bNewSeq) {
-    for(int i = 0; i < MAX_LAYER_NUM; i++) {
+    for (int i = 0; i < MAX_LAYER_NUM; i++) {
       if (pCtx->pActiveLayerSps[i] == NULL && pTmpLayerSps[i] != NULL) {
         pCtx->pActiveLayerSps[i] = pTmpLayerSps[i];
       }
     }
   } else {
     // UpdateActiveLayerSps if new sequence start
-    memcpy(&pCtx->pActiveLayerSps[0], &pTmpLayerSps[0], MAX_LAYER_NUM * sizeof(PSps));
+    memcpy (&pCtx->pActiveLayerSps[0], &pTmpLayerSps[0], MAX_LAYER_NUM * sizeof (PSps));
   }
   return bNewSeq;
 }
 
-static void WriteBackActiveParameters(PWelsDecoderContext pCtx) {
+static void WriteBackActiveParameters (PWelsDecoderContext pCtx) {
   if (pCtx->iOverwriteFlags & OVERWRITE_PPS) {
-    memcpy(&pCtx->sPpsBuffer[pCtx->sPpsBuffer[MAX_PPS_COUNT].iPpsId], &pCtx->sPpsBuffer[MAX_PPS_COUNT], sizeof(SPps));
+    memcpy (&pCtx->sPpsBuffer[pCtx->sPpsBuffer[MAX_PPS_COUNT].iPpsId], &pCtx->sPpsBuffer[MAX_PPS_COUNT], sizeof (SPps));
   }
   if (pCtx->iOverwriteFlags & OVERWRITE_SPS) {
-    memcpy(&pCtx->sSpsBuffer[pCtx->sSpsBuffer[MAX_SPS_COUNT].iSpsId], &pCtx->sSpsBuffer[MAX_SPS_COUNT], sizeof(SSps));
+    memcpy (&pCtx->sSpsBuffer[pCtx->sSpsBuffer[MAX_SPS_COUNT].iSpsId], &pCtx->sSpsBuffer[MAX_SPS_COUNT], sizeof (SSps));
     pCtx->bNewSeqBegin = true;
   }
   if (pCtx->iOverwriteFlags & OVERWRITE_SUBSETSPS) {
-    memcpy(&pCtx->sSubsetSpsBuffer[pCtx->sSubsetSpsBuffer[MAX_SPS_COUNT].sSps.iSpsId], &pCtx->sSubsetSpsBuffer[MAX_SPS_COUNT], sizeof(SSubsetSps));
+    memcpy (&pCtx->sSubsetSpsBuffer[pCtx->sSubsetSpsBuffer[MAX_SPS_COUNT].sSps.iSpsId],
+            &pCtx->sSubsetSpsBuffer[MAX_SPS_COUNT], sizeof (SSubsetSps));
     pCtx->bNewSeqBegin = true;
   }
   pCtx->iOverwriteFlags = OVERWRITE_NONE;
@@ -1561,7 +1565,7 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
 
   pCtx->bAuReadyFlag = false;
   pCtx->bLastHasMmco5 = false;
-  bool bTmpNewSeqBegin = CheckNewSeqBeginAndUpdateActiveLayerSps(pCtx);
+  bool bTmpNewSeqBegin = CheckNewSeqBeginAndUpdateActiveLayerSps (pCtx);
   pCtx->bNewSeqBegin = pCtx->bNewSeqBegin || bTmpNewSeqBegin;
   iErr = WelsDecodeAccessUnitStart (pCtx);
   GetVclNalTemporalId (pCtx);
@@ -1595,11 +1599,11 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
   ImplementErrorCon (pCtx);
 
   pCtx->bNewSeqBegin = false;
-  WriteBackActiveParameters(pCtx);
+  WriteBackActiveParameters (pCtx);
   pCtx->bNewSeqBegin = pCtx->bNewSeqBegin || pCtx->bNextNewSeqBegin;
   pCtx->bNextNewSeqBegin = false; // reset it
   if (pCtx->bNewSeqBegin)
-    ResetActiveSPSForEachLayer(pCtx);
+    ResetActiveSPSForEachLayer (pCtx);
   if (ERR_NONE != iErr) {
     WelsLog (pCtx, WELS_LOG_INFO, "returned error from decoding:[0x%x]\n", iErr);
     return iErr;
@@ -1932,7 +1936,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
       }
     }
 
-   // need update frame_num due current frame is well decoded
+    // need update frame_num due current frame is well decoded
     pCtx->iPrevFrameNum	= pSh->iFrameNum;
     if (pCtx->bLastHasMmco5)
       pCtx->iPrevFrameNum = 0;

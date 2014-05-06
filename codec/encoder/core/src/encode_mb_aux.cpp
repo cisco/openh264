@@ -450,9 +450,9 @@ int32_t WelsGetNoneZeroCount_c (int16_t* pLevel) {
 }
 
 #ifdef	HAVE_NEON
-int32_t WelsHadamardQuant2x2Skip_neon(int16_t* pRes, int16_t iFF,  int16_t iMF) {
-  int16_t iThreshold = ((1<<16)-1)/iMF - iFF;
-  return WelsHadamardQuant2x2SkipKernel_neon(pRes, iThreshold);
+int32_t WelsHadamardQuant2x2Skip_neon (int16_t* pRes, int16_t iFF,  int16_t iMF) {
+  int16_t iThreshold = ((1 << 16) - 1) / iMF - iFF;
+  return WelsHadamardQuant2x2SkipKernel_neon (pRes, iThreshold);
 }
 #endif
 

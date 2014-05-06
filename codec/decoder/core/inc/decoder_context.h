@@ -78,7 +78,7 @@ typedef struct TagDataBuffer {
 typedef void (*PGetIntraPredFunc) (uint8_t* pPred, const int32_t kiLumaStride);
 typedef void (*PIdctResAddPredFunc) (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
 typedef void (*PExpandPictureFunc) (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicWidth,
-                                      const int32_t kiPicHeight);
+                                    const int32_t kiPicHeight);
 
 /**/
 typedef struct TagRefPic {
@@ -92,7 +92,7 @@ typedef struct TagRefPic {
 } SRefPic, *PRefPic;
 
 typedef void (*PWelsMcFunc) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                               int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight);
+                             int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight);
 typedef struct TagMcFunc {
   PWelsMcFunc pMcLumaFunc;
   PWelsMcFunc pMcChromaFunc;
@@ -120,7 +120,7 @@ typedef struct tagDeblockingFilter {
 
 typedef void (*PDeblockingFilterMbFunc) (PDqLayer pCurDqLayer, PDeblockingFilter  filter, int32_t boundry_flag);
 typedef void (*PLumaDeblockingLT4Func) (uint8_t* iSampleY, int32_t iStride, int32_t iAlpha, int32_t iBeta,
-    int8_t* iTc);
+                                        int8_t* iTc);
 typedef void (*PLumaDeblockingEQ4Func) (uint8_t* iSampleY, int32_t iStride, int32_t iAlpha, int32_t iBeta);
 typedef void (*PChromaDeblockingLT4Func) (uint8_t* iSampleCb, uint8_t* iSampleCr, int32_t iStride, int32_t iAlpha,
     int32_t iBeta, int8_t* iTc);
@@ -330,8 +330,8 @@ typedef struct TagWelsDecoderContext {
 
 } SWelsDecoderContext, *PWelsDecoderContext;
 
-static inline void ResetActiveSPSForEachLayer(PWelsDecoderContext pCtx) {
-  for(int i = 0; i < MAX_LAYER_NUM; i++) {
+static inline void ResetActiveSPSForEachLayer (PWelsDecoderContext pCtx) {
+  for (int i = 0; i < MAX_LAYER_NUM; i++) {
     pCtx->pActiveLayerSps[i] = NULL;
   }
 }

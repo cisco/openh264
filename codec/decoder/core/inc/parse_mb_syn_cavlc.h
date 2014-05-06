@@ -137,11 +137,11 @@ static const SPartMbInfo g_ksInterSubMbTypeInfo[4] = {
 void GetNeighborAvailMbType (PNeighAvail pNeighAvail, PDqLayer pCurLayer);
 void WelsFillCacheNonZeroCount (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, PDqLayer pCurLayer);
 void WelsFillCacheConstrain0Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int8_t* pIntraPredMode,
-                                        PDqLayer pCurLayer);
+                                      PDqLayer pCurLayer);
 void WelsFillCacheConstrain1Intra4x4 (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int8_t* pIntraPredMode,
-                                        PDqLayer pCurLayer);
+                                      PDqLayer pCurLayer);
 void WelsFillCacheInter (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
-                           int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30], PDqLayer pCurLayer);
+                         int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30], PDqLayer pCurLayer);
 
 
 /*!

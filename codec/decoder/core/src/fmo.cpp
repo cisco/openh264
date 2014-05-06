@@ -239,7 +239,7 @@ void UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail) {
  * \return	true - changed or not initialized yet; false - not change at all
  */
 bool FmoParamSetsChanged (PFmo pFmo, const int32_t kiCountNumMb, const int32_t kiSliceGroupType,
-                            const int32_t kiSliceGroupCount) {
+                          const int32_t kiSliceGroupCount) {
   WELS_VERIFY_RETURN_IF (false, (NULL == pFmo))
 
   return ((!pFmo->bActiveFlag)

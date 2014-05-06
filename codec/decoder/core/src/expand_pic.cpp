@@ -38,7 +38,7 @@ namespace WelsDec {
 
 // rewrite it (split into luma & chroma) that is helpful for mmx/sse2 optimization perform, 9/27/2009
 static inline void ExpandPictureLuma_c (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicWidth,
-    const int32_t kiPicHeight) {
+                                        const int32_t kiPicHeight) {
   uint8_t* pTmp				= pDst;
   uint8_t* pDstLastLine		= pTmp + (kiPicHeight - 1) * kiStride;
   const int32_t kiPaddingLen	= PADDING_LENGTH;

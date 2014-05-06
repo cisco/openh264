@@ -35,13 +35,13 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-IStrategy * BuildSceneChangeDetection(EMethods eMethod, int32_t iCpuFlag){
-  switch(eMethod){
+IStrategy* BuildSceneChangeDetection (EMethods eMethod, int32_t iCpuFlag) {
+  switch (eMethod) {
   case METHOD_SCENE_CHANGE_DETECTION_VIDEO:
-    return new CSceneChangeDetection<CSceneChangeDetectorVideo>(eMethod, iCpuFlag);
+    return new CSceneChangeDetection<CSceneChangeDetectorVideo> (eMethod, iCpuFlag);
     break;
   case METHOD_SCENE_CHANGE_DETECTION_SCREEN:
-    return new CSceneChangeDetection<CSceneChangeDetectorScreen>(eMethod, iCpuFlag);
+    return new CSceneChangeDetection<CSceneChangeDetectorScreen> (eMethod, iCpuFlag);
     break;
   default:
     // not support yet

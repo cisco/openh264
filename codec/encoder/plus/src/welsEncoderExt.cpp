@@ -84,7 +84,7 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
 #ifdef OUTPUT_BIT_STREAM
   SWelsTime tTime;
 
-  WelsGetTimeOfDay(&tTime);
+  WelsGetTimeOfDay (&tTime);
 
   iCurUsed      = WelsSnprintf (strStreamFileName, iBufferLeft, "enc_bs_0x%p_", (void*)this);
   iCurUsedSize  = WelsSnprintf (strLenFileName, iBufferLeftSize, "enc_size_0x%p_", (void*)this);
@@ -108,14 +108,14 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
 
   if (iBufferLeft > 0) {
     iCurUsed = WelsSnprintf (&strStreamFileName[iBufferUsed], iBufferLeft, ".%03.3u.264",
-                             WelsGetMillisecond(&tTime));
+                             WelsGetMillisecond (&tTime));
     iBufferUsed += iCurUsed;
     iBufferLeft -= iCurUsed;
   }
 
   if (iBufferLeftSize > 0) {
     iCurUsedSize = WelsSnprintf (&strLenFileName[iBufferUsedSize], iBufferLeftSize, ".%03.3u.len",
-                                 WelsGetMillisecond(&tTime));
+                                 WelsGetMillisecond (&tTime));
     iBufferUsedSize += iCurUsedSize;
     iBufferLeftSize -= iCurUsedSize;
   }
@@ -186,7 +186,7 @@ void CWelsH264SVCEncoder::InitEncoder (void) {
 /* Interfaces override from ISVCEncoder */
 
 int CWelsH264SVCEncoder::GetDefaultParams (SEncParamExt* argv) {
-  SWelsSvcCodingParam::FillDefault(*argv);
+  SWelsSvcCodingParam::FillDefault (*argv);
   return cmResultSuccess;
 }
 
@@ -209,7 +209,7 @@ int CWelsH264SVCEncoder::Initialize (const SEncParamBase* argv) {
     return cmInitParaError;
   }
 
-  return InitializeInternal(&sConfig);
+  return InitializeInternal (&sConfig);
 }
 
 int CWelsH264SVCEncoder::InitializeExt (const SEncParamExt* argv) {
@@ -228,10 +228,10 @@ int CWelsH264SVCEncoder::InitializeExt (const SEncParamExt* argv) {
     return cmInitParaError;
   }
 
-  return InitializeInternal(&sConfig);
+  return InitializeInternal (&sConfig);
 }
 
-int CWelsH264SVCEncoder::InitializeInternal(SWelsSvcCodingParam* pCfg) {
+int CWelsH264SVCEncoder::InitializeInternal (SWelsSvcCodingParam* pCfg) {
   if (NULL == pCfg) {
     WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::Initialize(), invalid argv= 0x%p.\n",
              pCfg);
@@ -245,7 +245,7 @@ int CWelsH264SVCEncoder::InitializeInternal(SWelsSvcCodingParam* pCfg) {
   }
 
 #ifdef REC_FRAME_COUNT
-  SWelsSvcCodingParam &sEncodingParam = *pCfg;
+  SWelsSvcCodingParam& sEncodingParam = *pCfg;
   WelsLog (m_pEncContext, WELS_LOG_INFO, "CWelsH264SVCEncoder::Initialize, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x\n",
            m_uiCountFrameNum, m_iCspInternal);
   WelsLog (m_pEncContext, WELS_LOG_INFO,
@@ -346,17 +346,17 @@ int CWelsH264SVCEncoder::InitializeInternal(SWelsSvcCodingParam* pCfg) {
   }
   if (pCfg->iUsageType == SCREEN_CONTENT_REAL_TIME) {
     if (pCfg->bEnableLongTermReference) {
-      pCfg->iLTRRefNum = WELS_CLIP3(pCfg->iLTRRefNum,1,LONG_TERM_REF_NUM_SCREEN);
-      pCfg->iNumRefFrame = WELS_MAX(1,WELS_LOG2 (pCfg->uiGopSize)) + pCfg->iLTRRefNum;
+      pCfg->iLTRRefNum = WELS_CLIP3 (pCfg->iLTRRefNum, 1, LONG_TERM_REF_NUM_SCREEN);
+      pCfg->iNumRefFrame = WELS_MAX (1, WELS_LOG2 (pCfg->uiGopSize)) + pCfg->iLTRRefNum;
     } else {
       pCfg->iLTRRefNum = 0;
-      pCfg->iNumRefFrame = WELS_MAX(1, pCfg->uiGopSize>>1);
+      pCfg->iNumRefFrame = WELS_MAX (1, pCfg->uiGopSize >> 1);
     }
-   } else {
-     pCfg->iLTRRefNum = pCfg->bEnableLongTermReference ? WELS_CLIP3(pCfg->iLTRRefNum,1,LONG_TERM_REF_NUM) : 0;
-     pCfg->iNumRefFrame		= ((pCfg->uiGopSize >> 1) > 1) ? ((pCfg->uiGopSize >> 1) + pCfg->iLTRRefNum) :
-                                  (MIN_REF_PIC_COUNT + pCfg->iLTRRefNum);
-     pCfg->iNumRefFrame		= WELS_CLIP3 (pCfg->iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM);
+  } else {
+    pCfg->iLTRRefNum = pCfg->bEnableLongTermReference ? WELS_CLIP3 (pCfg->iLTRRefNum, 1, LONG_TERM_REF_NUM) : 0;
+    pCfg->iNumRefFrame		= ((pCfg->uiGopSize >> 1) > 1) ? ((pCfg->uiGopSize >> 1) + pCfg->iLTRRefNum) :
+                            (MIN_REF_PIC_COUNT + pCfg->iLTRRefNum);
+    pCfg->iNumRefFrame		= WELS_CLIP3 (pCfg->iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM);
   }
 
   if (pCfg->iLtrMarkPeriod == 0) {
@@ -419,9 +419,9 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
     return cmInitParaError;
   }
 
-  const int32_t kiEncoderReturn = EncodeFrameInternal(kpSrcPic, pBsInfo);
+  const int32_t kiEncoderReturn = EncodeFrameInternal (kpSrcPic, pBsInfo);
 
-  if(kiEncoderReturn != cmResultSuccess)
+  if (kiEncoderReturn != cmResultSuccess)
     return kiEncoderReturn;
 
 #ifdef REC_FRAME_COUNT
@@ -437,14 +437,13 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
 }
 
 
-int CWelsH264SVCEncoder::EncodeFrameInternal(const SSourcePicture*  pSrcPic, SFrameBSInfo* pBsInfo) {
+int CWelsH264SVCEncoder::EncodeFrameInternal (const SSourcePicture*  pSrcPic, SFrameBSInfo* pBsInfo) {
   const int32_t kiEncoderReturn = WelsEncoderEncodeExt (m_pEncContext, pBsInfo, pSrcPic);
 
-  if(kiEncoderReturn == ENC_RETURN_MEMALLOCERR) {
+  if (kiEncoderReturn == ENC_RETURN_MEMALLOCERR) {
     WelsUninitEncoderExt (&m_pEncContext);
     return cmMallocMemeError;
-  }
-  else if((kiEncoderReturn != ENC_RETURN_SUCCESS)&&(kiEncoderReturn == ENC_RETURN_CORRECTED)){
+  } else if ((kiEncoderReturn != ENC_RETURN_SUCCESS) && (kiEncoderReturn == ENC_RETURN_CORRECTED)) {
     WelsLog (m_pEncContext, WELS_LOG_ERROR, "unexpected return(%d) from EncodeFrameInternal()!\n", kiEncoderReturn);
     return cmUnkonwReason;
   }
@@ -500,7 +499,7 @@ int CWelsH264SVCEncoder::EncodeFrameInternal(const SSourcePicture*  pSrcPic, SFr
 }
 
 int CWelsH264SVCEncoder::EncodeParameterSets (SFrameBSInfo* pBsInfo) {
-    return WelsEncoderEncodeParameterSets (m_pEncContext, pBsInfo);
+  return WelsEncoderEncodeParameterSets (m_pEncContext, pBsInfo);
 }
 
 /*
@@ -512,7 +511,7 @@ int CWelsH264SVCEncoder::PauseFrame (const SSourcePicture* kpSrcPic, SFrameBSInf
   ForceIntraFrame (true);
 
   if (EncodeFrameInternal (kpSrcPic, pBsInfo) != videoFrameTypeInvalid) {
-	iReturn = 0;
+    iReturn = 0;
   }
 
 
@@ -692,7 +691,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
              "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_FRAME_RATE, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x, iValue= %f\n",
              m_uiCountFrameNum, m_iCspInternal, iValue);
 #endif//REC_FRAME_COUNT
-    if (iValue<=0) {
+    if (iValue <= 0) {
       return cmInitParaError;
     }
     //adjust to valid range
@@ -701,80 +700,84 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   }
   break;
   case ENCODER_OPTION_BITRATE: {	// Target bit-rate
-    SBitrateInfo*pInfo = (static_cast<SBitrateInfo *>(pOption));
+    SBitrateInfo* pInfo = (static_cast<SBitrateInfo*> (pOption));
     int32_t iBitrate = pInfo->iBitrate;
 #ifdef REC_FRAME_COUNT
     WelsLog (m_pEncContext, WELS_LOG_INFO,
-      "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x, iValue= %d\n",
-      m_uiCountFrameNum, m_iCspInternal, iValue);
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x, iValue= %d\n",
+             m_uiCountFrameNum, m_iCspInternal, iValue);
 #endif//REC_FRAME_COUNT
-    if (iBitrate<=0) {
-	  WelsLog (m_pEncContext, WELS_LOG_ERROR,"CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE,iBitrate = %d\n",iBitrate);
+    if (iBitrate <= 0) {
+      WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE,iBitrate = %d\n",
+               iBitrate);
       return cmInitParaError;
     }
     iBitrate	= WELS_CLIP3 (iBitrate, MIN_BIT_RATE, MAX_BIT_RATE);
-	switch(pInfo->iLayer){
-	case SPATIAL_LAYER_ALL:
-	  m_pEncContext->pSvcParam->iTargetBitrate = iBitrate;
-	break;
-	case SPATIAL_LAYER_0:
-	  m_pEncContext->pSvcParam->sSpatialLayers[0].iSpatialBitrate = iBitrate;
-	break;
-	case SPATIAL_LAYER_1:
-	  m_pEncContext->pSvcParam->sSpatialLayers[1].iSpatialBitrate = iBitrate;
-	break;
-	case SPATIAL_LAYER_2:
-	  m_pEncContext->pSvcParam->sSpatialLayers[2].iSpatialBitrate = iBitrate;
-	break;
-	case SPATIAL_LAYER_3:
-	  m_pEncContext->pSvcParam->sSpatialLayers[3].iSpatialBitrate = iBitrate;
-	break;
-	default:
-	   WelsLog (m_pEncContext, WELS_LOG_ERROR,"CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE,iLayer = %d\n",pInfo->iLayer);
-	return cmInitParaError;
-	break;
-	}
+    switch (pInfo->iLayer) {
+    case SPATIAL_LAYER_ALL:
+      m_pEncContext->pSvcParam->iTargetBitrate = iBitrate;
+      break;
+    case SPATIAL_LAYER_0:
+      m_pEncContext->pSvcParam->sSpatialLayers[0].iSpatialBitrate = iBitrate;
+      break;
+    case SPATIAL_LAYER_1:
+      m_pEncContext->pSvcParam->sSpatialLayers[1].iSpatialBitrate = iBitrate;
+      break;
+    case SPATIAL_LAYER_2:
+      m_pEncContext->pSvcParam->sSpatialLayers[2].iSpatialBitrate = iBitrate;
+      break;
+    case SPATIAL_LAYER_3:
+      m_pEncContext->pSvcParam->sSpatialLayers[3].iSpatialBitrate = iBitrate;
+      break;
+    default:
+      WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE,iLayer = %d\n",
+               pInfo->iLayer);
+      return cmInitParaError;
+      break;
+    }
     //adjust to valid range
-    WelsEncoderApplyBitRate (m_pEncContext->pSvcParam,pInfo->iLayer);
+    WelsEncoderApplyBitRate (m_pEncContext->pSvcParam, pInfo->iLayer);
   }
   break;
   case ENCODER_OPTION_MAX_BITRATE: {	// Target bit-rate
-    SBitrateInfo*pInfo = (static_cast<SBitrateInfo *>(pOption));
+    SBitrateInfo* pInfo = (static_cast<SBitrateInfo*> (pOption));
     int32_t iBitrate = pInfo->iBitrate;
 
 #ifdef REC_FRAME_COUNT
     WelsLog (m_pEncContext, WELS_LOG_INFO,
-      "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x, iValue= %d\n",
-      m_uiCountFrameNum, m_iCspInternal, iValue);
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x, iValue= %d\n",
+             m_uiCountFrameNum, m_iCspInternal, iValue);
 #endif//REC_FRAME_COUNT
-	if (iBitrate<=0) {
-	  WelsLog (m_pEncContext, WELS_LOG_ERROR,"CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_MAX_BITRATE,iBitrate = %d\n",iBitrate);
-	   return cmInitParaError;
-	}
-	iBitrate	= WELS_CLIP3 (iBitrate, MIN_BIT_RATE, MAX_BIT_RATE);
-	switch(pInfo->iLayer){
-	case SPATIAL_LAYER_ALL:
-	  m_pEncContext->pSvcParam->iMaxBitrate = iBitrate;
-	break;
-	case SPATIAL_LAYER_0:
-	  m_pEncContext->pSvcParam->sSpatialLayers[0].iMaxSpatialBitrate = iBitrate;
-	break;
-	case SPATIAL_LAYER_1:
-	  m_pEncContext->pSvcParam->sSpatialLayers[1].iMaxSpatialBitrate = iBitrate;
-	break;
-	case SPATIAL_LAYER_2:
-	  m_pEncContext->pSvcParam->sSpatialLayers[2].iMaxSpatialBitrate = iBitrate;
-	break;
-	case SPATIAL_LAYER_3:
-	  m_pEncContext->pSvcParam->sSpatialLayers[3].iMaxSpatialBitrate = iBitrate;
-	break;
-	default:
-	  WelsLog (m_pEncContext, WELS_LOG_ERROR,"CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_MAX_BITRATE,iLayer = %d\n",pInfo->iLayer);
-			return cmInitParaError;
-	break;
-	}
-	  //adjust to valid range
-	WelsEncoderApplyBitRate (m_pEncContext->pSvcParam,pInfo->iLayer);
+    if (iBitrate <= 0) {
+      WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_MAX_BITRATE,iBitrate = %d\n",
+               iBitrate);
+      return cmInitParaError;
+    }
+    iBitrate	= WELS_CLIP3 (iBitrate, MIN_BIT_RATE, MAX_BIT_RATE);
+    switch (pInfo->iLayer) {
+    case SPATIAL_LAYER_ALL:
+      m_pEncContext->pSvcParam->iMaxBitrate = iBitrate;
+      break;
+    case SPATIAL_LAYER_0:
+      m_pEncContext->pSvcParam->sSpatialLayers[0].iMaxSpatialBitrate = iBitrate;
+      break;
+    case SPATIAL_LAYER_1:
+      m_pEncContext->pSvcParam->sSpatialLayers[1].iMaxSpatialBitrate = iBitrate;
+      break;
+    case SPATIAL_LAYER_2:
+      m_pEncContext->pSvcParam->sSpatialLayers[2].iMaxSpatialBitrate = iBitrate;
+      break;
+    case SPATIAL_LAYER_3:
+      m_pEncContext->pSvcParam->sSpatialLayers[3].iMaxSpatialBitrate = iBitrate;
+      break;
+    default:
+      WelsLog (m_pEncContext, WELS_LOG_ERROR, "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_MAX_BITRATE,iLayer = %d\n",
+               pInfo->iLayer);
+      return cmInitParaError;
+      break;
+    }
+    //adjust to valid range
+    WelsEncoderApplyBitRate (m_pEncContext->pSvcParam, pInfo->iLayer);
   }
   break;
   case ENCODER_OPTION_RC_MODE: {	// 0:quality mode;1:bit-rate mode;2:bitrate limited mode
@@ -838,20 +841,21 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     }
   }
   break;
-  case ENCODER_OPTION_DUMP_FILE:{
+  case ENCODER_OPTION_DUMP_FILE: {
 #ifdef ENABLE_FRAME_DUMP
-    if(m_pEncContext->pSvcParam!=NULL){
-      SDumpLayer*pDump = (static_cast<SDumpLayer *>(pOption));
-      WelsStrncpy(m_pEncContext->pSvcParam->sDependencyLayers[pDump->iLayer].sRecFileName, sizeof(m_pEncContext->pSvcParam->sDependencyLayers[pDump->iLayer].sRecFileName),pDump->pFileName);
+    if (m_pEncContext->pSvcParam != NULL) {
+      SDumpLayer* pDump = (static_cast<SDumpLayer*> (pOption));
+      WelsStrncpy (m_pEncContext->pSvcParam->sDependencyLayers[pDump->iLayer].sRecFileName,
+                   sizeof (m_pEncContext->pSvcParam->sDependencyLayers[pDump->iLayer].sRecFileName), pDump->pFileName);
     }
 #endif
   }
   break;
-  case ENCODER_OPTION_TRACE_LEVEL:{
-    if(m_pWelsTrace){
-	  uint32_t level = *((uint32_t*)pOption);
-	  m_pWelsTrace->SetTraceLevel(level);
-	}
+  case ENCODER_OPTION_TRACE_LEVEL: {
+    if (m_pWelsTrace) {
+      uint32_t level = * ((uint32_t*)pOption);
+      m_pWelsTrace->SetTraceLevel (level);
+    }
   }
   break;
   default:
@@ -908,7 +912,7 @@ int CWelsH264SVCEncoder::GetOption (ENCODER_OPTION eOptionId, void* pOption) {
              "CWelsH264SVCEncoder::GetOption():ENCODER_OPTION_SVC_ENCODE_PARAM_BASE, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x\n",
              m_uiCountFrameNum, m_iCspInternal);
 #endif//REC_FRAME_COUNT
-    m_pEncContext->pSvcParam->GetBaseParams((SEncParamBase*) pOption);
+    m_pEncContext->pSvcParam->GetBaseParams ((SEncParamBase*) pOption);
   }
   break;
 
@@ -927,29 +931,32 @@ int CWelsH264SVCEncoder::GetOption (ENCODER_OPTION eOptionId, void* pOption) {
              "CWelsH264SVCEncoder::GetOption():ENCODER_OPTION_BITRATE, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x\n",
              m_uiCountFrameNum, m_iCspInternal);
 #endif//REC_FRAME_COUNT
-    SBitrateInfo*pInfo = (static_cast<SBitrateInfo *>(pOption));
-    if((pInfo->iLayer!=SPATIAL_LAYER_ALL)&&(pInfo->iLayer!=SPATIAL_LAYER_0)&&(pInfo->iLayer!=SPATIAL_LAYER_1)&&(pInfo->iLayer!=SPATIAL_LAYER_2)&&(pInfo->iLayer!=SPATIAL_LAYER_3))
-        return cmInitParaError;
-    if(pInfo->iLayer == SPATIAL_LAYER_ALL){
+    SBitrateInfo* pInfo = (static_cast<SBitrateInfo*> (pOption));
+    if ((pInfo->iLayer != SPATIAL_LAYER_ALL) && (pInfo->iLayer != SPATIAL_LAYER_0) && (pInfo->iLayer != SPATIAL_LAYER_1)
+        && (pInfo->iLayer != SPATIAL_LAYER_2) && (pInfo->iLayer != SPATIAL_LAYER_3))
+      return cmInitParaError;
+    if (pInfo->iLayer == SPATIAL_LAYER_ALL) {
       pInfo->iBitrate = m_pEncContext->pSvcParam->iTargetBitrate;
-    }else{
+    } else {
       pInfo->iBitrate = m_pEncContext->pSvcParam->sSpatialLayers[pInfo->iLayer].iSpatialBitrate;
-	}
+    }
   }
   break;
   case ENCODER_OPTION_MAX_BITRATE: {	// Target bit-rate
 #ifdef REC_FRAME_COUNT
-    WelsLog (m_pEncContext, WELS_LOG_INFO,"CWelsH264SVCEncoder::GetOption():ENCODER_OPTION_MAX_BITRATE, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x\n",
-	          m_uiCountFrameNum, m_iCspInternal);
+    WelsLog (m_pEncContext, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::GetOption():ENCODER_OPTION_MAX_BITRATE, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x\n",
+             m_uiCountFrameNum, m_iCspInternal);
 #endif//REC_FRAME_COUNT
-    SBitrateInfo*pInfo = (static_cast<SBitrateInfo *>(pOption));
-	if((pInfo->iLayer!=SPATIAL_LAYER_ALL)&&(pInfo->iLayer!=SPATIAL_LAYER_0)&&(pInfo->iLayer!=SPATIAL_LAYER_1)&&(pInfo->iLayer!=SPATIAL_LAYER_2)&&(pInfo->iLayer!=SPATIAL_LAYER_3))
-	  return cmInitParaError;
-	if(pInfo->iLayer == SPATIAL_LAYER_ALL){
+    SBitrateInfo* pInfo = (static_cast<SBitrateInfo*> (pOption));
+    if ((pInfo->iLayer != SPATIAL_LAYER_ALL) && (pInfo->iLayer != SPATIAL_LAYER_0) && (pInfo->iLayer != SPATIAL_LAYER_1)
+        && (pInfo->iLayer != SPATIAL_LAYER_2) && (pInfo->iLayer != SPATIAL_LAYER_3))
+      return cmInitParaError;
+    if (pInfo->iLayer == SPATIAL_LAYER_ALL) {
       pInfo->iBitrate = m_pEncContext->pSvcParam->iMaxBitrate;
-	}else{
-	  pInfo->iBitrate = m_pEncContext->pSvcParam->sSpatialLayers[pInfo->iLayer].iMaxSpatialBitrate;
-	}
+    } else {
+      pInfo->iBitrate = m_pEncContext->pSvcParam->sSpatialLayers[pInfo->iLayer].iMaxSpatialBitrate;
+    }
   }
   break;
   default:

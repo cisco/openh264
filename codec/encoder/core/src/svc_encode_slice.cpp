@@ -644,7 +644,7 @@ int32_t WelsCodePSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
 
   const bool kbBaseAvail		= pCurLayer->bBaseLayerAvailableFlag;
   const bool kbHighestSpatial = pEncCtx->pSvcParam->iSpatialLayerNum ==
-                                  (pCurLayer->sLayerInfo.sNalHeaderExt.uiDependencyId + 1);
+                                (pCurLayer->sLayerInfo.sNalHeaderExt.uiDependencyId + 1);
 
   //MD switch
   if (kbBaseAvail && kbHighestSpatial) {
@@ -663,7 +663,7 @@ int32_t WelsCodePOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
 
   const bool kbBaseAvail		= pCurLayer->bBaseLayerAvailableFlag;
   const bool kbHighestSpatial = pEncCtx->pSvcParam->iSpatialLayerNum ==
-                                  (pCurLayer->sLayerInfo.sNalHeaderExt.uiDependencyId + 1);
+                                (pCurLayer->sLayerInfo.sNalHeaderExt.uiDependencyId + 1);
 
   //MD switch
   if (kbBaseAvail && kbHighestSpatial) {
@@ -693,7 +693,8 @@ int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx, const 
   SNalUnitHeaderExt* pNalHeadExt	= &pCurLayer->sLayerInfo.sNalHeaderExt;
   SSlice* pCurSlice					= &pCurLayer->sLayerInfo.pSliceInLayer[kiSliceIdx];
   SBitStringAux* pBs					= pCurSlice->pSliceBsa;
-  const int32_t kiDynamicSliceFlag	= (pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId].sSliceCfg.uiSliceMode ==
+  const int32_t kiDynamicSliceFlag	= (pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId].sSliceCfg.uiSliceMode
+                                       ==
                                        SM_DYN_SLICE);
 
   assert (kiSliceIdx == pCurSlice->uiSliceIdx);
@@ -831,7 +832,7 @@ void AddSliceBoundary (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, SSliceCtx* pSlic
 }
 
 bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
-    SDynamicSlicingStack* pDss) {
+                                       SDynamicSlicingStack* pDss) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   SSlice* pCurSlice = (SSlice*)pSlice;
   int32_t		   iCurMbIdx  = pCurMb->iMbXY;
@@ -903,13 +904,13 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
 ///////////////
 //  pMb loop
 ///////////////
-inline void WelsInitInterMDStruc(const SMB* pCurMb, uint16_t *pMvdCostTableInter, const int32_t kiMvdInterTableStride, SWelsMD* pMd )
-{
+inline void WelsInitInterMDStruc (const SMB* pCurMb, uint16_t* pMvdCostTableInter, const int32_t kiMvdInterTableStride,
+                                  SWelsMD* pMd) {
   pMd->iLambda = g_kiQpCostTable[pCurMb->uiLumaQp];
   pMd->pMvdCost = &pMvdCostTableInter[pCurMb->uiLumaQp * kiMvdInterTableStride];
-  pMd->	iMbPixX = (pCurMb->iMbX<<4);
-  pMd->	iMbPixY = (pCurMb->iMbY<<4);
-  memset( &pMd->iBlock8x8StaticIdc[0], 0, sizeof(pMd->iBlock8x8StaticIdc) );
+  pMd->	iMbPixX = (pCurMb->iMbX << 4);
+  pMd->	iMbPixY = (pCurMb->iMbY << 4);
+  memset (&pMd->iBlock8x8StaticIdc[0], 0, sizeof (pMd->iBlock8x8StaticIdc));
 }
 // for inter non-dynamic pSlice
 int32_t WelsMdInterMbLoop (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pWelsMd, const int32_t kiSliceFirstMbXY) {
@@ -943,7 +944,7 @@ int32_t WelsMdInterMbLoop (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pWelsMd, 
     //step (2). save some vale for future use, initial pWelsMd
     WelsMdIntraInit (pEncCtx, pCurMb, pMbCache, kiSliceFirstMbXY);
     WelsMdInterInit (pEncCtx, pSlice, pCurMb, kiSliceFirstMbXY);
-    WelsInitInterMDStruc(pCurMb, pMvdCostTableInter, kiMvdInterTableStride, pMd );
+    WelsInitInterMDStruc (pCurMb, pMvdCostTableInter, kiMvdInterTableStride, pMd);
     pEncCtx->pFuncList->pfInterMd (pEncCtx, pMd, pSlice, pCurMb, pMbCache);
     //mb_qp
 
@@ -999,7 +1000,7 @@ int32_t WelsMdInterMbLoop (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pWelsMd, 
 
 // Only for inter dynamic slicing
 int32_t WelsMdInterMbLoopOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pWelsMd,
-                                        const int32_t kiSliceFirstMbXY) {
+    const int32_t kiSliceFirstMbXY) {
   SWelsMD* pMd					= (SWelsMD*)pWelsMd;
   SBitStringAux* pBs			= pSlice->pSliceBsa;
   SDqLayer* pCurLayer			= pEncCtx->pCurDqLayer;
@@ -1041,7 +1042,7 @@ int32_t WelsMdInterMbLoopOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice,
     //step (2). save some vale for future use, initial pWelsMd
     WelsMdIntraInit (pEncCtx, pCurMb, pMbCache, kiSliceFirstMbXY);
     WelsMdInterInit (pEncCtx, pSlice, pCurMb, kiSliceFirstMbXY);
-    WelsInitInterMDStruc(pCurMb, pMvdCostTableInter, kiMvdInterTableStride, pMd );
+    WelsInitInterMDStruc (pCurMb, pMvdCostTableInter, kiMvdInterTableStride, pMd);
     pEncCtx->pFuncList->pfInterMd (pEncCtx, pMd, pSlice, pCurMb, pMbCache);
     //mb_qp
 

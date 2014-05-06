@@ -185,25 +185,25 @@ void static inline DeblockingBSInsideMBNormal (PDqLayer pCurDqLayer, uint8_t nBS
   uiNnz32b3 = * (uint32_t*) (pNnzTab + 12);
 
   for (int i = 0; i < 3; i++)
-      uiBsx4[i] = pNnzTab[i] | pNnzTab[i + 1];
+    uiBsx4[i] = pNnzTab[i] | pNnzTab[i + 1];
   nBS[0][1][0] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 1, 0);
   nBS[0][2][0] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 2, 1);
   nBS[0][3][0] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 3, 2);
 
   for (int i = 0; i < 3; i++)
-      uiBsx4[i] = pNnzTab[4 + i] | pNnzTab[4 + i + 1];
+    uiBsx4[i] = pNnzTab[4 + i] | pNnzTab[4 + i + 1];
   nBS[0][1][1] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 5, 4);
   nBS[0][2][1] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 6, 5);
   nBS[0][3][1] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 7, 6);
 
   for (int i = 0; i < 3; i++)
-      uiBsx4[i] = pNnzTab[8 + i] | pNnzTab[8 + i + 1];
+    uiBsx4[i] = pNnzTab[8 + i] | pNnzTab[8 + i + 1];
   nBS[0][1][2] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 9, 8);
   nBS[0][2][2] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 10, 9);
   nBS[0][3][2] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 11, 10);
 
   for (int i = 0; i < 3; i++)
-      uiBsx4[i] = pNnzTab[12 + i] | pNnzTab[12 + i + 1];
+    uiBsx4[i] = pNnzTab[12 + i] | pNnzTab[12 + i + 1];
   nBS[0][1][3] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 13, 12);
   nBS[0][2][3] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 14, 13);
   nBS[0][3][3] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 15, 14);
@@ -233,8 +233,8 @@ uint32_t DeblockingBsMarginalMBAvcbase (PDqLayer pCurDqLayer, int32_t iEdge, int
   uint32_t uiBSx4;
   //uint8_t* bS = static_cast<uint8_t*>(&uiBSx4);
   uint8_t* pBS = (uint8_t*) (&uiBSx4);
-  const uint8_t *pBIdx  = &g_kuiTableBIdx[iEdge][0];
-  const uint8_t *pBnIdx = &g_kuiTableBIdx[iEdge][4];
+  const uint8_t* pBIdx  = &g_kuiTableBIdx[iEdge][0];
+  const uint8_t* pBnIdx = &g_kuiTableBIdx[iEdge][4];
 
   for (i = 0; i < 4; i++) {
     if (pCurDqLayer->pNzc[iMbXy][*pBIdx] | pCurDqLayer->pNzc[iNeighMb][*pBnIdx]) {
@@ -327,7 +327,7 @@ void FilteringEdgeLumaIntraV (SDeblockingFilter* pFilter, uint8_t* pPix, int32_t
   return;
 }
 void FilteringEdgeChromaH (SDeblockingFilter* pFilter, uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride,
-                             uint8_t* pBS) {
+                           uint8_t* pBS) {
   int32_t iIndexA;
   int32_t iAlpha;
   int32_t iBeta;
@@ -343,7 +343,7 @@ void FilteringEdgeChromaH (SDeblockingFilter* pFilter, uint8_t* pPixCb, uint8_t*
   return;
 }
 void FilteringEdgeChromaV (SDeblockingFilter* pFilter, uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride,
-                             uint8_t* pBS) {
+                           uint8_t* pBS) {
   int32_t iIndexA;
   int32_t iAlpha;
   int32_t iBeta;
@@ -360,7 +360,7 @@ void FilteringEdgeChromaV (SDeblockingFilter* pFilter, uint8_t* pPixCb, uint8_t*
 }
 
 void FilteringEdgeChromaIntraH (SDeblockingFilter* pFilter, uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride,
-                                  uint8_t* pBS) {
+                                uint8_t* pBS) {
   int32_t iIndexA;
   int32_t iAlpha;
   int32_t iBeta;
@@ -375,7 +375,7 @@ void FilteringEdgeChromaIntraH (SDeblockingFilter* pFilter, uint8_t* pPixCb, uin
 }
 
 void FilteringEdgeChromaIntraV (SDeblockingFilter* pFilter, uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride,
-                                  uint8_t* pBS) {
+                                uint8_t* pBS) {
   int32_t iIndexA;
   int32_t iAlpha;
   int32_t iBeta;
@@ -391,7 +391,7 @@ void FilteringEdgeChromaIntraV (SDeblockingFilter* pFilter, uint8_t* pPixCb, uin
 
 
 void DeblockingInterMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint8_t nBS[2][4][4],
-                          int32_t iBoundryFlag) {
+                        int32_t iBoundryFlag) {
   int32_t iMbXyIndex = pCurDqLayer->iMbXyIndex;
   int32_t iMbX = pCurDqLayer->iMbX;
   int32_t iMbY = pCurDqLayer->iMbY;
@@ -631,7 +631,7 @@ void WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFun
   int32_t iTotalMbCount = pSliceHeaderExt->sSliceHeader.pSps->uiTotalMbCount;
 
   SDeblockingFilter pFilter;
-  memset (&pFilter, 0, sizeof(pFilter));
+  memset (&pFilter, 0, sizeof (pFilter));
   PFmo pFmo = pCtx->pFmo;
   int32_t iNextMbXyIndex = 0;
   int32_t iTotalNumMb = pCurDqLayer->sLayerInfo.sSliceInLayer.iTotalMbInCurSlice;
@@ -720,18 +720,17 @@ void  DeblockingInit (SDeblockingFunc*  pFunc,  int32_t iCpu) {
 #endif
 
 #if defined(HAVE_NEON)
-  if ( iCpu & WELS_CPU_NEON )
-	{
-		pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_neon;
-		pFunc->pfLumaDeblockingEQ4Ver		= DeblockLumaEq4V_neon;
-		pFunc->pfLumaDeblockingLT4Hor		= DeblockLumaLt4H_neon;
-		pFunc->pfLumaDeblockingEQ4Hor		= DeblockLumaEq4H_neon;
+  if (iCpu & WELS_CPU_NEON) {
+    pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_neon;
+    pFunc->pfLumaDeblockingEQ4Ver		= DeblockLumaEq4V_neon;
+    pFunc->pfLumaDeblockingLT4Hor		= DeblockLumaLt4H_neon;
+    pFunc->pfLumaDeblockingEQ4Hor		= DeblockLumaEq4H_neon;
 
-		pFunc->pfChromaDeblockingLT4Ver     = DeblockChromaLt4V_neon;
-		pFunc->pfChromaDeblockingEQ4Ver     = DeblockChromaEq4V_neon;
-		pFunc->pfChromaDeblockingLT4Hor     = DeblockChromaLt4H_neon;
-		pFunc->pfChromaDeblockingEQ4Hor      = DeblockChromaEq4H_neon;
-	}
+    pFunc->pfChromaDeblockingLT4Ver     = DeblockChromaLt4V_neon;
+    pFunc->pfChromaDeblockingEQ4Ver     = DeblockChromaEq4V_neon;
+    pFunc->pfChromaDeblockingLT4Hor     = DeblockChromaLt4H_neon;
+    pFunc->pfChromaDeblockingEQ4Hor      = DeblockChromaEq4H_neon;
+  }
 #endif
 }
 

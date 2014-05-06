@@ -70,7 +70,8 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pParam, con
 void ReleaseMtResource (sWelsEncCtx** ppCtx);
 
 int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32_t kiSliceCount);
-int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFrameBsBuffer, const int32_t iSliceIdx, int32_t& iSliceSize);
+int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFrameBsBuffer, const int32_t iSliceIdx,
+                             int32_t& iSliceSize);
 
 #if !defined(_WIN32)
 WELS_THREAD_ROUTINE_TYPE UpdateMbListThreadProc (void* arg);
@@ -80,7 +81,8 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg);
 
 int32_t CreateSliceThreads (sWelsEncCtx* pCtx);
 
-int32_t FiredSliceThreads (SSliceThreadPrivateData* pPriData, WELS_EVENT* pEventsList, WELS_EVENT* pMasterEventsList, SLayerBSInfo* pLayerBsInfo,
+int32_t FiredSliceThreads (SSliceThreadPrivateData* pPriData, WELS_EVENT* pEventsList, WELS_EVENT* pMasterEventsList,
+                           SLayerBSInfo* pLayerBsInfo,
                            const uint32_t kuiNumThreads/*, int32_t *iLayerNum*/, SSliceCtx* pSliceCtx, const bool kbIsDynamicSlicingMode);
 
 int32_t DynamicDetectCpuCores();

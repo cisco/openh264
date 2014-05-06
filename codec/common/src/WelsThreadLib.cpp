@@ -175,13 +175,13 @@ WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_n
 WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_THREAD_ROUTINE  routine,
     void* arg, WELS_THREAD_ATTR attr) {
 #ifdef USE_THREADPOOL
-  HANDLE h = CreateEvent(NULL, FALSE, FALSE, NULL);
+  HANDLE h = CreateEvent (NULL, FALSE, FALSE, NULL);
   HANDLE h2;
-  DuplicateHandle(GetCurrentProcess(), h, GetCurrentProcess(), &h2, 0, FALSE, DUPLICATE_SAME_ACCESS);
-  ThreadPool::RunAsync(ref new WorkItemHandler([=](IAsyncAction^) {
-    routine(arg);
-    SetEvent(h2);
-    CloseHandle(h2);
+  DuplicateHandle (GetCurrentProcess(), h, GetCurrentProcess(), &h2, 0, FALSE, DUPLICATE_SAME_ACCESS);
+  ThreadPool::RunAsync (ref new WorkItemHandler ([ = ] (IAsyncAction^) {
+    routine (arg);
+    SetEvent (h2);
+    CloseHandle (h2);
   }, CallbackContext::Any), WorkItemPriority::Normal, WorkItemOptions::TimeSliced);
 #else
   WELS_THREAD_HANDLE   h = CreateThread (NULL, 0, routine, arg, 0, NULL);
@@ -265,15 +265,15 @@ WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* p_event, const char* event_
     return WELS_THREAD_ERROR_OK;
   }
 #else
-  WELS_EVENT event = (WELS_EVENT) malloc(sizeof(*event));
+  WELS_EVENT event = (WELS_EVENT) malloc (sizeof (*event));
   if (event == NULL)
     return WELS_THREAD_ERROR_GENERAL;
-  WELS_THREAD_ERROR_CODE err = sem_init(event, 0, 0);
+  WELS_THREAD_ERROR_CODE err = sem_init (event, 0, 0);
   if (!err) {
     *p_event = event;
     return err;
   }
-  free(event);
+  free (event);
   return err;
 #endif
 }
@@ -285,7 +285,7 @@ WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_n
   return err;
 #else
   WELS_THREAD_ERROR_CODE err = sem_destroy (*event);	// match with sem_init
-  free(*event);
+  free (*event);
   return err;
 #endif
 }

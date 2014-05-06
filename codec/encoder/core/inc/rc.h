@@ -55,7 +55,7 @@ namespace WelsSVCEnc {
 #define    WELS_RC_DISABLE        0
 #define    WELS_RC_GOM            1
 
-enum{
+enum {
   BITS_NORMAL,
   BITS_LIMITED,
   BITS_EXCEEDED,

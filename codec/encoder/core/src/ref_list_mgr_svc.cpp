@@ -600,7 +600,7 @@ bool WelsBuildRefList (void* pEncCtx, const int32_t iPOC, int32_t iBestLtrRefIdx
         if (pRef != NULL && pRef->bUsedAsRef && pRef->iFramePoc >= 0 && pRef->uiTemporalId <= kuiTid) {
           pCtx->pRefList0[pCtx->iNumRef0++]	= pRef;
           WelsLog (pCtx, WELS_LOG_INFO, "WelsBuildRefList pCtx->uiTemporalId = %d,pRef->iFrameNum = %d,pRef->uiTemporalId = %d\n",
-                  pCtx->uiTemporalId,pRef->iFrameNum,pRef->uiTemporalId);
+                   pCtx->uiTemporalId, pRef->iFrameNum, pRef->uiTemporalId);
           break;
         }
       }
@@ -640,7 +640,7 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
     /*syntax for num_ref_idx_l0_active_minus1*/
     pSliceHdr->uiRefCount = pCtx->iNumRef0;
     if (pCtx->iNumRef0 > 0) {
-      if ((!pCtx->pRefList0[0]->bIsLongRef)||(!pCtx->pSvcParam->bEnableLongTermReference)) {
+      if ((!pCtx->pRefList0[0]->bIsLongRef) || (!pCtx->pSvcParam->bEnableLongTermReference)) {
         if (iAbsDiffPicNumMinus1 < 0) {
           WelsLog (pCtx, WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1:%d\n", iAbsDiffPicNumMinus1);
           iAbsDiffPicNumMinus1 += (1 << (pCtx->pSps->uiLog2MaxFrameNum));
@@ -662,11 +662,11 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
       pRefPicMark->bNoOutputOfPriorPicsFlag = false;
       pRefPicMark->bLongTermRefFlag = pCtx->pSvcParam->bEnableLongTermReference;
     } else {
-      if(pCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME)
+      if (pCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME)
         pRefPicMark->bAdaptiveRefPicMarkingModeFlag = pCtx->pSvcParam->bEnableLongTermReference;
       else
         pRefPicMark->bAdaptiveRefPicMarkingModeFlag = (pCtx->pSvcParam->bEnableLongTermReference
-          && pLtr->bLTRMarkingFlag) ? (true) : (false);
+            && pLtr->bLTRMarkingFlag) ? (true) : (false);
     }
   }
 }
@@ -689,17 +689,18 @@ static int32_t UpdateSrcPicList (sWelsEncCtx* pCtx) {
     pCtx->pEncPic->bIsSceneLTR      = pCtx->pDecPic->bIsSceneLTR;
     pCtx->pEncPic->iFrameAverageQp  = pCtx->pDecPic->iFrameAverageQp;
   }
-  PrefetchNextBuffer(pCtx);
+  PrefetchNextBuffer (pCtx);
   for (int32_t i = 0; i < MAX_REF_PIC_COUNT; ++i) {
-    if (NULL == pLongRefSrcList[i + 1] || (NULL != pLongRefList[i] && pLongRefList[i]->bUsedAsRef&& pLongRefList[i]->bIsLongRef)) {
+    if (NULL == pLongRefSrcList[i + 1] || (NULL != pLongRefList[i] && pLongRefList[i]->bUsedAsRef
+                                           && pLongRefList[i]->bIsLongRef)) {
       continue;
-      } else {
-        SetUnref (pLongRefSrcList[i + 1]);
-      }
+    } else {
+      SetUnref (pLongRefSrcList[i + 1]);
     }
-    WelsExchangeSpatialPictures (&pCtx->pVpp->m_pSpatialPic[iDIdx][0],
-                                 &pCtx->pVpp->m_pSpatialPic[iDIdx][1 + pCtx->pVaa->uiMarkLongTermPicIdx]);
-    SetUnref (pCtx->pVpp->m_pSpatialPic[iDIdx][0]);
+  }
+  WelsExchangeSpatialPictures (&pCtx->pVpp->m_pSpatialPic[iDIdx][0],
+                               &pCtx->pVpp->m_pSpatialPic[iDIdx][1 + pCtx->pVaa->uiMarkLongTermPicIdx]);
+  SetUnref (pCtx->pVpp->m_pSpatialPic[iDIdx][0]);
 
   return 0;
 }
@@ -772,8 +773,9 @@ bool WelsBuildRefListScreen (void* pEncCtx, const int32_t iPOC, int32_t iBestLtr
                      "WelsBuildRefListScreen(), ref !current iFrameNum = %d, ref iFrameNum = %d,LTR number = %d,iNumRef = %d ref is Scene LTR = %d\n",
                      pCtx->iFrameNum, pCtx->pRefList0[pCtx->iNumRef0 - 1]->iFrameNum, pRefList->uiLongRefCount, iNumRef,
                      pRefPic->bIsSceneLTR);
-           WelsLog (pCtx, WELS_LOG_INFO, "WelsBuildRefListScreen pCtx->uiTemporalId = %d,pRef->iFrameNum = %d,pRef->uiTemporalId = %d\n",
-                  pCtx->uiTemporalId,pRefPic->iFrameNum,pRefPic->uiTemporalId);
+            WelsLog (pCtx, WELS_LOG_INFO,
+                     "WelsBuildRefListScreen pCtx->uiTemporalId = %d,pRef->iFrameNum = %d,pRef->uiTemporalId = %d\n",
+                     pCtx->uiTemporalId, pRefPic->iFrameNum, pRefPic->uiTemporalId);
           }
         }
       } else {

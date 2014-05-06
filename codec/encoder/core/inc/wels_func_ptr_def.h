@@ -96,7 +96,8 @@ typedef void (*PChromaDeblockingLT4Func) (uint8_t* iSampleCb, uint8_t* iSampleCr
     int32_t iBeta, int8_t* iTc);
 typedef void (*PChromaDeblockingEQ4Func) (uint8_t* iSampleCb, uint8_t* iSampleCr, int32_t iStride, int32_t iAlpha,
     int32_t iBeta);
-typedef void (*PDeblockingBSCalc) (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2][4][4], Mb_Type uiCurMbType, int32_t iMbStride, int32_t iLeftFlag, int32_t iTopFlag);
+typedef void (*PDeblockingBSCalc) (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2][4][4], Mb_Type uiCurMbType,
+                                   int32_t iMbStride, int32_t iLeftFlag, int32_t iTopFlag);
 
 typedef struct tagDeblockingFunc {
   PLumaDeblockingLT4Func    pfLumaDeblockingLT4Ver;
@@ -142,23 +143,26 @@ typedef int32_t (*PIntraPred16x16Combined3Func) (uint8_t*, int32_t, uint8_t*, in
 typedef int32_t (*PIntraPred8x8Combined3Func) (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*,
     uint8_t*, uint8_t*);
 
-typedef uint32_t (*PSampleSadHor8Func)( uint8_t*, int32_t, uint8_t*, int32_t, uint16_t*, int32_t* );
+typedef uint32_t (*PSampleSadHor8Func) (uint8_t*, int32_t, uint8_t*, int32_t, uint16_t*, int32_t*);
 typedef void (*PMotionSearchFunc) (SWelsFuncPtrList* pFuncList, void* pCurDqLayer, void* pMe,
                                    void* pSlice);
-typedef void (*PSearchMethodFunc) (SWelsFuncPtrList* pFuncList, void* pMe, void* pSlice, const int32_t kiEncStride, const int32_t kiRefStride);
-typedef void (*PCalculateSatdFunc) ( PSampleSadSatdCostFunc pSatd, void * vpMe, const int32_t kiEncStride, const int32_t kiRefStride );
-typedef bool (*PCheckDirectionalMv) (PSampleSadSatdCostFunc pSad, void * vpMe,
-                      const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
-                      int32_t& iBestSadCost);
-typedef void (*PLineFullSearchFunc) (	SWelsFuncPtrList *pFuncList, SWelsME *pMe,
-													uint16_t* pMvdTable, const int32_t kiFixedMvd,
-													const int32_t kiEncStride, const int32_t kiRefStride,
-													const int32_t kiMinPos, const int32_t kiMaxPos,
-                          const bool bVerticalSearch );
-typedef void (*PCalculateBlockFeatureOfFrame)(uint8_t *pRef, const int32_t kiWidth, const int32_t kiHeight, const int32_t kiRefStride,
-                                              uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
-typedef int32_t (*PCalculateSingleBlockFeature)(uint8_t *pRef, const int32_t kiRefStride);
-typedef void (*PUpdateFMESwitch)(SDqLayer* pCurLayer);
+typedef void (*PSearchMethodFunc) (SWelsFuncPtrList* pFuncList, void* pMe, void* pSlice, const int32_t kiEncStride,
+                                   const int32_t kiRefStride);
+typedef void (*PCalculateSatdFunc) (PSampleSadSatdCostFunc pSatd, void* vpMe, const int32_t kiEncStride,
+                                    const int32_t kiRefStride);
+typedef bool (*PCheckDirectionalMv) (PSampleSadSatdCostFunc pSad, void* vpMe,
+                                     const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
+                                     int32_t& iBestSadCost);
+typedef void (*PLineFullSearchFunc) (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
+                                     uint16_t* pMvdTable, const int32_t kiFixedMvd,
+                                     const int32_t kiEncStride, const int32_t kiRefStride,
+                                     const int32_t kiMinPos, const int32_t kiMaxPos,
+                                     const bool bVerticalSearch);
+typedef void (*PCalculateBlockFeatureOfFrame) (uint8_t* pRef, const int32_t kiWidth, const int32_t kiHeight,
+    const int32_t kiRefStride,
+    uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+typedef int32_t (*PCalculateSingleBlockFeature) (uint8_t* pRef, const int32_t kiRefStride);
+typedef void (*PUpdateFMESwitch) (SDqLayer* pCurLayer);
 
 #define     MAX_BLOCK_TYPE 5 // prev 7
 typedef struct TagSampleDealingFunc {
@@ -183,8 +187,8 @@ typedef int32_t (*PGetVarianceFromIntraVaaFunc) (uint8_t* pSampelY, const int32_
 typedef uint8_t (*PGetMbSignFromInterVaaFunc) (int32_t* pSad8x8);
 typedef void (*PUpdateMbMvFunc) (SMVUnitXY* pMvUnit, const SMVUnitXY ksMv);
 
-typedef bool (*PBuildRefListFunc)(void* pCtx, const int32_t iPOC,int32_t iBestLtrRefIdx);
-typedef void (*PMarkPicFunc)(void* pCtx);
+typedef bool (*PBuildRefListFunc) (void* pCtx, const int32_t iPOC, int32_t iBestLtrRefIdx);
+typedef void (*PMarkPicFunc) (void* pCtx);
 typedef bool (*PUpdateRefListFunc) (void* pCtx);
 
 struct TagWelsFuncPointerList {

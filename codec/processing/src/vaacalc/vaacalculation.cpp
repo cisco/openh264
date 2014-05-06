@@ -72,7 +72,7 @@ void CVAACalculation::InitVaaFuncs (SVaaFuncs& sVaaFuncs, int32_t iCpuFlag) {
     sVaaFuncs.pfVAACalcSadSsd		= VAACalcSadSsd_neon;
     sVaaFuncs.pfVAACalcSadSsdBgd = VAACalcSadSsdBgd_neon;
     sVaaFuncs.pfVAACalcSadVar		= VAACalcSadVar_neon;
-    }
+  }
 #endif//HAVE_NEON
 }
 

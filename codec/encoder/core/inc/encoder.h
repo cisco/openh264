@@ -61,7 +61,8 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx);
  * \brief	 allocate or reallocate the output bs buffer
  * \return:		successful - 0; otherwise none 0 for failed
  */
-int32_t AllocateBsOutputBuffer(CMemoryAlign*pMa, const int32_t iNeededLen, int32_t iOrigLen, const char* kpTag, uint8_t*& pOutputBuffer );
+int32_t AllocateBsOutputBuffer (CMemoryAlign* pMa, const int32_t iNeededLen, int32_t iOrigLen, const char* kpTag,
+                                uint8_t*& pOutputBuffer);
 //TODO: to finish this function and call it
 
 /*!
@@ -127,7 +128,7 @@ void WelsSetMemZeroSize64_mmx (void* pDst, int32_t iSize);
 void WelsSetMemZeroSize8_mmx (void* pDst, int32_t iSize);
 void WelsPrefetchZero_mmx (int8_t const* kpDst);
 #elif defined(HAVE_NEON)
-void WelsSetMemZero_neon(void* pDst, int32_t iSize);
+void WelsSetMemZero_neon (void* pDst, int32_t iSize);
 #endif
 
 #if defined(__cplusplus)

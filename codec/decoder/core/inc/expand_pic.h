@@ -48,7 +48,7 @@
 namespace WelsDec {
 
 void ExpandReferencingPicture (PPicture pPic, PExpandPictureFunc pExpandPictureLuma,
-                                 PExpandPictureFunc pExpandPictureChroma[2]);
+                               PExpandPictureFunc pExpandPictureChroma[2]);
 
 void InitExpandPictureFunc (SExpandPicFunc* pExpandPicFunc, const uint32_t kuiCpuFlags);
 

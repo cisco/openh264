@@ -650,7 +650,7 @@ static int32_t	CavlcGetRunBefore (int32_t iRun[16], SReadBitsCache* pBitsCache, 
       }
     } else {
       for (int j = i; j < uiTotalCoeff; j++) {
-	iRun[j] = 0;
+        iRun[j] = 0;
       }
       return iUsedBits;
     }

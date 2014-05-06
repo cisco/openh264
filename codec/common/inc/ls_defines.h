@@ -55,12 +55,12 @@ struct tagUnaligned_16 {
 #define STRUCTA(size, align) struct tagUnaligned_##size##_##align {\
     uint##size##_t l; \
 } __attribute__ ((aligned(align)))
-STRUCTA(16,2);
-STRUCTA(32,2);
-STRUCTA(32,4);
-STRUCTA(64,2);
-STRUCTA(64,4);
-STRUCTA(64,8);
+STRUCTA (16, 2);
+STRUCTA (32, 2);
+STRUCTA (32, 4);
+STRUCTA (64, 2);
+STRUCTA (64, 4);
+STRUCTA (64, 8);
 //#define _USE_STRUCT_INT_CVT
 //	#ifdef _USE_STRUCT_INT_CVT
 #define ST16(a, b) (((struct tagUnaligned_16 *) (a))->l) = (b)
