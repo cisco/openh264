@@ -7,6 +7,7 @@
 #include "cpu.h"
 #include "sample.h"
 #include "sad_common.h"
+#include "get_intra_predictor.h"
 
 using namespace WelsSVCEnc;
 #ifdef X86_ASM
@@ -86,6 +87,7 @@ TEST(IntraSadSatdFuncTest, WelsSampleSatdThree4x4_sse2){
   uint8_t* pDec = (uint8_t *)cMemoryAlign.WelsMalloc(iLineSizeDec<<5,"pDec");
   uint8_t* pEnc = (uint8_t *)cMemoryAlign.WelsMalloc(iLineSizeEnc<<5,"pEnc");
   uint8_t* pDst = (uint8_t *)cMemoryAlign.WelsMalloc(512,"pDst");
+  WelsInitFillingPredFuncs(WELS_CPU_SSE2);
   srand((uint32_t)time(NULL));
   for(int i=0;i<(iLineSizeDec<<5);i++)
     pDec[i]=rand()%256;
