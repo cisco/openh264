@@ -43,7 +43,6 @@
 
 #include "mc.h"
 #include "cpu_core.h"
-#include "get_intra_predictor.h"
 
 namespace WelsSVCEnc {
 int32_t WelsSampleSatd4x4_c (uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2) {
@@ -151,7 +150,7 @@ int32_t WelsSampleSatdIntra4x4Combined3_c (uint8_t* pDec, int32_t iDecStride, ui
     iBestMode = 2;
     iBestCost = iCurCost;
   }
-  WelsInitFillingPredFuncs(WELS_CPU_SSE2);
+
   WelsI4x4LumaPredH_c (uiLocalBuffer[1], pDec, iDecStride);
   iCurCost = WelsSampleSatd4x4_c (uiLocalBuffer[1], 4, pEnc, iEncStride) + iLambda1;
   if (iCurCost < iBestCost) {
