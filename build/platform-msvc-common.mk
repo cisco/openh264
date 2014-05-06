@@ -19,7 +19,10 @@ CC=cl
 CXX=cl
 AR=lib
 CXX_O=-Fo$@
-CFLAGS += -nologo -W3 -EHsc -fp:precise -Zc:wchar_t -Zc:forScope -DGTEST_HAS_TR1_TUPLE=1 -DGTEST_USE_OWN_TR1_TUPLE=1
+# -DGTEST_HAS_TR1_TUPLE=0 is temporarily broken in gtest,
+# using _VARIADIC_MAX=10 to fix building on MSVC 2012 meanwhile.
+# Once gtest works with the former again, it should be preferred.
+CFLAGS += -nologo -W3 -EHsc -fp:precise -Zc:wchar_t -Zc:forScope -D_VARIADIC_MAX=10
 CXX_LINK_O=-nologo -Fe$@
 AR_OPTS=-nologo -out:$@
 CFLAGS_OPT=-O2 -Ob1 -Oy- -Zi -GF -Gm- -GS -Gy -DNDEBUG
