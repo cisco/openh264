@@ -75,9 +75,9 @@ void WelsMdInterMb (void* pEncCtx, void* pWelsMd, SSlice* pSlice, SMB* pCurMb, S
 //void wels_md_inter_init ( SWelsMD* pMd, const uint8_t ref_idx, const bool is_highest_dlayer_flag );
 
 bool WelsMdInterJudgeBGDPskip (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
-                                 bool* bKeepSkip);
+                               bool* bKeepSkip);
 bool WelsMdInterJudgeBGDPskipFalse (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
-                                      bool* bKeepSkip);
+                                    bool* bKeepSkip);
 
 void WelsMdInterUpdateBGDInfo (SDqLayer* pCurLayer,  SMB* pCurMb, const bool kbCollocatedPredFlag,
                                const int32_t kiRefPictureType);
@@ -85,7 +85,7 @@ void WelsMdInterUpdateBGDInfoNULL (SDqLayer* pCurLayer,  SMB* pCurMb, const bool
                                    const int32_t kiRefPictureType);
 
 bool WelsMdInterJudgePskip (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
-                              bool bTrySkip);
+                            bool bTrySkip);
 void WelsMdInterUpdatePskip (SDqLayer* pCurDqLayer, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache);
 void WelsMdInterDecidedPskip (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache);
 

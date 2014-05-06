@@ -184,7 +184,7 @@ typedef struct TagMCRefMember {
 } sMCRefMember;
 //according to current 8*8 block ref_index to gain reference picture
 static inline void GetRefPic (sMCRefMember* pMCRefMem, PWelsDecoderContext pCtx, int8_t* pRefIdxList,
-                                int32_t iIndex) {
+                              int32_t iIndex) {
   PPicture pRefPic;
 
   int8_t iRefIdx = pRefIdxList[iIndex];
@@ -203,7 +203,7 @@ static inline void GetRefPic (sMCRefMember* pMCRefMem, PWelsDecoderContext pCtx,
 #define MC_FLOW_SIMPLE_JUDGE 1
 #endif //MC_FLOW_SIMPLE_JUDGE
 static inline void BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t iYOffset, SMcFunc* pMCFunc,
-                             int32_t iBlkWidth, int32_t iBlkHeight, int16_t iMVs[2]) {
+                           int32_t iBlkWidth, int32_t iBlkHeight, int16_t iMVs[2]) {
   int32_t iExpandWidth = PADDING_LENGTH;
   int32_t	iExpandHeight = PADDING_LENGTH;
 
@@ -465,7 +465,7 @@ int32_t RecChroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLeve
 }
 
 void FillBufForMc (uint8_t* pBuf, int32_t iBufStride, uint8_t* pSrc, int32_t iSrcStride, int32_t iSrcOffset,
-                     int32_t iBlockWidth, int32_t iBlockHeight, int32_t iSrcX, int32_t iSrcY, int32_t iPicWidth, int32_t iPicHeight) {
+                   int32_t iBlockWidth, int32_t iBlockHeight, int32_t iSrcX, int32_t iSrcY, int32_t iPicWidth, int32_t iPicHeight) {
   int32_t iY;
   int32_t iStartY, iStartX, iEndY, iEndX;
   int32_t iOffsetAdj = 0;

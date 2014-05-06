@@ -358,7 +358,8 @@ void WelsMdInterInit (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb, const i
   ST32 (&pCurMb->sP16x16Mv, 0);
   ST32 (&pCurLayer->pDecPic->sMvList[kiMbXY], 0);
 
-  SetMvWithinIntegerMvRange( kiMbWidth, kiMbHeight, kiMbX, kiMbY, CAMERA_STARTMV_RANGE, &(pSlice->sMvStartMin), &(pSlice->sMvStartMax));
+  SetMvWithinIntegerMvRange (kiMbWidth, kiMbHeight, kiMbX, kiMbY, CAMERA_STARTMV_RANGE, & (pSlice->sMvStartMin),
+                             & (pSlice->sMvStartMax));
 }
 
 int32_t WelsMdI16x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SMbCache* pMbCache, int32_t iLambda) {
@@ -969,9 +970,8 @@ void WelsMdIntraMb (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCach
   WelsMdIntraSecondaryModesEnc (pEncCtx, pWelsMd, pCurMb, pMbCache);
 }
 
-static inline void InitMe(const SWelsMD& sWelsMd, const int32_t iBlockSize, uint8_t* pEnc, uint8_t* pRef,
-                   SWelsME& sWelsMe )
-{
+static inline void InitMe (const SWelsMD& sWelsMd, const int32_t iBlockSize, uint8_t* pEnc, uint8_t* pRef,
+                           SWelsME& sWelsMe) {
   sWelsMe.iCurMeBlockPixX = sWelsMd.iMbPixX;
   sWelsMe.iCurMeBlockPixY = sWelsMd.iMbPixY;
   sWelsMe.uiBlockSize = iBlockSize;
@@ -987,8 +987,8 @@ int32_t WelsMdP16x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurLayer, SWelsMD* pWe
   uint32_t uiNeighborAvail = pCurMb->uiNeighborAvail;
   const int32_t kiMbWidth	= pCurLayer->iMbWidth;	// for assign once
   const int32_t kiMbHeight	= pCurLayer->iMbHeight;
-  InitMe(*pWelsMd, BLOCK_16x16, pMbCache->SPicData.pEncMb[0], pMbCache->SPicData.pRefMb[0],
-                   *pMe16x16 );
+  InitMe (*pWelsMd, BLOCK_16x16, pMbCache->SPicData.pEncMb[0], pMbCache->SPicData.pRefMb[0],
+          *pMe16x16);
   //not putting the line below into InitMe to avoid judging mode in InitMe
   pMe16x16->uSadPredISatd.uiSadPred = pWelsMd->iSadPredMb;
 
@@ -1035,10 +1035,10 @@ int32_t WelsMdP16x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pW
   do {
     sMe16x8 = &pWelsMd->sMe.sMe16x8[i];
     iPixelY = (i << 3);
-    InitMe(*pWelsMd, BLOCK_16x8,
-      pMbCache->SPicData.pEncMb[0] + (iPixelY * iStrideEnc),
-      pMbCache->SPicData.pRefMb[0] + (iPixelY * iStrideRef),
-      *sMe16x8 );
+    InitMe (*pWelsMd, BLOCK_16x8,
+            pMbCache->SPicData.pEncMb[0] + (iPixelY * iStrideEnc),
+            pMbCache->SPicData.pRefMb[0] + (iPixelY * iStrideRef),
+            *sMe16x8);
     //not putting the lines below into InitMe to avoid judging mode in InitMe
     sMe16x8->iCurMeBlockPixY = pWelsMd->iMbPixY + iPixelY;
     sMe16x8->uSadPredISatd.uiSadPred = pWelsMd->iSadPredMb >> 1;
@@ -1062,10 +1062,10 @@ int32_t WelsMdP8x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurLayer, SWelsMD* pWel
   do {
     iPixelX = (i << 3);
     sMe8x16 = &pWelsMd->sMe.sMe8x16[i];
-    InitMe(*pWelsMd, BLOCK_8x16,
-      pMbCache->SPicData.pEncMb[0] + iPixelX,
-      pMbCache->SPicData.pRefMb[0] + iPixelX,
-      *sMe8x16 );
+    InitMe (*pWelsMd, BLOCK_8x16,
+            pMbCache->SPicData.pEncMb[0] + iPixelX,
+            pMbCache->SPicData.pRefMb[0] + iPixelX,
+            *sMe8x16);
     //not putting the lines below into InitMe to avoid judging mode in InitMe
     sMe8x16->iCurMeBlockPixX = pWelsMd->iMbPixX + iPixelX;
     sMe8x16->uSadPredISatd.uiSadPred = pWelsMd->iSadPredMb >> 1;
@@ -1093,14 +1093,14 @@ int32_t WelsMdP8x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWe
     iIdxY = i >> 1;
     iPixelX = (iIdxX << 3);
     iPixelY = (iIdxY << 3);
-    iStrideEnc = iPixelX + ( iPixelY * iLineSizeEnc);
-    iStrideRef = iPixelX + ( iPixelY * iLineSizeRef);
+    iStrideEnc = iPixelX + (iPixelY * iLineSizeEnc);
+    iStrideRef = iPixelX + (iPixelY * iLineSizeRef);
 
     sMe8x8 = &pWelsMd->sMe.sMe8x8[i];
-    InitMe(*pWelsMd, BLOCK_8x8,
-      pMbCache->SPicData.pEncMb[0] + iStrideEnc,
-      pMbCache->SPicData.pRefMb[0] + iStrideRef,
-      *sMe8x8 );
+    InitMe (*pWelsMd, BLOCK_8x8,
+            pMbCache->SPicData.pEncMb[0] + iStrideEnc,
+            pMbCache->SPicData.pRefMb[0] + iStrideRef,
+            *sMe8x8);
     //not putting these three lines below into InitMe to avoid judging mode in InitMe
     sMe8x8->iCurMeBlockPixX = pWelsMd->iMbPixX + iPixelX;
     sMe8x8->iCurMeBlockPixY = pWelsMd->iMbPixY + iPixelY;
@@ -1340,7 +1340,7 @@ bool WelsMdPSkipEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
   PredSkipMv (pMbCache, &sMvp);
 
   // Special case, need to clip the vector //
-  SMVUnitXY sQpelMvp = { static_cast<int16_t>(sMvp.iMvX >> 2), static_cast<int16_t>(sMvp.iMvY >> 2) };
+  SMVUnitXY sQpelMvp = { static_cast<int16_t> (sMvp.iMvX >> 2), static_cast<int16_t> (sMvp.iMvY >> 2) };
   n = (pCurMb->iMbX << 4) + sQpelMvp.iMvX;
   if (n < -29)
     return false;
@@ -1669,7 +1669,7 @@ void WelsMdInterMb (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache
 //  try the ordinary Pskip
 //////
 bool WelsMdInterJudgePskip (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
-                              bool bTrySkip) {
+                            bool bTrySkip) {
   bool bRet = true;
   if (((pEncCtx->pRefPic->iPictureType == P_SLICE) && (pMbCache->uiRefMbType == MB_TYPE_SKIP
        || pMbCache->uiRefMbType == MB_TYPE_BACKGROUND)) ||
@@ -1751,7 +1751,7 @@ void WelsMdInterEncode (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb, SMbCa
 //  try the BGD Pskip
 //////
 bool WelsMdInterJudgeBGDPskip (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
-                                 bool* bKeepSkip) {
+                               bool* bKeepSkip) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   SWelsMD* pWelsMd = (SWelsMD*)pMd;
 
@@ -1783,7 +1783,7 @@ bool WelsMdInterJudgeBGDPskip (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurM
 }
 
 bool WelsMdInterJudgeBGDPskipFalse (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
-                                      bool* bKeepSkip) {
+                                    bool* bKeepSkip) {
   return false;
 }
 

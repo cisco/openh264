@@ -1047,7 +1047,8 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
     iVaaFrameSceneChangeIdc = SIMILAR_SCENE;
   }
 
-  WelsLog(pCtx,WELS_LOG_INFO,"iVaaFrameSceneChangeIdc = %d,codingIdx = %d\n",iVaaFrameSceneChangeIdc,pCtx->iCodingIndex);
+  WelsLog (pCtx, WELS_LOG_INFO, "iVaaFrameSceneChangeIdc = %d,codingIdx = %d\n", iVaaFrameSceneChangeIdc,
+           pCtx->iCodingIndex);
 
   SaveBestRefToVaa (sLtrSaved, & (pVaaExt->sVaaStrBestRefCandidate[0]));
 

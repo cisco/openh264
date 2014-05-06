@@ -58,17 +58,17 @@ namespace WelsSVCEnc {
 typedef struct TagDqLayer	SDqLayer;
 typedef SDqLayer*            pDqLayer;
 
-typedef struct TagFeatureSearchPreparation{
+typedef struct TagFeatureSearchPreparation {
   SScreenBlockFeatureStorage*	pRefBlockFeature;//point the the ref frame storage
 
   uint16_t*	pFeatureOfBlock;		// Feature of every block (8x8), begin with the point
-	uint8_t      uiFeatureStrategyIndex;// index of hash strategy
+  uint8_t      uiFeatureStrategyIndex;// index of hash strategy
 
-	/* for FME frame-level switch */
-	bool bFMESwitchFlag;
-	uint8_t uiFMEGoodFrameCount;
-	int32_t iHighFreMbCount;
-}SFeatureSearchPreparation;//maintain only one
+  /* for FME frame-level switch */
+  bool bFMESwitchFlag;
+  uint8_t uiFMEGoodFrameCount;
+  int32_t iHighFreMbCount;
+} SFeatureSearchPreparation; //maintain only one
 
 typedef struct TagLayerInfo {
   SNalUnitHeaderExt		sNalHeaderExt;

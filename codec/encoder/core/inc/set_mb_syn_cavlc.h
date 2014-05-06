@@ -49,11 +49,11 @@ namespace WelsSVCEnc {
 
 
 enum EResidualProperty {
-LUMA_DC     = 0,
-LUMA_AC     = 1,
-LUMA_4x4    = 2,
-CHROMA_DC   = 3,
-CHROMA_AC   = 4
+  LUMA_DC     = 0,
+  LUMA_AC     = 1,
+  LUMA_4x4    = 2,
+  CHROMA_DC   = 3,
+  CHROMA_AC   = 4
 };
 
 
@@ -63,16 +63,16 @@ typedef  int32_t (*PCavlcParamCalFunc) (int16_t* pCoff, uint8_t* pRun, int16_t* 
                                         int32_t iEndIdx);
 
 typedef  struct TagCoeffFunc {
-PCavlcParamCalFunc    pfCavlcParamCal;
+  PCavlcParamCalFunc    pfCavlcParamCal;
 } SCoeffFunc;
 
 /*  For CAVLC   */
 extern SCoeffFunc    sCoeffFunc;
 
 typedef struct TagCavlcTableItem {
-uint16_t uiBits;
-uint8_t  uiLen;
-uint8_t  uiSuffixLength;
+  uint16_t uiBits;
+  uint8_t  uiLen;
+  uint8_t  uiSuffixLength;
 } SCavlcTableItem;
 
 void  InitCoeffFunc (const uint32_t uiCpuFlag);

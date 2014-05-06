@@ -40,8 +40,7 @@
 
 namespace WelsSVCEnc {
 #define LIST_SIZE      0x10000    //(256*256)
-typedef struct TagScreenBlockFeatureStorage
-{
+typedef struct TagScreenBlockFeatureStorage {
   //Input
   uint16_t*  pFeatureOfBlockPointer;    // Pointer to pFeatureOfBlock
   int32_t    iIs16x16;      //Feature block size
@@ -49,7 +48,8 @@ typedef struct TagScreenBlockFeatureStorage
 
   //Modify
   uint32_t*  pTimesOfFeatureValue;    // times of every value in Feature
-  uint16_t**  pLocationOfFeature;      // uint16_t *pLocationOfFeature[LIST_SIZE], pLocationOfFeature[i] saves all the location(x,y) whose Feature = i;
+  uint16_t**
+  pLocationOfFeature;      // uint16_t *pLocationOfFeature[LIST_SIZE], pLocationOfFeature[i] saves all the location(x,y) whose Feature = i;
   uint16_t*  pLocationPointer;  // buffer of position array
   int32_t    iActualListSize;      // actual list size
   uint32_t uiSadCostThreshold[BLOCK_SIZE_ALL];

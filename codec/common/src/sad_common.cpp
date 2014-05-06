@@ -107,33 +107,33 @@ int32_t WelsSampleSad16x16_c (uint8_t* pSample1, int32_t iStride1, uint8_t* pSam
 
 void WelsSampleSadFour16x16_c (uint8_t* iSample1, int32_t iStride1, uint8_t* iSample2, int32_t iStride2,
                                int32_t* pSad) {
-    * (pSad)     = WelsSampleSad16x16_c (iSample1, iStride1, (iSample2 - iStride2), iStride2);
-    * (pSad + 1) = WelsSampleSad16x16_c (iSample1, iStride1, (iSample2 + iStride2), iStride2);
-    * (pSad + 2) = WelsSampleSad16x16_c (iSample1, iStride1, (iSample2 - 1), iStride2);
-    * (pSad + 3) = WelsSampleSad16x16_c (iSample1, iStride1, (iSample2 + 1), iStride2);
+  * (pSad)     = WelsSampleSad16x16_c (iSample1, iStride1, (iSample2 - iStride2), iStride2);
+  * (pSad + 1) = WelsSampleSad16x16_c (iSample1, iStride1, (iSample2 + iStride2), iStride2);
+  * (pSad + 2) = WelsSampleSad16x16_c (iSample1, iStride1, (iSample2 - 1), iStride2);
+  * (pSad + 3) = WelsSampleSad16x16_c (iSample1, iStride1, (iSample2 + 1), iStride2);
 }
 void WelsSampleSadFour16x8_c (uint8_t* iSample1, int32_t iStride1, uint8_t* iSample2, int32_t iStride2, int32_t* pSad) {
-    * (pSad)     = WelsSampleSad16x8_c (iSample1, iStride1, (iSample2 - iStride2), iStride2);
-    * (pSad + 1) = WelsSampleSad16x8_c (iSample1, iStride1, (iSample2 + iStride2), iStride2);
-    * (pSad + 2) = WelsSampleSad16x8_c (iSample1, iStride1, (iSample2 - 1), iStride2);
-    * (pSad + 3) = WelsSampleSad16x8_c (iSample1, iStride1, (iSample2 + 1), iStride2);
+  * (pSad)     = WelsSampleSad16x8_c (iSample1, iStride1, (iSample2 - iStride2), iStride2);
+  * (pSad + 1) = WelsSampleSad16x8_c (iSample1, iStride1, (iSample2 + iStride2), iStride2);
+  * (pSad + 2) = WelsSampleSad16x8_c (iSample1, iStride1, (iSample2 - 1), iStride2);
+  * (pSad + 3) = WelsSampleSad16x8_c (iSample1, iStride1, (iSample2 + 1), iStride2);
 }
 void WelsSampleSadFour8x16_c (uint8_t* iSample1, int32_t iStride1, uint8_t* iSample2, int32_t iStride2, int32_t* pSad) {
-    * (pSad)     = WelsSampleSad8x16_c (iSample1, iStride1, (iSample2 - iStride2), iStride2);
-    * (pSad + 1) = WelsSampleSad8x16_c (iSample1, iStride1, (iSample2 + iStride2), iStride2);
-    * (pSad + 2) = WelsSampleSad8x16_c (iSample1, iStride1, (iSample2 - 1), iStride2);
-    * (pSad + 3) = WelsSampleSad8x16_c (iSample1, iStride1, (iSample2 + 1), iStride2);
+  * (pSad)     = WelsSampleSad8x16_c (iSample1, iStride1, (iSample2 - iStride2), iStride2);
+  * (pSad + 1) = WelsSampleSad8x16_c (iSample1, iStride1, (iSample2 + iStride2), iStride2);
+  * (pSad + 2) = WelsSampleSad8x16_c (iSample1, iStride1, (iSample2 - 1), iStride2);
+  * (pSad + 3) = WelsSampleSad8x16_c (iSample1, iStride1, (iSample2 + 1), iStride2);
 
 }
 void WelsSampleSadFour8x8_c (uint8_t* iSample1, int32_t iStride1, uint8_t* iSample2, int32_t iStride2, int32_t* pSad) {
-    * (pSad)     = WelsSampleSad8x8_c (iSample1, iStride1, (iSample2 - iStride2), iStride2);
-    * (pSad + 1) = WelsSampleSad8x8_c (iSample1, iStride1, (iSample2 + iStride2), iStride2);
-    * (pSad + 2) = WelsSampleSad8x8_c (iSample1, iStride1, (iSample2 - 1), iStride2);
-    * (pSad + 3) = WelsSampleSad8x8_c (iSample1, iStride1, (iSample2 + 1), iStride2);
+  * (pSad)     = WelsSampleSad8x8_c (iSample1, iStride1, (iSample2 - iStride2), iStride2);
+  * (pSad + 1) = WelsSampleSad8x8_c (iSample1, iStride1, (iSample2 + iStride2), iStride2);
+  * (pSad + 2) = WelsSampleSad8x8_c (iSample1, iStride1, (iSample2 - 1), iStride2);
+  * (pSad + 3) = WelsSampleSad8x8_c (iSample1, iStride1, (iSample2 + 1), iStride2);
 }
 void WelsSampleSadFour4x4_c (uint8_t* iSample1, int32_t iStride1, uint8_t* iSample2, int32_t iStride2, int32_t* pSad) {
-    * (pSad)     = WelsSampleSad4x4_c (iSample1, iStride1, (iSample2 - iStride2), iStride2);
-    * (pSad + 1) = WelsSampleSad4x4_c (iSample1, iStride1, (iSample2 + iStride2), iStride2);
-    * (pSad + 2) = WelsSampleSad4x4_c (iSample1, iStride1, (iSample2 - 1), iStride2);
-    * (pSad + 3) = WelsSampleSad4x4_c (iSample1, iStride1, (iSample2 + 1), iStride2);
+  * (pSad)     = WelsSampleSad4x4_c (iSample1, iStride1, (iSample2 - iStride2), iStride2);
+  * (pSad + 1) = WelsSampleSad4x4_c (iSample1, iStride1, (iSample2 + iStride2), iStride2);
+  * (pSad + 2) = WelsSampleSad4x4_c (iSample1, iStride1, (iSample2 - 1), iStride2);
+  * (pSad + 3) = WelsSampleSad4x4_c (iSample1, iStride1, (iSample2 + 1), iStride2);
 }

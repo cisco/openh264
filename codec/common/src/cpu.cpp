@@ -96,7 +96,7 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
     uiCPU |= WELS_CPU_CMOV;
   }
   if ((!strcmp ((const char*)chVendorName, CPU_Vendor_INTEL)) ||
-      (!strcmp((const char*)chVendorName, CPU_Vendor_AMD)) ) {	// confirmed_safe_unsafe_usage
+      (!strcmp ((const char*)chVendorName, CPU_Vendor_AMD))) {	// confirmed_safe_unsafe_usage
     if (uiFeatureD & 0x10000000) {
       /* Multi-Threading checking: contains of multiple logic processors */
       uiCPU |= WELS_CPU_HTT;
@@ -136,18 +136,18 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
     uiCPU |= WELS_CPU_MOVBE;
   }
 
-  if( pNumberOfLogicProcessors != NULL ){
-    if( uiCPU & WELS_CPU_HTT){
+  if (pNumberOfLogicProcessors != NULL) {
+    if (uiCPU & WELS_CPU_HTT) {
       *pNumberOfLogicProcessors = (uiFeatureB & 0x00ff0000) >> 16; // feature bits: 23-16 on returned EBX
     } else {
       *pNumberOfLogicProcessors = 0;
     }
-    if( !strcmp((const char*)chVendorName, CPU_Vendor_INTEL) ){
-      if( uiMaxCpuidLevel >= 4 ){
+    if (!strcmp ((const char*)chVendorName, CPU_Vendor_INTEL)) {
+      if (uiMaxCpuidLevel >= 4) {
         uiFeatureC = 0;
-        WelsCPUId(0x4, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);
-        if( uiFeatureA != 0 ){
-          *pNumberOfLogicProcessors = ((uiFeatureA&0xfc000000)>>26) + 1;
+        WelsCPUId (0x4, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);
+        if (uiFeatureA != 0) {
+          *pNumberOfLogicProcessors = ((uiFeatureA & 0xfc000000) >> 26) + 1;
         }
       }
     }
@@ -209,26 +209,25 @@ void WelsCPURestore (const uint32_t kuiCPU) {
 
 #elif defined(HAVE_NEON) //For supporting both android platform and iOS platform
 #if defined(ANDROID_NDK)
-uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors)
-{
+uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
   uint32_t         uiCPU = 0;
   AndroidCpuFamily cpuFamily = ANDROID_CPU_FAMILY_UNKNOWN;
   uint64_t         uiFeatures = 0;
   cpuFamily = android_getCpuFamily();
   if (cpuFamily == ANDROID_CPU_FAMILY_ARM)	{
     uiFeatures = android_getCpuFeatures();
-    if (uiFeatures & ANDROID_CPU_ARM_FEATURE_ARMv7){
+    if (uiFeatures & ANDROID_CPU_ARM_FEATURE_ARMv7) {
       uiCPU |= WELS_CPU_ARMv7;
     }
-    if (uiFeatures & ANDROID_CPU_ARM_FEATURE_VFPv3){
+    if (uiFeatures & ANDROID_CPU_ARM_FEATURE_VFPv3) {
       uiCPU |= WELS_CPU_VFPv3;
     }
-    if (uiFeatures & ANDROID_CPU_ARM_FEATURE_NEON){
+    if (uiFeatures & ANDROID_CPU_ARM_FEATURE_NEON) {
       uiCPU |= WELS_CPU_NEON;
     }
   }
 
-  if( pNumberOfLogicProcessors != NULL ){
+  if (pNumberOfLogicProcessors != NULL) {
     *pNumberOfLogicProcessors = android_getCpuCount();
   }
 
@@ -236,38 +235,37 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors)
 }
 
 #elif defined(__APPLE__)
-uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors)
-{
-    uint32_t       uiCPU = 0;
+uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
+  uint32_t       uiCPU = 0;
 
 #if defined(__ARM_NEON__)
-    uiCPU |= WELS_CPU_ARMv7;
-    uiCPU |= WELS_CPU_VFPv3;
-    uiCPU |= WELS_CPU_NEON;
+  uiCPU |= WELS_CPU_ARMv7;
+  uiCPU |= WELS_CPU_VFPv3;
+  uiCPU |= WELS_CPU_NEON;
 #endif
-    return uiCPU;
+  return uiCPU;
 }
 #elif defined(__linux__)
 
 /* Generic arm/linux cpu feature detection */
 uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
-  FILE *f = fopen("/proc/cpuinfo", "r");
+  FILE* f = fopen ("/proc/cpuinfo", "r");
 
   if (!f)
     return 0;
 
   char buf[200];
   int flags = 0;
-  while (fgets(buf, sizeof(buf), f)) {
-    if (!strncmp(buf, "Features", strlen("Features"))) {
-      if (strstr(buf, " neon "))
+  while (fgets (buf, sizeof (buf), f)) {
+    if (!strncmp (buf, "Features", strlen ("Features"))) {
+      if (strstr (buf, " neon "))
         flags |= WELS_CPU_NEON;
-      if (strstr(buf, " vfpv3 "))
+      if (strstr (buf, " vfpv3 "))
         flags |= WELS_CPU_VFPv3;
       break;
     }
   }
-  fclose(f);
+  fclose (f);
   return flags;
 }
 

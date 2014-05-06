@@ -64,7 +64,7 @@ extern "C" {
 #endif//__cplusplus
 
 #if defined(HAVE_NEON)
-void SetNonZeroCount_neon(int16_t* pBlock, int8_t* pNonZeroCount);
+void SetNonZeroCount_neon (int16_t* pBlock, int8_t* pNonZeroCount);
 #endif
 
 #ifdef __cplusplus

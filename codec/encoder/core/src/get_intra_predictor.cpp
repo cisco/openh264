@@ -729,7 +729,7 @@ void WelsInitIntraPredFuncs (SWelsFuncPtrList* pFuncList, const uint32_t kuiCpuF
     pFuncList->pfGetChromaPred[C_PRED_V]	= WelsIChromaPredV_neon;
     pFuncList->pfGetChromaPred[C_PRED_P]	= WelsIChromaPredPlane_neon;
     pFuncList->pfGetChromaPred[C_PRED_H]    = WelsIChromaPredH_neon;
-    }
+  }
 #endif
 
 #ifdef X86_ASM

@@ -34,7 +34,8 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-void VAACalcSadSsd_c (const uint8_t* pCurData, const uint8_t* pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
+void VAACalcSadSsd_c (const uint8_t* pCurData, const uint8_t* pRefData, int32_t iPicWidth, int32_t iPicHeight,
+                      int32_t iPicStride,
                       int32_t* pFrameSad, int32_t* pSad8x8, int32_t* pSum16x16, int32_t* psqsum16x16, int32_t* psqdiff16x16) {
   const uint8_t* tmp_ref = pRefData;
   const uint8_t* tmp_cur = pCurData;
@@ -145,7 +146,8 @@ void VAACalcSadSsd_c (const uint8_t* pCurData, const uint8_t* pRefData, int32_t 
     tmp_cur += step;
   }
 }
-void VAACalcSadVar_c (const uint8_t* pCurData, const uint8_t* pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
+void VAACalcSadVar_c (const uint8_t* pCurData, const uint8_t* pRefData, int32_t iPicWidth, int32_t iPicHeight,
+                      int32_t iPicStride,
                       int32_t* pFrameSad, int32_t* pSad8x8, int32_t* pSum16x16, int32_t* psqsum16x16) {
   const uint8_t* tmp_ref = pRefData;
   const uint8_t* tmp_cur = pCurData;
@@ -249,7 +251,8 @@ void VAACalcSadVar_c (const uint8_t* pCurData, const uint8_t* pRefData, int32_t 
 }
 
 
-void VAACalcSad_c (const uint8_t* pCurData, const uint8_t* pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
+void VAACalcSad_c (const uint8_t* pCurData, const uint8_t* pRefData, int32_t iPicWidth, int32_t iPicHeight,
+                   int32_t iPicStride,
                    int32_t* pFrameSad, int32_t* pSad8x8) {
   const uint8_t* tmp_ref = pRefData;
   const uint8_t* tmp_cur = pCurData;
@@ -480,7 +483,8 @@ void VAACalcSadSsdBgd_c (const uint8_t* pCurData, const uint8_t* pRefData, int32
   }
 }
 
-void VAACalcSadBgd_c (const uint8_t* pCurData, const uint8_t* pRefData, int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
+void VAACalcSadBgd_c (const uint8_t* pCurData, const uint8_t* pRefData, int32_t iPicWidth, int32_t iPicHeight,
+                      int32_t iPicStride,
                       int32_t* pFrameSad, int32_t* pSad8x8, int32_t* pSd8x8, uint8_t* pMad8x8) {
   const uint8_t* tmp_ref = pRefData;
   const uint8_t* tmp_cur = pCurData;

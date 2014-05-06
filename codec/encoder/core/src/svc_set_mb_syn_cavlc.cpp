@@ -208,10 +208,9 @@ void WelsSpatialWriteSubMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurM
   }
 }
 
-int32_t CheckBitstreamBuffer(const uint8_t	kuiSliceIdx, sWelsEncCtx* pEncCtx,  SBitStringAux* pBs)
-{
+int32_t CheckBitstreamBuffer (const uint8_t	kuiSliceIdx, sWelsEncCtx* pEncCtx,  SBitStringAux* pBs) {
   const int32_t iLeftLength = pBs->pBufEnd - pBs->pBufPtr - 1;
-  assert(iLeftLength > 0);
+  assert (iLeftLength > 0);
 
   if (iLeftLength < MAX_MACROBLOCK_SIZE_IN_BYTE) {
     return ENC_RETURN_MEMALLOCERR;
@@ -253,7 +252,7 @@ int32_t WelsSpatialWriteMbSyn (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb
   }
 
   /* Step 4: Check the left buffer */
-  return CheckBitstreamBuffer(pSlice->uiSliceIdx, pEncCtx, pBs);
+  return CheckBitstreamBuffer (pSlice->uiSliceIdx, pEncCtx, pBs);
 }
 
 void WelsWriteMbResidual (SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux* pBs) {

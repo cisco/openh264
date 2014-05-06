@@ -711,8 +711,8 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
   const int32_t kiFeatureStrategyIndex = FME_DEFAULT_FEATURE_INDEX;
   const int32_t kiMe16x16 = ME_DIA_CROSS;
   const int32_t kiMe8x8 = ME_DIA_CROSS_FME;
-  const int32_t kiNeedFeatureStorage = (pParam->iUsageType != SCREEN_CONTENT_REAL_TIME)?0:
-    ((kiFeatureStrategyIndex<<16) +  ((kiMe16x16 & 0x00FF)<<8) + (kiMe8x8 & 0x00FF));
+  const int32_t kiNeedFeatureStorage = (pParam->iUsageType != SCREEN_CONTENT_REAL_TIME) ? 0 :
+                                       ((kiFeatureStrategyIndex << 16) + ((kiMe16x16 & 0x00FF) << 8) + (kiMe8x8 & 0x00FF));
 
   iDlayerIndex			= 0;
   while (iDlayerIndex < iDlayerCount) {
@@ -733,7 +733,8 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
     pRefList		= (SRefList*)pMa->WelsMallocz (sizeof (SRefList), "pRefList");
     WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pRefList), FreeMemorySvc (ppCtx))
     do {
-      pRefList->pRef[i]	= AllocPicture (pMa, kiWidth, kiHeight, true, (iDlayerIndex == iDlayerCount-1)?kiNeedFeatureStorage:0);	// to use actual size of current layer
+      pRefList->pRef[i]	= AllocPicture (pMa, kiWidth, kiHeight, true,
+                                        (iDlayerIndex == iDlayerCount - 1) ? kiNeedFeatureStorage : 0);	// to use actual size of current layer
       WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pRefList->pRef[i]), FreeMemorySvc (ppCtx))
       ++ i;
     } while (i < 1 + iNumRef);
@@ -831,13 +832,14 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
     }
 
     //
-    if (kiNeedFeatureStorage && iDlayerIndex==iDlayerCount-1)
-    {
-      pDqLayer->pFeatureSearchPreparation	= static_cast<SFeatureSearchPreparation*> (pMa->WelsMallocz (sizeof (SFeatureSearchPreparation), "pFeatureSearchPreparation"));
-      WELS_VERIFY_RETURN_PROC_IF (1, NULL==pDqLayer->pFeatureSearchPreparation, FreeMemorySvc (ppCtx));
-      int32_t iReturn = RequestFeatureSearchPreparation(pMa, pDlayer->iFrameWidth, pDlayer->iFrameHeight, kiNeedFeatureStorage,
-        pDqLayer->pFeatureSearchPreparation);
-      WELS_VERIFY_RETURN_PROC_IF (1, ENC_RETURN_SUCCESS!=iReturn, FreeMemorySvc (ppCtx));
+    if (kiNeedFeatureStorage && iDlayerIndex == iDlayerCount - 1) {
+      pDqLayer->pFeatureSearchPreparation	= static_cast<SFeatureSearchPreparation*> (pMa->WelsMallocz (sizeof (
+                                              SFeatureSearchPreparation), "pFeatureSearchPreparation"));
+      WELS_VERIFY_RETURN_PROC_IF (1, NULL == pDqLayer->pFeatureSearchPreparation, FreeMemorySvc (ppCtx));
+      int32_t iReturn = RequestFeatureSearchPreparation (pMa, pDlayer->iFrameWidth, pDlayer->iFrameHeight,
+                        kiNeedFeatureStorage,
+                        pDqLayer->pFeatureSearchPreparation);
+      WELS_VERIFY_RETURN_PROC_IF (1, ENC_RETURN_SUCCESS != iReturn, FreeMemorySvc (ppCtx));
     } else {
       pDqLayer->pFeatureSearchPreparation = NULL;
     }
@@ -1363,19 +1365,19 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pWelsSvcRc), FreeMemorySvc (ppCtx))
   //End of Rate control module memory allocation
 
-    //pVaa memory allocation
-    if (pParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
-      (*ppCtx)->pVaa	= (SVAAFrameInfoExt*)pMa->WelsMallocz (sizeof (SVAAFrameInfoExt), "pVaa");
-      WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pVaa), FreeMemorySvc (ppCtx))
-      if(RequestMemoryVaaScreen ((*ppCtx)->pVaa, pMa, (*ppCtx)->pSvcParam->iNumRefFrame, iCountMaxMbNum << 2)){
-        WelsLog (*ppCtx, WELS_LOG_WARNING, "RequestMemorySvc(), RequestMemoryVaaScreen failed!");
-        FreeMemorySvc (ppCtx);
-        return 1;
-      }
-    } else {
-        (*ppCtx)->pVaa	= (SVAAFrameInfo*)pMa->WelsMallocz (sizeof (SVAAFrameInfo), "pVaa");
-        WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pVaa), FreeMemorySvc (ppCtx))
+  //pVaa memory allocation
+  if (pParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
+    (*ppCtx)->pVaa	= (SVAAFrameInfoExt*)pMa->WelsMallocz (sizeof (SVAAFrameInfoExt), "pVaa");
+    WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pVaa), FreeMemorySvc (ppCtx))
+    if (RequestMemoryVaaScreen ((*ppCtx)->pVaa, pMa, (*ppCtx)->pSvcParam->iNumRefFrame, iCountMaxMbNum << 2)) {
+      WelsLog (*ppCtx, WELS_LOG_WARNING, "RequestMemorySvc(), RequestMemoryVaaScreen failed!");
+      FreeMemorySvc (ppCtx);
+      return 1;
     }
+  } else {
+    (*ppCtx)->pVaa	= (SVAAFrameInfo*)pMa->WelsMallocz (sizeof (SVAAFrameInfo), "pVaa");
+    WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pVaa), FreeMemorySvc (ppCtx))
+  }
 
   if ((*ppCtx)->pSvcParam->bEnableAdaptiveQuant) { //malloc mem
     (*ppCtx)->pVaa->sAdaptiveQuantParam.pMotionTextureUnit   = static_cast<SMotionTextureUnit*>
@@ -1585,7 +1587,7 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
           }
 
           if (pDq->pFeatureSearchPreparation) {
-            ReleaseFeatureSearchPreparation(pMa, pDq->pFeatureSearchPreparation->pFeatureOfBlock);
+            ReleaseFeatureSearchPreparation (pMa, pDq->pFeatureSearchPreparation->pFeatureOfBlock);
             pMa->WelsFree (pDq->pFeatureSearchPreparation, "pFeatureSearchPreparation");
             pDq->pFeatureSearchPreparation = NULL;
           }
@@ -1663,8 +1665,8 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
         pMa->WelsFree (pCtx->pVaa->sVaaCalcInfo.pMad8x8, "pVaa->sVaaCalcInfo.pMad8x8");
         pCtx->pVaa->sVaaCalcInfo.pMad8x8	= NULL;
       }
-      if(pCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME)
-        ReleaseMemoryVaaScreen(pCtx->pVaa, pMa,pCtx->pSvcParam->iNumRefFrame);
+      if (pCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME)
+        ReleaseMemoryVaaScreen (pCtx->pVaa, pMa, pCtx->pSvcParam->iNumRefFrame);
       pMa->WelsFree (pCtx->pVaa, "pVaa");
       pCtx->pVaa = NULL;
     }
@@ -2456,19 +2458,20 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
 
       if (P_SLICE == pCtx->eSliceType) {
         //calculate bFMESwitchFlag
-        SVAAFrameInfoExt *pVaaExt		= static_cast<SVAAFrameInfoExt *>(pCtx->pVaa);
-        const int32_t kiMbSize = pCurLayer->iMbHeight*pCurLayer->iMbWidth;
-        pFeatureSearchPreparation->bFMESwitchFlag = CalcFMESwitchFlag( pFeatureSearchPreparation->uiFMEGoodFrameCount,
-          pFeatureSearchPreparation->iHighFreMbCount*100/kiMbSize, pCtx->pVaa->sVaaCalcInfo.iFrameSad/kiMbSize,
-          pVaaExt->sScrollDetectInfo.bScrollDetectFlag);
+        SVAAFrameInfoExt* pVaaExt		= static_cast<SVAAFrameInfoExt*> (pCtx->pVaa);
+        const int32_t kiMbSize = pCurLayer->iMbHeight * pCurLayer->iMbWidth;
+        pFeatureSearchPreparation->bFMESwitchFlag = CalcFMESwitchFlag (pFeatureSearchPreparation->uiFMEGoodFrameCount,
+            pFeatureSearchPreparation->iHighFreMbCount * 100 / kiMbSize, pCtx->pVaa->sVaaCalcInfo.iFrameSad / kiMbSize,
+            pVaaExt->sScrollDetectInfo.bScrollDetectFlag);
 
         //PerformFMEPreprocess
         SScreenBlockFeatureStorage* pScreenBlockFeatureStorage = pCurLayer->pRefPic->pScreenBlockFeatureStorage;
         pFeatureSearchPreparation->pRefBlockFeature = pScreenBlockFeatureStorage;
         if (pFeatureSearchPreparation->bFMESwitchFlag
-          && !pScreenBlockFeatureStorage->bRefBlockFeatureCalculated) {
-            //TODO: use ORIGIN of reference when preprocessing is ready
-            PerformFMEPreprocess( pFuncList, pCurLayer->pRefPic,pFeatureSearchPreparation->pFeatureOfBlock,pScreenBlockFeatureStorage);
+            && !pScreenBlockFeatureStorage->bRefBlockFeatureCalculated) {
+          //TODO: use ORIGIN of reference when preprocessing is ready
+          PerformFMEPreprocess (pFuncList, pCurLayer->pRefPic, pFeatureSearchPreparation->pFeatureOfBlock,
+                                pScreenBlockFeatureStorage);
         }
 
         //assign ME pointer
@@ -3011,9 +3014,10 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 #ifdef LONG_TERM_REF_DUMP
     DumpRef (pCtx);
 #endif
-    if((pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME)&&(pSvcParam->iRCMode != RC_OFF_MODE))
-      pCtx->pVpp->AnalyzePictureComplexity(pCtx,pCtx->pEncPic,((pCtx->eSliceType == P_SLICE)&&(pCtx->iNumRef0>0))?pCtx->pRefList0[0]:NULL,
-                                           iCurDid,pSvcParam->bEnableBackgroundDetection);
+    if ((pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) && (pSvcParam->iRCMode != RC_OFF_MODE))
+      pCtx->pVpp->AnalyzePictureComplexity (pCtx, pCtx->pEncPic, ((pCtx->eSliceType == P_SLICE)
+                                            && (pCtx->iNumRef0 > 0)) ? pCtx->pRefList0[0] : NULL,
+                                            iCurDid, pSvcParam->bEnableBackgroundDetection);
 
     WelsUpdateRefSyntax (pCtx,  pCtx->iPOC,
                          eFrameType);	//get reordering syntax used for writing slice header and transmit to encoder.
@@ -3093,8 +3097,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
           pCtx->iActiveThreadsNum	= iSliceCount;
           // to fire slice coding threads
           iRet = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
-                                   &pCtx->pSliceThreading->pThreadMasterEvent[0],
-                                   pLayerBsInfo, iSliceCount, pCtx->pCurDqLayer->pSliceEncCtx, false);
+                                    &pCtx->pSliceThreading->pThreadMasterEvent[0],
+                                    pLayerBsInfo, iSliceCount, pCtx->pCurDqLayer->pSliceEncCtx, false);
           if (iRet) {
             WelsLog (pCtx, WELS_LOG_ERROR,
                      "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!\n",
@@ -3132,8 +3136,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
           iNumThreadsRunning		= iNumThreadsScheduled;
           // to fire slice coding threads
           iRet = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
-                                   &pCtx->pSliceThreading->pThreadMasterEvent[0],
-                                   pLayerBsInfo, iNumThreadsRunning, pCtx->pCurDqLayer->pSliceEncCtx, false);
+                                    &pCtx->pSliceThreading->pThreadMasterEvent[0],
+                                    pLayerBsInfo, iNumThreadsRunning, pCtx->pCurDqLayer->pSliceEncCtx, false);
           if (iRet) {
             WelsLog (pCtx, WELS_LOG_ERROR,
                      "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!\n",
@@ -3178,8 +3182,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
         // to fire slice coding threads
         iRet = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
-                                 &pCtx->pSliceThreading->pThreadMasterEvent[0],
-                                 pLayerBsInfo, kiPartitionCnt, pCtx->pCurDqLayer->pSliceEncCtx, true);
+                                  &pCtx->pSliceThreading->pThreadMasterEvent[0],
+                                  pLayerBsInfo, kiPartitionCnt, pCtx->pCurDqLayer->pSliceEncCtx, true);
         if (iRet) {
           WelsLog (pCtx, WELS_LOG_ERROR,
                    "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!\n",

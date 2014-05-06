@@ -53,12 +53,12 @@ typedef  int32_t (SadFunc) (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY,
 
 typedef SadFunc*   SadFuncPtr;
 
-typedef int32_t (Sad16x16Func) ( uint8_t * pSrcY, int32_t iSrcStrideY, uint8_t *pRefY, int32_t iRefStrideY );
-typedef Sad16x16Func      *PSad16x16Func;
+typedef int32_t (Sad16x16Func) (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY);
+typedef Sad16x16Func*      PSad16x16Func;
 
-typedef void (GetIntraPred)(uint8_t *pPred, uint8_t *pRef, const int32_t kiStride);
+typedef void (GetIntraPred) (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 
-typedef GetIntraPred  *GetIntraPredPtr;
+typedef GetIntraPred*  GetIntraPredPtr;
 
 GetIntraPred     WelsI16x16LumaPredV_c;
 GetIntraPred     WelsI16x16LumaPredH_c;

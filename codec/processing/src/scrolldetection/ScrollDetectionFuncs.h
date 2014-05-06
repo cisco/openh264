@@ -51,11 +51,11 @@ WELSVP_NAMESPACE_BEGIN
   x[_t>>5] |= (1 << (_t&31)); \
 }
 
-int32_t CheckLine(uint8_t* pData, int32_t iWidth);
-int32_t SelectTestLine(uint8_t* pY, int32_t iWidth, int32_t iHeight, int32_t iPicHeight,
-                       int32_t iStride, int32_t iOffsetX, int32_t iOffsetY);
-int32_t CompareLine(uint8_t *pYSrc, uint8_t *pYRef, const int32_t kiWidth);
-void ScrollDetectionCore(SPixMap* pSrcPixMap, SPixMap* pRefPixMap, int32_t iWidth, int32_t iHeight,
-                         int32_t iOffsetX, int32_t iOffsetY, SScrollDetectionParam &sScrollDetectionParam);
+int32_t CheckLine (uint8_t* pData, int32_t iWidth);
+int32_t SelectTestLine (uint8_t* pY, int32_t iWidth, int32_t iHeight, int32_t iPicHeight,
+                        int32_t iStride, int32_t iOffsetX, int32_t iOffsetY);
+int32_t CompareLine (uint8_t* pYSrc, uint8_t* pYRef, const int32_t kiWidth);
+void ScrollDetectionCore (SPixMap* pSrcPixMap, SPixMap* pRefPixMap, int32_t iWidth, int32_t iHeight,
+                          int32_t iOffsetX, int32_t iOffsetY, SScrollDetectionParam& sScrollDetectionParam);
 
 WELSVP_NAMESPACE_END

@@ -142,7 +142,7 @@ void WelsLogDefault (void* pCtx, const int32_t kiLevel, const char* kpFmtStr, va
     if (pEncCtx) {
       SWelsTime tTime;
 
-      WelsGetTimeOfDay(&tTime);
+      WelsGetTimeOfDay (&tTime);
       iCurUsed = WelsSnprintf (&pBuf[iBufUsed], iBufLeft, "[0x%p @ ", pEncCtx);	// confirmed_safe_unsafe_usage
       iBufUsed += iCurUsed;
       iBufLeft -= iCurUsed;

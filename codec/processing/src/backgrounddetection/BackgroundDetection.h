@@ -84,7 +84,7 @@ class CBackgroundDetection : public IStrategy {
   inline void     FreeOUArrayMemory();
   inline int32_t  CalculateAsdChromaEdge (uint8_t* pOriRef, uint8_t* pOriCur, int32_t iStride);
   inline bool   ForegroundDilation23Luma (SBackgroundOU* pBackgroundOU,
-      SBackgroundOU* pOUNeighbours[]); //Foreground_Dilation_2_3_Luma
+                                          SBackgroundOU* pOUNeighbours[]); //Foreground_Dilation_2_3_Luma
   inline bool   ForegroundDilation23Chroma (int8_t iNeighbourForegroundFlags, int32_t iStartSamplePos,
       int32_t iPicStrideUV, vBGDParam* pBgdParam);//Foreground_Dilation_2_3_Chroma
   inline void     ForegroundDilation (SBackgroundOU* pBackgroundOU, SBackgroundOU* pOUNeighbours[], vBGDParam* pBgdParam,

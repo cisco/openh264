@@ -192,7 +192,7 @@ int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* 
 
   //
   WelsInitBGDFunc (pFuncList, pParam->bEnableBackgroundDetection);
-  WelsInitScrollingSkipFunc (pFuncList, bScreenContent&&(pParam->bEnableSceneChangeDetect));
+  WelsInitScrollingSkipFunc (pFuncList, bScreenContent && (pParam->bEnableSceneChangeDetect));
 
   // for pfGetVarianceFromIntraVaa function ptr adaptive by CPU features, 6/7/2010
   InitIntraAnalysisVaaInfo (pFuncList, uiCpuFlag);

@@ -41,7 +41,7 @@
 namespace WelsDec {
 
 typedef void (*PMcChromaWidthExtFunc) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-    const uint8_t* kpABCD, int32_t iHeight);
+                                       const uint8_t* kpABCD, int32_t iHeight);
 
 void InitMcFunc (SMcFunc* pMcFunc, int32_t iCpu);
 

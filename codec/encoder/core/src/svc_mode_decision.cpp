@@ -61,7 +61,7 @@ void WelsMdSpatialelInterMbIlfmdNoilp (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, S
   const bool kbMbTopAvailPskip			= ((kuiNeighborAvail & TOP_MB_POS) ? IS_SKIP (kpTopMb->uiMbType) : false);
   const bool kbMbTopLeftAvailPskip		= ((kuiNeighborAvail & TOPLEFT_MB_POS) ? IS_SKIP ((kpTopMb - 1)->uiMbType) : false);
   const bool kbMbTopRightAvailPskip	= ((kuiNeighborAvail & TOPRIGHT_MB_POS) ? IS_SKIP ((
-      kpTopMb + 1)->uiMbType) : false);
+                                         kpTopMb + 1)->uiMbType) : false);
 
   bool bTrySkip  = kbMbLeftAvailPskip | kbMbTopAvailPskip | kbMbTopLeftAvailPskip | kbMbTopRightAvailPskip;
   bool bKeepSkip = kbMbLeftAvailPskip & kbMbTopAvailPskip & kbMbTopRightAvailPskip;
@@ -162,11 +162,12 @@ void SetMvBaseEnhancelayer (SWelsMD* pMd, SMB* pCurMb, const SMB* kpRefMb) {
 ///////////////////////
 // Scrolling PSkip Decision for screen content
 ////////////////////////
-bool WelsMdInterJudgeScrollingPskip(void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache) {
+bool WelsMdInterJudgeScrollingPskip (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache) {
   //TBD
   return false;
 }
-bool WelsMdInterJudgeScrollingPskipFalse(void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache) {
+bool WelsMdInterJudgeScrollingPskipFalse (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb,
+    SMbCache* pMbCache) {
   return false;
 }
 

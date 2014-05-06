@@ -58,8 +58,8 @@ void UpdateP16x16MotionInfo (PDqLayer pCurDqLayer, int8_t iRef, int16_t iMVs[2])
 * \param
 */
 void UpdateP16x8MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][30][MV_A],
-                              int8_t iRefIndex[LIST_A][30],
-                              int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]);
+                            int8_t iRefIndex[LIST_A][30],
+                            int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]);
 
 
 /*!
@@ -68,8 +68,8 @@ void UpdateP16x8MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][
  * \param
  */
 void UpdateP8x16MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][30][MV_A],
-                              int8_t iRefIndex[LIST_A][30],
-                              int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]);
+                            int8_t iRefIndex[LIST_A][30],
+                            int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]);
 
 /*!
  * \brief   get the motion predictor for skip mode
@@ -84,7 +84,7 @@ void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]);
  * \param 	output iMvp[]
  */
 void PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
-               int32_t iPartIdx, int32_t iPartWidth, int8_t iRef, int16_t iMVP[2]);
+             int32_t iPartIdx, int32_t iPartWidth, int8_t iRef, int16_t iMVP[2]);
 
 /*!
  * \brief   get the motion predictor for inter16x8 MB
@@ -92,7 +92,7 @@ void PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][3
  * \param 	output mvp_x and mvp_y
  */
 void PredInter16x8Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
-                        int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]);
+                      int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]);
 
 /*!
  * \brief   get the motion predictor for inter8x16 MB
@@ -100,7 +100,7 @@ void PredInter16x8Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[
  * \param 	output mvp_x and mvp_y
  */
 void PredInter8x16Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
-                        int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]);
+                      int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]);
 
 } // namespace WelsDec
 

@@ -47,29 +47,29 @@ namespace WelsSVCEnc {
 // keep the most essential level pData structure be 64 Bytes, which matches cache line size; if so, the order with structure maybe negligible.
 // pls take care when modify MB structure size
 typedef struct TagMB {
-/*************************mb_layer() syntax and generated********************************/
-/*mb_layer():*/
-Mb_Type		uiMbType;	// including MB detailed partition type, number and type of reference list
-int16_t		iMbXY;		// offset position of MB top left point based
-int16_t		iMbX;		// position of MB in horizontal axis
-int16_t		iMbY;		// position of MB in vertical axis
+  /*************************mb_layer() syntax and generated********************************/
+  /*mb_layer():*/
+  Mb_Type		uiMbType;	// including MB detailed partition type, number and type of reference list
+  int16_t		iMbXY;		// offset position of MB top left point based
+  int16_t		iMbX;		// position of MB in horizontal axis
+  int16_t		iMbY;		// position of MB in vertical axis
 
-uint8_t		uiNeighborAvail;	// avail && same_slice: LEFT_MB_POS:0x01, TOP_MB_POS:0x02, TOPRIGHT_MB_POS = 0x04 ,TOPLEFT_MB_POS = 0x08;
-uint8_t		uiCbp;
+  uint8_t		uiNeighborAvail;	// avail && same_slice: LEFT_MB_POS:0x01, TOP_MB_POS:0x02, TOPRIGHT_MB_POS = 0x04 ,TOPLEFT_MB_POS = 0x08;
+  uint8_t		uiCbp;
 
-SMVUnitXY*	sMv;
-int8_t*		pRefIndex;
+  SMVUnitXY*	sMv;
+  int8_t*		pRefIndex;
 
-int32_t*     pSadCost;				// mb sad. set to 0 for intra mb
-int8_t*      pIntra4x4PredMode;	// [MB_BLOCK4x4_NUM]
-int8_t*      pNonZeroCount;		// [MB_LUMA_CHROMA_BLOCK4x4_NUM]
+  int32_t*     pSadCost;				// mb sad. set to 0 for intra mb
+  int8_t*      pIntra4x4PredMode;	// [MB_BLOCK4x4_NUM]
+  int8_t*      pNonZeroCount;		// [MB_LUMA_CHROMA_BLOCK4x4_NUM]
 
-SMVUnitXY	sP16x16Mv;
+  SMVUnitXY	sP16x16Mv;
 
-uint8_t		uiLumaQp;		// uiLumaQp: pPps->iInitialQp + sSliceHeader->delta_qp + mb->dquant.
-uint8_t		uiChromaQp;
-uint8_t		uiSliceIdc;	// AVC: pFirstMbInSlice?; SVC: (pFirstMbInSlice << 7) | ((uiDependencyId << 4) | uiQualityId);
-uint8_t		reserved_filling_bytes[1];	// filling bytes reserved to make structure aligned with 4 bytes, higher cache hit on less structure size by 2 cache lines( 2 * 64 bytes) once hit
+  uint8_t		uiLumaQp;		// uiLumaQp: pPps->iInitialQp + sSliceHeader->delta_qp + mb->dquant.
+  uint8_t		uiChromaQp;
+  uint8_t		uiSliceIdc;	// AVC: pFirstMbInSlice?; SVC: (pFirstMbInSlice << 7) | ((uiDependencyId << 4) | uiQualityId);
+  uint8_t		reserved_filling_bytes[1];	// filling bytes reserved to make structure aligned with 4 bytes, higher cache hit on less structure size by 2 cache lines( 2 * 64 bytes) once hit
 } SMB, *PMb;
 
 }
