@@ -60,7 +60,7 @@ typedef struct {
   int32_t iHeight;
   int32_t iBlock8x8Width;
   int32_t iBlock8x8Height;
-  uint8_t* pRefY; 
+  uint8_t* pRefY;
   uint8_t* pCurY;
   int32_t iRefStride;
   int32_t iCurStride;
