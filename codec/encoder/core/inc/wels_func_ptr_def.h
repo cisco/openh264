@@ -146,7 +146,7 @@ typedef int32_t (*PIntraPred8x8Combined3Func) (uint8_t*, int32_t, uint8_t*, int3
 typedef uint32_t (*PSampleSadHor8Func) (uint8_t*, int32_t, uint8_t*, int32_t, uint16_t*, int32_t*);
 typedef void (*PMotionSearchFunc) (SWelsFuncPtrList* pFuncList, void* pCurDqLayer, void* pMe,
                                    void* pSlice);
-typedef void (*PSearchMethodFunc) (SWelsFuncPtrList* pFuncList, void* pMe, void* pSlice, const int32_t kiEncStride,
+typedef void (*PSearchMethodFunc) (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlice, const int32_t kiEncStride,
                                    const int32_t kiRefStride);
 typedef void (*PCalculateSatdFunc) (PSampleSadSatdCostFunc pSatd, void* vpMe, const int32_t kiEncStride,
                                     const int32_t kiRefStride);
