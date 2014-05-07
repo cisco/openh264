@@ -138,13 +138,6 @@ typedef enum {
 //-----------------------------------------------------------------//
 //  Algorithm parameters define
 //-----------------------------------------------------------------//
-typedef struct {
-  SRect sMaskRect;
-  bool bMaskInfoAvailable;
-  int iScrollMvX;
-  int iScrollMvY;
-  bool bScrollDetectFlag; // 0:false ; 1:ltr; 2: scene change
-} SScrollDetectionParam;
 
 typedef enum {
   SIMILAR_SCENE,   //similar scene
@@ -159,11 +152,20 @@ typedef enum {
   BLOCK_STATIC_IDC_ALL,
 } EStaticBlockIdc;
 
+typedef struct{
+  SRect sMaskRect;
+  bool bMaskInfoAvailable;
+  int iScrollMvX;
+  int iScrollMvY;
+  bool bScrollDetectFlag; // 0:false ; 1:ltr; 2: scene change
+} SScrollDetectionParam;
+
 typedef struct {
   ESceneChangeIdc eSceneChangeIdc; // SIMILAR_SCENE, MEDIUM_CHANGED_SCENE, LARGE_CHANGED_SCENE
   int             iMotionBlockNum; // Number of motion blocks
   int             iFrameComplexity; // frame complexity
-  unsigned char* pStaticBlockIdc;   // static block idc
+  unsigned char * pStaticBlockIdc;  // static block idc
+  SScrollDetectionParam sScrollResult; //results from scroll detection
 } SSceneChangeResult;
 
 typedef struct {
@@ -217,12 +219,6 @@ typedef enum {
 } EComplexityAnalysisMode;
 
 typedef struct {
-  int iScrollMvX;
-  int iScrollMvY;
-  bool bScrollDetectFlag; // 0:false ; 1:ltr; 2: scene change
-} SScrollDetectionResult;
-
-typedef struct {
   int  iComplexityAnalysisMode;
   int  iCalcBgd;
   int  iMbNumInGom;
@@ -240,7 +236,7 @@ typedef struct {
   int  iGomNumInFrame;
   int  iFrameComplexity;
   int  iIdrFlag;
-  SScrollDetectionResult sScrollResult;
+  SScrollDetectionParam sScrollResult;
 } SComplexityAnalysisScreenParam;
 /////////////////////////////////////////////////////////////////////////////////////////////
 

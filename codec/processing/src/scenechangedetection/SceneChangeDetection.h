@@ -72,8 +72,9 @@ class CSceneChangeDetectorVideo {
   }
   virtual ~CSceneChangeDetectorVideo() {
   }
-  void operator() (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY, uint8_t*& pStaticBlockIdc) {
-    int32_t iSad = m_pfSad (pSrcY, iSrcStrideY, pRefY, iSrcStrideY);
+  void operator() (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY, uint8_t *& pStaticBlockIdc,
+    int32_t iBlockPointX, int32_t iBlockPointY,int32_t iWidth,int32_t iHeight ,SSceneChangeResult m_sSceneChangeParam) {
+    int32_t iSad = m_pfSad(pSrcY, iSrcStrideY, pRefY, iRefStrideY);
     m_sParam.iMotionBlockNum += iSad > HIGH_MOTION_BLOCK_THRESHOLD;
   }
  protected:
@@ -88,15 +89,33 @@ class CSceneChangeDetectorScreen : public CSceneChangeDetectorVideo {
   }
   virtual ~CSceneChangeDetectorScreen() {
   }
-  void operator() (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY, uint8_t*& pStaticBlockIdc) {
-    int32_t iSad = m_pfSad (pSrcY, iSrcStrideY, pRefY, iSrcStrideY);
-    if (iSad == 0) {
-      *pStaticBlockIdc ++ = COLLOCATED_STATIC;
+  void operator() (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY, uint8_t *& pStaticBlockIdc,
+    int32_t iBlockPointX, int32_t iBlockPointY,int32_t iWidth,int32_t iHeight ,SSceneChangeResult m_sSceneChangeParam) {
+    bool bScrollDetectFlag =  m_sSceneChangeParam.sScrollResult.bScrollDetectFlag;
+    int32_t iScrollMvX = m_sSceneChangeParam.sScrollResult.iScrollMvX;
+    int32_t iScrollMvY = m_sSceneChangeParam.sScrollResult.iScrollMvY;
+    uint8_t uiBlockIdcTmp = NO_STATIC;
+
+    int32_t iSad = m_pfSad(pSrcY, iSrcStrideY, pRefY, iRefStrideY);
+
+    if( iSad == 0 ){
+      uiBlockIdcTmp = COLLOCATED_STATIC;
+    } else if (bScrollDetectFlag && (!iScrollMvX||!iScrollMvY) && (iBlockPointX+iScrollMvX >= 0) && (iBlockPointX+iScrollMvX <=iWidth-8) &&
+      (iBlockPointY+iScrollMvY >= 0) && (iBlockPointY+iScrollMvY <=iHeight-8)){
+        uint8_t* pRefTmpY =  pRefY + iScrollMvY * iRefStrideY + iScrollMvX;
+        int32_t iSadScroll = m_pfSad(pSrcY, iSrcStrideY, pRefTmpY, iRefStrideY);
+
+        if ( iSadScroll == 0 ){
+          uiBlockIdcTmp = SCROLLED_STATIC;
+        } else{
+          m_sParam.iFrameComplexity += iSad;
+          m_sParam.iMotionBlockNum += iSad > HIGH_MOTION_BLOCK_THRESHOLD;
+        }
     } else {
       m_sParam.iFrameComplexity += iSad;
       m_sParam.iMotionBlockNum += iSad > HIGH_MOTION_BLOCK_THRESHOLD;
-      *pStaticBlockIdc ++ = NO_STATIC;
     }
+    *pStaticBlockIdc ++ = uiBlockIdcTmp;
   }
 };
 
@@ -146,7 +165,9 @@ class CSceneChangeDetection : public IStrategy {
       pCurTmp   = pCurY;
 
       for (int32_t i = 0; i < iBlock8x8Width; i++) {
-        m_cDetector (pRefTmp, iRefStride, pCurTmp, iCurStride, pStaticBlockIdc);
+        int32_t iBlockPointX = i << 3;
+        int32_t iBlockPointY = j << 3;
+        m_cDetector(pRefTmp, iRefStride, pCurTmp, iCurStride, pStaticBlockIdc, iBlockPointX, iBlockPointY,iWidth,iHeight,m_sSceneChangeParam);
         pRefTmp += 8;
         pCurTmp += 8;
       }
