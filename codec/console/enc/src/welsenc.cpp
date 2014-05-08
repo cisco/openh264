@@ -72,7 +72,7 @@
 #include "mt_defs.h"
 #include "WelsThreadLib.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifdef WINAPI_FAMILY
 #include <winapifamily.h>
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
@@ -81,7 +81,7 @@
 #else /* defined(WINAPI_FAMILY) */
 #define HAVE_PROCESS_AFFINITY
 #endif
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 #include <iostream>
 using namespace std;
