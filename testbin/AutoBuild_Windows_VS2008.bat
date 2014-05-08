@@ -24,7 +24,7 @@ rem call VP build
 echo "Welsvp Building....."
 cd %VPProjectDir%
 rem vcclean
-%VCBUILDEXE% WelsVP_2008.vcproj
+%VCBUILDEXE% WelsVP.vcproj
 
 
 rem ************************************************
