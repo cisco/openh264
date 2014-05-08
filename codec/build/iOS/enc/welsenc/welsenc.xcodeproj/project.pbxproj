@@ -123,7 +123,6 @@
 		4CE446C918BC605C0017DF25 /* slice_multi_threading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slice_multi_threading.h; sourceTree = "<group>"; };
 		4CE446CA18BC605C0017DF25 /* stat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stat.h; sourceTree = "<group>"; };
 		4CE446CB18BC605C0017DF25 /* svc_base_layer_md.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = svc_base_layer_md.h; sourceTree = "<group>"; };
-		4CE446CC18BC605C0017DF25 /* svc_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = svc_config.h; sourceTree = "<group>"; };
 		4CE446CD18BC605C0017DF25 /* svc_enc_frame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = svc_enc_frame.h; sourceTree = "<group>"; };
 		4CE446CE18BC605C0017DF25 /* svc_enc_golomb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = svc_enc_golomb.h; sourceTree = "<group>"; };
 		4CE446CF18BC605C0017DF25 /* svc_enc_macroblock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = svc_enc_macroblock.h; sourceTree = "<group>"; };
@@ -315,7 +314,6 @@
 				4CE446C918BC605C0017DF25 /* slice_multi_threading.h */,
 				4CE446CA18BC605C0017DF25 /* stat.h */,
 				4CE446CB18BC605C0017DF25 /* svc_base_layer_md.h */,
-				4CE446CC18BC605C0017DF25 /* svc_config.h */,
 				4CE446CD18BC605C0017DF25 /* svc_enc_frame.h */,
 				4CE446CE18BC605C0017DF25 /* svc_enc_golomb.h */,
 				4CE446CF18BC605C0017DF25 /* svc_enc_macroblock.h */,
