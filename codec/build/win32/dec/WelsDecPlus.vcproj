@@ -53,7 +53,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc"
+				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc"
 				PreprocessorDefinitions="NDEBUG;_USRDLL;X86_ASM"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -153,7 +153,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc"
+				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc"
 				PreprocessorDefinitions="NDEBUG;_USRDLL;X86_ASM"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -252,7 +252,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc"
+				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc"
 				PreprocessorDefinitions="_DEBUG;_USRDLL;X86_ASM"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -349,7 +349,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc"
+				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc"
 				PreprocessorDefinitions="_DEBUG;_USRDLL;X86_ASM"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -432,7 +432,7 @@
 						<Tool
 							Name="VCResourceCompilerTool"
 							PreprocessorDefinitions=""
-							AdditionalIncludeDirectories="\SVN_project_https\trunk\codec\Wels\project\decoder\plus\res"
+							AdditionalIncludeDirectories=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -441,7 +441,7 @@
 						<Tool
 							Name="VCResourceCompilerTool"
 							PreprocessorDefinitions=""
-							AdditionalIncludeDirectories="\SVN_project_https\trunk\codec\Wels\project\decoder\plus\res"
+							AdditionalIncludeDirectories=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -450,7 +450,7 @@
 						<Tool
 							Name="VCResourceCompilerTool"
 							PreprocessorDefinitions=""
-							AdditionalIncludeDirectories="\SVN_project_https\trunk\codec\Wels\project\decoder\plus\res"
+							AdditionalIncludeDirectories=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -459,7 +459,7 @@
 						<Tool
 							Name="VCResourceCompilerTool"
 							PreprocessorDefinitions=""
-							AdditionalIncludeDirectories="\SVN_project_https\trunk\codec\Wels\project\decoder\plus\res"
+							AdditionalIncludeDirectories=""
 						/>
 					</FileConfiguration>
 				</File>

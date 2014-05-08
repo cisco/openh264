@@ -585,7 +585,7 @@
 					<Tool
 						Name="VCResourceCompilerTool"
 						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="\Project\svc_perf_opt_b\codec\Wels\project\encoder\plus\res"
+						AdditionalIncludeDirectories=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -594,7 +594,7 @@
 					<Tool
 						Name="VCResourceCompilerTool"
 						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="\Project\svc_perf_opt_b\codec\Wels\project\encoder\plus\res"
+						AdditionalIncludeDirectories=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -603,7 +603,7 @@
 					<Tool
 						Name="VCResourceCompilerTool"
 						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="\Project\svc_perf_opt_b\codec\Wels\project\encoder\plus\res"
+						AdditionalIncludeDirectories=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -612,7 +612,7 @@
 					<Tool
 						Name="VCResourceCompilerTool"
 						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="\Project\svc_perf_opt_b\codec\Wels\project\encoder\plus\res"
+						AdditionalIncludeDirectories=""
 					/>
 				</FileConfiguration>
 			</File>
