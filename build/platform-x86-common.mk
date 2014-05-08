@@ -17,7 +17,7 @@ ASMFLAGS_PLATFORM = -DX86_32
 endif
 ifeq ($(USE_ASM),Yes)
 CFLAGS += -DX86_ASM
-endif
 ASM_ARCH = x86
+endif
 ASM = nasm
 ASMFLAGS += $(ASMFLAGS_PLATFORM)
