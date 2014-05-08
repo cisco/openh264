@@ -3,13 +3,10 @@ ifeq ($(ASM_ARCH), x86)
 ifeq ($(ENABLE64BIT), Yes)
 ASMFLAGS += -f win64
 ASMFLAGS_PLATFORM = -DWIN64
-CFLAGS += -DWIN64
 else
 ASMFLAGS += -f win32 -DPREFIX
-CFLAGS += -DWIN32
 endif
 else
-CFLAGS += -DWIN32
 endif
 ifeq ($(ASM_ARCH), arm)
 CCAS = gas-preprocessor.pl -as-type armasm -force-thumb -- armasm
