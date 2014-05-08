@@ -405,18 +405,18 @@ bool CheckAccessUnitBoundary (PWelsDecoderContext pCtx, const PNalUnit kpCurNal,
   const PNalUnitHeaderExt kpCurNalHeaderExt = &kpCurNal->sNalHeaderExt;
   const SSliceHeader* kpLastSliceHeader = &kpLastNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
   const SSliceHeader* kpCurSliceHeader = &kpCurNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
-
+  if (pCtx->pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != NULL
+      && pCtx->pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != kpSps) {
+    pCtx->bNextNewSeqBegin = true;
+    return true; // the active sps changed, new sequence begins, so the current au is ready
+  }
+ 
   //Sub-clause 7.1.4.1.1 temporal_id
   if (kpLastNalHeaderExt->uiTemporalId != kpCurNalHeaderExt->uiTemporalId) {
     return true;
   }
   if (kpLastSliceHeader->iFrameNum != kpCurSliceHeader->iFrameNum)
     return true;
-  if (pCtx->pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != NULL
-      && pCtx->pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != kpSps) {
-    pCtx->bNextNewSeqBegin = true;
-    return true; // the active sps changed, new sequence begins, so the current au is ready
-  }
   // Subclause 7.4.1.2.5
   if (kpLastSliceHeader->iRedundantPicCnt > kpCurSliceHeader->iRedundantPicCnt)
     return true;
