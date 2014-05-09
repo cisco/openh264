@@ -493,7 +493,8 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
 #endif
     iErr = ParseSps (pCtx, pBs, &iPicWidth, &iPicHeight);
     if (ERR_NONE != iErr) {	// modified for pSps/pSubsetSps invalid, 12/1/2009
-      pCtx->iErrorCode |= dsNoParamSets;
+      if (pCtx->iErrorConMethod == ERROR_CON_DISABLE)
+        pCtx->iErrorCode |= dsNoParamSets;
       return iErr;
     }
 
@@ -507,7 +508,8 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
 #endif
     iErr = ParsePps (pCtx, &pCtx->sPpsBuffer[0], pBs);
     if (ERR_NONE != iErr) {	// modified for pps invalid, 12/1/2009
-      pCtx->iErrorCode |= dsNoParamSets;
+      if (pCtx->iErrorConMethod == ERROR_CON_DISABLE)
+        pCtx->iErrorCode |= dsNoParamSets;
       return iErr;
     }
 
