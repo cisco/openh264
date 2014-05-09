@@ -62,7 +62,6 @@
 				ObjectFile=".\..\..\..\obj\encoder\core\Debug/"
 				ProgramDataBaseFileName=".\..\..\..\obj\encoder\core\Debug/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -79,7 +78,6 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="$(OutDir)\welsecore.lib"
-				SuppressStartupBanner="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -89,7 +87,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile="$(OutDir)\WelsEncCore.bsc"
 			/>
 			<Tool
@@ -142,7 +139,6 @@
 				ObjectFile=".\..\..\..\obj\encoder\core\Debug/"
 				ProgramDataBaseFileName=".\..\..\..\obj\encoder\core\Debug/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -159,7 +155,6 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="$(OutDir)\welsecore.lib"
-				SuppressStartupBanner="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -169,7 +164,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile="$(OutDir)\WelsEncCore.bsc"
 			/>
 			<Tool
@@ -224,7 +218,6 @@
 				ObjectFile=".\..\..\..\obj\encoder\core\Release/"
 				ProgramDataBaseFileName=".\..\..\..\obj\encoder\core\Release/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -242,7 +235,6 @@
 				Name="VCLibrarianTool"
 				AdditionalOptions="/LTCG"
 				OutputFile="$(OutDir)\welsecore.lib"
-				SuppressStartupBanner="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -252,7 +244,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile="$(OutDir)\WelsEncCore.bsc"
 			/>
 			<Tool
@@ -308,7 +299,6 @@
 				ObjectFile=".\..\..\..\obj\encoder\core\Release/"
 				ProgramDataBaseFileName=".\..\..\..\obj\encoder\core\Release/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -326,7 +316,6 @@
 				Name="VCLibrarianTool"
 				AdditionalOptions="/LTCG"
 				OutputFile="$(OutDir)\welsecore.lib"
-				SuppressStartupBanner="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -336,7 +325,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile="$(OutDir)\WelsEncCore.bsc"
 			/>
 			<Tool

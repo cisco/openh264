@@ -44,7 +44,6 @@
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
 				MkTypLibCompatible="true"
-				SuppressStartupBanner="true"
 				TargetEnvironment="1"
 				TypeLibraryName=".\..\..\..\..\..\bin\Debug/WelsEncPlus.tlb"
 				HeaderFileName=""
@@ -62,7 +61,6 @@
 				ObjectFile=".\..\..\..\obj\encoder\plus\Debug/"
 				ProgramDataBaseFileName=".\..\..\..\obj\encoder\plus\Debug/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -81,7 +79,6 @@
 				AdditionalDependencies="$(OutDir)\welsecore.lib"
 				OutputFile="$(OutDir)\welsenc.dll"
 				LinkIncremental="2"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\libs"
 				ModuleDefinitionFile="..\..\..\encoder\plus\src\wels_enc_export.def"
 				GenerateDebugInformation="true"
@@ -104,7 +101,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile="$(OutDir)/WelsEncPlus.bsc"
 			/>
 			<Tool
@@ -143,7 +139,6 @@
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
 				MkTypLibCompatible="true"
-				SuppressStartupBanner="true"
 				TargetEnvironment="3"
 				TypeLibraryName=".\..\..\..\..\..\bin\Debug/WelsEncPlus.tlb"
 				HeaderFileName=""
@@ -161,7 +156,6 @@
 				ObjectFile=".\..\..\..\obj\encoder\plus\Debug/"
 				ProgramDataBaseFileName=".\..\..\..\obj\encoder\plus\Debug/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -180,7 +174,6 @@
 				AdditionalDependencies="$(OutDir)\welsecore.lib"
 				OutputFile="$(OutDir)\welsenc.dll"
 				LinkIncremental="2"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\libs"
 				ModuleDefinitionFile="..\..\..\encoder\plus\src\wels_enc_export.def"
 				GenerateDebugInformation="true"
@@ -203,7 +196,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile="$(OutDir)/WelsEncPlus.bsc"
 			/>
 			<Tool
@@ -242,7 +234,6 @@
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
 				MkTypLibCompatible="true"
-				SuppressStartupBanner="true"
 				TargetEnvironment="1"
 				TypeLibraryName=".\..\..\..\..\..\bin\Release/WelsEncPlus.tlb"
 				HeaderFileName=""
@@ -264,7 +255,6 @@
 				ObjectFile=".\..\..\..\obj\encoder\plus\Release/"
 				ProgramDataBaseFileName=".\..\..\..\obj\encoder\plus\Release/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -284,7 +274,6 @@
 				AdditionalDependencies="$(OutDir)\welsecore.lib"
 				OutputFile="$(OutDir)\welsenc.dll"
 				LinkIncremental="1"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\libs"
 				ModuleDefinitionFile="..\..\..\encoder\plus\src\wels_enc_export.def"
 				GenerateDebugInformation="true"
@@ -308,7 +297,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile="$(OutDir)/WelsEncPlus.bsc"
 			/>
 			<Tool
@@ -347,7 +335,6 @@
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
 				MkTypLibCompatible="true"
-				SuppressStartupBanner="true"
 				TargetEnvironment="3"
 				TypeLibraryName=".\..\..\..\..\..\bin\Release/WelsEncPlus.tlb"
 				HeaderFileName=""
@@ -369,7 +356,6 @@
 				ObjectFile=".\..\..\..\obj\encoder\plus\Release/"
 				ProgramDataBaseFileName=".\..\..\..\obj\encoder\plus\Release/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -389,7 +375,6 @@
 				AdditionalDependencies="$(OutDir)\welsecore.lib"
 				OutputFile="$(OutDir)\welsenc.dll"
 				LinkIncremental="1"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\libs"
 				ModuleDefinitionFile="..\..\..\encoder\plus\src\wels_enc_export.def"
 				GenerateDebugInformation="true"
@@ -413,7 +398,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile="$(OutDir)/WelsEncPlus.bsc"
 			/>
 			<Tool
