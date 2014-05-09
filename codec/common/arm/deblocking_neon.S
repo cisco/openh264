@@ -58,13 +58,16 @@
 
 
 .macro	DIFF_LUMA_LT4_P1_Q1
-    vabd.u8	$9, $0, $2
-    vclt.u8	$9, $9, $4
+    vmov.i8 $9, #128
     vrhadd.u8	$8, $2, $3
     vhadd.u8	$8, $0, $8
-    vsub.s8	$8, $8, $1
+    vsub.s8	$8, $8, $9
+    vsub.s8	$9, $1, $9
+    vqsub.s8	$8, $8, $9
     vmax.s8	$8, $8, $5
     vmin.s8	$8, $8, $6
+    vabd.u8	$9, $0, $2
+    vclt.u8	$9, $9, $4
     vand.s8	$8, $8, $9
     vand.s8	$8, $8, $7
     vadd.u8	$8, $1, $8
@@ -76,7 +79,7 @@
     vsubl.u8	$6, $2, $1
     vshl.s16	$6, $6, #2
     vadd.s16	$5, $5, $6
-    vrshrn.s16		$4, $5, #3
+    vqrshrn.s16		$4, $5, #3
 .endm
 
 .macro	DIFF_LUMA_EQ4_P2P1P0
@@ -172,13 +175,16 @@
 .endm
 
 .macro	DIFF_LUMA_LT4_P1_Q1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
-    vabd.u8	\arg9, \arg0, \arg2
-    vclt.u8	\arg9, \arg9, \arg4
+    vmov.i8 \arg9, #128
     vrhadd.u8	\arg8, \arg2, \arg3
     vhadd.u8	\arg8, \arg0, \arg8
-    vsub.s8	\arg8, \arg8, \arg1
+    vsub.s8	\arg8, \arg8, \arg9
+    vsub.s8	\arg9, \arg1, \arg9
+    vqsub.s8    \arg8, \arg8, \arg9
     vmax.s8	\arg8, \arg8, \arg5
     vmin.s8	\arg8, \arg8, \arg6
+    vabd.u8	\arg9, \arg0, \arg2
+    vclt.u8	\arg9, \arg9, \arg4
     vand.s8	\arg8, \arg8, \arg9
     vand.s8	\arg8, \arg8, \arg7
     vadd.u8	\arg8, \arg1, \arg8
@@ -190,7 +196,7 @@
     vsubl.u8	\arg6, \arg2, \arg1
     vshl.s16	\arg6, \arg6, #2
     vadd.s16	\arg5, \arg5, \arg6
-    vrshrn.s16		\arg4, \arg5, #3
+    vqrshrn.s16		\arg4, \arg5, #3
 .endm
 
 
