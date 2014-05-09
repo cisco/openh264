@@ -152,7 +152,7 @@ typedef enum {
   BLOCK_STATIC_IDC_ALL,
 } EStaticBlockIdc;
 
-typedef struct{
+typedef struct {
   SRect sMaskRect;
   bool bMaskInfoAvailable;
   int iScrollMvX;
@@ -164,7 +164,7 @@ typedef struct {
   ESceneChangeIdc eSceneChangeIdc; // SIMILAR_SCENE, MEDIUM_CHANGED_SCENE, LARGE_CHANGED_SCENE
   int             iMotionBlockNum; // Number of motion blocks
   int             iFrameComplexity; // frame complexity
-  unsigned char * pStaticBlockIdc;  // static block idc
+  unsigned char* pStaticBlockIdc;   // static block idc
   SScrollDetectionParam sScrollResult; //results from scroll detection
 } SSceneChangeResult;
 
