@@ -1002,16 +1002,16 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
     bIsClosestLtrFrame = (pRefPic->iLongTermPicNum == iClosestLtrFrameNum);
     if (0 == iScdIdx) {
       int32_t ret = 1;
-      SScrollDetectionParam* sScrollDetectInfo = & (pVaaExt->sScrollDetectInfo);
-      memset (sScrollDetectInfo, 0, sizeof (SScrollDetectionParam));
+      SScrollDetectionParam* pScrollDetectInfo = & (pVaaExt->sScrollDetectInfo);
+      memset (pScrollDetectInfo, 0, sizeof (SScrollDetectionParam));
 
       int32_t iMethodIdx = METHOD_SCROLL_DETECTION;
 
-      m_pInterfaceVp->Set (iMethodIdx, (void*) (sScrollDetectInfo));
+      m_pInterfaceVp->Set (iMethodIdx, (void*) (pScrollDetectInfo));
       ret = m_pInterfaceVp->Process (iMethodIdx, &sSrcMap, &sRefMap);
 
       if (ret == 0) {
-        m_pInterfaceVp->Get (iMethodIdx, (void*) (sScrollDetectInfo));
+        m_pInterfaceVp->Get (iMethodIdx, (void*) (pScrollDetectInfo));
       }
       sSceneChangeResult.sScrollResult = pVaaExt->sScrollDetectInfo;
     }
