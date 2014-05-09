@@ -253,9 +253,8 @@ bool WelsMeSadCostSelect (int32_t* iSadCost, const uint16_t* kpMvdCost, int32_t*
   return (*pBestCost == iInputSadCost);
 }
 
-void WelsDiamondSearch (SWelsFuncPtrList* pFuncList, void* pLpme, void* pLpslice,
+void WelsDiamondSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlice,
                         const int32_t kiStrideEnc,  const int32_t kiStrideRef) {
-  SWelsME* pMe            = (SWelsME*)pLpme;
   PSample4SadCostFunc      pSad          =  pFuncList->sSampleDealingFuncs.pfSample4Sad[pMe->uiBlockSize];
 
   uint8_t* pFref = pMe->pRefMb;
@@ -917,13 +916,10 @@ void UpdateFMESwitchNull (SDqLayer* pCurLayer) {
 /////////////////////////
 // Search function options
 /////////////////////////
-void WelsDiamondCrossSearch (SWelsFuncPtrList* pFunc, void* vpMe, void* vpSlice, const int32_t kiEncStride,
+void WelsDiamondCrossSearch (SWelsFuncPtrList* pFunc, SWelsME* pMe, SSlice* pSlice, const int32_t kiEncStride,
                              const int32_t kiRefStride) {
-  SWelsME* pMe       = static_cast<SWelsME*> (vpMe);
-  SSlice* pSlice         = static_cast<SSlice*> (vpSlice);
-
   //  Step 1: diamond search
-  WelsDiamondSearch (pFunc, vpMe, vpSlice, kiEncStride, kiRefStride);
+  WelsDiamondSearch (pFunc, pMe, pSlice, kiEncStride, kiRefStride);
 
   //  Step 2: CROSS search
   SScreenBlockFeatureStorage pRefBlockFeature; //TODO: use this structure from Ref
@@ -932,11 +928,8 @@ void WelsDiamondCrossSearch (SWelsFuncPtrList* pFunc, void* vpMe, void* vpSlice,
     WelsMotionCrossSearch (pFunc, pMe, pSlice, kiEncStride, kiRefStride);
   }
 }
-void WelsDiamondCrossFeatureSearch (SWelsFuncPtrList* pFunc, void* vpMe, void* vpSlice, const int32_t kiEncStride,
+void WelsDiamondCrossFeatureSearch (SWelsFuncPtrList* pFunc, SWelsME* pMe, SSlice* pSlice, const int32_t kiEncStride,
                                     const int32_t kiRefStride) {
-  SWelsME* pMe       = static_cast<SWelsME*> (vpMe);
-  SSlice* pSlice         = static_cast<SSlice*> (vpSlice);
-
   //  Step 1: diamond search + cross
   WelsDiamondCrossSearch (pFunc, pMe, pSlice, kiEncStride, kiRefStride);
 
