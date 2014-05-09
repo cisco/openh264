@@ -15,7 +15,6 @@ PREFIX=/usr/local
 SHARED=-shared
 OBJ=o
 PROJECT_NAME=openh264
-PLUGIN_NAME=plugin
 
 ifeq (,$(wildcard ./gtest))
 HAVE_GTEST=No
@@ -42,9 +41,6 @@ include build/platform-$(OS).mk
 
 CFLAGS +=
 LDFLAGS +=
-
-FIREFOX_DIR=/Users/emannion/code/git/gecko_dev/gecko-dev-plugin/gecko-dev
-FIREFOX_OBJ=/Users/emannion/code/git/gecko_dev/gecko-dev-plugin/gecko-dev/obj-x86_64-apple-darwin12.5.0
 
 ifeq (Yes, $(GCOV))
 CFLAGS += -fprofile-arcs -ftest-coverage
@@ -100,15 +96,12 @@ DECODER_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(DECODER_INCLUDES) -Ites
 ENCODER_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(ENCODER_INCLUDES) -Itest -Itest/encoder
 PROCESSING_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(PROCESSING_INCLUDES) -Itest -Itest/processing
 API_TEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) -Itest -Itest/api
-
-MODULE_INCLUDES = -I$(FIREFOX_DIR)/content/media/gmp/gmp-api -I$(FIREFOX_OBJ)/dist/include/nspr $(ENCODER_INCLUDES) $(DECODER_INCLUDES)
-
 .PHONY: test gtest-bootstrap clean
 
 all:	libraries binaries
 
 clean:
-	$(QUIET)rm -f $(OBJS) $(OBJS:.$(OBJ)=.d) $(LIBRARIES) $(BINARIES) $(PLUGINS)
+	$(QUIET)rm -f $(OBJS) $(OBJS:.$(OBJ)=.d) $(LIBRARIES) $(BINARIES)
 
 gtest-bootstrap:
 	svn co https://googletest.googlecode.com/svn/trunk/ gtest
@@ -126,7 +119,6 @@ include codec/common/targets.mk
 include codec/decoder/targets.mk
 include codec/encoder/targets.mk
 include codec/processing/targets.mk
-include module/targets.mk
 
 ifneq (android, $(OS))
 ifneq (ios, $(OS))
@@ -163,12 +155,6 @@ endif
 
 install: install-static install-shared
 	@:
-
-plugin: $(LIBPREFIX)$(PROJECT_NAME)$(PLUGIN_NAME).$(SHAREDLIBSUFFIX)
-PLUGINS += $(LIBPREFIX)$(PROJECT_NAME)$(PLUGIN_NAME).$(SHAREDLIBSUFFIX)
-$(LIBPREFIX)$(PROJECT_NAME)$(PLUGIN_NAME).$(SHAREDLIBSUFFIX): $(MODULE_OBJS) $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
-	$(QUIET)rm -f $@
-	$(QUIET_CXX)$(CXX) $(SHARED) $(LDFLAGS) $(CXX_LINK_O) $+ $(SHLDFLAGS)
 
 ifeq ($(HAVE_GTEST),Yes)
 include build/gtest-targets.mk

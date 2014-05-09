@@ -1,6 +1,6 @@
 include build/platform-x86-common.mk
 SHAREDLIBSUFFIX = dll
-CFLAGS += -MMD -MP -std=c++11
+CFLAGS += -MMD -MP
 LDFLAGS +=
 ifeq ($(ENABLE64BIT), Yes)
 ASMFLAGS += -f win64
