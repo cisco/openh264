@@ -170,7 +170,6 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
            << codecSettings.mMinBitrate
            << "; Max: "
            << codecSettings.mMaxBitrate);
-    
     param.iRCMode = RC_BITRATE_MODE;
 
     // TODO(ekr@rtfm.com). Scary conversion from unsigned char to float below.
@@ -367,7 +366,6 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
   }
 
   virtual GMPVideoErr SetChannelParameters(uint32_t aPacketLoss, uint32_t aRTT) override {
-    printf("%s\n", __PRETTY_FUNCTION__);
     return GMPVideoNoErr;
   }
 
@@ -408,7 +406,6 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
         return GMPVideoGenericErr;
       }
     }
-    
     //update framerate if needed
     float existFrameRate = 0;
     rv = encoder_->GetOption(ENCODER_OPTION_FRAME_RATE, &existFrameRate);
@@ -430,12 +427,10 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
         return GMPVideoGenericErr;
       }
     }
-    
     return GMPVideoNoErr;
   }
 
   virtual GMPVideoErr SetPeriodicKeyFrames(bool aEnable) override {
-    printf("%s\n", __PRETTY_FUNCTION__);
     return GMPVideoNoErr;
   }
 
