@@ -350,6 +350,18 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& sParam) {
     else if (!strcmp (pCmd, "-ltrper") && (i < argc))
       sParam.iLtrMarkPeriod = atoi (argv[i++]);
 
+    else if (!strcmp (pCmd, "-threadIdc") && (i < argc))
+      sParam.iMultipleThreadIdc= atoi (argv[i++]);
+
+    else if (!strcmp (pCmd, "-deblockIdc") && (i < argc))
+      sParam.iLoopFilterDisableIdc = atoi (argv[i++]);
+
+    else if (!strcmp (pCmd, "-alphaOffset") && (i < argc))
+      sParam.iLoopFilterAlphaC0Offset = atoi (argv[i++]);
+
+    else if (!strcmp (pCmd, "-betaOffset") && (i < argc))
+      sParam.iLoopFilterBetaOffset = atoi (argv[i++]);
+
     else if (!strcmp (pCmd, "-rcm") && (i < argc))
       sParam.iRCMode = (RC_MODES) atoi (argv[i++]);
 
@@ -395,6 +407,10 @@ void PrintHelp() {
   printf ("  -aq     Control adaptive quantization (default: 0)\n");
   printf ("  -ltr    Control long term reference (default: 0)\n");
   printf ("  -ltrnum Control the number of long term reference((1-4):screen LTR,(1-2):video LTR \n");
+  printf ("  -threadIdc 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads \n");
+  printf ("  -deblockIdc Loop filter idc (0: on, 1: off, \n");
+  printf ("  -alphaOffset AlphaOffset(-6..+6): valid range \n");
+  printf ("  -betaOffset BetaOffset (-6..+6): valid range\n");
   printf ("  -rc	  rate control mode: 0-quality mode; 1-bitrate mode; 2-bitrate limited mode; -1-rc off \n");
   printf ("  -tarb	  Overall target bitrate\n");
   printf ("  -numl   Number Of Layers: Must exist with layer_cfg file and the number of input layer_cfg file must equal to the value set by this command\n");
@@ -468,6 +484,18 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
 
     else if (!strcmp (pCommand, "-ltrper") && (n < argc))
       pSvcParam.iLtrMarkPeriod = atoi (argv[n++]);
+
+    else if (!strcmp (pCommand, "-threadIdc") && (n < argc))
+      pSvcParam.iMultipleThreadIdc= atoi (argv[n++]);
+
+    else if (!strcmp (pCommand, "-deblockIdc") && (n < argc))
+      pSvcParam.iLoopFilterDisableIdc = atoi (argv[n++]);
+
+    else if (!strcmp (pCommand, "-alphaOffset") && (n < argc))
+      pSvcParam.iLoopFilterAlphaC0Offset = atoi (argv[n++]);
+
+    else if (!strcmp (pCommand, "-betaOffset") && (n < argc))
+      pSvcParam.iLoopFilterBetaOffset = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-rc") && (n < argc))
       pSvcParam.iRCMode = static_cast<RC_MODES> (atoi (argv[n++]));
