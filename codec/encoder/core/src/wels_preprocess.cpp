@@ -177,6 +177,12 @@ int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePi
   if (!m_bInitDone) {
     if (WelsPreprocessCreate() != 0)
       return -1;
+
+    //init source width and height
+    pSvcParam->SUsedPicRect.iLeft = 0;
+    pSvcParam->SUsedPicRect.iTop  = 0;
+    pSvcParam->SUsedPicRect.iWidth = ((kpSrcPic->iPicWidth >> 1) << 1);
+    pSvcParam->SUsedPicRect.iHeight = ((kpSrcPic->iPicHeight >> 1) << 1);
     if (WelsPreprocessReset (pCtx) != 0)
       return -1;
 
