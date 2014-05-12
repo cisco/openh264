@@ -53,7 +53,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc"
+				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc"
 				PreprocessorDefinitions="NDEBUG;_LIB;X86_ASM"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -63,7 +63,6 @@
 				ObjectFile=".\..\..\..\obj\decoder\core\release/"
 				ProgramDataBaseFileName=".\..\..\..\obj\decoder\core\release/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="0"
 			/>
 			<Tool
@@ -80,7 +79,6 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="$(OutDir)\welsdcore.lib"
-				SuppressStartupBanner="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -90,7 +88,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile=".\..\..\..\..\bin\win32\Release/WelsDecCore.bsc"
 			/>
 			<Tool
@@ -133,7 +130,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc"
+				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc"
 				PreprocessorDefinitions="NDEBUG;_LIB;X86_ASM"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -143,7 +140,6 @@
 				ObjectFile=".\..\..\..\obj\decoder\core\release/"
 				ProgramDataBaseFileName=".\..\..\..\obj\decoder\core\release/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="0"
 			/>
 			<Tool
@@ -160,7 +156,6 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="$(OutDir)\welsdcore.lib"
-				SuppressStartupBanner="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -170,7 +165,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile=".\..\..\..\..\bin\win32\Release/WelsDecCore.bsc"
 			/>
 			<Tool
@@ -211,7 +205,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc"
+				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc"
 				PreprocessorDefinitions="_DEBUG;_LIB;X86_ASM"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -221,7 +215,6 @@
 				ObjectFile=".\..\..\..\obj\decoder\core\debug/"
 				ProgramDataBaseFileName=".\..\..\..\obj\decoder\core\debug/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -238,7 +231,6 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="$(OutDir)\welsdcore.lib"
-				SuppressStartupBanner="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -248,7 +240,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile=".\..\..\..\..\bin\win32\Debug/WelsDecCore.bsc"
 			/>
 			<Tool
@@ -290,7 +281,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc;..\..\..\hwDecoder\core\inc;..\..\..\hwDecoder\dxva\inc"
+				AdditionalIncludeDirectories="..\..\..\decoder\core\inc;..\..\..\common\inc;..\..\..\api\svc"
 				PreprocessorDefinitions="_DEBUG;_LIB;X86_ASM"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -300,7 +291,6 @@
 				ObjectFile=".\..\..\..\obj\decoder\core\debug/"
 				ProgramDataBaseFileName=".\..\..\..\obj\decoder\core\debug/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -317,7 +307,6 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="$(OutDir)\welsdcore.lib"
-				SuppressStartupBanner="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -327,7 +316,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile=".\..\..\..\..\bin\win32\Debug/WelsDecCore.bsc"
 			/>
 			<Tool

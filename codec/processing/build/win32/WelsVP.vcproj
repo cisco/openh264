@@ -224,7 +224,7 @@
 				Optimization="3"
 				EnableIntrinsicFunctions="false"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../../../common/inc/;../../interface;../../src/common"
+				AdditionalIncludeDirectories="../../../common/inc;../../interface;../../src/common"
 				PreprocessorDefinitions="NDEBUG;_USRDLL;X86_ASM"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="false"
@@ -314,7 +314,7 @@
 				Optimization="3"
 				EnableIntrinsicFunctions="false"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../../../common/inc/;../../interface;../../src/common"
+				AdditionalIncludeDirectories="../../../common/inc;../../interface;../../src/common"
 				PreprocessorDefinitions="NDEBUG;_USRDLL;X86_ASM"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="false"
@@ -416,20 +416,6 @@
 			<File
 				RelativePath="..\..\interface\IWelsVP.h"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\common\resource.h"
