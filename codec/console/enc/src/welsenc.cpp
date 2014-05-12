@@ -212,6 +212,8 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
         pSvcParam.iTemporalLayerNum	= atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("IntraPeriod") == 0) {
         pSvcParam.uiIntraPeriod	= atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("MaxNalSize") == 0) {
+        pSvcParam.uiMaxNalSize = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("EnableSpsPpsIDAddition") == 0) {
         pSvcParam.bEnableSpsPpsIdAddition	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableScalableSEI") == 0) {
@@ -326,6 +328,9 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& sParam) {
     else if (!strcmp (pCmd, "-iper") && (i < argc))
       sParam.uiIntraPeriod = atoi (argv[i++]);
 
+    else if (!strcmp (pCmd, "-nalsize") && (i < argc))
+      sParam.uiMaxNalSize = atoi (argv[i++]);
+
     else if (!strcmp (pCmd, "-spsid") && (i < argc))
       sParam.bEnableSpsPpsIdAddition = atoi (argv[i++]) ? true : false;
 
@@ -388,6 +393,7 @@ void PrintHelp() {
   printf ("  -frms   Number of total frames to be encoded\n");
   printf ("  -gop    GOPSize - GOP size (1,2,4,8, default: 1)\n");
   printf ("  -iper   Intra period (default: -1) : must be a power of 2 of GOP size (or -1)\n");
+  printf ("  -nalsize the Maximum NAL size. which should be larger than the each layer slicesize when slice mode equals to SM_DYN_SLICE\n");
   printf ("  -spsid   Enable id adding in SPS/PPS per IDR \n");
   printf ("  -denois Control denoising  (default: 0)\n");
   printf ("  -scene  Control scene change detection (default: 0)\n");
@@ -441,6 +447,9 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
 
     else if (!strcmp (pCommand, "-iper") && (n < argc))
       pSvcParam.uiIntraPeriod = atoi (argv[n++]);
+
+    else if (!strcmp (pCommand, "-nalsize") && (n < argc))
+      pSvcParam.uiMaxNalSize = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-spsid") && (n < argc))
       pSvcParam.bEnableSpsPpsIdAddition = atoi (argv[n++]) ? true : false;
