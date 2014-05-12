@@ -2457,6 +2457,9 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
       pFeatureSearchPreparation->iHighFreMbCount = 0;
 
       if (P_SLICE == pCtx->eSliceType) {
+        //MD related func pointers
+        pFuncList->pfInterFineMd = WelsMdInterFinePartitionVaaOnScreen;
+
         //calculate bFMESwitchFlag
         SVAAFrameInfoExt* pVaaExt		= static_cast<SVAAFrameInfoExt*> (pCtx->pVaa);
         const int32_t kiMbSize = pCurLayer->iMbHeight * pCurLayer->iMbWidth;

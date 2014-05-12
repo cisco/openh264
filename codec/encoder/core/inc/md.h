@@ -66,6 +66,15 @@ namespace WelsSVCEnc {
 
 #define NO_BEST_FRAC_PIX   1 // REFINE_ME_NO_BEST_HALF_PIXEL + ME_NO_BEST_QUAR_PIXEL
 
+//for vaa constants
+#define MBVAASIGN_FLAT       15
+#define MBVAASIGN_HOR1      3
+#define MBVAASIGN_HOR2      12
+#define MBVAASIGN_VER1       5
+#define MBVAASIGN_VER2       10
+#define MBVAASIGN_CMPX1    6
+#define MBVAASIGN_CMPX2    9
+
 extern const int32_t g_kiQpCostTable[52];
 extern const int8_t g_kiMapModeI16x16[7];
 //extern const int8_t g_kiMapModeI4x4[14];
