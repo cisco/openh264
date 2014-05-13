@@ -1,6 +1,6 @@
 include build/platform-arch.mk
 SHAREDLIBSUFFIX = so
-CFLAGS += -Wall -fno-strict-aliasing -fPIC -DLINUX -MMD -MP
+CFLAGS += -Wall -fno-strict-aliasing -fPIC -MMD -MP
 LDFLAGS += -lpthread
 ifeq ($(ASM_ARCH), x86)
 ifeq ($(ENABLE64BIT), Yes)
