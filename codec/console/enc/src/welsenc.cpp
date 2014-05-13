@@ -634,6 +634,14 @@ int ProcessEncoding(ISVCEncoder* pPtrEnc, int argc, char** argv,bool bConfigFile
   memset (&fs.sRecFileName[0][0], 0, sizeof (fs.sRecFileName));
 
   FillSpecificParameters (sSvcParam);
+  pSrcPic = new SSourcePicture;
+  if (pSrcPic == NULL) {
+    iRet = 1;
+    goto INSIDE_MEM_FREE;
+  }
+  //fill default pSrcPic
+  pSrcPic->iColorFormat = videoFormatI420;
+  pSrcPic->uiTimeStamp = 0;
 
   // if configure file exit, reading configure file firstly
   if(bConfigFile){
@@ -652,14 +660,6 @@ int ProcessEncoding(ISVCEncoder* pPtrEnc, int argc, char** argv,bool bConfigFile
       goto INSIDE_MEM_FREE;
     }
   }
-  pSrcPic = new SSourcePicture;
-  if (pSrcPic == NULL) {
-    iRet = 1;
-    goto INSIDE_MEM_FREE;
-  }
-  //fill default pSrcPic
-  pSrcPic->iColorFormat = videoFormatI420;
-  pSrcPic->uiTimeStamp = 0;
 
   // if configure file exit, reading configure file firstly
   if(bConfigFile){
