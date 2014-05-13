@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="refresh" content="1;url=http://www.mpegla.com/main/programs/avc/Documents/AVC_TermsSummary.pdf">
+  <script type="text/javascript">
+      window.location.href = "http://www.mpegla.com/main/programs/avc/Documents/AVC_TermsSummary.pdf"
+  </script>
+
+<title>OpenH264</title>
+<link rel="stylesheet" type="text/css" href="css/styles.css" media="screen" />
+</head>
+<body>
+<div class="header">
+  <div class="logo"></div>
+</div>
+<div class="container">
+  <table width="950" border="0" cellspacing="0" cellpadding="0" class="table3">
+    <tr>
+      <td width="914"></td>
+      <td width="36">&nbsp;</td>
+    </tr>
+  </table>
+  <div class="clear"></div>
+  <table width="950" border="0" cellspacing="0" cellpadding="10" class="table2">
+    <tr>
+      <td width="168" align="left" valign="top"><div class="appt">
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="faq.html">FAQ</a></li>
+               
+            <li> <a href="https://github.com/cisco/openh264" target="_blank">Source Code</a></li>
+            <li> <a href="https://github.com/cisco/openh264/issues"
+            target="_blank">Issue Tracker </a></li>
+   
+            
+          </ul>
+          <div style="margin-top:20px; margin-left: -10px; width: 100; text-align:center">Follow us on <br />
+            <a href="https://twitter.com/OpenH264" target="_blank"><img src="images/twitter.png" width="40" height="40" alt="Twitter" /></a></div>
+        </div></td>
+      <td width="740" rowspan="4" valign="top" align="left"><H4>FAQ</H4>
+        <div class="text">
+          
+    <p> If you are not redirected automatically, follow the <a href='http://www.mpegla.com/main/programs/avc/Documents/AVC_TermsSummary.pdf'>link to MPEGLA AVC H.264 License Terms Summary</a>
+	  </p>
+
+        </div></td>
+    </tr>
+    <tr>
+      <td></td>
+    </tr>
+  </table>
+  <table width="950" border="0" cellspacing="0" cellpadding="0" align="center" bgcolor="#093C53">
+    <tr>
+      <td class="center"><div class="footer">
+         <li><a href="index.html">Home</a></li>
+          |
+          <li><a href="faq.html">FAQ</a></li>
+          |
+           <li> <a href="https://github.com/cisco/openh264" target="_blank">Source Code</a></li> |
+            <li> <a href="https://github.com/cisco/openh264/issues"
+          target="_blank">Issue Tracker </a></li> 
+          
+        </div></td>
+    </tr>
+    
+  </table>
+</div>
+</body>
+</html>
