@@ -322,6 +322,10 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
       return NULL;
     }
 
+    if ((uiAvailNalNum == 1) && ((NAL_UNIT_CODED_SLICE_IDR == pNalUnitHeader->eNalUnitType)
+                                 || (pCurNal->sNalHeaderExt.bIdrFlag))) {
+      ResetActiveSPSForEachLayer (pCtx);
+    }
     if ((uiAvailNalNum > 1) &&
         CheckAccessUnitBoundary (pCtx, pCurAu->pNalUnitsList[uiAvailNalNum - 1], pCurAu->pNalUnitsList[uiAvailNalNum - 2],
                                  pCurAu->pNalUnitsList[uiAvailNalNum - 1]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps)) {
@@ -410,7 +414,7 @@ bool CheckAccessUnitBoundary (PWelsDecoderContext pCtx, const PNalUnit kpCurNal,
     pCtx->bNextNewSeqBegin = true;
     return true; // the active sps changed, new sequence begins, so the current au is ready
   }
- 
+
   //Sub-clause 7.1.4.1.1 temporal_id
   if (kpLastNalHeaderExt->uiTemporalId != kpCurNalHeaderExt->uiTemporalId) {
     return true;
