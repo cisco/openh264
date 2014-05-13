@@ -661,6 +661,23 @@ int ProcessEncoding(ISVCEncoder* pPtrEnc, int argc, char** argv,bool bConfigFile
   pSrcPic->iColorFormat = videoFormatI420;
   pSrcPic->uiTimeStamp = 0;
 
+  // if configure file exit, reading configure file firstly
+  if(bConfigFile){
+    iParsedNum = 2;
+    cRdCfg.Openf (argv[1]);
+    if (!cRdCfg.ExistFile()) {
+      fprintf (stderr, "Specified file: %s not exist, maybe invalid path or parameter settting.\n",
+               cRdCfg.GetFileName().c_str());
+      iRet = 1;
+      goto INSIDE_MEM_FREE;
+    }
+    iRet = ParseConfig (cRdCfg, pSrcPic, sSvcParam, fs);
+    if (iRet) {
+      fprintf (stderr, "parse svc parameter config file failed.\n");
+      iRet = 1;
+      goto INSIDE_MEM_FREE;
+    }
+  }
   if (ParseCommandLine (argc - iParsedNum, argv + iParsedNum, pSrcPic, sSvcParam, fs) != 0) {
     printf ("parse pCommand line failed\n");
     iRet = 1;
