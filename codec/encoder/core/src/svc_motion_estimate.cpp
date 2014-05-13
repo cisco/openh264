@@ -492,8 +492,8 @@ void LineFullSearch_c (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
   }
 }
 
-void WelsMotionCrossSearch (SWelsFuncPtrList* pFuncList,  SWelsME* pMe,
-                            const SSlice* pSlice, const int32_t kiEncStride,  const int32_t kiRefStride) {
+void WelsMotionCrossSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlice,
+                            const int32_t kiEncStride,  const int32_t kiRefStride) {
   PLineFullSearchFunc pfVerticalFullSearchFunc = pFuncList->pfVerticalFullSearch;
   PLineFullSearchFunc pfHorizontalFullSearchFunc = pFuncList->pfHorizontalFullSearch;
 
@@ -709,12 +709,17 @@ void FillQpelLocationByFeatureValue_c (uint16_t* pFeatureOfBlock, const int32_t 
   }
 }
 
-void CalculateFeatureOfBlock (SWelsFuncPtrList* pFunc, SPicture* pRef,
+bool CalculateFeatureOfBlock (SWelsFuncPtrList* pFunc, SPicture* pRef,
                               SScreenBlockFeatureStorage* pScreenBlockFeatureStorage) {
   uint16_t* pFeatureOfBlock = pScreenBlockFeatureStorage->pFeatureOfBlockPointer;
   uint32_t* pTimesOfFeatureValue = pScreenBlockFeatureStorage->pTimesOfFeatureValue;
   uint16_t** pLocationOfFeature  = pScreenBlockFeatureStorage->pLocationOfFeature;
   uint16_t* pBuf = pScreenBlockFeatureStorage->pLocationPointer;
+
+  if (NULL == pFeatureOfBlock || NULL == pTimesOfFeatureValue || NULL == pLocationOfFeature || NULL == pBuf
+      || NULL == pRef->pData[0]) {
+    return false;
+  }
 
   uint8_t* pRefData = pRef->pData[0];
   const int32_t iRefStride = pRef->iLineSize[0];
@@ -735,25 +740,28 @@ void CalculateFeatureOfBlock (SWelsFuncPtrList* pFunc, SPicture* pRef,
 
   //assign each pixel's pLocationOfFeature
   FillQpelLocationByFeatureValue_c (pFeatureOfBlock, iWidth, kiHeight, pFeatureValuePointerList);
+  return true;
 }
 
 void PerformFMEPreprocess (SWelsFuncPtrList* pFunc, SPicture* pRef, uint16_t*	pFeatureOfBlock,
                            SScreenBlockFeatureStorage* pScreenBlockFeatureStorage) {
   pScreenBlockFeatureStorage->pFeatureOfBlockPointer = pFeatureOfBlock;
-  CalculateFeatureOfBlock (pFunc, pRef, pScreenBlockFeatureStorage);
-  pScreenBlockFeatureStorage->bRefBlockFeatureCalculated = true;
+  pScreenBlockFeatureStorage->bRefBlockFeatureCalculated = CalculateFeatureOfBlock (pFunc, pRef,
+      pScreenBlockFeatureStorage);
 
-  uint32_t uiRefPictureAvgQstepx16 = QStepx16ByQp[WelsMedian (0, pRef->iFrameAverageQp, 51)];
-  uint32_t uiSadCostThreshold16x16 = ((30 * (uiRefPictureAvgQstepx16 + 160)) >> 3);
-  pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_16x16] = uiSadCostThreshold16x16;
-  pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_8x8] = (uiSadCostThreshold16x16 >> 2);
-  pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_16x8]
-    = pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_8x16]
-      = pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_4x4] = UINT_MAX;
+  if (pScreenBlockFeatureStorage->bRefBlockFeatureCalculated) {
+    uint32_t uiRefPictureAvgQstepx16 = QStepx16ByQp[WelsMedian (0, pRef->iFrameAverageQp, 51)];
+    uint32_t uiSadCostThreshold16x16 = ((30 * (uiRefPictureAvgQstepx16 + 160)) >> 3);
+    pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_16x16] = uiSadCostThreshold16x16;
+    pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_8x8] = (uiSadCostThreshold16x16 >> 2);
+    pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_16x8]
+      = pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_8x16]
+        = pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_4x4] = UINT_MAX;
+  }
 }
 
 //search related
-void SetFeatureSearchIn (SWelsFuncPtrList* pFunc,  const SWelsME& sMe,
+bool SetFeatureSearchIn (SWelsFuncPtrList* pFunc,  const SWelsME& sMe,
                          const SSlice* pSlice, SScreenBlockFeatureStorage* pRefFeatureStorage,
                          const int32_t kiEncStride, const int32_t kiRefStride,
                          SFeatureSearchIn* pFeatureSearchIn) {
@@ -781,6 +789,12 @@ void SetFeatureSearchIn (SWelsFuncPtrList* pFunc,  const SWelsME& sMe,
   pFeatureSearchIn->iMinQpelY = pFeatureSearchIn->iCurPixYQpel + ((pSlice->sMvStartMin.iMvY) << 2);
   pFeatureSearchIn->iMaxQpelX = pFeatureSearchIn->iCurPixXQpel + ((pSlice->sMvStartMax.iMvX) << 2);
   pFeatureSearchIn->iMaxQpelY = pFeatureSearchIn->iCurPixYQpel + ((pSlice->sMvStartMax.iMvY) << 2);
+
+  if (NULL == pFeatureSearchIn->pSad || NULL == pFeatureSearchIn->pTimesOfFeature
+      || NULL == pFeatureSearchIn->pQpelLocationOfFeature) {
+    return false;
+  }
+  return true;
 }
 void SaveFeatureSearchOut (const SMVUnitXY sBestMv, const uint32_t uiBestSadCost, uint8_t* pRef,
                            SFeatureSearchOut* pFeatureSearchOut) {
@@ -922,8 +936,7 @@ void WelsDiamondCrossSearch (SWelsFuncPtrList* pFunc, SWelsME* pMe, SSlice* pSli
   WelsDiamondSearch (pFunc, pMe, pSlice, kiEncStride, kiRefStride);
 
   //  Step 2: CROSS search
-  SScreenBlockFeatureStorage pRefBlockFeature; //TODO: use this structure from Ref
-  pMe->uiSadCostThreshold = pRefBlockFeature.uiSadCostThreshold[pMe->uiBlockSize];
+  pMe->uiSadCostThreshold = pMe->pRefFeatureStorage->uiSadCostThreshold[pMe->uiBlockSize];
   if (pMe->uiSadCost >= pMe->uiSadCostThreshold) {
     WelsMotionCrossSearch (pFunc, pMe, pSlice, kiEncStride, kiRefStride);
   }
@@ -937,14 +950,13 @@ void WelsDiamondCrossFeatureSearch (SWelsFuncPtrList* pFunc, SWelsME* pMe, SSlic
   if (pMe->uiSadCost >= pMe->uiSadCostThreshold) {
     pSlice->uiSliceFMECostDown += pMe->uiSadCost;
 
-    SScreenBlockFeatureStorage tmpScreenBlockFeatureStorage; //TODO: use this structure from Ref
     uint32_t uiMaxSearchPoint = INT_MAX;//TODO: change it according to computational-complexity setting
     SFeatureSearchIn sFeatureSearchIn = {0};
-    SetFeatureSearchIn (pFunc, *pMe, pSlice, &tmpScreenBlockFeatureStorage,
-                        kiEncStride, kiRefStride,
-                        &sFeatureSearchIn);
-    MotionEstimateFeatureFullSearch (sFeatureSearchIn, uiMaxSearchPoint, pMe);
-
+    if (SetFeatureSearchIn (pFunc, *pMe, pSlice, pMe->pRefFeatureStorage,
+                            kiEncStride, kiRefStride,
+                            &sFeatureSearchIn)) {
+      MotionEstimateFeatureFullSearch (sFeatureSearchIn, uiMaxSearchPoint, pMe);
+    }
     pSlice->uiSliceFMECostDown -= pMe->uiSadCost;
   }
 }

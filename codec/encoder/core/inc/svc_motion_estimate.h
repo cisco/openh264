@@ -90,6 +90,8 @@ typedef struct TagWelsME {
   SMVUnitXY          sMvBase;
   SMVUnitXY          sDirectionalMv;
 
+  SScreenBlockFeatureStorage* pRefFeatureStorage;
+
   /* output */
   SMVUnitXY          sMv;
 } SWelsME;
@@ -220,7 +222,10 @@ void HorizontalFullSearchUsingSSE41 (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
                                      const int32_t kiMinPos, const int32_t kiMaxPos,
                                      const bool bVerticalSearch);
 #endif
-void WelsMotionCrossSearch (SWelsFuncPtrList* pFuncList,  SDqLayer* pCurLayer, SWelsME* pMe, const SSlice* pSlice);
+void WelsMotionCrossSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlice,
+                            const int32_t kiEncStride, const int32_t kiRefStride);
+void WelsDiamondCrossSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlice,
+                             const int32_t kiEncStride, const int32_t kiRefStride);
 
 // Feature Search Basics
 #define LIST_SIZE_SUM_16x16 0x0FF01  //(256*255+1)
@@ -255,6 +260,9 @@ void PerformFMEPreprocess (SWelsFuncPtrList* pFunc, SPicture* pRef, uint16_t* pF
                            SScreenBlockFeatureStorage* pScreenBlockFeatureStorage);
 void UpdateFMESwitch (SDqLayer* pCurLayer);
 void UpdateFMESwitchNull (SDqLayer* pCurLayer);
+
+void WelsDiamondCrossFeatureSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlice,
+                                    const int32_t kiEncStride, const int32_t kiRefStride);
 
 //inline functions
 inline void SetMvWithinIntegerMvRange (const int32_t kiMbWidth, const int32_t kiMbHeight, const int32_t kiMbX,
