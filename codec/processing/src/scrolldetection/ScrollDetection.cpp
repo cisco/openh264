@@ -105,10 +105,6 @@ void CScrollDetection::ScrollDetectionWithoutMask (SPixMap* pSrcPixMap, SPixMap*
     iWidth /= 2;
     iStartX += iWidth / 2;
 
-    m_sScrollDetectionParam.iScrollMvX = 0;
-    m_sScrollDetectionParam.iScrollMvY = 0;
-    m_sScrollDetectionParam.bScrollDetectFlag = false;
-
     ScrollDetectionCore (pSrcPixMap, pRefPixMap, iWidth, iHeight, iStartX, iStartY, m_sScrollDetectionParam);
 
     if (m_sScrollDetectionParam.bScrollDetectFlag && m_sScrollDetectionParam.iScrollMvY)
