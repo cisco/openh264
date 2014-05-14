@@ -347,7 +347,7 @@ typedef struct {
   unsigned char uiLayerType;
 
   int	iNalCount;					// Count number of NAL coded already
-  int	iNalLengthInByte[MAX_NAL_UNITS_IN_LAYER];	// Length of NAL size in byte from 0 to iNalCount-1
+  int*	pNalLengthInByte;	// Length of NAL size in byte from 0 to iNalCount-1
   unsigned char*	pBsBuf;		// Buffer of bitstream contained
 } SLayerBSInfo, *PLayerBSInfo;
 
