@@ -211,7 +211,7 @@ void MotionEstimateTest::DoLineTest(PLineFullSearchFunc func, bool vertical) {
     //it is possible that ref at differnt position is identical, but that should be under a low probability
   }
 }
-
+/*
 TEST_F(MotionEstimateTest, TestVerticalSearch) {
   DoLineTest(LineFullSearch_c, true);
 }
@@ -238,7 +238,7 @@ TEST_F(MotionEstimateTest, TestHorizontalSearch_SSE41)
   DoLineTest(HorizontalFullSearchUsingSSE41, false);
 }
 #endif
-
+*/
 class FeatureMotionEstimateTest : public ::testing::Test {
 public:
   virtual void SetUp() {
