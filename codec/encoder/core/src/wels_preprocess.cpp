@@ -997,7 +997,8 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
   for (iScdIdx = 0; iScdIdx < iAvailableRefNum; iScdIdx ++) {
     pCurBlockStaticPointer = pVaaExt->pVaaBlockStaticIdc[iScdIdx];
     sSceneChangeResult.eSceneChangeIdc = SIMILAR_SCENE;
-    sSceneChangeResult.pStaticBlockIdc = pCurBlockStaticPointer;//
+    sSceneChangeResult.pStaticBlockIdc = pCurBlockStaticPointer;
+    sSceneChangeResult.sScrollResult.bScrollDetectFlag = false;
 
     pRefPicInfo = & (sAvailableRefList[iScdIdx]);
     assert (NULL != pRefPicInfo);
@@ -1005,8 +1006,22 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
     InitPixMap (pRefPic, &sRefMap);
 
     bIsClosestLtrFrame = (pRefPic->iLongTermPicNum == iClosestLtrFrameNum);
+    if (0 == iScdIdx) {
+      int32_t ret = 1;
+      SScrollDetectionParam* pScrollDetectInfo = & (pVaaExt->sScrollDetectInfo);
+      memset (pScrollDetectInfo, 0, sizeof (SScrollDetectionParam));
 
-    //TBD scrolling detection
+      int32_t iMethodIdx = METHOD_SCROLL_DETECTION;
+
+      m_pInterfaceVp->Set (iMethodIdx, (void*) (pScrollDetectInfo));
+      ret = m_pInterfaceVp->Process (iMethodIdx, &sSrcMap, &sRefMap);
+
+      if (ret == 0) {
+        m_pInterfaceVp->Get (iMethodIdx, (void*) (pScrollDetectInfo));
+      }
+      sSceneChangeResult.sScrollResult = pVaaExt->sScrollDetectInfo;
+    }
+
     m_pInterfaceVp->Set (iSceneChangeMethodIdx, (void*) (&sSceneChangeResult));
     ret = m_pInterfaceVp->Process (iSceneChangeMethodIdx, &sSrcMap, &sRefMap);
 
