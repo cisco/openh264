@@ -326,7 +326,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     m_pDecContext->iErrorCode |= dsOutOfMemory;
     IWelsTrace::WelsVTrace (m_pTrace, IWelsTrace::WELS_LOG_INFO,
                             "max AU size exceeded. Allowed size = %d, current size = %d",
-                            MAX_ACCESS_UNIT_CAPACITY, kiSrcLen);
+                            MAX_ACCESS_UNIT_CAPACITY - MAX_MACROBLOCK_CAPACITY, kiSrcLen);
     return dsOutOfMemory;
   }
   if (kiSrcLen > 0 && kpSrc != NULL) {
