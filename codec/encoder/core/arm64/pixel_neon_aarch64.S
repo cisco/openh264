@@ -35,20 +35,16 @@
 #include "arm_arch64_common_macro.S"
 
 .macro CALC_AND_STORE_SAD
-    uaddlp  v2.4s, v2.8h
-    addp    v2.4s, v2.4s, v2.4s
-    addp    v2.2s, v2.2s, v2.2s
-    umov    w0, v2.s[0]
+    saddlv  s2, v2.8h
+    fmov    w0, s2
 .endm
 
 .macro CALC_AND_STORE_SAD_FOUR
-    addp    v0.8h, v28.8h, v29.8h
-    addp    v1.8h, v30.8h, v31.8h
-    addp    v0.8h, v0.8h, v1.8h
-    addp    v0.8h, v0.8h, v0.8h
-    eor     v1.8b, v1.8b, v1.8b
-    saddl   v0.4s, v0.4h, v1.4h
-    st1     {v0.4s}, [x4]
+    saddlv  s28, v28.8h
+    saddlv  s29, v29.8h
+    saddlv  s30, v30.8h
+    saddlv  s31, v31.8h
+    st4     {v28.s, v29.s, v30.s, v31.s}[0], [x4]
 .endm
 
 .macro LOAD_8X8_1
@@ -250,9 +246,8 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSad4x4_AArch64_neon
     ld1     {v1.s}[0], [x2], x3
     uabal   v2.8h, v0.8b, v1.8b
 .endr
-    uaddlp  v2.2s, v2.4h
-    addp    v2.2s, v2.2s, v2.2s
-    umov    w0, v2.s[0]
+    saddlv  s2, v2.4h
+    fmov    w0, s2
 WELS_ASM_ARCH64_FUNC_END
 
 WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSad8x8_AArch64_neon
