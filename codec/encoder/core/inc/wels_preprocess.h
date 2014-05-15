@@ -104,9 +104,8 @@ typedef struct {
 
 typedef struct SVAAFrameInfoExt_t: public SVAAFrameInfo {
   SComplexityAnalysisScreenParam    sComplexityScreenParam;
-  SScrollDetectionResult    sScrollDetectInfo;
-  //TOP3_BEST_REF_NO_TID
-  SRefInfoParam    sVaaStrBestRefCandidate[MAX_REF_PIC_COUNT];
+  SScrollDetectionParam    sScrollDetectInfo;
+  SRefInfoParam    sVaaStrBestRefCandidate[MAX_REF_PIC_COUNT];   //TOP3_BEST_REF_NO_TID
   int32_t    iNumOfAvailableRef;
 
   uint8_t*    pVaaBestBlockStaticIdc;//pointer
