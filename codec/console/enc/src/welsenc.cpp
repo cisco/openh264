@@ -354,7 +354,7 @@ int ParseCommandLine (int argc, char** argv, SEncParamExt& sParam) {
       sParam.iRCMode = (RC_MODES) atoi (argv[i++]);
 
     else if (!strcmp (pCmd, "-tarb") && (i < argc))
-      sParam.iTargetBitrate = atoi (argv[i++]);
+      sParam.iTargetBitrate = 1000*atoi (argv[i++]);
 
     else if (!strcmp (pCmd, "-ltarb") && (i + 1 < argc)) {
       int iLayer = atoi (argv[i++]);
@@ -476,7 +476,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       g_LevelSetting = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-tarb") && (n < argc))
-      pSvcParam.iTargetBitrate = atoi (argv[n++]);
+      pSvcParam.iTargetBitrate = 1000*atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-numl") && (n < argc)) {
       pSvcParam.iSpatialLayerNum = atoi (argv[n++]);

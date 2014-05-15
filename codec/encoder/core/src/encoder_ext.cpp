@@ -112,6 +112,19 @@ int32_t ParamValidation (SWelsSvcCodingParam* pCfg) {
     pCfg->fMaxFrameRate	= fMaxFrameRate;
   }
 
+  //bitrate setting validation
+  if (pCfg->iRCMode != RC_OFF_MODE){
+    int32_t  iTotalBitrate = 0;
+    for (i = 0; i < pCfg->iSpatialLayerNum; ++ i) {
+      SDLayerParam* fDlp = &pCfg->sDependencyLayers[i];
+      iTotalBitrate += fDlp->iSpatialBitrate;
+    }
+    if(iTotalBitrate > pCfg->iTargetBitrate){
+      WelsLog(NULL, WELS_LOG_ERROR,"Invalid setttings in bitrate. the sum of each layer bitrate(%d) is larger than total bitrate setting(%d)\n",
+              iTotalBitrate,pCfg->iTargetBitrate);
+    }
+  }
+
   return ENC_RETURN_SUCCESS;
 }
 
