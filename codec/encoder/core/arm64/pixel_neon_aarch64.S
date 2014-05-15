@@ -62,6 +62,18 @@
     ld1     {v7.8b}, [x0], x1
 .endm
 
+.macro LOAD_16X8_1
+    ld1     {v0.16b}, [x0], x1
+    ld1     {v1.16b}, [x0], x1
+    ld1     {v2.16b}, [x0], x1
+    ld1     {v3.16b}, [x0], x1
+    ld1     {v4.16b}, [x0], x1
+    ld1     {v5.16b}, [x0], x1
+    ld1     {v6.16b}, [x0], x1
+    ld1     {v7.16b}, [x0], x1
+.endm
+
+#ifdef __APPLE__
 .macro LOAD_8X8_2
     ld1     {v16.8b}, [$0], x3
     ld1     {v17.8b}, [$0], x3
@@ -93,17 +105,6 @@
     uabal   v29.8h, v5.8b, v23.8b
     uabal   v29.8h, v6.8b, v24.8b
     uabal   v29.8h, v7.8b, v25.8b
-.endm
-
-.macro LOAD_16X8_1
-    ld1     {v0.16b}, [x0], x1
-    ld1     {v1.16b}, [x0], x1
-    ld1     {v2.16b}, [x0], x1
-    ld1     {v3.16b}, [x0], x1
-    ld1     {v4.16b}, [x0], x1
-    ld1     {v5.16b}, [x0], x1
-    ld1     {v6.16b}, [x0], x1
-    ld1     {v7.16b}, [x0], x1
 .endm
 
 .macro LOAD_16X8_2
@@ -154,6 +155,89 @@
     uabal   v29.8h, v7.8b, v25.8b
     uabal2  v29.8h, v7.16b,v25.16b
 .endm
+#else
+.macro LOAD_8X8_2 arg0
+    ld1     {v16.8b}, [\arg0], x3
+    ld1     {v17.8b}, [\arg0], x3
+    ld1     {v18.8b}, [\arg0], x3
+    ld1     {v19.8b}, [\arg0], x3
+    ld1     {v20.8b}, [\arg0], x3
+    ld1     {v21.8b}, [\arg0], x3
+    ld1     {v22.8b}, [\arg0], x3
+    ld1     {v23.8b}, [\arg0], x3
+.endm
+
+.macro CALC_ABS_8X8_1 arg0, arg1
+    uab\arg1\()l    \arg0, v0.8b, v16.8b
+    uabal   \arg0, v1.8b, v17.8b
+    uabal   \arg0, v2.8b, v18.8b
+    uabal   \arg0, v3.8b, v19.8b
+    uabal   \arg0, v4.8b, v20.8b
+    uabal   \arg0, v5.8b, v21.8b
+    uabal   \arg0, v6.8b, v22.8b
+    uabal   \arg0, v7.8b, v23.8b
+.endm
+
+.macro CALC_ABS_8X8_2 arg0
+    uab\arg0\()l    v29.8h, v0.8b, v18.8b
+    uabal   v29.8h, v1.8b, v19.8b
+    uabal   v29.8h, v2.8b, v20.8b
+    uabal   v29.8h, v3.8b, v21.8b
+    uabal   v29.8h, v4.8b, v22.8b
+    uabal   v29.8h, v5.8b, v23.8b
+    uabal   v29.8h, v6.8b, v24.8b
+    uabal   v29.8h, v7.8b, v25.8b
+.endm
+
+.macro LOAD_16X8_2 arg0
+    ld1     {v16.16b}, [\arg0], x3
+    ld1     {v17.16b}, [\arg0], x3
+    ld1     {v18.16b}, [\arg0], x3
+    ld1     {v19.16b}, [\arg0], x3
+    ld1     {v20.16b}, [\arg0], x3
+    ld1     {v21.16b}, [\arg0], x3
+    ld1     {v22.16b}, [\arg0], x3
+    ld1     {v23.16b}, [\arg0], x3
+.endm
+
+.macro CALC_ABS_16X8_1 arg0, arg1
+    uab\arg1\()l  \arg0, v0.8b, v16.8b
+    uabal2  \arg0, v0.16b,v16.16b
+    uabal   \arg0, v1.8b, v17.8b
+    uabal2  \arg0, v1.16b,v17.16b
+    uabal   \arg0, v2.8b, v18.8b
+    uabal2  \arg0, v2.16b,v18.16b
+    uabal   \arg0, v3.8b, v19.8b
+    uabal2  \arg0, v3.16b,v19.16b
+    uabal   \arg0, v4.8b, v20.8b
+    uabal2  \arg0, v4.16b,v20.16b
+    uabal   \arg0, v5.8b, v21.8b
+    uabal2  \arg0, v5.16b,v21.16b
+    uabal   \arg0, v6.8b, v22.8b
+    uabal2  \arg0, v6.16b,v22.16b
+    uabal   \arg0, v7.8b, v23.8b
+    uabal2  \arg0, v7.16b,v23.16b
+.endm
+
+.macro CALC_ABS_16X8_2 arg0
+    uab\arg0\()l  v29.8h, v0.8b, v18.8b
+    uabal2  v29.8h, v0.16b,v18.16b
+    uabal   v29.8h, v1.8b, v19.8b
+    uabal2  v29.8h, v1.16b,v19.16b
+    uabal   v29.8h, v2.8b, v20.8b
+    uabal2  v29.8h, v2.16b,v20.16b
+    uabal   v29.8h, v3.8b, v21.8b
+    uabal2  v29.8h, v3.16b,v21.16b
+    uabal   v29.8h, v4.8b, v22.8b
+    uabal2  v29.8h, v4.16b,v22.16b
+    uabal   v29.8h, v5.8b, v23.8b
+    uabal2  v29.8h, v5.16b,v23.16b
+    uabal   v29.8h, v6.8b, v24.8b
+    uabal2  v29.8h, v6.16b,v24.16b
+    uabal   v29.8h, v7.8b, v25.8b
+    uabal2  v29.8h, v7.16b,v25.16b
+.endm
+#endif
 
 WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSad4x4_AArch64_neon
     sxtw    x1, w1
