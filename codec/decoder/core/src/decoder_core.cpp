@@ -314,13 +314,13 @@ int32_t WelsInitMemory (PWelsDecoderContext pCtx) {
   if (MemInitNalList (&pCtx->pAccessUnitList, MAX_NAL_UNIT_NUM_IN_AU) != 0)
     return ERR_INFO_OUT_OF_MEMORY;
 
-  if ((pCtx->sRawData.pHead = static_cast<uint8_t*> (WelsMalloc (MAX_ACCESS_UNIT_CAPACITY,
+  if ((pCtx->sRawData.pHead = static_cast<uint8_t*> (WelsMalloc (BS_BUFFER_SIZE,
                               "pCtx->sRawData->pHead"))) == NULL) {
     return ERR_INFO_OUT_OF_MEMORY;
   }
   pCtx->sRawData.pStartPos               =
     pCtx->sRawData.pCurPos                 = pCtx->sRawData.pHead;
-  pCtx->sRawData.pEnd                     = pCtx->sRawData.pHead + MAX_ACCESS_UNIT_CAPACITY;
+  pCtx->sRawData.pEnd                     = pCtx->sRawData.pHead + BS_BUFFER_SIZE;
 
   pCtx->uiTargetDqId			= (uint8_t) - 1;
   pCtx->bEndOfStreamFlag	= false;

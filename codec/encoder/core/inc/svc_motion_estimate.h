@@ -180,7 +180,7 @@ bool WelsMotionEstimateInitialPoint (SWelsFuncPtrList* pFuncList, SWelsME* pMe, 
  *
  * \return  NONE
  */
-void WelsDiamondSearch (SWelsFuncPtrList* pFuncList, void* pLpme, void* pLpslice, const int32_t kiEncStride,
+void WelsDiamondSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlice, const int32_t kiEncStride,
                         const int32_t kiRefStride);
 
 bool WelsMeSadCostSelect (int32_t* pSadCost, const uint16_t* kpMvdCost, int32_t* pBestCost, const int32_t kiDx,

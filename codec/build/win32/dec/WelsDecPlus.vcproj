@@ -44,7 +44,6 @@
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
 				MkTypLibCompatible="true"
-				SuppressStartupBanner="true"
 				TargetEnvironment="1"
 				TypeLibraryName=".\..\..\..\..\..\bin\win32\Release/WelsDecPlus.tlb"
 				HeaderFileName=""
@@ -53,8 +52,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;WELSDECPLUS_EXPORTS;HAVE_CACHE_LINE_ALIGN;X86_ASM"
+				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc"
+				PreprocessorDefinitions="NDEBUG;_USRDLL;X86_ASM"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -63,7 +62,6 @@
 				ObjectFile=".\..\..\..\obj\decoder\plus\Release/"
 				ProgramDataBaseFileName=".\..\..\..\obj\decoder\plus\Release/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -82,7 +80,6 @@
 				AdditionalDependencies=".\..\..\..\..\bin\win32\Release\welsdcore.lib"
 				OutputFile="$(OutDir)\welsdec.dll"
 				LinkIncremental="1"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories=".\..\..\..\libs\Release\"
 				ModuleDefinitionFile="..\..\..\decoder\plus\src\wels_dec_export.def"
 				GenerateDebugInformation="true"
@@ -105,7 +102,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile=".\..\..\..\..\bin\win32\Release/WelsDecPlus.bsc"
 			/>
 			<Tool
@@ -144,7 +140,6 @@
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
 				MkTypLibCompatible="true"
-				SuppressStartupBanner="true"
 				TargetEnvironment="3"
 				TypeLibraryName=".\..\..\..\..\..\bin\win32\Release/WelsDecPlus.tlb"
 				HeaderFileName=""
@@ -153,8 +148,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc"
-				PreprocessorDefinitions="WIN64;NDEBUG;_WINDOWS;_USRDLL;WELSDECPLUS_EXPORTS;HAVE_CACHE_LINE_ALIGN;X86_ASM"
+				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc"
+				PreprocessorDefinitions="NDEBUG;_USRDLL;X86_ASM"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -163,7 +158,6 @@
 				ObjectFile=".\..\..\..\obj\decoder\plus\Release/"
 				ProgramDataBaseFileName=".\..\..\..\obj\decoder\plus\Release/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -182,7 +176,6 @@
 				AdditionalDependencies=".\..\..\..\..\bin\win64\Release\welsdcore.lib"
 				OutputFile="$(OutDir)\welsdec.dll"
 				LinkIncremental="1"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories=".\..\..\..\libs\Release\"
 				ModuleDefinitionFile="..\..\..\decoder\plus\src\wels_dec_export.def"
 				GenerateDebugInformation="true"
@@ -205,7 +198,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile=".\..\..\..\..\bin\win32\Release/WelsDecPlus.bsc"
 			/>
 			<Tool
@@ -244,7 +236,6 @@
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
 				MkTypLibCompatible="true"
-				SuppressStartupBanner="true"
 				TargetEnvironment="1"
 				TypeLibraryName=".\..\..\..\..\..\bin\win32\Debug/WelsDecPlus.tlb"
 				HeaderFileName=""
@@ -252,8 +243,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;WELSDECPLUS_EXPORTS;HAVE_CACHE_LINE_ALIGN;X86_ASM"
+				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc"
+				PreprocessorDefinitions="_DEBUG;_USRDLL;X86_ASM"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -262,7 +253,6 @@
 				ObjectFile=".\..\..\..\obj\decoder\plus\debug/"
 				ProgramDataBaseFileName=".\..\..\..\obj\decoder\plus\debug/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -281,7 +271,6 @@
 				AdditionalDependencies=".\..\..\..\..\bin\win32\Debug\welsdcore.lib"
 				OutputFile="$(OutDir)\welsdec.dll"
 				LinkIncremental="2"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\libs\debug"
 				ModuleDefinitionFile="..\..\..\decoder\plus\src\wels_dec_export.def"
 				GenerateDebugInformation="true"
@@ -302,7 +291,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile=".\..\..\..\..\bin\win32\Debug/WelsDecPlus.bsc"
 			/>
 			<Tool
@@ -341,7 +329,6 @@
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
 				MkTypLibCompatible="true"
-				SuppressStartupBanner="true"
 				TargetEnvironment="3"
 				TypeLibraryName=".\..\..\..\..\..\bin\win32\Debug/WelsDecPlus.tlb"
 				HeaderFileName=""
@@ -349,8 +336,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc;..\..\..\hwDecoder\plus\inc;..\..\..\hwDecoder\core\inc"
-				PreprocessorDefinitions="WIN64;_DEBUG;_WINDOWS;_USRDLL;WELSDECPLUS_EXPORTS;HAVE_CACHE_LINE_ALIGN;X86_ASM"
+				AdditionalIncludeDirectories="..\..\..\decoder\plus\inc;..\..\..\decoder\core\inc;..\..\..\api\svc;..\..\..\common\inc"
+				PreprocessorDefinitions="_DEBUG;_USRDLL;X86_ASM"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -359,7 +346,6 @@
 				ObjectFile=".\..\..\..\obj\decoder\plus\debug/"
 				ProgramDataBaseFileName=".\..\..\..\obj\decoder\plus\debug/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -378,7 +364,6 @@
 				AdditionalDependencies=".\..\..\..\..\bin\win64\Debug\welsdcore.lib"
 				OutputFile="$(OutDir)\welsdec.dll"
 				LinkIncremental="2"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\libs\debug"
 				ModuleDefinitionFile="..\..\..\decoder\plus\src\wels_dec_export.def"
 				GenerateDebugInformation="true"
@@ -399,7 +384,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile=".\..\..\..\..\bin\win32\Debug/WelsDecPlus.bsc"
 			/>
 			<Tool
@@ -426,42 +410,6 @@
 				<File
 					RelativePath="..\..\..\decoder\plus\res\welsdec.rc"
 					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCResourceCompilerTool"
-							PreprocessorDefinitions=""
-							AdditionalIncludeDirectories="\SVN_project_https\trunk\codec\Wels\project\decoder\plus\res"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|x64"
-						>
-						<Tool
-							Name="VCResourceCompilerTool"
-							PreprocessorDefinitions=""
-							AdditionalIncludeDirectories="\SVN_project_https\trunk\codec\Wels\project\decoder\plus\res"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCResourceCompilerTool"
-							PreprocessorDefinitions=""
-							AdditionalIncludeDirectories="\SVN_project_https\trunk\codec\Wels\project\decoder\plus\res"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|x64"
-						>
-						<Tool
-							Name="VCResourceCompilerTool"
-							PreprocessorDefinitions=""
-							AdditionalIncludeDirectories="\SVN_project_https\trunk\codec\Wels\project\decoder\plus\res"
-						/>
-					</FileConfiguration>
 				</File>
 			</Filter>
 			<Filter
@@ -475,82 +423,10 @@
 				<File
 					RelativePath="..\..\..\decoder\plus\src\welsCodecTrace.cpp"
 					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|x64"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|x64"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\..\decoder\plus\src\welsDecoderExt.cpp"
 					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|x64"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|x64"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
 				</File>
 			</Filter>
 			<Filter

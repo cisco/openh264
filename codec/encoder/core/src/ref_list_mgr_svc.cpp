@@ -482,9 +482,6 @@ void WelsMarkPic (void* pEncCtx) {
 
     memset (pRefPicMark, 0, sizeof (SRefPicMarking));
 
-    if (iSliceIdx != kiCountSliceNum - 1)	{ //marking syntax only exist in last slice head
-      continue;
-    }
     if (pCtx->pSvcParam->bEnableLongTermReference && pLtr->bLTRMarkingFlag) {
       if (pLtr->iLTRMarkMode == LTR_DIRECT_MARK)	{
         pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iMaxLongTermFrameIdx = LONG_TERM_REF_NUM - 1;

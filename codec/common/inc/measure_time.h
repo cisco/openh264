@@ -79,7 +79,7 @@ static inline int64_t WelsTime (void) {
   QueryPerformanceCounter ((LARGE_INTEGER*)&iMtimeCur);
   iResult = (int64_t) ((double)iMtimeCur * 1e6 / (double)iMtimeFreq + 0.5);
   return iResult;
-#endif//WIN32
+#endif//_WIN32
 }
 
 #ifdef __cplusplus
