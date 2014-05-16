@@ -1285,7 +1285,7 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
 
     fCompressRatioThr	= COMPRESS_RATIO_THR;
 
-    iLayerBsSize = WELS_ROUND (((3 * fDlp->iFrameWidth * fDlp->iFrameHeight) >> 1) * fCompressRatioThr);
+    iLayerBsSize = WELS_ROUND (((3 * fDlp->iFrameWidth * fDlp->iFrameHeight) >> 1) * fCompressRatioThr) + MAX_MACROBLOCK_SIZE_IN_BYTE;
     iLayerBsSize	= WELS_ALIGN (iLayerBsSize, 4);			// 4 bytes alinged
     iVclLayersBsSizeCount += iLayerBsSize;
     ++ iIndex;
