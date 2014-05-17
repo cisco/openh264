@@ -46,11 +46,6 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-#ifdef HAVE_MMX
-WELSVP_EXTERN_C_BEGIN
-WELSVP_EXTERN_C_END
-#endif
-
 class CScrollDetection : public IStrategy {
  public:
   CScrollDetection (int32_t iCpuFlag) {
