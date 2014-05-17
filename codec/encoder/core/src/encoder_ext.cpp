@@ -2428,6 +2428,36 @@ static inline void SetNormalCodingFunc (SWelsFuncPtrList* pFuncList) {
   pFuncList->sSampleDealingFuncs.pfIntra4x4Combined3 =
     pFuncList->sSampleDealingFuncs.pfIntra4x4Combined3Satd;
 }
+bool SetMeMethod (const uint8_t uiMethod, PSearchMethodFunc& pSearchMethodFunc) {
+  switch (uiMethod) {
+  case  ME_DIA:
+    pSearchMethodFunc  = WelsDiamondSearch;
+    break;
+  case  ME_CROSS:
+    pSearchMethodFunc = WelsMotionCrossSearch;
+    break;
+  case  ME_DIA_CROSS:
+    pSearchMethodFunc = WelsDiamondCrossSearch;
+    break;
+  case  ME_DIA_CROSS_FME:
+    pSearchMethodFunc = WelsDiamondCrossFeatureSearch;
+    break;
+  case ME_FULL:
+#ifdef HAVE_MMX
+    // make sure your cpu can support x86 sse4.1 instruction set if try it
+    //pSearchMethodFunc = WelsFullSearch;
+#else
+    pSearchMethodFunc = WelsDiamondSearch;
+    return false;
+#endif//HAVE_MMX
+    break;
+  default:
+    pSearchMethodFunc = WelsDiamondSearch;
+    return false;
+  }
+  return true;
+}
+
 
 
 void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
@@ -2465,13 +2495,19 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
   return;
   //to init at each frame will be needed when dealing with hybrid content (camera+screen)
   if (pCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
-    SFeatureSearchPreparation* pFeatureSearchPreparation = pCurLayer->pFeatureSearchPreparation;
-    if (pFeatureSearchPreparation) {
-      pFeatureSearchPreparation->iHighFreMbCount = 0;
+    if (P_SLICE == pCtx->eSliceType) {
+      //MD related func pointers
+      pFuncList->pfInterFineMd = WelsMdInterFinePartitionVaaOnScreen;
 
-      if (P_SLICE == pCtx->eSliceType) {
-        //MD related func pointers
-        pFuncList->pfInterFineMd = WelsMdInterFinePartitionVaaOnScreen;
+      //ME related func pointers
+      //ME16x16
+      if (!SetMeMethod (ME_DIA_CROSS, pFuncList->pfSearchMethod[BLOCK_16x16])) {
+        WelsLog (pCtx, WELS_LOG_WARNING, "SetMeMethod(BLOCK_16x16) ME_DIA_CROSS unsuccessful, switched to default search\n");
+      }
+      //ME8x8
+      SFeatureSearchPreparation* pFeatureSearchPreparation = pCurLayer->pFeatureSearchPreparation;
+      if (pFeatureSearchPreparation) {
+        pFeatureSearchPreparation->iHighFreMbCount = 0;
 
         //calculate bFMESwitchFlag
         SVAAFrameInfoExt* pVaaExt		= static_cast<SVAAFrameInfoExt*> (pCtx->pVaa);
@@ -2491,8 +2527,11 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
         }
 
         //assign ME pointer
-        if (pScreenBlockFeatureStorage->bRefBlockFeatureCalculated) {
-          //TBC int32_t iIs16x16 = pScreenBlockFeatureStorage->iIs16x16;
+        if (pFeatureSearchPreparation->bFMESwitchFlag && pScreenBlockFeatureStorage->bRefBlockFeatureCalculated
+            && (!pScreenBlockFeatureStorage->iIs16x16)) {
+          if (!SetMeMethod (ME_DIA_CROSS_FME, pFuncList->pfSearchMethod[BLOCK_8x8])) {
+            WelsLog (pCtx, WELS_LOG_WARNING, "SetMeMethod(BLOCK_8x8) ME_DIA_CROSS_FME unsuccessful, switched to default search\n");
+          }
         }
 
         //assign UpdateFMESwitch pointer
@@ -2501,11 +2540,11 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
         } else {
           pFuncList->pfUpdateFMESwitch = UpdateFMESwitchNull;
         }
-      } else {
-        //reset some status when at I_SLICE
-        pFeatureSearchPreparation->bFMESwitchFlag = true;
-        pFeatureSearchPreparation->uiFMEGoodFrameCount = FMESWITCH_DEFAULT_GOODFRAME_NUM;
-      }
+      }//if (pFeatureSearchPreparation)
+    } else {
+      //reset some status when at I_SLICE
+      pCurLayer->pFeatureSearchPreparation->bFMESwitchFlag = true;
+      pCurLayer->pFeatureSearchPreparation->uiFMEGoodFrameCount = FMESWITCH_DEFAULT_GOODFRAME_NUM;
     }
   }
 }
