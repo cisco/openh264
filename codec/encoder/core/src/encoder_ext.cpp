@@ -80,7 +80,7 @@ int32_t ParamValidation (SWelsSvcCodingParam* pCfg) {
   assert (pCfg != NULL);
 
   if ((pCfg->iUsageType != CAMERA_VIDEO_REAL_TIME) && (pCfg->iUsageType != SCREEN_CONTENT_REAL_TIME)) {
-    WelsLog (NULL, WELS_LOG_ERROR, "ParamValidation(),Invalid usage type = %d", pCfg->iUsageType);
+    WelsLog (NULL, WELS_LOG_ERROR, "ParamValidation(),Invalid usage type = %d\n", pCfg->iUsageType);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
   for (i = 0; i < pCfg->iSpatialLayerNum; ++ i) {
@@ -113,15 +113,16 @@ int32_t ParamValidation (SWelsSvcCodingParam* pCfg) {
   }
 
   //bitrate setting validation
-  if (pCfg->iRCMode != RC_OFF_MODE){
+  if (pCfg->iRCMode != RC_OFF_MODE) {
     int32_t  iTotalBitrate = 0;
     for (i = 0; i < pCfg->iSpatialLayerNum; ++ i) {
       SDLayerParam* fDlp = &pCfg->sDependencyLayers[i];
       iTotalBitrate += fDlp->iSpatialBitrate;
     }
-    if(iTotalBitrate > pCfg->iTargetBitrate){
-      WelsLog(NULL, WELS_LOG_ERROR,"Invalid setttings in bitrate. the sum of each layer bitrate(%d) is larger than total bitrate setting(%d)\n",
-              iTotalBitrate,pCfg->iTargetBitrate);
+    if (iTotalBitrate > pCfg->iTargetBitrate) {
+      WelsLog (NULL, WELS_LOG_ERROR,
+               "Invalid setttings in bitrate. the sum of each layer bitrate(%d) is larger than total bitrate setting(%d)\n",
+               iTotalBitrate, pCfg->iTargetBitrate);
     }
   }
 
