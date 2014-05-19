@@ -7,6 +7,7 @@ ifeq ($(ASM_ARCH), x86)
 ASMFLAGS += -DPREFIX
 ifeq ($(ENABLE64BIT), Yes)
 ASMFLAGS += -f macho64
+CFLAGS += -arch x86_64
 else
 ASMFLAGS += -f macho
 LDFLAGS += -read_only_relocs suppress

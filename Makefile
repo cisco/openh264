@@ -15,6 +15,7 @@ PREFIX=/usr/local
 SHARED=-shared
 OBJ=o
 PROJECT_NAME=openh264
+MODULE_NAME=mozopenh264
 CCASFLAGS=$(CFLAGS)
 
 ifeq (,$(wildcard ./gtest))
@@ -97,12 +98,15 @@ DECODER_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(DECODER_INCLUDES) -Ites
 ENCODER_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(ENCODER_INCLUDES) -Itest -Itest/encoder
 PROCESSING_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(PROCESSING_INCLUDES) -Itest -Itest/processing
 API_TEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) -Itest -Itest/api
+
+MODULE_INCLUDES = -Imodule/gmp-api $(ENCODER_INCLUDES) $(DECODER_INCLUDES)
+
 .PHONY: test gtest-bootstrap clean
 
 all:	libraries binaries
 
 clean:
-	$(QUIET)rm -f $(OBJS) $(OBJS:.$(OBJ)=.d) $(LIBRARIES) $(BINARIES)
+	$(QUIET)rm -f $(OBJS) $(OBJS:.$(OBJ)=.d) $(LIBRARIES) $(BINARIES) $(PLUGINS)
 
 gtest-bootstrap:
 	svn co https://googletest.googlecode.com/svn/trunk/ gtest
@@ -120,6 +124,7 @@ include codec/common/targets.mk
 include codec/decoder/targets.mk
 include codec/encoder/targets.mk
 include codec/processing/targets.mk
+include module/targets.mk
 
 ifneq (android, $(OS))
 ifneq (ios, $(OS))
@@ -156,6 +161,12 @@ endif
 
 install: install-static install-shared
 	@:
+
+plugin: $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX)
+PLUGINS += $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX)
+$(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX): $(MODULE_OBJS) $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
+	$(QUIET)rm -f $@
+	$(QUIET_CXX)$(CXX) $(SHARED) $(LDFLAGS) $(CXX_LINK_O) $+ $(SHLDFLAGS)
 
 ifeq ($(HAVE_GTEST),Yes)
 include build/gtest-targets.mk
