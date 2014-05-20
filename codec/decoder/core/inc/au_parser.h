@@ -96,6 +96,8 @@ bool CheckAccessUnitBoundary (PWelsDecoderContext pCtx, const PNalUnit kpCurNal,
                               const PSps kpSps);
 bool CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeaderExt pCurNalHeaderExt,
                                  PSliceHeader pLastSliceHeader, PSliceHeader pCurSliceHeader);
+bool CheckNextAuNewSeq (PWelsDecoderContext pCtx, const PNalUnit kpCurNal, const PSps kpSps);
+
 /*!
  *************************************************************************************
  * \brief	to parse Sequence Parameter Set (SPS)
