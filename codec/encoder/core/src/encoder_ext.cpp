@@ -2451,14 +2451,8 @@ bool SetMeMethod (const uint8_t uiMethod, PSearchMethodFunc& pSearchMethodFunc) 
     pSearchMethodFunc = WelsDiamondCrossFeatureSearch;
     break;
   case ME_FULL:
-#ifdef HAVE_MMX
-    // make sure your cpu can support x86 sse4.1 instruction set if try it
-    //pSearchMethodFunc = WelsFullSearch;
-#else
     pSearchMethodFunc = WelsDiamondSearch;
     return false;
-#endif//HAVE_MMX
-    break;
   default:
     pSearchMethodFunc = WelsDiamondSearch;
     return false;
