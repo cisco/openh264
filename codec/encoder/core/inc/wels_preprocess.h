@@ -178,9 +178,8 @@ class CWelsPreProcess {
   uint8_t          m_uiSpatialPicNum[MAX_DEPENDENCY_LAYER];
  public:
   /* For Downsampling & VAA I420 based source pictures */
-  SPicture*        m_pSpatialPic[MAX_DEPENDENCY_LAYER][MAX_TEMPORAL_LEVEL + 1 +
-      LONG_TERM_REF_NUM];	// need memory requirement with total number of (log2(uiGopSize)+1+1+long_term_ref_num)
-
+  SPicture*        m_pSpatialPic[MAX_DEPENDENCY_LAYER][MAX_REF_PIC_COUNT+1];	
+  // need memory requirement with total number of (log2(uiGopSize)+1+1+long_term_ref_num)
 };
 
 }
