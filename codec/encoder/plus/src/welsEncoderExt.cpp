@@ -479,7 +479,7 @@ int CWelsH264SVCEncoder::EncodeFrameInternal (const SSourcePicture*  pSrcPic, SF
 
       iCurLayerBits = 0;
       for (j = 0; j < pLayer->iNalCount; j++) {
-        iCurLayerBits += pLayer->iNalLengthInByte[j];
+        iCurLayerBits += pLayer->pNalLengthInByte[j];
       }
       total_bits += iCurLayerBits;
       if (m_pFileBs != NULL)
