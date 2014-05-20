@@ -739,7 +739,7 @@ int ProcessEncoding(ISVCEncoder* pPtrEnc, int argc, char** argv,bool bConfigFile
     if (!fseek (pFileYUV, 0, SEEK_END)) {
       int64_t i_size = ftell (pFileYUV);
       fseek (pFileYUV, 0, SEEK_SET);
-      iTotalFrameMax = WELS_MAX ((int32_t) (i_size / kiPicResSize), iTotalFrameMax);
+      iTotalFrameMax = WELS_MAX (WELS_ROUND (i_size / kiPicResSize), iTotalFrameMax);
     }
   } else {
     fprintf (stderr, "Unable to open source sequence file (%s), check corresponding path!\n",
