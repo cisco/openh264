@@ -236,11 +236,11 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
 
   iSliceIdx	= 0;
   while (iSliceIdx + 1 < kiCountSliceNum) {
-    int32_t iNumMbAssigning = (int32_t) (kiCountNumMb * pSliceComplexRatio[iSliceIdx] + EPSN);
+    int32_t iNumMbAssigning = WELS_ROUND(kiCountNumMb * pSliceComplexRatio[iSliceIdx]);
 
     // GOM boundary aligned
     if (pCtx->pSvcParam->iRCMode != RC_OFF_MODE) {
-      iNumMbAssigning = (int32_t) (1.0f * iNumMbAssigning / iNumMbInEachGom + 0.5f + EPSN) * iNumMbInEachGom;
+      iNumMbAssigning = WELS_ROUND (1.0f * iNumMbAssigning / iNumMbInEachGom) * iNumMbInEachGom;
     }
 
     // make sure one GOM at least in each pSlice for safe
