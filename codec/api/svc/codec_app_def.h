@@ -87,9 +87,9 @@ typedef enum {
   ENCOCER_LTR_MARKING_PERIOD,
   ENCODER_OPTION_LTR,
 
-  ENCODER_OPTION_ENABLE_SSEI,               //disable SSEI: true--disable ssei; false--enable ssei
+  ENCODER_OPTION_ENABLE_SSEI,               //enable SSEI: true--enable ssei; false--disable ssei
   ENCODER_OPTION_ENABLE_PREFIX_NAL_ADDING,   //enable prefix: true--enable prefix; false--disable prefix
-  ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, //disable pSps/pPps id addition: true--disable pSps/pPps id; false--enable pSps/pPps id addistion
+  ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, //enable pSps/pPps id addition: true--enable pSps/pPps id; false--disable pSps/pPps id addistion
 
   ENCODER_OPTION_CURRENT_PATH,
   ENCODER_OPTION_DUMP_FILE,
