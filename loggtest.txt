@@ -1,0 +1,2009 @@
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -Itest -Itest/decoder -c -o test/decoder/DecUT_ExpandPicture.o test/decoder/DecUT_ExpandPicture.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -Itest -Itest/decoder -c -o test/decoder/DecUT_IdctResAddPred.o test/decoder/DecUT_IdctResAddPred.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -Itest -Itest/decoder -c -o test/decoder/DecUT_IntraPrediction.o test/decoder/DecUT_IntraPrediction.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -Itest -Itest/decoder -c -o test/decoder/DecUT_MotionCompensation.o test/decoder/DecUT_MotionCompensation.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -Itest -Itest/decoder -c -o test/decoder/DecUT_PredMv.o test/decoder/DecUT_PredMv.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -Itest -Itest/encoder -c -o test/encoder/EncUT_DecodeMbAux.o test/encoder/EncUT_DecodeMbAux.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -Itest -Itest/encoder -c -o test/encoder/EncUT_EncoderMb.o test/encoder/EncUT_EncoderMb.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -Itest -Itest/encoder -c -o test/encoder/EncUT_EncoderMbAux.o test/encoder/EncUT_EncoderMbAux.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -Itest -Itest/encoder -c -o test/encoder/EncUT_ExpandPic.o test/encoder/EncUT_ExpandPic.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -Itest -Itest/encoder -c -o test/encoder/EncUT_ExpGolomb.o test/encoder/EncUT_ExpGolomb.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -Itest -Itest/encoder -c -o test/encoder/EncUT_GetIntraPredictor.o test/encoder/EncUT_GetIntraPredictor.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -Itest -Itest/encoder -c -o test/encoder/EncUT_MemoryAlloc.o test/encoder/EncUT_MemoryAlloc.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -Itest -Itest/encoder -c -o test/encoder/EncUT_MotionEstimate.o test/encoder/EncUT_MotionEstimate.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -Itest -Itest/encoder -c -o test/encoder/EncUT_Sample.o test/encoder/EncUT_Sample.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -Itest -Itest/processing -c -o test/processing/ProcessUT_ScrollDetection.o test/processing/ProcessUT_ScrollDetection.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Itest -Itest/api -c -o test/api/BaseDecoderTest.o test/api/BaseDecoderTest.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Itest -Itest/api -c -o test/api/BaseEncoderTest.o test/api/BaseEncoderTest.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Itest -Itest/api -c -o test/api/cpp_interface_test.o test/api/cpp_interface_test.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Itest -Itest/api -c -o test/api/DataGenerator.o test/api/DataGenerator.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Itest -Itest/api -c -o test/api/decode_encode_test.o test/api/decode_encode_test.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Itest -Itest/api -c -o test/api/decoder_test.o test/api/decoder_test.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Itest -Itest/api -c -o test/api/encoder_test.o test/api/encoder_test.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Itest -Itest/api -c -o test/api/simple_test.o test/api/simple_test.cpp
+cc -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP  -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Itest -Itest/api -c -o test/api/c_interface_test.o test/api/c_interface_test.c
+cc -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP  -Icodec/api/svc -Icodec/common/inc  -Igtest/include -Icodec/common/inc  -Itest -Itest/api -c -o test/api/sha1.o test/api/sha1.c
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Igtest -Igtest/include -c -o gtest/src/gtest-all.o gtest/src/gtest-all.cc
+rm -f libgtest.a
+ar cr libgtest.a gtest/src/gtest-all.o
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/au_parser.o codec/decoder/core/src/au_parser.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/bit_stream.o codec/decoder/core/src/bit_stream.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/deblocking.o codec/decoder/core/src/deblocking.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/decode_mb_aux.o codec/decoder/core/src/decode_mb_aux.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/decode_slice.o codec/decoder/core/src/decode_slice.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/decoder.o codec/decoder/core/src/decoder.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/decoder_core.o codec/decoder/core/src/decoder_core.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/decoder_data_tables.o codec/decoder/core/src/decoder_data_tables.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/error_concealment.o codec/decoder/core/src/error_concealment.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/expand_pic.o codec/decoder/core/src/expand_pic.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/fmo.o codec/decoder/core/src/fmo.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/get_intra_predictor.o codec/decoder/core/src/get_intra_predictor.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/manage_dec_ref.o codec/decoder/core/src/manage_dec_ref.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/mc.o codec/decoder/core/src/mc.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/mem_align.o codec/decoder/core/src/mem_align.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/memmgr_nal_unit.o codec/decoder/core/src/memmgr_nal_unit.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/mv_pred.o codec/decoder/core/src/mv_pred.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/parse_mb_syn_cavlc.o codec/decoder/core/src/parse_mb_syn_cavlc.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/pic_queue.o codec/decoder/core/src/pic_queue.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/rec_mb.o codec/decoder/core/src/rec_mb.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/core/src/utils.o codec/decoder/core/src/utils.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/plus/src/welsCodecTrace.o codec/decoder/plus/src/welsCodecTrace.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/decoder/core/inc -Icodec/decoder/plus/inc -c -o codec/decoder/plus/src/welsDecoderExt.o codec/decoder/plus/src/welsDecoderExt.cpp
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/decoder/core/x86/dct.o codec/decoder/core/x86/dct.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/decoder/core/x86/intra_pred.o codec/decoder/core/x86/intra_pred.asm
+rm -f libdecoder.a
+ar cr libdecoder.a codec/decoder/core/src/au_parser.o codec/decoder/core/src/bit_stream.o codec/decoder/core/src/deblocking.o codec/decoder/core/src/decode_mb_aux.o codec/decoder/core/src/decode_slice.o codec/decoder/core/src/decoder.o codec/decoder/core/src/decoder_core.o codec/decoder/core/src/decoder_data_tables.o codec/decoder/core/src/error_concealment.o codec/decoder/core/src/expand_pic.o codec/decoder/core/src/fmo.o codec/decoder/core/src/get_intra_predictor.o codec/decoder/core/src/manage_dec_ref.o codec/decoder/core/src/mc.o codec/decoder/core/src/mem_align.o codec/decoder/core/src/memmgr_nal_unit.o codec/decoder/core/src/mv_pred.o codec/decoder/core/src/parse_mb_syn_cavlc.o codec/decoder/core/src/pic_queue.o codec/decoder/core/src/rec_mb.o codec/decoder/core/src/utils.o codec/decoder/plus/src/welsCodecTrace.o codec/decoder/plus/src/welsDecoderExt.o codec/decoder/core/x86/dct.o codec/decoder/core/x86/intra_pred.o
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/au_set.o codec/encoder/core/src/au_set.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/deblocking.o codec/encoder/core/src/deblocking.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/decode_mb_aux.o codec/encoder/core/src/decode_mb_aux.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/encode_mb_aux.o codec/encoder/core/src/encode_mb_aux.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/encoder.o codec/encoder/core/src/encoder.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/encoder_data_tables.o codec/encoder/core/src/encoder_data_tables.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/encoder_ext.o codec/encoder/core/src/encoder_ext.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/expand_pic.o codec/encoder/core/src/expand_pic.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/get_intra_predictor.o codec/encoder/core/src/get_intra_predictor.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/mc.o codec/encoder/core/src/mc.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/md.o codec/encoder/core/src/md.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/memory_align.o codec/encoder/core/src/memory_align.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/mv_pred.o codec/encoder/core/src/mv_pred.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/nal_encap.o codec/encoder/core/src/nal_encap.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/picture_handle.o codec/encoder/core/src/picture_handle.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/property.o codec/encoder/core/src/property.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/ratectl.o codec/encoder/core/src/ratectl.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/ref_list_mgr_svc.o codec/encoder/core/src/ref_list_mgr_svc.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/sample.o codec/encoder/core/src/sample.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/set_mb_syn_cavlc.o codec/encoder/core/src/set_mb_syn_cavlc.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/slice_multi_threading.o codec/encoder/core/src/slice_multi_threading.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/svc_base_layer_md.o codec/encoder/core/src/svc_base_layer_md.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/svc_enc_slice_segment.o codec/encoder/core/src/svc_enc_slice_segment.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/svc_encode_mb.o codec/encoder/core/src/svc_encode_mb.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/svc_encode_slice.o codec/encoder/core/src/svc_encode_slice.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/svc_mode_decision.o codec/encoder/core/src/svc_mode_decision.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/svc_motion_estimate.o codec/encoder/core/src/svc_motion_estimate.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/svc_set_mb_syn_cavlc.o codec/encoder/core/src/svc_set_mb_syn_cavlc.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/utils.o codec/encoder/core/src/utils.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/core/src/wels_preprocess.o codec/encoder/core/src/wels_preprocess.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/plus/src/welsCodecTrace.o codec/encoder/plus/src/welsCodecTrace.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/encoder/core/inc -Icodec/encoder/plus/inc -Icodec/processing/interface -c -o codec/encoder/plus/src/welsEncoderExt.o codec/encoder/plus/src/welsEncoderExt.cpp
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/encoder/core/x86/coeff.o codec/encoder/core/x86/coeff.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/encoder/core/x86/dct.o codec/encoder/core/x86/dct.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/encoder/core/x86/intra_pred.o codec/encoder/core/x86/intra_pred.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/encoder/core/x86/matrix_transpose.o codec/encoder/core/x86/matrix_transpose.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/encoder/core/x86/memzero.o codec/encoder/core/x86/memzero.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/encoder/core/x86/quant.o codec/encoder/core/x86/quant.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/encoder/core/x86/sample_sc.o codec/encoder/core/x86/sample_sc.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/encoder/core/x86/score.o codec/encoder/core/x86/score.asm
+rm -f libencoder.a
+ar cr libencoder.a codec/encoder/core/src/au_set.o codec/encoder/core/src/deblocking.o codec/encoder/core/src/decode_mb_aux.o codec/encoder/core/src/encode_mb_aux.o codec/encoder/core/src/encoder.o codec/encoder/core/src/encoder_data_tables.o codec/encoder/core/src/encoder_ext.o codec/encoder/core/src/expand_pic.o codec/encoder/core/src/get_intra_predictor.o codec/encoder/core/src/mc.o codec/encoder/core/src/md.o codec/encoder/core/src/memory_align.o codec/encoder/core/src/mv_pred.o codec/encoder/core/src/nal_encap.o codec/encoder/core/src/picture_handle.o codec/encoder/core/src/property.o codec/encoder/core/src/ratectl.o codec/encoder/core/src/ref_list_mgr_svc.o codec/encoder/core/src/sample.o codec/encoder/core/src/set_mb_syn_cavlc.o codec/encoder/core/src/slice_multi_threading.o codec/encoder/core/src/svc_base_layer_md.o codec/encoder/core/src/svc_enc_slice_segment.o codec/encoder/core/src/svc_encode_mb.o codec/encoder/core/src/svc_encode_slice.o codec/encoder/core/src/svc_mode_decision.o codec/encoder/core/src/svc_motion_estimate.o codec/encoder/core/src/svc_set_mb_syn_cavlc.o codec/encoder/core/src/utils.o codec/encoder/core/src/wels_preprocess.o codec/encoder/plus/src/welsCodecTrace.o codec/encoder/plus/src/welsEncoderExt.o codec/encoder/core/x86/coeff.o codec/encoder/core/x86/dct.o codec/encoder/core/x86/intra_pred.o codec/encoder/core/x86/matrix_transpose.o codec/encoder/core/x86/memzero.o codec/encoder/core/x86/quant.o codec/encoder/core/x86/sample_sc.o codec/encoder/core/x86/score.o
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/adaptivequantization/AdaptiveQuantization.o codec/processing/src/adaptivequantization/AdaptiveQuantization.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/backgrounddetection/BackgroundDetection.o codec/processing/src/backgrounddetection/BackgroundDetection.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/common/common.o codec/processing/src/common/common.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/common/memory.o codec/processing/src/common/memory.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/common/WelsFrameWork.o codec/processing/src/common/WelsFrameWork.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/common/WelsFrameWorkEx.o codec/processing/src/common/WelsFrameWorkEx.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/complexityanalysis/ComplexityAnalysis.o codec/processing/src/complexityanalysis/ComplexityAnalysis.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/denoise/denoise.o codec/processing/src/denoise/denoise.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/denoise/denoise_filter.o codec/processing/src/denoise/denoise_filter.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/downsample/downsample.o codec/processing/src/downsample/downsample.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/downsample/downsamplefuncs.o codec/processing/src/downsample/downsamplefuncs.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/imagerotate/imagerotate.o codec/processing/src/imagerotate/imagerotate.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/imagerotate/imagerotatefuncs.o codec/processing/src/imagerotate/imagerotatefuncs.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/scenechangedetection/SceneChangeDetection.o codec/processing/src/scenechangedetection/SceneChangeDetection.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/scrolldetection/ScrollDetection.o codec/processing/src/scrolldetection/ScrollDetection.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/scrolldetection/ScrollDetectionFuncs.o codec/processing/src/scrolldetection/ScrollDetectionFuncs.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/vaacalc/vaacalcfuncs.o codec/processing/src/vaacalc/vaacalcfuncs.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc  -Icodec/processing/interface -Icodec/processing/src/common -Icodec/processing/src/scrolldetection -c -o codec/processing/src/vaacalc/vaacalculation.o codec/processing/src/vaacalc/vaacalculation.cpp
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/processing/src/x86/denoisefilter.o codec/processing/src/x86/denoisefilter.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/processing/src/x86/downsample_bilinear.o codec/processing/src/x86/downsample_bilinear.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/processing/src/x86/vaa.o codec/processing/src/x86/vaa.asm
+rm -f libprocessing.a
+ar cr libprocessing.a codec/processing/src/adaptivequantization/AdaptiveQuantization.o codec/processing/src/backgrounddetection/BackgroundDetection.o codec/processing/src/common/common.o codec/processing/src/common/memory.o codec/processing/src/common/WelsFrameWork.o codec/processing/src/common/WelsFrameWorkEx.o codec/processing/src/complexityanalysis/ComplexityAnalysis.o codec/processing/src/denoise/denoise.o codec/processing/src/denoise/denoise_filter.o codec/processing/src/downsample/downsample.o codec/processing/src/downsample/downsamplefuncs.o codec/processing/src/imagerotate/imagerotate.o codec/processing/src/imagerotate/imagerotatefuncs.o codec/processing/src/scenechangedetection/SceneChangeDetection.o codec/processing/src/scrolldetection/ScrollDetection.o codec/processing/src/scrolldetection/ScrollDetectionFuncs.o codec/processing/src/vaacalc/vaacalcfuncs.o codec/processing/src/vaacalc/vaacalculation.o codec/processing/src/x86/denoisefilter.o codec/processing/src/x86/downsample_bilinear.o codec/processing/src/x86/vaa.o
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc   -c -o codec/common/src/copy_mb.o codec/common/src/copy_mb.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc   -c -o codec/common/src/cpu.o codec/common/src/cpu.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc   -c -o codec/common/src/crt_util_safe_x.o codec/common/src/crt_util_safe_x.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc   -c -o codec/common/src/deblocking_common.o codec/common/src/deblocking_common.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc   -c -o codec/common/src/logging.o codec/common/src/logging.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc   -c -o codec/common/src/sad_common.o codec/common/src/sad_common.cpp
+g++ -O3 -m64 -DX86_ASM -Wall -fno-strict-aliasing -fPIC -MMD -MP   -Icodec/api/svc -Icodec/common/inc   -c -o codec/common/src/WelsThreadLib.o codec/common/src/WelsThreadLib.cpp
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/common/x86/cpuid.o codec/common/x86/cpuid.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/common/x86/deblock.o codec/common/x86/deblock.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/common/x86/expand_picture.o codec/common/x86/expand_picture.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/common/x86/mb_copy.o codec/common/x86/mb_copy.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/common/x86/mc_chroma.o codec/common/x86/mc_chroma.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/common/x86/mc_luma.o codec/common/x86/mc_luma.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/common/x86/satd_sad.o codec/common/x86/satd_sad.asm
+nasm -DUNIX64 -f elf64 -Icodec/common/x86/   -o codec/common/x86/vaa.o codec/common/x86/vaa.asm
+rm -f libcommon.a
+ar cr libcommon.a codec/common/src/copy_mb.o codec/common/src/cpu.o codec/common/src/crt_util_safe_x.o codec/common/src/deblocking_common.o codec/common/src/logging.o codec/common/src/sad_common.o codec/common/src/WelsThreadLib.o codec/common/x86/cpuid.o codec/common/x86/deblock.o codec/common/x86/expand_picture.o codec/common/x86/mb_copy.o codec/common/x86/mc_chroma.o codec/common/x86/mc_luma.o codec/common/x86/satd_sad.o codec/common/x86/vaa.o
+rm -f codec_unittest
+g++ -o codec_unittest test/decoder/DecUT_Deblock.o test/decoder/DecUT_ErrorConcealment.o test/decoder/DecUT_ExpandPicture.o test/decoder/DecUT_IdctResAddPred.o test/decoder/DecUT_IntraPrediction.o test/decoder/DecUT_MotionCompensation.o test/decoder/DecUT_PredMv.o test/encoder/EncUT_DecodeMbAux.o test/encoder/EncUT_EncoderMb.o test/encoder/EncUT_EncoderMbAux.o test/encoder/EncUT_ExpandPic.o test/encoder/EncUT_ExpGolomb.o test/encoder/EncUT_GetIntraPredictor.o test/encoder/EncUT_MemoryAlloc.o test/encoder/EncUT_MotionEstimate.o test/encoder/EncUT_Sample.o test/processing/ProcessUT_ScrollDetection.o test/api/BaseDecoderTest.o test/api/BaseEncoderTest.o test/api/cpp_interface_test.o test/api/DataGenerator.o test/api/decode_encode_test.o test/api/decoder_test.o test/api/encoder_test.o test/api/simple_test.o test/api/c_interface_test.o test/api/sha1.o libgtest.a libdecoder.a libencoder.a libprocessing.a libcommon.a -L. -lgtest -ldecoder -lencoder -lprocessing -lcommon  -m64 -lpthread 
+./codec_unittest
+[==========] Running 773 tests from 106 test cases.
+[----------] Global test environment set-up.
+[----------] 8 tests from DeblockTest
+[ RUN      ] DeblockTest.LumaLt4V_ssse3
+[       OK ] DeblockTest.LumaLt4V_ssse3 (4 ms)
+[ RUN      ] DeblockTest.LumaLt4H_ssse3
+[       OK ] DeblockTest.LumaLt4H_ssse3 (4 ms)
+[ RUN      ] DeblockTest.LumaEq4V_ssse3
+[       OK ] DeblockTest.LumaEq4V_ssse3 (5 ms)
+[ RUN      ] DeblockTest.LumaEq4H_ssse3
+[       OK ] DeblockTest.LumaEq4H_ssse3 (4 ms)
+[ RUN      ] DeblockTest.ChromaLt4V_ssse3
+[       OK ] DeblockTest.ChromaLt4V_ssse3 (2 ms)
+[ RUN      ] DeblockTest.ChromaLt4H_ssse3
+[       OK ] DeblockTest.ChromaLt4H_ssse3 (3 ms)
+[ RUN      ] DeblockTest.ChromaEq4V_ssse3
+[       OK ] DeblockTest.ChromaEq4V_ssse3 (2 ms)
+[ RUN      ] DeblockTest.ChromaEq4H_ssse3
+[       OK ] DeblockTest.ChromaEq4H_ssse3 (2 ms)
+[----------] 8 tests from DeblockTest (26 ms total)
+
+[----------] 2 tests from ErrorConTest
+[ RUN      ] ErrorConTest.DoErrorConFrameCopy
+[       OK ] ErrorConTest.DoErrorConFrameCopy (48 ms)
+[ RUN      ] ErrorConTest.DoErrorConSliceCopy
+[       OK ] ErrorConTest.DoErrorConSliceCopy (48 ms)
+[----------] 2 tests from ErrorConTest (96 ms total)
+
+[----------] 3 tests from ExpandPicture
+[ RUN      ] ExpandPicture.ExpandPictureLuma
+[       OK ] ExpandPicture.ExpandPictureLuma (134 ms)
+[ RUN      ] ExpandPicture.ExpandPictureChroma
+[       OK ] ExpandPicture.ExpandPictureChroma (25 ms)
+[ RUN      ] ExpandPicture.ExpandPicForMotion
+[       OK ] ExpandPicture.ExpandPicForMotion (133 ms)
+[----------] 3 tests from ExpandPicture (293 ms total)
+
+[----------] 2 tests from DecoderDecodeMbAux
+[ RUN      ] DecoderDecodeMbAux.IdctResAddPred_c
+[       OK ] DecoderDecodeMbAux.IdctResAddPred_c (1 ms)
+[ RUN      ] DecoderDecodeMbAux.IdctResAddPred_mmx
+[       OK ] DecoderDecodeMbAux.IdctResAddPred_mmx (0 ms)
+[----------] 2 tests from DecoderDecodeMbAux (1 ms total)
+
+[----------] 48 tests from DecoderIntraPredictionTest
+[ RUN      ] DecoderIntraPredictionTest.WelsI4x4LumaPredV_c
+[       OK ] DecoderIntraPredictionTest.WelsI4x4LumaPredV_c (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI4x4LumaPredH_c
+[       OK ] DecoderIntraPredictionTest.WelsI4x4LumaPredH_c (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI4x4LumaPredDc_c
+[       OK ] DecoderIntraPredictionTest.WelsI4x4LumaPredDc_c (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI4x4LumaPredDcLeft_c
+[       OK ] DecoderIntraPredictionTest.WelsI4x4LumaPredDcLeft_c (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI4x4LumaPredDcTop_c
+[       OK ] DecoderIntraPredictionTest.WelsI4x4LumaPredDcTop_c (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI4x4LumaPredDcNA_c
+[       OK ] DecoderIntraPredictionTest.WelsI4x4LumaPredDcNA_c (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI4x4LumaPredDDL_c
+[       OK ] DecoderIntraPredictionTest.WelsI4x4LumaPredDDL_c (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI4x4LumaPredDDLTop_c
+[       OK ] DecoderIntraPredictionTest.WelsI4x4LumaPredDDLTop_c (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI4x4LumaPredDDR_c
+[       OK ] DecoderIntraPredictionTest.WelsI4x4LumaPredDDR_c (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI4x4LumaPredVR_c
+[       OK ] DecoderIntraPredictionTest.WelsI4x4LumaPredVR_c (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI4x4LumaPredVL_c
+[       OK ] DecoderIntraPredictionTest.WelsI4x4LumaPredVL_c (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI4x4LumaPredVLTop_c
+[       OK ] DecoderIntraPredictionTest.WelsI4x4LumaPredVLTop_c (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI4x4LumaPredHU_c
+[       OK ] DecoderIntraPredictionTest.WelsI4x4LumaPredHU_c (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI4x4LumaPredHD_c
+[       OK ] DecoderIntraPredictionTest.WelsI4x4LumaPredHD_c (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsIChromaPredDcNA_c
+[       OK ] DecoderIntraPredictionTest.WelsIChromaPredDcNA_c (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsIChromaPredPlane_c
+[       OK ] DecoderIntraPredictionTest.WelsIChromaPredPlane_c (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsIChromaPredDc_c
+[       OK ] DecoderIntraPredictionTest.WelsIChromaPredDc_c (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsIChromaPredDcTop_c
+[       OK ] DecoderIntraPredictionTest.WelsIChromaPredDcTop_c (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsIChromaPredDcLeft_c
+[       OK ] DecoderIntraPredictionTest.WelsIChromaPredDcLeft_c (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsIChromaPredH_c
+[       OK ] DecoderIntraPredictionTest.WelsIChromaPredH_c (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsIChromaPredV_c
+[       OK ] DecoderIntraPredictionTest.WelsIChromaPredV_c (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI16x16LumaPredDcNA_c
+[       OK ] DecoderIntraPredictionTest.WelsI16x16LumaPredDcNA_c (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI16x16LumaPredPlane_c
+[       OK ] DecoderIntraPredictionTest.WelsI16x16LumaPredPlane_c (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI16x16LumaPredDcLeft_c
+[       OK ] DecoderIntraPredictionTest.WelsI16x16LumaPredDcLeft_c (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI16x16LumaPredDcTop_c
+[       OK ] DecoderIntraPredictionTest.WelsI16x16LumaPredDcTop_c (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI16x16LumaPredDc_c
+[       OK ] DecoderIntraPredictionTest.WelsI16x16LumaPredDc_c (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI16x16LumaPredH_c
+[       OK ] DecoderIntraPredictionTest.WelsI16x16LumaPredH_c (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsI16x16LumaPredV_c
+[       OK ] DecoderIntraPredictionTest.WelsI16x16LumaPredV_c (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderI4x4LumaPredH_sse2
+[       OK ] DecoderIntraPredictionTest.WelsDecoderI4x4LumaPredH_sse2 (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderI4x4LumaPredDDR_mmx
+[       OK ] DecoderIntraPredictionTest.WelsDecoderI4x4LumaPredDDR_mmx (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderI4x4LumaPredHD_mmx
+[       OK ] DecoderIntraPredictionTest.WelsDecoderI4x4LumaPredHD_mmx (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderI4x4LumaPredHU_mmx
+[       OK ] DecoderIntraPredictionTest.WelsDecoderI4x4LumaPredHU_mmx (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderI4x4LumaPredVR_mmx
+[       OK ] DecoderIntraPredictionTest.WelsDecoderI4x4LumaPredVR_mmx (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderI4x4LumaPredDDL_mmx
+[       OK ] DecoderIntraPredictionTest.WelsDecoderI4x4LumaPredDDL_mmx (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderI4x4LumaPredVL_mmx
+[       OK ] DecoderIntraPredictionTest.WelsDecoderI4x4LumaPredVL_mmx (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderIChromaPredDcTop_sse2
+[       OK ] DecoderIntraPredictionTest.WelsDecoderIChromaPredDcTop_sse2 (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderIChromaPredDc_sse2
+[       OK ] DecoderIntraPredictionTest.WelsDecoderIChromaPredDc_sse2 (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderIChromaPredPlane_sse2
+[       OK ] DecoderIntraPredictionTest.WelsDecoderIChromaPredPlane_sse2 (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderIChromaPredH_mmx
+[       OK ] DecoderIntraPredictionTest.WelsDecoderIChromaPredH_mmx (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderIChromaPredV_mmx
+[       OK ] DecoderIntraPredictionTest.WelsDecoderIChromaPredV_mmx (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderIChromaPredDcLeft_mmx
+[       OK ] DecoderIntraPredictionTest.WelsDecoderIChromaPredDcLeft_mmx (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderIChromaPredDcNA_mmx
+[       OK ] DecoderIntraPredictionTest.WelsDecoderIChromaPredDcNA_mmx (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderI16x16LumaPredPlane_sse2
+[       OK ] DecoderIntraPredictionTest.WelsDecoderI16x16LumaPredPlane_sse2 (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderI16x16LumaPredH_sse2
+[       OK ] DecoderIntraPredictionTest.WelsDecoderI16x16LumaPredH_sse2 (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderI16x16LumaPredV_sse2
+[       OK ] DecoderIntraPredictionTest.WelsDecoderI16x16LumaPredV_sse2 (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderI16x16LumaPredDc_sse2
+[       OK ] DecoderIntraPredictionTest.WelsDecoderI16x16LumaPredDc_sse2 (0 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderI16x16LumaPredDcTop_sse2
+[       OK ] DecoderIntraPredictionTest.WelsDecoderI16x16LumaPredDcTop_sse2 (1 ms)
+[ RUN      ] DecoderIntraPredictionTest.WelsDecoderI16x16LumaPredDcNA_sse2
+[       OK ] DecoderIntraPredictionTest.WelsDecoderI16x16LumaPredDcNA_sse2 (1 ms)
+[----------] 48 tests from DecoderIntraPredictionTest (23 ms total)
+
+[----------] 10 tests from McCopy_c
+[ RUN      ] McCopy_c.2x2
+[       OK ] McCopy_c.2x2 (0 ms)
+[ RUN      ] McCopy_c.4x2
+[       OK ] McCopy_c.4x2 (0 ms)
+[ RUN      ] McCopy_c.2x4
+[       OK ] McCopy_c.2x4 (0 ms)
+[ RUN      ] McCopy_c.4x4
+[       OK ] McCopy_c.4x4 (0 ms)
+[ RUN      ] McCopy_c.8x4
+[       OK ] McCopy_c.8x4 (0 ms)
+[ RUN      ] McCopy_c.4x8
+[       OK ] McCopy_c.4x8 (0 ms)
+[ RUN      ] McCopy_c.8x8
+[       OK ] McCopy_c.8x8 (0 ms)
+[ RUN      ] McCopy_c.8x16
+[       OK ] McCopy_c.8x16 (0 ms)
+[ RUN      ] McCopy_c.16x8
+[       OK ] McCopy_c.16x8 (0 ms)
+[ RUN      ] McCopy_c.16x16
+[       OK ] McCopy_c.16x16 (0 ms)
+[----------] 10 tests from McCopy_c (0 ms total)
+
+[----------] 7 tests from McHorVer01_c
+[ RUN      ] McHorVer01_c.4x4
+[       OK ] McHorVer01_c.4x4 (0 ms)
+[ RUN      ] McHorVer01_c.4x8
+[       OK ] McHorVer01_c.4x8 (0 ms)
+[ RUN      ] McHorVer01_c.8x4
+[       OK ] McHorVer01_c.8x4 (0 ms)
+[ RUN      ] McHorVer01_c.8x8
+[       OK ] McHorVer01_c.8x8 (0 ms)
+[ RUN      ] McHorVer01_c.16x8
+[       OK ] McHorVer01_c.16x8 (0 ms)
+[ RUN      ] McHorVer01_c.8x16
+[       OK ] McHorVer01_c.8x16 (0 ms)
+[ RUN      ] McHorVer01_c.16x16
+[       OK ] McHorVer01_c.16x16 (0 ms)
+[----------] 7 tests from McHorVer01_c (0 ms total)
+
+[----------] 7 tests from McHorVer02_c
+[ RUN      ] McHorVer02_c.4x4
+[       OK ] McHorVer02_c.4x4 (0 ms)
+[ RUN      ] McHorVer02_c.4x8
+[       OK ] McHorVer02_c.4x8 (0 ms)
+[ RUN      ] McHorVer02_c.8x4
+[       OK ] McHorVer02_c.8x4 (0 ms)
+[ RUN      ] McHorVer02_c.8x8
+[       OK ] McHorVer02_c.8x8 (0 ms)
+[ RUN      ] McHorVer02_c.16x8
+[       OK ] McHorVer02_c.16x8 (0 ms)
+[ RUN      ] McHorVer02_c.8x16
+[       OK ] McHorVer02_c.8x16 (0 ms)
+[ RUN      ] McHorVer02_c.16x16
+[       OK ] McHorVer02_c.16x16 (0 ms)
+[----------] 7 tests from McHorVer02_c (0 ms total)
+
+[----------] 7 tests from McHorVer03_c
+[ RUN      ] McHorVer03_c.4x4
+[       OK ] McHorVer03_c.4x4 (0 ms)
+[ RUN      ] McHorVer03_c.4x8
+[       OK ] McHorVer03_c.4x8 (0 ms)
+[ RUN      ] McHorVer03_c.8x4
+[       OK ] McHorVer03_c.8x4 (0 ms)
+[ RUN      ] McHorVer03_c.8x8
+[       OK ] McHorVer03_c.8x8 (0 ms)
+[ RUN      ] McHorVer03_c.16x8
+[       OK ] McHorVer03_c.16x8 (0 ms)
+[ RUN      ] McHorVer03_c.8x16
+[       OK ] McHorVer03_c.8x16 (0 ms)
+[ RUN      ] McHorVer03_c.16x16
+[       OK ] McHorVer03_c.16x16 (0 ms)
+[----------] 7 tests from McHorVer03_c (1 ms total)
+
+[----------] 7 tests from McHorVer10_c
+[ RUN      ] McHorVer10_c.4x4
+[       OK ] McHorVer10_c.4x4 (0 ms)
+[ RUN      ] McHorVer10_c.4x8
+[       OK ] McHorVer10_c.4x8 (0 ms)
+[ RUN      ] McHorVer10_c.8x4
+[       OK ] McHorVer10_c.8x4 (0 ms)
+[ RUN      ] McHorVer10_c.8x8
+[       OK ] McHorVer10_c.8x8 (0 ms)
+[ RUN      ] McHorVer10_c.16x8
+[       OK ] McHorVer10_c.16x8 (0 ms)
+[ RUN      ] McHorVer10_c.8x16
+[       OK ] McHorVer10_c.8x16 (0 ms)
+[ RUN      ] McHorVer10_c.16x16
+[       OK ] McHorVer10_c.16x16 (0 ms)
+[----------] 7 tests from McHorVer10_c (0 ms total)
+
+[----------] 7 tests from McHorVer11_c
+[ RUN      ] McHorVer11_c.4x4
+[       OK ] McHorVer11_c.4x4 (0 ms)
+[ RUN      ] McHorVer11_c.4x8
+[       OK ] McHorVer11_c.4x8 (0 ms)
+[ RUN      ] McHorVer11_c.8x4
+[       OK ] McHorVer11_c.8x4 (0 ms)
+[ RUN      ] McHorVer11_c.8x8
+[       OK ] McHorVer11_c.8x8 (0 ms)
+[ RUN      ] McHorVer11_c.16x8
+[       OK ] McHorVer11_c.16x8 (0 ms)
+[ RUN      ] McHorVer11_c.8x16
+[       OK ] McHorVer11_c.8x16 (0 ms)
+[ RUN      ] McHorVer11_c.16x16
+[       OK ] McHorVer11_c.16x16 (0 ms)
+[----------] 7 tests from McHorVer11_c (0 ms total)
+
+[----------] 7 tests from McHorVer12_c
+[ RUN      ] McHorVer12_c.4x4
+[       OK ] McHorVer12_c.4x4 (0 ms)
+[ RUN      ] McHorVer12_c.4x8
+[       OK ] McHorVer12_c.4x8 (0 ms)
+[ RUN      ] McHorVer12_c.8x4
+[       OK ] McHorVer12_c.8x4 (0 ms)
+[ RUN      ] McHorVer12_c.8x8
+[       OK ] McHorVer12_c.8x8 (0 ms)
+[ RUN      ] McHorVer12_c.16x8
+[       OK ] McHorVer12_c.16x8 (0 ms)
+[ RUN      ] McHorVer12_c.8x16
+[       OK ] McHorVer12_c.8x16 (0 ms)
+[ RUN      ] McHorVer12_c.16x16
+[       OK ] McHorVer12_c.16x16 (0 ms)
+[----------] 7 tests from McHorVer12_c (0 ms total)
+
+[----------] 7 tests from McHorVer13_c
+[ RUN      ] McHorVer13_c.4x4
+[       OK ] McHorVer13_c.4x4 (1 ms)
+[ RUN      ] McHorVer13_c.4x8
+[       OK ] McHorVer13_c.4x8 (0 ms)
+[ RUN      ] McHorVer13_c.8x4
+[       OK ] McHorVer13_c.8x4 (0 ms)
+[ RUN      ] McHorVer13_c.8x8
+[       OK ] McHorVer13_c.8x8 (0 ms)
+[ RUN      ] McHorVer13_c.16x8
+[       OK ] McHorVer13_c.16x8 (0 ms)
+[ RUN      ] McHorVer13_c.8x16
+[       OK ] McHorVer13_c.8x16 (0 ms)
+[ RUN      ] McHorVer13_c.16x16
+[       OK ] McHorVer13_c.16x16 (0 ms)
+[----------] 7 tests from McHorVer13_c (1 ms total)
+
+[----------] 7 tests from McHorVer20_c
+[ RUN      ] McHorVer20_c.4x4
+[       OK ] McHorVer20_c.4x4 (0 ms)
+[ RUN      ] McHorVer20_c.4x8
+[       OK ] McHorVer20_c.4x8 (0 ms)
+[ RUN      ] McHorVer20_c.8x4
+[       OK ] McHorVer20_c.8x4 (0 ms)
+[ RUN      ] McHorVer20_c.8x8
+[       OK ] McHorVer20_c.8x8 (0 ms)
+[ RUN      ] McHorVer20_c.16x8
+[       OK ] McHorVer20_c.16x8 (0 ms)
+[ RUN      ] McHorVer20_c.8x16
+[       OK ] McHorVer20_c.8x16 (0 ms)
+[ RUN      ] McHorVer20_c.16x16
+[       OK ] McHorVer20_c.16x16 (0 ms)
+[----------] 7 tests from McHorVer20_c (0 ms total)
+
+[----------] 7 tests from McHorVer21_c
+[ RUN      ] McHorVer21_c.4x4
+[       OK ] McHorVer21_c.4x4 (0 ms)
+[ RUN      ] McHorVer21_c.4x8
+[       OK ] McHorVer21_c.4x8 (0 ms)
+[ RUN      ] McHorVer21_c.8x4
+[       OK ] McHorVer21_c.8x4 (0 ms)
+[ RUN      ] McHorVer21_c.8x8
+[       OK ] McHorVer21_c.8x8 (0 ms)
+[ RUN      ] McHorVer21_c.16x8
+[       OK ] McHorVer21_c.16x8 (0 ms)
+[ RUN      ] McHorVer21_c.8x16
+[       OK ] McHorVer21_c.8x16 (0 ms)
+[ RUN      ] McHorVer21_c.16x16
+[       OK ] McHorVer21_c.16x16 (0 ms)
+[----------] 7 tests from McHorVer21_c (0 ms total)
+
+[----------] 7 tests from McHorVer22_c
+[ RUN      ] McHorVer22_c.4x4
+[       OK ] McHorVer22_c.4x4 (0 ms)
+[ RUN      ] McHorVer22_c.4x8
+[       OK ] McHorVer22_c.4x8 (0 ms)
+[ RUN      ] McHorVer22_c.8x4
+[       OK ] McHorVer22_c.8x4 (0 ms)
+[ RUN      ] McHorVer22_c.8x8
+[       OK ] McHorVer22_c.8x8 (0 ms)
+[ RUN      ] McHorVer22_c.16x8
+[       OK ] McHorVer22_c.16x8 (0 ms)
+[ RUN      ] McHorVer22_c.8x16
+[       OK ] McHorVer22_c.8x16 (0 ms)
+[ RUN      ] McHorVer22_c.16x16
+[       OK ] McHorVer22_c.16x16 (0 ms)
+[----------] 7 tests from McHorVer22_c (0 ms total)
+
+[----------] 7 tests from McHorVer23_c
+[ RUN      ] McHorVer23_c.4x4
+[       OK ] McHorVer23_c.4x4 (1 ms)
+[ RUN      ] McHorVer23_c.4x8
+[       OK ] McHorVer23_c.4x8 (0 ms)
+[ RUN      ] McHorVer23_c.8x4
+[       OK ] McHorVer23_c.8x4 (0 ms)
+[ RUN      ] McHorVer23_c.8x8
+[       OK ] McHorVer23_c.8x8 (0 ms)
+[ RUN      ] McHorVer23_c.16x8
+[       OK ] McHorVer23_c.16x8 (0 ms)
+[ RUN      ] McHorVer23_c.8x16
+[       OK ] McHorVer23_c.8x16 (0 ms)
+[ RUN      ] McHorVer23_c.16x16
+[       OK ] McHorVer23_c.16x16 (0 ms)
+[----------] 7 tests from McHorVer23_c (1 ms total)
+
+[----------] 7 tests from McHorVer30_c
+[ RUN      ] McHorVer30_c.4x4
+[       OK ] McHorVer30_c.4x4 (0 ms)
+[ RUN      ] McHorVer30_c.4x8
+[       OK ] McHorVer30_c.4x8 (0 ms)
+[ RUN      ] McHorVer30_c.8x4
+[       OK ] McHorVer30_c.8x4 (0 ms)
+[ RUN      ] McHorVer30_c.8x8
+[       OK ] McHorVer30_c.8x8 (0 ms)
+[ RUN      ] McHorVer30_c.16x8
+[       OK ] McHorVer30_c.16x8 (0 ms)
+[ RUN      ] McHorVer30_c.8x16
+[       OK ] McHorVer30_c.8x16 (0 ms)
+[ RUN      ] McHorVer30_c.16x16
+[       OK ] McHorVer30_c.16x16 (0 ms)
+[----------] 7 tests from McHorVer30_c (0 ms total)
+
+[----------] 7 tests from McHorVer31_c
+[ RUN      ] McHorVer31_c.4x4
+[       OK ] McHorVer31_c.4x4 (0 ms)
+[ RUN      ] McHorVer31_c.4x8
+[       OK ] McHorVer31_c.4x8 (0 ms)
+[ RUN      ] McHorVer31_c.8x4
+[       OK ] McHorVer31_c.8x4 (0 ms)
+[ RUN      ] McHorVer31_c.8x8
+[       OK ] McHorVer31_c.8x8 (0 ms)
+[ RUN      ] McHorVer31_c.16x8
+[       OK ] McHorVer31_c.16x8 (0 ms)
+[ RUN      ] McHorVer31_c.8x16
+[       OK ] McHorVer31_c.8x16 (0 ms)
+[ RUN      ] McHorVer31_c.16x16
+[       OK ] McHorVer31_c.16x16 (0 ms)
+[----------] 7 tests from McHorVer31_c (0 ms total)
+
+[----------] 7 tests from McHorVer32_c
+[ RUN      ] McHorVer32_c.4x4
+[       OK ] McHorVer32_c.4x4 (0 ms)
+[ RUN      ] McHorVer32_c.4x8
+[       OK ] McHorVer32_c.4x8 (0 ms)
+[ RUN      ] McHorVer32_c.8x4
+[       OK ] McHorVer32_c.8x4 (0 ms)
+[ RUN      ] McHorVer32_c.8x8
+[       OK ] McHorVer32_c.8x8 (0 ms)
+[ RUN      ] McHorVer32_c.16x8
+[       OK ] McHorVer32_c.16x8 (0 ms)
+[ RUN      ] McHorVer32_c.8x16
+[       OK ] McHorVer32_c.8x16 (0 ms)
+[ RUN      ] McHorVer32_c.16x16
+[       OK ] McHorVer32_c.16x16 (0 ms)
+[----------] 7 tests from McHorVer32_c (0 ms total)
+
+[----------] 7 tests from McHorVer33_c
+[ RUN      ] McHorVer33_c.4x4
+[       OK ] McHorVer33_c.4x4 (0 ms)
+[ RUN      ] McHorVer33_c.4x8
+[       OK ] McHorVer33_c.4x8 (0 ms)
+[ RUN      ] McHorVer33_c.8x4
+[       OK ] McHorVer33_c.8x4 (0 ms)
+[ RUN      ] McHorVer33_c.8x8
+[       OK ] McHorVer33_c.8x8 (0 ms)
+[ RUN      ] McHorVer33_c.16x8
+[       OK ] McHorVer33_c.16x8 (0 ms)
+[ RUN      ] McHorVer33_c.8x16
+[       OK ] McHorVer33_c.8x16 (0 ms)
+[ RUN      ] McHorVer33_c.16x16
+[       OK ] McHorVer33_c.16x16 (0 ms)
+[----------] 7 tests from McHorVer33_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_01_c
+[ RUN      ] McChromaWithFragMv_01_c.2x2
+[       OK ] McChromaWithFragMv_01_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_01_c.2x4
+[       OK ] McChromaWithFragMv_01_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_01_c.4x2
+[       OK ] McChromaWithFragMv_01_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_01_c.4x4
+[       OK ] McChromaWithFragMv_01_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_01_c.4x8
+[       OK ] McChromaWithFragMv_01_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_01_c.8x4
+[       OK ] McChromaWithFragMv_01_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_01_c.8x8
+[       OK ] McChromaWithFragMv_01_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_01_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_02_c
+[ RUN      ] McChromaWithFragMv_02_c.2x2
+[       OK ] McChromaWithFragMv_02_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_02_c.2x4
+[       OK ] McChromaWithFragMv_02_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_02_c.4x2
+[       OK ] McChromaWithFragMv_02_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_02_c.4x4
+[       OK ] McChromaWithFragMv_02_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_02_c.4x8
+[       OK ] McChromaWithFragMv_02_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_02_c.8x4
+[       OK ] McChromaWithFragMv_02_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_02_c.8x8
+[       OK ] McChromaWithFragMv_02_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_02_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_03_c
+[ RUN      ] McChromaWithFragMv_03_c.2x2
+[       OK ] McChromaWithFragMv_03_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_03_c.2x4
+[       OK ] McChromaWithFragMv_03_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_03_c.4x2
+[       OK ] McChromaWithFragMv_03_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_03_c.4x4
+[       OK ] McChromaWithFragMv_03_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_03_c.4x8
+[       OK ] McChromaWithFragMv_03_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_03_c.8x4
+[       OK ] McChromaWithFragMv_03_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_03_c.8x8
+[       OK ] McChromaWithFragMv_03_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_03_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_04_c
+[ RUN      ] McChromaWithFragMv_04_c.2x2
+[       OK ] McChromaWithFragMv_04_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_04_c.2x4
+[       OK ] McChromaWithFragMv_04_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_04_c.4x2
+[       OK ] McChromaWithFragMv_04_c.4x2 (1 ms)
+[ RUN      ] McChromaWithFragMv_04_c.4x4
+[       OK ] McChromaWithFragMv_04_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_04_c.4x8
+[       OK ] McChromaWithFragMv_04_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_04_c.8x4
+[       OK ] McChromaWithFragMv_04_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_04_c.8x8
+[       OK ] McChromaWithFragMv_04_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_04_c (1 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_05_c
+[ RUN      ] McChromaWithFragMv_05_c.2x2
+[       OK ] McChromaWithFragMv_05_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_05_c.2x4
+[       OK ] McChromaWithFragMv_05_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_05_c.4x2
+[       OK ] McChromaWithFragMv_05_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_05_c.4x4
+[       OK ] McChromaWithFragMv_05_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_05_c.4x8
+[       OK ] McChromaWithFragMv_05_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_05_c.8x4
+[       OK ] McChromaWithFragMv_05_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_05_c.8x8
+[       OK ] McChromaWithFragMv_05_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_05_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_06_c
+[ RUN      ] McChromaWithFragMv_06_c.2x2
+[       OK ] McChromaWithFragMv_06_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_06_c.2x4
+[       OK ] McChromaWithFragMv_06_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_06_c.4x2
+[       OK ] McChromaWithFragMv_06_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_06_c.4x4
+[       OK ] McChromaWithFragMv_06_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_06_c.4x8
+[       OK ] McChromaWithFragMv_06_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_06_c.8x4
+[       OK ] McChromaWithFragMv_06_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_06_c.8x8
+[       OK ] McChromaWithFragMv_06_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_06_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_07_c
+[ RUN      ] McChromaWithFragMv_07_c.2x2
+[       OK ] McChromaWithFragMv_07_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_07_c.2x4
+[       OK ] McChromaWithFragMv_07_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_07_c.4x2
+[       OK ] McChromaWithFragMv_07_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_07_c.4x4
+[       OK ] McChromaWithFragMv_07_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_07_c.4x8
+[       OK ] McChromaWithFragMv_07_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_07_c.8x4
+[       OK ] McChromaWithFragMv_07_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_07_c.8x8
+[       OK ] McChromaWithFragMv_07_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_07_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_10_c
+[ RUN      ] McChromaWithFragMv_10_c.2x2
+[       OK ] McChromaWithFragMv_10_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_10_c.2x4
+[       OK ] McChromaWithFragMv_10_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_10_c.4x2
+[       OK ] McChromaWithFragMv_10_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_10_c.4x4
+[       OK ] McChromaWithFragMv_10_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_10_c.4x8
+[       OK ] McChromaWithFragMv_10_c.4x8 (1 ms)
+[ RUN      ] McChromaWithFragMv_10_c.8x4
+[       OK ] McChromaWithFragMv_10_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_10_c.8x8
+[       OK ] McChromaWithFragMv_10_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_10_c (1 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_11_c
+[ RUN      ] McChromaWithFragMv_11_c.2x2
+[       OK ] McChromaWithFragMv_11_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_11_c.2x4
+[       OK ] McChromaWithFragMv_11_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_11_c.4x2
+[       OK ] McChromaWithFragMv_11_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_11_c.4x4
+[       OK ] McChromaWithFragMv_11_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_11_c.4x8
+[       OK ] McChromaWithFragMv_11_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_11_c.8x4
+[       OK ] McChromaWithFragMv_11_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_11_c.8x8
+[       OK ] McChromaWithFragMv_11_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_11_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_12_c
+[ RUN      ] McChromaWithFragMv_12_c.2x2
+[       OK ] McChromaWithFragMv_12_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_12_c.2x4
+[       OK ] McChromaWithFragMv_12_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_12_c.4x2
+[       OK ] McChromaWithFragMv_12_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_12_c.4x4
+[       OK ] McChromaWithFragMv_12_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_12_c.4x8
+[       OK ] McChromaWithFragMv_12_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_12_c.8x4
+[       OK ] McChromaWithFragMv_12_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_12_c.8x8
+[       OK ] McChromaWithFragMv_12_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_12_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_13_c
+[ RUN      ] McChromaWithFragMv_13_c.2x2
+[       OK ] McChromaWithFragMv_13_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_13_c.2x4
+[       OK ] McChromaWithFragMv_13_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_13_c.4x2
+[       OK ] McChromaWithFragMv_13_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_13_c.4x4
+[       OK ] McChromaWithFragMv_13_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_13_c.4x8
+[       OK ] McChromaWithFragMv_13_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_13_c.8x4
+[       OK ] McChromaWithFragMv_13_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_13_c.8x8
+[       OK ] McChromaWithFragMv_13_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_13_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_14_c
+[ RUN      ] McChromaWithFragMv_14_c.2x2
+[       OK ] McChromaWithFragMv_14_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_14_c.2x4
+[       OK ] McChromaWithFragMv_14_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_14_c.4x2
+[       OK ] McChromaWithFragMv_14_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_14_c.4x4
+[       OK ] McChromaWithFragMv_14_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_14_c.4x8
+[       OK ] McChromaWithFragMv_14_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_14_c.8x4
+[       OK ] McChromaWithFragMv_14_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_14_c.8x8
+[       OK ] McChromaWithFragMv_14_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_14_c (1 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_15_c
+[ RUN      ] McChromaWithFragMv_15_c.2x2
+[       OK ] McChromaWithFragMv_15_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_15_c.2x4
+[       OK ] McChromaWithFragMv_15_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_15_c.4x2
+[       OK ] McChromaWithFragMv_15_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_15_c.4x4
+[       OK ] McChromaWithFragMv_15_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_15_c.4x8
+[       OK ] McChromaWithFragMv_15_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_15_c.8x4
+[       OK ] McChromaWithFragMv_15_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_15_c.8x8
+[       OK ] McChromaWithFragMv_15_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_15_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_16_c
+[ RUN      ] McChromaWithFragMv_16_c.2x2
+[       OK ] McChromaWithFragMv_16_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_16_c.2x4
+[       OK ] McChromaWithFragMv_16_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_16_c.4x2
+[       OK ] McChromaWithFragMv_16_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_16_c.4x4
+[       OK ] McChromaWithFragMv_16_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_16_c.4x8
+[       OK ] McChromaWithFragMv_16_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_16_c.8x4
+[       OK ] McChromaWithFragMv_16_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_16_c.8x8
+[       OK ] McChromaWithFragMv_16_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_16_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_17_c
+[ RUN      ] McChromaWithFragMv_17_c.2x2
+[       OK ] McChromaWithFragMv_17_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_17_c.2x4
+[       OK ] McChromaWithFragMv_17_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_17_c.4x2
+[       OK ] McChromaWithFragMv_17_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_17_c.4x4
+[       OK ] McChromaWithFragMv_17_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_17_c.4x8
+[       OK ] McChromaWithFragMv_17_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_17_c.8x4
+[       OK ] McChromaWithFragMv_17_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_17_c.8x8
+[       OK ] McChromaWithFragMv_17_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_17_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_20_c
+[ RUN      ] McChromaWithFragMv_20_c.2x2
+[       OK ] McChromaWithFragMv_20_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_20_c.2x4
+[       OK ] McChromaWithFragMv_20_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_20_c.4x2
+[       OK ] McChromaWithFragMv_20_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_20_c.4x4
+[       OK ] McChromaWithFragMv_20_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_20_c.4x8
+[       OK ] McChromaWithFragMv_20_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_20_c.8x4
+[       OK ] McChromaWithFragMv_20_c.8x4 (1 ms)
+[ RUN      ] McChromaWithFragMv_20_c.8x8
+[       OK ] McChromaWithFragMv_20_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_20_c (1 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_21_c
+[ RUN      ] McChromaWithFragMv_21_c.2x2
+[       OK ] McChromaWithFragMv_21_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_21_c.2x4
+[       OK ] McChromaWithFragMv_21_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_21_c.4x2
+[       OK ] McChromaWithFragMv_21_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_21_c.4x4
+[       OK ] McChromaWithFragMv_21_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_21_c.4x8
+[       OK ] McChromaWithFragMv_21_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_21_c.8x4
+[       OK ] McChromaWithFragMv_21_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_21_c.8x8
+[       OK ] McChromaWithFragMv_21_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_21_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_22_c
+[ RUN      ] McChromaWithFragMv_22_c.2x2
+[       OK ] McChromaWithFragMv_22_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_22_c.2x4
+[       OK ] McChromaWithFragMv_22_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_22_c.4x2
+[       OK ] McChromaWithFragMv_22_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_22_c.4x4
+[       OK ] McChromaWithFragMv_22_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_22_c.4x8
+[       OK ] McChromaWithFragMv_22_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_22_c.8x4
+[       OK ] McChromaWithFragMv_22_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_22_c.8x8
+[       OK ] McChromaWithFragMv_22_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_22_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_23_c
+[ RUN      ] McChromaWithFragMv_23_c.2x2
+[       OK ] McChromaWithFragMv_23_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_23_c.2x4
+[       OK ] McChromaWithFragMv_23_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_23_c.4x2
+[       OK ] McChromaWithFragMv_23_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_23_c.4x4
+[       OK ] McChromaWithFragMv_23_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_23_c.4x8
+[       OK ] McChromaWithFragMv_23_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_23_c.8x4
+[       OK ] McChromaWithFragMv_23_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_23_c.8x8
+[       OK ] McChromaWithFragMv_23_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_23_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_24_c
+[ RUN      ] McChromaWithFragMv_24_c.2x2
+[       OK ] McChromaWithFragMv_24_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_24_c.2x4
+[       OK ] McChromaWithFragMv_24_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_24_c.4x2
+[       OK ] McChromaWithFragMv_24_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_24_c.4x4
+[       OK ] McChromaWithFragMv_24_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_24_c.4x8
+[       OK ] McChromaWithFragMv_24_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_24_c.8x4
+[       OK ] McChromaWithFragMv_24_c.8x4 (1 ms)
+[ RUN      ] McChromaWithFragMv_24_c.8x8
+[       OK ] McChromaWithFragMv_24_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_24_c (1 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_25_c
+[ RUN      ] McChromaWithFragMv_25_c.2x2
+[       OK ] McChromaWithFragMv_25_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_25_c.2x4
+[       OK ] McChromaWithFragMv_25_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_25_c.4x2
+[       OK ] McChromaWithFragMv_25_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_25_c.4x4
+[       OK ] McChromaWithFragMv_25_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_25_c.4x8
+[       OK ] McChromaWithFragMv_25_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_25_c.8x4
+[       OK ] McChromaWithFragMv_25_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_25_c.8x8
+[       OK ] McChromaWithFragMv_25_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_25_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_26_c
+[ RUN      ] McChromaWithFragMv_26_c.2x2
+[       OK ] McChromaWithFragMv_26_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_26_c.2x4
+[       OK ] McChromaWithFragMv_26_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_26_c.4x2
+[       OK ] McChromaWithFragMv_26_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_26_c.4x4
+[       OK ] McChromaWithFragMv_26_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_26_c.4x8
+[       OK ] McChromaWithFragMv_26_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_26_c.8x4
+[       OK ] McChromaWithFragMv_26_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_26_c.8x8
+[       OK ] McChromaWithFragMv_26_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_26_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_27_c
+[ RUN      ] McChromaWithFragMv_27_c.2x2
+[       OK ] McChromaWithFragMv_27_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_27_c.2x4
+[       OK ] McChromaWithFragMv_27_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_27_c.4x2
+[       OK ] McChromaWithFragMv_27_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_27_c.4x4
+[       OK ] McChromaWithFragMv_27_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_27_c.4x8
+[       OK ] McChromaWithFragMv_27_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_27_c.8x4
+[       OK ] McChromaWithFragMv_27_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_27_c.8x8
+[       OK ] McChromaWithFragMv_27_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_27_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_30_c
+[ RUN      ] McChromaWithFragMv_30_c.2x2
+[       OK ] McChromaWithFragMv_30_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_30_c.2x4
+[       OK ] McChromaWithFragMv_30_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_30_c.4x2
+[       OK ] McChromaWithFragMv_30_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_30_c.4x4
+[       OK ] McChromaWithFragMv_30_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_30_c.4x8
+[       OK ] McChromaWithFragMv_30_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_30_c.8x4
+[       OK ] McChromaWithFragMv_30_c.8x4 (1 ms)
+[ RUN      ] McChromaWithFragMv_30_c.8x8
+[       OK ] McChromaWithFragMv_30_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_30_c (1 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_31_c
+[ RUN      ] McChromaWithFragMv_31_c.2x2
+[       OK ] McChromaWithFragMv_31_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_31_c.2x4
+[       OK ] McChromaWithFragMv_31_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_31_c.4x2
+[       OK ] McChromaWithFragMv_31_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_31_c.4x4
+[       OK ] McChromaWithFragMv_31_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_31_c.4x8
+[       OK ] McChromaWithFragMv_31_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_31_c.8x4
+[       OK ] McChromaWithFragMv_31_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_31_c.8x8
+[       OK ] McChromaWithFragMv_31_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_31_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_32_c
+[ RUN      ] McChromaWithFragMv_32_c.2x2
+[       OK ] McChromaWithFragMv_32_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_32_c.2x4
+[       OK ] McChromaWithFragMv_32_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_32_c.4x2
+[       OK ] McChromaWithFragMv_32_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_32_c.4x4
+[       OK ] McChromaWithFragMv_32_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_32_c.4x8
+[       OK ] McChromaWithFragMv_32_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_32_c.8x4
+[       OK ] McChromaWithFragMv_32_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_32_c.8x8
+[       OK ] McChromaWithFragMv_32_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_32_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_33_c
+[ RUN      ] McChromaWithFragMv_33_c.2x2
+[       OK ] McChromaWithFragMv_33_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_33_c.2x4
+[       OK ] McChromaWithFragMv_33_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_33_c.4x2
+[       OK ] McChromaWithFragMv_33_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_33_c.4x4
+[       OK ] McChromaWithFragMv_33_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_33_c.4x8
+[       OK ] McChromaWithFragMv_33_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_33_c.8x4
+[       OK ] McChromaWithFragMv_33_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_33_c.8x8
+[       OK ] McChromaWithFragMv_33_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_33_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_34_c
+[ RUN      ] McChromaWithFragMv_34_c.2x2
+[       OK ] McChromaWithFragMv_34_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_34_c.2x4
+[       OK ] McChromaWithFragMv_34_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_34_c.4x2
+[       OK ] McChromaWithFragMv_34_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_34_c.4x4
+[       OK ] McChromaWithFragMv_34_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_34_c.4x8
+[       OK ] McChromaWithFragMv_34_c.4x8 (1 ms)
+[ RUN      ] McChromaWithFragMv_34_c.8x4
+[       OK ] McChromaWithFragMv_34_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_34_c.8x8
+[       OK ] McChromaWithFragMv_34_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_34_c (1 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_35_c
+[ RUN      ] McChromaWithFragMv_35_c.2x2
+[       OK ] McChromaWithFragMv_35_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_35_c.2x4
+[       OK ] McChromaWithFragMv_35_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_35_c.4x2
+[       OK ] McChromaWithFragMv_35_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_35_c.4x4
+[       OK ] McChromaWithFragMv_35_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_35_c.4x8
+[       OK ] McChromaWithFragMv_35_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_35_c.8x4
+[       OK ] McChromaWithFragMv_35_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_35_c.8x8
+[       OK ] McChromaWithFragMv_35_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_35_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_36_c
+[ RUN      ] McChromaWithFragMv_36_c.2x2
+[       OK ] McChromaWithFragMv_36_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_36_c.2x4
+[       OK ] McChromaWithFragMv_36_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_36_c.4x2
+[       OK ] McChromaWithFragMv_36_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_36_c.4x4
+[       OK ] McChromaWithFragMv_36_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_36_c.4x8
+[       OK ] McChromaWithFragMv_36_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_36_c.8x4
+[       OK ] McChromaWithFragMv_36_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_36_c.8x8
+[       OK ] McChromaWithFragMv_36_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_36_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_37_c
+[ RUN      ] McChromaWithFragMv_37_c.2x2
+[       OK ] McChromaWithFragMv_37_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_37_c.2x4
+[       OK ] McChromaWithFragMv_37_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_37_c.4x2
+[       OK ] McChromaWithFragMv_37_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_37_c.4x4
+[       OK ] McChromaWithFragMv_37_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_37_c.4x8
+[       OK ] McChromaWithFragMv_37_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_37_c.8x4
+[       OK ] McChromaWithFragMv_37_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_37_c.8x8
+[       OK ] McChromaWithFragMv_37_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_37_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_40_c
+[ RUN      ] McChromaWithFragMv_40_c.2x2
+[       OK ] McChromaWithFragMv_40_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_40_c.2x4
+[       OK ] McChromaWithFragMv_40_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_40_c.4x2
+[       OK ] McChromaWithFragMv_40_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_40_c.4x4
+[       OK ] McChromaWithFragMv_40_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_40_c.4x8
+[       OK ] McChromaWithFragMv_40_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_40_c.8x4
+[       OK ] McChromaWithFragMv_40_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_40_c.8x8
+[       OK ] McChromaWithFragMv_40_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_40_c (1 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_41_c
+[ RUN      ] McChromaWithFragMv_41_c.2x2
+[       OK ] McChromaWithFragMv_41_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_41_c.2x4
+[       OK ] McChromaWithFragMv_41_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_41_c.4x2
+[       OK ] McChromaWithFragMv_41_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_41_c.4x4
+[       OK ] McChromaWithFragMv_41_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_41_c.4x8
+[       OK ] McChromaWithFragMv_41_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_41_c.8x4
+[       OK ] McChromaWithFragMv_41_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_41_c.8x8
+[       OK ] McChromaWithFragMv_41_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_41_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_42_c
+[ RUN      ] McChromaWithFragMv_42_c.2x2
+[       OK ] McChromaWithFragMv_42_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_42_c.2x4
+[       OK ] McChromaWithFragMv_42_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_42_c.4x2
+[       OK ] McChromaWithFragMv_42_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_42_c.4x4
+[       OK ] McChromaWithFragMv_42_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_42_c.4x8
+[       OK ] McChromaWithFragMv_42_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_42_c.8x4
+[       OK ] McChromaWithFragMv_42_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_42_c.8x8
+[       OK ] McChromaWithFragMv_42_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_42_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_43_c
+[ RUN      ] McChromaWithFragMv_43_c.2x2
+[       OK ] McChromaWithFragMv_43_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_43_c.2x4
+[       OK ] McChromaWithFragMv_43_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_43_c.4x2
+[       OK ] McChromaWithFragMv_43_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_43_c.4x4
+[       OK ] McChromaWithFragMv_43_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_43_c.4x8
+[       OK ] McChromaWithFragMv_43_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_43_c.8x4
+[       OK ] McChromaWithFragMv_43_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_43_c.8x8
+[       OK ] McChromaWithFragMv_43_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_43_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_44_c
+[ RUN      ] McChromaWithFragMv_44_c.2x2
+[       OK ] McChromaWithFragMv_44_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_44_c.2x4
+[       OK ] McChromaWithFragMv_44_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_44_c.4x2
+[       OK ] McChromaWithFragMv_44_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_44_c.4x4
+[       OK ] McChromaWithFragMv_44_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_44_c.4x8
+[       OK ] McChromaWithFragMv_44_c.4x8 (1 ms)
+[ RUN      ] McChromaWithFragMv_44_c.8x4
+[       OK ] McChromaWithFragMv_44_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_44_c.8x8
+[       OK ] McChromaWithFragMv_44_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_44_c (1 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_45_c
+[ RUN      ] McChromaWithFragMv_45_c.2x2
+[       OK ] McChromaWithFragMv_45_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_45_c.2x4
+[       OK ] McChromaWithFragMv_45_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_45_c.4x2
+[       OK ] McChromaWithFragMv_45_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_45_c.4x4
+[       OK ] McChromaWithFragMv_45_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_45_c.4x8
+[       OK ] McChromaWithFragMv_45_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_45_c.8x4
+[       OK ] McChromaWithFragMv_45_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_45_c.8x8
+[       OK ] McChromaWithFragMv_45_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_45_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_46_c
+[ RUN      ] McChromaWithFragMv_46_c.2x2
+[       OK ] McChromaWithFragMv_46_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_46_c.2x4
+[       OK ] McChromaWithFragMv_46_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_46_c.4x2
+[       OK ] McChromaWithFragMv_46_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_46_c.4x4
+[       OK ] McChromaWithFragMv_46_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_46_c.4x8
+[       OK ] McChromaWithFragMv_46_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_46_c.8x4
+[       OK ] McChromaWithFragMv_46_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_46_c.8x8
+[       OK ] McChromaWithFragMv_46_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_46_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_47_c
+[ RUN      ] McChromaWithFragMv_47_c.2x2
+[       OK ] McChromaWithFragMv_47_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_47_c.2x4
+[       OK ] McChromaWithFragMv_47_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_47_c.4x2
+[       OK ] McChromaWithFragMv_47_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_47_c.4x4
+[       OK ] McChromaWithFragMv_47_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_47_c.4x8
+[       OK ] McChromaWithFragMv_47_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_47_c.8x4
+[       OK ] McChromaWithFragMv_47_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_47_c.8x8
+[       OK ] McChromaWithFragMv_47_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_47_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_50_c
+[ RUN      ] McChromaWithFragMv_50_c.2x2
+[       OK ] McChromaWithFragMv_50_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_50_c.2x4
+[       OK ] McChromaWithFragMv_50_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_50_c.4x2
+[       OK ] McChromaWithFragMv_50_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_50_c.4x4
+[       OK ] McChromaWithFragMv_50_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_50_c.4x8
+[       OK ] McChromaWithFragMv_50_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_50_c.8x4
+[       OK ] McChromaWithFragMv_50_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_50_c.8x8
+[       OK ] McChromaWithFragMv_50_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_50_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_51_c
+[ RUN      ] McChromaWithFragMv_51_c.2x2
+[       OK ] McChromaWithFragMv_51_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_51_c.2x4
+[       OK ] McChromaWithFragMv_51_c.2x4 (1 ms)
+[ RUN      ] McChromaWithFragMv_51_c.4x2
+[       OK ] McChromaWithFragMv_51_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_51_c.4x4
+[       OK ] McChromaWithFragMv_51_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_51_c.4x8
+[       OK ] McChromaWithFragMv_51_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_51_c.8x4
+[       OK ] McChromaWithFragMv_51_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_51_c.8x8
+[       OK ] McChromaWithFragMv_51_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_51_c (1 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_52_c
+[ RUN      ] McChromaWithFragMv_52_c.2x2
+[       OK ] McChromaWithFragMv_52_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_52_c.2x4
+[       OK ] McChromaWithFragMv_52_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_52_c.4x2
+[       OK ] McChromaWithFragMv_52_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_52_c.4x4
+[       OK ] McChromaWithFragMv_52_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_52_c.4x8
+[       OK ] McChromaWithFragMv_52_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_52_c.8x4
+[       OK ] McChromaWithFragMv_52_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_52_c.8x8
+[       OK ] McChromaWithFragMv_52_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_52_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_53_c
+[ RUN      ] McChromaWithFragMv_53_c.2x2
+[       OK ] McChromaWithFragMv_53_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_53_c.2x4
+[       OK ] McChromaWithFragMv_53_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_53_c.4x2
+[       OK ] McChromaWithFragMv_53_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_53_c.4x4
+[       OK ] McChromaWithFragMv_53_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_53_c.4x8
+[       OK ] McChromaWithFragMv_53_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_53_c.8x4
+[       OK ] McChromaWithFragMv_53_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_53_c.8x8
+[       OK ] McChromaWithFragMv_53_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_53_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_54_c
+[ RUN      ] McChromaWithFragMv_54_c.2x2
+[       OK ] McChromaWithFragMv_54_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_54_c.2x4
+[       OK ] McChromaWithFragMv_54_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_54_c.4x2
+[       OK ] McChromaWithFragMv_54_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_54_c.4x4
+[       OK ] McChromaWithFragMv_54_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_54_c.4x8
+[       OK ] McChromaWithFragMv_54_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_54_c.8x4
+[       OK ] McChromaWithFragMv_54_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_54_c.8x8
+[       OK ] McChromaWithFragMv_54_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_54_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_55_c
+[ RUN      ] McChromaWithFragMv_55_c.2x2
+[       OK ] McChromaWithFragMv_55_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_55_c.2x4
+[       OK ] McChromaWithFragMv_55_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_55_c.4x2
+[       OK ] McChromaWithFragMv_55_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_55_c.4x4
+[       OK ] McChromaWithFragMv_55_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_55_c.4x8
+[       OK ] McChromaWithFragMv_55_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_55_c.8x4
+[       OK ] McChromaWithFragMv_55_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_55_c.8x8
+[       OK ] McChromaWithFragMv_55_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_55_c (1 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_56_c
+[ RUN      ] McChromaWithFragMv_56_c.2x2
+[       OK ] McChromaWithFragMv_56_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_56_c.2x4
+[       OK ] McChromaWithFragMv_56_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_56_c.4x2
+[       OK ] McChromaWithFragMv_56_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_56_c.4x4
+[       OK ] McChromaWithFragMv_56_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_56_c.4x8
+[       OK ] McChromaWithFragMv_56_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_56_c.8x4
+[       OK ] McChromaWithFragMv_56_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_56_c.8x8
+[       OK ] McChromaWithFragMv_56_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_56_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_57_c
+[ RUN      ] McChromaWithFragMv_57_c.2x2
+[       OK ] McChromaWithFragMv_57_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_57_c.2x4
+[       OK ] McChromaWithFragMv_57_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_57_c.4x2
+[       OK ] McChromaWithFragMv_57_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_57_c.4x4
+[       OK ] McChromaWithFragMv_57_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_57_c.4x8
+[       OK ] McChromaWithFragMv_57_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_57_c.8x4
+[       OK ] McChromaWithFragMv_57_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_57_c.8x8
+[       OK ] McChromaWithFragMv_57_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_57_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_60_c
+[ RUN      ] McChromaWithFragMv_60_c.2x2
+[       OK ] McChromaWithFragMv_60_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_60_c.2x4
+[       OK ] McChromaWithFragMv_60_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_60_c.4x2
+[       OK ] McChromaWithFragMv_60_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_60_c.4x4
+[       OK ] McChromaWithFragMv_60_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_60_c.4x8
+[       OK ] McChromaWithFragMv_60_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_60_c.8x4
+[       OK ] McChromaWithFragMv_60_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_60_c.8x8
+[       OK ] McChromaWithFragMv_60_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_60_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_61_c
+[ RUN      ] McChromaWithFragMv_61_c.2x2
+[       OK ] McChromaWithFragMv_61_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_61_c.2x4
+[       OK ] McChromaWithFragMv_61_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_61_c.4x2
+[       OK ] McChromaWithFragMv_61_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_61_c.4x4
+[       OK ] McChromaWithFragMv_61_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_61_c.4x8
+[       OK ] McChromaWithFragMv_61_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_61_c.8x4
+[       OK ] McChromaWithFragMv_61_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_61_c.8x8
+[       OK ] McChromaWithFragMv_61_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_61_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_62_c
+[ RUN      ] McChromaWithFragMv_62_c.2x2
+[       OK ] McChromaWithFragMv_62_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_62_c.2x4
+[       OK ] McChromaWithFragMv_62_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_62_c.4x2
+[       OK ] McChromaWithFragMv_62_c.4x2 (1 ms)
+[ RUN      ] McChromaWithFragMv_62_c.4x4
+[       OK ] McChromaWithFragMv_62_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_62_c.4x8
+[       OK ] McChromaWithFragMv_62_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_62_c.8x4
+[       OK ] McChromaWithFragMv_62_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_62_c.8x8
+[       OK ] McChromaWithFragMv_62_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_62_c (1 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_63_c
+[ RUN      ] McChromaWithFragMv_63_c.2x2
+[       OK ] McChromaWithFragMv_63_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_63_c.2x4
+[       OK ] McChromaWithFragMv_63_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_63_c.4x2
+[       OK ] McChromaWithFragMv_63_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_63_c.4x4
+[       OK ] McChromaWithFragMv_63_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_63_c.4x8
+[       OK ] McChromaWithFragMv_63_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_63_c.8x4
+[       OK ] McChromaWithFragMv_63_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_63_c.8x8
+[       OK ] McChromaWithFragMv_63_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_63_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_64_c
+[ RUN      ] McChromaWithFragMv_64_c.2x2
+[       OK ] McChromaWithFragMv_64_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_64_c.2x4
+[       OK ] McChromaWithFragMv_64_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_64_c.4x2
+[       OK ] McChromaWithFragMv_64_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_64_c.4x4
+[       OK ] McChromaWithFragMv_64_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_64_c.4x8
+[       OK ] McChromaWithFragMv_64_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_64_c.8x4
+[       OK ] McChromaWithFragMv_64_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_64_c.8x8
+[       OK ] McChromaWithFragMv_64_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_64_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_65_c
+[ RUN      ] McChromaWithFragMv_65_c.2x2
+[       OK ] McChromaWithFragMv_65_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_65_c.2x4
+[       OK ] McChromaWithFragMv_65_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_65_c.4x2
+[       OK ] McChromaWithFragMv_65_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_65_c.4x4
+[       OK ] McChromaWithFragMv_65_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_65_c.4x8
+[       OK ] McChromaWithFragMv_65_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_65_c.8x4
+[       OK ] McChromaWithFragMv_65_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_65_c.8x8
+[       OK ] McChromaWithFragMv_65_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_65_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_66_c
+[ RUN      ] McChromaWithFragMv_66_c.2x2
+[       OK ] McChromaWithFragMv_66_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_66_c.2x4
+[       OK ] McChromaWithFragMv_66_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_66_c.4x2
+[       OK ] McChromaWithFragMv_66_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_66_c.4x4
+[       OK ] McChromaWithFragMv_66_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_66_c.4x8
+[       OK ] McChromaWithFragMv_66_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_66_c.8x4
+[       OK ] McChromaWithFragMv_66_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_66_c.8x8
+[       OK ] McChromaWithFragMv_66_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_66_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_67_c
+[ RUN      ] McChromaWithFragMv_67_c.2x2
+[       OK ] McChromaWithFragMv_67_c.2x2 (1 ms)
+[ RUN      ] McChromaWithFragMv_67_c.2x4
+[       OK ] McChromaWithFragMv_67_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_67_c.4x2
+[       OK ] McChromaWithFragMv_67_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_67_c.4x4
+[       OK ] McChromaWithFragMv_67_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_67_c.4x8
+[       OK ] McChromaWithFragMv_67_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_67_c.8x4
+[       OK ] McChromaWithFragMv_67_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_67_c.8x8
+[       OK ] McChromaWithFragMv_67_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_67_c (1 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_70_c
+[ RUN      ] McChromaWithFragMv_70_c.2x2
+[       OK ] McChromaWithFragMv_70_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_70_c.2x4
+[       OK ] McChromaWithFragMv_70_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_70_c.4x2
+[       OK ] McChromaWithFragMv_70_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_70_c.4x4
+[       OK ] McChromaWithFragMv_70_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_70_c.4x8
+[       OK ] McChromaWithFragMv_70_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_70_c.8x4
+[       OK ] McChromaWithFragMv_70_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_70_c.8x8
+[       OK ] McChromaWithFragMv_70_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_70_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_71_c
+[ RUN      ] McChromaWithFragMv_71_c.2x2
+[       OK ] McChromaWithFragMv_71_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_71_c.2x4
+[       OK ] McChromaWithFragMv_71_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_71_c.4x2
+[       OK ] McChromaWithFragMv_71_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_71_c.4x4
+[       OK ] McChromaWithFragMv_71_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_71_c.4x8
+[       OK ] McChromaWithFragMv_71_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_71_c.8x4
+[       OK ] McChromaWithFragMv_71_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_71_c.8x8
+[       OK ] McChromaWithFragMv_71_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_71_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_72_c
+[ RUN      ] McChromaWithFragMv_72_c.2x2
+[       OK ] McChromaWithFragMv_72_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_72_c.2x4
+[       OK ] McChromaWithFragMv_72_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_72_c.4x2
+[       OK ] McChromaWithFragMv_72_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_72_c.4x4
+[       OK ] McChromaWithFragMv_72_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_72_c.4x8
+[       OK ] McChromaWithFragMv_72_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_72_c.8x4
+[       OK ] McChromaWithFragMv_72_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_72_c.8x8
+[       OK ] McChromaWithFragMv_72_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_72_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_73_c
+[ RUN      ] McChromaWithFragMv_73_c.2x2
+[       OK ] McChromaWithFragMv_73_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_73_c.2x4
+[       OK ] McChromaWithFragMv_73_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_73_c.4x2
+[       OK ] McChromaWithFragMv_73_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_73_c.4x4
+[       OK ] McChromaWithFragMv_73_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_73_c.4x8
+[       OK ] McChromaWithFragMv_73_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_73_c.8x4
+[       OK ] McChromaWithFragMv_73_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_73_c.8x8
+[       OK ] McChromaWithFragMv_73_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_73_c (1 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_74_c
+[ RUN      ] McChromaWithFragMv_74_c.2x2
+[       OK ] McChromaWithFragMv_74_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_74_c.2x4
+[       OK ] McChromaWithFragMv_74_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_74_c.4x2
+[       OK ] McChromaWithFragMv_74_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_74_c.4x4
+[       OK ] McChromaWithFragMv_74_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_74_c.4x8
+[       OK ] McChromaWithFragMv_74_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_74_c.8x4
+[       OK ] McChromaWithFragMv_74_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_74_c.8x8
+[       OK ] McChromaWithFragMv_74_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_74_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_75_c
+[ RUN      ] McChromaWithFragMv_75_c.2x2
+[       OK ] McChromaWithFragMv_75_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_75_c.2x4
+[       OK ] McChromaWithFragMv_75_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_75_c.4x2
+[       OK ] McChromaWithFragMv_75_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_75_c.4x4
+[       OK ] McChromaWithFragMv_75_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_75_c.4x8
+[       OK ] McChromaWithFragMv_75_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_75_c.8x4
+[       OK ] McChromaWithFragMv_75_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_75_c.8x8
+[       OK ] McChromaWithFragMv_75_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_75_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_76_c
+[ RUN      ] McChromaWithFragMv_76_c.2x2
+[       OK ] McChromaWithFragMv_76_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_76_c.2x4
+[       OK ] McChromaWithFragMv_76_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_76_c.4x2
+[       OK ] McChromaWithFragMv_76_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_76_c.4x4
+[       OK ] McChromaWithFragMv_76_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_76_c.4x8
+[       OK ] McChromaWithFragMv_76_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_76_c.8x4
+[       OK ] McChromaWithFragMv_76_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_76_c.8x8
+[       OK ] McChromaWithFragMv_76_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_76_c (0 ms total)
+
+[----------] 7 tests from McChromaWithFragMv_77_c
+[ RUN      ] McChromaWithFragMv_77_c.2x2
+[       OK ] McChromaWithFragMv_77_c.2x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_77_c.2x4
+[       OK ] McChromaWithFragMv_77_c.2x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_77_c.4x2
+[       OK ] McChromaWithFragMv_77_c.4x2 (0 ms)
+[ RUN      ] McChromaWithFragMv_77_c.4x4
+[       OK ] McChromaWithFragMv_77_c.4x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_77_c.4x8
+[       OK ] McChromaWithFragMv_77_c.4x8 (0 ms)
+[ RUN      ] McChromaWithFragMv_77_c.8x4
+[       OK ] McChromaWithFragMv_77_c.8x4 (0 ms)
+[ RUN      ] McChromaWithFragMv_77_c.8x8
+[       OK ] McChromaWithFragMv_77_c.8x8 (0 ms)
+[----------] 7 tests from McChromaWithFragMv_77_c (0 ms total)
+
+[----------] 4 tests from PredMvTest
+[ RUN      ] PredMvTest.PredMv
+[       OK ] PredMvTest.PredMv (3 ms)
+[ RUN      ] PredMvTest.PredInter16x8Mv
+[       OK ] PredMvTest.PredInter16x8Mv (0 ms)
+[ RUN      ] PredMvTest.PredInter8x16Mv
+[       OK ] PredMvTest.PredInter8x16Mv (0 ms)
+[ RUN      ] PredMvTest.PredSkipMvFromNeighbor
+[       OK ] PredMvTest.PredSkipMvFromNeighbor (8 ms)
+[----------] 4 tests from PredMvTest (11 ms total)
+
+[----------] 11 tests from DecodeMbAuxTest
+[ RUN      ] DecodeMbAuxTest.TestIhdm_4x4_dc
+[       OK ] DecodeMbAuxTest.TestIhdm_4x4_dc (0 ms)
+[ RUN      ] DecodeMbAuxTest.TestDequant_4x4_luma_dc
+[       OK ] DecodeMbAuxTest.TestDequant_4x4_luma_dc (0 ms)
+[ RUN      ] DecodeMbAuxTest.TestDequant_ihdm_4x4_c
+[       OK ] DecodeMbAuxTest.TestDequant_ihdm_4x4_c (0 ms)
+[ RUN      ] DecodeMbAuxTest.TestDequant_4x4_c
+[       OK ] DecodeMbAuxTest.TestDequant_4x4_c (0 ms)
+[ RUN      ] DecodeMbAuxTest.TestDequant_4_4x4_c
+[       OK ] DecodeMbAuxTest.TestDequant_4_4x4_c (0 ms)
+[ RUN      ] DecodeMbAuxTest.WelsDequantIHadamard2x2Dc
+[       OK ] DecodeMbAuxTest.WelsDequantIHadamard2x2Dc (0 ms)
+[ RUN      ] DecodeMbAuxTest.WelsIDctT4Rec_c
+[       OK ] DecodeMbAuxTest.WelsIDctT4Rec_c (0 ms)
+[ RUN      ] DecodeMbAuxTest.WelsIDctT4Rec_mmx
+[       OK ] DecodeMbAuxTest.WelsIDctT4Rec_mmx (0 ms)
+[ RUN      ] DecodeMbAuxTest.WelsIDctFourT4Rec_c
+[       OK ] DecodeMbAuxTest.WelsIDctFourT4Rec_c (0 ms)
+[ RUN      ] DecodeMbAuxTest.WelsIDctRecI16x16Dc_c
+[       OK ] DecodeMbAuxTest.WelsIDctRecI16x16Dc_c (0 ms)
+[ RUN      ] DecodeMbAuxTest.WelsIDctRecI16x16Dc_sse2
+[       OK ] DecodeMbAuxTest.WelsIDctRecI16x16Dc_sse2 (0 ms)
+[----------] 11 tests from DecodeMbAuxTest (0 ms total)
+
+[----------] 1 test from EncoderMbTest
+[ RUN      ] EncoderMbTest.TestQuantTable
+[       OK ] EncoderMbTest.TestQuantTable (1 ms)
+[----------] 1 test from EncoderMbTest (1 ms total)
+
+[----------] 25 tests from EncodeMbAuxTest
+[ RUN      ] EncodeMbAuxTest.TestScan_4x4_ac_c
+[       OK ] EncodeMbAuxTest.TestScan_4x4_ac_c (0 ms)
+[ RUN      ] EncodeMbAuxTest.TestScan_4x4_ac_sse2
+[       OK ] EncodeMbAuxTest.TestScan_4x4_ac_sse2 (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsScan4x4DcAc_sse2
+[       OK ] EncodeMbAuxTest.WelsScan4x4DcAc_sse2 (0 ms)
+[ RUN      ] EncodeMbAuxTest.TestScan_4x4_dcc
+[       OK ] EncodeMbAuxTest.TestScan_4x4_dcc (1 ms)
+[ RUN      ] EncodeMbAuxTest.WelsDctT4_c
+[       OK ] EncodeMbAuxTest.WelsDctT4_c (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsDctFourT4_c
+[       OK ] EncodeMbAuxTest.WelsDctFourT4_c (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsDctT4_mmx
+[       OK ] EncodeMbAuxTest.WelsDctT4_mmx (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsDctFourT4_sse2
+[       OK ] EncodeMbAuxTest.WelsDctFourT4_sse2 (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsCalculateSingleCtr4x4_sse2
+[       OK ] EncodeMbAuxTest.WelsCalculateSingleCtr4x4_sse2 (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsCopy4x4
+[       OK ] EncodeMbAuxTest.WelsCopy4x4 (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsCopy8x8_c
+[       OK ] EncodeMbAuxTest.WelsCopy8x8_c (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsCopy8x16_c
+[       OK ] EncodeMbAuxTest.WelsCopy8x16_c (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsCopy16x8_c
+[       OK ] EncodeMbAuxTest.WelsCopy16x8_c (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsCopy16x16_c
+[       OK ] EncodeMbAuxTest.WelsCopy16x16_c (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsCopy16x8NotAligned_sse2
+[       OK ] EncodeMbAuxTest.WelsCopy16x8NotAligned_sse2 (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsCopy16x16NotAligned_sse2
+[       OK ] EncodeMbAuxTest.WelsCopy16x16NotAligned_sse2 (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsCopy16x16_sse2
+[       OK ] EncodeMbAuxTest.WelsCopy16x16_sse2 (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsGetNoneZeroCount_c
+[       OK ] EncodeMbAuxTest.WelsGetNoneZeroCount_c (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsGetNoneZeroCount_sse2
+[       OK ] EncodeMbAuxTest.WelsGetNoneZeroCount_sse2 (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsQuantFour4x4Max_c
+[       OK ] EncodeMbAuxTest.WelsQuantFour4x4Max_c (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsQuantFour4x4Max_sse2
+[       OK ] EncodeMbAuxTest.WelsQuantFour4x4Max_sse2 (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsHadamardQuant2x2Skip_c
+[       OK ] EncodeMbAuxTest.WelsHadamardQuant2x2Skip_c (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsHadamardQuant2x2_c
+[       OK ] EncodeMbAuxTest.WelsHadamardQuant2x2_c (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsHadamardT4Dc_c
+[       OK ] EncodeMbAuxTest.WelsHadamardT4Dc_c (0 ms)
+[ RUN      ] EncodeMbAuxTest.WelsHadamardT4Dc_sse2
+[       OK ] EncodeMbAuxTest.WelsHadamardT4Dc_sse2 (0 ms)
+[----------] 25 tests from EncodeMbAuxTest (1 ms total)
+
+[----------] 2 tests from ExpandPicTest
+[ RUN      ] ExpandPicTest.TestExpandPictureLuma_c
+[       OK ] ExpandPicTest.TestExpandPictureLuma_c (1 ms)
+[ RUN      ] ExpandPicTest.TestExpandPictureChroma_c
+[       OK ] ExpandPicTest.TestExpandPictureChroma_c (1 ms)
+[----------] 2 tests from ExpandPicTest (2 ms total)
+
+[----------] 3 tests from UeExpGolombTest
+[ RUN      ] UeExpGolombTest.TestBsSizeUeLt256
+[       OK ] UeExpGolombTest.TestBsSizeUeLt256 (0 ms)
+[ RUN      ] UeExpGolombTest.TestBsSizeUeRangeFrom256To65534
+[       OK ] UeExpGolombTest.TestBsSizeUeRangeFrom256To65534 (4 ms)
+[ RUN      ] UeExpGolombTest.TestBsSizeUeRangeFrom65535ToPlus256
+[       OK ] UeExpGolombTest.TestBsSizeUeRangeFrom65535ToPlus256 (0 ms)
+[----------] 3 tests from UeExpGolombTest (4 ms total)
+
+[----------] 14 tests from GetIntraPredictorTest
+[ RUN      ] GetIntraPredictorTest.TestGetI4x4LumaPredV
+[       OK ] GetIntraPredictorTest.TestGetI4x4LumaPredV (0 ms)
+[ RUN      ] GetIntraPredictorTest.TestGetI4x4LumaPredH
+[       OK ] GetIntraPredictorTest.TestGetI4x4LumaPredH (0 ms)
+[ RUN      ] GetIntraPredictorTest.TestGetI4x4LumaPredDDL
+[       OK ] GetIntraPredictorTest.TestGetI4x4LumaPredDDL (0 ms)
+[ RUN      ] GetIntraPredictorTest.TestGetI4x4LumaPredDDLTop
+[       OK ] GetIntraPredictorTest.TestGetI4x4LumaPredDDLTop (0 ms)
+[ RUN      ] GetIntraPredictorTest.TestGetI4x4LumaPredDDR
+[       OK ] GetIntraPredictorTest.TestGetI4x4LumaPredDDR (0 ms)
+[ RUN      ] GetIntraPredictorTest.TestGetI4x4LumaPredVL
+[       OK ] GetIntraPredictorTest.TestGetI4x4LumaPredVL (0 ms)
+[ RUN      ] GetIntraPredictorTest.TestGetI4x4LumaPredVLTop
+[       OK ] GetIntraPredictorTest.TestGetI4x4LumaPredVLTop (0 ms)
+[ RUN      ] GetIntraPredictorTest.TestGetI4x4LumaPredVR
+[       OK ] GetIntraPredictorTest.TestGetI4x4LumaPredVR (0 ms)
+[ RUN      ] GetIntraPredictorTest.TestGetI4x4LumaPredHU
+[       OK ] GetIntraPredictorTest.TestGetI4x4LumaPredHU (0 ms)
+[ RUN      ] GetIntraPredictorTest.TestGetI4x4LumaPredHD
+[       OK ] GetIntraPredictorTest.TestGetI4x4LumaPredHD (0 ms)
+[ RUN      ] GetIntraPredictorTest.TestGetIChormaPredV
+[       OK ] GetIntraPredictorTest.TestGetIChormaPredV (0 ms)
+[ RUN      ] GetIntraPredictorTest.TestGetI16x16LumaPredPlane
+[       OK ] GetIntraPredictorTest.TestGetI16x16LumaPredPlane (0 ms)
+[ RUN      ] GetIntraPredictorTest.TestGetI16x16LumaPredDc
+[       OK ] GetIntraPredictorTest.TestGetI16x16LumaPredDc (0 ms)
+[ RUN      ] GetIntraPredictorTest.TestGetI16x16LumaPredDcTop
+[       OK ] GetIntraPredictorTest.TestGetI16x16LumaPredDcTop (0 ms)
+[----------] 14 tests from GetIntraPredictorTest (0 ms total)
+
+[----------] 4 tests from MemoryAlignTest
+[ RUN      ] MemoryAlignTest.GetCacheLineSize_LoopWithin16K
+[       OK ] MemoryAlignTest.GetCacheLineSize_LoopWithin16K (0 ms)
+[ RUN      ] MemoryAlignTest.GetCacheLineSize_Zero
+[       OK ] MemoryAlignTest.GetCacheLineSize_Zero (0 ms)
+[ RUN      ] MemoryAlignTest.GetCacheLineSize_MaxUINT
+[       OK ] MemoryAlignTest.GetCacheLineSize_MaxUINT (0 ms)
+[ RUN      ] MemoryAlignTest.WelsMallocAndFreeOnceFunctionVerify
+[       OK ] MemoryAlignTest.WelsMallocAndFreeOnceFunctionVerify (0 ms)
+[----------] 4 tests from MemoryAlignTest (0 ms total)
+
+[----------] 5 tests from MotionEstimateTest
+[ RUN      ] MotionEstimateTest.TestDiamondSearch
+[       OK ] MotionEstimateTest.TestDiamondSearch (1 ms)
+[ RUN      ] MotionEstimateTest.TestVerticalSearch
+[       OK ] MotionEstimateTest.TestVerticalSearch (0 ms)
+[ RUN      ] MotionEstimateTest.TestHorizontalSearch
+[       OK ] MotionEstimateTest.TestHorizontalSearch (1 ms)
+[ RUN      ] MotionEstimateTest.TestVerticalSearch_SSE41
+[       OK ] MotionEstimateTest.TestVerticalSearch_SSE41 (0 ms)
+[ RUN      ] MotionEstimateTest.TestHorizontalSearch_SSE41
+[       OK ] MotionEstimateTest.TestHorizontalSearch_SSE41 (0 ms)
+[----------] 5 tests from MotionEstimateTest (2 ms total)
+
+[----------] 1 test from FeatureMotionEstimateTest
+[ RUN      ] FeatureMotionEstimateTest.TestFeatureSearch
+[       OK ] FeatureMotionEstimateTest.TestFeatureSearch (1 ms)
+[----------] 1 test from FeatureMotionEstimateTest (1 ms total)
+
+[----------] 4 tests from IntraSadSatdFuncTest
+[ RUN      ] IntraSadSatdFuncTest.WelsIntra16x16Combined3Sad_ssse3
+[       OK ] IntraSadSatdFuncTest.WelsIntra16x16Combined3Sad_ssse3 (0 ms)
+[ RUN      ] IntraSadSatdFuncTest.WelsIntra16x16Combined3Satd_sse41
+[       OK ] IntraSadSatdFuncTest.WelsIntra16x16Combined3Satd_sse41 (0 ms)
+[ RUN      ] IntraSadSatdFuncTest.WelsSampleSatdThree4x4_sse2
+[       OK ] IntraSadSatdFuncTest.WelsSampleSatdThree4x4_sse2 (0 ms)
+[ RUN      ] IntraSadSatdFuncTest.WelsIntraChroma8x8Combined3Satd_sse41
+[       OK ] IntraSadSatdFuncTest.WelsIntraChroma8x8Combined3Satd_sse41 (0 ms)
+[----------] 4 tests from IntraSadSatdFuncTest (0 ms total)
+
+[----------] 11 tests from SadSatdCFuncTest
+[ RUN      ] SadSatdCFuncTest.WelsSampleSad4x4_c
+[       OK ] SadSatdCFuncTest.WelsSampleSad4x4_c (0 ms)
+[ RUN      ] SadSatdCFuncTest.WelsSampleSad8x8_c
+[       OK ] SadSatdCFuncTest.WelsSampleSad8x8_c (0 ms)
+[ RUN      ] SadSatdCFuncTest.WelsSampleSad16x8_c
+[       OK ] SadSatdCFuncTest.WelsSampleSad16x8_c (0 ms)
+[ RUN      ] SadSatdCFuncTest.WelsSampleSad8x16_c
+[       OK ] SadSatdCFuncTest.WelsSampleSad8x16_c (0 ms)
+[ RUN      ] SadSatdCFuncTest.WelsSampleSad16x16_c
+[       OK ] SadSatdCFuncTest.WelsSampleSad16x16_c (0 ms)
+[ RUN      ] SadSatdCFuncTest.WelsSampleSatd4x4_c
+[       OK ] SadSatdCFuncTest.WelsSampleSatd4x4_c (0 ms)
+[ RUN      ] SadSatdCFuncTest.WelsSampleSadFour16x16_c
+[       OK ] SadSatdCFuncTest.WelsSampleSadFour16x16_c (0 ms)
+[ RUN      ] SadSatdCFuncTest.WelsSampleSadFour16x8_c
+[       OK ] SadSatdCFuncTest.WelsSampleSadFour16x8_c (1 ms)
+[ RUN      ] SadSatdCFuncTest.WelsSampleSadFour8x16_c
+[       OK ] SadSatdCFuncTest.WelsSampleSadFour8x16_c (0 ms)
+[ RUN      ] SadSatdCFuncTest.WelsSampleSadFour8x8_c
+[       OK ] SadSatdCFuncTest.WelsSampleSadFour8x8_c (0 ms)
+[ RUN      ] SadSatdCFuncTest.WelsSampleSadFour4x4_c
+[       OK ] SadSatdCFuncTest.WelsSampleSadFour4x4_c (0 ms)
+[----------] 11 tests from SadSatdCFuncTest (1 ms total)
+
+[----------] 20 tests from SadSatdAssemblyFuncTest
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSad4x4_mmx
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSad4x4_mmx (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSad8x8_sse21
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSad8x8_sse21 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSad8x16_sse2
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSad8x16_sse2 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSad16x8_sse2
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSad16x8_sse2 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSad16x16_sse2
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSad16x16_sse2 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSatd4x4_sse2
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSatd4x4_sse2 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSatd8x8_sse2
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSatd8x8_sse2 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSatd8x16_sse2
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSatd8x16_sse2 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSatd16x8_sse2
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSatd16x8_sse2 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSatd16x16_sse2
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSatd16x16_sse2 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSatd4x4_sse41
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSatd4x4_sse41 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSatd8x8_sse41
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSatd8x8_sse41 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSatd8x16_sse41
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSatd8x16_sse41 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSatd16x8_sse41
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSatd16x8_sse41 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSatd16x16_sse41
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSatd16x16_sse41 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSadFour16x16_sse2
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSadFour16x16_sse2 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSadFour16x8_sse2
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSadFour16x8_sse2 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSadFour8x16_sse2
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSadFour8x16_sse2 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSadFour8x8_sse2
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSadFour8x8_sse2 (0 ms)
+[ RUN      ] SadSatdAssemblyFuncTest.WelsSampleSadFour4x4_sse2
+[       OK ] SadSatdAssemblyFuncTest.WelsSampleSadFour4x4_sse2 (0 ms)
+[----------] 20 tests from SadSatdAssemblyFuncTest (1 ms total)
+
+[----------] 1 test from ScrollDetectionTest
+[ RUN      ] ScrollDetectionTest.TestScroll
+[       OK ] ScrollDetectionTest.TestScroll (239 ms)
+[----------] 1 test from ScrollDetectionTest (239 ms total)
+
+[----------] 1 test from ISVCEncoderTest
+[ RUN      ] ISVCEncoderTest.CheckFunctionOrder
+[       OK ] ISVCEncoderTest.CheckFunctionOrder (0 ms)
+[----------] 1 test from ISVCEncoderTest (0 ms total)
+
+[----------] 1 test from ISVCDecoderTest
+[ RUN      ] ISVCDecoderTest.CheckFunctionOrder
+[       OK ] ISVCDecoderTest.CheckFunctionOrder (0 ms)
+[----------] 1 test from ISVCDecoderTest (0 ms total)
+
+[----------] 1 test from ISVCDecoderEncoderTest
+[ RUN      ] ISVCDecoderEncoderTest.CheckCAbi
+[       OK ] ISVCDecoderEncoderTest.CheckCAbi (0 ms)
+[----------] 1 test from ISVCDecoderEncoderTest (0 ms total)
+
+[----------] 1 test from DecoderInitTest
+[ RUN      ] DecoderInitTest.JustInit
+[       OK ] DecoderInitTest.JustInit (1 ms)
+[----------] 1 test from DecoderInitTest (1 ms total)
+
+[----------] 1 test from EncoderInitTest
+[ RUN      ] EncoderInitTest.JustInit
+[       OK ] EncoderInitTest.JustInit (0 ms)
+[----------] 1 test from EncoderInitTest (0 ms total)
+
+[----------] 2 tests from DecodeEncodeFile/DecodeEncodeTest
+[ RUN      ] DecodeEncodeFile/DecodeEncodeTest.CompareOutput/0
+[       OK ] DecodeEncodeFile/DecodeEncodeTest.CompareOutput/0 (26 ms)
+[ RUN      ] DecodeEncodeFile/DecodeEncodeTest.CompareOutput/1
+[       OK ] DecodeEncodeFile/DecodeEncodeTest.CompareOutput/1 (26 ms)
+[----------] 2 tests from DecodeEncodeFile/DecodeEncodeTest (52 ms total)
+
+[----------] 32 tests from DecodeFile/DecoderOutputTest
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/0
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/0 (17 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/1
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/1 (16 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/2
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/2 (4 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/3
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/3 (620 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/4
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/4 (16 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/5
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/5 (52 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/6
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/6 (41 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/7
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/7 (61 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/8
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/8 (58 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/9
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/9 (4 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/10
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/10 (578 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/11
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/11 (57 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/12
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/12 (130 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/13
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/13 (195 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/14
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/14 (862 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/15
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/15 (59 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/16
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/16 (100 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/17
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/17 (49 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/18
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/18 (102 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/19
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/19 (191 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/20
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/20 (188 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/21
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/21 (15 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/22
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/22 (51 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/23
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/23 (41 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/24
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/24 (57 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/25
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/25 (13 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/26
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/26 (10 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/27
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/27 (9 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/28
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/28 (24 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/29
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/29 (9 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/30
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/30 (12 ms)
+[ RUN      ] DecodeFile/DecoderOutputTest.CompareOutput/31
+[       OK ] DecodeFile/DecoderOutputTest.CompareOutput/31 (9 ms)
+[----------] 32 tests from DecodeFile/DecoderOutputTest (3650 ms total)
+
+[----------] 9 tests from EncodeFile/EncoderOutputTest
+[ RUN      ] EncodeFile/EncoderOutputTest.CompareOutput/0
+[       OK ] EncodeFile/EncoderOutputTest.CompareOutput/0 (19 ms)
+[ RUN      ] EncodeFile/EncoderOutputTest.CompareOutput/1
+[       OK ] EncodeFile/EncoderOutputTest.CompareOutput/1 (3 ms)
+[ RUN      ] EncodeFile/EncoderOutputTest.CompareOutput/2
+[       OK ] EncodeFile/EncoderOutputTest.CompareOutput/2 (3 ms)
+[ RUN      ] EncodeFile/EncoderOutputTest.CompareOutput/3
+[       OK ] EncodeFile/EncoderOutputTest.CompareOutput/3 (21 ms)
+[ RUN      ] EncodeFile/EncoderOutputTest.CompareOutput/4
+[       OK ] EncodeFile/EncoderOutputTest.CompareOutput/4 (20 ms)
+[ RUN      ] EncodeFile/EncoderOutputTest.CompareOutput/5
+[       OK ] EncodeFile/EncoderOutputTest.CompareOutput/5 (24 ms)
+[ RUN      ] EncodeFile/EncoderOutputTest.CompareOutput/6
+[       OK ] EncodeFile/EncoderOutputTest.CompareOutput/6 (21 ms)
+[ RUN      ] EncodeFile/EncoderOutputTest.CompareOutput/7
+[       OK ] EncodeFile/EncoderOutputTest.CompareOutput/7 (5 ms)
+[ RUN      ] EncodeFile/EncoderOutputTest.CompareOutput/8
+[       OK ] EncodeFile/EncoderOutputTest.CompareOutput/8 (4 ms)
+[----------] 9 tests from EncodeFile/EncoderOutputTest (120 ms total)
+
+[----------] Global test environment tear-down
+[==========] 773 tests from 106 test cases ran. (4543 ms total)
+[  PASSED  ] 773 tests.
