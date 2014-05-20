@@ -920,7 +920,10 @@ void  WelsRcPictureInitDisable (void* pCtx) {
   if (pEncCtx->pSvcParam->bEnableAdaptiveQuant && (pEncCtx->eSliceType == P_SLICE)) {
     pEncCtx->iGlobalQp = (int32_t)WELS_CLIP3 (pEncCtx->iGlobalQp -
                          pEncCtx->pVaa->sAdaptiveQuantParam.dAverMotionTextureIndexToDeltaQp, GOM_MIN_QP_MODE, GOM_MAX_QP_MODE);
+  }else{
+    pEncCtx->iGlobalQp = WELS_CLIP3(pEncCtx->iGlobalQp, FIX_MIN_QP_MODE, FIX_MAX_QP_MODE);
   }
+
   pWelsSvcRc->iAverageFrameQp = pEncCtx->iGlobalQp;
 }
 
@@ -934,6 +937,8 @@ void  WelsRcMbInitDisable (void* pCtx, SMB* pCurMb, SSlice* pSlice) {
   if (pEncCtx->pSvcParam->bEnableAdaptiveQuant && (pEncCtx->eSliceType == P_SLICE)) {
     iLumaQp   = (int8_t)WELS_CLIP3 (iLumaQp +
                                     pEncCtx->pVaa->sAdaptiveQuantParam.pMotionTextureIndexToDeltaQp[pCurMb->iMbXY], GOM_MIN_QP_MODE, 51);
+  }else{
+    iLumaQp = WELS_CLIP3(iLumaQp,FIX_MIN_QP_MODE,FIX_MAX_QP_MODE);
   }
   pCurMb->uiChromaQp = g_kuiChromaQpTable[iLumaQp];
   pCurMb->uiLumaQp = iLumaQp;
