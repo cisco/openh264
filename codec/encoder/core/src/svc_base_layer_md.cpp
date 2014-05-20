@@ -1887,9 +1887,6 @@ static inline void MergeSub16Me (const SWelsME& sSrcMe0, const SWelsME& sSrcMe1,
 static inline bool IsSameMv (const SMVUnitXY& sMv0, const SMVUnitXY& sMv1) {
   return ((sMv0.iMvX == sMv1.iMvX) && (sMv0.iMvY == sMv1.iMvY));
 }
-static inline int32_t Mvd (const SMVUnitXY& sMv, const SMVUnitXY& sMvp) {
-  return (WELS_ABS (sMv.iMvX - sMvp.iMvX) + WELS_ABS (sMv.iMvY - sMvp.iMvY));
-}
 bool TryModeMerge (SMbCache* pMbCache, SWelsMD* pWelsMd, SMB* pCurMb) {
   SWelsME* pMe8x8 = & (pWelsMd->sMe.sMe8x8[0]);
   const bool bSameMv16x8_0 = IsSameMv (pMe8x8[0].sMv, pMe8x8[1].sMv);
