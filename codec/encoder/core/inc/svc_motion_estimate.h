@@ -256,8 +256,16 @@ int32_t ReleaseFeatureSearchPreparation (CMemoryAlign* pMa, uint16_t*& pFeatureO
 #define FMESWITCH_DEFAULT_GOODFRAME_NUM (2)
 #define FME_DEFAULT_FEATURE_INDEX (0)
 
+
 void PerformFMEPreprocess (SWelsFuncPtrList* pFunc, SPicture* pRef, uint16_t* pFeatureOfBlock,
                            SScreenBlockFeatureStorage* pScreenBlockFeatureStorage);
+bool SetFeatureSearchIn (SWelsFuncPtrList* pFunc,  const SWelsME& sMe,
+                         const SSlice* pSlice, SScreenBlockFeatureStorage* pRefFeatureStorage,
+                         const int32_t kiEncStride, const int32_t kiRefStride,
+                         SFeatureSearchIn* pFeatureSearchIn);
+void MotionEstimateFeatureFullSearch (SFeatureSearchIn& sFeatureSearchIn,
+                                      const uint32_t kuiMaxSearchPoint,
+                                      SWelsME* pMe);
 void UpdateFMESwitch (SDqLayer* pCurLayer);
 void UpdateFMESwitchNull (SDqLayer* pCurLayer);
 
