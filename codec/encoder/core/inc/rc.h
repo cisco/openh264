@@ -66,7 +66,7 @@ enum {
   VGOP_SIZE             = 8,
 
   //qp information
-  FIX_MIN_QP_MODE       = 4, //qp <4 will cause level code overflow in cavlc coding which isn't suppored in baseline profile
+  FIX_MIN_QP_MODE       = 10, //qp <10 will cause level code overflow in cavlc coding which isn't suppored in baseline profile
   FIX_MAX_QP_MODE       = 51,
   GOM_MIN_QP_MODE       = 12,
   GOM_MAX_QP_MODE       = 36,
