@@ -86,6 +86,7 @@ void WelsEncRecI16x16Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
   }
   pRes -= 256;
   pBlock -= 256;
+
   for (i = 0; i < 16; i++)	{
     uiNoneZeroCount = pFuncList->pfGetNoneZeroCount (pBlock);
     pCurMb->pNonZeroCount[*kpNoneZeroCountIdx++] = uiNoneZeroCount;
