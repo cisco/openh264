@@ -58,7 +58,8 @@ namespace WelsSVCEnc {
 
 
 int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
-                                 SLayerBSInfo* pLbi,
+                                 SFrameBSInfo* pFrameBsInfo,
+                                 SLayerBSInfo* pLayerBsInfo,
                                  int32_t* pNalIdxInLayer,
                                  int32_t* pLayerSize,
                                  int32_t iFirstMbInPartition,	// first mb inclusive in partition
@@ -1588,6 +1589,11 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
           if (NULL != pDq->sLayerInfo.pSliceInLayer) {
             int32_t iSliceIdx = 0;
             int32_t iSliceNum = GetInitialSliceNum (pDq->iMbWidth, pDq->iMbHeight, &pDlp->sSliceCfg);
+            if (pDlp->sSliceCfg.uiSliceMode == SM_DYN_SLICE && pCtx->iActiveThreadsNum == 1) {
+              if (iSliceNum < pDq->pSliceEncCtx->iMaxSliceNumConstraint) {
+                iSliceNum = pDq->pSliceEncCtx->iMaxSliceNumConstraint;
+              }
+            }
             if (iSliceNum < 1)
               iSliceNum = 1;
             while (iSliceIdx < iSliceNum) {
@@ -3117,7 +3123,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     // for dynamic slicing single threading..
     else if ((SM_DYN_SLICE == pParam->sSliceCfg.uiSliceMode) && (pSvcParam->iMultipleThreadIdc <= 1)) {
       const int32_t kiLastMbInFrame = pCtx->pCurDqLayer->pSliceEncCtx->iMbNumInFrame;
-      pCtx->iEncoderError = WelsCodeOnePicPartition (pCtx, pLayerBsInfo, &iNalIdxInLayer, &iLayerSize, 0, kiLastMbInFrame, 0);
+      pCtx->iEncoderError = WelsCodeOnePicPartition (pCtx, pFbi, pLayerBsInfo, &iNalIdxInLayer, &iLayerSize, 0, kiLastMbInFrame, 0);
       WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
     } else {
       //other multi-slice uiSliceMode
@@ -3680,8 +3686,112 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
   return 0;
 }
 
+int32_t DynSliceRealloc(sWelsEncCtx* pCtx,
+                        SFrameBSInfo* pFrameBsInfo,
+                        SLayerBSInfo* pLayerBsInfo) {
+  CMemoryAlign* pMA = pCtx->pMemAlign;
+  SDqLayer* pCurLayer = pCtx->pCurDqLayer;
 
+  int32_t iCountNals = pCtx->pOut->iCountNals;
+  int32_t iMaxSliceNumOld = pCurLayer->pSliceEncCtx->iMaxSliceNumConstraint;
+  int32_t iMaxSliceNum = iMaxSliceNumOld;
+  iCountNals += iMaxSliceNum * (pCtx->pSvcParam->iSpatialLayerNum + pCtx->bNeedPrefixNalFlag);
+  iMaxSliceNum *= SLICE_NUM_EXPAND_COEF;
+
+  SWelsNalRaw* pNalList = (SWelsNalRaw*)pMA->WelsMalloc(iCountNals * sizeof(SWelsNalRaw), "pOut->sNalList");
+  if (NULL == pNalList)
+    return ENC_RETURN_MEMALLOCERR;
+  memcpy(pNalList, pCtx->pOut->sNalList, sizeof(SWelsNalRaw) * pCtx->pOut->iCountNals);
+  pMA->WelsFree(pCtx->pOut->sNalList, "pOut->sNalList");
+  pCtx->pOut->sNalList = pNalList;
+
+  int32_t* pNalLen = (int32_t*)pMA->WelsMalloc(iCountNals * sizeof(int32_t), "pOut->pNalLen");
+  if (NULL == pNalLen)
+    return ENC_RETURN_MEMALLOCERR;
+  memcpy(pNalLen, pCtx->pOut->pNalLen, sizeof(int32_t) * pCtx->pOut->iCountNals);
+  pMA->WelsFree(pCtx->pOut->pNalLen, "pOut->pNalLen");
+  pCtx->pOut->pNalLen = pNalLen;
+
+  pCtx->pOut->iCountNals = iCountNals;
+  SLayerBSInfo *pLBI1, *pLBI2;
+  pLBI1 = &pFrameBsInfo->sLayerInfo[0];
+  pLBI1->pNalLengthInByte = pCtx->pOut->pNalLen;
+  while (pLBI1 != pLayerBsInfo) {
+    pLBI2 = pLBI1;
+    ++ pLBI1;
+    pLBI1->pNalLengthInByte = pLBI2->pNalLengthInByte + pLBI2->iNalCount;
+  }
+
+  SSlice *pSlice = (SSlice*)pMA->WelsMallocz( sizeof(SSlice) * iMaxSliceNum, "Slice");
+  if (NULL == pSlice)
+    return ENC_RETURN_MEMALLOCERR;
+  memcpy(pSlice, pCurLayer->sLayerInfo.pSliceInLayer, sizeof(SSlice) * iMaxSliceNumOld);
+  uint32_t uiSliceIdx;
+  uiSliceIdx = iMaxSliceNumOld;
+  SSlice *pBaseSlice = &pCurLayer->sLayerInfo.pSliceInLayer[0];
+  SSliceHeaderExt *pBaseSHExt = &pBaseSlice->sSliceHeaderExt;
+  SSlice *pSliceIdx = &pSlice[uiSliceIdx];
+  while (uiSliceIdx < iMaxSliceNum) {
+    SSliceHeaderExt *pSHExt = &pSliceIdx->sSliceHeaderExt;
+    pSliceIdx->uiSliceIdx = uiSliceIdx;
+    if (pCtx->pSvcParam->iMultipleThreadIdc > 1)
+      pSliceIdx->pSliceBsa = &pCtx->pSliceBs[uiSliceIdx].sBsWrite;
+    else
+      pSliceIdx->pSliceBsa = &pCtx->pOut->sBsWrite;
+    if (AllocMbCacheAligned(&pSliceIdx->sMbCacheInfo, pMA))
+      return ENC_RETURN_MEMALLOCERR;
+
+    pSliceIdx->bSliceHeaderExtFlag = pBaseSlice->bSliceHeaderExtFlag;
+    pSHExt->sSliceHeader.iPpsId = pBaseSHExt->sSliceHeader.iPpsId;
+    pSHExt->sSliceHeader.pPps = pBaseSHExt->sSliceHeader.pPps;
+    pSHExt->sSliceHeader.iSpsId = pBaseSHExt->sSliceHeader.iSpsId;
+    pSHExt->sSliceHeader.pSps = pBaseSHExt->sSliceHeader.pSps;
+    pSHExt->sSliceHeader.uiRefCount = pCtx->iNumRef0;
+    memcpy(&pSHExt->sSliceHeader.sRefMarking, &pBaseSHExt->sSliceHeader.sRefMarking, sizeof(SRefPicMarking));
+    memcpy(&pSHExt->sSliceHeader.sRefReordering, &pBaseSHExt->sSliceHeader.sRefReordering, sizeof(SRefPicListReorderSyntax));
+
+    pSliceIdx++;
+    uiSliceIdx++;
+	}
+  pMA->WelsFree(pCurLayer->sLayerInfo.pSliceInLayer, "Slice");
+  pCurLayer->sLayerInfo.pSliceInLayer = pSlice;
+
+  SRCSlicing *pSlcingOverRc = (SRCSlicing *)pMA->WelsMalloc(iMaxSliceNum * sizeof(SRCSlicing), "SlicingOverRC");
+  if (NULL == pSlcingOverRc)
+    return ENC_RETURN_MEMALLOCERR;
+  memcpy(pSlcingOverRc, pCtx->pWelsSvcRc->pSlicingOverRc, sizeof(SRCSlicing) * iMaxSliceNumOld);
+  uiSliceIdx = iMaxSliceNumOld;
+  SRCSlicing *pSORC = &pSlcingOverRc[uiSliceIdx];
+  while (uiSliceIdx < iMaxSliceNum) {
+    pSORC->iComplexityIndexSlice = 0;
+    pSORC->iCalculatedQpSlice = pCtx->iGlobalQp;
+    pSORC ++;
+    uiSliceIdx ++;
+  }
+  pMA->WelsFree(pCtx->pWelsSvcRc->pSlicingOverRc, "SlicingOverRC");
+  pCtx->pWelsSvcRc->pSlicingOverRc = pSlcingOverRc;
+
+  int16_t *pFirstMbInSlice = (int16_t *)pMA->WelsMalloc(iMaxSliceNum * sizeof(int16_t), "pSliceSeg->pFirstMbInSlice");
+  if (NULL == pFirstMbInSlice)
+    return ENC_RETURN_MEMALLOCERR;
+  memcpy(pFirstMbInSlice, pCurLayer->pSliceEncCtx->pFirstMbInSlice, sizeof(int16_t) * iMaxSliceNumOld);
+  pMA->WelsFree(pCurLayer->pSliceEncCtx->pFirstMbInSlice, "pSliceSeg->pFirstMbInSlice");
+  pCurLayer->pSliceEncCtx->pFirstMbInSlice = pFirstMbInSlice;
+
+  int32_t *pCountMbNumInSlice = (int32_t *)pMA->WelsMalloc(iMaxSliceNum * sizeof(int32_t), "pSliceSeg->pCountMbNumInSlice");
+  if (NULL == pCountMbNumInSlice)
+    return ENC_RETURN_MEMALLOCERR;
+  memcpy(pCountMbNumInSlice, pCurLayer->pSliceEncCtx->pCountMbNumInSlice, sizeof(int32_t) * iMaxSliceNumOld);
+  pMA->WelsFree(pCurLayer->pSliceEncCtx->pCountMbNumInSlice, "pSliceSeg->pCountMbNumInSlice");
+  pCurLayer->pSliceEncCtx->pCountMbNumInSlice = pCountMbNumInSlice;
+
+  if (pCtx->iMaxSliceCount < iMaxSliceNum)
+    pCtx->iMaxSliceCount = iMaxSliceNum;
+  pCurLayer->pSliceEncCtx->iMaxSliceNumConstraint = iMaxSliceNum;
+	return ENC_RETURN_SUCCESS;
+}
 int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
+                                 SFrameBSInfo* pFrameBSInfo,
                                  SLayerBSInfo* pLayerBsInfo,
                                  int32_t* pNalIdxInLayer,
                                  int32_t* pLayerSize,
@@ -3701,6 +3811,7 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
   const EWelsNalUnitType keNalType	= pCtx->eNalType;
   const EWelsNalRefIdc keNalRefIdc	= pCtx->eNalPriority;
   const bool kbNeedPrefix		= pCtx->bNeedPrefixNalFlag;
+  const int32_t kiSliceIdxStep = pCtx->iActiveThreadsNum;
   int32_t iReturn = ENC_RETURN_SUCCESS;
 
   //init
@@ -3715,10 +3826,13 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
     int32_t iSliceSize	= 0;
     int32_t iPayloadSize	= 0;
 
-    if (iSliceIdx >= pSliceCtx->iMaxSliceNumConstraint) {	// insufficient memory in pSliceInLayer[]
-      // TODO: need exception handler for not large enough of MAX_SLICES_NUM related memory usage
-      // No idea about its solution due MAX_SLICES_NUM is fixed lenght in relevent pData structure
-      return ENC_RETURN_MEMALLOCERR;
+    if (iSliceIdx >= (pSliceCtx->iMaxSliceNumConstraint - kiSliceIdxStep)) {	// insufficient memory in pSliceInLayer[]
+      if (pCtx->iActiveThreadsNum == 1)
+        if (DynSliceRealloc(pCtx, pFrameBSInfo, pLayerBsInfo)) //only single thread support re-alloc now
+          return ENC_RETURN_MEMALLOCERR;
+      else if (iSliceIdx >= pSliceCtx->iMaxSliceNumConstraint) {
+        return ENC_RETURN_MEMALLOCERR;
+			}
     }
 
     if (kbNeedPrefix) {

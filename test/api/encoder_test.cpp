@@ -96,6 +96,10 @@ static const EncodeFileParam kFileParamArray[] = {
       "a74ae382356098fb5cce216a97f2c0cef00a0a9d", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 2
   },
   {
+      "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
+      "76b26c32dd3b400d3dccee0e8a52581f5c2588bb", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1
+  },
+  {
       "res/CiscoVT2people_320x192_12fps.yuv",
       "", SCREEN_CONTENT_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1
   },

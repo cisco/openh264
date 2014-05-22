@@ -176,6 +176,8 @@
 #define MAX_ACCESS_UINT_CAPACITY	(1<<20)	// Maximal AU capacity in bytes: 1024 KB predefined
 #define MAX_ACCESS_UNIT_CACHE_NUM	2	// Maximal Access Unit(AU) cache number to be processed, denote current AU and the next coming AU.
 
+#define SLICE_NUM_EXPAND_COEF 2
+
 enum {
   BLOCK_16x16 = 0,
   BLOCK_16x8  = 1,
