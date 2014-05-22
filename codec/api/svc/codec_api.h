@@ -109,7 +109,7 @@ class ISVCDecoder {
    */
   virtual DECODING_STATE EXTAPI DecodeFrame2 (const unsigned char* pSrc,
       const int iSrcLen,
-      void** ppDst,
+      unsigned char** ppDst,
       SBufferInfo* pDstInfo) = 0;
 
   /*
@@ -174,7 +174,7 @@ DECODING_STATE (*DecodeFrame) (ISVCDecoder*, const unsigned char* pSrc,
 
 DECODING_STATE (*DecodeFrame2) (ISVCDecoder*, const unsigned char* pSrc,
                                 const int iSrcLen,
-                                void** ppDst,
+                                unsigned char** ppDst,
                                 SBufferInfo* pDstInfo);
 
 DECODING_STATE (*DecodeFrameEx) (ISVCDecoder*, const unsigned char* pSrc,
