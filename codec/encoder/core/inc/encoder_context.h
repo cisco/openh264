@@ -64,7 +64,7 @@ namespace WelsSVCEnc {
  */
 typedef struct TagRefList {
   SPicture*					pShortRefList[1 + MAX_SHORT_REF_COUNT]; // reference list 0 - int16_t
-  SPicture*					pLongRefList[1 + MAX_LONG_REF_COUNT];	// reference list 1 - int32_t
+  SPicture*					pLongRefList[1 + MAX_REF_PIC_COUNT];	// reference list 1 - int32_t
   SPicture*					pNextBuffer;
   SPicture*					pRef[1 + MAX_REF_PIC_COUNT];	// plus 1 for swap intend
   uint8_t						uiShortRefCount;

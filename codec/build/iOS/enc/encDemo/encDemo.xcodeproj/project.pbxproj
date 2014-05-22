@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9ABF4379192DE20800A6BD61 /* EncUT_MemoryAlloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ABF4378192DE20800A6BD61 /* EncUT_MemoryAlloc.cpp */; };
 		FAA3D9D318BD729500BCD52D /* welsenc_ios.cfg in Resources */ = {isa = PBXBuildFile; fileRef = FAA3D9D218BD729500BCD52D /* welsenc_ios.cfg */; };
 		FAA3D9D818BD777100BCD52D /* CiscoVT2people_320x192_12fps.yuv in Resources */ = {isa = PBXBuildFile; fileRef = FAA3D9D718BD777100BCD52D /* CiscoVT2people_320x192_12fps.yuv */; };
 		FAA3D9DD18BD8A5600BCD52D /* layer2.cfg in Resources */ = {isa = PBXBuildFile; fileRef = FAA3D9DC18BD8A5600BCD52D /* layer2.cfg */; };
@@ -94,6 +95,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9ABF4378192DE20800A6BD61 /* EncUT_MemoryAlloc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EncUT_MemoryAlloc.cpp; path = ../../../../../test/encoder/EncUT_MemoryAlloc.cpp; sourceTree = "<group>"; };
 		FAA3D9D218BD729500BCD52D /* welsenc_ios.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = welsenc_ios.cfg; path = ../../../../../../testbin/welsenc_ios.cfg; sourceTree = "<group>"; };
 		FAA3D9D718BD777100BCD52D /* CiscoVT2people_320x192_12fps.yuv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CiscoVT2people_320x192_12fps.yuv; path = ../../../../../../res/CiscoVT2people_320x192_12fps.yuv; sourceTree = "<group>"; };
 		FAA3D9DC18BD8A5600BCD52D /* layer2.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = layer2.cfg; path = ../../../../../../testbin/layer2.cfg; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 		FAFB4F9C18BC8DD700315438 = {
 			isa = PBXGroup;
 			children = (
+				9ABF4378192DE20800A6BD61 /* EncUT_MemoryAlloc.cpp */,
 				FAFB4FAE18BC8DD700315438 /* encDemo */,
 				FAFB4FA718BC8DD700315438 /* Frameworks */,
 				FAFB4FA618BC8DD700315438 /* Products */,
@@ -388,6 +391,7 @@
 				FAFB502F18BCA50900315438 /* read_config.cpp in Sources */,
 				FAFB500B18BC8F6C00315438 /* welsenc.cpp in Sources */,
 				FAFB4FB918BC8DD700315438 /* AppDelegate.m in Sources */,
+				9ABF4379192DE20800A6BD61 /* EncUT_MemoryAlloc.cpp in Sources */,
 				FAFB4FB518BC8DD700315438 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
