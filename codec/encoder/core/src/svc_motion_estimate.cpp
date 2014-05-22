@@ -914,47 +914,6 @@ void UpdateFMESwitch (SDqLayer* pCurLayer) {
 }
 void UpdateFMESwitchNull (SDqLayer* pCurLayer) {
 }
-/////////////////////////
-// Search function options
-/////////////////////////
-void WelsDiamondCrossSearch (SWelsFuncPtrList* pFunc, void* vpMe, void* vpSlice, const int32_t kiEncStride,
-                             const int32_t kiRefStride) {
-  SWelsME* pMe       = static_cast<SWelsME*> (vpMe);
-  SSlice* pSlice         = static_cast<SSlice*> (vpSlice);
-
-  //  Step 1: diamond search
-  WelsDiamondSearch (pFunc, vpMe, vpSlice, kiEncStride, kiRefStride);
-
-  //  Step 2: CROSS search
-  SScreenBlockFeatureStorage pRefBlockFeature; //TODO: use this structure from Ref
-  pMe->uiSadCostThreshold = pRefBlockFeature.uiSadCostThreshold[pMe->uiBlockSize];
-  if (pMe->uiSadCost >= pMe->uiSadCostThreshold) {
-    WelsMotionCrossSearch (pFunc, pMe, pSlice, kiEncStride, kiRefStride);
-  }
-}
-void WelsDiamondCrossFeatureSearch (SWelsFuncPtrList* pFunc, void* vpMe, void* vpSlice, const int32_t kiEncStride,
-                                    const int32_t kiRefStride) {
-  SWelsME* pMe       = static_cast<SWelsME*> (vpMe);
-  SSlice* pSlice         = static_cast<SSlice*> (vpSlice);
-
-  //  Step 1: diamond search + cross
-  WelsDiamondCrossSearch (pFunc, pMe, pSlice, kiEncStride, kiRefStride);
-
-  // Step 2: FeatureSearch
-  if (pMe->uiSadCost >= pMe->uiSadCostThreshold) {
-    pSlice->uiSliceFMECostDown += pMe->uiSadCost;
-
-    SScreenBlockFeatureStorage tmpScreenBlockFeatureStorage; //TODO: use this structure from Ref
-    uint32_t uiMaxSearchPoint = INT_MAX;//TODO: change it according to computational-complexity setting
-    SFeatureSearchIn sFeatureSearchIn = {0};
-    SetFeatureSearchIn (pFunc, *pMe, pSlice, &tmpScreenBlockFeatureStorage,
-                        kiEncStride, kiRefStride,
-                        &sFeatureSearchIn);
-    MotionEstimateFeatureFullSearch (sFeatureSearchIn, uiMaxSearchPoint, pMe);
-
-    pSlice->uiSliceFMECostDown -= pMe->uiSadCost;
-  }
-}
 
 } // namespace WelsSVCEnc
 
