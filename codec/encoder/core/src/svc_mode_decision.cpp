@@ -118,12 +118,6 @@ void WelsMdInterMbEnhancelayer (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCur
   WelsMdSpatialelInterMbIlfmdNoilp (pEncCtx, pWelsMd, pSlice, pCurMb, kuiInterLayerRefMbType); //MD process
 }
 
-//////////////////////////
-//
-//SUPPORTING FUNCS
-//
-//////////////////////////
-
 ///////////////////////
 // do initiation for noILP (needed by ILFMD)
 ////////////////////////

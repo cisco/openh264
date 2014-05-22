@@ -782,7 +782,7 @@ int ProcessEncoding(ISVCEncoder* pPtrEnc, int argc, char** argv,bool bConfigFile
           int iLayerSize = 0;
           int iNalIdx = pLayerBsInfo->iNalCount - 1;
           do {
-            iLayerSize += pLayerBsInfo->iNalLengthInByte[iNalIdx];
+            iLayerSize += pLayerBsInfo->pNalLengthInByte[iNalIdx];
             -- iNalIdx;
           } while (iNalIdx >= 0);
 #if defined(COMPARE_DATA)

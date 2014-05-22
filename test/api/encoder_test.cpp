@@ -7,7 +7,7 @@ static void UpdateHashFromFrame(const SFrameBSInfo& info, SHA1Context* ctx) {
     const SLayerBSInfo& layerInfo = info.sLayerInfo[i];
     int layerSize = 0;
     for (int j = 0; j < layerInfo.iNalCount; ++j) {
-      layerSize += layerInfo.iNalLengthInByte[j];
+      layerSize += layerInfo.pNalLengthInByte[j];
     }
     SHA1Input(ctx, layerInfo.pBsBuf, layerSize);
   }

@@ -7,16 +7,6 @@
 #include "wels_func_ptr_def.h"
 #include "cpu.h"
 
-namespace WelsSVCEnc {
-  extern void SetFeatureSearchIn( SWelsFuncPtrList *pFunc,  const SWelsME& sMe,
-                                 const SSlice *pSlice, SScreenBlockFeatureStorage* pRefFeatureStorage,
-                                 const int32_t kiEncStride, const int32_t kiRefStride,
-                                 SFeatureSearchIn* pFeatureSearchIn );
-  extern void MotionEstimateFeatureFullSearch( SFeatureSearchIn &sFeatureSearchIn,
-                                              const uint32_t kuiMaxSearchPoint,
-                                              SWelsME* pMe);
-}
-
 using namespace WelsSVCEnc;
 
 void CopyTargetBlock( uint8_t* pSrcBlock, const int32_t kiBlockSize, SMVUnitXY sTargetMv, const int32_t kiRefPicStride,
@@ -377,10 +367,11 @@ TEST_F(FeatureMotionEstimateTest, TestFeatureSearch) {
       m_pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_8x8] = UINT_MAX;//to avoid early skip
       uint32_t uiMaxSearchPoint = INT_MAX;
       SFeatureSearchIn sFeatureSearchIn = {0};
-      SetFeatureSearchIn(&sFuncList, sMe, &sSlice, m_pScreenBlockFeatureStorage,
+      if (SetFeatureSearchIn(&sFuncList, sMe, &sSlice, m_pScreenBlockFeatureStorage,
         m_iMaxSearchBlock, m_iWidth,
-        &sFeatureSearchIn);
-      MotionEstimateFeatureFullSearch( sFeatureSearchIn, uiMaxSearchPoint, &sMe);
+        &sFeatureSearchIn)) {
+        MotionEstimateFeatureFullSearch( sFeatureSearchIn, uiMaxSearchPoint, &sMe);
+      }
 
       bool bMvMatch  = sMe.sMv.iMvX==sTargetMv.iMvX && sMe.sMv.iMvY==sTargetMv.iMvY;
       bool bFeatureMatch =
