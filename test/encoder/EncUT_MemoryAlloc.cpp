@@ -18,18 +18,20 @@ TEST(MemoryAlignTest, GetCacheLineSize_LoopWithin16K) {
 
 TEST(MemoryAlignTest, GetCacheLineSize_Zero) {
   CMemoryAlign cTestMa(0);
-  ASSERT_EQ(  16, cTestMa.WelsGetCacheLineSize() );
+  const uint32_t kuiSixteen = 16;
+  ASSERT_EQ(  kuiSixteen, cTestMa.WelsGetCacheLineSize() );
 }
 TEST(MemoryAlignTest, GetCacheLineSize_MaxUINT) {
 	CMemoryAlign cTestMa(0xFFFFFFFF);
-	ASSERT_EQ( 16, cTestMa.WelsGetCacheLineSize() );
+    const uint32_t kuiSixteen = 16;
+	ASSERT_EQ( kuiSixteen, cTestMa.WelsGetCacheLineSize() );
 }
 //Tests of WelsGetCacheLineSize End
 //Tests of WelsMallocAndFree Begin
 TEST(MemoryAlignTest, WelsMallocAndFreeOnceFunctionVerify) {
   const uint32_t kuiTargetAlignSize[4] = {32, 16, 64, 8};
   srand((uint32_t)time(NULL));
-
+  const uint32_t kuiZero = 0;
   for (int i=0; i<4; i++) {
     const uint32_t kuiTestAlignSize	= kuiTargetAlignSize[i];
     const uint32_t kuiTestDataSize		= abs(rand());
@@ -45,13 +47,13 @@ TEST(MemoryAlignTest, WelsMallocAndFreeOnceFunctionVerify) {
       ASSERT_TRUE( (((uintptr_t)(pUnitTestData)) & kuiExtraAlignSize) == 0 );
       EXPECT_EQ( kuiExpectedSize, cTestMa.WelsGetMemoryUsage() );
       cTestMa.WelsFree( pUnitTestData, strUnitTestTag );
-      EXPECT_EQ( 0, cTestMa.WelsGetMemoryUsage() );
+      EXPECT_EQ( kuiZero, cTestMa.WelsGetMemoryUsage() );
     }
     else {
       EXPECT_EQ( NULL, pUnitTestData );
-      EXPECT_EQ( 0, cTestMa.WelsGetMemoryUsage() );
+      EXPECT_EQ( kuiZero, cTestMa.WelsGetMemoryUsage() );
       cTestMa.WelsFree( pUnitTestData, strUnitTestTag );
-      EXPECT_EQ( 0, cTestMa.WelsGetMemoryUsage() );
+      EXPECT_EQ( kuiZero, cTestMa.WelsGetMemoryUsage() );
     }
   }
 }
