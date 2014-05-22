@@ -320,7 +320,7 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
 
 DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     const int kiSrcLen,
-    void** ppDst,
+    unsigned char** ppDst,
     SBufferInfo* pDstInfo) {
   if (kiSrcLen > MAX_ACCESS_UNIT_CAPACITY - MAX_MACROBLOCK_CAPACITY) {//prevent from residual reading overflow
     m_pDecContext->iErrorCode |= dsOutOfMemory;
@@ -361,7 +361,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
   m_pDecContext->iFeedbackTidInAu             = -1; //initialize
 
-  WelsDecodeBs (m_pDecContext, kpSrc, kiSrcLen, (unsigned char**)ppDst,
+  WelsDecodeBs (m_pDecContext, kpSrc, kiSrcLen, ppDst,
                 pDstInfo); //iErrorCode has been modified in this function
 
   if (m_pDecContext->iErrorCode) {
@@ -406,7 +406,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame (const unsigned char* kpSrc,
   DstInfo.UsrData.sSystemBuffer.iWidth = iWidth;
   DstInfo.UsrData.sSystemBuffer.iHeight = iHeight;
 
-  eDecState = DecodeFrame2 (kpSrc, kiSrcLen, (void**)ppDst, &DstInfo);
+  eDecState = DecodeFrame2 (kpSrc, kiSrcLen, ppDst, &DstInfo);
   if (eDecState == dsErrorFree) {
     pStride[0] = DstInfo.UsrData.sSystemBuffer.iStride[0];
     pStride[1] = DstInfo.UsrData.sSystemBuffer.iStride[1];

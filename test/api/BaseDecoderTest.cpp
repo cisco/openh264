@@ -71,7 +71,7 @@ void BaseDecoderTest::TearDown() {
 
 
 void BaseDecoderTest::DecodeFrame(const uint8_t* src, int sliceSize, Callback* cbk) {
-  void* data[3];
+  uint8_t* data[3];
   SBufferInfo bufInfo;
   memset(data, 0, sizeof(data));
   memset(&bufInfo, 0, sizeof(SBufferInfo));
@@ -82,19 +82,19 @@ void BaseDecoderTest::DecodeFrame(const uint8_t* src, int sliceSize, Callback* c
   if (bufInfo.iBufferStatus == 1 && cbk != NULL) {
     const Frame frame = {
         { // y plane
-            static_cast<uint8_t*>(data[0]),
+            data[0],
             bufInfo.UsrData.sSystemBuffer.iWidth,
             bufInfo.UsrData.sSystemBuffer.iHeight,
             bufInfo.UsrData.sSystemBuffer.iStride[0]
         },
         { // u plane
-            static_cast<uint8_t*>(data[1]),
+            data[1],
             bufInfo.UsrData.sSystemBuffer.iWidth / 2,
             bufInfo.UsrData.sSystemBuffer.iHeight / 2,
             bufInfo.UsrData.sSystemBuffer.iStride[1]
         },
         { // v plane
-            static_cast<uint8_t*>(data[2]),
+            data[2],
             bufInfo.UsrData.sSystemBuffer.iWidth / 2,
             bufInfo.UsrData.sSystemBuffer.iHeight / 2,
             bufInfo.UsrData.sSystemBuffer.iStride[1]
