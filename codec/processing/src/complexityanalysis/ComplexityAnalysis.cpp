@@ -101,7 +101,7 @@ void CComplexityAnalysis::AnalyzeFrameComplexityViaSad (SPixMap* pSrcPixMap, SPi
   m_sComplexityAnalysisParam.iFrameComplexity = pVaaCalcResults->iFrameSad;
 
   if (m_sComplexityAnalysisParam.iCalcBgd) { //BGD control
-    m_sComplexityAnalysisParam.iFrameComplexity = (int32_t)GetFrameSadExcludeBackground (pSrcPixMap, pRefPixMap);
+    m_sComplexityAnalysisParam.iFrameComplexity = GetFrameSadExcludeBackground (pSrcPixMap, pRefPixMap);
   }
 }
 
