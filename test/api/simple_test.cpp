@@ -11,7 +11,7 @@ int CodecUtMain(int argc , char** argv ) {
 int main (int argc, char** argv) {
 #endif
 
-#if defined(ANDROID_NDK)   
+#if defined(ANDROID_NDK)
    char xmlPath[1024] = "";
    sprintf(xmlPath,"xml:%s",argv[1]);
   ::testing::GTEST_FLAG(output) = xmlPath;

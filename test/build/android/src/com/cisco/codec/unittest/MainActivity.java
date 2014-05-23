@@ -11,18 +11,18 @@ import android.os.Build;
 import android.os.Process;
 
 public class MainActivity extends Activity {
-	
+
 	private TextView mStatusView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+
 		mStatusView = (TextView)findViewById(R.id.status_view);
-		
+
         runUnitTest();
-		
+
 	}
 
 	@Override
@@ -30,13 +30,13 @@ public class MainActivity extends Activity {
 	{
 		Process.killProcess(Process.myPid());
 	}
-   
-	
-	
+
+
+
 	public void runUnitTest()
 	{
 		Thread thread = new Thread() {
-	
+
 			public void run()
 			{
 				Log.i("codec_unittest","codec unittest begin");
@@ -45,7 +45,7 @@ public class MainActivity extends Activity {
 				{
 					mStatusView.setText(text);
 				}
-				
+
 //				String path = getIntent().getStringExtra("path");
 //				if (path.length() <=0)
 //				{ 
@@ -62,20 +62,20 @@ public class MainActivity extends Activity {
 		};
 		thread.start();
 	}
-	
+
 	static{
 		try{
 			System.loadLibrary("stlport_shared");
 			//System.loadLibrary("openh264");
 			System.loadLibrary("ut");
 			System.loadLibrary("utDemo");
-			
-			
+
+
 		}
 		catch(Exception e){Log.v("codec_unittest","Load library failed");}
-		
+
 	}
-	
+
 	public native void DoUnittest(String path);
 
 }

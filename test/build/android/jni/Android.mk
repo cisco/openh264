@@ -2,7 +2,7 @@
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE    := libUT 
+LOCAL_MODULE    := libUT
 LOCAL_SRC_FILES := ../../../../libut.so
 include $(PREBUILT_SHARED_LIBRARY)
 
@@ -20,7 +20,7 @@ LOCAL_MODULE := utDemo
 #
 
 LOCAL_SRC_FILES := \
-codec_unittest.cpp 
+codec_unittest.cpp
 #
 # Header Includes
 #
@@ -35,6 +35,6 @@ LOCAL_ARM_MODE := arm
 endif
 
 LOCAL_LDLIBS := -llog
-LOCAL_SHARED_LIBRARIES := libUT 
+LOCAL_SHARED_LIBRARIES := libUT
 
 include $(BUILD_SHARED_LIBRARY)
