@@ -5,7 +5,7 @@ OpenH264 is a codec library which supports H.264 encoding and decoding. It is su
 Encoder Features
 ----------------
 - Constrained Baseline Profile up to Level 5.2 (4096x2304)
-- Arbitrary resolution, not constrained to multiples of 16x16
+- Arbitrary resolution, support cropping
 - Rate control with adaptive quantization, or constant quantization
 - Slice options: 1 slice per frame, N slices per frame, N macroblocks per slice, or N bytes per slice
 - Multiple threads automatically used for multiple slices
@@ -32,6 +32,8 @@ Decoder Features
 - Multiple reference frames when specified in Sequence Parameter Set (SPS)
 - Annex B byte stream input
 - YUV 4:2:0 planar output
+- Decoder output timing conformance
+- Error concealment support with slice copy as default method
 
 OS Support
 ----------
@@ -39,7 +41,7 @@ OS Support
 - Mac OS X 64-bit and 32-bit
 - Linux 64-bit and 32-bit
 - Android 32-bit
-- iOS 64-bit and 32-bit
+- iOS 64-bit and 32-bit (not fully tested)
 
 Processor Support
 -----------------
@@ -136,6 +138,9 @@ Known Issues
 See the issue tracker on https://github.com/cisco/openh264/issues
 - Encoder errors when resolution exceeds 3840x2160
 - Encoder errors when compressed frame size exceeds half uncompressed size
+- Encoder does not support QP < 10 encoding
+- Encoder does not support slice number > 35 encoding
+- The result of float-point calculation in rate control will be affected by preciseness of double-typed variable on different platform
 - Decoder errors when compressed frame size exceeds 1MB
 - Encoder RC requires frame skipping to be enabled to hit the target bitrate,
   if frame skipping is disabled the target bitrate may be exceeded
