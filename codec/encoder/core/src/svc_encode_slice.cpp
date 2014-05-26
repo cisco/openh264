@@ -477,16 +477,13 @@ int32_t WelsISliceMdEnc (sWelsEncCtx* pEncCtx, SSlice* pSlice) { //pMd + encodin
   const int32_t kiTotalNumMb		= pCurLayer->iMbWidth * pCurLayer->iMbHeight;
   int32_t iCurMbIdx				= 0, iNumMbCoded = 0;
   const int32_t kiSliceIdx			= pSlice->uiSliceIdx;
-  const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
+
   SWelsMD sMd;
   int32_t iEncReturn = ENC_RETURN_SUCCESS;
 
   for (; ;) {
     iCurMbIdx	= iNextMbIdx;
     pCurMb = &pMbList[ iCurMbIdx ];
-    pCurMb->uiLumaQp   = pEncCtx->iGlobalQp;
-    pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp + kuiChromaQpIndexOffset)];
-
     pEncCtx->pFuncList->pfRc.pfWelsRcMbInit (pEncCtx, pCurMb, pSlice);
 
     sMd.iLambda = g_kiQpCostTable[pCurMb->uiLumaQp];
@@ -543,9 +540,6 @@ int32_t WelsISliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice) { //pMd + 
   for (; ;) {
     iCurMbIdx	= iNextMbIdx;
     pCurMb = &pMbList[ iCurMbIdx ];
-    pCurMb->uiLumaQp   = pEncCtx->iGlobalQp;
-    pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp + kuiChromaQpIndexOffset)];
-
     pEncCtx->pFuncList->pfRc.pfWelsRcMbInit (pEncCtx, pCurMb, pSlice);
     // if already reaches the largest number of slices, set QPs to the upper bound
     if (pSlice->bDynamicSlicingSliceSizeCtrlFlag) {

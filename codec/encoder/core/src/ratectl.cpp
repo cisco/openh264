@@ -562,14 +562,15 @@ void RcCalculateMbQp (sWelsEncCtx* pEncCtx, SMB* pCurMb, const int32_t kiSliceId
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   SRCSlicing* pSOverRc		= &pWelsSvcRc->pSlicingOverRc[kiSliceId];
   int32_t iLumaQp			= pSOverRc->iCalculatedQpSlice;
-
+  SDqLayer* pCurLayer				= pEncCtx->pCurDqLayer;
+  const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
 #ifndef _NOT_USE_AQ_FOR_TEST_
   if (pEncCtx->pSvcParam->bEnableAdaptiveQuant) {
     iLumaQp   = (int8_t)WELS_CLIP3 (iLumaQp +
                                     pEncCtx->pVaa->sAdaptiveQuantParam.pMotionTextureIndexToDeltaQp[pCurMb->iMbXY], pWelsSvcRc->iMinQp, 51);
   }
 #endif
-  pCurMb->uiChromaQp	= g_kuiChromaQpTable[iLumaQp];
+  pCurMb->uiChromaQp	= g_kuiChromaQpTable[CLIP3_QP_0_51 (iLumaQp + kuiChromaQpIndexOffset)];
   pCurMb->uiLumaQp		= iLumaQp;
 }
 
@@ -873,12 +874,16 @@ void WelsRcMbInitGom (void* pCtx, SMB* pCurMb, SSlice* pSlice) {
   const int32_t kiSliceId			= pSlice->uiSliceIdx;
   SRCSlicing* pSOverRc				= &pWelsSvcRc->pSlicingOverRc[kiSliceId];
   SBitStringAux* bs				= pSlice->pSliceBsa;
-
+  SDqLayer* pCurLayer				= pEncCtx->pCurDqLayer;
+  const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
 
   pSOverRc->iBsPosSlice = BsGetBitsPos (bs);
 
-  if (pEncCtx->eSliceType == I_SLICE)
+  if (pEncCtx->eSliceType == I_SLICE) {
+    pCurMb->uiLumaQp   = pEncCtx->iGlobalQp;
+    pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp + kuiChromaQpIndexOffset)];
     return;
+  }
   //calculate gom qp and target bits at the beginning of gom
   if (0 == (pCurMb->iMbXY % pWelsSvcRc->iNumberMbGom)) {
     if (pCurMb->iMbXY != pSOverRc->iStartMbSlice) {
@@ -915,7 +920,6 @@ void  WelsRcPictureInitDisable (void* pCtx) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   SDLayerParam* pDLayerParam		= &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
-
   const int32_t kiQp = pDLayerParam->iDLayerQp;
 
   pEncCtx->iGlobalQp	= RcCalculateCascadingQp (pEncCtx, kiQp);
@@ -936,6 +940,8 @@ void  WelsRcPictureInfoUpdateDisable (void* pCtx, int32_t layer_size) {
 void  WelsRcMbInitDisable (void* pCtx, SMB* pCurMb, SSlice* pSlice) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   int32_t iLumaQp					= pEncCtx->iGlobalQp;
+  SDqLayer* pCurLayer				= pEncCtx->pCurDqLayer;
+  const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
 
   if (pEncCtx->pSvcParam->bEnableAdaptiveQuant && (pEncCtx->eSliceType == P_SLICE)) {
     iLumaQp   = (int8_t)WELS_CLIP3 (iLumaQp +
@@ -943,7 +949,7 @@ void  WelsRcMbInitDisable (void* pCtx, SMB* pCurMb, SSlice* pSlice) {
   } else {
     iLumaQp = WELS_CLIP3 (iLumaQp, FIX_MIN_QP_MODE, FIX_MAX_QP_MODE);
   }
-  pCurMb->uiChromaQp = g_kuiChromaQpTable[iLumaQp];
+  pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (iLumaQp + kuiChromaQpIndexOffset)];
   pCurMb->uiLumaQp = iLumaQp;
 }
 
