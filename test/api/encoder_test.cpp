@@ -73,31 +73,31 @@ TEST_P(EncoderOutputTest, CompareOutput) {
 static const EncodeFileParam kFileParamArray[] = {
   {
       "res/CiscoVT2people_320x192_12fps.yuv",
-      "5fa8c8551133b7d7586f498121028d0e05a28e1d", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1
+      "86ee1314eabf5a6d6083c5260d36e2d908f36ea5", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1
   },
   {
       "res/CiscoVT2people_160x96_6fps.yuv",
-      "c619645a7d46f8fade40d2b0e5ae01adc2e5c3ff", CAMERA_VIDEO_REAL_TIME, 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1
+      "20f3e5cbefe70e5a8793e60672fd70e136bc082a", CAMERA_VIDEO_REAL_TIME, 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1
   },
   {
       "res/Static_152_100.yuv",
-      "68cde1b5f790213baab1a10d4a19a3618c138405", CAMERA_VIDEO_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1
+      "035f2e5b35947ab43cad7c5ca4cd8a3b658306ba", CAMERA_VIDEO_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1
   },
   {
       "res/CiscoVT2people_320x192_12fps.yuv",
-      "d0d0a087451c2813e9b0fd61bc5b25a4e82519ac", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_ROWMB_SLICE, false, 1 // One slice per MB row
+      "c8b759bcec7ffa048f1d3ded594b8815bed0aead", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_ROWMB_SLICE, false, 1 // One slice per MB row
   },
   {
       "res/CiscoVT2people_320x192_12fps.yuv",
-      "d3760e61e38af978d5b59232d8402448812d1540", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, true, 1
+      "6f49cc4e746522d7d91599c9a883072e838ae918", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, true, 1
   },
   {
       "res/CiscoVT2people_320x192_12fps.yuv",
-      "a74ae382356098fb5cce216a97f2c0cef00a0a9d", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 2
+      "4da4526a763497cfd777e1a211c67df5e9d48b29", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 2
   },
   {
       "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-      "76b26c32dd3b400d3dccee0e8a52581f5c2588bb", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1
+      "6df1ece77c0de63cdf8ab52ccef3a7d139022717", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1
   },
   {
       "res/CiscoVT2people_320x192_12fps.yuv",

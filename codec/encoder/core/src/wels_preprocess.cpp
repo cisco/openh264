@@ -663,7 +663,7 @@ void CWelsPreProcess::BackgroundDetection (SVAAFrameInfo* pVaaInfo, SPicture* pC
 
 void CWelsPreProcess::AdaptiveQuantCalculation (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture) {
   pVaaInfo->sAdaptiveQuantParam.pCalcResult = & (pVaaInfo->sVaaCalcInfo);
-  pVaaInfo->sAdaptiveQuantParam.dAverMotionTextureIndexToDeltaQp = 0;
+  pVaaInfo->sAdaptiveQuantParam.iAverMotionTextureIndexToDeltaQp = 0;
 
   {
     int32_t iMethodIdx = METHOD_ADAPTIVE_QUANT;
