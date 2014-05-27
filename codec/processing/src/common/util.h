@@ -67,8 +67,15 @@ WELSVP_NAMESPACE_BEGIN
 
 #define WELS_MAX(x, y)	((x) > (y) ? (x) : (y))
 #define WELS_MIN(x, y)	((x) < (y) ? (x) : (y))
+
+#ifndef WELS_SIGN
 #define WELS_SIGN(a)	((int32_t)(a) >> 31)
+#endif
+
+#ifndef WELS_ABS
 #define WELS_ABS(a)		((WELS_SIGN(a) ^ (int32_t)(a)) - WELS_SIGN(a))
+#endif
+
 #define WELS_CLAMP(x, minv, maxv)  WELS_MIN(WELS_MAX(x, minv), maxv)
 
 #define ALIGNBYTES         (16)       /* Worst case is requiring alignment to an 16 byte boundary */

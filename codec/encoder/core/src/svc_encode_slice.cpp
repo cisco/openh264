@@ -460,7 +460,25 @@ void OutputPMbWithoutConstructCsRsNoCopy (sWelsEncCtx* pCtx, SDqLayer* pDq, SSli
     pfIdctFour4x4 (pDecV, kiDecStrideChroma, pDecV, kiDecStrideChroma, pScaledTcoeff + 320);
   }
 }
-
+inline void StashMBStatus (SDynamicSlicingStack* pDss, SBitStringAux* pBs, SSlice* pSlice, int32_t iMbSkipRun = 0) {
+  pDss->pBsStackBufPtr	= pBs->pBufPtr;
+  pDss->uiBsStackCurBits	= pBs->uiCurBits;
+  pDss->iBsStackLeftBits	= pBs->iLeftBits;
+  pDss->uiLastMbQp =  pSlice->uiLastMbQp;
+  pDss->iMbSkipRunStack = iMbSkipRun;
+}
+void StashPopMBStatus (SDynamicSlicingStack* pDss, SBitStringAux* pBs, SSlice* pSlice, int32_t* pMbSkipRun = 0) {
+  pBs->pBufPtr		= pDss->pBsStackBufPtr;
+  pBs->uiCurBits	= pDss->uiBsStackCurBits;
+  pBs->iLeftBits	= pDss->iBsStackLeftBits;
+  pSlice->uiLastMbQp = pDss->uiLastMbQp;
+  if(pMbSkipRun)
+    *pMbSkipRun = pDss->iMbSkipRunStack;
+}
+void UpdateQpForOverflow (SMB* pCurMb, uint8_t kuiChromaQpIndexOffset) {
+  pCurMb->uiLumaQp += DELTA_QP;
+  pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp + kuiChromaQpIndexOffset)];
+}
 // for intra non-dynamic pSlice
 //encapsulate two kinds of reconstruction:
 //first. store base or highest Dependency Layer with only one quality (without CS RS reconstruction)
@@ -477,22 +495,31 @@ int32_t WelsISliceMdEnc (sWelsEncCtx* pEncCtx, SSlice* pSlice) { //pMd + encodin
   const int32_t kiTotalNumMb		= pCurLayer->iMbWidth * pCurLayer->iMbHeight;
   int32_t iCurMbIdx				= 0, iNumMbCoded = 0;
   const int32_t kiSliceIdx			= pSlice->uiSliceIdx;
+  const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
 
   SWelsMD sMd;
   int32_t iEncReturn = ENC_RETURN_SUCCESS;
-
+  SBitStringAux* pBs = pSlice->pSliceBsa;
+  SDynamicSlicingStack sDss;
   for (; ;) {
+    StashMBStatus (&sDss, pBs, pSlice);
     iCurMbIdx	= iNextMbIdx;
     pCurMb = &pMbList[ iCurMbIdx ];
+
     pEncCtx->pFuncList->pfRc.pfWelsRcMbInit (pEncCtx, pCurMb, pSlice);
-
-    sMd.iLambda = g_kiQpCostTable[pCurMb->uiLumaQp];
-
     WelsMdIntraInit (pEncCtx, pCurMb, pMbCache, kiSliceFirstMbXY);
+
+TRY_REENCODING:
+    sMd.iLambda = g_kiQpCostTable[pCurMb->uiLumaQp];
     WelsMdIntraMb (pEncCtx, &sMd, pCurMb, pMbCache);
     UpdateNonZeroCountCache (pCurMb, pMbCache);
 
     iEncReturn = WelsSpatialWriteMbSyn (pEncCtx, pSlice, pCurMb);
+    if (iEncReturn == ENC_RETURN_VLCOVERFLOWFOUND) {
+      StashPopMBStatus (&sDss, pBs, pSlice);
+      UpdateQpForOverflow (pCurMb, kuiChromaQpIndexOffset);
+      goto TRY_REENCODING;
+    }
     if (ENC_RETURN_SUCCESS != iEncReturn)
       return iEncReturn;
 
@@ -505,7 +532,6 @@ int32_t WelsISliceMdEnc (sWelsEncCtx* pEncCtx, SSlice* pSlice) { //pMd + encodin
     pEncCtx->pFuncList->pfRc.pfWelsRcMbInfoUpdate (pEncCtx, pCurMb, sMd.iCostLuma, pSlice);
 
     ++iNumMbCoded;
-
     iNextMbIdx = WelsGetNextMbOfSlice (pSliceCtx, iCurMbIdx);
     if (iNextMbIdx == -1 || iNextMbIdx >= kiTotalNumMb || iNumMbCoded >= kiTotalNumMb) {
       break;
@@ -540,24 +566,27 @@ int32_t WelsISliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice) { //pMd + 
   for (; ;) {
     iCurMbIdx	= iNextMbIdx;
     pCurMb = &pMbList[ iCurMbIdx ];
+
+    StashMBStatus (&sDss, pBs, pSlice);
     pEncCtx->pFuncList->pfRc.pfWelsRcMbInit (pEncCtx, pCurMb, pSlice);
     // if already reaches the largest number of slices, set QPs to the upper bound
     if (pSlice->bDynamicSlicingSliceSizeCtrlFlag) {
       pCurMb->uiLumaQp = pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId].iMaxQp;
       pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp + kuiChromaQpIndexOffset)];
     }
-
-    sMd.iLambda = g_kiQpCostTable[pCurMb->uiLumaQp];
-
     WelsMdIntraInit (pEncCtx, pCurMb, pMbCache, kiSliceFirstMbXY);
+
+TRY_REENCODING:
+    sMd.iLambda = g_kiQpCostTable[pCurMb->uiLumaQp];
     WelsMdIntraMb (pEncCtx, &sMd, pCurMb, pMbCache);
     UpdateNonZeroCountCache (pCurMb, pMbCache);
-    //stack pBs pointer
-    sDss.pBsStackBufPtr	= pBs->pBufPtr;
-    sDss.uiBsStackCurBits	= pBs->uiCurBits;
-    sDss.iBsStackLeftBits	= pBs->iLeftBits;
 
     iEncReturn = WelsSpatialWriteMbSyn (pEncCtx, pSlice, pCurMb);
+    if (iEncReturn == ENC_RETURN_VLCOVERFLOWFOUND) {
+      StashPopMBStatus (&sDss, pBs, pSlice);
+      UpdateQpForOverflow (pCurMb, kuiChromaQpIndexOffset);
+      goto TRY_REENCODING;
+    }
     if (ENC_RETURN_SUCCESS != iEncReturn)
       return iEncReturn;
 
@@ -926,11 +955,13 @@ int32_t WelsMdInterMbLoop (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pWelsMd, 
   const int32_t kiSliceIdx				= pSlice->uiSliceIdx;
   const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
   int32_t iEncReturn = ENC_RETURN_SUCCESS;
-
+  SDynamicSlicingStack sDss;
   for (;;) {
+    StashMBStatus (&sDss, pBs, pSlice, iMbSkipRun);
     //point to current pMb
     iCurMbIdx	= iNextMbIdx;
     pCurMb = &pMbList[ iCurMbIdx ];
+
 
     //step(1): set QP for the current MB
     pEncCtx->pFuncList->pfRc.pfWelsRcMbInit (pEncCtx, pCurMb, pSlice);
@@ -938,6 +969,8 @@ int32_t WelsMdInterMbLoop (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pWelsMd, 
     //step (2). save some vale for future use, initial pWelsMd
     WelsMdIntraInit (pEncCtx, pCurMb, pMbCache, kiSliceFirstMbXY);
     WelsMdInterInit (pEncCtx, pSlice, pCurMb, kiSliceFirstMbXY);
+
+TRY_REENCODING:
     WelsInitInterMDStruc (pCurMb, pMvdCostTableInter, kiMvdInterTableStride, pMd);
     pEncCtx->pFuncList->pfInterMd (pEncCtx, pMd, pSlice, pCurMb, pMbCache);
     //mb_qp
@@ -961,6 +994,11 @@ int32_t WelsMdInterMbLoop (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pWelsMd, 
       BsWriteUE (pBs, iMbSkipRun);
       iMbSkipRun = 0;
       iEncReturn = WelsSpatialWriteMbSyn (pEncCtx, pSlice, pCurMb);
+      if (iEncReturn == ENC_RETURN_VLCOVERFLOWFOUND) {
+        StashPopMBStatus (&sDss, pBs, pSlice, &iMbSkipRun);
+        UpdateQpForOverflow (pCurMb, kuiChromaQpIndexOffset);
+        goto TRY_REENCODING;
+      }
       if (ENC_RETURN_SUCCESS != iEncReturn)
         return iEncReturn;
     }
@@ -1018,6 +1056,10 @@ int32_t WelsMdInterMbLoopOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice,
   SDynamicSlicingStack sDss;
   sDss.iStartPos = BsGetBitsPos (pBs);
   for (;;) {
+    //DYNAMIC_SLICING_ONE_THREAD - MultiD
+    //stack pBs pointer
+    StashMBStatus (&sDss, pBs, pSlice, iMbSkipRun);
+
     //point to current pMb
     iCurMbIdx	= iNextMbIdx;
     pCurMb = &pMbList[ iCurMbIdx ];
@@ -1036,6 +1078,8 @@ int32_t WelsMdInterMbLoopOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice,
     //step (2). save some vale for future use, initial pWelsMd
     WelsMdIntraInit (pEncCtx, pCurMb, pMbCache, kiSliceFirstMbXY);
     WelsMdInterInit (pEncCtx, pSlice, pCurMb, kiSliceFirstMbXY);
+
+TRY_REENCODING:
     WelsInitInterMDStruc (pCurMb, pMvdCostTableInter, kiMvdInterTableStride, pMd);
     pEncCtx->pFuncList->pfInterMd (pEncCtx, pMd, pSlice, pCurMb, pMbCache);
     //mb_qp
@@ -1051,15 +1095,6 @@ int32_t WelsMdInterMbLoopOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice,
 
     //step (6): begin to write bit stream; if the pSlice size is controlled, the writing may be skipped
 
-    //DYNAMIC_SLICING_ONE_THREAD - MultiD
-    //stack pBs pointer
-    sDss.pBsStackBufPtr	= pBs->pBufPtr;
-    sDss.uiBsStackCurBits	= pBs->uiCurBits;
-    sDss.iBsStackLeftBits	= pBs->iLeftBits;
-    //stack Pskip status
-    sDss.iMbSkipRunStack = iMbSkipRun;
-    //DYNAMIC_SLICING_ONE_THREAD - MultiD
-
     if (IS_SKIP (pCurMb->uiMbType)) {
       pCurMb->uiLumaQp	= pSlice->uiLastMbQp;
       pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp + kuiChromaQpIndexOffset)];
@@ -1069,6 +1104,11 @@ int32_t WelsMdInterMbLoopOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice,
       BsWriteUE (pBs, iMbSkipRun);
       iMbSkipRun = 0;
       iEncReturn = WelsSpatialWriteMbSyn (pEncCtx, pSlice, pCurMb);
+      if (iEncReturn == ENC_RETURN_VLCOVERFLOWFOUND) {
+        StashPopMBStatus (&sDss, pBs, pSlice, &iMbSkipRun);
+        UpdateQpForOverflow (pCurMb, kuiChromaQpIndexOffset);
+        goto TRY_REENCODING;
+      }
       if (ENC_RETURN_SUCCESS != iEncReturn)
         return iEncReturn;
     }
