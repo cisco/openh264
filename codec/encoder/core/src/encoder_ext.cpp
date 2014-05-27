@@ -3833,12 +3833,12 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
     int32_t iPayloadSize	= 0;
 
     if (iSliceIdx >= (pSliceCtx->iMaxSliceNumConstraint - kiSliceIdxStep)) {	// insufficient memory in pSliceInLayer[]
-      if (pCtx->iActiveThreadsNum == 1)
+      if (pCtx->iActiveThreadsNum == 1) {
         if (DynSliceRealloc (pCtx, pFrameBSInfo, pLayerBsInfo)) //only single thread support re-alloc now
           return ENC_RETURN_MEMALLOCERR;
-        else if (iSliceIdx >= pSliceCtx->iMaxSliceNumConstraint) {
-          return ENC_RETURN_MEMALLOCERR;
-        }
+      } else if (iSliceIdx >= pSliceCtx->iMaxSliceNumConstraint) {
+        return ENC_RETURN_MEMALLOCERR;
+      }
     }
 
     if (kbNeedPrefix) {
