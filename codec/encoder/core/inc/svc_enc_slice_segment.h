@@ -95,6 +95,7 @@ typedef struct TagDynamicSlicingStack {
   int32_t		iBsStackLeftBits;
 
   int32_t		iMbSkipRunStack;
+  uint8_t   uiLastMbQp;
 } SDynamicSlicingStack;
 
 /*!

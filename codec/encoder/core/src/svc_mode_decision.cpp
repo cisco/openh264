@@ -153,24 +153,55 @@ void SetMvBaseEnhancelayer (SWelsMD* pMd, SMB* pCurMb, const SMB* kpRefMb) {
   }
 }
 
+void SetBlockStaticIdcToMd (void* pVaa, void* pMd, SMB* pCurMb, void* pDqLay) { //TODO: OPT?
+  SVAAFrameInfoExt_t* pVaaExt = static_cast<SVAAFrameInfoExt_t*> (pVaa);
+  SWelsMD* pWelsMd = static_cast<SWelsMD*> (pMd);
+  SDqLayer* pDqLayer = static_cast<SDqLayer*> (pDqLay);
+
+  const int32_t kiMbX = pCurMb->iMbX;
+  const int32_t kiMbY = pCurMb->iMbY;
+  const int32_t kiMbWidth = pDqLayer->iMbWidth;
+  const int32_t kiWidth = kiMbWidth << 1;
+
+  const int32_t kiBlockIndexUp = (kiMbY << 1) * kiWidth + (kiMbX << 1);
+  const int32_t kiBlockIndexLow = ((kiMbY << 1) + 1) * kiWidth + (kiMbX << 1);
+
+  //fill_blockstaticidc with pVaaExt->pVaaBestBlockStaticIdc
+  pWelsMd->iBlock8x8StaticIdc[0] = pVaaExt->pVaaBestBlockStaticIdc[kiBlockIndexUp];
+  pWelsMd->iBlock8x8StaticIdc[1] = pVaaExt->pVaaBestBlockStaticIdc[kiBlockIndexUp + 1];
+  pWelsMd->iBlock8x8StaticIdc[2] = pVaaExt->pVaaBestBlockStaticIdc[kiBlockIndexLow];
+  pWelsMd->iBlock8x8StaticIdc[3] = pVaaExt->pVaaBestBlockStaticIdc[kiBlockIndexLow + 1];
+
+}
+
 ///////////////////////
-// Scrolling PSkip Decision for screen content
+// Scene Change Detection (SCD) PSkip Decision for screen content
 ////////////////////////
-bool WelsMdInterJudgeScrollingPskip (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache) {
+bool WelsMdInterJudgeSCDPskip (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache) {
+  sWelsEncCtx* pCtx	= (sWelsEncCtx*)pEncCtx;
+  SWelsMD* pMd					= (SWelsMD*)pWelsMd;
+  SDqLayer* pCurDqLayer			= pCtx->pCurDqLayer;
+
+  SetBlockStaticIdcToMd (pCtx->pVaa, pMd, pCurMb, pCurDqLayer);
+
+  //try static Pskip;
+
+  //try scrolled Pskip
   //TBD
+
   return false;
 }
-bool WelsMdInterJudgeScrollingPskipFalse (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb,
-    SMbCache* pMbCache) {
+bool WelsMdInterJudgeSCDPskipFalse (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb,
+                                    SMbCache* pMbCache) {
   return false;
 }
 
 
 void WelsInitScrollingSkipFunc (SWelsFuncPtrList* pFuncList, const bool bScrollingDetection) {
   if (bScrollingDetection) {
-    pFuncList->pfScrollingPSkipDecision = WelsMdInterJudgeScrollingPskip;
+    pFuncList->pfScrollingPSkipDecision = WelsMdInterJudgeSCDPskip;
   } else {
-    pFuncList->pfScrollingPSkipDecision = WelsMdInterJudgeScrollingPskipFalse;
+    pFuncList->pfScrollingPSkipDecision = WelsMdInterJudgeSCDPskipFalse;
   }
 }
 

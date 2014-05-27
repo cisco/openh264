@@ -244,7 +244,8 @@ int32_t WelsSpatialWriteMbSyn (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb
     pSlice->uiLastMbQp = pCurMb->uiLumaQp;
 
     BsWriteSE (pBs, kiDeltaQp);
-    WelsWriteMbResidual (pMbCache, pCurMb, pBs);
+    if (WelsWriteMbResidual (pMbCache, pCurMb, pBs))
+      return ENC_RETURN_VLCOVERFLOWFOUND;
   } else {
     pCurMb->uiLumaQp = pSlice->uiLastMbQp;
     pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp +
@@ -255,7 +256,7 @@ int32_t WelsSpatialWriteMbSyn (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb
   return CheckBitstreamBuffer (pSlice->uiSliceIdx, pEncCtx, pBs);
 }
 
-void WelsWriteMbResidual (SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux* pBs) {
+int32_t WelsWriteMbResidual (SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux* pBs) {
   int32_t i;
   Mb_Type uiMbType					= pCurMb->uiMbType;
   const int32_t kiCbpChroma		= pCurMb->uiCbp >> 4;
@@ -269,7 +270,8 @@ void WelsWriteMbResidual (SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux* pB
     iA = pNonZeroCoeffCount[8];
     iB = pNonZeroCoeffCount[ 1];
     WELS_NON_ZERO_COUNT_AVERAGE (iC, iA, iB);
-    WriteBlockResidualCavlc (sMbCacheInfo->pDct->iLumaI16x16Dc, 15, 1, LUMA_4x4, iC, pBs);
+    if (WriteBlockResidualCavlc (sMbCacheInfo->pDct->iLumaI16x16Dc, 15, 1, LUMA_4x4, iC, pBs))
+      return ENC_RETURN_VLCOVERFLOWFOUND;
 
     /* AC Luma */
     if (kiCbpLuma) {
@@ -324,10 +326,12 @@ void WelsWriteMbResidual (SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux* pB
   if (kiCbpChroma) {
     /* Chroma DC residual present */
     pBlock = sMbCacheInfo->pDct->iChromaDc[0]; // Cb
-    WriteBlockResidualCavlc (pBlock, 3, 1, CHROMA_DC, CHROMA_DC_NC_OFFSET, pBs);
+    if (WriteBlockResidualCavlc (pBlock, 3, 1, CHROMA_DC, CHROMA_DC_NC_OFFSET, pBs))
+      return ENC_RETURN_VLCOVERFLOWFOUND;
 
     pBlock += 4; // Cr
-    WriteBlockResidualCavlc (pBlock, 3, 1, CHROMA_DC, CHROMA_DC_NC_OFFSET, pBs);
+    if (WriteBlockResidualCavlc (pBlock, 3, 1, CHROMA_DC, CHROMA_DC_NC_OFFSET, pBs))
+      return ENC_RETURN_VLCOVERFLOWFOUND;
 
     /* Chroma AC residual present */
     if (kiCbpChroma & 0x02) {
@@ -355,6 +359,7 @@ void WelsWriteMbResidual (SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux* pB
       }
     }
   }
+  return 0;
 }
 
 } // namespace WelsSVCEnc

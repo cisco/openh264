@@ -927,6 +927,7 @@ void CWelsPreProcess::SaveBestRefToLocal (SRefInfoParam* pRefPicInfo, const SSce
     SRefInfoParam* pRefSaved) {
   pRefSaved->iSrcListIdx = pRefPicInfo->iSrcListIdx;
   pRefSaved->bSceneLtrFlag = pRefPicInfo->bSceneLtrFlag;
+  pRefSaved->pBestBlockStaticIdc = sSceneChangeResult.pStaticBlockIdc;
 }
 
 void CWelsPreProcess::SaveBestRefToVaa (SRefInfoParam& sRefSaved, SRefInfoParam* pVaaBestRef) {
@@ -974,8 +975,6 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
   SPicture* pRefPic = NULL;
   SRefInfoParam* pRefPicInfo = NULL;
   uint8_t*  pCurBlockStaticPointer = NULL;
-  uint8_t*  pBestStrBlockStaticPointer = NULL;
-  uint8_t*  pBestLtrBlockStaticPointer = NULL;
 
   const int32_t iNegligibleMotionBlocks = (static_cast<int32_t> ((pCurPicture->iWidthInPixel >> 3) *
                                           (pCurPicture->iHeightInPixel >> 3) * STATIC_SCENE_MOTION_RATIO));
@@ -1046,12 +1045,10 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
         SaveBestRefToJudgement (iRefPicAvQP, iFrameComplexity, &sLtrJudgement);
         SaveBestRefToLocal (pRefPicInfo, sSceneChangeResult, &sLtrSaved);
         bBestRefIsLtr = bCurRefIsLtr;
-        pBestStrBlockStaticPointer = sSceneChangeResult.pStaticBlockIdc;
       }
       if (bCurRefIsLtr && JudgeBestRef (pRefPic, sSceneLtrJudgement, iFrameComplexity, bIsClosestLtrFrame)) {
         SaveBestRefToJudgement (iRefPicAvQP, iFrameComplexity, &sSceneLtrJudgement);
         SaveBestRefToLocal (pRefPicInfo, sSceneChangeResult, &sSceneLtrSaved);
-        pBestLtrBlockStaticPointer = sSceneChangeResult.pStaticBlockIdc;
       }
 
       if (iMotionBlockNum <= iNegligibleMotionBlocks) {
@@ -1072,6 +1069,7 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
            pCtx->iCodingIndex);
 
   SaveBestRefToVaa (sLtrSaved, & (pVaaExt->sVaaStrBestRefCandidate[0]));
+  pVaaExt->pVaaBestBlockStaticIdc = sLtrSaved.pBestBlockStaticIdc;
 
   if (0 == iAvailableSceneRefNum) {
     SaveBestRefToVaa (sSceneLtrSaved, & (pVaaExt->sVaaStrBestRefCandidate[1]));
