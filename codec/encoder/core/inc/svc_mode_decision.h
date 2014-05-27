@@ -57,6 +57,7 @@ void WelsMdInterMbEnhancelayer (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCur
 
 SMB* GetRefMb (SDqLayer* pCurLayer, SMB* pCurMb);
 void SetMvBaseEnhancelayer (SWelsMD* pMd, SMB* pCurMb, const SMB* kpRefMb);
+void SetBlockStaticIdcToMd (void* pVaa, void* pMd, SMB* pCurMb, void* pDqLay);
 }
 #endif //SVC_MODE_DECISION_H
 

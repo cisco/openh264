@@ -74,6 +74,7 @@ typedef struct {
   SPicture*   pRefPicture;
   int32_t     iSrcListIdx;   //idx in  h->spatial_pic[base_did];
   bool        bSceneLtrFlag;
+  unsigned char*		pBestBlockStaticIdc;
 } SRefInfoParam;
 
 typedef struct {
