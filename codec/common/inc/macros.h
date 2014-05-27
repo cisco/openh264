@@ -44,6 +44,7 @@
 #include <assert.h>
 #include "typedefs.h"
 
+
 /*
 * ENFORCE_STACK_ALIGN_1D: force 1 dimension local data aligned in stack
 * _tp: type
@@ -124,6 +125,14 @@ __declspec(align(alignment)) type name[(sizex)*(sizey)]
 #ifndef WELS_ROUND
 #define WELS_ROUND(x)	((int32_t)(0.5+(x)))
 #endif//WELS_ROUND
+
+#ifndef WELS_DIV_ROUND
+#define WELS_DIV_ROUND(x,y)	((int32_t)((y)==0?((x)/((y)+1)):(((y)/2+(x))/(y))))
+#endif//WELS_DIV_ROUND
+
+#ifndef WELS_DIV_ROUND64
+#define WELS_DIV_ROUND64(x,y)	((int64_t)((y)==0?((x)/((y)+1)):(((y)/2+(x))/(y))))
+#endif//WELS_DIV_ROUND64
 
 #define WELS_NON_ZERO_COUNT_AVERAGE(nC,nA,nB) {		\
     nC = nA + nB + 1;                      \

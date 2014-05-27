@@ -85,7 +85,7 @@ typedef struct TagSliceThreading {
   WELS_MUTEX					mutexSliceNumUpdate;	// for dynamic slicing mode MT
 
   uint32_t*					pSliceConsumeTime[MAX_DEPENDENCY_LAYER];	// consuming time for each slice, [iSpatialIdx][uiSliceIdx]
-  float*						pSliceComplexRatio[MAX_DEPENDENCY_LAYER];
+  int32_t*					pSliceComplexRatio[MAX_DEPENDENCY_LAYER]; // *INT_MULTIPLY
 
 #ifdef MT_DEBUG
   FILE*						pFSliceDiff;	// file handle for debug

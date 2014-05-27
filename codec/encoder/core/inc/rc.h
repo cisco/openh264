@@ -107,18 +107,21 @@ enum {
 
 //bits allocation
 #define MAX_BITS_VARY_PERCENTAGE 100 //bits vary range in percentage
+#define INT_MULTIPLY 100 // use to multiply in Double to Int Conversion, should be same as AQ_QSTEP_INT_MULTIPLY in WelsVP
+#define WEIGHT_MULTIPLY 2000
+#define REMAIN_BITS_TH (10) // *INT_MULTIPLY
 #define VGOP_BITS_PERCENTAGE_DIFF 5
-#define IDR_BITRATE_RATIO  4.0
-#define FRAME_iTargetBits_VARY_RANGE 0.5
+#define IDR_BITRATE_RATIO  4
+#define FRAME_iTargetBits_VARY_RANGE 50 // *INT_MULTIPLY
 //R-Q Model
-#define LINEAR_MODEL_DECAY_FACTOR 0.8
-#define FRAME_CMPLX_RATIO_RANGE 0.1
-#define SMOOTH_FACTOR_MIN_VALUE 0.02
+#define LINEAR_MODEL_DECAY_FACTOR 80 // *INT_MULTIPLY
+#define FRAME_CMPLX_RATIO_RANGE 10 // *INT_MULTIPLY
+#define SMOOTH_FACTOR_MIN_VALUE 2 // *INT_MULTIPLY
 //#define VGOP_BITS_MIN_RATIO 0.8
 //skip and padding
-#define SKIP_RATIO  0.5
-#define PADDING_BUFFER_RATIO 0.5
-#define PADDING_THRESHOLD    0.05
+#define SKIP_RATIO  50 // *INT_MULTIPLY
+#define PADDING_BUFFER_RATIO 50 // *INT_MULTIPLY
+#define PADDING_THRESHOLD    5 //*INT_MULTIPLY
 
 typedef struct TagRCSlicing {
   int32_t   iComplexityIndexSlice;
@@ -138,10 +141,10 @@ typedef struct TagRCSlicing {
 typedef struct TagRCTemporal {
   int32_t   iMinBitsTl;
   int32_t   iMaxBitsTl;
-  double    dTlayerWeight;
+  int32_t   iTlayerWeight;
   int32_t   iGopBitsDq;
   //P frame level R-Q Model
-  double    dLinearCmplx;
+  int64_t   iLinearCmplx; // *INT_MULTIPLY
   int32_t   iPFrameNum;
   int32_t   iFrameCmplxMean;
 
@@ -149,14 +152,14 @@ typedef struct TagRCTemporal {
 
 typedef struct TagWelsRc {
   int32_t   iRcVaryPercentage;
-  double    dRcVaryRatio;
+  int32_t    iRcVaryRatio;
 
   int32_t   iInitialQp; //initial qp
   int32_t   iBitRate;
   int32_t   iPreviousBitrate;
   int32_t   iPreviousGopSize;
   double    fFrameRate;
-  double    dBitsPerFrame;
+  int32_t   iBitsPerFrame; // *INT_MULTIPLY
   double    dPreviousFps;
 
   // bits allocation and status
@@ -169,7 +172,7 @@ typedef struct TagWelsRc {
   int32_t   iIntraMbCount;
 
   int8_t    iTlOfFrames[VGOP_SIZE];
-  double    dRemainingWeights;
+  int32_t   iRemainingWeights;
   int32_t   iFrameDqBits;
 
   double*    pGomComplexity;
@@ -195,9 +198,9 @@ typedef struct TagWelsRc {
   int32_t   iMinQp;
   int32_t   iMaxQp;
   //int32_t   delta_adaptive_qp;
-  double    dSkipBufferRatio;
+  int32_t   iSkipBufferRatio;
 
-  double    dQStep;
+  int32_t   iQStep; // *INT_MULTIPLY
   int32_t   iFrameDeltaQpUpper;
   int32_t   iFrameDeltaQpLower;
   int32_t   iLastCalculatedQScale;

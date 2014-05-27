@@ -30,16 +30,16 @@
  *
  */
 #include "AdaptiveQuantization.h"
-
+#include "macros.h"
 WELSVP_NAMESPACE_BEGIN
 
 
 
-#define AVERAGE_TIME_MOTION                   (0.3) //0.3046875 // 1/4 + 1/16 - 1/128 ~ 0.3
-#define AVERAGE_TIME_TEXTURE_QUALITYMODE  (1.0) //0.5 // 1/2
-#define AVERAGE_TIME_TEXTURE_BITRATEMODE  (0.875) //0.5 // 1/2
-#define MODEL_ALPHA                           (0.9910) //1.5 //1.1102
-#define MODEL_TIME                            (5.8185) //9.0 //5.9842
+#define AVERAGE_TIME_MOTION                   (3000) //0.3046875 // 1/4 + 1/16 - 1/128 ~ 0.3 *AQ_TIME_INT_MULTIPLY
+#define AVERAGE_TIME_TEXTURE_QUALITYMODE  (10000) //0.5 // 1/2 *AQ_TIME_INT_MULTIPLY
+#define AVERAGE_TIME_TEXTURE_BITRATEMODE  (8750) //0.5 // 1/2 *AQ_TIME_INT_MULTIPLY
+#define MODEL_ALPHA                           (9910) //1.5 //1.1102 *AQ_TIME_INT_MULTIPLY
+#define MODEL_TIME                            (58185) //9.0 //5.9842 *AQ_TIME_INT_MULTIPLY
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -65,14 +65,14 @@ EResult CAdaptiveQuantization::Process (int32_t iType, SPixMap* pSrcPixMap, SPix
 
   SMotionTextureUnit* pMotionTexture = NULL;
   SVAACalcResult*     pVaaCalcResults = NULL;
-  int8_t   iMotionTextureIndexToDeltaQp = 0;
+  int32_t   iMotionTextureIndexToDeltaQp = 0;
   int32_t	 iAverMotionTextureIndexToDeltaQp = 0;	// double to uint32
-  double dAverageMotionIndex = 0.0;	// double to float
-  double dAverageTextureIndex = 0.0;
+  int64_t iAverageMotionIndex = 0;	// double to float
+  int64_t iAverageTextureIndex = 0;
 
-  double dQStep = 0.0;
-  double dLumaMotionDeltaQp = 0;
-  double dLumaTextureDeltaQp = 0;
+  int64_t iQStep = 0;
+  int64_t iLumaMotionDeltaQp = 0;
+  int64_t iLumaTextureDeltaQp = 0;
 
   uint8_t* pRefFrameY = NULL, *pCurFrameY = NULL;
   int32_t iRefStride = 0, iCurStride = 0;
@@ -88,8 +88,8 @@ EResult CAdaptiveQuantization::Process (int32_t iType, SPixMap* pSrcPixMap, SPix
 
   /////////////////////////////////////// motion //////////////////////////////////
   //  motion MB residual variance
-  dAverageMotionIndex = 0.0;
-  dAverageTextureIndex = 0.0;
+  iAverageMotionIndex = 0;
+  iAverageTextureIndex = 0;
   pMotionTexture = m_sAdaptiveQuantParam.pMotionTextureUnit;
   pVaaCalcResults = m_sAdaptiveQuantParam.pCalcResult;
 
@@ -115,8 +115,8 @@ EResult CAdaptiveQuantization::Process (int32_t iType, SPixMap* pSrcPixMap, SPix
         uiSum = uiSum >> 8;
         pMotionTexture->uiTextureIndex = (iSQSum >> 8) - (uiSum * uiSum);
 
-        dAverageMotionIndex += pMotionTexture->uiMotionIndex;
-        dAverageTextureIndex += pMotionTexture->uiTextureIndex;
+        iAverageMotionIndex += pMotionTexture->uiMotionIndex;
+        iAverageTextureIndex += pMotionTexture->uiTextureIndex;
         pMotionTexture++;
         ++iMbIndex;
         pRefFrameTmp += MB_WIDTH_LUMA;
@@ -131,8 +131,8 @@ EResult CAdaptiveQuantization::Process (int32_t iType, SPixMap* pSrcPixMap, SPix
       pCurFrameTmp  = pCurFrameY;
       for (i = 0; i < iMbWidth; i++) {
         m_pfVar (pRefFrameTmp, iRefStride, pCurFrameTmp, iCurStride, pMotionTexture);
-        dAverageMotionIndex += pMotionTexture->uiMotionIndex;
-        dAverageTextureIndex += pMotionTexture->uiTextureIndex;
+        iAverageMotionIndex += pMotionTexture->uiMotionIndex;
+        iAverageTextureIndex += pMotionTexture->uiTextureIndex;
         pMotionTexture++;
         pRefFrameTmp += MB_WIDTH_LUMA;
         pCurFrameTmp += MB_WIDTH_LUMA;
@@ -142,49 +142,51 @@ EResult CAdaptiveQuantization::Process (int32_t iType, SPixMap* pSrcPixMap, SPix
       pCurFrameY += (iCurStride) << 4;
     }
   }
-  dAverageMotionIndex = dAverageMotionIndex / iMbTotalNum;
-  dAverageTextureIndex = dAverageTextureIndex / iMbTotalNum;
-  if ((dAverageMotionIndex <= PESN) && (dAverageMotionIndex >= -PESN)) {
-    dAverageMotionIndex = 1.0;
+  iAverageMotionIndex = WELS_DIV_ROUND64(iAverageMotionIndex * AQ_INT_MULTIPLY,iMbTotalNum);
+  iAverageTextureIndex = WELS_DIV_ROUND64(iAverageTextureIndex * AQ_INT_MULTIPLY, iMbTotalNum);
+  if ((iAverageMotionIndex <= AQ_PESN) && (iAverageMotionIndex >= -AQ_PESN)) {
+    iAverageMotionIndex = AQ_INT_MULTIPLY;
   }
-  if ((dAverageTextureIndex <= PESN) && (dAverageTextureIndex >= -PESN)) {
-    dAverageTextureIndex = 1.0;
+  if ((iAverageTextureIndex <= AQ_PESN) && (iAverageTextureIndex >= -AQ_PESN)) {
+    iAverageTextureIndex = AQ_INT_MULTIPLY;
   }
   //  motion mb residual map to QP
   //  texture mb original map to QP
   iAverMotionTextureIndexToDeltaQp = 0;
-  dAverageMotionIndex = AVERAGE_TIME_MOTION * dAverageMotionIndex;
+  iAverageMotionIndex = WELS_DIV_ROUND64(AVERAGE_TIME_MOTION * iAverageMotionIndex, AQ_TIME_INT_MULTIPLY);
 
   if (m_sAdaptiveQuantParam.iAdaptiveQuantMode == AQ_QUALITY_MODE) {
-    dAverageTextureIndex = AVERAGE_TIME_TEXTURE_QUALITYMODE * dAverageTextureIndex;
+    iAverageTextureIndex = WELS_DIV_ROUND64(AVERAGE_TIME_TEXTURE_QUALITYMODE * iAverageTextureIndex, AQ_TIME_INT_MULTIPLY);
   } else {
-    dAverageTextureIndex = AVERAGE_TIME_TEXTURE_BITRATEMODE * dAverageTextureIndex;
+    iAverageTextureIndex = WELS_DIV_ROUND64(AVERAGE_TIME_TEXTURE_BITRATEMODE * iAverageTextureIndex, AQ_TIME_INT_MULTIPLY);
   }
 
+  int64_t iAQ_EPSN = -((int64_t)AQ_PESN*AQ_TIME_INT_MULTIPLY*AQ_QSTEP_INT_MULTIPLY/AQ_INT_MULTIPLY);
   pMotionTexture = m_sAdaptiveQuantParam.pMotionTextureUnit;
   for (j = 0; j < iMbHeight; j ++) {
     for (i = 0; i < iMbWidth; i++) {
-      double a = pMotionTexture->uiTextureIndex / dAverageTextureIndex;
-      dQStep = (a - 1) / (a + MODEL_ALPHA);
-      dLumaTextureDeltaQp = MODEL_TIME * dQStep;// range +- 6
+      int64_t a = WELS_DIV_ROUND64((int64_t)(pMotionTexture->uiTextureIndex) *AQ_INT_MULTIPLY * AQ_TIME_INT_MULTIPLY, iAverageTextureIndex);
+      iQStep = WELS_DIV_ROUND64((a - AQ_TIME_INT_MULTIPLY) * AQ_QSTEP_INT_MULTIPLY, (a + MODEL_ALPHA));
+      iLumaTextureDeltaQp = MODEL_TIME * iQStep;// range +- 6
 
-      iMotionTextureIndexToDeltaQp = (int8_t)dLumaTextureDeltaQp;
+      iMotionTextureIndexToDeltaQp = ((int32_t)(iLumaTextureDeltaQp/(AQ_TIME_INT_MULTIPLY)));
 
-      a = pMotionTexture->uiMotionIndex / dAverageMotionIndex;
-      dQStep = (a - 1) / (a + MODEL_ALPHA);
-      dLumaMotionDeltaQp = MODEL_TIME * dQStep;// range +- 6
+      a = WELS_DIV_ROUND64(((int64_t)pMotionTexture->uiMotionIndex)*AQ_INT_MULTIPLY * AQ_TIME_INT_MULTIPLY, iAverageMotionIndex);
+      iQStep = WELS_DIV_ROUND64((a - AQ_TIME_INT_MULTIPLY) * AQ_QSTEP_INT_MULTIPLY, (a + MODEL_ALPHA));
+      iLumaMotionDeltaQp = MODEL_TIME * iQStep;// range +- 6
 
-      if ((m_sAdaptiveQuantParam.iAdaptiveQuantMode == AQ_QUALITY_MODE && dLumaMotionDeltaQp < -PESN)
+      if ((m_sAdaptiveQuantParam.iAdaptiveQuantMode == AQ_QUALITY_MODE && iLumaMotionDeltaQp < iAQ_EPSN)
           || (m_sAdaptiveQuantParam.iAdaptiveQuantMode == AQ_BITRATE_MODE)) {
-        iMotionTextureIndexToDeltaQp += (int8_t)dLumaMotionDeltaQp;
+        iMotionTextureIndexToDeltaQp += ((int32_t)(iLumaMotionDeltaQp/(AQ_TIME_INT_MULTIPLY)));
       }
 
-      m_sAdaptiveQuantParam.pMotionTextureIndexToDeltaQp[j * iMbWidth + i] = iMotionTextureIndexToDeltaQp;
+      m_sAdaptiveQuantParam.pMotionTextureIndexToDeltaQp[j * iMbWidth + i] = (int8_t)(iMotionTextureIndexToDeltaQp/AQ_QSTEP_INT_MULTIPLY);
       iAverMotionTextureIndexToDeltaQp += iMotionTextureIndexToDeltaQp;
       pMotionTexture++;
     }
   }
-  m_sAdaptiveQuantParam.dAverMotionTextureIndexToDeltaQp = (1.0 * iAverMotionTextureIndexToDeltaQp) / iMbTotalNum;
+
+  m_sAdaptiveQuantParam.iAverMotionTextureIndexToDeltaQp = iAverMotionTextureIndexToDeltaQp / iMbTotalNum;
 
   eReturn = RET_SUCCESS;
 
@@ -210,7 +212,7 @@ EResult CAdaptiveQuantization::Get (int32_t iType, void* pParam) {
 
   SAdaptiveQuantizationParam* sAdaptiveQuantParam = (SAdaptiveQuantizationParam*)pParam;
 
-  sAdaptiveQuantParam->dAverMotionTextureIndexToDeltaQp = m_sAdaptiveQuantParam.dAverMotionTextureIndexToDeltaQp;
+  sAdaptiveQuantParam->iAverMotionTextureIndexToDeltaQp = m_sAdaptiveQuantParam.iAverMotionTextureIndexToDeltaQp;
 
   return RET_SUCCESS;
 }

@@ -209,7 +209,7 @@ typedef struct {
   SMotionTextureUnit*  pMotionTextureUnit;
 
   signed char*			pMotionTextureIndexToDeltaQp;
-  double				dAverMotionTextureIndexToDeltaQp;
+  int				iAverMotionTextureIndexToDeltaQp; // *AQ_STEP_INT_MULTIPLY
 } SAdaptiveQuantizationParam;
 
 typedef enum {
