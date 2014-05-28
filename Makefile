@@ -44,9 +44,6 @@ CFLAGS +=
 LDFLAGS +=
 
 
-FIREFOX_DIR=/Users/ekr/dev/gecko/gmp
-FIREFOX_OBJ=/Users/ekr/dev/gecko/gmp/obj-x86_64-apple-darwin12.5.0/
-
 ifeq (Yes, $(GCOV))
 CFLAGS += -fprofile-arcs -ftest-coverage
 LDFLAGS += -lgcov
@@ -104,7 +101,7 @@ ENCODER_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(ENCODER_INCLUDES) -Ites
 PROCESSING_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(PROCESSING_INCLUDES) -Itest -Itest/processing
 API_TEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) -Itest -Itest/api
 
-MODULE_INCLUDES = -I$(FIREFOX_DIR)/content/media/gmp/gmp-api -I$(FIREFOX_OBJ)/dist/include/nspr $(ENCODER_INCLUDES) $(DECODER_INCLUDES)
+MODULE_INCLUDES = -Igmp-api $(ENCODER_INCLUDES) $(DECODER_INCLUDES)
 MODULE_CFLAGS = -arch x86_64 -std=c++11
 
 .PHONY: test gtest-bootstrap clean
