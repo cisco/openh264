@@ -593,11 +593,7 @@ TRY_REENCODING:
     sDss.iCurrentPos = BsGetBitsPos (pBs);
 
     if (DynSlcJudgeSliceBoundaryStepBack (pEncCtx, pSlice, pSliceCtx, pCurMb, &sDss)) { //islice
-      //stack pBs pointer
-      pBs->pBufPtr		= sDss.pBsStackBufPtr;
-      pBs->uiCurBits	= sDss.uiBsStackCurBits;
-      pBs->iLeftBits	= sDss.iBsStackLeftBits;
-
+      StashPopMBStatus (&sDss, pBs, pSlice);
       pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId] = iCurMbIdx -
           1;	// update pLastCodedMbIdxOfPartition, need to -1 due to stepping back
       ++ pCurLayer->pNumSliceCodedOfPartition[kiPartitionId];
@@ -1116,13 +1112,7 @@ TRY_REENCODING:
     //DYNAMIC_SLICING_ONE_THREAD - MultiD
     sDss.iCurrentPos = BsGetBitsPos (pBs);
     if (DynSlcJudgeSliceBoundaryStepBack (pEncCtx, pSlice, pSliceCtx, pCurMb, &sDss)) {
-      //stack pBs pointer
-      pBs->pBufPtr		= sDss.pBsStackBufPtr;
-      pBs->uiCurBits	= sDss.uiBsStackCurBits;
-      pBs->iLeftBits	= sDss.iBsStackLeftBits;
-
-      iMbSkipRun = sDss.iMbSkipRunStack;
-
+      StashPopMBStatus (&sDss, pBs, pSlice, &iMbSkipRun);
       pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId] = iCurMbIdx -
           1;	// update pLastCodedMbIdxOfPartition, need to -1 due to stepping back
       ++ pCurLayer->pNumSliceCodedOfPartition[kiPartitionId];
