@@ -111,6 +111,9 @@ all:	libraries binaries
 clean:
 	$(QUIET)rm -f $(OBJS) $(OBJS:.$(OBJ)=.d) $(LIBRARIES) $(BINARIES)
 
+gmp-bootstrap:
+	git clone https://github.com/mozilla/gmp-api gmp-api
+
 gtest-bootstrap:
 	svn co https://googletest.googlecode.com/svn/trunk/ gtest
 
