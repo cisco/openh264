@@ -45,8 +45,7 @@
 
 namespace WelsDec {
 
-static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t** ppDst, int32_t* pDstLen,
-    int32_t* pWidth, int32_t* pHeight, SBufferInfo* pDstInfo) {
+static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
   PDqLayer pCurDq = pCtx->pCurDqLayer;
   PPicture pPic = pCtx->pDec;
 
@@ -55,15 +54,6 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
 
   const int32_t kiTotalNumMbInCurLayer = pCurDq->iMbWidth * pCurDq->iMbHeight;
   bool bFrameCompleteFlag = true;
-
-  if (pCtx->iTotalNumMbRec != kiTotalNumMbInCurLayer) {
-    WelsLog (pCtx, WELS_LOG_WARNING,
-             "DecodeFrameConstruction():::iTotalNumMbRec:%d, total_num_mb_sps:%d, cur_layer_mb_width:%d, cur_layer_mb_height:%d \n",
-             pCtx->iTotalNumMbRec, kiTotalNumMbInCurLayer, pCurDq->iMbWidth, pCurDq->iMbHeight);
-    bFrameCompleteFlag = false; //return later after output buffer is done
-  }
-
-  pCtx->iTotalNumMbRec = 0;
 
   if (pCtx->bNewSeqBegin) {
     memcpy (& (pCtx->sFrameCrop), & (pCurDq->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.pSps->sFrameCrop),
@@ -79,14 +69,21 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
              pCtx->sFrameCrop.iBottomOffset);
   }
 
+  if (pCtx->iTotalNumMbRec != kiTotalNumMbInCurLayer) {
+    WelsLog (pCtx, WELS_LOG_WARNING,
+             "DecodeFrameConstruction():::iTotalNumMbRec:%d, total_num_mb_sps:%d, cur_layer_mb_width:%d, cur_layer_mb_height:%d \n",
+             pCtx->iTotalNumMbRec, kiTotalNumMbInCurLayer, pCurDq->iMbWidth, pCurDq->iMbHeight);
+    bFrameCompleteFlag = false; //return later after output buffer is done
+    if (pCtx->bInstantDecFlag) //no-delay decoding, wait for new slice
+      return -1;
+  }
+
+  pCtx->iTotalNumMbRec = 0;
+
   //////output:::normal path
   ppDst[0]      = pPic->pData[0];
   ppDst[1]      = pPic->pData[1];
   ppDst[2]      = pPic->pData[2];
-  *pDstLen     = pPic->iLinesize[0];
-  * (pDstLen + 1) = pPic->iLinesize[1];
-  *pWidth      = kiWidth;
-  *pHeight     = kiHeight;
 
   pDstInfo->UsrData.sSystemBuffer.iFormat = videoFormatI420;
 
@@ -1474,6 +1471,12 @@ int32_t WelsDecodeAccessUnitStart (PWelsDecoderContext pCtx) {
 }
 
 void WelsDecodeAccessUnitEnd (PWelsDecoderContext pCtx) {
+  //save previous header info
+  PAccessUnit pCurAu = pCtx->pAccessUnitList;
+  PNalUnit pCurNal = pCurAu->pNalUnitsList[pCurAu->uiEndPos];
+  memcpy (&pCtx->sLastNalHdrExt, &pCurNal->sNalHeaderExt, sizeof (SNalUnitHeaderExt));
+  memcpy (&pCtx->sLastSliceHeader,
+          &pCurNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader, sizeof (SSliceHeader));
   // uninitialize context of current access unit and rbsp buffer clean
   ResetCurrentAccessUnit (pCtx);
 }
@@ -1557,9 +1560,6 @@ static void WriteBackActiveParameters (PWelsDecoderContext pCtx) {
  */
 int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
   int32_t iErr;
-  int32_t iWidth;
-  int32_t iHeight;
-  int32_t iStride[2] = { 0 };
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
 
   pCtx->bAuReadyFlag = false;
@@ -1591,11 +1591,14 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
   }
 
 
-  iErr = DecodeCurrentAccessUnit (pCtx, ppDst, iStride, &iWidth, &iHeight, pDstInfo);
+  iErr = DecodeCurrentAccessUnit (pCtx, ppDst, pDstInfo);
 
   WelsDecodeAccessUnitEnd (pCtx);
-  //Do error concealment here
-  ImplementErrorCon (pCtx);
+
+  if (!pCtx->bInstantDecFlag) {
+    //Do error concealment here
+    ImplementErrorCon (pCtx);
+  }
 
   pCtx->bNewSeqBegin = false;
   WriteBackActiveParameters (pCtx);
@@ -1703,8 +1706,7 @@ void ResetParameterSetsState (PWelsDecoderContext pCtx) {
  * DecodeCurrentAccessUnit
  * Decode current access unit when current AU is completed.
  */
-int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int32_t* pDstLen, int32_t* pWidth,
-                                 int32_t* pHeight, SBufferInfo* pDstInfo) {
+int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
   int32_t iRefCount[LIST_A];
   PNalUnit pNalCur = NULL;
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
@@ -1746,13 +1748,6 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
         pCtx->iErrorCode |= dsOutOfMemory;
         return ERR_INFO_REF_COUNT_OVERFLOW;
       }
-    }
-
-    //For fixing the nal lossing issue
-    if ((pCtx->iTotalNumMbRec != 0) &&
-        (CheckAccessUnitBoundaryExt (&pCtx->sLastNalHdrExt, &pNalCur->sNalHeaderExt, &pCtx->sLastSliceHeader,
-                                     &pNalCur->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader))) {
-      pCtx->iTotalNumMbRec = 0;
     }
 
     if (pCtx->iTotalNumMbRec == 0) { //Picture start to decode
@@ -1902,10 +1897,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
 #endif//#if !CODEC_FOR_TESTBED
 
     if (dq_cur->uiLayerDqId == kuiTargetLayerDqId) {
-      if (DecodeFrameConstruction (pCtx, ppDst, pDstLen, pWidth, pHeight, pDstInfo)) {
-        memcpy (&pCtx->sLastNalHdrExt, &pCurAu->pNalUnitsList[iIdx - 1]->sNalHeaderExt, sizeof (SNalUnitHeaderExt));
-        memcpy (&pCtx->sLastSliceHeader, &pCurAu->pNalUnitsList[iIdx - 1]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader,
-                sizeof (SSliceHeader));
+      if (DecodeFrameConstruction (pCtx, ppDst, pDstInfo)) {
         return ERR_NONE;
       }
 
@@ -1931,6 +1923,25 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int3
       pCtx->iPrevFrameNum = 0;
   }
 
+  return ERR_NONE;
+}
+
+bool CheckAndDoEC (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
+  PAccessUnit pAu = pCtx->pAccessUnitList;
+  PNalUnit pCurNal = pAu->pNalUnitsList[pAu->uiEndPos];
+  if ((pCtx->iTotalNumMbRec != 0)
+      && (CheckAccessUnitBoundaryExt (&pCtx->sLastNalHdrExt, &pCurNal->sNalHeaderExt, &pCtx->sLastSliceHeader,
+                                      &pCurNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader))) {
+    pCtx->iTotalNumMbRec = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
+    DecodeFrameConstruction (pCtx, ppDst, pDstInfo);
+    PPicture pCurPic = pCtx->pDec; //temporally store current picture
+    //Do Error Concealment here
+    ImplementErrorCon (pCtx);
+    pCtx->pPreviousDecodedPictureInDpb = pCurPic; //save ECed pic for future use
+    pCtx->iPrevFrameNum = pCtx->sLastSliceHeader.iFrameNum; //save frame_num
+    if (pCtx->bLastHasMmco5)
+      pCtx->iPrevFrameNum = 0;
+  }
   return ERR_NONE;
 }
 
