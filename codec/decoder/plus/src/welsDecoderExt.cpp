@@ -49,6 +49,7 @@
 
 //#include "macros.h"
 #include "decoder.h"
+#include "decoder_core.h"
 
 extern "C" {
 #include "decoder_core.h"
@@ -322,11 +323,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     const int kiSrcLen,
     unsigned char** ppDst,
     SBufferInfo* pDstInfo) {
-  if (kiSrcLen > MAX_ACCESS_UNIT_CAPACITY - MAX_MACROBLOCK_CAPACITY) {//prevent from residual reading overflow
-    m_pDecContext->iErrorCode |= dsOutOfMemory;
-    IWelsTrace::WelsVTrace (m_pTrace, IWelsTrace::WELS_LOG_INFO,
-                            "max AU size exceeded. Allowed size = %d, current size = %d",
-                            MAX_ACCESS_UNIT_CAPACITY - MAX_MACROBLOCK_CAPACITY, kiSrcLen);
+  if (CheckBsBuffer (m_pDecContext, kiSrcLen)) {
     return dsOutOfMemory;
   }
   if (kiSrcLen > 0 && kpSrc != NULL) {

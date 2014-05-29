@@ -233,6 +233,7 @@ typedef struct TagWelsDecoderContext {
   SVlcTable			sVlcTable;		 // vlc table
 
   SBitStringAux		sBs;
+  int32_t iMaxBsBufferSizeInByte; //actual memory size for BS buffer
 
   /* Global memory external */
 

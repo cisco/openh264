@@ -297,6 +297,57 @@ bool FillDefaultSliceHeaderExt (PSliceHeaderExt pShExt, PNalUnitHeaderExt pNalEx
   return true;
 }
 
+int32_t InitBsBuffer (PWelsDecoderContext pCtx) {
+  if (pCtx == NULL)
+    return ERR_INFO_INVALID_PTR;
+
+  pCtx->iMaxBsBufferSizeInByte = MIN_ACCESS_UNIT_CAPACITY * MAX_BUFFERED_NUM;
+  if ((pCtx->sRawData.pHead = static_cast<uint8_t*> (WelsMalloc (pCtx->iMaxBsBufferSizeInByte,
+                              "pCtx->sRawData.pHead"))) == NULL) {
+    return ERR_INFO_OUT_OF_MEMORY;
+  }
+  pCtx->sRawData.pStartPos = pCtx->sRawData.pCurPos = pCtx->sRawData.pHead;
+  pCtx->sRawData.pEnd = pCtx->sRawData.pHead + pCtx->iMaxBsBufferSizeInByte;
+  return ERR_NONE;
+}
+
+int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int kiSrcLen) {
+  if (pCtx == NULL)
+    return ERR_INFO_INVALID_PTR;
+  int32_t iExpandStepShift = 1;
+  int32_t iNewBuffLen = WELS_MAX ((kiSrcLen * MAX_BUFFERED_NUM), (pCtx->iMaxBsBufferSizeInByte << iExpandStepShift));
+  //allocate new bs buffer
+  uint8_t* pNewBsBuff = static_cast<uint8_t*> (WelsMalloc (iNewBuffLen, "pCtx->sRawData.pHead"));
+  if (pNewBsBuff == NULL)
+    return ERR_INFO_OUT_OF_MEMORY;
+
+  //Copy current buffer status to new buffer
+  memcpy (pNewBsBuff, pCtx->sRawData.pHead, pCtx->iMaxBsBufferSizeInByte);
+  pCtx->iMaxBsBufferSizeInByte = iNewBuffLen;
+  pCtx->sRawData.pStartPos = pNewBsBuff + (pCtx->sRawData.pStartPos - pCtx->sRawData.pHead);
+  pCtx->sRawData.pCurPos = pNewBsBuff + (pCtx->sRawData.pCurPos - pCtx->sRawData.pHead);
+  pCtx->sRawData.pEnd = pNewBsBuff + iNewBuffLen;
+  WelsFree (pCtx->sRawData.pHead, "pCtx->sRawData.pHead");
+  pCtx->sRawData.pHead = pNewBsBuff;
+  return ERR_NONE;
+}
+
+int32_t CheckBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen) {
+  if (kiSrcLen > MAX_ACCESS_UNIT_CAPACITY) { //exceeds max allowed data
+    WelsLog (pCtx, WELS_LOG_WARNING, "Max AU size exceeded. Allowed size = %d, current size = %d", MAX_ACCESS_UNIT_CAPACITY,
+             kiSrcLen);
+    pCtx->iErrorCode |= dsBitstreamError;
+    return ERR_INFO_INVALID_ACCESS;
+  } else if (kiSrcLen > pCtx->iMaxBsBufferSizeInByte /
+             MAX_BUFFERED_NUM) { //may lead to buffer overwrite, prevent it by expanding buffer
+    if (ExpandBsBuffer (pCtx, kiSrcLen)) {
+      return ERR_INFO_OUT_OF_MEMORY;
+    }
+  }
+
+  return ERR_NONE;
+}
+
 /*
  * WelsInitMemory
  * Memory request for new introduced data
@@ -313,13 +364,8 @@ int32_t WelsInitMemory (PWelsDecoderContext pCtx) {
   if (MemInitNalList (&pCtx->pAccessUnitList, MAX_NAL_UNIT_NUM_IN_AU) != 0)
     return ERR_INFO_OUT_OF_MEMORY;
 
-  if ((pCtx->sRawData.pHead = static_cast<uint8_t*> (WelsMalloc (BS_BUFFER_SIZE,
-                              "pCtx->sRawData->pHead"))) == NULL) {
+  if (InitBsBuffer (pCtx) != 0)
     return ERR_INFO_OUT_OF_MEMORY;
-  }
-  pCtx->sRawData.pStartPos               =
-    pCtx->sRawData.pCurPos                 = pCtx->sRawData.pHead;
-  pCtx->sRawData.pEnd                     = pCtx->sRawData.pHead + BS_BUFFER_SIZE;
 
   pCtx->uiTargetDqId			= (uint8_t) - 1;
   pCtx->bEndOfStreamFlag	= false;

@@ -48,6 +48,28 @@
 #include "codec_def.h"
 
 namespace WelsDec {
+/*
+ * InitBsBuffer
+ * Memory allocation for Bitstream Buffer
+ * return:
+ *	0 - success; otherwise returned error_no defined in error_no.h.
+ */
+int32_t InitBsBuffer (PWelsDecoderContext pCtx);
+
+/*
+ * ExpandBsBuffer
+ * Expand current BS buffer and copy its content
+ * new buffer size will consider input size as a reference
+ * return:
+ *	0 - success; otherwise returned error_no defined in error_no.h.
+ */
+int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen);
+
+/*
+ * CheckBsBuffer
+ * Check if current buffer size is enough
+ */
+int32_t CheckBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen);
 
 /*
  * WelsInitMemory
@@ -56,7 +78,7 @@ namespace WelsDec {
  * rbsp_au_buffer, cur_dq_layer_ptr and ref_dq_layer_ptr in MB info cache.
  * return:
  *	0 - success; otherwise returned error_no defined in error_no.h.
-*/
+ */
 int32_t WelsInitMemory (PWelsDecoderContext pCtx);
 
 /*
