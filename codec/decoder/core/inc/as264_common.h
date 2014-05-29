@@ -38,6 +38,5 @@
  */
 #ifndef WELS_AS264_COMMON_H__
 #define WELS_AS264_COMMON_H__
-#define  NO_WAITING_AU //slice level decoding
 #define  LONG_TERM_REF //for app
 #endif // WELS_AS264_COMMON_H__

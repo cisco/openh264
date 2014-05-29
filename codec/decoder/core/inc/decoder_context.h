@@ -322,11 +322,9 @@ typedef struct TagWelsDecoderContext {
   //trace handle
   void*      pTraceHandle;
 
-#ifdef NO_WAITING_AU
   //Save the last nal header info
   SNalUnitHeaderExt sLastNalHdrExt;
   SSliceHeader      sLastSliceHeader;
-#endif
 
 } SWelsDecoderContext, *PWelsDecoderContext;
 
