@@ -32,9 +32,7 @@
 #include <string.h>
 #include "expand_pic.h"
 #include "cpu_core.h"
-#include "wels_func_ptr_def.h"
 
-namespace WelsSVCEnc {
 // rewrite it (split into luma & chroma) that is helpful for mmx/sse2 optimization perform, 9/27/2009
 static inline void ExpandPictureLuma_c (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicW,
                                         const int32_t kiPicH) {
@@ -116,60 +114,61 @@ static inline void ExpandPictureChroma_c (uint8_t* pDst, const int32_t kiStride,
   } while (i < kiPicH);
 }
 
-void InitExpandPictureFunc (void* pL, const uint32_t kuiCPUFlag) {
-  SWelsFuncPtrList* pFuncList = (SWelsFuncPtrList*)pL;
-  pFuncList->pfExpandLumaPicture		= ExpandPictureLuma_c;
-  pFuncList->pfExpandChromaPicture[0]	= ExpandPictureChroma_c;
-  pFuncList->pfExpandChromaPicture[1]	= ExpandPictureChroma_c;
+void InitExpandPictureFunc (SExpandPicFunc* pExpandPicFunc, const uint32_t kuiCPUFlag) {
+  pExpandPicFunc->pfExpandLumaPicture		= ExpandPictureLuma_c;
+  pExpandPicFunc->pfExpandChromaPicture[0]	= ExpandPictureChroma_c;
+  pExpandPicFunc->pfExpandChromaPicture[1]	= ExpandPictureChroma_c;
 
 #if defined(X86_ASM)
   if ((kuiCPUFlag & WELS_CPU_SSE2) == WELS_CPU_SSE2) {
-    pFuncList->pfExpandLumaPicture	= ExpandPictureLuma_sse2;
-    pFuncList->pfExpandChromaPicture[0] = ExpandPictureChromaUnalign_sse2;
-    pFuncList->pfExpandChromaPicture[1] = ExpandPictureChromaAlign_sse2;
+    pExpandPicFunc->pfExpandLumaPicture	= ExpandPictureLuma_sse2;
+    pExpandPicFunc->pfExpandChromaPicture[0] = ExpandPictureChromaUnalign_sse2;
+    pExpandPicFunc->pfExpandChromaPicture[1] = ExpandPictureChromaAlign_sse2;
   }
 #endif//X86_ASM
 #if defined(HAVE_NEON)
   if (kuiCPUFlag & WELS_CPU_NEON) {
-    pFuncList->pfExpandLumaPicture	= ExpandPictureLuma_neon;
-    pFuncList->pfExpandChromaPicture[0] = ExpandPictureChroma_neon;
-    pFuncList->pfExpandChromaPicture[1] = ExpandPictureChroma_neon;
+    pExpandPicFunc->pfExpandLumaPicture	= ExpandPictureLuma_neon;
+    pExpandPicFunc->pfExpandChromaPicture[0] = ExpandPictureChroma_neon;
+    pExpandPicFunc->pfExpandChromaPicture[1] = ExpandPictureChroma_neon;
   }
 #endif//HAVE_NEON
 #if defined(HAVE_NEON_AARCH64)
   if (kuiCPUFlag & WELS_CPU_NEON) {
-    pFuncList->pfExpandLumaPicture	= ExpandPictureLuma_AArch64_neon;
-    pFuncList->pfExpandChromaPicture[0] = ExpandPictureChroma_AArch64_neon;
-    pFuncList->pfExpandChromaPicture[1] = ExpandPictureChroma_AArch64_neon;
+    pExpandPicFunc->pfExpandLumaPicture	= ExpandPictureLuma_AArch64_neon;
+    pExpandPicFunc->pfExpandChromaPicture[0] = ExpandPictureChroma_AArch64_neon;
+    pExpandPicFunc->pfExpandChromaPicture[1] = ExpandPictureChroma_AArch64_neon;
   }
 #endif//HAVE_NEON_AARCH64
 }
 
 
-void ExpandReferencingPicture (SPicture* pPic, PExpandPictureFunc pExpLuma, PExpandPictureFunc pExpChrom[2]) {
+//void ExpandReferencingPicture (SPicture* pPic, PExpandPictureFunc pExpLuma, PExpandPictureFunc pExpChrom[2]) {
+void ExpandReferencingPicture (uint8_t* pData[3], int32_t iWidth, int32_t iHeight, int32_t iStride[3],
+                               PExpandPictureFunc pExpLuma, PExpandPictureFunc pExpChrom[2]) {
   /*local variable*/
-  uint8_t* pPicY	= pPic->pData[0];
-  uint8_t* pPicCb = pPic->pData[1];
-  uint8_t* pPicCr = pPic->pData[2];
-  const int32_t kiWidthY	= pPic->iWidthInPixel;
-  const int32_t kiHeightY	= pPic->iHeightInPixel;
+  uint8_t* pPicY	= pData[0];
+  uint8_t* pPicCb = pData[1];
+  uint8_t* pPicCr = pData[2];
+  const int32_t kiWidthY	= iWidth;
+  const int32_t kiHeightY	= iHeight;
   const int32_t kiWidthUV	= kiWidthY >> 1;
   const int32_t kiHeightUV	= kiHeightY >> 1;
 
 
 
-  pExpLuma (pPicY, pPic->iLineSize[0], kiWidthY, kiHeightY);
+  pExpLuma (pPicY, iStride[0], kiWidthY, kiHeightY);
   if (kiWidthUV >= 16) {
     // fix coding picture size as 16x16
     const bool kbChrAligned = /*(iWidthUV >= 16) && */ ((kiWidthUV & 0x0F) == 0);	// chroma planes: (16+iWidthUV) & 15
-    pExpChrom[kbChrAligned] (pPicCb, pPic->iLineSize[1], kiWidthUV, kiHeightUV);
-    pExpChrom[kbChrAligned] (pPicCr, pPic->iLineSize[2], kiWidthUV, kiHeightUV);
+    pExpChrom[kbChrAligned] (pPicCb, iStride[1], kiWidthUV, kiHeightUV);
+    pExpChrom[kbChrAligned] (pPicCr, iStride[2], kiWidthUV, kiHeightUV);
   } else {
     // fix coding picture size as 16x16
-    ExpandPictureChroma_c (pPicCb, pPic->iLineSize[1], kiWidthUV, kiHeightUV);
-    ExpandPictureChroma_c (pPicCr, pPic->iLineSize[2], kiWidthUV, kiHeightUV);
+    ExpandPictureChroma_c (pPicCb, iStride[1], kiWidthUV, kiHeightUV);
+    ExpandPictureChroma_c (pPicCr, iStride[2], kiWidthUV, kiHeightUV);
   }
 
-}
+
 
 }

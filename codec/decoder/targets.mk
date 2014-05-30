@@ -9,7 +9,6 @@ DECODER_CPP_SRCS=\
 	$(DECODER_SRCDIR)/core/src/decoder_core.cpp\
 	$(DECODER_SRCDIR)/core/src/decoder_data_tables.cpp\
 	$(DECODER_SRCDIR)/core/src/error_concealment.cpp\
-	$(DECODER_SRCDIR)/core/src/expand_pic.cpp\
 	$(DECODER_SRCDIR)/core/src/fmo.cpp\
 	$(DECODER_SRCDIR)/core/src/get_intra_predictor.cpp\
 	$(DECODER_SRCDIR)/core/src/manage_dec_ref.cpp\

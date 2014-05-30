@@ -192,10 +192,7 @@ typedef void (*PMarkPicFunc) (void* pCtx);
 typedef bool (*PUpdateRefListFunc) (void* pCtx);
 
 struct TagWelsFuncPointerList {
-  PExpandPictureFunc      pfExpandLumaPicture;
-  PExpandPictureFunc
-  pfExpandChromaPicture[2];// 0: for chroma unalignment && width_uv >= 16; 1: for chroma alignment && width_uv >= 16;
-
+  SExpandPicFunc sExpandPicFunc;
   PFillInterNeighborCacheFunc       pfFillInterNeighborCache;
 
   PGetVarianceFromIntraVaaFunc  pfGetVarianceFromIntraVaa;

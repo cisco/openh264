@@ -7,7 +7,6 @@ ENCODER_CPP_SRCS=\
 	$(ENCODER_SRCDIR)/core/src/encoder.cpp\
 	$(ENCODER_SRCDIR)/core/src/encoder_data_tables.cpp\
 	$(ENCODER_SRCDIR)/core/src/encoder_ext.cpp\
-	$(ENCODER_SRCDIR)/core/src/expand_pic.cpp\
 	$(ENCODER_SRCDIR)/core/src/get_intra_predictor.cpp\
 	$(ENCODER_SRCDIR)/core/src/mc.cpp\
 	$(ENCODER_SRCDIR)/core/src/md.cpp\

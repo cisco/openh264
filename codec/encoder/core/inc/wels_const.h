@@ -103,7 +103,7 @@
 
 #define ALIGN_RBSP_LEN_FIX		4
 
-#define PADDING_LENGTH			32 // reference extension
+
 #define INTPEL_NEEDED_MARGIN	(3)  // for safe sub-pel MC
 
 #define I420_PLANES				3
