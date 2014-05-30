@@ -53,7 +53,7 @@ public class MainActivity extends Activity {
 //				}
 				String path = "/sdcard/codec_unittest.xml";
 				Log.i("codec_unittest","codec unittest runing @"+path);
-				DoUnittest(path);
+				DoUnittest("/sdcard", path);
 				Log.i("codec_unittest","codec unittest end");
 				Process.killProcess(Process.myPid());
 				finish();
@@ -76,6 +76,6 @@ public class MainActivity extends Activity {
 
 	}
 
-	public native void DoUnittest(String path);
+	public native void DoUnittest(String directory, String path);
 
 }
