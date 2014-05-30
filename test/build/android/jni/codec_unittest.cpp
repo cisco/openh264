@@ -16,7 +16,7 @@ JNIEXPORT void JNICALL Java_com_cisco_codec_unittest_MainActivity_DoUnittest
   int  argc = 2;
   argv[0] = (char*) ("codec_unittest.exe");
   argv[1] = (char*) ((*env).GetStringUTFChars (jspath,NULL));
-  LOGI ("PATH:",+argv[1]);
+  LOGI ("PATH: %s", argv[1]);
   LOGI ("Start to run JNI module!+++");
  CodecUtMain(argc,argv);
   LOGI ("End to run JNI module!+++");
