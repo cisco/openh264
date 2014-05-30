@@ -2,6 +2,7 @@
 #include "codec_def.h"
 #include "expand_pic.h"
 #include "mem_align.h"
+#include "decoder_context.h"
 using namespace WelsDec;
 #define EXPAND_PIC_TEST_NUM 10
 namespace WelsDec {
@@ -120,7 +121,7 @@ TEST (ExpandPicture, ExpandPictureLuma) {
       }
     }
     H264ExpandPictureLumaAnchor_c (pAnchorDst, iStride, iPicWidth, iPicHeight);
-    sExpandPicFunc.pExpandLumaPicture (pTestDst, iStride, iPicWidth, iPicHeight);
+    sExpandPicFunc.pfExpandLumaPicture (pTestDst, iStride, iPicWidth, iPicHeight);
     EXPECT_EQ (CompareBuff (pAnchorDstBuff, pTestDstBuff, iStride, iPicWidth + H264_PADDING_LENGTH_LUMA * 2,
                             iPicHeight + H264_PADDING_LENGTH_LUMA * 2), true);
 
@@ -155,7 +156,7 @@ TEST (ExpandPicture, ExpandPictureChroma) {
       }
     }
     H264ExpandPictureChromaAnchor_c (pAnchorDst, iStride, iPicWidth, iPicHeight);
-    sExpandPicFunc.pExpandChromaPicture[0] (pTestDst, iStride, iPicWidth, iPicHeight);
+    sExpandPicFunc.pfExpandChromaPicture[0] (pTestDst, iStride, iPicWidth, iPicHeight);
     EXPECT_EQ (CompareBuff (pAnchorDstBuff, pTestDstBuff, iStride, iPicWidth + H264_PADDING_LENGTH_CHROMA * 2,
                             iPicHeight + H264_PADDING_LENGTH_CHROMA * 2), true);
 
@@ -199,7 +200,8 @@ TEST (ExpandPicture, ExpandPicForMotion) {
     H264ExpandPictureLumaAnchor_c (pPicAnchor->pData[0], iStride, iPicWidth, iPicHeight);
     H264ExpandPictureChromaAnchor_c (pPicAnchor->pData[1], iStrideC, iPicWidth / 2, iPicHeight / 2);
     H264ExpandPictureChromaAnchor_c (pPicAnchor->pData[2], iStrideC, iPicWidth / 2, iPicHeight / 2);
-    ExpandReferencingPicture (sCtx.pDec, sExpandPicFunc.pExpandLumaPicture, sExpandPicFunc.pExpandChromaPicture);
+    ExpandReferencingPicture (sCtx.pDec->pData, sCtx.pDec->iWidthInPixel, sCtx.pDec->iHeightInPixel, sCtx.pDec->iLinesize,
+                              sExpandPicFunc.pfExpandLumaPicture, sExpandPicFunc.pfExpandChromaPicture);
 
     EXPECT_EQ (CompareBuff (pPicAnchor->pBuffer[0], pPicTest->pBuffer[0], iStride, iPicWidth + PADDING_LENGTH * 2,
                             iPicHeight + PADDING_LENGTH * 2), true);

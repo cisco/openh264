@@ -388,7 +388,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\src\expand_pic.cpp"
+				RelativePath="..\..\..\common\src\expand_pic.cpp"
 				>
 			</File>
 			<File
@@ -545,11 +545,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\expand_pic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\common\inc\expand_picture_common.h"
+				RelativePath="..\..\..\common\inc\expand_pic.h"
 				>
 			</File>
 			<File

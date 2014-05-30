@@ -378,7 +378,9 @@ bool WelsUpdateRefList (void* pEncCtx) {
     if ((pParamD->iHighestTemporalId == 0) || (kuiTid < pParamD->iHighestTemporalId))
 #endif// !ENABLE_FRAME_DUMP
       // Expanding picture for future reference
-      ExpandReferencingPicture (pCtx->pDecPic, pCtx->pFuncList->pfExpandLumaPicture, pCtx->pFuncList->pfExpandChromaPicture);
+      ExpandReferencingPicture (pCtx->pDecPic->pData, pCtx->pDecPic->iWidthInPixel, pCtx->pDecPic->iHeightInPixel,
+                                pCtx->pDecPic->iLineSize,
+                                pCtx->pFuncList->sExpandPicFunc.pfExpandLumaPicture, pCtx->pFuncList->sExpandPicFunc.pfExpandChromaPicture);
 
     // move picture in list
     pCtx->pDecPic->uiTemporalId = kuiTid;
@@ -720,7 +722,9 @@ bool WelsUpdateRefListScreen (void* pEncCtx) {
     if ((pParamD->iHighestTemporalId == 0) || (kuiTid < pParamD->iHighestTemporalId))
 #endif// !ENABLE_FRAME_DUMP
       // Expanding picture for future reference
-      ExpandReferencingPicture (pCtx->pDecPic, pCtx->pFuncList->pfExpandLumaPicture, pCtx->pFuncList->pfExpandChromaPicture);
+      ExpandReferencingPicture (pCtx->pDecPic->pData, pCtx->pDecPic->iWidthInPixel, pCtx->pDecPic->iHeightInPixel,
+                                pCtx->pDecPic->iLineSize,
+                                pCtx->pFuncList->sExpandPicFunc.pfExpandLumaPicture, pCtx->pFuncList->sExpandPicFunc.pfExpandChromaPicture);
 
     // move picture in list
     pCtx->pDecPic->uiTemporalId =  pCtx->uiTemporalId;

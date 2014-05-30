@@ -81,7 +81,6 @@
 
 #define ALIGN_RBSP_LEN_FIX		4
 
-#define PADDING_LENGTH			32 // reference extension
 
 #define BASE_QUALITY_ID			0
 //#define BASE_DEPENDENCY_ID		0
