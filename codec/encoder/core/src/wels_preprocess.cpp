@@ -969,7 +969,7 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
 
   int32_t iNumOfLargeChange = 0, iNumOfMediumChangeToLtr = 0;
 
-  bool bBestRefIsLtr = false, bIsClosestLtrFrame = false;
+  bool bIsClosestLtrFrame = false;
   int32_t ret = 1, iScdIdx = 0;
 
   SPicture* pRefPic = NULL;
@@ -1044,7 +1044,6 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
       if (JudgeBestRef (pRefPic, sLtrJudgement, iFrameComplexity, bIsClosestLtrFrame)) {
         SaveBestRefToJudgement (iRefPicAvQP, iFrameComplexity, &sLtrJudgement);
         SaveBestRefToLocal (pRefPicInfo, sSceneChangeResult, &sLtrSaved);
-        bBestRefIsLtr = bCurRefIsLtr;
       }
       if (bCurRefIsLtr && JudgeBestRef (pRefPic, sSceneLtrJudgement, iFrameComplexity, bIsClosestLtrFrame)) {
         SaveBestRefToJudgement (iRefPicAvQP, iFrameComplexity, &sSceneLtrJudgement);

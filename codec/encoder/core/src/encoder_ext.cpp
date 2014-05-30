@@ -3730,7 +3730,7 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   if (NULL == pSlice)
     return ENC_RETURN_MEMALLOCERR;
   memcpy (pSlice, pCurLayer->sLayerInfo.pSliceInLayer, sizeof (SSlice) * iMaxSliceNumOld);
-  uint32_t uiSliceIdx;
+  int32_t uiSliceIdx;
   uiSliceIdx = iMaxSliceNumOld;
   SSlice* pBaseSlice = &pCurLayer->sLayerInfo.pSliceInLayer[0];
   SSliceHeaderExt* pBaseSHExt = &pBaseSlice->sSliceHeaderExt;
