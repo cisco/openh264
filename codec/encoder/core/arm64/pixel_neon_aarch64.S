@@ -474,4 +474,233 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSadFour16x16_AArch64_neon
 
     CALC_AND_STORE_SAD_FOUR
 WELS_ASM_ARCH64_FUNC_END
+
+WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSatd4x4_AArch64_neon
+    sxtw    x1, w1
+    sxtw    x3, w3
+    ld1     {v0.s}[0], [x0], x1
+    ld1     {v0.s}[1], [x0], x1
+    ld1     {v1.s}[0], [x0], x1
+    ld1     {v1.s}[1], [x0]
+
+    ld1     {v2.s}[0], [x2], x3
+    ld1     {v2.s}[1], [x2], x3
+    ld1     {v3.s}[0], [x2], x3
+    ld1     {v3.s}[1], [x2]
+    usubl   v4.8h, v0.8b, v2.8b //{0,1,2,3,4,5,6,7}
+    usubl   v5.8h, v1.8b, v3.8b //{8,9,10,11,12,13,14,15}
+
+    //Do the vertical transform
+    add     v6.8h, v4.8h, v5.8h //{0,4,8,12,1,5,9,13}
+    sub     v7.8h, v4.8h, v5.8h //{2,6,10,14,3,7,11,15}
+    mov     x4,      v6.d[1]
+    mov     v6.d[1], v7.d[0]
+    ins     v7.d[0], x4
+    add     v4.8h, v6.8h, v7.8h
+    sub     v5.8h, v6.8h, v7.8h
+
+    //Do the horizontal transform
+    trn1    v6.4s, v4.4s, v5.4s
+    trn2    v7.4s, v4.4s, v5.4s
+    add     v4.8h, v6.8h, v7.8h
+    sub     v5.8h, v6.8h, v7.8h
+    trn1    v6.8h, v4.8h, v5.8h
+    trn2    v7.8h, v4.8h, v5.8h
+    add     v4.8h, v6.8h, v7.8h
+    abs     v4.8h, v4.8h
+    saba    v4.8h, v6.8h, v7.8h
+    uaddlv  s4, v4.8h
+    fmov    w0, s4
+    add     w0, w0, #1
+    lsr     w0, w0, #1
+
+WELS_ASM_ARCH64_FUNC_END
+
+.macro SATD_8x4
+    ld1     {v0.8b}, [x0], x1
+    ld1     {v1.8b}, [x2], x3
+    ld1     {v2.8b}, [x0], x1
+    usubl   v16.8h,  v0.8b, v1.8b
+
+    ld1     {v3.8b}, [x2], x3
+    usubl   v17.8h,  v2.8b, v3.8b
+    ld1     {v4.8b}, [x0], x1
+    ld1     {v5.8b}, [x2], x3
+
+    add     v25.8h,  v16.8h, v17.8h
+    usubl   v18.8h,  v4.8b,  v5.8b
+
+    ld1     {v6.8b}, [x0], x1
+    ld1     {v7.8b}, [x2], x3
+
+    usubl   v19.8h,  v6.8b,  v7.8b
+    sub     v26.8h,  v16.8h, v17.8h
+
+    add     v27.8h,  v18.8h, v19.8h
+    sub     v28.8h,  v18.8h, v19.8h
+
+    add     v0.8h,  v25.8h, v27.8h
+    sub     v1.8h,  v25.8h, v27.8h
+
+    add     v2.8h,  v26.8h, v28.8h
+    sub     v3.8h,  v26.8h, v28.8h
+
+    trn1    v4.8h, v0.8h, v1.8h
+    trn2    v5.8h, v0.8h, v1.8h
+    trn1    v6.8h, v2.8h, v3.8h
+    trn2    v7.8h, v2.8h, v3.8h
+
+    add     v16.8h, v4.8h, v5.8h
+    sabd    v17.8h, v4.8h, v5.8h
+    abs     v16.8h, v16.8h
+    add     v18.8h, v6.8h, v7.8h
+    sabd    v19.8h, v6.8h, v7.8h
+    abs     v18.8h, v18.8h
+
+    trn1    v4.4s, v16.4s, v17.4s
+    trn2    v5.4s, v16.4s, v17.4s
+    trn1    v6.4s, v18.4s, v19.4s
+    trn2    v7.4s, v18.4s, v19.4s
+
+    smax    v0.8h, v4.8h, v5.8h
+    smax    v1.8h, v6.8h, v7.8h
+.endm
+
+.macro SATD_16x4
+    ld1     {v0.16b}, [x0], x1
+    ld1     {v1.16b}, [x2], x3
+    ld1     {v2.16b}, [x0], x1
+    usubl   v16.8h,  v0.8b, v1.8b
+    usubl2  v24.8h,  v0.16b, v1.16b
+
+    ld1     {v3.16b}, [x2], x3
+    usubl   v17.8h,  v2.8b, v3.8b
+    usubl2  v25.8h,  v2.16b, v3.16b
+
+    ld1     {v4.16b}, [x0], x1
+    ld1     {v5.16b}, [x2], x3
+    usubl   v18.8h,  v4.8b, v5.8b
+    usubl2  v26.8h,  v4.16b, v5.16b
+
+    ld1     {v6.16b}, [x0], x1
+    ld1     {v7.16b}, [x2], x3
+    usubl   v19.8h,  v6.8b, v7.8b
+    usubl2  v27.8h,  v6.16b, v7.16b
+
+    add     v0.8h,  v16.8h, v17.8h
+    sub     v1.8h,  v16.8h, v17.8h
+    add     v2.8h,  v18.8h, v19.8h
+    sub     v3.8h,  v18.8h, v19.8h
+
+    add     v4.8h,  v24.8h, v25.8h
+    sub     v5.8h,  v24.8h, v25.8h
+    add     v6.8h,  v26.8h, v27.8h
+    sub     v7.8h,  v26.8h, v27.8h
+
+    add     v16.8h,  v0.8h, v2.8h
+    sub     v18.8h,  v0.8h, v2.8h
+    add     v17.8h,  v4.8h, v6.8h
+    sub     v19.8h,  v4.8h, v6.8h
+
+    add     v0.8h,  v1.8h, v3.8h
+    sub     v2.8h,  v1.8h, v3.8h
+    add     v1.8h,  v5.8h, v7.8h
+    sub     v3.8h,  v5.8h, v7.8h
+
+    trn1    v4.8h, v16.8h, v18.8h
+    trn2    v6.8h, v16.8h, v18.8h
+    trn1    v5.8h, v17.8h, v19.8h
+    trn2    v7.8h, v17.8h, v19.8h
+
+    add     v16.8h, v4.8h, v6.8h
+    sabd    v18.8h, v4.8h, v6.8h
+    add     v17.8h, v5.8h, v7.8h
+    sabd    v19.8h, v5.8h, v7.8h
+    abs     v16.8h, v16.8h
+    abs     v17.8h, v17.8h
+
+    trn1    v4.8h, v0.8h, v2.8h
+    trn2    v6.8h, v0.8h, v2.8h
+    trn1    v5.8h, v1.8h, v3.8h
+    trn2    v7.8h, v1.8h, v3.8h
+
+    add     v0.8h, v4.8h, v6.8h
+    sabd    v2.8h, v4.8h, v6.8h
+    add     v1.8h, v5.8h, v7.8h
+    sabd    v3.8h, v5.8h, v7.8h
+    abs     v0.8h, v0.8h
+    abs     v1.8h, v1.8h
+
+    trn1    v4.4s, v16.4s, v18.4s
+    trn2    v6.4s, v16.4s, v18.4s
+    trn1    v5.4s, v17.4s, v19.4s
+    trn2    v7.4s, v17.4s, v19.4s
+
+    trn1    v16.4s, v0.4s, v2.4s
+    trn2    v18.4s, v0.4s, v2.4s
+    trn1    v17.4s, v1.4s, v3.4s
+    trn2    v19.4s, v1.4s, v3.4s
+
+    smax    v0.8h, v4.8h, v6.8h
+    smax    v1.8h, v5.8h, v7.8h
+    smax    v2.8h, v16.8h, v18.8h
+    smax    v3.8h, v17.8h, v19.8h
+    add     v0.8h, v0.8h, v1.8h
+    add     v2.8h, v2.8h, v3.8h
+.endm
+
+WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSatd16x16_AArch64_neon
+    sxtw    x1, w1
+    sxtw    x3, w3
+    SATD_16x4
+    add     v31.8h, v0.8h, v2.8h
+.rept 3
+    SATD_16x4
+    add     v31.8h, v31.8h, v0.8h
+    add     v31.8h, v31.8h, v2.8h
+.endr
+    uaddlv  s4, v31.8h
+    fmov    w0, s4
+WELS_ASM_ARCH64_FUNC_END
+
+WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSatd16x8_AArch64_neon
+    sxtw    x1, w1
+    sxtw    x3, w3
+    SATD_16x4
+    add     v31.8h, v0.8h, v2.8h
+
+    SATD_16x4
+    add     v31.8h, v31.8h, v0.8h
+    add     v31.8h, v31.8h, v2.8h
+
+    uaddlv  s4, v31.8h
+    fmov    w0, s4
+WELS_ASM_ARCH64_FUNC_END
+
+WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSatd8x16_AArch64_neon
+    sxtw    x1, w1
+    sxtw    x3, w3
+    SATD_8x4
+    add     v31.8h, v0.8h, v1.8h
+.rept 3
+    SATD_8x4
+    add     v31.8h, v31.8h, v0.8h
+    add     v31.8h, v31.8h, v1.8h
+.endr
+    uaddlv  s4, v31.8h
+    fmov    w0, s4
+WELS_ASM_ARCH64_FUNC_END
+
+WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSatd8x8_AArch64_neon
+    sxtw    x1, w1
+    sxtw    x3, w3
+    SATD_8x4
+    add     v31.8h, v0.8h, v1.8h
+
+    SATD_8x4
+    add     v31.8h, v31.8h, v0.8h
+    add     v31.8h, v31.8h, v1.8h
+    uaddlv  s4, v31.8h
+    fmov    w0, s4
+WELS_ASM_ARCH64_FUNC_END
 #endif
