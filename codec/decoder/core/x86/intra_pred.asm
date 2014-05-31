@@ -50,11 +50,6 @@
 ;*******************************************************************************
 
 SECTION .rodata align=16
-%if 1
-	%define WELSEMMS	emms
-%else
-	%define WELSEMMS
-%endif
 
 align 16
 sse2_plane_inc_minus dw -7, -6, -5, -4, -3, -2, -1, 0
