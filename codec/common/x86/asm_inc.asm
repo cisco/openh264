@@ -577,7 +577,7 @@ BITS 32
 %endmacro
 
 ;all 0 for xmm and mm
-%macro	WELS_Zero 1
+%macro WELS_Zero 1
 	pxor %1, %1
 %endmacro
 

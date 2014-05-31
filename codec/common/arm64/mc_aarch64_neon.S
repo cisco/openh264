@@ -38,7 +38,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 
 #ifdef __APPLE__
 
-.macro	FILTER_6TAG_8BITS1
+.macro FILTER_6TAG_8BITS1
 //	{	// input:src[-2], src[-1], src[0], src[1], src[2], src[3], dst_d, multiplier a/b; working: v18, v19
     uaddl v18.8h, $0.8b, $5.8b //v18=src[-2]+src[3]
     uaddl v19.8h, $2.8b, $3.8b	//src[0]+src[1]
@@ -49,7 +49,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_6TAG_8BITS2
+.macro FILTER_6TAG_8BITS2
 //	{	// input:src[-2], src[-1], src[0], src[1], src[2], src[3], dst_d, multiplier a/b; working: v18, v19
     uaddl2 v18.8h, $0.16b, $5.16b //v18=src[-2]+src[3]
     uaddl2 v19.8h, $2.16b, $3.16b	//src[0]+src[1]
@@ -60,7 +60,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_6TAG_8BITS1_AVERAGE_WITH_0
+.macro FILTER_6TAG_8BITS1_AVERAGE_WITH_0
 //	{	// input:src[-2], src[-1], src[0], src[1], src[2], src[3], dst_d, multiplier a/b; working: v18, v19
     uaddl v18.8h, $0.8b, $5.8b //v18=src[-2]+src[3]
     uaddl v19.8h, $2.8b, $3.8b	//src[0]+src[1]
@@ -73,7 +73,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_6TAG_8BITS2_AVERAGE_WITH_0
+.macro FILTER_6TAG_8BITS2_AVERAGE_WITH_0
 //	{	// input:src[-2], src[-1], src[0], src[1], src[2], src[3], dst_d, multiplier a/b; working: v18, v19
     uaddl2 v18.8h, $0.16b, $5.16b //v18=src[-2]+src[3]
     uaddl2 v19.8h, $2.16b, $3.16b	//src[0]+src[1]
@@ -86,7 +86,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_6TAG_8BITS1_AVERAGE_WITH_1
+.macro FILTER_6TAG_8BITS1_AVERAGE_WITH_1
 //	{	// input:src[-2], src[-1], src[0], src[1], src[2], src[3], dst_d, multiplier a/b; working: v18, v19
     uaddl v18.8h, $0.8b, $5.8b //v18=src[-2]+src[3]
     uaddl v19.8h, $2.8b, $3.8b	//src[0]+src[1]
@@ -99,7 +99,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_6TAG_8BITS2_AVERAGE_WITH_1
+.macro FILTER_6TAG_8BITS2_AVERAGE_WITH_1
 //	{	// input:src[-2], src[-1], src[0], src[1], src[2], src[3], dst_d, multiplier a/b; working: v18, v19
     uaddl2 v18.8h, $0.16b, $5.16b //v18=src[-2]+src[3]
     uaddl2 v19.8h, $2.16b, $3.16b	//src[0]+src[1]
@@ -112,7 +112,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_6TAG_8BITS_TO_16BITS1
+.macro FILTER_6TAG_8BITS_TO_16BITS1
 //	{	// input:d_src[-2], d_src[-1], d_src[0], d_src[1], d_src[2], d_src[3], dst_q, multiplier a/b; working:v31
     uaddl	$6.8h, $0.8b, $5.8b		//dst_q=src[-2]+src[3]
     uaddl	v31.8h, $2.8b, $3.8b	//src[0]+src[1]
@@ -122,7 +122,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_6TAG_8BITS_TO_16BITS2
+.macro FILTER_6TAG_8BITS_TO_16BITS2
 //	{	// input:d_src[-2], d_src[-1], d_src[0], d_src[1], d_src[2], d_src[3], dst_q, multiplier a/b; working:v31
     uaddl2	$6.8h, $0.16b, $5.16b		//dst_q=src[-2]+src[3]
     uaddl2	v31.8h, $2.16b, $3.16b	//src[0]+src[1]
@@ -132,7 +132,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_3_IN_16BITS_TO_8BITS1
+.macro FILTER_3_IN_16BITS_TO_8BITS1
 //	{	// input:a, b, c, dst_d;
     sub	$0.8h, $0.8h, $1.8h			//a-b
     sshr	$0.8h, $0.8h, #2			//(a-b)/4
@@ -144,7 +144,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_3_IN_16BITS_TO_8BITS2
+.macro FILTER_3_IN_16BITS_TO_8BITS2
 //	{	// input:a, b, c, dst_d;
     sub	$0.8h, $0.8h, $1.8h			//a-b
     sshr	$0.8h, $0.8h, #2			//(a-b)/4
@@ -156,7 +156,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	UNPACK_2_16BITS_TO_ABC
+.macro UNPACK_2_16BITS_TO_ABC
 //	{	// input:q_src[-2:5], q_src[6:13](avail 8+5)/q_src[6:**](avail 4+5), dst_a, dst_b, dst_c;
     ext	$4.16b, $0.16b, $1.16b, #4		//src[0]
     ext	$3.16b, $0.16b, $1.16b, #6		//src[1]
@@ -171,21 +171,21 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	AVERAGE_TWO_8BITS1
+.macro AVERAGE_TWO_8BITS1
 //	{	// input:dst_d, src_d A and B; working: v5
     uaddl	v30.8h, $2.8b, $1.8b
     rshrn	$0.8b, v30.8h, #1
 //	}
 .endm
 
-.macro	AVERAGE_TWO_8BITS2
+.macro AVERAGE_TWO_8BITS2
 //	{	// input:dst_d, src_d A and B; working: v5
     uaddl2	v30.8h, $2.16b, $1.16b
     rshrn2	$0.16b, v30.8h, #1
 //	}
 .endm
 
-.macro	FILTER_SINGLE_TAG_8BITS		// when width=17/9, used
+.macro FILTER_SINGLE_TAG_8BITS		// when width=17/9, used
 //	{	// input: src_d{Y[0][1][2][3][4][5]X},
     rev64	$2.8b, $0.8b				// X[5][4][3][2][1][0]O
     uaddl	$2.8h, $0.8b, $2.8b			// each 16bits, *[50][41][32][23][14][05]*
@@ -195,7 +195,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	UNPACK_FILTER_SINGLE_TAG_16BITS // v0, v1, v22, v23
+.macro UNPACK_FILTER_SINGLE_TAG_16BITS // v0, v1, v22, v23
 //	{	// each 16bits; input: d_dst, d_src[0:5], para, working, working, d(low part of d_dst)
     ext.16b $3, $1, $1, #14       // X[0][1][2][3][4][5]O
     ext.16b $4, $3, $3, #8      // [3][4][5]OX[0][1][2]
@@ -211,7 +211,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 .endm
 
 #else
-.macro	FILTER_6TAG_8BITS1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
+.macro FILTER_6TAG_8BITS1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
 //	{	// input:src[-2], src[-1], src[0], src[1], src[2], src[3], dst_d, multiplier a/b; working: v18, v19
     uaddl v18.8h, \arg0\().8b, \arg5\().8b //v18=src[-2]+src[3]
     uaddl v19.8h, \arg2\().8b, \arg3\().8b	//src[0]+src[1]
@@ -222,7 +222,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_6TAG_8BITS2 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
+.macro FILTER_6TAG_8BITS2 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
 //	{	// input:src[-2], src[-1], src[0], src[1], src[2], src[3], dst_d, multiplier a/b; working: v18, v19
     uaddl2 v18.8h, \arg0\().16b, \arg5\().16b //v18=src[-2]+src[3]
     uaddl2 v19.8h, \arg2\().16b, \arg3\().16b	//src[0]+src[1]
@@ -233,7 +233,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_6TAG_8BITS1_AVERAGE_WITH_0 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
+.macro FILTER_6TAG_8BITS1_AVERAGE_WITH_0 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
 //	{	// input:src[-2], src[-1], src[0], src[1], src[2], src[3], dst_d, multiplier a/b; working: v18, v19
     uaddl v18.8h, \arg0\().8b, \arg5\().8b //v18=src[-2]+src[3]
     uaddl v19.8h, \arg2\().8b, \arg3\().8b	//src[0]+src[1]
@@ -246,7 +246,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_6TAG_8BITS2_AVERAGE_WITH_0 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
+.macro FILTER_6TAG_8BITS2_AVERAGE_WITH_0 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
 //	{	// input:src[-2], src[-1], src[0], src[1], src[2], src[3], dst_d, multiplier a/b; working: v18, v19
     uaddl2 v18.8h, \arg0\().16b, \arg5\().16b //v18=src[-2]+src[3]
     uaddl2 v19.8h, \arg2\().16b, \arg3\().16b	//src[0]+src[1]
@@ -259,7 +259,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_6TAG_8BITS1_AVERAGE_WITH_1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
+.macro FILTER_6TAG_8BITS1_AVERAGE_WITH_1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
 //	{	// input:src[-2], src[-1], src[0], src[1], src[2], src[3], dst_d, multiplier a/b; working: v18, v19
     uaddl v18.8h, \arg0\().8b, \arg5\().8b //v18=src[-2]+src[3]
     uaddl v19.8h, \arg2\().8b, \arg3\().8b	//src[0]+src[1]
@@ -272,7 +272,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_6TAG_8BITS2_AVERAGE_WITH_1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
+.macro FILTER_6TAG_8BITS2_AVERAGE_WITH_1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
 //	{	// input:src[-2], src[-1], src[0], src[1], src[2], src[3], dst_d, multiplier a/b; working: v18, v19
     uaddl2 v18.8h, \arg0\().16b, \arg5\().16b //v18=src[-2]+src[3]
     uaddl2 v19.8h, \arg2\().16b, \arg3\().16b	//src[0]+src[1]
@@ -285,7 +285,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_6TAG_8BITS_TO_16BITS1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
+.macro FILTER_6TAG_8BITS_TO_16BITS1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
 //	{	// input:d_src[-2], d_src[-1], d_src[0], d_src[1], d_src[2], d_src[3], dst_q, multiplier a/b; working:v31
     uaddl	\arg6\().8h, \arg0\().8b, \arg5\().8b		//dst_q=src[-2]+src[3]
     uaddl	v31.8h, \arg2\().8b, \arg3\().8b	//src[0]+src[1]
@@ -295,7 +295,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_6TAG_8BITS_TO_16BITS2 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
+.macro FILTER_6TAG_8BITS_TO_16BITS2 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
 //	{	// input:d_src[-2], d_src[-1], d_src[0], d_src[1], d_src[2], d_src[3], dst_q, multiplier a/b; working:v31
     uaddl2	\arg6\().8h, \arg0\().16b, \arg5\().16b		//dst_q=src[-2]+src[3]
     uaddl2	v31.8h, \arg2\().16b, \arg3\().16b	//src[0]+src[1]
@@ -305,7 +305,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_3_IN_16BITS_TO_8BITS1 arg0, arg1, arg2, arg3
+.macro FILTER_3_IN_16BITS_TO_8BITS1 arg0, arg1, arg2, arg3
 //	{	// input:a, b, c, dst_d;
     sub	\arg0\().8h, \arg0\().8h, \arg1\().8h			//a-b
     sshr	\arg0\().8h, \arg0\().8h, #2			//(a-b)/4
@@ -317,7 +317,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	FILTER_3_IN_16BITS_TO_8BITS2 arg0, arg1, arg2, arg3
+.macro FILTER_3_IN_16BITS_TO_8BITS2 arg0, arg1, arg2, arg3
 //	{	// input:a, b, c, dst_d;
     sub	\arg0\().8h, \arg0\().8h, \arg1\().8h			//a-b
     sshr	\arg0\().8h, \arg0\().8h, #2			//(a-b)/4
@@ -329,7 +329,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	UNPACK_2_16BITS_TO_ABC arg0, arg1, arg2, arg3, arg4
+.macro UNPACK_2_16BITS_TO_ABC arg0, arg1, arg2, arg3, arg4
 //	{	// input:q_src[-2:5], q_src[6:13](avail 8+5)/q_src[6:**](avail 4+5), dst_a, dst_b, dst_c;
     ext	\arg4\().16b, \arg0\().16b, \arg1\().16b, #4		//src[0]
     ext	\arg3\().16b, \arg0\().16b, \arg1\().16b, #6		//src[1]
@@ -344,21 +344,21 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	AVERAGE_TWO_8BITS1 arg0, arg1, arg2
+.macro AVERAGE_TWO_8BITS1 arg0, arg1, arg2
 //	{	// input:dst_d, src_d A and B; working: v5
     uaddl	v30.8h, \arg2\().8b, \arg1\().8b
     rshrn	\arg0\().8b, v30.8h, #1
 //	}
 .endm
 
-.macro	AVERAGE_TWO_8BITS2 arg0, arg1, arg2
+.macro AVERAGE_TWO_8BITS2 arg0, arg1, arg2
 //	{	// input:dst_d, src_d A and B; working: v5
     uaddl2	v30.8h, \arg2\().16b, \arg1\().16b
     rshrn2	\arg0\().16b, v30.8h, #1
 //	}
 .endm
 
-.macro	FILTER_SINGLE_TAG_8BITS arg0, arg1, arg2, arg3
+.macro FILTER_SINGLE_TAG_8BITS arg0, arg1, arg2, arg3
 // when width=17/9, used
 //	{	// input: src_d{Y[0][1][2][3][4][5]X},
     rev64	\arg2\().8b, \arg0\().8b				// X[5][4][3][2][1][0]O
@@ -369,7 +369,7 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
 //	}
 .endm
 
-.macro	UNPACK_FILTER_SINGLE_TAG_16BITS arg0, arg1, arg2, arg3, arg4, arg5
+.macro UNPACK_FILTER_SINGLE_TAG_16BITS arg0, arg1, arg2, arg3, arg4, arg5
 //	{	// each 16bits; input: d_dst, d_src[0:5], para, working, working, d(low part of d_dst)
     ext \arg3\().16b, \arg1\().16b, \arg1\().16b, #14       // X[0][1][2][3][4][5]O
     ext \arg4\().16b, \arg3\().16b, \arg3\().16b, #8      // [3][4][5]OX[0][1][2]

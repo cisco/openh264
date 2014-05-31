@@ -35,7 +35,7 @@
 #include "arm_arch_common_macro.S"
 #ifdef __APPLE__
 
-.macro	ROW_TRANSFORM_1_STEP
+.macro ROW_TRANSFORM_1_STEP
 //	{	//	input: src_d[0]~[3], output: e_q[0]~[3]; working: $8 $9
     vaddl.s16		$4, $0, $2			//int32 e[i][0] = src[0] + src[2];
     vsubl.s16		$5, $0, $2			//int32 e[i][1] = src[0] - src[2];
@@ -46,7 +46,7 @@
 //	}
 .endm
 
-.macro	TRANSFORM_4BYTES	// both row & col transform used
+.macro TRANSFORM_4BYTES	// both row & col transform used
 //	{	//	output: f_q[0]~[3], input: e_q[0]~[3];
     vadd.s32		$0, $4, $7			//int16 f[i][0] = e[i][0] + e[i][3];
     vadd.s32		$1, $5, $6			//int16 f[i][1] = e[i][1] + e[i][2];
@@ -55,7 +55,7 @@
 //	}
 .endm
 
-.macro	COL_TRANSFORM_1_STEP
+.macro COL_TRANSFORM_1_STEP
 //	{	//	input: src_q[0]~[3], output: e_q[0]~[3];
     vadd.s32		$4, $0, $2			//int32 e[0][j] = f[0][j] + f[2][j];
     vsub.s32		$5, $0, $2			//int32 e[1][j] = f[0][j] - f[2][j];
@@ -68,7 +68,7 @@
 
 #else
 
-.macro	ROW_TRANSFORM_1_STEP arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
+.macro ROW_TRANSFORM_1_STEP arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
 //	{	//	input: src_d[0]~[3], output: e_q[0]~[3]; working: $8 $9
     vaddl.s16		\arg4, \arg0, \arg2			//int32 e[i][0] = src[0] + src[2];
     vsubl.s16		\arg5, \arg0, \arg2			//int32 e[i][1] = src[0] - src[2];
@@ -79,7 +79,7 @@
 //	}
 .endm
 
-.macro	TRANSFORM_4BYTES  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 // both row & col transform used
+.macro TRANSFORM_4BYTES  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 // both row & col transform used
 //	{	//	output: f_q[0]~[3], input: e_q[0]~[3];
     vadd.s32		\arg0, \arg4, \arg7			//int16 f[i][0] = e[i][0] + e[i][3];
     vadd.s32		\arg1, \arg5, \arg6			//int16 f[i][1] = e[i][1] + e[i][2];
@@ -88,7 +88,7 @@
 //	}
 .endm
 
-.macro	COL_TRANSFORM_1_STEP arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
+.macro COL_TRANSFORM_1_STEP arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
 //	{	//	input: src_q[0]~[3], output: e_q[0]~[3];
     vadd.s32		\arg4, \arg0, \arg2			//int32 e[0][j] = f[0][j] + f[2][j];
     vsub.s32		\arg5, \arg0, \arg2			//int32 e[1][j] = f[0][j] - f[2][j];

@@ -454,7 +454,7 @@ WELS_EXTERN WelsIDctRecI16x16Dc_sse2
 	movdqa	%4, %1
 	psubd	%4, %2
 %endmacro
-%macro		SSE2_Load4Col	5
+%macro SSE2_Load4Col	5
 	movsx		r2,		WORD[%5]
  	movd		%1,			r2d
  	movsx		r2,		WORD[%5 + 0x20]

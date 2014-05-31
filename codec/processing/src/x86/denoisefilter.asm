@@ -56,7 +56,7 @@ sse2_20 times 8 dw 20
 ;***********************************************************************
 SECTION .text
 
-%macro	WEIGHT_LINE	9
+%macro WEIGHT_LINE	9
 		movq		%2,	%9
 		punpcklbw	%2,	%7
 		movdqa		%8,	%2
@@ -76,7 +76,7 @@ SECTION .text
 		paddusw		%5,	%2
 %endmacro
 
-%macro	WEIGHT_LINE1_UV	4
+%macro WEIGHT_LINE1_UV	4
 		movdqa		%2,	%1
 		punpcklbw	%2,	%4
 		paddw		%3,	%2
@@ -103,7 +103,7 @@ SECTION .text
 		paddw		%3,	%2
 %endmacro
 
-%macro	WEIGHT_LINE2_UV	4
+%macro WEIGHT_LINE2_UV	4
 		movdqa		%2,	%1
 		punpcklbw	%2,	%4
 		paddw		%3,	%2
@@ -132,7 +132,7 @@ SECTION .text
 		paddw		%3,	%2
 %endmacro
 
-%macro	WEIGHT_LINE3_UV	4
+%macro WEIGHT_LINE3_UV	4
 		movdqa		%2,	%1
 		punpcklbw	%2,	%4
 		psllw		%2,	1

@@ -35,7 +35,7 @@
 #include "arm_arch_common_macro.S"
 
 #ifdef __APPLE__
-.macro	LOAD_4x4_DATA_FOR_DCT
+.macro LOAD_4x4_DATA_FOR_DCT
 //	{	//	input: $0~$3, src1*, src1_stride, src2*, src2_stride
     vld2.16	{$0[0],$1[0]}, [$4], $5
     vld2.16	{$2[0],$3[0]}, [$6], $7
@@ -49,7 +49,7 @@
 //	}
 .endm
 
-.macro	LOAD_8x8_DATA_FOR_DCT
+.macro LOAD_8x8_DATA_FOR_DCT
 //	{	//	input: $0~$3, src1*, src2*; untouched r2:src1_stride &r4:src2_stride
     vld1.64	{$0}, [$8], r2
     vld1.64	{$4}, [$9], r4
@@ -63,7 +63,7 @@
 //	}
 .endm
 
-.macro	DCT_ROW_TRANSFORM_TOTAL_16BITS
+.macro DCT_ROW_TRANSFORM_TOTAL_16BITS
 //	{	//	input: src_d[0]~[3], working: [4]~[7]
     vadd.s16		$4, $0, $3			//int16 s[0] = data[i] + data[i3];
     vsub.s16		$7, $0, $3			//int16 s[3] = data[i] - data[i3];
@@ -79,7 +79,7 @@
 //	}
 .endm
 
-.macro	MATRIX_TRANSFORM_EACH_16BITS
+.macro MATRIX_TRANSFORM_EACH_16BITS
 //	{	//	input & output: src_d[0]~[3];[0 1 2 3]+[4 5 6 7]+[8 9 10 11]+[12 13 14 15]
     vtrn.s16		$0, $1				//[0 1 2 3]+[4 5 6 7]-->[0 4 2 6]+[1 5 3 7]
     vtrn.s16		$2, $3				//[8 9 10 11]+[12 13 14 15]-->[8 12 10 14]+[9 13 11 15]
@@ -88,7 +88,7 @@
 //	}
 .endm
 
-.macro	NEWQUANT_COEF_EACH_16BITS	// if coef <= 0, - coef; else , coef;
+.macro NEWQUANT_COEF_EACH_16BITS	// if coef <= 0, - coef; else , coef;
 //	{	//	input:	coef, ff (dst), ff_d0, ff_d1, mf_d0, md_d1
     veor.s16		$6, $6			// init 0 , and keep 0;
     vaba.s16		$1, $0, $6		// f + abs(coef - 0)
@@ -106,7 +106,7 @@
 //	}
 .endm
 
-.macro	NEWQUANT_COEF_EACH_16BITS_MAX	// if coef <= 0, - coef; else , coef;
+.macro NEWQUANT_COEF_EACH_16BITS_MAX	// if coef <= 0, - coef; else , coef;
 //	{	//	input:	coef, ff (dst), ff_d0, ff_d1, mf_d0(max), md_d1
     veor.s16		$6, $6			// init 0 , and keep 0;
     vaba.s16		$1, $0, $6		// f + abs(coef - 0)
@@ -125,7 +125,7 @@
 //	}
 .endm
 
-.macro	QUANT_DUALWORD_COEF_EACH_16BITS	// if coef <= 0, - coef; else , coef;
+.macro QUANT_DUALWORD_COEF_EACH_16BITS	// if coef <= 0, - coef; else , coef;
 //	{	//	input:	coef, ff (dst), mf , working_d (all 0), working_q
     vaba.s16		$1, $0, $3		// f + abs(coef - 0)
     vmull.s16		$4, $1, $2		// *= mf
@@ -139,7 +139,7 @@
 //	}
 .endm
 
-.macro	DC_ZERO_COUNT_IN_DUALWORD
+.macro DC_ZERO_COUNT_IN_DUALWORD
 //	{	//	input:	coef, dst_d, working_d (all 0x01)
     vceq.s16	$1, $0, #0
     vand.s16	$1, $2
@@ -148,7 +148,7 @@
 //	}
 .endm
 
-.macro	SELECT_MAX_IN_ABS_COEF
+.macro SELECT_MAX_IN_ABS_COEF
 //	{	//	input:	coef_0, coef_1, max_q (identy to follow two)
     vmax.s16		$2, $0, $1		// max 1st in $3 & max 2nd in $4
     vpmax.s16		$3, $3, $4		// max 1st in $3[0][1] & max 2nd in $3[2][3]
@@ -156,7 +156,7 @@
 //	}
 .endm
 
-.macro	ZERO_COUNT_IN_2_QUARWORD
+.macro ZERO_COUNT_IN_2_QUARWORD
 //	{	//	input:	coef_0 (identy to $3 $4), coef_1(identy to $5 $6), mask_q
     vceq.s16	$0, #0
     vceq.s16	$1, #0
@@ -171,7 +171,7 @@
 //	}
 .endm
 
-.macro	HDM_QUANT_2x2_TOTAL_16BITS
+.macro HDM_QUANT_2x2_TOTAL_16BITS
 //	{	//	input: src_d[0]~[3], working_d, dst_d
     vshr.s64	$1, $0, #32
     vadd.s16	$2, $0, $1		// [0] = rs[0] + rs[32];[1] = rs[16] + rs[48];
@@ -181,7 +181,7 @@
 //	}
 .endm
 
-.macro	IHDM_4x4_TOTAL_16BITS
+.macro IHDM_4x4_TOTAL_16BITS
 //	{	//	input: each src_d[0]~[3](dst), working_q0, working_q1, working_q2
     vshr.s64	$1, $0, #32
     vadd.s16	$2, $0, $1		// [0] = rs[0] + rs[2];[1] = rs[1] + rs[3];
@@ -198,7 +198,7 @@
 //	}
 .endm
 
-.macro	MB_PRED_8BITS_ADD_DCT_16BITS_CLIP
+.macro MB_PRED_8BITS_ADD_DCT_16BITS_CLIP
 //	{	//	input: pred_d[0]/[1](output), dct_q0/1, working_q0/1;
     vmovl.u8		$4,$0
     vmovl.u8		$5,$1
@@ -209,7 +209,7 @@
 //	}
 .endm
 
-.macro	ROW_TRANSFORM_1_STEP_TOTAL_16BITS
+.macro ROW_TRANSFORM_1_STEP_TOTAL_16BITS
 //	{	//	input: src_d[0]~[3], output: e_d[0]~[3];
     vadd.s16		$4, $0, $2			//int16 e[i][0] = src[0] + src[2];
     vsub.s16		$5, $0, $2			//int16 e[i][1] = src[0] - src[2];
@@ -220,7 +220,7 @@
 //	}
 .endm
 
-.macro	TRANSFORM_TOTAL_16BITS	// both row & col transform used
+.macro TRANSFORM_TOTAL_16BITS	// both row & col transform used
 //	{	//	output: f_q[0]~[3], input: e_q[0]~[3];
     vadd.s16		$0, $4, $7			//int16 f[i][0] = e[i][0] + e[i][3];
     vadd.s16		$1, $5, $6			//int16 f[i][1] = e[i][1] + e[i][2];
@@ -230,7 +230,7 @@
 .endm
 
 
-.macro	ROW_TRANSFORM_0_STEP
+.macro ROW_TRANSFORM_0_STEP
 //	{	//	input: src_d[0]~[3], output: e_q[0]~[3];
     vaddl.s16		$4, $0, $2			//int32 e[i][0] = src[0] + src[2];
     vsubl.s16		$5, $0, $2			//int32 e[i][1] = src[0] - src[2];
@@ -239,7 +239,7 @@
 //	}
 .endm
 
-.macro	ROW_TRANSFORM_1_STEP
+.macro ROW_TRANSFORM_1_STEP
 //	{	//	input: src_d[0]~[3], output: e_q[0]~[3]; working: $8 $9
     vaddl.s16		$4, $0, $2			//int32 e[i][0] = src[0] + src[2];
     vsubl.s16		$5, $0, $2			//int32 e[i][1] = src[0] - src[2];
@@ -250,7 +250,7 @@
 //	}
 .endm
 
-.macro	TRANSFORM_4BYTES	// both row & col transform used
+.macro TRANSFORM_4BYTES	// both row & col transform used
 //	{	//	output: f_q[0]~[3], input: e_q[0]~[3];
     vadd.s32		$0, $4, $7			//int16 f[i][0] = e[i][0] + e[i][3];
     vadd.s32		$1, $5, $6			//int16 f[i][1] = e[i][1] + e[i][2];
@@ -259,7 +259,7 @@
 //	}
 .endm
 
-.macro	COL_TRANSFORM_0_STEP
+.macro COL_TRANSFORM_0_STEP
 //	{	//	input: src_q[0]~[3], output: e_q[0]~[3];
     vadd.s32		$4, $0, $2			//int32 e[0][j] = f[0][j] + f[2][j];
     vsub.s32		$5, $0, $2			//int32 e[1][j] = f[0][j] - f[2][j];
@@ -268,7 +268,7 @@
 //	}
 .endm
 
-.macro	COL_TRANSFORM_1_STEP
+.macro COL_TRANSFORM_1_STEP
 //	{	//	input: src_q[0]~[3], output: e_q[0]~[3];
     vadd.s32		$4, $0, $2			//int32 e[0][j] = f[0][j] + f[2][j];
     vsub.s32		$5, $0, $2			//int32 e[1][j] = f[0][j] - f[2][j];
@@ -279,7 +279,7 @@
 //	}
 .endm
 #else
-.macro	LOAD_4x4_DATA_FOR_DCT arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
+.macro LOAD_4x4_DATA_FOR_DCT arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
 //	{	//	input: \arg0~\arg3, src1*, src1_stride, src2*, src2_stride
     vld2.16	{\arg0[0],\arg1[0]}, [\arg4], \arg5
     vld2.16	{\arg2[0],\arg3[0]}, [\arg6], \arg7
@@ -293,7 +293,7 @@
 //	}
 .endm
 
-.macro	LOAD_8x8_DATA_FOR_DCT arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
+.macro LOAD_8x8_DATA_FOR_DCT arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
 //	{	//	input: \arg0~\arg3, src1*, src2*; untouched r2:src1_stride &r4:src2_stride
     vld1.64	{\arg0}, [\arg8], r2
     vld1.64	{\arg4}, [\arg9], r4
@@ -307,7 +307,7 @@
 //	}
 .endm
 
-.macro	DCT_ROW_TRANSFORM_TOTAL_16BITS arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
+.macro DCT_ROW_TRANSFORM_TOTAL_16BITS arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
 //	{	//	input: src_d[0]~[3], working: [4]~[7]
     vadd.s16		\arg4, \arg0, \arg3			//int16 s[0] = data[i] + data[i3];
     vsub.s16		\arg7, \arg0, \arg3			//int16 s[3] = data[i] - data[i3];
@@ -323,7 +323,7 @@
 //	}
 .endm
 
-.macro	MATRIX_TRANSFORM_EACH_16BITS arg0, arg1, arg2, arg3
+.macro MATRIX_TRANSFORM_EACH_16BITS arg0, arg1, arg2, arg3
 //	{	//	input & output: src_d[0]~[3];[0 1 2 3]+[4 5 6 7]+[8 9 10 11]+[12 13 14 15]
     vtrn.s16		\arg0, \arg1				//[0 1 2 3]+[4 5 6 7]-->[0 4 2 6]+[1 5 3 7]
     vtrn.s16		\arg2, \arg3				//[8 9 10 11]+[12 13 14 15]-->[8 12 10 14]+[9 13 11 15]
@@ -332,7 +332,7 @@
 //	}
 .endm
 
-.macro	NEWQUANT_COEF_EACH_16BITS arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
+.macro NEWQUANT_COEF_EACH_16BITS arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
 //	{	//	input:	coef, ff (dst), ff_d0, ff_d1, mf_d0, md_d1
     veor.s16		\arg6, \arg6			// init 0 , and keep 0;
     vaba.s16		\arg1, \arg0, \arg6		// f + abs(coef - 0)
@@ -350,7 +350,7 @@
 //	}
 .endm
 
-.macro	NEWQUANT_COEF_EACH_16BITS_MAX arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
+.macro NEWQUANT_COEF_EACH_16BITS_MAX arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
 //	{	//	input:	coef, ff (dst), ff_d0, ff_d1, mf_d0(max), md_d1
     veor.s16		\arg6, \arg6			// init 0 , and keep 0;
     vaba.s16		\arg1, \arg0, \arg6		// f + abs(coef - 0)
@@ -369,7 +369,7 @@
 //	}
 .endm
 
-.macro	QUANT_DUALWORD_COEF_EACH_16BITS arg0, arg1, arg2, arg3, arg4
+.macro QUANT_DUALWORD_COEF_EACH_16BITS arg0, arg1, arg2, arg3, arg4
 //	{	//	input:	coef, ff (dst), mf , working_d (all 0), working_q
     vaba.s16		\arg1, \arg0, \arg3		// f + abs(coef - 0)
     vmull.s16		\arg4, \arg1, \arg2		// *= mf
@@ -383,7 +383,7 @@
 //	}
 .endm
 
-.macro	DC_ZERO_COUNT_IN_DUALWORD arg0, arg1, arg2
+.macro DC_ZERO_COUNT_IN_DUALWORD arg0, arg1, arg2
 //	{	//	input:	coef, dst_d, working_d (all 0x01)
     vceq.s16	\arg1, \arg0, #0
     vand.s16	\arg1, \arg2
@@ -392,7 +392,7 @@
 //	}
 .endm
 
-.macro	SELECT_MAX_IN_ABS_COEF arg0, arg1, arg2, arg3, arg4
+.macro SELECT_MAX_IN_ABS_COEF arg0, arg1, arg2, arg3, arg4
 //	{	//	input:	coef_0, coef_1, max_q (identy to follow two), output: max_d0, max_d1
     vmax.s16		\arg2, \arg0, \arg1		// max 1st in \arg3 & max 2nd in \arg4
     vpmax.s16		\arg3, \arg3, \arg4		// max 1st in \arg3[0][1] & max 2nd in \arg3[2][3]
@@ -400,7 +400,7 @@
 //	}
 .endm
 
-.macro	ZERO_COUNT_IN_2_QUARWORD arg0, arg1, arg2, arg3, arg4, arg5, arg6
+.macro ZERO_COUNT_IN_2_QUARWORD arg0, arg1, arg2, arg3, arg4, arg5, arg6
 //	{	//	input:	coef_0 (identy to \arg3 \arg4), coef_1(identy to \arg5 \arg6), mask_q
     vceq.s16	\arg0, #0
     vceq.s16	\arg1, #0
@@ -415,7 +415,7 @@
 //	}
 .endm
 
-.macro	HDM_QUANT_2x2_TOTAL_16BITS arg0, arg1, arg2
+.macro HDM_QUANT_2x2_TOTAL_16BITS arg0, arg1, arg2
 //	{	//	input: src_d[0]~[3], working_d, dst_d
     vshr.s64	\arg1, \arg0, #32
     vadd.s16	\arg2, \arg0, \arg1		// [0] = rs[0] + rs[32];[1] = rs[16] + rs[48];
@@ -425,7 +425,7 @@
 //	}
 .endm
 
-.macro	IHDM_4x4_TOTAL_16BITS arg0, arg1, arg2
+.macro IHDM_4x4_TOTAL_16BITS arg0, arg1, arg2
 //	{	//	input: each src_d[0]~[3](dst), working_q0, working_q1, working_q2
     vshr.s64	\arg1, \arg0, #32
     vadd.s16	\arg2, \arg0, \arg1		// [0] = rs[0] + rs[2];[1] = rs[1] + rs[3];
@@ -442,7 +442,7 @@
 //	}
 .endm
 
-.macro	MB_PRED_8BITS_ADD_DCT_16BITS_CLIP arg0, arg1, arg2, arg3, arg4, arg5
+.macro MB_PRED_8BITS_ADD_DCT_16BITS_CLIP arg0, arg1, arg2, arg3, arg4, arg5
 //	{	//	input: pred_d[0]/[1](output), dct_q0/1, working_q0/1;
     vmovl.u8		\arg4,\arg0
     vmovl.u8		\arg5,\arg1
@@ -453,7 +453,7 @@
 //	}
 .endm
 
-.macro	ROW_TRANSFORM_1_STEP_TOTAL_16BITS arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
+.macro ROW_TRANSFORM_1_STEP_TOTAL_16BITS arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
 //	{	//	input: src_d[0]~[3], output: e_d[0]~[3];
     vadd.s16		\arg4, \arg0, \arg2			//int16 e[i][0] = src[0] + src[2];
     vsub.s16		\arg5, \arg0, \arg2			//int16 e[i][1] = src[0] - src[2];
@@ -464,7 +464,7 @@
 //	}
 .endm
 
-.macro	TRANSFORM_TOTAL_16BITS arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7	// both row & col transform used
+.macro TRANSFORM_TOTAL_16BITS arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7	// both row & col transform used
 //	{	//	output: f_q[0]~[3], input: e_q[0]~[3];
     vadd.s16		\arg0, \arg4, \arg7			//int16 f[i][0] = e[i][0] + e[i][3];
     vadd.s16		\arg1, \arg5, \arg6			//int16 f[i][1] = e[i][1] + e[i][2];
@@ -474,7 +474,7 @@
 .endm
 
 
-.macro	ROW_TRANSFORM_0_STEP arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
+.macro ROW_TRANSFORM_0_STEP arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
 //	{	//	input: src_d[0]~[3], output: e_q[0]~[3];
     vaddl.s16		\arg4, \arg0, \arg2			//int32 e[i][0] = src[0] + src[2];
     vsubl.s16		\arg5, \arg0, \arg2			//int32 e[i][1] = src[0] - src[2];
@@ -483,7 +483,7 @@
 //	}
 .endm
 
-.macro	ROW_TRANSFORM_1_STEP arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
+.macro ROW_TRANSFORM_1_STEP arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
 //	{	//	input: src_d[0]~[3], output: e_q[0]~[3]; working: \arg8 \arg9
     vaddl.s16		\arg4, \arg0, \arg2			//int32 e[i][0] = src[0] + src[2];
     vsubl.s16		\arg5, \arg0, \arg2			//int32 e[i][1] = src[0] - src[2];
@@ -494,7 +494,7 @@
 //	}
 .endm
 
-.macro	TRANSFORM_4BYTES arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7	// both row & col transform used
+.macro TRANSFORM_4BYTES arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7	// both row & col transform used
 //	{	//	output: f_q[0]~[3], input: e_q[0]~[3];
     vadd.s32		\arg0, \arg4, \arg7			//int16 f[i][0] = e[i][0] + e[i][3];
     vadd.s32		\arg1, \arg5, \arg6			//int16 f[i][1] = e[i][1] + e[i][2];
@@ -503,7 +503,7 @@
 //	}
 .endm
 
-.macro	COL_TRANSFORM_0_STEP arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
+.macro COL_TRANSFORM_0_STEP arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
 //	{	//	input: src_q[0]~[3], output: e_q[0]~[3];
     vadd.s32		\arg4, \arg0, \arg2			//int32 e[0][j] = f[0][j] + f[2][j];
     vsub.s32		\arg5, \arg0, \arg2			//int32 e[1][j] = f[0][j] - f[2][j];
@@ -512,7 +512,7 @@
 //	}
 .endm
 
-.macro	COL_TRANSFORM_1_STEP arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
+.macro COL_TRANSFORM_1_STEP arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
 //	{	//	input: src_q[0]~[3], output: e_q[0]~[3];
     vadd.s32		\arg4, \arg0, \arg2			//int32 e[0][j] = f[0][j] + f[2][j];
     vsub.s32		\arg5, \arg0, \arg2			//int32 e[1][j] = f[0][j] - f[2][j];

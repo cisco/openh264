@@ -108,7 +108,7 @@ mmx_0x02: dw 0x02, 0x00, 0x00, 0x00
 	paddusw     %1, %2
 %endmacro
 
-%macro	LOAD_COLUMN 6
+%macro LOAD_COLUMN 6
 		movd	%1,	[%5]
 		movd	%2,	[%5+%6]
 		punpcklbw %1,	%2
@@ -155,7 +155,7 @@ mmx_0x02: dw 0x02, 0x00, 0x00, 0x00
 		pshufd		%2,	%2, 0
 %endmacro
 
-%macro	LOAD_COLUMN_C 6
+%macro LOAD_COLUMN_C 6
 		movd	%1,	[%5]
 		movd	%2,	[%5+%6]
 		punpcklbw %1,%2

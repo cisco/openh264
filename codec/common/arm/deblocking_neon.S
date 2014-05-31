@@ -36,14 +36,14 @@
 #include "arm_arch_common_macro.S"
 
 #ifdef __APPLE__
-.macro	JMP_IF_128BITS_IS_ZERO
+.macro JMP_IF_128BITS_IS_ZERO
     vorr.s16	$2, $0, $1
     vmov		r3, r2, $2
     orr			r3, r3, r2
     cmp			r3, #0
 .endm
 
-.macro	MASK_MATRIX
+.macro MASK_MATRIX
     vabd.u8	$6, $1, $2
     vcgt.u8	$6, $4, $6
 
@@ -57,7 +57,7 @@
 .endm
 
 
-.macro	DIFF_LUMA_LT4_P1_Q1
+.macro DIFF_LUMA_LT4_P1_Q1
     vmov.i8 $9, #128
     vrhadd.u8	$8, $2, $3
     vhadd.u8	$8, $0, $8
@@ -74,7 +74,7 @@
     vabs.s8	$9, $9
 .endm
 
-.macro	DIFF_LUMA_LT4_P0_Q0
+.macro DIFF_LUMA_LT4_P0_Q0
     vsubl.u8	$5, $0, $3
     vsubl.u8	$6, $2, $1
     vshl.s16	$6, $6, #2
@@ -82,7 +82,7 @@
     vqrshrn.s16		$4, $5, #3
 .endm
 
-.macro	DIFF_LUMA_EQ4_P2P1P0
+.macro DIFF_LUMA_EQ4_P2P1P0
     vaddl.u8	q4, $1, $2
     vaddl.u8	q5, $3, $4
     vadd.u16	q5, q4, q5
@@ -107,12 +107,12 @@
     vbsl.u8		$6, d10, d8
 .endm
 
-.macro	DIFF_LUMA_EQ4_MASK
+.macro DIFF_LUMA_EQ4_MASK
     vmov	$3, $2
     vbsl.u8	$3, $0, $1
 .endm
 
-.macro	DIFF_CHROMA_EQ4_P0Q0
+.macro DIFF_CHROMA_EQ4_P0Q0
     vaddl.u8	$4, $0, $3
     vaddw.u8	$5, $4, $1
     vaddw.u8	$6, $4, $2
@@ -123,45 +123,45 @@
     vrshrn.u16		$8, $6, #2
 .endm
 
-.macro	LOAD_CHROMA_DATA_4
+.macro LOAD_CHROMA_DATA_4
     vld4.u8	{$0[$8],$1[$8],$2[$8],$3[$8]}, [r0], r2
     vld4.u8	{$4[$8],$5[$8],$6[$8],$7[$8]}, [r1], r2
 .endm
 
-.macro	STORE_CHROMA_DATA_4
+.macro STORE_CHROMA_DATA_4
     vst4.u8	{$0[$8],$1[$8],$2[$8],$3[$8]}, [r0], r2
     vst4.u8	{$4[$8],$5[$8],$6[$8],$7[$8]}, [r1], r2
 .endm
 
-.macro	LOAD_LUMA_DATA_3
+.macro LOAD_LUMA_DATA_3
     vld3.u8	{$0[$6],$1[$6],$2[$6]}, [r2], r1
     vld3.u8	{$3[$6],$4[$6],$5[$6]}, [r0], r1
 .endm
 
-.macro	STORE_LUMA_DATA_4
+.macro STORE_LUMA_DATA_4
     vst4.u8	{$0[$4],$1[$4],$2[$4],$3[$4]}, [r0], r1
     vst4.u8	{$0[$5],$1[$5],$2[$5],$3[$5]}, [r2], r1
 .endm
 
-.macro	STORE_LUMA_DATA_3
+.macro STORE_LUMA_DATA_3
     vst3.u8	{$0[$6],$1[$6],$2[$6]}, [r3], r1
     vst3.u8	{$3[$6],$4[$6],$5[$6]}, [r0], r1
 .endm
 
-.macro	EXTRACT_DELTA_INTO_TWO_PART
+.macro EXTRACT_DELTA_INTO_TWO_PART
     vcge.s8	$1, $0, #0
     vand	$1, $0, $1
     vsub.s8	$0, $1, $0
 .endm
 #else
-.macro	JMP_IF_128BITS_IS_ZERO arg0, arg1, arg2
+.macro JMP_IF_128BITS_IS_ZERO arg0, arg1, arg2
     vorr.s16	\arg2, \arg0, \arg1
     vmov		r3, r2, \arg2
     orr			r3, r3, r2
     cmp			r3, #0
 .endm
 
-.macro	MASK_MATRIX arg0, arg1, arg2, arg3, arg4, arg5, arg6
+.macro MASK_MATRIX arg0, arg1, arg2, arg3, arg4, arg5, arg6
     vabd.u8	\arg6, \arg1, \arg2
     vcgt.u8	\arg6, \arg4, \arg6
 
@@ -174,7 +174,7 @@
     vand.u8	\arg6, \arg6, \arg4
 .endm
 
-.macro	DIFF_LUMA_LT4_P1_Q1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
+.macro DIFF_LUMA_LT4_P1_Q1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
     vmov.i8 \arg9, #128
     vrhadd.u8	\arg8, \arg2, \arg3
     vhadd.u8	\arg8, \arg0, \arg8
@@ -191,7 +191,7 @@
     vabs.s8	\arg9, \arg9
 .endm
 
-.macro	DIFF_LUMA_LT4_P0_Q0 arg0, arg1, arg2, arg3, arg4, arg5, arg6
+.macro DIFF_LUMA_LT4_P0_Q0 arg0, arg1, arg2, arg3, arg4, arg5, arg6
     vsubl.u8	\arg5, \arg0, \arg3
     vsubl.u8	\arg6, \arg2, \arg1
     vshl.s16	\arg6, \arg6, #2
@@ -200,7 +200,7 @@
 .endm
 
 
-.macro	DIFF_LUMA_EQ4_P2P1P0 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
+.macro DIFF_LUMA_EQ4_P2P1P0 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
     vaddl.u8	q4, \arg1, \arg2
     vaddl.u8	q5, \arg3, \arg4
     vadd.u16	q5, q4, q5
@@ -225,12 +225,12 @@
     vbsl.u8		\arg6, d10, d8
 .endm
 
-.macro	DIFF_LUMA_EQ4_MASK arg0, arg1, arg2, arg3
+.macro DIFF_LUMA_EQ4_MASK arg0, arg1, arg2, arg3
     vmov	\arg3, \arg2
     vbsl.u8	\arg3, \arg0, \arg1
 .endm
 
-.macro	DIFF_CHROMA_EQ4_P0Q0 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
+.macro DIFF_CHROMA_EQ4_P0Q0 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
     vaddl.u8	\arg4, \arg0, \arg3
     vaddw.u8	\arg5, \arg4, \arg1
     vaddw.u8	\arg6, \arg4, \arg2
@@ -240,32 +240,32 @@
     vrshrn.u16		\arg8, \arg6, #2
 .endm
 
-.macro	LOAD_CHROMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
+.macro LOAD_CHROMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
     vld4.u8	{\arg0[\arg8],\arg1[\arg8],\arg2[\arg8],\arg3[\arg8]}, [r0], r2
     vld4.u8	{\arg4[\arg8],\arg5[\arg8],\arg6[\arg8],\arg7[\arg8]}, [r1], r2
 .endm
 
-.macro	STORE_CHROMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
+.macro STORE_CHROMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
     vst4.u8	{\arg0[\arg8],\arg1[\arg8],\arg2[\arg8],\arg3[\arg8]}, [r0], r2
     vst4.u8	{\arg4[\arg8],\arg5[\arg8],\arg6[\arg8],\arg7[\arg8]}, [r1], r2
 .endm
 
-.macro	LOAD_LUMA_DATA_3 arg0, arg1, arg2, arg3, arg4, arg5, arg6
+.macro LOAD_LUMA_DATA_3 arg0, arg1, arg2, arg3, arg4, arg5, arg6
     vld3.u8	{\arg0[\arg6],\arg1[\arg6],\arg2[\arg6]}, [r2], r1
     vld3.u8	{\arg3[\arg6],\arg4[\arg6],\arg5[\arg6]}, [r0], r1
 .endm
 
-.macro	STORE_LUMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5
+.macro STORE_LUMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5
     vst4.u8	{\arg0[\arg4],\arg1[\arg4],\arg2[\arg4],\arg3[\arg4]}, [r0], r1
     vst4.u8	{\arg0[\arg5],\arg1[\arg5],\arg2[\arg5],\arg3[\arg5]}, [r2], r1
 .endm
 
-.macro	STORE_LUMA_DATA_3 arg0, arg1, arg2, arg3, arg4, arg5, arg6
+.macro STORE_LUMA_DATA_3 arg0, arg1, arg2, arg3, arg4, arg5, arg6
     vst3.u8	{\arg0[\arg6],\arg1[\arg6],\arg2[\arg6]}, [r3], r1
     vst3.u8	{\arg3[\arg6],\arg4[\arg6],\arg5[\arg6]}, [r0], r1
 .endm
 
-.macro	EXTRACT_DELTA_INTO_TWO_PART arg0, arg1
+.macro EXTRACT_DELTA_INTO_TWO_PART arg0, arg1
     vcge.s8	\arg1, \arg0, #0
     vand	\arg1, \arg0, \arg1
     vsub.s8	\arg0, \arg1, \arg0

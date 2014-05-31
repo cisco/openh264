@@ -35,7 +35,7 @@
 #include "arm_arch_common_macro.S"
 
 #ifdef __APPLE__
-.macro	LOAD_ALIGNED_DATA_WITH_STRIDE
+.macro LOAD_ALIGNED_DATA_WITH_STRIDE
 //	{	//	input: $0~$3, src*, src_stride
     vld1.64	{$0}, [$4,:128], $5
     vld1.64	{$1}, [$4,:128], $5
@@ -44,7 +44,7 @@
 //	}
 .endm
 
-.macro	STORE_ALIGNED_DATA_WITH_STRIDE
+.macro STORE_ALIGNED_DATA_WITH_STRIDE
 //	{	//	input: $0~$3, dst*, dst_stride
     vst1.64	{$0}, [$4,:128], $5
     vst1.64	{$1}, [$4,:128], $5
@@ -53,7 +53,7 @@
 //	}
 .endm
 
-.macro	LOAD_UNALIGNED_DATA_WITH_STRIDE
+.macro LOAD_UNALIGNED_DATA_WITH_STRIDE
 //	{	//	input: $0~$3, src*, src_stride
     vld1.64	{$0}, [$4], $5
     vld1.64	{$1}, [$4], $5
@@ -62,7 +62,7 @@
 //	}
 .endm
 
-.macro	STORE_UNALIGNED_DATA_WITH_STRIDE
+.macro STORE_UNALIGNED_DATA_WITH_STRIDE
 //	{	//	input: $0~$3, dst*, dst_stride
     vst1.64	{$0}, [$4], $5
     vst1.64	{$1}, [$4], $5
@@ -71,7 +71,7 @@
 //	}
 .endm
 #else
-.macro	LOAD_ALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
+.macro LOAD_ALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
 //	{	//	input: \arg0~\arg3, src*, src_stride
     vld1.64	{\arg0}, [\arg4,:128], \arg5
     vld1.64	{\arg1}, [\arg4,:128], \arg5
@@ -80,7 +80,7 @@
 //	}
 .endm
 
-.macro	STORE_ALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
+.macro STORE_ALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
 //	{	//	input: \arg0~\arg3, dst*, dst_stride
     vst1.64	{\arg0}, [\arg4,:128], \arg5
     vst1.64	{\arg1}, [\arg4,:128], \arg5
@@ -89,7 +89,7 @@
 //	}
 .endm
 
-.macro	LOAD_UNALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
+.macro LOAD_UNALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
 //	{	//	input: \arg0~\arg3, src*, src_stride
     vld1.64	{\arg0}, [\arg4], \arg5
     vld1.64	{\arg1}, [\arg4], \arg5
@@ -98,7 +98,7 @@
 //	}
 .endm
 
-.macro	STORE_UNALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
+.macro STORE_UNALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
 //	{	//	input: \arg0~\arg3, dst*, dst_stride
     vst1.64	{\arg0}, [\arg4], \arg5
     vst1.64	{\arg1}, [\arg4], \arg5

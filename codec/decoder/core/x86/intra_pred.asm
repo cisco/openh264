@@ -97,7 +97,7 @@ sse2_wd_0x02: times 8 dw 0x02
 %endmacro
 
 
-%macro	LOAD_COLUMN 6
+%macro LOAD_COLUMN 6
 		movd	%1,	[%5]
 		movd	%2,	[%5+%6]
 		punpcklbw %1,	%2
@@ -143,7 +143,7 @@ sse2_wd_0x02: times 8 dw 0x02
 		pshufd		%2,	%2, 0
 %endmacro
 
-%macro	LOAD_COLUMN_C 6
+%macro LOAD_COLUMN_C 6
 		movd	%1,	[%5]
 		movd	%2,	[%5+%6]
 		punpcklbw %1,%2
