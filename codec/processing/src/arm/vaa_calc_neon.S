@@ -161,7 +161,7 @@ WELS_ASM_FUNC_END
 
 
 #ifdef __APPLE__
-.macro  SAD_SD_MAD_16BYTES
+.macro SAD_SD_MAD_16BYTES
 	vld1.32 {q0}, [$0], $2
 	vld1.32 {q1}, [$1], $2
 
@@ -173,7 +173,7 @@ WELS_ASM_FUNC_END
 	vpadal.u8 $6, q0
 .endm
 
-.macro  SAD_SD_MAD_8x16BYTES
+.macro SAD_SD_MAD_8x16BYTES
 	vld1.32 {q0}, [$0], $2
 	vld1.32 {q1}, [$1], $2
 
@@ -195,7 +195,7 @@ WELS_ASM_FUNC_END
 	vsub.u16 $5, q2, q3
 .endm
 
-.macro  SAD_SD_MAD_CALC
+.macro SAD_SD_MAD_CALC
 	vpmax.u8 d0, $0, $1 //8bytes
 	vpmax.u8 d0, d0, d0 //4bytes
 	vpmax.u8 $2, d0, d0 //2bytes
@@ -206,7 +206,7 @@ WELS_ASM_FUNC_END
 	vpaddl.s32 $4, $4
 .endm
 #else
-.macro  SAD_SD_MAD_16BYTES arg0, arg1, arg2, arg3, arg4, arg5, arg6
+.macro SAD_SD_MAD_16BYTES arg0, arg1, arg2, arg3, arg4, arg5, arg6
 	vld1.32 {q0}, [\arg0], \arg2
 	vld1.32 {q1}, [\arg1], \arg2
 
@@ -218,7 +218,7 @@ WELS_ASM_FUNC_END
 	vpadal.u8 \arg6, q0
 .endm
 
-.macro  SAD_SD_MAD_8x16BYTES arg0, arg1, arg2, arg3, arg4, arg5
+.macro SAD_SD_MAD_8x16BYTES arg0, arg1, arg2, arg3, arg4, arg5
 	vld1.32 {q0}, [\arg0], \arg2
 	vld1.32 {q1}, [\arg1], \arg2
 
@@ -240,7 +240,7 @@ WELS_ASM_FUNC_END
 	vsub.u16 \arg5, q2, q3
 .endm
 
-.macro  SAD_SD_MAD_CALC arg0, arg1, arg2, arg3, arg4
+.macro SAD_SD_MAD_CALC arg0, arg1, arg2, arg3, arg4
 	vpmax.u8 d0, \arg0, \arg1 //8bytes
 	vpmax.u8 d0, d0, d0 //4bytes
 	vpmax.u8 \arg2, d0, d0 //2bytes
@@ -315,7 +315,7 @@ WELS_ASM_FUNC_END
 
 
 #ifdef __APPLE__
-.macro  SSD_MUL_SUM_16BYTES_RESET
+.macro SSD_MUL_SUM_16BYTES_RESET
 	vmull.u8 $3, $0, $0
 	vpaddl.u16 $2, $3
 
@@ -323,7 +323,7 @@ WELS_ASM_FUNC_END
 	vpadal.u16 $2, $3
 .endm
 
-.macro  SSD_MUL_SUM_16BYTES
+.macro SSD_MUL_SUM_16BYTES
 	vmull.u8 $3, $0, $0
 	vpadal.u16 $2, $3
 
@@ -467,13 +467,13 @@ WELS_ASM_FUNC_END
 	SAD_SSD_BGD_CALC_8x16 d27, q15, q7
 .endm
 
-.macro  SSD_SAD_SD_MAD_PADDL
+.macro SSD_SAD_SD_MAD_PADDL
 	vpaddl.s16 $0, $0
 	vpaddl.s32 $0, $0
 	vadd.i32 $1, $1, $2
 .endm
 #else
-.macro  SSD_MUL_SUM_16BYTES_RESET arg0, arg1, arg2, arg3
+.macro SSD_MUL_SUM_16BYTES_RESET arg0, arg1, arg2, arg3
 	vmull.u8   \arg3, \arg0, \arg0
 	vpaddl.u16 \arg2, \arg3
 
@@ -481,7 +481,7 @@ WELS_ASM_FUNC_END
 	vpadal.u16 \arg2, \arg3
 .endm
 
-.macro  SSD_MUL_SUM_16BYTES arg0, arg1, arg2, arg3
+.macro SSD_MUL_SUM_16BYTES arg0, arg1, arg2, arg3
 	vmull.u8   \arg3, \arg0, \arg0
 	vpadal.u16 \arg2, \arg3
 
@@ -625,7 +625,7 @@ WELS_ASM_FUNC_END
 	SAD_SSD_BGD_CALC_8x16 d27, q15, q7
 .endm
 
-.macro  SSD_SAD_SD_MAD_PADDL arg0, arg1, arg2
+.macro SSD_SAD_SD_MAD_PADDL arg0, arg1, arg2
 	vpaddl.s16 \arg0, \arg0
 	vpaddl.s32 \arg0, \arg0
 	vadd.i32 \arg1, \arg1, \arg2

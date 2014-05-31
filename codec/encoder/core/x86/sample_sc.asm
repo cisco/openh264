@@ -44,7 +44,7 @@ SECTION .text
 ;**********************************************************************************************************************************
 ; try 8 mv via offset
 ; xmm7 store sad costs
-%macro   SAD_16x16_LINE_SSE41  4	; src, ref, stride_src, stride_ref
+%macro SAD_16x16_LINE_SSE41  4	; src, ref, stride_src, stride_ref
     movdqa		xmm0, [%1]
     movdqu		xmm1, [%2]
     movdqu		xmm2, [%2+8h]
@@ -66,7 +66,7 @@ SECTION .text
     add			%1, %3
     add			%2, %4
 %endmacro	; end of SAD_16x16_LINE_SSE41
-%macro   SAD_16x16_LINE_SSE41E  4	; src, ref, stride_src, stride_ref
+%macro SAD_16x16_LINE_SSE41E  4	; src, ref, stride_src, stride_ref
     movdqa		xmm0, [%1]
     movdqu		xmm1, [%2]
     movdqu		xmm2, [%2+8h]
@@ -168,7 +168,7 @@ WRITE_INDEX:
 ;**********************************************************************************************************************************
 ; try 8 mv via offset
 ; xmm7 store sad costs
-%macro   SAD_8x8_LINE_SSE41  4	; src, ref, stride_src, stride_ref
+%macro SAD_8x8_LINE_SSE41  4	; src, ref, stride_src, stride_ref
     movdqu		xmm0, [%1]
     movdqu		xmm1, [%2]
     movdqa		xmm2, xmm1
@@ -182,7 +182,7 @@ WRITE_INDEX:
     add			%1, %3
     add			%2, %4
 %endmacro	; end of SAD_8x8_LINE_SSE41
-%macro   SAD_8x8_LINE_SSE41E  4	; src, ref, stride_src, stride_ref
+%macro SAD_8x8_LINE_SSE41E  4	; src, ref, stride_src, stride_ref
     movdqu		xmm0, [%1]
     movdqu		xmm1, [%2]
     movdqa		xmm2, xmm1

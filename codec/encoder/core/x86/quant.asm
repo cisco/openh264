@@ -166,7 +166,7 @@ WELS_EXTERN WelsQuantFour4x4Max_sse2
 		LOAD_4_PARA_POP
 		ret
 
-%macro  MMX_Copy4Times 2
+%macro MMX_Copy4Times 2
 		movd		%1, %2
 		punpcklwd	%1, %1
 		punpckldq	%1,	%1

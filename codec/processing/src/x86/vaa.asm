@@ -85,7 +85,7 @@
   ; end of @sum_8x2
 %endmacro       ; END of SUM_WORD_8x2_SSE2
 
-%macro  WELS_SAD_SUM_SQSUM_16x1_SSE2 3 ;esi:%1,edi:%2,ebx:%3
+%macro WELS_SAD_SUM_SQSUM_16x1_SSE2 3 ;esi:%1,edi:%2,ebx:%3
   movdqa        xmm1,   [%1]
   movdqa        xmm2,   [%2]
   movdqa        xmm3,   xmm1
@@ -108,7 +108,7 @@
   add           %2,     %3
 %endmacro
 
-%macro  WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 3 ;esi:%1 edi:%2 ebx:%3
+%macro WELS_SAD_SUM_SQSUM_SQDIFF_16x1_SSE2 3 ;esi:%1 edi:%2 ebx:%3
   movdqa        xmm1,   [%1]
   movdqa        xmm2,   [%2]
   movdqa        xmm3,   xmm1
@@ -144,7 +144,7 @@
   add           %2,     %3
 %endmacro
 
-%macro  WELS_SAD_SD_MAD_16x1_SSE2       7 ;esi:%5 edi:%6 ebx:%7
+%macro WELS_SAD_SD_MAD_16x1_SSE2       7 ;esi:%5 edi:%6 ebx:%7
 %define sad_reg                 %1
 %define sum_cur_reg             %2
 %define sum_ref_reg             %3
@@ -172,7 +172,7 @@
 %endmacro
 
 
-%macro  WELS_MAX_REG_SSE2       1       ; xmm1, xmm2, xmm3 can be used
+%macro WELS_MAX_REG_SSE2       1       ; xmm1, xmm2, xmm3 can be used
 %define max_reg  %1
   movdqa        xmm1,           max_reg
   psrldq        xmm1,           4
@@ -185,7 +185,7 @@
   pmaxub        max_reg,        xmm1
 %endmacro
 
-%macro  WELS_SAD_BGD_SQDIFF_16x1_SSE2   7 ;esi:%5 edi:%6 ebx:%7
+%macro WELS_SAD_BGD_SQDIFF_16x1_SSE2   7 ;esi:%5 edi:%6 ebx:%7
 %define sad_reg         %1
 %define sum_reg         %2
 %define mad_reg         %3

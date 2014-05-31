@@ -542,14 +542,14 @@ BITS 32
 %endmacro
 
 ;copy a dw into a xmm for 8 times
-%macro  SSE2_Copy8Times 2
+%macro SSE2_Copy8Times 2
 		movd	%1, %2
 		punpcklwd %1, %1
 		pshufd	%1,	%1,	0
 %endmacro
 
 ;copy a db into a xmm for 16 times
-%macro  SSE2_Copy16Times 2
+%macro SSE2_Copy16Times 2
 		movd		%1, %2
 		pshuflw		%1, %1, 0
 		punpcklqdq	%1, %1

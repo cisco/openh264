@@ -82,7 +82,7 @@ SECTION .text
       psubw %1, %2
 %endmacro
 
-%macro  SSE2_SumWHorizon1 2
+%macro SSE2_SumWHorizon1 2
 	movdqa      %2, %1
 	psrldq      %2, 8
 	paddusw     %1, %2
@@ -112,7 +112,7 @@ SECTION .text
 	paddusw       %7, %4
 %endmacro
 
-%macro  SSE2_SumWHorizon 3
+%macro SSE2_SumWHorizon 3
 	movhlps		%2, %1			; x2 = xx xx xx xx d7 d6 d5 d4
 	paddw		%1, %2			; x1 = xx xx xx xx d37 d26 d15 d04
 	punpcklwd	%1, %3			; x1 =  d37  d26 d15 d04

@@ -119,7 +119,7 @@ sse2_wd_0x02: times 8 dw 0x02
 		punpckhdq %1,	%4
 %endmacro
 
-%macro  SUMW_HORIZON 3
+%macro SUMW_HORIZON 3
 	movhlps		%2, %1			; x2 = xx xx xx xx d7 d6 d5 d4
 	paddw		%1, %2			; x1 = xx xx xx xx d37 d26 d15 d04
 	punpcklwd	%1, %3			; x1 =  d37  d26 d15 d04
@@ -129,14 +129,14 @@ sse2_wd_0x02: times 8 dw 0x02
 	paddd		%1, %2			; x1 = xxxx xxxx xxxx  d01234567
 %endmacro
 
-%macro  COPY_16_TIMES 2
+%macro COPY_16_TIMES 2
 		movdqa		%2,	[%1-16]
 		psrldq		%2,	15
 		pmuludq		%2,	[mmx_01bytes]
 		pshufd		%2,	%2, 0
 %endmacro
 
-%macro  COPY_16_TIMESS 3
+%macro COPY_16_TIMESS 3
 		movdqa		%2,	[%1+%3-16]
 		psrldq		%2,	15
 		pmuludq		%2,	[mmx_01bytes]
