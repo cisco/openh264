@@ -56,217 +56,217 @@ sse2_20 times 8 dw 20
 ;***********************************************************************
 SECTION .text
 
-%macro WEIGHT_LINE	9
-		movq		%2,	%9
-		punpcklbw	%2,	%7
-		movdqa		%8,	%2
+%macro WEIGHT_LINE  9
+    movq        %2, %9
+    punpcklbw   %2, %7
+    movdqa      %8, %2
 
-		movdqa		%1,	%6
-		psubusb		%1,	%8
-		psubusb		%8,	%6
-		por			%8,	%1		; ABS(curPixel - centerPixel);
+    movdqa      %1, %6
+    psubusb     %1, %8
+    psubusb     %8, %6
+    por         %8, %1      ; ABS(curPixel - centerPixel);
 
-		movdqa		%1,	%3
-		psubusb		%1,	%8
+    movdqa      %1, %3
+    psubusb     %1, %8
 
-		pmullw		%1,	%1
-		psrlw		%1,	5
-		pmullw		%2,	%1
-		paddusw		%4,	%1
-		paddusw		%5,	%2
+    pmullw      %1, %1
+    psrlw       %1, 5
+    pmullw      %2, %1
+    paddusw     %4, %1
+    paddusw     %5, %2
 %endmacro
 
-%macro WEIGHT_LINE1_UV	4
-		movdqa		%2,	%1
-		punpcklbw	%2,	%4
-		paddw		%3,	%2
+%macro WEIGHT_LINE1_UV  4
+    movdqa      %2, %1
+    punpcklbw   %2, %4
+    paddw       %3, %2
 
-		movdqa		%2,	%1
-		psrldq		%2,	1
-		punpcklbw	%2,	%4
-		paddw		%3,	%2
+    movdqa      %2, %1
+    psrldq      %2, 1
+    punpcklbw   %2, %4
+    paddw       %3, %2
 
-		movdqa		%2,	%1
-		psrldq		%2,	2
-		punpcklbw	%2,	%4
-		psllw		%2,	1
-		paddw		%3,	%2
+    movdqa      %2, %1
+    psrldq      %2, 2
+    punpcklbw   %2, %4
+    psllw       %2, 1
+    paddw       %3, %2
 
-		movdqa		%2,	%1
-		psrldq		%2,	3
-		punpcklbw	%2,	%4
-		paddw		%3,	%2
+    movdqa      %2, %1
+    psrldq      %2, 3
+    punpcklbw   %2, %4
+    paddw       %3, %2
 
-		movdqa		%2,	%1
-		psrldq		%2,	4
-		punpcklbw	%2,	%4
-		paddw		%3,	%2
+    movdqa      %2, %1
+    psrldq      %2, 4
+    punpcklbw   %2, %4
+    paddw       %3, %2
 %endmacro
 
-%macro WEIGHT_LINE2_UV	4
-		movdqa		%2,	%1
-		punpcklbw	%2,	%4
-		paddw		%3,	%2
+%macro WEIGHT_LINE2_UV  4
+    movdqa      %2, %1
+    punpcklbw   %2, %4
+    paddw       %3, %2
 
-		movdqa		%2,	%1
-		psrldq		%2,	1
-		punpcklbw	%2,	%4
-		psllw		%2,	1
-		paddw		%3,	%2
+    movdqa      %2, %1
+    psrldq      %2, 1
+    punpcklbw   %2, %4
+    psllw       %2, 1
+    paddw       %3, %2
 
-		movdqa		%2,	%1
-		psrldq		%2,	2
-		punpcklbw	%2,	%4
-		psllw		%2,	2
-		paddw		%3,	%2
+    movdqa      %2, %1
+    psrldq      %2, 2
+    punpcklbw   %2, %4
+    psllw       %2, 2
+    paddw       %3, %2
 
-		movdqa		%2,	%1
-		psrldq		%2,	3
-		punpcklbw	%2,	%4
-		psllw		%2,	1
-		paddw		%3,	%2
+    movdqa      %2, %1
+    psrldq      %2, 3
+    punpcklbw   %2, %4
+    psllw       %2, 1
+    paddw       %3, %2
 
-		movdqa		%2,	%1
-		psrldq		%2,	4
-		punpcklbw	%2,	%4
-		paddw		%3,	%2
+    movdqa      %2, %1
+    psrldq      %2, 4
+    punpcklbw   %2, %4
+    paddw       %3, %2
 %endmacro
 
-%macro WEIGHT_LINE3_UV	4
-		movdqa		%2,	%1
-		punpcklbw	%2,	%4
-		psllw		%2,	1
-		paddw		%3,	%2
+%macro WEIGHT_LINE3_UV  4
+    movdqa      %2, %1
+    punpcklbw   %2, %4
+    psllw       %2, 1
+    paddw       %3, %2
 
-		movdqa		%2,	%1
-		psrldq		%2,	1
-		punpcklbw	%2,	%4
-		psllw		%2,	2
-		paddw		%3,	%2
+    movdqa      %2, %1
+    psrldq      %2, 1
+    punpcklbw   %2, %4
+    psllw       %2, 2
+    paddw       %3, %2
 
-		movdqa		%2,	%1
-		psrldq		%2,	2
-		punpcklbw	%2,	%4
-		pmullw		%2,	[sse2_20]
-		paddw		%3,	%2
+    movdqa      %2, %1
+    psrldq      %2, 2
+    punpcklbw   %2, %4
+    pmullw      %2, [sse2_20]
+    paddw       %3, %2
 
-		movdqa		%2,	%1
-		psrldq		%2,	3
-		punpcklbw	%2,	%4
-		psllw		%2,	2
-		paddw		%3,	%2
+    movdqa      %2, %1
+    psrldq      %2, 3
+    punpcklbw   %2, %4
+    psllw       %2, 2
+    paddw       %3, %2
 
-		movdqa		%2,	%1
-		psrldq		%2,	4
-		punpcklbw	%2,	%4
-		psllw		%2,	1
-		paddw		%3,	%2
+    movdqa      %2, %1
+    psrldq      %2, 4
+    punpcklbw   %2, %4
+    psllw       %2, 1
+    paddw       %3, %2
 %endmacro
 
 ;***********************************************************************
 ;  BilateralLumaFilter8_sse2(uint8_t *pixels, int stride);
 ;***********************************************************************
-;	1	2	3
-;	4	0	5
-;	6	7	8
-;	0:	the center point
+;   1   2   3
+;   4   0   5
+;   6   7   8
+;   0:  the center point
 
 WELS_EXTERN BilateralLumaFilter8_sse2
 
-        push r3
-        %assign push_num 1
-        LOAD_2_PARA
-        PUSH_XMM 8
+    push r3
+    %assign push_num 1
+    LOAD_2_PARA
+    PUSH_XMM 8
 
-		pxor		xmm7,	xmm7
+    pxor        xmm7,   xmm7
 
-		mov         r3,     r0
+    mov         r3,     r0
 
-		movq        xmm6,   [r0]
-		punpcklbw	xmm6,	xmm7
-		movdqa		xmm3,	[sse2_32]
-		pxor		xmm4,	xmm4		; nTotWeight
-		pxor		xmm5,	xmm5		; nSum
+    movq        xmm6,   [r0]
+    punpcklbw   xmm6,   xmm7
+    movdqa      xmm3,   [sse2_32]
+    pxor        xmm4,   xmm4        ; nTotWeight
+    pxor        xmm5,   xmm5        ; nSum
 
-        dec         r0
-		WEIGHT_LINE	xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [r0]			; pixel 4
-		WEIGHT_LINE	xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [r0 + 2]		; pixel 5
+    dec         r0
+    WEIGHT_LINE xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [r0]           ; pixel 4
+    WEIGHT_LINE xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [r0 + 2]       ; pixel 5
 
-		sub			r0,	r1
-		WEIGHT_LINE	xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [r0]			; pixel 1
-		WEIGHT_LINE	xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [r0 + 1]		; pixel 2
-		WEIGHT_LINE	xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [r0 + 2]		; pixel 3
+    sub         r0, r1
+    WEIGHT_LINE xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [r0]           ; pixel 1
+    WEIGHT_LINE xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [r0 + 1]       ; pixel 2
+    WEIGHT_LINE xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [r0 + 2]       ; pixel 3
 
-		lea			r0,	[r0 + r1 * 2]
-		WEIGHT_LINE	xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [r0]			; pixel 6
-		WEIGHT_LINE	xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [r0 + 1]		; pixel 7
-		WEIGHT_LINE	xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [r0 + 2]		; pixel 8
+    lea         r0, [r0 + r1 * 2]
+    WEIGHT_LINE xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [r0]           ; pixel 6
+    WEIGHT_LINE xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [r0 + 1]       ; pixel 7
+    WEIGHT_LINE xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,  [r0 + 2]       ; pixel 8
 
-		pcmpeqw		xmm0,	xmm0
-		psrlw		xmm0,	15
-		psllw		xmm0,	8
-		psubusw		xmm0,	xmm4
-		pmullw		xmm0,	xmm6
-		paddusw		xmm5,	xmm0
-		psrlw		xmm5,	8
-		packuswb	xmm5,	xmm5
-		movq		[r3],	xmm5
+    pcmpeqw     xmm0,   xmm0
+    psrlw       xmm0,   15
+    psllw       xmm0,   8
+    psubusw     xmm0,   xmm4
+    pmullw      xmm0,   xmm6
+    paddusw     xmm5,   xmm0
+    psrlw       xmm5,   8
+    packuswb    xmm5,   xmm5
+    movq        [r3],   xmm5
 
 
-		POP_XMM
-		pop r3
-		%assign push_num 0
+    POP_XMM
+    pop r3
+    %assign push_num 0
 
-		ret
+    ret
 
 ;***********************************************************************
-; void		WaverageChromaFilter8_sse2(uint8_t *pixels, int stride);
+; void      WaverageChromaFilter8_sse2(uint8_t *pixels, int stride);
 ;***********************************************************************
 ;5x5 filter:
-;1	1	2	1	1
-;1	2	4	2	1
-;2	4	20	4	2
-;1	2	4	2	1
-;1	1	2	1	1
+;1  1   2   1   1
+;1  2   4   2   1
+;2  4   20  4   2
+;1  2   4   2   1
+;1  1   2   1   1
 
 WELS_EXTERN WaverageChromaFilter8_sse2
 
-        push r3
+    push r3
 
-        %assign push_num 1
+    %assign push_num 1
 
-        LOAD_2_PARA
+    LOAD_2_PARA
 
-        mov		r3,	r1
-		add		r3,	r3
-		sub		r0,	r3			; pixels - 2 * stride
-		sub		r0,	2
+    mov     r3, r1
+    add     r3, r3
+    sub     r0, r3          ; pixels - 2 * stride
+    sub     r0, 2
 
-		pxor	xmm0,	xmm0
-		pxor	xmm3,	xmm3
+    pxor    xmm0,   xmm0
+    pxor    xmm3,   xmm3
 
-		movdqu		xmm1,	[r0]
-		WEIGHT_LINE1_UV	xmm1,	xmm2,	xmm3,	xmm0
+    movdqu      xmm1,   [r0]
+    WEIGHT_LINE1_UV xmm1,   xmm2,   xmm3,   xmm0
 
-		movdqu		xmm1,	[r0 + r1]
-		WEIGHT_LINE2_UV	xmm1,	xmm2,	xmm3,	xmm0
+    movdqu      xmm1,   [r0 + r1]
+    WEIGHT_LINE2_UV xmm1,   xmm2,   xmm3,   xmm0
 
-		add		r0,	r3
-		movdqu		xmm1,	[r0]
-		WEIGHT_LINE3_UV	xmm1,	xmm2,	xmm3,	xmm0
+    add     r0, r3
+    movdqu      xmm1,   [r0]
+    WEIGHT_LINE3_UV xmm1,   xmm2,   xmm3,   xmm0
 
-		movdqu		xmm1,	[r0 + r1]
-		WEIGHT_LINE2_UV	xmm1,	xmm2,	xmm3,	xmm0
+    movdqu      xmm1,   [r0 + r1]
+    WEIGHT_LINE2_UV xmm1,   xmm2,   xmm3,   xmm0
 
-		movdqu		xmm1,	[r0 + r1 * 2]
-		WEIGHT_LINE1_UV	xmm1,	xmm2,	xmm3,	xmm0
+    movdqu      xmm1,   [r0 + r1 * 2]
+    WEIGHT_LINE1_UV xmm1,   xmm2,   xmm3,   xmm0
 
-		psrlw		xmm3,		6
-		packuswb	xmm3,		xmm3
-		movq		[r0 + 2],		xmm3
+    psrlw       xmm3,       6
+    packuswb    xmm3,       xmm3
+    movq        [r0 + 2],       xmm3
 
 
-        pop r3
+    pop r3
 
-        %assign push_num 0
-		ret
+    %assign push_num 0
+    ret

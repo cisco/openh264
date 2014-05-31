@@ -36,75 +36,75 @@
 
 #ifdef __APPLE__
 .macro LOAD_ALIGNED_DATA_WITH_STRIDE
-//	{	//	input: $0~$3, src*, src_stride
-    vld1.64	{$0}, [$4,:128], $5
-    vld1.64	{$1}, [$4,:128], $5
-    vld1.64	{$2}, [$4,:128], $5
-    vld1.64	{$3}, [$4,:128], $5
-//	}
+//  {   //  input: $0~$3, src*, src_stride
+    vld1.64 {$0}, [$4,:128], $5
+    vld1.64 {$1}, [$4,:128], $5
+    vld1.64 {$2}, [$4,:128], $5
+    vld1.64 {$3}, [$4,:128], $5
+//  }
 .endm
 
 .macro STORE_ALIGNED_DATA_WITH_STRIDE
-//	{	//	input: $0~$3, dst*, dst_stride
-    vst1.64	{$0}, [$4,:128], $5
-    vst1.64	{$1}, [$4,:128], $5
-    vst1.64	{$2}, [$4,:128], $5
-    vst1.64	{$3}, [$4,:128], $5
-//	}
+//  {   //  input: $0~$3, dst*, dst_stride
+    vst1.64 {$0}, [$4,:128], $5
+    vst1.64 {$1}, [$4,:128], $5
+    vst1.64 {$2}, [$4,:128], $5
+    vst1.64 {$3}, [$4,:128], $5
+//  }
 .endm
 
 .macro LOAD_UNALIGNED_DATA_WITH_STRIDE
-//	{	//	input: $0~$3, src*, src_stride
-    vld1.64	{$0}, [$4], $5
-    vld1.64	{$1}, [$4], $5
-    vld1.64	{$2}, [$4], $5
-    vld1.64	{$3}, [$4], $5
-//	}
+//  {   //  input: $0~$3, src*, src_stride
+    vld1.64 {$0}, [$4], $5
+    vld1.64 {$1}, [$4], $5
+    vld1.64 {$2}, [$4], $5
+    vld1.64 {$3}, [$4], $5
+//  }
 .endm
 
 .macro STORE_UNALIGNED_DATA_WITH_STRIDE
-//	{	//	input: $0~$3, dst*, dst_stride
-    vst1.64	{$0}, [$4], $5
-    vst1.64	{$1}, [$4], $5
-    vst1.64	{$2}, [$4], $5
-    vst1.64	{$3}, [$4], $5
-//	}
+//  {   //  input: $0~$3, dst*, dst_stride
+    vst1.64 {$0}, [$4], $5
+    vst1.64 {$1}, [$4], $5
+    vst1.64 {$2}, [$4], $5
+    vst1.64 {$3}, [$4], $5
+//  }
 .endm
 #else
 .macro LOAD_ALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
-//	{	//	input: \arg0~\arg3, src*, src_stride
-    vld1.64	{\arg0}, [\arg4,:128], \arg5
-    vld1.64	{\arg1}, [\arg4,:128], \arg5
-    vld1.64	{\arg2}, [\arg4,:128], \arg5
-    vld1.64	{\arg3}, [\arg4,:128], \arg5
-//	}
+//  {   //  input: \arg0~\arg3, src*, src_stride
+    vld1.64 {\arg0}, [\arg4,:128], \arg5
+    vld1.64 {\arg1}, [\arg4,:128], \arg5
+    vld1.64 {\arg2}, [\arg4,:128], \arg5
+    vld1.64 {\arg3}, [\arg4,:128], \arg5
+//  }
 .endm
 
 .macro STORE_ALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
-//	{	//	input: \arg0~\arg3, dst*, dst_stride
-    vst1.64	{\arg0}, [\arg4,:128], \arg5
-    vst1.64	{\arg1}, [\arg4,:128], \arg5
-    vst1.64	{\arg2}, [\arg4,:128], \arg5
-    vst1.64	{\arg3}, [\arg4,:128], \arg5
-//	}
+//  {   //  input: \arg0~\arg3, dst*, dst_stride
+    vst1.64 {\arg0}, [\arg4,:128], \arg5
+    vst1.64 {\arg1}, [\arg4,:128], \arg5
+    vst1.64 {\arg2}, [\arg4,:128], \arg5
+    vst1.64 {\arg3}, [\arg4,:128], \arg5
+//  }
 .endm
 
 .macro LOAD_UNALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
-//	{	//	input: \arg0~\arg3, src*, src_stride
-    vld1.64	{\arg0}, [\arg4], \arg5
-    vld1.64	{\arg1}, [\arg4], \arg5
-    vld1.64	{\arg2}, [\arg4], \arg5
-    vld1.64	{\arg3}, [\arg4], \arg5
-//	}
+//  {   //  input: \arg0~\arg3, src*, src_stride
+    vld1.64 {\arg0}, [\arg4], \arg5
+    vld1.64 {\arg1}, [\arg4], \arg5
+    vld1.64 {\arg2}, [\arg4], \arg5
+    vld1.64 {\arg3}, [\arg4], \arg5
+//  }
 .endm
 
 .macro STORE_UNALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
-//	{	//	input: \arg0~\arg3, dst*, dst_stride
-    vst1.64	{\arg0}, [\arg4], \arg5
-    vst1.64	{\arg1}, [\arg4], \arg5
-    vst1.64	{\arg2}, [\arg4], \arg5
-    vst1.64	{\arg3}, [\arg4], \arg5
-//	}
+//  {   //  input: \arg0~\arg3, dst*, dst_stride
+    vst1.64 {\arg0}, [\arg4], \arg5
+    vst1.64 {\arg1}, [\arg4], \arg5
+    vst1.64 {\arg2}, [\arg4], \arg5
+    vst1.64 {\arg3}, [\arg4], \arg5
+//  }
 .endm
 
 #endif
@@ -112,89 +112,89 @@
 
 WELS_ASM_FUNC_BEGIN WelsCopy8x8_neon
 
-	LOAD_UNALIGNED_DATA_WITH_STRIDE	d0, d1, d2, d3, r2, r3
+    LOAD_UNALIGNED_DATA_WITH_STRIDE d0, d1, d2, d3, r2, r3
 
-	STORE_UNALIGNED_DATA_WITH_STRIDE	d0, d1, d2, d3, r0, r1
+    STORE_UNALIGNED_DATA_WITH_STRIDE    d0, d1, d2, d3, r0, r1
 
-	LOAD_UNALIGNED_DATA_WITH_STRIDE	d4, d5, d6, d7, r2, r3
+    LOAD_UNALIGNED_DATA_WITH_STRIDE d4, d5, d6, d7, r2, r3
 
-	STORE_UNALIGNED_DATA_WITH_STRIDE	d4, d5, d6, d7, r0, r1
+    STORE_UNALIGNED_DATA_WITH_STRIDE    d4, d5, d6, d7, r0, r1
 
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN WelsCopy16x16_neon
 
-	LOAD_ALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
+    LOAD_ALIGNED_DATA_WITH_STRIDE   q0, q1, q2, q3, r2, r3
 
-	STORE_ALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r0, r1
+    STORE_ALIGNED_DATA_WITH_STRIDE  q0, q1, q2, q3, r0, r1
 
-	LOAD_ALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r2, r3
+    LOAD_ALIGNED_DATA_WITH_STRIDE   q8, q9, q10, q11, r2, r3
 
-	STORE_ALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r0, r1
+    STORE_ALIGNED_DATA_WITH_STRIDE  q8, q9, q10, q11, r0, r1
 
-	LOAD_ALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
+    LOAD_ALIGNED_DATA_WITH_STRIDE   q0, q1, q2, q3, r2, r3
 
-	STORE_ALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r0, r1
+    STORE_ALIGNED_DATA_WITH_STRIDE  q0, q1, q2, q3, r0, r1
 
-	LOAD_ALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r2, r3
+    LOAD_ALIGNED_DATA_WITH_STRIDE   q8, q9, q10, q11, r2, r3
 
-	STORE_ALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r0, r1
+    STORE_ALIGNED_DATA_WITH_STRIDE  q8, q9, q10, q11, r0, r1
 
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN WelsCopy16x16NotAligned_neon
 
-	LOAD_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
+    LOAD_UNALIGNED_DATA_WITH_STRIDE q0, q1, q2, q3, r2, r3
 
-	STORE_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r0, r1
+    STORE_UNALIGNED_DATA_WITH_STRIDE    q0, q1, q2, q3, r0, r1
 
-	LOAD_UNALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r2, r3
+    LOAD_UNALIGNED_DATA_WITH_STRIDE q8, q9, q10, q11, r2, r3
 
-	STORE_UNALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r0, r1
+    STORE_UNALIGNED_DATA_WITH_STRIDE    q8, q9, q10, q11, r0, r1
 
-	LOAD_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
+    LOAD_UNALIGNED_DATA_WITH_STRIDE q0, q1, q2, q3, r2, r3
 
-	STORE_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r0, r1
+    STORE_UNALIGNED_DATA_WITH_STRIDE    q0, q1, q2, q3, r0, r1
 
-	LOAD_UNALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r2, r3
+    LOAD_UNALIGNED_DATA_WITH_STRIDE q8, q9, q10, q11, r2, r3
 
-	STORE_UNALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r0, r1
+    STORE_UNALIGNED_DATA_WITH_STRIDE    q8, q9, q10, q11, r0, r1
 
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN WelsCopy16x8NotAligned_neon
 
-	LOAD_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r2, r3
+    LOAD_UNALIGNED_DATA_WITH_STRIDE q0, q1, q2, q3, r2, r3
 
-	STORE_UNALIGNED_DATA_WITH_STRIDE	q0, q1, q2, q3, r0, r1
+    STORE_UNALIGNED_DATA_WITH_STRIDE    q0, q1, q2, q3, r0, r1
 
-	LOAD_UNALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r2, r3
+    LOAD_UNALIGNED_DATA_WITH_STRIDE q8, q9, q10, q11, r2, r3
 
-	STORE_UNALIGNED_DATA_WITH_STRIDE	q8, q9, q10, q11, r0, r1
+    STORE_UNALIGNED_DATA_WITH_STRIDE    q8, q9, q10, q11, r0, r1
 
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN WelsCopy8x16_neon
 
-	LOAD_UNALIGNED_DATA_WITH_STRIDE	d0, d1, d2, d3, r2, r3
+    LOAD_UNALIGNED_DATA_WITH_STRIDE d0, d1, d2, d3, r2, r3
 
-	STORE_UNALIGNED_DATA_WITH_STRIDE	d0, d1, d2, d3, r0, r1
+    STORE_UNALIGNED_DATA_WITH_STRIDE    d0, d1, d2, d3, r0, r1
 
-	LOAD_UNALIGNED_DATA_WITH_STRIDE	d4, d5, d6, d7, r2, r3
+    LOAD_UNALIGNED_DATA_WITH_STRIDE d4, d5, d6, d7, r2, r3
 
-	STORE_UNALIGNED_DATA_WITH_STRIDE	d4, d5, d6, d7, r0, r1
+    STORE_UNALIGNED_DATA_WITH_STRIDE    d4, d5, d6, d7, r0, r1
 
-	LOAD_UNALIGNED_DATA_WITH_STRIDE	d0, d1, d2, d3, r2, r3
+    LOAD_UNALIGNED_DATA_WITH_STRIDE d0, d1, d2, d3, r2, r3
 
-	STORE_UNALIGNED_DATA_WITH_STRIDE	d0, d1, d2, d3, r0, r1
+    STORE_UNALIGNED_DATA_WITH_STRIDE    d0, d1, d2, d3, r0, r1
 
-	LOAD_UNALIGNED_DATA_WITH_STRIDE	d4, d5, d6, d7, r2, r3
+    LOAD_UNALIGNED_DATA_WITH_STRIDE d4, d5, d6, d7, r2, r3
 
-	STORE_UNALIGNED_DATA_WITH_STRIDE	d4, d5, d6, d7, r0, r1
+    STORE_UNALIGNED_DATA_WITH_STRIDE    d4, d5, d6, d7, r0, r1
 
 WELS_ASM_FUNC_END
 

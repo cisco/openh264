@@ -37,32 +37,32 @@
 
 WELS_ASM_FUNC_BEGIN WelsProcessingSampleSad8x8_neon
     stmdb sp!, {lr}
-	//Loading a horizontal line data (8 bytes)
-	vld1.8 {d0}, [r0], r1
-	vld1.8 {d1}, [r2], r3
+    //Loading a horizontal line data (8 bytes)
+    vld1.8 {d0}, [r0], r1
+    vld1.8 {d1}, [r2], r3
 
-	//Do the SAD for 8 bytes
-	vabdl.u8  q1, d0, d1
+    //Do the SAD for 8 bytes
+    vabdl.u8  q1, d0, d1
 
-	mov lr, #7
+    mov lr, #7
 pixel_sad_8x8_loop0:
 
     //Loading a horizontal line data (8 bytes)
-	vld1.8 {d0}, [r0], r1
-	vld1.8 {d1}, [r2], r3
+    vld1.8 {d0}, [r0], r1
+    vld1.8 {d1}, [r2], r3
 
-	subs lr, #1
+    subs lr, #1
 
-	//Do the SAD for 8 bytes
-	vabal.u8  q1, d0, d1
-	bne pixel_sad_8x8_loop0
+    //Do the SAD for 8 bytes
+    vabal.u8  q1, d0, d1
+    bne pixel_sad_8x8_loop0
 
-	vadd.u16   d2, d3
-	vpaddl.u16 d2, d2
-	vpaddl.u32 d2, d2
-	vmov.u32   r0, d2[0]//TBO...
+    vadd.u16   d2, d3
+    vpaddl.u16 d2, d2
+    vpaddl.u32 d2, d2
+    vmov.u32   r0, d2[0]//TBO...
 
-	ldmia sp!, {lr}
+    ldmia sp!, {lr}
 WELS_ASM_FUNC_END
 
 #endif
