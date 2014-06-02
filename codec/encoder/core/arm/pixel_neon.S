@@ -66,10 +66,10 @@
     vsub.s16    q3, q12, q13
 
     vadd.s16    q8, q10, q11
-    vsub.s16	q9, q10, q11
+    vsub.s16    q9, q10, q11
 
     vadd.s16    q10, q14, q15
-    vsub.s16	q11, q14, q15
+    vsub.s16    q11, q14, q15
 
     vadd.s16    q12, q0, q2
     vsub.s16    q14, q0, q2
@@ -372,28 +372,28 @@ WELS_ASM_FUNC_END
 WELS_ASM_FUNC_BEGIN WelsSampleSad4x4_neon
     stmdb sp!, {r4-r5, lr}
 
-	//Loading a horizontal line data (4 bytes)
-	//line 0
-	ldr r4, [r0], r1
-	ldr r5, [r2], r3
-	usad8  lr, r4, r5
+    //Loading a horizontal line data (4 bytes)
+    //line 0
+    ldr r4, [r0], r1
+    ldr r5, [r2], r3
+    usad8  lr, r4, r5
 
     //line 1
-	ldr r4, [r0], r1
-	ldr r5, [r2], r3
-	usada8  lr, r4, r5, lr
+    ldr r4, [r0], r1
+    ldr r5, [r2], r3
+    usada8  lr, r4, r5, lr
 
     //line 2
-	ldr r4, [r0], r1
-	ldr r5, [r2], r3
-	usada8  lr, r4, r5, lr
+    ldr r4, [r0], r1
+    ldr r5, [r2], r3
+    usada8  lr, r4, r5, lr
 
-	//line 3
-	ldr r4, [r0]
-	ldr r5, [r2]
-	usada8  r0, r4, r5, lr
+    //line 3
+    ldr r4, [r0]
+    ldr r5, [r2]
+    usada8  r0, r4, r5, lr
 
-	ldmia sp!, {r4-r5, lr}
+    ldmia sp!, {r4-r5, lr}
 WELS_ASM_FUNC_END
 
 
@@ -401,340 +401,340 @@ WELS_ASM_FUNC_BEGIN WelsSampleSadFour16x16_neon
 
     stmdb sp!, {r4-r5, lr}
 
-	//Generate the pix2 start addr
-	sub   r4, r2, #1
-	add   r5, r2, #1
-	sub   r2, r3
+    //Generate the pix2 start addr
+    sub   r4, r2, #1
+    add   r5, r2, #1
+    sub   r2, r3
 
     //Loading a horizontal line data (16 bytes)
-	vld1.8 {q0}, [r0], r1 //save pix1
+    vld1.8 {q0}, [r0], r1 //save pix1
 
-	vld1.8 {q1}, [r2], r3 //save pix2 - stride
-	vld1.8 {q10}, [r2], r3 //save pix2
-	vld1.8 {q2}, [r2], r3 //save pix2 + stride
+    vld1.8 {q1}, [r2], r3 //save pix2 - stride
+    vld1.8 {q10}, [r2], r3 //save pix2
+    vld1.8 {q2}, [r2], r3 //save pix2 + stride
 
-	vld1.8 {q3}, [r4], r3 //save pix2 - 1
-	vld1.8 {q8}, [r5], r3 //save pix2 + 1
+    vld1.8 {q3}, [r4], r3 //save pix2 - 1
+    vld1.8 {q8}, [r5], r3 //save pix2 + 1
 
-	//Do the SAD for 16 bytes
-	vabdl.u8  q15, d0, d2
-	vabal.u8  q15, d1, d3
+    //Do the SAD for 16 bytes
+    vabdl.u8  q15, d0, d2
+    vabal.u8  q15, d1, d3
 
-	vabdl.u8  q13, d0, d4
-	vabal.u8  q13, d1, d5
+    vabdl.u8  q13, d0, d4
+    vabal.u8  q13, d1, d5
 
-	vabdl.u8  q11, d0, d6
-	vabal.u8  q11, d1, d7
+    vabdl.u8  q11, d0, d6
+    vabal.u8  q11, d1, d7
 
-	vabdl.u8  q9, d0, d16
-	vabal.u8  q9, d1, d17
+    vabdl.u8  q9, d0, d16
+    vabal.u8  q9, d1, d17
 
-	mov lr, #15
+    mov lr, #15
 pixel_sad_4_16x16_loop_0:
 
     //Loading a horizontal line data (16 bytes)
-	vld1.8 {q0}, [r0], r1 //save pix1
-	vmov.8 q1,   q10      //save pix2 - stride
-	vmov.8 q10,  q2
-	vabal.u8  q15, d0, d2
-	vld1.8 {q2}, [r2], r3 //save pix2 + stride
-	vabal.u8  q15, d1, d3
-	vld1.8 {q3}, [r4], r3 //save pix2 - 1
-	vabal.u8  q13, d0, d4
-	vld1.8 {q8}, [r5], r3 //save pix2 + 1
+    vld1.8 {q0}, [r0], r1 //save pix1
+    vmov.8 q1,   q10      //save pix2 - stride
+    vmov.8 q10,  q2
+    vabal.u8  q15, d0, d2
+    vld1.8 {q2}, [r2], r3 //save pix2 + stride
+    vabal.u8  q15, d1, d3
+    vld1.8 {q3}, [r4], r3 //save pix2 - 1
+    vabal.u8  q13, d0, d4
+    vld1.8 {q8}, [r5], r3 //save pix2 + 1
     vabal.u8  q13, d1, d5
-	subs lr, #1
+    subs lr, #1
 
-	vabal.u8  q11, d0, d6
-	vabal.u8  q11, d1, d7
+    vabal.u8  q11, d0, d6
+    vabal.u8  q11, d1, d7
 
-	vabal.u8  q9, d0, d16
-	vabal.u8  q9, d1, d17
+    vabal.u8  q9, d0, d16
+    vabal.u8  q9, d1, d17
 
-	bne pixel_sad_4_16x16_loop_0
+    bne pixel_sad_4_16x16_loop_0
 
 
     //Save SAD to 'r0'
-	ldr   r0, [sp, #12]
+    ldr   r0, [sp, #12]
 
-	vadd.u16   d0, d30, d31
-	vadd.u16   d1, d26, d27
-	vadd.u16   d2, d22, d23
-	vadd.u16   d3, d18, d19
+    vadd.u16   d0, d30, d31
+    vadd.u16   d1, d26, d27
+    vadd.u16   d2, d22, d23
+    vadd.u16   d3, d18, d19
 
-	vpaddl.u16 q0, q0
-	vpaddl.u16 q1, q1
+    vpaddl.u16 q0, q0
+    vpaddl.u16 q1, q1
 
-	vpaddl.u32 q0, q0
-	vpaddl.u32 q1, q1
+    vpaddl.u32 q0, q0
+    vpaddl.u32 q1, q1
 
-	vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
+    vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
 
-	ldmia sp!, {r4-r5, lr}
+    ldmia sp!, {r4-r5, lr}
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN WelsSampleSadFour16x8_neon
     stmdb sp!, {r4-r5, lr}
 
-	//Generate the pix2 start addr
-	sub   r4, r2, #1
-	add   r5, r2, #1
-	sub   r2, r3
+    //Generate the pix2 start addr
+    sub   r4, r2, #1
+    add   r5, r2, #1
+    sub   r2, r3
 
     //Loading a horizontal line data (16 bytes)
-	vld1.8 {q0}, [r0], r1 //save pix1
+    vld1.8 {q0}, [r0], r1 //save pix1
 
-	vld1.8 {q1}, [r2], r3 //save pix2 - stride
-	vld1.8 {q10}, [r2], r3 //save pix2
-	vld1.8 {q2}, [r2], r3 //save pix2 + stride
+    vld1.8 {q1}, [r2], r3 //save pix2 - stride
+    vld1.8 {q10}, [r2], r3 //save pix2
+    vld1.8 {q2}, [r2], r3 //save pix2 + stride
 
-	vld1.8 {q3}, [r4], r3 //save pix2 - 1
-	vld1.8 {q8}, [r5], r3 //save pix2 + 1
+    vld1.8 {q3}, [r4], r3 //save pix2 - 1
+    vld1.8 {q8}, [r5], r3 //save pix2 + 1
 
-	//Do the SAD for 16 bytes
-	vabdl.u8  q15, d0, d2
-	vabal.u8  q15, d1, d3
+    //Do the SAD for 16 bytes
+    vabdl.u8  q15, d0, d2
+    vabal.u8  q15, d1, d3
 
-	vabdl.u8  q13, d0, d4
-	vabal.u8  q13, d1, d5
+    vabdl.u8  q13, d0, d4
+    vabal.u8  q13, d1, d5
 
-	vabdl.u8  q11, d0, d6
-	vabal.u8  q11, d1, d7
+    vabdl.u8  q11, d0, d6
+    vabal.u8  q11, d1, d7
 
-	vabdl.u8  q9, d0, d16
-	vabal.u8  q9, d1, d17
+    vabdl.u8  q9, d0, d16
+    vabal.u8  q9, d1, d17
 
-	mov lr, #7
+    mov lr, #7
 pixel_sad_4_16x8_loop_0:
 
     //Loading a horizontal line data (16 bytes)
-	vld1.8 {q0}, [r0], r1 //save pix1
-	vmov.8 q1,   q10      //save pix2 - stride
-	vmov.8 q10,  q2
-	vabal.u8  q15, d0, d2
-	vld1.8 {q2}, [r2], r3 //save pix2 + stride
-	vabal.u8  q15, d1, d3
-	vld1.8 {q3}, [r4], r3 //save pix2 - 1
-	vabal.u8  q13, d0, d4
-	vld1.8 {q8}, [r5], r3 //save pix2 + 1
+    vld1.8 {q0}, [r0], r1 //save pix1
+    vmov.8 q1,   q10      //save pix2 - stride
+    vmov.8 q10,  q2
+    vabal.u8  q15, d0, d2
+    vld1.8 {q2}, [r2], r3 //save pix2 + stride
+    vabal.u8  q15, d1, d3
+    vld1.8 {q3}, [r4], r3 //save pix2 - 1
+    vabal.u8  q13, d0, d4
+    vld1.8 {q8}, [r5], r3 //save pix2 + 1
     vabal.u8  q13, d1, d5
-	subs lr, #1
+    subs lr, #1
 
-	vabal.u8  q11, d0, d6
-	vabal.u8  q11, d1, d7
+    vabal.u8  q11, d0, d6
+    vabal.u8  q11, d1, d7
 
-	vabal.u8  q9, d0, d16
-	vabal.u8  q9, d1, d17
+    vabal.u8  q9, d0, d16
+    vabal.u8  q9, d1, d17
 
-	bne pixel_sad_4_16x8_loop_0
+    bne pixel_sad_4_16x8_loop_0
 
     //Save SAD to 'r0'
-	ldr   r0, [sp, #12]
+    ldr   r0, [sp, #12]
 
-	vadd.u16   d0, d30, d31
-	vadd.u16   d1, d26, d27
-	vadd.u16   d2, d22, d23
-	vadd.u16   d3, d18, d19
+    vadd.u16   d0, d30, d31
+    vadd.u16   d1, d26, d27
+    vadd.u16   d2, d22, d23
+    vadd.u16   d3, d18, d19
 
-	vpaddl.u16 q0, q0
-	vpaddl.u16 q1, q1
+    vpaddl.u16 q0, q0
+    vpaddl.u16 q1, q1
 
-	vpaddl.u32 q0, q0
-	vpaddl.u32 q1, q1
+    vpaddl.u32 q0, q0
+    vpaddl.u32 q1, q1
 
-	vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
+    vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
 
-	ldmia sp!, {r4-r5, lr}
+    ldmia sp!, {r4-r5, lr}
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN WelsSampleSadFour8x16_neon
     stmdb sp!, {r4-r5, lr}
 
-	//Generate the pix2 start addr
-	sub   r4, r2, #1
-	add   r5, r2, #1
-	sub   r2, r3
+    //Generate the pix2 start addr
+    sub   r4, r2, #1
+    add   r5, r2, #1
+    sub   r2, r3
 
     //Loading a horizontal line data (8 bytes)
-	vld1.8 {d0}, [r0], r1 //save pix1
+    vld1.8 {d0}, [r0], r1 //save pix1
 
-	vld1.8 {d1}, [r2], r3 //save pix2 - stride
-	vld1.8 {d6}, [r2], r3 //save pix2
-	vld1.8 {d2}, [r2], r3 //save pix2 + stride
+    vld1.8 {d1}, [r2], r3 //save pix2 - stride
+    vld1.8 {d6}, [r2], r3 //save pix2
+    vld1.8 {d2}, [r2], r3 //save pix2 + stride
 
-	vld1.8 {d3}, [r4], r3 //save pix2 - 1
-	vld1.8 {d4}, [r5], r3 //save pix2 + 1
+    vld1.8 {d3}, [r4], r3 //save pix2 - 1
+    vld1.8 {d4}, [r5], r3 //save pix2 + 1
 
-	//Do the SAD for 8 bytes
-	vabdl.u8  q15, d0, d1
-	vabdl.u8  q14, d0, d2
-	vabdl.u8  q13, d0, d3
-	vabdl.u8  q12, d0, d4
+    //Do the SAD for 8 bytes
+    vabdl.u8  q15, d0, d1
+    vabdl.u8  q14, d0, d2
+    vabdl.u8  q13, d0, d3
+    vabdl.u8  q12, d0, d4
 
-	mov lr, #15
+    mov lr, #15
 pixel_sad_4_8x16_loop_0:
 
     //Loading a horizontal line data (8 bytes)
-	vld1.8 {d0}, [r0], r1 //save pix1
-	vmov.8 d1,   d6       //save pix2 - stride
-	vmov.8 d6,   d2
-	vld1.8 {d2}, [r2], r3 //save pix2 + stride
-	vld1.8 {d3}, [r4], r3 //save pix2 - 1
-	vabal.u8  q15, d0, d1
+    vld1.8 {d0}, [r0], r1 //save pix1
+    vmov.8 d1,   d6       //save pix2 - stride
+    vmov.8 d6,   d2
+    vld1.8 {d2}, [r2], r3 //save pix2 + stride
+    vld1.8 {d3}, [r4], r3 //save pix2 - 1
+    vabal.u8  q15, d0, d1
 
-	vld1.8 {d4}, [r5], r3 //save pix2 + 1
-	//Do the SAD for 8 bytes
-	vabal.u8  q14, d0, d2
-	vabal.u8  q13, d0, d3
-	vabal.u8  q12, d0, d4
+    vld1.8 {d4}, [r5], r3 //save pix2 + 1
+    //Do the SAD for 8 bytes
+    vabal.u8  q14, d0, d2
+    vabal.u8  q13, d0, d3
+    vabal.u8  q12, d0, d4
     subs lr, #1
 
-	bne pixel_sad_4_8x16_loop_0
+    bne pixel_sad_4_8x16_loop_0
 
     //Save SAD to 'r0'
-	ldr   r0, [sp, #12]
+    ldr   r0, [sp, #12]
 
-	vadd.u16   d0, d30, d31
-	vadd.u16   d1, d28, d29
-	vadd.u16   d2, d26, d27
-	vadd.u16   d3, d24, d25
+    vadd.u16   d0, d30, d31
+    vadd.u16   d1, d28, d29
+    vadd.u16   d2, d26, d27
+    vadd.u16   d3, d24, d25
 
-	vpaddl.u16 q0, q0
-	vpaddl.u16 q1, q1
+    vpaddl.u16 q0, q0
+    vpaddl.u16 q1, q1
 
-	vpaddl.u32 q0, q0
-	vpaddl.u32 q1, q1
+    vpaddl.u32 q0, q0
+    vpaddl.u32 q1, q1
 
-	vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
+    vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
 
-	ldmia sp!, {r4-r5, lr}
+    ldmia sp!, {r4-r5, lr}
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN WelsSampleSadFour8x8_neon
-	stmdb sp!, {r4-r5, lr}
+    stmdb sp!, {r4-r5, lr}
 
-	//Generate the pix2 start addr
-	sub   r4, r2, #1
-	add   r5, r2, #1
-	sub   r2, r3
+    //Generate the pix2 start addr
+    sub   r4, r2, #1
+    add   r5, r2, #1
+    sub   r2, r3
 
     //Loading a horizontal line data (8 bytes)
-	vld1.8 {d0}, [r0], r1 //save pix1
+    vld1.8 {d0}, [r0], r1 //save pix1
 
-	vld1.8 {d1}, [r2], r3 //save pix2 - stride
-	vld1.8 {d6}, [r2], r3 //save pix2
-	vld1.8 {d2}, [r2], r3 //save pix2 + stride
+    vld1.8 {d1}, [r2], r3 //save pix2 - stride
+    vld1.8 {d6}, [r2], r3 //save pix2
+    vld1.8 {d2}, [r2], r3 //save pix2 + stride
 
-	vld1.8 {d3}, [r4], r3 //save pix2 - 1
-	vld1.8 {d4}, [r5], r3 //save pix2 + 1
+    vld1.8 {d3}, [r4], r3 //save pix2 - 1
+    vld1.8 {d4}, [r5], r3 //save pix2 + 1
 
-	//Do the SAD for 8 bytes
-	vabdl.u8  q15, d0, d1
-	vabdl.u8  q14, d0, d2
-	vabdl.u8  q13, d0, d3
-	vabdl.u8  q12, d0, d4
+    //Do the SAD for 8 bytes
+    vabdl.u8  q15, d0, d1
+    vabdl.u8  q14, d0, d2
+    vabdl.u8  q13, d0, d3
+    vabdl.u8  q12, d0, d4
 
-	mov lr, #7
+    mov lr, #7
 pixel_sad_4_8x8_loop_0:
 
     //Loading a horizontal line data (8 bytes)
-	vld1.8 {d0}, [r0], r1 //save pix1
-	vmov.8 d1,   d6       //save pix2 - stride
-	vmov.8 d6,   d2
-	vld1.8 {d2}, [r2], r3 //save pix2 + stride
-	vld1.8 {d3}, [r4], r3 //save pix2 - 1
-	vabal.u8  q15, d0, d1
+    vld1.8 {d0}, [r0], r1 //save pix1
+    vmov.8 d1,   d6       //save pix2 - stride
+    vmov.8 d6,   d2
+    vld1.8 {d2}, [r2], r3 //save pix2 + stride
+    vld1.8 {d3}, [r4], r3 //save pix2 - 1
+    vabal.u8  q15, d0, d1
 
-	vld1.8 {d4}, [r5], r3 //save pix2 + 1
-	//Do the SAD for 8 bytes
-	vabal.u8  q14, d0, d2
-	vabal.u8  q13, d0, d3
-	vabal.u8  q12, d0, d4
+    vld1.8 {d4}, [r5], r3 //save pix2 + 1
+    //Do the SAD for 8 bytes
+    vabal.u8  q14, d0, d2
+    vabal.u8  q13, d0, d3
+    vabal.u8  q12, d0, d4
     subs lr, #1
-	bne pixel_sad_4_8x8_loop_0
+    bne pixel_sad_4_8x8_loop_0
 
     //Save SAD to 'r0'
-	ldr   r0, [sp, #12]
+    ldr   r0, [sp, #12]
 
-	vadd.u16   d0, d30, d31
-	vadd.u16   d1, d28, d29
-	vadd.u16   d2, d26, d27
-	vadd.u16   d3, d24, d25
+    vadd.u16   d0, d30, d31
+    vadd.u16   d1, d28, d29
+    vadd.u16   d2, d26, d27
+    vadd.u16   d3, d24, d25
 
-	vpaddl.u16 q0, q0
-	vpaddl.u16 q1, q1
+    vpaddl.u16 q0, q0
+    vpaddl.u16 q1, q1
 
-	vpaddl.u32 q0, q0
-	vpaddl.u32 q1, q1
+    vpaddl.u32 q0, q0
+    vpaddl.u32 q1, q1
 
-	vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
+    vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
 
-	ldmia sp!, {r4-r5, lr}
+    ldmia sp!, {r4-r5, lr}
 WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN WelsSampleSadFour4x4_neon
 
-	vld1.32  {d0[0]}, [r0], r1
-	vld1.32  {d0[1]}, [r0], r1
-	vld1.32  {d1[0]}, [r0], r1
-	vld1.32  {d1[1]}, [r0]
+    vld1.32  {d0[0]}, [r0], r1
+    vld1.32  {d0[1]}, [r0], r1
+    vld1.32  {d1[0]}, [r0], r1
+    vld1.32  {d1[1]}, [r0]
 
 
-	sub   r0, r2, r3
-	vld1.32  {d2[0]}, [r0], r3
-	vld1.32  {d2[1]}, [r0], r3
-	vld1.32  {d3[0]}, [r0], r3
-	vld1.32  {d3[1]}, [r0], r3
-	vld1.32  {d4[0]}, [r0], r3
-	vld1.32  {d4[1]}, [r0]
+    sub   r0, r2, r3
+    vld1.32  {d2[0]}, [r0], r3
+    vld1.32  {d2[1]}, [r0], r3
+    vld1.32  {d3[0]}, [r0], r3
+    vld1.32  {d3[1]}, [r0], r3
+    vld1.32  {d4[0]}, [r0], r3
+    vld1.32  {d4[1]}, [r0]
 
-	sub   r0,  r2, #1
-	vld1.32  {d5[0]}, [r0], r3
-	vld1.32  {d5[1]}, [r0], r3
-	vld1.32  {d6[0]}, [r0], r3
-	vld1.32  {d6[1]}, [r0]
+    sub   r0,  r2, #1
+    vld1.32  {d5[0]}, [r0], r3
+    vld1.32  {d5[1]}, [r0], r3
+    vld1.32  {d6[0]}, [r0], r3
+    vld1.32  {d6[1]}, [r0]
 
-	add   r0,  r2, #1
-	vld1.32  {d7[0]}, [r0], r3
-	vld1.32  {d7[1]}, [r0], r3
-	vld1.32  {d8[0]}, [r0], r3
-	vld1.32  {d8[1]}, [r0]
+    add   r0,  r2, #1
+    vld1.32  {d7[0]}, [r0], r3
+    vld1.32  {d7[1]}, [r0], r3
+    vld1.32  {d8[0]}, [r0], r3
+    vld1.32  {d8[1]}, [r0]
 
-	vabdl.u8  q15, d0, d2
-	vabdl.u8  q14, d1, d3
+    vabdl.u8  q15, d0, d2
+    vabdl.u8  q14, d1, d3
 
-	vabdl.u8  q13, d0, d3
-	vabdl.u8  q12, d1, d4
+    vabdl.u8  q13, d0, d3
+    vabdl.u8  q12, d1, d4
 
-	vabdl.u8  q11, d0, d5
-	vabdl.u8  q10, d1, d6
+    vabdl.u8  q11, d0, d5
+    vabdl.u8  q10, d1, d6
 
-	vabdl.u8  q9, d0, d7
-	vabdl.u8  q8, d1, d8
+    vabdl.u8  q9, d0, d7
+    vabdl.u8  q8, d1, d8
 
-	//Save SAD to 'r4'
-	ldr   r0, [sp]
-	vadd.u16   q0, q14, q15
-	vadd.u16   q1, q12, q13
-	vadd.u16   q2, q10, q11
-	vadd.u16   q3, q8 , q9
+    //Save SAD to 'r4'
+    ldr   r0, [sp]
+    vadd.u16   q0, q14, q15
+    vadd.u16   q1, q12, q13
+    vadd.u16   q2, q10, q11
+    vadd.u16   q3, q8 , q9
 
-	vadd.u16   d0, d1
-	vadd.u16   d1, d2, d3
-	vadd.u16   d2, d4, d5
-	vadd.u16   d3, d6, d7
+    vadd.u16   d0, d1
+    vadd.u16   d1, d2, d3
+    vadd.u16   d2, d4, d5
+    vadd.u16   d3, d6, d7
 
-	vpaddl.u16 q0, q0
-	vpaddl.u16 q1, q1
+    vpaddl.u16 q0, q0
+    vpaddl.u16 q1, q1
 
-	vpaddl.u32 q0, q0
-	vpaddl.u32 q1, q1
+    vpaddl.u32 q0, q0
+    vpaddl.u32 q1, q1
 
-	vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
+    vst4.32    {d0[0],d1[0],d2[0],d3[0]}, [r0]
 
 WELS_ASM_FUNC_END
 
@@ -834,16 +834,16 @@ WELS_ASM_FUNC_END
 WELS_ASM_FUNC_BEGIN WelsSampleSatd4x4_neon
 
     //Load the pix1 data --- 16 bytes
-	vld1.32  {d0[0]}, [r0], r1
-	vld1.32  {d0[1]}, [r0], r1
-	vld1.32  {d1[0]}, [r0], r1
-	vld1.32  {d1[1]}, [r0]
+    vld1.32  {d0[0]}, [r0], r1
+    vld1.32  {d0[1]}, [r0], r1
+    vld1.32  {d1[0]}, [r0], r1
+    vld1.32  {d1[1]}, [r0]
 
     //Load the pix2 data --- 16 bytes
-	vld1.32  {d2[0]}, [r2], r3
-	vld1.32  {d2[1]}, [r2], r3
-	vld1.32  {d3[0]}, [r2], r3
-	vld1.32  {d3[1]}, [r2]
+    vld1.32  {d2[0]}, [r2], r3
+    vld1.32  {d2[1]}, [r2], r3
+    vld1.32  {d3[0]}, [r2], r3
+    vld1.32  {d3[1]}, [r2]
 
     //Get the difference
     vsubl.u8 q15, d0, d2 //{0,1,2,3,4,5,6,7}
@@ -874,7 +874,7 @@ WELS_ASM_FUNC_BEGIN WelsSampleSatd4x4_neon
     vpaddl.u16 d0, d0
     vpaddl.u32 d0, d0
 
-	vmov.u32   r0, d0[0]
+    vmov.u32   r0, d0[0]
 
 WELS_ASM_FUNC_END
 

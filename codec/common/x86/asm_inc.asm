@@ -44,15 +44,15 @@
 ;***********************************************************************
 
 %if 1
-	%define MOVDQ movdqa
+    %define MOVDQ movdqa
 %else
-	%define MOVDQ movdqu
+    %define MOVDQ movdqu
 %endif
 
 %if 1
-	%define WELSEMMS	emms
+    %define WELSEMMS emms
 %else
-	%define WELSEMMS
+    %define WELSEMMS
 %endif
 
 
@@ -220,7 +220,7 @@ BITS 32
 
 %macro LOAD_1_PARA 0
     %ifdef X86_32
-	mov r0, [esp + push_num*4 + 4]
+        mov r0, [esp + push_num*4 + 4]
     %endif
 %endmacro
 
@@ -234,8 +234,8 @@ BITS 32
 %macro LOAD_3_PARA 0
     %ifdef X86_32
         mov r0, [esp + push_num*4 + 4]
-	mov r1, [esp + push_num*4 + 8]
-	mov r2, [esp + push_num*4 + 12]
+        mov r1, [esp + push_num*4 + 8]
+        mov r2, [esp + push_num*4 + 12]
     %endif
 %endmacro
 
@@ -267,7 +267,7 @@ BITS 32
 
 %macro LOAD_6_PARA 0
     %ifdef X86_32
-	push r3
+        push r3
         push r4
         push r5
         %assign  push_num push_num+3
@@ -310,22 +310,22 @@ BITS 32
 
 %macro LOAD_4_PARA_POP 0
     %ifdef X86_32
-	pop r3
+        pop r3
     %endif
 %endmacro
 
 %macro LOAD_5_PARA_POP 0
     %ifdef X86_32
         pop r4
-	pop r3
+        pop r3
     %endif
 %endmacro
 
 %macro LOAD_6_PARA_POP 0
     %ifdef X86_32
         pop r5
-  	pop r4
- 	pop r3
+        pop r4
+        pop r3
     %endif
 %endmacro
 
@@ -416,13 +416,13 @@ BITS 32
 
 %macro SIGN_EXTENSION 2
     %ifndef X86_32
-            movsxd %1, %2
+        movsxd %1, %2
     %endif
 %endmacro
 
 %macro SIGN_EXTENSIONW 2
     %ifndef X86_32
-            movsx %1, %2
+        movsx %1, %2
     %endif
 %endmacro
 
@@ -438,13 +438,13 @@ BITS 32
 %endmacro
 
 %macro WELS_AbsW 2
-	pxor        %2, %2
+    pxor        %2, %2
     psubw       %2, %1
     pmaxsw      %1, %2
 %endmacro
 
 %macro MMX_XSwap  4
-    movq		%4, %2
+    movq        %4, %2
     punpckh%1   %4, %3
     punpckl%1   %2, %3
 %endmacro
@@ -485,35 +485,35 @@ BITS 32
 ;in:  m1, m2, m3, m4, m5, m6, m7, m8
 ;pOut: m5, m3, m4, m8, m6, m2, m7, m1
 %macro SSE2_TransTwo8x8B 9
-	movdqa	%9,	%8
-	SSE2_XSawp bw,  %1, %2, %8
-	SSE2_XSawp bw,  %3, %4, %2
-	SSE2_XSawp bw,  %5, %6, %4
-	movdqa	%6, %9
-	movdqa	%9, %4
-	SSE2_XSawp bw,  %7, %6, %4
+    movdqa  %9,     %8
+    SSE2_XSawp bw,  %1, %2, %8
+    SSE2_XSawp bw,  %3, %4, %2
+    SSE2_XSawp bw,  %5, %6, %4
+    movdqa  %6, %9
+    movdqa  %9, %4
+    SSE2_XSawp bw,  %7, %6, %4
 
-	SSE2_XSawp wd,  %1, %3, %6
-	SSE2_XSawp wd,  %8, %2, %3
-	SSE2_XSawp wd,  %5, %7, %2
-	movdqa	%7, %9
-	movdqa	%9, %3
-	SSE2_XSawp wd,  %7, %4, %3
+    SSE2_XSawp wd,  %1, %3, %6
+    SSE2_XSawp wd,  %8, %2, %3
+    SSE2_XSawp wd,  %5, %7, %2
+    movdqa  %7, %9
+    movdqa  %9, %3
+    SSE2_XSawp wd,  %7, %4, %3
 
-	SSE2_XSawp dq,  %1, %5, %4
-	SSE2_XSawp dq,  %6, %2, %5
-	SSE2_XSawp dq,  %8, %7, %2
-	movdqa	%7, %9
-	movdqa	%9, %5
-	SSE2_XSawp dq,  %7, %3, %5
+    SSE2_XSawp dq,  %1, %5, %4
+    SSE2_XSawp dq,  %6, %2, %5
+    SSE2_XSawp dq,  %8, %7, %2
+    movdqa  %7, %9
+    movdqa  %9, %5
+    SSE2_XSawp dq,  %7, %3, %5
 
-	SSE2_XSawp qdq,  %1, %8, %3
-	SSE2_XSawp qdq,  %4, %2, %8
-	SSE2_XSawp qdq,  %6, %7, %2
-	movdqa	%7, %9
-	movdqa	%9, %1
-	SSE2_XSawp qdq,  %7, %5, %1
-	movdqa	%5, %9
+    SSE2_XSawp qdq,  %1, %8, %3
+    SSE2_XSawp qdq,  %4, %2, %8
+    SSE2_XSawp qdq,  %6, %7, %2
+    movdqa  %7, %9
+    movdqa  %9, %1
+    SSE2_XSawp qdq,  %7, %5, %1
+    movdqa  %5, %9
 %endmacro
 
 ;xmm0, xmm6, xmm7, [eax], [ecx]
@@ -528,32 +528,32 @@ BITS 32
 
 ; m2 = m1 + m2, m1 = m1 - m2
 %macro SSE2_SumSub 3
-	movdqa  %3, %2
+    movdqa  %3, %2
     paddw   %2, %1
     psubw   %1, %3
 %endmacro
 
 
-%macro butterfly_1to16_sse	3	; xmm? for dst, xmm? for tmp, one byte for pSrc [generic register name: a/b/c/d]
-	mov %3h, %3l
-	movd %1, e%3x		; i.e, 1% = eax (=b0)
-	pshuflw %2, %1, 00h	; ..., b0 b0 b0 b0 b0 b0 b0 b0
-	pshufd %1, %2, 00h	; b0 b0 b0 b0, b0 b0 b0 b0, b0 b0 b0 b0, b0 b0 b0 b0
+%macro butterfly_1to16_sse      3       ; xmm? for dst, xmm? for tmp, one byte for pSrc [generic register name: a/b/c/d]
+    mov %3h, %3l
+    movd %1, e%3x           ; i.e, 1% = eax (=b0)
+    pshuflw %2, %1, 00h     ; ..., b0 b0 b0 b0 b0 b0 b0 b0
+    pshufd %1, %2, 00h      ; b0 b0 b0 b0, b0 b0 b0 b0, b0 b0 b0 b0, b0 b0 b0 b0
 %endmacro
 
 ;copy a dw into a xmm for 8 times
-%macro  SSE2_Copy8Times 2
-		movd	%1, %2
-		punpcklwd %1, %1
-		pshufd	%1,	%1,	0
+%macro SSE2_Copy8Times 2
+    movd    %1, %2
+    punpcklwd %1, %1
+    pshufd  %1,     %1,     0
 %endmacro
 
 ;copy a db into a xmm for 16 times
-%macro  SSE2_Copy16Times 2
-		movd		%1, %2
-		pshuflw		%1, %1, 0
-		punpcklqdq	%1, %1
-		packuswb	%1,	%1
+%macro SSE2_Copy16Times 2
+    movd            %1, %2
+    pshuflw         %1, %1, 0
+    punpcklqdq      %1, %1
+    packuswb        %1,     %1
 %endmacro
 
 
@@ -564,35 +564,35 @@ BITS 32
 ;dw 32,32,32,32,32,32,32,32 for xmm
 ;dw 32,32,32,32 for mm
 %macro WELS_DW32 1
-	pcmpeqw %1,%1
-	psrlw %1,15
-	psllw %1,5
+    pcmpeqw %1,%1
+    psrlw %1,15
+    psllw %1,5
 %endmacro
 
 ;dw 1, 1, 1, 1, 1, 1, 1, 1 for xmm
 ;dw 1, 1, 1, 1 for mm
 %macro WELS_DW1 1
-	pcmpeqw %1,%1
-	psrlw %1,15
+    pcmpeqw %1,%1
+    psrlw %1,15
 %endmacro
 
 ;all 0 for xmm and mm
-%macro	WELS_Zero 1
-	pxor %1, %1
+%macro WELS_Zero 1
+    pxor %1, %1
 %endmacro
 
 ;dd 1, 1, 1, 1 for xmm
 ;dd 1, 1 for mm
 %macro WELS_DD1 1
-	pcmpeqw %1,%1
-	psrld %1,31
+    pcmpeqw %1,%1
+    psrld %1,31
 %endmacro
 
 ;dB 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 %macro WELS_DB1 1
-	pcmpeqw %1,%1
-	psrlw %1,15
-	packuswb %1,%1
+    pcmpeqw %1,%1
+    psrlw %1,15
+    packuswb %1,%1
 %endmacro
 
 
