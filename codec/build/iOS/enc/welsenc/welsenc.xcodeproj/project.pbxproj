@@ -27,7 +27,6 @@
 		4CE4471218BC605C0017DF25 /* encoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E118BC605C0017DF25 /* encoder.cpp */; };
 		4CE4471318BC605C0017DF25 /* encoder_data_tables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E218BC605C0017DF25 /* encoder_data_tables.cpp */; };
 		4CE4471418BC605C0017DF25 /* encoder_ext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E318BC605C0017DF25 /* encoder_ext.cpp */; };
-		4CE4471518BC605C0017DF25 /* expand_pic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E418BC605C0017DF25 /* expand_pic.cpp */; };
 		4CE4471618BC605C0017DF25 /* get_intra_predictor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E518BC605C0017DF25 /* get_intra_predictor.cpp */; };
 		4CE4471718BC605C0017DF25 /* mc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E618BC605C0017DF25 /* mc.cpp */; };
 		4CE4471818BC605C0017DF25 /* md.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E718BC605C0017DF25 /* md.cpp */; };
@@ -147,7 +146,6 @@
 		4CE446E118BC605C0017DF25 /* encoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = encoder.cpp; sourceTree = "<group>"; };
 		4CE446E218BC605C0017DF25 /* encoder_data_tables.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = encoder_data_tables.cpp; sourceTree = "<group>"; };
 		4CE446E318BC605C0017DF25 /* encoder_ext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = encoder_ext.cpp; sourceTree = "<group>"; };
-		4CE446E418BC605C0017DF25 /* expand_pic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = expand_pic.cpp; sourceTree = "<group>"; };
 		4CE446E518BC605C0017DF25 /* get_intra_predictor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = get_intra_predictor.cpp; sourceTree = "<group>"; };
 		4CE446E618BC605C0017DF25 /* mc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mc.cpp; sourceTree = "<group>"; };
 		4CE446E718BC605C0017DF25 /* md.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = md.cpp; sourceTree = "<group>"; };
@@ -354,7 +352,6 @@
 				4CE446E118BC605C0017DF25 /* encoder.cpp */,
 				4CE446E218BC605C0017DF25 /* encoder_data_tables.cpp */,
 				4CE446E318BC605C0017DF25 /* encoder_ext.cpp */,
-				4CE446E418BC605C0017DF25 /* expand_pic.cpp */,
 				4CE446E518BC605C0017DF25 /* get_intra_predictor.cpp */,
 				4CE446E618BC605C0017DF25 /* mc.cpp */,
 				4CE446E718BC605C0017DF25 /* md.cpp */,
@@ -503,7 +500,6 @@
 				4C34067118C57D0400DFA14A /* pixel_neon.S in Sources */,
 				4CE4471F18BC605C0017DF25 /* ref_list_mgr_svc.cpp in Sources */,
 				4CE4472218BC605C0017DF25 /* slice_multi_threading.cpp in Sources */,
-				4CE4471518BC605C0017DF25 /* expand_pic.cpp in Sources */,
 				4C34067018C57D0400DFA14A /* memory_neon.S in Sources */,
 				4CE4470F18BC605C0017DF25 /* deblocking.cpp in Sources */,
 				4CE4472518BC605C0017DF25 /* svc_encode_mb.cpp in Sources */,
