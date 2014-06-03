@@ -4,7 +4,9 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 LOCAL_MODULE    := wels
 LOCAL_SRC_FILES := ../../../../../libopenh264.so
+ifneq (,$(wildcard $(LOCAL_PATH)/$(LOCAL_SRC_FILES)))
 include $(PREBUILT_SHARED_LIBRARY)
+endif
 
 
 
