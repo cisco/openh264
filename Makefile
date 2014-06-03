@@ -15,7 +15,8 @@ PREFIX=/usr/local
 SHARED=-shared
 OBJ=o
 PROJECT_NAME=openh264
-MODULE_NAME=mozopenh264
+MODULE_NAME=gmpopenh264
+CCASFLAGS=$(CFLAGS)
 
 ifeq (,$(wildcard ./gtest))
 HAVE_GTEST=No
@@ -119,8 +120,14 @@ gtest-bootstrap:
 
 
 ifeq ($(HAVE_GTEST),Yes)
+
 test: codec_unittest$(EXEEXT)
+ifeq (android, $(OS))
+
+else
+
 	./codec_unittest
+endif
 else
 test:
 	@echo "./gtest : No such file or directory."
@@ -182,11 +189,27 @@ include test/api/targets.mk
 include test/decoder/targets.mk
 include test/encoder/targets.mk
 include test/processing/targets.mk
+
+
+LIBRARIES +=$(LIBPREFIX)ut.$(SHAREDLIBSUFFIX)
+$(LIBPREFIX)ut.$(SHAREDLIBSUFFIX): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(PROCESSING_UNITTEST_OBJS) $(API_TEST_OBJS) $(CODEC_UNITTEST_DEPS)
+	$(QUIET)rm -f $@
+	$(QUIET_CXX)$(CXX) $(SHARED) $(LDFLAGS) $(CXX_LINK_O) $+ $(CODEC_UNITTEST_LDFLAGS)
+
 binaries: codec_unittest$(EXEEXT)
 BINARIES += codec_unittest$(EXEEXT)
+
+ifeq (android,$(OS))
+
+
+codec_unittest$(EXEEXT):$(LIBPREFIX)ut.$(SHAREDLIBSUFFIX)
+	cd ./test/build/android && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
+
+else
 codec_unittest$(EXEEXT): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(PROCESSING_UNITTEST_OBJS) $(API_TEST_OBJS) $(CODEC_UNITTEST_DEPS)
 	$(QUIET)rm -f $@
 	$(QUIET_CXX)$(CXX) $(CXX_LINK_O) $+ $(CODEC_UNITTEST_LDFLAGS) $(LDFLAGS)
+endif
 else
 binaries:
 	@:

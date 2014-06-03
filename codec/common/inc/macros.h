@@ -122,7 +122,7 @@ __declspec(align(alignment)) type name[(sizex)*(sizey)]
 #endif//WELS_FLOOR
 
 #ifndef WELS_ROUND
-#define WELS_ROUND(x)	((int32_t)(0.5f+(x)))
+#define WELS_ROUND(x)	((int32_t)(0.5+(x)))
 #endif//WELS_ROUND
 
 #define WELS_NON_ZERO_COUNT_AVERAGE(nC,nA,nB) {		\

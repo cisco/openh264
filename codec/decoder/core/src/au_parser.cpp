@@ -322,12 +322,16 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
       return NULL;
     }
 
+    if ((uiAvailNalNum == 1) && ((NAL_UNIT_CODED_SLICE_IDR == pNalUnitHeader->eNalUnitType)
+                                 || (pCurNal->sNalHeaderExt.bIdrFlag))) {
+      ResetActiveSPSForEachLayer (pCtx);
+    }
     if ((uiAvailNalNum > 1) &&
         CheckAccessUnitBoundary (pCtx, pCurAu->pNalUnitsList[uiAvailNalNum - 1], pCurAu->pNalUnitsList[uiAvailNalNum - 2],
                                  pCurAu->pNalUnitsList[uiAvailNalNum - 1]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps)) {
       pCurAu->uiEndPos = uiAvailNalNum - 2;
       pCtx->bAuReadyFlag = true;
-
+      pCtx->bNextNewSeqBegin = CheckNextAuNewSeq (pCtx, pCurNal, pCurNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps);
 
     }
   }
@@ -407,10 +411,9 @@ bool CheckAccessUnitBoundary (PWelsDecoderContext pCtx, const PNalUnit kpCurNal,
   const SSliceHeader* kpCurSliceHeader = &kpCurNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
   if (pCtx->pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != NULL
       && pCtx->pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != kpSps) {
-    pCtx->bNextNewSeqBegin = true;
     return true; // the active sps changed, new sequence begins, so the current au is ready
   }
- 
+
   //Sub-clause 7.1.4.1.1 temporal_id
   if (kpLastNalHeaderExt->uiTemporalId != kpCurNalHeaderExt->uiTemporalId) {
     return true;
@@ -452,6 +455,17 @@ bool CheckAccessUnitBoundary (PWelsDecoderContext pCtx, const PNalUnit kpCurNal,
     if (kpLastSliceHeader->iDeltaPicOrderCnt[1] != kpCurSliceHeader->iDeltaPicOrderCnt[1])
       return true;
   }
+
+  return false;
+}
+
+bool CheckNextAuNewSeq (PWelsDecoderContext pCtx, const PNalUnit kpCurNal, const PSps kpSps) {
+  const PNalUnitHeaderExt kpCurNalHeaderExt = &kpCurNal->sNalHeaderExt;
+  if (pCtx->pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != NULL
+      && pCtx->pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != kpSps)
+    return true;
+  if (kpCurNalHeaderExt->bIdrFlag)
+    return true;
 
   return false;
 }

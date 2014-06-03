@@ -45,6 +45,7 @@
 #include "util.h"
 #include "WelsFrameWork.h"
 #include "IWelsVP.h"
+#include "macros.h"
 
 WELSVP_NAMESPACE_BEGIN
 

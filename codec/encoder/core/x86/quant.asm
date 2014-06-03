@@ -49,241 +49,241 @@ SECTION .text
 ;************************************************
 
 %macro SSE2_Quant8  5
-		MOVDQ	%1, %5
-		pxor	%2, %2
-		pcmpgtw	%2, %1
-		pxor	%1, %2
-		psubw	%1, %2
-		paddusw	%1, %3
-		pmulhuw	%1, %4
-		pxor	%1, %2
-		psubw	%1, %2
-		MOVDQ	%5, %1
+    MOVDQ   %1, %5
+    pxor    %2, %2
+    pcmpgtw %2, %1
+    pxor    %1, %2
+    psubw   %1, %2
+    paddusw %1, %3
+    pmulhuw %1, %4
+    pxor    %1, %2
+    psubw   %1, %2
+    MOVDQ   %5, %1
 %endmacro
 
 %macro SSE2_QuantMax8  6
-		MOVDQ	%1, %5
-		pxor	%2, %2
-		pcmpgtw	%2, %1
-		pxor	%1, %2
-		psubw	%1, %2
-		paddusw	%1, %3
-		pmulhuw	%1, %4
-		pmaxsw	%6, %1
-		pxor	%1, %2
-		psubw	%1, %2
-		MOVDQ	%5, %1
+    MOVDQ   %1, %5
+    pxor    %2, %2
+    pcmpgtw %2, %1
+    pxor    %1, %2
+    psubw   %1, %2
+    paddusw %1, %3
+    pmulhuw %1, %4
+    pmaxsw  %6, %1
+    pxor    %1, %2
+    psubw   %1, %2
+    MOVDQ   %5, %1
 %endmacro
 
-%define pDct				esp + 4
-%define ff					esp + 8
-%define mf					esp + 12
-%define max					esp + 16
+%define pDct                esp + 4
+%define ff                  esp + 8
+%define mf                  esp + 12
+%define max                 esp + 16
 ;***********************************************************************
-;	void WelsQuant4x4_sse2(int16_t *pDct, int16_t* ff,  int16_t *mf);
+;   void WelsQuant4x4_sse2(int16_t *pDct, int16_t* ff,  int16_t *mf);
 ;***********************************************************************
 WELS_EXTERN WelsQuant4x4_sse2
-		%assign push_num 0
-                LOAD_3_PARA
-		movdqa	xmm2, [r1]
-		movdqa	xmm3, [r2]
+    %assign push_num 0
+    LOAD_3_PARA
+    movdqa  xmm2, [r1]
+    movdqa  xmm3, [r2]
 
-		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0]
-		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x10]
+    SSE2_Quant8 xmm0, xmm1, xmm2, xmm3, [r0]
+    SSE2_Quant8 xmm0, xmm1, xmm2, xmm3, [r0 + 0x10]
 
-		ret
+    ret
 
 ;***********************************************************************
 ;void WelsQuant4x4Dc_sse2(int16_t *pDct, const int16_t ff, int16_t mf);
 ;***********************************************************************
 WELS_EXTERN WelsQuant4x4Dc_sse2
- 		%assign push_num 0
-		LOAD_3_PARA
-		SIGN_EXTENSIONW r1, r1w
-		SIGN_EXTENSIONW r2, r2w
-		SSE2_Copy8Times xmm3, r2d
+    %assign push_num 0
+    LOAD_3_PARA
+    SIGN_EXTENSIONW r1, r1w
+    SIGN_EXTENSIONW r2, r2w
+    SSE2_Copy8Times xmm3, r2d
 
-		SSE2_Copy8Times xmm2, r1d
+    SSE2_Copy8Times xmm2, r1d
 
-		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0]
-		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x10]
+    SSE2_Quant8 xmm0, xmm1, xmm2, xmm3, [r0]
+    SSE2_Quant8 xmm0, xmm1, xmm2, xmm3, [r0 + 0x10]
 
-		ret
+    ret
 
 ;***********************************************************************
-;	void WelsQuantFour4x4_sse2(int16_t *pDct, int16_t* ff,  int16_t *mf);
+;   void WelsQuantFour4x4_sse2(int16_t *pDct, int16_t* ff,  int16_t *mf);
 ;***********************************************************************
 WELS_EXTERN WelsQuantFour4x4_sse2
-		%assign push_num 0
-		LOAD_3_PARA
-		MOVDQ	xmm2, [r1]
-		MOVDQ	xmm3, [r2]
+    %assign push_num 0
+    LOAD_3_PARA
+    MOVDQ   xmm2, [r1]
+    MOVDQ   xmm3, [r2]
 
-		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0]
-		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x10]
-		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x20]
-		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x30]
-		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x40]
-		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x50]
-		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x60]
-		SSE2_Quant8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x70]
+    SSE2_Quant8 xmm0, xmm1, xmm2, xmm3, [r0]
+    SSE2_Quant8 xmm0, xmm1, xmm2, xmm3, [r0 + 0x10]
+    SSE2_Quant8 xmm0, xmm1, xmm2, xmm3, [r0 + 0x20]
+    SSE2_Quant8 xmm0, xmm1, xmm2, xmm3, [r0 + 0x30]
+    SSE2_Quant8 xmm0, xmm1, xmm2, xmm3, [r0 + 0x40]
+    SSE2_Quant8 xmm0, xmm1, xmm2, xmm3, [r0 + 0x50]
+    SSE2_Quant8 xmm0, xmm1, xmm2, xmm3, [r0 + 0x60]
+    SSE2_Quant8 xmm0, xmm1, xmm2, xmm3, [r0 + 0x70]
 
-		ret
+    ret
 
 ;***********************************************************************
-;	void WelsQuantFour4x4Max_sse2(int16_t *pDct, int32_t* f,  int16_t *mf, int16_t *max);
+;   void WelsQuantFour4x4Max_sse2(int16_t *pDct, int32_t* f,  int16_t *mf, int16_t *max);
 ;***********************************************************************
 WELS_EXTERN WelsQuantFour4x4Max_sse2
-		%assign push_num 0
-		LOAD_4_PARA
-		PUSH_XMM 8
-		MOVDQ	xmm2, [r1]
-		MOVDQ	xmm3, [r2]
+    %assign push_num 0
+    LOAD_4_PARA
+    PUSH_XMM 8
+    MOVDQ   xmm2, [r1]
+    MOVDQ   xmm3, [r2]
 
-		pxor	xmm4, xmm4
-		pxor	xmm5, xmm5
-		pxor	xmm6, xmm6
-		pxor	xmm7, xmm7
-		SSE2_QuantMax8	xmm0, xmm1, xmm2, xmm3, [r0	  ], xmm4
-		SSE2_QuantMax8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x10], xmm4
-		SSE2_QuantMax8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x20], xmm5
-		SSE2_QuantMax8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x30], xmm5
-		SSE2_QuantMax8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x40], xmm6
-		SSE2_QuantMax8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x50], xmm6
-		SSE2_QuantMax8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x60], xmm7
-		SSE2_QuantMax8	xmm0, xmm1, xmm2, xmm3, [r0 + 0x70], xmm7
+    pxor    xmm4, xmm4
+    pxor    xmm5, xmm5
+    pxor    xmm6, xmm6
+    pxor    xmm7, xmm7
+    SSE2_QuantMax8  xmm0, xmm1, xmm2, xmm3, [r0   ], xmm4
+    SSE2_QuantMax8  xmm0, xmm1, xmm2, xmm3, [r0 + 0x10], xmm4
+    SSE2_QuantMax8  xmm0, xmm1, xmm2, xmm3, [r0 + 0x20], xmm5
+    SSE2_QuantMax8  xmm0, xmm1, xmm2, xmm3, [r0 + 0x30], xmm5
+    SSE2_QuantMax8  xmm0, xmm1, xmm2, xmm3, [r0 + 0x40], xmm6
+    SSE2_QuantMax8  xmm0, xmm1, xmm2, xmm3, [r0 + 0x50], xmm6
+    SSE2_QuantMax8  xmm0, xmm1, xmm2, xmm3, [r0 + 0x60], xmm7
+    SSE2_QuantMax8  xmm0, xmm1, xmm2, xmm3, [r0 + 0x70], xmm7
 
-		SSE2_TransTwo4x4W xmm4, xmm5, xmm6, xmm7, xmm0
-		pmaxsw  xmm0,  xmm4
-		pmaxsw  xmm0,  xmm5
-		pmaxsw  xmm0,  xmm7
-		movdqa	xmm1,  xmm0
-		punpckhqdq	xmm0, xmm1
-		pmaxsw	xmm0, xmm1
+    SSE2_TransTwo4x4W xmm4, xmm5, xmm6, xmm7, xmm0
+    pmaxsw  xmm0,  xmm4
+    pmaxsw  xmm0,  xmm5
+    pmaxsw  xmm0,  xmm7
+    movdqa  xmm1,  xmm0
+    punpckhqdq  xmm0, xmm1
+    pmaxsw  xmm0, xmm1
 
-		movq	[r3], xmm0
-		POP_XMM
-		LOAD_4_PARA_POP
-		ret
+    movq    [r3], xmm0
+    POP_XMM
+    LOAD_4_PARA_POP
+    ret
 
-%macro  MMX_Copy4Times 2
-		movd		%1, %2
-		punpcklwd	%1, %1
-		punpckldq	%1,	%1
+%macro MMX_Copy4Times 2
+    movd        %1, %2
+    punpcklwd   %1, %1
+    punpckldq   %1, %1
 %endmacro
 
 SECTION .text
 
 %macro MMX_Quant4  4
-		pxor	%2, %2
-		pcmpgtw	%2, %1
-		pxor	%1, %2
-		psubw	%1, %2
-		paddusw	%1, %3
-		pmulhuw	%1, %4
-		pxor	%1, %2
-		psubw	%1, %2
+    pxor    %2, %2
+    pcmpgtw %2, %1
+    pxor    %1, %2
+    psubw   %1, %2
+    paddusw %1, %3
+    pmulhuw %1, %4
+    pxor    %1, %2
+    psubw   %1, %2
 %endmacro
 
 ;***********************************************************************
 ;int32_t WelsHadamardQuant2x2_mmx(int16_t *rs, const int16_t ff, int16_t mf, int16_t * pDct, int16_t * block);
 ;***********************************************************************
 WELS_EXTERN WelsHadamardQuant2x2_mmx
-		%assign push_num 0
-		LOAD_5_PARA
-		SIGN_EXTENSIONW r1, r1w
-		SIGN_EXTENSIONW r2, r2w
-		movd		mm0,			[r0]
-		movd		mm1,			[r0 + 0x20]
-		punpcklwd	mm0,			mm1
-		movd		mm3,			[r0 + 0x40]
-		movd		mm1,			[r0 + 0x60]
-		punpcklwd	mm3,			mm1
+    %assign push_num 0
+    LOAD_5_PARA
+    SIGN_EXTENSIONW r1, r1w
+    SIGN_EXTENSIONW r2, r2w
+    movd        mm0,            [r0]
+    movd        mm1,            [r0 + 0x20]
+    punpcklwd   mm0,            mm1
+    movd        mm3,            [r0 + 0x40]
+    movd        mm1,            [r0 + 0x60]
+    punpcklwd   mm3,            mm1
 
-		;hdm_2x2,	mm0 = dct0 dct1, mm3 = dct2 dct3
-		movq		mm5,			mm3
-		paddw		mm3,			mm0
-		psubw		mm0,			mm5
-		punpcklwd	mm3,			mm0
-		movq		mm1,			mm3
-		psrlq		mm1,			32
-		movq		mm5,			mm1
-		paddw		mm1,			mm3
-		psubw		mm3,			mm5
-		punpcklwd	mm1,			mm3
+    ;hdm_2x2,   mm0 = dct0 dct1, mm3 = dct2 dct3
+    movq        mm5,            mm3
+    paddw       mm3,            mm0
+    psubw       mm0,            mm5
+    punpcklwd   mm3,            mm0
+    movq        mm1,            mm3
+    psrlq       mm1,            32
+    movq        mm5,            mm1
+    paddw       mm1,            mm3
+    psubw       mm3,            mm5
+    punpcklwd   mm1,            mm3
 
-		;quant_2x2_dc
-		MMX_Copy4Times	mm3,		r2d
-		MMX_Copy4Times	mm2,		r1d
-		MMX_Quant4		mm1,	mm0,	mm2,	mm3
+    ;quant_2x2_dc
+    MMX_Copy4Times  mm3,        r2d
+    MMX_Copy4Times  mm2,        r1d
+    MMX_Quant4      mm1,    mm0,    mm2,    mm3
 
-		; store dct_2x2
-		movq		[r3],			mm1
-		movq		[r4],			mm1
+    ; store dct_2x2
+    movq        [r3],           mm1
+    movq        [r4],           mm1
 
-		; pNonZeroCount of dct_2x2
-		pcmpeqb		mm2,			mm2		; mm2 = FF
-		pxor		mm3,			mm3
-		packsswb	mm1,			mm3
-		pcmpeqb		mm1,			mm3		; set FF if equal, 0 if not equal
-		psubsb		mm1,			mm2		; set 0 if equal, 1 if not equal
-		psadbw		mm1,			mm3		;
-		mov			r1w,				0
-		mov			[r0],			r1w
-		mov			[r0 + 0x20],	r1w
-		mov			[r0 + 0x40],	r1w
-		mov			[r0 + 0x60],	r1w
+    ; pNonZeroCount of dct_2x2
+    pcmpeqb     mm2,            mm2     ; mm2 = FF
+    pxor        mm3,            mm3
+    packsswb    mm1,            mm3
+    pcmpeqb     mm1,            mm3     ; set FF if equal, 0 if not equal
+    psubsb      mm1,            mm2     ; set 0 if equal, 1 if not equal
+    psadbw      mm1,            mm3     ;
+    mov         r1w,                0
+    mov         [r0],           r1w
+    mov         [r0 + 0x20],    r1w
+    mov         [r0 + 0x40],    r1w
+    mov         [r0 + 0x60],    r1w
 
 
-		movd		retrd,		mm1
+    movd        retrd,      mm1
 
-		WELSEMMS
-		LOAD_5_PARA_POP
-		ret
+    WELSEMMS
+    LOAD_5_PARA_POP
+    ret
 
 ;***********************************************************************
 ;int32_t WelsHadamardQuant2x2Skip_mmx(int16_t *pDct, int16_t ff,  int16_t mf);
 ;***********************************************************************
 WELS_EXTERN WelsHadamardQuant2x2Skip_mmx
-		%assign push_num 0
-		LOAD_3_PARA
-		SIGN_EXTENSIONW r1, r1w
-		SIGN_EXTENSIONW r2, r2w
-		movd		mm0,			[r0]
-		movd		mm1,			[r0 + 0x20]
-		punpcklwd	mm0,			mm1
-		movd		mm3,			[r0 + 0x40]
-		movd		mm1,			[r0 + 0x60]
-		punpcklwd	mm3,			mm1
+    %assign push_num 0
+    LOAD_3_PARA
+    SIGN_EXTENSIONW r1, r1w
+    SIGN_EXTENSIONW r2, r2w
+    movd        mm0,            [r0]
+    movd        mm1,            [r0 + 0x20]
+    punpcklwd   mm0,            mm1
+    movd        mm3,            [r0 + 0x40]
+    movd        mm1,            [r0 + 0x60]
+    punpcklwd   mm3,            mm1
 
-		;hdm_2x2,	mm0 = dct0 dct1, mm3 = dct2 dct3
-		movq		mm5,			mm3
-		paddw		mm3,			mm0
-		psubw		mm0,			mm5
-		punpcklwd	mm3,			mm0
-		movq		mm1,			mm3
-		psrlq		mm1,			32
-		movq		mm5,			mm1
-		paddw		mm1,			mm3
-		psubw		mm3,			mm5
-		punpcklwd	mm1,			mm3
+    ;hdm_2x2,   mm0 = dct0 dct1, mm3 = dct2 dct3
+    movq        mm5,            mm3
+    paddw       mm3,            mm0
+    psubw       mm0,            mm5
+    punpcklwd   mm3,            mm0
+    movq        mm1,            mm3
+    psrlq       mm1,            32
+    movq        mm5,            mm1
+    paddw       mm1,            mm3
+    psubw       mm3,            mm5
+    punpcklwd   mm1,            mm3
 
-		;quant_2x2_dc
-		MMX_Copy4Times	mm3,		r2d
-		MMX_Copy4Times	mm2,		r1d
-		MMX_Quant4		mm1,	mm0,	mm2,	mm3
+    ;quant_2x2_dc
+    MMX_Copy4Times  mm3,        r2d
+    MMX_Copy4Times  mm2,        r1d
+    MMX_Quant4      mm1,    mm0,    mm2,    mm3
 
-		; pNonZeroCount of dct_2x2
-		pcmpeqb		mm2,			mm2		; mm2 = FF
-		pxor		mm3,			mm3
-		packsswb	mm1,			mm3
-		pcmpeqb		mm1,			mm3		; set FF if equal, 0 if not equal
-		psubsb		mm1,			mm2		; set 0 if equal, 1 if not equal
-		psadbw		mm1,			mm3		;
-		movd		retrd,			mm1
+    ; pNonZeroCount of dct_2x2
+    pcmpeqb     mm2,            mm2     ; mm2 = FF
+    pxor        mm3,            mm3
+    packsswb    mm1,            mm3
+    pcmpeqb     mm1,            mm3     ; set FF if equal, 0 if not equal
+    psubsb      mm1,            mm2     ; set 0 if equal, 1 if not equal
+    psadbw      mm1,            mm3     ;
+    movd        retrd,          mm1
 
-		WELSEMMS
-		ret
+    WELSEMMS
+    ret
 
 
 %macro SSE2_DeQuant8 3
@@ -297,12 +297,12 @@ WELS_EXTERN WelsHadamardQuant2x2Skip_mmx
 ; void WelsDequant4x4_sse2(int16_t *pDct, const uint16_t* mf);
 ;***********************************************************************
 WELS_EXTERN WelsDequant4x4_sse2
-	%assign push_num 0
-	LOAD_2_PARA
+    %assign push_num 0
+    LOAD_2_PARA
 
-	movdqa  xmm1, [r1]
-	SSE2_DeQuant8 [r0	],  xmm0, xmm1
-	SSE2_DeQuant8 [r0 + 0x10],  xmm0, xmm1
+    movdqa  xmm1, [r1]
+    SSE2_DeQuant8 [r0   ],  xmm0, xmm1
+    SSE2_DeQuant8 [r0 + 0x10],  xmm0, xmm1
 
     ret
 
@@ -311,18 +311,18 @@ WELS_EXTERN WelsDequant4x4_sse2
 ;***********************************************************************====
 
 WELS_EXTERN WelsDequantFour4x4_sse2
-	%assign push_num 0
-	LOAD_2_PARA
+    %assign push_num 0
+    LOAD_2_PARA
 
-	movdqa  xmm1, [r1]
-	SSE2_DeQuant8 [r0	],  xmm0, xmm1
-	SSE2_DeQuant8 [r0+0x10	],  xmm0, xmm1
-	SSE2_DeQuant8 [r0+0x20	],  xmm0, xmm1
-	SSE2_DeQuant8 [r0+0x30	],  xmm0, xmm1
-	SSE2_DeQuant8 [r0+0x40	],  xmm0, xmm1
-	SSE2_DeQuant8 [r0+0x50	],  xmm0, xmm1
-	SSE2_DeQuant8 [r0+0x60	],  xmm0, xmm1
-	SSE2_DeQuant8 [r0+0x70	],  xmm0, xmm1
+    movdqa  xmm1, [r1]
+    SSE2_DeQuant8 [r0   ],  xmm0, xmm1
+    SSE2_DeQuant8 [r0+0x10  ],  xmm0, xmm1
+    SSE2_DeQuant8 [r0+0x20  ],  xmm0, xmm1
+    SSE2_DeQuant8 [r0+0x30  ],  xmm0, xmm1
+    SSE2_DeQuant8 [r0+0x40  ],  xmm0, xmm1
+    SSE2_DeQuant8 [r0+0x50  ],  xmm0, xmm1
+    SSE2_DeQuant8 [r0+0x60  ],  xmm0, xmm1
+    SSE2_DeQuant8 [r0+0x70  ],  xmm0, xmm1
 
     ret
 
@@ -330,41 +330,41 @@ WELS_EXTERN WelsDequantFour4x4_sse2
 ;void WelsDequantIHadamard4x4_sse2(int16_t *rs, const uint16_t mf);
 ;***********************************************************************
 WELS_EXTERN WelsDequantIHadamard4x4_sse2
-		%assign push_num 0
-		LOAD_2_PARA
-		%ifndef X86_32
-		movzx r1, r1w
-		%endif
+    %assign push_num 0
+    LOAD_2_PARA
+    %ifndef X86_32
+    movzx r1, r1w
+    %endif
 
-		; WelsDequantLumaDc4x4
-		SSE2_Copy8Times	xmm1,		r1d
-		;psrlw		xmm1,		2		; for the (>>2) in ihdm
-		MOVDQ		xmm0,		[r0]
-		MOVDQ		xmm2,		[r0+0x10]
-		pmullw		xmm0,		xmm1
-		pmullw		xmm2,		xmm1
+    ; WelsDequantLumaDc4x4
+    SSE2_Copy8Times xmm1,       r1d
+    ;psrlw      xmm1,       2       ; for the (>>2) in ihdm
+    MOVDQ       xmm0,       [r0]
+    MOVDQ       xmm2,       [r0+0x10]
+    pmullw      xmm0,       xmm1
+    pmullw      xmm2,       xmm1
 
-		; ihdm_4x4
-		movdqa		xmm1,		xmm0
-		psrldq		xmm1,		8
-		movdqa		xmm3,		xmm2
-		psrldq		xmm3,		8
+    ; ihdm_4x4
+    movdqa      xmm1,       xmm0
+    psrldq      xmm1,       8
+    movdqa      xmm3,       xmm2
+    psrldq      xmm3,       8
 
-		SSE2_SumSub		xmm0, xmm3,	xmm5					; xmm0 = xmm0 - xmm3, xmm3 = xmm0 + xmm3
-		SSE2_SumSub		xmm1, xmm2, xmm5					; xmm1 = xmm1 - xmm2, xmm2 = xmm1 + xmm2
-		SSE2_SumSub		xmm3, xmm2, xmm5					; xmm3 = xmm3 - xmm2, xmm2 = xmm3 + xmm2
-		SSE2_SumSub		xmm0, xmm1, xmm5               		; xmm0 = xmm0 - xmm1, xmm1 = xmm0 + xmm1
+    SSE2_SumSub     xmm0, xmm3, xmm5                    ; xmm0 = xmm0 - xmm3, xmm3 = xmm0 + xmm3
+    SSE2_SumSub     xmm1, xmm2, xmm5                    ; xmm1 = xmm1 - xmm2, xmm2 = xmm1 + xmm2
+    SSE2_SumSub     xmm3, xmm2, xmm5                    ; xmm3 = xmm3 - xmm2, xmm2 = xmm3 + xmm2
+    SSE2_SumSub     xmm0, xmm1, xmm5                    ; xmm0 = xmm0 - xmm1, xmm1 = xmm0 + xmm1
 
-		SSE2_TransTwo4x4W	xmm2, xmm1, xmm3, xmm0, xmm4
-		SSE2_SumSub		xmm2, xmm4,	xmm5
-		SSE2_SumSub		xmm1, xmm0, xmm5
-		SSE2_SumSub		xmm4, xmm0, xmm5
-		SSE2_SumSub		xmm2, xmm1, xmm5
-		SSE2_TransTwo4x4W	xmm0, xmm1, xmm4, xmm2, xmm3
+    SSE2_TransTwo4x4W   xmm2, xmm1, xmm3, xmm0, xmm4
+    SSE2_SumSub     xmm2, xmm4, xmm5
+    SSE2_SumSub     xmm1, xmm0, xmm5
+    SSE2_SumSub     xmm4, xmm0, xmm5
+    SSE2_SumSub     xmm2, xmm1, xmm5
+    SSE2_TransTwo4x4W   xmm0, xmm1, xmm4, xmm2, xmm3
 
-		punpcklqdq	xmm0,		xmm1
-		MOVDQ		[r0],		xmm0
+    punpcklqdq  xmm0,       xmm1
+    MOVDQ       [r0],       xmm0
 
-		punpcklqdq	xmm2,		xmm3
-		MOVDQ		[r0+16],	xmm2
-		ret
+    punpcklqdq  xmm2,       xmm3
+    MOVDQ       [r0+16],    xmm2
+    ret

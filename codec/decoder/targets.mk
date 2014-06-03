@@ -9,7 +9,6 @@ DECODER_CPP_SRCS=\
 	$(DECODER_SRCDIR)/core/src/decoder_core.cpp\
 	$(DECODER_SRCDIR)/core/src/decoder_data_tables.cpp\
 	$(DECODER_SRCDIR)/core/src/error_concealment.cpp\
-	$(DECODER_SRCDIR)/core/src/expand_pic.cpp\
 	$(DECODER_SRCDIR)/core/src/fmo.cpp\
 	$(DECODER_SRCDIR)/core/src/get_intra_predictor.cpp\
 	$(DECODER_SRCDIR)/core/src/manage_dec_ref.cpp\
@@ -50,7 +49,7 @@ $(DECODER_SRCDIR)/%.$(OBJ): $(DECODER_SRCDIR)/%.asm
 	$(QUIET_ASM)$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(DECODER_ASMFLAGS) $(DECODER_ASM_INCLUDES) -o $@ $<
 
 $(DECODER_SRCDIR)/%.$(OBJ): $(DECODER_SRCDIR)/%.S
-	$(QUIET_CCAS)$(CCAS) $(CFLAGS) $(ASMFLAGS) $(INCLUDES) $(DECODER_CFLAGS) $(DECODER_INCLUDES) -c -o $@ $<
+	$(QUIET_CCAS)$(CCAS) $(CCASFLAGS) $(ASMFLAGS) $(INCLUDES) $(DECODER_CFLAGS) $(DECODER_INCLUDES) -c -o $@ $<
 
 $(LIBPREFIX)decoder.$(LIBSUFFIX): $(DECODER_OBJS)
 	$(QUIET)rm -f $@

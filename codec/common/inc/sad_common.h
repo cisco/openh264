@@ -89,6 +89,19 @@ void WelsSampleSadFour4x4_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
 
 #endif
 
+#if defined (HAVE_NEON_AARCH64)
+int32_t WelsSampleSad4x4_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad16x16_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad16x8_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad8x16_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad8x8_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+
+void WelsSampleSadFour16x16_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+void WelsSampleSadFour16x8_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+void WelsSampleSadFour8x16_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+void WelsSampleSadFour8x8_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+void WelsSampleSadFour4x4_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+#endif
 #if defined(__cplusplus)
 }
 #endif//__cplusplus

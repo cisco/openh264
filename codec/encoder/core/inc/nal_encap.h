@@ -71,6 +71,7 @@ typedef struct TagWelsEncoderOutput {
 
 //	SWelsNalRaw		raw_nals[MAX_DEPENDENCY_LAYER*2+MAX_DEPENDENCY_LAYER*MAX_QUALITY_LEVEL]; // AVC: max up to SPS+PPS+max_slice_idc (2 + 8) for FMO;
   SWelsNalRaw*		sNalList;			// nal list, adaptive for AVC/SVC in case single slice, multiple slices or fmo
+  int32_t*      pNalLen;
   int32_t				iCountNals;			// count number of NAL in list
 // SVC: num_sps (MAX_D) + num_pps (MAX_D) + num_vcl (MAX_D * MAX_Q)
   int32_t				iNalIndex;			// coding NAL currently, 0 based

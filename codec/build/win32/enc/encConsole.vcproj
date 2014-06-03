@@ -48,7 +48,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
+				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
 				PreprocessorDefinitions="_DEBUG;_CONSOLE;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -58,7 +58,6 @@
 				ObjectFile=".\..\..\..\obj\encConsole\Debug/"
 				ProgramDataBaseFileName=".\..\..\..\obj\encConsole\Debug/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -77,7 +76,6 @@
 				AdditionalDependencies="$(OutDir)\welsenc.lib"
 				OutputFile="$(OutDir)\encConsole.exe"
 				LinkIncremental="2"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\bin"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\encConsole.pdb"
@@ -99,102 +97,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
-				OutputFile="$(OutDir)\encConsole.bsc"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			OutputDirectory=".\..\..\..\..\bin\win32\Release"
-			IntermediateDirectory=".\..\..\..\obj\encConsole\Release"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TypeLibraryName=".\..\..\..\..\..\bin\Release/encConsole.tlb"
-				HeaderFileName=""
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
-				PreprocessorDefinitions="NDEBUG;_CONSOLE;X86_ASM;"
-				StringPooling="true"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				PrecompiledHeaderFile=".\..\..\..\obj\encConsole\Release/encConsole.pch"
-				AssemblerListingLocation=".\..\..\..\obj\encConsole\Release/"
-				ObjectFile=".\..\..\..\obj\encConsole\Release/"
-				ProgramDataBaseFileName=".\..\..\..\obj\encConsole\Release/"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="$(OutDir)\welsenc.lib"
-				OutputFile="$(OutDir)\encConsole.exe"
-				LinkIncremental="1"
-				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\..\bin"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)\encConsole.pdb"
-				GenerateMapFile="false"
-				MapExports="false"
-				SubSystem="1"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="2"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile="$(OutDir)\encConsole.bsc"
 			/>
 			<Tool
@@ -238,7 +140,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
+				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
 				PreprocessorDefinitions="_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -248,7 +150,6 @@
 				ObjectFile=".\..\..\..\obj\encConsole\Debug/"
 				ProgramDataBaseFileName=".\..\..\..\obj\encConsole\Debug/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -267,7 +168,6 @@
 				AdditionalDependencies="$(OutDir)\welsenc.lib"
 				OutputFile="$(OutDir)\encConsole.exe"
 				LinkIncremental="2"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\bin"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\encConsole.pdb"
@@ -289,7 +189,98 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
+				OutputFile="$(OutDir)\encConsole.bsc"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory=".\..\..\..\..\bin\win32\Release"
+			IntermediateDirectory=".\..\..\..\obj\encConsole\Release"
+			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TypeLibraryName=".\..\..\..\..\..\bin\Release/encConsole.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
+				PreprocessorDefinitions="NDEBUG;_CONSOLE;X86_ASM;"
+				StringPooling="true"
+				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="true"
+				PrecompiledHeaderFile=".\..\..\..\obj\encConsole\Release/encConsole.pch"
+				AssemblerListingLocation=".\..\..\..\obj\encConsole\Release/"
+				ObjectFile=".\..\..\..\obj\encConsole\Release/"
+				ProgramDataBaseFileName=".\..\..\..\obj\encConsole\Release/"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="$(OutDir)\welsenc.lib"
+				OutputFile="$(OutDir)\encConsole.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\..\bin"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(OutDir)\encConsole.pdb"
+				GenerateMapFile="false"
+				MapExports="false"
+				SubSystem="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="2"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
 				OutputFile="$(OutDir)\encConsole.bsc"
 			/>
 			<Tool
@@ -334,7 +325,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\WelsThreadLib\api,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
+				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
 				PreprocessorDefinitions="NDEBUG;_CONSOLE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -344,7 +335,6 @@
 				ObjectFile=".\..\..\..\obj\encConsole\Release/"
 				ProgramDataBaseFileName=".\..\..\..\obj\encConsole\Release/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -363,7 +353,6 @@
 				AdditionalDependencies="$(OutDir)\welsenc.lib"
 				OutputFile="$(OutDir)\encConsole.exe"
 				LinkIncremental="1"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\bin"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\encConsole.pdb"
@@ -385,7 +374,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile="$(OutDir)\encConsole.bsc"
 			/>
 			<Tool
@@ -413,82 +401,10 @@
 			<File
 				RelativePath="..\..\..\console\enc\src\read_config.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\console\enc\src\welsenc.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter

@@ -177,6 +177,12 @@ int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePi
   if (!m_bInitDone) {
     if (WelsPreprocessCreate() != 0)
       return -1;
+
+    //init source width and height
+    pSvcParam->SUsedPicRect.iLeft = 0;
+    pSvcParam->SUsedPicRect.iTop  = 0;
+    pSvcParam->SUsedPicRect.iWidth = ((kpSrcPic->iPicWidth >> 1) << 1);
+    pSvcParam->SUsedPicRect.iHeight = ((kpSrcPic->iPicHeight >> 1) << 1);
     if (WelsPreprocessReset (pCtx) != 0)
       return -1;
 
@@ -921,6 +927,7 @@ void CWelsPreProcess::SaveBestRefToLocal (SRefInfoParam* pRefPicInfo, const SSce
     SRefInfoParam* pRefSaved) {
   pRefSaved->iSrcListIdx = pRefPicInfo->iSrcListIdx;
   pRefSaved->bSceneLtrFlag = pRefPicInfo->bSceneLtrFlag;
+  pRefSaved->pBestBlockStaticIdc = sSceneChangeResult.pStaticBlockIdc;
 }
 
 void CWelsPreProcess::SaveBestRefToVaa (SRefInfoParam& sRefSaved, SRefInfoParam* pVaaBestRef) {
@@ -962,14 +969,12 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
 
   int32_t iNumOfLargeChange = 0, iNumOfMediumChangeToLtr = 0;
 
-  bool bBestRefIsLtr = false, bIsClosestLtrFrame = false;
+  bool bIsClosestLtrFrame = false;
   int32_t ret = 1, iScdIdx = 0;
 
   SPicture* pRefPic = NULL;
   SRefInfoParam* pRefPicInfo = NULL;
   uint8_t*  pCurBlockStaticPointer = NULL;
-  uint8_t*  pBestStrBlockStaticPointer = NULL;
-  uint8_t*  pBestLtrBlockStaticPointer = NULL;
 
   const int32_t iNegligibleMotionBlocks = (static_cast<int32_t> ((pCurPicture->iWidthInPixel >> 3) *
                                           (pCurPicture->iHeightInPixel >> 3) * STATIC_SCENE_MOTION_RATIO));
@@ -991,7 +996,8 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
   for (iScdIdx = 0; iScdIdx < iAvailableRefNum; iScdIdx ++) {
     pCurBlockStaticPointer = pVaaExt->pVaaBlockStaticIdc[iScdIdx];
     sSceneChangeResult.eSceneChangeIdc = SIMILAR_SCENE;
-    sSceneChangeResult.pStaticBlockIdc = pCurBlockStaticPointer;//
+    sSceneChangeResult.pStaticBlockIdc = pCurBlockStaticPointer;
+    sSceneChangeResult.sScrollResult.bScrollDetectFlag = false;
 
     pRefPicInfo = & (sAvailableRefList[iScdIdx]);
     assert (NULL != pRefPicInfo);
@@ -999,8 +1005,22 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
     InitPixMap (pRefPic, &sRefMap);
 
     bIsClosestLtrFrame = (pRefPic->iLongTermPicNum == iClosestLtrFrameNum);
+    if (0 == iScdIdx) {
+      int32_t ret = 1;
+      SScrollDetectionParam* pScrollDetectInfo = & (pVaaExt->sScrollDetectInfo);
+      memset (pScrollDetectInfo, 0, sizeof (SScrollDetectionParam));
 
-    //TBD scrolling detection
+      int32_t iMethodIdx = METHOD_SCROLL_DETECTION;
+
+      m_pInterfaceVp->Set (iMethodIdx, (void*) (pScrollDetectInfo));
+      ret = m_pInterfaceVp->Process (iMethodIdx, &sSrcMap, &sRefMap);
+
+      if (ret == 0) {
+        m_pInterfaceVp->Get (iMethodIdx, (void*) (pScrollDetectInfo));
+      }
+      sSceneChangeResult.sScrollResult = pVaaExt->sScrollDetectInfo;
+    }
+
     m_pInterfaceVp->Set (iSceneChangeMethodIdx, (void*) (&sSceneChangeResult));
     ret = m_pInterfaceVp->Process (iSceneChangeMethodIdx, &sSrcMap, &sRefMap);
 
@@ -1024,13 +1044,10 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
       if (JudgeBestRef (pRefPic, sLtrJudgement, iFrameComplexity, bIsClosestLtrFrame)) {
         SaveBestRefToJudgement (iRefPicAvQP, iFrameComplexity, &sLtrJudgement);
         SaveBestRefToLocal (pRefPicInfo, sSceneChangeResult, &sLtrSaved);
-        bBestRefIsLtr = bCurRefIsLtr;
-        pBestStrBlockStaticPointer = sSceneChangeResult.pStaticBlockIdc;
       }
       if (bCurRefIsLtr && JudgeBestRef (pRefPic, sSceneLtrJudgement, iFrameComplexity, bIsClosestLtrFrame)) {
         SaveBestRefToJudgement (iRefPicAvQP, iFrameComplexity, &sSceneLtrJudgement);
         SaveBestRefToLocal (pRefPicInfo, sSceneChangeResult, &sSceneLtrSaved);
-        pBestLtrBlockStaticPointer = sSceneChangeResult.pStaticBlockIdc;
       }
 
       if (iMotionBlockNum <= iNegligibleMotionBlocks) {
@@ -1051,6 +1068,7 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
            pCtx->iCodingIndex);
 
   SaveBestRefToVaa (sLtrSaved, & (pVaaExt->sVaaStrBestRefCandidate[0]));
+  pVaaExt->pVaaBestBlockStaticIdc = sLtrSaved.pBestBlockStaticIdc;
 
   if (0 == iAvailableSceneRefNum) {
     SaveBestRefToVaa (sSceneLtrSaved, & (pVaaExt->sVaaStrBestRefCandidate[1]));

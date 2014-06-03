@@ -79,8 +79,8 @@ void  InitCoeffFunc (const uint32_t uiCpuFlag);
 
 void  InitCavlcTable();
 
-void  WriteBlockResidualCavlc (int16_t* pCoffLevel, int32_t iEndIdx, int32_t iCalRunLevelFlag,
-                               int32_t iResidualProperty, int8_t iNC, SBitStringAux* pBs);
+int32_t  WriteBlockResidualCavlc (int16_t* pCoffLevel, int32_t iEndIdx, int32_t iCalRunLevelFlag,
+                                  int32_t iResidualProperty, int8_t iNC, SBitStringAux* pBs);
 
 #if defined(__cplusplus)
 extern "C" {

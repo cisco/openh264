@@ -103,7 +103,7 @@
 
 #define ALIGN_RBSP_LEN_FIX		4
 
-#define PADDING_LENGTH			32 // reference extension
+
 #define INTPEL_NEEDED_MARGIN	(3)  // for safe sub-pel MC
 
 #define I420_PLANES				3
@@ -176,6 +176,8 @@
 #define MAX_ACCESS_UINT_CAPACITY	(1<<20)	// Maximal AU capacity in bytes: 1024 KB predefined
 #define MAX_ACCESS_UNIT_CACHE_NUM	2	// Maximal Access Unit(AU) cache number to be processed, denote current AU and the next coming AU.
 
+#define SLICE_NUM_EXPAND_COEF 2
+
 enum {
   BLOCK_16x16 = 0,
   BLOCK_16x8  = 1,
@@ -200,6 +202,7 @@ enum {
   ENC_RETURN_CORRECTED = 0x08, //unexpected value but corrected by encoder
   ENC_RETURN_INVALIDINPUT = 0x10, //invalid input
   ENC_RETURN_MEMOVERFLOWFOUND = 0x20,
+  ENC_RETURN_VLCOVERFLOWFOUND = 0x40
 };
 //TODO: need to complete the return checking in encoder and fill in more types if needed
 

@@ -10,15 +10,18 @@ else
 endif
 ifeq ($(ASM_ARCH), arm)
 CCAS = gas-preprocessor.pl -as-type armasm -force-thumb -- armasm
+CCASFLAGS = -nologo -DHAVE_NEON
 endif
 
 CC=cl
 CXX=cl
 AR=lib
 CXX_O=-Fo$@
-# -DGTEST_HAS_TR1_TUPLE=0 is temporarily broken in gtest,
-# using _VARIADIC_MAX=10 to fix building on MSVC 2012 meanwhile.
-# Once gtest works with the former again, it should be preferred.
+# -D_VARIADIC_MAX=10 is required to fix building gtest on MSVC 2012, but
+# since we don't (easily) know which version of MSVC we use here, we add
+# it unconditionally. The same issue can also be worked around by adding
+# -DGTEST_HAS_TR1_TUPLE=0 instead, but we prefer this version since it
+# matches what gtest itself does.
 CFLAGS += -nologo -W3 -EHsc -fp:precise -Zc:wchar_t -Zc:forScope -D_VARIADIC_MAX=10
 CXX_LINK_O=-nologo -Fe$@
 AR_OPTS=-nologo -out:$@

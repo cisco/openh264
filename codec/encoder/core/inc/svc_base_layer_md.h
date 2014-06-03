@@ -66,6 +66,8 @@ int32_t WelsMdP8x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWe
 /*static*/  void WelsMdInterInit (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb, const int32_t kiSliceFirstMbXY);
 /*static*/ void WelsMdInterFinePartition (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, int32_t bestCost);
 /*static*/ void WelsMdInterFinePartitionVaa (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, int32_t bestCost);
+/*static*/ void WelsMdInterFinePartitionVaaOnScreen (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb,
+    int32_t bestCost);
 void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
 bool WelsMdFirstIntraMode (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache);
 //bool svc_md_first_intra_mode_constrained(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache);

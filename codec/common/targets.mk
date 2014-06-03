@@ -4,6 +4,7 @@ COMMON_CPP_SRCS=\
 	$(COMMON_SRCDIR)/src/cpu.cpp\
 	$(COMMON_SRCDIR)/src/crt_util_safe_x.cpp\
 	$(COMMON_SRCDIR)/src/deblocking_common.cpp\
+	$(COMMON_SRCDIR)/src/expand_pic.cpp\
 	$(COMMON_SRCDIR)/src/logging.cpp\
 	$(COMMON_SRCDIR)/src/sad_common.cpp\
 	$(COMMON_SRCDIR)/src/WelsThreadLib.cpp\
@@ -50,7 +51,7 @@ $(COMMON_SRCDIR)/%.$(OBJ): $(COMMON_SRCDIR)/%.asm
 	$(QUIET_ASM)$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(COMMON_ASMFLAGS) $(COMMON_ASM_INCLUDES) -o $@ $<
 
 $(COMMON_SRCDIR)/%.$(OBJ): $(COMMON_SRCDIR)/%.S
-	$(QUIET_CCAS)$(CCAS) $(CFLAGS) $(ASMFLAGS) $(INCLUDES) $(COMMON_CFLAGS) $(COMMON_INCLUDES) -c -o $@ $<
+	$(QUIET_CCAS)$(CCAS) $(CCASFLAGS) $(ASMFLAGS) $(INCLUDES) $(COMMON_CFLAGS) $(COMMON_INCLUDES) -c -o $@ $<
 
 $(LIBPREFIX)common.$(LIBSUFFIX): $(COMMON_OBJS)
 	$(QUIET)rm -f $@

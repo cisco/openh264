@@ -149,8 +149,9 @@ int32_t MarkECFrameAsRef (PWelsDecoderContext pCtx) {
     pCtx->pDec = NULL;
     return iRet;
   }
-  ExpandReferencingPicture (pCtx->pDec, pCtx->sExpandPicFunc.pExpandLumaPicture,
-                            pCtx->sExpandPicFunc.pExpandChromaPicture);
+  ExpandReferencingPicture (pCtx->pDec->pData, pCtx->pDec->iWidthInPixel, pCtx->pDec->iHeightInPixel,
+                            pCtx->pDec->iLinesize,
+                            pCtx->sExpandPicFunc.pfExpandLumaPicture, pCtx->sExpandPicFunc.pfExpandChromaPicture);
   pCtx->pDec = NULL;
 
   return ERR_NONE;

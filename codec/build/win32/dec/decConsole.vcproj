@@ -49,7 +49,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\api\svc,..\..\..\common\inc,..\..\..\encoder\core\inc"
+				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\api\svc,..\..\..\common\inc"
 				PreprocessorDefinitions="NDEBUG;_CONSOLE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -59,7 +59,6 @@
 				ObjectFile=".\..\..\..\obj\decConsole\Release/"
 				ProgramDataBaseFileName=".\..\..\..\obj\decConsole\Release/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -77,7 +76,6 @@
 				AdditionalDependencies="$(OutDir)\welsdec.lib"
 				OutputFile="$(OutDir)\decConsole.exe"
 				LinkIncremental="1"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\bin\win32"
 				ProgramDatabaseFile="$(OutDir)\decConsole.pdb"
 				GenerateMapFile="false"
@@ -97,7 +95,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile="$(OutDir)\decConsole.bsc"
 			/>
 			<Tool
@@ -142,7 +139,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\api\svc,..\..\..\common\inc,..\..\..\encoder\core\inc"
+				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\api\svc,..\..\..\common\inc"
 				PreprocessorDefinitions="NDEBUG;_CONSOLE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -152,7 +149,6 @@
 				ObjectFile=".\..\..\..\obj\decConsole\Release/"
 				ProgramDataBaseFileName=".\..\..\..\obj\decConsole\Release/"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -170,7 +166,6 @@
 				AdditionalDependencies="$(OutDir)\welsdec.lib"
 				OutputFile="$(OutDir)\decConsole.exe"
 				LinkIncremental="1"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\bin\win64"
 				ProgramDatabaseFile="$(OutDir)\decConsole.pdb"
 				GenerateMapFile="false"
@@ -190,7 +185,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile="$(OutDir)\decConsole.bsc"
 			/>
 			<Tool
@@ -233,7 +227,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\api\svc,..\..\..\common\inc,..\..\..\decoder\core\inc,..\..\..\encoder\core\inc"
+				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\api\svc,..\..\..\common\inc"
 				PreprocessorDefinitions="_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -244,7 +238,6 @@
 				ProgramDataBaseFileName=".\..\..\..\obj\decConsole\Debug/"
 				BrowseInformation="1"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -263,7 +256,6 @@
 				AdditionalDependencies="$(OutDir)\welsdec.lib"
 				OutputFile="$(OutDir)\decConsoled.exe"
 				LinkIncremental="2"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\bin\win32"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\decConsoled.pdb"
@@ -283,7 +275,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile="$(OutDir)\decConsole.bsc"
 			/>
 			<Tool
@@ -327,7 +318,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\api\svc,..\..\..\common\inc,..\..\..\decoder\core\inc,..\..\..\encoder\core\inc"
+				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\api\svc,..\..\..\common\inc"
 				PreprocessorDefinitions="_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -338,7 +329,6 @@
 				ProgramDataBaseFileName=".\..\..\..\obj\decConsole\Debug/"
 				BrowseInformation="1"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -357,7 +347,6 @@
 				AdditionalDependencies="$(OutDir)\welsdec.lib"
 				OutputFile="$(OutDir)\decConsoled.exe"
 				LinkIncremental="2"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\bin\win64"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\decConsoled.pdb"
@@ -377,7 +366,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
 				OutputFile="$(OutDir)\decConsole.bsc"
 			/>
 			<Tool
@@ -405,42 +393,6 @@
 			<File
 				RelativePath="..\..\..\console\dec\src\h264dec.cpp"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\common\src\logging.cpp"
@@ -449,42 +401,6 @@
 			<File
 				RelativePath="..\..\..\console\dec\src\read_config.cpp"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter

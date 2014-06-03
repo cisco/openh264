@@ -64,7 +64,7 @@ class CWelsDecoder : public ISVCDecoder {
 
   /***************************************************************************
   *	Description:
-  *		Decompress one frame, and output RGB24 or YV12 decoded stream and its length.
+  *		Decompress one frame, and output I420 or RGB24(in the future) decoded stream and its length.
   *	Input parameters:
   *       Parameter		TYPE			       Description
   *       pSrc             unsigned char*         the h264 stream to decode
@@ -83,7 +83,7 @@ class CWelsDecoder : public ISVCDecoder {
 
   virtual DECODING_STATE EXTAPI DecodeFrame2 (const unsigned char* kpSrc,
       const int kiSrcLen,
-      void** ppDst,
+      unsigned char** ppDst,
       SBufferInfo* pDstInfo);
   virtual DECODING_STATE EXTAPI DecodeFrameEx (const unsigned char* kpSrc,
       const int kiSrcLen,

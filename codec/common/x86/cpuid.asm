@@ -29,13 +29,13 @@
 ;*     POSSIBILITY OF SUCH DAMAGE.
 ;*
 ;*
-;*	cpu_mmx.asm
+;*  cpu_mmx.asm
 ;*
 ;*  Abstract
-;*		verify cpuid feature support and cpuid detection
+;*      verify cpuid feature support and cpuid detection
 ;*
 ;*  History
-;*      04/29/2009	Created
+;*      04/29/2009  Created
 ;*
 ;*************************************************************************/
 
@@ -115,13 +115,13 @@ WELS_EXTERN WelsCPUId
 %elifdef     X86_32
 
 WELS_EXTERN WelsCPUId
-    push	ebx
-    push	edi
+    push    ebx
+    push    edi
 
-    mov     eax, [esp+12]	; operating index
+    mov     eax, [esp+12]   ; operating index
     mov     edi, [esp+24]
     mov     ecx, [edi]
-    cpuid					; cpuid
+    cpuid                   ; cpuid
 
     ; processing various information return
     mov     edi, [esp+16]
@@ -133,7 +133,7 @@ WELS_EXTERN WelsCPUId
     mov     edi, [esp+28]
     mov     [edi], edx
 
-    pop	    edi
+    pop     edi
     pop     ebx
     ret
 
@@ -145,31 +145,31 @@ WELS_EXTERN WelsCPUId
 ;****************************************************************************************************
 WELS_EXTERN WelsCPUSupportAVX
 %ifdef     WIN64
-        mov   eax,    ecx
-        mov   ecx,    edx
+    mov   eax,    ecx
+    mov   ecx,    edx
 %elifdef   UNIX64
-        mov eax, edi
-        mov ecx, esi
+    mov eax, edi
+    mov ecx, esi
 %else
-        mov eax, [esp+4]
-        mov ecx, [esp+8]
+    mov eax, [esp+4]
+    mov ecx, [esp+8]
 %endif
 
-        ; refer to detection of AVX addressed in INTEL AVX manual document
-        and ecx, 018000000H
-        cmp ecx, 018000000H             ; check both OSXSAVE and AVX feature flags
-        jne avx_not_supported
-        ; processor supports AVX instructions and XGETBV is enabled by OS
-        mov ecx, 0                              ; specify 0 for XFEATURE_ENABLED_MASK register
-        XGETBV                                  ; result in EDX:EAX
-        and eax, 06H
-        cmp eax, 06H                    ; check OS has enabled both XMM and YMM state support
-        jne avx_not_supported
-        mov eax, 1
-        ret
+    ; refer to detection of AVX addressed in INTEL AVX manual document
+    and ecx, 018000000H
+    cmp ecx, 018000000H             ; check both OSXSAVE and AVX feature flags
+    jne avx_not_supported
+    ; processor supports AVX instructions and XGETBV is enabled by OS
+    mov ecx, 0                              ; specify 0 for XFEATURE_ENABLED_MASK register
+    XGETBV                                  ; result in EDX:EAX
+    and eax, 06H
+    cmp eax, 06H                    ; check OS has enabled both XMM and YMM state support
+    jne avx_not_supported
+    mov eax, 1
+    ret
 avx_not_supported:
-        mov eax, 0
-        ret
+    mov eax, 0
+    ret
 
 
 ; need call after cpuid=1 and eax, ecx flag got then
@@ -178,35 +178,35 @@ avx_not_supported:
 ;****************************************************************************************************
 WELS_EXTERN  WelsCPUSupportFMA
 %ifdef     WIN64
-        mov   eax,   ecx
-        mov   ecx,   edx
+    mov   eax,   ecx
+    mov   ecx,   edx
 %elifdef   UNIX64
-        mov   eax,   edi
-        mov   ecx,   esi
+    mov   eax,   edi
+    mov   ecx,   esi
 %else
-	mov eax, [esp+4]
-	mov ecx, [esp+8]
+    mov eax, [esp+4]
+    mov ecx, [esp+8]
 %endif
-	; refer to detection of FMA addressed in INTEL AVX manual document
-	and ecx, 018001000H
-	cmp ecx, 018001000H		; check OSXSAVE, AVX, FMA feature flags
-	jne fma_not_supported
-	; processor supports AVX,FMA instructions and XGETBV is enabled by OS
-	mov ecx, 0				; specify 0 for XFEATURE_ENABLED_MASK register
-	XGETBV					; result in EDX:EAX
-	and eax, 06H
-	cmp eax, 06H			; check OS has enabled both XMM and YMM state support
-	jne fma_not_supported
-	mov eax, 1
-	ret
+    ; refer to detection of FMA addressed in INTEL AVX manual document
+    and ecx, 018001000H
+    cmp ecx, 018001000H     ; check OSXSAVE, AVX, FMA feature flags
+    jne fma_not_supported
+    ; processor supports AVX,FMA instructions and XGETBV is enabled by OS
+    mov ecx, 0              ; specify 0 for XFEATURE_ENABLED_MASK register
+    XGETBV                  ; result in EDX:EAX
+    and eax, 06H
+    cmp eax, 06H            ; check OS has enabled both XMM and YMM state support
+    jne fma_not_supported
+    mov eax, 1
+    ret
 fma_not_supported:
-	mov eax, 0
-	ret
+    mov eax, 0
+    ret
 
 ;******************************************************************************************
 ;   void WelsEmms()
 ;******************************************************************************************
 WELS_EXTERN WelsEmms
-	emms	; empty mmx technology states
-	ret
+    emms    ; empty mmx technology states
+    ret
 

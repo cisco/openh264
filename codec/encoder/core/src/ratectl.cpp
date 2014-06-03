@@ -62,8 +62,7 @@ void RcInitLayerMemory (SWelsSvcRc* pWelsSvcRc, CMemoryAlign* pMA, const int32_t
   const int32_t kiGomSize				= pWelsSvcRc->iGomSize;
   const int32_t kiGomSizeD			= kiGomSize * sizeof (double);
   const int32_t kiGomSizeI			= kiGomSize * sizeof (int32_t);
-  const int32_t kiLayerRcSize			= kiGomSizeD + (kiGomSizeI * 3) + sizeof (SRCSlicing) * kiSliceNum + sizeof (
-                                      SRCTemporal) * kiMaxTl;
+  const int32_t kiLayerRcSize			= kiGomSizeD + (kiGomSizeI * 3) +  sizeof (SRCTemporal) * kiMaxTl;
   uint8_t* pBaseMem					= (uint8_t*)pMA->WelsMalloc (kiLayerRcSize, "rc_layer_memory");
 
   if (NULL == pBaseMem)
@@ -77,19 +76,22 @@ void RcInitLayerMemory (SWelsSvcRc* pWelsSvcRc, CMemoryAlign* pMA, const int32_t
   pBaseMem += kiGomSizeI;
   pWelsSvcRc->pGomCost					= (int32_t*)pBaseMem;
   pBaseMem += kiGomSizeI;
-  pWelsSvcRc->pSlicingOverRc			= (SRCSlicing*)pBaseMem;
-  pBaseMem += sizeof (SRCSlicing) * kiSliceNum;
   pWelsSvcRc->pTemporalOverRc			= (SRCTemporal*)pBaseMem;
+
+  pWelsSvcRc->pSlicingOverRc			= (SRCSlicing*)pMA->WelsMalloc(sizeof (SRCSlicing) * kiSliceNum, "SlicingOverRC");
 }
 
 void RcFreeLayerMemory (SWelsSvcRc* pWelsSvcRc, CMemoryAlign* pMA) {
+  if (pWelsSvcRc != NULL && pWelsSvcRc->pSlicingOverRc != NULL) {
+    pMA->WelsFree (pWelsSvcRc->pSlicingOverRc, "SlicingOverRC");
+    pWelsSvcRc->pSlicingOverRc = NULL;
+  }
   if (pWelsSvcRc != NULL && pWelsSvcRc->pGomComplexity != NULL) {
     pMA->WelsFree (pWelsSvcRc->pGomComplexity, "rc_layer_memory");
     pWelsSvcRc->pGomComplexity			= NULL;
     pWelsSvcRc->pGomForegroundBlockNum	= NULL;
     pWelsSvcRc->pCurrentFrameGomSad	= NULL;
     pWelsSvcRc->pGomCost				= NULL;
-    pWelsSvcRc->pSlicingOverRc			= NULL;
     pWelsSvcRc->pTemporalOverRc		= NULL;
   }
 }
@@ -127,10 +129,10 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
 
     pWelsSvcRc->dSkipBufferRatio  = SKIP_RATIO;
 
-    pWelsSvcRc->iQpRangeUpperInFrame = QP_RANGE_UPPER_MODE1 - (int32_t) ((QP_RANGE_UPPER_MODE1 - QP_RANGE_MODE0) *
-                                       pWelsSvcRc->dRcVaryRatio + 0.5);
-    pWelsSvcRc->iQpRangeLowerInFrame = QP_RANGE_LOWER_MODE1 - (int32_t) ((QP_RANGE_LOWER_MODE1 - QP_RANGE_MODE0) *
-                                       pWelsSvcRc->dRcVaryRatio + 0.5);
+    pWelsSvcRc->iQpRangeUpperInFrame = QP_RANGE_UPPER_MODE1 - WELS_ROUND ((QP_RANGE_UPPER_MODE1 - QP_RANGE_MODE0) *
+                                       pWelsSvcRc->dRcVaryRatio);
+    pWelsSvcRc->iQpRangeLowerInFrame = QP_RANGE_LOWER_MODE1 - WELS_ROUND ((QP_RANGE_LOWER_MODE1 - QP_RANGE_MODE0) *
+                                       pWelsSvcRc->dRcVaryRatio);
 
     if (iMbWidth <= MB_WIDTH_THRESHOLD_90P) {
       pWelsSvcRc->iSkipQpValue = SKIP_QP_90P;
@@ -149,17 +151,17 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
       iGomRowMode0 = GOM_ROW_MODE0_720P;
       iGomRowMode1 = GOM_ROW_MODE1_720P;
     }
-    iGomRowMode0 = iGomRowMode1 + (int32_t) ((iGomRowMode0 - iGomRowMode1) * pWelsSvcRc->dRcVaryRatio + 0.5);
+    iGomRowMode0 = iGomRowMode1 + WELS_ROUND ((iGomRowMode0 - iGomRowMode1) * pWelsSvcRc->dRcVaryRatio);
 
     pWelsSvcRc->iNumberMbGom   = iMbWidth * iGomRowMode0;
 
     pWelsSvcRc->iMinQp = GOM_MIN_QP_MODE;
     pWelsSvcRc->iMaxQp = GOM_MAX_QP_MODE;
 
-    pWelsSvcRc->iFrameDeltaQpUpper = LAST_FRAME_QP_RANGE_UPPER_MODE1 - (int32_t) ((LAST_FRAME_QP_RANGE_UPPER_MODE1 -
-                                     LAST_FRAME_QP_RANGE_UPPER_MODE0) * pWelsSvcRc->dRcVaryRatio + 0.5);
-    pWelsSvcRc->iFrameDeltaQpLower = LAST_FRAME_QP_RANGE_LOWER_MODE1 - (int32_t) ((LAST_FRAME_QP_RANGE_LOWER_MODE1 -
-                                     LAST_FRAME_QP_RANGE_LOWER_MODE0) * pWelsSvcRc->dRcVaryRatio + 0.5);
+    pWelsSvcRc->iFrameDeltaQpUpper = LAST_FRAME_QP_RANGE_UPPER_MODE1 - WELS_ROUND ((LAST_FRAME_QP_RANGE_UPPER_MODE1 -
+                                     LAST_FRAME_QP_RANGE_UPPER_MODE0) * pWelsSvcRc->dRcVaryRatio);
+    pWelsSvcRc->iFrameDeltaQpLower = LAST_FRAME_QP_RANGE_LOWER_MODE1 - WELS_ROUND ((LAST_FRAME_QP_RANGE_LOWER_MODE1 -
+                                     LAST_FRAME_QP_RANGE_LOWER_MODE0) * pWelsSvcRc->dRcVaryRatio);
 
     pWelsSvcRc->iSkipFrameNum = 0;
     pWelsSvcRc->iGomSize = (pWelsSvcRc->iNumberMbFrame + pWelsSvcRc->iNumberMbGom - 1) / pWelsSvcRc->iNumberMbGom;
@@ -213,7 +215,7 @@ void RcUpdateBitrateFps (sWelsEncCtx* pEncCtx) {
   const int32_t kiGopSize	= (1 << pDLayerParam->iDecompositionStages);
   const int32_t kiHighestTid = pDLayerParam->iHighestTemporalId;
   double input_dBitsPerFrame = pDLayerParam->iSpatialBitrate / pDLayerParam->fInputFrameRate;
-  const int32_t kiGopBits	= (int32_t) (input_dBitsPerFrame * kiGopSize);
+  const int32_t kiGopBits	= WELS_ROUND (input_dBitsPerFrame * kiGopSize);
   int32_t i;
 
   pWelsSvcRc->iBitRate   = pDLayerParam->iSpatialBitrate;
@@ -225,16 +227,16 @@ void RcUpdateBitrateFps (sWelsEncCtx* pEncCtx) {
 
   for (i = 0; i <= kiHighestTid; i++) {
     const double kdConstraitBits = kiGopBits * pTOverRc[i].dTlayerWeight;
-    pTOverRc[i].iMinBitsTl = (int32_t) (kdConstraitBits * dMinBitsRatio);
-    pTOverRc[i].iMaxBitsTl = (int32_t) (kdConstraitBits * dMaxBitsRatio);
+    pTOverRc[i].iMinBitsTl = WELS_ROUND (kdConstraitBits * dMinBitsRatio);
+    pTOverRc[i].iMaxBitsTl = WELS_ROUND (kdConstraitBits * dMaxBitsRatio);
   }
   //When bitrate is changed, pBuffer size should be updated
-  pWelsSvcRc->iBufferSizeSkip = (int32_t) (pWelsSvcRc->iBitRate * pWelsSvcRc->dSkipBufferRatio);
-  pWelsSvcRc->iBufferSizePadding = (int32_t) (pWelsSvcRc->iBitRate * PADDING_BUFFER_RATIO);
+  pWelsSvcRc->iBufferSizeSkip = WELS_ROUND (pWelsSvcRc->iBitRate * pWelsSvcRc->dSkipBufferRatio);
+  pWelsSvcRc->iBufferSizePadding = WELS_ROUND (pWelsSvcRc->iBitRate * PADDING_BUFFER_RATIO);
 
   //change remaining bits
   if (pWelsSvcRc->dBitsPerFrame > 0.1)
-    pWelsSvcRc->iRemainingBits = (int32_t) (pWelsSvcRc->iRemainingBits * input_dBitsPerFrame / pWelsSvcRc->dBitsPerFrame);
+    pWelsSvcRc->iRemainingBits = WELS_ROUND (pWelsSvcRc->iRemainingBits * input_dBitsPerFrame / pWelsSvcRc->dBitsPerFrame);
   pWelsSvcRc->dBitsPerFrame = input_dBitsPerFrame;
 }
 
@@ -245,7 +247,7 @@ void RcInitVGop (sWelsEncCtx* pEncCtx) {
   SRCTemporal* pTOverRc		= pWelsSvcRc->pTemporalOverRc;
   const int32_t kiHighestTid = pEncCtx->pSvcParam->sDependencyLayers[kiDid].iHighestTemporalId;
 
-  pWelsSvcRc->iRemainingBits = (int32_t) (VGOP_SIZE * pWelsSvcRc->dBitsPerFrame);
+  pWelsSvcRc->iRemainingBits = WELS_ROUND (VGOP_SIZE * pWelsSvcRc->dBitsPerFrame);
   pWelsSvcRc->dRemainingWeights = pWelsSvcRc->iGopNumberInVGop;
 
   pWelsSvcRc->iFrameCodedInVGop = 0;
@@ -325,9 +327,9 @@ void RcTraceVGopBitrate (sWelsEncCtx* pEncCtx) {
     }
     int32_t iFrameInVGop = pWelsSvcRc->iFrameCodedInVGop + pWelsSvcRc->iSkipFrameInVGop;
     if (0 != iFrameInVGop)
-      iVGopBitrate = (int32_t) (iTotalBits / iFrameInVGop * pWelsSvcRc->fFrameRate);
+      iVGopBitrate = WELS_ROUND (iTotalBits / iFrameInVGop * pWelsSvcRc->fFrameRate);
 #ifdef _TEST_TEMP_Rc_
-    fprintf (fp_vgop, "%d\n", (int32_t) ((double)iTotalBits / iFrameInVGop));
+    fprintf (fp_vgop, "%d\n", WELS_ROUND ((double)iTotalBits / iFrameInVGop));
 #endif
     WelsLog (pEncCtx, WELS_LOG_INFO, "[Rc] VGOPbitrate%d: %d \n", kiDid, iVGopBitrate);
     if (iTotalBits > 0) {
@@ -400,7 +402,7 @@ void RcInitIdrQp (sWelsEncCtx* pEncCtx) {
       break;
   }
   pWelsSvcRc->iInitialQp = dInitialQPArray[iBppIndex][i];
-  pWelsSvcRc->iInitialQp = (int32_t)WELS_CLIP3 (pWelsSvcRc->iInitialQp, MIN_IDR_QP, MAX_IDR_QP);
+  pWelsSvcRc->iInitialQp = WELS_CLIP3 (pWelsSvcRc->iInitialQp, MIN_IDR_QP, MAX_IDR_QP);
   pEncCtx->iGlobalQp = pWelsSvcRc->iInitialQp;
   pWelsSvcRc->dQStep = RcConvertQp2QStep (pEncCtx->iGlobalQp);
   pWelsSvcRc->iLastCalculatedQScale = pEncCtx->iGlobalQp;
@@ -410,11 +412,12 @@ void RcCalculateIdrQp (sWelsEncCtx* pEncCtx) {
   SWelsSvcRc* pWelsSvcRc			= &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   //obtain the idr qp using previous idr complexity
   if (pWelsSvcRc->iNumberMbFrame != pWelsSvcRc->iIntraMbCount) {
-    pWelsSvcRc->iIntraComplexity = (int32_t) ((double)pWelsSvcRc->iIntraComplexity * pWelsSvcRc->iNumberMbFrame /
-                                   pWelsSvcRc->iIntraMbCount + 0.5);
+    pWelsSvcRc->iIntraComplexity = WELS_ROUND ((double)pWelsSvcRc->iIntraComplexity * pWelsSvcRc->iNumberMbFrame /
+                                   pWelsSvcRc->iIntraMbCount);
   }
-  pWelsSvcRc->iInitialQp = (int32_t)RcConvertQStep2Qp ((double)pWelsSvcRc->iIntraComplexity / pWelsSvcRc->iTargetBits);
-  pWelsSvcRc->iInitialQp = (int32_t)WELS_CLIP3 (pWelsSvcRc->iInitialQp, MIN_IDR_QP, MAX_IDR_QP);
+  pWelsSvcRc->iInitialQp = WELS_ROUND (RcConvertQStep2Qp ((double)pWelsSvcRc->iIntraComplexity /
+                                       pWelsSvcRc->iTargetBits));
+  pWelsSvcRc->iInitialQp = WELS_CLIP3 (pWelsSvcRc->iInitialQp, MIN_IDR_QP, MAX_IDR_QP);
   pEncCtx->iGlobalQp = pWelsSvcRc->iInitialQp;
   pWelsSvcRc->dQStep = RcConvertQp2QStep (pEncCtx->iGlobalQp);
   pWelsSvcRc->iLastCalculatedQScale = pEncCtx->iGlobalQp;
@@ -451,7 +454,7 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
     pWelsSvcRc->iLastCalculatedQScale = iLumaQp;
 
     if (pEncCtx->pSvcParam->bEnableAdaptiveQuant) {
-      iLumaQp = (int32_t) (iLumaQp - pEncCtx->pVaa->sAdaptiveQuantParam.dAverMotionTextureIndexToDeltaQp);
+      iLumaQp = WELS_ROUND (iLumaQp - pEncCtx->pVaa->sAdaptiveQuantParam.dAverMotionTextureIndexToDeltaQp);
     }
 
     pEncCtx->iGlobalQp = iLumaQp;
@@ -462,7 +465,7 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
     dCmplxRatio = WELS_CLIP3 (dCmplxRatio, 1.0 - FRAME_CMPLX_RATIO_RANGE, 1.0 + FRAME_CMPLX_RATIO_RANGE);
 
     pWelsSvcRc->dQStep = pTOverRc->dLinearCmplx * dCmplxRatio / pWelsSvcRc->iTargetBits;
-    iLumaQp = (int32_t) (RcConvertQStep2Qp (pWelsSvcRc->dQStep) + 0.5);
+    iLumaQp = WELS_ROUND (RcConvertQStep2Qp (pWelsSvcRc->dQStep));
 
     //limit QP
     int32_t iLastIdxCodecInVGop = pWelsSvcRc->iFrameCodedInVGop - 1;
@@ -487,10 +490,10 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
 #ifndef _NOT_USE_AQ_FOR_TEST_
   if (pEncCtx->pSvcParam->bEnableAdaptiveQuant) {
 
-    iLumaQp = (int32_t) (iLumaQp - pEncCtx->pVaa->sAdaptiveQuantParam.dAverMotionTextureIndexToDeltaQp);
+    iLumaQp = WELS_ROUND (iLumaQp - pEncCtx->pVaa->sAdaptiveQuantParam.dAverMotionTextureIndexToDeltaQp);
 
     if (pEncCtx->pSvcParam->iRCMode != RC_LOW_BW_MODE)
-      iLumaQp = (int32_t)WELS_CLIP3 (iLumaQp, pWelsSvcRc->iMinQp, pWelsSvcRc->iMaxQp);
+      iLumaQp = WELS_CLIP3 (iLumaQp, pWelsSvcRc->iMinQp, pWelsSvcRc->iMaxQp);
 
   }
 #endif
@@ -510,7 +513,7 @@ void RcInitSliceInformation (sWelsEncCtx* pEncCtx) {
     pSOverRc->iEndMbSlice		+= (pCurSliceCtx->pCountMbNumInSlice[i] - 1);
     pSOverRc->iTotalQpSlice	= 0;
     pSOverRc->iTotalMbSlice	= 0;
-    pSOverRc->iTargetBitsSlice = (int32_t) (kdBitsPerMb * pCurSliceCtx->pCountMbNumInSlice[i]);
+    pSOverRc->iTargetBitsSlice = WELS_ROUND (kdBitsPerMb * pCurSliceCtx->pCountMbNumInSlice[i]);
     pSOverRc->iFrameBitsSlice	= 0;
     pSOverRc->iGomBitsSlice	= 0;
     ++ pSOverRc;
@@ -524,10 +527,10 @@ void RcDecideTargetBits (sWelsEncCtx* pEncCtx) {
   pWelsSvcRc->iCurrentBitsLevel = BITS_NORMAL;
   //allocate bits
   if (pEncCtx->eSliceType == I_SLICE) {
-    pWelsSvcRc->iTargetBits = (int32_t) (pWelsSvcRc->dBitsPerFrame * IDR_BITRATE_RATIO);
+    pWelsSvcRc->iTargetBits = WELS_ROUND (pWelsSvcRc->dBitsPerFrame * IDR_BITRATE_RATIO);
   } else {
-    pWelsSvcRc->iTargetBits = (int32_t) (pWelsSvcRc->iRemainingBits * pTOverRc->dTlayerWeight /
-                                         pWelsSvcRc->dRemainingWeights);
+    pWelsSvcRc->iTargetBits = WELS_ROUND (pWelsSvcRc->iRemainingBits * pTOverRc->dTlayerWeight /
+                                          pWelsSvcRc->dRemainingWeights);
     if ((pWelsSvcRc->iTargetBits <= 0) && (pEncCtx->pSvcParam->iRCMode == RC_LOW_BW_MODE)) {
       pWelsSvcRc->iCurrentBitsLevel = BITS_EXCEEDED;
     } else if ((pWelsSvcRc->iTargetBits <= pTOverRc->iMinBitsTl) && (pEncCtx->pSvcParam->iRCMode == RC_LOW_BW_MODE)) {
@@ -559,14 +562,15 @@ void RcCalculateMbQp (sWelsEncCtx* pEncCtx, SMB* pCurMb, const int32_t kiSliceId
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   SRCSlicing* pSOverRc		= &pWelsSvcRc->pSlicingOverRc[kiSliceId];
   int32_t iLumaQp			= pSOverRc->iCalculatedQpSlice;
-
+  SDqLayer* pCurLayer				= pEncCtx->pCurDqLayer;
+  const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
 #ifndef _NOT_USE_AQ_FOR_TEST_
   if (pEncCtx->pSvcParam->bEnableAdaptiveQuant) {
     iLumaQp   = (int8_t)WELS_CLIP3 (iLumaQp +
                                     pEncCtx->pVaa->sAdaptiveQuantParam.pMotionTextureIndexToDeltaQp[pCurMb->iMbXY], pWelsSvcRc->iMinQp, 51);
   }
 #endif
-  pCurMb->uiChromaQp	= g_kuiChromaQpTable[iLumaQp];
+  pCurMb->uiChromaQp	= g_kuiChromaQpTable[CLIP3_QP_0_51 (iLumaQp + kuiChromaQpIndexOffset)];
   pCurMb->uiLumaQp		= iLumaQp;
 }
 
@@ -625,7 +629,7 @@ void RcGomTargetBits (sWelsEncCtx* pEncCtx, const int32_t kiSliceId) {
       dAllocateBits = (double)iLeftBits * pWelsSvcRc_Base->pCurrentFrameGomSad[kiComplexityIndex + 1] / iSumSad;
 
   }
-  pSOverRc->iGomTargetBits = int32_t (dAllocateBits + 0.5);
+  pSOverRc->iGomTargetBits = WELS_ROUND (dAllocateBits);
 }
 
 
@@ -665,11 +669,11 @@ void RcCalculateGomQp (sWelsEncCtx* pEncCtx, SMB* pCurMb, int32_t iSliceId) {
 void   RcVBufferCalculationSkip (sWelsEncCtx* pEncCtx) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   SRCTemporal* pTOverRc		= pWelsSvcRc->pTemporalOverRc;
-  const int32_t kiOutputBits = (int32_t) (pWelsSvcRc->dBitsPerFrame + 0.5);
+  const int32_t kiOutputBits = WELS_ROUND (pWelsSvcRc->dBitsPerFrame);
   //condition 1: whole pBuffer fullness
   pWelsSvcRc->iBufferFullnessSkip += (pWelsSvcRc->iFrameDqBits - kiOutputBits);
   //condition 2: VGOP bits constraint
-  const int32_t kiVGopBits = (int32_t) (pWelsSvcRc->dBitsPerFrame * VGOP_SIZE);
+  const int32_t kiVGopBits = WELS_ROUND (pWelsSvcRc->dBitsPerFrame * VGOP_SIZE);
   int32_t iVGopBitsPred = 0;
   for (int32_t i = pWelsSvcRc->iFrameCodedInVGop + 1; i < VGOP_SIZE; i++)
     iVGopBitsPred += pTOverRc[pWelsSvcRc->iTlOfFrames[i]].iMinBitsTl;
@@ -690,7 +694,7 @@ void   RcVBufferCalculationSkip (sWelsEncCtx* pEncCtx) {
     pWelsSvcRc->iBufferFullnessSkip = 0;
 
   if (pEncCtx->iSkipFrameFlag == 1) {
-    pWelsSvcRc->iRemainingBits += (int32_t) (pWelsSvcRc->dBitsPerFrame + 0.5);
+    pWelsSvcRc->iRemainingBits += WELS_ROUND (pWelsSvcRc->dBitsPerFrame);
     pWelsSvcRc->iSkipFrameNum++;
     pWelsSvcRc->iSkipFrameInVGop++;
   }
@@ -698,8 +702,8 @@ void   RcVBufferCalculationSkip (sWelsEncCtx* pEncCtx) {
 
 void RcVBufferCalculationPadding (sWelsEncCtx* pEncCtx) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
-  const int32_t kiOutputBits = (int32_t) (pWelsSvcRc->dBitsPerFrame + 0.5);
-  const int32_t kiBufferThreshold = (int32_t) (PADDING_THRESHOLD * (-pWelsSvcRc->iBufferSizePadding));
+  const int32_t kiOutputBits = WELS_ROUND (pWelsSvcRc->dBitsPerFrame);
+  const int32_t kiBufferThreshold = WELS_ROUND (PADDING_THRESHOLD * (-pWelsSvcRc->iBufferSizePadding));
 
   pWelsSvcRc->iBufferFullnessPadding += (pWelsSvcRc->iFrameDqBits - kiOutputBits);
 
@@ -736,7 +740,7 @@ void RcUpdatePictureQpBits (sWelsEncCtx* pEncCtx, int32_t iCodedBits) {
       ++ pSOverRc;
     }
     if (iTotalMb > 0)
-      pWelsSvcRc->iAverageFrameQp = (int32_t) (1.0 * iTotalQp / iTotalMb + 0.5);
+      pWelsSvcRc->iAverageFrameQp = WELS_ROUND (1.0 * iTotalQp / iTotalMb);
     else
       pWelsSvcRc->iAverageFrameQp = pEncCtx->iGlobalQp;
   } else {
@@ -753,7 +757,7 @@ void RcUpdateIntraComplexity (sWelsEncCtx* pEncCtx) {
 
   double dIntraCmplx = pWelsSvcRc->dQStep * pWelsSvcRc->iFrameDqBits;
   dIntraCmplx = (1.0 - iAlpha) * pWelsSvcRc->iIntraComplexity + iAlpha * dIntraCmplx;
-  pWelsSvcRc->iIntraComplexity = (int32_t) (dIntraCmplx + 0.5);
+  pWelsSvcRc->iIntraComplexity = WELS_ROUND (dIntraCmplx);
   pWelsSvcRc->iIntraMbCount = pWelsSvcRc->iNumberMbFrame;
 
   pWelsSvcRc->iIdrNum++;
@@ -775,8 +779,8 @@ void RcUpdateFrameComplexity (sWelsEncCtx* pEncCtx) {
   double iAlpha = 1.0 / (1 + pTOverRc->iPFrameNum);
   if (iAlpha < SMOOTH_FACTOR_MIN_VALUE)
     iAlpha = SMOOTH_FACTOR_MIN_VALUE;
-  pTOverRc->iFrameCmplxMean = (int32_t) ((1.0 - iAlpha) * pTOverRc->iFrameCmplxMean + iAlpha *
-                                         pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity + 0.5);
+  pTOverRc->iFrameCmplxMean = WELS_ROUND ((1.0 - iAlpha) * pTOverRc->iFrameCmplxMean + iAlpha *
+                                          pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity);
 
   pTOverRc->iPFrameNum++;
   if (pTOverRc->iPFrameNum > 255)
@@ -870,12 +874,16 @@ void WelsRcMbInitGom (void* pCtx, SMB* pCurMb, SSlice* pSlice) {
   const int32_t kiSliceId			= pSlice->uiSliceIdx;
   SRCSlicing* pSOverRc				= &pWelsSvcRc->pSlicingOverRc[kiSliceId];
   SBitStringAux* bs				= pSlice->pSliceBsa;
-
+  SDqLayer* pCurLayer				= pEncCtx->pCurDqLayer;
+  const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
 
   pSOverRc->iBsPosSlice = BsGetBitsPos (bs);
 
-  if (pEncCtx->eSliceType == I_SLICE)
+  if (pEncCtx->eSliceType == I_SLICE) {
+    pCurMb->uiLumaQp   = pEncCtx->iGlobalQp;
+    pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp + kuiChromaQpIndexOffset)];
     return;
+  }
   //calculate gom qp and target bits at the beginning of gom
   if (0 == (pCurMb->iMbXY % pWelsSvcRc->iNumberMbGom)) {
     if (pCurMb->iMbXY != pSOverRc->iStartMbSlice) {
@@ -912,15 +920,17 @@ void  WelsRcPictureInitDisable (void* pCtx) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   SDLayerParam* pDLayerParam		= &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
-
   const int32_t kiQp = pDLayerParam->iDLayerQp;
 
   pEncCtx->iGlobalQp	= RcCalculateCascadingQp (pEncCtx, kiQp);
 
   if (pEncCtx->pSvcParam->bEnableAdaptiveQuant && (pEncCtx->eSliceType == P_SLICE)) {
-    pEncCtx->iGlobalQp = (int32_t)WELS_CLIP3 (pEncCtx->iGlobalQp -
-                         pEncCtx->pVaa->sAdaptiveQuantParam.dAverMotionTextureIndexToDeltaQp, GOM_MIN_QP_MODE, GOM_MAX_QP_MODE);
+    pEncCtx->iGlobalQp = WELS_CLIP3 (WELS_ROUND (pEncCtx->iGlobalQp -
+                                     pEncCtx->pVaa->sAdaptiveQuantParam.dAverMotionTextureIndexToDeltaQp), GOM_MIN_QP_MODE, GOM_MAX_QP_MODE);
+  } else {
+    pEncCtx->iGlobalQp = WELS_CLIP3 (pEncCtx->iGlobalQp, 0, 51);
   }
+
   pWelsSvcRc->iAverageFrameQp = pEncCtx->iGlobalQp;
 }
 
@@ -931,11 +941,17 @@ void  WelsRcMbInitDisable (void* pCtx, SMB* pCurMb, SSlice* pSlice) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   int32_t iLumaQp					= pEncCtx->iGlobalQp;
 
+  SDqLayer* pCurLayer				= pEncCtx->pCurDqLayer;
+  const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
+
+
   if (pEncCtx->pSvcParam->bEnableAdaptiveQuant && (pEncCtx->eSliceType == P_SLICE)) {
     iLumaQp   = (int8_t)WELS_CLIP3 (iLumaQp +
                                     pEncCtx->pVaa->sAdaptiveQuantParam.pMotionTextureIndexToDeltaQp[pCurMb->iMbXY], GOM_MIN_QP_MODE, 51);
+  } else {
+    iLumaQp = WELS_CLIP3 (iLumaQp, 0, 51);
   }
-  pCurMb->uiChromaQp = g_kuiChromaQpTable[iLumaQp];
+  pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (iLumaQp + kuiChromaQpIndexOffset)];
   pCurMb->uiLumaQp = iLumaQp;
 }
 

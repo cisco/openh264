@@ -32,7 +32,7 @@ static int InitWithParam(ISVCEncoder* encoder, EUsageType usageType,int width,
     param.bEnableDenoise = denoise;
     param.iSpatialLayerNum = layers;
 
-    if (sliceMode != SM_SINGLE_SLICE)
+    if (sliceMode != SM_SINGLE_SLICE && sliceMode != SM_DYN_SLICE) //SM_DYN_SLICE don't support multi-thread now
       param.iMultipleThreadIdc = 2;
 
     for (int i = 0; i < param.iSpatialLayerNum; i++) {
@@ -42,6 +42,10 @@ static int InitWithParam(ISVCEncoder* encoder, EUsageType usageType,int width,
       param.sSpatialLayers[i].iSpatialBitrate = param.iTargetBitrate;
 
       param.sSpatialLayers[i].sSliceCfg.uiSliceMode = sliceMode;
+      if (sliceMode == SM_DYN_SLICE) {
+        param.sSpatialLayers[i].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 600;
+        param.uiMaxNalSize = 1500;
+      }
     }
 
     return encoder->InitializeExt(&param);

@@ -50,7 +50,7 @@
 
 namespace WelsSVCEnc {
 
-void WelsWriteMbResidual (SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux* pBs);
+int32_t WelsWriteMbResidual (SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux* pBs);
 
 void WelsSpatialWriteSubMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb);
 

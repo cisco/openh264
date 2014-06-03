@@ -7,7 +7,6 @@ ENCODER_CPP_SRCS=\
 	$(ENCODER_SRCDIR)/core/src/encoder.cpp\
 	$(ENCODER_SRCDIR)/core/src/encoder_data_tables.cpp\
 	$(ENCODER_SRCDIR)/core/src/encoder_ext.cpp\
-	$(ENCODER_SRCDIR)/core/src/expand_pic.cpp\
 	$(ENCODER_SRCDIR)/core/src/get_intra_predictor.cpp\
 	$(ENCODER_SRCDIR)/core/src/mc.cpp\
 	$(ENCODER_SRCDIR)/core/src/md.cpp\
@@ -60,6 +59,13 @@ ENCODER_ASM_ARM_SRCS=\
 ENCODER_OBJS += $(ENCODER_ASM_ARM_SRCS:.S=.$(OBJ))
 endif
 
+ifeq ($(ASM_ARCH), arm64)
+ENCODER_ASM_ARM64_SRCS=\
+	$(ENCODER_SRCDIR)/core/arm64/pixel_neon_aarch64.S\
+
+ENCODER_OBJS += $(ENCODER_ASM_ARM64_SRCS:.S=.$(OBJ))
+endif
+
 OBJS += $(ENCODER_OBJS)
 $(ENCODER_SRCDIR)/%.$(OBJ): $(ENCODER_SRCDIR)/%.cpp
 	$(QUIET_CXX)$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(ENCODER_CFLAGS) $(ENCODER_INCLUDES) -c $(CXX_O) $<
@@ -68,7 +74,7 @@ $(ENCODER_SRCDIR)/%.$(OBJ): $(ENCODER_SRCDIR)/%.asm
 	$(QUIET_ASM)$(ASM) $(ASMFLAGS) $(ASM_INCLUDES) $(ENCODER_ASMFLAGS) $(ENCODER_ASM_INCLUDES) -o $@ $<
 
 $(ENCODER_SRCDIR)/%.$(OBJ): $(ENCODER_SRCDIR)/%.S
-	$(QUIET_CCAS)$(CCAS) $(CFLAGS) $(ASMFLAGS) $(INCLUDES) $(ENCODER_CFLAGS) $(ENCODER_INCLUDES) -c -o $@ $<
+	$(QUIET_CCAS)$(CCAS) $(CCASFLAGS) $(ASMFLAGS) $(INCLUDES) $(ENCODER_CFLAGS) $(ENCODER_INCLUDES) -c -o $@ $<
 
 $(LIBPREFIX)encoder.$(LIBSUFFIX): $(ENCODER_OBJS)
 	$(QUIET)rm -f $@

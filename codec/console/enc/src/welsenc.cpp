@@ -212,6 +212,8 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
         pSvcParam.iTemporalLayerNum	= atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("IntraPeriod") == 0) {
         pSvcParam.uiIntraPeriod	= atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("MaxNalSize") == 0) {
+        pSvcParam.uiMaxNalSize = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("EnableSpsPpsIDAddition") == 0) {
         pSvcParam.bEnableSpsPpsIdAddition	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableScalableSEI") == 0) {
@@ -310,70 +312,6 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
   return iRet;
 }
 
-int ParseCommandLine (int argc, char** argv, SEncParamExt& sParam) {
-  char* pCmd;
-  int i = 0;
-
-  while (i < argc) {
-    pCmd = argv[i++];
-
-    if (!strcmp (pCmd, "-numl") && (i < argc))
-      sParam.iSpatialLayerNum = atoi (argv[i++]);
-
-    else if (!strcmp (pCmd, "-numt") && (i < argc))
-      sParam.iTemporalLayerNum = atoi (argv[i++]);
-
-    else if (!strcmp (pCmd, "-iper") && (i < argc))
-      sParam.uiIntraPeriod = atoi (argv[i++]);
-
-    else if (!strcmp (pCmd, "-spsid") && (i < argc))
-      sParam.bEnableSpsPpsIdAddition = atoi (argv[i++]) ? true : false;
-
-    else if (!strcmp (pCmd, "-denois") && (i < argc))
-      sParam.bEnableDenoise = atoi (argv[i++]) ? true : false;
-
-    else if (!strcmp (pCmd, "-bgd") && (i < argc))
-      sParam.bEnableBackgroundDetection = atoi (argv[i++]) ? true : false;
-
-    else if (!strcmp (pCmd, "-aq") && (i < argc))
-      sParam.bEnableAdaptiveQuant = atoi (argv[i++]) ? true : false;
-
-    else if (!strcmp (pCmd, "-fs") && (i < argc))
-      sParam.bEnableFrameSkip = atoi (argv[i++]) ? true : false;
-
-    else if (!strcmp (pCmd, "-ltr") && (i < argc))
-      sParam.bEnableLongTermReference = atoi (argv[i++]) ? true : false;
-
-    else if (!strcmp (pCmd, "-ltrnum") && (i < argc))
-      sParam.iLTRRefNum = atoi (argv[i++]);
-
-    else if (!strcmp (pCmd, "-ltrper") && (i < argc))
-      sParam.iLtrMarkPeriod = atoi (argv[i++]);
-
-    else if (!strcmp (pCmd, "-rcm") && (i < argc))
-      sParam.iRCMode = (RC_MODES) atoi (argv[i++]);
-
-    else if (!strcmp (pCmd, "-tarb") && (i < argc))
-      sParam.iTargetBitrate = atoi (argv[i++]);
-
-    else if (!strcmp (pCmd, "-ltarb") && (i + 1 < argc)) {
-      int iLayer = atoi (argv[i++]);
-      sParam.sSpatialLayers[iLayer].iSpatialBitrate = atoi (argv[i++]);
-    }
-
-    else if (!strcmp (pCmd, "-trace") && (i < argc))
-      g_LevelSetting = atoi (argv[i++]);
-
-    else if (!strcmp (pCmd, "-dw") && (i < argc))
-      sParam.iPicWidth = atoi (argv[i++]);
-
-    else if (!strcmp (pCmd, "-dh") && (i < argc))
-      sParam.iPicHeight = atoi (argv[i++]);
-  }
-
-  return 0;
-}
-
 void PrintHelp() {
   printf ("\n Wels SVC Encoder Usage:\n\n");
   printf (" Syntax: welsenc.exe -h\n");
@@ -388,6 +326,7 @@ void PrintHelp() {
   printf ("  -frms   Number of total frames to be encoded\n");
   printf ("  -gop    GOPSize - GOP size (1,2,4,8, default: 1)\n");
   printf ("  -iper   Intra period (default: -1) : must be a power of 2 of GOP size (or -1)\n");
+  printf ("  -nalsize the Maximum NAL size. which should be larger than the each layer slicesize when slice mode equals to SM_DYN_SLICE\n");
   printf ("  -spsid   Enable id adding in SPS/PPS per IDR \n");
   printf ("  -denois Control denoising  (default: 0)\n");
   printf ("  -scene  Control scene change detection (default: 0)\n");
@@ -395,10 +334,15 @@ void PrintHelp() {
   printf ("  -aq     Control adaptive quantization (default: 0)\n");
   printf ("  -ltr    Control long term reference (default: 0)\n");
   printf ("  -ltrnum Control the number of long term reference((1-4):screen LTR,(1-2):video LTR \n");
+  printf ("  -threadIdc 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads \n");
+  printf ("  -deblockIdc Loop filter idc (0: on, 1: off, \n");
+  printf ("  -alphaOffset AlphaOffset(-6..+6): valid range \n");
+  printf ("  -betaOffset BetaOffset (-6..+6): valid range\n");
   printf ("  -rc	  rate control mode: 0-quality mode; 1-bitrate mode; 2-bitrate limited mode; -1-rc off \n");
   printf ("  -tarb	  Overall target bitrate\n");
   printf ("  -numl   Number Of Layers: Must exist with layer_cfg file and the number of input layer_cfg file must equal to the value set by this command\n");
   printf ("  The options below are layer-based: (need to be set with layer id)\n");
+  printf ("  -lconfig (Layer) (spatial layer configure file)\n");
   printf ("  -drec		(Layer) (reconstruction file);example: -drec 0 rec.yuv.  Setting the reconstruction file, this will only functioning when dumping reconstruction is enabled\n");
   printf ("  -dw		(Layer) (output width)\n");
   printf ("  -dh		(Layer) (output height)\n");
@@ -442,6 +386,9 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
     else if (!strcmp (pCommand, "-iper") && (n < argc))
       pSvcParam.uiIntraPeriod = atoi (argv[n++]);
 
+    else if (!strcmp (pCommand, "-nalsize") && (n < argc))
+      pSvcParam.uiMaxNalSize = atoi (argv[n++]);
+
     else if (!strcmp (pCommand, "-spsid") && (n < argc))
       pSvcParam.bEnableSpsPpsIdAddition = atoi (argv[n++]) ? true : false;
 
@@ -469,6 +416,18 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
     else if (!strcmp (pCommand, "-ltrper") && (n < argc))
       pSvcParam.iLtrMarkPeriod = atoi (argv[n++]);
 
+    else if (!strcmp (pCommand, "-threadIdc") && (n < argc))
+      pSvcParam.iMultipleThreadIdc= atoi (argv[n++]);
+
+    else if (!strcmp (pCommand, "-deblockIdc") && (n < argc))
+      pSvcParam.iLoopFilterDisableIdc = atoi (argv[n++]);
+
+    else if (!strcmp (pCommand, "-alphaOffset") && (n < argc))
+      pSvcParam.iLoopFilterAlphaC0Offset = atoi (argv[n++]);
+
+    else if (!strcmp (pCommand, "-betaOffset") && (n < argc))
+      pSvcParam.iLoopFilterBetaOffset = atoi (argv[n++]);
+
     else if (!strcmp (pCommand, "-rc") && (n < argc))
       pSvcParam.iRCMode = static_cast<RC_MODES> (atoi (argv[n++]));
 
@@ -476,20 +435,17 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       g_LevelSetting = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-tarb") && (n < argc))
-      pSvcParam.iTargetBitrate = atoi (argv[n++]);
+      pSvcParam.iTargetBitrate = 1000*atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-numl") && (n < argc)) {
       pSvcParam.iSpatialLayerNum = atoi (argv[n++]);
-      for (int ln = 0 ; (ln < pSvcParam.iSpatialLayerNum) && (n < argc) ; ln++) {
-//				pSvcParam.sDependencyLayers[ln].uiDependencyId = ln;
-        sFileSet.strLayerCfgFile[ln].assign (argv[n++]);
-      }
-
-      for (int8_t iLayer = 0; iLayer < pSvcParam.iSpatialLayerNum; ++ iLayer) {
-        CReadConfig cRdLayerCfg (sFileSet.strLayerCfgFile[iLayer]);
-        if (-1 == ParseLayerConfig (cRdLayerCfg, iLayer, pSvcParam, sFileSet)) {
-          return 1;
-        }
+    }
+    else if (!strcmp (pCommand, "-lconfig") && (n < argc)) {
+      unsigned int	iLayer = atoi (argv[n++]);
+      sFileSet.strLayerCfgFile[iLayer].assign (argv[n++]);
+      CReadConfig cRdLayerCfg (sFileSet.strLayerCfgFile[iLayer]);
+      if (-1 == ParseLayerConfig (cRdLayerCfg, iLayer, pSvcParam, sFileSet)) {
+        return 1;
       }
     } else if (!strcmp (pCommand, "-drec") && (n + 1 < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
@@ -595,9 +551,10 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.iInputCsp			= videoFormatI420;			// color space of input sequence
   sParam.uiIntraPeriod		= 320;		// period of Intra frame
   sParam.bEnableSpsPpsIdAddition = 1;
-  sParam.bPrefixNalAddingCtrl = 1;
+  sParam.bPrefixNalAddingCtrl = 0;
 
   int iIndexLayer = 0;
+  sParam.sSpatialLayers[iIndexLayer].uiProfileIdc	= PRO_BASELINE;
   sParam.sSpatialLayers[iIndexLayer].iVideoWidth	= 160;
   sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 90;
   sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 7.5f;
@@ -605,6 +562,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
 
   ++ iIndexLayer;
+  sParam.sSpatialLayers[iIndexLayer].uiProfileIdc	= PRO_SCALABLE_BASELINE;
   sParam.sSpatialLayers[iIndexLayer].iVideoWidth	= 320;
   sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 180;
   sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 15.0f;
@@ -612,6 +570,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
 
   ++ iIndexLayer;
+  sParam.sSpatialLayers[iIndexLayer].uiProfileIdc	= PRO_SCALABLE_BASELINE;
   sParam.sSpatialLayers[iIndexLayer].iVideoWidth	= 640;
   sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 360;
   sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 30.0f;
@@ -620,6 +579,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.sSliceArgument.uiSliceNum = 1;
 
   ++ iIndexLayer;
+  sParam.sSpatialLayers[iIndexLayer].uiProfileIdc	= PRO_SCALABLE_BASELINE;
   sParam.sSpatialLayers[iIndexLayer].iVideoWidth	= 1280;
   sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 720;
   sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 30.0f;
@@ -637,174 +597,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   return 0;
 }
 
-/* For SVC Demo test */
-int ProcessEncodingSvcWithParam (ISVCEncoder* pPtrEnc, int argc, char** argv) {
-  const char* kpSrcFile = argv[1];
-  const char* kpStrBsFile = argv[2];
-
-  if (pPtrEnc == NULL || kpSrcFile == NULL || kpStrBsFile == NULL)
-    return 1;
-
-  FILE* pFpBs = NULL;
-  FILE* pFpSrc = NULL;
-  SFrameBSInfo sFbi;
-  SEncParamExt sSvcParam;
-  int64_t iStart = 0, iTotal = 0;
-  int32_t ret = 0;
-
-  int32_t iPicLumaSize = 0;
-  int32_t iFrameSize = 0;
-  uint8_t* pPlanes[3] = { 0 };
-  int32_t iFrame = 0;
-  SSourcePicture* pSrcPic = NULL;
-#if defined ( STICK_STREAM_SIZE )
-  FILE* fTrackStream = fopen ("coding_size.stream", "wb");;
-#endif
-
-  pFpSrc	= fopen (kpSrcFile, "rb");
-  if (NULL == pFpSrc)
-    return 1;
-  pFpBs	= fopen (kpStrBsFile, "wb");
-  if (NULL == pFpBs) {
-    fclose (pFpSrc);
-    pFpSrc = NULL;
-    return 1;
-  }
-
-  memset (&sFbi, 0, sizeof (SFrameBSInfo));
-  memset (&sSvcParam, 0, sizeof (SEncParamExt));
-
-  FillSpecificParameters (sSvcParam);
-
-  int iParsedNum = 3;
-  if (ParseCommandLine (argc - iParsedNum, argv + iParsedNum, sSvcParam) != 0) {
-    printf ("parse pCommand line failed\n");
-    ret = 1;
-    goto ERROR_RET;
-  }
-  pPtrEnc->SetOption (ENCODER_OPTION_TRACE_LEVEL, &g_LevelSetting);
-  if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) {
-    fprintf (stderr, "Encoder Initialization failed!\n");
-    ret = 1;
-    goto ERROR_RET;
-  }
-  iPicLumaSize = sSvcParam.iPicWidth * sSvcParam.iPicHeight;
-  switch (sSvcParam.iInputCsp) {
-    int iStride;
-  case videoFormatI420:
-  case videoFormatYV12:
-    iFrameSize  = (3 * iPicLumaSize) >> 1;
-    pPlanes[0]	= new uint8_t[iFrameSize];
-    pPlanes[1]	= pPlanes[0] + iPicLumaSize;
-    pPlanes[2]	= pPlanes[1]	+ (iPicLumaSize >> 2);
-    break;
-  case videoFormatYUY2:
-  case videoFormatYVYU:
-  case videoFormatUYVY:
-    iStride      = CALC_BI_STRIDE (sSvcParam.iPicWidth,  16);
-    iFrameSize  = iStride * sSvcParam.iPicHeight;
-    pPlanes[0]   = new uint8_t[iFrameSize];
-    break;
-  case videoFormatRGB:
-  case videoFormatBGR:
-    iStride      = CALC_BI_STRIDE (sSvcParam.iPicWidth,  24);
-    iFrameSize  = iStride * sSvcParam.iPicHeight;
-    pPlanes[0]	= new uint8_t[iFrameSize];
-    break;
-  case videoFormatBGRA:
-  case videoFormatRGBA:
-  case videoFormatARGB:
-  case videoFormatABGR:
-    iStride = 4 * sSvcParam.iPicWidth;
-    iFrameSize  = iStride * sSvcParam.iPicHeight;
-    pPlanes[0]	= new uint8_t[iFrameSize];
-    break;
-  default:
-    ret = 1;
-    goto ERROR_RET;
-  }
-
-  pSrcPic = new SSourcePicture;
-  if (pSrcPic == NULL) {
-    ret = 1;
-    goto ERROR_RET;
-  }
-
-  pSrcPic->iColorFormat = sSvcParam.iInputCsp;
-  pSrcPic->iPicHeight = sSvcParam.iPicHeight;
-  pSrcPic->iPicWidth = sSvcParam.iPicWidth;
-  pSrcPic->iStride[0] = sSvcParam.iPicWidth;
-  pSrcPic->iStride[1] = pSrcPic->iStride[2] = sSvcParam.iPicWidth >> 1;
-
-  pSrcPic->pData[0] = pPlanes[0];
-  pSrcPic->pData[1] = pSrcPic->pData[0] + (sSvcParam.iPicWidth * sSvcParam.iPicHeight);
-  pSrcPic->pData[2] = pSrcPic->pData[1] + (sSvcParam.iPicWidth * sSvcParam.iPicHeight >> 2);
-
-  while (true) {
-    if (feof (pFpSrc))
-      break;
-#ifdef ONLY_ENC_FRAMES_NUM
-    if (iFrame >= ONLY_ENC_FRAMES_NUM)
-      break;
-#endif//ONLY_ENC_FRAMES_NUM
-    if (fread (pPlanes[0], sizeof (uint8_t), iFrameSize, pFpSrc) <= 0)
-      break;
-
-    iStart	= WelsTime();
-    long iEncode = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
-    iTotal += WelsTime() - iStart;
-    if (cmResultSuccess != iEncode) {
-      fprintf (stderr, "EncodeFrame() failed: %ld.\n", iEncode);
-      break;
-    }
-
-    /* Write bit-stream */
-    if (pFpBs != NULL && videoFrameTypeSkip != sFbi.eOutputFrameType) {	// file handler to write bit stream
-      int iLayer = 0;
-      while (iLayer < sFbi.iLayerNum) {
-        SLayerBSInfo* pLayerBsInfo = &sFbi.sLayerInfo[iLayer];
-        if (pLayerBsInfo != NULL) {
-          int iLayerSize = 0;
-          int iNalIdx = pLayerBsInfo->iNalCount - 1;
-          do {
-            iLayerSize += pLayerBsInfo->iNalLengthInByte[iNalIdx];
-            -- iNalIdx;
-          } while (iNalIdx >= 0);
-          fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs);	// write pure bit stream into file
-        }
-        ++ iLayer;
-      }
-      ++ iFrame;
-    }
-  }
-
-  if (iFrame > 0) {
-    double dElapsed = iTotal / 1e6;
-    printf ("Frames:		%d\nencode time:	%f sec\nFPS:		%f fps\n", iFrame, dElapsed, (iFrame * 1.0) / dElapsed);
-  }
-
-  if (NULL != pPlanes[0]) {
-    delete [] pPlanes[0];
-    pPlanes[0] = NULL;
-  }
-ERROR_RET:
-  if (pFpBs) {
-    fclose (pFpBs);
-    pFpBs = NULL;
-  }
-  if (pFpSrc) {
-    fclose (pFpSrc);
-    pFpSrc = NULL;
-  }
-  if (pSrcPic) {
-    delete pSrcPic;
-    pSrcPic = NULL;
-  }
-  return ret;
-}
-
-
-int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
+int ProcessEncoding(ISVCEncoder* pPtrEnc, int argc, char** argv,bool bConfigFile) {
   int iRet				= 0;
 
   if (pPtrEnc == NULL)
@@ -834,24 +627,13 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   SFilesSet fs;
   // for configuration file
   CReadConfig cRdCfg;
-  int iParsedNum = 2;
+  int iParsedNum = 1;
 
   memset (&sFbi, 0, sizeof (SFrameBSInfo));
   memset (&sSvcParam, 0, sizeof (SEncParamExt));
   memset (&fs.sRecFileName[0][0], 0, sizeof (fs.sRecFileName));
-  sSvcParam.iInputCsp	= videoFormatI420;	// I420 in default
-  sSvcParam.sSpatialLayers[0].uiProfileIdc	= PRO_BASELINE;
-//	svc_cfg->sDependencyLayers[0].frext_mode	= 0;
 
-  // for configuration file
-  cRdCfg.Openf (argv[1]);
-  if (!cRdCfg.ExistFile()) {
-    fprintf (stderr, "Specified file: %s not exist, maybe invalid path or parameter settting.\n",
-             cRdCfg.GetFileName().c_str());
-    iRet = 1;
-    goto INSIDE_MEM_FREE;
-  }
-
+  FillSpecificParameters (sSvcParam);
   pSrcPic = new SSourcePicture;
   if (pSrcPic == NULL) {
     iRet = 1;
@@ -860,19 +642,29 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   //fill default pSrcPic
   pSrcPic->iColorFormat = videoFormatI420;
   pSrcPic->uiTimeStamp = 0;
-  iRet = ParseConfig (cRdCfg, pSrcPic, sSvcParam, fs);
-  if (iRet) {
-    fprintf (stderr, "parse svc parameter config file failed.\n");
-    iRet = 1;
-    goto INSIDE_MEM_FREE;
-  }
 
+  // if configure file exit, reading configure file firstly
+  if(bConfigFile){
+    iParsedNum = 2;
+    cRdCfg.Openf (argv[1]);
+    if (!cRdCfg.ExistFile()) {
+      fprintf (stderr, "Specified file: %s not exist, maybe invalid path or parameter settting.\n",
+               cRdCfg.GetFileName().c_str());
+      iRet = 1;
+      goto INSIDE_MEM_FREE;
+    }
+    iRet = ParseConfig (cRdCfg, pSrcPic, sSvcParam, fs);
+    if (iRet) {
+      fprintf (stderr, "parse svc parameter config file failed.\n");
+      iRet = 1;
+      goto INSIDE_MEM_FREE;
+    }
+  }
   if (ParseCommandLine (argc - iParsedNum, argv + iParsedNum, pSrcPic, sSvcParam, fs) != 0) {
     printf ("parse pCommand line failed\n");
     iRet = 1;
     goto INSIDE_MEM_FREE;
   }
-
   //finish reading the configurations
   iSourceWidth = pSrcPic->iPicWidth;
   iSourceHeight = pSrcPic->iPicHeight;
@@ -893,6 +685,8 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
   pSrcPic->pData[2] = pSrcPic->pData[1] + (iSourceWidth * iSourceHeight >> 2);
 
   //update sSvcParam
+  sSvcParam.iPicWidth = 0;
+  sSvcParam.iPicHeight = 0;
   for (int iLayer = 0; iLayer < sSvcParam.iSpatialLayerNum; iLayer++) {
     SSpatialLayerConfig* pDLayer = &sSvcParam.sSpatialLayers[iLayer];
     sSvcParam.iPicWidth = WELS_MAX (sSvcParam.iPicWidth, pDLayer->iVideoWidth);
@@ -988,7 +782,7 @@ int ProcessEncodingSvcWithConfig (ISVCEncoder* pPtrEnc, int argc, char** argv) {
           int iLayerSize = 0;
           int iNalIdx = pLayerBsInfo->iNalCount - 1;
           do {
-            iLayerSize += pLayerBsInfo->iNalLengthInByte[iNalIdx];
+            iLayerSize += pLayerBsInfo->pNalLengthInByte[iNalIdx];
             -- iNalIdx;
           } while (iNalIdx >= 0);
 #if defined(COMPARE_DATA)
@@ -1139,7 +933,7 @@ int main (int argc, char** argv)
   } else {
     if (!strstr (argv[1], ".cfg")) { // check configuration type (like .cfg?)
       if (argc > 2) {
-        iRet = ProcessEncodingSvcWithParam (pSVCEncoder, argc, argv);
+        iRet = ProcessEncoding(pSVCEncoder, argc, argv,false);
         if (iRet != 0)
           goto exit;
       } else if (argc == 2 && ! strcmp (argv[1], "-h"))
@@ -1149,7 +943,7 @@ int main (int argc, char** argv)
         goto exit;
       }
     } else {
-      iRet = ProcessEncodingSvcWithConfig (pSVCEncoder, argc, argv);
+      iRet = ProcessEncoding(pSVCEncoder, argc, argv,true);
       if (iRet > 0)
         goto exit;
     }

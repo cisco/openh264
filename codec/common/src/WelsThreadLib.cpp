@@ -39,7 +39,7 @@
  */
 
 
-#ifdef LINUX
+#ifdef __linux__
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
@@ -450,7 +450,7 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* p
 #ifdef ANDROID_NDK
   pInfo->ProcessorCount = android_getCpuCount();
   return WELS_THREAD_ERROR_OK;
-#elif defined(LINUX)
+#elif defined(__linux__)
 
   cpu_set_t cpuset;
 
@@ -472,7 +472,7 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* p
 
   return WELS_THREAD_ERROR_OK;
 
-#endif//LINUX
+#endif//__linux__
 }
 
 #endif

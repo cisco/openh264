@@ -178,7 +178,7 @@ int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* 
   }
 #endif
 
-  InitExpandPictureFunc (pFuncList, uiCpuFlag);
+  InitExpandPictureFunc (& (pFuncList->sExpandPicFunc), uiCpuFlag);
 
   /* Intra_Prediction_fn*/
   WelsInitFillingPredFuncs (uiCpuFlag);

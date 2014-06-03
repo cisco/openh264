@@ -52,7 +52,7 @@ def write_asm_s_rule_pattern(f):
     dst = "$(%s_SRCDIR)/%%.$(OBJ)"%(PREFIX)
 
     f.write("%s: %s\n"%(dst, src))
-    f.write('\t$(QUIET_CCAS)$(CCAS) $(CFLAGS) $(ASMFLAGS) $(INCLUDES) $(' + PREFIX + '_CFLAGS) $(' + PREFIX + '_INCLUDES) -c -o $@ $<\n')
+    f.write('\t$(QUIET_CCAS)$(CCAS) $(CCASFLAGS) $(ASMFLAGS) $(INCLUDES) $(' + PREFIX + '_CFLAGS) $(' + PREFIX + '_INCLUDES) -c -o $@ $<\n')
     f.write("\n")
 
 

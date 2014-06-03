@@ -63,17 +63,18 @@ TEST(DecodeMbAuxTest, TestIhdm_4x4_dc) {
 TEST(DecodeMbAuxTest, TestDequant_4x4_luma_dc) {
   short T[16],W[16];
   srand((uint32_t)time(NULL));
-  for(int i=0;i<16;i++) {
-    T[i]=rand()%256+1;
-    W[i]=T[i];
-  }
 
-  //TODO: QP<18 will cause case fail, need fix and enable the test afterwards
-  for (int qp=18;qp<52;qp++) {
+  for (int qp=0; qp<12; qp++) {
+    for(int i=0; i<16; i++) {
+        T[i]=rand()%256+1;
+        W[i]=T[i];
+    }
     WelsDequantLumaDc4x4(W,qp);
-    for(int i=0;i<16;i++)
-      EXPECT_EQ(((T[i]*g_kuiDequantCoeff[qp%6][0]+(1 << (1 -  qp / 6))))>>(2- qp / 6),W[i]);
-   }
+    for(int i=0; i<16; i++) {
+        T[i]= (((T[i]*g_kuiDequantCoeff[qp%6][0]+(1 << (1 -  qp / 6))))>>(2- qp / 6));
+        EXPECT_EQ(T[i],W[i]);
+    }
+  }
 }
 
 TEST(DecodeMbAuxTest, TestDequant_ihdm_4x4_c) {

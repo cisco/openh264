@@ -236,11 +236,11 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
 
   iSliceIdx	= 0;
   while (iSliceIdx + 1 < kiCountSliceNum) {
-    int32_t iNumMbAssigning = (int32_t) (kiCountNumMb * pSliceComplexRatio[iSliceIdx] + EPSN);
+    int32_t iNumMbAssigning = WELS_ROUND (kiCountNumMb * pSliceComplexRatio[iSliceIdx]);
 
     // GOM boundary aligned
     if (pCtx->pSvcParam->iRCMode != RC_OFF_MODE) {
-      iNumMbAssigning = (int32_t) (1.0f * iNumMbAssigning / iNumMbInEachGom + 0.5f + EPSN) * iNumMbInEachGom;
+      iNumMbAssigning = WELS_ROUND (1.0f * iNumMbAssigning / iNumMbInEachGom) * iNumMbInEachGom;
     }
 
     // make sure one GOM at least in each pSlice for safe
@@ -548,7 +548,7 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
         iLayerSize += pSliceBs->uiBsPos;
 
         while (iNalIdx < iCountNal) {
-          pLbi->iNalLengthInByte[iNalIdxBase + iNalIdx]	= pSliceBs->iNalLen[iNalIdx];
+          pLbi->pNalLengthInByte[iNalIdxBase + iNalIdx]	= pSliceBs->iNalLen[iNalIdx];
           ++ iNalIdx;
         }
         pLbi->iNalCount	+= iCountNal;
@@ -580,7 +580,7 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
             iLayerSize += pSliceBs->uiBsPos;
 
             while (iNalIdx < iCountNal) {
-              pLbi->iNalLengthInByte[iNalIdxBase + iNalIdx]	= pSliceBs->iNalLen[iNalIdx];
+              pLbi->pNalLengthInByte[iNalIdxBase + iNalIdx]	= pSliceBs->iNalLen[iNalIdx];
               ++ iNalIdx;
             }
             pLbi->iNalCount	+= iCountNal;
@@ -621,7 +621,7 @@ int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFr
     WELS_VERIFY_RETURN_IFNEQ (iReturn, ENC_RETURN_SUCCESS)
     iSliceSize += iNalSize;
     pDst += iNalSize;
-    pLbi->iNalLengthInByte[iNalBase + iNalIdx]	= iNalSize;
+    pLbi->pNalLengthInByte[iNalBase + iNalIdx]	= iNalSize;
 
     ++ iNalIdx;
   }

@@ -321,8 +321,8 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
     for (int i=0; i<encoded->iLayerNum; ++i) {
       lengths.push_back(0);
       for (int j=0; j<encoded->sLayerInfo[i].iNalCount; ++j) {
-        lengths[i] += encoded->sLayerInfo[i].iNalLengthInByte[j];
-        length += encoded->sLayerInfo[i].iNalLengthInByte[j];
+        lengths[i] += encoded->sLayerInfo[i].pNalLengthInByte[j];
+        length += encoded->sLayerInfo[i].pNalLengthInByte[j];
       }
     }
 
@@ -540,7 +540,7 @@ private:
     SBufferInfo decoded;
     bool valid = false;
     memset(&decoded, 0, sizeof(decoded));
-    void *data[3] = {nullptr, nullptr, nullptr};
+    unsigned char *data[3] = {nullptr, nullptr, nullptr};
 
     int rv = decoder_->DecodeFrame2(inputFrame->Buffer(),
                                     inputFrame->Size(),
@@ -566,7 +566,7 @@ private:
   // Return the decoded data back to the parent.
   void Decode_m(GMPVideoEncodedFrame* inputFrame,
                 SBufferInfo* decoded,
-                void* data[3],
+                unsigned char* data[3],
                 int64_t renderTimeMs,
                 bool valid) {
     // Attach a self-destructor so that this dies on return.
