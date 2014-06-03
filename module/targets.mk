@@ -12,5 +12,5 @@ $(LIBPREFIX)module.$(LIBSUFFIX): $(MODULE_OBJS)
 	$(QUIET)rm -f $@
 	$(QUIET_AR)$(AR) $(AR_OPTS) $+
 
-libraries: $(LIBPREFIX)module.$(LIBSUFFIX)
+plugin: $(LIBPREFIX)module.$(LIBSUFFIX)
 LIBRARIES += $(LIBPREFIX)module.$(LIBSUFFIX)

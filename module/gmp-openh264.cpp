@@ -59,15 +59,9 @@
 #define PUBLIC_FUNC
 #endif
 
-// This is for supporting older compilers which do not have support for nullptr.
+// This is for supporting older versions which do not have support for nullptr.
 #if defined(__clang__)
-# ifndef __has_extension
-# define __has_extension __has_feature
-# endif
-
-# if __has_extension(cxx_nullptr)
 # define GMP_HAVE_NULLPTR
-# endif
 
 #elif defined(__GNUC__)
 # if defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L
