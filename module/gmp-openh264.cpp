@@ -1,5 +1,36 @@
-// Written by Josh Aas and Eric Rescorla
-// TODO(ekr@rtfm.com): Need license.
+/*!
+ * \copy
+ *     Copyright (c)  2009-2014, Cisco Systems
+ *     All rights reserved.
+ *
+ *     Redistribution and use in source and binary forms, with or without
+ *     modification, are permitted provided that the following conditions
+ *     are met:
+ *
+ *        * Redistributions of source code must retain the above copyright
+ *          notice, this list of conditions and the following disclaimer.
+ *
+ *        * Redistributions in binary form must reproduce the above copyright
+ *          notice, this list of conditions and the following disclaimer in
+ *          the documentation and/or other materials provided with the
+ *          distribution.
+ *
+ *     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *     FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *     COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *     INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *     BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *     CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *     POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ *************************************************************************************
+ */
 
 #include <stdint.h>
 #include <time.h>
@@ -26,6 +57,33 @@
 #define PUBLIC_FUNC __declspec(dllexport)
 #else
 #define PUBLIC_FUNC
+#endif
+
+// This is for supporting older compilers which do not have support for nullptr.
+#if defined(__clang__)
+# ifndef __has_extension
+# define __has_extension __has_feature
+# endif
+
+# if __has_extension(cxx_nullptr)
+# define GMP_HAVE_NULLPTR
+# endif
+
+#elif defined(__GNUC__)
+# if defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L
+# if (__GNU_C__ >=4)
+# if (__GNU_C_MINOR__ >= 6)
+# define GMP_HAVE_NULLPTR
+# endif
+# endif
+# endif
+
+#elif defined(_MSC_VER)
+# define GMP_HAVE_NULLPTR
+#endif
+
+#if !defined (GMP_HAVE_NULLPTR)
+# define nullptr __null
 #endif
 
 static int g_log_level = 0;
@@ -134,7 +192,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
   virtual GMPVideoErr InitEncode(const GMPVideoCodec& codecSettings,
                                  GMPEncoderCallback* callback,
                                  int32_t numberOfCores,
-                                 uint32_t maxPayloadSize) override {
+                                 uint32_t maxPayloadSize) {
     GMPErr err = g_platform_api->createthread(&worker_thread_);
     if (err != GMPNoErr) {
       GMPLOG(GL_ERROR, "Couldn't create new thread");
@@ -208,7 +266,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
   virtual GMPVideoErr Encode(GMPVideoi420Frame* inputImage,
                              const GMPCodecSpecificInfo& codecSpecificInfo,
                              const std::vector<GMPVideoFrameType>& frameTypes)
-      override {
+      {
     GMPLOG(GL_DEBUG,
            __FUNCTION__
            << " size="
@@ -365,11 +423,11 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
     stats_.FrameOut();
   }
 
-  virtual GMPVideoErr SetChannelParameters(uint32_t aPacketLoss, uint32_t aRTT) override {
+  virtual GMPVideoErr SetChannelParameters(uint32_t aPacketLoss, uint32_t aRTT) {
     return GMPVideoNoErr;
   }
 
-  virtual GMPVideoErr SetRates(uint32_t aNewBitRate, uint32_t aFrameRate) override {
+  virtual GMPVideoErr SetRates(uint32_t aNewBitRate, uint32_t aFrameRate) {
     GMPLOG(GL_INFO, "[SetRates] Begin with: "
            << aNewBitRate << " , "<< aFrameRate);
     //update bitrate if needed
@@ -430,11 +488,11 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
     return GMPVideoNoErr;
   }
 
-  virtual GMPVideoErr SetPeriodicKeyFrames(bool aEnable) override {
+  virtual GMPVideoErr SetPeriodicKeyFrames(bool aEnable) {
     return GMPVideoNoErr;
   }
 
-  virtual void EncodingComplete() override {
+  virtual void EncodingComplete() {
     printf("%s\n", __PRETTY_FUNCTION__);
     delete this;
   }
@@ -462,7 +520,7 @@ public:
 
   virtual GMPVideoErr InitDecode(const GMPVideoCodec& codecSettings,
                                  GMPDecoderCallback* callback,
-                                 int32_t coreCount) override {
+                                 int32_t coreCount) {
     GMPLOG(GL_INFO, "InitDecode");
 
     GMPErr err = g_platform_api->createthread(&worker_thread_);
@@ -500,7 +558,7 @@ public:
   virtual GMPVideoErr Decode(GMPVideoEncodedFrame* inputFrame,
                              bool missingFrames,
                              const GMPCodecSpecificInfo& codecSpecificInfo,
-                             int64_t renderTimeMs = -1) override {
+                             int64_t renderTimeMs = -1) {
     GMPLOG(GL_DEBUG, __FUNCTION__
            << "Decoding frame size=" << inputFrame->Size()
            << " timestamp=" << inputFrame->TimeStamp());
@@ -515,17 +573,17 @@ public:
     return GMPVideoNoErr;
   }
 
-  virtual GMPVideoErr Reset() override {
+  virtual GMPVideoErr Reset() {
     printf("%s\n", __PRETTY_FUNCTION__);
     return GMPVideoNoErr;
   }
 
-  virtual GMPVideoErr Drain() override {
+  virtual GMPVideoErr Drain() {
     printf("%s\n", __PRETTY_FUNCTION__);
     return GMPVideoNoErr;
   }
 
-  virtual void DecodingComplete() override {
+  virtual void DecodingComplete() {
     printf("%s\n", __PRETTY_FUNCTION__);
     delete this;
   }

@@ -1,4 +1,0 @@
-Name: Sample
-Description: Greatest fake video encoding/decoding plugin of all time.
-Version: 1.0
-APIs: encode-video[h264:vp8], decode-video[h264:vp8]
