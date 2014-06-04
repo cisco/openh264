@@ -99,20 +99,16 @@
 //  }
 .endm
 #endif
-// r0    int16_t* block,
-// r1    int8_t* non_zero_count,
+// r0    int8_t* non_zero_count,
 WELS_ASM_FUNC_BEGIN SetNonZeroCount_neon
-
-    vld1.64 {d0-d2}, [r1]
-
+    vld1.64 {d0-d2}, [r0]
     vceq.s8 q0, q0, #0
     vceq.s8 d2, d2, #0
     vmvn    q0, q0
     vmvn    d2, d2
     vabs.s8 q0, q0
     vabs.s8 d2, d2
-
-    vst1.64 {d0-d2}, [r1]
+    vst1.64 {d0-d2}, [r0]
 WELS_ASM_FUNC_END
 
 

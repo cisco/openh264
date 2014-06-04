@@ -183,8 +183,7 @@ int32_t WelsMbInterConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer) {
   GetInterPred (pDstY, pDstCb, pDstCr, pCtx);
   WelsMbInterSampleConstruction (pCtx, pCurLayer, pDstY, pDstCb, pDstCr, iLumaStride, iChromaStride);
 
-  pCtx->sBlockFunc.pWelsSetNonZeroCountFunc (NULL,
-      pCurLayer->pNzc[pCurLayer->iMbXyIndex]); // set all none-zero nzc to 1; dbk can be opti!
+  pCtx->sBlockFunc.pWelsSetNonZeroCountFunc (pCurLayer->pNzc[pCurLayer->iMbXyIndex]); // set all none-zero nzc to 1; dbk can be opti!
   return 0;
 }
 
@@ -1054,7 +1053,7 @@ void WelsBlockFuncInit (SBlockFunc*   pFunc,  int32_t iCpu) {
 #endif
 }
 
-void SetNonZeroCount_c (int16_t* pBlock, int8_t* pNonZeroCount) {
+void SetNonZeroCount_c (int8_t* pNonZeroCount) {
   int32_t i;
 
   for (i = 0; i < 24; i++) {

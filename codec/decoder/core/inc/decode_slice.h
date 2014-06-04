@@ -64,14 +64,14 @@ extern "C" {
 #endif//__cplusplus
 
 #if defined(HAVE_NEON)
-void SetNonZeroCount_neon (int16_t* pBlock, int8_t* pNonZeroCount);
+void SetNonZeroCount_neon (int8_t* pNonZeroCount);
 #endif
 
 #ifdef __cplusplus
 }
 #endif//__cplusplus
 
-void SetNonZeroCount_c (int16_t* pBlock, int8_t* pNonZeroCount);
+void SetNonZeroCount_c (int8_t* pNonZeroCount);
 
 void WelsBlockFuncInit (SBlockFunc* pFunc,  int32_t iCpu);
 
