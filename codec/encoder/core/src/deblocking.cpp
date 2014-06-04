@@ -573,6 +573,27 @@ void DeblockingBSCalc_neon (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2
 }
 #endif
 
+#if defined(HAVE_NEON_AARCH64) && defined(SINGLE_REF_FRAME)
+void DeblockingBSCalc_AArch64_neon (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2][4][4], Mb_Type uiCurMbType,
+                                int32_t iMbStride, int32_t iLeftFlag, int32_t iTopFlag) {
+    DeblockingBSCalcEnc_AArch64_neon (pCurMb->pNonZeroCount, pCurMb->sMv, pCurMb->uiNeighborAvail, iMbStride, uiBS);
+    if (iLeftFlag) {
+        if (IS_INTRA ((pCurMb - 1)->uiMbType)) {
+            * (uint32_t*)uiBS[0][0] = 0x04040404;
+        }
+    } else {
+        * (uint32_t*)uiBS[0][0] = 0;
+    }
+    if (iTopFlag) {
+        if (IS_INTRA ((pCurMb - iMbStride)->uiMbType)) {
+            * (uint32_t*)uiBS[1][0] = 0x04040404;
+        }
+    } else {
+        * (uint32_t*)uiBS[1][0] = 0;
+    }
+}
+#endif
+
 void DeblockingBSCalc_c (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2][4][4], Mb_Type uiCurMbType,
                          int32_t iMbStride, int32_t iLeftFlag, int32_t iTopFlag) {
   if (iLeftFlag) {
@@ -765,6 +786,11 @@ void WelsBlockFuncInit (PSetNoneZeroCountZeroFunc* pfSetNZCZero,  int32_t iCpu) 
     *pfSetNZCZero = WelsNonZeroCount_neon;
   }
 #endif
+#ifdef	HAVE_NEON_AARCH64
+    if (iCpu & WELS_CPU_NEON) {
+        *pfSetNZCZero = WelsNonZeroCount_AArch64_neon;
+    }
+#endif
 }
 
 void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
@@ -810,6 +836,24 @@ void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
     pFunc->pfDeblockingBSCalc           = DeblockingBSCalc_neon;
 #endif
   }
+#endif
+
+#if defined(HAVE_NEON_AARCH64)
+    if (iCpu & WELS_CPU_NEON) {
+        pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_AArch64_neon;
+        pFunc->pfLumaDeblockingEQ4Ver		= DeblockLumaEq4V_AArch64_neon;
+        pFunc->pfLumaDeblockingLT4Hor		= DeblockLumaLt4H_AArch64_neon;
+        pFunc->pfLumaDeblockingEQ4Hor		= DeblockLumaEq4H_AArch64_neon;
+
+        pFunc->pfChromaDeblockingLT4Ver     = DeblockChromaLt4V_AArch64_neon;
+        pFunc->pfChromaDeblockingEQ4Ver     = DeblockChromaEq4V_AArch64_neon;
+        pFunc->pfChromaDeblockingLT4Hor     = DeblockChromaLt4H_AArch64_neon;
+        pFunc->pfChromaDeblockingEQ4Hor     = DeblockChromaEq4H_AArch64_neon;
+
+#if defined(SINGLE_REF_FRAME)
+        pFunc->pfDeblockingBSCalc           = DeblockingBSCalc_AArch64_neon;
+#endif
+    }
 #endif
 }
 
