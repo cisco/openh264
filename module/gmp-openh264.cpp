@@ -206,7 +206,6 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
 
     SEncParamBase param;
     memset(&param, 0, sizeof(param));
-    //encoder_->GetDefaultParams(&param);
 
     GMPLOG(GL_INFO, "Initializing encoder at "
             << codecSettings.mWidth
@@ -233,21 +232,6 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
     // TODO(ekr@rtfm.com). Scary conversion from unsigned char to float below.
     param.fMaxFrameRate = codecSettings.mMaxFramerate;
     param.iInputCsp = videoFormatI420;
-
-    /*
-    // Set up layers. Currently we have one layer.
-    auto layer = &param.sSpatialLayers[0];
-
-    layer->iVideoWidth = codecSettings.mWidth;
-    layer->iVideoHeight = codecSettings.mHeight;
-    layer->iSpatialBitrate = param.iTargetBitrate;
-    layer->fFrameRate = param.fMaxFrameRate;
-
-    // Based on guidance from Cisco.
-    layer->sSliceCfg.sSliceArgument.uiSliceMbNum[0] = 1000;
-    layer->sSliceCfg.sSliceArgument.uiSliceNum = 1;
-    layer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 1000;
-    */
 
     rv = encoder_->Initialize(&param);
     if (rv) {
