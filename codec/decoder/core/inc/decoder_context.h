@@ -140,7 +140,7 @@ typedef struct TagDeblockingFunc {
   PChromaDeblockingEQ4Func  pfChromaDeblockingEQ4Hor;
 } SDeblockingFunc, *PDeblockingFunc;
 
-typedef void (*PWelsNonZeroCountFunc) (int16_t* pBlock, int8_t* pNonZeroCount);
+typedef void (*PWelsNonZeroCountFunc) (int8_t* pNonZeroCount);
 
 typedef  struct  TagBlockFunc {
   PWelsNonZeroCountFunc		pWelsSetNonZeroCountFunc;
