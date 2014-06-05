@@ -113,12 +113,12 @@ gtest-bootstrap:
 ifeq ($(HAVE_GTEST),Yes)
 
 test: codec_unittest$(EXEEXT)
-ifeq (android, $(OS))
-
-else
-
+ifneq (android,$(OS)) 
+ifneq (ios,$(OS))
 	./codec_unittest
 endif
+endif
+
 else
 test:
 	@echo "./gtest : No such file or directory."
@@ -137,7 +137,12 @@ include codec/console/enc/targets.mk
 endif
 endif
 
+ifneq (ios, $(OS))
 libraries: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX)
+else
+libraries: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX)
+endif
+
 LIBRARIES += $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX)
 
 $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
@@ -173,6 +178,11 @@ include test/decoder/targets.mk
 include test/encoder/targets.mk
 include test/processing/targets.mk
 
+LIBRARIES += $(LIBPREFIX)ut.$(LIBSUFFX)
+$(LIBPREFIX)ut.$(LIBSUFFIX): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(PROCESSING_UNITTEST_OBJS) $(API_TEST_OBJS) 
+	$(QUIET)rm -f $@
+	$(QUIET_AR)$(AR) $(AR_OPTS) $+
+
 
 LIBRARIES +=$(LIBPREFIX)ut.$(SHAREDLIBSUFFIX)
 $(LIBPREFIX)ut.$(SHAREDLIBSUFFIX): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(PROCESSING_UNITTEST_OBJS) $(API_TEST_OBJS) $(CODEC_UNITTEST_DEPS)
@@ -182,10 +192,12 @@ $(LIBPREFIX)ut.$(SHAREDLIBSUFFIX): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_O
 binaries: codec_unittest$(EXEEXT)
 BINARIES += codec_unittest$(EXEEXT)
 
+ifeq (ios,$(OS))
+codec_unittest$(EXEEXT): $(LIBPREFIX)ut.$(LIBSUFFIX)
+
+else
 ifeq (android,$(OS))
-
-
-codec_unittest$(EXEEXT):$(LIBPREFIX)ut.$(SHAREDLIBSUFFIX)
+codec_unittest$(EXEEXT): $(LIBPREFIX)ut.$(SHAREDLIBSUFFIX)
 	cd ./test/build/android && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
 
 clean_Android: clean_Android_ut
@@ -196,7 +208,10 @@ else
 codec_unittest$(EXEEXT): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(PROCESSING_UNITTEST_OBJS) $(API_TEST_OBJS) $(CODEC_UNITTEST_DEPS)
 	$(QUIET)rm -f $@
 	$(QUIET_CXX)$(CXX) $(CXX_LINK_O) $+ $(CODEC_UNITTEST_LDFLAGS) $(LDFLAGS)
+
 endif
+endif
+
 else
 binaries:
 	@:
