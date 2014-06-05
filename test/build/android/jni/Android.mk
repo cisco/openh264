@@ -1,4 +1,4 @@
-# Generate the libwelsdecdemo.so file
+# Generate the libutdemo.so file
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)

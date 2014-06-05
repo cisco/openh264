@@ -102,9 +102,8 @@ API_TEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) -Itest -Itest/api
 all:	libraries binaries
 
 clean:
-
 ifeq (android,$(OS))
-clean:clean_Android
+clean: clean_Android
 endif
 	$(QUIET)rm -f $(OBJS) $(OBJS:.$(OBJ)=.d) $(LIBRARIES) $(BINARIES)
 
@@ -189,7 +188,7 @@ ifeq (android,$(OS))
 codec_unittest$(EXEEXT):$(LIBPREFIX)ut.$(SHAREDLIBSUFFIX)
 	cd ./test/build/android && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
 
-clean_Android:clean_Android_ut
+clean_Android: clean_Android_ut
 clean_Android_ut:
 	cd ./test/build/android && $(NDKROOT)/ndk-build APP_ABI=$(APP_ABI) clean && ant clean
 
