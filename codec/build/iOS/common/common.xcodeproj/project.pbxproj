@@ -18,12 +18,6 @@
 		4C3406D118D96EA600DFA14A /* WelsThreadLib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406C818D96EA600DFA14A /* WelsThreadLib.cpp */; };
 		4CC61F0918FF6B4B00E56EAB /* copy_mb_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CC61F0818FF6B4B00E56EAB /* copy_mb_neon.S */; };
 		4CE443D918B722CD0017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443D818B722CD0017DF25 /* Foundation.framework */; };
-		4CE443E718B722CD0017DF25 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443E618B722CD0017DF25 /* XCTest.framework */; };
-		4CE443E818B722CD0017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443D818B722CD0017DF25 /* Foundation.framework */; };
-		4CE443EA18B722CD0017DF25 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443E918B722CD0017DF25 /* UIKit.framework */; };
-		4CE443ED18B722CD0017DF25 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443D518B722CD0017DF25 /* libcommon.a */; };
-		4CE443F318B722CD0017DF25 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4CE443F118B722CD0017DF25 /* InfoPlist.strings */; };
-		4CE443F518B722CD0017DF25 /* commonTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CE443F418B722CD0017DF25 /* commonTests.m */; };
 		53C1C9BC193F0FB000404D8F /* expand_pic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C1C9BB193F0FB000404D8F /* expand_pic.cpp */; };
 		F0B204F918FD23BF005DA23F /* copy_mb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F0B204F818FD23BF005DA23F /* copy_mb.cpp */; };
 		F556A8241906673900E156A8 /* arm_arch64_common_macro.S in Sources */ = {isa = PBXBuildFile; fileRef = F556A8221906673900E156A8 /* arm_arch64_common_macro.S */; };
@@ -31,16 +25,6 @@
 		F5B8D82D190757290037849A /* mc_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F5B8D82C190757290037849A /* mc_aarch64_neon.S */; };
 		FAABAA1818E9354A00D4186F /* sad_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAABAA1718E9354A00D4186F /* sad_common.cpp */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		4CE443EB18B722CD0017DF25 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4CE443CD18B722CC0017DF25 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4CE443D418B722CD0017DF25;
-			remoteInfo = common;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		4CE443D318B722CD0017DF25 /* CopyFiles */ = {
@@ -78,12 +62,8 @@
 		4CC61F0818FF6B4B00E56EAB /* copy_mb_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = copy_mb_neon.S; sourceTree = "<group>"; };
 		4CE443D518B722CD0017DF25 /* libcommon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE443D818B722CD0017DF25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		4CE443E518B722CD0017DF25 /* commonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = commonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE443E618B722CD0017DF25 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4CE443E918B722CD0017DF25 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		4CE443F018B722CD0017DF25 /* commonTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "commonTests-Info.plist"; sourceTree = "<group>"; };
-		4CE443F218B722CD0017DF25 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		4CE443F418B722CD0017DF25 /* commonTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = commonTests.m; sourceTree = "<group>"; };
 		53C1C9BA193F0F9E00404D8F /* expand_pic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = expand_pic.h; sourceTree = "<group>"; };
 		53C1C9BB193F0FB000404D8F /* expand_pic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = expand_pic.cpp; sourceTree = "<group>"; };
 		F0B204F718FD23B6005DA23F /* copy_mb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = copy_mb.h; sourceTree = "<group>"; };
@@ -101,17 +81,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4CE443D918B722CD0017DF25 /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4CE443E218B722CD0017DF25 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4CE443E718B722CD0017DF25 /* XCTest.framework in Frameworks */,
-				4CE443EA18B722CD0017DF25 /* UIKit.framework in Frameworks */,
-				4CE443ED18B722CD0017DF25 /* libcommon.a in Frameworks */,
-				4CE443E818B722CD0017DF25 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -170,7 +139,6 @@
 			isa = PBXGroup;
 			children = (
 				4CE4472F18BC61650017DF25 /* common */,
-				4CE443EE18B722CD0017DF25 /* commonTests */,
 				4CE443D718B722CD0017DF25 /* Frameworks */,
 				4CE443D618B722CD0017DF25 /* Products */,
 			);
@@ -180,7 +148,6 @@
 			isa = PBXGroup;
 			children = (
 				4CE443D518B722CD0017DF25 /* libcommon.a */,
-				4CE443E518B722CD0017DF25 /* commonTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -193,24 +160,6 @@
 				4CE443E918B722CD0017DF25 /* UIKit.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		4CE443EE18B722CD0017DF25 /* commonTests */ = {
-			isa = PBXGroup;
-			children = (
-				4CE443F418B722CD0017DF25 /* commonTests.m */,
-				4CE443EF18B722CD0017DF25 /* Supporting Files */,
-			);
-			path = commonTests;
-			sourceTree = "<group>";
-		};
-		4CE443EF18B722CD0017DF25 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				4CE443F018B722CD0017DF25 /* commonTests-Info.plist */,
-				4CE443F118B722CD0017DF25 /* InfoPlist.strings */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		4CE4472F18BC61650017DF25 /* common */ = {
@@ -255,24 +204,6 @@
 			productReference = 4CE443D518B722CD0017DF25 /* libcommon.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		4CE443E418B722CD0017DF25 /* commonTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4CE443FB18B722CD0017DF25 /* Build configuration list for PBXNativeTarget "commonTests" */;
-			buildPhases = (
-				4CE443E118B722CD0017DF25 /* Sources */,
-				4CE443E218B722CD0017DF25 /* Frameworks */,
-				4CE443E318B722CD0017DF25 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				4CE443EC18B722CD0017DF25 /* PBXTargetDependency */,
-			);
-			name = commonTests;
-			productName = commonTests;
-			productReference = 4CE443E518B722CD0017DF25 /* commonTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -295,21 +226,9 @@
 			projectRoot = "";
 			targets = (
 				4CE443D418B722CD0017DF25 /* common */,
-				4CE443E418B722CD0017DF25 /* commonTests */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXResourcesBuildPhase section */
-		4CE443E318B722CD0017DF25 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4CE443F318B722CD0017DF25 /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4CE443D118B722CD0017DF25 /* Sources */ = {
@@ -335,34 +254,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4CE443E118B722CD0017DF25 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4CE443F518B722CD0017DF25 /* commonTests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		4CE443EC18B722CD0017DF25 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4CE443D418B722CD0017DF25 /* common */;
-			targetProxy = 4CE443EB18B722CD0017DF25 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		4CE443F118B722CD0017DF25 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4CE443F218B722CD0017DF25 /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		4CE443F618B722CD0017DF25 /* Debug */ = {
@@ -496,44 +388,6 @@
 			};
 			name = Release;
 		};
-		4CE443FC18B722CD0017DF25 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "common/common-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "commonTests/commonTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		4CE443FD18B722CD0017DF25 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "common/common-Prefix.pch";
-				INFOPLIST_FILE = "commonTests/commonTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -551,15 +405,6 @@
 			buildConfigurations = (
 				4CE443F918B722CD0017DF25 /* Debug */,
 				4CE443FA18B722CD0017DF25 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4CE443FB18B722CD0017DF25 /* Build configuration list for PBXNativeTarget "commonTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4CE443FC18B722CD0017DF25 /* Debug */,
-				4CE443FD18B722CD0017DF25 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

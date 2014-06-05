@@ -14,12 +14,6 @@
 		4C34067218C57D0400DFA14A /* reconstruct_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4C34066B18C57D0400DFA14A /* reconstruct_neon.S */; };
 		4CB8F2B419235FC5005D6386 /* pixel_neon_aarch64.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CB8F2B319235FC5005D6386 /* pixel_neon_aarch64.S */; };
 		4CE4431518B6FFA00017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4431418B6FFA00017DF25 /* Foundation.framework */; };
-		4CE4432318B6FFA00017DF25 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4432218B6FFA00017DF25 /* XCTest.framework */; };
-		4CE4432418B6FFA00017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4431418B6FFA00017DF25 /* Foundation.framework */; };
-		4CE4432618B6FFA00017DF25 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4432518B6FFA00017DF25 /* UIKit.framework */; };
-		4CE4432918B6FFA00017DF25 /* libwelsenc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4431118B6FFA00017DF25 /* libwelsenc.a */; };
-		4CE4432F18B6FFA00017DF25 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4CE4432D18B6FFA00017DF25 /* InfoPlist.strings */; };
-		4CE4433118B6FFA00017DF25 /* welsencTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4433018B6FFA00017DF25 /* welsencTests.m */; };
 		4CE4470E18BC605C0017DF25 /* au_set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446DD18BC605C0017DF25 /* au_set.cpp */; };
 		4CE4470F18BC605C0017DF25 /* deblocking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446DE18BC605C0017DF25 /* deblocking.cpp */; };
 		4CE4471018BC605C0017DF25 /* decode_mb_aux.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446DF18BC605C0017DF25 /* decode_mb_aux.cpp */; };
@@ -53,16 +47,6 @@
 		4CE4472E18BC605C0017DF25 /* welsEncoderExt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4470618BC605C0017DF25 /* welsEncoderExt.cpp */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		4CE4432718B6FFA00017DF25 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4CE4430918B6FFA00017DF25 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4CE4431018B6FFA00017DF25;
-			remoteInfo = welsenc;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXCopyFilesBuildPhase section */
 		4CE4430F18B6FFA00017DF25 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -85,12 +69,8 @@
 		4CDBFB9D18E5068D0025A767 /* wels_transpose_matrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wels_transpose_matrix.h; sourceTree = "<group>"; };
 		4CE4431118B6FFA00017DF25 /* libwelsenc.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libwelsenc.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE4431418B6FFA00017DF25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		4CE4432118B6FFA00017DF25 /* welsencTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = welsencTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE4432218B6FFA00017DF25 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4CE4432518B6FFA00017DF25 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		4CE4432C18B6FFA00017DF25 /* welsencTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "welsencTests-Info.plist"; sourceTree = "<group>"; };
-		4CE4432E18B6FFA00017DF25 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		4CE4433018B6FFA00017DF25 /* welsencTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = welsencTests.m; sourceTree = "<group>"; };
 		4CE446AA18BC605C0017DF25 /* as264_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = as264_common.h; sourceTree = "<group>"; };
 		4CE446AB18BC605C0017DF25 /* au_set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = au_set.h; sourceTree = "<group>"; };
 		4CE446AC18BC605C0017DF25 /* bit_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bit_stream.h; sourceTree = "<group>"; };
@@ -184,17 +164,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4CE4431E18B6FFA00017DF25 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4CE4432318B6FFA00017DF25 /* XCTest.framework in Frameworks */,
-				4CE4432618B6FFA00017DF25 /* UIKit.framework in Frameworks */,
-				4CE4432418B6FFA00017DF25 /* Foundation.framework in Frameworks */,
-				4CE4432918B6FFA00017DF25 /* libwelsenc.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -222,7 +191,6 @@
 			isa = PBXGroup;
 			children = (
 				4CE446A018BC605B0017DF25 /* encoder */,
-				4CE4432A18B6FFA00017DF25 /* welsencTests */,
 				4CE4431318B6FFA00017DF25 /* Frameworks */,
 				4CE4431218B6FFA00017DF25 /* Products */,
 			);
@@ -232,7 +200,6 @@
 			isa = PBXGroup;
 			children = (
 				4CE4431118B6FFA00017DF25 /* libwelsenc.a */,
-				4CE4432118B6FFA00017DF25 /* welsencTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -245,24 +212,6 @@
 				4CE4432518B6FFA00017DF25 /* UIKit.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		4CE4432A18B6FFA00017DF25 /* welsencTests */ = {
-			isa = PBXGroup;
-			children = (
-				4CE4433018B6FFA00017DF25 /* welsencTests.m */,
-				4CE4432B18B6FFA00017DF25 /* Supporting Files */,
-			);
-			path = welsencTests;
-			sourceTree = "<group>";
-		};
-		4CE4432B18B6FFA00017DF25 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				4CE4432C18B6FFA00017DF25 /* welsencTests-Info.plist */,
-				4CE4432D18B6FFA00017DF25 /* InfoPlist.strings */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		4CE446A018BC605B0017DF25 /* encoder */ = {
@@ -426,24 +375,6 @@
 			productReference = 4CE4431118B6FFA00017DF25 /* libwelsenc.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		4CE4432018B6FFA00017DF25 /* welsencTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4CE4433718B6FFA00017DF25 /* Build configuration list for PBXNativeTarget "welsencTests" */;
-			buildPhases = (
-				4CE4431D18B6FFA00017DF25 /* Sources */,
-				4CE4431E18B6FFA00017DF25 /* Frameworks */,
-				4CE4431F18B6FFA00017DF25 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				4CE4432818B6FFA00017DF25 /* PBXTargetDependency */,
-			);
-			name = welsencTests;
-			productName = welsencTests;
-			productReference = 4CE4432118B6FFA00017DF25 /* welsencTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -466,21 +397,9 @@
 			projectRoot = "";
 			targets = (
 				4CE4431018B6FFA00017DF25 /* welsenc */,
-				4CE4432018B6FFA00017DF25 /* welsencTests */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXResourcesBuildPhase section */
-		4CE4431F18B6FFA00017DF25 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4CE4432F18B6FFA00017DF25 /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4CE4430D18B6FFA00017DF25 /* Sources */ = {
@@ -527,34 +446,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4CE4431D18B6FFA00017DF25 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4CE4433118B6FFA00017DF25 /* welsencTests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		4CE4432818B6FFA00017DF25 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4CE4431018B6FFA00017DF25 /* welsenc */;
-			targetProxy = 4CE4432718B6FFA00017DF25 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		4CE4432D18B6FFA00017DF25 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4CE4432E18B6FFA00017DF25 /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		4CE4433218B6FFA00017DF25 /* Debug */ = {
@@ -705,44 +597,6 @@
 			};
 			name = Release;
 		};
-		4CE4433818B6FFA00017DF25 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "welsenc/welsenc-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "welsencTests/welsencTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		4CE4433918B6FFA00017DF25 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "welsenc/welsenc-Prefix.pch";
-				INFOPLIST_FILE = "welsencTests/welsencTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -760,15 +614,6 @@
 			buildConfigurations = (
 				4CE4433518B6FFA00017DF25 /* Debug */,
 				4CE4433618B6FFA00017DF25 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4CE4433718B6FFA00017DF25 /* Build configuration list for PBXNativeTarget "welsencTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4CE4433818B6FFA00017DF25 /* Debug */,
-				4CE4433918B6FFA00017DF25 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
