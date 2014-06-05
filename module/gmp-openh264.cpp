@@ -39,6 +39,7 @@
 #include <iostream>
 #include <memory>
 #include <assert.h>
+#include <limits.h>
 
 #include "gmp-platform.h"
 #include "gmp-video-host.h"
