@@ -38,6 +38,7 @@
 #include <cstring>
 #include <iostream>
 #include <memory>
+#include <assert.h>
 
 #include "gmp-platform.h"
 #include "gmp-video-host.h"
@@ -49,7 +50,6 @@
 #include "codec_def.h"
 #include "codec_app_def.h"
 #include "codec_api.h"
-#include "param_svc.h"
 
 #include "task_utils.h"
 

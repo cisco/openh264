@@ -122,7 +122,7 @@ def generate_function_template(args, member):
     else:
         nm = "nm"
         NM = "NM";
-        
+
     print "// %d arguments --"%args
     print "template<" + gen_typenames(args, member) + ">"
     print "gmp_args_%s_%d<"%(nm, args) + gen_types(args, member) + ">* WrapTask%s("%NM + gen_args_type(args, member) + ") {"
