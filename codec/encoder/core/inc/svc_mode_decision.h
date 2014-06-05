@@ -53,10 +53,10 @@ namespace WelsSVCEnc {
 ///////////////////////
 #define DELTA_QP_SCD_THD 5
 
-typedef enum{
+typedef enum {
   STATIC,
   SCROLLED,
-}ESkipModes;
+} ESkipModes;
 
 // NOILP ILFMD ENTRANCE
 void WelsMdSpatialelInterMbIlfmdNoilp (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb,
@@ -64,9 +64,10 @@ void WelsMdSpatialelInterMbIlfmdNoilp (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, S
 void WelsMdInterMbEnhancelayer (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache);
 SMB* GetRefMb (SDqLayer* pCurLayer, SMB* pCurMb);
 void SetMvBaseEnhancelayer (SWelsMD* pMd, SMB* pCurMb, const SMB* kpRefMb);
-bool MdInterSCDPskipProcess(sWelsEncCtx* pEncCtx, SWelsMD* pMd, SSlice *pSlice, SMB* pCurMb, SMbCache *pMbCache, ESkipModes eSkipMode);
+bool MdInterSCDPskipProcess (sWelsEncCtx* pEncCtx, SWelsMD* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
+                             ESkipModes eSkipMode);
 
-typedef bool (*pJudgeSkipFun)(sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache,SWelsMD* pWelsMd);
+typedef bool (*pJudgeSkipFun) (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWelsMD* pWelsMd);
 void SetBlockStaticIdcToMd (void* pVaa, void* pMd, SMB* pCurMb, void* pDqLay);
 }
 #endif //SVC_MODE_DECISION_H
