@@ -24,6 +24,7 @@
 		4CE443ED18B722CD0017DF25 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443D518B722CD0017DF25 /* libcommon.a */; };
 		4CE443F318B722CD0017DF25 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4CE443F118B722CD0017DF25 /* InfoPlist.strings */; };
 		4CE443F518B722CD0017DF25 /* commonTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CE443F418B722CD0017DF25 /* commonTests.m */; };
+		53C1C9BC193F0FB000404D8F /* expand_pic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C1C9BB193F0FB000404D8F /* expand_pic.cpp */; };
 		F0B204F918FD23BF005DA23F /* copy_mb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F0B204F818FD23BF005DA23F /* copy_mb.cpp */; };
 		F556A8241906673900E156A8 /* arm_arch64_common_macro.S in Sources */ = {isa = PBXBuildFile; fileRef = F556A8221906673900E156A8 /* arm_arch64_common_macro.S */; };
 		F556A8251906673900E156A8 /* expand_picture_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F556A8231906673900E156A8 /* expand_picture_aarch64_neon.S */; };
@@ -62,7 +63,6 @@
 		4C3406B818D96EA600DFA14A /* cpu_core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpu_core.h; sourceTree = "<group>"; };
 		4C3406B918D96EA600DFA14A /* crt_util_safe_x.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crt_util_safe_x.h; sourceTree = "<group>"; };
 		4C3406BA18D96EA600DFA14A /* deblocking_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = deblocking_common.h; sourceTree = "<group>"; };
-		4C3406BB18D96EA600DFA14A /* expand_picture_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = expand_picture_common.h; sourceTree = "<group>"; };
 		4C3406BC18D96EA600DFA14A /* logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logging.h; sourceTree = "<group>"; };
 		4C3406BD18D96EA600DFA14A /* ls_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ls_defines.h; sourceTree = "<group>"; };
 		4C3406BE18D96EA600DFA14A /* macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = macros.h; sourceTree = "<group>"; };
@@ -84,6 +84,8 @@
 		4CE443F018B722CD0017DF25 /* commonTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "commonTests-Info.plist"; sourceTree = "<group>"; };
 		4CE443F218B722CD0017DF25 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4CE443F418B722CD0017DF25 /* commonTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = commonTests.m; sourceTree = "<group>"; };
+		53C1C9BA193F0F9E00404D8F /* expand_pic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = expand_pic.h; sourceTree = "<group>"; };
+		53C1C9BB193F0FB000404D8F /* expand_pic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = expand_pic.cpp; sourceTree = "<group>"; };
 		F0B204F718FD23B6005DA23F /* copy_mb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = copy_mb.h; sourceTree = "<group>"; };
 		F0B204F818FD23BF005DA23F /* copy_mb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = copy_mb.cpp; sourceTree = "<group>"; };
 		F556A8221906673900E156A8 /* arm_arch64_common_macro.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = arm_arch64_common_macro.S; path = arm64/arm_arch64_common_macro.S; sourceTree = "<group>"; };
@@ -136,8 +138,8 @@
 				4C3406B718D96EA600DFA14A /* cpu.h */,
 				4C3406B818D96EA600DFA14A /* cpu_core.h */,
 				4C3406B918D96EA600DFA14A /* crt_util_safe_x.h */,
+				53C1C9BA193F0F9E00404D8F /* expand_pic.h */,
 				4C3406BA18D96EA600DFA14A /* deblocking_common.h */,
-				4C3406BB18D96EA600DFA14A /* expand_picture_common.h */,
 				4C3406BC18D96EA600DFA14A /* logging.h */,
 				4C3406BD18D96EA600DFA14A /* ls_defines.h */,
 				4C3406BE18D96EA600DFA14A /* macros.h */,
@@ -156,6 +158,7 @@
 				FAABAA1718E9354A00D4186F /* sad_common.cpp */,
 				4C3406C418D96EA600DFA14A /* cpu.cpp */,
 				4C3406C518D96EA600DFA14A /* crt_util_safe_x.cpp */,
+				53C1C9BB193F0FB000404D8F /* expand_pic.cpp */,
 				4C3406C618D96EA600DFA14A /* deblocking_common.cpp */,
 				4C3406C718D96EA600DFA14A /* logging.cpp */,
 				4C3406C818D96EA600DFA14A /* WelsThreadLib.cpp */,
@@ -323,6 +326,7 @@
 				4C3406CC18D96EA600DFA14A /* mc_neon.S in Sources */,
 				4C3406CB18D96EA600DFA14A /* expand_picture_neon.S in Sources */,
 				4CC61F0918FF6B4B00E56EAB /* copy_mb_neon.S in Sources */,
+				53C1C9BC193F0FB000404D8F /* expand_pic.cpp in Sources */,
 				4C3406CD18D96EA600DFA14A /* cpu.cpp in Sources */,
 				F556A8251906673900E156A8 /* expand_picture_aarch64_neon.S in Sources */,
 				4C3406CA18D96EA600DFA14A /* deblocking_neon.S in Sources */,
