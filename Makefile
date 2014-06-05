@@ -113,7 +113,7 @@ gtest-bootstrap:
 ifeq ($(HAVE_GTEST),Yes)
 
 test: codec_unittest$(EXEEXT)
-ifneq (android,$(OS)) 
+ifneq (android,$(OS))
 ifneq (ios,$(OS))
 	./codec_unittest
 endif
