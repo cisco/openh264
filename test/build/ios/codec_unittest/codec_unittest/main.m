@@ -16,13 +16,11 @@ extern int CodecUtMain(int argc, char** argv);
 int GetDocumentPath(char *pPath, unsigned long *pLen)
 {
     if (!pLen) return 1;
-    
     unsigned long uPathLen = *pLen;
     if(NULL == pPath || 0 == uPathLen)
     {
         return 1;
     }
-    
     NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     if([paths count] == 0)
     {
@@ -33,7 +31,6 @@ int GetDocumentPath(char *pPath, unsigned long *pLen)
     unsigned long uDocumentPathLen = [escapedPath length];
     uPathLen= (uDocumentPathLen <= uPathLen) ? uDocumentPathLen : uPathLen;
     memcpy(pPath,[escapedPath UTF8String],uPathLen);
-    
     return 0;
 }
 
@@ -51,7 +48,6 @@ int main(int argc, char * argv[])
     char path[1024] = "";
     GetDocumentPath(xmlWritePath,&uPathLen);
     sprintf(path, "%s%s",xmlWritePath,"/codec_unittest.xml");
-    
 #endif
     argc =2;
     argv[0]="codec_unittest";
