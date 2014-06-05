@@ -18,6 +18,12 @@ PROJECT_NAME=openh264
 MODULE_NAME=gmpopenh264
 CCASFLAGS=$(CFLAGS)
 
+ifeq (,$(wildcard ./gmp-api))
+HAVE_GMP_API=No
+else
+HAVE_GMP_API=Yes
+endif
+
 ifeq (,$(wildcard ./gtest))
 HAVE_GTEST=No
 else
@@ -133,7 +139,10 @@ include codec/common/targets.mk
 include codec/decoder/targets.mk
 include codec/encoder/targets.mk
 include codec/processing/targets.mk
+
+ifeq ($(HAVE_GMP_API),Yes)
 include module/targets.mk
+endif
 
 ifneq (android, $(OS))
 ifneq (ios, $(OS))
@@ -153,8 +162,14 @@ $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) 
 	$(QUIET)rm -f $@
 	$(QUIET_CXX)$(CXX) $(SHARED) $(LDFLAGS) $(CXX_LINK_O) $+ $(SHLDFLAGS)
 
+ifeq ($(HAVE_GMP_API),Yes)
 plugin: $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX)
 PLUGINS += $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX)
+else
+plugin:
+	@echo "./gmp-api : No such file or directory."
+	@echo "You do not have gmp-api.  Run make gmp-bootstrap to get the gmp-api headers."
+endif
 
 $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX): $(MODULE_OBJS) $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
 	$(QUIET)rm -f $@
