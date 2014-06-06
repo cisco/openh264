@@ -1,6 +1,7 @@
 #ifeq ($(filter %86 armv7 armv7s arm64, $(ARCH)),)
 #$(error Default ARCH is the build platform not ios devices platform,should pass ARCH to make,only support ARCH of %86 armv7 armv7s arm64)
 #endif
+ARCH=armv7
 include build/platform-darwin.mk
 CXX = clang++
 CC = clang

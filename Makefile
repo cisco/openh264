@@ -178,7 +178,7 @@ include test/decoder/targets.mk
 include test/encoder/targets.mk
 include test/processing/targets.mk
 
-LIBRARIES += $(LIBPREFIX)ut.$(LIBSUFFX)
+LIBRARIES += $(LIBPREFIX)ut.$(LIBSUFFIX)
 $(LIBPREFIX)ut.$(LIBSUFFIX): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(PROCESSING_UNITTEST_OBJS) $(API_TEST_OBJS) 
 	$(QUIET)rm -f $@
 	$(QUIET_AR)$(AR) $(AR_OPTS) $+
