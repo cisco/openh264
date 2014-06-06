@@ -91,7 +91,6 @@
 		FAFB4FC018BC8DD700315438 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		FAFB4FC118BC8DD700315438 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		FAFB4FC318BC8DD700315438 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		FAFB4FCA18BC8DD700315438 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		FAFB4FE218BC8E7C00315438 /* welsenc.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = welsenc.xcodeproj; path = ../welsenc/welsenc.xcodeproj; sourceTree = "<group>"; };
 		FAFB4FEB18BC8E8600315438 /* common.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = common.xcodeproj; path = ../../common/common.xcodeproj; sourceTree = "<group>"; };
 		FAFB4FF418BC8E9A00315438 /* processing.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = processing.xcodeproj; path = ../../../../processing/build/iOS/processing.xcodeproj; sourceTree = "<group>"; };
@@ -143,7 +142,6 @@
 				FAFB4FA818BC8DD700315438 /* Foundation.framework */,
 				FAFB4FAA18BC8DD700315438 /* CoreGraphics.framework */,
 				FAFB4FAC18BC8DD700315438 /* UIKit.framework */,
-				FAFB4FCA18BC8DD700315438 /* XCTest.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
