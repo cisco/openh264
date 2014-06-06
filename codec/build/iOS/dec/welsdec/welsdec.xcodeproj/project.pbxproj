@@ -8,12 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		4CE4427D18B6FC360017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4427C18B6FC360017DF25 /* Foundation.framework */; };
-		4CE4428B18B6FC360017DF25 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4428A18B6FC360017DF25 /* XCTest.framework */; };
-		4CE4428C18B6FC360017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4427C18B6FC360017DF25 /* Foundation.framework */; };
-		4CE4428E18B6FC360017DF25 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4428D18B6FC360017DF25 /* UIKit.framework */; };
-		4CE4429118B6FC360017DF25 /* libwelsdec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4427918B6FC360017DF25 /* libwelsdec.a */; };
-		4CE4429718B6FC360017DF25 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4CE4429518B6FC360017DF25 /* InfoPlist.strings */; };
-		4CE4429918B6FC360017DF25 /* welsdecTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4429818B6FC360017DF25 /* welsdecTests.m */; };
 		4CE4468A18BC5EAB0017DF25 /* au_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4466718BC5EAA0017DF25 /* au_parser.cpp */; };
 		4CE4468B18BC5EAB0017DF25 /* bit_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4466818BC5EAA0017DF25 /* bit_stream.cpp */; };
 		4CE4468C18BC5EAB0017DF25 /* deblocking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4466918BC5EAA0017DF25 /* deblocking.cpp */; };
@@ -41,16 +35,6 @@
 		F0B204FC18FD23D8005DA23F /* error_concealment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F0B204FB18FD23D8005DA23F /* error_concealment.cpp */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		4CE4428F18B6FC360017DF25 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4CE4427118B6FC360017DF25 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4CE4427818B6FC360017DF25;
-			remoteInfo = welsdec;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXCopyFilesBuildPhase section */
 		4CE4427718B6FC360017DF25 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -66,12 +50,8 @@
 /* Begin PBXFileReference section */
 		4CE4427918B6FC360017DF25 /* libwelsdec.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libwelsdec.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE4427C18B6FC360017DF25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		4CE4428918B6FC360017DF25 /* welsdecTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = welsdecTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE4428A18B6FC360017DF25 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4CE4428D18B6FC360017DF25 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		4CE4429418B6FC360017DF25 /* welsdecTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "welsdecTests-Info.plist"; sourceTree = "<group>"; };
-		4CE4429618B6FC360017DF25 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		4CE4429818B6FC360017DF25 /* welsdecTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = welsdecTests.m; sourceTree = "<group>"; };
 		4CE4464518BC5EAA0017DF25 /* as264_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = as264_common.h; sourceTree = "<group>"; };
 		4CE4464618BC5EAA0017DF25 /* au_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = au_parser.h; sourceTree = "<group>"; };
 		4CE4464718BC5EAA0017DF25 /* bit_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bit_stream.h; sourceTree = "<group>"; };
@@ -145,17 +125,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4CE4428618B6FC360017DF25 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4CE4428B18B6FC360017DF25 /* XCTest.framework in Frameworks */,
-				4CE4429118B6FC360017DF25 /* libwelsdec.a in Frameworks */,
-				4CE4428E18B6FC360017DF25 /* UIKit.framework in Frameworks */,
-				4CE4428C18B6FC360017DF25 /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -163,7 +132,6 @@
 			isa = PBXGroup;
 			children = (
 				4CE4463E18BC5EAA0017DF25 /* decoder */,
-				4CE4429218B6FC360017DF25 /* welsdecTests */,
 				4CE4427B18B6FC360017DF25 /* Frameworks */,
 				4CE4427A18B6FC360017DF25 /* Products */,
 			);
@@ -173,7 +141,6 @@
 			isa = PBXGroup;
 			children = (
 				4CE4427918B6FC360017DF25 /* libwelsdec.a */,
-				4CE4428918B6FC360017DF25 /* welsdecTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -186,24 +153,6 @@
 				4CE4428D18B6FC360017DF25 /* UIKit.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		4CE4429218B6FC360017DF25 /* welsdecTests */ = {
-			isa = PBXGroup;
-			children = (
-				4CE4429818B6FC360017DF25 /* welsdecTests.m */,
-				4CE4429318B6FC360017DF25 /* Supporting Files */,
-			);
-			path = welsdecTests;
-			sourceTree = "<group>";
-		};
-		4CE4429318B6FC360017DF25 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				4CE4429418B6FC360017DF25 /* welsdecTests-Info.plist */,
-				4CE4429518B6FC360017DF25 /* InfoPlist.strings */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		4CE4463E18BC5EAA0017DF25 /* decoder */ = {
@@ -352,24 +301,6 @@
 			productReference = 4CE4427918B6FC360017DF25 /* libwelsdec.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		4CE4428818B6FC360017DF25 /* welsdecTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4CE4429F18B6FC360017DF25 /* Build configuration list for PBXNativeTarget "welsdecTests" */;
-			buildPhases = (
-				4CE4428518B6FC360017DF25 /* Sources */,
-				4CE4428618B6FC360017DF25 /* Frameworks */,
-				4CE4428718B6FC360017DF25 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				4CE4429018B6FC360017DF25 /* PBXTargetDependency */,
-			);
-			name = welsdecTests;
-			productName = welsdecTests;
-			productReference = 4CE4428918B6FC360017DF25 /* welsdecTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -392,21 +323,9 @@
 			projectRoot = "";
 			targets = (
 				4CE4427818B6FC360017DF25 /* welsdec */,
-				4CE4428818B6FC360017DF25 /* welsdecTests */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXResourcesBuildPhase section */
-		4CE4428718B6FC360017DF25 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4CE4429718B6FC360017DF25 /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4CE4427518B6FC360017DF25 /* Sources */ = {
@@ -441,34 +360,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4CE4428518B6FC360017DF25 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4CE4429918B6FC360017DF25 /* welsdecTests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		4CE4429018B6FC360017DF25 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4CE4427818B6FC360017DF25 /* welsdec */;
-			targetProxy = 4CE4428F18B6FC360017DF25 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		4CE4429518B6FC360017DF25 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4CE4429618B6FC360017DF25 /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		4CE4429A18B6FC360017DF25 /* Debug */ = {
@@ -611,44 +503,6 @@
 			};
 			name = Release;
 		};
-		4CE442A018B6FC360017DF25 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "welsdec/welsdec-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "welsdecTests/welsdecTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		4CE442A118B6FC360017DF25 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "welsdec/welsdec-Prefix.pch";
-				INFOPLIST_FILE = "welsdecTests/welsdecTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -666,15 +520,6 @@
 			buildConfigurations = (
 				4CE4429D18B6FC360017DF25 /* Debug */,
 				4CE4429E18B6FC360017DF25 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4CE4429F18B6FC360017DF25 /* Build configuration list for PBXNativeTarget "welsdecTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4CE442A018B6FC360017DF25 /* Debug */,
-				4CE442A118B6FC360017DF25 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

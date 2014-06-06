@@ -12,12 +12,6 @@
 		4C34067A18C5A4AD00DFA14A /* pixel_sad_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4C34067618C5A4AD00DFA14A /* pixel_sad_neon.S */; };
 		4C34067B18C5A4AD00DFA14A /* vaa_calc_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4C34067718C5A4AD00DFA14A /* vaa_calc_neon.S */; };
 		4CE4443518B724B60017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4443418B724B60017DF25 /* Foundation.framework */; };
-		4CE4444318B724B60017DF25 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4444218B724B60017DF25 /* XCTest.framework */; };
-		4CE4444418B724B60017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4443418B724B60017DF25 /* Foundation.framework */; };
-		4CE4444618B724B60017DF25 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4444518B724B60017DF25 /* UIKit.framework */; };
-		4CE4444918B724B60017DF25 /* libprocessing.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4443118B724B60017DF25 /* libprocessing.a */; };
-		4CE4444F18B724B60017DF25 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4CE4444D18B724B60017DF25 /* InfoPlist.strings */; };
-		4CE4445118B724B60017DF25 /* processingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4445018B724B60017DF25 /* processingTests.m */; };
 		4CE4478B18BC62960017DF25 /* AdaptiveQuantization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4475D18BC62960017DF25 /* AdaptiveQuantization.cpp */; };
 		4CE4478F18BC62960017DF25 /* BackgroundDetection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4476418BC62960017DF25 /* BackgroundDetection.cpp */; };
 		4CE4479018BC62960017DF25 /* memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4476718BC62960017DF25 /* memory.cpp */; };
@@ -38,16 +32,6 @@
 		FAC77EA418F7B09C0038A4E4 /* ScrollDetectionFuncs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAC77EA118F7B09C0038A4E4 /* ScrollDetectionFuncs.cpp */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		4CE4444718B724B60017DF25 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4CE4442918B724B60017DF25 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4CE4443018B724B60017DF25;
-			remoteInfo = processing;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXCopyFilesBuildPhase section */
 		4CE4442F18B724B60017DF25 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -67,12 +51,8 @@
 		4C34067718C5A4AD00DFA14A /* vaa_calc_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = vaa_calc_neon.S; sourceTree = "<group>"; };
 		4CE4443118B724B60017DF25 /* libprocessing.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libprocessing.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE4443418B724B60017DF25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		4CE4444118B724B60017DF25 /* processingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = processingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE4444218B724B60017DF25 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4CE4444518B724B60017DF25 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		4CE4444C18B724B60017DF25 /* processingTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "processingTests-Info.plist"; sourceTree = "<group>"; };
-		4CE4444E18B724B60017DF25 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		4CE4445018B724B60017DF25 /* processingTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = processingTests.m; sourceTree = "<group>"; };
 		4CE4475A18BC62960017DF25 /* IWelsVP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IWelsVP.h; sourceTree = "<group>"; };
 		4CE4475D18BC62960017DF25 /* AdaptiveQuantization.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AdaptiveQuantization.cpp; sourceTree = "<group>"; };
 		4CE4475E18BC62960017DF25 /* AdaptiveQuantization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdaptiveQuantization.h; sourceTree = "<group>"; };
@@ -119,17 +99,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4CE4443E18B724B60017DF25 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4CE4444318B724B60017DF25 /* XCTest.framework in Frameworks */,
-				4CE4444618B724B60017DF25 /* UIKit.framework in Frameworks */,
-				4CE4444918B724B60017DF25 /* libprocessing.a in Frameworks */,
-				4CE4444418B724B60017DF25 /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -149,7 +118,6 @@
 			children = (
 				4CE4475918BC62960017DF25 /* interface */,
 				4CE4475B18BC62960017DF25 /* src */,
-				4CE4444A18B724B60017DF25 /* processingTests */,
 				4CE4443318B724B60017DF25 /* Frameworks */,
 				4CE4443218B724B60017DF25 /* Products */,
 			);
@@ -159,7 +127,6 @@
 			isa = PBXGroup;
 			children = (
 				4CE4443118B724B60017DF25 /* libprocessing.a */,
-				4CE4444118B724B60017DF25 /* processingTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -172,24 +139,6 @@
 				4CE4444518B724B60017DF25 /* UIKit.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		4CE4444A18B724B60017DF25 /* processingTests */ = {
-			isa = PBXGroup;
-			children = (
-				4CE4445018B724B60017DF25 /* processingTests.m */,
-				4CE4444B18B724B60017DF25 /* Supporting Files */,
-			);
-			path = processingTests;
-			sourceTree = "<group>";
-		};
-		4CE4444B18B724B60017DF25 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				4CE4444C18B724B60017DF25 /* processingTests-Info.plist */,
-				4CE4444D18B724B60017DF25 /* InfoPlist.strings */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		4CE4475918BC62960017DF25 /* interface */ = {
@@ -344,24 +293,6 @@
 			productReference = 4CE4443118B724B60017DF25 /* libprocessing.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		4CE4444018B724B60017DF25 /* processingTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4CE4445718B724B60017DF25 /* Build configuration list for PBXNativeTarget "processingTests" */;
-			buildPhases = (
-				4CE4443D18B724B60017DF25 /* Sources */,
-				4CE4443E18B724B60017DF25 /* Frameworks */,
-				4CE4443F18B724B60017DF25 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				4CE4444818B724B60017DF25 /* PBXTargetDependency */,
-			);
-			name = processingTests;
-			productName = processingTests;
-			productReference = 4CE4444118B724B60017DF25 /* processingTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -384,21 +315,9 @@
 			projectRoot = "";
 			targets = (
 				4CE4443018B724B60017DF25 /* processing */,
-				4CE4444018B724B60017DF25 /* processingTests */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXResourcesBuildPhase section */
-		4CE4443F18B724B60017DF25 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4CE4444F18B724B60017DF25 /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4CE4442D18B724B60017DF25 /* Sources */ = {
@@ -430,34 +349,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4CE4443D18B724B60017DF25 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4CE4445118B724B60017DF25 /* processingTests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		4CE4444818B724B60017DF25 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4CE4443018B724B60017DF25 /* processing */;
-			targetProxy = 4CE4444718B724B60017DF25 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		4CE4444D18B724B60017DF25 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4CE4444E18B724B60017DF25 /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		4CE4445218B724B60017DF25 /* Debug */ = {
@@ -600,44 +492,6 @@
 			};
 			name = Release;
 		};
-		4CE4445818B724B60017DF25 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "processing/processing-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "processingTests/processingTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		4CE4445918B724B60017DF25 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "processing/processing-Prefix.pch";
-				INFOPLIST_FILE = "processingTests/processingTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -655,15 +509,6 @@
 			buildConfigurations = (
 				4CE4445518B724B60017DF25 /* Debug */,
 				4CE4445618B724B60017DF25 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4CE4445718B724B60017DF25 /* Build configuration list for PBXNativeTarget "processingTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4CE4445818B724B60017DF25 /* Debug */,
-				4CE4445918B724B60017DF25 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
