@@ -35,26 +35,12 @@
 			remoteGlobalIDString = 4CE443D518B722CD0017DF25;
 			remoteInfo = common;
 		};
-		4CE444F718B72A900017DF25 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4CE444F018B72A8F0017DF25 /* common.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4CE443E518B722CD0017DF25;
-			remoteInfo = commonTests;
-		};
 		4CE444FF18B72AD70017DF25 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 4CE444FA18B72AD70017DF25 /* welsdec.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 4CE4427918B6FC360017DF25;
 			remoteInfo = welsdec;
-		};
-		4CE4450118B72AD70017DF25 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4CE444FA18B72AD70017DF25 /* welsdec.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4CE4428918B6FC360017DF25;
-			remoteInfo = welsdecTests;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -106,7 +92,6 @@
 			isa = PBXGroup;
 			children = (
 				4CE444F618B72A900017DF25 /* libcommon.a */,
-				4CE444F818B72A900017DF25 /* commonTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -115,7 +100,6 @@
 			isa = PBXGroup;
 			children = (
 				4CE4450018B72AD70017DF25 /* libwelsdec.a */,
-				4CE4450218B72AD70017DF25 /* welsdecTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -273,25 +257,11 @@
 			remoteRef = 4CE444F518B72A900017DF25 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		4CE444F818B72A900017DF25 /* commonTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = commonTests.xctest;
-			remoteRef = 4CE444F718B72A900017DF25 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		4CE4450018B72AD70017DF25 /* libwelsdec.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libwelsdec.a;
 			remoteRef = 4CE444FF18B72AD70017DF25 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		4CE4450218B72AD70017DF25 /* welsdecTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = welsdecTests.xctest;
-			remoteRef = 4CE4450118B72AD70017DF25 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
