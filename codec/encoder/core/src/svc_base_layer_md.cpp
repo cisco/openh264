@@ -1647,7 +1647,7 @@ void WelsMdInterMb (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache
   }
 
   //try static or scrolled Pskip
-  if (pEncCtx->pFuncList->pfScrollingPSkipDecision (pEncCtx, pWelsMd, pSlice, pCurMb, pMbCache)) {
+  if (pEncCtx->pFuncList->pfSCDPSkipDecision (pEncCtx, pWelsMd, pSlice, pCurMb, pMbCache)) {
     return;
   }
 

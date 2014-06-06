@@ -207,7 +207,7 @@ struct TagWelsFuncPointerList {
   PInterMdBackgroundDecisionFunc          pfInterMdBackgroundDecision;
   PInterMdBackgroundInfoUpdateFunc      pfInterMdBackgroundInfoUpdate;
 
-  PInterMdScrollingPSkipDecisionFunc pfScrollingPSkipDecision;
+  PInterMdScrollingPSkipDecisionFunc pfSCDPSkipDecision;
 
   SMcFunc                sMcFuncs;
   SSampleDealingFunc     sSampleDealingFuncs;
