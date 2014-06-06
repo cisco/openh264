@@ -763,12 +763,14 @@ bool WelsBuildRefListScreen (void* pEncCtx, const int32_t iPOC, int32_t iBestLtr
 
   if (pCtx->eSliceType != I_SLICE) {
     int iLtrRefIdx = 0;
+    SPicture *pRefOri = NULL;
     for (int idx = 0; idx < pVaaExt->iNumOfAvailableRef; idx++) {
-      iLtrRefIdx = pCtx->pVpp->GetRefCandidateLtrIndex (idx);
+      iLtrRefIdx = pCtx->pVpp->GetRefFrameInfo(idx,pRefOri);
       if (iLtrRefIdx >= 0 && iLtrRefIdx <= pParam->iLTRRefNum) {
         SPicture* pRefPic = pRefList->pLongRefList[iLtrRefIdx];
         if (pRefPic != NULL && pRefPic->bUsedAsRef && pRefPic->bIsLongRef) {
           if (pRefPic->uiTemporalId <= pCtx->uiTemporalId && (!pCtx->bCurFrameMarkedAsSceneLtr || pRefPic->bIsSceneLTR)) {
+            pCtx->pCurDqLayer->pRefOri[pCtx->iNumRef0] = pRefOri;
             pCtx->pRefList0[pCtx->iNumRef0++] = pRefPic;
             WelsLog (pCtx, WELS_LOG_INFO,
                      "WelsBuildRefListScreen(), ref !current iFrameNum = %d, ref iFrameNum = %d,LTR number = %d,iNumRef = %d ref is Scene LTR = %d\n",
@@ -785,6 +787,7 @@ bool WelsBuildRefListScreen (void* pEncCtx, const int32_t iPOC, int32_t iBestLtr
             continue;
           } else if (pRefList->pLongRefList[i]->uiTemporalId == 0
                      || pRefList->pLongRefList[i]->uiTemporalId < pCtx->uiTemporalId)	{
+            pCtx->pCurDqLayer->pRefOri[pCtx->iNumRef0] = pRefOri;
             pCtx->pRefList0[pCtx->iNumRef0++] = pRefList->pLongRefList[i];
             WelsLog (pCtx, WELS_LOG_INFO,
                      "WelsBuildRefListScreen(), ref !current iFrameNum = %d, ref iFrameNum = %d,LTR number = %d\n",

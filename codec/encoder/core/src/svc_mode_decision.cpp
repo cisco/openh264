@@ -194,7 +194,7 @@ bool JudgeStaticSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWe
   if (bTryStaticSkip) {
     int32_t iStrideUV, iOffsetUV;
     SWelsFuncPtrList* pFunc = pEncCtx->pFuncList;
-    SPicture* pRefOri = pCurDqLayer->pRefOri;
+    SPicture* pRefOri = pCurDqLayer->pRefOri[0];
     if (pRefOri != NULL) {
       iStrideUV	= pCurDqLayer->iEncStride[1];
       iOffsetUV	= (kiMbX + kiMbY * iStrideUV) << 3;
@@ -229,7 +229,7 @@ bool JudgeScrollSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWe
   if (bTryScrollSkip) {
     int32_t iStrideUV, iOffsetUV;
     SWelsFuncPtrList* pFunc = pEncCtx->pFuncList;
-    SPicture* pRefOri = pCurDqLayer->pRefOri;
+    SPicture* pRefOri = pCurDqLayer->pRefOri[0];
     if (pRefOri != NULL) {
       int32_t iScrollMvX = pVaaExt->sScrollDetectInfo.iScrollMvX;
       int32_t iScrollMvY = pVaaExt->sScrollDetectInfo.iScrollMvY;
