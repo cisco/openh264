@@ -176,7 +176,7 @@ avx_not_supported:
 ;****************************************************************************************************
 ;   int32_t WelsCPUSupportFMA( uint32_t eax, uint32_t ecx )
 ;****************************************************************************************************
-WELS_EXTERN  WelsCPUSupportFMA
+WELS_EXTERN WelsCPUSupportFMA
 %ifdef     WIN64
     mov   eax,   ecx
     mov   ecx,   edx
