@@ -51,7 +51,6 @@
 		4C34067718C5A4AD00DFA14A /* vaa_calc_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = vaa_calc_neon.S; sourceTree = "<group>"; };
 		4CE4443118B724B60017DF25 /* libprocessing.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libprocessing.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE4443418B724B60017DF25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		4CE4444218B724B60017DF25 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4CE4444518B724B60017DF25 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		4CE4475A18BC62960017DF25 /* IWelsVP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IWelsVP.h; sourceTree = "<group>"; };
 		4CE4475D18BC62960017DF25 /* AdaptiveQuantization.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AdaptiveQuantization.cpp; sourceTree = "<group>"; };
@@ -135,7 +134,6 @@
 			isa = PBXGroup;
 			children = (
 				4CE4443418B724B60017DF25 /* Foundation.framework */,
-				4CE4444218B724B60017DF25 /* XCTest.framework */,
 				4CE4444518B724B60017DF25 /* UIKit.framework */,
 			);
 			name = Frameworks;

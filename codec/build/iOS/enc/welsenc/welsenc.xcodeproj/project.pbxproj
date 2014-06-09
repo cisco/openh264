@@ -69,7 +69,6 @@
 		4CDBFB9D18E5068D0025A767 /* wels_transpose_matrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wels_transpose_matrix.h; sourceTree = "<group>"; };
 		4CE4431118B6FFA00017DF25 /* libwelsenc.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libwelsenc.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE4431418B6FFA00017DF25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		4CE4432218B6FFA00017DF25 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4CE4432518B6FFA00017DF25 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		4CE446AA18BC605C0017DF25 /* as264_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = as264_common.h; sourceTree = "<group>"; };
 		4CE446AB18BC605C0017DF25 /* au_set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = au_set.h; sourceTree = "<group>"; };
@@ -208,7 +207,6 @@
 			isa = PBXGroup;
 			children = (
 				4CE4431418B6FFA00017DF25 /* Foundation.framework */,
-				4CE4432218B6FFA00017DF25 /* XCTest.framework */,
 				4CE4432518B6FFA00017DF25 /* UIKit.framework */,
 			);
 			name = Frameworks;
