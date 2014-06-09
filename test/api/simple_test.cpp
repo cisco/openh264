@@ -4,8 +4,7 @@
 #endif
 
 
-
-#if defined(ANDROID_NDK)
+#if (defined(ANDROID_NDK)||defined(APPLE_IOS))
 int CodecUtMain(int argc , char** argv ) {
 #else
 int main (int argc, char** argv) {
