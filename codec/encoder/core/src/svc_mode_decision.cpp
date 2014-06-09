@@ -223,7 +223,7 @@ bool JudgeScrollSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWe
   bool bTryScrollSkip = false;
 
   if (pVaaExt->sScrollDetectInfo.bScrollDetectFlag)
-    bTryScrollSkip = IsMbCollocatedStatic (pWelsMd->iBlock8x8StaticIdc);
+    bTryScrollSkip = IsMbScrolledStatic (pWelsMd->iBlock8x8StaticIdc);
   else return 0;
 
   if (bTryScrollSkip) {
@@ -237,7 +237,7 @@ bool JudgeScrollSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWe
         bTryScrollSkip =  false;
       } else {
         iStrideUV	= pCurDqLayer->iEncStride[1];
-        iOffsetUV	= (kiMbX << 3) + (iScrollMvX >> 1) + ((kiMbX << 3) + (iScrollMvY >> 1)) * iStrideUV;
+        iOffsetUV	= (kiMbX << 3) + (iScrollMvX >> 1) + ((kiMbY << 3) + (iScrollMvY >> 1)) * iStrideUV;
 
         int32_t iSadCostCb = CalUVSadCost (pFunc, pMbCache->SPicData.pEncMb[1], iStrideUV, pRefOri->pData[1] + iOffsetUV,
                                            pRefOri->iLineSize[1]);
@@ -390,9 +390,14 @@ bool WelsMdInterJudgeSCDPskip (void* pCtx, void* pMd, SSlice* slice, SMB* pCurMb
   SetBlockStaticIdcToMd (pEncCtx->pVaa, pWelsMd, pCurMb, pCurDqLayer);
 
   //try static Pskip;
+  if (MdInterSCDPskipProcess (pEncCtx, pWelsMd, slice, pCurMb, pMbCache, STATIC)) {
+    return true;
+  }
 
   //try scrolled Pskip
-  //TBD
+  if (MdInterSCDPskipProcess (pEncCtx, pWelsMd, slice, pCurMb, pMbCache, SCROLLED)) {
+    return true;
+  }
 
   return false;
 }
