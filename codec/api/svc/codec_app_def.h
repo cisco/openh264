@@ -93,7 +93,9 @@ typedef enum {
 
   ENCODER_OPTION_CURRENT_PATH,
   ENCODER_OPTION_DUMP_FILE,
-  ENCODER_OPTION_TRACE_LEVEL
+  ENCODER_OPTION_TRACE_LEVEL,
+  ENCODER_OPTION_TRACE_CALLBACK, // a void (*)(void* context, int level, const char* message) function which receives log messages
+  ENCODER_OPTION_TRACE_CALLBACK_CONTEXT,
 } ENCODER_OPTION;
 
 /* Option types introduced in decoder application */
@@ -108,6 +110,8 @@ typedef enum {
   DECODER_OPTION_LTR_MARKED_FRAME_NUM,	// feedback frame num marked by current Frame
   DECODER_OPTION_ERROR_CON_IDC, //not finished yet, indicate decoder error concealment status, in progress
   DECODER_OPTION_TRACE_LEVEL,
+  DECODER_OPTION_TRACE_CALLBACK, // a void (*)(void* context, int level, const char* message) function which receives log messages
+  DECODER_OPTION_TRACE_CALLBACK_CONTEXT,
 
 } DECODER_OPTION;
 

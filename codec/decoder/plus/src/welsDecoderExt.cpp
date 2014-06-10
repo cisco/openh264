@@ -242,7 +242,8 @@ void CWelsDecoder::InitDecoder (void) {
 long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
   int iVal = 0;
 
-  if (m_pDecContext == NULL && eOptID != DECODER_OPTION_TRACE_LEVEL)
+  if (m_pDecContext == NULL && eOptID != DECODER_OPTION_TRACE_LEVEL &&
+      eOptID != DECODER_OPTION_TRACE_CALLBACK && eOptID != DECODER_OPTION_TRACE_CALLBACK_CONTEXT)
     return dsInitialOptExpected;
 
   if (eOptID == DECODER_OPTION_DATAFORMAT) { // Set color space of decoding output frame
@@ -272,6 +273,18 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
     if (m_pWelsTrace) {
       uint32_t level = * ((uint32_t*)pOption);
       m_pWelsTrace->SetTraceLevel (level);
+    }
+    return cmResultSuccess;
+  } else if (eOptID == DECODER_OPTION_TRACE_CALLBACK) {
+    if (m_pWelsTrace) {
+      CM_WELS_TRACE callback = * ((CM_WELS_TRACE*)pOption);
+      m_pWelsTrace->SetTraceCallback (callback);
+    }
+    return cmResultSuccess;
+  } else if (eOptID == DECODER_OPTION_TRACE_CALLBACK_CONTEXT) {
+    if (m_pWelsTrace) {
+      void* ctx = * ((void**)pOption);
+      m_pWelsTrace->SetTraceCallbackContext (ctx);
     }
     return cmResultSuccess;
   }

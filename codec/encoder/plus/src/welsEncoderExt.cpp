@@ -563,7 +563,8 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     return cmInitParaError;
   }
 
-  if ((NULL == m_pEncContext || false == m_bInitialFlag) && eOptionId != ENCODER_OPTION_TRACE_LEVEL) {
+  if ((NULL == m_pEncContext || false == m_bInitialFlag) && eOptionId != ENCODER_OPTION_TRACE_LEVEL
+      && eOptionId != ENCODER_OPTION_TRACE_CALLBACK && eOptionId != ENCODER_OPTION_TRACE_CALLBACK_CONTEXT) {
     return cmInitExpected;
   }
 
@@ -868,6 +869,20 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     if (m_pWelsTrace) {
       uint32_t level = * ((uint32_t*)pOption);
       m_pWelsTrace->SetTraceLevel (level);
+    }
+  }
+  break;
+  case ENCODER_OPTION_TRACE_CALLBACK: {
+    if (m_pWelsTrace) {
+      CM_WELS_TRACE callback = * ((CM_WELS_TRACE*)pOption);
+      m_pWelsTrace->SetTraceCallback (callback);
+    }
+  }
+  break;
+  case ENCODER_OPTION_TRACE_CALLBACK_CONTEXT: {
+    if (m_pWelsTrace) {
+      void* ctx = * ((void**)pOption);
+      m_pWelsTrace->SetTraceCallbackContext (ctx);
     }
   }
   break;
