@@ -77,19 +77,6 @@ extern void WelsLog (void* pCtx, int32_t iLevel, const char* kpFmt, ...) __attri
 extern void WelsLog (void* pCtx, int32_t iLevel, const char* kpFmt, ...);
 #endif
 
-/*!
- *************************************************************************************
- * \brief	set log callback from external call
- *
- * \param	_log	log function routine
- *
- * \return	NONE
- *
- * \note	N/A
- *************************************************************************************
- */
-void WelsSetLogCallback (PWelsLogCallbackFunc _log);
-
 /*
  *	PSNR calculation routines
  */

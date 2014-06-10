@@ -174,7 +174,6 @@ void CWelsH264SVCEncoder::InitEncoder (void) {
   }
 
   m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);
-  WelsSetLogCallback (welsCodecTrace::CODEC_TRACE);
 
 #ifdef REC_FRAME_COUNT
   WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,

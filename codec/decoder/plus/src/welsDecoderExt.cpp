@@ -103,7 +103,6 @@ CWelsDecoder::CWelsDecoder (void)
   m_pWelsTrace	= new welsCodecTrace();
   if (m_pWelsTrace != NULL) {
     m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);
-    WelsSetLogCallback (welsCodecTrace::CODEC_TRACE);
 
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::CWelsDecoder() entry");
   }
