@@ -51,7 +51,6 @@
 #include "typedefs.h"
 #include "measure_time.h"
 #include "d3d9_utils.h"
-#include "logging.h"
 
 
 using namespace std;

@@ -5,7 +5,6 @@ COMMON_CPP_SRCS=\
 	$(COMMON_SRCDIR)/src/crt_util_safe_x.cpp\
 	$(COMMON_SRCDIR)/src/deblocking_common.cpp\
 	$(COMMON_SRCDIR)/src/expand_pic.cpp\
-	$(COMMON_SRCDIR)/src/logging.cpp\
 	$(COMMON_SRCDIR)/src/sad_common.cpp\
 	$(COMMON_SRCDIR)/src/utils.cpp\
 	$(COMMON_SRCDIR)/src/welsCodecTrace.cpp\

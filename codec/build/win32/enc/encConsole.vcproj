@@ -395,10 +395,6 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="..\..\..\common\src\logging.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\console\enc\src\read_config.cpp"
 				>
 			</File>

@@ -44,8 +44,11 @@
 #include "welsCodecTrace.h"
 #include "utils.h"
 
-#include "logging.h"
 
+
+static void welsStderrTrace (void* ctx, int level, const char* string) {
+  fprintf (stderr, "%s", string);
+}
 
 welsCodecTrace::welsCodecTrace() {
 

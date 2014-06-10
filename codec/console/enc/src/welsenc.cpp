@@ -67,7 +67,6 @@
 #include "extern.h"
 #include "macros.h"
 #include "wels_const.h"
-#include "logging.h"
 
 #include "mt_defs.h"
 #include "WelsThreadLib.h"

@@ -395,10 +395,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\common\src\logging.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\console\dec\src\read_config.cpp"
 				>
 			</File>
