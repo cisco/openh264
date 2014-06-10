@@ -35,7 +35,6 @@
 #include <stdio.h>
 #include "typedefs.h"
 
-int32_t welsStderrTrace (const char* string) {
+void welsStderrTrace (void* ctx, int level, const char* string) {
   fprintf (stderr, "%s", string);
-  return 0;
 }

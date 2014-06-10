@@ -37,6 +37,6 @@
 
 
 // Internal details.
-int32_t welsStderrTrace (const char* string);
+void welsStderrTrace (void* ctx, int level, const char* string);
 
 #endif
