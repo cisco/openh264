@@ -38,8 +38,8 @@
  *
  *
  *************************************************************************/
-#if !defined(AFX_WELSH264ENCODER_H__D9FAA1D1_5403_47E1_8E27_78F11EE65F02__INCLUDED_)
-#define AFX_WELSH264ENCODER_H__D9FAA1D1_5403_47E1_8E27_78F11EE65F02__INCLUDED_
+#if !defined(WELS_PLUS_WELSENCODEREXT_H)
+#define WELS_PLUS_WELSENCODEREXT_H
 
 #include "codec_api.h"
 #include "codec_def.h"
@@ -129,4 +129,4 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   void    DumpSrcPicture (const uint8_t* pSrc);
 };
 }
-#endif // !defined(AFX_WELSH264ENCODER_H__D9FAA1D1_5403_47E1_8E27_78F11EE65F02__INCLUDED_)
+#endif // !defined(WELS_PLUS_WELSENCODEREXT_H)
