@@ -46,15 +46,14 @@
 
 #include "logging.h"
 
-int32_t	welsCodecTrace::m_iTraceLevel			= WELS_LOG_DEFAULT;
-CM_WELS_TRACE welsCodecTrace::m_fpTrace	= NULL;
 
 welsCodecTrace::welsCodecTrace() {
 
+  m_iTraceLevel = WELS_LOG_DEFAULT;
   m_fpTrace = welsStderrTrace;
 
   m_sLogCtx.pLogCtx = this;
-  m_sLogCtx.pfLog = CODEC_TRACE;
+  m_sLogCtx.pfLog = StaticCodecTrace;
 }
 
 welsCodecTrace::~welsCodecTrace() {
@@ -63,7 +62,12 @@ welsCodecTrace::~welsCodecTrace() {
 
 #define MAX_LOG_SIZE	1024
 
-void welsCodecTrace::CODEC_TRACE (void* ignore, const int32_t iLevel, const char* Str_Format, va_list vl) {
+void welsCodecTrace::StaticCodecTrace (void* pCtx, const int32_t iLevel, const char* Str_Format, va_list vl) {
+  welsCodecTrace* self = (welsCodecTrace*) pCtx;
+  self->CodecTrace (iLevel, Str_Format, vl);
+}
+
+void welsCodecTrace::CodecTrace (const int32_t iLevel, const char* Str_Format, va_list vl) {
   if (m_iTraceLevel < iLevel) {
     return;
   }

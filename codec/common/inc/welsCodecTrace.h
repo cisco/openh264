@@ -44,13 +44,15 @@ class welsCodecTrace {
   welsCodecTrace();
   ~welsCodecTrace();
 
-  static void CODEC_TRACE (void* pIgnore, const int32_t kiLevel, const char* kpStrFormat, va_list vl);
-
   void SetTraceLevel (const int32_t kiLevel);
 
+ private:
+  static void StaticCodecTrace (void* pCtx, const int32_t kiLevel, const char* kpStrFormat, va_list vl);
+  void CodecTrace (const int32_t kiLevel, const char* kpStrFormat, va_list vl);
+
+  int32_t	m_iTraceLevel;
+  CM_WELS_TRACE m_fpTrace;
  public:
-  static int32_t	m_iTraceLevel;
-  static CM_WELS_TRACE m_fpTrace;
 
   SLogContext m_sLogCtx;
 };
