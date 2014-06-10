@@ -35,6 +35,7 @@
 
 #include <stdarg.h>
 #include "typedefs.h"
+#include "utils.h"
 
 typedef int32_t (*CM_WELS_TRACE) (const char* string);
 
@@ -51,6 +52,7 @@ class welsCodecTrace {
   static int32_t	m_iTraceLevel;
   static CM_WELS_TRACE m_fpTrace;
 
+  SLogContext m_sLogCtx;
 };
 
 #endif //WELS_CODEC_TRACE

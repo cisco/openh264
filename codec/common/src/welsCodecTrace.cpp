@@ -52,6 +52,9 @@ CM_WELS_TRACE welsCodecTrace::m_fpTrace	= NULL;
 welsCodecTrace::welsCodecTrace() {
 
   m_fpTrace = welsStderrTrace;
+
+  m_sLogCtx.pLogCtx = this;
+  m_sLogCtx.pfLog = CODEC_TRACE;
 }
 
 welsCodecTrace::~welsCodecTrace() {
