@@ -35,15 +35,7 @@
 #include <stdio.h>
 #include "typedefs.h"
 
-static int32_t g_TraceLevel = 0;
-
-void WelsStderrSetTraceLevel (int32_t level) {
-  g_TraceLevel = level;
-}
-
 int32_t welsStderrLevelTrace (int32_t level, const char* format, va_list ap) {
-  if (level < g_TraceLevel) {
-    vfprintf (stderr, format, ap);
-  }
+  vfprintf (stderr, format, ap);
   return 0;
 }

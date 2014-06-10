@@ -35,9 +35,6 @@
 #ifndef WELS_LOGGING_H__
 #define WELS_LOGGING_H__
 
-// API surface.
-void WelsStderrSetTraceLevel (int32_t level);
-
 
 // Internal details.
 int32_t welsStderrLevelTrace (int32_t level, const char* format, va_list ap);

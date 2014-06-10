@@ -108,7 +108,6 @@ void welsCodecTrace::CODEC_TRACE (void* ignore, const int32_t iLevel, const char
 void welsCodecTrace::SetTraceLevel (const int32_t iLevel) {
   if (iLevel >= 0)
     m_iTraceLevel	= iLevel;
-  WelsStderrSetTraceLevel (iLevel);
 }
 
 
