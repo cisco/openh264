@@ -818,7 +818,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\decoder\core\inc\utils.h"
+					RelativePath="..\..\..\common\inc\utils.h"
 					>
 				</File>
 				<File
@@ -939,7 +939,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\decoder\core\src\utils.cpp"
+					RelativePath="..\..\..\common\src\utils.cpp"
 					>
 				</File>
 			</Filter>

@@ -7,6 +7,8 @@ COMMON_CPP_SRCS=\
 	$(COMMON_SRCDIR)/src/expand_pic.cpp\
 	$(COMMON_SRCDIR)/src/logging.cpp\
 	$(COMMON_SRCDIR)/src/sad_common.cpp\
+	$(COMMON_SRCDIR)/src/utils.cpp\
+	$(COMMON_SRCDIR)/src/welsCodecTrace.cpp\
 	$(COMMON_SRCDIR)/src/WelsThreadLib.cpp\
 
 COMMON_OBJS += $(COMMON_CPP_SRCS:.cpp=.$(OBJ))

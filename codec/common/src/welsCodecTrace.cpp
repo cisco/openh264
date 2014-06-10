@@ -46,13 +46,6 @@
 
 #include "logging.h"
 
-//#define CODEC_TRACE_ERROR 0
-//#define CODEC_TRACE_WARNING 1
-//#define CODEC_TRACE_INFO 2
-//#define CODEC_TRACE_DEDBUG 3
-
-using namespace WelsSVCEnc;
-
 int32_t	welsCodecTrace::m_iTraceLevel			= WELS_LOG_DEFAULT;
 CM_WELS_TRACE welsCodecTrace::m_fpDebugTrace	= NULL;
 CM_WELS_TRACE welsCodecTrace::m_fpInfoTrace	= NULL;
@@ -60,16 +53,11 @@ CM_WELS_TRACE welsCodecTrace::m_fpWarnTrace	= NULL;
 CM_WELS_TRACE welsCodecTrace::m_fpErrorTrace	= NULL;
 
 welsCodecTrace::welsCodecTrace() {
-  m_fpDebugTrace = NULL;
-  m_fpInfoTrace = NULL;
-  m_fpWarnTrace = NULL;
-  m_fpErrorTrace = NULL;
-  m_WelsTraceExistFlag	= false;
+
   m_fpDebugTrace = welsStderrTrace<WELS_LOG_DEBUG>;
   m_fpInfoTrace = welsStderrTrace<WELS_LOG_INFO>;
   m_fpWarnTrace = welsStderrTrace<WELS_LOG_WARNING>;
   m_fpErrorTrace = welsStderrTrace<WELS_LOG_ERROR>;
-
   m_WelsTraceExistFlag = true;
 }
 

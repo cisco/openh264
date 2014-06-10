@@ -99,7 +99,7 @@ class CWelsDecoder : public ISVCDecoder {
 
  private:
   PWelsDecoderContext 				m_pDecContext;
-  IWelsTrace*							m_pTrace;
+  welsCodecTrace*			m_pWelsTrace;
 
   void InitDecoder (void);
   void UninitDecoder (void);

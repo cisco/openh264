@@ -350,17 +350,13 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
  * \note	N/A
  *************************************************************************************
  */
-int32_t WelsInitDecoder (PWelsDecoderContext pCtx, void* pTraceHandle, PWelsLogCallbackFunc pLog) {
+int32_t WelsInitDecoder (PWelsDecoderContext pCtx) {
   if (pCtx == NULL) {
     return ERR_INFO_INVALID_PTR;
   }
 
   // default
   WelsDecoderDefaults (pCtx);
-
-  pCtx->pTraceHandle = pTraceHandle;
-
-  g_pLog = pLog;
 
   // open decoder
   WelsOpenDecoder (pCtx);

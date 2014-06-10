@@ -26,12 +26,12 @@
 		4CE4469A18BC5EAB0017DF25 /* parse_mb_syn_cavlc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4467718BC5EAA0017DF25 /* parse_mb_syn_cavlc.cpp */; };
 		4CE4469B18BC5EAB0017DF25 /* pic_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4467818BC5EAA0017DF25 /* pic_queue.cpp */; };
 		4CE4469C18BC5EAB0017DF25 /* rec_mb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4467918BC5EAA0017DF25 /* rec_mb.cpp */; };
-		4CE4469D18BC5EAB0017DF25 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4467A18BC5EAA0017DF25 /* utils.cpp */; };
-		4CE4469E18BC5EAB0017DF25 /* welsCodecTrace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4468418BC5EAB0017DF25 /* welsCodecTrace.cpp */; };
 		4CE4469F18BC5EAB0017DF25 /* welsDecoderExt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4468518BC5EAB0017DF25 /* welsDecoderExt.cpp */; };
 		4CE447AC18BC6BE90017DF25 /* block_add_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CE447A718BC6BE90017DF25 /* block_add_neon.S */; };
 		4CE447AE18BC6BE90017DF25 /* intra_pred_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CE447A918BC6BE90017DF25 /* intra_pred_neon.S */; };
 		9ABF4382193EB60900A6BD61 /* expand_pic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ABF4381193EB60900A6BD61 /* expand_pic.cpp */; };
+		9AED66561946A1DE009A3567 /* welsCodecTrace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9AED66551946A1DE009A3567 /* welsCodecTrace.cpp */; };
+		9AED66591946A203009A3567 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9AED66581946A203009A3567 /* utils.cpp */; };
 		F0B204FC18FD23D8005DA23F /* error_concealment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F0B204FB18FD23D8005DA23F /* error_concealment.cpp */; };
 /* End PBXBuildFile section */
 
@@ -79,7 +79,6 @@
 		4CE4465F18BC5EAA0017DF25 /* picture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = picture.h; sourceTree = "<group>"; };
 		4CE4466018BC5EAA0017DF25 /* rec_mb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rec_mb.h; sourceTree = "<group>"; };
 		4CE4466118BC5EAA0017DF25 /* slice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slice.h; sourceTree = "<group>"; };
-		4CE4466218BC5EAA0017DF25 /* utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
 		4CE4466318BC5EAA0017DF25 /* vlc_decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vlc_decoder.h; sourceTree = "<group>"; };
 		4CE4466418BC5EAA0017DF25 /* wels_common_basis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wels_common_basis.h; sourceTree = "<group>"; };
 		4CE4466518BC5EAA0017DF25 /* wels_const.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wels_const.h; sourceTree = "<group>"; };
@@ -101,16 +100,17 @@
 		4CE4467718BC5EAA0017DF25 /* parse_mb_syn_cavlc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = parse_mb_syn_cavlc.cpp; sourceTree = "<group>"; };
 		4CE4467818BC5EAA0017DF25 /* pic_queue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pic_queue.cpp; sourceTree = "<group>"; };
 		4CE4467918BC5EAA0017DF25 /* rec_mb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rec_mb.cpp; sourceTree = "<group>"; };
-		4CE4467A18BC5EAA0017DF25 /* utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utils.cpp; sourceTree = "<group>"; };
-		4CE4467D18BC5EAA0017DF25 /* welsCodecTrace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = welsCodecTrace.h; sourceTree = "<group>"; };
 		4CE4467E18BC5EAA0017DF25 /* welsDecoderExt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = welsDecoderExt.h; sourceTree = "<group>"; };
 		4CE4468318BC5EAB0017DF25 /* wels_dec_export.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = wels_dec_export.def; sourceTree = "<group>"; };
-		4CE4468418BC5EAB0017DF25 /* welsCodecTrace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = welsCodecTrace.cpp; sourceTree = "<group>"; };
 		4CE4468518BC5EAB0017DF25 /* welsDecoderExt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = welsDecoderExt.cpp; sourceTree = "<group>"; };
 		4CE447A718BC6BE90017DF25 /* block_add_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = block_add_neon.S; sourceTree = "<group>"; };
 		4CE447A918BC6BE90017DF25 /* intra_pred_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = intra_pred_neon.S; sourceTree = "<group>"; };
 		9ABF4380193EB5F700A6BD61 /* expand_pic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = expand_pic.h; path = ../../../common/inc/expand_pic.h; sourceTree = "<group>"; };
 		9ABF4381193EB60900A6BD61 /* expand_pic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = expand_pic.cpp; path = ../../../common/src/expand_pic.cpp; sourceTree = "<group>"; };
+		9AED66551946A1DE009A3567 /* welsCodecTrace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = welsCodecTrace.cpp; path = ../../../common/src/welsCodecTrace.cpp; sourceTree = "<group>"; };
+		9AED66571946A1EB009A3567 /* welsCodecTrace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = welsCodecTrace.h; path = ../../../common/inc/welsCodecTrace.h; sourceTree = "<group>"; };
+		9AED66581946A203009A3567 /* utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utils.cpp; path = ../../../common/src/utils.cpp; sourceTree = "<group>"; };
+		9AED665A1946A21D009A3567 /* utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utils.h; path = ../../../common/inc/utils.h; sourceTree = "<group>"; };
 		F0B204FA18FD23CF005DA23F /* error_concealment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = error_concealment.h; sourceTree = "<group>"; };
 		F0B204FB18FD23D8005DA23F /* error_concealment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = error_concealment.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -176,6 +176,7 @@
 		4CE4464418BC5EAA0017DF25 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				9AED665A1946A21D009A3567 /* utils.h */,
 				9ABF4380193EB5F700A6BD61 /* expand_pic.h */,
 				F0B204FA18FD23CF005DA23F /* error_concealment.h */,
 				4CE4464518BC5EAA0017DF25 /* as264_common.h */,
@@ -206,7 +207,6 @@
 				4CE4465F18BC5EAA0017DF25 /* picture.h */,
 				4CE4466018BC5EAA0017DF25 /* rec_mb.h */,
 				4CE4466118BC5EAA0017DF25 /* slice.h */,
-				4CE4466218BC5EAA0017DF25 /* utils.h */,
 				4CE4466318BC5EAA0017DF25 /* vlc_decoder.h */,
 				4CE4466418BC5EAA0017DF25 /* wels_common_basis.h */,
 				4CE4466518BC5EAA0017DF25 /* wels_const.h */,
@@ -217,6 +217,7 @@
 		4CE4466618BC5EAA0017DF25 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				9AED66581946A203009A3567 /* utils.cpp */,
 				9ABF4381193EB60900A6BD61 /* expand_pic.cpp */,
 				F0B204FB18FD23D8005DA23F /* error_concealment.cpp */,
 				4CE4466718BC5EAA0017DF25 /* au_parser.cpp */,
@@ -237,7 +238,6 @@
 				4CE4467718BC5EAA0017DF25 /* parse_mb_syn_cavlc.cpp */,
 				4CE4467818BC5EAA0017DF25 /* pic_queue.cpp */,
 				4CE4467918BC5EAA0017DF25 /* rec_mb.cpp */,
-				4CE4467A18BC5EAA0017DF25 /* utils.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -254,7 +254,7 @@
 		4CE4467C18BC5EAA0017DF25 /* inc */ = {
 			isa = PBXGroup;
 			children = (
-				4CE4467D18BC5EAA0017DF25 /* welsCodecTrace.h */,
+				9AED66571946A1EB009A3567 /* welsCodecTrace.h */,
 				4CE4467E18BC5EAA0017DF25 /* welsDecoderExt.h */,
 			);
 			path = inc;
@@ -263,8 +263,8 @@
 		4CE4468218BC5EAB0017DF25 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				9AED66551946A1DE009A3567 /* welsCodecTrace.cpp */,
 				4CE4468318BC5EAB0017DF25 /* wels_dec_export.def */,
-				4CE4468418BC5EAB0017DF25 /* welsCodecTrace.cpp */,
 				4CE4468518BC5EAB0017DF25 /* welsDecoderExt.cpp */,
 			);
 			path = src;
@@ -333,7 +333,6 @@
 				4CE4469B18BC5EAB0017DF25 /* pic_queue.cpp in Sources */,
 				4CE4469F18BC5EAB0017DF25 /* welsDecoderExt.cpp in Sources */,
 				4CE4469318BC5EAB0017DF25 /* fmo.cpp in Sources */,
-				4CE4469D18BC5EAB0017DF25 /* utils.cpp in Sources */,
 				4CE4469118BC5EAB0017DF25 /* decoder_data_tables.cpp in Sources */,
 				4CE4469718BC5EAB0017DF25 /* mem_align.cpp in Sources */,
 				9ABF4382193EB60900A6BD61 /* expand_pic.cpp in Sources */,
@@ -342,9 +341,9 @@
 				4CE4469918BC5EAB0017DF25 /* mv_pred.cpp in Sources */,
 				4CE447AC18BC6BE90017DF25 /* block_add_neon.S in Sources */,
 				4CE4469418BC5EAB0017DF25 /* get_intra_predictor.cpp in Sources */,
+				9AED66561946A1DE009A3567 /* welsCodecTrace.cpp in Sources */,
 				F0B204FC18FD23D8005DA23F /* error_concealment.cpp in Sources */,
 				4CE4469018BC5EAB0017DF25 /* decoder_core.cpp in Sources */,
-				4CE4469E18BC5EAB0017DF25 /* welsCodecTrace.cpp in Sources */,
 				4CE447AE18BC6BE90017DF25 /* intra_pred_neon.S in Sources */,
 				4CE4469618BC5EAB0017DF25 /* mc.cpp in Sources */,
 				4CE4469C18BC5EAB0017DF25 /* rec_mb.cpp in Sources */,
@@ -352,6 +351,7 @@
 				4CE4468D18BC5EAB0017DF25 /* decode_mb_aux.cpp in Sources */,
 				4CE4468E18BC5EAB0017DF25 /* decode_slice.cpp in Sources */,
 				4CE4468F18BC5EAB0017DF25 /* decoder.cpp in Sources */,
+				9AED66591946A203009A3567 /* utils.cpp in Sources */,
 				4CE4469818BC5EAB0017DF25 /* memmgr_nal_unit.cpp in Sources */,
 				4CE4468C18BC5EAB0017DF25 /* deblocking.cpp in Sources */,
 				4CE4469A18BC5EAB0017DF25 /* parse_mb_syn_cavlc.cpp in Sources */,
