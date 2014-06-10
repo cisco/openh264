@@ -35,7 +35,7 @@
 #include <stdio.h>
 #include "typedefs.h"
 
-int32_t welsStderrLevelTrace (const char* format, va_list ap) {
-  vfprintf (stderr, format, ap);
+int32_t welsStderrTrace (const char* string) {
+  fprintf (stderr, "%s", string);
   return 0;
 }

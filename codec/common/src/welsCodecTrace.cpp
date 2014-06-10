@@ -54,10 +54,10 @@ CM_WELS_TRACE welsCodecTrace::m_fpErrorTrace	= NULL;
 
 welsCodecTrace::welsCodecTrace() {
 
-  m_fpDebugTrace = welsStderrTrace<WELS_LOG_DEBUG>;
-  m_fpInfoTrace = welsStderrTrace<WELS_LOG_INFO>;
-  m_fpWarnTrace = welsStderrTrace<WELS_LOG_WARNING>;
-  m_fpErrorTrace = welsStderrTrace<WELS_LOG_ERROR>;
+  m_fpDebugTrace = welsStderrTrace;
+  m_fpInfoTrace = welsStderrTrace;
+  m_fpWarnTrace = welsStderrTrace;
+  m_fpErrorTrace = welsStderrTrace;
 }
 
 welsCodecTrace::~welsCodecTrace() {
@@ -71,23 +71,23 @@ void welsCodecTrace::TraceString (int32_t iLevel, const char* str) {
   switch (iLevel) {
   case WELS_LOG_ERROR:
     if (m_fpErrorTrace)
-      m_fpErrorTrace ("%s", str);
+      m_fpErrorTrace (str);
     break;
   case WELS_LOG_WARNING:
     if (m_fpWarnTrace)
-      m_fpWarnTrace ("%s", str);
+      m_fpWarnTrace (str);
     break;
   case WELS_LOG_INFO:
     if (m_fpInfoTrace)
-      m_fpInfoTrace ("%s", str);
+      m_fpInfoTrace (str);
     break;
   case WELS_LOG_DEBUG:
     if (m_fpDebugTrace)
-      m_fpDebugTrace ("%s", str);
+      m_fpDebugTrace (str);
     break;
   default:
     if (m_fpDebugTrace)
-      m_fpInfoTrace ("%s", str);
+      m_fpInfoTrace (str);
     break;
   }
 }

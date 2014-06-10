@@ -36,7 +36,7 @@
 #include <stdarg.h>
 #include "typedefs.h"
 
-typedef int32_t (*CM_WELS_TRACE) (const char* format, ...);
+typedef int32_t (*CM_WELS_TRACE) (const char* string);
 
 class welsCodecTrace {
  public:
