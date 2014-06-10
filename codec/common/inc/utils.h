@@ -55,7 +55,7 @@ enum {
   WELS_LOG_DEBUG		= 1 << 3,	// Debug log iLevel
   WELS_LOG_RESV		= 1 << 4,	// Resversed log iLevel
   WELS_LOG_LEVEL_COUNT = 5,
-  WELS_LOG_DEFAULT	= WELS_LOG_ERROR | WELS_LOG_WARNING | WELS_LOG_INFO | WELS_LOG_DEBUG	// Default log iLevel in Wels codec
+  WELS_LOG_DEFAULT	= WELS_LOG_DEBUG	// Default log iLevel in Wels codec
 };
 
 /*
