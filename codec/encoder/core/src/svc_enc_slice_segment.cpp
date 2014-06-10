@@ -118,7 +118,7 @@ int32_t AssignMbMapMultipleSlices (SSliceCtx* pSliceSeg, const SSliceConfig* kpM
 }
 
 /*!
- *  Check slices assignment setttings on MST_INTERLEAVE type
+ *  Check slices assignment settings on MST_INTERLEAVE type
  */
 
 //slice parameter check for SM_FIXEDSLCNUM_SLICE
