@@ -134,8 +134,8 @@ TEST(McCopy_c,iW##x##iH) \
       InitMcFunc(&sMcFunc, uiCpuFlag); \
       uint8_t uSrcAnchor[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE]; \
       uint8_t uSrcTest[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE];    \
-      uint8_t uDstAnchor[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE] __attribute__ ((aligned(16))); \
-      uint8_t uDstTest[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE] __attribute__ ((aligned(16)));   \
+      ENFORCE_STACK_ALIGN_2D(uint8_t, uDstAnchor, MC_BUFF_HEIGHT, MC_BUFF_DST_STRIDE, 16); \
+      ENFORCE_STACK_ALIGN_2D(uint8_t, uDstTest, MC_BUFF_HEIGHT, MC_BUFF_DST_STRIDE, 16); \
       srand((unsigned int)time(0));                           \
       for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)                    \
       {                                                         \
@@ -175,8 +175,8 @@ TEST(McHorVer##a##b##_c,iW##x##iH)  \
     SMcFunc sMcFunc;  \
     uint8_t uSrcAnchor[4][MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE]; \
     uint8_t uSrcTest[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE];      \
-    uint8_t uDstAnchor[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE] __attribute__ ((aligned(16))); \
-    uint8_t uDstTest[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE] __attribute__ ((aligned(16)));    \
+    ENFORCE_STACK_ALIGN_2D(uint8_t, uDstAnchor, MC_BUFF_HEIGHT, MC_BUFF_DST_STRIDE, 16); \
+    ENFORCE_STACK_ALIGN_2D(uint8_t, uDstTest, MC_BUFF_HEIGHT, MC_BUFF_DST_STRIDE, 16); \
     uint8_t* uSrcInputAnchor[4];                              \
     int16_t pBuf[MC_BUFF_DST_STRIDE]; \
     uSrcInputAnchor[0] = &uSrcAnchor[0][4][4]; \
@@ -249,8 +249,9 @@ TEST(McChromaWithFragMv_##a##b##_c,iW##x##iH)  \
     SMcFunc sMcFunc;  \
     uint8_t uSrcAnchor[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE*2]; \
     uint8_t uSrcTest[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE];      \
-    uint8_t uDstAnchor[2][MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE] __attribute__ ((aligned(16))); \
-    uint8_t uDstTest[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE] __attribute__ ((aligned(16)));    \
+    ENFORCE_STACK_ALIGN_2D(uint8_t, uDstAnchor1, MC_BUFF_HEIGHT, MC_BUFF_DST_STRIDE, 16); \
+    ENFORCE_STACK_ALIGN_2D(uint8_t, uDstAnchor2, MC_BUFF_HEIGHT, MC_BUFF_DST_STRIDE, 16); \
+    ENFORCE_STACK_ALIGN_2D(uint8_t, uDstTest, MC_BUFF_HEIGHT, MC_BUFF_DST_STRIDE, 16); \
     srand((unsigned int)time(0)); \
     for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)   \
     {\
@@ -271,15 +272,16 @@ TEST(McChromaWithFragMv_##a##b##_c,iW##x##iH)  \
         uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores); \
       }\
       InitMcFunc(&sMcFunc,uiCpuFlag);\
-      memset(uDstAnchor[0],0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE); \
+      memset(uDstAnchor1,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE); \
+      memset(uDstAnchor2,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE); \
       memset(uDstTest,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE);     \
-      MCChromaAnchor(uDstAnchor[0][0],uDstAnchor[1][0],MC_BUFF_DST_STRIDE,uSrcAnchor[0],MC_BUFF_SRC_STRIDE*2,a,b,iW,iH); \
+      MCChromaAnchor(uDstAnchor1[0],uDstAnchor2[0],MC_BUFF_DST_STRIDE,uSrcAnchor[0],MC_BUFF_SRC_STRIDE*2,a,b,iW,iH); \
       sMcFunc.pMcChromaFunc(uSrcTest[0],MC_BUFF_SRC_STRIDE,uDstTest[0],MC_BUFF_DST_STRIDE,a,b,iW,iH);\
       for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)   \
       {                                                                             \
           for(int32_t i=0;i<MC_BUFF_DST_STRIDE;i++)                                  \
           {                                                                           \
-              ASSERT_EQ(uDstAnchor[0][j][i],uDstTest[j][i]);                           \
+              ASSERT_EQ(uDstAnchor1[j][i],uDstTest[j][i]);                             \
           }                                                                             \
       }                                                                                 \
     }\
