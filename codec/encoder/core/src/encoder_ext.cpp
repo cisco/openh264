@@ -1712,14 +1712,6 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
       pCtx->pMvdCostTableInter = NULL;
     }
 
-#ifdef ENABLE_TRACE_FILE
-    if (NULL != pCtx->pFileLog) {
-      WelsFclose (pCtx->pFileLog);
-      pCtx->pFileLog	= NULL;
-    }
-    pCtx->uiSizeLog	= 0;
-#endif//ENABLE_TRACE_FILE
-
     FreeCodingParam (&pCtx->pSvcParam, pMa);
     if (NULL != pCtx->pFuncList) {
       pMa->WelsFree (pCtx->pFuncList, "SWelsFuncPtrList");
@@ -1975,19 +1967,6 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
 
   pCtx->pMemAlign = new CMemoryAlign (iCacheLineSize);
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pCtx->pMemAlign), FreeMemorySvc (&pCtx))
-
-  // for logs
-#ifdef ENABLE_TRACE_FILE
-  if (wlog == WelsLogDefault) {
-    char fname[MAX_FNAME_LEN] = {0};
-
-    WelsSnprintf (fname, MAX_FNAME_LEN, "wels_svc_encoder_trace.txt");
-
-
-    pCtx->pFileLog	= WelsFopen (fname, "wt+");
-    pCtx->uiSizeLog	= 0;
-  }
-#endif//ENABLE_TRACE_FILE
 
   pCodingParam->DetermineTemporalSettings();
   iRet = AllocCodingParam (&pCtx->pSvcParam, pCtx->pMemAlign);

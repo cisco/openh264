@@ -206,12 +206,6 @@ typedef struct TagWelsEncCtx {
   SParaSetOffset				sPSOVector;
   CMemoryAlign*				pMemAlign;
 
-#ifdef ENABLE_TRACE_FILE
-  WelsFileHandle*				pFileLog;		// log file for wels encoder
-  uint32_t					uiSizeLog;		// size of log have been written in file
-
-#endif//ENABLE_TRACE_FILE
-
 #if defined(STAT_OUTPUT)
   // overall stat pData, refer to SStatData in stat.h, in case avc to use stat[0][0]
   SStatData					sStatData [ MAX_DEPENDENCY_LAYER ] [ MAX_QUALITY_LEVEL ];
