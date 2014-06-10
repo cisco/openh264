@@ -178,9 +178,6 @@ void CWelsH264SVCEncoder::InitEncoder (void) {
       WelsSetLogCallback (welsCodecTrace::CODEC_TRACE);
     }
   }
-
-  // initialization
-  WelsSetLogLevel (WELS_LOG_ERROR);	// no output, WELS_LOG_QUIET
 }
 
 /* Interfaces override from ISVCEncoder */

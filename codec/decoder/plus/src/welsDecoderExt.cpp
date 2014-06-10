@@ -109,9 +109,6 @@ CWelsDecoder::CWelsDecoder (void)
     }
   }
 
-  // initialization
-  WelsSetLogLevel (WELS_LOG_ERROR);	// no output, WELS_LOG_QUIET
-
   WelsLog (NULL, WELS_LOG_INFO, "CWelsDecoder::CWelsDecoder() entry");
 
 #ifdef OUTPUT_BIT_STREAM
