@@ -237,7 +237,7 @@ void CWelsDecoder::InitDecoder (void) {
 long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
   int iVal = 0;
 
-  if (m_pDecContext == NULL)
+  if (m_pDecContext == NULL && eOptID != DECODER_OPTION_TRACE_LEVEL)
     return dsInitialOptExpected;
 
   if (eOptID == DECODER_OPTION_DATAFORMAT) { // Set color space of decoding output frame
@@ -262,6 +262,12 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
     else
       iVal = * ((int*)pOption); //EC method
     m_pDecContext->iErrorConMethod = iVal;
+    return cmResultSuccess;
+  } else if (eOptID == DECODER_OPTION_TRACE_LEVEL) {
+    if (m_pWelsTrace) {
+      uint32_t level = * ((uint32_t*)pOption);
+      m_pWelsTrace->SetTraceLevel (level);
+    }
     return cmResultSuccess;
   }
 
