@@ -3,15 +3,11 @@
 #include "mc.h"
 #include "mem_align.h"
 #include "cpu_core.h"
+#include "cpu.h"
 using namespace WelsDec;
-#ifdef X86_ASM
-#define TEST_CASE 0
-//TEST_CASE can be 0,WELS_CPU_SSE2 or WELS_CPU_MMXEXT
-#else
-#define TEST_CASE 0
-#endif
-#define MC_BUFF_SRC_STRIDE 30
-#define MC_BUFF_DST_STRIDE 31
+
+#define MC_BUFF_SRC_STRIDE 32
+#define MC_BUFF_DST_STRIDE 32
 #define MC_BUFF_HEIGHT 30
 
 /**********************MC Unit Test Anchor Code Begin******************************/
@@ -120,46 +116,58 @@ void MCChromaAnchor (uint8_t* pDstU, uint8_t* pDstV, int32_t iDstStride, uint8_t
 }
 
 /**********************MC Unit Test OPENH264 Code Begin******************************/
-#define DEF_MCCOPYTEST(iH,iW) \
+#define DEF_MCCOPYTEST(iH,iW, forceC) \
 TEST(McCopy_c,iW##x##iH) \
 {                             \
     SMcFunc sMcFunc;      \
-    InitMcFunc(&sMcFunc, TEST_CASE); \
-    uint8_t uSrcAnchor[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE]; \
-    uint8_t uSrcTest[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE];    \
-    uint8_t uDstAnchor[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE]; \
-    uint8_t uDstTest[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE];   \
-    srand((unsigned int)time(0));                           \
-    for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)                    \
-    {                                                         \
+    int32_t iCpuCores = 1; \
+    uint32_t uiCpuFlag;\
+    for(int32_t k =0; k<2; k++)\
+    {\
+      if(k==0||forceC!=0)\
+      {\
+        uiCpuFlag = 0;\
+      }else \
+      {\
+        uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores); \
+      }\
+      InitMcFunc(&sMcFunc, uiCpuFlag); \
+      uint8_t uSrcAnchor[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE]; \
+      uint8_t uSrcTest[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE];    \
+      uint8_t uDstAnchor[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE] __attribute__ ((aligned(16))); \
+      uint8_t uDstTest[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE] __attribute__ ((aligned(16)));   \
+      srand((unsigned int)time(0));                           \
+      for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)                    \
+      {                                                         \
         for(int32_t i=0;i<MC_BUFF_SRC_STRIDE;i++)                  \
         {                                                       \
-            uSrcAnchor[j][i] = uSrcTest[j][i] = rand()%256;      \
+          uSrcAnchor[j][i] = uSrcTest[j][i] = rand()%256;      \
         }                                                         \
-    }                                                              \
-    memset(uDstAnchor,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE);\
-    memset(uDstTest,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE);  \
-    MCCopyAnchor(uSrcAnchor[0],MC_BUFF_SRC_STRIDE,uDstAnchor[0],MC_BUFF_DST_STRIDE,iW,iH);   \
-    sMcFunc.pMcLumaFunc(uSrcTest[0],MC_BUFF_SRC_STRIDE,uDstTest[0],MC_BUFF_DST_STRIDE,0,0,iW,iH); \
-    for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)   \
-    {                                                                             \
+      }                                                              \
+      memset(uDstAnchor,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE);\
+      memset(uDstTest,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE);  \
+      MCCopyAnchor(uSrcAnchor[0],MC_BUFF_SRC_STRIDE,uDstAnchor[0],MC_BUFF_DST_STRIDE,iW,iH);   \
+      sMcFunc.pMcLumaFunc(uSrcTest[0],MC_BUFF_SRC_STRIDE,uDstTest[0],MC_BUFF_DST_STRIDE,0,0,iW,iH); \
+      for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)   \
+      {                                                                             \
         for(int32_t i=0;i<MC_BUFF_DST_STRIDE;i++)                                  \
         {                                                                           \
-            ASSERT_EQ(uDstAnchor[j][i],uDstTest[j][i]);                              \
+          ASSERT_EQ(uDstAnchor[j][i],uDstTest[j][i]);                              \
         }                                                                             \
-    }                                                                                 \
+      }                                                                                 \
+    }\
 }
 
-DEF_MCCOPYTEST (2, 2)
-DEF_MCCOPYTEST (2, 4)
-DEF_MCCOPYTEST (4, 2)
-DEF_MCCOPYTEST (4, 4)
-DEF_MCCOPYTEST (4, 8)
-DEF_MCCOPYTEST (8, 4)
-DEF_MCCOPYTEST (8, 8)
-DEF_MCCOPYTEST (16, 8)
-DEF_MCCOPYTEST (8, 16)
-DEF_MCCOPYTEST (16, 16)
+DEF_MCCOPYTEST (2, 2, 1)
+DEF_MCCOPYTEST (2, 4, 0)
+DEF_MCCOPYTEST (4, 2, 1)
+DEF_MCCOPYTEST (4, 4, 0)
+DEF_MCCOPYTEST (4, 8, 0)
+DEF_MCCOPYTEST (8, 4, 0)
+DEF_MCCOPYTEST (8, 8, 0)
+DEF_MCCOPYTEST (16, 8, 0)
+DEF_MCCOPYTEST (8, 16, 0)
+DEF_MCCOPYTEST (16, 16, 0)
 
 #define DEF_LUMA_MCTEST_SUBCASE(a,b,iW,iH) \
 TEST(McHorVer##a##b##_c,iW##x##iH)  \
@@ -167,8 +175,8 @@ TEST(McHorVer##a##b##_c,iW##x##iH)  \
     SMcFunc sMcFunc;  \
     uint8_t uSrcAnchor[4][MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE]; \
     uint8_t uSrcTest[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE];      \
-    uint8_t uDstAnchor[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE]; \
-    uint8_t uDstTest[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE];    \
+    uint8_t uDstAnchor[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE] __attribute__ ((aligned(16))); \
+    uint8_t uDstTest[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE] __attribute__ ((aligned(16)));    \
     uint8_t* uSrcInputAnchor[4];                              \
     int16_t pBuf[MC_BUFF_DST_STRIDE]; \
     uSrcInputAnchor[0] = &uSrcAnchor[0][4][4]; \
@@ -183,19 +191,31 @@ TEST(McHorVer##a##b##_c,iW##x##iH)  \
         uSrcAnchor[0][j][i] = uSrcTest[j][i] = rand()%256;  \
       }\
     }\
-    InitMcFunc(&sMcFunc,TEST_CASE);\
-    memset(uDstAnchor,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE); \
-    memset(uDstTest,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE); \
-    MCHalfPelFilterAnchor(uSrcInputAnchor[1],uSrcInputAnchor[2],uSrcInputAnchor[3],uSrcInputAnchor[0],MC_BUFF_SRC_STRIDE,iW+1,iH+1,pBuf+4); \
-    MCLumaAnchor(uDstAnchor[0],MC_BUFF_DST_STRIDE,uSrcInputAnchor,MC_BUFF_SRC_STRIDE,a,b,iW,iH); \
-    sMcFunc.pMcLumaFunc(&uSrcTest[4][4],MC_BUFF_SRC_STRIDE,uDstTest[0],MC_BUFF_DST_STRIDE,a,b,iW,iH);\
-    for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)   \
-    {                                                                             \
-        for(int32_t i=0;i<MC_BUFF_DST_STRIDE;i++)                                  \
-        {                                                                           \
-            ASSERT_EQ(uDstAnchor[j][i],uDstTest[j][i]);                              \
-        }                                                                             \
-    }                                                                                \
+    int32_t iCpuCores = 1; \
+    uint32_t uiCpuFlag;\
+    for(int32_t k =0; k<2; k++)\
+    {\
+      if(k==0)\
+      {\
+        uiCpuFlag = 0;\
+      }else \
+      {\
+        uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores); \
+      }\
+      InitMcFunc(&sMcFunc,uiCpuFlag);\
+      memset(uDstAnchor,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE); \
+      memset(uDstTest,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE); \
+      MCHalfPelFilterAnchor(uSrcInputAnchor[1],uSrcInputAnchor[2],uSrcInputAnchor[3],uSrcInputAnchor[0],MC_BUFF_SRC_STRIDE,iW+1,iH+1,pBuf+4); \
+      MCLumaAnchor(uDstAnchor[0],MC_BUFF_DST_STRIDE,uSrcInputAnchor,MC_BUFF_SRC_STRIDE,a,b,iW,iH); \
+      sMcFunc.pMcLumaFunc(&uSrcTest[4][4],MC_BUFF_SRC_STRIDE,uDstTest[0],MC_BUFF_DST_STRIDE,a,b,iW,iH);\
+      for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)   \
+      {                                                                             \
+          for(int32_t i=0;i<MC_BUFF_DST_STRIDE;i++)                                  \
+          {                                                                           \
+              ASSERT_EQ(uDstAnchor[j][i],uDstTest[j][i]);                              \
+          }                                                                             \
+      }                                                                                \
+    }\
 }
 
 #define DEF_LUMA_MCTEST(a,b) \
@@ -229,8 +249,8 @@ TEST(McChromaWithFragMv_##a##b##_c,iW##x##iH)  \
     SMcFunc sMcFunc;  \
     uint8_t uSrcAnchor[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE*2]; \
     uint8_t uSrcTest[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE];      \
-    uint8_t uDstAnchor[2][MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE]; \
-    uint8_t uDstTest[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE];    \
+    uint8_t uDstAnchor[2][MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE] __attribute__ ((aligned(16))); \
+    uint8_t uDstTest[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE] __attribute__ ((aligned(16)));    \
     srand((unsigned int)time(0)); \
     for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)   \
     {\
@@ -239,18 +259,30 @@ TEST(McChromaWithFragMv_##a##b##_c,iW##x##iH)  \
         uSrcAnchor[j][i*2] = uSrcTest[j][i] = rand()%256;  \
       }\
     }\
-    InitMcFunc(&sMcFunc,TEST_CASE);\
-    memset(uDstAnchor[0],0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE); \
-    memset(uDstTest,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE);     \
-    MCChromaAnchor(uDstAnchor[0][0],uDstAnchor[1][0],MC_BUFF_DST_STRIDE,uSrcAnchor[0],MC_BUFF_SRC_STRIDE*2,a,b,iW,iH); \
-    sMcFunc.pMcChromaFunc(uSrcTest[0],MC_BUFF_SRC_STRIDE,uDstTest[0],MC_BUFF_DST_STRIDE,a,b,iW,iH);\
-    for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)   \
-    {                                                                             \
-        for(int32_t i=0;i<MC_BUFF_DST_STRIDE;i++)                                  \
-        {                                                                           \
-            ASSERT_EQ(uDstAnchor[0][j][i],uDstTest[j][i]);                           \
-        }                                                                             \
-    }                                                                                 \
+    int32_t iCpuCores = 1; \
+    uint32_t uiCpuFlag;\
+    for(int32_t k =0; k<2; k++)\
+    {\
+      if(k==0)\
+      {\
+        uiCpuFlag = 0;\
+      }else \
+      {\
+        uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores); \
+      }\
+      InitMcFunc(&sMcFunc,uiCpuFlag);\
+      memset(uDstAnchor[0],0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE); \
+      memset(uDstTest,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE);     \
+      MCChromaAnchor(uDstAnchor[0][0],uDstAnchor[1][0],MC_BUFF_DST_STRIDE,uSrcAnchor[0],MC_BUFF_SRC_STRIDE*2,a,b,iW,iH); \
+      sMcFunc.pMcChromaFunc(uSrcTest[0],MC_BUFF_SRC_STRIDE,uDstTest[0],MC_BUFF_DST_STRIDE,a,b,iW,iH);\
+      for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)   \
+      {                                                                             \
+          for(int32_t i=0;i<MC_BUFF_DST_STRIDE;i++)                                  \
+          {                                                                           \
+              ASSERT_EQ(uDstAnchor[0][j][i],uDstTest[j][i]);                           \
+          }                                                                             \
+      }                                                                                 \
+    }\
 }
 
 #define DEF_CHROMA_MCTEST(a,b) \
