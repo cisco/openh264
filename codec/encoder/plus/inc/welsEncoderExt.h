@@ -29,7 +29,6 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- *  welsCodecTrace.h
  *
  *  Abstract
  *      Cisco OpenH264 encoder extension utilization interface for T26
