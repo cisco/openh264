@@ -122,7 +122,7 @@ int32_t ParamValidation (SWelsSvcCodingParam* pCfg) {
     }
     if (iTotalBitrate > pCfg->iTargetBitrate) {
       WelsLog (NULL, WELS_LOG_ERROR,
-               "Invalid setttings in bitrate. the sum of each layer bitrate(%d) is larger than total bitrate setting(%d)\n",
+               "Invalid settings in bitrate. the sum of each layer bitrate(%d) is larger than total bitrate setting(%d)\n",
                iTotalBitrate, pCfg->iTargetBitrate);
     }
   }
