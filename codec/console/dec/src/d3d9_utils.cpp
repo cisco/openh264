@@ -75,7 +75,8 @@ CD3D9Utils::CD3D9Utils() {
   m_lpD3D9                = NULL;
   m_lpD3D9Device          = NULL;
   m_lpD3D9RawSurfaceShare = NULL;
-
+	m_nWidth  = 0;
+	m_nHeight = 0;
   // coverity scan uninitial
   ZeroMemory (&m_d3dpp, sizeof (m_d3dpp));
 }
@@ -134,7 +135,7 @@ HRESULT CD3D9Utils::Process (void* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
   if (m_bInitDone) {
     if (bWindowed) {
       hResult = Render (pDst, pInfo);
-      Sleep (30);
+      Sleep (100);
     } else if (pFp) {
       hResult = Dump (pDst, pInfo, pFp);
       Sleep (0);
@@ -147,10 +148,21 @@ HRESULT CD3D9Utils::Process (void* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
 HRESULT CD3D9Utils::Render (void* pDst[3], SBufferInfo* pInfo) {
   HRESULT hResult = E_FAIL;
 
-    hResult = InitResource (NULL, pInfo);
-    if (SUCCEEDED (hResult))
-      hResult = Dump2Surface (pDst, m_lpD3D9RawSurfaceShare, pInfo->UsrData.sSystemBuffer.iWidth,
-                              pInfo->UsrData.sSystemBuffer.iHeight, pInfo->UsrData.sSystemBuffer.iStride);
+  if(!pInfo)
+	  return E_FAIL;
+
+  if(m_nWidth!= pInfo->UsrData.sSystemBuffer.iWidth
+	  || m_nHeight != pInfo->UsrData.sSystemBuffer.iHeight)
+  {
+	  m_nWidth = pInfo->UsrData.sSystemBuffer.iWidth;
+	  m_nHeight = pInfo->UsrData.sSystemBuffer.iHeight;
+	  SAFE_RELEASE (m_lpD3D9RawSurfaceShare);
+	  SAFE_RELEASE (m_lpD3D9Device);
+  }
+  hResult = InitResource (NULL, pInfo);
+  if (SUCCEEDED (hResult))
+    hResult = Dump2Surface (pDst, m_lpD3D9RawSurfaceShare, pInfo->UsrData.sSystemBuffer.iWidth,
+                            pInfo->UsrData.sSystemBuffer.iHeight, pInfo->UsrData.sSystemBuffer.iStride);
 
   if (SUCCEEDED (hResult)) {
     IDirect3DSurface9* pBackBuffer = NULL;
@@ -218,10 +230,10 @@ HRESULT CD3D9Utils::InitResource (void* pSharedHandle, SBufferInfo* pInfo) {
     m_d3dpp.hDeviceWindow = m_hWnd;
     m_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
     hResult = m_lpD3D9->CreateDevice (uiAdapter, D3DDevType, NULL, dwBehaviorFlags, &m_d3dpp, &m_lpD3D9Device);
-      iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
-      iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
-      D3Dformat = (D3DFORMAT)NV12_FORMAT;
-      D3Dpool = (D3DPOOL)D3DPOOL_DEFAULT;
+    iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
+    iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
+    D3Dformat = (D3DFORMAT)NV12_FORMAT;
+    D3Dpool = (D3DPOOL)D3DPOOL_DEFAULT;
 
     hResult = m_lpD3D9Device->CreateOffscreenPlainSurface (iWidth, iHeight, (D3DFORMAT)D3Dformat, (D3DPOOL)D3Dpool,
               &m_lpD3D9RawSurfaceShare, NULL);
@@ -245,6 +257,8 @@ CD3D9ExUtils::CD3D9ExUtils() {
   m_lpD3D9Device          = NULL;
   m_lpD3D9RawSurfaceShare = NULL;
 
+  m_nWidth = 0;
+  m_nHeight = 0;
   // coverity scan uninitial
   ZeroMemory (&m_d3dpp, sizeof (m_d3dpp));
 }
@@ -303,7 +317,7 @@ HRESULT CD3D9ExUtils::Process (void* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
   if (m_bInitDone) {
     if (bWindowed) {
       hResult = Render (pDst, pInfo);
-      Sleep (30); // set a simple time controlling with default of 30fps
+      Sleep (100); // set a simple time controlling with default of 10fps 
     } else if (pFp) {
       hResult = Dump (pDst, pInfo, pFp);
       Sleep (0);
@@ -316,10 +330,21 @@ HRESULT CD3D9ExUtils::Process (void* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
 HRESULT CD3D9ExUtils::Render (void* pDst[3], SBufferInfo* pInfo) {
   HRESULT hResult = E_FAIL;
 
-    hResult = InitResource (NULL, pInfo);
-    if (SUCCEEDED (hResult))
-      hResult = Dump2Surface (pDst, m_lpD3D9RawSurfaceShare, pInfo->UsrData.sSystemBuffer.iWidth,
-                              pInfo->UsrData.sSystemBuffer.iHeight, pInfo->UsrData.sSystemBuffer.iStride);
+  if(!pInfo)
+	  return E_FAIL;
+
+  if(m_nWidth!= pInfo->UsrData.sSystemBuffer.iWidth
+	  || m_nHeight != pInfo->UsrData.sSystemBuffer.iHeight)
+  {
+	  m_nWidth = pInfo->UsrData.sSystemBuffer.iWidth;
+	  m_nHeight = pInfo->UsrData.sSystemBuffer.iHeight;
+	  SAFE_RELEASE (m_lpD3D9RawSurfaceShare);
+	  SAFE_RELEASE (m_lpD3D9Device);
+	   }
+  hResult = InitResource (NULL, pInfo);
+  if (SUCCEEDED (hResult))
+    hResult = Dump2Surface (pDst, m_lpD3D9RawSurfaceShare, pInfo->UsrData.sSystemBuffer.iWidth,
+                            pInfo->UsrData.sSystemBuffer.iHeight, pInfo->UsrData.sSystemBuffer.iStride);
 
   if (SUCCEEDED (hResult)) {
     IDirect3DSurface9* pBackBuffer = NULL;
@@ -337,10 +362,10 @@ HRESULT CD3D9ExUtils::Dump (void* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
   int iWidth;
   int iHeight;
 
-    iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
-    iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
-    iStride[0] = pInfo->UsrData.sSystemBuffer.iStride[0];
-    iStride[1] = pInfo->UsrData.sSystemBuffer.iStride[1];
+  iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
+  iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
+  iStride[0] = pInfo->UsrData.sSystemBuffer.iStride[0];
+  iStride[1] = pInfo->UsrData.sSystemBuffer.iStride[1];
 
   if (pDst[0] && pDst[1] && pDst[2])
     Write2File (pFp, (unsigned char**)pDst, iStride, iWidth, iHeight);
@@ -386,10 +411,14 @@ HRESULT CD3D9ExUtils::InitResource (void* pSharedHandle, SBufferInfo* pInfo) {
     m_d3dpp.hDeviceWindow = m_hWnd;
     m_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
     hResult = m_lpD3D9->CreateDeviceEx (uiAdapter, D3DDevType, NULL, dwBehaviorFlags, &m_d3dpp, NULL, &m_lpD3D9Device);
-      iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
-      iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
-      D3Dformat = (D3DFORMAT)NV12_FORMAT;
-      D3Dpool = (D3DPOOL)D3DPOOL_DEFAULT;
+	if(FAILED(hResult))
+	{
+		return hResult;
+	}
+    iWidth = pInfo->UsrData.sSystemBuffer.iWidth;
+    iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
+    D3Dformat = (D3DFORMAT)NV12_FORMAT;
+    D3Dpool = (D3DPOOL)D3DPOOL_DEFAULT;
     hResult = m_lpD3D9Device->CreateOffscreenPlainSurface (iWidth, iHeight, (D3DFORMAT)D3Dformat, (D3DPOOL)D3Dpool,
               &m_lpD3D9RawSurfaceShare, &pSharedHandle);
   }
