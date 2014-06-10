@@ -48,52 +48,7 @@ float WelsCalcPsnr (const void* kpTarPic,
                     const int32_t kiHeight);
 
 
-iWelsLogLevel		g_iLevelLog	= WELS_LOG_DEFAULT;	// default log iLevel
-int32_t			g_iSizeLogBuf	= 1024;			// pBuffer size for each log output
-PWelsLogCallbackFunc	wlog;
-
-/*!
- *************************************************************************************
- * \brief	set log iLevel from external call
- *
- * \param	iLevel	iLevel of log
- *
- * \return	NONE
- *
- * \note	can be able to control log iLevel dynamically
- *************************************************************************************
- */
-void WelsSetLogLevel (const int32_t kiLevel) {
-  iWelsLogLevel iVal = 0;
-  if (kiLevel & WELS_LOG_ERROR) {
-    iVal |= WELS_LOG_ERROR;
-  }
-  if (kiLevel & WELS_LOG_WARNING) {
-    iVal |= WELS_LOG_WARNING;
-  }
-  if (kiLevel & WELS_LOG_INFO) {
-    iVal |= WELS_LOG_INFO;
-  }
-  if (kiLevel & WELS_LOG_DEBUG) {
-    iVal |= WELS_LOG_DEBUG;
-  }
-  g_iLevelLog	= iVal;
-}
-
-/*!
- *************************************************************************************
- * \brief	get log iLevel from external call
- *
- * \param	N/A
- *
- * \return	current iLevel of log used in codec internal
- *
- * \note	can be able to get log iLevel of internal codec applicable
- *************************************************************************************
- */
-int32_t WelsGetLogLevel (void) {
-  return g_iLevelLog;
-}
+static PWelsLogCallbackFunc	wlog;
 
 /*!
  *************************************************************************************
@@ -110,14 +65,10 @@ void WelsSetLogCallback (PWelsLogCallbackFunc _log) {
   wlog	= _log;
 }
 
-void WelsLogCall (void* pCtx, int32_t iLevel, const char* kpFmt, va_list vl) {
-  wlog (pCtx, iLevel, kpFmt, vl);
-}
-
 void WelsLog (void* pCtx, int32_t iLevel, const char* kpFmt, ...) {
   va_list vl;
   va_start (vl, kpFmt);
-  WelsLogCall (pCtx, iLevel, kpFmt, vl);
+  wlog (pCtx, iLevel, kpFmt, vl);
   va_end (vl);
 }
 

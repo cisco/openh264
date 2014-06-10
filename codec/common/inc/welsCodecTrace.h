@@ -47,11 +47,6 @@ class welsCodecTrace {
   static void CODEC_TRACE (void* pIgnore, const int32_t kiLevel, const char* kpStrFormat, va_list vl);
 
   void SetTraceLevel (const int32_t kiLevel);
-  int32_t WelsTraceModuleIsExist();
-
- private:
-
-  int32_t m_WelsTraceExistFlag;
 
  public:
   static int32_t	m_iTraceLevel;

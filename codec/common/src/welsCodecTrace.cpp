@@ -58,7 +58,6 @@ welsCodecTrace::welsCodecTrace() {
   m_fpInfoTrace = welsStderrTrace<WELS_LOG_INFO>;
   m_fpWarnTrace = welsStderrTrace<WELS_LOG_WARNING>;
   m_fpErrorTrace = welsStderrTrace<WELS_LOG_ERROR>;
-  m_WelsTraceExistFlag = true;
 }
 
 welsCodecTrace::~welsCodecTrace() {
@@ -66,12 +65,6 @@ welsCodecTrace::~welsCodecTrace() {
   m_fpInfoTrace = NULL;
   m_fpWarnTrace = NULL;
   m_fpErrorTrace = NULL;
-//	g_bWelsLibLoaded = false;
-  m_WelsTraceExistFlag = false;
-}
-
-int32_t welsCodecTrace::WelsTraceModuleIsExist() {
-  return m_WelsTraceExistFlag;
 }
 
 void welsCodecTrace::TraceString (int32_t iLevel, const char* str) {
@@ -102,19 +95,13 @@ void welsCodecTrace::TraceString (int32_t iLevel, const char* str) {
 #define MAX_LOG_SIZE	1024
 
 void welsCodecTrace::CODEC_TRACE (void* ignore, const int32_t iLevel, const char* Str_Format, va_list vl) {
-//		if(g_traceLevel < iLevel)
   if (m_iTraceLevel < iLevel) {
     return;
   }
 
   char pBuf[MAX_LOG_SIZE] = {0};
-  const int32_t len	= strlen ("[ENCODER]: ");	// confirmed_safe_unsafe_usage
+  WelsVsnprintf (pBuf, MAX_LOG_SIZE, Str_Format, vl);	// confirmed_safe_unsafe_usage
 
-
-  WelsStrncpy (pBuf, MAX_LOG_SIZE, "[ENCODER]: ");	// confirmed_safe_unsafe_usage
-  WelsVsnprintf (pBuf + len, MAX_LOG_SIZE - len, Str_Format, vl);	// confirmed_safe_unsafe_usage
-
-//		g_WelsCodecTrace.TraceString(iLevel, pBuf);
   welsCodecTrace::TraceString (iLevel, pBuf);
 }
 

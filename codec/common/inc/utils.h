@@ -84,32 +84,6 @@ extern void WelsLog (void* pCtx, int32_t iLevel, const char* kpFmt, ...);
 
 /*!
  *************************************************************************************
- * \brief	set log iLevel from external call
- *
- * \param	iLevel	iLevel of log
- *
- * \return	NONE
- *
- * \note	can be able to control log iLevel dynamically
- *************************************************************************************
- */
-void WelsSetLogLevel (const int32_t kiLevel);
-
-/*!
- *************************************************************************************
- * \brief	get log iLevel from external call
- *
- * \param	N/A
- *
- * \return	current iLevel of log used in codec internal
- *
- * \note	can be able to get log iLevel of internal codec applicable
- *************************************************************************************
- */
-int32_t WelsGetLogLevel (void);
-
-/*!
- *************************************************************************************
  * \brief	set log callback from external call
  *
  * \param	_log	log function routine
