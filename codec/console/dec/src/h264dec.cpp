@@ -384,14 +384,14 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
 
         if (!strcmp (cmd, "-options")) {
           if (i + 1 < iArgC)
-            strOptionFile = pArgV[i++];
+            strOptionFile = pArgV[++i];
           else {
             printf ("options file not specified.\n");
             return 1;
           }
         } else if (!strcmp (cmd, "-trace")) {
           if (i + 1 < iArgC)
-            WelsStderrSetTraceLevel (atoi (pArgV[i++]));
+            WelsStderrSetTraceLevel (atoi (pArgV[++i]));
           else {
             printf ("trace level not specified.\n");
             return 1;
