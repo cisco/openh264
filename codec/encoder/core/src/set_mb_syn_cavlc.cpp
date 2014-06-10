@@ -50,10 +50,6 @@ const  ALIGNED_DECLARE (uint8_t, g_kuiZeroLeftMap[16], 16) = {
   0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7
 };
 
-const ALIGNED_DECLARE (uint8_t, g_kuiTrailingOneIndex[8], 16) = {
-  3, 0, 1, 0, 2, 0, 1, 0
-};
-
 int32_t CavlcParamCal_c (int16_t* pCoffLevel, uint8_t* pRun, int16_t* pLevel, int32_t* pTotalCoeff ,
                          int32_t iLastIndex) {
   int32_t iTotalZeros = 0;

@@ -41,14 +41,6 @@
 #include "au_set.h"
 #include "svc_enc_golomb.h"
 namespace WelsSVCEnc {
-static const uint32_t g_kuiMaxDPBx2AtLevel[52] = { // *2 on the basic of Annex A, Table A-1, for int32_t type
-  0,		0,		0,		0,		0,	0,	0,	0,	0,	0, //0~9
-  297,	675,	1782,	1782,	0,	0,	0,	0,	0,	0, //10, 11, 12, 13
-  1782,	3564,	6075,	0,		0,	0,	0,	0,	0,	0, //20, 21, 22
-  6075,	13500,	15360,	0,		0,	0,	0,	0,	0,	0, //30, 31, 32
-  24576,	24576,	26112,	0,		0,	0,	0,	0,	0,	0, //40, 41, 42
-  82800,	138240											//50, 51
-};
 
 
 #define LEVEL_NUMBER 16
