@@ -58,7 +58,6 @@ welsCodecTrace::welsCodecTrace() {
   m_fpInfoTrace = welsStderrTrace<WELS_LOG_INFO>;
   m_fpWarnTrace = welsStderrTrace<WELS_LOG_WARNING>;
   m_fpErrorTrace = welsStderrTrace<WELS_LOG_ERROR>;
-  m_WelsTraceExistFlag = true;
 }
 
 welsCodecTrace::~welsCodecTrace() {
@@ -66,11 +65,6 @@ welsCodecTrace::~welsCodecTrace() {
   m_fpInfoTrace = NULL;
   m_fpWarnTrace = NULL;
   m_fpErrorTrace = NULL;
-  m_WelsTraceExistFlag = false;
-}
-
-int32_t welsCodecTrace::WelsTraceModuleIsExist() {
-  return m_WelsTraceExistFlag;
 }
 
 void welsCodecTrace::TraceString (int32_t iLevel, const char* str) {

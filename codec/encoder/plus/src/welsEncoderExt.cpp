@@ -172,11 +172,8 @@ void CWelsH264SVCEncoder::InitEncoder (void) {
 
   m_pWelsTrace	= new welsCodecTrace();
   if (m_pWelsTrace != NULL) {
-    const int32_t iWelsTraceExistingFlag = m_pWelsTrace->WelsTraceModuleIsExist();
-    if (iWelsTraceExistingFlag) {
-      m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);
-      WelsSetLogCallback (welsCodecTrace::CODEC_TRACE);
-    }
+    m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);
+    WelsSetLogCallback (welsCodecTrace::CODEC_TRACE);
   }
 }
 
