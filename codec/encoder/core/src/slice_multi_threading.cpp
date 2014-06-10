@@ -968,15 +968,15 @@ int32_t CreateSliceThreads (sWelsEncCtx* pCtx) {
   return 0;
 }
 
-int32_t FiredSliceThreads (SSliceThreadPrivateData* pPriData, WELS_EVENT* pEventsList, WELS_EVENT* pMasterEventsList,
-                           SLayerBSInfo* pLbi,
+int32_t FiredSliceThreads (sWelsEncCtx* pCtx, SSliceThreadPrivateData* pPriData, WELS_EVENT* pEventsList,
+                           WELS_EVENT* pMasterEventsList, SLayerBSInfo* pLbi,
                            const uint32_t uiNumThreads, SSliceCtx* pSliceCtx, const bool bIsDynamicSlicingMode) {
   int32_t iEndMbIdx	= 0;
   int32_t iIdx		= 0;
   const int32_t kiEventCnt = uiNumThreads;
 
   if (pPriData == NULL || pLbi == NULL || kiEventCnt <= 0 || pEventsList == NULL) {
-    WelsLog (NULL, WELS_LOG_ERROR,
+    WelsLog (pCtx, WELS_LOG_ERROR,
              "FiredSliceThreads(), fail due pPriData == %p || pLbi == %p || iEventCnt(%d) <= 0 || pEventsList == %p!!\n",
              (void*)pPriData, (void*)pLbi, uiNumThreads, (void*)pEventsList);
     return 1;
