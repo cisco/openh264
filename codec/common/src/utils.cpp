@@ -49,7 +49,6 @@ float WelsCalcPsnr (const void* kpTarPic,
 
 
 iWelsLogLevel		g_iLevelLog	= WELS_LOG_DEFAULT;	// default log iLevel
-int32_t			g_iSizeLogBuf	= 1024;			// pBuffer size for each log output
 PWelsLogCallbackFunc	wlog;
 
 /*!
