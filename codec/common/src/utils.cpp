@@ -65,14 +65,10 @@ void WelsSetLogCallback (PWelsLogCallbackFunc _log) {
   wlog	= _log;
 }
 
-void WelsLogCall (void* pCtx, int32_t iLevel, const char* kpFmt, va_list vl) {
-  wlog (pCtx, iLevel, kpFmt, vl);
-}
-
 void WelsLog (void* pCtx, int32_t iLevel, const char* kpFmt, ...) {
   va_list vl;
   va_start (vl, kpFmt);
-  WelsLogCall (pCtx, iLevel, kpFmt, vl);
+  wlog (pCtx, iLevel, kpFmt, vl);
   va_end (vl);
 }
 
