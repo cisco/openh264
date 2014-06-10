@@ -100,11 +100,7 @@ void welsCodecTrace::CODEC_TRACE (void* ignore, const int32_t iLevel, const char
   }
 
   char pBuf[MAX_LOG_SIZE] = {0};
-  const int32_t len	= strlen ("[ENCODER]: ");	// confirmed_safe_unsafe_usage
-
-
-  WelsStrncpy (pBuf, MAX_LOG_SIZE, "[ENCODER]: ");	// confirmed_safe_unsafe_usage
-  WelsVsnprintf (pBuf + len, MAX_LOG_SIZE - len, Str_Format, vl);	// confirmed_safe_unsafe_usage
+  WelsVsnprintf (pBuf, MAX_LOG_SIZE, Str_Format, vl);	// confirmed_safe_unsafe_usage
 
   welsCodecTrace::TraceString (iLevel, pBuf);
 }
