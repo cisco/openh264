@@ -43,17 +43,13 @@ class welsCodecTrace {
   welsCodecTrace();
   ~welsCodecTrace();
 
-  static void TraceString (int32_t iLevel, const char* kpStrFormat);
   static void CODEC_TRACE (void* pIgnore, const int32_t kiLevel, const char* kpStrFormat, va_list vl);
 
   void SetTraceLevel (const int32_t kiLevel);
 
  public:
   static int32_t	m_iTraceLevel;
-  static CM_WELS_TRACE m_fpDebugTrace;
-  static CM_WELS_TRACE m_fpInfoTrace;
-  static CM_WELS_TRACE m_fpWarnTrace;
-  static CM_WELS_TRACE m_fpErrorTrace;
+  static CM_WELS_TRACE m_fpTrace;
 
 };
 

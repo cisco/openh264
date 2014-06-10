@@ -47,49 +47,15 @@
 #include "logging.h"
 
 int32_t	welsCodecTrace::m_iTraceLevel			= WELS_LOG_DEFAULT;
-CM_WELS_TRACE welsCodecTrace::m_fpDebugTrace	= NULL;
-CM_WELS_TRACE welsCodecTrace::m_fpInfoTrace	= NULL;
-CM_WELS_TRACE welsCodecTrace::m_fpWarnTrace	= NULL;
-CM_WELS_TRACE welsCodecTrace::m_fpErrorTrace	= NULL;
+CM_WELS_TRACE welsCodecTrace::m_fpTrace	= NULL;
 
 welsCodecTrace::welsCodecTrace() {
 
-  m_fpDebugTrace = welsStderrTrace;
-  m_fpInfoTrace = welsStderrTrace;
-  m_fpWarnTrace = welsStderrTrace;
-  m_fpErrorTrace = welsStderrTrace;
+  m_fpTrace = welsStderrTrace;
 }
 
 welsCodecTrace::~welsCodecTrace() {
-  m_fpDebugTrace = NULL;
-  m_fpInfoTrace = NULL;
-  m_fpWarnTrace = NULL;
-  m_fpErrorTrace = NULL;
-}
-
-void welsCodecTrace::TraceString (int32_t iLevel, const char* str) {
-  switch (iLevel) {
-  case WELS_LOG_ERROR:
-    if (m_fpErrorTrace)
-      m_fpErrorTrace (str);
-    break;
-  case WELS_LOG_WARNING:
-    if (m_fpWarnTrace)
-      m_fpWarnTrace (str);
-    break;
-  case WELS_LOG_INFO:
-    if (m_fpInfoTrace)
-      m_fpInfoTrace (str);
-    break;
-  case WELS_LOG_DEBUG:
-    if (m_fpDebugTrace)
-      m_fpDebugTrace (str);
-    break;
-  default:
-    if (m_fpDebugTrace)
-      m_fpInfoTrace (str);
-    break;
-  }
+  m_fpTrace = NULL;
 }
 
 #define MAX_LOG_SIZE	1024
@@ -102,7 +68,7 @@ void welsCodecTrace::CODEC_TRACE (void* ignore, const int32_t iLevel, const char
   char pBuf[MAX_LOG_SIZE] = {0};
   WelsVsnprintf (pBuf, MAX_LOG_SIZE, Str_Format, vl);	// confirmed_safe_unsafe_usage
 
-  welsCodecTrace::TraceString (iLevel, pBuf);
+  m_fpTrace (pBuf);
 }
 
 void welsCodecTrace::SetTraceLevel (const int32_t iLevel) {
