@@ -47,6 +47,7 @@ static int InitWithParam(ISVCEncoder* encoder, EUsageType usageType,int width,
         param.uiMaxNalSize = 1500;
       }
     }
+    param.iTargetBitrate *= param.iSpatialLayerNum;
 
     return encoder->InitializeExt(&param);
   }
