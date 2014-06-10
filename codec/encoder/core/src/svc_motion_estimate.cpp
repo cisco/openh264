@@ -961,5 +961,6 @@ void WelsDiamondCrossFeatureSearch (SWelsFuncPtrList* pFunc, SWelsME* pMe, SSlic
   }
 }
 
+
 } // namespace WelsSVCEnc
 

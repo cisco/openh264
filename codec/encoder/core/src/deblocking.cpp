@@ -115,37 +115,6 @@ static const uint8_t g_kuiTableBIdx[2][8] = {
   }, // table_bn_idx
 };
 
-static const ALIGNED_DECLARE (int32_t, g_kiTableBlock8x8Idx[2][4][4], 16) = {
-  {
-    {0, 0, 2, 2},
-    {0, 0, 2, 2},
-    {1, 1, 3, 3},
-    {1, 1, 3, 3}
-  },
-
-  {
-    {0, 0, 1, 1},
-    {0, 0, 1, 1},
-    {2, 2, 3, 3},
-    {2, 2, 3, 3}
-  }
-};
-static const ALIGNED_DECLARE (int32_t, g_kiTableBlock8x8NIdx[2][4][4], 16) = {
-  {
-    {1, 1, 3, 3},
-    {0, 0, 2, 2},
-    {0, 0, 2, 2},
-    {1, 1, 3, 3}
-  },
-
-  {
-    {2, 2, 3, 3},
-    {0, 0, 1, 1},
-    {0, 0, 1, 1},
-    {2, 2, 3, 3}
-  }
-};
-
 #define TC0_TBL_LOOKUP(iTc, iIdexA, pBS, bchroma) \
 {\
 	iTc[0] = g_kiTc0Table(iIdexA)[pBS[0]] + bchroma;\

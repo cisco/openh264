@@ -77,7 +77,7 @@ void BaseEncoderTest::EncodeStream(InputStream* in, EUsageType usageType, int wi
 
   BufferedData buf;
   buf.SetLength(frameSize);
-  ASSERT_TRUE(buf.Length() == frameSize);
+  ASSERT_TRUE(buf.Length() == (size_t)frameSize);
 
   SFrameBSInfo info;
   memset(&info, 0, sizeof(SFrameBSInfo));
