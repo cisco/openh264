@@ -193,7 +193,7 @@ binaries: codec_unittest$(EXEEXT)
 BINARIES += codec_unittest$(EXEEXT)
 
 ifeq (ios,$(OS))
-codec_unittest$(EXEEXT): $(LIBPREFIX)ut.$(LIBSUFFIX)
+codec_unittest$(EXEEXT): $(LIBPREFIX)ut.$(LIBSUFFIX) $(LIBPREFIX)gtest.$(LIBSUFFIX) $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX)
 
 else
 ifeq (android,$(OS))
