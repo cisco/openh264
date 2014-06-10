@@ -47,7 +47,6 @@
  *	Log output routines
  */
 
-typedef int32_t	iWelsLogLevel;
 enum {
   WELS_LOG_QUIET		= 0x00,		// Quiet mode
   WELS_LOG_ERROR		= 1 << 0,	// Error log iLevel
@@ -64,14 +63,6 @@ enum {
  */
 // wels log output
 typedef void (*PWelsLogCallbackFunc) (void* pCtx, const int32_t iLevel, const char* kpFmt, va_list argv);
-
-// wels psnr calc
-typedef float (*PWelsPsnrFunc) (const void* kpTarPic,
-                                const int32_t kiTarStride,
-                                const void* kpRefPic,
-                                const int32_t kiRefStride,
-                                const int32_t kiWidth,
-                                const int32_t kiHeight);
 
 
 
