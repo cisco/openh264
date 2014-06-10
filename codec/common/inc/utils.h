@@ -64,6 +64,10 @@ enum {
 // wels log output
 typedef void (*PWelsLogCallbackFunc) (void* pCtx, const int32_t iLevel, const char* kpFmt, va_list argv);
 
+typedef struct TagLogContext {
+  PWelsLogCallbackFunc pfLog;
+  void* pLogCtx;
+} SLogContext;
 
 
 #ifdef __GNUC__

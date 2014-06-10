@@ -53,6 +53,7 @@
 #include "wels_preprocess.h"
 #include "wels_func_ptr_def.h"
 #include "crt_util_safe_x.h"
+#include "utils.h"
 
 #include "mt_defs.h"	// for multiple threadin,
 #include "WelsThreadLib.h"
@@ -110,6 +111,7 @@ typedef struct TagStrideTables {
 } SStrideTables;
 
 typedef struct TagWelsEncCtx {
+  SLogContext sLogCtx;
   // Input
   SWelsSvcCodingParam*		pSvcParam;	// SVC parameter, WelsSVCParamConfig in svc_param_settings.h
   SWelsSliceBs*		 	pSliceBs;		// bitstream buffering for various slices, [uiSliceIdx]

@@ -164,6 +164,7 @@ enum {
  */
 
 typedef struct TagWelsDecoderContext {
+  SLogContext sLogCtx;
   // Input
   void*				pArgDec;			// structured arguments for decoder, reserved here for extension in the future
 
