@@ -48,8 +48,8 @@ float WelsCalcPsnr (const void* kpTarPic,
                     const int32_t kiHeight);
 
 
-iWelsLogLevel		g_iLevelLog	= WELS_LOG_DEFAULT;	// default log iLevel
-PWelsLogCallbackFunc	wlog;
+static iWelsLogLevel		g_iLevelLog	= WELS_LOG_DEFAULT;	// default log iLevel
+static PWelsLogCallbackFunc	wlog;
 
 /*!
  *************************************************************************************
