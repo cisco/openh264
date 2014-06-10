@@ -37,13 +37,13 @@
 
 
 // Internal details.
-int32_t welsStderrLevelTrace (int32_t level, const char* format, va_list ap);
+int32_t welsStderrLevelTrace (const char* format, va_list ap);
 
 template<int level> int32_t welsStderrTrace (
   const char* format, ...) {
   va_list ap;
   va_start (ap, format);
-  welsStderrLevelTrace (level, format, ap);
+  welsStderrLevelTrace (format, ap);
   va_end (ap);
   return 0;
 }
