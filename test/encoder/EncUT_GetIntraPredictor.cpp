@@ -509,7 +509,9 @@ TEST(GetIntraPredictorTest, TestGetI16x16LumaPredPlane) {
   }
 
   pRef -= kiStride + 1;
+  pPred -= (iPredStride * 16);
   delete []pRef;
+  delete []pPred;
 }
 
 TEST(GetIntraPredictorTest, TestGetI16x16LumaPredDc) {
