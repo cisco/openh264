@@ -66,7 +66,6 @@ welsCodecTrace::~welsCodecTrace() {
   m_fpInfoTrace = NULL;
   m_fpWarnTrace = NULL;
   m_fpErrorTrace = NULL;
-//	g_bWelsLibLoaded = false;
   m_WelsTraceExistFlag = false;
 }
 
@@ -102,7 +101,6 @@ void welsCodecTrace::TraceString (int32_t iLevel, const char* str) {
 #define MAX_LOG_SIZE	1024
 
 void welsCodecTrace::CODEC_TRACE (void* ignore, const int32_t iLevel, const char* Str_Format, va_list vl) {
-//		if(g_traceLevel < iLevel)
   if (m_iTraceLevel < iLevel) {
     return;
   }
@@ -114,7 +112,6 @@ void welsCodecTrace::CODEC_TRACE (void* ignore, const int32_t iLevel, const char
   WelsStrncpy (pBuf, MAX_LOG_SIZE, "[ENCODER]: ");	// confirmed_safe_unsafe_usage
   WelsVsnprintf (pBuf + len, MAX_LOG_SIZE - len, Str_Format, vl);	// confirmed_safe_unsafe_usage
 
-//		g_WelsCodecTrace.TraceString(iLevel, pBuf);
   welsCodecTrace::TraceString (iLevel, pBuf);
 }
 
