@@ -156,7 +156,7 @@ TEST (ExpandPicture, ExpandPictureChroma) {
 
     for (int32_t iTestIdx = 0; iTestIdx < EXPAND_PIC_TEST_NUM; iTestIdx++) {
       int32_t iPicWidth = (8 + (rand() % 200) * 8);
-      if(uiCpuFlag && WELS_CPU_SSE2)
+      if(uiCpuFlag & WELS_CPU_SSE2)
       {
         iPicWidth = WELS_MAX(iPicWidth, 16);
       }
