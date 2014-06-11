@@ -277,7 +277,7 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
     return cmResultSuccess;
   } else if (eOptID == DECODER_OPTION_TRACE_CALLBACK) {
     if (m_pWelsTrace) {
-      CM_WELS_TRACE callback = * ((CM_WELS_TRACE*)pOption);
+      WelsTraceCallback callback = * ((WelsTraceCallback*)pOption);
       m_pWelsTrace->SetTraceCallback (callback);
     }
     return cmResultSuccess;
