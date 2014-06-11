@@ -4,14 +4,12 @@
 #include "mem_align.h"
 #include "decoder_context.h"
 #include "cpu.h"
-using namespace WelsDec;
+#include "cpu_core.h"
 #define EXPAND_PIC_TEST_NUM 10
-namespace WelsDec {
-extern PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kPicWidth, const int32_t kPicHeight);
-extern void FreePicture (PPicture pPic);
-}
 #define H264_PADDING_LENGTH_LUMA (PADDING_LENGTH)
 #define H264_PADDING_LENGTH_CHROMA (PADDING_LENGTH>>1)
+
+using namespace WelsDec;
 
 void H264ExpandPictureLumaAnchor_c (uint8_t* pDst, int32_t iStride, int32_t iPicWidth, int32_t iPicHeight) {
   uint8_t* pTmp = pDst;
@@ -98,14 +96,24 @@ bool CompareBuff (uint8_t* pSrc0, uint8_t* pSrc1, int32_t iStride, int32_t iWidt
   return true;
 }
 
+bool CompareImage (uint8_t* pSrc0, uint8_t* pSrc1, int32_t iSize) {
+  for (int32_t n = 0; n < iSize; n++) {
+    if (pSrc0[n] !=  pSrc1[n]) {
+      return false;
+    }
+
+  }
+  return true;
+}
+
 TEST (ExpandPicture, ExpandPictureLuma) {
   SExpandPicFunc	    sExpandPicFunc;
   int32_t iCpuCores = 1;
   uint32_t uiCpuFlag = 0;
-  for(int32_t k =0; k<2; k++) {
-    if(k==0) {
+  for (int32_t k = 0; k < 2; k++) {
+    if (k == 0) {
       uiCpuFlag = 0;
-    }else {
+    } else {
       uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores);
     }
     InitExpandPictureFunc (&sExpandPicFunc, uiCpuFlag);
@@ -145,10 +153,10 @@ TEST (ExpandPicture, ExpandPictureChroma) {
   SExpandPicFunc	    sExpandPicFunc;
   int32_t iCpuCores = 1;
   uint32_t uiCpuFlag = 0;
-  for(int32_t k =0; k<2; k++) {
-    if(k==0) {
+  for (int32_t k = 0; k < 2; k++) {
+    if (k == 0) {
       uiCpuFlag = 0;
-    }else {
+    } else {
       uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores);
     }
     InitExpandPictureFunc (&sExpandPicFunc, uiCpuFlag);
@@ -156,9 +164,8 @@ TEST (ExpandPicture, ExpandPictureChroma) {
 
     for (int32_t iTestIdx = 0; iTestIdx < EXPAND_PIC_TEST_NUM; iTestIdx++) {
       int32_t iPicWidth = (8 + (rand() % 200) * 8);
-      if(uiCpuFlag & WELS_CPU_SSE2)
-      {
-        iPicWidth = WELS_MAX(iPicWidth, 16);
+      if (uiCpuFlag & WELS_CPU_SSE2) {
+        iPicWidth = WELS_MAX (iPicWidth, 16);
       }
       int32_t iPicHeight = (8 + (rand() % 100) * 8);
 
@@ -193,56 +200,67 @@ TEST (ExpandPicture, ExpandPicForMotion) {
   SExpandPicFunc	    sExpandPicFunc;
   int32_t iCpuCores = 1;
   uint32_t uiCpuFlag = 0;
-  for(int32_t k =0; k<2; k++) {
-    if(k==0) {
+  for (int32_t k = 0; k < 2; k++) {
+    if (k == 0) {
       uiCpuFlag = 0;
-    }else {
+    } else {
       uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores);
     }
     InitExpandPictureFunc (&sExpandPicFunc, uiCpuFlag);
     srand ((unsigned int)time (0));
-    SWelsDecoderContext sCtx;
-    PPicture pPicAnchor = NULL;
-    PPicture pPicTest = NULL;
+    uint8_t* pPicAnchorBuffer = NULL;
+    uint8_t* pPicTestBuffer = NULL;
+    uint8_t* pPicAnchor[3] = {NULL, NULL, NULL};
+    uint8_t* pPicTest[3] = {NULL, NULL, NULL};
+    int32_t iStride[3];
     for (int32_t iTestIdx = 0; iTestIdx < EXPAND_PIC_TEST_NUM; iTestIdx++) {
       int32_t iPicWidth = (16 + (rand() % 200) * 16);
       int32_t iPicHeight = (16 + (rand() % 100) * 16);
+      if (uiCpuFlag & WELS_CPU_SSE2) {
+        iPicWidth = WELS_ALIGN (iPicWidth, 32);
+      }
+      iStride[0]	= WELS_ALIGN (iPicWidth, MB_WIDTH_LUMA) + (PADDING_LENGTH << 1);	// with width of horizon
+      int32_t iPicHeightExt	= WELS_ALIGN (iPicHeight, MB_HEIGHT_LUMA) + (PADDING_LENGTH << 1);	// with height of vertical
+      iStride[1]	= iStride[0] >> 1;
+      int32_t iPicChromaHeightExt	= iPicHeightExt >> 1;
+      iStride[2]    = iStride[1];
+      int32_t iLumaSize	= iStride[0] * iPicHeightExt;
+      int32_t iChromaSize	= iStride[1] * iPicChromaHeightExt;
 
-      pPicAnchor = AllocPicture (&sCtx, iPicWidth, iPicHeight);
-      pPicTest = AllocPicture (&sCtx, iPicWidth, iPicHeight);
-      sCtx.pDec = pPicTest;
+      pPicAnchorBuffer = static_cast<uint8_t*> (WelsMalloc (iLumaSize + (iChromaSize << 1), "pPicAnchor"));
+      pPicAnchor[0]	= pPicAnchorBuffer + (1 + iStride[0]) * PADDING_LENGTH;
+      pPicAnchor[1]	= pPicAnchorBuffer + iLumaSize + (((1 + iStride[1]) * PADDING_LENGTH) >> 1);
+      pPicAnchor[2]	= pPicAnchorBuffer + iLumaSize + iChromaSize + (((1 + iStride[2]) * PADDING_LENGTH) >> 1);
 
-      int32_t iStride = pPicAnchor->iLinesize[0];
-      int32_t iStrideC;
-      iStrideC = pPicAnchor->iLinesize[1];
+      pPicTestBuffer = static_cast<uint8_t*> (WelsMalloc (iLumaSize + (iChromaSize << 1), "pPicTest"));
+      pPicTest[0]	= pPicTestBuffer + (1 + iStride[0]) * PADDING_LENGTH;
+      pPicTest[1]	= pPicTestBuffer + iLumaSize + (((1 + iStride[1]) * PADDING_LENGTH) >> 1);
+      pPicTest[2]	= pPicTestBuffer + iLumaSize + iChromaSize + (((1 + iStride[2]) * PADDING_LENGTH) >> 1);
+
+
       // Generate Src
       for (int32_t j = 0; j < iPicHeight; j++) {
         for (int32_t i = 0; i < iPicWidth; i++) {
-          pPicAnchor->pData[0][i + j * iStride] =  pPicTest->pData[0][i + j * iStride] = rand() % 256;
+          pPicAnchor[0][i + j * iStride[0]] =  pPicTest[0][i + j * iStride[0]] = rand() % 256;
         }
       }
       for (int32_t j = 0; j < iPicHeight / 2; j++) {
         for (int32_t i = 0; i < iPicWidth / 2; i++) {
-          pPicAnchor->pData[1][i + j * iStrideC] =  pPicTest->pData[1][i + j * iStrideC] = rand() % 256;
-          pPicAnchor->pData[2][i + j * iStrideC] =  pPicTest->pData[2][i + j * iStrideC] = rand() % 256;
+          pPicAnchor[1][i + j * iStride[1]] =  pPicTest[1][i + j * iStride[1]] = rand() % 256;
+          pPicAnchor[2][i + j * iStride[2]] =  pPicTest[2][i + j * iStride[2]] = rand() % 256;
         }
       }
-
-      H264ExpandPictureLumaAnchor_c (pPicAnchor->pData[0], iStride, iPicWidth, iPicHeight);
-      H264ExpandPictureChromaAnchor_c (pPicAnchor->pData[1], iStrideC, iPicWidth / 2, iPicHeight / 2);
-      H264ExpandPictureChromaAnchor_c (pPicAnchor->pData[2], iStrideC, iPicWidth / 2, iPicHeight / 2);
-      ExpandReferencingPicture (sCtx.pDec->pData, sCtx.pDec->iWidthInPixel, sCtx.pDec->iHeightInPixel, sCtx.pDec->iLinesize,
+      H264ExpandPictureLumaAnchor_c (pPicAnchor[0], iStride[0], iPicWidth, iPicHeight);
+      H264ExpandPictureChromaAnchor_c (pPicAnchor[1], iStride[1], iPicWidth / 2, iPicHeight / 2);
+      H264ExpandPictureChromaAnchor_c (pPicAnchor[2], iStride[2], iPicWidth / 2, iPicHeight / 2);
+      ExpandReferencingPicture (pPicTest, iPicWidth, iPicHeight, iStride,
                                 sExpandPicFunc.pfExpandLumaPicture, sExpandPicFunc.pfExpandChromaPicture);
+      EXPECT_EQ (CompareImage (pPicAnchorBuffer, pPicTestBuffer, (iLumaSize + (iChromaSize << 1))), true);
 
-      EXPECT_EQ (CompareBuff (pPicAnchor->pBuffer[0], pPicTest->pBuffer[0], iStride, iPicWidth + PADDING_LENGTH * 2,
-                              iPicHeight + PADDING_LENGTH * 2), true);
-      EXPECT_EQ (CompareBuff (pPicAnchor->pBuffer[1], pPicTest->pBuffer[1], iStrideC, iPicWidth / 2 + PADDING_LENGTH,
-                              iPicHeight / 2 + PADDING_LENGTH), true);
-      EXPECT_EQ (CompareBuff (pPicAnchor->pBuffer[2], pPicTest->pBuffer[2], iStrideC, iPicWidth / 2 + PADDING_LENGTH,
-                              iPicHeight / 2 + PADDING_LENGTH), true);
 
-      FreePicture (pPicAnchor);
-      FreePicture (pPicTest);
+      WELS_SAFE_FREE (pPicAnchorBuffer, "pPicAnchor");
+      WELS_SAFE_FREE (pPicTestBuffer, "pPicTest");
+
     }
   }
 }
