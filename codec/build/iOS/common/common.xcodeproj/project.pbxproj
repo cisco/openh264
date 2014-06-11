@@ -14,7 +14,6 @@
 		4C3406CD18D96EA600DFA14A /* cpu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406C418D96EA600DFA14A /* cpu.cpp */; };
 		4C3406CE18D96EA600DFA14A /* crt_util_safe_x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406C518D96EA600DFA14A /* crt_util_safe_x.cpp */; };
 		4C3406CF18D96EA600DFA14A /* deblocking_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406C618D96EA600DFA14A /* deblocking_common.cpp */; };
-		4C3406D018D96EA600DFA14A /* logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406C718D96EA600DFA14A /* logging.cpp */; };
 		4C3406D118D96EA600DFA14A /* WelsThreadLib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406C818D96EA600DFA14A /* WelsThreadLib.cpp */; };
 		4CC61F0918FF6B4B00E56EAB /* copy_mb_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CC61F0818FF6B4B00E56EAB /* copy_mb_neon.S */; };
 		4CE443D918B722CD0017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443D818B722CD0017DF25 /* Foundation.framework */; };
@@ -47,7 +46,6 @@
 		4C3406B818D96EA600DFA14A /* cpu_core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpu_core.h; sourceTree = "<group>"; };
 		4C3406B918D96EA600DFA14A /* crt_util_safe_x.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crt_util_safe_x.h; sourceTree = "<group>"; };
 		4C3406BA18D96EA600DFA14A /* deblocking_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = deblocking_common.h; sourceTree = "<group>"; };
-		4C3406BC18D96EA600DFA14A /* logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logging.h; sourceTree = "<group>"; };
 		4C3406BD18D96EA600DFA14A /* ls_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ls_defines.h; sourceTree = "<group>"; };
 		4C3406BE18D96EA600DFA14A /* macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = macros.h; sourceTree = "<group>"; };
 		4C3406BF18D96EA600DFA14A /* mc_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mc_common.h; sourceTree = "<group>"; };
@@ -57,7 +55,6 @@
 		4C3406C418D96EA600DFA14A /* cpu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cpu.cpp; sourceTree = "<group>"; };
 		4C3406C518D96EA600DFA14A /* crt_util_safe_x.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crt_util_safe_x.cpp; sourceTree = "<group>"; };
 		4C3406C618D96EA600DFA14A /* deblocking_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = deblocking_common.cpp; sourceTree = "<group>"; };
-		4C3406C718D96EA600DFA14A /* logging.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = logging.cpp; sourceTree = "<group>"; };
 		4C3406C818D96EA600DFA14A /* WelsThreadLib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WelsThreadLib.cpp; sourceTree = "<group>"; };
 		4CC61F0818FF6B4B00E56EAB /* copy_mb_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = copy_mb_neon.S; sourceTree = "<group>"; };
 		4CE443D518B722CD0017DF25 /* libcommon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -108,7 +105,6 @@
 				4C3406B918D96EA600DFA14A /* crt_util_safe_x.h */,
 				53C1C9BA193F0F9E00404D8F /* expand_pic.h */,
 				4C3406BA18D96EA600DFA14A /* deblocking_common.h */,
-				4C3406BC18D96EA600DFA14A /* logging.h */,
 				4C3406BD18D96EA600DFA14A /* ls_defines.h */,
 				4C3406BE18D96EA600DFA14A /* macros.h */,
 				4C3406BF18D96EA600DFA14A /* mc_common.h */,
@@ -128,7 +124,6 @@
 				4C3406C518D96EA600DFA14A /* crt_util_safe_x.cpp */,
 				53C1C9BB193F0FB000404D8F /* expand_pic.cpp */,
 				4C3406C618D96EA600DFA14A /* deblocking_common.cpp */,
-				4C3406C718D96EA600DFA14A /* logging.cpp */,
 				4C3406C818D96EA600DFA14A /* WelsThreadLib.cpp */,
 			);
 			path = src;
@@ -238,7 +233,6 @@
 				F556A8241906673900E156A8 /* arm_arch64_common_macro.S in Sources */,
 				4C3406CE18D96EA600DFA14A /* crt_util_safe_x.cpp in Sources */,
 				4C3406CF18D96EA600DFA14A /* deblocking_common.cpp in Sources */,
-				4C3406D018D96EA600DFA14A /* logging.cpp in Sources */,
 				4C3406D118D96EA600DFA14A /* WelsThreadLib.cpp in Sources */,
 				4C3406CC18D96EA600DFA14A /* mc_neon.S in Sources */,
 				4C3406CB18D96EA600DFA14A /* expand_picture_neon.S in Sources */,

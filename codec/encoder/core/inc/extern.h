@@ -64,7 +64,7 @@ int32_t InitPic (const void* kpSrc, const int32_t kiCsp, const int32_t kiWidth, 
  * \pParam	pParam		SWelsSvcCodingParam*
  * \return	successful - 0; otherwise none 0 for failed
  */
-int32_t ParamValidationExt (sWelsEncCtx* pCtx, SWelsSvcCodingParam* pParam);
+int32_t ParamValidationExt (SLogContext* pCtx, SWelsSvcCodingParam* pParam);
 
 // GOM based RC related for uiSliceNum decision
 void GomValidCheck (const int32_t kiMbWidth, const int32_t kiMbHeight, int32_t* pSliceNum);
@@ -75,7 +75,7 @@ void GomValidCheck (const int32_t kiMbWidth, const int32_t kiMbHeight, int32_t* 
  * \param	para		SWelsSvcCodingParam*
  * \return	successful - 0; otherwise none 0 for failed
  */
-int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pPara);
+int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pPara, SLogContext* pLogCtx);
 
 /*!
  * \brief	uninitialize Wels encoder core library
@@ -107,7 +107,7 @@ int32_t ForceCodingIDR (sWelsEncCtx* pCtx);
  */
 int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNew);
 void WelsEncoderApplyFrameRate (SWelsSvcCodingParam* pParam);
-void WelsEncoderApplyBitRate (SWelsSvcCodingParam* pParam, int32_t iLayer);
+void WelsEncoderApplyBitRate (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iLayer);
 
 int32_t FilterLTRRecoveryRequest (sWelsEncCtx* pCtx, SLTRRecoverRequest* pLTRRecoverRequest);
 

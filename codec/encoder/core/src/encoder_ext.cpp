@@ -73,7 +73,7 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
  * \pParam	pParam		SWelsSvcCodingParam*
  * \return	successful - 0; otherwise none 0 for failed
  */
-int32_t ParamValidation (SWelsSvcCodingParam* pCfg) {
+int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
   float fMaxFrameRate = 0.0f;
   const float fEpsn = 0.000001f;
   int32_t i = 0;
@@ -81,7 +81,7 @@ int32_t ParamValidation (SWelsSvcCodingParam* pCfg) {
   assert (pCfg != NULL);
 
   if ((pCfg->iUsageType != CAMERA_VIDEO_REAL_TIME) && (pCfg->iUsageType != SCREEN_CONTENT_REAL_TIME)) {
-    WelsLog (NULL, WELS_LOG_ERROR, "ParamValidation(),Invalid usage type = %d\n", pCfg->iUsageType);
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidation(),Invalid usage type = %d\n", pCfg->iUsageType);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
   for (i = 0; i < pCfg->iSpatialLayerNum; ++ i) {
@@ -89,13 +89,13 @@ int32_t ParamValidation (SWelsSvcCodingParam* pCfg) {
     if (fDlp->fOutputFrameRate > fDlp->fInputFrameRate || (fDlp->fInputFrameRate >= -fEpsn
         && fDlp->fInputFrameRate <= fEpsn)
         || (fDlp->fOutputFrameRate >= -fEpsn && fDlp->fOutputFrameRate <= fEpsn)) {
-      WelsLog (NULL, WELS_LOG_ERROR,
+      WelsLog (pLogCtx, WELS_LOG_ERROR,
                "Invalid settings in input frame rate(%.6f) or output frame rate(%.6f) of layer #%d config file..\n",
                fDlp->fInputFrameRate, fDlp->fOutputFrameRate, i);
       return ENC_RETURN_INVALIDINPUT;
     }
     if (UINT_MAX == GetLogFactor (fDlp->fOutputFrameRate, fDlp->fInputFrameRate)) {
-      WelsLog (NULL, WELS_LOG_ERROR,
+      WelsLog (pLogCtx, WELS_LOG_ERROR,
                "Invalid settings in input frame rate(%.6f) and output frame rate(%.6f) of layer #%d config file: iResult of output frame rate divided by input frame rate should be power of 2(i.e,in/pOut=2^n)..\n",
                fDlp->fInputFrameRate, fDlp->fOutputFrameRate, i);
       return ENC_RETURN_INVALIDINPUT;
@@ -121,7 +121,7 @@ int32_t ParamValidation (SWelsSvcCodingParam* pCfg) {
       iTotalBitrate += fDlp->iSpatialBitrate;
     }
     if (iTotalBitrate > pCfg->iTargetBitrate) {
-      WelsLog (NULL, WELS_LOG_ERROR,
+      WelsLog (pLogCtx, WELS_LOG_ERROR,
                "Invalid settings in bitrate. the sum of each layer bitrate(%d) is larger than total bitrate setting(%d)\n",
                iTotalBitrate, pCfg->iTargetBitrate);
     }
@@ -131,7 +131,7 @@ int32_t ParamValidation (SWelsSvcCodingParam* pCfg) {
 }
 
 
-int32_t ParamValidationExt (sWelsEncCtx* pCtx, SWelsSvcCodingParam* pCodingParam) {
+int32_t ParamValidationExt (SLogContext* pCtx, SWelsSvcCodingParam* pCodingParam) {
   int8_t i = 0;
   int32_t iIdx = 0;
 
@@ -383,7 +383,7 @@ int32_t ParamValidationExt (sWelsEncCtx* pCtx, SWelsSvcCodingParam* pCodingParam
     }
   }
 
-  return ParamValidation (pCodingParam);
+  return ParamValidation (pCtx, pCodingParam);
 }
 
 
@@ -412,7 +412,7 @@ void WelsEncoderApplyFrameRate (SWelsSvcCodingParam* pParam) {
 }
 
 
-void WelsEncoderApplyBitRate (SWelsSvcCodingParam* pParam, int iLayer) {
+void WelsEncoderApplyBitRate (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int iLayer) {
   //TODO (Sijia):  this is a temporary solution which keep the ratio between layers
   //but it is also possible to fulfill the bitrate of lower layer first
 
@@ -421,7 +421,7 @@ void WelsEncoderApplyBitRate (SWelsSvcCodingParam* pParam, int iLayer) {
   int32_t i, iOrigTotalBitrate = 0;
   if (iLayer == SPATIAL_LAYER_ALL) {
     if (pParam->iMaxBitrate < pParam->iTargetBitrate) {
-      WelsLog (NULL, WELS_LOG_WARNING,
+      WelsLog (pLogCtx, WELS_LOG_WARNING,
                "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE,overall settting,TargetBitrate = %d,iMaxBitrate = %d\n",
                pParam->iTargetBitrate, pParam->iMaxBitrate);
       pParam->iMaxBitrate  = pParam->iTargetBitrate;
@@ -439,7 +439,7 @@ void WelsEncoderApplyBitRate (SWelsSvcCodingParam* pParam, int iLayer) {
     }
   } else {
     if (pParam->sSpatialLayers[iLayer].iMaxSpatialBitrate < pParam->sSpatialLayers[iLayer].iSpatialBitrate) {
-      WelsLog (NULL, WELS_LOG_WARNING,
+      WelsLog (pLogCtx, WELS_LOG_WARNING,
                "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE,iLayer = %d,iTargetBitrate = %d,iMaxBitrate = %d\n",
                iLayer, pParam->sSpatialLayers[iLayer].iSpatialBitrate, pParam->sSpatialLayers[iLayer].iMaxSpatialBitrate);
       pParam->sSpatialLayers[iLayer].iMaxSpatialBitrate = pParam->sSpatialLayers[iLayer].iSpatialBitrate;
@@ -1723,7 +1723,7 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
 #endif//MEMORY_MONITOR
 
     if ((*ppCtx)->pMemAlign != NULL) {
-      WelsLog (NULL, WELS_LOG_INFO, "FreeMemorySvc(), verify memory usage (%d bytes) after free..\n",
+      WelsLog (*ppCtx, WELS_LOG_INFO, "FreeMemorySvc(), verify memory usage (%d bytes) after free..\n",
                (*ppCtx)->pMemAlign->WelsGetMemoryUsage());
       delete (*ppCtx)->pMemAlign;
       (*ppCtx)->pMemAlign = NULL;
@@ -1734,7 +1734,8 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
   }
 }
 
-int32_t InitSliceSettings (SWelsSvcCodingParam* pCodingParam, const int32_t kiCpuCores, int16_t* pMaxSliceCount) {
+int32_t InitSliceSettings (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingParam, const int32_t kiCpuCores,
+                           int16_t* pMaxSliceCount) {
   int32_t iSpatialIdx = 0, iSpatialNum = pCodingParam->iSpatialLayerNum;
   uint16_t iMaxSliceCount = 0;
 
@@ -1784,7 +1785,7 @@ int32_t InitSliceSettings (SWelsSvcCodingParam* pCodingParam, const int32_t kiCp
         pDlp->sSliceCfg.sSliceArgument.uiSliceNum = iMaxSliceCount;
       }
       if (pDlp->sSliceCfg.sSliceArgument.uiSliceNum == 1) {
-        WelsLog (NULL, WELS_LOG_DEBUG,
+        WelsLog (pLogCtx, WELS_LOG_DEBUG,
                  "InitSliceSettings(), uiSliceNum(%d) you set for SM_AUTO_SLICE, now turn to SM_SINGLE_SLICE type!\n",
                  pDlp->sSliceCfg.sSliceArgument.uiSliceNum);
         pDlp->sSliceCfg.uiSliceMode	= SM_SINGLE_SLICE;
@@ -1799,7 +1800,7 @@ int32_t InitSliceSettings (SWelsSvcCodingParam* pCodingParam, const int32_t kiCp
       } else if (!CheckFixedSliceNumMultiSliceSetting (kiMbNumInFrame,
                  &pDlp->sSliceCfg.sSliceArgument)) {	// verify interleave mode settings
         //check uiSliceMbNum with current uiSliceNum
-        WelsLog (NULL, WELS_LOG_ERROR,
+        WelsLog (pLogCtx, WELS_LOG_ERROR,
                  "InitSliceSettings(), invalid uiSliceMbNum (%d) settings!,now turn to SM_SINGLE_SLICE type\n",
                  pDlp->sSliceCfg.sSliceArgument.uiSliceMbNum[0]);
         pDlp->sSliceCfg.uiSliceMode	= SM_SINGLE_SLICE;
@@ -1838,9 +1839,10 @@ int32_t InitSliceSettings (SWelsSvcCodingParam* pCodingParam, const int32_t kiCp
 /*!
  * \brief	log output for cpu features/capabilities
  */
-void OutputCpuFeaturesLog (uint32_t uiCpuFeatureFlags, uint32_t uiCpuCores, int32_t iCacheLineSize) {
+void OutputCpuFeaturesLog (SLogContext* pLogCtx, uint32_t uiCpuFeatureFlags, uint32_t uiCpuCores,
+                           int32_t iCacheLineSize) {
   // welstracer output
-  WelsLog (NULL, WELS_LOG_INFO, "WELS CPU features/capacities (0x%x) detected: \t"	\
+  WelsLog (pLogCtx, WELS_LOG_INFO, "WELS CPU features/capacities (0x%x) detected: \t"	\
            "HTT:      %c, "	\
            "MMX:      %c, "	\
            "MMXEX:    %c, "	\
@@ -1890,7 +1892,7 @@ void OutputCpuFeaturesLog (uint32_t uiCpuFeatureFlags, uint32_t uiCpuCores, int3
  * \pParam	pParam		SWelsSvcCodingParam*
  * \return	successful - 0; otherwise none 0 for failed
  */
-int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingParam) {
+int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingParam, SLogContext* pLogCtx) {
   sWelsEncCtx* pCtx		= NULL;
   int32_t	iRet					= 0;
   uint32_t uiCpuFeatureFlags		= 0;	// CPU features
@@ -1900,14 +1902,14 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   int16_t iSliceNum				= 1;	// number of slices used
 
   if (NULL == ppCtx || NULL == pCodingParam) {
-    WelsLog (NULL, WELS_LOG_ERROR, "WelsInitEncoderExt(), NULL == ppCtx(0x%p) or NULL == pCodingParam(0x%p).\n",
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), NULL == ppCtx(0x%p) or NULL == pCodingParam(0x%p).\n",
              (void*)ppCtx, (void*)pCodingParam);
     return 1;
   }
 
-  iRet	=	ParamValidationExt (*ppCtx, pCodingParam);
+  iRet	=	ParamValidationExt (pLogCtx, pCodingParam);
   if (iRet != 0) {
-    WelsLog (NULL, WELS_LOG_ERROR, "WelsInitEncoderExt(), ParamValidationExt failed return %d.\n", iRet);
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), ParamValidationExt failed return %d.\n", iRet);
     return iRet;
   }
 
@@ -1922,7 +1924,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
     iCacheLineSize	= 32;
   else if (uiCpuFeatureFlags & WELS_CPU_CACHELINE_16)
     iCacheLineSize	= 16;
-  OutputCpuFeaturesLog (uiCpuFeatureFlags, uiCpuCores, iCacheLineSize);
+  OutputCpuFeaturesLog (pLogCtx, uiCpuFeatureFlags, uiCpuCores, iCacheLineSize);
 #else
   iCacheLineSize	= 16;	// 16 bytes aligned in default
 #endif//X86_ASM
@@ -1953,8 +1955,8 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
 
   uiCpuCores	= WELS_CLIP3 (uiCpuCores, 1, MAX_THREADS_NUM);
 
-  if (InitSliceSettings (pCodingParam, uiCpuCores, &iSliceNum)) {
-    WelsLog (NULL, WELS_LOG_ERROR, "WelsInitEncoderExt(), InitSliceSettings failed.\n");
+  if (InitSliceSettings (pLogCtx, pCodingParam, uiCpuCores, &iSliceNum)) {
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), InitSliceSettings failed.\n");
     return 1;
   }
 
@@ -1964,6 +1966,8 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
 
   WELS_VERIFY_RETURN_IF (1, (NULL == pCtx))
   memset (pCtx, 0, sizeof (sWelsEncCtx));
+
+  pCtx->sLogCtx = *pLogCtx;
 
   pCtx->pMemAlign = new CMemoryAlign (iCacheLineSize);
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pCtx->pMemAlign), FreeMemorySvc (&pCtx))
@@ -3133,7 +3137,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
           pCtx->iActiveThreadsNum	= iSliceCount;
           // to fire slice coding threads
-          iRet = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
+          iRet = FiredSliceThreads (pCtx, &pCtx->pSliceThreading->pThreadPEncCtx[0],
+                                    &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
                                     &pCtx->pSliceThreading->pThreadMasterEvent[0],
                                     pLayerBsInfo, iSliceCount, pCtx->pCurDqLayer->pSliceEncCtx, false);
           if (iRet) {
@@ -3172,7 +3177,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
           iNumThreadsScheduled	= pCtx->iActiveThreadsNum;
           iNumThreadsRunning		= iNumThreadsScheduled;
           // to fire slice coding threads
-          iRet = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
+          iRet = FiredSliceThreads (pCtx, &pCtx->pSliceThreading->pThreadPEncCtx[0],
+                                    &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
                                     &pCtx->pSliceThreading->pThreadMasterEvent[0],
                                     pLayerBsInfo, iNumThreadsRunning, pCtx->pCurDqLayer->pSliceEncCtx, false);
           if (iRet) {
@@ -3218,7 +3224,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         const int32_t kiPartitionCnt	= pCtx->iActiveThreadsNum; //pSvcParam->iCountThreadsNum;
 
         // to fire slice coding threads
-        iRet = FiredSliceThreads (&pCtx->pSliceThreading->pThreadPEncCtx[0], &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
+        iRet = FiredSliceThreads (pCtx, &pCtx->pSliceThreading->pThreadPEncCtx[0],
+                                  &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
                                   &pCtx->pSliceThreading->pThreadMasterEvent[0],
                                   pLayerBsInfo, kiPartitionCnt, pCtx->pCurDqLayer->pSliceEncCtx, true);
         if (iRet) {
@@ -3509,7 +3516,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
   if (NULL == ppCtx || NULL == *ppCtx || NULL == pNewParam)	return 1;
 
   /* Check validation in new parameters */
-  iReturn	= ParamValidationExt (*ppCtx, pNewParam);
+  iReturn	= ParamValidationExt (& (*ppCtx)->sLogCtx, pNewParam);
   if (iReturn != ENC_RETURN_SUCCESS)	return iReturn;
 
   pOldParam	= (*ppCtx)->pSvcParam;
@@ -3574,6 +3581,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
   if (bNeedReset) {
     SParaSetOffsetVariable sTmpPsoVariable[PARA_SET_TYPE];
     uint16_t	          uiTmpIdrPicId;//this is for LTR!
+    SLogContext sLogCtx = (*ppCtx)->sLogCtx;
     memcpy (sTmpPsoVariable, (*ppCtx)->sPSOVector.sParaSetOffsetVariable,
             (PARA_SET_TYPE)*sizeof (SParaSetOffsetVariable)); // confirmed_safe_unsafe_usage
     uiTmpIdrPicId = (*ppCtx)->sPSOVector.uiIdrPicId;
@@ -3581,7 +3589,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     WelsUninitEncoderExt (ppCtx);
 
     /* Update new parameters */
-    if (WelsInitEncoderExt (ppCtx, pNewParam))
+    if (WelsInitEncoderExt (ppCtx, pNewParam, &sLogCtx))
       return 1;
 
     // reset the scaled spatial picture size

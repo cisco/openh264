@@ -35,26 +35,29 @@
 
 #include <stdarg.h>
 #include "typedefs.h"
+#include "utils.h"
 
-typedef int32_t (*CM_WELS_TRACE) (const char* format, ...);
+typedef void (*CM_WELS_TRACE) (void* ctx, int level, const char* string);
 
 class welsCodecTrace {
  public:
   welsCodecTrace();
   ~welsCodecTrace();
 
-  static void TraceString (int32_t iLevel, const char* kpStrFormat);
-  static void CODEC_TRACE (void* pIgnore, const int32_t kiLevel, const char* kpStrFormat, va_list vl);
-
   void SetTraceLevel (const int32_t kiLevel);
+  void SetTraceCallback (CM_WELS_TRACE func);
+  void SetTraceCallbackContext (void* pCtx);
 
+ private:
+  static void StaticCodecTrace (void* pCtx, const int32_t kiLevel, const char* kpStrFormat, va_list vl);
+  void CodecTrace (const int32_t kiLevel, const char* kpStrFormat, va_list vl);
+
+  int32_t	m_iTraceLevel;
+  CM_WELS_TRACE m_fpTrace;
+  void*         m_pTraceCtx;
  public:
-  static int32_t	m_iTraceLevel;
-  static CM_WELS_TRACE m_fpDebugTrace;
-  static CM_WELS_TRACE m_fpInfoTrace;
-  static CM_WELS_TRACE m_fpWarnTrace;
-  static CM_WELS_TRACE m_fpErrorTrace;
 
+  SLogContext m_sLogCtx;
 };
 
 #endif //WELS_CODEC_TRACE

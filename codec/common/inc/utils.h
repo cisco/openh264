@@ -47,7 +47,6 @@
  *	Log output routines
  */
 
-typedef int32_t	iWelsLogLevel;
 enum {
   WELS_LOG_QUIET		= 0x00,		// Quiet mode
   WELS_LOG_ERROR		= 1 << 0,	// Error log iLevel
@@ -56,7 +55,7 @@ enum {
   WELS_LOG_DEBUG		= 1 << 3,	// Debug log iLevel
   WELS_LOG_RESV		= 1 << 4,	// Resversed log iLevel
   WELS_LOG_LEVEL_COUNT = 5,
-  WELS_LOG_DEFAULT	= WELS_LOG_ERROR | WELS_LOG_WARNING | WELS_LOG_INFO | WELS_LOG_DEBUG	// Default log iLevel in Wels codec
+  WELS_LOG_DEFAULT	= WELS_LOG_DEBUG	// Default log iLevel in Wels codec
 };
 
 /*
@@ -65,14 +64,10 @@ enum {
 // wels log output
 typedef void (*PWelsLogCallbackFunc) (void* pCtx, const int32_t iLevel, const char* kpFmt, va_list argv);
 
-// wels psnr calc
-typedef float (*PWelsPsnrFunc) (const void* kpTarPic,
-                                const int32_t kiTarStride,
-                                const void* kpRefPic,
-                                const int32_t kiRefStride,
-                                const int32_t kiWidth,
-                                const int32_t kiHeight);
-
+typedef struct TagLogContext {
+  PWelsLogCallbackFunc pfLog;
+  void* pLogCtx;
+} SLogContext;
 
 
 #ifdef __GNUC__
@@ -81,19 +76,6 @@ extern void WelsLog (void* pCtx, int32_t iLevel, const char* kpFmt, ...) __attri
 #else
 extern void WelsLog (void* pCtx, int32_t iLevel, const char* kpFmt, ...);
 #endif
-
-/*!
- *************************************************************************************
- * \brief	set log callback from external call
- *
- * \param	_log	log function routine
- *
- * \return	NONE
- *
- * \note	N/A
- *************************************************************************************
- */
-void WelsSetLogCallback (PWelsLogCallbackFunc _log);
 
 /*
  *	PSNR calculation routines

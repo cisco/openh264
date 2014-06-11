@@ -44,57 +44,34 @@
 #include "welsCodecTrace.h"
 #include "utils.h"
 
-#include "logging.h"
 
-int32_t	welsCodecTrace::m_iTraceLevel			= WELS_LOG_DEFAULT;
-CM_WELS_TRACE welsCodecTrace::m_fpDebugTrace	= NULL;
-CM_WELS_TRACE welsCodecTrace::m_fpInfoTrace	= NULL;
-CM_WELS_TRACE welsCodecTrace::m_fpWarnTrace	= NULL;
-CM_WELS_TRACE welsCodecTrace::m_fpErrorTrace	= NULL;
+
+static void welsStderrTrace (void* ctx, int level, const char* string) {
+  fprintf (stderr, "%s", string);
+}
 
 welsCodecTrace::welsCodecTrace() {
 
-  m_fpDebugTrace = welsStderrTrace<WELS_LOG_DEBUG>;
-  m_fpInfoTrace = welsStderrTrace<WELS_LOG_INFO>;
-  m_fpWarnTrace = welsStderrTrace<WELS_LOG_WARNING>;
-  m_fpErrorTrace = welsStderrTrace<WELS_LOG_ERROR>;
+  m_iTraceLevel = WELS_LOG_DEFAULT;
+  m_fpTrace = welsStderrTrace;
+  m_pTraceCtx = NULL;
+
+  m_sLogCtx.pLogCtx = this;
+  m_sLogCtx.pfLog = StaticCodecTrace;
 }
 
 welsCodecTrace::~welsCodecTrace() {
-  m_fpDebugTrace = NULL;
-  m_fpInfoTrace = NULL;
-  m_fpWarnTrace = NULL;
-  m_fpErrorTrace = NULL;
-}
-
-void welsCodecTrace::TraceString (int32_t iLevel, const char* str) {
-  switch (iLevel) {
-  case WELS_LOG_ERROR:
-    if (m_fpErrorTrace)
-      m_fpErrorTrace ("%s", str);
-    break;
-  case WELS_LOG_WARNING:
-    if (m_fpWarnTrace)
-      m_fpWarnTrace ("%s", str);
-    break;
-  case WELS_LOG_INFO:
-    if (m_fpInfoTrace)
-      m_fpInfoTrace ("%s", str);
-    break;
-  case WELS_LOG_DEBUG:
-    if (m_fpDebugTrace)
-      m_fpDebugTrace ("%s", str);
-    break;
-  default:
-    if (m_fpDebugTrace)
-      m_fpInfoTrace ("%s", str);
-    break;
-  }
+  m_fpTrace = NULL;
 }
 
 #define MAX_LOG_SIZE	1024
 
-void welsCodecTrace::CODEC_TRACE (void* ignore, const int32_t iLevel, const char* Str_Format, va_list vl) {
+void welsCodecTrace::StaticCodecTrace (void* pCtx, const int32_t iLevel, const char* Str_Format, va_list vl) {
+  welsCodecTrace* self = (welsCodecTrace*) pCtx;
+  self->CodecTrace (iLevel, Str_Format, vl);
+}
+
+void welsCodecTrace::CodecTrace (const int32_t iLevel, const char* Str_Format, va_list vl) {
   if (m_iTraceLevel < iLevel) {
     return;
   }
@@ -102,13 +79,19 @@ void welsCodecTrace::CODEC_TRACE (void* ignore, const int32_t iLevel, const char
   char pBuf[MAX_LOG_SIZE] = {0};
   WelsVsnprintf (pBuf, MAX_LOG_SIZE, Str_Format, vl);	// confirmed_safe_unsafe_usage
 
-  welsCodecTrace::TraceString (iLevel, pBuf);
+  m_fpTrace (m_pTraceCtx, iLevel, pBuf);
 }
 
 void welsCodecTrace::SetTraceLevel (const int32_t iLevel) {
   if (iLevel >= 0)
     m_iTraceLevel	= iLevel;
-  WelsStderrSetTraceLevel (iLevel);
 }
 
+void welsCodecTrace::SetTraceCallback (CM_WELS_TRACE func) {
+  m_fpTrace = func;
+}
+
+void welsCodecTrace::SetTraceCallbackContext (void* ctx) {
+  m_pTraceCtx = ctx;
+}
 

@@ -396,10 +396,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\common\src\logging.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\encoder\core\src\mc.cpp"
 				>
 			</File>

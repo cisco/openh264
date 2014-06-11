@@ -48,27 +48,11 @@ float WelsCalcPsnr (const void* kpTarPic,
                     const int32_t kiHeight);
 
 
-static PWelsLogCallbackFunc	wlog;
-
-/*!
- *************************************************************************************
- * \brief	set log callback from external call
- *
- * \param	_log	log function routine
- *
- * \return	NONE
- *
- * \note	N/A
- *************************************************************************************
- */
-void WelsSetLogCallback (PWelsLogCallbackFunc _log) {
-  wlog	= _log;
-}
-
 void WelsLog (void* pCtx, int32_t iLevel, const char* kpFmt, ...) {
+  SLogContext* logCtx = (SLogContext*) pCtx;
   va_list vl;
   va_start (vl, kpFmt);
-  wlog (pCtx, iLevel, kpFmt, vl);
+  logCtx->pfLog (logCtx->pLogCtx, iLevel, kpFmt, vl);
   va_end (vl);
 }
 

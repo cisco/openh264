@@ -103,10 +103,9 @@ CWelsDecoder::CWelsDecoder (void)
   m_pWelsTrace	= new welsCodecTrace();
   if (m_pWelsTrace != NULL) {
     m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);
-    WelsSetLogCallback (welsCodecTrace::CODEC_TRACE);
-  }
 
-  WelsLog (NULL, WELS_LOG_INFO, "CWelsDecoder::CWelsDecoder() entry");
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::CWelsDecoder() entry");
+  }
 
 #ifdef OUTPUT_BIT_STREAM
   SWelsTime sCurTime;
@@ -161,7 +160,9 @@ CWelsDecoder::CWelsDecoder (void)
 *	return: none
 ***************************************************************************/
 CWelsDecoder::~CWelsDecoder() {
-  WelsLog (NULL, WELS_LOG_INFO, "CWelsDecoder::~CWelsDecoder()");
+  if (m_pWelsTrace != NULL) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::~CWelsDecoder()");
+  }
 
   UninitDecoder();
 
@@ -183,8 +184,12 @@ CWelsDecoder::~CWelsDecoder() {
 }
 
 long CWelsDecoder::Initialize (const SDecodingParam* pParam) {
+  if (m_pWelsTrace == NULL) {
+    return cmMallocMemeError;
+  }
+
   if (pParam == NULL) {
-    WelsLog (NULL, WELS_LOG_INFO, "CWelsDecoder::Initialize(), invalid input argument.");
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::Initialize(), invalid input argument.");
     return cmInitParaError;
   }
 
@@ -206,7 +211,7 @@ void CWelsDecoder::UninitDecoder (void) {
   if (NULL == m_pDecContext)
     return;
 
-  WelsLog (NULL, WELS_LOG_INFO, "into CWelsDecoder::uninit_decoder()..");
+  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "into CWelsDecoder::uninit_decoder()..");
 
   WelsEndDecoder (m_pDecContext);
 
@@ -216,19 +221,19 @@ void CWelsDecoder::UninitDecoder (void) {
     m_pDecContext	= NULL;
   }
 
-  WelsLog (NULL , WELS_LOG_INFO, "left CWelsDecoder::uninit_decoder()..");
+  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "left CWelsDecoder::uninit_decoder()..");
 }
 
 // the return value of this function is not suitable, it need report failure info to upper layer.
 void CWelsDecoder::InitDecoder (void) {
 
-  WelsLog (NULL, WELS_LOG_INFO, "CWelsDecoder::init_decoder()..");
+  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::init_decoder()..");
 
   m_pDecContext	= (PWelsDecoderContext)WelsMalloc (sizeof (SWelsDecoderContext), "m_pDecContext");
 
-  WelsInitDecoder (m_pDecContext);
+  WelsInitDecoder (m_pDecContext, &m_pWelsTrace->m_sLogCtx);
 
-  WelsLog (NULL, WELS_LOG_INFO, "CWelsDecoder::init_decoder().. left");
+  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::init_decoder().. left");
 }
 
 /*
@@ -237,7 +242,8 @@ void CWelsDecoder::InitDecoder (void) {
 long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
   int iVal = 0;
 
-  if (m_pDecContext == NULL)
+  if (m_pDecContext == NULL && eOptID != DECODER_OPTION_TRACE_LEVEL &&
+      eOptID != DECODER_OPTION_TRACE_CALLBACK && eOptID != DECODER_OPTION_TRACE_CALLBACK_CONTEXT)
     return dsInitialOptExpected;
 
   if (eOptID == DECODER_OPTION_DATAFORMAT) { // Set color space of decoding output frame
@@ -262,6 +268,24 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
     else
       iVal = * ((int*)pOption); //EC method
     m_pDecContext->iErrorConMethod = iVal;
+    return cmResultSuccess;
+  } else if (eOptID == DECODER_OPTION_TRACE_LEVEL) {
+    if (m_pWelsTrace) {
+      uint32_t level = * ((uint32_t*)pOption);
+      m_pWelsTrace->SetTraceLevel (level);
+    }
+    return cmResultSuccess;
+  } else if (eOptID == DECODER_OPTION_TRACE_CALLBACK) {
+    if (m_pWelsTrace) {
+      CM_WELS_TRACE callback = * ((CM_WELS_TRACE*)pOption);
+      m_pWelsTrace->SetTraceCallback (callback);
+    }
+    return cmResultSuccess;
+  } else if (eOptID == DECODER_OPTION_TRACE_CALLBACK_CONTEXT) {
+    if (m_pWelsTrace) {
+      void* ctx = * ((void**)pOption);
+      m_pWelsTrace->SetTraceCallbackContext (ctx);
+    }
     return cmResultSuccess;
   }
 
@@ -386,7 +410,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
       }
     }
 
-    WelsLog (NULL, WELS_LOG_INFO, "decode failed, failure type:%d \n",
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "decode failed, failure type:%d \n",
              m_pDecContext->iErrorCode);
     return (DECODING_STATE)m_pDecContext->iErrorCode;
   }

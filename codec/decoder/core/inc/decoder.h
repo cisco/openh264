@@ -68,7 +68,7 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
  * \note	N/A
  *************************************************************************************
  */
-int32_t WelsInitDecoder (PWelsDecoderContext pCtx);
+int32_t WelsInitDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx);
 
 /*!
  *************************************************************************************

@@ -67,7 +67,6 @@
 #include "extern.h"
 #include "macros.h"
 #include "wels_const.h"
-#include "logging.h"
 
 #include "mt_defs.h"
 #include "WelsThreadLib.h"
@@ -102,7 +101,7 @@ static int     g_iCtrlC = 0;
 static void    SigIntHandler (int a) {
   g_iCtrlC = 1;
 }
-static int     g_LevelSetting = 0;
+static int     g_LevelSetting = -1;
 
 int ParseLayerConfig (CReadConfig& cRdLayerCfg, const int iLayer, SEncParamExt& pSvcParam, SFilesSet& sFileSet) {
   if (!cRdLayerCfg.ExistFile()) {
@@ -664,6 +663,9 @@ int ProcessEncoding(ISVCEncoder* pPtrEnc, int argc, char** argv,bool bConfigFile
     printf ("parse pCommand line failed\n");
     iRet = 1;
     goto INSIDE_MEM_FREE;
+  }
+  if (g_LevelSetting >= 0) {
+    pPtrEnc->SetOption (ENCODER_OPTION_TRACE_LEVEL, &g_LevelSetting);
   }
   //finish reading the configurations
   iSourceWidth = pSrcPic->iPicWidth;
