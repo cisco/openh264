@@ -87,7 +87,7 @@ void welsCodecTrace::SetTraceLevel (const int32_t iLevel) {
     m_iTraceLevel	= iLevel;
 }
 
-void welsCodecTrace::SetTraceCallback (CM_WELS_TRACE func) {
+void welsCodecTrace::SetTraceCallback (WelsTraceCallback func) {
   m_fpTrace = func;
 }
 

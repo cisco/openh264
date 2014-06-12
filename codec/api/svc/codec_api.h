@@ -191,6 +191,7 @@ long (*GetOption) (ISVCDecoder*, DECODER_OPTION eOptionId, void* pOption);
 };
 #endif
 
+typedef void (*WelsTraceCallback) (void* ctx, int level, const char* string);
 
 int  WelsCreateSVCEncoder (ISVCEncoder** ppEncoder);
 void WelsDestroySVCEncoder (ISVCEncoder* pEncoder);
