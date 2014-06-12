@@ -3532,7 +3532,8 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
                  || pOldParam->iPicHeight != pNewParam->iPicHeight) ||
                 (pOldParam->SUsedPicRect.iWidth != pNewParam->SUsedPicRect.iWidth
                  || pOldParam->SUsedPicRect.iHeight != pNewParam->SUsedPicRect.iHeight) ||
-                (pOldParam->bEnableLongTermReference != pNewParam->bEnableLongTermReference);
+                (pOldParam->bEnableLongTermReference != pNewParam->bEnableLongTermReference) ||
+                (pOldParam->iLTRRefNum != pNewParam->iLTRRefNum);
   if (!bNeedReset) {	// Check its picture resolutions/quality settings respectively in each dependency layer
     iIndexD = 0;
     assert (pOldParam->iSpatialLayerNum == pNewParam->iSpatialLayerNum);
