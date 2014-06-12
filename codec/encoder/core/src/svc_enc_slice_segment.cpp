@@ -407,6 +407,7 @@ int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
 
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pOverallMbMap)
 
+    memset (pSliceSeg->pOverallMbMap, 0, kiCountMbNum * sizeof (uint8_t));
     //SM_DYN_SLICE: init, set pSliceSeg->iSliceNumInFrame	= 1;
     pSliceSeg->iSliceNumInFrame = GetInitialSliceNum (kiMbWidth, kiMbHeight, pMso);
 
