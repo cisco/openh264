@@ -120,9 +120,9 @@ void UpdateMbListNeighborParallel (SSliceCtx* pSliceCtx,
 }
 
 void CalcSliceComplexRatio (void* pRatio, SSliceCtx* pSliceCtx, uint32_t* pSliceConsume) {
-  float* pRatioList			= (float*)pRatio;
-  float fAvI[MAX_SLICES_NUM];
-  float fSumAv				= .0f;
+  int32_t* pRatioList			= (int32_t*)pRatio;
+  int32_t iAvI[MAX_SLICES_NUM];
+  int32_t iSumAv				= 0;
   uint32_t* pSliceTime		= (uint32_t*)pSliceConsume;
   int32_t* pCountMbInSlice	= (int32_t*)pSliceCtx->pCountMbNumInSlice;
   const int32_t kiSliceCount	= pSliceCtx->iSliceNumInFrame;
@@ -131,16 +131,16 @@ void CalcSliceComplexRatio (void* pRatio, SSliceCtx* pSliceCtx, uint32_t* pSlice
   WelsEmms();
 
   while (iSliceIdx < kiSliceCount) {
-    fAvI[iSliceIdx]	= 1.0f * pCountMbInSlice[iSliceIdx] / pSliceTime[iSliceIdx];
+    iAvI[iSliceIdx]	= WELS_DIV_ROUND(INT_MULTIPLY * pCountMbInSlice[iSliceIdx], pSliceTime[iSliceIdx]);
     MT_TRACE_LOG (NULL, WELS_LOG_DEBUG, "[MT] CalcSliceComplexRatio(), pSliceConsumeTime[%d]= %d us, slice_run= %d\n",
                   iSliceIdx,
                   pSliceTime[iSliceIdx], pCountMbInSlice[iSliceIdx]);
-    fSumAv += fAvI[iSliceIdx];
+    iSumAv += iAvI[iSliceIdx];
 
     ++ iSliceIdx;
   }
   while (-- iSliceIdx >= 0) {
-    pRatioList[iSliceIdx] = fAvI[iSliceIdx] / fSumAv;
+    pRatioList[iSliceIdx] = WELS_DIV_ROUND(INT_MULTIPLY * iAvI[iSliceIdx], iSumAv);
   }
 }
 
@@ -200,7 +200,7 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
   const int32_t kiCountNumMb		= pSliceCtx->iMbNumInFrame;
   int32_t iMinimalMbNum			= pSliceCtx->iMbWidth;	// in theory we need only 1 SMB, here let it as one SMB row required
   int32_t iMaximalMbNum			= 0;	// dynamically assign later
-  float* pSliceComplexRatio	= (float*)pComplexRatio;
+  int32_t* pSliceComplexRatio	= (int32_t*)pComplexRatio;
   int32_t iMbNumLeft					= kiCountNumMb;
   int32_t iRunLen[MAX_THREADS_NUM]	= {0};
   int32_t iSliceIdx					= 0;
@@ -236,11 +236,11 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
 
   iSliceIdx	= 0;
   while (iSliceIdx + 1 < kiCountSliceNum) {
-    int32_t iNumMbAssigning = WELS_ROUND (kiCountNumMb * pSliceComplexRatio[iSliceIdx]);
+    int32_t iNumMbAssigning = WELS_DIV_ROUND(kiCountNumMb * pSliceComplexRatio[iSliceIdx], INT_MULTIPLY);
 
     // GOM boundary aligned
     if (pCtx->pSvcParam->iRCMode != RC_OFF_MODE) {
-      iNumMbAssigning = WELS_ROUND (1.0f * iNumMbAssigning / iNumMbInEachGom) * iNumMbInEachGom;
+      iNumMbAssigning = iNumMbAssigning / iNumMbInEachGom * iNumMbInEachGom;
     }
 
     // make sure one GOM at least in each pSlice for safe
@@ -259,14 +259,14 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
     iRunLen[iSliceIdx]	= iNumMbAssigning;
     MT_TRACE_LOG (pCtx, WELS_LOG_DEBUG,
                   "[MT] DynamicAdjustSlicing(), uiSliceIdx= %d, pSliceComplexRatio= %.2f, slice_run_org= %d, slice_run_adj= %d\n",
-                  iSliceIdx, pSliceComplexRatio[iSliceIdx], pSliceCtx->pCountMbNumInSlice[iSliceIdx], iNumMbAssigning);
+                  iSliceIdx, pSliceComplexRatio[iSliceIdx]* 1.0f / INT_MULTIPLY, pSliceCtx->pCountMbNumInSlice[iSliceIdx], iNumMbAssigning);
     ++ iSliceIdx;
     iMaximalMbNum	= iMbNumLeft - (kiCountSliceNum - iSliceIdx - 1) * iMinimalMbNum;	// get maximal num_mb in left parts
   }
   iRunLen[iSliceIdx] = iMbNumLeft;
   MT_TRACE_LOG (pCtx, WELS_LOG_DEBUG,
                 "[MT] DynamicAdjustSlicing(), iSliceIdx= %d, pSliceComplexRatio= %.2f, slice_run_org= %d, slice_run_adj= %d\n",
-                iSliceIdx, pSliceComplexRatio[iSliceIdx], pSliceCtx->pCountMbNumInSlice[iSliceIdx], iMbNumLeft);
+                iSliceIdx, pSliceComplexRatio[iSliceIdx]* 1.0f / INT_MULTIPLY, pSliceCtx->pCountMbNumInSlice[iSliceIdx], iMbNumLeft);
 
 
   if (DynamicAdjustSlicePEncCtxAll (pSliceCtx, iRunLen) == 0) {
@@ -329,7 +329,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
         && pPara->iMultipleThreadIdc >= kiSliceNum) {
       pSmt->pSliceConsumeTime[iIdx]	= (uint32_t*)pMa->WelsMallocz (kiSliceNum * sizeof (uint32_t), "pSliceConsumeTime[]");
       WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pSliceConsumeTime[iIdx]), FreeMemorySvc (ppCtx))
-      pSmt->pSliceComplexRatio[iIdx]	= (float*)pMa->WelsMalloc (kiSliceNum * sizeof (float), "pSliceComplexRatio[]");
+      pSmt->pSliceComplexRatio[iIdx]	= (int32_t*)pMa->WelsMalloc (kiSliceNum * sizeof (int32_t), "pSliceComplexRatio[]");
       WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pSliceComplexRatio[iIdx]), FreeMemorySvc (ppCtx))
     } else {
       pSmt->pSliceConsumeTime[iIdx]	= NULL;
