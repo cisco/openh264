@@ -352,7 +352,7 @@ WELS_ASM_ARCH64_FUNC_END
 //for Luma 16x16
 WELS_ASM_ARCH64_FUNC_BEGIN WelsI16x16LumaPredV_AArch64_neon
     sub     x3, x1, x2
-    ld1     {v0.16b}, [x3], x1
+    ld1     {v0.16b}, [x3]
 .rept 16
     st1     {v0.16b}, [x0], 16
 .endr

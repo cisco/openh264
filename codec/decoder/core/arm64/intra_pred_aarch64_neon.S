@@ -368,7 +368,7 @@ WELS_ASM_ARCH64_FUNC_END
 WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredV_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, x1
-    ld1     {v0.16b}, [x2], x1
+    ld1     {v0.16b}, [x2]
 .rept 16
     st1     {v0.16b}, [x0], x1
 .endr
