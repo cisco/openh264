@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4CBC1B81194AC4E100214D9E /* intra_pred_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CBC1B80194AC4E100214D9E /* intra_pred_aarch64_neon.S */; };
 		4CE4427D18B6FC360017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4427C18B6FC360017DF25 /* Foundation.framework */; };
 		4CE4468A18BC5EAB0017DF25 /* au_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4466718BC5EAA0017DF25 /* au_parser.cpp */; };
 		4CE4468B18BC5EAB0017DF25 /* bit_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4466818BC5EAA0017DF25 /* bit_stream.cpp */; };
@@ -48,6 +49,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4CBC1B80194AC4E100214D9E /* intra_pred_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = intra_pred_aarch64_neon.S; path = arm64/intra_pred_aarch64_neon.S; sourceTree = "<group>"; };
 		4CE4427918B6FC360017DF25 /* libwelsdec.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libwelsdec.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE4427C18B6FC360017DF25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4CE4428D18B6FC360017DF25 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
@@ -127,6 +129,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4CBC1B7F194AC4A400214D9E /* arm64 */ = {
+			isa = PBXGroup;
+			children = (
+				4CBC1B80194AC4E100214D9E /* intra_pred_aarch64_neon.S */,
+			);
+			name = arm64;
+			sourceTree = "<group>";
+		};
 		4CE4427018B6FC360017DF25 = {
 			isa = PBXGroup;
 			children = (
@@ -166,6 +176,7 @@
 		4CE4463F18BC5EAA0017DF25 /* core */ = {
 			isa = PBXGroup;
 			children = (
+				4CBC1B7F194AC4A400214D9E /* arm64 */,
 				4CE447A518BC6BE90017DF25 /* arm */,
 				4CE4464418BC5EAA0017DF25 /* inc */,
 				4CE4466618BC5EAA0017DF25 /* src */,
@@ -343,6 +354,7 @@
 				4CE4469418BC5EAB0017DF25 /* get_intra_predictor.cpp in Sources */,
 				9AED66561946A1DE009A3567 /* welsCodecTrace.cpp in Sources */,
 				F0B204FC18FD23D8005DA23F /* error_concealment.cpp in Sources */,
+				4CBC1B81194AC4E100214D9E /* intra_pred_aarch64_neon.S in Sources */,
 				4CE4469018BC5EAB0017DF25 /* decoder_core.cpp in Sources */,
 				4CE447AE18BC6BE90017DF25 /* intra_pred_neon.S in Sources */,
 				4CE4469618BC5EAB0017DF25 /* mc.cpp in Sources */,
@@ -458,6 +470,7 @@
 					"$(SRCROOT)/../../../../common/inc",
 					"$(SRCROOT)/../../../../api/svc",
 					"$(SRCROOT)/../../../../common/arm",
+					"$(SRCROOT)/../../../../common/arm64",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";
@@ -492,6 +505,7 @@
 					"$(SRCROOT)/../../../../common/inc",
 					"$(SRCROOT)/../../../../api/svc",
 					"$(SRCROOT)/../../../../common/arm",
+					"$(SRCROOT)/../../../../common/arm64",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";

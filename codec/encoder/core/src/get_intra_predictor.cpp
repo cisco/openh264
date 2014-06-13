@@ -732,6 +732,34 @@ void WelsInitIntraPredFuncs (SWelsFuncPtrList* pFuncList, const uint32_t kuiCpuF
   }
 #endif
 
+#if defined(HAVE_NEON_AARCH64)
+  if (kuiCpuFlag & WELS_CPU_NEON) {
+    pFuncList->pfGetLumaI16x16Pred[I16_PRED_DC] = WelsI16x16LumaPredDc_AArch64_neon;
+    pFuncList->pfGetLumaI16x16Pred[I16_PRED_P]  = WelsI16x16LumaPredPlane_AArch64_neon;
+    pFuncList->pfGetLumaI16x16Pred[I16_PRED_H]  = WelsI16x16LumaPredH_AArch64_neon;
+    pFuncList->pfGetLumaI16x16Pred[I16_PRED_V]  = WelsI16x16LumaPredV_AArch64_neon;
+    pFuncList->pfGetLumaI16x16Pred[I16_PRED_DC_L]  = WelsI16x16LumaPredDcLeft_AArch64_neon;
+    pFuncList->pfGetLumaI16x16Pred[I16_PRED_DC_T]  = WelsI16x16LumaPredDcTop_AArch64_neon;
+
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_H    ] = WelsI4x4LumaPredH_AArch64_neon;
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_DDL  ] = WelsI4x4LumaPredDDL_AArch64_neon;
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_DDL_TOP] = WelsI4x4LumaPredDDLTop_AArch64_neon;
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_VL   ] = WelsI4x4LumaPredVL_AArch64_neon;
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_VL_TOP ] = WelsI4x4LumaPredVLTop_AArch64_neon;
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_VR   ] = WelsI4x4LumaPredVR_AArch64_neon;
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_HU   ] = WelsI4x4LumaPredHU_AArch64_neon;
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_HD   ] = WelsI4x4LumaPredHD_AArch64_neon;
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_DC   ] = WelsI4x4LumaPredDc_AArch64_neon;
+    pFuncList->pfGetLumaI4x4Pred[I4_PRED_DC_T   ] = WelsI4x4LumaPredDcTop_AArch64_neon;
+
+    pFuncList->pfGetChromaPred[C_PRED_H]       = WelsIChromaPredH_AArch64_neon;
+    pFuncList->pfGetChromaPred[C_PRED_V]       = WelsIChromaPredV_AArch64_neon;
+    pFuncList->pfGetChromaPred[C_PRED_P ]      = WelsIChromaPredPlane_AArch64_neon;
+    pFuncList->pfGetChromaPred[C_PRED_DC]      = WelsIChromaPredDc_AArch64_neon;
+    pFuncList->pfGetChromaPred[C_PRED_DC_T]      = WelsIChromaPredDcTop_AArch64_neon;
+  }
+#endif//HAVE_NEON_AARCH64
+
 #ifdef X86_ASM
   if (kuiCpuFlag & WELS_CPU_MMXEXT) {
     pFuncList->pfGetLumaI4x4Pred[I4_PRED_DDR] = WelsI4x4LumaPredDDR_mmx;

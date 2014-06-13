@@ -59,7 +59,8 @@ endif
 
 ifeq ($(ASM_ARCH), arm64)
 ENCODER_ASM_ARM64_SRCS=\
-	$(ENCODER_SRCDIR)/core/arm64/pixel_neon_aarch64.S\
+	$(ENCODER_SRCDIR)/core/arm64/intra_pred_aarch64_neon.S\
+	$(ENCODER_SRCDIR)/core/arm64/pixel_aarch64_neon.S\
 
 ENCODER_OBJS += $(ENCODER_ASM_ARM64_SRCS:.S=.$(OBJ))
 endif
