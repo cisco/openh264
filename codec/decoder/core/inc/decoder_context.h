@@ -260,6 +260,7 @@ typedef struct TagWelsDecoderContext {
   uint8_t				uiTargetDqId;		// maximal DQ ID in current access unit, meaning target layer ID
   bool				bAvcBasedFlag;		// For decoding bitstream:
   bool				bEndOfStreamFlag;	// Flag on end of stream requested by external application layer
+  bool                          bInstantDecFlag;        // Flag for no-delay decoding
   bool				bInitialDqLayersMem;	// dq layers related memory is available?
 
   bool              bOnlyOneLayerInCurAuFlag; //only one layer in current AU: 1

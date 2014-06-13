@@ -372,6 +372,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     //For application MODE, the error detection should be added for safe.
     //But for CONSOLE MODE, when decoding LAST AU, kiSrcLen==0 && kpSrc==NULL.
     m_pDecContext->bEndOfStreamFlag = true;
+    m_pDecContext->bInstantDecFlag = true;
   }
 
   ppDst[0] = ppDst[1] = ppDst[2] = NULL;
@@ -390,7 +391,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
   WelsDecodeBs (m_pDecContext, kpSrc, kiSrcLen, ppDst,
                 pDstInfo); //iErrorCode has been modified in this function
-
+  m_pDecContext->bInstantDecFlag = false; //reset no-delay flag
   if (m_pDecContext->iErrorCode) {
     ENalUnitType eNalType =
       NAL_UNIT_UNSPEC_0;	//for NBR, IDR frames are expected to decode as followed if error decoding an IDR currently

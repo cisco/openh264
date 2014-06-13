@@ -139,8 +139,12 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
  * DecodeCurrentAccessUnit
  * Decode current access unit when current AU is completed.
  */
-int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int32_t* iDstLen, int32_t* pWidth,
-                                 int32_t* pHeight, SBufferInfo* pDstInfo);
+int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo);
+
+/*
+ * Check if frame is completed and EC is required
+ */
+bool CheckAndDoEC (PWelsDecoderContext pCtx, uint8_t** pDst, SBufferInfo* pDstInfo);
 
 /*
  *	Prepare current dq layer context initialization.
