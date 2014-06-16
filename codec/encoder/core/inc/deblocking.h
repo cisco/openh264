@@ -69,6 +69,10 @@ void WelsNonZeroCount_neon (int8_t* pNonZeroCount);
 void DeblockingBSCalcEnc_neon (int8_t* pNzc, SMVUnitXY* pMv, int32_t iBoundryFlag, int32_t iMbStride,
                                uint8_t (*pBS)[4][4]);
 #endif
+#if defined(HAVE_NEON_AARCH64)
+void WelsNonZeroCount_AArch64_neon (int8_t* pNonZeroCount);
+void DeblockingBSCalcEnc_AArch64_neon (int8_t* pNzc, SMVUnitXY* pMv, int32_t iBoundryFlag, int32_t iMbStride, uint8_t (*pBS)[4][4]);
+#endif
 #if defined(__cplusplus)
 }
 #endif//__cplusplus

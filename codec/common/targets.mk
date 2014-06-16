@@ -38,6 +38,7 @@ endif
 
 ifeq ($(ASM_ARCH), arm64)
 COMMON_ASM_ARM64_SRCS=\
+	$(COMMON_SRCDIR)/arm64/deblocking_aarch64_neon.S\
 	$(COMMON_SRCDIR)/arm64/expand_picture_aarch64_neon.S\
 	$(COMMON_SRCDIR)/arm64/mc_aarch64_neon.S\
 
