@@ -172,9 +172,6 @@ bool NeedErrorCon (PWelsDecoderContext pCtx) {
 // ImplementErrorConceal
 // Do actual error concealment
 void ImplementErrorCon (PWelsDecoderContext pCtx) {
-  if (!NeedErrorCon (pCtx))
-    return;
-
   if (ERROR_CON_DISABLE == pCtx->iErrorConMethod) {
     pCtx->iErrorCode |= dsBitstreamError;
     return;
@@ -183,14 +180,6 @@ void ImplementErrorCon (PWelsDecoderContext pCtx) {
   } else if (ERROR_CON_SLICE_COPY == pCtx->iErrorConMethod) {
     DoErrorConSliceCopy (pCtx);
   } //TODO add other EC methods here in the future
-
-  //mark the erroneous frame as Ref pic in DPB
-  MarkECFrameAsRef (pCtx);
-  //need update frame_num due current frame is well decoded
-  pCtx->iPrevFrameNum	= pCtx->pSliceHeader->iFrameNum;
-  if (pCtx->bLastHasMmco5)
-    pCtx->iPrevFrameNum = 0;
-
 }
 
 } // namespace WelsDec

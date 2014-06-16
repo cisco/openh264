@@ -1641,11 +1641,6 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
 
   WelsDecodeAccessUnitEnd (pCtx);
 
-  if (!pCtx->bInstantDecFlag) {
-    //Do error concealment here
-    ImplementErrorCon (pCtx);
-  }
-
   pCtx->bNewSeqBegin = false;
   WriteBackActiveParameters (pCtx);
   pCtx->bNewSeqBegin = pCtx->bNewSeqBegin || pCtx->bNextNewSeqBegin;
@@ -1943,6 +1938,14 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
 #endif//#if !CODEC_FOR_TESTBED
 
     if (dq_cur->uiLayerDqId == kuiTargetLayerDqId) {
+      if (!pCtx->bInstantDecFlag) {
+        //Do error concealment here
+        if (NeedErrorCon (pCtx)) {
+          ImplementErrorCon (pCtx);
+          pCtx->iTotalNumMbRec = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
+        }
+      }
+
       if (DecodeFrameConstruction (pCtx, ppDst, pDstInfo)) {
         return ERR_NONE;
       }
@@ -1979,15 +1982,17 @@ bool CheckAndDoEC (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstI
   if ((pCtx->iTotalNumMbRec != 0)
       && (CheckAccessUnitBoundaryExt (&pCtx->sLastNalHdrExt, &pCurNal->sNalHeaderExt, &pCtx->sLastSliceHeader,
                                       &pCurNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader))) {
-    pCtx->iTotalNumMbRec = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
-    DecodeFrameConstruction (pCtx, ppDst, pDstInfo);
-    PPicture pCurPic = pCtx->pDec; //temporally store current picture
     //Do Error Concealment here
-    ImplementErrorCon (pCtx);
-    pCtx->pPreviousDecodedPictureInDpb = pCurPic; //save ECed pic for future use
-    pCtx->iPrevFrameNum = pCtx->sLastSliceHeader.iFrameNum; //save frame_num
-    if (pCtx->bLastHasMmco5)
-      pCtx->iPrevFrameNum = 0;
+    if (NeedErrorCon (pCtx)) { //should always be true!
+      ImplementErrorCon (pCtx);
+      pCtx->iTotalNumMbRec = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
+      DecodeFrameConstruction (pCtx, ppDst, pDstInfo);
+      pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //save ECed pic for future use
+      MarkECFrameAsRef (pCtx);
+      pCtx->iPrevFrameNum = pCtx->sLastSliceHeader.iFrameNum; //save frame_num
+      if (pCtx->bLastHasMmco5)
+        pCtx->iPrevFrameNum = 0;
+    }
   }
   return ERR_NONE;
 }
