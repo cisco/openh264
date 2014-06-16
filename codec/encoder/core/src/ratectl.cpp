@@ -84,7 +84,7 @@ void RcInitLayerMemory (SWelsSvcRc* pWelsSvcRc, CMemoryAlign* pMA, const int32_t
   pBaseMem += kiGomSizeI;
   pWelsSvcRc->pTemporalOverRc			= (SRCTemporal*)pBaseMem;
 
-  pWelsSvcRc->pSlicingOverRc			= (SRCSlicing*)pMA->WelsMalloc(sizeof (SRCSlicing) * kiSliceNum, "SlicingOverRC");
+  pWelsSvcRc->pSlicingOverRc			= (SRCSlicing*)pMA->WelsMalloc (sizeof (SRCSlicing) * kiSliceNum, "SlicingOverRC");
 }
 
 void RcFreeLayerMemory (SWelsSvcRc* pWelsSvcRc, CMemoryAlign* pMA) {
@@ -111,7 +111,7 @@ static inline int32_t RcConvertQStep2Qp (int32_t iQpStep) {
 
 void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
   SWelsSvcRc* pWelsSvcRc = NULL;
-  SDLayerParam* pDLayerParam = NULL;
+  SSpatialLayerConfig* pDLayerParam = NULL;
 
   int32_t j = 0;
   int32_t iMbWidth = 0;
@@ -125,9 +125,9 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
   for (j = 0; j < pEncCtx->pSvcParam->iSpatialLayerNum; j++) {
     SSliceCtx* pSliceCtx = &pEncCtx->pSliceCtxList[j];
     pWelsSvcRc  = &pEncCtx->pWelsSvcRc[j];
-    pDLayerParam = &pEncCtx->pSvcParam->sDependencyLayers[j];
-    iMbWidth     = (pDLayerParam->iFrameWidth >> 4);
-    pWelsSvcRc->iNumberMbFrame = iMbWidth * (pDLayerParam->iFrameHeight >> 4);
+    pDLayerParam = &pEncCtx->pSvcParam->sSpatialLayers[j];
+    iMbWidth     = (pDLayerParam->iVideoWidth >> 4);
+    pWelsSvcRc->iNumberMbFrame = iMbWidth * (pDLayerParam->iVideoHeight >> 4);
     pWelsSvcRc->iSliceNum = pSliceCtx->iSliceNumInFrame;
 
     pWelsSvcRc->iRcVaryPercentage = _BITS_RANGE;	// % -- for temp
@@ -173,7 +173,7 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
     pWelsSvcRc->iGomSize = (pWelsSvcRc->iNumberMbFrame + pWelsSvcRc->iNumberMbGom - 1) / pWelsSvcRc->iNumberMbGom;
 
 
-    RcInitLayerMemory (pWelsSvcRc, pEncCtx->pMemAlign, 1 + pDLayerParam->iHighestTemporalId);
+    RcInitLayerMemory (pWelsSvcRc, pEncCtx->pMemAlign, 1 + pEncCtx->pSvcParam->sDependencyLayers[j].iHighestTemporalId);
 
     bMultiSliceMode	= ((SM_RASTER_SLICE == pDLayerParam->sSliceCfg.uiSliceMode) ||
                        (SM_ROWMB_SLICE	 == pDLayerParam->sSliceCfg.uiSliceMode) ||
@@ -187,7 +187,7 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
 void RcInitTlWeight (sWelsEncCtx* pEncCtx) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   SRCTemporal* pTOverRc	= pWelsSvcRc->pTemporalOverRc;
-  SDLayerParam* pDLayerParam =  &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
+  SSpatialLayerInternal* pDLayerParam =  &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
   const int32_t kiDecompositionStages = pDLayerParam->iDecompositionStages;
   const int32_t kiHighestTid = pDLayerParam->iHighestTemporalId;
 
@@ -218,15 +218,17 @@ void RcInitTlWeight (sWelsEncCtx* pEncCtx) {
 void RcUpdateBitrateFps (sWelsEncCtx* pEncCtx) {
   SWelsSvcRc* pWelsSvcRc	= &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   SRCTemporal* pTOverRc		= pWelsSvcRc->pTemporalOverRc;
-  SDLayerParam* pDLayerParam     = &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
-  const int32_t kiGopSize	= (1 << pDLayerParam->iDecompositionStages);
-  const int32_t kiHighestTid = pDLayerParam->iHighestTemporalId;
-  int32_t input_iBitsPerFrame = WELS_ROUND(pDLayerParam->iSpatialBitrate * INT_MULTIPLY / pDLayerParam->fInputFrameRate);
+
+  SSpatialLayerConfig* pDLayerParam     = &pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId];
+  SSpatialLayerInternal* pDLayerParamInternal     = &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
+  const int32_t kiGopSize	= (1 << pDLayerParamInternal->iDecompositionStages);
+  const int32_t kiHighestTid = pDLayerParamInternal->iHighestTemporalId;
+  int32_t input_iBitsPerFrame = WELS_ROUND(pDLayerParam->iSpatialBitrate * INT_MULTIPLY / pDLayerParamInternal->fInputFrameRate);
   const int32_t kiGopBits	= WELS_DIV_ROUND(input_iBitsPerFrame * kiGopSize, INT_MULTIPLY);
   int32_t i;
 
   pWelsSvcRc->iBitRate   = pDLayerParam->iSpatialBitrate;
-  pWelsSvcRc->fFrameRate = pDLayerParam->fInputFrameRate;
+  pWelsSvcRc->fFrameRate = pDLayerParamInternal->fInputFrameRate;
 
   int32_t iTargetVaryRange = FRAME_iTargetBits_VARY_RANGE * (MAX_BITS_VARY_PERCENTAGE - pWelsSvcRc->iRcVaryRatio);
   int32_t iMinBitsRatio = (MAX_BITS_VARY_PERCENTAGE) * INT_MULTIPLY - iTargetVaryRange;
@@ -269,8 +271,9 @@ void RcInitRefreshParameter (sWelsEncCtx* pEncCtx) {
   const int32_t kiDid		  = pEncCtx->uiDependencyId;
   SWelsSvcRc* pWelsSvcRc   = &pEncCtx->pWelsSvcRc[kiDid];
   SRCTemporal* pTOverRc		  = pWelsSvcRc->pTemporalOverRc;
-  SDLayerParam* pDLayerParam       = &pEncCtx->pSvcParam->sDependencyLayers[kiDid];
-  const int32_t kiHighestTid = pDLayerParam->iHighestTemporalId;
+  SSpatialLayerConfig* pDLayerParam       = &pEncCtx->pSvcParam->sSpatialLayers[kiDid];
+  SSpatialLayerInternal* pDLayerParamInternal       = &pEncCtx->pSvcParam->sDependencyLayers[kiDid];
+  const int32_t kiHighestTid = pDLayerParamInternal->iHighestTemporalId;
   int32_t i;
 
   //I frame R-Q Model
@@ -293,7 +296,7 @@ void RcInitRefreshParameter (sWelsEncCtx* pEncCtx) {
 
   //Backup the initial bitrate and fps
   pWelsSvcRc->iPreviousBitrate  = pDLayerParam->iSpatialBitrate;
-  pWelsSvcRc->dPreviousFps      = pDLayerParam->fInputFrameRate;
+  pWelsSvcRc->dPreviousFps      = pDLayerParamInternal->fInputFrameRate;
 
   memset (pWelsSvcRc->pCurrentFrameGomSad, 0, pWelsSvcRc->iGomSize * sizeof (int32_t));
 
@@ -305,13 +308,14 @@ void RcInitRefreshParameter (sWelsEncCtx* pEncCtx) {
 bool RcJudgeBitrateFpsUpdate (sWelsEncCtx* pEncCtx) {
   int32_t iCurDid = pEncCtx->uiDependencyId;
   SWelsSvcRc* pWelsSvcRc       = &pEncCtx->pWelsSvcRc[iCurDid];
-  SDLayerParam* pDLayerParam    = &pEncCtx->pSvcParam->sDependencyLayers[iCurDid];
+  SSpatialLayerInternal* pDLayerParamInternal    = &pEncCtx->pSvcParam->sDependencyLayers[iCurDid];
+  SSpatialLayerConfig* pDLayerParam    = &pEncCtx->pSvcParam->sSpatialLayers[iCurDid];
 
   if ((pWelsSvcRc->iPreviousBitrate != pDLayerParam->iSpatialBitrate) ||
-      (pWelsSvcRc->dPreviousFps - pDLayerParam->fInputFrameRate) > EPSN ||
-      (pWelsSvcRc->dPreviousFps - pDLayerParam->fInputFrameRate) < -EPSN) {
+      (pWelsSvcRc->dPreviousFps - pDLayerParamInternal->fInputFrameRate) > EPSN ||
+      (pWelsSvcRc->dPreviousFps - pDLayerParamInternal->fInputFrameRate) < -EPSN) {
     pWelsSvcRc->iPreviousBitrate = pDLayerParam->iSpatialBitrate;
-    pWelsSvcRc->dPreviousFps = pDLayerParam->fInputFrameRate;
+    pWelsSvcRc->dPreviousFps = pDLayerParamInternal->fInputFrameRate;
     return true;
   } else
     return false;
@@ -353,7 +357,7 @@ void RcTraceVGopBitrate (sWelsEncCtx* pEncCtx) {
 void RcUpdateTemporalZero (sWelsEncCtx* pEncCtx) {
   const int32_t kiDid		= pEncCtx->uiDependencyId;
   SWelsSvcRc* pWelsSvcRc	= &pEncCtx->pWelsSvcRc[kiDid];
-  SDLayerParam* pDLayerParam		= &pEncCtx->pSvcParam->sDependencyLayers[kiDid];
+  SSpatialLayerInternal* pDLayerParam		= &pEncCtx->pSvcParam->sDependencyLayers[kiDid];
   const int32_t kiGopSize	= (1 << pDLayerParam->iDecompositionStages);
 
   if (pWelsSvcRc->iPreviousGopSize  != kiGopSize) {
@@ -385,20 +389,20 @@ void RcInitIdrQp (sWelsEncCtx* pEncCtx) {
   int32_t iBppIndex = 0;
 
   SWelsSvcRc* pWelsSvcRc		= &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
-  SDLayerParam* pDLayerParam			= &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
+  SSpatialLayerConfig* pDLayerParam			= &pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId];
 
-  if (pDLayerParam->fOutputFrameRate > EPSN && pDLayerParam->iFrameWidth && pDLayerParam->iFrameHeight)
-    dBpp = (double) (pDLayerParam->iSpatialBitrate) / (double) (pDLayerParam->fOutputFrameRate * pDLayerParam->iFrameWidth *
-           pDLayerParam->iFrameHeight);
+  if (pDLayerParam->fFrameRate > EPSN && pDLayerParam->iVideoWidth && pDLayerParam->iVideoHeight)
+    dBpp = (double) (pDLayerParam->iSpatialBitrate) / (double) (pDLayerParam->fFrameRate * pDLayerParam->iVideoWidth *
+           pDLayerParam->iVideoHeight);
   else
     dBpp = 0.1;
 
   //Area*2
-  if (pDLayerParam->iFrameWidth * pDLayerParam->iFrameHeight <= 28800) // 90p video:160*90
+  if (pDLayerParam->iVideoWidth * pDLayerParam->iVideoHeight <= 28800) // 90p video:160*90
     iBppIndex = 0;
-  else if (pDLayerParam->iFrameWidth * pDLayerParam->iFrameHeight <= 115200) // 180p video:320*180
+  else if (pDLayerParam->iVideoWidth * pDLayerParam->iVideoHeight <= 115200) // 180p video:320*180
     iBppIndex = 1;
-  else if (pDLayerParam->iFrameWidth * pDLayerParam->iFrameHeight <= 460800) // 360p video:640*360
+  else if (pDLayerParam->iVideoWidth * pDLayerParam->iVideoHeight <= 460800) // 360p video:640*360
     iBppIndex = 2;
   else
     iBppIndex = 3;
@@ -583,20 +587,20 @@ void RcCalculateMbQp (sWelsEncCtx* pEncCtx, SMB* pCurMb, const int32_t kiSliceId
 
 SWelsSvcRc* RcJudgeBaseUsability (sWelsEncCtx* pEncCtx) {
   SWelsSvcRc* pWelsSvcRc  = NULL, *pWelsSvcRc_Base = NULL;
-  SDLayerParam* pDlpBase = NULL, *pDLayerParam = NULL;
-
+  SSpatialLayerConfig* pDlpBase = NULL, *pDLayerParam = NULL;
+  SSpatialLayerInternal* pDlpBaseInternal = NULL;
   if (pEncCtx->uiDependencyId <= 0)
     return NULL;
-
-  pDlpBase = &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId - 1];
+  pDlpBaseInternal = &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId - 1];
+  pDlpBase = &pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId - 1];
   pWelsSvcRc_Base = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId - 1];
-  if (pEncCtx->uiTemporalId <= pDlpBase->iDecompositionStages) {
+  if (pEncCtx->uiTemporalId <= pDlpBaseInternal->iDecompositionStages) {
     pWelsSvcRc      = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
     pWelsSvcRc_Base = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId - 1];
-    pDLayerParam             = &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
-    pDlpBase        = &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId - 1];
-    if ((pDLayerParam->iFrameWidth * pDLayerParam->iFrameHeight / pWelsSvcRc->iNumberMbGom) ==
-        (pDlpBase->iFrameWidth * pDlpBase->iFrameHeight / pWelsSvcRc_Base->iNumberMbGom))
+    pDLayerParam             = &pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId];
+    pDlpBase        = &pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId - 1];
+    if ((pDLayerParam->iVideoWidth * pDLayerParam->iVideoHeight / pWelsSvcRc->iNumberMbGom) ==
+        (pDlpBase->iVideoWidth * pDlpBase->iVideoHeight / pWelsSvcRc_Base->iNumberMbGom))
       return pWelsSvcRc_Base;
     else
       return NULL;
@@ -925,7 +929,7 @@ void WelsRcMbInfoUpdateGom (void* pCtx, SMB* pCurMb, int32_t iCostLuma, SSlice* 
 void  WelsRcPictureInitDisable (void* pCtx) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
-  SDLayerParam* pDLayerParam		= &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
+  SSpatialLayerConfig* pDLayerParam		= &pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId];
   const int32_t kiQp = pDLayerParam->iDLayerQp;
 
   pEncCtx->iGlobalQp	= RcCalculateCascadingQp (pEncCtx, kiQp);

@@ -127,8 +127,8 @@ int32_t CWelsPreProcess::AllocSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCoding
   // spatial pictures
   iDlayerIndex = 0;
   do {
-    const int32_t kiPicWidth = pParam->sDependencyLayers[iDlayerIndex].iFrameWidth;
-    const int32_t kiPicHeight   = pParam->sDependencyLayers[iDlayerIndex].iFrameHeight;
+    const int32_t kiPicWidth = pParam->sSpatialLayers[iDlayerIndex].iVideoWidth;
+    const int32_t kiPicHeight   = pParam->sSpatialLayers[iDlayerIndex].iVideoHeight;
     const uint8_t kuiLayerInTemporal = 2 + WELS_MAX (pParam->sDependencyLayers[iDlayerIndex].iHighestTemporalId, 1);
     const uint8_t kuiRefNumInTemporal = kuiLayerInTemporal + pParam->iLTRRefNum;
     uint8_t i = 0;
@@ -291,7 +291,8 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
 
   SPicture* pSrcPic					= NULL;	// large
   SPicture* pDstPic					= NULL;	// small
-  SDLayerParam* pDlayerParam					= NULL;
+  SSpatialLayerConfig* pDlayerParam					= NULL;
+  SSpatialLayerInternal* pDlayerParamInternal					= NULL;
   int32_t iSpatialNum					= 0;
   int32_t iSrcWidth					= 0;
   int32_t iSrcHeight					= 0;
@@ -300,10 +301,11 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
   int32_t iTemporalId = 0;
   int32_t iActualSpatialLayerNum      = 0;
 
-  pDlayerParam = &pSvcParam->sDependencyLayers[iDependencyId];
-  iTargetWidth	  = pDlayerParam->iFrameWidth;
-  iTargetHeight  = pDlayerParam->iFrameHeight;
-  iTemporalId    = pDlayerParam->uiCodingIdx2TemporalId[pCtx->iCodingIndex & (pSvcParam->uiGopSize - 1)];
+  pDlayerParamInternal = &pSvcParam->sDependencyLayers[iDependencyId];
+  pDlayerParam = &pSvcParam->sSpatialLayers[iDependencyId];
+  iTargetWidth	  = pDlayerParam->iVideoWidth;
+  iTargetHeight  = pDlayerParam->iVideoHeight;
+  iTemporalId    = pDlayerParamInternal->uiCodingIdx2TemporalId[pCtx->iCodingIndex & (pSvcParam->uiGopSize - 1)];
   iSrcWidth   = pSvcParam->SUsedPicRect.iWidth;
   iSrcHeight  = pSvcParam->SUsedPicRect.iHeight;
 
@@ -365,10 +367,11 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
   //	-- highest layer, if no downsampling, [else] block above
   if (pSvcParam->iSpatialLayerNum > 1) {
     while (iDependencyId >= 0) {
-      pDlayerParam			= &pSvcParam->sDependencyLayers[iDependencyId];
-      iTargetWidth	= pDlayerParam->iFrameWidth;
-      iTargetHeight	= pDlayerParam->iFrameHeight;
-      iTemporalId = pDlayerParam->uiCodingIdx2TemporalId[pCtx->iCodingIndex & (pSvcParam->uiGopSize - 1)];
+      pDlayerParamInternal = &pSvcParam->sDependencyLayers[iDependencyId];
+      pDlayerParam = &pSvcParam->sSpatialLayers[iDependencyId];
+      iTargetWidth	= pDlayerParam->iVideoWidth;
+      iTargetHeight	= pDlayerParam->iVideoHeight;
+      iTemporalId = pDlayerParamInternal->uiCodingIdx2TemporalId[pCtx->iCodingIndex & (pSvcParam->uiGopSize - 1)];
       iPicturePos		= m_uiSpatialLayersInTemporal[iDependencyId] - 1;
 
       // NOT work for CGS, FIXME
@@ -414,7 +417,7 @@ bool JudgeNeedOfScaling (SWelsSvcCodingParam* pParam, Scaled_Picture* pScaledPic
   }
 
   for (; iSpatialIdx >= 0; iSpatialIdx --) {
-    SDLayerParam* pCurLayer = &pParam->sDependencyLayers[iSpatialIdx];
+    SSpatialLayerInternal* pCurLayer = &pParam->sDependencyLayers[iSpatialIdx];
     int32_t iCurDstWidth			= pCurLayer->iActualWidth;
     int32_t iCurDstHeight			= pCurLayer->iActualHeight;
     int32_t iInputWidthXDstHeight	= kiInputPicWidth * iCurDstHeight;
@@ -1078,7 +1081,7 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
   return static_cast<ESceneChangeIdc> (iVaaFrameSceneChangeIdc);
 }
 
-int32_t CWelsPreProcess::GetRefFrameInfo(int32_t iRefIdx,SPicture *&pRefOri) {
+int32_t CWelsPreProcess::GetRefFrameInfo (int32_t iRefIdx, SPicture*& pRefOri) {
   const int32_t iTargetDid = m_pEncCtx->pSvcParam->iSpatialLayerNum - 1;
   SVAAFrameInfoExt* pVaaExt			= static_cast<SVAAFrameInfoExt*> (m_pEncCtx->pVaa);
   SRefInfoParam* BestRefCandidateParam = & (pVaaExt->sVaaStrBestRefCandidate[iRefIdx]);

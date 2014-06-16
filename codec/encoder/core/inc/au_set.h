@@ -98,25 +98,28 @@ int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, SParaS
 /*!
  * \brief	initialize pSps based on configurable parameters in svc
  * \param	pSps				SWelsSPS*
- * \param	layer_param		SDLayerParam*, dependency layer parameter
+ * \param   pLayerParam     SSpatialLayerConfig  dependency layer parameter
+ * \param	pLayerParamInternal		SSpatialLayerInternal*, internal dependency layer parameter
  * \param	iSpsId			SPS Id
  * \return	0 - successful
  *			1 - failed
  */
-int32_t WelsInitSps (SWelsSPS* pSps, SDLayerParam* pLayerParam, const uint32_t kuiIntraPeriod,
-                     const int32_t kiNumRefFrame,
+int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialLayerInternal* pLayerParamInternal,
+                     const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame,
                      const uint32_t kiSpsId, const bool kbEnableFrameCropping, bool bEnableRc);
 
 /*!
  * \brief	initialize subset pSps based on configurable parameters in svc
  * \param	pSubsetSps		SSubsetSps*
- * \param	layer_param		SDLayerParam*, dependency layer parameter
+ * \param   pLayerParam     SSpatialLayerConfig  dependency layer parameter
+ * \param	pLayerParamInternal		SSpatialLayerInternal*, internal dependency layer parameter
  * \param	kiSpsId			SPS Id
  * \return	0 - successful
  *			1 - failed
  */
-int32_t WelsInitSubsetSps (SSubsetSps* pSubsetSps, SDLayerParam* pLayerParam, const uint32_t kuiIntraPeriod,
-                           const int32_t kiNumRefFrame,
+int32_t WelsInitSubsetSps (SSubsetSps* pSubsetSps, SSpatialLayerConfig* pLayerParam,
+                           SSpatialLayerInternal* pLayerParamInternal,
+                           const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame,
                            const uint32_t kiSpsId, const bool kbEnableFrameCropping, bool bEnableRc);
 
 /*!
