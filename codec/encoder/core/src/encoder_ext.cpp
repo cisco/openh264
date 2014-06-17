@@ -112,21 +112,30 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
                                 || fMaxFrameRate - pCfg->fMaxFrameRate < -fEpsn)) {
     pCfg->fMaxFrameRate	= fMaxFrameRate;
   }
-
-  //bitrate setting validation
+//bitrate setting validation
   if (pCfg->iRCMode != RC_OFF_MODE) {
     int32_t  iTotalBitrate = 0;
+    if (pCfg->iTargetBitrate <= 0) {
+      WelsLog (pLogCtx, WELS_LOG_ERROR, "Invalid bitrate settings in total configure, bitrate= %d\n", pCfg->iTargetBitrate);
+      return ENC_RETURN_INVALIDINPUT;
+    }
     for (i = 0; i < pCfg->iSpatialLayerNum; ++ i) {
       SSpatialLayerConfig* pSpatialLayer = &pCfg->sSpatialLayers[i];
       iTotalBitrate += pSpatialLayer->iSpatialBitrate;
+      if (pSpatialLayer->iSpatialBitrate <= 0) {
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "Invalid bitrate settings in layer %d, bitrate= %d\n", i,
+                 pSpatialLayer->iSpatialBitrate);
+        return ENC_RETURN_INVALIDINPUT;
+      }
     }
     if (iTotalBitrate > pCfg->iTargetBitrate) {
       WelsLog (pLogCtx, WELS_LOG_ERROR,
                "Invalid settings in bitrate. the sum of each layer bitrate(%d) is larger than total bitrate setting(%d)\n",
                iTotalBitrate, pCfg->iTargetBitrate);
+      return ENC_RETURN_INVALIDINPUT;
     }
-  }
 
+  }
   return ENC_RETURN_SUCCESS;
 }
 
