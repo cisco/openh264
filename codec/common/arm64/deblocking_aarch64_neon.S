@@ -295,166 +295,166 @@ bs_mv_check_jump1:
 #else
 
 .macro MASK_MATRIX arg0, arg1, arg2, arg3, arg4, arg5, arg6
-    uabd    \arg6.16b, \arg1.16b, \arg2.16b
-    cmhi    \arg6.16b, \arg4.16b, \arg6.16b
+    uabd    \arg6\().16b, \arg1\().16b, \arg2\().16b
+    cmhi    \arg6\().16b, \arg4\().16b, \arg6\().16b
 
-    uabd    \arg4.16b, \arg0.16b, \arg1.16b
-    cmhi    \arg4.16b, \arg5.16b, \arg4.16b
-    and     \arg6.16b, \arg6.16b, \arg4.16b
+    uabd    \arg4\().16b, \arg0\().16b, \arg1\().16b
+    cmhi    \arg4\().16b, \arg5\().16b, \arg4\().16b
+    and     \arg6\().16b, \arg6\().16b, \arg4\().16b
 
-    uabd    \arg4.16b, \arg3.16b, \arg2.16b
-    cmhi    \arg4.16b, \arg5.16b, \arg4.16b
-    and     \arg6.16b, \arg6.16b, \arg4.16b
+    uabd    \arg4\().16b, \arg3\().16b, \arg2\().16b
+    cmhi    \arg4\().16b, \arg5\().16b, \arg4\().16b
+    and     \arg6\().16b, \arg6\().16b, \arg4\().16b
 .endm
 
 .macro DIFF_LUMA_LT4_P1_Q1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
     //v0, v1, v2, v3, v17(beta), v18(-Tc0), v6(Tc0), v7(flag), v19, v20
-    urhadd    \arg8.16b, \arg2.16b, \arg3.16b
-    uhadd   \arg8.16b, \arg0.16b, \arg8.16b
-    usubl   \arg9.8h, \arg8.8b, \arg1.8b
-    sqxtn   \arg9.8b, \arg9.8h
-    usubl2  \arg8.8h, \arg8.16b, \arg1.16b
-    sqxtn2  \arg9.16b, \arg8.8h
-    smax    \arg8.16b, \arg9.16b, \arg5.16b
+    urhadd    \arg8\().16b, \arg2\().16b, \arg3\().16b
+    uhadd   \arg8\().16b, \arg0\().16b, \arg8\().16b
+    usubl   \arg9\().8h, \arg8\().8b, \arg1\().8b
+    sqxtn   \arg9\().8b, \arg9\().8h
+    usubl2  \arg8\().8h, \arg8\().16b, \arg1\().16b
+    sqxtn2  \arg9\().16b, \arg8\().8h
+    smax    \arg8\().16b, \arg9\().16b, \arg5\().16b
     //
-    smin  \arg8.16b, \arg8.16b, \arg6.16b
-    uabd  \arg9.16b, \arg0.16b, \arg2.16b
-    cmhi  \arg9.16b, \arg4.16b, \arg9.16b
-    and     \arg8.16b, \arg8.16b, \arg9.16b
-    and     \arg8.16b, \arg8.16b, \arg7.16b
-    add     \arg8.16b, \arg1.16b, \arg8.16b
-    abs     \arg9.16b, \arg9.16b
+    smin  \arg8\().16b, \arg8\().16b, \arg6\().16b
+    uabd  \arg9\().16b, \arg0\().16b, \arg2\().16b
+    cmhi  \arg9\().16b, \arg4\().16b, \arg9\().16b
+    and     \arg8\().16b, \arg8\().16b, \arg9\().16b
+    and     \arg8\().16b, \arg8\().16b, \arg7\().16b
+    add     \arg8\().16b, \arg1\().16b, \arg8\().16b
+    abs     \arg9\().16b, \arg9\().16b
 .endm
 
 .macro DIFF_LUMA_LT4_P0_Q0_1 arg0, arg1, arg2, arg3, arg4, arg5, arg6
-    usubl \arg5.8h, \arg0.8b, \arg3.8b
-    usubl \arg6.8h, \arg2.8b, \arg1.8b
-    shl     \arg6.8h, \arg6.8h, #2
-    add     \arg5.8h, \arg5.8h, \arg6.8h
-    sqrshrn  \arg4.8b, \arg5.8h, #3
+    usubl \arg5\().8h, \arg0\().8b, \arg3\().8b
+    usubl \arg6\().8h, \arg2\().8b, \arg1\().8b
+    shl     \arg6\().8h, \arg6\().8h, #2
+    add     \arg5\().8h, \arg5\().8h, \arg6\().8h
+    sqrshrn  \arg4\().8b, \arg5\().8h, #3
 .endm
 
 .macro DIFF_LUMA_LT4_P0_Q0_2 arg0, arg1, arg2, arg3, arg4, arg5, arg6
-    usubl2    \arg5.8h, \arg0.16b, \arg3.16b
-    usubl2    \arg6.8h, \arg2.16b, \arg1.16b
-    shl     \arg6.8h, \arg6.8h, #2
-    add     \arg5.8h, \arg5.8h, \arg6.8h
-    sqrshrn2  \arg4.16b, \arg5.8h, #3
+    usubl2    \arg5\().8h, \arg0\().16b, \arg3\().16b
+    usubl2    \arg6\().8h, \arg2\().16b, \arg1\().16b
+    shl     \arg6\().8h, \arg6\().8h, #2
+    add     \arg5\().8h, \arg5\().8h, \arg6\().8h
+    sqrshrn2  \arg4\().16b, \arg5\().8h, #3
 .endm
 
 .macro EXTRACT_DELTA_INTO_TWO_PART arg0, arg1
-    cmge  \arg1.16b, \arg0.16b, #0
-    and     \arg1.16b, \arg0.16b, \arg1.16b
-    sub     \arg0.16b, \arg1.16b, \arg0.16b
+    cmge  \arg1\().16b, \arg0\().16b, #0
+    and     \arg1\().16b, \arg0\().16b, \arg1\().16b
+    sub     \arg0\().16b, \arg1\().16b, \arg0\().16b
 .endm
 
 .macro DIFF_LUMA_EQ4_P2P1P0_1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
-    uaddl \arg8.8h, \arg1.8b, \arg2.8b
-    uaddl \arg9.8h, \arg3.8b, \arg4.8b
-    add   \arg9.8h, \arg9.8h, \arg8.8h
+    uaddl \arg8\().8h, \arg1\().8b, \arg2\().8b
+    uaddl \arg9\().8h, \arg3\().8b, \arg4\().8b
+    add   \arg9\().8h, \arg9\().8h, \arg8\().8h
 
-    uaddl \arg8.8h, \arg0.8b, \arg1.8b
-    shl   \arg8.8h, \arg8.8h, #1
-    add   \arg8.8h, \arg9.8h, \arg8.8h
+    uaddl \arg8\().8h, \arg0\().8b, \arg1\().8b
+    shl   \arg8\().8h, \arg8\().8h, #1
+    add   \arg8\().8h, \arg9\().8h, \arg8\().8h
 
-    rshrn \arg0.8b, \arg9.8h, #2
-    rshrn \arg7.8b, \arg8.8h, #3
-    shl     \arg9.8h, \arg9.8h, #1
-    usubl   \arg8.8h, \arg5.8b, \arg1.8b
-    add     \arg9.8h, \arg8.8h, \arg9.8h
+    rshrn \arg0\().8b, \arg9\().8h, #2
+    rshrn \arg7\().8b, \arg8\().8h, #3
+    shl     \arg9\().8h, \arg9\().8h, #1
+    usubl   \arg8\().8h, \arg5\().8b, \arg1\().8b
+    add     \arg9\().8h, \arg8\().8h, \arg9\().8h
 
-    uaddl \arg8.8h, \arg2.8b, \arg5.8b
-    uaddw \arg8.8h, \arg8.8h, \arg2.8b
-    uaddw \arg8.8h, \arg8.8h, \arg3.8b
+    uaddl \arg8\().8h, \arg2\().8b, \arg5\().8b
+    uaddw \arg8\().8h, \arg8\().8h, \arg2\().8b
+    uaddw \arg8\().8h, \arg8\().8h, \arg3\().8b
 
-    rshrn \arg9.8b, \arg9.8h, #3
-    rshrn \arg8.8b, \arg8.8h, #2
-    bsl       \arg6.8b, \arg9.8b, \arg8.8b
+    rshrn \arg9\().8b, \arg9\().8h, #3
+    rshrn \arg8\().8b, \arg8\().8h, #2
+    bsl       \arg6\().8b, \arg9\().8b, \arg8\().8b
 .endm
 
 .macro DIFF_LUMA_EQ4_P2P1P0_2 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
-    uaddl2 \arg8.8h, \arg1.16b, \arg2.16b
-    uaddl2 \arg9.8h, \arg3.16b, \arg4.16b
-    add   \arg9.8h, \arg9.8h, \arg8.8h
+    uaddl2 \arg8\().8h, \arg1\().16b, \arg2\().16b
+    uaddl2 \arg9\().8h, \arg3\().16b, \arg4\().16b
+    add   \arg9\().8h, \arg9\().8h, \arg8\().8h
 
-    uaddl2 \arg8.8h, \arg0.16b, \arg1.16b
-    shl   \arg8.8h, \arg8.8h, #1
-    add   \arg8.8h, \arg9.8h, \arg8.8h
+    uaddl2 \arg8\().8h, \arg0\().16b, \arg1\().16b
+    shl   \arg8\().8h, \arg8\().8h, #1
+    add   \arg8\().8h, \arg9\().8h, \arg8\().8h
 
-    rshrn2    \arg0.16b, \arg9.8h, #2
-    rshrn2    \arg7.16b, \arg8.8h, #3
-    shl     \arg9.8h, \arg9.8h, #1
-    usubl2   \arg8.8h, \arg5.16b, \arg1.16b
-    add     \arg9.8h, \arg8.8h, \arg9.8h
+    rshrn2    \arg0\().16b, \arg9\().8h, #2
+    rshrn2    \arg7\().16b, \arg8\().8h, #3
+    shl     \arg9\().8h, \arg9\().8h, #1
+    usubl2   \arg8\().8h, \arg5\().16b, \arg1\().16b
+    add     \arg9\().8h, \arg8\().8h, \arg9\().8h
 
-    uaddl2    \arg8.8h, \arg2.16b, \arg5.16b
-    uaddw2    \arg8.8h, \arg8.8h, \arg2.16b
-    uaddw2    \arg8.8h, \arg8.8h, \arg3.16b
+    uaddl2    \arg8\().8h, \arg2\().16b, \arg5\().16b
+    uaddw2    \arg8\().8h, \arg8\().8h, \arg2\().16b
+    uaddw2    \arg8\().8h, \arg8\().8h, \arg3\().16b
 
-    rshrn2    \arg9.16b, \arg9.8h, #3
-    rshrn2    \arg8.16b, \arg8.8h, #2
-    bsl       \arg6.16b, \arg9.16b, \arg8.16b
+    rshrn2    \arg9\().16b, \arg9\().8h, #3
+    rshrn2    \arg8\().16b, \arg8\().8h, #2
+    bsl       \arg6\().16b, \arg9\().16b, \arg8\().16b
 .endm
 
 
 .macro DIFF_CHROMA_EQ4_P0Q0_1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
-    uaddl \arg4.8h, \arg0.8b, \arg3.8b
-    shl   \arg4.8h, \arg4.8h, #1
-    usubl \arg5.8h, \arg1.8b, \arg3.8b
-    add   \arg5.8h, \arg5.8h, \arg4.8h
-    rshrn \arg6.8b, \arg5.8h, #2
-    usubl \arg5.8h, \arg2.8b, \arg0.8b
-    add   \arg5.8h, \arg5.8h, \arg4.8h
-    rshrn \arg7.8b, \arg5.8h, #2
+    uaddl \arg4\().8h, \arg0\().8b, \arg3\().8b
+    shl   \arg4\().8h, \arg4\().8h, #1
+    usubl \arg5\().8h, \arg1\().8b, \arg3\().8b
+    add   \arg5\().8h, \arg5\().8h, \arg4\().8h
+    rshrn \arg6\().8b, \arg5\().8h, #2
+    usubl \arg5\().8h, \arg2\().8b, \arg0\().8b
+    add   \arg5\().8h, \arg5\().8h, \arg4\().8h
+    rshrn \arg7\().8b, \arg5\().8h, #2
 .endm
 
 .macro DIFF_CHROMA_EQ4_P0Q0_2  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
-    uaddl2 \arg4.8h, \arg0.16b, \arg3.16b
-    shl   \arg4.8h, \arg4.8h, #1
-    usubl2 \arg5.8h, \arg1.16b, \arg3.16b
-    add   \arg5.8h, \arg5.8h, \arg4.8h
-    rshrn2 \arg6.16b, \arg5.8h, #2
-    usubl2 \arg5.8h, \arg2.16b, \arg0.16b
-    add   \arg5.8h, \arg5.8h, \arg4.8h
-    rshrn2 \arg7.16b, \arg5.8h, #2
+    uaddl2 \arg4\().8h, \arg0\().16b, \arg3\().16b
+    shl   \arg4\().8h, \arg4\().8h, #1
+    usubl2 \arg5\().8h, \arg1\().16b, \arg3\().16b
+    add   \arg5\().8h, \arg5\().8h, \arg4\().8h
+    rshrn2 \arg6\().16b, \arg5\().8h, #2
+    usubl2 \arg5\().8h, \arg2\().16b, \arg0\().16b
+    add   \arg5\().8h, \arg5\().8h, \arg4\().8h
+    rshrn2 \arg7\().16b, \arg5\().8h, #2
 .endm
 
 .macro DIFF_LUMA_EQ4_MASK arg0, arg1, arg2, arg3
     mov.16b   \arg3, \arg2
-    bsl   \arg3.16b, \arg0.16b, \arg1.16b
+    bsl   \arg3\().16b, \arg0\().16b, \arg1\().16b
 .endm
 
 .macro LOAD_LUMA_DATA_3 arg0, arg1, arg2, arg3, arg4, arg5, arg6
-    ld3   {\arg0.b, \arg1.b, \arg2.b} [\arg6], [x2], x1
-    ld3   {\arg3.b, \arg4.b, \arg5.b} [\arg6], [x0], x1
+    ld3   {\arg0\().b, \arg1\().b, \arg2\().b} [\arg6], [x2], x1
+    ld3   {\arg3\().b, \arg4\().b, \arg5\().b} [\arg6], [x0], x1
 .endm
 
 .macro LOAD_LUMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
-    ld4   {\arg0.b, \arg1.b, \arg2.b, \arg3.b} [\arg8], [x3], x1
-    ld4   {\arg4.b, \arg5.b, \arg6.b, \arg7.b} [\arg8], [x0], x1
+    ld4   {\arg0\().b, \arg1\().b, \arg2\().b, \arg3\().b} [\arg8], [x3], x1
+    ld4   {\arg4\().b, \arg5\().b, \arg6\().b, \arg7\().b} [\arg8], [x0], x1
 .endm
 
 .macro STORE_LUMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5
-    st4   {\arg0.b, \arg1.b, \arg2.b, \arg3.b} [\arg4], [x0], x1
-    st4   {\arg0.b, \arg1.b, \arg2.b, \arg3.b} [\arg5], [x2], x1
+    st4   {\arg0\().b, \arg1\().b, \arg2\().b, \arg3\().b} [\arg4], [x0], x1
+    st4   {\arg0\().b, \arg1\().b, \arg2\().b, \arg3\().b} [\arg5], [x2], x1
 .endm
 
 .macro STORE_LUMA_DATA_3 arg0, arg1, arg2, arg3, arg4, arg5, arg6
-    st3   {\arg0.b, \arg1.b, \arg2.b} [\arg6], [x3], x1
-    st3   {\arg3.b, \arg4.b, \arg5.b} [\arg6], [x0], x1
+    st3   {\arg0\().b, \arg1\().b, \arg2\().b} [\arg6], [x3], x1
+    st3   {\arg3\().b, \arg4\().b, \arg5\().b} [\arg6], [x0], x1
 .endm
 
 .macro LOAD_CHROMA_DATA_4 arg0, arg1, arg2, arg3, arg4, arg5
-    ld4   {\arg0.b, \arg1.b, \arg2.b, \arg3.b} [\arg5], [\arg4], x2
+    ld4   {\arg0\().b, \arg1\().b, \arg2\().b, \arg3\().b} [\arg5], [\arg4], x2
 .endm
 
 .macro STORE_CHROMA_DATA_2 arg0, arg1, arg2, arg3
-    st2   {\arg0.b, \arg1.b} [\arg3], [\arg2], x2
+    st2   {\arg0\().b, \arg1\().b} [\arg3], [\arg2], x2
 .endm
 
 .macro ZERO_JUMP_END arg0, arg1, arg2, arg3
-    mov \arg1, \arg0.d[0]
-    mov \arg2, \arg0.d[1]
+    mov \arg1, \arg0\().d[0]
+    mov \arg2, \arg0\().d[1]
     orr \arg1, \arg1, \arg2
     cbz \arg1, \arg3
 .endm
@@ -471,7 +471,7 @@ bs_mv_check_jump1:
 
 bs_nzc_check_jump0:
     ext.16b  v1, v1, v0, #12
-    add      \arg3.16b, v0.16b, v1.16b
+    add      \arg3\().16b, v0.16b, v1.16b
 
     // Arrange the input data --- LEFT
     ands     x6, \arg1, #1
@@ -492,28 +492,28 @@ bs_nzc_check_jump1:
     ins      v2.d[0], v0.d[1]
     zip1     v0.16b, v0.16b, v2.16b
     ext.16b  v1, v1, v0, #12
-    add      \arg4.16b, v0.16b, v1.16b
+    add      \arg4\().16b, v0.16b, v1.16b
 .endm
 
 .macro BS_COMPARE_MV arg0, arg1, arg2, arg3, arg4, arg5
     //in: \arg0,\arg1(const),\arg2(const),\arg3(const),\arg4(const); out:\arg5
     mov   w6, #4
-    sabd  v20.8h, \arg0.8h, \arg1.8h
-    sabd  v21.8h, \arg1.8h, \arg2.8h
-    dup   \arg0.8h, w6
-    sabd  v22.8h, \arg2.8h, \arg3.8h
-    sabd  v23.8h, \arg3.8h, \arg4.8h
+    sabd  v20.8h, \arg0\().8h, \arg1\().8h
+    sabd  v21.8h, \arg1\().8h, \arg2\().8h
+    dup   \arg0\().8h, w6
+    sabd  v22.8h, \arg2\().8h, \arg3\().8h
+    sabd  v23.8h, \arg3\().8h, \arg4\().8h
 
-    cmge  v20.8h, v20.8h, \arg0.8h
-    cmge  v21.8h, v21.8h, \arg0.8h
-    cmge  v22.8h, v22.8h, \arg0.8h
-    cmge  v23.8h, v23.8h, \arg0.8h
+    cmge  v20.8h, v20.8h, \arg0\().8h
+    cmge  v21.8h, v21.8h, \arg0\().8h
+    cmge  v22.8h, v22.8h, \arg0\().8h
+    cmge  v23.8h, v23.8h, \arg0\().8h
 
     addp v20.8h, v20.8h, v21.8h
     addp v21.8h, v22.8h, v23.8h
 
-    addhn  \arg5.8b, v20.8h, v20.8h
-    addhn2  \arg5.16b, v21.8h, v21.8h
+    addhn  \arg5\().8b, v20.8h, v20.8h
+    addhn2  \arg5\().16b, v21.8h, v21.8h
 .endm
 
 .macro BS_MV_CHECK arg0, arg1, arg2, arg3, arg4, arg5, arg6
@@ -540,14 +540,14 @@ bs_mv_check_jump0:
     ld1      {v4.s} [2], [x6]
     ld1      {v4.s} [3], [x7]
 bs_mv_check_jump1:
-    zip1  \arg5.4s, v0.4s, v2.4s
-    zip2  \arg6.4s, v0.4s, v2.4s
+    zip1  \arg5\().4s, v0.4s, v2.4s
+    zip2  \arg6\().4s, v0.4s, v2.4s
     zip1  v0.4s, v1.4s, v3.4s
     zip2  v2.4s, v1.4s, v3.4s
-    zip2  v1.4s, \arg5.4s, v0.4s
-    zip1  v0.4s, \arg5.4s, v0.4s
-    zip2  v3.4s, \arg6.4s, v2.4s
-    zip1  v2.4s, \arg6.4s, v2.4s
+    zip2  v1.4s, \arg5\().4s, v0.4s
+    zip1  v0.4s, \arg5\().4s, v0.4s
+    zip2  v3.4s, \arg6\().4s, v2.4s
+    zip1  v2.4s, \arg6\().4s, v2.4s
     BS_COMPARE_MV  v4, v0, v1, v2, v3, \arg4
 .endm
 #endif
