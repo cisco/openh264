@@ -2814,8 +2814,6 @@ int32_t WritePadding (sWelsEncCtx* pCtx, int32_t iLen, int32_t& iSize) {
 
   BsRbspTrailingBits (pBs);
 
-  BsFlush (pBs);
-
   WelsUnloadNal (pCtx->pOut);
   int32_t iReturn = WelsEncodeNal (&pCtx->pOut->sNalList[iNal], NULL,
                                    pCtx->iFrameBsSize - pCtx->iPosBsBuffer,

@@ -751,8 +751,6 @@ int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx, const 
 
   BsRbspTrailingBits (pBs);
 
-  BsFlush (pBs);
-
   return ENC_RETURN_SUCCESS;
 }
 
