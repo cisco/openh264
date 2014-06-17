@@ -1,10 +1,12 @@
-# Generate the libwelsdecdemo.so file
+# Generate the libutdemo.so file
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE    := libUT
 LOCAL_SRC_FILES := ../../../../libut.so
+ifneq (,$(wildcard $(LOCAL_PATH)/$(LOCAL_SRC_FILES)))
 include $(PREBUILT_SHARED_LIBRARY)
+endif
 
 
 

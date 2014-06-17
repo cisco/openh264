@@ -104,7 +104,7 @@ void WelsMdIntraSecondaryModesEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* 
 
 //typedef void (*MD_INTRA_MB_BASE) (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb);
 
-void WelsInitScrollingSkipFunc (SWelsFuncPtrList* pFuncList, const bool bScrollingDetection);
+void WelsInitSCDPskipFunc (SWelsFuncPtrList* pFuncList, const bool bScrollingDetection);
 
 }
 #endif//WELS_MACROBLOCK_MODE_DECISION_H__

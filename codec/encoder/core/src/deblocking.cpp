@@ -115,37 +115,6 @@ static const uint8_t g_kuiTableBIdx[2][8] = {
   }, // table_bn_idx
 };
 
-static const ALIGNED_DECLARE (int32_t, g_kiTableBlock8x8Idx[2][4][4], 16) = {
-  {
-    {0, 0, 2, 2},
-    {0, 0, 2, 2},
-    {1, 1, 3, 3},
-    {1, 1, 3, 3}
-  },
-
-  {
-    {0, 0, 1, 1},
-    {0, 0, 1, 1},
-    {2, 2, 3, 3},
-    {2, 2, 3, 3}
-  }
-};
-static const ALIGNED_DECLARE (int32_t, g_kiTableBlock8x8NIdx[2][4][4], 16) = {
-  {
-    {1, 1, 3, 3},
-    {0, 0, 2, 2},
-    {0, 0, 2, 2},
-    {1, 1, 3, 3}
-  },
-
-  {
-    {2, 2, 3, 3},
-    {0, 0, 1, 1},
-    {0, 0, 1, 1},
-    {2, 2, 3, 3}
-  }
-};
-
 #define TC0_TBL_LOOKUP(iTc, iIdexA, pBS, bchroma) \
 {\
 	iTc[0] = g_kiTc0Table(iIdexA)[pBS[0]] + bchroma;\
@@ -604,6 +573,27 @@ void DeblockingBSCalc_neon (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2
 }
 #endif
 
+#if defined(HAVE_NEON_AARCH64) && defined(SINGLE_REF_FRAME)
+void DeblockingBSCalc_AArch64_neon (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2][4][4], Mb_Type uiCurMbType,
+                                int32_t iMbStride, int32_t iLeftFlag, int32_t iTopFlag) {
+    DeblockingBSCalcEnc_AArch64_neon (pCurMb->pNonZeroCount, pCurMb->sMv, pCurMb->uiNeighborAvail, iMbStride, uiBS);
+    if (iLeftFlag) {
+        if (IS_INTRA ((pCurMb - 1)->uiMbType)) {
+            * (uint32_t*)uiBS[0][0] = 0x04040404;
+        }
+    } else {
+        * (uint32_t*)uiBS[0][0] = 0;
+    }
+    if (iTopFlag) {
+        if (IS_INTRA ((pCurMb - iMbStride)->uiMbType)) {
+            * (uint32_t*)uiBS[1][0] = 0x04040404;
+        }
+    } else {
+        * (uint32_t*)uiBS[1][0] = 0;
+    }
+}
+#endif
+
 void DeblockingBSCalc_c (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2][4][4], Mb_Type uiCurMbType,
                          int32_t iMbStride, int32_t iLeftFlag, int32_t iTopFlag) {
   if (iLeftFlag) {
@@ -750,7 +740,7 @@ void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, co
 void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
   const int32_t kiCurDid				= pEnc->uiDependencyId;
   SWelsSvcCodingParam* pSvcParam	= pEnc->pSvcParam;
-  SDLayerParam* pDlp					= &pSvcParam->sDependencyLayers[kiCurDid];
+  SSpatialLayerConfig* pSpatialLayer = &pSvcParam->sSpatialLayers[kiCurDid];
   SDqLayer* pCurLayer					= pEnc->pCurDqLayer;
 
   if (pCurLayer->iLoopFilterDisableIdc == 0) {
@@ -759,7 +749,7 @@ void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
     int32_t iSliceCount			= 0;
     int32_t iSliceIdx			= 0;
 
-    if (SM_DYN_SLICE != pDlp->sSliceCfg.uiSliceMode) {
+    if (SM_DYN_SLICE != pSpatialLayer->sSliceCfg.uiSliceMode) {
       iSliceCount	= GetCurrentSliceNum (pCurLayer->pSliceEncCtx);
       do {
         DeblockingFilterSliceAvcbase (pCurLayer, pEnc->pFuncList, iSliceIdx);
@@ -795,6 +785,11 @@ void WelsBlockFuncInit (PSetNoneZeroCountZeroFunc* pfSetNZCZero,  int32_t iCpu) 
   if (iCpu & WELS_CPU_NEON) {
     *pfSetNZCZero = WelsNonZeroCount_neon;
   }
+#endif
+#ifdef	HAVE_NEON_AARCH64
+    if (iCpu & WELS_CPU_NEON) {
+        *pfSetNZCZero = WelsNonZeroCount_AArch64_neon;
+    }
 #endif
 }
 
@@ -841,6 +836,24 @@ void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
     pFunc->pfDeblockingBSCalc           = DeblockingBSCalc_neon;
 #endif
   }
+#endif
+
+#if defined(HAVE_NEON_AARCH64)
+    if (iCpu & WELS_CPU_NEON) {
+        pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_AArch64_neon;
+        pFunc->pfLumaDeblockingEQ4Ver		= DeblockLumaEq4V_AArch64_neon;
+        pFunc->pfLumaDeblockingLT4Hor		= DeblockLumaLt4H_AArch64_neon;
+        pFunc->pfLumaDeblockingEQ4Hor		= DeblockLumaEq4H_AArch64_neon;
+
+        pFunc->pfChromaDeblockingLT4Ver     = DeblockChromaLt4V_AArch64_neon;
+        pFunc->pfChromaDeblockingEQ4Ver     = DeblockChromaEq4V_AArch64_neon;
+        pFunc->pfChromaDeblockingLT4Hor     = DeblockChromaLt4H_AArch64_neon;
+        pFunc->pfChromaDeblockingEQ4Hor     = DeblockChromaEq4H_AArch64_neon;
+
+#if defined(SINGLE_REF_FRAME)
+        pFunc->pfDeblockingBSCalc           = DeblockingBSCalc_AArch64_neon;
+#endif
+    }
 #endif
 }
 

@@ -91,8 +91,9 @@
 #define LAYER_NUM_EXCHANGEABLE	1
 
 #define MAX_NAL_UNIT_NUM_IN_AU	32	// predefined maximal number of NAL Units in an access unit
-#define MAX_ACCESS_UNIT_CAPACITY	1048576	// Maximal AU capacity in bytes: (1<<20) = 1024 KB predefined
-#define BS_BUFFER_SIZE  (MAX_ACCESS_UNIT_CAPACITY * 3) //for delay case, keep three AU size to prevent buffer overwrite
+#define MIN_ACCESS_UNIT_CAPACITY	1048576	// Min AU capacity in bytes: (1<<20) = 1024 KB predefined
+#define MAX_BUFFERED_NUM 3 //mamixum stored number of AU|packet to prevent overwrite
+#define MAX_ACCESS_UNIT_CAPACITY 7077888 //Maximum AU size in bytes for level 5.2 for single frame
 #define MAX_MACROBLOCK_CAPACITY 5000 //Maximal legal MB capacity, 15000 bits is enough
 
 #endif//WELS_CONSTANCE_H__

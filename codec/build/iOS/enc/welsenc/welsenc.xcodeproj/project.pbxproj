@@ -14,12 +14,6 @@
 		4C34067218C57D0400DFA14A /* reconstruct_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4C34066B18C57D0400DFA14A /* reconstruct_neon.S */; };
 		4CB8F2B419235FC5005D6386 /* pixel_neon_aarch64.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CB8F2B319235FC5005D6386 /* pixel_neon_aarch64.S */; };
 		4CE4431518B6FFA00017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4431418B6FFA00017DF25 /* Foundation.framework */; };
-		4CE4432318B6FFA00017DF25 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4432218B6FFA00017DF25 /* XCTest.framework */; };
-		4CE4432418B6FFA00017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4431418B6FFA00017DF25 /* Foundation.framework */; };
-		4CE4432618B6FFA00017DF25 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4432518B6FFA00017DF25 /* UIKit.framework */; };
-		4CE4432918B6FFA00017DF25 /* libwelsenc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE4431118B6FFA00017DF25 /* libwelsenc.a */; };
-		4CE4432F18B6FFA00017DF25 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4CE4432D18B6FFA00017DF25 /* InfoPlist.strings */; };
-		4CE4433118B6FFA00017DF25 /* welsencTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4433018B6FFA00017DF25 /* welsencTests.m */; };
 		4CE4470E18BC605C0017DF25 /* au_set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446DD18BC605C0017DF25 /* au_set.cpp */; };
 		4CE4470F18BC605C0017DF25 /* deblocking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446DE18BC605C0017DF25 /* deblocking.cpp */; };
 		4CE4471018BC605C0017DF25 /* decode_mb_aux.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446DF18BC605C0017DF25 /* decode_mb_aux.cpp */; };
@@ -47,21 +41,11 @@
 		4CE4472718BC605C0017DF25 /* svc_mode_decision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446F618BC605C0017DF25 /* svc_mode_decision.cpp */; };
 		4CE4472818BC605C0017DF25 /* svc_motion_estimate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446F718BC605C0017DF25 /* svc_motion_estimate.cpp */; };
 		4CE4472918BC605C0017DF25 /* svc_set_mb_syn_cavlc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446F818BC605C0017DF25 /* svc_set_mb_syn_cavlc.cpp */; };
-		4CE4472A18BC605C0017DF25 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446F918BC605C0017DF25 /* utils.cpp */; };
 		4CE4472B18BC605C0017DF25 /* wels_preprocess.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446FA18BC605C0017DF25 /* wels_preprocess.cpp */; };
-		4CE4472D18BC605C0017DF25 /* welsCodecTrace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4470518BC605C0017DF25 /* welsCodecTrace.cpp */; };
 		4CE4472E18BC605C0017DF25 /* welsEncoderExt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4470618BC605C0017DF25 /* welsEncoderExt.cpp */; };
+		9AED665019469FC1009A3567 /* welsCodecTrace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9AED664C19469FC1009A3567 /* welsCodecTrace.cpp */; };
+		9AED66661946A2B3009A3567 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9AED66651946A2B3009A3567 /* utils.cpp */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		4CE4432718B6FFA00017DF25 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4CE4430918B6FFA00017DF25 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4CE4431018B6FFA00017DF25;
-			remoteInfo = welsenc;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		4CE4430F18B6FFA00017DF25 /* CopyFiles */ = {
@@ -85,12 +69,7 @@
 		4CDBFB9D18E5068D0025A767 /* wels_transpose_matrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wels_transpose_matrix.h; sourceTree = "<group>"; };
 		4CE4431118B6FFA00017DF25 /* libwelsenc.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libwelsenc.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE4431418B6FFA00017DF25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		4CE4432118B6FFA00017DF25 /* welsencTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = welsencTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		4CE4432218B6FFA00017DF25 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4CE4432518B6FFA00017DF25 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		4CE4432C18B6FFA00017DF25 /* welsencTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "welsencTests-Info.plist"; sourceTree = "<group>"; };
-		4CE4432E18B6FFA00017DF25 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		4CE4433018B6FFA00017DF25 /* welsencTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = welsencTests.m; sourceTree = "<group>"; };
 		4CE446AA18BC605C0017DF25 /* as264_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = as264_common.h; sourceTree = "<group>"; };
 		4CE446AB18BC605C0017DF25 /* au_set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = au_set.h; sourceTree = "<group>"; };
 		4CE446AC18BC605C0017DF25 /* bit_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bit_stream.h; sourceTree = "<group>"; };
@@ -100,7 +79,6 @@
 		4CE446B118BC605C0017DF25 /* encode_mb_aux.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = encode_mb_aux.h; sourceTree = "<group>"; };
 		4CE446B218BC605C0017DF25 /* encoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = encoder.h; sourceTree = "<group>"; };
 		4CE446B318BC605C0017DF25 /* encoder_context.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = encoder_context.h; sourceTree = "<group>"; };
-		4CE446B418BC605C0017DF25 /* expand_pic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = expand_pic.h; sourceTree = "<group>"; };
 		4CE446B518BC605C0017DF25 /* extern.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = extern.h; sourceTree = "<group>"; };
 		4CE446B618BC605C0017DF25 /* get_intra_predictor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = get_intra_predictor.h; sourceTree = "<group>"; };
 		4CE446B718BC605C0017DF25 /* mb_cache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mb_cache.h; sourceTree = "<group>"; };
@@ -133,7 +111,6 @@
 		4CE446D318BC605C0017DF25 /* svc_mode_decision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = svc_mode_decision.h; sourceTree = "<group>"; };
 		4CE446D418BC605C0017DF25 /* svc_motion_estimate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = svc_motion_estimate.h; sourceTree = "<group>"; };
 		4CE446D518BC605C0017DF25 /* svc_set_mb_syn_cavlc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = svc_set_mb_syn_cavlc.h; sourceTree = "<group>"; };
-		4CE446D618BC605C0017DF25 /* utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
 		4CE446D718BC605C0017DF25 /* vlc_encoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vlc_encoder.h; sourceTree = "<group>"; };
 		4CE446D818BC605C0017DF25 /* wels_common_basis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wels_common_basis.h; sourceTree = "<group>"; };
 		4CE446D918BC605C0017DF25 /* wels_const.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wels_const.h; sourceTree = "<group>"; };
@@ -166,13 +143,14 @@
 		4CE446F618BC605C0017DF25 /* svc_mode_decision.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = svc_mode_decision.cpp; sourceTree = "<group>"; };
 		4CE446F718BC605C0017DF25 /* svc_motion_estimate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = svc_motion_estimate.cpp; sourceTree = "<group>"; };
 		4CE446F818BC605C0017DF25 /* svc_set_mb_syn_cavlc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = svc_set_mb_syn_cavlc.cpp; sourceTree = "<group>"; };
-		4CE446F918BC605C0017DF25 /* utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utils.cpp; sourceTree = "<group>"; };
 		4CE446FA18BC605C0017DF25 /* wels_preprocess.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wels_preprocess.cpp; sourceTree = "<group>"; };
-		4CE446FD18BC605C0017DF25 /* welsCodecTrace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = welsCodecTrace.h; sourceTree = "<group>"; };
 		4CE446FE18BC605C0017DF25 /* welsEncoderExt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = welsEncoderExt.h; sourceTree = "<group>"; };
 		4CE4470418BC605C0017DF25 /* wels_enc_export.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = wels_enc_export.def; sourceTree = "<group>"; };
-		4CE4470518BC605C0017DF25 /* welsCodecTrace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = welsCodecTrace.cpp; sourceTree = "<group>"; };
 		4CE4470618BC605C0017DF25 /* welsEncoderExt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = welsEncoderExt.cpp; sourceTree = "<group>"; };
+		9AED664819469FAF009A3567 /* welsCodecTrace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = welsCodecTrace.h; path = ../../../common/inc/welsCodecTrace.h; sourceTree = "<group>"; };
+		9AED664C19469FC1009A3567 /* welsCodecTrace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = welsCodecTrace.cpp; path = ../../../common/src/welsCodecTrace.cpp; sourceTree = "<group>"; };
+		9AED66651946A2B3009A3567 /* utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utils.cpp; path = ../../../common/src/utils.cpp; sourceTree = "<group>"; };
+		9AED66671946A2C4009A3567 /* utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utils.h; path = ../../../common/inc/utils.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -181,17 +159,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4CE4431518B6FFA00017DF25 /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4CE4431E18B6FFA00017DF25 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4CE4432318B6FFA00017DF25 /* XCTest.framework in Frameworks */,
-				4CE4432618B6FFA00017DF25 /* UIKit.framework in Frameworks */,
-				4CE4432418B6FFA00017DF25 /* Foundation.framework in Frameworks */,
-				4CE4432918B6FFA00017DF25 /* libwelsenc.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,7 +189,6 @@
 			isa = PBXGroup;
 			children = (
 				4CE446A018BC605B0017DF25 /* encoder */,
-				4CE4432A18B6FFA00017DF25 /* welsencTests */,
 				4CE4431318B6FFA00017DF25 /* Frameworks */,
 				4CE4431218B6FFA00017DF25 /* Products */,
 			);
@@ -232,7 +198,6 @@
 			isa = PBXGroup;
 			children = (
 				4CE4431118B6FFA00017DF25 /* libwelsenc.a */,
-				4CE4432118B6FFA00017DF25 /* welsencTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -241,28 +206,9 @@
 			isa = PBXGroup;
 			children = (
 				4CE4431418B6FFA00017DF25 /* Foundation.framework */,
-				4CE4432218B6FFA00017DF25 /* XCTest.framework */,
 				4CE4432518B6FFA00017DF25 /* UIKit.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		4CE4432A18B6FFA00017DF25 /* welsencTests */ = {
-			isa = PBXGroup;
-			children = (
-				4CE4433018B6FFA00017DF25 /* welsencTests.m */,
-				4CE4432B18B6FFA00017DF25 /* Supporting Files */,
-			);
-			path = welsencTests;
-			sourceTree = "<group>";
-		};
-		4CE4432B18B6FFA00017DF25 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				4CE4432C18B6FFA00017DF25 /* welsencTests-Info.plist */,
-				4CE4432D18B6FFA00017DF25 /* InfoPlist.strings */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		4CE446A018BC605B0017DF25 /* encoder */ = {
@@ -289,6 +235,7 @@
 		4CE446A918BC605C0017DF25 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				9AED66671946A2C4009A3567 /* utils.h */,
 				4CDBFB9D18E5068D0025A767 /* wels_transpose_matrix.h */,
 				4CE446AA18BC605C0017DF25 /* as264_common.h */,
 				4CE446AB18BC605C0017DF25 /* au_set.h */,
@@ -299,7 +246,6 @@
 				4CE446B118BC605C0017DF25 /* encode_mb_aux.h */,
 				4CE446B218BC605C0017DF25 /* encoder.h */,
 				4CE446B318BC605C0017DF25 /* encoder_context.h */,
-				4CE446B418BC605C0017DF25 /* expand_pic.h */,
 				4CE446B518BC605C0017DF25 /* extern.h */,
 				4CE446B618BC605C0017DF25 /* get_intra_predictor.h */,
 				4CE446B718BC605C0017DF25 /* mb_cache.h */,
@@ -332,7 +278,6 @@
 				4CE446D318BC605C0017DF25 /* svc_mode_decision.h */,
 				4CE446D418BC605C0017DF25 /* svc_motion_estimate.h */,
 				4CE446D518BC605C0017DF25 /* svc_set_mb_syn_cavlc.h */,
-				4CE446D618BC605C0017DF25 /* utils.h */,
 				4CE446D718BC605C0017DF25 /* vlc_encoder.h */,
 				4CE446D818BC605C0017DF25 /* wels_common_basis.h */,
 				4CE446D918BC605C0017DF25 /* wels_const.h */,
@@ -345,6 +290,7 @@
 		4CE446DC18BC605C0017DF25 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				9AED66651946A2B3009A3567 /* utils.cpp */,
 				4CE446DD18BC605C0017DF25 /* au_set.cpp */,
 				4CE446DE18BC605C0017DF25 /* deblocking.cpp */,
 				4CE446DF18BC605C0017DF25 /* decode_mb_aux.cpp */,
@@ -372,7 +318,6 @@
 				4CE446F618BC605C0017DF25 /* svc_mode_decision.cpp */,
 				4CE446F718BC605C0017DF25 /* svc_motion_estimate.cpp */,
 				4CE446F818BC605C0017DF25 /* svc_set_mb_syn_cavlc.cpp */,
-				4CE446F918BC605C0017DF25 /* utils.cpp */,
 				4CE446FA18BC605C0017DF25 /* wels_preprocess.cpp */,
 			);
 			path = src;
@@ -390,7 +335,7 @@
 		4CE446FC18BC605C0017DF25 /* inc */ = {
 			isa = PBXGroup;
 			children = (
-				4CE446FD18BC605C0017DF25 /* welsCodecTrace.h */,
+				9AED664819469FAF009A3567 /* welsCodecTrace.h */,
 				4CE446FE18BC605C0017DF25 /* welsEncoderExt.h */,
 			);
 			path = inc;
@@ -399,8 +344,8 @@
 		4CE4470218BC605C0017DF25 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				9AED664C19469FC1009A3567 /* welsCodecTrace.cpp */,
 				4CE4470418BC605C0017DF25 /* wels_enc_export.def */,
-				4CE4470518BC605C0017DF25 /* welsCodecTrace.cpp */,
 				4CE4470618BC605C0017DF25 /* welsEncoderExt.cpp */,
 			);
 			path = src;
@@ -426,24 +371,6 @@
 			productReference = 4CE4431118B6FFA00017DF25 /* libwelsenc.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		4CE4432018B6FFA00017DF25 /* welsencTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4CE4433718B6FFA00017DF25 /* Build configuration list for PBXNativeTarget "welsencTests" */;
-			buildPhases = (
-				4CE4431D18B6FFA00017DF25 /* Sources */,
-				4CE4431E18B6FFA00017DF25 /* Frameworks */,
-				4CE4431F18B6FFA00017DF25 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				4CE4432818B6FFA00017DF25 /* PBXTargetDependency */,
-			);
-			name = welsencTests;
-			productName = welsencTests;
-			productReference = 4CE4432118B6FFA00017DF25 /* welsencTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -466,21 +393,9 @@
 			projectRoot = "";
 			targets = (
 				4CE4431018B6FFA00017DF25 /* welsenc */,
-				4CE4432018B6FFA00017DF25 /* welsencTests */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXResourcesBuildPhase section */
-		4CE4431F18B6FFA00017DF25 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4CE4432F18B6FFA00017DF25 /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4CE4430D18B6FFA00017DF25 /* Sources */ = {
@@ -492,12 +407,11 @@
 				4CE4472718BC605C0017DF25 /* svc_mode_decision.cpp in Sources */,
 				4CE4472818BC605C0017DF25 /* svc_motion_estimate.cpp in Sources */,
 				4CE4471D18BC605C0017DF25 /* property.cpp in Sources */,
-				4CE4472A18BC605C0017DF25 /* utils.cpp in Sources */,
 				4CE4471018BC605C0017DF25 /* decode_mb_aux.cpp in Sources */,
 				4CE4472018BC605C0017DF25 /* sample.cpp in Sources */,
-				4CE4472D18BC605C0017DF25 /* welsCodecTrace.cpp in Sources */,
 				4CE4471318BC605C0017DF25 /* encoder_data_tables.cpp in Sources */,
 				4C34067118C57D0400DFA14A /* pixel_neon.S in Sources */,
+				9AED665019469FC1009A3567 /* welsCodecTrace.cpp in Sources */,
 				4CE4471F18BC605C0017DF25 /* ref_list_mgr_svc.cpp in Sources */,
 				4CE4472218BC605C0017DF25 /* slice_multi_threading.cpp in Sources */,
 				4C34067018C57D0400DFA14A /* memory_neon.S in Sources */,
@@ -518,6 +432,7 @@
 				4CE4471E18BC605C0017DF25 /* ratectl.cpp in Sources */,
 				4C34066D18C57D0400DFA14A /* intra_pred_neon.S in Sources */,
 				4CE4471C18BC605C0017DF25 /* picture_handle.cpp in Sources */,
+				9AED66661946A2B3009A3567 /* utils.cpp in Sources */,
 				4CE4472618BC605C0017DF25 /* svc_encode_slice.cpp in Sources */,
 				4CE4471218BC605C0017DF25 /* encoder.cpp in Sources */,
 				4CE4471618BC605C0017DF25 /* get_intra_predictor.cpp in Sources */,
@@ -527,34 +442,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4CE4431D18B6FFA00017DF25 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4CE4433118B6FFA00017DF25 /* welsencTests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		4CE4432818B6FFA00017DF25 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4CE4431018B6FFA00017DF25 /* welsenc */;
-			targetProxy = 4CE4432718B6FFA00017DF25 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		4CE4432D18B6FFA00017DF25 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4CE4432E18B6FFA00017DF25 /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		4CE4433218B6FFA00017DF25 /* Debug */ = {
@@ -705,44 +593,6 @@
 			};
 			name = Release;
 		};
-		4CE4433818B6FFA00017DF25 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "welsenc/welsenc-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "welsencTests/welsencTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		4CE4433918B6FFA00017DF25 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "welsenc/welsenc-Prefix.pch";
-				INFOPLIST_FILE = "welsencTests/welsencTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -760,15 +610,6 @@
 			buildConfigurations = (
 				4CE4433518B6FFA00017DF25 /* Debug */,
 				4CE4433618B6FFA00017DF25 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4CE4433718B6FFA00017DF25 /* Build configuration list for PBXNativeTarget "welsencTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4CE4433818B6FFA00017DF25 /* Debug */,
-				4CE4433918B6FFA00017DF25 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

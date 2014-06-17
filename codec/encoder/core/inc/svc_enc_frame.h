@@ -103,6 +103,7 @@ struct TagDqLayer {
 
   SPicture*				pRefPic;			// reference picture pointer
   SPicture*				pDecPic;			// reconstruction picture pointer for layer
+  SPicture*       pRefOri[MAX_REF_PIC_COUNT];
 
   SSliceCtx*			pSliceEncCtx;	// current slice context
 

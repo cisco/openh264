@@ -53,6 +53,7 @@
 #include "wels_preprocess.h"
 #include "wels_func_ptr_def.h"
 #include "crt_util_safe_x.h"
+#include "utils.h"
 
 #include "mt_defs.h"	// for multiple threadin,
 #include "WelsThreadLib.h"
@@ -110,6 +111,7 @@ typedef struct TagStrideTables {
 } SStrideTables;
 
 typedef struct TagWelsEncCtx {
+  SLogContext sLogCtx;
   // Input
   SWelsSvcCodingParam*		pSvcParam;	// SVC parameter, WelsSVCParamConfig in svc_param_settings.h
   SWelsSliceBs*		 	pSliceBs;		// bitstream buffering for various slices, [uiSliceIdx]
@@ -205,12 +207,6 @@ typedef struct TagWelsEncCtx {
 
   SParaSetOffset				sPSOVector;
   CMemoryAlign*				pMemAlign;
-
-#ifdef ENABLE_TRACE_FILE
-  WelsFileHandle*				pFileLog;		// log file for wels encoder
-  uint32_t					uiSizeLog;		// size of log have been written in file
-
-#endif//ENABLE_TRACE_FILE
 
 #if defined(STAT_OUTPUT)
   // overall stat pData, refer to SStatData in stat.h, in case avc to use stat[0][0]

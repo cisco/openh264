@@ -127,9 +127,10 @@ static void DestroyPicBuff (PPicBuff* ppPicBuf) {
 /*
  * fill data fields in default for decoder context
  */
-void WelsDecoderDefaults (PWelsDecoderContext pCtx) {
+void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   int32_t iCpuCores               = 1;
   memset (pCtx, 0, sizeof (SWelsDecoderContext));	// fill zero first
+  pCtx->sLogCtx = *pLogCtx;
 
   pCtx->pArgDec                   = NULL;
 
@@ -350,17 +351,13 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
  * \note	N/A
  *************************************************************************************
  */
-int32_t WelsInitDecoder (PWelsDecoderContext pCtx, void* pTraceHandle, PWelsLogCallbackFunc pLog) {
+int32_t WelsInitDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   if (pCtx == NULL) {
     return ERR_INFO_INVALID_PTR;
   }
 
   // default
-  WelsDecoderDefaults (pCtx);
-
-  pCtx->pTraceHandle = pTraceHandle;
-
-  g_pLog = pLog;
+  WelsDecoderDefaults (pCtx, pLogCtx);
 
   // open decoder
   WelsOpenDecoder (pCtx);
@@ -512,6 +509,9 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 
     iConsumedBytes = 0;
     pNalPayload = ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
+    if ((pCtx->iErrorConMethod != ERROR_CON_DISABLE) && (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1))) {
+      CheckAndDoEC (pCtx, ppDst, pDstBufInfo);
+    }
     if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType) && pNalPayload) {
       iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes);
     }

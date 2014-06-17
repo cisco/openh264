@@ -42,24 +42,6 @@
 #include <stdarg.h>
 #include "typedefs.h"
 
-namespace WelsSVCEnc {
-
-
-/*
- *	Log output routines
- */
-
-typedef int32_t	iWelsLogLevel;
-enum {
-  WELS_LOG_QUIET		= 0x00,		// Quiet mode
-  WELS_LOG_ERROR		= 1 << 0,	// Error log iLevel
-  WELS_LOG_WARNING	= 1 << 1,	// Warning log iLevel
-  WELS_LOG_INFO		= 1 << 2,	// Information log iLevel
-  WELS_LOG_DEBUG		= 1 << 3,	// Debug log iLevel
-  WELS_LOG_RESV		= 1 << 4,	// Resversed log iLevel
-  WELS_LOG_LEVEL_COUNT = 5,
-  WELS_LOG_DEFAULT	= WELS_LOG_ERROR | WELS_LOG_WARNING | WELS_LOG_INFO | WELS_LOG_DEBUG	// Default log iLevel in Wels codec
-};
 
 /*
  *	Function pointer declaration for various tool sets
@@ -67,15 +49,11 @@ enum {
 // wels log output
 typedef void (*PWelsLogCallbackFunc) (void* pCtx, const int32_t iLevel, const char* kpFmt, va_list argv);
 
-// wels psnr calc
-typedef float (*PWelsPsnrFunc) (const void* kpTarPic,
-                                const int32_t kiTarStride,
-                                const void* kpRefPic,
-                                const int32_t kiRefStride,
-                                const int32_t kiWidth,
-                                const int32_t kiHeight);
+typedef struct TagLogContext {
+  PWelsLogCallbackFunc pfLog;
+  void* pLogCtx;
+} SLogContext;
 
-extern PWelsLogCallbackFunc	wlog;
 
 #ifdef __GNUC__
 extern void WelsLog (void* pCtx, int32_t iLevel, const char* kpFmt, ...) __attribute__ ((__format__ (__printf__, 3,
@@ -83,79 +61,6 @@ extern void WelsLog (void* pCtx, int32_t iLevel, const char* kpFmt, ...) __attri
 #else
 extern void WelsLog (void* pCtx, int32_t iLevel, const char* kpFmt, ...);
 #endif
-
-extern const char* g_sWelsLogTags[];
-
-/*!
- *************************************************************************************
- * \brief	System trace log output in Wels
- *
- * \param	pCtx	instance pointer
- * \param	kiLevel	log iLevel ( WELS_LOG_QUIET, ERROR, WARNING, INFO, DEBUG )
- * \param	kpFmtStr	formated string to mount
- * \param 	argv	pData string argument
- *
- * \return	NONE
- *
- * \note	N/A
- *************************************************************************************
- */
-void WelsLogDefault (void* pCtx, const int32_t kiLevel, const char* kpFmtStr, va_list argv);
-void WelsLogNil (void* pCtx, const int32_t kiLevel, const char* kpFmtStr, va_list argv);
-
-
-/*!
- *************************************************************************************
- * \brief	set log iLevel from external call
- *
- * \param	iLevel	iLevel of log
- *
- * \return	NONE
- *
- * \note	can be able to control log iLevel dynamically
- *************************************************************************************
- */
-void WelsSetLogLevel (const int32_t kiLevel);
-
-/*!
- *************************************************************************************
- * \brief	get log iLevel from external call
- *
- * \param	N/A
- *
- * \return	current iLevel of log used in codec internal
- *
- * \note	can be able to get log iLevel of internal codec applicable
- *************************************************************************************
- */
-int32_t WelsGetLogLevel (void);
-
-/*!
- *************************************************************************************
- * \brief	set log callback from external call
- *
- * \param	_log	log function routine
- *
- * \return	NONE
- *
- * \note	N/A
- *************************************************************************************
- */
-void WelsSetLogCallback (PWelsLogCallbackFunc _log);
-
-/*!
-*************************************************************************************
-* \brief	reopen log file when finish setting current path
-*
-* \param	pCtx		context pCtx
-* \param	pCurPath	current path string
-*
-* \return	NONE
-*
-* \note	N/A
-*************************************************************************************
-*/
-void WelsReopenTraceFile (void* pCtx, char* pCurPath);
 
 /*
  *	PSNR calculation routines
@@ -183,5 +88,5 @@ float WelsCalcPsnr (const void* kpTarPic,
                     const int32_t kiWidth,
                     const int32_t kiHeight);
 
-}
+
 #endif//WELS_UTILS_H__

@@ -396,10 +396,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\common\src\logging.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\encoder\core\src\mc.cpp"
 				>
 			</File>
@@ -480,7 +476,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\src\utils.cpp"
+				RelativePath="..\..\..\common\src\utils.cpp"
 				>
 			</File>
 			<File
@@ -705,7 +701,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\utils.h"
+				RelativePath="..\..\..\common\inc\utils.h"
 				>
 			</File>
 			<File

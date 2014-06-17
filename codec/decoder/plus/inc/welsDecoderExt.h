@@ -39,8 +39,8 @@
  *
  *
  *************************************************************************/
-#if !defined(AFX_WELSH264DECODER_H__D9FAA1D1_5403_47E1_8E27_78F11EE65F02__INCLUDED_)
-#define AFX_WELSH264DECODER_H__D9FAA1D1_5403_47E1_8E27_78F11EE65F02__INCLUDED_
+#if !defined(WELS_PLUS_WELSDECODEREXT_H)
+#define WELS_PLUS_WELSDECODEREXT_H
 
 #include "codec_api.h"
 #include "codec_app_def.h"
@@ -99,7 +99,7 @@ class CWelsDecoder : public ISVCDecoder {
 
  private:
   PWelsDecoderContext 				m_pDecContext;
-  IWelsTrace*							m_pTrace;
+  welsCodecTrace*			m_pWelsTrace;
 
   void InitDecoder (void);
   void UninitDecoder (void);
@@ -113,4 +113,4 @@ class CWelsDecoder : public ISVCDecoder {
 
 } // namespace WelsDec
 
-#endif // !defined(AFX_WELSH264DECODER_H__D9FAA1D1_5403_47E1_8E27_78F11EE65F02__INCLUDED_)
+#endif // !defined(WELS_PLUS_WELSDECODEREXT_H)

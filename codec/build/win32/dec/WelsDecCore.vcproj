@@ -818,7 +818,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\decoder\core\inc\utils.h"
+					RelativePath="..\..\..\common\inc\utils.h"
 					>
 				</File>
 				<File
@@ -903,10 +903,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\common\src\logging.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\decoder\core\src\manage_dec_ref.cpp"
 					>
 				</File>
@@ -939,7 +935,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\decoder\core\src\utils.cpp"
+					RelativePath="..\..\..\common\src\utils.cpp"
 					>
 				</File>
 			</Filter>

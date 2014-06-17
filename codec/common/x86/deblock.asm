@@ -56,7 +56,7 @@ SECTION .text
 %ifdef  WIN64
 
 
-WELS_EXTERN   DeblockLumaLt4V_ssse3
+WELS_EXTERN DeblockLumaLt4V_ssse3
     push        rbp
     mov         r11,[rsp + 16 + 20h]  ; pTC
     PUSH_XMM 16
@@ -313,7 +313,7 @@ WELS_EXTERN   DeblockLumaLt4V_ssse3
     ret
 
 
-WELS_EXTERN   DeblockLumaEq4V_ssse3
+WELS_EXTERN DeblockLumaEq4V_ssse3
     mov         rax,rsp
     push        rbx
     push        rbp
@@ -773,7 +773,7 @@ WELS_EXTERN   DeblockLumaEq4V_ssse3
     ret
 
 
-WELS_EXTERN  DeblockChromaLt4V_ssse3
+WELS_EXTERN DeblockChromaLt4V_ssse3
     mov         rax,rsp
     push        rbx
     push        rdi
@@ -934,7 +934,7 @@ WELS_EXTERN  DeblockChromaLt4V_ssse3
     ret
 
 
-WELS_EXTERN   DeblockChromaEq4V_ssse3
+WELS_EXTERN DeblockChromaEq4V_ssse3
     mov         rax,rsp
     push        rbx
     PUSH_XMM 15
@@ -1088,7 +1088,7 @@ WELS_EXTERN   DeblockChromaEq4V_ssse3
 
 
 
-WELS_EXTERN   DeblockChromaEq4H_ssse3
+WELS_EXTERN DeblockChromaEq4H_ssse3
     mov         rax,rsp
     mov         [rax+20h],rbx
     push        rdi
@@ -1637,7 +1637,7 @@ WELS_EXTERN DeblockChromaLt4H_ssse3
 %elifdef  UNIX64
 
 
-WELS_EXTERN   DeblockLumaLt4V_ssse3
+WELS_EXTERN DeblockLumaLt4V_ssse3
     push        rbp
     mov         r11,r8  ; pTC
     sub         rsp,1B0h
@@ -2351,7 +2351,7 @@ WELS_EXTERN DeblockLumaEq4V_ssse3
     pop         rbx
     ret
 
-WELS_EXTERN  DeblockChromaLt4V_ssse3
+WELS_EXTERN DeblockChromaLt4V_ssse3
     mov         rax,rsp
     push        rbx
     push        rbp
@@ -3232,7 +3232,7 @@ WELS_EXTERN DeblockChromaLt4H_ssse3
 ;  void DeblockChromaEq4V_ssse3(uint8_t * pPixCb, uint8_t * pPixCr, int32_t iStride,
 ;                             int32_t iAlpha, int32_t iBeta)
 ;********************************************************************************
-WELS_EXTERN   DeblockChromaEq4V_ssse3
+WELS_EXTERN DeblockChromaEq4V_ssse3
     push        ebp
     mov         ebp,esp
     and         esp,0FFFFFFF0h
@@ -3399,7 +3399,7 @@ WELS_EXTERN   DeblockChromaEq4V_ssse3
 ;                           int32_t iAlpha, int32_t iBeta, int8_t * pTC);
 ;*******************************************************************************
 
-WELS_EXTERN  DeblockChromaLt4V_ssse3
+WELS_EXTERN DeblockChromaLt4V_ssse3
     push        ebp
     mov         ebp,esp
     and         esp,0FFFFFFF0h
@@ -3600,7 +3600,7 @@ WELS_EXTERN  DeblockChromaLt4V_ssse3
 ;          int32_t iAlpha, int32_t iBeta)
 ;***************************************************************************
 
-WELS_EXTERN     DeblockChromaEq4H_ssse3
+WELS_EXTERN DeblockChromaEq4H_ssse3
     push        ebp
     mov         ebp,esp
     and         esp,0FFFFFFF0h
@@ -3881,7 +3881,7 @@ WELS_EXTERN     DeblockChromaEq4H_ssse3
 ;                                int32_t iAlpha, int32_t iBeta, int8_t * pTC);
 ;*******************************************************************************
 
-WELS_EXTERN  DeblockChromaLt4H_ssse3
+WELS_EXTERN DeblockChromaLt4H_ssse3
     push        ebp
     mov         ebp,esp
     and         esp,0FFFFFFF0h
@@ -4193,7 +4193,7 @@ WELS_EXTERN  DeblockChromaLt4H_ssse3
 ;*******************************************************************************
 
 
-WELS_EXTERN  DeblockLumaLt4V_ssse3
+WELS_EXTERN DeblockLumaLt4V_ssse3
     push    ebp
     mov ebp, esp
     and esp, -16                ; fffffff0H
@@ -4581,7 +4581,7 @@ WELS_EXTERN  DeblockLumaLt4V_ssse3
 ;*******************************************************************************
 
 
-WELS_EXTERN  DeblockLumaEq4V_ssse3
+WELS_EXTERN DeblockLumaEq4V_ssse3
 
     push    ebp
     mov ebp, esp
@@ -5130,7 +5130,7 @@ WELS_EXTERN  DeblockLumaEq4V_ssse3
 ;
 ;********************************************************************************
 
-WELS_EXTERN  DeblockLumaTransposeH2V_sse2
+WELS_EXTERN DeblockLumaTransposeH2V_sse2
     push     r3
     push     r4
     push     r5
@@ -5207,7 +5207,7 @@ WELS_EXTERN  DeblockLumaTransposeH2V_sse2
 ;
 ;*******************************************************************************************
 
-WELS_EXTERN   DeblockLumaTransposeV2H_sse2
+WELS_EXTERN DeblockLumaTransposeV2H_sse2
     push     r3
     push     r4
 

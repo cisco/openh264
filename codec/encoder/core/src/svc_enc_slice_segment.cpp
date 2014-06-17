@@ -118,7 +118,7 @@ int32_t AssignMbMapMultipleSlices (SSliceCtx* pSliceSeg, const SSliceConfig* kpM
 }
 
 /*!
- *  Check slices assignment setttings on MST_INTERLEAVE type
+ *  Check slices assignment settings on MST_INTERLEAVE type
  */
 
 //slice parameter check for SM_FIXEDSLCNUM_SLICE
@@ -276,7 +276,7 @@ void GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,
 
   while (uiSliceIdx + 1 < kuiSliceNum) {
     // GOM boundary aligned
-    int32_t iNumMbAssigning = WELS_ROUND (1.0f * kiMbNumPerSlice / iGomSize) * iGomSize;
+    int32_t iNumMbAssigning = WELS_DIV_ROUND(INT_MULTIPLY * kiMbNumPerSlice, iGomSize * INT_MULTIPLY) * iGomSize;
 
     // make sure one GOM at least in each slice for safe
     if (iNumMbAssigning < iMinimalMbNum)
@@ -407,6 +407,7 @@ int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
 
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pOverallMbMap)
 
+    memset (pSliceSeg->pOverallMbMap, 0, kiCountMbNum * sizeof (uint8_t));
     //SM_DYN_SLICE: init, set pSliceSeg->iSliceNumInFrame	= 1;
     pSliceSeg->iSliceNumInFrame = GetInitialSliceNum (kiMbWidth, kiMbHeight, pMso);
 

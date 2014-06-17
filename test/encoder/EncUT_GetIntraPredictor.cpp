@@ -32,9 +32,9 @@ TEST(GetIntraPredictorTest, TestGetI4x4LumaPredH)
   const uint32_t kiStride3 = kiStride + kiStride2;
 
   uint8_t *pPred = new uint8_t[64];
-  uint8_t *pRef  = new uint8_t[kiStride3+1];
+  uint8_t *pRef  = new uint8_t[kiStride3+2];
 
-  for (int i=0; i<(static_cast<int32_t>(kiStride3+1)); i++)
+  for (int i=0; i<(static_cast<int32_t>(kiStride3+2)); i++)
     pRef[i] = rand() % 256;
 
   pRef++;
@@ -509,7 +509,9 @@ TEST(GetIntraPredictorTest, TestGetI16x16LumaPredPlane) {
   }
 
   pRef -= kiStride + 1;
+  pPred -= (iPredStride * 16);
   delete []pRef;
+  delete []pPred;
 }
 
 TEST(GetIntraPredictorTest, TestGetI16x16LumaPredDc) {

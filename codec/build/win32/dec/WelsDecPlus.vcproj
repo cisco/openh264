@@ -421,7 +421,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\decoder\plus\src\welsCodecTrace.cpp"
+					RelativePath="..\..\..\common\src\welsCodecTrace.cpp"
 					>
 				</File>
 				<File
@@ -438,7 +438,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\decoder\plus\inc\welsCodecTrace.h"
+					RelativePath="..\..\..\common\inc\welsCodecTrace.h"
 					>
 				</File>
 				<File

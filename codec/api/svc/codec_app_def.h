@@ -93,7 +93,9 @@ typedef enum {
 
   ENCODER_OPTION_CURRENT_PATH,
   ENCODER_OPTION_DUMP_FILE,
-  ENCODER_OPTION_TRACE_LEVEL
+  ENCODER_OPTION_TRACE_LEVEL,
+  ENCODER_OPTION_TRACE_CALLBACK, // a void (*)(void* context, int level, const char* message) function which receives log messages
+  ENCODER_OPTION_TRACE_CALLBACK_CONTEXT,
 } ENCODER_OPTION;
 
 /* Option types introduced in decoder application */
@@ -107,6 +109,9 @@ typedef enum {
   DECODER_OPTION_LTR_MARKING_FLAG,	// feedback wether current frame mark a LTR
   DECODER_OPTION_LTR_MARKED_FRAME_NUM,	// feedback frame num marked by current Frame
   DECODER_OPTION_ERROR_CON_IDC, //not finished yet, indicate decoder error concealment status, in progress
+  DECODER_OPTION_TRACE_LEVEL,
+  DECODER_OPTION_TRACE_CALLBACK, // a void (*)(void* context, int level, const char* message) function which receives log messages
+  DECODER_OPTION_TRACE_CALLBACK_CONTEXT,
 
 } DECODER_OPTION;
 
@@ -225,6 +230,18 @@ typedef enum {
   LEVEL_5_1,
   LEVEL_5_2
 } ELevelIdc;
+
+
+enum {
+  WELS_LOG_QUIET		= 0x00,		// Quiet mode
+  WELS_LOG_ERROR		= 1 << 0,	// Error log iLevel
+  WELS_LOG_WARNING	= 1 << 1,	// Warning log iLevel
+  WELS_LOG_INFO		= 1 << 2,	// Information log iLevel
+  WELS_LOG_DEBUG		= 1 << 3,	// Debug log iLevel
+  WELS_LOG_RESV		= 1 << 4,	// Resversed log iLevel
+  WELS_LOG_LEVEL_COUNT = 5,
+  WELS_LOG_DEFAULT	= WELS_LOG_DEBUG	// Default log iLevel in Wels codec
+};
 
 typedef struct {
   SliceModeEnum uiSliceMode; //by default, uiSliceMode will be SM_SINGLE_SLICE

@@ -1,10 +1,12 @@
-# Generate the libwelsdecdemo.so file
+# Generate the libwelsencdemo.so file
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE    := wels
 LOCAL_SRC_FILES := ../../../../../libopenh264.so
+ifneq (,$(wildcard $(LOCAL_PATH)/$(LOCAL_SRC_FILES)))
 include $(PREBUILT_SHARED_LIBRARY)
+endif
 
 
 
@@ -23,7 +25,6 @@ CONSOLE_ENC_PATH := ../../../../console/enc
 LOCAL_SRC_FILES := \
             $(CONSOLE_ENC_PATH)/src/welsenc.cpp \
             $(CONSOLE_ENC_PATH)/src/read_config.cpp \
-            $(CODEC_PATH)/common/src/logging.cpp \
             myjni.cpp
 
 #

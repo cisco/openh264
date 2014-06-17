@@ -35,13 +35,6 @@
 			remoteGlobalIDString = 4CE4431118B6FFA00017DF25;
 			remoteInfo = welsenc;
 		};
-		FAFB4FE918BC8E7D00315438 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FAFB4FE218BC8E7C00315438 /* welsenc.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4CE4432118B6FFA00017DF25;
-			remoteInfo = welsencTests;
-		};
 		FAFB4FF018BC8E8600315438 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FAFB4FEB18BC8E8600315438 /* common.xcodeproj */;
@@ -49,26 +42,12 @@
 			remoteGlobalIDString = 4CE443D518B722CD0017DF25;
 			remoteInfo = common;
 		};
-		FAFB4FF218BC8E8600315438 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FAFB4FEB18BC8E8600315438 /* common.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4CE443E518B722CD0017DF25;
-			remoteInfo = commonTests;
-		};
 		FAFB4FF918BC8E9A00315438 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FAFB4FF418BC8E9A00315438 /* processing.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 4CE4443118B724B60017DF25;
 			remoteInfo = processing;
-		};
-		FAFB4FFB18BC8E9A00315438 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FAFB4FF418BC8E9A00315438 /* processing.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4CE4444118B724B60017DF25;
-			remoteInfo = processingTests;
 		};
 		FAFB4FFD18BC8EAA00315438 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -112,7 +91,6 @@
 		FAFB4FC018BC8DD700315438 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		FAFB4FC118BC8DD700315438 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		FAFB4FC318BC8DD700315438 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		FAFB4FCA18BC8DD700315438 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		FAFB4FE218BC8E7C00315438 /* welsenc.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = welsenc.xcodeproj; path = ../welsenc/welsenc.xcodeproj; sourceTree = "<group>"; };
 		FAFB4FEB18BC8E8600315438 /* common.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = common.xcodeproj; path = ../../common/common.xcodeproj; sourceTree = "<group>"; };
 		FAFB4FF418BC8E9A00315438 /* processing.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = processing.xcodeproj; path = ../../../../processing/build/iOS/processing.xcodeproj; sourceTree = "<group>"; };
@@ -164,7 +142,6 @@
 				FAFB4FA818BC8DD700315438 /* Foundation.framework */,
 				FAFB4FAA18BC8DD700315438 /* CoreGraphics.framework */,
 				FAFB4FAC18BC8DD700315438 /* UIKit.framework */,
-				FAFB4FCA18BC8DD700315438 /* XCTest.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -203,7 +180,6 @@
 			isa = PBXGroup;
 			children = (
 				FAFB4FE818BC8E7D00315438 /* libwelsenc.a */,
-				FAFB4FEA18BC8E7D00315438 /* welsencTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -212,7 +188,6 @@
 			isa = PBXGroup;
 			children = (
 				FAFB4FF118BC8E8600315438 /* libcommon.a */,
-				FAFB4FF318BC8E8600315438 /* commonTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -221,7 +196,6 @@
 			isa = PBXGroup;
 			children = (
 				FAFB4FFA18BC8E9A00315438 /* libprocessing.a */,
-				FAFB4FFC18BC8E9A00315438 /* processingTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -325,13 +299,6 @@
 			remoteRef = FAFB4FE718BC8E7D00315438 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		FAFB4FEA18BC8E7D00315438 /* welsencTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = welsencTests.xctest;
-			remoteRef = FAFB4FE918BC8E7D00315438 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		FAFB4FF118BC8E8600315438 /* libcommon.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -339,25 +306,11 @@
 			remoteRef = FAFB4FF018BC8E8600315438 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		FAFB4FF318BC8E8600315438 /* commonTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = commonTests.xctest;
-			remoteRef = FAFB4FF218BC8E8600315438 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		FAFB4FFA18BC8E9A00315438 /* libprocessing.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libprocessing.a;
 			remoteRef = FAFB4FF918BC8E9A00315438 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FAFB4FFC18BC8E9A00315438 /* processingTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = processingTests.xctest;
-			remoteRef = FAFB4FFB18BC8E9A00315438 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */

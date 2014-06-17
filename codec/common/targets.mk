@@ -5,8 +5,9 @@ COMMON_CPP_SRCS=\
 	$(COMMON_SRCDIR)/src/crt_util_safe_x.cpp\
 	$(COMMON_SRCDIR)/src/deblocking_common.cpp\
 	$(COMMON_SRCDIR)/src/expand_pic.cpp\
-	$(COMMON_SRCDIR)/src/logging.cpp\
 	$(COMMON_SRCDIR)/src/sad_common.cpp\
+	$(COMMON_SRCDIR)/src/utils.cpp\
+	$(COMMON_SRCDIR)/src/welsCodecTrace.cpp\
 	$(COMMON_SRCDIR)/src/WelsThreadLib.cpp\
 
 COMMON_OBJS += $(COMMON_CPP_SRCS:.cpp=.$(OBJ))
@@ -37,6 +38,7 @@ endif
 
 ifeq ($(ASM_ARCH), arm64)
 COMMON_ASM_ARM64_SRCS=\
+	$(COMMON_SRCDIR)/arm64/deblocking_aarch64_neon.S\
 	$(COMMON_SRCDIR)/arm64/expand_picture_aarch64_neon.S\
 	$(COMMON_SRCDIR)/arm64/mc_aarch64_neon.S\
 

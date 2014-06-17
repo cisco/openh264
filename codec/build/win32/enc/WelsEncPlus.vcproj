@@ -427,7 +427,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\plus\src\welsCodecTrace.cpp"
+				RelativePath="..\..\..\common\src\welsCodecTrace.cpp"
 				>
 			</File>
 			<File
@@ -440,7 +440,7 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="..\..\..\encoder\plus\inc\welsCodecTrace.h"
+				RelativePath="..\..\..\common\inc\welsCodecTrace.h"
 				>
 			</File>
 			<File

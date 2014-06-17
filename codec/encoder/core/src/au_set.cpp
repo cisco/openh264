@@ -41,14 +41,6 @@
 #include "au_set.h"
 #include "svc_enc_golomb.h"
 namespace WelsSVCEnc {
-static const uint32_t g_kuiMaxDPBx2AtLevel[52] = { // *2 on the basic of Annex A, Table A-1, for int32_t type
-  0,		0,		0,		0,		0,	0,	0,	0,	0,	0, //0~9
-  297,	675,	1782,	1782,	0,	0,	0,	0,	0,	0, //10, 11, 12, 13
-  1782,	3564,	6075,	0,		0,	0,	0,	0,	0,	0, //20, 21, 22
-  6075,	13500,	15360,	0,		0,	0,	0,	0,	0,	0, //30, 31, 32
-  24576,	24576,	26112,	0,		0,	0,	0,	0,	0,	0, //40, 41, 42
-  82800,	138240											//50, 51
-};
 
 
 #define LEVEL_NUMBER 16
@@ -364,14 +356,14 @@ static inline bool WelsGetPaddingOffset (int32_t iActualWidth, int32_t iActualHe
 
   return (iWidth > iActualWidth) || (iHeight > iActualHeight);
 }
-int32_t WelsInitSps (SWelsSPS* pSps, SDLayerParam* pLayerParam, const uint32_t kuiIntraPeriod,
-                     const int32_t kiNumRefFrame,
+int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialLayerInternal* pLayerParamInternal,
+                     const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame,
                      const uint32_t kuiSpsId, const bool kbEnableFrameCropping, bool bEnableRc) {
   memset (pSps, 0, sizeof (SWelsSPS));
 
   pSps->uiSpsId		= kuiSpsId;
-  pSps->iMbWidth	= (pLayerParam->iFrameWidth + 15) >> 4;
-  pSps->iMbHeight	= (pLayerParam->iFrameHeight + 15) >> 4;
+  pSps->iMbWidth	= (pLayerParam->iVideoWidth + 15) >> 4;
+  pSps->iMbHeight	= (pLayerParam->iVideoHeight + 15) >> 4;
 
   if (0 == kuiIntraPeriod) {
     //max value of both iFrameNum and POC are 2^16-1, in our encoder, iPOC=2*iFrameNum, so max of iFrameNum should be 2^15-1.--
@@ -388,8 +380,8 @@ int32_t WelsInitSps (SWelsSPS* pSps, SDLayerParam* pLayerParam, const uint32_t k
 
   if (kbEnableFrameCropping) {
     // TODO: get frame_crop_left_offset, frame_crop_right_offset, frame_crop_top_offset, frame_crop_bottom_offset
-    pSps->bFrameCroppingFlag = WelsGetPaddingOffset (pLayerParam->iActualWidth, pLayerParam->iActualHeight,
-                               pLayerParam->iFrameWidth, pLayerParam->iFrameHeight, pSps->sFrameCrop);
+    pSps->bFrameCroppingFlag = WelsGetPaddingOffset (pLayerParamInternal->iActualWidth, pLayerParamInternal->iActualHeight,
+                               pLayerParam->iVideoWidth, pLayerParam->iVideoHeight, pSps->sFrameCrop);
   } else {
     pSps->bFrameCroppingFlag	= false;
   }
@@ -397,9 +389,9 @@ int32_t WelsInitSps (SWelsSPS* pSps, SDLayerParam* pLayerParam, const uint32_t k
   pSps->uiProfileIdc	= pLayerParam->uiProfileIdc ? pLayerParam->uiProfileIdc : PRO_BASELINE;
 
   if (bEnableRc)  //fixed QP condition
-    pSps->iLevelIdc	= WelsGetLevelIdc (pSps, pLayerParam->fOutputFrameRate, pLayerParam->iSpatialBitrate);
+    pSps->iLevelIdc	= WelsGetLevelIdc (pSps, pLayerParamInternal->fOutputFrameRate, pLayerParam->iSpatialBitrate);
   else
-    pSps->iLevelIdc  = WelsGetLevelIdc (pSps, pLayerParam->fOutputFrameRate,
+    pSps->iLevelIdc  = WelsGetLevelIdc (pSps, pLayerParamInternal->fOutputFrameRate,
                                         0); // Set tar_br = 0 to remove the bitrate constraint; a better way is to set actual tar_br as 0
 
   //for Scalable Baseline, Scalable High, and Scalable High Intra profiles.If level_idc is equal to 9, the indicated level is level 1b.
@@ -413,14 +405,16 @@ int32_t WelsInitSps (SWelsSPS* pSps, SDLayerParam* pLayerParam, const uint32_t k
 }
 
 
-int32_t WelsInitSubsetSps (SSubsetSps* pSubsetSps, SDLayerParam* pLayerParam, const uint32_t kuiIntraPeriod,
-                           const int32_t kiNumRefFrame,
+int32_t WelsInitSubsetSps (SSubsetSps* pSubsetSps, SSpatialLayerConfig* pLayerParam,
+                           SSpatialLayerInternal* pLayerParamInternal,
+                           const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame,
                            const uint32_t kuiSpsId, const bool kbEnableFrameCropping, bool bEnableRc) {
   SWelsSPS* pSps = &pSubsetSps->pSps;
 
   memset (pSubsetSps, 0, sizeof (SSubsetSps));
 
-  WelsInitSps (pSps, pLayerParam, kuiIntraPeriod, kiNumRefFrame, kuiSpsId, kbEnableFrameCropping, bEnableRc);
+  WelsInitSps (pSps, pLayerParam, pLayerParamInternal, kuiIntraPeriod, kiNumRefFrame, kuiSpsId, kbEnableFrameCropping,
+               bEnableRc);
 
   pSps->uiProfileIdc	= (pLayerParam->uiProfileIdc >= PRO_SCALABLE_BASELINE) ? pLayerParam->uiProfileIdc :
                         PRO_SCALABLE_BASELINE;

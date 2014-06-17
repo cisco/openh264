@@ -1,7 +1,6 @@
 /*!
  * \copy
  *     Copyright (c)  2013, Cisco Systems
- *     Copyright (c)  2013, Mozilla
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -31,19 +30,34 @@
  *
  */
 
+#ifndef WELS_CODEC_TRACE
+#define WELS_CODEC_TRACE
+
 #include <stdarg.h>
-#include <stdio.h>
 #include "typedefs.h"
+#include "utils.h"
+#include "codec_app_def.h"
+#include "codec_api.h"
 
-static int32_t g_TraceLevel = 0;
+class welsCodecTrace {
+ public:
+  welsCodecTrace();
+  ~welsCodecTrace();
 
-void WelsStderrSetTraceLevel (int32_t level) {
-  g_TraceLevel = level;
-}
+  void SetTraceLevel (const int32_t kiLevel);
+  void SetTraceCallback (WelsTraceCallback func);
+  void SetTraceCallbackContext (void* pCtx);
 
-int32_t welsStderrLevelTrace (int32_t level, const char* format, va_list ap) {
-  if (level < g_TraceLevel) {
-    vfprintf (stderr, format, ap);
-  }
-  return 0;
-}
+ private:
+  static void StaticCodecTrace (void* pCtx, const int32_t kiLevel, const char* kpStrFormat, va_list vl);
+  void CodecTrace (const int32_t kiLevel, const char* kpStrFormat, va_list vl);
+
+  int32_t	m_iTraceLevel;
+  WelsTraceCallback m_fpTrace;
+  void*         m_pTraceCtx;
+ public:
+
+  SLogContext m_sLogCtx;
+};
+
+#endif //WELS_CODEC_TRACE

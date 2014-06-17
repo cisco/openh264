@@ -164,6 +164,7 @@ enum {
  */
 
 typedef struct TagWelsDecoderContext {
+  SLogContext sLogCtx;
   // Input
   void*				pArgDec;			// structured arguments for decoder, reserved here for extension in the future
 
@@ -229,6 +230,7 @@ typedef struct TagWelsDecoderContext {
   SVlcTable			sVlcTable;		 // vlc table
 
   SBitStringAux		sBs;
+  int32_t iMaxBsBufferSizeInByte; //actual memory size for BS buffer
 
   /* Global memory external */
 
@@ -258,6 +260,7 @@ typedef struct TagWelsDecoderContext {
   uint8_t				uiTargetDqId;		// maximal DQ ID in current access unit, meaning target layer ID
   bool				bAvcBasedFlag;		// For decoding bitstream:
   bool				bEndOfStreamFlag;	// Flag on end of stream requested by external application layer
+  bool                          bInstantDecFlag;        // Flag for no-delay decoding
   bool				bInitialDqLayersMem;	// dq layers related memory is available?
 
   bool              bOnlyOneLayerInCurAuFlag; //only one layer in current AU: 1

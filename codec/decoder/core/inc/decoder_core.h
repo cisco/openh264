@@ -48,6 +48,28 @@
 #include "codec_def.h"
 
 namespace WelsDec {
+/*
+ * InitBsBuffer
+ * Memory allocation for Bitstream Buffer
+ * return:
+ *	0 - success; otherwise returned error_no defined in error_no.h.
+ */
+int32_t InitBsBuffer (PWelsDecoderContext pCtx);
+
+/*
+ * ExpandBsBuffer
+ * Expand current BS buffer and copy its content
+ * new buffer size will consider input size as a reference
+ * return:
+ *	0 - success; otherwise returned error_no defined in error_no.h.
+ */
+int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen);
+
+/*
+ * CheckBsBuffer
+ * Check if current buffer size is enough
+ */
+int32_t CheckBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen);
 
 /*
  * WelsInitMemory
@@ -56,7 +78,7 @@ namespace WelsDec {
  * rbsp_au_buffer, cur_dq_layer_ptr and ref_dq_layer_ptr in MB info cache.
  * return:
  *	0 - success; otherwise returned error_no defined in error_no.h.
-*/
+ */
 int32_t WelsInitMemory (PWelsDecoderContext pCtx);
 
 /*
@@ -117,8 +139,12 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
  * DecodeCurrentAccessUnit
  * Decode current access unit when current AU is completed.
  */
-int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, int32_t* iDstLen, int32_t* pWidth,
-                                 int32_t* pHeight, SBufferInfo* pDstInfo);
+int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo);
+
+/*
+ * Check if frame is completed and EC is required
+ */
+bool CheckAndDoEC (PWelsDecoderContext pCtx, uint8_t** pDst, SBufferInfo* pDstInfo);
 
 /*
  *	Prepare current dq layer context initialization.

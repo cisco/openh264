@@ -51,7 +51,6 @@
 #include "typedefs.h"
 #include "measure_time.h"
 #include "d3d9_utils.h"
-#include "logging.h"
 
 
 using namespace std;
@@ -311,6 +310,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
 
   SDecodingParam sDecParam = {0};
   string strInputFile (""), strOutputFile (""), strOptionFile ("");
+  int iLevelSetting = -1;
 
   sDecParam.sVideoProperty.size = sizeof (sDecParam.sVideoProperty);
 
@@ -384,14 +384,14 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
 
         if (!strcmp (cmd, "-options")) {
           if (i + 1 < iArgC)
-            strOptionFile = pArgV[i++];
+            strOptionFile = pArgV[++i];
           else {
             printf ("options file not specified.\n");
             return 1;
           }
         } else if (!strcmp (cmd, "-trace")) {
           if (i + 1 < iArgC)
-            WelsStderrSetTraceLevel (atoi (pArgV[i++]));
+            iLevelSetting = atoi (pArgV[++i]);
           else {
             printf ("trace level not specified.\n");
             return 1;
@@ -417,6 +417,9 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
   if (WelsCreateDecoder (&pDecoder)  || (NULL == pDecoder)) {
     printf ("Create Decoder failed.\n");
     return 1;
+  }
+  if (iLevelSetting >= 0) {
+    pDecoder->SetOption (DECODER_OPTION_TRACE_LEVEL, &iLevelSetting);
   }
 
   if (pDecoder->Initialize (&sDecParam)) {
