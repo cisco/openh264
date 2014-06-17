@@ -740,7 +740,7 @@ void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, co
 void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
   const int32_t kiCurDid				= pEnc->uiDependencyId;
   SWelsSvcCodingParam* pSvcParam	= pEnc->pSvcParam;
-  SDLayerParam* pDlp					= &pSvcParam->sDependencyLayers[kiCurDid];
+  SSpatialLayerConfig* pSpatialLayer = &pSvcParam->sSpatialLayers[kiCurDid];
   SDqLayer* pCurLayer					= pEnc->pCurDqLayer;
 
   if (pCurLayer->iLoopFilterDisableIdc == 0) {
@@ -749,7 +749,7 @@ void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
     int32_t iSliceCount			= 0;
     int32_t iSliceIdx			= 0;
 
-    if (SM_DYN_SLICE != pDlp->sSliceCfg.uiSliceMode) {
+    if (SM_DYN_SLICE != pSpatialLayer->sSliceCfg.uiSliceMode) {
       iSliceCount	= GetCurrentSliceNum (pCurLayer->pSliceEncCtx);
       do {
         DeblockingFilterSliceAvcbase (pCurLayer, pEnc->pFuncList, iSliceIdx);

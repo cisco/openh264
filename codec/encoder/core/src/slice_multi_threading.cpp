@@ -322,7 +322,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 
   iIdx = 0;
   while (iIdx < iNumSpatialLayers) {
-    SSliceConfig* pMso	= &pPara->sDependencyLayers[iIdx].sSliceCfg;
+    SSliceConfig* pMso	= &pPara->sSpatialLayers[iIdx].sSliceCfg;
     const int32_t kiSliceNum = pMso->sSliceArgument.uiSliceNum;
     if (((pMso->uiSliceMode == SM_FIXEDSLCNUM_SLICE) || (pMso->uiSliceMode == SM_AUTO_SLICE))
         && pPara->iMultipleThreadIdc > 1
@@ -520,7 +520,7 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
 
 int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32_t iSliceCount) {
   SWelsSvcCodingParam* pCodingParam	= pCtx->pSvcParam;
-  SDLayerParam* pDlp				= &pCodingParam->sDependencyLayers[pCtx->uiDependencyId];
+  SSpatialLayerConfig* pDlp				= &pCodingParam->sSpatialLayers[pCtx->uiDependencyId];
   SWelsSliceBs* pSliceBs			= NULL;
   const bool kbIsDynamicSlicingMode	= (pDlp->sSliceCfg.uiSliceMode == SM_DYN_SLICE);
 
@@ -717,7 +717,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
       const int32_t kiCurDid			= pEncPEncCtx->uiDependencyId;
       const int32_t kiCurTid			= pEncPEncCtx->uiTemporalId;
       SWelsSvcCodingParam* pCodingParam	= pEncPEncCtx->pSvcParam;
-      SDLayerParam* pParamD			= &pCodingParam->sDependencyLayers[kiCurDid];
+      SSpatialLayerConfig* pParamD			= &pCodingParam->sSpatialLayers[kiCurDid];
 
       pCurDq			= pEncPEncCtx->pCurDqLayer;
       eNalType		= pEncPEncCtx->eNalType;
@@ -788,7 +788,8 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         if (pCurDq->bDeblockingParallelFlag && pSlice->sSliceHeaderExt.sSliceHeader.uiDisableDeblockingFilterIdc != 1
 #if !defined(ENABLE_FRAME_DUMP)
             && (eNalRefIdc != NRI_PRI_LOWEST) &&
-            (pParamD->iHighestTemporalId == 0 || kiCurTid < pParamD->iHighestTemporalId)
+            (pCodingParam->sDependencyLayers[kiCurDid].iHighestTemporalId == 0
+             || kiCurTid < pCodingParam->sDependencyLayers[kiCurDid].iHighestTemporalId)
 #endif// !ENABLE_FRAME_DUMP
            ) {
           DeblockingFilterSliceAvcbase (pCurDq, pEncPEncCtx->pFuncList, iSliceIdx);
@@ -896,7 +897,8 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
           if (pCurDq->bDeblockingParallelFlag && pSlice->sSliceHeaderExt.sSliceHeader.uiDisableDeblockingFilterIdc != 1
 #if !defined(ENABLE_FRAME_DUMP)
               && (eNalRefIdc != NRI_PRI_LOWEST) &&
-              (pParamD->iHighestTemporalId == 0 || kiCurTid < pParamD->iHighestTemporalId)
+              (pCodingParam->sDependencyLayers[kiCurDid].iHighestTemporalId == 0
+               || kiCurTid < pCodingParam->sDependencyLayers[kiCurDid].iHighestTemporalId)
 #endif// !ENABLE_FRAME_DUMP
              ) {
             DeblockingFilterSliceAvcbase (pCurDq, pEncPEncCtx->pFuncList, iSliceIdx);
@@ -1050,8 +1052,8 @@ int32_t AdjustEnhanceLayer (sWelsEncCtx* pCtx, int32_t iCurDid) {
   // if using spatial base layer for complexity estimation
 
   const bool kbModelingFromSpatial =	(pCtx->pCurDqLayer->pRefLayer != NULL && iCurDid > 0)
-                                      && (pCtx->pSvcParam->sDependencyLayers[iCurDid - 1].sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE
-                                          && pCtx->pSvcParam->iMultipleThreadIdc >= pCtx->pSvcParam->sDependencyLayers[iCurDid -
+                                      && (pCtx->pSvcParam->sSpatialLayers[iCurDid - 1].sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE
+                                          && pCtx->pSvcParam->iMultipleThreadIdc >= pCtx->pSvcParam->sSpatialLayers[iCurDid -
                                               1].sSliceCfg.sSliceArgument.uiSliceNum);
 
   if (kbModelingFromSpatial) {	// using spatial base layer for complexity estimation
@@ -1115,7 +1117,7 @@ void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t 
   pPara	= pCtx->pSvcParam;
   while (iSpatialIdx < iSpatialNum) {
     const int32_t kiDid		= pDidList[iSpatialIdx];
-    SDLayerParam* pDlp		= &pPara->sDependencyLayers[kiDid];
+    SSpatialLayerInternal* pDlp		= &pPara->sDependencyLayers[kiDid];
     SSliceConfig* pMso		= &pDlp->sSliceCfg;
     SDqLayer* pCurDq		= pCtx->ppDqLayerList[kiDid];
     SSliceCtx* pSliceCtx = pCurDq->pSliceEncCtx;

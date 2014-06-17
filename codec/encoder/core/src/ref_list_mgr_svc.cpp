@@ -356,7 +356,7 @@ bool WelsUpdateRefList (void* pEncCtx) {
   sWelsEncCtx* pCtx     = (sWelsEncCtx*)pEncCtx;
   SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SLTRState* pLtr			= &pCtx->pLtr[pCtx->uiDependencyId];
-  SDLayerParam* pParamD	= &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
+  SSpatialLayerInternal* pParamD	= &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
   const int32_t kiNumRef	= pCtx->pSvcParam->iNumRefFrame;
 
   int32_t iRefIdx			= 0;
@@ -708,7 +708,7 @@ bool WelsUpdateRefListScreen (void* pEncCtx) {
   sWelsEncCtx* pCtx     = (sWelsEncCtx*)pEncCtx;
   SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SLTRState* pLtr			= &pCtx->pLtr[pCtx->uiDependencyId];
-  SDLayerParam* pParamD	= &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
+  SSpatialLayerInternal* pParamD	= &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
   const uint8_t kuiTid		= pCtx->uiTemporalId;
   // Need update ref list in case store base layer or target dependency layer construction
   if (NULL == pCtx->pCurDqLayer)
@@ -763,9 +763,9 @@ bool WelsBuildRefListScreen (void* pEncCtx, const int32_t iPOC, int32_t iBestLtr
 
   if (pCtx->eSliceType != I_SLICE) {
     int iLtrRefIdx = 0;
-    SPicture *pRefOri = NULL;
+    SPicture* pRefOri = NULL;
     for (int idx = 0; idx < pVaaExt->iNumOfAvailableRef; idx++) {
-      iLtrRefIdx = pCtx->pVpp->GetRefFrameInfo(idx,pRefOri);
+      iLtrRefIdx = pCtx->pVpp->GetRefFrameInfo (idx, pRefOri);
       if (iLtrRefIdx >= 0 && iLtrRefIdx <= pParam->iLTRRefNum) {
         SPicture* pRefPic = pRefList->pLongRefList[iLtrRefIdx];
         if (pRefPic != NULL && pRefPic->bUsedAsRef && pRefPic->bIsLongRef) {
