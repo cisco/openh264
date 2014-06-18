@@ -32,6 +32,7 @@
 
 #include "ScrollDetection.h"
 #include "ScrollDetectionFuncs.h"
+#include "ls_defines.h"
 
 WELSVP_NAMESPACE_BEGIN
 
@@ -98,9 +99,9 @@ int32_t SelectTestLine (uint8_t* pY, int32_t iWidth, int32_t iHeight, int32_t iP
 int32_t CompareLine (uint8_t* pYSrc, uint8_t* pYRef, const int32_t kiWidth) {
   int32_t iCmp = 1;
 
-  if (* ((int32_t*)pYSrc) != * ((int32_t*)pYRef)) return 1;
-  if (* ((int32_t*) (pYSrc + 4)) != * ((int32_t*) (pYRef + 4))) return 1;
-  if (* ((int32_t*) (pYSrc + 8)) != * ((int32_t*) (pYRef + 8))) return 1;
+  if (LD32 (pYSrc) != LD32 (pYRef)) return 1;
+  if (LD32 (pYSrc + 4) != LD32 (pYRef + 4)) return 1;
+  if (LD32 (pYSrc + 8) != LD32 (pYRef + 8)) return 1;
   if (kiWidth > 12)
     iCmp = WelsMemcmp (pYSrc + 12, pYRef + 12, kiWidth - 12);
   return iCmp;
