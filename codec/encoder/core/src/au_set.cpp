@@ -182,8 +182,6 @@ int32_t WelsWriteSpsNal (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_t* 
 
   BsRbspTrailingBits (pBitStringAux);
 
-  BsFlush (pBitStringAux);
-
   return 0;
 }
 
@@ -232,8 +230,6 @@ int32_t WelsWriteSubsetSpsSyntax (SSubsetSps* pSubsetSps, SBitStringAux* pBitStr
   BsWriteOneBit (pBitStringAux, false/*pSubsetSps->bAdditionalExtension2Flag*/);
 
   BsRbspTrailingBits (pBitStringAux);
-
-  BsFlush (pBitStringAux);
 
   return 0;
 }
@@ -334,8 +330,6 @@ int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, SParaS
   BsWriteOneBit (pLocalBitStringAux, false/*pPps->bRedundantPicCntPresentFlag*/);
 
   BsRbspTrailingBits (pLocalBitStringAux);
-
-  BsFlush (pLocalBitStringAux);
 
   return 0;
 }

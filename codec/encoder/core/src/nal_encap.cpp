@@ -193,7 +193,6 @@ int32_t WelsWriteSVCPrefixNal (SBitStringAux* pBitStringAux, const int32_t kiNal
     BsWriteOneBit (pBitStringAux, false/*bStoreRefBasePicFlag*/);
     BsWriteOneBit (pBitStringAux, false);
     BsRbspTrailingBits (pBitStringAux);
-    BsFlush (pBitStringAux);
   }
   return 0;
 }
