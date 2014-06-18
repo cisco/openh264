@@ -15,7 +15,14 @@ PREFIX=/usr/local
 SHARED=-shared
 OBJ=o
 PROJECT_NAME=openh264
+MODULE_NAME=gmpopenh264
 CCASFLAGS=$(CFLAGS)
+
+ifeq (,$(wildcard ./gmp-api))
+HAVE_GMP_API=No
+else
+HAVE_GMP_API=Yes
+endif
 
 ifeq (,$(wildcard ./gtest))
 HAVE_GTEST=No
@@ -98,6 +105,8 @@ ENCODER_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(ENCODER_INCLUDES) -Ites
 PROCESSING_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(PROCESSING_INCLUDES) -Itest -Itest/processing
 API_TEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) -Itest -Itest/api
 COMMON_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(DECODER_INCLUDES) -Itest -Itest/common
+MODULE_INCLUDES = -Igmp-api
+
 .PHONY: test gtest-bootstrap clean
 
 all:	libraries binaries
@@ -107,6 +116,9 @@ ifeq (android,$(OS))
 clean: clean_Android
 endif
 	$(QUIET)rm -f $(OBJS) $(OBJS:.$(OBJ)=.d) $(LIBRARIES) $(BINARIES)
+
+gmp-bootstrap:
+	git clone https://github.com/mozilla/gmp-api gmp-api
 
 gtest-bootstrap:
 	svn co https://googletest.googlecode.com/svn/trunk/ gtest
@@ -131,6 +143,10 @@ include codec/decoder/targets.mk
 include codec/encoder/targets.mk
 include codec/processing/targets.mk
 
+ifeq ($(HAVE_GMP_API),Yes)
+include module/targets.mk
+endif
+
 ifneq (android, $(OS))
 ifneq (ios, $(OS))
 include codec/console/dec/targets.mk
@@ -151,6 +167,19 @@ $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROC
 	$(QUIET_AR)$(AR) $(AR_OPTS) $+
 
 $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
+	$(QUIET)rm -f $@
+	$(QUIET_CXX)$(CXX) $(SHARED) $(LDFLAGS) $(CXX_LINK_O) $+ $(SHLDFLAGS)
+
+ifeq ($(HAVE_GMP_API),Yes)
+plugin: $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX)
+PLUGINS += $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX)
+else
+plugin:
+	@echo "./gmp-api : No such file or directory."
+	@echo "You do not have gmp-api.  Run make gmp-bootstrap to get the gmp-api headers."
+endif
+
+$(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX): $(MODULE_OBJS) $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
 	$(QUIET)rm -f $@
 	$(QUIET_CXX)$(CXX) $(SHARED) $(LDFLAGS) $(CXX_LINK_O) $+ $(SHLDFLAGS)
 
