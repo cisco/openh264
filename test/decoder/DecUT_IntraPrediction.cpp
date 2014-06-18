@@ -5,13 +5,15 @@
 #include "get_intra_predictor.h"
 #include "typedefs.h"
 #include "ls_defines.h"
+#include "macros.h"
+
 using namespace WelsDec;
 #define GENERATE_4x4_UT(pred, ref, ASM, CPUFLAGS) \
   TEST(DecoderIntraPredictionTest, pred) { \
   const int32_t kiStride = 32; \
   int32_t iRunTimes = 1000; \
-  uint8_t pPredBuffer[9 * kiStride]; \
-  uint8_t pRefBuffer[9 * kiStride]; \
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pPredBuffer, 12 * kiStride, 4); \
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pRefBuffer, 12 * kiStride, 4); \
 if (ASM) {\
   int32_t  iNumberofCPUCore = 1; \
   uint32_t uiCPUFlags = WelsCPUFeatureDetect( &iNumberofCPUCore); \
@@ -21,16 +23,16 @@ if (ASM) {\
 }\
   srand((unsigned int)time(NULL)); \
   while(iRunTimes--) {\
-  for (int i = 0; i < 9; i++) {\
-    pRefBuffer[i] = pPredBuffer[i] = rand() & 255; \
-    pRefBuffer[i * kiStride] = pPredBuffer[i * kiStride] = rand() & 255; \
+  for (int i = 0; i < 12; i++) {\
+    pRefBuffer[kiStride * 3 + i] = pPredBuffer[kiStride * 3 + i] = rand() & 255; \
+    pRefBuffer[i * kiStride + 3] = pPredBuffer[i * kiStride + 3] = rand() & 255; \
   } \
-  pred (&pPredBuffer[kiStride + 1], kiStride); \
-  ref (&pRefBuffer[kiStride + 1], kiStride); \
+  pred (&pPredBuffer[kiStride * 4 + 4], kiStride); \
+  ref (&pRefBuffer[kiStride * 4 + 4], kiStride); \
   bool ok = true; \
   for (int i = 0; i < 4; i++) \
     for (int j = 0; j < 4; j++) \
-      if (pPredBuffer[(i+1) * kiStride + j + 1] != pRefBuffer[(i+1) * kiStride + j + 1]) { \
+      if (pPredBuffer[(i+4) * kiStride + j + 4] != pRefBuffer[(i+4) * kiStride + j + 4]) { \
         ok = false; \
         break; \
       } \
