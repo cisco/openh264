@@ -149,8 +149,9 @@ class FrameStats {
     ++frames_in_;
     time_t now = time(0);
 
-    if (now == last_time_)
+    if (now == last_time_) {
       return;
+    }
 
     if (!(frames_in_ % 10)) {
       GMPLOG(GL_INFO, type_ << ": " << now << " Frame count "
@@ -187,7 +188,6 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
 
   virtual ~OpenH264VideoEncoder() {
     worker_thread_->Join();
-    // TODO(ekr@rtfm.com)
   }
 
   virtual GMPVideoErr InitEncode(const GMPVideoCodec& codecSettings,
@@ -231,7 +231,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
     param.iRCMode = RC_BITRATE_MODE;
 
     // TODO(ekr@rtfm.com). Scary conversion from unsigned char to float below.
-    param.fMaxFrameRate = codecSettings.mMaxFramerate;
+    param.fMaxFrameRate = static_cast<float>(codecSettings.mMaxFramerate);
     param.iInputCsp = videoFormatI420;
 
     rv = encoder_->Initialize(&param);
@@ -259,7 +259,6 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
 
     stats_.FrameIn();
 
-    // TODO(josh): this is empty.
     assert(!frameTypes.empty());
     if (frameTypes.empty()) {
       GMPLOG(GL_ERROR, "No frame types provided");
@@ -321,7 +320,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
         has_frame = true;
         break;
       case videoFrameTypeSkip:
-        //can skip the call back since not actual bit stream will be generated
+        // Can skip the call back since no actual bitstream will be generated
         break;
       case videoFrameTypeIPMixed://this type is currently not suppported
       case videoFrameTypeInvalid:
@@ -334,8 +333,9 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
         break;
     }
 
-    if (!has_frame)
+    if (!has_frame) {
       return;
+    }
 
     // Synchronously send this back to the main thread for delivery.
     g_platform_api->syncrunonmainthread(WrapTask(
@@ -369,6 +369,9 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
       }
     }
 
+    // TODO start-code to length conversion here when gmp
+    // stops doing it for us before this call.
+
     err = f->CreateEmptyFrame(length);
     if (err != GMPVideoNoErr) {
       GMPLOG(GL_ERROR, "Error allocating frame data");
@@ -377,9 +380,9 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
     }
 
     // Copy the data.
+    // Here we concatenate into one big buffer
     uint8_t* tmp = f->Buffer();
     for (int i=0; i<encoded->iLayerNum; ++i) {
-      // TODO(ekr@rtfm.com): This seems screwy, but I copied it from Cisco.
       memcpy(tmp, encoded->sLayerInfo[i].pBsBuf, lengths[i]);
       tmp += lengths[i];
     }
@@ -403,6 +406,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
     // Return the encoded frame.
     GMPCodecSpecificInfo info;
     memset(&info, 0, sizeof(info));
+    // TODO need to set what goes in this info structure.
     callback_->Encoded(f, info);
 
     stats_.FrameOut();
@@ -458,7 +462,8 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
       return GMPVideoGenericErr;
     }
     if ( rv==cmResultSuccess &&
-        ( aFrameRate-existFrameRate>0.001f || existFrameRate-aFrameRate>0.001f ) ) {
+        ( aFrameRate-existFrameRate > 0.001f ||
+          existFrameRate-aFrameRate > 0.001f ) ) {
       float newFrameRate = static_cast<float>(aFrameRate);
       rv = encoder_->SetOption(ENCODER_OPTION_FRAME_RATE, &newFrameRate);
       if (rv==cmResultSuccess) {
@@ -478,7 +483,6 @@ class OpenH264VideoEncoder : public GMPVideoEncoder
   }
 
   virtual void EncodingComplete() {
-    printf("%s\n", __PRETTY_FUNCTION__);
     delete this;
   }
 
@@ -527,7 +531,7 @@ public:
     SDecodingParam param;
     memset(&param, 0, sizeof(param));
     param.iOutputColorFormat = videoFormatI420;
-    param.uiTargetDqLayer = UCHAR_MAX;  // TODO(ekr@rtfm.com): correct?
+    param.uiTargetDqLayer = UCHAR_MAX;  // Default value
     param.uiEcActiveFlag = 1; // Error concealment on.
     param.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
 
@@ -559,17 +563,14 @@ public:
   }
 
   virtual GMPVideoErr Reset() {
-    printf("%s\n", __PRETTY_FUNCTION__);
     return GMPVideoNoErr;
   }
 
   virtual GMPVideoErr Drain() {
-    printf("%s\n", __PRETTY_FUNCTION__);
     return GMPVideoNoErr;
   }
 
   virtual void DecodingComplete() {
-    printf("%s\n", __PRETTY_FUNCTION__);
     delete this;
   }
 
@@ -616,12 +617,13 @@ private:
     SelfDestruct<GMPVideoEncodedFrame> ifd(inputFrame);
 
     // If we don't actually have data, just abort.
-    if (!valid)
+    if (!valid) {
       return;
+    }
 
-    // TODO(ekr@rtfm.com): still need to check for BUFFER_HOST?
-    if (decoded->iBufferStatus != 1)
+    if (decoded->iBufferStatus != 1) {
       return;
+    }
 
     int width = decoded->UsrData.sSystemBuffer.iWidth;
     int height = decoded->UsrData.sSystemBuffer.iHeight;
