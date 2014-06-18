@@ -82,6 +82,8 @@ class CD3D9Utils {
   HWND                  m_hWnd;
   unsigned char*        m_pDumpYUV;
   BOOL                  m_bInitDone;
+  int                   m_nWidth;
+  int                   m_nHeight;
 
   LPDIRECT3D9           m_lpD3D9;
   LPDIRECT3DDEVICE9     m_lpD3D9Device;
@@ -110,6 +112,8 @@ class CD3D9ExUtils {
   HWND                  m_hWnd;
   unsigned char*        m_pDumpYUV;
   BOOL                  m_bInitDone;
+  int                   m_nWidth;
+  int                   m_nHeight;
 
   LPDIRECT3D9EX         m_lpD3D9;
   LPDIRECT3DDEVICE9EX   m_lpD3D9Device;
