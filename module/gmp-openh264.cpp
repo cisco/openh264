@@ -37,6 +37,7 @@
 #include <cstdio>
 #include <cstring>
 #include <iostream>
+#include <string>
 #include <memory>
 #include <assert.h>
 #include <limits.h>
