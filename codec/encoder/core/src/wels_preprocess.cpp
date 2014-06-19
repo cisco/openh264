@@ -457,16 +457,20 @@ int32_t CWelsPreProcess::InitLastSpatialPictures (sWelsEncCtx* pCtx) {
   SWelsSvcCodingParam* pParam	= pCtx->pSvcParam;
   const int32_t kiDlayerCount			= pParam->iSpatialLayerNum;
   int32_t iDlayerIndex					= 0;
-
-  for (; iDlayerIndex < kiDlayerCount; iDlayerIndex++) {
-    const int32_t kiLayerInTemporal = m_uiSpatialLayersInTemporal[iDlayerIndex];
-    m_pLastSpatialPicture[iDlayerIndex][0]	= m_pSpatialPic[iDlayerIndex][kiLayerInTemporal - 2];
-    m_pLastSpatialPicture[iDlayerIndex][1]	= NULL;
+  if (pParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
+    for (; iDlayerIndex < MAX_DEPENDENCY_LAYER; iDlayerIndex++) {
+      m_pLastSpatialPicture[iDlayerIndex][0]	= m_pLastSpatialPicture[iDlayerIndex][1] = NULL;
+    }
+  } else {
+    for (; iDlayerIndex < kiDlayerCount; iDlayerIndex++) {
+      const int32_t kiLayerInTemporal = m_uiSpatialLayersInTemporal[iDlayerIndex];
+      m_pLastSpatialPicture[iDlayerIndex][0]	= m_pSpatialPic[iDlayerIndex][kiLayerInTemporal - 2];
+      m_pLastSpatialPicture[iDlayerIndex][1]	= NULL;
+    }
+    for (; iDlayerIndex < MAX_DEPENDENCY_LAYER; iDlayerIndex++) {
+      m_pLastSpatialPicture[iDlayerIndex][0]	= m_pLastSpatialPicture[iDlayerIndex][1] = NULL;
+    }
   }
-  for (; iDlayerIndex < MAX_DEPENDENCY_LAYER; iDlayerIndex++) {
-    m_pLastSpatialPicture[iDlayerIndex][0]	= m_pLastSpatialPicture[iDlayerIndex][1] = NULL;
-  }
-
   return 0;
 }
 //*********************************************************************************************************/
