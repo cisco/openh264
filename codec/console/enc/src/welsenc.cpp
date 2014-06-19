@@ -153,6 +153,18 @@ int ParseLayerConfig (CReadConfig& cRdLayerCfg, const int iLayer, SEncParamExt& 
           }
           iLeftTargetBitrate -= pDLayer->iSpatialBitrate;
         }
+      } else if (strTag[0].compare ("MaxSpatialBitrate") == 0) {
+        pDLayer->iMaxSpatialBitrate = 1000 * atoi (strTag[1].c_str());
+        if (pSvcParam.iRCMode != RC_OFF_MODE) {
+          if (pDLayer->iMaxSpatialBitrate <= 0) {
+            fprintf (stderr, "Invalid max spatial bitrate(%d) in dependency layer #%d.\n", pDLayer->iMaxSpatialBitrate, iLayer);
+            return -1;
+          }
+          if (pDLayer->iMaxSpatialBitrate < pDLayer->iSpatialBitrate) {
+            fprintf (stderr, "Invalid max spatial(#%d) bitrate(%d) setting::: < layerBitrate(%d)!\n", iLayer, pDLayer->iMaxSpatialBitrate, pDLayer->iSpatialBitrate);
+            return -1;
+          }
+        }
       } else if (strTag[0].compare ("InitialQP") == 0) {
         sLayerCtx.iDLayerQp	= atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("SliceMode") == 0) {
@@ -253,6 +265,12 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
           fprintf (stderr, "Invalid target bitrate setting due to RC enabled. Check TargetBitrate field please!\n");
           return 1;
         }
+      } else if (strTag[0].compare ("MaxOverallBitrate") == 0) {
+        pSvcParam.iMaxBitrate	= 1000 * atoi (strTag[1].c_str());
+        if ((pSvcParam.iRCMode != RC_OFF_MODE) && pSvcParam.iMaxBitrate <= 0) {
+          fprintf (stderr, "Invalid max overall bitrate setting due to RC enabled. Check MaxOverallBitrate field please!\n");
+          return 1;
+        }
       } else if (strTag[0].compare ("EnableDenoise") == 0) {
         pSvcParam.bEnableDenoise	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableSceneChangeDetection") == 0) {
@@ -339,6 +357,7 @@ void PrintHelp() {
   printf ("  -betaOffset BetaOffset (-6..+6): valid range\n");
   printf ("  -rc	  rate control mode: 0-quality mode; 1-bitrate mode; 2-bitrate limited mode; -1-rc off \n");
   printf ("  -tarb	  Overall target bitrate\n");
+  printf ("  -maxbrTotal  Overall max bitrate\n");
   printf ("  -numl   Number Of Layers: Must exist with layer_cfg file and the number of input layer_cfg file must equal to the value set by this command\n");
   printf ("  The options below are layer-based: (need to be set with layer id)\n");
   printf ("  -lconfig (Layer) (spatial layer configure file)\n");
@@ -348,6 +367,7 @@ void PrintHelp() {
   printf ("  -frout  	(Layer) (output frame rate)\n");
   printf ("  -lqp		(Layer) (base quality layer qp : must work with -ldeltaqp or -lqparr)\n");
   printf ("  -ltarb	    (Layer) (spatial layer target bitrate)\n");
+  printf ("  -lmaxb     (Layer) (spatial layer max bitrate)\n");
   printf ("  -slcmd   (Layer) (spatial layer slice mode): pls refer to layerX.cfg for details ( -slcnum: set target slice num; -slcsize: set target slice size constraint ) \n");
   printf ("  -trace   (Level)\n");
   printf ("\n");
@@ -436,6 +456,9 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
     else if (!strcmp (pCommand, "-tarb") && (n < argc))
       pSvcParam.iTargetBitrate = 1000*atoi (argv[n++]);
 
+    else if (!strcmp (pCommand, "-maxbrTotal") && (n < argc))
+      pSvcParam.iMaxBitrate = 1000*atoi  (argv[n++]);
+
     else if (!strcmp (pCommand, "-numl") && (n < argc)) {
       pSvcParam.iSpatialLayerNum = atoi (argv[n++]);
     }
@@ -482,6 +505,12 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       unsigned int	iLayer = atoi (argv[n++]);
       SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
       pDLayer->iSpatialBitrate	= 1000 * atoi (argv[n++]);
+    }
+
+    else if (!strcmp (pCommand, "-lmaxb") && (n + 1 < argc)) {
+      unsigned int	iLayer = atoi (argv[n++]);
+      SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
+      pDLayer->iMaxSpatialBitrate	= 1000 * atoi (argv[n++]);
     }
 
     else if (!strcmp (pCommand, "-slcmd") && (n + 1 < argc)) {
@@ -537,6 +566,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.iPicWidth		= 1280;			// width of picture in samples
   sParam.iPicHeight	= 720;			// height of picture in samples
   sParam.iTargetBitrate = 2500000;		// target bitrate desired
+  sParam.iMaxBitrate    = MAX_BIT_RATE;
   sParam.iRCMode       = RC_QUALITY_MODE;       //  rc mode control
   sParam.iTemporalLayerNum = 3;	// layer number at temporal level
   sParam.iSpatialLayerNum	= 4;	// layer number at spatial level
@@ -558,6 +588,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 90;
   sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 7.5f;
   sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 64000;
+  sParam.sSpatialLayers[iIndexLayer].iMaxSpatialBitrate     = MAX_BIT_RATE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
 
   ++ iIndexLayer;
@@ -566,6 +597,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 180;
   sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 15.0f;
   sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 160000;
+  sParam.sSpatialLayers[iIndexLayer].iMaxSpatialBitrate     = MAX_BIT_RATE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
 
   ++ iIndexLayer;
@@ -574,6 +606,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 360;
   sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 30.0f;
   sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 512000;
+  sParam.sSpatialLayers[iIndexLayer].iMaxSpatialBitrate     = MAX_BIT_RATE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.sSliceArgument.uiSliceNum = 1;
 
@@ -583,6 +616,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 720;
   sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 30.0f;
   sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 1500000;
+  sParam.sSpatialLayers[iIndexLayer].iMaxSpatialBitrate     = MAX_BIT_RATE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.sSliceArgument.uiSliceNum = 1;
 

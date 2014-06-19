@@ -212,18 +212,21 @@ typedef struct TagWelsRc {
   int32_t   iBufferFullnessPadding;
   int32_t   iPaddingSize;
   int32_t   iPaddingBitrateStat;
+  bool      bSkipFlag;
 
   SRCSlicing*	pSlicingOverRc;
   SRCTemporal* pTemporalOverRc;
 } SWelsSvcRc;
 
 typedef  void (*PWelsRCPictureInitFunc) (void* pCtx);
+typedef  void (*PWelsRCPictureDelayJudgeFunc) (void* pCtx);
 typedef  void (*PWelsRCPictureInfoUpdateFunc) (void* pCtx, int32_t iLayerSize);
 typedef  void (*PWelsRCMBInfoUpdateFunc) (void* pCtx, SMB* pCurMb, int32_t iCostLuma, SSlice* pSlice);
 typedef  void (*PWelsRCMBInitFunc) (void* pCtx, SMB* pCurMb, SSlice* pSlice);
 
 typedef  struct  WelsRcFunc_s {
   PWelsRCPictureInitFunc			pfWelsRcPictureInit;
+  PWelsRCPictureDelayJudgeFunc      pfWelsRcPicDelayJudge;
   PWelsRCPictureInfoUpdateFunc	pfWelsRcPictureInfoUpdate;
   PWelsRCMBInitFunc				pfWelsRcMbInit;
   PWelsRCMBInfoUpdateFunc			pfWelsRcMbInfoUpdate;

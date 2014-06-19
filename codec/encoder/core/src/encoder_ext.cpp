@@ -2938,6 +2938,23 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     return ENC_RETURN_SUCCESS;
   }
 
+  //loop each layer to check if have skip frame when RC and frame skip enable
+  if (RC_OFF_MODE != pCtx->pSvcParam->iRCMode && true == pCtx->pSvcParam->bEnableFrameSkip) {
+    bool bSkipMustFlag = false;
+    for (int32_t i = 0; i< iSpatialNum; i++) {
+      pCtx->uiDependencyId = (uint8_t)(pSpatialIndexMap+i)->iDid;
+      pCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge(pCtx);
+      if (true == pCtx->pWelsSvcRc[pCtx->uiDependencyId].bSkipFlag) {
+        bSkipMustFlag = true;
+      }
+    }
+    if (true == bSkipMustFlag) {
+      pFbi->eOutputFrameType = videoFrameTypeSkip;
+      return ENC_RETURN_SUCCESS;
+    }
+  }
+
+
   InitFrameCoding (pCtx, eFrameType);
 
   iCurTid	= GetTemporalLevel (&pSvcParam->sDependencyLayers[pSpatialIndexMap->iDid], pCtx->iCodingIndex,
