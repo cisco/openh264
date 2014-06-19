@@ -339,7 +339,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
             strOutputFile	= strTag[1];
           } else if (strTag[0].compare ("RestructionFile") == 0) {
             strReconFile	= strTag[1];
-            int32_t iLen = strReconFile.length();
+            int32_t iLen = (int32_t)strReconFile.length();
             sDecParam.pFileNameRestructed	= new char[iLen + 1];
             if (sDecParam.pFileNameRestructed != NULL) {
               sDecParam.pFileNameRestructed[iLen] = 0;

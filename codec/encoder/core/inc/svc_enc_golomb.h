@@ -243,7 +243,7 @@ static inline bool   BsCheckByteAlign (SBitStringAux* pBs) {
 
 
 static inline int32_t BsGetBitsPos (SBitStringAux* pBs) {
-  return (((pBs->pBufPtr - pBs->pBuf) << 3) + 32 - pBs->iLeftBits);
+  return (int32_t) (((pBs->pBufPtr - pBs->pBuf) << 3) + 32 - pBs->iLeftBits);
 }
 
 }

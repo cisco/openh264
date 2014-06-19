@@ -116,7 +116,7 @@ int ParseLayerConfig (CReadConfig& cRdLayerCfg, const int iLayer, SEncParamExt& 
 
   string strTag[4];
   string str_ ("SlicesAssign");
-  const int kiSize = str_.size();
+  const int kiSize = (int)str_.size();
 
   while (!cRdLayerCfg.EndOfFile()) {
     long iLayerRd = cRdLayerCfg.ReadLine (&strTag[0]);
@@ -130,7 +130,7 @@ int ParseLayerConfig (CReadConfig& cRdLayerCfg, const int iLayer, SEncParamExt& 
       } else if (strTag[0].compare ("FrameRateOut") == 0) {
         pDLayer->fFrameRate = (float)atof (strTag[1].c_str());
       } else if (strTag[0].compare ("ReconFile") == 0) {
-        const unsigned int kiLen = strTag[1].length();
+        const unsigned int kiLen = (unsigned int)strTag[1].length();
         if (kiLen >= sizeof (sFileSet.sRecFileName[iLayer]))
           return -1;
         sFileSet.sRecFileName[iLayer][kiLen] = '\0';
@@ -436,7 +436,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       pSvcParam.iLtrMarkPeriod = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-threadIdc") && (n < argc))
-      pSvcParam.iMultipleThreadIdc= atoi (argv[n++]);
+      pSvcParam.iMultipleThreadIdc = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-deblockIdc") && (n < argc))
       pSvcParam.iLoopFilterDisableIdc = atoi (argv[n++]);
@@ -454,15 +454,17 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       g_LevelSetting = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-tarb") && (n < argc))
-      pSvcParam.iTargetBitrate = 1000*atoi (argv[n++]);
+      pSvcParam.iTargetBitrate = 1000 * atoi (argv[n++]);
+
+    else if (!strcmp (pCommand, "-maxbrTotal") && (n < argc))
+      pSvcParam.iMaxBitrate = 1000 * atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-maxbrTotal") && (n < argc))
       pSvcParam.iMaxBitrate = 1000*atoi  (argv[n++]);
 
     else if (!strcmp (pCommand, "-numl") && (n < argc)) {
       pSvcParam.iSpatialLayerNum = atoi (argv[n++]);
-    }
-    else if (!strcmp (pCommand, "-lconfig") && (n < argc)) {
+    } else if (!strcmp (pCommand, "-lconfig") && (n < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
       sFileSet.strLayerCfgFile[iLayer].assign (argv[n++]);
       CReadConfig cRdLayerCfg (sFileSet.strLayerCfgFile[iLayer]);
@@ -471,7 +473,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       }
     } else if (!strcmp (pCommand, "-drec") && (n + 1 < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
-      const unsigned int iLen = strlen (argv[n]);
+      const unsigned int iLen = (unsigned int)strlen (argv[n]);
       if (iLen >= sizeof (sFileSet.sRecFileName[iLayer]))
         return 1;
       sFileSet.sRecFileName[iLayer][iLen] = '\0';
@@ -630,7 +632,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   return 0;
 }
 
-int ProcessEncoding(ISVCEncoder* pPtrEnc, int argc, char** argv,bool bConfigFile) {
+int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFile) {
   int iRet				= 0;
 
   if (pPtrEnc == NULL)
@@ -677,7 +679,7 @@ int ProcessEncoding(ISVCEncoder* pPtrEnc, int argc, char** argv,bool bConfigFile
   pSrcPic->uiTimeStamp = 0;
 
   // if configure file exit, reading configure file firstly
-  if(bConfigFile){
+  if (bConfigFile) {
     iParsedNum = 2;
     cRdCfg.Openf (argv[1]);
     if (!cRdCfg.ExistFile()) {
@@ -969,7 +971,7 @@ int main (int argc, char** argv)
   } else {
     if (!strstr (argv[1], ".cfg")) { // check configuration type (like .cfg?)
       if (argc > 2) {
-        iRet = ProcessEncoding(pSVCEncoder, argc, argv,false);
+        iRet = ProcessEncoding (pSVCEncoder, argc, argv, false);
         if (iRet != 0)
           goto exit;
       } else if (argc == 2 && ! strcmp (argv[1], "-h"))
@@ -979,7 +981,7 @@ int main (int argc, char** argv)
         goto exit;
       }
     } else {
-      iRet = ProcessEncoding(pSVCEncoder, argc, argv,true);
+      iRet = ProcessEncoding (pSVCEncoder, argc, argv, true);
       if (iRet > 0)
         goto exit;
     }

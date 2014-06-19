@@ -131,7 +131,7 @@ void CalcSliceComplexRatio (void* pRatio, SSliceCtx* pSliceCtx, uint32_t* pSlice
   WelsEmms();
 
   while (iSliceIdx < kiSliceCount) {
-    iAvI[iSliceIdx]	= WELS_DIV_ROUND(INT_MULTIPLY * pCountMbInSlice[iSliceIdx], pSliceTime[iSliceIdx]);
+    iAvI[iSliceIdx]	= WELS_DIV_ROUND (INT_MULTIPLY * pCountMbInSlice[iSliceIdx], pSliceTime[iSliceIdx]);
     MT_TRACE_LOG (NULL, WELS_LOG_DEBUG, "[MT] CalcSliceComplexRatio(), pSliceConsumeTime[%d]= %d us, slice_run= %d\n",
                   iSliceIdx,
                   pSliceTime[iSliceIdx], pCountMbInSlice[iSliceIdx]);
@@ -140,7 +140,7 @@ void CalcSliceComplexRatio (void* pRatio, SSliceCtx* pSliceCtx, uint32_t* pSlice
     ++ iSliceIdx;
   }
   while (-- iSliceIdx >= 0) {
-    pRatioList[iSliceIdx] = WELS_DIV_ROUND(INT_MULTIPLY * iAvI[iSliceIdx], iSumAv);
+    pRatioList[iSliceIdx] = WELS_DIV_ROUND (INT_MULTIPLY * iAvI[iSliceIdx], iSumAv);
   }
 }
 
@@ -236,7 +236,7 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
 
   iSliceIdx	= 0;
   while (iSliceIdx + 1 < kiCountSliceNum) {
-    int32_t iNumMbAssigning = WELS_DIV_ROUND(kiCountNumMb * pSliceComplexRatio[iSliceIdx], INT_MULTIPLY);
+    int32_t iNumMbAssigning = WELS_DIV_ROUND (kiCountNumMb * pSliceComplexRatio[iSliceIdx], INT_MULTIPLY);
 
     // GOM boundary aligned
     if (pCtx->pSvcParam->iRCMode != RC_OFF_MODE) {
@@ -259,14 +259,15 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
     iRunLen[iSliceIdx]	= iNumMbAssigning;
     MT_TRACE_LOG (pCtx, WELS_LOG_DEBUG,
                   "[MT] DynamicAdjustSlicing(), uiSliceIdx= %d, pSliceComplexRatio= %.2f, slice_run_org= %d, slice_run_adj= %d\n",
-                  iSliceIdx, pSliceComplexRatio[iSliceIdx]* 1.0f / INT_MULTIPLY, pSliceCtx->pCountMbNumInSlice[iSliceIdx], iNumMbAssigning);
+                  iSliceIdx, pSliceComplexRatio[iSliceIdx] * 1.0f / INT_MULTIPLY, pSliceCtx->pCountMbNumInSlice[iSliceIdx],
+                  iNumMbAssigning);
     ++ iSliceIdx;
     iMaximalMbNum	= iMbNumLeft - (kiCountSliceNum - iSliceIdx - 1) * iMinimalMbNum;	// get maximal num_mb in left parts
   }
   iRunLen[iSliceIdx] = iMbNumLeft;
   MT_TRACE_LOG (pCtx, WELS_LOG_DEBUG,
                 "[MT] DynamicAdjustSlicing(), iSliceIdx= %d, pSliceComplexRatio= %.2f, slice_run_org= %d, slice_run_adj= %d\n",
-                iSliceIdx, pSliceComplexRatio[iSliceIdx]* 1.0f / INT_MULTIPLY, pSliceCtx->pCountMbNumInSlice[iSliceIdx], iMbNumLeft);
+                iSliceIdx, pSliceComplexRatio[iSliceIdx] * 1.0f / INT_MULTIPLY, pSliceCtx->pCountMbNumInSlice[iSliceIdx], iMbNumLeft);
 
 
   if (DynamicAdjustSlicePEncCtxAll (pSliceCtx, iRunLen) == 0) {
@@ -651,7 +652,7 @@ int32_t WriteSliceBs (sWelsEncCtx* pCtx, uint8_t* pSliceBsBuf, const int32_t iSl
   int32_t iNalIdx					= 0;
   int32_t iNalSize					= 0;
   int32_t iReturn = ENC_RETURN_SUCCESS;
-  const int32_t kiWrittenLength = pSliceBs->sBsWrite.pBufPtr - pSliceBs->sBsWrite.pBuf;
+  const int32_t kiWrittenLength = (int32_t) (pSliceBs->sBsWrite.pBufPtr - pSliceBs->sBsWrite.pBuf);
 
   iSliceSize				= 0;
   assert (kiNalCnt <= 2);

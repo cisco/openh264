@@ -177,7 +177,7 @@ int32_t WelsEncodeNal (SWelsNalRaw* pRawNal, void* pNalHeaderExt, const int32_t 
   }
 
   /* count length of NAL Unit */
-  iNalLength	= pDstPointer - pDstStart;
+  iNalLength	= (int32_t) (pDstPointer - pDstStart);
   if (NULL != pDstLen)
     *pDstLen	= iNalLength;
 

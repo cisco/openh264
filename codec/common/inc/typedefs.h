@@ -48,6 +48,12 @@
 #include <stdint.h>
 #include <inttypes.h>
 
+#ifdef __LP64__
+typedef int64_t intX_t;
+#else
+typedef int32_t intX_t;
+#endif
+
 #else
 
 // FIXME:     all singed type should be declared explicit,  for example,  int8_t should be declared as signed char.
@@ -60,6 +66,12 @@ typedef unsigned int     uint32_t;
 typedef __int64          int64_t ;
 typedef unsigned __int64 uint64_t;
 #define PRId64 "I64d"
+
+#ifdef _WIN64
+typedef int64_t intX_t;
+#else
+typedef int32_t intX_t;
+#endif
 
 #endif // _MSC_VER defined
 

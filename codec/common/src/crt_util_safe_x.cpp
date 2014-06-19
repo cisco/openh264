@@ -112,7 +112,7 @@ int32_t WelsStrftime (char* pBuffer, int32_t iSize, const char* kpFormat, const 
 
   localtime_s (&sTimeNow, &kpTp->time);
 
-  iRc = strftime (pBuffer, iSize, kpFormat, &sTimeNow);
+  iRc = (int32_t)strftime (pBuffer, iSize, kpFormat, &sTimeNow);
   if (iRc == 0)
     pBuffer[0] = '\0';
   return iRc;
@@ -244,12 +244,12 @@ int32_t WelsStrftime (char* pBuffer, int32_t iSize, const char* kpFormat, const 
 
 
 char* WelsStrcat (char* pDest, int32_t iSizeInBytes, const char* kpSrc) {
-  int32_t iCurLen = strlen (pDest);
+  int32_t iCurLen = (int32_t)strlen (pDest);
   return WelsStrncpy (pDest + iCurLen, iSizeInBytes - iCurLen, kpSrc);
 }
 
 int32_t WelsFwrite (const void* kpBuffer, int32_t iSize, int32_t iCount, WelsFileHandle* pFp) {
-  return fwrite (kpBuffer, iSize, iCount, pFp);
+  return (int32_t)fwrite (kpBuffer, iSize, iCount, pFp);
 }
 
 uint16_t WelsGetMillisecond (const SWelsTime* kpTp) {
