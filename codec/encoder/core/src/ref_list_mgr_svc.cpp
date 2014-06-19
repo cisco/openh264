@@ -363,14 +363,12 @@ bool WelsUpdateRefList (void* pEncCtx) {
   const uint8_t kuiTid		= pCtx->uiTemporalId;
   const uint8_t kuiDid		= pCtx->uiDependencyId;
   const EWelsSliceType keSliceType		= pCtx->eSliceType;
-  const int32_t kiSwapIdx = (pCtx->eSliceType == P_SLICE) ? (kiNumRef - LONG_TERM_REF_NUM) : ((
-                              pCtx->pSvcParam->bEnableLongTermReference) ? (kiNumRef - pLtr->iCurLtrIdx) : (1));
   uint32_t i = 0;
   // Need update pRef list in case store base layer or target dependency layer construction
   if (NULL == pCtx->pCurDqLayer)
     return false;
 
-  if (NULL == pRefList || NULL == pRefList->pRef[0] || NULL == pRefList->pRef[kiSwapIdx])
+  if (NULL == pRefList || NULL == pRefList->pRef[0])
     return false;
 
   if (NULL != pCtx->pDecPic) {
