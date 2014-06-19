@@ -3789,9 +3789,15 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   memcpy (pSlcingOverRc, pCtx->pWelsSvcRc->pSlicingOverRc, sizeof (SRCSlicing) * iMaxSliceNumOld);
   uiSliceIdx = iMaxSliceNumOld;
   SRCSlicing* pSORC = &pSlcingOverRc[uiSliceIdx];
+  const int32_t kiBitsPerMb		= WELS_DIV_ROUND(pCtx->pWelsSvcRc->iTargetBits * INT_MULTIPLY, pCtx->pWelsSvcRc->iNumberMbFrame);
   while (uiSliceIdx < iMaxSliceNum) {
     pSORC->iComplexityIndexSlice = 0;
     pSORC->iCalculatedQpSlice = pCtx->iGlobalQp;
+    pSORC->iTotalQpSlice	= 0;
+    pSORC->iTotalMbSlice	= 0;
+    pSORC->iTargetBitsSlice = WELS_DIV_ROUND(kiBitsPerMb * pCurLayer->pSliceEncCtx->pCountMbNumInSlice[uiSliceIdx], INT_MULTIPLY);
+    pSORC->iFrameBitsSlice	= 0;
+    pSORC->iGomBitsSlice	= 0;
     pSORC ++;
     uiSliceIdx ++;
   }
