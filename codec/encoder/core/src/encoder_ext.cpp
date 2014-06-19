@@ -91,6 +91,19 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
   }
+  if (pCfg->iSpatialLayerNum > 1) {
+    int32_t iFinalWidth = pCfg->sSpatialLayers[pCfg->iSpatialLayerNum - 1].iVideoWidth;
+    int32_t iFinalHeight = pCfg->sSpatialLayers[pCfg->iSpatialLayerNum - 1].iVideoWidth;
+    for (i = 0; i < (pCfg->iSpatialLayerNum - 1); i++) {
+      SSpatialLayerConfig* fDlp = &pCfg->sSpatialLayers[i];
+      if ((fDlp->iVideoWidth > iFinalWidth) || (fDlp->iVideoHeight > iFinalHeight)) {
+        WelsLog (pLogCtx, WELS_LOG_ERROR,
+                 "ParamValidation,Invalid resolution layer(%d) resolution(%d x %d) shoudl be less than the highest spatial layer resolution(%d x %d)\n ",
+                 i, fDlp->iVideoWidth, fDlp->iVideoHeight, iFinalWidth, iFinalHeight);
+        return ENC_RETURN_UNSUPPORTED_PARA;
+      }
+    }
+  }
   for (i = 0; i < pCfg->iSpatialLayerNum; ++ i) {
     SSpatialLayerInternal* fDlp = &pCfg->sDependencyLayers[i];
     if (fDlp->fOutputFrameRate > fDlp->fInputFrameRate || (fDlp->fInputFrameRate >= -fEpsn
