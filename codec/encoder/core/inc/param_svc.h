@@ -307,7 +307,10 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     iPaddingFlag = pCodingParam.iPaddingFlag;
 
     iTargetBitrate		= pCodingParam.iTargetBitrate;	// target bitrate
-    iMaxBitrate           = pCodingParam.iMaxBitrate;
+    iMaxBitrate         = pCodingParam.iMaxBitrate;
+    if (iMaxBitrate < iTargetBitrate) {
+      iMaxBitrate  = iTargetBitrate;
+    }
 
     uiMaxNalSize          = pCodingParam.uiMaxNalSize;
     /* Denoise Control */
