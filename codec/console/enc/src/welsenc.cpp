@@ -265,12 +265,6 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
           fprintf (stderr, "Invalid target bitrate setting due to RC enabled. Check TargetBitrate field please!\n");
           return 1;
         }
-      } else if (strTag[0].compare ("MaxOverallBitrate") == 0) {
-        pSvcParam.iMaxBitrate	= 1000 * atoi (strTag[1].c_str());
-        if ((pSvcParam.iRCMode != RC_OFF_MODE) && pSvcParam.iMaxBitrate <= 0) {
-          fprintf (stderr, "Invalid max overall bitrate setting due to RC enabled. Check MaxOverallBitrate field please!\n");
-          return 1;
-        }
       } else if (strTag[0].compare ("EnableDenoise") == 0) {
         pSvcParam.bEnableDenoise	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableSceneChangeDetection") == 0) {
@@ -357,7 +351,6 @@ void PrintHelp() {
   printf ("  -betaOffset BetaOffset (-6..+6): valid range\n");
   printf ("  -rc	  rate control mode: 0-quality mode; 1-bitrate mode; 2-bitrate limited mode; -1-rc off \n");
   printf ("  -tarb	  Overall target bitrate\n");
-  printf ("  -maxbrTotal  Overall max bitrate\n");
   printf ("  -numl   Number Of Layers: Must exist with layer_cfg file and the number of input layer_cfg file must equal to the value set by this command\n");
   printf ("  The options below are layer-based: (need to be set with layer id)\n");
   printf ("  -lconfig (Layer) (spatial layer configure file)\n");
@@ -367,7 +360,6 @@ void PrintHelp() {
   printf ("  -frout  	(Layer) (output frame rate)\n");
   printf ("  -lqp		(Layer) (base quality layer qp : must work with -ldeltaqp or -lqparr)\n");
   printf ("  -ltarb	    (Layer) (spatial layer target bitrate)\n");
-  printf ("  -lmaxb     (Layer) (spatial layer max bitrate)\n");
   printf ("  -slcmd   (Layer) (spatial layer slice mode): pls refer to layerX.cfg for details ( -slcnum: set target slice num; -slcsize: set target slice size constraint ) \n");
   printf ("  -trace   (Level)\n");
   printf ("\n");
