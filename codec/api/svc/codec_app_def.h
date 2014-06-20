@@ -389,12 +389,12 @@ typedef struct Source_Picture_s {
   long long uiTimeStamp;
 } SSourcePicture;
 
-typedef struct Bitrate_Info_s {
+typedef struct TagBitrateInfo {
   LAYER_NUM iLayer;
   int iBitrate;    //the maximum bitrate
 } SBitrateInfo;
 
-typedef struct Dump_Layer_s {
+typedef struct TagDumpLayer {
   int iLayer;
   char* pFileName;
 } SDumpLayer;
