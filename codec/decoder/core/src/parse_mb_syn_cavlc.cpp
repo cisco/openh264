@@ -674,7 +674,7 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
   int8_t nA, nB, nC;
   uint8_t uiTotalCoeff, uiTrailingOnes;
   int32_t iUsedBits = 0;
-  int32_t iCurIdx   = pBs->iIndex;
+  intX_t iCurIdx   = pBs->iIndex;
   uint8_t* pBuf     = ((uint8_t*)pBs->pStartBuf) + (iCurIdx >> 3);
   bool  bChromaDc = (CHROMA_DC == iResidualProperty);
   uint8_t bChroma   = (bChromaDc || CHROMA_AC == iResidualProperty);

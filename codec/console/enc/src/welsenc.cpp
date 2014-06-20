@@ -116,7 +116,7 @@ int ParseLayerConfig (CReadConfig& cRdLayerCfg, const int iLayer, SEncParamExt& 
 
   string strTag[4];
   string str_ ("SlicesAssign");
-  const int kiSize = str_.size();
+  const int kiSize = (int)str_.size();
 
   while (!cRdLayerCfg.EndOfFile()) {
     long iLayerRd = cRdLayerCfg.ReadLine (&strTag[0]);
@@ -130,7 +130,7 @@ int ParseLayerConfig (CReadConfig& cRdLayerCfg, const int iLayer, SEncParamExt& 
       } else if (strTag[0].compare ("FrameRateOut") == 0) {
         pDLayer->fFrameRate = (float)atof (strTag[1].c_str());
       } else if (strTag[0].compare ("ReconFile") == 0) {
-        const unsigned int kiLen = strTag[1].length();
+        const unsigned int kiLen = (unsigned int)strTag[1].length();
         if (kiLen >= sizeof (sFileSet.sRecFileName[iLayer]))
           return -1;
         sFileSet.sRecFileName[iLayer][kiLen] = '\0';

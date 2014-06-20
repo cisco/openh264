@@ -75,11 +75,11 @@ namespace WelsDec {
 }
 
 static inline int32_t BsGetBits (PBitStringAux pBs, int32_t iNumBits, uint32_t* pCode) {
-  int32_t iRc = UBITS (pBs->uiCurBits, iNumBits);
-  int32_t iAllowedBytes = pBs->pEndBuf - pBs->pStartBuf; //actual stream bytes
-  int32_t iReadBytes = pBs->pCurBuf - pBs->pStartBuf;
+  intX_t iRc = UBITS (pBs->uiCurBits, iNumBits);
+  intX_t iAllowedBytes = pBs->pEndBuf - pBs->pStartBuf; //actual stream bytes
+  intX_t iReadBytes = pBs->pCurBuf - pBs->pStartBuf;
   DUMP_BITS (pBs->uiCurBits, pBs->pCurBuf, pBs->iLeftBits, iNumBits, iAllowedBytes, iReadBytes);
-  *pCode = iRc;
+  *pCode = (uint32_t)iRc;
   return ERR_NONE;
 }
 
@@ -155,7 +155,7 @@ static inline int32_t GetLeadingZeroBits (uint32_t iCurBits) { //<=32 bits
 static inline uint32_t BsGetUe (PBitStringAux pBs, uint32_t* pCode) {
   uint32_t iValue = 0;
   int32_t  iLeadingZeroBits = GetLeadingZeroBits (pBs->uiCurBits);
-  int32_t iAllowedBytes, iReadBytes;
+  intX_t iAllowedBytes, iReadBytes;
   iAllowedBytes = pBs->pEndBuf - pBs->pStartBuf; //actual stream bytes
 
   if (iLeadingZeroBits == -1) { //bistream error

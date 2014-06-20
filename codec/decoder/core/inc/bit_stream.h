@@ -46,7 +46,7 @@ typedef struct TagBitStringAux {
   uint8_t*		pEndBuf;	// buffer + length
   int32_t     iBits;       // count bits of overall bitstreaming input
 
-  int32_t     iIndex;      //only for cavlc usage
+  intX_t     iIndex;      //only for cavlc usage
   uint8_t*		pCurBuf;	// current reading position
   uint32_t    uiCurBits;
   int32_t		iLeftBits;	// count number of available bits left ([1, 8]),

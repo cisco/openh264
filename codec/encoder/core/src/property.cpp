@@ -64,7 +64,7 @@ int32_t GetCodeName (char* pBuf, int32_t iSize) {
   if (NULL == pBuf)
     return 0;
 
-  iLen = strlen (WELS_CODE_NAME);	// confirmed_safe_unsafe_usage
+  iLen = (int32_t)strlen (WELS_CODE_NAME);	// confirmed_safe_unsafe_usage
   if (iSize <= iLen)
     return 0;
 
@@ -85,7 +85,7 @@ int32_t GetLibName (char* pBuf, int32_t iSize) {
   if (NULL == pBuf)
     return 0;
 
-  iLen	= strlen (WELS_LIB_NAME);	// confirmed_safe_unsafe_usage
+  iLen	= (int32_t)strlen (WELS_LIB_NAME);	// confirmed_safe_unsafe_usage
   if (iSize <= iLen)
     return 0;
 
@@ -106,7 +106,7 @@ int32_t GetVerNum (char* pBuf, int32_t iSize) {
   if (NULL == pBuf)
     return 0;
 
-  iLen	= strlen (WELS_VERSION_STR);	// confirmed_safe_unsafe_usage
+  iLen	= (int32_t)strlen (WELS_VERSION_STR);	// confirmed_safe_unsafe_usage
   if (iSize <= iLen)
     return 0;
 
@@ -127,7 +127,7 @@ int32_t GetIdentInfo (char* pBuf, int32_t iSize) {
   if (NULL == pBuf)
     return 0;
 
-  iLen	= strlen (WELS_IDENT);	// confirmed_safe_unsafe_usage
+  iLen	= (int32_t)strlen (WELS_IDENT);	// confirmed_safe_unsafe_usage
   if (iSize <= iLen)
     return 0;
 
