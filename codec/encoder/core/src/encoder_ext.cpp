@@ -84,6 +84,26 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
     WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidation(),Invalid usage type = %d\n", pCfg->iUsageType);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
+  if (pCfg->iUsageType == SCREEN_CONTENT_REAL_TIME) {
+    if (pCfg->iSpatialLayerNum > 1) {
+      WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidation(),Invalid the number of Spatial layer(%d)for screen content\n",
+               pCfg->iSpatialLayerNum);
+      return ENC_RETURN_UNSUPPORTED_PARA;
+    }
+  }
+  if (pCfg->iSpatialLayerNum > 1) {
+    int32_t iFinalWidth = pCfg->sSpatialLayers[pCfg->iSpatialLayerNum - 1].iVideoWidth;
+    int32_t iFinalHeight = pCfg->sSpatialLayers[pCfg->iSpatialLayerNum - 1].iVideoWidth;
+    for (i = 0; i < (pCfg->iSpatialLayerNum - 1); i++) {
+      SSpatialLayerConfig* fDlp = &pCfg->sSpatialLayers[i];
+      if ((fDlp->iVideoWidth > iFinalWidth) || (fDlp->iVideoHeight > iFinalHeight)) {
+        WelsLog (pLogCtx, WELS_LOG_ERROR,
+                 "ParamValidation,Invalid resolution layer(%d) resolution(%d x %d) shoudl be less than the highest spatial layer resolution(%d x %d)\n ",
+                 i, fDlp->iVideoWidth, fDlp->iVideoHeight, iFinalWidth, iFinalHeight);
+        return ENC_RETURN_UNSUPPORTED_PARA;
+      }
+    }
+  }
   for (i = 0; i < pCfg->iSpatialLayerNum; ++ i) {
     SSpatialLayerInternal* fDlp = &pCfg->sDependencyLayers[i];
     if (fDlp->fOutputFrameRate > fDlp->fInputFrameRate || (fDlp->fInputFrameRate >= -fEpsn
@@ -2941,9 +2961,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   //loop each layer to check if have skip frame when RC and frame skip enable
   if (RC_OFF_MODE != pCtx->pSvcParam->iRCMode && true == pCtx->pSvcParam->bEnableFrameSkip) {
     bool bSkipMustFlag = false;
-    for (int32_t i = 0; i< iSpatialNum; i++) {
-      pCtx->uiDependencyId = (uint8_t)(pSpatialIndexMap+i)->iDid;
-      pCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge(pCtx);
+    for (int32_t i = 0; i < iSpatialNum; i++) {
+      pCtx->uiDependencyId = (uint8_t) (pSpatialIndexMap + i)->iDid;
+      pCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge (pCtx);
       if (true == pCtx->pWelsSvcRc[pCtx->uiDependencyId].bSkipFlag) {
         bSkipMustFlag = true;
       }
