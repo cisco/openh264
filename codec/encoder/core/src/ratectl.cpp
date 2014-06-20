@@ -74,6 +74,8 @@ void RcInitLayerMemory (SWelsSvcRc* pWelsSvcRc, CMemoryAlign* pMA, const int32_t
   if (NULL == pBaseMem)
     return;
 
+  pWelsSvcRc->pTemporalOverRc			= (SRCTemporal*)pBaseMem;
+  pBaseMem += sizeof (SRCTemporal) * kiMaxTl;
   pWelsSvcRc->pGomComplexity				= (double*)pBaseMem;
   pBaseMem += kiGomSizeD;
   pWelsSvcRc->pGomForegroundBlockNum	= (int32_t*)pBaseMem;
@@ -81,8 +83,6 @@ void RcInitLayerMemory (SWelsSvcRc* pWelsSvcRc, CMemoryAlign* pMA, const int32_t
   pWelsSvcRc->pCurrentFrameGomSad		= (int32_t*)pBaseMem;
   pBaseMem += kiGomSizeI;
   pWelsSvcRc->pGomCost					= (int32_t*)pBaseMem;
-  pBaseMem += kiGomSizeI;
-  pWelsSvcRc->pTemporalOverRc			= (SRCTemporal*)pBaseMem;
 
   pWelsSvcRc->pSlicingOverRc			= (SRCSlicing*)pMA->WelsMalloc (sizeof (SRCSlicing) * kiSliceNum, "SlicingOverRC");
 }
@@ -92,13 +92,13 @@ void RcFreeLayerMemory (SWelsSvcRc* pWelsSvcRc, CMemoryAlign* pMA) {
     pMA->WelsFree (pWelsSvcRc->pSlicingOverRc, "SlicingOverRC");
     pWelsSvcRc->pSlicingOverRc = NULL;
   }
-  if (pWelsSvcRc != NULL && pWelsSvcRc->pGomComplexity != NULL) {
-    pMA->WelsFree (pWelsSvcRc->pGomComplexity, "rc_layer_memory");
+  if (pWelsSvcRc != NULL && pWelsSvcRc->pTemporalOverRc != NULL) {
+    pMA->WelsFree (pWelsSvcRc->pTemporalOverRc, "rc_layer_memory");
+    pWelsSvcRc->pTemporalOverRc         = NULL;
     pWelsSvcRc->pGomComplexity			= NULL;
     pWelsSvcRc->pGomForegroundBlockNum	= NULL;
     pWelsSvcRc->pCurrentFrameGomSad	= NULL;
     pWelsSvcRc->pGomCost				= NULL;
-    pWelsSvcRc->pTemporalOverRc		= NULL;
   }
 }
 
