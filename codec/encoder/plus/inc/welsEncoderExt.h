@@ -104,7 +104,9 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
 
  private:
   int InitializeInternal (SWelsSvcCodingParam* argv);
-
+  void CheckProfileSetting (int32_t iLayer, EProfileIdc uiProfileIdc);
+  void CheckLevelSetting (int32_t iLayer, ELevelIdc uiLevelIdc);
+  void CheckReferenceNumSetting (int32_t iNumRef);
   sWelsEncCtx*	m_pEncContext;
 
   welsCodecTrace*			m_pWelsTrace;
