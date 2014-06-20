@@ -459,12 +459,6 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
     else if (!strcmp (pCommand, "-maxbrTotal") && (n < argc))
       pSvcParam.iMaxBitrate = 1000*atoi  (argv[n++]);
 
-    else if (!strcmp (pCommand, "-maxbrTotal") && (n < argc))
-      pSvcParam.iMaxBitrate = 1000 * atoi (argv[n++]);
-
-    else if (!strcmp (pCommand, "-maxbrTotal") && (n < argc))
-      pSvcParam.iMaxBitrate = 1000*atoi  (argv[n++]);
-
     else if (!strcmp (pCommand, "-numl") && (n < argc)) {
       pSvcParam.iSpatialLayerNum = atoi (argv[n++]);
     }
