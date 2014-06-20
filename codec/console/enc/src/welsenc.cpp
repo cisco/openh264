@@ -501,75 +501,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       pDLayer->iSpatialBitrate	= 1000 * atoi (argv[n++]);
     }
 
-    else if (!strcmp (pCommand, "-lmaxb") && (n + 1 < argc)) {
-      unsigned int	iLayer = atoi (argv[n++]);
-      SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
-      pDLayer->iMaxSpatialBitrate	= 1000 * atoi (argv[n++]);
-    }
-
-    else if (!strcmp (pCommand, "-slcmd") && (n + 1 < argc)) {
-      unsigned int	iLayer = atoi (argv[n++]);
-      SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
-
-      switch (atoi (argv[n++])) {
-      case 0:
-        pDLayer->sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
-        break;
-      case 1:
-        pDLayer->sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
-        break;
-      case 2:
-        pDLayer->sSliceCfg.uiSliceMode = SM_RASTER_SLICE;
-        break;
-      case 3:
-        pDLayer->sSliceCfg.uiSliceMode = SM_ROWMB_SLICE;
-        break;
-      case 4:
-        pDLayer->sSliceCfg.uiSliceMode = SM_DYN_SLICE;
-        break;
-      case 5:
-        pDLayer->sSliceCfg.uiSliceMode = SM_AUTO_SLICE;
-        break;
-      default:
-        pDLayer->sSliceCfg.uiSliceMode = SM_RESERVED;
-        break;
-      }
-    }
-
-    else if (!strcmp (pCommand, "-slcsize") && (n + 1 < argc)) {
-      unsigned int	iLayer = atoi (argv[n++]);
-      SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
-      pDLayer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint = atoi (argv[n++]);
-    }
-
-    else if (!strcmp (pCommand, "-slcnum") && (n + 1 < argc)) {
-      unsigned int	iLayer = atoi (argv[n++]);
-      SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
-      pDLayer->sSliceCfg.sSliceArgument.uiSliceNum = atoi (argv[n++]);
-    }
-  }
-  return 0;
-}
-
-
-
-int FillSpecificParameters (SEncParamExt& sParam) {
-  /* Test for temporal, spatial, SNR scalability */
-  sParam.iUsageType = CAMERA_VIDEO_REAL_TIME;
-  sParam.fMaxFrameRate	= 30.0f;		// input frame rate
-  sParam.iPicWidth		= 1280;			// width of picture in samples
-  sParam.iPicHeight	= 720;			// height of picture in samples
-  sParam.iTargetBitrate = 2500000;		// target bitrate desired
-  sParam.iMaxBitrate    = MAX_BIT_RATE;
-  sParam.iRCMode       = RC_QUALITY_MODE;       //  rc mode control
-  sParam.iTemporalLayerNum = 3;	// layer number at temporal level
-  sParam.iSpatialLayerNum	= 4;	// layer number at spatial level
-  sParam.bEnableDenoise    = 0;    // denoise control
-  sParam.bEnableBackgroundDetection = 1; // background detection control
-  sParam.bEnableAdaptiveQuant       = 1; // adaptive quantization control
-  sParam.bEnableFrameSkip           = 1; // frame skipping
-  sParam.bEnableLongTermReference  = 0; // long term reference control
-  sParam.iLtrMarkPeriod = 30;
+    sParam.iLtrMarkPeriod = 30;
 
   sParam.iInputCsp			= videoFormatI420;			// color space of input sequence
   sParam.uiIntraPeriod		= 320;		// period of Intra frame
@@ -582,7 +514,6 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 90;
   sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 7.5f;
   sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 64000;
-  sParam.sSpatialLayers[iIndexLayer].iMaxSpatialBitrate     = MAX_BIT_RATE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
 
   ++ iIndexLayer;
@@ -591,7 +522,6 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 180;
   sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 15.0f;
   sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 160000;
-  sParam.sSpatialLayers[iIndexLayer].iMaxSpatialBitrate     = MAX_BIT_RATE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
 
   ++ iIndexLayer;
@@ -600,7 +530,6 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 360;
   sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 30.0f;
   sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 512000;
-  sParam.sSpatialLayers[iIndexLayer].iMaxSpatialBitrate     = MAX_BIT_RATE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.sSliceArgument.uiSliceNum = 1;
 
@@ -610,7 +539,6 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 720;
   sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 30.0f;
   sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 1500000;
-  sParam.sSpatialLayers[iIndexLayer].iMaxSpatialBitrate     = MAX_BIT_RATE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.sSliceArgument.uiSliceNum = 1;
 
