@@ -935,9 +935,9 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     CheckReferenceNumSetting (iValue);
   }
   break;
-  case ENCODER_OPTION_DROP_NUM: {
-    int32_t iValue = * ((int32_t*)pOption);
-    m_pEncContext->iDropNumber = iValue;
+  case ENCODER_OPTION_DELIVERY_STATUS: {
+    SDeliveryStatus *pValue = (static_cast<SDeliveryStatus*>(pOption));
+    m_pEncContext->iDropNumber = pValue->iDropNum;
   }
   break;
   default:

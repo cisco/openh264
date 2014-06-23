@@ -85,7 +85,7 @@ typedef enum {
   ENCODER_OPTION_PROFILE,
   ENCODER_OPTION_LEVEL,
   ENCODER_OPTION_NUMBER_REF,
-  ENCODER_OPTION_DROP_NUM,
+  ENCODER_OPTION_DELIVERY_STATUS,
 
   ENCODER_LTR_RECOVERY_REQUEST,
   ENCODER_LTR_MARKING_FEEDBACK,
@@ -414,4 +414,9 @@ typedef struct TagLevelInfo {
   ELevelIdc uiLevelIdc;    //the level info
 } SLevelInfo;
 
+typedef struct TagDeliveryStatus{
+  int iDropNum;      //the number of video frames that are dropped continuously before delivery to encoder, which is used by screen content.
+  int iDropFrameType; // the frame type that is dropped 
+  int iDropFrameSize; // the frame size that is dropped
+}SDeliveryStatus;
 #endif//WELS_VIDEO_CODEC_APPLICATION_DEFINITION_H__
