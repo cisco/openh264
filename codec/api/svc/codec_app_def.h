@@ -416,7 +416,7 @@ typedef struct TagLevelInfo {
 
 typedef struct TagDeliveryStatus{
   int iDropNum;      //the number of video frames that are dropped continuously before delivery to encoder, which is used by screen content.
-  int iDropFrameType; // the frame type that is dropped 
+  int iDropFrameType; // the frame type that is dropped
   int iDropFrameSize; // the frame size that is dropped
 }SDeliveryStatus;
 #endif//WELS_VIDEO_CODEC_APPLICATION_DEFINITION_H__
