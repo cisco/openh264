@@ -216,7 +216,7 @@ typedef struct TagWelsEncCtx {
 
   int32_t iEncoderError;
   WELS_MUTEX					mutexEncoderError;
-
+  int32_t iDropNumber;
 } sWelsEncCtx/*, *PWelsEncCtx*/;
 }
 #endif//sWelsEncCtx_H__

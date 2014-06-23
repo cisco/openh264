@@ -356,16 +356,16 @@ int CWelsH264SVCEncoder::InitializeInternal (SWelsSvcCodingParam* pCfg) {
   if (pCfg->iUsageType == SCREEN_CONTENT_REAL_TIME) {
     if (pCfg->bEnableLongTermReference) {
       pCfg->iLTRRefNum = WELS_CLIP3 (pCfg->iLTRRefNum, 1, LONG_TERM_REF_NUM_SCREEN);
-      if(pCfg->iNumRefFrame == AUTO_REF_PIC_COUNT)
+      if (pCfg->iNumRefFrame == AUTO_REF_PIC_COUNT)
         pCfg->iNumRefFrame = WELS_MAX (1, WELS_LOG2 (pCfg->uiGopSize)) + pCfg->iLTRRefNum;
     } else {
       pCfg->iLTRRefNum = 0;
-      if(pCfg->iNumRefFrame == AUTO_REF_PIC_COUNT)
+      if (pCfg->iNumRefFrame == AUTO_REF_PIC_COUNT)
         pCfg->iNumRefFrame = WELS_MAX (1, pCfg->uiGopSize >> 1);
     }
   } else {
     pCfg->iLTRRefNum = pCfg->bEnableLongTermReference ? WELS_CLIP3 (pCfg->iLTRRefNum, 1, LONG_TERM_REF_NUM) : 0;
-    if(pCfg->iNumRefFrame == AUTO_REF_PIC_COUNT){
+    if (pCfg->iNumRefFrame == AUTO_REF_PIC_COUNT) {
       pCfg->iNumRefFrame		= ((pCfg->uiGopSize >> 1) > 1) ? ((pCfg->uiGopSize >> 1) + pCfg->iLTRRefNum) :
                               (MIN_REF_PIC_COUNT + pCfg->iLTRRefNum);
       pCfg->iNumRefFrame		= WELS_CLIP3 (pCfg->iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM);
@@ -554,7 +554,29 @@ int CWelsH264SVCEncoder::ForceIntraFrame (bool bIDR) {
 
   return 0;
 }
-
+void CWelsH264SVCEncoder::CheckProfileSetting (int32_t iLayer, EProfileIdc uiProfileIdc) {
+  SSpatialLayerConfig* pLayerInfo = &m_pEncContext->pSvcParam->sSpatialLayers[iLayer];
+  pLayerInfo->uiProfileIdc = uiProfileIdc;
+  if ((iLayer == SPATIAL_LAYER_0) && (uiProfileIdc != PRO_BASELINE)) {
+    pLayerInfo->uiProfileIdc = PRO_BASELINE;
+    WelsLog (m_pEncContext, WELS_LOG_WARNING, "doesn't support profile(%d),change to baseline profile", uiProfileIdc);
+  }
+  if (iLayer > SPATIAL_LAYER_0) {
+    if ((uiProfileIdc != PRO_BASELINE) || (uiProfileIdc != PRO_SCALABLE_BASELINE)) {
+      pLayerInfo->uiProfileIdc = PRO_BASELINE;
+      WelsLog (m_pEncContext, WELS_LOG_WARNING, "doesn't support profile(%d),change to baseline profile", uiProfileIdc);
+    }
+  }
+}
+void CWelsH264SVCEncoder::CheckLevelSetting (int32_t iLayer, ELevelIdc uiLevelIdc) {
+  SSpatialLayerConfig* pLayerInfo = &m_pEncContext->pSvcParam->sSpatialLayers[iLayer];
+  pLayerInfo->uiLevelIdc = uiLevelIdc;
+  //TBD
+}
+void CWelsH264SVCEncoder::CheckReferenceNumSetting (int32_t iNumRef) {
+  m_pEncContext->pSvcParam->iNumRefFrame = iNumRef;
+  //TBD
+}
 /************************************************************************
 * InDataFormat, IDRInterval, SVC Encode Param, Frame Rate, Bitrate,..
 ************************************************************************/
@@ -886,6 +908,36 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
       void* ctx = * ((void**)pOption);
       m_pWelsTrace->SetTraceCallbackContext (ctx);
     }
+  }
+  break;
+  case ENCODER_OPTION_PROFILE: {
+    SProfileInfo* pProfileInfo = (static_cast<SProfileInfo*> (pOption));
+    if ((pProfileInfo->iLayer < SPATIAL_LAYER_0) || (pProfileInfo->iLayer > SPATIAL_LAYER_3)) {
+      WelsLog (m_pEncContext, WELS_LOG_ERROR,
+               "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_PROFILE,iLayer = %d(rang0-3)\n", pProfileInfo->iLayer);
+      return cmInitParaError;
+    }
+    CheckProfileSetting (pProfileInfo->iLayer, pProfileInfo->uiProfileIdc);
+  }
+  break;
+  case ENCODER_OPTION_LEVEL: {
+    SLevelInfo* pLevelInfo = (static_cast<SLevelInfo*> (pOption));
+    if ((pLevelInfo->iLayer < SPATIAL_LAYER_0) || (pLevelInfo->iLayer > SPATIAL_LAYER_3)) {
+      WelsLog (m_pEncContext, WELS_LOG_ERROR,
+               "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_PROFILE,iLayer = %d(rang0-3)\n", pLevelInfo->iLayer);
+      return cmInitParaError;
+    }
+    CheckLevelSetting (pLevelInfo->iLayer, pLevelInfo->uiLevelIdc);
+  }
+  break;
+  case ENCODER_OPTION_NUMBER_REF: {
+    int32_t iValue = * ((int32_t*)pOption);
+    CheckReferenceNumSetting (iValue);
+  }
+  break;
+  case ENCODER_OPTION_DELIVERY_STATUS: {
+    SDeliveryStatus *pValue = (static_cast<SDeliveryStatus*>(pOption));
+    m_pEncContext->iDropNumber = pValue->iDropNum;
   }
   break;
   default:
