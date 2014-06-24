@@ -40,6 +40,7 @@ CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS += --sysroot=$(SYSROOT)
 SHLDFLAGS = -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,-soname,lib$(PROJECT_NAME).so
 
+LOCAL_LDLIBS := $(NDKROOT)/sources/cxx-stl/stlport/libs/$(APP_ABI)/libstlport_static.a 
 STL_INCLUDES = \
     -I$(NDKROOT)/sources/cxx-stl/stlport/stlport
 
