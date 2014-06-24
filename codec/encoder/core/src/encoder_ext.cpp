@@ -2885,7 +2885,6 @@ int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst) {
   int32_t iReturn = WelsWriteParameterSets (pCtx, &pLayerBsInfo->pNalLengthInByte[0], &iCountNal);
   WELS_VERIFY_RETURN_IFNEQ (iReturn, ENC_RETURN_SUCCESS)
 
-  pLayerBsInfo->uiPriorityId  = 0;
   pLayerBsInfo->uiSpatialId   = 0;
   pLayerBsInfo->uiTemporalId  = 0;
   pLayerBsInfo->uiQualityId   = 0;
@@ -2948,13 +2947,13 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   iSpatialNum = pCtx->pVpp->BuildSpatialPicList (pCtx, pSrcPic);
   if (iSpatialNum < 1) {	// skip due to temporal layer settings (different frame rate)
     ++ pCtx->iCodingIndex;
-    pFbi->eOutputFrameType = videoFrameTypeSkip;
+    pFbi->eFrameType = videoFrameTypeSkip;
     return ENC_RETURN_SUCCESS;
   }
 
   eFrameType = DecideFrameType (pCtx, iSpatialNum);
   if (eFrameType == videoFrameTypeSkip) {
-    pFbi->eOutputFrameType = eFrameType;
+    pFbi->eFrameType = eFrameType;
     return ENC_RETURN_SUCCESS;
   }
 
@@ -2969,7 +2968,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       }
     }
     if (true == bSkipMustFlag) {
-      pFbi->eOutputFrameType = videoFrameTypeSkip;
+      pFbi->eFrameType = videoFrameTypeSkip;
       return ENC_RETURN_SUCCESS;
     }
   }
@@ -2992,7 +2991,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     pCtx->iEncoderError = WelsWriteParameterSets (pCtx, &pLayerBsInfo->pNalLengthInByte[0], &iCountNal);
     WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
 
-    pLayerBsInfo->uiPriorityId	= 0;
     pLayerBsInfo->uiSpatialId		= 0;
     pLayerBsInfo->uiTemporalId	= 0;
     pLayerBsInfo->uiQualityId		= 0;
@@ -3095,7 +3093,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       WelsLog (pCtx, WELS_LOG_WARNING,
                "WelsEncoderEncodeExt(), WelsBuildRefList failed for P frames, pCtx->iNumRef0= %d. ForceCodingIDR!\n",
                pCtx->iNumRef0);
-      pFbi->eOutputFrameType = videoFrameTypeIDR;
+      pFbi->eFrameType = videoFrameTypeIDR;
       pCtx->iEncoderError = ENC_RETURN_CORRECTED;
       return ENC_RETURN_CORRECTED;
     }
@@ -3150,7 +3148,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       pLayerBsInfo->uiSpatialId		= iCurDid;
       pLayerBsInfo->uiTemporalId	= iCurTid;
       pLayerBsInfo->uiQualityId		= 0;
-      pLayerBsInfo->uiPriorityId	= 0;
       pLayerBsInfo->iNalCount		= ++ iNalIdxInLayer;
     }
     // for dynamic slicing single threading..
@@ -3336,7 +3333,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         pLayerBsInfo->uiSpatialId		= iCurDid;
         pLayerBsInfo->uiTemporalId	= iCurTid;
         pLayerBsInfo->uiQualityId		= 0;
-        pLayerBsInfo->uiPriorityId	= 0;
         pLayerBsInfo->iNalCount		= iNalIdxInLayer;
       }
     }
@@ -3360,7 +3356,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         ForceCodingIDR (pCtx);
         WelsLog (pCtx, WELS_LOG_WARNING, "WelsEncoderEncodeExt(), WelsUpdateRefList failed. ForceCodingIDR!\n");
         //the above is to set the next frame to be IDR
-        pFbi->eOutputFrameType = eFrameType;
+        pFbi->eFrameType = eFrameType;
         return ENC_RETURN_CORRECTED;
       }
     }
@@ -3474,7 +3470,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
       pCtx->pWelsSvcRc[pCtx->uiDependencyId].iPaddingSize = 0;
 
-      pLayerBsInfo->uiPriorityId	= 0;
       pLayerBsInfo->uiSpatialId		= 0;
       pLayerBsInfo->uiTemporalId	= 0;
       pLayerBsInfo->uiQualityId		= 0;
@@ -3512,7 +3507,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       ForceCodingIDR (pCtx);
       WelsLog (pCtx, WELS_LOG_WARNING, "WelsEncoderEncodeExt(), Logic Error Found in temporal level. ForceCodingIDR!\n");
       //the above is to set the next frame IDR
-      pFbi->eOutputFrameType = eFrameType;
+      pFbi->eFrameType = eFrameType;
       return ENC_RETURN_CORRECTED;
     }
 
@@ -3548,7 +3543,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
   WelsEmms();
 
-  pFbi->eOutputFrameType = eFrameType;
+  pFbi->eFrameType = eFrameType;
   return ENC_RETURN_SUCCESS;
 }
 
@@ -3939,7 +3934,6 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
   pLayerBsInfo->uiSpatialId		= pCtx->uiDependencyId;
   pLayerBsInfo->uiTemporalId	= pCtx->uiTemporalId;
   pLayerBsInfo->uiQualityId		= 0;
-  pLayerBsInfo->uiPriorityId	= 0;
   pLayerBsInfo->iNalCount		= iNalIdxInLayer;
 
   return ENC_RETURN_SUCCESS;

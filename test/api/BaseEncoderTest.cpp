@@ -96,7 +96,7 @@ void BaseEncoderTest::EncodeStream(InputStream* in, EUsageType usageType, int wi
   while (in->read(buf.data(), frameSize) == frameSize) {
     rv = encoder_->EncodeFrame(&pic, &info);
     ASSERT_TRUE(rv == cmResultSuccess);
-    if (info.eOutputFrameType != videoFrameTypeSkip && cbk != NULL) {
+    if (info.eFrameType != videoFrameTypeSkip && cbk != NULL) {
       cbk->onEncodeFrame(info);
     }
   }

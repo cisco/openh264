@@ -247,19 +247,6 @@ enum {
   WELS_LOG_DEFAULT	= WELS_LOG_DEBUG	// Default log iLevel in Wels codec
 };
 
-typedef enum{
-  FRAMEIDC_IDR              = 0x00,
-  FRAMEIDC_I                = 0x04,
-  FRAMEIDC_LTR              = 0x08,
-  FRAMEIDC_T0               = 0x10,
-  FRAMEIDC_T1               = 0x11,
-  FRAMEIDC_T2               = 0x12,
-  FRAMEIDC_T3               = 0x13,
-  FRAMEIDC_T4               = 0x14,
-  FRAMEIDC_UNKNOWN          = 0x20,
-  FRAMEIDC_INVALID          = 0xFF,
-}EFrameIDC;
-
 typedef struct {
   SliceModeEnum uiSliceMode; //by default, uiSliceMode will be SM_SINGLE_SLICE
   SSliceArgument sSliceArgument;
@@ -376,8 +363,6 @@ typedef struct {
   unsigned char uiSpatialId;
   unsigned char uiQualityId;
 
-  unsigned char uiPriorityId; //ignore it currently
-
   unsigned char uiLayerType;
 
   int	iNalCount;					// Count number of NAL coded already
@@ -388,12 +373,14 @@ typedef struct {
 
 typedef struct {
   int		iTemporalId;	// Temporal ID
-  EFrameIDC	eFrameIdc;
+  //The sub sequence layers are ordered hierarchically based on their dependency on each other so that any picture in a layer shall not be
+  //predicted from any picture on any higher layer.
+  int	  iSubSeqId;  //refer to D.2.11 Sub-sequence information SEI message semantics
 
   int		iLayerNum;
   SLayerBSInfo	sLayerInfo[MAX_LAYER_NUM_OF_FRAME];
 
-  EVideoFrameType eOutputFrameType;
+  EVideoFrameType eFrameType;
   long long uiTimeStamp;
 } SFrameBSInfo, *PFrameBSInfo;
 

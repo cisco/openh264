@@ -634,7 +634,6 @@ int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFr
     pLbi->uiSpatialId		= pNalHdrExt->uiDependencyId;
     pLbi->uiTemporalId	= pNalHdrExt->uiTemporalId;
     pLbi->uiQualityId		= 0;
-    pLbi->uiPriorityId	= 0;
     pLbi->iNalCount		= kiNalCnt;
   } else {
     pLbi->iNalCount		+= kiNalCnt;

@@ -360,7 +360,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
     GMPVideoFrameType encoded_type;
     bool has_frame = false;
 
-    switch (encoded.eOutputFrameType) {
+    switch (encoded.eFrameType) {
     case videoFrameTypeIDR:
       encoded_type = kGMPKeyFrame;
       has_frame = true;
@@ -379,7 +379,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
     case videoFrameTypeIPMixed://this type is currently not suppported
     case videoFrameTypeInvalid:
       GMPLOG (GL_ERROR, "Couldn't encode frame. Type = "
-              << encoded.eOutputFrameType);
+              << encoded.eFrameType);
       break;
     default:
       // The API is defined as returning a type.

@@ -805,7 +805,7 @@ int ProcessEncoding(ISVCEncoder* pPtrEnc, int argc, char** argv,bool bConfigFile
     iTotal += WelsTime() - iStart;
 
     // fixed issue in case dismatch source picture introduced by frame skipped, 1/12/2010
-    if (videoFrameTypeSkip == sFbi.eOutputFrameType) {
+    if (videoFrameTypeSkip == sFbi.eFrameType) {
       continue;
     }
 
