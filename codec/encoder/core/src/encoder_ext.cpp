@@ -3803,6 +3803,26 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   pMA->WelsFree (pCurLayer->sLayerInfo.pSliceInLayer, "Slice");
   pCurLayer->sLayerInfo.pSliceInLayer = pSlice;
 
+  int16_t* pFirstMbInSlice = (int16_t*)pMA->WelsMalloc (iMaxSliceNum * sizeof (int16_t), "pSliceSeg->pFirstMbInSlice");
+  if (NULL == pFirstMbInSlice)
+    return ENC_RETURN_MEMALLOCERR;
+  memset(pFirstMbInSlice, 0, sizeof(int16_t) * iMaxSliceNum);
+  memcpy (pFirstMbInSlice, pCurLayer->pSliceEncCtx->pFirstMbInSlice, sizeof (int16_t) * iMaxSliceNumOld);
+  pMA->WelsFree (pCurLayer->pSliceEncCtx->pFirstMbInSlice, "pSliceSeg->pFirstMbInSlice");
+  pCurLayer->pSliceEncCtx->pFirstMbInSlice = pFirstMbInSlice;
+
+  int32_t* pCountMbNumInSlice = (int32_t*)pMA->WelsMalloc (iMaxSliceNum * sizeof (int32_t),"pSliceSeg->pCountMbNumInSlice");
+  if (NULL == pCountMbNumInSlice)
+    return ENC_RETURN_MEMALLOCERR;
+  memcpy (pCountMbNumInSlice, pCurLayer->pSliceEncCtx->pCountMbNumInSlice, sizeof (int32_t) * iMaxSliceNumOld);
+  uiSliceIdx = iMaxSliceNumOld;
+  while (uiSliceIdx < iMaxSliceNum) {
+    pCountMbNumInSlice[uiSliceIdx] = pCurLayer->pSliceEncCtx->iMbNumInFrame;
+    uiSliceIdx++;
+  }
+  pMA->WelsFree (pCurLayer->pSliceEncCtx->pCountMbNumInSlice, "pSliceSeg->pCountMbNumInSlice");
+  pCurLayer->pSliceEncCtx->pCountMbNumInSlice = pCountMbNumInSlice;
+
   SRCSlicing* pSlcingOverRc = (SRCSlicing*)pMA->WelsMalloc (iMaxSliceNum * sizeof (SRCSlicing), "SlicingOverRC");
   if (NULL == pSlcingOverRc)
     return ENC_RETURN_MEMALLOCERR;
@@ -3823,21 +3843,6 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   }
   pMA->WelsFree (pCtx->pWelsSvcRc->pSlicingOverRc, "SlicingOverRC");
   pCtx->pWelsSvcRc->pSlicingOverRc = pSlcingOverRc;
-
-  int16_t* pFirstMbInSlice = (int16_t*)pMA->WelsMalloc (iMaxSliceNum * sizeof (int16_t), "pSliceSeg->pFirstMbInSlice");
-  if (NULL == pFirstMbInSlice)
-    return ENC_RETURN_MEMALLOCERR;
-  memcpy (pFirstMbInSlice, pCurLayer->pSliceEncCtx->pFirstMbInSlice, sizeof (int16_t) * iMaxSliceNumOld);
-  pMA->WelsFree (pCurLayer->pSliceEncCtx->pFirstMbInSlice, "pSliceSeg->pFirstMbInSlice");
-  pCurLayer->pSliceEncCtx->pFirstMbInSlice = pFirstMbInSlice;
-
-  int32_t* pCountMbNumInSlice = (int32_t*)pMA->WelsMalloc (iMaxSliceNum * sizeof (int32_t),
-                                "pSliceSeg->pCountMbNumInSlice");
-  if (NULL == pCountMbNumInSlice)
-    return ENC_RETURN_MEMALLOCERR;
-  memcpy (pCountMbNumInSlice, pCurLayer->pSliceEncCtx->pCountMbNumInSlice, sizeof (int32_t) * iMaxSliceNumOld);
-  pMA->WelsFree (pCurLayer->pSliceEncCtx->pCountMbNumInSlice, "pSliceSeg->pCountMbNumInSlice");
-  pCurLayer->pSliceEncCtx->pCountMbNumInSlice = pCountMbNumInSlice;
 
   if (pCtx->iMaxSliceCount < iMaxSliceNum)
     pCtx->iMaxSliceCount = iMaxSliceNum;

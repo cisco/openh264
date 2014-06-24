@@ -109,6 +109,14 @@ int32_t AssignMbMapMultipleSlices (SSliceCtx* pSliceSeg, const SSliceConfig* kpM
       ++ iSliceIdx;
     } while (iSliceIdx < kiCountSliceNumInFrame && iMbIdx < kiCountNumMbInFrame);
   } else if (SM_DYN_SLICE == pSliceSeg->uiSliceMode) {
+    int32_t iSliceIdx = 0;
+    const int32_t kiMaxSliceNum = pSliceSeg->iMaxSliceNumConstraint;
+    const int32_t kiCountNumMbInFrame = pSliceSeg->iMbNumInFrame;
+    do {
+      pSliceSeg->pFirstMbInSlice[iSliceIdx] = 0;
+      pSliceSeg->pCountMbNumInSlice[iSliceIdx] = kiCountNumMbInFrame;
+      iSliceIdx++;
+    } while (iSliceIdx < kiMaxSliceNum);
   } else {	// any else uiSliceMode?
     assert (0);
   }
