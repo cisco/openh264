@@ -157,8 +157,6 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
 
   }
   return WelsCheckRefFrameLimitation (pLogCtx, pCfg);
-
-  return ENC_RETURN_SUCCESS;
 }
 
 
