@@ -40,14 +40,16 @@ CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS += --sysroot=$(SYSROOT)
 SHLDFLAGS = -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,-soname,lib$(PROJECT_NAME).so
 
-LOCAL_LDLIBS := $(NDKROOT)/sources/cxx-stl/stlport/libs/$(APP_ABI)/libstlport_static.a 
 STL_INCLUDES = \
     -I$(NDKROOT)/sources/cxx-stl/stlport/stlport
+STL_LIB = \
+    $(NDKROOT)/sources/cxx-stl/stlport/libs/$(APP_ABI)/libstlport_static.a
 
 GTEST_INCLUDES = $(STL_INCLUDES)
 CODEC_UNITTEST_INCLUDES = $(STL_INCLUDES)
-CODEC_UNITTEST_LDFLAGS_SUFFIX = \
-    $(NDKROOT)/sources/cxx-stl/stlport/libs/$(APP_ABI)/libstlport_static.a
+CODEC_UNITTEST_LDFLAGS_SUFFIX = $(STL_LIB)
+MODULE_INCLUDES = $(STL_INCLUDES)
+MODULE_LDFLAGS = $(STL_LIB)
 
 binaries : decdemo encdemo
 
