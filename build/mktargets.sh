@@ -11,5 +11,5 @@ python build/mktargets.py --directory test/encoder --prefix encoder_unittest
 python build/mktargets.py --directory test/decoder --prefix decoder_unittest
 python build/mktargets.py --directory test/processing --prefix processing_unittest
 python build/mktargets.py --directory test/api --prefix api_test
-python build/mktargets.py --directory module --library module
+python build/mktargets.py --directory module --prefix module
 python build/mktargets.py --directory gtest --library gtest --out build/gtest-targets.mk --cpp-suffix .cc --include gtest-all.cc
