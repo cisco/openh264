@@ -28,6 +28,7 @@ codec_unittest
 
 # External source
 gtest
+gmp-api
 
 # Output files from example commands
 testbin/test_vd_1d.264
