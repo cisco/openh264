@@ -2899,6 +2899,22 @@ int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst) {
   return ENC_RETURN_SUCCESS;
 }
 
+int32_t GetSubSequenceId(sWelsEncCtx* pCtx,EVideoFrameType eFrameType){
+  int32_t iSubSeqId = 0;
+  if(eFrameType == videoFrameTypeIDR )
+    iSubSeqId = 0;
+  else if(eFrameType == videoFrameTypeI)
+    iSubSeqId = 1;
+  else if (eFrameType == videoFrameTypeP){
+    if(pCtx->bCurFrameMarkedAsSceneLtr)
+      iSubSeqId = 2;
+    else 
+      iSubSeqId = 3 + pCtx->uiTemporalId; //T0:3 T1:4 T2:5 T3:6
+  }
+  else 
+    iSubSeqId = 3 + MAX_TEMPORAL_LAYER_NUM;
+   return iSubSeqId;
+}
 /*!
  * \brief	core svc encoding process
  *
@@ -3540,7 +3556,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   ++ pCtx->iCodingIndex;
   pCtx->eLastNalPriority	= eNalRefIdc;
   pFbi->iLayerNum			= iLayerNum;
-
+  pFbi->iSubSeqId = GetSubSequenceId(pCtx,eFrameType); 
   WelsEmms();
 
   pFbi->eFrameType = eFrameType;
