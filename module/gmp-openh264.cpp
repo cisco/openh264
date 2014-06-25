@@ -331,6 +331,15 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
                  GMPVideoFrameType frame_type) {
     SFrameBSInfo encoded;
 
+    if (frame_type  == kGMPKeyFrame) {
+      encoder_->ForceIntraFrame (true);
+      if (!inputImage)
+        return;
+    }
+    if (!inputImage) {
+      GMPLOG (GL_ERROR, "no input image");
+      return;
+    }
     SSourcePicture src;
 
     src.iColorFormat = videoFormatI420;
