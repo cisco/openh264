@@ -2899,6 +2899,21 @@ int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst) {
   return ENC_RETURN_SUCCESS;
 }
 
+int32_t GetSubSequenceId (sWelsEncCtx* pCtx, EVideoFrameType eFrameType) {
+  int32_t iSubSeqId = 0;
+  if (eFrameType == videoFrameTypeIDR)
+    iSubSeqId = 0;
+  else if (eFrameType == videoFrameTypeI)
+    iSubSeqId = 1;
+  else if (eFrameType == videoFrameTypeP) {
+    if (pCtx->bCurFrameMarkedAsSceneLtr)
+      iSubSeqId = 2;
+    else
+      iSubSeqId = 3 + pCtx->uiTemporalId; //T0:3 T1:4 T2:5 T3:6
+  } else
+    iSubSeqId = 3 + MAX_TEMPORAL_LAYER_NUM;
+  return iSubSeqId;
+}
 /*!
  * \brief	core svc encoding process
  *
@@ -3540,7 +3555,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   ++ pCtx->iCodingIndex;
   pCtx->eLastNalPriority	= eNalRefIdc;
   pFbi->iLayerNum			= iLayerNum;
-
+  pFbi->iSubSeqId = GetSubSequenceId (pCtx, eFrameType);
   WelsEmms();
 
   pFbi->eFrameType = eFrameType;
@@ -3801,12 +3816,13 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   int16_t* pFirstMbInSlice = (int16_t*)pMA->WelsMalloc (iMaxSliceNum * sizeof (int16_t), "pSliceSeg->pFirstMbInSlice");
   if (NULL == pFirstMbInSlice)
     return ENC_RETURN_MEMALLOCERR;
-  memset(pFirstMbInSlice, 0, sizeof(int16_t) * iMaxSliceNum);
+  memset (pFirstMbInSlice, 0, sizeof (int16_t) * iMaxSliceNum);
   memcpy (pFirstMbInSlice, pCurLayer->pSliceEncCtx->pFirstMbInSlice, sizeof (int16_t) * iMaxSliceNumOld);
   pMA->WelsFree (pCurLayer->pSliceEncCtx->pFirstMbInSlice, "pSliceSeg->pFirstMbInSlice");
   pCurLayer->pSliceEncCtx->pFirstMbInSlice = pFirstMbInSlice;
 
-  int32_t* pCountMbNumInSlice = (int32_t*)pMA->WelsMalloc (iMaxSliceNum * sizeof (int32_t),"pSliceSeg->pCountMbNumInSlice");
+  int32_t* pCountMbNumInSlice = (int32_t*)pMA->WelsMalloc (iMaxSliceNum * sizeof (int32_t),
+                                "pSliceSeg->pCountMbNumInSlice");
   if (NULL == pCountMbNumInSlice)
     return ENC_RETURN_MEMALLOCERR;
   memcpy (pCountMbNumInSlice, pCurLayer->pSliceEncCtx->pCountMbNumInSlice, sizeof (int32_t) * iMaxSliceNumOld);
@@ -3824,13 +3840,15 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   memcpy (pSlcingOverRc, pCtx->pWelsSvcRc->pSlicingOverRc, sizeof (SRCSlicing) * iMaxSliceNumOld);
   uiSliceIdx = iMaxSliceNumOld;
   SRCSlicing* pSORC = &pSlcingOverRc[uiSliceIdx];
-  const int32_t kiBitsPerMb		= WELS_DIV_ROUND(pCtx->pWelsSvcRc->iTargetBits * INT_MULTIPLY, pCtx->pWelsSvcRc->iNumberMbFrame);
+  const int32_t kiBitsPerMb		= WELS_DIV_ROUND (pCtx->pWelsSvcRc->iTargetBits * INT_MULTIPLY,
+                                pCtx->pWelsSvcRc->iNumberMbFrame);
   while (uiSliceIdx < iMaxSliceNum) {
     pSORC->iComplexityIndexSlice = 0;
     pSORC->iCalculatedQpSlice = pCtx->iGlobalQp;
     pSORC->iTotalQpSlice	= 0;
     pSORC->iTotalMbSlice	= 0;
-    pSORC->iTargetBitsSlice = WELS_DIV_ROUND(kiBitsPerMb * pCurLayer->pSliceEncCtx->pCountMbNumInSlice[uiSliceIdx], INT_MULTIPLY);
+    pSORC->iTargetBitsSlice = WELS_DIV_ROUND (kiBitsPerMb * pCurLayer->pSliceEncCtx->pCountMbNumInSlice[uiSliceIdx],
+                              INT_MULTIPLY);
     pSORC->iFrameBitsSlice	= 0;
     pSORC->iGomBitsSlice	= 0;
     pSORC ++;
