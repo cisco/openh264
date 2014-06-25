@@ -48,6 +48,7 @@ GTEST_INCLUDES = $(STL_INCLUDES)
 CODEC_UNITTEST_INCLUDES = $(STL_INCLUDES)
 CODEC_UNITTEST_LDFLAGS_SUFFIX = \
     $(NDKROOT)/sources/cxx-stl/stlport/libs/$(APP_ABI)/libstlport_static.a
+MODULE_INCLUDES = $(STL_INCLUDES)
 
 binaries : decdemo encdemo
 
