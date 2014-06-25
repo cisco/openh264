@@ -357,7 +357,6 @@ bool WelsUpdateRefList (void* pEncCtx) {
   SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SLTRState* pLtr			= &pCtx->pLtr[pCtx->uiDependencyId];
   SSpatialLayerInternal* pParamD	= &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
-  const int32_t kiNumRef	= pCtx->pSvcParam->iNumRefFrame;
 
   int32_t iRefIdx			= 0;
   const uint8_t kuiTid		= pCtx->uiTemporalId;
