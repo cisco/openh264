@@ -40,6 +40,7 @@
 
 #include "au_set.h"
 #include "svc_enc_golomb.h"
+#include "macros.h"
 namespace WelsSVCEnc {
 
 
@@ -102,6 +103,44 @@ static inline int32_t WelsCheckLevelLimitation (const SWelsSPS* kpSps, const SLe
 
 }
 
+int32_t WelsCheckRefFrameLimitation (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam) {
+  int32_t i = 0;
+  int32_t iRefFrame = 1;
+  //get the number of reference frame according to level limitation.
+  for (i = 0; i < pParam->iSpatialLayerNum; ++ i) {
+    SSpatialLayerConfig* pSpatialLayer = &pParam->sSpatialLayers[i];
+    uint32_t uiPicInMBs = ((pSpatialLayer->iVideoHeight + 15) >> 4) * ((pSpatialLayer->iVideoWidth + 15) >> 4);
+    if (pSpatialLayer->uiLevelIdc == LEVEL_UNKNOWN) {
+      pSpatialLayer->uiLevelIdc = LEVEL_5_0;
+      WelsLog (pLogCtx, WELS_LOG_WARNING, "change level to level5.0\n");
+    }
+    iRefFrame = g_ksLevelLimit[pSpatialLayer->uiLevelIdc - 1].uiMaxDPBMB / uiPicInMBs;
+    if (iRefFrame < pParam->iMaxNumRefFrame)
+      pParam->iMaxNumRefFrame = iRefFrame;
+    if (pParam->iMaxNumRefFrame < 1) {
+      pParam->iMaxNumRefFrame = 1;
+      WelsLog (pLogCtx, WELS_LOG_ERROR, "error Level setting (%d)\n", pSpatialLayer->uiLevelIdc);
+      return ENC_RETURN_UNSUPPORTED_PARA;
+    }
+  }
+  //check temporal layer number according to the number of reference frame
+  int32_t iMaxTemporalLayer = pParam->iNumRefFrame - pParam->iLTRRefNum;
+  if (iMaxTemporalLayer < 1) {
+    iMaxTemporalLayer = 1;
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "Invalid the number of reference frame ltr num(%d)\n", pParam->iLTRRefNum);
+    return ENC_RETURN_UNSUPPORTED_PARA;
+  }
+  if (pParam->iTemporalLayerNum > iMaxTemporalLayer)
+    pParam->iTemporalLayerNum = iMaxTemporalLayer;
+
+  //get the maximum num of reference frame according to temporal Layer
+  iRefFrame = WELS_CLIP3 ((pParam->iTemporalLayerNum + pParam->iLTRRefNum), MIN_REF_PIC_COUNT,
+                          MAX_REFERENCE_REORDER_COUNT_NUM);
+  if (pParam->iMaxNumRefFrame < iRefFrame)
+    pParam->iMaxNumRefFrame = iRefFrame;
+
+  return ENC_RETURN_SUCCESS;
+}
 static inline int32_t WelsGetLevelIdc (const SWelsSPS* kpSps, float fFrameRate, int32_t iTargetBitRate) {
   int32_t iOrder;
   for (iOrder = 0; iOrder < LEVEL_NUMBER; iOrder++) {

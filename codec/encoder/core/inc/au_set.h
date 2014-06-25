@@ -45,7 +45,7 @@
 #include "bit_stream.h"
 #include "parameter_sets.h"
 #include "param_svc.h"
-
+#include "utils.h"
 namespace WelsSVCEnc {
 /*!
  *************************************************************************************
@@ -139,6 +139,6 @@ int32_t WelsInitPps (SWelsPPS* pPps,
                      const uint32_t kuiPpsId,
                      const bool kbDeblockingFilterPresentFlag,
                      const bool kbUsingSubsetSps);
-
+int32_t WelsCheckRefFrameLimitation(SLogContext* pLogCtx,SWelsSvcCodingParam* pParam);
 }
 #endif//WELS_ACCESS_UNIT_PARSER_H__

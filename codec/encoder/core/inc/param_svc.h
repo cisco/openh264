@@ -116,7 +116,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
   iCountThreadsNum;                       //              # derived from disable_multiple_slice_idc (=0 or >1) means;
 
   int8_t		iDecompStages;		// GOP size dependency
-
+  int32_t  iMaxNumRefFrame;
 
  public:
   TagWelsSvcCodingParam() {
@@ -190,7 +190,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
   void FillDefault() {
     FillDefault (*this);
     uiGopSize			= 1;			// GOP size (at maximal frame rate: 16)
-
+    iMaxNumRefFrame = 1;
     SUsedPicRect.iLeft	=
       SUsedPicRect.iTop	=
         SUsedPicRect.iWidth	=
@@ -369,6 +369,8 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
         iNumRefFrame		= WELS_CLIP3 (iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM);
       }
     }
+    if (iNumRefFrame > iMaxNumRefFrame)
+      iMaxNumRefFrame = iNumRefFrame;
     iLtrMarkPeriod  = pCodingParam.iLtrMarkPeriod;
 
     bPrefixNalAddingCtrl	= pCodingParam.bPrefixNalAddingCtrl;
@@ -391,8 +393,8 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       float fLayerFrameRate	= WELS_CLIP3 (pCodingParam.sSpatialLayers[iIdxSpatial].fFrameRate,
                                           MIN_FRAME_RATE, fParamMaxFrameRate);
       pSpatialLayer->fFrameRate =
-      pDlp->fInputFrameRate	=
-        pDlp->fOutputFrameRate	= WELS_CLIP3 (fLayerFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
+        pDlp->fInputFrameRate	=
+          pDlp->fOutputFrameRate	= WELS_CLIP3 (fLayerFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
       if (pDlp->fInputFrameRate > fMaxFr + EPSN)
         fMaxFr = pDlp->fInputFrameRate;
 

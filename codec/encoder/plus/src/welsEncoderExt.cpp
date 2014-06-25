@@ -356,22 +356,23 @@ int CWelsH264SVCEncoder::InitializeInternal (SWelsSvcCodingParam* pCfg) {
   if (pCfg->iUsageType == SCREEN_CONTENT_REAL_TIME) {
     if (pCfg->bEnableLongTermReference) {
       pCfg->iLTRRefNum = WELS_CLIP3 (pCfg->iLTRRefNum, 1, LONG_TERM_REF_NUM_SCREEN);
-      if (pCfg->iNumRefFrame == AUTO_REF_PIC_COUNT)
+      if(pCfg->iNumRefFrame == AUTO_REF_PIC_COUNT)
         pCfg->iNumRefFrame = WELS_MAX (1, WELS_LOG2 (pCfg->uiGopSize)) + pCfg->iLTRRefNum;
     } else {
       pCfg->iLTRRefNum = 0;
-      if (pCfg->iNumRefFrame == AUTO_REF_PIC_COUNT)
-        pCfg->iNumRefFrame = WELS_MAX (1, pCfg->uiGopSize >> 1);
+      if(pCfg->iNumRefFrame == AUTO_REF_PIC_COUNT)
+        pCfg->iNumRefFrame = WELS_MAX (1, pCfg->uiGopSize >> 1);;
     }
   } else {
     pCfg->iLTRRefNum = pCfg->bEnableLongTermReference ? WELS_CLIP3 (pCfg->iLTRRefNum, 1, LONG_TERM_REF_NUM) : 0;
-    if (pCfg->iNumRefFrame == AUTO_REF_PIC_COUNT) {
+    if(pCfg->iNumRefFrame == AUTO_REF_PIC_COUNT){
       pCfg->iNumRefFrame		= ((pCfg->uiGopSize >> 1) > 1) ? ((pCfg->uiGopSize >> 1) + pCfg->iLTRRefNum) :
-                              (MIN_REF_PIC_COUNT + pCfg->iLTRRefNum);
+        (MIN_REF_PIC_COUNT + pCfg->iLTRRefNum);
       pCfg->iNumRefFrame		= WELS_CLIP3 (pCfg->iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM);
     }
   }
-
+  if(pCfg->iNumRefFrame > pCfg->iMaxNumRefFrame)
+    pCfg->iMaxNumRefFrame = pCfg->iNumRefFrame;
   if (pCfg->iLtrMarkPeriod == 0) {
     pCfg->iLtrMarkPeriod = 30;
   }
@@ -559,23 +560,29 @@ void CWelsH264SVCEncoder::CheckProfileSetting (int32_t iLayer, EProfileIdc uiPro
   pLayerInfo->uiProfileIdc = uiProfileIdc;
   if ((iLayer == SPATIAL_LAYER_0) && (uiProfileIdc != PRO_BASELINE)) {
     pLayerInfo->uiProfileIdc = PRO_BASELINE;
-    WelsLog (m_pEncContext, WELS_LOG_WARNING, "doesn't support profile(%d),change to baseline profile", uiProfileIdc);
+    WelsLog (m_pEncContext, WELS_LOG_WARNING, "doesn't support profile(%d),change to baseline profile\n", uiProfileIdc);
   }
   if (iLayer > SPATIAL_LAYER_0) {
     if ((uiProfileIdc != PRO_BASELINE) || (uiProfileIdc != PRO_SCALABLE_BASELINE)) {
       pLayerInfo->uiProfileIdc = PRO_BASELINE;
-      WelsLog (m_pEncContext, WELS_LOG_WARNING, "doesn't support profile(%d),change to baseline profile", uiProfileIdc);
+      WelsLog (m_pEncContext, WELS_LOG_WARNING, "doesn't support profile(%d),change to baseline profile\n", uiProfileIdc);
     }
   }
 }
 void CWelsH264SVCEncoder::CheckLevelSetting (int32_t iLayer, ELevelIdc uiLevelIdc) {
   SSpatialLayerConfig* pLayerInfo = &m_pEncContext->pSvcParam->sSpatialLayers[iLayer];
   pLayerInfo->uiLevelIdc = uiLevelIdc;
-  //TBD
+  if( (uiLevelIdc< LEVEL_1_0)||(uiLevelIdc >LEVEL_5_2)){
+    pLayerInfo->uiLevelIdc = LEVEL_5_2;
+    WelsLog (m_pEncContext, WELS_LOG_WARNING, "doesn't support level(%d) change to LEVEL_5_2\n",uiLevelIdc);
+  }
 }
 void CWelsH264SVCEncoder::CheckReferenceNumSetting (int32_t iNumRef) {
   m_pEncContext->pSvcParam->iNumRefFrame = iNumRef;
-  //TBD
+  if((iNumRef < MIN_REF_PIC_COUNT)||(iNumRef> MAX_REFERENCE_PICTURE_COUNT_NUM)){
+     m_pEncContext->pSvcParam->iNumRefFrame = AUTO_REF_PIC_COUNT;
+     WelsLog (m_pEncContext, WELS_LOG_WARNING, "doesn't support the number of reference frame(%d) change to auto select mode\n",iNumRef);
+  }
 }
 /************************************************************************
 * InDataFormat, IDRInterval, SVC Encode Param, Frame Rate, Bitrate,..
