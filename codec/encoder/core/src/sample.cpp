@@ -433,6 +433,12 @@ void WelsInitSampleSadFunc (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
     pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_8x16 ] = WelsSampleSatd8x16_AArch64_neon;
     pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x8 ] = WelsSampleSatd16x8_AArch64_neon;
     pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x16] = WelsSampleSatd16x16_AArch64_neon;
+
+    pFuncList->sSampleDealingFuncs.pfIntra4x4Combined3Satd   = WelsIntra4x4Combined3Satd_AArch64_neon;
+    pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3Satd   = WelsIntra8x8Combined3Satd_AArch64_neon;
+    pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3Sad    = WelsIntra8x8Combined3Sad_AArch64_neon;
+    pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3Satd = WelsIntra16x16Combined3Satd_AArch64_neon;
+    pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3Sad  = WelsIntra16x16Combined3Sad_AArch64_neon;
   }
 #endif
 }
