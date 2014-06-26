@@ -69,4 +69,10 @@ TEST (EncoderExtTest, SetOptionIDRRequst) {
   EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
   EXPECT_EQ (sFbi.eFrameType, static_cast<int32_t> (videoFrameTypeP));
 
-}
+  pPtrEnc->Uninitialize();
+  delete pPtrEnc;
+  delete pParamExt;
+  delete pOption;
+  delete pSrcPic;
+  delete pYUV;
+  }
