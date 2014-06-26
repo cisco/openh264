@@ -51,55 +51,55 @@ extern __align16 (const uint16_t, g_kuiDequantCoeff[52][8]);
 /* Profile IDC */
 typedef uint8_t		ProfileIdc;
 enum {
-  PRO_BASELINE	= 66,
-  PRO_MAIN		= 77,
-  PRO_EXTENDED	= 88,
-  PRO_HIGH		= 100,
-  PRO_HIGH10		= 110,
-  PRO_HIGH422		= 122,
-  PRO_HIGH444		= 144,
-  PRO_CAVLC444	= 244,
+PRO_BASELINE	= 66,
+PRO_MAIN		= 77,
+PRO_EXTENDED	= 88,
+PRO_HIGH		= 100,
+PRO_HIGH10		= 110,
+PRO_HIGH422		= 122,
+PRO_HIGH444		= 144,
+PRO_CAVLC444	= 244,
 
-  PRO_SCALABLE_BASELINE	= 83,
-  PRO_SCALABLE_HIGH		= 86,
+PRO_SCALABLE_BASELINE	= 83,
+PRO_SCALABLE_HIGH		= 86,
 };
 
 /*
  *	NAL Unit Type (5 Bits)
  */
 typedef enum TagNalUnitType {
-  NAL_UNIT_UNSPEC_0			= 0,
-  NAL_UNIT_CODED_SLICE		= 1,
-  NAL_UNIT_CODED_SLICE_DPA	= 2,
-  NAL_UNIT_CODED_SLICE_DPB	= 3,
-  NAL_UNIT_CODED_SLICE_DPC	= 4,
-  NAL_UNIT_CODED_SLICE_IDR	= 5,
-  NAL_UNIT_SEI				= 6,
-  NAL_UNIT_SPS				= 7,
-  NAL_UNIT_PPS				= 8,
-  NAL_UNIT_AU_DELIMITER		= 9,
-  NAL_UNIT_END_OF_SEQ			= 10,
-  NAL_UNIT_END_OF_STR			= 11,
-  NAL_UNIT_FILLER_DATA		= 12,
-  NAL_UNIT_SPS_EXT			= 13,
-  NAL_UNIT_PREFIX				= 14,
-  NAL_UNIT_SUBSET_SPS			= 15,
-  NAL_UNIT_RESV_16			= 16,
-  NAL_UNIT_RESV_17			= 17,
-  NAL_UNIT_RESV_18			= 18,
-  NAL_UNIT_AUX_CODED_SLICE	= 19,
-  NAL_UNIT_CODED_SLICE_EXT	= 20,
-  NAL_UNIT_RESV_21			= 21,
-  NAL_UNIT_RESV_22			= 22,
-  NAL_UNIT_RESV_23			= 23,
-  NAL_UNIT_UNSPEC_24			= 24,
-  NAL_UNIT_UNSPEC_25			= 25,
-  NAL_UNIT_UNSPEC_26			= 26,
-  NAL_UNIT_UNSPEC_27			= 27,
-  NAL_UNIT_UNSPEC_28			= 28,
-  NAL_UNIT_UNSPEC_29			= 29,
-  NAL_UNIT_UNSPEC_30			= 30,
-  NAL_UNIT_UNSPEC_31			= 31
+NAL_UNIT_UNSPEC_0			= 0,
+NAL_UNIT_CODED_SLICE		= 1,
+NAL_UNIT_CODED_SLICE_DPA	= 2,
+NAL_UNIT_CODED_SLICE_DPB	= 3,
+NAL_UNIT_CODED_SLICE_DPC	= 4,
+NAL_UNIT_CODED_SLICE_IDR	= 5,
+NAL_UNIT_SEI				= 6,
+NAL_UNIT_SPS				= 7,
+NAL_UNIT_PPS				= 8,
+NAL_UNIT_AU_DELIMITER		= 9,
+NAL_UNIT_END_OF_SEQ			= 10,
+NAL_UNIT_END_OF_STR			= 11,
+NAL_UNIT_FILLER_DATA		= 12,
+NAL_UNIT_SPS_EXT			= 13,
+NAL_UNIT_PREFIX				= 14,
+NAL_UNIT_SUBSET_SPS			= 15,
+NAL_UNIT_RESV_16			= 16,
+NAL_UNIT_RESV_17			= 17,
+NAL_UNIT_RESV_18			= 18,
+NAL_UNIT_AUX_CODED_SLICE	= 19,
+NAL_UNIT_CODED_SLICE_EXT	= 20,
+NAL_UNIT_RESV_21			= 21,
+NAL_UNIT_RESV_22			= 22,
+NAL_UNIT_RESV_23			= 23,
+NAL_UNIT_UNSPEC_24			= 24,
+NAL_UNIT_UNSPEC_25			= 25,
+NAL_UNIT_UNSPEC_26			= 26,
+NAL_UNIT_UNSPEC_27			= 27,
+NAL_UNIT_UNSPEC_28			= 28,
+NAL_UNIT_UNSPEC_29			= 29,
+NAL_UNIT_UNSPEC_30			= 30,
+NAL_UNIT_UNSPEC_31			= 31
 } ENalUnitType;
 
 static const uint8_t g_kuiEmulationPreventionThreeByte	= 0x03;
@@ -109,10 +109,10 @@ static const uint8_t g_kuiEmulationPreventionThreeByte	= 0x03;
  */
 typedef uint8_t		NalRefIdc;
 enum {
-  NRI_PRI_LOWEST	= 0,
-  NRI_PRI_LOW		= 1,
-  NRI_PRI_HIGH	= 2,
-  NRI_PRI_HIGHEST	= 3
+NRI_PRI_LOWEST	= 0,
+NRI_PRI_LOW		= 1,
+NRI_PRI_HIGH	= 2,
+NRI_PRI_HIGHEST	= 3
 };
 
 /*
@@ -120,9 +120,9 @@ enum {
  */
 typedef uint8_t		VclType;
 enum {
-  NON_VCL			= 0,
-  VCL				= 1,
-  NOT_APP			= 2
+NON_VCL			= 0,
+VCL				= 1,
+NOT_APP			= 2
 };
 
 /*
@@ -147,58 +147,58 @@ extern const VclType g_kuiVclTypeMap[32][2];
  * meaning mapped version after eSliceType minus 4.
  */
 typedef enum TagSliceType {
-  P_SLICE	= 0,
-  B_SLICE	= 1,
-  I_SLICE	= 2,
-  SP_SLICE = 3,
-  SI_SLICE = 4,
-  UNKNOWN_SLICE = 5
+P_SLICE	= 0,
+B_SLICE	= 1,
+I_SLICE	= 2,
+SP_SLICE = 3,
+SI_SLICE = 4,
+UNKNOWN_SLICE = 5
 } ESliceType;
 
 /* List Index */
 typedef uint8_t		ListIndex;
 enum {
-  LIST_0	= 0,
-  LIST_1	= 1,
-  LIST_A	= 2
+LIST_0	= 0,
+LIST_1	= 1,
+LIST_A	= 2
 };
 
 /* Picture Size */
 typedef struct TagPictureSize {
-  int32_t	iWidth;
-  int32_t iHeight;
+int32_t	iWidth;
+int32_t iHeight;
 } SPictureSize;
 
 /* Motion Vector components */
 typedef uint8_t		MvComp;
 enum {
-  MV_X	= 0,
-  MV_Y	= 1,
-  MV_A	= 2
+MV_X	= 0,
+MV_Y	= 1,
+MV_A	= 2
 };
 
 /* Chroma Components */
 typedef uint8_t		ChromaComp;
 enum {
-  CHROMA_CB	= 0,
-  CHROMA_CR	= 1,
-  CHROMA_A	= 2
+CHROMA_CB	= 0,
+CHROMA_CR	= 1,
+CHROMA_A	= 2
 };
 
 /* Position Offset structure */
 typedef struct TagPosOffset {
-  int32_t	iLeftOffset;
-  int32_t	iTopOffset;
-  int32_t	iRightOffset;
-  int32_t	iBottomOffset;
+int32_t	iLeftOffset;
+int32_t	iTopOffset;
+int32_t	iRightOffset;
+int32_t	iBottomOffset;
 } SPosOffset;
 
 enum EMbPosition { //
-  MB_LEFT     = 0x01,	// A
-  MB_TOP      = 0x02,	// B
-  MB_TOPRIGHT = 0x04,	// C
-  MB_TOPLEFT	= 0x08,	// D,
-  MB_PRIVATE  = 0x10,
+MB_LEFT     = 0x01,	// A
+MB_TOP      = 0x02,	// B
+MB_TOPRIGHT = 0x04,	// C
+MB_TOPLEFT	= 0x08,	// D,
+MB_PRIVATE  = 0x10,
 };
 /* MB Type & Sub-MB Type */
 typedef int32_t MbType;
@@ -237,13 +237,13 @@ typedef int32_t SubMbType;
  *	Memory Management Control Operation (MMCO) code
  */
 enum {
-  MMCO_END			= 0,
-  MMCO_SHORT2UNUSED	= 1,
-  MMCO_LONG2UNUSED	= 2,
-  MMCO_SHORT2LONG		= 3,
-  MMCO_SET_MAX_LONG	= 4,
-  MMCO_RESET			= 5,
-  MMCO_LONG			= 6
+MMCO_END			= 0,
+MMCO_SHORT2UNUSED	= 1,
+MMCO_LONG2UNUSED	= 2,
+MMCO_SHORT2LONG		= 3,
+MMCO_SET_MAX_LONG	= 4,
+MMCO_RESET			= 5,
+MMCO_LONG			= 6
 };
 
 /////////intra16x16  Luma

@@ -6,15 +6,15 @@
 
 class FileInputStream : public InputStream {
  public:
-  bool Open(const char* fileName) {
-    file_.open(fileName, std::ios_base::in | std::ios_base::binary);
+  bool Open (const char* fileName) {
+    file_.open (fileName, std::ios_base::in | std::ios_base::binary);
     return file_.is_open();
   }
-  int read(void* ptr, size_t len) {
+  int read (void* ptr, size_t len) {
     if (!file_.good()) {
       return -1;
     }
-    file_.read(static_cast<char*>(ptr), len);
+    file_.read (static_cast<char*> (ptr), len);
     return file_.gcount();
   }
  private:

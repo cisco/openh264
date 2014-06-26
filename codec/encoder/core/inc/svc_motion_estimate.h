@@ -55,78 +55,78 @@ namespace WelsSVCEnc {
 #define EXPANDED_MVD_RANGE ((504+1)<<1)
 
 enum {
-  ME_DIA    = 0x01,  // LITTLE DIAMOND= 0x01
-  ME_CROSS  = 0x02,  // CROSS=  0x02
-  ME_FME    = 0x04,  // FME = 0x04
-  ME_FULL    = 0x10,  // FULL
+ME_DIA    = 0x01,  // LITTLE DIAMOND= 0x01
+ME_CROSS  = 0x02,  // CROSS=  0x02
+ME_FME    = 0x04,  // FME = 0x04
+ME_FULL    = 0x10,  // FULL
 
-  // derived ME methods combination
-  ME_DIA_CROSS    = (ME_DIA | ME_CROSS),   // DIA+CROSS
-  ME_DIA_CROSS_FME  = (ME_DIA_CROSS | ME_FME), // DIA+CROSS+FME
+// derived ME methods combination
+ME_DIA_CROSS    = (ME_DIA | ME_CROSS),   // DIA+CROSS
+ME_DIA_CROSS_FME  = (ME_DIA_CROSS | ME_FME), // DIA+CROSS+FME
 };
 
 union SadPredISatdUnit {
-  uint32_t  uiSadPred;
-  uint32_t  uiSatd;    //reuse the sad_pred as a temp satd pData
+uint32_t  uiSadPred;
+uint32_t  uiSatd;    //reuse the sad_pred as a temp satd pData
 };
 typedef struct TagWelsME {
-  /* input */
-  uint16_t*          pMvdCost;
-  union SadPredISatdUnit  uSadPredISatd; //reuse the sad_pred as a temp pData
-  uint32_t
-  uiSadCost;  //used by ME and RC //max SAD should be max_delta*size+lambda*mvdsize = 255*256+91*33*2 = 65280 + 6006 = 71286 > (2^16)-1 = 65535
-  uint32_t          uiSatdCost; /* satd + lm * nbits */
-  uint32_t          uiSadCostThreshold;
-  int32_t            iCurMeBlockPixX;
-  int32_t            iCurMeBlockPixY;
-  uint8_t            uiBlockSize;   /* BLOCK_WxH */
-  uint8_t            uiReserved;
+/* input */
+uint16_t*          pMvdCost;
+union SadPredISatdUnit  uSadPredISatd; //reuse the sad_pred as a temp pData
+uint32_t
+uiSadCost;  //used by ME and RC //max SAD should be max_delta*size+lambda*mvdsize = 255*256+91*33*2 = 65280 + 6006 = 71286 > (2^16)-1 = 65535
+uint32_t          uiSatdCost; /* satd + lm * nbits */
+uint32_t          uiSadCostThreshold;
+int32_t            iCurMeBlockPixX;
+int32_t            iCurMeBlockPixY;
+uint8_t            uiBlockSize;   /* BLOCK_WxH */
+uint8_t            uiReserved;
 
-  uint8_t*            pEncMb;
-  uint8_t*            pRefMb;
-  uint8_t*            pColoRefMb;
+uint8_t*            pEncMb;
+uint8_t*            pRefMb;
+uint8_t*            pColoRefMb;
 
-  SMVUnitXY          sMvp;
-  SMVUnitXY          sMvBase;
-  SMVUnitXY          sDirectionalMv;
+SMVUnitXY          sMvp;
+SMVUnitXY          sMvBase;
+SMVUnitXY          sDirectionalMv;
 
-  SScreenBlockFeatureStorage* pRefFeatureStorage;
+SScreenBlockFeatureStorage* pRefFeatureStorage;
 
-  /* output */
-  SMVUnitXY          sMv;
+/* output */
+SMVUnitXY          sMv;
 } SWelsME;
 
 typedef struct TagFeatureSearchIn {
-  PSampleSadSatdCostFunc pSad;
+PSampleSadSatdCostFunc pSad;
 
-  uint32_t* pTimesOfFeature;
-  uint16_t** pQpelLocationOfFeature;
-  uint16_t* pMvdCostX;
-  uint16_t* pMvdCostY;
+uint32_t* pTimesOfFeature;
+uint16_t** pQpelLocationOfFeature;
+uint16_t* pMvdCostX;
+uint16_t* pMvdCostY;
 
-  uint8_t* pEnc;
-  uint8_t* pColoRef;
-  int32_t iEncStride;
-  int32_t iRefStride;
-  uint16_t uiSadCostThresh;
+uint8_t* pEnc;
+uint8_t* pColoRef;
+int32_t iEncStride;
+int32_t iRefStride;
+uint16_t uiSadCostThresh;
 
-  int32_t iFeatureOfCurrent;
+int32_t iFeatureOfCurrent;
 
-  int32_t iCurPixX;
-  int32_t iCurPixY;
-  int32_t iCurPixXQpel;
-  int32_t iCurPixYQpel;
+int32_t iCurPixX;
+int32_t iCurPixY;
+int32_t iCurPixXQpel;
+int32_t iCurPixYQpel;
 
-  int32_t iMinQpelX;
-  int32_t iMinQpelY;
-  int32_t iMaxQpelX;
-  int32_t iMaxQpelY;
+int32_t iMinQpelX;
+int32_t iMinQpelY;
+int32_t iMaxQpelX;
+int32_t iMaxQpelY;
 } SFeatureSearchIn;
 
 typedef struct TagFeatureSearchOut {
-  SMVUnitXY sBestMv;
-  uint32_t uiBestSadCost;
-  uint8_t* pBestRef;
+SMVUnitXY sBestMv;
+uint32_t uiBestSadCost;
+uint8_t* pBestRef;
 } SFeatureSearchOut;
 
 #define  COST_MVD(table, mx, my)  (table[mx] + table[my])
@@ -207,8 +207,8 @@ void LineFullSearch_c (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
 #ifdef X86_ASM
 extern "C"
 {
-  uint32_t SampleSad8x8Hor8_sse41 (uint8_t*, int32_t, uint8_t*, int32_t, uint16_t*, int32_t*);
-  uint32_t SampleSad16x16Hor8_sse41 (uint8_t*, int32_t, uint8_t*, int32_t, uint16_t*, int32_t*);
+uint32_t SampleSad8x8Hor8_sse41 (uint8_t*, int32_t, uint8_t*, int32_t, uint16_t*, int32_t*);
+uint32_t SampleSad16x16Hor8_sse41 (uint8_t*, int32_t, uint8_t*, int32_t, uint16_t*, int32_t*);
 }
 
 void VerticalFullSearchUsingSSE41 (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
@@ -277,27 +277,27 @@ inline void SetMvWithinIntegerMvRange (const int32_t kiMbWidth, const int32_t ki
                                        const int32_t kiMbY,
                                        const int32_t kiMaxMvRange,
                                        SMVUnitXY* pMvMin, SMVUnitXY* pMvMax) {
-  pMvMin->iMvX = WELS_MAX (-1 * ((kiMbX + 1) << 4) + INTPEL_NEEDED_MARGIN, -1 * kiMaxMvRange);
-  pMvMin->iMvY = WELS_MAX (-1 * ((kiMbY + 1) << 4) + INTPEL_NEEDED_MARGIN, -1 * kiMaxMvRange);
-  pMvMax->iMvX = WELS_MIN (((kiMbWidth - kiMbX) << 4) - INTPEL_NEEDED_MARGIN, kiMaxMvRange);
-  pMvMax->iMvY = WELS_MIN (((kiMbHeight - kiMbY) << 4) - INTPEL_NEEDED_MARGIN, kiMaxMvRange);
+pMvMin->iMvX = WELS_MAX (-1 * ((kiMbX + 1) << 4) + INTPEL_NEEDED_MARGIN, -1 * kiMaxMvRange);
+pMvMin->iMvY = WELS_MAX (-1 * ((kiMbY + 1) << 4) + INTPEL_NEEDED_MARGIN, -1 * kiMaxMvRange);
+pMvMax->iMvX = WELS_MIN (((kiMbWidth - kiMbX) << 4) - INTPEL_NEEDED_MARGIN, kiMaxMvRange);
+pMvMax->iMvY = WELS_MIN (((kiMbHeight - kiMbY) << 4) - INTPEL_NEEDED_MARGIN, kiMaxMvRange);
 }
 
 inline bool CheckMvInRange (const int16_t kiCurrentMv, const int16_t kiMinMv, const int16_t kiMaxMv) {
-  return ((kiCurrentMv >= kiMinMv) && (kiCurrentMv < kiMaxMv));
+return ((kiCurrentMv >= kiMinMv) && (kiCurrentMv < kiMaxMv));
 }
 inline bool CheckMvInRange (const SMVUnitXY ksCurrentMv, const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv) {
-  return (CheckMvInRange (ksCurrentMv.iMvX, ksMinMv.iMvX, ksMaxMv.iMvX)
-          && CheckMvInRange (ksCurrentMv.iMvY, ksMinMv.iMvY, ksMaxMv.iMvY));
+return (CheckMvInRange (ksCurrentMv.iMvX, ksMinMv.iMvX, ksMaxMv.iMvX)
+        && CheckMvInRange (ksCurrentMv.iMvY, ksMinMv.iMvY, ksMaxMv.iMvY));
 }
 //FME switch related
 inline bool CalcFMESwitchFlag (const uint8_t uiFMEGoodFrameCount, const int32_t iHighFreMbPrecentage,
                                const int32_t iAvgMbSAD, const bool bScrollingDetected) {
-  return (bScrollingDetected || (uiFMEGoodFrameCount > 0 && iAvgMbSAD > FMESWITCH_MBSAD_THRESHOLD));
-  //TODO: add the logic of iHighFreMbPrecentage
-  //return ( iHighFreMbPrecentage > 2
-  //            && ( bScrollingDetected || iHighFreMbPrecentage >15
-  //            ||( uiFMEGoodFrameCount>0 && iFrameSAD > FMESWITCH_FRAMESAD_THRESHOLD ) ) );
+return (bScrollingDetected || (uiFMEGoodFrameCount > 0 && iAvgMbSAD > FMESWITCH_MBSAD_THRESHOLD));
+//TODO: add the logic of iHighFreMbPrecentage
+//return ( iHighFreMbPrecentage > 2
+//            && ( bScrollingDetected || iHighFreMbPrecentage >15
+//            ||( uiFMEGoodFrameCount>0 && iFrameSAD > FMESWITCH_FRAMESAD_THRESHOLD ) ) );
 }
 }
 #endif

@@ -73,29 +73,29 @@ namespace WelsSVCEnc {
  */
 /* Single/multiple slices */
 typedef struct SlicepEncCtx_s {
-  SliceModeEnum		uiSliceMode;			/* 0: single slice in frame; 1: multiple slices in frame; */
-  int16_t			iMbWidth;			/* width of picture size in mb */
-  int16_t			iMbHeight;			/* height of picture size in mb */
-  int16_t			iSliceNumInFrame;	/* count number of slices in frame; */
-  int32_t			iMbNumInFrame;	/* count number of MBs in frame */
-  uint8_t*			pOverallMbMap;	/* overall MB map in frame, store virtual slice idc; */
-  int16_t*			pFirstMbInSlice;	/* first MB address top-left based in every slice respectively; */
-  int32_t*			pCountMbNumInSlice;	/* count number of MBs in every slice respectively; */
-  uint32_t		uiSliceSizeConstraint;/*in byte*/
-  int32_t			iMaxSliceNumConstraint;/*maximal number of slices constraint*/
+SliceModeEnum		uiSliceMode;			/* 0: single slice in frame; 1: multiple slices in frame; */
+int16_t			iMbWidth;			/* width of picture size in mb */
+int16_t			iMbHeight;			/* height of picture size in mb */
+int16_t			iSliceNumInFrame;	/* count number of slices in frame; */
+int32_t			iMbNumInFrame;	/* count number of MBs in frame */
+uint8_t*			pOverallMbMap;	/* overall MB map in frame, store virtual slice idc; */
+int16_t*			pFirstMbInSlice;	/* first MB address top-left based in every slice respectively; */
+int32_t*			pCountMbNumInSlice;	/* count number of MBs in every slice respectively; */
+uint32_t		uiSliceSizeConstraint;/*in byte*/
+int32_t			iMaxSliceNumConstraint;/*maximal number of slices constraint*/
 } SSliceCtx;
 
 
 typedef struct TagDynamicSlicingStack {
-  int32_t		iStartPos;
-  int32_t		iCurrentPos;
+int32_t		iStartPos;
+int32_t		iCurrentPos;
 
-  uint8_t*		pBsStackBufPtr;	// current writing position
-  uint32_t    uiBsStackCurBits;
-  int32_t		iBsStackLeftBits;
+uint8_t*		pBsStackBufPtr;	// current writing position
+uint32_t    uiBsStackCurBits;
+int32_t		iBsStackLeftBits;
 
-  int32_t		iMbSkipRunStack;
-  uint8_t   uiLastMbQp;
+int32_t		iMbSkipRunStack;
+uint8_t   uiLastMbQp;
 } SDynamicSlicingStack;
 
 /*!

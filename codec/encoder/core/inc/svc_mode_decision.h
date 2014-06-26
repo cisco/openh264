@@ -54,8 +54,8 @@ namespace WelsSVCEnc {
 #define DELTA_QP_SCD_THD 5
 
 typedef enum {
-  STATIC,
-  SCROLLED,
+STATIC,
+SCROLLED,
 } ESkipModes;
 
 // NOILP ILFMD ENTRANCE

@@ -24,19 +24,19 @@ class BaseDecoderTest {
   };
 
   struct Callback {
-    virtual void onDecodeFrame(const Frame& frame) = 0;
+    virtual void onDecodeFrame (const Frame& frame) = 0;
   };
 
   BaseDecoderTest();
   void SetUp();
   void TearDown();
-  void DecodeFile(const char* fileName, Callback* cbk);
+  void DecodeFile (const char* fileName, Callback* cbk);
 
-  bool Open(const char* fileName);
-  bool DecodeNextFrame(Callback* cbk);
+  bool Open (const char* fileName);
+  bool DecodeNextFrame (Callback* cbk);
 
  private:
-  void DecodeFrame(const uint8_t* src, int sliceSize, Callback* cbk);
+  void DecodeFrame (const uint8_t* src, int sliceSize, Callback* cbk);
 
   ISVCDecoder* decoder_;
   std::ifstream file_;

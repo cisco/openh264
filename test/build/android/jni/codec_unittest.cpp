@@ -8,7 +8,7 @@
 #define LOG_TAG "codec_unittest"
 #define LOGI(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 
-int CodecUtMain(int argc, char** argv);
+int CodecUtMain (int argc, char** argv);
 extern "C"
 JNIEXPORT void JNICALL Java_com_cisco_codec_unittest_MainActivity_DoUnittest
 (JNIEnv* env, jobject thiz, jstring directory, jstring jspath) {
@@ -16,11 +16,11 @@ JNIEXPORT void JNICALL Java_com_cisco_codec_unittest_MainActivity_DoUnittest
   char* argv[2];
   int  argc = 2;
   argv[0] = (char*) ("codec_unittest.exe");
-  argv[1] = (char*) ((*env).GetStringUTFChars (jspath,NULL));
-  chdir((*env).GetStringUTFChars (directory, NULL));
+  argv[1] = (char*) ((*env).GetStringUTFChars (jspath, NULL));
+  chdir ((*env).GetStringUTFChars (directory, NULL));
   LOGI ("PATH: %s", argv[1]);
   LOGI ("Start to run JNI module!+++");
- CodecUtMain(argc,argv);
+  CodecUtMain (argc, argv);
   LOGI ("End to run JNI module!+++");
 }
 

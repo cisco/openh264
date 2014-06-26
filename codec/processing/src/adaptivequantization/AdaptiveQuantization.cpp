@@ -142,8 +142,8 @@ EResult CAdaptiveQuantization::Process (int32_t iType, SPixMap* pSrcPixMap, SPix
       pCurFrameY += (iCurStride) << 4;
     }
   }
-  iAverageMotionIndex = WELS_DIV_ROUND64(iAverageMotionIndex * AQ_INT_MULTIPLY,iMbTotalNum);
-  iAverageTextureIndex = WELS_DIV_ROUND64(iAverageTextureIndex * AQ_INT_MULTIPLY, iMbTotalNum);
+  iAverageMotionIndex = WELS_DIV_ROUND64 (iAverageMotionIndex * AQ_INT_MULTIPLY, iMbTotalNum);
+  iAverageTextureIndex = WELS_DIV_ROUND64 (iAverageTextureIndex * AQ_INT_MULTIPLY, iMbTotalNum);
   if ((iAverageMotionIndex <= AQ_PESN) && (iAverageMotionIndex >= -AQ_PESN)) {
     iAverageMotionIndex = AQ_INT_MULTIPLY;
   }
@@ -153,34 +153,37 @@ EResult CAdaptiveQuantization::Process (int32_t iType, SPixMap* pSrcPixMap, SPix
   //  motion mb residual map to QP
   //  texture mb original map to QP
   iAverMotionTextureIndexToDeltaQp = 0;
-  iAverageMotionIndex = WELS_DIV_ROUND64(AVERAGE_TIME_MOTION * iAverageMotionIndex, AQ_TIME_INT_MULTIPLY);
+  iAverageMotionIndex = WELS_DIV_ROUND64 (AVERAGE_TIME_MOTION * iAverageMotionIndex, AQ_TIME_INT_MULTIPLY);
 
   if (m_sAdaptiveQuantParam.iAdaptiveQuantMode == AQ_QUALITY_MODE) {
-    iAverageTextureIndex = WELS_DIV_ROUND64(AVERAGE_TIME_TEXTURE_QUALITYMODE * iAverageTextureIndex, AQ_TIME_INT_MULTIPLY);
+    iAverageTextureIndex = WELS_DIV_ROUND64 (AVERAGE_TIME_TEXTURE_QUALITYMODE * iAverageTextureIndex, AQ_TIME_INT_MULTIPLY);
   } else {
-    iAverageTextureIndex = WELS_DIV_ROUND64(AVERAGE_TIME_TEXTURE_BITRATEMODE * iAverageTextureIndex, AQ_TIME_INT_MULTIPLY);
+    iAverageTextureIndex = WELS_DIV_ROUND64 (AVERAGE_TIME_TEXTURE_BITRATEMODE * iAverageTextureIndex, AQ_TIME_INT_MULTIPLY);
   }
 
-  int64_t iAQ_EPSN = -((int64_t)AQ_PESN*AQ_TIME_INT_MULTIPLY*AQ_QSTEP_INT_MULTIPLY/AQ_INT_MULTIPLY);
+  int64_t iAQ_EPSN = - ((int64_t)AQ_PESN * AQ_TIME_INT_MULTIPLY * AQ_QSTEP_INT_MULTIPLY / AQ_INT_MULTIPLY);
   pMotionTexture = m_sAdaptiveQuantParam.pMotionTextureUnit;
   for (j = 0; j < iMbHeight; j ++) {
     for (i = 0; i < iMbWidth; i++) {
-      int64_t a = WELS_DIV_ROUND64((int64_t)(pMotionTexture->uiTextureIndex) *AQ_INT_MULTIPLY * AQ_TIME_INT_MULTIPLY, iAverageTextureIndex);
-      iQStep = WELS_DIV_ROUND64((a - AQ_TIME_INT_MULTIPLY) * AQ_QSTEP_INT_MULTIPLY, (a + MODEL_ALPHA));
+      int64_t a = WELS_DIV_ROUND64 ((int64_t) (pMotionTexture->uiTextureIndex) * AQ_INT_MULTIPLY * AQ_TIME_INT_MULTIPLY,
+                                    iAverageTextureIndex);
+      iQStep = WELS_DIV_ROUND64 ((a - AQ_TIME_INT_MULTIPLY) * AQ_QSTEP_INT_MULTIPLY, (a + MODEL_ALPHA));
       iLumaTextureDeltaQp = MODEL_TIME * iQStep;// range +- 6
 
-      iMotionTextureIndexToDeltaQp = ((int32_t)(iLumaTextureDeltaQp/(AQ_TIME_INT_MULTIPLY)));
+      iMotionTextureIndexToDeltaQp = ((int32_t) (iLumaTextureDeltaQp / (AQ_TIME_INT_MULTIPLY)));
 
-      a = WELS_DIV_ROUND64(((int64_t)pMotionTexture->uiMotionIndex)*AQ_INT_MULTIPLY * AQ_TIME_INT_MULTIPLY, iAverageMotionIndex);
-      iQStep = WELS_DIV_ROUND64((a - AQ_TIME_INT_MULTIPLY) * AQ_QSTEP_INT_MULTIPLY, (a + MODEL_ALPHA));
+      a = WELS_DIV_ROUND64 (((int64_t)pMotionTexture->uiMotionIndex) * AQ_INT_MULTIPLY * AQ_TIME_INT_MULTIPLY,
+                            iAverageMotionIndex);
+      iQStep = WELS_DIV_ROUND64 ((a - AQ_TIME_INT_MULTIPLY) * AQ_QSTEP_INT_MULTIPLY, (a + MODEL_ALPHA));
       iLumaMotionDeltaQp = MODEL_TIME * iQStep;// range +- 6
 
       if ((m_sAdaptiveQuantParam.iAdaptiveQuantMode == AQ_QUALITY_MODE && iLumaMotionDeltaQp < iAQ_EPSN)
           || (m_sAdaptiveQuantParam.iAdaptiveQuantMode == AQ_BITRATE_MODE)) {
-        iMotionTextureIndexToDeltaQp += ((int32_t)(iLumaMotionDeltaQp/(AQ_TIME_INT_MULTIPLY)));
+        iMotionTextureIndexToDeltaQp += ((int32_t) (iLumaMotionDeltaQp / (AQ_TIME_INT_MULTIPLY)));
       }
 
-      m_sAdaptiveQuantParam.pMotionTextureIndexToDeltaQp[j * iMbWidth + i] = (int8_t)(iMotionTextureIndexToDeltaQp/AQ_QSTEP_INT_MULTIPLY);
+      m_sAdaptiveQuantParam.pMotionTextureIndexToDeltaQp[j * iMbWidth + i] = (int8_t) (iMotionTextureIndexToDeltaQp /
+          AQ_QSTEP_INT_MULTIPLY);
       iAverMotionTextureIndexToDeltaQp += iMotionTextureIndexToDeltaQp;
       pMotionTexture++;
     }

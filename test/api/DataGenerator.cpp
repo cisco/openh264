@@ -7,35 +7,34 @@
 using namespace std;
 
 
-bool YUVPixelDataGenerator( uint8_t* pPointer, int32_t iWidth, int32_t iHeight, int32_t iStride )
-{
+bool YUVPixelDataGenerator (uint8_t* pPointer, int32_t iWidth, int32_t iHeight, int32_t iStride) {
 #define SRC_FRAME_WIDTH (160)
 #define SRC_FRAME_HEIGHT (96)
 
-  if ( SRC_FRAME_WIDTH-iWidth <= 0 || SRC_FRAME_HEIGHT-iHeight <= 0 ) {
+  if (SRC_FRAME_WIDTH - iWidth <= 0 || SRC_FRAME_HEIGHT - iHeight <= 0) {
     return false;
   }
 
-  const int32_t kiFrameSize = SRC_FRAME_WIDTH*SRC_FRAME_HEIGHT;
+  const int32_t kiFrameSize = SRC_FRAME_WIDTH * SRC_FRAME_HEIGHT;
   BufferedData sBuf;
-  sBuf.SetLength(kiFrameSize);
+  sBuf.SetLength (kiFrameSize);
   if (sBuf.Length() != (size_t)kiFrameSize) {
     return false;
   }
 
   FileInputStream fileStream;
-  if (!fileStream.Open("res/CiscoVT2people_160x96_6fps.yuv")) {
+  if (!fileStream.Open ("res/CiscoVT2people_160x96_6fps.yuv")) {
     return false;
   }
-  if (fileStream.read(sBuf.data(), kiFrameSize) == kiFrameSize) {
-    srand((uint32_t)time(NULL));
-    int32_t iStartPosX = rand()%(SRC_FRAME_WIDTH-iWidth);
-    int32_t iStartPosY = rand()%(SRC_FRAME_HEIGHT-iHeight);
-    uint8_t* pSrcPointer = sBuf.data() + iStartPosX + iStartPosY*SRC_FRAME_WIDTH;
+  if (fileStream.read (sBuf.data(), kiFrameSize) == kiFrameSize) {
+    srand ((uint32_t)time (NULL));
+    int32_t iStartPosX = rand() % (SRC_FRAME_WIDTH - iWidth);
+    int32_t iStartPosY = rand() % (SRC_FRAME_HEIGHT - iHeight);
+    uint8_t* pSrcPointer = sBuf.data() + iStartPosX + iStartPosY * SRC_FRAME_WIDTH;
     uint8_t* pLocalPointer = pPointer;
 
-    for (int j=0;j<iHeight;j++) {
-      memcpy(pLocalPointer, pSrcPointer, iWidth*sizeof(uint8_t));
+    for (int j = 0; j < iHeight; j++) {
+      memcpy (pLocalPointer, pSrcPointer, iWidth * sizeof (uint8_t));
       pLocalPointer += iStride;
       pSrcPointer += SRC_FRAME_WIDTH;
     }
@@ -44,24 +43,21 @@ bool YUVPixelDataGenerator( uint8_t* pPointer, int32_t iWidth, int32_t iHeight, 
   return false;
 }
 
-void RandomPixelDataGenerator( uint8_t* pPointer, int32_t iWidth, int32_t iHeight, int32_t iStride, int32_t iIdx )
-{
+void RandomPixelDataGenerator (uint8_t* pPointer, int32_t iWidth, int32_t iHeight, int32_t iStride, int32_t iIdx) {
   uint8_t* pLocalPointer = pPointer;
-  srand((uint32_t)(time(NULL)+iIdx));
-  for (int32_t j=0;j<iHeight;j++) {
-    for (int32_t i=0;i<iWidth;i++) {
-      pLocalPointer[i] = rand()%256;
+  srand ((uint32_t) (time (NULL) + iIdx));
+  for (int32_t j = 0; j < iHeight; j++) {
+    for (int32_t i = 0; i < iWidth; i++) {
+      pLocalPointer[i] = rand() % 256;
     }
     pLocalPointer += iStride;
   }
 }
 
 
-void RandomResidueDataGenerator( uint16_t* pPointer, int32_t iWidth, int32_t iHeight, int32_t iStride )
-{
+void RandomResidueDataGenerator (uint16_t* pPointer, int32_t iWidth, int32_t iHeight, int32_t iStride) {
 }
 
-void RandomCoeffDataGenerator( uint16_t* pPointer, int32_t iWidth, int32_t iHeight, int32_t iStride )
-{
+void RandomCoeffDataGenerator (uint16_t* pPointer, int32_t iWidth, int32_t iHeight, int32_t iStride) {
 }
 

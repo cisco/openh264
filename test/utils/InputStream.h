@@ -4,7 +4,7 @@
 #include <cstddef>
 
 struct InputStream {
-  virtual int read(void* ptr, size_t len) = 0;
+  virtual int read (void* ptr, size_t len) = 0;
 };
 
 #endif //__INPUTSTREAM_H__

@@ -284,7 +284,7 @@ void GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,
 
   while (uiSliceIdx + 1 < kuiSliceNum) {
     // GOM boundary aligned
-    int32_t iNumMbAssigning = WELS_DIV_ROUND(INT_MULTIPLY * kiMbNumPerSlice, iGomSize * INT_MULTIPLY) * iGomSize;
+    int32_t iNumMbAssigning = WELS_DIV_ROUND (INT_MULTIPLY * kiMbNumPerSlice, iGomSize * INT_MULTIPLY) * iGomSize;
 
     // make sure one GOM at least in each slice for safe
     if (iNumMbAssigning < iMinimalMbNum)

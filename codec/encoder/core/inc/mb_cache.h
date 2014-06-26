@@ -65,79 +65,79 @@ extern const uint8_t g_kuiCache48CountScan4Idx[24];
 
 typedef	struct TagDCTCoeff {
 //ALIGNED_DECLARE( int16_t, residual_ac[16], 16 ); //I_16x16
-  int16_t iLumaBlock[16][16]; //based on block4x4 luma DC/AC
+int16_t iLumaBlock[16][16]; //based on block4x4 luma DC/AC
 //ALIGNED_DECLARE( int16_t, iLumaI16x16Dc[16], 16 ); //I_16x16 DC
-  int16_t iLumaI16x16Dc[16];
+int16_t iLumaI16x16Dc[16];
 //ALIGNED_DECLARE( int16_t, iChromaDc[2][4], 16 ); //chroma DC
-  int16_t iChromaBlock[8][16]; //based on block4x4  chroma DC/AC
-  int16_t iChromaDc[2][4];
+int16_t iChromaBlock[8][16]; //based on block4x4  chroma DC/AC
+int16_t iChromaDc[2][4];
 } SDCTCoeff ;
 
 typedef struct TagMbCache {
 //the followed pData now is promised aligned to 16 bytes
-  ALIGNED_DECLARE (SMVComponentUnit, sMvComponents, 16);
+ALIGNED_DECLARE (SMVComponentUnit, sMvComponents, 16);
 
-  ALIGNED_DECLARE_MATRIX_1D (iNonZeroCoeffCount, 48, int8_t, 16);	// Cache line size
+ALIGNED_DECLARE_MATRIX_1D (iNonZeroCoeffCount, 48, int8_t, 16);	// Cache line size
 // 	int8_t		iNonZeroCoeffCount[6 * 8];	// Right luma, Chroma(Left Top Cb, Left btm Cr); must follow by iIntraPredMode!
-  ALIGNED_DECLARE_MATRIX_1D (iIntraPredMode, 48, int8_t, 16);
+ALIGNED_DECLARE_MATRIX_1D (iIntraPredMode, 48, int8_t, 16);
 //	must follow with iNonZeroCoeffCount!
 
-  int32_t     iSadCost[4];			//avail 1; unavail 0
-  SMVUnitXY  sMbMvp[MB_BLOCK8x8_NUM];// for write bs
+int32_t     iSadCost[4];			//avail 1; unavail 0
+SMVUnitXY  sMbMvp[MB_BLOCK8x8_NUM];// for write bs
 
 //for residual decoding (recovery) at the side of Encoder
-  int16_t* pCoeffLevel;		// tmep
+int16_t* pCoeffLevel;		// tmep
 //malloc memory for prediction
-  uint8_t* pSkipMb;
+uint8_t* pSkipMb;
 
 //ALIGNED_DECLARE(uint8_t, pMemPredMb[2][256],  16);//One: Best I_16x16 Luma and refine frac_pixel pBuffer; another: PingPong I_8x8&&Inter Cb + Cr
-  uint8_t* pMemPredMb;
-  uint8_t* pMemPredLuma;// inter && intra share same pointer;
+uint8_t* pMemPredMb;
+uint8_t* pMemPredLuma;// inter && intra share same pointer;
 //ALIGNED_DECLARE(uint8_t, pMemPredChroma[2][64*2], 16); //another PingPong pBuffer: Best Cb + Cr;
-  uint8_t* pMemPredChroma;// inter && intra share same pointer;
-  uint8_t* pBestPredIntraChroma; //Cb:0~63;   Cr:64~127
+uint8_t* pMemPredChroma;// inter && intra share same pointer;
+uint8_t* pBestPredIntraChroma; //Cb:0~63;   Cr:64~127
 
 //ALIGNED_DECLARE(uint8_t, pMemPredBlk4[2][16], 16); //I_4x4
-  uint8_t* pMemPredBlk4;
+uint8_t* pMemPredBlk4;
 
-  uint8_t* pBestPredI4x4Blk4;//I_4x4
+uint8_t* pBestPredI4x4Blk4;//I_4x4
 
 //ALIGNED_DECLARE(uint8_t, pBufferInterPredMe[4][400], 16);//inter type pBuffer for ME h & v & hv
-  uint8_t* pBufferInterPredMe;    // [4][400] is enough because only h&v or v&hv or h&hv. but if both h&v&hv is needed when 8 quart pixel, future we have to use [5][400].
+uint8_t* pBufferInterPredMe;    // [4][400] is enough because only h&v or v&hv or h&hv. but if both h&v&hv is needed when 8 quart pixel, future we have to use [5][400].
 
 //no scan4[] order, just as memory order to store
 //ALIGNED_DECLARE(bool, pPrevIntra4x4PredModeFlag[16], 16);//if 1, means no rem_intra4x4_pred_mode; if 0, means rem_intra4x4_pred_mode != 0
-  bool* pPrevIntra4x4PredModeFlag;
+bool* pPrevIntra4x4PredModeFlag;
 //ALIGNED_DECLARE(int8_t, pRemIntra4x4PredModeFlag[16], 16);//-1 as default; if pPrevIntra4x4PredModeFlag==0,
 //pRemIntra4x4PredModeFlag or added by 1 is the best pred_mode
-  int8_t* pRemIntra4x4PredModeFlag;
+int8_t* pRemIntra4x4PredModeFlag;
 
-  int32_t     iSadCostSkip[4];	     //avail 1; unavail 0
-  bool      bMbTypeSkip[4];         //1: skip; 0: non-skip
-  int32_t*     pEncSad;
+int32_t     iSadCostSkip[4];	     //avail 1; unavail 0
+bool      bMbTypeSkip[4];         //1: skip; 0: non-skip
+int32_t*     pEncSad;
 
 //for residual encoding at the side of Encoder
-  SDCTCoeff* pDct;
+SDCTCoeff* pDct;
 
-  uint8_t      uiNeighborIntra; // LEFT_MB_POS:0x01, TOP_MB_POS:0x02, TOPLEFT_MB_POS = 0x04 ,TOPRIGHT_MB_POS = 0x08;
-  uint8_t uiLumaI16x16Mode;
-  uint8_t uiChmaI8x8Mode;
+uint8_t      uiNeighborIntra; // LEFT_MB_POS:0x01, TOP_MB_POS:0x02, TOPLEFT_MB_POS = 0x04 ,TOPRIGHT_MB_POS = 0x08;
+uint8_t uiLumaI16x16Mode;
+uint8_t uiChmaI8x8Mode;
 
-  bool		bCollocatedPredFlag;//denote if current MB is collocated predicted (MV==0).
-  uint32_t	uiRefMbType;
+bool		bCollocatedPredFlag;//denote if current MB is collocated predicted (MV==0).
+uint32_t	uiRefMbType;
 
-  struct {
-    /* pointer of current mb location in original frame */
-    uint8_t* pEncMb[3];
-    /* pointer of current mb location in recovery frame */
-    uint8_t* pDecMb[3];
-    /* pointer of co-located mb location in reference frame */
-    uint8_t* pRefMb[3];
-    //for SVC
-    uint8_t*	pCsMb[3];//locating current mb's CS in whole frame
+struct {
+  /* pointer of current mb location in original frame */
+  uint8_t* pEncMb[3];
+  /* pointer of current mb location in recovery frame */
+  uint8_t* pDecMb[3];
+  /* pointer of co-located mb location in reference frame */
+  uint8_t* pRefMb[3];
+  //for SVC
+  uint8_t*	pCsMb[3];//locating current mb's CS in whole frame
 //		int16_t *p_rs[3];//locating current mb's RS	in whole frame
 
-  } SPicData;
+} SPicData;
 } SMbCache;
 
 }//end of namespace

@@ -52,29 +52,29 @@ namespace WelsSVCEnc {
  *	Raw payload pData for NAL unit, AVC/SVC compatible
  */
 typedef struct TagWelsNalRaw {
-  uint8_t*				pRawData;		// pRawNal payload for slice pData
-  int32_t				iPayloadSize;		// size of pRawNal pData
+uint8_t*				pRawData;		// pRawNal payload for slice pData
+int32_t				iPayloadSize;		// size of pRawNal pData
 
-  SNalUnitHeaderExt		sNalExt;		// NAL header information
+SNalUnitHeaderExt		sNalExt;		// NAL header information
 
-  int32_t iStartPos; //NAL start position in buffer
+int32_t iStartPos; //NAL start position in buffer
 } SWelsNalRaw;
 
 /*
  *	Encoder majoy output pData
  */
 typedef struct TagWelsEncoderOutput {
-  uint8_t*				pBsBuffer;			// overall bitstream pBuffer allocation for a coded picture, recycling use intend.
-  uint32_t			uiSize;				// size of allocation pBuffer above
+uint8_t*				pBsBuffer;			// overall bitstream pBuffer allocation for a coded picture, recycling use intend.
+uint32_t			uiSize;				// size of allocation pBuffer above
 
-  SBitStringAux		sBsWrite;
+SBitStringAux		sBsWrite;
 
 //	SWelsNalRaw		raw_nals[MAX_DEPENDENCY_LAYER*2+MAX_DEPENDENCY_LAYER*MAX_QUALITY_LEVEL]; // AVC: max up to SPS+PPS+max_slice_idc (2 + 8) for FMO;
-  SWelsNalRaw*		sNalList;			// nal list, adaptive for AVC/SVC in case single slice, multiple slices or fmo
-  int32_t*      pNalLen;
-  int32_t				iCountNals;			// count number of NAL in list
+SWelsNalRaw*		sNalList;			// nal list, adaptive for AVC/SVC in case single slice, multiple slices or fmo
+int32_t*      pNalLen;
+int32_t				iCountNals;			// count number of NAL in list
 // SVC: num_sps (MAX_D) + num_pps (MAX_D) + num_vcl (MAX_D * MAX_Q)
-  int32_t				iNalIndex;			// coding NAL currently, 0 based
+int32_t				iNalIndex;			// coding NAL currently, 0 based
 
 //	bool				bAnnexBFlag;		// annexeb flag, to figure it pOut the packetization mode whether need 4 bytes (0 0 0 1) of start code prefix
 } SWelsEncoderOutput;
@@ -82,21 +82,21 @@ typedef struct TagWelsEncoderOutput {
 //#define MT_DEBUG_BS_WR	0	// for MT debugging if needed
 
 typedef struct TagWelsSliceBs {
-  uint8_t*				pBs;				// output bitstream, pBitStringAux not needed for slice 0 due to no dependency of pFrameBs available
-  uint32_t			uiBsPos;				// position of output bitstream
-  uint8_t*				pBsBuffer;			// overall bitstream pBuffer allocation for a coded slice, recycling use intend.
-  uint32_t			uiSize;				// size of allocation pBuffer above
+uint8_t*				pBs;				// output bitstream, pBitStringAux not needed for slice 0 due to no dependency of pFrameBs available
+uint32_t			uiBsPos;				// position of output bitstream
+uint8_t*				pBsBuffer;			// overall bitstream pBuffer allocation for a coded slice, recycling use intend.
+uint32_t			uiSize;				// size of allocation pBuffer above
 
-  SBitStringAux		sBsWrite;
+SBitStringAux		sBsWrite;
 
-  SWelsNalRaw		sNalList[2];		// nal list, PREFIX NAL(if applicable) + SLICE NAL
+SWelsNalRaw		sNalList[2];		// nal list, PREFIX NAL(if applicable) + SLICE NAL
 //	int32_t				iCountNals;			// count number of NAL in list
-  int32_t				iNalLen[2];
-  int32_t				iNalIndex;			// coding NAL currently, 0 based
+int32_t				iNalLen[2];
+int32_t				iNalIndex;			// coding NAL currently, 0 based
 
 //	bool				bAnnexBFlag;		// annexeb flag, to figure it pOut the packetization mode whether need 4 bytes (0 0 0 1) of start code prefix
 #if MT_DEBUG_BS_WR
-  bool				bSliceCodedFlag;
+bool				bSliceCodedFlag;
 #endif//MT_DEBUG_BS_WR
 } SWelsSliceBs;
 

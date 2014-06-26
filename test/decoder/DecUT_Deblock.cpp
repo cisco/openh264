@@ -141,6 +141,8 @@ GENERATE_LUMA_UT (LumaEq4H_AArch64_neon, DeblockLumaEq4H_AArch64_neon_wrap, Debl
 
 GENERATE_CHROMA_UT (ChromaLt4V_AArch64_neon, DeblockChromaLt4V_AArch64_neon, DeblockChromaLt4V_c, WELS_CPU_NEON, 0)
 GENERATE_CHROMA_UT (ChromaLt4H_AArch64_neon, DeblockChromaLt4H_AArch64_neon, DeblockChromaLt4H_c, WELS_CPU_NEON, 1)
-GENERATE_CHROMA_UT (ChromaEq4V_AArch64_neon, DeblockChromaEq4V_AArch64_neon_wrap, DeblockChromaEq4V_c_wrap, WELS_CPU_NEON, 0)
-GENERATE_CHROMA_UT (ChromaEq4H_AArch64_neon, DeblockChromaEq4H_AArch64_neon_wrap, DeblockChromaEq4H_c_wrap, WELS_CPU_NEON, 1)
+GENERATE_CHROMA_UT (ChromaEq4V_AArch64_neon, DeblockChromaEq4V_AArch64_neon_wrap, DeblockChromaEq4V_c_wrap,
+                    WELS_CPU_NEON, 0)
+GENERATE_CHROMA_UT (ChromaEq4H_AArch64_neon, DeblockChromaEq4H_AArch64_neon_wrap, DeblockChromaEq4H_c_wrap,
+                    WELS_CPU_NEON, 1)
 #endif

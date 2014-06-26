@@ -5,12 +5,12 @@
 #include "utils/FileInputStream.h"
 #include "BaseEncoderTest.h"
 
-static int InitWithParam(ISVCEncoder* encoder, EUsageType usageType,int width,
-    int height, float frameRate, SliceModeEnum sliceMode, bool denoise, int layers) {
+static int InitWithParam (ISVCEncoder* encoder, EUsageType usageType, int width,
+                          int height, float frameRate, SliceModeEnum sliceMode, bool denoise, int layers) {
   if (SM_SINGLE_SLICE == sliceMode && !denoise && layers == 1) {
     SEncParamBase param;
-    memset (&param, 0, sizeof(SEncParamBase));
-    
+    memset (&param, 0, sizeof (SEncParamBase));
+
     param.iUsageType = usageType;
     param.fMaxFrameRate = frameRate;
     param.iPicWidth = width;
@@ -18,10 +18,10 @@ static int InitWithParam(ISVCEncoder* encoder, EUsageType usageType,int width,
     param.iTargetBitrate = 5000000;
     param.iInputCsp = videoFormatI420;
 
-    return encoder->Initialize(&param);
+    return encoder->Initialize (&param);
   } else {
     SEncParamExt param;
-    encoder->GetDefaultParams(&param);
+    encoder->GetDefaultParams (&param);
 
     param.iUsageType = usageType;
     param.fMaxFrameRate = frameRate;
@@ -49,62 +49,62 @@ static int InitWithParam(ISVCEncoder* encoder, EUsageType usageType,int width,
     }
     param.iTargetBitrate *= param.iSpatialLayerNum;
 
-    return encoder->InitializeExt(&param);
+    return encoder->InitializeExt (&param);
   }
 }
 
-BaseEncoderTest::BaseEncoderTest() : encoder_(NULL) {}
+BaseEncoderTest::BaseEncoderTest() : encoder_ (NULL) {}
 
 void BaseEncoderTest::SetUp() {
-  int rv = WelsCreateSVCEncoder(&encoder_);
-  ASSERT_EQ(0, rv);
-  ASSERT_TRUE(encoder_ != NULL);
+  int rv = WelsCreateSVCEncoder (&encoder_);
+  ASSERT_EQ (0, rv);
+  ASSERT_TRUE (encoder_ != NULL);
 }
 
 void BaseEncoderTest::TearDown() {
   if (encoder_) {
     encoder_->Uninitialize();
-    WelsDestroySVCEncoder(encoder_);
+    WelsDestroySVCEncoder (encoder_);
   }
 }
 
-void BaseEncoderTest::EncodeStream(InputStream* in, EUsageType usageType, int width, int height,
-    float frameRate, SliceModeEnum slices, bool denoise, int layers, Callback* cbk) {
-  int rv = InitWithParam(encoder_, usageType, width, height, frameRate, slices, denoise, layers);
-  ASSERT_TRUE(rv == cmResultSuccess);
+void BaseEncoderTest::EncodeStream (InputStream* in, EUsageType usageType, int width, int height,
+                                    float frameRate, SliceModeEnum slices, bool denoise, int layers, Callback* cbk) {
+  int rv = InitWithParam (encoder_, usageType, width, height, frameRate, slices, denoise, layers);
+  ASSERT_TRUE (rv == cmResultSuccess);
 
   // I420: 1(Y) + 1/4(U) + 1/4(V)
   int frameSize = width * height * 3 / 2;
 
   BufferedData buf;
-  buf.SetLength(frameSize);
-  ASSERT_TRUE(buf.Length() == (size_t)frameSize);
+  buf.SetLength (frameSize);
+  ASSERT_TRUE (buf.Length() == (size_t)frameSize);
 
   SFrameBSInfo info;
-  memset(&info, 0, sizeof(SFrameBSInfo));
+  memset (&info, 0, sizeof (SFrameBSInfo));
 
   SSourcePicture pic;
-  memset(&pic,0,sizeof(SSourcePicture));
+  memset (&pic, 0, sizeof (SSourcePicture));
   pic.iPicWidth = width;
   pic.iPicHeight = height;
   pic.iColorFormat = videoFormatI420;
   pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth>>1;
+  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
   pic.pData[0] = buf.data();
-  pic.pData[1] = pic.pData[0] + width *height;
-  pic.pData[2] = pic.pData[1] + (width*height>>2);
-  while (in->read(buf.data(), frameSize) == frameSize) {
-    rv = encoder_->EncodeFrame(&pic, &info);
-    ASSERT_TRUE(rv == cmResultSuccess);
+  pic.pData[1] = pic.pData[0] + width * height;
+  pic.pData[2] = pic.pData[1] + (width * height >> 2);
+  while (in->read (buf.data(), frameSize) == frameSize) {
+    rv = encoder_->EncodeFrame (&pic, &info);
+    ASSERT_TRUE (rv == cmResultSuccess);
     if (info.eFrameType != videoFrameTypeSkip && cbk != NULL) {
-      cbk->onEncodeFrame(info);
+      cbk->onEncodeFrame (info);
     }
   }
 }
 
-void BaseEncoderTest::EncodeFile(const char* fileName, EUsageType usageType, int width, int height,
-    float frameRate, SliceModeEnum slices, bool denoise, int layers, Callback* cbk) {
+void BaseEncoderTest::EncodeFile (const char* fileName, EUsageType usageType, int width, int height,
+                                  float frameRate, SliceModeEnum slices, bool denoise, int layers, Callback* cbk) {
   FileInputStream fileStream;
-  ASSERT_TRUE(fileStream.Open(fileName));
-  EncodeStream(&fileStream, usageType, width, height, frameRate, slices, denoise, layers, cbk);
+  ASSERT_TRUE (fileStream.Open (fileName));
+  EncodeStream (&fileStream, usageType, width, height, frameRate, slices, denoise, layers, cbk);
 }

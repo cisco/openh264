@@ -341,7 +341,7 @@ bool MdInterSCDPskipProcess (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSl
 
   if (bSkipFlag) {
     bool bQpSimilarFlag = (kiRefMbQp - kiCurMbQp <= DELTA_QP_SCD_THD || kiRefMbQp <= 26);
-    SMVUnitXY sVaaPredSkipMv = {0,0}, sCurMbMv[2] = {{0,0},{0,0}};
+    SMVUnitXY sVaaPredSkipMv = {0, 0}, sCurMbMv[2] = {{0, 0}, {0, 0}};
     PredSkipMv (pMbCache, &sVaaPredSkipMv);
 
     if (eSkipMode == SCROLLED) {
