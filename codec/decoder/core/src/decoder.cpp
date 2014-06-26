@@ -644,7 +644,6 @@ void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
   pCtx->pGetIChromaPredFunc[C_PRED_DC_T  ] = WelsIChromaPredDcTop_c;
   pCtx->pGetIChromaPredFunc[C_PRED_DC_128] = WelsIChromaPredDcNA_c;
 
-  InitDctClipTable();
   pCtx->pIdctResAddPredFunc	= IdctResAddPred_c;
 
 #if defined(HAVE_NEON)
