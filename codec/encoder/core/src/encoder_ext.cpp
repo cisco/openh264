@@ -3384,8 +3384,11 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
 #ifdef ENABLE_FRAME_DUMP
     // Dump reconstruction picture for each sQualityStat layer
-    if (iCurDid + 1 < pSvcParam->iSpatialLayerNum)
-      DumpDependencyRec (fsnr, &pSvcParam->sDependencyLayers[pSvcParam->iSpatialLayerNum].sRecFileName[0], iCurDid);
+    if (iCurDid + 1 < pSvcParam->iSpatialLayerNum) {
+      DumpDependencyRec (fsnr, &pSvcParam->sDependencyLayers[pSvcParam->iSpatialLayerNum].sRecFileName[0], iCurDid,
+                         pCtx->bDependencyRecFlag[iCurDid]);
+      pCtx->bDependencyRecFlag[iCurDid] = true;
+    }
 #endif//ENABLE_FRAME_DUMP
 
 #if defined(ENABLE_PSNR_CALC)
@@ -3551,7 +3554,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
 #ifdef ENABLE_FRAME_DUMP
   DumpRecFrame (fsnr, &pSvcParam->sDependencyLayers[pSvcParam->iSpatialLayerNum -
-                1].sRecFileName[0]);	// pDecPic: final reconstruction output
+                1].sRecFileName[0], pCtx->bRecFlag);	// pDecPic: final reconstruction output
+  pCtx->bRecFlag = true;
 #endif//ENABLE_FRAME_DUMP
 
   ++ pCtx->iCodingIndex;

@@ -350,15 +350,14 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
  * \brief	Dump reconstruction for dependency layer
  */
 
-extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName, const int8_t kiDid) {
+extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName, const int8_t kiDid, bool bAppend) {
   WelsFileHandle* pDumpRecFile = NULL;
-  static bool bDependencyRecFlag[MAX_DEPENDENCY_LAYER]	= {0};
   int32_t iWrittenSize											= 0;
 
   if (NULL == pCurPicture || NULL == kpFileName || kiDid >= MAX_DEPENDENCY_LAYER)
     return;
 
-  if (bDependencyRecFlag[kiDid]) {
+  if (bAppend) {
     if (strlen (kpFileName) > 0)	// confirmed_safe_unsafe_usage
       pDumpRecFile = WelsFopen (kpFileName, "ab");
     else {
@@ -376,7 +375,6 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName
       WelsSnprintf (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
       pDumpRecFile	= WelsFopen (sDependencyRecFileName, "wb");
     }
-    bDependencyRecFlag[kiDid]	= true;
   }
 
   if (NULL != pDumpRecFile) {
@@ -418,15 +416,14 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName
  * \brief	Dump the reconstruction pictures
  */
 
-void DumpRecFrame (SPicture* pCurPicture, const char* kpFileName) {
+void DumpRecFrame (SPicture* pCurPicture, const char* kpFileName, bool bAppend) {
   WelsFileHandle* pDumpRecFile				= NULL;
-  static bool bRecFlag	= false;
   int32_t iWrittenSize			= 0;
 
   if (NULL == pCurPicture || NULL == kpFileName)
     return;
 
-  if (bRecFlag) {
+  if (bAppend) {
     if (strlen (kpFileName) > 0) {	// confirmed_safe_unsafe_usage
       pDumpRecFile	= WelsFopen (kpFileName, "ab");
     } else {
@@ -440,7 +437,6 @@ void DumpRecFrame (SPicture* pCurPicture, const char* kpFileName) {
     } else {
       pDumpRecFile	= WelsFopen ("rec.yuv", "wb");
     }
-    bRecFlag	= true;
   }
 
   if (NULL != pDumpRecFile) {

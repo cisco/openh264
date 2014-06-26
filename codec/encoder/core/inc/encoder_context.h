@@ -217,6 +217,11 @@ SStatSliceInfo				sPerInfo;
 int32_t iEncoderError;
 WELS_MUTEX					mutexEncoderError;
 int32_t iDropNumber;
+
+#ifdef ENABLE_FRAME_DUMP
+bool bDependencyRecFlag[MAX_DEPENDENCY_LAYER];
+bool bRecFlag;
+#endif
 } sWelsEncCtx/*, *PWelsEncCtx*/;
 }
 #endif//sWelsEncCtx_H__
