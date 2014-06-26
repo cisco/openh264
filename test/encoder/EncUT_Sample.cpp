@@ -83,7 +83,6 @@ TEST (IntraSadSatdFuncTest, WelsSampleSatdThree4x4_sse2) {
   uint8_t* pDec = (uint8_t*)cMemoryAlign.WelsMalloc (iLineSizeDec << 5, "pDec");
   uint8_t* pEnc = (uint8_t*)cMemoryAlign.WelsMalloc (iLineSizeEnc << 5, "pEnc");
   uint8_t* pDst = (uint8_t*)cMemoryAlign.WelsMalloc (512, "pDst");
-  WelsInitFillingPredFuncs (WELS_CPU_SSE2);
   for (int i = 0; i < (iLineSizeDec << 5); i++)
     pDec[i] = rand() % 256;
   for (int i = 0; i < (iLineSizeEnc << 5); i++)

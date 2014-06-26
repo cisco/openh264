@@ -65,27 +65,9 @@ static inline void WelsFillingPred1to16_c (uint8_t* pPred, const uint8_t kuiSrc)
   ST64 (pPred + 8, LD64 (kuiSrc8));
 }
 
-PFillingPred					WelsFillingPred8to16;
-PFillingPred					WelsFillingPred8x2to16;
-PFillingPred1to16 WelsFillingPred1to16;
-
-void WelsInitFillingPredFuncs (const uint32_t kuiCpuFlag) {
-  WelsFillingPred8to16	= WelsFillingPred8to16_c;
-  WelsFillingPred8x2to16	= WelsFillingPred8x2to16_c;
-  WelsFillingPred1to16	= WelsFillingPred1to16_c;
-
-#if defined(X86_ASM)
-  if (kuiCpuFlag & WELS_CPU_MMXEXT) {
-    //  WelsFillingPred8to16		= WelsFillingPred8to16_mmx;
-    //  WelsFillingPred8x2to16	    = WelsFillingPred8x2to16_mmx;
-    //  WelsFillingPred1to16		= WelsFillingPred1to16_mmx;
-  }
-  if (kuiCpuFlag & WELS_CPU_SSE2) {
-    // WelsFillingPred8x2to16	    = WelsFillingPred8x2to16_sse2;
-    // WelsFillingPred1to16		= WelsFillingPred1to16_sse2;
-  }
-#endif//X86_ASM
-}
+#define WelsFillingPred8to16 WelsFillingPred8to16_c
+#define WelsFillingPred8x2to16 WelsFillingPred8x2to16_c
+#define WelsFillingPred1to16 WelsFillingPred1to16_c
 
 
 

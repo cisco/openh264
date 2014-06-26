@@ -165,7 +165,6 @@ void WelsIChromaPredDcTop_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int
 }
 #endif//__cplusplus
 
-void WelsInitFillingPredFuncs (const uint32_t kuiCpuFlag);
 void WelsInitIntraPredFuncs (SWelsFuncPtrList* pFuncList, const uint32_t kuiCpuFlag);
 
 }
