@@ -5,14 +5,13 @@
 
 using namespace WelsSVCEnc;
 
-TEST(EncoderExtTest,SetOptionIDRRequst)
-{
-  CWelsH264SVCEncoder* pPtrEnc= new CWelsH264SVCEncoder();
+TEST (EncoderExtTest, SetOptionIDRRequst) {
+  CWelsH264SVCEncoder* pPtrEnc = new CWelsH264SVCEncoder();
 
-  SEncParamExt* pParamExt= new SEncParamExt();
+  SEncParamExt* pParamExt = new SEncParamExt();
   SWelsSvcCodingParam	sConfig;
 
-  pParamExt->iInputCsp = 23;	
+  pParamExt->iInputCsp = 23;
   pParamExt->iPicWidth = 1280;
   pParamExt->iPicHeight = 720;
   pParamExt->iTargetBitrate = 6000;
@@ -23,7 +22,7 @@ TEST(EncoderExtTest,SetOptionIDRRequst)
   pParamExt->iSpatialLayerNum = 1;
 
   int32_t iResult = pPtrEnc->InitializeExt (pParamExt);
-  EXPECT_EQ(iResult,static_cast<int32_t>(cmResultSuccess));
+  EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
 
   SSourcePicture* pSrcPic = new SSourcePicture;
   pSrcPic->iColorFormat = videoFormatI420;
@@ -45,29 +44,29 @@ TEST(EncoderExtTest,SetOptionIDRRequst)
 
   SFrameBSInfo sFbi;
   memset (&sFbi, 0, sizeof (SFrameBSInfo));
-  EXPECT_EQ(sFbi.eFrameType,static_cast<int32_t>(videoFrameTypeInvalid));
+  EXPECT_EQ (sFbi.eFrameType, static_cast<int32_t> (videoFrameTypeInvalid));
 
-  iResult = pPtrEnc->EncodeFrame(pSrcPic, &sFbi);
-  EXPECT_EQ(iResult,static_cast<int32_t>(cmResultSuccess));
-  EXPECT_EQ(sFbi.eFrameType,static_cast<int32_t>(videoFrameTypeIDR));
+  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+  EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+  EXPECT_EQ (sFbi.eFrameType, static_cast<int32_t> (videoFrameTypeIDR));
 
   pSrcPic->uiTimeStamp = 30;
-  iResult = pPtrEnc->EncodeFrame(pSrcPic, &sFbi);
-  EXPECT_EQ(iResult,static_cast<int32_t>(cmResultSuccess));
-  EXPECT_EQ(sFbi.eFrameType,static_cast<int32_t>(videoFrameTypeP));
+  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+  EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+  EXPECT_EQ (sFbi.eFrameType, static_cast<int32_t> (videoFrameTypeP));
 
-  SEncParamExt* pOption=new SEncParamExt();
-  memcpy(pOption,pParamExt,sizeof(SEncParamExt));
+  SEncParamExt* pOption = new SEncParamExt();
+  memcpy (pOption, pParamExt, sizeof (SEncParamExt));
   pOption ->iTemporalLayerNum = 2;
 
-  EXPECT_EQ(pOption ->iSpatialLayerNum,1);
+  EXPECT_EQ (pOption ->iSpatialLayerNum, 1);
   ENCODER_OPTION eOptionId = ENCODER_OPTION_SVC_ENCODE_PARAM_EXT;
   iResult = pPtrEnc->SetOption (eOptionId, pOption);
-  EXPECT_EQ(iResult,static_cast<int32_t>(cmResultSuccess));
+  EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
 
   pSrcPic->uiTimeStamp = 60;
-  iResult = pPtrEnc->EncodeFrame(pSrcPic, &sFbi);
-  EXPECT_EQ(iResult,static_cast<int32_t>(cmResultSuccess));
-  EXPECT_EQ(sFbi.eFrameType,static_cast<int32_t>(videoFrameTypeP));
+  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+  EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+  EXPECT_EQ (sFbi.eFrameType, static_cast<int32_t> (videoFrameTypeP));
 
 }
