@@ -53,6 +53,7 @@ int main(int argc, char * argv[])
     argv[0]="codec_unittest";
     argv[1]=path;
     CodecUtMain(argc,argv);
+    abort();
     @autoreleasepool {
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
     }
