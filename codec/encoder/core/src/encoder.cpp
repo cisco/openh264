@@ -353,29 +353,20 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
 extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName, const int8_t kiDid, bool bAppend) {
   WelsFileHandle* pDumpRecFile = NULL;
   int32_t iWrittenSize											= 0;
+  const char* openMode = bAppend ? "ab" : "wb";
 
   if (NULL == pCurPicture || NULL == kpFileName || kiDid >= MAX_DEPENDENCY_LAYER)
     return;
 
-  if (bAppend) {
-    if (strlen (kpFileName) > 0)	// confirmed_safe_unsafe_usage
-      pDumpRecFile = WelsFopen (kpFileName, "ab");
-    else {
-      char sDependencyRecFileName[16] = {0};
-      WelsSnprintf (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-      pDumpRecFile	= WelsFopen (sDependencyRecFileName, "ab");
-    }
-    if (NULL != pDumpRecFile)
-      WelsFseek (pDumpRecFile, 0, SEEK_END);
-  } else {
-    if (strlen (kpFileName) > 0) {	// confirmed_safe_unsafe_usage
-      pDumpRecFile	= WelsFopen (kpFileName, "wb");
-    } else {
-      char sDependencyRecFileName[16] = {0};
-      WelsSnprintf (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-      pDumpRecFile	= WelsFopen (sDependencyRecFileName, "wb");
-    }
+  if (strlen (kpFileName) > 0)	// confirmed_safe_unsafe_usage
+    pDumpRecFile = WelsFopen (kpFileName, openMode);
+  else {
+    char sDependencyRecFileName[16] = {0};
+    WelsSnprintf (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
+    pDumpRecFile	= WelsFopen (sDependencyRecFileName, openMode);
   }
+  if (NULL != pDumpRecFile && bAppend)
+    WelsFseek (pDumpRecFile, 0, SEEK_END);
 
   if (NULL != pDumpRecFile) {
     int32_t i = 0;
@@ -419,25 +410,18 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName
 void DumpRecFrame (SPicture* pCurPicture, const char* kpFileName, bool bAppend) {
   WelsFileHandle* pDumpRecFile				= NULL;
   int32_t iWrittenSize			= 0;
+  const char* openMode = bAppend ? "ab" : "wb";
 
   if (NULL == pCurPicture || NULL == kpFileName)
     return;
 
-  if (bAppend) {
-    if (strlen (kpFileName) > 0) {	// confirmed_safe_unsafe_usage
-      pDumpRecFile	= WelsFopen (kpFileName, "ab");
-    } else {
-      pDumpRecFile	= WelsFopen ("rec.yuv", "ab");
-    }
-    if (NULL != pDumpRecFile)
-      WelsFseek (pDumpRecFile, 0, SEEK_END);
+  if (strlen (kpFileName) > 0) {	// confirmed_safe_unsafe_usage
+    pDumpRecFile	= WelsFopen (kpFileName, openMode);
   } else {
-    if (strlen (kpFileName) > 0) {	// confirmed_safe_unsafe_usage
-      pDumpRecFile	= WelsFopen (kpFileName, "wb");
-    } else {
-      pDumpRecFile	= WelsFopen ("rec.yuv", "wb");
-    }
+    pDumpRecFile	= WelsFopen ("rec.yuv", openMode);
   }
+  if (NULL != pDumpRecFile && bAppend)
+    WelsFseek (pDumpRecFile, 0, SEEK_END);
 
   if (NULL != pDumpRecFile) {
     int32_t i = 0;
