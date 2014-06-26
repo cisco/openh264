@@ -540,7 +540,7 @@ void RcDecideTargetBits (sWelsEncCtx* pEncCtx) {
   if (pEncCtx->eSliceType == I_SLICE) {
     pWelsSvcRc->iTargetBits = WELS_DIV_ROUND(pWelsSvcRc->iBitsPerFrame * IDR_BITRATE_RATIO, INT_MULTIPLY);
   } else {
-    pWelsSvcRc->iTargetBits = (pWelsSvcRc->iRemainingBits * pTOverRc->iTlayerWeight /
+    pWelsSvcRc->iTargetBits = (int32_t)((int64_t)pWelsSvcRc->iRemainingBits * pTOverRc->iTlayerWeight /
                                           pWelsSvcRc->iRemainingWeights);
     if ((pWelsSvcRc->iTargetBits <= 0) && (pEncCtx->pSvcParam->iRCMode == RC_LOW_BW_MODE)) {
       pWelsSvcRc->iCurrentBitsLevel = BITS_EXCEEDED;
@@ -637,7 +637,7 @@ void RcGomTargetBits (sWelsEncCtx* pEncCtx, const int32_t kiSliceId) {
     if (0 == iSumSad)
       iAllocateBits = WELS_DIV_ROUND(iLeftBits, (iLastGomIndex - kiComplexityIndex));
     else
-      iAllocateBits = WELS_DIV_ROUND(iLeftBits * pWelsSvcRc_Base->pCurrentFrameGomSad[kiComplexityIndex + 1], iSumSad);
+      iAllocateBits = WELS_DIV_ROUND((int64_t)iLeftBits * pWelsSvcRc_Base->pCurrentFrameGomSad[kiComplexityIndex + 1], iSumSad);
 
   }
   pSOverRc->iGomTargetBits = iAllocateBits;
@@ -648,10 +648,10 @@ void RcGomTargetBits (sWelsEncCtx* pEncCtx, const int32_t kiSliceId) {
 void RcCalculateGomQp (sWelsEncCtx* pEncCtx, SMB* pCurMb, int32_t iSliceId) {
   SWelsSvcRc* pWelsSvcRc			= &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   SRCSlicing* pSOverRc				= &pWelsSvcRc->pSlicingOverRc[iSliceId];
-  int32_t iBitsRatio = 1;
+  int64_t iBitsRatio = 1;
 
-  int32_t iLeftBits = pSOverRc->iTargetBitsSlice - pSOverRc->iFrameBitsSlice;
-  int32_t iTargetLeftBits = iLeftBits + pSOverRc->iGomBitsSlice - pSOverRc->iGomTargetBits;
+  int64_t iLeftBits = pSOverRc->iTargetBitsSlice - pSOverRc->iFrameBitsSlice;
+  int64_t iTargetLeftBits = iLeftBits + pSOverRc->iGomBitsSlice - pSOverRc->iGomTargetBits;
 
   if (iLeftBits <= 0) {
     pSOverRc->iCalculatedQpSlice += 2;
@@ -799,8 +799,8 @@ void RcUpdateFrameComplexity (sWelsEncCtx* pEncCtx) {
   if (0 == pTOverRc->iPFrameNum) {
     pTOverRc->iLinearCmplx = ((int64_t)pWelsSvcRc->iFrameDqBits) * pWelsSvcRc->iQStep;
   } else {
-    pTOverRc->iLinearCmplx = WELS_DIV_ROUND64((LINEAR_MODEL_DECAY_FACTOR * pTOverRc->iLinearCmplx
-                             + (INT_MULTIPLY - LINEAR_MODEL_DECAY_FACTOR) * (pWelsSvcRc->iFrameDqBits * pWelsSvcRc->iQStep)), INT_MULTIPLY);
+    pTOverRc->iLinearCmplx = WELS_DIV_ROUND64((LINEAR_MODEL_DECAY_FACTOR * (int64_t)pTOverRc->iLinearCmplx
+                             + (INT_MULTIPLY - LINEAR_MODEL_DECAY_FACTOR) * (int64_t)(pWelsSvcRc->iFrameDqBits * pWelsSvcRc->iQStep)), INT_MULTIPLY);
   }
   int32_t iAlpha = WELS_DIV_ROUND(INT_MULTIPLY, (1 + pTOverRc->iPFrameNum));
   if (iAlpha < SMOOTH_FACTOR_MIN_VALUE)
