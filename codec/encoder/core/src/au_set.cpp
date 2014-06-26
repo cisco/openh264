@@ -123,15 +123,6 @@ int32_t WelsCheckRefFrameLimitation (SLogContext* pLogCtx, SWelsSvcCodingParam* 
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
   }
-  //check temporal layer number according to the number of reference frame
-  int32_t iMaxTemporalLayer = pParam->iNumRefFrame - pParam->iLTRRefNum;
-  if (iMaxTemporalLayer < 1) {
-    iMaxTemporalLayer = 1;
-    WelsLog (pLogCtx, WELS_LOG_ERROR, "Invalid the number of reference frame ltr num(%d)\n", pParam->iLTRRefNum);
-    return ENC_RETURN_UNSUPPORTED_PARA;
-  }
-  if (pParam->iTemporalLayerNum > iMaxTemporalLayer)
-    pParam->iTemporalLayerNum = iMaxTemporalLayer;
 
   //get the maximum num of reference frame according to temporal Layer
   iRefFrame = WELS_CLIP3 ((pParam->iTemporalLayerNum + pParam->iLTRRefNum), MIN_REF_PIC_COUNT,
