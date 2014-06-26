@@ -590,8 +590,8 @@ void MeRefineFracPixel (sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME*
   int32_t iBestQuarPix = ME_NO_BEST_QUAR_PIXEL;
 
   SQuarRefineParams sParams;
-  static int32_t iMvQuarAddX[10] = {0, 0, -1, 1, 0, 0, 0, -1, 1, 0};
-  int32_t* pMvQuarAddY = iMvQuarAddX + 3;
+  static const int32_t iMvQuarAddX[10] = {0, 0, -1, 1, 0, 0, 0, -1, 1, 0};
+  const int32_t* pMvQuarAddY = iMvQuarAddX + 3;
   uint8_t* pBestPredInter = pRef;
   int32_t iInterBlk4Stride = ME_REFINE_BUF_STRIDE;
 

@@ -892,7 +892,7 @@ void McHorVer33_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, in
 
 void McLuma_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                   int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
-  static PWelsMcWidthHeightFunc pWelsMcFunc[4][4] = { //[x][y]
+  static const PWelsMcWidthHeightFunc pWelsMcFunc[4][4] = { //[x][y]
     {McCopy_neon,  McHorVer01_neon, McHorVer02_neon,    McHorVer03_neon},
     {McHorVer10_neon, McHorVer11_neon, McHorVer12_neon, McHorVer13_neon},
     {McHorVer20_neon,    McHorVer21_neon, McHorVer22_neon,    McHorVer23_neon},
@@ -1143,7 +1143,7 @@ void McHorVer33_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* 
 
 void McLuma_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                           int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
-  static PWelsMcWidthHeightFunc pWelsMcFunc[4][4] = { //[x][y]
+  static const PWelsMcWidthHeightFunc pWelsMcFunc[4][4] = { //[x][y]
     {McCopy_AArch64_neon,  McHorVer01_AArch64_neon, McHorVer02_AArch64_neon,    McHorVer03_AArch64_neon},
     {McHorVer10_AArch64_neon, McHorVer11_AArch64_neon, McHorVer12_AArch64_neon, McHorVer13_AArch64_neon},
     {McHorVer20_AArch64_neon,    McHorVer21_AArch64_neon, McHorVer22_AArch64_neon,    McHorVer23_AArch64_neon},
