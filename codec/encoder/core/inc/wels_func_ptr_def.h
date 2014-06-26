@@ -86,8 +86,8 @@ typedef struct TagMcFunc {
   PWelsLumaHalfpelMcFunc      pfLumaHalfpelCen;
   PWelsMcFunc                         pfChromaMc;
 
-  PWelsLumaQuarpelMcFunc*     pfLumaQuarpelMc;
-  PWelsSampleAveragingFunc*   pfSampleAveraging;
+  PWelsLumaQuarpelMcFunc      pfLumaQuarpelMc[16];
+  PWelsSampleAveragingFunc    pfSampleAveraging[2];
 } SMcFunc;
 
 typedef void (*PLumaDeblockingLT4Func) (uint8_t* iSampleY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* iTc);

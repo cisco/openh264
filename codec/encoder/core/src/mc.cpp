@@ -676,16 +676,16 @@ void EncMcChroma_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t*
 
 typedef void (*PixelAvgFunc) (uint8_t*, int32_t, const uint8_t*, int32_t, const uint8_t*, int32_t, int32_t);
 void WelsInitMcFuncs (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
-  static PixelAvgFunc pfPixAvgFunc[2] = {PixelAvgWidthEq8_c, PixelAvgWidthEq16_c};
+  static const PixelAvgFunc pfPixAvgFunc[2] = {PixelAvgWidthEq8_c, PixelAvgWidthEq16_c};
 
-  static PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16[16] = { //[y*4+x]
+  static const PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16[16] = { //[y*4+x]
     McCopyWidthEq16_c,  McHorVer10WidthEq16, McHorVer20WidthEq16_c,     McHorVer30WidthEq16,
     McHorVer01WidthEq16, McHorVer11WidthEq16, McHorVer21WidthEq16, McHorVer31WidthEq16,
     McHorVer02WidthEq16_c,     McHorVer12WidthEq16, McHorVer22WidthEq16_c,    McHorVer32WidthEq16,
     McHorVer03WidthEq16, McHorVer13WidthEq16, McHorVer23WidthEq16, McHorVer33WidthEq16
   };
 #if defined (X86_ASM)
-  static PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16_sse2[16] = {
+  static const PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16_sse2[16] = {
     McCopyWidthEq16_sse2,  McHorVer10WidthEq16, McHorVer20WidthEq16_sse2,     McHorVer30WidthEq16,
     McHorVer01WidthEq16, McHorVer11WidthEq16, McHorVer21WidthEq16, McHorVer31WidthEq16,
     McHorVer02WidthEq16_sse2,     McHorVer12WidthEq16, McHorVer22WidthEq16_sse2,    McHorVer32WidthEq16,
@@ -693,7 +693,7 @@ void WelsInitMcFuncs (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
   };
 #endif
 #if defined(HAVE_NEON)
-  static PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16_neon[16] = { //[x][y]
+  static const PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16_neon[16] = { //[x][y]
     McCopyWidthEq16_neon,        McHorVer10WidthEq16_neon,   McHorVer20WidthEq16_neon,    McHorVer30WidthEq16_neon,
     McHorVer01WidthEq16_neon,    EncMcHorVer11_neon,         EncMcHorVer21_neon,          EncMcHorVer31_neon,
     McHorVer02WidthEq16_neon,    EncMcHorVer12_neon,         McHorVer22WidthEq16_neon,    EncMcHorVer32_neon,
@@ -701,7 +701,7 @@ void WelsInitMcFuncs (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
   };
 #endif
 #if defined(HAVE_NEON_AARCH64)
-  static PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16_AArch64_neon[16] = { //[x][y]
+  static const PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16_AArch64_neon[16] = { //[x][y]
     McCopyWidthEq16_AArch64_neon,        McHorVer10WidthEq16_AArch64_neon,   McHorVer20WidthEq16_AArch64_neon,    McHorVer30WidthEq16_AArch64_neon,
     McHorVer01WidthEq16_AArch64_neon,    EncMcHorVer11_AArch64_neon,         EncMcHorVer21_AArch64_neon,          EncMcHorVer31_AArch64_neon,
     McHorVer02WidthEq16_AArch64_neon,    EncMcHorVer12_AArch64_neon,         McHorVer22WidthEq16_AArch64_neon,    EncMcHorVer32_AArch64_neon,
@@ -711,7 +711,7 @@ void WelsInitMcFuncs (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
   pFuncList->sMcFuncs.pfLumaHalfpelHor = McHorVer20_c;
   pFuncList->sMcFuncs.pfLumaHalfpelVer = McHorVer02_c;
   pFuncList->sMcFuncs.pfLumaHalfpelCen = McHorVer22_c;
-  pFuncList->sMcFuncs.pfSampleAveraging = pfPixAvgFunc;
+  memcpy (pFuncList->sMcFuncs.pfSampleAveraging, pfPixAvgFunc, sizeof (pfPixAvgFunc));
   pFuncList->sMcFuncs.pfChromaMc	= McChroma_c;
   fpVerFilter				= VerFilter_c;
   fpHorFilter				= HorFilter_c;
@@ -723,7 +723,7 @@ void WelsInitMcFuncs (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
   pfMcHorVer02WidthEq16 = McHorVer02WidthEq16_c;
   pfMcHorVer20WidthEq16 = McHorVer20WidthEq16_c;
   pfMcHorVer22WidthEq16 = McHorVer22WidthEq16_c;
-  pFuncList->sMcFuncs.pfLumaQuarpelMc = pWelsMcFuncWidthEq16;
+  memcpy (pFuncList->sMcFuncs.pfLumaQuarpelMc, pWelsMcFuncWidthEq16, sizeof (pWelsMcFuncWidthEq16));
 #if defined (X86_ASM)
   if (uiCpuFlag & WELS_CPU_SSE2) {
     pFuncList->sMcFuncs.pfLumaHalfpelHor = McHorVer20Width9Or17_sse2;
@@ -739,7 +739,7 @@ void WelsInitMcFuncs (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
     pfMcHorVer02WidthEq16 = McHorVer02WidthEq16_sse2;
     pfMcHorVer20WidthEq16 = McHorVer20WidthEq16_sse2;
     pfMcHorVer22WidthEq16 = McHorVer22WidthEq16_sse2;
-    pFuncList->sMcFuncs.pfLumaQuarpelMc = pWelsMcFuncWidthEq16_sse2;
+    memcpy (pFuncList->sMcFuncs.pfLumaQuarpelMc, pWelsMcFuncWidthEq16_sse2, sizeof (pWelsMcFuncWidthEq16_sse2));
   }
 
   if (uiCpuFlag & WELS_CPU_SSSE3) {
@@ -750,7 +750,7 @@ void WelsInitMcFuncs (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
 
 #if defined(HAVE_NEON)
   if (uiCpuFlag & WELS_CPU_NEON) {
-    pFuncList->sMcFuncs.pfLumaQuarpelMc	= pWelsMcFuncWidthEq16_neon;
+    memcpy (pFuncList->sMcFuncs.pfLumaQuarpelMc, pWelsMcFuncWidthEq16_neon, sizeof (pWelsMcFuncWidthEq16_neon));
     pFuncList->sMcFuncs.pfChromaMc	= EncMcChroma_neon;
     pFuncList->sMcFuncs.pfSampleAveraging[0] = PixStrideAvgWidthEq8_neon;
     pFuncList->sMcFuncs.pfSampleAveraging[1] = PixStrideAvgWidthEq16_neon;
@@ -761,7 +761,8 @@ void WelsInitMcFuncs (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
 #endif
 #if defined(HAVE_NEON_AARCH64)
   if (uiCpuFlag & WELS_CPU_NEON) {
-    pFuncList->sMcFuncs.pfLumaQuarpelMc	= pWelsMcFuncWidthEq16_AArch64_neon;
+    memcpy (pFuncList->sMcFuncs.pfLumaQuarpelMc, pWelsMcFuncWidthEq16_AArch64_neon,
+            sizeof (pWelsMcFuncWidthEq16_AArch64_neon));
     pFuncList->sMcFuncs.pfChromaMc	= EncMcChroma_AArch64_neon;
     pFuncList->sMcFuncs.pfSampleAveraging[0] = PixStrideAvgWidthEq8_AArch64_neon;
     pFuncList->sMcFuncs.pfSampleAveraging[1] = PixStrideAvgWidthEq16_AArch64_neon;
