@@ -200,7 +200,7 @@ int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* 
   /*init pixel average function*/
   /*get one column or row pixel when refinement*/
   WelsInitMcFuncs (pFuncList, uiCpuFlag);
-  InitCoeffFunc (uiCpuFlag);
+  InitCoeffFunc (pFuncList, uiCpuFlag);
 
   WelsInitEncodingFuncs (pFuncList, uiCpuFlag);
   WelsInitReconstructionFuncs (pFuncList, uiCpuFlag);
