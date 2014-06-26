@@ -161,7 +161,8 @@ int ParseLayerConfig (CReadConfig& cRdLayerCfg, const int iLayer, SEncParamExt& 
             return -1;
           }
           if (pDLayer->iMaxSpatialBitrate < pDLayer->iSpatialBitrate) {
-            fprintf (stderr, "Invalid max spatial(#%d) bitrate(%d) setting::: < layerBitrate(%d)!\n", iLayer, pDLayer->iMaxSpatialBitrate, pDLayer->iSpatialBitrate);
+            fprintf (stderr, "Invalid max spatial(#%d) bitrate(%d) setting::: < layerBitrate(%d)!\n", iLayer,
+                     pDLayer->iMaxSpatialBitrate, pDLayer->iSpatialBitrate);
             return -1;
           }
         }
@@ -436,7 +437,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       pSvcParam.iLtrMarkPeriod = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-threadIdc") && (n < argc))
-      pSvcParam.iMultipleThreadIdc= atoi (argv[n++]);
+      pSvcParam.iMultipleThreadIdc = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-deblockIdc") && (n < argc))
       pSvcParam.iLoopFilterDisableIdc = atoi (argv[n++]);
@@ -454,15 +455,14 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       g_LevelSetting = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-tarb") && (n < argc))
-      pSvcParam.iTargetBitrate = 1000*atoi (argv[n++]);
+      pSvcParam.iTargetBitrate = 1000 * atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-maxbrTotal") && (n < argc))
-      pSvcParam.iMaxBitrate = 1000*atoi  (argv[n++]);
+      pSvcParam.iMaxBitrate = 1000 * atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-numl") && (n < argc)) {
       pSvcParam.iSpatialLayerNum = atoi (argv[n++]);
-    }
-    else if (!strcmp (pCommand, "-lconfig") && (n < argc)) {
+    } else if (!strcmp (pCommand, "-lconfig") && (n < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
       sFileSet.strLayerCfgFile[iLayer].assign (argv[n++]);
       CReadConfig cRdLayerCfg (sFileSet.strLayerCfgFile[iLayer]);
@@ -630,7 +630,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   return 0;
 }
 
-int ProcessEncoding(ISVCEncoder* pPtrEnc, int argc, char** argv,bool bConfigFile) {
+int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFile) {
   int iRet				= 0;
 
   if (pPtrEnc == NULL)
@@ -677,7 +677,7 @@ int ProcessEncoding(ISVCEncoder* pPtrEnc, int argc, char** argv,bool bConfigFile
   pSrcPic->uiTimeStamp = 0;
 
   // if configure file exit, reading configure file firstly
-  if(bConfigFile){
+  if (bConfigFile) {
     iParsedNum = 2;
     cRdCfg.Openf (argv[1]);
     if (!cRdCfg.ExistFile()) {
@@ -969,7 +969,7 @@ int main (int argc, char** argv)
   } else {
     if (!strstr (argv[1], ".cfg")) { // check configuration type (like .cfg?)
       if (argc > 2) {
-        iRet = ProcessEncoding(pSVCEncoder, argc, argv,false);
+        iRet = ProcessEncoding (pSVCEncoder, argc, argv, false);
         if (iRet != 0)
           goto exit;
       } else if (argc == 2 && ! strcmp (argv[1], "-h"))
@@ -979,7 +979,7 @@ int main (int argc, char** argv)
         goto exit;
       }
     } else {
-      iRet = ProcessEncoding(pSVCEncoder, argc, argv,true);
+      iRet = ProcessEncoding (pSVCEncoder, argc, argv, true);
       if (iRet > 0)
         goto exit;
     }

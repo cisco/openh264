@@ -32,18 +32,17 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DEMOViewController : UIViewController
-{
-    BOOL bEnableFlag;
+@interface DEMOViewController : UIViewController {
+  BOOL bEnableFlag;
 }
-@property (strong, nonatomic) NSMutableArray *resFileArray;
-@property (retain, nonatomic)UIAlertView *statusIndication;
+@property (strong, nonatomic) NSMutableArray* resFileArray;
+@property (retain, nonatomic)UIAlertView* statusIndication;
 @property (assign, nonatomic) NSUInteger selectedRow;
 
-- (IBAction)startDecoderAll:(id)sender;
-- (IBAction)startDecoderOne:(id)sender;
-@property (weak, nonatomic) IBOutlet UITextField *currentSelectedFileTF;
+- (IBAction)startDecoderAll: (id)sender;
+- (IBAction)startDecoderOne: (id)sender;
+@property (weak, nonatomic) IBOutlet UITextField* currentSelectedFileTF;
 
 //unwind segue
-- (IBAction)unwindSegueForShowResourceViewController:(UIStoryboardSegue *)segue;
+- (IBAction)unwindSegueForShowResourceViewController: (UIStoryboardSegue*)segue;
 @end

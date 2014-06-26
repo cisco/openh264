@@ -2,10 +2,10 @@
 #include "utils/HashFunctions.h"
 #include "BaseDecoderTest.h"
 
-static void UpdateHashFromPlane(SHA1Context* ctx, const uint8_t* plane,
-    int width, int height, int stride) {
+static void UpdateHashFromPlane (SHA1Context* ctx, const uint8_t* plane,
+                                 int width, int height, int stride) {
   for (int i = 0; i < height; i++) {
-    SHA1Input(ctx, plane, width);
+    SHA1Input (ctx, plane, width);
     plane += stride;
   }
 }
@@ -21,7 +21,7 @@ class DecoderInitTest : public ::testing::Test, public BaseDecoderTest {
   }
 };
 
-TEST_F(DecoderInitTest, JustInit) {}
+TEST_F (DecoderInitTest, JustInit) {}
 
 struct FileParam {
   const char* fileName;
@@ -29,35 +29,35 @@ struct FileParam {
 };
 
 class DecoderOutputTest : public ::testing::WithParamInterface<FileParam>,
-    public DecoderInitTest, public BaseDecoderTest::Callback {
+  public DecoderInitTest, public BaseDecoderTest::Callback {
  public:
   virtual void SetUp() {
     DecoderInitTest::SetUp();
     if (HasFatalFailure()) {
       return;
     }
-    SHA1Reset(&ctx_);
+    SHA1Reset (&ctx_);
   }
-  virtual void onDecodeFrame(const Frame& frame) {
+  virtual void onDecodeFrame (const Frame& frame) {
     const Plane& y = frame.y;
     const Plane& u = frame.u;
     const Plane& v = frame.v;
-    UpdateHashFromPlane(&ctx_, y.data, y.width, y.height, y.stride);
-    UpdateHashFromPlane(&ctx_, u.data, u.width, u.height, u.stride);
-    UpdateHashFromPlane(&ctx_, v.data, v.width, v.height, v.stride);
+    UpdateHashFromPlane (&ctx_, y.data, y.width, y.height, y.stride);
+    UpdateHashFromPlane (&ctx_, u.data, u.width, u.height, u.stride);
+    UpdateHashFromPlane (&ctx_, v.data, v.width, v.height, v.stride);
   }
  protected:
   SHA1Context ctx_;
 };
 
-TEST_P(DecoderOutputTest, CompareOutput) {
+TEST_P (DecoderOutputTest, CompareOutput) {
   FileParam p = GetParam();
-  DecodeFile(p.fileName, this);
+  DecodeFile (p.fileName, this);
 
   unsigned char digest[SHA_DIGEST_LENGTH];
-  SHA1Result(&ctx_, digest);
+  SHA1Result (&ctx_, digest);
   if (!HasFatalFailure()) {
-    CompareHash(digest, p.hashStr);
+    CompareHash (digest, p.hashStr);
   }
 }
 
@@ -96,5 +96,5 @@ static const FileParam kFileParamArray[] = {
   {"res/SVA_NL2_E.264", "70453ef8097c94dd190d6d2d1d5cb83c67e66238"}
 };
 
-INSTANTIATE_TEST_CASE_P(DecodeFile, DecoderOutputTest,
-    ::testing::ValuesIn(kFileParamArray));
+INSTANTIATE_TEST_CASE_P (DecodeFile, DecoderOutputTest,
+                         ::testing::ValuesIn (kFileParamArray));

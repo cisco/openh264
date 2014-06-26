@@ -126,7 +126,7 @@ class CWelsPreProcess {
   int32_t AnalyzeSpatialPic (sWelsEncCtx* pEncCtx, const int32_t kiDIdx);
   int32_t UpdateSpatialPictures (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam, const int8_t iCurTid,
                                  const int32_t d_idx);
-  int32_t GetRefFrameInfo (int32_t iRefIdx,SPicture *&pRefOri);
+  int32_t GetRefFrameInfo (int32_t iRefIdx, SPicture*& pRefOri);
   void    AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCurPicture, SPicture* pRefPicture,
                                     const int32_t kiDependencyId, const bool kbCalculateBGD);
 

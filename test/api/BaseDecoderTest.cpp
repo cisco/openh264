@@ -5,18 +5,18 @@
 #include "utils/BufferedData.h"
 #include "BaseDecoderTest.h"
 
-static void ReadFrame(std::ifstream* file, BufferedData* buf) {
+static void ReadFrame (std::ifstream* file, BufferedData* buf) {
   // start code of a frame is {0, 0, 0, 1}
   int zeroCount = 0;
   char b;
 
   buf->Clear();
   for (;;) {
-    file->read(&b, 1);
+    file->read (&b, 1);
     if (file->gcount() != 1) { // end of file
       return;
     }
-    if (!buf->PushBack(b)) {
+    if (!buf->PushBack (b)) {
       FAIL() << "unable to allocate memory";
     }
 
@@ -28,8 +28,8 @@ static void ReadFrame(std::ifstream* file, BufferedData* buf) {
       zeroCount = b != 0 ? 0 : zeroCount + 1;
     } else {
       if (b == 1) {
-        if (file->seekg(-4, file->cur).good()) {
-          buf->SetLength(buf->Length() - 4);
+        if (file->seekg (-4, file->cur).good()) {
+          buf->SetLength (buf->Length() - 4);
           return;
         } else {
           FAIL() << "unable to seek file";
@@ -44,94 +44,97 @@ static void ReadFrame(std::ifstream* file, BufferedData* buf) {
 }
 
 BaseDecoderTest::BaseDecoderTest()
-  : decoder_(NULL), decodeStatus_(OpenFile) {}
+  : decoder_ (NULL), decodeStatus_ (OpenFile) {}
 
 void BaseDecoderTest::SetUp() {
-  long rv = WelsCreateDecoder(&decoder_);
-  ASSERT_EQ(0, rv);
-  ASSERT_TRUE(decoder_ != NULL);
+  long rv = WelsCreateDecoder (&decoder_);
+  ASSERT_EQ (0, rv);
+  ASSERT_TRUE (decoder_ != NULL);
 
   SDecodingParam decParam;
-  memset(&decParam, 0, sizeof(SDecodingParam));
+  memset (&decParam, 0, sizeof (SDecodingParam));
   decParam.iOutputColorFormat  = videoFormatI420;
   decParam.uiTargetDqLayer = UCHAR_MAX;
   decParam.uiEcActiveFlag  = 1;
   decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
 
-  rv = decoder_->Initialize(&decParam);
-  ASSERT_EQ(0, rv);
+  rv = decoder_->Initialize (&decParam);
+  ASSERT_EQ (0, rv);
 }
 
 void BaseDecoderTest::TearDown() {
   if (decoder_ != NULL) {
     decoder_->Uninitialize();
-    WelsDestroyDecoder(decoder_);
+    WelsDestroyDecoder (decoder_);
   }
 }
 
 
-void BaseDecoderTest::DecodeFrame(const uint8_t* src, int sliceSize, Callback* cbk) {
+void BaseDecoderTest::DecodeFrame (const uint8_t* src, int sliceSize, Callback* cbk) {
   uint8_t* data[3];
   SBufferInfo bufInfo;
-  memset(data, 0, sizeof(data));
-  memset(&bufInfo, 0, sizeof(SBufferInfo));
+  memset (data, 0, sizeof (data));
+  memset (&bufInfo, 0, sizeof (SBufferInfo));
 
-  DECODING_STATE rv = decoder_->DecodeFrame2(src, sliceSize, data, &bufInfo);
-  ASSERT_TRUE(rv == dsErrorFree);
+  DECODING_STATE rv = decoder_->DecodeFrame2 (src, sliceSize, data, &bufInfo);
+  ASSERT_TRUE (rv == dsErrorFree);
 
   if (bufInfo.iBufferStatus == 1 && cbk != NULL) {
     const Frame frame = {
-        { // y plane
-            data[0],
-            bufInfo.UsrData.sSystemBuffer.iWidth,
-            bufInfo.UsrData.sSystemBuffer.iHeight,
-            bufInfo.UsrData.sSystemBuffer.iStride[0]
-        },
-        { // u plane
-            data[1],
-            bufInfo.UsrData.sSystemBuffer.iWidth / 2,
-            bufInfo.UsrData.sSystemBuffer.iHeight / 2,
-            bufInfo.UsrData.sSystemBuffer.iStride[1]
-        },
-        { // v plane
-            data[2],
-            bufInfo.UsrData.sSystemBuffer.iWidth / 2,
-            bufInfo.UsrData.sSystemBuffer.iHeight / 2,
-            bufInfo.UsrData.sSystemBuffer.iStride[1]
-        },
+      {
+        // y plane
+        data[0],
+        bufInfo.UsrData.sSystemBuffer.iWidth,
+        bufInfo.UsrData.sSystemBuffer.iHeight,
+        bufInfo.UsrData.sSystemBuffer.iStride[0]
+      },
+      {
+        // u plane
+        data[1],
+        bufInfo.UsrData.sSystemBuffer.iWidth / 2,
+        bufInfo.UsrData.sSystemBuffer.iHeight / 2,
+        bufInfo.UsrData.sSystemBuffer.iStride[1]
+      },
+      {
+        // v plane
+        data[2],
+        bufInfo.UsrData.sSystemBuffer.iWidth / 2,
+        bufInfo.UsrData.sSystemBuffer.iHeight / 2,
+        bufInfo.UsrData.sSystemBuffer.iStride[1]
+      },
     };
-    cbk->onDecodeFrame(frame);
+    cbk->onDecodeFrame (frame);
   }
 }
-void BaseDecoderTest::DecodeFile(const char* fileName, Callback* cbk) {
-  std::ifstream file(fileName, std::ios::in | std::ios::binary);
-  ASSERT_TRUE(file.is_open());
+void BaseDecoderTest::DecodeFile (const char* fileName, Callback* cbk) {
+  std::ifstream file (fileName, std::ios::in | std::ios::binary);
+  ASSERT_TRUE (file.is_open());
 
   BufferedData buf;
   while (true) {
-    ReadFrame(&file, &buf);
+    ReadFrame (&file, &buf);
     if (::testing::Test::HasFatalFailure()) {
       return;
     }
     if (buf.Length() == 0) {
       break;
     }
-    DecodeFrame(buf.data(), buf.Length(), cbk);
+    DecodeFrame (buf.data(), buf.Length(), cbk);
     if (::testing::Test::HasFatalFailure()) {
       return;
     }
   }
 
   int32_t iEndOfStreamFlag = 1;
-  decoder_->SetOption(DECODER_OPTION_END_OF_STREAM, &iEndOfStreamFlag);
+  decoder_->SetOption (DECODER_OPTION_END_OF_STREAM, &iEndOfStreamFlag);
 
   // Get pending last frame
-  DecodeFrame(NULL, 0, cbk);
+  DecodeFrame (NULL, 0, cbk);
 }
 
-bool BaseDecoderTest::Open(const char* fileName) {
+bool BaseDecoderTest::Open (const char* fileName) {
   if (decodeStatus_ == OpenFile) {
-    file_.open(fileName, std::ios_base::out | std::ios_base::binary);
+    file_.open (fileName, std::ios_base::out | std::ios_base::binary);
     if (file_.is_open()) {
       decodeStatus_ = Decoding;
       return true;
@@ -140,10 +143,10 @@ bool BaseDecoderTest::Open(const char* fileName) {
   return false;
 }
 
-bool BaseDecoderTest::DecodeNextFrame(Callback* cbk) {
+bool BaseDecoderTest::DecodeNextFrame (Callback* cbk) {
   switch (decodeStatus_) {
   case Decoding:
-    ReadFrame(&file_, &buf_);
+    ReadFrame (&file_, &buf_);
     if (::testing::Test::HasFatalFailure()) {
       return false;
     }
@@ -151,15 +154,15 @@ bool BaseDecoderTest::DecodeNextFrame(Callback* cbk) {
       decodeStatus_ = EndOfStream;
       return true;
     }
-    DecodeFrame(buf_.data(), buf_.Length(), cbk);
+    DecodeFrame (buf_.data(), buf_.Length(), cbk);
     if (::testing::Test::HasFatalFailure()) {
       return false;
     }
     return true;
   case EndOfStream: {
     int32_t iEndOfStreamFlag = 1;
-    decoder_->SetOption(DECODER_OPTION_END_OF_STREAM, &iEndOfStreamFlag);
-    DecodeFrame(NULL, 0, cbk);
+    decoder_->SetOption (DECODER_OPTION_END_OF_STREAM, &iEndOfStreamFlag);
+    DecodeFrame (NULL, 0, cbk);
     decodeStatus_ = End;
     break;
   }

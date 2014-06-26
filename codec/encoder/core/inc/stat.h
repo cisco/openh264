@@ -47,9 +47,9 @@ namespace WelsSVCEnc {
  */
 typedef struct TagStatQuality {
 
-  float	rYPsnr[5];
-  float	rUPsnr[5];
-  float	rVPsnr[5];
+float	rYPsnr[5];
+float	rUPsnr[5];
+float	rVPsnr[5];
 
 } SStatQuality;
 
@@ -59,13 +59,13 @@ typedef struct TagStatQuality {
 typedef struct TagComplexityStat {
 
 #ifdef FME_TEST
-  int32_t		cost_time;
-  int32_t		me_time;
-  int32_t		mvp_time;
-  int32_t		mvb_time;
+int32_t		cost_time;
+int32_t		me_time;
+int32_t		mvp_time;
+int32_t		mvb_time;
 #endif
 
-  // any else?
+// any else?
 
 } SComplexityStat;
 
@@ -74,10 +74,10 @@ typedef struct TagComplexityStat {
  */
 typedef struct TagStatSliceInfo {
 
-  /* per slice info */
-  int32_t		iSliceCount[5];
-  int32_t		iSliceSize [5];
-  int32_t		iMbCount   [5][18];
+/* per slice info */
+int32_t		iSliceCount[5];
+int32_t		iSliceSize [5];
+int32_t		iMbCount   [5][18];
 
 } SStatSliceInfo;
 
@@ -86,14 +86,14 @@ typedef struct TagStatSliceInfo {
  */
 typedef struct TagStatData {
 
-  // Quality
-  SStatQuality		sQualityStat;
+// Quality
+SStatQuality		sQualityStat;
 
-  // Complexity
-  SComplexityStat		sComplexityStat;
+// Complexity
+SComplexityStat		sComplexityStat;
 
-  // SSlice information output
-  SStatSliceInfo		sSliceData;
+// SSlice information output
+SStatSliceInfo		sSliceData;
 
 } SStatData;
 

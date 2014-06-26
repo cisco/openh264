@@ -33,12 +33,12 @@
 #import <UIKit/UIKit.h>
 
 @interface ViewController : UIViewController {
-    UILabel * statusText_;
+  UILabel* statusText_;
 }
 
-@property (retain, nonatomic) IBOutlet UILabel * statusText;
+@property (retain, nonatomic) IBOutlet UILabel* statusText;
 
--(IBAction) buttonPressed:(id)sender;
+- (IBAction) buttonPressed: (id)sender;
 
 
 @end

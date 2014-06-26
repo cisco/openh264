@@ -33,6 +33,6 @@
 #import <UIKit/UIKit.h>
 
 @interface DEMOViewControllerShowResource : UITableViewController
-@property (strong, nonatomic) NSMutableArray *resFileArray;
+  @property (strong, nonatomic) NSMutableArray* resFileArray;
 @property (assign, nonatomic) NSUInteger selectedRow;
 @end
