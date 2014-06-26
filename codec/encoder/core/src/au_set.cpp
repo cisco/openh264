@@ -124,12 +124,6 @@ int32_t WelsCheckRefFrameLimitation (SLogContext* pLogCtx, SWelsSvcCodingParam* 
     }
   }
 
-  //get the maximum num of reference frame according to temporal Layer
-  iRefFrame = WELS_CLIP3 ((pParam->iTemporalLayerNum + pParam->iLTRRefNum), MIN_REF_PIC_COUNT,
-                          MAX_REFERENCE_REORDER_COUNT_NUM);
-  if (pParam->iMaxNumRefFrame < iRefFrame)
-    pParam->iMaxNumRefFrame = iRefFrame;
-
   return ENC_RETURN_SUCCESS;
 }
 static inline int32_t WelsGetLevelIdc (const SWelsSPS* kpSps, float fFrameRate, int32_t iTargetBitRate) {
