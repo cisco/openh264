@@ -77,8 +77,6 @@ uint8_t  uiSuffixLength;
 
 void  InitCoeffFunc (const uint32_t uiCpuFlag);
 
-void  InitCavlcTable();
-
 int32_t  WriteBlockResidualCavlc (int16_t* pCoffLevel, int32_t iEndIdx, int32_t iCalRunLevelFlag,
                                   int32_t iResidualProperty, int8_t iNC, SBitStringAux* pBs);
 

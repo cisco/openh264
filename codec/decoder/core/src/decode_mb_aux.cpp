@@ -37,32 +37,6 @@
 
 namespace WelsDec {
 
-#define MAX_NEG_CROP 1024
-uint8_t g_ClipTable[256 + 2 *
-                    MAX_NEG_CROP];	//the front 1024 is 0, the back 1024 is 255, the middle 256 elements is 0-255
-
-
-/* init pClip table to pClip the final dct data */
-void InitDctClipTable (void) {
-  uint8_t* p		        = &g_ClipTable[0];
-  const int32_t kiLength	= MAX_NEG_CROP * sizeof (uint8_t);
-  int32_t i               = 0;
-
-  do {
-    const int32_t kiIdx = MAX_NEG_CROP + i;
-
-    p[kiIdx]	= i;
-    p[1 + kiIdx]	= 1 + i;
-    p[2 + kiIdx]	= 2 + i;
-    p[3 + kiIdx]	= 3 + i;
-
-    i += 4;
-  } while (i < 256);
-
-  memset (p, 0, kiLength);
-  memset (p + MAX_NEG_CROP + 256, 0xFF, kiLength);
-}
-
 //NOTE::: p_RS should NOT be modified and it will lead to mismatch with JSVM.
 //        so should allocate kA array to store the temporary value (idct).
 void IdctResAddPred_c (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) {

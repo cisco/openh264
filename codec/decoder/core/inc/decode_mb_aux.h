@@ -38,8 +38,6 @@
 
 namespace WelsDec {
 
-void InitDctClipTable (void);
-
 void IdctResAddPred_c (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
 
 #if defined(__cplusplus)
