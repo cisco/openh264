@@ -280,7 +280,19 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
          WELS_CPU_NEON;
 }
 #endif
-#else /* Neither X86_ASM nor HAVE_NEON */
+#elif defined(HAVE_NEON_AARCH64)
+
+/* For AArch64, no runtime detection actually is necessary for now, since
+ * NEON and VFPv3 is mandatory on all such CPUs. (/proc/cpuinfo doesn't
+ * contain neon, and the android cpufeatures library doesn't return it
+ * either.) */
+
+uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
+  return WELS_CPU_VFPv3 |
+         WELS_CPU_NEON;
+}
+
+#else /* Neither X86_ASM, HAVE_NEON nor HAVE_NEON_AARCH64 */
 
 uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
   return 0;
