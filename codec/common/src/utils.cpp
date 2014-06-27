@@ -48,8 +48,7 @@ float WelsCalcPsnr (const void* kpTarPic,
                     const int32_t kiHeight);
 
 
-void WelsLog (void* pCtx, int32_t iLevel, const char* kpFmt, ...) {
-  SLogContext* logCtx = (SLogContext*) pCtx;
+void WelsLog (SLogContext* logCtx, int32_t iLevel, const char* kpFmt, ...) {
   va_list vl;
   va_start (vl, kpFmt);
   logCtx->pfLog (logCtx->pLogCtx, iLevel, kpFmt, vl);

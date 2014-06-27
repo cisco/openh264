@@ -1011,7 +1011,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
         }
       }
     } else {
-      WelsLog (pCtx, WELS_LOG_WARNING, "inter parse: iMotionPredFlag = 1 not supported. \n");
+      WelsLog (&(pCtx->sLogCtx), WELS_LOG_WARNING, "inter parse: iMotionPredFlag = 1 not supported. \n");
       return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_UNSUPPORTED_ILP);
     }
     PredMv (iMvArray, iRefIdxArray, 0, 4, iRefIdx, iMv);
@@ -1035,7 +1035,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
 
     for (i = 0; i < 2; i++) {
       if (iMotionPredFlag[i]) {
-        WelsLog (pCtx, WELS_LOG_WARNING, "inter parse: iMotionPredFlag = 1 not supported. \n");
+        WelsLog (&(pCtx->sLogCtx), WELS_LOG_WARNING, "inter parse: iMotionPredFlag = 1 not supported. \n");
         return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_UNSUPPORTED_ILP);
       }
       WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[0], &uiCode)); //ref_idx_l0[ mbPartIdx ]
@@ -1083,7 +1083,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
           }
         }
       } else {
-        WelsLog (pCtx, WELS_LOG_WARNING, "inter parse: iMotionPredFlag = 1 not supported. \n");
+        WelsLog (&(pCtx->sLogCtx), WELS_LOG_WARNING, "inter parse: iMotionPredFlag = 1 not supported. \n");
         return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_UNSUPPORTED_ILP);
       }
 
@@ -1152,7 +1152,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
           pCurDqLayer->pRefIndex[0][iMbXy][uiScan4Idx  ] = pCurDqLayer->pRefIndex[0][iMbXy][uiScan4Idx + 1] =
                 pCurDqLayer->pRefIndex[0][iMbXy][uiScan4Idx + 4] = pCurDqLayer->pRefIndex[0][iMbXy][uiScan4Idx + 5] = iRefIdx[i];
         } else {
-          WelsLog (pCtx, WELS_LOG_WARNING, "inter parse: iMotionPredFlag = 1 not supported. \n");
+          WelsLog (&(pCtx->sLogCtx), WELS_LOG_WARNING, "inter parse: iMotionPredFlag = 1 not supported. \n");
           return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_UNSUPPORTED_ILP);
         }
       }
