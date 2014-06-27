@@ -110,8 +110,12 @@ class CSceneChangeDetectorVideo {
       pCurY += iCurRowStride;
     }
   }
-  float  GetSceneChangeMotionRatioLarge() const { return m_fSceneChangeMotionRatioLarge; }
-  float  GetSceneChangeMotionRatioMedium() const { return m_fSceneChangeMotionRatioMedium; }
+  float  GetSceneChangeMotionRatioLarge() const {
+    return m_fSceneChangeMotionRatioLarge;
+  }
+  float  GetSceneChangeMotionRatioMedium() const {
+    return m_fSceneChangeMotionRatioMedium;
+  }
  protected:
   SadFuncPtr m_pfSad;
   SSceneChangeResult& m_sParam;
