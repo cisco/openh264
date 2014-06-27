@@ -438,11 +438,7 @@ void WelsIChormaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) 
 
   do {
     const uint8_t kuiLeft = pRef[iStridex7 - 1];	// pLeft value
-#ifdef _MSC_VER
-    uint64_t kuiSrc64 = (uint64_t) (0x0101010101010101U * kuiLeft);
-#else
     uint64_t kuiSrc64 = (uint64_t) (0x0101010101010101ULL * kuiLeft);
-#endif
     ST64 (pPred + iI8x8Stridex7, kuiSrc64);
 
     iStridex7 -= kiStride;
@@ -518,13 +514,8 @@ void WelsIChormaPredDcLeft_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStr
   /*caculate the iMean value*/
   const uint8_t kuiTopMean	= (pRef[-1] + pRef[kuiL1] + pRef[kuiL2] + pRef[kuiL3] + 2) >> 2 ;
   const uint8_t kuiBottomMean	= (pRef[kuiL4] + pRef[kuiL5] + pRef[kuiL6] + pRef[kuiL7] + 2) >> 2;
-#ifdef _MSC_VER
-  const uint64_t kuiTopMean64	= (uint64_t) (0x0101010101010101U * kuiTopMean);
-  const uint64_t kuiBottomMean64	= (uint64_t) (0x0101010101010101U * kuiBottomMean);
-#else
   const uint64_t kuiTopMean64	= (uint64_t) (0x0101010101010101ULL * kuiTopMean);
   const uint64_t kuiBottomMean64	= (uint64_t) (0x0101010101010101ULL * kuiBottomMean);
-#endif
   ST64 (pPred   , kuiTopMean64);
   ST64 (pPred + 8 , kuiTopMean64);
   ST64 (pPred + 16, kuiTopMean64);
@@ -553,11 +544,7 @@ void WelsIChormaPredDcTop_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStri
 }
 
 void WelsIChormaPredDcNA_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
-#ifdef _MSC_VER
-  const uint64_t kuiDcValue64 = (uint64_t)0x8080808080808080U;
-#else
   const uint64_t kuiDcValue64 = (uint64_t)0x8080808080808080ULL;
-#endif
   ST64 (pPred   , kuiDcValue64);
   ST64 (pPred + 8 , kuiDcValue64);
   ST64 (pPred + 16, kuiDcValue64);
@@ -591,11 +578,7 @@ void WelsI16x16LumaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStrid
 
   do {
     const uint8_t kuiSrc8	= pRef[iStridex15 - 1];
-#ifdef _MSC_VER
-    const uint64_t kuiV64	= (uint64_t) (0x0101010101010101U * kuiSrc8);
-#else
     const uint64_t kuiV64	= (uint64_t) (0x0101010101010101ULL * kuiSrc8);
-#endif
     ST64 (&pPred[iPredStridex15], kuiV64);
     ST64 (&pPred[iPredStridex15 + 8], kuiV64);
 
