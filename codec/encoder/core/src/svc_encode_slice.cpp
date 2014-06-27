@@ -697,11 +697,11 @@ int32_t WelsCodePOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
 
 // 1st index: 0: for P pSlice; 1: for I pSlice;
 // 2nd index: 0: for non-dynamic pSlice; 1: for dynamic I pSlice;
-PWelsCodingSliceFunc	g_pWelsSliceCoding[2][2] = {
+static const PWelsCodingSliceFunc	g_pWelsSliceCoding[2][2] = {
   { WelsCodePSlice, WelsCodePOverDynamicSlice },	// P SSlice
   { WelsISliceMdEnc, WelsISliceMdEncDynamic }	// I SSlice
 };
-PWelsSliceHeaderWriteFunc		g_pWelsWriteSliceHeader[2] = {	// 0: for base; 1: for ext;
+static const PWelsSliceHeaderWriteFunc		g_pWelsWriteSliceHeader[2] = {	// 0: for base; 1: for ext;
   WelsSliceHeaderWrite,
   WelsSliceHeaderExtWrite
 };
