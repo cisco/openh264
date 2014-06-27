@@ -35,16 +35,16 @@
 #include "arm_arch64_common_macro.S"
 
 // for Luma 4x4
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredH_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredH_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, #1
 .rept 4
     ld1r    {v0.8b}, [x2], x1
     st1     {v0.S}[0], [x0], x1
 .endr
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredDc_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredDc_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, x1
     sub     x3, x0, #1
@@ -59,9 +59,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredDc_AArch64_neon
 .rept 4
     st1     {v0.S}[0], [x0], x1
 .endr
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredDcTop_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredDcTop_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, x1
     sub     v0.8b, v0.8b, v0.8b
@@ -72,9 +72,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredDcTop_AArch64_neon
 .rept 4
     st1     {v0.S}[0], [x0], x1
 .endr
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredDDL_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredDDL_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, x1
     ld1     {v0.8b}, [x2]
@@ -92,9 +92,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredDDL_AArch64_neon
     st1     {v0.S}[0], [x0], x1
     ext     v0.8b, v1.8b, v2.8b, #3
     st1     {v0.S}[0], [x0]
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredDDLTop_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredDDLTop_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, x1
     ld1     {v0.8b}, [x2]
@@ -113,9 +113,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredDDLTop_AArch64_neon
     st1     {v0.S}[0], [x0], x1
     ext     v0.8b, v1.8b, v2.8b, #3
     st1     {v0.S}[0], [x0]
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredVL_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredVL_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, x1
     ld1     {v0.8b}, [x2]
@@ -131,9 +131,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredVL_AArch64_neon
     ext     v2.8b, v1.8b, v1.8b, #1
     st1     {v3.s}[0], [x0], x1 // write the third row
     st1     {v2.s}[0], [x0]     // write the fourth row
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredVLTop_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredVLTop_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, x1
     ld1     {v0.8b}, [x2]
@@ -151,9 +151,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredVLTop_AArch64_neon
     ext     v2.8b, v1.8b, v1.8b, #1
     st1     {v3.s}[0], [x0], x1 // write the third row
     st1     {v2.s}[0], [x0]     // write the fourth row
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredVR_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredVR_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, x1
     ld1     {v0.s}[1], [x2]
@@ -182,10 +182,10 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredVR_AArch64_neon
     ins     v3.b[4], v3.b[3]
     st1     {v3.s}[1], [x0], x1
 
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredHU_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredHU_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, #1
     mov     x3, #3
@@ -210,9 +210,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredHU_AArch64_neon
     st1     {v2.s}[0], [x0], x1
     st1     {v3.s}[1], [x0], x1
     st1     {v0.s}[0], [x0]
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredHD_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredHD_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, #1
     sub     x2, x2, x1 // x2 points to top left
@@ -235,29 +235,29 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI4x4LumaPredHD_AArch64_neon
     ext     v3.8b, v2.8b, v1.8b, #2
     st1     {v3.s}[0], [x0], x1
     st1     {v2.s}[0], [x0]
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
 // for Chroma 8x8
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderIChromaPredV_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderIChromaPredV_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, x1
     ld1     {v0.8b}, [x2]
 .rept   8
     st1     {v0.8b}, [x0], x1
 .endr
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderIChromaPredH_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderIChromaPredH_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, #1
 .rept 8
     ld1r    {v0.8b}, [x2], x1
     st1     {v0.8b}, [x0], x1
 .endr
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderIChromaPredDc_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderIChromaPredDc_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, x1
     sub     x3, x0, #1
@@ -291,9 +291,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderIChromaPredDc_AArch64_neon
     st1     {v2.8b}, [x0], x1
 .endr
 
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderIChromaPredDcTop_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderIChromaPredDcTop_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, x1
     ld1     {v0.8b}, [x2]
@@ -306,13 +306,13 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderIChromaPredDcTop_AArch64_neon
 .rept 8
     st1     {v1.8b}, [x0], x1
 .endr
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
 .align 16
 intra_1_to_4: .short 17*1, 17*2, 17*3, 17*4, 17*1, 17*2, 17*3, 17*4
 intra_m3_to_p4: .short -3, -2, -1, 0, 1, 2, 3, 4
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderIChromaPredPlane_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderIChromaPredPlane_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, x1
     sub     x2, x2, #1
@@ -362,28 +362,28 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderIChromaPredPlane_AArch64_neon
     sqrshrun v1.8b, v4.8h, #5
     st1     {v1.8b}, [x0], x1
 .endr
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
 //for Luma 16x16
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredV_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredV_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, x1
     ld1     {v0.16b}, [x2]
 .rept 16
     st1     {v0.16b}, [x0], x1
 .endr
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredH_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredH_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, #1
 .rept 16
     ld1r    {v0.16b}, [x2], x1
     st1     {v0.16b}, [x0], x1
 .endr
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredDc_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredDc_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, x1
     sub     x3, x0, #1
@@ -413,9 +413,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredDc_AArch64_neon
 .rept 16
     st1     {v0.16b}, [x0], x1
 .endr
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredDcTop_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredDcTop_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, x1
     ld1     {v0.16b}, [x2]
@@ -426,9 +426,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredDcTop_AArch64_neon
 .rept 16
     st1     {v0.16b}, [x0], x1
 .endr
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredDcLeft_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredDcLeft_AArch64_neon
     sxtw    x1, w1
     sub     x3, x0, #1
     ld1     {v1.b}[0], [x3], x1
@@ -454,14 +454,14 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredDcLeft_AArch64_neon
 .rept 16
     st1     {v0.16b}, [x0], x1
 .endr
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
 
 .align 16
 intra_1_to_8: .short 5, 10, 15, 20, 25, 30, 35, 40
 intra_m7_to_p8: .short -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredPlane_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredPlane_AArch64_neon
     sxtw    x1, w1
     sub     x2, x0, x1
     sub     x2, x2, #1
@@ -521,5 +521,5 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredPlane_AArch64_neon
     sqrshrun2 v4.16b, v3.8h, #5
     st1     {v4.16b}, [x0], x1
 .endr
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 #endif
