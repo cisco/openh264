@@ -81,7 +81,7 @@ WELS_EXTERN WelsCPUId
     push     rdx
 
     mov      eax,     ecx
-    mov      rcx,     [r9]
+    mov      ecx,     [r9]
     cpuid
     mov      [r9],    ecx
     mov      [r8],    ebx
@@ -100,7 +100,7 @@ WELS_EXTERN WelsCPUId
     push     rdx
 
     mov      eax,     edi
-    mov      rcx,     [rcx]
+    mov      ecx,     [rcx]
     cpuid
     mov      [r8],    edx
     pop      rdx
