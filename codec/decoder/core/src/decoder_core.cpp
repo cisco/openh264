@@ -1943,6 +1943,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         if (NeedErrorCon (pCtx)) {
           ImplementErrorCon (pCtx);
           pCtx->iTotalNumMbRec = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
+          pCtx->iErrorCode |= dsDataErrorConcealed;
         }
       }
 
@@ -1992,6 +1993,7 @@ bool CheckAndDoEC (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstI
       pCtx->iPrevFrameNum = pCtx->sLastSliceHeader.iFrameNum; //save frame_num
       if (pCtx->bLastHasMmco5)
         pCtx->iPrevFrameNum = 0;
+      pCtx->iErrorCode |= dsDataErrorConcealed;
     }
   }
   return ERR_NONE;

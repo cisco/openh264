@@ -58,6 +58,7 @@ typedef enum {
   dsBitstreamError	= 0x04,	/* Error bitstreams(maybe broken internal frame) the decoder cared */
   dsDepLayerLost		= 0x08,	/* Dependented layer is ever lost */
   dsNoParamSets		= 0x10, /* No parameter set NALs involved */
+  dsDataErrorConcealed  = 0x20, /* current data Error concealed specified */
 
   /* Errors derived from logic level */
   dsInvalidArgument	= 0x1000,	/* Invalid argument specified */
