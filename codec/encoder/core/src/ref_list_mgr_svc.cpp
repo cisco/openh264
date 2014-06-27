@@ -168,13 +168,14 @@ static inline void DeleteInvalidLTR (sWelsEncCtx* pCtx) {
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
   int32_t iMaxFrameNumPlus1 = (1 << pCtx->pSps->uiLog2MaxFrameNum);
   int32_t i;
+  SLogContext* pLogCtx = &(pCtx->sLogCtx);
 
   for (i = 0; i < LONG_TERM_REF_NUM; i++) {
     if (pLongRefList[i] != NULL)	{
       if (CompareFrameNum (pLongRefList[i]->iFrameNum , pLtr->iLastCorFrameNumDec, iMaxFrameNumPlus1) == FRAME_NUM_BIGGER
           && (CompareFrameNum (pLongRefList[i]->iFrameNum , pLtr->iCurFrameNumInDec,
                                iMaxFrameNumPlus1) & (FRAME_NUM_EQUAL | FRAME_NUM_SMALLER))) {
-        WelsLog (pCtx, WELS_LOG_WARNING, "LTR ,invalid LTR delete ,long_term_idx = %d , iFrameNum =%d \n",
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "LTR ,invalid LTR delete ,long_term_idx = %d , iFrameNum =%d \n",
                  pLongRefList[i]->iLongTermPicNum, pLongRefList[i]->iFrameNum);
         SetUnref (pLongRefList[i]);
         DeleteLTRFromLongList (pCtx, i);
@@ -187,7 +188,7 @@ static inline void DeleteInvalidLTR (sWelsEncCtx* pCtx) {
                  && (CompareFrameNum (pLongRefList[i]->iMarkFrameNum, pLtr->iCurFrameNumInDec ,
                                       iMaxFrameNumPlus1) & (FRAME_NUM_EQUAL | FRAME_NUM_SMALLER))
                  && pLtr->iLTRMarkMode == LTR_DELAY_MARK)	{
-        WelsLog (pCtx, WELS_LOG_WARNING, "LTR ,iMarkFrameNum invalid LTR delete ,long_term_idx = %d , iFrameNum =%d \n",
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "LTR ,iMarkFrameNum invalid LTR delete ,long_term_idx = %d , iFrameNum =%d \n",
                  pLongRefList[i]->iLongTermPicNum, pLongRefList[i]->iFrameNum);
         SetUnref (pLongRefList[i]);
         DeleteLTRFromLongList (pCtx, i);
@@ -210,7 +211,7 @@ static inline void HandleLTRMarkFeedback (sWelsEncCtx* pCtx) {
   int32_t i, j;
 
   if (pLtr->uiLtrMarkState == LTR_MARKING_SUCCESS) {
-    WelsLog (pCtx, WELS_LOG_WARNING,
+    WelsLog (&(pCtx->sLogCtx), WELS_LOG_WARNING,
              "pLtr->uiLtrMarkState = %d, pLtr.iCurLtrIdx = %d , pLtr->iLtrMarkFbFrameNum = %d ,pCtx->iFrameNum = %d ",
              pLtr->uiLtrMarkState, pLtr->iCurLtrIdx, pLtr->iLtrMarkFbFrameNum, pCtx->iFrameNum);
     for (i = 0; i < pRefList->uiLongRefCount; i++)	{
@@ -233,7 +234,7 @@ static inline void HandleLTRMarkFeedback (sWelsEncCtx* pCtx) {
         pLtr->iLTRMarkSuccessNum++;
         pLtr->iCurLtrIdx = (pLtr->iCurLtrIdx + 1) % LONG_TERM_REF_NUM;
         pLtr->iLTRMarkMode = (pLtr->iLTRMarkSuccessNum >= (LONG_TERM_REF_NUM)) ? (LTR_DELAY_MARK) : (LTR_DIRECT_MARK);
-        WelsLog (pCtx, WELS_LOG_WARNING, "LTR mark mode =%d", pLtr->iLTRMarkMode);
+        WelsLog (&(pCtx->sLogCtx), WELS_LOG_WARNING, "LTR mark mode =%d", pLtr->iLTRMarkMode);
         pLtr->bLTRMarkEnable = true;
         break;
       }
@@ -522,12 +523,12 @@ int32_t FilterLTRRecoveryRequest (sWelsEncCtx* pCtx, SLTRRecoverRequest* pLTRRec
         pLtr->bReceivedT0LostFlag = true;
         pLtr->iLastCorFrameNumDec = pRequest->iLastCorrectFrameNum;
         pLtr->iCurFrameNumInDec = pRequest->iCurrentFrameNum;
-        WelsLog (pCtx, WELS_LOG_INFO,
+        WelsLog (&(pCtx->sLogCtx), WELS_LOG_INFO,
                  "Receive valid LTR recovery pRequest,feedback_type = %d ,uiIdrPicId = %d , current_frame_num = %d , last correct frame num = %d"
                  , pRequest->uiFeedbackType, pRequest->uiIDRPicId, pRequest->iCurrentFrameNum, pRequest->iLastCorrectFrameNum);
       }
 
-      WelsLog (pCtx, WELS_LOG_INFO,
+      WelsLog (&(pCtx->sLogCtx), WELS_LOG_INFO,
                "Receive LTR recovery pRequest,feedback_type = %d ,uiIdrPicId = %d , current_frame_num = %d , last correct frame num = %d"
                , pRequest->uiFeedbackType, pRequest->uiIDRPicId, pRequest->iCurrentFrameNum, pRequest->iLastCorrectFrameNum);
     }
@@ -545,13 +546,13 @@ void FilterLTRMarkingFeedback (sWelsEncCtx* pCtx, SLTRMarkingFeedback* pLTRMarki
             || pLTRMarkingFeedback->uiFeedbackType == LTR_MARKING_FAILED)) { // avoid error pData
       pLtr->uiLtrMarkState = pLTRMarkingFeedback->uiFeedbackType;
       pLtr->iLtrMarkFbFrameNum =  pLTRMarkingFeedback->iLTRFrameNum ;
-      WelsLog (pCtx, WELS_LOG_INFO,
+      WelsLog (&(pCtx->sLogCtx), WELS_LOG_INFO,
                "Receive valid LTR marking feedback, feedback_type = %d , uiIdrPicId = %d , LTR_frame_num = %d , cur_idr_pic_id = %d",
                pLTRMarkingFeedback->uiFeedbackType, pLTRMarkingFeedback->uiIDRPicId, pLTRMarkingFeedback->iLTRFrameNum ,
                pCtx->sPSOVector.uiIdrPicId);
 
     } else {
-      WelsLog (pCtx, WELS_LOG_INFO,
+      WelsLog (&(pCtx->sLogCtx), WELS_LOG_INFO,
                "Receive LTR marking feedback, feedback_type = %d , uiIdrPicId = %d , LTR_frame_num = %d , cur_idr_pic_id = %d",
                pLTRMarkingFeedback->uiFeedbackType, pLTRMarkingFeedback->uiIDRPicId, pLTRMarkingFeedback->iLTRFrameNum ,
                pCtx->sPSOVector.uiIdrPicId);
@@ -585,7 +586,7 @@ bool WelsBuildRefList (void* pEncCtx, const int32_t iPOC, int32_t iBestLtrRefIdx
         if (pRefList->pLongRefList[i]->uiRecieveConfirmed == RECIEVE_SUCCESS)	{
           pCtx->pRefList0[pCtx->iNumRef0++] = pRefList->pLongRefList[i];
           pLtr->iLastRecoverFrameNum = pCtx->iFrameNum;
-          WelsLog (pCtx, WELS_LOG_INFO, "pRef is int32_t !iLastRecoverFrameNum = %d, pRef iFrameNum = %d,LTR number = %d,",
+          WelsLog (&(pCtx->sLogCtx), WELS_LOG_INFO, "pRef is int32_t !iLastRecoverFrameNum = %d, pRef iFrameNum = %d,LTR number = %d,",
                    pLtr->iLastRecoverFrameNum, pCtx->pRefList0[0]->iFrameNum, pRefList->uiLongRefCount);
           break;
         }
@@ -595,7 +596,7 @@ bool WelsBuildRefList (void* pEncCtx, const int32_t iPOC, int32_t iBestLtrRefIdx
         SPicture* pRef = pRefList->pShortRefList[i];
         if (pRef != NULL && pRef->bUsedAsRef && pRef->iFramePoc >= 0 && pRef->uiTemporalId <= kuiTid) {
           pCtx->pRefList0[pCtx->iNumRef0++]	= pRef;
-          WelsLog (pCtx, WELS_LOG_INFO, "WelsBuildRefList pCtx->uiTemporalId = %d,pRef->iFrameNum = %d,pRef->uiTemporalId = %d\n",
+          WelsLog (&(pCtx->sLogCtx), WELS_LOG_INFO, "WelsBuildRefList pCtx->uiTemporalId = %d,pRef->iFrameNum = %d,pRef->uiTemporalId = %d\n",
                    pCtx->uiTemporalId, pRef->iFrameNum, pRef->uiTemporalId);
           break;
         }
@@ -638,9 +639,9 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
     if (pCtx->iNumRef0 > 0) {
       if ((!pCtx->pRefList0[0]->bIsLongRef) || (!pCtx->pSvcParam->bEnableLongTermReference)) {
         if (iAbsDiffPicNumMinus1 < 0) {
-          WelsLog (pCtx, WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1:%d\n", iAbsDiffPicNumMinus1);
+          WelsLog (&(pCtx->sLogCtx), WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1:%d\n", iAbsDiffPicNumMinus1);
           iAbsDiffPicNumMinus1 += (1 << (pCtx->pSps->uiLog2MaxFrameNum));
-          WelsLog (pCtx, WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1< 0, update as:%d\n", iAbsDiffPicNumMinus1);
+          WelsLog (&(pCtx->sLogCtx), WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1< 0, update as:%d\n", iAbsDiffPicNumMinus1);
         }
 
         pRefReorder->SReorderingSyntax[0].uiReorderingOfPicNumsIdc = 0;
@@ -769,11 +770,11 @@ bool WelsBuildRefListScreen (void* pEncCtx, const int32_t iPOC, int32_t iBestLtr
           if (pRefPic->uiTemporalId <= pCtx->uiTemporalId && (!pCtx->bCurFrameMarkedAsSceneLtr || pRefPic->bIsSceneLTR)) {
             pCtx->pCurDqLayer->pRefOri[pCtx->iNumRef0] = pRefOri;
             pCtx->pRefList0[pCtx->iNumRef0++] = pRefPic;
-            WelsLog (pCtx, WELS_LOG_INFO,
+            WelsLog (&(pCtx->sLogCtx), WELS_LOG_INFO,
                      "WelsBuildRefListScreen(), ref !current iFrameNum = %d, ref iFrameNum = %d,LTR number = %d,iNumRef = %d ref is Scene LTR = %d\n",
                      pCtx->iFrameNum, pCtx->pRefList0[pCtx->iNumRef0 - 1]->iFrameNum, pRefList->uiLongRefCount, iNumRef,
                      pRefPic->bIsSceneLTR);
-            WelsLog (pCtx, WELS_LOG_INFO,
+            WelsLog (&(pCtx->sLogCtx), WELS_LOG_INFO,
                      "WelsBuildRefListScreen pCtx->uiTemporalId = %d,pRef->iFrameNum = %d,pRef->uiTemporalId = %d\n",
                      pCtx->uiTemporalId, pRefPic->iFrameNum, pRefPic->uiTemporalId);
           }
@@ -786,7 +787,7 @@ bool WelsBuildRefListScreen (void* pEncCtx, const int32_t iPOC, int32_t iBestLtr
                      || pRefList->pLongRefList[i]->uiTemporalId < pCtx->uiTemporalId)	{
             pCtx->pCurDqLayer->pRefOri[pCtx->iNumRef0] = pRefOri;
             pCtx->pRefList0[pCtx->iNumRef0++] = pRefList->pLongRefList[i];
-            WelsLog (pCtx, WELS_LOG_INFO,
+            WelsLog (&(pCtx->sLogCtx), WELS_LOG_INFO,
                      "WelsBuildRefListScreen(), ref !current iFrameNum = %d, ref iFrameNum = %d,LTR number = %d\n",
                      pCtx->iFrameNum, pCtx->pRefList0[pCtx->iNumRef0 - 1]->iFrameNum, pRefList->uiLongRefCount);
             break;

@@ -576,7 +576,6 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.bEnableFrameSkip           = 1; // frame skipping
   sParam.bEnableLongTermReference  = 0; // long term reference control
   sParam.iLtrMarkPeriod = 30;
-
   sParam.iInputCsp			= videoFormatI420;			// color space of input sequence
   sParam.uiIntraPeriod		= 320;		// period of Intra frame
   sParam.bEnableSpsPpsIdAddition = 1;

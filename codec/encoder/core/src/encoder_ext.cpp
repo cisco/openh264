@@ -160,7 +160,7 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
 }
 
 
-int32_t ParamValidationExt (SLogContext* pCtx, SWelsSvcCodingParam* pCodingParam) {
+int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingParam) {
   int8_t i = 0;
   int32_t iIdx = 0;
 
@@ -169,37 +169,37 @@ int32_t ParamValidationExt (SLogContext* pCtx, SWelsSvcCodingParam* pCodingParam
     return ENC_RETURN_INVALIDINPUT;
 
   if ((pCodingParam->iUsageType != CAMERA_VIDEO_REAL_TIME) && (pCodingParam->iUsageType != SCREEN_CONTENT_REAL_TIME)) {
-    WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(),Invalid usage type = %d", pCodingParam->iUsageType);
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(),Invalid usage type = %d", pCodingParam->iUsageType);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
   if (pCodingParam->iSpatialLayerNum < 1 || pCodingParam->iSpatialLayerNum > MAX_DEPENDENCY_LAYER) {
-    WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), monitor invalid pCodingParam->iSpatialLayerNum: %d!\n",
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), monitor invalid pCodingParam->iSpatialLayerNum: %d!\n",
              pCodingParam->iSpatialLayerNum);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
 
   if (pCodingParam->iTemporalLayerNum < 1 || pCodingParam->iTemporalLayerNum > MAX_TEMPORAL_LEVEL) {
-    WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), monitor invalid pCodingParam->iTemporalLayerNum: %d!\n",
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), monitor invalid pCodingParam->iTemporalLayerNum: %d!\n",
              pCodingParam->iTemporalLayerNum);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
 
   if (pCodingParam->uiGopSize < 1 || pCodingParam->uiGopSize > MAX_GOP_SIZE) {
-    WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), monitor invalid pCodingParam->uiGopSize: %d!\n",
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), monitor invalid pCodingParam->uiGopSize: %d!\n",
              pCodingParam->uiGopSize);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
 
 
   if (pCodingParam->uiIntraPeriod && pCodingParam->uiIntraPeriod < pCodingParam->uiGopSize) {
-    WelsLog (pCtx, WELS_LOG_ERROR,
+    WelsLog (pLogCtx, WELS_LOG_ERROR,
              "ParamValidationExt(), uiIntraPeriod(%d) should be not less than that of uiGopSize(%d) or -1 specified!\n",
              pCodingParam->uiIntraPeriod, pCodingParam->uiGopSize);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
 
   if (pCodingParam->uiIntraPeriod && (pCodingParam->uiIntraPeriod & (pCodingParam->uiGopSize - 1)) != 0) {
-    WelsLog (pCtx, WELS_LOG_ERROR,
+    WelsLog (pLogCtx, WELS_LOG_ERROR,
              "ParamValidationExt(), uiIntraPeriod(%d) should be multiple of uiGopSize(%d) or -1 specified!\n",
              pCodingParam->uiIntraPeriod, pCodingParam->uiGopSize);
     return ENC_RETURN_UNSUPPORTED_PARA;
@@ -227,24 +227,24 @@ int32_t ParamValidationExt (SLogContext* pCtx, SWelsSvcCodingParam* pCodingParam
     int32_t iMbNumInFrame		= 0;
     uint32_t iMaxSliceNum		= MAX_SLICES_NUM;
     if (kiPicWidth <= 0 || kiPicHeight <= 0) {
-      WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid %d x %d in dependency layer settings!\n", kiPicWidth,
+      WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid %d x %d in dependency layer settings!\n", kiPicWidth,
                kiPicHeight);
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
     if ((kiPicWidth & 0x0F) != 0 || (kiPicHeight & 0x0F) != 0) {
-      WelsLog (pCtx, WELS_LOG_ERROR,
+      WelsLog (pLogCtx, WELS_LOG_ERROR,
                "ParamValidationExt(), in layer #%d iWidth x iHeight(%d x %d) both should be multiple of 16, can not support with arbitrary size currently!\n",
                i, kiPicWidth, kiPicHeight);
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
 
     if (pSpatialLayer->sSliceCfg.uiSliceMode >= SM_RESERVED) {
-      WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMode (%d) settings!\n",
+      WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMode (%d) settings!\n",
                pSpatialLayer->sSliceCfg.uiSliceMode);
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
     if ((pCodingParam->uiMaxNalSize != 0) && (pSpatialLayer->sSliceCfg.uiSliceMode != SM_DYN_SLICE)) {
-      WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMode (%d) settings!,MaxNalSize = %d\n",
+      WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMode (%d) settings!,MaxNalSize = %d\n",
                pSpatialLayer->sSliceCfg.uiSliceMode, pCodingParam->uiMaxNalSize);
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
@@ -271,12 +271,12 @@ int32_t ParamValidationExt (SLogContext* pCtx, SWelsSvcCodingParam* pCodingParam
       iMaxSliceNum = MAX_SLICES_NUM;
       if (pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum <= 0
           || pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum > iMaxSliceNum) {
-        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceNum (%d) settings!\n",
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceNum (%d) settings!\n",
                  pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
       if (pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum == 1) {
-        WelsLog (pCtx, WELS_LOG_DEBUG,
+        WelsLog (pLogCtx, WELS_LOG_DEBUG,
                  "ParamValidationExt(), uiSliceNum(%d) you set for SM_FIXEDSLCNUM_SLICE, now turn to SM_SINGLE_SLICE type!\n",
                  pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum);
         pSpatialLayer->sSliceCfg.uiSliceMode	= SM_SINGLE_SLICE;
@@ -291,7 +291,7 @@ int32_t ParamValidationExt (SLogContext* pCtx, SWelsSvcCodingParam* pCodingParam
       } else if (!CheckFixedSliceNumMultiSliceSetting (iMbNumInFrame,
                  &pSpatialLayer->sSliceCfg.sSliceArgument)) {	// verify interleave mode settings
         //check uiSliceMbNum with current uiSliceNum
-        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMbNum (%d) settings!\n",
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMbNum (%d) settings!\n",
                  pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceMbNum[0]);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
@@ -315,31 +315,31 @@ int32_t ParamValidationExt (SLogContext* pCtx, SWelsSvcCodingParam* pCodingParam
       iMbNumInFrame = iMbWidth * iMbHeight;
       iMaxSliceNum = MAX_SLICES_NUM;
       if (pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceMbNum[0] <= 0) {
-        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMbNum (%d) settings!\n",
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMbNum (%d) settings!\n",
                  pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceMbNum[0]);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
 
       if (!CheckRasterMultiSliceSetting (iMbNumInFrame,
                                          &pSpatialLayer->sSliceCfg.sSliceArgument)) {	// verify interleave mode settings
-        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMbNum (%d) settings!\n",
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMbNum (%d) settings!\n",
                  pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceMbNum[0]);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
       if (pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum <= 0
           || pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum > iMaxSliceNum) {	// verify interleave mode settings
-        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceNum (%d) in SM_RASTER_SLICE settings!\n",
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceNum (%d) in SM_RASTER_SLICE settings!\n",
                  pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
       if (pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum == 1) {
-        WelsLog (pCtx, WELS_LOG_ERROR,
+        WelsLog (pLogCtx, WELS_LOG_ERROR,
                  "ParamValidationExt(), pSlice setting for SM_RASTER_SLICE now turn to SM_SINGLE_SLICE!\n");
         pSpatialLayer->sSliceCfg.uiSliceMode	= SM_SINGLE_SLICE;
         break;
       }
       if ((pCodingParam->iRCMode != RC_OFF_MODE) && pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum > 1) {
-        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), WARNING: GOM based RC do not support SM_RASTER_SLICE!\n");
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), WARNING: GOM based RC do not support SM_RASTER_SLICE!\n");
       }
       // considering the coding efficient and performance, iCountMbNum constraint by MIN_NUM_MB_PER_SLICE condition of multi-pSlice mode settting
       if (iMbNumInFrame <= MIN_NUM_MB_PER_SLICE) {
@@ -356,19 +356,19 @@ int32_t ParamValidationExt (SLogContext* pCtx, SWelsSvcCodingParam* pCodingParam
       iMbHeight	= (kiPicHeight + 15) >> 4;
       iMaxSliceNum = MAX_SLICES_NUM;
       if (iMbHeight > iMaxSliceNum) {
-        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceNum (%d) settings more than MAX!\n", iMbHeight);
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceNum (%d) settings more than MAX!\n", iMbHeight);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
       pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum	= iMbHeight;
 
       if (pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum <= 0) {
-        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceNum (%d) settings!\n",
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceNum (%d) settings!\n",
                  pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
       if (!CheckRowMbMultiSliceSetting (iMbWidth,
                                         &pSpatialLayer->sSliceCfg.sSliceArgument)) {	// verify interleave mode settings
-        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMbNum (%d) settings!\n",
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMbNum (%d) settings!\n",
                  pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceMbNum[0]);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
@@ -378,20 +378,20 @@ int32_t ParamValidationExt (SLogContext* pCtx, SWelsSvcCodingParam* pCodingParam
       iMbWidth	= (kiPicWidth + 15) >> 4;
       iMbHeight	= (kiPicHeight + 15) >> 4;
       if (pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint <= 0) {
-        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid iSliceSize (%d) settings!\n",
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid iSliceSize (%d) settings!\n",
                  pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
 
       if (pCodingParam->uiMaxNalSize <= NAL_HEADER_ADD_0X30BYTES) {
-        WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiMaxNalSize (%d) settings!\n",
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiMaxNalSize (%d) settings!\n",
                  pCodingParam->uiMaxNalSize);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
 
       if (pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint > (pCodingParam->uiMaxNalSize -
           NAL_HEADER_ADD_0X30BYTES)) {
-        WelsLog (pCtx, WELS_LOG_WARNING,
+        WelsLog (pLogCtx, WELS_LOG_WARNING,
                  "ParamValidationExt(), slice mode = SM_DYN_SLICE, uiSliceSizeConstraint = %d ,uiMaxNalsize = %d!\n",
                  pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint, pCodingParam->uiMaxNalSize);
         pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint =  pCodingParam->uiMaxNalSize - NAL_HEADER_ADD_0X30BYTES;
@@ -406,7 +406,7 @@ int32_t ParamValidationExt (SLogContext* pCtx, SWelsSvcCodingParam* pCodingParam
     }
     break;
     default: {
-      WelsLog (pCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMode (%d) settings!\n",
+      WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMode (%d) settings!\n",
                pCodingParam->sSpatialLayers[0].sSliceCfg.uiSliceMode);
       return ENC_RETURN_UNSUPPORTED_PARA;
 
@@ -415,7 +415,7 @@ int32_t ParamValidationExt (SLogContext* pCtx, SWelsSvcCodingParam* pCodingParam
     }
   }
 
-  return ParamValidation (pCtx, pCodingParam);
+  return ParamValidation (pLogCtx, pCodingParam);
 }
 
 
@@ -2025,7 +2025,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   pCtx->iMaxSliceCount	= iSliceNum;
   iRet = RequestMemorySvc (&pCtx);
   if (iRet != 0) {
-    WelsLog (pCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), RequestMemorySvc failed return %d.\n", iRet);
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), RequestMemorySvc failed return %d.\n", iRet);
     FreeMemorySvc (&pCtx);
     return iRet;
   }
@@ -2038,18 +2038,18 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   pCtx->pVpp = new CWelsPreProcess (pCtx);
   if (pCtx->pVpp == NULL) {
     iRet = 1;
-    WelsLog (pCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), pOut of memory in case new CWelsPreProcess().\n");
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), pOut of memory in case new CWelsPreProcess().\n");
     FreeMemorySvc (&pCtx);
     return iRet;
   }
   if ((iRet = pCtx->pVpp->AllocSpatialPictures (pCtx, pCtx->pSvcParam)) != 0) {
-    WelsLog (pCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), pVPP alloc spatial pictures failed\n");
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), pVPP alloc spatial pictures failed\n");
     FreeMemorySvc (&pCtx);
     return iRet;
   }
 
 #if defined(MEMORY_MONITOR)
-  WelsLog (pCtx, WELS_LOG_INFO, "WelsInitEncoderExt() exit, overall memory usage: %llu bytes\n",
+  WelsLog (pLogCtx, WELS_LOG_INFO, "WelsInitEncoderExt() exit, overall memory usage: %llu bytes\n",
            static_cast<unsigned long long> (sizeof (sWelsEncCtx) /* requested size from malloc() or new operator */
                + pCtx->pMemAlign->WelsGetMemoryUsage())  /* requested size from CMemoryAlign::WelsMalloc() */
           );
@@ -2057,7 +2057,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
 
   *ppCtx	= pCtx;
 
-  WelsLog (pCtx, WELS_LOG_DEBUG, "WelsInitEncoderExt(), pCtx= 0x%p.\n", (void*)pCtx);
+  WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsInitEncoderExt(), pCtx= 0x%p.\n", (void*)pCtx);
 
   return 0;
 }
@@ -2150,7 +2150,7 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
   if (NULL == ppCtx || NULL == *ppCtx)
     return;
 
-  WelsLog (*ppCtx, WELS_LOG_INFO, "WelsUninitEncoderExt(), pCtx= %p, iThreadCount= %d, iMultipleThreadIdc= %d.\n",
+  WelsLog (&(*ppCtx)->sLogCtx, WELS_LOG_INFO, "WelsUninitEncoderExt(), pCtx= %p, iThreadCount= %d, iMultipleThreadIdc= %d.\n",
            (void*) (*ppCtx), (*ppCtx)->pSvcParam->iCountThreadsNum, (*ppCtx)->pSvcParam->iMultipleThreadIdc);
 
 #if defined(STAT_OUTPUT)
@@ -2168,7 +2168,7 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
           WelsEventSignal (& (*ppCtx)->pSliceThreading->pExitEncodeEvent[iThreadIdx]);
           WelsEventSignal (& (*ppCtx)->pSliceThreading->pThreadMasterEvent[iThreadIdx]);
           res = WelsThreadJoin ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx]);	// waiting thread exit
-          WelsLog (*ppCtx, WELS_LOG_INFO, "WelsUninitEncoderExt(), pthread_join(pThreadHandles%d) return %d..\n", iThreadIdx,
+          WelsLog (&(*ppCtx)->sLogCtx, WELS_LOG_INFO, "WelsUninitEncoderExt(), pthread_join(pThreadHandles%d) return %d..\n", iThreadIdx,
                    res);
           (*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx] = 0;
         }
@@ -2333,7 +2333,7 @@ void WelsInitCurrentDlayerMltslc (sWelsEncCtx* pCtx, int32_t iPartitionNum) {
                     / (pSliceCtx->iMaxSliceNumConstraint))
        ) {
 
-      WelsLog (pCtx,
+      WelsLog (&(pCtx->sLogCtx),
                WELS_LOG_WARNING,
                "Set-SliceConstraint(%d) too small for current resolution (MB# %d) under QP/BR!\n",
                pSliceCtx->uiSliceSizeConstraint,
@@ -2492,7 +2492,7 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
   const bool kbHighestSpatialLayer	=
     (pCtx->pSvcParam->iSpatialLayerNum == (pCurLayer->sLayerInfo.sNalHeaderExt.uiDependencyId + 1));
   SWelsFuncPtrList* pFuncList = pCtx->pFuncList;
-
+  SLogContext* pLogCtx = &(pCtx->sLogCtx);
   /* function pointers conditional assignment under sWelsEncCtx, layer_mb_enc_rec (in stack) is exclusive */
   if (kbHighestSpatialLayer && pCtx->pSvcParam->iUsageType == CAMERA_VIDEO_REAL_TIME) {
     SetFastCodingFunc (pFuncList);
@@ -2528,7 +2528,7 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
       //ME related func pointers
       //ME16x16
       if (!SetMeMethod (ME_DIA_CROSS, pFuncList->pfSearchMethod[BLOCK_16x16])) {
-        WelsLog (pCtx, WELS_LOG_WARNING, "SetMeMethod(BLOCK_16x16) ME_DIA_CROSS unsuccessful, switched to default search\n");
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "SetMeMethod(BLOCK_16x16) ME_DIA_CROSS unsuccessful, switched to default search\n");
       }
       //ME8x8
       SFeatureSearchPreparation* pFeatureSearchPreparation = pCurLayer->pFeatureSearchPreparation;
@@ -2556,7 +2556,7 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
         if (pFeatureSearchPreparation->bFMESwitchFlag && pScreenBlockFeatureStorage->bRefBlockFeatureCalculated
             && (!pScreenBlockFeatureStorage->iIs16x16)) {
           if (!SetMeMethod (ME_DIA_CROSS_FME, pFuncList->pfSearchMethod[BLOCK_8x8])) {
-            WelsLog (pCtx, WELS_LOG_WARNING, "SetMeMethod(BLOCK_8x8) ME_DIA_CROSS_FME unsuccessful, switched to default search\n");
+            WelsLog (pLogCtx, WELS_LOG_WARNING, "SetMeMethod(BLOCK_8x8) ME_DIA_CROSS_FME unsuccessful, switched to default search\n");
           }
         }
 
@@ -2833,7 +2833,7 @@ int32_t WritePadding (sWelsEncCtx* pCtx, int32_t iLen, int32_t& iSize) {
 
   if ((pBs->pBufEnd - pBs->pBufPtr) < iLen || iNal >= pCtx->pOut->iCountNals) {
 #if GOM_TRACE_FLAG
-    WelsLog (pCtx, WELS_LOG_ERROR,
+    WelsLog (&(pCtx->sLogCtx), WELS_LOG_ERROR,
              "[RC] paddingcal pBuffer overflow, bufferlen=%lld, paddinglen=%d, iNalIdx= %d, iCountNals= %d\n",
              static_cast<long long int> (pBs->pBufEnd - pBs->pBufPtr), iLen, iNal, pCtx->pOut->iCountNals);
 #endif
@@ -2947,6 +2947,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   int8_t iCurDid						= 0;
   int8_t iCurTid						= 0;
   bool bAvcBased					= false;
+  SLogContext* pLogCtx = &(pCtx->sLogCtx);
 #if defined(ENABLE_PSNR_CALC)
   float fSnrY = .0f, fSnrU = .0f, fSnrV = .0f;
 #endif//ENABLE_PSNR_CALC
@@ -3066,7 +3067,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     /* coding each spatial layer, only one sQualityStat layer within spatial support */
     int32_t iSliceCount	= 1;
     if (iLayerNum >= MAX_LAYER_NUM_OF_FRAME) {	// check available layer_bs_info writing as follows
-      WelsLog (pCtx, WELS_LOG_ERROR, "WelsEncoderEncodeExt(), iLayerNum(%d) overflow(max:%d)!", iLayerNum,
+      WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsEncoderEncodeExt(), iLayerNum(%d) overflow(max:%d)!", iLayerNum,
                MAX_LAYER_NUM_OF_FRAME);
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
@@ -3106,7 +3107,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     if (!pCtx->pFuncList->pBuildRefList (pCtx, pCtx->iPOC, 0)) {
       // Force coding IDR as followed
       ForceCodingIDR (pCtx);
-      WelsLog (pCtx, WELS_LOG_WARNING,
+      WelsLog (pLogCtx, WELS_LOG_WARNING,
                "WelsEncoderEncodeExt(), WelsBuildRefList failed for P frames, pCtx->iNumRef0= %d. ForceCodingIDR!\n",
                pCtx->iNumRef0);
       pFbi->eFrameType = videoFrameTypeIDR;
@@ -3179,13 +3180,13 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       if ((SM_DYN_SLICE != pParam->sSliceCfg.uiSliceMode) && (pSvcParam->iMultipleThreadIdc > 1)) {
         iSliceCount	= GetCurrentSliceNum (pCtx->pCurDqLayer->pSliceEncCtx);
         if (iLayerNum + 1 >= MAX_LAYER_NUM_OF_FRAME) {	// check available layer_bs_info for further writing as followed
-          WelsLog (pCtx, WELS_LOG_ERROR,
+          WelsLog (pLogCtx, WELS_LOG_ERROR,
                    "WelsEncoderEncodeExt(), iLayerNum(%d) overflow(max:%d) at iDid= %d uiSliceMode= %d, iSliceCount= %d!",
                    iLayerNum, MAX_LAYER_NUM_OF_FRAME, iCurDid, pParam->sSliceCfg.uiSliceMode, iSliceCount);
           return ENC_RETURN_UNSUPPORTED_PARA;
         }
         if (iSliceCount <= 1) {
-          WelsLog (pCtx, WELS_LOG_ERROR,
+          WelsLog (pLogCtx, WELS_LOG_ERROR,
                    "WelsEncoderEncodeExt(), iSliceCount(%d) from GetCurrentSliceNum() is untrusted due stack/heap crupted!\n",
                    iSliceCount);
           return ENC_RETURN_UNEXPECTED;
@@ -3203,7 +3204,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                                     &pCtx->pSliceThreading->pThreadMasterEvent[0],
                                     pLayerBsInfo, iSliceCount, pCtx->pCurDqLayer->pSliceEncCtx, false);
           if (iRet) {
-            WelsLog (pCtx, WELS_LOG_ERROR,
+            WelsLog (pLogCtx, WELS_LOG_ERROR,
                      "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!\n",
                      iRet, pSvcParam->iCountThreadsNum, iSliceCount, pParam->sSliceCfg.uiSliceMode, pSvcParam->iMultipleThreadIdc);
             return ENC_RETURN_UNEXPECTED;
@@ -3243,7 +3244,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                                     &pCtx->pSliceThreading->pThreadMasterEvent[0],
                                     pLayerBsInfo, iNumThreadsRunning, pCtx->pCurDqLayer->pSliceEncCtx, false);
           if (iRet) {
-            WelsLog (pCtx, WELS_LOG_ERROR,
+            WelsLog (pLogCtx, WELS_LOG_ERROR,
                      "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!\n",
                      iRet, pSvcParam->iCountThreadsNum, iSliceCount, pParam->sSliceCfg.uiSliceMode, pSvcParam->iMultipleThreadIdc);
             return ENC_RETURN_UNEXPECTED;
@@ -3290,7 +3291,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                                   &pCtx->pSliceThreading->pThreadMasterEvent[0],
                                   pLayerBsInfo, kiPartitionCnt, pCtx->pCurDqLayer->pSliceEncCtx, true);
         if (iRet) {
-          WelsLog (pCtx, WELS_LOG_ERROR,
+          WelsLog (pLogCtx, WELS_LOG_ERROR,
                    "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!\n",
                    iRet, pSvcParam->iCountThreadsNum, iSliceCount, pParam->sSliceCfg.uiSliceMode, pSvcParam->iMultipleThreadIdc);
           return ENC_RETURN_UNEXPECTED;
@@ -3370,7 +3371,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       if (!pCtx->pFuncList->pUpdateRefList (pCtx)) {
         // Force coding IDR as followed
         ForceCodingIDR (pCtx);
-        WelsLog (pCtx, WELS_LOG_WARNING, "WelsEncoderEncodeExt(), WelsUpdateRefList failed. ForceCodingIDR!\n");
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "WelsEncoderEncodeExt(), WelsUpdateRefList failed. ForceCodingIDR!\n");
         //the above is to set the next frame to be IDR
         pFbi->eFrameType = eFrameType;
         return ENC_RETURN_CORRECTED;
@@ -3476,7 +3477,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
 
 #if GOM_TRACE_FLAG
-      WelsLog (pCtx, WELS_LOG_INFO, "[RC] encoding_qp%d Padding: %d\n", pCtx->uiDependencyId,
+      WelsLog (pLogCtx, WELS_LOG_INFO, "[RC] encoding_qp%d Padding: %d\n", pCtx->uiDependencyId,
                pCtx->pWelsSvcRc[pCtx->uiDependencyId].iPaddingSize);
 #endif
       if (iPaddingNalSize <= 0)
@@ -3521,7 +3522,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
     if (pCtx->pVpp->UpdateSpatialPictures (pCtx, pSvcParam, iCurTid, iDidIdx) != 0) {
       ForceCodingIDR (pCtx);
-      WelsLog (pCtx, WELS_LOG_WARNING, "WelsEncoderEncodeExt(), Logic Error Found in temporal level. ForceCodingIDR!\n");
+      WelsLog (pLogCtx, WELS_LOG_WARNING, "WelsEncoderEncodeExt(), Logic Error Found in temporal level. ForceCodingIDR!\n");
       //the above is to set the next frame IDR
       pFbi->eFrameType = eFrameType;
       return ENC_RETURN_CORRECTED;

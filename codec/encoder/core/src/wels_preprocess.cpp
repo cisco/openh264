@@ -982,7 +982,7 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
   SPicture* pRefPic = NULL;
   SRefInfoParam* pRefPicInfo = NULL;
   uint8_t*  pCurBlockStaticPointer = NULL;
-
+  SLogContext* pLogCtx = &(pCtx->sLogCtx);
   const int32_t iNegligibleMotionBlocks = (static_cast<int32_t> ((pCurPicture->iWidthInPixel >> 3) *
                                           (pCurPicture->iHeightInPixel >> 3) * STATIC_SCENE_MOTION_RATIO));
   const uint8_t iCurTid = GetTemporalLevel (&pSvcParam->sDependencyLayers[m_pEncCtx->sSpatialIndexMap[0].iDid],
@@ -992,7 +992,7 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
                        iAvailableSceneRefNum);
   //after this build, pAvailableRefList[idx].iSrcListIdx is the idx of the ref in h->spatial_pic
   if (0 == iAvailableRefNum) {
-    WelsLog (pCtx, WELS_LOG_ERROR, "SceneChangeDetect() iAvailableRefNum=0 but not I.\n");
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "SceneChangeDetect() iAvailableRefNum=0 but not I.\n");
     return LARGE_CHANGED_SCENE;
   }
 
@@ -1071,7 +1071,7 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
     iVaaFrameSceneChangeIdc = SIMILAR_SCENE;
   }
 
-  WelsLog (pCtx, WELS_LOG_INFO, "iVaaFrameSceneChangeIdc = %d,codingIdx = %d\n", iVaaFrameSceneChangeIdc,
+  WelsLog (pLogCtx, WELS_LOG_INFO, "iVaaFrameSceneChangeIdc = %d,codingIdx = %d\n", iVaaFrameSceneChangeIdc,
            pCtx->iCodingIndex);
 
   SaveBestRefToVaa (sLtrSaved, & (pVaaExt->sVaaStrBestRefCandidate[0]));

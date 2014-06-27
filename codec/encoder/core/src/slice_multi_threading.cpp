@@ -940,7 +940,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
       WelsEventSignal (
         &pEncPEncCtx->pSliceThreading->pFinUpdateMbListEvent[iEventIdx]);	// mean finished update pMb list for this pSlice
     } else { // WELS_THREAD_ERROR_WAIT_TIMEOUT, or WELS_THREAD_ERROR_WAIT_FAILED
-      WelsLog (pEncPEncCtx, WELS_LOG_WARNING,
+      WelsLog (&(pEncPEncCtx->sLogCtx), WELS_LOG_WARNING,
                "[MT] CodingSliceThreadProc(), waiting pReadySliceCodingEvent[%d] failed(%d) and thread%d terminated!\n", iEventIdx,
                iWaitRet, iThreadIdx);
       uiThrdRet	= 1;
@@ -978,7 +978,7 @@ int32_t FiredSliceThreads (sWelsEncCtx* pCtx, SSliceThreadPrivateData* pPriData,
   const int32_t kiEventCnt = uiNumThreads;
 
   if (pPriData == NULL || pLbi == NULL || kiEventCnt <= 0 || pEventsList == NULL) {
-    WelsLog (pCtx, WELS_LOG_ERROR,
+    WelsLog (&(pCtx->sLogCtx), WELS_LOG_ERROR,
              "FiredSliceThreads(), fail due pPriData == %p || pLbi == %p || iEventCnt(%d) <= 0 || pEventsList == %p!!\n",
              (void*)pPriData, (void*)pLbi, uiNumThreads, (void*)pEventsList);
     return 1;
