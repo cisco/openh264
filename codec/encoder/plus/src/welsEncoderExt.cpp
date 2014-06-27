@@ -355,7 +355,7 @@ int CWelsH264SVCEncoder::InitializeInternal (SWelsSvcCodingParam* pCfg) {
   }
   if (pCfg->iUsageType == SCREEN_CONTENT_REAL_TIME) {
     if (pCfg->bEnableLongTermReference) {
-      pCfg->iLTRRefNum = WELS_CLIP3 (pCfg->iLTRRefNum, 1, LONG_TERM_REF_NUM_SCREEN);
+      pCfg->iLTRRefNum = LONG_TERM_REF_NUM_SCREEN;
       if (pCfg->iNumRefFrame == AUTO_REF_PIC_COUNT)
         pCfg->iNumRefFrame = WELS_MAX (1, WELS_LOG2 (pCfg->uiGopSize)) + pCfg->iLTRRefNum;
     } else {
@@ -364,7 +364,7 @@ int CWelsH264SVCEncoder::InitializeInternal (SWelsSvcCodingParam* pCfg) {
         pCfg->iNumRefFrame = WELS_MAX (1, pCfg->uiGopSize >> 1);
     }
   } else {
-    pCfg->iLTRRefNum = pCfg->bEnableLongTermReference ? WELS_CLIP3 (pCfg->iLTRRefNum, 1, LONG_TERM_REF_NUM) : 0;
+    pCfg->iLTRRefNum = pCfg->bEnableLongTermReference ? LONG_TERM_REF_NUM : 0;
     if (pCfg->iNumRefFrame == AUTO_REF_PIC_COUNT) {
       pCfg->iNumRefFrame		= ((pCfg->uiGopSize >> 1) > 1) ? ((pCfg->uiGopSize >> 1) + pCfg->iLTRRefNum) :
                               (MIN_REF_PIC_COUNT + pCfg->iLTRRefNum);

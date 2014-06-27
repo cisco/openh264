@@ -353,7 +353,7 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
 
   if (iUsageType == SCREEN_CONTENT_REAL_TIME) {
     if (bEnableLongTermReference) {
-      iLTRRefNum = WELS_CLIP3 (pCodingParam.iLTRRefNum, 1, LONG_TERM_REF_NUM_SCREEN);
+      iLTRRefNum = LONG_TERM_REF_NUM_SCREEN;
       if (iNumRefFrame == AUTO_REF_PIC_COUNT)
         iNumRefFrame = WELS_MAX (1, WELS_LOG2 (uiGopSize)) + iLTRRefNum;
     } else {
@@ -363,7 +363,7 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
         iNumRefFrame = WELS_MAX (1, uiGopSize >> 1);
     }
   } else {
-    iLTRRefNum = bEnableLongTermReference ? WELS_CLIP3 (pCodingParam.iLTRRefNum, 1, LONG_TERM_REF_NUM) : 0;
+    iLTRRefNum = bEnableLongTermReference ? LONG_TERM_REF_NUM : 0;
     if (iNumRefFrame == AUTO_REF_PIC_COUNT) {
       iNumRefFrame		= ((uiGopSize >> 1) > 1) ? ((uiGopSize >> 1) + iLTRRefNum) : (MIN_REF_PIC_COUNT + iLTRRefNum);
       iNumRefFrame		= WELS_CLIP3 (iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM);
