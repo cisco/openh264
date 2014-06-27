@@ -186,7 +186,7 @@
 .macro LOAD_CHROMA_DATA arg0, arg1, arg2
     sub     x9, \arg0, x1
     ld1     {\arg1}, [x9]      //top_cb
-    sub     x9, $0, #1
+    sub     x9, \arg0, #1
     ld1     {\arg2}[8], [x9], x1
     ld1     {\arg2}[9], [x9], x1
     ld1     {\arg2}[10], [x9], x1
