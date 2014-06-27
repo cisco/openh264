@@ -86,7 +86,7 @@ int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx) {
 
   do {
     if (WelsTargetMbConstruction (pCtx)) {
-      WelsLog (pCtx, WELS_LOG_WARNING, "WelsTargetSliceConstruction():::MB(%d, %d) construction error. pCurSlice_type:%d\n",
+      WelsLog (&(pCtx->sLogCtx), WELS_LOG_WARNING, "WelsTargetSliceConstruction():::MB(%d, %d) construction error. pCurSlice_type:%d\n",
                pCurLayer->iMbX, pCurLayer->iMbY, pCurSlice->eSliceType);
 
       return -1;

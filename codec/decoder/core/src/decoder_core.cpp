@@ -750,7 +750,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
         pSliceHeadExt->uiDisableInterLayerDeblockingFilterIdc	= uiCode;
         //refer to JVT-X201wcm1.doc G.7.4.3.4--2010.4.20
         if (pSliceHeadExt->uiDisableInterLayerDeblockingFilterIdc > 6) {
-          WelsLog (pCtx, WELS_LOG_WARNING, "disable_inter_layer_deblock_filter_idc (%d) out of range [0, 6]\n",
+          WelsLog (&(pCtx->sLogCtx), WELS_LOG_WARNING, "disable_inter_layer_deblock_filter_idc (%d) out of range [0, 6]\n",
                    pSliceHeadExt->uiDisableInterLayerDeblockingFilterIdc);
           return ERR_INFO_INVALID_DBLOCKING_IDC;
         }

@@ -211,7 +211,7 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
     iNumMbInEachGom = pWelsSvcRc->iNumberMbGom;
 
     if (iNumMbInEachGom <= 0) {
-      WelsLog (pCtx, WELS_LOG_ERROR,
+      WelsLog (&(pCtx->sLogCtx), WELS_LOG_ERROR,
                "[MT] DynamicAdjustSlicing(), invalid iNumMbInEachGom= %d from RC, iDid= %d, iCountNumMb= %d\n", iNumMbInEachGom,
                iCurDid, kiCountNumMb);
       return;

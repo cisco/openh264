@@ -527,7 +527,7 @@ static inline int32_t AcquireLayersNals (sWelsEncCtx** ppCtx, SWelsSvcCodingPara
         iCountNumNals += kiNumOfSlice;
       assert (iCountNumNals - iOrgNumNals <= MAX_NAL_UNITS_IN_LAYER);
       if (kiNumOfSlice > MAX_SLICES_NUM) {
-        WelsLog (*ppCtx, WELS_LOG_ERROR,
+        WelsLog (&(*ppCtx)->sLogCtx, WELS_LOG_ERROR,
                  "AcquireLayersNals(), num_of_slice(%d) > MAX_SLICES_NUM(%d) per (iDid= %d, qid= %d) settings!\n",
                  kiNumOfSlice, MAX_SLICES_NUM, iDIndex, 0);
         return 1;
@@ -535,7 +535,7 @@ static inline int32_t AcquireLayersNals (sWelsEncCtx** ppCtx, SWelsSvcCodingPara
     }
 
     if (iCountNumNals - iOrgNumNals > MAX_NAL_UNITS_IN_LAYER) {
-      WelsLog (*ppCtx, WELS_LOG_ERROR,
+      WelsLog (&(*ppCtx)->sLogCtx, WELS_LOG_ERROR,
                "AcquireLayersNals(), num_of_nals(%d) > MAX_NAL_UNITS_IN_LAYER(%d) per (iDid= %d, qid= %d) settings!\n",
                (iCountNumNals - iOrgNumNals), MAX_NAL_UNITS_IN_LAYER, iDIndex, 0);
       return 1;
@@ -551,7 +551,7 @@ static inline int32_t AcquireLayersNals (sWelsEncCtx** ppCtx, SWelsSvcCodingPara
 
   // to check number of layers / nals / slices dependencies, 12/8/2010
   if (iCountNumLayers > MAX_LAYER_NUM_OF_FRAME) {
-    WelsLog (*ppCtx, WELS_LOG_ERROR, "AcquireLayersNals(), iCountNumLayers(%d) > MAX_LAYER_NUM_OF_FRAME(%d)!",
+    WelsLog (&(*ppCtx)->sLogCtx, WELS_LOG_ERROR, "AcquireLayersNals(), iCountNumLayers(%d) > MAX_LAYER_NUM_OF_FRAME(%d)!",
              iCountNumLayers, MAX_LAYER_NUM_OF_FRAME);
     return 1;
   }
@@ -955,7 +955,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
                                   & (pDlayerParam->sSliceCfg),
                                   pPps);
       if (iResult) {
-        WelsLog (*ppCtx, WELS_LOG_WARNING, "InitDqLayers(), InitSlicePEncCtx failed(%d)!", iResult);
+        WelsLog (&(*ppCtx)->sLogCtx, WELS_LOG_WARNING, "InitDqLayers(), InitSlicePEncCtx failed(%d)!", iResult);
         FreeMemorySvc (ppCtx);
         return 1;
       }
@@ -1285,14 +1285,14 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
   int32_t iTargetSpatialBsSize			= 0;
 
   if (kiNumDependencyLayers < 1 || kiNumDependencyLayers > MAX_DEPENDENCY_LAYER) {
-    WelsLog (*ppCtx, WELS_LOG_WARNING, "RequestMemorySvc() failed due to invalid iNumDependencyLayers(%d)!\n",
+    WelsLog (&(*ppCtx)->sLogCtx, WELS_LOG_WARNING, "RequestMemorySvc() failed due to invalid iNumDependencyLayers(%d)!\n",
              kiNumDependencyLayers);
     FreeMemorySvc (ppCtx);
     return 1;
   }
 
   if (pParam->uiGopSize == 0 || (pParam->uiIntraPeriod && ((pParam->uiIntraPeriod % pParam->uiGopSize) != 0))) {
-    WelsLog (*ppCtx, WELS_LOG_WARNING,
+    WelsLog (&(*ppCtx)->sLogCtx, WELS_LOG_WARNING,
              "RequestMemorySvc() failed due to invalid uiIntraPeriod(%d) (=multipler of uiGopSize(%d)!",
              pParam->uiIntraPeriod, pParam->uiGopSize);
     FreeMemorySvc (ppCtx);
@@ -1306,7 +1306,7 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
 
   iResult = AcquireLayersNals (ppCtx, pParam, &iCountLayers, &iCountNals);
   if (iResult) {
-    WelsLog (*ppCtx, WELS_LOG_WARNING, "RequestMemorySvc(), AcquireLayersNals failed(%d)!", iResult);
+    WelsLog (&(*ppCtx)->sLogCtx, WELS_LOG_WARNING, "RequestMemorySvc(), AcquireLayersNals failed(%d)!", iResult);
     FreeMemorySvc (ppCtx);
     return 1;
   }
@@ -1359,7 +1359,7 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
 
   // for pSlice bs buffers
   if (pParam->iMultipleThreadIdc > 1 && RequestMtResource (ppCtx, pParam, iCountBsLen, iTargetSpatialBsSize)) {
-    WelsLog (*ppCtx, WELS_LOG_WARNING, "RequestMemorySvc(), RequestMtResource failed!");
+    WelsLog (&(*ppCtx)->sLogCtx, WELS_LOG_WARNING, "RequestMemorySvc(), RequestMtResource failed!");
     FreeMemorySvc (ppCtx);
     return 1;
   }
@@ -1406,7 +1406,7 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
 
   // stride tables
   if (AllocStrideTables (ppCtx, kiNumDependencyLayers)) {
-    WelsLog (*ppCtx, WELS_LOG_WARNING, "RequestMemorySvc(), AllocStrideTables failed!");
+    WelsLog (&(*ppCtx)->sLogCtx, WELS_LOG_WARNING, "RequestMemorySvc(), AllocStrideTables failed!");
     FreeMemorySvc (ppCtx);
     return 1;
   }
@@ -1422,7 +1422,7 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
     (*ppCtx)->pVaa	= (SVAAFrameInfoExt*)pMa->WelsMallocz (sizeof (SVAAFrameInfoExt), "pVaa");
     WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pVaa), FreeMemorySvc (ppCtx))
     if (RequestMemoryVaaScreen ((*ppCtx)->pVaa, pMa, (*ppCtx)->pSvcParam->iMaxNumRefFrame, iCountMaxMbNum << 2)) {
-      WelsLog (*ppCtx, WELS_LOG_WARNING, "RequestMemorySvc(), RequestMemoryVaaScreen failed!");
+      WelsLog (&(*ppCtx)->sLogCtx, WELS_LOG_WARNING, "RequestMemorySvc(), RequestMemoryVaaScreen failed!");
       FreeMemorySvc (ppCtx);
       return 1;
     }
@@ -1471,13 +1471,13 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
 
   iResult = InitDqLayers (ppCtx);
   if (iResult) {
-    WelsLog (*ppCtx, WELS_LOG_WARNING, "RequestMemorySvc(), InitDqLayers failed(%d)!", iResult);
+    WelsLog (&(*ppCtx)->sLogCtx, WELS_LOG_WARNING, "RequestMemorySvc(), InitDqLayers failed(%d)!", iResult);
     FreeMemorySvc (ppCtx);
     return iResult;
   }
 
   if (InitMbListD (ppCtx)) {
-    WelsLog (*ppCtx, WELS_LOG_WARNING, "RequestMemorySvc(), InitMbListD failed!");
+    WelsLog (&(*ppCtx)->sLogCtx, WELS_LOG_WARNING, "RequestMemorySvc(), InitMbListD failed!");
     FreeMemorySvc (ppCtx);
     return 1;
   }
@@ -1757,7 +1757,7 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
 #endif//MEMORY_MONITOR
 
     if ((*ppCtx)->pMemAlign != NULL) {
-      WelsLog (*ppCtx, WELS_LOG_INFO, "FreeMemorySvc(), verify memory usage (%d bytes) after free..\n",
+      WelsLog (&(*ppCtx)->sLogCtx, WELS_LOG_INFO, "FreeMemorySvc(), verify memory usage (%d bytes) after free..\n",
                (*ppCtx)->pMemAlign->WelsGetMemoryUsage());
       delete (*ppCtx)->pMemAlign;
       (*ppCtx)->pMemAlign = NULL;
