@@ -132,7 +132,7 @@ const EVclType g_keTypeMap[32][2] = {
   { NON_VCL,	NON_VCL }	// 31: NAL_UNIT_UNSPEC_31
 };
 
-__align16 (const uint16_t, g_kuiDequantCoeff[52][8]) = {
+ALIGNED_DECLARE (const uint16_t, g_kuiDequantCoeff[52][8], 16) = {
   /* 0*/{   10,   13,   10,   13,   13,   16,   13,   16 },	/* 1*/{   11,   14,   11,   14,   14,   18,   14,   18 },
   /* 2*/{   13,   16,   13,   16,   16,   20,   16,   20 },	/* 3*/{   14,   18,   14,   18,   18,   23,   18,   23 },
   /* 4*/{   16,   20,   16,   20,   20,   25,   20,   25 },	/* 5*/{   18,   23,   18,   23,   23,   29,   23,   29 },

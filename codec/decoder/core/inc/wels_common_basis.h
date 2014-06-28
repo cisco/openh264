@@ -47,7 +47,7 @@ extern const uint8_t g_kuiChromaQp[52];
 extern const uint8_t g_kuiScan8[24];
 extern const uint8_t g_kuiLumaDcZigzagScan[16];
 extern const uint8_t g_kuiChromaDcScan[4];
-extern __align16 (const uint16_t, g_kuiDequantCoeff[52][8]);
+extern ALIGNED_DECLARE (const uint16_t, g_kuiDequantCoeff[52][8], 16);
 /* Profile IDC */
 typedef uint8_t		ProfileIdc;
 enum {
