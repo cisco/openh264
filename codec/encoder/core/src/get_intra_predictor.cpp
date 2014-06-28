@@ -418,7 +418,7 @@ void WelsI4x4LumaPredHD_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride
 
 #define I8x8_PRED_STRIDE 8
 
-void WelsIChormaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
+void WelsIChromaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
   const uint64_t kuiSrc64 = LD64 (&pRef[-kiStride]);
 
   ST64 (pPred   , kuiSrc64);
@@ -431,7 +431,7 @@ void WelsIChormaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) 
   ST64 (pPred + 56, kuiSrc64);
 }
 
-void WelsIChormaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
+void WelsIChromaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
   int32_t iStridex7 = (kiStride << 3) - kiStride;
   int32_t iI8x8Stridex7 = (I8x8_PRED_STRIDE << 3) - I8x8_PRED_STRIDE;
   uint8_t i = 7;
@@ -447,7 +447,7 @@ void WelsIChormaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) 
 }
 
 
-void WelsIChormaPredPlane_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
+void WelsIChromaPredPlane_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
   int32_t iLTshift = 0, iTopshift = 0, iLeftshift = 0, iTopSum = 0, iLeftSum = 0;
   int32_t i, j;
   uint8_t* pTop = &pRef[-kiStride];
@@ -471,7 +471,7 @@ void WelsIChormaPredPlane_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStri
 }
 
 
-void WelsIChormaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
+void WelsIChromaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
   const int32_t kuiL1 = kiStride - 1;
   const int32_t kuiL2 = kuiL1 + kiStride;
   const int32_t kuiL3 = kuiL2 + kiStride;
@@ -503,7 +503,7 @@ void WelsIChormaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride)
   ST64 (pPred + 56, kuiBottomMean64);
 }
 
-void WelsIChormaPredDcLeft_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
+void WelsIChromaPredDcLeft_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
   const int32_t kuiL1	= kiStride - 1;
   const int32_t kuiL2	= kuiL1 + kiStride;
   const int32_t kuiL3	= kuiL2 + kiStride;
@@ -526,7 +526,7 @@ void WelsIChormaPredDcLeft_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStr
   ST64 (pPred + 56, kuiBottomMean64);
 }
 
-void WelsIChormaPredDcTop_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
+void WelsIChromaPredDcTop_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
   /*caculate the iMean value*/
   const uint8_t kuiMean1 = (pRef[-kiStride] + pRef[1 - kiStride] + pRef[2 - kiStride] + pRef[3 - kiStride] + 2) >> 2;
   const uint8_t kuiMean2 = (pRef[4 - kiStride] + pRef[5 - kiStride] + pRef[6 - kiStride] + pRef[7 - kiStride] + 2) >> 2;
@@ -543,7 +543,7 @@ void WelsIChormaPredDcTop_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStri
   ST64 (pPred + 56, kuiMean64);
 }
 
-void WelsIChormaPredDcNA_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
+void WelsIChromaPredDcNA_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
   const uint64_t kuiDcValue64 = (uint64_t)0x8080808080808080ULL;
   ST64 (pPred   , kuiDcValue64);
   ST64 (pPred + 8 , kuiDcValue64);
@@ -685,13 +685,13 @@ void WelsInitIntraPredFuncs (SWelsFuncPtrList* pFuncList, const uint32_t kuiCpuF
   pFuncList->pfGetLumaI4x4Pred[I4_PRED_HU] = WelsI4x4LumaPredHU_c;
   pFuncList->pfGetLumaI4x4Pred[I4_PRED_HD] = WelsI4x4LumaPredHD_c;
 
-  pFuncList->pfGetChromaPred[C_PRED_DC] = WelsIChormaPredDc_c;
-  pFuncList->pfGetChromaPred[C_PRED_H] = WelsIChormaPredH_c;
-  pFuncList->pfGetChromaPred[C_PRED_V] = WelsIChormaPredV_c;
-  pFuncList->pfGetChromaPred[C_PRED_P] = WelsIChormaPredPlane_c;
-  pFuncList->pfGetChromaPred[C_PRED_DC_L] = WelsIChormaPredDcLeft_c;
-  pFuncList->pfGetChromaPred[C_PRED_DC_T] = WelsIChormaPredDcTop_c;
-  pFuncList->pfGetChromaPred[C_PRED_DC_128] = WelsIChormaPredDcNA_c;
+  pFuncList->pfGetChromaPred[C_PRED_DC] = WelsIChromaPredDc_c;
+  pFuncList->pfGetChromaPred[C_PRED_H] = WelsIChromaPredH_c;
+  pFuncList->pfGetChromaPred[C_PRED_V] = WelsIChromaPredV_c;
+  pFuncList->pfGetChromaPred[C_PRED_P] = WelsIChromaPredPlane_c;
+  pFuncList->pfGetChromaPred[C_PRED_DC_L] = WelsIChromaPredDcLeft_c;
+  pFuncList->pfGetChromaPred[C_PRED_DC_T] = WelsIChromaPredDcTop_c;
+  pFuncList->pfGetChromaPred[C_PRED_DC_128] = WelsIChromaPredDcNA_c;
 #ifdef HAVE_NEON
   if (kuiCpuFlag & WELS_CPU_NEON) {
     pFuncList->pfGetLumaI4x4Pred[I4_PRED_DDR] = WelsI4x4LumaPredDDR_neon;

@@ -63,16 +63,16 @@ void WelsI4x4LumaPredVLTop_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStr
 void WelsI4x4LumaPredHU_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 
 
-void WelsIChormaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
-void WelsIChormaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
-void WelsIChormaPredPlane_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
-void WelsIChormaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
-void WelsIChormaPredDcLeft_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
-void WelsIChormaPredDcTop_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
-void WelsIChormaPredDcNA_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsIChromaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsIChromaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsIChromaPredPlane_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsIChromaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsIChromaPredDcLeft_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsIChromaPredDcTop_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsIChromaPredDcNA_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 
-void WelsI16x16ChormaPredVer (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
-void WelsI16x16ChormaPredHor (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsI16x16ChromaPredVer (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsI16x16ChromaPredHor (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 
 void WelsI16x16LumaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI16x16LumaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);

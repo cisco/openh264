@@ -169,17 +169,17 @@ int32_t WelsSampleSatdIntra4x4Combined3_c (uint8_t* pDec, int32_t iDecStride, ui
 
   return iBestCost;
 }
-extern void WelsIChormaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t iStride);
-extern void WelsIChormaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t iStride);
-extern void WelsIChormaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t iStride);
+extern void WelsIChromaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t iStride);
+extern void WelsIChromaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t iStride);
+extern void WelsIChromaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t iStride);
 
 int32_t WelsSampleSatdIntra8x8Combined3_c (uint8_t* pDecCb, int32_t iDecStride, uint8_t* pEncCb, int32_t iEncStride,
     int32_t* pBestMode, int32_t iLambda, uint8_t* pDstChroma, uint8_t* pDecCr, uint8_t* pEncCr) {
   int32_t iBestMode = -1;
   int32_t iCurCost, iBestCost = INT_MAX;
 
-  WelsIChormaPredV_c (pDstChroma, pDecCb, iDecStride);
-  WelsIChormaPredV_c (pDstChroma + 64, pDecCr, iDecStride);
+  WelsIChromaPredV_c (pDstChroma, pDecCb, iDecStride);
+  WelsIChromaPredV_c (pDstChroma + 64, pDecCr, iDecStride);
   iCurCost = WelsSampleSatd8x8_c (pDstChroma, 8, pEncCb, iEncStride);
   iCurCost += WelsSampleSatd8x8_c (pDstChroma + 64, 8, pEncCr, iEncStride) + iLambda * 2;
 
@@ -188,16 +188,16 @@ int32_t WelsSampleSatdIntra8x8Combined3_c (uint8_t* pDecCb, int32_t iDecStride, 
     iBestCost = iCurCost;
   }
 
-  WelsIChormaPredH_c (pDstChroma, pDecCb, iDecStride);
-  WelsIChormaPredH_c (pDstChroma + 64, pDecCr, iDecStride);
+  WelsIChromaPredH_c (pDstChroma, pDecCb, iDecStride);
+  WelsIChromaPredH_c (pDstChroma + 64, pDecCr, iDecStride);
   iCurCost = WelsSampleSatd8x8_c (pDstChroma, 8, pEncCb, iEncStride);
   iCurCost += WelsSampleSatd8x8_c (pDstChroma + 64, 8, pEncCr, iEncStride) + iLambda * 2;
   if (iCurCost < iBestCost) {
     iBestMode = 1;
     iBestCost = iCurCost;
   }
-  WelsIChormaPredDc_c (pDstChroma, pDecCb, iDecStride);
-  WelsIChormaPredDc_c (pDstChroma + 64, pDecCr, iDecStride);
+  WelsIChromaPredDc_c (pDstChroma, pDecCb, iDecStride);
+  WelsIChromaPredDc_c (pDstChroma + 64, pDecCr, iDecStride);
   iCurCost = WelsSampleSatd8x8_c (pDstChroma, 8, pEncCb, iEncStride);
   iCurCost += WelsSampleSatd8x8_c (pDstChroma + 64, 8, pEncCr, iEncStride);
   if (iCurCost < iBestCost) {
@@ -216,8 +216,8 @@ int32_t WelsSampleSadIntra8x8Combined3_c (uint8_t* pDecCb, int32_t iDecStride, u
   int32_t iBestMode = -1;
   int32_t iCurCost, iBestCost = INT_MAX;
 
-  WelsIChormaPredV_c (pDstChroma, pDecCb, iDecStride);
-  WelsIChormaPredV_c (pDstChroma + 64, pDecCr, iDecStride);
+  WelsIChromaPredV_c (pDstChroma, pDecCb, iDecStride);
+  WelsIChromaPredV_c (pDstChroma + 64, pDecCr, iDecStride);
   iCurCost = WelsSampleSad8x8_c (pDstChroma, 8, pEncCb, iEncStride);
   iCurCost += WelsSampleSad8x8_c (pDstChroma + 64, 8, pEncCr, iEncStride) + iLambda * 2;
 
@@ -226,16 +226,16 @@ int32_t WelsSampleSadIntra8x8Combined3_c (uint8_t* pDecCb, int32_t iDecStride, u
     iBestCost = iCurCost;
   }
 
-  WelsIChormaPredH_c (pDstChroma, pDecCb, iDecStride);
-  WelsIChormaPredH_c (pDstChroma + 64, pDecCr, iDecStride);
+  WelsIChromaPredH_c (pDstChroma, pDecCb, iDecStride);
+  WelsIChromaPredH_c (pDstChroma + 64, pDecCr, iDecStride);
   iCurCost = WelsSampleSad8x8_c (pDstChroma, 8, pEncCb, iEncStride);
   iCurCost += WelsSampleSad8x8_c (pDstChroma + 64, 8, pEncCr, iEncStride) + iLambda * 2;
   if (iCurCost < iBestCost) {
     iBestMode = 1;
     iBestCost = iCurCost;
   }
-  WelsIChormaPredDc_c (pDstChroma, pDecCb, iDecStride);
-  WelsIChormaPredDc_c (pDstChroma + 64, pDecCr, iDecStride);
+  WelsIChromaPredDc_c (pDstChroma, pDecCb, iDecStride);
+  WelsIChromaPredDc_c (pDstChroma + 64, pDecCr, iDecStride);
   iCurCost = WelsSampleSad8x8_c (pDstChroma, 8, pEncCb, iEncStride);
   iCurCost += WelsSampleSad8x8_c (pDstChroma + 64, 8, pEncCr, iEncStride);
   if (iCurCost < iBestCost) {

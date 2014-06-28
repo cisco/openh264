@@ -457,14 +457,14 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredHD) {
   delete []pPred;
 }
 
-TEST (GetIntraPredictorTest, TestGetIChormaPredV) {
+TEST (GetIntraPredictorTest, TestGetIChromaPredV) {
   uint8_t* pPred = new uint8_t[64];
   uint8_t* pRef  = new uint8_t[64];
   for (int i = 0; i < 64; i++)
     pRef[i] = rand() % 256 + 1;
 
   const int32_t kiStride = 0;
-  WelsIChormaPredV_c (pPred, pRef, kiStride);
+  WelsIChromaPredV_c (pPred, pRef, kiStride);
 
   for (int i = 0; i < 8; i++)
     EXPECT_EQ (LD32 (&pPred[8 * i]), LD32 (&pRef[-kiStride]));
