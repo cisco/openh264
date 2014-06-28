@@ -1,6 +1,4 @@
 #include<gtest/gtest.h>
-#include <stdlib.h>
-#include <time.h>
 
 #include "wels_common_basis.h"
 #include "mem_align.h"
@@ -49,7 +47,6 @@ int32_t InitAndAllocInputData (PECInputCtx& pECCtx) {
     return 1;
   memset (pECCtx, 0, sizeof (SECInputCtx));
 
-  srand ((uint32_t)time (NULL));
   pECCtx->iMbWidth = rand() % MAX_MB_WIDTH; //give a constrained max width
   pECCtx->iMbHeight = rand() % MAX_MB_HEIGHT; //give a constrained max height
   pECCtx->iLinesize[0] = pECCtx->iMbWidth << 4;
@@ -103,7 +100,6 @@ int32_t InitAndAllocInputData (PECInputCtx& pECCtx) {
 }
 
 void InitECCopyData (PECInputCtx pECCtx) {
-  srand ((uint32_t)time (NULL));
   const int32_t kiMbNum = pECCtx->iMbWidth * pECCtx->iMbHeight;
   int i;
   //init pMbCorrectlyDecodedFlag

@@ -1,6 +1,4 @@
 #include<gtest/gtest.h>
-#include<stdlib.h>
-#include<time.h>
 #include "decode_mb_aux.h"
 #include "wels_common_basis.h"
 #include "macros.h"
@@ -11,7 +9,6 @@ using namespace WelsSVCEnc;
 
 TEST (DecodeMbAuxTest, TestIhdm_4x4_dc) {
   short W[16], T[16], Y[16];
-  srand ((uint32_t)time (NULL));
   for (int i = 0; i < 16; i++)
     W[i] = rand() % 256 + 1;
 
@@ -62,7 +59,6 @@ TEST (DecodeMbAuxTest, TestIhdm_4x4_dc) {
 
 TEST (DecodeMbAuxTest, TestDequant_4x4_luma_dc) {
   short T[16], W[16];
-  srand ((uint32_t)time (NULL));
 
   for (int qp = 0; qp < 12; qp++) {
     for (int i = 0; i < 16; i++) {
@@ -79,7 +75,6 @@ TEST (DecodeMbAuxTest, TestDequant_4x4_luma_dc) {
 
 TEST (DecodeMbAuxTest, TestDequant_ihdm_4x4_c) {
   short W[16], T[16], Y[16];
-  srand ((uint32_t)time (NULL));
   const unsigned short mf = rand() % 16 + 1;
   for (int i = 0; i < 16; i++)
     W[i] = rand() % 256 + 1;
@@ -132,7 +127,6 @@ TEST (DecodeMbAuxTest, TestDequant_ihdm_4x4_c) {
 TEST (DecodeMbAuxTest, TestDequant_4x4_c) {
   short W[16], T[16];
   unsigned short mf[16];
-  srand ((uint32_t)time (NULL));
   for (int i = 0; i < 16; i++) {
     W[i] = rand() % 256 + 1;
     T[i] = W[i];
@@ -147,7 +141,6 @@ TEST (DecodeMbAuxTest, TestDequant_4x4_c) {
 TEST (DecodeMbAuxTest, TestDequant_4_4x4_c) {
   short W[64], T[64];
   unsigned short mf[16];
-  srand ((uint32_t)time (NULL));
   for (int i = 0; i < 64; i++) {
     W[i] = rand() % 256 + 1;
     T[i] = W[i];
@@ -171,7 +164,6 @@ void WelsDequantHadamard2x2DcAnchor (int16_t* pDct, int16_t iMF) {
 TEST (DecodeMbAuxTest, WelsDequantIHadamard2x2Dc) {
   int16_t iDct[4], iRefDct[4];
   int16_t iMF;
-  srand ((unsigned int)time (NULL));
   iMF = rand() & 127;
   for (int i = 0; i < 4; i++)
     iDct[i] = iRefDct[i] = (rand() & 65535) - 32768;
@@ -216,7 +208,6 @@ TEST (DecodeMbAuxTest, WelsIDctT4Rec_c) {
   ENFORCE_STACK_ALIGN_1D (int16_t, iDct, 16, 16);
   ENFORCE_STACK_ALIGN_1D (uint8_t, iPred, 16 * FDEC_STRIDE, 16);
   ENFORCE_STACK_ALIGN_1D (uint8_t, iRec, 16 * FDEC_STRIDE, 16);
-  srand ((unsigned int)time (NULL));
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
       iRefDct[i * 4 + j] = iDct[i * 4 + j] = (rand() & 65535) - 32768;
@@ -245,7 +236,6 @@ TEST (DecodeMbAuxTest, WelsIDctT4Rec_mmx) {
     ENFORCE_STACK_ALIGN_1D (uint8_t, iPred, 16 * FDEC_STRIDE, 16);
     ENFORCE_STACK_ALIGN_1D (uint8_t, iRecC, 16 * FDEC_STRIDE, 16);
     ENFORCE_STACK_ALIGN_1D (uint8_t, iRecM, 16 * FDEC_STRIDE, 16);
-    srand ((unsigned int)time (NULL));
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
         iDct[i * 4 + j] = (rand() & ((1 << 12) - 1)) - (1 << 11);
@@ -279,7 +269,6 @@ TEST (DecodeMbAuxTest, WelsIDctFourT4Rec_c) {
   ENFORCE_STACK_ALIGN_1D (int16_t, iDct, 64, 16);
   ENFORCE_STACK_ALIGN_1D (uint8_t, iPred, 16 * FDEC_STRIDE, 16);
   ENFORCE_STACK_ALIGN_1D (uint8_t, iRec, 16 * FDEC_STRIDE, 16);
-  srand ((unsigned int)time (NULL));
   for (int k = 0; k < 4; k++)
     for (int i = 0; i < 16; i++)
       iRefDct[k][i] = iDct[k * 16 + i] = (rand() & 65535) - 32768;

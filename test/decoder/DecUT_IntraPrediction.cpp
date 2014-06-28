@@ -1,5 +1,4 @@
 #include<gtest/gtest.h>
-#include <time.h>
 #include "cpu.h"
 #include "cpu_core.h"
 #include "get_intra_predictor.h"
@@ -21,7 +20,6 @@ if (ASM) {\
     return; \
   } \
 }\
-  srand((unsigned int)time(NULL)); \
   while(iRunTimes--) {\
   for (int i = 0; i < 12; i++) {\
     pRefBuffer[kiStride * 3 + i] = pPredBuffer[kiStride * 3 + i] = rand() & 255; \
@@ -391,7 +389,6 @@ if (ASM) { \
     return; \
   } \
 } \
-srand((unsigned int)time(NULL)); \
 while(iRunTimes--) {\
 for (int i = 0; i < 17; i ++) {\
   pRefBuffer[i] = pPredBuffer[i] = rand() & 255; \
@@ -529,7 +526,6 @@ if (ASM) { \
     return ; \
   } \
 }\
-srand((unsigned int)time(NULL)); \
 while(iRunTimes--) {\
 for (int i = 0; i < 17; i ++) {\
   pRefBuffer[i] = pPredBuffer[i] = rand() & 255; \

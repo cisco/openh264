@@ -21,7 +21,6 @@ TEST (ScrollDetectionTest, TestScroll) {
   int iWidthSets[4] = {640, 1024, 1280, 1980};
   int iHeightSets[4] = {360, 768, 720, 1080};
   int iStride = 0;
-  int iIdx = 0;
 
   for (int i = 0; i < 4; i++) {
     int iWidth = iWidthSets[i];
@@ -31,7 +30,7 @@ TEST (ScrollDetectionTest, TestScroll) {
     ASSERT_TRUE (NULL != pSrc);
     pRef = new unsigned char[iHeight * iStride];
     ASSERT_MEMORY_FAIL2X (pSrc, pRef)
-    RandomPixelDataGenerator (pRef, iWidth, iHeight, iStride, iIdx);
+    RandomPixelDataGenerator (pRef, iWidth, iHeight, iStride);
 
     int iMvRange = iHeight / 3;
     int iScrollMv = rand() % (iMvRange << 1) - iMvRange;

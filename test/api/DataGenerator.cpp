@@ -1,5 +1,4 @@
 #include <string.h>//memset/memcpy
-#include <time.h>
 #include "utils/DataGenerator.h"
 #include "utils/BufferedData.h"
 #include "utils/FileInputStream.h"
@@ -27,7 +26,6 @@ bool YUVPixelDataGenerator (uint8_t* pPointer, int32_t iWidth, int32_t iHeight, 
     return false;
   }
   if (fileStream.read (sBuf.data(), kiFrameSize) == kiFrameSize) {
-    srand ((uint32_t)time (NULL));
     int32_t iStartPosX = rand() % (SRC_FRAME_WIDTH - iWidth);
     int32_t iStartPosY = rand() % (SRC_FRAME_HEIGHT - iHeight);
     uint8_t* pSrcPointer = sBuf.data() + iStartPosX + iStartPosY * SRC_FRAME_WIDTH;
@@ -43,9 +41,8 @@ bool YUVPixelDataGenerator (uint8_t* pPointer, int32_t iWidth, int32_t iHeight, 
   return false;
 }
 
-void RandomPixelDataGenerator (uint8_t* pPointer, int32_t iWidth, int32_t iHeight, int32_t iStride, int32_t iIdx) {
+void RandomPixelDataGenerator (uint8_t* pPointer, int32_t iWidth, int32_t iHeight, int32_t iStride) {
   uint8_t* pLocalPointer = pPointer;
-  srand ((uint32_t) (time (NULL) + iIdx));
   for (int32_t j = 0; j < iHeight; j++) {
     for (int32_t i = 0; i < iWidth; i++) {
       pLocalPointer[i] = rand() % 256;
