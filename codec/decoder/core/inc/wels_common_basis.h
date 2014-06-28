@@ -102,7 +102,6 @@ NAL_UNIT_UNSPEC_30			= 30,
 NAL_UNIT_UNSPEC_31			= 31
 } ENalUnitType;
 
-static const uint8_t g_kuiEmulationPreventionThreeByte	= 0x03;
 
 /*
  *	NAL Reference IDC (2 Bits)
