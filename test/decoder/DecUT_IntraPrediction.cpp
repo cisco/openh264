@@ -382,9 +382,8 @@ GENERATE_4x4_UT (WelsI4x4LumaPredHD_c, WelsI4x4LumaPredHD_ref, 0, 0)
 TEST(DecoderIntraPredictionTest, pred) {\
 const int32_t kiStride = 32; \
 int iRunTimes = 1000; \
-uint8_t _pRefBuffer[18 * kiStride + 64]; \
-uint8_t _pPredBuffer[18 * kiStride + 64]; \
-uint8_t *pRefBuffer, *pPredBuffer; \
+ENFORCE_STACK_ALIGN_1D (uint8_t, pRefBuffer, 18 * kiStride, 16); \
+ENFORCE_STACK_ALIGN_1D (uint8_t, pPredBuffer, 18 * kiStride, 16); \
 if (ASM) { \
   int32_t iTmp = 1; \
   uint32_t uiCPUFlags = WelsCPUFeatureDetect(&iTmp); \
@@ -392,8 +391,6 @@ if (ASM) { \
     return; \
   } \
 } \
-pRefBuffer = (uint8_t*)((((intptr_t)(&_pRefBuffer[31])) >> 4) << 4); \
-pPredBuffer = (uint8_t*)((((intptr_t)(&_pPredBuffer[31])) >> 4) << 4); \
 srand((unsigned int)time(NULL)); \
 while(iRunTimes--) {\
 for (int i = 0; i < 17; i ++) {\
@@ -523,9 +520,8 @@ GENERATE_8x8_UT (WelsIChromaPredV_c, LumaI8x8PredV, 0, 0)
 TEST(DecoderIntraPredictionTest, pred) {\
 const int32_t kiStride = 32; \
 int32_t iRunTimes = 1000; \
-uint8_t _pRefBuffer[18 * kiStride + 64]; \
-uint8_t _pPredBuffer[18 * kiStride + 64]; \
-uint8_t *pRefBuffer, *pPredBuffer; \
+ENFORCE_STACK_ALIGN_1D (uint8_t, pRefBuffer, 18 * kiStride, 16); \
+ENFORCE_STACK_ALIGN_1D (uint8_t, pPredBuffer, 18 * kiStride, 16); \
 if (ASM) { \
   int32_t iTmp = 1; \
   uint32_t uiCPUFlags = WelsCPUFeatureDetect( &iTmp); \
@@ -533,8 +529,6 @@ if (ASM) { \
     return ; \
   } \
 }\
-pRefBuffer = (uint8_t*)((((intptr_t)(&_pRefBuffer[31])) >> 4) << 4); \
-pPredBuffer = (uint8_t*)((((intptr_t)(&_pPredBuffer[31])) >> 4) << 4); \
 srand((unsigned int)time(NULL)); \
 while(iRunTimes--) {\
 for (int i = 0; i < 17; i ++) {\
