@@ -3593,7 +3593,6 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
                 (pOldParam->bEnableLongTermReference != pNewParam->bEnableLongTermReference) ||
                 (pOldParam->iLTRRefNum != pNewParam->iLTRRefNum);
   if (pNewParam->iMaxNumRefFrame > pOldParam->iMaxNumRefFrame) {
-    pNewParam->iMaxNumRefFrame = pOldParam->iMaxNumRefFrame;
     bNeedReset = true;
   }
 
@@ -3676,7 +3675,9 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     pOldParam->bEnableSpsPpsIdAddition = pNewParam->bEnableSpsPpsIdAddition;
     pOldParam->bPrefixNalAddingCtrl = pNewParam->bPrefixNalAddingCtrl;
     pOldParam->iNumRefFrame		= pNewParam->iNumRefFrame;		// number of reference frame used
-
+    pOldParam->uiGopSize = pNewParam->uiGopSize;
+    pOldParam->iTemporalLayerNum = pNewParam->iTemporalLayerNum;
+    pOldParam->iDecompStages = pNewParam->iDecompStages;
     /* denoise control */
     pOldParam->bEnableDenoise	= pNewParam->bEnableDenoise;
 
