@@ -94,6 +94,13 @@ typedef struct LayerpEncCtx_s {
   SSliceConfig	sSliceCfg;
 } SLayerPEncCtx;
 
+typedef struct tagFilesSet {
+  string strBsFile;
+  string strSeqFile;    // for cmd lines
+  string strLayerCfgFile[MAX_DEPENDENCY_LAYER];
+  char   sRecFileName[MAX_DEPENDENCY_LAYER][MAX_FNAME_LEN];
+} SFilesSet;
+
 
 
 /* Ctrl-C handler */

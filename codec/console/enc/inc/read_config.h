@@ -42,15 +42,7 @@
 
 #include <stdlib.h>
 #include <string>
-#include "wels_const.h"
 using namespace std;
-
-typedef struct tagFilesSet {
-  string strBsFile;
-  string strSeqFile;	// for cmd lines
-  string strLayerCfgFile[MAX_DEPENDENCY_LAYER];
-  char	 sRecFileName[MAX_DEPENDENCY_LAYER][MAX_FNAME_LEN];
-} SFilesSet;
 
 
 class CReadConfig {
