@@ -46,7 +46,7 @@ namespace WelsDec {
 typedef struct TagNalUnitHeader {
 uint8_t		    uiForbiddenZeroBit;
 uint8_t		    uiNalRefIdc;
-ENalUnitType    eNalUnitType;
+EWelsNalUnitType    eNalUnitType;
 uint8_t		    uiReservedOneByte;		// only padding usage
 } SNalUnitHeader, *PNalUnitHeader;
 

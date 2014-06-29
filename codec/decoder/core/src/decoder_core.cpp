@@ -161,7 +161,7 @@ inline int32_t  WelsDecodeConstructSlice (PWelsDecoderContext pCtx, PNalUnit pCu
  */
 int32_t ParseRefPicListReordering (PBitStringAux pBs, PSliceHeader pSh) {
   int32_t iList = 0;
-  const ESliceType keSt = pSh->eSliceType;
+  const EWelsSliceType keSt = pSh->eSliceType;
   PRefPicListReorderSyn pRefPicListReordering = &pSh->pRefPicListReordering;
   PSps pSps = pSh->pSps;
   uint32_t uiCode;
@@ -446,7 +446,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   PSubsetSps pSubsetSps				= NULL;
   PSps pSps							= NULL;
   PPps pPps							= NULL;
-  ENalUnitType eNalType				= static_cast<ENalUnitType> (0);
+  EWelsNalUnitType eNalType				= static_cast<EWelsNalUnitType> (0);
   int32_t iPpsId						= 0;
   int32_t iRet						= ERR_NONE;
   uint8_t uiSliceType				= 0;
@@ -508,7 +508,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     }
   }
 
-  pSliceHead->eSliceType	= static_cast <ESliceType> (uiSliceType);
+  pSliceHead->eSliceType	= static_cast <EWelsSliceType> (uiSliceType);
 
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //pic_parameter_set_id
   iPpsId = uiCode;

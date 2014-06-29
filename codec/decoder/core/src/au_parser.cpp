@@ -135,7 +135,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
   }
 
   pNalUnitHeader->uiNalRefIdc		= (uint8_t) (pNal[0] >> 5);			// uiNalRefIdc
-  pNalUnitHeader->eNalUnitType		= (ENalUnitType) (pNal[0] & 0x1f);	// eNalUnitType
+  pNalUnitHeader->eNalUnitType		= (EWelsNalUnitType) (pNal[0] & 0x1f);	// eNalUnitType
 
   ++pNal;
   --iNalSize;
@@ -485,7 +485,7 @@ bool CheckNextAuNewSeq (PWelsDecoderContext pCtx, const PNalUnit kpCurNal, const
  */
 int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t kiSrcLen) {
   PBitStringAux	pBs = NULL;
-  ENalUnitType eNalType	= NAL_UNIT_UNSPEC_0; // make initial value as unspecified
+  EWelsNalUnitType eNalType	= NAL_UNIT_UNSPEC_0; // make initial value as unspecified
   int32_t iPicWidth		= 0;
   int32_t iPicHeight		= 0;
   int32_t iBitSize		= 0;

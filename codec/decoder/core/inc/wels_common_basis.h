@@ -100,7 +100,7 @@ NAL_UNIT_UNSPEC_28			= 28,
 NAL_UNIT_UNSPEC_29			= 29,
 NAL_UNIT_UNSPEC_30			= 30,
 NAL_UNIT_UNSPEC_31			= 31
-} ENalUnitType;
+} EWelsNalUnitType;
 
 
 /*
@@ -152,7 +152,7 @@ I_SLICE	= 2,
 SP_SLICE = 3,
 SI_SLICE = 4,
 UNKNOWN_SLICE = 5
-} ESliceType;
+} EWelsSliceType;
 
 /* List Index */
 typedef uint8_t		ListIndex;
