@@ -58,9 +58,9 @@ namespace WelsDec {
 ////////////////////////mapping scan index////////////////////////
 
 // for data sharing cross modules and try to reduce size of binary generated
-extern const uint8_t g_kuiMbNonZeroCountIdx[24];
+extern const uint8_t g_kuiMbCountScan4Idx[24];
 extern const uint8_t g_kuiCache30ScanIdx[16];
-extern const uint8_t g_kuiCacheNzcScanIdx[24];
+extern const uint8_t g_kuiCache48CountScan4Idx[24];
 
 extern const uint8_t g_kuiScan4[16];
 

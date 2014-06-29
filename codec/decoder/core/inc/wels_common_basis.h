@@ -41,7 +41,7 @@ namespace WelsDec {
 
 // for data sharing cross modules and try to reduce size of binary generated
 
-extern const uint8_t g_kuiChromaQp[52];
+extern const uint8_t g_kuiChromaQpTable[52];
 
 /*common use table*/
 extern const uint8_t g_kuiScan8[24];

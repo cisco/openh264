@@ -41,7 +41,7 @@ namespace WelsDec {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //////non_zero_count[16+8] mapping scan index
-const uint8_t g_kuiMbNonZeroCountIdx[24] = {
+const uint8_t g_kuiMbCountScan4Idx[24] = {
   //  0   1 | 4  5      luma 8*8 block           non_zero_count[16+8]
   0,  1,  4,  5,   //  2   3 | 6  7        0  |  1                  0   1   2   3
   2,  3,  6,  7,   //---------------      ---------                 4   5   6   7
@@ -52,7 +52,7 @@ const uint8_t g_kuiMbNonZeroCountIdx[24] = {
 };
 //cache element equal to 26
 
-const uint8_t g_kuiCacheNzcScanIdx[24] = {
+const uint8_t g_kuiCache48CountScan4Idx[24] = {
   /* Luma */
   9, 10, 17, 18,	// 1+1*8, 2+1*8, 1+2*8, 2+2*8,
   11, 12, 19, 20,	// 3+1*8, 4+1*8, 3+2*8, 4+2*8,
@@ -87,7 +87,7 @@ const uint8_t g_kuiScan4[16] = { //for mb cache in sMb (only current element, wi
 
 // extern at wels_common_basis.h
 
-const uint8_t g_kuiChromaQp[52] = {
+const uint8_t g_kuiChromaQpTable[52] = {
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
   12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
   28, 29, 29, 30, 31, 32, 32, 33, 34, 34, 35, 35, 36, 36, 37, 37,
