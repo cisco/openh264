@@ -81,14 +81,6 @@ static const uint8_t g_kuiABCD[8][8][4] = { ////g_kuiA[dy][dx], g_kuiB[dy][dx], 
     {4, 4, 28, 28}, {3, 5, 21, 35}, {2, 6, 14, 42}, {1, 7, 7, 49}
   }
 };
-typedef int32_t (*VerFilterFunc) (const uint8_t* pSrc, const int32_t kiSrcStride);
-typedef int32_t (*HorFilterFunc) (const uint8_t* pSrc);
-typedef int32_t (*HorFilterFuncInput16Bits) (int16_t* pSrc);
-
-VerFilterFunc fpVerFilter			= NULL;
-HorFilterFunc fpHorFilter			= NULL;
-HorFilterFuncInput16Bits fpHorFilterInput16Bits = NULL;
-
 typedef void (*WelsMcFunc0) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                              int32_t iHeight);
 typedef void (*WelsMcFunc1) (uint8_t* pDst, int32_t iDstStride, const uint8_t* psrcA, int32_t iSrcAStride,
@@ -194,7 +186,7 @@ static inline void McHorVer20WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStrid
   int32_t i, j;
   for (i = 0; i < iHeight; i++) {
     for (j = 0; j < 16; j++) {
-      pDst[j] = WelsClip1 ((fpHorFilter (pSrc + j) + 16) >> 5);
+      pDst[j] = WelsClip1 ((HorFilter_c (pSrc + j) + 16) >> 5);
     }
     pDst += iDstStride;
     pSrc += iSrcStride;
@@ -206,7 +198,7 @@ static inline void McHorVer02WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStrid
   int32_t i, j;
   for (i = 0; i < iHeight; i++) {
     for (j = 0; j < 16; j++) {
-      pDst[j] = WelsClip1 ((fpVerFilter (pSrc + j, iSrcStride) + 16) >> 5);
+      pDst[j] = WelsClip1 ((VerFilter_c (pSrc + j, iSrcStride) + 16) >> 5);
     }
     pDst += iDstStride;
     pSrc += iSrcStride;
@@ -220,10 +212,10 @@ static inline void McHorVer22WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStrid
 
   for (i = 0; i < iHeight; i++) {
     for (j = 0; j < 16 + 5; j++) {
-      pTmp[j] = fpVerFilter (pSrc - 2 + j, iSrcStride);
+      pTmp[j] = VerFilter_c (pSrc - 2 + j, iSrcStride);
     }
     for (k = 0; k < 16; k++) {
-      pDst[k] = WelsClip1 ((fpHorFilterInput16Bits (&pTmp[2 + k]) + 512) >> 10);
+      pDst[k] = WelsClip1 ((HorFilterInput16bit1_c (&pTmp[2 + k]) + 512) >> 10);
     }
     pSrc += iSrcStride;
     pDst += iDstStride;
@@ -331,7 +323,7 @@ static inline void McHorVer20_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_
   int32_t i, j;
   for (i = 0; i < iHeight; i++) {
     for (j = 0; j < iWidth; j++) {
-      pDst[j] = WelsClip1 ((fpHorFilter (pSrc + j) + 16) >> 5);
+      pDst[j] = WelsClip1 ((HorFilter_c (pSrc + j) + 16) >> 5);
     }
     pDst += iDstStride;
     pSrc += iSrcStride;
@@ -344,7 +336,7 @@ static inline void McHorVer02_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_
   int32_t i, j;
   for (i = 0; i < iHeight; i++) {
     for (j = 0; j < iWidth; j++) {
-      pDst[j] = WelsClip1 ((fpVerFilter (pSrc + j, iSrcStride) + 16) >> 5);
+      pDst[j] = WelsClip1 ((VerFilter_c (pSrc + j, iSrcStride) + 16) >> 5);
     }
     pDst += iDstStride;
     pSrc += iSrcStride;
@@ -359,10 +351,10 @@ static inline void McHorVer22_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_
 
   for (i = 0; i < iHeight; i++) {
     for (j = 0; j < iWidth + 5; j++) {
-      pTmp[j] = fpVerFilter (pSrc - 2 + j, iSrcStride);
+      pTmp[j] = VerFilter_c (pSrc - 2 + j, iSrcStride);
     }
     for (k = 0; k < iWidth; k++) {
-      pDst[k] = WelsClip1 ((fpHorFilterInput16Bits (&pTmp[2 + k]) + 512) >> 10);
+      pDst[k] = WelsClip1 ((HorFilterInput16bit1_c (&pTmp[2 + k]) + 512) >> 10);
     }
     pSrc += iSrcStride;
     pDst += iDstStride;
@@ -713,9 +705,6 @@ void WelsInitMcFuncs (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
   pFuncList->sMcFuncs.pfLumaHalfpelCen = McHorVer22_c;
   memcpy (pFuncList->sMcFuncs.pfSampleAveraging, pfPixAvgFunc, sizeof (pfPixAvgFunc));
   pFuncList->sMcFuncs.pfChromaMc	= McChroma_c;
-  fpVerFilter				= VerFilter_c;
-  fpHorFilter				= HorFilter_c;
-  fpHorFilterInput16Bits			= HorFilterInput16bit1_c;
   McCopyWidthEq4 = McCopyWidthEq4_c;
   McCopyWidthEq8 = McCopyWidthEq8_c;
   McCopyWidthEq16 = McCopyWidthEq16_c;
