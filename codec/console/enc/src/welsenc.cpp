@@ -471,7 +471,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       }
     } else if (!strcmp (pCommand, "-drec") && (n + 1 < argc)) {
       unsigned int	iLayer = atoi (argv[n++]);
-      const unsigned int iLen = strlen (argv[n]);
+      const unsigned int iLen = (int) strlen (argv[n]);
       if (iLen >= sizeof (sFileSet.sRecFileName[iLayer]))
         return 1;
       sFileSet.sRecFileName[iLayer][iLen] = '\0';
@@ -921,8 +921,8 @@ void LockToSingleCore() {
   return ;
 }
 
-long CreateSVCEncHandle (ISVCEncoder** ppEncoder) {
-  long ret = 0;
+int32_t CreateSVCEncHandle (ISVCEncoder** ppEncoder) {
+  int32_t ret = 0;
   ret = WelsCreateSVCEncoder (ppEncoder);
   return ret;
 }

@@ -128,7 +128,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
   printf ("------------------------------------------------------\n");
 
   fseek (pH264File, 0L, SEEK_END);
-  iFileSize = ftell (pH264File);
+  iFileSize = (int32_t) ftell (pH264File);
   if (iFileSize <= 0) {
     fprintf (stderr, "Current Bit Stream File is too small, read error!!!!\n");
     goto label_exit;
@@ -349,7 +349,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
           } else if (strTag[0].compare ("TargetDQID") == 0) {
             sDecParam.uiTargetDqLayer	= (uint8_t)atol (strTag[1].c_str());
           } else if (strTag[0].compare ("OutColorFormat") == 0) {
-            sDecParam.iOutputColorFormat = atol (strTag[1].c_str());
+            sDecParam.iOutputColorFormat = atoi (strTag[1].c_str());
           } else if (strTag[0].compare ("ErrorConcealmentFlag") == 0) {
             sDecParam.uiEcActiveFlag	= (uint8_t)atol (strTag[1].c_str());
           } else if (strTag[0].compare ("CPULoad") == 0) {
