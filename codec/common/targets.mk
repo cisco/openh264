@@ -1,5 +1,6 @@
 COMMON_SRCDIR=codec/common
 COMMON_CPP_SRCS=\
+	$(COMMON_SRCDIR)/src/common_tables.cpp\
 	$(COMMON_SRCDIR)/src/copy_mb.cpp\
 	$(COMMON_SRCDIR)/src/cpu.cpp\
 	$(COMMON_SRCDIR)/src/crt_util_safe_x.cpp\

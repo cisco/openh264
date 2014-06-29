@@ -830,6 +830,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\common\inc\wels_common_defs.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\decoder\core\inc\wels_const.h"
 					>
 				</File>
@@ -844,6 +848,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\decoder\core\src\bit_stream.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\common\src\common_tables.cpp"
 					>
 				</File>
 				<File
