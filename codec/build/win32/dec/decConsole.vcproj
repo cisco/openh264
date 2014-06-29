@@ -49,7 +49,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\api\svc,..\..\..\common\inc"
+				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\console\common\inc,..\..\..\api\svc,..\..\..\common\inc"
 				PreprocessorDefinitions="NDEBUG;_CONSOLE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -139,7 +139,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\api\svc,..\..\..\common\inc"
+				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\console\common\inc,..\..\..\api\svc,..\..\..\common\inc"
 				PreprocessorDefinitions="NDEBUG;_CONSOLE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -227,7 +227,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\api\svc,..\..\..\common\inc"
+				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\console\common\inc,..\..\..\api\svc,..\..\..\common\inc"
 				PreprocessorDefinitions="_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -318,7 +318,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\api\svc,..\..\..\common\inc"
+				AdditionalIncludeDirectories="..\..\..\console\dec\inc,..\..\..\console\common\inc,..\..\..\api\svc,..\..\..\common\inc"
 				PreprocessorDefinitions="_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -395,7 +395,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\console\dec\src\read_config.cpp"
+				RelativePath="..\..\..\console\common\src\read_config.cpp"
 				>
 			</File>
 		</Filter>
@@ -408,7 +408,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\console\dec\inc\read_config.h"
+				RelativePath="..\..\..\console\common\inc\read_config.h"
 				>
 			</File>
 		</Filter>

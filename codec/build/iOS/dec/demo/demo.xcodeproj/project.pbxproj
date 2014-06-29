@@ -64,10 +64,10 @@
 		F0E663671810EFA5000C888E /* DEMOViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DEMOViewController.h; sourceTree = "<group>"; };
 		F0E663681810EFA5000C888E /* DEMOViewController.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = DEMOViewController.m; sourceTree = "<group>"; };
 		F0E663721810EFF7000C888E /* d3d9_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = d3d9_utils.h; sourceTree = "<group>"; };
-		F0E663741810EFF7000C888E /* read_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = read_config.h; sourceTree = "<group>"; };
+		F0E663741810EFF7000C888E /* read_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = read_config.h; path = ../../common/inc/read_config.h; sourceTree = "<group>"; };
 		F0E663761810EFF7000C888E /* d3d9_utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = d3d9_utils.cpp; sourceTree = "<group>"; };
 		F0E663771810EFF7000C888E /* h264dec.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = h264dec.cpp; sourceTree = "<group>"; };
-		F0E663791810EFF7000C888E /* read_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = read_config.cpp; sourceTree = "<group>"; };
+		F0E663791810EFF7000C888E /* read_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = read_config.cpp; path = ../../common/src/read_config.cpp; sourceTree = "<group>"; };
 		F0E663B3181117B9000C888E /* DEMOViewControllerShowResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DEMOViewControllerShowResource.h; sourceTree = "<group>"; };
 		F0E663B4181117B9000C888E /* DEMOViewControllerShowResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DEMOViewControllerShowResource.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */

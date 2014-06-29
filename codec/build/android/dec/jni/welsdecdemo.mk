@@ -22,9 +22,10 @@ LOCAL_MODULE := welsdecdemo
 #
 CODEC_PATH := ../../../../
 CONSOLE_DEC_PATH := ../../../../console/dec
+CONSOLE_COMMON_PATH := ../../../../console/common
 LOCAL_SRC_FILES := \
             $(CONSOLE_DEC_PATH)/src/h264dec.cpp \
-            $(CONSOLE_DEC_PATH)/src/read_config.cpp \
+            $(CONSOLE_COMMON_PATH)/src/read_config.cpp \
             $(CONSOLE_DEC_PATH)/src/d3d9_utils.cpp \
             myjni.cpp
 #
@@ -33,6 +34,7 @@ LOCAL_SRC_FILES := \
 LOCAL_C_INCLUDES := \
             $(LOCAL_PATH)/../../../../api/svc \
             $(LOCAL_PATH)/../../../../console/dec/inc \
+            $(LOCAL_PATH)/../../../../console/common/inc \
             $(LOCAL_PATH)/../../../../common/inc
 #
 # Compile Flags and Link Libraries
