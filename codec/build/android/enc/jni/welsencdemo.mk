@@ -41,11 +41,7 @@ LOCAL_C_INCLUDES := \
 #
 # Compile Flags and Link Libraries
 #
-LOCAL_CFLAGS := -O3 -DANDROID_NDK
-
-ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-LOCAL_ARM_MODE := arm
-endif
+LOCAL_CFLAGS := -DANDROID_NDK
 
 LOCAL_LDLIBS := -llog
 LOCAL_SHARED_LIBRARIES := wels
