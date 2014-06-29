@@ -233,7 +233,6 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalOptions="/LTCG"
 				OutputFile="$(OutDir)\welsecore.lib"
 			/>
 			<Tool
@@ -314,7 +313,6 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalOptions="/LTCG"
 				OutputFile="$(OutDir)\welsecore.lib"
 			/>
 			<Tool
