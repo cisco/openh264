@@ -126,8 +126,8 @@ void WelsQuantFour4x4Max_neon (int16_t* pDct, const int16_t* pFF, const int16_t*
 }
 #endif//__cplusplus
 
-__align16 (extern const int16_t, g_kiQuantInterFF[58][8]);
+ALIGNED_DECLARE (extern const int16_t, g_kiQuantInterFF[58][8], 16);
 #define g_iQuantIntraFF (g_kiQuantInterFF +6 )
-__align16 (extern const int16_t, g_kiQuantMF[52][8]) ;
+ALIGNED_DECLARE (extern const int16_t, g_kiQuantMF[52][8], 16);
 }
 #endif//ENCODE_MB_AUX_H

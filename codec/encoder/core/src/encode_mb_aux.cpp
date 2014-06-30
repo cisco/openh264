@@ -36,7 +36,7 @@
 #include "cpu_core.h"
 namespace WelsSVCEnc {
 
-__align16 (const int16_t, g_kiQuantInterFF[58][8]) = {
+ALIGNED_DECLARE (const int16_t, g_kiQuantInterFF[58][8], 16) = {
   /* 0*/ {   0,   1,   0,   1,   1,   1,   1,   1 },
   /* 1*/ {   0,   1,   0,   1,   1,   1,   1,   1 },
   /* 2*/ {   1,   1,   1,   1,   1,   1,   1,   1 },
@@ -100,7 +100,7 @@ __align16 (const int16_t, g_kiQuantInterFF[58][8]) = {
 
 
 
-__align16 (const int16_t, g_kiQuantMF[52][8]) = {
+ALIGNED_DECLARE (const int16_t, g_kiQuantMF[52][8], 16) = {
   /* 0*/	{26214, 16132, 26214, 16132, 16132, 10486, 16132, 10486 },
   /* 1*/	{23832, 14980, 23832, 14980, 14980,  9320, 14980,  9320 },
   /* 2*/	{20164, 13108, 20164, 13108, 13108,  8388, 13108,  8388 },

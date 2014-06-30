@@ -6,7 +6,7 @@
 using namespace WelsSVCEnc;
 #include "encode_mb_aux.h"
 
-__align16 (const int16_t, g_kiQuantInterFFCompare[104][8]) = {
+ALIGNED_DECLARE (const int16_t, g_kiQuantInterFFCompare[104][8], 16) = {
   /* 0*/	{   0,     1,     0,     1,     1,     1,     1,     1 },
   /* 1*/	{   0,     1,     0,     1,     1,     1,     1,     1 },
   /* 2*/	{   1,     1,     1,     1,     1,     1,     1,     1 },

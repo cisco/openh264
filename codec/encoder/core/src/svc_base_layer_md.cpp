@@ -239,7 +239,7 @@ static const ALIGNED_DECLARE (int8_t, g_kiNeighborIntraToI4x4[16][16], 16) = {
   {	15,	15,	15,	7,	15,	15,	15,	7,	15,	15,	15,	7,	15,	7,	15,	7},
 };
 
-__align16 (const int8_t, g_kiMapModeI4x4[14]) = {
+ALIGNED_DECLARE (const int8_t, g_kiMapModeI4x4[14], 16) = {
   0, 1, 2, 3, 4, 5, 6, 7, 8, 2, 2, 2, 3, 7
 };
 
