@@ -58,7 +58,7 @@ class CReadConfig {
  private:
   FILE*			m_pCfgFile;
   string			m_strCfgFileName;
-  unsigned long	m_ulLines;
+  unsigned int	m_ulLines;
 };
 
 #endif	// READ_CONFIG_H__

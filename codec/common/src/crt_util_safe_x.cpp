@@ -234,7 +234,7 @@ int32_t WelsStrftime (char* pBuffer, int32_t iSize, const char* kpFormat, const 
 
   pTnow = localtime (&kpTp->time);
 
-  iRc = strftime (pBuffer, iSize, kpFormat, pTnow);
+  iRc = (int32_t) strftime (pBuffer, iSize, kpFormat, pTnow);
   if (iRc == 0)
     pBuffer[0] = '\0';
   return iRc;
