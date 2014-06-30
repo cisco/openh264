@@ -270,7 +270,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/MAPINFO:exports /LTCG"
 				AdditionalDependencies="$(OutDir)\welsecore.lib"
 				OutputFile="$(OutDir)\welsenc.dll"
 				LinkIncremental="1"
@@ -371,7 +370,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/MAPINFO:exports /LTCG"
 				AdditionalDependencies="$(OutDir)\welsecore.lib"
 				OutputFile="$(OutDir)\welsenc.dll"
 				LinkIncremental="1"
