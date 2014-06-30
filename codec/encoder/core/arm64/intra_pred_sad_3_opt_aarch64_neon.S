@@ -97,12 +97,20 @@
 #ifdef __APPLE__
 .macro SELECT_BEST_COST
     cmp     w1, $0
-    csel    $0, $0, w1, hs
-    cset    w7, lo
+    csel    $0, $0, w1, $2
+    cset    w7, $1
     cmp     w2, $0
     mov     w6, #2
-    csel    $0, $0, w2, hs
-    csel    w7, w7, w6, hs
+    csel    $0, $0, w2, $2
+    csel    w7, w7, w6, $2
+.endm
+
+.macro SELECT_BEST_COST_PREFER_HIGHER arg0
+    SELECT_BEST_COST \arg0, ls, hi
+.endm
+
+.macro SELECT_BEST_COST_PREFER_LOWER arg0
+    SELECT_BEST_COST \arg0, lo, hs
 .endm
 
 .macro LOAD_CHROMA_DATA
@@ -173,14 +181,22 @@
     add     $7, $7, v4.4s
 .endm
 #else
-.macro SELECT_BEST_COST arg0
+.macro SELECT_BEST_COST arg0, arg1, arg2
     cmp     w1, \arg0
-    csel    \arg0, \arg0, w1, hs
-    cset    w7, lo
+    csel    \arg0, \arg0, w1, \arg2
+    cset    w7, \arg1
     cmp     w2, \arg0
     mov     w6, #2
-    csel    \arg0, \arg0, w2, hs
-    csel    w7, w7, w6, hs
+    csel    \arg0, \arg0, w2, \arg2
+    csel    w7, w7, w6, \arg2
+.endm
+
+.macro SELECT_BEST_COST_PREFER_HIGHER arg0
+    SELECT_BEST_COST \arg0, ls, hi
+.endm
+
+.macro SELECT_BEST_COST_PREFER_LOWER arg0
+    SELECT_BEST_COST \arg0, lo, hs
 .endm
 
 .macro LOAD_CHROMA_DATA arg0, arg1, arg2
@@ -347,7 +363,7 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsIntra8x8Combined3Sad_AArch64_neon
     saddlv  s31, v31.8h
     fmov    w0, s31
 
-    SELECT_BEST_COST w0
+    SELECT_BEST_COST_PREFER_HIGHER w0
 
     str     w7, [x4]
 WELS_ASM_ARCH64_FUNC_END
@@ -399,7 +415,7 @@ sad_intra_16x16_x3_opt_loop0:
     fmov    w2, s31
     add     w2, w2, w5, lsl #1
 
-    SELECT_BEST_COST w0
+    SELECT_BEST_COST_PREFER_LOWER w0
 
     str     w7, [x4]
 WELS_ASM_ARCH64_FUNC_END
@@ -464,7 +480,7 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsIntra4x4Combined3Satd_AArch64_neon
     add     w2, w2, w6
 
     mov     w10, w0
-    SELECT_BEST_COST w10
+    SELECT_BEST_COST_PREFER_HIGHER w10
 
     str     w7, [x5]
 
@@ -579,7 +595,7 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsIntra8x8Combined3Satd_AArch64_neon
     addv    s31, v31.4s
     fmov    w0, s31
 
-    SELECT_BEST_COST w0
+    SELECT_BEST_COST_PREFER_HIGHER w0
 
     str     w7, [x4]
 WELS_ASM_ARCH64_FUNC_END
@@ -656,7 +672,7 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsIntra16x16Combined3Satd_AArch64_neon
     fmov    w2, s31
     add     w2, w2, w5, lsl #1
 
-    SELECT_BEST_COST w0
+    SELECT_BEST_COST_PREFER_LOWER w0
 
     str     w7, [x4]
 
