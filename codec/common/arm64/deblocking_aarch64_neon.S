@@ -552,7 +552,7 @@ bs_mv_check_jump1:
 .endm
 #endif
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsNonZeroCount_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsNonZeroCount_AArch64_neon
     ld1 {v0.8b, v1.8b, v2.8b}, [x0]
     ins v0.d[1], v1.d[0]
     uzp1 v0.2d, v0.2d, v1.2d
@@ -564,10 +564,10 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsNonZeroCount_AArch64_neon
     abs v2.8b, v2.8b
     ins v1.d[0], v0.d[1]
     st1 {v0.8b, v1.8b, v2.8b}, [x0]
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
 
-WELS_ASM_ARCH64_FUNC_BEGIN DeblockLumaLt4V_AArch64_neon //uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* tc
+WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaLt4V_AArch64_neon //uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* tc
     dup v16.16b, w2 //alpha
     dup v17.16b, w3 //beta
     add x2, x1, x1, lsl #1
@@ -622,10 +622,10 @@ WELS_ASM_ARCH64_FUNC_BEGIN DeblockLumaLt4V_AArch64_neon //uint8_t* pPix, int32_t
     st1     {v3.16b}, [x2], x1
     st1     {v21.16b}, [x2]
 DeblockLumaLt4V_AArch64_neon_end:
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
 
-WELS_ASM_ARCH64_FUNC_BEGIN DeblockLumaEq4V_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaEq4V_AArch64_neon
     dup     v16.16b, w2 //alpha
     dup     v17.16b, w3 //beta
     sub     x3, x0, x1, lsl #2
@@ -688,10 +688,10 @@ WELS_ASM_ARCH64_FUNC_BEGIN DeblockLumaEq4V_AArch64_neon
     DIFF_LUMA_EQ4_MASK    v19, v6, v22, v17
     st1   {v17.16b}, [x3], x1
 DeblockLumaEq4V_AArch64_neon_end:
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
 
-WELS_ASM_ARCH64_FUNC_BEGIN DeblockLumaLt4H_AArch64_neon //uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* tc
+WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaLt4H_AArch64_neon //uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* tc
     dup v16.16b, w2 //alpha
     dup v17.16b, w3 //beta
     sub x2, x0, #3
@@ -773,10 +773,10 @@ WELS_ASM_ARCH64_FUNC_BEGIN DeblockLumaLt4H_AArch64_neon //uint8_t* pPix, int32_t
     STORE_LUMA_DATA_4     v25, v26, v27, v28, 12, 13
     STORE_LUMA_DATA_4     v25, v26, v27, v28, 14, 15
 DeblockLumaLt4H_AArch64_neon_end:
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
 
-WELS_ASM_ARCH64_FUNC_BEGIN DeblockLumaEq4H_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaEq4H_AArch64_neon
     dup     v16.16b, w2 //alpha
     dup     v17.16b, w3 //beta
     sub     x3, x0, #4
@@ -869,10 +869,10 @@ WELS_ASM_ARCH64_FUNC_BEGIN DeblockLumaEq4H_AArch64_neon
     STORE_LUMA_DATA_3     v26, v27, v28, v29, v30, v31, 14
     STORE_LUMA_DATA_3     v26, v27, v28, v29, v30, v31, 15
 DeblockLumaEq4H_AArch64_neon_end:
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
 
-WELS_ASM_ARCH64_FUNC_BEGIN DeblockChromaLt4V_AArch64_neon //uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iAlpha, int32_t iBeta, int8_t* pTc
+WELS_ASM_AARCH64_FUNC_BEGIN DeblockChromaLt4V_AArch64_neon //uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iAlpha, int32_t iBeta, int8_t* pTc
     dup v16.16b, w3 //alpha
     dup v17.16b, w4 //beta
     lsl x3, x2, #1
@@ -919,9 +919,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN DeblockChromaLt4V_AArch64_neon //uint8_t* pPixCb, uin
     st1     {v2.d} [0], [x6]
     st1     {v2.d} [1], [x7]
 DeblockChromaLt4V_AArch64_neon_end:
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN DeblockChromaLt4H_AArch64_neon //uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iAlpha, int32_t iBeta, int8_t* pTc
+WELS_ASM_AARCH64_FUNC_BEGIN DeblockChromaLt4H_AArch64_neon //uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iAlpha, int32_t iBeta, int8_t* pTc
     dup v16.16b, w3 //alpha
     dup v17.16b, w4 //beta
     sub x6, x0, #2 //pPixCb-2
@@ -992,9 +992,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN DeblockChromaLt4H_AArch64_neon //uint8_t* pPixCb, uin
     STORE_CHROMA_DATA_2 v1, v2, x1, 14
     STORE_CHROMA_DATA_2 v1, v2, x1, 15
 DeblockChromaLt4H_AArch64_neon_end:
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN DeblockChromaEq4V_AArch64_neon //uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iAlpha, int32_t iBeta
+WELS_ASM_AARCH64_FUNC_BEGIN DeblockChromaEq4V_AArch64_neon //uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iAlpha, int32_t iBeta
     dup v16.16b, w3 //alpha
     dup v17.16b, w4 //beta
     lsl x3, x2, #1
@@ -1027,9 +1027,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN DeblockChromaEq4V_AArch64_neon //uint8_t* pPixCb, uin
     st1     {v7.d} [0], [x6]
     st1     {v7.d} [1], [x7]
 DeblockChromaEq4V_AArch64_neon_end:
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN DeblockChromaEq4H_AArch64_neon //uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iAlpha, int32_t iBeta
+WELS_ASM_AARCH64_FUNC_BEGIN DeblockChromaEq4H_AArch64_neon //uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStrideX, int32_t iAlpha, int32_t iBeta
     dup v16.16b, w3 //alpha
     dup v17.16b, w4 //beta
 
@@ -1085,10 +1085,10 @@ WELS_ASM_ARCH64_FUNC_BEGIN DeblockChromaEq4H_AArch64_neon //uint8_t* pPixCb, uin
     STORE_CHROMA_DATA_2 v6, v7, x1, 14
     STORE_CHROMA_DATA_2 v6, v7, x1, 15
     DeblockChromaEq4H_AArch64_neon_end:
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
 
-WELS_ASM_ARCH64_FUNC_BEGIN DeblockingBSCalcEnc_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN DeblockingBSCalcEnc_AArch64_neon
     // Checking the nzc status
     BS_NZC_CHECK x0, x2, x3, v16, v17 //v16,v17 save the nzc status
     // For checking bS[I] = 2
@@ -1110,7 +1110,7 @@ WELS_ASM_ARCH64_FUNC_BEGIN DeblockingBSCalcEnc_AArch64_neon
     umax v1.16b, v18.16b, v16.16b
     umax v0.16b, v19.16b, v17.16b
     st1 {v0.16b, v1.16b}, [x4]
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
 
 #endif

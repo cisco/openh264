@@ -235,7 +235,7 @@
 .endm
 #endif
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSad4x4_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSad4x4_AArch64_neon
     sxtw    x1, w1
     sxtw    x3, w3
     ld1     {v0.s}[0], [x0], x1
@@ -248,9 +248,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSad4x4_AArch64_neon
 .endr
     saddlv  s2, v2.4h
     fmov    w0, s2
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSad8x8_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSad8x8_AArch64_neon
     sxtw    x1, w1
     sxtw    x3, w3
     ld1     {v0.8b}, [x0], x1
@@ -262,9 +262,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSad8x8_AArch64_neon
     uabal   v2.8h, v0.8b, v1.8b
 .endr
     CALC_AND_STORE_SAD
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSad8x16_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSad8x16_AArch64_neon
     sxtw    x1, w1
     sxtw    x3, w3
     ld1     {v0.8b}, [x0], x1
@@ -276,9 +276,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSad8x16_AArch64_neon
     uabal   v2.8h, v0.8b, v1.8b
 .endr
     CALC_AND_STORE_SAD
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSad16x8_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSad16x8_AArch64_neon
     sxtw    x1, w1
     sxtw    x3, w3
     ld1     {v0.16b}, [x0], x1
@@ -292,9 +292,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSad16x8_AArch64_neon
     uabal2  v2.8h, v0.16b, v1.16b
 .endr
     CALC_AND_STORE_SAD
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSad16x16_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSad16x16_AArch64_neon
     sxtw    x1, w1
     sxtw    x3, w3
     ld1     {v0.16b}, [x0], x1
@@ -308,9 +308,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSad16x16_AArch64_neon
     uabal2  v2.8h, v0.16b, v1.16b
 .endr
     CALC_AND_STORE_SAD
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSadFour4x4_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSadFour4x4_AArch64_neon
     sxtw    x1, w1
     sxtw    x3, w3
     ld1     {v0.s}[0], [x0], x1
@@ -348,9 +348,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSadFour4x4_AArch64_neon
     uabal   v31.8h, v1.8b, v3.8b
 
     CALC_AND_STORE_SAD_FOUR
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSadFour8x8_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSadFour8x8_AArch64_neon
     sxtw    x1, w1
     sxtw    x3, w3
     LOAD_8X8_1
@@ -371,9 +371,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSadFour8x8_AArch64_neon
     CALC_ABS_8X8_1 v31.8h, d
 
     CALC_AND_STORE_SAD_FOUR
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSadFour8x16_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSadFour8x16_AArch64_neon
     sxtw    x1, w1
     sxtw    x3, w3
     LOAD_8X8_1
@@ -410,9 +410,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSadFour8x16_AArch64_neon
     CALC_ABS_8X8_1 v31.8h, a
 
     CALC_AND_STORE_SAD_FOUR
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSadFour16x8_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSadFour16x8_AArch64_neon
     sxtw    x1, w1
     sxtw    x3, w3
     LOAD_16X8_1
@@ -433,9 +433,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSadFour16x8_AArch64_neon
     CALC_ABS_16X8_1 v31.8h, d
 
     CALC_AND_STORE_SAD_FOUR
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSadFour16x16_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSadFour16x16_AArch64_neon
     sxtw    x1, w1
     sxtw    x3, w3
 
@@ -473,9 +473,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSadFour16x16_AArch64_neon
     CALC_ABS_16X8_1 v31.8h, a
 
     CALC_AND_STORE_SAD_FOUR
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSatd4x4_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSatd4x4_AArch64_neon
     sxtw    x1, w1
     sxtw    x3, w3
     ld1     {v0.s}[0], [x0], x1
@@ -514,7 +514,7 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSatd4x4_AArch64_neon
     add     w0, w0, #1
     lsr     w0, w0, #1
 
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
 .macro SATD_8x4
     ld1     {v0.8b}, [x0], x1
@@ -649,7 +649,7 @@ WELS_ASM_ARCH64_FUNC_END
     add     v2.8h, v2.8h, v3.8h
 .endm
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSatd16x16_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSatd16x16_AArch64_neon
     sxtw    x1, w1
     sxtw    x3, w3
     SATD_16x4
@@ -661,9 +661,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSatd16x16_AArch64_neon
 .endr
     uaddlv  s4, v31.8h
     fmov    w0, s4
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSatd16x8_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSatd16x8_AArch64_neon
     sxtw    x1, w1
     sxtw    x3, w3
     SATD_16x4
@@ -675,9 +675,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSatd16x8_AArch64_neon
 
     uaddlv  s4, v31.8h
     fmov    w0, s4
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSatd8x16_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSatd8x16_AArch64_neon
     sxtw    x1, w1
     sxtw    x3, w3
     SATD_8x4
@@ -689,9 +689,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSatd8x16_AArch64_neon
 .endr
     uaddlv  s4, v31.8h
     fmov    w0, s4
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSatd8x8_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSatd8x8_AArch64_neon
     sxtw    x1, w1
     sxtw    x3, w3
     SATD_8x4
@@ -702,5 +702,5 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsSampleSatd8x8_AArch64_neon
     add     v31.8h, v31.8h, v1.8h
     uaddlv  s4, v31.8h
     fmov    w0, s4
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 #endif

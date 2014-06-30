@@ -268,7 +268,7 @@
 .endm
 #endif
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsIntra8x8Combined3Sad_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsIntra8x8Combined3Sad_AArch64_neon
     ldr     x11, [sp, #0]
 
     LOAD_CHROMA_DATA x0, v0.8b, v0.b
@@ -366,9 +366,9 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsIntra8x8Combined3Sad_AArch64_neon
     SELECT_BEST_COST_PREFER_HIGHER w0
 
     str     w7, [x4]
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsIntra16x16Combined3Sad_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsIntra16x16Combined3Sad_AArch64_neon
 
     LOAD_LUMA_DATA
 
@@ -418,9 +418,9 @@ sad_intra_16x16_x3_opt_loop0:
     SELECT_BEST_COST_PREFER_LOWER w0
 
     str     w7, [x4]
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsIntra4x4Combined3Satd_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsIntra4x4Combined3Satd_AArch64_neon
     sub     x9, x0, x1
     ld1     {v16.s}[0], [x9]      //top
     sub     x9, x0, #1
@@ -508,9 +508,9 @@ satd_intra_4x4_x3_opt_jump1:
 satd_intra_4x4_x3_opt_end:
     mov     w0, w10
 
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsIntra8x8Combined3Satd_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsIntra8x8Combined3Satd_AArch64_neon
     ldr     x11, [sp, #0]
 
     LOAD_CHROMA_DATA x0, v0.8b, v0.b
@@ -598,10 +598,10 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsIntra8x8Combined3Satd_AArch64_neon
     SELECT_BEST_COST_PREFER_HIGHER w0
 
     str     w7, [x4]
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
 
-WELS_ASM_ARCH64_FUNC_BEGIN WelsIntra16x16Combined3Satd_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN WelsIntra16x16Combined3Satd_AArch64_neon
     LOAD_LUMA_DATA
 
     uaddlv  h2, v0.16b
@@ -676,6 +676,6 @@ WELS_ASM_ARCH64_FUNC_BEGIN WelsIntra16x16Combined3Satd_AArch64_neon
 
     str     w7, [x4]
 
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
 #endif

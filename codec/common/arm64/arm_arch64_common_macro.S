@@ -32,13 +32,13 @@
 
 #ifdef __APPLE__
 
-.macro WELS_ASM_ARCH64_FUNC_BEGIN
+.macro WELS_ASM_AARCH64_FUNC_BEGIN
 .align 2
 .globl _$0
 _$0:
 .endm
 
-.macro WELS_ASM_ARCH64_FUNC_END
+.macro WELS_ASM_AARCH64_FUNC_END
 ret
 .endm
 #else
@@ -46,7 +46,7 @@ ret
 .section .note.GNU-stack,"",%progbits // Mark stack as non-executable
 .text
 
-.macro WELS_ASM_ARCH64_FUNC_BEGIN funcName
+.macro WELS_ASM_AARCH64_FUNC_BEGIN funcName
 .align 2
 .global \funcName
 .type \funcName, %function
@@ -54,7 +54,7 @@ ret
 \funcName:
 .endm
 
-.macro WELS_ASM_ARCH64_FUNC_END
+.macro WELS_ASM_AARCH64_FUNC_END
 ret
 .endfunc
 .endm

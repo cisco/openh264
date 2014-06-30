@@ -34,7 +34,7 @@
 .text
 #include "arm_arch64_common_macro.S"
 
-WELS_ASM_ARCH64_FUNC_BEGIN ExpandPictureLuma_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN ExpandPictureLuma_AArch64_neon
     mov x7, x0
     mov x8, x3
     add x4, x7, x2
@@ -72,9 +72,9 @@ _expand_picture_luma_loop1:
 
     sub x2, x2, #16
     cbnz x2, _expand_picture_luma_loop0
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_ARCH64_FUNC_BEGIN ExpandPictureChroma_AArch64_neon
+WELS_ASM_AARCH64_FUNC_BEGIN ExpandPictureChroma_AArch64_neon
     //Save the dst
     mov x7, x0
     mov x8, x3
@@ -138,6 +138,6 @@ _expand_picture_chroma_loop3:
     cbnz x8, _expand_picture_chroma_loop3
 _expand_picture_chroma_end:
 
-WELS_ASM_ARCH64_FUNC_END
+WELS_ASM_AARCH64_FUNC_END
 #endif
 
