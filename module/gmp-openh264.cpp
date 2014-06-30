@@ -397,6 +397,11 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
     }
 
     if (!has_frame) {
+      // This frame must be destroyed on the main thread.
+      g_platform_api->syncrunonmainthread (WrapTask (
+                                             this,
+                                             &OpenH264VideoEncoder::DestroyInputFrame_m,
+                                             inputImage));
       return;
     }
 
@@ -473,6 +478,11 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
     callback_->Encoded (f, info);
 
     stats_.FrameOut();
+  }
+
+  // These frames must be destroyed on the main thread.
+  void DestroyInputFrame_m (GMPVideoi420Frame* frame) {
+    frame->Destroy();
   }
 
   virtual GMPVideoErr SetChannelParameters (uint32_t aPacketLoss, uint32_t aRTT) {
