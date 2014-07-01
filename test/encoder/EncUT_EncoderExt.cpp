@@ -75,7 +75,7 @@ TEST (EncoderExtTest, SetOption) {
   iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
   EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
   EXPECT_EQ (sFbi.eFrameType, static_cast<int32_t> (videoFrameTypeIDR));
- 
+
   pOption ->iTemporalLayerNum = 2;
   iResult = pPtrEnc->SetOption (eOptionId, pOption);
   EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
