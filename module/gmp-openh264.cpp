@@ -204,95 +204,40 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
     if (rv) {
       return GMPVideoGenericErr;
     }
-    if (maxPayloadSize <= 0) {
-      SEncParamBase param;
-      memset (&param, 0, sizeof (param));
 
-      GMPLOG (GL_INFO, "Initializing encoder at "
-              << codecSettings.mWidth
-              << "x"
-              << codecSettings.mHeight
-              << "@"
-              << static_cast<int> (codecSettings.mMaxFramerate)
-              << "max payload size="
-              << maxPayloadSize);
+    SEncParamBase param;
+    memset (&param, 0, sizeof (param));
 
-      // Translate parameters.
-      param.iUsageType = CAMERA_VIDEO_REAL_TIME;
-      param.iPicWidth = codecSettings.mWidth;
-      param.iPicHeight = codecSettings.mHeight;
-      param.iTargetBitrate = codecSettings.mStartBitrate * 1000;
-      GMPLOG (GL_INFO, "Initializing Bit Rate at: Start: "
-              << codecSettings.mStartBitrate
-              << "; Min: "
-              << codecSettings.mMinBitrate
-              << "; Max: "
-              << codecSettings.mMaxBitrate);
+    GMPLOG (GL_INFO, "Initializing encoder at "
+            << codecSettings.mWidth
+            << "x"
+            << codecSettings.mHeight
+            << "@"
+            << static_cast<int> (codecSettings.mMaxFramerate)
+            << "max payload size="
+            << maxPayloadSize);
 
-      param.iRCMode = RC_BITRATE_MODE;
+    // Translate parameters.
+    param.iUsageType = CAMERA_VIDEO_REAL_TIME;
+    param.iPicWidth = codecSettings.mWidth;
+    param.iPicHeight = codecSettings.mHeight;
+    param.iTargetBitrate = codecSettings.mStartBitrate * 1000;
+    GMPLOG (GL_INFO, "Initializing Bit Rate at: Start: "
+            << codecSettings.mStartBitrate
+            << "; Min: "
+            << codecSettings.mMinBitrate
+            << "; Max: "
+            << codecSettings.mMaxBitrate);
+    param.iRCMode = RC_BITRATE_MODE;
 
-      // TODO(ekr@rtfm.com). Scary conversion from unsigned char to float below.
-      param.fMaxFrameRate = static_cast<float> (codecSettings.mMaxFramerate);
-      param.iInputCsp = videoFormatI420;
+    // TODO(ekr@rtfm.com). Scary conversion from unsigned char to float below.
+    param.fMaxFrameRate = static_cast<float> (codecSettings.mMaxFramerate);
+    param.iInputCsp = videoFormatI420;
 
-      rv = encoder_->Initialize (&param);
-      if (rv) {
-        GMPLOG (GL_ERROR, "Couldn't initialize encoder");
-        return GMPVideoGenericErr;
-      }
-    } else {
-      SEncParamExt param;
-      memset (&param, 0, sizeof (param));
-      encoder_->GetDefaultParams (&param);
-
-      GMPLOG (GL_INFO, "Initializing encoder at "
-              << codecSettings.mWidth
-              << "x"
-              << codecSettings.mHeight
-              << "@"
-              << static_cast<int> (codecSettings.mMaxFramerate)
-              << "max payload size="
-              << maxPayloadSize);
-
-      // Translate parameters.
-      param.iUsageType = CAMERA_VIDEO_REAL_TIME;
-      param.iInputCsp = videoFormatI420;
-      param.iPicWidth = codecSettings.mWidth;
-      param.iPicHeight = codecSettings.mHeight;
-      param.iRCMode = RC_BITRATE_MODE;
-      param.iTargetBitrate = codecSettings.mStartBitrate * 1000;
-      param.iMaxBitrate = codecSettings.mMaxBitrate * 1000;
-      GMPLOG (GL_INFO, "Initializing Bit Rate at: Start: "
-              << codecSettings.mStartBitrate
-              << "; Min: "
-              << codecSettings.mMinBitrate
-              << "; Max: "
-              << codecSettings.mMaxBitrate);
-      //for controlling the NAL size (normally for packetization-mode=0)
-      param.uiMaxNalSize = maxPayloadSize;
-
-      // TODO(ekr@rtfm.com). Scary conversion from unsigned char to float below.
-      param.fMaxFrameRate = static_cast<float> (codecSettings.mMaxFramerate);
-
-      // Set up layers. Currently we have one layer.
-      SSpatialLayerConfig* layer = &param.sSpatialLayers[0];
-
-      layer->iVideoWidth = codecSettings.mWidth;
-      layer->iVideoHeight = codecSettings.mHeight;
-      layer->fFrameRate = param.fMaxFrameRate;
-      layer->iSpatialBitrate = param.iTargetBitrate;
-      layer->iMaxSpatialBitrate = param.iMaxBitrate;
-
-      // Based on guidance from Cisco.
-      layer->sSliceCfg.uiSliceMode = SM_DYN_SLICE;
-      layer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint = maxPayloadSize;
-
-      rv = encoder_->InitializeExt (&param);
-      if (rv) {
-        GMPLOG (GL_ERROR, "Couldn't initialize encoder");
-        return GMPVideoGenericErr;
-      }
-
+    rv = encoder_->Initialize (&param);
+    if (rv) {
+      GMPLOG (GL_ERROR, "Couldn't initialize encoder");
+      return GMPVideoGenericErr;
     }
 
     max_payload_size_ = maxPayloadSize;
