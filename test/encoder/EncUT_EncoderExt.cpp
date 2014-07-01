@@ -5,20 +5,18 @@
 
 using namespace WelsSVCEnc;
 
-TEST (EncoderExtTest, SetOptionIDRRequst) {
+TEST (EncoderExtTest, SetOption) {
   CWelsH264SVCEncoder* pPtrEnc = new CWelsH264SVCEncoder();
-
   SEncParamExt* pParamExt = new SEncParamExt();
-  SWelsSvcCodingParam	sConfig;
 
   pParamExt->iInputCsp = 23;
   pParamExt->iPicWidth = 1280;
   pParamExt->iPicHeight = 720;
-  pParamExt->iTargetBitrate = 6000;
+  pParamExt->iTargetBitrate = 60000;
   pParamExt->sSpatialLayers[0].iVideoHeight = pParamExt->iPicHeight;
   pParamExt->sSpatialLayers[0].iVideoWidth = pParamExt->iPicWidth;
-  pParamExt->sSpatialLayers[0].iSpatialBitrate = 5000;
-  pParamExt->iTemporalLayerNum = 3;
+  pParamExt->sSpatialLayers[0].iSpatialBitrate = 50000;
+  pParamExt->iTemporalLayerNum = 1;
   pParamExt->iSpatialLayerNum = 1;
 
   int32_t iResult = pPtrEnc->InitializeExt (pParamExt);
@@ -28,12 +26,22 @@ TEST (EncoderExtTest, SetOptionIDRRequst) {
   pSrcPic->iColorFormat = videoFormatI420;
   pSrcPic->uiTimeStamp = 0;
   uint32_t iSourceWidth, iSourceHeight, kiPicResSize;
-  uint8_t* pYUV = NULL;
-  iSourceWidth = pSrcPic->iPicWidth = pParamExt->iPicWidth ;
+
+  iSourceWidth = pSrcPic->iPicWidth = pParamExt->iPicWidth;
   iSourceHeight = pSrcPic->iPicHeight = pParamExt->iPicHeight;
   kiPicResSize = iSourceWidth * iSourceHeight * 3 >> 1;
 
+  uint8_t* pYUV = NULL;
   pYUV = new uint8_t [kiPicResSize];
+  if (pYUV == NULL){
+    delete pPtrEnc;
+    delete pParamExt;
+    delete pSrcPic;
+    return;
+  }
+
+  for(int32_t i=0;i<kiPicResSize;i++)
+    pYUV[i]=rand()%256;
 
   pSrcPic->iStride[0] = iSourceWidth;
   pSrcPic->iStride[1] = pSrcPic->iStride[2] = pSrcPic->iStride[0] >> 1;
@@ -57,14 +65,29 @@ TEST (EncoderExtTest, SetOptionIDRRequst) {
 
   SEncParamExt* pOption = new SEncParamExt();
   memcpy (pOption, pParamExt, sizeof (SEncParamExt));
-  pOption ->iTemporalLayerNum = 2;
+  pOption ->iTemporalLayerNum = 4;
 
-  EXPECT_EQ (pOption ->iSpatialLayerNum, 1);
   ENCODER_OPTION eOptionId = ENCODER_OPTION_SVC_ENCODE_PARAM_EXT;
   iResult = pPtrEnc->SetOption (eOptionId, pOption);
   EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
 
   pSrcPic->uiTimeStamp = 60;
+  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+  EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+  EXPECT_EQ (sFbi.eFrameType, static_cast<int32_t> (videoFrameTypeIDR));
+ 
+  pOption ->iTemporalLayerNum = 2;
+  iResult = pPtrEnc->SetOption (eOptionId, pOption);
+  EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+  pSrcPic->uiTimeStamp = 90;
+  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+  EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+  EXPECT_EQ (sFbi.eFrameType, static_cast<int32_t> (videoFrameTypeP));
+
+  pOption ->iTemporalLayerNum = 4;
+  iResult = pPtrEnc->SetOption (eOptionId, pOption);
+  EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+  pSrcPic->uiTimeStamp = 120;
   iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
   EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
   EXPECT_EQ (sFbi.eFrameType, static_cast<int32_t> (videoFrameTypeP));
@@ -74,5 +97,5 @@ TEST (EncoderExtTest, SetOptionIDRRequst) {
   delete pParamExt;
   delete pOption;
   delete pSrcPic;
-  delete pYUV;
-  }
+  delete []pYUV;
+ }
