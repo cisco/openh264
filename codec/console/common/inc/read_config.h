@@ -44,12 +44,16 @@
 #include <string>
 using namespace std;
 
+
 class CReadConfig {
  public:
-  CReadConfig (const char* kpConfigFileName);
+  CReadConfig();
+  CReadConfig (const char* pConfigFileName);
+  CReadConfig (const string& pConfigFileName);
   virtual ~CReadConfig();
 
-  long ReadLine (string* val, const int kiValSize = 4);
+  void Openf (const char* strFile);
+  long ReadLine (string* strVal, const int iValSize = 4);
   const bool EndOfFile();
   const int GetLines();
   const bool ExistFile();
@@ -58,7 +62,7 @@ class CReadConfig {
  private:
   FILE*			m_pCfgFile;
   string			m_strCfgFileName;
-  unsigned int	m_ulLines;
+  unsigned int	m_iLines;
 };
 
 #endif	// READ_CONFIG_H__

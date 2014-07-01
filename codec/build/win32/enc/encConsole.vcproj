@@ -48,7 +48,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
+				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\console\common\inc,..\..\..\api\svc,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
 				PreprocessorDefinitions="_DEBUG;_CONSOLE;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -140,7 +140,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
+				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\console\common\inc,..\..\..\api\svc,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
 				PreprocessorDefinitions="_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -232,7 +232,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
+				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\console\common\inc,..\..\..\api\svc,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
 				PreprocessorDefinitions="NDEBUG;_CONSOLE;X86_ASM;"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -325,7 +325,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\api\svc,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
+				AdditionalIncludeDirectories="..\..\..\console\enc\inc,..\..\..\console\common\inc,..\..\..\api\svc,..\..\..\encoder\core\inc,..\..\..\common\inc,..\..\..\processing\interface"
 				PreprocessorDefinitions="NDEBUG;_CONSOLE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -395,7 +395,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="..\..\..\console\enc\src\read_config.cpp"
+				RelativePath="..\..\..\console\common\src\read_config.cpp"
 				>
 			</File>
 			<File
@@ -408,7 +408,7 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="..\..\..\console\enc\inc\read_config.h"
+				RelativePath="..\..\..\console\common\inc\read_config.h"
 				>
 			</File>
 		</Filter>

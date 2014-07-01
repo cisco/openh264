@@ -96,7 +96,7 @@
 		FAFB4FF418BC8E9A00315438 /* processing.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = processing.xcodeproj; path = ../../../../processing/build/iOS/processing.xcodeproj; sourceTree = "<group>"; };
 		FAFB500918BC8F6600315438 /* read_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = read_config.h; sourceTree = "<group>"; };
 		FAFB500A18BC8F6C00315438 /* welsenc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = welsenc.cpp; sourceTree = "<group>"; };
-		FAFB502E18BCA50900315438 /* read_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = read_config.cpp; sourceTree = "<group>"; };
+		FAFB502E18BCA50900315438 /* read_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = read_config.cpp; path = ../../common/src/read_config.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -224,7 +224,8 @@
 			children = (
 				FAFB500918BC8F6600315438 /* read_config.h */,
 			);
-			path = inc;
+			name = inc;
+			path = ../common/inc;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
