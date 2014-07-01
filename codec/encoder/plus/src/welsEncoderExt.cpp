@@ -464,7 +464,7 @@ int CWelsH264SVCEncoder::EncodeFrameInternal (const SSourcePicture*  pSrcPic, SF
   }
   ///////////////////for test
 #ifdef OUTPUT_BIT_STREAM
-  if (pBsInfo->eOutputFrameType != videoFrameTypeInvalid && pBsInfo->eOutputFrameType != videoFrameTypeSkip) {
+  if (pBsInfo->eFrameType != videoFrameTypeInvalid && pBsInfo->eFrameType != videoFrameTypeSkip) {
     SLayerBSInfo* pLayer = NULL;
     int32_t i = 0, j = 0, iCurLayerBits = 0, total_bits = 0;
 
@@ -692,7 +692,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     }
 #ifdef OUTPUT_BIT_STREAM
     if (sEncodingParam.sSpatialLayers[sEncodingParam.iSpatialLayerNum - 1].iVideoWidth !=
-        m_pEncContext->pSvcParam->sDependencyLayers[m_pEncContext->pSvcParam->iSpatialLayerNum - 1].iFrameWidth) {
+        m_pEncContext->pSvcParam->sDependencyLayers[m_pEncContext->pSvcParam->iSpatialLayerNum - 1].iActualWidth) {
       ++ m_iSwitchTimes;
       m_bSwitch = true;
     }
