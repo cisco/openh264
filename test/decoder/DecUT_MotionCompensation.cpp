@@ -136,7 +136,6 @@ TEST(McCopy_c,iW##x##iH) \
       uint8_t uSrcTest[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE];    \
       ENFORCE_STACK_ALIGN_2D(uint8_t, uDstAnchor, MC_BUFF_HEIGHT, MC_BUFF_DST_STRIDE, 16); \
       ENFORCE_STACK_ALIGN_2D(uint8_t, uDstTest, MC_BUFF_HEIGHT, MC_BUFF_DST_STRIDE, 16); \
-      srand((unsigned int)time(0));                           \
       for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)                    \
       {                                                         \
         for(int32_t i=0;i<MC_BUFF_SRC_STRIDE;i++)                  \
@@ -183,7 +182,6 @@ TEST(McHorVer##a##b##_c,iW##x##iH)  \
     uSrcInputAnchor[1] = &uSrcAnchor[1][4][4]; \
     uSrcInputAnchor[2] = &uSrcAnchor[2][4][4]; \
     uSrcInputAnchor[3] = &uSrcAnchor[3][4][4]; \
-    srand((unsigned int)time(0)); \
     for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)   \
     {\
       for(int32_t i=0;i<MC_BUFF_SRC_STRIDE;i++)   \
@@ -252,7 +250,6 @@ TEST(McChromaWithFragMv_##a##b##_c,iW##x##iH)  \
     ENFORCE_STACK_ALIGN_2D(uint8_t, uDstAnchor1, MC_BUFF_HEIGHT, MC_BUFF_DST_STRIDE, 16); \
     ENFORCE_STACK_ALIGN_2D(uint8_t, uDstAnchor2, MC_BUFF_HEIGHT, MC_BUFF_DST_STRIDE, 16); \
     ENFORCE_STACK_ALIGN_2D(uint8_t, uDstTest, MC_BUFF_HEIGHT, MC_BUFF_DST_STRIDE, 16); \
-    srand((unsigned int)time(0)); \
     for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)   \
     {\
       for(int32_t i=0;i<MC_BUFF_SRC_STRIDE;i++)   \

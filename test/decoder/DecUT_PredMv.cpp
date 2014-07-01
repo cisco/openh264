@@ -1,6 +1,4 @@
 #include<gtest/gtest.h>
-#include <stdlib.h>
-#include <time.h>
 
 #include "wels_common_basis.h"
 #include "mem_align.h"
@@ -133,7 +131,6 @@ typedef struct TagWelsMvPred {
 //mok input data
 void AssignMvInputData (SAnchorMvPred* pAncMvPred) {
   int32_t i, j, k;
-  srand ((uint32_t)time (NULL));
   //fill MV data and refIdx
   for (i = 0; i < 2; ++i) {
     for (j = 0; j < 30; ++j) {
@@ -182,7 +179,6 @@ TEST (PredMvTest, PredMv) {
   iIndex = 0;
   iBlockWidth = 4;
   i = 0;
-  srand ((uint32_t)time (NULL));
   while (i++ < kiRandTime) {
     iRef = (rand() % 18) - 2; //-2~15
     INIT_MV_DATA;
@@ -235,7 +231,6 @@ TEST (PredMvTest, PredInter16x8Mv) {
   bool bOK = true;
 
   i = 0;
-  srand ((uint32_t)time (NULL));
   while (i++ < kiRandTime) {
     iIndex = (rand() & 1) << 3; //0, 8
     iRef = (rand() % 18) - 2; //-2~15
@@ -255,7 +250,6 @@ TEST (PredMvTest, PredInter8x16Mv) {
   bool bOK = true;
 
   i = 0;
-  srand ((uint32_t)time (NULL));
   while (i++ < kiRandTime) {
     iIndex = (rand() & 1) << 2; //0, 4
     iRef = (rand() % 18) - 2; //-2~15
@@ -469,7 +463,6 @@ int32_t FreeLayerData (PDqLayer pDqLayer) {
 }
 
 void InitRandomLayerSliceIdc (PDqLayer pDqLayer) {
-  srand ((uint32_t)time (NULL));
   int32_t i = 0;
   int32_t iTotalMbNum = pDqLayer->iMbWidth * pDqLayer->iMbHeight;
   int32_t iMbFirstSliceEnd = rand() % (iTotalMbNum - 1); //assure 2 slices
@@ -482,14 +475,12 @@ void InitRandomLayerSliceIdc (PDqLayer pDqLayer) {
 }
 
 void InitRandomLayerMbType (PDqLayer pDqLayer) {
-  srand ((uint32_t)time (NULL));
   for (int32_t i = 0; i < pDqLayer->iMbWidth * pDqLayer->iMbHeight; ++i) {
     pDqLayer->pMbType[i] = (rand() & 0x0f) + 1; //1 ~ 16
   }
 }
 
 void InitRandomLayerMvData (PDqLayer pDqLayer) {
-  srand ((uint32_t)time (NULL));
   for (int32_t i = 0; i < pDqLayer->iMbWidth * pDqLayer->iMbHeight; ++i) {
     for (int32_t j = 0; j < MB_BLOCK4x4_NUM; ++j) {
       for (int32_t k = 0; k < MV_A; ++k) {
@@ -500,7 +491,6 @@ void InitRandomLayerMvData (PDqLayer pDqLayer) {
 }
 
 void InitRandomLayerRefIdxData (PDqLayer pDqLayer) {
-  srand ((uint32_t)time (NULL));
   for (int32_t i = 0; i < pDqLayer->iMbWidth * pDqLayer->iMbHeight; ++i) {
     for (int32_t j = 0; j < MB_BLOCK4x4_NUM; ++j) {
       pDqLayer->pRefIndex[0][i][j] = (rand() % 18 - 2); //-2 ~ 15

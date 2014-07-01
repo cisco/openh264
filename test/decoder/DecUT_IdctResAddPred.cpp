@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <time.h>
 #include "macros.h"
 #include "decode_mb_aux.h"
 using namespace WelsDec;
@@ -51,7 +50,6 @@ TEST(DecoderDecodeMbAux, pred) {\
   int16_t iRefRS[16];\
   uint8_t uiRefPred[16*kiStride];\
   int32_t iRunTimes = 1000;\
-  srand((unsigned int)time(NULL));\
   while(iRunTimes--) {\
     for(int i = 0; i < 4; i++)\
       for(int j = 0; j < 4; j++)\

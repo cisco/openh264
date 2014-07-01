@@ -81,7 +81,6 @@ TEST_F (MotionEstimateTest, TestDiamondSearch) {
   SWelsME sMe;
   SSlice sSlice;
 
-  srand ((uint32_t)time (NULL));
   const uint8_t kuiQp = rand() % 52;
   InitMe (kuiQp, 648, m_uiMvdTableSize, m_pMvdCostTable, &sMe);
 
@@ -132,7 +131,6 @@ void MotionEstimateTest::DoLineTest (PLineFullSearchFunc func, bool vertical) {
   SWelsFuncPtrList sFuncList;
   SWelsME sMe;
 
-  srand ((uint32_t)time (NULL));
   const uint8_t kuiQp = rand() % 52;
   InitMe (kuiQp, 648, m_uiMvdTableSize, m_pMvdCostTable, &sMe);
 
@@ -314,7 +312,6 @@ TEST_F (FeatureMotionEstimateTest, TestFeatureSearch) {
   WelsInitMeFunc (&sFuncList, 0, true);
 
   SWelsME sMe;
-  srand ((uint32_t)time (NULL));
   const uint8_t kuiQp = rand() % 52;
   InitMe (kuiQp, 648, m_uiMvdTableSize, m_pMvdCostTable, &sMe);
   sMe.iCurMeBlockPixX = (m_iWidth / 2);

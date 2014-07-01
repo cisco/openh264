@@ -124,8 +124,8 @@ void TestQuant (uint32_t qp, uint8_t* pSrc, uint8_t* pPred, int16_t* pDct,
   const int16_t* pFfI = g_kiQuantInterFF[6 + qp];
   const int16_t* pFfP = g_kiQuantInterFF[qp];
   //quant4x4  Intra MB
-  RandomPixelDataGenerator (pSrc, iWidth, iHeight, iWidth, 0);
-  RandomPixelDataGenerator (pPred, iWidth, iHeight, iWidth, rand());
+  RandomPixelDataGenerator (pSrc, iWidth, iHeight, iWidth);
+  RandomPixelDataGenerator (pPred, iWidth, iHeight, iWidth);
 
   for (int16_t i = 0; i < 16; i++) {
     pDct[i] = pSrc[i] - pPred[i];
@@ -142,8 +142,8 @@ void TestQuant (uint32_t qp, uint8_t* pSrc, uint8_t* pPred, int16_t* pDct,
   }
 
   //quant4x4 DC
-  RandomPixelDataGenerator (pSrc, iWidth, iHeight, iWidth, 0);
-  RandomPixelDataGenerator (pPred, iWidth, iHeight, iWidth, rand());
+  RandomPixelDataGenerator (pSrc, iWidth, iHeight, iWidth);
+  RandomPixelDataGenerator (pPred, iWidth, iHeight, iWidth);
 
   for (int16_t i = 0; i < 16; i++) {
     pDct[i] = pSrc[i] - pPred[i];
@@ -160,8 +160,8 @@ void TestQuant (uint32_t qp, uint8_t* pSrc, uint8_t* pPred, int16_t* pDct,
   }
 
   //quant4x4 Inter MB
-  RandomPixelDataGenerator (pSrc, iWidth, iHeight, iWidth, 0);
-  RandomPixelDataGenerator (pPred, iWidth, iHeight, iWidth, rand());
+  RandomPixelDataGenerator (pSrc, iWidth, iHeight, iWidth);
+  RandomPixelDataGenerator (pPred, iWidth, iHeight, iWidth);
 
   for (int16_t i = 0; i < 64; i++) {
     pDct[i] =  pSrc[i] - pPred[i];

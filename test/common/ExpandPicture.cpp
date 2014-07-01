@@ -117,7 +117,6 @@ TEST (ExpandPicture, ExpandPictureLuma) {
       uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores);
     }
     InitExpandPictureFunc (&sExpandPicFunc, uiCpuFlag);
-    srand ((unsigned int)time (0));
     for (int32_t iTestIdx = 0; iTestIdx < EXPAND_PIC_TEST_NUM; iTestIdx++) {
       int32_t iPicWidth = 16 + (rand() % 200) * 16;
       int32_t iPicHeight = 16 + (rand() % 100) * 16;
@@ -160,7 +159,6 @@ TEST (ExpandPicture, ExpandPictureChroma) {
       uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores);
     }
     InitExpandPictureFunc (&sExpandPicFunc, uiCpuFlag);
-    srand ((unsigned int)time (0));
 
     for (int32_t iTestIdx = 0; iTestIdx < EXPAND_PIC_TEST_NUM; iTestIdx++) {
       int32_t iPicWidth = (8 + (rand() % 200) * 8);
@@ -207,7 +205,6 @@ TEST (ExpandPicture, ExpandPicForMotion) {
       uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores);
     }
     InitExpandPictureFunc (&sExpandPicFunc, uiCpuFlag);
-    srand ((unsigned int)time (0));
     uint8_t* pPicAnchorBuffer = NULL;
     uint8_t* pPicTestBuffer = NULL;
     uint8_t* pPicAnchor[3] = {NULL, NULL, NULL};
