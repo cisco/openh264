@@ -1,4 +1,4 @@
-#include<gtest/gtest.h>
+#include <gtest/gtest.h>
 
 #include "wels_common_basis.h"
 #include "mem_align.h"

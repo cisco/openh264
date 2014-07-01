@@ -1,4 +1,4 @@
-#include<gtest/gtest.h>
+#include <gtest/gtest.h>
 #include "codec_def.h"
 #include "mc.h"
 #include "mem_align.h"
