@@ -130,7 +130,7 @@ int32_t		iMbHeight; //from?
 SRefPicMarking		sRefMarking;	// Decoded reference picture marking syntaxs
 
 uint16_t    uiIdrPicId;
-ESliceType	eSliceType;
+EWelsSliceType	eSliceType;
 bool		bNumRefIdxActiveOverrideFlag;
 bool		bFieldPicFlag;		//not supported in base profile
 bool		bBottomFiledFlag;		//not supported in base profile

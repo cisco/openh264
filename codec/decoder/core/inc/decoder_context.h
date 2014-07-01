@@ -111,7 +111,7 @@ struct TagDeblockingFunc;
 typedef struct tagDeblockingFilter {
 uint8_t*	pCsData[3];	// pointer to reconstructed picture data
 int32_t	iCsStride[2];	// Cs stride
-ESliceType  eSliceType;
+EWelsSliceType  eSliceType;
 int8_t	iSliceAlphaC0Offset;
 int8_t	iSliceBetaOffset;
 int8_t  iChromaQP;
@@ -184,7 +184,7 @@ int32_t				iImgHeightInPixel;// height of image in pixel reconstruction picture 
 
 // Derived common elements
 SNalUnitHeader		sCurNalHead;
-ESliceType			eSliceType;			// Slice type
+EWelsSliceType			eSliceType;			// Slice type
 int32_t				iFrameNum;
 int32_t				iPrevFrameNum;		// frame number of previous frame well decoded for non-truncated mode yet
 bool              bLastHasMmco5;      //

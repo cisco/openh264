@@ -135,7 +135,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
   }
 
   pNalUnitHeader->uiNalRefIdc		= (uint8_t) (pNal[0] >> 5);			// uiNalRefIdc
-  pNalUnitHeader->eNalUnitType		= (ENalUnitType) (pNal[0] & 0x1f);	// eNalUnitType
+  pNalUnitHeader->eNalUnitType		= (EWelsNalUnitType) (pNal[0] & 0x1f);	// eNalUnitType
 
   ++pNal;
   --iNalSize;
@@ -162,7 +162,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
     return NULL;
   }
   if ((IS_VCL_NAL_AVC_BASE (pNalUnitHeader->eNalUnitType) && ! (pCtx->bSpsExistAheadFlag || pCtx->bPpsExistAheadFlag)) ||
-      (IS_NEW_INTRODUCED_NAL (pNalUnitHeader->eNalUnitType) && ! (pCtx->bSpsExistAheadFlag || pCtx->bSubspsExistAheadFlag
+      (IS_NEW_INTRODUCED_SVC_NAL (pNalUnitHeader->eNalUnitType) && ! (pCtx->bSpsExistAheadFlag || pCtx->bSubspsExistAheadFlag
           || pCtx->bPpsExistAheadFlag))) {
     WelsLog (pLogCtx, WELS_LOG_WARNING,
              "ParseNalHeader(), no exist Parameter Sets ahead of sequence when try to decode slice(type:%d).\n",
@@ -485,7 +485,7 @@ bool CheckNextAuNewSeq (PWelsDecoderContext pCtx, const PNalUnit kpCurNal, const
  */
 int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t kiSrcLen) {
   PBitStringAux	pBs = NULL;
-  ENalUnitType eNalType	= NAL_UNIT_UNSPEC_0; // make initial value as unspecified
+  EWelsNalUnitType eNalType	= NAL_UNIT_UNSPEC_0; // make initial value as unspecified
   int32_t iPicWidth		= 0;
   int32_t iPicHeight		= 0;
   int32_t iBitSize		= 0;

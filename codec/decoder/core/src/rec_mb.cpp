@@ -93,7 +93,7 @@ int32_t RecI4x4Luma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLe
 
     pGetI4x4LumaPredFunc[uiMode] (pPredI4x4, iLumaStride);
 
-    if (pDqLayer->pNzc[iMBXY][g_kuiMbNonZeroCountIdx[i]]) {
+    if (pDqLayer->pNzc[iMBXY][g_kuiMbCountScan4Idx[i]]) {
       int16_t* pRSI4x4 = &pRS[i << 4];
       pIdctResAddPredFunc (pPredI4x4, iLumaStride, pRSI4x4);
     }
@@ -149,7 +149,7 @@ int32_t RecI16x16Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLe
     int16_t* pRSI4x4 = pRS + (i << 4);
     uint8_t* pPredI4x4 = pPred + pBlockOffset[i];
 
-    if (pDqLayer->pNzc[iMBXY][g_kuiMbNonZeroCountIdx[i]] || pRSI4x4[0]) {
+    if (pDqLayer->pNzc[iMBXY][g_kuiMbCountScan4Idx[i]] || pRSI4x4[0]) {
       pIdctResAddPredFunc (pPredI4x4, iYStride, pRSI4x4);
     }
   }
@@ -454,7 +454,7 @@ int32_t RecChroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLeve
         int16_t* pRSI4x4 = &pRS[j << 4];
         uint8_t* pPredI4x4 = pPred + pBlockOffset[j];
 
-        if (pDqLayer->pNzc[iMBXY][g_kuiMbNonZeroCountIdx[16 + (i << 2) + j]] || pRSI4x4[0]) {
+        if (pDqLayer->pNzc[iMBXY][g_kuiMbCountScan4Idx[16 + (i << 2) + j]] || pRSI4x4[0]) {
           pIdctResAddPredFunc (pPredI4x4, iChromaStride, pRSI4x4);
         }
       }

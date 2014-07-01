@@ -647,7 +647,7 @@ void WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFun
   pFilter.iCsStride[0] = pCtx->pDec->iLinesize[0];
   pFilter.iCsStride[1] = pCtx->pDec->iLinesize[1];
 
-  pFilter.eSliceType = (ESliceType) pCurDqLayer->sLayerInfo.sSliceInLayer.eSliceType;
+  pFilter.eSliceType = (EWelsSliceType) pCurDqLayer->sLayerInfo.sSliceInLayer.eSliceType;
 
   pFilter.iSliceAlphaC0Offset = pSliceHeaderExt->sSliceHeader.iSliceAlphaC0Offset;
   pFilter.iSliceBetaOffset     = pSliceHeaderExt->sSliceHeader.iSliceBetaOffset;

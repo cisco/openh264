@@ -346,6 +346,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\common\src\common_tables.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\common\src\copy_mb.cpp"
 				>
 			</File>
@@ -708,6 +712,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\encoder\core\inc\wels_common_basis.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\encoder\core\inc\wels_common_defs.h"
 				>
 			</File>
 			<File

@@ -687,11 +687,11 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
   //////////////////////////////////////////////////////////////////////////
 
   if (bChroma) {
-    iCurNonZeroCacheIdx = g_kuiCacheNzcScanIdx[iIndex];
+    iCurNonZeroCacheIdx = g_kuiCache48CountScan4Idx[iIndex];
     nA = pNonZeroCountCache[iCurNonZeroCacheIdx - 1];
     nB = pNonZeroCountCache[iCurNonZeroCacheIdx - 8];
   } else { //luma
-    iCurNonZeroCacheIdx = g_kuiCacheNzcScanIdx[iIndex];
+    iCurNonZeroCacheIdx = g_kuiCache48CountScan4Idx[iIndex];
     nA = pNonZeroCountCache[iCurNonZeroCacheIdx - 1];
     nB = pNonZeroCountCache[iCurNonZeroCacheIdx - 8];
   }

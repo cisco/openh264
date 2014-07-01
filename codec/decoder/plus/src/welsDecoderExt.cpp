@@ -393,7 +393,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
                 pDstInfo); //iErrorCode has been modified in this function
   m_pDecContext->bInstantDecFlag = false; //reset no-delay flag
   if (m_pDecContext->iErrorCode) {
-    ENalUnitType eNalType =
+    EWelsNalUnitType eNalType =
       NAL_UNIT_UNSPEC_0;	//for NBR, IDR frames are expected to decode as followed if error decoding an IDR currently
 
     eNalType	= m_pDecContext->sCurNalHead.eNalUnitType;

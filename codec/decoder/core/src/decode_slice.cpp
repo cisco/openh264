@@ -149,7 +149,7 @@ int32_t WelsMbInterSampleConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLa
   WelsChromaDcIdct (pCurLayer->pScaledTCoeff[iMbXy] + 320);	// 320 = 16*16 + 16*4
 
   for (i = 0; i < 16; i++) { //luma
-    iIndex = g_kuiMbNonZeroCountIdx[i];
+    iIndex = g_kuiMbCountScan4Idx[i];
     if (pCurLayer->pNzc[iMbXy][iIndex]) {
       iOffset = ((iIndex >> 2) << 2) * iStrideL + ((iIndex % 4) << 2);
       pCtx->pIdctResAddPredFunc (pDstY + iOffset, iStrideL, pCurLayer->pScaledTCoeff[iMbXy] + (i << 4));
@@ -157,13 +157,13 @@ int32_t WelsMbInterSampleConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLa
   }
 
   for (i = 0; i < 4; i++) { //chroma
-    iIndex = g_kuiMbNonZeroCountIdx[i + 16]; //Cb
+    iIndex = g_kuiMbCountScan4Idx[i + 16]; //Cb
     if (pCurLayer->pNzc[iMbXy][iIndex] || * (pCurLayer->pScaledTCoeff[iMbXy] + ((i + 16) << 4))) {
       iOffset = (((iIndex - 16) >> 2) << 2) * iStrideC + (((iIndex - 16) % 4) << 2);
       pCtx->pIdctResAddPredFunc (pDstU + iOffset, iStrideC, pCurLayer->pScaledTCoeff[iMbXy] + ((i + 16) << 4));
     }
 
-    iIndex = g_kuiMbNonZeroCountIdx[i + 20]; //Cr
+    iIndex = g_kuiMbCountScan4Idx[i + 20]; //Cr
     if (pCurLayer->pNzc[iMbXy][iIndex] || * (pCurLayer->pScaledTCoeff[iMbXy] + ((i + 20) << 4))) {
       iOffset = (((iIndex - 18) >> 2) << 2) * iStrideC + (((iIndex - 18) % 4) << 2);
       pCtx->pIdctResAddPredFunc (pDstV + iOffset, iStrideC , pCurLayer->pScaledTCoeff[iMbXy] + ((i + 20) << 4));
@@ -553,7 +553,7 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
 
   if (pCurLayer->pCbp[iMbXy] == 0 && IS_INTRA4x4 (pCurLayer->pMbType[iMbXy])) {
     pCurLayer->pLumaQp[iMbXy] = pSlice->iLastMbQp;
-    pCurLayer->pChromaQp[iMbXy] = g_kuiChromaQp[WELS_CLIP3 (pCurLayer->pLumaQp[iMbXy] +
+    pCurLayer->pChromaQp[iMbXy] = g_kuiChromaQpTable[WELS_CLIP3 (pCurLayer->pLumaQp[iMbXy] +
                                   pSliceHeader->pPps->iChromaQpIndexOffset, 0, 51)];
 
   }
@@ -582,7 +582,7 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
       return ERR_INFO_INVALID_QP;
     }
     pSlice->iLastMbQp = pCurLayer->pLumaQp[iMbXy];
-    pCurLayer->pChromaQp[iMbXy] = g_kuiChromaQp[WELS_CLIP3 (pSlice->iLastMbQp + pSliceHeader->pPps->iChromaQpIndexOffset, 0,
+    pCurLayer->pChromaQp[iMbXy] = g_kuiChromaQpTable[WELS_CLIP3 (pSlice->iLastMbQp + pSliceHeader->pPps->iChromaQpIndexOffset, 0,
                                   51)];
 
 
@@ -622,8 +622,8 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
             iIndex++;
           }
         } else {
-          ST16 (&pNonZeroCount[g_kuiCacheNzcScanIdx[ (iId8x8 << 2)]], 0);
-          ST16 (&pNonZeroCount[g_kuiCacheNzcScanIdx[ (iId8x8 << 2) + 2]], 0);
+          ST16 (&pNonZeroCount[g_kuiCache48CountScan4Idx[ (iId8x8 << 2)]], 0);
+          ST16 (&pNonZeroCount[g_kuiCache48CountScan4Idx[ (iId8x8 << 2) + 2]], 0);
         }
       }
       ST32A4 (&pNzc[0], LD32 (&pNonZeroCount[1 + 8 * 1]));
@@ -857,7 +857,7 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
   ST32A4 (&pNzc[20], 0);
   if (pCurLayer->pCbp[iMbXy] == 0 && !IS_INTRA16x16 (pCurLayer->pMbType[iMbXy]) && !IS_I_BL (pCurLayer->pMbType[iMbXy])) {
     pCurLayer->pLumaQp[iMbXy] = pSlice->iLastMbQp;
-    pCurLayer->pChromaQp[iMbXy] = g_kuiChromaQp[WELS_CLIP3 (pCurLayer->pLumaQp[iMbXy] +
+    pCurLayer->pChromaQp[iMbXy] = g_kuiChromaQpTable[WELS_CLIP3 (pCurLayer->pLumaQp[iMbXy] +
                                   pSliceHeader->pPps->iChromaQpIndexOffset, 0, 51)];
   }
 
@@ -885,7 +885,7 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
       return ERR_INFO_INVALID_QP;
     }
     pSlice->iLastMbQp = pCurLayer->pLumaQp[iMbXy];
-    pCurLayer->pChromaQp[iMbXy] = g_kuiChromaQp[WELS_CLIP3 (pSlice->iLastMbQp + pSliceHeader->pPps->iChromaQpIndexOffset, 0,
+    pCurLayer->pChromaQp[iMbXy] = g_kuiChromaQpTable[WELS_CLIP3 (pSlice->iLastMbQp + pSliceHeader->pPps->iChromaQpIndexOffset, 0,
                                   51)];
 
     BsStartCavlc (pBs);
@@ -924,8 +924,8 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
             iIndex++;
           }
         } else {
-          ST16 (&pNonZeroCount[g_kuiCacheNzcScanIdx[iId8x8 << 2]], 0);
-          ST16 (&pNonZeroCount[g_kuiCacheNzcScanIdx[ (iId8x8 << 2) + 2]], 0);
+          ST16 (&pNonZeroCount[g_kuiCache48CountScan4Idx[iId8x8 << 2]], 0);
+          ST16 (&pNonZeroCount[g_kuiCache48CountScan4Idx[ (iId8x8 << 2) + 2]], 0);
         }
       }
       ST32A4 (&pNzc[0], LD32 (&pNonZeroCount[1 + 8 * 1]));
@@ -1019,7 +1019,7 @@ int32_t WelsDecodeMbCavlcPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur) {
     if (!pSlice->sSliceHeaderExt.bDefaultResidualPredFlag ||
         (pNalCur->sNalHeaderExt.uiQualityId == 0 && pNalCur->sNalHeaderExt.uiDependencyId == 0)) {
       pCurLayer->pLumaQp[iMbXy] = pSlice->iLastMbQp;
-      pCurLayer->pChromaQp[iMbXy] = g_kuiChromaQp[WELS_CLIP3 (pCurLayer->pLumaQp[iMbXy] +
+      pCurLayer->pChromaQp[iMbXy] = g_kuiChromaQpTable[WELS_CLIP3 (pCurLayer->pLumaQp[iMbXy] +
                                     pSliceHeader->pPps->iChromaQpIndexOffset, 0, 51)];
     }
 
