@@ -282,7 +282,8 @@ int32_t WelsWriteMbResidual (SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux*
         iA = pNonZeroCoeffCount[iIdx - 1];
         iB = pNonZeroCoeffCount[iIdx - 8];
         WELS_NON_ZERO_COUNT_AVERAGE (iC, iA, iB);
-        WriteBlockResidualCavlc (pBlock, 14, pNonZeroCoeffCount[iIdx] > 0, LUMA_AC, iC, pBs);
+        if (WriteBlockResidualCavlc (pBlock, 14, pNonZeroCoeffCount[iIdx] > 0, LUMA_AC, iC, pBs))
+          return ENC_RETURN_VLCOVERFLOWFOUND;
         pBlock += 16;
       }
     }
@@ -301,22 +302,26 @@ int32_t WelsWriteMbResidual (SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux*
           iA = pNonZeroCoeffCount[iIdx - 1];
           iB = pNonZeroCoeffCount[iIdx - 8];
           WELS_NON_ZERO_COUNT_AVERAGE (iC, iA, iB);
-          WriteBlockResidualCavlc (pBlock, 15, kiA > 0, LUMA_4x4, iC, pBs);
+          if (WriteBlockResidualCavlc (pBlock, 15, kiA > 0, LUMA_4x4, iC, pBs))
+            return ENC_RETURN_VLCOVERFLOWFOUND;
 
           iA = kiA;
           iB = pNonZeroCoeffCount[iIdx - 7];
           WELS_NON_ZERO_COUNT_AVERAGE (iC, iA, iB);
-          WriteBlockResidualCavlc (pBlock + 16, 15, kiB > 0, LUMA_4x4, iC, pBs);
+          if (WriteBlockResidualCavlc (pBlock + 16, 15, kiB > 0, LUMA_4x4, iC, pBs))
+            return ENC_RETURN_VLCOVERFLOWFOUND;
 
           iA = pNonZeroCoeffCount[iIdx + 7];
           iB = kiA;
           WELS_NON_ZERO_COUNT_AVERAGE (iC, iA, iB);
-          WriteBlockResidualCavlc (pBlock + 32, 15, kiC > 0, LUMA_4x4, iC, pBs);
+          if (WriteBlockResidualCavlc (pBlock + 32, 15, kiC > 0, LUMA_4x4, iC, pBs))
+            return ENC_RETURN_VLCOVERFLOWFOUND;
 
           iA = kiC;
           iB = kiB;
           WELS_NON_ZERO_COUNT_AVERAGE (iC, iA, iB);
-          WriteBlockResidualCavlc (pBlock + 48, 15, kiD > 0, LUMA_4x4, iC, pBs);
+          if (WriteBlockResidualCavlc (pBlock + 48, 15, kiD > 0, LUMA_4x4, iC, pBs))
+            return ENC_RETURN_VLCOVERFLOWFOUND;
         }
         pBlock += 64;
       }
@@ -343,7 +348,8 @@ int32_t WelsWriteMbResidual (SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux*
         iA = pNonZeroCoeffCount[iIdx - 1];
         iB = pNonZeroCoeffCount[iIdx - 8];
         WELS_NON_ZERO_COUNT_AVERAGE (iC, iA, iB);
-        WriteBlockResidualCavlc (pBlock, 14, pNonZeroCoeffCount[iIdx] > 0, CHROMA_AC, iC, pBs);
+        if (WriteBlockResidualCavlc (pBlock, 14, pNonZeroCoeffCount[iIdx] > 0, CHROMA_AC, iC, pBs))
+          return ENC_RETURN_VLCOVERFLOWFOUND;
         pBlock += 16;
       }
 
@@ -354,7 +360,8 @@ int32_t WelsWriteMbResidual (SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux*
         iA = pNonZeroCoeffCount[iIdx - 1];
         iB = pNonZeroCoeffCount[iIdx - 8];
         WELS_NON_ZERO_COUNT_AVERAGE (iC, iA, iB);
-        WriteBlockResidualCavlc (pBlock, 14, pNonZeroCoeffCount[iIdx] > 0, CHROMA_AC, iC, pBs);
+        if (WriteBlockResidualCavlc (pBlock, 14, pNonZeroCoeffCount[iIdx] > 0, CHROMA_AC, iC, pBs))
+          return ENC_RETURN_VLCOVERFLOWFOUND;
         pBlock += 16;
       }
     }
