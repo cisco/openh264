@@ -258,9 +258,10 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
   int flags = 0;
   while (fgets (buf, sizeof (buf), f)) {
     if (!strncmp (buf, "Features", strlen ("Features"))) {
-      if (strstr (buf, " neon "))
+      // The asimd and fp features are listed on 64 bit ARMv8 kernels
+      if (strstr (buf, " neon ") || strstr(buf, " asimd "))
         flags |= WELS_CPU_NEON;
-      if (strstr (buf, " vfpv3 "))
+      if (strstr (buf, " vfpv3 ") || strstr(buf, " fp "))
         flags |= WELS_CPU_VFPv3;
       break;
     }
