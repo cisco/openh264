@@ -71,19 +71,22 @@ static inline void MeEndIntepelSearch (SWelsME* pMe) {
 }
 
 void WelsInitMeFunc (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag, bool bScreenContent) {
+  pFuncList->pfUpdateFMESwitch = UpdateFMESwitchNull;
+
   if (!bScreenContent) {
     pFuncList->pfCheckDirectionalMv = CheckDirectionalMvFalse;
     pFuncList->pfCalculateBlockFeatureOfFrame[0] =
       pFuncList->pfCalculateBlockFeatureOfFrame[1] = NULL;
     pFuncList->pfCalculateSingleBlockFeature[0] =
       pFuncList->pfCalculateSingleBlockFeature[1] = NULL;
-    pFuncList->pfUpdateFMESwitch = UpdateFMESwitchNull;
+
   } else {
     pFuncList->pfCheckDirectionalMv = CheckDirectionalMv;
 
     //for cross serarch
     pFuncList->pfVerticalFullSearch = LineFullSearch_c;
     pFuncList->pfHorizontalFullSearch = LineFullSearch_c;
+
 #if defined (X86_ASM)
     if (uiCpuFlag & WELS_CPU_SSE41) {
       pFuncList->pfSampleSadHor8[0] = SampleSad8x8Hor8_sse41;
@@ -99,7 +102,6 @@ void WelsInitMeFunc (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag, bool bScre
     //TODO: it is possible to differentiate width that is times of 8, so as to accelerate the speed when width is times of 8?
     pFuncList->pfCalculateSingleBlockFeature[0] = SumOf8x8SingleBlock_c;
     pFuncList->pfCalculateSingleBlockFeature[1] = SumOf16x16SingleBlock_c;
-    pFuncList->pfUpdateFMESwitch = UpdateFMESwitchNull;
   }
 }
 
@@ -129,6 +131,38 @@ void WelsMotionEstimateSearch (SWelsFuncPtrList* pFuncList, void* pLplayer, void
                               kiStrideRef);
 }
 
+void WelsMotionEstimateSearchStatic (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice) {
+  SDqLayer* pCurDqLayer      = (SDqLayer*)pLplayer;
+  SWelsME* pMe            = (SWelsME*)pLpme;
+  SSlice* pSlice          = (SSlice*)pLpslice;
+  const int32_t kiStrideEnc = pCurDqLayer->iEncStride[0];
+  const int32_t kiStrideRef = pCurDqLayer->pRefPic->iLineSize[0];
+
+  pMe->sMv.iMvX = pMe->sMv.iMvY = 0;
+  pMe->uiSadCost =
+    pFuncList->sSampleDealingFuncs.pfSampleSad[pMe->uiBlockSize] (pMe->pEncMb, kiStrideEnc, pMe->pRefMb, kiStrideRef) ;
+  pMe->uiSadCost += COST_MVD (pMe->pMvdCost, - pMe->sMvp.iMvX, - pMe->sMvp.iMvY);
+  MeEndIntepelSearch (pMe);
+  pFuncList->pfCalculateSatd (pFuncList->sSampleDealingFuncs.pfSampleSatd[pMe->uiBlockSize], pMe, kiStrideEnc,
+                              kiStrideRef);
+}
+
+void WelsMotionEstimateSearchScrolled (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice) {
+  SDqLayer* pCurDqLayer      = (SDqLayer*)pLplayer;
+  SWelsME* pMe            = (SWelsME*)pLpme;
+  SSlice* pSlice          = (SSlice*)pLpslice;
+  const int32_t kiStrideEnc = pCurDqLayer->iEncStride[0];
+  const int32_t kiStrideRef = pCurDqLayer->pRefPic->iLineSize[0];
+
+  pMe->sMv = pMe->sDirectionalMv;
+  pMe->pRefMb = pMe->pColoRefMb + pMe->sMv.iMvY * kiStrideRef + pMe->sMv.iMvX;
+  pMe->uiSadCost =
+    pFuncList->sSampleDealingFuncs.pfSampleSad[pMe->uiBlockSize] (pMe->pEncMb, kiStrideEnc, pMe->pRefMb, kiStrideRef)
+    + COST_MVD (pMe->pMvdCost, (pMe->sMv.iMvX << 2) - pMe->sMvp.iMvX, (pMe->sMv.iMvY << 2) - pMe->sMvp.iMvY);
+  MeEndIntepelSearch (pMe);
+  pFuncList->pfCalculateSatd (pFuncList->sSampleDealingFuncs.pfSampleSatd[pMe->uiBlockSize], pMe, kiStrideEnc,
+                              kiStrideRef);
+}
 /*!
  * \brief  EL mb motion estimate initial point testing
  *
@@ -456,7 +490,7 @@ void HorizontalFullSearchUsingSSE41 (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
     SMVUnitXY sBestMv;
     sBestMv.iMvX = iBestPos - kiCurMeBlockPix;
     sBestMv.iMvY = 0;
-    UpdateMeResults (sBestMv, uiBestCost, &pMe->pColoRefMb[sBestMv.iMvY], pMe);
+    UpdateMeResults (sBestMv, uiBestCost, &pMe->pColoRefMb[sBestMv.iMvX], pMe);
   }
 }
 #endif
@@ -488,7 +522,7 @@ void LineFullSearch_c (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
     SMVUnitXY sBestMv;
     sBestMv.iMvX = bVerticalSearch ? 0 : (iBestPos - kiCurMeBlockPix);
     sBestMv.iMvY = bVerticalSearch ? (iBestPos - kiCurMeBlockPix) : 0;
-    UpdateMeResults (sBestMv, uiBestCost, &pMe->pColoRefMb[sBestMv.iMvY * kiStride], pMe);
+    UpdateMeResults (sBestMv, uiBestCost, &pMe->pColoRefMb[sBestMv.iMvY * kiRefStride + sBestMv.iMvX], pMe);
   }
 }
 

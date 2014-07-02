@@ -145,8 +145,8 @@ void WelsInitMeFunc (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag, bool bScre
  * \return  NONE
  */
 void WelsMotionEstimateSearch (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice);
-
-
+void WelsMotionEstimateSearchStatic (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice);
+void WelsMotionEstimateSearchScrolled (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice);
 /*!
  * \brief  BL mb motion estimate initial point testing
  *
