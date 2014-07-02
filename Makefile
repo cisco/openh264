@@ -66,18 +66,18 @@ ifneq ($(V),Yes)
 endif
 
 
-INCLUDES = -Icodec/api/svc -Icodec/common/inc
+INCLUDES += -Icodec/api/svc -Icodec/common/inc
 
-DECODER_INCLUDES = \
+DECODER_INCLUDES += \
     -Icodec/decoder/core/inc \
     -Icodec/decoder/plus/inc
 
-ENCODER_INCLUDES = \
+ENCODER_INCLUDES += \
     -Icodec/encoder/core/inc \
     -Icodec/encoder/plus/inc \
     -Icodec/processing/interface
 
-PROCESSING_INCLUDES = \
+PROCESSING_INCLUDES += \
     -Icodec/processing/interface \
     -Icodec/processing/src/common \
     -Icodec/processing/src/scrolldetection
@@ -90,24 +90,24 @@ CODEC_UNITTEST_INCLUDES += \
     -Igtest/include \
     -Icodec/common/inc \
 
-CONSOLE_COMMON_INCLUDES = \
+CONSOLE_COMMON_INCLUDES += \
     -Icodec/console/common/inc
 
-H264DEC_INCLUDES = $(DECODER_INCLUDES) $(CONSOLE_COMMON_INCLUDES) -Icodec/console/dec/inc
+H264DEC_INCLUDES += $(DECODER_INCLUDES) $(CONSOLE_COMMON_INCLUDES) -Icodec/console/dec/inc
 H264DEC_LDFLAGS = -L. $(call LINK_LIB,decoder) $(call LINK_LIB,common) $(call LINK_LIB,console_common)
 H264DEC_DEPS = $(LIBPREFIX)decoder.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX) $(LIBPREFIX)console_common.$(LIBSUFFIX)
 
-H264ENC_INCLUDES = $(ENCODER_INCLUDES) $(CONSOLE_COMMON_INCLUDES) -Icodec/console/enc/inc
+H264ENC_INCLUDES += $(ENCODER_INCLUDES) $(CONSOLE_COMMON_INCLUDES) -Icodec/console/enc/inc
 H264ENC_LDFLAGS = -L. $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common) $(call LINK_LIB,console_common)
 H264ENC_DEPS = $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX) $(LIBPREFIX)console_common.$(LIBSUFFIX)
 
 CODEC_UNITTEST_LDFLAGS = -L. $(call LINK_LIB,gtest) $(call LINK_LIB,decoder) $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common) $(CODEC_UNITTEST_LDFLAGS_SUFFIX)
 CODEC_UNITTEST_DEPS = $(LIBPREFIX)gtest.$(LIBSUFFIX) $(LIBPREFIX)decoder.$(LIBSUFFIX) $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX)
-DECODER_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(DECODER_INCLUDES) -Itest -Itest/decoder
-ENCODER_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(ENCODER_INCLUDES) -Itest -Itest/encoder
-PROCESSING_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(PROCESSING_INCLUDES) -Itest -Itest/processing
-API_TEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) -Itest -Itest/api
-COMMON_UNITTEST_INCLUDES = $(CODEC_UNITTEST_INCLUDES) $(DECODER_INCLUDES) -Itest -Itest/common
+DECODER_UNITTEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) $(DECODER_INCLUDES) -Itest -Itest/decoder
+ENCODER_UNITTEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) $(ENCODER_INCLUDES) -Itest -Itest/encoder
+PROCESSING_UNITTEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) $(PROCESSING_INCLUDES) -Itest -Itest/processing
+API_TEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) -Itest -Itest/api
+COMMON_UNITTEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) $(DECODER_INCLUDES) -Itest -Itest/common
 MODULE_INCLUDES += -Igmp-api
 
 .PHONY: test gtest-bootstrap clean
