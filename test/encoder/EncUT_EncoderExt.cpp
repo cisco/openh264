@@ -5,13 +5,45 @@
 
 using namespace WelsSVCEnc;
 
-TEST (EncoderExtTest, SetOption) {
-  CWelsH264SVCEncoder* pPtrEnc = new CWelsH264SVCEncoder();
-  SEncParamExt* pParamExt = new SEncParamExt();
+class EncoderInterfaceTest : public ::testing::Test {
+public:
+  virtual void SetUp() {
+    pPtrEnc = new CWelsH264SVCEncoder();
+    pParamExt = new SEncParamExt();
+    pSrcPic = new SSourcePicture;
+    pOption = new SEncParamExt();
+    pYUV = NULL;
+
+    m_iWidth = 1280;
+    m_iHeight = 720;
+    m_iPicResSize =  m_iWidth * m_iHeight * 3 >> 1;
+    pYUV = new uint8_t [m_iPicResSize];
+  }
+  void TemporalLayerSettingTest();
+  virtual void TearDown() {
+    delete pPtrEnc;
+    delete pParamExt;
+    delete pOption;
+    delete pSrcPic;
+    delete []pYUV;
+  }
+public:
+  CWelsH264SVCEncoder* pPtrEnc;
+  SEncParamExt* pParamExt;
+  SSourcePicture* pSrcPic;
+  SEncParamExt* pOption;
+  uint8_t* pYUV;
+
+  int32_t m_iWidth;
+  int32_t m_iHeight;
+  int32_t m_iPicResSize;
+};
+
+void EncoderInterfaceTest::TemporalLayerSettingTest () {
 
   pParamExt->iInputCsp = 23;
-  pParamExt->iPicWidth = 1280;
-  pParamExt->iPicHeight = 720;
+  pParamExt->iPicWidth = m_iWidth;
+  pParamExt->iPicHeight = m_iHeight;
   pParamExt->iTargetBitrate = 60000;
   pParamExt->sSpatialLayers[0].iVideoHeight = pParamExt->iPicHeight;
   pParamExt->sSpatialLayers[0].iVideoWidth = pParamExt->iPicWidth;
@@ -22,33 +54,20 @@ TEST (EncoderExtTest, SetOption) {
   int32_t iResult = pPtrEnc->InitializeExt (pParamExt);
   EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
 
-  SSourcePicture* pSrcPic = new SSourcePicture;
   pSrcPic->iColorFormat = videoFormatI420;
   pSrcPic->uiTimeStamp = 0;
-  uint32_t iSourceWidth, iSourceHeight, kiPicResSize;
+  pSrcPic->iPicWidth = pParamExt->iPicWidth;
+  pSrcPic->iPicHeight = pParamExt->iPicHeight;
 
-  iSourceWidth = pSrcPic->iPicWidth = pParamExt->iPicWidth;
-  iSourceHeight = pSrcPic->iPicHeight = pParamExt->iPicHeight;
-  kiPicResSize = iSourceWidth * iSourceHeight * 3 >> 1;
-
-  uint8_t* pYUV = NULL;
-  pYUV = new uint8_t [kiPicResSize];
-  if (pYUV == NULL){
-    delete pPtrEnc;
-    delete pParamExt;
-    delete pSrcPic;
-    return;
-  }
-
-  for(int32_t i=0;i<kiPicResSize;i++)
+  for(int32_t i=0;i<m_iPicResSize;i++)
     pYUV[i]=rand()%256;
 
-  pSrcPic->iStride[0] = iSourceWidth;
+  pSrcPic->iStride[0] = m_iWidth;
   pSrcPic->iStride[1] = pSrcPic->iStride[2] = pSrcPic->iStride[0] >> 1;
 
   pSrcPic->pData[0] = pYUV;
-  pSrcPic->pData[1] = pSrcPic->pData[0] + (iSourceWidth * iSourceHeight);
-  pSrcPic->pData[2] = pSrcPic->pData[1] + (iSourceWidth * iSourceHeight >> 2);
+  pSrcPic->pData[1] = pSrcPic->pData[0] + (m_iWidth * m_iHeight);
+  pSrcPic->pData[2] = pSrcPic->pData[1] + (m_iWidth * m_iHeight >> 2);
 
   SFrameBSInfo sFbi;
   memset (&sFbi, 0, sizeof (SFrameBSInfo));
@@ -63,7 +82,6 @@ TEST (EncoderExtTest, SetOption) {
   EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
   EXPECT_EQ (sFbi.eFrameType, static_cast<int32_t> (videoFrameTypeP));
 
-  SEncParamExt* pOption = new SEncParamExt();
   memcpy (pOption, pParamExt, sizeof (SEncParamExt));
   pOption ->iTemporalLayerNum = 4;
 
@@ -93,9 +111,9 @@ TEST (EncoderExtTest, SetOption) {
   EXPECT_EQ (sFbi.eFrameType, static_cast<int32_t> (videoFrameTypeP));
 
   pPtrEnc->Uninitialize();
-  delete pPtrEnc;
-  delete pParamExt;
-  delete pOption;
-  delete pSrcPic;
-  delete []pYUV;
- }
+
+}
+
+TEST_F (EncoderInterfaceTest, TestTemporalLayerSetting) {
+  TemporalLayerSettingTest ();
+}
