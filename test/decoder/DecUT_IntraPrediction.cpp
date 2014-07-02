@@ -1,4 +1,4 @@
-#include<gtest/gtest.h>
+#include <gtest/gtest.h>
 #include "cpu.h"
 #include "cpu_core.h"
 #include "get_intra_predictor.h"

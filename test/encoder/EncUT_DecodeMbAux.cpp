@@ -1,4 +1,4 @@
-#include<gtest/gtest.h>
+#include <gtest/gtest.h>
 #include "decode_mb_aux.h"
 #include "wels_common_basis.h"
 #include "macros.h"
