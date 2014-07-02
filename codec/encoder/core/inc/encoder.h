@@ -91,12 +91,12 @@ int32_t GetTemporalLevel (SSpatialLayerInternal* fDlp, const int32_t kiFrameNum,
  * \brief	Dump reconstruction for dependency layer
  */
 
-extern "C" void DumpDependencyRec (SPicture* pSrcPic, const char* kpFileName, const int8_t kiDid);
+extern "C" void DumpDependencyRec (SPicture* pSrcPic, const char* kpFileName, const int8_t kiDid, bool bAppend);
 
 /*!
  * \brief	Dump the reconstruction pictures
  */
-void DumpRecFrame (SPicture* pSrcPic, const char* kpFileName);
+void DumpRecFrame (SPicture* pSrcPic, const char* kpFileName, bool bAppend);
 
 
 /*!

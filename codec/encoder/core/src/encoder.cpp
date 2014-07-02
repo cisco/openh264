@@ -181,7 +181,6 @@ int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* 
   InitExpandPictureFunc (& (pFuncList->sExpandPicFunc), uiCpuFlag);
 
   /* Intra_Prediction_fn*/
-  WelsInitFillingPredFuncs (uiCpuFlag);
   WelsInitIntraPredFuncs (pFuncList, uiCpuFlag);
 
   /* ME func */
@@ -201,7 +200,7 @@ int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* 
   /*init pixel average function*/
   /*get one column or row pixel when refinement*/
   WelsInitMcFuncs (pFuncList, uiCpuFlag);
-  InitCoeffFunc (uiCpuFlag);
+  InitCoeffFunc (pFuncList, uiCpuFlag);
 
   WelsInitEncodingFuncs (pFuncList, uiCpuFlag);
   WelsInitReconstructionFuncs (pFuncList, uiCpuFlag);
@@ -351,34 +350,23 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
  * \brief	Dump reconstruction for dependency layer
  */
 
-extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName, const int8_t kiDid) {
+extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName, const int8_t kiDid, bool bAppend) {
   WelsFileHandle* pDumpRecFile = NULL;
-  static bool bDependencyRecFlag[MAX_DEPENDENCY_LAYER]	= {0};
   int32_t iWrittenSize											= 0;
+  const char* openMode = bAppend ? "ab" : "wb";
 
   if (NULL == pCurPicture || NULL == kpFileName || kiDid >= MAX_DEPENDENCY_LAYER)
     return;
 
-  if (bDependencyRecFlag[kiDid]) {
-    if (strlen (kpFileName) > 0)	// confirmed_safe_unsafe_usage
-      pDumpRecFile = WelsFopen (kpFileName, "ab");
-    else {
-      char sDependencyRecFileName[16] = {0};
-      WelsSnprintf (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-      pDumpRecFile	= WelsFopen (sDependencyRecFileName, "ab");
-    }
-    if (NULL != pDumpRecFile)
-      WelsFseek (pDumpRecFile, 0, SEEK_END);
-  } else {
-    if (strlen (kpFileName) > 0) {	// confirmed_safe_unsafe_usage
-      pDumpRecFile	= WelsFopen (kpFileName, "wb");
-    } else {
-      char sDependencyRecFileName[16] = {0};
-      WelsSnprintf (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-      pDumpRecFile	= WelsFopen (sDependencyRecFileName, "wb");
-    }
-    bDependencyRecFlag[kiDid]	= true;
+  if (strlen (kpFileName) > 0)	// confirmed_safe_unsafe_usage
+    pDumpRecFile = WelsFopen (kpFileName, openMode);
+  else {
+    char sDependencyRecFileName[16] = {0};
+    WelsSnprintf (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
+    pDumpRecFile	= WelsFopen (sDependencyRecFileName, openMode);
   }
+  if (NULL != pDumpRecFile && bAppend)
+    WelsFseek (pDumpRecFile, 0, SEEK_END);
 
   if (NULL != pDumpRecFile) {
     int32_t i = 0;
@@ -419,30 +407,21 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName
  * \brief	Dump the reconstruction pictures
  */
 
-void DumpRecFrame (SPicture* pCurPicture, const char* kpFileName) {
+void DumpRecFrame (SPicture* pCurPicture, const char* kpFileName, bool bAppend) {
   WelsFileHandle* pDumpRecFile				= NULL;
-  static bool bRecFlag	= false;
   int32_t iWrittenSize			= 0;
+  const char* openMode = bAppend ? "ab" : "wb";
 
   if (NULL == pCurPicture || NULL == kpFileName)
     return;
 
-  if (bRecFlag) {
-    if (strlen (kpFileName) > 0) {	// confirmed_safe_unsafe_usage
-      pDumpRecFile	= WelsFopen (kpFileName, "ab");
-    } else {
-      pDumpRecFile	= WelsFopen ("rec.yuv", "ab");
-    }
-    if (NULL != pDumpRecFile)
-      WelsFseek (pDumpRecFile, 0, SEEK_END);
+  if (strlen (kpFileName) > 0) {	// confirmed_safe_unsafe_usage
+    pDumpRecFile	= WelsFopen (kpFileName, openMode);
   } else {
-    if (strlen (kpFileName) > 0) {	// confirmed_safe_unsafe_usage
-      pDumpRecFile	= WelsFopen (kpFileName, "wb");
-    } else {
-      pDumpRecFile	= WelsFopen ("rec.yuv", "wb");
-    }
-    bRecFlag	= true;
+    pDumpRecFile	= WelsFopen ("rec.yuv", openMode);
   }
+  if (NULL != pDumpRecFile && bAppend)
+    WelsFseek (pDumpRecFile, 0, SEEK_END);
 
   if (NULL != pDumpRecFile) {
     int32_t i = 0;

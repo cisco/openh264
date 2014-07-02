@@ -14,8 +14,6 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredV) {
     pRef[i] = rand() % 256;
 
   const int32_t kkiStride = 0;
-  const uint32_t kuiCpuFlag = 0;
-  WelsInitFillingPredFuncs (kuiCpuFlag);
   WelsI4x4LumaPredV_c (pPred, pRef, kkiStride);
 
   for (int i = 0; i < 4; i++)
@@ -47,15 +45,12 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredH) {
   const uint8_t kuiV3[4] = {kuiH3, kuiH3, kuiH3, kuiH3};
   const uint8_t kuiV4[4] = {kuiH4, kuiH4, kuiH4, kuiH4};
 
-  const uint32_t kuiCpuFlag = 0;
-
   ENFORCE_STACK_ALIGN_1D (uint8_t, uiV, 16, 16) // TobeCont'd about assign opt as follows
   ST32 (&uiV[0], LD32 (kuiV1));
   ST32 (&uiV[4], LD32 (kuiV2));
   ST32 (&uiV[8], LD32 (kuiV3));
   ST32 (&uiV[12], LD32 (kuiV4));
 
-  WelsInitFillingPredFuncs (kuiCpuFlag);
   WelsI4x4LumaPredH_c (pPred, pRef, kiStride);
 
   for (int i = 0; i < 4; i++)
@@ -99,8 +94,6 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredDDL) {
   uiV[11] = uiV[14] = kuiDDL5;
   uiV[15] = kuiDDL6;
 
-  const uint32_t kuiCpuFlag = 0;
-  WelsInitFillingPredFuncs (kuiCpuFlag);
   WelsI4x4LumaPredDDL_c (pPred, pRef, kiStride);
 
   for (int i = 0; i < 4; i++)
@@ -133,8 +126,6 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredDDLTop) {
   uiV[2] = uiV[5] = uiV[8] = kuiDLT2;
   uiV[3] = kuiDLT3;
 
-  const uint32_t kuiCpuFlag = 0;
-  WelsInitFillingPredFuncs (kuiCpuFlag);
   WelsI4x4LumaPredDDLTop_c (pPred, pRef, kiStride);
 
   for (int i = 0; i < 4; i++)
@@ -190,8 +181,6 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredDDR) {
   uiV[8] = uiV[13] = kuiDDR5;
   uiV[12] = kuiDDR6;
 
-  const uint32_t kuiCpuFlag = 0;
-  WelsInitFillingPredFuncs (kuiCpuFlag);
   WelsI4x4LumaPredDDR_c (pPred, pRef, kiStride);
 
   for (int i = 0; i < 4; i++)
@@ -240,8 +229,6 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredVL) {
   uiV[11] = kuiVL4;
   uiV[15] = kuiVL9;
 
-  const uint32_t kuiCpuFlag = 0;
-  WelsInitFillingPredFuncs (kuiCpuFlag);
   WelsI4x4LumaPredVL_c (pPred, pRef, kiStride);
 
   for (int i = 0; i < 4; i++)
@@ -285,8 +272,6 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredVLTop) {
   uiV[6] = uiV[13] = kuiVLT6;
   uiV[7] = uiV[14] = uiV[15] = kuiVLT7;
 
-  const uint32_t kuiCpuFlag = 0;
-  WelsInitFillingPredFuncs (kuiCpuFlag);
   WelsI4x4LumaPredVLTop_c (pPred, pRef, kiStride);
 
   for (int i = 0; i < 4; i++)
@@ -340,8 +325,6 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredVR) {
   uiV[8] = kuiVR8;
   uiV[12] = kuiVR9;
 
-  const uint32_t kuiCpuFlag = 0;
-  WelsInitFillingPredFuncs (kuiCpuFlag);
   WelsI4x4LumaPredVR_c (pPred, pRef, kiStride);
 
   for (int i = 0; i < 4; i++)
@@ -388,8 +371,6 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredHU) {
   uiV[7] = uiV[9] = kuiHU5;
   memset (&uiV[10], kuiL3, 6 * sizeof (uint8_t));
 
-  const uint32_t kuiCpuFlag = 0;
-  WelsInitFillingPredFuncs (kuiCpuFlag);
   WelsI4x4LumaPredHU_c (pPred, pRef, kiStride);
 
   for (int i = 0; i < 4; i++)
@@ -444,8 +425,6 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredHD) {
   uiV[12] = kuiHD8;
   uiV[13] = kuiHD9;
 
-  const uint32_t kuiCpuFlag = 0;
-  WelsInitFillingPredFuncs (kuiCpuFlag);
   WelsI4x4LumaPredHD_c (pPred, pRef, kiStride);
 
   for (int i = 0; i < 4; i++)

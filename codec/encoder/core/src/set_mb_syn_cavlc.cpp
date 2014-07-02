@@ -44,7 +44,6 @@
 #include "wels_const.h"
 
 namespace WelsSVCEnc {
-SCoeffFunc    sCoeffFunc;
 
 const  ALIGNED_DECLARE (uint8_t, g_kuiZeroLeftMap[16], 16) = {
   0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7
@@ -74,7 +73,8 @@ int32_t CavlcParamCal_c (int16_t* pCoffLevel, uint8_t* pRun, int16_t* pLevel, in
   return iTotalZeros;
 }
 
-int32_t  WriteBlockResidualCavlc (int16_t* pCoffLevel, int32_t iEndIdx, int32_t iCalRunLevelFlag,
+int32_t  WriteBlockResidualCavlc (SWelsFuncPtrList* pFuncList, int16_t* pCoffLevel, int32_t iEndIdx,
+                                  int32_t iCalRunLevelFlag,
                                   int32_t iResidualProperty, int8_t iNC, SBitStringAux* pBs) {
   ENFORCE_STACK_ALIGN_1D (int16_t, iLevel, 16, 16)
   ENFORCE_STACK_ALIGN_1D (uint8_t, uiRun, 16, 16)
@@ -95,7 +95,7 @@ int32_t  WriteBlockResidualCavlc (int16_t* pCoffLevel, int32_t iEndIdx, int32_t 
 
   if (iCalRunLevelFlag) {
     int32_t iCount = 0;
-    iTotalZeros = sCoeffFunc.pfCavlcParamCal (pCoffLevel, uiRun, iLevel, &iTotalCoeffs, iEndIdx);
+    iTotalZeros = pFuncList->pfCavlcParamCal (pCoffLevel, uiRun, iLevel, &iTotalCoeffs, iEndIdx);
     iCount = (iTotalCoeffs > 3) ? 3 : iTotalCoeffs;
     for (i = 0; i < iCount ; i++) {
       if (WELS_ABS (iLevel[i]) == 1) {
@@ -200,12 +200,12 @@ int32_t  WriteBlockResidualCavlc (int16_t* pCoffLevel, int32_t iEndIdx, int32_t 
 }
 
 
-void InitCoeffFunc (const uint32_t uiCpuFlag) {
-  sCoeffFunc.pfCavlcParamCal = CavlcParamCal_c;
+void InitCoeffFunc (SWelsFuncPtrList* pFuncList, const uint32_t uiCpuFlag) {
+  pFuncList->pfCavlcParamCal = CavlcParamCal_c;
 
 #if defined(X86_ASM)
   if (uiCpuFlag & WELS_CPU_SSE2) {
-    // sCoeffFunc.pfCavlcParamCal = CavlcParamCal_sse2;
+    // pFuncList->pfCavlcParamCal = CavlcParamCal_sse2;
   }
 #endif
 }
