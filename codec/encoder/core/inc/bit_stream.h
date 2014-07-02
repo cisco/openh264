@@ -43,11 +43,11 @@ namespace WelsSVCEnc {
  *	auxiliary struct for bit-stream reading / writing
  */
 typedef struct TagBitStringAux {
-uint8_t*		pBuf;		// pBuffer to start position
-uint8_t*		pBufEnd;	// pBuffer + length
-uint8_t*		pBufPtr;	// current writing position
-uint32_t    uiCurBits;
-int32_t		iLeftBits;	// count number of available bits left ([1, 8]),
+  uint8_t*		pBuf;		// pBuffer to start position
+  uint8_t*		pBufEnd;	// pBuffer + length
+  uint8_t*		pBufPtr;	// current writing position
+  uint32_t    uiCurBits;
+  int32_t		iLeftBits;	// count number of available bits left ([1, 8]),
 // need pointer to next byte start position in case 0 bit left then 8 instead
 } SBitStringAux;
 
@@ -61,15 +61,15 @@ int32_t		iLeftBits;	// count number of available bits left ([1, 8]),
  * \return	iSize of pBuffer pData in byte; failed in -1 return
  */
 static inline int32_t InitBits (SBitStringAux* pBs, const uint8_t* kpBuf, const int32_t kiSize) {
-uint8_t* ptr = (uint8_t*)kpBuf;
+  uint8_t* ptr = (uint8_t*)kpBuf;
 
-pBs->pBuf			= ptr;
-pBs->pBufPtr		= ptr;
-pBs->pBufEnd		= ptr + kiSize;
-pBs->iLeftBits	= 32;
-pBs->uiCurBits = 0;
+  pBs->pBuf			= ptr;
+  pBs->pBufPtr		= ptr;
+  pBs->pBufEnd		= ptr + kiSize;
+  pBs->iLeftBits	= 32;
+  pBs->uiCurBits = 0;
 
-return kiSize;
+  return kiSize;
 }
 
 }

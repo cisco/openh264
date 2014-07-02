@@ -64,11 +64,31 @@ void WelsMdSpatialelInterMbIlfmdNoilp (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, S
 void WelsMdInterMbEnhancelayer (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache);
 SMB* GetRefMb (SDqLayer* pCurLayer, SMB* pCurMb);
 void SetMvBaseEnhancelayer (SWelsMD* pMd, SMB* pCurMb, const SMB* kpRefMb);
+
+//////////////
+// MD from background detection
+//////////////
+bool WelsMdInterJudgeBGDPskip (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
+                               bool* bKeepSkip);
+bool WelsMdInterJudgeBGDPskipFalse (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
+                                    bool* bKeepSkip);
+
+void WelsMdInterUpdateBGDInfo (SDqLayer* pCurLayer,  SMB* pCurMb, const bool kbCollocatedPredFlag,
+                               const int32_t kiRefPictureType);
+void WelsMdInterUpdateBGDInfoNULL (SDqLayer* pCurLayer,  SMB* pCurMb, const bool kbCollocatedPredFlag,
+                                   const int32_t kiRefPictureType);
+
+//////////////
+// MD for screen contents
+//////////////
 bool MdInterSCDPskipProcess (sWelsEncCtx* pEncCtx, SWelsMD* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
                              ESkipModes eSkipMode);
-
 typedef bool (*pJudgeSkipFun) (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWelsMD* pWelsMd);
 void SetBlockStaticIdcToMd (void* pVaa, void* pMd, SMB* pCurMb, void* pDqLay);
+void WelsInitSCDPskipFunc (SWelsFuncPtrList* pFuncList, const bool bScrollingDetection);
+
+void SetScrollingMvToMd (void* pVaa, void* pWelsMd);
+void SetScrollingMvToMdNull (void* pVaa, void* pWelsMd);
 }
 #endif //SVC_MODE_DECISION_H
 

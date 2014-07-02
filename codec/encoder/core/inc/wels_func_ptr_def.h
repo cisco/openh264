@@ -132,6 +132,7 @@ typedef void (*PInterMdBackgroundInfoUpdateFunc) (SDqLayer* pCurLayer,  SMB* pCu
 
 typedef bool (*PInterMdScrollingPSkipDecisionFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb,
     SMbCache* pMbCache);
+typedef void (*PSetScrollingMv) (void* pVaa, void* pMd);
 
 typedef void (*PInterMdFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache);
 
@@ -208,6 +209,7 @@ struct TagWelsFuncPointerList {
   PInterMdBackgroundInfoUpdateFunc      pfInterMdBackgroundInfoUpdate;
 
   PInterMdScrollingPSkipDecisionFunc pfSCDPSkipDecision;
+  PSetScrollingMv pfSetScrollingMv;
 
   SMcFunc                sMcFuncs;
   SSampleDealingFunc     sSampleDealingFuncs;
