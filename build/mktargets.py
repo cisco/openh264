@@ -20,9 +20,6 @@ INCLUDE=[]
 OUTFILE="targets.mk"
 CPP_SUFFIX=".cpp"
 
-def make_o(x):
-    return os.path.splitext(x)[0] + ".$(OBJ)"
-
 def write_cpp_rule_pattern(f):
     src = "$(%s_SRCDIR)/%%%s"%(PREFIX, CPP_SUFFIX)
     dst = "$(%s_SRCDIR)/%%.$(OBJ)"%(PREFIX)
