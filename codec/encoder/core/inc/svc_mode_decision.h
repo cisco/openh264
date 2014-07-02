@@ -68,8 +68,10 @@ void SetMvBaseEnhancelayer (SWelsMD* pMd, SMB* pCurMb, const SMB* kpRefMb);
 //////////////
 // MD from background detection
 //////////////
-bool WelsMdInterJudgeBGDPskip (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
+bool WelsMdInterJudgeBGDPskipCamera (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
                                bool* bKeepSkip);
+bool WelsMdInterJudgeBGDPskipScreen (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
+                                     bool* bKeepSkip);
 bool WelsMdInterJudgeBGDPskipFalse (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
                                     bool* bKeepSkip);
 

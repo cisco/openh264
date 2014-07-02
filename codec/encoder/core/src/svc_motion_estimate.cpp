@@ -134,7 +134,6 @@ void WelsMotionEstimateSearch (SWelsFuncPtrList* pFuncList, void* pLplayer, void
 void WelsMotionEstimateSearchStatic (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice) {
   SDqLayer* pCurDqLayer      = (SDqLayer*)pLplayer;
   SWelsME* pMe            = (SWelsME*)pLpme;
-  SSlice* pSlice          = (SSlice*)pLpslice;
   const int32_t kiStrideEnc = pCurDqLayer->iEncStride[0];
   const int32_t kiStrideRef = pCurDqLayer->pRefPic->iLineSize[0];
 
@@ -150,7 +149,6 @@ void WelsMotionEstimateSearchStatic (SWelsFuncPtrList* pFuncList, void* pLplayer
 void WelsMotionEstimateSearchScrolled (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice) {
   SDqLayer* pCurDqLayer      = (SDqLayer*)pLplayer;
   SWelsME* pMe            = (SWelsME*)pLpme;
-  SSlice* pSlice          = (SSlice*)pLpslice;
   const int32_t kiStrideEnc = pCurDqLayer->iEncStride[0];
   const int32_t kiStrideRef = pCurDqLayer->pRefPic->iLineSize[0];
 
