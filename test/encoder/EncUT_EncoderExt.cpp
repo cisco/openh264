@@ -71,7 +71,6 @@ void EncoderInterfaceTest::TemporalLayerSettingTest () {
 
   SFrameBSInfo sFbi;
   memset (&sFbi, 0, sizeof (SFrameBSInfo));
-  EXPECT_EQ (sFbi.eFrameType, static_cast<int32_t> (videoFrameTypeInvalid));
 
   iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
   EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
