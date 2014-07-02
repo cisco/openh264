@@ -430,7 +430,6 @@
 					"$(inherited)",
 					"/Applications/Xcode\\ 5.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
 					"\"$(SRCROOT)/../../../../api/svc\"",
-					"\"$(SRCROOT)/../../../../common\"",
 					"\"$(SRCROOT)/../../../../processing/interface\"",
 					"\"$(SRCROOT)/../../../../encoder/core/inc\"",
 				);
@@ -471,7 +470,6 @@
 					"$(inherited)",
 					"/Applications/Xcode\\ 5.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
 					"\"$(SRCROOT)/../../../../api/svc\"",
-					"\"$(SRCROOT)/../../../../common\"",
 					"\"$(SRCROOT)/../../../../processing/interface\"",
 					"\"$(SRCROOT)/../../../../encoder/core/inc\"",
 				);
