@@ -261,6 +261,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
     assert (!frameTypes.empty());
     if (frameTypes.empty()) {
       GMPLOG (GL_ERROR, "No frame types provided");
+      inputImage->Destroy();
       return GMPVideoGenericErr;
     }
 
@@ -366,6 +367,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
     GMPVideoErr err = host_->CreateFrame (kGMPEncodedVideoFrame, &ftmp);
     if (err != GMPVideoNoErr) {
       GMPLOG (GL_ERROR, "Error creating encoded frame");
+      frame->Destroy();
       return;
     }
 
@@ -389,6 +391,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
     if (err != GMPVideoNoErr) {
       GMPLOG (GL_ERROR, "Error allocating frame data");
       f->Destroy();
+      frame->Destroy();
       return;
     }
 
