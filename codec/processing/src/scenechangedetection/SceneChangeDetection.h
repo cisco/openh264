@@ -50,8 +50,9 @@
 #include "common.h"
 
 #define HIGH_MOTION_BLOCK_THRESHOLD 320
-#define SCENE_CHANGE_MOTION_RATIO_LARGE   0.85f
+#define SCENE_CHANGE_MOTION_RATIO_LARGE_VIDEO   0.85f
 #define SCENE_CHANGE_MOTION_RATIO_MEDIUM  0.50f
+#define SCENE_CHANGE_MOTION_RATIO_LARGE_SCREEN    0.80f
 
 WELSVP_NAMESPACE_BEGIN
 
@@ -81,6 +82,9 @@ class CSceneChangeDetectorVideo {
       m_pfSad = WelsProcessingSampleSad8x8_neon;
     }
 #endif
+
+    m_fSceneChangeMotionRatioLarge = SCENE_CHANGE_MOTION_RATIO_LARGE_VIDEO;
+    m_fSceneChangeMotionRatioMedium = SCENE_CHANGE_MOTION_RATIO_MEDIUM;
   }
   virtual ~CSceneChangeDetectorVideo() {
   }
@@ -106,15 +110,25 @@ class CSceneChangeDetectorVideo {
       pCurY += iCurRowStride;
     }
   }
+  float  GetSceneChangeMotionRatioLarge() const {
+    return m_fSceneChangeMotionRatioLarge;
+  }
+  float  GetSceneChangeMotionRatioMedium() const {
+    return m_fSceneChangeMotionRatioMedium;
+  }
  protected:
   SadFuncPtr m_pfSad;
   SSceneChangeResult& m_sParam;
+  float    m_fSceneChangeMotionRatioLarge;
+  float    m_fSceneChangeMotionRatioMedium;
 };
 
 class CSceneChangeDetectorScreen : public CSceneChangeDetectorVideo {
  public:
   CSceneChangeDetectorScreen (SSceneChangeResult& sParam, int32_t iCpuFlag) : CSceneChangeDetectorVideo (sParam,
         iCpuFlag) {
+    m_fSceneChangeMotionRatioLarge = SCENE_CHANGE_MOTION_RATIO_LARGE_SCREEN;
+    m_fSceneChangeMotionRatioMedium = SCENE_CHANGE_MOTION_RATIO_MEDIUM;
   }
   virtual ~CSceneChangeDetectorScreen() {
   }
@@ -195,9 +209,9 @@ class CSceneChangeDetection : public IStrategy {
 
     int32_t iBlock8x8Num = m_sLocalParam.iBlock8x8Width * m_sLocalParam.iBlock8x8Height;
     int32_t iSceneChangeThresholdLarge = WelsStaticCast (int32_t,
-                                         SCENE_CHANGE_MOTION_RATIO_LARGE * iBlock8x8Num + 0.5f + PESN);
+                                         m_cDetector.GetSceneChangeMotionRatioLarge() * iBlock8x8Num + 0.5f + PESN);
     int32_t iSceneChangeThresholdMedium	= WelsStaticCast (int32_t,
-                                          SCENE_CHANGE_MOTION_RATIO_MEDIUM * iBlock8x8Num + 0.5f + PESN);
+                                          m_cDetector.GetSceneChangeMotionRatioMedium() * iBlock8x8Num + 0.5f + PESN);
 
     m_sSceneChangeParam.iMotionBlockNum = 0;
     m_sSceneChangeParam.iFrameComplexity = 0;
