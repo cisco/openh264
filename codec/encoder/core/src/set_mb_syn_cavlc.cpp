@@ -203,9 +203,9 @@ int32_t  WriteBlockResidualCavlc (SWelsFuncPtrList* pFuncList, int16_t* pCoffLev
 void InitCoeffFunc (SWelsFuncPtrList* pFuncList, const uint32_t uiCpuFlag) {
   pFuncList->pfCavlcParamCal = CavlcParamCal_c;
 
-#if defined(X86_ASM)
+#if defined(X86_32_ASM)
   if (uiCpuFlag & WELS_CPU_SSE2) {
-    // pFuncList->pfCavlcParamCal = CavlcParamCal_sse2;
+    pFuncList->pfCavlcParamCal = CavlcParamCal_sse2;
   }
 #endif
 }
