@@ -137,13 +137,9 @@ int32_t InitPic (const void* kpSrc, const int32_t kiColorspace, const int32_t ki
 }
 
 
-void WelsInitBGDFunc (SWelsFuncPtrList* pFuncList, const bool kbEnableBackgroundDetection, const bool kbScreenContent) {
+void WelsInitBGDFunc (SWelsFuncPtrList* pFuncList, const bool kbEnableBackgroundDetection) {
   if (kbEnableBackgroundDetection) {
-    if (!kbScreenContent) {
-      pFuncList->pfInterMdBackgroundDecision = WelsMdInterJudgeBGDPskipCamera;
-    } else {
-      pFuncList->pfInterMdBackgroundDecision = WelsMdInterJudgeBGDPskipScreen;
-    }
+    pFuncList->pfInterMdBackgroundDecision = WelsMdInterJudgeBGDPskip;
     pFuncList->pfInterMdBackgroundInfoUpdate = WelsMdInterUpdateBGDInfo;
   } else {
     pFuncList->pfInterMdBackgroundDecision = WelsMdInterJudgeBGDPskipFalse;
@@ -195,7 +191,7 @@ int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* 
   WelsInitSampleSadFunc (pFuncList, uiCpuFlag);
 
   //
-  WelsInitBGDFunc (pFuncList, pParam->bEnableBackgroundDetection, bScreenContent);
+  WelsInitBGDFunc (pFuncList, pParam->bEnableBackgroundDetection);
   WelsInitSCDPskipFunc (pFuncList, bScreenContent && (pParam->bEnableSceneChangeDetect));
 
   // for pfGetVarianceFromIntraVaa function ptr adaptive by CPU features, 6/7/2010

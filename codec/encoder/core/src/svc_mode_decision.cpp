@@ -214,40 +214,8 @@ bool CheckChromaCost (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMbCache* pMbCache
   return (!bChromaCostCannotSkip && !bChromaTooLarge);
 }
 
-bool WelsMdInterJudgeBGDPskipCamera (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
-                                     bool* bKeepSkip) {
-  sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
-  SWelsMD* pWelsMd = (SWelsMD*)pMd;
-
-  SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
-
-  const int32_t kiRefMbQp = pCurDqLayer->pRefPic->pRefMbQp[pCurMb->iMbXY];
-  const int32_t kiCurMbQp = pCurMb->uiLumaQp;// unsigned -> signed
-  int8_t*	pVaaBgMbFlag = pEncCtx->pVaa->pVaaBackgroundMbFlag + pCurMb->iMbXY;
-
-  const int32_t kiMbWidth = pCurDqLayer->iMbWidth;
-
-  *bKeepSkip = (*bKeepSkip) &&
-               ((!pVaaBgMbFlag[-1]) &&
-                (!pVaaBgMbFlag[-kiMbWidth]) &&
-                (!pVaaBgMbFlag[-kiMbWidth + 1]));
-
-  if (
-    *pVaaBgMbFlag
-    && !IS_INTRA (pMbCache->uiRefMbType)
-    && (kiRefMbQp - kiCurMbQp <= DELTA_QP_BGD_THD || kiRefMbQp <= 26)
-  ) {
-    SMVUnitXY	sVaaPredSkipMv = { 0 };
-    PredSkipMv (pMbCache, &sVaaPredSkipMv);
-    WelsMdBackgroundMbEnc (pEncCtx, pWelsMd, pCurMb, pMbCache, pSlice, (LD32 (&sVaaPredSkipMv) == 0));
-    return true;
-  }
-
-  return false;
-}
-
-//01/17/2013. USE the NEW BGD Pskip with COLOR CHECK for screen content because of color artifact seen in test
-bool WelsMdInterJudgeBGDPskipScreen (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
+//01/17/2013. USE the NEW BGD Pskip with COLOR CHECK for screen content and camera because of color artifact seen in test
+bool WelsMdInterJudgeBGDPskip (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
                                      bool* bKeepSkip) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   SWelsMD* pWelsMd = (SWelsMD*)pMd;
