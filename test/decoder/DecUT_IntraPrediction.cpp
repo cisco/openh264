@@ -391,15 +391,15 @@ if (ASM) { \
 } \
 while(iRunTimes--) {\
 for (int i = 0; i < 17; i ++) {\
-  pRefBuffer[i] = pPredBuffer[i] = rand() & 255; \
-  pRefBuffer[i * kiStride - 1] = pPredBuffer[i * kiStride - 1] = rand() & 255; \
+  pRefBuffer[kiStride + i] = pPredBuffer[kiStride + i] = rand() & 255; \
+  pRefBuffer[(i+1) * kiStride - 1] = pPredBuffer[(i+1) * kiStride - 1] = rand() & 255; \
 }\
-pred(&pPredBuffer[kiStride], kiStride); \
-ref(&pRefBuffer[kiStride], kiStride); \
+pred(&pPredBuffer[2*kiStride], kiStride); \
+ref(&pRefBuffer[2*kiStride], kiStride); \
 bool ok = true; \
 for (int i = 0; i < 8; i ++)\
   for(int j = 0; j < 8; j ++)\
-    if (pPredBuffer[(i+1) * kiStride + j] != pRefBuffer[(i+1) * kiStride + j]) {\
+    if (pPredBuffer[(i+2) * kiStride + j] != pRefBuffer[(i+2) * kiStride + j]) {\
       ok = false; \
       break; \
     } \
@@ -528,15 +528,15 @@ if (ASM) { \
 }\
 while(iRunTimes--) {\
 for (int i = 0; i < 17; i ++) {\
-  pRefBuffer[i] = pPredBuffer[i] = rand() & 255; \
-  pRefBuffer[i * kiStride - 1] = pPredBuffer[i * kiStride - 1] = rand() & 255; \
+  pRefBuffer[kiStride + i] = pPredBuffer[kiStride + i] = rand() & 255; \
+  pRefBuffer[(i+1) * kiStride - 1] = pPredBuffer[(i+1) * kiStride - 1] = rand() & 255; \
 }\
-pred(&pPredBuffer[kiStride], kiStride); \
-ref(&pRefBuffer[kiStride], kiStride); \
+pred(&pPredBuffer[2*kiStride], kiStride); \
+ref(&pRefBuffer[2*kiStride], kiStride); \
 bool ok = true; \
 for (int i = 0; i < 16; i ++)\
   for(int j = 0; j < 16; j ++)\
-    if (pPredBuffer[(i+1) * kiStride + j] != pRefBuffer[(i+1) * kiStride + j]) {\
+    if (pPredBuffer[(i+2) * kiStride + j] != pRefBuffer[(i+2) * kiStride + j]) {\
       ok = false; \
       break; \
     } \
