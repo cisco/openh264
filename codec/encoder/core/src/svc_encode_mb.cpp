@@ -304,7 +304,7 @@ void    WelsEncRecUV (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCac
   }
 
   if (uiNoneZeroCountMbDc > 0) {
-    WelsDequantIHadamard2x2Dc (aDct2x2, g_kuiDequantCoeff[kiQp][0] >> 1);
+    WelsDequantIHadamard2x2Dc (aDct2x2, g_kuiDequantCoeff[kiQp][0]);
     if (2 != (pCurMb->uiCbp >> 4))
       pCurMb->uiCbp |= (0x01 << 4) ;
     pRes[0]	= aDct2x2[0];
