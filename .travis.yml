@@ -9,15 +9,7 @@ install:
   - make gmp-bootstrap
   - make gtest-bootstrap
 script:
-  - make -B ENABLE64BIT=Yes
-  - make -B ENABLE64BIT=Yes plugin
-  - make -B ENABLE64BIT=Yes test
-  - make -B ENABLE64BIT=Yes BUILDTYPE=Debug
-  - make -B ENABLE64BIT=Yes BUILDTYPE=Debug plugin
-  - make -B ENABLE64BIT=Yes test
-  - make -B ENABLE64BIT=No
-  - make -B ENABLE64BIT=No plugin
-  - make -B ENABLE64BIT=No test
-  - make -B ENABLE64BIT=No BUILDTYPE=Debug
-  - make -B ENABLE64BIT=No BUILDTYPE=Debug plugin
-  - make -B ENABLE64BIT=No test
+  - make -B ENABLE64BIT=Yes BUILDTYPE=Release all plugin test
+  - make -B ENABLE64BIT=Yes BUILDTYPE=Debug all plugin test
+  - make -B ENABLE64BIT=No BUILDTYPE=Release all plugin test
+  - make -B ENABLE64BIT=No BUILDTYPE=Debug all plugin test
