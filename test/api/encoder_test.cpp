@@ -81,7 +81,7 @@ static const EncodeFileParam kFileParamArray[] = {
   },
   {
     "res/Static_152_100.yuv",
-    "83db4c0e3006bbe039bd327b6e78c57fbb05316f", CAMERA_VIDEO_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1
+    "02bbff550ee0630e44e46e14dc459d3686f2a360", CAMERA_VIDEO_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1
   },
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
@@ -97,7 +97,7 @@ static const EncodeFileParam kFileParamArray[] = {
   },
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    "6df1ece77c0de63cdf8ab52ccef3a7d139022717", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1
+    "f4377e3d23748d5f997cd286bc71cc75fbc72013", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1
   },
   {
     "res/CiscoVT2people_320x192_12fps.yuv",

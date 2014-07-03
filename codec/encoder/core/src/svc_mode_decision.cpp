@@ -160,8 +160,63 @@ void SetMvBaseEnhancelayer (SWelsMD* pMd, SMB* pCurMb, const SMB* kpRefMb) {
 //////
 //  try the BGD Pskip
 //////
+inline int32_t GetChromaCost (PSampleSadSatdCostFunc* pCalculateFunc,
+                              uint8_t* pSrcChroma, int32_t iSrcStride, uint8_t* pRefChroma, int32_t iRefStride) {
+  return pCalculateFunc[BLOCK_8x8] (pSrcChroma, iSrcStride, pRefChroma, iRefStride);
+}
+inline bool IsCostLessEqualSkipCost (int32_t iCurCost, const int32_t iPredPskipSad, const int32_t iRefMbType,
+                                     const SPicture* pRef, const int32_t iMbXy,  const int32_t iSmallestInvisibleTh) {
+  return ((iPredPskipSad > iSmallestInvisibleTh && iCurCost >= iPredPskipSad)  ||
+          (pRef->iPictureType == P_SLICE     &&
+           iRefMbType == MB_TYPE_SKIP    &&
+           pRef->pMbSkipSad[iMbXy] > iSmallestInvisibleTh &&
+           iCurCost >= (pRef->pMbSkipSad[iMbXy])));
+}
+bool CheckChromaCost (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMbCache* pMbCache, const int32_t iCurMbXy) {
+#define KNOWN_CHROMA_TOO_LARGE 640
+#define SMALLEST_INVISIBLE 128 //2*64, 2 in pixel maybe the smallest not visible for luma
+
+  PSampleSadSatdCostFunc* pSad = pEncCtx->pFuncList->sSampleDealingFuncs.pfSampleSad;
+  SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
+
+  uint8_t* pCbEnc = pMbCache->SPicData.pEncMb[1];
+  uint8_t* pCrEnc = pMbCache->SPicData.pEncMb[2];
+  uint8_t* pCbRef	 = pMbCache->SPicData.pRefMb[1];
+  uint8_t* pCrRef = pMbCache->SPicData.pRefMb[2];
+
+  const int32_t iCbEncStride         = pCurDqLayer->iEncStride[1];
+  const int32_t iCrEncStride          = pCurDqLayer->iEncStride[2];
+  const int32_t iChromaRefStride	= pCurDqLayer->pRefPic->iLineSize[1];
+
+  const int32_t iCbSad = GetChromaCost (pSad, pCbEnc, iCbEncStride, pCbRef, iChromaRefStride);
+  const int32_t iCrSad = GetChromaCost (pSad, pCrEnc, iCrEncStride, pCrRef, iChromaRefStride);
+
+  //01/17/13
+  //the in-question error area is
+  //from: (yellow) Y=212, V=023, U=145
+  //to:     (grey)    Y=213, V=136, U=124
+  //visible difference can be seen on the U plane
+  //so the allowing chroma difference should be at least no larger than
+  //20*8*8 = 1280 for U or V
+  //one local test case show that "either one >640" will become a too strict criteria, which will appear when QP is large(36) and maybe no much harm for visual
+  //another local test case show that "either one >960" will be a moderate criteria, an area is changed from light green to light pink, but without careful observation it won't be obvious, but people will feel the unclean area (and note that, the color visible criteria is also related to the luma of them!)
+  //another case show that color changed from black to very dark red can be visible even under the threshold 960, the color difference is about 13*64=832 (U123V145->U129V132)
+  //TODO:
+  //OPTI-ABLE: the visible color criteria may be related to luma (very bright or very dark), or related to the ratio of U/V rather than the absolute value
+  const bool bChromaTooLarge = (iCbSad > KNOWN_CHROMA_TOO_LARGE || iCrSad > KNOWN_CHROMA_TOO_LARGE);
+
+  const int32_t iChromaSad = iCbSad + iCrSad;
+  PredictSadSkip (pMbCache->sMvComponents.iRefIndexCache, pMbCache->bMbTypeSkip, pMbCache->iSadCostSkip, 0,
+                  & (pWelsMd->iSadPredSkip));
+  const bool bChromaCostCannotSkip = IsCostLessEqualSkipCost (iChromaSad, pWelsMd->iSadPredSkip, pMbCache->uiRefMbType,
+                                     pCurDqLayer->pRefPic, iCurMbXy, SMALLEST_INVISIBLE);
+
+  return (!bChromaCostCannotSkip && !bChromaTooLarge);
+}
+
+//01/17/2013. USE the NEW BGD Pskip with COLOR CHECK for screen content and camera because of color artifact seen in test
 bool WelsMdInterJudgeBGDPskip (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
-                               bool* bKeepSkip) {
+                                     bool* bKeepSkip) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   SWelsMD* pWelsMd = (SWelsMD*)pMd;
 
@@ -183,10 +238,22 @@ bool WelsMdInterJudgeBGDPskip (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurM
     && !IS_INTRA (pMbCache->uiRefMbType)
     && (kiRefMbQp - kiCurMbQp <= DELTA_QP_BGD_THD || kiRefMbQp <= 26)
   ) {
-    SMVUnitXY	sVaaPredSkipMv = { 0 };
-    PredSkipMv (pMbCache, &sVaaPredSkipMv);
-    WelsMdBackgroundMbEnc (pEncCtx, pWelsMd, pCurMb, pMbCache, pSlice, (LD32 (&sVaaPredSkipMv) == 0));
-    return true;
+    //01/16/13
+    //the current BGD method uses luma SAD in first step judging of Background blocks
+    //and uses chroma edges to confirm the Background blocks
+    //HOWEVER, there is such case in SCC,
+    //that the luma of two collocated blocks (block in reference frame and in current frame) is very similar
+    //but the chroma are very different, at the same time the chroma are plain and without edge
+    //IN SUCH A CASE,
+    //it will be not proper to just use Pskip
+    //TODO: consider reusing this result of ChromaCheck when SCDSkip needs this as well
+
+    if (CheckChromaCost (pEncCtx, pWelsMd, pMbCache, pCurMb->iMbXY)) {
+      SMVUnitXY	sVaaPredSkipMv = { 0 };
+      PredSkipMv (pMbCache, &sVaaPredSkipMv);
+      WelsMdBackgroundMbEnc (pEncCtx, pWelsMd, pCurMb, pMbCache, pSlice, (LD32 (&sVaaPredSkipMv) == 0));
+      return true;
+    }
   }
 
   return false;
