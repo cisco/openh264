@@ -694,12 +694,11 @@ void   RcVBufferCalculationSkip (sWelsEncCtx* pEncCtx) {
   //condition 1: whole pBuffer fullness
   pWelsSvcRc->iBufferFullnessSkip += (pWelsSvcRc->iFrameDqBits - kiOutputBits);
   //condition 2: VGOP bits constraint
-  const int32_t kiVGopBits = WELS_DIV_ROUND (pWelsSvcRc->iBitsPerFrame * VGOP_SIZE, INT_MULTIPLY);
   int32_t iVGopBitsPred = 0;
   for (int32_t i = pWelsSvcRc->iFrameCodedInVGop + 1; i < VGOP_SIZE; i++)
     iVGopBitsPred += pTOverRc[pWelsSvcRc->iTlOfFrames[i]].iMinBitsTl;
   iVGopBitsPred -= pWelsSvcRc->iRemainingBits;
-  double dIncPercent = iVGopBitsPred * 100.0 / kiVGopBits - (double)VGOP_BITS_PERCENTAGE_DIFF;
+  double dIncPercent = iVGopBitsPred * 100.0 * INT_MULTIPLY / (pWelsSvcRc->iBitsPerFrame * VGOP_SIZE) - (double)VGOP_BITS_PERCENTAGE_DIFF;
 
   if ((pWelsSvcRc->iBufferFullnessSkip > pWelsSvcRc->iBufferSizeSkip
        &&	pWelsSvcRc->iAverageFrameQp > pWelsSvcRc->iSkipQpValue)
