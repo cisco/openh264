@@ -21,7 +21,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory=".\..\..\..\..\bin\win32\Debug"
-			IntermediateDirectory=".\..\..\..\obj\encConsole\Debug"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -51,9 +51,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				AssemblerListingLocation=".\..\..\..\obj\encConsole\Debug/"
-				ObjectFile=".\..\..\..\obj\encConsole\Debug/"
-				ProgramDataBaseFileName=".\..\..\..\obj\encConsole\Debug/"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -108,7 +105,7 @@
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory=".\..\..\..\..\bin\win64\Debug"
-			IntermediateDirectory=".\..\..\..\obj\encConsole\Debug"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -138,9 +135,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				AssemblerListingLocation=".\..\..\..\obj\encConsole\Debug/"
-				ObjectFile=".\..\..\..\obj\encConsole\Debug/"
-				ProgramDataBaseFileName=".\..\..\..\obj\encConsole\Debug/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -195,7 +189,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory=".\..\..\..\..\bin\win32\Release"
-			IntermediateDirectory=".\..\..\..\obj\encConsole\Release"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -226,9 +220,6 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				AssemblerListingLocation=".\..\..\..\obj\encConsole\Release/"
-				ObjectFile=".\..\..\..\obj\encConsole\Release/"
-				ProgramDataBaseFileName=".\..\..\..\obj\encConsole\Release/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -283,7 +274,7 @@
 		<Configuration
 			Name="Release|x64"
 			OutputDirectory=".\..\..\..\..\bin\win64\Release"
-			IntermediateDirectory=".\..\..\..\obj\encConsole\Release"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -314,9 +305,6 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				AssemblerListingLocation=".\..\..\..\obj\encConsole\Release/"
-				ObjectFile=".\..\..\..\obj\encConsole\Release/"
-				ProgramDataBaseFileName=".\..\..\..\obj\encConsole\Release/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
