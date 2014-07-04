@@ -28,7 +28,6 @@
 			IntermediateDirectory=".\..\..\..\obj\vp\Debug"
 			ConfigurationType="2"
 			CharacterSet="1"
-			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -112,7 +111,6 @@
 			IntermediateDirectory=".\..\..\..\obj\vp\Debug"
 			ConfigurationType="2"
 			CharacterSet="1"
-			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
