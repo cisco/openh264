@@ -21,7 +21,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory=".\..\..\..\..\bin\win32\Debug"
-			IntermediateDirectory=".\..\..\..\obj\encoder\plus\Debug"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -56,9 +56,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				AssemblerListingLocation=".\..\..\..\obj\encoder\plus\Debug/"
-				ObjectFile=".\..\..\..\obj\encoder\plus\Debug/"
-				ProgramDataBaseFileName=".\..\..\..\obj\encoder\plus\Debug/"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -111,7 +108,7 @@
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory=".\..\..\..\..\bin\win64\Debug"
-			IntermediateDirectory=".\..\..\..\obj\encoder\plus\Debug"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -146,9 +143,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				AssemblerListingLocation=".\..\..\..\obj\encoder\plus\Debug/"
-				ObjectFile=".\..\..\..\obj\encoder\plus\Debug/"
-				ProgramDataBaseFileName=".\..\..\..\obj\encoder\plus\Debug/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -201,7 +195,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory=".\..\..\..\..\bin\win32\Release"
-			IntermediateDirectory=".\..\..\..\obj\encoder\plus\Release"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -240,9 +234,6 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				AssemblerListingLocation=".\..\..\..\obj\encoder\plus\Release/"
-				ObjectFile=".\..\..\..\obj\encoder\plus\Release/"
-				ProgramDataBaseFileName=".\..\..\..\obj\encoder\plus\Release/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -295,7 +286,7 @@
 		<Configuration
 			Name="Release|x64"
 			OutputDirectory=".\..\..\..\..\bin\win64\Release"
-			IntermediateDirectory=".\..\..\..\obj\encoder\plus\Release"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -334,9 +325,6 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				AssemblerListingLocation=".\..\..\..\obj\encoder\plus\Release/"
-				ObjectFile=".\..\..\..\obj\encoder\plus\Release/"
-				ProgramDataBaseFileName=".\..\..\..\obj\encoder\plus\Release/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>

@@ -21,7 +21,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory=".\..\..\..\..\bin\win32\Release"
-			IntermediateDirectory=".\..\..\..\obj\decConsole\Release"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -54,9 +54,6 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				AssemblerListingLocation=".\..\..\..\obj\decConsole\Release/"
-				ObjectFile=".\..\..\..\obj\decConsole\Release/"
-				ProgramDataBaseFileName=".\..\..\..\obj\decConsole\Release/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -108,7 +105,7 @@
 		<Configuration
 			Name="Release|x64"
 			OutputDirectory=".\..\..\..\..\bin\win64\Release"
-			IntermediateDirectory=".\..\..\..\obj\decConsole\Release"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -142,9 +139,6 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				AssemblerListingLocation=".\..\..\..\obj\decConsole\Release/"
-				ObjectFile=".\..\..\..\obj\decConsole\Release/"
-				ProgramDataBaseFileName=".\..\..\..\obj\decConsole\Release/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -196,7 +190,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory=".\..\..\..\..\bin\win32\Debug"
-			IntermediateDirectory=".\..\..\..\obj\decConsole\Debug"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -228,9 +222,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				AssemblerListingLocation=".\..\..\..\obj\decConsole\Debug/"
-				ObjectFile=".\..\..\..\obj\decConsole\Debug/"
-				ProgramDataBaseFileName=".\..\..\..\obj\decConsole\Debug/"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -282,7 +273,7 @@
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory=".\..\..\..\..\bin\win64\Debug"
-			IntermediateDirectory=".\..\..\..\obj\decConsole\Debug"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -315,9 +306,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				AssemblerListingLocation=".\..\..\..\obj\decConsole\Debug/"
-				ObjectFile=".\..\..\..\obj\decConsole\Debug/"
-				ProgramDataBaseFileName=".\..\..\..\obj\decConsole\Debug/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>

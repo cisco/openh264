@@ -25,7 +25,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory=".\..\..\..\..\bin\win32\Debug"
-			IntermediateDirectory=".\..\..\..\obj\vp\Debug"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
 			>
@@ -56,7 +56,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				AssemblerListingLocation=""
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -104,7 +103,7 @@
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory=".\..\..\..\..\bin\win64\Debug"
-			IntermediateDirectory=".\..\..\..\obj\vp\Debug"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
 			>
@@ -136,7 +135,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				AssemblerListingLocation=""
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -184,7 +182,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory=".\..\..\..\..\bin\win32\Release"
-			IntermediateDirectory=".\..\..\..\obj\vp\Release"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -268,7 +266,7 @@
 		<Configuration
 			Name="Release|x64"
 			OutputDirectory=".\..\..\..\..\bin\win64\Release"
-			IntermediateDirectory=".\..\..\..\obj\vp\Release"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"

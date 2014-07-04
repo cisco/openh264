@@ -24,7 +24,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory=".\..\..\..\..\bin\win32\Release"
-			IntermediateDirectory=".\..\..\..\obj\decoder\core\release"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -59,9 +59,6 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				AssemblerListingLocation=".\..\..\..\obj\decoder\core\release/"
-				ObjectFile=".\..\..\..\obj\decoder\core\release/"
-				ProgramDataBaseFileName=".\..\..\..\obj\decoder\core\release/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -100,7 +97,7 @@
 		<Configuration
 			Name="Release|x64"
 			OutputDirectory=".\..\..\..\..\bin\win64\Release"
-			IntermediateDirectory=".\..\..\..\obj\decoder\core\release"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -136,9 +133,6 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				AssemblerListingLocation=".\..\..\..\obj\decoder\core\release/"
-				ObjectFile=".\..\..\..\obj\decoder\core\release/"
-				ProgramDataBaseFileName=".\..\..\..\obj\decoder\core\release/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -177,7 +171,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory=".\..\..\..\..\bin\win32\Debug"
-			IntermediateDirectory=".\..\..\..\obj\decoder\core\debug"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -210,9 +204,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				AssemblerListingLocation=".\..\..\..\obj\decoder\core\debug/"
-				ObjectFile=".\..\..\..\obj\decoder\core\debug/"
-				ProgramDataBaseFileName=".\..\..\..\obj\decoder\core\debug/"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -251,7 +242,7 @@
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory=".\..\..\..\..\bin\win64\Debug"
-			IntermediateDirectory=".\..\..\..\obj\decoder\core\debug"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -285,9 +276,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				AssemblerListingLocation=".\..\..\..\obj\decoder\core\debug/"
-				ObjectFile=".\..\..\..\obj\decoder\core\debug/"
-				ProgramDataBaseFileName=".\..\..\..\obj\decoder\core\debug/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>

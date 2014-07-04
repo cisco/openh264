@@ -1,7 +1,6 @@
 # Object files
 *.o
 *.obj
-codec/obj
 
 # Dependency files
 *.d
