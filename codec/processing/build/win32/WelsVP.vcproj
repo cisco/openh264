@@ -210,11 +210,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
+				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="../../../common/inc;../../interface;../../src/common"
 				PreprocessorDefinitions="NDEBUG;_USRDLL;X86_ASM"
+				StringPooling="true"
 				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="false"
+				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -236,8 +238,6 @@
 				ModuleDefinitionFile="../../src/common/WelsVP.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -295,11 +295,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
+				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="../../../common/inc;../../interface;../../src/common"
 				PreprocessorDefinitions="NDEBUG;_USRDLL;X86_ASM"
+				StringPooling="true"
 				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="false"
+				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -321,8 +323,6 @@
 				ModuleDefinitionFile="../../src/common/WelsVP.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
 				TargetMachine="17"
 			/>
 			<Tool
