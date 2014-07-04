@@ -91,6 +91,11 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
                pCfg->iSpatialLayerNum);
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
+    if (pCfg->bEnableAdaptiveQuant) {
+       WelsLog (pLogCtx, WELS_LOG_WARNING, "ParamValidation(), AdaptiveQuant(%d) is not supported yet for screen content, auto turned off\n",
+               pCfg->bEnableAdaptiveQuant);
+       pCfg->bEnableAdaptiveQuant = false;
+    }
   }
   if (pCfg->iSpatialLayerNum > 1) {
     int32_t iFinalWidth = pCfg->sSpatialLayers[pCfg->iSpatialLayerNum - 1].iVideoWidth;
