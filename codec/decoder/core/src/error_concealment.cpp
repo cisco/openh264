@@ -57,6 +57,7 @@ void InitErrorCon (PWelsDecoderContext pCtx) {
 
 #if defined(HAVE_NEON)
     if (pCtx->uiCpuFlag & WELS_CPU_NEON) {
+      pCtx->sCopyFunc.pCopyLumaFunc		= WelsCopy16x16_neon; //aligned
       pCtx->sCopyFunc.pCopyChromaFunc		= WelsCopy8x8_neon; //aligned
     }
 #endif //HAVE_NEON
