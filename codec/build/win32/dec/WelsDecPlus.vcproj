@@ -74,7 +74,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies=".\..\..\..\..\bin\win32\Release\welsdcore.lib"
+				AdditionalDependencies="$(OutDir)\welsdcore.lib"
 				OutputFile="$(OutDir)\welsdec.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\..\..\decoder\plus\src\wels_dec_export.def"
@@ -163,7 +163,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies=".\..\..\..\..\bin\win64\Release\welsdcore.lib"
+				AdditionalDependencies="$(OutDir)\welsdcore.lib"
 				OutputFile="$(OutDir)\welsdec.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\..\..\decoder\plus\src\wels_dec_export.def"
@@ -250,7 +250,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies=".\..\..\..\..\bin\win32\Debug\welsdcore.lib"
+				AdditionalDependencies="$(OutDir)\welsdcore.lib"
 				OutputFile="$(OutDir)\welsdec.dll"
 				LinkIncremental="2"
 				ModuleDefinitionFile="..\..\..\decoder\plus\src\wels_dec_export.def"
@@ -337,7 +337,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies=".\..\..\..\..\bin\win64\Debug\welsdcore.lib"
+				AdditionalDependencies="$(OutDir)\welsdcore.lib"
 				OutputFile="$(OutDir)\welsdec.dll"
 				LinkIncremental="2"
 				ModuleDefinitionFile="..\..\..\decoder\plus\src\wels_dec_export.def"
