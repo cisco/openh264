@@ -156,10 +156,10 @@ void WelsDequantHadamard2x2DcAnchor (int16_t* pDct, int16_t iMF) {
   const int16_t iDelU =   pDct[0] -  pDct[2];
   const int16_t iSumD = pDct[1] + pDct[3];
   const int16_t iDelD =   pDct[1] -  pDct[3];
-  pDct[0] = (iSumU + iSumD) * iMF;
-  pDct[1] = (iSumU  -  iSumD) * iMF;
-  pDct[2] = (iDelU   + iDelD)   * iMF;
-  pDct[3] = (iDelU   -  iDelD)   * iMF;
+  pDct[0] = ((iSumU + iSumD) * iMF)>>1;
+  pDct[1] = ((iSumU - iSumD) * iMF)>>1;
+  pDct[2] = ((iDelU + iDelD) * iMF)>>1;
+  pDct[3] = ((iDelU - iDelD) * iMF)>>1;
 }
 TEST (DecodeMbAuxTest, WelsDequantIHadamard2x2Dc) {
   int16_t iDct[4], iRefDct[4];
