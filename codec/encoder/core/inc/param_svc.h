@@ -293,9 +293,11 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   SUsedPicRect.iWidth = ((iPicWidth >> 1) << 1);
   SUsedPicRect.iHeight = ((iPicHeight >> 1) << 1);
 
+  iMultipleThreadIdc = pCodingParam.iMultipleThreadIdc;
+
   /* Deblocking loop filter */
   iLoopFilterDisableIdc	= pCodingParam.iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries,
-  if (iLoopFilterDisableIdc == 0) // Loop filter requested to be enabled
+  if (iLoopFilterDisableIdc == 0 && iMultipleThreadIdc != 1) // Loop filter requested to be enabled, with threading enabled
     iLoopFilterDisableIdc = 2; // Disable loop filter on slice boundaries since that's not allowed with multithreading
   iLoopFilterAlphaC0Offset = pCodingParam.iLoopFilterAlphaC0Offset;	// AlphaOffset: valid range [-6, 6], default 0
   iLoopFilterBetaOffset = pCodingParam.iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0
@@ -331,8 +333,6 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   /* Enable int32_t term reference */
   bEnableLongTermReference	= pCodingParam.bEnableLongTermReference ? true : false;
   iLtrMarkPeriod = pCodingParam.iLtrMarkPeriod;
-
-  iMultipleThreadIdc = pCodingParam.iMultipleThreadIdc;
 
   /* For ssei information */
   bEnableSSEI		= pCodingParam.bEnableSSEI;
