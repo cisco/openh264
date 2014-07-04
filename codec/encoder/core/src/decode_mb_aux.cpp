@@ -130,10 +130,10 @@ void WelsDequantIHadamard2x2Dc (int16_t* pDct, const uint16_t kuiMF) {
   const int16_t kiSumD = pDct[1] + pDct[3];
   const int16_t kiDelD =   pDct[1] -  pDct[3];
 
-  pDct[0] = (kiSumU + kiSumD) * kuiMF;
-  pDct[1] = (kiSumU  -  kiSumD) * kuiMF;
-  pDct[2] = (kiDelU   + kiDelD)   * kuiMF;
-  pDct[3] = (kiDelU   - kiDelD)   * kuiMF;
+  pDct[0] = ((kiSumU + kiSumD) * kuiMF) >> 1;
+  pDct[1] = ((kiSumU - kiSumD) * kuiMF) >> 1;
+  pDct[2] = ((kiDelU + kiDelD) * kuiMF) >> 1;
+  pDct[3] = ((kiDelU - kiDelD) * kuiMF) >> 1;
 }
 
 void WelsDequant4x4_c (int16_t* pRes, const uint16_t* kpMF) {
