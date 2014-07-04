@@ -236,7 +236,6 @@
 				AssemblerListingLocation=".\..\..\..\obj\decConsole\Debug/"
 				ObjectFile=".\..\..\..\obj\decConsole\Debug/"
 				ProgramDataBaseFileName=".\..\..\..\obj\decConsole\Debug/"
-				BrowseInformation="1"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -327,7 +326,6 @@
 				AssemblerListingLocation=".\..\..\..\obj\decConsole\Debug/"
 				ObjectFile=".\..\..\..\obj\decConsole\Debug/"
 				ProgramDataBaseFileName=".\..\..\..\obj\decConsole\Debug/"
-				BrowseInformation="1"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
