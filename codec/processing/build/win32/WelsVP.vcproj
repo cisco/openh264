@@ -74,8 +74,6 @@
 				LinkIncremental="2"
 				ModuleDefinitionFile="../../src/common/WelsVP.def"
 				GenerateDebugInformation="true"
-				GenerateMapFile="true"
-				MapFileName="$(OutDir)\welsvp.map"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -155,8 +153,6 @@
 				LinkIncremental="2"
 				ModuleDefinitionFile="../../src/common/WelsVP.def"
 				GenerateDebugInformation="true"
-				GenerateMapFile="true"
-				MapFileName="$(OutDir)\welsvp.map"
 				SubSystem="2"
 				TargetMachine="17"
 			/>
@@ -240,10 +236,7 @@
 				GenerateManifest="false"
 				EnableUAC="false"
 				ModuleDefinitionFile="../../src/common/WelsVP.def"
-				GenerateDebugInformation="false"
-				GenerateMapFile="false"
-				MapFileName=""
-				MapExports="false"
+				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -328,10 +321,7 @@
 				GenerateManifest="false"
 				EnableUAC="false"
 				ModuleDefinitionFile="../../src/common/WelsVP.def"
-				GenerateDebugInformation="false"
-				GenerateMapFile="false"
-				MapFileName=""
-				MapExports="false"
+				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="17"
 			/>
