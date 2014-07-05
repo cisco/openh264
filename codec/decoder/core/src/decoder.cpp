@@ -228,6 +228,8 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
     }
   }
 
+  pCtx->pPreviousDecodedPictureInDpb = NULL;
+
   // currently only active for LIST_0 due to have no B frames
   iErr = CreatePicBuff (pCtx, &pCtx->pPicBuff[LIST_0], iPicQueueSize, kiPicWidth, kiPicHeight);
   if (iErr != ERR_NONE)
