@@ -552,7 +552,7 @@ void RcDecideTargetBits (sWelsEncCtx* pEncCtx) {
     if (pWelsSvcRc->iRemainingWeights > pTOverRc->iTlayerWeight)
       pWelsSvcRc->iTargetBits = (int32_t) ((int64_t)pWelsSvcRc->iRemainingBits * pTOverRc->iTlayerWeight /
                                            pWelsSvcRc->iRemainingWeights);
-    else //this case should be hit. needs to more test case to verify this
+    else //this case should be not hit. needs to more test case to verify this
       pWelsSvcRc->iTargetBits = pWelsSvcRc->iRemainingBits;
     if ((pWelsSvcRc->iTargetBits <= 0) && (pEncCtx->pSvcParam->iRCMode == RC_LOW_BW_MODE)) {
       pWelsSvcRc->iCurrentBitsLevel = BITS_EXCEEDED;
