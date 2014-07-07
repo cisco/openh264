@@ -92,10 +92,17 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
     if (pCfg->bEnableAdaptiveQuant) {
-      WelsLog (pLogCtx, WELS_LOG_WARNING, "ParamValidation(), AdaptiveQuant(%d) is not supported yet for screen content, auto turned off\n",
+      WelsLog (pLogCtx, WELS_LOG_WARNING,
+               "ParamValidation(), AdaptiveQuant(%d) is not supported yet for screen content, auto turned off\n",
                pCfg->bEnableAdaptiveQuant);
       pCfg->bEnableAdaptiveQuant = false;
     }
+    if (pCfg->bEnableSceneChangeDetect == false) {
+      pCfg->bEnableSceneChangeDetect = true;
+      WelsLog (pLogCtx, WELS_LOG_WARNING,
+               "ParamValidation(), screen change detection should be turned on,change bEnableSceneChangeDetect as true\n");
+    }
+
   }
   if (pCfg->iSpatialLayerNum > 1) {
     int32_t iFinalWidth = pCfg->sSpatialLayers[pCfg->iSpatialLayerNum - 1].iVideoWidth;
@@ -2931,13 +2938,13 @@ int32_t GetSubSequenceId (sWelsEncCtx* pCtx, EVideoFrameType eFrameType) {
 }
 
 //loop each layer to check if have skip frame when RC and frame skip enable (maxbr>0)
-bool CheckFrameSkipBasedMaxbr(sWelsEncCtx* pCtx, int32_t iSpatialNum) {
+bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pCtx, int32_t iSpatialNum) {
   SSpatialPicIndex* pSpatialIndexMap = &pCtx->sSpatialIndexMap[0];
   bool bSkipMustFlag = false;
 
   if (RC_OFF_MODE != pCtx->pSvcParam->iRCMode && true == pCtx->pSvcParam->bEnableFrameSkip) {
     for (int32_t i = 0; i < iSpatialNum; i++) {
-      if(0 == pCtx->pSvcParam->sSpatialLayers[i].iMaxSpatialBitrate) {
+      if (0 == pCtx->pSvcParam->sSpatialLayers[i].iMaxSpatialBitrate) {
         break;
       }
       pCtx->uiDependencyId = (uint8_t) (pSpatialIndexMap + i)->iDid;
@@ -3011,7 +3018,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   }
 
   //loop each layer to check if have skip frame when RC and frame skip enable
-  if (CheckFrameSkipBasedMaxbr(pCtx, iSpatialNum)) {
+  if (CheckFrameSkipBasedMaxbr (pCtx, iSpatialNum)) {
     pFbi->eFrameType = videoFrameTypeSkip;
     return ENC_RETURN_SUCCESS;
   }
