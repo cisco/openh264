@@ -73,9 +73,9 @@ void DoErrorConFrameCopy (PWelsDecoderContext pCtx) {
   int32_t iStrideY = pDstPic->iLinesize[0];
   int32_t iStrideUV = pDstPic->iLinesize[1];
   if (pSrcPic == NULL) { //no ref pic, assign specific data to picture
-    memset (pDstPic->pData[0], 0, uiHeightInPixelY * iStrideY);
-    memset (pDstPic->pData[1], 0, (uiHeightInPixelY >> 1) * iStrideUV);
-    memset (pDstPic->pData[2], 0, (uiHeightInPixelY >> 1) * iStrideUV);
+    memset (pDstPic->pData[0], 128, uiHeightInPixelY * iStrideY);
+    memset (pDstPic->pData[1], 128, (uiHeightInPixelY >> 1) * iStrideUV);
+    memset (pDstPic->pData[2], 128, (uiHeightInPixelY >> 1) * iStrideUV);
   } else { //has ref pic here
     memcpy (pDstPic->pData[0], pSrcPic->pData[0], uiHeightInPixelY * iStrideY);
     memcpy (pDstPic->pData[1], pSrcPic->pData[1], (uiHeightInPixelY >> 1) * iStrideUV);
@@ -121,19 +121,19 @@ void DoErrorConSliceCopy (PWelsDecoderContext pCtx) {
           //Y component
           pDstData = pDstPic->pData[0] + iMbY * 16 * iDstStride + iMbX * 16;
           for (int32_t i = 0; i < 16; ++i) {
-            memset (pDstData, 0, 16);
+            memset (pDstData, 128, 16);
             pDstData += iDstStride;
           }
           //U component
           pDstData = pDstPic->pData[1] + iMbY * 8 * iDstStride / 2 + iMbX * 8;
           for (int32_t i = 0; i < 8; ++i) {
-            memset (pDstData, 0, 8);
+            memset (pDstData, 128, 8);
             pDstData += iDstStride / 2;
           }
           //V component
           pDstData = pDstPic->pData[2] + iMbY * 8 * iDstStride / 2 + iMbX * 8;
           for (int32_t i = 0; i < 8; ++i) {
-            memset (pDstData, 0, 8);
+            memset (pDstData, 128, 8);
             pDstData += iDstStride / 2;
           }
         } //
