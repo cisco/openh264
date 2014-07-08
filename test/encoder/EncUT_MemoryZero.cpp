@@ -1,7 +1,7 @@
-#include<gtest/gtest.h>
-#include<math.h>
-#include<stdlib.h>
-#include<time.h>
+#include <gtest/gtest.h>
+#include <math.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include "cpu_core.h"
 #include "cpu.h"
