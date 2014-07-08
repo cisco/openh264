@@ -419,6 +419,10 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
 
     pSpatialLayer->iDLayerQp = pCodingParam.sSpatialLayers[iIdxSpatial].iDLayerQp;
 
+    // Don't do deblocking over slice boundaries even in single-threaded mode with SM_DYN_SLICE
+    if (pSpatialLayer->sSliceCfg.uiSliceMode == SM_DYN_SLICE && iLoopFilterDisableIdc == 0)
+      iLoopFilterDisableIdc = 2;
+
     uiProfileIdc	= PRO_SCALABLE_BASELINE;
     ++ pDlp;
     ++ pSpatialLayer;
