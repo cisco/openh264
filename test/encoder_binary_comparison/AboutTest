@@ -1,0 +1,66 @@
+
+about
+#*******************************************************************************
+  1.This file is about how to run encoder binary comparison test.
+    Binary comparison is the comparison between target encoder and benchmark encoder.
+
+  2.As SHA1 string is unique for bit stream file. so in current test, we only  compare
+    the SHA1 string of bit stream. If the SHA1 string of target bit stream is the same
+    with benchmark's, the related test case can be verified as pass status.
+
+  3.SHA1 table files for each test bit stream are pre-generated.
+    For how to update SHA1 tables, please go to below part "how to update SHA1 table"
+
+  4.SHA1 tables can be found in folder ./SHA1Table/
+
+  5.Test bit streams are  those xxx.264 files in folder openh264/res/
+    --If you want to change the test bit stream on travis test,
+      please go to part "for travis test"
+    --If you want to run test locally, please to go part "for local test"
+
+
+how to update SHA1 table
+#*******************************************************************************
+  If there is something change in bit stream due to your encoder design;
+  you need to update the SHA1 tables in ./SHA1Table.As the SHA1 string is unique, once the
+  bit stream change, the SHA1 string will also change.
+
+  If you want to update SHA1 table files in ./SHA1Tabel, please run below command under
+  openh264/test/encoder_binary_test,
+    ./run_Main.sh   UpdateSHA1Table
+
+for travis test
+#*******************************************************************************
+  Currently, travis only allow 5 jobs on parallel status, and 2 jobs are for
+  unit test with g++ and clang compiler. So there will be only 3 jobs left for encoder
+  binary comparison test, which means that 3 of 27 bit stream in ./res folder are chosen for test.
+
+  Actually, you can use all of test bit streams in ./res folder, but it will take
+  a long time to wait for the test result. So we do not suggest to do so.
+  If you want to test all cases for all test bit steams in ./res,you need to generate related
+  SHA1 table files before you add those bit streams into below setting.
+
+  To change the test bit steam in travis, you can edit file .travis.yml.
+  For example,if you want to add  CVPCMNL1_SVA_C.264 as test bit stream, you can add on line and
+  change the TestParameter value to CVPCMNL1_SVA_C.264
+     - TASK=BinaryCompare; TestParameter=CVPCMNL1_SVA_C.264;
+
+  Below is the example for adding CVPCMNL1_SVA_C.264 into test list.
+  ****************************************************************************************
+  env:
+    - TASK=UnitTest;      TestParameter=""
+    - TASK=BinaryCompare; TestParameter=BA_MW_D.264;
+    - TASK=BinaryCompare; TestParameter=MR2_MW_A.264;
+    - TASK=BinaryCompare; TestParameter=CVPCMNL1_SVA_C.264;
+  ****************************************************************************************
+
+for local test
+#*******************************************************************************
+  If you want to run the test locally,you can run below command:
+    ./run_Main.sh  LocalTest
+
+  All SHA1 tables in ./SHA1Table/ folder will be tested.
+  And the final result can be found in folder ./FinalResult, which include:
+    --console log for each test bit stream (XXXX.TestLog)
+    --pass status for each case each bit stream (xxx_AllCaseOutput.csv)
+    --pass status for each case each bit stream (xxx_unpassCaseOutput.csv)
