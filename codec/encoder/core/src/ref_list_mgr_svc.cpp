@@ -600,7 +600,7 @@ bool WelsBuildRefList (void* pEncCtx, const int32_t iPOC, int32_t iBestLtrRefIdx
         SPicture* pRef = pRefList->pShortRefList[i];
         if (pRef != NULL && pRef->bUsedAsRef && pRef->iFramePoc >= 0 && pRef->uiTemporalId <= kuiTid) {
           pCtx->pRefList0[pCtx->iNumRef0++]	= pRef;
-          WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
+          WelsLog (& (pCtx->sLogCtx), WELS_LOG_DETAIL,
                    "WelsBuildRefList pCtx->uiTemporalId = %d,pRef->iFrameNum = %d,pRef->uiTemporalId = %d\n",
                    pCtx->uiTemporalId, pRef->iFrameNum, pRef->uiTemporalId);
           break;
