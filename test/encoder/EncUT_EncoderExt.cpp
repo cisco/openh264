@@ -1,5 +1,5 @@
-#include<gtest/gtest.h>
-#include<stdlib.h>
+#include <gtest/gtest.h>
+#include <stdlib.h>
 #include "codec_api.h"
 #include "welsEncoderExt.h"
 
