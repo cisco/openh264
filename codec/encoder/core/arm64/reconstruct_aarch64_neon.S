@@ -73,7 +73,7 @@
     cmgt    $4.8h, $0.8h, #0      // if true, location of coef == 11111111
     bif     $3.16b, $1.16b, $4.16b      // if (x<0) reserved part; else keep 0 untouched
     shl     $3.8h, $3.8h, #1
-    mov.8h   $6, $1
+    mov.16b $6, $1
     sub     $1.8h, $1.8h, $3.8h      // if x > 0, -= 0; else x-= 2x
 //  }
 .endm
@@ -315,7 +315,7 @@ shrn2   \arg1\().8h, \arg5\().4s, #16
 cmgt    \arg4\().8h, \arg0\().8h, #0      // if true, location of coef == 11111111
 bif     \arg3\().16b, \arg1\().16b, \arg4\().16b      // if (x<0) reserved part; else keep 0 untouched
 shl     \arg3\().8h, \arg3\().8h, #1
-mov.8h  \arg6, \arg1
+mov     \arg6\().16b, \arg1\().16b
 sub     \arg1\().8h, \arg1\().8h, \arg3\().8h      // if x > 0, -= 0; else x-= 2x
 //  }
 .endm
@@ -533,7 +533,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsQuant4x4_AArch64_neon
     ld1     {v2.8h}, [x1]
     ld1     {v0.8h, v1.8h}, [x0]
     ld1     {v3.8h}, [x2]
-    mov.8h  v4, v2
+    mov.16b v4, v2
     NEWQUANT_COEF_EACH_16BITS   v0, v2, v3, v5, v6, v7
     st1     {v2.8h}, [x0], #16
     NEWQUANT_COEF_EACH_16BITS   v1, v4, v3, v5, v6, v7
@@ -545,7 +545,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsQuant4x4Dc_AArch64_neon
     ld1     {v0.8h, v1.8h}, [x0]
     dup     v2.8h, w1      // even ff range [0, 768]
     dup     v3.8h, w2
-    mov.8h  v4, v2
+    mov.16b v4, v2
     NEWQUANT_COEF_EACH_16BITS   v0, v2, v3, v5, v6, v7
     st1     {v2.8h}, [x0], #16
     NEWQUANT_COEF_EACH_16BITS   v1, v4, v3, v5, v6, v7
@@ -559,10 +559,10 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsQuantFour4x4_AArch64_neon
 
 .rept 4
     ld1     {v0.8h, v1.8h}, [x0], #32
-    mov.8h  v4, v2
+    mov.16b v4, v2
     NEWQUANT_COEF_EACH_16BITS   v0, v4, v3, v5, v6, v7
     st1     {v4.8h}, [x1], #16
-    mov.8h  v4, v2
+    mov.16b v4, v2
     NEWQUANT_COEF_EACH_16BITS   v1, v4, v3, v5, v6, v7
     st1     {v4.8h}, [x1], #16
 .endr
@@ -575,36 +575,36 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsQuantFour4x4Max_AArch64_neon
     mov     x1, x0
 
     ld1     {v0.8h, v1.8h}, [x0], #32
-    mov.8h  v4, v2
+    mov.16b v4, v2
     NEWQUANT_COEF_EACH_16BITS_MAX   v0, v4, v3, v5, v6, v7, v16
     st1     {v4.8h}, [x1], #16
-    mov.8h  v4, v2
+    mov.16b v4, v2
     NEWQUANT_COEF_EACH_16BITS_MAX   v1, v4, v3, v5, v6, v7, v17
     st1     {v4.8h}, [x1], #16   // then 1st 16 elem in v16  & v17
 
     ld1     {v0.8h, v1.8h}, [x0], #32
-    mov.8h  v4, v2
+    mov.16b v4, v2
     NEWQUANT_COEF_EACH_16BITS_MAX   v0, v4, v3, v5, v6, v7, v18
     st1     {v4.8h}, [x1], #16
-    mov.8h  v4, v2
+    mov.16b v4, v2
     NEWQUANT_COEF_EACH_16BITS_MAX   v1, v4, v3, v5, v6, v7, v19
     st1     {v4.8h}, [x1], #16   // then 2st 16 elem in v18 & v19
 
     SELECT_MAX_IN_ABS_COEF  v16, v17, v18, v19, h20, h21
 
     ld1     {v0.8h, v1.8h}, [x0], #32
-    mov.8h  v4, v2
+    mov.16b v4, v2
     NEWQUANT_COEF_EACH_16BITS_MAX   v0, v4, v3, v5, v6, v7, v16
     st1     {v4.8h}, [x1], #16
-    mov.8h  v4, v2
+    mov.16b v4, v2
     NEWQUANT_COEF_EACH_16BITS_MAX   v1, v4, v3, v5, v6, v7, v17
     st1     {v4.8h}, [x1], #16   // then 1st 16 elem in v16  & v17
 
     ld1     {v0.8h, v1.8h}, [x0], #32
-    mov.8h  v4, v2
+    mov.16b v4, v2
     NEWQUANT_COEF_EACH_16BITS_MAX   v0, v4, v3, v5, v6, v7, v18
     st1     {v4.8h}, [x1], #16
-    mov.8h  v4, v2
+    mov.16b v4, v2
     NEWQUANT_COEF_EACH_16BITS_MAX   v1, v4, v3, v5, v6, v7, v19
     st1     {v4.8h}, [x1], #16   // then 2st 16 elem in v18 & v19
 
