@@ -202,31 +202,31 @@ void GeneralBilinearAccurateDownsampler_c (uint8_t* pDst, const int32_t kiDstStr
 
 
 #ifdef X86_ASM
-//void GeneralBilinearFastDownsamplerWrap_sse2 (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
-//    const int32_t kiDstHeight,
-//    uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
-//  const int32_t kiScaleBitWidth = 16, kiScaleBitHeight = 15;
-//  const uint32_t kuiScaleWidth = (1 << kiScaleBitWidth), kuiScaleHeight = (1 << kiScaleBitHeight);
-//
-//  uint32_t uiScalex = WELS_ROUND ((float)kiSrcWidth / (float)kiDstWidth * kuiScaleWidth);
-//  uint32_t uiScaley = WELS_ROUND ((float)kiSrcHeight / (float)kiDstHeight * kuiScaleHeight);
-//
-//  GeneralBilinearFastDownsampler_sse2 (pDst, kiDstStride, kiDstWidth, kiDstHeight,
-//                                       pSrc, kiSrcStride, kiSrcWidth, kiSrcHeight, uiScalex, uiScaley);
-//}
-//
-//void GeneralBilinearAccurateDownsamplerWrap_sse2 (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
-//    const int32_t kiDstHeight,
-//    uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
-//  const int32_t kiScaleBit = 15;
-//  const uint32_t kuiScale = (1 << kiScaleBit);
-//
-//  uint32_t uiScalex = WELS_ROUND ((float)kiSrcWidth / (float)kiDstWidth * kuiScale);
-//  uint32_t uiScaley = WELS_ROUND ((float)kiSrcHeight / (float)kiDstHeight * kuiScale);
-//
-//  GeneralBilinearAccurateDownsampler_sse2 (pDst, kiDstStride, kiDstWidth, kiDstHeight,
-//      pSrc, kiSrcStride, kiSrcWidth, kiSrcHeight, uiScalex, uiScaley);
-//}
+void GeneralBilinearFastDownsamplerWrap_sse2 (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
+    const int32_t kiDstHeight,
+    uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
+  const int32_t kiScaleBitWidth = 16, kiScaleBitHeight = 15;
+  const uint32_t kuiScaleWidth = (1 << kiScaleBitWidth), kuiScaleHeight = (1 << kiScaleBitHeight);
+
+  uint32_t uiScalex = WELS_ROUND ((float)kiSrcWidth / (float)kiDstWidth * kuiScaleWidth);
+  uint32_t uiScaley = WELS_ROUND ((float)kiSrcHeight / (float)kiDstHeight * kuiScaleHeight);
+
+  GeneralBilinearFastDownsampler_sse2 (pDst, kiDstStride, kiDstWidth, kiDstHeight,
+                                       pSrc, kiSrcStride, kiSrcWidth, kiSrcHeight, uiScalex, uiScaley);
+}
+
+void GeneralBilinearAccurateDownsamplerWrap_sse2 (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
+    const int32_t kiDstHeight,
+    uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
+  const int32_t kiScaleBit = 15;
+  const uint32_t kuiScale = (1 << kiScaleBit);
+
+  uint32_t uiScalex = WELS_ROUND ((float)kiSrcWidth / (float)kiDstWidth * kuiScale);
+  uint32_t uiScaley = WELS_ROUND ((float)kiSrcHeight / (float)kiDstHeight * kuiScale);
+
+  GeneralBilinearAccurateDownsampler_sse2 (pDst, kiDstStride, kiDstWidth, kiDstHeight,
+      pSrc, kiSrcStride, kiSrcWidth, kiSrcHeight, uiScalex, uiScaley);
+}
 #endif //X86_ASM
 
 #ifdef HAVE_NEON
