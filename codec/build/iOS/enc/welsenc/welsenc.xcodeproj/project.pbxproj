@@ -47,6 +47,7 @@
 		4CE4472E18BC605C0017DF25 /* welsEncoderExt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4470618BC605C0017DF25 /* welsEncoderExt.cpp */; };
 		9AED665019469FC1009A3567 /* welsCodecTrace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9AED664C19469FC1009A3567 /* welsCodecTrace.cpp */; };
 		9AED66661946A2B3009A3567 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9AED66651946A2B3009A3567 /* utils.cpp */; };
+		F5617A50196A833A006E2B20 /* reconstruct_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F5617A4F196A833A006E2B20 /* reconstruct_aarch64_neon.S */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -155,6 +156,7 @@
 		9AED664C19469FC1009A3567 /* welsCodecTrace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = welsCodecTrace.cpp; path = ../../../common/src/welsCodecTrace.cpp; sourceTree = "<group>"; };
 		9AED66651946A2B3009A3567 /* utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utils.cpp; path = ../../../common/src/utils.cpp; sourceTree = "<group>"; };
 		9AED66671946A2C4009A3567 /* utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utils.h; path = ../../../common/inc/utils.h; sourceTree = "<group>"; };
+		F5617A4F196A833A006E2B20 /* reconstruct_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = reconstruct_aarch64_neon.S; path = arm64/reconstruct_aarch64_neon.S; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -184,6 +186,7 @@
 		4CB8F2B219235FAC005D6386 /* arm64 */ = {
 			isa = PBXGroup;
 			children = (
+				F5617A4F196A833A006E2B20 /* reconstruct_aarch64_neon.S */,
 				4C23BC5F195A77E0003B81FC /* intra_pred_sad_3_opt_aarch64_neon.S */,
 				4CBC1B82194ACBB400214D9E /* intra_pred_aarch64_neon.S */,
 				4CB8F2B319235FC5005D6386 /* pixel_aarch64_neon.S */,
@@ -430,6 +433,7 @@
 				4CE4470E18BC605C0017DF25 /* au_set.cpp in Sources */,
 				4CBC1B83194ACBB400214D9E /* intra_pred_aarch64_neon.S in Sources */,
 				4CE4471718BC605C0017DF25 /* mc.cpp in Sources */,
+				F5617A50196A833A006E2B20 /* reconstruct_aarch64_neon.S in Sources */,
 				4CE4472918BC605C0017DF25 /* svc_set_mb_syn_cavlc.cpp in Sources */,
 				4CE4471818BC605C0017DF25 /* md.cpp in Sources */,
 				4CE4471B18BC605C0017DF25 /* nal_encap.cpp in Sources */,
