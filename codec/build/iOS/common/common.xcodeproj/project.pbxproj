@@ -24,6 +24,7 @@
 		F556A8251906673900E156A8 /* expand_picture_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F556A8231906673900E156A8 /* expand_picture_aarch64_neon.S */; };
 		F5AC94FF193EB7D800F58154 /* deblocking_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F5AC94FE193EB7D800F58154 /* deblocking_aarch64_neon.S */; };
 		F5B8D82D190757290037849A /* mc_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F5B8D82C190757290037849A /* mc_aarch64_neon.S */; };
+		F5BB0BB8196BB5960072D50D /* copy_mb_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F5BB0BB7196BB5960072D50D /* copy_mb_aarch64_neon.S */; };
 		FAABAA1818E9354A00D4186F /* sad_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAABAA1718E9354A00D4186F /* sad_common.cpp */; };
 /* End PBXBuildFile section */
 
@@ -72,6 +73,7 @@
 		F556A8231906673900E156A8 /* expand_picture_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = expand_picture_aarch64_neon.S; path = arm64/expand_picture_aarch64_neon.S; sourceTree = "<group>"; };
 		F5AC94FE193EB7D800F58154 /* deblocking_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = deblocking_aarch64_neon.S; path = arm64/deblocking_aarch64_neon.S; sourceTree = "<group>"; };
 		F5B8D82C190757290037849A /* mc_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = mc_aarch64_neon.S; path = arm64/mc_aarch64_neon.S; sourceTree = "<group>"; };
+		F5BB0BB7196BB5960072D50D /* copy_mb_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = copy_mb_aarch64_neon.S; path = arm64/copy_mb_aarch64_neon.S; sourceTree = "<group>"; };
 		FAABAA1618E9353F00D4186F /* sad_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sad_common.h; sourceTree = "<group>"; };
 		FAABAA1718E9354A00D4186F /* sad_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sad_common.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -177,6 +179,7 @@
 		F556A81D1906669F00E156A8 /* arm64 */ = {
 			isa = PBXGroup;
 			children = (
+				F5BB0BB7196BB5960072D50D /* copy_mb_aarch64_neon.S */,
 				F5AC94FE193EB7D800F58154 /* deblocking_aarch64_neon.S */,
 				F5B8D82C190757290037849A /* mc_aarch64_neon.S */,
 				F556A8221906673900E156A8 /* arm_arch64_common_macro.S */,
@@ -245,6 +248,7 @@
 				5BA8F2C019603F5F00011CE4 /* common_tables.cpp in Sources */,
 				4C3406D118D96EA600DFA14A /* WelsThreadLib.cpp in Sources */,
 				4C3406CC18D96EA600DFA14A /* mc_neon.S in Sources */,
+				F5BB0BB8196BB5960072D50D /* copy_mb_aarch64_neon.S in Sources */,
 				4C3406CB18D96EA600DFA14A /* expand_picture_neon.S in Sources */,
 				4CC61F0918FF6B4B00E56EAB /* copy_mb_neon.S in Sources */,
 				53C1C9BC193F0FB000404D8F /* expand_pic.cpp in Sources */,
