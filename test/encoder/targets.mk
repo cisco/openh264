@@ -7,6 +7,7 @@ ENCODER_UNITTEST_CPP_SRCS=\
 	$(ENCODER_UNITTEST_SRCDIR)/EncUT_ExpGolomb.cpp\
 	$(ENCODER_UNITTEST_SRCDIR)/EncUT_GetIntraPredictor.cpp\
 	$(ENCODER_UNITTEST_SRCDIR)/EncUT_MemoryAlloc.cpp\
+	$(ENCODER_UNITTEST_SRCDIR)/EncUT_MemoryZero.cpp\
 	$(ENCODER_UNITTEST_SRCDIR)/EncUT_MotionEstimate.cpp\
         $(ENCODER_UNITTEST_SRCDIR)/EncUT_Reconstruct.cpp\
 	$(ENCODER_UNITTEST_SRCDIR)/EncUT_Sample.cpp\
