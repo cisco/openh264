@@ -315,7 +315,7 @@ shrn2   \arg1\().8h, \arg5\().4s, #16
 cmgt    \arg4\().8h, \arg0\().8h, #0      // if true, location of coef == 11111111
 bif     \arg3\().16b, \arg1\().16b, \arg4\().16b      // if (x<0) reserved part; else keep 0 untouched
 shl     \arg3\().8h, \arg3\().8h, #1
-mov.8h  \arg6, \arg1
+mov     \arg6\().8h, \arg1\().8h
 sub     \arg1\().8h, \arg1\().8h, \arg3\().8h      // if x > 0, -= 0; else x-= 2x
 //  }
 .endm
