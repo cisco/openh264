@@ -85,6 +85,10 @@ int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx) {
   }
 
   do {
+    if (iCountNumMb >= iTotalNumMb) {
+      break;
+    }
+
     if (WelsTargetMbConstruction (pCtx)) {
       WelsLog (&(pCtx->sLogCtx), WELS_LOG_WARNING, "WelsTargetSliceConstruction():::MB(%d, %d) construction error. pCurSlice_type:%d\n",
                pCurLayer->iMbX, pCurLayer->iMbY, pCurSlice->eSliceType);
@@ -98,9 +102,6 @@ int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx) {
       ++pCtx->iTotalNumMbRec;
     }
 
-    if (iCountNumMb >= iTotalNumMb) {
-      break;
-    }
     if (pCtx->iTotalNumMbRec > iTotalMbTargetLayer) {
       WelsLog (&(pCtx->sLogCtx), WELS_LOG_WARNING, "WelsTargetSliceConstruction():::pCtx->iTotalNumMbRec:%d, iTotalMbTargetLayer:%d\n",
                pCtx->iTotalNumMbRec, iTotalMbTargetLayer);
@@ -390,6 +391,10 @@ int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNal
   }
 
   do {
+    if ((-1 == iNextMbXyIndex) || (iNextMbXyIndex >= kiCountNumMb)) {	// slice group boundary or end of a frame
+      break;
+    }
+
     pCurLayer->pSliceIdc[iNextMbXyIndex] = iSliceIdc;
     iRet = pDecMbCavlcFunc (pCtx,  pNalCur);
 
@@ -403,9 +408,6 @@ int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNal
       iNextMbXyIndex = FmoNextMb (pFmo, iNextMbXyIndex);
     } else {
       ++iNextMbXyIndex;
-    }
-    if ((-1 == iNextMbXyIndex) || (iNextMbXyIndex >= kiCountNumMb)) {	// slice group boundary or end of a frame
-      break;
     }
 
     // check whether there is left bits to read next time in case multiple slices
