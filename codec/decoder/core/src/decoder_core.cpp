@@ -76,6 +76,8 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
     bFrameCompleteFlag = false; //return later after output buffer is done
     if (pCtx->bInstantDecFlag) //no-delay decoding, wait for new slice
       return -1;
+  } else if (pCurDq->sLayerInfo.sNalHeaderExt.bIdrFlag && (pCtx->iErrorCode == dsErrorFree)) { //complete non-ECed IDR frame done
+      pCtx->bDecErrorConedFlag = false;
   }
 
   pCtx->iTotalNumMbRec = 0;
@@ -1959,7 +1961,6 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         if (NeedErrorCon (pCtx)) {
           ImplementErrorCon (pCtx);
           pCtx->iTotalNumMbRec = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
-          pCtx->iErrorCode |= dsDataErrorConcealed;
         }
       }
 
@@ -2009,7 +2010,6 @@ bool CheckAndDoEC (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstI
       pCtx->iPrevFrameNum = pCtx->sLastSliceHeader.iFrameNum; //save frame_num
       if (pCtx->bLastHasMmco5)
         pCtx->iPrevFrameNum = 0;
-      pCtx->iErrorCode |= dsDataErrorConcealed;
     }
   }
   return ERR_NONE;

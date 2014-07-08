@@ -317,6 +317,7 @@ int32_t iFeedbackVclNalInAu;
 int32_t iFeedbackTidInAu;
 
 bool bAuReadyFlag;   // true: one au is ready for decoding; false: default value
+bool bDecErrorConedFlag; //true: current decoder is error coned
 
 //trace handle
 void*      pTraceHandle;
