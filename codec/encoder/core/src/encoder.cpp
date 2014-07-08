@@ -325,10 +325,14 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
     } else {
       iFrameType = videoFrameTypeP;
     }
-    if (videoFrameTypeIDR == iFrameType) {
+    if (videoFrameTypeP == iFrameType && pEncCtx->iSkipFrameFlag > 0) {
+      -- pEncCtx->iSkipFrameFlag;
+      iFrameType = videoFrameTypeSkip;
+    } else if (videoFrameTypeIDR == iFrameType) {
       pEncCtx->iCodingIndex = 0;
       pEncCtx->bCurFrameMarkedAsSceneLtr   = true;
     }
+
   } else {
     // perform scene change detection
     if ((!pSvcParam->bEnableSceneChangeDetect) || pEncCtx->pVaa->bIdrPeriodFlag ||
