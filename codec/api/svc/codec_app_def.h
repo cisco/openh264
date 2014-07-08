@@ -242,9 +242,10 @@ enum {
   WELS_LOG_ERROR		= 1 << 0,	// Error log iLevel
   WELS_LOG_WARNING	= 1 << 1,	// Warning log iLevel
   WELS_LOG_INFO		= 1 << 2,	// Information log iLevel
-  WELS_LOG_DEBUG		= 1 << 3,	// Debug log iLevel
-  WELS_LOG_RESV		= 1 << 4,	// Resversed log iLevel
-  WELS_LOG_LEVEL_COUNT = 5,
+  WELS_LOG_DEBUG		= 1 << 3,	// Debug log, critical algo log
+  WELS_LOG_DETAIL		= 1 << 4,	// per packet/frame log
+  WELS_LOG_RESV		= 1 << 5,	// Resversed log iLevel
+  WELS_LOG_LEVEL_COUNT = 6,
   WELS_LOG_DEFAULT	= WELS_LOG_DEBUG	// Default log iLevel in Wels codec
 };
 
