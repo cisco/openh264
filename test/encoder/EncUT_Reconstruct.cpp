@@ -248,7 +248,7 @@ TEST (ReconstructionFunTest, WelsDequant4x4) {
     uint8_t uiQp = rand() % 52;
     FillWithRandomData ((uint8_t*)pInput[0], 32);
     for (int32_t i = 0 ; i < 16; i++) {
-      pInput[0][i] = WELS_CLIP3 (pInput[0][i], -32640, 32640);
+      pInput[0][i] = WELS_CLIP3 (pInput[0][i], -32000, 32000);
     }
     memcpy ((uint8_t*)pInput[1], (uint8_t*)pInput[0], 32);
 
@@ -278,7 +278,7 @@ TEST (ReconstructionFunTest, WelsDequantIHadamard4x4) {
     uint8_t uiQp = rand() % 52;
     FillWithRandomData ((uint8_t*)pInput[0], 32);
     for (int32_t i = 0 ; i < 16; i++) {
-      pInput[0][i] = WELS_CLIP3 (pInput[0][i], -32640, 32640);
+      pInput[0][i] = WELS_CLIP3 (pInput[0][i], -32000, 32000);
     }
     memcpy ((uint8_t*)pInput[1], (uint8_t*)pInput[0], 32);
 
@@ -307,7 +307,7 @@ TEST (ReconstructionFunTest, WelsQuant4x4) {
     uint8_t uiQp = rand() % 52;
     FillWithRandomData ((uint8_t*)pInput[0], 32);
     for (int32_t i = 0 ; i < 16; i++) {
-      pInput[0][i] = WELS_CLIP3 (pInput[0][i], -32640, 32640);
+      pInput[0][i] = WELS_CLIP3 (pInput[0][i], -32000, 32000);
     }
     memcpy ((uint8_t*)pInput[1], (uint8_t*)pInput[0], 32);
 
@@ -334,7 +334,7 @@ TEST (ReconstructionFunTest, WelsQuant4x4Dc) {
     uint8_t uiQp = rand() % 52;
     FillWithRandomData ((uint8_t*)pInput[0], 32);
     for (int32_t i = 0 ; i < 16; i++) {
-      pInput[0][i] = WELS_CLIP3 (pInput[0][i], -32640, 32640);
+      pInput[0][i] = WELS_CLIP3 (pInput[0][i], -32000, 32000);
     }
     memcpy ((uint8_t*)pInput[1], (uint8_t*)pInput[0], 32);
 
@@ -360,7 +360,7 @@ TEST (ReconstructionFunTest, WelsQuantFour4x4) {
     uint8_t uiQp = rand() % 52;
     FillWithRandomData ((uint8_t*)pInput[0], 128);
     for (int32_t i = 0 ; i < 64; i++) {
-      pInput[0][i] = WELS_CLIP3 (pInput[0][i], -32640, 32640);
+      pInput[0][i] = WELS_CLIP3 (pInput[0][i], -32000, 32000);
     }
     memcpy ((uint8_t*)pInput[1], (uint8_t*)pInput[0], 128);
 
@@ -387,7 +387,7 @@ TEST (ReconstructionFunTest, WelsQuantFour4x4Max) {
     uint8_t uiQp = rand() % 52;
     FillWithRandomData ((uint8_t*)pInput[0], 128);
     for (int32_t i = 0 ; i < 64; i++) {
-      pInput[0][i] = WELS_CLIP3 (pInput[0][i], -32640, 32640);
+      pInput[0][i] = WELS_CLIP3 (pInput[0][i], -32000, 32000);
     }
     memcpy ((uint8_t*)pInput[1], (uint8_t*)pInput[0], 128);
 
@@ -414,7 +414,7 @@ TEST (ReconstructionFunTest, WelsDeQuantFour4x4) {
     uint8_t uiQp = rand() % 52;
     FillWithRandomData ((uint8_t*)pInput[0], 128);
     for (int32_t i = 0 ; i < 64; i++) {
-      pInput[0][i] = WELS_CLIP3 (pInput[0][i], -32640, 32640);
+      pInput[0][i] = WELS_CLIP3 (pInput[0][i], -32000, 32000);
     }
     memcpy ((uint8_t*)pInput[1], (uint8_t*)pInput[0], 128);
 
