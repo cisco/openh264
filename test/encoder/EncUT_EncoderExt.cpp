@@ -41,7 +41,6 @@ class EncoderInterfaceTest : public ::testing::Test {
 
 void EncoderInterfaceTest::TemporalLayerSettingTest() {
 
-  pParamExt->iInputCsp = 23;
   pParamExt->iPicWidth = m_iWidth;
   pParamExt->iPicHeight = m_iHeight;
   pParamExt->iTargetBitrate = 60000;

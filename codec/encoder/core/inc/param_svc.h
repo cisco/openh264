@@ -133,9 +133,8 @@ static void FillDefault (SEncParamExt& param) {
   param.iPicHeight	= 0;	//   actual input picture height
 
   param.fMaxFrameRate		= MAX_FRAME_RATE;	// maximal frame rate [Hz / fps]
-  param.iInputCsp			= videoFormatI420;	// input sequence color space in default
-  param.uiFrameToBeCoded	= (uint32_t) - 1;		// frame to be encoded (at input frame rate)
 
+  param.iComplexityMode = MEDIUM_COMPLEXITY;
   param.iTargetBitrate			= 0;	// overall target bitrate introduced in RC module
   param.iMaxBitrate             = MAX_BIT_RATE;
   param.iMultipleThreadIdc		= 1;
@@ -203,7 +202,7 @@ void FillDefault() {
   iCountThreadsNum		= 1;	//		# derived from disable_multiple_slice_idc (=0 or >1) means;
 
   iDecompStages				= 0;	// GOP size dependency, unknown here and be revised later
-
+  iComplexityMode = MEDIUM_COMPLEXITY;
   memset (sDependencyLayers, 0, sizeof (SSpatialLayerInternal)*MAX_DEPENDENCY_LAYER);
   memset (sSpatialLayers, 0 , sizeof (SSpatialLayerConfig)*MAX_SPATIAL_LAYER_NUM);
 
@@ -223,7 +222,6 @@ void FillDefault() {
 
 int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam) {
 
-  iInputCsp		= pCodingParam.iInputCsp;		// color space of input sequence
   fMaxFrameRate		= WELS_CLIP3 (pCodingParam.fMaxFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
   iTargetBitrate	= pCodingParam.iTargetBitrate;
   iUsageType = pCodingParam.iUsageType;
@@ -271,7 +269,6 @@ int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam) {
 }
 void GetBaseParams (SEncParamBase* pCodingParam) {
   pCodingParam->iUsageType     = iUsageType;
-  pCodingParam->iInputCsp      = iInputCsp;
   pCodingParam->iPicWidth      = iPicWidth;
   pCodingParam->iPicHeight     = iPicHeight;
   pCodingParam->iTargetBitrate = iTargetBitrate;
@@ -281,12 +278,10 @@ void GetBaseParams (SEncParamBase* pCodingParam) {
 int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
   float fParamMaxFrameRate		= WELS_CLIP3 (pCodingParam.fMaxFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
 
-  iInputCsp		= pCodingParam.iInputCsp;		// color space of input sequence
-  uiFrameToBeCoded	= (uint32_t) -
-                      1;		// frame to be encoded (at input frame rate), -1 dependents on length of input sequence
   iUsageType = pCodingParam.iUsageType;
   iPicWidth   = pCodingParam.iPicWidth;
   iPicHeight  = pCodingParam.iPicHeight;
+  iComplexityMode = pCodingParam.iComplexityMode;
 
   SUsedPicRect.iLeft = 0;
   SUsedPicRect.iTop  = 0;
@@ -297,7 +292,8 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
 
   /* Deblocking loop filter */
   iLoopFilterDisableIdc	= pCodingParam.iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries,
-  if (iLoopFilterDisableIdc == 0 && iMultipleThreadIdc != 1) // Loop filter requested to be enabled, with threading enabled
+  if (iLoopFilterDisableIdc == 0
+      && iMultipleThreadIdc != 1) // Loop filter requested to be enabled, with threading enabled
     iLoopFilterDisableIdc = 2; // Disable loop filter on slice boundaries since that's not allowed with multithreading
   iLoopFilterAlphaC0Offset = pCodingParam.iLoopFilterAlphaC0Offset;	// AlphaOffset: valid range [-6, 6], default 0
   iLoopFilterBetaOffset = pCodingParam.iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0

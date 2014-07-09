@@ -232,7 +232,6 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
 
     // TODO(ekr@rtfm.com). Scary conversion from unsigned char to float below.
     param.fMaxFrameRate = static_cast<float> (codecSettings.mMaxFramerate);
-    param.iInputCsp = videoFormatI420;
 
     rv = encoder_->Initialize (&param);
     if (rv) {
