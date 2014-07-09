@@ -17,6 +17,7 @@ SHARED=-shared
 OBJ=o
 PROJECT_NAME=openh264
 MODULE_NAME=gmpopenh264
+GMP_API_BRANCH=Firefox32
 CCASFLAGS=$(CFLAGS)
 
 ifeq (,$(wildcard ./gmp-api))
@@ -122,7 +123,8 @@ endif
 	$(QUIET)rm -f $(OBJS) $(OBJS:.$(OBJ)=.d) $(LIBRARIES) $(BINARIES)
 
 gmp-bootstrap:
-	git clone https://github.com/mozilla/gmp-api gmp-api
+	if [ ! -d gmp-api ] ; then git clone https://github.com/mozilla/gmp-api gmp-api ; fi
+	cd gmp-api && git fetch origin && git checkout $(GMP_API_BRANCH)
 
 gtest-bootstrap:
 	svn co https://googletest.googlecode.com/svn/trunk/ gtest
