@@ -63,7 +63,7 @@
 				ObjectFile=".\..\..\..\obj\decoder\core\release/"
 				ProgramDataBaseFileName=".\..\..\..\obj\decoder\core\release/"
 				WarningLevel="3"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -140,7 +140,7 @@
 				ObjectFile=".\..\..\..\obj\decoder\core\release/"
 				ProgramDataBaseFileName=".\..\..\..\obj\decoder\core\release/"
 				WarningLevel="3"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

@@ -58,6 +58,7 @@
 				ObjectFile=".\..\..\..\obj\decConsole\Release/"
 				ProgramDataBaseFileName=".\..\..\..\obj\decConsole\Release/"
 				WarningLevel="3"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -146,6 +147,7 @@
 				ObjectFile=".\..\..\..\obj\decConsole\Release/"
 				ProgramDataBaseFileName=".\..\..\..\obj\decConsole\Release/"
 				WarningLevel="3"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
