@@ -3718,7 +3718,10 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     pOldParam->bPrefixNalAddingCtrl = pNewParam->bPrefixNalAddingCtrl;
     pOldParam->iNumRefFrame		= pNewParam->iNumRefFrame;		// number of reference frame used
     pOldParam->uiGopSize = pNewParam->uiGopSize;
-    pOldParam->iTemporalLayerNum = pNewParam->iTemporalLayerNum;
+    if (pOldParam->iTemporalLayerNum != pNewParam->iTemporalLayerNum) {
+      pOldParam->iTemporalLayerNum = pNewParam->iTemporalLayerNum;
+      (*ppCtx)->iCodingIndex = 0;
+    }
     pOldParam->iDecompStages = pNewParam->iDecompStages;
     /* denoise control */
     pOldParam->bEnableDenoise	= pNewParam->bEnableDenoise;
