@@ -243,13 +243,15 @@ void GeneralBilinearAccurateDownsamplerWrap_neon (uint8_t* pDst, const int32_t k
 #endif
 
 #ifdef HAVE_NEON_AARCH64
-void GeneralBilinearAccurateDownsamplerWrap_AArch64_neon (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth, const int32_t kiDstHeight,
-                                                  uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
+void GeneralBilinearAccurateDownsamplerWrap_AArch64_neon (uint8_t* pDst, const int32_t kiDstStride,
+    const int32_t kiDstWidth, const int32_t kiDstHeight,
+    uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
   const int32_t kiScaleBit = 15;
   const uint32_t kuiScale = (1 << kiScaleBit);
   uint32_t uiScalex = WELS_ROUND ((float)kiSrcWidth / (float)kiDstWidth * kuiScale);
   uint32_t uiScaley = WELS_ROUND ((float)kiSrcHeight / (float)kiDstHeight * kuiScale);
-  GeneralBilinearAccurateDownsampler_AArch64_neon (pDst, kiDstStride, kiDstWidth, kiDstHeight, pSrc, kiSrcStride, uiScalex, uiScaley);
+  GeneralBilinearAccurateDownsampler_AArch64_neon (pDst, kiDstStride, kiDstWidth, kiDstHeight, pSrc, kiSrcStride,
+      uiScalex, uiScaley);
 }
 #endif
 WELSVP_NAMESPACE_END

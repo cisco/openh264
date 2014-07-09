@@ -216,7 +216,7 @@ bool CheckChromaCost (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMbCache* pMbCache
 
 //01/17/2013. USE the NEW BGD Pskip with COLOR CHECK for screen content and camera because of color artifact seen in test
 bool WelsMdInterJudgeBGDPskip (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
-                                     bool* bKeepSkip) {
+                               bool* bKeepSkip) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   SWelsMD* pWelsMd = (SWelsMD*)pMd;
 

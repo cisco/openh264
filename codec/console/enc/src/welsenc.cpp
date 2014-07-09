@@ -667,7 +667,7 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
   int iParsedNum = 1;
 
   memset (&sFbi, 0, sizeof (SFrameBSInfo));
-  pPtrEnc->GetDefaultParams(&sSvcParam);
+  pPtrEnc->GetDefaultParams (&sSvcParam);
   memset (&fs.sRecFileName[0][0], 0, sizeof (fs.sRecFileName));
 
   FillSpecificParameters (sSvcParam);

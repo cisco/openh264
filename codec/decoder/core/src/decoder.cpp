@@ -341,7 +341,7 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
     pCtx->eVideoType = VIDEO_BITSTREAM_DEFAULT;
   }
 
-  WelsLog (&(pCtx->sLogCtx), WELS_LOG_INFO, "eVideoType: %d\n", pCtx->eVideoType);
+  WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "eVideoType: %d\n", pCtx->eVideoType);
 
   return 0;
 }
@@ -605,14 +605,16 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
 
   iErr = WelsRequestMem (pCtx, kiMbWidth, kiMbHeight);	// common memory used
   if (ERR_NONE != iErr) {
-    WelsLog (&(pCtx->sLogCtx), WELS_LOG_WARNING, "SyncPictureResolutionExt()::WelsRequestMem--buffer allocated failure.\n");
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
+             "SyncPictureResolutionExt()::WelsRequestMem--buffer allocated failure.\n");
     pCtx->iErrorCode = dsOutOfMemory;
     return iErr;
   }
 
   iErr = InitialDqLayersContext (pCtx, kiPicWidth, kiPicHeight);
   if (ERR_NONE != iErr) {
-    WelsLog (&(pCtx->sLogCtx), WELS_LOG_WARNING, "SyncPictureResolutionExt()::InitialDqLayersContext--buffer allocated failure.\n");
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
+             "SyncPictureResolutionExt()::InitialDqLayersContext--buffer allocated failure.\n");
     pCtx->iErrorCode = dsOutOfMemory;
   }
 
