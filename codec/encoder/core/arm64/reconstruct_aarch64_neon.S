@@ -270,253 +270,253 @@
     uxtl2     $4.8h, $0.16b
     add       $3.8h, $3.8h, $1.8h
     add       $4.8h, $4.8h, $2.8h
-    sqxtun   $0.8b, $3.8h
-    sqxtun2  $0.16b,$4.8h
+    sqxtun    $0.8b, $3.8h
+    sqxtun2   $0.16b,$4.8h
 //  }
 .endm
 #else
 .macro ZERO_COUNT_IN_2_QUARWORD arg0, arg1, arg2
 //  {   //  input:  coef_0 (identy to \arg3\() \arg4\()), coef_1(identy to \arg5\() \arg6\()), mask_q
-cmeq    \arg0\().8h, \arg0\().8h, #0
-cmeq    \arg1\().8h, \arg1\().8h, #0
-uzp1    \arg0\().16b, \arg0\().16b, \arg1\().16b
-ushr    \arg0\().16b, \arg0\().16b, 7
-addv    \arg2\(), \arg0\().16b
+    cmeq    \arg0\().8h, \arg0\().8h, #0
+    cmeq    \arg1\().8h, \arg1\().8h, #0
+    uzp1    \arg0\().16b, \arg0\().16b, \arg1\().16b
+    ushr    \arg0\().16b, \arg0\().16b, 7
+    addv    \arg2\(), \arg0\().16b
 //  }
 .endm
 
 .macro NEWQUANT_COEF_EACH_16BITS arg0, arg1, arg2, arg3, arg4, arg5
 // if coef <= 0, - coef; else , coef;
 //  {   //  input:  coef, ff (dst), mf
-eor     \arg3\().16b, \arg3\().16b, \arg3\().16b          // init 0 , and keep 0;
-saba    \arg1\().8h, \arg0\().8h, \arg3\().8h      // f + abs(coef - 0)
-smull   \arg4\().4s, \arg1\().4h, \arg2\().4h
-smull2  \arg5\().4s, \arg1\().8h, \arg2\().8h
-shrn    \arg1\().4h, \arg4\().4s, #16
-shrn2   \arg1\().8h, \arg5\().4s, #16
+    eor     \arg3\().16b, \arg3\().16b, \arg3\().16b          // init 0 , and keep 0;
+    saba    \arg1\().8h, \arg0\().8h, \arg3\().8h      // f + abs(coef - 0)
+    smull   \arg4\().4s, \arg1\().4h, \arg2\().4h
+    smull2  \arg5\().4s, \arg1\().8h, \arg2\().8h
+    shrn    \arg1\().4h, \arg4\().4s, #16
+    shrn2   \arg1\().8h, \arg5\().4s, #16
 
-cmgt    \arg4\().8h, \arg0\().8h, #0      // if true, location of coef == 11111111
-bif     \arg3\().16b, \arg1\().16b, \arg4\().16b      // if (x<0) reserved part; else keep 0 untouched
-shl     \arg3\().8h, \arg3\().8h, #1
-sub     \arg1\().8h, \arg1\().8h, \arg3\().8h      // if x > 0, -= 0; else x-= 2x
+    cmgt    \arg4\().8h, \arg0\().8h, #0      // if true, location of coef == 11111111
+    bif     \arg3\().16b, \arg1\().16b, \arg4\().16b      // if (x<0) reserved part; else keep 0 untouched
+    shl     \arg3\().8h, \arg3\().8h, #1
+    sub     \arg1\().8h, \arg1\().8h, \arg3\().8h      // if x > 0, -= 0; else x-= 2x
 //  }
 .endm
 
 .macro NEWQUANT_COEF_EACH_16BITS_MAX arg0, arg1, arg2, arg3, arg4, arg5, arg6
 // if coef <= 0, - coef; else , coef;
 //  {   //  input:  coef, ff (dst), mf
-eor     \arg3\().16b, \arg3\().16b, \arg3\().16b          // init 0 , and keep 0;
-saba    \arg1\().8h, \arg0\().8h, \arg3\().8h      // f + abs(coef - 0)
-smull   \arg4\().4s, \arg1\().4h, \arg2\().4h
-smull2  \arg5\().4s, \arg1\().8h, \arg2\().8h
-shrn    \arg1\().4h, \arg4\().4s, #16
-shrn2   \arg1\().8h, \arg5\().4s, #16
+    eor     \arg3\().16b, \arg3\().16b, \arg3\().16b          // init 0 , and keep 0;
+    saba    \arg1\().8h, \arg0\().8h, \arg3\().8h      // f + abs(coef - 0)
+    smull   \arg4\().4s, \arg1\().4h, \arg2\().4h
+    smull2  \arg5\().4s, \arg1\().8h, \arg2\().8h
+    shrn    \arg1\().4h, \arg4\().4s, #16
+    shrn2   \arg1\().8h, \arg5\().4s, #16
 
-cmgt    \arg4\().8h, \arg0\().8h, #0      // if true, location of coef == 11111111
-bif     \arg3\().16b, \arg1\().16b, \arg4\().16b      // if (x<0) reserved part; else keep 0 untouched
-shl     \arg3\().8h, \arg3\().8h, #1
-mov     \arg6\().16b, \arg1\().16b
-sub     \arg1\().8h, \arg1\().8h, \arg3\().8h      // if x > 0, -= 0; else x-= 2x
+    cmgt    \arg4\().8h, \arg0\().8h, #0      // if true, location of coef == 11111111
+    bif     \arg3\().16b, \arg1\().16b, \arg4\().16b      // if (x<0) reserved part; else keep 0 untouched
+    shl     \arg3\().8h, \arg3\().8h, #1
+    mov     \arg6\().16b, \arg1\().16b
+    sub     \arg1\().8h, \arg1\().8h, \arg3\().8h      // if x > 0, -= 0; else x-= 2x
 //  }
 .endm
 
 .macro QUANT_DUALWORD_COEF_EACH_16BITS arg0, arg1, arg2, arg3, arg4
 // if coef <= 0, - coef; else , coef;
 //  {   //  input:  coef, ff (dst), mf
-saba    \arg1\().8h, \arg0\().8h, \arg3\().8h      // f + abs(coef - 0)
-smull   \arg4\().4s, \arg1\().4h, \arg2\().4h
-shrn    \arg1\().4h, \arg4\().4s, #16
+    saba    \arg1\().8h, \arg0\().8h, \arg3\().8h      // f + abs(coef - 0)
+    smull   \arg4\().4s, \arg1\().4h, \arg2\().4h
+    shrn    \arg1\().4h, \arg4\().4s, #16
 
-cmgt    \arg4\().8h, \arg0\().8h, #0      // if true, location of coef == 11111111
-bif     \arg3\().16b, \arg1\().16b, \arg4\().16b      // if (x<0) reserved part; else keep 0 untouched
-shl     \arg3\().8h, \arg3\().8h, #1
-sub     \arg1\().8h, \arg1\().8h, \arg3\().8h      // if x > 0, -= 0; else x-= 2x
+    cmgt    \arg4\().8h, \arg0\().8h, #0      // if true, location of coef == 11111111
+    bif     \arg3\().16b, \arg1\().16b, \arg4\().16b      // if (x<0) reserved part; else keep 0 untouched
+    shl     \arg3\().8h, \arg3\().8h, #1
+    sub     \arg1\().8h, \arg1\().8h, \arg3\().8h      // if x > 0, -= 0; else x-= 2x
 //  }
 .endm
 
 .macro SELECT_MAX_IN_ABS_COEF arg0, arg1, arg2, arg3, arg4, arg5
 //  {   //  input:  coef_0, coef_1, coef_2, coef_3, max_q (identy to follow two)
-umax    \arg0\().8h, \arg0\().8h, \arg1\().8h
-umaxv   \arg4\(), \arg0\().8h
-umax    \arg2\().8h, \arg2\().8h, \arg3\().8h
-umaxv   \arg5\(), \arg2\().8h
+    umax    \arg0\().8h, \arg0\().8h, \arg1\().8h
+    umaxv   \arg4\(), \arg0\().8h
+    umax    \arg2\().8h, \arg2\().8h, \arg3\().8h
+    umaxv   \arg5\(), \arg2\().8h
 //  }
 .endm
 
 .macro HDM_QUANT_2x2_TOTAL_16BITS arg0, arg1, arg2
 //  {   //  input: src_d[0][16][32][48], dst_d[0][16][32][48], working
-sshr  \arg1\().2d, \arg0\().2d, #32
-add   \arg2\().4h, \arg0\().4h, \arg1\().4h      // [0] = rs[0] + rs[32];[1] = rs[16] + rs[48];
-sub   \arg1\().4h, \arg0\().4h, \arg1\().4h      // [0] = rs[0] - rs[32];[1] = rs[16] - rs[48];
-zip1  \arg1\().4h, \arg2\().4h, \arg1\().4h
+    sshr  \arg1\().2d, \arg0\().2d, #32
+    add   \arg2\().4h, \arg0\().4h, \arg1\().4h      // [0] = rs[0] + rs[32];[1] = rs[16] + rs[48];
+    sub   \arg1\().4h, \arg0\().4h, \arg1\().4h      // [0] = rs[0] - rs[32];[1] = rs[16] - rs[48];
+    zip1  \arg1\().4h, \arg2\().4h, \arg1\().4h
 //  }
 .endm
 
 
 .macro DC_ZERO_COUNT_IN_DUALWORD arg0, arg1, arg2
 //  {   //  input:  coef, dst_d, working_d (all 0x01)
-cmeq    \arg0\().4h, \arg0\().4h, #0
-and     \arg0\().8b, \arg0\().8b, \arg2\().8b
-addv    \arg1\(), \arg0\().4h
+    cmeq    \arg0\().4h, \arg0\().4h, #0
+    and     \arg0\().8b, \arg0\().8b, \arg2\().8b
+    addv    \arg1\(), \arg0\().4h
 //  }
 .endm
 
 .macro IHDM_4x4_TOTAL_16BITS arg0, arg1, arg2
 //  {   //  input: each src_d[0]~[3](dst), working_q0, working_q1
-uzp2  \arg1\().4s, \arg0\().4s, \arg0\().4s
-uzp1  \arg0\().4s, \arg0\().4s, \arg0\().4s
-add   \arg2\().8h, \arg0\().8h, \arg1\().8h      // [0] = rs[0] + rs[2];[1] = rs[1] + rs[3];[2] = rs[4] + rs[6];[3] = rs[5] + rs[7];
-sub   \arg1\().8h, \arg0\().8h, \arg1\().8h      // [0] = rs[0] - rs[2];[1] = rs[1] - rs[3];[2] = rs[4] - rs[6];[3] = rs[5] - rs[7];
-zip1  \arg2\().8h, \arg2\().8h, \arg1\().8h      // [0] = rs[0] + rs[2]; [1] = rs[0] - rs[2]; ... [2]; [3]
+    uzp2  \arg1\().4s, \arg0\().4s, \arg0\().4s
+    uzp1  \arg0\().4s, \arg0\().4s, \arg0\().4s
+    add   \arg2\().8h, \arg0\().8h, \arg1\().8h      // [0] = rs[0] + rs[2];[1] = rs[1] + rs[3];[2] = rs[4] + rs[6];[3] = rs[5] + rs[7];
+    sub   \arg1\().8h, \arg0\().8h, \arg1\().8h      // [0] = rs[0] - rs[2];[1] = rs[1] - rs[3];[2] = rs[4] - rs[6];[3] = rs[5] - rs[7];
+    zip1  \arg2\().8h, \arg2\().8h, \arg1\().8h      // [0] = rs[0] + rs[2]; [1] = rs[0] - rs[2]; ... [2]; [3]
 
-uzp2  \arg1\().4s, \arg2\().4s, \arg2\().4s
-uzp1  \arg0\().4s, \arg2\().4s, \arg2\().4s
-add   \arg2\().8h, \arg0\().8h, \arg1\().8h      // [0] = rs[0] + rs[2];[1] = rs[1] + rs[3];[2] = rs[4] + rs[6];[3] = rs[5] + rs[7];
-sub   \arg1\().8h, \arg0\().8h, \arg1\().8h      // [0] = rs[0] - rs[2];[1] = rs[1] - rs[3];[2] = rs[4] - rs[6];[3] = rs[5] - rs[7];
-rev32 \arg1\().4h, \arg1\().4h             // [0] = rs[1] - rs[3];[1] = rs[0] - rs[2];[2] = rs[5] - rs[7];[3] = rs[4] - rs[6];
-zip1  \arg0\().4s, \arg2\().4s, \arg1\().4s
-//  }
+    uzp2  \arg1\().4s, \arg2\().4s, \arg2\().4s
+    uzp1  \arg0\().4s, \arg2\().4s, \arg2\().4s
+    add   \arg2\().8h, \arg0\().8h, \arg1\().8h      // [0] = rs[0] + rs[2];[1] = rs[1] + rs[3];[2] = rs[4] + rs[6];[3] = rs[5] + rs[7];
+    sub   \arg1\().8h, \arg0\().8h, \arg1\().8h      // [0] = rs[0] - rs[2];[1] = rs[1] - rs[3];[2] = rs[4] - rs[6];[3] = rs[5] - rs[7];
+    rev32 \arg1\().4h, \arg1\().4h             // [0] = rs[1] - rs[3];[1] = rs[0] - rs[2];[2] = rs[5] - rs[7];[3] = rs[4] - rs[6];
+    zip1  \arg0\().4s, \arg2\().4s, \arg1\().4s
+    //  }
 .endm
 
 .macro MATRIX_TRANSFORM_EACH_16BITS_2x8_OUT2 arg0, arg1, arg2, arg3
 //  {   //  input & output: src_d[0]~[3];[0 1 2 3]+[4 5 6 7]+[8 9 10 11]+[12 13 14 15]
-uzp1 \arg2\().4s, \arg0\().4s, \arg1\().4s   //[0 1 4 5]+[8 9 12 13]
-uzp2 \arg3\().4s, \arg0\().4s, \arg1\().4s   //[2 3 6 7]+[10 11 14 15]
+    uzp1 \arg2\().4s, \arg0\().4s, \arg1\().4s   //[0 1 4 5]+[8 9 12 13]
+    uzp2 \arg3\().4s, \arg0\().4s, \arg1\().4s   //[2 3 6 7]+[10 11 14 15]
 
-uzp1 \arg0\().8h, \arg2\().8h, \arg3\().8h   //[0 4 8 12]+[2 6 10 14]
-uzp2 \arg2\().8h, \arg2\().8h, \arg3\().8h   //[1 5 9 13]+[3 7 11 15]
-zip2 \arg1\().2d, \arg0\().2d, \arg2\().2d   //[2 6 10 14]+[3 7 11 15]
-zip1 \arg0\().2d, \arg0\().2d, \arg2\().2d   //[0 4 8 12]+[1 5 9 13]
+    uzp1 \arg0\().8h, \arg2\().8h, \arg3\().8h   //[0 4 8 12]+[2 6 10 14]
+    uzp2 \arg2\().8h, \arg2\().8h, \arg3\().8h   //[1 5 9 13]+[3 7 11 15]
+    zip2 \arg1\().2d, \arg0\().2d, \arg2\().2d   //[2 6 10 14]+[3 7 11 15]
+    zip1 \arg0\().2d, \arg0\().2d, \arg2\().2d   //[0 4 8 12]+[1 5 9 13]
 //  }
 .endm
 
 .macro MATRIX_TRANSFORM_EACH_16BITS_OUT4 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
 //  {   //  input & output: src_d[0]~[3];[0 4 8 12],[1 5 9 13],[2 6 10 14],[3 7 11 15]
-trn1 \arg4\().8h, v0.8h, v1.8h
-trn2 \arg5\().8h, v0.8h, v1.8h
-trn1 \arg6\().8h, v2.8h, v3.8h
-trn2 \arg7\().8h, v2.8h, v3.8h
+    trn1 \arg4\().8h, v0.8h, v1.8h
+    trn2 \arg5\().8h, v0.8h, v1.8h
+    trn1 \arg6\().8h, v2.8h, v3.8h
+    trn2 \arg7\().8h, v2.8h, v3.8h
 
-trn1 \arg0\().4s, v4.4s, v6.4s
-trn2 \arg2\().4s, v4.4s, v6.4s
-trn1 \arg1\().4s, v5.4s, v7.4s
-trn2 \arg3\().4s, v5.4s, v7.4s
+    trn1 \arg0\().4s, v4.4s, v6.4s
+    trn2 \arg2\().4s, v4.4s, v6.4s
+    trn1 \arg1\().4s, v5.4s, v7.4s
+    trn2 \arg3\().4s, v5.4s, v7.4s
 //  }
 .endm
 
 .macro MATRIX_TRANSFORM_EACH_16BITS_4x4_OUT2 arg0, arg1, arg2, arg3
 //  {   //  input & output: src_d[0]~[3];[0 1 2 3],[4 5 6 7],[8 9 10 11],[12 13 14 15]
-mov  \arg0\().d[1], \arg1\().d[0]  //[0 1 2 3]+[4 5 6 7]
-mov  \arg2\().d[1], \arg3\().d[0]  //[8 9 10 11]+[12 13 14 15]
-uzp1 \arg1\().4s, \arg0\().4s, \arg2\().4s   //[0 1 4 5]+[8 9 12 13]
-uzp2 \arg3\().4s, \arg0\().4s, \arg2\().4s   //[2 3 6 7]+[10 11 14 15]
+    mov  \arg0\().d[1], \arg1\().d[0]  //[0 1 2 3]+[4 5 6 7]
+    mov  \arg2\().d[1], \arg3\().d[0]  //[8 9 10 11]+[12 13 14 15]
+    uzp1 \arg1\().4s, \arg0\().4s, \arg2\().4s   //[0 1 4 5]+[8 9 12 13]
+    uzp2 \arg3\().4s, \arg0\().4s, \arg2\().4s   //[2 3 6 7]+[10 11 14 15]
 
-uzp1 \arg0\().8h, \arg1\().8h, \arg3\().8h   //[0 4 8 12]+[2 6 10 14]
-uzp2 \arg2\().8h, \arg1\().8h, \arg3\().8h   //[1 5 9 13]+[3 7 11 15]
-zip2 \arg1\().2d, \arg0\().2d, \arg2\().2d   //[2 6 10 14]+[3 7 11 15]
-zip1 \arg0\().2d, \arg0\().2d, \arg2\().2d   //[0 4 8 12]+[1 5 9 13]
+    uzp1 \arg0\().8h, \arg1\().8h, \arg3\().8h   //[0 4 8 12]+[2 6 10 14]
+    uzp2 \arg2\().8h, \arg1\().8h, \arg3\().8h   //[1 5 9 13]+[3 7 11 15]
+    zip2 \arg1\().2d, \arg0\().2d, \arg2\().2d   //[2 6 10 14]+[3 7 11 15]
+    zip1 \arg0\().2d, \arg0\().2d, \arg2\().2d   //[0 4 8 12]+[1 5 9 13]
 //  }
 .endm
 
 .macro LOAD_4x4_DATA_FOR_DCT arg0, arg1, arg2, arg3, arg4, arg5
-ld1   {\arg0\().s}[0], [\arg2\()], \arg3\()
-ld1   {\arg0\().s}[1], [\arg2\()], \arg3\()
-ld1   {\arg0\().s}[2], [\arg2\()], \arg3\()
-ld1   {\arg0\().s}[3], [\arg2\()]
+    ld1   {\arg0\().s}[0], [\arg2\()], \arg3\()
+    ld1   {\arg0\().s}[1], [\arg2\()], \arg3\()
+    ld1   {\arg0\().s}[2], [\arg2\()], \arg3\()
+    ld1   {\arg0\().s}[3], [\arg2\()]
 
-ld1   {\arg1\().s}[0], [\arg4\()], \arg5\()
-ld1   {\arg1\().s}[1], [\arg4\()], \arg5\()
-ld1   {\arg1\().s}[2], [\arg4\()], \arg5\()
-ld1   {\arg1\().s}[3], [\arg4\()]
+    ld1   {\arg1\().s}[0], [\arg4\()], \arg5\()
+    ld1   {\arg1\().s}[1], [\arg4\()], \arg5\()
+    ld1   {\arg1\().s}[2], [\arg4\()], \arg5\()
+    ld1   {\arg1\().s}[3], [\arg4\()]
 .endm
 
 .macro DCT_ROW_TRANSFORM_TOTAL_16BITS arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
 //  {   //  input: src_d[0]~[3], working: [4]~[7]
-add     \arg4\().8h, \arg0\().8h, \arg3\().8h   //int16 s[0] = data[i] + data[i3];
-sub     \arg7\().8h, \arg0\().8h, \arg3\().8h   //int16 s[3] = data[i] - data[i3];
-add     \arg5\().8h, \arg1\().8h, \arg2\().8h   //int16 s[1] = data[i1] + data[i2];
-sub     \arg6\().8h, \arg1\().8h, \arg2\().8h   //int16 s[2] = data[i1] - data[i2];
+    add     \arg4\().8h, \arg0\().8h, \arg3\().8h   //int16 s[0] = data[i] + data[i3];
+    sub     \arg7\().8h, \arg0\().8h, \arg3\().8h   //int16 s[3] = data[i] - data[i3];
+    add     \arg5\().8h, \arg1\().8h, \arg2\().8h   //int16 s[1] = data[i1] + data[i2];
+    sub     \arg6\().8h, \arg1\().8h, \arg2\().8h   //int16 s[2] = data[i1] - data[i2];
 
-add     \arg0\().8h, \arg4\().8h, \arg5\().8h   //int16 dct[i ] = s[0] + s[1];
-sub     \arg2\().8h, \arg4\().8h, \arg5\().8h   //int16 dct[i2] = s[0] - s[1];
-shl     \arg1\().8h, \arg7\().8h, #1
-shl     \arg3\().8h, \arg6\().8h, #1
-add     \arg1\().8h, \arg1\().8h, \arg6\().8h   //int16 dct[i1] = (s[3] << 1) + s[2];
-sub     \arg3\().8h, \arg7\().8h, \arg3\().8h   //int16 dct[i3] = s[3] - (s[2] << 1);
+    add     \arg0\().8h, \arg4\().8h, \arg5\().8h   //int16 dct[i ] = s[0] + s[1];
+    sub     \arg2\().8h, \arg4\().8h, \arg5\().8h   //int16 dct[i2] = s[0] - s[1];
+    shl     \arg1\().8h, \arg7\().8h, #1
+    shl     \arg3\().8h, \arg6\().8h, #1
+    add     \arg1\().8h, \arg1\().8h, \arg6\().8h   //int16 dct[i1] = (s[3] << 1) + s[2];
+    sub     \arg3\().8h, \arg7\().8h, \arg3\().8h   //int16 dct[i3] = s[3] - (s[2] << 1);
 //  }
 .endm
 
 .macro LOAD_8x4_DATA_FOR_DCT arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
 //  {   //  input: \arg0\()~\arg3\(), src1*, src2*; untouched r2:src1_stride &r4:src2_stride
-ld1   {\arg0\().d}[0], [\arg8\()], x2
-ld1   {\arg1\().d}[0], [\arg8\()], x2
-ld1   {\arg2\().d}[0], [\arg8\()], x2
-ld1   {\arg3\().d}[0], [\arg8\()], x2
+    ld1   {\arg0\().d}[0], [\arg8\()], x2
+    ld1   {\arg1\().d}[0], [\arg8\()], x2
+    ld1   {\arg2\().d}[0], [\arg8\()], x2
+    ld1   {\arg3\().d}[0], [\arg8\()], x2
 
-ld1   {\arg4\().d}[0], [\arg9\()], x4
-ld1   {\arg5\().d}[0], [\arg9\()], x4
-ld1   {\arg6\().d}[0], [\arg9\()], x4
-ld1   {\arg7\().d}[0], [\arg9\()], x4
+    ld1   {\arg4\().d}[0], [\arg9\()], x4
+    ld1   {\arg5\().d}[0], [\arg9\()], x4
+    ld1   {\arg6\().d}[0], [\arg9\()], x4
+    ld1   {\arg7\().d}[0], [\arg9\()], x4
 //  }
 .endm
 
 .macro ROW_TRANSFORM_1_STEP_TOTAL_16BITS arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
 //  {   //  input: src_d[0]~[3], output: e_d[0]~[3];
-add   \arg4\().8h, \arg0\().8h, \arg2\().8h          //int16 e[i][0] = src[0] + src[2];
-sub   \arg5\().8h, \arg0\().8h, \arg2\().8h          //int16 e[i][1] = src[0] - src[2];
-sshr  \arg6\().8h, \arg1\().8h, #1
-sshr  \arg7\().8h, \arg3\().8h, #1
-sub   \arg6\().8h, \arg6\().8h, \arg3\().8h          //int16 e[i][2] = (src[1]>>1)-src[3];
-add   \arg7\().8h, \arg1\().8h, \arg7\().8h          //int16 e[i][3] = src[1] + (src[3]>>1);
+    add   \arg4\().8h, \arg0\().8h, \arg2\().8h          //int16 e[i][0] = src[0] + src[2];
+    sub   \arg5\().8h, \arg0\().8h, \arg2\().8h          //int16 e[i][1] = src[0] - src[2];
+    sshr  \arg6\().8h, \arg1\().8h, #1
+    sshr  \arg7\().8h, \arg3\().8h, #1
+    sub   \arg6\().8h, \arg6\().8h, \arg3\().8h          //int16 e[i][2] = (src[1]>>1)-src[3];
+    add   \arg7\().8h, \arg1\().8h, \arg7\().8h          //int16 e[i][3] = src[1] + (src[3]>>1);
 //  }
 .endm
 
 .macro TRANSFORM_TOTAL_16BITS arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
 // both row & col transform used
 //  {   //  output: f_q[0]~[3], input: e_q[0]~[3];
-add   \arg0\().8h, \arg4\().8h, \arg7\().8h          //int16 f[i][0] = e[i][0] + e[i][3];
-add   \arg1\().8h, \arg5\().8h, \arg6\().8h          //int16 f[i][1] = e[i][1] + e[i][2];
-sub   \arg2\().8h, \arg5\().8h, \arg6\().8h          //int16 f[i][2] = e[i][1] - e[i][2];
-sub   \arg3\().8h, \arg4\().8h, \arg7\().8h          //int16 f[i][3] = e[i][0] - e[i][3];
+    add   \arg0\().8h, \arg4\().8h, \arg7\().8h          //int16 f[i][0] = e[i][0] + e[i][3];
+    add   \arg1\().8h, \arg5\().8h, \arg6\().8h          //int16 f[i][1] = e[i][1] + e[i][2];
+    sub   \arg2\().8h, \arg5\().8h, \arg6\().8h          //int16 f[i][2] = e[i][1] - e[i][2];
+    sub   \arg3\().8h, \arg4\().8h, \arg7\().8h          //int16 f[i][3] = e[i][0] - e[i][3];
 //  }
 .endm
 
 .macro ROW_TRANSFORM_0_STEP arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
 //  {   //  input: src_d[0]~[3], output: e_q[0]~[3];
-saddl   \arg4\().4s, \arg0\().4h, \arg2\().4h          //int32 e[i][0] = src[0] + src[2];
-ssubl   \arg5\().4s, \arg0\().4h, \arg2\().4h          //int32 e[i][1] = src[0] - src[2];
-ssubl   \arg6\().4s, \arg1\().4h, \arg3\().4h          //int32 e[i][2] = src[1] - src[3];
-saddl   \arg7\().4s, \arg1\().4h, \arg3\().4h          //int32 e[i][3] = src[1] + src[3];
+    saddl   \arg4\().4s, \arg0\().4h, \arg2\().4h          //int32 e[i][0] = src[0] + src[2];
+    ssubl   \arg5\().4s, \arg0\().4h, \arg2\().4h          //int32 e[i][1] = src[0] - src[2];
+    ssubl   \arg6\().4s, \arg1\().4h, \arg3\().4h          //int32 e[i][2] = src[1] - src[3];
+    saddl   \arg7\().4s, \arg1\().4h, \arg3\().4h          //int32 e[i][3] = src[1] + src[3];
 //  }
 .endm
 
 .macro COL_TRANSFORM_0_STEP arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
 //  {   //  input: src_q[0]~[3], output: e_q[0]~[3];
-add     \arg4\().4s, \arg0\().4s, \arg2\().4s          //int32 e[0][j] = f[0][j] + f[2][j];
-sub     \arg5\().4s, \arg0\().4s, \arg2\().4s          //int32 e[1][j] = f[0][j] - f[2][j];
-sub     \arg6\().4s, \arg1\().4s, \arg3\().4s          //int32 e[2][j] = (f[1][j]>>1) - f[3][j];
-add     \arg7\().4s, \arg1\().4s, \arg3\().4s          //int32 e[3][j] = f[1][j] + (f[3][j]>>1);
+    add     \arg4\().4s, \arg0\().4s, \arg2\().4s          //int32 e[0][j] = f[0][j] + f[2][j];
+    sub     \arg5\().4s, \arg0\().4s, \arg2\().4s          //int32 e[1][j] = f[0][j] - f[2][j];
+    sub     \arg6\().4s, \arg1\().4s, \arg3\().4s          //int32 e[2][j] = (f[1][j]>>1) - f[3][j];
+    add     \arg7\().4s, \arg1\().4s, \arg3\().4s          //int32 e[3][j] = f[1][j] + (f[3][j]>>1);
 //  }
 .endm
 
 .macro TRANSFORM_4BYTES arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
 // both row & col transform used
 //  {   //  output: f_q[0]~[3], input: e_q[0]~[3];
-add     \arg0\().4s, \arg4\().4s, \arg7\().4s          //int16 f[i][0] = e[i][0] + e[i][3];
-add     \arg1\().4s, \arg5\().4s, \arg6\().4s          //int16 f[i][1] = e[i][1] + e[i][2];
-sub     \arg2\().4s, \arg5\().4s, \arg6\().4s          //int16 f[i][2] = e[i][1] - e[i][2];
-sub     \arg3\().4s, \arg4\().4s, \arg7\().4s          //int16 f[i][3] = e[i][0] - e[i][3];
+    add     \arg0\().4s, \arg4\().4s, \arg7\().4s          //int16 f[i][0] = e[i][0] + e[i][3];
+    add     \arg1\().4s, \arg5\().4s, \arg6\().4s          //int16 f[i][1] = e[i][1] + e[i][2];
+    sub     \arg2\().4s, \arg5\().4s, \arg6\().4s          //int16 f[i][2] = e[i][1] - e[i][2];
+    sub     \arg3\().4s, \arg4\().4s, \arg7\().4s          //int16 f[i][3] = e[i][0] - e[i][3];
 //  }
 .endm
 
 .macro MB_PRED_8BITS_ADD_DCT_16BITS_CLIP arg0, arg1, arg2, arg3, arg4
 //  {   //  input: pred_d[0](output), dct_q0/1, working_q0/1;
-uxtl      \arg3\().8h, \arg0\().8b
-uxtl2     \arg4\().8h, \arg0\().16b
-add       \arg3\().8h, \arg3\().8h, \arg1\().8h
-add       \arg4\().8h, \arg4\().8h, \arg2\().8h
-sqxtun   \arg0\().8b, \arg3\().8h
-sqxtun2  \arg0\().16b,\arg4\().8h
+    uxtl      \arg3\().8h, \arg0\().8b
+    uxtl2     \arg4\().8h, \arg0\().16b
+    add       \arg3\().8h, \arg3\().8h, \arg1\().8h
+    add       \arg4\().8h, \arg4\().8h, \arg2\().8h
+    sqxtun    \arg0\().8b, \arg3\().8h
+    sqxtun2   \arg0\().16b,\arg4\().8h
 //  }
 .endm
 #endif
