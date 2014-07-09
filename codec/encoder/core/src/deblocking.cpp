@@ -555,7 +555,8 @@ void DeblockingIntraMb (DeblockingFunc* pfDeblocking, SMB* pCurMb, SDeblockingFi
 #if defined(HAVE_NEON) && defined(SINGLE_REF_FRAME)
 void DeblockingBSCalc_neon (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2][4][4], Mb_Type uiCurMbType,
                             int32_t iMbStride, int32_t iLeftFlag, int32_t iTopFlag) {
-  DeblockingBSCalcEnc_neon (pCurMb->pNonZeroCount, pCurMb->sMv, pCurMb->uiNeighborAvail, iMbStride, uiBS);
+  DeblockingBSCalcEnc_neon (pCurMb->pNonZeroCount, pCurMb->sMv,
+                            (iLeftFlag ? LEFT_MB_POS : 0) | (iTopFlag ? TOP_MB_POS : 0), iMbStride, uiBS);
   if (iLeftFlag) {
     if (IS_INTRA ((pCurMb - 1)->uiMbType)) {
       * (uint32_t*)uiBS[0][0] = 0x04040404;
@@ -576,7 +577,8 @@ void DeblockingBSCalc_neon (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2
 #if defined(HAVE_NEON_AARCH64) && defined(SINGLE_REF_FRAME)
 void DeblockingBSCalc_AArch64_neon (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2][4][4], Mb_Type uiCurMbType,
                                     int32_t iMbStride, int32_t iLeftFlag, int32_t iTopFlag) {
-  DeblockingBSCalcEnc_AArch64_neon (pCurMb->pNonZeroCount, pCurMb->sMv, pCurMb->uiNeighborAvail, iMbStride, uiBS);
+  DeblockingBSCalcEnc_AArch64_neon (pCurMb->pNonZeroCount, pCurMb->sMv,
+                                    (iLeftFlag ? LEFT_MB_POS : 0) | (iTopFlag ? TOP_MB_POS : 0), iMbStride, uiBS);
   if (iLeftFlag) {
     if (IS_INTRA ((pCurMb - 1)->uiMbType)) {
       * (uint32_t*)uiBS[0][0] = 0x04040404;
