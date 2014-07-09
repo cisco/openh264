@@ -181,6 +181,8 @@ void ImplementErrorCon (PWelsDecoderContext pCtx) {
   } else if (ERROR_CON_SLICE_COPY == pCtx->iErrorConMethod) {
     DoErrorConSliceCopy (pCtx);
   } //TODO add other EC methods here in the future
+  pCtx->iErrorCode |= dsDataErrorConcealed;
+  pCtx->bDecErrorConedFlag = true;
 }
 
 } // namespace WelsDec

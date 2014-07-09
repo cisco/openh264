@@ -414,6 +414,11 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "decode failed, failure type:%d \n",
              m_pDecContext->iErrorCode);
     return (DECODING_STATE)m_pDecContext->iErrorCode;
+  } else { //decoding correct, but may have ECed status
+    if (m_pDecContext->bDecErrorConedFlag) {
+      m_pDecContext->iErrorCode |= dsDataErrorConcealed;
+      return dsDataErrorConcealed;
+    }
   }
 
   return dsErrorFree;
