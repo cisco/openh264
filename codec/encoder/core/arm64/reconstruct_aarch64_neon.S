@@ -646,7 +646,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsHadamardQuant2x2SkipKernel_AArch64_neon
     HDM_QUANT_2x2_TOTAL_16BITS  v1, v0, v2      // output v0
 
     abs   v1.4h, v0.4h
-    cmhi  v1.4h, v1.4h, v4.4h         // abs(dct[i])>threshold;
+    cmhi  v0.4h, v1.4h, v4.4h         // abs(dct[i])>threshold;
     mov   w0, v0.s[0]
     mov   w1, v0.s[1]
     orr   w0, w0, w1
@@ -687,7 +687,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsHadamardQuant2x2_AArch64_neon
     DC_ZERO_COUNT_IN_DUALWORD   v1, h0, v3
 
     mov     x0, v0.d[0]
-    mov     x1, #16
+    mov     x1, #4
     subs    x0, x1, x0
 WELS_ASM_AARCH64_FUNC_END
 
