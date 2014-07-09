@@ -295,6 +295,8 @@ void WelsOpenDecoder (PWelsDecoderContext pCtx) {
 #endif //LONG_TERM_REF
   pCtx->bNewSeqBegin = true;
   pCtx->bDecErrorConedFlag = false; //default: decoder normal status
+  pCtx->bPrintFrameErrorTraceFlag = true;
+  pCtx->iIgnoredErrorInfoPacketCount = 0;
 }
 
 /*!
@@ -312,6 +314,8 @@ void WelsCloseDecoder (PWelsDecoderContext pCtx) {
 #else
   pCtx->bReferenceLostAtT0Flag = false;
 #endif
+  pCtx->bNewSeqBegin = false;
+  pCtx->bPrintFrameErrorTraceFlag = false;
 }
 
 /*!

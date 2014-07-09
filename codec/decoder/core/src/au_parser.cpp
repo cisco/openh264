@@ -141,32 +141,34 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
   --iNalSize;
   ++ (*pConsumedBytes);
 
-#ifdef DEBUG_PARSE_INFO
-  WelsLog (pLogCtx, WELS_LOG_INFO, "nal type: %d \n", pNalUnitHeader->eNalUnitType);
-#endif
-
   if (! (IS_SEI_NAL (pNalUnitHeader->eNalUnitType) || IS_SPS_NAL (pNalUnitHeader->eNalUnitType)
          || pCtx->bSpsExistAheadFlag)) {
-    WelsLog (pLogCtx, WELS_LOG_WARNING,
+    if (pCtx->bPrintFrameErrorTraceFlag) {
+      WelsLog (pLogCtx, WELS_LOG_WARNING,
              "parse_nal(), no exist Sequence Parameter Sets ahead of sequence when try to decode NAL(type:%d).\n",
              pNalUnitHeader->eNalUnitType);
+    }
     pCtx->iErrorCode	= dsNoParamSets;
     return NULL;
   }
   if (! (IS_SEI_NAL (pNalUnitHeader->eNalUnitType) || IS_PARAM_SETS_NALS (pNalUnitHeader->eNalUnitType)
          || pCtx->bPpsExistAheadFlag)) {
-    WelsLog (pLogCtx, WELS_LOG_WARNING,
+    if (pCtx->bPrintFrameErrorTraceFlag) {
+      WelsLog (pLogCtx, WELS_LOG_WARNING,
              "parse_nal(), no exist Picture Parameter Sets ahead of sequence when try to decode NAL(type:%d).\n",
              pNalUnitHeader->eNalUnitType);
+    }
     pCtx->iErrorCode	= dsNoParamSets;
     return NULL;
   }
   if ((IS_VCL_NAL_AVC_BASE (pNalUnitHeader->eNalUnitType) && ! (pCtx->bSpsExistAheadFlag || pCtx->bPpsExistAheadFlag)) ||
       (IS_NEW_INTRODUCED_SVC_NAL (pNalUnitHeader->eNalUnitType) && ! (pCtx->bSpsExistAheadFlag || pCtx->bSubspsExistAheadFlag
           || pCtx->bPpsExistAheadFlag))) {
-    WelsLog (pLogCtx, WELS_LOG_WARNING,
+    if (pCtx->bPrintFrameErrorTraceFlag) {
+      WelsLog (pLogCtx, WELS_LOG_WARNING,
              "ParseNalHeader(), no exist Parameter Sets ahead of sequence when try to decode slice(type:%d).\n",
              pNalUnitHeader->eNalUnitType);
+    }
     pCtx->iErrorCode	|= dsNoParamSets;
     return NULL;
   }
@@ -244,7 +246,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
     uint32_t uiAvailNalNum;
     pCurNal = MemGetNextNal (&pCtx->pAccessUnitList);
     if (NULL == pCurNal) {
-      WelsLog (pLogCtx, WELS_LOG_WARNING, "MemGetNextNal() fail due out of memory.\n");
+      WelsLog (pLogCtx, WELS_LOG_ERROR, "MemGetNextNal() fail due out of memory.\n");
       pCtx->iErrorCode	|= dsOutOfMemory;
       return NULL;
     }
@@ -502,9 +504,6 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
   case NAL_UNIT_SUBSET_SPS:
     if (iBitSize > 0)
       InitBits (pBs, pRbsp, iBitSize);
-#ifdef DEBUG_PARSE_INFO
-    WelsLog (&(pCtx->sLogCtx), WELS_LOG_INFO, "parsing nal: %d \n", eNalType);
-#endif
     iErr = ParseSps (pCtx, pBs, &iPicWidth, &iPicHeight);
     if (ERR_NONE != iErr) {	// modified for pSps/pSubsetSps invalid, 12/1/2009
       if (pCtx->iErrorConMethod == ERROR_CON_DISABLE)
@@ -517,9 +516,6 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
   case NAL_UNIT_PPS:
     if (iBitSize > 0)
       InitBits (pBs, pRbsp, iBitSize);
-#ifdef DEBUG_PARSE_INFO
-    WelsLog (&(pCtx->sLogCtx), WELS_LOG_INFO, "parsing nal: %d \n", eNalType);
-#endif
     iErr = ParsePps (pCtx, &pCtx->sPpsBuffer[0], pBs);
     if (ERR_NONE != iErr) {	// modified for pps invalid, 12/1/2009
       if (pCtx->iErrorConMethod == ERROR_CON_DISABLE)
