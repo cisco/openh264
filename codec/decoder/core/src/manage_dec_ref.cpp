@@ -115,9 +115,9 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
     if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) { //IDR lost!, recover it for future decoding with data all set to 0
       PPicture pRef = PrefetchPic (pCtx->pPicBuff[0]);
       if (pRef != NULL) {
-        memset (pRef->pData[0], 0, pRef->iLinesize[0] * pRef->iHeightInPixel);
-        memset (pRef->pData[1], 0, pRef->iLinesize[1] * pRef->iHeightInPixel / 2);
-        memset (pRef->pData[2], 0, pRef->iLinesize[2] * pRef->iHeightInPixel / 2);
+        memset (pRef->pData[0], 128, pRef->iLinesize[0] * pRef->iHeightInPixel);
+        memset (pRef->pData[1], 128, pRef->iLinesize[1] * pRef->iHeightInPixel / 2);
+        memset (pRef->pData[2], 128, pRef->iLinesize[2] * pRef->iHeightInPixel / 2);
         pRef->iFrameNum = 0;
         pRef->iFramePoc = 0;
         pRef->uiTemporalId = pRef->uiQualityId = 0;
