@@ -42,8 +42,6 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\..\..\..\..\bin\win32\Release/decConsole.tlb"
-				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
@@ -130,9 +128,6 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="3"
-				TypeLibraryName=".\..\..\..\..\bin\win32\Release/decConsole.tlb"
-				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
@@ -219,8 +214,6 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\..\..\..\..\bin\win32\Debug/decConsole.tlb"
-				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
@@ -307,9 +300,6 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="3"
-				TypeLibraryName=".\..\..\..\..\bin\win32\Debug/decConsole.tlb"
-				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
