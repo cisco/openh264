@@ -56,7 +56,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
 				AssemblerListingLocation=""
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -72,7 +71,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkLibraryDependencies="true"
 				OutputFile="$(OutDir)\welsvp.dll"
 				LinkIncremental="2"
 				ModuleDefinitionFile="../../src/common/WelsVP.def"
@@ -140,7 +138,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
 				AssemblerListingLocation=""
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -156,7 +153,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkLibraryDependencies="true"
 				OutputFile="$(OutDir)\welsvp.dll"
 				LinkIncremental="2"
 				ModuleDefinitionFile="../../src/common/WelsVP.def"
@@ -220,13 +216,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				EnableIntrinsicFunctions="false"
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="../../../common/inc;../../interface;../../src/common"
 				PreprocessorDefinitions="NDEBUG;_USRDLL;X86_ASM"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="false"
-				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="0"
 			/>
@@ -310,13 +304,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				EnableIntrinsicFunctions="false"
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="../../../common/inc;../../interface;../../src/common"
 				PreprocessorDefinitions="NDEBUG;_USRDLL;X86_ASM"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="false"
-				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="0"
 			/>
