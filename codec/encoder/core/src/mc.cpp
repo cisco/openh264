@@ -213,28 +213,28 @@ static inline void McHorVer22WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStrid
 /////////////////////luma MC//////////////////////////
 
 static inline void McHorVer01WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                          int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 256, 16)
 
   McHorVer02WidthEq16_c (pSrc, iSrcStride, pTmp, 16, iHeight);
   PixelAvgWidthEq16_c (pDst, iDstStride, pSrc, iSrcStride, pTmp, 16, iHeight);
 }
 static inline void McHorVer03WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                          int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 256, 16)
 
   McHorVer02WidthEq16_c (pSrc, iSrcStride, pTmp, 16, iHeight);
   PixelAvgWidthEq16_c (pDst, iDstStride, pSrc + iSrcStride, iSrcStride, pTmp, 16, iHeight);
 }
 static inline void McHorVer10WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                          int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 256, 16)
 
   McHorVer20WidthEq16_c (pSrc, iSrcStride, pTmp, 16, iHeight);
   PixelAvgWidthEq16_c (pDst, iDstStride, pSrc, iSrcStride, pTmp, 16, iHeight);
 }
 static inline void McHorVer11WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                          int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 512, 16)
 
   McHorVer20WidthEq16_c (pSrc, iSrcStride, pTmp, 16, iHeight);
@@ -242,7 +242,7 @@ static inline void McHorVer11WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStrid
   PixelAvgWidthEq16_c (pDst, iDstStride, pTmp, 16, &pTmp[256], 16, iHeight);
 }
 static inline void McHorVer12WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                          int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 512, 16)
 
   McHorVer02WidthEq16_c (pSrc, iSrcStride, pTmp, 16, iHeight);
@@ -250,7 +250,7 @@ static inline void McHorVer12WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStrid
   PixelAvgWidthEq16_c (pDst, iDstStride, pTmp, 16, &pTmp[256], 16, iHeight);
 }
 static inline void McHorVer13WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                          int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 512, 16)
 
   McHorVer20WidthEq16_c (pSrc + iSrcStride, iSrcStride, pTmp, 16, iHeight);
@@ -258,7 +258,7 @@ static inline void McHorVer13WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStrid
   PixelAvgWidthEq16_c (pDst, iDstStride, pTmp, 16, &pTmp[256], 16, iHeight);
 }
 static inline void McHorVer21WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                          int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 512, 16)
 
   McHorVer20WidthEq16_c (pSrc, iSrcStride, pTmp, 16, iHeight);
@@ -266,7 +266,7 @@ static inline void McHorVer21WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStrid
   PixelAvgWidthEq16_c (pDst, iDstStride, pTmp, 16, &pTmp[256], 16, iHeight);
 }
 static inline void McHorVer23WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                          int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 512, 16)
 
   McHorVer20WidthEq16_c (pSrc + iSrcStride, iSrcStride, pTmp, 16, iHeight);
@@ -274,14 +274,14 @@ static inline void McHorVer23WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStrid
   PixelAvgWidthEq16_c (pDst, iDstStride, pTmp, 16, &pTmp[256], 16, iHeight);
 }
 static inline void McHorVer30WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                          int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 256, 16)
 
   McHorVer20WidthEq16_c (pSrc, iSrcStride, pTmp, 16, iHeight);
   PixelAvgWidthEq16_c (pDst, iDstStride, pSrc + 1, iSrcStride, pTmp, 16, iHeight);
 }
 static inline void McHorVer31WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                          int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 512, 16)
 
   McHorVer20WidthEq16_c (pSrc, iSrcStride, pTmp, 16, iHeight);
@@ -289,7 +289,7 @@ static inline void McHorVer31WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStrid
   PixelAvgWidthEq16_c (pDst, iDstStride, pTmp, 16, &pTmp[256], 16, iHeight);
 }
 static inline void McHorVer32WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                          int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 512, 16)
 
   McHorVer02WidthEq16_c (pSrc + 1, iSrcStride, pTmp, 16, iHeight);
@@ -297,7 +297,7 @@ static inline void McHorVer32WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStrid
   PixelAvgWidthEq16_c (pDst, iDstStride, pTmp, 16, &pTmp[256], 16, iHeight);
 }
 static inline void McHorVer33WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                          int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 512, 16)
 
   McHorVer20WidthEq16_c (pSrc + iSrcStride, iSrcStride, pTmp, 16, iHeight);
@@ -430,28 +430,28 @@ void McHorVer22Width9Or17Height9Or17_sse2 (const uint8_t* pSrc, int32_t iSrcStri
 }
 
 static inline void McHorVer01WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                             int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 256, 16)
 
   McHorVer02WidthEq16_sse2 (pSrc, iSrcStride, pTmp, 16, iHeight);
   PixelAvgWidthEq16_sse2 (pDst, iDstStride, pSrc, iSrcStride, pTmp, 16, iHeight);
 }
 static inline void McHorVer03WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                             int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 256, 16)
 
   McHorVer02WidthEq16_sse2 (pSrc, iSrcStride, pTmp, 16, iHeight);
   PixelAvgWidthEq16_sse2 (pDst, iDstStride, pSrc + iSrcStride, iSrcStride, pTmp, 16, iHeight);
 }
 static inline void McHorVer10WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                             int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 256, 16)
 
   McHorVer20WidthEq16_sse2 (pSrc, iSrcStride, pTmp, 16, iHeight);
   PixelAvgWidthEq16_sse2 (pDst, iDstStride, pSrc, iSrcStride, pTmp, 16, iHeight);
 }
 static inline void McHorVer11WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                             int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 512, 16)
 
   McHorVer20WidthEq16_sse2 (pSrc, iSrcStride, pTmp, 16, iHeight);
@@ -459,7 +459,7 @@ static inline void McHorVer11WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcSt
   PixelAvgWidthEq16_sse2 (pDst, iDstStride, pTmp, 16, &pTmp[256], 16, iHeight);
 }
 static inline void McHorVer12WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                             int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 512, 16)
 
   McHorVer02WidthEq16_sse2 (pSrc, iSrcStride, pTmp, 16, iHeight);
@@ -467,7 +467,7 @@ static inline void McHorVer12WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcSt
   PixelAvgWidthEq16_sse2 (pDst, iDstStride, pTmp, 16, &pTmp[256], 16, iHeight);
 }
 static inline void McHorVer13WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                             int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 512, 16)
 
   McHorVer20WidthEq16_sse2 (pSrc + iSrcStride, iSrcStride, pTmp, 16, iHeight);
@@ -475,7 +475,7 @@ static inline void McHorVer13WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcSt
   PixelAvgWidthEq16_sse2 (pDst, iDstStride, pTmp, 16, &pTmp[256], 16, iHeight);
 }
 static inline void McHorVer21WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                             int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 512, 16)
 
   McHorVer20WidthEq16_sse2 (pSrc, iSrcStride, pTmp, 16, iHeight);
@@ -483,7 +483,7 @@ static inline void McHorVer21WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcSt
   PixelAvgWidthEq16_sse2 (pDst, iDstStride, pTmp, 16, &pTmp[256], 16, iHeight);
 }
 static inline void McHorVer23WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                             int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 512, 16)
 
   McHorVer20WidthEq16_sse2 (pSrc + iSrcStride, iSrcStride, pTmp, 16, iHeight);
@@ -491,14 +491,14 @@ static inline void McHorVer23WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcSt
   PixelAvgWidthEq16_sse2 (pDst, iDstStride, pTmp, 16, &pTmp[256], 16, iHeight);
 }
 static inline void McHorVer30WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                             int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 256, 16)
 
   McHorVer20WidthEq16_sse2 (pSrc, iSrcStride, pTmp, 16, iHeight);
   PixelAvgWidthEq16_sse2 (pDst, iDstStride, pSrc + 1, iSrcStride, pTmp, 16, iHeight);
 }
 static inline void McHorVer31WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                             int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 512, 16)
 
   McHorVer20WidthEq16_sse2 (pSrc, iSrcStride, pTmp, 16, iHeight);
@@ -506,7 +506,7 @@ static inline void McHorVer31WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcSt
   PixelAvgWidthEq16_sse2 (pDst, iDstStride, pTmp, 16, &pTmp[256], 16, iHeight);
 }
 static inline void McHorVer32WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                             int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 512, 16)
 
   McHorVer02WidthEq16_sse2 (pSrc + 1, iSrcStride, pTmp, 16, iHeight);
@@ -514,7 +514,7 @@ static inline void McHorVer32WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcSt
   PixelAvgWidthEq16_sse2 (pDst, iDstStride, pTmp, 16, &pTmp[256], 16, iHeight);
 }
 static inline void McHorVer33WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                             int32_t iHeight) {
+    int32_t iHeight) {
   ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 512, 16)
 
   McHorVer20WidthEq16_sse2 (pSrc + iSrcStride, iSrcStride, pTmp, 16, iHeight);

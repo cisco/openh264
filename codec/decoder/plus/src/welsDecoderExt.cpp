@@ -411,7 +411,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
     if (m_pDecContext->bPrintFrameErrorTraceFlag) {
       WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "decode failed, failure type:%d \n",
-             m_pDecContext->iErrorCode);
+               m_pDecContext->iErrorCode);
       m_pDecContext->bPrintFrameErrorTraceFlag = false;
     } else {
       m_pDecContext->iIgnoredErrorInfoPacketCount ++;
