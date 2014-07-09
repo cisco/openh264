@@ -44,11 +44,11 @@ runBuildCodec()
   if [ "${BitType}" -eq 64   ]
   then
     make clean
-    make -B ENABLE64BIT=Yes
+    make -B ENABLE64BIT=Yes h264dec h264enc
   elif [ "${BitType}" -eq 32   ]
   then
     make clean
-    make -B ENABLE64BIT=No
+    make -B ENABLE64BIT=No h264dec h264enc
   else
     echo "usage: runBuildCodec  \64/32  #bits"
     exit 1
