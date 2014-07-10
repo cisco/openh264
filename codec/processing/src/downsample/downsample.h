@@ -94,13 +94,9 @@ GeneralDownsampleFunc GeneralBilinearFastDownsamplerWrap_sse2;
 GeneralDownsampleFunc GeneralBilinearAccurateDownsamplerWrap_sse2;
 
 void GeneralBilinearFastDownsampler_sse2 (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
-    const int32_t kiDstHeight,
-    uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight,
-    const uint32_t kuiScaleX, const uint32_t kuiScaleY);
+    const int32_t kiDstHeight, uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX, const uint32_t kuiScaleY);
 void GeneralBilinearAccurateDownsampler_sse2 (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
-    const int32_t kiDstHeight,
-    uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight,
-    const uint32_t kuiScaleX, const uint32_t kuiScaleY);
+    const int32_t kiDstHeight, uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX, const uint32_t kuiScaleY);
 WELSVP_EXTERN_C_END
 #endif
 

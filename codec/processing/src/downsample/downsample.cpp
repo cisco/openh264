@@ -66,8 +66,8 @@ void CDownsampling::InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc,  int
     sDownsampleFunc.pfGeneralRatioLuma   = GeneralBilinearFastDownsamplerWrap_sse2;
   }
   if (iCpuFlag & WELS_CPU_SSSE3) {
-      sDownsampleFunc.pfHalfAverage[0]	= DyadicBilinearDownsamplerWidthx32_ssse3;
-      sDownsampleFunc.pfHalfAverage[1]	= DyadicBilinearDownsamplerWidthx16_ssse3;
+    sDownsampleFunc.pfHalfAverage[0]	= DyadicBilinearDownsamplerWidthx32_ssse3;
+    sDownsampleFunc.pfHalfAverage[1]	= DyadicBilinearDownsamplerWidthx16_ssse3;
   }
   if (iCpuFlag & WELS_CPU_SSE41) {
     sDownsampleFunc.pfHalfAverage[0]	= DyadicBilinearDownsamplerWidthx32_sse4;

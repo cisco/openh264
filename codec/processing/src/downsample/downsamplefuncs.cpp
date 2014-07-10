@@ -212,7 +212,7 @@ void GeneralBilinearFastDownsamplerWrap_sse2 (uint8_t* pDst, const int32_t kiDst
   uint32_t uiScaley = WELS_ROUND ((float)kiSrcHeight / (float)kiDstHeight * kuiScaleHeight);
 
   GeneralBilinearFastDownsampler_sse2 (pDst, kiDstStride, kiDstWidth, kiDstHeight,
-                                       pSrc, kiSrcStride, kiSrcWidth, kiSrcHeight, uiScalex, uiScaley);
+                                       pSrc, kiSrcStride, uiScalex, uiScaley);
 }
 
 void GeneralBilinearAccurateDownsamplerWrap_sse2 (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
@@ -225,7 +225,7 @@ void GeneralBilinearAccurateDownsamplerWrap_sse2 (uint8_t* pDst, const int32_t k
   uint32_t uiScaley = WELS_ROUND ((float)kiSrcHeight / (float)kiDstHeight * kuiScale);
 
   GeneralBilinearAccurateDownsampler_sse2 (pDst, kiDstStride, kiDstWidth, kiDstHeight,
-      pSrc, kiSrcStride, kiSrcWidth, kiSrcHeight, uiScalex, uiScaley);
+      pSrc, kiSrcStride, uiScalex, uiScaley);
 }
 #endif //X86_ASM
 
