@@ -49,6 +49,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		04FE0680196FD8BE0004D7CE /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = version.h; path = ../../../common/inc/version.h; sourceTree = "<group>"; };
 		4CBC1B80194AC4E100214D9E /* intra_pred_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = intra_pred_aarch64_neon.S; path = arm64/intra_pred_aarch64_neon.S; sourceTree = "<group>"; };
 		4CE4427918B6FC360017DF25 /* libwelsdec.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libwelsdec.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE4427C18B6FC360017DF25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -265,6 +266,7 @@
 		4CE4467C18BC5EAA0017DF25 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				04FE0680196FD8BE0004D7CE /* version.h */,
 				9AED66571946A1EB009A3567 /* welsCodecTrace.h */,
 				4CE4467E18BC5EAA0017DF25 /* welsDecoderExt.h */,
 			);
