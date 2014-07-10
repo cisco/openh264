@@ -91,6 +91,7 @@ typedef enum {
   ENCODER_LTR_MARKING_FEEDBACK,
   ENCOCER_LTR_MARKING_PERIOD,
   ENCODER_OPTION_LTR,
+  ENCODER_OPTION_COMPLEXITY,
 
   ENCODER_OPTION_ENABLE_SSEI,               //enable SSEI: true--enable ssei; false--disable ssei
   ENCODER_OPTION_ENABLE_PREFIX_NAL_ADDING,   //enable prefix: true--enable prefix; false--disable prefix
@@ -272,12 +273,16 @@ typedef enum {
   SCREEN_CONTENT_REAL_TIME,//screen content signal
 } EUsageType;
 
+typedef enum {
+  LOW_COMPLEXITY, //the lowest compleixty,the fastest speed,
+  MEDIUM_COMPLEXITY, //medium complexity, medium speed,medium quality
+  HIGH_COMPLEXITY, //high complexity, lowest speed, high quality
+} ECOMPLEXITY_MODE;
 // TODO:  Refine the parameters definition.
 // SVC Encoding Parameters
 typedef struct TagEncParamBase {
   EUsageType
   iUsageType;	//application type;// CAMERA_VIDEO_REAL_TIME: //camera video signal; SCREEN_CONTENT_REAL_TIME: screen content signal;
-  int		iInputCsp;	// color space of input sequence
 
   int		iPicWidth;			// width of picture in samples
   int		iPicHeight;			// height of picture in samples
@@ -291,7 +296,6 @@ typedef struct TagEncParamBase {
 typedef struct TagEncParamExt {
   EUsageType
   iUsageType;	//application type;// CAMERA_VIDEO_REAL_TIME: //camera video signal; SCREEN_CONTENT_REAL_TIME: screen content signal;
-  int		iInputCsp;	// color space of input sequence
 
   int		iPicWidth;			// width of picture in samples
   int		iPicHeight;			// height of picture in samples
@@ -303,9 +307,9 @@ typedef struct TagEncParamExt {
   int		iSpatialLayerNum;	// layer number at spatial level
   SSpatialLayerConfig sSpatialLayers[MAX_SPATIAL_LAYER_NUM];
 
+  ECOMPLEXITY_MODE iComplexityMode;
   unsigned int		uiIntraPeriod;		// period of Intra frame
   int		        iNumRefFrame;		// number of reference frame used
-  unsigned int	    uiFrameToBeCoded;	// frame to be encoded (at input frame rate)
   bool    bEnableSpsPpsIdAddition;
   bool    bPrefixNalAddingCtrl;
   bool	  bEnableSSEI;

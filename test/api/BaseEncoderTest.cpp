@@ -16,7 +16,6 @@ static int InitWithParam (ISVCEncoder* encoder, EUsageType usageType, int width,
     param.iPicWidth = width;
     param.iPicHeight = height;
     param.iTargetBitrate = 5000000;
-    param.iInputCsp = videoFormatI420;
 
     return encoder->Initialize (&param);
   } else {
@@ -28,7 +27,6 @@ static int InitWithParam (ISVCEncoder* encoder, EUsageType usageType, int width,
     param.iPicWidth = width;
     param.iPicHeight = height;
     param.iTargetBitrate = 5000000;
-    param.iInputCsp = videoFormatI420;
     param.bEnableDenoise = denoise;
     param.iSpatialLayerNum = layers;
 

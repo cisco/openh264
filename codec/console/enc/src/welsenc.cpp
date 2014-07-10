@@ -99,6 +99,7 @@ typedef struct tagFilesSet {
   string strSeqFile;    // for cmd lines
   string strLayerCfgFile[MAX_DEPENDENCY_LAYER];
   char   sRecFileName[MAX_DEPENDENCY_LAYER][MAX_FNAME_LEN];
+  uint32_t uiFrameToBeCoded;
 } SFilesSet;
 
 
@@ -224,7 +225,7 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
       } else if (strTag[0].compare ("MaxFrameRate") == 0) {
         pSvcParam.fMaxFrameRate	= (float)atof (strTag[1].c_str());
       } else if (strTag[0].compare ("FramesToBeEncoded") == 0) {
-        pSvcParam.uiFrameToBeCoded	= atoi (strTag[1].c_str());
+        sFileSet.uiFrameToBeCoded	= atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("TemporalLayerNum") == 0) {
         pSvcParam.iTemporalLayerNum	= atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("IntraPeriod") == 0) {
@@ -403,7 +404,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       pSrcPic->iPicHeight = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-frms") && (n < argc))
-      pSvcParam.uiFrameToBeCoded = atoi (argv[n++]);
+      sFileSet.uiFrameToBeCoded = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-numtl") && (n < argc))
       pSvcParam.iTemporalLayerNum = atoi (argv[n++]);
@@ -581,11 +582,10 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.bEnableFrameSkip           = 1; // frame skipping
   sParam.bEnableLongTermReference  = 0; // long term reference control
   sParam.iLtrMarkPeriod = 30;
-  sParam.iInputCsp			= videoFormatI420;			// color space of input sequence
   sParam.uiIntraPeriod		= 320;		// period of Intra frame
   sParam.bEnableSpsPpsIdAddition = 1;
   sParam.bPrefixNalAddingCtrl = 0;
-
+  sParam.iComplexityMode = MEDIUM_COMPLEXITY;
   int iIndexLayer = 0;
   sParam.sSpatialLayers[iIndexLayer].uiProfileIdc	= PRO_BASELINE;
   sParam.sSpatialLayers[iIndexLayer].iVideoWidth	= 160;
@@ -736,7 +736,7 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
   sSvcParam.iPicWidth = (!sSvcParam.iPicWidth) ? iSourceWidth : sSvcParam.iPicWidth;
   sSvcParam.iPicHeight = (!sSvcParam.iPicHeight) ? iSourceHeight : sSvcParam.iPicHeight;
 
-  iTotalFrameMax = (int32_t)sSvcParam.uiFrameToBeCoded;
+  iTotalFrameMax = (int32_t)fs.uiFrameToBeCoded;
 
   if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) {	// SVC encoder initialization
     fprintf (stderr, "SVC encoder Initialize failed\n");
@@ -789,8 +789,8 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
   }
 
   iFrameIdx = 0;
-  while (iFrameIdx < iTotalFrameMax && (((int32_t)sSvcParam.uiFrameToBeCoded <= 0)
-                                        || (iFrameIdx < (int32_t)sSvcParam.uiFrameToBeCoded))) {
+  while (iFrameIdx < iTotalFrameMax && (((int32_t)fs.uiFrameToBeCoded <= 0)
+                                        || (iFrameIdx < (int32_t)fs.uiFrameToBeCoded))) {
 
 #ifdef ONLY_ENC_FRAMES_NUM
     // Only encoded some limited frames here
