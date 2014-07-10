@@ -67,11 +67,4 @@ ret
     mov \arg0\().8b, \arg1\().8b
 .endm
 
-.macro ext.16b arg0, arg1, arg2, arg3
-    ext \arg0\().16b, \arg1\().16b, \arg2\().16b, \arg3
-.endm
-
-.macro ext.8b arg0, arg1, arg2, arg3
-    ext \arg0\().8b, \arg1\().8b, \arg2\().8b, \arg3
-.endm
 #endif
