@@ -64,6 +64,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		04FE0684196FD9370004D7CE /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = version.h; path = ../../../common/inc/version.h; sourceTree = "<group>"; };
 		4C23BC5F195A77E0003B81FC /* intra_pred_sad_3_opt_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = intra_pred_sad_3_opt_aarch64_neon.S; path = arm64/intra_pred_sad_3_opt_aarch64_neon.S; sourceTree = "<group>"; };
 		4C34066618C57D0400DFA14A /* intra_pred_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = intra_pred_neon.S; sourceTree = "<group>"; };
 		4C34066718C57D0400DFA14A /* intra_pred_sad_3_opt_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = intra_pred_sad_3_opt_neon.S; sourceTree = "<group>"; };
@@ -347,6 +348,7 @@
 		4CE446FC18BC605C0017DF25 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				04FE0684196FD9370004D7CE /* version.h */,
 				9AED664819469FAF009A3567 /* welsCodecTrace.h */,
 				4CE446FE18BC605C0017DF25 /* welsEncoderExt.h */,
 			);
