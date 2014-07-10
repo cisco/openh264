@@ -433,6 +433,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 
     if (NULL == DetectStartCodePrefix (kpBsBuf, &iOffset,
                                        kiBsLen)) {  //CAN'T find the 00 00 01 start prefix from the source buffer
+      pCtx->iErrorCode |= dsBitstreamError;
       return dsBitstreamError;
     }
 
