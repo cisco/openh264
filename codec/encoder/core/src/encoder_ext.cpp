@@ -102,9 +102,7 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "ParamValidation(), screen change detection should be turned on,change bEnableSceneChangeDetect as true\n");
     }
-    //LTR logic needs more testing
-    pCfg->bEnableLongTermReference = false;
-    pCfg->iLTRRefNum = 0;
+
   }
   if (pCfg->iSpatialLayerNum > 1) {
     int32_t iFinalWidth = pCfg->sSpatialLayers[pCfg->iSpatialLayerNum - 1].iVideoWidth;
