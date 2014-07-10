@@ -131,6 +131,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
   pNalUnitHeader->uiForbiddenZeroBit	= (uint8_t) (pNal[0] >> 7);			// uiForbiddenZeroBit
   if (pNalUnitHeader->uiForbiddenZeroBit) { //2010.4.14
+    pCtx->iErrorCode |= dsBitstreamError;
     return NULL; //uiForbiddenZeroBit should always equal to 0
   }
 
@@ -186,8 +187,6 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
     pCurNal = &pCtx->sPrefixNal;
 
     if (iNalSize < NAL_UNIT_HEADER_EXT_SIZE) {
-      pCtx->iErrorCode |= dsBitstreamError;
-
       PAccessUnit pCurAu	   = pCtx->pAccessUnitList;
       uint32_t uiAvailNalNum = pCurAu->uiAvailUnitsNum;
 
@@ -198,6 +197,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
         }
       }
       pCurNal->sNalData.sPrefixNal.bPrefixNalCorrectFlag = false;
+      pCtx->iErrorCode |= dsBitstreamError;
       return NULL;
     }
 
@@ -216,7 +216,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
         }
       }
       pCurNal->sNalData.sPrefixNal.bPrefixNalCorrectFlag = false;
-      pCtx->iErrorCode |= dsInvalidArgument;
+      pCtx->iErrorCode |= dsBitstreamError;
       return NULL;
     }
 
@@ -260,14 +260,13 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
     if (pNalUnitHeader->eNalUnitType == NAL_UNIT_CODED_SLICE_EXT) {
       if (iNalSize < NAL_UNIT_HEADER_EXT_SIZE) {
-        pCtx->iErrorCode |= dsBitstreamError;
-
         ForceClearCurrentNal (pCurAu);
 
         if (uiAvailNalNum > 1) {
           pCurAu->uiEndPos = uiAvailNalNum - 2;
           pCtx->bAuReadyFlag = true;
         }
+        pCtx->iErrorCode |= dsBitstreamError;
         return NULL;
       }
 
@@ -281,13 +280,13 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
           WelsLog (pLogCtx, WELS_LOG_WARNING, "ParseNalHeader():bUseRefBasePicFlag (%d) != 0, MGS not supported!\n",
                    pCurNal->sNalHeaderExt.bUseRefBasePicFlag);
 
-        pCtx->iErrorCode |= dsInvalidArgument;
         ForceClearCurrentNal (pCurAu);
 
         if (uiAvailNalNum > 1) {
           pCurAu->uiEndPos = uiAvailNalNum - 2;
           pCtx->bAuReadyFlag = true;
         }
+        pCtx->iErrorCode |= dsBitstreamError;
         return NULL;
       }
       pNal            += NAL_UNIT_HEADER_EXT_SIZE;
@@ -321,6 +320,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
         pCurAu->uiEndPos = uiAvailNalNum - 2;
         pCtx->bAuReadyFlag = true;
       }
+      pCtx->iErrorCode |= dsBitstreamError;
       return NULL;
     }
 
