@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		544F0DC4196F86F50092FC6F /* libprocessing.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 544F0DC3196F86EF0092FC6F /* libprocessing.a */; };
 		FAA3D9D318BD729500BCD52D /* welsenc_ios.cfg in Resources */ = {isa = PBXBuildFile; fileRef = FAA3D9D218BD729500BCD52D /* welsenc_ios.cfg */; };
 		FAA3D9D818BD777100BCD52D /* CiscoVT2people_320x192_12fps.yuv in Resources */ = {isa = PBXBuildFile; fileRef = FAA3D9D718BD777100BCD52D /* CiscoVT2people_320x192_12fps.yuv */; };
 		FAA3D9DD18BD8A5600BCD52D /* layer2.cfg in Resources */ = {isa = PBXBuildFile; fileRef = FAA3D9DC18BD8A5600BCD52D /* layer2.cfg */; };
@@ -21,13 +22,26 @@
 		FAFB4FC218BC8DD700315438 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FAFB4FC118BC8DD700315438 /* ViewController.m */; };
 		FAFB4FC418BC8DD700315438 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FAFB4FC318BC8DD700315438 /* Images.xcassets */; };
 		FAFB500318BC8F0D00315438 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAFB4FF118BC8E8600315438 /* libcommon.a */; };
-		FAFB500418BC8F1100315438 /* libprocessing.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAFB4FFA18BC8E9A00315438 /* libprocessing.a */; };
 		FAFB500518BC8F1500315438 /* libwelsenc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAFB4FE818BC8E7D00315438 /* libwelsenc.a */; };
 		FAFB500B18BC8F6C00315438 /* welsenc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAFB500A18BC8F6C00315438 /* welsenc.cpp */; };
 		FAFB502F18BCA50900315438 /* read_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAFB502E18BCA50900315438 /* read_config.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		544F0DBF196F86EF0092FC6F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 544F0DB9196F85F20092FC6F /* processing.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 5499477B196A3F3900BA3D87;
+			remoteInfo = processing;
+		};
+		544F0DC2196F86EF0092FC6F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 544F0DB9196F85F20092FC6F /* processing.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5499477C196A3F3900BA3D87;
+			remoteInfo = processing;
+		};
 		FAFB4FE718BC8E7D00315438 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FAFB4FE218BC8E7C00315438 /* welsenc.xcodeproj */;
@@ -42,26 +56,12 @@
 			remoteGlobalIDString = 4CE443D518B722CD0017DF25;
 			remoteInfo = common;
 		};
-		FAFB4FF918BC8E9A00315438 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FAFB4FF418BC8E9A00315438 /* processing.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4CE4443118B724B60017DF25;
-			remoteInfo = processing;
-		};
 		FAFB4FFD18BC8EAA00315438 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FAFB4FEB18BC8E8600315438 /* common.xcodeproj */;
 			proxyType = 1;
 			remoteGlobalIDString = 4CE443D418B722CD0017DF25;
 			remoteInfo = common;
-		};
-		FAFB4FFF18BC8EAF00315438 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FAFB4FF418BC8E9A00315438 /* processing.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 4CE4443018B724B60017DF25;
-			remoteInfo = processing;
 		};
 		FAFB500118BC8EB200315438 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -73,6 +73,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		544F0DB9196F85F20092FC6F /* processing.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = processing.xcodeproj; path = ../../processing/processing.xcodeproj; sourceTree = "<group>"; };
 		FAA3D9D218BD729500BCD52D /* welsenc_ios.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = welsenc_ios.cfg; path = ../../../../../../testbin/welsenc_ios.cfg; sourceTree = "<group>"; };
 		FAA3D9D718BD777100BCD52D /* CiscoVT2people_320x192_12fps.yuv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CiscoVT2people_320x192_12fps.yuv; path = ../../../../../../res/CiscoVT2people_320x192_12fps.yuv; sourceTree = "<group>"; };
 		FAA3D9DC18BD8A5600BCD52D /* layer2.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = layer2.cfg; path = ../../../../../../testbin/layer2.cfg; sourceTree = "<group>"; };
@@ -93,7 +94,6 @@
 		FAFB4FC318BC8DD700315438 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		FAFB4FE218BC8E7C00315438 /* welsenc.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = welsenc.xcodeproj; path = ../welsenc/welsenc.xcodeproj; sourceTree = "<group>"; };
 		FAFB4FEB18BC8E8600315438 /* common.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = common.xcodeproj; path = ../../common/common.xcodeproj; sourceTree = "<group>"; };
-		FAFB4FF418BC8E9A00315438 /* processing.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = processing.xcodeproj; path = ../../../../processing/build/iOS/processing.xcodeproj; sourceTree = "<group>"; };
 		FAFB500918BC8F6600315438 /* read_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = read_config.h; sourceTree = "<group>"; };
 		FAFB500A18BC8F6C00315438 /* welsenc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = welsenc.cpp; sourceTree = "<group>"; };
 		FAFB502E18BCA50900315438 /* read_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = read_config.cpp; path = ../../common/src/read_config.cpp; sourceTree = "<group>"; };
@@ -104,8 +104,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				544F0DC4196F86F50092FC6F /* libprocessing.a in Frameworks */,
 				FAFB500518BC8F1500315438 /* libwelsenc.a in Frameworks */,
-				FAFB500418BC8F1100315438 /* libprocessing.a in Frameworks */,
 				FAFB500318BC8F0D00315438 /* libcommon.a in Frameworks */,
 				FAFB4FAB18BC8DD700315438 /* CoreGraphics.framework in Frameworks */,
 				FAFB4FAD18BC8DD700315438 /* UIKit.framework in Frameworks */,
@@ -116,6 +116,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		544F0DBA196F85F20092FC6F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				544F0DC3196F86EF0092FC6F /* libprocessing.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		FAFB4F9C18BC8DD700315438 = {
 			isa = PBXGroup;
 			children = (
@@ -136,7 +144,7 @@
 		FAFB4FA718BC8DD700315438 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				FAFB4FF418BC8E9A00315438 /* processing.xcodeproj */,
+				544F0DB9196F85F20092FC6F /* processing.xcodeproj */,
 				FAFB4FEB18BC8E8600315438 /* common.xcodeproj */,
 				FAFB4FE218BC8E7C00315438 /* welsenc.xcodeproj */,
 				FAFB4FA818BC8DD700315438 /* Foundation.framework */,
@@ -192,14 +200,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		FAFB4FF518BC8E9A00315438 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				FAFB4FFA18BC8E9A00315438 /* libprocessing.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		FAFB500618BC8F2800315438 /* console */ = {
 			isa = PBXGroup;
 			children = (
@@ -242,8 +242,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				544F0DC0196F86EF0092FC6F /* PBXTargetDependency */,
 				FAFB500218BC8EB200315438 /* PBXTargetDependency */,
-				FAFB500018BC8EAF00315438 /* PBXTargetDependency */,
 				FAFB4FFE18BC8EAA00315438 /* PBXTargetDependency */,
 			);
 			name = encDemo;
@@ -277,8 +277,8 @@
 					ProjectRef = FAFB4FEB18BC8E8600315438 /* common.xcodeproj */;
 				},
 				{
-					ProductGroup = FAFB4FF518BC8E9A00315438 /* Products */;
-					ProjectRef = FAFB4FF418BC8E9A00315438 /* processing.xcodeproj */;
+					ProductGroup = 544F0DBA196F85F20092FC6F /* Products */;
+					ProjectRef = 544F0DB9196F85F20092FC6F /* processing.xcodeproj */;
 				},
 				{
 					ProductGroup = FAFB4FE318BC8E7C00315438 /* Products */;
@@ -293,6 +293,13 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		544F0DC3196F86EF0092FC6F /* libprocessing.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libprocessing.a;
+			remoteRef = 544F0DC2196F86EF0092FC6F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		FAFB4FE818BC8E7D00315438 /* libwelsenc.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -305,13 +312,6 @@
 			fileType = archive.ar;
 			path = libcommon.a;
 			remoteRef = FAFB4FF018BC8E8600315438 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FAFB4FFA18BC8E9A00315438 /* libprocessing.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libprocessing.a;
-			remoteRef = FAFB4FF918BC8E9A00315438 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -349,15 +349,15 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		544F0DC0196F86EF0092FC6F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = processing;
+			targetProxy = 544F0DBF196F86EF0092FC6F /* PBXContainerItemProxy */;
+		};
 		FAFB4FFE18BC8EAA00315438 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = common;
 			targetProxy = FAFB4FFD18BC8EAA00315438 /* PBXContainerItemProxy */;
-		};
-		FAFB500018BC8EAF00315438 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = processing;
-			targetProxy = FAFB4FFF18BC8EAF00315438 /* PBXContainerItemProxy */;
 		};
 		FAFB500218BC8EB200315438 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
