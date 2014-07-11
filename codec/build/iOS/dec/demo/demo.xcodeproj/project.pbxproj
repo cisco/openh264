@@ -398,6 +398,7 @@
 					APPLE_IOS,
 				);
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"\"$(SRCROOT)/../../../../api/svc\"",
 					"\"$(SRCROOT)/../../../../common/inc\"",
 				);
@@ -417,6 +418,7 @@
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PREPROCESSOR_DEFINITIONS = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"\"$(SRCROOT)/../../../../api/svc\"",
 					"\"$(SRCROOT)/../../../../common/inc\"",
 				);

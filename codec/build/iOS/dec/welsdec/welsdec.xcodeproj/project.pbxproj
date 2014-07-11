@@ -464,6 +464,7 @@
 				);
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"$(SRCROOT)/../../../../common/inc",
 					"$(SRCROOT)/../../../../api/svc",
 					"$(SRCROOT)/../../../../common/arm",
@@ -499,6 +500,7 @@
 				);
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"$(SRCROOT)/../../../../common/inc",
 					"$(SRCROOT)/../../../../api/svc",
 					"$(SRCROOT)/../../../../common/arm",
