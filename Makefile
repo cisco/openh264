@@ -17,7 +17,7 @@ SHARED=-shared
 OBJ=o
 PROJECT_NAME=openh264
 MODULE_NAME=gmpopenh264
-GMP_API_BRANCH=Firefox32
+GMP_API_BRANCH=master
 CCASFLAGS=$(CFLAGS)
 
 ifeq (,$(wildcard ./gmp-api))
