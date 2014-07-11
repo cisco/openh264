@@ -447,7 +447,6 @@
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/../../../processing/interface",
 					"$(SRCROOT)/../../../processing/src/common",
 					"$(SRCROOT)/../../../common/inc",
@@ -483,7 +482,6 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/../../../processing/interface",
 					"$(SRCROOT)/../../../processing/src/common",
 					"$(SRCROOT)/../../../common/inc",
