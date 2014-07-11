@@ -376,13 +376,13 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
 
     for (int i = 0; i < encoded->iLayerNum; ++i) {
       lengths.push_back (0);
-      uint8_t *tmp = encoded->sLayerInfo[i].pBsBuf;
+      uint8_t* tmp = encoded->sLayerInfo[i].pBsBuf;
       for (int j = 0; j < encoded->sLayerInfo[i].iNalCount; ++j) {
         lengths[i] += encoded->sLayerInfo[i].pNalLengthInByte[j];
         // Convert from 4-byte start codes to GMP_BufferLength32 (NAL lengths)
-        assert(*(reinterpret_cast<uint32_t *>(tmp)) == 0x01000000);
+        assert (* (reinterpret_cast<uint32_t*> (tmp)) == 0x01000000);
         // BufferType32 doesn't include the length of the length itself!
-        *(reinterpret_cast<uint32_t *>(tmp)) = encoded->sLayerInfo[i].pNalLengthInByte[j] - sizeof(uint32_t);
+        * (reinterpret_cast<uint32_t*> (tmp)) = encoded->sLayerInfo[i].pNalLengthInByte[j] - sizeof (uint32_t);
         length += encoded->sLayerInfo[i].pNalLengthInByte[j];
         tmp += encoded->sLayerInfo[i].pNalLengthInByte[j];
       }
@@ -428,7 +428,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
     info.mBufferType = GMP_BufferLength32;
     info.mCodecSpecific.mH264.mSimulcastIdx = 0;
 
-    callback_->Encoded (f, reinterpret_cast<uint8_t*>(&info), sizeof(info));
+    callback_->Encoded (f, reinterpret_cast<uint8_t*> (&info), sizeof (info));
 
     stats_.FrameOut();
   }
@@ -585,29 +585,28 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
 
     // Convert to H.264 start codes
     switch (inputFrame->BufferType()) {
-      case GMP_BufferSingle:
-      case GMP_BufferLength8:
-      case GMP_BufferLength16:
-      case GMP_BufferLength24:
-        // We should look to support these, especially GMP_BufferSingle
-        assert(false);
-        break;
+    case GMP_BufferSingle:
+    case GMP_BufferLength8:
+    case GMP_BufferLength16:
+    case GMP_BufferLength24:
+      // We should look to support these, especially GMP_BufferSingle
+      assert (false);
+      break;
 
-      case GMP_BufferLength32:
-        {
-          uint8_t *start_code = inputFrame->Buffer();
-          while (start_code < inputFrame->Buffer() + inputFrame->Size()) {
-            static const uint8_t code[] = { 0x00, 0x00, 0x00, 0x01 };
-            uint8_t *lenp = start_code;
-            start_code += *(reinterpret_cast<int32_t *>(lenp));
-            memcpy(lenp, code, 4);
-          }
-        }
-        break;
+    case GMP_BufferLength32: {
+      uint8_t* start_code = inputFrame->Buffer();
+      while (start_code < inputFrame->Buffer() + inputFrame->Size()) {
+        static const uint8_t code[] = { 0x00, 0x00, 0x00, 0x01 };
+        uint8_t* lenp = start_code;
+        start_code += * (reinterpret_cast<int32_t*> (lenp));
+        memcpy (lenp, code, 4);
+      }
+    }
+    break;
 
-      default:
-        assert(false);
-        break;
+    default:
+      assert (false);
+      break;
     }
 
     worker_thread_->Post (WrapTask (
