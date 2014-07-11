@@ -473,7 +473,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 #else
               pCtx->bReferenceLostAtT0Flag = true;
 #endif
-              ResetParameterSetsState (pCtx);
+              if ((pCtx->iErrorConMethod == ERROR_CON_DISABLE) || (dsOutOfMemory & pCtx->iErrorCode))
+                ResetParameterSetsState (pCtx);
 
               if (dsOutOfMemory & pCtx->iErrorCode) {
                 return pCtx->iErrorCode;
@@ -488,7 +489,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 #else
               pCtx->bReferenceLostAtT0Flag = true;
 #endif
-              ResetParameterSetsState (pCtx);
+              if (pCtx->iErrorConMethod == ERROR_CON_DISABLE)
+                ResetParameterSetsState (pCtx);
             }
             return pCtx->iErrorCode;
           }
@@ -531,7 +533,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 #else
         pCtx->bReferenceLostAtT0Flag = true;
 #endif
-        ResetParameterSetsState (pCtx);
+        if ((pCtx->iErrorConMethod == ERROR_CON_DISABLE) || (dsOutOfMemory & pCtx->iErrorCode))
+          ResetParameterSetsState (pCtx);
         return pCtx->iErrorCode;
       }
     }
@@ -566,7 +569,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 #else
         pCtx->bReferenceLostAtT0Flag = true;
 #endif
-        ResetParameterSetsState (pCtx);
+        if ((pCtx->iErrorConMethod == ERROR_CON_DISABLE) || (dsOutOfMemory & pCtx->iErrorCode))
+          ResetParameterSetsState (pCtx);
         return pCtx->iErrorCode;
       }
     }
