@@ -198,7 +198,9 @@ TEST_F (EncoderInterfaceTest, BasicInitializeTest) {
 TEST_F (EncoderInterfaceTest, BasicInitializeTestFalse) {
   int iResult;
   SEncParamBase sEncParamBase;
+  int uiTraceLevel = WELS_LOG_QUIET;
 
+  pPtrEnc->SetOption (ENCODER_OPTION_TRACE_LEVEL, &uiTraceLevel);
   //iUsageType
   GetValidEncParamBase (&sEncParamBase);
   sEncParamBase.iUsageType = static_cast<EUsageType> (2);
@@ -254,6 +256,9 @@ TEST_F (EncoderInterfaceTest, BasicInitializeTestFalse) {
   sEncParamBase.iRCMode = static_cast<RC_MODES> (3);
   iResult = pPtrEnc->Initialize (&sEncParamBase);
   EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
+
+  uiTraceLevel = WELS_LOG_ERROR;
+  pPtrEnc->SetOption (ENCODER_OPTION_TRACE_LEVEL, &uiTraceLevel);
 }
 
 TEST_F (EncoderInterfaceTest, BasicInitializeTestAutoAdjustment) {
