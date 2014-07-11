@@ -1724,9 +1724,9 @@ void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pS
 
 int32_t InitRefPicList (PWelsDecoderContext pCtx, const uint8_t kuiNRi, const bool kbFirstSlice, int32_t iPoc) {
   int32_t iRet = ERR_NONE;
-  if (kbFirstSlice)
-    iRet = WelsInitRefList (pCtx, iPoc);
-  if ((pCtx->eSliceType != I_SLICE && pCtx->eSliceType != SI_SLICE) && kbFirstSlice) {
+  
+  iRet = WelsInitRefList (pCtx, iPoc);
+  if ((pCtx->eSliceType != I_SLICE && pCtx->eSliceType != SI_SLICE) ) {
     iRet = WelsReorderRefList (pCtx);
   }
 
