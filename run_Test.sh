@@ -29,6 +29,7 @@ runMain()
 
   if [ "${TestType}"  = "UnitTest"  ]
   then
+    set -e
     make -B ENABLE64BIT=Yes BUILDTYPE=Release all plugin test
     make -B ENABLE64BIT=Yes BUILDTYPE=Debug all plugin test
     make -B ENABLE64BIT=No BUILDTYPE=Release all plugin test
