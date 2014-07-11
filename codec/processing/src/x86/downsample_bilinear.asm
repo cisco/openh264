@@ -39,7 +39,7 @@
 ;*
 ;*************************************************************************/
 %include "asm_inc.asm"
-%ifdef X86_32
+
 ;***********************************************************************
 ; Macros and other preprocessor constants
 ;***********************************************************************
@@ -64,6 +64,8 @@ shufb_mask_low:
     db 00h, 80h, 02h, 80h, 04h, 80h, 06h, 80h, 08h, 80h, 0ah, 80h, 0ch, 80h, 0eh, 80h
 shufb_mask_high:
     db 01h, 80h, 03h, 80h, 05h, 80h, 07h, 80h, 09h, 80h, 0bh, 80h, 0dh, 80h, 0fh, 80h
+add_extra_half:
+    dd 16384,0,0,0
 
 
 ;***********************************************************************
@@ -78,28 +80,36 @@ SECTION .text
 ;                   const int iSrcWidth, const int iSrcHeight );
 ;***********************************************************************
 WELS_EXTERN DyadicBilinearDownsamplerWidthx32_sse
-    push ebx
-    push edx
-    push esi
-    push edi
-    push ebp
+%ifdef X86_32
+    push r6
+    %assign push_num 1
+%else
+    %assign push_num 0
+%endif
+    LOAD_6_PARA
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    SIGN_EXTENSION r4, r4d
+    SIGN_EXTENSION r5, r5d
 
-    mov edi, [esp+24]   ; pDst
-    mov edx, [esp+28]   ; iDstStride
-    mov esi, [esp+32]   ; pSrc
-    mov ecx, [esp+36]   ; iSrcStride
-    mov ebp, [esp+44]   ; iSrcHeight
+%ifndef X86_32
+    push r12
+    mov r12, r4
+%endif
+    sar r5, $01            ; iSrcHeight >> 1
 
-    sar ebp, $01            ; iSrcHeight >> 1
-
-.yloops:
-    mov eax, [esp+40]   ; iSrcWidth
-    sar eax, $01            ; iSrcWidth >> 1
-    mov ebx, eax        ; iDstWidth restored at ebx
-    sar eax, $04            ; (iSrcWidth >> 1) / 16     ; loop count = num_of_mb
-    neg ebx             ; - (iSrcWidth >> 1)
+.yloops1:
+%ifdef X86_32
+    mov r4, arg5
+%else
+    mov r4, r12
+%endif
+    sar r4, $01            ; iSrcWidth >> 1
+    mov r6, r4        ; iDstWidth restored at ebx
+    sar r4, $04            ; (iSrcWidth >> 1) / 16     ; loop count = num_of_mb
+    neg r6             ; - (iSrcWidth >> 1)
     ; each loop = source bandwidth: 32 bytes
-.xloops:
+.xloops1:
     ; 1st part horizonal loop: x16 bytes
     ;               mem  hi<-       ->lo
     ;1st Line Src:  mm0: d D c C b B a A    mm1: h H g G f F e E
@@ -108,10 +118,10 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx32_sse
     ;: H G F E D C B A, P O N M L K J I
     ;: h g f e d c b a, p o n m l k j i
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    movq mm0, [esi]         ; 1st pSrc line
-    movq mm1, [esi+8]       ; 1st pSrc line + 8
-    movq mm2, [esi+ecx]     ; 2nd pSrc line
-    movq mm3, [esi+ecx+8]   ; 2nd pSrc line + 8
+    movq mm0, [r2]         ; 1st pSrc line
+    movq mm1, [r2+8]       ; 1st pSrc line + 8
+    movq mm2, [r2+r3]     ; 2nd pSrc line
+    movq mm3, [r2+r3+8]   ; 2nd pSrc line + 8
 
     ; to handle mm0, mm1, mm2, mm3
     pshufw mm4, mm0, 0d8h   ; d D b B c C a A ; 11011000 B
@@ -156,10 +166,10 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx32_sse
     ;: H G F E D C B A, P O N M L K J I
     ;: h g f e d c b a, p o n m l k j i
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    movq mm1, [esi+16]      ; 1st pSrc line + 16
-    movq mm2, [esi+24]      ; 1st pSrc line + 24
-    movq mm3, [esi+ecx+16]  ; 2nd pSrc line + 16
-    movq mm4, [esi+ecx+24]  ; 2nd pSrc line + 24
+    movq mm1, [r2+16]      ; 1st pSrc line + 16
+    movq mm2, [r2+24]      ; 1st pSrc line + 24
+    movq mm3, [r2+r3+16]  ; 2nd pSrc line + 16
+    movq mm4, [r2+r3+24]  ; 2nd pSrc line + 24
 
     ; to handle mm1, mm2, mm3, mm4
     pshufw mm5, mm1, 0d8h   ; d D b B c C a A ; 11011000 B
@@ -196,31 +206,33 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx32_sse
     pavgb mm3, mm7      ; (I+i+1)>>1, .., (P+p+1)>>1, temp_row2
     pavgb mm2, mm3      ; (temp_row1+temp_row2+1)>>1, done in another 2nd horizonal part
 
-    movq [edi  ], mm0
-    movq [edi+8], mm2
+    movq [r0  ], mm0
+    movq [r0+8], mm2
 
     ; next SMB
-    lea esi, [esi+32]
-    lea edi, [edi+16]
+    lea r2, [r2+32]
+    lea r0, [r0+16]
 
-    dec eax
-    jg near .xloops
+    dec r4
+    jg near .xloops1
 
     ; next line
-    lea esi, [esi+2*ecx]    ; next end of lines
-    lea esi, [esi+2*ebx]    ; reset to base 0 [- 2 * iDstWidth]
-    lea edi, [edi+edx]
-    lea edi, [edi+ebx]      ; reset to base 0 [- iDstWidth]
+    lea r2, [r2+2*r3]    ; next end of lines
+    lea r2, [r2+2*r6]    ; reset to base 0 [- 2 * iDstWidth]
+    lea r0, [r0+r1]
+    lea r0, [r0+r6]      ; reset to base 0 [- iDstWidth]
 
-    dec ebp
-    jg near .yloops
+    dec r5
+    jg near .yloops1
 
     WELSEMMS
-    pop ebp
-    pop edi
-    pop esi
-    pop edx
-    pop ebx
+%ifndef X86_32
+    pop r12
+%endif
+    LOAD_6_PARA_POP
+%ifdef X86_32
+    pop r6
+%endif
     ret
 
 ;***********************************************************************
@@ -229,28 +241,36 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx32_sse
 ;                     const int iSrcWidth, const int iSrcHeight );
 ;***********************************************************************
 WELS_EXTERN DyadicBilinearDownsamplerWidthx16_sse
-    push ebx
-    push edx
-    push esi
-    push edi
-    push ebp
+%ifdef X86_32
+    push r6
+    %assign push_num 1
+%else
+    %assign push_num 0
+%endif
+    LOAD_6_PARA
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    SIGN_EXTENSION r4, r4d
+    SIGN_EXTENSION r5, r5d
 
-    mov edi, [esp+24]   ; pDst
-    mov edx, [esp+28]   ; iDstStride
-    mov esi, [esp+32]   ; pSrc
-    mov ecx, [esp+36]   ; iSrcStride
-    mov ebp, [esp+44]   ; iSrcHeight
+%ifndef X86_32
+    push r12
+    mov r12, r4
+%endif
+    sar r5, $01            ; iSrcHeight >> 1
 
-    sar ebp, $01        ; iSrcHeight >> 1
-
-.yloops:
-    mov eax, [esp+40]   ; iSrcWidth
-    sar eax, $01        ; iSrcWidth >> 1
-    mov ebx, eax        ; iDstWidth restored at ebx
-    sar eax, $03        ; (iSrcWidth >> 1) / 8      ; loop count = num_of_mb
-    neg ebx         ; - (iSrcWidth >> 1)
+.yloops2:
+%ifdef X86_32
+    mov r4, arg5
+%else
+    mov r4, r12
+%endif
+    sar r4, $01            ; iSrcWidth >> 1
+    mov r6, r4        ; iDstWidth restored at ebx
+    sar r4, $03            ; (iSrcWidth >> 1) / 8     ; loop count = num_of_mb
+    neg r6             ; - (iSrcWidth >> 1)
     ; each loop = source bandwidth: 16 bytes
-.xloops:
+.xloops2:
     ; 1st part horizonal loop: x16 bytes
     ;               mem  hi<-       ->lo
     ;1st Line Src:  mm0: d D c C b B a A    mm1: h H g G f F e E
@@ -259,10 +279,10 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx16_sse
     ;: H G F E D C B A, P O N M L K J I
     ;: h g f e d c b a, p o n m l k j i
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    movq mm0, [esi]         ; 1st pSrc line
-    movq mm1, [esi+8]       ; 1st pSrc line + 8
-    movq mm2, [esi+ecx]     ; 2nd pSrc line
-    movq mm3, [esi+ecx+8]   ; 2nd pSrc line + 8
+    movq mm0, [r2]         ; 1st pSrc line
+    movq mm1, [r2+8]       ; 1st pSrc line + 8
+    movq mm2, [r2+r3]     ; 2nd pSrc line
+    movq mm3, [r2+r3+8]   ; 2nd pSrc line + 8
 
     ; to handle mm0, mm1, mm2, mm3
     pshufw mm4, mm0, 0d8h   ; d D b B c C a A ; 11011000 B
@@ -299,30 +319,32 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx16_sse
     pavgb mm1, mm6      ; (I+i+1)>>1, .., (P+p+1)>>1, temp_row2
     pavgb mm0, mm1      ; (temp_row1+temp_row2+1)>>1, pending here and wait another horizonal part done then write memory once
 
-    movq [edi  ], mm0
+    movq [r0  ], mm0
 
     ; next SMB
-    lea esi, [esi+16]
-    lea edi, [edi+8]
+    lea r2, [r2+16]
+    lea r0, [r0+8]
 
-    dec eax
-    jg near .xloops
+    dec r4
+    jg near .xloops2
 
     ; next line
-    lea esi, [esi+2*ecx]    ; next end of lines
-    lea esi, [esi+2*ebx]    ; reset to base 0 [- 2 * iDstWidth]
-    lea edi, [edi+edx]
-    lea edi, [edi+ebx]      ; reset to base 0 [- iDstWidth]
+    lea r2, [r2+2*r3]    ; next end of lines
+    lea r2, [r2+2*r6]    ; reset to base 0 [- 2 * iDstWidth]
+    lea r0, [r0+r1]
+    lea r0, [r0+r6]      ; reset to base 0 [- iDstWidth]
 
-    dec ebp
-    jg near .yloops
+    dec r5
+    jg near .yloops2
 
     WELSEMMS
-    pop ebp
-    pop edi
-    pop esi
-    pop edx
-    pop ebx
+%ifndef X86_32
+    pop r12
+%endif
+    LOAD_6_PARA_POP
+%ifdef X86_32
+    pop r6
+%endif
     ret
 
 ;***********************************************************************
@@ -331,28 +353,36 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx16_sse
 ;                     const int iSrcWidth, const int iSrcHeight );
 ;***********************************************************************
 WELS_EXTERN DyadicBilinearDownsamplerWidthx8_sse
-    push ebx
-    push edx
-    push esi
-    push edi
-    push ebp
+%ifdef X86_32
+    push r6
+    %assign push_num 1
+%else
+    %assign push_num 0
+%endif
+    LOAD_6_PARA
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    SIGN_EXTENSION r4, r4d
+    SIGN_EXTENSION r5, r5d
 
-    mov edi, [esp+24]   ; pDst
-    mov edx, [esp+28]   ; iDstStride
-    mov esi, [esp+32]   ; pSrc
-    mov ecx, [esp+36]   ; iSrcStride
-    mov ebp, [esp+44]   ; iSrcHeight
+%ifndef X86_32
+    push r12
+    mov r12, r4
+%endif
+    sar r5, $01            ; iSrcHeight >> 1
 
-    sar ebp, $01        ; iSrcHeight >> 1
-
-.yloops:
-    mov eax, [esp+40]   ; iSrcWidth
-    sar eax, $01        ; iSrcWidth >> 1
-    mov ebx, eax        ; iDstWidth restored at ebx
-    sar eax, $02        ; (iSrcWidth >> 1) / 4      ; loop count = num_of_mb
-    neg ebx         ; - (iSrcWidth >> 1)
+.yloops3:
+%ifdef X86_32
+    mov r4, arg5
+%else
+    mov r4, r12
+%endif
+    sar r4, $01            ; iSrcWidth >> 1
+    mov r6, r4        ; iDstWidth restored at ebx
+    sar r4, $02            ; (iSrcWidth >> 1) / 4     ; loop count = num_of_mb
+    neg r6             ; - (iSrcWidth >> 1)
     ; each loop = source bandwidth: 8 bytes
-.xloops:
+.xloops3:
     ; 1st part horizonal loop: x8 bytes
     ;               mem  hi<-       ->lo
     ;1st Line Src:  mm0: d D c C b B a A
@@ -361,8 +391,8 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx8_sse
     ;: H G F E D C B A
     ;: h g f e d c b a
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    movq mm0, [esi]         ; 1st pSrc line
-    movq mm1, [esi+ecx]     ; 2nd pSrc line
+    movq mm0, [r2]         ; 1st pSrc line
+    movq mm1, [r2+r3]     ; 2nd pSrc line
 
     ; to handle mm0, mm1, mm2, mm3
     pshufw mm2, mm0, 0d8h   ; d D b B c C a A ; 11011000 B
@@ -385,30 +415,32 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx8_sse
     pshufw mm1, mm0, 04eh   ; 01001110 B
     pavgb mm0, mm1      ; (temp_row1+temp_row2+1)>>1, pending here and wait another horizonal part done then write memory once
 
-    movd [edi], mm0
+    movd [r0], mm0
 
     ; next unit
-    lea esi, [esi+8]
-    lea edi, [edi+4]
+    lea r2, [r2+8]
+    lea r0, [r0+4]
 
-    dec eax
-    jg near .xloops
+    dec r4
+    jg near .xloops3
 
     ; next line
-    lea esi, [esi+2*ecx]    ; next end of lines
-    lea esi, [esi+2*ebx]    ; reset to base 0 [- 2 * iDstWidth]
-    lea edi, [edi+edx]
-    lea edi, [edi+ebx]      ; reset to base 0 [- iDstWidth]
+    lea r2, [r2+2*r3]    ; next end of lines
+    lea r2, [r2+2*r6]    ; reset to base 0 [- 2 * iDstWidth]
+    lea r0, [r0+r1]
+    lea r0, [r0+r6]      ; reset to base 0 [- iDstWidth]
 
-    dec ebp
-    jg near .yloops
+    dec r5
+    jg near .yloops3
 
     WELSEMMS
-    pop ebp
-    pop edi
-    pop esi
-    pop edx
-    pop ebx
+%ifndef X86_32
+    pop r12
+%endif
+    LOAD_6_PARA_POP
+%ifdef X86_32
+    pop r6
+%endif
     ret
 
 
@@ -420,31 +452,56 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx8_sse
 ;                   const int iSrcWidth, const int iSrcHeight );
 ;***********************************************************************
 WELS_EXTERN DyadicBilinearDownsamplerWidthx32_ssse3
-    push ebx
-    push edx
-    push esi
-    push edi
-    push ebp
+    ;push ebx
+    ;push edx
+    ;push esi
+    ;push edi
+    ;push ebp
 
-    mov edi, [esp+24]   ; pDst
-    mov edx, [esp+28]   ; iDstStride
-    mov esi, [esp+32]   ; pSrc
-    mov ecx, [esp+36]   ; iSrcStride
-    mov ebp, [esp+44]   ; iSrcHeight
+    ;mov edi, [esp+24]   ; pDst
+    ;mov edx, [esp+28]   ; iDstStride
+    ;mov esi, [esp+32]   ; pSrc
+    ;mov ecx, [esp+36]   ; iSrcStride
+    ;mov ebp, [esp+44]   ; iSrcHeight
+%ifdef X86_32
+    push r6
+    %assign push_num 1
+%else
+    %assign push_num 0
+%endif
+    LOAD_6_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    SIGN_EXTENSION r4, r4d
+    SIGN_EXTENSION r5, r5d
 
-    sar ebp, $01            ; iSrcHeight >> 1
+%ifndef X86_32
+    push r12
+    mov r12, r4
+%endif
+    sar r5, $01            ; iSrcHeight >> 1
 
     movdqa xmm7, [shufb_mask_low]   ; mask low
     movdqa xmm6, [shufb_mask_high]  ; mask high
 
-.yloops:
-    mov eax, [esp+40]   ; iSrcWidth
-    sar eax, $01            ; iSrcWidth >> 1
-    mov ebx, eax        ; iDstWidth restored at ebx
-    sar eax, $04            ; (iSrcWidth >> 1) / 16     ; loop count = num_of_mb
-    neg ebx             ; - (iSrcWidth >> 1)
+.yloops4:
+    ;mov eax, [esp+40]   ; iSrcWidth
+    ;sar eax, $01            ; iSrcWidth >> 1
+    ;mov ebx, eax        ; iDstWidth restored at ebx
+    ;sar eax, $04            ; (iSrcWidth >> 1) / 16     ; loop count = num_of_mb
+    ;neg ebx             ; - (iSrcWidth >> 1)
+%ifdef X86_32
+    mov r4, arg5
+%else
+    mov r4, r12
+%endif
+    sar r4, $01            ; iSrcWidth >> 1
+    mov r6, r4        ; iDstWidth restored at ebx
+    sar r4, $04            ; (iSrcWidth >> 1) / 16     ; loop count = num_of_mb
+    neg r6             ; - (iSrcWidth >> 1)
     ; each loop = source bandwidth: 32 bytes
-.xloops:
+.xloops4:
     ; 1st part horizonal loop: x16 bytes
     ;               mem  hi<-       ->lo
     ;1st Line Src:  xmm0: h H g G f F e E d D c C b B a A
@@ -458,10 +515,10 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx32_ssse3
     ;: p ..                          a
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    movdqa xmm0, [esi]          ; 1st_src_line
-    movdqa xmm1, [esi+16]       ; 1st_src_line + 16
-    movdqa xmm2, [esi+ecx]      ; 2nd_src_line
-    movdqa xmm3, [esi+ecx+16]   ; 2nd_src_line + 16
+    movdqa xmm0, [r2]          ; 1st_src_line
+    movdqa xmm1, [r2+16]       ; 1st_src_line + 16
+    movdqa xmm2, [r2+r3]      ; 2nd_src_line
+    movdqa xmm3, [r2+r3+16]   ; 2nd_src_line + 16
 
     ; packing & avg
     movdqa xmm4, xmm0           ; h H g G f F e E d D c C b B a A
@@ -498,29 +555,33 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx32_ssse3
     pavgb xmm0, xmm2
 
     ; write pDst
-    movdqa [edi], xmm0
+    movdqa [r0], xmm0
 
     ; next SMB
-    lea esi, [esi+32]
-    lea edi, [edi+16]
+    lea r2, [r2+32]
+    lea r0, [r0+16]
 
-    dec eax
-    jg near .xloops
+    dec r4
+    jg near .xloops4
 
     ; next line
-    lea esi, [esi+2*ecx]    ; next end of lines
-    lea esi, [esi+2*ebx]    ; reset to base 0 [- 2 * iDstWidth]
-    lea edi, [edi+edx]
-    lea edi, [edi+ebx]      ; reset to base 0 [- iDstWidth]
+    lea r2, [r2+2*r3]    ; next end of lines
+    lea r2, [r2+2*r6]    ; reset to base 0 [- 2 * iDstWidth]
+    lea r0, [r0+r1]
+    lea r0, [r0+r6]      ; reset to base 0 [- iDstWidth]
 
-    dec ebp
-    jg near .yloops
+    dec r5
+    jg near .yloops4
 
-    pop ebp
-    pop edi
-    pop esi
-    pop edx
-    pop ebx
+%ifndef X86_32
+    pop r12
+%endif
+
+    POP_XMM
+    LOAD_6_PARA_POP
+%ifdef X86_32
+    pop r6
+%endif
     ret
 
 ;***********************************************************************
@@ -529,30 +590,39 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx32_ssse3
 ;                     const int iSrcWidth, const int iSrcHeight );
 ;***********************************************************************
 WELS_EXTERN DyadicBilinearDownsamplerWidthx16_ssse3
-    push ebx
-    push edx
-    push esi
-    push edi
-    push ebp
+%ifdef X86_32
+    push r6
+    %assign push_num 1
+%else
+    %assign push_num 0
+%endif
+    LOAD_6_PARA
+    PUSH_XMM 6
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    SIGN_EXTENSION r4, r4d
+    SIGN_EXTENSION r5, r5d
 
-    mov edi, [esp+24]   ; pDst
-    mov edx, [esp+28]   ; iDstStride
-    mov esi, [esp+32]   ; pSrc
-    mov ecx, [esp+36]   ; iSrcStride
-    mov ebp, [esp+44]   ; iSrcHeight
+%ifndef X86_32
+    push r12
+    mov r12, r4
+%endif
+    sar r5, $01            ; iSrcHeight >> 1
+    movdqa xmm5, [shufb_mask_low]   ; mask low
+    movdqa xmm4, [shufb_mask_high]  ; mask high
 
-    sar ebp, $01        ; iSrcHeight >> 1
-    movdqa xmm7, [shufb_mask_low]   ; mask low
-    movdqa xmm6, [shufb_mask_high]  ; mask high
-
-.yloops:
-    mov eax, [esp+40]   ; iSrcWidth
-    sar eax, $01        ; iSrcWidth >> 1
-    mov ebx, eax        ; iDstWidth restored at ebx
-    sar eax, $03        ; (iSrcWidth >> 1) / 8      ; loop count = num_of_mb
-    neg ebx         ; - (iSrcWidth >> 1)
+.yloops5:
+%ifdef X86_32
+    mov r4, arg5
+%else
+    mov r4, r12
+%endif
+    sar r4, $01            ; iSrcWidth >> 1
+    mov r6, r4        ; iDstWidth restored at ebx
+    sar r4, $03            ; (iSrcWidth >> 1) / 8     ; loop count = num_of_mb
+    neg r6             ; - (iSrcWidth >> 1)
     ; each loop = source bandwidth: 16 bytes
-.xloops:
+.xloops5:
     ; horizonal loop: x16 bytes by source
     ;               mem  hi<-       ->lo
     ;1st line pSrc: xmm0: h H g G f F e E d D c C b B a A
@@ -562,21 +632,21 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx16_ssse3
     ;: h g f e d c b a, p o n m l k j i
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    movdqa xmm0, [esi]          ; 1st_src_line
-    movdqa xmm1, [esi+ecx]      ; 2nd_src_line
+    movdqa xmm0, [r2]          ; 1st_src_line
+    movdqa xmm1, [r2+r3]      ; 2nd_src_line
 
     ; packing & avg
     movdqa xmm2, xmm0           ; h H g G f F e E d D c C b B a A
-    pshufb xmm0, xmm7           ; 0 H 0 G 0 F 0 E 0 D 0 C 0 B 0 A
-    pshufb xmm2, xmm6           ; 0 h 0 g 0 f 0 e 0 d 0 c 0 b 0 a
+    pshufb xmm0, xmm5           ; 0 H 0 G 0 F 0 E 0 D 0 C 0 B 0 A
+    pshufb xmm2, xmm4           ; 0 h 0 g 0 f 0 e 0 d 0 c 0 b 0 a
     ; another implementation for xmm2 high bits
 ;   psubb xmm2, xmm0            ; h 0 g 0 f 0 e 0 d 0 c 0 b 0 a 0
 ;   psrlw xmm2, 8               ; 0 h 0 g 0 f 0 e 0 d 0 c 0 b 0 a
     pavgb xmm0, xmm2
 
     movdqa xmm3, xmm1
-    pshufb xmm1, xmm7
-    pshufb xmm3, xmm6
+    pshufb xmm1, xmm5
+    pshufb xmm3, xmm4
 ;   psubb xmm3, xmm1
 ;   psrlw xmm3, 8
     pavgb xmm1, xmm3
@@ -585,29 +655,32 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx16_ssse3
     packuswb xmm0, xmm1
 
     ; write pDst
-    movq [edi], xmm0
+    movq [r0], xmm0
 
     ; next SMB
-    lea esi, [esi+16]
-    lea edi, [edi+8]
+    lea r2, [r2+16]
+    lea r0, [r0+8]
 
-    dec eax
-    jg near .xloops
+    dec r4
+    jg near .xloops5
 
-    ; next line
-    lea esi, [esi+2*ecx]    ; next end of lines
-    lea esi, [esi+2*ebx]    ; reset to base 0 [- 2 * iDstWidth]
-    lea edi, [edi+edx]
-    lea edi, [edi+ebx]      ; reset to base 0 [- iDstWidth]
+    lea r2, [r2+2*r3]    ; next end of lines
+    lea r2, [r2+2*r6]    ; reset to base 0 [- 2 * iDstWidth]
+    lea r0, [r0+r1]
+    lea r0, [r0+r6]      ; reset to base 0 [- iDstWidth]
 
-    dec ebp
-    jg near .yloops
+    dec r5
+    jg near .yloops5
 
-    pop ebp
-    pop edi
-    pop esi
-    pop edx
-    pop ebx
+%ifndef X86_32
+    pop r12
+%endif
+
+    POP_XMM
+    LOAD_6_PARA_POP
+%ifdef X86_32
+    pop r6
+%endif
     ret
 
 ; got about 65% improvement over DyadicBilinearDownsamplerWidthx32_sse
@@ -617,31 +690,40 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx16_ssse3
 ;                   const int iSrcWidth, const int iSrcHeight );
 ;***********************************************************************
 WELS_EXTERN DyadicBilinearDownsamplerWidthx32_sse4
-    push ebx
-    push edx
-    push esi
-    push edi
-    push ebp
+%ifdef X86_32
+    push r6
+    %assign push_num 1
+%else
+    %assign push_num 0
+%endif
+    LOAD_6_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    SIGN_EXTENSION r4, r4d
+    SIGN_EXTENSION r5, r5d
 
-    mov edi, [esp+24]   ; pDst
-    mov edx, [esp+28]   ; iDstStride
-    mov esi, [esp+32]   ; pSrc
-    mov ecx, [esp+36]   ; iSrcStride
-    mov ebp, [esp+44]   ; iSrcHeight
-
-    sar ebp, $01            ; iSrcHeight >> 1
+%ifndef X86_32
+    push r12
+    mov r12, r4
+%endif
+    sar r5, $01            ; iSrcHeight >> 1
 
     movdqa xmm7, [shufb_mask_low]   ; mask low
     movdqa xmm6, [shufb_mask_high]  ; mask high
 
-.yloops:
-    mov eax, [esp+40]   ; iSrcWidth
-    sar eax, $01            ; iSrcWidth >> 1
-    mov ebx, eax        ; iDstWidth restored at ebx
-    sar eax, $04            ; (iSrcWidth >> 1) / 16     ; loop count = num_of_mb
-    neg ebx             ; - (iSrcWidth >> 1)
+.yloops6:
+%ifdef X86_32
+    mov r4, arg5
+%else
+    mov r4, r12
+%endif
+    sar r4, $01            ; iSrcWidth >> 1
+    mov r6, r4        ; iDstWidth restored at ebx
+    sar r4, $04            ; (iSrcWidth >> 1) / 16     ; loop count = num_of_mb
+    neg r6             ; - (iSrcWidth >> 1)
     ; each loop = source bandwidth: 32 bytes
-.xloops:
+.xloops6:
     ; 1st part horizonal loop: x16 bytes
     ;               mem  hi<-       ->lo
     ;1st Line Src:  xmm0: h H g G f F e E d D c C b B a A
@@ -655,10 +737,10 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx32_sse4
     ;: p ..                          a
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    movntdqa xmm0, [esi]            ; 1st_src_line
-    movntdqa xmm1, [esi+16]     ; 1st_src_line + 16
-    movntdqa xmm2, [esi+ecx]        ; 2nd_src_line
-    movntdqa xmm3, [esi+ecx+16] ; 2nd_src_line + 16
+    movntdqa xmm0, [r2]            ; 1st_src_line
+    movntdqa xmm1, [r2+16]     ; 1st_src_line + 16
+    movntdqa xmm2, [r2+r3]        ; 2nd_src_line
+    movntdqa xmm3, [r2+r3+16] ; 2nd_src_line + 16
 
     ; packing & avg
     movdqa xmm4, xmm0           ; h H g G f F e E d D c C b B a A
@@ -694,29 +776,32 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx32_sse4
     pavgb xmm0, xmm2
 
     ; write pDst
-    movdqa [edi], xmm0
+    movdqa [r0], xmm0
 
     ; next SMB
-    lea esi, [esi+32]
-    lea edi, [edi+16]
+    lea r2, [r2+32]
+    lea r0, [r0+16]
 
-    dec eax
-    jg near .xloops
+    dec r4
+    jg near .xloops6
 
-    ; next line
-    lea esi, [esi+2*ecx]    ; next end of lines
-    lea esi, [esi+2*ebx]    ; reset to base 0 [- 2 * iDstWidth]
-    lea edi, [edi+edx]
-    lea edi, [edi+ebx]      ; reset to base 0 [- iDstWidth]
+    lea r2, [r2+2*r3]    ; next end of lines
+    lea r2, [r2+2*r6]    ; reset to base 0 [- 2 * iDstWidth]
+    lea r0, [r0+r1]
+    lea r0, [r0+r6]      ; reset to base 0 [- iDstWidth]
 
-    dec ebp
-    jg near .yloops
+    dec r5
+    jg near .yloops6
 
-    pop ebp
-    pop edi
-    pop esi
-    pop edx
-    pop ebx
+%ifndef X86_32
+    pop r12
+%endif
+
+    POP_XMM
+    LOAD_6_PARA_POP
+%ifdef X86_32
+    pop r6
+%endif
     ret
 
 ;***********************************************************************
@@ -725,30 +810,39 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx32_sse4
 ;                     const int iSrcWidth, const int iSrcHeight );
 ;***********************************************************************
 WELS_EXTERN DyadicBilinearDownsamplerWidthx16_sse4
-    push ebx
-    push edx
-    push esi
-    push edi
-    push ebp
+%ifdef X86_32
+    push r6
+    %assign push_num 1
+%else
+    %assign push_num 0
+%endif
+    LOAD_6_PARA
+    PUSH_XMM 6
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    SIGN_EXTENSION r4, r4d
+    SIGN_EXTENSION r5, r5d
 
-    mov edi, [esp+24]   ; pDst
-    mov edx, [esp+28]   ; iDstStride
-    mov esi, [esp+32]   ; pSrc
-    mov ecx, [esp+36]   ; iSrcStride
-    mov ebp, [esp+44]   ; iSrcHeight
+%ifndef X86_32
+    push r12
+    mov r12, r4
+%endif
+    sar r5, $01            ; iSrcHeight >> 1
+    movdqa xmm5, [shufb_mask_low]   ; mask low
+    movdqa xmm4, [shufb_mask_high]  ; mask high
 
-    sar ebp, $01        ; iSrcHeight >> 1
-    movdqa xmm7, [shufb_mask_low]   ; mask low
-    movdqa xmm6, [shufb_mask_high]  ; mask high
-
-.yloops:
-    mov eax, [esp+40]   ; iSrcWidth
-    sar eax, $01        ; iSrcWidth >> 1
-    mov ebx, eax        ; iDstWidth restored at ebx
-    sar eax, $03        ; (iSrcWidth >> 1) / 8      ; loop count = num_of_mb
-    neg ebx         ; - (iSrcWidth >> 1)
+.yloops7:
+%ifdef X86_32
+    mov r4, arg5
+%else
+    mov r4, r12
+%endif
+    sar r4, $01            ; iSrcWidth >> 1
+    mov r6, r4        ; iDstWidth restored at ebx
+    sar r4, $03            ; (iSrcWidth >> 1) / 8     ; loop count = num_of_mb
+    neg r6             ; - (iSrcWidth >> 1)
     ; each loop = source bandwidth: 16 bytes
-.xloops:
+.xloops7:
     ; horizonal loop: x16 bytes by source
     ;               mem  hi<-       ->lo
     ;1st line pSrc: xmm0: h H g G f F e E d D c C b B a A
@@ -758,20 +852,20 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx16_sse4
     ;: h g f e d c b a, p o n m l k j i
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    movntdqa xmm0, [esi]            ; 1st_src_line
-    movntdqa xmm1, [esi+ecx]        ; 2nd_src_line
+    movntdqa xmm0, [r2]            ; 1st_src_line
+    movntdqa xmm1, [r2+r3]        ; 2nd_src_line
 
     ; packing & avg
     movdqa xmm2, xmm0           ; h H g G f F e E d D c C b B a A
-    pshufb xmm0, xmm7           ; 0 H 0 G 0 F 0 E 0 D 0 C 0 B 0 A
-    pshufb xmm2, xmm6           ; 0 h 0 g 0 f 0 e 0 d 0 c 0 b 0 a
+    pshufb xmm0, xmm5           ; 0 H 0 G 0 F 0 E 0 D 0 C 0 B 0 A
+    pshufb xmm2, xmm4           ; 0 h 0 g 0 f 0 e 0 d 0 c 0 b 0 a
 ;   psubb xmm2, xmm0            ; h 0 g 0 f 0 e 0 d 0 c 0 b 0 a 0
 ;   psrlw xmm2, 8               ; 0 h 0 g 0 f 0 e 0 d 0 c 0 b 0 a
     pavgb xmm0, xmm2
 
     movdqa xmm3, xmm1
-    pshufb xmm1, xmm7
-    pshufb xmm3, xmm6
+    pshufb xmm1, xmm5
+    pshufb xmm3, xmm4
 ;   psubb xmm3, xmm1
 ;   psrlw xmm3, 8
     pavgb xmm1, xmm3
@@ -780,38 +874,40 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx16_sse4
     packuswb xmm0, xmm1
 
     ; write pDst
-    movq [edi], xmm0
+    movq [r0], xmm0
 
     ; next SMB
-    lea esi, [esi+16]
-    lea edi, [edi+8]
+    lea r2, [r2+16]
+    lea r0, [r0+8]
 
-    dec eax
-    jg near .xloops
+    dec r4
+    jg near .xloops7
 
     ; next line
-    lea esi, [esi+2*ecx]    ; next end of lines
-    lea esi, [esi+2*ebx]    ; reset to base 0 [- 2 * iDstWidth]
-    lea edi, [edi+edx]
-    lea edi, [edi+ebx]      ; reset to base 0 [- iDstWidth]
+    lea r2, [r2+2*r3]    ; next end of lines
+    lea r2, [r2+2*r6]    ; reset to base 0 [- 2 * iDstWidth]
+    lea r0, [r0+r1]
+    lea r0, [r0+r6]      ; reset to base 0 [- iDstWidth]
 
-    dec ebp
-    jg near .yloops
+    dec r5
+    jg near .yloops7
 
-    pop ebp
-    pop edi
-    pop esi
-    pop edx
-    pop ebx
+%ifndef X86_32
+    pop r12
+%endif
+
+    POP_XMM
+    LOAD_6_PARA_POP
+%ifdef X86_32
+    pop r6
+%endif
     ret
 
 
-
-
-
+%ifdef X86_32
 ;**************************************************************************************************************
 ;int GeneralBilinearAccurateDownsampler_sse2(   unsigned char* pDst, const int iDstStride, const int iDstWidth, const int iDstHeight,
-;                           unsigned char* pSrc, const int iSrcStride, const int iSrcWidth, const int iSrcHeight,
+;                           unsigned char* pSrc, const int iSrcStride,
 ;                           unsigned int uiScaleX, unsigned int uiScaleY );
 ;{
 ;**************************************************************************************************************
@@ -822,26 +918,22 @@ WELS_EXTERN GeneralBilinearAccurateDownsampler_sse2
     push    edi
     push    ebx
 %define     pushsize    16
-%define     localsize   28
+%define     localsize   16
 %define     pDstData        esp + pushsize + localsize + 4
 %define     dwDstStride     esp + pushsize + localsize + 8
 %define     dwDstWidth      esp + pushsize + localsize + 12
 %define     dwDstHeight     esp + pushsize + localsize + 16
 %define     pSrcData        esp + pushsize + localsize + 20
 %define     dwSrcStride     esp + pushsize + localsize + 24
-%define     dwSrcWidth      esp + pushsize + localsize + 28
-%define     dwSrcHeight     esp + pushsize + localsize + 32
-%define     scale           esp + 0
-%define     uiScaleX            esp + pushsize + localsize + 36
-%define     uiScaleY            esp + pushsize + localsize + 40
-%define     tmpHeight       esp + 12
-%define     yInverse        esp + 16
-%define     xInverse        esp + 20
-%define     dstStep         esp + 24
+%define     uiScaleX            esp + pushsize + localsize + 28
+%define     uiScaleY            esp + pushsize + localsize + 32
+%define     tmpHeight       esp + 0
+%define     yInverse        esp + 4
+%define     xInverse        esp + 8
+%define     dstStep         esp + 12
     sub     esp,            localsize
 
     pxor    xmm0,   xmm0
-    mov     edx,    32767
     mov     eax,    [uiScaleX]
     and     eax,    32767
     mov     ebx,    eax
@@ -999,7 +1091,6 @@ LAST_ROW_END:
 %undef      dwDstWidth
 %undef      dwDstHeight
 %undef      dwDstStride
-%undef      scale
 %undef      uiScaleX
 %undef      uiScaleY
 %undef      tmpHeight
@@ -1013,7 +1104,7 @@ LAST_ROW_END:
 
 ;**************************************************************************************************************
 ;int GeneralBilinearFastDownsampler_sse2(   unsigned char* pDst, const int iDstStride, const int iDstWidth, const int iDstHeight,
-;               unsigned char* pSrc, const int iSrcStride, const int iSrcWidth, const int iSrcHeight,
+;               unsigned char* pSrc, const int iSrcStride,
 ;               unsigned int uiScaleX, unsigned int uiScaleY );
 ;{
 ;**************************************************************************************************************
@@ -1024,22 +1115,19 @@ WELS_EXTERN GeneralBilinearFastDownsampler_sse2
     push    edi
     push    ebx
 %define     pushsize    16
-%define     localsize   28
+%define     localsize   16
 %define     pDstData        esp + pushsize + localsize + 4
 %define     dwDstStride     esp + pushsize + localsize + 8
 %define     dwDstWidth      esp + pushsize + localsize + 12
 %define     dwDstHeight     esp + pushsize + localsize + 16
 %define     pSrcData        esp + pushsize + localsize + 20
 %define     dwSrcStride     esp + pushsize + localsize + 24
-%define     dwSrcWidth      esp + pushsize + localsize + 28
-%define     dwSrcHeight     esp + pushsize + localsize + 32
-%define     scale           esp + 0
-%define     uiScaleX            esp + pushsize + localsize + 36
-%define     uiScaleY            esp + pushsize + localsize + 40
-%define     tmpHeight       esp + 12
-%define     yInverse        esp + 16
-%define     xInverse        esp + 20
-%define     dstStep         esp + 24
+%define     uiScaleX            esp + pushsize + localsize + 28
+%define     uiScaleY            esp + pushsize + localsize + 32
+%define     tmpHeight       esp + 0
+%define     yInverse        esp + 4
+%define     xInverse        esp + 8
+%define     dstStep         esp + 12
     sub     esp,            localsize
 
     pxor    xmm0,   xmm0
@@ -1191,15 +1279,620 @@ FAST_LAST_ROW_END:
 %undef      dwSrcHeight
 %undef      dwSrcStride
 %undef      pDstData
-%undef      dwDstWidth
-%undef      dwDstHeight
 %undef      dwDstStride
-%undef      scale
 %undef      uiScaleX
 %undef      uiScaleY
 %undef      tmpHeight
 %undef      yInverse
 %undef      xInverse
 %undef      dstStep
+    ret
+
+%elifdef  WIN64
+
+;**************************************************************************************************************
+;int GeneralBilinearAccurateDownsampler_sse2(   unsigned char* pDst, const int iDstStride, const int iDstWidth, const int iDstHeight,
+;                           unsigned char* pSrc, const int iSrcStride,
+;                           unsigned int uiScaleX, unsigned int uiScaleY );
+;{
+;**************************************************************************************************************
+
+WELS_EXTERN GeneralBilinearAccurateDownsampler_sse2
+    push    r12
+    push    r13
+    push    r14
+    push    r15
+    push    rsi
+    push    rdi
+    push    rbx
+    push    rbp
+    %assign push_num 8
+    LOAD_7_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r2, r2d
+    SIGN_EXTENSION r3, r3d
+    SIGN_EXTENSION r5, r5d
+    SIGN_EXTENSION r6, r6d
+
+    pxor    xmm0,   xmm0
+    mov     r12d,   r6d
+    and     r12d,   32767
+    mov     r13d,   r12d
+    neg     r13d
+    and     r13d,   32767
+    movd    xmm1,   r12d                     ; uinc(uiScaleX mod 32767)
+    movd    xmm2,   r13d                     ; -uinc
+    psllq   xmm1,   32
+    por     xmm1,   xmm2                    ; 0 0  uinc  -uinc   (dword)
+    pshufd  xmm7,   xmm1,   01000100b       ; xmm7: uinc -uinc uinc -uinc
+
+    mov     r12,    arg8
+    SIGN_EXTENSION r12, r12d
+    mov     rbp,    r12
+    and     r12d,   32767
+    mov     r13d,   r12d
+    neg     r13d
+    and     r13d,   32767
+    movd    xmm6,       r12d                     ; vinc(uiScaleY mod 32767)
+    movd    xmm2,       r13d                     ; -vinc
+    psllq   xmm6,       32
+    por     xmm6,       xmm2                    ; 0 0 vinc -vinc (dword)
+    pshufd  xmm6,       xmm6,   01010000b       ; xmm6: vinc vinc -vinc -vinc
+
+    mov     r12d,        40003fffh
+    movd    xmm5,       r12d
+    punpcklwd   xmm5,   xmm0                    ; 16384 16383
+    pshufd  xmm5,       xmm5,   01000100b       ; xmm5: 16384 16383 16384 16383
+
+DOWNSAMPLE:
+    sub     r1, r2                   ; stride - width
+    dec     r3
+    mov     r14,16384
+    pshufd  xmm4,       xmm5,   01010000b   ; initial v to 16384 16384 16383 16383
+
+HEIGHT:
+    ;mov     r12, r4
+    mov     r12, r14
+    shr     r12,    15
+    imul    r12,    r5
+    add     r12,    r4                 ; get current row address
+    mov     r13,    r12
+    add     r13,    r5
+
+    mov     r15, 16384
+    mov     rsi, r2
+    dec     rsi
+    movdqa  xmm3,       xmm5            ; initial u to 16384 16383 16384 16383
+
+WIDTH:
+    mov     rdi,        r15
+    shr     rdi,        15
+
+    movd    xmm1,       [r12+rdi]       ; xxxxxxba
+    movd    xmm2,       [r13+rdi]       ; xxxxxxdc
+    pxor    xmm0,       xmm0
+    punpcklwd   xmm1,   xmm2            ; xxxxdcba
+    punpcklbw   xmm1,   xmm0            ; 0d0c0b0a
+    punpcklwd   xmm1,   xmm0            ; 000d000c000b000a
+
+    movdqa  xmm2,   xmm4    ; xmm2:  vv(1-v)(1-v)  tmpv
+    pmaddwd xmm2,   xmm3    ; mul u(1-u)u(1-u) on xmm2
+    movdqa  xmm0,   xmm2
+    pmuludq xmm2,   xmm1
+    psrlq   xmm0,   32
+    psrlq   xmm1,   32
+    pmuludq xmm0,   xmm1
+    paddq   xmm2,   xmm0
+    pshufd  xmm1,   xmm2,   00001110b
+    paddq   xmm2,   xmm1
+    psrlq   xmm2,   29
+
+    movd    ebx,    xmm2
+    inc     ebx
+    shr     ebx,    1
+    mov     [r0],   bl
+    inc     r0
+
+    add      r15, r6
+    paddw   xmm3,       xmm7            ; inc u
+    psllw   xmm3,       1
+    psrlw   xmm3,       1
+
+    dec     rsi
+    jg      WIDTH
+
+WIDTH_END:
+    shr     r15, 15
+    mov     bl,  [r12+r15]
+    mov     [r0],bl
+    inc     r0
+    add     r14, rbp
+    add     r0,  r1
+
+    paddw   xmm4,   xmm6                ; inc v
+    psllw   xmm4,   1
+    psrlw   xmm4,   1
+
+    dec     r3
+    jg      HEIGHT
+
+LAST_ROW:
+    shr     r14, 15
+    imul    r14, r5
+    add     r4, r14
+    mov     r15, 16384
+
+LAST_ROW_WIDTH:
+    mov     rdi, r15
+    shr     rdi, 15
+    mov     bl,  [r4+rdi]
+    mov     [r0],bl
+    inc     r0
+
+    add     r15, r6
+    dec     r2
+    jg    LAST_ROW_WIDTH
+
+LAST_ROW_END:
+
+    POP_XMM
+    pop     rbp
+    pop     rbx
+    pop     rdi
+    pop     rsi
+    pop     r15
+    pop     r14
+    pop     r13
+    pop     r12
+    ret
+
+;**************************************************************************************************************
+;int GeneralBilinearFastDownsampler_sse2(   unsigned char* pDst, const int iDstStride, const int iDstWidth, const int iDstHeight,
+;               unsigned char* pSrc, const int iSrcStride,
+;               unsigned int uiScaleX, unsigned int uiScaleY );
+;{
+;**************************************************************************************************************
+
+WELS_EXTERN GeneralBilinearFastDownsampler_sse2
+    push    r12
+    push    r13
+    push    r14
+    push    r15
+    push    rsi
+    push    rdi
+    push    rbx
+    push    rbp
+    %assign push_num 8
+    LOAD_7_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r2, r2d
+    SIGN_EXTENSION r3, r3d
+    SIGN_EXTENSION r5, r5d
+    SIGN_EXTENSION r6, r6d
+
+    pxor    xmm0,   xmm0
+    mov     r12d,   r6d
+    and     r12d,   65535
+    mov     r13d,   r12d
+    neg     r13d
+    and     r13d,   65535
+    movd    xmm1,   r12d                     ; uinc(uiScaleX mod 65536)
+    movd    xmm2,   r13d                     ; -uinc
+    psllq   xmm1,   32
+    por     xmm1,   xmm2                    ; 0 uinc 0 -uinc
+    pshuflw xmm7,   xmm1,   10001000b       ; xmm7: uinc -uinc uinc -uinc
+
+    mov     r12,    arg8
+    SIGN_EXTENSION r12, r12d
+    mov     rbp,    r12
+    and     r12d,   32767
+    mov     r13d,   r12d
+    neg     r13d
+    and     r13d,   32767
+    movd    xmm6,       r12d                     ; vinc(uiScaleY mod 32767)
+    movd    xmm2,       r13d                     ; -vinc
+    psllq   xmm6,       32
+    por     xmm6,       xmm2                    ; 0 vinc 0 -vinc
+    pshuflw xmm6,       xmm6,   10100000b       ; xmm6: vinc vinc -vinc -vinc
+
+    mov     r12d,       80007fffh               ; 32768 32767
+    movd    xmm5,       r12d
+    pshuflw xmm5,       xmm5,       01000100b   ; 32768 32767 32768 32767
+
+FAST_DOWNSAMPLE:
+    sub     r1, r2                   ; stride - width
+    dec     r3
+    mov     r14,16384
+
+    pshuflw xmm4,       xmm5,   01010000b
+    psrlw   xmm4,       1               ; initial v to 16384 16384 16383 16383
+
+FAST_HEIGHT:
+    mov     r12, r14
+    shr     r12,    15
+    imul    r12,    r5
+    add     r12,    r4                 ; get current row address
+    mov     r13,    r12
+    add     r13,    r5
+
+    mov     r15, 32768
+    mov     rsi, r2
+    dec     rsi
+
+    movdqa  xmm3,       xmm5            ; initial u to 32768 32767 32768 32767
+
+FAST_WIDTH:
+    mov     rdi,        r15
+    shr     rdi,        16
+
+    movd    xmm1,       [r12+rdi]       ; xxxxxxba
+    movd    xmm2,       [r13+rdi]       ; xxxxxxdc
+    punpcklwd   xmm1,   xmm2            ; xxxxdcba
+    punpcklbw   xmm1,   xmm0            ; 0d0c0b0a
+
+    movdqa  xmm2,   xmm4    ; xmm2:  vv(1-v)(1-v)  tmpv
+    pmulhuw xmm2,   xmm3    ; mul u(1-u)u(1-u) on xmm2
+    pmaddwd     xmm2,   xmm1
+    pshufd  xmm1,   xmm2,   00000001b
+    paddd   xmm2,   xmm1
+    movdqa  xmm1,   [add_extra_half]
+    paddd   xmm2,   xmm1
+    psrld   xmm2,   15
+
+    packuswb    xmm2,   xmm0
+    movd    ebx,    xmm2
+    mov     [r0],  bl
+    inc     r0
+
+    add     r15, r6
+
+    paddw   xmm3,       xmm7            ; inc u
+    dec     rsi
+    jg      FAST_WIDTH
+
+FAST_WIDTH_END:
+    shr     r15, 16
+    mov     bl,  [r12+r15]
+    mov     [r0],bl
+    inc     r0
+    add     r14, rbp
+    add     r0,  r1
+
+    paddw   xmm4,   xmm6                ; inc v
+    psllw   xmm4,   1
+    psrlw   xmm4,   1
+
+    dec     r3
+    jg      FAST_HEIGHT
+
+
+FAST_LAST_ROW:
+    shr     r14, 15
+    imul    r14, r5
+    add     r4, r14
+    mov     r15, 32768
+
+FAST_LAST_ROW_WIDTH:
+    mov     rdi, r15
+    shr     rdi, 16
+    mov     bl,  [r4+rdi]
+    mov     [r0],bl
+    inc     r0
+
+    add     r15, r6
+    dec     r2
+    jg      FAST_LAST_ROW_WIDTH
+
+FAST_LAST_ROW_END:
+
+    POP_XMM
+    pop     rbp
+    pop     rbx
+    pop     rdi
+    pop     rsi
+    pop     r15
+    pop     r14
+    pop     r13
+    pop     r12
+    ret
+
+%elifdef  UNIX64
+
+;**************************************************************************************************************
+;int GeneralBilinearAccurateDownsampler_sse2(   unsigned char* pDst, const int iDstStride, const int iDstWidth, const int iDstHeight,
+;                           unsigned char* pSrc, const int iSrcStride,
+;                           unsigned int uiScaleX, unsigned int uiScaleY );
+;{
+;**************************************************************************************************************
+
+WELS_EXTERN GeneralBilinearAccurateDownsampler_sse2
+    push    r12
+    push    r13
+    push    r14
+    push    r15
+    push    rbx
+    push    rbp
+    %assign push_num 6
+    LOAD_7_PARA
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r2, r2d
+    SIGN_EXTENSION r3, r3d
+    SIGN_EXTENSION r5, r5d
+    SIGN_EXTENSION r6, r6d
+
+    pxor    xmm0,   xmm0
+    mov     r12d,   r6d
+    and     r12d,   32767
+    mov     r13d,   r12d
+    neg     r13d
+    and     r13d,   32767
+    movd    xmm1,   r12d                     ; uinc(uiScaleX mod 32767)
+    movd    xmm2,   r13d                     ; -uinc
+    psllq   xmm1,   32
+    por     xmm1,   xmm2                    ; 0 0  uinc  -uinc   (dword)
+    pshufd  xmm7,   xmm1,   01000100b       ; xmm7: uinc -uinc uinc -uinc
+
+    mov     r12,    arg8
+    SIGN_EXTENSION r12, r12d
+    mov     rbp,    r12
+    and     r12d,   32767
+    mov     r13d,   r12d
+    neg     r13d
+    and     r13d,   32767
+    movd    xmm6,       r12d                     ; vinc(uiScaleY mod 32767)
+    movd    xmm2,       r13d                     ; -vinc
+    psllq   xmm6,       32
+    por     xmm6,       xmm2                    ; 0 0 vinc -vinc (dword)
+    pshufd  xmm6,       xmm6,   01010000b       ; xmm6: vinc vinc -vinc -vinc
+
+    mov     r12d,        40003fffh
+    movd    xmm5,       r12d
+    punpcklwd   xmm5,   xmm0                    ; 16384 16383
+    pshufd  xmm5,       xmm5,   01000100b       ; xmm5: 16384 16383 16384 16383
+
+DOWNSAMPLE:
+    sub     r1, r2                   ; stride - width
+    dec     r3
+    mov     r14,16384
+    pshufd  xmm4,       xmm5,   01010000b   ; initial v to 16384 16384 16383 16383
+
+HEIGHT:
+    ;mov     r12, r4
+    mov     r12, r14
+    shr     r12,    15
+    imul    r12,    r5
+    add     r12,    r4                 ; get current row address
+    mov     r13,    r12
+    add     r13,    r5
+
+    mov     r15, 16384
+    mov     rax, r2
+    dec     rax
+    movdqa  xmm3,       xmm5            ; initial u to 16384 16383 16384 16383
+
+WIDTH:
+    mov     r11,        r15
+    shr     r11,        15
+
+    movd    xmm1,       [r12+r11]       ; xxxxxxba
+    movd    xmm2,       [r13+r11]       ; xxxxxxdc
+    pxor    xmm0,       xmm0
+    punpcklwd   xmm1,   xmm2            ; xxxxdcba
+    punpcklbw   xmm1,   xmm0            ; 0d0c0b0a
+    punpcklwd   xmm1,   xmm0            ; 000d000c000b000a
+
+    movdqa  xmm2,   xmm4    ; xmm2:  vv(1-v)(1-v)  tmpv
+    pmaddwd xmm2,   xmm3    ; mul u(1-u)u(1-u) on xmm2
+    movdqa  xmm0,   xmm2
+    pmuludq xmm2,   xmm1
+    psrlq   xmm0,   32
+    psrlq   xmm1,   32
+    pmuludq xmm0,   xmm1
+    paddq   xmm2,   xmm0
+    pshufd  xmm1,   xmm2,   00001110b
+    paddq   xmm2,   xmm1
+    psrlq   xmm2,   29
+
+    movd    ebx,    xmm2
+    inc     ebx
+    shr     ebx,    1
+    mov     [r0],   bl
+    inc     r0
+
+    add      r15, r6
+    paddw   xmm3,       xmm7            ; inc u
+    psllw   xmm3,       1
+    psrlw   xmm3,       1
+
+    dec     rax
+    jg      WIDTH
+
+WIDTH_END:
+    shr     r15, 15
+    mov     bl,  [r12+r15]
+    mov     [r0],bl
+    inc     r0
+    add     r14, rbp
+    add     r0,  r1
+
+    paddw   xmm4,   xmm6                ; inc v
+    psllw   xmm4,   1
+    psrlw   xmm4,   1
+
+    dec     r3
+    jg      HEIGHT
+
+LAST_ROW:
+    shr     r14, 15
+    imul    r14, r5
+    add     r4, r14
+    mov     r15, 16384
+
+LAST_ROW_WIDTH:
+    mov     r11, r15
+    shr     r11, 15
+    mov     bl,  [r4+r11]
+    mov     [r0],bl
+    inc     r0
+
+    add     r15, r6
+    dec     r2
+    jg    LAST_ROW_WIDTH
+
+LAST_ROW_END:
+
+    pop     rbp
+    pop     rbx
+    pop     r15
+    pop     r14
+    pop     r13
+    pop     r12
+    ret
+
+;**************************************************************************************************************
+;int GeneralBilinearFastDownsampler_sse2(   unsigned char* pDst, const int iDstStride, const int iDstWidth, const int iDstHeight,
+;               unsigned char* pSrc, const int iSrcStride,
+;               unsigned int uiScaleX, unsigned int uiScaleY );
+;{
+;**************************************************************************************************************
+
+WELS_EXTERN GeneralBilinearFastDownsampler_sse2
+    push    r12
+    push    r13
+    push    r14
+    push    r15
+    push    rbx
+    push    rbp
+    %assign push_num 6
+    LOAD_7_PARA
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r2, r2d
+    SIGN_EXTENSION r3, r3d
+    SIGN_EXTENSION r5, r5d
+    SIGN_EXTENSION r6, r6d
+
+    pxor    xmm0,   xmm0
+    mov     r12d,   r6d
+    and     r12d,   65535
+    mov     r13d,   r12d
+    neg     r13d
+    and     r13d,   65535
+    movd    xmm1,   r12d                     ; uinc(uiScaleX mod 65536)
+    movd    xmm2,   r13d                     ; -uinc
+    psllq   xmm1,   32
+    por     xmm1,   xmm2                    ; 0 uinc 0 -uinc
+    pshuflw xmm7,   xmm1,   10001000b       ; xmm7: uinc -uinc uinc -uinc
+
+    mov     r12,    arg8
+    SIGN_EXTENSION r12, r12d
+    mov     rbp,    r12
+    and     r12d,   32767
+    mov     r13d,   r12d
+    neg     r13d
+    and     r13d,   32767
+    movd    xmm6,       r12d                     ; vinc(uiScaleY mod 32767)
+    movd    xmm2,       r13d                     ; -vinc
+    psllq   xmm6,       32
+    por     xmm6,       xmm2                    ; 0 vinc 0 -vinc
+    pshuflw xmm6,       xmm6,   10100000b       ; xmm6: vinc vinc -vinc -vinc
+
+    mov     r12d,       80007fffh               ; 32768 32767
+    movd    xmm5,       r12d
+    pshuflw xmm5,       xmm5,       01000100b   ; 32768 32767 32768 32767
+
+FAST_DOWNSAMPLE:
+    sub     r1, r2                   ; stride - width
+    dec     r3
+    mov     r14,16384
+
+    pshuflw xmm4,       xmm5,   01010000b
+    psrlw   xmm4,       1               ; initial v to 16384 16384 16383 16383
+
+FAST_HEIGHT:
+    mov     r12, r14
+    shr     r12,    15
+    imul    r12,    r5
+    add     r12,    r4                 ; get current row address
+    mov     r13,    r12
+    add     r13,    r5
+
+    mov     r15, 32768
+    mov     rax, r2
+    dec     rax
+
+    movdqa  xmm3,       xmm5            ; initial u to 32768 32767 32768 32767
+
+FAST_WIDTH:
+    mov     r11,        r15
+    shr     r11,        16
+
+    movd    xmm1,       [r12+r11]       ; xxxxxxba
+    movd    xmm2,       [r13+r11]       ; xxxxxxdc
+    punpcklwd   xmm1,   xmm2            ; xxxxdcba
+    punpcklbw   xmm1,   xmm0            ; 0d0c0b0a
+
+    movdqa  xmm2,   xmm4    ; xmm2:  vv(1-v)(1-v)  tmpv
+    pmulhuw xmm2,   xmm3    ; mul u(1-u)u(1-u) on xmm2
+    pmaddwd     xmm2,   xmm1
+    pshufd  xmm1,   xmm2,   00000001b
+    paddd   xmm2,   xmm1
+    movdqa  xmm1,   [add_extra_half]
+    paddd   xmm2,   xmm1
+    psrld   xmm2,   15
+
+    packuswb    xmm2,   xmm0
+    movd    ebx,    xmm2
+    mov     [r0],  bl
+    inc     r0
+
+    add     r15, r6
+
+    paddw   xmm3,       xmm7            ; inc u
+    dec     rax
+    jg      FAST_WIDTH
+
+FAST_WIDTH_END:
+    shr     r15, 16
+    mov     bl,  [r12+r15]
+    mov     [r0],bl
+    inc     r0
+    add     r14, rbp
+    add     r0,  r1
+
+    paddw   xmm4,   xmm6                ; inc v
+    psllw   xmm4,   1
+    psrlw   xmm4,   1
+
+    dec     r3
+    jg      FAST_HEIGHT
+
+
+FAST_LAST_ROW:
+    shr     r14, 15
+    imul    r14, r5
+    add     r4, r14
+    mov     r15, 32768
+
+FAST_LAST_ROW_WIDTH:
+    mov     r11, r15
+    shr     r11, 16
+    mov     bl,  [r4+r11]
+    mov     [r0],bl
+    inc     r0
+
+    add     r15, r6
+    dec     r2
+    jg      FAST_LAST_ROW_WIDTH
+
+FAST_LAST_ROW_END:
+
+    pop     rbp
+    pop     rbx
+    pop     r15
+    pop     r14
+    pop     r13
+    pop     r12
     ret
 %endif
