@@ -428,7 +428,6 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Applications/Xcode\\ 5.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
 					"\"$(SRCROOT)/../../../../api/svc\"",
 					"\"$(SRCROOT)/../../../../processing/interface\"",
 					"\"$(SRCROOT)/../../../../encoder/core/inc\"",
@@ -468,7 +467,6 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Applications/Xcode\\ 5.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
 					"\"$(SRCROOT)/../../../../api/svc\"",
 					"\"$(SRCROOT)/../../../../processing/interface\"",
 					"\"$(SRCROOT)/../../../../encoder/core/inc\"",
@@ -488,7 +486,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Applications/Xcode\\ 5.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
 					"\"$(SRCROOT)/../../../../api/svc\"",
 					"\"$(SRCROOT)/../../../../common/inc\"",
 				);
@@ -506,7 +503,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Applications/Xcode\\ 5.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
 					"\"$(SRCROOT)/../../../../api/svc\"",
 					"\"$(SRCROOT)/../../../../common/inc\"",
 				);
