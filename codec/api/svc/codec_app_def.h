@@ -198,6 +198,7 @@ typedef enum {
   RC_QUALITY_MODE = 0,      //Quality mode
   RC_BITRATE_MODE = 1,   //Bitrate mode
   RC_LOW_BW_MODE = 2, //bitrate limited mode
+  RC_BUFFERBASED_MODE = 3,//no bitrate control,only using buffer status,adjust the video quality
   RC_OFF_MODE = -1,    // rate control off mode
 } RC_MODES;
 
