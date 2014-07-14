@@ -84,7 +84,6 @@ void EncoderInterfaceTest::PrepareOneSrcFrame() {
 
 void EncoderInterfaceTest::EncodeOneFrame (SEncParamBase* pEncParamBase) {
   int iResult;
-
   iResult = pPtrEnc->Initialize (pEncParamBase);
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
   PrepareOneSrcFrame();
@@ -101,7 +100,6 @@ void EncoderInterfaceTest::EncodeOneFrame (SEncParamBase* pEncParamBase) {
 
 void EncoderInterfaceTest::EncodeOneIDRandP (ISVCEncoder* pPtrEnc) {
   int iResult;
-
   iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
   EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeIDR));
@@ -180,7 +178,6 @@ void GetValidEncParamBase (SEncParamBase* pEncParamBase) {
   pEncParamBase->iRCMode = RC_BITRATE_MODE; //-1, 0, 1, 2
   pEncParamBase->fMaxFrameRate = rand() + 0.5f; //!=0
 }
-
 
 TEST_F (EncoderInterfaceTest, BasicInitializeTest) {
   SEncParamBase sEncParamBase;
