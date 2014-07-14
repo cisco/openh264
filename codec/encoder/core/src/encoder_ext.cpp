@@ -2042,7 +2042,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   if (pCodingParam->iMultipleThreadIdc > 1)
     iRet = CreateSliceThreads (pCtx);
 
-  WelsRcInitModule (pCtx,  pCtx->pSvcParam->iRCMode != RC_OFF_MODE ? WELS_RC_GOM : WELS_RC_DISABLE);
+  WelsRcInitModule (pCtx,  pCtx->pSvcParam->iRCMode);
 
   pCtx->pVpp = new CWelsPreProcess (pCtx);
   if (pCtx->pVpp == NULL) {
@@ -2948,17 +2948,19 @@ int32_t GetSubSequenceId (sWelsEncCtx* pCtx, EVideoFrameType eFrameType) {
 bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pCtx, int32_t iSpatialNum) {
   SSpatialPicIndex* pSpatialIndexMap = &pCtx->sSpatialIndexMap[0];
   bool bSkipMustFlag = false;
-
-  if (RC_OFF_MODE != pCtx->pSvcParam->iRCMode && true == pCtx->pSvcParam->bEnableFrameSkip) {
-    for (int32_t i = 0; i < iSpatialNum; i++) {
-      if (0 == pCtx->pSvcParam->sSpatialLayers[i].iMaxSpatialBitrate) {
-        break;
-      }
-      pCtx->uiDependencyId = (uint8_t) (pSpatialIndexMap + i)->iDid;
-      pCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge (pCtx);
-      if (true == pCtx->pWelsSvcRc[pCtx->uiDependencyId].bSkipFlag) {
-        bSkipMustFlag = true;
-        break;
+  if (pCtx->pSvcParam->bEnableFrameSkip) {
+    if ((RC_QUALITY_MODE == pCtx->pSvcParam->iRCMode) || (RC_BITRATE_MODE == pCtx->pSvcParam->iRCMode)
+        || (RC_LOW_BW_MODE == pCtx->pSvcParam->iRCMode)) {
+      for (int32_t i = 0; i < iSpatialNum; i++) {
+        if (0 == pCtx->pSvcParam->sSpatialLayers[i].iMaxSpatialBitrate) {
+          break;
+        }
+        pCtx->uiDependencyId = (uint8_t) (pSpatialIndexMap + i)->iDid;
+        pCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge (pCtx);
+        if (true == pCtx->pWelsSvcRc[pCtx->uiDependencyId].bSkipFlag) {
+          bSkipMustFlag = true;
+          break;
+        }
       }
     }
   }

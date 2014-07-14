@@ -999,20 +999,44 @@ void  WelsRcMbInitDisable (void* pCtx, SMB* pCurMb, SSlice* pSlice) {
 void  WelsRcMbInfoUpdateDisable (void* pCtx, SMB* pCurMb, int32_t iCostLuma, SSlice* pSlice) {
 }
 
+void WelRcPictureInitBufferBasedQp (void* pCtx) {
+  sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
+  SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
+  SVAAFrameInfo* pVaa			= static_cast<SVAAFrameInfo*> (pEncCtx->pVaa);
 
-void  WelsRcInitModule (void* pCtx,  int32_t iModule) {
+  int32_t iMinQp = MIN_SCREEN_QP;
+  if (pVaa->eSceneChangeIdc == LARGE_CHANGED_SCENE)
+    iMinQp = MIN_SCREEN_QP + 2;
+  else if (pVaa->eSceneChangeIdc == MEDIUM_CHANGED_SCENE)
+    iMinQp = MIN_SCREEN_QP + 1;
+  else
+    iMinQp = MIN_SCREEN_QP;
+
+  pEncCtx->iGlobalQp += pEncCtx->iDropNumber;
+  pEncCtx->iGlobalQp = WELS_CLIP3 (pEncCtx->iGlobalQp, MIN_SCREEN_QP, MAX_SCREEN_QP);
+}
+void  WelsRcInitModule (void* pCtx, RC_MODES iRcMode) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   SWelsRcFunc*   pRcf = &pEncCtx->pFuncList->pfRc;
 
-  switch (iModule) {
-  case WELS_RC_DISABLE:
+  switch (iRcMode) {
+  case RC_OFF_MODE:
     pRcf->pfWelsRcPictureInit = WelsRcPictureInitDisable;
     pRcf->pfWelsRcPicDelayJudge = NULL;
     pRcf->pfWelsRcPictureInfoUpdate = WelsRcPictureInfoUpdateDisable;
     pRcf->pfWelsRcMbInit = WelsRcMbInitDisable;
     pRcf->pfWelsRcMbInfoUpdate = WelsRcMbInfoUpdateDisable;
     break;
-  case WELS_RC_GOM:
+  case RC_BUFFERBASED_MODE:
+    pRcf->pfWelsRcPictureInit = WelRcPictureInitBufferBasedQp;
+    pRcf->pfWelsRcPicDelayJudge = NULL;
+    pRcf->pfWelsRcPictureInfoUpdate = WelsRcPictureInfoUpdateDisable;
+    pRcf->pfWelsRcMbInit = WelsRcMbInitDisable;
+    pRcf->pfWelsRcMbInfoUpdate = WelsRcMbInfoUpdateDisable;
+    break;
+  case RC_QUALITY_MODE:
+  case RC_BITRATE_MODE:
+  case RC_LOW_BW_MODE:
   default:
     pRcf->pfWelsRcPictureInit = WelsRcPictureInitGom;
     pRcf->pfWelsRcPicDelayJudge = WelsRcFrameDelayJudge;
