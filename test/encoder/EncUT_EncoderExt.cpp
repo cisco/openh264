@@ -203,7 +203,7 @@ void EncoderInterfaceTest::MemoryCheckTest() {
       pYUV[j] = rand() % 256;
 
     iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
-    EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
     pSrcPic->uiTimeStamp += 30;
   }
 
@@ -223,7 +223,7 @@ void EncoderInterfaceTest::MemoryCheckTest() {
   pOption ->iPicWidth = m_iWidth;
   pOption ->iPicHeight = m_iHeight;
   iResult = pPtrEnc->SetOption (eOptionId, pOption);
-  EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
 
   for(int i = 0; i < kiFrameNumber; i ++){
     int iStartX = rand() % (m_iPicResSize >> 1);
@@ -232,13 +232,13 @@ void EncoderInterfaceTest::MemoryCheckTest() {
       pYUV[j] = rand() % 256;
 
     iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
-    EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
     pSrcPic->uiTimeStamp += 30;
   }
 
   pOption ->iLTRRefNum += rand() % 8 + 1;
   iResult = pPtrEnc->SetOption (eOptionId, pOption);
-  EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
 
   for(int i = 0; i < kiFrameNumber; i ++){
     int iStartX = rand() % (m_iPicResSize >> 1);
@@ -247,7 +247,7 @@ void EncoderInterfaceTest::MemoryCheckTest() {
       pYUV[j] = rand() % 256;
 
     iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
-    EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
     pSrcPic->uiTimeStamp += 30;
   }
   pPtrEnc->Uninitialize();
