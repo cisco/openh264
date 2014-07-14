@@ -43,6 +43,7 @@ class EncoderInterfaceTest : public ::testing::Test {
   }
 
   void TemporalLayerSettingTest();
+  void MemoryCheckTest();
   void EncodeOneFrame (SEncParamBase* pEncParamBase);
   void PrepareOneSrcFrame();
   void EncodeOneIDRandP (ISVCEncoder* pPtrEnc);
@@ -120,54 +121,140 @@ void EncoderInterfaceTest::TemporalLayerSettingTest() {
   pParamExt->iTemporalLayerNum = 1;
   pParamExt->iSpatialLayerNum = 1;
 
-  int iResult = pPtrEnc->InitializeExt (pParamExt);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  for(int i = 0; i < 2; i++){
+    pParamExt->iUsageType = (( i == 0 ) ? SCREEN_CONTENT_REAL_TIME : CAMERA_VIDEO_REAL_TIME);
+    int iResult = pPtrEnc->InitializeExt (pParamExt);
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
 
-  PrepareOneSrcFrame();
+    PrepareOneSrcFrame();
 
-  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeIDR));
+    iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+    EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeIDR));
 
-  pSrcPic->uiTimeStamp = 30;
-  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeP));
+    pSrcPic->uiTimeStamp = 30;
+    iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+    EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeP));
 
-  memcpy (pOption, pParamExt, sizeof (SEncParamExt));
-  pOption ->iTemporalLayerNum = 4;
+    memcpy (pOption, pParamExt, sizeof (SEncParamExt));
+    pOption ->iTemporalLayerNum = 4;
 
-  ENCODER_OPTION eOptionId = ENCODER_OPTION_SVC_ENCODE_PARAM_EXT;
-  iResult = pPtrEnc->SetOption (eOptionId, pOption);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+    ENCODER_OPTION eOptionId = ENCODER_OPTION_SVC_ENCODE_PARAM_EXT;
+    iResult = pPtrEnc->SetOption (eOptionId, pOption);
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
 
-  pSrcPic->uiTimeStamp = 60;
-  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeIDR));
+    pSrcPic->uiTimeStamp = 60;
+    iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+    EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeIDR));
 
-  pOption ->iTemporalLayerNum = 2;
-  iResult = pPtrEnc->SetOption (eOptionId, pOption);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  pSrcPic->uiTimeStamp = 90;
-  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeP));
+    pOption ->iTemporalLayerNum = 2;
+    iResult = pPtrEnc->SetOption (eOptionId, pOption);
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+    pSrcPic->uiTimeStamp = 90;
+    iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+    EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeP));
 
-  pOption ->iTemporalLayerNum = 4;
-  iResult = pPtrEnc->SetOption (eOptionId, pOption);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  pSrcPic->uiTimeStamp = 120;
-  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeP));
+    pOption ->iTemporalLayerNum = 4;
+    iResult = pPtrEnc->SetOption (eOptionId, pOption);
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+    pSrcPic->uiTimeStamp = 120;
+    iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+    EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeP));
 
-  pPtrEnc->Uninitialize();
-
+    pPtrEnc->Uninitialize();
+  }
 }
 
 TEST_F (EncoderInterfaceTest, TestTemporalLayerSetting) {
   TemporalLayerSettingTest();
+}
+
+void EncoderInterfaceTest::MemoryCheckTest() {
+  #define MEM_VARY_SIZE 1024
+  #define TEST_FRAMES 500
+
+  pParamExt->iPicWidth = 1280;
+  pParamExt->iPicHeight = 720;
+  pParamExt->iTargetBitrate = 60000;
+  pParamExt->sSpatialLayers[0].iVideoHeight = pParamExt->iPicHeight;
+  pParamExt->sSpatialLayers[0].iVideoWidth = pParamExt->iPicWidth;
+  pParamExt->sSpatialLayers[0].iSpatialBitrate = 50000;
+  pParamExt->iTemporalLayerNum = 3;
+  pParamExt->iSpatialLayerNum = 1;
+
+  int iResult = pPtrEnc->InitializeExt (pParamExt);
+  const int kiFrameNumber = TEST_FRAMES;
+
+  m_iWidth = pParamExt->iPicWidth;
+  m_iHeight = pParamExt->iPicHeight;
+  m_iPicResSize =  m_iWidth * m_iHeight * 3 >> 1;
+  delete []pYUV;
+  pYUV = new unsigned char [m_iPicResSize];
+  PrepareOneSrcFrame();
+
+  for(int i = 0; i < kiFrameNumber; i ++){
+    int iStartX = rand() % (m_iPicResSize >> 1);
+    int iEndX = (iStartX + (rand() % MEM_VARY_SIZE)) % m_iPicResSize;
+    for (int j = iStartX; j < iEndX; j++)
+      pYUV[j] = rand() % 256;
+
+    iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+    EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+    pSrcPic->uiTimeStamp += 30;
+  }
+
+  pParamExt->iPicWidth += rand() % 256;
+  pParamExt->iPicHeight += rand() % 256;
+  m_iWidth = pParamExt->iPicWidth;
+  m_iHeight = pParamExt->iPicHeight;
+  m_iPicResSize =  m_iWidth * m_iHeight * 3 >> 1;
+  delete []pYUV;
+  pYUV = new unsigned char [m_iPicResSize];
+
+  iResult = pPtrEnc->InitializeExt (pParamExt);
+  PrepareOneSrcFrame();
+
+  ENCODER_OPTION eOptionId = ENCODER_OPTION_SVC_ENCODE_PARAM_EXT;
+  memcpy (pOption, pParamExt, sizeof (SEncParamExt));
+  pOption ->iPicWidth = m_iWidth;
+  pOption ->iPicHeight = m_iHeight;
+  iResult = pPtrEnc->SetOption (eOptionId, pOption);
+  EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+
+  for(int i = 0; i < kiFrameNumber; i ++){
+    int iStartX = rand() % (m_iPicResSize >> 1);
+    int iEndX = (iStartX + (rand() % MEM_VARY_SIZE)) % m_iPicResSize;
+    for (int j = iStartX; j < iEndX; j++)
+      pYUV[j] = rand() % 256;
+
+    iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+    EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+    pSrcPic->uiTimeStamp += 30;
+  }
+
+  pOption ->iLTRRefNum += rand() % 8 + 1;
+  iResult = pPtrEnc->SetOption (eOptionId, pOption);
+  EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+
+  for(int i = 0; i < kiFrameNumber; i ++){
+    int iStartX = rand() % (m_iPicResSize >> 1);
+    int iEndX = (iStartX + (rand() % MEM_VARY_SIZE)) % m_iPicResSize;
+    for (int j = iStartX; j < iEndX; j++)
+      pYUV[j] = rand() % 256;
+
+    iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+    EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+    pSrcPic->uiTimeStamp += 30;
+  }
+  pPtrEnc->Uninitialize();
+}
+
+TEST_F (EncoderInterfaceTest, MemoryCheck) {
+  MemoryCheckTest();
 }
 
 void GetValidEncParamBase (SEncParamBase* pEncParamBase) {
@@ -198,7 +285,7 @@ TEST_F (EncoderInterfaceTest, BasicInitializeTest) {
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
   EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeIDR));
 
-  pPtrEnc->Uninitialize();
+  iResult = pPtrEnc->Uninitialize();
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
 }
 
