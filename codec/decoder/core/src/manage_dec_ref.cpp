@@ -121,6 +121,8 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
         pRef->iFrameNum = 0;
         pRef->iFramePoc = 0;
         pRef->uiTemporalId = pRef->uiQualityId = 0;
+        ExpandReferencingPicture (pRef->pData, pRef->iWidthInPixel, pRef->iHeightInPixel, pRef->iLinesize,
+                                  pCtx->sExpandPicFunc.pfExpandLumaPicture, pCtx->sExpandPicFunc.pfExpandChromaPicture);
         AddShortTermToList (&pCtx->sRefPic, pRef);
       } else {
         WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "WelsInitRefList()::PrefetchPic for EC errors.\n");
