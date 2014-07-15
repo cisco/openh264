@@ -96,7 +96,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				OutputFile=".\..\..\..\..\bin\win32\Release/WelsDecPlus.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -186,7 +185,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				OutputFile=".\..\..\..\..\bin\win32\Release/WelsDecPlus.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -272,7 +270,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				OutputFile=".\..\..\..\..\bin\win32\Debug/WelsDecPlus.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -358,7 +355,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				OutputFile=".\..\..\..\..\bin\win32\Debug/WelsDecPlus.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
