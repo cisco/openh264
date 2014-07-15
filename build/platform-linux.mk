@@ -1,4 +1,4 @@
-include build/platform-arch.mk
+include $(SRC_PATH)build/platform-arch.mk
 SHAREDLIBSUFFIX = so
 CFLAGS += -Wall -fno-strict-aliasing -fPIC -MMD -MP
 LDFLAGS += -lpthread
