@@ -312,6 +312,9 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
     InitBits (pBs, pNal, iBitSize);
     iErr = ParseSliceHeaderSyntaxs (pCtx, pBs, bExtensionFlag);
     if (iErr != ERR_NONE) {
+      if ((uiAvailNalNum == 1) && (pCurNal->sNalHeaderExt.bIdrFlag)) { //IDR parse error
+        ResetActiveSPSForEachLayer (pCtx);
+      }
       //if current NAL occur error when parsing, should clean it from pNalUnitsList
       //otherwise, when Next good NAL decoding, this corrupt NAL is considered as normal NAL and lead to decoder crash
       ForceClearCurrentNal (pCurAu);
