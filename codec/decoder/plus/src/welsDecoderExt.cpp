@@ -46,6 +46,7 @@
 #include "typedefs.h"
 #include "mem_align.h"
 #include "utils.h"
+#include "version.h"
 
 //#include "macros.h"
 #include "decoder.h"
@@ -104,7 +105,7 @@ CWelsDecoder::CWelsDecoder (void)
   if (m_pWelsTrace != NULL) {
     m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);
 
-    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::CWelsDecoder() entry");
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::CWelsDecoder() entry, openh264 version = %s", VERSION_NUMBER);
   }
 
 #ifdef OUTPUT_BIT_STREAM
