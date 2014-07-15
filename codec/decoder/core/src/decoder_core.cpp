@@ -1722,11 +1722,10 @@ void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pS
   pCtx->iFrameNum			= pSh->iFrameNum;
 }
 
-int32_t InitRefPicList (PWelsDecoderContext pCtx, const uint8_t kuiNRi, const bool kbFirstSlice, int32_t iPoc) {
+int32_t InitRefPicList (PWelsDecoderContext pCtx, const uint8_t kuiNRi, int32_t iPoc) {
   int32_t iRet = ERR_NONE;
-  if (kbFirstSlice)
-    iRet = WelsInitRefList (pCtx, iPoc);
-  if ((pCtx->eSliceType != I_SLICE && pCtx->eSliceType != SI_SLICE) && kbFirstSlice) {
+  iRet = WelsInitRefList (pCtx, iPoc);
+  if ((pCtx->eSliceType != I_SLICE && pCtx->eSliceType != SI_SLICE)) {
     iRet = WelsReorderRefList (pCtx);
   }
 
@@ -1901,7 +1900,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         }
 
         if (iCurrIdD == kuiDependencyIdMax && iCurrIdQ == BASE_QUALITY_ID) {
-          iRet = InitRefPicList (pCtx, uiNalRefIdc, bFreshSliceAvailable, pSh->iPicOrderCntLsb);
+          iRet = InitRefPicList (pCtx, uiNalRefIdc, pSh->iPicOrderCntLsb);
           if (iRet) {
             HandleReferenceLost (pCtx, pNalCur);
             WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
