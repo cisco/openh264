@@ -82,12 +82,6 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
    * return: 0 - success; otherwise - failed;
    */
   virtual int EXTAPI EncodeParameterSets (SFrameBSInfo* pBsInfo);
-
-  /*
-   * return: 0 - success; otherwise - failed;
-   */
-  virtual int EXTAPI PauseFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo);
-
   /*
    * return: 0 - success; otherwise - failed;
    */
