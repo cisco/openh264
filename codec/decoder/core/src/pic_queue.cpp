@@ -83,6 +83,7 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
   iChromaSize	= iPicChromaWidth * iPicChromaHeight;
   pPic->pBuffer[0]	= static_cast<uint8_t*> (WelsMalloc (iLumaSize /* luma */
                       + (iChromaSize << 1) /* Cb,Cr */, "_pic->buffer[0]"));
+  memset (pPic->pBuffer[0], 128, (iLumaSize + (iChromaSize << 1)));
 
   WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pBuffer[0], FreePicture (pPic));
   pPic->iLinesize[0] = iPicWidth;

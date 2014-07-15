@@ -1973,9 +1973,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         return ERR_NONE;
       }
 
-      pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //store latest decoded picture for EC
-
       if (uiNalRefIdc > 0) {
+        pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //store latest decoded picture for EC
         iRet = WelsMarkAsRef (pCtx);
         if (iRet != ERR_NONE) {
           if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
@@ -2010,8 +2009,10 @@ bool CheckAndDoEC (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstI
       ImplementErrorCon (pCtx);
       pCtx->iTotalNumMbRec = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
       DecodeFrameConstruction (pCtx, ppDst, pDstInfo);
-      pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //save ECed pic for future use
-      MarkECFrameAsRef (pCtx);
+      if (pCtx->sLastNalHdrExt.sNalUnitHeader.uiNalRefIdc > 0) {
+        pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //save ECed pic for future use
+        MarkECFrameAsRef (pCtx);
+      }
       pCtx->iPrevFrameNum = pCtx->sLastSliceHeader.iFrameNum; //save frame_num
       if (pCtx->bLastHasMmco5)
         pCtx->iPrevFrameNum = 0;
