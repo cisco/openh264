@@ -123,7 +123,7 @@ MODULE_INCLUDES += -I$(SRC_PATH)gmp-api
 
 all:	General_ver libraries binaries
 General_ver:
-	sh ./codec/common/generate_version.sh
+	$(QUIET)cd $(SRC_PATH) && sh ./codec/common/generate_version.sh
 
 clean:
 ifeq (android,$(OS))
