@@ -67,7 +67,6 @@ Valid **ANDROID_TARGET** can be found in **ANDROID_SDK**/platforms, such as andr
 You can also set ARCH, NDKLEVEL, GCCVERSION according to your device and NDK version.
 ARCH specifies the architecture of android device. Currently only arm and x86 are supported, the default is arm.
 NDKLEVEL specifies android api level, the api level can be 12-19, the default is 12.
-GCCVERSION specifies which gcc in NDK is used, the default is 4.8.
 
 By default these commands build for the armeabi-v7a ABI. To build for the other android
 ABIs, add "ARCH=mips" or "ARCH=x86". To build for the older armeabi ABI (which has
