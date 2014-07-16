@@ -48,7 +48,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <sys/types.h>
-#include <sys/timeb.h>
 #else
 #include <sys/time.h>
 #endif

@@ -47,7 +47,6 @@
 #include <sys/time.h>
 #else
 #include <windows.h>
-#include <sys/timeb.h>
 #endif
 #include <time.h>
 
