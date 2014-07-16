@@ -69,8 +69,8 @@ ARCH specifies the architecture of android device. Currently only arm and x86 ar
 NDKLEVEL specifies android api level, the api level can be 12-19, the default is 12.
 
 By default these commands build for the armeabi-v7a ABI. To build for the other android
-ABIs, add "ARCH=mips" or "ARCH=x86". To build for the older armeabi ABI (which has
-armv5te as baseline), add "APP_ABI=armeabi" (ARCH=arm is implicit).
+ABIs, add "ARCH=arm64", "ARCH=x86", "ARCH=x86_64", "ARCH=mips" or "ARCH=mips64".
+To build for the older armeabi ABI (which has armv5te as baseline), add "APP_ABI=armeabi" (ARCH=arm is implicit).
 
 For iOS Builds
 --------------
