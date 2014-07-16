@@ -15,7 +15,7 @@ ifeq ($(ARCH), arm)
 else ifeq ($(ARCH), arm64)
   APP_ABI = arm64-v8a
 else ifeq ($(ARCH), x86)
-    APP_ABI = x86
+  APP_ABI = x86
   ifeq (Yes, $(USE_ASM))
     ASMFLAGS += -f elf32
   endif
@@ -25,7 +25,7 @@ else ifeq ($(ARCH), x86_64)
     ASMFLAGS += -f elf64
   endif
 else
-    APP_ABI = $(ARCH)
+  APP_ABI = $(ARCH)
 endif
 
 ifndef NDKROOT
