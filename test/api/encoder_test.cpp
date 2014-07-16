@@ -61,8 +61,6 @@ TEST_P (EncoderOutputTest, CompareOutput) {
 
   //will remove this after screen content algorithms are ready,
   //because the bitstream output will vary when the different algorithms are added.
-  if (p.usageType == SCREEN_CONTENT_REAL_TIME)
-    return;
   unsigned char digest[SHA_DIGEST_LENGTH];
   SHA1Result (&ctx_, digest);
   if (!HasFatalFailure()) {
@@ -100,17 +98,25 @@ static const EncodeFileParam kFileParamArray[] = {
     "2bc06262d87fa0897ad4c336cc4047d5a67f7203", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1
   },
   {
+    "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
+    "68c3220e49b7a57d563faf7c99a870ab34a23400", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SINGLE_SLICE, false, 4
+  },
+  {
     "res/CiscoVT2people_320x192_12fps.yuv",
-    "", SCREEN_CONTENT_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1
+    "030d0e2d742ac039c2ab6333fe7cb18623c0d283", SCREEN_CONTENT_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1
   },
   {
     "res/CiscoVT2people_160x96_6fps.yuv",
-    "", SCREEN_CONTENT_REAL_TIME, 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1
+    "40aa19d4b2684a59e689860d2a793876f33904f7", SCREEN_CONTENT_REAL_TIME, 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1
   },
   {
     "res/Static_152_100.yuv",
-    "", SCREEN_CONTENT_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1
-  }
+    "494068b59aa9ed9118a9f33174b732024effc870", SCREEN_CONTENT_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1
+  },
+  {
+    "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
+    "dc5aedee4d8f1fe8d6647a9f7b8c2d3df758ac27", SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1
+  },
 };
 
 INSTANTIATE_TEST_CASE_P (EncodeFile, EncoderOutputTest,
