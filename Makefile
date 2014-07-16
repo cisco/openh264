@@ -114,7 +114,9 @@ MODULE_INCLUDES += -Igmp-api
 
 .PHONY: test gtest-bootstrap clean
 
-all:	libraries binaries
+all:	General_ver libraries binaries
+General_ver:
+	sh ./codec/common/generate_version.sh
 
 clean:
 ifeq (android,$(OS))

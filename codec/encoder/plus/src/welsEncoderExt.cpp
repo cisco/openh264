@@ -37,7 +37,7 @@
 #include "wels_const.h"
 #include "utils.h"
 #include "macros.h"
-
+#include "version.h"
 #include "crt_util_safe_x.h"	// Safe CRT routines like util for cross platforms
 #include "ref_list_mgr_svc.h"
 
@@ -174,7 +174,7 @@ void CWelsH264SVCEncoder::InitEncoder (void) {
   }
 
   m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);
-
+  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsH264SVCEncoder::InitEncoder(), openh264 codec version = %s", VERSION_NUMBER);
 #ifdef REC_FRAME_COUNT
   WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
            "CWelsH264SVCEncoder::InitEncoder, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x\n", m_uiCountFrameNum, m_iCspInternal);

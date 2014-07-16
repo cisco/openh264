@@ -46,6 +46,7 @@
 #include "typedefs.h"
 #include "mem_align.h"
 #include "utils.h"
+#include "version.h"
 
 //#include "macros.h"
 #include "decoder.h"
@@ -211,7 +212,7 @@ void CWelsDecoder::UninitDecoder (void) {
   if (NULL == m_pDecContext)
     return;
 
-  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::uninit_decoder()..");
+  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::uninit_decoder(), openh264 codec version = %s.", VERSION_NUMBER);
 
   WelsEndDecoder (m_pDecContext);
 
