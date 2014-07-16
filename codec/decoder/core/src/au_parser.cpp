@@ -327,8 +327,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
       return NULL;
     }
 
-    if ((uiAvailNalNum == 1) && ((NAL_UNIT_CODED_SLICE_IDR == pNalUnitHeader->eNalUnitType)
-                                 || (pCurNal->sNalHeaderExt.bIdrFlag))) {
+    if ((uiAvailNalNum == 1) && CheckNextAuNewSeq (pCtx, pCurNal, pCurNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps)) {
       ResetActiveSPSForEachLayer (pCtx);
     }
     if ((uiAvailNalNum > 1) &&
