@@ -508,23 +508,6 @@ int CWelsH264SVCEncoder::EncodeParameterSets (SFrameBSInfo* pBsInfo) {
 }
 
 /*
- * return: 0 - success; otherwise - failed;
- */
-int CWelsH264SVCEncoder::PauseFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo) {
-  int32_t  iReturn = cmResultSuccess;
-
-  ForceIntraFrame (true);
-
-  iReturn = EncodeFrameInternal (kpSrcPic, pBsInfo);
-  // to avoid pause frame bitstream and
-  // normal bitstream use different video channel.
-  ForceIntraFrame (true);
-
-  return (int)iReturn;
-}
-
-
-/*
  *	Force key frame
  */
 int CWelsH264SVCEncoder::ForceIntraFrame (bool bIDR) {

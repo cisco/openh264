@@ -16,10 +16,9 @@ void CheckEncoderInterface(ISVCEncoder* p, CheckFunc check) {
   CHECK(4, p, Uninitialize);
   CHECK(5, p, EncodeFrame);
   CHECK(6, p, EncodeParameterSets);
-  CHECK(7, p, PauseFrame);
-  CHECK(8, p, ForceIntraFrame);
-  CHECK(9, p, SetOption);
-  CHECK(10, p, GetOption);
+  CHECK(7, p, ForceIntraFrame);
+  CHECK(8, p, SetOption);
+  CHECK(9, p, GetOption);
 }
 
 void CheckDecoderInterface(ISVCDecoder* p, CheckFunc check) {

@@ -71,12 +71,6 @@ class ISVCEncoder {
    * return: 0 - success; otherwise - failed;
    */
   virtual int EXTAPI EncodeParameterSets (SFrameBSInfo* pBsInfo) = 0;
-
-  /*
-   * return: 0 - success; otherwise - failed;
-   */
-  virtual int EXTAPI PauseFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo) = 0;
-
   /*
    * return: 0 - success; otherwise - failed;
    */
@@ -150,8 +144,6 @@ int (*Uninitialize) (ISVCEncoder*);
 
 int (*EncodeFrame) (ISVCEncoder*, const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo);
 int (*EncodeParameterSets) (ISVCEncoder*, SFrameBSInfo* pBsInfo);
-
-int (*PauseFrame) (ISVCEncoder*, const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo);
 
 int (*ForceIntraFrame) (ISVCEncoder*, bool bIDR);
 
