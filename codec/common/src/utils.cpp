@@ -39,7 +39,7 @@
  */
 #include "utils.h"
 #include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross platforms
-
+#include "codec_app_def.h"
 float WelsCalcPsnr (const void* kpTarPic,
                     const int32_t kiTarStride,
                     const void* kpRefPic,
@@ -50,6 +50,28 @@ float WelsCalcPsnr (const void* kpTarPic,
 
 void WelsLog (SLogContext* logCtx, int32_t iLevel, const char* kpFmt, ...) {
   va_list vl;
+  char pTraceTag[MAX_LOG_SIZE];
+  switch (iLevel) {
+  case WELS_LOG_ERROR:
+    WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] Error:");
+    break;
+  case WELS_LOG_WARNING:
+    WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] Warning:");
+    break;
+  case WELS_LOG_INFO:
+    WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] Info:");
+    break;
+  case WELS_LOG_DEBUG:
+    WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] Debug:");
+    break;
+  default:
+    WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] Detail:");
+    break;
+  }
+  va_start (vl, pTraceTag);
+  logCtx->pfLog (logCtx->pLogCtx, iLevel, pTraceTag, vl);
+  va_end (vl);
+
   va_start (vl, kpFmt);
   logCtx->pfLog (logCtx->pLogCtx, iLevel, kpFmt, vl);
   va_end (vl);
