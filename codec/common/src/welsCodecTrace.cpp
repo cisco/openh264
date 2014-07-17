@@ -64,7 +64,7 @@ welsCodecTrace::~welsCodecTrace() {
   m_fpTrace = NULL;
 }
 
-#define MAX_LOG_SIZE	1024
+
 
 void welsCodecTrace::StaticCodecTrace (void* pCtx, const int32_t iLevel, const char* Str_Format, va_list vl) {
   welsCodecTrace* self = (welsCodecTrace*) pCtx;
