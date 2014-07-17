@@ -265,6 +265,7 @@ TEST_F (EncoderInterfaceTest, RCTest) {
   #define MEM_VARY_SIZE 512
   #define TEST_FRAMES 500
 
+  pParamExt->iUsageType = (rand() % 2) ? SCREEN_CONTENT_REAL_TIME : CAMERA_VIDEO_REAL_TIME;
   pParamExt->iRCMode = (rand() % 2) ? RC_BITRATE_MODE : RC_QUALITY_MODE;
   pParamExt->iPicWidth = 1280;
   pParamExt->iPicHeight = 720;
