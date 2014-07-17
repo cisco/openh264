@@ -127,6 +127,7 @@ static void DeleteNonSceneLTR (sWelsEncCtx* pCtx) {
         (pCtx->uiTemporalId < pRef->uiTemporalId || pCtx->bCurFrameMarkedAsSceneLtr)) {
       SetUnref (pRef);
       DeleteLTRFromLongList (pCtx, i);
+      i--;
     }
   }
 }
