@@ -52,7 +52,6 @@
 #include <sys/types.h>
 #include <sys/timeb.h>
 #else
-#include <sys/timeb.h>
 #include <sys/time.h>
 #include "typedefs.h"
 #endif//_WIN32
@@ -72,7 +71,10 @@ typedef      FILE  WelsFileHandle;
 #ifdef _WIN32
 typedef      struct _timeb     SWelsTime;
 #else
-typedef      struct timeb      SWelsTime;
+typedef struct TagWelsTime {
+  time_t time;
+  unsigned short millitm;
+} SWelsTime;
 #endif
 
 int32_t   WelsSnprintf (char* buffer,  int32_t sizeOfBuffer,  const char* format, ...);
