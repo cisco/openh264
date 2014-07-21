@@ -690,7 +690,7 @@ void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
 
 #if defined(HAVE_NEON_AARCH64)
   if (pCtx->uiCpuFlag & WELS_CPU_NEON) {
-    //pCtx->pIdctResAddPredFunc	= IdctResAddPred_neon;
+    pCtx->pIdctResAddPredFunc	= IdctResAddPred_AArch64_neon;
 
     pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_AArch64_neon;
     pCtx->pGetI16x16LumaPredFunc[I16_PRED_P]  = WelsDecoderI16x16LumaPredPlane_AArch64_neon;

@@ -41,6 +41,7 @@ endif
 
 ifeq ($(ASM_ARCH), arm64)
 DECODER_ASM_ARM64_SRCS=\
+	$(DECODER_SRCDIR)/core/arm64/block_add_aarch64_neon.S\
 	$(DECODER_SRCDIR)/core/arm64/intra_pred_aarch64_neon.S\
 
 DECODER_OBJS += $(DECODER_ASM_ARM64_SRCS:.S=.$(OBJ))
