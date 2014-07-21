@@ -5,31 +5,31 @@ AUTO_TEST_SRC_PATH="../../../"
 AUTO_TEST_RES_PATH="${AUTO_TEST_ANDROID_PATH}/report"
 mkdir -p ${AUTO_TEST_RES_PATH}
 #Prepare android build enviroment
-echo please set the enviroment variable as: 
-echo export ANDROID_HOME="path of android sdk" 
+echo please set the enviroment variable as:
+echo export ANDROID_HOME="path of android sdk"
 echo export ANDROID_NDK_HOME="path of android ndk"
 ANDROID_SDK_PATH=${ANDROID_HOME}
 ANDROID_NDK_PATH=${ANDROID_NDK_HOME}
 ANDROID_MAKE_PARAMS="OS=android NDKROOT=${ANDROID_NDK_PATH} TARGET=android-19"
 
 if [ "#${ANDROID_SDK_PATH}" = "#" ]
-then  
-echo Please set ANDROID_HOME with the path of Android SDK 
+then
+echo Please set ANDROID_HOME with the path of Android SDK
 exit 1
 fi
 if [ "#${ANDROID_NDK_PATH}" = "#" ]
 then
-echo Please set ANDROID_NDK_HOME with the path of Android NDK 
+echo Please set ANDROID_NDK_HOME with the path of Android NDK
 exit 1
 fi
 #make build
 cd ${AUTO_TEST_SRC_PATH}
 find ./ -name *.o -exec rm -f {} \;
 find ./ -name *.d -exec rm -f {} \;
-make $ANDROID_MAKE_PARAMS 
+make $ANDROID_MAKE_PARAMS
 
 if [ $? -ne 0 ]
-then 
+then
    echo Build error,check with the trace of make
    exit 1
 fi
@@ -59,13 +59,13 @@ fi
 ADB=${ANDROID_SDK_PATH}/platform-tools/adb
 
 #get devices
-devices=`$ADB devices | awk -F" " '/\tdevice/{print $1}'`                                         
-if [ "#$devices" = "#" ];then                                                                     
-   echo "Have not any android devices."                                        
-   exit 1                                                                                        
-fi 
-              
-#run apk                                                                          
+devices=`$ADB devices | awk -F" " '/\tdevice/{print $1}'`
+if [ "#$devices" = "#" ];then
+   echo "Have not any android devices."
+   exit 1
+fi
+
+#run apk
 run_apk() {
 local apk=$1;
 local rand=` date +%s`
@@ -78,7 +78,7 @@ then
    log_grep_params="welsdec"
    test_res=${AUTO_TEST_ANDROID_PATH}/../DecoderPerfTestRes
    report_file=${AUTO_TEST_RES_PATH}/decPerf_${rand}
-   
+
 fi
 if [[ "${apk}" =~ "WelsEncTest-debug.apk" ]]
 then
@@ -90,17 +90,17 @@ then
   report_file=${AUTO_TEST_RES_PATH}/encPerf_${rand}
 fi
 
-for dev in $devices; do  
-    dev_info_file=${AUTO_TEST_RES_PATH}/${dev}.log                                                                       
-    $ADB -s $dev uninstall ${apk_id}                                            
+for dev in $devices; do
+    dev_info_file=${AUTO_TEST_RES_PATH}/${dev}.log
+    $ADB -s $dev uninstall ${apk_id}
     $ADB -s $dev install -r ${apk}
     #TODO: output more info about android device such as name,cpu,memory,and also power comsumption.
     echo `$ADB -s $dev shell cat /system/build.prop |grep ro.product.model | awk -F"=" '{print $2}'`>${dev_info_file}
     #push resources
-    $ADB -s $dev push ${test_res} ${test_path}                              
-    #before start logcat,kill logcat                               
-    pid=`$ADB -s $dev shell ps | grep logcat | awk '{print $2;}'` 
-    [ "#$pid" != "#" ] && $ADB -s $dev shell kill $pid >/dev/null 
+    $ADB -s $dev push ${test_res} ${test_path}
+    #before start logcat,kill logcat
+    pid=`$ADB -s $dev shell ps | grep logcat | awk '{print $2;}'`
+    [ "#$pid" != "#" ] && $ADB -s $dev shell kill $pid >/dev/null
     $ADB -s $dev logcat -c
     $ADB -s $dev logcat |grep ${log_grep_params} >${report_file}_${dev}.log &
     $ADB -s $dev shell am start -n ${apk_main}
@@ -121,7 +121,7 @@ for dev in $devices; do
 
     #delete the res
     $ADB -s $dev shell rm -rf ${test_path}
-done      
+done
 }
 for apk in ${apk_name};do
    run_apk $apk;

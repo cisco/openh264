@@ -23,7 +23,7 @@ elif [ $params = "dec" ];then
   echo Running the decoder performance test
   ENC=0
 else
-  echo parameters are illegal!!!, ${0} [ios/android] [enc/dec]. 
+  echo parameters are illegal!!!, ${0} [ios/android] [enc/dec] 
   exit 1
 fi
 done
@@ -36,8 +36,7 @@ if [ ! -d ./EncoderPerTestRes ]
 then
 mkdir -p ./EncoderPerfTestRes
 fi
- 
-if [ "#`ls ./EncoderPerfTestRes`" = "#" ]  
+if [ "#`ls ./EncoderPerfTestRes`" = "#" ]
 then
 echo put yuv and cfg file into ./EncoderPerfTest folder as
 echo case_720p
@@ -54,7 +53,7 @@ else
 if [ ${IOS} = "1" ]
 then
 echo xxxxxxxxxxxxxxxxIOS ENC Startxxxxxxxxxxxxxxxxxx
-echo Run the Encoder performance test on ios devices 
+echo Run the Encoder performance test on ios devices
 cd ./ios
 bash run_AutoTest_ios.sh enc
 cd ${AUTO_TEST_PATH}

@@ -28,9 +28,7 @@ runGetPerformanceInfo_openh264()
 	do 
 		if [[ $line =~ "enc yuv file"  ]]
 		then
-			
             FileName=`echo $line | awk 'BEGIN {FS="enc yuv file"} {print $2}'`
-            
             FileName=`echo $FileName | awk 'BEGIN {FS=":"} {print $2}'` 
         fi
         if [[ $line =~ "Width" ]]
@@ -62,7 +60,6 @@ runGetPerformanceInfo_openh264()
         fi
         if [[ $line =~ "H264 source file name" ]]
         then
-             
             FileName=`echo $line | awk 'BEGIN {FS=":"} {print $'${seperatorNum}'}'`
        if [ $1 = "ios" ]
        then 
@@ -101,7 +98,6 @@ do
   PerformFile=`echo $log |awk -F"." '{print $1}'`
   PerformFile=${PerformFile}_${suffix}.csv
  #inital perfermance file
-                                                                                                                                                   
  echo "$log,,,">>${AUTO_TEST_RESULT_PATH}${PerformFile}
  echo "YUV,Resolution,Encodedframes,FPS">>${AUTO_TEST_RESULT_PATH}${PerformFile} 
   runGetPerformanceInfo_openh264 ${suffix} ${Result_log_path}${log}>>${AUTO_TEST_RESULT_PATH}${PerformFile}
