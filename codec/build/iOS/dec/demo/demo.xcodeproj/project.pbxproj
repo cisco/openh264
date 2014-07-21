@@ -53,7 +53,7 @@
 		F0E6634D1810EFA5000C888E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		F0E663511810EFA5000C888E /* demo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "demo-Info.plist"; sourceTree = "<group>"; };
 		F0E663531810EFA5000C888E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		F0E663551810EFA5000C888E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		F0E663551810EFA5000C888E /* main.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = main.m; sourceTree = "<group>"; };
 		F0E663581810EFA5000C888E /* DEMOAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DEMOAppDelegate.h; sourceTree = "<group>"; };
 		F0E663591810EFA5000C888E /* DEMOAppDelegate.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp.preprocessed; path = DEMOAppDelegate.m; sourceTree = "<group>"; };
 		F0E6635B1810EFA5000C888E /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };

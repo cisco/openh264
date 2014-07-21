@@ -3,6 +3,7 @@ package com.wels.dec;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Process;
 import android.util.Log;
 
 import android.view.KeyEvent;
@@ -19,7 +20,7 @@ public class WelsDecTest extends Activity {
     private OnClickListener OnClickEvent;
     private Button mBtnLoad, mBtnStartSW;
 
-    final String   mStreamPath = "/sdcard/wels-seq/";
+    final String   mStreamPath = "/sdcard/welsdec/";
     Vector<String> mStreamFiles = new Vector<String>();
 
     @Override
@@ -81,6 +82,41 @@ public class WelsDecTest extends Activity {
         mBtnStartSW.setOnClickListener(OnClickEvent);
 
         System.out.println("Done!");
+        //if you want to run the demo manually, just comment following 2 lines
+        runAutoDec(); 
+    }
+    public void runAutoDec()
+    {
+    	Thread thread = new Thread() {
+
+			public void run()
+			{
+			Log.i(TAG,"decoder performance test begin");
+					
+			File bitstreams = new File(mStreamPath);
+			String[] list = bitstreams.list();
+			if(list==null || list.length==0)
+			{
+             Log.i(TAG,"have not find any coder resourse");           
+             finish();
+			}
+			for(int i=0;i<list.length;i++)
+			{				
+				
+			  String inFile=list[i];
+			  inFile = mStreamPath + inFile;
+			  String outFile=inFile +".yuv";
+			  DoDecoderTest(inFile, outFile);
+			  
+			 			  
+			}			
+			Log.i(TAG,"decoder performance test finish");			
+			finish();
+			}
+
+		};
+		thread.start();
+				
     }
 
     @Override
@@ -89,6 +125,16 @@ public class WelsDecTest extends Activity {
         Log.i("WSE_DEC","welsdecdemo onStart");
         super.onStart();
     }
+    @Override
+    public void onDestroy()
+	{ 
+    	super.onDestroy();
+    	
+    	Log.i(TAG,"OnDestroy");
+    	
+		Process.killProcess(Process.myPid());
+	
+	}
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
