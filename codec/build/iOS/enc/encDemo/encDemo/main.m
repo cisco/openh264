@@ -35,149 +35,139 @@
 
 #import "AppDelegate.h"
 
-extern int EncMain(int argc, char **argv);
+extern int EncMain (int argc, char** argv);
 
 //redirect NSLog and stdout to logfile
-void redirectLogToDocumentFile()
-{
-    NSArray *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *document = [path objectAtIndex:0];
-    NSString *fileName = [NSString stringWithFormat:@"encPerf.log"];
-    NSString *logPath = [document stringByAppendingPathComponent:fileName];
-    
-    NSFileManager *defaultManager = [NSFileManager defaultManager];
-    [defaultManager removeItemAtPath:logPath error:nil];
-    
-    freopen([logPath cStringUsingEncoding:NSASCIIStringEncoding], "a+", stdout);
-    freopen([logPath cStringUsingEncoding:NSASCIIStringEncoding], "a+", stderr);
+void redirectLogToDocumentFile() {
+  NSArray* path = NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString* document = [path objectAtIndex:0];
+  NSString* fileName = [NSString stringWithFormat:@"encPerf.log"];
+  NSString* logPath = [document stringByAppendingPathComponent:fileName];
+
+  NSFileManager* defaultManager = [NSFileManager defaultManager];
+  [defaultManager removeItemAtPath:logPath error:nil];
+
+  freopen ([logPath cStringUsingEncoding:NSASCIIStringEncoding], "a+", stdout);
+  freopen ([logPath cStringUsingEncoding:NSASCIIStringEncoding], "a+", stderr);
 }
 
 //to judge whether the path is needed case path
-bool IsOneDeptDir(NSString* path)
-{
-    BOOL isDir = NO;
-    BOOL isOneDeptDir = NO;
-    NSFileManager* fileManager=[NSFileManager defaultManager];
-    NSArray* dirPathArray=[fileManager subpathsAtPath:path];
-    if([dirPathArray count]==0 || dirPathArray == nil)
-        isOneDeptDir = NO;
-    else
-    {
-        for (NSString* dirPath in dirPathArray){
-            NSString* tmpPath = [path stringByAppendingString:@"/"];
-            tmpPath = [tmpPath stringByAppendingString:dirPath];
-            [fileManager fileExistsAtPath:tmpPath isDirectory:&isDir];
-            if (isDir) {
-                isOneDeptDir = YES;
-                break;
-            }
-        }
+bool IsOneDeptDir (NSString* path) {
+  BOOL isDir = NO;
+  BOOL isOneDeptDir = NO;
+  NSFileManager* fileManager = [NSFileManager defaultManager];
+  NSArray* dirPathArray = [fileManager subpathsAtPath:path];
+  if ([dirPathArray count] == 0 || dirPathArray == nil)
+    isOneDeptDir = NO;
+  else {
+    for (NSString * dirPath in dirPathArray) {
+      NSString* tmpPath = [path stringByAppendingString:@"/"];
+      tmpPath = [tmpPath stringByAppendingString:dirPath];
+      [fileManager fileExistsAtPath:tmpPath isDirectory:&isDir];
+      if (isDir) {
+        isOneDeptDir = YES;
+        break;
+      }
     }
-    return isOneDeptDir;
+  }
+  return isOneDeptDir;
 }
 
 //run auto test to get encoder performance
-int AutoTestEnc()
-{
-    NSString* document= [[NSString alloc] init];
-    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    if([paths count] == 0)
-    {
-        NSLog(@"could not find document path");
-        return 2;
+int AutoTestEnc() {
+  NSString* document = [[NSString alloc] init];
+  NSArray* paths = NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES);
+  if ([paths count] == 0) {
+    NSLog (@"could not find document path");
+    return 2;
+  }
+  document = [paths objectAtIndex:0];
+
+  NSString* encFilePath = [document stringByAppendingString:@"/EncoderPerfTestRes"];
+  NSFileManager* manage = [NSFileManager defaultManager];
+
+  NSArray* cases = [manage subpathsAtPath:encFilePath];
+  if (cases == nil) {
+    NSLog (@"could not find any test case under encoderperftest");
+    return 1;
+
+  }
+  redirectLogToDocumentFile();
+  NSMutableArray* dirArray = [[NSMutableArray alloc] init];
+  for (NSString * casePath in cases) {
+
+    NSString* path = [encFilePath stringByAppendingPathComponent:casePath];
+    if (IsOneDeptDir (path)) {
+      [dirArray addObject:casePath];
     }
-    document = [paths objectAtIndex:0];
-    
-    NSString* encFilePath =[document stringByAppendingString:@"/EncoderPerfTestRes"];
-    NSFileManager* manage=[NSFileManager defaultManager];
-    
-    NSArray* cases=[manage subpathsAtPath:encFilePath];
-    if(cases == nil)
-    {
-        NSLog(@"could not find any test case under encoderperftest");
-        return 1;
-        
+
+  }
+  for (int caseNO = 0; caseNO < [dirArray count]; caseNO++) {
+
+    NSString* caseName = [dirArray objectAtIndex:caseNO];
+    NSString* caseFilePath = [encFilePath stringByAppendingString:@"/"];
+    caseFilePath = [caseFilePath stringByAppendingString:caseName];
+    [manage changeCurrentDirectoryPath:[caseFilePath stringByExpandingTildeInPath]];
+
+    NSString* welscfg = [caseFilePath stringByAppendingString:@"/welsenc.cfg"];
+    NSString* layercfg = [caseFilePath stringByAppendingString:@"/layer2.cfg"];
+    NSString* yuvFilePath = [caseFilePath stringByAppendingString:@"/yuv"];
+    NSString* bitFilePath = [caseFilePath stringByAppendingString:@"/bit"];
+    [manage removeItemAtPath:bitFilePath error:nil];
+    [manage createDirectoryAtPath:bitFilePath withIntermediateDirectories:YES attributes:nil error:nil];
+
+
+    NSArray* files = [manage subpathsAtPath:yuvFilePath];
+
+    [manage changeCurrentDirectoryPath:[bitFilePath stringByExpandingTildeInPath]];
+
+    for (int i = 0; i < [files count]; i++) {
+      NSString* yuvFileName = [files objectAtIndex:i];
+      NSString* bitFileName = [yuvFileName stringByAppendingString:@".264"];
+
+      NSString*  bitFileNamePath = [bitFilePath stringByAppendingString:@"/"];
+      bitFileName = [bitFileNamePath stringByAppendingString:bitFileName];
+
+
+      [manage createFileAtPath:bitFileName contents:nil attributes:nil];
+      [manage changeCurrentDirectoryPath:[yuvFilePath stringByExpandingTildeInPath]];
+      const char* argvv[] = {
+        "dummy",
+        [welscfg UTF8String],
+        "-org",
+        [yuvFileName UTF8String],
+        "-bf",
+        [bitFileName UTF8String],
+        "-numl",
+        "1",
+        [layercfg UTF8String]
+      };
+
+      NSLog (@"WELS_INFO: enc config file: %@", welscfg);
+      NSLog (@"WELS_INFO: enc yuv file: %@", yuvFileName);
+      EncMain (sizeof (argvv) / sizeof (argvv[0]), (char**)&argvv[0]);
+      fflush (stdout); // flush the content of stdout instantly
     }
-    redirectLogToDocumentFile();
-    NSMutableArray *dirArray = [[NSMutableArray alloc] init];
-    for (NSString *casePath in cases) {
-        
-        NSString *path = [encFilePath stringByAppendingPathComponent:casePath];
-        if(IsOneDeptDir(path))
-        {
-            [dirArray addObject:casePath];
-        }
-        
-    }
-    for (int caseNO=0; caseNO<[dirArray count]; caseNO++)
-    {
-        
-        NSString* caseName = [dirArray objectAtIndex:caseNO];
-        NSString* caseFilePath = [encFilePath stringByAppendingString:@"/"];
-        caseFilePath = [caseFilePath stringByAppendingString:caseName];
-        [manage changeCurrentDirectoryPath:[caseFilePath stringByExpandingTildeInPath]];
-        
-        NSString* welscfg = [caseFilePath stringByAppendingString:@"/welsenc.cfg"];
-        NSString* layercfg = [caseFilePath stringByAppendingString:@"/layer2.cfg"];
-        NSString* yuvFilePath = [caseFilePath stringByAppendingString:@"/yuv"];
-        NSString* bitFilePath = [caseFilePath stringByAppendingString:@"/bit"];
-        [manage removeItemAtPath:bitFilePath error:nil];
-        [manage createDirectoryAtPath:bitFilePath withIntermediateDirectories:YES attributes:nil error:nil];
-        
-        
-        NSArray* files=[manage subpathsAtPath:yuvFilePath];
-        
-        [manage changeCurrentDirectoryPath:[bitFilePath stringByExpandingTildeInPath]];
-        
-        for(int i=0;i<[files count];i++)
-        {
-            NSString* yuvFileName = [files objectAtIndex:i];
-            NSString* bitFileName = [yuvFileName stringByAppendingString:@".264"];
-            
-            NSString*  bitFileNamePath = [bitFilePath stringByAppendingString:@"/"];
-            bitFileName = [bitFileNamePath stringByAppendingString:bitFileName];
-            
-            
-            [manage createFileAtPath:bitFileName contents:nil attributes:nil];
-            [manage changeCurrentDirectoryPath:[yuvFilePath stringByExpandingTildeInPath]];
-            const char* argvv[]={
-                "dummy",
-                [welscfg UTF8String],
-                "-org",
-                [yuvFileName UTF8String],
-                "-bf",
-                [bitFileName UTF8String],
-                "-numl",
-                "1",
-                [layercfg UTF8String]
-            };
-            
-            NSLog(@"WELS_INFO: enc config file: %@", welscfg);
-            NSLog(@"WELS_INFO: enc yuv file: %@", yuvFileName);
-            EncMain(sizeof(argvv)/sizeof(argvv[0]), (char**)&argvv[0]);
-            fflush(stdout);// flush the content of stdout instantly
-        }
-        
-    }
-    
-    
-    return 0;
+
+  }
+
+
+  return 0;
 }
 
 
-int main(int argc, char * argv[])
-{
-    
-    
-    //***For auto testing of encoder performance, call auto test here, if you not want to do auto test, you can comment it manualy
-    
-    if(AutoTestEnc() == 0)
-        NSLog(@"Auto testing running sucessfully");
-    else
-        NSLog(@"Auto testing running failed");
-    abort();
-    //************************
-    @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
-    }
+int main (int argc, char* argv[]) {
+
+
+  //***For auto testing of encoder performance, call auto test here, if you not want to do auto test, you can comment it manualy
+
+  if (AutoTestEnc() == 0)
+    NSLog (@"Auto testing running sucessfully");
+  else
+    NSLog (@"Auto testing running failed");
+  abort();
+  //************************
+  @autoreleasepool {
+    return UIApplicationMain (argc, argv, nil, NSStringFromClass ([AppDelegate class]));
+  }
 }
