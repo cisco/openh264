@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "macros.h"
 #include "decode_mb_aux.h"
+#include "../../codec/decoder/core/src/decode_slice.cpp"
 using namespace WelsDec;
 void IdctResAddPred_ref (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) {
   int16_t iSrc[16];
@@ -36,6 +37,14 @@ void IdctResAddPred_ref (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) {
     kT2	= (iSrc[i + 4] >> 1) - iSrc[i + 12];
     pDst[i + kiStride] = WelsClip1 (((32 + kT1 + kT2) >> 6) + pDst[i + kiStride]);
     pDst[i + kiStride2] = WelsClip1 (((32 + kT1 - kT2) >> 6) + pDst[i + kiStride2]);
+  }
+}
+
+void SetNonZeroCount_ref (int8_t* pNonZeroCount) {
+  int32_t i;
+
+  for (i = 0; i < 24; i++) {
+    pNonZeroCount[i] = !!pNonZeroCount[i];
   }
 }
 
@@ -78,4 +87,48 @@ GENERATE_IDCTRESADDPRED (IdctResAddPred_mmx)
 
 #if defined(HAVE_NEON)
 GENERATE_IDCTRESADDPRED (IdctResAddPred_neon)
+#endif
+
+#if defined(HAVE_NEON_AARCH64)
+GENERATE_IDCTRESADDPRED (IdctResAddPred_AArch64_neon)
+#endif
+
+#define GENERATE_SETNONZEROCOUNT(method) \
+TEST(DecoderDecodeMbAux, method) \
+{\
+    int8_t iNonZeroCount[2][24];\
+    for(int32_t i = 0; i < 24; i++) {\
+        iNonZeroCount[0][i] = iNonZeroCount[1][i] = (rand() % 256)-128;\
+    }\
+    method(iNonZeroCount[0]);\
+    SetNonZeroCount_ref(iNonZeroCount[1]);\
+    for(int32_t i =0; i<24; i++) {\
+        ASSERT_EQ (iNonZeroCount[0][i], iNonZeroCount[1][i]);\
+    }\
+    for(int32_t i =0; i<24; i++) {\
+        iNonZeroCount[0][i] = iNonZeroCount[1][i] = -128;\
+    }\
+    method(iNonZeroCount[0]);\
+    SetNonZeroCount_ref(iNonZeroCount[1]);\
+    for(int32_t i =0; i<24; i++) {\
+        ASSERT_EQ (iNonZeroCount[0][i], iNonZeroCount[1][i]);\
+    }\
+    for(int32_t i =0; i<24; i++) {\
+        iNonZeroCount[0][i] = iNonZeroCount[1][i] = 127;\
+    }\
+    method(iNonZeroCount[0]);\
+    SetNonZeroCount_ref(iNonZeroCount[1]);\
+    for(int32_t i =0; i<24; i++) {\
+        ASSERT_EQ (iNonZeroCount[0][i], iNonZeroCount[1][i]);\
+    }\
+}
+
+GENERATE_SETNONZEROCOUNT (SetNonZeroCount_c)
+
+#if defined(HAVE_NEON)
+GENERATE_SETNONZEROCOUNT (SetNonZeroCount_neon)
+#endif
+
+#if defined(HAVE_NEON_AARCH64)
+GENERATE_SETNONZEROCOUNT (SetNonZeroCount_AArch64_neon)
 #endif

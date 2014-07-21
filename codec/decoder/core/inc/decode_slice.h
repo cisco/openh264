@@ -67,6 +67,9 @@ extern "C" {
 void SetNonZeroCount_neon (int8_t* pNonZeroCount);
 #endif
 
+#if defined(HAVE_NEON_AARCH64)
+void SetNonZeroCount_AArch64_neon (int8_t* pNonZeroCount);
+#endif
 #ifdef __cplusplus
 }
 #endif//__cplusplus
