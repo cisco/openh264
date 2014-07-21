@@ -13,13 +13,13 @@ CODEC_TEST_IOS_REPORT_SUBFOLDER="release"
 buildXcodeProject()
 {
  xcodebuild ARCHS="${CODEC_TEST_IOS_ARCH}" VALID_ARCHS="${CODEC_TEST_IOS_ARCH}" ONLY_ACTIVE_ARCH=YES -project $1 -target $2 -configuration $3 -sdk ${CODEC_TEST_IOS_PLATFORM} clean build
- 
-if [ $? -eq 0 ]; then                                                                              
- echo "build $1 $3 successfully"                                                                                                                                                         
- else                                                                                              
- echo "build $1 $3  fail"                                                                        
- exit 1                                                                                         
- fi            
+
+if [ $? -eq 0 ]; then
+ echo "build $1 $3 successfully"
+ else
+ echo "build $1 $3  fail"
+ exit 1
+ fi
 }
 
 
@@ -50,22 +50,22 @@ for PARAM in $*; do
      CODEC_TEST_RES=${AUTO_TEST_IOS_PATH}/../DecoderPerfTestRes
      CODEC_TEST_LOG="decPerf"
  elif [ "release" = "${PARAM}" ]; then
-     CODEC_TEST_IOS_DEBUG_RELEASE="Release"                                                      
-     CODEC_TEST_IOS_REPORT_SUBFOLDER="release"                                                   
- elif [ "debug" = "${PARAM}" ]; then                                                             
-     CODEC_TEST_IOS_DEBUG_RELEASE="Debug"                                                        
-     CODEC_TEST_IOS_REPORT_SUBFOLDER="debug"                                                     
- else                                                                                          
-    echo parameters are illegal!!!, please have a check.                                        
-    exit 1                                                                                      
- fi                                                                                            
- done     
+     CODEC_TEST_IOS_DEBUG_RELEASE="Release"
+     CODEC_TEST_IOS_REPORT_SUBFOLDER="release"
+ elif [ "debug" = "${PARAM}" ]; then
+     CODEC_TEST_IOS_DEBUG_RELEASE="Debug"
+     CODEC_TEST_IOS_REPORT_SUBFOLDER="debug"
+ else
+    echo parameters are illegal!!!, please have a check.
+    exit 1
+ fi
+ done
 
 echo "Codec test will run on ${CODEC_TEST_IOS_PLATFORM} with ${CODEC_TEST_IOS_DEBUG_RELEASE}"
 buildXcodeProject ${CODEC_TEST_XCODE_PROJECT_NAME} ${CODEC_TEST_IOS_PROJECT_NAME} ${CODEC_TEST_IOS_DEBUG_RELEASE} ${CODEC_TEST_IOS_PLATFORM}
 
 
- 
+
 
 ##############run on ios devices#########################
 # for real device
@@ -81,15 +81,15 @@ echo "Try to kill the runing instruments"
 pids_str=`ps x -o pid,command | grep -v grep | grep "instruments" | awk '{printf "%s,", $1}'`
 instruments_pids="${pids_str//,/ }"
 for pid in ${instruments_pids}; do
-echo "Found instruments ${pid}. Killing..."                                                      
-kill -9 ${pid} && wait ${pid} &> /dev/null                                                       
-done                                                                                             
+echo "Found instruments ${pid}. Killing..."
+kill -9 ${pid} && wait ${pid} &> /dev/null
+done
 
 
 
 DEVICES=`system_profiler SPUSBDataType | sed -n -e '/iPad/,/Serial/p' -e '/iPhone/,/Serial/p' | grep "Serial Number:" | awk -F ": " '{print $2}'`
 if [ "${DEVICES}#" == "#" ]
-then  
+then
 echo "Can not find any connected device! please check device is connected to MAC!"
 exit 1
 else
@@ -135,13 +135,13 @@ ENCDEC=$1
 #start to get encoder/decoder performance data,default run the xcode with release
 iosPerformanceTest $ENCDEC release
 
-if [ $? -ne 0 ]; then                                                                                              
-echo "Running $ENCDEC demo to get encoder performance is failed!"                          
+if [ $? -ne 0 ]; then
+echo "Running $ENCDEC demo to get encoder performance is failed!"
 exit 1
-else 
+else
 echo Finished $ENCDEC performance test on ios devices
 echo the test result is generated at ./ios/report/xx.loGbash parsePerfData.sh
 echo xxxxxxxxxxxxxxxxxxxxxxxxxxxxIOS $ENCDEC  Endxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 fi
-#TODO:according to the trace of instruments to do some analysis                            
+#TODO:according to the trace of instruments to do some analysis
 find .\ -name *.trace -exec rm -rf {} \;

@@ -11,7 +11,7 @@ UIATarget.onAlert = function onAlert(alert){
 			var acceptButton = buttons[buttonCount - 1];
 			acceptButton.tap(); // last button is accept
 		}
-       	return true; //forbid the default cancel processing
+	return true; //forbid the default cancel processing
     }
     return false; //using the default cancel processing
 }

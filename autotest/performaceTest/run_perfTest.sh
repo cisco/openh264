@@ -23,7 +23,7 @@ elif [ $params = "dec" ];then
   echo Running the decoder performance test
   ENC=0
 else
-  echo parameters are illegal!!!, ${0} [ios/android] [enc/dec] 
+  echo parameters are illegal!!!, ${0} [ios/android] [enc/dec]
   exit 1
 fi
 done
