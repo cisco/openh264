@@ -1063,6 +1063,12 @@ void WelsBlockFuncInit (SBlockFunc*   pFunc,  int32_t iCpu) {
     pFunc->pWelsSetNonZeroCountFunc		= SetNonZeroCount_neon;
   }
 #endif
+
+#ifdef	HAVE_NEON_AARCH64
+    if (iCpu & WELS_CPU_NEON) {
+        pFunc->pWelsSetNonZeroCountFunc		= SetNonZeroCount_AArch64_neon;
+    }
+#endif
 }
 
 void SetNonZeroCount_c (int8_t* pNonZeroCount) {
