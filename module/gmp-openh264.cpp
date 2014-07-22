@@ -608,13 +608,15 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
       assert (false);
       break;
     }
-
+    DECODING_STATE dState = dsErrorFree;
     worker_thread_->Post (WrapTask (
                             this, &OpenH264VideoDecoder::Decode_w,
                             inputFrame,
                             missingFrames,
+                            dState,
                             renderTimeMs));
-
+    if (dState)
+      return GMPGenericErr;
     return GMPNoErr;
   }
 
@@ -633,6 +635,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
  private:
   void Decode_w (GMPVideoEncodedFrame* inputFrame,
                  bool missingFrames,
+                 DECODING_STATE& dState,
                  int64_t renderTimeMs = -1) {
     GMPLOG (GL_DEBUG, "Frame decode on worker thread length = "
             << inputFrame->Size());
@@ -642,13 +645,13 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
     memset (&decoded, 0, sizeof (decoded));
     unsigned char* data[3] = {nullptr, nullptr, nullptr};
 
-    int rv = decoder_->DecodeFrame2 (inputFrame->Buffer(),
+    dState = decoder_->DecodeFrame2 (inputFrame->Buffer(),
                                      inputFrame->Size(),
                                      data,
                                      &decoded);
 
-    if (rv) {
-      GMPLOG (GL_ERROR, "Decoding error rv=" << rv);
+    if (dState) {
+      GMPLOG (GL_ERROR, "Decoding error dState=" << dState);
     } else {
       valid = true;
     }
