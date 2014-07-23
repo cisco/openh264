@@ -553,7 +553,6 @@ TEST_F (EncoderInterfaceTest, BasicReturnTypeTest) {
 }
 
 TEST_F (EncoderInterfaceTest, BitStreamTest){
-
   pParamExt->iPicWidth = 320;
   pParamExt->iPicHeight = 180;
   pParamExt->iTargetBitrate = 6000;
