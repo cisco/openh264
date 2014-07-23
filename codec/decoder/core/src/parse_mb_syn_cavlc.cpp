@@ -1003,7 +1003,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
       // Security check: iRefIdx should be in range 0 to num_ref_idx_l0_active_minus1, includsive
       // ref to standard section 7.4.5.1. iRefCount[0] is 1 + num_ref_idx_l0_active_minus1.
       if ((iRefIdx < 0) || (iRefIdx >= iRefCount[0]) || (ppRefPic[iRefIdx] == NULL)) { //error ref_idx
-        if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) {
+        if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
           iRefIdx = 0;
           pCtx->iErrorCode |= dsBitstreamError;
         } else {
@@ -1041,7 +1041,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
       WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[0], &uiCode)); //ref_idx_l0[ mbPartIdx ]
       iRefIdx[i] = uiCode;
       if ((iRefIdx[i] < 0) || (iRefIdx[i] >= iRefCount[0]) || (ppRefPic[iRefIdx[i]] == NULL)) { //error ref_idx
-        if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) {
+        if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
           iRefIdx[i] = 0;
           pCtx->iErrorCode |= dsBitstreamError;
         } else {
@@ -1075,7 +1075,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
         WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[0], &uiCode)); //ref_idx_l0[ mbPartIdx ]
         iRefIdx[i] = uiCode;
         if ((iRefIdx[i] < 0) || (iRefIdx[i] >= iRefCount[0]) || (ppRefPic[iRefIdx[i]] == NULL)) { //error ref_idx
-          if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) {
+          if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
             iRefIdx[i] = 0;
             pCtx->iErrorCode |= dsBitstreamError;
           } else {
@@ -1141,7 +1141,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
           WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[0], &uiCode)); //ref_idx_l0[ mbPartIdx ]
           iRefIdx[i] = uiCode;
           if ((iRefIdx[i] < 0) || (iRefIdx[i] >= iRefCount[0]) || (ppRefPic[iRefIdx[i]] == NULL)) { //error ref_idx
-            if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) {
+            if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
               iRefIdx[i] = 0;
               pCtx->iErrorCode |= dsBitstreamError;
             } else {

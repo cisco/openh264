@@ -55,7 +55,7 @@ void BaseDecoderTest::SetUp() {
   memset (&decParam, 0, sizeof (SDecodingParam));
   decParam.iOutputColorFormat  = videoFormatI420;
   decParam.uiTargetDqLayer = UCHAR_MAX;
-  decParam.uiEcActiveFlag  = 1;
+  decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
   decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
 
   rv = decoder_->Initialize (&decParam);
