@@ -123,11 +123,11 @@ MODULE_INCLUDES += -I$(SRC_PATH)gmp-api
 
 all: libraries binaries
 
-General_ver:
+generate-version:
 	$(QUIET)cd $(SRC_PATH) && sh ./codec/common/generate_version.sh
 
-codec/decoder/plus/src/welsDecoderExt.$(OBJ): | General_ver
-codec/encoder/plus/src/welsEncoderExt.$(OBJ): | General_ver
+codec/decoder/plus/src/welsDecoderExt.$(OBJ): | generate-version
+codec/encoder/plus/src/welsEncoderExt.$(OBJ): | generate-version
 
 clean:
 ifeq (android,$(OS))
