@@ -622,9 +622,10 @@ int32_t RequestScreenBlockFeatureStorage (CMemoryAlign* pMa, const int32_t kiFra
   pScreenBlockFeatureStorage->pLocationPointer = (uint16_t*)pMa->WelsMalloc (2 * kiFrameSize * sizeof (uint16_t),
       "pScreenBlockFeatureStorage->pLocationPointer");
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pScreenBlockFeatureStorage->pLocationPointer)
-    //  uint16_t* pFeatureValuePointerList[WELS_MAX (LIST_SIZE_SUM_16x16, LIST_SIZE_MSE_16x16)] = {0};
-  pScreenBlockFeatureStorage->pFeatureValuePointerList = (uint16_t**)pMa->WelsMalloc (WELS_MAX (LIST_SIZE_SUM_16x16, LIST_SIZE_MSE_16x16)* sizeof (uint16_t*),
-    "pScreenBlockFeatureStorage->pFeatureValuePointerList");
+  //  uint16_t* pFeatureValuePointerList[WELS_MAX (LIST_SIZE_SUM_16x16, LIST_SIZE_MSE_16x16)] = {0};
+  pScreenBlockFeatureStorage->pFeatureValuePointerList = (uint16_t**)pMa->WelsMalloc (WELS_MAX (LIST_SIZE_SUM_16x16,
+      LIST_SIZE_MSE_16x16) * sizeof (uint16_t*),
+      "pScreenBlockFeatureStorage->pFeatureValuePointerList");
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pScreenBlockFeatureStorage->pFeatureValuePointerList)
 
   pScreenBlockFeatureStorage->pFeatureOfBlockPointer = NULL;
@@ -654,7 +655,8 @@ int32_t ReleaseScreenBlockFeatureStorage (CMemoryAlign* pMa, SScreenBlockFeature
     }
 
     if (pScreenBlockFeatureStorage->pFeatureValuePointerList) {
-      pMa->WelsFree (pScreenBlockFeatureStorage->pFeatureValuePointerList, "pScreenBlockFeatureStorage->pFeatureValuePointerList");
+      pMa->WelsFree (pScreenBlockFeatureStorage->pFeatureValuePointerList,
+                     "pScreenBlockFeatureStorage->pFeatureValuePointerList");
       pScreenBlockFeatureStorage->pFeatureValuePointerList = NULL;
     }
 
@@ -779,7 +781,8 @@ bool CalculateFeatureOfBlock (SWelsFuncPtrList* pFunc, SPicture* pRef,
                               pLocationOfFeature, pScreenBlockFeatureStorage->pFeatureValuePointerList);
 
   //assign each pixel's pLocationOfFeature
-  FillQpelLocationByFeatureValue_c (pFeatureOfBlock, iWidth, kiHeight, pScreenBlockFeatureStorage->pFeatureValuePointerList);
+  FillQpelLocationByFeatureValue_c (pFeatureOfBlock, iWidth, kiHeight,
+                                    pScreenBlockFeatureStorage->pFeatureValuePointerList);
   return true;
 }
 
