@@ -35,14 +35,14 @@
 #include "arm_arch64_common_macro.S"
 
 #ifdef __APPLE__
-.macro ABS_SUB_SUM_16BYTES 
+.macro ABS_SUB_SUM_16BYTES
 	ld1     {v0.16b}, [x0], x4
 	ld1     {v1.16b}, [x1], x4
 	uabal   $0, v0.8b, v1.8b
 	uabal2  $1, v0.16b,v1.16b
 .endm
 
-.macro ABS_SUB_SUM_8x16BYTES 
+.macro ABS_SUB_SUM_8x16BYTES
 	ld1     {v0.16b}, [x0], x4
 	ld1     {v1.16b}, [x1], x4
 	uabdl   $0, v0.8b, v1.8b
@@ -64,7 +64,7 @@
 	uabal2  \arg1, v0.16b,v1.16b
 .endm
 
-.macro ABS_SUB_SUM_8x16BYTES 
+.macro ABS_SUB_SUM_8x16BYTES arg0, arg1
 	ld1     {v0.16b}, [x0], x4
 	ld1     {v1.16b}, [x1], x4
 	uabdl   \arg0, v0.8b, v1.8b
@@ -80,7 +80,7 @@
 #endif
 
 /*
- * void vaa_calc_sad_neon(uint8_t *cur_data, uint8_t *ref_data, int32_t pic_width, int32_t pic_height, int32_t pic_stride, 
+ * void vaa_calc_sad_neon(uint8_t *cur_data, uint8_t *ref_data, int32_t pic_width, int32_t pic_height, int32_t pic_stride,
  *						int32_t *psadframe, int32_t *psad8x8)
  */
 WELS_ASM_AARCH64_FUNC_BEGIN VAACalcSad_AArch64_neon
@@ -136,7 +136,7 @@ WELS_ASM_AARCH64_FUNC_END
 .endr
 .endm
 /*
- * void vaa_calc_sad_bgd_neon(uint8_t *cur_data, uint8_t *ref_data, int32_t pic_width, int32_t pic_height, int32_t pic_stride, 
+ * void vaa_calc_sad_bgd_neon(uint8_t *cur_data, uint8_t *ref_data, int32_t pic_width, int32_t pic_height, int32_t pic_stride,
  *							   int32_t *psadframe, int32_t *psad8x8, int32_t *p_sd8x8, uint8_t *p_mad8x8)
  */
 WELS_ASM_AARCH64_FUNC_BEGIN VAACalcSadBgd_AArch64_neon
@@ -274,7 +274,7 @@ WELS_ASM_AARCH64_FUNC_END
 .endm
 
 /*
- * void vaa_calc_sad_ssd_bgd_c(uint8_t *cur_data, uint8_t *ref_data, int32_t pic_width, int32_t pic_height, int32_t pic_stride, 
+ * void vaa_calc_sad_ssd_bgd_c(uint8_t *cur_data, uint8_t *ref_data, int32_t pic_width, int32_t pic_height, int32_t pic_stride,
  *        int32_t *psadframe,int32_t *psad8x8, int32_t *psum16x16, int32_t *psqsum16x16, int32_t *psqdiff16x16, int32_t *p_sd8x8, uint8_t *p_mad8x8)
  */
 WELS_ASM_AARCH64_FUNC_BEGIN VAACalcSadSsdBgd_AArch64_neon
