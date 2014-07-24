@@ -114,9 +114,13 @@ MODULE_INCLUDES += -Igmp-api
 
 .PHONY: test gtest-bootstrap clean
 
-all:	General_ver libraries binaries
-General_ver:
+all: libraries binaries
+
+generate-version:
 	sh ./codec/common/generate_version.sh
+
+codec/decoder/plus/src/welsDecoderExt.$(OBJ): | generate-version
+codec/encoder/plus/src/welsEncoderExt.$(OBJ): | generate-version
 
 clean:
 ifeq (android,$(OS))
