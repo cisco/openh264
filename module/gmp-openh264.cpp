@@ -190,21 +190,25 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
     worker_thread_->Join();
   }
 
-  virtual GMPErr InitEncode (const GMPVideoCodec& codecSettings,
-                             const uint8_t* aCodecSpecific,
-                             uint32_t aCodecSpecificSize,
-                             GMPVideoEncoderCallback* callback,
-                             int32_t numberOfCores,
-                             uint32_t maxPayloadSize) {
+  virtual void InitEncode (const GMPVideoCodec& codecSettings,
+                           const uint8_t* aCodecSpecific,
+                           uint32_t aCodecSpecificSize,
+                           GMPVideoEncoderCallback* callback,
+                           int32_t numberOfCores,
+                           uint32_t maxPayloadSize) {
+    callback_ = callback;
+
     GMPErr err = g_platform_api->createthread (&worker_thread_);
     if (err != GMPNoErr) {
       GMPLOG (GL_ERROR, "Couldn't create new thread");
-      return GMPGenericErr;
+      Error (GMPGenericErr);
+      return;
     }
 
     int rv = WelsCreateSVCEncoder (&encoder_);
     if (rv) {
-      return GMPGenericErr;
+      Error (GMPGenericErr);
+      return;
     }
 
     SEncParamBase param;
@@ -238,22 +242,20 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
     rv = encoder_->Initialize (&param);
     if (rv) {
       GMPLOG (GL_ERROR, "Couldn't initialize encoder");
-      return GMPGenericErr;
+      Error (GMPGenericErr);
+      return;
     }
 
     max_payload_size_ = maxPayloadSize;
-    callback_ = callback;
 
     GMPLOG (GL_INFO, "Initialized encoder");
-
-    return GMPNoErr;
   }
 
-  virtual GMPErr Encode (GMPVideoi420Frame* inputImage,
-                         const uint8_t* aCodecSpecificInfo,
-                         uint32_t aCodecSpecificInfoLength,
-                         const GMPVideoFrameType* aFrameTypes,
-                         uint32_t aFrameTypesLength) {
+  virtual void Encode (GMPVideoi420Frame* inputImage,
+                       const uint8_t* aCodecSpecificInfo,
+                       uint32_t aCodecSpecificInfoLength,
+                       const GMPVideoFrameType* aFrameTypes,
+                       uint32_t aFrameTypesLength) {
     GMPLOG (GL_DEBUG,
             __FUNCTION__
             << " size="
@@ -267,8 +269,88 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
                             this, &OpenH264VideoEncoder::Encode_w,
                             inputImage,
                             (aFrameTypes)[0]));
+  }
 
-    return GMPGenericErr;
+  virtual void SetChannelParameters (uint32_t aPacketLoss, uint32_t aRTT) {
+  }
+
+  virtual void SetRates (uint32_t aNewBitRate, uint32_t aFrameRate) {
+    GMPLOG (GL_INFO, "[SetRates] Begin with: "
+            << aNewBitRate << " , " << aFrameRate);
+    //update bitrate if needed
+    const int32_t newBitRate = aNewBitRate * 1000; //kbps->bps
+    SBitrateInfo existEncoderBitRate;
+    existEncoderBitRate.iLayer = SPATIAL_LAYER_ALL;
+    int rv = encoder_->GetOption (ENCODER_OPTION_BITRATE, &existEncoderBitRate);
+    if (rv != cmResultSuccess) {
+      GMPLOG (GL_ERROR, "[SetRates] Error in Getting Bit Rate at Layer:"
+              << rv
+              << " ; Layer = "
+              << existEncoderBitRate.iLayer
+              << " ; BR = "
+              << existEncoderBitRate.iBitrate);
+      Error (GMPGenericErr);
+      return;
+    }
+    if (rv == cmResultSuccess && existEncoderBitRate.iBitrate != newBitRate) {
+      SBitrateInfo newEncoderBitRate;
+      newEncoderBitRate.iLayer = SPATIAL_LAYER_ALL;
+      newEncoderBitRate.iBitrate = newBitRate;
+      rv = encoder_->SetOption (ENCODER_OPTION_BITRATE, &newEncoderBitRate);
+      if (rv == cmResultSuccess) {
+        GMPLOG (GL_INFO, "[SetRates] Update Encoder Bandwidth (AllLayers): ReturnValue: "
+                << rv
+                << "BitRate(kbps): "
+                << aNewBitRate);
+      } else {
+        GMPLOG (GL_ERROR, "[SetRates] Error in Setting Bit Rate at Layer:"
+                << rv
+                << " ; Layer = "
+                << newEncoderBitRate.iLayer
+                << " ; BR = "
+                << newEncoderBitRate.iBitrate);
+        Error (GMPGenericErr);
+        return;
+      }
+    }
+    //update framerate if needed
+    float existFrameRate = 0;
+    rv = encoder_->GetOption (ENCODER_OPTION_FRAME_RATE, &existFrameRate);
+    if (rv != cmResultSuccess) {
+      GMPLOG (GL_ERROR, "[SetRates] Error in Getting Frame Rate:"
+              << rv << " FrameRate: " << existFrameRate);
+      Error (GMPGenericErr);
+      return;
+    }
+    if (rv == cmResultSuccess &&
+        (aFrameRate - existFrameRate > 0.001f ||
+         existFrameRate - aFrameRate > 0.001f)) {
+      float newFrameRate = static_cast<float> (aFrameRate);
+      rv = encoder_->SetOption (ENCODER_OPTION_FRAME_RATE, &newFrameRate);
+      if (rv == cmResultSuccess) {
+        GMPLOG (GL_INFO, "[SetRates] Update Encoder Frame Rate: ReturnValue: "
+                << rv << " FrameRate: " << aFrameRate);
+      } else {
+        GMPLOG (GL_ERROR, "[SetRates] Error in Setting Frame Rate: ReturnValue: "
+                << rv << " FrameRate: " << aFrameRate);
+        Error (GMPGenericErr);
+        return;
+      }
+    }
+  }
+
+  virtual void SetPeriodicKeyFrames (bool aEnable) {
+  }
+
+  virtual void EncodingComplete() {
+    delete this;
+  }
+
+ private:
+  void Error (GMPErr error) {
+    if (callback_) {
+      callback_->Error (error);
+    }
   }
 
   void Encode_w (GMPVideoi420Frame* inputImage,
@@ -438,79 +520,6 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
     frame->Destroy();
   }
 
-  virtual GMPErr SetChannelParameters (uint32_t aPacketLoss, uint32_t aRTT) {
-    return GMPNoErr;
-  }
-
-  virtual GMPErr SetRates (uint32_t aNewBitRate, uint32_t aFrameRate) {
-    GMPLOG (GL_INFO, "[SetRates] Begin with: "
-            << aNewBitRate << " , " << aFrameRate);
-    //update bitrate if needed
-    const int32_t newBitRate = aNewBitRate * 1000; //kbps->bps
-    SBitrateInfo existEncoderBitRate;
-    existEncoderBitRate.iLayer = SPATIAL_LAYER_ALL;
-    int rv = encoder_->GetOption (ENCODER_OPTION_BITRATE, &existEncoderBitRate);
-    if (rv != cmResultSuccess) {
-      GMPLOG (GL_ERROR, "[SetRates] Error in Getting Bit Rate at Layer:"
-              << rv
-              << " ; Layer = "
-              << existEncoderBitRate.iLayer
-              << " ; BR = "
-              << existEncoderBitRate.iBitrate);
-      return GMPGenericErr;
-    }
-    if (rv == cmResultSuccess && existEncoderBitRate.iBitrate != newBitRate) {
-      SBitrateInfo newEncoderBitRate;
-      newEncoderBitRate.iLayer = SPATIAL_LAYER_ALL;
-      newEncoderBitRate.iBitrate = newBitRate;
-      rv = encoder_->SetOption (ENCODER_OPTION_BITRATE, &newEncoderBitRate);
-      if (rv == cmResultSuccess) {
-        GMPLOG (GL_INFO, "[SetRates] Update Encoder Bandwidth (AllLayers): ReturnValue: "
-                << rv
-                << "BitRate(kbps): "
-                << aNewBitRate);
-      } else {
-        GMPLOG (GL_ERROR, "[SetRates] Error in Setting Bit Rate at Layer:"
-                << rv
-                << " ; Layer = "
-                << newEncoderBitRate.iLayer
-                << " ; BR = "
-                << newEncoderBitRate.iBitrate);
-        return GMPGenericErr;
-      }
-    }
-    //update framerate if needed
-    float existFrameRate = 0;
-    rv = encoder_->GetOption (ENCODER_OPTION_FRAME_RATE, &existFrameRate);
-    if (rv != cmResultSuccess) {
-      GMPLOG (GL_ERROR, "[SetRates] Error in Getting Frame Rate:"
-              << rv << " FrameRate: " << existFrameRate);
-      return GMPGenericErr;
-    }
-    if (rv == cmResultSuccess &&
-        (aFrameRate - existFrameRate > 0.001f ||
-         existFrameRate - aFrameRate > 0.001f)) {
-      float newFrameRate = static_cast<float> (aFrameRate);
-      rv = encoder_->SetOption (ENCODER_OPTION_FRAME_RATE, &newFrameRate);
-      if (rv == cmResultSuccess) {
-        GMPLOG (GL_INFO, "[SetRates] Update Encoder Frame Rate: ReturnValue: "
-                << rv << " FrameRate: " << aFrameRate);
-      } else {
-        GMPLOG (GL_ERROR, "[SetRates] Error in Setting Frame Rate: ReturnValue: "
-                << rv << " FrameRate: " << aFrameRate);
-        return GMPGenericErr;
-      }
-    }
-    return GMPNoErr;
-  }
-
-  virtual GMPErr SetPeriodicKeyFrames (bool aEnable) {
-    return GMPNoErr;
-  }
-
-  virtual void EncodingComplete() {
-    delete this;
-  }
 
  private:
   GMPVideoHost* host_;
@@ -533,27 +542,32 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
   virtual ~OpenH264VideoDecoder() {
   }
 
-  virtual GMPErr InitDecode (const GMPVideoCodec& codecSettings,
-                             const uint8_t* aCodecSpecific,
-                             uint32_t aCodecSpecificSize,
-                             GMPVideoDecoderCallback* callback,
-                             int32_t coreCount) {
+  virtual void InitDecode (const GMPVideoCodec& codecSettings,
+                           const uint8_t* aCodecSpecific,
+                           uint32_t aCodecSpecificSize,
+                           GMPVideoDecoderCallback* callback,
+                           int32_t coreCount) {
+    callback_ = callback;
+
     GMPLOG (GL_INFO, "InitDecode");
 
     GMPErr err = g_platform_api->createthread (&worker_thread_);
     if (err != GMPNoErr) {
       GMPLOG (GL_ERROR, "Couldn't create new thread");
-      return GMPGenericErr;
+      Error (GMPGenericErr);
+      return;
     }
 
     if (WelsCreateDecoder (&decoder_)) {
       GMPLOG (GL_ERROR, "Couldn't create decoder");
-      return GMPGenericErr;
+      Error (GMPGenericErr);
+      return;
     }
 
     if (!decoder_) {
       GMPLOG (GL_ERROR, "Couldn't create decoder");
-      return GMPGenericErr;
+      Error (GMPGenericErr);
+      return;
     }
 
     SDecodingParam param;
@@ -565,18 +579,16 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
 
     if (decoder_->Initialize (&param)) {
       GMPLOG (GL_ERROR, "Couldn't initialize decoder");
-      return GMPGenericErr;
+      Error (GMPGenericErr);
+      return;
     }
-
-    callback_ = callback;
-    return GMPNoErr;
   }
 
-  virtual GMPErr Decode (GMPVideoEncodedFrame* inputFrame,
-                         bool missingFrames,
-                         const uint8_t* aCodecSpecificInfo,
-                         uint32_t aCodecSpecificInfoLength,
-                         int64_t renderTimeMs = -1) {
+  virtual void Decode (GMPVideoEncodedFrame* inputFrame,
+                       bool missingFrames,
+                       const uint8_t* aCodecSpecificInfo,
+                       uint32_t aCodecSpecificInfoLength,
+                       int64_t renderTimeMs = -1) {
     GMPLOG (GL_DEBUG, __FUNCTION__
             << "Decoding frame size=" << inputFrame->Size()
             << " timestamp=" << inputFrame->TimeStamp());
@@ -615,17 +627,15 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
                             missingFrames,
                             dState,
                             renderTimeMs));
-    if (dState)
-      return GMPGenericErr;
-    return GMPNoErr;
+    if (dState) {
+      Error(GMPGenericErr);
+    }
   }
 
-  virtual GMPErr Reset() {
-    return GMPNoErr;
+  virtual void Reset() {
   }
 
-  virtual GMPErr Drain() {
-    return GMPNoErr;
+  virtual void Drain() {
   }
 
   virtual void DecodingComplete() {
@@ -633,6 +643,12 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
   }
 
  private:
+  void Error (GMPErr error) {
+    if (callback_) {
+      callback_->Error (error);
+    }
+  }
+
   void Decode_w (GMPVideoEncodedFrame* inputFrame,
                  bool missingFrames,
                  DECODING_STATE& dState,
