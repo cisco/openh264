@@ -44,7 +44,7 @@ AR = $(TOOLCHAINPREFIX)ar
 CFLAGS += -DANDROID_NDK -fpic --sysroot=$(SYSROOT) -MMD -MP
 CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS += --sysroot=$(SYSROOT)
-SHLDFLAGS = -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,-soname,lib$(PROJECT_NAME).so
+SHLDFLAGS = -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-soname,lib$(PROJECT_NAME).so
 
 ifneq ($(CXX),$(wildcard $(CXX)))
 $(error Compiler not found, bad NDKROOT or ARCH?)

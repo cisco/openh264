@@ -116,6 +116,10 @@ BITS 64
 
 BITS 64
 
+%ifidn __OUTPUT_FORMAT__,elf64
+SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-executable
+%endif
+
 %define arg1 rdi
 %define arg2 rsi
 %define arg3 rdx
@@ -165,6 +169,10 @@ BITS 64
 %elifdef X86_32 ; X86_32 ;************************************
 
 BITS 32
+
+%ifidn __OUTPUT_FORMAT__,elf
+SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-executable
+%endif
 
 %define arg1 [esp + push_num*4 + 4]
 %define arg2 [esp + push_num*4 + 8]
