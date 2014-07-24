@@ -6,7 +6,7 @@ ifeq ($(ASM_ARCH), x86)
 ifeq ($(ENABLE64BIT), Yes)
 ASMFLAGS += -f elf64
 else
-ASMFLAGS += -f elf32
+ASMFLAGS += -f elf
 endif
 endif
 ifeq ($(ASM_ARCH), arm)
