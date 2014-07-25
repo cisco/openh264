@@ -617,7 +617,7 @@ TEST_F (EncoderInterfaceTest, BitStreamTest){
   int iNalCount = sFbi.sLayerInfo[0].iNalCount;
   EXPECT_EQ(iNalCountBak, iNalCount);
 
-  int iNalLength = 0; 
+  int iNalLength = 0;
   int iNalLengthBak = 0;
   for(int i = 0; i < iNalCount; i ++){
     iNalLength += sFbi.sLayerInfo[0].pNalLengthInByte[i];
