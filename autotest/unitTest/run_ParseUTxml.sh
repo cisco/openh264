@@ -22,7 +22,6 @@ parse_unittest() {
     echo $msg
     UT_Failed_Num=$[${UT_Failed_Num}+${fails}]
 	fi
-		
 }
 
 xmlcount=`ls $REPORT | wc -l`
