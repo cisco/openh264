@@ -246,9 +246,10 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
     uint32_t iMbHeight		= 0;
     int32_t iMbNumInFrame		= 0;
     uint32_t iMaxSliceNum		= MAX_SLICES_NUM;
-    if (kiPicWidth <= 0 || kiPicHeight <= 0) {
-      WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid %d x %d in dependency layer settings!\n", kiPicWidth,
-               kiPicHeight);
+    if ((kiPicWidth <= 0) || (kiPicHeight <= 0) || (kiPicWidth > MAX_WIDTH) || (kiPicHeight > MAX_HEIGHT)) {
+      WelsLog (pLogCtx, WELS_LOG_ERROR,
+               "ParamValidationExt(),width(1-%d),height(1-%d)invalid %d x %d in dependency layer settings!\n", MAX_WIDTH, MAX_HEIGHT,
+               kiPicWidth, kiPicHeight);
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
     if ((kiPicWidth & 0x0F) != 0 || (kiPicHeight & 0x0F) != 0) {

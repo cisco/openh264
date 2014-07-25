@@ -19,8 +19,9 @@ class BaseEncoderTest {
   void EncodeStream (InputStream* in, EUsageType usageType, int width, int height, float frameRate, SliceModeEnum slices,
                      bool denoise, int layers, Callback* cbk);
 
- private:
   ISVCEncoder* encoder_;
+ private:
+
 };
 
 #endif //__BASEENCODERTEST_H__

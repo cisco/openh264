@@ -1190,8 +1190,6 @@ void  CWelsPreProcess::WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SP
   const int32_t kiDstStrideY = pDstPic->iLineSize[0];
   const int32_t kiDstStrideUV = pDstPic->iLineSize[1];
 
-#define MAX_WIDTH      (4096)
-#define MAX_HEIGHT     (2304)//MAX_FS_LEVEL51 (36864); MAX_FS_LEVEL51*256/4096 = 2304
   if (pSrcY) {
     if (iSrcWidth <= 0 || iSrcWidth > MAX_WIDTH || iSrcHeight <= 0 || iSrcHeight > MAX_HEIGHT)
       return;
