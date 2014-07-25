@@ -42,6 +42,7 @@ endif
 
 ifeq ($(ASM_ARCH), arm64)
 PROCESSING_ASM_ARM64_SRCS=\
+	$(PROCESSING_SRCDIR)/src/arm64/adaptive_quantization_aarch64_neon.S\
 	$(PROCESSING_SRCDIR)/src/arm64/down_sample_aarch64_neon.S\
 
 PROCESSING_OBJS += $(PROCESSING_ASM_ARM64_SRCS:.S=.$(OBJ))

@@ -31,6 +31,7 @@
 		549947F2196A3FB400BA3D87 /* ScrollDetectionFuncs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 549947D5196A3FB400BA3D87 /* ScrollDetectionFuncs.cpp */; };
 		549947F3196A3FB400BA3D87 /* vaacalcfuncs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 549947D8196A3FB400BA3D87 /* vaacalcfuncs.cpp */; };
 		549947F4196A3FB400BA3D87 /* vaacalculation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 549947D9196A3FB400BA3D87 /* vaacalculation.cpp */; };
+		6C749B78197E2A2000A111F9 /* adaptive_quantization_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 6C749B77197E2A2000A111F9 /* adaptive_quantization_aarch64_neon.S */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -91,6 +92,7 @@
 		549947D8196A3FB400BA3D87 /* vaacalcfuncs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vaacalcfuncs.cpp; sourceTree = "<group>"; };
 		549947D9196A3FB400BA3D87 /* vaacalculation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vaacalculation.cpp; sourceTree = "<group>"; };
 		549947DA196A3FB400BA3D87 /* vaacalculation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vaacalculation.h; sourceTree = "<group>"; };
+		6C749B77197E2A2000A111F9 /* adaptive_quantization_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = adaptive_quantization_aarch64_neon.S; path = arm64/adaptive_quantization_aarch64_neon.S; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,6 +110,7 @@
 		4CC6094D197E008B00BE8B8B /* arm64 */ = {
 			isa = PBXGroup;
 			children = (
+				6C749B77197E2A2000A111F9 /* adaptive_quantization_aarch64_neon.S */,
 				4CC6094E197E009D00BE8B8B /* down_sample_aarch64_neon.S */,
 			);
 			name = arm64;
@@ -337,6 +340,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C749B78197E2A2000A111F9 /* adaptive_quantization_aarch64_neon.S in Sources */,
 				549947F4196A3FB400BA3D87 /* vaacalculation.cpp in Sources */,
 				549947E9196A3FB400BA3D87 /* ComplexityAnalysis.cpp in Sources */,
 				549947E3196A3FB400BA3D87 /* vaa_calc_neon.S in Sources */,
