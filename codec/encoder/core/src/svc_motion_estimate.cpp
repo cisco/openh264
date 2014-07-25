@@ -622,6 +622,10 @@ int32_t RequestScreenBlockFeatureStorage (CMemoryAlign* pMa, const int32_t kiFra
   pScreenBlockFeatureStorage->pLocationPointer = (uint16_t*)pMa->WelsMalloc (2 * kiFrameSize * sizeof (uint16_t),
       "pScreenBlockFeatureStorage->pLocationPointer");
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pScreenBlockFeatureStorage->pLocationPointer)
+    //  uint16_t* pFeatureValuePointerList[WELS_MAX (LIST_SIZE_SUM_16x16, LIST_SIZE_MSE_16x16)] = {0};
+  pScreenBlockFeatureStorage->pFeatureValuePointerList = (uint16_t**)pMa->WelsMalloc (WELS_MAX (LIST_SIZE_SUM_16x16, LIST_SIZE_MSE_16x16)* sizeof (uint16_t*),
+    "pScreenBlockFeatureStorage->pFeatureValuePointerList");
+  WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pScreenBlockFeatureStorage->pFeatureValuePointerList)
 
   pScreenBlockFeatureStorage->pFeatureOfBlockPointer = NULL;
   pScreenBlockFeatureStorage->iIs16x16 = !bIsBlock8x8;
@@ -647,6 +651,11 @@ int32_t ReleaseScreenBlockFeatureStorage (CMemoryAlign* pMa, SScreenBlockFeature
     if (pScreenBlockFeatureStorage->pLocationPointer) {
       pMa->WelsFree (pScreenBlockFeatureStorage->pLocationPointer, "pScreenBlockFeatureStorage->pLocationPointer");
       pScreenBlockFeatureStorage->pLocationPointer = NULL;
+    }
+
+    if (pScreenBlockFeatureStorage->pFeatureValuePointerList) {
+      pMa->WelsFree (pScreenBlockFeatureStorage->pFeatureValuePointerList, "pScreenBlockFeatureStorage->pFeatureValuePointerList");
+      pScreenBlockFeatureStorage->pFeatureValuePointerList = NULL;
     }
 
     return ENC_RETURN_SUCCESS;
@@ -760,7 +769,6 @@ bool CalculateFeatureOfBlock (SWelsFuncPtrList* pFunc, SPicture* pRef,
   const int32_t iWidth = pRef->iWidthInPixel - iEdgeDiscard;
   const int32_t kiHeight = pRef->iHeightInPixel - iEdgeDiscard;
   const int32_t kiActualListSize = pScreenBlockFeatureStorage->iActualListSize;
-  uint16_t* pFeatureValuePointerList[WELS_MAX (LIST_SIZE_SUM_16x16, LIST_SIZE_MSE_16x16)] = {0};
 
   memset (pTimesOfFeatureValue, 0, sizeof (int32_t)*kiActualListSize);
   (pFunc->pfCalculateBlockFeatureOfFrame[iIs16x16]) (pRefData, iWidth, kiHeight, iRefStride, pFeatureOfBlock,
@@ -768,10 +776,10 @@ bool CalculateFeatureOfBlock (SWelsFuncPtrList* pFunc, SPicture* pRef,
 
   //assign pLocationOfFeature pointer
   InitializeHashforFeature_c (pTimesOfFeatureValue, pBuf, kiActualListSize,
-                              pLocationOfFeature, pFeatureValuePointerList);
+                              pLocationOfFeature, pScreenBlockFeatureStorage->pFeatureValuePointerList);
 
   //assign each pixel's pLocationOfFeature
-  FillQpelLocationByFeatureValue_c (pFeatureOfBlock, iWidth, kiHeight, pFeatureValuePointerList);
+  FillQpelLocationByFeatureValue_c (pFeatureOfBlock, iWidth, kiHeight, pScreenBlockFeatureStorage->pFeatureValuePointerList);
   return true;
 }
 

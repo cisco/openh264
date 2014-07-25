@@ -54,6 +54,7 @@ uint16_t*  pLocationPointer;  // buffer of position array
 int32_t    iActualListSize;      // actual list size
 uint32_t uiSadCostThreshold[BLOCK_SIZE_ALL];
 bool      bRefBlockFeatureCalculated; // flag of whether pre-process is done
+uint16_t **pFeatureValuePointerList;//uint16_t* pFeatureValuePointerList[WELS_MAX (LIST_SIZE_SUM_16x16, LIST_SIZE_MSE_16x16)]
 } SScreenBlockFeatureStorage; //should be stored with RefPic, one for each frame
 
 /*
