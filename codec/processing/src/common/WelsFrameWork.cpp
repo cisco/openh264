@@ -40,7 +40,7 @@
 #include "../adaptivequantization/AdaptiveQuantization.h"
 #include "../complexityanalysis/ComplexityAnalysis.h"
 #include "../imagerotate/imagerotate.h"
-
+#include "util.h"
 
 /* interface API implement */
 

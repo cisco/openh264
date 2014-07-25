@@ -56,6 +56,7 @@ WELSVP_NAMESPACE_BEGIN
 
 #define MAX_WIDTH      (4096)
 #define MAX_HEIGHT     (2304)//MAX_FS_LEVEL51 (36864); MAX_FS_LEVEL51*256/4096 = 2304
+
 #define MB_WIDTH_LUMA  (16)
 #define PESN		   (1e-6)	// desired float precision
 #define AQ_INT_MULTIPLY                   10000000
