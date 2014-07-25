@@ -316,8 +316,8 @@ TEST_F (EncoderInterfaceTest, MemoryCheckTest) {
 
 void GetValidEncParamBase (SEncParamBase* pEncParamBase) {
   pEncParamBase->iUsageType = CAMERA_VIDEO_REAL_TIME;
-  pEncParamBase->iPicWidth = ((rand() * 2) % (MAX_WIDTH));
-  pEncParamBase->iPicHeight = ((rand() * 2) % (MAX_HEIGHT));
+  pEncParamBase->iPicWidth = 2 + ((rand() * 2) % (MAX_WIDTH - 2));
+  pEncParamBase->iPicHeight = 2 + ((rand() * 2) % (MAX_HEIGHT - 2));
   pEncParamBase->iPicWidth = VALID_SIZE(pEncParamBase->iPicWidth);
   pEncParamBase->iPicHeight = VALID_SIZE(pEncParamBase->iPicHeight);
   pEncParamBase->iTargetBitrate = rand() + 1; //!=0
@@ -470,8 +470,8 @@ TEST_F (EncoderInterfaceTest, ForceIntraFrameWithTemporal) {
   SEncParamExt sEncParamExt;
   pPtrEnc->GetDefaultParams (&sEncParamExt);
   sEncParamExt.iUsageType = CAMERA_VIDEO_REAL_TIME;
-  sEncParamExt.iPicWidth = abs ((rand() * 2) + MB_SIZE) % (MAX_WIDTH + 1);
-  sEncParamExt.iPicHeight = abs ((rand() * 2) + MB_SIZE) % (MAX_HEIGHT + 1);
+  sEncParamExt.iPicWidth = MB_SIZE + abs ((rand() * 2) % (MAX_WIDTH - MB_SIZE));
+  sEncParamExt.iPicHeight = MB_SIZE + abs ((rand() * 2) % (MAX_HEIGHT - MB_SIZE));
   sEncParamExt.iTargetBitrate = rand() + 1; //!=0
   sEncParamExt.iRCMode = RC_BITRATE_MODE; //-1, 0, 1, 2
   sEncParamExt.fMaxFrameRate = rand() + 0.5f; //!=0
