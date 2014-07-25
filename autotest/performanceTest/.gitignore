@@ -1,0 +1,13 @@
+#performance test resource folder
+./EncoderPerfTestRes
+./DecoderPerfTestRes
+./DecoderPerfTestRes/*.*
+./EncoderPerfTestRes/*.*
+#performance test result folder
+./TestResultCSV
+#
+.DS_Store
+#.
+./android/report
+./ios/report
+

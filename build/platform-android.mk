@@ -46,6 +46,10 @@ CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS += --sysroot=$(SYSROOT)
 SHLDFLAGS = -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,-soname,lib$(PROJECT_NAME).so
 
+ifneq ($(CXX),$(wildcard $(CXX)))
+$(error Compiler not found, bad NDKROOT or ARCH?)
+endif
+
 STL_INCLUDES = \
     -I$(NDKROOT)/sources/cxx-stl/stlport/stlport
 STL_LIB = \

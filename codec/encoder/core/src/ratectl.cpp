@@ -1012,7 +1012,7 @@ void WelRcPictureInitBufferBasedQp (void* pCtx) {
     iMinQp = MIN_SCREEN_QP;
 
   pEncCtx->iGlobalQp += pEncCtx->iDropNumber;
-  pEncCtx->iGlobalQp = WELS_CLIP3 (pEncCtx->iGlobalQp, MIN_SCREEN_QP, MAX_SCREEN_QP);
+  pEncCtx->iGlobalQp = WELS_CLIP3 (pEncCtx->iGlobalQp, iMinQp, MAX_SCREEN_QP);
 }
 void  WelsRcInitModule (void* pCtx, RC_MODES iRcMode) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;

@@ -34,9 +34,90 @@
 
 #import "DEMOAppDelegate.h"
 
-int main(int argc, char *argv[])
-{
-    @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([DEMOAppDelegate class]));
+extern int DecMain (int argc, char* argv[]);
+
+//redirect NSLog and stdout to logfile
+void redirectLogToDocumentFile() {
+  NSArray* path = NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString* document = [path objectAtIndex:0];
+  NSString* fileName = [NSString stringWithFormat:@"decPerf.log"];
+  NSString* logPath = [document stringByAppendingPathComponent:fileName];
+
+  NSFileManager* defaultManager = [NSFileManager defaultManager];
+  [defaultManager removeItemAtPath:logPath error:nil];
+
+  freopen ([logPath cStringUsingEncoding:NSASCIIStringEncoding], "a+", stdout);
+  freopen ([logPath cStringUsingEncoding:NSASCIIStringEncoding], "a+", stderr);
+}
+
+
+//run auto test to get encoder performance
+int AutoTestDec() {
+
+
+  NSString* document = [[NSString alloc] init];
+  NSArray* paths = NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES);
+  if ([paths count] == 0) {
+    NSLog (@"could not find document path");
+    return 2;
+  }
+  document = [paths objectAtIndex:0];
+
+
+  NSString* decFilePath = [document stringByAppendingString:@"/DecoderPerfTestRes"];
+  NSFileManager* manage = [NSFileManager defaultManager];
+
+  NSString* outYuvPath = [decFilePath stringByAppendingString:@"/yuv"];
+  [manage removeItemAtPath:outYuvPath error:nil];
+  [manage createDirectoryAtPath:outYuvPath withIntermediateDirectories:YES attributes:nil error: nil];
+
+
+  NSArray* bitstreams = [manage subpathsAtPath:decFilePath];
+  if (bitstreams == nil) {
+    NSLog (@"could not find any bitstream under decoderperfpath");
+    return 1;
+  }
+
+  redirectLogToDocumentFile(); //output to console, just comment this line
+
+  for (int caseNO = 0; caseNO < [bitstreams count]; caseNO++) {
+
+    NSString* caseName = [bitstreams objectAtIndex:caseNO];
+    if ([caseName  isEqual: @"yuv"]) {
+      break;
     }
+    NSString* bitstream = [decFilePath stringByAppendingString:@"/"];
+    bitstream = [bitstream stringByAppendingString:caseName];
+    NSString* yuvFileName = [caseName stringByAppendingString:@".yuv"];
+    NSString* tmpyuvFileName = [outYuvPath stringByAppendingString:@"/"];
+    yuvFileName = [tmpyuvFileName stringByAppendingString:yuvFileName];
+
+    [manage createFileAtPath:yuvFileName contents:nil attributes:nil];
+
+    const char* argvv[] = {
+      "decConsole.exe",
+      [bitstream UTF8String],
+      [yuvFileName UTF8String]
+    };
+    DecMain (sizeof (argvv) / sizeof (argvv[0]), (char**)&argvv[0]);
+    fflush (stdout); // flush the content of stdout instantly
+  }
+
+
+  return 0;
+}
+
+int main (int argc, char* argv[]) {
+  //***For auto testing of decoder performance, call auto test here, if you not want to do auto test, you can comment it manualy
+
+  if (AutoTestDec() == 0)
+    NSLog (@"Auto testing running sucessfully");
+  else
+    NSLog (@"Auto testing running failed");
+  abort();
+  //********
+
+  @autoreleasepool {
+    return UIApplicationMain (argc, argv, nil, NSStringFromClass ([DEMOAppDelegate class]));
+  }
 }

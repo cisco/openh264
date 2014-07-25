@@ -8,6 +8,25 @@
 
 extern "C" int EncMain (int argc, char* argv[]);
 extern "C"
+JNIEXPORT void JNICALL Java_com_wels_enc_WelsEncTest_DoEncoderAutoTest
+(JNIEnv* env, jobject thiz, jstring jsIncfgName, jstring jsInlayerName, jstring jsInyuvName, jstring jsOutbitName) {
+  /**************** Add the native codes/API *****************/
+  const char* argv[]={
+	(char*)("encConsole.exe"),
+	(char*) ((*env).GetStringUTFChars (jsIncfgName, NULL)),
+	(char*)("-org"),
+	(char*) ((*env).GetStringUTFChars (jsInyuvName, NULL)),
+	(char*)("-bf"),
+	(char*) ((*env).GetStringUTFChars (jsOutbitName, NULL)),
+	(char*)("-numl"),
+	(char*)("1"),
+	(char*) ((*env).GetStringUTFChars (jsInlayerName, NULL))
+  };
+  LOGI ("Start to run JNI module!+++");
+  EncMain(sizeof(argv)/sizeof(argv[0]),(char**)&argv[0]);
+  LOGI ("End to run JNI module!+++");
+}
+
 JNIEXPORT void JNICALL Java_com_wels_enc_WelsEncTest_DoEncoderTest
 (JNIEnv* env, jobject thiz, jstring jsFileNameIn) {
   /**************** Add the native codes/API *****************/
