@@ -28,6 +28,8 @@ public class MainActivity extends Activity {
 	@Override
 	public void onDestroy()
 	{
+        super.onDestroy();
+        Log.i("codec_unittest","OnDestroy");
 		Process.killProcess(Process.myPid());
 	}
 
@@ -55,7 +57,6 @@ public class MainActivity extends Activity {
 				Log.i("codec_unittest","codec unittest runing @"+path);
 				DoUnittest("/sdcard", path);
 				Log.i("codec_unittest","codec unittest end");
-				Process.killProcess(Process.myPid());
 				finish();
 			}
 

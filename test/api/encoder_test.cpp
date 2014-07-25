@@ -67,7 +67,58 @@ TEST_P (EncoderOutputTest, CompareOutput) {
     CompareHash (digest, p.hashStr);
   }
 }
-
+#if defined(ANDROID_NDK)
+static const EncodeFileParam kFileParamArray[] = {
+  {
+    "/sdcard/res/CiscoVT2people_320x192_12fps.yuv",
+    "0a36b75e423fc6b49f6adf7eee12c039a096f538", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1
+  },
+  {
+    "/sdcard/res/CiscoVT2people_160x96_6fps.yuv",
+    "73981e6ea5b62f7338212c538a7cc755e7c9c030", CAMERA_VIDEO_REAL_TIME, 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1
+  },
+  {
+    "/sdcard/res/Static_152_100.yuv",
+    "02bbff550ee0630e44e46e14dc459d3686f2a360", CAMERA_VIDEO_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1
+  },
+  {
+    "/sdcard/res/CiscoVT2people_320x192_12fps.yuv",
+    "c8b759bcec7ffa048f1d3ded594b8815bed0aead", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_ROWMB_SLICE, false, 1 // One slice per MB row
+  },
+  {
+    "/sdcard/res/CiscoVT2people_320x192_12fps.yuv",
+    "e64ba75456c821ca35a949eda89f85bff8ee69fa", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, true, 1
+  },
+  {
+    "/sdcard/res/CiscoVT2people_320x192_12fps.yuv",
+    "684e6d141ada776892bdb01ee93efe475983ed36", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 2
+  },
+  {
+    "/sdcard/res/Cisco_Absolute_Power_1280x720_30fps.yuv",
+    "2bc06262d87fa0897ad4c336cc4047d5a67f7203", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1
+  },
+  {
+    "/sdcard/res/Cisco_Absolute_Power_1280x720_30fps.yuv",
+    "68c3220e49b7a57d563faf7c99a870ab34a23400", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SINGLE_SLICE, false, 4
+  },
+  {
+    "/sdcard/res/CiscoVT2people_320x192_12fps.yuv",
+    "030d0e2d742ac039c2ab6333fe7cb18623c0d283", SCREEN_CONTENT_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1
+  },
+  {
+    "/sdcard/res/CiscoVT2people_160x96_6fps.yuv",
+    "40aa19d4b2684a59e689860d2a793876f33904f7", SCREEN_CONTENT_REAL_TIME, 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1
+  },
+  {
+    "/sdcard/res/Static_152_100.yuv",
+    "494068b59aa9ed9118a9f33174b732024effc870", SCREEN_CONTENT_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1
+  },
+  {
+    "/sdcard/res/Cisco_Absolute_Power_1280x720_30fps.yuv",
+    "dc5aedee4d8f1fe8d6647a9f7b8c2d3df758ac27", SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1
+  },
+};
+#else
 static const EncodeFileParam kFileParamArray[] = {
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
@@ -119,5 +170,6 @@ static const EncodeFileParam kFileParamArray[] = {
   },
 };
 
+#endif
 INSTANTIATE_TEST_CASE_P (EncodeFile, EncoderOutputTest,
                          ::testing::ValuesIn (kFileParamArray));

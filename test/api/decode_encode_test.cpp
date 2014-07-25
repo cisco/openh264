@@ -102,11 +102,18 @@ TEST_P (DecodeEncodeTest, CompareOutput) {
     CompareHash (digest, p.hashStr);
   }
 }
-
+#if defined(ANDROID_NDK)
+static const DecodeEncodeFileParam kFileParamArray[] = {
+  {"/sdcard/res/test_vd_1d.264", "a4c7299ec1a7bacd5819685e221a79ac2b56cdbc", 320, 192, 12.0f},
+  {"/sdcard/res/test_vd_rc.264", "106fd8cc978c1801b0d1f8297e9b7f17d5336e15", 320, 192, 12.0f},
+};
+#else
 static const DecodeEncodeFileParam kFileParamArray[] = {
   {"res/test_vd_1d.264", "a4c7299ec1a7bacd5819685e221a79ac2b56cdbc", 320, 192, 12.0f},
   {"res/test_vd_rc.264", "106fd8cc978c1801b0d1f8297e9b7f17d5336e15", 320, 192, 12.0f},
 };
+
+#endif
 
 INSTANTIATE_TEST_CASE_P (DecodeEncodeFile, DecodeEncodeTest,
                          ::testing::ValuesIn (kFileParamArray));
