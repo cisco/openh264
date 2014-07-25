@@ -17,7 +17,7 @@ else ifeq ($(ARCH), arm64)
 else ifeq ($(ARCH), x86)
   APP_ABI = x86
   ifeq (Yes, $(USE_ASM))
-    ASMFLAGS += -f elf32
+    ASMFLAGS += -f elf
   endif
 else ifeq ($(ARCH), x86_64)
   APP_ABI = x86_64
@@ -44,7 +44,7 @@ AR = $(TOOLCHAINPREFIX)ar
 CFLAGS += -DANDROID_NDK -fpic --sysroot=$(SYSROOT) -MMD -MP
 CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS += --sysroot=$(SYSROOT)
-SHLDFLAGS = -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,-soname,lib$(PROJECT_NAME).so
+SHLDFLAGS = -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-soname,lib$(PROJECT_NAME).so
 
 ifneq ($(CXX),$(wildcard $(CXX)))
 $(error Compiler not found, bad NDKROOT or ARCH?)
