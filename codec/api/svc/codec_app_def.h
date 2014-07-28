@@ -359,7 +359,7 @@ typedef struct TagSVCDecodingParam {
   unsigned int	uiCpuLoad;		// CPU load
   unsigned char	uiTargetDqLayer;	// Setting target dq layer id
 
-  unsigned char	uiEcActiveFlag;		// Whether active error concealment feature in decoder
+  ERROR_CON_IDC eEcActiveIdc;		// Whether active error concealment feature in decoder
 
   SVideoProperty   sVideoProperty;
 } SDecodingParam, *PDecodingParam;

@@ -231,7 +231,7 @@ TEST (ErrorConTest, DoErrorConFrameCopy) {
     return;
   }
 
-  pECCtx->pCtx->iErrorConMethod = ERROR_CON_FRAME_COPY;
+  pECCtx->pCtx->eErrorConMethod = ERROR_CON_FRAME_COPY;
   InitECCopyData (pECCtx);
   //case 1: no reference picture
   pECCtx->pCtx->pPreviousDecodedPictureInDpb = NULL;
@@ -263,7 +263,7 @@ TEST (ErrorConTest, DoErrorConSliceCopy) {
     FreeInputData (pECCtx);
     return;
   }
-  pECCtx->pCtx->iErrorConMethod = ERROR_CON_SLICE_COPY;
+  pECCtx->pCtx->eErrorConMethod = ERROR_CON_SLICE_COPY;
   InitECCopyData (pECCtx);
   //case 1: no reference picture
   pECCtx->pCtx->pPreviousDecodedPictureInDpb = NULL;

@@ -211,7 +211,8 @@ void CWelsDecoder::UninitDecoder (void) {
   if (NULL == m_pDecContext)
     return;
 
-  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::uninit_decoder(), openh264 codec version = %s.", VERSION_NUMBER);
+  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::uninit_decoder(), openh264 codec version = %s.",
+           VERSION_NUMBER);
 
   WelsEndDecoder (m_pDecContext);
 
@@ -265,7 +266,7 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
       iVal = ERROR_CON_SLICE_COPY;
     else
       iVal = * ((int*)pOption); //EC method
-    m_pDecContext->iErrorConMethod = iVal;
+    m_pDecContext->eErrorConMethod = (ERROR_CON_IDC) iVal;
     return cmResultSuccess;
   } else if (eOptID == DECODER_OPTION_TRACE_LEVEL) {
     if (m_pWelsTrace) {
@@ -339,7 +340,7 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
     * ((int*)pOption) = iVal;
     return cmResultSuccess;
   } else if (DECODER_OPTION_ERROR_CON_IDC == eOptID) {
-    iVal = m_pDecContext->iErrorConMethod;
+    iVal = (int) m_pDecContext->eErrorConMethod;
     * ((int*)pOption) = iVal;
     return cmResultSuccess;
   }
@@ -399,7 +400,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     //for AVC bitstream (excluding AVC with temporal scalability, including TP), as long as error occur, SHOULD notify upper layer key frame loss.
     if ((IS_PARAM_SETS_NALS (eNalType) || NAL_UNIT_CODED_SLICE_IDR == eNalType) ||
         (VIDEO_BITSTREAM_AVC == m_pDecContext->eVideoType)) {
-      if (m_pDecContext->iErrorConMethod == ERROR_CON_DISABLE) {
+      if (m_pDecContext->eErrorConMethod == ERROR_CON_DISABLE) {
 #ifdef LONG_TERM_REF
         m_pDecContext->bParamSetsLostFlag = true;
 #else

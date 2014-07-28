@@ -103,7 +103,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   ppDst[2] = ppDst[2] + pCtx->sFrameCrop.iTopOffset  * pPic->iLinesize[1] + pCtx->sFrameCrop.iLeftOffset;
   pDstInfo->iBufferStatus = 1;
 
-  if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) //no buffer output if EC is disabled and frame incomplete
+  if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) //no buffer output if EC is disabled and frame incomplete
     pDstInfo->iBufferStatus = (int32_t) bFrameCompleteFlag;
 
   if (!bFrameCompleteFlag) {
@@ -129,7 +129,7 @@ inline void    HandleReferenceLostL0 (PWelsDecoderContext pCtx, PNalUnit pCurNal
   if (0 == pCurNal->sNalHeaderExt.uiTemporalId) {
     pCtx->bReferenceLostAtT0Flag = true;
   }
-  if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
+  if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
 #ifndef LONG_TERM_REF
     if (pCtx->bReferenceLostAtT0Flag) {
       ResetParameterSetsState (pCtx);
@@ -143,7 +143,7 @@ inline void    HandleReferenceLost (PWelsDecoderContext pCtx, PNalUnit pCurNal) 
   if ((0 == pCurNal->sNalHeaderExt.uiTemporalId) || (1 == pCurNal->sNalHeaderExt.uiTemporalId)) {
     pCtx->bReferenceLostAtT0Flag = true;
   }
-  if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
+  if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
 #ifndef LONG_TERM_REF
     if (pCtx->bReferenceLostAtT0Flag) {
       ResetParameterSetsState (pCtx);
@@ -959,7 +959,7 @@ int32_t UpdateAccessUnit (PWelsDecoderContext pCtx) {
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
                "UpdateAccessUnit():::::Key frame lost.....CAN NOT find IDR from current AU.\n");
       pCtx->iErrorCode |= dsRefLost;
-      if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
+      if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
 #ifdef LONG_TERM_REF
         pCtx->iErrorCode |= dsNoParamSets;
         return dsNoParamSets;
@@ -1887,7 +1887,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
                      pSh->iFrameNum);
 
             pCtx->iErrorCode |= dsRefLost;
-            if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
+            if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
 #ifdef LONG_TERM_REF
               pCtx->bParamSetsLostFlag = true;
 #else
@@ -1906,7 +1906,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
             WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
                      "reference picture introduced by this frame is lost during transmission! uiTId: %d\n",
                      pNalCur->sNalHeaderExt.uiTemporalId);
-            if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
+            if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
               return iRet;
             }
           }
@@ -1920,7 +1920,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
                    "DecodeCurrentAccessUnit() failed (%d) in frame: %d uiDId: %d uiQId: %d\n",
                    iRet, pSh->iFrameNum, iCurrIdD, iCurrIdQ);
           HandleReferenceLostL0 (pCtx, pNalCur);
-          if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
+          if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
             return iRet;
           }
         }
@@ -1976,7 +1976,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //store latest decoded picture for EC
         iRet = WelsMarkAsRef (pCtx);
         if (iRet != ERR_NONE) {
-          if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
+          if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
             pCtx->pDec = NULL;
             return iRet;
           }

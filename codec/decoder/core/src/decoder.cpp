@@ -160,7 +160,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->pPicBuff[LIST_1]		= NULL;
 
   pCtx->bAvcBasedFlag			= true;
-  pCtx->iErrorConMethod = ERROR_CON_SLICE_COPY;
+  pCtx->eErrorConMethod = ERROR_CON_SLICE_COPY;
   pCtx->pPreviousDecodedPictureInDpb = NULL;
 
 }
@@ -332,7 +332,7 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
 
   memcpy (pCtx->pParam, kpParam, sizeof (SDecodingParam));
   pCtx->iOutputColorFormat	= pCtx->pParam->iOutputColorFormat;
-  pCtx->bErrorResilienceFlag	= pCtx->pParam->uiEcActiveFlag ? true : false;
+  pCtx->eErrorConMethod = pCtx->pParam->eEcActiveIdc;
 
   if (VIDEO_BITSTREAM_SVC == pCtx->pParam->sVideoProperty.eVideoBsType ||
       VIDEO_BITSTREAM_AVC == pCtx->pParam->sVideoProperty.eVideoBsType) {
@@ -462,7 +462,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 
           iConsumedBytes = 0;
           pNalPayload	= ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
-          if ((pCtx->iErrorConMethod != ERROR_CON_DISABLE) && (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1))) {
+          if ((pCtx->eErrorConMethod != ERROR_CON_DISABLE) && (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1))) {
             CheckAndDoEC (pCtx, ppDst, pDstBufInfo);
           }
           if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType) && pNalPayload) {
@@ -477,7 +477,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 #else
               pCtx->bReferenceLostAtT0Flag = true;
 #endif
-              if ((pCtx->iErrorConMethod == ERROR_CON_DISABLE) || (dsOutOfMemory & pCtx->iErrorCode))
+              if ((pCtx->eErrorConMethod == ERROR_CON_DISABLE) || (dsOutOfMemory & pCtx->iErrorCode))
                 ResetParameterSetsState (pCtx);
 
               if (dsOutOfMemory & pCtx->iErrorCode) {
@@ -493,7 +493,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 #else
               pCtx->bReferenceLostAtT0Flag = true;
 #endif
-              if ((pCtx->iErrorConMethod == ERROR_CON_DISABLE) || (dsOutOfMemory & pCtx->iErrorCode)) 
+              if ((pCtx->eErrorConMethod == ERROR_CON_DISABLE) || (dsOutOfMemory & pCtx->iErrorCode))
                 ResetParameterSetsState (pCtx);
             }
             return pCtx->iErrorCode;
@@ -522,7 +522,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 
     iConsumedBytes = 0;
     pNalPayload = ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
-    if ((pCtx->iErrorConMethod != ERROR_CON_DISABLE) && (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1))) {
+    if ((pCtx->eErrorConMethod != ERROR_CON_DISABLE) && (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1))) {
       CheckAndDoEC (pCtx, ppDst, pDstBufInfo);
     }
     if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType) && pNalPayload) {
@@ -537,7 +537,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 #else
         pCtx->bReferenceLostAtT0Flag = true;
 #endif
-        if ((pCtx->iErrorConMethod == ERROR_CON_DISABLE) || (dsOutOfMemory & pCtx->iErrorCode))
+        if ((pCtx->eErrorConMethod == ERROR_CON_DISABLE) || (dsOutOfMemory & pCtx->iErrorCode))
           ResetParameterSetsState (pCtx);
         return pCtx->iErrorCode;
       }
@@ -573,7 +573,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 #else
         pCtx->bReferenceLostAtT0Flag = true;
 #endif
-        if ((pCtx->iErrorConMethod == ERROR_CON_DISABLE) || (dsOutOfMemory & pCtx->iErrorCode))
+        if ((pCtx->eErrorConMethod == ERROR_CON_DISABLE) || (dsOutOfMemory & pCtx->iErrorCode))
           ResetParameterSetsState (pCtx);
         return pCtx->iErrorCode;
       }

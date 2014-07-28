@@ -192,7 +192,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
       if (uiAvailNalNum > 0) {
         pCurAu->uiEndPos = uiAvailNalNum - 1;
-        if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
+        if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
           pCtx->bAuReadyFlag = true;
         }
       }
@@ -211,7 +211,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
       if (uiAvailNalNum > 0) {
         pCurAu->uiEndPos = uiAvailNalNum - 1;
-        if (pCtx->iErrorConMethod == ERROR_CON_DISABLE) {
+        if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
           pCtx->bAuReadyFlag = true;
         }
       }
@@ -327,7 +327,8 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
       return NULL;
     }
 
-    if ((uiAvailNalNum == 1) && CheckNextAuNewSeq (pCtx, pCurNal, pCurNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps)) {
+    if ((uiAvailNalNum == 1)
+        && CheckNextAuNewSeq (pCtx, pCurNal, pCurNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps)) {
       ResetActiveSPSForEachLayer (pCtx);
     }
     if ((uiAvailNalNum > 1) &&
@@ -508,7 +509,7 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
       InitBits (pBs, pRbsp, iBitSize);
     iErr = ParseSps (pCtx, pBs, &iPicWidth, &iPicHeight);
     if (ERR_NONE != iErr) {	// modified for pSps/pSubsetSps invalid, 12/1/2009
-      if (pCtx->iErrorConMethod == ERROR_CON_DISABLE)
+      if (pCtx->eErrorConMethod == ERROR_CON_DISABLE)
         pCtx->iErrorCode |= dsNoParamSets;
       else
         pCtx->iErrorCode |= dsBitstreamError;
@@ -522,7 +523,7 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
       InitBits (pBs, pRbsp, iBitSize);
     iErr = ParsePps (pCtx, &pCtx->sPpsBuffer[0], pBs);
     if (ERR_NONE != iErr) {	// modified for pps invalid, 12/1/2009
-      if (pCtx->iErrorConMethod == ERROR_CON_DISABLE)
+      if (pCtx->eErrorConMethod == ERROR_CON_DISABLE)
         pCtx->iErrorCode |= dsNoParamSets;
       else
         pCtx->iErrorCode |= dsBitstreamError;

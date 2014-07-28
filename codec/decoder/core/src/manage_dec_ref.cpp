@@ -112,7 +112,7 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
 
   if ((pCtx->sRefPic.uiShortRefCount[LIST_0] + pCtx->sRefPic.uiLongRefCount[LIST_0] <= 0) && (pCtx->eSliceType != I_SLICE
       && pCtx->eSliceType != SI_SLICE)) {
-    if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) { //IDR lost!, recover it for future decoding with data all set to 0
+    if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) { //IDR lost!, recover it for future decoding with data all set to 0
       PPicture pRef = PrefetchPic (pCtx->pPicBuff[0]);
       if (pRef != NULL) {
         memset (pRef->pData[0], 128, pRef->iLinesize[0] * pRef->iHeightInPixel);
@@ -259,7 +259,7 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
     if (pRefPicMarking->bAdaptiveRefPicMarkingModeFlag) {
       iRet = MMCO (pCtx, pRefPicMarking);
       if (iRet != ERR_NONE) {
-        if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) {
+        if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
           iRet = RemainOneBufferInDpbForEC (pCtx);
         } else {
           return iRet;
@@ -274,7 +274,7 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
     } else {
       iRet = SlidingWindow (pCtx);
       if (iRet != ERR_NONE) {
-        if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) {
+        if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
           iRet = RemainOneBufferInDpbForEC (pCtx);
         } else {
           return iRet;
@@ -285,7 +285,7 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
 
   if (!pCtx->pDec->bIsLongRef) {
     if (pRefPic->uiLongRefCount[LIST_0] + pRefPic->uiShortRefCount[LIST_0] >= WELS_MAX (1, pCtx->pSps->iNumRefFrames)) {
-      if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) {
+      if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
         iRet = RemainOneBufferInDpbForEC (pCtx);
       } else {
         return ERR_INFO_INVALID_MMCO_REF_NUM_OVERFLOW;

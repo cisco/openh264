@@ -41,7 +41,7 @@
 namespace WelsDec {
 //Init
 void InitErrorCon (PWelsDecoderContext pCtx) {
-  if (pCtx->iErrorConMethod == ERROR_CON_SLICE_COPY) {
+  if (pCtx->eErrorConMethod == ERROR_CON_SLICE_COPY) {
     pCtx->sCopyFunc.pCopyLumaFunc = WelsCopy16x16_c;
     pCtx->sCopyFunc.pCopyChromaFunc = WelsCopy8x8_c;
 
@@ -64,8 +64,8 @@ void InitErrorCon (PWelsDecoderContext pCtx) {
 
 #if defined(HAVE_NEON_AARCH64)
     if (pCtx->uiCpuFlag & WELS_CPU_NEON) {
-        pCtx->sCopyFunc.pCopyLumaFunc		= WelsCopy16x16_AArch64_neon; //aligned
-        pCtx->sCopyFunc.pCopyChromaFunc		= WelsCopy8x8_AArch64_neon; //aligned
+      pCtx->sCopyFunc.pCopyLumaFunc		= WelsCopy16x16_AArch64_neon; //aligned
+      pCtx->sCopyFunc.pCopyChromaFunc		= WelsCopy8x8_AArch64_neon; //aligned
     }
 #endif //HAVE_NEON_AARCH64
   } //TODO add more methods here
@@ -180,12 +180,12 @@ bool NeedErrorCon (PWelsDecoderContext pCtx) {
 // ImplementErrorConceal
 // Do actual error concealment
 void ImplementErrorCon (PWelsDecoderContext pCtx) {
-  if (ERROR_CON_DISABLE == pCtx->iErrorConMethod) {
+  if (ERROR_CON_DISABLE == pCtx->eErrorConMethod) {
     pCtx->iErrorCode |= dsBitstreamError;
     return;
-  } else if (ERROR_CON_FRAME_COPY == pCtx->iErrorConMethod) {
+  } else if (ERROR_CON_FRAME_COPY == pCtx->eErrorConMethod) {
     DoErrorConFrameCopy (pCtx);
-  } else if (ERROR_CON_SLICE_COPY == pCtx->iErrorConMethod) {
+  } else if (ERROR_CON_SLICE_COPY == pCtx->eErrorConMethod) {
     DoErrorConSliceCopy (pCtx);
   } //TODO add other EC methods here in the future
   pCtx->iErrorCode |= dsDataErrorConcealed;
