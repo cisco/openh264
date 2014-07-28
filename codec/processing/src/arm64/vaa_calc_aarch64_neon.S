@@ -77,6 +77,7 @@
     ABS_SUB_SUM_16BYTES \arg0, \arg1
     ABS_SUB_SUM_16BYTES \arg0, \arg1
     ABS_SUB_SUM_16BYTES \arg0, \arg1
+.endm
 #endif
 
 /*
