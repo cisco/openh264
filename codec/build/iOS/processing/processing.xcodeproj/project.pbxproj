@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4CC6094F197E009D00BE8B8B /* down_sample_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CC6094E197E009D00BE8B8B /* down_sample_aarch64_neon.S */; };
+		4CC6095A1980F34F00BE8B8B /* vaa_calc_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4CC609591980F34F00BE8B8B /* vaa_calc_aarch64_neon.S */; };
 		54994780196A3F3900BA3D87 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5499477F196A3F3900BA3D87 /* Foundation.framework */; };
 		549947DF196A3FB400BA3D87 /* AdaptiveQuantization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 549947A9196A3FB400BA3D87 /* AdaptiveQuantization.cpp */; };
 		549947E0196A3FB400BA3D87 /* adaptive_quantization.S in Sources */ = {isa = PBXBuildFile; fileRef = 549947AC196A3FB400BA3D87 /* adaptive_quantization.S */; };
@@ -48,6 +49,7 @@
 
 /* Begin PBXFileReference section */
 		4CC6094E197E009D00BE8B8B /* down_sample_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = down_sample_aarch64_neon.S; path = arm64/down_sample_aarch64_neon.S; sourceTree = "<group>"; };
+		4CC609591980F34F00BE8B8B /* vaa_calc_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = vaa_calc_aarch64_neon.S; path = arm64/vaa_calc_aarch64_neon.S; sourceTree = "<group>"; };
 		5499477C196A3F3900BA3D87 /* libprocessing.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libprocessing.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		5499477F196A3F3900BA3D87 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		54994790196A3F3900BA3D87 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
@@ -111,6 +113,7 @@
 			isa = PBXGroup;
 			children = (
 				6C749B77197E2A2000A111F9 /* adaptive_quantization_aarch64_neon.S */,
+				4CC609591980F34F00BE8B8B /* vaa_calc_aarch64_neon.S */,
 				4CC6094E197E009D00BE8B8B /* down_sample_aarch64_neon.S */,
 			);
 			name = arm64;
@@ -358,6 +361,7 @@
 				549947E2196A3FB400BA3D87 /* pixel_sad_neon.S in Sources */,
 				549947F0196A3FB400BA3D87 /* SceneChangeDetection.cpp in Sources */,
 				4CC6094F197E009D00BE8B8B /* down_sample_aarch64_neon.S in Sources */,
+				4CC6095A1980F34F00BE8B8B /* vaa_calc_aarch64_neon.S in Sources */,
 				549947F2196A3FB400BA3D87 /* ScrollDetectionFuncs.cpp in Sources */,
 				549947EF196A3FB400BA3D87 /* imagerotatefuncs.cpp in Sources */,
 				549947DF196A3FB400BA3D87 /* AdaptiveQuantization.cpp in Sources */,
