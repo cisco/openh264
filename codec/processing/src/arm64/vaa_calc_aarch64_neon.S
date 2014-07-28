@@ -36,19 +36,19 @@
 
 #ifdef __APPLE__
 .macro ABS_SUB_SUM_16BYTES
-	ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
-	uabal   $0, v0.8b, v1.8b
-	uabal2  $1, v0.16b,v1.16b
+    ld1     {v0.16b}, [x0], x4
+    ld1     {v1.16b}, [x1], x4
+    uabal   $0, v0.8b, v1.8b
+    uabal2  $1, v0.16b,v1.16b
 .endm
 
 .macro ABS_SUB_SUM_8x16BYTES
-	ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
-	uabdl   $0, v0.8b, v1.8b
-	uabdl2  $1, v0.16b,v1.16b
+    ld1     {v0.16b}, [x0], x4
+    ld1     {v1.16b}, [x1], x4
+    uabdl   $0, v0.8b, v1.8b
+    uabdl2  $1, v0.16b,v1.16b
 
-	ABS_SUB_SUM_16BYTES $0, $1
+    ABS_SUB_SUM_16BYTES $0, $1
     ABS_SUB_SUM_16BYTES $0, $1
     ABS_SUB_SUM_16BYTES $0, $1
     ABS_SUB_SUM_16BYTES $0, $1
@@ -58,19 +58,19 @@
 .endm
 #else
 .macro ABS_SUB_SUM_16BYTES arg0, arg1
-	ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
-	uabal   \arg0, v0.8b, v1.8b
-	uabal2  \arg1, v0.16b,v1.16b
+    ld1     {v0.16b}, [x0], x4
+    ld1     {v1.16b}, [x1], x4
+    uabal   \arg0, v0.8b, v1.8b
+    uabal2  \arg1, v0.16b,v1.16b
 .endm
 
 .macro ABS_SUB_SUM_8x16BYTES arg0, arg1
-	ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
-	uabdl   \arg0, v0.8b, v1.8b
-	uabdl2  \arg1, v0.16b,v1.16b
+    ld1     {v0.16b}, [x0], x4
+    ld1     {v1.16b}, [x1], x4
+    uabdl   \arg0, v0.8b, v1.8b
+    uabdl2  \arg1, v0.16b,v1.16b
 
-	ABS_SUB_SUM_16BYTES \arg0, \arg1
+    ABS_SUB_SUM_16BYTES \arg0, \arg1
     ABS_SUB_SUM_16BYTES \arg0, \arg1
     ABS_SUB_SUM_16BYTES \arg0, \arg1
     ABS_SUB_SUM_16BYTES \arg0, \arg1
@@ -82,7 +82,7 @@
 
 /*
  * void vaa_calc_sad_neon(uint8_t *cur_data, uint8_t *ref_data, int32_t pic_width, int32_t pic_height, int32_t pic_stride,
- *						int32_t *psadframe, int32_t *psad8x8)
+ *                      int32_t *psadframe, int32_t *psad8x8)
  */
 WELS_ASM_AARCH64_FUNC_BEGIN VAACalcSad_AArch64_neon
     eor     v31.16b, v31.16b, v31.16b
@@ -121,14 +121,14 @@ WELS_ASM_AARCH64_FUNC_END
 
 .macro SAD_SD_MAD_8x16BYTES
     ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
+    ld1     {v1.16b}, [x1], x4
     uabd    v31.16b, v0.16b, v1.16b
     uaddlp  v2.8h, v31.16b
     uaddlp  v4.8h, v0.16b
     uaddlp  v5.8h, v1.16b
 .rept 7
     ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
+    ld1     {v1.16b}, [x1], x4
     uabd    v30.16b, v0.16b, v1.16b
     umax    v31.16b, v31.16b,v30.16b
     uadalp  v2.8h, v30.16b
@@ -138,7 +138,7 @@ WELS_ASM_AARCH64_FUNC_END
 .endm
 /*
  * void vaa_calc_sad_bgd_neon(uint8_t *cur_data, uint8_t *ref_data, int32_t pic_width, int32_t pic_height, int32_t pic_stride,
- *							   int32_t *psadframe, int32_t *psad8x8, int32_t *p_sd8x8, uint8_t *p_mad8x8)
+ *                             int32_t *psadframe, int32_t *psad8x8, int32_t *p_sd8x8, uint8_t *p_mad8x8)
  */
 WELS_ASM_AARCH64_FUNC_BEGIN VAACalcSadBgd_AArch64_neon
     ldr     x15, [sp, #0]
@@ -196,7 +196,7 @@ WELS_ASM_AARCH64_FUNC_END
 
 .macro SAD_SSD_BGD_8x16BYTES_1
     ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
+    ld1     {v1.16b}, [x1], x4
     uabd    v31.16b, v0.16b, v1.16b
     umull   v30.8h, v31.8b, v31.8b
     uaddlp  v29.4s, v30.8h
@@ -214,7 +214,7 @@ WELS_ASM_AARCH64_FUNC_END
     uaddlp  v5.8h, v1.16b
 .rept 7
     ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
+    ld1     {v1.16b}, [x1], x4
     uabd    v3.16b, v0.16b, v1.16b
     umax    v31.16b, v31.16b,v3.16b     //p_mad
     umull   v30.8h, v3.8b, v3.8b
@@ -236,7 +236,7 @@ WELS_ASM_AARCH64_FUNC_END
 
 .macro SAD_SSD_BGD_8x16BYTES_2
     ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
+    ld1     {v1.16b}, [x1], x4
     uabd    v26.16b, v0.16b, v1.16b
     umull   v30.8h, v26.8b, v26.8b
     uadalp  v29.4s, v30.8h
@@ -254,7 +254,7 @@ WELS_ASM_AARCH64_FUNC_END
     uaddlp  v7.8h, v1.16b
 .rept 7
     ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
+    ld1     {v1.16b}, [x1], x4
     uabd    v3.16b, v0.16b, v1.16b
     umax    v26.16b, v26.16b,v3.16b     //p_mad
     umull   v30.8h, v3.8b, v3.8b
@@ -347,7 +347,7 @@ WELS_ASM_AARCH64_FUNC_END
 
 .macro SAD_SSD_8x16BYTES_1
     ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
+    ld1     {v1.16b}, [x1], x4
     uabd    v31.16b, v0.16b, v1.16b
     umull   v30.8h, v31.8b, v31.8b
     uaddlp  v29.4s, v30.8h
@@ -363,7 +363,7 @@ WELS_ASM_AARCH64_FUNC_END
     uaddlp  v2.8h, v31.16b      //  p_sad
 .rept 7
     ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
+    ld1     {v1.16b}, [x1], x4
     uabd    v3.16b, v0.16b, v1.16b
     umull   v30.8h, v3.8b, v3.8b
     uadalp  v29.4s, v30.8h
@@ -382,7 +382,7 @@ WELS_ASM_AARCH64_FUNC_END
 
 .macro SAD_SSD_8x16BYTES_2
     ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
+    ld1     {v1.16b}, [x1], x4
     uabd    v26.16b, v0.16b, v1.16b
     umull   v30.8h, v26.8b, v26.8b
     uadalp  v29.4s, v30.8h
@@ -400,7 +400,7 @@ WELS_ASM_AARCH64_FUNC_END
     uaddlp  v7.8h, v1.16b
 .rept 7
     ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
+    ld1     {v1.16b}, [x1], x4
     uabd    v3.16b, v0.16b, v1.16b
     umull   v30.8h, v3.8b, v3.8b
     uadalp  v29.4s, v30.8h
@@ -469,7 +469,7 @@ WELS_ASM_AARCH64_FUNC_END
 
 .macro SAD_VAR_8x16BYTES_1
     ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
+    ld1     {v1.16b}, [x1], x4
     uabd    v31.16b, v0.16b, v1.16b
     uaddlp  v2.8h, v31.16b      //  p_sad
 
@@ -481,7 +481,7 @@ WELS_ASM_AARCH64_FUNC_END
 
 .rept 7
     ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
+    ld1     {v1.16b}, [x1], x4
     uabd    v3.16b, v0.16b, v1.16b
     uadalp  v2.8h, v3.16b              //p_sad
 
@@ -494,7 +494,7 @@ WELS_ASM_AARCH64_FUNC_END
 .endm
 .macro SAD_VAR_8x16BYTES_2
     ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
+    ld1     {v1.16b}, [x1], x4
     uabd    v26.16b, v0.16b, v1.16b
     uaddlp  v16.8h,v26.16b      //  p_sad
 
@@ -505,7 +505,7 @@ WELS_ASM_AARCH64_FUNC_END
     uadalp  v27.4s, v30.8h      //  p_sqsum
 .rept 7
     ld1     {v0.16b}, [x0], x4
-	ld1     {v1.16b}, [x1], x4
+    ld1     {v1.16b}, [x1], x4
     uabd    v3.16b, v0.16b, v1.16b
     uadalp  v16.8h, v3.16b              //p_sad
 
