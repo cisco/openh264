@@ -1,6 +1,8 @@
 #!/bin/bash
 
 AUTO_TEST_PATH=`pwd`
+IOS=0
+ANDROID=0
 #Prepare GTEST
 AUTO_TEST_SRC_PATH="../../"
 cd ${AUTO_TEST_SRC_PATH}
@@ -36,7 +38,7 @@ else
    echo Start to run the unittest on android devices
    ANDROID=1
    cd ./android
-   bash run_AutoTest_android.sh
+   #bash run_AutoTest_android.sh
    cd ${AUTO_TEST_PATH}
    if [ $? -ne 0 ];then
    echo There is something wrong happened when runing unittest on android devices,please to check
@@ -47,12 +49,12 @@ fi
  DEVICES=`system_profiler SPUSBDataType | sed -n -e '/iPad/,/Serial/p' -e '/iPhone/,/Serial/p' | grep "Serial Number:" | awk -F ": " '{print $2}'`
  if [ "${DEVICES}#" == "#" ]
  then
- echo "Can not find any connected device! please check device is connected to MAC!"
+ echo "Can not find any ios devices!"
 else
   echo Start to run the unittest on ios devices
   IOS=1
   cd ./ios
-  bash run_AutoTest_ios.sh
+  #bash run_AutoTest_ios.sh
   cd ${AUTO_TEST_PATH}
  if [ $? -ne 0 ];then
  echo There is something wrong happened when runing unittest on ios devices,please to check
@@ -71,7 +73,7 @@ elif [ ${ret} -eq 1 ];then
 echo Unit test run failed
 fi
 fi
-if [ $IOS = "1" ];then
+if [ ${IOS} = "1" ];then
 bash run_ParseUTxml.sh ./ios/report
 ret=$?
 if [ $ret -eq 0 ];then
