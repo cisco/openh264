@@ -404,12 +404,6 @@ TEST_F (EncoderInterfaceTest, BasicInitializeTestFalse) {
   iResult = pPtrEnc->Initialize (&sEncParamBase);
   EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
 
-  //iUsageType
-  GetValidEncParamBase (&sEncParamBase);
-  sEncParamBase.iRCMode = static_cast<RC_MODES> (3);
-  iResult = pPtrEnc->Initialize (&sEncParamBase);
-  EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
-
   uiTraceLevel = WELS_LOG_ERROR;
   pPtrEnc->SetOption (ENCODER_OPTION_TRACE_LEVEL, &uiTraceLevel);
 }
