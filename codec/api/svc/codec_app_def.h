@@ -355,7 +355,7 @@ typedef struct {
 typedef struct TagSVCDecodingParam {
   char*		pFileNameRestructed;	// File name of restructed frame used for PSNR calculation based debug
 
-  int				iOutputColorFormat;	// color space format to be outputed, EVideoFormatType specified in codec_def.h
+  EVideoFormatType eOutputColorFormat;	// color space format to be outputed, EVideoFormatType specified in codec_def.h
   unsigned int	uiCpuLoad;		// CPU load
   unsigned char	uiTargetDqLayer;	// Setting target dq layer id
 

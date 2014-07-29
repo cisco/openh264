@@ -168,13 +168,13 @@ SLogContext sLogCtx;
 // Input
 void*				pArgDec;			// structured arguments for decoder, reserved here for extension in the future
 
-SDataBuffer       	sRawData;
+SDataBuffer                     sRawData;
 
 // Configuration
-SDecodingParam*    	pParam;
+SDecodingParam*                 pParam;
 uint32_t			uiCpuFlag;			// CPU compatibility detected
 
-int32_t				iOutputColorFormat;		// color space format to be outputed
+EVideoFormatType eOutputColorFormat;		// color space format to be outputed
 VIDEO_BITSTREAM_TYPE eVideoType; //indicate the type of video to decide whether or not to do qp_delta error detection.
 bool				bHaveGotMemory;	// global memory for decoder context related ever requested?
 
