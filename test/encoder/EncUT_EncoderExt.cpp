@@ -316,8 +316,8 @@ TEST_F (EncoderInterfaceTest, MemoryCheckTest) {
 
 void GetValidEncParamBase (SEncParamBase* pEncParamBase) {
   pEncParamBase->iUsageType = CAMERA_VIDEO_REAL_TIME;
-  pEncParamBase->iPicWidth = 2 + ((rand() * 2) % (MAX_WIDTH - 2));
-  pEncParamBase->iPicHeight = 2 + ((rand() * 2) % (MAX_HEIGHT - 2));
+  pEncParamBase->iPicWidth = 2 + ((rand() % ((MAX_WIDTH >> 1) - 1)) << 1);
+  pEncParamBase->iPicHeight = 2 + ((rand() % ((MAX_HEIGHT >> 1) - 1)) << 1);
   pEncParamBase->iPicWidth = VALID_SIZE(pEncParamBase->iPicWidth);
   pEncParamBase->iPicHeight = VALID_SIZE(pEncParamBase->iPicHeight);
   pEncParamBase->iTargetBitrate = rand() + 1; //!=0
