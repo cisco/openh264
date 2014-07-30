@@ -50,29 +50,7 @@
 #define WELSVP_NAMESPACE_BEGIN      namespace nsWelsVP {
 #define WELSVP_NAMESPACE_END        }
 
-#include <stddef.h>
-#ifndef _MSC_VER
-#include <stdint.h>
-#endif
-
-WELSVP_NAMESPACE_BEGIN
-
-#if defined(_MSC_VER)
-
-typedef signed char        int8_t   ;
-typedef unsigned char      uint8_t  ;
-typedef short              int16_t  ;
-typedef unsigned short     uint16_t ;
-typedef int                int32_t  ;
-typedef unsigned int       uint32_t ;
-typedef __int64            int64_t  ;
-typedef unsigned __int64   uint64_t ;
-#if _MSC_VER < 1700
-#define inline            __inline
-#endif
-
-#endif
-
-WELSVP_NAMESPACE_END
+// Get the stdint type definitions from typedefs.h in the common lib
+#include "typedefs.h"
 
 #endif
