@@ -325,7 +325,7 @@ typedef struct TagEncParamExt {
   unsigned int uiMaxNalSize;
 
   /*LTR settings*/
-  bool     bEnableLongTermReference; // 0: on, 1: off
+  bool     bEnableLongTermReference; // 1: on, 0: off
   int	   iLTRRefNum;
   unsigned int      iLtrMarkPeriod;
 
