@@ -38,7 +38,7 @@ else
    echo Start to run the unittest on android devices
    ANDROID=1
    cd ./android
-   #bash run_AutoTest_android.sh
+   bash run_AutoTest_android.sh
    cd ${AUTO_TEST_PATH}
    if [ $? -ne 0 ];then
    echo There is something wrong happened when runing unittest on android devices,please to check
@@ -54,7 +54,7 @@ else
   echo Start to run the unittest on ios devices
   IOS=1
   cd ./ios
-  #bash run_AutoTest_ios.sh
+  bash run_AutoTest_ios.sh
   cd ${AUTO_TEST_PATH}
  if [ $? -ne 0 ];then
  echo There is something wrong happened when runing unittest on ios devices,please to check
