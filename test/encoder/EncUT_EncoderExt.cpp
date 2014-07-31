@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "codec_api.h"
 #include "codec_app_def.h"
+#include "test_stdint.h"
 //TODO: consider using BaseEncoderTest class from #include "../BaseEncoderTest.h"
 
 class EncoderInterfaceTest : public ::testing::Test {
