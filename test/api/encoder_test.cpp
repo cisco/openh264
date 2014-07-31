@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "utils/HashFunctions.h"
 #include "BaseEncoderTest.h"
-
+#include <string>
 static void UpdateHashFromFrame (const SFrameBSInfo& info, SHA1Context* ctx) {
   for (int i = 0; i < info.iLayerNum; ++i) {
     const SLayerBSInfo& layerInfo = info.sLayerInfo[i];
@@ -57,8 +57,12 @@ class EncoderOutputTest : public ::testing::WithParamInterface<EncodeFileParam>,
 
 TEST_P (EncoderOutputTest, CompareOutput) {
   EncodeFileParam p = GetParam();
+#if defined(ANDROID_NDK)
+  std::string filename = std::string ("/sdcard/") + p.fileName;
+  EncodeFile (filename.c_str(), p.usageType , p.width, p.height, p.frameRate, p.slices, p.denoise, p.layers, this);
+#else
   EncodeFile (p.fileName, p.usageType , p.width, p.height, p.frameRate, p.slices, p.denoise, p.layers, this);
-
+#endif
   //will remove this after screen content algorithms are ready,
   //because the bitstream output will vary when the different algorithms are added.
   unsigned char digest[SHA_DIGEST_LENGTH];
@@ -67,7 +71,6 @@ TEST_P (EncoderOutputTest, CompareOutput) {
     CompareHash (digest, p.hashStr);
   }
 }
-
 static const EncodeFileParam kFileParamArray[] = {
   {
     "res/CiscoVT2people_320x192_12fps.yuv",

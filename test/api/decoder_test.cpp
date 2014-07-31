@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "utils/HashFunctions.h"
 #include "BaseDecoderTest.h"
+#include <string>
 
 static void UpdateHashFromPlane (SHA1Context* ctx, const uint8_t* plane,
                                  int width, int height, int stride) {
@@ -52,7 +53,12 @@ class DecoderOutputTest : public ::testing::WithParamInterface<FileParam>,
 
 TEST_P (DecoderOutputTest, CompareOutput) {
   FileParam p = GetParam();
+#if defined(ANDROID_NDK)
+  std::string filename = std::string ("/sdcard/") + p.fileName;
+  DecodeFile (filename.c_str(), this);
+#else
   DecodeFile (p.fileName, this);
+#endif
 
   unsigned char digest[SHA_DIGEST_LENGTH];
   SHA1Result (&ctx_, digest);
@@ -60,7 +66,6 @@ TEST_P (DecoderOutputTest, CompareOutput) {
     CompareHash (digest, p.hashStr);
   }
 }
-
 static const FileParam kFileParamArray[] = {
   {"res/test_vd_1d.264", "5827d2338b79ff82cd091c707823e466197281d3"},
   {"res/test_vd_rc.264", "eea02e97bfec89d0418593a8abaaf55d02eaa1ca"},

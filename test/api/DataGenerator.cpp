@@ -22,7 +22,11 @@ bool YUVPixelDataGenerator (uint8_t* pPointer, int32_t iWidth, int32_t iHeight, 
   }
 
   FileInputStream fileStream;
+#if defined(ANDROID_NDK)
+  if (!fileStream.Open ("/sdcard/res/CiscoVT2people_160x96_6fps.yuv")) {
+#else
   if (!fileStream.Open ("res/CiscoVT2people_160x96_6fps.yuv")) {
+#endif
     return false;
   }
   if (fileStream.read (sBuf.data(), kiFrameSize) == kiFrameSize) {
