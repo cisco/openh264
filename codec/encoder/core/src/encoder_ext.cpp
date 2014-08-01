@@ -418,12 +418,6 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
         pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint =  pCodingParam->uiMaxNalSize - NAL_HEADER_ADD_0X30BYTES;
       }
 
-      // considering the coding efficient and performance, iCountMbNum constraint by MIN_NUM_MB_PER_SLICE condition of multi-pSlice mode settting
-      if (iMbWidth * iMbHeight <= MIN_NUM_MB_PER_SLICE) {
-        pSpatialLayer->sSliceCfg.uiSliceMode	= SM_SINGLE_SLICE;
-        pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum	= 1;
-        break;
-      }
     }
     break;
     default: {
