@@ -134,7 +134,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
 
   pCtx->pArgDec                   = NULL;
 
-  pCtx->iOutputColorFormat		= videoFormatI420;	// yuv in default
+  pCtx->eOutputColorFormat		= videoFormatI420;	// yuv in default
   pCtx->bHaveGotMemory			= false;	// not ever request memory blocks for decoder context related
   pCtx->uiCpuFlag					= 0;
 
@@ -331,7 +331,7 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
     return 1;
 
   memcpy (pCtx->pParam, kpParam, sizeof (SDecodingParam));
-  pCtx->iOutputColorFormat	= pCtx->pParam->iOutputColorFormat;
+  pCtx->eOutputColorFormat	= pCtx->pParam->eOutputColorFormat;
   pCtx->eErrorConMethod = pCtx->pParam->eEcActiveIdc;
 
   if (VIDEO_BITSTREAM_SVC == pCtx->pParam->sVideoProperty.eVideoBsType ||
@@ -589,9 +589,15 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 int32_t DecoderSetCsp (PWelsDecoderContext pCtx, const int32_t kiColorFormat) {
   WELS_VERIFY_RETURN_IF (1, (NULL == pCtx));
 
-  pCtx->iOutputColorFormat	= kiColorFormat;
+  pCtx->eOutputColorFormat	= (EVideoFormatType) kiColorFormat;
   if (pCtx->pParam != NULL) {
-    pCtx->pParam->iOutputColorFormat	= kiColorFormat;
+    pCtx->pParam->eOutputColorFormat	= (EVideoFormatType) kiColorFormat;
+  }
+
+  //For now, support only videoFormatI420!
+  if (kiColorFormat != (int32_t) videoFormatI420) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "Support I420 output only for now! Change to I420...\n");
+    pCtx->pParam->eOutputColorFormat = pCtx->eOutputColorFormat = videoFormatI420;
   }
 
   return 0;

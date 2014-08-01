@@ -24,8 +24,8 @@ class DecoderInterfaceTest : public ::testing::Test {
   }
   //Init members
   void Init();
-  //Uninit
-  void Uninit() {}
+  //Uninit members
+  void Uninit();
   //Mock input data for test
   void MockPacketType (const EWelsNalUnitType eNalUnitType);
   //Test Initialize/Uninitialize
@@ -72,7 +72,7 @@ void DecoderInterfaceTest::Init() {
   memset (&m_sBufferInfo, 0, sizeof (SBufferInfo));
   memset (&m_sDecParam, 0, sizeof (SDecodingParam));
   m_sDecParam.pFileNameRestructed = NULL;
-  m_sDecParam.iOutputColorFormat = rand() % 100;
+  m_sDecParam.eOutputColorFormat = (EVideoFormatType) (rand() % 100);
   m_sDecParam.uiCpuLoad = rand() % 100;
   m_sDecParam.uiTargetDqLayer = rand() % 100;
   m_sDecParam.eEcActiveIdc = (ERROR_CON_IDC) (rand() & 3);
@@ -83,6 +83,19 @@ void DecoderInterfaceTest::Init() {
   m_szBuffer[0] = m_szBuffer[1] = m_szBuffer[2] = 0;
   m_szBuffer[3] = 1;
   m_iBufLength = 4;
+  CM_RETURN eRet = (CM_RETURN) m_pDec->Initialize (&m_sDecParam);
+  ASSERT_EQ (eRet, cmResultSuccess);
+}
+
+void DecoderInterfaceTest::Uninit() {
+  if (m_pDec) {
+    CM_RETURN eRet = (CM_RETURN) m_pDec->Uninitialize();
+    ASSERT_EQ (eRet, cmResultSuccess);
+  }
+  memset (&m_sDecParam, 0, sizeof (SDecodingParam));
+  memset (&m_sBufferInfo, 0, sizeof (SBufferInfo));
+  m_pData[0] = m_pData[1] = m_pData[2] = NULL;
+  m_iBufLength = 0;
 }
 
 //Mock input data for test
@@ -128,7 +141,7 @@ void DecoderInterfaceTest::TestInitUninit() {
   eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_DATAFORMAT, &iOutput);
   EXPECT_EQ (eRet, cmInitExpected);
   //Initialize first, can get input color format
-  m_sDecParam.iOutputColorFormat = 20; //just for test
+  m_sDecParam.eOutputColorFormat = (EVideoFormatType) 20; //just for test
   m_pDec->Initialize (&m_sDecParam);
   eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_DATAFORMAT, &iOutput);
   EXPECT_EQ (eRet, cmResultSuccess);
@@ -144,7 +157,21 @@ void DecoderInterfaceTest::TestInitUninit() {
 
 //DECODER_OPTION_DATAFORMAT
 void DecoderInterfaceTest::TestDataFormat() {
-  //TODO
+  int iTmp = rand();
+  int iOut;
+  CM_RETURN eRet;
+
+  //invalid input
+  eRet = (CM_RETURN) m_pDec->SetOption (DECODER_OPTION_DATAFORMAT, NULL);
+  EXPECT_EQ (eRet, cmInitParaError);
+
+  //valid input
+  eRet = (CM_RETURN) m_pDec->SetOption (DECODER_OPTION_DATAFORMAT, &iTmp);
+  EXPECT_EQ (eRet, cmResultSuccess);
+  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_DATAFORMAT, &iOut);
+  EXPECT_EQ (eRet, cmResultSuccess);
+
+  EXPECT_EQ (iOut, (int32_t) videoFormatI420);
 }
 
 //DECODER_OPTION_END_OF_STREAM
@@ -204,10 +231,12 @@ void DecoderInterfaceTest::TestTraceCallbackContext() {
 
 //TEST here for whole tests
 TEST_F (DecoderInterfaceTest, DecoderInterfaceAll) {
-  Init();
 
   //Initialize Uninitialize
   TestInitUninit();
+
+  //AfterInitialize is OK, do the following tests
+  Init();
   //DECODER_OPTION_DATAFORMAT
   TestDataFormat();
   //DECODER_OPTION_END_OF_STREAM
@@ -233,6 +262,8 @@ TEST_F (DecoderInterfaceTest, DecoderInterfaceAll) {
   //DECODER_OPTION_TRACE_CALLBACK_CONTEXT
   TestTraceCallbackContext();
 
+  //uninitialize
+  Uninit();
 }
 
 

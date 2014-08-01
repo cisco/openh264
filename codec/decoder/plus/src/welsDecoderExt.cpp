@@ -304,7 +304,7 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
     return cmInitParaError;
 
   if (DECODER_OPTION_DATAFORMAT == eOptID) {
-    iVal = m_pDecContext->iOutputColorFormat;
+    iVal = (int32_t) m_pDecContext->eOutputColorFormat;
     * ((int*)pOption)	= iVal;
     return cmResultSuccess;
   } else if (DECODER_OPTION_END_OF_STREAM == eOptID) {
