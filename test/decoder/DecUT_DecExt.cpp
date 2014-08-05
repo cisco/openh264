@@ -8,7 +8,9 @@
 #include "ls_defines.h"
 
 using namespace WelsDec;
-
+#define BUF_SIZE 100
+//payload size exclude 6 bytes: 0001, nal type and final '\0'
+#define PAYLOAD_SIZE (BUF_SIZE - 6)
 class DecoderInterfaceTest : public ::testing::Test {
  public:
   virtual void SetUp() {
@@ -27,7 +29,7 @@ class DecoderInterfaceTest : public ::testing::Test {
   //Uninit members
   void Uninit();
   //Mock input data for test
-  void MockPacketType (const EWelsNalUnitType eNalUnitType);
+  void MockPacketType (const EWelsNalUnitType eNalUnitType, const int iPacketLength);
   //Test Initialize/Uninitialize
   void TestInitUninit();
   //DECODER_OPTION_DATAFORMAT
@@ -63,7 +65,7 @@ class DecoderInterfaceTest : public ::testing::Test {
   SDecodingParam m_sDecParam;
   SBufferInfo m_sBufferInfo;
   uint8_t* m_pData[3];
-  char m_szBuffer[100]; //for mocking packet
+  unsigned char m_szBuffer[BUF_SIZE]; //for mocking packet
   int m_iBufLength; //record the valid data in m_szBuffer
 };
 
@@ -99,35 +101,40 @@ void DecoderInterfaceTest::Uninit() {
 }
 
 //Mock input data for test
-void DecoderInterfaceTest::MockPacketType (const EWelsNalUnitType eNalUnitType) {
+void DecoderInterfaceTest::MockPacketType (const EWelsNalUnitType eNalUnitType, const int iPacketLength) {
   switch (eNalUnitType) {
   case NAL_UNIT_SEI:
-    //TODO
+    m_szBuffer[m_iBufLength++] = 6;
     break;
   case NAL_UNIT_SPS:
-    //TODO
+    m_szBuffer[m_iBufLength++] = 67;
     break;
   case NAL_UNIT_PPS:
-    //TODO
+    m_szBuffer[m_iBufLength++] = 68;
     break;
   case NAL_UNIT_SUBSET_SPS:
-    //TODO
+    m_szBuffer[m_iBufLength++] = 15;
     break;
   case NAL_UNIT_PREFIX:
-    //TODO
+    m_szBuffer[m_iBufLength++] = 14;
     break;
   case NAL_UNIT_CODED_SLICE:
-    //TODO
+    m_szBuffer[m_iBufLength++] = 61;
     break;
   case NAL_UNIT_CODED_SLICE_IDR:
-    //TODO
+    m_szBuffer[m_iBufLength++] = 65;
     break;
   default:
-    //TODO
+    m_szBuffer[m_iBufLength++] = 0; //NAL_UNIT_UNSPEC_0
     break;
 
-    m_szBuffer[m_iBufLength] = '\0';
-    m_iBufLength++; //including '\0'
+    int iAddLength = iPacketLength - 5; //excluding 0001 and type
+    if (iAddLength > PAYLOAD_SIZE)
+      iAddLength = PAYLOAD_SIZE;
+    for (int i = 0; i < iAddLength; ++i) {
+      m_szBuffer[m_iBufLength++] = rand() % 256;
+    }
+    m_szBuffer[m_iBufLength++] = '\0';
 
   }
 }
@@ -176,8 +183,60 @@ void DecoderInterfaceTest::TestDataFormat() {
 
 //DECODER_OPTION_END_OF_STREAM
 void DecoderInterfaceTest::TestEndOfStream() {
-  //TODO
+  int iTmp, iOut;
+  CM_RETURN eRet;
+
+  //invalid input
+  eRet = (CM_RETURN) m_pDec->SetOption (DECODER_OPTION_END_OF_STREAM, NULL);
+  EXPECT_EQ (eRet, cmInitParaError);
+
+  //valid random input
+  for (int i = 0; i < 10; ++i) {
+    iTmp = rand();
+    eRet = (CM_RETURN) m_pDec->SetOption (DECODER_OPTION_END_OF_STREAM, &iTmp);
+    EXPECT_EQ (eRet, cmResultSuccess);
+    eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_END_OF_STREAM, &iOut);
+    EXPECT_EQ (eRet, cmResultSuccess);
+    EXPECT_EQ (iOut, iTmp != 0);
+  }
+
+  //set false as input
+  iTmp = false;
+  eRet = (CM_RETURN) m_pDec->SetOption (DECODER_OPTION_END_OF_STREAM, &iTmp);
+  EXPECT_EQ (eRet, cmResultSuccess);
+  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_END_OF_STREAM, &iOut);
+  EXPECT_EQ (eRet, cmResultSuccess);
+
+  EXPECT_EQ (iOut, false);
+
+  //set true as input
+  iTmp = true;
+  eRet = (CM_RETURN) m_pDec->SetOption (DECODER_OPTION_END_OF_STREAM, &iTmp);
+  EXPECT_EQ (eRet, cmResultSuccess);
+  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_END_OF_STREAM, &iOut);
+  EXPECT_EQ (eRet, cmResultSuccess);
+
+  EXPECT_EQ (iOut, true);
+
+  //Mock data packet in
+  //Test NULL data input for decoder, should be true for EOS
+  eRet = (CM_RETURN) m_pDec->DecodeFrame2 (NULL, 0, m_pData, &m_sBufferInfo);
+  EXPECT_EQ (eRet, 0); //decode should return OK
+  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_END_OF_STREAM, &iOut);
+  EXPECT_EQ (iOut, true); //decoder should have EOS == true
+
+  //Test valid data input for decoder, should be false for EOS
+  MockPacketType (NAL_UNIT_UNSPEC_0, 50);
+  eRet = (CM_RETURN) m_pDec->DecodeFrame2 (m_szBuffer, m_iBufLength, m_pData, &m_sBufferInfo);
+  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_END_OF_STREAM, &iOut);
+  EXPECT_EQ (iOut, false); //decoder should have EOS == false
+  //Test NULL data input for decoder, should be true for EOS
+  eRet = (CM_RETURN) m_pDec->DecodeFrame2 (NULL, 0, m_pData, &m_sBufferInfo);
+  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_END_OF_STREAM, &iOut);
+  EXPECT_EQ (iOut, true); //decoder should have EOS == true
 }
+
+
 //DECODER_OPTION_VCL_NAL
 void DecoderInterfaceTest::TestVclNal() {
   //TODO
