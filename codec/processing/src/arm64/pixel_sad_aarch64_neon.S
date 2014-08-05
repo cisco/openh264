@@ -1,6 +1,6 @@
 /*!
  * \copy
- *     Copyright (c)  2011-2013, Cisco Systems
+ *     Copyright (c)  2013, Cisco Systems
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -28,53 +28,23 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	        :  SceneChangeDetectionCommon.h
- *
- * \brief	    :  scene change detection class of wels video processor class
- *
- * \date         :  2011/03/14
- *
- * \description  :  1. rewrite the package code of scene change detection class
- *
  */
 
-#ifndef WELSVP_SCENECHANGEDETECTIONCOMMON_H
-#define WELSVP_SCENECHANGEDETECTIONCOMMON_H
-
-#include "util.h"
-#include "memory.h"
-#include "WelsFrameWork.h"
-#include "IWelsVP.h"
-#include "sad_common.h"
-
-WELSVP_NAMESPACE_BEGIN
-
-typedef  int32_t (SadFunc) (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY);
-
-typedef SadFunc*   SadFuncPtr;
-
-typedef int32_t (Sad16x16Func) (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY);
-typedef Sad16x16Func*      PSad16x16Func;
-
-typedef void (GetIntraPred) (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
-
-typedef GetIntraPred*  GetIntraPredPtr;
-
-GetIntraPred     WelsI16x16LumaPredV_c;
-GetIntraPred     WelsI16x16LumaPredH_c;
-
-#ifdef HAVE_NEON
-WELSVP_EXTERN_C_BEGIN
-int32_t WelsProcessingSampleSad8x8_neon (uint8_t*, int32_t, uint8_t*, int32_t);
-WELSVP_EXTERN_C_END
-#endif
-
 #ifdef HAVE_NEON_AARCH64
-WELSVP_EXTERN_C_BEGIN
-int32_t WelsProcessingSampleSad8x8_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
-WELSVP_EXTERN_C_END
-#endif
+.text
+#include "arm_arch64_common_macro.S"
 
-WELSVP_NAMESPACE_END
+WELS_ASM_AARCH64_FUNC_BEGIN WelsProcessingSampleSad8x8_AArch64_neon
+    ld1     {v0.8b}, [x0], x1
+    ld1     {v1.8b}, [x2], x3
+    uabdl   v2.8h, v0.8b, v1.8b
+.rept 7
+    ld1     {v0.8b}, [x0], x1
+    ld1     {v1.8b}, [x2], x3
+    uabal   v2.8h, v0.8b, v1.8b
+.endr
+    saddlv  s2, v2.8h
+    fmov    w0, s2
+WELS_ASM_AARCH64_FUNC_END
 
 #endif
