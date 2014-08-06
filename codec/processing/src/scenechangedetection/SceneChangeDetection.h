@@ -83,6 +83,12 @@ class CSceneChangeDetectorVideo {
     }
 #endif
 
+#ifdef HAVE_NEON_AARCH64
+    if (iCpuFlag & WELS_CPU_NEON) {
+      m_pfSad = WelsProcessingSampleSad8x8_AArch64_neon;
+    }
+#endif
+
     m_fSceneChangeMotionRatioLarge = SCENE_CHANGE_MOTION_RATIO_LARGE_VIDEO;
     m_fSceneChangeMotionRatioMedium = SCENE_CHANGE_MOTION_RATIO_MEDIUM;
   }
