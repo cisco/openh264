@@ -18,6 +18,9 @@ class EncInterfaceCallTest : public ::testing::Test, public BaseEncoderTest {
 
 
 TEST_F (EncInterfaceCallTest, BaseParameterVerify) {
+  int uiTraceLevel = WELS_LOG_QUIET;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &uiTraceLevel);
+
   int ret = cmResultSuccess;
   SEncParamBase baseparam;
   memset (&baseparam, 0, sizeof (SEncParamBase));
@@ -27,4 +30,7 @@ TEST_F (EncInterfaceCallTest, BaseParameterVerify) {
 
   ret =  encoder_->Initialize (&baseparam);
   EXPECT_EQ (ret, static_cast<int> (cmInitParaError));
+
+  uiTraceLevel = WELS_LOG_ERROR;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &uiTraceLevel);
 }
