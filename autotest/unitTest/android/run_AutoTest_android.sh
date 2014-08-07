@@ -3,7 +3,13 @@
 AUTO_TEST_ANDROID_PATH=`pwd`
 AUTO_TEST_SRC_PATH="../../../"
 AUTO_TEST_RES_PATH="${AUTO_TEST_ANDROID_PATH}/report"
+if [ ! -d ${AUTO_TEST_RES_PATH} ]
+then
 mkdir -p ${AUTO_TEST_RES_PATH}
+else
+echo "Will delete those outdate xml in the report"
+rm -f ${AUTO_TEST_RES_PATH}/*.xml
+fi
 #Prepare android build enviroment
 echo please set the enviroment variable as:
 echo export ANDROID_HOME="path of android sdk"

@@ -62,6 +62,7 @@ IOS_MAKE_PARAMS="OS=ios ARCH=${CODEC_TEST_IOS_ARCH}"
 ############make build
 find ./ -name *.o -exec rm -rf {} \;
 find ./ -name *.d -exec rm -rf {} \;
+rm -f *.so
 make clean
 make ${IOS_MAKE_PARAMS} test
 echo "Codec test will run on ${CODEC_TEST_IOS_PLATFORM} with ${CODEC_TEST_IOS_DEBUG_RELEASE}"
@@ -134,6 +135,9 @@ CODEC_TEST_IOS_REPORT_PATH="${AUTO_TEST_IOS_PATH}/report"
 if [ ! -d ${CODEC_TEST_IOS_REPORT_PATH} ]
 then
  mkdir -p ${CODEC_TEST_IOS_REPORT_PATH}
+else
+ echo "Will delete those outdate xml in the report"
+ rm -f ${CODEC_TEST_IOS_REPORT_PATH}/*.xml
 fi
 
 #start to run unittest,default run the xcode at arch armv7 with release

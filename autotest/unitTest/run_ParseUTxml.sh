@@ -22,7 +22,34 @@ parse_unittest() {
     msg="Total testcases: $tests, failed: $fails,time:$waste seconds, at$times,xml:$res"
     echo ${msg}
     UT_Failed_Num=$((${UT_Failed_Num}+${fails}))
-    fi
+cat >> mail.log << EOF
+<style>
+.fail {
+    background-color: yellow;
+}
+</style>
+<br>
+   <table  style="width:600px" cellspacing="0" border="1" width="100%">
+    <thead>
+    <tr>
+        <td>Total unit test cases</td>
+        <td>Failed</td>
+        <td>Time</td>
+        <td>Date</td>
+    </tr>
+    </thead>
+       <tbody>
+        <tr style="text-align:center; font-weight: bold;">
+            <td>${tests}</td>
+            <td><font class="fail">${fails}</font></td>
+            <td>${waste}</td>
+            <td>${times}</td>
+        </tr>
+    </tbody>
+    </table>
+<br>
+EOF
+   fi
 }
 
 xmlcount=`ls $REPORT | wc -l`
