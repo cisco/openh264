@@ -147,7 +147,8 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
   }
 
 
-  if ((pCfg->iRCMode != RC_OFF_MODE) && (pCfg->iRCMode != RC_QUALITY_MODE) && (pCfg->iRCMode!= RC_BUFFERBASED_MODE)&&(pCfg->iRCMode != RC_BITRATE_MODE)
+  if ((pCfg->iRCMode != RC_OFF_MODE) && (pCfg->iRCMode != RC_QUALITY_MODE) && (pCfg->iRCMode != RC_BUFFERBASED_MODE)
+      && (pCfg->iRCMode != RC_BITRATE_MODE)
       && (pCfg->iRCMode != RC_LOW_BW_MODE)) {
     WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidation(),Invalid iRCMode = %d\n", pCfg->iRCMode);
     return ENC_RETURN_UNSUPPORTED_PARA;
@@ -3594,7 +3595,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   }
 
 #ifdef ENABLE_FRAME_DUMP
-  DumpRecFrame (fsnr, &pSvcParam->sDependencyLayers[pSvcParam->iSpatialLayerNum-1].sRecFileName[0], pCtx->bRecFlag);	// pDecPic: final reconstruction output
+  DumpRecFrame (fsnr, &pSvcParam->sDependencyLayers[pSvcParam->iSpatialLayerNum - 1].sRecFileName[0],
+                pCtx->bRecFlag);	// pDecPic: final reconstruction output
   pCtx->bRecFlag = true;
 
 #endif//ENABLE_FRAME_DUMP
@@ -3636,7 +3638,8 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
                 (pOldParam->SUsedPicRect.iWidth != pNewParam->SUsedPicRect.iWidth
                  || pOldParam->SUsedPicRect.iHeight != pNewParam->SUsedPicRect.iHeight) ||
                 (pOldParam->bEnableLongTermReference != pNewParam->bEnableLongTermReference) ||
-                (pOldParam->iLTRRefNum != pNewParam->iLTRRefNum);
+                (pOldParam->iLTRRefNum != pNewParam->iLTRRefNum) ||
+                (pOldParam->iMultipleThreadIdc != pNewParam->iMultipleThreadIdc);
   if (pNewParam->iMaxNumRefFrame > pOldParam->iMaxNumRefFrame) {
     bNeedReset = true;
   }
