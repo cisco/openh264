@@ -138,8 +138,10 @@ void EncoderInterfaceTest::InitializeParamExt() {
 
 TEST_F (EncoderInterfaceTest, TemporalLayerSettingTest) {
 
-  pParamExt->iPicWidth = m_iWidth;
-  pParamExt->iPicHeight = m_iHeight;
+  pParamExt->iPicWidth = 1280;
+  pParamExt->iPicHeight = 720;
+  m_iWidth = pParamExt->iPicWidth;
+  m_iHeight = pParamExt->iPicHeight;
   pParamExt->iTargetBitrate = 60000;
   pParamExt->sSpatialLayers[0].iVideoHeight = pParamExt->iPicHeight;
   pParamExt->sSpatialLayers[0].iVideoWidth = pParamExt->iPicWidth;
