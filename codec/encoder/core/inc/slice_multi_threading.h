@@ -50,7 +50,7 @@
 #include "svc_enc_slice_segment.h"
 #include "WelsThreadLib.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 void UpdateMbListNeighborParallel (SSliceCtx* pSliceCtx,
                                    SMB* pMbList,
                                    const int32_t kiSliceIdc);

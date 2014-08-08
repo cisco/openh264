@@ -45,7 +45,7 @@
 #include "bit_stream.h"
 #include "wels_func_ptr_def.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 
 

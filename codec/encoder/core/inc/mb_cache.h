@@ -39,7 +39,7 @@
 #include "wels_const.h"
 #include "macros.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 /*
  *	MB Cache information, such one cache should be defined within a slice

@@ -42,7 +42,7 @@
 #include "ls_defines.h"
 #include "svc_set_mb_syn_cavlc.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 const uint32_t g_kuiIntra4x4CbpMap[48] = {
   3, 29, 30, 17, 31, 18, 37,  8, 32, 38, 19,  9, 20, 10, 11, 2, //15
   16, 33, 34, 21, 35, 22, 39,  4, 36, 40, 23,  5, 24,  6,  7, 1, //31
@@ -369,4 +369,4 @@ int32_t WelsWriteMbResidual (SWelsFuncPtrList* pFuncList, SMbCache* sMbCacheInfo
   return 0;
 }
 
-} // namespace WelsSVCEnc
+} // namespace WelsEnc

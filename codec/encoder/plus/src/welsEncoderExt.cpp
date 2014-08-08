@@ -52,7 +52,7 @@
 #include <sys/time.h>
 #endif
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 /*
  *	CWelsH264SVCEncoder class implementation
@@ -1102,7 +1102,7 @@ void CWelsH264SVCEncoder::DumpSrcPicture (const uint8_t* pSrc) {
 }
 }
 
-using namespace WelsSVCEnc;
+using namespace WelsEnc;
 
 int32_t WelsCreateSVCEncoder (ISVCEncoder** ppEncoder) {
   if ((*ppEncoder = new CWelsH264SVCEncoder()) != NULL) {

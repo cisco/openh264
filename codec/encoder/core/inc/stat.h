@@ -40,7 +40,7 @@
 #if !defined(WELS_ENCODER_STATISTICAL_DATA_H__)
 #define WELS_ENCODER_STATISTICAL_DATA_H__
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 /*
  *	Stat quality

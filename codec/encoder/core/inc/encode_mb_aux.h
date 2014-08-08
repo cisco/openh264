@@ -37,7 +37,7 @@
 #include "wels_func_ptr_def.h"
 #include "copy_mb.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag);
 int32_t WelsGetNoneZeroCount_c (int16_t* pLevel);
 

@@ -7,7 +7,7 @@
 #include "sad_common.h"
 #include "get_intra_predictor.h"
 
-using namespace WelsSVCEnc;
+using namespace WelsEnc;
 #ifdef X86_ASM
 TEST (IntraSadSatdFuncTest, WelsIntra16x16Combined3Sad_ssse3) {
   const int32_t iLineSizeDec = 32;

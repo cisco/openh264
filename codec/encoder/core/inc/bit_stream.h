@@ -36,7 +36,7 @@
 
 #include "typedefs.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 //#include "macros.h"
 
 /*

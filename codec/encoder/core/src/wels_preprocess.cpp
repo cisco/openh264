@@ -36,7 +36,7 @@
 #include "utils.h"
 #include "encoder.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 #define WelsSafeDelete(p) if(p){ delete (p); (p) = NULL; }
 
@@ -1219,4 +1219,4 @@ void  CWelsPreProcess::WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SP
 }
 
 //*********************************************************************************************************/
-} // namespace WelsSVCEnc
+} // namespace WelsEnc

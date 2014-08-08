@@ -33,7 +33,7 @@
 #include "decode_mb_aux.h"
 #include "cpu_core.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 /****************************************************************************
  * Dequant and Ihdm functions
  ****************************************************************************/

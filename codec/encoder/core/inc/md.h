@@ -45,7 +45,7 @@
 #include "encode_mb_aux.h"
 #include "wels_func_ptr_def.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 #define ME_REFINE_BUF_STRIDE       32
 #define ME_REFINE_BUF_WIDTH_BLK4   8
 #define ME_REFINE_BUF_WIDTH_BLK8   16

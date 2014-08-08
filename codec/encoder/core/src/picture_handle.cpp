@@ -39,7 +39,7 @@
 #include "picture_handle.h"
 #include "svc_motion_estimate.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 /*!
  * \brief	alloc picture pData with borders for each plane based width and height of picture
  * \param	cx				width of picture in pixels
@@ -194,5 +194,5 @@ void WelsExchangeSpatialPictures (SPicture** ppPic1, SPicture** ppPic2) {
   *ppPic2 = tmp;
 }
 
-} // namespace WelsSVCEnc
+} // namespace WelsEnc
 

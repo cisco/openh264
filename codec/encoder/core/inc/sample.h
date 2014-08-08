@@ -36,7 +36,7 @@
 #include "typedefs.h"
 #include "wels_func_ptr_def.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 //======================SATD======================//
 int32_t WelsSampleSatd16x16_c (uint8_t*, int32_t, uint8_t*, int32_t);

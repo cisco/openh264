@@ -45,7 +45,7 @@
 #include "rc.h"
 #include "IWelsVP.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 typedef struct TagWelsFuncPointerList SWelsFuncPtrList;
 
@@ -289,6 +289,6 @@ struct TagWelsFuncPointerList {
   PCavlcParamCalFunc    pfCavlcParamCal;
 };
 
-}  //end of namespace WelsSVCEnc {
+}  //end of namespace WelsEnc {
 
 #endif//WELS_ENCODER_FUNCTION_POINTERS_DEFINITION_H_

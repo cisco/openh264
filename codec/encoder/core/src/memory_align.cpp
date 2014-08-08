@@ -35,7 +35,7 @@
 #include "memory_align.h"
 #include "macros.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 CMemoryAlign::CMemoryAlign (const uint32_t kuiCacheLineSize)
 #ifdef MEMORY_MONITOR
@@ -143,4 +143,4 @@ const uint32_t CMemoryAlign::WelsGetMemoryUsage() const {
   return m_nMemoryUsageInBytes;
 }
 
-} // end of namespace WelsSVCEnc
+} // end of namespace WelsEnc

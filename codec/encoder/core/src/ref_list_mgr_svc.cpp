@@ -34,7 +34,7 @@
 #include "ref_list_mgr_svc.h"
 #include "utils.h"
 #include "picture_handle.h"
-namespace WelsSVCEnc {
+namespace WelsEnc {
 /*
  *	set picture as unreferenced
  */
@@ -912,5 +912,5 @@ void InitRefListMgrFunc (SWelsFuncPtrList* pFuncList, EUsageType eUsageType) {
     pFuncList->pUpdateRefList =   WelsUpdateRefList;
   }
 }
-} // namespace WelsSVCEnc
+} // namespace WelsEnc
 

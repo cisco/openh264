@@ -42,7 +42,7 @@
 #if !defined(WELS_ENCODER_DEPENDENCY_QUAILITY_IDC_MAP_H__)
 #define WELS_ENCODER_DEPENDENCY_QUAILITY_IDC_MAP_H__
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 /*
  *	Dependency Quality IDC
  */

@@ -69,7 +69,7 @@
 #define MT_TRACE_LOG(x, ...)
 #endif
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 void UpdateMbListNeighborParallel (SSliceCtx* pSliceCtx,
                                    SMB* pMbList,
                                    const int32_t uiSliceIdc) {

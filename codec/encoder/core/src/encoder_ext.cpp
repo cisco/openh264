@@ -55,7 +55,7 @@
 #include "slice_multi_threading.h"
 #include "measure_time.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 
 int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
@@ -4003,4 +4003,4 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
 
   return ENC_RETURN_SUCCESS;
 }
-} // namespace WelsSVCEnc
+} // namespace WelsEnc

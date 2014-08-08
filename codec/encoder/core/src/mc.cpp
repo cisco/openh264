@@ -41,7 +41,7 @@
 #include "mc.h"
 #include "cpu_core.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 /*------------------weight for chroma fraction pixel interpolation------------------*/
 //kuiA = (8 - dx) * (8 - dy);
 //kuiB = dx * (8 - dy);
