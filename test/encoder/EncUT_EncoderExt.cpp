@@ -12,7 +12,7 @@ class EncoderInterfaceTest : public ::testing::Test {
 #define VALID_SIZE(iSize) (((iSize)>1)?(iSize):1)
 #define MEM_VARY_SIZE (512)
 #define IMAGE_VARY_SIZE (512)
-#define TEST_FRAMES (200)
+#define TEST_FRAMES (30)
 
 #define NAL_HEADER_BYTES (4)
 #define NAL_TYPE (0x0F)
