@@ -6,7 +6,6 @@
 #include "macros.h"
 
 using namespace WelsSVCEnc;
-/* disable two UT to avoide fail on Android, root cause not found
 TEST (GetIntraPredictorTest, TestGetI4x4LumaPredV) {
   uint8_t* pPred = new uint8_t[64];
   uint8_t*	pRef  = new uint8_t[64];
@@ -61,7 +60,6 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredH) {
   delete []pRef;
   delete []pPred;
 }
-*/
 
 TEST (GetIntraPredictorTest, TestGetI4x4LumaPredDDL) {
   const int32_t kiStride = 0;
