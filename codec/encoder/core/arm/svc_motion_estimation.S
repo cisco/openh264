@@ -79,7 +79,7 @@ WELS_ASM_FUNC_BEGIN SumOf8x8BlockOfFrame_neon
     mov r8, r0
     mov r6, r1
     add r8, r6
-    add r4, r6, lsl #1
+    add r4, r4, r6, lsl #1
 
 _height_loop8x8:
     mov r7, r6
@@ -115,7 +115,7 @@ _width_loop8x8:
     bne _width_loop8x8
 
     add r8, r3
-    add r4, r6, lsl #1
+    add r4, r4, r6, lsl #1
     subs r2, #1
     bne _height_loop8x8
 
@@ -131,7 +131,7 @@ WELS_ASM_FUNC_BEGIN SumOf16x16BlockOfFrame_neon
     mov r8, r0
     mov r6, r1
     add r8, r6
-    add r4, r6, lsl #1
+    add r4, r4, r6, lsl #1
 
 _height_loop16x16:
     mov r7, r6
@@ -159,7 +159,7 @@ _width_loop16x16:
     bne _width_loop16x16
 
     add r8, r3
-    add r4, r6, lsl #1
+    add r4, r4, r6, lsl #1
     subs r2, #1
     bne _height_loop16x16
 
