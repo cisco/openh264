@@ -46,7 +46,7 @@
 #include "parameter_sets.h"
 #include "param_svc.h"
 #include "utils.h"
-namespace WelsSVCEnc {
+namespace WelsEnc {
 /*!
  *************************************************************************************
  * \brief	to write Sequence Parameter Set (SPS)

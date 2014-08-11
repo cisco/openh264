@@ -41,7 +41,7 @@
 #include "deblocking.h"
 #include "cpu_core.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 #define g_kuiAlphaTable(x) g_kuiAlphaTable[(x)]
 #define g_kiBetaTable(x)  g_kiBetaTable[(x)]
@@ -860,5 +860,5 @@ void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
 }
 
 
-} // namespace WelsSVCEnc
+} // namespace WelsEnc
 

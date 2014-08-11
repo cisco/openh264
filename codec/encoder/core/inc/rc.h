@@ -48,7 +48,7 @@
 #include "svc_enc_macroblock.h"
 #include "slice.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 //trace
 #define GOM_TRACE_FLAG 0
 #define GOM_H_SCC               8

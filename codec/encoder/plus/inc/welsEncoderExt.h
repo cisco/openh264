@@ -55,7 +55,7 @@
 //#define REC_FRAME_COUNT
 
 class ISVCEncoder;
-namespace WelsSVCEnc {
+namespace WelsEnc {
 class CWelsH264SVCEncoder : public ISVCEncoder {
  public:
   CWelsH264SVCEncoder();

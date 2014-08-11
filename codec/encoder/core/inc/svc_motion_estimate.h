@@ -44,7 +44,7 @@
 #include "encoder_context.h"
 #include "wels_func_ptr_def.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 #define CAMERA_STARTMV_RANGE (64)
 #define  ITERATIVE_TIMES  (16)
 #define CAMERA_MV_RANGE (CAMERA_STARTMV_RANGE+ITERATIVE_TIMES)

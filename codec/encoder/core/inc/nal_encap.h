@@ -45,7 +45,7 @@
 #include "nal_prefix.h"
 
 //SBitStringAux
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 #define NAL_HEADER_SIZE (4)
 /*

@@ -43,7 +43,7 @@
 #include "decode_mb_aux.h"
 #include "ls_defines.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 void WelsDctMb (int16_t* pRes, uint8_t* pEncMb, int32_t iEncStride, uint8_t* pBestPred, PDctFunc pfDctFourT4) {
   pfDctFourT4 (pRes,			    pEncMb,							    iEncStride, pBestPred,			16);
   pfDctFourT4 (pRes + 64,		pEncMb + 8,						    iEncStride, pBestPred + 8,		16);
@@ -383,4 +383,4 @@ bool    WelsTryPUVskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, i
   }
 }
 
-} // namespace WelsSVCEnc
+} // namespace WelsEnc

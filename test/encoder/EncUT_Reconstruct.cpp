@@ -10,7 +10,7 @@
 #include "decode_mb_aux.h"
 #include "wels_func_ptr_def.h"
 
-using namespace WelsSVCEnc;
+using namespace WelsEnc;
 #define RECONTEST_NUM 1000
 static void FillWithRandomData (uint8_t* p, int32_t Len) {
   for (int32_t i = 0; i < Len; i++) {

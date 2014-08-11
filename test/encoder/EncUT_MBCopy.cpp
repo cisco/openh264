@@ -10,7 +10,7 @@
 #include "wels_func_ptr_def.h"
 #include "copy_mb.h"
 
-using namespace WelsSVCEnc;
+using namespace WelsEnc;
 #define MBCOPYTEST_NUM 1000
 static void FillWithRandomData (uint8_t* p, int32_t Len) {
   for (int32_t i = 0; i < Len; i++) {

@@ -51,7 +51,7 @@
 #include "svc_enc_slice_segment.h"
 #include "as264_common.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 #define   INVALID_TEMPORAL_ID   ((uint8_t)0xff)
 
@@ -513,6 +513,6 @@ if (NULL == pCodingParam)
 return 0;
 }
 
-}//end of namespace WelsSVCEnc
+}//end of namespace WelsEnc
 
 #endif//WELS_ENCODER_PARAMETER_SVC_H__

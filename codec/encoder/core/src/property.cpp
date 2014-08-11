@@ -39,7 +39,7 @@
  */
 #include "property.h"
 #include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross_platforms
-namespace WelsSVCEnc {
+namespace WelsEnc {
 #define WELS_CODE_NAME	"Wels"
 #define WELS_LIB_NAME	"Encoder"
 
@@ -136,4 +136,4 @@ int32_t GetIdentInfo (char* pBuf, int32_t iSize) {
   return iLen;
 }
 
-} // namespace WelsSVCEnc
+} // namespace WelsEnc

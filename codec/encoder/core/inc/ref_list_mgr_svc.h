@@ -46,7 +46,7 @@
 #include "encoder_context.h"
 #include "codec_app_def.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 typedef enum {
 RECIEVE_UNKOWN = 0,
 RECIEVE_SUCCESS = 1,

@@ -42,7 +42,7 @@
 
 #include "typedefs.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 
 /*!

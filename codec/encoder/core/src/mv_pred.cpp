@@ -40,7 +40,7 @@
 
 #include "mv_pred.h"
 #include "ls_defines.h"
-namespace WelsSVCEnc {
+namespace WelsEnc {
 //basic pMv prediction unit for pMv width (4, 2, 1)
 void PredMv (const SMVComponentUnit* kpMvComp, int8_t iPartIdx, int8_t iPartW, int32_t iRef, SMVUnitXY* sMvp) {
   const uint8_t kuiLeftIdx		= g_kuiCache30ScanIdx[iPartIdx] - 1;
@@ -359,4 +359,4 @@ void UpdateP8x8Motion2Cache (SMbCache* pMbCache, int32_t iPartIdx, int8_t pRef, 
         pMvComp->sMotionVectorCache[7 + kuiCacheIdx] = *pMv;
 }
 
-} // namespace WelsSVCEnc
+} // namespace WelsEnc

@@ -46,7 +46,7 @@
 
 
 #include "svc_enc_slice_segment.h"
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 /*
  *	Frame level in SVC DQLayer instead.
