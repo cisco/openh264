@@ -7,7 +7,7 @@
 #include "wels_func_ptr_def.h"
 #include "cpu.h"
 
-using namespace WelsSVCEnc;
+using namespace WelsEnc;
 
 void CopyTargetBlock (uint8_t* pSrcBlock, const int32_t kiBlockSize, SMVUnitXY sTargetMv, const int32_t kiRefPicStride,
                       uint8_t* pRefPic) {

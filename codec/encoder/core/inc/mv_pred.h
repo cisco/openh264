@@ -45,7 +45,7 @@
 #include "svc_enc_macroblock.h"
 #include "mb_cache.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 /*!
  * \brief   update pMv and uiRefIndex cache for current MB, only for P_16x16 (SKIP inclusive)
  * \param

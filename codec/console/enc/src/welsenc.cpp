@@ -84,7 +84,7 @@
 
 #include <iostream>
 using namespace std;
-using namespace WelsSVCEnc;
+using namespace WelsEnc;
 
 /*
  *	Layer Context

@@ -40,7 +40,7 @@
 /* VLC FOR WELS ENCODER                                                 */
 /************************************************************************/
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 //g_kuiVlcCoeffToken[uiNc][total-coeff][trailing-ones][0--value, 1--bit count]
 extern const uint8_t g_kuiVlcCoeffToken[5][17][4][2];

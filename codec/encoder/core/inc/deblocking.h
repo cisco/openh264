@@ -44,7 +44,7 @@
 #include "encoder_context.h"
 #include "wels_func_ptr_def.h"
 #include "deblocking_common.h"
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 
 //struct tagDeblockingFunc;

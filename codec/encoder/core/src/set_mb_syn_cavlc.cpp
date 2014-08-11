@@ -43,7 +43,7 @@
 #include "cpu_core.h"
 #include "wels_const.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 const  ALIGNED_DECLARE (uint8_t, g_kuiZeroLeftMap[16], 16) = {
   0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7
@@ -210,4 +210,4 @@ void InitCoeffFunc (SWelsFuncPtrList* pFuncList, const uint32_t uiCpuFlag) {
 #endif
 }
 
-} // namespace WelsSVCEnc
+} // namespace WelsEnc

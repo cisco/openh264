@@ -39,7 +39,7 @@
 #include <stdio.h>
 #endif//MEMORY_CHECK
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 class CMemoryAlign {
  public:

@@ -48,7 +48,7 @@
 
 #include "set_mb_syn_cavlc.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 int32_t WelsWriteMbResidual (SWelsFuncPtrList* pFuncList, SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux* pBs);
 

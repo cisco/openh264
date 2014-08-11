@@ -43,7 +43,7 @@
 #include "cpu_core.h"
 #include "svc_enc_golomb.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 #define INTRA_VARIANCE_SAD_THRESHOLD 150
 #define INTER_VARIANCE_SAD_THRESHOLD 20
 

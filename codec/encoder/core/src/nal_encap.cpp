@@ -39,7 +39,7 @@
 #include "nal_encap.h"
 #include "svc_enc_golomb.h"
 #include "ls_defines.h"
-namespace WelsSVCEnc {
+namespace WelsEnc {
 /*!
  * \brief	load an initialize NAL pRawNal pData
  */
@@ -197,4 +197,4 @@ int32_t WelsWriteSVCPrefixNal (SBitStringAux* pBitStringAux, const int32_t kiNal
   return 0;
 }
 
-} // namespace WelsSVCEnc
+} // namespace WelsEnc

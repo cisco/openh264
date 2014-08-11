@@ -50,7 +50,7 @@
 #include "IWelsVP.h"
 #include "param_svc.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 typedef struct TagWelsEncCtx sWelsEncCtx;
 

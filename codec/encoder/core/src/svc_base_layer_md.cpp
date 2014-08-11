@@ -44,7 +44,7 @@
 #include "encoder.h"
 #include "svc_encode_mb.h"
 #include "svc_encode_slice.h"
-namespace WelsSVCEnc {
+namespace WelsEnc {
 static const ALIGNED_DECLARE (int8_t, g_kiIntra16AvaliMode[8][5], 16) = {
   { I16_PRED_DC_128, I16_PRED_INVALID, I16_PRED_INVALID, I16_PRED_INVALID, 1 },
   { I16_PRED_DC_L,   I16_PRED_H,       I16_PRED_INVALID, I16_PRED_INVALID, 2 },
@@ -1809,4 +1809,4 @@ void WelsMdIntraSecondaryModesEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* 
   pCurMb->pSadCost[0] = 0;
 }
 
-} // namespace WelsSVCEnc
+} // namespace WelsEnc

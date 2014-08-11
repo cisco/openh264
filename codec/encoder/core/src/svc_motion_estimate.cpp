@@ -43,7 +43,7 @@
 #include "svc_motion_estimate.h"
 #include "wels_transpose_matrix.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 const int32_t QStepx16ByQp[52] = {  /* save QStep<<4 for int32_t */
   10,  11,  13,  14,  16,  18,  /* 0~5   */
@@ -1019,5 +1019,5 @@ void WelsDiamondCrossFeatureSearch (SWelsFuncPtrList* pFunc, SWelsME* pMe, SSlic
 }
 
 
-} // namespace WelsSVCEnc
+} // namespace WelsEnc
 

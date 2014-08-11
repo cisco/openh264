@@ -42,7 +42,7 @@
 
 #include "encoder_context.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 /*!
  * \brief	request specific memory for SVC
  * \param	pEncCtx		sWelsEncCtx*

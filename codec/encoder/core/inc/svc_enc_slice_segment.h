@@ -46,7 +46,7 @@
 #include "memory_align.h"
 
 #include "codec_app_def.h"
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 
 // NOTE:

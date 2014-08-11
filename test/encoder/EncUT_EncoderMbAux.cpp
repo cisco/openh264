@@ -3,7 +3,7 @@
 #include "encode_mb_aux.h"
 #include "wels_common_basis.h"
 
-using namespace WelsSVCEnc;
+using namespace WelsEnc;
 
 #define ALLOC_MEMORY(type, name, num) type* name = (type*)cMemoryAlign.WelsMalloc(num*sizeof(type), #name);
 #define FREE_MEMORY(name) cMemoryAlign.WelsFree(name, #name);

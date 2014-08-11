@@ -47,7 +47,7 @@
 #include "svc_enc_golomb.h"
 
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 //#define _TEST_TEMP_RC_
 #ifdef _TEST_TEMP_RC_

@@ -45,7 +45,7 @@
 #include "svc_enc_macroblock.h"
 #include "mb_cache.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 #if defined(MB_TYPES_CHECK)
 void WelsCountMbType (int32_t (*iMbCount)[18], const EWelsSliceType eSt, const SMB* pMb);
 #endif
