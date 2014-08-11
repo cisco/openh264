@@ -12,7 +12,7 @@ class EncoderInterfaceTest : public ::testing::Test {
 #define VALID_SIZE(iSize) (((iSize)>1)?(iSize):1)
 #define MEM_VARY_SIZE (512)
 #define IMAGE_VARY_SIZE (512)
-#define TEST_FRAMES (200)
+#define TEST_FRAMES (30)
 
 #define NAL_HEADER_BYTES (4)
 #define NAL_TYPE (0x0F)
@@ -138,8 +138,10 @@ void EncoderInterfaceTest::InitializeParamExt() {
 
 TEST_F (EncoderInterfaceTest, TemporalLayerSettingTest) {
 
-  pParamExt->iPicWidth = m_iWidth;
-  pParamExt->iPicHeight = m_iHeight;
+  pParamExt->iPicWidth = 1280;
+  pParamExt->iPicHeight = 720;
+  m_iWidth = pParamExt->iPicWidth;
+  m_iHeight = pParamExt->iPicHeight;
   pParamExt->iTargetBitrate = 60000;
   pParamExt->sSpatialLayers[0].iVideoHeight = pParamExt->iPicHeight;
   pParamExt->sSpatialLayers[0].iVideoWidth = pParamExt->iPicWidth;
