@@ -43,7 +43,7 @@
 #include "typedefs.h"
 #include "memory_align.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 /*!
  * \brief	alloc picture pData with borders for each plane based width and height of picture
  * \param	kiWidth				width of picture in pixels

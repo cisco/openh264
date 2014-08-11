@@ -58,7 +58,7 @@
 #include "mt_defs.h"	// for multiple threadin,
 #include "WelsThreadLib.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 /*
  *	reference list for each quality layer in SVC

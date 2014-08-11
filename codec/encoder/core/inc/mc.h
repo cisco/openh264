@@ -44,7 +44,7 @@
 /////////////////////luma MC//////////////////////////
 //x y means dx(mv[0] & 3) and dy(mv[1] & 3)
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 void WelsInitMcFuncs (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag);
 
 }

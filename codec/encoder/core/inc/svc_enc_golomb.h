@@ -44,7 +44,7 @@
 #include "bit_stream.h"
 #include "macros.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 #define WRITE_BE_32(ptr, val) do { \
         (ptr)[0] = (val) >> 24; \

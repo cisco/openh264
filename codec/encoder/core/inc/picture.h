@@ -38,7 +38,7 @@
 #include "as264_common.h"
 #include "wels_common_basis.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 #define LIST_SIZE      0x10000    //(256*256)
 typedef struct TagScreenBlockFeatureStorage {
 //Input
@@ -112,7 +112,7 @@ SScreenBlockFeatureStorage* pScreenBlockFeatureStorage;
 //  int32_t    planes;      // planes of YUV
 //}Rs_Picture_t;
 
-}  // end of namespace WelsSVCEnc {
+}  // end of namespace WelsEnc {
 
 #endif//WELS_PICTURE_H__
 

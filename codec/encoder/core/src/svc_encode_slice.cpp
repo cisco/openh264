@@ -47,7 +47,7 @@
 #include "decode_mb_aux.h"
 #include "svc_mode_decision.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 //#define ENC_TRACE
 
 typedef int32_t (*PWelsCodingSliceFunc) (sWelsEncCtx* pCtx, SSlice* pSlice);
@@ -1146,4 +1146,4 @@ TRY_REENCODING:
   return iEncReturn;
 }
 
-}//namespace WelsSVCEnc
+}//namespace WelsEnc

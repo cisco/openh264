@@ -43,7 +43,7 @@
 #include "typedefs.h"
 #include "encoder_context.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 /*!
  * \brief	initialize source picture body

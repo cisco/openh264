@@ -37,7 +37,7 @@
 #include "macros.h"
 #include "wels_func_ptr_def.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 void WelsDequantLumaDc4x4 (int16_t* pRes, const int32_t kiQp);
 void WelsIHadamard4x4Dc (int16_t* pRes);
 

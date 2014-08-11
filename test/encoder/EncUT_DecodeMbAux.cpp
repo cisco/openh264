@@ -4,7 +4,7 @@
 #include "macros.h"
 #include "cpu.h"
 
-using namespace WelsSVCEnc;
+using namespace WelsEnc;
 
 
 TEST (DecodeMbAuxTest, TestIhdm_4x4_dc) {

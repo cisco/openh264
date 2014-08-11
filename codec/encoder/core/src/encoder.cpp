@@ -55,7 +55,7 @@
 #include "slice_multi_threading.h"
 
 //  global   function  pointers  definition
-namespace WelsSVCEnc {
+namespace WelsEnc {
 /* Motion compensation */
 
 

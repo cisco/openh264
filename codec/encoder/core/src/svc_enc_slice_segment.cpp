@@ -40,7 +40,7 @@
 #include <string.h>
 #include "rc.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 /*!
  * \brief	Assign MB map for single slice segment
  *
@@ -694,4 +694,4 @@ int32_t DynamicMaxSliceNumConstraint (uint32_t uiMaximumNum, int32_t iConsumedNu
   return ((uiMaximumNum - iConsumedNum - 1) / iDulplicateTimes);
 }
 
-} // namespace WelsSVCEnc
+} // namespace WelsEnc

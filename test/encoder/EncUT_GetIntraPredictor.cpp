@@ -5,7 +5,8 @@
 #include "ls_defines.h"
 #include "macros.h"
 
-using namespace WelsSVCEnc;
+using namespace WelsEnc;
+
 TEST (GetIntraPredictorTest, TestGetI4x4LumaPredV) {
   uint8_t* pPred = new uint8_t[64];
   uint8_t*	pRef  = new uint8_t[64];

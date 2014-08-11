@@ -8,7 +8,7 @@
 #include "macros.h"
 #include "svc_motion_estimate.h"
 
-using namespace WelsSVCEnc;
+using namespace WelsEnc;
 #define SVC_ME_TEST_NUM 10
 static void FillWithRandomData (uint8_t* p, int32_t Len) {
   for (int32_t i = 0; i < Len; i++) {

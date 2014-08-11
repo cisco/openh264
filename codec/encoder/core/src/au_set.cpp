@@ -41,7 +41,7 @@
 #include "au_set.h"
 #include "svc_enc_golomb.h"
 #include "macros.h"
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 
 #define LEVEL_NUMBER 16
@@ -501,4 +501,4 @@ int32_t WelsInitPps (SWelsPPS* pPps,
 
   return 0;
 }
-} // namespace WelsSVCEnc
+} // namespace WelsEnc

@@ -9,7 +9,7 @@
 #include "wels_func_ptr_def.h"
 #include "../../codec/encoder/core/src/encoder.cpp"
 
-using namespace WelsSVCEnc;
+using namespace WelsEnc;
 #define MEMORYZEROTEST_NUM 1000
 
 TEST (SetMemZeroFunTest, WelsSetMemZero) {
