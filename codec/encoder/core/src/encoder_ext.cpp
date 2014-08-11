@@ -1862,14 +1862,6 @@ int32_t InitSliceSettings (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPar
   pCodingParam->iCountThreadsNum				= WELS_MIN (kiCpuCores, iMaxSliceCount);
   pCodingParam->iMultipleThreadIdc	= pCodingParam->iCountThreadsNum;
 
-#ifndef WELS_TESTBED	// for product release and non-SGE testing
-
-  if (kiCpuCores < 2) {	// single CPU core, make no sense for MT parallelization
-    pCodingParam->iMultipleThreadIdc	= 1;
-    pCodingParam->iCountThreadsNum				= 1;
-  }
-#endif
-
   *pMaxSliceCount					= iMaxSliceCount;
 
   return 0;
