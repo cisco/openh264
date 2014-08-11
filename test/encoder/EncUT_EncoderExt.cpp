@@ -165,10 +165,11 @@ TEST_F (EncoderInterfaceTest, TemporalLayerSettingTest) {
     EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
     EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeP));
 
-    memcpy (pOption, pParamExt, sizeof (SEncParamExt));
+    ENCODER_OPTION eOptionId = ENCODER_OPTION_SVC_ENCODE_PARAM_EXT;
+    iResult = pPtrEnc->GetOption (eOptionId, pOption);
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
     pOption ->iTemporalLayerNum = 4;
 
-    ENCODER_OPTION eOptionId = ENCODER_OPTION_SVC_ENCODE_PARAM_EXT;
     iResult = pPtrEnc->SetOption (eOptionId, pOption);
     EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
 
