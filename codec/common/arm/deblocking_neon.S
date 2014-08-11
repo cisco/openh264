@@ -855,7 +855,7 @@ WELS_ASM_FUNC_END
     beq      bs_nzc_check_jump0
 
     sub      r6, $0, $2, lsl #4
-    sub      r6, $2, lsl #3
+    sub      r6, r6, $2, lsl #3
     add      r6, #12
     vld1.32  d3[1], [r6]
 

@@ -30,6 +30,8 @@
  *
  */
 
+.syntax unified
+
 #ifdef __APPLE__
 
 .macro WELS_ASM_FUNC_BEGIN
@@ -44,7 +46,6 @@ mov pc, lr
 .endm
 #else
 
-.syntax unified
 .section .note.GNU-stack,"",%progbits // Mark stack as non-executable
 .text
 

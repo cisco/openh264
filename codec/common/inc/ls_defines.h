@@ -40,13 +40,13 @@
 
 struct tagUnaligned_64 {
   uint64_t l;
-} __attribute__ ((packed));
+} __attribute__ ((packed)) __attribute__ ((may_alias));
 struct tagUnaligned_32 {
   uint32_t l;
-} __attribute__ ((packed));
+} __attribute__ ((packed)) __attribute__ ((may_alias));
 struct tagUnaligned_16 {
   uint16_t l;
-} __attribute__ ((packed));
+} __attribute__ ((packed)) __attribute__ ((may_alias));
 
 #define LD16(a) (((struct tagUnaligned_16 *) (a))->l)
 #define LD32(a) (((struct tagUnaligned_32 *) (a))->l)
@@ -54,7 +54,7 @@ struct tagUnaligned_16 {
 
 #define STRUCTA(size, align) struct tagUnaligned_##size##_##align {\
     uint##size##_t l; \
-} __attribute__ ((aligned(align)))
+} __attribute__ ((aligned(align))) __attribute__ ((may_alias))
 STRUCTA (16, 2);
 STRUCTA (32, 2);
 STRUCTA (32, 4);
