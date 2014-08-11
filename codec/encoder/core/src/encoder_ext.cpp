@@ -279,7 +279,6 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
     case SM_SINGLE_SLICE:
       pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum = 1;
       pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 0;
-      pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum = 0;
       for (iIdx = 0; iIdx < MAX_SLICES_NUM; iIdx++) {
         pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceMbNum[iIdx] = 0;
       }
