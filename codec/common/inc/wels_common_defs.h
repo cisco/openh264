@@ -42,6 +42,21 @@
 namespace WelsCommon {
 /*common use table*/
 
+#define LEVEL_NUMBER 17
+typedef struct TagLevelLimits {
+uint8_t uiLevelIdc;
+uint32_t uiMaxMBPS; // Max macroblock processing rate(MB/s)
+uint32_t uiMaxFS;   // Max frame sizea(MBs)
+uint32_t uiMaxDPBMbs;// Max decoded picture buffer size(MBs)
+uint32_t uiMaxBR; // Max video bit rate
+uint32_t uiMaxCPB; // Max CPB size
+int16_t iMinVmv; // Vertical MV component range upper bound
+int16_t iMaxVmv; // Vertical MV component range lower bound
+uint16_t uiMinCR;  // Min compression ration
+int16_t iMaxMvsPer2Mb; // Max number of motion vectors per two consecutive MBs
+} SLevelLimits;
+
+extern const SLevelLimits g_ksLevelLimits[LEVEL_NUMBER];
 extern const uint8_t g_kuiMbCountScan4Idx[24];
 extern const uint8_t g_kuiCache30ScanIdx[16];
 extern const uint8_t g_kuiCache48CountScan4Idx[24];
