@@ -44,16 +44,16 @@ namespace WelsCommon {
 
 #define LEVEL_NUMBER 17
 typedef struct TagLevelLimits {
-uint8_t uiLevelIdc;
-uint32_t uiMaxMBPS; // Max macroblock processing rate(MB/s)
-uint32_t uiMaxFS;   // Max frame sizea(MBs)
-uint32_t uiMaxDPBMbs;// Max decoded picture buffer size(MBs)
-uint32_t uiMaxBR; // Max video bit rate
-uint32_t uiMaxCPB; // Max CPB size
-int16_t iMinVmv; // Vertical MV component range upper bound
-int16_t iMaxVmv; // Vertical MV component range lower bound
-uint16_t uiMinCR;  // Min compression ration
-int16_t iMaxMvsPer2Mb; // Max number of motion vectors per two consecutive MBs
+  uint8_t uiLevelIdc;  // level idc
+  uint32_t uiMaxMBPS; // Max macroblock processing rate(MB/s)
+  uint32_t uiMaxFS;   // Max frame sizea(MBs)
+  uint32_t uiMaxDPBMbs;// Max decoded picture buffer size(MBs)
+  uint32_t uiMaxBR; // Max video bit rate
+  uint32_t uiMaxCPB; // Max CPB size
+  int16_t iMinVmv; // Vertical MV component range upper bound
+  int16_t iMaxVmv; // Vertical MV component range lower bound
+  uint16_t uiMinCR;  // Min compression ration
+  int16_t iMaxMvsPer2Mb; // Max number of motion vectors per two consecutive MBs
 } SLevelLimits;
 
 extern const SLevelLimits g_ksLevelLimits[LEVEL_NUMBER];
@@ -68,38 +68,38 @@ extern const uint8_t g_kuiChromaQpTable[52];
  *	NAL Unit Type (5 Bits)
  */
 enum EWelsNalUnitType {
-NAL_UNIT_UNSPEC_0			= 0,
-NAL_UNIT_CODED_SLICE		= 1,
-NAL_UNIT_CODED_SLICE_DPA	= 2,
-NAL_UNIT_CODED_SLICE_DPB	= 3,
-NAL_UNIT_CODED_SLICE_DPC	= 4,
-NAL_UNIT_CODED_SLICE_IDR	= 5,
-NAL_UNIT_SEI				= 6,
-NAL_UNIT_SPS				= 7,
-NAL_UNIT_PPS				= 8,
-NAL_UNIT_AU_DELIMITER		= 9,
-NAL_UNIT_END_OF_SEQ			= 10,
-NAL_UNIT_END_OF_STR			= 11,
-NAL_UNIT_FILLER_DATA		= 12,
-NAL_UNIT_SPS_EXT			= 13,
-NAL_UNIT_PREFIX				= 14,
-NAL_UNIT_SUBSET_SPS			= 15,
-NAL_UNIT_RESV_16			= 16,
-NAL_UNIT_RESV_17			= 17,
-NAL_UNIT_RESV_18			= 18,
-NAL_UNIT_AUX_CODED_SLICE	= 19,
-NAL_UNIT_CODED_SLICE_EXT	= 20,
-NAL_UNIT_RESV_21			= 21,
-NAL_UNIT_RESV_22			= 22,
-NAL_UNIT_RESV_23			= 23,
-NAL_UNIT_UNSPEC_24			= 24,
-NAL_UNIT_UNSPEC_25			= 25,
-NAL_UNIT_UNSPEC_26			= 26,
-NAL_UNIT_UNSPEC_27			= 27,
-NAL_UNIT_UNSPEC_28			= 28,
-NAL_UNIT_UNSPEC_29			= 29,
-NAL_UNIT_UNSPEC_30			= 30,
-NAL_UNIT_UNSPEC_31			= 31
+  NAL_UNIT_UNSPEC_0			= 0,
+  NAL_UNIT_CODED_SLICE		= 1,
+  NAL_UNIT_CODED_SLICE_DPA	= 2,
+  NAL_UNIT_CODED_SLICE_DPB	= 3,
+  NAL_UNIT_CODED_SLICE_DPC	= 4,
+  NAL_UNIT_CODED_SLICE_IDR	= 5,
+  NAL_UNIT_SEI				= 6,
+  NAL_UNIT_SPS				= 7,
+  NAL_UNIT_PPS				= 8,
+  NAL_UNIT_AU_DELIMITER		= 9,
+  NAL_UNIT_END_OF_SEQ			= 10,
+  NAL_UNIT_END_OF_STR			= 11,
+  NAL_UNIT_FILLER_DATA		= 12,
+  NAL_UNIT_SPS_EXT			= 13,
+  NAL_UNIT_PREFIX				= 14,
+  NAL_UNIT_SUBSET_SPS			= 15,
+  NAL_UNIT_RESV_16			= 16,
+  NAL_UNIT_RESV_17			= 17,
+  NAL_UNIT_RESV_18			= 18,
+  NAL_UNIT_AUX_CODED_SLICE	= 19,
+  NAL_UNIT_CODED_SLICE_EXT	= 20,
+  NAL_UNIT_RESV_21			= 21,
+  NAL_UNIT_RESV_22			= 22,
+  NAL_UNIT_RESV_23			= 23,
+  NAL_UNIT_UNSPEC_24			= 24,
+  NAL_UNIT_UNSPEC_25			= 25,
+  NAL_UNIT_UNSPEC_26			= 26,
+  NAL_UNIT_UNSPEC_27			= 27,
+  NAL_UNIT_UNSPEC_28			= 28,
+  NAL_UNIT_UNSPEC_29			= 29,
+  NAL_UNIT_UNSPEC_30			= 30,
+  NAL_UNIT_UNSPEC_31			= 31
 };
 
 /*
@@ -107,10 +107,10 @@ NAL_UNIT_UNSPEC_31			= 31
  */
 
 enum EWelsNalRefIdc {
-NRI_PRI_LOWEST	= 0,
-NRI_PRI_LOW		= 1,
-NRI_PRI_HIGH	= 2,
-NRI_PRI_HIGHEST	= 3
+  NRI_PRI_LOWEST	= 0,
+  NRI_PRI_LOW		= 1,
+  NRI_PRI_HIGH	= 2,
+  NRI_PRI_HIGHEST	= 3
 };
 
 /*
@@ -118,9 +118,9 @@ NRI_PRI_HIGHEST	= 3
  */
 
 enum EVclType {
-NON_VCL			= 0,
-VCL				= 1,
-NOT_APP			= 2
+  NON_VCL			= 0,
+  VCL				= 1,
+  NOT_APP			= 2
 };
 
 /*
@@ -147,43 +147,43 @@ extern const EVclType g_keTypeMap[32][2];
  */
 
 enum EWelsSliceType {
-P_SLICE	= 0,
-B_SLICE	= 1,
-I_SLICE	= 2,
-SP_SLICE = 3,
-SI_SLICE = 4,
-UNKNOWN_SLICE = 5
+  P_SLICE	= 0,
+  B_SLICE	= 1,
+  I_SLICE	= 2,
+  SP_SLICE = 3,
+  SI_SLICE = 4,
+  UNKNOWN_SLICE = 5
 };
 
 /* SSlice Types in scalable extension */		;
 enum ESliceTypeExt {
-EP_SLICE = 0,	// EP_SLICE: 0, 5
-EB_SLICE = 1,	// EB_SLICE: 1, 6
-EI_SLICE = 2	// EI_SLICE: 2, 7
+  EP_SLICE = 0,	// EP_SLICE: 0, 5
+  EB_SLICE = 1,	// EB_SLICE: 1, 6
+  EI_SLICE = 2	// EI_SLICE: 2, 7
 };
 
 /* List Index */
 enum EListIndex {
-LIST_0	= 0,
-LIST_1	= 1,
-LIST_A	= 2
+  LIST_0	= 0,
+  LIST_1	= 1,
+  LIST_A	= 2
 };
 
 
 
 /* Motion Vector components */
 enum EMvComp {
-MV_X	= 0,
-MV_Y	= 1,
-MV_A	= 2
+  MV_X	= 0,
+  MV_Y	= 1,
+  MV_A	= 2
 };
 
 /* Chroma Components */
 
 enum EChromaComp {
-CHROMA_CB	= 0,
-CHROMA_CR	= 1,
-CHROMA_A	= 2
+  CHROMA_CB	= 0,
+  CHROMA_CR	= 1,
+  CHROMA_A	= 2
 };
 
 
@@ -192,13 +192,13 @@ CHROMA_A	= 2
  *	Memory Management Control Operation (MMCO) code
  */
 enum EMmcoCode {
-MMCO_END			= 0,
-MMCO_SHORT2UNUSED	= 1,
-MMCO_LONG2UNUSED	= 2,
-MMCO_SHORT2LONG		= 3,
-MMCO_SET_MAX_LONG	= 4,
-MMCO_RESET			= 5,
-MMCO_LONG			= 6
+  MMCO_END			= 0,
+  MMCO_SHORT2UNUSED	= 1,
+  MMCO_LONG2UNUSED	= 2,
+  MMCO_SHORT2LONG		= 3,
+  MMCO_SET_MAX_LONG	= 4,
+  MMCO_RESET			= 5,
+  MMCO_LONG			= 6
 };
 
 /////////intra16x16  Luma
