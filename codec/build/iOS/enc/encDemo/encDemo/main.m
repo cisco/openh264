@@ -140,6 +140,8 @@ int AutoTestEnc() {
         [bitFileName UTF8String],
         "-numl",
         "1",
+          "-lconfig",
+          "0",
         [layercfg UTF8String]
       };
 

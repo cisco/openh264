@@ -20,6 +20,8 @@ JNIEXPORT void JNICALL Java_com_wels_enc_WelsEncTest_DoEncoderAutoTest
 	(char*) ((*env).GetStringUTFChars (jsOutbitName, NULL)),
 	(char*)("-numl"),
 	(char*)("1"),
+    (char*)("-lconfig"),
+    (char*)("0"),
 	(char*) ((*env).GetStringUTFChars (jsInlayerName, NULL))
   };
   LOGI ("Start to run JNI module!+++");

@@ -12,7 +12,7 @@ CODEC_TEST_IOS_REPORT_SUBFOLDER="release"
 
 buildXcodeProject()
 {
- xcodebuild ARCHS="${CODEC_TEST_IOS_ARCH}" VALID_ARCHS="${CODEC_TEST_IOS_ARCH}" ONLY_ACTIVE_ARCH=YES -project $1 -target $2 -configuration $3 -sdk ${CODEC_TEST_IOS_PLATFORM} clean build
+ xcodebuild ARCHS="${CODEC_TEST_IOS_ARCH}" VALID_ARCHS="${CODEC_TEST_IOS_ARCH}" ONLY_ACTIVE_ARCH=YES  -project $1 -target $2 -configuration $3 -sdk ${CODEC_TEST_IOS_PLATFORM} clean build
 
 if [ $? -eq 0 ]; then
  echo "build $1 $3 successfully"
@@ -98,6 +98,21 @@ for DEVICE_ID in ${DEVICES}
 do
 echo "Try to run on device:${DEVICE_ID}"
 
+#Encoder YUV file too large
+if [ ${ENCDEC} = "enc" ]
+then
+#For limited devices space
+BAKRES=${CODEC_TEST_RES}_bak
+mv ${CODEC_TEST_RES} ${BAKRES}
+mkdir -p ${CODEC_TEST_RES}
+CODEC_CASE=`ls ${BAKRES}`
+echo ${CODEC_CASE}
+for CASE in ${CODEC_CASE}
+do
+echo ${CASE}
+cp -r ${BAKRES}/${CASE} ${CODEC_TEST_RES}/.
+
+
 #uninstall the application from device to remove the last result
 ./fruitstrap uninstall --bundle ${CODEC_TEST_IOS_APP_ID} --id ${DEVICE_ID}
 if [ $? -ne 0 ]; then
@@ -110,16 +125,47 @@ echo install application: ${CODEC_TEST_IOS_APP} to device: ${DEVICE_ID} is faile
 exit 1
 fi
 
-./iFileTransfer -o copy -id ${DEVICE_ID} -app ${CODEC_TEST_IOS_APP_ID} -from ${CODEC_TEST_RES}
+#./iFileTransfer -o copy -id ${DEVICE_ID} -app ${CODEC_TEST_IOS_APP_ID} -from ${CODEC_TEST_RES}
 instruments -w ${DEVICE_ID}  -t /Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/PlugIns/AutomationInstrument.bundle/Contents/Resources/Automation.tracetemplate ${CODEC_TEST_IOS_APP} -e UIASCRIPT ./uiascript.js -e UIARRESULTPATH /tmp/
 #copy to report folder
-./iFileTransfer -o download -id ${DEVICE_ID} -app ${CODEC_TEST_IOS_APP_ID} -from /Documents/${CODEC_TEST_LOG}.log -to ${CODEC_TEST_IOS_REPORT_PATH}/${CODEC_TEST_LOG}_${DEVICE_ID}_${rand}.log
+./iFileTransfer -o download -id ${DEVICE_ID} -app ${CODEC_TEST_IOS_APP_ID} -from /Documents/${CODEC_TEST_LOG}.log -to ${CODEC_TEST_IOS_REPORT_PATH}/${CODEC_TEST_LOG}_${DEVICE_ID}_${rand}_${CASE}.log
+if [ $? -ne 0 ]; then
+echo "download file: ${CODEC_TEST_LOG}.log from ${CODEC_TEST_IOS_APP_ID} is failed!"
+exit 1
+fi
+cat ${CODEC_TEST_IOS_REPORT_PATH}/${CODEC_TEST_LOG}_${DEVICE_ID}_${rand}_${CASE}.log>>${CODEC_TEST_IOS_REPORT_PATH}/${CODEC_TEST_LOG}_${DEVICE_ID}_${rand}.log
+rm -f ${CODEC_TEST_IOS_REPORT_PATH}/${CODEC_TEST_LOG}_${DEVICE_ID}_${rand}_${CASE}.log
+rm -rf ${CODEC_TEST_RES}/${CASE}
+done
+rm -rf ${CODEC_TEST_RES}
+mv ${BAKRES} ${CODEC_TEST_RES}
+#Enough spaces
+else
+#uninstall the application from device to remove the last result
+./fruitstrap uninstall --bundle ${CODEC_TEST_IOS_APP_ID} --id ${DEVICE_ID}
+if [ $? -ne 0 ]; then
+echo uninstall application: ${CODEC_TEST_IOS_APP} from device: ${DEVICE_ID} is failed!
+fi
+#install the application
+./fruitstrap install --bundle ${CODEC_TEST_IOS_APP} --id ${DEVICE_ID}
+if [ $? -ne 0 ]; then
+echo install application: ${CODEC_TEST_IOS_APP} to device: ${DEVICE_ID} is failed!
+exit 1
+fi
+
+#./iFileTransfer -o copy -id ${DEVICE_ID} -app ${CODEC_TEST_IOS_APP_ID} -from ${CODEC_TEST_RES}
+instruments -w ${DEVICE_ID}  -t /Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/PlugIns/AutomationInstrument.bundle/Contents/Resources/Automation.tracetemplate ${CODEC_TEST_IOS_APP} -e UIASCRIPT ./uiascript.js -e UIARRESULTPATH /tmp/
+#copy to report folder
+./iFileTransfer -o download -id ${DEVICE_ID} -app ${CODEC_TEST_IOS_APP_ID} -from /Documents/${CODEC_TEST_LOG}.log -to ${CODEC_TEST_IOS_REPORT_PATH}/${CODEC_TEST_LOG}_${DEVICE_ID}_${rand}_${CASE}.log
 if [ $? -ne 0 ]; then
 echo "download file: ${CODEC_TEST_LOG}.log from ${CODEC_TEST_IOS_APP_ID} is failed!"
 exit 1
 fi
 
+
+fi
 done
+
 fi
 }
 
@@ -144,4 +190,4 @@ echo the test result is generated at ./ios/report/xx.loGbash parsePerfData.sh
 echo xxxxxxxxxxxxxxxxxxxxxxxxxxxxIOS $ENCDEC  Endxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 fi
 #TODO:according to the trace of instruments to do some analysis
-find .\ -name *.trace -exec rm -rf {} \;
+#find ./ -name *.trace -exec rm -rf {} \;
