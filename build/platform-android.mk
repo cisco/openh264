@@ -47,7 +47,9 @@ LDFLAGS += --sysroot=$(SYSROOT)
 SHLDFLAGS = -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-soname,lib$(PROJECT_NAME).so
 
 ifneq ($(CXX),$(wildcard $(CXX)))
+ifneq ($(CXX).exe,$(wildcard $(CXX).exe))
 $(error Compiler not found, bad NDKROOT or ARCH?)
+endif
 endif
 
 STL_INCLUDES = \
