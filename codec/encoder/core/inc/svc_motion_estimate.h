@@ -244,6 +244,22 @@ void SumOf8x8BlockOfFrame_c (uint8_t* pRefPicture, const int32_t kiWidth, const 
 void SumOf16x16BlockOfFrame_c (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
                                const int32_t kiRefStride,
                                uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+
+#ifdef X86_ASM
+extern "C"
+{
+int32_t SumOf8x8SingleBlock_sse2 (uint8_t* pRef, const int32_t kiRefStride);
+int32_t SumOf16x16SingleBlock_sse2 (uint8_t* pRef, const int32_t kiRefStride);
+void SumOf8x8BlockOfFrame_sse2 (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
+                const int32_t kiRefStride, uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+void SumOf16x16BlockOfFrame_sse2 (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
+                const int32_t kiRefStride, uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+void SumOf8x8BlockOfFrame_sse4 (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
+                const int32_t kiRefStride, uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+void SumOf16x16BlockOfFrame_sse4 (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
+                const int32_t kiRefStride, uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+}
+#endif
 #ifdef HAVE_NEON
 extern "C"
 {
