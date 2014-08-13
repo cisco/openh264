@@ -145,8 +145,10 @@ void DecoderInterfaceTest::TestInitUninit() {
   CM_RETURN eRet;
   //No initialize, no GetOption can be done
   m_pDec->Uninitialize();
-  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_DATAFORMAT, &iOutput);
-  EXPECT_EQ (eRet, cmInitExpected);
+  for (int i = 0; i <= (int) DECODER_OPTION_TRACE_CALLBACK_CONTEXT; ++i) {
+    eRet = (CM_RETURN) m_pDec->GetOption ((DECODER_OPTION) i, &iOutput);
+    EXPECT_EQ (eRet, cmInitExpected);
+  }
   //Initialize first, can get input color format
   m_sDecParam.eOutputColorFormat = (EVideoFormatType) 20; //just for test
   m_pDec->Initialize (&m_sDecParam);
@@ -157,9 +159,11 @@ void DecoderInterfaceTest::TestInitUninit() {
   //Uninitialize, no GetOption can be done
   m_pDec->Uninitialize();
   iOutput = 21;
-  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_DATAFORMAT, &iOutput);
-  EXPECT_EQ (iOutput, 21);
-  EXPECT_EQ (eRet, cmInitExpected);
+  for (int i = 0; i <= (int) DECODER_OPTION_TRACE_CALLBACK_CONTEXT; ++i) {
+    eRet = (CM_RETURN) m_pDec->GetOption ((DECODER_OPTION) i, &iOutput);
+    EXPECT_EQ (iOutput, 21);
+    EXPECT_EQ (eRet, cmInitExpected);
+  }
 }
 
 //DECODER_OPTION_DATAFORMAT
@@ -167,6 +171,8 @@ void DecoderInterfaceTest::TestDataFormat() {
   int iTmp = rand();
   int iOut;
   CM_RETURN eRet;
+
+  Init();
 
   //invalid input
   eRet = (CM_RETURN) m_pDec->SetOption (DECODER_OPTION_DATAFORMAT, NULL);
@@ -179,12 +185,16 @@ void DecoderInterfaceTest::TestDataFormat() {
   EXPECT_EQ (eRet, cmResultSuccess);
 
   EXPECT_EQ (iOut, (int32_t) videoFormatI420);
+
+  Uninit();
 }
 
 //DECODER_OPTION_END_OF_STREAM
 void DecoderInterfaceTest::TestEndOfStream() {
   int iTmp, iOut;
   CM_RETURN eRet;
+
+  Init();
 
   //invalid input
   eRet = (CM_RETURN) m_pDec->SetOption (DECODER_OPTION_END_OF_STREAM, NULL);
@@ -234,12 +244,48 @@ void DecoderInterfaceTest::TestEndOfStream() {
   eRet = (CM_RETURN) m_pDec->DecodeFrame2 (NULL, 0, m_pData, &m_sBufferInfo);
   eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_END_OF_STREAM, &iOut);
   EXPECT_EQ (iOut, true); //decoder should have EOS == true
+
+  Uninit();
 }
 
 
 //DECODER_OPTION_VCL_NAL
+//Here Test illegal bitstream input
+//legal bitstream decoding test, please see api test
 void DecoderInterfaceTest::TestVclNal() {
-  //TODO
+  int iTmp, iOut;
+  CM_RETURN eRet;
+
+  Init();
+
+  //Test SetOption
+  //VclNal never supports SetOption
+  iTmp = rand();
+  eRet = (CM_RETURN) m_pDec->SetOption (DECODER_OPTION_VCL_NAL, &iTmp);
+  EXPECT_EQ (eRet, cmInitParaError);
+
+  //Test GetOption
+  //invalid input
+  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_VCL_NAL, NULL);
+  EXPECT_EQ (eRet, cmInitParaError);
+
+  //valid input without actual decoding
+  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_VCL_NAL, &iOut);
+  EXPECT_EQ (eRet, cmResultSuccess);
+  EXPECT_EQ (iOut, FEEDBACK_NON_VCL_NAL);
+
+  //valid input with decoding error
+  MockPacketType (NAL_UNIT_CODED_SLICE_IDR, 50);
+  m_pDec->DecodeFrame2 (m_szBuffer, m_iBufLength, m_pData, &m_sBufferInfo);
+  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_VCL_NAL, &iOut);
+  EXPECT_EQ (eRet, cmResultSuccess);
+  EXPECT_EQ (iOut, FEEDBACK_UNKNOWN_NAL);
+  m_pDec->DecodeFrame2 (NULL, 0, m_pData, &m_sBufferInfo);
+  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_VCL_NAL, &iOut);
+  EXPECT_EQ (eRet, cmResultSuccess);
+  EXPECT_EQ (iOut, FEEDBACK_UNKNOWN_NAL);
+
+  Uninit();
 }
 
 //DECODER_OPTION_TEMPORAL_ID
@@ -293,9 +339,6 @@ TEST_F (DecoderInterfaceTest, DecoderInterfaceAll) {
 
   //Initialize Uninitialize
   TestInitUninit();
-
-  //AfterInitialize is OK, do the following tests
-  Init();
   //DECODER_OPTION_DATAFORMAT
   TestDataFormat();
   //DECODER_OPTION_END_OF_STREAM
@@ -320,9 +363,6 @@ TEST_F (DecoderInterfaceTest, DecoderInterfaceAll) {
   TestTraceCallback();
   //DECODER_OPTION_TRACE_CALLBACK_CONTEXT
   TestTraceCallbackContext();
-
-  //uninitialize
-  Uninit();
 }
 
 
