@@ -6,6 +6,7 @@ API_TEST_CPP_SRCS=\
 	$(API_TEST_SRCDIR)/DataGenerator.cpp\
 	$(API_TEST_SRCDIR)/decode_encode_test.cpp\
 	$(API_TEST_SRCDIR)/decoder_test.cpp\
+	$(API_TEST_SRCDIR)/encode_decode_api_test.cpp\
 	$(API_TEST_SRCDIR)/encoder_test.cpp\
 	$(API_TEST_SRCDIR)/simple_test.cpp\
 
