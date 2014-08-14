@@ -31,6 +31,16 @@
 ;*************************************************************************/
 %include "asm_inc.asm"
 
+;***********************************************************************
+; Local Data (Read Only)
+;***********************************************************************
+SECTION .rodata align=16
+
+ALIGN 16
+mv_x_inc_x4		dw	0x10, 0x10, 0x10, 0x10
+mv_y_inc_x4		dw	0x04, 0x04, 0x04, 0x04
+mx_x_offset_x4	dw	0x00, 0x04, 0x08, 0x0C
+
 SECTION .text
 %ifdef X86_32
 ;**********************************************************************************************************************
@@ -661,6 +671,159 @@ WIDTH_LOOP_X16_SSE4:
 %undef		tmp_width
     ret
 
+
+;-----------------------------------------------------------------------------------------------------------------------------
+; void FillQpelLocationByFeatureValue_sse2(uint16_t* pFeatureOfBlock, const int32_t kiWidth, const int32_t kiHeight, uint16_t** pFeatureValuePointerList)
+;-----------------------------------------------------------------------------------------------------------------------------
+WELS_EXTERN FillQpelLocationByFeatureValue_sse2
+	push	esi
+	push	edi
+	push	ebx
+	push	ebp
+
+	%define _ps			16				; push size
+	%define	_ls			4				; local size
+	%define	sum_ref		esp+_ps+_ls+4
+	%define	pos_list	esp+_ps+_ls+16
+	%define width		esp+_ps+_ls+8
+	%define height		esp+_ps+_ls+12
+	%define	i_height	esp
+	sub		esp,	_ls
+
+	mov		esi,	[sum_ref]
+	mov		edi,	[pos_list]
+	mov		ebp,	[width]
+	mov		ebx,	[height]
+	mov		[i_height],	ebx
+
+	movq	xmm7,	[mv_x_inc_x4]		; x_qpel inc
+	movq	xmm6,	[mv_y_inc_x4]		; y_qpel inc
+	movq	xmm5,	[mx_x_offset_x4]	; x_qpel vector
+	pxor	xmm4,	xmm4
+	pxor	xmm3,	xmm3				; y_qpel vector
+HASH_HEIGHT_LOOP_SSE2:
+	movdqa	xmm2,	xmm5	; x_qpel vector
+	mov		ecx,	ebp
+HASH_WIDTH_LOOP_SSE2:
+	movq	xmm0,	[esi]			; load x8 sum
+	punpcklwd	xmm0,	xmm4
+	movdqa		xmm1,	xmm2
+	punpcklwd	xmm1,	xmm3
+%rep	3
+	movd	edx,	xmm0
+	lea		ebx,	[edi+edx*4]
+	mov		eax,	[ebx]
+	movd	[eax],	xmm1
+	mov		edx,	[eax+4]	; explictly load eax+4 due cache miss from vtune observation
+	lea		eax,	[eax+4]
+	mov		[ebx],	eax
+	psrldq	xmm1,	4
+	psrldq	xmm0,	4
+%endrep
+	movd	edx,	xmm0
+	lea		ebx,	[edi+edx*4]
+	mov		eax,	[ebx]
+	movd	[eax],	xmm1
+	mov		edx,	[eax+4]	; explictly load eax+4 due cache miss from vtune observation
+	lea		eax,	[eax+4]
+	mov		[ebx],	eax
+
+	paddw	xmm2,	xmm7
+	lea		esi,	[esi+8]
+	sub		ecx,	4
+	jnz near HASH_WIDTH_LOOP_SSE2
+	paddw	xmm3,	xmm6
+	dec	dword [i_height]
+	jnz	near HASH_HEIGHT_LOOP_SSE2
+
+	add		esp,	_ls
+	%undef	_ps
+	%undef	_ls
+	%undef	sum_ref
+	%undef	pos_list
+	%undef	width
+	%undef	height
+	%undef	i_height
+	pop		ebp
+	pop		ebx
+	pop		edi
+	pop		esi
+	ret
+
+;---------------------------------------------------------------------------------------------------------------------------------------------------
+; void InitializeHashforFeature_sse2( uint32_t* pTimesOfFeatureValue, uint16_t* pBuf, const int32_t kiListSize,
+;                        uint16_t** pLocationOfFeature, uint16_t** pFeatureValuePointerList )
+;---------------------------------------------------------------------------------------------------------------------------------------------------
+WELS_EXTERN InitializeHashforFeature_sse2
+	push	ebx
+	push	esi
+	push	edi
+	push	ebp
+	%define	_ps	16	; push size
+	mov		edi,	[esp+_ps+16]	; pPositionOfSum
+	mov		ebp,	[esp+_ps+20]	; sum_idx_list
+	mov		esi,	[esp+_ps+4]     ; pTimesOfSum
+	mov		ebx,	[esp+_ps+8]     ; pBuf
+	mov		edx,	[esp+_ps+12]	; list_sz
+	sar		edx,	2
+	mov		ecx,	0
+	pxor	xmm7,	xmm7
+hash_assign_loop_x4_sse2:
+	movdqa	xmm0,	[esi+ecx]
+	pslld	xmm0,	2
+
+	movdqa	xmm1,	xmm0
+	pcmpeqd	xmm1,	xmm7
+	movmskps	eax,	xmm1
+    cmp eax, 0x0f
+	je	near hash_assign_with_copy_sse2
+
+%assign x	0
+%rep 4
+	lea		eax,	[edi+ecx+x]
+	mov		[eax],	ebx
+	lea		eax,	[ebp+ecx+x]
+	mov		[eax],	ebx
+	movd	eax,	xmm0
+	add		ebx,	eax
+	psrldq	xmm0,	4
+%assign	x	x+4
+%endrep
+	jmp near assign_next_sse2
+
+hash_assign_with_copy_sse2:
+	movd	xmm1,	ebx
+	pshufd	xmm2,	xmm1,	0
+	movdqa	[edi+ecx], xmm2
+	movdqa	[ebp+ecx], xmm2
+
+assign_next_sse2:
+	add		ecx,	16
+	dec		edx
+	jnz		near hash_assign_loop_x4_sse2
+
+	mov		edx,	[esp+_ps+12]	; list_sz
+	and		edx,	3
+	jz		near hash_assign_no_rem_sse2
+hash_assign_loop_x4_rem_sse2:
+	lea		eax,	[edi+ecx]
+	mov		[eax],	ebx
+	lea		eax,	[ebp+ecx]
+	mov		[eax],	ebx
+	mov		eax,	[esi+ecx]
+	sal		eax,	2
+	add		ebx,	eax
+	add		ecx,	4
+	dec		edx
+	jnz		near hash_assign_loop_x4_rem_sse2
+
+hash_assign_no_rem_sse2:
+	%undef	_ps
+	pop		ebp
+	pop		edi
+	pop		esi
+	pop		ebx
+	ret
 %else
 
 ;**********************************************************************************************************************
@@ -1221,6 +1384,146 @@ WIDTH_LOOP_X16_SSE4:
     POP_XMM
     LOAD_6_PARA_POP
     ret
+
+;-----------------------------------------------------------------------------------------------------------------------------
+; void FillQpelLocationByFeatureValue_sse2(uint16_t* pFeatureOfBlock, const int32_t kiWidth, const int32_t kiHeight, uint16_t** pFeatureValuePointerList)
+;-----------------------------------------------------------------------------------------------------------------------------
+WELS_EXTERN FillQpelLocationByFeatureValue_sse2
+    %assign  push_num 0
+    LOAD_4_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION  r1, r1d
+    SIGN_EXTENSION  r2, r2d
+    push r12
+    push r13
+
+	;mov		esi,	[sum_ref]   r0:esi
+	;mov		edi,	[pos_list]  r3:edi
+	;mov		ebp,	[width]     r1:ebp
+	;mov		ebx,	[height]    r2:ebx
+	;mov		[i_height],	ebx
+    mov     r12,    r2
+
+	movq	xmm7,	[mv_x_inc_x4]		; x_qpel inc
+	movq	xmm6,	[mv_y_inc_x4]		; y_qpel inc
+	movq	xmm5,	[mx_x_offset_x4]	; x_qpel vector
+	pxor	xmm4,	xmm4
+	pxor	xmm3,	xmm3				; y_qpel vector
+HASH_HEIGHT_LOOP_SSE2:
+	movdqa	xmm2,	xmm5	; x_qpel vector
+	mov		r4,	r1
+HASH_WIDTH_LOOP_SSE2:
+	movq	xmm0,	[r0]			; load x8 sum
+	punpcklwd	xmm0,	xmm4
+	movdqa		xmm1,	xmm2
+	punpcklwd	xmm1,	xmm3
+%rep	3
+	movd	r2d,	xmm0        ;edx:r3
+	lea		r5,     [r3+r2*8]   ;ebx:r5
+	mov		r6,     [r5]        ;eax:r6
+	movd	[r6],	xmm1
+	mov		r13,    [r6+4]	; explictly load eax+4 due cache miss from vtune observation
+	lea		r6,     [r6+4]
+	mov		[r5],	r6
+	psrldq	xmm1,	4
+	psrldq	xmm0,	4
+%endrep
+	movd	r2d,	xmm0
+	lea		r5,     [r3+r2*8]   ;ebx:r5
+	mov		r6,     [r5]        ;eax:r6
+	movd	[r6],	xmm1
+	mov		r13,    [r6+4]	; explictly load eax+4 due cache miss from vtune observation
+	lea		r6,     [r6+4]
+	mov		[r5],	r6
+
+	paddw	xmm2,	xmm7
+	lea		r0,     [r0+8]
+	sub		r4,     4
+	jnz near HASH_WIDTH_LOOP_SSE2
+	paddw	xmm3,	xmm6
+	dec	r12
+	jnz	near HASH_HEIGHT_LOOP_SSE2
+
+	pop		r13
+	pop		r12
+    POP_XMM
+	ret
+
+;---------------------------------------------------------------------------------------------------------------------------------------------------
+; void InitializeHashforFeature_sse2( uint32_t* pTimesOfFeatureValue, uint16_t* pBuf, const int32_t kiListSize,
+;                                 uint16_t** pLocationOfFeature, uint16_t** pFeatureValuePointerList);
+;uint16_t** pPositionOfSum, uint16_t** sum_idx_list, uint32_t* pTimesOfSum, uint16_t* pBuf, const int32_t list_sz )
+;---------------------------------------------------------------------------------------------------------------------------------------------------
+WELS_EXTERN InitializeHashforFeature_sse2
+    %assign  push_num 0
+    LOAD_5_PARA
+    SIGN_EXTENSION  r2, r2d
+    push r12
+    push r13
+	;mov		edi,	[esp+_ps+4]		; pPositionOfSum    r3:edi
+	;mov		ebp,	[esp+_ps+8]		; sum_idx_list      r4:ebp
+	;mov		esi,	[esp+_ps+12]	; pTimesOfSum       r0:esi
+	;mov		ebx,	[esp+_ps+16]	; pBuf              r1:ebx
+	;mov		edx,	[esp+_ps+20]	; list_sz           r2:edx
+    mov     r12,    r2
+	sar		r2,     2
+	mov		r5,     0       ;r5:ecx
+    xor     r6,     r6
+	pxor	xmm3,	xmm3
+hash_assign_loop_x4_sse2:
+	movdqa	xmm0,	[r0+r5]
+	pslld	xmm0,	2
+
+	movdqa	xmm1,	xmm0
+	pcmpeqd	xmm1,	xmm3
+	movmskps	r6,	xmm1
+    cmp         r6, 0x0f
+	jz	near hash_assign_with_copy_sse2
+
+%assign x	0
+%rep 4
+	lea		r13,	[r3+r5*2+x]
+	mov		[r13],	r1
+	lea		r13,	[r4+r5*2+x]
+	mov		[r13],	r1
+	movd	r6d,	xmm0
+	add		r1,     r6
+	psrldq	xmm0,	4
+%assign	x	x+8
+%endrep
+	jmp near assign_next_sse2
+
+hash_assign_with_copy_sse2:
+	movq	xmm1,	r1
+	pshufd	xmm2,	xmm1,	01000100b
+	movdqa	[r3+r5*2], xmm2
+	movdqa	[r4+r5*2], xmm2
+	movdqa	[r3+r5*2+16], xmm2
+	movdqa	[r4+r5*2+16], xmm2
+
+assign_next_sse2:
+	add		r5,	16
+	dec		r2
+	jnz		near hash_assign_loop_x4_sse2
+
+	and		r12,	3
+	jz		near hash_assign_no_rem_sse2
+hash_assign_loop_x4_rem_sse2:
+	lea		r13,	[r3+r5*2]
+	mov		[r13],	r1
+	lea		r13,	[r4+r5*2]
+	mov		[r13],	r1
+	mov		r6d,	[r0+r5]
+	sal		r6,     2
+	add		r1,     r6
+	add		r5,     4
+	dec		r12
+	jnz		near hash_assign_loop_x4_rem_sse2
+
+hash_assign_no_rem_sse2:
+    pop     r13
+    pop		r12
+	ret
 
 %endif
 

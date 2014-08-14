@@ -107,6 +107,8 @@ void WelsInitMeFunc (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag, bool bScre
 #if defined (X86_ASM)
     if (uiCpuFlag & WELS_CPU_SSE2) {
         //for feature search
+      pFuncList->pfInitializeHashforFeature = InitializeHashforFeature_sse2;
+      pFuncList->pfFillQpelLocationByFeatureValue = FillQpelLocationByFeatureValue_sse2;
       pFuncList->pfCalculateBlockFeatureOfFrame[0] = SumOf8x8BlockOfFrame_sse2;
       pFuncList->pfCalculateBlockFeatureOfFrame[1] = SumOf16x16BlockOfFrame_sse2;
         //TODO: it is possible to differentiate width that is times of 8, so as to accelerate the speed when width is times of 8?
