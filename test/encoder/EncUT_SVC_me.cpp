@@ -168,15 +168,6 @@ GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 640, 3
 GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 640, 320)
 #endif
 
-#ifdef HAVE_NEON
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 1, 1)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 1, 1)
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 1, 320)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 1, 320)
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 640, 320)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 640, 320)
-#endif
-
 #ifdef HAVE_NEON_AARCH64
 GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_AArch64_neon, 1, 1)
 GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_AArch64_neon, 1, 1)
