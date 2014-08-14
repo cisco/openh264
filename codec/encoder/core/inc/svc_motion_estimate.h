@@ -236,6 +236,10 @@ void WelsDiamondCrossSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* 
 #define FMESWITCH_DEFAULT_GOODFRAME_NUM (2)
 #define FMESWITCH_MBSAD_THRESHOLD   30 // empirically set.
 
+void InitializeHashforFeature_c (uint32_t* pTimesOfFeatureValue, uint16_t* pBuf, const int32_t kiListSize,
+                                 uint16_t** pLocationOfFeature, uint16_t** pFeatureValuePointerList);
+void FillQpelLocationByFeatureValue_c (uint16_t* pFeatureOfBlock, const int32_t kiWidth, const int32_t kiHeight,
+                                       uint16_t** pFeatureValuePointerList);
 int32_t SumOf8x8SingleBlock_c (uint8_t* pRef, const int32_t kiRefStride);
 int32_t SumOf16x16SingleBlock_c (uint8_t* pRef, const int32_t kiRefStride);
 void SumOf8x8BlockOfFrame_c (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,

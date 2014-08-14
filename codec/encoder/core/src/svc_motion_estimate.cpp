@@ -97,6 +97,8 @@ void WelsInitMeFunc (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag, bool bScre
 #endif
 
     //for feature search
+    pFuncList->pfInitializeHashforFeature = InitializeHashforFeature_c;
+    pFuncList->pfFillQpelLocationByFeatureValue = FillQpelLocationByFeatureValue_c;
     pFuncList->pfCalculateBlockFeatureOfFrame[0] = SumOf8x8BlockOfFrame_c;
     pFuncList->pfCalculateBlockFeatureOfFrame[1] = SumOf16x16BlockOfFrame_c;
     //TODO: it is possible to differentiate width that is times of 8, so as to accelerate the speed when width is times of 8?
@@ -812,11 +814,11 @@ bool CalculateFeatureOfBlock (SWelsFuncPtrList* pFunc, SPicture* pRef,
       pTimesOfFeatureValue);
 
   //assign pLocationOfFeature pointer
-  InitializeHashforFeature_c (pTimesOfFeatureValue, pBuf, kiActualListSize,
+  pFunc->pfInitializeHashforFeature (pTimesOfFeatureValue, pBuf, kiActualListSize,
                               pLocationOfFeature, pScreenBlockFeatureStorage->pFeatureValuePointerList);
 
   //assign each pixel's pLocationOfFeature
-  FillQpelLocationByFeatureValue_c (pFeatureOfBlock, iWidth, kiHeight, pScreenBlockFeatureStorage->pFeatureValuePointerList);
+  pFunc->pfFillQpelLocationByFeatureValue (pFeatureOfBlock, iWidth, kiHeight, pScreenBlockFeatureStorage->pFeatureValuePointerList);
   return true;
 }
 
