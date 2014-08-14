@@ -92,6 +92,11 @@ TEST (SVC_ME_FunTest, method) {\
 GENERATE_SumOfSingleBlock (SumOf8x8SingleBlock_ref, SumOf8x8SingleBlock_c)
 GENERATE_SumOfSingleBlock (SumOf16x16SingleBlock_ref, SumOf16x16SingleBlock_c)
 
+#ifdef X86_ASM
+GENERATE_SumOfSingleBlock (SumOf8x8SingleBlock_ref, SumOf8x8SingleBlock_sse2)
+GENERATE_SumOfSingleBlock (SumOf16x16SingleBlock_ref, SumOf16x16SingleBlock_sse2)
+#endif
+
 #ifdef HAVE_NEON
 GENERATE_SumOfSingleBlock (SumOf8x8SingleBlock_ref, SumOf8x8SingleBlock_neon)
 GENERATE_SumOfSingleBlock (SumOf16x16SingleBlock_ref, SumOf16x16SingleBlock_neon)
@@ -137,6 +142,31 @@ GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_c, 1, 320)
 GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_c, 1, 320)
 GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_c, 640, 320)
 GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_c, 640, 320)
+
+#ifdef X86_ASM
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse2, 6, 6)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse2, 6, 6)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse2, 6, 320)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse2, 6, 320)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse2, 640, 320)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse2, 640, 320)
+
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse4, 8, 2)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse4, 16, 2)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse4, 8, 320)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse4, 16, 320)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse4, 640, 320)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse4, 640, 320)
+#endif
+
+#ifdef HAVE_NEON
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 1, 1)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 1, 1)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 1, 320)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 1, 320)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 640, 320)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 640, 320)
+#endif
 
 #ifdef HAVE_NEON
 GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 1, 1)
