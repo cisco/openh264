@@ -72,9 +72,8 @@ WELS_ASM_AARCH64_FUNC_BEGIN SumOf8x8BlockOfFrame_AArch64_neon
     add x8, x8, x6
     add x4, x4, x6, lsl #1
 
-_height_loop8x8:
     mov x7, x6
-_width_loop8x8:
+_width_loop8x8_1:
     subs x0, x8, x7
     ld1 {v0.d}[0], [x0], x3
     ld1 {v0.d}[1], [x0], x3
@@ -100,13 +99,48 @@ _width_loop8x8:
     add w0, w0, #1
     str w0, [x1]
     subs x7, x7, #1
-    cbnz x7, _width_loop8x8
+    cbnz x7, _width_loop8x8_1
+
+    add x8, x8, x3
+    add x4, x4, x6, lsl #1
+    subs x2, x2, #1
+    cbz x2, _SumOf8x8BlockOfFrame_AArch64_neon_end
+
+_height_loop8x8:
+    mov x7, x6
+_width_loop8x8_2:
+    subs x0, x8, x7
+    subs x1, x4, x7, lsl #1
+    subs x9, x1, x6, lsl #1 // last line of pFeatureOfBlock[i]
+    ldrh  w10, [x9] // sum of last line of pFeatureOfBlock[i]
+
+    subs x11, x0, x3
+    ld1 {v0.d}[1], [x11]
+    add x0, x11, x3, lsl #3
+    ld1 {v0.d}[0], [x0] //
+
+    uaddlp v0.8h, v0.16b
+    addp v0.8h, v0.8h, v1.8h
+    uaddlp v0.4s, v0.8h
+    umov w11, v0.s[0]
+    umov w12, v0.s[1]
+
+    subs w10, w10, w12
+    mov x0, #0
+    add w0, w10, w11
+    strh w0, [x1] // sum -> pFeatureOfBlock[i]
+    add x1, x5, x0, lsl #2
+    ldr w0, [x1]
+    add w0, w0, #1
+    str w0, [x1]
+    subs x7, x7, #1
+    cbnz x7, _width_loop8x8_2
 
     add x8, x8, x3
     add x4, x4, x6, lsl #1
     subs x2, x2, #1
     cbnz x2, _height_loop8x8
-
+_SumOf8x8BlockOfFrame_AArch64_neon_end:
 WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN SumOf16x16BlockOfFrame_AArch64_neon
@@ -119,9 +153,8 @@ WELS_ASM_AARCH64_FUNC_BEGIN SumOf16x16BlockOfFrame_AArch64_neon
     add x8, x8, x6
     add x4, x4, x6, lsl #1
 
-_height_loop16x16:
     mov x7, x6
-_width_loop16x16:
+_width_loop16x16_1:
     subs x0, x8, x7
     ld1 {v0.16b}, [x0], x3
     uaddlp v0.8h, v0.16b
@@ -141,11 +174,47 @@ _width_loop16x16:
     add w0, w0, #1
     str w0, [x1]
     subs x7, x7, #1
-    cbnz x7, _width_loop16x16
+    cbnz x7, _width_loop16x16_1
+
+    add x8, x8, x3
+    add x4, x4, x6, lsl #1
+    subs x2, x2, #1
+    cbz x2, _SumOf16x16BlockOfFrame_AArch64_neon_end
+
+_height_loop16x16:
+    mov x7, x6
+_width_loop16x16_2:
+    subs x0, x8, x7
+
+    subs x1, x4, x7, lsl #1
+    subs x9, x1, x6, lsl #1 // last line of pFeatureOfBlock[i]
+    ldrh  w10, [x9] // sum of last line of pFeatureOfBlock[i]
+
+    subs x11, x0, x3
+    ld1 {v1.16b}, [x11]
+    add x0, x11, x3, lsl #4
+    ld1 {v0.16b}, [x0] //
+
+    uaddlv h0, v0.16b
+    uaddlv h1, v1.16b
+    umov w11, v0.h[0]
+    umov w12, v1.h[0]
+
+    subs w10, w10, w12
+    mov x0, #0
+    add w0, w10, w11
+    strh w0, [x1] // sum -> pFeatureOfBlock[i]
+    add x1, x5, x0, lsl #2
+    ldr w0, [x1]
+    add w0, w0, #1
+    str w0, [x1]
+    subs x7, x7, #1
+    cbnz x7, _width_loop16x16_2
 
     add x8, x8, x3
     add x4, x4, x6, lsl #1
     subs x2, x2, #1
     cbnz x2, _height_loop16x16
+_SumOf16x16BlockOfFrame_AArch64_neon_end:
 WELS_ASM_AARCH64_FUNC_END
 #endif
