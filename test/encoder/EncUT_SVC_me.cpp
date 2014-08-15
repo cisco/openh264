@@ -6,6 +6,7 @@
 #include "cpu_core.h"
 #include "cpu.h"
 #include "macros.h"
+#include "ls_defines.h"
 #include "svc_motion_estimate.h"
 
 using namespace WelsEnc;
@@ -77,6 +78,33 @@ void SumOf16x16BlockOfFrame_ref (uint8_t* pRefPicture, const int32_t kiWidth, co
   }
 }
 
+
+void InitializeHashforFeature_ref (uint32_t* pTimesOfFeatureValue, uint16_t* pBuf, const int32_t kiListSize,
+                                 uint16_t** pLocationOfFeature, uint16_t** pFeatureValuePointerList) {
+    //assign location pointer
+  uint16_t* pBufPos  = pBuf;
+  for (int32_t i = 0 ; i < kiListSize; ++i) {
+    pLocationOfFeature[i] =
+    pFeatureValuePointerList[i] = pBufPos;
+    pBufPos      += (pTimesOfFeatureValue[i] << 1);
+  }
+}
+void FillQpelLocationByFeatureValue_ref (uint16_t* pFeatureOfBlock, const int32_t kiWidth, const int32_t kiHeight,
+                                       uint16_t** pFeatureValuePointerList) {
+    //assign each pixel's position
+  uint16_t* pSrcPointer  =  pFeatureOfBlock;
+  int32_t iQpelY = 0;
+  for (int32_t y = 0; y < kiHeight; y++) {
+    for (int32_t x = 0; x < kiWidth; x++) {
+      uint16_t uiFeature = pSrcPointer[x];
+      ST32 (&pFeatureValuePointerList[uiFeature][0], ((iQpelY << 16) | (x << 2)));
+      pFeatureValuePointerList[uiFeature] += 2;
+    }
+    iQpelY += 4;
+    pSrcPointer += kiWidth;
+  }
+}
+
 #define GENERATE_SumOfSingleBlock(anchor, method) \
 TEST (SVC_ME_FunTest, method) {\
   ENFORCE_STACK_ALIGN_1D (uint8_t,  uiRefBuf,   16*320, 16);\
@@ -135,6 +163,93 @@ delete[] pRefPictureBuff; \
 delete[] pFeatureOfBlockBuff1; \
 delete[] pFeatureOfBlockBuff2; \
 }
+
+#define GENERATE_InitializeHashforFeature(anchor, method, kiWidth, kiHeight) \
+TEST (SVC_ME_FunTest, method##_##kiWidth##x##kiHeight) {\
+ENFORCE_NEW_ALIGN_1D (uint8_t, pRefPicture, pRefPictureBuff, ((kiHeight+16)*((((kiWidth+15)>>4)<<4)+16)), 16) \
+ENFORCE_NEW_ALIGN_1D (uint16_t, pFeatureOfBlock, pFeatureOfBlockBuff, (kiWidth*kiHeight), 16) \
+ENFORCE_NEW_ALIGN_1D (uint16_t, pLocation1, pLocationBuff1, (kiWidth*kiHeight)*2, 16) \
+ENFORCE_NEW_ALIGN_1D (uint32_t, pTimesOfFeatureValue, pTimesOfFeatureValueBuff, 65536, 16) \
+ENFORCE_NEW_ALIGN_1D (uint16_t*, pLocationFeature0, pLocationFeature0Buff, 65536, 16) \
+ENFORCE_NEW_ALIGN_1D (uint16_t*, pLocationFeature1, pLocationFeature1Buff, 65536, 16) \
+ENFORCE_NEW_ALIGN_1D (uint16_t*, pFeaturePointValueList0, pFeaturePointValueList0Buff, 65536, 16) \
+ENFORCE_NEW_ALIGN_1D (uint16_t*, pFeaturePointValueList1, pFeaturePointValueList1Buff, 65536, 16) \
+for (int32_t k = 0; k < SVC_ME_TEST_NUM; k++) { \
+  FillWithRandomData (pRefPicture,(kiHeight+16)*((((kiWidth+15)>>4)<<4)+16)); \
+  memset(pTimesOfFeatureValue, 0, 65536*sizeof(uint32_t)); \
+  memset(pLocationFeature0, 0, 65536*sizeof(uint16_t*)); \
+  memset(pFeaturePointValueList0, 0, 65536*sizeof(uint16_t*)); \
+  memset(pLocationFeature1, 0, 65536*sizeof(uint16_t*)); \
+  memset(pFeaturePointValueList1, 0, 65536*sizeof(uint16_t*)); \
+  SumOf8x8BlockOfFrame_c (pRefPicture,kiWidth,kiHeight,((((kiWidth+15)>>4)<<4)+16),pFeatureOfBlock,pTimesOfFeatureValue); \
+  int32_t iActSize = 65536;\
+  anchor ( pTimesOfFeatureValue, pLocation1, iActSize, pLocationFeature0, pFeaturePointValueList0);\
+  method ( pTimesOfFeatureValue, pLocation1, iActSize, pLocationFeature1, pFeaturePointValueList1); \
+  for(int32_t j =0; j<65536; j++) { \
+    EXPECT_EQ (pLocationFeature0[j], pLocationFeature1[j]); \
+    EXPECT_EQ (pFeaturePointValueList0[j], pFeaturePointValueList1[j]); \
+  } \
+} \
+delete[] pRefPictureBuff; \
+delete[] pFeatureOfBlockBuff; \
+delete[] pLocationBuff1; \
+delete[] pTimesOfFeatureValueBuff; \
+delete[] pLocationFeature0Buff; \
+delete[] pFeaturePointValueList0Buff; \
+delete[] pLocationFeature1Buff; \
+delete[] pFeaturePointValueList1Buff; \
+}
+
+
+#define GENERATE_FillQpelLocationByFeatureValue(anchor, method, kiWidth, kiHeight) \
+TEST (SVC_ME_FunTest, method##_##kiWidth##x##kiHeight) {\
+ENFORCE_NEW_ALIGN_1D (uint8_t, pRefPicture, pRefPictureBuff, ((kiHeight+16)*((((kiWidth+15)>>4)<<4)+16)), 16) \
+ENFORCE_NEW_ALIGN_1D (uint16_t, pFeatureOfBlock, pFeatureOfBlockBuff, (kiWidth*kiHeight), 16) \
+ENFORCE_NEW_ALIGN_1D (uint16_t, pLocation1, pLocationBuff1, (kiWidth*kiHeight)*2, 16) \
+ENFORCE_NEW_ALIGN_1D (uint16_t, pLocation2, pLocationBuff2, (kiWidth*kiHeight)*2, 16) \
+ENFORCE_NEW_ALIGN_1D (uint32_t, pTimesOfFeatureValue, pTimesOfFeatureValueBuff, 65536, 16) \
+ENFORCE_NEW_ALIGN_1D (uint16_t*, pLocationFeature0, pLocationFeature0Buff, 65536, 16) \
+ENFORCE_NEW_ALIGN_1D (uint16_t*, pLocationFeature1, pLocationFeature1Buff, 65536, 16) \
+ENFORCE_NEW_ALIGN_1D (uint16_t*, pFeaturePointValueList0, pFeaturePointValueList0Buff, 65536, 16) \
+ENFORCE_NEW_ALIGN_1D (uint16_t*, pFeaturePointValueList1, pFeaturePointValueList1Buff, 65536, 16) \
+for (int32_t k = 0; k < SVC_ME_TEST_NUM; k++) { \
+  FillWithRandomData (pRefPicture,(kiHeight+16)*((((kiWidth+15)>>4)<<4)+16)); \
+  memset(pTimesOfFeatureValue, 0, 65536*sizeof(uint32_t)); \
+  memset(pLocationFeature0, 0, 65536*sizeof(uint16_t*)); \
+  memset(pFeaturePointValueList0, 0, 65536*sizeof(uint16_t*)); \
+  memset(pLocationFeature1, 0, 65536*sizeof(uint16_t*)); \
+  memset(pFeaturePointValueList1, 0, 65536*sizeof(uint16_t*)); \
+  SumOf8x8BlockOfFrame_c (pRefPicture,kiWidth,kiHeight,((((kiWidth+15)>>4)<<4)+16),pFeatureOfBlock,pTimesOfFeatureValue); \
+  int32_t iActSize = 65536; \
+  InitializeHashforFeature_c ( pTimesOfFeatureValue, pLocation1, iActSize, pLocationFeature0, pFeaturePointValueList0); \
+  InitializeHashforFeature_c( pTimesOfFeatureValue, pLocation2, iActSize, pLocationFeature1, pFeaturePointValueList1); \
+  anchor(pFeatureOfBlock, kiWidth, kiHeight, pFeaturePointValueList0); \
+  method(pFeatureOfBlock, kiWidth, kiHeight, pFeaturePointValueList1); \
+  for(int32_t j =0; j<kiWidth*kiHeight*2; j++) { \
+    EXPECT_EQ (pLocation1[j], pLocation2[j]); \
+  } \
+} \
+delete[] pRefPictureBuff; \
+delete[] pFeatureOfBlockBuff; \
+delete[] pLocationBuff1; \
+delete[] pLocationBuff2; \
+delete[] pTimesOfFeatureValueBuff; \
+delete[] pLocationFeature0Buff; \
+delete[] pFeaturePointValueList0Buff; \
+delete[] pLocationFeature1Buff; \
+delete[] pFeaturePointValueList1Buff; \
+}
+
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_c, 10, 10)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_c, 16, 16)
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_c, 640, 320)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_c, 640, 320)
+#ifdef X86_ASM
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_sse2, 10, 10)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_sse2, 16, 16)
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_sse2, 640, 320)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_sse2, 640, 320)
+#endif
 
 GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_c, 1, 1)
 GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_c, 1, 1)
