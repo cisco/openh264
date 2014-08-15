@@ -30,6 +30,8 @@
  *
  */
 
+#ifdef HAVE_NEON
+
 .syntax unified
 
 #ifdef __APPLE__
@@ -62,4 +64,6 @@ mov pc, lr
 mov pc, lr
 .endfunc
 .endm
+#endif
+
 #endif
