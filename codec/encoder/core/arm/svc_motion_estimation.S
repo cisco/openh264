@@ -235,4 +235,133 @@ _width_loop16x16_2:
 _SumOf16x16BlockOfFrame_neon_end:
     ldmia sp!, {r4-r12}
 WELS_ASM_FUNC_END
+
+WELS_ASM_FUNC_BEGIN InitializeHashforFeature_neon
+// (uint32_t* pTimesOfFeatureValue, uint16_t* pBuf, const int32_t kiListSize, uint16_t** pLocationOfFeature, uint16_t** pFeatureValuePointerList);
+    stmdb sp!, {r4-r7}
+    ldr	r4, [sp, #16] //pFeatureValuePointerList
+    bic r5, r2, #3
+_hash_assign_loop_x4:
+    vld1.64 {q0}, [r0]!
+    vshl.u32 q0, q0, #2
+    vceq.u32 q1, q0, #0
+    vand.i32 d2, d2, d3
+    vmov r6, r7, d2
+    and r6, r6, r7
+    cmp r6, #0xffffffff
+    beq _hash_assign_with_copy_x4
+
+    veor q1, q1
+    vext.32 q2, q1, q0, #3
+    vext.32 q3, q1, q0, #2
+    vext.32 q4, q1, q0, #1
+    vadd.u32 q0, q0, q2
+    vadd.u32 q0, q0, q3
+    vadd.u32 q0, q0, q4
+    vext.32 q2, q1, q0, #3
+    vdup.32  q3, r1
+    vadd.u32 q2, q2, q3
+    vst1.64 {q2}, [r3]!
+    vst1.64 {q2}, [r4]!
+    vmov.32 r6, d1[1]
+    add r1, r1, r6
+    b _assign_next
+
+_hash_assign_with_copy_x4:
+    vdup.32  q2, r1
+    vst1.64 {q2}, [r3]!
+    vst1.64 {q2}, [r4]!
+
+_assign_next:
+	subs r5, r5, #4
+	bne _hash_assign_loop_x4
+
+    and r5, r2, #3
+    cmp r5, #0
+    beq _hash_assign_end
+_hash_assign_loop_x4_rem:
+    str r1, [r3], #4
+    str r1, [r4], #4
+    ldr r7, [r0], #4
+    lsl r7, r7, #2
+    add r1, r1, r7
+    subs r5, r5, #1
+    bne _hash_assign_loop_x4_rem
+_hash_assign_end:
+
+    ldmia sp!, {r4-r7}
+WELS_ASM_FUNC_END
+
+.align 16
+mv_x_inc_x4: .short 0x10, 0x10, 0x10, 0x10, 0x00, 0x00, 0x00, 0x00
+mv_y_inc_x4: .short 0x04, 0x04, 0x04, 0x04, 0x00, 0x00, 0x00, 0x00
+mx_x_offset_x4: .short 0x00, 0x04, 0x08, 0x0c, 0x00, 0x00, 0x00, 0x00
+
+WELS_ASM_FUNC_BEGIN FillQpelLocationByFeatureValue_neon
+// void  (uint16_t* pFeatureOfBlock, const int32_t kiWidth, const int32_t kiHeight, uint16_t** pFeatureValuePointerList)
+    stmdb sp!, {r4-r8}
+    vpush		{q4-q7}
+    adr r7, mv_x_inc_x4
+    vld1.64 {q7}, [r7]
+    adr r7, mv_y_inc_x4
+    vld1.64 {q6}, [r7]
+    adr r7, mx_x_offset_x4
+    vld1.64 {q5}, [r7]
+    veor q4, q4
+    veor q3, q3
+    vdup.32 q8, r3
+_hash_height_loop:
+    mov r7, r1
+    vmov q2, q5 //mx_x_offset_x4
+_hash_width_loop:
+    vld1.64 {d0}, [r0]!
+    vshll.u16 q0, d0, #2
+    vadd.u32 q0, q8
+    vmov q1, q2
+    vmov q4, q3
+    vzip.16 q1, q4
+
+    vmov.32 r4, d0[0]
+    ldr r5, [r4]
+    vmov.32 r6, d2[0]
+    str r6, [r5]
+    add r5, r5, #4
+    pld [r5] // cache miss?
+    str r5, [r4]
+
+    vmov.32 r4, d0[1]
+    ldr r5, [r4]
+    vmov.32 r6, d2[1]
+    str r6, [r5]
+    add r5, r5, #4
+    pld [r5] // cache miss?
+    str r5, [r4]
+
+    vmov.32 r4, d1[0]
+    ldr r5, [r4]
+    vmov.32 r6, d3[0]
+    str r6, [r5]
+    add r5, r5, #4
+    pld [r5] // cache miss?
+    str r5, [r4]
+
+    vmov.32 r4, d1[1]
+    ldr r5, [r4]
+    vmov.32 r6, d3[1]
+    str r6, [r5]
+    add r5, r5, #4
+    pld [r5] // cache miss?
+    str r5, [r4]
+
+    vadd.u16 q2, q2, q7
+    subs r7, #4
+    bne _hash_width_loop
+
+    vadd.u16 q3, q3, q6
+    subs r2, #1
+    bne _hash_height_loop
+
+    vpop		{q4-q7}
+    ldmia sp!, {r4-r8}
+WELS_ASM_FUNC_END
 #endif
