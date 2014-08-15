@@ -1396,12 +1396,6 @@ WELS_EXTERN FillQpelLocationByFeatureValue_sse2
     SIGN_EXTENSION  r2, r2d
     push r12
     push r13
-
-	;mov		esi,	[sum_ref]   r0:esi
-	;mov		edi,	[pos_list]  r3:edi
-	;mov		ebp,	[width]     r1:ebp
-	;mov		ebx,	[height]    r2:ebx
-	;mov		[i_height],	ebx
     mov     r12,    r2
 
 	movq	xmm7,	[mv_x_inc_x4]		; x_qpel inc
@@ -1460,11 +1454,6 @@ WELS_EXTERN InitializeHashforFeature_sse2
     SIGN_EXTENSION  r2, r2d
     push r12
     push r13
-	;mov		edi,	[esp+_ps+4]		; pPositionOfSum    r3:edi
-	;mov		ebp,	[esp+_ps+8]		; sum_idx_list      r4:ebp
-	;mov		esi,	[esp+_ps+12]	; pTimesOfSum       r0:esi
-	;mov		ebx,	[esp+_ps+16]	; pBuf              r1:ebx
-	;mov		edx,	[esp+_ps+20]	; list_sz           r2:edx
     mov     r12,    r2
 	sar		r2,     2
 	mov		r5,     0       ;r5:ecx
@@ -1477,7 +1466,7 @@ hash_assign_loop_x4_sse2:
 	movdqa	xmm1,	xmm0
 	pcmpeqd	xmm1,	xmm3
 	movmskps	r6,	xmm1
-    cmp         r6, 0x0f
+    cmp     r6, 	0x0f
 	jz	near hash_assign_with_copy_sse2
 
 %assign x	0
@@ -1522,8 +1511,8 @@ hash_assign_loop_x4_rem_sse2:
 
 hash_assign_no_rem_sse2:
     pop     r13
-    pop		r12
-	ret
+    pop	    r12
+    ret
 
 %endif
 
