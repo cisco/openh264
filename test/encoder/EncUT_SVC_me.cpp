@@ -242,9 +242,13 @@ delete[] pFeaturePointValueList1Buff; \
 
 GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_c, 10, 10)
 GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_c, 16, 16)
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_c, 640, 320)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_c, 640, 320)
 #ifdef X86_ASM
 GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_sse2, 10, 10)
 GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_sse2, 16, 16)
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_sse2, 640, 320)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_sse2, 640, 320)
 #endif
 
 GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_c, 1, 1)
