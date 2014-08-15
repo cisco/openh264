@@ -100,6 +100,7 @@ int AutoTestDec() {
       [yuvFileName UTF8String]
     };
     DecMain (sizeof (argvv) / sizeof (argvv[0]), (char**)&argvv[0]);
+    [manage removeItemAtPath:yuvFileName error:nil];//FOR limited devices spaces
     fflush (stdout); // flush the content of stdout instantly
   }
 

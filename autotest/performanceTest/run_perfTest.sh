@@ -108,7 +108,7 @@ fi
 
 #TODO:NOW just generate csv file to display performance data
 cd ${AUTO_TEST_PATH}
-if [[ "#`ls ./ios/report`" == "#" || "#`ls ./android/report`" == "#" ]]
+if [[ "#`ls ./ios/report`" == "#" && "#`ls ./android/report`" == "#" ]]
 then
 echo There is nothing result log generated at ios or android devices
 else

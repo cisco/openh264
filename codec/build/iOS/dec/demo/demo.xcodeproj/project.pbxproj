@@ -42,6 +42,20 @@
 			remoteGlobalIDString = 4CE4427918B6FC360017DF25;
 			remoteInfo = welsdec;
 		};
+		541044A6199888F800B44931 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4CE444FA18B72AD70017DF25 /* welsdec.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 4CE4427818B6FC360017DF25;
+			remoteInfo = welsdec;
+		};
+		541044A8199888F800B44931 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4CE444F018B72A8F0017DF25 /* common.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 4CE443D418B722CD0017DF25;
+			remoteInfo = common;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -206,6 +220,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				541044A7199888F800B44931 /* PBXTargetDependency */,
+				541044A9199888F800B44931 /* PBXTargetDependency */,
 			);
 			name = demo;
 			productName = demo;
@@ -298,6 +314,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		541044A7199888F800B44931 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = welsdec;
+			targetProxy = 541044A6199888F800B44931 /* PBXContainerItemProxy */;
+		};
+		541044A9199888F800B44931 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = common;
+			targetProxy = 541044A8199888F800B44931 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		F0E663521810EFA5000C888E /* InfoPlist.strings */ = {
