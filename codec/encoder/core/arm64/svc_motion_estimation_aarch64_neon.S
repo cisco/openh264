@@ -217,4 +217,121 @@ _width_loop16x16_2:
     cbnz x2, _height_loop16x16
 _SumOf16x16BlockOfFrame_AArch64_neon_end:
 WELS_ASM_AARCH64_FUNC_END
+
+WELS_ASM_AARCH64_FUNC_BEGIN InitializeHashforFeature_AArch64_neon
+// (uint32_t* pTimesOfFeatureValue, uint16_t* pBuf, const int32_t kiListSize, uint16_t** pLocationOfFeature, uint16_t** pFeatureValuePointerList);
+    mov x9, #3
+    bic x5, x2, x9
+    mov x8, #0
+_hash_assign_loop_x4:
+    ld1 {v0.16b}, [x0], #16
+    shl v0.4s, v0.4s, #2
+    addv s1, v0.4s
+    umov w7, v1.s[0]
+    cbz w7, _hash_assign_with_copy_x4
+
+    ins v2.d[0], x1
+    umov w8, v0.s[0]
+    add x1, x1, x8
+    ins v2.d[1], x1
+    umov w8, v0.s[1]
+    add x1, x1, x8
+    ins v3.d[0], x1
+    umov w8, v0.s[2]
+    add x1, x1, x8
+    ins v3.d[1], x1
+    umov w8, v0.s[3]
+    add x1, x1, x8
+    st1 {v2.16b, v3.16b}, [x3], #32
+    st1 {v2.16b, v3.16b}, [x4], #32
+    b _assign_next
+_hash_assign_with_copy_x4:
+    dup  v2.2d, x1
+    dup  v3.2d, x1
+    st1 {v2.16b, v3.16b}, [x3], #32
+    st1 {v2.16b, v3.16b}, [x4], #32
+
+_assign_next:
+	subs x5, x5, #4
+	cbnz x5, _hash_assign_loop_x4
+
+    and x5, x2, x9
+    cbz x5, _hash_assign_end
+
+
+_hash_assign_loop_x4_rem:
+    str x1, [x3], #8
+    str x1, [x4], #8
+    ldr w8, [x0], #4
+    lsl w8, w8, #2
+    add x1, x1, x8
+    subs x5, x5, #1
+    cbnz x5, _hash_assign_loop_x4_rem
+
+_hash_assign_end:
+WELS_ASM_AARCH64_FUNC_END
+
+.align 16
+mv_x_inc_x4: .short 0x10, 0x10, 0x10, 0x10, 0x00, 0x00, 0x00, 0x00
+mv_y_inc_x4: .short 0x04, 0x04, 0x04, 0x04, 0x00, 0x00, 0x00, 0x00
+mx_x_offset_x4: .short 0x00, 0x04, 0x08, 0x0c, 0x00, 0x00, 0x00, 0x00
+
+WELS_ASM_AARCH64_FUNC_BEGIN FillQpelLocationByFeatureValue_AArch64_neon
+// void  (uint16_t* pFeatureOfBlock, const int32_t kiWidth, const int32_t kiHeight, uint16_t** pFeatureValuePointerList)
+    ldr q7, mv_x_inc_x4
+    ldr q6, mv_y_inc_x4
+    ldr q5, mx_x_offset_x4
+
+    eor v4.16b, v4.16b, v4.16b
+    eor v3.16b, v3.16b, v3.16b
+    dup v16.2d, x3 // v8->v16
+
+_hash_height_loop:
+    mov x7, x1
+    mov.16b v2, v5 //mx_x_offset_x4
+
+_hash_width_loop:
+    ld1 {v0.d}[0], [x0], #8
+
+    ushll v0.4s, v0.4h, #3
+    uaddw   v17.2d, v16.2d, v0.2s
+    uaddw2  v18.2d, v16.2d, v0.4s
+    zip1 v1.8h, v2.8h, v3.8h
+
+    umov x4, v17.d[0]
+    ldr x5, [x4]
+    umov w6, v1.s[0]
+    str w6, [x5]
+    add x5, x5, #4
+    str x5, [x4]
+
+    umov x4, v17.d[1]
+    ldr x5, [x4]
+    umov w6, v1.s[1]
+    str w6, [x5]
+    add x5, x5, #4
+    str x5, [x4]
+
+    umov x4, v18.d[0]
+    ldr x5, [x4]
+    umov w6, v1.s[2]
+    str w6, [x5]
+    add x5, x5, #4
+    str x5, [x4]
+
+    umov x4, v18.d[1]
+    ldr x5, [x4]
+    umov w6, v1.s[3]
+    str w6, [x5]
+    add x5, x5, #4
+    str x5, [x4]
+
+    add v2.8h, v2.8h, v7.8h
+    subs x7, x7, #4
+    cbnz x7, _hash_width_loop
+
+    add v3.8h, v3.8h, v6.8h
+    subs x2, x2, #1
+    cbnz x2, _hash_height_loop
+WELS_ASM_AARCH64_FUNC_END
 #endif

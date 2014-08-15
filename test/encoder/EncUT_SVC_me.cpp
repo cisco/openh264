@@ -281,6 +281,10 @@ GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 1, 320
 GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 1, 320)
 GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 640, 320)
 GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 640, 320)
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_neon, 10, 10)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_neon, 16, 16)
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_neon, 640, 320)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_neon, 640, 320)
 #endif
 
 #ifdef HAVE_NEON_AARCH64
@@ -290,4 +294,8 @@ GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_AArch64_neon
 GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_AArch64_neon, 1, 320)
 GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_AArch64_neon, 640, 320)
 GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_AArch64_neon, 640, 320)
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_AArch64_neon, 10, 10)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_AArch64_neon, 16, 16)
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_AArch64_neon, 640, 320)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_AArch64_neon, 640, 320)
 #endif
