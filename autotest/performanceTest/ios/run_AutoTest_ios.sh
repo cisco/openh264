@@ -125,7 +125,7 @@ echo install application: ${CODEC_TEST_IOS_APP} to device: ${DEVICE_ID} is faile
 exit 1
 fi
 
-#./iFileTransfer -o copy -id ${DEVICE_ID} -app ${CODEC_TEST_IOS_APP_ID} -from ${CODEC_TEST_RES}
+./iFileTransfer -o copy -id ${DEVICE_ID} -app ${CODEC_TEST_IOS_APP_ID} -from ${CODEC_TEST_RES}
 instruments -w ${DEVICE_ID}  -t /Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/PlugIns/AutomationInstrument.bundle/Contents/Resources/Automation.tracetemplate ${CODEC_TEST_IOS_APP} -e UIASCRIPT ./uiascript.js -e UIARRESULTPATH /tmp/
 #copy to report folder
 ./iFileTransfer -o download -id ${DEVICE_ID} -app ${CODEC_TEST_IOS_APP_ID} -from /Documents/${CODEC_TEST_LOG}.log -to ${CODEC_TEST_IOS_REPORT_PATH}/${CODEC_TEST_LOG}_${DEVICE_ID}_${rand}_${CASE}.log
@@ -153,7 +153,7 @@ echo install application: ${CODEC_TEST_IOS_APP} to device: ${DEVICE_ID} is faile
 exit 1
 fi
 
-#./iFileTransfer -o copy -id ${DEVICE_ID} -app ${CODEC_TEST_IOS_APP_ID} -from ${CODEC_TEST_RES}
+./iFileTransfer -o copy -id ${DEVICE_ID} -app ${CODEC_TEST_IOS_APP_ID} -from ${CODEC_TEST_RES}
 instruments -w ${DEVICE_ID}  -t /Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/PlugIns/AutomationInstrument.bundle/Contents/Resources/Automation.tracetemplate ${CODEC_TEST_IOS_APP} -e UIASCRIPT ./uiascript.js -e UIARRESULTPATH /tmp/
 #copy to report folder
 ./iFileTransfer -o download -id ${DEVICE_ID} -app ${CODEC_TEST_IOS_APP_ID} -from /Documents/${CODEC_TEST_LOG}.log -to ${CODEC_TEST_IOS_REPORT_PATH}/${CODEC_TEST_LOG}_${DEVICE_ID}_${rand}_${CASE}.log
