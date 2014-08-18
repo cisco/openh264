@@ -95,7 +95,7 @@ for dev in $devices; do
     $ADB -s $dev uninstall ${apk_id}
     $ADB -s $dev install -r ${apk}
     #TODO: output more info about android device such as name,cpu,memory,and also power comsumption.
-    echo `$ADB -s $dev shell cat /system/build.prop |grep ro.product.model | awk -F"=" '{print $2}'`>${dev_info_file}
+    #echo `$ADB -s $dev shell cat /system/build.prop |grep ro.product.model | awk -F"=" '{print $2}'`>${dev_info_file}
     #push resources
     #For limited devices space
     if [ ${space} = "limit" ]
