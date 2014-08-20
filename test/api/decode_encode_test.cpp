@@ -96,6 +96,9 @@ TEST_P (DecodeEncodeTest, CompareOutput) {
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + p.fileName;
   ASSERT_TRUE (Open (filename.c_str()));
+#elif defined(_WIN32)
+  std::string filename = std::string ("../../../../../") + p.fileName;
+  ASSERT_TRUE (Open (filename.c_str()));
 #else
   ASSERT_TRUE (Open (p.fileName));
 #endif
