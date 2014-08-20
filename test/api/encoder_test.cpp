@@ -60,6 +60,9 @@ TEST_P (EncoderOutputTest, CompareOutput) {
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + p.fileName;
   EncodeFile (filename.c_str(), p.usageType , p.width, p.height, p.frameRate, p.slices, p.denoise, p.layers, this);
+#elif defined(_WIN32)
+  std::string filename = std::string ("../../../../../") + p.fileName;
+  EncodeFile (filename.c_str(), p.usageType , p.width, p.height, p.frameRate, p.slices, p.denoise, p.layers, this);
 #else
   EncodeFile (p.fileName, p.usageType , p.width, p.height, p.frameRate, p.slices, p.denoise, p.layers, this);
 #endif
