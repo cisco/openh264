@@ -1959,14 +1959,12 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   iCacheLineSize	= 16;	// 16 bytes aligned in default
 #endif//X86_ASM
 
-#ifndef WELS_TESTBED
-
 #if defined(DYNAMIC_DETECT_CPU_CORES)
   if (pCodingParam->iMultipleThreadIdc > 0)
     uiCpuCores = pCodingParam->iMultipleThreadIdc;
   else {
     if (uiCpuCores ==
-        0)	// cpuid not supported or doesn't expose the number of cores, use high level system API as followed to detect number of pysical/logic processor
+      0)	// cpuid not supported or doesn't expose the number of cores, use high level system API as followed to detect number of pysical/logic processor
       uiCpuCores = DynamicDetectCpuCores();
     // So far so many cpu cores up to MAX_THREADS_NUM mean for server platforms,
     // for client application here it is constrained by maximal to MAX_THREADS_NUM
@@ -1976,12 +1974,6 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
       uiCpuCores	= 1;
   }
 #endif//DYNAMIC_DETECT_CPU_CORES
-
-#else//WELS_TESTBED
-
-  uiCpuCores	= pCodingParam->iMultipleThreadIdc;	// assigned uiCpuCores from iMultipleThreadIdc from SGE testing
-
-#endif//WELS_TESTBED
 
   uiCpuCores	= WELS_CLIP3 (uiCpuCores, 1, MAX_THREADS_NUM);
 
