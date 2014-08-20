@@ -2976,6 +2976,9 @@ bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pCtx, int32_t iSpatialNum) {
  * \return	EFrameType (videoFrameTypeIDR/videoFrameTypeI/videoFrameTypeP)
  */
 int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSourcePicture* pSrcPic) {
+  if( pCtx == NULL ) {
+    return ENC_RETURN_MEMALLOCERR;
+  }
   SLayerBSInfo* pLayerBsInfo					= &pFbi->sLayerInfo[0];
   SWelsSvcCodingParam* pSvcParam	= pCtx->pSvcParam;
   SSpatialPicIndex* pSpatialIndexMap = &pCtx->sSpatialIndexMap[0];
