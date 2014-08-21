@@ -56,9 +56,6 @@ TEST_P (DecoderOutputTest, CompareOutput) {
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + p.fileName;
   DecodeFile (filename.c_str(), this);
-#elif defined(_WIN32)
-   std::string filename = std::string ("../../../../../") + p.fileName;
-  DecodeFile (filename.c_str(), this);
 #else
   DecodeFile (p.fileName, this);
 #endif

@@ -80,9 +80,6 @@ TEST_F (EncodeDecodeTestVclNal, DecoderVclNal) {
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + p.fileName;
   ASSERT_TRUE (fileStream.Open (filename.c_str()));
-#elif defined(_WIN32)
-  std::string filename = std::string ("../../../../../") + p.fileName;
-  ASSERT_TRUE (fileStream.Open (filename.c_str()));
 #else
   ASSERT_TRUE (fileStream.Open (p.fileName));
 #endif
