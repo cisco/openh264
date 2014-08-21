@@ -70,6 +70,8 @@ extern int EncMain(int argc, char **argv);
         [bsfile UTF8String],
         "-numl",
         "1",
+        "-lconfig",
+        "0",
         [dlayerCfg UTF8String],
     };
     NSLog(@"WELS_INFO: enc config file: %@", encCfg);
