@@ -53,6 +53,8 @@ int32_t WelsSampleSatdIntra16x16Combined3_c (uint8_t*, int32_t, uint8_t*, int32_
 int32_t WelsSampleSadIntra16x16Combined3_c (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*);
 int32_t WelsSampleSatdIntra8x8Combined3_c (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*,
     uint8_t*, uint8_t*);
+int32_t WelsSampleSadIntra8x8Combined3_c (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*,
+    uint8_t*, uint8_t*);
 
 #if defined(__cplusplus)
 extern "C" {
