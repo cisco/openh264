@@ -1860,7 +1860,9 @@ int32_t InitSliceSettings (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPar
 
   pCodingParam->iCountThreadsNum				= WELS_MIN (kiCpuCores, iMaxSliceCount);
   pCodingParam->iMultipleThreadIdc	= pCodingParam->iCountThreadsNum;
-
+  if (pCodingParam->iLoopFilterDisableIdc == 0
+    && pCodingParam->iMultipleThreadIdc != 1) // Loop filter requested to be enabled, with threading enabled
+    pCodingParam->iLoopFilterDisableIdc = 2; // Disable loop filter on slice boundaries since that's not allowed with multithreading
   *pMaxSliceCount					= iMaxSliceCount;
 
   return 0;
