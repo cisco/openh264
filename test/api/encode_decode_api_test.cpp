@@ -7,7 +7,7 @@
 #include <string>
 
 struct EncodeDecodeFileParamBase {
-  const char* fileName;
+  int numframes;
   int width;
   int height;
   float frameRate;
@@ -56,7 +56,7 @@ class EncodeDecodeTestBase : public ::testing::Test,
   SBufferInfo dstBufInfo_;
 };
 
-class EncodeDecodeTestVclNal : public EncodeDecodeTestBase {
+class EncodeDecodeTestAPI : public EncodeDecodeTestBase {
  public:
   void SetUp() {
     EncodeDecodeTestBase::SetUp();
@@ -72,18 +72,10 @@ class EncodeDecodeTestVclNal : public EncodeDecodeTestBase {
 };
 
 static const EncodeDecodeFileParamBase kFileParamArray =
-{"res/CiscoVT2people_160x96_6fps.yuv", 160, 96, 6.0f};
+{300, 160, 96, 6.0f};
 
-TEST_F (EncodeDecodeTestVclNal, DecoderVclNal) {
+TEST_F (EncodeDecodeTestAPI, DecoderVclNal) {
   EncodeDecodeFileParamBase p = kFileParamArray;
-  FileInputStream fileStream;
-#if defined(ANDROID_NDK)
-  std::string filename = std::string ("/sdcard/") + p.fileName;
-  ASSERT_TRUE (fileStream.Open (filename.c_str()));
-#else
-  ASSERT_TRUE (fileStream.Open (p.fileName));
-#endif
-
   prepareParam (p.width, p.height, p.frameRate);
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
@@ -108,7 +100,9 @@ TEST_F (EncodeDecodeTestVclNal, DecoderVclNal) {
   pic.pData[0] = buf_.data();
   pic.pData[1] = pic.pData[0] + p.width * p.height;
   pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
-  while (fileStream.read (buf_.data(), frameSize) == frameSize) {
+  int iIdx = 0;
+  while (iIdx <= p.numframes) {
+    memset (buf_.data(), rand() % 256, frameSize);
     rv = encoder_->EncodeFrame (&pic, &info);
     ASSERT_TRUE (rv == cmResultSuccess);
     //decoding after each encoding frame
@@ -124,8 +118,121 @@ TEST_F (EncodeDecodeTestVclNal, DecoderVclNal) {
     ASSERT_TRUE (rv == cmResultSuccess);
     rv = decoder_->GetOption (DECODER_OPTION_VCL_NAL, &vclNal);
     EXPECT_EQ (vclNal, FEEDBACK_VCL_NAL);
-
+    iIdx++;
   } //while
   //ignore last frame
 }
+
+TEST_F (EncodeDecodeTestAPI, GetOptionFramenum) {
+  EncodeDecodeFileParamBase p = kFileParamArray;
+  prepareParam (p.width, p.height, p.frameRate);
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == cmResultSuccess);
+
+  //init for encoder
+  // I420: 1(Y) + 1/4(U) + 1/4(V)
+  int frameSize = p.width * p.height * 3 / 2;
+
+  buf_.SetLength (frameSize);
+  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
+
+  SFrameBSInfo info;
+  memset (&info, 0, sizeof (SFrameBSInfo));
+
+  SSourcePicture pic;
+  memset (&pic, 0, sizeof (SSourcePicture));
+  pic.iPicWidth = p.width;
+  pic.iPicHeight = p.height;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = pic.iPicWidth;
+  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
+  pic.pData[0] = buf_.data();
+  pic.pData[1] = pic.pData[0] + p.width * p.height;
+  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  int32_t iEncFrameNum = -1;
+  int32_t iDecFrameNum;
+  int iIdx = 0;
+  while (iIdx <= p.numframes) {
+    memset (buf_.data(), rand() % 256, frameSize);
+    rv = encoder_->EncodeFrame (&pic, &info);
+    ASSERT_TRUE (rv == cmResultSuccess);
+    //decoding after each encoding frame
+    int len = 0;
+    encToDecData (info, len);
+    unsigned char* pData[3] = { NULL };
+    memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+    rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+    ASSERT_TRUE (rv == cmResultSuccess);
+    decoder_->GetOption (DECODER_OPTION_FRAME_NUM, &iDecFrameNum);
+    EXPECT_EQ (iDecFrameNum, -1);
+    iEncFrameNum++;
+    rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+    ASSERT_TRUE (rv == cmResultSuccess);
+    decoder_->GetOption (DECODER_OPTION_FRAME_NUM, &iDecFrameNum);
+    EXPECT_EQ (iEncFrameNum, iDecFrameNum);
+    iIdx++;
+  } //while
+  //ignore last frame
+}
+
+TEST_F (EncodeDecodeTestAPI, GetOptionIDR) {
+  EncodeDecodeFileParamBase p = kFileParamArray;
+  prepareParam (p.width, p.height, p.frameRate);
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == cmResultSuccess);
+
+  //init for encoder
+  // I420: 1(Y) + 1/4(U) + 1/4(V)
+  int frameSize = p.width * p.height * 3 / 2;
+
+  buf_.SetLength (frameSize);
+  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
+
+  SFrameBSInfo info;
+  memset (&info, 0, sizeof (SFrameBSInfo));
+
+  SSourcePicture pic;
+  memset (&pic, 0, sizeof (SSourcePicture));
+  pic.iPicWidth = p.width;
+  pic.iPicHeight = p.height;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = pic.iPicWidth;
+  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
+  pic.pData[0] = buf_.data();
+  pic.pData[1] = pic.pData[0] + p.width * p.height;
+  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  int32_t iEncCurIdrPicId = 0;
+  int32_t iDecCurIdrPicId;
+  int32_t iIDRPeriod = 1;
+  int32_t iSpsPpsIdAddition = 0;
+  int iIdx = 0;
+  while (iIdx <= p.numframes) {
+    memset (buf_.data(), rand() % 256, frameSize);
+    iSpsPpsIdAddition = rand() % 2;
+    iIDRPeriod = (rand() % 150) + 1;
+    encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
+    encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
+    rv = encoder_->EncodeFrame (&pic, &info);
+    ASSERT_TRUE (rv == cmResultSuccess);
+    if (info.eFrameType == videoFrameTypeIDR) {
+      iEncCurIdrPicId = (iSpsPpsIdAddition == 0) ? 0 : (iEncCurIdrPicId + 1);
+    }
+    //decoding after each encoding frame
+    int len = 0;
+    encToDecData (info, len);
+    unsigned char* pData[3] = { NULL };
+    memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+    rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+    ASSERT_TRUE (rv == cmResultSuccess);
+    decoder_->GetOption (DECODER_OPTION_IDR_PIC_ID, &iDecCurIdrPicId);
+    EXPECT_EQ (iDecCurIdrPicId, iEncCurIdrPicId);
+    rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+    ASSERT_TRUE (rv == cmResultSuccess);
+    decoder_->GetOption (DECODER_OPTION_IDR_PIC_ID, &iDecCurIdrPicId);
+    EXPECT_EQ (iDecCurIdrPicId, iEncCurIdrPicId);
+    iIdx++;
+  } //while
+  //ignore last frame
+}
+
 
