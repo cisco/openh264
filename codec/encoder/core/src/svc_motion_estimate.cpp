@@ -434,8 +434,8 @@ void VerticalFullSearchUsingSSE41 (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
 
   int32_t iMinPos = kiCurMeBlockPixY + kiMinMv;
   int32_t iMaxPos = kiCurMeBlockPixY + kiMaxMv;
-  int32_t iFixedMvd = *(pMvdTable - pMe->sMvp.iMvX);
-  uint16_t *pMvdCost  = & (pMvdTable[(kiMinMv<<2) - pMe->sMvp.iMvY]);
+  int32_t iFixedMvd = * (pMvdTable - pMe->sMvp.iMvX);
+  uint16_t* pMvdCost  = & (pMvdTable[ (kiMinMv << 2) - pMe->sMvp.iMvY]);
   int16_t iStartMv = 0;
 
 
@@ -478,7 +478,7 @@ void VerticalFullSearchUsingSSE41 (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
     }
     iTargetPos += 8;
     pRef += 8;
-    iStartMv+=8;
+    iStartMv += 8;
     -- iCountLoop8;
   }
   if (kiRemainingVectors > 0) {
@@ -514,8 +514,8 @@ void HorizontalFullSearchUsingSSE41 (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
   const int32_t iCurMeBlockPixX = pMe->iCurMeBlockPixX;
   int32_t iMinPos = iCurMeBlockPixX + kiMinMv;
   int32_t iMaxPos = iCurMeBlockPixX + kiMaxMv;
-  int32_t iFixedMvd = *(pMvdTable - pMe->sMvp.iMvY);
-  uint16_t *pMvdCost  = & (pMvdTable[(kiMinMv<<2) - pMe->sMvp.iMvX]);
+  int32_t iFixedMvd = * (pMvdTable - pMe->sMvp.iMvY);
+  uint16_t* pMvdCost  = & (pMvdTable[ (kiMinMv << 2) - pMe->sMvp.iMvX]);
   int16_t iStartMv = 0;
   uint8_t* pRef         = &pMe->pColoRefMb[kiMinMv];
   const int32_t kIsBlock16x16 = pMe->uiBlockSize == BLOCK_16x16;
@@ -540,7 +540,7 @@ void HorizontalFullSearchUsingSSE41 (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
     }
     iTargetPos += 8;
     pRef += 8;
-    iStartMv +=8;
+    iStartMv += 8;
     -- iCountLoop8;
   }
   if (kiRemainingLoop8 > 0) {
@@ -574,26 +574,26 @@ void LineFullSearch_c (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
   const int32_t kiCurMeBlockQpelPixX = ((kiCurMeBlockPixX) << 2);
   const int32_t kiCurMeBlockPixY = pMe->iCurMeBlockPixY;
   const int32_t kiCurMeBlockQpelPixY = ((kiCurMeBlockPixY) << 2);
-  int32_t iMinPos,iMaxPos;
+  int32_t iMinPos, iMaxPos;
   int32_t iFixedMvd;
   int32_t iCurMeBlockPix;
   int32_t iStride;
   uint16_t* pMvdCost;
 
-  if(bVerticalSearch){
-     iMinPos = kiCurMeBlockPixY + iMinMv;
-     iMaxPos = kiCurMeBlockPixY + iMaxMv;
-     iFixedMvd = *(pMvdTable - pMe->sMvp.iMvX);
-     iCurMeBlockPix = pMe->iCurMeBlockPixY;
-     iStride = kiRefStride;
-     pMvdCost  = & (pMvdTable[(iMinMv<<2) - pMe->sMvp.iMvY]);
-  }else{
-     iMinPos = kiCurMeBlockPixX + iMinMv;
-     iMaxPos = kiCurMeBlockPixX + iMaxMv;
-     iFixedMvd = *(pMvdTable - pMe->sMvp.iMvY);
-     iCurMeBlockPix = pMe->iCurMeBlockPixX;
-     iStride = 1;
-     pMvdCost  = & (pMvdTable[(iMinMv<<2) - pMe->sMvp.iMvX]);
+  if (bVerticalSearch) {
+    iMinPos = kiCurMeBlockPixY + iMinMv;
+    iMaxPos = kiCurMeBlockPixY + iMaxMv;
+    iFixedMvd = * (pMvdTable - pMe->sMvp.iMvX);
+    iCurMeBlockPix = pMe->iCurMeBlockPixY;
+    iStride = kiRefStride;
+    pMvdCost  = & (pMvdTable[ (iMinMv << 2) - pMe->sMvp.iMvY]);
+  } else {
+    iMinPos = kiCurMeBlockPixX + iMinMv;
+    iMaxPos = kiCurMeBlockPixX + iMaxMv;
+    iFixedMvd = * (pMvdTable - pMe->sMvp.iMvY);
+    iCurMeBlockPix = pMe->iCurMeBlockPixX;
+    iStride = 1;
+    pMvdCost  = & (pMvdTable[ (iMinMv << 2) - pMe->sMvp.iMvX]);
   }
   uint8_t* pRef            = &pMe->pColoRefMb[ iMinMv * iStride];
   uint32_t uiBestCost    = 0xFFFFFFFF;
@@ -623,7 +623,7 @@ void WelsMotionCrossSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* p
   PLineFullSearchFunc pfVerticalFullSearchFunc = pFuncList->pfVerticalFullSearch;
   PLineFullSearchFunc pfHorizontalFullSearchFunc = pFuncList->pfHorizontalFullSearch;
 
-   //vertical search
+  //vertical search
   pfVerticalFullSearchFunc (pFuncList, pMe,
                             pMe->pMvdCost,
                             kiEncStride, kiRefStride,
@@ -633,7 +633,7 @@ void WelsMotionCrossSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* p
   //horizontal search
   if (pMe->uiSadCost >= pMe->uiSadCostThreshold) {
     pfHorizontalFullSearchFunc (pFuncList, pMe,
-                                pMe->pMvdCost, 
+                                pMe->pMvdCost,
                                 kiEncStride, kiRefStride,
                                 pSlice->sMvStartMin.iMvX,
                                 pSlice->sMvStartMax.iMvX,
