@@ -106,17 +106,17 @@ void WelsInitMeFunc (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag, bool bScre
     pFuncList->pfCalculateSingleBlockFeature[1] = SumOf16x16SingleBlock_c;
 #if defined (X86_ASM)
     if (uiCpuFlag & WELS_CPU_SSE2) {
-        //for feature search
+      //for feature search
       pFuncList->pfInitializeHashforFeature = InitializeHashforFeature_sse2;
       pFuncList->pfFillQpelLocationByFeatureValue = FillQpelLocationByFeatureValue_sse2;
       pFuncList->pfCalculateBlockFeatureOfFrame[0] = SumOf8x8BlockOfFrame_sse2;
       pFuncList->pfCalculateBlockFeatureOfFrame[1] = SumOf16x16BlockOfFrame_sse2;
-        //TODO: it is possible to differentiate width that is times of 8, so as to accelerate the speed when width is times of 8?
+      //TODO: it is possible to differentiate width that is times of 8, so as to accelerate the speed when width is times of 8?
       pFuncList->pfCalculateSingleBlockFeature[0] = SumOf8x8SingleBlock_sse2;
       pFuncList->pfCalculateSingleBlockFeature[1] = SumOf16x16SingleBlock_sse2;
     }
     if (uiCpuFlag & WELS_CPU_SSE41) {
-          //for feature search
+      //for feature search
       pFuncList->pfCalculateBlockFeatureOfFrame[0] = SumOf8x8BlockOfFrame_sse4;
       pFuncList->pfCalculateBlockFeatureOfFrame[1] = SumOf16x16BlockOfFrame_sse4;
     }
@@ -338,6 +338,9 @@ void WelsDiamondSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlic
   uint8_t* const kpEncMb = pMe->pEncMb;
   const uint16_t* kpMvdCost = pMe->pMvdCost;
 
+  const SMVUnitXY ksMvStartMin    = pSlice->sMvStartMin;
+  const SMVUnitXY ksMvStartMax    = pSlice->sMvStartMax;
+
   int32_t iMvDx = ((pMe->sMv.iMvX) << 2) - pMe->sMvp.iMvX;
   int32_t iMvDy = ((pMe->sMv.iMvY) << 2) - pMe->sMvp.iMvY;
 
@@ -348,6 +351,10 @@ void WelsDiamondSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlic
   ENFORCE_STACK_ALIGN_1D (int32_t, iSadCosts, 4, 16)
 
   while (iTimeThreshold--) {
+    pMe->sMv.iMvX = (iMvDx + pMe->sMvp.iMvX) >> 2;
+    pMe->sMv.iMvY = (iMvDy + pMe->sMvp.iMvY) >> 2;
+    if (!CheckMvInRange (pMe->sMv, ksMvStartMin, ksMvStartMax))
+      continue;
     pSad (kpEncMb, kiStrideEnc, pRefMb, kiStrideRef, &iSadCosts[0]);
 
     int32_t iX, iY;
@@ -667,9 +674,10 @@ int32_t RequestScreenBlockFeatureStorage (CMemoryAlign* pMa, const int32_t kiFra
   pScreenBlockFeatureStorage->pLocationPointer = (uint16_t*)pMa->WelsMalloc (2 * kiFrameSize * sizeof (uint16_t),
       "pScreenBlockFeatureStorage->pLocationPointer");
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pScreenBlockFeatureStorage->pLocationPointer)
-    //  uint16_t* pFeatureValuePointerList[WELS_MAX (LIST_SIZE_SUM_16x16, LIST_SIZE_MSE_16x16)] = {0};
-  pScreenBlockFeatureStorage->pFeatureValuePointerList = (uint16_t**)pMa->WelsMalloc (WELS_MAX (LIST_SIZE_SUM_16x16, LIST_SIZE_MSE_16x16)* sizeof (uint16_t*),
-    "pScreenBlockFeatureStorage->pFeatureValuePointerList");
+  //  uint16_t* pFeatureValuePointerList[WELS_MAX (LIST_SIZE_SUM_16x16, LIST_SIZE_MSE_16x16)] = {0};
+  pScreenBlockFeatureStorage->pFeatureValuePointerList = (uint16_t**)pMa->WelsMalloc (WELS_MAX (LIST_SIZE_SUM_16x16,
+      LIST_SIZE_MSE_16x16) * sizeof (uint16_t*),
+      "pScreenBlockFeatureStorage->pFeatureValuePointerList");
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pScreenBlockFeatureStorage->pFeatureValuePointerList)
 
   pScreenBlockFeatureStorage->pFeatureOfBlockPointer = NULL;
@@ -699,7 +707,8 @@ int32_t ReleaseScreenBlockFeatureStorage (CMemoryAlign* pMa, SScreenBlockFeature
     }
 
     if (pScreenBlockFeatureStorage->pFeatureValuePointerList) {
-      pMa->WelsFree (pScreenBlockFeatureStorage->pFeatureValuePointerList, "pScreenBlockFeatureStorage->pFeatureValuePointerList");
+      pMa->WelsFree (pScreenBlockFeatureStorage->pFeatureValuePointerList,
+                     "pScreenBlockFeatureStorage->pFeatureValuePointerList");
       pScreenBlockFeatureStorage->pFeatureValuePointerList = NULL;
     }
 
@@ -821,10 +830,11 @@ bool CalculateFeatureOfBlock (SWelsFuncPtrList* pFunc, SPicture* pRef,
 
   //assign pLocationOfFeature pointer
   pFunc->pfInitializeHashforFeature (pTimesOfFeatureValue, pBuf, kiActualListSize,
-                              pLocationOfFeature, pScreenBlockFeatureStorage->pFeatureValuePointerList);
+                                     pLocationOfFeature, pScreenBlockFeatureStorage->pFeatureValuePointerList);
 
   //assign each pixel's pLocationOfFeature
-  pFunc->pfFillQpelLocationByFeatureValue (pFeatureOfBlock, iWidth, kiHeight, pScreenBlockFeatureStorage->pFeatureValuePointerList);
+  pFunc->pfFillQpelLocationByFeatureValue (pFeatureOfBlock, iWidth, kiHeight,
+      pScreenBlockFeatureStorage->pFeatureValuePointerList);
   return true;
 }
 
