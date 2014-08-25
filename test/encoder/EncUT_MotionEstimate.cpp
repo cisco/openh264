@@ -174,7 +174,6 @@ class MotionEstimateRangeTest : public ::testing::Test {
       delete m_pMa;
       m_pMa = NULL;
     }
-
   }
  public:
   uint8_t* m_pRefStart;
@@ -206,7 +205,7 @@ TEST_F (MotionEstimateRangeTest, TestDiamondSearch) {
   SWelsME sMe;
   SSlice sSlice;
   const uint8_t kuiQp = rand() % 52;
-  InitMe (kuiQp, m_uiMvdInterTableStride, m_uiMvdInterTableStride, m_pMvdCostTable, &sMe);
+  InitMe (kuiQp, m_uiMvdInterTableSize, m_uiMvdInterTableStride, m_pMvdCostTable, &sMe);
 
   WelsInitSampleSadFunc (&sFuncList, 0); //test c functions
 
@@ -244,6 +243,50 @@ TEST_F (MotionEstimateRangeTest, TestDiamondSearch) {
 
 }
 
+TEST_F (MotionEstimateRangeTest, TestWelsMotionCrossSearch) {
+
+  SWelsFuncPtrList sFuncList;
+  SWelsME sMe;
+  SSlice sSlice;
+  int32_t iUsageType = 1;
+  uint8_t* pRef = m_pRefStart + PADDING_LENGTH * m_iWidthExt + PADDING_LENGTH;
+  const int32_t kiMaxBlock16Sad = 72000;//a rough number
+
+  WelsInitSampleSadFunc (&sFuncList, 0); //test c functions
+  WelsInitMeFunc (&sFuncList, 0, iUsageType);
+
+  RandomPixelDataGenerator (m_pSrc, m_iWidth, m_iHeight, m_iWidth);
+  RandomPixelDataGenerator (m_pRefStart, m_iWidthExt, m_iHeightExt, m_iWidthExt);
+
+  sMe.uiBlockSize = BLOCK_16x16; //
+  for (int32_t iMby = 0; iMby < m_iMbHeight; iMby++) {
+    for (int32_t iMbx = 0; iMbx < m_iMbWidth; iMbx++) {
+
+      const uint8_t kuiQp = rand() % 52;
+
+      InitMe (kuiQp, m_uiMvdInterTableSize, m_uiMvdInterTableStride, m_pMvdCostTable, &sMe);
+      SetMvWithinIntegerMvRange (m_iMbWidth, m_iMbHeight, iMbx , iMby, m_iMvRange,
+                                 & (sSlice.sMvStartMin), & (sSlice.sMvStartMax));
+
+
+      sMe.sMvp.iMvX = rand() % m_iMvRange;
+      sMe.sMvp.iMvY = rand() % m_iMvRange;
+      sMe.iCurMeBlockPixX = (iMbx << 4);
+      sMe.iCurMeBlockPixY = (iMby << 4);
+      sMe.pRefMb = pRef + sMe.iCurMeBlockPixX + sMe.iCurMeBlockPixY * m_iWidthExt;
+      sMe.pEncMb = m_pSrc + sMe.iCurMeBlockPixX + sMe.iCurMeBlockPixY * m_iWidth;;
+      sMe.uiSadCost = sMe.uiSatdCost = kiMaxBlock16Sad;
+      sMe.pColoRefMb = sMe.pRefMb;
+      WelsMotionCrossSearch (&sFuncList, &sMe, &sSlice, m_iWidth, m_iWidthExt);
+      if ((WELS_ABS (sMe.sMv.iMvX) > m_iMvRange))
+        printf ("mvx = %d\n", sMe.sMv.iMvX);
+      ASSERT_TRUE (! (WELS_ABS (sMe.sMv.iMvX) > m_iMvRange));
+      if ((WELS_ABS (sMe.sMv.iMvY) > m_iMvRange))
+        printf ("mvy = %d\n", sMe.sMv.iMvY);
+      ASSERT_TRUE (! (WELS_ABS (sMe.sMv.iMvY) > m_iMvRange));
+    }
+  }
+}
 void MotionEstimateTest::DoLineTest (PLineFullSearchFunc func, bool vertical) {
   const int32_t kiMaxBlock16Sad = 72000;//a rough number
   SWelsFuncPtrList sFuncList;
@@ -295,18 +338,22 @@ void MotionEstimateTest::DoLineTest (PLineFullSearchFunc func, bool vertical) {
     uint16_t* pMvdCostY = sMe.pMvdCost - iCurMeBlockQpelPixY - sMe.sMvp.iMvY;
     uint16_t* pMvdCost = vertical ? pMvdCostY : pMvdCostX;
     int iSize = vertical ? m_iHeight : m_iWidth;
-    int iFixedMvd = vertical ? pMvdCostX[ iCurMeBlockQpelPixX ] : pMvdCostY[ iCurMeBlockQpelPixY ];
-    func (&sFuncList, &sMe,
-          pMvdCost, iFixedMvd,
-          m_iMaxSearchBlock, m_iWidth,
-          INTPEL_NEEDED_MARGIN,
-          iSize - INTPEL_NEEDED_MARGIN - 16, vertical);
 
     //the last selection may be affected by MVDcost, that is when smaller MvY will be better
     if (vertical) {
+      func (&sFuncList, &sMe,
+            pMvdCost,
+            m_iMaxSearchBlock, m_iWidth,
+            INTPEL_NEEDED_MARGIN - sMe.iCurMeBlockPixY,
+            iSize - INTPEL_NEEDED_MARGIN - 16 - sMe.iCurMeBlockPixY, vertical);
       bFoundMatch = (sMe.sMv.iMvX == 0
                      && (sMe.sMv.iMvY == sTargetMv.iMvY || abs (sMe.sMv.iMvY) < abs (sTargetMv.iMvY)));
     } else {
+      func (&sFuncList, &sMe,
+            pMvdCost,
+            m_iMaxSearchBlock, m_iWidth,
+            INTPEL_NEEDED_MARGIN - sMe.iCurMeBlockPixX,
+            iSize - INTPEL_NEEDED_MARGIN - 16 - sMe.iCurMeBlockPixX, vertical);
       bFoundMatch = (sMe.sMv.iMvY == 0
                      && (sMe.sMv.iMvX == sTargetMv.iMvX || abs (sMe.sMv.iMvX) < abs (sTargetMv.iMvX)));
     }
