@@ -155,9 +155,9 @@ typedef bool (*PCheckDirectionalMv) (PSampleSadSatdCostFunc pSad, void* vpMe,
                                      const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
                                      int32_t& iBestSadCost);
 typedef void (*PLineFullSearchFunc) (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
-                                     uint16_t* pMvdTable, const int32_t kiFixedMvd,
+                                     uint16_t* pMvdTable,
                                      const int32_t kiEncStride, const int32_t kiRefStride,
-                                     const int32_t kiMinPos, const int32_t kiMaxPos,
+                                     const int16_t kiMinMv, const int16_t kiMaxMv,
                                      const bool bVerticalSearch);
 typedef void (*PInitializeHashforFeatureFunc) (uint32_t* pTimesOfFeatureValue, uint16_t* pBuf, const int32_t kiListSize,
                     uint16_t** pLocationOfFeature, uint16_t** pFeatureValuePointerList);
