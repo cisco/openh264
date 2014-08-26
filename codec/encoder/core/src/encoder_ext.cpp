@@ -2642,19 +2642,13 @@ void ParasetIdAdditionIdAdjust (SParaSetOffsetVariable* sParaSetOffsetVariable, 
   //31st finish:	next_spsid_in_bs == 1;
 
   const int32_t kiEncId			= kiCurEncoderParaSetId;
-  const uint32_t kuiPrevIdInBs	= sParaSetOffsetVariable->iParaSetIdDelta[kiEncId] + kiEncId;//mark current_id
   const bool* kpUsedIdPointer   = &sParaSetOffsetVariable->bUsedParaSetIdInBs[0];
   uint32_t uiNextIdInBs			= sParaSetOffsetVariable->uiNextParaSetIdToUseInBs;
 
-#if _DEBUG
-  if (0 != sParaSetOffsetVariable->iParaSetIdDelta[kiEncId])
-    assert (sParaSetOffsetVariable->bUsedParaSetIdInBs[kuiPrevIdInBs]);   //sure the prev-used one was marked activated correctly
-#endif
   //update current layer's pCodingParam
   sParaSetOffsetVariable->iParaSetIdDelta[kiEncId]	= uiNextIdInBs -
       kiEncId;  //for current parameter set, change its id_delta
   //write pso pData for next update:
-  sParaSetOffsetVariable->bUsedParaSetIdInBs[kuiPrevIdInBs] = false;	//
   sParaSetOffsetVariable->bUsedParaSetIdInBs[uiNextIdInBs] = true;		//   update current used_id
 
   //prepare for next update:
@@ -3677,6 +3671,8 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     SParaSetOffsetVariable sTmpPsoVariable[PARA_SET_TYPE];
     uint16_t	          uiTmpIdrPicId;//this is for LTR!
     SLogContext sLogCtx = (*ppCtx)->sLogCtx;
+    for (int32_t k=0;k<PARA_SET_TYPE;k++)
+      memset(((*ppCtx)->sPSOVector.sParaSetOffsetVariable[k].bUsedParaSetIdInBs), 0, MAX_PPS_COUNT*sizeof(bool));
     memcpy (sTmpPsoVariable, (*ppCtx)->sPSOVector.sParaSetOffsetVariable,
             (PARA_SET_TYPE)*sizeof (SParaSetOffsetVariable)); // confirmed_safe_unsafe_usage
     uiTmpIdrPicId = (*ppCtx)->sPSOVector.uiIdrPicId;
