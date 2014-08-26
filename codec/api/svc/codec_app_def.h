@@ -89,7 +89,7 @@ typedef enum {
 
   ENCODER_LTR_RECOVERY_REQUEST,
   ENCODER_LTR_MARKING_FEEDBACK,
-  ENCOCER_LTR_MARKING_PERIOD,
+  ENCODER_LTR_MARKING_PERIOD,
   ENCODER_OPTION_LTR,
   ENCODER_OPTION_COMPLEXITY,
 
@@ -177,6 +177,10 @@ typedef struct {
   int			  iLTRFrameNum; //specify current decoder frame_num
 } SLTRMarkingFeedback;
 
+typedef struct {
+  bool   bEnableLongTermReference; // 1: on, 0: off
+  int	   iLTRRefNum;
+}SLTRConfig;
 typedef struct {
   unsigned int
   uiSliceMbNum[MAX_SLICES_NUM_TMP];  //here we use a tmp fixed value since MAX_SLICES_NUM is not defined here and its definition may be changed;

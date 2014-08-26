@@ -818,16 +818,20 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     FilterLTRMarkingFeedback (m_pEncContext, fb);
   }
   break;
-  case ENCOCER_LTR_MARKING_PERIOD: {
+  case ENCODER_LTR_MARKING_PERIOD: {
     uint32_t iValue = * ((uint32_t*) (pOption));
     m_pEncContext->pSvcParam->iLtrMarkPeriod = iValue;
   }
   break;
   case ENCODER_OPTION_LTR: {
-    uint32_t iValue = * ((uint32_t*) (pOption));
-    m_pEncContext->pSvcParam->bEnableLongTermReference = iValue ? true : false;
-    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING, " CWelsH264SVCEncoder::SetOption enable LTR = %d",
-             m_pEncContext->pSvcParam->bEnableLongTermReference);
+    SLTRConfig* pLTRValue = ((SLTRConfig*) (pOption));
+    SWelsSvcCodingParam	sConfig;
+    memcpy (&sConfig, m_pEncContext->pSvcParam, sizeof (SWelsSvcCodingParam));
+    sConfig.bEnableLongTermReference = pLTRValue->bEnableLongTermReference;
+    sConfig.iLTRRefNum = pLTRValue->iLTRRefNum;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING, " CWelsH264SVCEncoder::SetOption enable LTR = %d,ltrnum = %d",
+             sConfig.bEnableLongTermReference, sConfig.iLTRRefNum);
+    WelsEncoderParamAdjust (&m_pEncContext, &sConfig);
   }
   break;
   case ENCODER_OPTION_ENABLE_SSEI: {
