@@ -571,9 +571,7 @@ void LineFullSearch_c (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
                        const bool bVerticalSearch) {
   PSampleSadSatdCostFunc pSad = pFuncList->sSampleDealingFuncs.pfSampleSad[pMe->uiBlockSize];
   const int32_t kiCurMeBlockPixX = pMe->iCurMeBlockPixX;
-  const int32_t kiCurMeBlockQpelPixX = ((kiCurMeBlockPixX) << 2);
   const int32_t kiCurMeBlockPixY = pMe->iCurMeBlockPixY;
-  const int32_t kiCurMeBlockQpelPixY = ((kiCurMeBlockPixY) << 2);
   int32_t iMinPos, iMaxPos;
   int32_t iFixedMvd;
   int32_t iCurMeBlockPix;
