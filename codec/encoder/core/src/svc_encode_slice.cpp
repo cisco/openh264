@@ -1038,9 +1038,8 @@ int32_t WelsMdInterMbLoopOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice,
   int32_t	iNextMbIdx			= kiSliceFirstMbXY;
   int32_t	iCurMbIdx			= -1;
   int32_t	iMbSkipRun			= 0;
-  const int32_t kiMvdInterTableSize	= (pEncCtx->pSvcParam->iSpatialLayerNum == 1 ? 648 : 972);
-  const int32_t kiMvdInterTableStride = 1 + (kiMvdInterTableSize << 1);
-  uint16_t* pMvdCostTable		= &pEncCtx->pMvdCostTable[kiMvdInterTableSize];
+  const int32_t kiMvdInterTableStride =  pEncCtx->iMvdCostTableStride;
+  uint16_t* pMvdCostTable		= &pEncCtx->pMvdCostTable[pEncCtx->iMvdCostTableSize];
   const int32_t kiSliceIdx				= pSlice->uiSliceIdx;
   const int32_t kiPartitionId			= (kiSliceIdx % pEncCtx->iActiveThreadsNum);
   const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
