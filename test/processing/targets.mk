@@ -1,6 +1,7 @@
 PROCESSING_UNITTEST_SRCDIR=test/processing
 PROCESSING_UNITTEST_CPP_SRCS=\
 	$(PROCESSING_UNITTEST_SRCDIR)/ProcessUT_AdaptiveQuantization.cpp\
+	$(PROCESSING_UNITTEST_SRCDIR)/ProcessUT_DownSample.cpp\
 	$(PROCESSING_UNITTEST_SRCDIR)/ProcessUT_ScrollDetection.cpp\
 	$(PROCESSING_UNITTEST_SRCDIR)/ProcessUT_VaaCalc.cpp\
 

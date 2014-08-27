@@ -90,6 +90,7 @@ PROCESSING_INCLUDES += \
     -I$(SRC_PATH)codec/processing/interface \
     -I$(SRC_PATH)codec/processing/src/common \
     -I$(SRC_PATH)codec/processing/src/adaptivequantization \
+    -I$(SRC_PATH)codec/processing/src/downsample \
     -I$(SRC_PATH)codec/processing/src/scrolldetection \
     -I$(SRC_PATH)codec/processing/src/vaacalc
 
