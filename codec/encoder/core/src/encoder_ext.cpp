@@ -175,7 +175,11 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
                iTotalBitrate, pCfg->iTargetBitrate);
       return ENC_RETURN_INVALIDINPUT;
     }
-
+    if ((pCfg->iRCMode == RC_QUALITY_MODE) || (pCfg->iRCMode == RC_BITRATE_MODE))
+      if (!pCfg->bEnableFrameSkip)
+        WelsLog (pLogCtx, WELS_LOG_WARNING,
+                 "bEnableFrameSkip = %d,bitrate can't be controlled for RC_QUALITY_MODE and RC_BITRATE_MODE without enabling skip frame.",
+                 pCfg->bEnableFrameSkip);
   }
   return WelsCheckRefFrameLimitation (pLogCtx, pCfg);
 }
@@ -1510,8 +1514,8 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
   (*ppCtx)->iMvdCostTableSize = kuiMvdInterTableSize;
   (*ppCtx)->iMvdCostTableStride = kuiMvdInterTableStride;
   (*ppCtx)->pMvdCostTable = (uint16_t*)pMa->WelsMallocz (52 * kuiMvdCacheAlignedSize, "pMvdCostTable");
-   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pMvdCostTable), FreeMemorySvc (ppCtx))
-   MvdCostInit ((*ppCtx)->pMvdCostTable, kuiMvdInterTableStride);  //should put to a better place?
+  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pMvdCostTable), FreeMemorySvc (ppCtx))
+  MvdCostInit ((*ppCtx)->pMvdCostTable, kuiMvdInterTableStride);  //should put to a better place?
 
   if ((*ppCtx)->ppRefPicListExt[0] != NULL && (*ppCtx)->ppRefPicListExt[0]->pRef[0] != NULL)
     (*ppCtx)->pDecPic				= (*ppCtx)->ppRefPicListExt[0]->pRef[0];
@@ -3695,8 +3699,8 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     SParaSetOffsetVariable sTmpPsoVariable[PARA_SET_TYPE];
     uint16_t	          uiTmpIdrPicId;//this is for LTR!
     SLogContext sLogCtx = (*ppCtx)->sLogCtx;
-    for (int32_t k=0;k<PARA_SET_TYPE;k++)
-      memset(((*ppCtx)->sPSOVector.sParaSetOffsetVariable[k].bUsedParaSetIdInBs), 0, MAX_PPS_COUNT*sizeof(bool));
+    for (int32_t k = 0; k < PARA_SET_TYPE; k++)
+      memset (((*ppCtx)->sPSOVector.sParaSetOffsetVariable[k].bUsedParaSetIdInBs), 0, MAX_PPS_COUNT * sizeof (bool));
     memcpy (sTmpPsoVariable, (*ppCtx)->sPSOVector.sParaSetOffsetVariable,
             (PARA_SET_TYPE)*sizeof (SParaSetOffsetVariable)); // confirmed_safe_unsafe_usage
     uiTmpIdrPicId = (*ppCtx)->sPSOVector.uiIdrPicId;
