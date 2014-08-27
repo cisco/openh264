@@ -825,13 +825,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   break;
   case ENCODER_OPTION_LTR: {
     SLTRConfig* pLTRValue = ((SLTRConfig*) (pOption));
-    SWelsSvcCodingParam	sConfig;
-    memcpy (&sConfig, m_pEncContext->pSvcParam, sizeof (SWelsSvcCodingParam));
-    sConfig.bEnableLongTermReference = pLTRValue->bEnableLongTermReference;
-    sConfig.iLTRRefNum = pLTRValue->iLTRRefNum;
-    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING, " CWelsH264SVCEncoder::SetOption enable LTR = %d,ltrnum = %d",
-             sConfig.bEnableLongTermReference, sConfig.iLTRRefNum);
-    WelsEncoderParamAdjust (&m_pEncContext, &sConfig);
+    WelsEncoderApplyLTR (&m_pWelsTrace->m_sLogCtx, m_pEncContext, pLTRValue);
   }
   break;
   case ENCODER_OPTION_ENABLE_SSEI: {

@@ -480,6 +480,7 @@ void WelsEncoderApplyBitRate (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam,
     }
   }
 }
+
 /*!
  * \brief	acquire count number of layers and NALs based on configurable paramters dependency
  * \pParam	pCtx				sWelsEncCtx*
@@ -1273,8 +1274,10 @@ void GetMvMvdRange (SWelsSvcCodingParam* pParam, int32_t& iMvRange, int32_t& iMv
     if (pParam->sSpatialLayers[iLayer].uiLevelIdc < iMinLevelIdc)
       iMinLevelIdc = pParam->sSpatialLayers[iLayer].uiLevelIdc;
   }
-  iMinMv = (g_ksLevelLimits[iMinLevelIdc - 1].iMinVmv)>>2;
-  iMaxMv = (g_ksLevelLimits[iMinLevelIdc - 1].iMaxVmv)>>2;
+
+  iMinMv = (g_ksLevelLimits[iMinLevelIdc - 1].iMinVmv) >> 2;
+  iMaxMv = (g_ksLevelLimits[iMinLevelIdc - 1].iMaxVmv) >> 2;
+
   iMvRange = WELS_MIN (WELS_ABS (iMinMv), iMaxMv);
 
   iMvRange = WELS_MIN (iMvRange, iFixMvRange);
@@ -3797,6 +3800,41 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
   return 0;
 }
 
+void WelsEncoderApplyLTR (SLogContext* pLogCtx, sWelsEncCtx* pCtx, SLTRConfig* pLTRValue) {
+  SWelsSvcCodingParam	sConfig;
+  int32_t iNumRefFrame = 1;
+  memcpy (&sConfig, pCtx->pSvcParam, sizeof (SWelsSvcCodingParam));
+  sConfig.bEnableLongTermReference = pLTRValue->bEnableLongTermReference;
+  sConfig.iLTRRefNum = pLTRValue->iLTRRefNum;
+  int32_t uiGopSize			= 1 << (sConfig.iTemporalLayerNum - 1);
+  if (sConfig.iUsageType == SCREEN_CONTENT_REAL_TIME) {
+    if (sConfig.bEnableLongTermReference) {
+      sConfig.iLTRRefNum = WELS_CLIP3 (sConfig.iLTRRefNum, 1, LONG_TERM_REF_NUM_SCREEN);
+      iNumRefFrame = WELS_MAX (1, WELS_LOG2 (uiGopSize)) + sConfig.iLTRRefNum;
+    } else {
+      sConfig.iLTRRefNum = 0;
+      iNumRefFrame = WELS_MAX (1, uiGopSize >> 1);
+    }
+  } else {
+    if (sConfig.bEnableLongTermReference) {
+      sConfig.iLTRRefNum = WELS_CLIP3 (sConfig.iLTRRefNum, 1, LONG_TERM_REF_NUM);
+    } else {
+      sConfig.iLTRRefNum = 0;
+    }
+    iNumRefFrame		= ((uiGopSize >> 1) > 1) ? ((uiGopSize >> 1) + sConfig.iLTRRefNum) : (MIN_REF_PIC_COUNT +
+                      sConfig.iLTRRefNum);
+    iNumRefFrame		= WELS_CLIP3 (iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM);
+
+  }
+  if (sConfig.iNumRefFrame < iNumRefFrame)
+    sConfig.iNumRefFrame = iNumRefFrame;
+  if (sConfig.iNumRefFrame > sConfig.iMaxNumRefFrame)
+    sConfig.iMaxNumRefFrame = sConfig.iNumRefFrame;
+
+  WelsLog (pLogCtx, WELS_LOG_WARNING, " CWelsH264SVCEncoder::SetOption enable LTR = %d,ltrnum = %d",
+           sConfig.bEnableLongTermReference, sConfig.iLTRRefNum);
+  WelsEncoderParamAdjust (&pCtx, &sConfig);
+}
 int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
                          SFrameBSInfo* pFrameBsInfo,
                          SLayerBSInfo* pLayerBsInfo) {
