@@ -11,6 +11,27 @@ static void UpdateHashFromPlane (SHA1Context* ctx, const uint8_t* plane,
   }
 }
 
+class DecoderCapabilityTest : public ::testing::Test {
+ public:
+  virtual void SetUp() {}
+  virtual void TearDown() {}
+};
+
+TEST_F (DecoderCapabilityTest, JustInit) {
+  SDecoderCapability sDecCap;
+  int iRet = WelsGetDecoderCapability (&sDecCap);
+  ASSERT_TRUE (iRet == 0);
+  EXPECT_EQ (sDecCap.iProfileIdc, 66);
+  EXPECT_EQ (sDecCap.iProfileIop, 0xE0);
+  EXPECT_EQ (sDecCap.iLevelIdc, 32);
+  EXPECT_EQ (sDecCap.iMaxMbps, 216000);
+  EXPECT_EQ (sDecCap.iMaxFs, 5120);
+  EXPECT_EQ (sDecCap.iMaxCpb, 20000);
+  EXPECT_EQ (sDecCap.iMaxDpb, 20480);
+  EXPECT_EQ (sDecCap.iMaxBr, 20000);
+  EXPECT_EQ (sDecCap.bRedPicCap, 0);
+}
+
 
 class DecoderInitTest : public ::testing::Test, public BaseDecoderTest {
  public:

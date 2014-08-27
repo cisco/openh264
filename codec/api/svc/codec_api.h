@@ -188,6 +188,7 @@ typedef void (*WelsTraceCallback) (void* ctx, int level, const char* string);
 int  WelsCreateSVCEncoder (ISVCEncoder** ppEncoder);
 void WelsDestroySVCEncoder (ISVCEncoder* pEncoder);
 
+int WelsGetDecoderCapability (SDecoderCapability* pDecCapability);
 long WelsCreateDecoder (ISVCDecoder** ppDecoder);
 void WelsDestroyDecoder (ISVCDecoder* pDecoder);
 

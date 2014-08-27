@@ -429,4 +429,17 @@ typedef struct TagDeliveryStatus {
   int iDropFrameType; // the frame type that is dropped
   int iDropFrameSize; // the frame size that is dropped
 } SDeliveryStatus;
+
+typedef struct TagDecoderCapability {
+  int iProfileIdc;
+  int iProfileIop;
+  int iLevelIdc;
+  int iMaxMbps;
+  int iMaxFs;
+  int iMaxCpb;
+  int iMaxDpb;
+  int iMaxBr;
+  bool bRedPicCap;
+} SDecoderCapability;
+
 #endif//WELS_VIDEO_CODEC_APPLICATION_DEFINITION_H__
