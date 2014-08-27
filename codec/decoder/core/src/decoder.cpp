@@ -341,7 +341,7 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
     pCtx->eVideoType = VIDEO_BITSTREAM_DEFAULT;
   }
 
-  WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "eVideoType: %d\n", pCtx->eVideoType);
+  WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "eVideoType: %d", pCtx->eVideoType);
 
   return 0;
 }
@@ -596,7 +596,7 @@ int32_t DecoderSetCsp (PWelsDecoderContext pCtx, const int32_t kiColorFormat) {
 
   //For now, support only videoFormatI420!
   if (kiColorFormat != (int32_t) videoFormatI420) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "Support I420 output only for now! Change to I420...\n");
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "Support I420 output only for now! Change to I420...");
     pCtx->pParam->eOutputColorFormat = pCtx->eOutputColorFormat = videoFormatI420;
   }
 
@@ -620,7 +620,7 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
   iErr = WelsRequestMem (pCtx, kiMbWidth, kiMbHeight);	// common memory used
   if (ERR_NONE != iErr) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
-             "SyncPictureResolutionExt()::WelsRequestMem--buffer allocated failure.\n");
+             "SyncPictureResolutionExt()::WelsRequestMem--buffer allocated failure.");
     pCtx->iErrorCode = dsOutOfMemory;
     return iErr;
   }
@@ -628,7 +628,7 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
   iErr = InitialDqLayersContext (pCtx, kiPicWidth, kiPicHeight);
   if (ERR_NONE != iErr) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
-             "SyncPictureResolutionExt()::InitialDqLayersContext--buffer allocated failure.\n");
+             "SyncPictureResolutionExt()::InitialDqLayersContext--buffer allocated failure.");
     pCtx->iErrorCode = dsOutOfMemory;
   }
 

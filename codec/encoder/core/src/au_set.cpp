@@ -83,14 +83,14 @@ int32_t WelsCheckRefFrameLimitation (SLogContext* pLogCtx, SWelsSvcCodingParam* 
     uint32_t uiPicInMBs = ((pSpatialLayer->iVideoHeight + 15) >> 4) * ((pSpatialLayer->iVideoWidth + 15) >> 4);
     if (pSpatialLayer->uiLevelIdc == LEVEL_UNKNOWN) {
       pSpatialLayer->uiLevelIdc = LEVEL_5_0;
-      WelsLog (pLogCtx, WELS_LOG_WARNING, "change level to level5.0\n");
+      WelsLog (pLogCtx, WELS_LOG_WARNING, "change level to level5.0");
     }
     iRefFrame = g_ksLevelLimits[pSpatialLayer->uiLevelIdc - 1].uiMaxDPBMbs / uiPicInMBs;
     if (iRefFrame < pParam->iMaxNumRefFrame)
       pParam->iMaxNumRefFrame = iRefFrame;
     if (pParam->iMaxNumRefFrame < 1) {
       pParam->iMaxNumRefFrame = 1;
-      WelsLog (pLogCtx, WELS_LOG_ERROR, "error Level setting (%d)\n", pSpatialLayer->uiLevelIdc);
+      WelsLog (pLogCtx, WELS_LOG_ERROR, "error Level setting (%d)", pSpatialLayer->uiLevelIdc);
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
   }
