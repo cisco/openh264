@@ -348,11 +348,11 @@ void RcTraceVGopBitrate (sWelsEncCtx* pEncCtx) {
 #ifdef _TEST_TEMP_Rc_
     fprintf (fp_vgop, "%d\n", WELS_ROUND ((double)iTotalBits / iFrameInVGop));
 #endif
-    WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO, "[Rc] VGOPbitrate%d: %d \n", kiDid, iVGopBitrate);
+    WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO, "[Rc] VGOPbitrate%d: %d ", kiDid, iVGopBitrate);
     if (iTotalBits > 0) {
       iTid = 0;
       while (iTid <= kiHighestTid) {
-        WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO, "T%d=%8.3f \n", iTid, (double) (pTOverRc[iTid].iGopBitsDq / iTotalBits));
+        WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO, "T%d=%8.3f ", iTid, (double) (pTOverRc[iTid].iGopBitsDq / iTotalBits));
         ++ iTid;
       }
     }
@@ -760,7 +760,7 @@ void RcTraceFrameBits (sWelsEncCtx* pEncCtx) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
 
   WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO,
-           "[Rc] encoding_qp%d, qp = %3d, index = %8d, iTid = %1d, used = %8d, target = %8d, remaingbits = %8d\n",
+           "[Rc] encoding_qp%d, qp = %3d, index = %8d, iTid = %1d, used = %8d, target = %8d, remaingbits = %8d",
            pEncCtx->uiDependencyId, pWelsSvcRc->iAverageFrameQp, pEncCtx->iFrameIndex, pEncCtx->uiTemporalId,
            pWelsSvcRc->iFrameDqBits,
            pWelsSvcRc->iTargetBits, pWelsSvcRc->iRemainingBits);
