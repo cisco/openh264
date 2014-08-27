@@ -1262,6 +1262,27 @@ void ReleaseMemoryVaaScreen (SVAAFrameInfo* pVaa,  CMemoryAlign* pMa, const int3
  * \pParam	pEncCtx		sWelsEncCtx*
  * \return	successful - 0; otherwise none 0 for failed
  */
+void GetMvMvdRange (SWelsSvcCodingParam* pParam, int32_t& iMvRange, int32_t& iMvdRange) {
+  ELevelIdc iMinLevelIdc = LEVEL_5_2;
+  int32_t iMinMv = 0;
+  int32_t iMaxMv = 0;
+  int32_t iFixMvRange = pParam->iUsageType ? EXPANDED_MV_RANGE : CAMERA_STARTMV_RANGE;
+  int32_t iFixMvdRange = (pParam->iUsageType ? EXPANDED_MVD_RANGE : ((pParam->iSpatialLayerNum == 1) ? CAMERA_MVD_RANGE :
+                          CAMERA_HIGHLAYER_MVD_RANGE));
+  for (int32_t iLayer = 0; iLayer < pParam->iSpatialLayerNum; iLayer++) {
+    if (pParam->sSpatialLayers[iLayer].uiLevelIdc < iMinLevelIdc)
+      iMinLevelIdc = pParam->sSpatialLayers[iLayer].uiLevelIdc;
+  }
+  iMinMv = (g_ksLevelLimits[iMinLevelIdc - 1].iMinVmv)>>2;
+  iMaxMv = (g_ksLevelLimits[iMinLevelIdc - 1].iMaxVmv)>>2;
+  iMvRange = WELS_MIN (WELS_ABS (iMinMv), iMaxMv);
+
+  iMvRange = WELS_MIN (iMvRange, iFixMvRange);
+
+  iMvdRange = (iMvRange + 1) << 1;
+
+  iMvdRange = WELS_MIN (iMvdRange, iFixMvdRange);
+}
 int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
   SWelsSvcCodingParam* pParam	= (*ppCtx)->pSvcParam;
   CMemoryAlign* pMa				= (*ppCtx)->pMemAlign;
@@ -1276,10 +1297,9 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
   int32_t iResult					= 0;
   float	fCompressRatioThr		= .5f;
   const int32_t kiNumDependencyLayers	= pParam->iSpatialLayerNum;
-  (*ppCtx)->iMvRange = pParam->iUsageType ? EXPANDED_MV_RANGE : CAMERA_STARTMV_RANGE;
-  const int32_t kiMvdRange = (pParam->iUsageType ? EXPANDED_MVD_RANGE : ((kiNumDependencyLayers == 1) ? CAMERA_MVD_RANGE :
-                              CAMERA_HIGHLAYER_MVD_RANGE));
-  const uint32_t kuiMvdInterTableSize	= (kiMvdRange << 2); //intepel*4=qpel
+  int32_t iMvdRange = 0;
+  GetMvMvdRange (pParam, (*ppCtx)->iMvRange, iMvdRange);
+  const uint32_t kuiMvdInterTableSize	= (iMvdRange << 2); //intepel*4=qpel
   const uint32_t kuiMvdInterTableStride	=  1 + (kuiMvdInterTableSize << 1);//qpel_mv_range*2=(+/-);
   const uint32_t kuiMvdCacheAlignedSize	= kuiMvdInterTableStride * sizeof (uint16_t);
   int32_t iVclLayersBsSizeCount		= 0;
@@ -1487,8 +1507,8 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
   (*ppCtx)->iMvdCostTableSize = kuiMvdInterTableSize;
   (*ppCtx)->iMvdCostTableStride = kuiMvdInterTableStride;
   (*ppCtx)->pMvdCostTable = (uint16_t*)pMa->WelsMallocz (52 * kuiMvdCacheAlignedSize, "pMvdCostTable");
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pMvdCostTable), FreeMemorySvc (ppCtx))
-  MvdCostInit ((*ppCtx)->pMvdCostTable, kuiMvdInterTableStride);  //should put to a better place?
+   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pMvdCostTable), FreeMemorySvc (ppCtx))
+   MvdCostInit ((*ppCtx)->pMvdCostTable, kuiMvdInterTableStride);  //should put to a better place?
 
   if ((*ppCtx)->ppRefPicListExt[0] != NULL && (*ppCtx)->ppRefPicListExt[0]->pRef[0] != NULL)
     (*ppCtx)->pDecPic				= (*ppCtx)->ppRefPicListExt[0]->pRef[0];
@@ -1861,8 +1881,9 @@ int32_t InitSliceSettings (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPar
   pCodingParam->iCountThreadsNum				= WELS_MIN (kiCpuCores, iMaxSliceCount);
   pCodingParam->iMultipleThreadIdc	= pCodingParam->iCountThreadsNum;
   if (pCodingParam->iLoopFilterDisableIdc == 0
-    && pCodingParam->iMultipleThreadIdc != 1) // Loop filter requested to be enabled, with threading enabled
-    pCodingParam->iLoopFilterDisableIdc = 2; // Disable loop filter on slice boundaries since that's not allowed with multithreading
+      && pCodingParam->iMultipleThreadIdc != 1) // Loop filter requested to be enabled, with threading enabled
+    pCodingParam->iLoopFilterDisableIdc =
+      2; // Disable loop filter on slice boundaries since that's not allowed with multithreading
   *pMaxSliceCount					= iMaxSliceCount;
 
   return 0;
@@ -1966,7 +1987,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
     uiCpuCores = pCodingParam->iMultipleThreadIdc;
   else {
     if (uiCpuCores ==
-      0)	// cpuid not supported or doesn't expose the number of cores, use high level system API as followed to detect number of pysical/logic processor
+        0)	// cpuid not supported or doesn't expose the number of cores, use high level system API as followed to detect number of pysical/logic processor
       uiCpuCores = DynamicDetectCpuCores();
     // So far so many cpu cores up to MAX_THREADS_NUM mean for server platforms,
     // for client application here it is constrained by maximal to MAX_THREADS_NUM
@@ -2953,7 +2974,7 @@ bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pCtx, int32_t iSpatialNum) {
  * \return	EFrameType (videoFrameTypeIDR/videoFrameTypeI/videoFrameTypeP)
  */
 int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSourcePicture* pSrcPic) {
-  if( pCtx == NULL ) {
+  if (pCtx == NULL) {
     return ENC_RETURN_MEMALLOCERR;
   }
   SLayerBSInfo* pLayerBsInfo					= &pFbi->sLayerInfo[0];
