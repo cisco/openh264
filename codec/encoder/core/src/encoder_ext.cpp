@@ -3434,7 +3434,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 #ifdef ENABLE_FRAME_DUMP
     if (iCurDid + 1 < pSvcParam->iSpatialLayerNum) {
       DumpDependencyRec (fsnr, &pSvcParam->sDependencyLayers[iCurDid].sRecFileName[0], iCurDid,
-                         pCtx->bDependencyRecFlag[iCurDid]);
+                         pCtx->bDependencyRecFlag[iCurDid], pCtx->pCurDqLayer);
       pCtx->bDependencyRecFlag[iCurDid] = true;
     }
 #endif//ENABLE_FRAME_DUMP
@@ -3601,8 +3601,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   }
 
 #ifdef ENABLE_FRAME_DUMP
-  DumpRecFrame (fsnr, &pSvcParam->sDependencyLayers[pSvcParam->iSpatialLayerNum - 1].sRecFileName[0],
-                pCtx->bRecFlag);	// pDecPic: final reconstruction output
+  DumpRecFrame (fsnr, &pSvcParam->sDependencyLayers[pSvcParam->iSpatialLayerNum - 1].sRecFileName[0], pSvcParam->iSpatialLayerNum - 1, pCtx->bRecFlag, pCtx->pCurDqLayer);	// pDecPic: final reconstruction output
   pCtx->bRecFlag = true;
 
 #endif//ENABLE_FRAME_DUMP
