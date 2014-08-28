@@ -709,9 +709,7 @@ void   RcVBufferCalculationSkip (sWelsEncCtx* pEncCtx) {
       || (dIncPercent > pWelsSvcRc->iRcVaryPercentage)) {
     pEncCtx->iSkipFrameFlag = 1;
     pWelsSvcRc->iBufferFullnessSkip = pWelsSvcRc->iBufferFullnessSkip - kiOutputBits;
-#ifdef FRAME_INFO_OUTPUT
-    fprintf (stderr, "skip one frame\n");
-#endif
+    WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO,"skip one frame");
   }
 
   if (pWelsSvcRc->iBufferFullnessSkip < 0)
@@ -759,7 +757,7 @@ void RcVBufferCalculationPadding (sWelsEncCtx* pEncCtx) {
 void RcTraceFrameBits (sWelsEncCtx* pEncCtx) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
 
-  WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO,
+  WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
            "[Rc] encoding_qp%d, qp = %3d, index = %8d, iTid = %1d, used = %8d, target = %8d, remaingbits = %8d",
            pEncCtx->uiDependencyId, pWelsSvcRc->iAverageFrameQp, pEncCtx->iFrameIndex, pEncCtx->uiTemporalId,
            pWelsSvcRc->iFrameDqBits,
@@ -888,10 +886,7 @@ void  WelsRcPictureInfoUpdateGom (void* pCtx, int32_t layer_size) {
   }
   pWelsSvcRc->iRemainingBits -= pWelsSvcRc->iFrameDqBits;
 
-#if GOM_TRACE_FLAG
   RcTraceFrameBits (pEncCtx);
-#endif
-
 
   if (pEncCtx->pSvcParam->bEnableFrameSkip /*&&
       pEncCtx->uiDependencyId == pEncCtx->pSvcParam->iSpatialLayerNum - 1*/) {
