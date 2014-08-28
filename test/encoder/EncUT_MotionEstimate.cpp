@@ -80,6 +80,7 @@ TEST_F (MotionEstimateTest, TestDiamondSearch) {
   SWelsFuncPtrList sFuncList;
   SWelsME sMe;
   SSlice sSlice;
+  memset (&sSlice, 0, sizeof (sSlice));
 
   const uint8_t kuiQp = rand() % 52;
   InitMe (kuiQp, 648, m_uiMvdTableSize, m_pMvdCostTable, &sMe);
@@ -209,6 +210,7 @@ TEST_F (MotionEstimateRangeTest, TestDiamondSearch) {
 
   WelsInitSampleSadFunc (&sFuncList, 0); //test c functions
 
+  memset (&sSlice, 0, sizeof (sSlice));
   memset (m_pSrc, 128, m_iWidth * m_iHeight);
   memset (m_pRefStart, 0, m_iWidthExt * m_iHeightExt);
 
@@ -252,6 +254,8 @@ TEST_F (MotionEstimateRangeTest, TestWelsMotionCrossSearch) {
   uint8_t* pRef = m_pRefStart + PADDING_LENGTH * m_iWidthExt + PADDING_LENGTH;
   const int32_t kiMaxBlock16Sad = 72000;//a rough number
 
+  memset (&sSlice, 0, sizeof (sSlice));
+  memset (&sMe, 0, sizeof (sMe));
   WelsInitSampleSadFunc (&sFuncList, 0); //test c functions
   WelsInitMeFunc (&sFuncList, 0, iUsageType);
 
