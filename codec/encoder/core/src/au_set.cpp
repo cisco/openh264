@@ -354,15 +354,8 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
   pSps->iMbWidth	= (pLayerParam->iVideoWidth + 15) >> 4;
   pSps->iMbHeight	= (pLayerParam->iVideoHeight + 15) >> 4;
 
-  if (0 == kuiIntraPeriod) {
-    //max value of both iFrameNum and POC are 2^16-1, in our encoder, iPOC=2*iFrameNum, so max of iFrameNum should be 2^15-1.--
-    pSps->uiLog2MaxFrameNum = 15;//16;
-  } else {
-    pSps->uiLog2MaxFrameNum	= 4;
-    while ((uint32_t) (1 << pSps->uiLog2MaxFrameNum) <= kuiIntraPeriod) {
-      ++ pSps->uiLog2MaxFrameNum;
-    }
-  }
+  //max value of both iFrameNum and POC are 2^16-1, in our encoder, iPOC=2*iFrameNum, so max of iFrameNum should be 2^15-1.--
+  pSps->uiLog2MaxFrameNum = 15;//16;
   pSps->iLog2MaxPocLsb	= 1 + pSps->uiLog2MaxFrameNum;
 
   pSps->iNumRefFrames	= kiNumRefFrame;	/* min pRef size when fifo pRef operation*/
