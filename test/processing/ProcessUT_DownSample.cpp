@@ -207,20 +207,20 @@ TEST (DownSampleTest, func) { \
   } \
   ENFORCE_STACK_ALIGN_1D (uint8_t, dst_c, 70000, 16); \
   ENFORCE_STACK_ALIGN_1D (uint8_t, src_c, 70000, 16); \
-  unsigned int dst_stride_c; \
-  unsigned int dst_width_c; \
-  unsigned int dst_height_c; \
-  unsigned int src_stride_c; \
-  unsigned int src_width_c; \
-  unsigned int src_height_c; \
+  int dst_stride_c; \
+  int dst_width_c; \
+  int dst_height_c; \
+  int src_stride_c; \
+  int src_width_c; \
+  int src_height_c; \
   ENFORCE_STACK_ALIGN_1D (uint8_t, dst_a, 70000, 16); \
   ENFORCE_STACK_ALIGN_1D (uint8_t, src_a, 70000, 16); \
-  unsigned int dst_stride_a; \
-  unsigned int dst_width_a; \
-  unsigned int dst_height_a; \
-  unsigned int src_stride_a; \
-  unsigned int src_width_a; \
-  unsigned int src_height_a; \
+  int dst_stride_a; \
+  int dst_width_a; \
+  int dst_height_a; \
+  int src_stride_a; \
+  int src_width_a; \
+  int src_height_a; \
   dst_stride_c = dst_stride_a = 320; \
   src_stride_c = src_stride_a = 320; \
   src_width_c = src_width_a = 320; \
