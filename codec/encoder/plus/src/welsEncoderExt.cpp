@@ -256,41 +256,6 @@ int CWelsH264SVCEncoder::InitializeInternal (SWelsSvcCodingParam* pCfg) {
   WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
            "CWelsH264SVCEncoder::Initialize, m_uiCountFrameNum= %d, m_iCspInternal= 0x%x",
            m_uiCountFrameNum, m_iCspInternal);
-  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-           "coding_param->iPicWidth= %d;coding_param->iPicHeight= %d;coding_param->iTargetBitrate= %d;coding_param->iRCMode= %d;coding_param->iTemporalLayerNum= %d;coding_param->iSpatialLayerNum= %d;coding_param->fFrameRate= %.6ff;coding_param->iInputCsp= %d;coding_param->uiIntraPeriod= %d;coding_param->bEnableSpsPpsIdAddition = %d;coding_param->bPrefixNalAddingCtrl = %d;coding_param->bEnableDenoise= %d;coding_param->bEnableBackgroundDetection= %d;coding_param->bEnableAdaptiveQuant= %d;coding_param->bEnableFrameSkip= %d;coding_param->bEnableCropPic= %d;coding_param->bEnableLongTermReference= %d;coding_param->iLtrMarkPeriod= %d;",
-           sEncodingParam.iPicWidth,
-           sEncodingParam.iPicHeight,
-           sEncodingParam.iTargetBitrate,
-           sEncodingParam.iRCMode,
-           sEncodingParam.iTemporalLayerNum,
-           sEncodingParam.iSpatialLayerNum,
-           sEncodingParam.fMaxFrameRate,
-           sEncodingParam.iInputCsp,
-           sEncodingParam.uiIntraPeriod,
-           sEncodingParam.bEnableSpsPpsIdAddition,
-           sEncodingParam.bPrefixNalAddingCtrl,
-           sEncodingParam.bEnableDenoise,
-           sEncodingParam.bEnableBackgroundDetection,
-           sEncodingParam.bEnableAdaptiveQuant,
-           sEncodingParam.bEnableFrameSkip,
-           sEncodingParam.bEnableCropPic,
-           sEncodingParam.bEnableLongTermReference,
-           sEncodingParam.iLtrMarkPeriod);
-  int32_t i = 0;
-  while (i < sEncodingParam.iSpatialLayerNum) {
-    SSpatialLayerConfig* spatial_cfg = &sEncodingParam.sSpatialLayers[i];
-    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-             "coding_param->sSpatialLayers[%d]: .iVideoWidth= %d; .iVideoHeight= %d; .fFrameRate= %.6ff; .iSpatialBitrate= %d; .sSliceCfg.uiSliceMode= %d; .sSliceCfg.sSliceArgument.uiSliceNum= %d; .sSliceCfg.sSliceArgument.uiSliceSizeConstraint= %d;",
-             i, spatial_cfg->iVideoWidth,
-             spatial_cfg->iVideoHeight,
-             spatial_cfg->fFrameRate,
-             spatial_cfg->iSpatialBitrate,
-             spatial_cfg->sSliceCfg.uiSliceMode,
-             spatial_cfg->sSliceCfg.sSliceArgument.uiSliceNum,
-             spatial_cfg->sSliceCfg.sSliceArgument.uiSliceSizeConstraint
-            );
-    ++ i;
-  }
 #endif//REC_FRAME_COUNT
 
   // Check valid parameters
@@ -378,6 +343,7 @@ int CWelsH264SVCEncoder::InitializeInternal (SWelsSvcCodingParam* pCfg) {
   m_iMaxPicWidth	= pCfg->iPicWidth;
   m_iMaxPicHeight	= pCfg->iPicHeight;
 
+  TraceParamInfo(pCfg);
   if (WelsInitEncoderExt (&m_pEncContext, pCfg, &m_pWelsTrace->m_sLogCtx)) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "CWelsH264SVCEncoder::Initialize(), WelsInitEncoderExt failed.");
     Uninitialize();
@@ -559,6 +525,58 @@ void CWelsH264SVCEncoder::CheckReferenceNumSetting (int32_t iNumRef) {
              "doesn't support the number of reference frame(%d) change to auto select mode", iNumRef);
   }
 }
+void CWelsH264SVCEncoder::TraceParamInfo(SEncParamExt *pParam){
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "iUsageType = %d,iPicWidth= %d;iPicHeight= %d;iTargetBitrate= %d;iMaxBitrate= %d;iRCMode= %d;iPaddingFlag= %d;iTemporalLayerNum= %d;iSpatialLayerNum= %d;fFrameRate= %.6ff;uiIntraPeriod= %d;\
+             bEnableSpsPpsIdAddition = %d;bPrefixNalAddingCtrl = %d;bEnableDenoise= %d;bEnableBackgroundDetection= %d;bEnableAdaptiveQuant= %d;bEnableFrameSkip= %d;bEnableLongTermReference= %d;iLtrMarkPeriod= %d;\
+             iComplexityMode = %d;iNumRefFrame = %d;iEntropyCodingModeFlag = %d;uiMaxNalSize = %d;iLTRRefNum = %d;iMultipleThreadIdc = %d;iLoopFilterDisableIdc = %d",
+             pParam->iUsageType,
+             pParam->iPicWidth,
+             pParam->iPicHeight,
+             pParam->iTargetBitrate,
+             pParam->iMaxBitrate,
+             pParam->iRCMode,
+             pParam->iPaddingFlag,
+             pParam->iTemporalLayerNum,
+             pParam->iSpatialLayerNum,
+             pParam->fMaxFrameRate,
+             pParam->uiIntraPeriod,
+             pParam->bEnableSpsPpsIdAddition,
+             pParam->bPrefixNalAddingCtrl,
+             pParam->bEnableDenoise,
+             pParam->bEnableBackgroundDetection,
+             pParam->bEnableAdaptiveQuant,
+             pParam->bEnableFrameSkip,
+             pParam->bEnableLongTermReference,
+             pParam->iLtrMarkPeriod,
+             pParam->iComplexityMode,
+             pParam->iNumRefFrame,
+             pParam->iEntropyCodingModeFlag,
+             pParam->uiMaxNalSize,
+             pParam->iLTRRefNum,
+             pParam->iMultipleThreadIdc,
+             pParam->iLoopFilterDisableIdc
+             );
+    int32_t i = 0;
+    while (i < pParam->iSpatialLayerNum) {
+      SSpatialLayerConfig* pSpatialCfg = &pParam->sSpatialLayers[i];
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+               "sSpatialLayers[%d]: .iVideoWidth= %d; .iVideoHeight= %d; .fFrameRate= %.6ff; .iSpatialBitrate= %d; .iMaxSpatialBitrate= %d; .sSliceCfg.uiSliceMode= %d; .sSliceCfg.sSliceArgument.iSliceNum= %d; .sSliceCfg.sSliceArgument.uiSliceSizeConstraint= %d;\
+               uiProfileIdc = %d;uiLevelIdc = %d",
+               i, pSpatialCfg->iVideoWidth,
+               pSpatialCfg->iVideoHeight,
+               pSpatialCfg->fFrameRate,
+               pSpatialCfg->iSpatialBitrate,
+               pSpatialCfg->iMaxSpatialBitrate,
+               pSpatialCfg->sSliceCfg.uiSliceMode,
+               pSpatialCfg->sSliceCfg.sSliceArgument.uiSliceNum,
+               pSpatialCfg->sSliceCfg.sSliceArgument.uiSliceSizeConstraint,
+               pSpatialCfg->uiProfileIdc,
+               pSpatialCfg->uiLevelIdc
+              );
+      ++ i;
+    }
+}
 /************************************************************************
 * InDataFormat, IDRInterval, SVC Encode Param, Frame Rate, Bitrate,..
 ************************************************************************/
@@ -624,42 +642,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     int32_t iTargetHeight = 0;
 
     memcpy (&sEncodingParam, pOption, sizeof (SEncParamExt));	// confirmed_safe_unsafe_usage
-    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-             "coding_param->iPicWidth= %d;coding_param->iPicHeight= %d;coding_param->iTargetBitrate= %d; coding_param->iMaxBitrate= %d; coding_param->iRCMode= %d;coding_param->iPaddingFlag= %d;coding_param->iTemporalLayerNum= %d;coding_param->iSpatialLayerNum= %d;coding_param->fFrameRate= %.6ff;coding_param->uiIntraPeriod= %d;coding_param->bEnableSpsPpsIdAddition = %d;coding_param->bPrefixNalAddingCtrl = %d;coding_param->bEnableDenoise= %d;coding_param->bEnableBackgroundDetection= %d;coding_param->bEnableAdaptiveQuant= %d;coding_param->bEnableAdaptiveQuant= %d;coding_param->bEnableLongTermReference= %d;coding_param->iLtrMarkPeriod= %d;",
-             sEncodingParam.iPicWidth,
-             sEncodingParam.iPicHeight,
-             sEncodingParam.iTargetBitrate,
-             sEncodingParam.iMaxBitrate,
-             sEncodingParam.iRCMode,
-             sEncodingParam.iPaddingFlag,
-             sEncodingParam.iTemporalLayerNum,
-             sEncodingParam.iSpatialLayerNum,
-             sEncodingParam.fMaxFrameRate,
-             sEncodingParam.uiIntraPeriod,
-             sEncodingParam.bEnableSpsPpsIdAddition,
-             sEncodingParam.bPrefixNalAddingCtrl,
-             sEncodingParam.bEnableDenoise,
-             sEncodingParam.bEnableBackgroundDetection,
-             sEncodingParam.bEnableAdaptiveQuant,
-             sEncodingParam.bEnableFrameSkip,
-             sEncodingParam.bEnableLongTermReference,
-             sEncodingParam.iLtrMarkPeriod);
-    int32_t i = 0;
-    while (i < sEncodingParam.iSpatialLayerNum) {
-      SSpatialLayerConfig* pSpatialCfg = &sEncodingParam.sSpatialLayers[i];
-      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-               "coding_param->sSpatialLayers[%d]: .iVideoWidth= %d; .iVideoHeight= %d; .fFrameRate= %.6ff; .iSpatialBitrate= %d; .iMaxSpatialBitrate= %d; .sSliceCfg.uiSliceMode= %d; .sSliceCfg.sSliceArgument.iSliceNum= %d; .sSliceCfg.sSliceArgument.uiSliceSizeConstraint= %d;",
-               i, pSpatialCfg->iVideoWidth,
-               pSpatialCfg->iVideoHeight,
-               pSpatialCfg->fFrameRate,
-               pSpatialCfg->iSpatialBitrate,
-               pSpatialCfg->iMaxSpatialBitrate,
-               pSpatialCfg->sSliceCfg.uiSliceMode,
-               pSpatialCfg->sSliceCfg.sSliceArgument.uiSliceNum,
-               pSpatialCfg->sSliceCfg.sSliceArgument.uiSliceSizeConstraint
-              );
-      ++ i;
-    }
+    TraceParamInfo(&sEncodingParam);
 #ifdef OUTPUT_BIT_STREAM
     if (sEncodingParam.sSpatialLayers[sEncodingParam.iSpatialLayerNum - 1].iVideoWidth !=
         m_pEncContext->pSvcParam->sDependencyLayers[m_pEncContext->pSvcParam->iSpatialLayerNum - 1].iActualWidth) {
