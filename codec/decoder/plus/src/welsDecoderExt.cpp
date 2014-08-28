@@ -476,7 +476,24 @@ DECODING_STATE CWelsDecoder::DecodeFrameEx (const unsigned char* kpSrc,
 
 
 using namespace WelsDec;
+/*
+*       WelsGetDecoderCapability
+*       @return: DecCapability information
+*/
+int WelsGetDecoderCapability(SDecoderCapability* pDecCapability) {
+  memset (pDecCapability, 0, sizeof (SDecoderCapability));
+  pDecCapability->iProfileIdc = 66; //Baseline
+  pDecCapability->iProfileIop = 0xE0; //11100000b
+  pDecCapability->iLevelIdc = 32; //level_idc = 3.2
+  pDecCapability->iMaxMbps = 216000; //from level_idc = 3.2
+  pDecCapability->iMaxFs = 5120; //from level_idc = 3.2
+  pDecCapability->iMaxCpb = 20000; //from level_idc = 3.2
+  pDecCapability->iMaxDpb = 20480; //from level_idc = 3.2
+  pDecCapability->iMaxBr = 20000; //from level_idc = 3.2
+  pDecCapability->bRedPicCap = 0; //not support redundant pic
 
+  return ERR_NONE;
+}
 /* WINAPI is indeed in prefix due to sync to application layer callings!! */
 
 /*

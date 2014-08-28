@@ -1,3 +1,4 @@
 EXPORTS
+    WelsGetDecoderCapability
     WelsCreateDecoder
     WelsDestroyDecoder
