@@ -528,8 +528,8 @@ void CWelsH264SVCEncoder::CheckReferenceNumSetting (int32_t iNumRef) {
 void CWelsH264SVCEncoder::TraceParamInfo(SEncParamExt *pParam){
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "iUsageType = %d,iPicWidth= %d;iPicHeight= %d;iTargetBitrate= %d;iMaxBitrate= %d;iRCMode= %d;iPaddingFlag= %d;iTemporalLayerNum= %d;iSpatialLayerNum= %d;fFrameRate= %.6ff;uiIntraPeriod= %d;\
-             bEnableSpsPpsIdAddition = %d;bPrefixNalAddingCtrl = %d;bEnableDenoise= %d;bEnableBackgroundDetection= %d;bEnableAdaptiveQuant= %d;bEnableAdaptiveQuant= %d;bEnableLongTermReference= %d;iLtrMarkPeriod= %d;\
-             iComplexityMode = %d;iNumRefFrame = %d;iEntropyCodingModeFlag = %d;bEnableFrameSkip = %d;uiMaxNalSize = %d;bEnableLongTermReference = %d;iLTRRefNum = %d;iMultipleThreadIdc = %d;iLoopFilterDisableIdc = %d",
+             bEnableSpsPpsIdAddition = %d;bPrefixNalAddingCtrl = %d;bEnableDenoise= %d;bEnableBackgroundDetection= %d;bEnableAdaptiveQuant= %d;bEnableFrameSkip= %d;bEnableLongTermReference= %d;iLtrMarkPeriod= %d;\
+             iComplexityMode = %d;iNumRefFrame = %d;iEntropyCodingModeFlag = %d;uiMaxNalSize = %d;iLTRRefNum = %d;iMultipleThreadIdc = %d;iLoopFilterDisableIdc = %d",
              pParam->iUsageType,
              pParam->iPicWidth,
              pParam->iPicHeight,
@@ -552,9 +552,7 @@ void CWelsH264SVCEncoder::TraceParamInfo(SEncParamExt *pParam){
              pParam->iComplexityMode,
              pParam->iNumRefFrame,
              pParam->iEntropyCodingModeFlag,
-             pParam->bEnableFrameSkip,
              pParam->uiMaxNalSize,
-             pParam->bEnableLongTermReference,
              pParam->iLTRRefNum,
              pParam->iMultipleThreadIdc,
              pParam->iLoopFilterDisableIdc
