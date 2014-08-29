@@ -1946,35 +1946,13 @@ void OutputCpuFeaturesLog (SLogContext* pLogCtx, uint32_t uiCpuFeatureFlags, uin
            iCacheLineSize);
 }
 
-/*!
- * \brief	initialize Wels avc encoder core library
- * \pParam	ppCtx		sWelsEncCtx**
- * \pParam	pParam		SWelsSvcCodingParam*
- * \return	successful - 0; otherwise none 0 for failed
- */
-int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingParam, SLogContext* pLogCtx) {
-  sWelsEncCtx* pCtx		= NULL;
-  int32_t	iRet					= 0;
-  uint32_t uiCpuFeatureFlags		= 0;	// CPU features
+int32_t GetMultipleThreadIdc (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingParam, int16_t& iSliceNum,
+                              int32_t& iCacheLineSize, uint32_t& uiCpuFeatureFlags) {
+  // for cpu features detection, Only detect once??
   int32_t uiCpuCores				=
     0;	// number of logic processors on physical processor package, zero logic processors means HTT not supported
-  int32_t iCacheLineSize			= 16;	// on chip cache line size in byte
-  int16_t iSliceNum				= 1;	// number of slices used
-
-  if (NULL == ppCtx || NULL == pCodingParam) {
-    WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), NULL == ppCtx(0x%p) or NULL == pCodingParam(0x%p).",
-             (void*)ppCtx, (void*)pCodingParam);
-    return 1;
-  }
-
-  iRet	=	ParamValidationExt (pLogCtx, pCodingParam);
-  if (iRet != 0) {
-    WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), ParamValidationExt failed return %d.", iRet);
-    return iRet;
-  }
-
-  // for cpu features detection, Only detect once??
   uiCpuFeatureFlags	= WelsCPUFeatureDetect (&uiCpuCores);	// detect cpu capacity features
+
 #ifdef X86_ASM
   if (uiCpuFeatureFlags & WELS_CPU_CACHELINE_128)
     iCacheLineSize = 128;
@@ -2008,9 +1986,41 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   uiCpuCores	= WELS_CLIP3 (uiCpuCores, 1, MAX_THREADS_NUM);
 
   if (InitSliceSettings (pLogCtx, pCodingParam, uiCpuCores, &iSliceNum)) {
-    WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), InitSliceSettings failed.");
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "GetMultipleThreadIdc(), InitSliceSettings failed.");
     return 1;
   }
+  return 0;
+}
+
+/*!
+ * \brief	initialize Wels avc encoder core library
+ * \pParam	ppCtx		sWelsEncCtx**
+ * \pParam	pParam		SWelsSvcCodingParam*
+ * \return	successful - 0; otherwise none 0 for failed
+ */
+int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingParam, SLogContext* pLogCtx) {
+  sWelsEncCtx* pCtx		= NULL;
+  int32_t	iRet					= 0;
+  int16_t iSliceNum				= 1;	// number of slices used
+  int32_t iCacheLineSize			= 16;	// on chip cache line size in byte
+  uint32_t uiCpuFeatureFlags = 0;
+  if (NULL == ppCtx || NULL == pCodingParam) {
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), NULL == ppCtx(0x%p) or NULL == pCodingParam(0x%p).",
+             (void*)ppCtx, (void*)pCodingParam);
+    return 1;
+  }
+
+  iRet	=	ParamValidationExt (pLogCtx, pCodingParam);
+  if (iRet != 0) {
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), ParamValidationExt failed return %d.", iRet);
+    return iRet;
+  }
+  iRet = GetMultipleThreadIdc (pLogCtx, pCodingParam, iSliceNum, iCacheLineSize, uiCpuFeatureFlags);
+  if (iRet != 0) {
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), GetMultipleThreadIdc failed return %d.", iRet);
+    return iRet;
+  }
+
 
   *ppCtx	= NULL;
 
@@ -3605,7 +3615,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   }
 
 #ifdef ENABLE_FRAME_DUMP
-  DumpRecFrame (fsnr, &pSvcParam->sDependencyLayers[pSvcParam->iSpatialLayerNum - 1].sRecFileName[0], pSvcParam->iSpatialLayerNum - 1, pCtx->bRecFlag, pCtx->pCurDqLayer);	// pDecPic: final reconstruction output
+  DumpRecFrame (fsnr, &pSvcParam->sDependencyLayers[pSvcParam->iSpatialLayerNum - 1].sRecFileName[0],
+                pSvcParam->iSpatialLayerNum - 1, pCtx->bRecFlag, pCtx->pCurDqLayer);	// pDecPic: final reconstruction output
   pCtx->bRecFlag = true;
 
 #endif//ENABLE_FRAME_DUMP
@@ -3629,12 +3640,23 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
   int32_t iReturn = ENC_RETURN_SUCCESS;
   int8_t iIndexD = 0;
   bool bNeedReset = false;
+  int16_t iSliceNum				= 1;	// number of slices used
+  int32_t iCacheLineSize			= 16;	// on chip cache line size in byte
+  uint32_t uiCpuFeatureFlags = 0;
 
   if (NULL == ppCtx || NULL == *ppCtx || NULL == pNewParam)	return 1;
 
   /* Check validation in new parameters */
   iReturn	= ParamValidationExt (& (*ppCtx)->sLogCtx, pNewParam);
   if (iReturn != ENC_RETURN_SUCCESS)	return iReturn;
+
+  iReturn = GetMultipleThreadIdc (& (*ppCtx)->sLogCtx, pNewParam, iSliceNum, iCacheLineSize, uiCpuFeatureFlags);
+  if (iReturn != ENC_RETURN_SUCCESS) {
+    WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_ERROR, "WelsEncoderParamAdjust(), GetMultipleThreadIdc failed return %d.",
+             iReturn);
+    return iReturn;
+  }
+
 
   pOldParam	= (*ppCtx)->pSvcParam;
 
