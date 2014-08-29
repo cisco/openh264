@@ -1,6 +1,21 @@
 
 Releases
 -----------
+v1.1.1
+- Modify some APIs
+  - Add WelsGetDecoderCapability for SDP negotiation usage
+  - Add RC_BUFFERBASED_MODE for screen content RC
+  - Add SLTRConfig for SetOption in encoder
+  - Add ENCODER_OPTION_COMPLEXITY/ECOMPLEXITY_MODE in TagEncParamExt
+  - Remove uiFrameToBeCoded in TagEncParamExt
+  - Remove iInputCsp in TagEncParamBase/TagEncParamExt
+  - Modify iOutputColorFormat as eOutputColorFormat
+  - Modify uiEcActiveFlag as eEcActiveIdc
+  - Rename ENCOCER_LTR_MARKING_PERIOD to ENCODER_LTR_MARKING_PERIOD
+- Improve the encoding speed of screen content encoding including ARM and X86
+- fix some bugs
+
+-----------
 v1.1.0
 ------
 - Modify some APIs (see API doc for detail)
