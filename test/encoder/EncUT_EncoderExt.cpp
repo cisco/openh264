@@ -173,6 +173,8 @@ TEST_F (EncoderInterfaceTest, EncoderAdditionalOptionSetTest) {
 
   iResult = pPtrEnc->GetOption (eOptionId, &iReturn);
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  if (iValue < -1 || iValue == 0)
+    iValue = 1;
   EXPECT_EQ (iValue, iReturn);
 
   PrepareOneSrcFrame();
