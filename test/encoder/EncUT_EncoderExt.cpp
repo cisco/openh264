@@ -334,7 +334,7 @@ TEST_F (EncoderInterfaceTest, TemporalLayerSettingTest) {
         pOption->iTemporalLayerNum--;
       }
       iResult = pPtrEnc->SetOption (eOptionId, pOption);
-      EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+      EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
       pSrcPic->uiTimeStamp += 30;
     }
 
@@ -344,7 +344,7 @@ TEST_F (EncoderInterfaceTest, TemporalLayerSettingTest) {
       pYUV[j] = rand() % 256;
 
     iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
-    EXPECT_EQ (iResult, static_cast<int32_t> (cmResultSuccess));
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
     pSrcPic->uiTimeStamp += 30;
   }
 
