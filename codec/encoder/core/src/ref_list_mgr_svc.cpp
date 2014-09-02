@@ -315,6 +315,10 @@ static inline void LTRMarkProcess (sWelsEncCtx* pCtx) {
     }
     pLongRefList[0]	 = pShortRefList[i];
     pRefList->uiLongRefCount++;
+    if (pRefList->uiLongRefCount > pCtx->pSvcParam->iLTRRefNum) {
+      SetUnref (pRefList->pLongRefList[pRefList->uiLongRefCount - 1]);
+      DeleteLTRFromLongList (pCtx, pRefList->uiLongRefCount - 1);
+    }
     DeleteSTRFromShortList (pCtx, i);
   }
 }
