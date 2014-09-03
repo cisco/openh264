@@ -398,6 +398,8 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
     pSpatialLayer->iVideoHeight		= pCodingParam.sSpatialLayers[iIdxSpatial].iVideoHeight;// frame height
     pSpatialLayer->iSpatialBitrate	=
       pCodingParam.sSpatialLayers[iIdxSpatial].iSpatialBitrate;	// target bitrate for current spatial layer
+    pSpatialLayer->iMaxSpatialBitrate	=
+      pCodingParam.sSpatialLayers[iIdxSpatial].iMaxSpatialBitrate;
 
     //multi slice
     pSpatialLayer->sSliceCfg.uiSliceMode = pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.uiSliceMode;
