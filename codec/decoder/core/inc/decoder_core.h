@@ -144,8 +144,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
 /*
  * Check if frame is completed and EC is required
  */
-bool CheckAndDoEC (PWelsDecoderContext pCtx, uint8_t** pDst, SBufferInfo* pDstInfo);
-
+bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** pDst, SBufferInfo* pDstInfo);
 /*
  *	Prepare current dq layer context initialization.
  */
