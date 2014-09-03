@@ -3825,10 +3825,10 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
   return 0;
 }
 
-void WelsEncoderApplyLTR (SLogContext* pLogCtx, sWelsEncCtx* pCtx, SLTRConfig* pLTRValue) {
+void WelsEncoderApplyLTR (SLogContext* pLogCtx, sWelsEncCtx** ppCtx, SLTRConfig* pLTRValue) {
   SWelsSvcCodingParam	sConfig;
   int32_t iNumRefFrame = 1;
-  memcpy (&sConfig, pCtx->pSvcParam, sizeof (SWelsSvcCodingParam));
+  memcpy (&sConfig, (*ppCtx)->pSvcParam, sizeof (SWelsSvcCodingParam));
   sConfig.bEnableLongTermReference = pLTRValue->bEnableLongTermReference;
   sConfig.iLTRRefNum = pLTRValue->iLTRRefNum;
   int32_t uiGopSize			= 1 << (sConfig.iTemporalLayerNum - 1);
@@ -3856,9 +3856,9 @@ void WelsEncoderApplyLTR (SLogContext* pLogCtx, sWelsEncCtx* pCtx, SLTRConfig* p
   if (sConfig.iNumRefFrame > sConfig.iMaxNumRefFrame)
     sConfig.iMaxNumRefFrame = sConfig.iNumRefFrame;
 
-  WelsLog (pLogCtx, WELS_LOG_WARNING, " CWelsH264SVCEncoder::SetOption enable LTR = %d,ltrnum = %d",
+  WelsLog (pLogCtx, WELS_LOG_INFO, " CWelsH264SVCEncoder::SetOption enable LTR = %d,ltrnum = %d",
            sConfig.bEnableLongTermReference, sConfig.iLTRRefNum);
-  WelsEncoderParamAdjust (&pCtx, &sConfig);
+  WelsEncoderParamAdjust (ppCtx, &sConfig);
 }
 int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
                          SFrameBSInfo* pFrameBsInfo,
