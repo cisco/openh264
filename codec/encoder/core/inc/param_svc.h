@@ -118,6 +118,9 @@ iCountThreadsNum;                       //              # derived from disable_m
 int8_t		iDecompStages;		// GOP size dependency
 int32_t  iMaxNumRefFrame;
 
+//setting this according to link type in use MAY invoke some algorithms targeting higher coding efficiency
+bool bIsLossLessLink;
+
  public:
 TagWelsSvcCodingParam() {
   FillDefault();
@@ -217,7 +220,7 @@ void FillDefault() {
     sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceMbNum[idx] = 960;
   sSpatialLayers[0].iDLayerQp = SVC_QUALITY_BASE_QP;
 
-
+  bIsLossLessLink = false;
 }
 
 int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam) {
