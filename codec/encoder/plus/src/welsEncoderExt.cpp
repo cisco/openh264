@@ -901,7 +901,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   break;
   case ENCODER_OPTION_DELIVERY_STATUS: {
     SDeliveryStatus* pValue = (static_cast<SDeliveryStatus*> (pOption));
-    m_pEncContext->iDropNumber = pValue->iDropNum;
+    m_pEncContext->bDeliveryFlag = pValue->bDeliveryFlag;
   }
   break;
   case ENCODER_OPTION_COMPLEXITY: {

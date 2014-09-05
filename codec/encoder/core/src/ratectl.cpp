@@ -709,7 +709,7 @@ void   RcVBufferCalculationSkip (sWelsEncCtx* pEncCtx) {
       || (dIncPercent > pWelsSvcRc->iRcVaryPercentage)) {
     pEncCtx->iSkipFrameFlag = 1;
     pWelsSvcRc->iBufferFullnessSkip = pWelsSvcRc->iBufferFullnessSkip - kiOutputBits;
-    WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO,"skip one frame");
+    WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO, "skip one frame");
   }
 
   if (pWelsSvcRc->iBufferFullnessSkip < 0)
@@ -1005,8 +1005,10 @@ void WelRcPictureInitBufferBasedQp (void* pCtx) {
     iMinQp = MIN_SCREEN_QP + 1;
   else
     iMinQp = MIN_SCREEN_QP;
-
-  pEncCtx->iGlobalQp += pEncCtx->iDropNumber;
+  if (pEncCtx->bDeliveryFlag)
+    pEncCtx->iGlobalQp -= 1;
+  else
+    pEncCtx->iGlobalQp += 2;
   pEncCtx->iGlobalQp = WELS_CLIP3 (pEncCtx->iGlobalQp, iMinQp, MAX_SCREEN_QP);
 }
 void  WelsRcInitModule (void* pCtx, RC_MODES iRcMode) {
