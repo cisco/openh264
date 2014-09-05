@@ -180,7 +180,7 @@ typedef struct {
 typedef struct {
   bool   bEnableLongTermReference; // 1: on, 0: off
   int	   iLTRRefNum;
-}SLTRConfig;
+} SLTRConfig;
 typedef struct {
   unsigned int
   uiSliceMbNum[MAX_SLICES_NUM_TMP];  //here we use a tmp fixed value since MAX_SLICES_NUM is not defined here and its definition may be changed;
@@ -425,9 +425,9 @@ typedef struct TagLevelInfo {
 } SLevelInfo;
 
 typedef struct TagDeliveryStatus {
-  int iDropNum;      //the number of video frames that are dropped continuously before delivery to encoder, which is used by screen content.
-  int iDropFrameType; // the frame type that is dropped
-  int iDropFrameSize; // the frame size that is dropped
+  bool bDeliveryFlag;  //0: the previous frame isn't delivered,1: the previous frame is delivered
+  int iDropFrameType; // the frame type that is dropped; reserved
+  int iDropFrameSize; // the frame size that is dropped; reserved
 } SDeliveryStatus;
 
 typedef struct TagDecoderCapability {
