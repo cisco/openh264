@@ -2680,7 +2680,6 @@ void ParasetIdAdditionIdAdjust (SParaSetOffsetVariable* sParaSetOffsetVariable, 
   //31st finish:	next_spsid_in_bs == 1;
 
   const int32_t kiEncId			= kiCurEncoderParaSetId;
-  const bool* kpUsedIdPointer   = &sParaSetOffsetVariable->bUsedParaSetIdInBs[0];
   uint32_t uiNextIdInBs			= sParaSetOffsetVariable->uiNextParaSetIdToUseInBs;
 
   //update current layer's pCodingParam
@@ -2691,20 +2690,13 @@ void ParasetIdAdditionIdAdjust (SParaSetOffsetVariable* sParaSetOffsetVariable, 
 
   //prepare for next update:
   //   find the next avaibable iId
-  do {
-    ++uiNextIdInBs;
-    if (uiNextIdInBs >= kuiMaxIdInBs) {
-      uiNextIdInBs = 0;//ensure the SPS_ID wound not exceed MAX_SPS_COUNT
-    }
-  } while (kpUsedIdPointer[uiNextIdInBs]);
+  ++uiNextIdInBs;
+  if (uiNextIdInBs >= kuiMaxIdInBs) {
+    uiNextIdInBs = 0;//ensure the SPS_ID wound not exceed MAX_SPS_COUNT
+  }
 
   //   update next_id
   sParaSetOffsetVariable->uiNextParaSetIdToUseInBs = uiNextIdInBs;
-
-#if _DEBUG
-  assert (!sParaSetOffsetVariable->bUsedParaSetIdInBs[uiNextIdInBs]);   //sure the next-to-use one is marked activated correctly
-#endif
-
 }
 
 /*!
