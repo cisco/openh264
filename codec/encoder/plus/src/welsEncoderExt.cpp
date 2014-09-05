@@ -902,8 +902,13 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   }
   break;
   case ENCODER_OPTION_COMPLEXITY: {
-    int32_t iValue = * ((int32_t*)pOption);
+    int32_t iValue = * (static_cast<int32_t*>(pOption));
     m_pEncContext->pSvcParam->iComplexityMode = (ECOMPLEXITY_MODE)iValue;
+  }
+  break;
+  case ENCODER_OPTION_IS_LOSSLESS_LINK: {
+    bool bValue = * (static_cast<bool*>(pOption));
+    m_pEncContext->pSvcParam->bIsLossLessLink = bValue;
   }
   break;
   default:

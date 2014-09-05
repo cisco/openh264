@@ -102,6 +102,9 @@ typedef enum {
   ENCODER_OPTION_TRACE_LEVEL,
   ENCODER_OPTION_TRACE_CALLBACK, // a void (*)(void* context, int level, const char* message) function which receives log messages
   ENCODER_OPTION_TRACE_CALLBACK_CONTEXT,
+
+  // advanced algorithmetic settings
+  ENCODER_OPTION_IS_LOSSLESS_LINK,
 } ENCODER_OPTION;
 
 /* Option types introduced in decoder application */
