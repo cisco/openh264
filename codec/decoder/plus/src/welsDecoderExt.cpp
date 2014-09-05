@@ -227,7 +227,8 @@ void CWelsDecoder::UninitDecoder (void) {
 // the return value of this function is not suitable, it need report failure info to upper layer.
 void CWelsDecoder::InitDecoder (void) {
 
-  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::init_decoder()..");
+  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::init_decoder(), openh264 codec version = %s",
+           VERSION_NUMBER);
 
   m_pDecContext	= (PWelsDecoderContext)WelsMalloc (sizeof (SWelsDecoderContext), "m_pDecContext");
 
@@ -278,6 +279,8 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
     if (m_pWelsTrace) {
       WelsTraceCallback callback = * ((WelsTraceCallback*)pOption);
       m_pWelsTrace->SetTraceCallback (callback);
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::SetOption(), openh264 codec version = %s.",
+               VERSION_NUMBER);
     }
     return cmResultSuccess;
   } else if (eOptID == DECODER_OPTION_TRACE_CALLBACK_CONTEXT) {
@@ -480,7 +483,7 @@ using namespace WelsDec;
 *       WelsGetDecoderCapability
 *       @return: DecCapability information
 */
-int WelsGetDecoderCapability(SDecoderCapability* pDecCapability) {
+int WelsGetDecoderCapability (SDecoderCapability* pDecCapability) {
   memset (pDecCapability, 0, sizeof (SDecoderCapability));
   pDecCapability->iProfileIdc = 66; //Baseline
   pDecCapability->iProfileIop = 0xE0; //11100000b
