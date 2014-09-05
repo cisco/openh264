@@ -3444,7 +3444,14 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     }
 
     iFrameSize += iLayerSize;
-
+    //check MinCr
+    {
+      int32_t iImageSize = (pParam->iVideoWidth * pParam->iVideoHeight * 3) >> 1;
+      int32_t iMinCr = g_ksLevelLimits[pParam->uiLevelIdc - 1].uiMinCR;
+      if (iFrameSize > (iImageSize / iMinCr))
+        WelsLog (pLogCtx, WELS_LOG_WARNING,
+                 "WelsEncoderEncodeExt()MinCr Checking,codec bitstream size is larger than Level limitation");
+    }
 #ifdef ENABLE_FRAME_DUMP
     if (iCurDid + 1 < pSvcParam->iSpatialLayerNum) {
       DumpDependencyRec (fsnr, &pSvcParam->sDependencyLayers[iCurDid].sRecFileName[0], iCurDid,
