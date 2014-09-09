@@ -333,7 +333,7 @@ typedef struct TagEncParamExt {
 
   /*LTR settings*/
   bool     bEnableLongTermReference; // 1: on, 0: off
-  int	   iLTRRefNum;
+  int	   iLTRRefNum; //TODO: not supported to set it arbitrary yet
   unsigned int      iLtrMarkPeriod;
 
   /* multi-thread settings*/
