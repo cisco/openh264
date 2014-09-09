@@ -806,40 +806,6 @@ bool WelsBuildRefListScreen (void* pEncCtx, const int32_t iPOC, int32_t iBestLtr
         }
       }
     } // end of (int idx = 0; idx < pVaaExt->iNumOfAvailableRef; idx++)
-#if 1
-    FILE* flog = fopen("ReferenceLog.txt","a+");
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,"CurrentFramePoc=%d\n", iPOC);
-    fprintf(flog,"CurrentFramePoc=%d, isLTR=%d\n", iPOC, pCtx->bCurFrameMarkedAsSceneLtr);
-    for (int j=0;j<iNumRef;j++) {
-          SPicture*	 pARefPicture = pRefList->pLongRefList[j];
-          if (pARefPicture!=NULL) {
-          fprintf(flog,"\tRefLot[%d]: iPictureType=%d, bUsedAsRef=%d, bIsLongRef=%d, bIsSceneLTR=%d, uiTemporalId=%d, iFrameNum=%d, iMarkFrameNum=%d, iLongTermPicNum=%d, uiRecieveConfirmed=%d\n",
-              j,
-              pARefPicture->iPictureType,
-              pARefPicture->bUsedAsRef, 
-              pARefPicture->bIsLongRef,
-              pARefPicture->bIsSceneLTR,
-              pARefPicture->uiTemporalId,
-              pARefPicture->iFrameNum,
-              pARefPicture->iMarkFrameNum,
-              pARefPicture->iLongTermPicNum,
-              pARefPicture->uiRecieveConfirmed);
-           WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,"\tRefLot[%d]: iPictureType=%d, bUsedAsRef=%d, bIsLongRef=%d, bIsSceneLTR=%d, uiTemporalId=%d, iFrameNum=%d, iMarkFrameNum=%d, iLongTermPicNum=%d, uiRecieveConfirmed=%d\n",
-              j,
-              pARefPicture->iPictureType,
-              pARefPicture->bUsedAsRef, 
-              pARefPicture->bIsLongRef,
-              pARefPicture->bIsSceneLTR,
-              pARefPicture->uiTemporalId,
-              pARefPicture->iFrameNum,
-              pARefPicture->iMarkFrameNum,
-              pARefPicture->iLongTermPicNum,
-              pARefPicture->uiRecieveConfirmed);
-          }
-    }
-    fclose(flog);
-#endif
-
   } else {
     // dealing with IDR
     WelsResetRefList (pCtx);  //for IDR, SHOULD reset pRef list.
