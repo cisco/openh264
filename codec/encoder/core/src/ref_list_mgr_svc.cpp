@@ -87,7 +87,7 @@ void WelsResetRefList (sWelsEncCtx* pCtx) {
 
   for (i = 0; i < MAX_SHORT_REF_COUNT + 1; i++)
     pRefList->pShortRefList[i] = NULL;
-  for (i = 0; i < MAX_LONG_REF_COUNT + 1; i++)
+  for (i = 0; i < pCtx->pSvcParam->iLTRRefNum + 1; i++)
     pRefList->pLongRefList[i] = NULL;
   for (i = 0; i < pCtx->pSvcParam->iNumRefFrame + 1; i++)
     SetUnref (pRefList->pRef[i]);
@@ -805,8 +805,43 @@ bool WelsBuildRefListScreen (void* pEncCtx, const int32_t iPOC, int32_t iBestLtr
           }
         }
       }
+    } // end of (int idx = 0; idx < pVaaExt->iNumOfAvailableRef; idx++)
+#if 1
+    FILE* flog = fopen("ReferenceLog.txt","a+");
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,"CurrentFramePoc=%d\n", iPOC);
+    fprintf(flog,"CurrentFramePoc=%d, isLTR=%d\n", iPOC, pCtx->bCurFrameMarkedAsSceneLtr);
+    for (int j=0;j<iNumRef;j++) {
+          SPicture*	 pARefPicture = pRefList->pLongRefList[j];
+          if (pARefPicture!=NULL) {
+          fprintf(flog,"\tRefLot[%d]: iPictureType=%d, bUsedAsRef=%d, bIsLongRef=%d, bIsSceneLTR=%d, uiTemporalId=%d, iFrameNum=%d, iMarkFrameNum=%d, iLongTermPicNum=%d, uiRecieveConfirmed=%d\n",
+              j,
+              pARefPicture->iPictureType,
+              pARefPicture->bUsedAsRef, 
+              pARefPicture->bIsLongRef,
+              pARefPicture->bIsSceneLTR,
+              pARefPicture->uiTemporalId,
+              pARefPicture->iFrameNum,
+              pARefPicture->iMarkFrameNum,
+              pARefPicture->iLongTermPicNum,
+              pARefPicture->uiRecieveConfirmed);
+           WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,"\tRefLot[%d]: iPictureType=%d, bUsedAsRef=%d, bIsLongRef=%d, bIsSceneLTR=%d, uiTemporalId=%d, iFrameNum=%d, iMarkFrameNum=%d, iLongTermPicNum=%d, uiRecieveConfirmed=%d\n",
+              j,
+              pARefPicture->iPictureType,
+              pARefPicture->bUsedAsRef, 
+              pARefPicture->bIsLongRef,
+              pARefPicture->bIsSceneLTR,
+              pARefPicture->uiTemporalId,
+              pARefPicture->iFrameNum,
+              pARefPicture->iMarkFrameNum,
+              pARefPicture->iLongTermPicNum,
+              pARefPicture->uiRecieveConfirmed);
+          }
     }
+    fclose(flog);
+#endif
+
   } else {
+    // dealing with IDR
     WelsResetRefList (pCtx);  //for IDR, SHOULD reset pRef list.
     ResetLtrState (&pCtx->pLtr[pCtx->uiDependencyId]); //SHOULD update it when IDR.
     pCtx->pRefList0[0]	= NULL;
@@ -814,7 +849,6 @@ bool WelsBuildRefListScreen (void* pEncCtx, const int32_t iPOC, int32_t iBestLtr
   if (pCtx->iNumRef0 > iNumRef) {
     pCtx->iNumRef0 = iNumRef;
   }
-  //TBD info update for md &fme
 
   return (pCtx->iNumRef0 > 0 || pCtx->eSliceType == I_SLICE) ? (true) : (false);
 }
