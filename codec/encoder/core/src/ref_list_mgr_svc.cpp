@@ -87,7 +87,7 @@ void WelsResetRefList (sWelsEncCtx* pCtx) {
 
   for (i = 0; i < MAX_SHORT_REF_COUNT + 1; i++)
     pRefList->pShortRefList[i] = NULL;
-  for (i = 0; i < MAX_LONG_REF_COUNT + 1; i++)
+  for (i = 0; i < pCtx->pSvcParam->iLTRRefNum + 1; i++)
     pRefList->pLongRefList[i] = NULL;
   for (i = 0; i < pCtx->pSvcParam->iNumRefFrame + 1; i++)
     SetUnref (pRefList->pRef[i]);
@@ -805,8 +805,9 @@ bool WelsBuildRefListScreen (void* pEncCtx, const int32_t iPOC, int32_t iBestLtr
           }
         }
       }
-    }
+    } // end of (int idx = 0; idx < pVaaExt->iNumOfAvailableRef; idx++)
   } else {
+    // dealing with IDR
     WelsResetRefList (pCtx);  //for IDR, SHOULD reset pRef list.
     ResetLtrState (&pCtx->pLtr[pCtx->uiDependencyId]); //SHOULD update it when IDR.
     pCtx->pRefList0[0]	= NULL;
@@ -814,7 +815,6 @@ bool WelsBuildRefListScreen (void* pEncCtx, const int32_t iPOC, int32_t iBestLtr
   if (pCtx->iNumRef0 > iNumRef) {
     pCtx->iNumRef0 = iNumRef;
   }
-  //TBD info update for md &fme
 
   return (pCtx->iNumRef0 > 0 || pCtx->eSliceType == I_SLICE) ? (true) : (false);
 }
