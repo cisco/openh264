@@ -263,12 +263,10 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
 
     return cmResultSuccess;
   } else if (eOptID == DECODER_OPTION_ERROR_CON_IDC) { // Indicate error concealment status
-    if (pOption == NULL) //Default: SLICE_COPY, enable
-      iVal = ERROR_CON_SLICE_COPY;
-    else
-      iVal = * ((int*)pOption); //EC method
-    m_pDecContext->eErrorConMethod = (ERROR_CON_IDC) iVal;
-    return cmResultSuccess;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
+             "CWelsDecoder::SetOption for ERROR_CON_IDC not permmited! Current eErrorConMethod = %d. Value can be set in Initialize() only!",
+             (int32_t) m_pDecContext->eErrorConMethod);
+    return cmInitParaError;
   } else if (eOptID == DECODER_OPTION_TRACE_LEVEL) {
     if (m_pWelsTrace) {
       uint32_t level = * ((uint32_t*)pOption);
