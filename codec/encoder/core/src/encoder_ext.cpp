@@ -3156,6 +3156,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
     pCtx->pFuncList->pMarkPic (pCtx);
     if (!pCtx->pFuncList->pBuildRefList (pCtx, pCtx->iPOC, 0)) {
+      pCtx->pVpp->UpdateSpatialPictures (pCtx, pSvcParam, iCurTid, iDidIdx);
       // Force coding IDR as followed
       ForceCodingIDR (pCtx);
       WelsLog (pLogCtx, WELS_LOG_WARNING,
@@ -3426,6 +3427,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     // reference picture list update
     if (eNalRefIdc != NRI_PRI_LOWEST) {
       if (!pCtx->pFuncList->pUpdateRefList (pCtx)) {
+        pCtx->pVpp->UpdateSpatialPictures (pCtx, pSvcParam, iCurTid, iDidIdx);
         // Force coding IDR as followed
         ForceCodingIDR (pCtx);
         WelsLog (pLogCtx, WELS_LOG_WARNING, "WelsEncoderEncodeExt(), WelsUpdateRefList failed. ForceCodingIDR!");
