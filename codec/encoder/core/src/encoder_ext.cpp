@@ -3834,7 +3834,7 @@ void WelsEncoderApplyLTR (SLogContext* pLogCtx, sWelsEncCtx** ppCtx, SLTRConfig*
   int32_t uiGopSize			= 1 << (sConfig.iTemporalLayerNum - 1);
   if (sConfig.iUsageType == SCREEN_CONTENT_REAL_TIME) {
     if (sConfig.bEnableLongTermReference) {
-      sConfig.iLTRRefNum = WELS_CLIP3 (sConfig.iLTRRefNum, 1, LONG_TERM_REF_NUM_SCREEN);
+      sConfig.iLTRRefNum = LONG_TERM_REF_NUM_SCREEN;//WELS_CLIP3 (sConfig.iLTRRefNum, 1, LONG_TERM_REF_NUM_SCREEN);
       iNumRefFrame = WELS_MAX (1, WELS_LOG2 (uiGopSize)) + sConfig.iLTRRefNum;
     } else {
       sConfig.iLTRRefNum = 0;
@@ -3842,7 +3842,7 @@ void WelsEncoderApplyLTR (SLogContext* pLogCtx, sWelsEncCtx** ppCtx, SLTRConfig*
     }
   } else {
     if (sConfig.bEnableLongTermReference) {
-      sConfig.iLTRRefNum = WELS_CLIP3 (sConfig.iLTRRefNum, 1, LONG_TERM_REF_NUM);
+      sConfig.iLTRRefNum = LONG_TERM_REF_NUM;//WELS_CLIP3 (sConfig.iLTRRefNum, 1, LONG_TERM_REF_NUM);
     } else {
       sConfig.iLTRRefNum = 0;
     }
