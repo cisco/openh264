@@ -182,7 +182,7 @@ typedef struct {
 
 typedef struct {
   bool   bEnableLongTermReference; // 1: on, 0: off
-  int	   iLTRRefNum;
+  int	   iLTRRefNum; //TODO: not supported to set it arbitrary yet
 } SLTRConfig;
 typedef struct {
   unsigned int
