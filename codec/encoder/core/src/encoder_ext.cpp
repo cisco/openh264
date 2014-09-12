@@ -148,8 +148,7 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
 
 
   if ((pCfg->iRCMode != RC_OFF_MODE) && (pCfg->iRCMode != RC_QUALITY_MODE) && (pCfg->iRCMode != RC_BUFFERBASED_MODE)
-      && (pCfg->iRCMode != RC_BITRATE_MODE)
-      && (pCfg->iRCMode != RC_LOW_BW_MODE)) {
+      && (pCfg->iRCMode != RC_BITRATE_MODE)) {
     WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidation(),Invalid iRCMode = %d", pCfg->iRCMode);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
@@ -2955,8 +2954,7 @@ bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pCtx, int32_t iSpatialNum) {
   SSpatialPicIndex* pSpatialIndexMap = &pCtx->sSpatialIndexMap[0];
   bool bSkipMustFlag = false;
   if (pCtx->pSvcParam->bEnableFrameSkip) {
-    if ((RC_QUALITY_MODE == pCtx->pSvcParam->iRCMode) || (RC_BITRATE_MODE == pCtx->pSvcParam->iRCMode)
-        || (RC_LOW_BW_MODE == pCtx->pSvcParam->iRCMode)) {
+    if ((RC_QUALITY_MODE == pCtx->pSvcParam->iRCMode) || (RC_BITRATE_MODE == pCtx->pSvcParam->iRCMode)) {
       for (int32_t i = 0; i < iSpatialNum; i++) {
         if (0 == pCtx->pSvcParam->sSpatialLayers[i].iMaxSpatialBitrate) {
           break;
