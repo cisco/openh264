@@ -512,7 +512,7 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
     iLumaQp =  WELS_DIV_ROUND (iLumaQp * INT_MULTIPLY - pEncCtx->pVaa->sAdaptiveQuantParam.iAverMotionTextureIndexToDeltaQp,
                                INT_MULTIPLY);
 
-    if (pEncCtx->pSvcParam->iRCMode != RC_LOW_BW_MODE)
+  if (!(pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE) && (pEncCtx->pSvcParam->bEnableFrameSkip == false))
       iLumaQp = WELS_CLIP3 (iLumaQp, pWelsSvcRc->iMinQp, pWelsSvcRc->iMaxQp);
 
   }
@@ -554,10 +554,8 @@ void RcDecideTargetBits (sWelsEncCtx* pEncCtx) {
                                            pWelsSvcRc->iRemainingWeights);
     else //this case should be not hit. needs to more test case to verify this
       pWelsSvcRc->iTargetBits = pWelsSvcRc->iRemainingBits;
-    if ((pWelsSvcRc->iTargetBits <= 0) && (pEncCtx->pSvcParam->iRCMode == RC_LOW_BW_MODE)) {
+    if ((pWelsSvcRc->iTargetBits <= 0) && ((pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE) && (pEncCtx->pSvcParam->bEnableFrameSkip == false))) {
       pWelsSvcRc->iCurrentBitsLevel = BITS_EXCEEDED;
-    } else if ((pWelsSvcRc->iTargetBits <= pTOverRc->iMinBitsTl) && (pEncCtx->pSvcParam->iRCMode == RC_LOW_BW_MODE)) {
-      pWelsSvcRc->iCurrentBitsLevel = BITS_LIMITED;
     }
     pWelsSvcRc->iTargetBits = WELS_CLIP3 (pWelsSvcRc->iTargetBits, pTOverRc->iMinBitsTl,	pTOverRc->iMaxBitsTl);
   }
@@ -683,7 +681,7 @@ void RcCalculateGomQp (sWelsEncCtx* pEncCtx, SMB* pCurMb, int32_t iSliceId) {
 
   pSOverRc->iCalculatedQpSlice = WELS_CLIP3 (pSOverRc->iCalculatedQpSlice,
                                  pEncCtx->iGlobalQp - pWelsSvcRc->iQpRangeLowerInFrame, pEncCtx->iGlobalQp + pWelsSvcRc->iQpRangeUpperInFrame);
-  if (! (pEncCtx->pSvcParam->iRCMode == RC_LOW_BW_MODE))
+  if (!(pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE) && (pEncCtx->pSvcParam->bEnableFrameSkip == false))
     pSOverRc->iCalculatedQpSlice = WELS_CLIP3 (pSOverRc->iCalculatedQpSlice, pWelsSvcRc->iMinQp, pWelsSvcRc->iMaxQp);
 
   pSOverRc->iGomBitsSlice = 0;
@@ -1032,7 +1030,6 @@ void  WelsRcInitModule (void* pCtx, RC_MODES iRcMode) {
     break;
   case RC_QUALITY_MODE:
   case RC_BITRATE_MODE:
-  case RC_LOW_BW_MODE:
   default:
     pRcf->pfWelsRcPictureInit = WelsRcPictureInitGom;
     pRcf->pfWelsRcPicDelayJudge = WelsRcFrameDelayJudge;
