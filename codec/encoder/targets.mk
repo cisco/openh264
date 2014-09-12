@@ -32,7 +32,6 @@ ENCODER_CPP_SRCS=\
 
 ENCODER_OBJS += $(ENCODER_CPP_SRCS:.cpp=.$(OBJ))
 
-ifeq ($(ASM_ARCH), x86)
 ENCODER_ASM_SRCS=\
 	$(ENCODER_SRCDIR)/core/x86/coeff.asm\
 	$(ENCODER_SRCDIR)/core/x86/dct.asm\
@@ -43,10 +42,12 @@ ENCODER_ASM_SRCS=\
 	$(ENCODER_SRCDIR)/core/x86/sample_sc.asm\
 	$(ENCODER_SRCDIR)/core/x86/score.asm\
 
-ENCODER_OBJS += $(ENCODER_ASM_SRCS:.asm=.$(OBJ))
+ENCODER_OBJSASM += $(ENCODER_ASM_SRCS:.asm=.$(OBJ))
+ifeq ($(ASM_ARCH), x86)
+ENCODER_OBJS += $(ENCODER_OBJSASM)
 endif
+OBJS += $(ENCODER_OBJSASM)
 
-ifeq ($(ASM_ARCH), arm)
 ENCODER_ASM_ARM_SRCS=\
 	$(ENCODER_SRCDIR)/core/arm/intra_pred_neon.S\
 	$(ENCODER_SRCDIR)/core/arm/intra_pred_sad_3_opt_neon.S\
@@ -55,10 +56,12 @@ ENCODER_ASM_ARM_SRCS=\
 	$(ENCODER_SRCDIR)/core/arm/reconstruct_neon.S\
 	$(ENCODER_SRCDIR)/core/arm/svc_motion_estimation.S\
 
-ENCODER_OBJS += $(ENCODER_ASM_ARM_SRCS:.S=.$(OBJ))
+ENCODER_OBJSARM += $(ENCODER_ASM_ARM_SRCS:.S=.$(OBJ))
+ifeq ($(ASM_ARCH), arm)
+ENCODER_OBJS += $(ENCODER_OBJSARM)
 endif
+OBJS += $(ENCODER_OBJSARM)
 
-ifeq ($(ASM_ARCH), arm64)
 ENCODER_ASM_ARM64_SRCS=\
 	$(ENCODER_SRCDIR)/core/arm64/intra_pred_aarch64_neon.S\
 	$(ENCODER_SRCDIR)/core/arm64/intra_pred_sad_3_opt_aarch64_neon.S\
@@ -67,10 +70,14 @@ ENCODER_ASM_ARM64_SRCS=\
 	$(ENCODER_SRCDIR)/core/arm64/reconstruct_aarch64_neon.S\
 	$(ENCODER_SRCDIR)/core/arm64/svc_motion_estimation_aarch64_neon.S\
 
-ENCODER_OBJS += $(ENCODER_ASM_ARM64_SRCS:.S=.$(OBJ))
+ENCODER_OBJSARM64 += $(ENCODER_ASM_ARM64_SRCS:.S=.$(OBJ))
+ifeq ($(ASM_ARCH), arm64)
+ENCODER_OBJS += $(ENCODER_OBJSARM64)
 endif
+OBJS += $(ENCODER_OBJSARM64)
 
 OBJS += $(ENCODER_OBJS)
+
 $(ENCODER_SRCDIR)/%.$(OBJ): $(ENCODER_SRCDIR)/%.cpp
 	$(QUIET_CXX)$(CXX) $(CFLAGS) $(CXXFLAGS) $(INCLUDES) $(ENCODER_CFLAGS) $(ENCODER_INCLUDES) -c $(CXX_O) $<
 
