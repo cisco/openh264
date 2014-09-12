@@ -152,7 +152,7 @@ if len(armfiles) > 0:
         f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
     f.write("\n")
     f.write("%s_OBJSARM += $(%s_ASM_ARM_SRCS:.S=.$(OBJ))\n\n"%(PREFIX, PREFIX))
-     f.write("ifeq ($(ASM_ARCH), arm)\n")
+    f.write("ifeq ($(ASM_ARCH), arm)\n")
     f.write("%s_OBJS += $(%s_OBJSARM)\n"%(PREFIX,PREFIX))
     f.write("endif\n\n")
 
@@ -162,7 +162,7 @@ if len(arm64files) > 0:
         f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
     f.write("\n")
     f.write("%s_OBJSARM64 += $(%s_ASM_ARM64_SRCS:.S=.$(OBJ))\n\n"%(PREFIX, PREFIX))
-     f.write("ifeq ($(ASM_ARCH), arm64)\n")
+    f.write("ifeq ($(ASM_ARCH), arm64)\n")
     f.write("%s_OBJS += $(%s_OBJSARM64)\n"%(PREFIX,PREFIX))
     f.write("endif\n\n")
 
