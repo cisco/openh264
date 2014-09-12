@@ -169,7 +169,7 @@ if len(arm64files) > 0:
     f.write("endif\n")
     f.write("OBJS += $(%s_OBJSARM64)\n\n"%(PREFIX))
 
-f.write("OBJS += $(%s_OBJS)\n\n"%(PREFIX)) 
+f.write("OBJS += $(%s_OBJS)\n\n"%(PREFIX))
 write_cpp_rule_pattern(f)
 
 if len(cfiles) > 0:
