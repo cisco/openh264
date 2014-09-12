@@ -135,7 +135,6 @@ if len(cfiles) > 0:
         f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, cfile))
     f.write("\n")
     f.write("%s_OBJS += $(%s_C_SRCS:.c=.$(OBJ))\n"%(PREFIX, PREFIX))
-   
 
 if len(asm) > 0:
     f.write("%s_ASM_SRCS=\\\n"%(PREFIX))
@@ -169,8 +168,8 @@ if len(arm64files) > 0:
     f.write("%s_OBJS += $(%s_OBJSARM64)\n"%(PREFIX,PREFIX))
     f.write("endif\n")
     f.write("OBJS += $(%s_OBJSARM64)\n\n"%(PREFIX))
-    
-f.write("OBJS += $(%s_OBJS)\n\n"%(PREFIX))    
+
+f.write("OBJS += $(%s_OBJS)\n\n"%(PREFIX)) 
 write_cpp_rule_pattern(f)
 
 if len(cfiles) > 0:
