@@ -512,7 +512,7 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
     iLumaQp =  WELS_DIV_ROUND (iLumaQp * INT_MULTIPLY - pEncCtx->pVaa->sAdaptiveQuantParam.iAverMotionTextureIndexToDeltaQp,
                                INT_MULTIPLY);
 
-  if (!(pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE) && (pEncCtx->pSvcParam->bEnableFrameSkip == false))
+  if (!((pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE) && (pEncCtx->pSvcParam->bEnableFrameSkip == false)))
       iLumaQp = WELS_CLIP3 (iLumaQp, pWelsSvcRc->iMinQp, pWelsSvcRc->iMaxQp);
 
   }
@@ -681,7 +681,7 @@ void RcCalculateGomQp (sWelsEncCtx* pEncCtx, SMB* pCurMb, int32_t iSliceId) {
 
   pSOverRc->iCalculatedQpSlice = WELS_CLIP3 (pSOverRc->iCalculatedQpSlice,
                                  pEncCtx->iGlobalQp - pWelsSvcRc->iQpRangeLowerInFrame, pEncCtx->iGlobalQp + pWelsSvcRc->iQpRangeUpperInFrame);
-  if (!(pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE) && (pEncCtx->pSvcParam->bEnableFrameSkip == false))
+  if (!((pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE) && (pEncCtx->pSvcParam->bEnableFrameSkip == false)))
     pSOverRc->iCalculatedQpSlice = WELS_CLIP3 (pSOverRc->iCalculatedQpSlice, pWelsSvcRc->iMinQp, pWelsSvcRc->iMaxQp);
 
   pSOverRc->iGomBitsSlice = 0;
