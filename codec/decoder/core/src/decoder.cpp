@@ -462,8 +462,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 
           iConsumedBytes = 0;
           pNalPayload	= ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
-          if ((pCtx->eErrorConMethod != ERROR_CON_DISABLE) && (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1))) {
-            CheckAndDoEC (pCtx, ppDst, pDstBufInfo);
+          if (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1)) {
+            CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
           }
           if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType) && pNalPayload) {
             iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes);
@@ -522,8 +522,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 
     iConsumedBytes = 0;
     pNalPayload = ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
-    if ((pCtx->eErrorConMethod != ERROR_CON_DISABLE) && (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1))) {
-      CheckAndDoEC (pCtx, ppDst, pDstBufInfo);
+    if (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1)) {
+      CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
     }
     if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType) && pNalPayload) {
       iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes);

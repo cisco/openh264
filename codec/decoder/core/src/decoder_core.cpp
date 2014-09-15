@@ -2001,7 +2001,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
   return ERR_NONE;
 }
 
-bool CheckAndDoEC (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
+bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
   PAccessUnit pAu = pCtx->pAccessUnitList;
   PNalUnit pCurNal = pAu->pNalUnitsList[pAu->uiEndPos];
   if ((pCtx->iTotalNumMbRec != 0)
@@ -2009,12 +2009,16 @@ bool CheckAndDoEC (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstI
                                       &pCurNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader))) {
     //Do Error Concealment here
     if (NeedErrorCon (pCtx)) { //should always be true!
-      ImplementErrorCon (pCtx);
-      pCtx->iTotalNumMbRec = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
-      DecodeFrameConstruction (pCtx, ppDst, pDstInfo);
-      if (pCtx->sLastNalHdrExt.sNalUnitHeader.uiNalRefIdc > 0) {
-        pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //save ECed pic for future use
-        MarkECFrameAsRef (pCtx);
+      if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
+        ImplementErrorCon (pCtx);
+        pCtx->iTotalNumMbRec = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
+        DecodeFrameConstruction (pCtx, ppDst, pDstInfo);
+        if (pCtx->sLastNalHdrExt.sNalUnitHeader.uiNalRefIdc > 0) {
+          pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //save ECed pic for future use
+          MarkECFrameAsRef (pCtx);
+        }
+      } else {
+        DecodeFrameConstruction (pCtx, ppDst, pDstInfo);
       }
       pCtx->iPrevFrameNum = pCtx->sLastSliceHeader.iFrameNum; //save frame_num
       if (pCtx->bLastHasMmco5)
@@ -2023,5 +2027,4 @@ bool CheckAndDoEC (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstI
   }
   return ERR_NONE;
 }
-
 } // namespace WelsDec
