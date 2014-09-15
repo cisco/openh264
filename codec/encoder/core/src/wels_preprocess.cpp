@@ -794,9 +794,9 @@ void CWelsPreProcess::AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCu
 
     if (pSvcParam->iRCMode == RC_QUALITY_MODE && pCtx->eSliceType == P_SLICE) {
       iComplexityAnalysisMode = FRAME_SAD;
-    } else if (pSvcParam->iRCMode >= RC_BITRATE_MODE && pCtx->eSliceType == P_SLICE) {
+    } else if (pSvcParam->iRCMode == RC_BITRATE_MODE && pCtx->eSliceType == P_SLICE) {
       iComplexityAnalysisMode = GOM_SAD;
-    } else if (pSvcParam->iRCMode >= RC_BITRATE_MODE && pCtx->eSliceType == I_SLICE) {
+    } else if (pSvcParam->iRCMode == RC_BITRATE_MODE && pCtx->eSliceType == I_SLICE) {
       iComplexityAnalysisMode = GOM_VAR;
     } else {
       return;
