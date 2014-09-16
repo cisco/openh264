@@ -134,37 +134,42 @@ if len(cfiles) > 0:
     for cfile in cfiles:
         f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, cfile))
     f.write("\n")
-    f.write("%s_OBJS += $(%s_C_SRCS:.c=.$(OBJ))\n\n"%(PREFIX, PREFIX))
+    f.write("%s_OBJS += $(%s_C_SRCS:.c=.$(OBJ))\n"%(PREFIX, PREFIX))
 
 if len(asm) > 0:
-    f.write("ifeq ($(ASM_ARCH), x86)\n")
     f.write("%s_ASM_SRCS=\\\n"%(PREFIX))
     for c in asm:
         f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
     f.write("\n")
-    f.write("%s_OBJS += $(%s_ASM_SRCS:.asm=.$(OBJ))\n"%(PREFIX, PREFIX))
-    f.write("endif\n\n")
+    f.write("%s_OBJSASM += $(%s_ASM_SRCS:.asm=.$(OBJ))\n"%(PREFIX, PREFIX))
+    f.write("ifeq ($(ASM_ARCH), x86)\n")
+    f.write("%s_OBJS += $(%s_OBJSASM)\n"%(PREFIX,PREFIX))
+    f.write("endif\n")
+    f.write("OBJS += $(%s_OBJSASM)\n\n"%(PREFIX))
 
 if len(armfiles) > 0:
-    f.write("ifeq ($(ASM_ARCH), arm)\n")
     f.write("%s_ASM_ARM_SRCS=\\\n"%(PREFIX))
     for c in armfiles:
         f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
     f.write("\n")
-    f.write("%s_OBJS += $(%s_ASM_ARM_SRCS:.S=.$(OBJ))\n"%(PREFIX, PREFIX))
-    f.write("endif\n\n")
+    f.write("%s_OBJSARM += $(%s_ASM_ARM_SRCS:.S=.$(OBJ))\n"%(PREFIX, PREFIX))
+    f.write("ifeq ($(ASM_ARCH), arm)\n")
+    f.write("%s_OBJS += $(%s_OBJSARM)\n"%(PREFIX,PREFIX))
+    f.write("endif\n")
+    f.write("OBJS += $(%s_OBJSARM)\n\n"%(PREFIX))
 
 if len(arm64files) > 0:
-    f.write("ifeq ($(ASM_ARCH), arm64)\n")
     f.write("%s_ASM_ARM64_SRCS=\\\n"%(PREFIX))
     for c in arm64files:
         f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
     f.write("\n")
-    f.write("%s_OBJS += $(%s_ASM_ARM64_SRCS:.S=.$(OBJ))\n"%(PREFIX, PREFIX))
-    f.write("endif\n\n")
+    f.write("%s_OBJSARM64 += $(%s_ASM_ARM64_SRCS:.S=.$(OBJ))\n"%(PREFIX, PREFIX))
+    f.write("ifeq ($(ASM_ARCH), arm64)\n")
+    f.write("%s_OBJS += $(%s_OBJSARM64)\n"%(PREFIX,PREFIX))
+    f.write("endif\n")
+    f.write("OBJS += $(%s_OBJSARM64)\n\n"%(PREFIX))
 
-f.write("OBJS += $(%s_OBJS)\n"%PREFIX)
-
+f.write("OBJS += $(%s_OBJS)\n\n"%(PREFIX))
 write_cpp_rule_pattern(f)
 
 if len(cfiles) > 0:
