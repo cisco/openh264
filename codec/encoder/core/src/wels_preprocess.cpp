@@ -38,7 +38,6 @@
 
 namespace WelsEnc {
 
-#define WelsSafeDelete(p) if(p){ delete (p); (p) = NULL; }
 
 
 //***** entry API declaration ************************************************************************//
