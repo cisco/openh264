@@ -81,7 +81,6 @@ class CBackgroundDetection : public IStrategy {
 
  private:
   inline SBackgroundOU* AllocateOUArrayMemory (int32_t iWidth, int32_t iHeight);
-  inline void     FreeOUArrayMemory();
   inline int32_t  CalculateAsdChromaEdge (uint8_t* pOriRef, uint8_t* pOriCur, int32_t iStride);
   inline bool   ForegroundDilation23Luma (SBackgroundOU* pBackgroundOU,
                                           SBackgroundOU* pOUNeighbours[]); //Foreground_Dilation_2_3_Luma
