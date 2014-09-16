@@ -405,7 +405,7 @@ int SimulateNALLoss (const unsigned char* pSrc,  int& iSrcLen, std::vector<SLost
   memset ((void*)pSrc, 0, iSrcLen);
   memcpy ((void*)pSrc, pDst, iDstLen);
   iSrcLen = iDstLen;
-  delete pDst;
+  delete [] pDst;
   return iSkipedBytes;
 }
 
