@@ -270,7 +270,7 @@ long IsKeyFrameLost (ISVCDecoder* pDecoder, SLTRRecoverRequest* p_LTR_Recover_Re
     if (m_P2PmodeFlag && temple_id == 0) {
       pDecoder->GetOption (DECODER_OPTION_IDR_PIC_ID, &tempInt);
       // idr_pic_id change ,reset last correct position
-      if (p_LTR_Recover_Request->uiIDRPicId != tempInt) {
+      if (p_LTR_Recover_Request->uiIDRPicId != (unsigned int) tempInt) {
         p_LTR_Recover_Request->uiIDRPicId = tempInt;
         p_LTR_Recover_Request->iLastCorrectFrameNum = -1;
       }
@@ -731,6 +731,7 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_SLICE_COPY) {
     LTRMarkFeedback (decoder_, encoder_, &m_LTR_Marking_Feedback, rv);
     iIdx++;
   }
+  (void) iSkipedBytes;
 }
 
 INSTANTIATE_TEST_CASE_P (EncodeDecodeTestBase, EncodeDecodeTestAPI,
