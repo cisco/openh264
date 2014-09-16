@@ -102,9 +102,6 @@ inline EMethods WelsVpGetValidMethod (int32_t a) {
 }
 
 
-#define _SafeFree(p)		if (p) { WelsFree(p); (p) = NULL; }
-#define _SafeDelete(p)		if (p) { delete (p); (p) = NULL; }
-
 
 WELSVP_NAMESPACE_END
 
