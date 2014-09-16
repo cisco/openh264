@@ -516,6 +516,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_ALLLTR) {
 TEST_P (EncodeDecodeTestAPI, GetOptionLTR_Engine) {
   SLTRMarkingFeedback m_LTR_Marking_Feedback;
   SLTRRecoverRequest m_LTR_Recover_Request;
+  m_LTR_Recover_Request.uiIDRPicId = 0;
   EncodeDecodeFileParamBase p = GetParam();
   prepareParam (p.width, p.height, p.frameRate);
   param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
@@ -582,6 +583,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_Engine) {
 TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_DISABLE) {
   SLTRMarkingFeedback m_LTR_Marking_Feedback;
   SLTRRecoverRequest m_LTR_Recover_Request;
+  m_LTR_Recover_Request.uiIDRPicId = 0;
   EncodeDecodeFileParamBase p = GetParam();
   prepareParam (p.width, p.height, p.frameRate);
   param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
@@ -666,6 +668,7 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_DISABLE) {
 TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_SLICE_COPY) {
   SLTRMarkingFeedback m_LTR_Marking_Feedback;
   SLTRRecoverRequest m_LTR_Recover_Request;
+  m_LTR_Recover_Request.uiIDRPicId = 0;
   EncodeDecodeFileParamBase p = GetParam();
   prepareParam (p.width, p.height, p.frameRate);
   param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
