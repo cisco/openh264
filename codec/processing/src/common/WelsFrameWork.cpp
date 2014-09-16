@@ -79,7 +79,7 @@ EResult CreateSpecificVpInterface (IWelsVP** ppCtx) {
 }
 
 EResult DestroySpecificVpInterface (IWelsVP* pCtx) {
-  _SafeDelete (pCtx);
+  delete pCtx;
 
   return RET_SUCCESS;
 }
