@@ -362,7 +362,7 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
     iLTRRefNum = bEnableLongTermReference ? LONG_TERM_REF_NUM : 0;
     if (iNumRefFrame == AUTO_REF_PIC_COUNT) {
       iNumRefFrame		= ((uiGopSize >> 1) > 1) ? ((uiGopSize >> 1) + iLTRRefNum) : (MIN_REF_PIC_COUNT + iLTRRefNum);
-      iNumRefFrame		= WELS_CLIP3 (iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM);
+      iNumRefFrame		= WELS_CLIP3 (iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA);
     }
   }
   if (iNumRefFrame > iMaxNumRefFrame)
