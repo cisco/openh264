@@ -8,7 +8,7 @@
 #include "ScrollDetectionFuncs.h"
 #include "utils/DataGenerator.h"
 
-using namespace nsWelsVP;
+using namespace WelsVP;
 
 #define ASSERT_MEMORY_FAIL2X(A, B)     \
   if (NULL == B) {                     \

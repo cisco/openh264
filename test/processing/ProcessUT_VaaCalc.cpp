@@ -6,7 +6,7 @@
 #include "IWelsVP.h"
 #include "vaacalculation.h"
 
-using namespace nsWelsVP;
+using namespace WelsVP;
 
 void VAACalcSadSsd_ref (const uint8_t* pCurData, const uint8_t* pRefData, int32_t iPicWidth, int32_t iPicHeight,
                         int32_t iPicStride,
