@@ -518,9 +518,10 @@ void CWelsH264SVCEncoder::CheckLevelSetting (int32_t iLayer, ELevelIdc uiLevelId
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING, "doesn't support level(%d) change to LEVEL_5_2", uiLevelIdc);
   }
 }
-void CWelsH264SVCEncoder::CheckReferenceNumSetting (bool bIsCameraVideo, int32_t iNumRef) {
+void CWelsH264SVCEncoder::CheckReferenceNumSetting (int32_t iNumRef) {
+  int32_t iRefUpperBound = (m_pEncContext->pSvcParam->iUsageType == CAMERA_VIDEO_REAL_TIME)?MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA:MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN;
   m_pEncContext->pSvcParam->iNumRefFrame = iNumRef;
-  if ((iNumRef < MIN_REF_PIC_COUNT) || (iNumRef > (bIsCameraVideo?MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA:MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN))) {
+  if ((iNumRef < MIN_REF_PIC_COUNT) || (iNumRef > iRefUpperBound)) {
     m_pEncContext->pSvcParam->iNumRefFrame = AUTO_REF_PIC_COUNT;
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
              "doesn't support the number of reference frame(%d) change to auto select mode", iNumRef);
@@ -896,7 +897,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   break;
   case ENCODER_OPTION_NUMBER_REF: {
     int32_t iValue = * ((int32_t*)pOption);
-    CheckReferenceNumSetting (m_pEncContext->pSvcParam->iUsageType == CAMERA_VIDEO_REAL_TIME, iValue);
+    CheckReferenceNumSetting (iValue);
   }
   break;
   case ENCODER_OPTION_DELIVERY_STATUS: {

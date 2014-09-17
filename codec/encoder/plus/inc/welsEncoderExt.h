@@ -100,7 +100,7 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   int InitializeInternal (SWelsSvcCodingParam* argv);
   void CheckProfileSetting (int32_t iLayer, EProfileIdc uiProfileIdc);
   void CheckLevelSetting (int32_t iLayer, ELevelIdc uiLevelIdc);
-  void CheckReferenceNumSetting (bool bIsCameraVideo, int32_t iNumRef);
+  void CheckReferenceNumSetting (int32_t iNumRef);
   void TraceParamInfo(SEncParamExt *pParam);
   sWelsEncCtx*	m_pEncContext;
 
