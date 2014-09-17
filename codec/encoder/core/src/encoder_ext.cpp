@@ -1358,7 +1358,7 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
   iTargetSpatialBsSize = iLayerBsSize;
   iCountBsLen = iNonVclLayersBsSizeCount + iVclLayersBsSizeCount;
 
-  pParam->iNumRefFrame	= WELS_CLIP3 (pParam->iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA);
+  pParam->iNumRefFrame	= WELS_CLIP3 (pParam->iNumRefFrame, MIN_REF_PIC_COUNT, (pParam->iUsageType==CAMERA_VIDEO_REAL_TIME?MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA:MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN));
 
   // Output
   (*ppCtx)->pOut = (SWelsEncoderOutput*)pMa->WelsMalloc (sizeof (SWelsEncoderOutput), "SWelsEncoderOutput");
