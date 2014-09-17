@@ -3034,7 +3034,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   }
 
   //loop each layer to check if have skip frame when RC and frame skip enable
-  if ((eFrameType != videoFrameTypeIDR) && CheckFrameSkipBasedMaxbr (pCtx, iSpatialNum)) {
+  if (CheckFrameSkipBasedMaxbr (pCtx, iSpatialNum)) {
     pFbi->eFrameType = videoFrameTypeSkip;
     return ENC_RETURN_SUCCESS;
   }
