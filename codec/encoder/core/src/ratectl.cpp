@@ -731,6 +731,8 @@ void WelsRcFrameDelayJudge (void* pCtx) {
   pWelsSvcRc->bSkipFlag = false;
   if (pWelsSvcRc->iBufferFullnessSkip > pWelsSvcRc->iBufferSizeSkip) {
     pWelsSvcRc->bSkipFlag = true;
+    pWelsSvcRc->iSkipFrameNum++;
+    pWelsSvcRc->iSkipFrameInVGop++;
     pWelsSvcRc->iBufferFullnessSkip -= iSentBits;
     pWelsSvcRc->iBufferFullnessSkip = WELS_MAX (pWelsSvcRc->iBufferFullnessSkip, 0);
   }
