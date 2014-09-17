@@ -905,8 +905,9 @@ void WelsMarkPicScreen (void* pEncCtx) {
   }
   return;
 }
-void InitRefListMgrFunc (SWelsFuncPtrList* pFuncList, EUsageType eUsageType) {
-  if (eUsageType == SCREEN_CONTENT_REAL_TIME) {
+void InitRefListMgrFunc (SWelsFuncPtrList* pFuncList,
+                         const EUsageType eUsageType, const bool bIsLosslessLink, const bool bEnableLtr) {
+  if (eUsageType == SCREEN_CONTENT_REAL_TIME && bIsLosslessLink && bEnableLtr) {
     pFuncList->pBuildRefList =   WelsBuildRefListScreen;
     pFuncList->pMarkPic      =   WelsMarkPicScreen;
     pFuncList->pUpdateRefList =   WelsUpdateRefListScreen;
