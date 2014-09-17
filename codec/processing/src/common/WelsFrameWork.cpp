@@ -79,7 +79,7 @@ EResult CreateSpecificVpInterface (IWelsVP** ppCtx) {
 }
 
 EResult DestroySpecificVpInterface (IWelsVP* pCtx) {
-  _SafeDelete (pCtx);
+  delete pCtx;
 
   return RET_SUCCESS;
 }
@@ -105,7 +105,7 @@ CVpFrameWork::~CVpFrameWork() {
   for (int32_t i = 0; i < MAX_STRATEGY_NUM; i++) {
     if (m_pStgChain[i]) {
       Uninit (m_pStgChain[i]->m_eMethod);
-      _SafeDelete (m_pStgChain[i]);
+      delete m_pStgChain[i];
     }
   }
 

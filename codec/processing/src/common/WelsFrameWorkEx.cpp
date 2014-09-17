@@ -87,7 +87,7 @@ EResult CreateSpecificVpInterface (IWelsVPc** pCtx) {
 EResult DestroySpecificVpInterface (IWelsVPc* pCtx) {
   if (pCtx) {
     DestroySpecificVpInterface (WelsStaticCast (IWelsVP*, pCtx->pCtx));
-    _SafeDelete (pCtx);
+    delete pCtx;
   }
 
   return RET_SUCCESS;
