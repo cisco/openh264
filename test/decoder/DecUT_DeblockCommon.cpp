@@ -24,7 +24,7 @@ if (iNum==0) { \
   iTc[0] = iTc[1] = iTc[2] = iTc[3] = 25; \
   pBase[0] = pRef[0] = 128; \
   for (int i = 1; i < iWidth*iWidth; i++) { \
-  pBase[i] = pRef[i] = CLIP3(0, 255, pBase[i-1] -16 + rand()%32); \
+  pBase[i] = pRef[i] = CLIP3( pBase[i-1] -16 + rand()%32, 0, 255); \
   } \
 } else if (iNum==1) { \
   iAlpha = 4; \
@@ -32,7 +32,7 @@ if (iNum==0) { \
   iTc[0] = iTc[1] = iTc[2] = iTc[3] = 9; \
   pBase[0] = pRef[0] = 128; \
   for (int i = 1; i < iWidth*iWidth; i++) { \
-  pBase[i] = pRef[i] = CLIP3(0, 255, pBase[i-1] -4 + rand()%8); \
+  pBase[i] = pRef[i] = CLIP3( pBase[i-1] -4 + rand()%8, 0, 255); \
   } \
 } else { \
   iAlpha = rand() % 256; \
@@ -41,7 +41,7 @@ if (iNum==0) { \
   iTc[i] = rand() % 26; \
   } \
   for (int i = 0; i < iWidth*iWidth; i++) { \
-  pBase[i] = pRef[i] = rand() % 256; \
+  pBase[i] = pRef[i] = rand() % 200; \
   } \
 }
 
@@ -69,14 +69,14 @@ void anchor_DeblockingLumaNormal (uint8_t* pPix, int32_t iStrideX, int32_t iStri
     if (abs (p[0] - q[0]) < iAlpha && abs (p[1] - p[0]) < iBeta && abs (q[1] - q[0]) < iBeta) {
       // 8-470
       if (abs (p[2] - p[0]) < iBeta) {
-        pPix[iStrideX * -2] = p[1] + CLIP3 (((p[2] + ((p[0] + q[0] + 1) >> 1) - (p[1] << 1)) >> 1), -1 * pTc[iIndexTc],
-                                            pTc[iIndexTc]);
+        pPix[iStrideX * -2] = CLIP3 (p[1] + CLIP3 (((p[2] + ((p[0] + q[0] + 1) >> 1) - (p[1] << 1)) >> 1), -1 * pTc[iIndexTc],
+                                     pTc[iIndexTc]), 0, 255);
         iTc++;
       }
       // 8-472
       if (abs (q[2] - q[0]) < iBeta) {
-        pPix[iStrideX * 1] = q[1] + CLIP3 (((q[2] + ((p[0] + q[0] + 1) >> 1) - (q[1] << 1)) >> 1), -1 * pTc[iIndexTc],
-                                           pTc[iIndexTc]);
+        pPix[iStrideX * 1] = CLIP3 (q[1] + CLIP3 (((q[2] + ((p[0] + q[0] + 1) >> 1) - (q[1] << 1)) >> 1), -1 * pTc[iIndexTc],
+                                    pTc[iIndexTc]), 0, 255);
         iTc++;
       }
       // 8-467,468,469
@@ -224,9 +224,7 @@ TEST (DeblockingCommon, DeblockLumaLt4_c) {
 
   ENFORCE_STACK_ALIGN_1D (int8_t,  iTc,   4, 16);
 
-  bool bEqual = true;
-
-  for (int iNum = 0; bEqual && iNum < TEST_CYCLE; iNum++) {
+  for (int iNum = 0; iNum < TEST_CYCLE; iNum++) {
     /* Horizontal */
     GENERATE_DATA_DEBLOCKING (iPixBase, iPixRef, 16)
 
@@ -234,10 +232,8 @@ TEST (DeblockingCommon, DeblockLumaLt4_c) {
     DeblockLumaLt4_c (&iPixRef[8 * 1], 1, 16, iAlpha, iBeta, iTc);
 
     for (int i = 0; i < 16 * 16; i++) {
-      if (iPixBase[i] != iPixRef[i]) {
-        bEqual = false;
-        break;
-      }
+      ASSERT_FALSE (iPixBase[i] != iPixRef[i]) << "Horizontal Error, (Pos, Base, Ref)-(" << i << "," <<
+          (uint32_t)iPixBase[i] << "," << (uint32_t)iPixRef[i] << ")";
     }
 
     /* Vertical */
@@ -247,14 +243,10 @@ TEST (DeblockingCommon, DeblockLumaLt4_c) {
     DeblockLumaLt4_c (&iPixRef[8 * 16], 16, 1, iAlpha, iBeta, iTc);
 
     for (int i = 0; i < 16 * 16; i++) {
-      if (iPixBase[i] != iPixRef[i]) {
-        bEqual = false;
-        break;
-      }
+      ASSERT_FALSE (iPixBase[i] != iPixRef[i]) << "Vertical Error, (Pos, Base, Ref)-(" << i << "," <<
+          (uint32_t)iPixBase[i] << "," << (uint32_t)iPixRef[i] << ")";
     }
   }
-
-  EXPECT_TRUE (bEqual);
 }
 TEST (DeblockingCommon, DeblockLumaEq4_c) {
   //void DeblockLumaEq4_c (uint8_t* pPix, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha, int32_t iBeta)
@@ -267,9 +259,7 @@ TEST (DeblockingCommon, DeblockLumaEq4_c) {
   /* NOT used here */
   ENFORCE_STACK_ALIGN_1D (int8_t,  iTc,   4, 16);
 
-  bool bEqual = true;
-
-  for (int iNum = 0; bEqual && iNum < TEST_CYCLE; iNum++) {
+  for (int iNum = 0; iNum < TEST_CYCLE; iNum++) {
     /* Horizontal */
     GENERATE_DATA_DEBLOCKING (iPixBase, iPixRef, 16)
 
@@ -277,10 +267,8 @@ TEST (DeblockingCommon, DeblockLumaEq4_c) {
     DeblockLumaEq4_c (&iPixRef[8 * 1], 1, 16, iAlpha, iBeta);
 
     for (int i = 0; i < 16 * 16; i++) {
-      if (iPixBase[i] != iPixRef[i]) {
-        bEqual = false;
-        break;
-      }
+      ASSERT_FALSE (iPixBase[i] != iPixRef[i]) << "Horizontal Error, (Pos, Base, Ref)-(" << i << "," <<
+          (uint32_t)iPixBase[i] << "," << (uint32_t)iPixRef[i] << ")";
     }
 
     /* Vertical */
@@ -290,14 +278,10 @@ TEST (DeblockingCommon, DeblockLumaEq4_c) {
     DeblockLumaEq4_c (&iPixRef[8 * 16], 16, 1, iAlpha, iBeta);
 
     for (int i = 0; i < 16 * 16; i++) {
-      if (iPixBase[i] != iPixRef[i]) {
-        bEqual = false;
-        break;
-      }
+      ASSERT_FALSE (iPixBase[i] != iPixRef[i]) << "Vertical Error, (Pos, Base, Ref)-(" << i << "," <<
+          (uint32_t)iPixBase[i] << "," << (uint32_t)iPixRef[i] << ")";
     }
   }
-
-  EXPECT_TRUE (bEqual);
 }
 
 TEST (DeblockingCommon, DeblockChromaLt4_c) {
@@ -312,9 +296,7 @@ TEST (DeblockingCommon, DeblockChromaLt4_c) {
 
   ENFORCE_STACK_ALIGN_1D (int8_t,  iTc,   4, 16);
 
-  bool bEqual = true;
-
-  for (int iNum = 0; bEqual && iNum < TEST_CYCLE; iNum++) {
+  for (int iNum = 0; iNum < TEST_CYCLE; iNum++) {
     /* Horizontal */
     GENERATE_DATA_DEBLOCKING (iPixCbBase, iPixCbRef, 8)
     GENERATE_DATA_DEBLOCKING (iPixCrBase, iPixCrRef, 8)
@@ -323,10 +305,10 @@ TEST (DeblockingCommon, DeblockChromaLt4_c) {
     DeblockChromaLt4_c (&iPixCbRef[4 * 1], &iPixCrRef[4 * 1], 1, 8, iAlpha, iBeta, iTc);
 
     for (int i = 0; i < 8 * 8; i++) {
-      if (iPixCbBase[i] != iPixCbRef[i] ||  iPixCrBase[i] != iPixCrRef[i]) {
-        bEqual = false;
-        break;
-      }
+      ASSERT_FALSE (iPixCbBase[i] != iPixCbRef[i]
+                    ||  iPixCrBase[i] != iPixCrRef[i]) << "Horizontal Error, (pos, CbBase, CbRef, CrBase, CrRef)-(" << i << "," <<
+                        (uint32_t)iPixCbBase[i] << "," << (uint32_t)iPixCbRef[i] << "," << (uint32_t)iPixCrBase[i] << "," <<
+                        (uint32_t)iPixCrRef[i] << ")";
     }
 
     /* Vertical */
@@ -337,14 +319,12 @@ TEST (DeblockingCommon, DeblockChromaLt4_c) {
     DeblockChromaLt4_c (&iPixCbRef[4 * 8], &iPixCrRef[4 * 8], 8, 1, iAlpha, iBeta, iTc);
 
     for (int i = 0; i < 8 * 8; i++) {
-      if (iPixCbBase[i] != iPixCbRef[i] ||  iPixCrBase[i] != iPixCrRef[i]) {
-        bEqual = false;
-        break;
-      }
+      ASSERT_FALSE (iPixCbBase[i] != iPixCbRef[i]
+                    ||  iPixCrBase[i] != iPixCrRef[i]) << "Vertical Error, (pos, CbBase, CbRef, CrBase, CrRef)-(" << i << "," <<
+                        (uint32_t)iPixCbBase[i] << "," << (uint32_t)iPixCbRef[i] << "," << (uint32_t)iPixCrBase[i] << "," <<
+                        (uint32_t)iPixCrRef[i] << ")";
     }
   }
-
-  EXPECT_TRUE (bEqual);
 }
 
 TEST (DeblockingCommon, DeblockChromaEq4_c) {
@@ -360,9 +340,7 @@ TEST (DeblockingCommon, DeblockChromaEq4_c) {
   /* NOT used here*/
   ENFORCE_STACK_ALIGN_1D (int8_t,  iTc,   4, 16);
 
-  bool bEqual = true;
-
-  for (int iNum = 0; bEqual && iNum < TEST_CYCLE; iNum++) {
+  for (int iNum = 0; iNum < TEST_CYCLE; iNum++) {
     /* Horizontal */
     GENERATE_DATA_DEBLOCKING (iPixCbBase, iPixCbRef, 8)
     GENERATE_DATA_DEBLOCKING (iPixCrBase, iPixCrRef, 8)
@@ -371,10 +349,10 @@ TEST (DeblockingCommon, DeblockChromaEq4_c) {
     DeblockChromaEq4_c (&iPixCbRef[4 * 1], &iPixCrRef[4 * 1], 1, 8, iAlpha, iBeta);
 
     for (int i = 0; i < 8 * 8; i++) {
-      if (iPixCbBase[i] != iPixCbRef[i] ||  iPixCrBase[i] != iPixCrRef[i]) {
-        bEqual = false;
-        break;
-      }
+      ASSERT_FALSE (iPixCbBase[i] != iPixCbRef[i]
+                    ||  iPixCrBase[i] != iPixCrRef[i]) << "Horizontal Error, (pos, CbBase, CbRef, CrBase, CrRef)-(" << i << "," <<
+                        (uint32_t)iPixCbBase[i] << "," << (uint32_t)iPixCbRef[i] << "," << (uint32_t)iPixCrBase[i] << "," <<
+                        (uint32_t)iPixCrRef[i] << ")";
     }
 
     /* Vertical */
@@ -385,12 +363,10 @@ TEST (DeblockingCommon, DeblockChromaEq4_c) {
     DeblockChromaEq4_c (&iPixCbRef[4 * 8], &iPixCrRef[4 * 8], 8, 1, iAlpha, iBeta);
 
     for (int i = 0; i < 8 * 8; i++) {
-      if (iPixCbBase[i] != iPixCbRef[i] ||  iPixCrBase[i] != iPixCrRef[i]) {
-        bEqual = false;
-        break;
-      }
+      ASSERT_FALSE (iPixCbBase[i] != iPixCbRef[i]
+                    ||  iPixCrBase[i] != iPixCrRef[i]) << "Vertical Error, (pos, CbBase, CbRef, CrBase, CrRef)-(" << i << "," <<
+                        (uint32_t)iPixCbBase[i] << "," << (uint32_t)iPixCbRef[i] << "," << (uint32_t)iPixCrBase[i] << "," <<
+                        (uint32_t)iPixCrRef[i] << ")";
     }
   }
-
-  EXPECT_TRUE (bEqual);
 }
