@@ -25,12 +25,31 @@ struct EncodeDecodeFileParamBase {
   const char* pLossSequence;
 };
 
+static void welsStderrTraceOrigin (void* ctx, int level, const char* string) {
+  fprintf (stderr, "%s\n", string);
+}
+
+typedef struct STrace_Unit {
+  int iTarLevel;
+} STraceUnit;
+
+static void TestOutPutTrace (void* ctx, int level, const char* string) {
+  STraceUnit* pTraceUnit = (STraceUnit*) ctx;
+  EXPECT_LE (level, pTraceUnit->iTarLevel);
+}
+
 class EncodeDecodeTestBase : public ::testing::TestWithParam<EncodeDecodeFileParamBase>,
   public BaseEncoderTest, public BaseDecoderTest {
  public:
   virtual void SetUp() {
     BaseEncoderTest::SetUp();
     BaseDecoderTest::SetUp();
+    pFunc = welsStderrTraceOrigin;
+    pTraceInfo = NULL;
+    encoder_->SetOption (ENCODER_OPTION_TRACE_CALLBACK, &pFunc);
+    encoder_->SetOption (ENCODER_OPTION_TRACE_CALLBACK_CONTEXT, &pTraceInfo);
+    decoder_->SetOption (DECODER_OPTION_TRACE_CALLBACK, &pFunc);
+    decoder_->SetOption (DECODER_OPTION_TRACE_CALLBACK_CONTEXT, &pTraceInfo);
   }
 
   virtual void TearDown() {
@@ -67,6 +86,9 @@ class EncodeDecodeTestBase : public ::testing::TestWithParam<EncodeDecodeFilePar
   BufferedData buf_;
   SBufferInfo dstBufInfo_;
   std::vector<SLostSim> m_SLostSim;
+  WelsTraceCallback pFunc;
+  STraceUnit sTrace;
+  STraceUnit* pTraceInfo;
 };
 
 class EncodeDecodeTestAPI : public EncodeDecodeTestBase {
@@ -87,6 +109,7 @@ class EncodeDecodeTestAPI : public EncodeDecodeTestBase {
 static const EncodeDecodeFileParamBase kFileParamArray[] = {
   {300, 160, 96, 6.0f, 2, 1, "000000000000001010101010101010101010101001101010100000010101000011"},
   {300, 140, 96, 6.0f, 4, 1, "000000000000001010101010101010101010101001101010100000010101000011"},
+  {300, 140, 96, 6.0f, 4, 1, "000000000000001010111010101011101010101001101010100000010101110011010101"},
 };
 
 TEST_P (EncodeDecodeTestAPI, DecoderVclNal) {
@@ -330,6 +353,52 @@ void LTRMarkFeedback (ISVCDecoder* pDecoder, ISVCEncoder* pEncoder, SLTRMarkingF
   }
 }
 
+bool ToRemainDidNal (const unsigned char* pSrc, EWelsNalUnitType eNalType, int iTarDid) {
+  uint8_t uiCurByte = *pSrc;
+  if (IS_NEW_INTRODUCED_SVC_NAL (eNalType)) {
+    int iDid = (uiCurByte & 0x70) >> 4;
+    return iDid == iTarDid;
+  } else if ((IS_VCL_NAL_AVC_BASE (eNalType)) && iTarDid != 0) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+void ExtractDidNal (SFrameBSInfo* pBsInfo, int& iSrcLen, std::vector<SLostSim>* p_SLostSim, int iTarDid) {
+  unsigned char* pDst = new unsigned char[iSrcLen];
+  const unsigned char* pSrc = pBsInfo->sLayerInfo[0].pBsBuf;
+  int iDstLen = 0;
+  bool bLost;
+  SLostSim tmpSLostSim;
+  p_SLostSim->clear();
+  int iPrefix;
+  unsigned char* pSrcPtr = pBsInfo->sLayerInfo[0].pBsBuf;
+  for (int j = 0; j < pBsInfo->iLayerNum; j++) {
+    for (int k = 0; k < pBsInfo->sLayerInfo[j].iNalCount; k++) {
+      if (pSrcPtr[0] == 0 && pSrcPtr[1] == 0 && pSrcPtr[2] == 0 && pSrcPtr[3] == 1) {
+        iPrefix = 4;
+      } else if (pSrcPtr[0] == 0 && pSrcPtr[1] == 0 && pSrcPtr[2] == 1) {
+        iPrefix = 3;
+      } else {
+        iPrefix = 0;
+      }
+      tmpSLostSim.eNalType = (EWelsNalUnitType) ((* (pSrcPtr + iPrefix)) & 0x1f);	// eNalUnitType
+      bLost = (ToRemainDidNal ((pSrcPtr + iPrefix + 2), tmpSLostSim.eNalType, iTarDid)) ? false : true;
+      tmpSLostSim.isLost = bLost;
+      p_SLostSim->push_back (tmpSLostSim);
+      if (!bLost) {
+        memcpy (pDst + iDstLen, pSrcPtr, pBsInfo->sLayerInfo[j].pNalLengthInByte[k]);
+        iDstLen += (pBsInfo->sLayerInfo[j].pNalLengthInByte[k]);
+      }
+      pSrcPtr += pBsInfo->sLayerInfo[j].pNalLengthInByte[k];
+    }
+  }
+  memset ((void*)pSrc, 0, iSrcLen);
+  memcpy ((void*)pSrc, pDst, iDstLen);
+  iSrcLen = iDstLen;
+  delete [] pDst;
+}
 
 int SimulateNALLoss (const unsigned char* pSrc,  int& iSrcLen, std::vector<SLostSim>* p_SLostSim,
                      const char* pLossChars, bool bLossPara, int& iLossIdx, bool& bVCLLoss) {
@@ -735,6 +804,406 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_SLICE_COPY) {
     iIdx++;
   }
   (void) iSkipedBytes;
+}
+
+TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_NOPREFIX) {
+  SLTRMarkingFeedback m_LTR_Marking_Feedback;
+  SLTRRecoverRequest m_LTR_Recover_Request;
+  m_LTR_Recover_Request.uiIDRPicId = 0;
+  EncodeDecodeFileParamBase p = GetParam();
+  prepareParam (p.width, p.height, p.frameRate);
+  param_.bPrefixNalAddingCtrl = false;
+  param_.iTemporalLayerNum = (rand() % 4) + 1;
+  param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  param_.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = p.slicenum;
+  encoder_->Uninitialize();
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == cmResultSuccess);
+  m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
+  int frameSize = p.width * p.height * 3 / 2;
+  buf_.SetLength (frameSize);
+  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
+  SFrameBSInfo info;
+  memset (&info, 0, sizeof (SFrameBSInfo));
+
+  SSourcePicture pic;
+  memset (&pic, 0, sizeof (SSourcePicture));
+  pic.iPicWidth = p.width;
+  pic.iPicHeight = p.height;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = pic.iPicWidth;
+  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
+  pic.pData[0] = buf_.data();
+  pic.pData[1] = pic.pData[0] + p.width * p.height;
+  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  int32_t iTraceLevel = WELS_LOG_QUIET;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  int32_t iSpsPpsIdAddition = 1;
+  encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
+  int32_t iIDRPeriod = 60;
+  encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
+  SLTRConfig sLtrConfigVal;
+  sLtrConfigVal.bEnableLongTermReference = 1;
+  sLtrConfigVal.iLTRRefNum = 1;
+  encoder_->SetOption (ENCODER_OPTION_LTR, &sLtrConfigVal);
+  int32_t iLtrPeriod = 2;
+  encoder_->SetOption (ENCODER_LTR_MARKING_PERIOD, &iLtrPeriod);
+  int iIdx = 0;
+  int iLossIdx = 0;
+  bool bVCLLoss = false;
+  while (iIdx <= p.numframes) {
+    memset (buf_.data(), rand() % 256, frameSize);
+    rv = encoder_->EncodeFrame (&pic, &info);
+    if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
+      ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
+    }
+    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+    //decoding after each encoding frame
+    int len = 0;
+    encToDecData (info, len);
+    unsigned char* pData[3] = { NULL };
+    memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+    SimulateNALLoss (info.sLayerInfo[0].pBsBuf, len, &m_SLostSim, p.pLossSequence, p.bLostPara, iLossIdx, bVCLLoss);
+    rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+    int iTid = -1;
+    decoder_->GetOption (DECODER_OPTION_TEMPORAL_ID, &iTid);
+    if (iTid != -1) {
+      ASSERT_EQ (iTid, 0);
+    }
+    m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
+    LTRRecoveryRequest (decoder_, encoder_, &m_LTR_Recover_Request, rv);
+    rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+    decoder_->GetOption (DECODER_OPTION_TEMPORAL_ID, &iTid);
+    std::vector<SLostSim>::iterator iter = m_SLostSim.begin();
+    bool bHasVCL = false;
+    for (int k = 0; k < m_SLostSim.size(); k++) {
+      if (IS_VCL_NAL (iter->eNalType, 0) && iter->isLost == false) {
+        bHasVCL = true;
+        break;
+      }
+      iter++;
+    }
+    if (iTid != -1) {
+      ASSERT_EQ (iTid, 0);
+    }
+    LTRRecoveryRequest (decoder_, encoder_, &m_LTR_Recover_Request, rv);
+    LTRMarkFeedback (decoder_, encoder_, &m_LTR_Marking_Feedback, rv);
+    iIdx++;
+  }
+}
+
+TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_WITH_PREFIX_NOLOSS) {
+  SLTRMarkingFeedback m_LTR_Marking_Feedback;
+  SLTRRecoverRequest m_LTR_Recover_Request;
+  m_LTR_Recover_Request.uiIDRPicId = 0;
+  EncodeDecodeFileParamBase p = GetParam();
+  prepareParam (p.width, p.height, p.frameRate);
+  param_.bPrefixNalAddingCtrl = true;
+  param_.iTemporalLayerNum = (rand() % 4) + 1;
+  param_.iSpatialLayerNum = 1;
+  param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  param_.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = p.slicenum;
+  encoder_->Uninitialize();
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == cmResultSuccess);
+  m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
+  int frameSize = p.width * p.height * 3 / 2;
+  buf_.SetLength (frameSize);
+  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
+  SFrameBSInfo info;
+  memset (&info, 0, sizeof (SFrameBSInfo));
+
+  SSourcePicture pic;
+  memset (&pic, 0, sizeof (SSourcePicture));
+  pic.iPicWidth = p.width;
+  pic.iPicHeight = p.height;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = pic.iPicWidth;
+  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
+  pic.pData[0] = buf_.data();
+  pic.pData[1] = pic.pData[0] + p.width * p.height;
+  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  int32_t iTraceLevel = WELS_LOG_QUIET;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  int32_t iSpsPpsIdAddition = 1;
+  encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
+  int32_t iIDRPeriod = 60;
+  encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
+  SLTRConfig sLtrConfigVal;
+  sLtrConfigVal.bEnableLongTermReference = 1;
+  sLtrConfigVal.iLTRRefNum = 1;
+  encoder_->SetOption (ENCODER_OPTION_LTR, &sLtrConfigVal);
+  int32_t iLtrPeriod = 2;
+  encoder_->SetOption (ENCODER_LTR_MARKING_PERIOD, &iLtrPeriod);
+  int iIdx = 0;
+  while (iIdx <= p.numframes) {
+    memset (buf_.data(), rand() % 256, frameSize);
+    rv = encoder_->EncodeFrame (&pic, &info);
+    if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
+      ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
+    }
+    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+    //decoding after each encoding frame
+    int len = 0;
+    encToDecData (info, len);
+    unsigned char* pData[3] = { NULL };
+    memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+    ExtractDidNal (&info, len, &m_SLostSim, 0);
+    rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+    int iTid = -1;
+    decoder_->GetOption (DECODER_OPTION_TEMPORAL_ID, &iTid);
+    ASSERT_EQ (iTid, -1);
+    m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
+    LTRRecoveryRequest (decoder_, encoder_, &m_LTR_Recover_Request, rv);
+    rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+    decoder_->GetOption (DECODER_OPTION_TEMPORAL_ID, &iTid);
+    ASSERT_EQ (iTid, info.sLayerInfo[0].uiTemporalId);
+    LTRRecoveryRequest (decoder_, encoder_, &m_LTR_Recover_Request, rv);
+    LTRMarkFeedback (decoder_, encoder_, &m_LTR_Marking_Feedback, rv);
+    iIdx++;
+  }
+}
+
+TEST_P (EncodeDecodeTestAPI, GetOptionTid_SVC_L1_NOLOSS) {
+  SLTRMarkingFeedback m_LTR_Marking_Feedback;
+  SLTRRecoverRequest m_LTR_Recover_Request;
+  m_LTR_Recover_Request.uiIDRPicId = 0;
+  EncodeDecodeFileParamBase p = GetParam();
+  prepareParam (p.width / 2, p.height / 2, p.frameRate);
+  param_.iTemporalLayerNum = (rand() % 4) + 1;
+  param_.iSpatialLayerNum = 2;
+  param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  param_.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = p.slicenum;
+  param_.sSpatialLayers[1].iVideoWidth = p.width;
+  param_.sSpatialLayers[1].iVideoHeight = p.height;
+  param_.sSpatialLayers[1].fFrameRate = p.frameRate;
+  param_.sSpatialLayers[1].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  param_.sSpatialLayers[1].sSliceCfg.sSliceArgument.uiSliceNum = p.slicenum;
+
+  encoder_->Uninitialize();
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == cmResultSuccess);
+  m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
+  int frameSize = p.width * p.height * 3 / 2;
+  buf_.SetLength (frameSize);
+  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
+  SFrameBSInfo info;
+  memset (&info, 0, sizeof (SFrameBSInfo));
+
+  SSourcePicture pic;
+  memset (&pic, 0, sizeof (SSourcePicture));
+  pic.iPicWidth = p.width;
+  pic.iPicHeight = p.height;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = pic.iPicWidth;
+  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
+  pic.pData[0] = buf_.data();
+  pic.pData[1] = pic.pData[0] + p.width * p.height;
+  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  int32_t iTraceLevel = WELS_LOG_QUIET;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  int32_t iSpsPpsIdAddition = 1;
+  encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
+  int32_t iIDRPeriod = 60;
+  encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
+  SLTRConfig sLtrConfigVal;
+  sLtrConfigVal.bEnableLongTermReference = 1;
+  sLtrConfigVal.iLTRRefNum = 1;
+  encoder_->SetOption (ENCODER_OPTION_LTR, &sLtrConfigVal);
+  int32_t iLtrPeriod = 2;
+  encoder_->SetOption (ENCODER_LTR_MARKING_PERIOD, &iLtrPeriod);
+  int iIdx = 0;
+  while (iIdx <= p.numframes) {
+    memset (buf_.data(), rand() % 256, frameSize);
+    rv = encoder_->EncodeFrame (&pic, &info);
+    if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
+      ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
+    }
+    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+    //decoding after each encoding frame
+    int len = 0;
+    encToDecData (info, len);
+    unsigned char* pData[3] = { NULL };
+    memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+    ExtractDidNal (&info, len, &m_SLostSim, 1);
+    rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+    int iTid = -1;
+    decoder_->GetOption (DECODER_OPTION_TEMPORAL_ID, &iTid);
+    ASSERT_EQ (iTid, -1);
+    m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
+    LTRRecoveryRequest (decoder_, encoder_, &m_LTR_Recover_Request, rv);
+    rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+    decoder_->GetOption (DECODER_OPTION_TEMPORAL_ID, &iTid);
+    ASSERT_EQ (iTid, info.sLayerInfo[0].uiTemporalId);
+    LTRRecoveryRequest (decoder_, encoder_, &m_LTR_Recover_Request, rv);
+    LTRMarkFeedback (decoder_, encoder_, &m_LTR_Marking_Feedback, rv);
+    iIdx++;
+  }
+}
+
+
+
+TEST_P (EncodeDecodeTestAPI, SetOption_Trace) {
+  SLTRMarkingFeedback m_LTR_Marking_Feedback;
+  SLTRRecoverRequest m_LTR_Recover_Request;
+  m_LTR_Recover_Request.uiIDRPicId = 0;
+  EncodeDecodeFileParamBase p = GetParam();
+  prepareParam (p.width, p.height, p.frameRate);
+  param_.iSpatialLayerNum = 1;
+  param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  param_.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = p.slicenum;
+
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == cmResultSuccess);
+  m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
+  int frameSize = p.width * p.height * 3 / 2;
+  buf_.SetLength (frameSize);
+  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
+  SFrameBSInfo info;
+  memset (&info, 0, sizeof (SFrameBSInfo));
+
+  SSourcePicture pic;
+  memset (&pic, 0, sizeof (SSourcePicture));
+  pic.iPicWidth = p.width;
+  pic.iPicHeight = p.height;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = pic.iPicWidth;
+  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
+  pic.pData[0] = buf_.data();
+  pic.pData[1] = pic.pData[0] + p.width * p.height;
+  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  int32_t iTraceLevel = WELS_LOG_QUIET;
+  pFunc = TestOutPutTrace;
+  pTraceInfo = &sTrace;
+  sTrace.iTarLevel = iTraceLevel;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_CALLBACK, &pFunc);
+  encoder_->SetOption (ENCODER_OPTION_TRACE_CALLBACK_CONTEXT, &pTraceInfo);
+  decoder_->SetOption (DECODER_OPTION_TRACE_CALLBACK, &pFunc);
+  decoder_->SetOption (DECODER_OPTION_TRACE_CALLBACK_CONTEXT, &pTraceInfo);
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+
+  int32_t iSpsPpsIdAddition = 1;
+  encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
+  int32_t iIDRPeriod = 60;
+  encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
+  SLTRConfig sLtrConfigVal;
+  sLtrConfigVal.bEnableLongTermReference = 1;
+  sLtrConfigVal.iLTRRefNum = 1;
+  encoder_->SetOption (ENCODER_OPTION_LTR, &sLtrConfigVal);
+  int32_t iLtrPeriod = 2;
+  encoder_->SetOption (ENCODER_LTR_MARKING_PERIOD, &iLtrPeriod);
+  int iIdx = 0;
+  int iLossIdx = 0;
+  bool bVCLLoss = false;
+  while (iIdx <= p.numframes) {
+    memset (buf_.data(), rand() % 256, frameSize);
+    iTraceLevel = rand() % 33;
+    sTrace.iTarLevel = iTraceLevel;
+    encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+    decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+    rv = encoder_->EncodeFrame (&pic, &info);
+    if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
+      ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
+    }
+    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+    //decoding after each encoding frame
+    int len = 0;
+    encToDecData (info, len);
+    unsigned char* pData[3] = { NULL };
+    memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+    ExtractDidNal (&info, len, &m_SLostSim, 0);
+    SimulateNALLoss (info.sLayerInfo[0].pBsBuf, len, &m_SLostSim, p.pLossSequence, p.bLostPara, iLossIdx, bVCLLoss);
+    rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+    m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
+    LTRRecoveryRequest (decoder_, encoder_, &m_LTR_Recover_Request, rv);
+    rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+    LTRRecoveryRequest (decoder_, encoder_, &m_LTR_Recover_Request, rv);
+    LTRMarkFeedback (decoder_, encoder_, &m_LTR_Marking_Feedback, rv);
+    iIdx++;
+  }
+}
+
+TEST_P (EncodeDecodeTestAPI, SetOption_Trace_NULL) {
+  SLTRMarkingFeedback m_LTR_Marking_Feedback;
+  SLTRRecoverRequest m_LTR_Recover_Request;
+  m_LTR_Recover_Request.uiIDRPicId = 0;
+  EncodeDecodeFileParamBase p = GetParam();
+  prepareParam (p.width, p.height, p.frameRate);
+  param_.iSpatialLayerNum = 1;
+  param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  param_.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = p.slicenum;
+
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == cmResultSuccess);
+  m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
+  int frameSize = p.width * p.height * 3 / 2;
+  buf_.SetLength (frameSize);
+  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
+  SFrameBSInfo info;
+  memset (&info, 0, sizeof (SFrameBSInfo));
+
+  SSourcePicture pic;
+  memset (&pic, 0, sizeof (SSourcePicture));
+  pic.iPicWidth = p.width;
+  pic.iPicHeight = p.height;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = pic.iPicWidth;
+  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
+  pic.pData[0] = buf_.data();
+  pic.pData[1] = pic.pData[0] + p.width * p.height;
+  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  int32_t iTraceLevel = WELS_LOG_QUIET;
+  pFunc = NULL;
+  pTraceInfo = NULL;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_CALLBACK, &pFunc);
+  encoder_->SetOption (ENCODER_OPTION_TRACE_CALLBACK_CONTEXT, &pTraceInfo);
+  decoder_->SetOption (DECODER_OPTION_TRACE_CALLBACK, &pFunc);
+  decoder_->SetOption (DECODER_OPTION_TRACE_CALLBACK_CONTEXT, &pTraceInfo);
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+
+  int32_t iSpsPpsIdAddition = 1;
+  encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
+  int32_t iIDRPeriod = 60;
+  encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
+  SLTRConfig sLtrConfigVal;
+  sLtrConfigVal.bEnableLongTermReference = 1;
+  sLtrConfigVal.iLTRRefNum = 1;
+  encoder_->SetOption (ENCODER_OPTION_LTR, &sLtrConfigVal);
+  int32_t iLtrPeriod = 2;
+  encoder_->SetOption (ENCODER_LTR_MARKING_PERIOD, &iLtrPeriod);
+  int iIdx = 0;
+  int iLossIdx = 0;
+  bool bVCLLoss = false;
+  while (iIdx <= p.numframes) {
+    memset (buf_.data(), rand() % 256, frameSize);
+    iTraceLevel = rand() % 33;
+    encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+    decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+    rv = encoder_->EncodeFrame (&pic, &info);
+    if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
+      ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
+    }
+    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+    //decoding after each encoding frame
+    int len = 0;
+    encToDecData (info, len);
+    unsigned char* pData[3] = { NULL };
+    memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+    ExtractDidNal (&info, len, &m_SLostSim, 0);
+    SimulateNALLoss (info.sLayerInfo[0].pBsBuf, len, &m_SLostSim, p.pLossSequence, p.bLostPara, iLossIdx, bVCLLoss);
+    rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+    m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
+    LTRRecoveryRequest (decoder_, encoder_, &m_LTR_Recover_Request, rv);
+    rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+    LTRRecoveryRequest (decoder_, encoder_, &m_LTR_Recover_Request, rv);
+    LTRMarkFeedback (decoder_, encoder_, &m_LTR_Marking_Feedback, rv);
+    iIdx++;
+  }
 }
 
 INSTANTIATE_TEST_CASE_P (EncodeDecodeTestBase, EncodeDecodeTestAPI,
