@@ -86,7 +86,7 @@ CWelsPreProcess::~CWelsPreProcess() {
 
 int32_t CWelsPreProcess::WelsPreprocessCreate() {
   if (m_pInterfaceVp == NULL) {
-    CreateVpInterface ((void**) &m_pInterfaceVp, WELSVP_INTERFACE_VERION);
+    WelsCreateVpInterface ((void**) &m_pInterfaceVp, WELSVP_INTERFACE_VERION);
     if (!m_pInterfaceVp)
       goto exit;
   } else
@@ -100,7 +100,7 @@ exit:
 }
 
 int32_t CWelsPreProcess::WelsPreprocessDestroy() {
-  DestroyVpInterface (m_pInterfaceVp, WELSVP_INTERFACE_VERION);
+  WelsDestroyVpInterface (m_pInterfaceVp, WELSVP_INTERFACE_VERION);
   m_pInterfaceVp = NULL;
 
   return 0;

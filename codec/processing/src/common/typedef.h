@@ -47,7 +47,7 @@
 #define WELSVP_EXTERN_C_BEGIN       extern "C" {
 #define WELSVP_EXTERN_C_END         }
 
-#define WELSVP_NAMESPACE_BEGIN      namespace nsWelsVP {
+#define WELSVP_NAMESPACE_BEGIN      namespace WelsVP {
 #define WELSVP_NAMESPACE_END        }
 
 // Get the stdint type definitions from typedefs.h in the common lib

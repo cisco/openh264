@@ -44,20 +44,20 @@
 
 /* interface API implement */
 
-EResult CreateVpInterface (void** ppCtx, int iVersion) {
+EResult WelsCreateVpInterface (void** ppCtx, int iVersion) {
   if (iVersion & 0x8000)
-    return nsWelsVP::CreateSpecificVpInterface ((IWelsVP**)ppCtx);
+    return WelsVP::CreateSpecificVpInterface ((IWelsVP**)ppCtx);
   else if (iVersion & 0x7fff)
-    return nsWelsVP::CreateSpecificVpInterface ((IWelsVPc**)ppCtx);
+    return WelsVP::CreateSpecificVpInterface ((IWelsVPc**)ppCtx);
   else
     return RET_INVALIDPARAM;
 }
 
-EResult DestroyVpInterface (void* pCtx, int iVersion) {
+EResult WelsDestroyVpInterface (void* pCtx, int iVersion) {
   if (iVersion & 0x8000)
-    return nsWelsVP::DestroySpecificVpInterface ((IWelsVP*)pCtx);
+    return WelsVP::DestroySpecificVpInterface ((IWelsVP*)pCtx);
   else if (iVersion & 0x7fff)
-    return nsWelsVP::DestroySpecificVpInterface ((IWelsVPc*)pCtx);
+    return WelsVP::DestroySpecificVpInterface ((IWelsVPc*)pCtx);
   else
     return RET_INVALIDPARAM;
 }

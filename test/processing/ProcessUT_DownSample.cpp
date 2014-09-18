@@ -6,7 +6,7 @@
 #include "IWelsVP.h"
 #include "downsample.h"
 
-using namespace nsWelsVP;
+using namespace WelsVP;
 
 void DyadicBilinearDownsampler_ref (uint8_t* pDst, const int32_t kiDstStride,
                                   uint8_t* pSrc, const int32_t kiSrcStride,
