@@ -349,7 +349,7 @@ typedef struct TagEncParamExt {
   bool    bEnableAdaptiveQuant; // adaptive quantization control
   bool	  bEnableFrameCroppingFlag;// enable frame cropping flag: TRUE always in application
   bool    bEnableSceneChangeDetect;
-  
+
   /*LTR advanced setting*/
   bool    bIsLosslessLink;
 } SEncParamExt;
