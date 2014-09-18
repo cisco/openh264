@@ -51,6 +51,7 @@
 //#include "macros.h"
 #include "decoder.h"
 #include "decoder_core.h"
+#include "error_concealment.h"
 
 extern "C" {
 #include "decoder_core.h"
@@ -263,10 +264,17 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
 
     return cmResultSuccess;
   } else if (eOptID == DECODER_OPTION_ERROR_CON_IDC) { // Indicate error concealment status
-    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
-             "CWelsDecoder::SetOption for ERROR_CON_IDC not permmited! Current eErrorConMethod = %d. Value can be set in Initialize() only!",
-             (int32_t) m_pDecContext->eErrorConMethod);
-    return cmInitParaError;
+    if (pOption == NULL)
+      return cmInitParaError;
+
+    iVal	= * ((int*)pOption);	// int value for error concealment idc
+    iVal = WELS_CLIP3 (iVal, (int32_t) ERROR_CON_DISABLE, (int32_t) ERROR_CON_SLICE_COPY);
+    m_pDecContext->eErrorConMethod = (ERROR_CON_IDC) iVal;
+    InitErrorCon (m_pDecContext);
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsDecoder::SetOption for ERROR_CON_IDC = %d.", iVal);
+
+    return cmResultSuccess;
   } else if (eOptID == DECODER_OPTION_TRACE_LEVEL) {
     if (m_pWelsTrace) {
       uint32_t level = * ((uint32_t*)pOption);
@@ -422,11 +430,17 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
         m_pDecContext->iIgnoredErrorInfoPacketCount = 0;
       }
     }
-    return (DECODING_STATE)m_pDecContext->iErrorCode;
-  } else { //decoding correct, but may have ECed status
-    if (m_pDecContext->bDecErrorConedFlag) {
+    if ((m_pDecContext->eErrorConMethod != ERROR_CON_DISABLE) && (pDstInfo->iBufferStatus == 1)) {
+      //TODO after dec status updated
+      m_pDecContext->bDecErrorConedFlag = true;
       m_pDecContext->iErrorCode |= dsDataErrorConcealed;
-      return dsDataErrorConcealed;
+    }
+    return (DECODING_STATE) m_pDecContext->iErrorCode;
+  } else { //decoding correct, but may have ECed status
+    if (m_pDecContext->bDecErrorConedFlag) { //TODO after dec status updated
+      if (m_pDecContext->eErrorConMethod != ERROR_CON_DISABLE) //EC is on
+        m_pDecContext->iErrorCode |= dsDataErrorConcealed;
+      return (DECODING_STATE) m_pDecContext->iErrorCode;
     }
   }
 
