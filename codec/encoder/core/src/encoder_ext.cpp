@@ -1358,7 +1358,7 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
   iTargetSpatialBsSize = iLayerBsSize;
   iCountBsLen = iNonVclLayersBsSizeCount + iVclLayersBsSizeCount;
 
-  pParam->iNumRefFrame	= WELS_CLIP3 (pParam->iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM);
+  pParam->iNumRefFrame	= WELS_CLIP3 (pParam->iNumRefFrame, MIN_REF_PIC_COUNT, (pParam->iUsageType==CAMERA_VIDEO_REAL_TIME?MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA:MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN));
 
   // Output
   (*ppCtx)->pOut = (SWelsEncoderOutput*)pMa->WelsMalloc (sizeof (SWelsEncoderOutput), "SWelsEncoderOutput");
@@ -3741,7 +3741,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
   } else {
     /* maybe adjustment introduced in bitrate or little settings adjustment and so on.. */
     pNewParam->iNumRefFrame								= WELS_CLIP3 (pNewParam->iNumRefFrame, MIN_REF_PIC_COUNT,
-                                            MAX_REFERENCE_PICTURE_COUNT_NUM);
+      (pNewParam->iUsageType==CAMERA_VIDEO_REAL_TIME?MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA:MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN));
     pNewParam->iLoopFilterDisableIdc					= WELS_CLIP3 (pNewParam->iLoopFilterDisableIdc, 0, 6);
     pNewParam->iLoopFilterAlphaC0Offset				= WELS_CLIP3 (pNewParam->iLoopFilterAlphaC0Offset, -6, 6);
     pNewParam->iLoopFilterBetaOffset					= WELS_CLIP3 (pNewParam->iLoopFilterBetaOffset, -6, 6);
@@ -3846,7 +3846,7 @@ void WelsEncoderApplyLTR (SLogContext* pLogCtx, sWelsEncCtx** ppCtx, SLTRConfig*
     }
     iNumRefFrame		= ((uiGopSize >> 1) > 1) ? ((uiGopSize >> 1) + sConfig.iLTRRefNum) : (MIN_REF_PIC_COUNT +
                       sConfig.iLTRRefNum);
-    iNumRefFrame		= WELS_CLIP3 (iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM);
+    iNumRefFrame		= WELS_CLIP3 (iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA);
 
   }
   if (sConfig.iNumRefFrame < iNumRefFrame)
