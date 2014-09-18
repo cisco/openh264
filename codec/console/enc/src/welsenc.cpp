@@ -805,10 +805,10 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
       break;
     // To encoder this frame
     iStart	= WelsTime();
+    pSrcPic->uiTimeStamp = WELS_ROUND (iFrameIdx * (1000 / sSvcParam.fMaxFrameRate));
     int iEncFrames = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
     iTotal += WelsTime() - iStart;
 
-    // fixed issue in case dismatch source picture introduced by frame skipped, 1/12/2010
     if (videoFrameTypeSkip == sFbi.eFrameType) {
       continue;
     }
