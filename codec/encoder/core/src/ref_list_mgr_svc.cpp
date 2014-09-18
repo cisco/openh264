@@ -679,25 +679,26 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
   }
 }
 
-static int32_t UpdateSrcPicList (sWelsEncCtx* pCtx) {
+static inline void UpdareOriginalPicInfo(SPicture* pOrigPic, SPicture* pReconPic) {
+  if (!pOrigPic)
+    return;
+
+  pOrigPic->iPictureType = pReconPic->iPictureType;
+  pOrigPic->iFramePoc = pReconPic->iFramePoc;
+  pOrigPic->iFrameNum = pReconPic->iFrameNum;
+  pOrigPic->uiSpatialId = pReconPic->uiSpatialId;
+  pOrigPic->uiTemporalId = pReconPic->uiTemporalId;
+  pOrigPic->iLongTermPicNum = pReconPic->iLongTermPicNum;
+  pOrigPic->bUsedAsRef = pReconPic->bUsedAsRef;
+  pOrigPic->bIsLongRef = pReconPic->bIsLongRef;
+  pOrigPic->bIsSceneLTR = pReconPic->bIsSceneLTR;
+  pOrigPic->iFrameAverageQp = pReconPic->iFrameAverageQp;
+}
+
+static void UpdateSrcListLosslessScreenRefSelectionWithLtr(sWelsEncCtx* pCtx) {
   int32_t iDIdx = pCtx->uiDependencyId;
   SPicture** pLongRefList = pCtx->ppRefPicListExt[iDIdx]->pLongRefList;
   SPicture** pLongRefSrcList = &pCtx->pVpp->m_pSpatialPic[iDIdx][0];
-
-  //update info in src list
-  if (pCtx->pEncPic) {
-    pCtx->pEncPic->iPictureType	    = pCtx->pDecPic->iPictureType;
-    pCtx->pEncPic->iFramePoc		    = pCtx->pDecPic->iFramePoc;
-    pCtx->pEncPic->iFrameNum		    = pCtx->pDecPic->iFrameNum;
-    pCtx->pEncPic->uiSpatialId		  = pCtx->pDecPic->uiSpatialId;
-    pCtx->pEncPic->uiTemporalId	    = pCtx->pDecPic->uiTemporalId;
-    pCtx->pEncPic->iLongTermPicNum  = pCtx->pDecPic->iLongTermPicNum;
-    pCtx->pEncPic->bUsedAsRef       = pCtx->pDecPic->bUsedAsRef;
-    pCtx->pEncPic->bIsLongRef       = pCtx->pDecPic->bIsLongRef;
-    pCtx->pEncPic->bIsSceneLTR      = pCtx->pDecPic->bIsSceneLTR;
-    pCtx->pEncPic->iFrameAverageQp  = pCtx->pDecPic->iFrameAverageQp;
-  }
-  PrefetchNextBuffer (pCtx);
   for (int32_t i = 0; i < MAX_REF_PIC_COUNT; ++i) {
     if (NULL == pLongRefSrcList[i + 1] || (NULL != pLongRefList[i] && pLongRefList[i]->bUsedAsRef
                                            && pLongRefList[i]->bIsLongRef)) {
@@ -708,9 +709,15 @@ static int32_t UpdateSrcPicList (sWelsEncCtx* pCtx) {
   }
   WelsExchangeSpatialPictures (&pCtx->pVpp->m_pSpatialPic[iDIdx][0],
                                &pCtx->pVpp->m_pSpatialPic[iDIdx][1 + pCtx->pVaa->uiMarkLongTermPicIdx]);
+}
+static void UpdateSrcPicList (void* pEncCtx) {
+  sWelsEncCtx* pCtx     = (sWelsEncCtx*)pEncCtx;
+  int32_t iDIdx = pCtx->uiDependencyId;
+  //update info in src list
+  UpdareOriginalPicInfo(pCtx->pEncPic, pCtx->pDecPic);
+  PrefetchNextBuffer (pCtx);
+  UpdateSrcListLosslessScreenRefSelectionWithLtr (pCtx);
   SetUnref (pCtx->pVpp->m_pSpatialPic[iDIdx][0]);
-
-  return 0;
 }
 
 bool WelsUpdateRefListScreen (void* pEncCtx) {
