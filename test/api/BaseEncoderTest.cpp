@@ -6,8 +6,8 @@
 #include "BaseEncoderTest.h"
 
 static int InitWithParam (ISVCEncoder* encoder, EUsageType usageType, int width,
-                          int height, float frameRate, SliceModeEnum sliceMode, bool denoise, int layers) {
-  if (SM_SINGLE_SLICE == sliceMode && !denoise && layers == 1) {
+                          int height, float frameRate, SliceModeEnum sliceMode, bool denoise, int layers, bool losslessLink, bool enableLtr) {
+  if (SM_SINGLE_SLICE == sliceMode && !denoise && layers == 1 && !losslessLink && !enableLtr) {
     SEncParamBase param;
     memset (&param, 0, sizeof (SEncParamBase));
 
@@ -29,6 +29,8 @@ static int InitWithParam (ISVCEncoder* encoder, EUsageType usageType, int width,
     param.iTargetBitrate = 5000000;
     param.bEnableDenoise = denoise;
     param.iSpatialLayerNum = layers;
+    param.bIsLosslessLink = losslessLink;
+    param.bEnableLongTermReference = enableLtr;
 
     if (sliceMode != SM_SINGLE_SLICE && sliceMode != SM_DYN_SLICE) //SM_DYN_SLICE don't support multi-thread now
       param.iMultipleThreadIdc = 2;
@@ -67,8 +69,8 @@ void BaseEncoderTest::TearDown() {
 }
 
 void BaseEncoderTest::EncodeStream (InputStream* in, EUsageType usageType, int width, int height,
-                                    float frameRate, SliceModeEnum slices, bool denoise, int layers, Callback* cbk) {
-  int rv = InitWithParam (encoder_, usageType, width, height, frameRate, slices, denoise, layers);
+                                    float frameRate, SliceModeEnum slices, bool denoise, int layers, bool losslessLink, bool enableLtr, Callback* cbk) {
+  int rv = InitWithParam (encoder_, usageType, width, height, frameRate, slices, denoise, layers, losslessLink, enableLtr);
   ASSERT_TRUE (rv == cmResultSuccess);
 
   // I420: 1(Y) + 1/4(U) + 1/4(V)
@@ -101,8 +103,8 @@ void BaseEncoderTest::EncodeStream (InputStream* in, EUsageType usageType, int w
 }
 
 void BaseEncoderTest::EncodeFile (const char* fileName, EUsageType usageType, int width, int height,
-                                  float frameRate, SliceModeEnum slices, bool denoise, int layers, Callback* cbk) {
+                                  float frameRate, SliceModeEnum slices, bool denoise, int layers, bool losslessLink, bool enableLtr, Callback* cbk) {
   FileInputStream fileStream;
   ASSERT_TRUE (fileStream.Open (fileName));
-  EncodeStream (&fileStream, usageType, width, height, frameRate, slices, denoise, layers, cbk);
+  EncodeStream (&fileStream, usageType, width, height, frameRate, slices, denoise, layers, losslessLink, enableLtr, cbk);
 }
