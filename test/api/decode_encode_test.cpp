@@ -99,7 +99,7 @@ TEST_P (DecodeEncodeTest, CompareOutput) {
 #else
   ASSERT_TRUE (Open (p.fileName));
 #endif
-  EncodeStream (this, CAMERA_VIDEO_REAL_TIME, p.width, p.height, p.frameRate, SM_SINGLE_SLICE, false, 1, this);
+  EncodeStream (this, CAMERA_VIDEO_REAL_TIME, p.width, p.height, p.frameRate, SM_SINGLE_SLICE, false, 1, false, false, this);
   unsigned char digest[SHA_DIGEST_LENGTH];
   SHA1Result (&ctx_, digest);
   if (!HasFatalFailure()) {
