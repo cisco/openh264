@@ -54,55 +54,55 @@ namespace WelsEnc {
 #define GOM_H_SCC               8
 
 enum {
-BITS_NORMAL,
-BITS_LIMITED,
-BITS_EXCEEDED,
+  BITS_NORMAL,
+  BITS_LIMITED,
+  BITS_EXCEEDED,
 };
 
 enum {
 //virtual gop size
-VGOP_SIZE             = 8,
+  VGOP_SIZE             = 8,
 
 //qp information
-GOM_MIN_QP_MODE       = 12,
-GOM_MAX_QP_MODE       = 36,
-MAX_LOW_BR_QP			= 42,
-MIN_IDR_QP            = 26,
-MAX_IDR_QP            = 32,
-MIN_SCREEN_QP         = 26,
-MAX_SCREEN_QP         = 32,
-DELTA_QP              = 2,
-DELTA_QP_BGD_THD      = 3,
+  GOM_MIN_QP_MODE       = 12,
+  GOM_MAX_QP_MODE       = 36,
+  MAX_LOW_BR_QP			= 42,
+  MIN_IDR_QP            = 26,
+  MAX_IDR_QP            = 32,
+  MIN_SCREEN_QP         = 26,
+  MAX_SCREEN_QP         = 32,
+  DELTA_QP              = 2,
+  DELTA_QP_BGD_THD      = 3,
 
 //frame skip constants
-SKIP_QP_90P           = 24,
-SKIP_QP_180P          = 24,
-SKIP_QP_360P          = 31,
-SKIP_QP_720P          = 31,
-LAST_FRAME_QP_RANGE_UPPER_MODE0  = 3,
-LAST_FRAME_QP_RANGE_LOWER_MODE0  = 2,
-LAST_FRAME_QP_RANGE_UPPER_MODE1  = 5,
-LAST_FRAME_QP_RANGE_LOWER_MODE1  = 3,
+  SKIP_QP_90P           = 24,
+  SKIP_QP_180P          = 24,
+  SKIP_QP_360P          = 31,
+  SKIP_QP_720P          = 31,
+  LAST_FRAME_QP_RANGE_UPPER_MODE0  = 3,
+  LAST_FRAME_QP_RANGE_LOWER_MODE0  = 2,
+  LAST_FRAME_QP_RANGE_UPPER_MODE1  = 5,
+  LAST_FRAME_QP_RANGE_LOWER_MODE1  = 3,
 
-MB_WIDTH_THRESHOLD_90P   = 15,
-MB_WIDTH_THRESHOLD_180P  = 30,
-MB_WIDTH_THRESHOLD_360P  = 60,
+  MB_WIDTH_THRESHOLD_90P   = 15,
+  MB_WIDTH_THRESHOLD_180P  = 30,
+  MB_WIDTH_THRESHOLD_360P  = 60,
 
 //Mode 0 parameter
-GOM_ROW_MODE0_90P     = 2,
-GOM_ROW_MODE0_180P    = 2,
-GOM_ROW_MODE0_360P    = 4,
-GOM_ROW_MODE0_720P    = 4,
-QP_RANGE_MODE0        = 3,
+  GOM_ROW_MODE0_90P     = 2,
+  GOM_ROW_MODE0_180P    = 2,
+  GOM_ROW_MODE0_360P    = 4,
+  GOM_ROW_MODE0_720P    = 4,
+  QP_RANGE_MODE0        = 3,
 
 //Mode 1 parameter
-GOM_ROW_MODE1_90P     = 1,
-GOM_ROW_MODE1_180P    = 1,
-GOM_ROW_MODE1_360P    = 2,
-GOM_ROW_MODE1_720P    = 2,
-QP_RANGE_UPPER_MODE1  = 9,
-QP_RANGE_LOWER_MODE1  = 4,
-QP_RANGE_INTRA_MODE1  = 3,
+  GOM_ROW_MODE1_90P     = 1,
+  GOM_ROW_MODE1_180P    = 1,
+  GOM_ROW_MODE1_360P    = 2,
+  GOM_ROW_MODE1_720P    = 2,
+  QP_RANGE_UPPER_MODE1  = 9,
+  QP_RANGE_LOWER_MODE1  = 4,
+  QP_RANGE_INTRA_MODE1  = 3,
 };
 
 //bits allocation
@@ -213,17 +213,23 @@ int32_t   iBufferFullnessPadding;
 int32_t   iPaddingSize;
 int32_t   iPaddingBitrateStat;
 bool      bSkipFlag;
- 
+
 SRCSlicing*	pSlicingOverRc;
 SRCTemporal* pTemporalOverRc;
+
+//for scc
+double     dAvgCost2Bits;
+double     dCost2BitsIntra;
+int32_t    iBaseQp;
+long long  uiLastTimeStamp;
 } SWelsSvcRc;
- 
+
 typedef  void (*PWelsRCPictureInitFunc) (void* pCtx);
-typedef  void (*PWelsRCPictureDelayJudgeFunc) (void* pCtx);
+typedef  void (*PWelsRCPictureDelayJudgeFunc) (void* pCtx, EVideoFrameType eFrameType, long long uiTimeStamp);
 typedef  void (*PWelsRCPictureInfoUpdateFunc) (void* pCtx, int32_t iLayerSize);
 typedef  void (*PWelsRCMBInfoUpdateFunc) (void* pCtx, SMB* pCurMb, int32_t iCostLuma, SSlice* pSlice);
 typedef  void (*PWelsRCMBInitFunc) (void* pCtx, SMB* pCurMb, SSlice* pSlice);
- 
+
 typedef  struct  WelsRcFunc_s {
 PWelsRCPictureInitFunc			pfWelsRcPictureInit;
 PWelsRCPictureDelayJudgeFunc      pfWelsRcPicDelayJudge;
@@ -231,10 +237,10 @@ PWelsRCPictureInfoUpdateFunc	pfWelsRcPictureInfoUpdate;
 PWelsRCMBInitFunc				pfWelsRcMbInit;
 PWelsRCMBInfoUpdateFunc			pfWelsRcMbInfoUpdate;
 } SWelsRcFunc;
- 
-void WelsRcInitModule (void* pCtx,RC_MODES iRcMode);
+
+void WelsRcInitModule (void* pCtx, RC_MODES iRcMode);
 void WelsRcFreeMemory (void* pCtx);
- 
+
 }
 #endif //RC_H
  

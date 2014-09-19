@@ -2950,7 +2950,8 @@ int32_t GetSubSequenceId (sWelsEncCtx* pCtx, EVideoFrameType eFrameType) {
 }
 
 //loop each layer to check if have skip frame when RC and frame skip enable (maxbr>0)
-bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pCtx, int32_t iSpatialNum) {
+bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pCtx, int32_t iSpatialNum, EVideoFrameType eFrameType,
+                               const uint32_t uiTimeStamp) {
   SSpatialPicIndex* pSpatialIndexMap = &pCtx->sSpatialIndexMap[0];
   bool bSkipMustFlag = false;
   if (pCtx->pSvcParam->bEnableFrameSkip) {
@@ -2960,7 +2961,7 @@ bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pCtx, int32_t iSpatialNum) {
           break;
         }
         pCtx->uiDependencyId = (uint8_t) (pSpatialIndexMap + i)->iDid;
-        pCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge (pCtx);
+        pCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge (pCtx, eFrameType, uiTimeStamp);
         if (true == pCtx->pWelsSvcRc[pCtx->uiDependencyId].bSkipFlag) {
           bSkipMustFlag = true;
           break;
@@ -3034,7 +3035,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   }
 
   //loop each layer to check if have skip frame when RC and frame skip enable
-  if (CheckFrameSkipBasedMaxbr (pCtx, iSpatialNum)) {
+  if (CheckFrameSkipBasedMaxbr (pCtx, iSpatialNum, eFrameType, (uint32_t)pSrcPic->uiTimeStamp)) {
     pFbi->eFrameType = videoFrameTypeSkip;
     return ENC_RETURN_SUCCESS;
   }
