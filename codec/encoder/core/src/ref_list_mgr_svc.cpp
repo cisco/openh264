@@ -337,7 +337,8 @@ static inline void LTRMarkProcessScreen (sWelsEncCtx* pCtx) {
   pRefList->uiLongRefCount++;
 }
 
-static inline void PrefetchNextBuffer (sWelsEncCtx* pCtx) {
+static void PrefetchNextBuffer (void* pEncCtx) {
+  sWelsEncCtx* pCtx     = (sWelsEncCtx*)pEncCtx;
   SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   const int32_t kiNumRef	= pCtx->pSvcParam->iNumRefFrame;
   int32_t i;
@@ -438,7 +439,7 @@ bool WelsUpdateRefList (void* pEncCtx) {
       pCtx->pVaa->uiMarkLongTermPicIdx = 0;
     }
   }
-  PrefetchNextBuffer (pCtx);
+  pCtx->pFuncList->pEndofUpdateRefList (pCtx);
   return true;
 }
 
@@ -679,7 +680,8 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
   }
 }
 
-static int32_t UpdateSrcPicList (sWelsEncCtx* pCtx) {
+static void UpdateSrcPicList (void* pEncCtx) {
+  sWelsEncCtx* pCtx     = (sWelsEncCtx*)pEncCtx;
   int32_t iDIdx = pCtx->uiDependencyId;
   SPicture** pLongRefList = pCtx->ppRefPicListExt[iDIdx]->pLongRefList;
   SPicture** pLongRefSrcList = &pCtx->pVpp->m_pSpatialPic[iDIdx][0];
@@ -709,8 +711,6 @@ static int32_t UpdateSrcPicList (sWelsEncCtx* pCtx) {
   WelsExchangeSpatialPictures (&pCtx->pVpp->m_pSpatialPic[iDIdx][0],
                                &pCtx->pVpp->m_pSpatialPic[iDIdx][1 + pCtx->pVaa->uiMarkLongTermPicIdx]);
   SetUnref (pCtx->pVpp->m_pSpatialPic[iDIdx][0]);
-
-  return 0;
 }
 
 bool WelsUpdateRefListScreen (void* pEncCtx) {
@@ -759,7 +759,7 @@ bool WelsUpdateRefListScreen (void* pEncCtx) {
     pCtx->pVaa->uiValidLongTermPicIdx = 0;
   }
 
-  UpdateSrcPicList (pCtx);
+  pCtx->pFuncList->pEndofUpdateRefList (pCtx);
   return true;
 }
 bool WelsBuildRefListScreen (void* pEncCtx, const int32_t iPOC, int32_t iBestLtrRefIdx) {
@@ -905,15 +905,17 @@ void WelsMarkPicScreen (void* pEncCtx) {
   }
   return;
 }
-void InitRefListMgrFunc (SWelsFuncPtrList* pFuncList, EUsageType eUsageType) {
-  if (eUsageType == SCREEN_CONTENT_REAL_TIME) {
+void InitRefListMgrFunc (SWelsFuncPtrList* pFuncList, const bool bScreenContent) {
+  if (bScreenContent) {
     pFuncList->pBuildRefList =   WelsBuildRefListScreen;
     pFuncList->pMarkPic      =   WelsMarkPicScreen;
     pFuncList->pUpdateRefList =   WelsUpdateRefListScreen;
+    pFuncList->pEndofUpdateRefList =   UpdateSrcPicList;
   } else {
     pFuncList->pBuildRefList =   WelsBuildRefList;
     pFuncList->pMarkPic      =   WelsMarkPic;
     pFuncList->pUpdateRefList =   WelsUpdateRefList;
+    pFuncList->pEndofUpdateRefList =   PrefetchNextBuffer;
   }
 }
 } // namespace WelsEnc
