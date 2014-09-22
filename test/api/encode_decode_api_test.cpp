@@ -81,6 +81,14 @@ class EncodeDecodeTestBase : public ::testing::TestWithParam<EncodeDecodeFilePar
     }
   }
 
+  virtual void encToDecSliceData (const int iLayerNum, const int iSliceNum, const SFrameBSInfo& info, int& len) {
+    ASSERT_TRUE (iLayerNum < MAX_LAYER_NUM_OF_FRAME);
+    len = 0;
+    const SLayerBSInfo& layerInfo = info.sLayerInfo[iLayerNum];
+    if (iSliceNum < layerInfo.iNalCount)
+      len = layerInfo.pNalLengthInByte[iSliceNum];
+  }
+
  protected:
   SEncParamExt param_;
   BufferedData buf_;
@@ -1208,3 +1216,622 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace_NULL) {
 
 INSTANTIATE_TEST_CASE_P (EncodeDecodeTestBase, EncodeDecodeTestAPI,
                          ::testing::ValuesIn (kFileParamArray));
+
+TEST_P (EncodeDecodeTestAPI, SetOptionECIDC_GeneralSliceChange) {
+  uint32_t uiEcIdc;
+  uint32_t uiGet;
+  EncodeDecodeFileParamBase p = GetParam();
+  prepareParam (p.width, p.height, p.frameRate);
+  param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  param_.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = p.slicenum;
+  encoder_->Uninitialize();
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == cmResultSuccess);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_SLICE_COPY); //default value should be ERROR_CON_SLICE_COPY
+
+  uiEcIdc = 0;
+  decoder_->SetOption (DECODER_OPTION_ERROR_CON_IDC, &uiEcIdc);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, uiEcIdc);
+
+  //Start for enc/dec
+  int frameSize = p.width * p.height * 3 / 2;
+  buf_.SetLength (frameSize);
+  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
+  SFrameBSInfo info;
+  memset (&info, 0, sizeof (SFrameBSInfo));
+
+  SSourcePicture pic;
+  memset (&pic, 0, sizeof (SSourcePicture));
+  pic.iPicWidth = p.width;
+  pic.iPicHeight = p.height;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = pic.iPicWidth;
+  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
+  pic.pData[0] = buf_.data();
+  pic.pData[1] = pic.pData[0] + p.width * p.height;
+  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  int32_t iTraceLevel = WELS_LOG_QUIET;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  int iIdx = 0;
+  bool bVCLLoss = false;
+  int iPacketNum;
+  int len;
+  int iTotalSliceSize;
+
+  //enc/dec pictures
+  while (iIdx <= p.numframes) {
+    memset (buf_.data(), rand() % 256, frameSize);
+    rv = encoder_->EncodeFrame (&pic, &info);
+    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+    //decoding after each encoding frame
+    len = 0;
+    iPacketNum = 0;
+    iTotalSliceSize = 0;
+    unsigned char* pData[3] = { NULL };
+    memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+    while (iPacketNum < info.sLayerInfo[0].iNalCount) {
+      encToDecSliceData (0, iPacketNum, info, len);
+      uiEcIdc = (ERROR_CON_IDC) (rand() % 2);
+      decoder_->SetOption (DECODER_OPTION_ERROR_CON_IDC, &uiEcIdc);
+      decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+      EXPECT_EQ (uiGet, uiEcIdc);
+
+      bVCLLoss = rand() & 1; //loss or not
+      if (!bVCLLoss) { //not loss
+        rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf + iTotalSliceSize,
+                                     info.sLayerInfo[0].pNalLengthInByte[iPacketNum], pData, &dstBufInfo_);
+        if (uiEcIdc == ERROR_CON_DISABLE)
+         EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+      }
+      //EC_IDC should not change till now
+      decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+      EXPECT_EQ (uiGet, uiEcIdc);
+      //Set again inside
+      uiEcIdc = (ERROR_CON_IDC) (rand() % 2);
+      decoder_->SetOption (DECODER_OPTION_ERROR_CON_IDC, &uiEcIdc);
+      decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+      EXPECT_EQ (uiGet, uiEcIdc);
+
+      rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+      //EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+      if (uiEcIdc == ERROR_CON_DISABLE && rv != 0)
+        EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+
+      //deal with next slice
+      iTotalSliceSize += len;
+      iPacketNum++;
+    } //while slice
+    iIdx++;
+  } //while frame
+}
+
+//This case contain 1 slice per picture
+//coding order:                 0   1   2   3   4   5   6   7
+//frame type:                   IDR P   P   P   P   P   P   P
+//EC_IDC:                       0   0   0   2   0   0   1   1
+//loss:                         N   Y   N   N   N   Y   Y   N
+
+TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
+  uint32_t uiEcIdc;
+  uint32_t uiGet;
+  EncodeDecodeFileParamBase p = kFileParamArray[0];
+  prepareParam (p.width, p.height, p.frameRate);
+  param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
+  param_.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = p.slicenum;
+  encoder_->Uninitialize();
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == cmResultSuccess);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (ERROR_CON_IDC) ERROR_CON_SLICE_COPY); //default value should be ERROR_CON_SLICE_COPY
+  int32_t iTraceLevel = WELS_LOG_QUIET;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+
+  //set EC=DISABLE
+  uiEcIdc = (uint32_t) (ERROR_CON_DISABLE);
+  decoder_->SetOption (DECODER_OPTION_ERROR_CON_IDC, &uiEcIdc);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, uiEcIdc);
+
+  //Start for enc/dec
+  int frameSize = p.width * p.height * 3 / 2;
+  buf_.SetLength (frameSize);
+  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
+  SFrameBSInfo info;
+  memset (&info, 0, sizeof (SFrameBSInfo));
+
+  SSourcePicture pic;
+  memset (&pic, 0, sizeof (SSourcePicture));
+  pic.iPicWidth = p.width;
+  pic.iPicHeight = p.height;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = pic.iPicWidth;
+  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
+  pic.pData[0] = buf_.data();
+  pic.pData[1] = pic.pData[0] + p.width * p.height;
+  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  int iIdx = 0;
+  int len = 0;
+  unsigned char* pData[3] = { NULL };
+
+  //Frame 0: IDR, EC_IDC=DISABLE, loss = 0
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  encToDecData (info, len);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (ERROR_CON_IDC) ERROR_CON_DISABLE);
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+  EXPECT_EQ (rv, 0);
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+  EXPECT_EQ (rv, 0);
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 1);
+  iIdx++;
+
+  //Frame 1: P, EC_IDC=DISABLE, loss = 1
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  iIdx++;
+
+  //Frame 2: P, EC_IDC=DISABLE, loss = 0
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  encToDecData (info, len);
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_DISABLE);
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+  EXPECT_EQ (rv, 0); //parse correct
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //no output
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+  EXPECT_TRUE (rv != 0); //construction error due to data loss
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //no output due to EC DISABLE
+  iIdx++;
+
+  //set EC=SLICE_COPY
+  uiEcIdc = (uint32_t) (ERROR_CON_SLICE_COPY);
+  decoder_->SetOption (DECODER_OPTION_ERROR_CON_IDC, &uiEcIdc);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, uiEcIdc);
+  //Frame 3: P, EC_IDC=SLICE_COPY, loss = 0
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  encToDecData (info, len);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_SLICE_COPY);
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+  EXPECT_EQ (rv, 0); //parse correct
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //no output
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+  EXPECT_TRUE (rv != 0); //construction error due to data loss
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 1);
+  iIdx++;
+
+  //set EC=DISABLE
+  uiEcIdc = (uint32_t) (ERROR_CON_DISABLE);
+  decoder_->SetOption (DECODER_OPTION_ERROR_CON_IDC, &uiEcIdc);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, uiEcIdc);
+  //Frame 4: P, EC_IDC=DISABLE, loss = 0
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  encToDecData (info, len);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_DISABLE);
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+  EXPECT_EQ (rv, 0); //parse correct
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //no output
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+  if (rv == 0) //TODO: should depend on if ref-frame is OK.
+    EXPECT_EQ (dstBufInfo_.iBufferStatus, 1);
+  else
+    EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+  iIdx++;
+
+  //Frame 5: P, EC_IDC=DISABLE, loss = 1
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  iIdx++;
+
+  //set EC=FRAME_COPY
+  uiEcIdc = (uint32_t) (ERROR_CON_FRAME_COPY);
+  decoder_->SetOption (DECODER_OPTION_ERROR_CON_IDC, &uiEcIdc);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, uiEcIdc);
+  //Frame 6: P, EC_IDC=FRAME_COPY, loss = 1
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EXPECT_EQ (uiGet, uiEcIdc);
+  iIdx++;
+
+  //Frame 7: P, EC_IDC=FRAME_COPY, loss = 0
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  encToDecData (info, len);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_FRAME_COPY);
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+  EXPECT_TRUE (rv != 0); //parse correct, but previous decoding error, ECed
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //no output
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+  EXPECT_TRUE (rv != 0); //not sure if previous data drop would be detected in construction
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 1);
+  iIdx++;
+
+}
+
+//This case contain 2 slices per picture for IDR loss
+//coding order:                 0   1   2   3   4
+//frame type                    IDR P   P   P   P
+//EC_IDC                        2   2   0   1   0
+//loss (2 slice: 1,2):          2   0   0   1   0
+
+TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
+  uint32_t uiEcIdc;
+  uint32_t uiGet;
+  EncodeDecodeFileParamBase p = kFileParamArray[0];
+  prepareParam (p.width, p.height, p.frameRate);
+  param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  param_.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = 2;
+  encoder_->Uninitialize();
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == cmResultSuccess);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_SLICE_COPY); //default value should be ERROR_CON_SLICE_COPY
+  int32_t iTraceLevel = WELS_LOG_QUIET;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+
+  //Start for enc/dec
+  int frameSize = p.width * p.height * 3 / 2;
+  buf_.SetLength (frameSize);
+  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
+  SFrameBSInfo info;
+  memset (&info, 0, sizeof (SFrameBSInfo));
+
+  SSourcePicture pic;
+  memset (&pic, 0, sizeof (SSourcePicture));
+  pic.iPicWidth = p.width;
+  pic.iPicHeight = p.height;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = pic.iPicWidth;
+  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
+  pic.pData[0] = buf_.data();
+  pic.pData[1] = pic.pData[0] + p.width * p.height;
+  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  int iIdx = 0;
+  int len = 0;
+  unsigned char* pData[3] = { NULL };
+  int iTotalSliceSize = 0;
+
+  //Frame 0: IDR, EC_IDC=2, loss = 2
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  iTotalSliceSize = 0;
+  encToDecSliceData (0, 0, info, len); //SPS
+  iTotalSliceSize = len;
+  encToDecSliceData (0, 1, info, len); //PPS
+  iTotalSliceSize += len;
+  encToDecSliceData (1, 0, info, len); //first slice
+  iTotalSliceSize += len;
+  //second slice loss
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_SLICE_COPY);
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, iTotalSliceSize, pData, &dstBufInfo_);
+  EXPECT_EQ (rv, 0); //parse correct
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+  EXPECT_EQ (rv, 0); //parse correct
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //slice incomplete, no output
+  iIdx++;
+
+  //Frame 1: P, EC_IDC=2, loss = 0
+  //will clean SPS/PPS status
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  encToDecData (info, len); //all slice together
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_SLICE_COPY);
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+  EXPECT_TRUE (rv & 32); //parse correct, but reconstruct ECed
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //ECed output for frame 0
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //ECed status, reconstruction current frame 1
+  EXPECT_TRUE (rv & 32); //decoder ECed status
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //ECed output for frame 1
+  iIdx++;
+
+  //set EC=DISABLE
+  uiEcIdc = (uint32_t) (ERROR_CON_DISABLE);
+  decoder_->SetOption (DECODER_OPTION_ERROR_CON_IDC, &uiEcIdc);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, uiEcIdc);
+  //Frame 2: P, EC_IDC=0, loss = 0
+  /////will clean SPS/PPS status
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  encToDecData (info, len); //all slice together
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_DISABLE);
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+  EXPECT_EQ (rv, 0); //parse correct
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+  if (rv == 0) //TODO: should depend on if ref-frame is OK.
+    EXPECT_EQ (dstBufInfo_.iBufferStatus, 1);
+  else
+    EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+  iIdx++;
+
+  //set EC=SLICE_COPY
+  uiEcIdc = (uint32_t) (ERROR_CON_FRAME_COPY);
+  decoder_->SetOption (DECODER_OPTION_ERROR_CON_IDC, &uiEcIdc);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, uiEcIdc);
+  //Frame 3: P, EC_IDC=2, loss = 1
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  encToDecSliceData (0, 0, info, iTotalSliceSize); //slice 1 lost
+  encToDecSliceData (0, 1, info, len); //slice 2
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_FRAME_COPY);
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf + iTotalSliceSize, len, pData, &dstBufInfo_);
+  EXPECT_TRUE (rv & 32);
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+  EXPECT_TRUE (rv & 32);
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //slice loss
+  iIdx++;
+
+  //set EC=DISABLE
+  uiEcIdc = (uint32_t) (ERROR_CON_DISABLE);
+  decoder_->SetOption (DECODER_OPTION_ERROR_CON_IDC, &uiEcIdc);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, uiEcIdc);
+  //Frame 4: P, EC_IDC=0, loss = 0
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  encToDecData (info, len); //all slice
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_DISABLE);
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+  EXPECT_TRUE (rv != 0);
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //output previous pic
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+  EXPECT_TRUE (rv != 0);
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //output previous pic
+  iIdx++;
+
+}
+
+
+
+//This case contain 2 slices per picture for no IDR loss
+//coding order:                 0   1   2   3   4   5
+//frame type                    IDR P   P   P   P   IDR
+//EC_IDC                        0   2   0   2   0   ^2^
+//loss (2 slice: 1,2):          0   0   1   2   0   0
+
+TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
+  uint32_t uiEcIdc;
+  uint32_t uiGet;
+  EncodeDecodeFileParamBase p = kFileParamArray[0];
+  prepareParam (p.width, p.height, p.frameRate);
+  param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  param_.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = 2;
+  encoder_->Uninitialize();
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == cmResultSuccess);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_SLICE_COPY); //default value should be ERROR_CON_SLICE_COPY
+  int32_t iTraceLevel = WELS_LOG_QUIET;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+
+  //Start for enc/dec
+  int frameSize = p.width * p.height * 3 / 2;
+  buf_.SetLength (frameSize);
+  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
+  SFrameBSInfo info;
+  memset (&info, 0, sizeof (SFrameBSInfo));
+
+  SSourcePicture pic;
+  memset (&pic, 0, sizeof (SSourcePicture));
+  pic.iPicWidth = p.width;
+  pic.iPicHeight = p.height;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = pic.iPicWidth;
+  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
+  pic.pData[0] = buf_.data();
+  pic.pData[1] = pic.pData[0] + p.width * p.height;
+  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  int iIdx = 0;
+  int len = 0;
+  unsigned char* pData[3] = { NULL };
+  int iTotalSliceSize = 0;
+
+  //set EC=DISABLE
+  uiEcIdc = (uint32_t) (ERROR_CON_DISABLE);
+  decoder_->SetOption (DECODER_OPTION_ERROR_CON_IDC, &uiEcIdc);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, uiEcIdc);
+  //Frame 0: IDR, EC_IDC=0, loss = 0
+  //Expected result: all OK, 2nd Output
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  encToDecData (info, len); //all slice
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_DISABLE);
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+  EXPECT_EQ (rv, 0); //parse correct
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+  EXPECT_EQ (rv, 0); //parse correct
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //output frame 0
+  iIdx++;
+
+  //Frame 1: P, EC_IDC=0, loss = 0
+  //Expected result: all OK, 2nd Output
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  encToDecData (info, len); //all slice together
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_DISABLE);
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+  EXPECT_EQ (rv, 0); //parse correct
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //ECed output for frame 0
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction current frame 1
+  EXPECT_EQ (rv, 0); //parse correct
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //ECed output for frame 1
+  iIdx++;
+
+  //Frame 2: P, EC_IDC=0, loss = 1
+  //Expected result: all OK, no Output
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  encToDecSliceData (0, 0, info, iTotalSliceSize); // slice 1 lost
+  encToDecSliceData (0, 1, info, len); // slice 2 only
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_DISABLE);
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf + iTotalSliceSize, len, pData, &dstBufInfo_);
+  EXPECT_EQ (rv, 0); //parse correct
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+  EXPECT_EQ (rv, 0); //parse correct
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+  iIdx++;
+
+  //set EC=SLICE_COPY
+  uiEcIdc = (uint32_t) (ERROR_CON_SLICE_COPY);
+  decoder_->SetOption (DECODER_OPTION_ERROR_CON_IDC, &uiEcIdc);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, uiEcIdc);
+  //Frame 3: P, EC_IDC=2, loss = 2
+  //Expected result: neither OK, 1st Output
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  encToDecSliceData (0, 0, info, len); //slice 1 only
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_SLICE_COPY);
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+  EXPECT_TRUE (rv & 32); //ECed
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //slice loss but ECed output Frame 2
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+  EXPECT_TRUE (rv & 32);
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //slice loss
+  iIdx++;
+
+  //set EC=DISABLE
+  uiEcIdc = (uint32_t) (ERROR_CON_DISABLE);
+  decoder_->SetOption (DECODER_OPTION_ERROR_CON_IDC, &uiEcIdc);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, uiEcIdc);
+  //Frame 4: P, EC_IDC=0, loss = 0
+  //Expected result: depends on DecodeFrame2 result. If OK, output; else ,no output
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  encToDecData (info, len); //all slice
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_DISABLE);
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+  EXPECT_TRUE (rv != 0); //previous slice not outputted, will return error due to incomplete frame
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //output previous pic
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction,
+  //not sure if current frame can be correctly decoded
+  if (rv == 0)
+    EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //output previous pic
+  else
+    EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //output previous pic
+  iIdx++;
+
+  //Frame 5: IDR, EC_IDC=2->0, loss = 0
+  //Expected result: depends on DecodeFrame2 result. If OK, output; else ,no output
+  int32_t iIDRPeriod = 1;
+  encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
+  memset (buf_.data(), rand() % 256, frameSize);
+  rv = encoder_->EncodeFrame (&pic, &info);
+  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EXPECT_TRUE (info.eFrameType == videoFrameTypeIDR);
+  encToDecSliceData (0, 0, info, len); //SPS
+  iTotalSliceSize = len;
+  encToDecSliceData (0, 1, info, len); //PPS
+  iTotalSliceSize += len;
+  encToDecSliceData (1, 0, info, len); //slice 1
+  iTotalSliceSize += len;
+  //set EC=SLICE_COPY for slice 1
+  uiEcIdc = (uint32_t) (ERROR_CON_SLICE_COPY);
+  decoder_->SetOption (DECODER_OPTION_ERROR_CON_IDC, &uiEcIdc);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, uiEcIdc);
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, iTotalSliceSize, pData, &dstBufInfo_);
+  EXPECT_TRUE (rv != 0); //TODO: should be correct, now ECed status will return error
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //frame incomplete
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction,
+  EXPECT_TRUE (rv != 0); //TODO: as above
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //output previous pic
+  //set EC=DISABLE for slice 2
+  encToDecSliceData (1, 1, info, len); //slice 1
+  uiEcIdc = (int) (ERROR_CON_DISABLE);
+  decoder_->SetOption (DECODER_OPTION_ERROR_CON_IDC, &uiEcIdc);
+  decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+  EXPECT_EQ (uiGet, uiEcIdc);
+  pData[0] = pData[1] = pData[2] = 0;
+  memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+  rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf + iTotalSliceSize, len, pData, &dstBufInfo_);
+  EXPECT_EQ (rv, 0); //Parse correct under no EC
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //frame incomplete
+  rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction,
+  EXPECT_EQ (rv, 0); //Parse correct under no EC
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //output previous pic
+  iIdx++;
+
+}
+

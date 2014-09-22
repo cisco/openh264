@@ -1657,7 +1657,6 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "sync picture resolution ext failed,  the error is %d", iErr);
       return iErr;
     }
-    InitErrorCon (pCtx); //Do EC initialization here, for sequence start
   }
 
 
@@ -1969,6 +1968,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         if (NeedErrorCon (pCtx)) {
           ImplementErrorCon (pCtx);
           pCtx->iTotalNumMbRec = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
+          pCtx->pDec->iSpsId = pCtx->pSps->iSpsId;
+          pCtx->pDec->iPpsId = pCtx->pPps->iPpsId;
         }
       }
 
@@ -2012,6 +2013,9 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
       if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
         ImplementErrorCon (pCtx);
         pCtx->iTotalNumMbRec = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
+        pCtx->pDec->iSpsId = pCtx->pSps->iSpsId;
+        pCtx->pDec->iPpsId = pCtx->pPps->iPpsId;
+
         DecodeFrameConstruction (pCtx, ppDst, pDstInfo);
         if (pCtx->sLastNalHdrExt.sNalUnitHeader.uiNalRefIdc > 0) {
           pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //save ECed pic for future use

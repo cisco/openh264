@@ -277,6 +277,7 @@ void WelsOpenDecoder (PWelsDecoderContext pCtx) {
   // function pointers
   //initial MC function pointer--
   InitMcFunc (& (pCtx->sMcFunc), pCtx->uiCpuFlag);
+  InitErrorCon (pCtx);
 
   InitExpandPictureFunc (& (pCtx->sExpandPicFunc), pCtx->uiCpuFlag);
   AssignFuncPointerForRec (pCtx);
