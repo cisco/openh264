@@ -101,7 +101,7 @@ virtual long EXTAPI GetOption (DECODER_OPTION eOptID, void* pOption);
 PWelsDecoderContext 				m_pDecContext;
 welsCodecTrace*			m_pWelsTrace;
 
-void InitDecoder (void);
+int32_t InitDecoder (void);
 void UninitDecoder (void);
 
 #ifdef OUTPUT_BIT_STREAM
