@@ -885,13 +885,14 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_NOPREFIX) {
     decoder_->GetOption (DECODER_OPTION_TEMPORAL_ID, &iTid);
     std::vector<SLostSim>::iterator iter = m_SLostSim.begin();
     bool bHasVCL = false;
-    for (int k = 0; k < m_SLostSim.size(); k++) {
+    for (unsigned int k = 0; k < m_SLostSim.size(); k++) {
       if (IS_VCL_NAL (iter->eNalType, 0) && iter->isLost == false) {
         bHasVCL = true;
         break;
       }
       iter++;
     }
+    (void) bHasVCL;
     if (iTid != -1) {
       ASSERT_EQ (iTid, 0);
     }
