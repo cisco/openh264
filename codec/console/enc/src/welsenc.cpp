@@ -294,6 +294,8 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
         pSvcParam.iLTRRefNum = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("LtrMarkPeriod") == 0) {
         pSvcParam.iLtrMarkPeriod	= (uint32_t)atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("LosslessLink") == 0) {
+        pSvcParam.bIsLosslessLink	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("NumLayers") == 0) {
         pSvcParam.iSpatialLayerNum	= (int8_t)atoi (strTag[1].c_str());
         if (pSvcParam.iSpatialLayerNum > MAX_DEPENDENCY_LAYER || pSvcParam.iSpatialLayerNum <= 0) {
