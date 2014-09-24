@@ -49,13 +49,9 @@
 
 namespace WelsEnc {
 
-#define COST2BITS_INIT          0.33
-#define COMPRESS_RATIO_I_P      3
-#define COST2BITS_INIT_P        (COST2BITS_INIT/COMPRESS_RATIO_I_P)
 
-
-#define VIRTUAL_BUFFER_LOW_TH   0.1
-#define VIRTUAL_BUFFER_HIGH_TH  2.5
+#define VIRTUAL_BUFFER_LOW_TH   1.2
+#define VIRTUAL_BUFFER_HIGH_TH  1.8
 
 //#define _TEST_TEMP_RC_
 #ifdef _TEST_TEMP_RC_
@@ -520,7 +516,7 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
     iLumaQp =  WELS_DIV_ROUND (iLumaQp * INT_MULTIPLY - pEncCtx->pVaa->sAdaptiveQuantParam.iAverMotionTextureIndexToDeltaQp,
                                INT_MULTIPLY);
 
-  if (!((pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE) && (pEncCtx->pSvcParam->bEnableFrameSkip == false)))
+    if (! ((pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE) && (pEncCtx->pSvcParam->bEnableFrameSkip == false)))
       iLumaQp = WELS_CLIP3 (iLumaQp, pWelsSvcRc->iMinQp, pWelsSvcRc->iMaxQp);
 
   }
@@ -562,7 +558,8 @@ void RcDecideTargetBits (sWelsEncCtx* pEncCtx) {
                                            pWelsSvcRc->iRemainingWeights);
     else //this case should be not hit. needs to more test case to verify this
       pWelsSvcRc->iTargetBits = pWelsSvcRc->iRemainingBits;
-    if ((pWelsSvcRc->iTargetBits <= 0) && ((pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE) && (pEncCtx->pSvcParam->bEnableFrameSkip == false))) {
+    if ((pWelsSvcRc->iTargetBits <= 0) && ((pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE)
+                                           && (pEncCtx->pSvcParam->bEnableFrameSkip == false))) {
       pWelsSvcRc->iCurrentBitsLevel = BITS_EXCEEDED;
     }
     pWelsSvcRc->iTargetBits = WELS_CLIP3 (pWelsSvcRc->iTargetBits, pTOverRc->iMinBitsTl,	pTOverRc->iMaxBitsTl);
@@ -689,7 +686,7 @@ void RcCalculateGomQp (sWelsEncCtx* pEncCtx, SMB* pCurMb, int32_t iSliceId) {
 
   pSOverRc->iCalculatedQpSlice = WELS_CLIP3 (pSOverRc->iCalculatedQpSlice,
                                  pEncCtx->iGlobalQp - pWelsSvcRc->iQpRangeLowerInFrame, pEncCtx->iGlobalQp + pWelsSvcRc->iQpRangeUpperInFrame);
-  if (!((pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE) && (pEncCtx->pSvcParam->bEnableFrameSkip == false)))
+  if (! ((pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE) && (pEncCtx->pSvcParam->bEnableFrameSkip == false)))
     pSOverRc->iCalculatedQpSlice = WELS_CLIP3 (pSOverRc->iCalculatedQpSlice, pWelsSvcRc->iMinQp, pWelsSvcRc->iMaxQp);
 
   pSOverRc->iGomBitsSlice = 0;
@@ -1028,11 +1025,8 @@ void InitRcModuleScc (void* pCtx) {
   pWelsSvcRc->iBufferFullnessSkip = 0;
   pWelsSvcRc->uiLastTimeStamp = 0;
 
-  SSpatialLayerConfig* pDLayerConfig   = &pEncCtx->pSvcParam->sSpatialLayers[0];
-  double dResoRatio = (pDLayerConfig->iVideoWidth * pDLayerConfig->iVideoHeight / 1024.0) / 768.0 * 0.8;
-
-  pWelsSvcRc->dCost2BitsIntra = COST2BITS_INIT * dResoRatio;
-  pWelsSvcRc->dAvgCost2Bits = COST2BITS_INIT_P * dResoRatio;
+  pWelsSvcRc->dCost2BitsIntra = 1;
+  pWelsSvcRc->dAvgCost2Bits = 1;
 }
 void WelRcPictureInitScc (void* pCtx) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
@@ -1049,13 +1043,13 @@ void WelRcPictureInitScc (void* pCtx) {
     int32_t iTargetBits = iBitRate * 2 - pWelsSvcRc->iBufferFullnessSkip;
     iTargetBits = WELS_MAX (1, iTargetBits);
     double Qstep = iFrameCplx * pWelsSvcRc->dCost2BitsIntra / iTargetBits;
-    int32_t iQp = RcConvertQStep2Qp ((int32_t)Qstep);
+    int32_t iQp = RcConvertQStep2Qp ((int32_t) (Qstep * INT_MULTIPLY));
 
     pEncCtx->iGlobalQp = WELS_CLIP3 (iQp, MIN_IDR_QP, MAX_IDR_QP);
   } else {
     int32_t iTargetBits = (int32_t) ((float)iBitRate / pDLayerConfig->fFrameRate); //iBitRate / 10;
     double Qstep = iFrameCplx * pWelsSvcRc->dAvgCost2Bits / iTargetBits;
-    int32_t iQp = RcConvertQStep2Qp ((int32_t)Qstep);
+    int32_t iQp = RcConvertQStep2Qp ((int32_t) (Qstep * INT_MULTIPLY));
     iDeltaQp = iQp - iBaseQp;
     if (pWelsSvcRc->iBufferFullnessSkip > iBitRate) {
       if (iDeltaQp > 0) {
@@ -1108,7 +1102,7 @@ void WelsRcFrameDelayJudgeScc (void* pCtx, EVideoFrameType eFrameType, long long
   iSentBits = WELS_MAX (iSentBits, 0);
 
   const double dVbufferThRatio = (eFrameType == videoFrameTypeI
-                                  || eFrameType == videoFrameTypeIDR) ? VIRTUAL_BUFFER_LOW_TH : VIRTUAL_BUFFER_HIGH_TH;
+                                  || eFrameType == videoFrameTypeIDR) ? VIRTUAL_BUFFER_HIGH_TH : VIRTUAL_BUFFER_LOW_TH;
   const int32_t iVbufferTh = (int32_t) (iBitRate * dVbufferThRatio + 0.5);
 
   pWelsSvcRc->iBufferFullnessSkip -= iSentBits;
@@ -1117,6 +1111,10 @@ void WelsRcFrameDelayJudgeScc (void* pCtx, EVideoFrameType eFrameType, long long
   pWelsSvcRc->bSkipFlag = true;
   if (pWelsSvcRc->iBufferFullnessSkip < iVbufferTh) {
     pWelsSvcRc->bSkipFlag = false;
+  }
+  if (pWelsSvcRc->bSkipFlag) {
+    pWelsSvcRc->iSkipFrameNum++;
+    WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO, "SCC iSkipFrameNum = %d,buffer = %d,threadhold = %d,bitrate = %d,timestamp=%d\n", pWelsSvcRc->iSkipFrameNum,pWelsSvcRc->iBufferFullnessSkip,iVbufferTh,pWelsSvcRc->iSkipFrameNum,iBitRate,uiTimeStamp);
   }
   pWelsSvcRc->uiLastTimeStamp = uiTimeStamp;
 }
@@ -1141,7 +1139,8 @@ void WelsRcPictureInfoUpdateScc (void* pCtx, int32_t iNalSize) {
   SVAAFrameInfoExt* pVaa = static_cast<SVAAFrameInfoExt*> (pEncCtx->pVaa);
 
   double Qstep = RcConvertQp2QStep (pEncCtx->iGlobalQp);
-  double dCost2Bits = (iFrameBits * Qstep) / (double) (pVaa->sComplexityScreenParam.iFrameComplexity + 1.0);
+  double dCost2Bits = (iFrameBits * Qstep) / (double) (pVaa->sComplexityScreenParam.iFrameComplexity + 1.0) /
+                      INT_MULTIPLY;
 
   if (pEncCtx->eSliceType == P_SLICE) {
     pWelsSvcRc->dAvgCost2Bits = 0.95 * pWelsSvcRc->dAvgCost2Bits + 0.05 * dCost2Bits;
@@ -1185,7 +1184,7 @@ void  WelsRcInitModule (void* pCtx, RC_MODES iRcMode) {
       pRcf->pfWelsRcPictureInfoUpdate = WelsRcPictureInfoUpdateScc;
       pRcf->pfWelsRcMbInit = WelsRcMbInitScc;
       pRcf->pfWelsRcMbInfoUpdate = WelsRcMbInfoUpdateDisable;
-      InitRcModuleScc(pEncCtx);
+      InitRcModuleScc (pEncCtx);
 
     } else {
       pRcf->pfWelsRcPictureInit = WelsRcPictureInitGom;
