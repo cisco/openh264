@@ -282,6 +282,19 @@ CComplexityAnalysisScreen::CComplexityAnalysisScreen (int32_t iCpuFlag) {
     m_pSadFunc = WelsSampleSad16x16_sse2;
   }
 #endif
+
+#if defined (HAVE_NEON)
+  if (iCpuFlag & WELS_CPU_NEON) {
+    m_pSadFunc = WelsSampleSad16x16_neon;
+  }
+#endif
+
+#if defined (HAVE_NEON_AARCH64)
+  if (iCpuFlag & WELS_CPU_NEON) {
+    m_pSadFunc = WelsSampleSad16x16_AArch64_neon;
+  }
+#endif
+
 }
 
 CComplexityAnalysisScreen::~CComplexityAnalysisScreen() {
