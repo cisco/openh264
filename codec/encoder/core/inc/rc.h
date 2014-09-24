@@ -70,7 +70,7 @@ enum {
   MIN_IDR_QP            = 26,
   MAX_IDR_QP            = 32,
   MIN_SCREEN_QP         = 26,
-  MAX_SCREEN_QP         = 32,
+  MAX_SCREEN_QP         = 35,
   DELTA_QP              = 2,
   DELTA_QP_BGD_THD      = 3,
 
