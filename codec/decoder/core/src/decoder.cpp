@@ -273,9 +273,10 @@ void WelsFreeMem (PWelsDecoderContext pCtx) {
 /*!
  * \brief	Open decoder
  */
-void WelsOpenDecoder (PWelsDecoderContext pCtx) {
+int32_t WelsOpenDecoder (PWelsDecoderContext pCtx) {
   // function pointers
   //initial MC function pointer--
+  int iRet = ERR_NONE;
   InitMcFunc (& (pCtx->sMcFunc), pCtx->uiCpuFlag);
   InitErrorCon (pCtx);
 
@@ -286,8 +287,9 @@ void WelsOpenDecoder (PWelsDecoderContext pCtx) {
   InitVlcTable (&pCtx->sVlcTable);
 
   // startup memory
-  if (ERR_NONE != WelsInitMemory (pCtx))
-    return;
+  iRet = WelsInitMemory (pCtx);
+  if (ERR_NONE != iRet)
+    return iRet;
 
 #ifdef LONG_TERM_REF
   pCtx->bParamSetsLostFlag = true;
@@ -298,6 +300,7 @@ void WelsOpenDecoder (PWelsDecoderContext pCtx) {
   pCtx->bDecErrorConedFlag = false; //default: decoder normal status
   pCtx->bPrintFrameErrorTraceFlag = true;
   pCtx->iIgnoredErrorInfoPacketCount = 0;
+  return iRet;
 }
 
 /*!
@@ -333,6 +336,9 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
 
   memcpy (pCtx->pParam, kpParam, sizeof (SDecodingParam));
   pCtx->eOutputColorFormat	= pCtx->pParam->eOutputColorFormat;
+  int32_t iRet = DecoderSetCsp (pCtx, pCtx->pParam->eOutputColorFormat);
+  if (iRet)
+    return iRet;
   pCtx->eErrorConMethod = pCtx->pParam->eEcActiveIdc;
 
   if (VIDEO_BITSTREAM_SVC == pCtx->pParam->sVideoProperty.eVideoBsType ||
@@ -368,10 +374,7 @@ int32_t WelsInitDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   WelsDecoderDefaults (pCtx, pLogCtx);
 
   // open decoder
-  WelsOpenDecoder (pCtx);
-
-
-  return ERR_NONE;
+  return WelsOpenDecoder (pCtx);
 }
 
 /*!
@@ -596,9 +599,12 @@ int32_t DecoderSetCsp (PWelsDecoderContext pCtx, const int32_t kiColorFormat) {
   }
 
   //For now, support only videoFormatI420!
-  if (kiColorFormat != (int32_t) videoFormatI420) {
+  if (kiColorFormat == (int32_t) videoFormatInternal) {
+    pCtx->pParam->eOutputColorFormat = pCtx->eOutputColorFormat = videoFormatI420;
+  } else if (kiColorFormat != (int32_t) videoFormatI420) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "Support I420 output only for now! Change to I420...");
     pCtx->pParam->eOutputColorFormat = pCtx->eOutputColorFormat = videoFormatI420;
+    return cmUnsupportedData;
   }
 
   return 0;

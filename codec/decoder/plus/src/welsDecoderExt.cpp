@@ -185,6 +185,7 @@ CWelsDecoder::~CWelsDecoder() {
 }
 
 long CWelsDecoder::Initialize (const SDecodingParam* pParam) {
+  int iRet = ERR_NONE;
   if (m_pWelsTrace == NULL) {
     return cmMallocMemeError;
   }
@@ -195,9 +196,13 @@ long CWelsDecoder::Initialize (const SDecodingParam* pParam) {
   }
 
   // H.264 decoder initialization,including memory allocation,then open it ready to decode
-  InitDecoder();
+  iRet = InitDecoder();
+  if (iRet)
+    return iRet;
 
-  DecoderConfigParam (m_pDecContext, pParam);
+  iRet = DecoderConfigParam (m_pDecContext, pParam);
+  if (iRet)
+    return iRet;
 
   return cmResultSuccess;
 }
@@ -226,15 +231,16 @@ void CWelsDecoder::UninitDecoder (void) {
 }
 
 // the return value of this function is not suitable, it need report failure info to upper layer.
-void CWelsDecoder::InitDecoder (void) {
+int32_t CWelsDecoder::InitDecoder (void) {
 
   WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::init_decoder(), openh264 codec version = %s",
            VERSION_NUMBER);
 
   m_pDecContext	= (PWelsDecoderContext)WelsMalloc (sizeof (SWelsDecoderContext), "m_pDecContext");
+  if (NULL == m_pDecContext)
+    return cmMallocMemeError;
 
-  WelsInitDecoder (m_pDecContext, &m_pWelsTrace->m_sLogCtx);
-
+  return WelsInitDecoder (m_pDecContext, &m_pWelsTrace->m_sLogCtx);
 }
 
 /*
