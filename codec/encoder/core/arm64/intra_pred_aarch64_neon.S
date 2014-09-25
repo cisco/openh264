@@ -349,23 +349,6 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsIChromaPredPlane_AArch64_neon
 .endr
 WELS_ASM_AARCH64_FUNC_END
 
-//for Luma 16x16
-WELS_ASM_AARCH64_FUNC_BEGIN WelsI16x16LumaPredV_AArch64_neon
-    sub     x3, x1, x2
-    ld1     {v0.16b}, [x3]
-.rept 16
-    st1     {v0.16b}, [x0], 16
-.endr
-WELS_ASM_AARCH64_FUNC_END
-
-WELS_ASM_AARCH64_FUNC_BEGIN WelsI16x16LumaPredH_AArch64_neon
-    sub     x3, x1, #1
-.rept 16
-    ld1r    {v0.16b}, [x3], x2
-    st1     {v0.16b}, [x0], 16
-.endr
-WELS_ASM_AARCH64_FUNC_END
-
 WELS_ASM_AARCH64_FUNC_BEGIN WelsI16x16LumaPredDc_AArch64_neon
     sub     x3, x1, x2
     sub     x4, x1, #1

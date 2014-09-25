@@ -17,7 +17,6 @@
 		549947E2196A3FB400BA3D87 /* pixel_sad_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 549947AE196A3FB400BA3D87 /* pixel_sad_neon.S */; };
 		549947E3196A3FB400BA3D87 /* vaa_calc_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 549947AF196A3FB400BA3D87 /* vaa_calc_neon.S */; };
 		549947E4196A3FB400BA3D87 /* BackgroundDetection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 549947B1196A3FB400BA3D87 /* BackgroundDetection.cpp */; };
-		549947E5196A3FB400BA3D87 /* common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 549947B4196A3FB400BA3D87 /* common.cpp */; };
 		549947E6196A3FB400BA3D87 /* memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 549947B6196A3FB400BA3D87 /* memory.cpp */; };
 		549947E7196A3FB400BA3D87 /* WelsFrameWork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 549947BB196A3FB400BA3D87 /* WelsFrameWork.cpp */; };
 		549947E8196A3FB400BA3D87 /* WelsFrameWorkEx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 549947BD196A3FB400BA3D87 /* WelsFrameWorkEx.cpp */; };
@@ -34,6 +33,7 @@
 		549947F3196A3FB400BA3D87 /* vaacalcfuncs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 549947D8196A3FB400BA3D87 /* vaacalcfuncs.cpp */; };
 		549947F4196A3FB400BA3D87 /* vaacalculation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 549947D9196A3FB400BA3D87 /* vaacalculation.cpp */; };
 		6C749B78197E2A2000A111F9 /* adaptive_quantization_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 6C749B77197E2A2000A111F9 /* adaptive_quantization_aarch64_neon.S */; };
+		F791965B19D3BF6B00F60C6B /* intra_pred_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F791965A19D3BF6B00F60C6B /* intra_pred_common.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -64,7 +64,6 @@
 		549947AF196A3FB400BA3D87 /* vaa_calc_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = vaa_calc_neon.S; sourceTree = "<group>"; };
 		549947B1196A3FB400BA3D87 /* BackgroundDetection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BackgroundDetection.cpp; sourceTree = "<group>"; };
 		549947B2196A3FB400BA3D87 /* BackgroundDetection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackgroundDetection.h; sourceTree = "<group>"; };
-		549947B4196A3FB400BA3D87 /* common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = common.cpp; sourceTree = "<group>"; };
 		549947B5196A3FB400BA3D87 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 		549947B6196A3FB400BA3D87 /* memory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = memory.cpp; sourceTree = "<group>"; };
 		549947B7196A3FB400BA3D87 /* memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
@@ -97,6 +96,7 @@
 		549947D9196A3FB400BA3D87 /* vaacalculation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vaacalculation.cpp; sourceTree = "<group>"; };
 		549947DA196A3FB400BA3D87 /* vaacalculation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vaacalculation.h; sourceTree = "<group>"; };
 		6C749B77197E2A2000A111F9 /* adaptive_quantization_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = adaptive_quantization_aarch64_neon.S; path = arm64/adaptive_quantization_aarch64_neon.S; sourceTree = "<group>"; };
+		F791965A19D3BF6B00F60C6B /* intra_pred_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = intra_pred_common.cpp; path = ../../../common/src/intra_pred_common.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -210,7 +210,7 @@
 		549947B3196A3FB400BA3D87 /* common */ = {
 			isa = PBXGroup;
 			children = (
-				549947B4196A3FB400BA3D87 /* common.cpp */,
+				F791965A19D3BF6B00F60C6B /* intra_pred_common.cpp */,
 				549947B5196A3FB400BA3D87 /* common.h */,
 				549947B6196A3FB400BA3D87 /* memory.cpp */,
 				549947B7196A3FB400BA3D87 /* memory.h */,
@@ -351,7 +351,6 @@
 				549947E9196A3FB400BA3D87 /* ComplexityAnalysis.cpp in Sources */,
 				549947E3196A3FB400BA3D87 /* vaa_calc_neon.S in Sources */,
 				549947EE196A3FB400BA3D87 /* imagerotate.cpp in Sources */,
-				549947E5196A3FB400BA3D87 /* common.cpp in Sources */,
 				549947EA196A3FB400BA3D87 /* denoise.cpp in Sources */,
 				549947E7196A3FB400BA3D87 /* WelsFrameWork.cpp in Sources */,
 				549947F1196A3FB400BA3D87 /* ScrollDetection.cpp in Sources */,
@@ -367,6 +366,7 @@
 				4CC6094F197E009D00BE8B8B /* down_sample_aarch64_neon.S in Sources */,
 				4CC6095A1980F34F00BE8B8B /* vaa_calc_aarch64_neon.S in Sources */,
 				549947F2196A3FB400BA3D87 /* ScrollDetectionFuncs.cpp in Sources */,
+				F791965B19D3BF6B00F60C6B /* intra_pred_common.cpp in Sources */,
 				549947EF196A3FB400BA3D87 /* imagerotatefuncs.cpp in Sources */,
 				549947DF196A3FB400BA3D87 /* AdaptiveQuantization.cpp in Sources */,
 				549947EC196A3FB400BA3D87 /* downsample.cpp in Sources */,

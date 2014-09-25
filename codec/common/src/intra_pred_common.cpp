@@ -1,6 +1,6 @@
 /*!
  * \copy
- *     Copyright (c)  2013, Cisco Systems
+ *     Copyright (c)  2009-2013, Cisco Systems
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -28,12 +28,21 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
+ *
+ * \file	get_intra_predictor.c
+ *
+ * \brief	implementation for get intra predictor about 16x16, 4x4, chroma.
+ *
+ * \date	4/2/2009 Created
+ *			9/14/2009 C level based optimization with high performance gained.
+ *				[const, using ST32/ST64 to replace memset, memcpy and memmove etc.]
+ *
+ *************************************************************************************
  */
-
-#include "common.h"
 #include "ls_defines.h"
+#include "cpu_core.h"
+#include "intra_pred_common.h"
 
-WELSVP_NAMESPACE_BEGIN
 
 void WelsI16x16LumaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
   uint8_t i = 15;
@@ -66,4 +75,3 @@ void WelsI16x16LumaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStrid
   } while (i-- > 0);
 }
 
-WELSVP_NAMESPACE_END

@@ -2,7 +2,6 @@ PROCESSING_SRCDIR=codec/processing
 PROCESSING_CPP_SRCS=\
 	$(PROCESSING_SRCDIR)/src/adaptivequantization/AdaptiveQuantization.cpp\
 	$(PROCESSING_SRCDIR)/src/backgrounddetection/BackgroundDetection.cpp\
-	$(PROCESSING_SRCDIR)/src/common/common.cpp\
 	$(PROCESSING_SRCDIR)/src/common/memory.cpp\
 	$(PROCESSING_SRCDIR)/src/common/WelsFrameWork.cpp\
 	$(PROCESSING_SRCDIR)/src/common/WelsFrameWorkEx.cpp\

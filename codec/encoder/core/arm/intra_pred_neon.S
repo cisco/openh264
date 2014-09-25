@@ -62,51 +62,6 @@
 #endif
 
 
-WELS_ASM_FUNC_BEGIN WelsI16x16LumaPredV_neon
-    //Get the top line data to 'q0'
-    sub  r3, r1, r2
-    vldm r3, {d0, d1}
-
-    //mov  r2, #16
-    mov  r3, #4
-    //Set the top line to the each line of MB(16*16)
-loop_0_get_i16x16_luma_pred_v:
-    vst1.8 {d0,d1}, [r0]!
-    vst1.8 {d0,d1}, [r0]!
-    vst1.8 {d0,d1}, [r0]!
-    vst1.8 {d0,d1}, [r0]!
-    subs  r3, #1
-    bne  loop_0_get_i16x16_luma_pred_v
-WELS_ASM_FUNC_END
-
-
-WELS_ASM_FUNC_BEGIN WelsI16x16LumaPredH_neon
-    //stmdb sp!, {r4, lr}
-    sub  r1, r1, #1
-    mov  r3, #4
-loop_0_get_i16x16_luma_pred_h:
-    //Get one byte data from left side
-    vld1.8 {d0[],d1[]}, [r1], r2
-    vld1.8 {d2[],d3[]}, [r1], r2
-    vld1.8 {d4[],d5[]}, [r1], r2
-    vld1.8 {d6[],d7[]}, [r1], r2
-
-    //Set the line of MB using the left side byte data
-    vst1.8 {d0,d1}, [r0]!
-    //add r0, #16
-    vst1.8 {d2,d3}, [r0]!
-    //add r0, #16
-    vst1.8 {d4,d5}, [r0]!
-    //add r0, #16
-    vst1.8 {d6,d7}, [r0]!
-    //add r0, #16
-
-    subs  r3, #1
-    bne  loop_0_get_i16x16_luma_pred_h
-
-WELS_ASM_FUNC_END
-
-
 WELS_ASM_FUNC_BEGIN WelsI16x16LumaPredDc_neon
     //stmdb sp!, { r2-r5, lr}
     //Get the left vertical line data

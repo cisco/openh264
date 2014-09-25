@@ -1,6 +1,6 @@
 /*!
  * \copy
- *     Copyright (c)  2011-2013, Cisco Systems
+ *     Copyright (c)  2013, Cisco Systems
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -28,57 +28,56 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	        :  SceneChangeDetectionCommon.h
- *
- * \brief	    :  scene change detection class of wels video processor class
- *
- * \date         :  2011/03/14
- *
- * \description  :  1. rewrite the package code of scene change detection class
- *
  */
 
-#ifndef WELSVP_COMMON_H
-#define WELSVP_COMMON_H
 
-#include "util.h"
-#include "memory.h"
-#include "WelsFrameWork.h"
-#include "IWelsVP.h"
-#include "sad_common.h"
-#include "intra_pred_common.h"
+#ifdef  HAVE_NEON
+.text
+#include "arm_arch_common_macro.S"
 
+WELS_ASM_FUNC_BEGIN WelsI16x16LumaPredV_neon
+    //Get the top line data to 'q0'
+    sub  r3, r1, r2
+    vldm r3, {d0, d1}
 
-
-typedef void (GetIntraPred) (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
-
-typedef GetIntraPred*  GetIntraPredPtr;
-
-GetIntraPred     WelsI16x16LumaPredV_c;
-GetIntraPred     WelsI16x16LumaPredH_c;
-
-WELSVP_NAMESPACE_BEGIN
-
-typedef  int32_t (SadFunc) (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY);
-
-typedef SadFunc*   SadFuncPtr;
-
-typedef int32_t (Sad16x16Func) (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY);
-typedef Sad16x16Func*      PSad16x16Func;
+    //mov  r2, #16
+    mov  r3, #4
+    //Set the top line to the each line of MB(16*16)
+loop_0_get_i16x16_luma_pred_v:
+    vst1.8 {d0,d1}, [r0]!
+    vst1.8 {d0,d1}, [r0]!
+    vst1.8 {d0,d1}, [r0]!
+    vst1.8 {d0,d1}, [r0]!
+    subs  r3, #1
+    bne  loop_0_get_i16x16_luma_pred_v
+WELS_ASM_FUNC_END
 
 
-#ifdef HAVE_NEON
-WELSVP_EXTERN_C_BEGIN
-int32_t WelsProcessingSampleSad8x8_neon (uint8_t*, int32_t, uint8_t*, int32_t);
-WELSVP_EXTERN_C_END
-#endif
+WELS_ASM_FUNC_BEGIN WelsI16x16LumaPredH_neon
+    //stmdb sp!, {r4, lr}
+    sub  r1, r1, #1
+    mov  r3, #4
+loop_0_get_i16x16_luma_pred_h:
+    //Get one byte data from left side
+    vld1.8 {d0[],d1[]}, [r1], r2
+    vld1.8 {d2[],d3[]}, [r1], r2
+    vld1.8 {d4[],d5[]}, [r1], r2
+    vld1.8 {d6[],d7[]}, [r1], r2
 
-#ifdef HAVE_NEON_AARCH64
-WELSVP_EXTERN_C_BEGIN
-int32_t WelsProcessingSampleSad8x8_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
-WELSVP_EXTERN_C_END
-#endif
+    //Set the line of MB using the left side byte data
+    vst1.8 {d0,d1}, [r0]!
+    //add r0, #16
+    vst1.8 {d2,d3}, [r0]!
+    //add r0, #16
+    vst1.8 {d4,d5}, [r0]!
+    //add r0, #16
+    vst1.8 {d6,d7}, [r0]!
+    //add r0, #16
 
-WELSVP_NAMESPACE_END
+    subs  r3, #1
+    bne  loop_0_get_i16x16_luma_pred_h
+
+WELS_ASM_FUNC_END
+
 
 #endif

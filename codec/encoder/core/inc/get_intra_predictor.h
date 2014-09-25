@@ -74,8 +74,6 @@ void WelsIChromaPredDcNA_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStrid
 void WelsI16x16ChromaPredVer (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI16x16ChromaPredHor (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 
-void WelsI16x16LumaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
-void WelsI16x16LumaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI16x16LumaPredPlane_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI16x16LumaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI16x16LumaPredDcLeft_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
@@ -94,8 +92,6 @@ void WelsFillingPred8x2to16_sse2 (uint8_t* pPred, uint8_t* pValue);
 void WelsFillingPred1to16_sse2 (uint8_t* pPred, const uint8_t kuiValue);
 
 //for intra-prediction ASM functions
-void WelsI16x16LumaPredV_sse2 (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
-void WelsI16x16LumaPredH_sse2 (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI16x16LumaPredDc_sse2 (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI16x16LumaPredPlane_sse2 (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 
@@ -116,8 +112,6 @@ void WelsI4x4LumaPredHU_mmx (uint8_t* pPred, uint8_t* pRef, const int32_t kiStri
 #endif//X86_ASM
 
 #if defined(HAVE_NEON)
-void WelsI16x16LumaPredV_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
-void WelsI16x16LumaPredH_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI16x16LumaPredDc_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI16x16LumaPredPlane_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 
@@ -137,8 +131,6 @@ void WelsIChromaPredPlane_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiS
 #endif//HAVE_NEON
 
 #if defined(HAVE_NEON_AARCH64)
-void WelsI16x16LumaPredV_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
-void WelsI16x16LumaPredH_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI16x16LumaPredDc_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI16x16LumaPredPlane_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI16x16LumaPredDcTop_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);

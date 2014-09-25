@@ -1,6 +1,6 @@
 /*!
  * \copy
- *     Copyright (c)  2011-2013, Cisco Systems
+ *     Copyright (c)  2009-2013, Cisco Systems
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -28,57 +28,49 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	        :  SceneChangeDetectionCommon.h
  *
- * \brief	    :  scene change detection class of wels video processor class
+ * \file	intra_pred_common.h
  *
- * \date         :  2011/03/14
+ * \brief	interfaces for intra predictor about 16x16.
  *
- * \description  :  1. rewrite the package code of scene change detection class
+ * \date	4/2/2014 Created
  *
+ *************************************************************************************
  */
 
-#ifndef WELSVP_COMMON_H
-#define WELSVP_COMMON_H
+#ifndef INTRA_PRED_COMMON_H
+#define INTRA_PRED_COMMON_H
 
-#include "util.h"
-#include "memory.h"
-#include "WelsFrameWork.h"
-#include "IWelsVP.h"
-#include "sad_common.h"
-#include "intra_pred_common.h"
+#include "typedefs.h"
 
 
-
-typedef void (GetIntraPred) (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
-
-typedef GetIntraPred*  GetIntraPredPtr;
-
-GetIntraPred     WelsI16x16LumaPredV_c;
-GetIntraPred     WelsI16x16LumaPredH_c;
-
-WELSVP_NAMESPACE_BEGIN
-
-typedef  int32_t (SadFunc) (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY);
-
-typedef SadFunc*   SadFuncPtr;
-
-typedef int32_t (Sad16x16Func) (uint8_t* pSrcY, int32_t iSrcStrideY, uint8_t* pRefY, int32_t iRefStrideY);
-typedef Sad16x16Func*      PSad16x16Func;
+void WelsI16x16LumaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsI16x16LumaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 
 
-#ifdef HAVE_NEON
-WELSVP_EXTERN_C_BEGIN
-int32_t WelsProcessingSampleSad8x8_neon (uint8_t*, int32_t, uint8_t*, int32_t);
-WELSVP_EXTERN_C_END
-#endif
+#if defined(__cplusplus)
+extern "C" {
+#endif//__cplusplus
 
-#ifdef HAVE_NEON_AARCH64
-WELSVP_EXTERN_C_BEGIN
-int32_t WelsProcessingSampleSad8x8_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
-WELSVP_EXTERN_C_END
-#endif
+#if defined(X86_ASM)
+//for intra-prediction ASM functions
+void WelsI16x16LumaPredV_sse2 (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsI16x16LumaPredH_sse2 (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+#endif//X86_ASM
 
-WELSVP_NAMESPACE_END
+#if defined(HAVE_NEON)
+void WelsI16x16LumaPredV_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsI16x16LumaPredH_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+#endif//HAVE_NEON
 
-#endif
+#if defined(HAVE_NEON_AARCH64)
+void WelsI16x16LumaPredV_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsI16x16LumaPredH_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+#endif//HAVE_NEON_AARCH64
+#if defined(__cplusplus)
+}
+#endif//__cplusplus
+#endif//
+
+
+
