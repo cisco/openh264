@@ -218,8 +218,8 @@ SRCSlicing*	pSlicingOverRc;
 SRCTemporal* pTemporalOverRc;
 
 //for scc
-double     dAvgCost2Bits;
-double     dCost2BitsIntra;
+int64_t     iAvgCost2Bits;
+int64_t     iCost2BitsIntra;
 int32_t    iBaseQp;
 long long  uiLastTimeStamp;
 } SWelsSvcRc;
