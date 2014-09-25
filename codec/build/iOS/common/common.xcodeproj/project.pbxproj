@@ -25,6 +25,9 @@
 		F5AC94FF193EB7D800F58154 /* deblocking_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F5AC94FE193EB7D800F58154 /* deblocking_aarch64_neon.S */; };
 		F5B8D82D190757290037849A /* mc_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F5B8D82C190757290037849A /* mc_aarch64_neon.S */; };
 		F5BB0BB8196BB5960072D50D /* copy_mb_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F5BB0BB7196BB5960072D50D /* copy_mb_aarch64_neon.S */; };
+		F791965419D3B89D00F60C6B /* intra_pred_common_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F791965319D3B89D00F60C6B /* intra_pred_common_aarch64_neon.S */; };
+		F791965619D3B8A600F60C6B /* intra_pred_common_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F791965519D3B8A600F60C6B /* intra_pred_common_neon.S */; };
+		F791965919D3BE2200F60C6B /* intra_pred_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F791965819D3BE2200F60C6B /* intra_pred_common.cpp */; };
 		FAABAA1818E9354A00D4186F /* sad_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAABAA1718E9354A00D4186F /* sad_common.cpp */; };
 /* End PBXBuildFile section */
 
@@ -74,6 +77,10 @@
 		F5AC94FE193EB7D800F58154 /* deblocking_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = deblocking_aarch64_neon.S; path = arm64/deblocking_aarch64_neon.S; sourceTree = "<group>"; };
 		F5B8D82C190757290037849A /* mc_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = mc_aarch64_neon.S; path = arm64/mc_aarch64_neon.S; sourceTree = "<group>"; };
 		F5BB0BB7196BB5960072D50D /* copy_mb_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = copy_mb_aarch64_neon.S; path = arm64/copy_mb_aarch64_neon.S; sourceTree = "<group>"; };
+		F791965319D3B89D00F60C6B /* intra_pred_common_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = intra_pred_common_aarch64_neon.S; path = arm64/intra_pred_common_aarch64_neon.S; sourceTree = "<group>"; };
+		F791965519D3B8A600F60C6B /* intra_pred_common_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = intra_pred_common_neon.S; sourceTree = "<group>"; };
+		F791965719D3BA9300F60C6B /* intra_pred_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = intra_pred_common.h; sourceTree = "<group>"; };
+		F791965819D3BE2200F60C6B /* intra_pred_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = intra_pred_common.cpp; sourceTree = "<group>"; };
 		FAABAA1618E9353F00D4186F /* sad_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sad_common.h; sourceTree = "<group>"; };
 		FAABAA1718E9354A00D4186F /* sad_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sad_common.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -93,6 +100,7 @@
 		4C3406B118D96EA600DFA14A /* arm */ = {
 			isa = PBXGroup;
 			children = (
+				F791965519D3B8A600F60C6B /* intra_pred_common_neon.S */,
 				4CC61F0818FF6B4B00E56EAB /* copy_mb_neon.S */,
 				4C3406B218D96EA600DFA14A /* arm_arch_common_macro.S */,
 				4C3406B318D96EA600DFA14A /* deblocking_neon.S */,
@@ -105,6 +113,7 @@
 		4C3406B618D96EA600DFA14A /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				F791965719D3BA9300F60C6B /* intra_pred_common.h */,
 				F0B204F718FD23B6005DA23F /* copy_mb.h */,
 				FAABAA1618E9353F00D4186F /* sad_common.h */,
 				4C3406B718D96EA600DFA14A /* cpu.h */,
@@ -126,6 +135,7 @@
 		4C3406C318D96EA600DFA14A /* src */ = {
 			isa = PBXGroup;
 			children = (
+				F791965819D3BE2200F60C6B /* intra_pred_common.cpp */,
 				5BA8F2BF19603F5F00011CE4 /* common_tables.cpp */,
 				F0B204F818FD23BF005DA23F /* copy_mb.cpp */,
 				FAABAA1718E9354A00D4186F /* sad_common.cpp */,
@@ -179,6 +189,7 @@
 		F556A81D1906669F00E156A8 /* arm64 */ = {
 			isa = PBXGroup;
 			children = (
+				F791965319D3B89D00F60C6B /* intra_pred_common_aarch64_neon.S */,
 				F5BB0BB7196BB5960072D50D /* copy_mb_aarch64_neon.S */,
 				F5AC94FE193EB7D800F58154 /* deblocking_aarch64_neon.S */,
 				F5B8D82C190757290037849A /* mc_aarch64_neon.S */,
@@ -244,12 +255,15 @@
 				F556A8241906673900E156A8 /* arm_arch64_common_macro.S in Sources */,
 				F5AC94FF193EB7D800F58154 /* deblocking_aarch64_neon.S in Sources */,
 				4C3406CE18D96EA600DFA14A /* crt_util_safe_x.cpp in Sources */,
+				F791965919D3BE2200F60C6B /* intra_pred_common.cpp in Sources */,
 				4C3406CF18D96EA600DFA14A /* deblocking_common.cpp in Sources */,
 				5BA8F2C019603F5F00011CE4 /* common_tables.cpp in Sources */,
+				F791965419D3B89D00F60C6B /* intra_pred_common_aarch64_neon.S in Sources */,
 				4C3406D118D96EA600DFA14A /* WelsThreadLib.cpp in Sources */,
 				4C3406CC18D96EA600DFA14A /* mc_neon.S in Sources */,
 				F5BB0BB8196BB5960072D50D /* copy_mb_aarch64_neon.S in Sources */,
 				4C3406CB18D96EA600DFA14A /* expand_picture_neon.S in Sources */,
+				F791965619D3B8A600F60C6B /* intra_pred_common_neon.S in Sources */,
 				4CC61F0918FF6B4B00E56EAB /* copy_mb_neon.S in Sources */,
 				53C1C9BC193F0FB000404D8F /* expand_pic.cpp in Sources */,
 				4C3406CD18D96EA600DFA14A /* cpu.cpp in Sources */,

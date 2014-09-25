@@ -6,6 +6,7 @@ COMMON_CPP_SRCS=\
 	$(COMMON_SRCDIR)/src/crt_util_safe_x.cpp\
 	$(COMMON_SRCDIR)/src/deblocking_common.cpp\
 	$(COMMON_SRCDIR)/src/expand_pic.cpp\
+	$(COMMON_SRCDIR)/src/intra_pred_common.cpp\
 	$(COMMON_SRCDIR)/src/sad_common.cpp\
 	$(COMMON_SRCDIR)/src/utils.cpp\
 	$(COMMON_SRCDIR)/src/welsCodecTrace.cpp\
@@ -17,6 +18,7 @@ COMMON_ASM_SRCS=\
 	$(COMMON_SRCDIR)/x86/cpuid.asm\
 	$(COMMON_SRCDIR)/x86/deblock.asm\
 	$(COMMON_SRCDIR)/x86/expand_picture.asm\
+	$(COMMON_SRCDIR)/x86/intra_pred_com.asm\
 	$(COMMON_SRCDIR)/x86/mb_copy.asm\
 	$(COMMON_SRCDIR)/x86/mc_chroma.asm\
 	$(COMMON_SRCDIR)/x86/mc_luma.asm\
@@ -33,6 +35,7 @@ COMMON_ASM_ARM_SRCS=\
 	$(COMMON_SRCDIR)/arm/copy_mb_neon.S\
 	$(COMMON_SRCDIR)/arm/deblocking_neon.S\
 	$(COMMON_SRCDIR)/arm/expand_picture_neon.S\
+	$(COMMON_SRCDIR)/arm/intra_pred_common_neon.S\
 	$(COMMON_SRCDIR)/arm/mc_neon.S\
 
 COMMON_OBJSARM += $(COMMON_ASM_ARM_SRCS:.S=.$(OBJ))
@@ -45,6 +48,7 @@ COMMON_ASM_ARM64_SRCS=\
 	$(COMMON_SRCDIR)/arm64/copy_mb_aarch64_neon.S\
 	$(COMMON_SRCDIR)/arm64/deblocking_aarch64_neon.S\
 	$(COMMON_SRCDIR)/arm64/expand_picture_aarch64_neon.S\
+	$(COMMON_SRCDIR)/arm64/intra_pred_common_aarch64_neon.S\
 	$(COMMON_SRCDIR)/arm64/mc_aarch64_neon.S\
 
 COMMON_OBJSARM64 += $(COMMON_ASM_ARM64_SRCS:.S=.$(OBJ))

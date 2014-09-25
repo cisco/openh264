@@ -40,7 +40,7 @@
 
 #include "sample.h"
 #include "sad_common.h"
-
+#include "intra_pred_common.h"
 #include "mc.h"
 #include "cpu_core.h"
 
@@ -250,8 +250,8 @@ int32_t WelsSampleSadIntra8x8Combined3_c (uint8_t* pDecCb, int32_t iDecStride, u
 }
 
 extern void WelsI16x16LumaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t iStride);
-extern void WelsI16x16LumaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t iStride);
-extern void WelsI16x16LumaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t iStride);
+//extern void WelsI16x16LumaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t iStride);
+//extern void WelsI16x16LumaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t iStride);
 
 int32_t WelsSampleSatdIntra16x16Combined3_c (uint8_t* pDec, int32_t iDecStride, uint8_t* pEnc, int32_t iEncStride,
     int32_t* pBestMode, int32_t iLambda, uint8_t* pDst) {

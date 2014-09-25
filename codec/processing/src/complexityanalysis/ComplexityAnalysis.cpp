@@ -33,9 +33,9 @@
 #include "ComplexityAnalysis.h"
 #include "cpu.h"
 #include "macros.h"
+#include "intra_pred_common.h"
 
 WELSVP_NAMESPACE_BEGIN
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -280,8 +280,29 @@ CComplexityAnalysisScreen::CComplexityAnalysisScreen (int32_t iCpuFlag) {
 #ifdef X86_ASM
   if (iCpuFlag & WELS_CPU_SSE2) {
     m_pSadFunc = WelsSampleSad16x16_sse2;
+    m_pIntraFunc[0] = WelsI16x16LumaPredV_sse2;
+    m_pIntraFunc[1] = WelsI16x16LumaPredH_sse2;
+
   }
 #endif
+
+#if defined (HAVE_NEON)
+  if (iCpuFlag & WELS_CPU_NEON) {
+    m_pSadFunc = WelsSampleSad16x16_neon;
+    m_pIntraFunc[0] = WelsI16x16LumaPredV_neon;
+    m_pIntraFunc[1] = WelsI16x16LumaPredH_neon;
+
+  }
+#endif
+
+#if defined (HAVE_NEON_AARCH64)
+  if (iCpuFlag & WELS_CPU_NEON) {
+    m_pSadFunc = WelsSampleSad16x16_AArch64_neon;
+    m_pIntraFunc[0] =  WelsI16x16LumaPredV_AArch64_neon;
+    m_pIntraFunc[1] = WelsI16x16LumaPredH_AArch64_neon;
+  }
+#endif
+
 }
 
 CComplexityAnalysisScreen::~CComplexityAnalysisScreen() {
