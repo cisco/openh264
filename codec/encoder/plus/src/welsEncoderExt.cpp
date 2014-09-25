@@ -912,7 +912,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   break;
   case ENCODER_OPTION_IS_LOSSLESS_LINK: {
     bool bValue = * (static_cast<bool*>(pOption));
-    m_pEncContext->pSvcParam->bIsLossLessLink = bValue;
+    m_pEncContext->pSvcParam->bIsLosslessLink = bValue;
   }
   break;
   default:
