@@ -86,7 +86,7 @@ void DecoderInterfaceTest::Init() {
   m_szBuffer[3] = 1;
   m_iBufLength = 4;
   CM_RETURN eRet = (CM_RETURN) m_pDec->Initialize (&m_sDecParam);
-  if ((m_sDecParam.eOutputColorFormat != videoFormatI420) ||
+  if ((m_sDecParam.eOutputColorFormat != videoFormatI420) &&
       (m_sDecParam.eOutputColorFormat != videoFormatInternal))
     ASSERT_EQ (eRet, cmUnsupportedData);
   else
