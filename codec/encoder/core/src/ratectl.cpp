@@ -50,8 +50,8 @@
 namespace WelsEnc {
 
 
-#define VIRTUAL_BUFFER_LOW_TH   1.2
-#define VIRTUAL_BUFFER_HIGH_TH  1.8
+#define VIRTUAL_BUFFER_LOW_TH   120 //*INT_MULTIPLY
+#define VIRTUAL_BUFFER_HIGH_TH  180 //*INT_MULTIPLY
 
 //#define _TEST_TEMP_RC_
 #ifdef _TEST_TEMP_RC_
@@ -1025,8 +1025,8 @@ void InitRcModuleScc (void* pCtx) {
   pWelsSvcRc->iBufferFullnessSkip = 0;
   pWelsSvcRc->uiLastTimeStamp = 0;
 
-  pWelsSvcRc->dCost2BitsIntra = 1;
-  pWelsSvcRc->dAvgCost2Bits = 1;
+  pWelsSvcRc->iCost2BitsIntra = INT_MULTIPLY;
+  pWelsSvcRc->iAvgCost2Bits = INT_MULTIPLY;
 }
 void WelRcPictureInitScc (void* pCtx) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
@@ -1042,14 +1042,14 @@ void WelRcPictureInitScc (void* pCtx) {
   if (pEncCtx->eSliceType == I_SLICE) {
     int32_t iTargetBits = iBitRate * 2 - pWelsSvcRc->iBufferFullnessSkip;
     iTargetBits = WELS_MAX (1, iTargetBits);
-    double Qstep = iFrameCplx * pWelsSvcRc->dCost2BitsIntra / iTargetBits;
-    int32_t iQp = RcConvertQStep2Qp ((int32_t) (Qstep * INT_MULTIPLY));
+    int32_t iQstep = WELS_DIV_ROUND ((((int64_t)iFrameCplx) * pWelsSvcRc->iCost2BitsIntra), iTargetBits);
+    int32_t iQp = RcConvertQStep2Qp (iQstep);
 
     pEncCtx->iGlobalQp = WELS_CLIP3 (iQp, MIN_IDR_QP, MAX_IDR_QP);
   } else {
-    int32_t iTargetBits = (int32_t) ((float)iBitRate / pDLayerConfig->fFrameRate); //iBitRate / 10;
-    double Qstep = iFrameCplx * pWelsSvcRc->dAvgCost2Bits / iTargetBits;
-    int32_t iQp = RcConvertQStep2Qp ((int32_t) (Qstep * INT_MULTIPLY));
+    int32_t iTargetBits = WELS_ROUND (((float)iBitRate / pDLayerConfig->fFrameRate)); //iBitRate / 10;
+    int32_t iQstep = (int32_t)(WELS_DIV_ROUND64 (iFrameCplx * pWelsSvcRc->iAvgCost2Bits, iTargetBits));
+    int32_t iQp = RcConvertQStep2Qp (iQstep);
     iDeltaQp = iQp - iBaseQp;
     if (pWelsSvcRc->iBufferFullnessSkip > iBitRate) {
       if (iDeltaQp > 0) {
@@ -1101,9 +1101,9 @@ void WelsRcFrameDelayJudgeScc (void* pCtx, EVideoFrameType eFrameType, long long
   int32_t iSentBits  = (int32_t) ((double)iBitRate * iEncTimeInv * (1.0E-3) + 0.5);
   iSentBits = WELS_MAX (iSentBits, 0);
 
-  const double dVbufferThRatio = (eFrameType == videoFrameTypeI
+  const int32_t iVbufferThRatio = (eFrameType == videoFrameTypeI
                                   || eFrameType == videoFrameTypeIDR) ? VIRTUAL_BUFFER_HIGH_TH : VIRTUAL_BUFFER_LOW_TH;
-  const int32_t iVbufferTh = (int32_t) (iBitRate * dVbufferThRatio + 0.5);
+  const int32_t iVbufferTh = WELS_DIV_ROUND ((((int64_t)iBitRate) * iVbufferThRatio), INT_MULTIPLY);
 
   pWelsSvcRc->iBufferFullnessSkip -= iSentBits;
   pWelsSvcRc->iBufferFullnessSkip = WELS_MAX (0, pWelsSvcRc->iBufferFullnessSkip);
@@ -1138,14 +1138,13 @@ void WelsRcPictureInfoUpdateScc (void* pCtx, int32_t iNalSize) {
 
   SVAAFrameInfoExt* pVaa = static_cast<SVAAFrameInfoExt*> (pEncCtx->pVaa);
 
-  double Qstep = RcConvertQp2QStep (pEncCtx->iGlobalQp);
-  double dCost2Bits = (iFrameBits * Qstep) / (double) (pVaa->sComplexityScreenParam.iFrameComplexity + 1.0) /
-                      INT_MULTIPLY;
+  int32_t iQstep = RcConvertQp2QStep (pEncCtx->iGlobalQp);
+  int64_t iCost2Bits = WELS_DIV_ROUND64 ((((int64_t)iFrameBits * iQstep)), pVaa->sComplexityScreenParam.iFrameComplexity);
 
   if (pEncCtx->eSliceType == P_SLICE) {
-    pWelsSvcRc->dAvgCost2Bits = 0.95 * pWelsSvcRc->dAvgCost2Bits + 0.05 * dCost2Bits;
+    pWelsSvcRc->iAvgCost2Bits = WELS_DIV_ROUND64 ((95 * pWelsSvcRc->iAvgCost2Bits + 5 * iCost2Bits), INT_MULTIPLY);
   } else {
-    pWelsSvcRc->dCost2BitsIntra = 0.9 * pWelsSvcRc->dCost2BitsIntra + 0.1 * dCost2Bits;
+    pWelsSvcRc->iCost2BitsIntra = WELS_DIV_ROUND64 ((90 * pWelsSvcRc->iCost2BitsIntra + 10 * iCost2Bits), INT_MULTIPLY);
   }
 }
 
