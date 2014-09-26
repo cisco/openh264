@@ -1114,7 +1114,7 @@ void WelsRcFrameDelayJudgeScc (void* pCtx, EVideoFrameType eFrameType, long long
   }
   if (pWelsSvcRc->bSkipFlag) {
     pWelsSvcRc->iSkipFrameNum++;
-    WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO, "SCC iSkipFrameNum = %d,buffer = %d,threadhold = %d,bitrate = %d,timestamp=%d\n", pWelsSvcRc->iSkipFrameNum,pWelsSvcRc->iBufferFullnessSkip,iVbufferTh,pWelsSvcRc->iSkipFrameNum,iBitRate,uiTimeStamp);
+    WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO, "SCC iSkipFrameNum = %d,buffer = %d,threadhold = %d,bitrate = %d,timestamp=%lld\n", pWelsSvcRc->iSkipFrameNum,pWelsSvcRc->iBufferFullnessSkip,iVbufferTh,iBitRate,uiTimeStamp);
   }
   pWelsSvcRc->uiLastTimeStamp = uiTimeStamp;
 }
