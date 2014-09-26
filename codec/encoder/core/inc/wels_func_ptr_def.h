@@ -196,6 +196,7 @@ typedef bool (*PBuildRefListFunc) (void* pCtx, const int32_t iPOC, int32_t iBest
 typedef void (*PMarkPicFunc) (void* pCtx);
 typedef bool (*PUpdateRefListFunc) (void* pCtx);
 typedef void (*PEndofUpdateRefListFunc) (void* pCtx);
+typedef void (*PAfterBuildRefListFunc) (void* pCtx);
 
 typedef  int32_t (*PCavlcParamCalFunc) (int16_t* pCoff, uint8_t* pRun, int16_t* pLevel, int32_t* pTotalCoeffs,
                                         int32_t iEndIdx);
@@ -293,6 +294,7 @@ struct TagWelsFuncPointerList {
   PMarkPicFunc          pMarkPic;
   PUpdateRefListFunc    pUpdateRefList;
   PEndofUpdateRefListFunc    pEndofUpdateRefList;
+  PAfterBuildRefListFunc    pAfterBuildRefList;
 
   PCavlcParamCalFunc    pfCavlcParamCal;
 };

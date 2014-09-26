@@ -624,6 +624,21 @@ bool WelsBuildRefList (void* pEncCtx, const int32_t iPOC, int32_t iBestLtrRefIdx
   return (pCtx->iNumRef0 > 0 || pCtx->eSliceType == I_SLICE) ? (true) : (false);
 }
 
+static void UpdateBlockStatic (void* pEncCtx) {
+  sWelsEncCtx* pCtx     = (sWelsEncCtx*)pEncCtx;
+  SVAAFrameInfoExt* pVaaExt			= static_cast<SVAAFrameInfoExt*> (pCtx->pVaa);
+  assert (pCtx->iNumRef0 == 1); //multi-ref is not support yet?
+  for (int32_t idx = 0; idx < pCtx->iNumRef0; idx++) {
+    //TODO: we need to re-factor the source picture storage first,
+    //and then use original frame of the ref to do this calculation for better vaa algo implementation
+    SPicture* pRef = pCtx->pRefList0[idx];
+    if (pVaaExt->iVaaBestRefFrameNum != pRef->iFrameNum) {
+      //re-do the calculation
+      pCtx->pVpp->UpdateBlockIdcForScreen (pVaaExt->pVaaBestBlockStaticIdc, pRef, pCtx->pEncPic);
+    }
+  }
+}
+
 /*
  *	update syntax for reference base related
  */
@@ -680,7 +695,7 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
   }
 }
 
-static inline void UpdareOriginalPicInfo(SPicture* pOrigPic, SPicture* pReconPic) {
+static inline void UpdateOriginalPicInfo (SPicture* pOrigPic, SPicture* pReconPic) {
   if (!pOrigPic)
     return;
 
@@ -696,7 +711,7 @@ static inline void UpdareOriginalPicInfo(SPicture* pOrigPic, SPicture* pReconPic
   pOrigPic->iFrameAverageQp = pReconPic->iFrameAverageQp;
 }
 
-static void UpdateSrcListLosslessScreenRefSelectionWithLtr(sWelsEncCtx* pCtx) {
+static void UpdateSrcListLosslessScreenRefSelectionWithLtr (sWelsEncCtx* pCtx) {
   int32_t iDIdx = pCtx->uiDependencyId;
   SPicture** pLongRefList = pCtx->ppRefPicListExt[iDIdx]->pLongRefList;
   SPicture** pLongRefSrcList = &pCtx->pVpp->m_pSpatialPic[iDIdx][0];
@@ -711,16 +726,47 @@ static void UpdateSrcListLosslessScreenRefSelectionWithLtr(sWelsEncCtx* pCtx) {
   WelsExchangeSpatialPictures (&pCtx->pVpp->m_pSpatialPic[iDIdx][0],
                                &pCtx->pVpp->m_pSpatialPic[iDIdx][1 + pCtx->pVaa->uiMarkLongTermPicIdx]);
 }
-static void UpdateSrcPicList (void* pEncCtx) {
+
+static void UpdateSrcList (sWelsEncCtx* pCtx) {
+  int32_t iDIdx = pCtx->uiDependencyId;
+  SPicture** pShortRefList = pCtx->ppRefPicListExt[iDIdx]->pShortRefList;
+  const uint32_t kuiShortRefCount = pCtx->ppRefPicListExt[iDIdx]->uiShortRefCount;
+  SPicture** pRefSrcList = &pCtx->pVpp->m_pSpatialPic[iDIdx][0];
+
+  //pRefSrcList[0] is for current frame
+  if (pCtx->eSliceType == P_SLICE && pCtx->uiTemporalId != 0) {
+    for (int iRefIdx = kuiShortRefCount - 1; iRefIdx >= 0; --iRefIdx)	{
+      WelsExchangeSpatialPictures (&pRefSrcList[iRefIdx + 1],
+                                   &pRefSrcList[iRefIdx]);
+    }
+  } else {
+    WelsExchangeSpatialPictures (&pRefSrcList[0], &pRefSrcList[1]);
+    for (int32_t i = MAX_SHORT_REF_COUNT - 1; i > 0  ; --i) {
+      if (pRefSrcList[i + 1] != NULL) {
+        SetUnref (pRefSrcList[i + 1]);
+      }
+    }
+  }
+}
+static void UpdateSrcPicListLosslessScreenRefSelectionWithLtr (void* pEncCtx) {
   sWelsEncCtx* pCtx     = (sWelsEncCtx*)pEncCtx;
   int32_t iDIdx = pCtx->uiDependencyId;
   //update info in src list
-  UpdareOriginalPicInfo(pCtx->pEncPic, pCtx->pDecPic);
+  UpdateOriginalPicInfo (pCtx->pEncPic, pCtx->pDecPic);
   PrefetchNextBuffer (pCtx);
   UpdateSrcListLosslessScreenRefSelectionWithLtr (pCtx);
   SetUnref (pCtx->pVpp->m_pSpatialPic[iDIdx][0]);
 }
-
+  
+static void UpdateSrcPicList (void* pEncCtx) {
+  sWelsEncCtx* pCtx     = (sWelsEncCtx*)pEncCtx;
+  int32_t iDIdx = pCtx->uiDependencyId;
+  //update info in src list
+  UpdateOriginalPicInfo (pCtx->pEncPic, pCtx->pDecPic);
+  PrefetchNextBuffer (pCtx);
+  UpdateSrcList (pCtx);
+  SetUnref (pCtx->pVpp->m_pSpatialPic[iDIdx][0]);
+}
 bool WelsUpdateRefListScreen (void* pEncCtx) {
   sWelsEncCtx* pCtx     = (sWelsEncCtx*)pEncCtx;
   SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
@@ -908,13 +954,17 @@ void WelsMarkPicScreen (void* pEncCtx) {
 
       pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iLongTermFrameIdx = pLtr->iCurLtrIdx;
       pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_LONG;
-
     }
   }
   return;
 }
-void InitRefListMgrFunc (SWelsFuncPtrList* pFuncList, const bool bScreenContent) {
-  if (bScreenContent) {
+
+void DoNothing (void* pointer) {
+}
+
+void InitRefListMgrFunc (SWelsFuncPtrList* pFuncList, const bool bWithLtr, const bool bScreenContent) {
+  bool bLosslessScreenRefSelectionWithLtr = bWithLtr && bScreenContent;
+  if (bLosslessScreenRefSelectionWithLtr) {
     pFuncList->pBuildRefList =   WelsBuildRefListScreen;
     pFuncList->pMarkPic      =   WelsMarkPicScreen;
     pFuncList->pUpdateRefList =   WelsUpdateRefListScreen;
@@ -924,6 +974,18 @@ void InitRefListMgrFunc (SWelsFuncPtrList* pFuncList, const bool bScreenContent)
     pFuncList->pMarkPic      =   WelsMarkPic;
     pFuncList->pUpdateRefList =   WelsUpdateRefList;
     pFuncList->pEndofUpdateRefList =   PrefetchNextBuffer;
+  }
+
+  pFuncList->pAfterBuildRefList = DoNothing;
+  if (bScreenContent) {
+    if (bLosslessScreenRefSelectionWithLtr) {
+      pFuncList->pEndofUpdateRefList =   UpdateSrcPicListLosslessScreenRefSelectionWithLtr;
+    } else {
+      pFuncList->pEndofUpdateRefList =   UpdateSrcPicList;
+      pFuncList->pAfterBuildRefList = UpdateBlockStatic;
+    }
+  } else {
+    pFuncList->pEndofUpdateRefList = PrefetchNextBuffer;
   }
 }
 } // namespace WelsEnc

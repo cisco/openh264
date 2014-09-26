@@ -98,7 +98,7 @@ bool CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx);
 */
 void WelsMarkPic (void* pCtx);
 
-void InitRefListMgrFunc (SWelsFuncPtrList* pFuncList, const bool bScreenContent);
+void InitRefListMgrFunc (SWelsFuncPtrList* pFuncList, const bool bEnableLongTermReference, const bool bScreenContent);
 
 #ifdef LONG_TERM_REF_DUMP
 void DumpRef (sWelsEncCtx* ctx);

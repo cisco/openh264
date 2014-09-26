@@ -106,21 +106,22 @@ static const EncodeFileParam kFileParamArray[] = {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
     "68c3220e49b7a57d563faf7c99a870ab34a23400", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SINGLE_SLICE, false, 4, false, false
   },
+  // the following values may be adjusted for times since we start tuning the strategy
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
-    "030d0e2d742ac039c2ab6333fe7cb18623c0d283", SCREEN_CONTENT_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1, false, false
+    "3ce65d9c326657b845cd00b22ce76128c29f8347", SCREEN_CONTENT_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1, false, false
   },
   {
     "res/CiscoVT2people_160x96_6fps.yuv",
-    "40aa19d4b2684a59e689860d2a793876f33904f7", SCREEN_CONTENT_REAL_TIME, 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1, false, false
+    "2b57e1cc7a4db6258116c302eada3bf870ee94a1", SCREEN_CONTENT_REAL_TIME, 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1, false, false
   },
   {
     "res/Static_152_100.yuv",
-    "494068b59aa9ed9118a9f33174b732024effc870", SCREEN_CONTENT_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1, false, false
+    "bad065da4564d0580a1722d91463fa0f9fd947c8", SCREEN_CONTENT_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1, false, false
   },
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    "7a0be680c2c89cda208fb5890e64867f3787491e", SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1, false, false
+    "8ee6cd375b58e9877f6145fb72da844e65162b14", SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1, false, false
   },
   //for different strategy
   {

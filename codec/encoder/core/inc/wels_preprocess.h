@@ -109,6 +109,7 @@ typedef struct SVAAFrameInfoExt_t: public SVAAFrameInfo {
   SRefInfoParam    sVaaStrBestRefCandidate[MAX_REF_PIC_COUNT];   //TOP3_BEST_REF_NO_TID
   int32_t    iNumOfAvailableRef;
 
+  int32_t     iVaaBestRefFrameNum;
   uint8_t*    pVaaBestBlockStaticIdc;//pointer
   uint8_t*    pVaaBlockStaticIdc[16];//real memory,
 } SVAAFrameInfoExt;
@@ -129,6 +130,7 @@ class CWelsPreProcess {
   int32_t GetRefFrameInfo (int32_t iRefIdx, SPicture*& pRefOri);
   void    AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCurPicture, SPicture* pRefPicture,
                                     const int32_t kiDependencyId, const bool kbCalculateBGD);
+  int32_t UpdateBlockIdcForScreen (uint8_t*  pCurBlockStaticPointer, const SPicture* kpRefPic, const SPicture* kpSrcPic);
 
  private:
   int32_t WelsPreprocessCreate();
@@ -158,6 +160,8 @@ class CWelsPreProcess {
 
   ESceneChangeIdc DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPicture* pCurPicture);
   void InitPixMap (const SPicture* pPicture, SPixMap* pPixMap);
+  void GetAvailableRefListLosslessScreenRefSelection (SPicture** pSrcPicList, uint8_t iCurTid, const int32_t iClosestLtrFrameNum,
+                            SRefInfoParam* pAvailableRefList, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum);
   void GetAvailableRefList (SPicture** pSrcPicList, uint8_t iCurTid, const int32_t iClosestLtrFrameNum,
                             SRefInfoParam* pAvailableRefList, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum);
   void InitRefJudgement (SRefJudgement* pRefJudgement);
