@@ -149,7 +149,7 @@ int32_t   iPFrameNum;
 int32_t   iFrameCmplxMean;
 
 } SRCTemporal;
- 
+
 typedef struct TagWelsRc {
 int32_t   iRcVaryPercentage;
 int32_t    iRcVaryRatio;
