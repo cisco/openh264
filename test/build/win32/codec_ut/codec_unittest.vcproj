@@ -45,7 +45,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\encoder\plus\inc;..\..\..\..\codec\encoder\core\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\codec\processing\src\common;..\..\..\..\codec\processing\interface"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;X86_ASM"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -194,7 +194,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\encoder\plus\inc;..\..\..\..\codec\encoder\core\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\codec\processing\src\common;..\..\..\..\codec\processing\interface"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;X86_ASM"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -727,6 +727,34 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\..\processing\ProcessUT_DownSample.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\processing\src\downsample;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common;$(NOINHERIT)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\processing\src\downsample;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common;$(NOINHERIT)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\processing\src\downsample;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common;$(NOINHERIT)"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath="..\..\..\processing\ProcessUT_ScrollDetection.cpp"
 				>
 				<FileConfiguration
@@ -759,6 +787,66 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\processing\src\scrolldetection;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common;$(NOINHERIT)"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\processing\ProcessUT_VaaCalc.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\processing\src\vaacalc;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common;$(NOINHERIT)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\processing\src\vaacalc;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common;$(NOINHERIT)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\processing\src\vaacalc;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common;$(NOINHERIT)"
+					/>
+				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="common"
+			>
+			<File
+				RelativePath="..\..\..\common\ExpandPicture.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories="..\..\..\codec\processing\src\common;..\..\..\..\codec\decoder\core\inc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories="..\..\..\codec\processing\src\common;..\..\..\..\codec\decoder\core\inc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories="..\..\..\codec\processing\src\common;..\..\..\..\codec\decoder\core\inc"
 					/>
 				</FileConfiguration>
 			</File>
