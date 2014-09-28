@@ -179,7 +179,7 @@ double*    pGomComplexity;
 int32_t*   pGomForegroundBlockNum;
 int32_t*   pCurrentFrameGomSad;
 int32_t*   pGomCost;
- 
+
 int32_t   iAverageFrameQp;
 int32_t   iMinFrameQp;
 int32_t   iMaxFrameQp;
@@ -187,7 +187,7 @@ int32_t   iNumberMbFrame;
 int32_t   iNumberMbGom;
 int32_t	iSliceNum;
 int32_t   iGomSize;
- 
+
 int32_t   iSkipFrameNum;
 int32_t   iFrameCodedInVGop;
 int32_t   iSkipFrameInVGop;
@@ -246,4 +246,3 @@ void WelsRcFreeMemory (void* pCtx);
 
 }
 #endif //RC_H
- 

@@ -951,7 +951,7 @@ void WelsRcMbInfoUpdateGom (void* pCtx, SMB* pCurMb, int32_t iCostLuma, SSlice* 
   pSOverRc->iGomBitsSlice += iCurMbBits;
 
   pWelsSvcRc->pGomCost[kiComplexityIndex] += iCostLuma;
- 
+
   pWelsSvcRc->iMinFrameQp = WELS_MIN(pWelsSvcRc->iMinFrameQp,pCurMb->uiLumaQp);
   pWelsSvcRc->iMaxFrameQp = WELS_MAX(pWelsSvcRc->iMaxFrameQp,pCurMb->uiLumaQp);
   if (iCurMbBits > 0) {
