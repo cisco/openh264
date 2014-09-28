@@ -122,7 +122,7 @@ enum {
 #define SKIP_RATIO  50 // *INT_MULTIPLY
 #define PADDING_BUFFER_RATIO 50 // *INT_MULTIPLY
 #define PADDING_THRESHOLD    5 //*INT_MULTIPLY
- 
+
 typedef struct TagRCSlicing {
 int32_t   iComplexityIndexSlice;
 int32_t   iCalculatedQpSlice;
@@ -137,7 +137,7 @@ int32_t   iGomBitsSlice;
 int32_t   iGomTargetBits;
 //int32_t   gom_coded_mb;
 } SRCSlicing;
- 
+
 typedef struct TagRCTemporal {
 int32_t   iMinBitsTl;
 int32_t   iMaxBitsTl;
@@ -147,13 +147,13 @@ int32_t   iGopBitsDq;
 int64_t   iLinearCmplx; // *INT_MULTIPLY
 int32_t   iPFrameNum;
 int32_t   iFrameCmplxMean;
- 
+
 } SRCTemporal;
  
 typedef struct TagWelsRc {
 int32_t   iRcVaryPercentage;
 int32_t    iRcVaryRatio;
- 
+
 int32_t   iInitialQp; //initial qp
 int32_t   iBitRate;
 int32_t   iPreviousBitrate;
@@ -161,16 +161,16 @@ int32_t   iPreviousGopSize;
 double    fFrameRate;
 int32_t   iBitsPerFrame; // *INT_MULTIPLY
 double    dPreviousFps;
- 
+
 // bits allocation and status
 int32_t   iRemainingBits;
 int32_t   iTargetBits;
 int32_t   iCurrentBitsLevel;//0:normal; 1:limited; 2:exceeded.
- 
+
 int32_t   iIdrNum;
 int32_t   iIntraComplexity;
 int32_t   iIntraMbCount;
- 
+
 int8_t    iTlOfFrames[VGOP_SIZE];
 int32_t   iRemainingWeights;
 int32_t   iFrameDqBits;
