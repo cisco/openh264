@@ -174,7 +174,7 @@ int32_t   iIntraMbCount;
 int8_t    iTlOfFrames[VGOP_SIZE];
 int32_t   iRemainingWeights;
 int32_t   iFrameDqBits;
- 
+
 double*    pGomComplexity;
 int32_t*   pGomForegroundBlockNum;
 int32_t*   pCurrentFrameGomSad;
