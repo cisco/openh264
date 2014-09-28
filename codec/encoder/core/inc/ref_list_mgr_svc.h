@@ -47,11 +47,6 @@
 #include "codec_app_def.h"
 
 namespace WelsEnc {
-typedef enum {
-RECIEVE_UNKOWN = 0,
-RECIEVE_SUCCESS = 1,
-RECIEVE_FAILED = 2,
-} LTR_MARKING_RECEIVE_STATE;
 
 typedef enum {
 LTR_DIRECT_MARK = 0,

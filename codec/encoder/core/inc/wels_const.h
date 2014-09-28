@@ -189,6 +189,12 @@ BLOCK_4x4   = 4,
 BLOCK_SIZE_ALL = 5
 };
 
+typedef enum {
+RECIEVE_UNKOWN = 0,
+RECIEVE_SUCCESS = 1,
+RECIEVE_FAILED = 2,
+} LTR_MARKING_RECEIVE_STATE;
+
 enum {
   CUR_AU_IDX	= 0,			// index symbol for current access unit
   SUC_AU_IDX	= 1				// index symbol for successive access unit

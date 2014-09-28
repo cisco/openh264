@@ -185,6 +185,8 @@ int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePi
     if (WelsPreprocessReset (pCtx) != 0)
       return -1;
 
+    m_iAvaliableRefInSpatialPicList = pSvcParam->iNumRefFrame;
+
     m_bInitDone = true;
   }
 
@@ -861,8 +863,7 @@ void CWelsPreProcess::InitPixMap (const SPicture* pPicture, SPixMap* pPixMap) {
 void CWelsPreProcess::GetAvailableRefListLosslessScreenRefSelection (SPicture** pSrcPicList, uint8_t iCurTid,
     const int32_t iClosestLtrFrameNum,
     SRefInfoParam* pAvailableRefList, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum) {
-  SWelsSvcCodingParam*		pSvcParam = m_pEncCtx->pSvcParam;
-  const int32_t iSourcePicNum = pSvcParam->iNumRefFrame;
+  const int32_t iSourcePicNum = m_iAvaliableRefInSpatialPicList;
   if (0 >= iSourcePicNum) {
     iAvailableRefNum = 0;
     iAvailableSceneRefNum = 0;
@@ -911,8 +912,7 @@ void CWelsPreProcess::GetAvailableRefListLosslessScreenRefSelection (SPicture** 
 
 void CWelsPreProcess::GetAvailableRefList (SPicture** pSrcPicList, uint8_t iCurTid, const int32_t iClosestLtrFrameNum,
     SRefInfoParam* pAvailableRefList, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum) {
-  SWelsSvcCodingParam*		pSvcParam = m_pEncCtx->pSvcParam;
-  const int32_t iSourcePicNum = pSvcParam->iNumRefFrame;
+  const int32_t iSourcePicNum = m_iAvaliableRefInSpatialPicList;
   if (0 >= iSourcePicNum) {
     iAvailableRefNum = 0;
     iAvailableSceneRefNum = 0;
@@ -1178,6 +1178,60 @@ int32_t CWelsPreProcess::UpdateBlockIdcForScreen (uint8_t*  pCurBlockStaticPoint
     return 0;
   }
   return iRet;
+}
+
+/*!
+* \brief	exchange two picture pData planes
+* \param	ppPic1		picture pointer to picture 1
+* \param	ppPic2		picture pointer to picture 2
+* \return	none
+*/
+void CWelsPreProcess::WelsExchangeSpatialPictures (SPicture** ppPic1, SPicture** ppPic2) {
+  SPicture* tmp	= *ppPic1;
+
+  assert (*ppPic1 != *ppPic2);
+
+  *ppPic1 = *ppPic2;
+  *ppPic2 = tmp;
+}
+
+void CWelsPreProcess::UpdateSrcListLosslessScreenRefSelectionWithLtr (SPicture*	pCurPicture, const int32_t kiCurDid, const int32_t kuiMarkLongTermPicIdx, SPicture** pLongRefList) {
+  SPicture** pLongRefSrcList = &m_pSpatialPic[kiCurDid][0];
+  for (int32_t i = 0; i < MAX_REF_PIC_COUNT; ++i) {
+    if (NULL == pLongRefSrcList[i + 1] || (NULL != pLongRefList[i] && pLongRefList[i]->bUsedAsRef
+                                           && pLongRefList[i]->bIsLongRef)) {
+      continue;
+    } else {
+      pLongRefSrcList[i + 1]->SetUnref ();
+    }
+  }
+  WelsExchangeSpatialPictures (&m_pSpatialPic[kiCurDid][0],
+                               &m_pSpatialPic[kiCurDid][1 + kuiMarkLongTermPicIdx]);
+  m_iAvaliableRefInSpatialPicList = MAX_REF_PIC_COUNT;
+  (GetCurrentFrameFromOrigList(kiCurDid))->SetUnref ();
+}
+void CWelsPreProcess::UpdateSrcList (SPicture*	pCurPicture, const int32_t kiCurDid, SPicture** pShortRefList, const uint32_t kuiShortRefCount) {
+  SPicture** pRefSrcList = &m_pSpatialPic[kiCurDid][0];
+
+  //pRefSrcList[0] is for current frame
+  if (pCurPicture->bUsedAsRef || pCurPicture->bIsLongRef) {
+    if (pCurPicture->iPictureType == P_SLICE && pCurPicture->uiTemporalId != 0 ) {
+      for (int iRefIdx = kuiShortRefCount - 1; iRefIdx >= 0; --iRefIdx)	{
+        WelsExchangeSpatialPictures (&pRefSrcList[iRefIdx + 1],
+          &pRefSrcList[iRefIdx]);
+      }
+      m_iAvaliableRefInSpatialPicList = kuiShortRefCount;
+    } else {
+      WelsExchangeSpatialPictures (&pRefSrcList[0], &pRefSrcList[1]);
+      for (int32_t i = MAX_SHORT_REF_COUNT - 1; i > 0  ; --i) {
+        if (pRefSrcList[i + 1] != NULL) {
+          pRefSrcList[i + 1]->SetUnref ();
+        }
+      }
+      m_iAvaliableRefInSpatialPicList = 1;
+    }
+  }
+  (GetCurrentFrameFromOrigList(kiCurDid))->SetUnref ();
 }
 
 //TODO: may opti later
