@@ -38,6 +38,7 @@
  *************************************************************************************
  */
 #include "bit_stream.h"
+#include "error_code.h"
 
 namespace WelsDec {
 
@@ -47,10 +48,14 @@ inline uint32_t GetValue4Bytes (uint8_t* pDstNal) {
   return uiValue;
 }
 
-void InitReadBits (PBitStringAux pBitString) {
+int32_t InitReadBits (PBitStringAux pBitString, intX_t iEndOffset) {
+  if(pBitString->pCurBuf>=(pBitString->pEndBuf - iEndOffset)) {
+    return ERR_INFO_INVALID_ACCESS;
+  }
   pBitString->uiCurBits  = GetValue4Bytes (pBitString->pCurBuf);
   pBitString->pCurBuf  += 4;
   pBitString->iLeftBits = -16;
+  return ERR_NONE;
 }
 
 /*!
@@ -60,23 +65,24 @@ void InitReadBits (PBitStringAux pBitString) {
  * \param	kpBuf		bit-stream buffer
  * \param	kiSize	    size in bits for decoder; size in bytes for encoder
  *
- * \return	size of buffer data in byte; failed in -1 return
+ * \return	0: success, other: fail
  */
 int32_t InitBits (PBitStringAux pBitString, const uint8_t* kpBuf, const int32_t kiSize) {
   const int32_t kiSizeBuf = (kiSize + 7) >> 3;
   uint8_t* pTmp = (uint8_t*)kpBuf;
 
   if (NULL == pTmp)
-    return -1;
+    return ERR_INFO_INVALID_ACCESS;
 
   pBitString->pStartBuf   = pTmp;				// buffer to start position
   pBitString->pEndBuf	    = pTmp + kiSizeBuf;	// buffer + length
   pBitString->iBits	    = kiSize;				// count bits of overall bitstreaming inputindex;
-
   pBitString->pCurBuf   = pBitString->pStartBuf;
-  InitReadBits (pBitString);
-
-  return kiSizeBuf;
+  int32_t iErr = InitReadBits (pBitString, 0);
+  if(iErr) {
+    return iErr;
+  }
+  return ERR_NONE;
 }
 
 } // namespace WelsDec

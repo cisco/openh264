@@ -69,7 +69,11 @@ int32_t iLeftType;
 int32_t iTopType;
 int32_t iLeftTopType;
 int32_t iRightTopType;
-} SNeighAvail, *PNeighAvail;
+
+int8_t  iTopCbp;
+int8_t  iLeftCbp;
+int8_t iDummy[2]; //for align
+} SWelsNeighAvail, *PWelsNeighAvail;
 
 } // namespace WelsDec
 

@@ -197,6 +197,7 @@ bool		bSliceHeaderExtFlag; // Indicate which slice header is used, avc or ext?
 /*from lower layer: slice header*/
 uint8_t		eSliceType;
 uint8_t		uiPadding[2];
+int32_t     iLastDeltaQp;
 } SSlice, *PSlice;
 
 } // namespace WelsDec

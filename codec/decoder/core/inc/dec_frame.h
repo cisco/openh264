@@ -66,10 +66,12 @@ struct TagDqLayer {
   int8_t*  pMbType;
   int32_t* pSliceIdc;				// using int32_t for slice_idc
   int16_t	(*pMv[LIST_A])[MB_BLOCK4x4_NUM][MV_A];
+  int16_t	(*pMvd[LIST_A])[MB_BLOCK4x4_NUM][MV_A];
   int8_t	(*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM];
   int8_t*  pLumaQp;
   int8_t*  pChromaQp;
   int8_t*  pCbp;
+  uint8_t *pCbfDc;
   int8_t (*pNzc)[24];
   int8_t (*pNzcRs)[24];
   int8_t*  pResidualPredFlag;

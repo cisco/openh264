@@ -43,7 +43,6 @@
 #include "error_code.h"
 #include "memmgr_nal_unit.h"
 #include "decoder_core.h"
-#include "decoder_core.h"
 
 namespace WelsDec {
 /*!
@@ -227,14 +226,18 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
     pCurNal->sNalHeaderExt.sNalUnitHeader.uiForbiddenZeroBit = pNalUnitHeader->uiForbiddenZeroBit;
     pCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc		  = pNalUnitHeader->uiNalRefIdc;
     pCurNal->sNalHeaderExt.sNalUnitHeader.eNalUnitType	      = pNalUnitHeader->eNalUnitType;
+    if (pNalUnitHeader->uiNalRefIdc != 0) {
+      pBs = &pCtx->sBs;
+      iBitSize = (iNalSize << 3) - BsGetTrailingBits (pNal + iNalSize - 1); // convert into bit
 
-    pBs = &pCtx->sBs;
-
-    iBitSize = (iNalSize << 3) - BsGetTrailingBits (pNal + iNalSize - 1); // convert into bit
-
-    InitBits (pBs, pNal, iBitSize);
-
-    ParsePrefixNalUnit (pCtx, pBs);
+      iErr = InitBits (pBs, pNal, iBitSize);
+      if (iErr) {
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "NAL_UNIT_PREFIX: InitBits() fail due invalid access.");
+        pCtx->iErrorCode	|= dsBitstreamError;
+        return NULL;
+      }
+      ParsePrefixNalUnit (pCtx, pBs);
+    }
     pCurNal->sNalData.sPrefixNal.bPrefixNalCorrectFlag = true;
 
     break;
@@ -309,7 +312,12 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
     pBs = &pCurAu->pNalUnitsList[uiAvailNalNum - 1]->sNalData.sVclNal.sSliceBitsRead;
     iBitSize = (iNalSize << 3) - BsGetTrailingBits (pNal + iNalSize - 1); // convert into bit
-    InitBits (pBs, pNal, iBitSize);
+    iErr = InitBits (pBs, pNal, iBitSize);
+    if (iErr) {
+      WelsLog (pLogCtx, WELS_LOG_ERROR, "NAL_UNIT_CODED_SLICE: InitBits() fail due invalid access.");
+      pCtx->iErrorCode	|= dsBitstreamError;
+      return NULL;
+    }
     iErr = ParseSliceHeaderSyntaxs (pCtx, pBs, bExtensionFlag);
     if (iErr != ERR_NONE) {
       if ((uiAvailNalNum == 1) && (pCurNal->sNalHeaderExt.bIdrFlag)) { //IDR parse error
@@ -505,8 +513,16 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
   switch (eNalType) {
   case NAL_UNIT_SPS:
   case NAL_UNIT_SUBSET_SPS:
-    if (iBitSize > 0)
-      InitBits (pBs, pRbsp, iBitSize);
+    if (iBitSize > 0) {
+      iErr = InitBits (pBs, pRbsp, iBitSize);
+      if (ERR_NONE != iErr) {
+        if (pCtx->eErrorConMethod == ERROR_CON_DISABLE)
+          pCtx->iErrorCode |= dsNoParamSets;
+        else
+          pCtx->iErrorCode |= dsBitstreamError;
+        return iErr;
+      }
+    }
     iErr = ParseSps (pCtx, pBs, &iPicWidth, &iPicHeight);
     if (ERR_NONE != iErr) {	// modified for pSps/pSubsetSps invalid, 12/1/2009
       if (pCtx->eErrorConMethod == ERROR_CON_DISABLE)
@@ -519,8 +535,16 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
     break;
 
   case NAL_UNIT_PPS:
-    if (iBitSize > 0)
-      InitBits (pBs, pRbsp, iBitSize);
+    if (iBitSize > 0) {
+      iErr = InitBits (pBs, pRbsp, iBitSize);
+      if (ERR_NONE != iErr) {
+        if (pCtx->eErrorConMethod == ERROR_CON_DISABLE)
+          pCtx->iErrorCode |= dsNoParamSets;
+        else
+          pCtx->iErrorCode |= dsBitstreamError;
+        return iErr;
+      }
+    }
     iErr = ParsePps (pCtx, &pCtx->sPpsBuffer[0], pBs);
     if (ERR_NONE != iErr) {	// modified for pps invalid, 12/1/2009
       if (pCtx->eErrorConMethod == ERROR_CON_DISABLE)

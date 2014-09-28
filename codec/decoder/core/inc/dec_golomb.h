@@ -219,7 +219,7 @@ static inline int32_t BsGetTe0 (PBitStringAux pBs, int32_t iRange, uint32_t* pCo
 static inline int32_t BsGetTrailingBits (uint8_t* pBuf) {
 // TODO
   uint32_t uiValue = *pBuf;
-  int32_t iRetNum = 1;
+  int32_t iRetNum = 0;
 
   do {
     if (uiValue & 1)
