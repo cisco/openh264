@@ -181,6 +181,8 @@ int32_t*   pCurrentFrameGomSad;
 int32_t*   pGomCost;
  
 int32_t   iAverageFrameQp;
+int32_t   iMinFrameQp;
+int32_t   iMaxFrameQp;
 int32_t   iNumberMbFrame;
 int32_t   iNumberMbGom;
 int32_t	iSliceNum;
@@ -238,6 +240,7 @@ PWelsRCMBInitFunc				pfWelsRcMbInit;
 PWelsRCMBInfoUpdateFunc			pfWelsRcMbInfoUpdate;
 } SWelsRcFunc;
 
+void RcTraceFrameBits (void* pEncCtx, long long uiTimeStamp);
 void WelsRcInitModule (void* pCtx, RC_MODES iRcMode);
 void WelsRcFreeMemory (void* pCtx);
 
