@@ -120,7 +120,7 @@ class EncodeDecodeTestAPI : public EncodeDecodeTestBase {
 	int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
     memset (buf_.data(), rand() % 256, frameSize);
     int rv = encoder_->EncodeFrame (&EncPic, &info);
-    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);   
+    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
   }
 };
 
@@ -252,7 +252,6 @@ TEST_P (EncodeDecodeTestAPI, GetOptionIDR) {
   int32_t iSpsPpsIdAddition = 0;
   int iIdx = 0;
   while (iIdx <= p.numframes) {
-  
     iSpsPpsIdAddition = rand() % 2;
     iIDRPeriod = (rand() % 150) + 1;
     encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
@@ -762,7 +761,6 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_NOPREFIX) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
   int frameSize = p.width * p.height * 3 / 2;
-  
   prepareEncDecParam(p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -857,7 +855,6 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_WITH_PREFIX_NOLOSS) {
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
-    
     //decoding after each encoding frame
     int len = 0;
     encToDecData (info, len);
@@ -1024,7 +1021,7 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace_NULL) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
   int frameSize = p.width * p.height * 3 / 2;
- 
+
   prepareEncDecParam(p);
 
   int32_t iTraceLevel = WELS_LOG_QUIET;
