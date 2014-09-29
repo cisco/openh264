@@ -126,7 +126,7 @@ class EncodeDecodeTestAPI : public EncodeDecodeTestBase {
 
 void EncodeDecodeTestAPI::prepareEncDecParam(const EncodeDecodeFileParamBase EncDecFileParam)
 {
-  //for encoder
+  // for encoder
   // I420: 1(Y) + 1/4(U) + 1/4(V)
   int frameSize = EncDecFileParam.width * EncDecFileParam.height * 3 / 2;
 
