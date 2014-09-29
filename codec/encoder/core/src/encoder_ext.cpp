@@ -167,6 +167,12 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
                  pSpatialLayer->iSpatialBitrate);
         return ENC_RETURN_INVALIDINPUT;
       }
+      if (pSpatialLayer->iMaxSpatialBitrate < pSpatialLayer->iSpatialBitrate * 1.1f) {
+        WelsLog (pLogCtx, WELS_LOG_WARNING,
+          "MaxSpatialBitrate (%d) should set be larger than 1.1 times of SpatialBitrate (%d)",
+          pSpatialLayer->iMaxSpatialBitrate, pSpatialLayer->iSpatialBitrate);
+ //       pSpatialLayer->iSpatialBitrate = (int32_t) (pSpatialLayer->iMaxSpatialBitrate/1.1f);
+      }
     }
     if (iTotalBitrate > pCfg->iTargetBitrate) {
       WelsLog (pLogCtx, WELS_LOG_ERROR,
@@ -3032,18 +3038,21 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   if (iSpatialNum < 1) {	// skip due to temporal layer settings (different frame rate)
     ++ pCtx->iCodingIndex;
     pFbi->eFrameType = videoFrameTypeSkip;
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,"[Rc] Frame timestamp = %8d, skip one frame",pSrcPic->uiTimeStamp);
     return ENC_RETURN_SUCCESS;
   }
 
   eFrameType = DecideFrameType (pCtx, iSpatialNum);
   if (eFrameType == videoFrameTypeSkip) {
     pFbi->eFrameType = eFrameType;
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,"[Rc] Frame timestamp = %8d, skip one frame",pSrcPic->uiTimeStamp);
     return ENC_RETURN_SUCCESS;
   }
 
   //loop each layer to check if have skip frame when RC and frame skip enable
   if (CheckFrameSkipBasedMaxbr (pCtx, iSpatialNum, eFrameType, (uint32_t)pSrcPic->uiTimeStamp)) {
     pFbi->eFrameType = videoFrameTypeSkip;
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,"[Rc] Frame timestamp = %8d, skip one frame",pSrcPic->uiTimeStamp);
     return ENC_RETURN_SUCCESS;
   }
 
@@ -3427,6 +3436,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     }
 
     pCtx->pFuncList->pfRc.pfWelsRcPictureInfoUpdate (pCtx, iLayerSize);
+    RcTraceFrameBits (pCtx,pSrcPic->uiTimeStamp);
     pCtx->pDecPic->iFrameAverageQp = pCtx->pWelsSvcRc->iAverageFrameQp;
 
     //update scc related
