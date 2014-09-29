@@ -453,6 +453,13 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
   return dsErrorFree;
 }
 
+DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
+    const int kiSrcLen,
+    SParserBsInfo* pDstInfo) {
+//TODO, add function here
+ return (DECODING_STATE) m_pDecContext->iErrorCode;
+}
+
 DECODING_STATE CWelsDecoder::DecodeFrame (const unsigned char* kpSrc,
     const int kiSrcLen,
     unsigned char** ppDst,

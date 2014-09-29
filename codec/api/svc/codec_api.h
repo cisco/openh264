@@ -107,6 +107,14 @@ class ISVCDecoder {
       SBufferInfo* pDstInfo) = 0;
 
   /*
+   * This function parse input bitstream only, and rewrite possible SVC syntax to AVC syntax
+   * return: 0 - success; otherwise -failed;
+   */
+  virtual DECODING_STATE EXTAPI DecodeParser (const unsigned char* pSrc,
+      const int iSrcLen,
+      SParserBsInfo* pDstInfo) = 0;
+
+  /*
    *  this API does not work for now!! This is for future use to support non-I420 color format output.
    */
   virtual DECODING_STATE EXTAPI DecodeFrameEx (const unsigned char* pSrc,
@@ -168,6 +176,10 @@ DECODING_STATE (*DecodeFrame2) (ISVCDecoder*, const unsigned char* pSrc,
                                 const int iSrcLen,
                                 unsigned char** ppDst,
                                 SBufferInfo* pDstInfo);
+
+DECODING_STATE (*DecodeParser) (ISVCDecoder*, const unsigned char* pSrc,
+                                const int iSrcLen,
+                                SParserBsInfo* pDstInfo);
 
 DECODING_STATE (*DecodeFrameEx) (ISVCDecoder*, const unsigned char* pSrc,
                                  const int iSrcLen,

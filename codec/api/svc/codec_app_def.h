@@ -447,4 +447,12 @@ typedef struct TagDecoderCapability {
   bool bRedPicCap;
 } SDecoderCapability;
 
+typedef struct TagParserBsInfo {
+  int iNalNum; //total NAL number in current AU
+  int iNalLenInByte [MAX_NAL_UNITS_IN_LAYER]; //each nal length
+  unsigned char* pDstBuff; //outputted dst buffer for parsed bitstream
+  int iSpsWidthInPixel; //required SPS width info
+  int iSpsHeightInPixel; //required SPS height info
+} SParserBsInfo, PParserBsInfo;
+
 #endif//WELS_VIDEO_CODEC_APPLICATION_DEFINITION_H__
