@@ -90,9 +90,11 @@ class EncodeDecodeTestBase : public ::testing::TestWithParam<EncodeDecodeFilePar
   }
 
  protected:
-  SEncParamExt param_;
-  BufferedData buf_;
-  SBufferInfo dstBufInfo_;
+  SEncParamExt   param_;
+  BufferedData   buf_;
+  SSourcePicture EncPic;
+  SFrameBSInfo   info;
+  SBufferInfo    dstBufInfo_;
   std::vector<SLostSim> m_SLostSim;
   WelsTraceCallback pFunc;
   STraceUnit sTrace;
@@ -112,7 +114,39 @@ class EncodeDecodeTestAPI : public EncodeDecodeTestBase {
   void prepareParam (int width, int height, float framerate) {
     EncodeDecodeTestBase::prepareParam (width, height, framerate);
   }
+
+  void prepareEncDecParam(const EncodeDecodeFileParamBase EncDecFileParam);
+  void EncodeOneFrame() {
+    int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
+    memset (buf_.data(), rand() % 256, frameSize);
+    int rv = encoder_->EncodeFrame (&EncPic, &info);
+    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  }
 };
+
+void EncodeDecodeTestAPI::prepareEncDecParam(const EncodeDecodeFileParamBase EncDecFileParam)
+{
+  // for encoder
+  // I420: 1(Y) + 1/4(U) + 1/4(V)
+  int frameSize = EncDecFileParam.width * EncDecFileParam.height * 3 / 2;
+
+  buf_.SetLength (frameSize);
+  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
+
+  memset (&EncPic, 0, sizeof (SSourcePicture));
+  EncPic.iPicWidth = EncDecFileParam.width;
+  EncPic.iPicHeight = EncDecFileParam.height;
+  EncPic.iColorFormat = videoFormatI420;
+  EncPic.iStride[0] = EncPic.iPicWidth;
+  EncPic.iStride[1] = EncPic.iStride[2] = EncPic.iPicWidth >> 1;
+  EncPic.pData[0] = buf_.data();
+  EncPic.pData[1] = EncPic.pData[0] + EncDecFileParam.width * EncDecFileParam.height;
+  EncPic.pData[2] = EncPic.pData[1] + (EncDecFileParam.width * EncDecFileParam.height >> 2);
+
+  //for decoder
+  memset (&info, 0, sizeof (SFrameBSInfo));
+}
+
 
 static const EncodeDecodeFileParamBase kFileParamArray[] = {
   {300, 160, 96, 6.0f, 2, 1, "000000000000001010101010101010101010101001101010100000010101000011"},
@@ -127,33 +161,19 @@ TEST_P (EncodeDecodeTestAPI, DecoderVclNal) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
 
-  //init for encoder
-  // I420: 1(Y) + 1/4(U) + 1/4(V)
   int frameSize = p.width * p.height * 3 / 2;
 
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
-  SFrameBSInfo info;
-  memset (&info, 0, sizeof (SFrameBSInfo));
 
-  SSourcePicture pic;
-  memset (&pic, 0, sizeof (SSourcePicture));
-  pic.iPicWidth = p.width;
-  pic.iPicHeight = p.height;
-  pic.iColorFormat = videoFormatI420;
-  pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = buf_.data();
-  pic.pData[1] = pic.pData[0] + p.width * p.height;
-  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  prepareEncDecParam(p);
+
   int iIdx = 0;
   while (iIdx <= p.numframes) {
-    memset (buf_.data(), rand() % 256, frameSize);
-    rv = encoder_->EncodeFrame (&pic, &info);
-    ASSERT_TRUE (rv == cmResultSuccess);
+
+    EncodeOneFrame();
+
     //decoding after each encoding frame
     int vclNal, len = 0;
     encToDecData (info, len);
@@ -179,35 +199,18 @@ TEST_P (EncodeDecodeTestAPI, GetOptionFramenum) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
 
-  //init for encoder
-  // I420: 1(Y) + 1/4(U) + 1/4(V)
   int frameSize = p.width * p.height * 3 / 2;
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
 
-  SFrameBSInfo info;
-  memset (&info, 0, sizeof (SFrameBSInfo));
+  prepareEncDecParam(p);
 
-  SSourcePicture pic;
-  memset (&pic, 0, sizeof (SSourcePicture));
-  pic.iPicWidth = p.width;
-  pic.iPicHeight = p.height;
-  pic.iColorFormat = videoFormatI420;
-  pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = buf_.data();
-  pic.pData[1] = pic.pData[0] + p.width * p.height;
-  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
   int32_t iEncFrameNum = -1;
   int32_t iDecFrameNum;
   int iIdx = 0;
   while (iIdx <= p.numframes) {
-    memset (buf_.data(), rand() % 256, frameSize);
-    rv = encoder_->EncodeFrame (&pic, &info);
-    ASSERT_TRUE (rv == cmResultSuccess);
+    EncodeOneFrame();
     //decoding after each encoding frame
     int len = 0;
     encToDecData (info, len);
@@ -240,35 +243,22 @@ TEST_P (EncodeDecodeTestAPI, GetOptionIDR) {
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
 
-  SFrameBSInfo info;
-  memset (&info, 0, sizeof (SFrameBSInfo));
+  prepareEncDecParam(p);
 
-  SSourcePicture pic;
-  memset (&pic, 0, sizeof (SSourcePicture));
-  pic.iPicWidth = p.width;
-  pic.iPicHeight = p.height;
-  pic.iColorFormat = videoFormatI420;
-  pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = buf_.data();
-  pic.pData[1] = pic.pData[0] + p.width * p.height;
-  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
   int32_t iEncCurIdrPicId = 0;
   int32_t iDecCurIdrPicId;
   int32_t iIDRPeriod = 1;
   int32_t iSpsPpsIdAddition = 0;
   int iIdx = 0;
   while (iIdx <= p.numframes) {
-    memset (buf_.data(), rand() % 256, frameSize);
     iSpsPpsIdAddition = rand() % 2;
     iIDRPeriod = (rand() % 150) + 1;
     encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
     encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
-    rv = encoder_->EncodeFrame (&pic, &info);
-    ASSERT_TRUE (rv == cmResultSuccess);
+
+    EncodeOneFrame();
+
     if (info.eFrameType == videoFrameTypeIDR) {
       iEncCurIdrPicId = (iSpsPpsIdAddition == 0) ? 0 : (iEncCurIdrPicId + 1);
     }
@@ -493,21 +483,9 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_ALLIDR) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
   int frameSize = p.width * p.height * 3 / 2;
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
 
-  SFrameBSInfo info;
-  memset (&info, 0, sizeof (SFrameBSInfo));
-  SSourcePicture pic;
-  memset (&pic, 0, sizeof (SSourcePicture));
-  pic.iPicWidth = p.width;
-  pic.iPicHeight = p.height;
-  pic.iColorFormat = videoFormatI420;
-  pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = buf_.data();
-  pic.pData[1] = pic.pData[0] + p.width * p.height;
-  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  prepareEncDecParam(p);
+
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -523,9 +501,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_ALLIDR) {
   encoder_->SetOption (ENCODER_LTR_MARKING_PERIOD, &iLtrPeriod);
   int iIdx = 0;
   while (iIdx <= p.numframes) {
-    memset (buf_.data(), rand() % 256, frameSize);
-    rv = encoder_->EncodeFrame (&pic, &info);
-    ASSERT_EQ (rv, cmResultSuccess);
+    EncodeOneFrame();
     ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     encoder_->ForceIntraFrame (true);
     iIdx++;
@@ -603,21 +579,9 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_Engine) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
   int frameSize = p.width * p.height * 3 / 2;
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
-  SFrameBSInfo info;
-  memset (&info, 0, sizeof (SFrameBSInfo));
 
-  SSourcePicture pic;
-  memset (&pic, 0, sizeof (SSourcePicture));
-  pic.iPicWidth = p.width;
-  pic.iPicHeight = p.height;
-  pic.iColorFormat = videoFormatI420;
-  pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = buf_.data();
-  pic.pData[1] = pic.pData[0] + p.width * p.height;
-  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  prepareEncDecParam(p);
+
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -635,12 +599,10 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_Engine) {
   int iLossIdx = 0;
   bool bVCLLoss = false;
   while (iIdx <= p.numframes) {
-    memset (buf_.data(), rand() % 256, frameSize);
-    rv = encoder_->EncodeFrame (&pic, &info);
+	EncodeOneFrame();
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
-    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
     //decoding after each encoding frame
     int len = 0;
     encToDecData (info, len);
@@ -683,21 +645,8 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_DISABLE) {
   ASSERT_EQ (0, rv);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
   int frameSize = p.width * p.height * 3 / 2;
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
-  SFrameBSInfo info;
-  memset (&info, 0, sizeof (SFrameBSInfo));
 
-  SSourcePicture pic;
-  memset (&pic, 0, sizeof (SSourcePicture));
-  pic.iPicWidth = p.width;
-  pic.iPicHeight = p.height;
-  pic.iColorFormat = videoFormatI420;
-  pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = buf_.data();
-  pic.pData[1] = pic.pData[0] + p.width * p.height;
-  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  prepareEncDecParam(p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -716,12 +665,10 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_DISABLE) {
   int iSkipedBytes;
   bool bVCLLoss = false;
   while (iIdx <= p.numframes) {
-    memset (buf_.data(), rand() % 256, frameSize);
-    rv = encoder_->EncodeFrame (&pic, &info);
+    EncodeOneFrame();
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
-    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
     //decoding after each encoding frame
     int len = 0;
     encToDecData (info, len);
@@ -755,21 +702,8 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_SLICE_COPY) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
   int frameSize = p.width * p.height * 3 / 2;
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
-  SFrameBSInfo info;
-  memset (&info, 0, sizeof (SFrameBSInfo));
 
-  SSourcePicture pic;
-  memset (&pic, 0, sizeof (SSourcePicture));
-  pic.iPicWidth = p.width;
-  pic.iPicHeight = p.height;
-  pic.iColorFormat = videoFormatI420;
-  pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = buf_.data();
-  pic.pData[1] = pic.pData[0] + p.width * p.height;
-  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  prepareEncDecParam(p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -788,12 +722,10 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_SLICE_COPY) {
   int iSkipedBytes;
   bool bVCLLoss = false;
   while (iIdx <= p.numframes) {
-    memset (buf_.data(), rand() % 256, frameSize);
-    rv = encoder_->EncodeFrame (&pic, &info);
+    EncodeOneFrame();
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
-    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
     //decoding after each encoding frame
     int len = 0;
     encToDecData (info, len);
@@ -829,21 +761,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_NOPREFIX) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
   int frameSize = p.width * p.height * 3 / 2;
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
-  SFrameBSInfo info;
-  memset (&info, 0, sizeof (SFrameBSInfo));
-
-  SSourcePicture pic;
-  memset (&pic, 0, sizeof (SSourcePicture));
-  pic.iPicWidth = p.width;
-  pic.iPicHeight = p.height;
-  pic.iColorFormat = videoFormatI420;
-  pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = buf_.data();
-  pic.pData[1] = pic.pData[0] + p.width * p.height;
-  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  prepareEncDecParam(p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -861,12 +779,10 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_NOPREFIX) {
   int iLossIdx = 0;
   bool bVCLLoss = false;
   while (iIdx <= p.numframes) {
-    memset (buf_.data(), rand() % 256, frameSize);
-    rv = encoder_->EncodeFrame (&pic, &info);
+    EncodeOneFrame();
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
-    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
     //decoding after each encoding frame
     int len = 0;
     encToDecData (info, len);
@@ -918,21 +834,8 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_WITH_PREFIX_NOLOSS) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
   int frameSize = p.width * p.height * 3 / 2;
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
-  SFrameBSInfo info;
-  memset (&info, 0, sizeof (SFrameBSInfo));
 
-  SSourcePicture pic;
-  memset (&pic, 0, sizeof (SSourcePicture));
-  pic.iPicWidth = p.width;
-  pic.iPicHeight = p.height;
-  pic.iColorFormat = videoFormatI420;
-  pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = buf_.data();
-  pic.pData[1] = pic.pData[0] + p.width * p.height;
-  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  prepareEncDecParam(p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -948,12 +851,10 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_WITH_PREFIX_NOLOSS) {
   encoder_->SetOption (ENCODER_LTR_MARKING_PERIOD, &iLtrPeriod);
   int iIdx = 0;
   while (iIdx <= p.numframes) {
-    memset (buf_.data(), rand() % 256, frameSize);
-    rv = encoder_->EncodeFrame (&pic, &info);
+    EncodeOneFrame();
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
-    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
     //decoding after each encoding frame
     int len = 0;
     encToDecData (info, len);
@@ -996,21 +897,8 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_SVC_L1_NOLOSS) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
   int frameSize = p.width * p.height * 3 / 2;
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
-  SFrameBSInfo info;
-  memset (&info, 0, sizeof (SFrameBSInfo));
 
-  SSourcePicture pic;
-  memset (&pic, 0, sizeof (SSourcePicture));
-  pic.iPicWidth = p.width;
-  pic.iPicHeight = p.height;
-  pic.iColorFormat = videoFormatI420;
-  pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = buf_.data();
-  pic.pData[1] = pic.pData[0] + p.width * p.height;
-  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  prepareEncDecParam(p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -1026,12 +914,10 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_SVC_L1_NOLOSS) {
   encoder_->SetOption (ENCODER_LTR_MARKING_PERIOD, &iLtrPeriod);
   int iIdx = 0;
   while (iIdx <= p.numframes) {
-    memset (buf_.data(), rand() % 256, frameSize);
-    rv = encoder_->EncodeFrame (&pic, &info);
+    EncodeOneFrame();
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
-    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
     //decoding after each encoding frame
     int len = 0;
     encToDecData (info, len);
@@ -1069,21 +955,8 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
   int frameSize = p.width * p.height * 3 / 2;
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
-  SFrameBSInfo info;
-  memset (&info, 0, sizeof (SFrameBSInfo));
 
-  SSourcePicture pic;
-  memset (&pic, 0, sizeof (SSourcePicture));
-  pic.iPicWidth = p.width;
-  pic.iPicHeight = p.height;
-  pic.iColorFormat = videoFormatI420;
-  pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = buf_.data();
-  pic.pData[1] = pic.pData[0] + p.width * p.height;
-  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  prepareEncDecParam(p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   pFunc = TestOutPutTrace;
   pTraceInfo = &sTrace;
@@ -1109,16 +982,14 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace) {
   int iLossIdx = 0;
   bool bVCLLoss = false;
   while (iIdx <= p.numframes) {
-    memset (buf_.data(), rand() % 256, frameSize);
     iTraceLevel = rand() % 33;
     sTrace.iTarLevel = iTraceLevel;
     encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
     decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
-    rv = encoder_->EncodeFrame (&pic, &info);
+    EncodeOneFrame();
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
-    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
     //decoding after each encoding frame
     int len = 0;
     encToDecData (info, len);
@@ -1150,21 +1021,9 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace_NULL) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
   int frameSize = p.width * p.height * 3 / 2;
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
-  SFrameBSInfo info;
-  memset (&info, 0, sizeof (SFrameBSInfo));
 
-  SSourcePicture pic;
-  memset (&pic, 0, sizeof (SSourcePicture));
-  pic.iPicWidth = p.width;
-  pic.iPicHeight = p.height;
-  pic.iColorFormat = videoFormatI420;
-  pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = buf_.data();
-  pic.pData[1] = pic.pData[0] + p.width * p.height;
-  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  prepareEncDecParam(p);
+
   int32_t iTraceLevel = WELS_LOG_QUIET;
   pFunc = NULL;
   pTraceInfo = NULL;
@@ -1189,15 +1048,13 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace_NULL) {
   int iLossIdx = 0;
   bool bVCLLoss = false;
   while (iIdx <= p.numframes) {
-    memset (buf_.data(), rand() % 256, frameSize);
     iTraceLevel = rand() % 33;
     encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
     decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
-    rv = encoder_->EncodeFrame (&pic, &info);
+    EncodeOneFrame();
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
-    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
     //decoding after each encoding frame
     int len = 0;
     encToDecData (info, len);
@@ -1238,21 +1095,8 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECIDC_GeneralSliceChange) {
 
   //Start for enc/dec
   int frameSize = p.width * p.height * 3 / 2;
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
-  SFrameBSInfo info;
-  memset (&info, 0, sizeof (SFrameBSInfo));
 
-  SSourcePicture pic;
-  memset (&pic, 0, sizeof (SSourcePicture));
-  pic.iPicWidth = p.width;
-  pic.iPicHeight = p.height;
-  pic.iColorFormat = videoFormatI420;
-  pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = buf_.data();
-  pic.pData[1] = pic.pData[0] + p.width * p.height;
-  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
+  prepareEncDecParam(p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -1264,9 +1108,7 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECIDC_GeneralSliceChange) {
 
   //enc/dec pictures
   while (iIdx <= p.numframes) {
-    memset (buf_.data(), rand() % 256, frameSize);
-    rv = encoder_->EncodeFrame (&pic, &info);
-    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+    EncodeOneFrame();
     //decoding after each encoding frame
     len = 0;
     iPacketNum = 0;
@@ -1339,29 +1181,13 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
 
   //Start for enc/dec
   int frameSize = p.width * p.height * 3 / 2;
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
-  SFrameBSInfo info;
-  memset (&info, 0, sizeof (SFrameBSInfo));
-
-  SSourcePicture pic;
-  memset (&pic, 0, sizeof (SSourcePicture));
-  pic.iPicWidth = p.width;
-  pic.iPicHeight = p.height;
-  pic.iColorFormat = videoFormatI420;
-  pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = buf_.data();
-  pic.pData[1] = pic.pData[0] + p.width * p.height;
-  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
   int iIdx = 0;
   int len = 0;
   unsigned char* pData[3] = { NULL };
 
+  prepareEncDecParam(p);
   //Frame 0: IDR, EC_IDC=DISABLE, loss = 0
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   encToDecData (info, len);
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, (ERROR_CON_IDC) ERROR_CON_DISABLE);
@@ -1376,15 +1202,11 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   iIdx++;
 
   //Frame 1: P, EC_IDC=DISABLE, loss = 1
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   iIdx++;
 
   //Frame 2: P, EC_IDC=DISABLE, loss = 0
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   encToDecData (info, len);
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
@@ -1404,9 +1226,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 3: P, EC_IDC=SLICE_COPY, loss = 0
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   encToDecData (info, len);
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_SLICE_COPY);
@@ -1426,9 +1246,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 4: P, EC_IDC=DISABLE, loss = 0
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   encToDecData (info, len);
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_DISABLE);
@@ -1445,9 +1263,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   iIdx++;
 
   //Frame 5: P, EC_IDC=DISABLE, loss = 1
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   iIdx++;
 
   //set EC=FRAME_COPY
@@ -1456,16 +1272,12 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 6: P, EC_IDC=FRAME_COPY, loss = 1
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   EXPECT_EQ (uiGet, uiEcIdc);
   iIdx++;
 
   //Frame 7: P, EC_IDC=FRAME_COPY, loss = 0
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   encToDecData (info, len);
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_FRAME_COPY);
@@ -1505,30 +1317,15 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
 
   //Start for enc/dec
   int frameSize = p.width * p.height * 3 / 2;
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
-  SFrameBSInfo info;
-  memset (&info, 0, sizeof (SFrameBSInfo));
-
-  SSourcePicture pic;
-  memset (&pic, 0, sizeof (SSourcePicture));
-  pic.iPicWidth = p.width;
-  pic.iPicHeight = p.height;
-  pic.iColorFormat = videoFormatI420;
-  pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = buf_.data();
-  pic.pData[1] = pic.pData[0] + p.width * p.height;
-  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
   int iIdx = 0;
   int len = 0;
   unsigned char* pData[3] = { NULL };
   int iTotalSliceSize = 0;
 
+  prepareEncDecParam(p);
+
   //Frame 0: IDR, EC_IDC=2, loss = 2
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   iTotalSliceSize = 0;
   encToDecSliceData (0, 0, info, len); //SPS
   iTotalSliceSize = len;
@@ -1550,9 +1347,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
 
   //Frame 1: P, EC_IDC=2, loss = 0
   //will clean SPS/PPS status
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   encToDecData (info, len); //all slice together
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
@@ -1573,9 +1368,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 2: P, EC_IDC=0, loss = 0
   /////will clean SPS/PPS status
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   encToDecData (info, len); //all slice together
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
@@ -1596,9 +1389,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 3: P, EC_IDC=2, loss = 1
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   encToDecSliceData (0, 0, info, iTotalSliceSize); //slice 1 lost
   encToDecSliceData (0, 1, info, len); //slice 2
   pData[0] = pData[1] = pData[2] = 0;
@@ -1619,9 +1410,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 4: P, EC_IDC=0, loss = 0
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   encToDecData (info, len); //all slice
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
@@ -1663,25 +1452,12 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
 
   //Start for enc/dec
   int frameSize = p.width * p.height * 3 / 2;
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
-  SFrameBSInfo info;
-  memset (&info, 0, sizeof (SFrameBSInfo));
-
-  SSourcePicture pic;
-  memset (&pic, 0, sizeof (SSourcePicture));
-  pic.iPicWidth = p.width;
-  pic.iPicHeight = p.height;
-  pic.iColorFormat = videoFormatI420;
-  pic.iStride[0] = pic.iPicWidth;
-  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = buf_.data();
-  pic.pData[1] = pic.pData[0] + p.width * p.height;
-  pic.pData[2] = pic.pData[1] + (p.width * p.height >> 2);
   int iIdx = 0;
   int len = 0;
   unsigned char* pData[3] = { NULL };
   int iTotalSliceSize = 0;
+
+  prepareEncDecParam(p);
 
   //set EC=DISABLE
   uiEcIdc = (uint32_t) (ERROR_CON_DISABLE);
@@ -1690,9 +1466,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 0: IDR, EC_IDC=0, loss = 0
   //Expected result: all OK, 2nd Output
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   encToDecData (info, len); //all slice
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
@@ -1707,9 +1481,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
 
   //Frame 1: P, EC_IDC=0, loss = 0
   //Expected result: all OK, 2nd Output
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   encToDecData (info, len); //all slice together
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
@@ -1725,9 +1497,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
 
   //Frame 2: P, EC_IDC=0, loss = 1
   //Expected result: all OK, no Output
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   encToDecSliceData (0, 0, info, iTotalSliceSize); // slice 1 lost
   encToDecSliceData (0, 1, info, len); // slice 2 only
   pData[0] = pData[1] = pData[2] = 0;
@@ -1749,9 +1519,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 3: P, EC_IDC=2, loss = 2
   //Expected result: neither OK, 1st Output
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   encToDecSliceData (0, 0, info, len); //slice 1 only
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
@@ -1772,9 +1540,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 4: P, EC_IDC=0, loss = 0
   //Expected result: depends on DecodeFrame2 result. If OK, output; else ,no output
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   encToDecData (info, len); //all slice
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
@@ -1795,9 +1561,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   //Expected result: depends on DecodeFrame2 result. If OK, output; else ,no output
   int32_t iIDRPeriod = 1;
   encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
-  memset (buf_.data(), rand() % 256, frameSize);
-  rv = encoder_->EncodeFrame (&pic, &info);
-  ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  EncodeOneFrame();
   EXPECT_TRUE (info.eFrameType == videoFrameTypeIDR);
   encToDecSliceData (0, 0, info, len); //SPS
   iTotalSliceSize = len;
