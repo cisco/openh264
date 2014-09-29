@@ -117,7 +117,7 @@ class EncodeDecodeTestAPI : public EncodeDecodeTestBase {
 
   void prepareEncDecParam(const EncodeDecodeFileParamBase EncDecFileParam);
   void EncodeOneFrame() {
-	int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
+    int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
     memset (buf_.data(), rand() % 256, frameSize);
     int rv = encoder_->EncodeFrame (&EncPic, &info);
     ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
