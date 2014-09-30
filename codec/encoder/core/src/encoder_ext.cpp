@@ -3038,21 +3038,21 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   if (iSpatialNum < 1) {	// skip due to temporal layer settings (different frame rate)
     ++ pCtx->iCodingIndex;
     pFbi->eFrameType = videoFrameTypeSkip;
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,"[Rc] Frame timestamp = %8d, skip one frame",pSrcPic->uiTimeStamp);
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,"[Rc] Frame timestamp = %8"PRId64", skip one frame", (int64_t)pSrcPic->uiTimeStamp);
     return ENC_RETURN_SUCCESS;
   }
 
   eFrameType = DecideFrameType (pCtx, iSpatialNum);
   if (eFrameType == videoFrameTypeSkip) {
     pFbi->eFrameType = eFrameType;
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,"[Rc] Frame timestamp = %8d, skip one frame",pSrcPic->uiTimeStamp);
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,"[Rc] Frame timestamp = %8"PRId64", skip one frame", (int64_t)pSrcPic->uiTimeStamp);
     return ENC_RETURN_SUCCESS;
   }
 
   //loop each layer to check if have skip frame when RC and frame skip enable
   if (CheckFrameSkipBasedMaxbr (pCtx, iSpatialNum, eFrameType, (uint32_t)pSrcPic->uiTimeStamp)) {
     pFbi->eFrameType = videoFrameTypeSkip;
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,"[Rc] Frame timestamp = %8d, skip one frame",pSrcPic->uiTimeStamp);
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,"[Rc] Frame timestamp = %8"PRId64", skip one frame", (int64_t)pSrcPic->uiTimeStamp);
     return ENC_RETURN_SUCCESS;
   }
 
