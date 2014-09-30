@@ -88,13 +88,18 @@ struct SVCDecoderImpl : public ISVCDecoder {
     EXPECT_TRUE (gThis == this);
     return static_cast<DECODING_STATE> (5);
   }
+  virtual DECODING_STATE EXTAPI DecodeParser (const unsigned char* pSrc,
+      const int iSrcLen, SParserBsInfo* pDstInfo) {
+    EXPECT_TRUE (gThis == this);
+    return static_cast<DECODING_STATE> (6);
+  }
   virtual long EXTAPI SetOption (DECODER_OPTION eOptionId, void* pOption) {
     EXPECT_TRUE (gThis == this);
-    return 6;
+    return 7;
   }
   virtual long EXTAPI GetOption (DECODER_OPTION eOptionId, void* pOption) {
     EXPECT_TRUE (gThis == this);
-    return 7;
+    return 8;
   }
 };
 
