@@ -75,7 +75,6 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
  * \return	successful - 0; otherwise none 0 for failed
  */
 int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
-  float fMaxFrameRate = 0.0f;
   const float fEpsn = 0.000001f;
   int32_t i = 0;
 
@@ -128,24 +127,12 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
       return ENC_RETURN_INVALIDINPUT;
     }
     if (UINT_MAX == GetLogFactor (fDlp->fOutputFrameRate, fDlp->fInputFrameRate)) {
-      WelsLog (pLogCtx, WELS_LOG_ERROR,
-               "Invalid settings in input frame rate(%.6f) and output frame rate(%.6f) of layer #%d config file: iResult of output frame rate divided by input frame rate should be power of 2(i.e,in/pOut=2^n)..",
-               fDlp->fInputFrameRate, fDlp->fOutputFrameRate, i);
-      return ENC_RETURN_INVALIDINPUT;
+      WelsLog (pLogCtx, WELS_LOG_WARNING,
+               "AUTO CORRECT: Invalid settings in input frame rate(%.6f) and output frame rate(%.6f) of layer #%d config file: iResult of output frame rate divided by input frame rate should be power of 2(i.e,in/pOut=2^n). \n Auto correcting Output Framerate to Input Framerate %f!\n",
+               fDlp->fInputFrameRate, fDlp->fOutputFrameRate, i, fDlp->fInputFrameRate);
+      fDlp->fOutputFrameRate = fDlp->fInputFrameRate;
     }
   }
-
-  for (i = 0; i < pCfg->iSpatialLayerNum; ++ i) {
-    SSpatialLayerInternal* fDlp = &pCfg->sDependencyLayers[i];
-    if (fDlp->fInputFrameRate > fMaxFrameRate)
-      fMaxFrameRate	= fDlp->fInputFrameRate;
-  }
-
-  if (fMaxFrameRate > fEpsn && (fMaxFrameRate - pCfg->fMaxFrameRate > fEpsn
-                                || fMaxFrameRate - pCfg->fMaxFrameRate < -fEpsn)) {
-    pCfg->fMaxFrameRate	= fMaxFrameRate;
-  }
-
 
   if ((pCfg->iRCMode != RC_OFF_MODE) && (pCfg->iRCMode != RC_QUALITY_MODE) && (pCfg->iRCMode != RC_BUFFERBASED_MODE)
       && (pCfg->iRCMode != RC_BITRATE_MODE)) {
@@ -2026,6 +2013,11 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
     WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), ParamValidationExt failed return %d.", iRet);
     return iRet;
   }
+  iRet	=	pCodingParam->DetermineTemporalSettings();
+  if (iRet != ENC_RETURN_SUCCESS) {
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), DetermineTemporalSettings failed return %d (check in/out frame rate and temporal layer setting!)", iRet);
+    return iRet;
+  }
   iRet = GetMultipleThreadIdc (pLogCtx, pCodingParam, iSliceNum, iCacheLineSize, uiCpuFeatureFlags);
   if (iRet != 0) {
     WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), GetMultipleThreadIdc failed return %d.", iRet);
@@ -2045,7 +2037,6 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   pCtx->pMemAlign = new CMemoryAlign (iCacheLineSize);
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pCtx->pMemAlign), FreeMemorySvc (&pCtx))
 
-  pCodingParam->DetermineTemporalSettings();
   iRet = AllocCodingParam (&pCtx->pSvcParam, pCtx->pMemAlign);
   if (iRet != 0) {
     FreeMemorySvc (&pCtx);

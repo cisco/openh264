@@ -284,6 +284,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     iUsageType = pCodingParam.iUsageType;
     iPicWidth   = pCodingParam.iPicWidth;
     iPicHeight  = pCodingParam.iPicHeight;
+    fMaxFrameRate = fParamMaxFrameRate;
     iComplexityMode = pCodingParam.iComplexityMode;
 
     SUsedPicRect.iLeft = 0;
@@ -381,7 +382,6 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
     SSpatialLayerInternal* pDlp		= &sDependencyLayers[0];
     SSpatialLayerConfig* pSpatialLayer = &sSpatialLayers[0];
-    float fMaxFr			= .0f;
     EProfileIdc uiProfileIdc		= PRO_BASELINE;
     int8_t iIdxSpatial	= 0;
     while (iIdxSpatial < iSpatialLayerNum) {
@@ -392,11 +392,9 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
       float fLayerFrameRate	= WELS_CLIP3 (pCodingParam.sSpatialLayers[iIdxSpatial].fFrameRate,
                                           MIN_FRAME_RATE, fParamMaxFrameRate);
+      pDlp->fInputFrameRate	= fParamMaxFrameRate;
       pSpatialLayer->fFrameRate =
-        pDlp->fInputFrameRate	=
-          pDlp->fOutputFrameRate	= WELS_CLIP3 (fLayerFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
-      if (pDlp->fInputFrameRate > fMaxFr + EPSN)
-        fMaxFr = pDlp->fInputFrameRate;
+        pDlp->fOutputFrameRate	= WELS_CLIP3 (fLayerFrameRate, MIN_FRAME_RATE, fParamMaxFrameRate);
 
 #ifdef ENABLE_FRAME_DUMP
       pDlp->sRecFileName[0]	= '\0';	// file to be constructed
@@ -427,8 +425,6 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       ++ iIdxSpatial;
     }
 
-    fMaxFrameRate	= fMaxFr;
-
     SetActualPicResolution();
 
     return 0;
@@ -454,7 +450,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
   * \param	SWelsSvcCodingParam, and carried with known GOP size, max, input and output frame rate of each spatial
   * \return	NONE (should ensure valid parameter before this procedure)
   */
-  void DetermineTemporalSettings() {
+  int32_t DetermineTemporalSettings() {
     const int32_t iDecStages		= WELS_LOG2 (
                                     uiGopSize);	// (int8_t)GetLogFactor(1.0f, 1.0f * pcfg->uiGopSize);	//log2(uiGopSize)
     const uint8_t* pTemporalIdList	= &g_kuiTemporalIdListTable[iDecStages][0];
@@ -466,6 +462,9 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     while (i < iSpatialLayerNum) {
       const uint32_t kuiLogFactorInOutRate	= GetLogFactor (pDlp->fOutputFrameRate, pDlp->fInputFrameRate);
       const uint32_t kuiLogFactorMaxInRate	= GetLogFactor (pDlp->fInputFrameRate, fMaxFrameRate);
+      if (UINT_MAX == kuiLogFactorInOutRate || UINT_MAX == kuiLogFactorMaxInRate) {
+        return ENC_RETURN_INVALIDINPUT;
+      }
       int32_t iNotCodedMask = 0;
       int8_t iMaxTemporalId = 0;
 
@@ -486,6 +485,9 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       pDlp->iHighestTemporalId	= iMaxTemporalId;
       pDlp->iTemporalResolution	= kuiLogFactorMaxInRate + kuiLogFactorInOutRate;
       pDlp->iDecompositionStages	= iDecStages - kuiLogFactorMaxInRate - kuiLogFactorInOutRate;
+      if (pDlp->iDecompositionStages < 0) {
+        return ENC_RETURN_INVALIDINPUT;
+      }
 
       uiProfileIdc	= PRO_SCALABLE_BASELINE;
       ++ pDlp;
@@ -493,6 +495,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       ++ i;
     }
     iDecompStages = (int8_t)iDecStages;
+    return ENC_RETURN_SUCCESS;
   }
 
 } SWelsSvcCodingParam;
