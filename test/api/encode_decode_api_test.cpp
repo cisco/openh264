@@ -161,8 +161,6 @@ TEST_P (EncodeDecodeTestAPI, DecoderVclNal) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
 
-  int frameSize = p.width * p.height * 3 / 2;
-
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -199,7 +197,6 @@ TEST_P (EncodeDecodeTestAPI, GetOptionFramenum) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
 
-  int frameSize = p.width * p.height * 3 / 2;
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -239,7 +236,6 @@ TEST_P (EncodeDecodeTestAPI, GetOptionIDR) {
 
   //init for encoder
   // I420: 1(Y) + 1/4(U) + 1/4(V)
-  int frameSize = p.width * p.height * 3 / 2;
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -482,7 +478,6 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_ALLIDR) {
   encoder_->Uninitialize();
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
-  int frameSize = p.width * p.height * 3 / 2;
 
   prepareEncDecParam(p);
 
@@ -578,7 +573,6 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_Engine) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
-  int frameSize = p.width * p.height * 3 / 2;
 
   prepareEncDecParam(p);
 
@@ -644,7 +638,6 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_DISABLE) {
   rv = decoder_->Initialize (&decParam);
   ASSERT_EQ (0, rv);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
-  int frameSize = p.width * p.height * 3 / 2;
 
   prepareEncDecParam(p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
@@ -701,7 +694,6 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_SLICE_COPY) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
-  int frameSize = p.width * p.height * 3 / 2;
 
   prepareEncDecParam(p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
@@ -760,7 +752,6 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_NOPREFIX) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
-  int frameSize = p.width * p.height * 3 / 2;
   prepareEncDecParam(p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -833,7 +824,6 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_WITH_PREFIX_NOLOSS) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
-  int frameSize = p.width * p.height * 3 / 2;
 
   prepareEncDecParam(p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
@@ -896,7 +886,6 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_SVC_L1_NOLOSS) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
-  int frameSize = p.width * p.height * 3 / 2;
 
   prepareEncDecParam(p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
@@ -954,7 +943,6 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
-  int frameSize = p.width * p.height * 3 / 2;
 
   prepareEncDecParam(p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
@@ -1020,7 +1008,6 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace_NULL) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
-  int frameSize = p.width * p.height * 3 / 2;
 
   prepareEncDecParam(p);
 
@@ -1094,7 +1081,6 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECIDC_GeneralSliceChange) {
   EXPECT_EQ (uiGet, uiEcIdc);
 
   //Start for enc/dec
-  int frameSize = p.width * p.height * 3 / 2;
 
   prepareEncDecParam(p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
@@ -1180,7 +1166,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   EXPECT_EQ (uiGet, uiEcIdc);
 
   //Start for enc/dec
-  int frameSize = p.width * p.height * 3 / 2;
   int iIdx = 0;
   int len = 0;
   unsigned char* pData[3] = { NULL };
@@ -1316,7 +1301,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
 
   //Start for enc/dec
-  int frameSize = p.width * p.height * 3 / 2;
   int iIdx = 0;
   int len = 0;
   unsigned char* pData[3] = { NULL };
@@ -1451,7 +1435,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
 
   //Start for enc/dec
-  int frameSize = p.width * p.height * 3 / 2;
   int iIdx = 0;
   int len = 0;
   unsigned char* pData[3] = { NULL };
