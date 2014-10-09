@@ -609,7 +609,7 @@ TEST (DecoderDeblocking, WelsDeblockingFilterSlice) {
     sDqLayer.sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.pSps->uiTotalMbCount + rand() % 256;
   sDqLayer.iMbWidth = 1 + rand() % 128;
   WelsDeblockingFilterSlice (&sCtx, pDeblockMb);
-  EXPECT_TRUE ((sDqLayer.iMbXyIndex + 1) ==
+  EXPECT_TRUE ((uint32_t) (sDqLayer.iMbXyIndex + 1) ==
                sDqLayer.sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.pSps->uiTotalMbCount);
 
   // (4) Special case, uiDisableDeblockingFilterIdc==1, disable deblocking
@@ -796,20 +796,20 @@ TEST (DecoderDeblocking, DeblockingBsMarginalMBAvcbase) {
       UT_DB_CLEAN_STATUS
       iNoZeroCount[0 * 24 + iCurrBlock] = 1; // Current MB_block position
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (2 << (iPos * 8))) << iEdge << " " << iPos << " NoZeroCount!=0";
+                   0) == (2u << (iPos * 8))) << iEdge << " " << iPos << " NoZeroCount!=0";
 
       // (2) iEdge == 0, neighbor block NoZeroCount != 0
       UT_DB_CLEAN_STATUS
       iNoZeroCount[1 * 24 + iNeighborBlock ] = 1; // Neighbor MB_block position
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (2 << (iPos * 8))) << iEdge << " " << iPos << " NoZeroCount!=0";
+                   0) == (2u << (iPos * 8))) << iEdge << " " << iPos << " NoZeroCount!=0";
 
       // (3) iEdge == 0, reference idx diff
       UT_DB_CLEAN_STATUS
       iLayerRefIndex[0][0 * 16 + iCurrBlock] = 0;
       iLayerRefIndex[0][1 * 16 + iNeighborBlock] = 1;
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (1 << (iPos * 8))) << iEdge << " " << iPos << " Ref idx diff";
+                   0) == (1u << (iPos * 8))) << iEdge << " " << iPos << " Ref idx diff";
 
       // (4) iEdge == 0, abs(mv diff) < 4
       UT_DB_CLEAN_STATUS
@@ -832,34 +832,34 @@ TEST (DecoderDeblocking, DeblockingBsMarginalMBAvcbase) {
       UT_DB_CLEAN_STATUS
       iLayerMv[0][0 * 16 + iCurrBlock][0] = 4;
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (1 << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == 4";
+                   0) == (1u << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == 4";
 
       UT_DB_CLEAN_STATUS
       iLayerMv[0][0 * 16 + iCurrBlock][1] = 4;
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (1 << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == 4";
+                   0) == (1u << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == 4";
 
       UT_DB_CLEAN_STATUS
       iLayerMv[0][1 * 16 + iNeighborBlock][0] = 4;
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (1 << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == 4";
+                   0) == (1u << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == 4";
 
       UT_DB_CLEAN_STATUS
       iLayerMv[0][1 * 16 + iNeighborBlock][1] = 4;
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (1 << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == 4";
+                   0) == (1u << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == 4";
 
       UT_DB_CLEAN_STATUS
       iLayerMv[0][0 * 16 + iCurrBlock][0] = -2048;
       iLayerMv[0][1 * 16 + iNeighborBlock][0] = 2047;
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (1 << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == maximum";
+                   0) == (1u << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == maximum";
 
       UT_DB_CLEAN_STATUS
       iLayerMv[0][0 * 16 + iCurrBlock][1] = -2048;
       iLayerMv[0][1 * 16 + iNeighborBlock][1] = 2047;
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (1 << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == maximum";
+                   0) == (1u << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == maximum";
     }
   }
 }
