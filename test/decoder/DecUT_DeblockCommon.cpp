@@ -583,7 +583,7 @@ TEST (DecoderDeblocking, WelsDeblockingFilterSlice) {
   // (1) Normal case, the iTotalMbInCurSlice == pSps->uiTotalMbCount
   sDqLayer.iMbX = sDqLayer.iMbY = 0;
   sDqLayer.iMbXyIndex = 0;
-  sDqLayer.sLayerInfo.sSliceInLayer.iTotalMbInCurSlice = rand() % 256;
+  sDqLayer.sLayerInfo.sSliceInLayer.iTotalMbInCurSlice = 1 + rand() % 256; // at least one MB
   sDqLayer.sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.pSps->uiTotalMbCount =
     sDqLayer.sLayerInfo.sSliceInLayer.iTotalMbInCurSlice;
   sDqLayer.iMbWidth = 1 + rand() % 128;
@@ -591,20 +591,20 @@ TEST (DecoderDeblocking, WelsDeblockingFilterSlice) {
   EXPECT_TRUE ((sDqLayer.iMbXyIndex + 1) == sDqLayer.sLayerInfo.sSliceInLayer.iTotalMbInCurSlice) << sDqLayer.iMbXyIndex
       << " " << sDqLayer.sLayerInfo.sSliceInLayer.iTotalMbInCurSlice;
 
-  // (2) Normal case, multi slices, iTotalMbInCurSlice < pSps->uiTotalMbCount
+  // (2) Normal case, multi slices, iTotalMbInCurSlice <= pSps->uiTotalMbCount
   sDqLayer.iMbX = sDqLayer.iMbY = 0;
   sDqLayer.iMbXyIndex = 0;
-  sDqLayer.sLayerInfo.sSliceInLayer.iTotalMbInCurSlice = rand() % 256;
+  sDqLayer.sLayerInfo.sSliceInLayer.iTotalMbInCurSlice = 1 + rand() % 256;
   sDqLayer.sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.pSps->uiTotalMbCount =
     sDqLayer.sLayerInfo.sSliceInLayer.iTotalMbInCurSlice + rand() % 256;
   sDqLayer.iMbWidth = 1 + rand() % 128;
   WelsDeblockingFilterSlice (&sCtx, pDeblockMb);
   EXPECT_TRUE ((sDqLayer.iMbXyIndex + 1) == sDqLayer.sLayerInfo.sSliceInLayer.iTotalMbInCurSlice);
 
-  // (3) Special case, iTotalMbInCurSlice > pSps->uiTotalMbCount, JUST FOR TEST
+  // (3) Special case, iTotalMbInCurSlice >= pSps->uiTotalMbCount, JUST FOR TEST
   sDqLayer.iMbX = sDqLayer.iMbY = 0;
   sDqLayer.iMbXyIndex = 0;
-  sDqLayer.sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.pSps->uiTotalMbCount = rand() % 256;
+  sDqLayer.sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.pSps->uiTotalMbCount = 1 + rand() % 256;
   sDqLayer.sLayerInfo.sSliceInLayer.iTotalMbInCurSlice =
     sDqLayer.sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.pSps->uiTotalMbCount + rand() % 256;
   sDqLayer.iMbWidth = 1 + rand() % 128;
@@ -616,7 +616,7 @@ TEST (DecoderDeblocking, WelsDeblockingFilterSlice) {
   sDqLayer.iMbX = sDqLayer.iMbY = 0;
   sDqLayer.iMbXyIndex = 0;
   sDqLayer.sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.uiDisableDeblockingFilterIdc = 1;
-  sDqLayer.sLayerInfo.sSliceInLayer.iTotalMbInCurSlice = rand() % 256;
+  sDqLayer.sLayerInfo.sSliceInLayer.iTotalMbInCurSlice = 1 + rand() % 256;
   sDqLayer.sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.pSps->uiTotalMbCount =
     sDqLayer.sLayerInfo.sSliceInLayer.iTotalMbInCurSlice;
   sDqLayer.iMbWidth = 1 + rand() % 128;
