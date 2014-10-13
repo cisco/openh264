@@ -316,7 +316,6 @@ int32_t iFeedbackVclNalInAu;
 int32_t iFeedbackTidInAu;
 
 bool bAuReadyFlag;   // true: one au is ready for decoding; false: default value
-bool bDecErrorConedFlag; //true: current decoder is error coned
 
 bool bPrintFrameErrorTraceFlag; //true: can print info for upper layer
 int32_t iIgnoredErrorInfoPacketCount; //store the packet number with error decoding info

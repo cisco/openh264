@@ -438,17 +438,11 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     }
     if ((m_pDecContext->eErrorConMethod != ERROR_CON_DISABLE) && (pDstInfo->iBufferStatus == 1)) {
       //TODO after dec status updated
-      m_pDecContext->bDecErrorConedFlag = true;
       m_pDecContext->iErrorCode |= dsDataErrorConcealed;
     }
     return (DECODING_STATE) m_pDecContext->iErrorCode;
-  } else { //decoding correct, but may have ECed status
-    if (m_pDecContext->bDecErrorConedFlag) { //TODO after dec status updated
-      if (m_pDecContext->eErrorConMethod != ERROR_CON_DISABLE) //EC is on
-        m_pDecContext->iErrorCode |= dsDataErrorConcealed;
-      return (DECODING_STATE) m_pDecContext->iErrorCode;
-    }
   }
+  // else Error free, the current codec works well
 
   return dsErrorFree;
 }
@@ -457,7 +451,7 @@ DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
     const int kiSrcLen,
     SParserBsInfo* pDstInfo) {
 //TODO, add function here
- return (DECODING_STATE) m_pDecContext->iErrorCode;
+  return (DECODING_STATE) m_pDecContext->iErrorCode;
 }
 
 DECODING_STATE CWelsDecoder::DecodeFrame (const unsigned char* kpSrc,

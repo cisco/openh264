@@ -189,7 +189,7 @@ void ImplementErrorCon (PWelsDecoderContext pCtx) {
     DoErrorConSliceCopy (pCtx);
   } //TODO add other EC methods here in the future
   pCtx->iErrorCode |= dsDataErrorConcealed;
-  pCtx->bDecErrorConedFlag = true;
+  pCtx->pDec->bIsComplete = false; // Set complete flag to false after do EC.
 }
 
 } // namespace WelsDec

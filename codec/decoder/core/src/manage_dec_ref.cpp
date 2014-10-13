@@ -73,6 +73,7 @@ static void SetUnRef (PPicture pRef) {
     pRef->uiTemporalId = -1;
     pRef->uiSpatialId = -1;
     pRef->iSpsId = -1;
+    pRef->bIsComplete = false;
   }
 }
 
@@ -115,6 +116,9 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
     if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) { //IDR lost!, recover it for future decoding with data all set to 0
       PPicture pRef = PrefetchPic (pCtx->pPicBuff[0]);
       if (pRef != NULL) {
+        // IDR lost, set new
+        pRef->bIsComplete = false; // Set complete flag to false for lost IDR ref picture
+        pCtx->iErrorCode |= dsDataErrorConcealed;
         memset (pRef->pData[0], 128, pRef->iLinesize[0] * pRef->iHeightInPixel);
         memset (pRef->pData[1], 128, pRef->iLinesize[1] * pRef->iHeightInPixel / 2);
         memset (pRef->pData[2], 128, pRef->iLinesize[2] * pRef->iHeightInPixel / 2);
