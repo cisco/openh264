@@ -104,7 +104,6 @@ SScreenBlockFeatureStorage* pScreenBlockFeatureStorage;
    *	set picture as unreferenced
    */
   void SetUnref () {
-    if (NULL != this)	{
       iFramePoc		= -1;
       iFrameNum		= -1;
       uiTemporalId	=
@@ -117,7 +116,6 @@ SScreenBlockFeatureStorage* pScreenBlockFeatureStorage;
 
       if (NULL != pScreenBlockFeatureStorage)
         pScreenBlockFeatureStorage->bRefBlockFeatureCalculated	= false;
-    }
   }
 
 } SPicture;
