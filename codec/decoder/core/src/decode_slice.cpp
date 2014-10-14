@@ -419,7 +419,7 @@ int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNal
     }
     if (iUsedBits > pBs->iBits) { //When BS incomplete, as long as find it, SHOULD stop decoding to avoid mosaic or crash.
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
-               "WelsDecodeSlice()::::pBs incomplete, iUsedBits:%"PRId64" > pBs->iBits:%d, MUST stop decoding.",
+               "WelsDecodeSlice()::::pBs incomplete, iUsedBits:%" PRId64" > pBs->iBits:%d, MUST stop decoding.",
                (int64_t) iUsedBits, pBs->iBits);
       return -1;
     }
