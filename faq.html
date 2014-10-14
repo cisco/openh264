@@ -88,22 +88,6 @@
           <p> <strong>Q. What source code license is used?</strong><br />
             A: Two-Clause <a href="LICENSE.txt">BSD license</a>. </p>
 
-          <p> <strong>Q. What platforms will you support?</strong><br />
-            A: Our initial plan is to support Linux (x86 and ARM), Windows (XP
-            forward), OSX, and Android. The governance board can decide to add
-            additional platforms. As long as there are ports of the source code
-            and automatic build scripts contributed as part of the open source,
-            we do not see difficulties in adding additional platforms.
-            </p>
-
-          <p> <strong>Q. iOS is noticeably absent from the list of
-            platforms. Why is that?</strong><br /> A: Unfortunately, iOS does
-            not allow for applications to fetch and install modules from the
-            Internet once that application has been installed on the
-            device.  Recently, in iOS 8, Apple has provided an update to their 
-            <a href="https://developer.apple.com/library/ios/releasenotes/General/WhatsNewIniOS/Articles/iOS8.html" target="_blank">Video Toolbox Framework</a> 
-            that give developers direct access to H.264/AVC hardware encoding and decoding. <br /> </p>
-
            <p> <strong>Q. Where will the source code repository be hosted?</strong><br />
             A: It is at <a href="https://github.com/cisco/openh264"
             target="_blank">https://github.com/cisco/openh264</a>. </p>
@@ -112,9 +96,38 @@
             A: The initial code has the baseline profile. We look forward to
             working with the open source community to add high profile and
             others. </p>
+            
+          <p> <strong>Q. What platforms will your binaries support?</strong><br />
+            A: Our initial plan is to support Linux (x86 and ARM), Windows (XP
+            forward), OSX, and Android. The governance board can decide to add
+            additional platforms. As long as there are ports of the source code
+            and automatic build scripts contributed as part of the open source,
+            we do not see difficulties in adding additional platforms.  
+            </p>
 
+          <p> <strong>Q. iOS is noticeably absent from the list of
+            platforms. Why is that?</strong><br /> A: Unfortunately, iOS does
+            not allow for applications to fetch and install modules from the
+            Internet once that application has been installed on the device.
+            Recently, in iOS 8, Apple has provided an update to their 
+            <a href="https://developer.apple.com/library/ios/releasenotes/General/WhatsNewIniOS/Articles/iOS8.html" target="_blank">Video Toolbox Framework</a> 
+            that gives developers direct access to H.264/AVC hardware encoding and decoding. 
+            </p>
+            
+          <p> <strong>Q. How can developers downloading OpenH264 binaries to their applications 
+          be reassured the package only contains the matching revision of the OpenH264 code?</strong><br />
+            A: The best approach will be for the OpenH264 community to ultimately co-develop an automated 
+            process to make the binaries from the project's source code on a public, infrastructure service. 
+            The automation tools could be <a href="https://github.com/cisco/openh264/issues/893">developed and stored in github and a log of each build published</a> 
+            for the benefit everyone to ensure the builds only contain OpenH264 code. <br /> <br />
+            In the meantime, Mozilla has built the binaries used in Firefox and Cisco has built binaries for 
+            general application use.  Cisco's development practices are focused on delivering trustworthy 
+            products and systems and strictly prohibit any intentional behaviors or features that allow
+            unauthorized access, exposure of sensitive device information, or bypass of security measures.
+            </p>
+            
            <p> <strong> Q. What email list can developers use to discuss work on
-           this project?</strong><br /> A: For right now, we are using the email
+           this project?</strong><br /> A: We are using the email
            list at openh264-dev@googlegroups.com - Subscribe at <a
             href="https://groups.google.com/d/forum/openh264-dev"
            >https://groups.google.com/d/forum/openh264-dev</a>.  </p>
