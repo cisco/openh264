@@ -104,7 +104,7 @@ typedef enum {
   ENCODER_OPTION_TRACE_CALLBACK_CONTEXT,
 
   // advanced algorithmetic settings
-  ENCODER_OPTION_IS_LOSSLESS_LINK,
+  ENCODER_OPTION_IS_LOSSLESS_LINK
 } ENCODER_OPTION;
 
 /* Option types introduced in decoder application */
@@ -120,7 +120,7 @@ typedef enum {
   DECODER_OPTION_ERROR_CON_IDC, //not finished yet, indicate decoder error concealment status, in progress
   DECODER_OPTION_TRACE_LEVEL,
   DECODER_OPTION_TRACE_CALLBACK, // a void (*)(void* context, int level, const char* message) function which receives log messages
-  DECODER_OPTION_TRACE_CALLBACK_CONTEXT,
+  DECODER_OPTION_TRACE_CALLBACK_CONTEXT
 
 } DECODER_OPTION;
 
@@ -128,7 +128,7 @@ typedef enum {
 typedef enum {
   ERROR_CON_DISABLE = 0,
   ERROR_CON_FRAME_COPY,
-  ERROR_CON_SLICE_COPY,
+  ERROR_CON_SLICE_COPY
 } ERROR_CON_IDC;
 
 typedef enum { //feedback that whether or not have VCL NAL in current AU
@@ -148,14 +148,14 @@ typedef enum {
   SPATIAL_LAYER_1 = 1,
   SPATIAL_LAYER_2 = 2,
   SPATIAL_LAYER_3 = 3,
-  SPATIAL_LAYER_ALL = 4,
+  SPATIAL_LAYER_ALL = 4
 } LAYER_NUM;
 
 //enumerate the type of video bitstream which is provided to decoder
 typedef enum {
   VIDEO_BITSTREAM_AVC               = 0,
   VIDEO_BITSTREAM_SVC               = 1,
-  VIDEO_BITSTREAM_DEFAULT           = VIDEO_BITSTREAM_SVC,
+  VIDEO_BITSTREAM_DEFAULT           = VIDEO_BITSTREAM_SVC
 } VIDEO_BITSTREAM_TYPE;
 
 typedef enum {
@@ -164,7 +164,7 @@ typedef enum {
   IDR_RECOVERY_REQUEST = 2,
   NO_LTR_MARKING_FEEDBACK = 3,
   LTR_MARKING_SUCCESS = 4,
-  LTR_MARKING_FAILED = 5,
+  LTR_MARKING_FAILED = 5
 } KEY_FRAME_REQUEST_TYPE;
 
 typedef struct {
@@ -205,7 +205,7 @@ typedef enum {
   RC_QUALITY_MODE = 0,      //Quality mode
   RC_BITRATE_MODE = 1,   //Bitrate mode
   RC_BUFFERBASED_MODE = 2,//no bitrate control,only using buffer status,adjust the video quality
-  RC_OFF_MODE = -1,    // rate control off mode
+  RC_OFF_MODE = -1     // rate control off mode
 } RC_MODES;
 
 typedef enum {
@@ -220,7 +220,7 @@ typedef enum {
   PRO_CAVLC444	= 244,
 
   PRO_SCALABLE_BASELINE	= 83,
-  PRO_SCALABLE_HIGH		= 86,
+  PRO_SCALABLE_HIGH		= 86
 } EProfileIdc;
 
 typedef enum {
@@ -277,13 +277,13 @@ typedef struct {
 
 typedef enum {
   CAMERA_VIDEO_REAL_TIME, //camera video signal
-  SCREEN_CONTENT_REAL_TIME,//screen content signal
+  SCREEN_CONTENT_REAL_TIME //screen content signal
 } EUsageType;
 
 typedef enum {
   LOW_COMPLEXITY, //the lowest compleixty,the fastest speed,
   MEDIUM_COMPLEXITY, //medium complexity, medium speed,medium quality
-  HIGH_COMPLEXITY, //high complexity, lowest speed, high quality
+  HIGH_COMPLEXITY  //high complexity, lowest speed, high quality
 } ECOMPLEXITY_MODE;
 // TODO:  Refine the parameters definition.
 // SVC Encoding Parameters

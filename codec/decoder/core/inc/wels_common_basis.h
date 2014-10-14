@@ -60,7 +60,7 @@ PRO_HIGH444		= 144,
 PRO_CAVLC444	= 244,
 
 PRO_SCALABLE_BASELINE	= 83,
-PRO_SCALABLE_HIGH		= 86,
+PRO_SCALABLE_HIGH		= 86
 };
 
 /* Picture Size */
@@ -83,7 +83,7 @@ MB_LEFT     = 0x01,	// A
 MB_TOP      = 0x02,	// B
 MB_TOPRIGHT = 0x04,	// C
 MB_TOPLEFT	= 0x08,	// D,
-MB_PRIVATE  = 0x10,
+MB_PRIVATE  = 0x10
 };
 /* MB Type & Sub-MB Type */
 typedef int32_t MbType;

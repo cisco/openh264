@@ -63,7 +63,7 @@ typedef enum {
   videoFrameTypeI,		/* I frame type */
   videoFrameTypeP,		/* P frame type */
   videoFrameTypeSkip,		/* Skip the frame based encoder kernel */
-  videoFrameTypeIPMixed,		/* Frame type introduced I and P slices are mixing */
+  videoFrameTypeIPMixed 		/* Frame type introduced I and P slices are mixing */
 } EVideoFrameType;
 
 typedef enum {
@@ -72,7 +72,7 @@ typedef enum {
   cmUnkonwReason,
   cmMallocMemeError,                /*Malloc a memory error*/
   cmInitExpected,			  /*Initial action is expected*/
-  cmUnsupportedData,
+  cmUnsupportedData
 } CM_RETURN;
 
 /* nal unit type */
@@ -93,7 +93,7 @@ enum ENalPriority {
   NAL_PRIORITY_DISPOSABLE = 0,
   NAL_PRIORITY_LOW        = 1,
   NAL_PRIORITY_HIGH       = 2,
-  NAL_PRIORITY_HIGHEST    = 3,
+  NAL_PRIORITY_HIGHEST    = 3
 };
 
 #define IS_PARAMETER_SET_NAL(eNalRefIdc, eNalType) \
@@ -116,7 +116,7 @@ enum {
   ET_IR_R3 = 0x10,				// Intra Refresh in predifined 10% MB
   ET_FEC_HALF = 0x20,				// Forward Error Correction in 50% redundency mode
   ET_FEC_FULL	= 0x40,				// Forward Error Correction in 100% redundency mode
-  ET_RFS = 0x80,					// Reference Frame Selection
+  ET_RFS = 0x80 					// Reference Frame Selection
 };
 
 /* information of coded Slice(=NAL)(s) */
