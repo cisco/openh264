@@ -51,7 +51,7 @@ class CScrollDetection : public IStrategy {
   CScrollDetection (int32_t iCpuFlag) {
     m_eMethod = METHOD_SCROLL_DETECTION;
     WelsMemset (&m_sScrollDetectionParam, 0, sizeof (m_sScrollDetectionParam));
-  };
+  }
   ~CScrollDetection() {
   }
   EResult Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap);
