@@ -892,7 +892,7 @@ INSIDE_MEM_FREE:
     pFileYUV = NULL;
   }
   if (pYUV) {
-    delete pYUV;
+    delete[] pYUV;
     pYUV = NULL;
   }
   if (pSrcPic) {
