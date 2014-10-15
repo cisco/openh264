@@ -1965,7 +1965,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
     if (dq_cur->uiLayerDqId == kuiTargetLayerDqId) {
       if (!pCtx->bInstantDecFlag) {
         //Do error concealment here
-        if (NeedErrorCon (pCtx)) {
+        if ((NeedErrorCon (pCtx)) && (pCtx->eErrorConMethod != ERROR_CON_DISABLE)) {
           ImplementErrorCon (pCtx);
           pCtx->iTotalNumMbRec = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
           pCtx->pDec->iSpsId = pCtx->pSps->iSpsId;
@@ -2022,7 +2022,8 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
           MarkECFrameAsRef (pCtx);
         }
       } else {
-        DecodeFrameConstruction (pCtx, ppDst, pDstInfo);
+        if (DecodeFrameConstruction (pCtx, ppDst, pDstInfo))
+          return false;
       }
       pCtx->iPrevFrameNum = pCtx->sLastSliceHeader.iFrameNum; //save frame_num
       if (pCtx->bLastHasMmco5)
