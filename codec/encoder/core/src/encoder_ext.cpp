@@ -356,7 +356,7 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
       if (pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum == 1) {
-        WelsLog (pLogCtx, WELS_LOG_ERROR,
+        WelsLog (pLogCtx, WELS_LOG_WARNING,
                  "ParamValidationExt(), pSlice setting for SM_RASTER_SLICE now turn to SM_SINGLE_SLICE!");
         pSpatialLayer->sSliceCfg.uiSliceMode	= SM_SINGLE_SLICE;
         break;
