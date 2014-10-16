@@ -82,7 +82,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
       return -1;
   } else if (pCurDq->sLayerInfo.sNalHeaderExt.bIdrFlag
              && (pCtx->iErrorCode == dsErrorFree)) { //complete non-ECed IDR frame done
-    pCtx->bDecErrorConedFlag = false;
+    pCtx->pDec->bIsComplete = true;
   }
 
   pCtx->iTotalNumMbRec = 0;
@@ -104,10 +104,12 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   pDstInfo->iBufferStatus = 1;
 
   if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) //no buffer output if EC is disabled and frame incomplete
-    pDstInfo->iBufferStatus = (int32_t) bFrameCompleteFlag;
+    pDstInfo->iBufferStatus = (int32_t) (bFrameCompleteFlag
+                                         && pPic->bIsComplete); // When EC disable, ECed picture not output
 
-  if (!bFrameCompleteFlag) {
-    pCtx->iErrorCode |= dsBitstreamError;
+  if (pDstInfo->iBufferStatus == 0) {
+    if (!bFrameCompleteFlag)
+      pCtx->iErrorCode |= dsBitstreamError;
     return -1;
   }
 
@@ -1780,6 +1782,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
   int32_t iPpsId = 0;
   int32_t iRet = ERR_NONE;
 
+  bool bAllRefComplete = true; // Assume default all ref picutres are complete
+
   const uint8_t kuiTargetLayerDqId = GetTargetDqId (pCtx->uiTargetDqId, pCtx->pParam);
   const uint8_t kuiDependencyIdMax = (kuiTargetLayerDqId & 0x7F) >> 4;
   int16_t iLastIdD = -1, iLastIdQ = -1;
@@ -1889,6 +1893,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
                      "referencing pictures lost due frame gaps exist, prev_frame_num: %d, curr_frame_num: %d", pCtx->iPrevFrameNum,
                      pSh->iFrameNum);
 
+            bAllRefComplete = false;
             pCtx->iErrorCode |= dsRefLost;
             if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
 #ifdef LONG_TERM_REF
@@ -1905,6 +1910,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         if (iCurrIdD == kuiDependencyIdMax && iCurrIdQ == BASE_QUALITY_ID) {
           iRet = InitRefPicList (pCtx, uiNalRefIdc, pSh->iPicOrderCntLsb);
           if (iRet) {
+            bAllRefComplete = false; // RPLR error, set ref pictures complete flag false
             HandleReferenceLost (pCtx, pNalCur);
             WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
                      "reference picture introduced by this frame is lost during transmission! uiTId: %d",
@@ -1922,6 +1928,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
           WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
                    "DecodeCurrentAccessUnit() failed (%d) in frame: %d uiDId: %d uiQId: %d",
                    iRet, pSh->iFrameNum, iCurrIdD, iCurrIdQ);
+          bAllRefComplete = false;
           HandleReferenceLostL0 (pCtx, pNalCur);
           if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
             return iRet;
@@ -1929,8 +1936,12 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         }
         if (bReconstructSlice)	{
           if (WelsDecodeConstructSlice (pCtx, pNalCur)) {
+            pCtx->pDec->bIsComplete = false; // reconstruction error, directly set the flag false
             return -1;
           }
+        }
+        if (bAllRefComplete && (pCtx->sRefPic.uiRefCount[LIST_0] > 0 || pCtx->eSliceType != I_SLICE)) {
+          bAllRefComplete &= bCheckRefPicturesComplete (pCtx);
         }
       }
 #if defined (_DEBUG) &&  !defined (CODEC_FOR_TESTBED)
@@ -1952,6 +1963,12 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
           iLastIdD != pNalCur->sNalHeaderExt.uiDependencyId ||
           iLastIdQ != pNalCur->sNalHeaderExt.uiQualityId)
         break;
+    }
+
+    // Set the current dec picture complete flag. The flag will be reset when current picture need do ErrorCon.
+    pCtx->pDec->bIsComplete = bAllRefComplete;
+    if (!pCtx->pDec->bIsComplete) {  // Ref pictures ECed, result in ECed
+      pCtx->iErrorCode |= dsDataErrorConcealed;
     }
 
     // A dq layer decoded here
@@ -2030,5 +2047,43 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
     }
   }
   return ERR_NONE;
+}
+
+bool bCheckRefPicturesComplete (PWelsDecoderContext pCtx) {
+  // Multi Reference, RefIdx may differ
+  bool bAllRefComplete = true;
+  int32_t iRealMbIdx;
+  for (int32_t iMbIdx = 0; bAllRefComplete
+       && iMbIdx < pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer.iTotalMbInCurSlice; iMbIdx++) {
+    iRealMbIdx = pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iFirstMbInSlice + iMbIdx;
+    switch (pCtx->pCurDqLayer->pMbType[iRealMbIdx]) {
+    case MB_TYPE_SKIP:
+    case MB_TYPE_16x16:
+      bAllRefComplete &= pCtx->sRefPic.pRefList[ LIST_0 ][ pCtx->pCurDqLayer->pRefIndex[0][iRealMbIdx][0] ]->bIsComplete;
+      break;
+
+    case MB_TYPE_16x8:
+      bAllRefComplete &= pCtx->sRefPic.pRefList[ LIST_0 ][ pCtx->pCurDqLayer->pRefIndex[0][iRealMbIdx][0] ]->bIsComplete;
+      bAllRefComplete &= pCtx->sRefPic.pRefList[ LIST_0 ][ pCtx->pCurDqLayer->pRefIndex[0][iRealMbIdx][8] ]->bIsComplete;
+      break;
+
+    case MB_TYPE_8x16:
+      bAllRefComplete &= pCtx->sRefPic.pRefList[ LIST_0 ][ pCtx->pCurDqLayer->pRefIndex[0][iRealMbIdx][0] ]->bIsComplete;
+      bAllRefComplete &= pCtx->sRefPic.pRefList[ LIST_0 ][ pCtx->pCurDqLayer->pRefIndex[0][iRealMbIdx][2] ]->bIsComplete;
+      break;
+
+    case MB_TYPE_8x8:
+    case MB_TYPE_8x8_REF0:
+      bAllRefComplete &= pCtx->sRefPic.pRefList[ LIST_0 ][ pCtx->pCurDqLayer->pRefIndex[0][iRealMbIdx][0] ]->bIsComplete;
+      bAllRefComplete &= pCtx->sRefPic.pRefList[ LIST_0 ][ pCtx->pCurDqLayer->pRefIndex[0][iRealMbIdx][2] ]->bIsComplete;
+      bAllRefComplete &= pCtx->sRefPic.pRefList[ LIST_0 ][ pCtx->pCurDqLayer->pRefIndex[0][iRealMbIdx][8] ]->bIsComplete;
+      bAllRefComplete &= pCtx->sRefPic.pRefList[ LIST_0 ][ pCtx->pCurDqLayer->pRefIndex[0][iRealMbIdx][10] ]->bIsComplete;
+      break;
+
+    default:
+      break;
+    }
+  }
+  return bAllRefComplete;
 }
 } // namespace WelsDec

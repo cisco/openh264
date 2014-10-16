@@ -103,6 +103,8 @@ class EncodeDecodeTestBase : public ::testing::TestWithParam<EncodeDecodeFilePar
 
 class EncodeDecodeTestAPI : public EncodeDecodeTestBase {
  public:
+  uint8_t iRandValue;
+ public:
   void SetUp() {
     EncodeDecodeTestBase::SetUp();
   }
@@ -115,17 +117,17 @@ class EncodeDecodeTestAPI : public EncodeDecodeTestBase {
     EncodeDecodeTestBase::prepareParam (width, height, framerate);
   }
 
-  void prepareEncDecParam(const EncodeDecodeFileParamBase EncDecFileParam);
+  void prepareEncDecParam (const EncodeDecodeFileParamBase EncDecFileParam);
   void EncodeOneFrame() {
     int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
-    memset (buf_.data(), rand() % 256, frameSize);
+    memset (buf_.data(), iRandValue, (frameSize >> 2));
+    memset (buf_.data() + (frameSize >> 2), rand() % 256, (frameSize - (frameSize >> 2)));
     int rv = encoder_->EncodeFrame (&EncPic, &info);
     ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
   }
 };
 
-void EncodeDecodeTestAPI::prepareEncDecParam(const EncodeDecodeFileParamBase EncDecFileParam)
-{
+void EncodeDecodeTestAPI::prepareEncDecParam (const EncodeDecodeFileParamBase EncDecFileParam) {
   // for encoder
   // I420: 1(Y) + 1/4(U) + 1/4(V)
   int frameSize = EncDecFileParam.width * EncDecFileParam.height * 3 / 2;
@@ -145,6 +147,9 @@ void EncodeDecodeTestAPI::prepareEncDecParam(const EncodeDecodeFileParamBase Enc
 
   //for decoder
   memset (&info, 0, sizeof (SFrameBSInfo));
+
+  //set a fixed random value
+  iRandValue = rand() % 256;
 }
 
 
@@ -165,7 +170,7 @@ TEST_P (EncodeDecodeTestAPI, DecoderVclNal) {
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
 
-  prepareEncDecParam(p);
+  prepareEncDecParam (p);
 
   int iIdx = 0;
   while (iIdx <= p.numframes) {
@@ -201,7 +206,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionFramenum) {
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
 
-  prepareEncDecParam(p);
+  prepareEncDecParam (p);
 
   int32_t iEncFrameNum = -1;
   int32_t iDecFrameNum;
@@ -240,7 +245,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionIDR) {
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
 
-  prepareEncDecParam(p);
+  prepareEncDecParam (p);
 
   int32_t iEncCurIdrPicId = 0;
   int32_t iDecCurIdrPicId;
@@ -479,7 +484,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_ALLIDR) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
 
-  prepareEncDecParam(p);
+  prepareEncDecParam (p);
 
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -574,7 +579,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_Engine) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  prepareEncDecParam(p);
+  prepareEncDecParam (p);
 
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -593,7 +598,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_Engine) {
   int iLossIdx = 0;
   bool bVCLLoss = false;
   while (iIdx <= p.numframes) {
-	EncodeOneFrame();
+    EncodeOneFrame();
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
@@ -639,7 +644,7 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_DISABLE) {
   ASSERT_EQ (0, rv);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  prepareEncDecParam(p);
+  prepareEncDecParam (p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -695,7 +700,7 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_SLICE_COPY) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  prepareEncDecParam(p);
+  prepareEncDecParam (p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -752,7 +757,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_NOPREFIX) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
-  prepareEncDecParam(p);
+  prepareEncDecParam (p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -825,7 +830,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_WITH_PREFIX_NOLOSS) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  prepareEncDecParam(p);
+  prepareEncDecParam (p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -887,7 +892,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_SVC_L1_NOLOSS) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  prepareEncDecParam(p);
+  prepareEncDecParam (p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -944,7 +949,7 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  prepareEncDecParam(p);
+  prepareEncDecParam (p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   pFunc = TestOutPutTrace;
   pTraceInfo = &sTrace;
@@ -1009,7 +1014,7 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace_NULL) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  prepareEncDecParam(p);
+  prepareEncDecParam (p);
 
   int32_t iTraceLevel = WELS_LOG_QUIET;
   pFunc = NULL;
@@ -1082,7 +1087,7 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECIDC_GeneralSliceChange) {
 
   //Start for enc/dec
 
-  prepareEncDecParam(p);
+  prepareEncDecParam (p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -1113,7 +1118,7 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECIDC_GeneralSliceChange) {
         rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf + iTotalSliceSize,
                                      info.sLayerInfo[0].pNalLengthInByte[iPacketNum], pData, &dstBufInfo_);
         if (uiEcIdc == ERROR_CON_DISABLE)
-         EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+          EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
       }
       //EC_IDC should not change till now
       decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
@@ -1170,7 +1175,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   int len = 0;
   unsigned char* pData[3] = { NULL };
 
-  prepareEncDecParam(p);
+  prepareEncDecParam (p);
   //Frame 0: IDR, EC_IDC=DISABLE, loss = 0
   EncodeOneFrame();
   encToDecData (info, len);
@@ -1241,10 +1246,9 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   EXPECT_EQ (rv, 0); //parse correct
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //no output
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
-  if (rv == 0) //TODO: should depend on if ref-frame is OK.
-    EXPECT_EQ (dstBufInfo_.iBufferStatus, 1);
-  else
-    EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+  //Ref picture is ECed, so current status is ECed, when EC disable, NO output
+  EXPECT_TRUE (rv & 32);
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
   iIdx++;
 
   //Frame 5: P, EC_IDC=DISABLE, loss = 1
@@ -1269,7 +1273,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
   rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
-  EXPECT_TRUE (rv != 0); //parse correct, but previous decoding error, ECed
+  EXPECT_TRUE (rv == 0); // Now the parse process is Error_None, and the reconstruction will has error return
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //no output
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   EXPECT_TRUE (rv != 0); //not sure if previous data drop would be detected in construction
@@ -1306,7 +1310,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   unsigned char* pData[3] = { NULL };
   int iTotalSliceSize = 0;
 
-  prepareEncDecParam(p);
+  prepareEncDecParam (p);
 
   //Frame 0: IDR, EC_IDC=2, loss = 2
   EncodeOneFrame();
@@ -1325,7 +1329,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, iTotalSliceSize, pData, &dstBufInfo_);
   EXPECT_EQ (rv, 0); //parse correct
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
-  EXPECT_EQ (rv, 0); //parse correct
+  EXPECT_EQ (rv, 0); // Reconstruct first slice OK
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //slice incomplete, no output
   iIdx++;
 
@@ -1361,10 +1365,9 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
   EXPECT_EQ (rv, 0); //parse correct
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
-  if (rv == 0) //TODO: should depend on if ref-frame is OK.
-    EXPECT_EQ (dstBufInfo_.iBufferStatus, 1);
-  else
-    EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+  // Ref picture is ECed, so reconstructed picture is ECed
+  EXPECT_TRUE (rv & 32);
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
   iIdx++;
 
   //set EC=SLICE_COPY
@@ -1381,7 +1384,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_FRAME_COPY);
   rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf + iTotalSliceSize, len, pData, &dstBufInfo_);
-  EXPECT_TRUE (rv & 32);
+  EXPECT_EQ (rv, 0); //parse correct
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   EXPECT_TRUE (rv & 32);
@@ -1402,10 +1405,10 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_DISABLE);
   rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
   EXPECT_TRUE (rv != 0);
-  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //output previous pic
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); // EC_IDC=0, previous picture slice lost, no output
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   EXPECT_TRUE (rv != 0);
-  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //output previous pic
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); // No ref picture, no output
   iIdx++;
 
 }
@@ -1440,7 +1443,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   unsigned char* pData[3] = { NULL };
   int iTotalSliceSize = 0;
 
-  prepareEncDecParam(p);
+  prepareEncDecParam (p);
 
   //set EC=DISABLE
   uiEcIdc = (uint32_t) (ERROR_CON_DISABLE);
@@ -1509,7 +1512,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_SLICE_COPY);
   rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
-  EXPECT_TRUE (rv & 32); //ECed
+  EXPECT_TRUE (rv & 32); //parse OK but frame 2 ECed
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //slice loss but ECed output Frame 2
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   EXPECT_TRUE (rv & 32);
@@ -1533,11 +1536,9 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   EXPECT_TRUE (rv != 0); //previous slice not outputted, will return error due to incomplete frame
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //output previous pic
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction,
-  //not sure if current frame can be correctly decoded
-  if (rv == 0)
-    EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //output previous pic
-  else
-    EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //output previous pic
+  // previous frame NOT output, no ref
+  EXPECT_TRUE (rv != 0);
+  EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //output previous pic
   iIdx++;
 
   //Frame 5: IDR, EC_IDC=2->0, loss = 0
@@ -1560,10 +1561,10 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
   rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, iTotalSliceSize, pData, &dstBufInfo_);
-  EXPECT_TRUE (rv != 0); //TODO: should be correct, now ECed status will return error
+  EXPECT_TRUE (rv == 0); // IDR status return error_free
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //frame incomplete
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction,
-  EXPECT_TRUE (rv != 0); //TODO: as above
+  EXPECT_TRUE (rv == 0);
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //output previous pic
   //set EC=DISABLE for slice 2
   encToDecSliceData (1, 1, info, len); //slice 1
@@ -1577,7 +1578,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   EXPECT_EQ (rv, 0); //Parse correct under no EC
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //frame incomplete
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction,
-  EXPECT_EQ (rv, 0); //Parse correct under no EC
+  EXPECT_EQ (rv, 0);
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //output previous pic
   iIdx++;
 
