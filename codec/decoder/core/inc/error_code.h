@@ -48,7 +48,7 @@ ERR_INVALID_PARAMETERS	= 1,
 ERR_MALLOC_FAILED		= 2,
 ERR_API_FAILED			= 3,
 
-ERR_BOUND				= 31,
+ERR_BOUND				= 31
 } EWelsErr;
 
 /*
@@ -68,7 +68,7 @@ ERR_LEVEL_PREFIX_NAL,
 ERR_LEVEL_PARAM_SETS,
 ERR_LEVEL_SLICE_HEADER,
 ERR_LEVEL_SLICE_DATA,
-ERR_LEVEL_MB_DATA,
+ERR_LEVEL_MB_DATA
 };
 
 //-----------------------------------------------------------------------------------------------------------
@@ -180,7 +180,7 @@ EER_INFO_INVALID_MMCO_LONG2UNUSED,
 ERR_INFO_INVALID_MMCO_SHOART2LONG,
 ERR_INFO_INVALID_MMCO_REF_NUM_OVERFLOW,
 ERR_INFO_INVALID_MMCO_REF_NUM_NOT_ENOUGH,
-ERR_INFO_INVALID_MMCO_LONG_TERM_IDX_EXCEED_MAX,
+ERR_INFO_INVALID_MMCO_LONG_TERM_IDX_EXCEED_MAX
 };
 //-----------------------------------------------------------------------------------------------------------
 

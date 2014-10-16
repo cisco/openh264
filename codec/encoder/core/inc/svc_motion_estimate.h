@@ -62,7 +62,7 @@ ME_FULL    = 0x10,  // FULL
 
 // derived ME methods combination
 ME_DIA_CROSS    = (ME_DIA | ME_CROSS),   // DIA+CROSS
-ME_DIA_CROSS_FME  = (ME_DIA_CROSS | ME_FME), // DIA+CROSS+FME
+ME_DIA_CROSS_FME  = (ME_DIA_CROSS | ME_FME)  // DIA+CROSS+FME
 };
 
 union SadPredISatdUnit {

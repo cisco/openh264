@@ -56,7 +56,7 @@ namespace WelsEnc {
 enum {
   BITS_NORMAL,
   BITS_LIMITED,
-  BITS_EXCEEDED,
+  BITS_EXCEEDED
 };
 
 enum {
@@ -102,7 +102,7 @@ enum {
   GOM_ROW_MODE1_720P    = 2,
   QP_RANGE_UPPER_MODE1  = 9,
   QP_RANGE_LOWER_MODE1  = 4,
-  QP_RANGE_INTRA_MODE1  = 3,
+  QP_RANGE_INTRA_MODE1  = 3
 };
 
 //bits allocation

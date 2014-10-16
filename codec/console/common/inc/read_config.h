@@ -42,26 +42,25 @@
 
 #include <stdlib.h>
 #include <string>
-using namespace std;
 
 
 class CReadConfig {
  public:
   CReadConfig();
   CReadConfig (const char* pConfigFileName);
-  CReadConfig (const string& pConfigFileName);
+  CReadConfig (const std::string& pConfigFileName);
   virtual ~CReadConfig();
 
   void Openf (const char* strFile);
-  long ReadLine (string* strVal, const int iValSize = 4);
+  long ReadLine (std::string* strVal, const int iValSize = 4);
   const bool EndOfFile();
   const int GetLines();
   const bool ExistFile();
-  const string& GetFileName();
+  const std::string& GetFileName();
 
  private:
   FILE*			m_pCfgFile;
-  string			m_strCfgFileName;
+  std::string			m_strCfgFileName;
   unsigned int	m_iLines;
 };
 

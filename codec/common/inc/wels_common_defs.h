@@ -155,7 +155,7 @@ enum EWelsSliceType {
   UNKNOWN_SLICE = 5
 };
 
-/* SSlice Types in scalable extension */		;
+/* SSlice Types in scalable extension */
 enum ESliceTypeExt {
   EP_SLICE = 0,	// EP_SLICE: 0, 5
   EB_SLICE = 1,	// EB_SLICE: 1, 6

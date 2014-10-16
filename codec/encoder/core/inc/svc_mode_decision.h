@@ -55,7 +55,7 @@ namespace WelsEnc {
 
 typedef enum {
 STATIC,
-SCROLLED,
+SCROLLED
 } ESkipModes;
 
 // NOILP ILFMD ENTRANCE

@@ -58,7 +58,7 @@ CReadConfig::CReadConfig (const char* kpConfigFileName)
   }
 }
 
-CReadConfig::CReadConfig (const string& kpConfigFileName)
+CReadConfig::CReadConfig (const std::string& kpConfigFileName)
   : m_pCfgFile (0)
   , m_strCfgFileName (kpConfigFileName)
   , m_iLines (0) {
@@ -81,11 +81,11 @@ void CReadConfig::Openf (const char* kpStrFile) {
   }
 }
 
-long CReadConfig::ReadLine (string* pVal, const int kiValSize/* = 4*/) {
+long CReadConfig::ReadLine (std::string* pVal, const int kiValSize/* = 4*/) {
   if (m_pCfgFile == NULL || pVal == NULL || kiValSize <= 1)
     return 0;
 
-  string* strTags = &pVal[0];
+  std::string* strTags = &pVal[0];
   int nTagNum = 0, n = 0;
   bool bCommentFlag = false;
 
@@ -134,6 +134,6 @@ const bool CReadConfig::ExistFile() {
   return (m_pCfgFile != NULL);
 }
 
-const string& CReadConfig::GetFileName() {
+const std::string& CReadConfig::GetFileName() {
   return m_strCfgFileName;
 }
