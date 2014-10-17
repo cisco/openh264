@@ -5,9 +5,19 @@
 #include "BaseDecoderTest.h"
 #include "BaseEncoderTest.h"
 #include "wels_common_defs.h"
+#include "wels_const.h"
 #include <string>
 #include <vector>
 using namespace WelsCommon;
+
+#define ENCODE_FRAME_NUM (30)
+#define MAX_WIDTH  (3840)
+#define MAX_HEIGHT (2160)
+#define SAVED_NALUNIT_NUM	( (MAX_SPATIAL_LAYER_NUM*MAX_QUALITY_LAYER_NUM) + 1 + MAX_SPATIAL_LAYER_NUM )
+#define MAX_SLICES_NUM		( ( MAX_NAL_UNITS_IN_LAYER - SAVED_NALUNIT_NUM ) / 3 )
+#define SLICE_MODE_NUM (6)
+#define LOOP_FILTER_IDC_NUM (3)
+#define LOOF_FILTER_OFFSET_RANGE (6)
 
 typedef struct SLost_Sim {
   WelsCommon::EWelsNalUnitType eNalType;
@@ -117,33 +127,41 @@ class EncodeDecodeTestAPI : public EncodeDecodeTestBase {
     EncodeDecodeTestBase::prepareParam (width, height, framerate);
   }
 
-  void prepareEncDecParam (const EncodeDecodeFileParamBase EncDecFileParam);
-  void EncodeOneFrame() {
+  void InitialEncDec(int iWidth, int iHeight);
+  void RandomParamExtCombination();
+  void ValidateParamExtCombination();
+
+  void EncodeOneFrame(int iCheckTypeIndex) {
     int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
     memset (buf_.data(), iRandValue, (frameSize >> 2));
     memset (buf_.data() + (frameSize >> 2), rand() % 256, (frameSize - (frameSize >> 2)));
     int rv = encoder_->EncodeFrame (&EncPic, &info);
-    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+	if ( 0 == iCheckTypeIndex)
+        ASSERT_TRUE (rv == cmResultSuccess );
+	else if ( 1 == iCheckTypeIndex)
+        ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason );
   }
 };
 
-void EncodeDecodeTestAPI::prepareEncDecParam (const EncodeDecodeFileParamBase EncDecFileParam) {
+
+void EncodeDecodeTestAPI::InitialEncDec(int iWidth, int iHeight){
+
   // for encoder
   // I420: 1(Y) + 1/4(U) + 1/4(V)
-  int frameSize = EncDecFileParam.width * EncDecFileParam.height * 3 / 2;
+  int frameSize = iWidth * iHeight * 3 / 2;
 
   buf_.SetLength (frameSize);
   ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
 
   memset (&EncPic, 0, sizeof (SSourcePicture));
-  EncPic.iPicWidth = EncDecFileParam.width;
-  EncPic.iPicHeight = EncDecFileParam.height;
+  EncPic.iPicWidth = iWidth;
+  EncPic.iPicHeight =  iHeight;
   EncPic.iColorFormat = videoFormatI420;
   EncPic.iStride[0] = EncPic.iPicWidth;
   EncPic.iStride[1] = EncPic.iStride[2] = EncPic.iPicWidth >> 1;
   EncPic.pData[0] = buf_.data();
-  EncPic.pData[1] = EncPic.pData[0] + EncDecFileParam.width * EncDecFileParam.height;
-  EncPic.pData[2] = EncPic.pData[1] + (EncDecFileParam.width * EncDecFileParam.height >> 2);
+  EncPic.pData[1] = EncPic.pData[0] + iWidth * iHeight;
+  EncPic.pData[2] = EncPic.pData[1] + (iWidth * iHeight >> 2);
 
   //for decoder
   memset (&info, 0, sizeof (SFrameBSInfo));
@@ -152,6 +170,109 @@ void EncodeDecodeTestAPI::prepareEncDecParam (const EncodeDecodeFileParamBase En
   iRandValue = rand() % 256;
 }
 
+void EncodeDecodeTestAPI::RandomParamExtCombination(){
+
+  param_.iPicWidth  = WELS_CLIP3( ( (rand() % MAX_WIDTH)>>1  + 1 )<<1, 2, MAX_WIDTH);
+  param_.iPicHeight = WELS_CLIP3( ( (rand() % MAX_HEIGHT)>>1 + 1 )<<1, 2, MAX_HEIGHT);
+
+  param_.fMaxFrameRate  = rand() + 0.5f;
+
+  param_.iUsageType         = static_cast<EUsageType> (rand() % 2);
+  param_.iTemporalLayerNum  = rand();
+  param_.iSpatialLayerNum   = rand();
+
+
+  for(int iSpatialIdx=0; iSpatialIdx < MAX_SPATIAL_LAYER_NUM; iSpatialIdx++){
+      param_.sSpatialLayers[iSpatialIdx].iVideoWidth  = param_.iPicWidth >> (param_.iSpatialLayerNum - 1 - iSpatialIdx);
+      param_.sSpatialLayers[iSpatialIdx].iVideoHeight = param_.iPicHeight >> (param_.iSpatialLayerNum - 1 - iSpatialIdx);
+      param_.sSpatialLayers[iSpatialIdx].fFrameRate   = param_.fMaxFrameRate;
+      param_.sSpatialLayers[iSpatialIdx].iSpatialBitrate = param_.iTargetBitrate;
+
+	  param_.sSpatialLayers[iSpatialIdx].sSliceCfg.uiSliceMode = static_cast<SliceModeEnum> (rand() % SLICE_MODE_NUM);
+      param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceNum = rand();
+
+      param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = rand();
+      param_.uiMaxNalSize = rand();
+  }
+
+  param_.iNumRefFrame       = rand();
+
+  param_.uiIntraPeriod      = rand() - 1;
+
+  param_.bEnableAdaptiveQuant = (bool)(rand() % 2);
+  param_.bPrefixNalAddingCtrl = (bool)(rand() % 2);
+  param_.bEnableSSEI          = (bool)(rand() % 2);
+  param_.iPaddingFlag         = rand() % 2;
+  param_.bEnableLongTermReference  = (bool)(rand() % 2);
+
+
+  param_.iLoopFilterDisableIdc    = rand();
+  param_.iLoopFilterAlphaC0Offset = rand();
+  param_.iLoopFilterBetaOffset    = rand();
+
+  param_.bEnableDenoise             = (bool)(rand() % 2);
+  param_.bEnableBackgroundDetection = (bool)(rand() % 2);
+  param_.bEnableAdaptiveQuant       = (bool)(rand() % 2);
+  param_.bEnableFrameCroppingFlag   = (bool)(rand() % 2);
+  param_.bEnableSceneChangeDetect   = (bool)(rand() % 2);
+
+}
+
+void EncodeDecodeTestAPI::ValidateParamExtCombination(){
+
+  bool bDYNSLICEFlag = false;
+
+  param_.iPicWidth  = WELS_CLIP3( param_.iPicWidth,  2, MAX_WIDTH);
+  param_.iPicHeight = WELS_CLIP3( param_.iPicHeight, 2, MAX_HEIGHT);
+
+  param_.iTemporalLayerNum  = WELS_CLIP3( param_.iTemporalLayerNum, 1, MAX_TEMPORAL_LAYER_NUM);
+
+  if( CAMERA_VIDEO_REAL_TIME == param_.iUsageType )
+      param_.iSpatialLayerNum   = WELS_CLIP3( param_.iSpatialLayerNum, 1, MAX_SPATIAL_LAYER_NUM);
+  else
+      param_.iSpatialLayerNum   = 1;
+
+  for(int iSpatialIdx=0; iSpatialIdx < param_.iSpatialLayerNum; iSpatialIdx++){
+      param_.sSpatialLayers[iSpatialIdx].iVideoWidth  = param_.iPicWidth >> (param_.iSpatialLayerNum - 1 - iSpatialIdx);
+      param_.sSpatialLayers[iSpatialIdx].iVideoHeight = param_.iPicHeight >> (param_.iSpatialLayerNum - 1 - iSpatialIdx);
+      param_.sSpatialLayers[iSpatialIdx].fFrameRate   = param_.fMaxFrameRate;
+      param_.sSpatialLayers[iSpatialIdx].iSpatialBitrate = param_.iTargetBitrate;
+
+      unsigned int uiSliceNum  = param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceNum;
+      param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceNum = WELS_CLIP3( uiSliceNum, 1, MAX_SLICES_NUM);
+
+      if ( SM_DYN_SLICE == param_.sSpatialLayers[iSpatialIdx].sSliceCfg.uiSliceMode) {
+          param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 600;
+          param_.uiMaxNalSize = 1500;
+		  bDYNSLICEFlag = true;
+      }
+      else{
+          param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 0;
+          param_.uiMaxNalSize = 0;
+      }
+  }
+
+  // slice mode of all spatial layer should be set as SM_DYN_SLICE
+  if ( true == bDYNSLICEFlag ){
+      for(int iSpatialIdx=0; iSpatialIdx < param_.iSpatialLayerNum; iSpatialIdx++){
+          param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 600;
+          param_.uiMaxNalSize = 1500;
+		   param_.sSpatialLayers[iSpatialIdx].sSliceCfg.uiSliceMode = SM_DYN_SLICE;
+	  }
+  }
+
+
+
+  int32_t iRefUpperBound    = (param_.iUsageType == CAMERA_VIDEO_REAL_TIME) ?
+                               MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA : MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN;
+  param_.iNumRefFrame       = WELS_CLIP3( param_.iNumRefFrame, MIN_REF_PIC_COUNT, iRefUpperBound);
+
+  param_.iLoopFilterDisableIdc    = param_.iLoopFilterDisableIdc    % LOOP_FILTER_IDC_NUM;
+  param_.iLoopFilterAlphaC0Offset = param_.iLoopFilterAlphaC0Offset % (2* LOOF_FILTER_OFFSET_RANGE +1 ) - LOOF_FILTER_OFFSET_RANGE;
+  param_.iLoopFilterBetaOffset    = param_.iLoopFilterBetaOffset    % (2* LOOF_FILTER_OFFSET_RANGE +1 ) - LOOF_FILTER_OFFSET_RANGE;
+
+
+}
 
 static const EncodeDecodeFileParamBase kFileParamArray[] = {
   {300, 160, 96, 6.0f, 2, 1, "000000000000001010101010101010101010101001101010100000010101000011"},
@@ -170,12 +291,11 @@ TEST_P (EncodeDecodeTestAPI, DecoderVclNal) {
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
 
-  prepareEncDecParam (p);
-
+  InitialEncDec(p.width,p.height);
   int iIdx = 0;
   while (iIdx <= p.numframes) {
 
-    EncodeOneFrame();
+    EncodeOneFrame(0);
 
     //decoding after each encoding frame
     int vclNal, len = 0;
@@ -206,13 +326,13 @@ TEST_P (EncodeDecodeTestAPI, GetOptionFramenum) {
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
 
-  prepareEncDecParam (p);
+  InitialEncDec(p.width,p.height);
 
   int32_t iEncFrameNum = -1;
   int32_t iDecFrameNum;
   int iIdx = 0;
   while (iIdx <= p.numframes) {
-    EncodeOneFrame();
+    EncodeOneFrame(0);
     //decoding after each encoding frame
     int len = 0;
     encToDecData (info, len);
@@ -245,7 +365,8 @@ TEST_P (EncodeDecodeTestAPI, GetOptionIDR) {
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
 
-  prepareEncDecParam (p);
+
+  InitialEncDec(p.width,p.height);
 
   int32_t iEncCurIdrPicId = 0;
   int32_t iDecCurIdrPicId;
@@ -258,7 +379,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionIDR) {
     encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
     encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
 
-    EncodeOneFrame();
+    EncodeOneFrame(0);
 
     if (info.eFrameType == videoFrameTypeIDR) {
       iEncCurIdrPicId = (iSpsPpsIdAddition == 0) ? 0 : (iEncCurIdrPicId + 1);
@@ -484,7 +605,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_ALLIDR) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
 
-  prepareEncDecParam (p);
+  InitialEncDec(p.width,p.height);
 
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -501,7 +622,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_ALLIDR) {
   encoder_->SetOption (ENCODER_LTR_MARKING_PERIOD, &iLtrPeriod);
   int iIdx = 0;
   while (iIdx <= p.numframes) {
-    EncodeOneFrame();
+    EncodeOneFrame(0);
     ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     encoder_->ForceIntraFrame (true);
     iIdx++;
@@ -579,7 +700,8 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_Engine) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  prepareEncDecParam (p);
+
+  InitialEncDec(p.width,p.height);
 
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -598,7 +720,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_Engine) {
   int iLossIdx = 0;
   bool bVCLLoss = false;
   while (iIdx <= p.numframes) {
-    EncodeOneFrame();
+    EncodeOneFrame(1);
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
@@ -644,7 +766,8 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_DISABLE) {
   ASSERT_EQ (0, rv);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  prepareEncDecParam (p);
+  InitialEncDec(p.width,p.height);
+
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -663,7 +786,7 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_DISABLE) {
   int iSkipedBytes;
   bool bVCLLoss = false;
   while (iIdx <= p.numframes) {
-    EncodeOneFrame();
+    EncodeOneFrame(1);
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
@@ -700,7 +823,8 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_SLICE_COPY) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  prepareEncDecParam (p);
+  InitialEncDec(p.width,p.height);
+
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -719,7 +843,7 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_SLICE_COPY) {
   int iSkipedBytes;
   bool bVCLLoss = false;
   while (iIdx <= p.numframes) {
-    EncodeOneFrame();
+    EncodeOneFrame(1);
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
@@ -757,7 +881,9 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_NOPREFIX) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
-  prepareEncDecParam (p);
+
+  InitialEncDec(p.width,p.height);
+
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -775,7 +901,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_NOPREFIX) {
   int iLossIdx = 0;
   bool bVCLLoss = false;
   while (iIdx <= p.numframes) {
-    EncodeOneFrame();
+    EncodeOneFrame(1);
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
@@ -830,7 +956,8 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_WITH_PREFIX_NOLOSS) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  prepareEncDecParam (p);
+  InitialEncDec(p.width,p.height);
+
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -846,7 +973,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_WITH_PREFIX_NOLOSS) {
   encoder_->SetOption (ENCODER_LTR_MARKING_PERIOD, &iLtrPeriod);
   int iIdx = 0;
   while (iIdx <= p.numframes) {
-    EncodeOneFrame();
+    EncodeOneFrame(1);
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
@@ -892,7 +1019,8 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_SVC_L1_NOLOSS) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  prepareEncDecParam (p);
+  InitialEncDec(p.width,p.height);
+
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -908,7 +1036,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_SVC_L1_NOLOSS) {
   encoder_->SetOption (ENCODER_LTR_MARKING_PERIOD, &iLtrPeriod);
   int iIdx = 0;
   while (iIdx <= p.numframes) {
-    EncodeOneFrame();
+    EncodeOneFrame(1);
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
@@ -949,7 +1077,8 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  prepareEncDecParam (p);
+  InitialEncDec(p.width,p.height);
+
   int32_t iTraceLevel = WELS_LOG_QUIET;
   pFunc = TestOutPutTrace;
   pTraceInfo = &sTrace;
@@ -979,7 +1108,7 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace) {
     sTrace.iTarLevel = iTraceLevel;
     encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
     decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
-    EncodeOneFrame();
+    EncodeOneFrame(1);
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
@@ -1014,7 +1143,7 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace_NULL) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  prepareEncDecParam (p);
+  InitialEncDec(p.width,p.height);
 
   int32_t iTraceLevel = WELS_LOG_QUIET;
   pFunc = NULL;
@@ -1043,7 +1172,7 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace_NULL) {
     iTraceLevel = rand() % 33;
     encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
     decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
-    EncodeOneFrame();
+    EncodeOneFrame(1);
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
@@ -1086,8 +1215,8 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECIDC_GeneralSliceChange) {
   EXPECT_EQ (uiGet, uiEcIdc);
 
   //Start for enc/dec
+  InitialEncDec(p.width,p.height);
 
-  prepareEncDecParam (p);
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -1099,7 +1228,7 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECIDC_GeneralSliceChange) {
 
   //enc/dec pictures
   while (iIdx <= p.numframes) {
-    EncodeOneFrame();
+    EncodeOneFrame(1);
     //decoding after each encoding frame
     len = 0;
     iPacketNum = 0;
@@ -1175,9 +1304,10 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   int len = 0;
   unsigned char* pData[3] = { NULL };
 
-  prepareEncDecParam (p);
+  InitialEncDec(p.width,p.height);
+
   //Frame 0: IDR, EC_IDC=DISABLE, loss = 0
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   encToDecData (info, len);
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, (ERROR_CON_IDC) ERROR_CON_DISABLE);
@@ -1192,11 +1322,11 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   iIdx++;
 
   //Frame 1: P, EC_IDC=DISABLE, loss = 1
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   iIdx++;
 
   //Frame 2: P, EC_IDC=DISABLE, loss = 0
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   encToDecData (info, len);
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
@@ -1216,7 +1346,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 3: P, EC_IDC=SLICE_COPY, loss = 0
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   encToDecData (info, len);
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_SLICE_COPY);
@@ -1236,7 +1366,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 4: P, EC_IDC=DISABLE, loss = 0
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   encToDecData (info, len);
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_DISABLE);
@@ -1252,7 +1382,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   iIdx++;
 
   //Frame 5: P, EC_IDC=DISABLE, loss = 1
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   iIdx++;
 
   //set EC=FRAME_COPY
@@ -1261,12 +1391,12 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 6: P, EC_IDC=FRAME_COPY, loss = 1
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   EXPECT_EQ (uiGet, uiEcIdc);
   iIdx++;
 
   //Frame 7: P, EC_IDC=FRAME_COPY, loss = 0
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   encToDecData (info, len);
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_FRAME_COPY);
@@ -1310,10 +1440,10 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   unsigned char* pData[3] = { NULL };
   int iTotalSliceSize = 0;
 
-  prepareEncDecParam (p);
+  InitialEncDec(p.width,p.height);
 
   //Frame 0: IDR, EC_IDC=2, loss = 2
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   iTotalSliceSize = 0;
   encToDecSliceData (0, 0, info, len); //SPS
   iTotalSliceSize = len;
@@ -1335,7 +1465,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
 
   //Frame 1: P, EC_IDC=2, loss = 0
   //will clean SPS/PPS status
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   encToDecData (info, len); //all slice together
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
@@ -1356,7 +1486,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 2: P, EC_IDC=0, loss = 0
   /////will clean SPS/PPS status
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   encToDecData (info, len); //all slice together
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
@@ -1376,7 +1506,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 3: P, EC_IDC=2, loss = 1
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   encToDecSliceData (0, 0, info, iTotalSliceSize); //slice 1 lost
   encToDecSliceData (0, 1, info, len); //slice 2
   pData[0] = pData[1] = pData[2] = 0;
@@ -1397,7 +1527,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 4: P, EC_IDC=0, loss = 0
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   encToDecData (info, len); //all slice
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
@@ -1443,7 +1573,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   unsigned char* pData[3] = { NULL };
   int iTotalSliceSize = 0;
 
-  prepareEncDecParam (p);
+  InitialEncDec(p.width,p.height);
 
   //set EC=DISABLE
   uiEcIdc = (uint32_t) (ERROR_CON_DISABLE);
@@ -1452,7 +1582,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 0: IDR, EC_IDC=0, loss = 0
   //Expected result: all OK, 2nd Output
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   encToDecData (info, len); //all slice
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
@@ -1467,7 +1597,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
 
   //Frame 1: P, EC_IDC=0, loss = 0
   //Expected result: all OK, 2nd Output
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   encToDecData (info, len); //all slice together
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
@@ -1483,7 +1613,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
 
   //Frame 2: P, EC_IDC=0, loss = 1
   //Expected result: all OK, no Output
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   encToDecSliceData (0, 0, info, iTotalSliceSize); // slice 1 lost
   encToDecSliceData (0, 1, info, len); // slice 2 only
   pData[0] = pData[1] = pData[2] = 0;
@@ -1505,7 +1635,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 3: P, EC_IDC=2, loss = 2
   //Expected result: neither OK, 1st Output
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   encToDecSliceData (0, 0, info, len); //slice 1 only
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
@@ -1526,7 +1656,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   EXPECT_EQ (uiGet, uiEcIdc);
   //Frame 4: P, EC_IDC=0, loss = 0
   //Expected result: depends on DecodeFrame2 result. If OK, output; else ,no output
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   encToDecData (info, len); //all slice
   pData[0] = pData[1] = pData[2] = 0;
   memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
@@ -1545,7 +1675,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   //Expected result: depends on DecodeFrame2 result. If OK, output; else ,no output
   int32_t iIDRPeriod = 1;
   encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
-  EncodeOneFrame();
+  EncodeOneFrame(1);
   EXPECT_TRUE (info.eFrameType == videoFrameTypeIDR);
   encToDecSliceData (0, 0, info, len); //SPS
   iTotalSliceSize = len;
@@ -1584,3 +1714,47 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
 
 }
 
+
+
+
+TEST_F (EncodeDecodeTestAPI, SetOptionEncParamExt)
+{
+  int iWidth      = WELS_CLIP3( ( (rand() % MAX_WIDTH)>>1 +1 )<<1,  2, MAX_WIDTH);
+  int iHeight     = WELS_CLIP3( ( (rand() % MAX_HEIGHT)>>1 +1 )<<1, 2, MAX_HEIGHT);
+  float fFrameRate = rand() + 0.5f;
+  int iEncFrameNum = WELS_CLIP3( (rand() % ENCODE_FRAME_NUM) + 1, 1, ENCODE_FRAME_NUM);
+
+  encoder_->GetDefaultParams(&param_);
+  prepareParam (iWidth, iHeight, fFrameRate);
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == cmResultSuccess);
+
+  for (int i =0; i<iEncFrameNum; i++){
+      int iResult;
+      int len = 0;
+      unsigned char* pData[3] = { NULL };
+      int iTotalSliceSize = 0;
+
+      RandomParamExtCombination();
+      ValidateParamExtCombination();
+      iResult = encoder_->SetOption(ENCODER_OPTION_SVC_ENCODE_PARAM_EXT,&param_);
+	  //to do
+	  // currently, there are still some error cases even though under condition cmResultSuccess == iResult
+	  // so need to enhance the validation check for any random value of each variable in ParamExt
+
+      if( cmResultSuccess == iResult){
+          InitialEncDec(param_.iPicWidth, param_.iPicHeight);
+          EncodeOneFrame(0);
+          encToDecData (info, len);
+          pData[0] = pData[1] = pData[2] = 0;
+          memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+
+          iResult = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, iTotalSliceSize, pData, &dstBufInfo_);
+          ASSERT_TRUE (iResult == cmResultSuccess);
+          iResult = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_);
+          ASSERT_TRUE (iResult == cmResultSuccess);
+          EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+      }
+  }
+
+}
