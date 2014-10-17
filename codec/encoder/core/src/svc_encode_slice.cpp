@@ -862,10 +862,6 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
   const bool    kbCurMbNotFirstMbOfCurSlice      = (pSliceCtx->pOverallMbMap[iCurMbIdx] ==
       pSliceCtx->pOverallMbMap[iCurMbIdx - 1]);
   const bool    kbCurMbNotLastMbOfCurPartition = iCurMbIdx < kiLastMbIdxInPartition;
-  const bool    kbSliceNumNotExceedConstraint       = pSliceCtx->iSliceNumInFrame <
-      pSliceCtx->iMaxSliceNumConstraint; /*tmp choice to avoid complex memory operation, 100520, to be modify*/
-  const bool    kbSliceNumReachConstraint               = (pSliceCtx->iSliceNumInFrame ==
-      pSliceCtx->iMaxSliceNumConstraint);
 
   if (pCurSlice->bDynamicSlicingSliceSizeCtrlFlag)
     return false;
@@ -876,44 +872,49 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
 #endif
   uiLen = ((iPosBitOffset >> 3) + ((iPosBitOffset & 0x07) ? 1 : 0));
 
-  if (pEncCtx->pSvcParam->iMultipleThreadIdc > 1)
-    WelsMutexLock (&pEncCtx->pSliceThreading->mutexSliceNumUpdate);
+  if ((kbCurMbNotFirstMbOfCurSlice
+       && JUMPPACKETSIZE_JUDGE (uiLen, iCurMbIdx, pSliceCtx->uiSliceSizeConstraint)) /*jump_avoiding_pack_exceed*/
+      && kbCurMbNotLastMbOfCurPartition) { //decide to add new pSlice
 
-  //DYNAMIC_SLICING_ONE_THREAD: judge jump_avoiding_pack_exceed
-  if (
-    ((kbCurMbNotFirstMbOfCurSlice
-      && JUMPPACKETSIZE_JUDGE (uiLen, iCurMbIdx, pSliceCtx->uiSliceSizeConstraint)) /*jump_avoiding_pack_exceed*/
-     && kbCurMbNotLastMbOfCurPartition) //decide to add new pSlice
-    && (kbSliceNumNotExceedConstraint
-        && ((pCurSlice->uiSliceIdx + kiActiveThreadsNum) < pSliceCtx->iMaxSliceNumConstraint)
-       )//able to add new pSlice
+    if (pEncCtx->pSvcParam->iMultipleThreadIdc > 1) {
+      WelsMutexLock (&pEncCtx->pSliceThreading->mutexSliceNumUpdate);
+      //lock the acessing to this variable: pSliceCtx->iSliceNumInFrame
+    }
+    const bool    kbSliceNumNotExceedConstraint = pSliceCtx->iSliceNumInFrame <
+        pSliceCtx->iMaxSliceNumConstraint; /*tmp choice to avoid complex memory operation, 100520, to be modify*/
+    const bool    kbSliceIdxNotExceedConstraint = (pCurSlice->uiSliceIdx + kiActiveThreadsNum) <
+        pSliceCtx->iMaxSliceNumConstraint;
+    const bool    kbSliceNumReachConstraint = (pSliceCtx->iSliceNumInFrame ==
+        pSliceCtx->iMaxSliceNumConstraint);
 
-  ) {
+    //DYNAMIC_SLICING_ONE_THREAD: judge jump_avoiding_pack_exceed
+    if (kbSliceNumNotExceedConstraint && kbSliceIdxNotExceedConstraint) {//able to add new pSlice
 
-    AddSliceBoundary (pEncCtx, pCurSlice, pSliceCtx, pCurMb, iCurMbIdx, kiLastMbIdxInPartition);
+      AddSliceBoundary (pEncCtx, pCurSlice, pSliceCtx, pCurMb, iCurMbIdx, kiLastMbIdxInPartition);
 
-    ++ pSliceCtx->iSliceNumInFrame;
+      ++ pSliceCtx->iSliceNumInFrame;
 
-    if (pEncCtx->pSvcParam->iMultipleThreadIdc > 1)
+      if (pEncCtx->pSvcParam->iMultipleThreadIdc > 1) {
+        WelsMutexUnlock (&pEncCtx->pSliceThreading->mutexSliceNumUpdate);
+      }
+
+      return true;
+    }
+    if (pEncCtx->pSvcParam->iMultipleThreadIdc > 1) {
       WelsMutexUnlock (&pEncCtx->pSliceThreading->mutexSliceNumUpdate);
+    }
 
-    return true;
+    if ((kbSliceNumReachConstraint || !kbSliceIdxNotExceedConstraint)
+        && kbCurMbNotLastMbOfCurPartition
+        && JUMPPACKETSIZE_JUDGE (uiLen,	iCurMbIdx,
+                                 pSliceCtx->uiSliceSizeConstraint - ((kiLastMbIdxInPartition - iCurMbIdx) <<
+                                     (pCurSlice->uiAssumeLog2BytePerMb) //assume each MB consumes these byte under largest QP
+                                                                    ))
+       ) {
+      // to minimize the impact under the risk of exceeding the size constraint when pSlice num reaches constraint
+      pCurSlice->bDynamicSlicingSliceSizeCtrlFlag = true;
+    }
   }
-
-  if (
-    (kbSliceNumReachConstraint
-     || ((pCurSlice->uiSliceIdx + kiActiveThreadsNum) >= pSliceCtx->iMaxSliceNumConstraint)
-    )
-    && ((JUMPPACKETSIZE_JUDGE (uiLen,	iCurMbIdx,
-                               pSliceCtx->uiSliceSizeConstraint - ((kiLastMbIdxInPartition - iCurMbIdx) <<
-                                   (pCurSlice->uiAssumeLog2BytePerMb) /* assume each MB consumes two byte under largest QP */)))
-        && kbCurMbNotLastMbOfCurPartition) //risk of exceeding the size constraint when pSlice num reaches constraint
-  ) {
-    pCurSlice->bDynamicSlicingSliceSizeCtrlFlag = true;
-  }
-
-  if (pEncCtx->pSvcParam->iMultipleThreadIdc > 1)
-    WelsMutexUnlock (&pEncCtx->pSliceThreading->mutexSliceNumUpdate);
 
   return false;
 }
