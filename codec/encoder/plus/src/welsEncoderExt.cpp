@@ -207,6 +207,7 @@ int CWelsH264SVCEncoder::Initialize (const SEncParamBase* argv) {
   if (sConfig.ParamBaseTranscode (*argv)) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
              "CWelsH264SVCEncoder::Initialize(), parameter_translation failed.");
+    TraceParamInfo (&sConfig);
     Uninitialize();
     return cmInitParaError;
   }
@@ -230,6 +231,7 @@ int CWelsH264SVCEncoder::InitializeExt (const SEncParamExt* argv) {
   if (sConfig.ParamTranscode (*argv)) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
              "CWelsH264SVCEncoder::InitializeExt(), parameter_translation failed.");
+    TraceParamInfo (&sConfig);
     Uninitialize();
     return cmInitParaError;
   }
