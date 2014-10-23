@@ -117,6 +117,8 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WE
 WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_THREAD_ROUTINE  routine,
     void* arg, WELS_THREAD_ATTR attr);
 
+WELS_THREAD_ERROR_CODE    WelsThreadSetName (const char* thread_name);
+
 WELS_THREAD_ERROR_CODE    WelsThreadJoin (WELS_THREAD_HANDLE  thread);
 
 WELS_THREAD_HANDLE        WelsThreadSelf();
