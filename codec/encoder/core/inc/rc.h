@@ -224,6 +224,10 @@ int64_t     iAvgCost2Bits;
 int64_t     iCost2BitsIntra;
 int32_t    iBaseQp;
 long long  uiLastTimeStamp;
+
+//for statistics and online adjustments
+int32_t   iActualBitRate; // TODO: to complete later
+float     fLatestFrameRate; // TODO: to complete later
 } SWelsSvcRc;
 
 typedef  void (*PWelsRCPictureInitFunc) (void* pCtx);

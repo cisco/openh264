@@ -2085,6 +2085,8 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
           );
 #endif//MEMORY_MONITOR
 
+  pCtx->iStatisticsLogInterval = STATISTICS_LOG_INTERVAL_MS;
+
   *ppCtx	= pCtx;
 
   WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsInitEncoderExt(), pCtx= 0x%p.", (void*)pCtx);
@@ -3736,6 +3738,8 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
             (PARA_SET_TYPE)*sizeof (SParaSetOffsetVariable)); // confirmed_safe_unsafe_usage
     uiTmpIdrPicId = (*ppCtx)->sPSOVector.uiIdrPicId;
 
+    SEncoderStatistics sTempEncoderStatistics = (*ppCtx)->sEncoderStatistics;
+
     WelsUninitEncoderExt (ppCtx);
 
     /* Update new parameters */
@@ -3746,10 +3750,13 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     (*ppCtx)->pVpp->WelsPreprocessReset (*ppCtx);
     //if WelsInitEncoderExt succeed
 
+    //load back the needed structure
     //for FLEXIBLE_PARASET_ID
     memcpy ((*ppCtx)->sPSOVector.sParaSetOffsetVariable, sTmpPsoVariable,
             (PARA_SET_TYPE)*sizeof (SParaSetOffsetVariable)); // confirmed_safe_unsafe_usage
     (*ppCtx)->sPSOVector.uiIdrPicId = uiTmpIdrPicId;
+    //for sEncoderStatistics
+    (*ppCtx)->sEncoderStatistics = sTempEncoderStatistics;
   } else {
     /* maybe adjustment introduced in bitrate or little settings adjustment and so on.. */
     pNewParam->iNumRefFrame								= WELS_CLIP3 (pNewParam->iNumRefFrame, MIN_REF_PIC_COUNT,

@@ -102,6 +102,8 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   void CheckLevelSetting (int32_t iLayer, ELevelIdc uiLevelIdc);
   void CheckReferenceNumSetting (int32_t iNumRef);
   void TraceParamInfo(SEncParamExt *pParam);
+  void UpdateStatistics(const int64_t kiCurrentFrameTs, EVideoFrameType eFrameType,  const int64_t kiCurrentFrameMs);
+
   sWelsEncCtx*	m_pEncContext;
 
   welsCodecTrace*			m_pWelsTrace;

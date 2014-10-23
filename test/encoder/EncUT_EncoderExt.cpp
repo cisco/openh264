@@ -661,3 +661,83 @@ TEST_F (EncoderInterfaceTest, EncodeParameterSets) {
 TEST_F (EncoderInterfaceTest, BasicReturnTypeTest) {
   //TODO
 }
+
+TEST_F (EncoderInterfaceTest, GetStatistics) {
+  SEncParamBase sEncParamBase;
+  GetValidEncParamBase (&sEncParamBase);
+
+  int iResult = pPtrEnc->Initialize (&sEncParamBase);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  if (iResult != cmResultSuccess) {
+    fprintf (stderr, "Unexpected ParamBase? \
+             iUsageType=%d, Pic=%dx%d, TargetBitrate=%d, iRCMode=%d, fMaxFrameRate=%.1f\n",
+             sEncParamBase.iUsageType, sEncParamBase.iPicWidth, sEncParamBase.iPicHeight,
+             sEncParamBase.iTargetBitrate, sEncParamBase.iRCMode, sEncParamBase.fMaxFrameRate);
+  }
+
+  PrepareOneSrcFrame();
+  EncodeOneIDRandP (pPtrEnc);
+
+  SEncoderStatistics sEncoderStatistics;
+  iResult = pPtrEnc->GetOption (ENCODER_OPTION_GET_STATISTICS, &sEncoderStatistics);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  EXPECT_EQ (sEncoderStatistics.uiInputFrameCount, 2);
+  EXPECT_EQ (sEncoderStatistics.uIDRSentNum, 1);
+  EXPECT_EQ (sEncoderStatistics.uiResolutionChangeTimes, 0);
+
+  EXPECT_EQ (sEncoderStatistics.uWidth, sEncParamBase.iPicWidth);
+  EXPECT_EQ (sEncoderStatistics.uHeight, sEncParamBase.iPicHeight);
+
+  // try param change
+  // 1, get the existing
+  pPtrEnc->GetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, pParamExt);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+
+  // 2, change the reoslution
+  GetValidEncParamBase (&sEncParamBase);
+  int32_t knownResolutionChangeTimes = 0;
+  if (pParamExt->iPicWidth != sEncParamBase.iPicWidth || pParamExt->iPicHeight != sEncParamBase.iPicHeight) {
+    knownResolutionChangeTimes = 1;
+  }
+  pParamExt->iPicWidth = pParamExt->sSpatialLayers[0].iVideoWidth = sEncParamBase.iPicWidth;
+  pParamExt->iPicHeight = pParamExt->sSpatialLayers[0].iVideoHeight = sEncParamBase.iPicHeight;
+  pPtrEnc->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, pParamExt);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+
+  // 3, code one frame
+  PrepareOneSrcFrame();
+  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  iResult = pPtrEnc->GetOption (ENCODER_OPTION_GET_STATISTICS, &sEncoderStatistics);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+
+  EXPECT_EQ (sEncoderStatistics.uiInputFrameCount, 3);
+  EXPECT_EQ (sEncoderStatistics.uIDRSentNum, 2);
+  EXPECT_EQ (sEncoderStatistics.uiResolutionChangeTimes, knownResolutionChangeTimes);
+
+  EXPECT_EQ (sEncoderStatistics.uWidth, sEncParamBase.iPicWidth);
+  EXPECT_EQ (sEncoderStatistics.uHeight, sEncParamBase.iPicHeight);
+
+  // 4, change log interval
+  int32_t iInterval = 0;
+  iResult = pPtrEnc->GetOption (ENCODER_OPTION_STATISTICS_LOG_INTERVAL, &iInterval);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  EXPECT_EQ (iInterval, 5000);
+
+  int32_t iInterval2 = 2000;
+  iResult = pPtrEnc->SetOption (ENCODER_OPTION_STATISTICS_LOG_INTERVAL, &iInterval2);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  iResult = pPtrEnc->GetOption (ENCODER_OPTION_STATISTICS_LOG_INTERVAL, &iInterval);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  EXPECT_EQ (iInterval, iInterval2);
+
+  iInterval2 = 0;
+  iResult = pPtrEnc->SetOption (ENCODER_OPTION_STATISTICS_LOG_INTERVAL, &iInterval2);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  iResult = pPtrEnc->GetOption (ENCODER_OPTION_STATISTICS_LOG_INTERVAL, &iInterval);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  EXPECT_EQ (iInterval, iInterval2);
+
+  // finish
+  pPtrEnc->Uninitialize();
+}
