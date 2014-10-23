@@ -70,7 +70,8 @@ void BaseEncoderTest::TearDown() {
 
 void BaseEncoderTest::EncodeStream (InputStream* in, EUsageType usageType, int width, int height,
                                     float frameRate, SliceModeEnum slices, bool denoise, int layers, bool losslessLink, bool enableLtr, Callback* cbk) {
-  int rv = InitWithParam (encoder_, usageType, width, height, frameRate, slices, denoise, layers, losslessLink, enableLtr);
+  int rv = InitWithParam (encoder_, usageType, width, height, frameRate, slices, denoise, layers, losslessLink,
+                          enableLtr);
   ASSERT_TRUE (rv == cmResultSuccess);
 
   // I420: 1(Y) + 1/4(U) + 1/4(V)

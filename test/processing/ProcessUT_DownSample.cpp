@@ -9,8 +9,8 @@
 using namespace WelsVP;
 
 void DyadicBilinearDownsampler_ref (uint8_t* pDst, const int32_t kiDstStride,
-                                  uint8_t* pSrc, const int32_t kiSrcStride,
-                                  const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
+                                    uint8_t* pSrc, const int32_t kiSrcStride,
+                                    const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
   uint8_t* pDstLine	= pDst;
   uint8_t* pSrcLine	= pSrc;
   const int32_t kiSrcStridex2	= kiSrcStride << 1;
@@ -30,8 +30,9 @@ void DyadicBilinearDownsampler_ref (uint8_t* pDst, const int32_t kiDstStride,
   }
 }
 
-void GeneralBilinearFastDownsampler_ref (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth, const int32_t kiDstHeight,
-                                       uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
+void GeneralBilinearFastDownsampler_ref (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
+    const int32_t kiDstHeight,
+    uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
   const uint32_t kuiScaleBitWidth = 16, kuiScaleBitHeight = 15;
   const uint32_t kuiScaleWidth = (1 << kuiScaleBitWidth), kuiScaleHeight = (1 << kuiScaleBitHeight);
   int32_t fScalex = WELS_ROUND ((float)kiSrcWidth / (float)kiDstWidth * kuiScaleWidth);
@@ -98,7 +99,8 @@ void GeneralBilinearFastDownsampler_ref (uint8_t* pDst, const int32_t kiDstStrid
   }
 }
 
-void GeneralBilinearAccurateDownsampler_ref (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth, const int32_t kiDstHeight,
+void GeneralBilinearAccurateDownsampler_ref (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
+    const int32_t kiDstHeight,
     uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
   const int32_t kiScaleBit = 15;
   const int32_t kiScale = (1 << kiScaleBit);
@@ -243,7 +245,8 @@ TEST (DownSampleTest, func) { \
 
 GENERATE_DyadicBilinearDownsampler_UT (DyadicBilinearDownsampler_c, 0, 0)
 GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearFastDownsampler_c, GeneralBilinearFastDownsampler_ref, 0, 0)
-GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearAccurateDownsampler_c, GeneralBilinearAccurateDownsampler_ref, 0, 0)
+GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearAccurateDownsampler_c, GeneralBilinearAccurateDownsampler_ref, 0,
+                                        0)
 
 #if defined(X86_ASM)
 GENERATE_DyadicBilinearDownsampler_UT (DyadicBilinearDownsamplerWidthx32_sse, 1, WELS_CPU_SSE)
@@ -256,20 +259,24 @@ GENERATE_DyadicBilinearDownsampler_UT (DyadicBilinearDownsamplerWidthx16_ssse3, 
 GENERATE_DyadicBilinearDownsampler_UT (DyadicBilinearDownsamplerWidthx32_sse4, 1, WELS_CPU_SSE41)
 GENERATE_DyadicBilinearDownsampler_UT (DyadicBilinearDownsamplerWidthx16_sse4, 1, WELS_CPU_SSE41)
 
-GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearFastDownsamplerWrap_sse2, GeneralBilinearFastDownsampler_ref, 1, WELS_CPU_SSE2)
-GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearAccurateDownsamplerWrap_sse2, GeneralBilinearAccurateDownsampler_ref, 1, WELS_CPU_SSE2)
+GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearFastDownsamplerWrap_sse2, GeneralBilinearFastDownsampler_ref, 1,
+                                        WELS_CPU_SSE2)
+GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearAccurateDownsamplerWrap_sse2,
+                                        GeneralBilinearAccurateDownsampler_ref, 1, WELS_CPU_SSE2)
 #endif
 
 #if defined(HAVE_NEON)
 GENERATE_DyadicBilinearDownsampler_UT (DyadicBilinearDownsamplerWidthx32_neon, 1, WELS_CPU_NEON)
 GENERATE_DyadicBilinearDownsampler_UT (DyadicBilinearDownsampler_neon, 1, WELS_CPU_NEON)
 
-GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearAccurateDownsamplerWrap_neon, GeneralBilinearAccurateDownsampler_ref, 1, WELS_CPU_NEON)
+GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearAccurateDownsamplerWrap_neon,
+                                        GeneralBilinearAccurateDownsampler_ref, 1, WELS_CPU_NEON)
 #endif
 
 #if defined(HAVE_NEON_AARCH64)
 GENERATE_DyadicBilinearDownsampler_UT (DyadicBilinearDownsamplerWidthx32_AArch64_neon, 1, WELS_CPU_NEON)
 GENERATE_DyadicBilinearDownsampler_UT (DyadicBilinearDownsampler_AArch64_neon, 1, WELS_CPU_NEON)
 
-GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearAccurateDownsamplerWrap_AArch64_neon, GeneralBilinearAccurateDownsampler_ref, 1, WELS_CPU_NEON)
+GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearAccurateDownsamplerWrap_AArch64_neon,
+                                        GeneralBilinearAccurateDownsampler_ref, 1, WELS_CPU_NEON)
 #endif

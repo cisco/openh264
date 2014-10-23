@@ -61,9 +61,11 @@ TEST_P (EncoderOutputTest, CompareOutput) {
   EncodeFileParam p = GetParam();
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + p.fileName;
-  EncodeFile (filename.c_str(), p.usageType , p.width, p.height, p.frameRate, p.slices, p.denoise, p.layers, p.isLossless, p.enableLtr, this);
+  EncodeFile (filename.c_str(), p.usageType , p.width, p.height, p.frameRate, p.slices, p.denoise, p.layers, p.isLossless,
+              p.enableLtr, this);
 #else
-  EncodeFile (p.fileName, p.usageType , p.width, p.height, p.frameRate, p.slices, p.denoise, p.layers, p.isLossless, p.enableLtr, this);
+  EncodeFile (p.fileName, p.usageType , p.width, p.height, p.frameRate, p.slices, p.denoise, p.layers, p.isLossless,
+              p.enableLtr, this);
 #endif
   //will remove this after screen content algorithms are ready,
   //because the bitstream output will vary when the different algorithms are added.
