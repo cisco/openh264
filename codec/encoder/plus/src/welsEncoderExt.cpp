@@ -689,7 +689,9 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
 #endif//REC_FRAME_COUNT
 
     /* Check every field whether there is new request for memory block changed or else, Oct. 24, 2008 */
-    WelsEncoderParamAdjust (&m_pEncContext, &sConfig);
+    if (WelsEncoderParamAdjust (&m_pEncContext, &sConfig)) {
+      return cmInitParaError;
+    }
   }
   break;
   case ENCODER_OPTION_FRAME_RATE: {	// Maximal input frame rate
@@ -819,7 +821,9 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   break;
   case ENCODER_OPTION_LTR: {
     SLTRConfig* pLTRValue = ((SLTRConfig*) (pOption));
-    WelsEncoderApplyLTR (&m_pWelsTrace->m_sLogCtx, &m_pEncContext, pLTRValue);
+    if (WelsEncoderApplyLTR (&m_pWelsTrace->m_sLogCtx, &m_pEncContext, pLTRValue)) {
+      return cmInitParaError;
+    }
   }
   break;
   case ENCODER_OPTION_ENABLE_SSEI: {
