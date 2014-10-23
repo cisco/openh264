@@ -1,4 +1,4 @@
-include $(SRC_PATH)build/platform-x86-common.mk
+include $(SRC_PATH)build/x86-common.mk
 SHAREDLIBSUFFIX = dll
 CFLAGS += -MMD -MP
 LDFLAGS +=

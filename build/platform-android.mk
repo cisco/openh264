@@ -1,5 +1,5 @@
 ARCH = arm
-include $(SRC_PATH)build/platform-arch.mk
+include $(SRC_PATH)build/arch.mk
 SHAREDLIBSUFFIX = so
 NDKLEVEL = 12
 ifeq ($(ARCH), arm)

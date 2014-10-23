@@ -1,5 +1,5 @@
 ifneq ($(filter %86 x86_64, $(ARCH)),)
-include $(SRC_PATH)build/platform-x86-common.mk
+include $(SRC_PATH)build/x86-common.mk
 endif
 ifneq ($(filter-out arm64, $(filter arm%, $(ARCH))),)
 ifeq ($(USE_ASM), Yes)
