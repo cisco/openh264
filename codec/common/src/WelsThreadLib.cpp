@@ -252,6 +252,9 @@ WELS_THREAD_ERROR_CODE WelsThreadSetName (const char* thread_name) {
 #ifdef APPLE_IOS
   pthread_setname_np(thread_name);
 #endif
+#ifdef __ANDROID__
+  pthread_setname_np(pthread_self(), thread_name);
+#endif
   // do nothing
   return WELS_THREAD_ERROR_OK;
 }
