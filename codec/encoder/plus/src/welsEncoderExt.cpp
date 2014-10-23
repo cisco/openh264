@@ -599,8 +599,8 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
 
   int32_t iMaxDid = m_pEncContext->pSvcParam->iSpatialLayerNum - 1;
   if ((0 != pStatistics->uWidth && 0 != pStatistics->uHeight)
-      && (pStatistics->uWidth != m_pEncContext->pSvcParam->sDependencyLayers[iMaxDid].iActualWidth
-          || pStatistics->uHeight != m_pEncContext->pSvcParam->sDependencyLayers[iMaxDid].iActualHeight)) {
+      && (pStatistics->uWidth != (unsigned int) m_pEncContext->pSvcParam->sDependencyLayers[iMaxDid].iActualWidth
+          || pStatistics->uHeight != (unsigned int) m_pEncContext->pSvcParam->sDependencyLayers[iMaxDid].iActualHeight)) {
     pStatistics->uiResolutionChangeTimes ++;
   }
   pStatistics->uWidth = m_pEncContext->pSvcParam->sDependencyLayers[iMaxDid].iActualWidth;

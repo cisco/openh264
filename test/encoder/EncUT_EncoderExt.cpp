@@ -681,12 +681,12 @@ TEST_F (EncoderInterfaceTest, GetStatistics) {
   SEncoderStatistics sEncoderStatistics;
   iResult = pPtrEnc->GetOption (ENCODER_OPTION_GET_STATISTICS, &sEncoderStatistics);
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  EXPECT_EQ (sEncoderStatistics.uiInputFrameCount, 2);
-  EXPECT_EQ (sEncoderStatistics.uIDRSentNum, 1);
-  EXPECT_EQ (sEncoderStatistics.uiResolutionChangeTimes, 0);
+  EXPECT_EQ (sEncoderStatistics.uiInputFrameCount, static_cast<unsigned int> (2));
+  EXPECT_EQ (sEncoderStatistics.uIDRSentNum, static_cast<unsigned int> (1));
+  EXPECT_EQ (sEncoderStatistics.uiResolutionChangeTimes, static_cast<unsigned int> (0));
 
-  EXPECT_EQ (sEncoderStatistics.uWidth, sEncParamBase.iPicWidth);
-  EXPECT_EQ (sEncoderStatistics.uHeight, sEncParamBase.iPicHeight);
+  EXPECT_EQ (sEncoderStatistics.uWidth, static_cast<unsigned int> (sEncParamBase.iPicWidth));
+  EXPECT_EQ (sEncoderStatistics.uHeight, static_cast<unsigned int> (sEncParamBase.iPicHeight));
 
   // try param change
   // 1, get the existing
@@ -711,12 +711,12 @@ TEST_F (EncoderInterfaceTest, GetStatistics) {
   iResult = pPtrEnc->GetOption (ENCODER_OPTION_GET_STATISTICS, &sEncoderStatistics);
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
 
-  EXPECT_EQ (sEncoderStatistics.uiInputFrameCount, 3);
-  EXPECT_EQ (sEncoderStatistics.uIDRSentNum, 2);
-  EXPECT_EQ (sEncoderStatistics.uiResolutionChangeTimes, knownResolutionChangeTimes);
+  EXPECT_EQ (sEncoderStatistics.uiInputFrameCount, static_cast<unsigned int> (3));
+  EXPECT_EQ (sEncoderStatistics.uIDRSentNum, static_cast<unsigned int> (2));
+  EXPECT_EQ (sEncoderStatistics.uiResolutionChangeTimes, static_cast<unsigned int> (knownResolutionChangeTimes));
 
-  EXPECT_EQ (sEncoderStatistics.uWidth, sEncParamBase.iPicWidth);
-  EXPECT_EQ (sEncoderStatistics.uHeight, sEncParamBase.iPicHeight);
+  EXPECT_EQ (sEncoderStatistics.uWidth, static_cast<unsigned int> (sEncParamBase.iPicWidth));
+  EXPECT_EQ (sEncoderStatistics.uHeight, static_cast<unsigned int> (sEncParamBase.iPicHeight));
 
   // 4, change log interval
   int32_t iInterval = 0;
