@@ -705,6 +705,8 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
   pEventsList[iEventCount++]	= pEncPEncCtx->pSliceThreading->pExitEncodeEvent[iEventIdx];
   pEventsList[iEventCount++] = pEncPEncCtx->pSliceThreading->pUpdateMbListEvent[iEventIdx];
 
+  WelsThreadSetName ("OpenH264Enc_CodingSliceThreadProc");
+
   do {
     MT_TRACE_LOG (pEncPEncCtx, WELS_LOG_INFO,
                   "[MT] CodingSliceThreadProc(), try to call WelsMultipleEventsWaitSingleBlocking(pEventsList= %p %p %p), pEncPEncCtx= %p!",
