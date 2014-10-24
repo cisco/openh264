@@ -1668,7 +1668,7 @@ TEST_F (EncodeDecodeTestAPI, Engine_SVC_Switch_P) {
     encToDecData (info, len);
     unsigned char* pData[3] = { NULL };
     memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
-    if (iIdx < strlen (p.pLossSequence)) {
+    if (iIdx < (int) strlen (p.pLossSequence)) {
       switch (p.pLossSequence[iIdx]) {
       case '0':
         iTarDid = 0;
