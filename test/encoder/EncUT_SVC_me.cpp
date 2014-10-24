@@ -80,18 +80,18 @@ void SumOf16x16BlockOfFrame_ref (uint8_t* pRefPicture, const int32_t kiWidth, co
 
 
 void InitializeHashforFeature_ref (uint32_t* pTimesOfFeatureValue, uint16_t* pBuf, const int32_t kiListSize,
-                                 uint16_t** pLocationOfFeature, uint16_t** pFeatureValuePointerList) {
-    //assign location pointer
+                                   uint16_t** pLocationOfFeature, uint16_t** pFeatureValuePointerList) {
+  //assign location pointer
   uint16_t* pBufPos  = pBuf;
   for (int32_t i = 0 ; i < kiListSize; ++i) {
     pLocationOfFeature[i] =
-    pFeatureValuePointerList[i] = pBufPos;
+      pFeatureValuePointerList[i] = pBufPos;
     pBufPos      += (pTimesOfFeatureValue[i] << 1);
   }
 }
 void FillQpelLocationByFeatureValue_ref (uint16_t* pFeatureOfBlock, const int32_t kiWidth, const int32_t kiHeight,
-                                       uint16_t** pFeatureValuePointerList) {
-    //assign each pixel's position
+    uint16_t** pFeatureValuePointerList) {
+  //assign each pixel's position
   uint16_t* pSrcPointer  =  pFeatureOfBlock;
   int32_t iQpelY = 0;
   for (int32_t y = 0; y < kiHeight; y++) {
@@ -246,9 +246,11 @@ GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashf
 GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_c, 640, 320)
 #ifdef X86_ASM
 GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_sse2, 10, 10)
-GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_sse2, 16, 16)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_sse2, 16,
+    16)
 GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_sse2, 640, 320)
-GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_sse2, 640, 320)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_sse2, 640,
+    320)
 #endif
 
 GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_c, 1, 1)
@@ -282,9 +284,11 @@ GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 1,
 GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 640, 320)
 GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 640, 320)
 GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_neon, 10, 10)
-GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_neon, 16, 16)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_neon, 16,
+    16)
 GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_neon, 640, 320)
-GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_neon, 640, 320)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_neon, 640,
+    320)
 #endif
 
 #ifdef HAVE_NEON_AARCH64
@@ -295,7 +299,9 @@ GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_AArch64_
 GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_AArch64_neon, 640, 320)
 GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_AArch64_neon, 640, 320)
 GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_AArch64_neon, 10, 10)
-GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_AArch64_neon, 16, 16)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref,
+    FillQpelLocationByFeatureValue_AArch64_neon, 16, 16)
 GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_AArch64_neon, 640, 320)
-GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_AArch64_neon, 640, 320)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref,
+    FillQpelLocationByFeatureValue_AArch64_neon, 640, 320)
 #endif

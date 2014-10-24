@@ -1,4 +1,4 @@
-include $(SRC_PATH)build/platform-arch.mk
+include $(SRC_PATH)build/arch.mk
 ifeq ($(ASM_ARCH), x86)
 ifeq ($(ENABLE64BIT), Yes)
 ASMFLAGS += -f win64

@@ -216,6 +216,12 @@ typedef struct TagWelsEncCtx {
   SStatSliceInfo				sPerInfo;
 #endif//STAT_OUTPUT
 
+  //related to Statistics
+  int64_t            uiStartTimestamp;
+  SEncoderStatistics sEncoderStatistics;
+  int32_t            iStatisticsLogInterval;
+  int64_t            iLastStatisticsLogTs;
+
   int32_t iEncoderError;
   WELS_MUTEX					mutexEncoderError;
   bool bDeliveryFlag;

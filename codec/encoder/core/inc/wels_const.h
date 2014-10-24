@@ -55,6 +55,8 @@
 #define MAX_TRACE_LOG_SIZE	(50 * (1<<20))	// max trace log size: 50 MB, overwrite occur if log file size exceeds this size
 #endif//MAX_TRACE_LOG_SIZE
 
+#define STATISTICS_LOG_INTERVAL_MS (5000) // output statistics log every 5s
+
 /* MB width in pixels for specified colorspace I420 usually used in codec */
 #define MB_WIDTH_LUMA		16
 #define MB_WIDTH_CHROMA		(MB_WIDTH_LUMA>>1)

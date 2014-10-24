@@ -103,6 +103,9 @@ typedef enum {
   ENCODER_OPTION_TRACE_CALLBACK, // a void (*)(void* context, int level, const char* message) function which receives log messages
   ENCODER_OPTION_TRACE_CALLBACK_CONTEXT,
 
+  ENCODER_OPTION_GET_STATISTICS, //read only
+  ENCODER_OPTION_STATISTICS_LOG_INTERVAL, // log interval in milliseconds
+
   // advanced algorithmetic settings
   ENCODER_OPTION_IS_LOSSLESS_LINK
 } ENCODER_OPTION;
@@ -120,7 +123,9 @@ typedef enum {
   DECODER_OPTION_ERROR_CON_IDC, //not finished yet, indicate decoder error concealment status, in progress
   DECODER_OPTION_TRACE_LEVEL,
   DECODER_OPTION_TRACE_CALLBACK, // a void (*)(void* context, int level, const char* message) function which receives log messages
-  DECODER_OPTION_TRACE_CALLBACK_CONTEXT
+  DECODER_OPTION_TRACE_CALLBACK_CONTEXT,
+
+  DECODER_OPTION_GET_STATISTICS
 
 } DECODER_OPTION;
 
@@ -454,5 +459,39 @@ typedef struct TagParserBsInfo {
   int iSpsWidthInPixel; //required SPS width info
   int iSpsHeightInPixel; //required SPS height info
 } SParserBsInfo, PParserBsInfo;
+
+typedef struct TagVideoEncoderStatistics {
+  unsigned int uWidth;					// the width of encoded frame
+  unsigned int uHeight;					// the height of encoded frame
+  //following standard, will be 16x aligned, if there are multiple spatial, this is of the highest
+  float fAverageFrameSpeedInMs; // Average_Encoding_Time
+
+  // rate control related
+  float fAverageFrameRate;	// the average frame rate in, calculate since encoding starts, supposed that the input timestamp is in unit of ms
+  float fLatestFrameRate;	// the frame rate in, in the last second, supposed that the input timestamp is in unit of ms (? useful for checking BR, but is it easy to calculate?
+  unsigned int uiBitRate;				// sendrate in Bits per second, calculated within the set time-window
+
+  unsigned int uiInputFrameCount; // number of frames
+  unsigned int uiSkippedFrameCount; // number of frames
+
+  unsigned int uiResolutionChangeTimes; // uiResolutionChangeTimes
+  unsigned int uIDRReqNum;				// number of IDR requests
+  unsigned int uIDRSentNum;				// number of actual IDRs sent
+  unsigned int uLTRSentNum;				// number of LTR sent/marked
+} SEncoderStatistics; // in building, coming soon
+
+typedef struct TagVideoDecoderStatistics {
+  unsigned int uWidth;					// the width of encode/decode frame
+  unsigned int uHeight;					// the height of encode/decode frame
+  float fAverageFrameSpeedInMs; // Average_Decoding_Time
+
+  unsigned int uiDecodedFrameCount; // number of frames
+  unsigned int uiResolutionChangeTimes; // uiResolutionChangeTimes
+  unsigned int
+  uiAvgEcRatio; // when EC is on, the average ratio of correct or EC areas, can be an indicator of reconstruction quality
+  unsigned int uIDRReqNum;	// number of actual IDR request
+  unsigned int uLTRReqNum;	// number of actual LTR request
+  unsigned int uIDRRecvNum;	// number of actual IDR received
+} SDecoderStatistics; // in building, coming soon
 
 #endif//WELS_VIDEO_CODEC_APPLICATION_DEFINITION_H__
