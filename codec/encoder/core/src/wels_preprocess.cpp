@@ -1195,43 +1195,45 @@ void CWelsPreProcess::WelsExchangeSpatialPictures (SPicture** ppPic1, SPicture**
   *ppPic2 = tmp;
 }
 
-void CWelsPreProcess::UpdateSrcListLosslessScreenRefSelectionWithLtr (SPicture*	pCurPicture, const int32_t kiCurDid, const int32_t kuiMarkLongTermPicIdx, SPicture** pLongRefList) {
+void CWelsPreProcess::UpdateSrcListLosslessScreenRefSelectionWithLtr (SPicture*	pCurPicture, const int32_t kiCurDid,
+    const int32_t kuiMarkLongTermPicIdx, SPicture** pLongRefList) {
   SPicture** pLongRefSrcList = &m_pSpatialPic[kiCurDid][0];
   for (int32_t i = 0; i < MAX_REF_PIC_COUNT; ++i) {
     if (NULL == pLongRefSrcList[i + 1] || (NULL != pLongRefList[i] && pLongRefList[i]->bUsedAsRef
                                            && pLongRefList[i]->bIsLongRef)) {
       continue;
     } else {
-      pLongRefSrcList[i + 1]->SetUnref ();
+      pLongRefSrcList[i + 1]->SetUnref();
     }
   }
   WelsExchangeSpatialPictures (&m_pSpatialPic[kiCurDid][0],
                                &m_pSpatialPic[kiCurDid][1 + kuiMarkLongTermPicIdx]);
   m_iAvaliableRefInSpatialPicList = MAX_REF_PIC_COUNT;
-  (GetCurrentFrameFromOrigList(kiCurDid))->SetUnref ();
+  (GetCurrentFrameFromOrigList (kiCurDid))->SetUnref();
 }
-void CWelsPreProcess::UpdateSrcList (SPicture*	pCurPicture, const int32_t kiCurDid, SPicture** pShortRefList, const uint32_t kuiShortRefCount) {
+void CWelsPreProcess::UpdateSrcList (SPicture*	pCurPicture, const int32_t kiCurDid, SPicture** pShortRefList,
+                                     const uint32_t kuiShortRefCount) {
   SPicture** pRefSrcList = &m_pSpatialPic[kiCurDid][0];
 
   //pRefSrcList[0] is for current frame
   if (pCurPicture->bUsedAsRef || pCurPicture->bIsLongRef) {
-    if (pCurPicture->iPictureType == P_SLICE && pCurPicture->uiTemporalId != 0 ) {
+    if (pCurPicture->iPictureType == P_SLICE && pCurPicture->uiTemporalId != 0) {
       for (int iRefIdx = kuiShortRefCount - 1; iRefIdx >= 0; --iRefIdx)	{
         WelsExchangeSpatialPictures (&pRefSrcList[iRefIdx + 1],
-          &pRefSrcList[iRefIdx]);
+                                     &pRefSrcList[iRefIdx]);
       }
       m_iAvaliableRefInSpatialPicList = kuiShortRefCount;
     } else {
       WelsExchangeSpatialPictures (&pRefSrcList[0], &pRefSrcList[1]);
       for (int32_t i = MAX_SHORT_REF_COUNT - 1; i > 0  ; --i) {
         if (pRefSrcList[i + 1] != NULL) {
-          pRefSrcList[i + 1]->SetUnref ();
+          pRefSrcList[i + 1]->SetUnref();
         }
       }
       m_iAvaliableRefInSpatialPicList = 1;
     }
   }
-  (GetCurrentFrameFromOrigList(kiCurDid))->SetUnref ();
+  (GetCurrentFrameFromOrigList (kiCurDid))->SetUnref();
 }
 
 //TODO: may opti later

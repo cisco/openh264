@@ -103,26 +103,26 @@ TEST (IntraSadSatdFuncTest, func) { \
 }
 
 #ifdef X86_ASM
-GENERATE_Intra16x16_UT(WelsIntra16x16Combined3Sad_ssse3, WelsSampleSadIntra16x16Combined3_c, 1, WELS_CPU_SSSE3)
-GENERATE_Intra16x16_UT(WelsIntra16x16Combined3Satd_sse41, WelsSampleSatdIntra16x16Combined3_c, 1, WELS_CPU_SSE41)
-GENERATE_Intra8x8_UT(WelsIntraChroma8x8Combined3Satd_sse41, WelsSampleSatdIntra8x8Combined3_c, 1, WELS_CPU_SSE41)
-GENERATE_Intra4x4_UT(WelsSampleSatdThree4x4_sse2, 1, WELS_CPU_SSE2)
+GENERATE_Intra16x16_UT (WelsIntra16x16Combined3Sad_ssse3, WelsSampleSadIntra16x16Combined3_c, 1, WELS_CPU_SSSE3)
+GENERATE_Intra16x16_UT (WelsIntra16x16Combined3Satd_sse41, WelsSampleSatdIntra16x16Combined3_c, 1, WELS_CPU_SSE41)
+GENERATE_Intra8x8_UT (WelsIntraChroma8x8Combined3Satd_sse41, WelsSampleSatdIntra8x8Combined3_c, 1, WELS_CPU_SSE41)
+GENERATE_Intra4x4_UT (WelsSampleSatdThree4x4_sse2, 1, WELS_CPU_SSE2)
 #endif
 
 #ifdef HAVE_NEON
-GENERATE_Intra16x16_UT(WelsIntra16x16Combined3Sad_neon, WelsSampleSadIntra16x16Combined3_c, 1, WELS_CPU_NEON)
-GENERATE_Intra16x16_UT(WelsIntra16x16Combined3Satd_neon, WelsSampleSatdIntra16x16Combined3_c, 1, WELS_CPU_NEON)
-GENERATE_Intra8x8_UT(WelsIntra8x8Combined3Satd_neon, WelsSampleSatdIntra8x8Combined3_c, 1, WELS_CPU_NEON)
-GENERATE_Intra8x8_UT(WelsIntra8x8Combined3Sad_neon, WelsSampleSadIntra8x8Combined3_c, 1, WELS_CPU_NEON)
-GENERATE_Intra4x4_UT(WelsIntra4x4Combined3Satd_neon, 1, WELS_CPU_NEON)
+GENERATE_Intra16x16_UT (WelsIntra16x16Combined3Sad_neon, WelsSampleSadIntra16x16Combined3_c, 1, WELS_CPU_NEON)
+GENERATE_Intra16x16_UT (WelsIntra16x16Combined3Satd_neon, WelsSampleSatdIntra16x16Combined3_c, 1, WELS_CPU_NEON)
+GENERATE_Intra8x8_UT (WelsIntra8x8Combined3Satd_neon, WelsSampleSatdIntra8x8Combined3_c, 1, WELS_CPU_NEON)
+GENERATE_Intra8x8_UT (WelsIntra8x8Combined3Sad_neon, WelsSampleSadIntra8x8Combined3_c, 1, WELS_CPU_NEON)
+GENERATE_Intra4x4_UT (WelsIntra4x4Combined3Satd_neon, 1, WELS_CPU_NEON)
 #endif
 
 #ifdef HAVE_NEON_AARCH64
-GENERATE_Intra16x16_UT(WelsIntra16x16Combined3Sad_AArch64_neon, WelsSampleSadIntra16x16Combined3_c, 1, WELS_CPU_NEON)
-GENERATE_Intra16x16_UT(WelsIntra16x16Combined3Satd_AArch64_neon, WelsSampleSatdIntra16x16Combined3_c, 1, WELS_CPU_NEON)
-GENERATE_Intra8x8_UT(WelsIntra8x8Combined3Satd_AArch64_neon, WelsSampleSatdIntra8x8Combined3_c, 1, WELS_CPU_NEON)
-GENERATE_Intra8x8_UT(WelsIntra8x8Combined3Sad_AArch64_neon, WelsSampleSadIntra8x8Combined3_c, 1, WELS_CPU_NEON)
-GENERATE_Intra4x4_UT(WelsIntra4x4Combined3Satd_AArch64_neon, 1, WELS_CPU_NEON)
+GENERATE_Intra16x16_UT (WelsIntra16x16Combined3Sad_AArch64_neon, WelsSampleSadIntra16x16Combined3_c, 1, WELS_CPU_NEON)
+GENERATE_Intra16x16_UT (WelsIntra16x16Combined3Satd_AArch64_neon, WelsSampleSatdIntra16x16Combined3_c, 1, WELS_CPU_NEON)
+GENERATE_Intra8x8_UT (WelsIntra8x8Combined3Satd_AArch64_neon, WelsSampleSatdIntra8x8Combined3_c, 1, WELS_CPU_NEON)
+GENERATE_Intra8x8_UT (WelsIntra8x8Combined3Sad_AArch64_neon, WelsSampleSadIntra8x8Combined3_c, 1, WELS_CPU_NEON)
+GENERATE_Intra4x4_UT (WelsIntra4x4Combined3Satd_AArch64_neon, 1, WELS_CPU_NEON)
 #endif
 
 #define ASSERT_MEMORY_FAIL2X(A, B)     \
@@ -537,51 +537,51 @@ TEST_F (SadSatdAssemblyFuncTest, func) { \
 }
 
 #ifdef X86_ASM
-GENERATE_Sad4x4_UT(WelsSampleSad4x4_mmx, WelsSampleSad4x4_c, WELS_CPU_MMXEXT)
-GENERATE_Sad8x8_UT(WelsSampleSad8x8_sse21, WelsSampleSad8x8_c, WELS_CPU_SSE2)
-GENERATE_Sad8x16_UT(WelsSampleSad8x16_sse2, WelsSampleSad8x16_c, WELS_CPU_SSE2)
-GENERATE_Sad16x8_UT(WelsSampleSad16x8_sse2, WelsSampleSad16x8_c, WELS_CPU_SSE2)
-GENERATE_Sad16x16_UT(WelsSampleSad16x16_sse2, WelsSampleSad16x16_c, WELS_CPU_SSE2)
+GENERATE_Sad4x4_UT (WelsSampleSad4x4_mmx, WelsSampleSad4x4_c, WELS_CPU_MMXEXT)
+GENERATE_Sad8x8_UT (WelsSampleSad8x8_sse21, WelsSampleSad8x8_c, WELS_CPU_SSE2)
+GENERATE_Sad8x16_UT (WelsSampleSad8x16_sse2, WelsSampleSad8x16_c, WELS_CPU_SSE2)
+GENERATE_Sad16x8_UT (WelsSampleSad16x8_sse2, WelsSampleSad16x8_c, WELS_CPU_SSE2)
+GENERATE_Sad16x16_UT (WelsSampleSad16x16_sse2, WelsSampleSad16x16_c, WELS_CPU_SSE2)
 
-GENERATE_Sad4x4_UT(WelsSampleSatd4x4_sse2, WelsSampleSatd4x4_c, WELS_CPU_SSE2)
-GENERATE_Sad8x8_UT(WelsSampleSatd8x8_sse2, WelsSampleSatd8x8_c, WELS_CPU_SSE2)
-GENERATE_Sad8x16_UT(WelsSampleSatd8x16_sse2, WelsSampleSatd8x16_c, WELS_CPU_SSE2)
-GENERATE_Sad16x8_UT(WelsSampleSatd16x8_sse2, WelsSampleSatd16x8_c, WELS_CPU_SSE2)
-GENERATE_Sad16x16_UT(WelsSampleSatd16x16_sse2, WelsSampleSatd16x16_c, WELS_CPU_SSE2)
+GENERATE_Sad4x4_UT (WelsSampleSatd4x4_sse2, WelsSampleSatd4x4_c, WELS_CPU_SSE2)
+GENERATE_Sad8x8_UT (WelsSampleSatd8x8_sse2, WelsSampleSatd8x8_c, WELS_CPU_SSE2)
+GENERATE_Sad8x16_UT (WelsSampleSatd8x16_sse2, WelsSampleSatd8x16_c, WELS_CPU_SSE2)
+GENERATE_Sad16x8_UT (WelsSampleSatd16x8_sse2, WelsSampleSatd16x8_c, WELS_CPU_SSE2)
+GENERATE_Sad16x16_UT (WelsSampleSatd16x16_sse2, WelsSampleSatd16x16_c, WELS_CPU_SSE2)
 
-GENERATE_Sad4x4_UT(WelsSampleSatd4x4_sse41, WelsSampleSatd4x4_c, WELS_CPU_SSE41)
-GENERATE_Sad8x8_UT(WelsSampleSatd8x8_sse41, WelsSampleSatd8x8_c, WELS_CPU_SSE41)
-GENERATE_Sad8x16_UT(WelsSampleSatd8x16_sse41, WelsSampleSatd8x16_c, WELS_CPU_SSE41)
-GENERATE_Sad16x8_UT(WelsSampleSatd16x8_sse41, WelsSampleSatd16x8_c, WELS_CPU_SSE41)
-GENERATE_Sad16x16_UT(WelsSampleSatd16x16_sse41, WelsSampleSatd16x16_c, WELS_CPU_SSE41)
+GENERATE_Sad4x4_UT (WelsSampleSatd4x4_sse41, WelsSampleSatd4x4_c, WELS_CPU_SSE41)
+GENERATE_Sad8x8_UT (WelsSampleSatd8x8_sse41, WelsSampleSatd8x8_c, WELS_CPU_SSE41)
+GENERATE_Sad8x16_UT (WelsSampleSatd8x16_sse41, WelsSampleSatd8x16_c, WELS_CPU_SSE41)
+GENERATE_Sad16x8_UT (WelsSampleSatd16x8_sse41, WelsSampleSatd16x8_c, WELS_CPU_SSE41)
+GENERATE_Sad16x16_UT (WelsSampleSatd16x16_sse41, WelsSampleSatd16x16_c, WELS_CPU_SSE41)
 #endif
 
 #ifdef HAVE_NEON
-GENERATE_Sad4x4_UT(WelsSampleSad4x4_neon, WelsSampleSad4x4_c, WELS_CPU_NEON)
-GENERATE_Sad8x8_UT(WelsSampleSad8x8_neon, WelsSampleSad8x8_c, WELS_CPU_NEON)
-GENERATE_Sad8x16_UT(WelsSampleSad8x16_neon, WelsSampleSad8x16_c, WELS_CPU_NEON)
-GENERATE_Sad16x8_UT(WelsSampleSad16x8_neon, WelsSampleSad16x8_c, WELS_CPU_NEON)
-GENERATE_Sad16x16_UT(WelsSampleSad16x16_neon, WelsSampleSad16x16_c, WELS_CPU_NEON)
+GENERATE_Sad4x4_UT (WelsSampleSad4x4_neon, WelsSampleSad4x4_c, WELS_CPU_NEON)
+GENERATE_Sad8x8_UT (WelsSampleSad8x8_neon, WelsSampleSad8x8_c, WELS_CPU_NEON)
+GENERATE_Sad8x16_UT (WelsSampleSad8x16_neon, WelsSampleSad8x16_c, WELS_CPU_NEON)
+GENERATE_Sad16x8_UT (WelsSampleSad16x8_neon, WelsSampleSad16x8_c, WELS_CPU_NEON)
+GENERATE_Sad16x16_UT (WelsSampleSad16x16_neon, WelsSampleSad16x16_c, WELS_CPU_NEON)
 
-GENERATE_Sad4x4_UT(WelsSampleSatd4x4_neon, WelsSampleSatd4x4_c, WELS_CPU_NEON)
-GENERATE_Sad8x8_UT(WelsSampleSatd8x8_neon, WelsSampleSatd8x8_c, WELS_CPU_NEON)
-GENERATE_Sad8x16_UT(WelsSampleSatd8x16_neon, WelsSampleSatd8x16_c, WELS_CPU_NEON)
-GENERATE_Sad16x8_UT(WelsSampleSatd16x8_neon, WelsSampleSatd16x8_c, WELS_CPU_NEON)
-GENERATE_Sad16x16_UT(WelsSampleSatd16x16_neon, WelsSampleSatd16x16_c, WELS_CPU_NEON)
+GENERATE_Sad4x4_UT (WelsSampleSatd4x4_neon, WelsSampleSatd4x4_c, WELS_CPU_NEON)
+GENERATE_Sad8x8_UT (WelsSampleSatd8x8_neon, WelsSampleSatd8x8_c, WELS_CPU_NEON)
+GENERATE_Sad8x16_UT (WelsSampleSatd8x16_neon, WelsSampleSatd8x16_c, WELS_CPU_NEON)
+GENERATE_Sad16x8_UT (WelsSampleSatd16x8_neon, WelsSampleSatd16x8_c, WELS_CPU_NEON)
+GENERATE_Sad16x16_UT (WelsSampleSatd16x16_neon, WelsSampleSatd16x16_c, WELS_CPU_NEON)
 #endif
 
 #ifdef HAVE_NEON_AARCH64
-GENERATE_Sad4x4_UT(WelsSampleSad4x4_AArch64_neon, WelsSampleSad4x4_c, WELS_CPU_NEON)
-GENERATE_Sad8x8_UT(WelsSampleSad8x8_AArch64_neon, WelsSampleSad8x8_c, WELS_CPU_NEON)
-GENERATE_Sad8x16_UT(WelsSampleSad8x16_AArch64_neon, WelsSampleSad8x16_c, WELS_CPU_NEON)
-GENERATE_Sad16x8_UT(WelsSampleSad16x8_AArch64_neon, WelsSampleSad16x8_c, WELS_CPU_NEON)
-GENERATE_Sad16x16_UT(WelsSampleSad16x16_AArch64_neon, WelsSampleSad16x16_c, WELS_CPU_NEON)
+GENERATE_Sad4x4_UT (WelsSampleSad4x4_AArch64_neon, WelsSampleSad4x4_c, WELS_CPU_NEON)
+GENERATE_Sad8x8_UT (WelsSampleSad8x8_AArch64_neon, WelsSampleSad8x8_c, WELS_CPU_NEON)
+GENERATE_Sad8x16_UT (WelsSampleSad8x16_AArch64_neon, WelsSampleSad8x16_c, WELS_CPU_NEON)
+GENERATE_Sad16x8_UT (WelsSampleSad16x8_AArch64_neon, WelsSampleSad16x8_c, WELS_CPU_NEON)
+GENERATE_Sad16x16_UT (WelsSampleSad16x16_AArch64_neon, WelsSampleSad16x16_c, WELS_CPU_NEON)
 
-GENERATE_Sad4x4_UT(WelsSampleSatd4x4_AArch64_neon, WelsSampleSatd4x4_c, WELS_CPU_NEON)
-GENERATE_Sad8x8_UT(WelsSampleSatd8x8_AArch64_neon, WelsSampleSatd8x8_c, WELS_CPU_NEON)
-GENERATE_Sad8x16_UT(WelsSampleSatd8x16_AArch64_neon, WelsSampleSatd8x16_c, WELS_CPU_NEON)
-GENERATE_Sad16x8_UT(WelsSampleSatd16x8_AArch64_neon, WelsSampleSatd16x8_c, WELS_CPU_NEON)
-GENERATE_Sad16x16_UT(WelsSampleSatd16x16_AArch64_neon, WelsSampleSatd16x16_c, WELS_CPU_NEON)
+GENERATE_Sad4x4_UT (WelsSampleSatd4x4_AArch64_neon, WelsSampleSatd4x4_c, WELS_CPU_NEON)
+GENERATE_Sad8x8_UT (WelsSampleSatd8x8_AArch64_neon, WelsSampleSatd8x8_c, WELS_CPU_NEON)
+GENERATE_Sad8x16_UT (WelsSampleSatd8x16_AArch64_neon, WelsSampleSatd8x16_c, WELS_CPU_NEON)
+GENERATE_Sad16x8_UT (WelsSampleSatd16x8_AArch64_neon, WelsSampleSatd16x8_c, WELS_CPU_NEON)
+GENERATE_Sad16x16_UT (WelsSampleSatd16x16_AArch64_neon, WelsSampleSatd16x16_c, WELS_CPU_NEON)
 #endif
 
 #define GENERATE_SadFour_UT(func, CPUFLAGS, width, height) \
@@ -610,25 +610,25 @@ TEST_F (SadSatdAssemblyFuncTest, func) { \
 }
 
 #ifdef X86_ASM
-GENERATE_SadFour_UT(WelsSampleSadFour4x4_sse2, WELS_CPU_SSE2, 4, 4)
-GENERATE_SadFour_UT(WelsSampleSadFour8x8_sse2, WELS_CPU_SSE2, 8, 8)
-GENERATE_SadFour_UT(WelsSampleSadFour8x16_sse2, WELS_CPU_SSE2, 8, 16)
-GENERATE_SadFour_UT(WelsSampleSadFour16x8_sse2, WELS_CPU_SSE2, 16, 8)
-GENERATE_SadFour_UT(WelsSampleSadFour16x16_sse2, WELS_CPU_SSE2, 16, 16)
+GENERATE_SadFour_UT (WelsSampleSadFour4x4_sse2, WELS_CPU_SSE2, 4, 4)
+GENERATE_SadFour_UT (WelsSampleSadFour8x8_sse2, WELS_CPU_SSE2, 8, 8)
+GENERATE_SadFour_UT (WelsSampleSadFour8x16_sse2, WELS_CPU_SSE2, 8, 16)
+GENERATE_SadFour_UT (WelsSampleSadFour16x8_sse2, WELS_CPU_SSE2, 16, 8)
+GENERATE_SadFour_UT (WelsSampleSadFour16x16_sse2, WELS_CPU_SSE2, 16, 16)
 #endif
 
 #ifdef HAVE_NEON
-GENERATE_SadFour_UT(WelsSampleSadFour4x4_neon, WELS_CPU_NEON, 4, 4)
-GENERATE_SadFour_UT(WelsSampleSadFour8x8_neon, WELS_CPU_NEON, 8, 8)
-GENERATE_SadFour_UT(WelsSampleSadFour8x16_neon, WELS_CPU_NEON, 8, 16)
-GENERATE_SadFour_UT(WelsSampleSadFour16x8_neon, WELS_CPU_NEON, 16, 8)
-GENERATE_SadFour_UT(WelsSampleSadFour16x16_neon, WELS_CPU_NEON, 16, 16)
+GENERATE_SadFour_UT (WelsSampleSadFour4x4_neon, WELS_CPU_NEON, 4, 4)
+GENERATE_SadFour_UT (WelsSampleSadFour8x8_neon, WELS_CPU_NEON, 8, 8)
+GENERATE_SadFour_UT (WelsSampleSadFour8x16_neon, WELS_CPU_NEON, 8, 16)
+GENERATE_SadFour_UT (WelsSampleSadFour16x8_neon, WELS_CPU_NEON, 16, 8)
+GENERATE_SadFour_UT (WelsSampleSadFour16x16_neon, WELS_CPU_NEON, 16, 16)
 #endif
 
 #ifdef HAVE_NEON_AARCH64
-GENERATE_SadFour_UT(WelsSampleSadFour4x4_AArch64_neon, WELS_CPU_NEON, 4, 4)
-GENERATE_SadFour_UT(WelsSampleSadFour8x8_AArch64_neon, WELS_CPU_NEON, 8, 8)
-GENERATE_SadFour_UT(WelsSampleSadFour8x16_AArch64_neon, WELS_CPU_NEON, 8, 16)
-GENERATE_SadFour_UT(WelsSampleSadFour16x8_AArch64_neon, WELS_CPU_NEON, 16, 8)
-GENERATE_SadFour_UT(WelsSampleSadFour16x16_AArch64_neon, WELS_CPU_NEON, 16, 16)
+GENERATE_SadFour_UT (WelsSampleSadFour4x4_AArch64_neon, WELS_CPU_NEON, 4, 4)
+GENERATE_SadFour_UT (WelsSampleSadFour8x8_AArch64_neon, WELS_CPU_NEON, 8, 8)
+GENERATE_SadFour_UT (WelsSampleSadFour8x16_AArch64_neon, WELS_CPU_NEON, 8, 16)
+GENERATE_SadFour_UT (WelsSampleSadFour16x8_AArch64_neon, WELS_CPU_NEON, 16, 8)
+GENERATE_SadFour_UT (WelsSampleSadFour16x16_AArch64_neon, WELS_CPU_NEON, 16, 16)
 #endif

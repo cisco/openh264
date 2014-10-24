@@ -71,7 +71,7 @@ void WelsResetRefList (sWelsEncCtx* pCtx) {
   for (i = 0; i < pCtx->pSvcParam->iLTRRefNum + 1; i++)
     pRefList->pLongRefList[i] = NULL;
   for (i = 0; i < pCtx->pSvcParam->iNumRefFrame + 1; i++)
-    pRefList->pRef[i]->SetUnref ();
+    pRefList->pRef[i]->SetUnref();
 
   pRefList->uiLongRefCount = 0;
   pRefList->uiShortRefCount = 0;
@@ -106,7 +106,7 @@ static void DeleteNonSceneLTR (sWelsEncCtx* pCtx) {
     SPicture* pRef = pRefList->pLongRefList[i];
     if (pRef != NULL &&  pRef->bUsedAsRef && pRef->bIsLongRef && (!pRef->bIsSceneLTR) &&
         (pCtx->uiTemporalId < pRef->uiTemporalId || pCtx->bCurFrameMarkedAsSceneLtr)) {
-      pRef->SetUnref ();
+      pRef->SetUnref();
       DeleteLTRFromLongList (pCtx, i);
       i--;
     }
@@ -162,7 +162,7 @@ static inline void DeleteInvalidLTR (sWelsEncCtx* pCtx) {
                                iMaxFrameNumPlus1) & (FRAME_NUM_EQUAL | FRAME_NUM_SMALLER))) {
         WelsLog (pLogCtx, WELS_LOG_WARNING, "LTR ,invalid LTR delete ,long_term_idx = %d , iFrameNum =%d ",
                  pLongRefList[i]->iLongTermPicNum, pLongRefList[i]->iFrameNum);
-        pLongRefList[i]->SetUnref ();
+        pLongRefList[i]->SetUnref();
         DeleteLTRFromLongList (pCtx, i);
         pLtr->bLTRMarkEnable = true;
         if (pRefList->uiLongRefCount == 0) 	{
@@ -175,7 +175,7 @@ static inline void DeleteInvalidLTR (sWelsEncCtx* pCtx) {
                  && pLtr->iLTRMarkMode == LTR_DELAY_MARK)	{
         WelsLog (pLogCtx, WELS_LOG_WARNING, "LTR ,iMarkFrameNum invalid LTR delete ,long_term_idx = %d , iFrameNum =%d ",
                  pLongRefList[i]->iLongTermPicNum, pLongRefList[i]->iFrameNum);
-        pLongRefList[i]->SetUnref ();
+        pLongRefList[i]->SetUnref();
         DeleteLTRFromLongList (pCtx, i);
         pLtr->bLTRMarkEnable = true;
         if (pRefList->uiLongRefCount == 0) 	{
@@ -211,7 +211,7 @@ static inline void HandleLTRMarkFeedback (sWelsEncCtx* pCtx) {
 
         for (j = 0; j < pRefList->uiLongRefCount; j++)	{
           if (pLongRefList[j]->iLongTermPicNum != pLtr->iCurLtrIdx)	{
-            pLongRefList[j]->SetUnref ();
+            pLongRefList[j]->SetUnref();
             DeleteLTRFromLongList (pCtx, j);
           }
         }
@@ -228,7 +228,7 @@ static inline void HandleLTRMarkFeedback (sWelsEncCtx* pCtx) {
   } else if (pLtr->uiLtrMarkState == LTR_MARKING_FAILED) {
     for (i = 0; i < pRefList->uiLongRefCount; i++)	{
       if (pLongRefList[i]->iFrameNum == pLtr->iLtrMarkFbFrameNum)	{
-        pLongRefList[i]->SetUnref ();
+        pLongRefList[i]->SetUnref();
         DeleteLTRFromLongList (pCtx, i);
         break;
       }
@@ -297,7 +297,7 @@ static inline void LTRMarkProcess (sWelsEncCtx* pCtx) {
     pLongRefList[0]	 = pShortRefList[i];
     pRefList->uiLongRefCount++;
     if (pRefList->uiLongRefCount > pCtx->pSvcParam->iLTRRefNum) {
-      pRefList->pLongRefList[pRefList->uiLongRefCount - 1]->SetUnref ();
+      pRefList->pLongRefList[pRefList->uiLongRefCount - 1]->SetUnref();
       DeleteLTRFromLongList (pCtx, pRefList->uiLongRefCount - 1);
     }
     DeleteSTRFromShortList (pCtx, i);
@@ -311,7 +311,7 @@ static inline void LTRMarkProcessScreen (sWelsEncCtx* pCtx) {
   pCtx->pVaa->uiMarkLongTermPicIdx = pCtx->pDecPic->iLongTermPicNum;
 
   if (pLongRefList[iLtrIdx] != NULL) {
-    pLongRefList[iLtrIdx]->SetUnref ();
+    pLongRefList[iLtrIdx]->SetUnref();
     DeleteLTRFromLongList (pCtx, iLtrIdx);
   }
   pLongRefList[iLtrIdx] = pCtx->pDecPic;
@@ -334,7 +334,7 @@ static void PrefetchNextBuffer (void* pEncCtx) {
 
   if (pRefList->pNextBuffer == NULL && pRefList->uiShortRefCount > 0) {
     pRefList->pNextBuffer = pRefList->pShortRefList[pRefList->uiShortRefCount - 1];
-    pRefList->pNextBuffer->SetUnref ();
+    pRefList->pNextBuffer->SetUnref();
   }
 
   pCtx->pDecPic = pRefList->pNextBuffer;
@@ -398,12 +398,12 @@ bool WelsUpdateRefList (void* pEncCtx) {
       }
 
       for (i = pRefList->uiShortRefCount - 1; i > 0; i--) {
-        pRefList->pShortRefList[i]->SetUnref ();
+        pRefList->pShortRefList[i]->SetUnref();
         DeleteSTRFromShortList (pCtx, i);
       }
       if (pRefList->uiShortRefCount > 0 && (pRefList->pShortRefList[0]->uiTemporalId > 0
                                             || pRefList->pShortRefList[0]->iFrameNum != pCtx->iFrameNum)) {
-        pRefList->pShortRefList[0]->SetUnref ();
+        pRefList->pShortRefList[0]->SetUnref();
         DeleteSTRFromShortList (pCtx, 0);
       }
     }
@@ -698,7 +698,8 @@ static void UpdateSrcPicListLosslessScreenRefSelectionWithLtr (void* pEncCtx) {
   //update info in src list
   UpdateOriginalPicInfo (pCtx->pEncPic, pCtx->pDecPic);
   PrefetchNextBuffer (pCtx);
-  pCtx->pVpp->UpdateSrcListLosslessScreenRefSelectionWithLtr (pCtx->pEncPic, iDIdx,  pCtx->pVaa->uiMarkLongTermPicIdx, pCtx->ppRefPicListExt[iDIdx]->pLongRefList);
+  pCtx->pVpp->UpdateSrcListLosslessScreenRefSelectionWithLtr (pCtx->pEncPic, iDIdx,  pCtx->pVaa->uiMarkLongTermPicIdx,
+      pCtx->ppRefPicListExt[iDIdx]->pLongRefList);
 }
 
 static void UpdateSrcPicList (void* pEncCtx) {
@@ -707,7 +708,8 @@ static void UpdateSrcPicList (void* pEncCtx) {
   //update info in src list
   UpdateOriginalPicInfo (pCtx->pEncPic, pCtx->pDecPic);
   PrefetchNextBuffer (pCtx);
-  pCtx->pVpp->UpdateSrcList (pCtx->pEncPic, iDIdx, pCtx->ppRefPicListExt[iDIdx]->pShortRefList, pCtx->ppRefPicListExt[iDIdx]->uiShortRefCount);
+  pCtx->pVpp->UpdateSrcList (pCtx->pEncPic, iDIdx, pCtx->ppRefPicListExt[iDIdx]->pShortRefList,
+                             pCtx->ppRefPicListExt[iDIdx]->uiShortRefCount);
 }
 
 bool WelsUpdateRefListScreen (void* pEncCtx) {

@@ -68,7 +68,7 @@ void WelsLog (SLogContext* logCtx, int32_t iLevel, const char* kpFmt, ...) {
     WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] Detail:");
     break;
   }
-  WelsStrcat(pTraceTag,MAX_LOG_SIZE,kpFmt);
+  WelsStrcat (pTraceTag, MAX_LOG_SIZE, kpFmt);
   va_start (vl, kpFmt);
   logCtx->pfLog (logCtx->pLogCtx, iLevel, pTraceTag, vl);
   va_end (vl);
