@@ -159,7 +159,7 @@ int32_t   iBitRate;
 int32_t   iPreviousBitrate;
 int32_t   iPreviousGopSize;
 double    fFrameRate;
-int32_t   iBitsPerFrame; // *INT_MULTIPLY
+int64_t   iBitsPerFrame; // *INT_MULTIPLY
 double    dPreviousFps;
 
 // bits allocation and status

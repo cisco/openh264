@@ -116,6 +116,10 @@
 #define WELS_ROUND(x)	((int32_t)(0.5+(x)))
 #endif//WELS_ROUND
 
+#ifndef WELS_ROUND64
+#define WELS_ROUND64(x)	((int64_t)(0.5+(x)))
+#endif//WELS_ROUND
+
 #ifndef WELS_DIV_ROUND
 #define WELS_DIV_ROUND(x,y)	((int32_t)((y)==0?((x)/((y)+1)):(((y)/2+(x))/(y))))
 #endif//WELS_DIV_ROUND
