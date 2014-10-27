@@ -47,40 +47,45 @@ namespace WelsEnc {
 
 
 struct SMVUnitXY {			// each 4 Bytes
-int16_t		iMvX;
-int16_t		iMvY;
+  int16_t		iMvX;
+  int16_t		iMvY;
  public:
-SMVUnitXY& sDeltaMv (const SMVUnitXY& _v0, const SMVUnitXY& _v1) {
-  iMvX = _v0.iMvX - _v1.iMvX;
-  iMvY = _v0.iMvY - _v1.iMvY;
-  return (*this);
-}
+  SMVUnitXY& sDeltaMv (const SMVUnitXY& _v0, const SMVUnitXY& _v1) {
+    iMvX = _v0.iMvX - _v1.iMvX;
+    iMvY = _v0.iMvY - _v1.iMvY;
+    return (*this);
+  };
+  SMVUnitXY& sAssginMv (const SMVUnitXY& _v0) {
+    iMvX = _v0.iMvX;
+    iMvY = _v0.iMvY;
+    return (*this);
+  };
 };
 
 typedef struct TagMVComponentUnit {		// each 	LIST_0/LIST_1
-SMVUnitXY	sMotionVectorCache[5 * 6 - 1];			// Luma only: 5 x 6 - 1 = 29 D-Words
-int8_t		iRefIndexCache[5 * 6];			// Luma only: 5 x 6 = 30 bytes
+  SMVUnitXY	sMotionVectorCache[5 * 6 - 1];			// Luma only: 5 x 6 - 1 = 29 D-Words
+  int8_t		iRefIndexCache[5 * 6];			// Luma only: 5 x 6 = 30 bytes
 } SMVComponentUnit, *PMVComponentUnit;
 
 
 typedef struct TagParaSetOffsetVariable {
-int32_t 	iParaSetIdDelta[MAX_DQ_LAYER_NUM/*+1*/];	//mark delta between SPS_ID_in_bs and sps_id_in_encoder, can be minus, for each dq-layer
+  int32_t 	iParaSetIdDelta[MAX_DQ_LAYER_NUM/*+1*/];	//mark delta between SPS_ID_in_bs and sps_id_in_encoder, can be minus, for each dq-layer
 //need not extra +1 due no MGS and FMO case so far
-bool		bUsedParaSetIdInBs[MAX_PPS_COUNT];	//mark the used SPS_ID with 1
-uint32_t	uiNextParaSetIdToUseInBs;					//mark the next SPS_ID_in_bs, for all layers
+  bool		bUsedParaSetIdInBs[MAX_PPS_COUNT];	//mark the used SPS_ID with 1
+  uint32_t	uiNextParaSetIdToUseInBs;					//mark the next SPS_ID_in_bs, for all layers
 } SParaSetOffsetVariable;
 
 typedef struct TagParaSetOffset {
 //in PS0 design, "sParaSetOffsetVariable" record the previous paras before current IDR, AND NEED to be stacked and recover across IDR
-SParaSetOffsetVariable
-sParaSetOffsetVariable[PARA_SET_TYPE]; //PARA_SET_TYPE=3; paraset_type = 0: AVC_SPS; =1: Subset_SPS; =2: PPS
+  SParaSetOffsetVariable
+  sParaSetOffsetVariable[PARA_SET_TYPE]; //PARA_SET_TYPE=3; paraset_type = 0: AVC_SPS; =1: Subset_SPS; =2: PPS
 //in PSO design, "bPpsIdMappingIntoSubsetsps" uses the current para of current IDR period
-bool
-bPpsIdMappingIntoSubsetsps[MAX_DQ_LAYER_NUM/*+1*/];	// need not extra +1 due no MGS and FMO case so far
-uint16_t
-uiIdrPicId;		// IDR picture id: [0, 65535], this one is used for LTR!! Can we just NOT put this into the SParaSetOffset structure?!!
+  bool
+  bPpsIdMappingIntoSubsetsps[MAX_DQ_LAYER_NUM/*+1*/];	// need not extra +1 due no MGS and FMO case so far
+  uint16_t
+  uiIdrPicId;		// IDR picture id: [0, 65535], this one is used for LTR!! Can we just NOT put this into the SParaSetOffset structure?!!
 #if _DEBUG
-bool                  bEnableSpsPpsIdAddition;
+  bool                  bEnableSpsPpsIdAddition;
 #endif
 } SParaSetOffset;
 
@@ -88,32 +93,32 @@ bool                  bEnableSpsPpsIdAddition;
 
 /* Position Offset structure */
 typedef struct TagCropOffset {
-int16_t	iCropLeft;
-int16_t	iCropRight;
-int16_t	iCropTop;
-int16_t	iCropBottom;
+  int16_t	iCropLeft;
+  int16_t	iCropRight;
+  int16_t	iCropTop;
+  int16_t	iCropBottom;
 } SCropOffset;
 
 
 /* Transform Type */
 
 enum ETransType {
-T_4x4	= 0,
-T_8x8	= 1,
-T_16x16	= 2,
-T_PCM	= 3
+  T_4x4	= 0,
+  T_8x8	= 1,
+  T_16x16	= 2,
+  T_PCM	= 3
 };
 
 enum EMbPosition {
-LEFT_MB_POS     = 0x01,	// A
-TOP_MB_POS      = 0x02,	// B
-TOPRIGHT_MB_POS = 0x04,	// C
-TOPLEFT_MB_POS	= 0x08,	// D,
-RIGHT_MB_POS	= 0x10,	//  add followed four case to reuse when intra up-sample
-BOTTOM_MB_POS	= 0x20,	//
-BOTTOMRIGHT_MB_POS = 0x40,	//
-BOTTOMLEFT_MB_POS	= 0x80,	//
-MB_POS_A  = 0x100
+  LEFT_MB_POS     = 0x01,	// A
+  TOP_MB_POS      = 0x02,	// B
+  TOPRIGHT_MB_POS = 0x04,	// C
+  TOPLEFT_MB_POS	= 0x08,	// D,
+  RIGHT_MB_POS	= 0x10,	//  add followed four case to reuse when intra up-sample
+  BOTTOM_MB_POS	= 0x20,	//
+  BOTTOMRIGHT_MB_POS = 0x40,	//
+  BOTTOMLEFT_MB_POS	= 0x80,	//
+  MB_POS_A  = 0x100
 };
 #define MB_ON_PIC_BOUNDRY			(RIGHT_MB_POS|BOTTOM_MB_POS|LEFT_MB_POS|TOP_MB_POS)
 
@@ -180,13 +185,13 @@ typedef uint32_t Mb_Type;
 
 
 enum {
-Intra4x4			= 0,
-Intra16x16			= 1,
-Inter16x16			= 2,
-Inter16x8			= 3,
-Inter8x16			= 4,
-Inter8x8			= 5,
-PSkip				= 6
+  Intra4x4			= 0,
+  Intra16x16			= 1,
+  Inter16x16			= 2,
+  Inter16x8			= 3,
+  Inter8x16			= 4,
+  Inter8x8			= 5,
+  PSkip				= 6
 };
 
 

@@ -29,61 +29,61 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	set_mb_syn_cavlc.h
+ * \file	set_mb_syn_cabac.h
  *
- * \brief	Seting all syntax elements of mb and decoding residual with cavlc
+ * \brief	Seting all syntax elements of mb and encoding residual with cabac
  *
- * \date	05/19/2009 Created
+ * \date	09/27/2014 Created
  *
  *************************************************************************************
  */
 
-#ifndef SET_MB_SYN_CAVLC_H_
-#define SET_MB_SYN_CAVLC_H_
+#ifndef SET_MB_SYN_CABAC_H_
+#define SET_MB_SYN_CABAC_H_
 
 #include "typedefs.h"
 #include "bit_stream.h"
-#include "wels_func_ptr_def.h"
 
 namespace WelsEnc {
 
+#define  WELS_QP_MAX    51
+#define  WELS_CONTEXT_COUNT 460
+#define  CTX_NA 0
 
-enum ECtxBlockCat {
-  LUMA_DC     = 0,
-  LUMA_AC     = 1,
-  LUMA_4x4    = 2,
-  CHROMA_DC   = 3,
-  CHROMA_AC   = 4
-};
+typedef struct TagStateCtx {
+  uint8_t   m_uiState;
+  uint8_t   m_uiValMps;
+} SStateCtx;
+typedef struct TagCabacCtx {
+  uint32_t  m_uiLow;
+  uint32_t  m_uiRange;
+  SStateCtx   m_sStateCtx[WELS_CONTEXT_COUNT];
+  uint8_t*   m_pBufStart;
+  uint8_t*   m_pBufEnd;
+  uint8_t*   m_pBufCur;
+  uint8_t  m_iBitsOutstanding;
+  uint32_t  m_uData;
+  uint32_t  m_uiBitsUsed;
+  uint32_t  m_iFirstFlag;
+  uint32_t  m_uiBinCountsInNalUnits;
+} SCabacCtx;
 
 
-#define LUMA_DC_AC    0x04
+extern const uint8_t g_kuiCabacRangeLps[64][4];
+extern const int8_t g_kiCabacGlobalContextIdx[WELS_CONTEXT_COUNT][4][2];
+extern const uint8_t g_kuiStateTransTable[64][2];
 
-typedef struct TagCavlcTableItem {
-  uint16_t uiBits;
-  uint8_t  uiLen;
-  uint8_t  uiSuffixLength;
-} SCavlcTableItem;
-
-void  InitCoeffFunc (SWelsFuncPtrList* pFuncList, const uint32_t uiCpuFlag,int32_t iEntropyCodingModeFlag);
-
-int32_t  WriteBlockResidualCavlc (SWelsFuncPtrList* pFuncList, int16_t* pCoffLevel, int32_t iEndIdx,
+void WelsCabacContextInit (void* pCtx,SCabacCtx* pCbCtx,int32_t iModel);
+void WelsCabacEncodeInit (SCabacCtx* pCbCtx, uint8_t* pBuf,  uint8_t* pEnd);
+void WelsCabacEncodeDecision (SCabacCtx* pCbCtx, int32_t iCtx, uint32_t uiBin);
+void WelsCabacEncodeBypassOne (SCabacCtx* pCbCtx, uint32_t uiBin);
+void WelsCabacEncodeTerminate (SCabacCtx* pCbCtx, uint32_t uiBin);
+void WelsCabacEncodeUeBypass (SCabacCtx* pCbCtx, int32_t iExpBits, uint32_t uiVal);
+void WelsCabacEncodeFlush (SCabacCtx* pCbCtx);
+uint8_t* WelsCabacEncodeGetPtr (SCabacCtx* pCbCtx);
+int32_t  WriteBlockResidualCabac (void* pEncCtx,  int16_t* pCoffLevel, int32_t iEndIdx,
                                   int32_t iCalRunLevelFlag,
                                   int32_t iResidualProperty, int8_t iNC, SBitStringAux* pBs);
-
-
-#if defined(__cplusplus)
-extern "C" {
-#endif//__cplusplus
-
-#ifdef  X86_ASM
-int32_t CavlcParamCal_sse2 (int16_t* pCoffLevel, uint8_t* pRun, int16_t* pLevel, int32_t* pTotalCoeffs ,
-                            int32_t iEndIdx);
-#endif
-
-#if defined(__cplusplus)
-}
-#endif//__cplusplus
 
 }
 #endif

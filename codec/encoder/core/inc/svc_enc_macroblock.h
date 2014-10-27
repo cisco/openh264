@@ -69,6 +69,10 @@ SMVUnitXY	sP16x16Mv;
 uint8_t		uiLumaQp;		// uiLumaQp: pPps->iInitialQp + sSliceHeader->delta_qp + mb->dquant.
 uint8_t		uiChromaQp;
 uint8_t		uiSliceIdc;	// AVC: pFirstMbInSlice?; SVC: (pFirstMbInSlice << 7) | ((uiDependencyId << 4) | uiQualityId);
+uint32_t    uiChromPredMode;
+int32_t     iLumaDQp;
+SMVUnitXY   sMvd[4];
+int32_t     iCbpDc;
 uint8_t		reserved_filling_bytes[1];	// filling bytes reserved to make structure aligned with 4 bytes, higher cache hit on less structure size by 2 cache lines( 2 * 64 bytes) once hit
 } SMB, *PMb;
 

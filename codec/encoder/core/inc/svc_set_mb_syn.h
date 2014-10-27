@@ -29,61 +29,40 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	set_mb_syn_cavlc.h
+ * \file	svc_set_mb_syn.h
  *
- * \brief	Seting all syntax elements of mb and decoding residual with cavlc
+ * \brief	Seting all syntax elements of mb and encoding residual with cavlc and cabac
  *
- * \date	05/19/2009 Created
+ * \date	2009.8.12 Created
  *
  *************************************************************************************
  */
 
-#ifndef SET_MB_SYN_CAVLC_H_
-#define SET_MB_SYN_CAVLC_H_
+#ifndef SVC_SET_MB_SYN_H_
+#define SVC_SET_MB_SYN_H_
 
 #include "typedefs.h"
-#include "bit_stream.h"
-#include "wels_func_ptr_def.h"
+#include "wels_common_basis.h"
+#include "encoder_context.h"
+#include "md.h"
+#include "slice.h"
+#include "set_mb_syn_cavlc.h"
+#include "set_mb_syn_cabac.h"
 
 namespace WelsEnc {
 
 
-enum ECtxBlockCat {
-  LUMA_DC     = 0,
-  LUMA_AC     = 1,
-  LUMA_4x4    = 2,
-  CHROMA_DC   = 3,
-  CHROMA_AC   = 4
-};
 
+int32_t WelsWriteMbResidual (SWelsFuncPtrList* pFuncList, SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux* pBs);
 
-#define LUMA_DC_AC    0x04
+void WelsSpatialWriteSubMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb);
 
-typedef struct TagCavlcTableItem {
-  uint16_t uiBits;
-  uint8_t  uiLen;
-  uint8_t  uiSuffixLength;
-} SCavlcTableItem;
-
-void  InitCoeffFunc (SWelsFuncPtrList* pFuncList, const uint32_t uiCpuFlag,int32_t iEntropyCodingModeFlag);
-
-int32_t  WriteBlockResidualCavlc (SWelsFuncPtrList* pFuncList, int16_t* pCoffLevel, int32_t iEndIdx,
-                                  int32_t iCalRunLevelFlag,
-                                  int32_t iResidualProperty, int8_t iNC, SBitStringAux* pBs);
-
-
-#if defined(__cplusplus)
-extern "C" {
-#endif//__cplusplus
-
-#ifdef  X86_ASM
-int32_t CavlcParamCal_sse2 (int16_t* pCoffLevel, uint8_t* pRun, int16_t* pLevel, int32_t* pTotalCoeffs ,
-                            int32_t iEndIdx);
-#endif
-
-#if defined(__cplusplus)
-}
-#endif//__cplusplus
-
+void WelsSpatialWriteMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb);
+void WelsInitSliceCabac(sWelsEncCtx* pEncCtx,SSlice* pSlice);
+void WelsCabacInit(void *pCtx);
+void WelsWriteSliceEndSyn(SSlice *pSlice,bool bEntropyCodingModeFlag);
+//for Base Layer CAVLC writing
+int32_t WelsSpatialWriteMbSyn (void* Ctx, SSlice* pSlice, SMB* pCurMb);
+int32_t WelsSpatialWriteMbSynCabac (void* pCtx, SSlice* pSlice, SMB* pCurMb);
 }
 #endif
