@@ -123,7 +123,7 @@ API_TEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) -I$(SRC_PATH)test -I$(SRC_PATH)t
 COMMON_UNITTEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) $(DECODER_INCLUDES) -I$(SRC_PATH)test -I$(SRC_PATH)test/common
 MODULE_INCLUDES += -I$(SRC_PATH)gmp-api
 
-.PHONY: test gtest-bootstrap clean
+.PHONY: test gtest-bootstrap clean $(PROJECT_NAME).pc
 
 all: libraries binaries
 
