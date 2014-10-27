@@ -221,6 +221,7 @@ install-static: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) install-headers
 install-shared: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) install-headers $(PROJECT_NAME).pc
 	mkdir -p $(PREFIX)/lib
 	install -m 755 $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) $(PREFIX)/lib
+	mkdir -p $(PREFIX)/lib/pkgconfig
 	install -m 444 $(PROJECT_NAME).pc $(PREFIX)/lib/pkgconfig
 ifneq ($(EXTRA_LIBRARY),)
 	install -m 644 $(EXTRA_LIBRARY) $(PREFIX)/lib
