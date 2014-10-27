@@ -26,6 +26,7 @@ PROJECT_NAME=openh264
 MODULE_NAME=gmpopenh264
 GMP_API_BRANCH=master
 CCASFLAGS=$(CFLAGS)
+VERSION=1.1
 
 ifeq (,$(wildcard $(SRC_PATH)gmp-api))
 HAVE_GMP_API=No
@@ -206,6 +207,9 @@ $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX): $(MODULE_OBJS) $(ENCODER_OBJS) $(
 	$(QUIET)rm -f $@
 	$(QUIET_CXX)$(CXX) $(SHARED) $(CXX_LINK_O) $+ $(LDFLAGS) $(SHLDFLAGS) $(MODULE_LDFLAGS)
 
+$(PROJECT_NAME).pc: $(PROJECT_NAME).pc.in
+	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(VERSION);' < $(PROJECT_NAME).pc.in > $(PROJECT_NAME).pc
+
 install-headers:
 	mkdir -p $(PREFIX)/include/wels
 	install -m 644 codec/api/svc/codec*.h $(PREFIX)/include/wels
@@ -214,9 +218,10 @@ install-static: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) install-headers
 	mkdir -p $(PREFIX)/lib
 	install -m 644 $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(PREFIX)/lib
 
-install-shared: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) install-headers
+install-shared: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) install-headers $(PROJECT_NAME).pc
 	mkdir -p $(PREFIX)/lib
 	install -m 755 $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) $(PREFIX)/lib
+	install -m 444 $(PROJECT_NAME).pc $(PREFIX)/lib/pkgconfig
 ifneq ($(EXTRA_LIBRARY),)
 	install -m 644 $(EXTRA_LIBRARY) $(PREFIX)/lib
 endif

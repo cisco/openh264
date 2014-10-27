@@ -44,3 +44,6 @@ testbin/test_vd_rc.264
 testbin/test_vd_rc.yuv
 testbin/test.264
 testbin/test.yuv
+
+# pkg-config file
+*.pc
