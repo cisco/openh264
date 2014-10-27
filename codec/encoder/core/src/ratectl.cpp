@@ -230,7 +230,7 @@ void RcUpdateBitrateFps (sWelsEncCtx* pEncCtx) {
   SSpatialLayerInternal* pDLayerParamInternal     = &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
   const int32_t kiGopSize	= (1 << pDLayerParamInternal->iDecompositionStages);
   const int32_t kiHighestTid = pDLayerParamInternal->iHighestTemporalId;
-  int32_t input_iBitsPerFrame = WELS_ROUND (pDLayerParam->iSpatialBitrate * INT_MULTIPLY /
+  int64_t input_iBitsPerFrame = WELS_ROUND64 (((int64_t)pDLayerParam->iSpatialBitrate) * INT_MULTIPLY /
                                 pDLayerParamInternal->fInputFrameRate);
   const int32_t kiGopBits	= WELS_DIV_ROUND (input_iBitsPerFrame * kiGopSize, INT_MULTIPLY);
   int32_t i;
@@ -255,7 +255,7 @@ void RcUpdateBitrateFps (sWelsEncCtx* pEncCtx) {
 
   //change remaining bits
   if (pWelsSvcRc->iBitsPerFrame > REMAIN_BITS_TH)
-    pWelsSvcRc->iRemainingBits = pWelsSvcRc->iRemainingBits * input_iBitsPerFrame / pWelsSvcRc->iBitsPerFrame;
+    pWelsSvcRc->iRemainingBits = (int32_t) (pWelsSvcRc->iRemainingBits * input_iBitsPerFrame / pWelsSvcRc->iBitsPerFrame);
   pWelsSvcRc->iBitsPerFrame = input_iBitsPerFrame;
 }
 
