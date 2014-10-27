@@ -716,7 +716,7 @@ int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx, const 
                                        ==
                                        SM_DYN_SLICE);
 
-  assert (kiSliceIdx == pCurSlice->uiSliceIdx);
+  assert (kiSliceIdx == (int) pCurSlice->uiSliceIdx);
 
   if (I_SLICE == pEncCtx->eSliceType) {
     pNalHeadExt->bIdrFlag = 1;
@@ -882,7 +882,7 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
     }
     const bool    kbSliceNumNotExceedConstraint = pSliceCtx->iSliceNumInFrame <
         pSliceCtx->iMaxSliceNumConstraint; /*tmp choice to avoid complex memory operation, 100520, to be modify*/
-    const bool    kbSliceIdxNotExceedConstraint = (pCurSlice->uiSliceIdx + kiActiveThreadsNum) <
+    const bool    kbSliceIdxNotExceedConstraint = ((int) pCurSlice->uiSliceIdx + kiActiveThreadsNum) <
         pSliceCtx->iMaxSliceNumConstraint;
     const bool    kbSliceNumReachConstraint = (pSliceCtx->iSliceNumInFrame ==
         pSliceCtx->iMaxSliceNumConstraint);

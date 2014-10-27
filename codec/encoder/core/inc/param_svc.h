@@ -399,9 +399,9 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 #ifdef ENABLE_FRAME_DUMP
       pDlp->sRecFileName[0]	= '\0';	// file to be constructed
 #endif//ENABLE_FRAME_DUMP
-      pSpatialLayer->iVideoWidth = WELS_CLIP3 (pCodingParam.sSpatialLayers[iIdxSpatial].iVideoWidth, MB_WIDTH_LUMA,
+      pSpatialLayer->iVideoWidth = WELS_CLIP3 (pCodingParam.sSpatialLayers[iIdxSpatial].iVideoWidth, 0,
                                    iPicWidth);	// frame width
-      pSpatialLayer->iVideoHeight = WELS_CLIP3 (pCodingParam.sSpatialLayers[iIdxSpatial].iVideoHeight, MB_HEIGHT_LUMA,
+      pSpatialLayer->iVideoHeight = WELS_CLIP3 (pCodingParam.sSpatialLayers[iIdxSpatial].iVideoHeight, 0,
                                     iPicHeight);// frame height
 
       pSpatialLayer->iSpatialBitrate	=
