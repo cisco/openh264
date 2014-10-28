@@ -106,7 +106,8 @@ typedef struct {
 typedef struct SVAAFrameInfoExt_t: public SVAAFrameInfo {
   SComplexityAnalysisScreenParam    sComplexityScreenParam;
   SScrollDetectionParam    sScrollDetectInfo;
-  SRefInfoParam    sVaaStrBestRefCandidate[MAX_REF_PIC_COUNT];   //TOP3_BEST_REF_NO_TID
+  SRefInfoParam    sVaaStrBestRefCandidate[MAX_REF_PIC_COUNT];
+  SRefInfoParam    sVaaLtrBestRefCandidate[MAX_REF_PIC_COUNT];
   int32_t    iNumOfAvailableRef;
 
   int32_t     iVaaBestRefFrameNum;
@@ -127,7 +128,7 @@ class CWelsPreProcess {
   int32_t AnalyzeSpatialPic (sWelsEncCtx* pEncCtx, const int32_t kiDIdx);
   int32_t UpdateSpatialPictures (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam, const int8_t iCurTid,
                                  const int32_t d_idx);
-  int32_t GetRefFrameInfo (int32_t iRefIdx, SPicture*& pRefOri);
+  int32_t GetRefFrameInfo (int32_t iRefIdx, bool bCurrentFrameIsSceneLtr, SPicture*& pRefOri);
   void    AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCurPicture, SPicture* pRefPicture,
                                     const int32_t kiDependencyId, const bool kbCalculateBGD);
   int32_t UpdateBlockIdcForScreen (uint8_t*  pCurBlockStaticPointer, const SPicture* kpRefPic, const SPicture* kpSrcPic);

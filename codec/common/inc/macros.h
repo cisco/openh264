@@ -272,6 +272,9 @@ static inline bool WELS_POWER2_IF (uint32_t v) {
 #define WELS_GCC_UNUSED
 #endif
 
+inline bool CheckInRangeCloseOpen (const int16_t kiCurrent, const int16_t kiMin, const int16_t kiMax) {
+return ((kiCurrent >= kiMin) && (kiCurrent < kiMax));
+}
 
 
 #endif//WELS_MACRO_UTILIZATIONS_H__
