@@ -1,6 +1,17 @@
 
 Releases
 -----------
+v1.2.0
+------
+- Add and modify encoder APIs related to rate control and screen content encoding
+- Remove PauseFrame in encoder APIs
+- Improve rate control and compression ratio for screen content encoding
+- Improve error concealment algorithm
+- Improve validation of input parameters
+- Add ARM64 assembly
+- bug fixes
+
+-----------
 v1.1.0
 ------
 - Modify some APIs (see API doc for detail)
@@ -14,6 +25,16 @@ Binaries
 -----------
 These binary releases are distributed under this license:
 http://www.openh264.org/BINARY_LICENSE.txt
+
+v1.2.0
+------
+http://ciscobinary.openh264.org/libopenh264-1.2.0-android19.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.2.0-linux32.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.2.0-linux64.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.2.0-osx32.dylib.bz2
+http://ciscobinary.openh264.org/libopenh264-1.2.0-osx64.dylib.bz2
+http://ciscobinary.openh264.org/openh264-1.2.0-win32msvc.dll.bz2
+http://ciscobinary.openh264.org/openh264-1.2.0-win64msvc.dll.bz2
 
 v1.1.0
 ------
