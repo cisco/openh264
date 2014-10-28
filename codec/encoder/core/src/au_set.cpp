@@ -266,7 +266,7 @@ int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, SParaS
   }
 #endif
 
-  BsWriteOneBit (pLocalBitStringAux, false/*pPps->entropy_coding_mode_flag*/);
+  BsWriteOneBit (pLocalBitStringAux, pPps->bEntropyCodingModeFlag);
   BsWriteOneBit (pLocalBitStringAux, false/*pPps->bPicOrderPresentFlag*/);
 
 #ifdef DISABLE_FMO_FEATURE
@@ -414,7 +414,8 @@ int32_t WelsInitPps (SWelsPPS* pPps,
                      SSubsetSps* pSubsetSps,
                      const uint32_t kuiPpsId,
                      const bool kbDeblockingFilterPresentFlag,
-                     const bool kbUsingSubsetSps) {
+                     const bool kbUsingSubsetSps,
+                     const bool kbEntropyCodingModeFlag) {
   SWelsSPS* pUsedSps = NULL;
   if (pPps == NULL || (pSps == NULL && pSubsetSps == NULL))
     return 1;
@@ -433,6 +434,7 @@ int32_t WelsInitPps (SWelsPPS* pPps,
   /* fill picture parameter set syntax */
   pPps->iPpsId		= kuiPpsId;
   pPps->iSpsId		= pUsedSps->uiSpsId;
+  pPps->bEntropyCodingModeFlag = kbEntropyCodingModeFlag;
 #if !defined(DISABLE_FMO_FEATURE)
   pPps->uiNumSliceGroups =  1;	//param->qos_param.sliceGroupCount;
   if (pPps->uiNumSliceGroups > 1) {

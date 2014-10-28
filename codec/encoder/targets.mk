@@ -1,6 +1,7 @@
 ENCODER_SRCDIR=codec/encoder
 ENCODER_CPP_SRCS=\
 	$(ENCODER_SRCDIR)/core/src/au_set.cpp\
+	$(ENCODER_SRCDIR)/core/src/cabac.cpp\
 	$(ENCODER_SRCDIR)/core/src/deblocking.cpp\
 	$(ENCODER_SRCDIR)/core/src/decode_mb_aux.cpp\
 	$(ENCODER_SRCDIR)/core/src/encode_mb_aux.cpp\
@@ -18,6 +19,7 @@ ENCODER_CPP_SRCS=\
 	$(ENCODER_SRCDIR)/core/src/ratectl.cpp\
 	$(ENCODER_SRCDIR)/core/src/ref_list_mgr_svc.cpp\
 	$(ENCODER_SRCDIR)/core/src/sample.cpp\
+	$(ENCODER_SRCDIR)/core/src/set_mb_syn_cabac.cpp\
 	$(ENCODER_SRCDIR)/core/src/set_mb_syn_cavlc.cpp\
 	$(ENCODER_SRCDIR)/core/src/slice_multi_threading.cpp\
 	$(ENCODER_SRCDIR)/core/src/svc_base_layer_md.cpp\
@@ -26,6 +28,7 @@ ENCODER_CPP_SRCS=\
 	$(ENCODER_SRCDIR)/core/src/svc_encode_slice.cpp\
 	$(ENCODER_SRCDIR)/core/src/svc_mode_decision.cpp\
 	$(ENCODER_SRCDIR)/core/src/svc_motion_estimate.cpp\
+	$(ENCODER_SRCDIR)/core/src/svc_set_mb_syn_cabac.cpp\
 	$(ENCODER_SRCDIR)/core/src/svc_set_mb_syn_cavlc.cpp\
 	$(ENCODER_SRCDIR)/core/src/wels_preprocess.cpp\
 	$(ENCODER_SRCDIR)/plus/src/welsEncoderExt.cpp\

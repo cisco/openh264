@@ -54,6 +54,7 @@
 #include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross platforms
 #include "slice_multi_threading.h"
 #include "measure_time.h"
+#include "svc_set_mb_syn.h"
 
 namespace WelsEnc {
 
@@ -947,7 +948,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
     }
 
     // initialize pPps
-    WelsInitPps (pPps, pSps, pSubsetSps, iPpsId, true, bUseSubsetSps);
+    WelsInitPps (pPps, pSps, pSubsetSps, iPpsId, true, bUseSubsetSps,pParam->iEntropyCodingModeFlag);
 
     // Not using FMO in SVC coding so far, come back if need FMO
     {
@@ -2053,7 +2054,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
     FreeMemorySvc (&pCtx);
     return 1;
   }
-  InitFunctionPointers (pCtx->pFuncList, pCtx->pSvcParam, uiCpuFeatureFlags);
+  InitFunctionPointers (pCtx, pCtx->pSvcParam, uiCpuFeatureFlags);
 
   pCtx->iActiveThreadsNum	= pCodingParam->iCountThreadsNum;
   pCtx->iMaxSliceCount	= iSliceNum;
@@ -2067,6 +2068,8 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   if (pCodingParam->iMultipleThreadIdc > 1)
     iRet = CreateSliceThreads (pCtx);
 
+  if(pCodingParam->iEntropyCodingModeFlag)
+    WelsCabacInit (pCtx);
   WelsRcInitModule (pCtx,  pCtx->pSvcParam->iRCMode);
 
   pCtx->pVpp = new CWelsPreProcess (pCtx);

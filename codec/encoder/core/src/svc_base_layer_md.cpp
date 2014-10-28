@@ -1617,7 +1617,7 @@ bool WelsMdFirstIntraMode (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCach
     //chroma
     pWelsMd->iCostChroma = WelsMdIntraChroma (pFunc, pEncCtx->pCurDqLayer, pMbCache, pWelsMd->iLambda);
     WelsIMbChromaEncode (pEncCtx, pCurMb, pMbCache);  //add pEnc&rec to MD--2010.3.15
-
+    pCurMb->uiChromPredMode = pMbCache->uiChmaI8x8Mode;
     pCurMb->pSadCost[0] = 0;
     return true; //intra_mb_type is best
   }
@@ -1806,6 +1806,7 @@ void WelsMdIntraSecondaryModesEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* 
   //chroma
   pWelsMd->iCostChroma = WelsMdIntraChroma (pFunc, pEncCtx->pCurDqLayer, pMbCache, pWelsMd->iLambda);
   WelsIMbChromaEncode (pEncCtx, pCurMb, pMbCache);  //add pEnc&rec to MD--2010.3.15
+  pCurMb->uiChromPredMode = pMbCache->uiChmaI8x8Mode;
   pCurMb->pSadCost[0] = 0;
 }
 

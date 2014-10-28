@@ -157,7 +157,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     /* Rate Control */
     param.iRCMode			= RC_QUALITY_MODE;
     param.iPaddingFlag	= 0;
-
+    param.iEntropyCodingModeFlag = 0;
     param.bEnableDenoise				= false;	// denoise control
     param.bEnableSceneChangeDetect	= true;		// scene change detection control
     param.bEnableBackgroundDetection	= true;		// background detection control
@@ -240,7 +240,8 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
     int8_t iIdxSpatial	= 0;
     EProfileIdc uiProfileIdc		= PRO_BASELINE;
-
+    if (iEntropyCodingModeFlag)
+      uiProfileIdc = PRO_MAIN;
     SSpatialLayerInternal* pDlp		= &sDependencyLayers[0];
 
     while (iIdxSpatial < iSpatialLayerNum) {
@@ -298,7 +299,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     iLoopFilterDisableIdc	= pCodingParam.iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries,
     iLoopFilterAlphaC0Offset = pCodingParam.iLoopFilterAlphaC0Offset;	// AlphaOffset: valid range [-6, 6], default 0
     iLoopFilterBetaOffset = pCodingParam.iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0
-
+    iEntropyCodingModeFlag = pCodingParam.iEntropyCodingModeFlag;
     bEnableFrameCroppingFlag	= pCodingParam.bEnableFrameCroppingFlag;
 
     /* Rate Control */
@@ -459,7 +460,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     const uint8_t* pTemporalIdList	= &g_kuiTemporalIdListTable[iDecStages][0];
     SSpatialLayerInternal* pDlp				= &sDependencyLayers[0];
     SSpatialLayerConfig* pSpatialLayer = &sSpatialLayers[0];
-    EProfileIdc uiProfileIdc				= PRO_BASELINE;
+    EProfileIdc uiProfileIdc = iEntropyCodingModeFlag ? PRO_MAIN : PRO_BASELINE;
     int8_t i						= 0;
 
     while (i < iSpatialLayerNum) {
@@ -492,7 +493,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
         return ENC_RETURN_INVALIDINPUT;
       }
 
-      uiProfileIdc	= PRO_SCALABLE_BASELINE;
+      uiProfileIdc	= iEntropyCodingModeFlag ? PRO_SCALABLE_HIGH : PRO_SCALABLE_BASELINE;
       ++ pDlp;
       ++ pSpatialLayer;
       ++ i;

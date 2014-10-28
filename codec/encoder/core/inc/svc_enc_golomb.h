@@ -171,7 +171,6 @@ pBs->pBufPtr += 4 - pBs->iLeftBits / 8;
 pBs->iLeftBits = 32;
 pBs->uiCurBits = 0;	//  for future writing safe, 5/19/2010
 }
-
 /*
  *	Write unsigned exp golomb codes
  */
@@ -246,5 +245,15 @@ static inline int32_t BsGetBitsPos (SBitStringAux* pBs) {
 return (int32_t) (((pBs->pBufPtr - pBs->pBuf) << 3) + 32 - pBs->iLeftBits);
 }
 
+static inline void BsAlign( SBitStringAux* pBs )
+{
+   if( pBs->iLeftBits&7 )
+   {
+      pBs->uiCurBits <<= pBs->iLeftBits&7;
+      pBs->uiCurBits |= (1 << (pBs->iLeftBits&7)) - 1;
+      pBs->iLeftBits &= ~7;
+   }
+   BsFlush(pBs );
+}
 }
 #endif//WELS_EXPONENTIAL_GOLOMB_ENTROPY_CODING_H__
