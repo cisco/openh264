@@ -216,13 +216,13 @@ int32_t StashPopMBStatusCavlc (SDynamicSlicingStack* pDss, void* pBuffer, SSlice
   return pDss->iMbSkipRunStack;
 }
 void StashMBStatusCabac (SDynamicSlicingStack* pDss, void* pBuffer, SSlice* pSlice, int32_t iMbSkipRun) {
-  SCabacCtx* pCtx = (SCabacCtx*)pBuffer;
+  SCabacCtx* pCtx = &pSlice->sCabacCtx;
   memcpy (&pDss->sStoredCabac, pCtx, sizeof (SCabacCtx));
   pDss->uiLastMbQp =  pSlice->uiLastMbQp;
   pDss->iMbSkipRunStack = iMbSkipRun;
 }
 int32_t StashPopMBStatusCabac (SDynamicSlicingStack* pDss, void* pBuffer, SSlice* pSlice) {
-  SCabacCtx* pCtx = (SCabacCtx*)pBuffer;
+  SCabacCtx* pCtx = &pSlice->sCabacCtx;
   memcpy (pCtx, &pDss->sStoredCabac, sizeof (SCabacCtx));
   pSlice->uiLastMbQp = pDss->uiLastMbQp;
   return pDss->iMbSkipRunStack;
