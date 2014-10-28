@@ -26,7 +26,7 @@ PROJECT_NAME=openh264
 MODULE_NAME=gmpopenh264
 GMP_API_BRANCH=master
 CCASFLAGS=$(CFLAGS)
-VERSION=1.1
+VERSION=1.2
 
 ifeq (,$(wildcard $(SRC_PATH)gmp-api))
 HAVE_GMP_API=No
