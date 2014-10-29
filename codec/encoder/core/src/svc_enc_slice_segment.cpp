@@ -218,7 +218,7 @@ bool CheckRasterMultiSliceSetting (const int32_t kiMbNumInFrame, SSliceArgument*
 
 
 // GOM based RC related for uiSliceNum decision, only used at SM_FIXEDSLCNUM_SLICE
-void GomValidCheckSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, uint32_t* pSliceNum) {
+bool GomValidCheckSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, uint32_t* pSliceNum) {
   const int32_t kiCountNumMb	= kiMbWidth * kiMbHeight;
   int32_t iSliceNum			= *pSliceNum;
   int32_t iGomSize;
@@ -246,15 +246,16 @@ void GomValidCheckSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, u
     break;
   }
 
-  if (0 == iSliceNum)
-    iSliceNum = 1;
-
-  *pSliceNum	= iSliceNum;
+  if (*pSliceNum	!= iSliceNum) {
+    *pSliceNum	= (0 != iSliceNum) ? iSliceNum : 1;
+    return false;
+  }
+  return true;
 }
 
 
 // GOM based RC related for uiSliceMbNum decision, only used at SM_FIXEDSLCNUM_SLICE
-void GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceArgument* pSliceArg) {
+bool GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceArgument* pSliceArg) {
   uint32_t* pSlicesAssignList		= & (pSliceArg->uiSliceMbNum[0]);
   const uint32_t kuiSliceNum			= pSliceArg->uiSliceNum;
   const int32_t kiMbNumInFrame	= kiMbWidth * kiMbHeight;
@@ -292,16 +293,23 @@ void GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,
     else if (iNumMbAssigning > iMaximalMbNum)
       iNumMbAssigning	= iMaximalMbNum;
 
-    assert (iNumMbAssigning > 0);
+    if (iNumMbAssigning <= 0) {
+      return false;
+    }
 
     iNumMbLeft -= iNumMbAssigning;
-    assert (iNumMbLeft > 0);
+    if (iNumMbLeft <= 0)  {
+      return false;
+    }
+
     pSlicesAssignList[uiSliceIdx]	= iNumMbAssigning;
 
     ++ uiSliceIdx;
     iMaximalMbNum	= iNumMbLeft - (kuiSliceNum - uiSliceIdx - 1) * iMinimalMbNum;	// get maximal num_mb in left parts
   }
   pSlicesAssignList[uiSliceIdx] = iNumMbLeft;
+
+  return true;
 }
 
 
