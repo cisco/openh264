@@ -493,13 +493,12 @@ int32_t WelsISliceMdEnc (sWelsEncCtx* pEncCtx, SSlice* pSlice) { //pMd + encodin
 
   SWelsMD sMd;
   int32_t iEncReturn = ENC_RETURN_SUCCESS;
-  SBitStringAux* pBs = pSlice->pSliceBsa;
   SDynamicSlicingStack sDss;
   if (pEncCtx->pSvcParam->iEntropyCodingModeFlag) {
     WelsInitSliceCabac (pEncCtx, pSlice);
   }
   for (; ;) {
-    pEncCtx->pFuncList->pfStashMBStatus (&sDss, pBs, pSlice, 0);
+    pEncCtx->pFuncList->pfStashMBStatus (&sDss, pSlice, 0);
     iCurMbIdx	= iNextMbIdx;
     pCurMb = &pMbList[ iCurMbIdx ];
 
@@ -514,7 +513,7 @@ TRY_REENCODING:
 
     iEncReturn = pEncCtx->pFuncList->pfWelsSpatialWriteMbSyn (pEncCtx, pSlice, pCurMb);
     if (iEncReturn == ENC_RETURN_VLCOVERFLOWFOUND) {
-      pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pBs, pSlice);
+      pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pSlice);
       UpdateQpForOverflow (pCurMb, kuiChromaQpIndexOffset);
       goto TRY_REENCODING;
     }
@@ -567,7 +566,7 @@ int32_t WelsISliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice) { //pMd + 
     iCurMbIdx	= iNextMbIdx;
     pCurMb = &pMbList[ iCurMbIdx ];
 
-    pEncCtx->pFuncList->pfStashMBStatus (&sDss, pBs, pSlice, 0);
+    pEncCtx->pFuncList->pfStashMBStatus (&sDss, pSlice, 0);
     pEncCtx->pFuncList->pfRc.pfWelsRcMbInit (pEncCtx, pCurMb, pSlice);
     // if already reaches the largest number of slices, set QPs to the upper bound
     if (pSlice->bDynamicSlicingSliceSizeCtrlFlag) {
@@ -583,7 +582,7 @@ TRY_REENCODING:
 
     iEncReturn = pEncCtx->pFuncList->pfWelsSpatialWriteMbSyn (pEncCtx, pSlice, pCurMb);
     if (iEncReturn == ENC_RETURN_VLCOVERFLOWFOUND) {
-      pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pBs, pSlice);
+      pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pSlice);
       UpdateQpForOverflow (pCurMb, kuiChromaQpIndexOffset);
       goto TRY_REENCODING;
     }
@@ -593,7 +592,7 @@ TRY_REENCODING:
     sDss.iCurrentPos = BsGetBitsPos (pBs);
 
     if (DynSlcJudgeSliceBoundaryStepBack (pEncCtx, pSlice, pSliceCtx, pCurMb, &sDss)) { //islice
-      pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pBs, pSlice);
+      pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pSlice);
       pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId] = iCurMbIdx -
           1;	// update pLastCodedMbIdxOfPartition, need to -1 due to stepping back
       ++ pCurLayer->pNumSliceCodedOfPartition[kiPartitionId];
@@ -954,7 +953,7 @@ int32_t WelsMdInterMbLoop (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pWelsMd, 
   }
   pSlice->iMbSkipRun = 0;
   for (;;) {
-    pEncCtx->pFuncList->pfStashMBStatus (&sDss, pBs, pSlice, pSlice->iMbSkipRun);
+    pEncCtx->pFuncList->pfStashMBStatus (&sDss, pSlice, pSlice->iMbSkipRun);
     //point to current pMb
     iCurMbIdx	= iNextMbIdx;
     pCurMb = &pMbList[ iCurMbIdx ];
@@ -985,7 +984,7 @@ TRY_REENCODING:
 
     iEncReturn = pEncCtx->pFuncList->pfWelsSpatialWriteMbSyn (pEncCtx, pSlice, pCurMb);
     if (iEncReturn == ENC_RETURN_VLCOVERFLOWFOUND) {
-      pSlice->iMbSkipRun = pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pBs, pSlice);
+      pSlice->iMbSkipRun = pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pSlice);
       UpdateQpForOverflow (pCurMb, kuiChromaQpIndexOffset);
       goto TRY_REENCODING;
     }
@@ -1050,7 +1049,7 @@ int32_t WelsMdInterMbLoopOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice,
   for (;;) {
     //DYNAMIC_SLICING_ONE_THREAD - MultiD
     //stack pBs pointer
-    pEncCtx->pFuncList->pfStashMBStatus (&sDss, pBs, pSlice, pSlice->iMbSkipRun);
+    pEncCtx->pFuncList->pfStashMBStatus (&sDss, pSlice, pSlice->iMbSkipRun);
 
     //point to current pMb
     iCurMbIdx	= iNextMbIdx;
@@ -1091,7 +1090,7 @@ TRY_REENCODING:
 
     iEncReturn = pEncCtx->pFuncList->pfWelsSpatialWriteMbSyn (pEncCtx, pSlice, pCurMb);
     if (iEncReturn == ENC_RETURN_VLCOVERFLOWFOUND) {
-      pSlice->iMbSkipRun = pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pBs, pSlice);
+      pSlice->iMbSkipRun = pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pSlice);
       UpdateQpForOverflow (pCurMb, kuiChromaQpIndexOffset);
       goto TRY_REENCODING;
     }
@@ -1102,7 +1101,7 @@ TRY_REENCODING:
     //DYNAMIC_SLICING_ONE_THREAD - MultiD
     sDss.iCurrentPos = BsGetBitsPos (pBs);
     if (DynSlcJudgeSliceBoundaryStepBack (pEncCtx, pSlice, pSliceCtx, pCurMb, &sDss)) {
-      pSlice->iMbSkipRun = pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pBs, pSlice);
+      pSlice->iMbSkipRun = pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pSlice);
       pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId] = iCurMbIdx -
           1;	// update pLastCodedMbIdxOfPartition, need to -1 due to stepping back
       ++ pCurLayer->pNumSliceCodedOfPartition[kiPartitionId];

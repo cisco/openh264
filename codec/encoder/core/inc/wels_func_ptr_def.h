@@ -202,8 +202,8 @@ typedef void (*PAfterBuildRefListFunc) (void* pCtx);
 typedef  int32_t (*PCavlcParamCalFunc) (int16_t* pCoff, uint8_t* pRun, int16_t* pLevel, int32_t* pTotalCoeffs,
                                         int32_t iEndIdx);
 typedef int32_t (*PWelsSpatialWriteMbSyn) (void* pCtx, SSlice* pSlice, SMB* pCurMb);
-typedef void (*PStashMBStatus) (SDynamicSlicingStack* pDss, void* pBuffer, SSlice* pSlice, int32_t iMbSkipRun);
-typedef int32_t (*PStashPopMBStatus) (SDynamicSlicingStack* pDss, void* pBuffer, SSlice* pSlice);
+typedef void (*PStashMBStatus) (SDynamicSlicingStack* pDss, SSlice* pSlice, int32_t iMbSkipRun);
+typedef int32_t (*PStashPopMBStatus) (SDynamicSlicingStack* pDss, SSlice* pSlice);
 
 struct TagWelsFuncPointerList {
   SExpandPicFunc sExpandPicFunc;
