@@ -51,7 +51,7 @@ namespace WelsEnc {
 //#define ENC_TRACE
 
 typedef int32_t (*PWelsCodingSliceFunc) (sWelsEncCtx* pCtx, SSlice* pSlice);
-typedef void (*PWelsSliceHeaderWriteFunc) (SBitStringAux* pBs, SDqLayer* pCurLayer, SSlice* pSlice,
+typedef void (*PWelsSliceHeaderWriteFunc) (sWelsEncCtx* pCtx, SBitStringAux* pBs, SDqLayer* pCurLayer, SSlice* pSlice,
     int32_t* pPpsIdDelta);
 
 void UpdateNonZeroCountCache (SMB* pMb, SMbCache* pMbCache) {
@@ -237,7 +237,7 @@ void WriteRefPicMarking (SBitStringAux* pBs, SSliceHeader* pSliceHeader, SNalUni
   }
 }
 
-void WelsSliceHeaderWrite (SBitStringAux* pBs, SDqLayer* pCurLayer, SSlice* pSlice, int32_t* pPpsIdDelta) {
+void WelsSliceHeaderWrite (sWelsEncCtx* pCtx, SBitStringAux* pBs, SDqLayer* pCurLayer, SSlice* pSlice, int32_t* pPpsIdDelta) {
   SWelsSPS* pSps = pCurLayer->sLayerInfo.pSpsP;
   SWelsPPS* pPps = pCurLayer->sLayerInfo.pPpsP;
   SSliceHeader* pSliceHeader      = &pSlice->sSliceHeaderExt.sSliceHeader;
@@ -291,7 +291,7 @@ void WelsSliceHeaderWrite (SBitStringAux* pBs, SDqLayer* pCurLayer, SSlice* pSli
       BsWriteUE (pBs, 2);
       break;
     default :
-      fprintf (stderr, "pData error for deblocking");
+      WelsLog(&pCtx->sLogCtx, WELS_LOG_ERROR, "pData error for deblocking");
       break;
     }
     if (1 != pSliceHeader->uiDisableDeblockingFilterIdc) {
@@ -301,7 +301,7 @@ void WelsSliceHeaderWrite (SBitStringAux* pBs, SDqLayer* pCurLayer, SSlice* pSli
   }
 }
 
-void WelsSliceHeaderExtWrite (SBitStringAux* pBs, SDqLayer* pCurLayer, SSlice* pSlice, int32_t* pPpsIdDelta) {
+void WelsSliceHeaderExtWrite (sWelsEncCtx* pCtx, SBitStringAux* pBs, SDqLayer* pCurLayer, SSlice* pSlice, int32_t* pPpsIdDelta) {
   SWelsSPS* pSps           = pCurLayer->sLayerInfo.pSpsP;
   SWelsPPS* pPps           = pCurLayer->sLayerInfo.pPpsP;
   SSubsetSps* pSubSps = pCurLayer->sLayerInfo.pSubsetSpsP;
@@ -728,7 +728,7 @@ int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx, const 
   WelsSliceHeaderExtInit (pEncCtx, pCurLayer, pCurSlice);
 
 
-  g_pWelsWriteSliceHeader[pCurSlice->bSliceHeaderExtFlag] (pBs, pCurLayer, pCurSlice,
+  g_pWelsWriteSliceHeader[pCurSlice->bSliceHeaderExtFlag] (pEncCtx, pBs, pCurLayer, pCurSlice,
       & (pEncCtx->sPSOVector.sParaSetOffsetVariable[PARA_SET_TYPE_PPS].iParaSetIdDelta[0]));
 #if _DEBUG
   if (pEncCtx->sPSOVector.bEnableSpsPpsIdAddition) {
