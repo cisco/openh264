@@ -2002,6 +2002,8 @@ TEST_F (EncodeDecodeTestAPI, SetOptionEncParamExt) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
 
+  int32_t iTraceLevel = WELS_LOG_QUIET;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   for (int i = 0; i < iEncFrameNum; i++) {
     //for (int i = 0; i < 9; i++) {
     int iResult;
@@ -2033,4 +2035,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionEncParamExt) {
     }
   }
 
+  iTraceLevel = WELS_LOG_ERROR;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
 }
