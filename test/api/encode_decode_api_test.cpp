@@ -282,9 +282,6 @@ void EncodeDecodeTestAPI::ValidateParamExtCombination() {
   //IntraPeriod
   uiGOPSize = 1 << (param_.iTemporalLayerNum - 1);
   param_.uiIntraPeriod -= param_.uiIntraPeriod % uiGOPSize;
-  if (param_.uiIntraPeriod < 0) {
-    param_.uiIntraPeriod = 0;
-  }
 
 //RefNum
   int32_t iRefUpperBound    = (param_.iUsageType == CAMERA_VIDEO_REAL_TIME) ?
