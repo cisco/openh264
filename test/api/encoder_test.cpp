@@ -129,7 +129,7 @@ static const EncodeFileParam kFileParamArray[] = {
   //for different strategy
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    "868f327765dc8e705ad6a9a942bfc7e32c03c791", SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1, true, true, false
+    "6a7fc060a4d9dc0ec397987f02df0cf4d96181e6", SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1, true, true, false
   },
   {
     "res/CiscoVT2people_320x192_12fps.yuv",

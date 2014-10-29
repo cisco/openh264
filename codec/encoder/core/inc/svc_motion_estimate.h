@@ -342,12 +342,9 @@ pMvMax->iMvX = WELS_MIN (((kiMbWidth - kiMbX) << 4) - INTPEL_NEEDED_MARGIN, kiMa
 pMvMax->iMvY = WELS_MIN (((kiMbHeight - kiMbY) << 4) - INTPEL_NEEDED_MARGIN, kiMaxMvRange);
 }
 
-inline bool CheckMvInRange (const int16_t kiCurrentMv, const int16_t kiMinMv, const int16_t kiMaxMv) {
-return ((kiCurrentMv >= kiMinMv) && (kiCurrentMv < kiMaxMv));
-}
 inline bool CheckMvInRange (const SMVUnitXY ksCurrentMv, const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv) {
-return (CheckMvInRange (ksCurrentMv.iMvX, ksMinMv.iMvX, ksMaxMv.iMvX)
-        && CheckMvInRange (ksCurrentMv.iMvY, ksMinMv.iMvY, ksMaxMv.iMvY));
+return (CheckInRangeCloseOpen (ksCurrentMv.iMvX, ksMinMv.iMvX, ksMaxMv.iMvX)
+        && CheckInRangeCloseOpen (ksCurrentMv.iMvY, ksMinMv.iMvY, ksMaxMv.iMvY));
 }
 //FME switch related
 inline bool CalcFMESwitchFlag (const uint8_t uiFMEGoodFrameCount, const int32_t iHighFreMbPrecentage,
