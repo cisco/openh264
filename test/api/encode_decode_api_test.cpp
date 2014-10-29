@@ -231,7 +231,7 @@ void EncodeDecodeTestAPI::RandomParamExtCombination() {
   param_.bEnableFrameCroppingFlag   = (rand() % 2 == 0) ? false : true;
   param_.bEnableSceneChangeDetect   = (rand() % 2 == 0) ? false : true;
 
-//for rc
+  //for rc
   param_.iRCMode            = static_cast<RC_MODES> (rand() % RC_MODE_RANGE - 1);
   param_.iMaxBitrate        = rand() % BIT_RATE_RANGE;
   param_.iTargetBitrate     = rand() % BIT_RATE_RANGE;
@@ -286,7 +286,7 @@ void EncodeDecodeTestAPI::ValidateParamExtCombination() {
     param_.uiIntraPeriod = 0;
   }
 
-//RefNum
+  //RefNum
   int32_t iRefUpperBound    = (param_.iUsageType == CAMERA_VIDEO_REAL_TIME) ?
                               MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA : MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN;
   param_.iNumRefFrame       = WELS_CLIP3 (param_.iNumRefFrame, MIN_REF_PIC_COUNT, iRefUpperBound);
@@ -2003,7 +2003,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionEncParamExt) {
   ASSERT_TRUE (rv == cmResultSuccess);
 
   for (int i = 0; i < iEncFrameNum; i++) {
-    //for (int i = 0; i < 9; i++) {
     int iResult;
     int len = 0;
     unsigned char* pData[3] = { NULL };
