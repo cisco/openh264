@@ -1878,9 +1878,8 @@ int32_t InitSliceSettings (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPar
           WelsLog (pLogCtx, WELS_LOG_ERROR,
                    "ParamValidationExt(), unsupported setting with Resolution and uiSliceNum (%d) combination  under RC on! Consider setting single slice with this resolution!",
                    pDlp->sSliceCfg.sSliceArgument.uiSliceNum);
-          return 1;
+          return ENC_RETURN_INVALIDINPUT;
         }
-        assert (pDlp->sSliceCfg.sSliceArgument.uiSliceNum > 1);
       } else if (!CheckFixedSliceNumMultiSliceSetting (kiMbNumInFrame,
                  &pDlp->sSliceCfg.sSliceArgument)) {	// verify interleave mode settings
         //check uiSliceMbNum with current uiSliceNum
@@ -1912,7 +1911,7 @@ int32_t InitSliceSettings (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPar
       2; // Disable loop filter on slice boundaries since that's not allowed with multithreading
   *pMaxSliceCount					= iMaxSliceCount;
 
-  return 0;
+  return ENC_RETURN_SUCCESS;
 }
 
 /*!
