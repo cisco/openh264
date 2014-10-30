@@ -748,7 +748,7 @@ int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx, const 
   if (ENC_RETURN_SUCCESS != iEncReturn)
     return iEncReturn;
 
-  WelsWriteSliceEndSyn (pCurSlice, pEncCtx->pSvcParam->iEntropyCodingModeFlag);
+  WelsWriteSliceEndSyn (pCurSlice, pEncCtx->pSvcParam->iEntropyCodingModeFlag != 0);
 
   return ENC_RETURN_SUCCESS;
 }
