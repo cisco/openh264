@@ -43,12 +43,10 @@
 
 #include "typedefs.h"
 #include "bit_stream.h"
-
+#include "wels_common_defs.h"
 namespace WelsEnc {
 
 #define  WELS_QP_MAX    51
-#define  WELS_CONTEXT_COUNT 460
-#define  CTX_NA 0
 
 typedef struct TagStateCtx {
   uint8_t   m_uiState;
@@ -69,11 +67,7 @@ typedef struct TagCabacCtx {
 } SCabacCtx;
 
 
-extern const uint8_t g_kuiCabacRangeLps[64][4];
-extern const int8_t g_kiCabacGlobalContextIdx[WELS_CONTEXT_COUNT][4][2];
-extern const uint8_t g_kuiStateTransTable[64][2];
-
-void WelsCabacContextInit (void* pCtx,SCabacCtx* pCbCtx,int32_t iModel);
+void WelsCabacContextInit (void* pCtx, SCabacCtx* pCbCtx, int32_t iModel);
 void WelsCabacEncodeInit (SCabacCtx* pCbCtx, uint8_t* pBuf,  uint8_t* pEnd);
 void WelsCabacEncodeDecision (SCabacCtx* pCbCtx, int32_t iCtx, uint32_t uiBin);
 void WelsCabacEncodeBypassOne (SCabacCtx* pCbCtx, uint32_t uiBin);

@@ -52,7 +52,6 @@
 		F5617A50196A833A006E2B20 /* reconstruct_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F5617A4F196A833A006E2B20 /* reconstruct_aarch64_neon.S */; };
 		F5BE8005196B913200ED02ED /* memory_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F5BE8004196B913200ED02ED /* memory_aarch64_neon.S */; };
 		F7E9994519EBD1E9009B1021 /* svc_set_mb_syn_cabac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F7E9994419EBD1E9009B1021 /* svc_set_mb_syn_cabac.cpp */; };
-		F7E9994719EBD1EF009B1021 /* cabac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F7E9994619EBD1EF009B1021 /* cabac.cpp */; };
 		F7E9994919EBD1F8009B1021 /* set_mb_syn_cabac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F7E9994819EBD1F8009B1021 /* set_mb_syn_cabac.cpp */; };
 /* End PBXBuildFile section */
 
@@ -168,7 +167,6 @@
 		F5617A4F196A833A006E2B20 /* reconstruct_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = reconstruct_aarch64_neon.S; path = arm64/reconstruct_aarch64_neon.S; sourceTree = "<group>"; };
 		F5BE8004196B913200ED02ED /* memory_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = memory_aarch64_neon.S; path = arm64/memory_aarch64_neon.S; sourceTree = "<group>"; };
 		F7E9994419EBD1E9009B1021 /* svc_set_mb_syn_cabac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = svc_set_mb_syn_cabac.cpp; sourceTree = "<group>"; };
-		F7E9994619EBD1EF009B1021 /* cabac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cabac.cpp; sourceTree = "<group>"; };
 		F7E9994819EBD1F8009B1021 /* set_mb_syn_cabac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = set_mb_syn_cabac.cpp; sourceTree = "<group>"; };
 		F7E9997E19EBD3C6009B1021 /* set_mb_syn_cabac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = set_mb_syn_cabac.h; sourceTree = "<group>"; };
 		F7E9997F19EBD3CE009B1021 /* svc_set_mb_syn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = svc_set_mb_syn.h; sourceTree = "<group>"; };
@@ -320,7 +318,6 @@
 			isa = PBXGroup;
 			children = (
 				F7E9994819EBD1F8009B1021 /* set_mb_syn_cabac.cpp */,
-				F7E9994619EBD1EF009B1021 /* cabac.cpp */,
 				F7E9994419EBD1E9009B1021 /* svc_set_mb_syn_cabac.cpp */,
 				9AED66651946A2B3009A3567 /* utils.cpp */,
 				4CE446DD18BC605C0017DF25 /* au_set.cpp */,
@@ -451,7 +448,6 @@
 				4C34067018C57D0400DFA14A /* memory_neon.S in Sources */,
 				4CE4470F18BC605C0017DF25 /* deblocking.cpp in Sources */,
 				4CE4472518BC605C0017DF25 /* svc_encode_mb.cpp in Sources */,
-				F7E9994719EBD1EF009B1021 /* cabac.cpp in Sources */,
 				4CE4471A18BC605C0017DF25 /* mv_pred.cpp in Sources */,
 				4C34066E18C57D0400DFA14A /* intra_pred_sad_3_opt_neon.S in Sources */,
 				4C23BC60195A77E0003B81FC /* intra_pred_sad_3_opt_aarch64_neon.S in Sources */,

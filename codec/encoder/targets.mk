@@ -1,7 +1,6 @@
 ENCODER_SRCDIR=codec/encoder
 ENCODER_CPP_SRCS=\
 	$(ENCODER_SRCDIR)/core/src/au_set.cpp\
-	$(ENCODER_SRCDIR)/core/src/cabac.cpp\
 	$(ENCODER_SRCDIR)/core/src/deblocking.cpp\
 	$(ENCODER_SRCDIR)/core/src/decode_mb_aux.cpp\
 	$(ENCODER_SRCDIR)/core/src/encode_mb_aux.cpp\
