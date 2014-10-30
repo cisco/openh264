@@ -330,10 +330,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\src\cabac.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\common\src\common_tables.cpp"
 				>
 			</File>
