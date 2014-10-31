@@ -957,7 +957,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
     }
 
     // initialize pPps
-    WelsInitPps (pPps, pSps, pSubsetSps, iPpsId, true, bUseSubsetSps,pParam->iEntropyCodingModeFlag);
+    WelsInitPps (pPps, pSps, pSubsetSps, iPpsId, true, bUseSubsetSps,pParam->iEntropyCodingModeFlag != 0);
 
     // Not using FMO in SVC coding so far, come back if need FMO
     {
