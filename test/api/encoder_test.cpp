@@ -2,6 +2,7 @@
 #include "utils/HashFunctions.h"
 #include "BaseEncoderTest.h"
 #include <string>
+
 static void UpdateHashFromFrame (const SFrameBSInfo& info, SHA1Context* ctx) {
   for (int i = 0; i < info.iLayerNum; ++i) {
     const SLayerBSInfo& layerInfo = info.sLayerInfo[i];
@@ -26,19 +27,39 @@ class EncoderInitTest : public ::testing::Test, public BaseEncoderTest {
 TEST_F (EncoderInitTest, JustInit) {}
 
 struct EncodeFileParam {
-  const char* fileName;
-  const char* hashStr;
-  EUsageType usageType;
-  int width;
-  int height;
-  float frameRate;
-  SliceModeEnum slices;
-  bool denoise;
-  int layers;
-  bool isLossless;
-  bool enableLtr;
-  bool cabac;
+  const char* pkcFileName;
+  const char* pkcHashStr;
+  EUsageType eUsageType;
+  int iWidth;
+  int iHeight;
+  float fFrameRate;
+  SliceModeEnum eSliceMode;
+  bool bDenoise;
+  int  iLayerNum;
+  bool bLossless;
+  bool bEnableLtr;
+  bool bCabac;
+// unsigned short iMultipleThreadIdc;
 };
+
+void EncFileParamToParamExt (EncodeFileParam* pEncFileParam, SEncParamExt* pEnxParamExt) {
+  ASSERT_TRUE (NULL != pEncFileParam && NULL != pEnxParamExt);
+  pEnxParamExt->iUsageType       = pEncFileParam->eUsageType;
+  pEnxParamExt->iPicWidth        = pEncFileParam->iWidth;
+  pEnxParamExt->iPicHeight       = pEncFileParam->iHeight;
+  pEnxParamExt->fMaxFrameRate    = pEncFileParam->fFrameRate;
+  pEnxParamExt->iSpatialLayerNum = pEncFileParam->iLayerNum;
+
+  pEnxParamExt->bEnableDenoise   = pEncFileParam->bDenoise;
+  pEnxParamExt->bIsLosslessLink  = pEncFileParam->bLossless;
+  pEnxParamExt->bEnableLongTermReference = pEncFileParam->bEnableLtr;
+  pEnxParamExt->iEntropyCodingModeFlag   = pEncFileParam->bCabac ? 1 : 0;
+
+  for (int i = 0; i < pEnxParamExt->iSpatialLayerNum; i++) {
+     pEnxParamExt->sSpatialLayers[i].sSliceCfg.uiSliceMode = pEncFileParam->eSliceMode;
+  }
+
+}
 
 class EncoderOutputTest : public ::testing::WithParamInterface<EncodeFileParam>,
   public EncoderInitTest , public BaseEncoderTest::Callback {
@@ -53,6 +74,7 @@ class EncoderOutputTest : public ::testing::WithParamInterface<EncodeFileParam>,
   virtual void onEncodeFrame (const SFrameBSInfo& frameInfo) {
     UpdateHashFromFrame (frameInfo, &ctx_);
   }
+
  protected:
   SHA1Context ctx_;
 };
@@ -60,20 +82,22 @@ class EncoderOutputTest : public ::testing::WithParamInterface<EncodeFileParam>,
 
 TEST_P (EncoderOutputTest, CompareOutput) {
   EncodeFileParam p = GetParam();
+  SEncParamExt EnxParamExt;
+
+  EncFileParamToParamExt (&p, &EnxParamExt);
+
 #if defined(ANDROID_NDK)
-  std::string filename = std::string ("/sdcard/") + p.fileName;
-  EncodeFile (filename.c_str(), p.usageType , p.width, p.height, p.frameRate, p.slices, p.denoise, p.layers, p.isLossless,
-              p.enableLtr,p.cabac, this);
+  std::string filename = std::string ("/sdcard/") + p.pkcFileName;
+  EncodeFile (p.pkcFileName, &EnxParamExt, this);
 #else
-  EncodeFile (p.fileName, p.usageType , p.width, p.height, p.frameRate, p.slices, p.denoise, p.layers, p.isLossless,
-              p.enableLtr, p.cabac, this);
+    EncodeFile (p.pkcFileName, &EnxParamExt, this);
 #endif
   //will remove this after screen content algorithms are ready,
   //because the bitstream output will vary when the different algorithms are added.
   unsigned char digest[SHA_DIGEST_LENGTH];
   SHA1Result (&ctx_, digest);
   if (!HasFatalFailure()) {
-    CompareHash (digest, p.hashStr);
+    CompareHash (digest, p.pkcHashStr);
   }
 }
 static const EncodeFileParam kFileParamArray[] = {
