@@ -119,7 +119,15 @@ enum {
 #define SMOOTH_FACTOR_MIN_VALUE 2 // *INT_MULTIPLY
 //#define VGOP_BITS_MIN_RATIO 0.8
 //skip and padding
+#define TimeCheckWindow 2000 // ms
+#define TimeCheckPoint 799 // ms
 #define SKIP_RATIO  50 // *INT_MULTIPLY
+#define MIN_SKIP_RATIO  20
+#define MAX_SKIP_RATIO  70
+#define SKIP_RATIO_STEP 10
+#define HUGE_FRAMEBIT_RATIO 5
+#define MEDIUM_FRAMEBIT_RATIO 2
+#define LAST_FRAME_PREDICT_WEIGHT 0.8
 #define PADDING_BUFFER_RATIO 50 // *INT_MULTIPLY
 #define PADDING_THRESHOLD    5 //*INT_MULTIPLY
 
@@ -152,7 +160,7 @@ int32_t   iFrameCmplxMean;
 
 typedef struct TagWelsRc {
 int32_t   iRcVaryPercentage;
-int32_t    iRcVaryRatio;
+int32_t   iRcVaryRatio;
 
 int32_t   iInitialQp; //initial qp
 int32_t   iBitRate;
@@ -160,6 +168,7 @@ int32_t   iPreviousBitrate;
 int32_t   iPreviousGopSize;
 double    fFrameRate;
 int64_t   iBitsPerFrame; // *INT_MULTIPLY
+int64_t   iMaxBitsPerFrame; // *INT_MULTIPLY
 double    dPreviousFps;
 
 // bits allocation and status
@@ -185,7 +194,7 @@ int32_t   iMinFrameQp;
 int32_t   iMaxFrameQp;
 int32_t   iNumberMbFrame;
 int32_t   iNumberMbGom;
-int32_t	iSliceNum;
+int32_t	  iSliceNum;
 int32_t   iGomSize;
 
 int32_t   iSkipFrameNum;
@@ -201,15 +210,17 @@ int32_t   iMinQp;
 int32_t   iMaxQp;
 //int32_t   delta_adaptive_qp;
 int32_t   iSkipBufferRatio;
- 
+
 int32_t   iQStep; // *INT_MULTIPLY
 int32_t   iFrameDeltaQpUpper;
 int32_t   iFrameDeltaQpLower;
 int32_t   iLastCalculatedQScale;
- 
+
 //for skip frame and padding
 int32_t   iBufferSizeSkip;
 int32_t   iBufferFullnessSkip;
+int32_t   iBufferMaxBitrateSkip;
+int32_t   iPredFrameBit;
 int32_t   iBufferSizePadding;
 int32_t   iBufferFullnessPadding;
 int32_t   iPaddingSize;
