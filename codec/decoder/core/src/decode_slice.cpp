@@ -501,7 +501,7 @@ int32_t WelsDecodeMbCabacISliceBaseMode0 (PWelsDecoderContext pCtx, uint32_t& ui
   int32_t iScanIdxStart = pSlice->sSliceHeaderExt.uiScanIdxStart;
   int32_t iScanIdxEnd   = pSlice->sSliceHeaderExt.uiScanIdxEnd;
   int32_t iMbXy = pCurLayer->iMbXyIndex;
-  int32_t iMbMode, i;
+  int32_t i;
   uint32_t uiMbType = 0, uiCbp = 0, uiCbpLuma = 0, uiCbpChroma = 0;
 
   ENFORCE_STACK_ALIGN_1D (uint8_t, pNonZeroCount, 48, 16);
@@ -538,7 +538,6 @@ int32_t WelsDecodeMbCabacISliceBaseMode0 (PWelsDecoderContext pCtx, uint32_t& ui
     WelsFillCacheNonZeroCount (&sNeighAvail, pNonZeroCount, pCurLayer);
     WELS_READ_VERIFY (ParseIntra16x16Mode (pCtx, &sNeighAvail, pBsAux, pCurLayer));
   }
-  iMbMode = BASE_MB;
 
   memset (pCurLayer->pScaledTCoeff[iMbXy], 0, 384 * sizeof (pCurLayer->pScaledTCoeff[iMbXy][0]));
   ST32 (&pCurLayer->pNzc[iMbXy][0], 0);
@@ -671,7 +670,7 @@ int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
   int32_t iScanIdxEnd   = pSlice->sSliceHeaderExt.uiScanIdxEnd;
   int32_t iMbXy = pCurLayer->iMbXyIndex;
 
-  int32_t iMbMode, i;
+  int32_t i;
   uint32_t uiMbType = 0, uiCbp = 0, uiCbpLuma = 0, uiCbpChroma = 0;
 
   ENFORCE_STACK_ALIGN_1D (uint8_t, pNonZeroCount, 48, 16);
@@ -687,7 +686,6 @@ int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
     pCurLayer->pMbType[iMbXy] = g_ksInterMbTypeInfo[uiMbType].iType;
     WelsFillCacheInterCabac (pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex, pCurLayer);
     WELS_READ_VERIFY (ParseInterMotionInfoCabac (pCtx, pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex));
-    iMbMode = BASE_MB;
     pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
   } else { //Intra mode
     uiMbType -= 5;
@@ -717,7 +715,6 @@ int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
         WelsFillCacheNonZeroCount (pNeighAvail, pNonZeroCount, pCurLayer);
         WELS_READ_VERIFY (ParseIntra16x16Mode (pCtx, pNeighAvail, pBsAux, pCurLayer));
       }
-      iMbMode = BASE_MB;
     }
   }
 
