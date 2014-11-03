@@ -945,9 +945,13 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
                    pParam->iMaxNumRefFrame,
                    iSpsId, pParam->bEnableFrameCroppingFlag, pParam->iRCMode != RC_OFF_MODE);
 
-      if (iDlayerCount > 1) {
+      if (pDlayerParam->uiProfileIdc == PRO_BASELINE) {
         pSps->bConstraintSet0Flag = true;
+      }
+      if (pDlayerParam->uiProfileIdc <= PRO_MAIN) {
         pSps->bConstraintSet1Flag = true;
+      }
+      if (iDlayerCount > 1) {
         pSps->bConstraintSet2Flag = true;
       }
     } else {
