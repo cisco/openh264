@@ -771,6 +771,9 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     //adjust to valid range
     m_pEncContext->pSvcParam->fMaxFrameRate = WELS_CLIP3 (iValue, MIN_FRAME_RATE, MAX_FRAME_RATE);
     WelsEncoderApplyFrameRate (m_pEncContext->pSvcParam);
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_FRAME_RATE,m_pEncContext->pSvcParam->fMaxFrameRate= %f",
+             m_pEncContext->pSvcParam->fMaxFrameRate);
   }
   break;
   case ENCODER_OPTION_BITRATE: {	// Target bit-rate
@@ -813,6 +816,8 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     }
     //adjust to valid range
     WelsEncoderApplyBitRate (&m_pWelsTrace->m_sLogCtx, m_pEncContext->pSvcParam, pInfo->iLayer);
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITRATE layerId= %d,iSpatialBitrate = %d", pInfo->iLayer, iBitrate);
   }
   break;
   case ENCODER_OPTION_MAX_BITRATE: {	// Target bit-rate
@@ -856,16 +861,25 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     }
     //adjust to valid range
     WelsEncoderApplyBitRate (&m_pWelsTrace->m_sLogCtx, m_pEncContext->pSvcParam, pInfo->iLayer);
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_MAX_BITRATE layerId= %d,iMaxSpatialBitrate = %d", pInfo->iLayer,
+             iBitrate);
   }
   break;
   case ENCODER_OPTION_RC_MODE: {	// 0:quality mode;1:bit-rate mode;2:bitrate limited mode
     int32_t iValue = * ((int32_t*)pOption);
     m_pEncContext->pSvcParam->iRCMode	= (RC_MODES) iValue;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_RC_MODE iRCMode= %d ",
+             iValue);
   }
   break;
   case ENCODER_PADDING_PADDING: {	// 0:disable padding;1:padding
     int32_t iValue = * ((int32_t*)pOption);
     m_pEncContext->pSvcParam->iPaddingFlag	= iValue;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_PADDING_PADDING iPaddingFlag= %d ",
+             iValue);
   }
   break;
   case ENCODER_LTR_RECOVERY_REQUEST: {
@@ -881,6 +895,9 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   case ENCODER_LTR_MARKING_PERIOD: {
     uint32_t iValue = * ((uint32_t*) (pOption));
     m_pEncContext->pSvcParam->iLtrMarkPeriod = iValue;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_LTR_MARKING_PERIOD iLtrMarkPeriod= %d ",
+             iValue);
   }
   break;
   case ENCODER_OPTION_LTR: {
@@ -888,6 +905,10 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     if (WelsEncoderApplyLTR (&m_pWelsTrace->m_sLogCtx, &m_pEncContext, pLTRValue)) {
       return cmInitParaError;
     }
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_LTR,expected bEnableLongTermReference = %d,expeced iLTRRefNum = %d,actual bEnableLongTermReference = %d,actual iLTRRefNum = %d",
+             pLTRValue->bEnableLongTermReference, pLTRValue->iLTRRefNum, m_pEncContext->pSvcParam->bEnableLongTermReference,
+             m_pEncContext->pSvcParam->iLTRRefNum);
   }
   break;
   case ENCODER_OPTION_ENABLE_SSEI: {
@@ -960,6 +981,10 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
       return cmInitParaError;
     }
     CheckProfileSetting (pProfileInfo->iLayer, pProfileInfo->uiProfileIdc);
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_PROFILE,layerId = %d,expected profile = %d,actual profile = %d",
+             pProfileInfo->iLayer, pProfileInfo->uiProfileIdc,
+             m_pEncContext->pSvcParam->sSpatialLayers[pProfileInfo->iLayer].uiProfileIdc);
   }
   break;
   case ENCODER_OPTION_LEVEL: {
@@ -970,21 +995,31 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
       return cmInitParaError;
     }
     CheckLevelSetting (pLevelInfo->iLayer, pLevelInfo->uiLevelIdc);
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_LEVEL,layerId = %d,expected level = %d,actual level = %d",
+             pLevelInfo->iLayer, pLevelInfo->uiLevelIdc, m_pEncContext->pSvcParam->sSpatialLayers[pLevelInfo->iLayer].uiLevelIdc);
   }
   break;
   case ENCODER_OPTION_NUMBER_REF: {
     int32_t iValue = * ((int32_t*)pOption);
     CheckReferenceNumSetting (iValue);
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_NUMBER_REF,expected refNum = %d,actual refnum = %d", iValue,
+             m_pEncContext->pSvcParam->iNumRefFrame);
   }
   break;
   case ENCODER_OPTION_DELIVERY_STATUS: {
     SDeliveryStatus* pValue = (static_cast<SDeliveryStatus*> (pOption));
     m_pEncContext->bDeliveryFlag = pValue->bDeliveryFlag;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_DELIVERY_STATUS,bDeliveryFlag = %d", pValue->bDeliveryFlag);
   }
   break;
   case ENCODER_OPTION_COMPLEXITY: {
     int32_t iValue = * (static_cast<int32_t*> (pOption));
     m_pEncContext->pSvcParam->iComplexityMode = (ECOMPLEXITY_MODE)iValue;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_COMPLEXITY,iComplexityMode = %d", iValue);
   }
   break;
   case ENCODER_OPTION_GET_STATISTICS: {
@@ -995,11 +1030,15 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   case ENCODER_OPTION_STATISTICS_LOG_INTERVAL: {
     int32_t iValue = * (static_cast<int32_t*> (pOption));
     m_pEncContext->iStatisticsLogInterval = iValue;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_STATISTICS_LOG_INTERVAL,iStatisticsLogInterval = %d", iValue);
   }
   break;
   case ENCODER_OPTION_IS_LOSSLESS_LINK: {
     bool bValue = * (static_cast<bool*> (pOption));
     m_pEncContext->pSvcParam->bIsLosslessLink = bValue;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_IS_LOSSLESS_LINK,bIsLosslessLink = %d", bValue);
   }
   break;
   default:
