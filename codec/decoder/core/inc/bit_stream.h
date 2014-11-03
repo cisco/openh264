@@ -35,7 +35,6 @@
 #define WELS_BIT_STREAM_H__
 
 #include "typedefs.h"
-
 namespace WelsDec {
 
 /*
@@ -64,7 +63,7 @@ typedef struct TagBitStringAux {
  */
 int32_t InitBits (PBitStringAux pBitString, const uint8_t* kpBuf, const int32_t kiSize);
 
-void InitReadBits (PBitStringAux pBitString);
+int32_t InitReadBits (PBitStringAux pBitString, intX_t iEndOffset);
 
 
 

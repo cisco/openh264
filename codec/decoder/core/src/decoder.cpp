@@ -139,7 +139,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->uiCpuFlag					= 0;
 
   pCtx->bAuReadyFlag				= 0; // au data is not ready
-
+  pCtx->bCabacInited = false;
 
   pCtx->uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores);
 
@@ -241,6 +241,10 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
 
   pCtx->bHaveGotMemory	= true;			// global memory for decoder context related is requested
   pCtx->pDec		        = NULL;			// need prefetch a new pic due to spatial size changed
+
+  if (pCtx->pCabacDecEngine == NULL)
+    pCtx->pCabacDecEngine = (SWelsCabacDecEngine*) WelsMalloc (sizeof (SWelsCabacDecEngine), "pCtx->pCabacDecEngine");
+
   return ERR_NONE;
 }
 
@@ -267,7 +271,7 @@ void WelsFreeMem (PWelsDecoderContext pCtx) {
   pCtx->iImgWidthInPixel	= 0;
   pCtx->iImgHeightInPixel = 0;
   pCtx->bHaveGotMemory	= false;
-
+  WelsFree (pCtx->pCabacDecEngine, "pCtx->pCabacDecEngine");
 }
 
 /*!
@@ -464,6 +468,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
         } else {
 
           iConsumedBytes = 0;
+          pDstNal[iDstIdx] = pDstNal[iDstIdx + 1] = pDstNal[iDstIdx + 2] = pDstNal[iDstIdx + 3] = 0; // set 4 reserved bytes to zero
           pNalPayload	= ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
           if (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1)) {
             CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
@@ -502,13 +507,12 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
             return pCtx->iErrorCode;
           }
 
-          pDstNal += iDstIdx; //update current position
+          pDstNal += (iDstIdx + 4); //init, increase 4 reserved zero bytes, used to store the next NAL
           if ((iSrcLength - iSrcConsumed + 4) > (pRawData->pEnd - pDstNal)) {
-            pRawData->pCurPos = pRawData->pHead;
+            pDstNal = pRawData->pCurPos = pRawData->pHead;
           } else {
             pRawData->pCurPos = pDstNal;
           }
-          pDstNal = pRawData->pCurPos + 4; //init, 4 bytes used to store the next NAL
 
           pSrcNal += iSrcIdx + 3;
           iSrcConsumed += 3;
@@ -524,6 +528,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
     //last NAL decoding
 
     iConsumedBytes = 0;
+    pDstNal[iDstIdx] = pDstNal[iDstIdx + 1] = pDstNal[iDstIdx + 2] = pDstNal[iDstIdx + 3] = 0; // set 4 reserved bytes to zero
     pNalPayload = ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
     if (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1)) {
       CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
@@ -557,8 +562,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
       }
       return pCtx->iErrorCode;
     }
-    pDstNal += iDstIdx;
-    pRawData->pCurPos = pDstNal; //init the pCurPos for next NAL(s) storage
+    pRawData->pCurPos = pDstNal + iDstIdx + 4; //init, increase 4 reserved zero bytes, used to store the next NAL
   } else { /* no supplementary picture payload input, but stored a picture */
     PAccessUnit pCurAu	=
       pCtx->pAccessUnitList;	// current access unit, it will never point to NULL after decode's successful initialization

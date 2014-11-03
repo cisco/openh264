@@ -656,6 +656,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\decoder\core\inc\cabac_decoder.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\common\inc\copy_mb.h"
 					>
 				</File>
@@ -776,6 +780,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\decoder\core\inc\parse_mb_syn_cabac.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\decoder\core\inc\parse_mb_syn_cavlc.h"
 					>
 				</File>
@@ -830,6 +838,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\decoder\core\src\bit_stream.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\decoder\core\src\cabac_decoder.cpp"
 					>
 				</File>
 				<File
@@ -910,6 +922,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\decoder\core\src\mv_pred.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\decoder\core\src\parse_mb_syn_cabac.cpp"
 					>
 				</File>
 				<File

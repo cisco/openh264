@@ -2,6 +2,7 @@ DECODER_SRCDIR=codec/decoder
 DECODER_CPP_SRCS=\
 	$(DECODER_SRCDIR)/core/src/au_parser.cpp\
 	$(DECODER_SRCDIR)/core/src/bit_stream.cpp\
+	$(DECODER_SRCDIR)/core/src/cabac_decoder.cpp\
 	$(DECODER_SRCDIR)/core/src/deblocking.cpp\
 	$(DECODER_SRCDIR)/core/src/decode_mb_aux.cpp\
 	$(DECODER_SRCDIR)/core/src/decode_slice.cpp\
@@ -16,6 +17,7 @@ DECODER_CPP_SRCS=\
 	$(DECODER_SRCDIR)/core/src/mem_align.cpp\
 	$(DECODER_SRCDIR)/core/src/memmgr_nal_unit.cpp\
 	$(DECODER_SRCDIR)/core/src/mv_pred.cpp\
+	$(DECODER_SRCDIR)/core/src/parse_mb_syn_cabac.cpp\
 	$(DECODER_SRCDIR)/core/src/parse_mb_syn_cavlc.cpp\
 	$(DECODER_SRCDIR)/core/src/pic_queue.cpp\
 	$(DECODER_SRCDIR)/core/src/rec_mb.cpp\

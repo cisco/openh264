@@ -54,6 +54,56 @@ const uint8_t g_kuiScan4[16] = { //for mb cache in sMb (only current element, wi
 // extern at wels_common_basis.h
 
 /*common use table*/
+const uint8_t g_kMbNonZeroCountIdx[24] = {
+  //  0   1 | 4  5      luma 8*8 block           pNonZeroCount[16+8]
+  0,  1,  4,  5,   //  2   3 | 6  7        0  |  1                  0   1   2   3
+  2,  3,  6,  7,   //---------------      ---------                 4   5   6   7
+  8,  9, 12, 13,   //  8   9 | 12 13       2  |  3                  8   9  10  11
+  10, 11, 14, 15,   // 10  11 | 14 15-----------------------------> 12  13  14  15
+  16, 17, 20, 21,   //----------------    chroma 8*8 block          16  17  18  19
+  18, 19, 22, 23   // 16  17 | 20 21        0    1                 20  21  22  23
+};
+//cache element equal to 26
+
+const uint8_t g_kCacheNzcScanIdx[4 * 4 + 4 + 4 + 3] = {
+  /* Luma */
+  9, 10, 17, 18,	// 1+1*8, 2+1*8, 1+2*8, 2+2*8,
+  11, 12, 19, 20,	// 3+1*8, 4+1*8, 3+2*8, 4+2*8,
+  25, 26, 33, 34,	// 1+3*8, 2+3*8, 1+4*8, 2+4*8,
+  27, 28, 35, 36,	// 3+3*8, 4+3*8, 3+4*8, 4+4*8,
+  /* Cb */
+  14, 15,			// 6+1*8, 7+1*8,
+  22, 23,			// 6+2*8, 7+2*8,
+
+  /* Cr */
+  38, 39,			// 6+4*8, 7+4*8,
+  46, 47,			// 6+5*8, 7+5*8,
+  /* Luma DC */
+  41,   // 1+5*8
+  /* Chroma DC */
+  42, 43 // 2+5*8, 3+5*8,
+};
+
+const uint8_t g_kCache26ScanIdx[16] = { //intra4*4_pred_mode and pNonZeroCount cache scan index, 4*4 block as basic unit
+  6,  7, 11, 12,
+  8,  9, 13, 14,
+  16, 17, 21, 22,
+  18, 19, 23, 24
+};
+
+//cache element equal to 30
+const uint8_t g_kCache30ScanIdx[16] = { //mv or pRefIndex cache scan index, 4*4 block as basic unit
+  7,  8, 13, 14,
+  9, 10, 15, 16,
+  19, 20, 25, 26,
+  21, 22, 27, 28
+};
+
+const uint8_t g_kNonZeroScanIdxC[4] = { //pNonZeroCount cache for chroma, 4*4 block as basic unit
+  4, 5,
+  7, 8
+};
+
 const uint8_t g_kuiScan8[24] = {	// [16 + 2*4]
   9, 10, 17, 18,	// 1+1*8, 2+1*8, 1+2*8, 2+2*8,
   11, 12, 19, 20,	// 3+1*8, 4+1*8, 3+2*8, 4+2*8,
