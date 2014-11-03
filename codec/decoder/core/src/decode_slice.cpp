@@ -418,7 +418,7 @@ int32_t ParseIntra4x4Mode (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail
         iBestMode = kiPredMode;
       } else {
         WELS_READ_VERIFY (BsGetBits (pBs, 3, &uiCode));
-        iBestMode = uiCode + (uiCode >= kiPredMode);
+        iBestMode = uiCode + ((int32_t) uiCode >= kiPredMode);
       }
     }
 

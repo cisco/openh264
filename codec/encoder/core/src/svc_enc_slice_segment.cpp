@@ -236,7 +236,7 @@ bool GomValidCheckSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, u
     iGomSize = kiMbWidth * GOM_ROW_MODE0_720P;
 
   while (true) {
-    if (kiCountNumMb < iGomSize * iSliceNum) {
+    if (kiCountNumMb < iGomSize * (int32_t) iSliceNum) {
       -- iSliceNum;
       iSliceNum = iSliceNum - (iSliceNum & 0x01);	// verfiy even num for multiple slices case
       if (iSliceNum < 2)	// for safe
