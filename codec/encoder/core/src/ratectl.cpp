@@ -257,8 +257,8 @@ void RcUpdateBitrateFps (sWelsEncCtx* pEncCtx) {
   if (pWelsSvcRc->iBitsPerFrame > REMAIN_BITS_TH)
     pWelsSvcRc->iRemainingBits = (int32_t) (pWelsSvcRc->iRemainingBits * input_iBitsPerFrame / pWelsSvcRc->iBitsPerFrame);
   pWelsSvcRc->iBitsPerFrame = input_iBitsPerFrame;
-  pWelsSvcRc->iMaxBitsPerFrame = (int32_t) (WELS_ROUND64 (((int64_t)pDLayerParam->iMaxSpatialBitrate) * INT_MULTIPLY /
-    pDLayerParamInternal->fInputFrameRate));
+  pWelsSvcRc->iMaxBitsPerFrame = WELS_DIV_ROUND (((int64_t)pDLayerParam->iMaxSpatialBitrate) * INT_MULTIPLY,
+    pDLayerParamInternal->fInputFrameRate);
 }
 
 
