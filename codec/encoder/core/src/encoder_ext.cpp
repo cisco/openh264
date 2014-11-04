@@ -3056,6 +3056,25 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   pFbi->uiTimeStamp = pSrcPic->uiTimeStamp;
   // perform csc/denoise/downsample/padding, generate spatial layers
   iSpatialNum = pCtx->pVpp->BuildSpatialPicList (pCtx, pSrcPic);
+
+  if(pCtx->bCheckWindowStatusRefreshFlag) {
+    pCtx->iCheckWindowCurrentTs = pSrcPic->uiTimeStamp;
+  } else {
+    pCtx->iCheckWindowCurrentTs = pCtx->iCheckWindowStartTs = pSrcPic->uiTimeStamp;
+    pCtx->bCheckWindowStatusRefreshFlag = true;
+  }
+  pCtx->iCheckWindowInterval = pCtx->iCheckWindowCurrentTs - pCtx->iCheckWindowStartTs;
+
+  if(pCtx->iCheckWindowInterval >= TimeCheckWindow || pCtx->iCheckWindowInterval == 0) {
+    pCtx->iCheckWindowStartTs = pCtx->iCheckWindowCurrentTs;
+    pCtx->iCheckWindowInterval = 0;
+    for (int32_t i = 0; i < iSpatialNum; i++) {
+      int32_t iCurDid	= (pSpatialIndexMap + i)->iDid;
+      pCtx->pWelsSvcRc[iCurDid].iBufferMaxBitrateSkip = 0;
+      pCtx->pWelsSvcRc[iCurDid].iPredFrameBit = 0;
+    }
+  }
+
   if (iSpatialNum < 1) {	// skip due to temporal layer settings (different frame rate)
     ++ pCtx->iCodingIndex;
     pFbi->eFrameType = videoFrameTypeSkip;
