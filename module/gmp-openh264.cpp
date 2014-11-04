@@ -382,7 +382,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
     src.pData[3] = nullptr;
     src.iPicWidth = inputImage->Width();
     src.iPicHeight = inputImage->Height();
-
+    src.uiTimeStamp = inputImage->Timestamp();
     const SSourcePicture* pics = &src;
 
     int result = encoder_->EncodeFrame (pics, &encoded);
