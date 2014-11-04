@@ -597,7 +597,7 @@ static  void  InitMbInfo (sWelsEncCtx* pEnc, SMB*   pList, SDqLayer* pLayer, con
     bool     bLeftTop;
     bool     bRightTop;
     int32_t  iLeftXY, iTopXY, iLeftTopXY, iRightTopXY;
-    uint8_t  uiSliceIdc;
+    uint16_t  uiSliceIdc;
 
     pList[iIdx].iMbX = pEnc->pStrideTab->pMbIndexX[kiDlayerId][iIdx];
     pList[iIdx].iMbY = pEnc->pStrideTab->pMbIndexY[kiDlayerId][iIdx];
@@ -2272,7 +2272,7 @@ void DynslcUpdateMbNeighbourInfoListForAllSlices (SSliceCtx* pSliceCtx, SMB* pMb
     bool     bTop;
     bool     bLeftTop;
     bool     bRightTop;
-    int32_t  uiSliceIdc;
+    uint16_t  uiSliceIdc;
     int32_t   iLeftXY, iTopXY, iLeftTopXY, iRightTopXY;
 
     uiSliceIdc = WelsMbToSliceIdc (pSliceCtx, kiMbXY);
@@ -2347,7 +2347,8 @@ void UpdateSlicepEncCtxWithPartition (SSliceCtx* pSliceCtx, int32_t iPartitionNu
     }
     pSliceCtx->pFirstMbInSlice[i]	=	iFirstMbIdx;
 
-    memset (pSliceCtx->pOverallMbMap + iFirstMbIdx, (uint8_t)i, pSliceCtx->pCountMbNumInSlice[i]*sizeof (uint8_t));
+    WelsSetMemMultiplebytes_c(pSliceCtx->pOverallMbMap + iFirstMbIdx, i,
+                              pSliceCtx->pCountMbNumInSlice[i], sizeof(uint16_t));
 
     // for next partition(or pSlice)
     iFirstMbIdx	+= pSliceCtx->pCountMbNumInSlice[i];
@@ -3924,15 +3925,19 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   iMaxSliceNum *= SLICE_NUM_EXPAND_COEF;
 
   SWelsNalRaw* pNalList = (SWelsNalRaw*)pMA->WelsMalloc (iCountNals * sizeof (SWelsNalRaw), "pOut->sNalList");
-  if (NULL == pNalList)
+  if (NULL == pNalList) {
+    WelsLog (&(pCtx->sLogCtx), WELS_LOG_ERROR, "CWelsH264SVCEncoder::DynSliceRealloc: pNalList is NULL");
     return ENC_RETURN_MEMALLOCERR;
+  }
   memcpy (pNalList, pCtx->pOut->sNalList, sizeof (SWelsNalRaw) * pCtx->pOut->iCountNals);
   pMA->WelsFree (pCtx->pOut->sNalList, "pOut->sNalList");
   pCtx->pOut->sNalList = pNalList;
 
   int32_t* pNalLen = (int32_t*)pMA->WelsMalloc (iCountNals * sizeof (int32_t), "pOut->pNalLen");
-  if (NULL == pNalLen)
+  if (NULL == pNalLen) {
+    WelsLog (&(pCtx->sLogCtx), WELS_LOG_ERROR, "CWelsH264SVCEncoder::DynSliceRealloc: pNalLen is NULL");
     return ENC_RETURN_MEMALLOCERR;
+  }
   memcpy (pNalLen, pCtx->pOut->pNalLen, sizeof (int32_t) * pCtx->pOut->iCountNals);
   pMA->WelsFree (pCtx->pOut->pNalLen, "pOut->pNalLen");
   pCtx->pOut->pNalLen = pNalLen;
@@ -3948,8 +3953,10 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   }
 
   SSlice* pSlice = (SSlice*)pMA->WelsMallocz (sizeof (SSlice) * iMaxSliceNum, "Slice");
-  if (NULL == pSlice)
+  if (NULL == pSlice) {
+    WelsLog (&(pCtx->sLogCtx), WELS_LOG_ERROR, "CWelsH264SVCEncoder::DynSliceRealloc: pSlice is NULL");
     return ENC_RETURN_MEMALLOCERR;
+  }
   memcpy (pSlice, pCurLayer->sLayerInfo.pSliceInLayer, sizeof (SSlice) * iMaxSliceNumOld);
   int32_t uiSliceIdx;
   uiSliceIdx = iMaxSliceNumOld;
@@ -3963,8 +3970,11 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
       pSliceIdx->pSliceBsa = &pCtx->pSliceBs[uiSliceIdx].sBsWrite;
     else
       pSliceIdx->pSliceBsa = &pCtx->pOut->sBsWrite;
-    if (AllocMbCacheAligned (&pSliceIdx->sMbCacheInfo, pMA))
+    if (AllocMbCacheAligned (&pSliceIdx->sMbCacheInfo, pMA)) {
+      WelsLog (&(pCtx->sLogCtx), WELS_LOG_ERROR, "CWelsH264SVCEncoder::DynSliceRealloc: realloc MbCache not successful at slice_idx=%d (max-slice=%d)",
+               uiSliceIdx, iMaxSliceNum);
       return ENC_RETURN_MEMALLOCERR;
+    }
 
     pSliceIdx->bSliceHeaderExtFlag = pBaseSlice->bSliceHeaderExtFlag;
     pSHExt->sSliceHeader.iPpsId = pBaseSHExt->sSliceHeader.iPpsId;
@@ -3983,8 +3993,10 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   pCurLayer->sLayerInfo.pSliceInLayer = pSlice;
 
   int16_t* pFirstMbInSlice = (int16_t*)pMA->WelsMalloc (iMaxSliceNum * sizeof (int16_t), "pSliceSeg->pFirstMbInSlice");
-  if (NULL == pFirstMbInSlice)
+  if (NULL == pFirstMbInSlice) {
+    WelsLog (&(pCtx->sLogCtx), WELS_LOG_ERROR, "CWelsH264SVCEncoder::DynSliceRealloc: pFirstMbInSlice is NULL");
     return ENC_RETURN_MEMALLOCERR;
+  }
   memset (pFirstMbInSlice, 0, sizeof (int16_t) * iMaxSliceNum);
   memcpy (pFirstMbInSlice, pCurLayer->pSliceEncCtx->pFirstMbInSlice, sizeof (int16_t) * iMaxSliceNumOld);
   pMA->WelsFree (pCurLayer->pSliceEncCtx->pFirstMbInSlice, "pSliceSeg->pFirstMbInSlice");
@@ -3992,8 +4004,10 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
 
   int32_t* pCountMbNumInSlice = (int32_t*)pMA->WelsMalloc (iMaxSliceNum * sizeof (int32_t),
                                 "pSliceSeg->pCountMbNumInSlice");
-  if (NULL == pCountMbNumInSlice)
+  if (NULL == pCountMbNumInSlice) {
+    WelsLog (&(pCtx->sLogCtx), WELS_LOG_ERROR, "CWelsH264SVCEncoder::DynSliceRealloc: realloc pCountMbNumInSlice not successful");
     return ENC_RETURN_MEMALLOCERR;
+  }
   memcpy (pCountMbNumInSlice, pCurLayer->pSliceEncCtx->pCountMbNumInSlice, sizeof (int32_t) * iMaxSliceNumOld);
   uiSliceIdx = iMaxSliceNumOld;
   while (uiSliceIdx < iMaxSliceNum) {
@@ -4004,8 +4018,10 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   pCurLayer->pSliceEncCtx->pCountMbNumInSlice = pCountMbNumInSlice;
 
   SRCSlicing* pSlcingOverRc = (SRCSlicing*)pMA->WelsMalloc (iMaxSliceNum * sizeof (SRCSlicing), "SlicingOverRC");
-  if (NULL == pSlcingOverRc)
+  if (NULL == pSlcingOverRc) {
+    WelsLog (&(pCtx->sLogCtx), WELS_LOG_ERROR, "CWelsH264SVCEncoder::DynSliceRealloc: realloc pSlcingOverRc not successful");
     return ENC_RETURN_MEMALLOCERR;
+  }
   memcpy (pSlcingOverRc, pCtx->pWelsSvcRc->pSlicingOverRc, sizeof (SRCSlicing) * iMaxSliceNumOld);
   uiSliceIdx = iMaxSliceNumOld;
   SRCSlicing* pSORC = &pSlcingOverRc[uiSliceIdx];
@@ -4069,9 +4085,13 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
 
     if (iSliceIdx >= (pSliceCtx->iMaxSliceNumConstraint - kiSliceIdxStep)) {	// insufficient memory in pSliceInLayer[]
       if (pCtx->iActiveThreadsNum == 1) {
-        if (DynSliceRealloc (pCtx, pFrameBSInfo, pLayerBsInfo)) //only single thread support re-alloc now
+        //only single thread support re-alloc now
+        if (DynSliceRealloc (pCtx, pFrameBSInfo, pLayerBsInfo)) {
+          WelsLog (&(pCtx->sLogCtx), WELS_LOG_ERROR, "CWelsH264SVCEncoder::WelsCodeOnePicPartition: DynSliceRealloc not successful");
           return ENC_RETURN_MEMALLOCERR;
+        }
       } else if (iSliceIdx >= pSliceCtx->iMaxSliceNumConstraint) {
+        WelsLog (&(pCtx->sLogCtx), WELS_LOG_ERROR, "CWelsH264SVCEncoder::WelsCodeOnePicPartition: iSliceIdx(%d) over iMaxSliceNumConstraint(%d)", iSliceIdx, pSliceCtx->iMaxSliceNumConstraint);
         return ENC_RETURN_MEMALLOCERR;
       }
     }

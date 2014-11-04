@@ -80,7 +80,7 @@ int16_t			iMbWidth;			/* width of picture size in mb */
 int16_t			iMbHeight;			/* height of picture size in mb */
 int16_t			iSliceNumInFrame;	/* count number of slices in frame; */
 int32_t			iMbNumInFrame;	/* count number of MBs in frame */
-uint8_t*			pOverallMbMap;	/* overall MB map in frame, store virtual slice idc; */
+uint16_t*			pOverallMbMap;	/* overall MB map in frame, store virtual slice idc; */
 int16_t*			pFirstMbInSlice;	/* first MB address top-left based in every slice respectively; */
 int32_t*			pCountMbNumInSlice;	/* count number of MBs in every slice respectively; */
 uint32_t		uiSliceSizeConstraint;/*in byte*/
@@ -140,7 +140,7 @@ void UninitSlicePEncCtx (SSliceCtx* pSliceCtx, CMemoryAlign* pMa);
  *
  * \return	uiSliceIdc - successful; (uint8_t)(-1) - failed;
  */
-uint8_t WelsMbToSliceIdc (SSliceCtx* pSliceCtx, const int16_t kiMbXY);
+uint16_t WelsMbToSliceIdc (SSliceCtx* pSliceCtx, const int16_t kiMbXY);
 
 /*!
  * \brief	Get first mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
