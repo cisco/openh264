@@ -776,7 +776,7 @@ void UpdateMbNeighbourInfoForNextSlice (SSliceCtx* pSliceCtx,
     bool     bLeftTop;
     bool     bRightTop;
     int32_t   iLeftXY, iTopXY, iLeftTopXY, iRightTopXY;
-    const uint8_t  kuiSliceIdc		= WelsMbToSliceIdc (pSliceCtx, kiMbXY);
+    const uint16_t  kuiSliceIdc		= WelsMbToSliceIdc (pSliceCtx, kiMbXY);
 
     pMb->uiSliceIdc	= kuiSliceIdc;
     iLeftXY = kiMbXY - 1;
@@ -814,9 +814,9 @@ void AddSliceBoundary (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, SSliceCtx* pSlic
                        int32_t iFirstMbIdxOfNextSlice, const int32_t kiLastMbIdxInPartition) {
   SDqLayer*	pCurLayer = pEncCtx->pCurDqLayer;
   int32_t		iCurMbIdx		= pCurMb->iMbXY;
-  int32_t		iCurSliceIdc	= pSliceCtx->pOverallMbMap[ iCurMbIdx ];
+  uint16_t		iCurSliceIdc	= pSliceCtx->pOverallMbMap[ iCurMbIdx ];
   const int32_t kiSliceIdxStep = pEncCtx->iActiveThreadsNum;
-  int32_t		iNextSliceIdc	= iCurSliceIdc + kiSliceIdxStep;
+  uint16_t		iNextSliceIdc	= iCurSliceIdc + kiSliceIdxStep;
   SSlice*		pNextSlice		= NULL;
 
   SMB* pMbList					= pCurLayer->sMbDataP;
@@ -839,9 +839,8 @@ void AddSliceBoundary (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, SSliceCtx* pSlic
           sizeof (SSliceHeaderExt));	// confirmed_safe_unsafe_usage
 
   pSliceCtx->pFirstMbInSlice[iNextSliceIdc] = iFirstMbIdxOfNextSlice;
-
-  memset (pSliceCtx->pOverallMbMap + iFirstMbIdxOfNextSlice, (uint8_t)iNextSliceIdc,
-          (kiLastMbIdxInPartition - iFirstMbIdxOfNextSlice + 1)*sizeof (uint8_t));
+  WelsSetMemMultiplebytes_c (pSliceCtx->pOverallMbMap + iFirstMbIdxOfNextSlice, iNextSliceIdc,
+                             (kiLastMbIdxInPartition - iFirstMbIdxOfNextSlice + 1), sizeof(uint16_t));
 
   //DYNAMIC_SLICING_ONE_THREAD: update pMbList slice_neighbor_info
   UpdateMbNeighbourInfoForNextSlice (pSliceCtx, pMbList, iFirstMbIdxOfNextSlice, kiLastMbIdxInPartition);
@@ -874,6 +873,10 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
   if ((kbCurMbNotFirstMbOfCurSlice
        && JUMPPACKETSIZE_JUDGE (uiLen, iCurMbIdx, pSliceCtx->uiSliceSizeConstraint)) /*jump_avoiding_pack_exceed*/
       && kbCurMbNotLastMbOfCurPartition) { //decide to add new pSlice
+
+    WelsLog (&pEncCtx->sLogCtx, WELS_LOG_DETAIL,
+             "DynSlcJudgeSliceBoundaryStepBack: AddSliceBoundary: iCurMbIdx=%d, uiLen=%d, uiSliceIdx=%d", iCurMbIdx, uiLen,
+             pCurSlice->uiSliceIdx);
 
     if (pEncCtx->pSvcParam->iMultipleThreadIdc > 1) {
       WelsMutexLock (&pEncCtx->pSliceThreading->mutexSliceNumUpdate);

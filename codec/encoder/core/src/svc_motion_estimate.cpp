@@ -718,7 +718,7 @@ int32_t RequestScreenBlockFeatureStorage (CMemoryAlign* pMa, const int32_t kiFra
   pScreenBlockFeatureStorage->iIs16x16 = !bIsBlock8x8;
   pScreenBlockFeatureStorage->uiFeatureStrategyIndex = kiFeatureStrategyIndex;
   pScreenBlockFeatureStorage->iActualListSize = kiListSize;
-  memset (pScreenBlockFeatureStorage->uiSadCostThreshold, UINT_MAX, BLOCK_SIZE_ALL * sizeof (uint32_t));
+  WelsSetMemMultiplebytes_c (pScreenBlockFeatureStorage->uiSadCostThreshold, UINT_MAX, BLOCK_SIZE_ALL, sizeof(uint32_t));
   pScreenBlockFeatureStorage->bRefBlockFeatureCalculated = false;
 
   return ENC_RETURN_SUCCESS;
