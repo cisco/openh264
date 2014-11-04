@@ -133,7 +133,9 @@ typedef enum {
 typedef enum {
   ERROR_CON_DISABLE = 0,
   ERROR_CON_FRAME_COPY,
-  ERROR_CON_SLICE_COPY
+  ERROR_CON_SLICE_COPY,
+  ERROR_CON_FRAME_COPY_CROSS_IDR,
+  ERROR_CON_SLICE_COPY_CROSS_IDR
 } ERROR_CON_IDC;
 
 typedef enum { //feedback that whether or not have VCL NAL in current AU

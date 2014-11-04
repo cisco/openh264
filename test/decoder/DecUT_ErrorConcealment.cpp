@@ -121,6 +121,9 @@ void DoAncErrorConSliceCopy (PECInputCtx pECCtx) {
   int32_t iMbHeight = (int32_t) pECCtx->iMbHeight;
   PPicture pDstPic = &pECCtx->sAncPic;
   PPicture pSrcPic = pECCtx->pCtx->pPreviousDecodedPictureInDpb;
+  if ((pECCtx->pCtx->eErrorConMethod == ERROR_CON_SLICE_COPY)
+      && (pECCtx->pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag))
+    pSrcPic = NULL;
 
   //uint8_t *pDstData[3], *pSrcData[3];
   bool* pMbCorrectlyDecodedFlag = pECCtx->pMbCorrectlyDecodedFlag;
@@ -231,26 +234,30 @@ TEST (ErrorConTest, DoErrorConFrameCopy) {
     return;
   }
 
-  pECCtx->pCtx->eErrorConMethod = ERROR_CON_FRAME_COPY;
-  InitECCopyData (pECCtx);
-  //case 1: no reference picture
-  pECCtx->pCtx->pPreviousDecodedPictureInDpb = NULL;
-  DoErrorConFrameCopy (pECCtx->pCtx);
+  for (int iEC = 0; iEC < 2; ++ iEC) { //ERROR_CON_FRAME_COPY, ERROR_CON_FRAME_COPY_CROSS_IDR
+    pECCtx->pCtx->eErrorConMethod = iEC > 0 ? ERROR_CON_FRAME_COPY_CROSS_IDR : ERROR_CON_FRAME_COPY;
+    InitECCopyData (pECCtx);
+    int32_t iLumaSize = pECCtx->iMbWidth * pECCtx->iMbHeight * 256;
 
-  int32_t iLumaSize = pECCtx->iMbWidth * pECCtx->iMbHeight * 256;
-  memset (pECCtx->sAncPic.pData[0], 128, iLumaSize * 3 / 2); //should be the same as known EC method, here all 128
-  bOK = ComparePictureDataI420 (pECCtx->sAncPic.pData[0], pECCtx->sWelsPic.pData[0], pECCtx->iLinesize[0],
-                                pECCtx->iMbHeight * 16);
-  EXPECT_EQ (bOK, true);
-
-  //case 2: with reference picture
-  pECCtx->pCtx->pPreviousDecodedPictureInDpb = &pECCtx->sSrcPic;
-  DoErrorConFrameCopy (pECCtx->pCtx);
-
-  memcpy (pECCtx->sAncPic.pData[0], pECCtx->sSrcPic.pData[0], iLumaSize * 3 / 2);
-  bOK = ComparePictureDataI420 (pECCtx->sAncPic.pData[0], pECCtx->sWelsPic.pData[0], pECCtx->iLinesize[0],
-                                pECCtx->iMbHeight * 16);
-  EXPECT_EQ (bOK, true);
+    for (int iRef = 0; iRef < 2; ++ iRef) { //no ref, with ref
+      pECCtx->pCtx->pPreviousDecodedPictureInDpb = iRef ? &pECCtx->sSrcPic : NULL;
+      for (int iIDR = 0; iIDR < 2; ++ iIDR) { //non IDR, IDR
+        pECCtx->pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag = (iIDR > 0);
+        //Do reference code method
+        DoErrorConFrameCopy (pECCtx->pCtx);
+        //Do anchor method
+        if (iRef && ! ((pECCtx->pCtx->eErrorConMethod == ERROR_CON_FRAME_COPY)
+                       && (pECCtx->pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag)))
+          memcpy (pECCtx->sAncPic.pData[0], pECCtx->sSrcPic.pData[0], iLumaSize * 3 / 2);
+        else
+          memset (pECCtx->sAncPic.pData[0], 128, iLumaSize * 3 / 2); //should be the same as known EC method, here all 128
+        //Compare results
+        bOK = ComparePictureDataI420 (pECCtx->sAncPic.pData[0], pECCtx->sWelsPic.pData[0], pECCtx->iLinesize[0],
+                                      pECCtx->iMbHeight * 16);
+        EXPECT_EQ (bOK, true);
+      } //non IDR, IDR
+    } // no ref, with ref
+  } //FRAME_COPY methods
 
   FreeInputData (pECCtx);
 }
@@ -263,25 +270,25 @@ TEST (ErrorConTest, DoErrorConSliceCopy) {
     FreeInputData (pECCtx);
     return;
   }
-  pECCtx->pCtx->eErrorConMethod = ERROR_CON_SLICE_COPY;
-  InitECCopyData (pECCtx);
-  //case 1: no reference picture
-  pECCtx->pCtx->pPreviousDecodedPictureInDpb = NULL;
-  DoAncErrorConSliceCopy (pECCtx);
-  DoErrorConSliceCopy (pECCtx->pCtx);
 
-  bOK = ComparePictureDataI420 (pECCtx->sAncPic.pData[0], pECCtx->sWelsPic.pData[0], pECCtx->iLinesize[0],
-                                pECCtx->iMbHeight * 16);
-  EXPECT_EQ (bOK, true);
-
-  //case 2: with reference picture
-  pECCtx->pCtx->pPreviousDecodedPictureInDpb = &pECCtx->sSrcPic;
-  DoAncErrorConSliceCopy (pECCtx);
-  DoErrorConSliceCopy (pECCtx->pCtx);
-
-  bOK = ComparePictureDataI420 (pECCtx->sAncPic.pData[0], pECCtx->sWelsPic.pData[0], pECCtx->iLinesize[0],
-                                pECCtx->iMbHeight * 16);
-  EXPECT_EQ (bOK, true);
+  for (int iEC = 0; iEC < 2; ++ iEC) { //ERROR_CON_SLICE_COPY, ERROR_CON_SLICE_COPY_CROSS_IDR
+    pECCtx->pCtx->eErrorConMethod = iEC > 0 ? ERROR_CON_SLICE_COPY_CROSS_IDR : ERROR_CON_SLICE_COPY;
+    InitECCopyData (pECCtx);
+    for (int iRef = 0; iRef < 2; ++ iRef) { //no ref, with ref
+      pECCtx->pCtx->pPreviousDecodedPictureInDpb = iRef ? &pECCtx->sSrcPic : NULL;
+      for (int iIDR = 0; iIDR < 2; ++ iIDR) { //non IDR, IDR
+        pECCtx->pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag = (iIDR > 0);
+        //Do reference code method
+        DoErrorConSliceCopy (pECCtx->pCtx);
+        //Do anchor method
+        DoAncErrorConSliceCopy (pECCtx);
+        //Compare results
+        bOK = ComparePictureDataI420 (pECCtx->sAncPic.pData[0], pECCtx->sWelsPic.pData[0], pECCtx->iLinesize[0],
+                                      pECCtx->iMbHeight * 16);
+        EXPECT_EQ (bOK, true);
+      } //non IDR, IDR
+    } // no ref, with ref
+  } //FRAME_COPY methods
 
   FreeInputData (pECCtx);
 }

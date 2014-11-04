@@ -160,7 +160,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->pPicBuff[LIST_1]		= NULL;
 
   pCtx->bAvcBasedFlag			= true;
-  pCtx->eErrorConMethod = ERROR_CON_SLICE_COPY;
+  pCtx->eErrorConMethod = ERROR_CON_SLICE_COPY_CROSS_IDR;
   pCtx->pPreviousDecodedPictureInDpb = NULL;
 
 }
@@ -468,7 +468,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
         } else {
 
           iConsumedBytes = 0;
-          pDstNal[iDstIdx] = pDstNal[iDstIdx + 1] = pDstNal[iDstIdx + 2] = pDstNal[iDstIdx + 3] = 0; // set 4 reserved bytes to zero
+          pDstNal[iDstIdx] = pDstNal[iDstIdx + 1] = pDstNal[iDstIdx + 2] = pDstNal[iDstIdx + 3] =
+                               0; // set 4 reserved bytes to zero
           pNalPayload	= ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
           if (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1)) {
             CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
@@ -528,7 +529,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
     //last NAL decoding
 
     iConsumedBytes = 0;
-    pDstNal[iDstIdx] = pDstNal[iDstIdx + 1] = pDstNal[iDstIdx + 2] = pDstNal[iDstIdx + 3] = 0; // set 4 reserved bytes to zero
+    pDstNal[iDstIdx] = pDstNal[iDstIdx + 1] = pDstNal[iDstIdx + 2] = pDstNal[iDstIdx + 3] =
+                         0; // set 4 reserved bytes to zero
     pNalPayload = ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
     if (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1)) {
       CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
