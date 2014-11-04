@@ -372,6 +372,8 @@ SWelsCabacCtx sWelsCabacContexts[4][WELS_QP_MAX + 1][WELS_CONTEXT_COUNT];
 bool bCabacInited;
 SWelsCabacCtx   pCabacCtx[WELS_CONTEXT_COUNT];
 PWelsCabacDecEngine   pCabacDecEngine;
+double dDecTime;
+SDecoderStatistics sDecoderStatistics;// For real time debugging
 } SWelsDecoderContext, *PWelsDecoderContext;
 
 static inline void ResetActiveSPSForEachLayer (PWelsDecoderContext pCtx) {
