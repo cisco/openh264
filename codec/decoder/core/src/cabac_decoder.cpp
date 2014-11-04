@@ -214,7 +214,7 @@ int32_t DecodeBypassCabac (PWelsCabacDecEngine pDecEngine, uint32_t& uiBinVal) {
 int32_t DecodeTerminateCabac (PWelsCabacDecEngine pDecEngine, uint32_t& uiBinVal) {
   int32_t iErrorInfo = ERR_NONE;
   uint64_t uiRange = pDecEngine->uiRange - 2;
-  int64_t uiOffset = pDecEngine->uiOffset;
+  uint64_t uiOffset = pDecEngine->uiOffset;
 
   if (uiOffset >= (uiRange << pDecEngine->iBitsLeft)) {
     uiBinVal = 1;
