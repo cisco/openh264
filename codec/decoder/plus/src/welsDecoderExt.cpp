@@ -366,6 +366,13 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
   } else if (DECODER_OPTION_GET_STATISTICS == eOptID) { // get decoder statistics info for real time debugging
     SDecoderStatistics* pDecoderStatistics = (static_cast<SDecoderStatistics*> (pOption));
 
+    memcpy (pDecoderStatistics, &m_pDecContext->sDecoderStatistics, sizeof (SDecoderStatistics));
+
+    pDecoderStatistics->fAverageFrameSpeedInMs = (m_pDecContext->dDecTime) /
+        (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount);
+    memset (&m_pDecContext->sDecoderStatistics, 0, sizeof (SDecoderStatistics));
+
+/*
     pDecoderStatistics->uiAvgEcRatio = m_pDecContext->sDecoderStatistics.uiAvgEcRatio;
     pDecoderStatistics->uiEcFrameNum = m_pDecContext->sDecoderStatistics.uiEcFrameNum;
     pDecoderStatistics->uiDecodedFrameCount = m_pDecContext->sDecoderStatistics.uiDecodedFrameCount;
@@ -389,7 +396,7 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
     m_pDecContext->sDecoderStatistics.fAverageFrameSpeedInMs = 0;
     m_pDecContext->sDecoderStatistics.uiAvgEcRatio = 0;
     m_pDecContext->sDecoderStatistics.uiIDRLostNum = 0;
-
+*/
     return cmResultSuccess;
   }
 
