@@ -372,31 +372,31 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
         (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount);
     memset (&m_pDecContext->sDecoderStatistics, 0, sizeof (SDecoderStatistics));
 
-/*
-    pDecoderStatistics->uiAvgEcRatio = m_pDecContext->sDecoderStatistics.uiAvgEcRatio;
-    pDecoderStatistics->uiEcFrameNum = m_pDecContext->sDecoderStatistics.uiEcFrameNum;
-    pDecoderStatistics->uiDecodedFrameCount = m_pDecContext->sDecoderStatistics.uiDecodedFrameCount;
-    pDecoderStatistics->uiHeight = m_pDecContext->sDecoderStatistics.uiHeight;
-    pDecoderStatistics->uiWidth = m_pDecContext->sDecoderStatistics.uiWidth;
-    pDecoderStatistics->uiIDRRecvNum = m_pDecContext->sDecoderStatistics.uiIDRRecvNum;
-    pDecoderStatistics->uiEcIDRNum = m_pDecContext->sDecoderStatistics.uiEcIDRNum;
-    pDecoderStatistics->uiResolutionChangeTimes = m_pDecContext->sDecoderStatistics.uiResolutionChangeTimes;
-    pDecoderStatistics->fAverageFrameSpeedInMs = (m_pDecContext->dDecTime) /
-        (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount);
-    pDecoderStatistics->uiIDRLostNum = m_pDecContext->sDecoderStatistics.uiIDRLostNum;
-    // After output the current status, reinit it
+    /*
+        pDecoderStatistics->uiAvgEcRatio = m_pDecContext->sDecoderStatistics.uiAvgEcRatio;
+        pDecoderStatistics->uiEcFrameNum = m_pDecContext->sDecoderStatistics.uiEcFrameNum;
+        pDecoderStatistics->uiDecodedFrameCount = m_pDecContext->sDecoderStatistics.uiDecodedFrameCount;
+        pDecoderStatistics->uiHeight = m_pDecContext->sDecoderStatistics.uiHeight;
+        pDecoderStatistics->uiWidth = m_pDecContext->sDecoderStatistics.uiWidth;
+        pDecoderStatistics->uiIDRRecvNum = m_pDecContext->sDecoderStatistics.uiIDRRecvNum;
+        pDecoderStatistics->uiEcIDRNum = m_pDecContext->sDecoderStatistics.uiEcIDRNum;
+        pDecoderStatistics->uiResolutionChangeTimes = m_pDecContext->sDecoderStatistics.uiResolutionChangeTimes;
+        pDecoderStatistics->fAverageFrameSpeedInMs = (m_pDecContext->dDecTime) /
+            (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount);
+        pDecoderStatistics->uiIDRLostNum = m_pDecContext->sDecoderStatistics.uiIDRLostNum;
+        // After output the current status, reinit it
 
-    m_pDecContext->sDecoderStatistics.uiDecodedFrameCount = 0;
-    m_pDecContext->sDecoderStatistics.uiIDRRecvNum = 0;
-    m_pDecContext->sDecoderStatistics.uiResolutionChangeTimes = 0;
-    m_pDecContext->sDecoderStatistics.uiEcFrameNum = 0;
-    m_pDecContext->sDecoderStatistics.uiEcIDRNum = 0;
-    m_pDecContext->sDecoderStatistics.uiHeight = 0;
-    m_pDecContext->sDecoderStatistics.uiWidth = 0;
-    m_pDecContext->sDecoderStatistics.fAverageFrameSpeedInMs = 0;
-    m_pDecContext->sDecoderStatistics.uiAvgEcRatio = 0;
-    m_pDecContext->sDecoderStatistics.uiIDRLostNum = 0;
-*/
+        m_pDecContext->sDecoderStatistics.uiDecodedFrameCount = 0;
+        m_pDecContext->sDecoderStatistics.uiIDRRecvNum = 0;
+        m_pDecContext->sDecoderStatistics.uiResolutionChangeTimes = 0;
+        m_pDecContext->sDecoderStatistics.uiEcFrameNum = 0;
+        m_pDecContext->sDecoderStatistics.uiEcIDRNum = 0;
+        m_pDecContext->sDecoderStatistics.uiHeight = 0;
+        m_pDecContext->sDecoderStatistics.uiWidth = 0;
+        m_pDecContext->sDecoderStatistics.fAverageFrameSpeedInMs = 0;
+        m_pDecContext->sDecoderStatistics.uiAvgEcRatio = 0;
+        m_pDecContext->sDecoderStatistics.uiIDRLostNum = 0;
+    */
     return cmResultSuccess;
   }
 
