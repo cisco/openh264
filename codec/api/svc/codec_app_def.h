@@ -489,8 +489,8 @@ typedef struct TagVideoDecoderStatistics {
   unsigned int uiIDRRecvNum;	// number of actual IDR received
   //EC on related
   unsigned int uiAvgEcRatio; // when EC is on, the average ratio of correct or EC areas, can be an indicator of reconstruction quality
-  unsigned int uiEcIDRNum;	// number of actual unintegrity IDR or not received but eced 
-  unsigned int uiEcFrameNum; // 
+  unsigned int uiEcIDRNum;	// number of actual unintegrity IDR or not received but eced
+  unsigned int uiEcFrameNum; //
   unsigned int uiIDRLostNum;//Decoder detect out the number of lost IDR lost
 } SDecoderStatistics; // in building, coming soon
 
