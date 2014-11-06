@@ -372,6 +372,7 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
     pDecoderStatistics->fAverageFrameSpeedInMs = (m_pDecContext->dDecTime) /
         (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount);
     memset (&m_pDecContext->sDecoderStatistics, 0, sizeof (SDecoderStatistics));
+    m_pDecContext->dDecTime = 0;
     return cmResultSuccess;
   }
 
