@@ -126,7 +126,6 @@ void EncoderInterfaceTest::EncodeOneIDRandP (ISVCEncoder* pPtrEnc) {
 
   iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  EXPECT_NE (sFbi.eFrameType, static_cast<int> (videoFrameTypeIDR));
 }
 
 void EncoderInterfaceTest::InitializeParamExt() {
