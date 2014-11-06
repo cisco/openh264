@@ -410,7 +410,7 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   iError = 2;
   m_pDec->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iError);
   //Decoder error bs
-  DecoderBs ("res/test.264");
+  DecoderBs ("res/Error_I_P.264");
   m_pDec->GetOption (DECODER_OPTION_GET_STATISTICS, &sDecStatic);
   EXPECT_EQ (57, sDecStatic.uiAvgEcRatio);
   EXPECT_EQ (5, sDecStatic.uiDecodedFrameCount);
