@@ -119,9 +119,19 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
         // IDR lost, set new
         pRef->bIsComplete = false; // Set complete flag to false for lost IDR ref picture
         pCtx->iErrorCode |= dsDataErrorConcealed;
-        memset (pRef->pData[0], 128, pRef->iLinesize[0] * pRef->iHeightInPixel);
-        memset (pRef->pData[1], 128, pRef->iLinesize[1] * pRef->iHeightInPixel / 2);
-        memset (pRef->pData[2], 128, pRef->iLinesize[2] * pRef->iHeightInPixel / 2);
+        bool bCopyPrevious = ((ERROR_CON_FRAME_COPY_CROSS_IDR == pCtx->eErrorConMethod)
+                              || (ERROR_CON_SLICE_COPY_CROSS_IDR == pCtx->eErrorConMethod)) && (NULL != pCtx->pPreviousDecodedPictureInDpb);
+        bCopyPrevious = bCopyPrevious && (pRef->iWidthInPixel == pCtx->pPreviousDecodedPictureInDpb->iWidthInPixel)
+                        && (pRef->iHeightInPixel == pCtx->pPreviousDecodedPictureInDpb->iHeightInPixel);
+        if (bCopyPrevious) {
+          memcpy (pRef->pData[0], pCtx->pPreviousDecodedPictureInDpb->pData[0], pRef->iLinesize[0] * pRef->iHeightInPixel);
+          memcpy (pRef->pData[1], pCtx->pPreviousDecodedPictureInDpb->pData[1], pRef->iLinesize[1] * pRef->iHeightInPixel / 2);
+          memcpy (pRef->pData[2], pCtx->pPreviousDecodedPictureInDpb->pData[2], pRef->iLinesize[2] * pRef->iHeightInPixel / 2);
+        } else {
+          memset (pRef->pData[0], 128, pRef->iLinesize[0] * pRef->iHeightInPixel);
+          memset (pRef->pData[1], 128, pRef->iLinesize[1] * pRef->iHeightInPixel / 2);
+          memset (pRef->pData[2], 128, pRef->iLinesize[2] * pRef->iHeightInPixel / 2);
+        }
         pRef->iFrameNum = 0;
         pRef->iFramePoc = 0;
         pRef->uiTemporalId = pRef->uiQualityId = 0;
