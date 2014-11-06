@@ -514,6 +514,7 @@ int32_t WelsDecodeMbCabacISliceBaseMode0 (PWelsDecoderContext pCtx, uint32_t& ui
     return ERR_INFO_INVALID_MB_TYPE;
   } else if (25 == uiMbType) {   //I_PCM
     WELS_READ_VERIFY (ParseIPCMInfoCabac (pCtx));
+    pSlice->iLastDeltaQp = 0;
     WELS_READ_VERIFY (ParseEndOfSliceCabac (pCtx, uiEosFlag));
     if (uiEosFlag) {
       RestoreCabacDecEngineToBS (pCtx->pCabacDecEngine, pCtx->pCurDqLayer->pBitStringAux);
@@ -527,6 +528,7 @@ int32_t WelsDecodeMbCabacISliceBaseMode0 (PWelsDecoderContext pCtx, uint32_t& ui
     //get uiCbp for I4x4
     WELS_READ_VERIFY (ParseCbpInfoCabac (pCtx, &sNeighAvail, uiCbp));
     pCurLayer->pCbp[iMbXy] = uiCbp;
+    pSlice->iLastDeltaQp = uiCbp == 0 ? 0: pSlice->iLastDeltaQp;
     uiCbpChroma = uiCbp >> 4;
     uiCbpLuma = uiCbp & 15;
   } else { //I16x16;
@@ -695,6 +697,7 @@ int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
 
     if (25 == uiMbType) {   //I_PCM
       WELS_READ_VERIFY (ParseIPCMInfoCabac (pCtx));
+      pSlice->iLastDeltaQp = 0;
       WELS_READ_VERIFY (ParseEndOfSliceCabac (pCtx, uiEosFlag));
       if (uiEosFlag) {
         RestoreCabacDecEngineToBS (pCtx->pCabacDecEngine, pCtx->pCurDqLayer->pBitStringAux);
@@ -721,6 +724,7 @@ int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
   if (MB_TYPE_INTRA16x16 != pCurLayer->pMbType[iMbXy]) {
     WELS_READ_VERIFY (ParseCbpInfoCabac (pCtx, pNeighAvail, uiCbp));
     pCurLayer->pCbp[iMbXy] = uiCbp;
+    pSlice->iLastDeltaQp = uiCbp == 0 ? 0: pSlice->iLastDeltaQp;
     uiCbpChroma = pCurLayer->pCbp[iMbXy] >> 4;
     uiCbpLuma = pCurLayer->pCbp[iMbXy] & 15;
   }
