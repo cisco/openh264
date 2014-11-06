@@ -473,12 +473,9 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
       m_pDecContext->sDecoderStatistics.uiEcFrameNum++;
       m_pDecContext->sDecoderStatistics.uiAvgEcRatio = m_pDecContext->sDecoderStatistics.uiAvgEcRatio /
           m_pDecContext->sDecoderStatistics.uiEcFrameNum;
-      iEnd = WelsTime();
-      m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
     }
     iEnd = WelsTime();
     m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
-
     return (DECODING_STATE) m_pDecContext->iErrorCode;
   }
   // else Error free, the current codec works well
@@ -493,9 +490,6 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
     }
     m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
-    iEnd = WelsTime();
-    m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
-
   }
   iEnd = WelsTime();
   m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
