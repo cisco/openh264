@@ -107,6 +107,14 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
     pDstInfo->iBufferStatus = (int32_t) (bFrameCompleteFlag
                                          && pPic->bIsComplete); // When EC disable, ECed picture not output
 
+
+  if ((pDstInfo->iBufferStatus == 1) && (pCurDq->sLayerInfo.sNalHeaderExt.bIdrFlag)) {
+    if (pPic->bIsComplete)
+      pCtx->sDecoderStatistics.uiIDRRecvNum++;
+    else
+      pCtx->sDecoderStatistics.uiEcIDRNum++;
+  }
+
   if (pDstInfo->iBufferStatus == 0) {
     if (!bFrameCompleteFlag)
       pCtx->iErrorCode |= dsBitstreamError;
@@ -974,6 +982,8 @@ int32_t UpdateAccessUnit (PWelsDecoderContext pCtx) {
     }
     if (uiActualIdx ==
         pCurAu->uiActualUnitsNum) {	// no found IDR nal within incoming AU, need exit to avoid mosaic issue, 11/19/2009
+
+      pCtx->sDecoderStatistics.uiIDRLostNum++;
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
                "UpdateAccessUnit():::::Key frame lost.....CAN NOT find IDR from current AU.");
       pCtx->iErrorCode |= dsRefLost;
