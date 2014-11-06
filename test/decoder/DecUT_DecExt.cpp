@@ -122,7 +122,7 @@ void DecoderInterfaceTest::DecoderBs (const char* sFileName) {
 
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + sFileName;
-  ASSERT_TRUE (pH264File = fopen (filename.c_str()));
+  ASSERT_TRUE (pH264File = fopen (filename.c_str(),"rb"));
 #else
   ASSERT_TRUE (pH264File = fopen (sFileName, "rb"));
 #endif
