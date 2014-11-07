@@ -463,8 +463,8 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
             m_pDecContext->sDecoderStatistics.uiEcFrameNum) + 100;
 
       //
-      if ((m_pDecContext->sDecoderStatistics.uiWidth != pDstInfo->UsrData.sSystemBuffer.iWidth)
-          || (m_pDecContext->sDecoderStatistics.uiHeight != pDstInfo->UsrData.sSystemBuffer.iHeight)) {
+      if ((m_pDecContext->sDecoderStatistics.uiWidth != (unsigned int) pDstInfo->UsrData.sSystemBuffer.iWidth)
+          || (m_pDecContext->sDecoderStatistics.uiHeight != (unsigned int) pDstInfo->UsrData.sSystemBuffer.iHeight)) {
         m_pDecContext->sDecoderStatistics.uiResolutionChangeTimes++;
         m_pDecContext->sDecoderStatistics.uiWidth = pDstInfo->UsrData.sSystemBuffer.iWidth;
         m_pDecContext->sDecoderStatistics.uiHeight = pDstInfo->UsrData.sSystemBuffer.iHeight;
@@ -483,8 +483,8 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
   if (pDstInfo->iBufferStatus == 1) {
 
-    if ((m_pDecContext->sDecoderStatistics.uiWidth != pDstInfo->UsrData.sSystemBuffer.iWidth)
-        || (m_pDecContext->sDecoderStatistics.uiHeight != pDstInfo->UsrData.sSystemBuffer.iHeight)) {
+    if ((m_pDecContext->sDecoderStatistics.uiWidth != (unsigned int) pDstInfo->UsrData.sSystemBuffer.iWidth)
+        || (m_pDecContext->sDecoderStatistics.uiHeight != (unsigned int) pDstInfo->UsrData.sSystemBuffer.iHeight)) {
       m_pDecContext->sDecoderStatistics.uiResolutionChangeTimes++;
       m_pDecContext->sDecoderStatistics.uiWidth = pDstInfo->UsrData.sSystemBuffer.iWidth;
       m_pDecContext->sDecoderStatistics.uiHeight = pDstInfo->UsrData.sSystemBuffer.iHeight;
