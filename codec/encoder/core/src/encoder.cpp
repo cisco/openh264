@@ -332,7 +332,6 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
       -- pEncCtx->iSkipFrameFlag;
       iFrameType = videoFrameTypeSkip;
     } else if (videoFrameTypeIDR == iFrameType) {
-      pEncCtx->iCodingIndex = 0;
       pEncCtx->bCurFrameMarkedAsSceneLtr   = true;
     }
 
@@ -355,8 +354,6 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
     if (videoFrameTypeP == iFrameType && pEncCtx->iSkipFrameFlag > 0) {  // for frame skip, 1/5/2010
       -- pEncCtx->iSkipFrameFlag;
       iFrameType = videoFrameTypeSkip;
-    } else if (videoFrameTypeIDR == iFrameType) {
-      pEncCtx->iCodingIndex = 0;
     }
   }
   return iFrameType;
