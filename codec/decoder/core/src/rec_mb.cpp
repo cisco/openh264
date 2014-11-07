@@ -214,8 +214,6 @@ static inline void BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t iY
 
   int32_t iBlkWidthChroma = iBlkWidth >> 1;
   int32_t iBlkHeightChroma = iBlkHeight >> 1;
-  int32_t iPicWidthChroma = pMCRefMem->iPicWidth >> 1;
-  int32_t iPicHeightChroma = pMCRefMem->iPicHeight >> 1;
 
   uint8_t* pSrcY = pMCRefMem->pSrcY + iSrcPixOffsetLuma;
   uint8_t* pSrcU = pMCRefMem->pSrcU + iSrcPixOffsetChroma;
