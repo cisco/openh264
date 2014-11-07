@@ -50,7 +50,7 @@
 #include "rc.h"
 #include "svc_enc_slice_segment.h"
 #include "as264_common.h"
-
+#include "stdio.h"
 namespace WelsEnc {
 
 #define   INVALID_TEMPORAL_ID   ((uint8_t)0xff)
@@ -265,7 +265,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
   }
   int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
     float fParamMaxFrameRate		= WELS_CLIP3 (pCodingParam.fMaxFrameRate, MIN_FRAME_RATE, MAX_FRAME_RATE);
-
+      printf("fParamMaxFrameRate = %f,pCodingParam.fMaxFrameRate = %f\n",fParamMaxFrameRate,pCodingParam.fMaxFrameRate);
     iUsageType = pCodingParam.iUsageType;
     iPicWidth   = pCodingParam.iPicWidth;
     iPicHeight  = pCodingParam.iPicHeight;
