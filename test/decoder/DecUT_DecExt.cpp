@@ -412,15 +412,15 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   //Decoder error bs
   DecoderBs ("res/Error_I_P.264");
   m_pDec->GetOption (DECODER_OPTION_GET_STATISTICS, &sDecStatic);
-  EXPECT_EQ (57, sDecStatic.uiAvgEcRatio);
-  EXPECT_EQ (5, sDecStatic.uiDecodedFrameCount);
-  EXPECT_EQ (288, sDecStatic.uiHeight);
-  EXPECT_EQ (1, sDecStatic.uiIDRRecvNum);
-  EXPECT_EQ (3, sDecStatic.uiResolutionChangeTimes);
-  EXPECT_EQ (352, sDecStatic.uiWidth);
-  EXPECT_EQ (4, sDecStatic.uiEcFrameNum);
-  EXPECT_EQ (2, sDecStatic.uiEcIDRNum);
-  EXPECT_EQ (0, sDecStatic.uiIDRLostNum);
+  EXPECT_EQ (57u, sDecStatic.uiAvgEcRatio);
+  EXPECT_EQ (5u, sDecStatic.uiDecodedFrameCount);
+  EXPECT_EQ (288u, sDecStatic.uiHeight);
+  EXPECT_EQ (1u, sDecStatic.uiIDRRecvNum);
+  EXPECT_EQ (3u, sDecStatic.uiResolutionChangeTimes);
+  EXPECT_EQ (352u, sDecStatic.uiWidth);
+  EXPECT_EQ (4u, sDecStatic.uiEcFrameNum);
+  EXPECT_EQ (2u, sDecStatic.uiEcIDRNum);
+  EXPECT_EQ (0u, sDecStatic.uiIDRLostNum);
   Uninit();
 
   //Decoder error bs when the first IDR lost
@@ -429,15 +429,15 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   m_pDec->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iError);
   DecoderBs ("res/BA_MW_D_IDR_LOST.264");
   m_pDec->GetOption (DECODER_OPTION_GET_STATISTICS, &sDecStatic);
-  EXPECT_EQ (0, sDecStatic.uiAvgEcRatio);
-  EXPECT_EQ (97, sDecStatic.uiDecodedFrameCount);
-  EXPECT_EQ (144, sDecStatic.uiHeight);
-  EXPECT_EQ (3, sDecStatic.uiIDRRecvNum);
-  EXPECT_EQ (0, sDecStatic.uiEcIDRNum);
-  EXPECT_EQ (1, sDecStatic.uiResolutionChangeTimes);
-  EXPECT_EQ (176, sDecStatic.uiWidth);
-  EXPECT_EQ (27, sDecStatic.uiEcFrameNum);
-  EXPECT_EQ (1, sDecStatic.uiIDRLostNum);
+  EXPECT_EQ (0u, sDecStatic.uiAvgEcRatio);
+  EXPECT_EQ (97u, sDecStatic.uiDecodedFrameCount);
+  EXPECT_EQ (144u, sDecStatic.uiHeight);
+  EXPECT_EQ (3u, sDecStatic.uiIDRRecvNum);
+  EXPECT_EQ (0u, sDecStatic.uiEcIDRNum);
+  EXPECT_EQ (1u, sDecStatic.uiResolutionChangeTimes);
+  EXPECT_EQ (176u, sDecStatic.uiWidth);
+  EXPECT_EQ (27u, sDecStatic.uiEcFrameNum);
+  EXPECT_EQ (1u, sDecStatic.uiIDRLostNum);
   Uninit();
 
   //ecoder error bs when the first P lost
@@ -448,15 +448,15 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   DecoderBs ("res/BA_MW_D_P_LOST.264");
 
   m_pDec->GetOption (DECODER_OPTION_GET_STATISTICS, &sDecStatic);
-  EXPECT_EQ (0, sDecStatic.uiAvgEcRatio);
-  EXPECT_EQ (99, sDecStatic.uiDecodedFrameCount);
-  EXPECT_EQ (144, sDecStatic.uiHeight);
-  EXPECT_EQ (4, sDecStatic.uiIDRRecvNum);
-  EXPECT_EQ (0, sDecStatic.uiEcIDRNum);
-  EXPECT_EQ (1, sDecStatic.uiResolutionChangeTimes);
-  EXPECT_EQ (176, sDecStatic.uiWidth);
-  EXPECT_EQ (28, sDecStatic.uiEcFrameNum);
-  EXPECT_EQ (0, sDecStatic.uiIDRLostNum);
+  EXPECT_EQ (0u, sDecStatic.uiAvgEcRatio);
+  EXPECT_EQ (99u, sDecStatic.uiDecodedFrameCount);
+  EXPECT_EQ (144u, sDecStatic.uiHeight);
+  EXPECT_EQ (4u, sDecStatic.uiIDRRecvNum);
+  EXPECT_EQ (0u, sDecStatic.uiEcIDRNum);
+  EXPECT_EQ (1u, sDecStatic.uiResolutionChangeTimes);
+  EXPECT_EQ (176u, sDecStatic.uiWidth);
+  EXPECT_EQ (28u, sDecStatic.uiEcFrameNum);
+  EXPECT_EQ (0u, sDecStatic.uiIDRLostNum);
   Uninit();
   //EC enable
 
@@ -468,14 +468,14 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
 
   m_pDec->GetOption (DECODER_OPTION_GET_STATISTICS, &sDecStatic);
 
-  EXPECT_EQ (0, sDecStatic.uiAvgEcRatio);
-  EXPECT_EQ (9, sDecStatic.uiDecodedFrameCount);
-  EXPECT_EQ (192, sDecStatic.uiHeight);
-  EXPECT_EQ (1, sDecStatic.uiIDRRecvNum);
-  EXPECT_EQ (1, sDecStatic.uiResolutionChangeTimes);
-  EXPECT_EQ (320, sDecStatic.uiWidth);
-  EXPECT_EQ (0, sDecStatic.uiEcFrameNum);
-  EXPECT_EQ (0, sDecStatic.uiIDRLostNum);
+  EXPECT_EQ (0u, sDecStatic.uiAvgEcRatio);
+  EXPECT_EQ (9u, sDecStatic.uiDecodedFrameCount);
+  EXPECT_EQ (192u, sDecStatic.uiHeight);
+  EXPECT_EQ (1u, sDecStatic.uiIDRRecvNum);
+  EXPECT_EQ (1u, sDecStatic.uiResolutionChangeTimes);
+  EXPECT_EQ (320u, sDecStatic.uiWidth);
+  EXPECT_EQ (0u, sDecStatic.uiEcFrameNum);
+  EXPECT_EQ (0u, sDecStatic.uiIDRLostNum);
   Uninit();
 
 }
