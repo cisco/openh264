@@ -130,7 +130,7 @@ void DecoderInterfaceTest::DecoderBs (const char* sFileName) {
   iFileSize = (int32_t) ftell (pH264File);
   fseek (pH264File, 0L, SEEK_SET);
   pBuf = new uint8_t[iFileSize + 4];
-  fread (pBuf, 1, iFileSize, pH264File);
+  ASSERT_EQ(fread (pBuf, 1, iFileSize, pH264File), (unsigned int) iFileSize);
   memcpy (pBuf + iFileSize, &uiStartCode[0], 4); //confirmed_safe_unsafe_usage
   while (true) {
     if (iBufPos >= iFileSize) {
