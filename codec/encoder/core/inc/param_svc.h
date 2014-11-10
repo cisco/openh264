@@ -118,9 +118,6 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
   int8_t		iDecompStages;		// GOP size dependency
   int32_t  iMaxNumRefFrame;
 
-//setting this according to link type in use MAY invoke some algorithms targeting higher coding efficiency
-  bool bIsLosslessLink;
-
  public:
   TagWelsSvcCodingParam() {
     FillDefault();
