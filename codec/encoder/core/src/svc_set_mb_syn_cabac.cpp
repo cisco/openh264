@@ -224,12 +224,12 @@ void WelsCabacMbCbp (SMB* pCurMb, int32_t iMbWidth, SCabacCtx* pCabacCtx) {
   }
 }
 
-void WelsCabacMbDeltaQp (SMB* pCurMb, SCabacCtx* pCabacCtx) {
+void WelsCabacMbDeltaQp (SMB* pCurMb, SCabacCtx* pCabacCtx, bool bPredMb) {
   SMB* pPrevMb = NULL;
   int32_t iCtx = 0;
   uint32_t uiNeighborAvail = pCurMb->uiNeighborAvail;
 
-  if ((uiNeighborAvail & LEFT_MB_POS) || (uiNeighborAvail & TOP_MB_POS)) {
+  if (bPredMb) {
     pPrevMb = pCurMb - 1;
     pCurMb->iLumaDQp = pCurMb->uiLumaQp - pPrevMb->uiLumaQp;
 
@@ -482,6 +482,8 @@ int32_t WelsWriteMbResidualCabac (SSlice* pSlice, SMbCache* sMbCacheInfo, SMB* p
   SMbCache* pMbCache	= &pSlice->sMbCacheInfo;
   int16_t i = 0;
   int8_t* pNonZeroCoeffCount	= pMbCache->iNonZeroCoeffCount;
+  SSliceHeaderExt* pSliceHeadExt = &pSlice->sSliceHeaderExt;
+  const int32_t iSliceFirstMbXY	= pSliceHeadExt->sSliceHeader.iFirstMbInSlice;
 
 
   pCurMb->iCbpDc = 0;
@@ -492,7 +494,7 @@ int32_t WelsWriteMbResidualCabac (SSlice* pSlice, SMbCache* sMbCacheInfo, SMB* p
     int32_t iCbpLuma   = pCurMb->uiCbp & 15;
 
     pCurMb->iLumaDQp = pCurMb->uiLumaQp - pSlice->uiLastMbQp;
-    WelsCabacMbDeltaQp (pCurMb, pCabacCtx);
+    WelsCabacMbDeltaQp (pCurMb, pCabacCtx, (pCurMb->iMbXY > iSliceFirstMbXY));
     pSlice->uiLastMbQp = pCurMb->uiLumaQp;
 
     if (uiMbType == MB_TYPE_INTRA16x16) {
@@ -557,6 +559,7 @@ int32_t WelsWriteMbResidualCabac (SSlice* pSlice, SMbCache* sMbCacheInfo, SMB* p
       }
     }
   } else {
+    pCurMb->iLumaDQp = 0;
     pCurMb->uiLumaQp	= pSlice->uiLastMbQp;
     pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp + uiChromaQpIndexOffset)];
   }
