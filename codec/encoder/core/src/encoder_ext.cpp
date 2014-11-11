@@ -2991,6 +2991,25 @@ bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pCtx, int32_t iSpatialNum, EVideoFra
   bool bSkipMustFlag = false;
   if (pCtx->pSvcParam->bEnableFrameSkip) {
     if ((RC_QUALITY_MODE == pCtx->pSvcParam->iRCMode) || (RC_BITRATE_MODE == pCtx->pSvcParam->iRCMode)) {
+
+      if(pCtx->bCheckWindowStatusRefreshFlag) {
+        pCtx->iCheckWindowCurrentTs = uiTimeStamp;
+      } else {
+        pCtx->iCheckWindowCurrentTs = pCtx->iCheckWindowStartTs = uiTimeStamp;
+        pCtx->bCheckWindowStatusRefreshFlag = true;
+      }
+      pCtx->iCheckWindowInterval = pCtx->iCheckWindowCurrentTs - pCtx->iCheckWindowStartTs;
+
+      if(pCtx->iCheckWindowInterval >= TIME_CHECK_WINDOW || pCtx->iCheckWindowInterval == 0) {
+        pCtx->iCheckWindowStartTs = pCtx->iCheckWindowCurrentTs;
+        pCtx->iCheckWindowInterval = 0;
+        for (int32_t i = 0; i < iSpatialNum; i++) {
+          int32_t iCurDid	= (pSpatialIndexMap + i)->iDid;
+          pCtx->pWelsSvcRc[iCurDid].iBufferFullnessMaxBRSkip = 0;
+          pCtx->pWelsSvcRc[iCurDid].iPredFrameBit = 0;
+        }
+      }
+
       for (int32_t i = 0; i < iSpatialNum; i++) {
         if (0 == pCtx->pSvcParam->sSpatialLayers[i].iMaxSpatialBitrate) {
           break;
@@ -3668,10 +3687,10 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   pCtx->eLastNalPriority	= eNalRefIdc;
   pFbi->iLayerNum			= iLayerNum;
   pFbi->iSubSeqId = GetSubSequenceId (pCtx, eFrameType);
-  WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsEncoderEncodeExt() OutputInfo iLayerNum ＝ %d,iSubSeqId = %d", iLayerNum,
+  WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsEncoderEncodeExt() OutputInfo iLayerNum = %d,iSubSeqId = %d", iLayerNum,
            pFbi->iSubSeqId);
   for (int32_t i = 0; i < iLayerNum; i++)
-    WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsEncoderEncodeExt() OutputInfo iLayerId = %d,iNalType = %d,iNalCount ＝ %d", i,
+    WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsEncoderEncodeExt() OutputInfo iLayerId = %d,iNalType = %d,iNalCount = %d", i,
              pFbi->sLayerInfo[i].uiLayerType, pFbi->sLayerInfo[i].iNalCount);
 
 
