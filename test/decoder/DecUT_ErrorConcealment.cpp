@@ -47,8 +47,8 @@ int32_t InitAndAllocInputData (PECInputCtx& pECCtx) {
     return 1;
   memset (pECCtx, 0, sizeof (SECInputCtx));
 
-  pECCtx->iMbWidth = rand() % MAX_MB_WIDTH; //give a constrained max width
-  pECCtx->iMbHeight = rand() % MAX_MB_HEIGHT; //give a constrained max height
+  pECCtx->iMbWidth = rand() % (MAX_MB_WIDTH - 1) + 1; //give a constrained max width
+  pECCtx->iMbHeight = rand() % (MAX_MB_HEIGHT - 1) + 1; //give a constrained max height
   pECCtx->iLinesize[0] = pECCtx->iMbWidth << 4;
   pECCtx->iLinesize[1] = pECCtx->iLinesize[2] = pECCtx->iLinesize[0] >> 1;
 
