@@ -124,6 +124,7 @@ void EncoderInterfaceTest::EncodeOneIDRandP (ISVCEncoder* pPtrEnc) {
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
   EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeIDR));
 
+  pSrcPic->uiTimeStamp += 30;
   iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
   EXPECT_NE (sFbi.eFrameType, static_cast<int> (videoFrameTypeIDR));
@@ -687,6 +688,7 @@ void EncoderInterfaceTest::ChangeResolutionAndCheckStatistics (const SEncParamBa
 
   // 3, code one frame
   PrepareOneSrcFrame();
+  pSrcPic->uiTimeStamp = 30 * pEncoderStatistics->uiInputFrameCount;
   iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
   iResult = pPtrEnc->GetOption (ENCODER_OPTION_GET_STATISTICS, pEncoderStatistics);
@@ -737,6 +739,14 @@ TEST_F (EncoderInterfaceTest, GetStatistics) {
   sEncParamBase.iPicWidth = (sEncParamBase.iPicWidth % 16) + 1; //try 1~16
   sEncParamBase.iPicHeight = (sEncParamBase.iPicHeight % 16) + 1; //try 1~16
   ChangeResolutionAndCheckStatistics (sEncParamBase, &sEncoderStatistics);
+
+  // try timestamp and frame rate
+  pSrcPic->uiTimeStamp = 1000;
+  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  iResult = pPtrEnc->GetOption (ENCODER_OPTION_GET_STATISTICS, &sEncoderStatistics);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  EXPECT_EQ (static_cast<int> (sEncoderStatistics.fAverageFrameRate), sEncoderStatistics.uiInputFrameCount);
 
   // 4, change log interval
   int32_t iInterval = 0;

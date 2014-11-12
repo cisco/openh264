@@ -616,9 +616,11 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
   pStatistics->uiSkippedFrameCount += (kbCurrentFrameSkipped ? 1 : 0);
 
   // rate control related
-  if (0 != m_pEncContext->uiStartTimestamp && kiCurrentFrameTs > m_pEncContext->uiStartTimestamp + 800) {
-    pStatistics->fAverageFrameRate = (float) (pStatistics->uiInputFrameCount * 1000 /
-                                     (kiCurrentFrameTs - m_pEncContext->uiStartTimestamp));
+  if (0 != m_pEncContext->uiStartTimestamp) {
+    if (kiCurrentFrameTs > m_pEncContext->uiStartTimestamp + 800) {
+      pStatistics->fAverageFrameRate = (static_cast<float> (pStatistics->uiInputFrameCount) * 1000 /
+                                        (kiCurrentFrameTs - m_pEncContext->uiStartTimestamp));
+    }
   } else {
     m_pEncContext->uiStartTimestamp = kiCurrentFrameTs;
   }
