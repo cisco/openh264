@@ -314,6 +314,11 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
     iBitSize = (iNalSize << 3) - BsGetTrailingBits (pNal + iNalSize - 1); // convert into bit
     iErr = InitBits (pBs, pNal, iBitSize);
     if (iErr) {
+      ForceClearCurrentNal (pCurAu);
+      if (uiAvailNalNum > 1) {
+        pCurAu->uiEndPos = uiAvailNalNum - 2;
+        pCtx->bAuReadyFlag = true;
+      }
       WelsLog (pLogCtx, WELS_LOG_ERROR, "NAL_UNIT_CODED_SLICE: InitBits() fail due invalid access.");
       pCtx->iErrorCode	|= dsBitstreamError;
       return NULL;
