@@ -210,44 +210,59 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
       Error (GMPGenericErr);
       return;
     }
-
-    SEncParamBase param;
+    SEncParamExt param;
     memset (&param, 0, sizeof (param));
+    encoder_->GetDefaultParams (&param);
 
     GMPLOG (GL_INFO, "Initializing encoder at "
             << codecSettings.mWidth
             << "x"
             << codecSettings.mHeight
             << "@"
-            << static_cast<int> (codecSettings.mMaxFramerate)
-            << "max payload size="
-            << maxPayloadSize);
+            << static_cast<int> (codecSettings.mMaxFramerate));
 
     // Translate parameters.
     param.iUsageType = CAMERA_VIDEO_REAL_TIME;
     param.iPicWidth = codecSettings.mWidth;
     param.iPicHeight = codecSettings.mHeight;
+    param.iRCMode = RC_BITRATE_MODE;
     param.iTargetBitrate = codecSettings.mStartBitrate * 1000;
+    param.iMaxBitrate = codecSettings.mMaxBitrate * 1000;
     GMPLOG (GL_INFO, "Initializing Bit Rate at: Start: "
             << codecSettings.mStartBitrate
             << "; Min: "
             << codecSettings.mMinBitrate
             << "; Max: "
-            << codecSettings.mMaxBitrate);
-    param.iRCMode = RC_BITRATE_MODE;
+            << codecSettings.mMaxBitrate
+            << "; Max payload size:"
+            << maxPayloadSize);
+
+    param.uiMaxNalSize = maxPayloadSize;
 
     // TODO(ekr@rtfm.com). Scary conversion from unsigned char to float below.
     param.fMaxFrameRate = static_cast<float> (codecSettings.mMaxFramerate);
 
-    rv = encoder_->Initialize (&param);
+    // Set up layers. Currently we have one layer.
+    SSpatialLayerConfig* layer = &param.sSpatialLayers[0];
+
+    layer->iVideoWidth = codecSettings.mWidth;
+    layer->iVideoHeight = codecSettings.mHeight;
+    layer->fFrameRate = param.fMaxFrameRate;
+    layer->iSpatialBitrate = param.iTargetBitrate;
+    layer->iMaxSpatialBitrate = param.iMaxBitrate;
+
+    //for controlling the NAL size (normally for packetization-mode=0)
+    if (maxPayloadSize != 0) {
+      layer->sSliceCfg.uiSliceMode = SM_DYN_SLICE;
+      layer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint = maxPayloadSize;
+    }
+    rv = encoder_->InitializeExt (&param);
     if (rv) {
       GMPLOG (GL_ERROR, "Couldn't initialize encoder");
       Error (GMPGenericErr);
       return;
     }
-
     max_payload_size_ = maxPayloadSize;
-
     GMPLOG (GL_INFO, "Initialized encoder");
   }
 
@@ -382,7 +397,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
     src.pData[3] = nullptr;
     src.iPicWidth = inputImage->Width();
     src.iPicHeight = inputImage->Height();
-    src.uiTimeStamp = inputImage->Timestamp()/1000; //encoder needs millisecond
+    src.uiTimeStamp = inputImage->Timestamp() / 1000; //encoder needs millisecond
     const SSourcePicture* pics = &src;
 
     int result = encoder_->EncodeFrame (pics, &encoded);
@@ -628,7 +643,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
                             dState,
                             renderTimeMs));
     if (dState) {
-      Error(GMPGenericErr);
+      Error (GMPGenericErr);
     }
   }
 
