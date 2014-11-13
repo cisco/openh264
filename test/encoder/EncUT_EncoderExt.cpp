@@ -745,7 +745,7 @@ TEST_F (EncoderInterfaceTest, GetStatistics) {
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
   iResult = pPtrEnc->GetOption (ENCODER_OPTION_GET_STATISTICS, &sEncoderStatistics);
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  EXPECT_EQ (static_cast<int> (sEncoderStatistics.fAverageFrameRate), sEncoderStatistics.uiInputFrameCount);
+  EXPECT_EQ (static_cast<unsigned int> (sEncoderStatistics.fAverageFrameRate), sEncoderStatistics.uiInputFrameCount);
 
   // 4, change log interval
   int32_t iInterval = 0;
