@@ -206,8 +206,8 @@ static inline void BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t iY
                            int32_t iBlkWidth, int32_t iBlkHeight, int16_t iMVs[2]) {
   int32_t iFullMVx = (iXOffset << 2) + iMVs[0]; //quarter pixel
   int32_t iFullMVy = (iYOffset << 2) + iMVs[1];
-  iFullMVx = WELS_CLIP3 (iFullMVx, ((-PADDING_LENGTH + 2) << 2), ((pMCRefMem->iPicWidth + PADDING_LENGTH - 17) << 2));
-  iFullMVy = WELS_CLIP3 (iFullMVy, ((-PADDING_LENGTH + 2) << 2), ((pMCRefMem->iPicHeight + PADDING_LENGTH - 17) << 2));
+  iFullMVx = WELS_CLIP3 (iFullMVx, ((-PADDING_LENGTH + 2) << 2), ((pMCRefMem->iPicWidth + PADDING_LENGTH - 19) << 2));
+  iFullMVy = WELS_CLIP3 (iFullMVy, ((-PADDING_LENGTH + 2) << 2), ((pMCRefMem->iPicHeight + PADDING_LENGTH - 19) << 2));
 
   int32_t iSrcPixOffsetLuma = (iFullMVx >> 2) + (iFullMVy >> 2) * pMCRefMem->iSrcLineLuma;
   int32_t iSrcPixOffsetChroma = (iFullMVx >> 3) + (iFullMVy >> 3) * pMCRefMem->iSrcLineChroma;
