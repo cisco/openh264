@@ -770,3 +770,31 @@ TEST_F (EncoderInterfaceTest, GetStatistics) {
   // finish
   pPtrEnc->Uninitialize();
 }
+
+TEST_F (EncoderInterfaceTest, FrameSizeCheck) {
+  SEncParamBase sEncParamBase;
+  GetValidEncParamBase (&sEncParamBase);
+
+  int iResult = pPtrEnc->Initialize (&sEncParamBase);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  if (iResult != cmResultSuccess) {
+    fprintf (stderr, "Unexpected ParamBase? \
+             iUsageType=%d, Pic=%dx%d, TargetBitrate=%d, iRCMode=%d, fMaxFrameRate=%.1f\n",
+             sEncParamBase.iUsageType, sEncParamBase.iPicWidth, sEncParamBase.iPicHeight,
+             sEncParamBase.iTargetBitrate, sEncParamBase.iRCMode, sEncParamBase.fMaxFrameRate);
+  }
+
+  PrepareOneSrcFrame();
+  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+
+  uint32_t length = 0;
+  for (int i = 0; i < sFbi.iLayerNum; ++i) {
+    for (int j = 0; j < sFbi.sLayerInfo[i].iNalCount; ++j) {
+      length += sFbi.sLayerInfo[i].pNalLengthInByte[j];
+    }
+  }
+  EXPECT_EQ (length, sFbi.iFrameSizeInBytes);
+
+  // finish
+  pPtrEnc->Uninitialize();
+}
