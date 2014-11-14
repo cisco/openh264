@@ -787,7 +787,7 @@ TEST_F (EncoderInterfaceTest, FrameSizeCheck) {
   PrepareOneSrcFrame();
   iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
 
-  uint32_t length = 0;
+  int length = 0;
   for (int i = 0; i < sFbi.iLayerNum; ++i) {
     for (int j = 0; j < sFbi.sLayerInfo[i].iNalCount; ++j) {
       length += sFbi.sLayerInfo[i].pNalLengthInByte[j];
