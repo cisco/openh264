@@ -2233,8 +2233,7 @@ TEST_F (DecodeCrashTestAPI, DecoderCrashTest) {
   } while (1); //while (iLoopRound<100);
   fclose (f);
 #else
-  }
-  while (uiLoopRound < 100);
+  } while (uiLoopRound < 10);
 #endif
 
 }
