@@ -90,7 +90,7 @@ void EncoderInterfaceTest::PrepareOneSrcFrame() {
     if ((i % 256) == 0)
       pYUV[i] = rand() % 256;
     else
-      pYUV[i] = WELS_CLIP3 (pYUV[i - 1] + (rand() % 3) - 1, 0, 255);
+      pYUV[i] = (pYUV[i - 1] + (rand() % 3) - 1) & 0xff;
   }
   pSrcPic->iStride[0] = m_iWidth;
   pSrcPic->iStride[1] = pSrcPic->iStride[2] = pSrcPic->iStride[0] >> 1;
