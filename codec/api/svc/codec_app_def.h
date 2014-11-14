@@ -404,6 +404,7 @@ typedef struct {
   SLayerBSInfo	sLayerInfo[MAX_LAYER_NUM_OF_FRAME];
 
   EVideoFrameType eFrameType;
+  int   iFrameSizeInBytes;
   long long uiTimeStamp;
 } SFrameBSInfo, *PFrameBSInfo;
 

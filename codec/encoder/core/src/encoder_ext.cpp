@@ -2736,7 +2736,7 @@ void ParasetIdAdditionIdAdjust (SParaSetOffsetVariable* sParaSetOffsetVariable, 
  * \brief	write all parameter sets introduced in SVC extension
  * \return	writing results, success or error
  */
-int32_t WelsWriteParameterSets (sWelsEncCtx* pCtx, int32_t* pNalLen, int32_t* pNumNal) {
+int32_t WelsWriteParameterSets (sWelsEncCtx* pCtx, int32_t* pNalLen, int32_t* pNumNal, int32_t* pTotalLength) {
   int32_t iSize	= 0;
   int32_t iNal	= 0;
   int32_t	iIdx	= 0;
@@ -2748,6 +2748,7 @@ int32_t WelsWriteParameterSets (sWelsEncCtx* pCtx, int32_t* pNalLen, int32_t* pN
   if (NULL == pCtx || NULL == pNalLen || NULL == pNumNal)
     return ENC_RETURN_UNEXPECTED;
 
+  *pTotalLength = 0;
   /* write all SPS */
   iIdx = 0;
   while (iIdx < pCtx->iSpsNum) {
@@ -2834,6 +2835,7 @@ int32_t WelsWriteParameterSets (sWelsEncCtx* pCtx, int32_t* pNalLen, int32_t* pN
   }
 
   *pNumNal = iCountNal;
+  *pTotalLength = iSize;
 
   return ENC_RETURN_SUCCESS;
 }
@@ -2944,13 +2946,14 @@ int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst) {
   SFrameBSInfo* pFbi          = (SFrameBSInfo*)pDst;
   SLayerBSInfo* pLayerBsInfo  = &pFbi->sLayerInfo[0];
   int32_t iCountNal           = 0;
+  int32_t iTotalLength        = 0;
 
   pLayerBsInfo->pBsBuf = pCtx->pFrameBs;
   pLayerBsInfo->pNalLengthInByte = pCtx->pOut->pNalLen;
   InitBits (&pCtx->pOut->sBsWrite, pCtx->pOut->pBsBuffer, pCtx->pOut->uiSize);
 
   pCtx->iPosBsBuffer = 0;
-  int32_t iReturn = WelsWriteParameterSets (pCtx, &pLayerBsInfo->pNalLengthInByte[0], &iCountNal);
+  int32_t iReturn = WelsWriteParameterSets (pCtx, &pLayerBsInfo->pNalLengthInByte[0], &iCountNal, &iTotalLength);
   WELS_VERIFY_RETURN_IFNEQ (iReturn, ENC_RETURN_SUCCESS)
 
   pLayerBsInfo->uiSpatialId   = 0;
@@ -3094,7 +3097,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     //if ( pSvcParam->bEnableSSEI )
 
     // write parameter sets bitstream here
-    pCtx->iEncoderError = WelsWriteParameterSets (pCtx, &pLayerBsInfo->pNalLengthInByte[0], &iCountNal);
+    int32_t iNonVclSize = 0;
+    pCtx->iEncoderError = WelsWriteParameterSets (pCtx, &pLayerBsInfo->pNalLengthInByte[0], &iCountNal, &iNonVclSize);
     WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
 
     pLayerBsInfo->uiSpatialId		= 0;
@@ -3107,6 +3111,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     pLayerBsInfo->pBsBuf			= pCtx->pFrameBs + pCtx->iPosBsBuffer;
     pLayerBsInfo->pNalLengthInByte = (pLayerBsInfo - 1)->pNalLengthInByte + iCountNal;
     ++ iLayerNum;
+
+    iFrameSize += iNonVclSize;
   }
 
   pCtx->pCurDqLayer				= pCtx->ppDqLayerList[pSpatialIndexMap->iDid];
@@ -3605,6 +3611,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       pLayerBsInfo->pBsBuf	= pCtx->pFrameBs + pCtx->iPosBsBuffer;
       pLayerBsInfo->pNalLengthInByte = (pLayerBsInfo - 1)->pNalLengthInByte + 1;
       ++ iLayerNum;
+
+      iFrameSize += iPaddingNalSize;
     }
 
     if ((pParam->sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE || pParam->sSliceCfg.uiSliceMode == SM_AUTO_SLICE)
@@ -3677,6 +3685,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   WelsEmms();
 
   pFbi->eFrameType = eFrameType;
+  pFbi->iFrameSizeInBytes = iFrameSize;
   return ENC_RETURN_SUCCESS;
 }
 
