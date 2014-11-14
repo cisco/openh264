@@ -275,7 +275,7 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
       return cmInitParaError;
 
     iVal	= * ((int*)pOption);	// int value for error concealment idc
-    iVal = WELS_CLIP3 (iVal, (int32_t) ERROR_CON_DISABLE, (int32_t) ERROR_CON_SLICE_COPY_CROSS_IDR);
+    iVal = WELS_CLIP3 (iVal, (int32_t) ERROR_CON_DISABLE, (int32_t) ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE);
     m_pDecContext->eErrorConMethod = (ERROR_CON_IDC) iVal;
     InitErrorCon (m_pDecContext);
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,

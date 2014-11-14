@@ -120,7 +120,9 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
         pRef->bIsComplete = false; // Set complete flag to false for lost IDR ref picture
         pCtx->iErrorCode |= dsDataErrorConcealed;
         bool bCopyPrevious = ((ERROR_CON_FRAME_COPY_CROSS_IDR == pCtx->eErrorConMethod)
-                              || (ERROR_CON_SLICE_COPY_CROSS_IDR == pCtx->eErrorConMethod)) && (NULL != pCtx->pPreviousDecodedPictureInDpb);
+                              || (ERROR_CON_SLICE_COPY_CROSS_IDR == pCtx->eErrorConMethod)
+                              || (ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE == pCtx->eErrorConMethod))
+                             && (NULL != pCtx->pPreviousDecodedPictureInDpb);
         bCopyPrevious = bCopyPrevious && (pRef->iWidthInPixel == pCtx->pPreviousDecodedPictureInDpb->iWidthInPixel)
                         && (pRef->iHeightInPixel == pCtx->pPreviousDecodedPictureInDpb->iHeightInPixel);
         if (bCopyPrevious) {
