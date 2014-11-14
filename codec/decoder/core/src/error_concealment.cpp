@@ -41,7 +41,8 @@
 namespace WelsDec {
 //Init
 void InitErrorCon (PWelsDecoderContext pCtx) {
-  if ((pCtx->eErrorConMethod == ERROR_CON_SLICE_COPY) || (pCtx->eErrorConMethod == ERROR_CON_SLICE_COPY_CROSS_IDR)) {
+  if ((pCtx->eErrorConMethod == ERROR_CON_SLICE_COPY) || (pCtx->eErrorConMethod == ERROR_CON_SLICE_COPY_CROSS_IDR)
+      || (pCtx->eErrorConMethod == ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE)) {
     pCtx->sCopyFunc.pCopyLumaFunc = WelsCopy16x16_c;
     pCtx->sCopyFunc.pCopyChromaFunc = WelsCopy8x8_c;
 
@@ -196,7 +197,8 @@ void ImplementErrorCon (PWelsDecoderContext pCtx) {
              || (ERROR_CON_FRAME_COPY_CROSS_IDR == pCtx->eErrorConMethod)) {
     DoErrorConFrameCopy (pCtx);
   } else if ((ERROR_CON_SLICE_COPY == pCtx->eErrorConMethod)
-             || (ERROR_CON_SLICE_COPY_CROSS_IDR == pCtx->eErrorConMethod)) {
+             || (ERROR_CON_SLICE_COPY_CROSS_IDR == pCtx->eErrorConMethod)
+             || (ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE == pCtx->eErrorConMethod)) {
     DoErrorConSliceCopy (pCtx);
   } //TODO add other EC methods here in the future
   pCtx->iErrorCode |= dsDataErrorConcealed;

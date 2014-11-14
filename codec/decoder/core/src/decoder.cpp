@@ -145,6 +145,9 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
 
   pCtx->iImgWidthInPixel		= 0;
   pCtx->iImgHeightInPixel		= 0;		// alloc picture data when picture size is available
+  pCtx->iLastImgWidthInPixel		= 0;
+  pCtx->iLastImgHeightInPixel		= 0;
+  pCtx->bFreezeOutput = false;
 
   pCtx->iFrameNum				= -1;
   pCtx->iPrevFrameNum			= -1;
@@ -160,7 +163,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->pPicBuff[LIST_1]		= NULL;
 
   pCtx->bAvcBasedFlag			= true;
-  pCtx->eErrorConMethod = ERROR_CON_SLICE_COPY_CROSS_IDR;
+  pCtx->eErrorConMethod = ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
   pCtx->pPreviousDecodedPictureInDpb = NULL;
 
 }
@@ -270,6 +273,9 @@ void WelsFreeMem (PWelsDecoderContext pCtx) {
   // added for safe memory
   pCtx->iImgWidthInPixel	= 0;
   pCtx->iImgHeightInPixel = 0;
+  pCtx->iLastImgWidthInPixel	= 0;
+  pCtx->iLastImgHeightInPixel = 0;
+  pCtx->bFreezeOutput = false;
   pCtx->bHaveGotMemory	= false;
   WelsFree (pCtx->pCabacDecEngine, "pCtx->pCabacDecEngine");
 }

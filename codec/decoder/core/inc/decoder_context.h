@@ -221,6 +221,10 @@ bool				bHaveGotMemory;	// global memory for decoder context related ever reques
 
 int32_t				iImgWidthInPixel;	// width of image in pixel reconstruction picture to be output
 int32_t				iImgHeightInPixel;// height of image in pixel reconstruction picture to be output
+int32_t				iLastImgWidthInPixel;	// width of image in last successful pixel reconstruction picture to be output
+int32_t				iLastImgHeightInPixel;// height of image in last successful pixel reconstruction picture to be output
+bool bFreezeOutput;
+
 
 // Derived common elements
 SNalUnitHeader		sCurNalHead;

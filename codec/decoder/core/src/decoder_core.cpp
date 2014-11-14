@@ -83,6 +83,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   } else if (pCurDq->sLayerInfo.sNalHeaderExt.bIdrFlag
              && (pCtx->iErrorCode == dsErrorFree)) { //complete non-ECed IDR frame done
     pCtx->pDec->bIsComplete = true;
+    pCtx->bFreezeOutput = false;
   }
 
   pCtx->iTotalNumMbRec = 0;
@@ -103,9 +104,15 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   ppDst[2] = ppDst[2] + pCtx->sFrameCrop.iTopOffset  * pPic->iLinesize[1] + pCtx->sFrameCrop.iLeftOffset;
   pDstInfo->iBufferStatus = 1;
 
+  bool bOutResChange = (pCtx->iLastImgWidthInPixel != pDstInfo->UsrData.sSystemBuffer.iWidth)
+                       || (pCtx->iLastImgHeightInPixel != pDstInfo->UsrData.sSystemBuffer.iHeight);
+  pCtx->iLastImgWidthInPixel = pDstInfo->UsrData.sSystemBuffer.iWidth;
+  pCtx->iLastImgHeightInPixel = pDstInfo->UsrData.sSystemBuffer.iHeight;
   if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) //no buffer output if EC is disabled and frame incomplete
     pDstInfo->iBufferStatus = (int32_t) (bFrameCompleteFlag
                                          && pPic->bIsComplete); // When EC disable, ECed picture not output
+  else if (pCtx->eErrorConMethod == ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE && pCtx->iErrorCode && bOutResChange)
+    pCtx->bFreezeOutput = true;
 
 
   if ((pDstInfo->iBufferStatus == 1) && (pCurDq->sLayerInfo.sNalHeaderExt.bIdrFlag)) {
@@ -120,6 +127,8 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
       pCtx->iErrorCode |= dsBitstreamError;
     return -1;
   }
+  if (pCtx->bFreezeOutput)
+    pDstInfo->iBufferStatus = 0;
 
   return 0;
 }
@@ -394,6 +403,9 @@ int32_t WelsInitMemory (PWelsDecoderContext pCtx) {
   pCtx->bEndOfStreamFlag	= false;
   pCtx->iImgWidthInPixel	= 0;
   pCtx->iImgHeightInPixel	= 0;
+  pCtx->iLastImgWidthInPixel	= 0;
+  pCtx->iLastImgHeightInPixel	= 0;
+  pCtx->bFreezeOutput = false;
 
   return ERR_NONE;
 }
