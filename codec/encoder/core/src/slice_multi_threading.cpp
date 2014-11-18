@@ -963,8 +963,11 @@ int32_t CreateSliceThreads (sWelsEncCtx* pCtx) {
   int32_t iIdx = 0;
 
   while (iIdx < kiThreadCount) {
-    WelsThreadCreate (&pCtx->pSliceThreading->pThreadHandles[iIdx], CodingSliceThreadProc,
-                      &pCtx->pSliceThreading->pThreadPEncCtx[iIdx], 0);
+    if (WelsThreadCreate (&pCtx->pSliceThreading->pThreadHandles[iIdx], CodingSliceThreadProc,
+                          &pCtx->pSliceThreading->pThreadPEncCtx[iIdx], 0)) {
+      return 1;
+    }
+
 
     ++ iIdx;
   }
