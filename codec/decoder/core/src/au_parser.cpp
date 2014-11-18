@@ -719,6 +719,8 @@ int32_t DecodeSpsSvcExt (PWelsDecoderContext pCtx, PSubsetSps pSpsExt, PBitStrin
 
 const SLevelLimits* GetLevelLimits (int32_t iLevelIdx, bool bConstraint3) {
   switch (iLevelIdx) {
+  case 9:
+    return &g_ksLevelLimits[1];
   case 10:
     return &g_ksLevelLimits[0];
   case 11:
