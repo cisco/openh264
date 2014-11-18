@@ -155,11 +155,16 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
                  pSpatialLayer->iSpatialBitrate);
         return ENC_RETURN_INVALIDINPUT;
       }
-      if (pSpatialLayer->iMaxSpatialBitrate < pSpatialLayer->iSpatialBitrate * 1.1f) {
-        WelsLog (pLogCtx, WELS_LOG_WARNING,
-                 "MaxSpatialBitrate (%d) should set be larger than 1.1 times of SpatialBitrate (%d)",
+      if (pSpatialLayer->iMaxSpatialBitrate == pSpatialLayer->iSpatialBitrate) {
+        WelsLog (pLogCtx, WELS_LOG_INFO,
+                 "Setting MaxSpatialBitrate (%d) the same at SpatialBitrate (%d) will make the actual bit rate lower than SpatialBitrate",
                  pSpatialLayer->iMaxSpatialBitrate, pSpatialLayer->iSpatialBitrate);
-//       pSpatialLayer->iSpatialBitrate = (int32_t) (pSpatialLayer->iMaxSpatialBitrate/1.1f);
+      }
+      if (pSpatialLayer->iMaxSpatialBitrate < pSpatialLayer->iSpatialBitrate) {
+        WelsLog (pLogCtx, WELS_LOG_WARNING,
+                 "MaxSpatialBitrate (%d) should be lower than SpatialBitrate (%d), considering it as invalid setting, adjust it to be UNSPECIFIED(0)",
+                 pSpatialLayer->iMaxSpatialBitrate, pSpatialLayer->iSpatialBitrate);
+        pSpatialLayer->iMaxSpatialBitrate = 0;
       }
     }
     if (iTotalBitrate > pCfg->iTargetBitrate) {
