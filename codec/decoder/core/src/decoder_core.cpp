@@ -114,8 +114,8 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
     pDstInfo->iBufferStatus = (int32_t) (bFrameCompleteFlag
                                          && pPic->bIsComplete); // When EC disable, ECed picture not output
   else if ((pCtx->eErrorConMethod == ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE
-           || pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE)
-            && pCtx->iErrorCode && bOutResChange)
+            || pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE)
+           && pCtx->iErrorCode && bOutResChange)
     pCtx->bFreezeOutput = true;
 
   if ((pDstInfo->iBufferStatus == 1) && (pCurDq->sLayerInfo.sNalHeaderExt.bIdrFlag)) {
@@ -151,26 +151,12 @@ inline void    HandleReferenceLostL0 (PWelsDecoderContext pCtx, PNalUnit pCurNal
   if (0 == pCurNal->sNalHeaderExt.uiTemporalId) {
     pCtx->bReferenceLostAtT0Flag = true;
   }
-  if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
-#ifndef LONG_TERM_REF
-    if (pCtx->bReferenceLostAtT0Flag) {
-      ResetParameterSetsState (pCtx);
-    }
-#endif
-  }
   pCtx->iErrorCode |= dsBitstreamError;
 }
 
 inline void    HandleReferenceLost (PWelsDecoderContext pCtx, PNalUnit pCurNal) {
   if ((0 == pCurNal->sNalHeaderExt.uiTemporalId) || (1 == pCurNal->sNalHeaderExt.uiTemporalId)) {
     pCtx->bReferenceLostAtT0Flag = true;
-  }
-  if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
-#ifndef LONG_TERM_REF
-    if (pCtx->bReferenceLostAtT0Flag) {
-      ResetParameterSetsState (pCtx);
-    }
-#endif
   }
   pCtx->iErrorCode |= dsRefLost;
 }
@@ -1877,14 +1863,6 @@ void InitCurDqLayerData (PWelsDecoderContext pCtx, PDqLayer pCurDq) {
   }
 }
 
-// added to reset state of parameter sets to waiting successive incoming IDR, 6/4/2010
-// It will be called in case packets lost/ broken and decoded failed at temporal level 0
-void ResetParameterSetsState (PWelsDecoderContext pCtx) {
-  pCtx->bSpsExistAheadFlag	   = false;
-  pCtx->bSubspsExistAheadFlag = false;
-  pCtx->bPpsExistAheadFlag	   = false;
-}
-
 /*
  * DecodeCurrentAccessUnit
  * Decode current access unit when current AU is completed.
@@ -2021,7 +1999,6 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
 #else
               pCtx->bReferenceLostAtT0Flag = true;
 #endif
-              ResetParameterSetsState (pCtx);
               return ERR_INFO_REFERENCE_PIC_LOST;
             }
           }
@@ -2131,7 +2108,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
                                   pCtx->pDec->iLinesize,
                                   pCtx->sExpandPicFunc.pfExpandLumaPicture, pCtx->sExpandPicFunc.pfExpandChromaPicture);
         pCtx->pDec = NULL;
-      } else if (pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR || pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE) {
+      } else if (pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR
+                 || pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE) {
         pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //store latest decoded picture for MV Copy EC
         pCtx->pDec = NULL;
       }
@@ -2164,7 +2142,8 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
         if (pCtx->sLastNalHdrExt.sNalUnitHeader.uiNalRefIdc > 0) {
           pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //save ECed pic for future use
           MarkECFrameAsRef (pCtx);
-        } else if (pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR || pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE) {
+        } else if (pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR
+                   || pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE) {
           pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //save ECed pic for future MV Copy use
         }
       } else {

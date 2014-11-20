@@ -790,6 +790,14 @@ bool CheckSpsActive (PWelsDecoderContext pCtx, PSps pSps) {
     if (pCtx->pActiveLayerSps[i] == pSps)
       return true;
   }
+  // Pre-active, will be used soon
+  if (pSps->iMbWidth > 0  && pSps->iMbHeight > 0 && pCtx->bSpsAvailFlags[pSps->iSpsId]
+      && pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
+    PSps pNextUsedSps =
+      pCtx->pAccessUnitList->pNalUnitsList[pCtx->pAccessUnitList->uiStartPos]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
+    if (pNextUsedSps->iSpsId == pSps->iSpsId)
+      return true;
+  }
   return false;
 }
 
