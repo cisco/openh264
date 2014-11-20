@@ -494,6 +494,20 @@ void WelsEncoderApplyBitRate (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam,
       pLayerParam = & (pParam->sSpatialLayers[i]);
       fRatio = pLayerParam->iSpatialBitrate / (static_cast<float> (iOrigTotalBitrate));
       pLayerParam->iSpatialBitrate = static_cast<int32_t> (pParam->iTargetBitrate * fRatio);
+      if ( UNSPECIFIED_BIT_RATE != pLayerParam->iMaxSpatialBitrate && pLayerParam->iSpatialBitrate > pLayerParam->iMaxSpatialBitrate ) {
+        WelsLog (pLogCtx, WELS_LOG_WARNING,
+                 "WelsEncoderApplyBitRate(), iSpatialBitrate(%d) > iMaxSpatialBitrate(%d) at Layer %d, limiting iSpatialBitrate to iMaxSpatialBitrate!",
+                 pLayerParam->iSpatialBitrate, pLayerParam->iMaxSpatialBitrate, iLayer);
+        pLayerParam->iSpatialBitrate = pLayerParam->iMaxSpatialBitrate;
+      }
+    }
+  } else {
+    SSpatialLayerConfig* pLayerParam = & (pParam->sSpatialLayers[iLayer]);
+    if ( UNSPECIFIED_BIT_RATE != pLayerParam->iMaxSpatialBitrate && pLayerParam->iSpatialBitrate > pLayerParam->iMaxSpatialBitrate ) {
+      WelsLog (pLogCtx, WELS_LOG_WARNING,
+               "WelsEncoderApplyBitRate(), iSpatialBitrate(%d) > iMaxSpatialBitrate(%d) at Layer %d, limiting iSpatialBitrate to iMaxSpatialBitrate!",
+               pLayerParam->iSpatialBitrate, pLayerParam->iMaxSpatialBitrate, iLayer);
+      pLayerParam->iSpatialBitrate = pLayerParam->iMaxSpatialBitrate;
     }
   }
 }
@@ -3005,7 +3019,7 @@ bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pCtx, int32_t iSpatialNum, EVideoFra
   if (pCtx->pSvcParam->bEnableFrameSkip) {
     if ((RC_QUALITY_MODE == pCtx->pSvcParam->iRCMode) || (RC_BITRATE_MODE == pCtx->pSvcParam->iRCMode)) {
       for (int32_t i = 0; i < iSpatialNum; i++) {
-        if (0 == pCtx->pSvcParam->sSpatialLayers[i].iMaxSpatialBitrate) {
+        if (UNSPECIFIED_BIT_RATE == pCtx->pSvcParam->sSpatialLayers[i].iMaxSpatialBitrate) {
           break;
         }
         pCtx->uiDependencyId = (uint8_t) (pSpatialIndexMap + i)->iDid;

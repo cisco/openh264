@@ -136,7 +136,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
     param.iComplexityMode = MEDIUM_COMPLEXITY;
     param.iTargetBitrate			= 0;	// overall target bitrate introduced in RC module
-    param.iMaxBitrate             = MAX_BIT_RATE;
+    param.iMaxBitrate         = UNSPECIFIED_BIT_RATE;
     param.iMultipleThreadIdc		= 1;
 
     param.iLTRRefNum				= 0;
@@ -179,7 +179,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       param.sSpatialLayers[iLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
       param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 1500;
       param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceNum = 1;
-      param.sSpatialLayers[iLayer].iMaxSpatialBitrate = MAX_BIT_RATE;
+      param.sSpatialLayers[iLayer].iMaxSpatialBitrate = UNSPECIFIED_BIT_RATE;
       const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
       for (int32_t idx = 0; idx < kiLesserSliceNum; idx++)
         param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceMbNum[idx] = 960;
