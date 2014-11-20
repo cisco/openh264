@@ -347,7 +347,8 @@ static inline bool WelsGetPaddingOffset (int32_t iActualWidth, int32_t iActualHe
 }
 int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialLayerInternal* pLayerParamInternal,
                      const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame,
-                     const uint32_t kuiSpsId, const bool kbEnableFrameCropping, bool bEnableRc) {
+                     const uint32_t kuiSpsId, const bool kbEnableFrameCropping, bool bEnableRc,
+                     const int32_t kiDlayerCount) {
   memset (pSps, 0, sizeof (SWelsSPS));
 
   pSps->uiSpsId		= kuiSpsId;
@@ -383,6 +384,16 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
     pSps->iLevelIdc = 11;
     pSps->bConstraintSet3Flag = true;
   }
+
+  if (pLayerParam->uiProfileIdc == PRO_BASELINE) {
+    pSps->bConstraintSet0Flag = true;
+  }
+  if (pLayerParam->uiProfileIdc <= PRO_MAIN) {
+    pSps->bConstraintSet1Flag = true;
+  }
+  if (kiDlayerCount > 1) {
+    pSps->bConstraintSet2Flag = true;
+  }
   return 0;
 }
 
@@ -396,7 +407,7 @@ int32_t WelsInitSubsetSps (SSubsetSps* pSubsetSps, SSpatialLayerConfig* pLayerPa
   memset (pSubsetSps, 0, sizeof (SSubsetSps));
 
   WelsInitSps (pSps, pLayerParam, pLayerParamInternal, kuiIntraPeriod, kiNumRefFrame, kuiSpsId, kbEnableFrameCropping,
-               bEnableRc);
+               bEnableRc, 1);
 
   pSps->uiProfileIdc	= (pLayerParam->uiProfileIdc >= PRO_SCALABLE_BASELINE) ? pLayerParam->uiProfileIdc :
                         PRO_SCALABLE_BASELINE;
