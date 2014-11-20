@@ -91,9 +91,7 @@ CVpFrameWork::CVpFrameWork (uint32_t uiThreadsNum, EResult& eReturn) {
   uint32_t uiCPUFlag = WelsCPUFeatureDetect (&iCoreNum);
 
   for (int32_t i = 0; i < MAX_STRATEGY_NUM; i++) {
-    IStrategy* pStrategy = m_pStgChain[i];
-    pStrategy = CreateStrategy (WelsStaticCast (EMethods, i + 1), uiCPUFlag);
-    m_pStgChain[i] = pStrategy;
+    m_pStgChain[i] = CreateStrategy (WelsStaticCast (EMethods, i + 1), uiCPUFlag);
   }
 
   WelsMutexInit (&m_mutes);
