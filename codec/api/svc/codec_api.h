@@ -1,4 +1,6 @@
 /*!
+ *@page License
+ *
  * \copy
  *     Copyright (c)  2013, Cisco Systems
  *     All rights reserved.
@@ -50,73 +52,345 @@ typedef unsigned char bool;
 #define EXTAPI
 #endif
 
+/**
+  * @file codec_api.h
+*/
+
+/**
+  * @page Overview
+  *   * This page is for openh264 codec API usage.
+  *   * For how to use the encoder,please refer to page UsageExampleForEncoder
+  *   * For how to use the decoder,please refer to page UsageExampleForDecoder
+  *   * For more detail about ISVEncoder,please refer to page ISVCEnoder
+  *   * For more detail about ISVDecoder,please refer to page ISVCDecoder
+*/
+
+/**
+  * @page DecoderUsageExample
+  *
+  * @brief
+  *   * An example for using the decoder
+  *
+  * Step 1:decoder declaration
+  * @code
+  *
+  *  //decoder declaration
+  *  ISVCDecoder *pSvcDecoder;
+  *  //input: encoded bitstream start position; should include start code prefix
+  *	 unsigned char *pBuf =...;
+  *  //input: encoded bit stream length; should include the size of start code prefix
+  *	 int iSize =...;
+  *  //output: [0~2] for Y,U,V buffer
+  *	 unsigned char *pData[3] =...;
+  *  //in-out: declare and initialize the output buffer info
+  *  SBufferInfo sDstBufInfo;
+  *	 memset(&sDstBufInfo, 0, sizeof(SBufferInfo));
+  *
+  * @endcode
+  *
+  *	Step 2:decoder creation
+  * @code
+  *  CreateDecoder(pSvcDecoder);
+  * @endcode
+  *
+  *	Step 3:declare required parameter
+  * @code
+  *  SDecodingParam sDecParam = {0};
+  *	 sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_AVC;
+  * @endcode
+  *
+  *	Step 4:initialize the parameter and decoder context, allocate memory
+  * @code
+  *  Initialize(&sDecParam);
+  * @endcode
+  *
+  *	Step 5:do actual decoding process in slice level;
+  *        this can be done in a loop until data ends
+  * @code
+  *  iRet = DecodeFrame2(pBuf, iSize, pData, &sDstBufInfo);
+  *  //decode failed
+  *	 If (iRet != 0){
+  *	     RequestIDR or something like that.
+  *  }
+  *  //pData can be used for render.
+  *  if (sDstBufInfo.iBufferStatus==1){
+  *      output pData[0], pData[1], pData[2];
+  *  }
+  * @endcode
+  *
+  *	Step 6:uninitialize the decoder and memory free
+  * @code
+  *  Uninitialize();
+  * @endcode
+  *
+  *	Step 7:destroy the decoder
+  * @code
+  *  DestroyDecoder();
+  * @endcode
+  *
+*/
+
+/**
+  * @page EncoderUsageExample1
+  *
+  * @brief
+  *  * An example for using encoder with basic parameter
+  *
+  * Step1:setup encoder
+  * @code
+  *  int rv = WelsCreateSVCEncoder (&encoder_);
+  *  ASSERT_EQ (0, rv);
+  *  ASSERT_TRUE (encoder_ != NULL);
+  * @endcode
+  *
+  * Step2:initilize with basic parameter
+  * @code
+  *  SEncParamBase param;
+  *  memset (&param, 0, sizeof (SEncParamBase));
+  *  param.iUsageType = usageType;
+  *  param.fMaxFrameRate = frameRate;
+  *  param.iPicWidth = width;
+  *  param.iPicHeight = height;
+  *  param.iTargetBitrate = 5000000;
+  *  param.iInputCsp = videoFormatI420;
+  *  encoder_->Initialize (&param);
+  * @endcode
+  *
+  * Step3:set option, set option during encoding process
+  * @code
+  *  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &g_LevelSetting);
+  * @endcode
+  *
+  * Step4: encode and  store ouput bistream
+  * @code
+  *  int frameSize = width * height * 3 / 2;
+  *  BufferedData buf;
+  *  buf.SetLength (frameSize);
+  *  ASSERT_TRUE (buf.Length() == (size_t)frameSize);
+  *  SFrameBSInfo info;
+  *  memset (&info, 0, sizeof (SFrameBSInfo));
+  *  SSourcePicture pic;
+  *  memset (&pic, 0, sizeof (SsourcePicture));
+  *  pic.iPicWidth = width;
+  *  pic.iPicHeight = height;
+  *  pic.iColorFormat = videoFormatI420;
+  *  pic.iStride[0] = pic.iPicWidth;
+  *  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
+  *  pic.pData[0] = buf.data();
+  *  pic.pData[1] = pic.pData[0] + width * height;
+  *  pic.pData[2] = pic.pData[1] + (width * height >> 2);
+  *  for(int num = 0;num<total_num;num++) {
+  *     //prepare input data
+  *     rv = encoder_->EncodeFrame (&pic, &info);
+  *     ASSERT_TRUE (rv == cmResultSuccess);
+  *     if (info.eFrameType != videoFrameTypeSkip && cbk != NULL) {
+  *      //output bitstream
+  *     }
+  *  }
+  * @endcode
+  *
+  * Step5:teardown encoder
+  * @code
+  *  if (encoder_) {
+  *      encoder_->Uninitialize();
+  *      WelsDestroySVCEncoder (encoder_);
+  *  }
+  * @endcode
+  *
+  */
+
+/**
+  * @page EncoderUsageExample2
+  *
+  * @brief
+  *     * An example for using the encoder with extension parameter.
+  *     * The same operation on Step 1,3,4,5 with Example-1
+  *
+  * Step 2:initialize with extension parameter
+  * @code
+  *  SEncParamExt param;
+  *  encoder->GetDefaultParams (&param);
+  *  param.iUsageType = usageType;
+  *  param.fMaxFrameRate = frameRate;
+  *  param.iPicWidth = width;
+  *  param.iPicHeight = height;
+  *  param.iTargetBitrate = 5000000;
+  *  param.iInputCsp = videoFormatI420;
+  *  param.bEnableDenoise = denoise;
+  *  param.iSpatialLayerNum = layers;
+  *  //SM_DYN_SLICE don't support multi-thread now
+  *  if (sliceMode != SM_SINGLE_SLICE && sliceMode != SM_DYN_SLICE)
+  *      param.iMultipleThreadIdc = 2;
+  *
+  *  for (int i = 0; i < param.iSpatialLayerNum; i++) {
+  *      param.sSpatialLayers[i].iVideoWidth = width >> (param.iSpatialLayerNum - 1 - i);
+  *      param.sSpatialLayers[i].iVideoHeight = height >> (param.iSpatialLayerNum - 1 - i);
+  *      param.sSpatialLayers[i].fFrameRate = frameRate;
+  *      param.sSpatialLayers[i].iSpatialBitrate = param.iTargetBitrate;
+  *
+  *      param.sSpatialLayers[i].sSliceCfg.uiSliceMode = sliceMode;
+  *      if (sliceMode == SM_DYN_SLICE) {
+  *          param.sSpatialLayers[i].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 600;
+  *          param.uiMaxNalSize = 1500;
+  *      }
+  *  }
+  *  param.iTargetBitrate *= param.iSpatialLayerNum;
+  *  encoder_->InitializeExt (&param);
+  *
+  * @endcode
+  */
+
+
+
+
 #ifdef __cplusplus
+/**
+* @brief Endocder definition
+*/
 class ISVCEncoder {
  public:
-  /*
-   * return: CM_RETURN: 0 - success; otherwise - failed;
-   */
+  /**
+  * @brief  Initialize the encoder
+  * @param  pParam  basic encoder parameter
+  * @return CM_RETURN: 0 - success; otherwise - failed;
+  */
   virtual int EXTAPI Initialize (const SEncParamBase* pParam) = 0;
+
+  /**
+  * @brief  Initilaize encoder by using extension parameters.
+  * @param  pParam  extension parameter for encoder
+  * @return CM_RETURN: 0 - success; otherwise - failed;
+  */
   virtual int EXTAPI InitializeExt (const SEncParamExt* pParam) = 0;
 
+  /**
+  * @brief   Get the default extension parameters.
+  *          If you want to change some parameters of encoder, firstly you need to get the default encoding parameters,
+  *          after that you can change part of parameters you want to.
+  * @param   pParam  extension parameter for encoder
+  * @return  CM_RETURN: 0 - success; otherwise - failed;
+  * */
   virtual int EXTAPI GetDefaultParams (SEncParamExt* pParam) = 0;
-
+  /// uninitialize the encoder
   virtual int EXTAPI Uninitialize() = 0;
 
-  /*
-   * return: 0 - success; otherwise -failed;
-   */
+  /**
+  * @brief Encode one frame
+  * @param kpSrcPic the pointer to the source luminance plane
+  *        chrominance data:
+  *        CbData = kpSrc  +  m_iMaxPicWidth * m_iMaxPicHeight;
+  *        CrData = CbData + (m_iMaxPicWidth * m_iMaxPicHeight)/4;
+  *        the application calling this interface needs to ensure the data validation between the location
+  * @param pBsInfo output bit stream
+  * @return  0 - success; otherwise -failed;
+  */
   virtual int EXTAPI EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo) = 0;
-  /*
-   * return: 0 - success; otherwise - failed;
-   */
+
+  /**
+  * @brief  Encode the parameters from output bit stream
+  * @param  pBsInfo output bit stream
+  * @return 0 - success; otherwise - failed;
+  */
   virtual int EXTAPI EncodeParameterSets (SFrameBSInfo* pBsInfo) = 0;
-  /*
-   * return: 0 - success; otherwise - failed;
-   */
+
+  /**
+  * @brief  Force encoder to encoder frame as IDR if bIDR set as true
+  * @param  bIDR true: force encoder to encode frame as IDR frame;false, return 1 and nothing to do
+  * @return 0 - success; otherwise - failed;
+  */
   virtual int EXTAPI ForceIntraFrame (bool bIDR) = 0;
 
-  /************************************************************************
-   * InDataFormat, IDRInterval, SVC Encode Param, Frame Rate, Bitrate,..
-   ************************************************************************/
-  /*
-   * return: CM_RETURN: 0 - success; otherwise - failed;
-   */
+  /**
+  * @brief   Set option for encoder, detail option type, please refer to enumurate ENCODER_OPTION.
+  * @param   pOption option for encoder such as InDataFormat, IDRInterval, SVC Encode Param, Frame Rate, Bitrate,...
+  * @return  CM_RETURN: 0 - success; otherwise - failed;
+  */
   virtual int EXTAPI SetOption (ENCODER_OPTION eOptionId, void* pOption) = 0;
+
+  /**
+  * @brief   Set option for encoder, detail option type, please refer to enumurate ENCODER_OPTION.
+  * @param   pOption option for encoder such as InDataFormat, IDRInterval, SVC Encode Param, Frame Rate, Bitrate,...
+  * @return  CM_RETURN: 0 - success; otherwise - failed;
+  */
   virtual int EXTAPI GetOption (ENCODER_OPTION eOptionId, void* pOption) = 0;
   virtual ~ISVCEncoder() {}
 };
 
+
+
+/**
+* @brief Decoder definition
+*/
 class ISVCDecoder {
  public:
+
+  /**
+  * @brief  Initilaize decoder
+  * @param  pParam  parameter for decoder
+  * @return 0 - success; otherwise - failed;
+  */
   virtual long EXTAPI Initialize (const SDecodingParam* pParam) = 0;
+
+  /// Uninitialize the decoder
   virtual long EXTAPI Uninitialize() = 0;
 
+  /**
+  * @brief   Decode one frame
+  * @param   pSrc the h264 stream to be decoded
+  * @param   iSrcLen the length of h264 stream
+  * @param   ppDst buffer pointer of decoded data (YUV)
+  * @param   pStride output stride
+  * @param   iWidth output width
+  * @param   iHeight output height
+  * @return  0 - success; otherwise -failed;
+  */
   virtual DECODING_STATE EXTAPI DecodeFrame (const unsigned char* pSrc,
       const int iSrcLen,
       unsigned char** ppDst,
       int* pStride,
       int& iWidth,
       int& iHeight) = 0;
-  /*
-   * return: 0 - success; otherwise -failed;
-   */
+
+  /**
+  * @brief    For slice level DecodeFrame2() (4 parameters input),
+  *           whatever the function return value is, the output data
+  *           of I420 format will only be available when pDstInfo->iBufferStatus == 1,.
+  *           (e.g., in multi-slice cases, only when the whole picture
+  *           is completely reconstructed, this variable would be set equal to 1.)
+  * @param   pSrc the h264 stream to be decoded
+  * @param   iSrcLen the length of h264 stream
+  * @param   ppDst buffer pointer of decoded data (YUV)
+  * @param   pDstInfo information provided to API(width, height, etc.)
+  * @return  0 - success; otherwise -failed;
+  */
   virtual DECODING_STATE EXTAPI DecodeFrame2 (const unsigned char* pSrc,
       const int iSrcLen,
       unsigned char** ppDst,
       SBufferInfo* pDstInfo) = 0;
 
-  /*
-   * This function parse input bitstream only, and rewrite possible SVC syntax to AVC syntax
-   * return: 0 - success; otherwise -failed;
-   */
+  /**
+  * @brief   This function parse input bitstream only, and rewrite possible SVC syntax to AVC syntax
+  * @param   pSrc the h264 stream to be decoded
+  * @param   iSrcLen the length of h264 stream
+  * @param   pDstInfo bit stream info
+  * @return  0 - success; otherwise -failed;
+  */
   virtual DECODING_STATE EXTAPI DecodeParser (const unsigned char* pSrc,
       const int iSrcLen,
       SParserBsInfo* pDstInfo) = 0;
 
-  /*
-   *  this API does not work for now!! This is for future use to support non-I420 color format output.
-   */
+  /**
+  * @brief   This API does not work for now!! This is for future use to support non-I420 color format output.
+  * @param   pSrc the h264 stream to be decoded
+  * @param   iSrcLen the length of h264 stream
+  * @param   pDst buffer pointer of decoded data (YUV)
+  * @param   iDstStride output stride
+  * @param   iDstLen bit stream info
+  * @param   iWidth output width
+  * @param   iHeight output height
+  * @param   iColorFormat output color format
+  * @return  to do ...
+  */
   virtual DECODING_STATE EXTAPI DecodeFrameEx (const unsigned char* pSrc,
       const int iSrcLen,
       unsigned char* pDst,
@@ -126,10 +400,18 @@ class ISVCDecoder {
       int& iHeight,
       int& iColorFormat) = 0;
 
-  /*************************************************************************
-   * OutDataFormat, Eos Flag, EC method, ...
-   *************************************************************************/
+  /**
+  * @brief   Set option for decoder, detail option type, please refer to enumurate DECODER_OPTION.
+  * @param   pOption  option for decoder such as OutDataFormat, Eos Flag, EC method, ...
+  * @return  CM_RETURN: 0 - success; otherwise - failed;
+  */
   virtual long EXTAPI SetOption (DECODER_OPTION eOptionId, void* pOption) = 0;
+
+  /**
+  * @brief   Get option for decoder, detail option type, please refer to enumurate DECODER_OPTION.
+  * @param   pOption  option for decoder such as OutDataFormat, Eos Flag, EC method, ...
+  * @return  CM_RETURN: 0 - success; otherwise - failed;
+  */
   virtual long EXTAPI GetOption (DECODER_OPTION eOptionId, void* pOption) = 0;
   virtual ~ISVCDecoder() {}
 };
@@ -197,11 +479,38 @@ long (*GetOption) (ISVCDecoder*, DECODER_OPTION eOptionId, void* pOption);
 
 typedef void (*WelsTraceCallback) (void* ctx, int level, const char* string);
 
+/** @brief   Create encoder
+ *  @param   ppEncoder encoder
+ *  @return  0 - success; otherwise - failed;
+*/
 int  WelsCreateSVCEncoder (ISVCEncoder** ppEncoder);
+
+
+/** @brief   Destroy encoder
+*   @param   pEncoder encoder
+ *  @return  void
+*/
 void WelsDestroySVCEncoder (ISVCEncoder* pEncoder);
 
+
+/** @brief   Get the capability of decoder
+ *  @param   pDecCapability  decoder capability
+ *  @return  0 - success; otherwise - failed;
+*/
 int WelsGetDecoderCapability (SDecoderCapability* pDecCapability);
+
+
+/** @brief   Create decoder
+ *  @param   ppDecoder decoder
+ *  @return  0 - success; otherwise - failed;
+*/
 long WelsCreateDecoder (ISVCDecoder** ppDecoder);
+
+
+/** @brief   Destroy decoder
+ *  @param   pDecoder  decoder
+ *  @return  void
+*/
 void WelsDestroyDecoder (ISVCDecoder* pDecoder);
 
 #ifdef __cplusplus
