@@ -494,7 +494,8 @@ void WelsEncoderApplyBitRate (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam,
       pLayerParam = & (pParam->sSpatialLayers[i]);
       fRatio = pLayerParam->iSpatialBitrate / (static_cast<float> (iOrigTotalBitrate));
       pLayerParam->iSpatialBitrate = static_cast<int32_t> (pParam->iTargetBitrate * fRatio);
-      if ( UNSPECIFIED_BIT_RATE != pLayerParam->iMaxSpatialBitrate && pLayerParam->iSpatialBitrate > pLayerParam->iMaxSpatialBitrate ) {
+      if (UNSPECIFIED_BIT_RATE != pLayerParam->iMaxSpatialBitrate
+          && pLayerParam->iSpatialBitrate > pLayerParam->iMaxSpatialBitrate) {
         WelsLog (pLogCtx, WELS_LOG_WARNING,
                  "WelsEncoderApplyBitRate(), iSpatialBitrate(%d) > iMaxSpatialBitrate(%d) at Layer %d, limiting iSpatialBitrate to iMaxSpatialBitrate!",
                  pLayerParam->iSpatialBitrate, pLayerParam->iMaxSpatialBitrate, iLayer);
@@ -503,7 +504,8 @@ void WelsEncoderApplyBitRate (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam,
     }
   } else {
     SSpatialLayerConfig* pLayerParam = & (pParam->sSpatialLayers[iLayer]);
-    if ( UNSPECIFIED_BIT_RATE != pLayerParam->iMaxSpatialBitrate && pLayerParam->iSpatialBitrate > pLayerParam->iMaxSpatialBitrate ) {
+    if (UNSPECIFIED_BIT_RATE != pLayerParam->iMaxSpatialBitrate
+        && pLayerParam->iSpatialBitrate > pLayerParam->iMaxSpatialBitrate) {
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "WelsEncoderApplyBitRate(), iSpatialBitrate(%d) > iMaxSpatialBitrate(%d) at Layer %d, limiting iSpatialBitrate to iMaxSpatialBitrate!",
                pLayerParam->iSpatialBitrate, pLayerParam->iMaxSpatialBitrate, iLayer);
@@ -3087,24 +3089,24 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   if (iSpatialNum < 1) {	// skip due to temporal layer settings (different frame rate)
     ++ pCtx->iCodingIndex;
     pFbi->eFrameType = videoFrameTypeSkip;
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld",
-             pSrcPic->uiTimeStamp);
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, Frame type =%d",
+             pSrcPic->uiTimeStamp, pFbi->eFrameType);
     return ENC_RETURN_SUCCESS;
   }
 
   eFrameType = DecideFrameType (pCtx, iSpatialNum);
   if (eFrameType == videoFrameTypeSkip) {
     pFbi->eFrameType = eFrameType;
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld",
-             pSrcPic->uiTimeStamp);
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, Frame type =%d",
+             pSrcPic->uiTimeStamp, pFbi->eFrameType);
     return ENC_RETURN_SUCCESS;
   }
 
   //loop each layer to check if have skip frame when RC and frame skip enable
   if (CheckFrameSkipBasedMaxbr (pCtx, iSpatialNum, eFrameType, pSrcPic->uiTimeStamp)) {
     pFbi->eFrameType = videoFrameTypeSkip;
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld",
-             pSrcPic->uiTimeStamp);
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, Frame type =%d",
+             pSrcPic->uiTimeStamp, pFbi->eFrameType);
     return ENC_RETURN_SUCCESS;
   }
   InitFrameCoding (pCtx, eFrameType);
@@ -3701,8 +3703,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   pFbi->iLayerNum			= iLayerNum;
   pFbi->iSubSeqId = GetSubSequenceId (pCtx, eFrameType);
 
-  WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsEncoderEncodeExt() OutputInfo iLayerNum ＝ %d,iSubSeqId = %d", iLayerNum,
-           pFbi->iSubSeqId);
+  WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsEncoderEncodeExt() OutputInfo iLayerNum ＝ %d,iSubSeqId = %d,iFrameSize = %d",
+           iLayerNum,
+           pFbi->iSubSeqId, iFrameSize);
   for (int32_t i = 0; i < iLayerNum; i++)
     WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsEncoderEncodeExt() OutputInfo iLayerId = %d,iNalType = %d,iNalCount ＝ %d", i,
              pFbi->sLayerInfo[i].uiLayerType, pFbi->sLayerInfo[i].iNalCount);
