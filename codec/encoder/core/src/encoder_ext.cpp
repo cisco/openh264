@@ -763,6 +763,35 @@ void FreeMbCache (SMbCache* pMbCache, CMemoryAlign* pMa) {
   }
 }
 
+int32_t WelsGenerateNewSps (sWelsEncCtx* pCtx, const bool kbUseSubsetSps, const int32_t iDlayerIndex,
+                            const int32_t iDlayerCount, const int32_t kiSpsId,
+                            SWelsSPS*& pSps, SSubsetSps*& pSubsetSps) {
+  int32_t iRet = 0;
+
+  if (!kbUseSubsetSps) {
+    pSps	= & (pCtx->pSpsArray[kiSpsId]);
+  } else {
+    pSubsetSps	= & (pCtx->pSubsetArray[kiSpsId]);
+    pSps			= &pSubsetSps->pSps;
+  }
+
+  SWelsSvcCodingParam* pParam	= pCtx->pSvcParam;
+  SSpatialLayerConfig* pDlayerParam	= &pParam->sSpatialLayers[iDlayerIndex];
+  // Need port pSps/pPps initialization due to spatial scalability changed
+  if (!kbUseSubsetSps) {
+    iRet = WelsInitSps (pSps, pDlayerParam, &pParam->sDependencyLayers[iDlayerIndex], pParam->uiIntraPeriod,
+                        pParam->iMaxNumRefFrame,
+                        kiSpsId, pParam->bEnableFrameCroppingFlag, pParam->iRCMode != RC_OFF_MODE, iDlayerCount);
+
+
+
+  } else {
+    iRet = WelsInitSubsetSps (pSubsetSps, pDlayerParam, &pParam->sDependencyLayers[iDlayerIndex], pParam->uiIntraPeriod,
+                              pParam->iMaxNumRefFrame,
+                              kiSpsId, pParam->bEnableFrameCroppingFlag, pParam->iRCMode != RC_OFF_MODE);
+  }
+  return iRet;
+}
 
 /*!
  * \brief	initialize ppDqLayerList and slicepEncCtx_list due to count number of layers available
@@ -952,35 +981,11 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx) {
     SSpatialLayerConfig* pDlayerParam	= &pParam->sSpatialLayers[iDlayerIndex];
 
     pDqIdc->uiSpatialId	= iDlayerIndex;
+
+    WelsGenerateNewSps (*ppCtx, bUseSubsetSps, iDlayerIndex,
+                        iDlayerCount, iSpsId, pSps, pSubsetSps);
+
     pPps	= & (*ppCtx)->pPPSArray[iPpsId];
-    if (!bUseSubsetSps) {
-      pSps	= & (*ppCtx)->pSpsArray[iSpsId];
-    } else {
-      pSubsetSps	= & (*ppCtx)->pSubsetArray[iSpsId];
-      pSps			= &pSubsetSps->pSps;
-    }
-
-    // Need port pSps/pPps initialization due to spatial scalability changed
-    if (!bUseSubsetSps) {
-      WelsInitSps (pSps, pDlayerParam, &pParam->sDependencyLayers[iDlayerIndex], pParam->uiIntraPeriod,
-                   pParam->iMaxNumRefFrame,
-                   iSpsId, pParam->bEnableFrameCroppingFlag, pParam->iRCMode != RC_OFF_MODE);
-
-      if (pDlayerParam->uiProfileIdc == PRO_BASELINE) {
-        pSps->bConstraintSet0Flag = true;
-      }
-      if (pDlayerParam->uiProfileIdc <= PRO_MAIN) {
-        pSps->bConstraintSet1Flag = true;
-      }
-      if (iDlayerCount > 1) {
-        pSps->bConstraintSet2Flag = true;
-      }
-    } else {
-      WelsInitSubsetSps (pSubsetSps, pDlayerParam, &pParam->sDependencyLayers[iDlayerIndex], pParam->uiIntraPeriod,
-                         pParam->iMaxNumRefFrame,
-                         iSpsId, pParam->bEnableFrameCroppingFlag, pParam->iRCMode != RC_OFF_MODE);
-    }
-
     // initialize pPps
     WelsInitPps (pPps, pSps, pSubsetSps, iPpsId, true, bUseSubsetSps, pParam->iEntropyCodingModeFlag != 0);
 
