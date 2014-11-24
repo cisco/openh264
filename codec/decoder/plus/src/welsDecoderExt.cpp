@@ -197,7 +197,7 @@ long CWelsDecoder::Initialize (const SDecodingParam* pParam) {
   }
 
   // H.264 decoder initialization,including memory allocation,then open it ready to decode
-  iRet = InitDecoder();
+  iRet = InitDecoder (pParam->bParseOnly);
   if (iRet)
     return iRet;
 
@@ -232,16 +232,18 @@ void CWelsDecoder::UninitDecoder (void) {
 }
 
 // the return value of this function is not suitable, it need report failure info to upper layer.
-int32_t CWelsDecoder::InitDecoder (void) {
+int32_t CWelsDecoder::InitDecoder (const bool bParseOnly) {
 
   WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::init_decoder(), openh264 codec version = %s",
            VERSION_NUMBER);
 
+  if (m_pDecContext) //free
+    UninitDecoder();
   m_pDecContext	= (PWelsDecoderContext)WelsMalloc (sizeof (SWelsDecoderContext), "m_pDecContext");
   if (NULL == m_pDecContext)
     return cmMallocMemeError;
 
-  return WelsInitDecoder (m_pDecContext, &m_pWelsTrace->m_sLogCtx);
+  return WelsInitDecoder (m_pDecContext, bParseOnly, &m_pWelsTrace->m_sLogCtx);
 }
 
 /*
@@ -422,7 +424,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
   m_pDecContext->iFeedbackTidInAu             = -1; //initialize
 
   WelsDecodeBs (m_pDecContext, kpSrc, kiSrcLen, ppDst,
-                pDstInfo); //iErrorCode has been modified in this function
+                pDstInfo, NULL); //iErrorCode has been modified in this function
   m_pDecContext->bInstantDecFlag = false; //reset no-delay flag
   if (m_pDecContext->iErrorCode) {
     EWelsNalUnitType eNalType =
@@ -500,7 +502,30 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
     const int kiSrcLen,
     SParserBsInfo* pDstInfo) {
-//TODO, add function here
+  if (CheckBsBuffer (m_pDecContext, kiSrcLen)) {
+    return dsOutOfMemory;
+  }
+  if (kiSrcLen > 0 && kpSrc != NULL) {
+#ifdef OUTPUT_BITSTREAM
+    if (m_pFBS) {
+      WelsFwrite (kpSrc, sizeof (unsigned char), kiSrcLen, m_pFBS);
+      WelsFflush (m_pFBS);
+    }
+#endif//OUTPUT_BIT_STREAM
+    m_pDecContext->bEndOfStreamFlag = false;
+  } else {
+    //For application MODE, the error detection should be added for safe.
+    //But for CONSOLE MODE, when decoding LAST AU, kiSrcLen==0 && kpSrc==NULL.
+    m_pDecContext->bEndOfStreamFlag = true;
+    m_pDecContext->bInstantDecFlag = true;
+  }
+
+  m_pDecContext->iErrorCode = dsErrorFree; //initialize at the starting of AU decoding.
+  m_pDecContext->pParserBsInfo = pDstInfo;
+  pDstInfo->iNalNum = 0;
+  pDstInfo->iSpsWidthInPixel = pDstInfo->iSpsHeightInPixel = 0;
+  WelsDecodeBs (m_pDecContext, kpSrc, kiSrcLen, NULL, NULL, pDstInfo);
+
   return (DECODING_STATE) m_pDecContext->iErrorCode;
 }
 

@@ -5,6 +5,7 @@
 #include "BaseDecoderTest.h"
 #include "BaseEncoderTest.h"
 #include "wels_common_defs.h"
+#include "utils/HashFunctions.h"
 #include <string>
 #include <vector>
 using namespace WelsCommon;
@@ -69,6 +70,8 @@ static void TestOutPutTrace (void* ctx, int level, const char* string) {
 class EncodeDecodeTestBase : public ::testing::TestWithParam<EncodeDecodeFileParamBase>,
   public BaseEncoderTest, public BaseDecoderTest {
  public:
+  uint8_t iRandValue;
+ public:
   virtual void SetUp() {
     BaseEncoderTest::SetUp();
     BaseDecoderTest::SetUp();
@@ -102,6 +105,26 @@ class EncodeDecodeTestBase : public ::testing::TestWithParam<EncodeDecodeFilePar
     }
 
 
+  }
+  virtual void prepareEncDecParam (const EncodeDecodeFileParamBase EncDecFileParam) {
+    //for encoder
+    //I420: 1(Y) + 1/4(U) + 1/4(V)
+    int frameSize = EncDecFileParam.width * EncDecFileParam.height * 3 / 2;
+    buf_.SetLength (frameSize);
+    ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
+    memset (&EncPic, 0, sizeof (SSourcePicture));
+    EncPic.iPicWidth = EncDecFileParam.width;
+    EncPic.iPicHeight = EncDecFileParam.height;
+    EncPic.iColorFormat = videoFormatI420;
+    EncPic.iStride[0] = EncPic.iPicWidth;
+    EncPic.iStride[1] = EncPic.iStride[2] = EncPic.iPicWidth >> 1;
+    EncPic.pData[0] = buf_.data();
+    EncPic.pData[1] = EncPic.pData[0] + EncDecFileParam.width * EncDecFileParam.height;
+    EncPic.pData[2] = EncPic.pData[1] + (EncDecFileParam.width * EncDecFileParam.height >> 2);
+    //for decoder
+    memset (&info, 0, sizeof (SFrameBSInfo));
+    //set a fixed random value
+    iRandValue = rand() % 256;
   }
 
   virtual void encToDecData (const SFrameBSInfo& info, int& len) {
@@ -1983,7 +2006,6 @@ TEST_F (EncodeDecodeTestAPI, Engine_SVC_Switch_P) {
   }
 }
 
-
 TEST_F (EncodeDecodeTestAPI, SetOptionEncParamExt) {
   int iWidth       = (((rand() % MAX_WIDTH) >> 1) + 16) << 1;
   int iHeight      = (((rand() % MAX_HEIGHT) >> 1) + 16) << 1;
@@ -2237,3 +2259,154 @@ TEST_F (DecodeCrashTestAPI, DecoderCrashTest) {
 #endif
 
 }
+
+const uint32_t kiTotalLayer = 3; //DO NOT CHANGE!
+const uint32_t kiSliceNum = 2; //DO NOT CHANGE!
+const uint32_t kiWidth = 160; //DO NOT CHANGE!
+const uint32_t kiHeight = 96; //DO NOT CHANGE!
+const uint32_t kiFrameRate = 12; //DO NOT CHANGE!
+const uint32_t kiFrameNum = 100; //DO NOT CHANGE!
+const uint32_t kiMaxBsSize = 10000000; //DO NOT CHANGE!
+const char* pHashStr[] = { //DO NOT CHANGE!
+  "c58322f886a3ba958c6f60b46b98f67b5d860866",
+  "f2799e1e5f6e33c6274f4e1f6273c721475492d0",
+  "8f0fafeaa2746e04d42fb17104efb61c9dbd1a6f"
+};
+
+class DecodeParseAPI : public EncodeDecodeTestBase {
+ public:
+  void SetUp() {
+    SHA1Reset (&ctx_);
+    EncodeDecodeTestBase::SetUp();
+
+    if (decoder_)
+      decoder_->Uninitialize();
+    SDecodingParam decParam;
+    memset (&decParam, 0, sizeof (SDecodingParam));
+    decParam.eOutputColorFormat = videoFormatI420;
+    decParam.uiTargetDqLayer = UCHAR_MAX;
+    decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
+    decParam.bParseOnly = true;
+    decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
+
+    int rv = decoder_->Initialize (&decParam);
+    ASSERT_EQ (0, rv);
+    memset (&BsInfo_, 0, sizeof (SParserBsInfo));
+    BsInfo_.pDstBuff = NULL;
+    BsInfo_.pDstBuff = new unsigned char [kiMaxBsSize];
+    ASSERT_TRUE (BsInfo_.pDstBuff != NULL);
+    fYuv_ = fopen ("./res/CiscoVT2people_160x96_6fps.yuv", "rb");
+    ASSERT_TRUE (fYuv_ != NULL);
+    iWidth_ = kiWidth;
+    iHeight_ = kiHeight;
+  }
+  void TearDown() {
+    EncodeDecodeTestBase::TearDown();
+    if (BsInfo_.pDstBuff) {
+      delete[] BsInfo_.pDstBuff;
+      BsInfo_.pDstBuff = NULL;
+    }
+    fclose (fYuv_);
+  }
+
+  void prepareEncDecParam (const EncodeDecodeFileParamBase p) {
+    EncodeDecodeTestBase::prepareEncDecParam (p);
+    unsigned char* pTmpPtr = BsInfo_.pDstBuff; //store for restore
+    memset (&BsInfo_, 0, sizeof (SParserBsInfo));
+    BsInfo_.pDstBuff = pTmpPtr;
+  }
+
+  void EncodeOneFrame (int iIdx) {
+    int iFrameSize = iWidth_ * iHeight_ * 3 / 2;
+    int iSize = fread (buf_.data(), sizeof (char), iFrameSize, fYuv_);
+    if (feof (fYuv_) || iSize != iFrameSize) {
+      rewind (fYuv_);
+      iSize = fread (buf_.data(), sizeof (char), iFrameSize, fYuv_);
+      ASSERT_TRUE (iSize == iFrameSize);
+    }
+    int rv = encoder_->EncodeFrame (&EncPic, &info);
+    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  }
+
+ protected:
+  SParserBsInfo BsInfo_;
+  FILE* fYuv_;
+  int iWidth_;
+  int iHeight_;
+  SHA1Context ctx_;
+};
+
+//#define DEBUG_FILE_SAVE
+TEST_F (DecodeParseAPI, ParseOnly_General) {
+  EncodeDecodeFileParamBase p;
+  p.width = iWidth_;
+  p.height = iHeight_;
+  p.frameRate = kiFrameRate;
+  p.numframes = kiFrameNum;
+  prepareParam (kiTotalLayer, kiSliceNum, p.width, p.height, p.frameRate);
+  param_.iSpatialLayerNum = kiTotalLayer;
+  encoder_->Uninitialize();
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == 0);
+  int32_t iTraceLevel = WELS_LOG_QUIET;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  uint32_t uiTargetLayerId = rand() % kiTotalLayer; //run only once
+#ifdef DEBUG_FILE_SAVE
+  FILE* fDec = fopen ("output.264", "wb");
+  FILE* fEnc = fopen ("enc.264", "wb");
+  FILE* fExtract = fopen ("extract.264", "wb");
+#endif
+  if (uiTargetLayerId < kiTotalLayer) { //should always be true
+    //Start for enc
+    int iLen = 0;
+    prepareEncDecParam (p);
+    int iFrame = 0;
+
+    while (iFrame < p.numframes) {
+      //encode
+      EncodeOneFrame (iFrame);
+      //extract target layer data
+      encToDecData (info, iLen);
+#ifdef DEBUG_FILE_SAVE
+      fwrite (info.sLayerInfo[0].pBsBuf, iLen, 1, fEnc);
+#endif
+      ExtractDidNal (&info, iLen, &m_SLostSim, uiTargetLayerId);
+#ifdef DEBUG_FILE_SAVE
+      fwrite (info.sLayerInfo[0].pBsBuf, iLen, 1, fExtract);
+#endif
+      //parseonly
+      //BsInfo_.pDstBuff = new unsigned char [1000000];
+      rv = decoder_->DecodeParser (info.sLayerInfo[0].pBsBuf, iLen, &BsInfo_);
+      EXPECT_TRUE (rv == 0);
+      EXPECT_TRUE (BsInfo_.iNalNum == 0);
+      rv = decoder_->DecodeParser (NULL, 0, &BsInfo_);
+      EXPECT_TRUE (rv == 0);
+      EXPECT_TRUE (BsInfo_.iNalNum != 0);
+      //get final output bs
+      iLen = 0;
+      int i = 0;
+      while (i < BsInfo_.iNalNum) {
+        iLen += BsInfo_.iNalLenInByte[i];
+        i++;
+      }
+#ifdef DEBUG_FILE_SAVE
+      fwrite (BsInfo_.pDstBuff, iLen, 1, fDec);
+#endif
+      SHA1Input (&ctx_, BsInfo_.pDstBuff, iLen);
+      iFrame++;
+    }
+    //calculate final SHA1 value
+    unsigned char digest[SHA_DIGEST_LENGTH];
+    SHA1Result (&ctx_, digest);
+    if (!HasFatalFailure()) {
+      CompareHash (digest, pHashStr[uiTargetLayerId]);
+    }
+  } //while
+#ifdef DEBUG_FILE_SAVE
+  fclose (fEnc);
+  fclose (fExtract);
+  fclose (fDec);
+#endif
+}
+
