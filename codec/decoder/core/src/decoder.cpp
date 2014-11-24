@@ -350,6 +350,9 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
     return iRet;
   pCtx->eErrorConMethod = pCtx->pParam->eEcActiveIdc;
 
+  if (pCtx->bParseOnly) //parse only, disable EC method
+    pCtx->eErrorConMethod = ERROR_CON_DISABLE;
+
   if (VIDEO_BITSTREAM_SVC == pCtx->pParam->sVideoProperty.eVideoBsType ||
       VIDEO_BITSTREAM_AVC == pCtx->pParam->sVideoProperty.eVideoBsType) {
     pCtx->eVideoType = pCtx->pParam->sVideoProperty.eVideoBsType;
@@ -374,7 +377,7 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
  * \note	N/A
  *************************************************************************************
  */
-int32_t WelsInitDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
+int32_t WelsInitDecoder (PWelsDecoderContext pCtx, const bool bParseOnly, SLogContext* pLogCtx) {
   if (pCtx == NULL) {
     return ERR_INFO_INVALID_PTR;
   }
@@ -382,6 +385,7 @@ int32_t WelsInitDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   // default
   WelsDecoderDefaults (pCtx, pLogCtx);
 
+  pCtx->bParseOnly = bParseOnly;
   // open decoder
   return WelsOpenDecoder (pCtx);
 }
@@ -427,9 +431,10 @@ void GetVclNalTemporalId (PWelsDecoderContext pCtx) {
  *************************************************************************************
  */
 int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const int32_t kiBsLen,
-                      uint8_t** ppDst, SBufferInfo* pDstBufInfo) {
+                      uint8_t** ppDst, SBufferInfo* pDstBufInfo, SParserBsInfo* pDstBsInfo) {
   if (!pCtx->bEndOfStreamFlag) {
     SDataBuffer* pRawData   = &pCtx->sRawData;
+    SDataBuffer* pSavedData = NULL;
 
     int32_t iSrcIdx        = 0; //the index of source bit-stream till now after parsing one or more NALs
     int32_t iSrcConsumed   = 0; // consumed bit count of source bs
@@ -457,7 +462,12 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
       pRawData->pCurPos = pRawData->pHead;
     }
 
-
+    if (pCtx->bParseOnly) {
+      pSavedData = &pCtx->sSavedData;
+      if ((kiBsLen + 4) > (pSavedData->pEnd - pSavedData->pCurPos)) {
+        pSavedData->pCurPos = pSavedData->pHead;
+      }
+    }
     //copy raw data from source buffer (application) to raw data buffer (codec inside)
     //0x03 removal and extract all of NAL Unit from current raw data
     pDstNal = pRawData->pCurPos;
@@ -481,7 +491,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
             CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
           }
           if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType) && pNalPayload) {
-            iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes);
+            iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes, pSrcNal - 3, iSrcIdx + 3);
           }
           if (pCtx->bAuReadyFlag) {
             ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
@@ -542,7 +552,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
       CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
     }
     if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType) && pNalPayload) {
-      iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes);
+      iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes, pSrcNal - 3, iSrcIdx + 3);
     }
     if (pCtx->bAuReadyFlag) {
       ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);

@@ -256,6 +256,8 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
 
   pCtx->pDec->uiQualityId = pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.uiQualityId;
   pCtx->pDec->uiTemporalId = pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.uiTemporalId;
+  pCtx->pDec->iSpsId = pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iSpsId;
+  pCtx->pDec->iPpsId = pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iPpsId;
 
   for (j = pCurAU->uiStartPos; j <= pCurAU->uiEndPos; j++) {
     if (pCurAU->pNalUnitsList[j]->sNalHeaderExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_IDR

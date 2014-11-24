@@ -88,21 +88,23 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
 
   pCtx->iTotalNumMbRec = 0;
 
-  //////output:::normal path
-  ppDst[0]      = pPic->pData[0];
-  ppDst[1]      = pPic->pData[1];
-  ppDst[2]      = pPic->pData[2];
+  if (!pCtx->bParseOnly) {
+    //////output:::normal path
+    ppDst[0]      = pPic->pData[0];
+    ppDst[1]      = pPic->pData[1];
+    ppDst[2]      = pPic->pData[2];
 
-  pDstInfo->UsrData.sSystemBuffer.iFormat = videoFormatI420;
+    pDstInfo->UsrData.sSystemBuffer.iFormat = videoFormatI420;
 
-  pDstInfo->UsrData.sSystemBuffer.iWidth = kiWidth - (pCtx->sFrameCrop.iLeftOffset + pCtx->sFrameCrop.iRightOffset) * 2;
-  pDstInfo->UsrData.sSystemBuffer.iHeight = kiHeight - (pCtx->sFrameCrop.iTopOffset + pCtx->sFrameCrop.iBottomOffset) * 2;
-  pDstInfo->UsrData.sSystemBuffer.iStride[0] = pPic->iLinesize[0];
-  pDstInfo->UsrData.sSystemBuffer.iStride[1] = pPic->iLinesize[1];
-  ppDst[0] = ppDst[0] + pCtx->sFrameCrop.iTopOffset * 2 * pPic->iLinesize[0] + pCtx->sFrameCrop.iLeftOffset * 2;
-  ppDst[1] = ppDst[1] + pCtx->sFrameCrop.iTopOffset  * pPic->iLinesize[1] + pCtx->sFrameCrop.iLeftOffset;
-  ppDst[2] = ppDst[2] + pCtx->sFrameCrop.iTopOffset  * pPic->iLinesize[1] + pCtx->sFrameCrop.iLeftOffset;
-  pDstInfo->iBufferStatus = 1;
+    pDstInfo->UsrData.sSystemBuffer.iWidth = kiWidth - (pCtx->sFrameCrop.iLeftOffset + pCtx->sFrameCrop.iRightOffset) * 2;
+    pDstInfo->UsrData.sSystemBuffer.iHeight = kiHeight - (pCtx->sFrameCrop.iTopOffset + pCtx->sFrameCrop.iBottomOffset) * 2;
+    pDstInfo->UsrData.sSystemBuffer.iStride[0] = pPic->iLinesize[0];
+    pDstInfo->UsrData.sSystemBuffer.iStride[1] = pPic->iLinesize[1];
+    ppDst[0] = ppDst[0] + pCtx->sFrameCrop.iTopOffset * 2 * pPic->iLinesize[0] + pCtx->sFrameCrop.iLeftOffset * 2;
+    ppDst[1] = ppDst[1] + pCtx->sFrameCrop.iTopOffset  * pPic->iLinesize[1] + pCtx->sFrameCrop.iLeftOffset;
+    ppDst[2] = ppDst[2] + pCtx->sFrameCrop.iTopOffset  * pPic->iLinesize[1] + pCtx->sFrameCrop.iLeftOffset;
+    pDstInfo->iBufferStatus = 1;
+  }
 
   bool bOutResChange = (pCtx->iLastImgWidthInPixel != pDstInfo->UsrData.sSystemBuffer.iWidth)
                        || (pCtx->iLastImgHeightInPixel != pDstInfo->UsrData.sSystemBuffer.iHeight);
@@ -113,7 +115,6 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
                                          && pPic->bIsComplete); // When EC disable, ECed picture not output
   else if (pCtx->eErrorConMethod == ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE && pCtx->iErrorCode && bOutResChange)
     pCtx->bFreezeOutput = true;
-
 
   if ((pDstInfo->iBufferStatus == 1) && (pCurDq->sLayerInfo.sNalHeaderExt.bIdrFlag)) {
     if (pPic->bIsComplete)
@@ -331,6 +332,14 @@ int32_t InitBsBuffer (PWelsDecoderContext pCtx) {
   }
   pCtx->sRawData.pStartPos = pCtx->sRawData.pCurPos = pCtx->sRawData.pHead;
   pCtx->sRawData.pEnd = pCtx->sRawData.pHead + pCtx->iMaxBsBufferSizeInByte;
+  if (pCtx->bParseOnly) {
+    if ((pCtx->sSavedData.pHead = static_cast<uint8_t*> (WelsMalloc (pCtx->iMaxBsBufferSizeInByte,
+                                  "pCtx->sSavedData.pHead"))) == NULL) {
+      return ERR_INFO_OUT_OF_MEMORY;
+    }
+    pCtx->sSavedData.pStartPos = pCtx->sSavedData.pCurPos = pCtx->sSavedData.pHead;
+    pCtx->sSavedData.pEnd = pCtx->sSavedData.pHead + pCtx->iMaxBsBufferSizeInByte;
+  }
   return ERR_NONE;
 }
 
@@ -434,6 +443,13 @@ void WelsFreeMemory (PWelsDecoderContext pCtx) {
   pCtx->sRawData.pEnd                 = NULL;
   pCtx->sRawData.pStartPos	        = NULL;
   pCtx->sRawData.pCurPos             = NULL;
+  if (pCtx->sSavedData.pHead) {
+    WelsFree (pCtx->sSavedData.pHead, "pCtx->sSavedData->pHead");
+  }
+  pCtx->sSavedData.pHead                = NULL;
+  pCtx->sSavedData.pEnd                 = NULL;
+  pCtx->sSavedData.pStartPos	        = NULL;
+  pCtx->sSavedData.pCurPos              = NULL;
 }
 
 /*
@@ -1692,7 +1708,8 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
 
   if (ERR_NONE != iErr) {
     ForceResetCurrentAccessUnit (pCtx->pAccessUnitList);
-    pDstInfo->iBufferStatus = 0;
+    if (!pCtx->bParseOnly)
+      pDstInfo->iBufferStatus = 0;
     return iErr;
   }
 
@@ -1712,6 +1729,53 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
 
 
   iErr = DecodeCurrentAccessUnit (pCtx, ppDst, pDstInfo);
+
+  if (pCtx->bParseOnly) {
+    if (dsErrorFree == pCtx->iErrorCode) {
+      SParserBsInfo* pParser = pCtx->pParserBsInfo;
+      uint8_t* pDstBuf = pParser->pDstBuff;
+      SNalUnit* pCurNal = NULL;
+      int32_t iNalLen = 0;
+      int32_t iIdx = pCurAu->uiStartPos;
+      int32_t iEndIdx = pCurAu->uiEndPos;
+      uint8_t* pNalBs = NULL;
+
+      pParser->iNalNum = 0;
+      pParser->iSpsWidthInPixel = (pCtx->pSps->iMbWidth << 4);
+      pParser->iSpsHeightInPixel = (pCtx->pSps->iMbHeight << 4);
+
+      if (pCurAu->pNalUnitsList [iIdx]->sNalHeaderExt.bIdrFlag) { //IDR
+        bool bSubSps = (NAL_UNIT_CODED_SLICE_EXT == pCurAu->pNalUnitsList [iIdx]->sNalHeaderExt.sNalUnitHeader.eNalUnitType);
+        SSpsBsInfo* pSpsBs = NULL;
+        SPpsBsInfo* pPpsBs = NULL;
+        int32_t iSpsId = pCtx->pSps->iSpsId;
+        int32_t iPpsId = pCtx->pPps->iPpsId;
+        pCtx->bParamSetsLostFlag = false;
+        //find required sps, pps and write into dst buff
+        pSpsBs = bSubSps ? &pCtx->sSubsetSpsBsInfo [iSpsId] : &pCtx->sSpsBsInfo [iSpsId];
+        memcpy (pDstBuf, pSpsBs->pSpsBsBuf, pSpsBs->uiSpsBsLen);
+        pParser->iNalLenInByte [pParser->iNalNum ++] = pSpsBs->uiSpsBsLen;
+        pDstBuf += pSpsBs->uiSpsBsLen;
+        pPpsBs = &pCtx->sPpsBsInfo [iPpsId];
+        memcpy (pDstBuf, pPpsBs->pPpsBsBuf, pPpsBs->uiPpsBsLen);
+        pParser->iNalLenInByte [pParser->iNalNum ++] = pPpsBs->uiPpsBsLen;
+        pDstBuf += pPpsBs->uiPpsBsLen;
+      } //IDR required SPS, PPS
+      //then VCL data re-write
+      while (iIdx <= iEndIdx) {
+        pCurNal = pCurAu->pNalUnitsList [iIdx ++];
+        iNalLen = pCurNal->sNalData.sVclNal.iNalLength;
+        pNalBs = pCurNal->sNalData.sVclNal.pNalPos;
+        pParser->iNalLenInByte [pParser->iNalNum ++] = iNalLen;
+        memcpy (pDstBuf, pNalBs, iNalLen);
+        pDstBuf += iNalLen;
+      }
+    } else { //error
+      pCtx->pParserBsInfo->iNalNum = 0;
+      pCtx->pParserBsInfo->iSpsWidthInPixel = 0;
+      pCtx->pParserBsInfo->iSpsHeightInPixel = 0;
+    }
+  }
 
   WelsDecodeAccessUnitEnd (pCtx);
 
@@ -1985,10 +2049,13 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
             return iRet;
           }
         }
-        if (bReconstructSlice)	{
-          if (WelsDecodeConstructSlice (pCtx, pNalCur)) {
-            pCtx->pDec->bIsComplete = false; // reconstruction error, directly set the flag false
-            return -1;
+
+        if (!pCtx->bParseOnly) {
+          if (bReconstructSlice) {
+            if (WelsDecodeConstructSlice (pCtx, pNalCur)) {
+              pCtx->pDec->bIsComplete = false; // reconstruction error, directly set the flag false
+              return -1;
+            }
           }
         }
         if (bAllRefComplete && (pCtx->sRefPic.uiRefCount[LIST_0] > 0 || pCtx->eSliceType != I_SLICE)) {
@@ -2031,20 +2098,21 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
 #endif//#if !CODEC_FOR_TESTBED
 
     if (dq_cur->uiLayerDqId == kuiTargetLayerDqId) {
-      if (!pCtx->bInstantDecFlag) {
-        //Do error concealment here
-        if ((NeedErrorCon (pCtx)) && (pCtx->eErrorConMethod != ERROR_CON_DISABLE)) {
-          ImplementErrorCon (pCtx);
-          pCtx->iTotalNumMbRec = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
-          pCtx->pDec->iSpsId = pCtx->pSps->iSpsId;
-          pCtx->pDec->iPpsId = pCtx->pPps->iPpsId;
+      if (!pCtx->bParseOnly) {
+        if (!pCtx->bInstantDecFlag) {
+          //Do error concealment here
+          if ((NeedErrorCon (pCtx)) && (pCtx->eErrorConMethod != ERROR_CON_DISABLE)) {
+            ImplementErrorCon (pCtx);
+            pCtx->iTotalNumMbRec = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
+            pCtx->pDec->iSpsId = pCtx->pSps->iSpsId;
+            pCtx->pDec->iPpsId = pCtx->pPps->iPpsId;
+          }
+        }
+
+        if (DecodeFrameConstruction (pCtx, ppDst, pDstInfo)) {
+          return ERR_NONE;
         }
       }
-
-      if (DecodeFrameConstruction (pCtx, ppDst, pDstInfo)) {
-        return ERR_NONE;
-      }
-
       if (uiNalRefIdc > 0) {
         pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //store latest decoded picture for EC
         iRet = WelsMarkAsRef (pCtx);

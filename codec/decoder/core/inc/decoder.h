@@ -68,7 +68,7 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
  * \note	N/A
  *************************************************************************************
  */
-int32_t WelsInitDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx);
+int32_t WelsInitDecoder (PWelsDecoderContext pCtx, const bool bParseOnly, SLogContext* pLogCtx);
 
 /*!
  *************************************************************************************
@@ -101,7 +101,7 @@ void WelsEndDecoder (PWelsDecoderContext pCtx);
  */
 
 int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const int32_t kiBsLen,
-                      uint8_t** ppDst, SBufferInfo* pDstBufInfo);
+                      uint8_t** ppDst, SBufferInfo* pDstBufInfo, SParserBsInfo* pDstBsInfo);
 
 /*
  *	request memory blocks for decoder avc part

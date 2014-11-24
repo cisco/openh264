@@ -457,6 +457,7 @@ typedef struct TagSVCDecodingParam {
   unsigned char	uiTargetDqLayer;       ///< setting target dq layer id
 
   ERROR_CON_IDC eEcActiveIdc;          ///< whether active error concealment feature in decoder
+  bool bParseOnly;                     ///< decoder for parse only, no reconstruction
 
   SVideoProperty   sVideoProperty;    ///< video stream property
 } SDecodingParam, *PDecodingParam;
@@ -574,7 +575,7 @@ typedef struct TagParserBsInfo {
   unsigned char* pDstBuff;                     ///< outputted dst buffer for parsed bitstream
   int iSpsWidthInPixel;                        ///< required SPS width info
   int iSpsHeightInPixel;                       ///< required SPS height info
-} SParserBsInfo, PParserBsInfo;
+} SParserBsInfo, *PParserBsInfo;
 
 /**
 * @brief Structure for encoder statistics
