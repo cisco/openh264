@@ -58,6 +58,7 @@ typedef struct TagLevelLimits {
   int16_t iMaxMvsPer2Mb; // Max number of motion vectors per two consecutive MBs
 } SLevelLimits;
 
+#define CpbBrNalFactor 1200  //baseline,main,and extended profiles.
 extern const SLevelLimits g_ksLevelLimits[LEVEL_NUMBER];
 extern const uint8_t g_kuiMbCountScan4Idx[24];
 extern const uint8_t g_kuiCache30ScanIdx[16];
