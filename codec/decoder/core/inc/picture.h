@@ -50,6 +50,9 @@ int32_t		iLinesize[4];// linesize of picture planes respectively used currently
 int32_t		iPlanes;			// How many planes are introduced due to color space format?
 // picture information
 
+/*******************************from EC mv copy****************************/
+bool bIdrFlag;
+
 /*******************************from other standard syntax****************************/
 /*from sps*/
 int32_t		iWidthInPixel;	// picture width in pixel

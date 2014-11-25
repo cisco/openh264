@@ -40,6 +40,7 @@
  *****************************************************************************/
 
 #include "manage_dec_ref.h"
+#include "error_concealment.h"
 #include "error_code.h"
 
 namespace WelsDec {
@@ -67,7 +68,7 @@ static void SetUnRef (PPicture pRef) {
     pRef->bUsedAsRef = false;
     pRef->bIsLongRef = false;
     pRef->iFrameNum = -1;
-    pRef->iFramePoc = 0;
+    //pRef->iFramePoc = 0;
     pRef->iLongTermFrameIdx = -1;
     pRef->uiQualityId = -1;
     pRef->uiTemporalId = -1;
@@ -121,10 +122,13 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
         pCtx->iErrorCode |= dsDataErrorConcealed;
         bool bCopyPrevious = ((ERROR_CON_FRAME_COPY_CROSS_IDR == pCtx->eErrorConMethod)
                               || (ERROR_CON_SLICE_COPY_CROSS_IDR == pCtx->eErrorConMethod)
-                              || (ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE == pCtx->eErrorConMethod))
-                             && (NULL != pCtx->pPreviousDecodedPictureInDpb);
+                              || (ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE == pCtx->eErrorConMethod)
+                              || (ERROR_CON_SLICE_MV_COPY_CROSS_IDR == pCtx->eErrorConMethod)
+                              || (ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE == pCtx->eErrorConMethod))
+                              && (NULL != pCtx->pPreviousDecodedPictureInDpb);
         bCopyPrevious = bCopyPrevious && (pRef->iWidthInPixel == pCtx->pPreviousDecodedPictureInDpb->iWidthInPixel)
                         && (pRef->iHeightInPixel == pCtx->pPreviousDecodedPictureInDpb->iHeightInPixel);
+
         if (bCopyPrevious) {
           memcpy (pRef->pData[0], pCtx->pPreviousDecodedPictureInDpb->pData[0], pRef->iLinesize[0] * pRef->iHeightInPixel);
           memcpy (pRef->pData[1], pCtx->pPreviousDecodedPictureInDpb->pData[1], pRef->iLinesize[1] * pRef->iHeightInPixel / 2);

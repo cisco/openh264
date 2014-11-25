@@ -53,7 +53,6 @@ int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx); //construction b
 
 int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNalUnit pNalCur);
 
-
 int32_t WelsTargetMbConstruction (PWelsDecoderContext pCtx);
 
 int32_t WelsMbIntraPredictionConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer, bool bOutput);

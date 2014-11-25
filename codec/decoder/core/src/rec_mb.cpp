@@ -164,24 +164,7 @@ int32_t RecI16x16Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLe
   return ERR_NONE;
 }
 
-typedef struct TagMCRefMember {
-  uint8_t* pDstY;
-  uint8_t* pDstU;
-  uint8_t* pDstV;
 
-  uint8_t* pSrcY;
-  uint8_t* pSrcU;
-  uint8_t* pSrcV;
-
-  int32_t iSrcLineLuma;
-  int32_t iSrcLineChroma;
-
-  int32_t iDstLineLuma;
-  int32_t iDstLineChroma;
-
-  int32_t iPicWidth;
-  int32_t iPicHeight;
-} sMCRefMember;
 //according to current 8*8 block ref_index to gain reference picture
 static inline void GetRefPic (sMCRefMember* pMCRefMem, PWelsDecoderContext pCtx, int8_t* pRefIdxList,
                               int32_t iIndex) {
@@ -202,7 +185,7 @@ static inline void GetRefPic (sMCRefMember* pMCRefMem, PWelsDecoderContext pCtx,
 #ifndef MC_FLOW_SIMPLE_JUDGE
 #define MC_FLOW_SIMPLE_JUDGE 1
 #endif //MC_FLOW_SIMPLE_JUDGE
-static inline void BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t iYOffset, SMcFunc* pMCFunc,
+void BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t iYOffset, SMcFunc* pMCFunc,
                            int32_t iBlkWidth, int32_t iBlkHeight, int16_t iMVs[2]) {
   int32_t iFullMVx = (iXOffset << 2) + iMVs[0]; //quarter pixel
   int32_t iFullMVy = (iYOffset << 2) + iMVs[1];
