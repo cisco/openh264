@@ -69,7 +69,7 @@ typedef unsigned char bool;
   * @page DecoderUsageExample
   *
   * @brief
-  *   * An example for using the decoder
+  *   * An example for using the decoder for Decoding only or Parsing only
   *
   * Step 1:decoder declaration
   * @code
@@ -80,11 +80,15 @@ typedef unsigned char bool;
   *	 unsigned char *pBuf =...;
   *  //input: encoded bit stream length; should include the size of start code prefix
   *	 int iSize =...;
-  *  //output: [0~2] for Y,U,V buffer
+  *  //output: [0~2] for Y,U,V buffer for Decoding only
   *	 unsigned char *pData[3] =...;
-  *  //in-out: declare and initialize the output buffer info
+  *  //in-out: for Decoding only: declare and initialize the output buffer info, this should never co-exist with Parsing only
   *  SBufferInfo sDstBufInfo;
   *	 memset(&sDstBufInfo, 0, sizeof(SBufferInfo));
+  *  //in-out: for Parsing only: declare and initialize the output bitstream buffer info for parse only, this should never co-exist with Decoding only
+  *  SParserBsInfo sDstParseInfo;
+  *      memset(&sDstParseInfo, 0, sizeof(SParserBsInfo));
+  *      sDstParseInfo.pDstBuff = new unsigned char[PARSE_SIZE]; //In Parsing only, allocate enough buffer to save transcoded bitstream for a frame
   *
   * @endcode
   *
@@ -93,10 +97,12 @@ typedef unsigned char bool;
   *  CreateDecoder(pSvcDecoder);
   * @endcode
   *
-  *	Step 3:declare required parameter
+  *	Step 3:declare required parameter, used to differentiate Decoding only and Parsing only
   * @code
   *  SDecodingParam sDecParam = {0};
   *	 sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_AVC;
+  *  //for Parsing only, the assignment is mandatory
+  *  sDecParam.bParseOnly = true;
   * @endcode
   *
   *	Step 4:initialize the parameter and decoder context, allocate memory
@@ -107,15 +113,25 @@ typedef unsigned char bool;
   *	Step 5:do actual decoding process in slice level;
   *        this can be done in a loop until data ends
   * @code
+  *  //for Decoding only
   *  iRet = DecodeFrame2(pBuf, iSize, pData, &sDstBufInfo);
+  *  //for Parsing only
+  *  iRet = DecodeParser(pBuf, iSize, &sDstParseInfo);
   *  //decode failed
   *	 If (iRet != 0){
   *	     RequestIDR or something like that.
   *  }
-  *  //pData can be used for render.
+  *  //for Decoding only, pData can be used for render.
   *  if (sDstBufInfo.iBufferStatus==1){
   *      output pData[0], pData[1], pData[2];
   *  }
+  * //for Parsing only, sDstParseInfo can be used for, e.g., HW decoding
+  *  if (sDstBufInfo.iBufferStatus==1){
+  *      Hardware decoding sDstParseInfo;
+  *  }
+  *  //no-delay decoding can be realized by directly calling decoder again with NULL input, as in the following. In this case, decoder would immediately reconstruct the input data. This can also be used similarly for Parsing only. Consequent decoding error and output indication should also be considered as above.
+  *  iRet = DecodeFrame2(NULL, 0, pData, &sDstBufInfo);
+  *  judge iRet, sDstBufInfo.iBufferStatus ...
   * @endcode
   *
   *	Step 6:uninitialize the decoder and memory free
