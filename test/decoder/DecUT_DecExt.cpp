@@ -211,6 +211,7 @@ void DecoderInterfaceTest::TestInitUninit() {
   }
   //Initialize first, can get input color format
   m_sDecParam.eOutputColorFormat = (EVideoFormatType) 20; //just for test
+  m_sDecParam.bParseOnly = false;
   m_pDec->Initialize (&m_sDecParam);
   eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_DATAFORMAT, &iOutput);
   EXPECT_EQ (eRet, cmResultSuccess);
