@@ -208,45 +208,50 @@ TEST_F (EncoderInterfaceTest, EncoderAdditionalOptionSetTest) {
   iResult = pPtrEnc->SetOption (eOptionId, &sInfo);
   if (sInfo.iBitrate <= 0)
     EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
-  else {
-    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-    sReturn.iLayer = static_cast<LAYER_NUM> (pParamExt->iSpatialLayerNum);
-    iResult = pPtrEnc->GetOption (eOptionId, &sReturn);
-    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-    EXPECT_EQ (WELS_CLIP3 (sInfo.iBitrate, 1, 2147483647), sReturn.iBitrate);
-  }
-  PrepareOneSrcFrame();
-  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  pSrcPic->uiTimeStamp += 30;
-
-  eOptionId = ENCODER_OPTION_MAX_BITRATE;
-  sInfo.iBitrate = rand() % 100000 - 100;
-  sInfo.iLayer = static_cast<LAYER_NUM> (pParamExt->iSpatialLayerNum);
-  iResult = pPtrEnc->SetOption (eOptionId, &sInfo);
-  if (sInfo.iBitrate <= 0)
+  else if (sInfo.iBitrate > pParam->sSpatialLayers[sInfo.iLayer].iMaxSpatialBitrate)
     EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
-  else {
-    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-    sReturn.iLayer = static_cast<LAYER_NUM> (pParamExt->iSpatialLayerNum);
-    iResult = pPtrEnc->GetOption (eOptionId, &sReturn);
-    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-    EXPECT_EQ (WELS_CLIP3 (sInfo.iBitrate, 1, 2147483647), sReturn.iBitrate);
-  }
-  PrepareOneSrcFrame();
-  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+}
+else {
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  pSrcPic->uiTimeStamp += 30;
+  sReturn.iLayer = static_cast<LAYER_NUM> (pParamExt->iSpatialLayerNum);
+  iResult = pPtrEnc->GetOption (eOptionId, &sReturn);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  EXPECT_EQ (WELS_CLIP3 (sInfo.iBitrate, 1, 2147483647), sReturn.iBitrate);
+}
+PrepareOneSrcFrame();
+iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+pSrcPic->uiTimeStamp += 30;
 
-  eOptionId = ENCODER_OPTION_RC_MODE;
-  iValue = (rand() % 4) - 1;
-  iResult = pPtrEnc->SetOption (eOptionId, &iValue);
+eOptionId = ENCODER_OPTION_MAX_BITRATE;
+sInfo.iBitrate = rand() % 100000 - 100;
+sInfo.iLayer = static_cast<LAYER_NUM> (pParamExt->iSpatialLayerNum);
+iResult = pPtrEnc->SetOption (eOptionId, &sInfo);
+if (sInfo.iBitrate <= 0)
+  EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
+else if (sInfo.iBitrate < pParam->sSpatialLayers[sInfo.iLayer].iSpatialBitrate) {
+  EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
+} else {
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  sReturn.iLayer = static_cast<LAYER_NUM> (pParamExt->iSpatialLayerNum);
+  iResult = pPtrEnc->GetOption (eOptionId, &sReturn);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  EXPECT_EQ (WELS_CLIP3 (sInfo.iBitrate, 1, 2147483647), sReturn.iBitrate);
+}
+PrepareOneSrcFrame();
+iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+pSrcPic->uiTimeStamp += 30;
 
-  PrepareOneSrcFrame();
-  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  pSrcPic->uiTimeStamp += 30;
+eOptionId = ENCODER_OPTION_RC_MODE;
+iValue = (rand() % 4) - 1;
+iResult = pPtrEnc->SetOption (eOptionId, &iValue);
+EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+
+PrepareOneSrcFrame();
+iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+pSrcPic->uiTimeStamp += 30;
 }
 
 TEST_F (EncoderInterfaceTest, TemporalLayerSettingTest) {
