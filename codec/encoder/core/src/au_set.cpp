@@ -73,7 +73,19 @@ static inline int32_t WelsCheckLevelLimitation (const SWelsSPS* kpSps, const SLe
   return 1;
 
 }
-
+int32_t WelsAdjustLevel (SSpatialLayerConfig* pSpatialLayer) {
+  int32_t iLevel = (int32_t)pSpatialLayer->uiLevelIdc;
+  int32_t iMaxBitrate = pSpatialLayer->iMaxSpatialBitrate;
+  while (iLevel <= LEVEL_5_2) {
+    int32_t iLevelMaxBitrate = g_ksLevelLimits[pSpatialLayer->uiLevelIdc - 1].uiMaxBR * CpbBrNalFactor;
+    if (iMaxBitrate < iLevelMaxBitrate) {
+      pSpatialLayer->uiLevelIdc = (ELevelIdc)iLevel;
+      return 0;
+    }
+    iLevel++;
+  }
+  return 1;
+}
 int32_t WelsCheckRefFrameLimitation (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam) {
   int32_t i = 0;
   int32_t iRefFrame = 1;
