@@ -400,6 +400,8 @@ SWelsCabacCtx   pCabacCtx[WELS_CONTEXT_COUNT];
 PWelsCabacDecEngine   pCabacDecEngine;
 double dDecTime;
 SDecoderStatistics sDecoderStatistics;// For real time debugging
+int32_t iECMVs[16][2];
+PPicture pECRefPic[16];
 } SWelsDecoderContext, *PWelsDecoderContext;
 
 static inline void ResetActiveSPSForEachLayer (PWelsDecoderContext pCtx) {

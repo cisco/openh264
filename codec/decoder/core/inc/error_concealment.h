@@ -39,6 +39,7 @@
 #ifndef WELS_ERROR_CONCEALMENT_H__
 #define WELS_ERROR_CONCEALMENT_H__
 #include "typedefs.h"
+#include "rec_mb.h"
 #include "decoder_context.h"
 
 namespace WelsDec {
@@ -48,6 +49,10 @@ void InitErrorCon (PWelsDecoderContext pCtx);
 void DoErrorConFrameCopy (PWelsDecoderContext pCtx);
 //Do error concealment using slice copy method
 void DoErrorConSliceCopy (PWelsDecoderContext pCtx);
+//Do error concealment using slice MV copy method
+void DoMbECMvCopy (PWelsDecoderContext pCtx, PPicture pDec, PPicture pRef, int32_t iMbXy, int32_t iMbX, int32_t iMbY, sMCRefMember* pMCRefMem, int32_t iCurrPoc);
+void GetAvilInfoFromCorrectMb (PWelsDecoderContext pCtx);
+void DoErrorConSliceMVCopy (PWelsDecoderContext pCtx);
 //Mark erroneous frame as Ref Pic into DPB
 int32_t MarkECFrameAsRef (PWelsDecoderContext pCtx);
 //Judge if EC is needed to current frame

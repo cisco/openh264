@@ -113,7 +113,9 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) //no buffer output if EC is disabled and frame incomplete
     pDstInfo->iBufferStatus = (int32_t) (bFrameCompleteFlag
                                          && pPic->bIsComplete); // When EC disable, ECed picture not output
-  else if (pCtx->eErrorConMethod == ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE && pCtx->iErrorCode && bOutResChange)
+  else if ((pCtx->eErrorConMethod == ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE
+           || pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE)
+            && pCtx->iErrorCode && bOutResChange)
     pCtx->bFreezeOutput = true;
 
   if ((pDstInfo->iBufferStatus == 1) && (pCurDq->sLayerInfo.sNalHeaderExt.bIdrFlag)) {
@@ -620,6 +622,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   pSliceHeadExt->pSubsetSps = pSubsetSps;
 
   bIdrFlag = (!kbExtensionFlag && eNalType == NAL_UNIT_CODED_SLICE_IDR) || (kbExtensionFlag && pNalHeaderExt->bIdrFlag);
+  pSliceHead->bIdrFlag = bIdrFlag;
 
   if (pSps->uiLog2MaxFrameNum == 0) {
     WelsLog (pLogCtx, WELS_LOG_WARNING, "non existing SPS referenced");
@@ -1961,6 +1964,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       memcpy (&pLayerInfo.sNalHeaderExt, &pNalCur->sNalHeaderExt, sizeof (SNalUnitHeaderExt)); //confirmed_safe_unsafe_usage
 
       pCtx->pDec->iFrameNum = pSh->iFrameNum;
+      pCtx->pDec->iFramePoc = pSh->iPicOrderCntLsb; // still can not obtain correct, because current do not support POCtype 2
+      pCtx->pDec->bIdrFlag = pNalCur->sNalHeaderExt.bIdrFlag;
 
       memcpy (&pLayerInfo.sSliceInLayer.sSliceHeaderExt, pShExt, sizeof (SSliceHeaderExt)); //confirmed_safe_unsafe_usage
       pLayerInfo.sSliceInLayer.bSliceHeaderExtFlag	= pNalCur->sNalData.sVclNal.bSliceHeaderExtFlag;
@@ -2126,6 +2131,9 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
                                   pCtx->pDec->iLinesize,
                                   pCtx->sExpandPicFunc.pfExpandLumaPicture, pCtx->sExpandPicFunc.pfExpandChromaPicture);
         pCtx->pDec = NULL;
+      } else if (pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR || pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE) {
+        pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //store latest decoded picture for MV Copy EC
+        pCtx->pDec = NULL;
       }
     }
 
@@ -2156,6 +2164,8 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
         if (pCtx->sLastNalHdrExt.sNalUnitHeader.uiNalRefIdc > 0) {
           pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //save ECed pic for future use
           MarkECFrameAsRef (pCtx);
+        } else if (pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR || pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE) {
+          pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //save ECed pic for future MV Copy use
         }
       } else {
         if (DecodeFrameConstruction (pCtx, ppDst, pDstInfo))
