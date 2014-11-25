@@ -90,6 +90,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
 
   if (!pCtx->bParseOnly) {
     //////output:::normal path
+    pDstInfo->uiOutYuvTimeStamp = pPic->uiTimeStamp;
     ppDst[0]      = pPic->pData[0];
     ppDst[1]      = pPic->pData[1];
     ppDst[2]      = pPic->pData[2];
@@ -1742,7 +1743,7 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
       int32_t iIdx = pCurAu->uiStartPos;
       int32_t iEndIdx = pCurAu->uiEndPos;
       uint8_t* pNalBs = NULL;
-
+      pParser->uiOutBsTimeStamp = (pCurAu->pNalUnitsList [iIdx]) ? pCurAu->pNalUnitsList [iIdx]->uiTimeStamp : 0;
       pParser->iNalNum = 0;
       pParser->iSpsWidthInPixel = (pCtx->pSps->iMbWidth << 4);
       pParser->iSpsHeightInPixel = (pCtx->pSps->iMbHeight << 4);
@@ -1774,6 +1775,7 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
         pDstBuf += iNalLen;
       }
     } else { //error
+      pCtx->pParserBsInfo->uiOutBsTimeStamp = 0;
       pCtx->pParserBsInfo->iNalNum = 0;
       pCtx->pParserBsInfo->iSpsWidthInPixel = 0;
       pCtx->pParserBsInfo->iSpsHeightInPixel = 0;
@@ -1935,6 +1937,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         return ERR_INFO_REF_COUNT_OVERFLOW;
       }
     }
+    pCtx->pDec->uiTimeStamp = pNalCur->uiTimeStamp;
 
     if (pCtx->iTotalNumMbRec == 0) { //Picture start to decode
       for (int32_t i = 0; i < LAYER_NUM_EXCHANGEABLE; ++ i)

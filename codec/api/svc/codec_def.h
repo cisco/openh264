@@ -196,7 +196,8 @@ typedef struct TagSysMemBuffer {
 */
 typedef struct TagBufferInfo {
   int iBufferStatus;             ///< 0: one frame data is not ready; 1: one frame data is ready
-
+  unsigned long long uiInBsTimeStamp;     ///< input BS timestamp
+  unsigned long long uiOutYuvTimeStamp;     ///< output YUV timestamp, when bufferstatus is 1
   union {
     SSysMEMBuffer sSystemBuffer; ///<  memory info for one picture
   } UsrData;                     ///<  output buffer info

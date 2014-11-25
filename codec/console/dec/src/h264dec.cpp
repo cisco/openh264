@@ -74,7 +74,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
   FILE* fpTrack = fopen ("3.len", "rb");
   unsigned long pInfo[4];
 #endif// STICK_STREAM_SIZE
-
+  unsigned long long uiTimeStamp = 0;
   int64_t iStart = 0, iEnd = 0, iTotal = 0;
   int32_t iSliceSize;
   int32_t iSliceIndex = 0;
@@ -208,8 +208,9 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     pData[0] = NULL;
     pData[1] = NULL;
     pData[2] = NULL;
+    uiTimeStamp ++;
     memset (&sDstBufInfo, 0, sizeof (SBufferInfo));
-
+    sDstBufInfo.uiInBsTimeStamp = uiTimeStamp;
     pDecoder->DecodeFrame2 (pBuf + iBufPos, iSliceSize, pData, &sDstBufInfo);
 
     if (sDstBufInfo.iBufferStatus == 1) {
@@ -242,6 +243,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     pData[1] = NULL;
     pData[2] = NULL;
     memset (&sDstBufInfo, 0, sizeof (SBufferInfo));
+    sDstBufInfo.uiInBsTimeStamp = uiTimeStamp;
     pDecoder->DecodeFrame2 (NULL, 0, pData, &sDstBufInfo);
     if (sDstBufInfo.iBufferStatus == 1) {
       pDst[0] = pData[0];

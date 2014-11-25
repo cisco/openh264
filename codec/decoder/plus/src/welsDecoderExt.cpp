@@ -412,8 +412,9 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
   ppDst[0] = ppDst[1] = ppDst[2] = NULL;
   m_pDecContext->iErrorCode             = dsErrorFree; //initialize at the starting of AU decoding.
   m_pDecContext->iFeedbackVclNalInAu = FEEDBACK_UNKNOWN_NAL; //initialize
+  unsigned long long uiInBsTimeStamp = pDstInfo->uiInBsTimeStamp;
   memset (pDstInfo, 0, sizeof (SBufferInfo));
-
+  pDstInfo->uiInBsTimeStamp = uiInBsTimeStamp;
 #ifdef LONG_TERM_REF
   m_pDecContext->bReferenceLostAtT0Flag       = false; //initialize for LTR
   m_pDecContext->bCurAuContainLtrMarkSeFlag = false;
@@ -422,7 +423,12 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 #endif
 
   m_pDecContext->iFeedbackTidInAu             = -1; //initialize
-
+  if (pDstInfo) {
+    pDstInfo->uiOutYuvTimeStamp = 0;
+    m_pDecContext->uiTimeStamp = pDstInfo->uiInBsTimeStamp;
+  } else {
+    m_pDecContext->uiTimeStamp = 0;
+  }
   WelsDecodeBs (m_pDecContext, kpSrc, kiSrcLen, ppDst,
                 pDstInfo, NULL); //iErrorCode has been modified in this function
   m_pDecContext->bInstantDecFlag = false; //reset no-delay flag
@@ -524,6 +530,12 @@ DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
   m_pDecContext->pParserBsInfo = pDstInfo;
   pDstInfo->iNalNum = 0;
   pDstInfo->iSpsWidthInPixel = pDstInfo->iSpsHeightInPixel = 0;
+  if(pDstInfo) {
+    m_pDecContext->uiTimeStamp = pDstInfo->uiInBsTimeStamp;
+    pDstInfo->uiOutBsTimeStamp = 0;
+  } else {
+    m_pDecContext->uiTimeStamp = 0;
+  }
   WelsDecodeBs (m_pDecContext, kpSrc, kiSrcLen, NULL, NULL, pDstInfo);
 
   return (DECODING_STATE) m_pDecContext->iErrorCode;
