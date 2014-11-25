@@ -438,6 +438,9 @@ void GetValidEncParamBase (SEncParamBase* pEncParamBase) {
   pEncParamBase->iPicWidth = VALID_SIZE (pEncParamBase->iPicWidth);
   pEncParamBase->iPicHeight = VALID_SIZE (pEncParamBase->iPicHeight);
   pEncParamBase->iTargetBitrate = rand() + 1; //!=0
+  int32_t iLevelMaxBitrate = WelsCommon::g_ksLevelLimits[LEVEL_5_0 - 1].uiMaxBR * CpbBrNalFactor;
+  if (pEncParamBase->iTargetBitrate > iLevelMaxBitrate)
+    pEncParamBase->iTargetBitrate = iLevelMaxBitrate;
   pEncParamBase->iRCMode = RC_BITRATE_MODE; //-1, 0, 1, 2
   pEncParamBase->fMaxFrameRate = rand() + 0.5f; //!=0
 }
@@ -584,12 +587,14 @@ TEST_F (EncoderInterfaceTest, ForceIntraFrameWithTemporal) {
   sEncParamExt.iPicWidth = MB_SIZE + abs ((rand() * 2) % (MAX_WIDTH - MB_SIZE));
   sEncParamExt.iPicHeight = MB_SIZE + abs ((rand() * 2) % (MAX_HEIGHT - MB_SIZE));
   sEncParamExt.iTargetBitrate = rand() + 1; //!=0
+  int32_t iLevelMaxBitrate = WelsCommon::g_ksLevelLimits[LEVEL_5_0 - 1].uiMaxBR * CpbBrNalFactor;
+  if (sEncParamExt.iTargetBitrate > iLevelMaxBitrate)
+    sEncParamExt.iTargetBitrate = iLevelMaxBitrate;
   sEncParamExt.iRCMode = RC_BITRATE_MODE; //-1, 0, 1, 2
   sEncParamExt.fMaxFrameRate = rand() + 0.5f; //!=0
   sEncParamExt.sSpatialLayers[0].iVideoWidth = sEncParamExt.iPicWidth;
   sEncParamExt.sSpatialLayers[0].iVideoHeight = sEncParamExt.iPicHeight;
   sEncParamExt.sSpatialLayers[0].iSpatialBitrate = sEncParamExt.iTargetBitrate;
-
   int iTargetTemporalLayerNum = rand() % MAX_TEMPORAL_LAYER_NUM;
   sEncParamExt.iTemporalLayerNum = (iTargetTemporalLayerNum > 2) ? iTargetTemporalLayerNum : 2;
 
