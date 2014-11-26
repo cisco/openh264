@@ -156,17 +156,6 @@ typedef struct SliceInformation {
   uiContainingFinalNal;              ///< whether final NAL is involved in buffer of coded slices, flag used in Pause feature in T27
 } SliceInfo, *PSliceInfo;
 
-
-
-#define CIF_WIDTH		352
-#define CIF_HEIGHT		288
-#define QVGA_WIDTH		320
-#define QVGA_HEIGHT		240
-#define QCIF_WIDTH		176
-#define QCIF_HEIGHT		144
-#define SQCIF_WIDTH		128
-#define SQCIF_HEIGHT	96
-
 /**
 * @brief thresholds of the initial, maximal and minimal rate
 */
@@ -202,17 +191,6 @@ typedef struct TagBufferInfo {
     SSysMEMBuffer sSystemBuffer; ///<  memory info for one picture
   } UsrData;                     ///<  output buffer info
 } SBufferInfo;
-
-/**
-* @brief Constants related to transmission rate at various resolutions
-*/
-static const SRateThresholds ksRateThrMap[4] = {
-  // initial-maximal-minimal
-  {CIF_WIDTH, CIF_HEIGHT, 225000, 384000, 96000, 3, 1, 1},		// CIF
-  {QVGA_WIDTH, QVGA_HEIGHT, 192000, 320000, 80000, -1, -1, -1},	// QVGA
-  {QCIF_WIDTH, QCIF_HEIGHT, 150000, 256000, 64000, 8, 4, 2},	// QCIF
-  {SQCIF_WIDTH, SQCIF_HEIGHT, 120000, 192000, 48000, 5, 3, 1}	// SQCIF
-};
 
 
 /**
