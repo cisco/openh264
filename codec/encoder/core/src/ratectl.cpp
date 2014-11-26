@@ -53,12 +53,6 @@ namespace WelsEnc {
 #define VIRTUAL_BUFFER_LOW_TH   120 //*INT_MULTIPLY
 #define VIRTUAL_BUFFER_HIGH_TH  180 //*INT_MULTIPLY
 
-//#define _TEST_TEMP_RC_
-#ifdef _TEST_TEMP_RC_
-//#define _NOT_USE_AQ_FOR_TEST_
-FILE* fp_test_rc = NULL;
-FILE* fp_vgop = NULL;
-#endif
 #define _BITS_RANGE 0
 const int32_t g_kiQpToQstepTable[52] = {   63,   71,   79,   89,  100,  112,  126,  141,  159,  178,
                                            200,  224,  252,  283,  317,  356,  400,  449,  504,  566,
@@ -123,10 +117,6 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
 
   bool bMultiSliceMode = false;
   int32_t iGomRowMode0 = 1, iGomRowMode1 = 1;
-#ifdef _TEST_TEMP_RC_
-  fp_test_rc = fopen ("testRC.dat", "w");
-  fp_vgop = fopen ("vgop.dat", "w");
-#endif
   for (j = 0; j < pEncCtx->pSvcParam->iSpatialLayerNum; j++) {
     SSliceCtx* pSliceCtx = &pEncCtx->pSliceCtxList[j];
     pWelsSvcRc  = &pEncCtx->pWelsSvcRc[j];
@@ -349,9 +339,6 @@ void RcTraceVGopBitrate (sWelsEncCtx* pEncCtx) {
     int32_t iFrameInVGop = pWelsSvcRc->iFrameCodedInVGop + pWelsSvcRc->iSkipFrameInVGop;
     if (0 != iFrameInVGop)
       iVGopBitrate = WELS_ROUND (iTotalBits / iFrameInVGop * pWelsSvcRc->fFrameRate);
-#ifdef _TEST_TEMP_Rc_
-    fprintf (fp_vgop, "%d\n", WELS_ROUND ((double)iTotalBits / iFrameInVGop));
-#endif
     WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO, "[Rc] VGOPbitrate%d: %d ", kiDid, iVGopBitrate);
     if (iTotalBits > 0) {
       iTid = 0;
@@ -905,12 +892,6 @@ void  WelsRcPictureInfoUpdateGom (void* pCtx, int32_t iLayerSize) {
   if (pEncCtx->pSvcParam->iPaddingFlag)
     RcVBufferCalculationPadding (pEncCtx);
   pWelsSvcRc->iFrameCodedInVGop++;
-#ifdef _TEST_TEMP_Rc_
-  fprintf (fp_test_rc, "%d\n", pWelsSvcRc->iFrameDqBits);
-  if (pEncCtx->iSkipFrameFlag)
-    fprintf (fp_test_rc, "0\n");
-  fflush (fp_test_rc);
-#endif
 }
 
 void WelsRcMbInitGom (void* pCtx, SMB* pCurMb, SSlice* pSlice) {
@@ -1216,14 +1197,6 @@ void  WelsRcFreeMemory (void* pCtx) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   SWelsSvcRc* pWelsSvcRc = NULL;
   int32_t i = 0;
-#ifdef _TEST_TEMP_Rc_
-  if (fp_test_rc)
-    fclose (fp_test_rc);
-  fp_test_rc = NULL;
-  if (fp_vgop)
-    fclose (fp_vgop);
-  fp_vgop = NULL;
-#endif
   for (i = 0; i < pEncCtx->pSvcParam->iSpatialLayerNum; i++) {
     pWelsSvcRc  = &pEncCtx->pWelsSvcRc[i];
     RcFreeLayerMemory (pWelsSvcRc, pEncCtx->pMemAlign);
