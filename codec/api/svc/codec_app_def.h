@@ -459,7 +459,7 @@ typedef struct TagSVCDecodingParam {
   unsigned char	uiTargetDqLayer;       ///< setting target dq layer id
 
   ERROR_CON_IDC eEcActiveIdc;          ///< whether active error concealment feature in decoder
-  bool bParseOnly;                     ///< decoder for parse only, no reconstruction
+  bool bParseOnly;                     ///< decoder for parse only, no reconstruction. When it is true, SPS/PPS size should not exceed SPS_PPS_BS_SIZE (128). Otherwise, it will return error info
 
   SVideoProperty   sVideoProperty;    ///< video stream property
 } SDecodingParam, *PDecodingParam;
@@ -554,18 +554,18 @@ typedef struct TagDeliveryStatus {
 } SDeliveryStatus;
 
 /**
-* @brief The capability of decoder
+* @brief The capability of decoder, for SDP negotiation
 */
 typedef struct TagDecoderCapability {
-  int iProfileIdc;
-  int iProfileIop;
-  int iLevelIdc;
-  int iMaxMbps;
-  int iMaxFs;
-  int iMaxCpb;
-  int iMaxDpb;
-  int iMaxBr;
-  bool bRedPicCap;
+  int iProfileIdc;     ///< profile_idc
+  int iProfileIop;     ///< profile-iop
+  int iLevelIdc;       ///< level_idc
+  int iMaxMbps;        ///< max-mbps
+  int iMaxFs;          ///< max-fs
+  int iMaxCpb;         ///< max-cpb
+  int iMaxDpb;         ///< max-dpb
+  int iMaxBr;          ///< max-br
+  bool bRedPicCap;     ///< redundant-pic-cap
 } SDecoderCapability;
 
 /**
