@@ -1032,6 +1032,53 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_SLICE_COPY) {
   (void) iSkipedBytes;
 }
 
+TEST_P (EncodeDecodeTestAPI, InOutTimeStamp) {
+  EncodeDecodeFileParamBase p = GetParam();
+  prepareParam (1, p.slicenum,  p.width, p.height, p.frameRate);
+  encoder_->Uninitialize();
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == cmResultSuccess);
+  
+  InitialEncDec (p.width, p.height);
+  int32_t iTraceLevel = WELS_LOG_QUIET;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  int32_t iSpsPpsIdAddition = 1;
+  encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
+  int32_t iIDRPeriod = 60;
+  encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
+  SLTRConfig sLtrConfigVal;
+  sLtrConfigVal.bEnableLongTermReference = 1;
+  sLtrConfigVal.iLTRRefNum = 1;
+  encoder_->SetOption (ENCODER_OPTION_LTR, &sLtrConfigVal);
+  int32_t iLtrPeriod = 2;
+  encoder_->SetOption (ENCODER_LTR_MARKING_PERIOD, &iLtrPeriod);
+  int iIdx = 0;
+  int iSkipedBytes;
+  unsigned long long uiEncTimeStamp = 100;
+  while (iIdx <= p.numframes) {
+    EncodeOneFrame (1);
+    //decoding after each encoding frame
+    int len = 0;
+    encToDecData (info, len);
+    unsigned char* pData[3] = { NULL };
+    memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+    uint32_t uiEcIdc = ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
+    decoder_->SetOption (DECODER_OPTION_ERROR_CON_IDC, &uiEcIdc);
+    dstBufInfo_.uiInBsTimeStamp = uiEncTimeStamp;
+    rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+    memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+    dstBufInfo_.uiInBsTimeStamp = uiEncTimeStamp;
+    rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
+    if(dstBufInfo_.iBufferStatus == 1) {
+      EXPECT_EQ (uiEncTimeStamp, dstBufInfo_.uiOutYuvTimeStamp);
+    }
+    iIdx++;
+    uiEncTimeStamp++;
+  }
+  (void) iSkipedBytes;
+}
+
 TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_NOPREFIX) {
   SLTRMarkingFeedback m_LTR_Marking_Feedback;
   SLTRRecoverRequest m_LTR_Recover_Request;

@@ -187,6 +187,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
   case NAL_UNIT_PREFIX:
     pCurNal = &pCtx->sPrefixNal;
+    pCurNal->uiTimeStamp = pCtx->uiTimeStamp;
 
     if (iNalSize < NAL_UNIT_HEADER_EXT_SIZE) {
       PAccessUnit pCurAu	   = pCtx->pAccessUnitList;
@@ -256,7 +257,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
       pCtx->iErrorCode	|= dsOutOfMemory;
       return NULL;
     }
-
+    pCurNal->uiTimeStamp = pCtx->uiTimeStamp;
     pCurNal->sNalHeaderExt.sNalUnitHeader.uiForbiddenZeroBit = pNalUnitHeader->uiForbiddenZeroBit;
     pCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc		  = pNalUnitHeader->uiNalRefIdc;
     pCurNal->sNalHeaderExt.sNalUnitHeader.eNalUnitType	  = pNalUnitHeader->eNalUnitType;
