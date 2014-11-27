@@ -122,7 +122,7 @@ void DecoderInterfaceTest::DecoderBs (const char* sFileName) {
 
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + sFileName;
-  ASSERT_TRUE (pH264File = fopen (filename.c_str(),"rb"));
+  ASSERT_TRUE (pH264File = fopen (filename.c_str(), "rb"));
 #else
   ASSERT_TRUE (pH264File = fopen (sFileName, "rb"));
 #endif
@@ -130,7 +130,7 @@ void DecoderInterfaceTest::DecoderBs (const char* sFileName) {
   iFileSize = (int32_t) ftell (pH264File);
   fseek (pH264File, 0L, SEEK_SET);
   pBuf = new uint8_t[iFileSize + 4];
-  ASSERT_EQ(fread (pBuf, 1, iFileSize, pH264File), (unsigned int) iFileSize);
+  ASSERT_EQ (fread (pBuf, 1, iFileSize, pH264File), (unsigned int) iFileSize);
   memcpy (pBuf + iFileSize, &uiStartCode[0], 4); //confirmed_safe_unsafe_usage
   while (true) {
     if (iBufPos >= iFileSize) {
@@ -416,7 +416,7 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   EXPECT_EQ (57u, sDecStatic.uiAvgEcRatio);
   EXPECT_EQ (5u, sDecStatic.uiDecodedFrameCount);
   EXPECT_EQ (288u, sDecStatic.uiHeight);
-  EXPECT_EQ (1u, sDecStatic.uiIDRRecvNum);
+  EXPECT_EQ (1u, sDecStatic.uiIDRCorrectNum);
   EXPECT_EQ (3u, sDecStatic.uiResolutionChangeTimes);
   EXPECT_EQ (352u, sDecStatic.uiWidth);
   EXPECT_EQ (4u, sDecStatic.uiEcFrameNum);
@@ -433,7 +433,7 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   EXPECT_EQ (0u, sDecStatic.uiAvgEcRatio);
   EXPECT_EQ (97u, sDecStatic.uiDecodedFrameCount);
   EXPECT_EQ (144u, sDecStatic.uiHeight);
-  EXPECT_EQ (3u, sDecStatic.uiIDRRecvNum);
+  EXPECT_EQ (3u, sDecStatic.uiIDRCorrectNum);
   EXPECT_EQ (0u, sDecStatic.uiEcIDRNum);
   EXPECT_EQ (1u, sDecStatic.uiResolutionChangeTimes);
   EXPECT_EQ (176u, sDecStatic.uiWidth);
@@ -452,7 +452,7 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   EXPECT_EQ (0u, sDecStatic.uiAvgEcRatio);
   EXPECT_EQ (99u, sDecStatic.uiDecodedFrameCount);
   EXPECT_EQ (144u, sDecStatic.uiHeight);
-  EXPECT_EQ (4u, sDecStatic.uiIDRRecvNum);
+  EXPECT_EQ (4u, sDecStatic.uiIDRCorrectNum);
   EXPECT_EQ (0u, sDecStatic.uiEcIDRNum);
   EXPECT_EQ (1u, sDecStatic.uiResolutionChangeTimes);
   EXPECT_EQ (176u, sDecStatic.uiWidth);
@@ -472,7 +472,7 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   EXPECT_EQ (0u, sDecStatic.uiAvgEcRatio);
   EXPECT_EQ (9u, sDecStatic.uiDecodedFrameCount);
   EXPECT_EQ (192u, sDecStatic.uiHeight);
-  EXPECT_EQ (1u, sDecStatic.uiIDRRecvNum);
+  EXPECT_EQ (1u, sDecStatic.uiIDRCorrectNum);
   EXPECT_EQ (1u, sDecStatic.uiResolutionChangeTimes);
   EXPECT_EQ (320u, sDecStatic.uiWidth);
   EXPECT_EQ (0u, sDecStatic.uiEcFrameNum);

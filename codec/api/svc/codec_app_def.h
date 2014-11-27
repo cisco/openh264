@@ -613,13 +613,17 @@ typedef struct TagVideoDecoderStatistics {
   float fAverageFrameSpeedInMs;                ///< average_Decoding_Time
   unsigned int uiDecodedFrameCount;            ///< number of frames
   unsigned int uiResolutionChangeTimes;        ///< uiResolutionChangeTimes
-  unsigned int uiIDRRecvNum;	               ///< number of actual IDR received
+  unsigned int uiIDRCorrectNum;	               ///< number of correct IDR received
   //EC on related
   unsigned int
   uiAvgEcRatio;                                ///< when EC is on, the average ratio of correct or EC areas, can be an indicator of reconstruction quality
   unsigned int uiEcIDRNum;                     ///< number of actual unintegrity IDR or not received but eced
   unsigned int uiEcFrameNum;                   ///<
-  unsigned int uiIDRLostNum;                   ///< decoder detect the number of lost IDR
+  unsigned int uiIDRLostNum;                   ///< number of lost IDR
+  unsigned int uiFreezingIDRNum;               ///< number of freezing IDR with error
+  unsigned int uiFreezingNonIDRNum;            ///< number of freezing non-IDR with error
+  int iAvgLumaQp;                              ///< average luma QP. default: -1, no correct frame outputted
+
 } SDecoderStatistics; // in building, coming soon
 
 #endif//WELS_VIDEO_CODEC_APPLICATION_DEFINITION_H__

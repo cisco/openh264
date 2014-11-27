@@ -237,7 +237,7 @@ int32_t				iImgWidthInPixel;	// width of image in pixel reconstruction picture t
 int32_t				iImgHeightInPixel;// height of image in pixel reconstruction picture to be output
 int32_t				iLastImgWidthInPixel;	// width of image in last successful pixel reconstruction picture to be output
 int32_t				iLastImgHeightInPixel;// height of image in last successful pixel reconstruction picture to be output
-bool bFreezeOutput;
+bool bFreezeOutput; // indicating current frame freezing. Default: true
 
 
 // Derived common elements
