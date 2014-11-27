@@ -113,3 +113,30 @@ WELS_EXTERN IdctResAddPred_mmx
 
     emms
     ret
+
+;void WelsBlockZero16x16_sse2(int16_t * block, int32_t stride);
+WELS_EXTERN WelsBlockZero16x16_sse2
+    %assign  push_num 0
+    LOAD_2_PARA
+    SIGN_EXTENSION r1, r1d
+    shl     r1, 1
+    pxor    xmm0, xmm0
+%rep 16
+    movdqa  [r0], xmm0
+    movdqa  [r0+16], xmm0
+    add     r0, r1
+%endrep
+    ret
+
+;void WelsBlockZero8x8_sse2(int16_t * block, int32_t stride);
+WELS_EXTERN WelsBlockZero8x8_sse2
+    %assign  push_num 0
+    LOAD_2_PARA
+    SIGN_EXTENSION r1, r1d
+    shl     r1, 1
+    pxor    xmm0, xmm0
+%rep 8
+    movdqa  [r0], xmm0
+    add     r0, r1
+%endrep
+    ret

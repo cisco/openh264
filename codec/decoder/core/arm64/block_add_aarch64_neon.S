@@ -158,4 +158,21 @@ WELS_ASM_AARCH64_FUNC_BEGIN IdctResAddPred_AArch64_neon
     st1     {v1.s}[0],[x2],x1
     st1     {v1.s}[1],[x2]
 WELS_ASM_AARCH64_FUNC_END
+
+WELS_ASM_AARCH64_FUNC_BEGIN WelsBlockZero16x16_AArch64_neon
+    eor v0.16b, v0.16b, v0.16b
+    eor v1.16b, v1.16b, v1.16b
+    lsl x1, x1, 1
+.rept 16
+    st1 {v0.16b, v1.16b}, [x0], x1
+.endr
+WELS_ASM_AARCH64_FUNC_END
+
+WELS_ASM_AARCH64_FUNC_BEGIN WelsBlockZero8x8_AArch64_neon
+    eor v0.16b, v0.16b, v0.16b
+    lsl x1, x1, 1
+.rept 8
+    st1 {v0.16b}, [x0], x1
+.endr
+WELS_ASM_AARCH64_FUNC_END
 #endif
