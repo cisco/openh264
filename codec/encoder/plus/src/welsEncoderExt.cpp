@@ -642,10 +642,11 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
     int64_t iTimeDiff = kiCurrentFrameTs - m_pEncContext->iLastStatisticsLogTs;
     if ((iTimeDiff > m_pEncContext->iStatisticsLogInterval) || (0 == pStatistics->uiInputFrameCount % 300)) {
       if (iTimeDiff) {
-        pStatistics->fLatestFrameRate = static_cast<float> ((pStatistics->uiInputFrameCount - m_pEncContext->iLastStatisticsFrameCount) * 1000 /
-                                                             iTimeDiff);
+        pStatistics->fLatestFrameRate = static_cast<float> ((pStatistics->uiInputFrameCount -
+                                        m_pEncContext->iLastStatisticsFrameCount) * 1000 /
+                                        iTimeDiff);
         pStatistics->uiBitRate = static_cast<unsigned int> ((m_pEncContext->iTotalEncodedBits -
-                                                             m_pEncContext->iLastStatisticsBits) * 1000 / iTimeDiff);
+                                 m_pEncContext->iLastStatisticsBits) * 1000 / iTimeDiff);
       }
 
       // update variables
@@ -1072,6 +1073,14 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
              "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_IS_LOSSLESS_LINK,bIsLosslessLink = %d", bValue);
   }
   break;
+  case ENCODER_OPTION_BITS_VARY_PERCENTAGE: {
+    bool bValue = * (static_cast<bool*> (pOption));
+    m_pEncContext->pSvcParam->iBitsVaryPercentage = bValue;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITS_VARY_PERCENTAGE,iBitsVaryPercentage = %d", bValue);
+  }
+  break;
+
   default:
     return cmInitParaError;
   }
