@@ -132,8 +132,6 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
 
 void AssignFuncPointerForRec (PWelsDecoderContext pCtx);
 
-void ResetParameterSetsState (PWelsDecoderContext pCtx);
-
 void GetVclNalTemporalId (PWelsDecoderContext pCtx); //get the info that whether or not have VCL NAL in current AU,
 //and if YES, get the temporal ID
 

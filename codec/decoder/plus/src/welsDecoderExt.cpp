@@ -447,7 +447,6 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 #else
         m_pDecContext->bReferenceLostAtT0Flag = true;
 #endif
-        ResetParameterSetsState (m_pDecContext);  //initial SPS&PPS ready flag
       }
     }
 
