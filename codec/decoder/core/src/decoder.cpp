@@ -178,10 +178,11 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
  */
 static inline int32_t GetTargetRefListSize (PWelsDecoderContext pCtx) {
   int32_t iNumRefFrames	= 0;
+  // +2 for EC MV Copy buffer exchange
   if ((pCtx == NULL) || (pCtx->pSps == NULL)) {
-    iNumRefFrames = MAX_REF_PIC_COUNT;
+    iNumRefFrames = MAX_REF_PIC_COUNT + 2;
   } else {
-    iNumRefFrames = pCtx->pSps->iNumRefFrames + 1;
+    iNumRefFrames = pCtx->pSps->iNumRefFrames + 2;
   }
 
 #ifdef LONG_TERM_REF
