@@ -1053,7 +1053,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
         pCtx->iErrorCode |= dsOutOfMemory;
         return pCtx->iErrorCode;
       }
-      DecInitBitsForEncoding (&sSubsetSpsBs, pBsBuf, pBs->pEndBuf - pBs->pStartBuf);
+      DecInitBitsForEncoding (&sSubsetSpsBs, pBsBuf, (int32_t) (pBs->pEndBuf - pBs->pStartBuf));
       DecBsWriteBits (&sSubsetSpsBs, 8, 77); //profile_idc, forced to Main profile
       DecBsWriteOneBit (&sSubsetSpsBs, pSps->bConstraintSet0Flag); // constraint_set0_flag
       DecBsWriteOneBit (&sSubsetSpsBs, pSps->bConstraintSet1Flag); // constraint_set1_flag
@@ -1093,9 +1093,9 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
       }
       DecBsWriteOneBit (&sSubsetSpsBs, 0); //vui_parameters_present_flag
       DecBsRbspTrailingBits (&sSubsetSpsBs); //finished, rbsp trailing bit
-      int32_t iRbspSize = sSubsetSpsBs.pCurBuf - sSubsetSpsBs.pStartBuf;
+      int32_t iRbspSize = (int32_t) (sSubsetSpsBs.pCurBuf - sSubsetSpsBs.pStartBuf);
       RBSP2EBSP (pSpsBs->pSpsBsBuf + 5, sSubsetSpsBs.pStartBuf, iRbspSize);
-      pSpsBs->uiSpsBsLen = sSubsetSpsBs.pCurBuf - sSubsetSpsBs.pStartBuf + 5;
+      pSpsBs->uiSpsBsLen = (uint16_t) (sSubsetSpsBs.pCurBuf - sSubsetSpsBs.pStartBuf + 5);
       if (pBsBuf) {
         WelsFree (pBsBuf, "pBsBuf for parse only usage");
       }
