@@ -261,6 +261,12 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
              pCodingParam->uiIntraPeriod, pCodingParam->uiGopSize);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
+  if (pCodingParam->iLoopFilterDisableIdc < 0 || pCodingParam->iLoopFilterDisableIdc > 6) {
+    WelsLog (pLogCtx, WELS_LOG_ERROR,
+             "ParamValidationExt(), iLoopFilterDisableIdc(%d) must be between 0 and 6",
+             pCodingParam->iLoopFilterDisableIdc);
+    return ENC_RETURN_UNSUPPORTED_PARA;
+  }
 
 
   //about iMultipleThreadIdc, bDeblockingParallelFlag, iLoopFilterDisableIdc, & uiSliceMode

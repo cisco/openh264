@@ -290,8 +290,8 @@ void WelsSliceHeaderWrite (sWelsEncCtx* pCtx, SBitStringAux* pBs, SDqLayer* pCur
     case 5:
       BsWriteUE (pBs, 2);
       break;
-    default :
-      WelsLog(&pCtx->sLogCtx, WELS_LOG_ERROR, "pData error for deblocking");
+    default:
+      WelsLog(&pCtx->sLogCtx, WELS_LOG_ERROR, "Invalid uiDisableDeblockingFilterIdc %d", pSliceHeader->uiDisableDeblockingFilterIdc);
       break;
     }
     if (1 != pSliceHeader->uiDisableDeblockingFilterIdc) {
