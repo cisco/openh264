@@ -143,6 +143,9 @@ void EncoderInterfaceTest::InitializeParamExt() {
 TEST_F (EncoderInterfaceTest, EncoderAdditionalOptionSetTest) {
   int iResult, iValue, iReturn;
   float fValue, fReturn;
+  int uiTraceLevel = WELS_LOG_QUIET;
+
+  pPtrEnc->SetOption (ENCODER_OPTION_TRACE_LEVEL, &uiTraceLevel);
 
   InitializeParamExt();
   iResult = pPtrEnc->InitializeExt (pParamExt);
@@ -255,6 +258,9 @@ TEST_F (EncoderInterfaceTest, EncoderAdditionalOptionSetTest) {
   iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
   pSrcPic->uiTimeStamp += 30;
+
+  uiTraceLevel = WELS_LOG_ERROR;
+  pPtrEnc->SetOption (ENCODER_OPTION_TRACE_LEVEL, &uiTraceLevel);
 }
 
 TEST_F (EncoderInterfaceTest, TemporalLayerSettingTest) {
