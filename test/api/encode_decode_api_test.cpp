@@ -244,7 +244,7 @@ void EncodeDecodeTestAPI::RandomParamExtCombination() {
   param_.iLtrMarkPeriod            = rand();
 
   //loop filter
-  param_.iLoopFilterDisableIdc     = rand();
+  param_.iLoopFilterDisableIdc     = rand() % 7;
   param_.iLoopFilterAlphaC0Offset  = rand();
   param_.iLoopFilterBetaOffset     = rand();
 
