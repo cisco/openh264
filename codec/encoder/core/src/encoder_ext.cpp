@@ -90,16 +90,13 @@ int32_t WelsBitRateVerification (SLogContext* pLogCtx, SSpatialLayerConfig* pLay
   if (pLayerParam->iMaxSpatialBitrate > iLevelMaxBitrate) {
     ELevelIdc iCurLevel = pLayerParam->uiLevelIdc;
     if (WelsAdjustLevel (pLayerParam)) {
-      WelsLog (pLogCtx, WELS_LOG_ERROR,
-               "MaxSpatialBitrate (%d) is larger that the limitation LEVEL_5_2, considering it as error setting",
-               pLayerParam->iMaxSpatialBitrate);
-      return ENC_RETURN_UNSUPPORTED_PARA;
-    } else {
       WelsLog (pLogCtx, WELS_LOG_WARNING,
+               "MaxSpatialBitrate (%d) is larger that the limitation LEVEL_5_2, the setting will be invalid",
+               pLayerParam->iMaxSpatialBitrate);
+    }
+    WelsLog (pLogCtx, WELS_LOG_INFO,
                "Level is changed from (%d) to (%d) according to the maxbitrate",
                iCurLevel, pLayerParam->uiLevelIdc);
-    }
-
   }
   if (pLayerParam->iMaxSpatialBitrate < pLayerParam->iSpatialBitrate) {
     WelsLog (pLogCtx, WELS_LOG_ERROR,
