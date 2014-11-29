@@ -43,8 +43,7 @@ RUN git status -v >> log
 
 RUN openssl dgst -sha1 libopenh264.so >> log
 RUN echo "Fluffy Got hash of  - 3b6280fce36111ab9c911453f4ee1fd99ce6f841" >> log
-RUN openssl dgst -sha1 libopenh264.a >> log
-RUN echo "Fluffy Got hash of  - eebcffe6197962113cf01f2f246badb7ac96618e" >> log 
+
 
 
 
