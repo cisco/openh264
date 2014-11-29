@@ -9,18 +9,7 @@ FROM ubuntu:14.04
 MAINTAINER Cullen Jennings <fluffy@cisco.com>
 RUN apt-get update
 RUN apt-get upgrade -y
-RUN apt-get install -y \
-    bison \
-    flex \
-    g++ \
-    gcc \
-    git \
-    libgmp3-dev \
-    libmpc-dev \
-    libmpfr-dev \
-    libz-dev \
-    make \
-    wget 
+RUN apt-get install -y bison flex g++ gcc git libgmp3-dev libmpc-dev libmpfr-dev libz-dev make wget
 
 WORKDIR /tmp
 RUN wget http://ftp.gnu.org/gnu/gcc/gcc-4.9.2/gcc-4.9.2.tar.gz
