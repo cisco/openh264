@@ -271,10 +271,10 @@ void WelsMbSkipCabac (SCabacCtx* pCabacCtx, SMB* pCurMb, int32_t iMbWidth, EWels
   WelsCabacEncodeDecision (pCabacCtx, iCtx, bSkipFlag);
 
   if (bSkipFlag) {
-    for (int  i = 0; i < 4; i++) {
+    for (auto & elem : pCurMb->sMvd) {
 
-      pCurMb->sMvd[i].iMvX = 0;
-      pCurMb->sMvd[i].iMvY = 0;
+      elem.iMvX = 0;
+      elem.iMvY = 0;
     }
     pCurMb->uiCbp = pCurMb->iCbpDc  = 0;
   }

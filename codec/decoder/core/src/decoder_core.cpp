@@ -1611,8 +1611,8 @@ static bool CheckNewSeqBeginAndUpdateActiveLayerSps (PWelsDecoderContext pCtx) {
   bool bNewSeq = false;
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
   PSps pTmpLayerSps[MAX_LAYER_NUM];
-  for (int i = 0; i < MAX_LAYER_NUM; i++) {
-    pTmpLayerSps[i] = NULL;
+  for (auto & pTmpLayerSp : pTmpLayerSps) {
+    pTmpLayerSp = NULL;
   }
   // track the layer sps for the current au
   for (unsigned int i = pCurAu->uiStartPos; i <= pCurAu->uiEndPos; i++) {
@@ -1913,8 +1913,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
     pCtx->pDec->uiTimeStamp = pNalCur->uiTimeStamp;
 
     if (pCtx->iTotalNumMbRec == 0) { //Picture start to decode
-      for (int32_t i = 0; i < LAYER_NUM_EXCHANGEABLE; ++ i)
-        memset (pCtx->sMb.pSliceIdc[i], 0xff, (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int32_t)));
+      for (auto & elem : pCtx->sMb.pSliceIdc)
+        memset (elem, 0xff, (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int32_t)));
       memset (pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag, 0, pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight);
     }
     GetI4LumaIChromaAddrTable (pCtx->iDecBlockOffsetArray, pCtx->pDec->iLinesize[0], pCtx->pDec->iLinesize[1]);

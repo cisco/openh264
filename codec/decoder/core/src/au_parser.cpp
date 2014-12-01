@@ -787,8 +787,8 @@ const SLevelLimits* GetLevelLimits (int32_t iLevelIdx, bool bConstraint3) {
 }
 
 bool CheckSpsActive (PWelsDecoderContext pCtx, PSps pSps) {
-  for (int i = 0; i < MAX_LAYER_NUM; i++) {
-    if (pCtx->pActiveLayerSps[i] == pSps)
+  for (auto & elem : pCtx->pActiveLayerSps) {
+    if (elem == pSps)
       return true;
   }
   // Pre-active, will be used soon

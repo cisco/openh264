@@ -100,10 +100,10 @@ CVpFrameWork::CVpFrameWork (uint32_t uiThreadsNum, EResult& eReturn) {
 }
 
 CVpFrameWork::~CVpFrameWork() {
-  for (int32_t i = 0; i < MAX_STRATEGY_NUM; i++) {
-    if (m_pStgChain[i]) {
-      Uninit (m_pStgChain[i]->m_eMethod);
-      delete m_pStgChain[i];
+  for (auto & elem : m_pStgChain) {
+    if (elem) {
+      Uninit (elem->m_eMethod);
+      delete elem;
     }
   }
 

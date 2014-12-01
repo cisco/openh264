@@ -48,9 +48,9 @@ int32_t CheckLine (uint8_t* pData, int32_t iWidth) {
     RECORD_COLOR (pData[i], iColorMap);
     iChangedTimes += (pData[i] != pData[i - 1]);
   }
-  for (int32_t i = 0; i < 8; i++)
+  for (auto & elem : iColorMap)
     for (int32_t j = 0; j < 32; j++)
-      iColorCounts += ((iColorMap[i] >> j) & 1);
+      iColorCounts += ((elem >> j) & 1);
 
   switch (iColorCounts) {
   case 1:
