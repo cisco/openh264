@@ -642,10 +642,11 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
     int64_t iTimeDiff = kiCurrentFrameTs - m_pEncContext->iLastStatisticsLogTs;
     if ((iTimeDiff > m_pEncContext->iStatisticsLogInterval) || (0 == pStatistics->uiInputFrameCount % 300)) {
       if (iTimeDiff) {
-        pStatistics->fLatestFrameRate = static_cast<float> ((pStatistics->uiInputFrameCount - m_pEncContext->iLastStatisticsFrameCount) * 1000 /
-                                                             iTimeDiff);
+        pStatistics->fLatestFrameRate = static_cast<float> ((pStatistics->uiInputFrameCount -
+                                        m_pEncContext->iLastStatisticsFrameCount) * 1000 /
+                                        iTimeDiff);
         pStatistics->uiBitRate = static_cast<unsigned int> ((m_pEncContext->iTotalEncodedBits -
-                                                             m_pEncContext->iLastStatisticsBits) * 1000 / iTimeDiff);
+                                 m_pEncContext->iLastStatisticsBits) * 1000 / iTimeDiff);
       }
 
       // update variables
@@ -727,6 +728,30 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     m_pEncContext->pSvcParam->uiIntraPeriod	= (uint32_t)iValue;
   }
   break;
+  case ENCODER_OPTION_SVC_ENCODE_PARAM_BASE: {	// SVC Encoding Parameter
+    SEncParamBase		sEncodingParam;
+    SWelsSvcCodingParam	sConfig;
+    int32_t iTargetWidth = 0;
+    int32_t iTargetHeight = 0;
+
+    memcpy (&sEncodingParam, pOption, sizeof (SEncParamBase));	// confirmed_safe_unsafe_usage
+    if (sConfig.ParamBaseTranscode (sEncodingParam)) {
+      return cmInitParaError;
+    }
+    /* New configuration available here */
+    iTargetWidth	= sConfig.iPicWidth;
+    iTargetHeight	= sConfig.iPicHeight;
+    if (m_iMaxPicWidth != iTargetWidth
+        || m_iMaxPicHeight != iTargetHeight) {
+      m_iMaxPicWidth	= iTargetWidth;
+      m_iMaxPicHeight	= iTargetHeight;
+    }
+    if (WelsEncoderParamAdjust (&m_pEncContext, &sConfig)) {
+      return cmInitParaError;
+    }
+  }
+  break;
+
   case ENCODER_OPTION_SVC_ENCODE_PARAM_EXT: {	// SVC Encoding Parameter
     SEncParamExt		sEncodingParam;
     SWelsSvcCodingParam	sConfig;

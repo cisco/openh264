@@ -482,6 +482,37 @@ TEST_F (EncoderInterfaceTest, BasicInitializeTest) {
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
 }
 
+TEST_F (EncoderInterfaceTest, BaseParamSettingTest) {
+  SEncParamBase sEncParamBase;
+  GetValidEncParamBase (&sEncParamBase);
+
+  int iResult = pPtrEnc->Initialize (&sEncParamBase);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  if (iResult != cmResultSuccess) {
+    fprintf (stderr, "Unexpected ParamBase? \
+                 iUsageType=%d, Pic=%dx%d, TargetBitrate=%d, iRCMode=%d, fMaxFrameRate=%.1f\n",
+             sEncParamBase.iUsageType, sEncParamBase.iPicWidth, sEncParamBase.iPicHeight,
+             sEncParamBase.iTargetBitrate, sEncParamBase.iRCMode, sEncParamBase.fMaxFrameRate);
+  }
+
+  PrepareOneSrcFrame();
+
+  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeIDR));
+
+  GetValidEncParamBase (&sEncParamBase);
+  iResult = pPtrEnc->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_BASE, &sEncParamBase);
+
+  PrepareOneSrcFrame();
+
+  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+
+  iResult = pPtrEnc->Uninitialize();
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+}
+
 TEST_F (EncoderInterfaceTest, BasicInitializeTestFalse) {
   int iResult;
   SEncParamBase sEncParamBase;
