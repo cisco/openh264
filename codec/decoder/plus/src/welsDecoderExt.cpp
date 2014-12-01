@@ -373,8 +373,9 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
 
     pDecoderStatistics->fAverageFrameSpeedInMs = (float) (m_pDecContext->dDecTime) /
         (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount);
-    memset (&m_pDecContext->sDecoderStatistics, 0, sizeof (SDecoderStatistics));
+    ResetDecStatNums (&m_pDecContext->sDecoderStatistics);
     m_pDecContext->dDecTime = 0;
+
     return cmResultSuccess;
   }
 
@@ -478,6 +479,10 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
       }
       m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
+      if (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount == 0) { //exceed max value of uint32_t
+        ResetDecStatNums (&m_pDecContext->sDecoderStatistics);
+        m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
+      }
       m_pDecContext->sDecoderStatistics.uiEcFrameNum++;
       m_pDecContext->sDecoderStatistics.uiAvgEcRatio = m_pDecContext->sDecoderStatistics.uiAvgEcRatio /
           m_pDecContext->sDecoderStatistics.uiEcFrameNum;
@@ -490,14 +495,18 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
   if (pDstInfo->iBufferStatus == 1) {
 
+    m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
+    if (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount == 0) { //exceed max value of uint32_t
+        ResetDecStatNums (&m_pDecContext->sDecoderStatistics);
+        m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
+    }
+
     if ((m_pDecContext->sDecoderStatistics.uiWidth != (unsigned int) pDstInfo->UsrData.sSystemBuffer.iWidth)
         || (m_pDecContext->sDecoderStatistics.uiHeight != (unsigned int) pDstInfo->UsrData.sSystemBuffer.iHeight)) {
       m_pDecContext->sDecoderStatistics.uiResolutionChangeTimes++;
       m_pDecContext->sDecoderStatistics.uiWidth = pDstInfo->UsrData.sSystemBuffer.iWidth;
       m_pDecContext->sDecoderStatistics.uiHeight = pDstInfo->UsrData.sSystemBuffer.iHeight;
-
     }
-    m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
   }
   iEnd = WelsTime();
   m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
@@ -529,7 +538,7 @@ DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
   m_pDecContext->pParserBsInfo = pDstInfo;
   pDstInfo->iNalNum = 0;
   pDstInfo->iSpsWidthInPixel = pDstInfo->iSpsHeightInPixel = 0;
-  if(pDstInfo) {
+  if (pDstInfo) {
     m_pDecContext->uiTimeStamp = pDstInfo->uiInBsTimeStamp;
     pDstInfo->uiOutBsTimeStamp = 0;
   } else {

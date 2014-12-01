@@ -147,7 +147,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->iImgHeightInPixel		= 0;		// alloc picture data when picture size is available
   pCtx->iLastImgWidthInPixel		= 0;
   pCtx->iLastImgHeightInPixel		= 0;
-  pCtx->bFreezeOutput = false;
+  pCtx->bFreezeOutput = true;
 
   pCtx->iFrameNum				= -1;
   pCtx->iPrevFrameNum			= -1;
@@ -165,6 +165,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->bAvcBasedFlag			= true;
   pCtx->eErrorConMethod = ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
   pCtx->pPreviousDecodedPictureInDpb = NULL;
+  pCtx->sDecoderStatistics.iAvgLumaQp = -1;
 
 }
 
@@ -275,7 +276,7 @@ void WelsFreeMem (PWelsDecoderContext pCtx) {
   pCtx->iImgHeightInPixel = 0;
   pCtx->iLastImgWidthInPixel	= 0;
   pCtx->iLastImgHeightInPixel = 0;
-  pCtx->bFreezeOutput = false;
+  pCtx->bFreezeOutput = true;
   pCtx->bHaveGotMemory	= false;
   WelsFree (pCtx->pCabacDecEngine, "pCtx->pCabacDecEngine");
 }
@@ -776,5 +777,63 @@ void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
 
   WelsBlockFuncInit (&pCtx->sBlockFunc, pCtx->uiCpuFlag);
 }
+
+//reset decoder number related statistics info
+void ResetDecStatNums (SDecoderStatistics* pDecStat) {
+  uint32_t uiWidth = pDecStat->uiWidth;
+  uint32_t uiHeight = pDecStat->uiHeight;
+  int32_t iAvgLumaQp = pDecStat->iAvgLumaQp;
+  memset (pDecStat, 0, sizeof (SDecoderStatistics));
+  pDecStat->uiWidth = uiWidth;
+  pDecStat->uiHeight = uiHeight;
+  pDecStat->iAvgLumaQp = iAvgLumaQp;
+}
+
+//update information when freezing occurs, including IDR/non-IDR number
+void UpdateDecStatFreezingInfo (const bool kbIdrFlag, SDecoderStatistics* pDecStat) {
+  if (kbIdrFlag)
+    pDecStat->uiFreezingIDRNum++;
+  else
+    pDecStat->uiFreezingNonIDRNum++;
+}
+
+//update information when no freezing occurs, including QP, correct IDR number, ECed IDR number
+void UpdateDecStatNoFreezingInfo (PWelsDecoderContext pCtx) {
+  PDqLayer pCurDq = pCtx->pCurDqLayer;
+  PPicture pPic = pCtx->pDec;
+  SDecoderStatistics* pDecStat = &pCtx->sDecoderStatistics;
+
+  if (pDecStat->iAvgLumaQp == -1) //first correct frame received
+    pDecStat->iAvgLumaQp = 0;
+
+  //update QP info
+  int32_t iTotalQp = 0;
+  const int32_t kiMbNum = pCurDq->iMbWidth * pCurDq->iMbHeight;
+  for (int32_t iMb = 0; iMb < kiMbNum; ++iMb) {
+    iTotalQp += pCurDq->pLumaQp[iMb] * pCurDq->pMbCorrectlyDecodedFlag[iMb];
+  }
+  iTotalQp /= kiMbNum;
+  if (pDecStat->uiDecodedFrameCount + 1 == 0) { //maximum uint32_t reached
+    ResetDecStatNums (pDecStat);
+    pDecStat->iAvgLumaQp = iTotalQp;
+  } else
+    pDecStat->iAvgLumaQp = (uint64_t) (pDecStat->iAvgLumaQp * pDecStat->uiDecodedFrameCount + iTotalQp) /
+                           (pDecStat->uiDecodedFrameCount + 1);
+
+  //update IDR number
+  if (pCurDq->sLayerInfo.sNalHeaderExt.bIdrFlag) {
+    pDecStat->uiIDRCorrectNum += (pPic->bIsComplete);
+    pDecStat->uiEcIDRNum += (!pPic->bIsComplete);
+  }
+}
+
+//update decoder statistics information
+void UpdateDecStat (PWelsDecoderContext pCtx, const bool kbOutput) {
+  if (pCtx->bFreezeOutput)
+    UpdateDecStatFreezingInfo (pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag, &pCtx->sDecoderStatistics);
+  else if (kbOutput)
+    UpdateDecStatNoFreezingInfo (pCtx);
+}
+
 
 } // namespace WelsDec

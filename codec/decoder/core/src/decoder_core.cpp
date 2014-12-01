@@ -44,7 +44,6 @@
 #include "error_concealment.h"
 
 namespace WelsDec {
-
 static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
   PDqLayer pCurDq = pCtx->pCurDqLayer;
   PPicture pPic = pCtx->pDec;
@@ -88,24 +87,22 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
 
   pCtx->iTotalNumMbRec = 0;
 
-  if (!pCtx->bParseOnly) {
-    //////output:::normal path
-    pDstInfo->uiOutYuvTimeStamp = pPic->uiTimeStamp;
-    ppDst[0]      = pPic->pData[0];
-    ppDst[1]      = pPic->pData[1];
-    ppDst[2]      = pPic->pData[2];
+  //////output:::normal path
+  pDstInfo->uiOutYuvTimeStamp = pPic->uiTimeStamp;
+  ppDst[0]      = pPic->pData[0];
+  ppDst[1]      = pPic->pData[1];
+  ppDst[2]      = pPic->pData[2];
 
-    pDstInfo->UsrData.sSystemBuffer.iFormat = videoFormatI420;
+  pDstInfo->UsrData.sSystemBuffer.iFormat = videoFormatI420;
 
-    pDstInfo->UsrData.sSystemBuffer.iWidth = kiWidth - (pCtx->sFrameCrop.iLeftOffset + pCtx->sFrameCrop.iRightOffset) * 2;
-    pDstInfo->UsrData.sSystemBuffer.iHeight = kiHeight - (pCtx->sFrameCrop.iTopOffset + pCtx->sFrameCrop.iBottomOffset) * 2;
-    pDstInfo->UsrData.sSystemBuffer.iStride[0] = pPic->iLinesize[0];
-    pDstInfo->UsrData.sSystemBuffer.iStride[1] = pPic->iLinesize[1];
-    ppDst[0] = ppDst[0] + pCtx->sFrameCrop.iTopOffset * 2 * pPic->iLinesize[0] + pCtx->sFrameCrop.iLeftOffset * 2;
-    ppDst[1] = ppDst[1] + pCtx->sFrameCrop.iTopOffset  * pPic->iLinesize[1] + pCtx->sFrameCrop.iLeftOffset;
-    ppDst[2] = ppDst[2] + pCtx->sFrameCrop.iTopOffset  * pPic->iLinesize[1] + pCtx->sFrameCrop.iLeftOffset;
-    pDstInfo->iBufferStatus = 1;
-  }
+  pDstInfo->UsrData.sSystemBuffer.iWidth = kiWidth - (pCtx->sFrameCrop.iLeftOffset + pCtx->sFrameCrop.iRightOffset) * 2;
+  pDstInfo->UsrData.sSystemBuffer.iHeight = kiHeight - (pCtx->sFrameCrop.iTopOffset + pCtx->sFrameCrop.iBottomOffset) * 2;
+  pDstInfo->UsrData.sSystemBuffer.iStride[0] = pPic->iLinesize[0];
+  pDstInfo->UsrData.sSystemBuffer.iStride[1] = pPic->iLinesize[1];
+  ppDst[0] = ppDst[0] + pCtx->sFrameCrop.iTopOffset * 2 * pPic->iLinesize[0] + pCtx->sFrameCrop.iLeftOffset * 2;
+  ppDst[1] = ppDst[1] + pCtx->sFrameCrop.iTopOffset  * pPic->iLinesize[1] + pCtx->sFrameCrop.iLeftOffset;
+  ppDst[2] = ppDst[2] + pCtx->sFrameCrop.iTopOffset  * pPic->iLinesize[1] + pCtx->sFrameCrop.iLeftOffset;
+  pDstInfo->iBufferStatus = 1;
 
   bool bOutResChange = (pCtx->iLastImgWidthInPixel != pDstInfo->UsrData.sSystemBuffer.iWidth)
                        || (pCtx->iLastImgHeightInPixel != pDstInfo->UsrData.sSystemBuffer.iHeight);
@@ -119,13 +116,6 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
            && pCtx->iErrorCode && bOutResChange)
     pCtx->bFreezeOutput = true;
 
-  if ((pDstInfo->iBufferStatus == 1) && (pCurDq->sLayerInfo.sNalHeaderExt.bIdrFlag)) {
-    if (pPic->bIsComplete)
-      pCtx->sDecoderStatistics.uiIDRRecvNum++;
-    else
-      pCtx->sDecoderStatistics.uiEcIDRNum++;
-  }
-
   if (pDstInfo->iBufferStatus == 0) {
     if (!bFrameCompleteFlag)
       pCtx->iErrorCode |= dsBitstreamError;
@@ -137,6 +127,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "DecodeFrameConstruction():New sequence detected, but freezed.");
     }
   }
+  UpdateDecStat (pCtx, pDstInfo->iBufferStatus);
 
   return 0;
 }

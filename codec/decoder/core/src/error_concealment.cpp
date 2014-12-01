@@ -157,8 +157,9 @@ void DoErrorConSliceCopy (PWelsDecoderContext pCtx) {
     } //iMbX
   } //iMbY
 
-  pCtx->sDecoderStatistics.uiAvgEcRatio = (pCtx->sDecoderStatistics.uiAvgEcRatio * pCtx->sDecoderStatistics.uiEcFrameNum)
-                                          + ((iMbEcedNum * 100) / iMbNum) ;
+  if (!pCtx->bFreezeOutput)
+    pCtx->sDecoderStatistics.uiAvgEcRatio = (pCtx->sDecoderStatistics.uiAvgEcRatio * pCtx->sDecoderStatistics.uiEcFrameNum)
+                                            + ((iMbEcedNum * 100) / iMbNum) ;
 }
 
 //Do error concealment using slice MV copy method
@@ -415,8 +416,9 @@ void DoErrorConSliceMVCopy (PWelsDecoderContext pCtx) {
     } //iMbX
   } //iMbY
 
-  pCtx->sDecoderStatistics.uiAvgEcRatio = (pCtx->sDecoderStatistics.uiAvgEcRatio * pCtx->sDecoderStatistics.uiEcFrameNum)
-                                          + ((iMbEcedNum * 100) / iMbNum) ;
+  if (!pCtx->bFreezeOutput)
+    pCtx->sDecoderStatistics.uiAvgEcRatio = (pCtx->sDecoderStatistics.uiAvgEcRatio * pCtx->sDecoderStatistics.uiEcFrameNum)
+                                            + ((iMbEcedNum * 100) / iMbNum) ;
 }
 
 //Mark erroneous frame as Ref Pic into DPB
