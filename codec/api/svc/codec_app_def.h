@@ -126,7 +126,9 @@ typedef enum {
   ENCODER_OPTION_GET_STATISTICS,             ///< read only
   ENCODER_OPTION_STATISTICS_LOG_INTERVAL,    ///< log interval in millisecond
 
-  ENCODER_OPTION_IS_LOSSLESS_LINK            ///< advanced algorithmetic settings
+  ENCODER_OPTION_IS_LOSSLESS_LINK,            ///< advanced algorithmetic settings
+
+  ENCODER_OPTION_BITS_VARY_PERCENTAGE        ///< bit vary percentage
 } ENCODER_OPTION;
 
 /**

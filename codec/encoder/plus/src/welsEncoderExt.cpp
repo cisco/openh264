@@ -1097,6 +1097,14 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
              "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_IS_LOSSLESS_LINK,bIsLosslessLink = %d", bValue);
   }
   break;
+  case ENCODER_OPTION_BITS_VARY_PERCENTAGE: {
+    int32_t iValue = * (static_cast<int32_t*> (pOption));
+    m_pEncContext->pSvcParam->iBitsVaryPercentage = iValue;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITS_VARY_PERCENTAGE,iBitsVaryPercentage = %d", iValue);
+  }
+  break;
+
   default:
     return cmInitParaError;
   }

@@ -125,7 +125,7 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
     pWelsSvcRc->iNumberMbFrame = iMbWidth * (pDLayerParam->iVideoHeight >> 4);
     pWelsSvcRc->iSliceNum = pSliceCtx->iSliceNumInFrame;
 
-    pWelsSvcRc->iRcVaryPercentage = _BITS_RANGE;	// % -- for temp
+    pWelsSvcRc->iRcVaryPercentage = pEncCtx->pSvcParam->iBitsVaryPercentage;	// % -- for temp
     pWelsSvcRc->iRcVaryRatio = pWelsSvcRc->iRcVaryPercentage;
 
     pWelsSvcRc->iSkipBufferRatio  = SKIP_RATIO;

@@ -111,7 +111,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
   char*       pCurPath; // record current lib path such as:/pData/pData/com.wels.enc/lib/
 
   bool		bDeblockingParallelFlag;	// deblocking filter parallelization control flag
-
+  int32_t   iBitsVaryPercentage;
   short
   iCountThreadsNum;                       //              # derived from disable_multiple_slice_idc (=0 or >1) means;
 
@@ -202,6 +202,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     iCountThreadsNum		= 1;	//		# derived from disable_multiple_slice_idc (=0 or >1) means;
 
     iDecompStages				= 0;	// GOP size dependency, unknown here and be revised later
+    iBitsVaryPercentage = 0;
   }
 
   int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam) {
