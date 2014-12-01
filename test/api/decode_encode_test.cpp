@@ -130,8 +130,8 @@ TEST_P (DecodeEncodeTest, CompareOutput) {
   }
 }
 static const DecodeEncodeFileParam kFileParamArray[] = {
-  {"res/test_vd_1d.264", "63fe502aa2d63869cc888592e4984b3d6e8c3bef", 320, 192, 12.0f},
-  {"res/test_vd_rc.264", "fda7fdfbef853ec7aaf3e236dcfa7c0ba9c2314a", 320, 192, 12.0f},
+  {"res/test_vd_1d.264", "3fee3297d9c69aa8726498fdacba87f1e12100b0", 320, 192, 12.0f},
+  {"res/test_vd_rc.264", "556ac0894af7bc93a27b3f0876184e0171288038", 320, 192, 12.0f},
 };
 
 

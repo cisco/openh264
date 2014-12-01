@@ -1335,7 +1335,6 @@ void GetMvMvdRange (SWelsSvcCodingParam* pParam, int32_t& iMvRange, int32_t& iMv
     if (pParam->sSpatialLayers[iLayer].uiLevelIdc < iMinLevelIdc)
       iMinLevelIdc = pParam->sSpatialLayers[iLayer].uiLevelIdc;
   }
-
   iMinMv = (g_ksLevelLimits[iMinLevelIdc - 1].iMinVmv) >> 2;
   iMaxMv = (g_ksLevelLimits[iMinLevelIdc - 1].iMaxVmv) >> 2;
 
@@ -1361,11 +1360,6 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
   int32_t iResult					= 0;
   float	fCompressRatioThr		= .5f;
   const int32_t kiNumDependencyLayers	= pParam->iSpatialLayerNum;
-  int32_t iMvdRange = 0;
-  GetMvMvdRange (pParam, (*ppCtx)->iMvRange, iMvdRange);
-  const uint32_t kuiMvdInterTableSize	= (iMvdRange << 2); //intepel*4=qpel
-  const uint32_t kuiMvdInterTableStride	=  1 + (kuiMvdInterTableSize << 1);//qpel_mv_range*2=(+/-);
-  const uint32_t kuiMvdCacheAlignedSize	= kuiMvdInterTableStride * sizeof (uint16_t);
   int32_t iVclLayersBsSizeCount		= 0;
   int32_t iNonVclLayersBsSizeCount	= 0;
   int32_t iTargetSpatialBsSize			= 0;
@@ -1569,6 +1563,12 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx) {
     FreeMemorySvc (ppCtx);
     return 1;
   }
+
+  int32_t iMvdRange = 0;
+  GetMvMvdRange (pParam, (*ppCtx)->iMvRange, iMvdRange);
+  const uint32_t kuiMvdInterTableSize	= (iMvdRange << 2); //intepel*4=qpel
+  const uint32_t kuiMvdInterTableStride	=  1 + (kuiMvdInterTableSize << 1);//qpel_mv_range*2=(+/-);
+  const uint32_t kuiMvdCacheAlignedSize	= kuiMvdInterTableStride * sizeof (uint16_t);
 
   (*ppCtx)->iMvdCostTableSize = kuiMvdInterTableSize;
   (*ppCtx)->iMvdCostTableStride = kuiMvdInterTableStride;
