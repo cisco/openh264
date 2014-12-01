@@ -230,7 +230,7 @@ install-static: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) install-headers
 install-shared: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXVER) install-headers $(PROJECT_NAME).pc
 	mkdir -p $(PREFIX)/lib
 	mkdir -p $(PREFIX)/bin
-	install -m 755 $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) $(PREFIX)/lib
+	install -m 755 $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXVER) $(PREFIX)/lib
 	if [ -L $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) ]; then \
 		cp -a $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) $(SHAREDLIB_DIR); \
 	fi
