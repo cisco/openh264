@@ -466,15 +466,15 @@ void  WelsWriteBlockResidualCabac (SMbCache* pMbCache, SMB* pCurMb, uint32_t iMb
 
 
 }
-int32_t WelsCalNonZeroCount (int16_t* pBlock, int16_t iNum) {
+int32_t WelsCalNonZeroCount2x2Block (int16_t* pBlock) {
   int32_t iCount = 0;
-  for (int16_t i = 0; i < iNum; i++) {
+  for (int16_t i = 0; i < 4; i++) {
     if (pBlock[i])
       iCount++;
   }
   return iCount;
 }
-int32_t WelsWriteMbResidualCabac (SSlice* pSlice, SMbCache* sMbCacheInfo, SMB* pCurMb, SCabacCtx* pCabacCtx,
+int32_t WelsWriteMbResidualCabac (SWelsFuncPtrList* pFuncList,SSlice* pSlice, SMbCache* sMbCacheInfo, SMB* pCurMb, SCabacCtx* pCabacCtx,
                                   int16_t iMbWidth, uint32_t uiChromaQpIndexOffset) {
 
   const uint16_t uiMbType = pCurMb->uiMbType;
@@ -498,7 +498,7 @@ int32_t WelsWriteMbResidualCabac (SSlice* pSlice, SMbCache* sMbCacheInfo, SMB* p
 
     if (uiMbType == MB_TYPE_INTRA16x16) {
       //Luma DC
-      int iNonZeroCount = WelsCalNonZeroCount (pMbCache->pDct->iLumaI16x16Dc, 16);
+      int iNonZeroCount = pFuncList->pfGetNoneZeroCount(pMbCache->pDct->iLumaI16x16Dc);
       WelsWriteBlockResidualCabac (pMbCache, pCurMb, iMbWidth, pCabacCtx, LUMA_DC, 0, iNonZeroCount,
                                    pMbCache->pDct->iLumaI16x16Dc, 15);
       if (iNonZeroCount)
@@ -527,13 +527,13 @@ int32_t WelsWriteMbResidualCabac (SSlice* pSlice, SMbCache* sMbCacheInfo, SMB* p
     if (iCbpChroma) {
       int32_t iNonZeroCount = 0;
       //chroma DC
-      iNonZeroCount = WelsCalNonZeroCount (pMbCache->pDct->iChromaDc[0], 4);
+      iNonZeroCount = WelsCalNonZeroCount2x2Block (pMbCache->pDct->iChromaDc[0]);
       if (iNonZeroCount)
         pCurMb->iCbpDc |= 0x2;
       WelsWriteBlockResidualCabac (pMbCache, pCurMb, iMbWidth, pCabacCtx, CHROMA_DC, 1, iNonZeroCount,
                                    pMbCache->pDct->iChromaDc[0], 3);
 
-      iNonZeroCount = WelsCalNonZeroCount (pMbCache->pDct->iChromaDc[1], 4);
+      iNonZeroCount = WelsCalNonZeroCount2x2Block (pMbCache->pDct->iChromaDc[1]);
       if (iNonZeroCount)
         pCurMb->iCbpDc |= 0x4;
       WelsWriteBlockResidualCabac (pMbCache, pCurMb, iMbWidth, pCabacCtx, CHROMA_DC, 2, iNonZeroCount,
@@ -681,7 +681,7 @@ int32_t WelsSpatialWriteMbSynCabac (void* pCtx, SSlice* pSlice, SMB* pCurMb) {
     if (uiMbType != MB_TYPE_INTRA16x16) {
       WelsCabacMbCbp (pCurMb, iMbWidth, pCabacCtx);
     }
-    iRet = WelsWriteMbResidualCabac (pSlice, pMbCache, pCurMb, pCabacCtx, iMbWidth, uiChromaQpIndexOffset);
+    iRet = WelsWriteMbResidualCabac (pEncCtx->pFuncList,pSlice, pMbCache, pCurMb, pCabacCtx, iMbWidth, uiChromaQpIndexOffset);
   }
   if (!IS_INTRA (pCurMb->uiMbType))
     pCurMb->uiChromPredMode = 0;
