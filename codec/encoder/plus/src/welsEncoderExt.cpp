@@ -1074,10 +1074,10 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   }
   break;
   case ENCODER_OPTION_BITS_VARY_PERCENTAGE: {
-    bool bValue = * (static_cast<bool*> (pOption));
-    m_pEncContext->pSvcParam->iBitsVaryPercentage = bValue;
+    int32_t iValue = * (static_cast<int32_t*> (pOption));
+    m_pEncContext->pSvcParam->iBitsVaryPercentage = iValue;
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITS_VARY_PERCENTAGE,iBitsVaryPercentage = %d", bValue);
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITS_VARY_PERCENTAGE,iBitsVaryPercentage = %d", iValue);
   }
   break;
 
