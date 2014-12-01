@@ -48,7 +48,7 @@ void	BilateralLumaFilter8_c (uint8_t* pSample, int32_t iStride) {
   int32_t iCurSample, iCurWeight, iGreyDiff;
   uint8_t aSample[8];
 
-  for (int32_t i = 0; i < 8; i++) {
+  for (auto & elem : aSample) {
     nSum = 0;
     nTotWeight = 0;
     iCenterSample = *pSample;
@@ -68,7 +68,7 @@ void	BilateralLumaFilter8_c (uint8_t* pSample, int32_t iStride) {
     }
     nTotWeight = 256 - nTotWeight;
     nSum += iCenterSample * nTotWeight;
-    aSample[i] = nSum >> 8;
+    elem = nSum >> 8;
     pSample++;
   }
   WelsMemcpy (pSample - 8, aSample, 8);

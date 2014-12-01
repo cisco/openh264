@@ -406,8 +406,8 @@ unsigned long long uiTimeStamp;
 } SWelsDecoderContext, *PWelsDecoderContext;
 
 static inline void ResetActiveSPSForEachLayer (PWelsDecoderContext pCtx) {
-for (int i = 0; i < MAX_LAYER_NUM; i++) {
-  pCtx->pActiveLayerSps[i] = NULL;
+for (auto & elem : pCtx->pActiveLayerSps) {
+  elem = NULL;
 }
 }
 //#ifdef __cplusplus

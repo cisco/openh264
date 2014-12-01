@@ -2617,8 +2617,8 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
   }
 
   if (P_SLICE == pCtx->eSliceType) {
-    for (int i = 0; i < BLOCK_STATIC_IDC_ALL; i++) {
-      pFuncList->pfMotionSearch[i] = WelsMotionEstimateSearch;
+    for (auto & elem : pFuncList->pfMotionSearch) {
+      elem = WelsMotionEstimateSearch;
     }
     pFuncList->pfSearchMethod[BLOCK_16x16]  =
       pFuncList->pfSearchMethod[BLOCK_16x8] =
@@ -3829,8 +3829,8 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     SParaSetOffsetVariable sTmpPsoVariable[PARA_SET_TYPE];
     uint16_t	          uiTmpIdrPicId;//this is for LTR!
     SLogContext sLogCtx = (*ppCtx)->sLogCtx;
-    for (int32_t k = 0; k < PARA_SET_TYPE; k++)
-      memset (((*ppCtx)->sPSOVector.sParaSetOffsetVariable[k].bUsedParaSetIdInBs), 0, MAX_PPS_COUNT * sizeof (bool));
+    for (auto & elem : (*ppCtx)->sPSOVector.sParaSetOffsetVariable)
+      memset ((elem.bUsedParaSetIdInBs), 0, MAX_PPS_COUNT * sizeof (bool));
     memcpy (sTmpPsoVariable, (*ppCtx)->sPSOVector.sParaSetOffsetVariable,
             (PARA_SET_TYPE)*sizeof (SParaSetOffsetVariable)); // confirmed_safe_unsafe_usage
     uiTmpIdrPicId = (*ppCtx)->sPSOVector.uiIdrPicId;

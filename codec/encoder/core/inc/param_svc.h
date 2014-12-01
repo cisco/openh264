@@ -171,18 +171,18 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     param.iUsageType = CAMERA_VIDEO_REAL_TIME;
     param.uiMaxNalSize = 0;
     param.bIsLosslessLink = false;
-    for (int32_t iLayer = 0; iLayer < MAX_SPATIAL_LAYER_NUM; iLayer++) {
-      param.sSpatialLayers[iLayer].uiProfileIdc = PRO_BASELINE;
-      param.sSpatialLayers[iLayer].uiLevelIdc = LEVEL_5_0;
-      param.sSpatialLayers[iLayer].iDLayerQp = SVC_QUALITY_BASE_QP;
-      param.sSpatialLayers[iLayer].fFrameRate = param.fMaxFrameRate;
-      param.sSpatialLayers[iLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
-      param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 1500;
-      param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceNum = 1;
-      param.sSpatialLayers[iLayer].iMaxSpatialBitrate = UNSPECIFIED_BIT_RATE;
+    for (auto & elem : param.sSpatialLayers) {
+      elem.uiProfileIdc = PRO_BASELINE;
+      elem.uiLevelIdc = LEVEL_5_0;
+      elem.iDLayerQp = SVC_QUALITY_BASE_QP;
+      elem.fFrameRate = param.fMaxFrameRate;
+      elem.sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
+      elem.sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 1500;
+      elem.sSliceCfg.sSliceArgument.uiSliceNum = 1;
+      elem.iMaxSpatialBitrate = UNSPECIFIED_BIT_RATE;
       const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
       for (int32_t idx = 0; idx < kiLesserSliceNum; idx++)
-        param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceMbNum[idx] = 960;
+        elem.sSliceCfg.sSliceArgument.uiSliceMbNum[idx] = 960;
     }
   }
 
