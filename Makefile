@@ -227,7 +227,7 @@ install-static: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) install-headers
 	mkdir -p $(PREFIX)/lib
 	install -m 644 $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(PREFIX)/lib
 
-install-shared: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) install-headers $(PROJECT_NAME).pc
+install-shared: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXVER) install-headers $(PROJECT_NAME).pc
 	mkdir -p $(PREFIX)/lib
 	mkdir -p $(PREFIX)/bin
 	install -m 755 $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) $(PREFIX)/lib
