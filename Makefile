@@ -231,7 +231,7 @@ install-shared: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXVER) install-header
 	mkdir -p $(PREFIX)/lib
 	mkdir -p $(PREFIX)/bin
 	install -m 755 $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXVER) $(PREFIX)/lib
-	if [ -L $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) ]; then \
+	if [ "$(SHAREDLIBSUFFIXVER)" != "$(SHAREDLIBSUFFIX)" ]; then \
 		cp -a $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) $(SHAREDLIB_DIR); \
 	fi
 	mkdir -p $(PREFIX)/lib/pkgconfig
