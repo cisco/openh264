@@ -22,6 +22,7 @@ V=Yes
 PREFIX=/usr/local
 SHARED=-shared
 OBJ=o
+SHAREDLIB_DIR=$(PREFIX)/lib
 PROJECT_NAME=openh264
 MODULE_NAME=gmpopenh264
 GMP_API_BRANCH=master
