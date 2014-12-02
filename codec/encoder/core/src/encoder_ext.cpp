@@ -3727,11 +3727,11 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   pFbi->iLayerNum			= iLayerNum;
   pFbi->iSubSeqId = GetSubSequenceId (pCtx, eFrameType);
 
-  WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsEncoderEncodeExt() OutputInfo iLayerNum ＝ %d,iSubSeqId = %d,iFrameSize = %d",
+  WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsEncoderEncodeExt() OutputInfo iLayerNum = %d,iSubSeqId = %d,iFrameSize = %d",
            iLayerNum,
            pFbi->iSubSeqId, iFrameSize);
   for (int32_t i = 0; i < iLayerNum; i++)
-    WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsEncoderEncodeExt() OutputInfo iLayerId = %d,iNalType = %d,iNalCount ＝ %d", i,
+    WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsEncoderEncodeExt() OutputInfo iLayerId = %d,iNalType = %d,iNalCount = %d", i,
              pFbi->sLayerInfo[i].uiLayerType, pFbi->sLayerInfo[i].iNalCount);
   WelsEmms();
 
