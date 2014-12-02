@@ -36,7 +36,7 @@
 
 #include "typedefs.h"
 #include "macros.h"
-
+#include "codec_app_def.h"
 
 
 namespace WelsCommon {
@@ -46,7 +46,7 @@ namespace WelsCommon {
 #define  WELS_CONTEXT_COUNT 460
 #define LEVEL_NUMBER 17
 typedef struct TagLevelLimits {
-  uint8_t uiLevelIdc;  // level idc
+  ELevelIdc uiLevelIdc;  // level idc
   uint32_t uiMaxMBPS; // Max macroblock processing rate(MB/s)
   uint32_t uiMaxFS;   // Max frame sizea(MBs)
   uint32_t uiMaxDPBMbs;// Max decoded picture buffer size(MBs)
@@ -60,6 +60,7 @@ typedef struct TagLevelLimits {
 
 #define CpbBrNalFactor 1200  //baseline,main,and extended profiles.
 extern const SLevelLimits g_ksLevelLimits[LEVEL_NUMBER];
+extern const uint32_t g_kuiLevelMaps[LEVEL_NUMBER];
 extern const uint8_t g_kuiMbCountScan4Idx[24];
 extern const uint8_t g_kuiCache30ScanIdx[16];
 extern const uint8_t g_kuiCache48CountScan4Idx[24];
