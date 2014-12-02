@@ -165,6 +165,9 @@ void DoErrorConSliceCopy (PWelsDecoderContext pCtx) {
 //Do error concealment using slice MV copy method
 void DoMbECMvCopy (PWelsDecoderContext pCtx, PPicture pDec, PPicture pRef, int32_t iMbXy, int32_t iMbX, int32_t iMbY,
                    sMCRefMember* pMCRefMem) {
+  if (pDec == pRef) {
+    return; // for protection, shall never go into this logic, error info printed outside.
+  }
   int16_t iMVs[2];
   int32_t iMbXInPix = iMbX << 4;
   int32_t iMbYInPix = iMbY << 4;
@@ -382,6 +385,10 @@ void DoErrorConSliceMVCopy (PWelsDecoderContext pCtx) {
     sMCRefMem.iDstLineChroma = pDstPic->iLinesize[1];
     sMCRefMem.iPicWidth = pDstPic->iWidthInPixel;
     sMCRefMem.iPicHeight = pDstPic->iHeightInPixel;
+    if (pDstPic == pSrcPic) {
+      // output error info, EC will be ignored in DoMbECMvCopy
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "DoErrorConSliceMVCopy()::pPreviousPic and pDec use same buffer, ignored.");
+    }
   }
 
   for (int32_t iMbY = 0; iMbY < iMbHeight; ++iMbY) {
