@@ -127,7 +127,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "DecodeFrameConstruction():New sequence detected, but freezed.");
     }
   }
-  UpdateDecStat (pCtx, pDstInfo->iBufferStatus);
+  UpdateDecStat (pCtx, pDstInfo->iBufferStatus != 0);
 
   return 0;
 }
