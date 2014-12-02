@@ -2317,7 +2317,7 @@ const uint32_t kiMaxBsSize = 10000000; //DO NOT CHANGE!
 const char* pHashStr[] = { //DO NOT CHANGE!
   "58fa8bbb386717d45c86bb8cc814159b99bbc200",
   "0fb76e4d6eb307c758eca657f8f0089fc5324a59",
-  "8f0fafeaa2746e04d42fb17104efb61c9dbd1a6f"
+  "c791064900c3ab4cf8e11cc5763f398717ec5557"
 };
 
 class DecodeParseAPI : public EncodeDecodeTestBase {
