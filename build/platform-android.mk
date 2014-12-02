@@ -1,6 +1,5 @@
 ARCH = arm
 include $(SRC_PATH)build/arch.mk
-SHAREDLIB_DIR = $(PREFIX)/lib
 SHAREDLIBSUFFIX = so
 # Android APK/JARs expect libraries to be unversioned
 SHAREDLIBSUFFIXVER=$(SHAREDLIBSUFFIX)
