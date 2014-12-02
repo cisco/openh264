@@ -621,8 +621,8 @@ typedef struct TagVideoDecoderStatistics {
   uiAvgEcRatio;                                ///< when EC is on, the average ratio of correct or EC areas, can be an indicator of reconstruction quality
   unsigned int uiEcIDRNum;                     ///< number of actual unintegrity IDR or not received but eced
   unsigned int uiEcFrameNum;                   ///<
-  unsigned int uiIDRLostNum;                   ///< number of lost IDR
-  unsigned int uiFreezingIDRNum;               ///< number of freezing IDR with error
+  unsigned int uiIDRLostNum;                   ///< number of whole lost IDR
+  unsigned int uiFreezingIDRNum;               ///< number of freezing IDR with error (partly received), under resolution change
   unsigned int uiFreezingNonIDRNum;            ///< number of freezing non-IDR with error
   int iAvgLumaQp;                              ///< average luma QP. default: -1, no correct frame outputted
 
