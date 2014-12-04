@@ -166,8 +166,6 @@ void CWelsH264SVCEncoder::InitEncoder (void) {
   if (m_pWelsTrace == NULL) {
     return;
   }
-
-  m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);
   WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsH264SVCEncoder::InitEncoder(), openh264 codec version = %s",
            VERSION_NUMBER);
 }
@@ -202,7 +200,7 @@ int CWelsH264SVCEncoder::Initialize (const SEncParamBase* argv) {
     Uninitialize();
     return cmInitParaError;
   }
-
+  TraceParamInfo (&sConfig);
   return InitializeInternal (&sConfig);
 }
 
@@ -226,7 +224,7 @@ int CWelsH264SVCEncoder::InitializeExt (const SEncParamExt* argv) {
     Uninitialize();
     return cmInitParaError;
   }
-
+  TraceParamInfo (&sConfig);
   return InitializeInternal (&sConfig);
 }
 
