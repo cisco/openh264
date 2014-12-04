@@ -202,7 +202,7 @@ int CWelsH264SVCEncoder::Initialize (const SEncParamBase* argv) {
     Uninitialize();
     return cmInitParaError;
   }
-
+  TraceParamInfo (&sConfig);
   return InitializeInternal (&sConfig);
 }
 
@@ -226,7 +226,7 @@ int CWelsH264SVCEncoder::InitializeExt (const SEncParamExt* argv) {
     Uninitialize();
     return cmInitParaError;
   }
-
+  TraceParamInfo (&sConfig);
   return InitializeInternal (&sConfig);
 }
 
