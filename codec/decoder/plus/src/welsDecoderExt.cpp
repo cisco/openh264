@@ -373,8 +373,6 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
 
     pDecoderStatistics->fAverageFrameSpeedInMs = (float) (m_pDecContext->dDecTime) /
         (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount);
-    ResetDecStatNums (&m_pDecContext->sDecoderStatistics);
-    m_pDecContext->dDecTime = 0;
 
     return cmResultSuccess;
   }
@@ -497,8 +495,8 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
     m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
     if (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount == 0) { //exceed max value of uint32_t
-        ResetDecStatNums (&m_pDecContext->sDecoderStatistics);
-        m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
+      ResetDecStatNums (&m_pDecContext->sDecoderStatistics);
+      m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
     }
 
     if ((m_pDecContext->sDecoderStatistics.uiWidth != (unsigned int) pDstInfo->UsrData.sSystemBuffer.iWidth)
