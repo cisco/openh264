@@ -146,7 +146,6 @@ typedef struct TagSliceHeaderExt {
 SSliceHeader	sSliceHeader;
 PSubsetSps	pSubsetSps;
 
-uint32_t	uiNumMbsInSlice;
 uint32_t	uiDisableInterLayerDeblockingFilterIdc;
 int32_t		iInterLayerSliceAlphaC0Offset;
 int32_t		iInterLayerSliceBetaOffset;

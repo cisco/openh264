@@ -90,7 +90,7 @@ static inline int32_t FmoGenerateMbAllocMapType0 (PFmo pFmo, PPps pPps) {
 static inline int32_t FmoGenerateMbAllocMapType1 (PFmo pFmo, PPps pPps, const int32_t kiMbWidth) {
   uint32_t uiNumSliceGroups = 0;
   int32_t iMbNum = 0;
-  int16_t i = 0;
+  int32_t i = 0;
   WELS_VERIFY_RETURN_IF (1, (NULL == pFmo || NULL == pPps))
   uiNumSliceGroups = pPps->uiNumSliceGroups;
   iMbNum			 = pFmo->iCountMbNum;

@@ -865,8 +865,8 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
       WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //slice_skip_flag
       pSliceHeadExt->bSliceSkipFlag	= !!uiCode;
       if (pSliceHeadExt->bSliceSkipFlag) {
-        WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //num_mbs_in_slice_minus1
-        pSliceHeadExt->uiNumMbsInSlice	= 1 + uiCode;
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "bSliceSkipFlag == 1 not supported.");
+        return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_UNSUPPORTED_SLICESKIP);
       } else {
         WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //adaptive_base_mode_flag
         pSliceHeadExt->bAdaptiveBaseModeFlag	= !!uiCode;
