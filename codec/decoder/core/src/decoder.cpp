@@ -94,6 +94,119 @@ static int32_t CreatePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, cons
   return 0;
 }
 
+static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, const int32_t kiOldSize,
+                              const int32_t kiPicWidth, const int32_t kiPicHeight, const int32_t kiNewSize) {
+  PPicBuff pPicOldBuf = *ppPicBuf;
+  PPicBuff pPicNewBuf = NULL;
+  int32_t iPicIdx = 0;
+  if (kiOldSize<=0 || kiNewSize <= 0 || kiPicWidth <= 0 || kiPicHeight <= 0) {
+    return 1;
+  }
+
+  pPicNewBuf	= (PPicBuff)WelsMalloc (sizeof (SPicBuff), "PPicBuff");
+
+  if (NULL == pPicNewBuf) {
+    return 1;
+  }
+
+  pPicNewBuf->ppPic = (PPicture*)WelsMalloc (kiNewSize * sizeof (PPicture), "PPicture*");
+
+  if (NULL == pPicNewBuf->ppPic) {
+    return 1;
+  }
+  // copy old PicBuf to new PicBuf
+  memcpy(pPicNewBuf->ppPic, pPicOldBuf->ppPic, kiOldSize * sizeof(PPicture));
+  // initialize context in queue
+  pPicNewBuf->iCapacity	 = kiNewSize;
+  pPicNewBuf->iCurrentIdx = pPicOldBuf->iCurrentIdx;
+  *ppPicBuf			 = pPicNewBuf;
+
+  // increase new PicBuf
+  for (iPicIdx = kiOldSize; iPicIdx < kiNewSize; ++ iPicIdx) {
+    PPicture pPic = AllocPicture (pCtx, kiPicWidth, kiPicHeight);
+    if (NULL == pPic) {
+      return 1;
+    }
+    pPicNewBuf->ppPic[iPicIdx] = pPic;
+  }
+
+  // remove old PicBuf
+  if (pPicOldBuf->ppPic != NULL) {
+    WelsFree (pPicOldBuf->ppPic, "pPicOldBuf->queue");
+    pPicOldBuf->ppPic	= NULL;
+  }
+  pPicOldBuf->iCapacity	= 0;
+  pPicOldBuf->iCurrentIdx = 0;
+  WelsFree (pPicOldBuf, "pPicOldBuf");
+
+  return 0;
+}
+
+static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, const int32_t kiOldSize,
+                              const int32_t kiPicWidth, const int32_t kiPicHeight, const int32_t kiNewSize) {
+  PPicBuff pPicOldBuf = *ppPicBuf;
+  PPicBuff pPicNewBuf = NULL;
+  int32_t iPicIdx = 0;
+  if (kiOldSize<=0 || kiNewSize <= 0 || kiPicWidth <= 0 || kiPicHeight <= 0) {
+    return 1;
+  }
+
+  pPicNewBuf	= (PPicBuff)WelsMalloc (sizeof (SPicBuff), "PPicBuff");
+
+  if (NULL == pPicNewBuf) {
+    return 1;
+  }
+
+  pPicNewBuf->ppPic = (PPicture*)WelsMalloc (kiNewSize * sizeof (PPicture), "PPicture*");
+
+  if (NULL == pPicNewBuf->ppPic) {
+    return 1;
+  }
+
+  int32_t iPrevPicIdx = -1;
+  for (iPrevPicIdx = 0; iPrevPicIdx < kiOldSize; ++iPrevPicIdx) {
+    if(pCtx->pPreviousDecodedPictureInDpb == pPicOldBuf->ppPic[iPrevPicIdx]) {
+      break;
+    }
+  }
+  int32_t iDelIdx;
+  if(iPrevPicIdx < kiOldSize && iPrevPicIdx >= kiNewSize) {
+    // found pPreviousDecodedPictureInDpb, 
+    pPicNewBuf->ppPic[0] = pPicOldBuf->ppPic[iPrevPicIdx];
+    pPicNewBuf->iCurrentIdx = 0;
+    memcpy(pPicNewBuf->ppPic + 1, pPicOldBuf->ppPic, (kiNewSize - 1) * sizeof(PPicture));
+    iDelIdx = kiNewSize - 1;
+  } else {
+    memcpy(pPicNewBuf->ppPic, pPicOldBuf->ppPic, kiNewSize * sizeof(PPicture));
+    pPicNewBuf->iCurrentIdx = iPrevPicIdx < kiNewSize? iPrevPicIdx : 0;
+    iDelIdx = kiNewSize;
+  }
+
+  for(iPicIdx = iDelIdx; iPicIdx < kiOldSize; iPicIdx++) {
+    if(iPrevPicIdx != iPicIdx) {
+      if (pPicOldBuf->ppPic[iPicIdx] != NULL) {
+        FreePicture (pPicOldBuf->ppPic[iPicIdx]);
+        pPicOldBuf->ppPic[iPicIdx] = NULL;
+       }
+    }
+  }
+
+  // initialize context in queue
+  pPicNewBuf->iCapacity	 = kiNewSize;
+  *ppPicBuf			 = pPicNewBuf;
+
+  // remove old PicBuf
+  if (pPicOldBuf->ppPic != NULL) {
+    WelsFree (pPicOldBuf->ppPic, "pPicOldBuf->queue");
+    pPicOldBuf->ppPic	= NULL;
+  }
+  pPicOldBuf->iCapacity	= 0;
+  pPicOldBuf->iCurrentIdx = 0;
+  WelsFree (pPicOldBuf, "pPicOldBuf");
+
+  return 0;
+}
+
 static void DestroyPicBuff (PPicBuff* ppPicBuf) {
   PPicBuff pPicBuf = NULL;
 
@@ -225,18 +338,29 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
   // sync update pRefList
   WelsResetRefPic (pCtx);	// added to sync update ref list due to pictures are free
 
-  // for Recycled_Pic_Queue
-  for (iListIdx = LIST_0; iListIdx < LIST_A; ++ iListIdx) {
-    PPicBuff* ppPic = &pCtx->pPicBuff[iListIdx];
-    if (NULL != ppPic && NULL != *ppPic) {
-      DestroyPicBuff (ppPic);
+  if(pCtx->bHaveGotMemory && (kiPicWidth == pCtx->iImgWidthInPixel && kiPicHeight == pCtx->iImgHeightInPixel)
+                         && pCtx->pPicBuff[LIST_0] != NULL && pCtx->pPicBuff[LIST_0]->iCapacity != iPicQueueSize) {
+      // currently only active for LIST_0 due to have no B frames
+    if (pCtx->pPicBuff[LIST_0]->iCapacity < iPicQueueSize) {
+      iErr = IncreasePicBuff (pCtx, &pCtx->pPicBuff[LIST_0], pCtx->pPicBuff[LIST_0]->iCapacity, kiPicWidth, kiPicHeight, iPicQueueSize);
+    } else {
+      iErr = DecreasePicBuff (pCtx, &pCtx->pPicBuff[LIST_0], pCtx->pPicBuff[LIST_0]->iCapacity, kiPicWidth, kiPicHeight, iPicQueueSize);
     }
+  } else {
+      // for Recycled_Pic_Queue
+      for (iListIdx = LIST_0; iListIdx < LIST_A; ++ iListIdx) {
+        PPicBuff* ppPic = &pCtx->pPicBuff[iListIdx];
+        if (NULL != ppPic && NULL != *ppPic) {
+          DestroyPicBuff (ppPic);
+        }
+      }
+
+      pCtx->pPreviousDecodedPictureInDpb = NULL;
+
+      // currently only active for LIST_0 due to have no B frames
+      iErr = CreatePicBuff (pCtx, &pCtx->pPicBuff[LIST_0], iPicQueueSize, kiPicWidth, kiPicHeight);
   }
 
-  pCtx->pPreviousDecodedPictureInDpb = NULL;
-
-  // currently only active for LIST_0 due to have no B frames
-  iErr = CreatePicBuff (pCtx, &pCtx->pPicBuff[LIST_0], iPicQueueSize, kiPicWidth, kiPicHeight);
   if (iErr != ERR_NONE)
     return iErr;
 
