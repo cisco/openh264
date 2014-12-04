@@ -893,7 +893,7 @@ int32_t WelsDecodeMbCabacPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
 int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNalUnit pNalCur) {
   PDqLayer pCurLayer = pCtx->pCurDqLayer;
   PFmo pFmo = pCtx->pFmo;
-  int32_t i, iRet;
+  int32_t iRet;
   int32_t iNextMbXyIndex, iSliceIdc;
 
   PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
@@ -956,29 +956,6 @@ int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNal
   pCurLayer->iMbX =  iMbX;
   pCurLayer->iMbY = iMbY;
   pCurLayer->iMbXyIndex = iNextMbXyIndex;
-
-  if (pSliceHeaderExt->bSliceSkipFlag == 1) {
-    for (i = 0; i < (int32_t)pSliceHeaderExt->uiNumMbsInSlice; i++) {
-      pCurLayer->pSliceIdc[iNextMbXyIndex] = iSliceIdc;
-
-
-      pCurLayer->pResidualPredFlag[iNextMbXyIndex] = 1;
-
-      if (pSliceHeaderExt->sSliceHeader.pPps->uiNumSliceGroups > 1) {
-        iNextMbXyIndex = FmoNextMb (pFmo, iNextMbXyIndex);
-      } else {
-        ++iNextMbXyIndex;
-      }
-
-      iMbX = iNextMbXyIndex % pCurLayer->iMbWidth;
-      iMbY = iNextMbXyIndex % pCurLayer->iMbHeight;
-
-      pCurLayer->iMbX =  iMbX;
-      pCurLayer->iMbY = iMbY;
-      pCurLayer->iMbXyIndex = iNextMbXyIndex;
-    }
-    return 0;
-  }
 
   do {
     if ((-1 == iNextMbXyIndex) || (iNextMbXyIndex >= kiCountNumMb)) {	// slice group boundary or end of a frame
