@@ -821,7 +821,7 @@ void UpdateMaxBrCheckWindowStatus(void* pCtx, int32_t iSpatialNum, const long lo
     pEncCtx->iCheckWindowCurrentTs = pEncCtx->iCheckWindowStartTs = uiTimeStamp;
     pEncCtx->bCheckWindowStatusRefreshFlag = true;
   }
-  pEncCtx->iCheckWindowInterval = pEncCtx->iCheckWindowCurrentTs - pEncCtx->iCheckWindowStartTs;
+  pEncCtx->iCheckWindowInterval = (int32_t) (pEncCtx->iCheckWindowCurrentTs - pEncCtx->iCheckWindowStartTs);
   if(pEncCtx->iCheckWindowInterval >= (TIME_CHECK_WINDOW >> 1) && !pEncCtx->bCheckWindowShiftResetFlag) {
     pEncCtx->bCheckWindowShiftResetFlag = true;
     for (int32_t i = 0; i < iSpatialNum; i++) {
@@ -875,7 +875,7 @@ void RcTraceFrameBits (void* pCtx, long long uiTimeStamp) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
 
   if (pWelsSvcRc->iPredFrameBit != 0)
-    pWelsSvcRc->iPredFrameBit = LAST_FRAME_PREDICT_WEIGHT * pWelsSvcRc->iFrameDqBits + (1 - LAST_FRAME_PREDICT_WEIGHT) * pWelsSvcRc->iPredFrameBit;
+    pWelsSvcRc->iPredFrameBit = (int32_t) (LAST_FRAME_PREDICT_WEIGHT * pWelsSvcRc->iFrameDqBits + (1 - LAST_FRAME_PREDICT_WEIGHT) * pWelsSvcRc->iPredFrameBit);
   else
     pWelsSvcRc->iPredFrameBit = pWelsSvcRc->iFrameDqBits;
 
