@@ -328,7 +328,7 @@ enum {
   WELS_LOG_DETAIL      = 1 << 4,        ///< per packet/frame log
   WELS_LOG_RESV        = 1 << 5,        ///< resversed log iLevel
   WELS_LOG_LEVEL_COUNT = 6,
-  WELS_LOG_DEFAULT     = WELS_LOG_DEBUG	///< default log iLevel in Wels codec
+  WELS_LOG_DEFAULT     = WELS_LOG_INFO	///< default log iLevel in Wels codec
 };
 
 /**

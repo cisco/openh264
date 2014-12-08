@@ -1276,12 +1276,13 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace) {
   pFunc = TestOutPutTrace;
   pTraceInfo = &sTrace;
   sTrace.iTarLevel = iTraceLevel;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   encoder_->SetOption (ENCODER_OPTION_TRACE_CALLBACK, &pFunc);
   encoder_->SetOption (ENCODER_OPTION_TRACE_CALLBACK_CONTEXT, &pTraceInfo);
   decoder_->SetOption (DECODER_OPTION_TRACE_CALLBACK, &pFunc);
   decoder_->SetOption (DECODER_OPTION_TRACE_CALLBACK_CONTEXT, &pTraceInfo);
-  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
-  decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+
 
   int32_t iSpsPpsIdAddition = 1;
   encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
