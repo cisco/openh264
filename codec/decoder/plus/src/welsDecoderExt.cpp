@@ -385,6 +385,8 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     const int kiSrcLen,
     unsigned char** ppDst,
     SBufferInfo* pDstInfo) {
+  m_pDecContext->iMbEcedNum = 0;
+  m_pDecContext->iMbNum = 0;
   if (CheckBsBuffer (m_pDecContext, kiSrcLen)) {
     return dsOutOfMemory;
   }
@@ -464,10 +466,6 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     if ((m_pDecContext->eErrorConMethod != ERROR_CON_DISABLE) && (pDstInfo->iBufferStatus == 1)) {
       //TODO after dec status updated
       m_pDecContext->iErrorCode |= dsDataErrorConcealed;
-      if (m_pDecContext->eErrorConMethod == ERROR_CON_FRAME_COPY)
-
-        m_pDecContext->sDecoderStatistics.uiAvgEcRatio = (m_pDecContext->sDecoderStatistics.uiAvgEcRatio *
-            m_pDecContext->sDecoderStatistics.uiEcFrameNum) + 100;
 
       //
       if ((m_pDecContext->sDecoderStatistics.uiWidth != (unsigned int) pDstInfo->UsrData.sSystemBuffer.iWidth)
@@ -482,6 +480,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
         ResetDecStatNums (&m_pDecContext->sDecoderStatistics);
         m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
       }
+      m_pDecContext->sDecoderStatistics.uiAvgEcRatio = m_pDecContext->iMbEcedNum == 0 ? (m_pDecContext->sDecoderStatistics.uiAvgEcRatio * m_pDecContext->sDecoderStatistics.uiEcFrameNum) :((m_pDecContext->sDecoderStatistics.uiAvgEcRatio * m_pDecContext->sDecoderStatistics.uiEcFrameNum) + ((m_pDecContext->iMbEcedNum * 100) / m_pDecContext->iMbNum));
       m_pDecContext->sDecoderStatistics.uiEcFrameNum++;
       m_pDecContext->sDecoderStatistics.uiAvgEcRatio = m_pDecContext->sDecoderStatistics.uiAvgEcRatio /
           m_pDecContext->sDecoderStatistics.uiEcFrameNum;

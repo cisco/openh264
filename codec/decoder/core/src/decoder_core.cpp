@@ -1683,7 +1683,8 @@ static void WriteBackActiveParameters (PWelsDecoderContext pCtx) {
 int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
   int32_t iErr;
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
-
+  pCtx->iMbEcedNum = 0;
+  pCtx->iMbNum = 0;
   pCtx->bAuReadyFlag = false;
   pCtx->bLastHasMmco5 = false;
   bool bTmpNewSeqBegin = CheckNewSeqBeginAndUpdateActiveLayerSps (pCtx);
