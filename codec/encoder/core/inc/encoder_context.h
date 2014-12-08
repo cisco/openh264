@@ -169,7 +169,14 @@ typedef struct TagWelsEncCtx {
 
 // Rate control routine
   SWelsSvcRc*					pWelsSvcRc;
+  bool              bCheckWindowStatusRefreshFlag;
+  int64_t           iCheckWindowStartTs;
+  int64_t           iCheckWindowCurrentTs;
+  int32_t           iCheckWindowInterval;
+  int32_t           iCheckWindowIntervalShift;
+  bool              bCheckWindowShiftResetFlag;
   int32_t						iSkipFrameFlag; //_GOM_RC_
+  int32_t           iContinualSkipFrames;
   int32_t						iGlobalQp;		// global qp
 
 // VAA
