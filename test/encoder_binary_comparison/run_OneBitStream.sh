@@ -8,7 +8,7 @@
 #       -- For more detail,please refer to file AboutTest.
 #
 #brief:
-#       -- Usage:  run_OneBitStream.sh      $BitSteamName
+#       -- Usage:  run_OneBitStream.sh   $BitStreamName $TestType
 #       -- WorkingDir
 #          1) For local  test:  WorkingDir=openh264/test/encoder_binary_comparison
 #          2) For travis test:  WorkingDir=openh264
@@ -51,7 +51,7 @@ runSHA1TableCheck()
   if [  ! -e  "${SHA1File}"   ]
   then
     echo "SHA1 table does not exist:  ${SHA1File} "
-    echo "SHA1 table should be named as \${StreamName}_AllCase_SHA1_Table.csv"
+    echo "SHA1 table should be named as \${StreamName}_AllCases_SHA1_Table.csv"
     exit 0
   fi
   return 0
@@ -70,7 +70,7 @@ runBitStreamCheck()
   if [ ! -e ${BitStream}  ]
   then
     echo -e "\033[31m   bit stream does not exist:  $BitSreamName   \033[0m"
-    echo -e "\033[31m   please double check under  /openh264/res folder \033[0m"
+    echo -e "\033[31m   please double check under  openh264/res folder \033[0m"
     echo -e "\033[31m     -----detected by run_OneBitStream.sh  \033[0m"
     exit 0
   fi
@@ -98,27 +98,47 @@ runBitStreamCheck()
   fi
   return 0
  }
- #usage: usage: runMain \$BitStreamName
+ #brief: delete temp files based on test type
+runPostAction()
+ {
+    echo ""
+    echo "deleting temp data,entire folder will be deleted........ "
+  if [ -d ${BitStreamTestDir} ]
+  then
+        ${EncoderTestDir}/Scripts/run_SafeDelete.sh ${BitStreamTestDir}
+  fi
+
+  if [ ${TestType} = "TravisTest" ]
+  then
+  if [-d ${FinalResultDir} ]
+      then
+          ${EncoderTestDir}/Scripts/run_SafeDelete.sh ${FinalResultDir}
+  fi
+  fi
+ }
+
+ #usage: usage: runMain $BitStreamName $TestType
 runMain()
 {
-  if [ ! $# -eq 1 ]
+  if [ ! $# -eq 2 ]
   then
-    echo "usage: runMain \$BitStreamName  "
+    echo "usage: runMain \$BitStreamName \$TestType"
     echo "detected by run_OneBitStream.sh"
-    return 1
+    exit 1
   fi
-  local BitStreamName=$1
-  local TestYUVName=""
-  local StreamName=""
-  local BitStreamToYUVLog="Bit2YUV.log"
-  local SHA1Table="${BitStreamName}_AllCase_SHA1_Table.csv"
+  BitStreamName=$1
+  TestType=$2
+  TestYUVName=""
+  StreamName=""
+  BitStreamToYUVLog="Bit2YUV.log"
+  SHA1Table="${BitStreamName}_AllCases_SHA1_Table.csv"
   #dir info
-  local WorkingDir=`pwd`
-  local EncoderTestDir=""
-  local BitStreamTestDir=""
-  local FinalResultDir=""
-  local StreamFileFullPath=""
-  local BitSreamDir=""
+  WorkingDir=`pwd`
+  EncoderTestDir=""
+  BitStreamTestDir=""
+  FinalResultDir=""
+  StreamFileFullPath=""
+  BitSreamDir=""
   if [[  "${WorkingDir}" =~ "test/encoder_binary_comparison"  ]]
   then
     #for local test: working dir is  openh264/test/encoder_binary_comparison
@@ -140,6 +160,7 @@ runMain()
   runBitStreamCheck ${StreamFileFullPath}
   runTestSpaceCheck  ${BitStreamTestDir}
   #go to Bitstream test space
+
   cd ${BitStreamTestDir}
   runSHA1TableCheck   ${SHA1Table}
   #bit stream to YUV
@@ -175,21 +196,18 @@ runMain()
     cp  ./result/*    ${FinalResultDir}
     cd  ${WorkingDir}
     #delete the test data
-    echo ""
-    echo "deleting temp data,entire folder will be deleted........ "
-    ${EncoderTestDir}/Scripts/run_SafeDelete.sh ${BitStreamTestDir}
+    runPostAction
     exit 1
   else
     echo -e "\033[32m  all cases passed!! ----bit stream:  ${StreamName} \033[0m"
     cp  ./result/*    ${FinalResultDir}
     cd  ${WorkingDir}
     #delete the test data
-    echo ""
-    echo "deleting temp data,entire folder will be deleted........ "
-    ${EncoderTestDir}/Scripts/run_SafeDelete.sh ${BitStreamTestDir}
+    runPostAction
     exit 0
   fi
  }
 BitSteamName=$1
-runMain  $BitSteamName
+TestType=$2
+runMain  "${BitSteamName}" "${TestType}"
 
