@@ -786,18 +786,28 @@ const SLevelLimits* GetLevelLimits (int32_t iLevelIdx, bool bConstraint3) {
   return NULL;
 }
 
-bool CheckSpsActive (PWelsDecoderContext pCtx, PSps pSps) {
+bool CheckSpsActive (PWelsDecoderContext pCtx, PSps pSps, bool bUseSubsetFlag) {
   for (int i = 0; i < MAX_LAYER_NUM; i++) {
     if (pCtx->pActiveLayerSps[i] == pSps)
       return true;
   }
   // Pre-active, will be used soon
-  if (pSps->iMbWidth > 0  && pSps->iMbHeight > 0 && pCtx->bSpsAvailFlags[pSps->iSpsId]
-      && pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
-    PSps pNextUsedSps =
-      pCtx->pAccessUnitList->pNalUnitsList[pCtx->pAccessUnitList->uiStartPos]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
-    if (pNextUsedSps->iSpsId == pSps->iSpsId)
-      return true;
+  if (bUseSubsetFlag) {
+    if (pSps->iMbWidth > 0  && pSps->iMbHeight > 0 && pCtx->bSubspsAvailFlags[pSps->iSpsId]
+        && pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
+      PSps pNextUsedSps =
+        pCtx->pAccessUnitList->pNalUnitsList[pCtx->pAccessUnitList->uiStartPos]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
+      if (pNextUsedSps->iSpsId == pSps->iSpsId)
+        return true;
+    }
+  } else {
+    if (pSps->iMbWidth > 0  && pSps->iMbHeight > 0 && pCtx->bSpsAvailFlags[pSps->iSpsId]
+        && pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
+      PSps pNextUsedSps =
+        pCtx->pAccessUnitList->pNalUnitsList[pCtx->pAccessUnitList->uiStartPos]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
+      if (pNextUsedSps->iSpsId == pSps->iSpsId)
+        return true;
+    }
   }
   return false;
 }
@@ -1127,7 +1137,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   } else {
     pTmpSps = &pCtx->sSpsBuffer[iSpsId];
   }
-  if (CheckSpsActive (pCtx, pTmpSps)) {
+  if (CheckSpsActive (pCtx, pTmpSps, kbUseSubsetFlag)) {
     // we are overwriting the active sps, copy a temp buffer
     if (kbUseSubsetFlag) {
       if (memcmp (&pCtx->sSubsetSpsBuffer[iSpsId], pSubsetSps, sizeof (SSubsetSps)) != 0) {
