@@ -385,8 +385,6 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     const int kiSrcLen,
     unsigned char** ppDst,
     SBufferInfo* pDstInfo) {
-  m_pDecContext->iMbEcedNum = 0;
-  m_pDecContext->iMbNum = 0;
   if (CheckBsBuffer (m_pDecContext, kiSrcLen)) {
     return dsOutOfMemory;
   }
@@ -480,10 +478,12 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
         ResetDecStatNums (&m_pDecContext->sDecoderStatistics);
         m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
       }
-      m_pDecContext->sDecoderStatistics.uiAvgEcRatio = m_pDecContext->iMbEcedNum == 0 ? (m_pDecContext->sDecoderStatistics.uiAvgEcRatio * m_pDecContext->sDecoderStatistics.uiEcFrameNum) :((m_pDecContext->sDecoderStatistics.uiAvgEcRatio * m_pDecContext->sDecoderStatistics.uiEcFrameNum) + ((m_pDecContext->iMbEcedNum * 100) / m_pDecContext->iMbNum));
-      m_pDecContext->sDecoderStatistics.uiEcFrameNum++;
-      m_pDecContext->sDecoderStatistics.uiAvgEcRatio = m_pDecContext->sDecoderStatistics.uiAvgEcRatio /
-          m_pDecContext->sDecoderStatistics.uiEcFrameNum;
+      int32_t iMbConcealedNum = m_pDecContext->iMbEcedNum + m_pDecContext->iMbEcedPropNum;
+      m_pDecContext->sDecoderStatistics.uiAvgEcRatio = iMbConcealedNum == 0 ? (m_pDecContext->sDecoderStatistics.uiAvgEcRatio * m_pDecContext->sDecoderStatistics.uiEcFrameNum) :((m_pDecContext->sDecoderStatistics.uiAvgEcRatio * m_pDecContext->sDecoderStatistics.uiEcFrameNum) + ((iMbConcealedNum * 100) / m_pDecContext->iMbNum));
+      m_pDecContext->sDecoderStatistics.uiAvgEcPropRatio = m_pDecContext->iMbEcedPropNum == 0 ? (m_pDecContext->sDecoderStatistics.uiAvgEcPropRatio * m_pDecContext->sDecoderStatistics.uiEcFrameNum) :((m_pDecContext->sDecoderStatistics.uiAvgEcPropRatio * m_pDecContext->sDecoderStatistics.uiEcFrameNum) + ((m_pDecContext->iMbEcedPropNum * 100) / m_pDecContext->iMbNum));
+      m_pDecContext->sDecoderStatistics.uiEcFrameNum += (iMbConcealedNum == 0 ? 0 : 1);
+      m_pDecContext->sDecoderStatistics.uiAvgEcRatio = m_pDecContext->sDecoderStatistics.uiEcFrameNum == 0? 0 : m_pDecContext->sDecoderStatistics.uiAvgEcRatio / m_pDecContext->sDecoderStatistics.uiEcFrameNum;
+      m_pDecContext->sDecoderStatistics.uiAvgEcPropRatio = m_pDecContext->sDecoderStatistics.uiEcFrameNum == 0? 0 :  m_pDecContext->sDecoderStatistics.uiAvgEcPropRatio / m_pDecContext->sDecoderStatistics.uiEcFrameNum;
     }
     iEnd = WelsTime();
     m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;

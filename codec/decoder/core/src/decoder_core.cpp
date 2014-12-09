@@ -127,6 +127,9 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "DecodeFrameConstruction():New sequence detected, but freezed.");
     }
   }
+  pCtx->iMbEcedNum = pPic->iMbEcedNum;
+  pCtx->iMbNum = pPic->iMbNum;
+  pCtx->iMbEcedPropNum = pPic->iMbEcedPropNum;
   UpdateDecStat (pCtx, pDstInfo->iBufferStatus != 0);
 
   return 0;
@@ -1079,6 +1082,8 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
 
     pCtx->sMb.pMbCorrectlyDecodedFlag[i] = (bool*) WelsMalloc (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (bool),
                                            "pCtx->sMb.pMbCorrectlyDecodedFlag[]");
+    pCtx->sMb.pMbRefConcealedFlag[i] = (bool*) WelsMalloc (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (bool),
+                                                           "pCtx->pMbRefConcealedFlag[]");
 
     // check memory block valid due above allocated..
     WELS_VERIFY_RETURN_IF (ERR_INFO_OUT_OF_MEMORY,
@@ -1100,6 +1105,7 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
                             (NULL == pCtx->sMb.pSliceIdc[i]) ||
                             (NULL == pCtx->sMb.pResidualPredFlag[i]) ||
                             (NULL == pCtx->sMb.pInterPredictionDoneFlag[i]) ||
+                            (NULL == pCtx->sMb.pMbRefConcealedFlag[i]) ||
                             (NULL == pCtx->sMb.pMbCorrectlyDecodedFlag[i])
                            )
                           )
@@ -1243,6 +1249,10 @@ void UninitialDqLayersContext (PWelsDecoderContext pCtx) {
       pCtx->sMb.pMbCorrectlyDecodedFlag[i] = NULL;
     }
 
+    if (pCtx->sMb.pMbRefConcealedFlag[i]) {
+      WelsFree (pCtx->sMb.pMbRefConcealedFlag[i], "pCtx->sMb.pMbRefConcealedFlag[]");
+      pCtx->sMb.pMbRefConcealedFlag[i] = NULL;
+    }
     WelsFree (pDq, "pDq");
 
     pDq = NULL;
@@ -1683,8 +1693,6 @@ static void WriteBackActiveParameters (PWelsDecoderContext pCtx) {
 int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
   int32_t iErr;
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
-  pCtx->iMbEcedNum = 0;
-  pCtx->iMbNum = 0;
   pCtx->bAuReadyFlag = false;
   pCtx->bLastHasMmco5 = false;
   bool bTmpNewSeqBegin = CheckNewSeqBeginAndUpdateActiveLayerSps (pCtx);
@@ -1858,6 +1866,7 @@ void InitCurDqLayerData (PWelsDecoderContext pCtx, PDqLayer pCurDq) {
     pCurDq->pInterPredictionDoneFlag = pCtx->sMb.pInterPredictionDoneFlag[0];
     pCurDq->pResidualPredFlag = pCtx->sMb.pResidualPredFlag[0];
     pCurDq->pMbCorrectlyDecodedFlag = pCtx->sMb.pMbCorrectlyDecodedFlag[0];
+    pCurDq->pMbRefConcealedFlag = pCtx->sMb.pMbRefConcealedFlag[0];
   }
 }
 
@@ -1916,8 +1925,13 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
     if (pCtx->iTotalNumMbRec == 0) { //Picture start to decode
       for (int32_t i = 0; i < LAYER_NUM_EXCHANGEABLE; ++ i)
         memset (pCtx->sMb.pSliceIdc[i], 0xff, (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int32_t)));
-      memset (pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag, 0, pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight);
+      memset (pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag, 0, pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight * sizeof (bool));
+      memset (pCtx->pCurDqLayer->pMbRefConcealedFlag, 0, pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight * sizeof (bool));
+      pCtx->pDec->iMbNum = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
+      pCtx->pDec->iMbEcedNum = 0;
+      pCtx->pDec->iMbEcedPropNum = 0;
     }
+    pCtx->bRPLRError = false;
     GetI4LumaIChromaAddrTable (pCtx->iDecBlockOffsetArray, pCtx->pDec->iLinesize[0], pCtx->pDec->iLinesize[1]);
 
     if (pNalCur->sNalHeaderExt.uiLayerDqId > kuiTargetLayerDqId) { // confirmed pNalCur will never be NULL
@@ -1935,7 +1949,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       iCurrIdD	= pNalCur->sNalHeaderExt.uiDependencyId;
       pSh		= &pNalCur->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
       pShExt	= &pNalCur->sNalData.sVclNal.sSliceHeaderExt;
-
+      pCtx->bRPLRError = false;
       bReconstructSlice = CheckSliceNeedReconstruct (pNalCur->sNalHeaderExt.uiLayerDqId, kuiTargetLayerDqId);
 
       memcpy (&pLayerInfo.sNalHeaderExt, &pNalCur->sNalHeaderExt, sizeof (SNalUnitHeaderExt)); //confirmed_safe_unsafe_usage
@@ -2006,6 +2020,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         if (iCurrIdD == kuiDependencyIdMax && iCurrIdQ == BASE_QUALITY_ID) {
           iRet = InitRefPicList (pCtx, uiNalRefIdc, pSh->iPicOrderCntLsb);
           if (iRet) {
+            pCtx->bRPLRError = true;
             bAllRefComplete = false; // RPLR error, set ref pictures complete flag false
             HandleReferenceLost (pCtx, pNalCur);
             WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
