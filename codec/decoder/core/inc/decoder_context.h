@@ -276,6 +276,7 @@ struct {
   int8_t*  pResidualPredFlag[LAYER_NUM_EXCHANGEABLE];
   int8_t*  pInterPredictionDoneFlag[LAYER_NUM_EXCHANGEABLE];
   bool*    pMbCorrectlyDecodedFlag[LAYER_NUM_EXCHANGEABLE];
+  bool*    pMbRefConcealedFlag[LAYER_NUM_EXCHANGEABLE];
   uint32_t iMbWidth;
   uint32_t iMbHeight;
 } sMb;
@@ -400,6 +401,10 @@ SWelsCabacCtx   pCabacCtx[WELS_CONTEXT_COUNT];
 PWelsCabacDecEngine   pCabacDecEngine;
 double dDecTime;
 SDecoderStatistics sDecoderStatistics;// For real time debugging
+int32_t iMbEcedNum;
+int32_t iMbEcedPropNum;
+int32_t iMbNum;
+bool bMbRefConcealed;
 int32_t iECMVs[16][2];
 PPicture pECRefPic[16];
 unsigned long long uiTimeStamp;

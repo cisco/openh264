@@ -101,6 +101,7 @@ int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx) {
     ++iCountNumMb;
     if (!pCurLayer->pMbCorrectlyDecodedFlag[iNextMbXyIndex]) { //already con-ed, overwrite
       pCurLayer->pMbCorrectlyDecodedFlag[iNextMbXyIndex] = true;
+      pCtx->pDec->iMbEcedPropNum += (pCurLayer->pMbRefConcealedFlag[iNextMbXyIndex]? 1 : 0);
       ++pCtx->iTotalNumMbRec;
     }
 
@@ -839,6 +840,7 @@ int32_t WelsDecodeMbCabacPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
   PDqLayer pCurLayer		 = pCtx->pCurDqLayer;
   PSlice pSlice			 = &pCurLayer->sLayerInfo.sSliceInLayer;
   PSliceHeader pSliceHeader		 = &pSlice->sSliceHeaderExt.sSliceHeader;
+  PPicture* ppRefPic = pCtx->sRefPic.pRefList[LIST_0];
   uint32_t uiCode;
   int32_t iMbXy = pCurLayer->iMbXyIndex;
   int32_t i;
@@ -861,7 +863,7 @@ int32_t WelsDecodeMbCabacPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
 
     pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
     memset (pCurLayer->pRefIndex[0][iMbXy], 0, sizeof (int8_t) * 16);
-
+    pCtx->bMbRefConcealed = pCtx->bMbRefConcealed || !(ppRefPic[0]&&ppRefPic[0]->bIsComplete);
     //predict mv
     PredPSkipMvFromNeighbor (pCurLayer, pMv);
     for (i = 0; i < 16; i++) {
@@ -963,8 +965,9 @@ int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNal
     }
 
     pCurLayer->pSliceIdc[iNextMbXyIndex] = iSliceIdc;
+    pCtx->bMbRefConcealed = false;
     iRet = pDecMbFunc (pCtx,  pNalCur, uiEosFlag);
-
+    pCurLayer->pMbRefConcealedFlag[iNextMbXyIndex] = pCtx->bMbRefConcealed;
     if (iRet != ERR_NONE) {
       return iRet;
     }
@@ -1520,6 +1523,7 @@ int32_t WelsDecodeMbCavlcPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
   PBitStringAux pBs		 = pCurLayer->pBitStringAux;
   PSlice pSlice			 = &pCurLayer->sLayerInfo.sSliceInLayer;
   PSliceHeader pSliceHeader		    = &pSlice->sSliceHeaderExt.sSliceHeader;
+  PPicture* ppRefPic = pCtx->sRefPic.pRefList[LIST_0];
   intX_t iUsedBits;
   const int32_t iMbXy = pCurLayer->iMbXyIndex;
   int8_t* pNzc = pCurLayer->pNzc[iMbXy];
@@ -1547,7 +1551,7 @@ int32_t WelsDecodeMbCavlcPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
 
     pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
     memset (pCurLayer->pRefIndex[0][iMbXy], 0, sizeof (int8_t) * 16);
-
+    pCtx->bMbRefConcealed = pCtx->bMbRefConcealed || !(ppRefPic[0]&&ppRefPic[0]->bIsComplete);
     //predict iMv
     PredPSkipMvFromNeighbor (pCurLayer, iMv);
     for (i = 0; i < 16; i++) {

@@ -82,6 +82,7 @@ void DoErrorConFrameCopy (PWelsDecoderContext pCtx) {
   uint32_t uiHeightInPixelY = (pCtx->pSps->iMbHeight) << 4;
   int32_t iStrideY = pDstPic->iLinesize[0];
   int32_t iStrideUV = pDstPic->iLinesize[1];
+  pCtx->pDec->iMbEcedNum = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
   if ((pCtx->eErrorConMethod == ERROR_CON_FRAME_COPY) && (pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag))
     pSrcPic = NULL; //no cross IDR method, should fill in data instead of copy
   if (pSrcPic == NULL) { //no ref pic, assign specific data to picture
@@ -105,10 +106,8 @@ void DoErrorConSliceCopy (PWelsDecoderContext pCtx) {
   if ((pCtx->eErrorConMethod == ERROR_CON_SLICE_COPY) && (pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag))
     pSrcPic = NULL; //no cross IDR method, should fill in data instead of copy
 
-  int32_t iMbNum = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
   //uint8_t *pDstData[3], *pSrcData[3];
   bool* pMbCorrectlyDecodedFlag = pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag;
-  int32_t iMbEcedNum = 0;
   //Do slice copy late
   int32_t iMbXyIndex;
   uint8_t* pSrcData, *pDstData;
@@ -118,7 +117,7 @@ void DoErrorConSliceCopy (PWelsDecoderContext pCtx) {
     for (int32_t iMbX = 0; iMbX < iMbWidth; ++iMbX) {
       iMbXyIndex = iMbY * iMbWidth + iMbX;
       if (!pMbCorrectlyDecodedFlag[iMbXyIndex]) {
-        iMbEcedNum++;
+        pCtx->pDec->iMbEcedNum++;
         if (pSrcPic != NULL) {
           iSrcStride = pSrcPic->iLinesize[0];
           //Y component
@@ -156,10 +155,6 @@ void DoErrorConSliceCopy (PWelsDecoderContext pCtx) {
       } //!pMbCorrectlyDecodedFlag[iMbXyIndex]
     } //iMbX
   } //iMbY
-
-  if (!pCtx->bFreezeOutput)
-    pCtx->sDecoderStatistics.uiAvgEcRatio = (pCtx->sDecoderStatistics.uiAvgEcRatio * pCtx->sDecoderStatistics.uiEcFrameNum)
-                                            + ((iMbEcedNum * 100) / iMbNum) ;
 }
 
 //Do error concealment using slice MV copy method
@@ -368,9 +363,7 @@ void DoErrorConSliceMVCopy (PWelsDecoderContext pCtx) {
   PPicture pDstPic = pCtx->pDec;
   PPicture pSrcPic = pCtx->pPreviousDecodedPictureInDpb;
 
-  int32_t iMbNum = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
   bool* pMbCorrectlyDecodedFlag = pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag;
-  int32_t iMbEcedNum = 0;
   int32_t iMbXyIndex;
   uint8_t* pDstData;
   uint32_t iDstStride = pDstPic->iLinesize[0];
@@ -395,7 +388,7 @@ void DoErrorConSliceMVCopy (PWelsDecoderContext pCtx) {
     for (int32_t iMbX = 0; iMbX < iMbWidth; ++iMbX) {
       iMbXyIndex = iMbY * iMbWidth + iMbX;
       if (!pMbCorrectlyDecodedFlag[iMbXyIndex]) {
-        iMbEcedNum++;
+        pCtx->pDec->iMbEcedNum++;
         if (pSrcPic != NULL) {
           DoMbECMvCopy (pCtx, pDstPic, pSrcPic, iMbXyIndex, iMbX, iMbY, &sMCRefMem);
         } else { //pSrcPic == NULL
@@ -422,10 +415,6 @@ void DoErrorConSliceMVCopy (PWelsDecoderContext pCtx) {
       } //!pMbCorrectlyDecodedFlag[iMbXyIndex]
     } //iMbX
   } //iMbY
-
-  if (!pCtx->bFreezeOutput)
-    pCtx->sDecoderStatistics.uiAvgEcRatio = (pCtx->sDecoderStatistics.uiAvgEcRatio * pCtx->sDecoderStatistics.uiEcFrameNum)
-                                            + ((iMbEcedNum * 100) / iMbNum) ;
 }
 
 //Mark erroneous frame as Ref Pic into DPB
