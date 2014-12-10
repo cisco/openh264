@@ -373,7 +373,8 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
 
     pDecoderStatistics->fAverageFrameSpeedInMs = (float) (m_pDecContext->dDecTime) /
         (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount);
-
+    pDecoderStatistics->fActualAverageFrameSpeedInMs = (float) (m_pDecContext->dDecTime) /
+    (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount + m_pDecContext->sDecoderStatistics.uiFreezingIDRNum + m_pDecContext->sDecoderStatistics.uiFreezingNonIDRNum);
     return cmResultSuccess;
   }
 

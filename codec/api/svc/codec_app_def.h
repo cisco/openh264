@@ -613,6 +613,7 @@ typedef struct TagVideoDecoderStatistics {
   unsigned int uiWidth;	                       ///< the width of encode/decode frame
   unsigned int uiHeight;                       ///< the height of encode/decode frame
   float fAverageFrameSpeedInMs;                ///< average_Decoding_Time
+  float fActualAverageFrameSpeedInMs;          ///< actual average_Decoding_Time, including freezing pictures
   unsigned int uiDecodedFrameCount;            ///< number of frames
   unsigned int uiResolutionChangeTimes;        ///< uiResolutionChangeTimes
   unsigned int uiIDRCorrectNum;	               ///< number of correct IDR received
