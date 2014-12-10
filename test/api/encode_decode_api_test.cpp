@@ -2056,8 +2056,8 @@ TEST_F (EncodeDecodeTestAPI, Engine_SVC_Switch_P) {
 }
 
 TEST_F (EncodeDecodeTestAPI, SetOptionEncParamExt) {
-  int iWidth       = (((rand() % MAX_WIDTH) >> 1) + 16) << 1;
-  int iHeight      = (((rand() % MAX_HEIGHT) >> 1) + 16) << 1;
+  int iWidth       = WELS_CLIP3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 2, MAX_WIDTH);
+  int iHeight      = WELS_CLIP3 ((((rand() % MAX_HEIGHT) >> 1)  + 1) << 1, 2, MAX_HEIGHT);
   float fFrameRate = rand() + 0.5f;
   int iEncFrameNum = WELS_CLIP3 ((rand() % ENCODE_FRAME_NUM) + 1, 1, ENCODE_FRAME_NUM);
   int iSpatialLayerNum = 4;
