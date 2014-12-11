@@ -63,6 +63,9 @@ void BaseEncoderTest::SetUp() {
   int rv = WelsCreateSVCEncoder (&encoder_);
   ASSERT_EQ (0, rv);
   ASSERT_TRUE (encoder_ != NULL);
+
+  unsigned int uiTraceLevel = WELS_LOG_ERROR;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &uiTraceLevel);
 }
 
 void BaseEncoderTest::TearDown() {
