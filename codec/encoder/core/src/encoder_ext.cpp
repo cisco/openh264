@@ -533,6 +533,20 @@ int32_t WelsEncoderApplyBitRate (SLogContext* pLogCtx, SWelsSvcCodingParam* pPar
   }
   return ENC_RETURN_SUCCESS;
 }
+int32_t WelsEncoderApplyBitVaryRang(SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iRang){
+    SSpatialLayerConfig* pLayerParam;
+    const int32_t iNumLayers = pParam->iSpatialLayerNum;
+    for (int32_t i = 0; i < iNumLayers; i++) {
+        pLayerParam = & (pParam->sSpatialLayers[i]);
+        pLayerParam->iMaxSpatialBitrate = WELS_MIN(pLayerParam->iSpatialBitrate * (1+ iRang/100.0),pLayerParam->iMaxSpatialBitrate);
+        if (WelsBitRateVerification (pLogCtx, pLayerParam, i) != ENC_RETURN_SUCCESS)
+            return ENC_RETURN_UNSUPPORTED_PARA;
+        WelsLog (pLogCtx, WELS_LOG_INFO,
+                 "WelsEncoderApplyBitVaryRang:UpdateMaxBitrate layerId= %d,iMaxSpatialBitrate = %d", i, pLayerParam->iMaxSpatialBitrate);
+    }
+    return ENC_RETURN_SUCCESS;
+}
+
 /*!
  * \brief	acquire count number of layers and NALs based on configurable paramters dependency
  * \pParam	pCtx				sWelsEncCtx*
