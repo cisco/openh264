@@ -53,19 +53,19 @@ void WelsLog (SLogContext* logCtx, int32_t iLevel, const char* kpFmt, ...) {
   char pTraceTag[MAX_LOG_SIZE];
   switch (iLevel) {
   case WELS_LOG_ERROR:
-    WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] Error:");
+    WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] this = 0x%p, Error:", logCtx->pCodecInstance);
     break;
   case WELS_LOG_WARNING:
-    WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] Warning:");
+    WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] this = 0x%p, Warning:", logCtx->pCodecInstance);
     break;
   case WELS_LOG_INFO:
-    WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] Info:");
+    WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] this = 0x%p, Info:", logCtx->pCodecInstance);
     break;
   case WELS_LOG_DEBUG:
-    WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] Debug:");
+    WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] this = 0x%p, Debug:", logCtx->pCodecInstance);
     break;
   default:
-    WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] Detail:");
+    WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] this = 0x%p, Detail:", logCtx->pCodecInstance);
     break;
   }
   WelsStrcat (pTraceTag, MAX_LOG_SIZE, kpFmt);
