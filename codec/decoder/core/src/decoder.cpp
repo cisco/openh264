@@ -95,11 +95,11 @@ static int32_t CreatePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, cons
 }
 
 static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, const int32_t kiOldSize,
-                              const int32_t kiPicWidth, const int32_t kiPicHeight, const int32_t kiNewSize) {
+                                const int32_t kiPicWidth, const int32_t kiPicHeight, const int32_t kiNewSize) {
   PPicBuff pPicOldBuf = *ppPicBuf;
   PPicBuff pPicNewBuf = NULL;
   int32_t iPicIdx = 0;
-  if (kiOldSize<=0 || kiNewSize <= 0 || kiPicWidth <= 0 || kiPicHeight <= 0) {
+  if (kiOldSize <= 0 || kiNewSize <= 0 || kiPicWidth <= 0 || kiPicHeight <= 0) {
     return 1;
   }
 
@@ -115,7 +115,7 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     return 1;
   }
   // copy old PicBuf to new PicBuf
-  memcpy(pPicNewBuf->ppPic, pPicOldBuf->ppPic, kiOldSize * sizeof(PPicture));
+  memcpy (pPicNewBuf->ppPic, pPicOldBuf->ppPic, kiOldSize * sizeof (PPicture));
   // initialize context in queue
   pPicNewBuf->iCapacity	 = kiNewSize;
   pPicNewBuf->iCurrentIdx = pPicOldBuf->iCurrentIdx;
@@ -143,11 +143,11 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
 }
 
 static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, const int32_t kiOldSize,
-                              const int32_t kiPicWidth, const int32_t kiPicHeight, const int32_t kiNewSize) {
+                                const int32_t kiPicWidth, const int32_t kiPicHeight, const int32_t kiNewSize) {
   PPicBuff pPicOldBuf = *ppPicBuf;
   PPicBuff pPicNewBuf = NULL;
   int32_t iPicIdx = 0;
-  if (kiOldSize<=0 || kiNewSize <= 0 || kiPicWidth <= 0 || kiPicHeight <= 0) {
+  if (kiOldSize <= 0 || kiNewSize <= 0 || kiPicWidth <= 0 || kiPicHeight <= 0) {
     return 1;
   }
 
@@ -165,29 +165,29 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
 
   int32_t iPrevPicIdx = -1;
   for (iPrevPicIdx = 0; iPrevPicIdx < kiOldSize; ++iPrevPicIdx) {
-    if(pCtx->pPreviousDecodedPictureInDpb == pPicOldBuf->ppPic[iPrevPicIdx]) {
+    if (pCtx->pPreviousDecodedPictureInDpb == pPicOldBuf->ppPic[iPrevPicIdx]) {
       break;
     }
   }
   int32_t iDelIdx;
-  if(iPrevPicIdx < kiOldSize && iPrevPicIdx >= kiNewSize) {
-    // found pPreviousDecodedPictureInDpb, 
+  if (iPrevPicIdx < kiOldSize && iPrevPicIdx >= kiNewSize) {
+    // found pPreviousDecodedPictureInDpb,
     pPicNewBuf->ppPic[0] = pPicOldBuf->ppPic[iPrevPicIdx];
     pPicNewBuf->iCurrentIdx = 0;
-    memcpy(pPicNewBuf->ppPic + 1, pPicOldBuf->ppPic, (kiNewSize - 1) * sizeof(PPicture));
+    memcpy (pPicNewBuf->ppPic + 1, pPicOldBuf->ppPic, (kiNewSize - 1) * sizeof (PPicture));
     iDelIdx = kiNewSize - 1;
   } else {
-    memcpy(pPicNewBuf->ppPic, pPicOldBuf->ppPic, kiNewSize * sizeof(PPicture));
-    pPicNewBuf->iCurrentIdx = iPrevPicIdx < kiNewSize? iPrevPicIdx : 0;
+    memcpy (pPicNewBuf->ppPic, pPicOldBuf->ppPic, kiNewSize * sizeof (PPicture));
+    pPicNewBuf->iCurrentIdx = iPrevPicIdx < kiNewSize ? iPrevPicIdx : 0;
     iDelIdx = kiNewSize;
   }
 
-  for(iPicIdx = iDelIdx; iPicIdx < kiOldSize; iPicIdx++) {
-    if(iPrevPicIdx != iPicIdx) {
+  for (iPicIdx = iDelIdx; iPicIdx < kiOldSize; iPicIdx++) {
+    if (iPrevPicIdx != iPicIdx) {
       if (pPicOldBuf->ppPic[iPicIdx] != NULL) {
         FreePicture (pPicOldBuf->ppPic[iPicIdx]);
         pPicOldBuf->ppPic[iPicIdx] = NULL;
-       }
+      }
     }
   }
 
@@ -338,27 +338,40 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
   // sync update pRefList
   WelsResetRefPic (pCtx);	// added to sync update ref list due to pictures are free
 
-  if(pCtx->bHaveGotMemory && (kiPicWidth == pCtx->iImgWidthInPixel && kiPicHeight == pCtx->iImgHeightInPixel)
-                         && pCtx->pPicBuff[LIST_0] != NULL && pCtx->pPicBuff[LIST_0]->iCapacity != iPicQueueSize) {
-      // currently only active for LIST_0 due to have no B frames
+  if (pCtx->bHaveGotMemory && (kiPicWidth == pCtx->iImgWidthInPixel && kiPicHeight == pCtx->iImgHeightInPixel)
+      && pCtx->pPicBuff[LIST_0] != NULL && pCtx->pPicBuff[LIST_0]->iCapacity != iPicQueueSize) {
+    // currently only active for LIST_0 due to have no B frames
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
+             "WelsRequestMem(): memory re-alloc for no resolution change (size = %d * %d), ref list size change from %d to %d",
+             kiPicWidth, kiPicHeight, pCtx->pPicBuff[LIST_0]->iCapacity, iPicQueueSize);
     if (pCtx->pPicBuff[LIST_0]->iCapacity < iPicQueueSize) {
-      iErr = IncreasePicBuff (pCtx, &pCtx->pPicBuff[LIST_0], pCtx->pPicBuff[LIST_0]->iCapacity, kiPicWidth, kiPicHeight, iPicQueueSize);
+      iErr = IncreasePicBuff (pCtx, &pCtx->pPicBuff[LIST_0], pCtx->pPicBuff[LIST_0]->iCapacity, kiPicWidth, kiPicHeight,
+                              iPicQueueSize);
     } else {
-      iErr = DecreasePicBuff (pCtx, &pCtx->pPicBuff[LIST_0], pCtx->pPicBuff[LIST_0]->iCapacity, kiPicWidth, kiPicHeight, iPicQueueSize);
+      iErr = DecreasePicBuff (pCtx, &pCtx->pPicBuff[LIST_0], pCtx->pPicBuff[LIST_0]->iCapacity, kiPicWidth, kiPicHeight,
+                              iPicQueueSize);
     }
   } else {
-      // for Recycled_Pic_Queue
-      for (iListIdx = LIST_0; iListIdx < LIST_A; ++ iListIdx) {
-        PPicBuff* ppPic = &pCtx->pPicBuff[iListIdx];
-        if (NULL != ppPic && NULL != *ppPic) {
-          DestroyPicBuff (ppPic);
-        }
+    if (pCtx->bHaveGotMemory)
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
+               "WelsRequestMem(): memory re-alloc for resolution change, size change from %d * %d to %d * %d, ref list size change from %d to %d",
+               pCtx->iImgWidthInPixel, pCtx->iImgHeightInPixel, kiPicWidth, kiPicHeight, pCtx->pPicBuff[LIST_0]->iCapacity,
+               iPicQueueSize);
+    else
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "WelsRequestMem(): memory alloc size = %d * %d, ref list size = %d",
+               kiPicWidth, kiPicHeight, iPicQueueSize);
+    // for Recycled_Pic_Queue
+    for (iListIdx = LIST_0; iListIdx < LIST_A; ++ iListIdx) {
+      PPicBuff* ppPic = &pCtx->pPicBuff[iListIdx];
+      if (NULL != ppPic && NULL != *ppPic) {
+        DestroyPicBuff (ppPic);
       }
+    }
 
-      pCtx->pPreviousDecodedPictureInDpb = NULL;
+    pCtx->pPreviousDecodedPictureInDpb = NULL;
 
-      // currently only active for LIST_0 due to have no B frames
-      iErr = CreatePicBuff (pCtx, &pCtx->pPicBuff[LIST_0], iPicQueueSize, kiPicWidth, kiPicHeight);
+    // currently only active for LIST_0 due to have no B frames
+    iErr = CreatePicBuff (pCtx, &pCtx->pPicBuff[LIST_0], iPicQueueSize, kiPicWidth, kiPicHeight);
   }
 
   if (iErr != ERR_NONE)
