@@ -78,6 +78,9 @@ int32_t		iLongTermFrameIdx;					//id for long term ref pic
 int32_t     iSpsId; //against mosaic caused by cross-IDR interval reference.
 int32_t     iPpsId;
 unsigned long long uiTimeStamp;
+int32_t iMbEcedNum;
+int32_t iMbEcedPropNum;
+int32_t iMbNum;
 } SPicture, *PPicture;	// "Picture" declaration is comflict with Mac system
 
 } // namespace WelsDec

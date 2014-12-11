@@ -413,7 +413,8 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   //Decoder error bs
   DecoderBs ("res/Error_I_P.264");
   m_pDec->GetOption (DECODER_OPTION_GET_STATISTICS, &sDecStatic);
-  EXPECT_EQ (57u, sDecStatic.uiAvgEcRatio);
+  EXPECT_EQ (65u, sDecStatic.uiAvgEcRatio);
+  EXPECT_EQ (7u, sDecStatic.uiAvgEcPropRatio);
   EXPECT_EQ (5u, sDecStatic.uiDecodedFrameCount);
   EXPECT_EQ (288u, sDecStatic.uiHeight);
   EXPECT_EQ (1u, sDecStatic.uiIDRCorrectNum);
@@ -430,7 +431,8 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   m_pDec->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iError);
   DecoderBs ("res/BA_MW_D_IDR_LOST.264");
   m_pDec->GetOption (DECODER_OPTION_GET_STATISTICS, &sDecStatic);
-  EXPECT_EQ (0u, sDecStatic.uiAvgEcRatio);
+  EXPECT_EQ (88u, sDecStatic.uiAvgEcRatio);
+  EXPECT_EQ (88u, sDecStatic.uiAvgEcPropRatio);
   EXPECT_EQ (97u, sDecStatic.uiDecodedFrameCount);
   EXPECT_EQ (144u, sDecStatic.uiHeight);
   EXPECT_EQ (3u, sDecStatic.uiIDRCorrectNum);
@@ -449,7 +451,8 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   DecoderBs ("res/BA_MW_D_P_LOST.264");
 
   m_pDec->GetOption (DECODER_OPTION_GET_STATISTICS, &sDecStatic);
-  EXPECT_EQ (0u, sDecStatic.uiAvgEcRatio);
+  EXPECT_EQ (85u, sDecStatic.uiAvgEcRatio);
+  EXPECT_EQ (85u, sDecStatic.uiAvgEcPropRatio);
   EXPECT_EQ (99u, sDecStatic.uiDecodedFrameCount);
   EXPECT_EQ (144u, sDecStatic.uiHeight);
   EXPECT_EQ (4u, sDecStatic.uiIDRCorrectNum);
@@ -470,6 +473,7 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   m_pDec->GetOption (DECODER_OPTION_GET_STATISTICS, &sDecStatic);
 
   EXPECT_EQ (0u, sDecStatic.uiAvgEcRatio);
+  EXPECT_EQ (0u, sDecStatic.uiAvgEcPropRatio);
   EXPECT_EQ (9u, sDecStatic.uiDecodedFrameCount);
   EXPECT_EQ (192u, sDecStatic.uiHeight);
   EXPECT_EQ (1u, sDecStatic.uiIDRCorrectNum);
