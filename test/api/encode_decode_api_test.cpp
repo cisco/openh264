@@ -1071,7 +1071,7 @@ TEST_P (EncodeDecodeTestAPI, InOutTimeStamp) {
     memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
     dstBufInfo_.uiInBsTimeStamp = uiEncTimeStamp;
     rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
-    if(dstBufInfo_.iBufferStatus == 1) {
+    if (dstBufInfo_.iBufferStatus == 1) {
       EXPECT_EQ (uiEncTimeStamp, dstBufInfo_.uiOutYuvTimeStamp);
     }
     iIdx++;
@@ -2064,11 +2064,14 @@ TEST_F (EncodeDecodeTestAPI, SetOptionEncParamExt) {
   int iSliceNum        = 1;
   encoder_->GetDefaultParams (&param_);
   prepareParam (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate);
+
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
 
-  int32_t iTraceLevel = WELS_LOG_QUIET;
-  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  int iTraceLevel = WELS_LOG_QUIET;
+  rv = encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  ASSERT_TRUE (rv == cmResultSuccess);
+
   for (int i = 0; i < iEncFrameNum; i++) {
     int iResult;
     int len = 0;
@@ -2304,7 +2307,8 @@ TEST_F (DecodeCrashTestAPI, DecoderCrashTest) {
   } while (1); //while (iLoopRound<100);
   fclose (f);
 #else
-  } while (uiLoopRound < 10);
+  }
+  while (uiLoopRound < 10);
 #endif
 
 }

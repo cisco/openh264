@@ -29,6 +29,9 @@ class EncoderInterfaceTest : public ::testing::Test {
     ASSERT_EQ (0, rv);
     ASSERT_TRUE (pPtrEnc != NULL);
 
+    unsigned int uiTraceLevel = WELS_LOG_ERROR;
+    pPtrEnc->SetOption (ENCODER_OPTION_TRACE_LEVEL, &uiTraceLevel);
+
     pParamExt = new SEncParamExt();
     ASSERT_TRUE (pParamExt != NULL);
 
