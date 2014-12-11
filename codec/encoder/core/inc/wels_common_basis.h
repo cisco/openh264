@@ -82,8 +82,7 @@ typedef struct TagParaSetOffset {
 //in PSO design, "bPpsIdMappingIntoSubsetsps" uses the current para of current IDR period
   bool
   bPpsIdMappingIntoSubsetsps[MAX_DQ_LAYER_NUM/*+1*/];	// need not extra +1 due no MGS and FMO case so far
-  uint16_t
-  uiIdrPicId;		// IDR picture id: [0, 65535], this one is used for LTR!! Can we just NOT put this into the SParaSetOffset structure?!!
+
 #if _DEBUG
   bool                  bEnableSpsPpsIdAddition;
 #endif

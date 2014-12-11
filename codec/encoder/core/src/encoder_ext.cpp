@@ -3126,7 +3126,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   pLayerBsInfo->pNalLengthInByte = pCtx->pOut->pNalLen;
 
   if (eFrameType == videoFrameTypeIDR) {
-    ++ pCtx->sPSOVector.uiIdrPicId;
+    ++ pCtx->uiIdrPicId;
     //if ( pSvcParam->bEnableSSEI )
 
     // write parameter sets bitstream here
@@ -3816,7 +3816,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
       memset (((*ppCtx)->sPSOVector.sParaSetOffsetVariable[k].bUsedParaSetIdInBs), 0, MAX_PPS_COUNT * sizeof (bool));
     memcpy (sTmpPsoVariable, (*ppCtx)->sPSOVector.sParaSetOffsetVariable,
             (PARA_SET_TYPE)*sizeof (SParaSetOffsetVariable)); // confirmed_safe_unsafe_usage
-    uiTmpIdrPicId = (*ppCtx)->sPSOVector.uiIdrPicId;
+    uiTmpIdrPicId = (*ppCtx)->uiIdrPicId;
 
     SEncoderStatistics sTempEncoderStatistics = (*ppCtx)->sEncoderStatistics;
 
@@ -3834,7 +3834,8 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     //for FLEXIBLE_PARASET_ID
     memcpy ((*ppCtx)->sPSOVector.sParaSetOffsetVariable, sTmpPsoVariable,
             (PARA_SET_TYPE)*sizeof (SParaSetOffsetVariable)); // confirmed_safe_unsafe_usage
-    (*ppCtx)->sPSOVector.uiIdrPicId = uiTmpIdrPicId;
+    //for LTR
+    (*ppCtx)->uiIdrPicId = uiTmpIdrPicId;
     //for sEncoderStatistics
     (*ppCtx)->sEncoderStatistics = sTempEncoderStatistics;
   } else {
