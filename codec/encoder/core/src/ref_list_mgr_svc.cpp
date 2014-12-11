@@ -498,7 +498,7 @@ int32_t FilterLTRRecoveryRequest (sWelsEncCtx* pCtx, SLTRRecoverRequest* pLTRRec
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
   int32_t iMaxFrameNumPlus1 = (1 << pCtx->pSps->uiLog2MaxFrameNum);
   if (pCtx->pSvcParam->bEnableLongTermReference) {
-    if (pRequest->uiFeedbackType == LTR_RECOVERY_REQUEST &&  pRequest->uiIDRPicId == pCtx->sPSOVector.uiIdrPicId) {
+    if (pRequest->uiFeedbackType == LTR_RECOVERY_REQUEST &&  pRequest->uiIDRPicId == pCtx->uiIdrPicId) {
       if (pRequest->iLastCorrectFrameNum == -1) {
         pCtx->bEncCurFrmAsIdrFlag = true;
         return true;
@@ -533,7 +533,7 @@ void FilterLTRMarkingFeedback (sWelsEncCtx* pCtx, SLTRMarkingFeedback* pLTRMarki
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
   assert (pLTRMarkingFeedback);
   if (pCtx->pSvcParam->bEnableLongTermReference)	{
-    if (pLTRMarkingFeedback->uiIDRPicId == pCtx->sPSOVector.uiIdrPicId
+    if (pLTRMarkingFeedback->uiIDRPicId == pCtx->uiIdrPicId
         && (pLTRMarkingFeedback->uiFeedbackType == LTR_MARKING_SUCCESS
             || pLTRMarkingFeedback->uiFeedbackType == LTR_MARKING_FAILED)) { // avoid error pData
       pLtr->uiLtrMarkState = pLTRMarkingFeedback->uiFeedbackType;
@@ -541,13 +541,13 @@ void FilterLTRMarkingFeedback (sWelsEncCtx* pCtx, SLTRMarkingFeedback* pLTRMarki
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
                "Receive valid LTR marking feedback, feedback_type = %d , uiIdrPicId = %d , LTR_frame_num = %d , cur_idr_pic_id = %d",
                pLTRMarkingFeedback->uiFeedbackType, pLTRMarkingFeedback->uiIDRPicId, pLTRMarkingFeedback->iLTRFrameNum ,
-               pCtx->sPSOVector.uiIdrPicId);
+               pCtx->uiIdrPicId);
 
     } else {
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
                "Receive LTR marking feedback, feedback_type = %d , uiIdrPicId = %d , LTR_frame_num = %d , cur_idr_pic_id = %d",
                pLTRMarkingFeedback->uiFeedbackType, pLTRMarkingFeedback->uiIDRPicId, pLTRMarkingFeedback->iLTRFrameNum ,
-               pCtx->sPSOVector.uiIdrPicId);
+               pCtx->uiIdrPicId);
     }
   }
 }

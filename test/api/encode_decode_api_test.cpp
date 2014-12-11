@@ -561,7 +561,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionIDR) {
     EncodeOneFrame (0);
 
     if (info.eFrameType == videoFrameTypeIDR) {
-      iEncCurIdrPicId = (iSpsPpsIdAddition == 0) ? 0 : (iEncCurIdrPicId + 1);
+      iEncCurIdrPicId = iEncCurIdrPicId + 1;
     }
     //decoding after each encoding frame
     int len = 0;
@@ -2321,9 +2321,9 @@ const uint32_t kiFrameRate = 12; //DO NOT CHANGE!
 const uint32_t kiFrameNum = 100; //DO NOT CHANGE!
 const uint32_t kiMaxBsSize = 10000000; //DO NOT CHANGE!
 const char* pHashStr[] = { //DO NOT CHANGE!
-  "c58322f886a3ba958c6f60b46b98f67b5d860866",
-  "f2799e1e5f6e33c6274f4e1f6273c721475492d0",
-  "8f0fafeaa2746e04d42fb17104efb61c9dbd1a6f"
+  "be28b28101023f92b0c994fc63531890d28307d0",
+  "3be320b5af1164cb88519b214e4698f11b3e4eb1",
+  "4ed8aa9a107119ff7b1a8821dc757ccc343ffd0b"
 };
 
 class DecodeParseAPI : public EncodeDecodeTestBase {
