@@ -483,7 +483,7 @@ int32_t ParseInterMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNe
           return ERR_INFO_INVALID_REF_INDEX;
         }
       }
-      pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || !(ppRefPic[iRef[i]]&&ppRefPic[iRef[i]]->bIsComplete);
+      pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || !(ppRefPic[pRefIdx[i]]&&ppRefPic[pRefIdx[i]]->bIsComplete);
       UpdateP8x8RefIdxCabac (pCurDqLayer, pRefIndex, iIdx8, pRefIdx[i], LIST_0);
     }
     //mv
