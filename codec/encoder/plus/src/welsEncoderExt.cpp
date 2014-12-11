@@ -166,6 +166,7 @@ void CWelsH264SVCEncoder::InitEncoder (void) {
   if (m_pWelsTrace == NULL) {
     return;
   }
+  m_pWelsTrace->SetCodecInstance (this);
 }
 
 /* Interfaces override from ISVCEncoder */
