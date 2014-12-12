@@ -83,8 +83,11 @@ runCopyFiles()
   #copy codec and configure files
   cp  -p  ${MakeFileDir}/h264enc    ${CodecFolder}/
   cp  -p  ${MakeFileDir}/h264dec    ${CodecFolder}/
-  cp  -p  ${ConfigureFileDir}/layer2.cfg     ${CodecFolder}/
-  cp  -p  ${ConfigureFileDir}/welsenc.cfg    ${CodecFolder}/
+  cp  -p  ${ConfigureFileDir}/layer2.cfg     ${CodecFolder}/layer0.cfg
+  cp  -p  ${ConfigureFileDir}/layer2.cfg     ${CodecFolder}/layer1.cfg
+  cp  -p  ${ConfigureFileDir}/layer2.cfg     ${CodecFolder}/layer2.cfg
+  cp  -p  ${ConfigureFileDir}/layer2.cfg     ${CodecFolder}/layer3.cfg
+  cp  -p  ${ConfigureFileDir}/welsenc.cfg    ${CodecFolder}/welsenc.cfg
   return 0
 }
 #usage: runPrepareAllFolder   $AllTestDataFolder  $CodecFolder  $ScriptFolder  $SHA1TableFolder
@@ -117,7 +120,7 @@ runPrepareAllFolder()
     StreamName=`echo ${Bitsream} | awk 'BEGIN {FS="/"}  {print $NF}   ' `
     StreamName=`echo ${StreamName} | awk 'BEGIN {FS="_AllCase"}  {print $1}   ' `
     SubFolder="${AllTestDataFolder}/${StreamName}"
-    SHA1TableName="${StreamName}_AllCase_SHA1_Table.csv"
+    SHA1TableName="${StreamName}_AllCases_SHA1_Table.csv"
     echo "BitSream is ${StreamName}"
     echo "sub folder is  ${SubFolder}"
     echo ""

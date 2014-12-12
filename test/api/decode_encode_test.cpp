@@ -91,16 +91,38 @@ class DecodeEncodeTest : public ::testing::TestWithParam<DecodeEncodeFileParam>,
   BufferedData buf_;
 };
 
+void DecEncFileParamToParamExt (DecodeEncodeFileParam * pDecEncFileParam, SEncParamExt* pEnxParamExt) {
+  ASSERT_TRUE (NULL != pDecEncFileParam && NULL != pEnxParamExt);
+
+  pEnxParamExt->iPicWidth      = pDecEncFileParam->width;
+  pEnxParamExt->iPicHeight     = pDecEncFileParam->height;
+  pEnxParamExt->fMaxFrameRate  = pDecEncFileParam->frameRate;
+
+  //default value
+  pEnxParamExt->iUsageType        = CAMERA_VIDEO_REAL_TIME;
+  pEnxParamExt->iSpatialLayerNum  = 1;
+  pEnxParamExt->bEnableDenoise    = false;
+  pEnxParamExt->bIsLosslessLink   = false;
+  pEnxParamExt->bEnableLongTermReference  = false;
+  pEnxParamExt->iEntropyCodingModeFlag    = 0;
+
+  for (int i = 0; i < pEnxParamExt->iSpatialLayerNum; i++) {
+     pEnxParamExt->sSpatialLayers[i].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
+  }
+
+}
 TEST_P (DecodeEncodeTest, CompareOutput) {
   DecodeEncodeFileParam p = GetParam();
+  SEncParamExt  EnxParamExt;
+  DecEncFileParamToParamExt(&p,&EnxParamExt);
+
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + p.fileName;
   ASSERT_TRUE (Open (filename.c_str()));
 #else
   ASSERT_TRUE (Open (p.fileName));
 #endif
-  EncodeStream (this, CAMERA_VIDEO_REAL_TIME, p.width, p.height, p.frameRate, SM_SINGLE_SLICE, false, 1, false, false,
-                this);
+  EncodeStream (this, &EnxParamExt, this);
   unsigned char digest[SHA_DIGEST_LENGTH];
   SHA1Result (&ctx_, digest);
   if (!HasFatalFailure()) {
@@ -108,8 +130,8 @@ TEST_P (DecodeEncodeTest, CompareOutput) {
   }
 }
 static const DecodeEncodeFileParam kFileParamArray[] = {
-  {"res/test_vd_1d.264", "a4c7299ec1a7bacd5819685e221a79ac2b56cdbc", 320, 192, 12.0f},
-  {"res/test_vd_rc.264", "106fd8cc978c1801b0d1f8297e9b7f17d5336e15", 320, 192, 12.0f},
+  {"res/test_vd_1d.264", "63fe502aa2d63869cc888592e4984b3d6e8c3bef", 320, 192, 12.0f},
+  {"res/test_vd_rc.264", "fda7fdfbef853ec7aaf3e236dcfa7c0ba9c2314a", 320, 192, 12.0f},
 };
 
 

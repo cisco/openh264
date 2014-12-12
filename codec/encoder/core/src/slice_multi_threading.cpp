@@ -73,7 +73,7 @@ namespace WelsEnc {
 void UpdateMbListNeighborParallel (SSliceCtx* pSliceCtx,
                                    SMB* pMbList,
                                    const int32_t uiSliceIdc) {
-  const uint8_t* kpMbMap			= pSliceCtx->pOverallMbMap;
+  const uint16_t* kpMbMap			= pSliceCtx->pOverallMbMap;
   const int32_t kiMbWidth			= pSliceCtx->iMbWidth;
   int32_t iIdx						= pSliceCtx->pFirstMbInSlice[uiSliceIdc];
   const int32_t kiEndMbInSlice	= iIdx + pSliceCtx->pCountMbNumInSlice[uiSliceIdc] - 1;
@@ -963,8 +963,11 @@ int32_t CreateSliceThreads (sWelsEncCtx* pCtx) {
   int32_t iIdx = 0;
 
   while (iIdx < kiThreadCount) {
-    WelsThreadCreate (&pCtx->pSliceThreading->pThreadHandles[iIdx], CodingSliceThreadProc,
-                      &pCtx->pSliceThreading->pThreadPEncCtx[iIdx], 0);
+    if (WelsThreadCreate (&pCtx->pSliceThreading->pThreadHandles[iIdx], CodingSliceThreadProc,
+                          &pCtx->pSliceThreading->pThreadPEncCtx[iIdx], 0)) {
+      return 1;
+    }
+
 
     ++ iIdx;
   }

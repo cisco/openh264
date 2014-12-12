@@ -119,7 +119,12 @@ static const FileParam kFileParamArray[] = {
   {"res/SVA_CL1_E.264", "4fe09ab6cdc965ea10a20f1d6dd38aca954412bb"},
   {"res/SVA_FM1_E.264", "fad08c4ff7cf2307b6579853d0f4652fc26645d3"},
   {"res/SVA_NL1_B.264", "6d63f72a0c0d833b1db0ba438afff3b4180fb3e6"},
-  {"res/SVA_NL2_E.264", "70453ef8097c94dd190d6d2d1d5cb83c67e66238"}
+  {"res/SVA_NL2_E.264", "70453ef8097c94dd190d6d2d1d5cb83c67e66238"},
+  {"res/test_cif_I_CABAC_PCM.264", "95fdf21470d3bbcf95505abb2164042063a79d98"},
+  {"res/test_cif_I_CABAC_slice.264", "19121bc67f2b13fb8f030504fc0827e1ac6d0fdb"},
+  {"res/test_cif_P_CABAC_slice.264", "521bbd0ba2422369b724c7054545cf107a56f959"},
+  {"res/test_qcif_cabac.264", "587d1d05943f3cd416bf69469975fdee05361e69"},
+  {"res/QCIF_2P_I_allIPCM.264", "8724c0866ebdba7ebb7209a0c0c3ae3ae38a0240"}
 };
 
 INSTANTIATE_TEST_CASE_P (DecodeFile, DecoderOutputTest,

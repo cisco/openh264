@@ -119,9 +119,17 @@ enum {
 #define SMOOTH_FACTOR_MIN_VALUE 2 // *INT_MULTIPLY
 //#define VGOP_BITS_MIN_RATIO 0.8
 //skip and padding
+#define TIME_CHECK_WINDOW 5000 // ms
 #define SKIP_RATIO  50 // *INT_MULTIPLY
+#define LAST_FRAME_PREDICT_WEIGHT 0.5
 #define PADDING_BUFFER_RATIO 50 // *INT_MULTIPLY
 #define PADDING_THRESHOLD    5 //*INT_MULTIPLY
+
+enum {
+  EVEN_TIME_WINDOW  =0,
+  ODD_TIME_WINDOW   =1,
+  TIME_WINDOW_TOTAL =2
+};
 
 typedef struct TagRCSlicing {
 int32_t   iComplexityIndexSlice;
@@ -152,14 +160,15 @@ int32_t   iFrameCmplxMean;
 
 typedef struct TagWelsRc {
 int32_t   iRcVaryPercentage;
-int32_t    iRcVaryRatio;
+int32_t   iRcVaryRatio;
 
 int32_t   iInitialQp; //initial qp
 int32_t   iBitRate;
 int32_t   iPreviousBitrate;
 int32_t   iPreviousGopSize;
 double    fFrameRate;
-int32_t   iBitsPerFrame; // *INT_MULTIPLY
+int64_t   iBitsPerFrame; // *INT_MULTIPLY
+int64_t   iMaxBitsPerFrame; // *INT_MULTIPLY
 double    dPreviousFps;
 
 // bits allocation and status
@@ -185,7 +194,7 @@ int32_t   iMinFrameQp;
 int32_t   iMaxFrameQp;
 int32_t   iNumberMbFrame;
 int32_t   iNumberMbGom;
-int32_t	iSliceNum;
+int32_t	  iSliceNum;
 int32_t   iGomSize;
 
 int32_t   iSkipFrameNum;
@@ -201,15 +210,18 @@ int32_t   iMinQp;
 int32_t   iMaxQp;
 //int32_t   delta_adaptive_qp;
 int32_t   iSkipBufferRatio;
- 
+
 int32_t   iQStep; // *INT_MULTIPLY
 int32_t   iFrameDeltaQpUpper;
 int32_t   iFrameDeltaQpLower;
 int32_t   iLastCalculatedQScale;
- 
+
 //for skip frame and padding
 int32_t   iBufferSizeSkip;
 int32_t   iBufferFullnessSkip;
+int32_t   iBufferMaxBRFullness[TIME_WINDOW_TOTAL];//0: EVEN_TIME_WINDOW; 1: ODD_TIME_WINDOW
+int32_t   iPredFrameBit;
+bool      bNeedShiftWindowCheck[TIME_WINDOW_TOTAL];
 int32_t   iBufferSizePadding;
 int32_t   iBufferFullnessPadding;
 int32_t   iPaddingSize;
@@ -244,6 +256,10 @@ PWelsRCMBInitFunc				pfWelsRcMbInit;
 PWelsRCMBInfoUpdateFunc			pfWelsRcMbInfoUpdate;
 } SWelsRcFunc;
 
+bool CheckFrameSkipBasedMaxbr (void* pCtx, int32_t iSpatialNum, EVideoFrameType eFrameType,
+  const uint32_t uiTimeStamp);
+void UpdateBufferWhenFrameSkipped(void* pCtx, int32_t iSpatialNum);
+void UpdateMaxBrCheckWindowStatus(void* pCtx, int32_t iSpatialNum, const long long uiTimeStamp);
 void RcTraceFrameBits (void* pEncCtx, long long uiTimeStamp);
 void WelsRcInitModule (void* pCtx, RC_MODES iRcMode);
 void WelsRcFreeMemory (void* pCtx);

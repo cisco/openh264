@@ -340,7 +340,6 @@ void CBackgroundDetection::ForegroundDilationAndBackgroundErosion (vBGDParam* pB
   int8_t*	pVaaBackgroundMbFlag   = (int8_t*)pBgdParam->pBackgroundMbFlag;
   SBackgroundOU*	pOUNeighbours[4];//0: left; 1: right; 2: top; 3: bottom
 
-  pBackgroundOU	= pBgdParam->pOU_array;
   pOUNeighbours[2]	= pBackgroundOU;//top OU
   for (int32_t j = 0; j < iPicHeightInOU; j ++) {
     int8_t* pRowSkipFlag = pVaaBackgroundMbFlag;

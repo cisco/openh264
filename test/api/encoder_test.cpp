@@ -2,6 +2,7 @@
 #include "utils/HashFunctions.h"
 #include "BaseEncoderTest.h"
 #include <string>
+
 static void UpdateHashFromFrame (const SFrameBSInfo& info, SHA1Context* ctx) {
   for (int i = 0; i < info.iLayerNum; ++i) {
     const SLayerBSInfo& layerInfo = info.sLayerInfo[i];
@@ -26,18 +27,39 @@ class EncoderInitTest : public ::testing::Test, public BaseEncoderTest {
 TEST_F (EncoderInitTest, JustInit) {}
 
 struct EncodeFileParam {
-  const char* fileName;
-  const char* hashStr;
-  EUsageType usageType;
-  int width;
-  int height;
-  float frameRate;
-  SliceModeEnum slices;
-  bool denoise;
-  int layers;
-  bool isLossless;
-  bool enableLtr;
+  const char* pkcFileName;
+  const char* pkcHashStr;
+  EUsageType eUsageType;
+  int iWidth;
+  int iHeight;
+  float fFrameRate;
+  SliceModeEnum eSliceMode;
+  bool bDenoise;
+  int  iLayerNum;
+  bool bLossless;
+  bool bEnableLtr;
+  bool bCabac;
+// unsigned short iMultipleThreadIdc;
 };
+
+void EncFileParamToParamExt (EncodeFileParam* pEncFileParam, SEncParamExt* pEnxParamExt) {
+  ASSERT_TRUE (NULL != pEncFileParam && NULL != pEnxParamExt);
+  pEnxParamExt->iUsageType       = pEncFileParam->eUsageType;
+  pEnxParamExt->iPicWidth        = pEncFileParam->iWidth;
+  pEnxParamExt->iPicHeight       = pEncFileParam->iHeight;
+  pEnxParamExt->fMaxFrameRate    = pEncFileParam->fFrameRate;
+  pEnxParamExt->iSpatialLayerNum = pEncFileParam->iLayerNum;
+
+  pEnxParamExt->bEnableDenoise   = pEncFileParam->bDenoise;
+  pEnxParamExt->bIsLosslessLink  = pEncFileParam->bLossless;
+  pEnxParamExt->bEnableLongTermReference = pEncFileParam->bEnableLtr;
+  pEnxParamExt->iEntropyCodingModeFlag   = pEncFileParam->bCabac ? 1 : 0;
+
+  for (int i = 0; i < pEnxParamExt->iSpatialLayerNum; i++) {
+     pEnxParamExt->sSpatialLayers[i].sSliceCfg.uiSliceMode = pEncFileParam->eSliceMode;
+  }
+
+}
 
 class EncoderOutputTest : public ::testing::WithParamInterface<EncodeFileParam>,
   public EncoderInitTest , public BaseEncoderTest::Callback {
@@ -52,6 +74,7 @@ class EncoderOutputTest : public ::testing::WithParamInterface<EncodeFileParam>,
   virtual void onEncodeFrame (const SFrameBSInfo& frameInfo) {
     UpdateHashFromFrame (frameInfo, &ctx_);
   }
+
  protected:
   SHA1Context ctx_;
 };
@@ -59,76 +82,86 @@ class EncoderOutputTest : public ::testing::WithParamInterface<EncodeFileParam>,
 
 TEST_P (EncoderOutputTest, CompareOutput) {
   EncodeFileParam p = GetParam();
+  SEncParamExt EnxParamExt;
+
+  EncFileParamToParamExt (&p, &EnxParamExt);
+
 #if defined(ANDROID_NDK)
-  std::string filename = std::string ("/sdcard/") + p.fileName;
-  EncodeFile (filename.c_str(), p.usageType , p.width, p.height, p.frameRate, p.slices, p.denoise, p.layers, p.isLossless,
-              p.enableLtr, this);
+  std::string filename = std::string ("/sdcard/") + p.pkcFileName;
+  EncodeFile (p.pkcFileName, &EnxParamExt, this);
 #else
-  EncodeFile (p.fileName, p.usageType , p.width, p.height, p.frameRate, p.slices, p.denoise, p.layers, p.isLossless,
-              p.enableLtr, this);
+    EncodeFile (p.pkcFileName, &EnxParamExt, this);
 #endif
   //will remove this after screen content algorithms are ready,
   //because the bitstream output will vary when the different algorithms are added.
   unsigned char digest[SHA_DIGEST_LENGTH];
   SHA1Result (&ctx_, digest);
   if (!HasFatalFailure()) {
-    CompareHash (digest, p.hashStr);
+    CompareHash (digest, p.pkcHashStr);
   }
 }
 static const EncodeFileParam kFileParamArray[] = {
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
-    "0a36b75e423fc6b49f6adf7eee12c039a096f538", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1, false, false
+    "16b145cf76a677d87240ef6c8efff0ff8d3a2f3a", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1, false, false, false
   },
   {
     "res/CiscoVT2people_160x96_6fps.yuv",
-    "73981e6ea5b62f7338212c538a7cc755e7c9c030", CAMERA_VIDEO_REAL_TIME, 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1, false, false
+    "874ab77ba13f199d70b67cd75f8e23baf482c1ed", CAMERA_VIDEO_REAL_TIME, 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1, false, false, false
   },
   {
     "res/Static_152_100.yuv",
-    "02bbff550ee0630e44e46e14dc459d3686f2a360", CAMERA_VIDEO_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1, false, false
+    "73b40ad71e1f1ffbbd5425de2b094ccbdfa798a6", CAMERA_VIDEO_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1, false, false, false
   },
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
-    "c8b759bcec7ffa048f1d3ded594b8815bed0aead", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_ROWMB_SLICE, false, 1, false, false // One slice per MB row
+    "c1b187be92a35ac8f4f9724b594559e0394c1df8", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_ROWMB_SLICE, false, 1, false, false, false // One slice per MB row
   },
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
-    "e64ba75456c821ca35a949eda89f85bff8ee69fa", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, true, 1, false, false
+    "959a94ea684bf37eaf39909f6460e02b50ad0a5f", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, true, 1, false, false, false
   },
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
-    "684e6d141ada776892bdb01ee93efe475983ed36", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 2, false, false
+    "684e6d141ada776892bdb01ee93efe475983ed36", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 2, false, false, false
   },
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    "2bc06262d87fa0897ad4c336cc4047d5a67f7203", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1, false, false
+    "27a595af0e9598feb4dc1403fd99affddfa51f46", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1, false, false, false
   },
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    "68c3220e49b7a57d563faf7c99a870ab34a23400", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SINGLE_SLICE, false, 4, false, false
+    "68c3220e49b7a57d563faf7c99a870ab34a23400", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SINGLE_SLICE, false, 4, false, false, false
   },
   // the following values may be adjusted for times since we start tuning the strategy
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
-    "3ce65d9c326657b845cd00b22ce76128c29f8347", SCREEN_CONTENT_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1, false, false
+    "7113004abe156bf69c399803f302644645ac42be", SCREEN_CONTENT_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1, false, false, false
   },
   {
     "res/CiscoVT2people_160x96_6fps.yuv",
-    "2b57e1cc7a4db6258116c302eada3bf870ee94a1", SCREEN_CONTENT_REAL_TIME, 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1, false, false
+    "51fc38d467509f94e85f9678f11429220e46d862", SCREEN_CONTENT_REAL_TIME, 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1, false, false, false
   },
   {
     "res/Static_152_100.yuv",
-    "bad065da4564d0580a1722d91463fa0f9fd947c8", SCREEN_CONTENT_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1, false, false
+    "1af33ad3d8c40756ef1f6074c019a06535c35ab0", SCREEN_CONTENT_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1, false, false, false
   },
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    "8ee6cd375b58e9877f6145fb72da844e65162b14", SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1, false, false
+    "e032f8f8b153f37e614676735074cdce843032de", SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1, false, false, false
   },
   //for different strategy
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    "868f327765dc8e705ad6a9a942bfc7e32c03c791", SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1, true, true
+    "28e290b204257eae5c735b2b96491358ec14221e", SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1, true, true, false
+  },
+  {
+    "res/CiscoVT2people_320x192_12fps.yuv",
+    "59e51ffc741172df4a729d7fc1f85645885311a5", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1, false, false, true //turn on cabac
+  },
+  {
+    "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
+    "f4361779554ae66ce62308f1e01218369ca0edf4", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_DYN_SLICE, false, 1, false, false, true
   },
 };
 

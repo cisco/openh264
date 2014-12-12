@@ -46,6 +46,8 @@
 #include "memory_align.h"
 
 #include "codec_app_def.h"
+#include "set_mb_syn_cabac.h"
+
 namespace WelsEnc {
 
 
@@ -78,7 +80,7 @@ int16_t			iMbWidth;			/* width of picture size in mb */
 int16_t			iMbHeight;			/* height of picture size in mb */
 int16_t			iSliceNumInFrame;	/* count number of slices in frame; */
 int32_t			iMbNumInFrame;	/* count number of MBs in frame */
-uint8_t*			pOverallMbMap;	/* overall MB map in frame, store virtual slice idc; */
+uint16_t*			pOverallMbMap;	/* overall MB map in frame, store virtual slice idc; */
 int16_t*			pFirstMbInSlice;	/* first MB address top-left based in every slice respectively; */
 int32_t*			pCountMbNumInSlice;	/* count number of MBs in every slice respectively; */
 uint32_t		uiSliceSizeConstraint;/*in byte*/
@@ -90,10 +92,11 @@ typedef struct TagDynamicSlicingStack {
 int32_t		iStartPos;
 int32_t		iCurrentPos;
 
-uint8_t*		pBsStackBufPtr;	// current writing position
+uint8_t*	pBsStackBufPtr;	// current writing position
 uint32_t    uiBsStackCurBits;
 int32_t		iBsStackLeftBits;
 
+SCabacCtx  sStoredCabac;
 int32_t		iMbSkipRunStack;
 uint8_t   uiLastMbQp;
 } SDynamicSlicingStack;
@@ -137,7 +140,7 @@ void UninitSlicePEncCtx (SSliceCtx* pSliceCtx, CMemoryAlign* pMa);
  *
  * \return	uiSliceIdc - successful; (uint8_t)(-1) - failed;
  */
-uint8_t WelsMbToSliceIdc (SSliceCtx* pSliceCtx, const int16_t kiMbXY);
+uint16_t WelsMbToSliceIdc (SSliceCtx* pSliceCtx, const int16_t kiMbXY);
 
 /*!
  * \brief	Get first mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
@@ -193,8 +196,8 @@ bool CheckFixedSliceNumMultiSliceSetting (const int32_t kiMbNumInFrame,  SSliceA
 bool CheckRasterMultiSliceSetting (const int32_t kiMbNumInFrame, SSliceArgument* pSliceArg);
 bool CheckRowMbMultiSliceSetting (const int32_t kiMbWidth,  SSliceArgument* pSliceArg);
 
-void GomValidCheckSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, uint32_t* pSliceNum);
-void GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,  SSliceArgument* pSliceArg);
+bool GomValidCheckSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, uint32_t* pSliceNum);
+bool GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,  SSliceArgument* pSliceArg);
 //end of checking valid para
 
 int32_t DynamicAdjustSlicePEncCtxAll (SSliceCtx* pSliceCtx,

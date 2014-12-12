@@ -430,6 +430,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\encoder\core\src\set_mb_syn_cabac.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\encoder\core\src\set_mb_syn_cavlc.cpp"
 				>
 			</File>
@@ -459,6 +463,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\encoder\core\src\svc_motion_estimate.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\encoder\core\src\svc_set_mb_syn_cabac.cpp"
 				>
 			</File>
 			<File
@@ -627,6 +635,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\encoder\core\inc\set_mb_syn_cabac.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\encoder\core\inc\set_mb_syn_cavlc.h"
 				>
 			</File>
@@ -676,6 +688,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\encoder\core\inc\svc_motion_estimate.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\encoder\core\inc\svc_set_mb_syn.h"
 				>
 			</File>
 			<File

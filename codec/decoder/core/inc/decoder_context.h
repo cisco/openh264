@@ -43,6 +43,7 @@
 #include "utils.h"
 #include "wels_const.h"
 #include "wels_common_basis.h"
+#include "wels_common_defs.h"
 #include "codec_app_def.h"
 #include "parameter_sets.h"
 #include "nalu.h"
@@ -56,6 +57,42 @@
 #include "expand_pic.h"
 
 namespace WelsDec {
+#define MAX_PRED_MODE_ID_I16x16  3
+#define MAX_PRED_MODE_ID_CHROMA  3
+#define MAX_PRED_MODE_ID_I4x4    8
+#define  WELS_QP_MAX    51
+
+typedef struct SWels_Cabac_Element {
+  uint8_t uiState;
+  uint8_t uiMPS;
+}SWelsCabacCtx, *PWelsCabacCtx;
+
+typedef struct
+{
+  uint64_t uiRange;
+  uint64_t uiOffset;
+  int32_t iBitsLeft;
+  uint8_t *pBuffStart;
+  uint8_t *pBuffCurr;
+  uint8_t *pBuffEnd;
+} SWelsCabacDecEngine, *PWelsCabacDecEngine;
+
+#define NEW_CTX_OFFSET_MB_TYPE_I 3
+#define NEW_CTX_OFFSET_SKIP 11
+#define NEW_CTX_OFFSET_SUBMB_TYPE 21
+#define NEW_CTX_OFFSET_MVD 40
+#define NEW_CTX_OFFSET_REF_NO 54
+#define NEW_CTX_OFFSET_DELTA_QP 60
+#define NEW_CTX_OFFSET_IPR 68
+#define NEW_CTX_OFFSET_CIPR 64
+#define NEW_CTX_OFFSET_CBP 73
+#define NEW_CTX_OFFSET_CBF 85
+#define NEW_CTX_OFFSET_MAP 105
+#define NEW_CTX_OFFSET_LAST 166
+#define NEW_CTX_OFFSET_ONE 227
+#define NEW_CTX_OFFSET_ABS 232
+#define CTX_NUM_MVD 7
+#define CTX_NUM_CBP 4
 
 typedef struct TagDataBuffer {
 uint8_t* pHead;
@@ -65,6 +102,19 @@ uint8_t* pStartPos;
 uint8_t* pCurPos;
 } SDataBuffer;
 
+//limit size for SPS PPS total permitted size for parse_only
+#define SPS_PPS_BS_SIZE 128
+typedef struct TagSpsBsInfo {
+  uint8_t pSpsBsBuf [SPS_PPS_BS_SIZE];
+  int32_t iSpsId;
+  uint16_t uiSpsBsLen;
+} SSpsBsInfo;
+
+typedef struct TagPpsBsInfo {
+  uint8_t pPpsBsBuf [SPS_PPS_BS_SIZE];
+  int32_t iPpsId;
+  uint16_t uiPpsBsLen;
+} SPpsBsInfo;
 //#ifdef __cplusplus
 //extern "C" {
 //#endif//__cplusplus
@@ -141,16 +191,20 @@ PChromaDeblockingEQ4Func  pfChromaDeblockingEQ4Hor;
 } SDeblockingFunc, *PDeblockingFunc;
 
 typedef void (*PWelsNonZeroCountFunc) (int8_t* pNonZeroCount);
-
+typedef void (*PWelsBlockZeroFunc) (int16_t* block,int32_t stride);
 typedef  struct  TagBlockFunc {
 PWelsNonZeroCountFunc		pWelsSetNonZeroCountFunc;
+PWelsBlockZeroFunc			pWelsBlockZero16x16Func;
+PWelsBlockZeroFunc			pWelsBlockZero8x8Func;
 } SBlockFunc;
 
-typedef void (*PWelsFillNeighborMbInfoIntra4x4Func) (PNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
+typedef void (*PWelsFillNeighborMbInfoIntra4x4Func) (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
     int8_t* pIntraPredMode, PDqLayer pCurLayer);
-typedef int32_t (*PWelsParseIntra4x4ModeFunc) (PNeighAvail pNeighAvail, int8_t* pIntraPredMode, PBitStringAux pBs,
+typedef void (*PWelsMapNeighToSample) (PWelsNeighAvail pNeighAvail, int32_t* pSampleAvail);
+typedef void (*PWelsMap16NeighToSample) (PWelsNeighAvail pNeighAvail, uint8_t* pSampleAvail);
+typedef int32_t (*PWelsParseIntra4x4ModeFunc) (PWelsNeighAvail pNeighAvail, int8_t* pIntraPredMode, PBitStringAux pBs,
     PDqLayer pCurDqLayer);
-typedef int32_t (*PWelsParseIntra16x16ModeFunc) (PNeighAvail pNeighAvail, PBitStringAux pBs, PDqLayer pCurDqLayer);
+typedef int32_t (*PWelsParseIntra16x16ModeFunc) (PWelsNeighAvail pNeighAvail, PBitStringAux pBs, PDqLayer pCurDqLayer);
 
 enum {
 OVERWRITE_NONE = 0,
@@ -169,6 +223,7 @@ SLogContext sLogCtx;
 void*				pArgDec;			// structured arguments for decoder, reserved here for extension in the future
 
 SDataBuffer                     sRawData;
+SDataBuffer                     sSavedData; //for parse only purpose
 
 // Configuration
 SDecodingParam*                 pParam;
@@ -180,6 +235,10 @@ bool				bHaveGotMemory;	// global memory for decoder context related ever reques
 
 int32_t				iImgWidthInPixel;	// width of image in pixel reconstruction picture to be output
 int32_t				iImgHeightInPixel;// height of image in pixel reconstruction picture to be output
+int32_t				iLastImgWidthInPixel;	// width of image in last successful pixel reconstruction picture to be output
+int32_t				iLastImgHeightInPixel;// height of image in last successful pixel reconstruction picture to be output
+bool bFreezeOutput; // indicating current frame freezing. Default: true
+
 
 // Derived common elements
 SNalUnitHeader		sCurNalHead;
@@ -202,6 +261,8 @@ struct {
   int8_t	(*pRefIndex[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM];
   int8_t*	pLumaQp[LAYER_NUM_EXCHANGEABLE];	/*mb luma_qp*/
   int8_t*	pChromaQp[LAYER_NUM_EXCHANGEABLE];					/*mb chroma_qp*/
+  int16_t	(*pMvd[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM][MV_A]; //[LAYER_NUM_EXCHANGEABLE   MB_BLOCK4x4_NUM*]
+  uint8_t *pCbfDc[LAYER_NUM_EXCHANGEABLE];
   int8_t	(*pNzc[LAYER_NUM_EXCHANGEABLE])[24];
   int8_t	(*pNzcRs[LAYER_NUM_EXCHANGEABLE])[24];
   int16_t (*pScaledTCoeff[LAYER_NUM_EXCHANGEABLE])[MB_COEFF_LIST_SIZE]; /*need be aligned*/
@@ -215,6 +276,7 @@ struct {
   int8_t*  pResidualPredFlag[LAYER_NUM_EXCHANGEABLE];
   int8_t*  pInterPredictionDoneFlag[LAYER_NUM_EXCHANGEABLE];
   bool*    pMbCorrectlyDecodedFlag[LAYER_NUM_EXCHANGEABLE];
+  bool*    pMbRefConcealedFlag[LAYER_NUM_EXCHANGEABLE];
   uint32_t iMbWidth;
   uint32_t iMbHeight;
 } sMb;
@@ -287,6 +349,14 @@ bool       bNewSeqBegin;
 bool       bNextNewSeqBegin;
 int        iOverwriteFlags;
 ERROR_CON_IDC eErrorConMethod; //
+
+//for Parse only
+bool bParseOnly;
+SSpsBsInfo sSpsBsInfo [MAX_SPS_COUNT];
+SSpsBsInfo sSubsetSpsBsInfo [MAX_PPS_COUNT];
+SPpsBsInfo sPpsBsInfo [MAX_PPS_COUNT];
+SParserBsInfo* pParserBsInfo;
+
 PPicture pPreviousDecodedPictureInDpb; //pointer to previously decoded picture in DPB for error concealment
 PGetIntraPredFunc pGetI16x16LumaPredFunc[7];		//h264_predict_copy_16x16;
 PGetIntraPredFunc pGetI4x4LumaPredFunc[14];		// h264_predict_4x4_t
@@ -308,8 +378,8 @@ int32_t iCurSeqIntervalMaxPicWidth;
 int32_t iCurSeqIntervalMaxPicHeight;
 
 PWelsFillNeighborMbInfoIntra4x4Func  pFillInfoCacheIntra4x4Func;
-PWelsParseIntra4x4ModeFunc           pParseIntra4x4ModeFunc;
-PWelsParseIntra16x16ModeFunc         pParseIntra16x16ModeFunc;
+PWelsMapNeighToSample pMap4x4NeighToSampleFunc;
+PWelsMap16NeighToSample pMap16x16NeighToSampleFunc;
 
 //feedback whether or not have VCL in current AU, and the temporal ID
 int32_t iFeedbackVclNalInAu;
@@ -325,7 +395,20 @@ void*      pTraceHandle;
 //Save the last nal header info
 SNalUnitHeaderExt sLastNalHdrExt;
 SSliceHeader      sLastSliceHeader;
-
+SWelsCabacCtx sWelsCabacContexts[4][WELS_QP_MAX + 1][WELS_CONTEXT_COUNT];
+bool bCabacInited;
+SWelsCabacCtx   pCabacCtx[WELS_CONTEXT_COUNT];
+PWelsCabacDecEngine   pCabacDecEngine;
+double dDecTime;
+SDecoderStatistics sDecoderStatistics;// For real time debugging
+int32_t iMbEcedNum;
+int32_t iMbEcedPropNum;
+int32_t iMbNum;
+bool bMbRefConcealed;
+bool bRPLRError;
+int32_t iECMVs[16][2];
+PPicture pECRefPic[16];
+unsigned long long uiTimeStamp;
 } SWelsDecoderContext, *PWelsDecoderContext;
 
 static inline void ResetActiveSPSForEachLayer (PWelsDecoderContext pCtx) {
@@ -336,6 +419,7 @@ for (int i = 0; i < MAX_LAYER_NUM; i++) {
 //#ifdef __cplusplus
 //}
 //#endif//__cplusplus
+
 
 } // namespace WelsDec
 

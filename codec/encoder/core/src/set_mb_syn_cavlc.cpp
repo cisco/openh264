@@ -38,7 +38,7 @@
  *************************************************************************************
  */
 
-#include "set_mb_syn_cavlc.h"
+#include "svc_set_mb_syn.h"
 #include "vlc_encoder.h"
 #include "cpu_core.h"
 #include "wels_const.h"
@@ -199,8 +199,47 @@ int32_t  WriteBlockResidualCavlc (SWelsFuncPtrList* pFuncList, int16_t* pCoffLev
   return ENC_RETURN_SUCCESS;
 }
 
+void StashMBStatusCavlc (SDynamicSlicingStack* pDss, SSlice* pSlice, int32_t iMbSkipRun) {
+  SBitStringAux* pBs = pSlice->pSliceBsa;
+  pDss->pBsStackBufPtr	= pBs->pBufPtr;
+  pDss->uiBsStackCurBits	= pBs->uiCurBits;
+  pDss->iBsStackLeftBits	= pBs->iLeftBits;
+  pDss->uiLastMbQp =  pSlice->uiLastMbQp;
+  pDss->iMbSkipRunStack = iMbSkipRun;
+}
+int32_t StashPopMBStatusCavlc (SDynamicSlicingStack* pDss, SSlice* pSlice) {
+  SBitStringAux* pBs = pSlice->pSliceBsa;
+  pBs->pBufPtr		= pDss->pBsStackBufPtr;
+  pBs->uiCurBits	= pDss->uiBsStackCurBits;
+  pBs->iLeftBits	= pDss->iBsStackLeftBits;
+  pSlice->uiLastMbQp = pDss->uiLastMbQp;
+  return pDss->iMbSkipRunStack;
+}
+void StashMBStatusCabac (SDynamicSlicingStack* pDss, SSlice* pSlice, int32_t iMbSkipRun) {
+  SCabacCtx* pCtx = &pSlice->sCabacCtx;
+  memcpy (&pDss->sStoredCabac, pCtx, sizeof (SCabacCtx));
+  pDss->uiLastMbQp =  pSlice->uiLastMbQp;
+  pDss->iMbSkipRunStack = iMbSkipRun;
+}
+int32_t StashPopMBStatusCabac (SDynamicSlicingStack* pDss, SSlice* pSlice) {
+  SCabacCtx* pCtx = &pSlice->sCabacCtx;
+  memcpy (pCtx, &pDss->sStoredCabac, sizeof (SCabacCtx));
+  pSlice->uiLastMbQp = pDss->uiLastMbQp;
+  return pDss->iMbSkipRunStack;
+}
 
-void InitCoeffFunc (SWelsFuncPtrList* pFuncList, const uint32_t uiCpuFlag) {
+void WelsWriteSliceEndSyn (SSlice* pSlice, bool bEntropyCodingModeFlag) {
+  SBitStringAux* pBs = pSlice->pSliceBsa;
+  if (bEntropyCodingModeFlag) {
+    WelsCabacEncodeFlush (&pSlice->sCabacCtx);
+    pBs->pBufPtr = WelsCabacEncodeGetPtr (&pSlice->sCabacCtx);
+
+  } else {
+    BsRbspTrailingBits (pBs);
+    BsFlush (pBs);
+  }
+}
+void InitCoeffFunc (SWelsFuncPtrList* pFuncList, const uint32_t uiCpuFlag,int32_t iEntropyCodingModeFlag) {
   pFuncList->pfCavlcParamCal = CavlcParamCal_c;
 
 #if defined(X86_ASM)
@@ -208,6 +247,17 @@ void InitCoeffFunc (SWelsFuncPtrList* pFuncList, const uint32_t uiCpuFlag) {
     // pFuncList->pfCavlcParamCal = CavlcParamCal_sse2;
   }
 #endif
+  if (iEntropyCodingModeFlag) {
+    pFuncList->pfStashMBStatus = StashMBStatusCabac;
+    pFuncList->pfStashPopMBStatus = StashPopMBStatusCabac;
+    pFuncList->pfWelsSpatialWriteMbSyn = WelsSpatialWriteMbSynCabac;
+  } else {
+    pFuncList->pfStashMBStatus = StashMBStatusCavlc;
+    pFuncList->pfStashPopMBStatus = StashPopMBStatusCavlc;
+    pFuncList->pfWelsSpatialWriteMbSyn = WelsSpatialWriteMbSyn;
+
+  }
 }
+
 
 } // namespace WelsEnc

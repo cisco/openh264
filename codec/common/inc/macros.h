@@ -42,6 +42,7 @@
 
 #include <math.h>
 #include <assert.h>
+#include <string.h>
 #include "typedefs.h"
 
 
@@ -114,6 +115,10 @@
 
 #ifndef WELS_ROUND
 #define WELS_ROUND(x)	((int32_t)(0.5+(x)))
+#endif//WELS_ROUND
+
+#ifndef WELS_ROUND64
+#define WELS_ROUND64(x)	((int64_t)(0.5+(x)))
 #endif//WELS_ROUND
 
 #ifndef WELS_DIV_ROUND
@@ -268,6 +273,37 @@ static inline bool WELS_POWER2_IF (uint32_t v) {
 #define WELS_GCC_UNUSED
 #endif
 
+inline bool CheckInRangeCloseOpen (const int16_t kiCurrent, const int16_t kiMin, const int16_t kiMax) {
+  return ((kiCurrent >= kiMin) && (kiCurrent < kiMax));
+}
 
+static inline void WelsSetMemUint32_c (uint32_t* pDst, uint32_t iValue, int32_t iSizeOfData) {
+  for (int i = 0; i < iSizeOfData; i++) {
+    pDst[i] = iValue;
+  }
+}
+
+static inline void WelsSetMemUint16_c (uint16_t* pDst, uint16_t iValue, int32_t iSizeOfData) {
+  for (int i = 0; i < iSizeOfData; i++) {
+    pDst[i] = iValue;
+  }
+}
+
+inline void WelsSetMemMultiplebytes_c (void* pDst, uint32_t iValue, int32_t iSizeOfData, int32_t iDataLengthOfData) {
+  assert (4 == iDataLengthOfData || 2 == iDataLengthOfData || 1 == iDataLengthOfData);
+
+  // TODO: consider add assembly for these functions
+  if (0 != iValue) {
+    if (4 == iDataLengthOfData) {
+      WelsSetMemUint32_c (static_cast<uint32_t*> (pDst), static_cast<uint32_t> (iValue), iSizeOfData);
+    } else if (2 == iDataLengthOfData) {
+      WelsSetMemUint16_c (static_cast<uint16_t*> (pDst), static_cast<uint16_t> (iValue), iSizeOfData);
+    } else {
+      memset (static_cast<uint8_t*> (pDst), static_cast<uint8_t> (iValue), iSizeOfData);
+    }
+  } else {
+    memset (static_cast<uint8_t*> (pDst), 0, iSizeOfData * iDataLengthOfData);
+  }
+}
 
 #endif//WELS_MACRO_UTILIZATIONS_H__

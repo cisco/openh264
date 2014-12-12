@@ -63,12 +63,18 @@ using namespace std;
 //using namespace WelsDec;
 
 //#define STICK_STREAM_SIZE	// For Demo interfaces test with track file of integrated frames
+//#define NO_DELAY_DECODING	// For Demo interfaces test with no delay decoding
 
 void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, const char* kpOuputFileName,
                          int32_t& iWidth, int32_t& iHeight, const char* pOptionFileName) {
   FILE* pH264File	  = NULL;
   FILE* pYuvFile	  = NULL;
   FILE* pOptionFile = NULL;
+#if defined ( STICK_STREAM_SIZE )
+  FILE* fpTrack = fopen ("3.len", "rb");
+  unsigned long pInfo[4];
+#endif// STICK_STREAM_SIZE
+  unsigned long long uiTimeStamp = 0;
   int64_t iStart = 0, iEnd = 0, iTotal = 0;
   int32_t iSliceSize;
   int32_t iSliceIndex = 0;
@@ -153,12 +159,6 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     goto label_exit;
   }
 
-#if defined ( STICK_STREAM_SIZE )
-  FILE* fpTrack = fopen ("3.len", "rb");
-
-#endif// STICK_STREAM_SIZE
-
-
   while (true) {
 
     if (iBufPos >= iFileSize) {
@@ -169,8 +169,10 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     }
 
 #if defined ( STICK_STREAM_SIZE )
-    if (fpTrack)
-      fread (&iSliceSize, 1, sizeof (int32_t), fpTrack);
+    if (fpTrack) {
+      fread (pInfo, 4, sizeof (unsigned long), fpTrack);
+      iSliceSize = static_cast<int32_t>(pInfo[2]);
+    }
 #else
     for (i = 0; i < iFileSize; i++) {
       if ((pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 0 && pBuf[iBufPos + i + 3] == 1
@@ -198,7 +200,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     pDecoder->GetOption (DECODER_OPTION_VCL_NAL, &iFeedbackVclNalInAu);
     int32_t iFeedbackTidInAu;
     pDecoder->GetOption (DECODER_OPTION_TEMPORAL_ID, &iFeedbackTidInAu);
-    int32_t iErrorConMethod = (int32_t) ERROR_CON_SLICE_COPY;
+    int32_t iErrorConMethod = (int32_t) ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
     pDecoder->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iErrorConMethod);
 //~end for
 
@@ -206,8 +208,9 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     pData[0] = NULL;
     pData[1] = NULL;
     pData[2] = NULL;
+    uiTimeStamp ++;
     memset (&sDstBufInfo, 0, sizeof (SBufferInfo));
-
+    sDstBufInfo.uiInBsTimeStamp = uiTimeStamp;
     pDecoder->DecodeFrame2 (pBuf + iBufPos, iSliceSize, pData, &sDstBufInfo);
 
     if (sDstBufInfo.iBufferStatus == 1) {
@@ -234,6 +237,38 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
       ++ iFrameCount;
     }
 
+#ifdef NO_DELAY_DECODING
+    iStart = WelsTime();
+    pData[0] = NULL;
+    pData[1] = NULL;
+    pData[2] = NULL;
+    memset (&sDstBufInfo, 0, sizeof (SBufferInfo));
+    sDstBufInfo.uiInBsTimeStamp = uiTimeStamp;
+    pDecoder->DecodeFrame2 (NULL, 0, pData, &sDstBufInfo);
+    if (sDstBufInfo.iBufferStatus == 1) {
+      pDst[0] = pData[0];
+      pDst[1] = pData[1];
+      pDst[2] = pData[2];
+    }
+    iEnd	= WelsTime();
+    iTotal	+= iEnd - iStart;
+    if (sDstBufInfo.iBufferStatus == 1) {
+      cOutputModule.Process ((void**)pDst, &sDstBufInfo, pYuvFile);
+      iWidth  = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
+      iHeight = sDstBufInfo.UsrData.sSystemBuffer.iHeight;
+
+      if (pOptionFile != NULL) {
+        if (iWidth != iLastWidth && iHeight != iLastHeight) {
+          fwrite (&iFrameCount, sizeof (iFrameCount), 1, pOptionFile);
+          fwrite (&iWidth , sizeof (iWidth) , 1, pOptionFile);
+          fwrite (&iHeight, sizeof (iHeight), 1, pOptionFile);
+          iLastWidth  = iWidth;
+          iLastHeight = iHeight;
+        }
+      }
+      ++ iFrameCount;
+    }
+#endif
     iBufPos += iSliceSize;
     ++ iSliceIndex;
   }

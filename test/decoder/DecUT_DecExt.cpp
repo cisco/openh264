@@ -30,6 +30,8 @@ class DecoderInterfaceTest : public ::testing::Test {
   void Uninit();
   //Mock input data for test
   void MockPacketType (const EWelsNalUnitType eNalUnitType, const int iPacketLength);
+  //Decoder real bitstream
+  void DecoderBs (const char* sFileName);
   //Test Initialize/Uninitialize
   void TestInitUninit();
   //DECODER_OPTION_DATAFORMAT
@@ -56,6 +58,8 @@ class DecoderInterfaceTest : public ::testing::Test {
   void TestTraceCallback();
   //DECODER_OPTION_TRACE_CALLBACK_CONTEXT
   void TestTraceCallbackContext();
+  //DECODER_OPTION_GET_DECODER_STATICTIS
+  void TestGetDecStatistics();
   //Do whole tests here
   void DecoderInterfaceAll();
 
@@ -104,6 +108,58 @@ void DecoderInterfaceTest::Uninit() {
   m_iBufLength = 0;
 }
 
+void DecoderInterfaceTest::DecoderBs (const char* sFileName) {
+
+  uint8_t* pBuf = NULL;
+  int32_t iBufPos = 0;
+  int32_t iFileSize;
+  int32_t i = 0;
+  int32_t iSliceSize;
+  int32_t iSliceIndex = 0;
+  int32_t iEndOfStreamFlag = 0;
+  FILE* pH264File;
+  uint8_t uiStartCode[4] = {0, 0, 0, 1};
+
+#if defined(ANDROID_NDK)
+  std::string filename = std::string ("/sdcard/") + sFileName;
+  ASSERT_TRUE (pH264File = fopen (filename.c_str(), "rb"));
+#else
+  ASSERT_TRUE (pH264File = fopen (sFileName, "rb"));
+#endif
+  fseek (pH264File, 0L, SEEK_END);
+  iFileSize = (int32_t) ftell (pH264File);
+  fseek (pH264File, 0L, SEEK_SET);
+  pBuf = new uint8_t[iFileSize + 4];
+  ASSERT_EQ (fread (pBuf, 1, iFileSize, pH264File), (unsigned int) iFileSize);
+  memcpy (pBuf + iFileSize, &uiStartCode[0], 4); //confirmed_safe_unsafe_usage
+  while (true) {
+    if (iBufPos >= iFileSize) {
+      iEndOfStreamFlag = true;
+      if (iEndOfStreamFlag)
+        m_pDec->SetOption (DECODER_OPTION_END_OF_STREAM, (void*)&iEndOfStreamFlag);
+      break;
+    }
+    for (i = 0; i < iFileSize; i++) {
+      if ((pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 0 && pBuf[iBufPos + i + 3] == 1
+           && i > 0)) {
+        break;
+      }
+    }
+    iSliceSize = i;
+    m_pDec->DecodeFrame2 (pBuf + iBufPos, iSliceSize, m_pData, &m_sBufferInfo);
+    m_pDec->DecodeFrame2 (NULL, 0, m_pData, &m_sBufferInfo);
+    iBufPos += iSliceSize;
+    ++ iSliceIndex;
+  }
+
+  fclose (pH264File);
+  if (pBuf) {
+    delete[] pBuf;
+    pBuf = NULL;
+  }
+
+
+}
 //Mock input data for test
 void DecoderInterfaceTest::MockPacketType (const EWelsNalUnitType eNalUnitType, const int iPacketLength) {
   switch (eNalUnitType) {
@@ -155,6 +211,7 @@ void DecoderInterfaceTest::TestInitUninit() {
   }
   //Initialize first, can get input color format
   m_sDecParam.eOutputColorFormat = (EVideoFormatType) 20; //just for test
+  m_sDecParam.bParseOnly = false;
   m_pDec->Initialize (&m_sDecParam);
   eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_DATAFORMAT, &iOutput);
   EXPECT_EQ (eRet, cmResultSuccess);
@@ -340,7 +397,93 @@ void DecoderInterfaceTest::TestTraceCallbackContext() {
   //TODO
 }
 
+//DECODER_OPTION_GET_STATISTICS
+void DecoderInterfaceTest::TestGetDecStatistics() {
+  CM_RETURN eRet;
+  SDecoderStatistics sDecStatic;
+  int32_t iError = 0;
 
+  Init();
+  // setoption not support,
+  eRet = (CM_RETURN)m_pDec->SetOption (DECODER_OPTION_GET_STATISTICS, NULL);
+  EXPECT_EQ (eRet, cmInitParaError);
+  //EC on UT
+  iError = 2;
+  m_pDec->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iError);
+  //Decoder error bs
+  DecoderBs ("res/Error_I_P.264");
+  m_pDec->GetOption (DECODER_OPTION_GET_STATISTICS, &sDecStatic);
+  EXPECT_EQ (65u, sDecStatic.uiAvgEcRatio);
+  EXPECT_EQ (7u, sDecStatic.uiAvgEcPropRatio);
+  EXPECT_EQ (5u, sDecStatic.uiDecodedFrameCount);
+  EXPECT_EQ (288u, sDecStatic.uiHeight);
+  EXPECT_EQ (1u, sDecStatic.uiIDRCorrectNum);
+  EXPECT_EQ (3u, sDecStatic.uiResolutionChangeTimes);
+  EXPECT_EQ (352u, sDecStatic.uiWidth);
+  EXPECT_EQ (4u, sDecStatic.uiEcFrameNum);
+  EXPECT_EQ (2u, sDecStatic.uiEcIDRNum);
+  EXPECT_EQ (0u, sDecStatic.uiIDRLostNum);
+  Uninit();
+
+  //Decoder error bs when the first IDR lost
+  Init();
+  iError = 2;
+  m_pDec->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iError);
+  DecoderBs ("res/BA_MW_D_IDR_LOST.264");
+  m_pDec->GetOption (DECODER_OPTION_GET_STATISTICS, &sDecStatic);
+  EXPECT_EQ (88u, sDecStatic.uiAvgEcRatio);
+  EXPECT_EQ (88u, sDecStatic.uiAvgEcPropRatio);
+  EXPECT_EQ (97u, sDecStatic.uiDecodedFrameCount);
+  EXPECT_EQ (144u, sDecStatic.uiHeight);
+  EXPECT_EQ (3u, sDecStatic.uiIDRCorrectNum);
+  EXPECT_EQ (0u, sDecStatic.uiEcIDRNum);
+  EXPECT_EQ (1u, sDecStatic.uiResolutionChangeTimes);
+  EXPECT_EQ (176u, sDecStatic.uiWidth);
+  EXPECT_EQ (27u, sDecStatic.uiEcFrameNum);
+  EXPECT_EQ (1u, sDecStatic.uiIDRLostNum);
+  Uninit();
+
+  //ecoder error bs when the first P lost
+  Init();
+  iError = 2;
+  m_pDec->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iError);
+
+  DecoderBs ("res/BA_MW_D_P_LOST.264");
+
+  m_pDec->GetOption (DECODER_OPTION_GET_STATISTICS, &sDecStatic);
+  EXPECT_EQ (85u, sDecStatic.uiAvgEcRatio);
+  EXPECT_EQ (85u, sDecStatic.uiAvgEcPropRatio);
+  EXPECT_EQ (99u, sDecStatic.uiDecodedFrameCount);
+  EXPECT_EQ (144u, sDecStatic.uiHeight);
+  EXPECT_EQ (4u, sDecStatic.uiIDRCorrectNum);
+  EXPECT_EQ (0u, sDecStatic.uiEcIDRNum);
+  EXPECT_EQ (1u, sDecStatic.uiResolutionChangeTimes);
+  EXPECT_EQ (176u, sDecStatic.uiWidth);
+  EXPECT_EQ (28u, sDecStatic.uiEcFrameNum);
+  EXPECT_EQ (0u, sDecStatic.uiIDRLostNum);
+  Uninit();
+  //EC enable
+
+  //EC Off UT just correc bitstream
+  Init();
+  iError = 0;
+  m_pDec->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iError);
+  DecoderBs ("res/test_vd_1d.264");
+
+  m_pDec->GetOption (DECODER_OPTION_GET_STATISTICS, &sDecStatic);
+
+  EXPECT_EQ (0u, sDecStatic.uiAvgEcRatio);
+  EXPECT_EQ (0u, sDecStatic.uiAvgEcPropRatio);
+  EXPECT_EQ (9u, sDecStatic.uiDecodedFrameCount);
+  EXPECT_EQ (192u, sDecStatic.uiHeight);
+  EXPECT_EQ (1u, sDecStatic.uiIDRCorrectNum);
+  EXPECT_EQ (1u, sDecStatic.uiResolutionChangeTimes);
+  EXPECT_EQ (320u, sDecStatic.uiWidth);
+  EXPECT_EQ (0u, sDecStatic.uiEcFrameNum);
+  EXPECT_EQ (0u, sDecStatic.uiIDRLostNum);
+  Uninit();
+
+}
 //TEST here for whole tests
 TEST_F (DecoderInterfaceTest, DecoderInterfaceAll) {
 
@@ -370,6 +513,8 @@ TEST_F (DecoderInterfaceTest, DecoderInterfaceAll) {
   TestTraceCallback();
   //DECODER_OPTION_TRACE_CALLBACK_CONTEXT
   TestTraceCallbackContext();
+  //DECODER_OPTION_GET_STATISTICS
+  TestGetDecStatistics();
 }
 
 

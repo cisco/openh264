@@ -105,9 +105,11 @@ int32_t ForceCodingIDR (sWelsEncCtx* pCtx);
  * \brief	Wels SVC encoder parameters adjustment
  *			SVC adjustment results in new requirement in memory blocks adjustment
  */
+int32_t WelsBitRateVerification(SLogContext* pLogCtx,SSpatialLayerConfig* pLayerParam,int32_t iLayerId);
 int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNew);
 void WelsEncoderApplyFrameRate (SWelsSvcCodingParam* pParam);
-void WelsEncoderApplyBitRate (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iLayer);
+int32_t WelsEncoderApplyBitRate (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iLayer);
+int32_t WelsEncoderApplyBitVaryRang(SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iRang);
 int32_t WelsEncoderApplyLTR (SLogContext* pLogCtx, sWelsEncCtx** ppCtx, SLTRConfig* pLTRValue);
 int32_t FilterLTRRecoveryRequest (sWelsEncCtx* pCtx, SLTRRecoverRequest* pLTRRecoverRequest);
 

@@ -83,6 +83,10 @@ void welsCodecTrace::CodecTrace (const int32_t iLevel, const char* Str_Format, v
   }
 }
 
+void welsCodecTrace::SetCodecInstance (void* pCodecInstance) {
+  m_sLogCtx.pCodecInstance = pCodecInstance;
+}
+
 void welsCodecTrace::SetTraceLevel (const int32_t iLevel) {
   if (iLevel >= 0)
     m_iTraceLevel	= iLevel;

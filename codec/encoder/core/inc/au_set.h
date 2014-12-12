@@ -106,7 +106,8 @@ int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, SParaS
  */
 int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialLayerInternal* pLayerParamInternal,
                      const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame,
-                     const uint32_t kiSpsId, const bool kbEnableFrameCropping, bool bEnableRc);
+                     const uint32_t kiSpsId, const bool kbEnableFrameCropping, bool bEnableRc,
+                     const int32_t kiDlayerCount);
 
 /*!
  * \brief	initialize subset pSps based on configurable parameters in svc
@@ -138,7 +139,9 @@ int32_t WelsInitPps (SWelsPPS* pPps,
                      SSubsetSps* pSubsetSps,
                      const uint32_t kuiPpsId,
                      const bool kbDeblockingFilterPresentFlag,
-                     const bool kbUsingSubsetSps);
+                     const bool kbUsingSubsetSps,
+                     const bool kbEntropyCodingModeFlag);
 int32_t WelsCheckRefFrameLimitation (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam);
+int32_t WelsAdjustLevel( SSpatialLayerConfig* pSpatialLayer);
 }
 #endif//WELS_ACCESS_UNIT_PARSER_H__

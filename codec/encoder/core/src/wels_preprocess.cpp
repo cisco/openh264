@@ -219,7 +219,8 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
 
   if (pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
     SVAAFrameInfoExt* pVaaExt			= static_cast<SVAAFrameInfoExt*> (m_pEncCtx->pVaa);
-    SRefInfoParam* BestRefCandidateParam = & (pVaaExt->sVaaStrBestRefCandidate[0]);
+    SRefInfoParam* BestRefCandidateParam = (pCtx->bCurFrameMarkedAsSceneLtr) ? (& (pVaaExt->sVaaLtrBestRefCandidate[0])) :
+                                           (& (pVaaExt->sVaaStrBestRefCandidate[0]));
     SPicture* pRefPic = m_pSpatialPic[0][BestRefCandidateParam->iSrcListIdx];
 
     VaaCalculation (pCtx->pVaa, pCurPic, pRefPic, false, bCalculateVar, bCalculateBGD);
@@ -1116,21 +1117,21 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
   pVaaExt->iVaaBestRefFrameNum = sLtrSaved.pRefPicture->iFrameNum;
   pVaaExt->pVaaBestBlockStaticIdc = sLtrSaved.pBestBlockStaticIdc;
 
-  if (0 == iAvailableSceneRefNum) {
-    SaveBestRefToVaa (sSceneLtrSaved, & (pVaaExt->sVaaStrBestRefCandidate[1]));
+  if (0 < iAvailableSceneRefNum) {
+    SaveBestRefToVaa (sSceneLtrSaved, & (pVaaExt->sVaaLtrBestRefCandidate[0]));
   }
 
   pVaaExt->iNumOfAvailableRef = 1;
   return static_cast<ESceneChangeIdc> (iVaaFrameSceneChangeIdc);
 }
 
-int32_t CWelsPreProcess::GetRefFrameInfo (int32_t iRefIdx, SPicture*& pRefOri) {
+int32_t CWelsPreProcess::GetRefFrameInfo (int32_t iRefIdx, bool bCurrentFrameIsSceneLtr, SPicture*& pRefOri) {
   const int32_t iTargetDid = m_pEncCtx->pSvcParam->iSpatialLayerNum - 1;
   SVAAFrameInfoExt* pVaaExt			= static_cast<SVAAFrameInfoExt*> (m_pEncCtx->pVaa);
-  SRefInfoParam* BestRefCandidateParam = & (pVaaExt->sVaaStrBestRefCandidate[iRefIdx]);
-  int32_t iLtrRefIdx = m_pSpatialPic[iTargetDid][BestRefCandidateParam->iSrcListIdx]->iLongTermPicNum;
-  pRefOri = m_pSpatialPic[iTargetDid][BestRefCandidateParam->iSrcListIdx];
-  return iLtrRefIdx;
+  SRefInfoParam* pBestRefCandidateParam = (bCurrentFrameIsSceneLtr) ? (& (pVaaExt->sVaaLtrBestRefCandidate[iRefIdx])) :
+                                          (& (pVaaExt->sVaaStrBestRefCandidate[iRefIdx]));
+  pRefOri = m_pSpatialPic[iTargetDid][pBestRefCandidateParam->iSrcListIdx];
+  return (m_pSpatialPic[iTargetDid][pBestRefCandidateParam->iSrcListIdx]->iLongTermPicNum);
 }
 void  CWelsPreProcess::Padding (uint8_t* pSrcY, uint8_t* pSrcU, uint8_t* pSrcV, int32_t iStrideY, int32_t iStrideUV,
                                 int32_t iActualWidth, int32_t iPaddingWidth, int32_t iActualHeight, int32_t iPaddingHeight) {

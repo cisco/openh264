@@ -1,0 +1,19 @@
+This file describes the interface of ISVCDecoder
+
+.. contents::
+    :local:
+    :depth: 2
+
+
+Methods(ISVCDecoder)
+============================
+<doxygen2rst class=ISVCDecoder> Class:ISVCDecoder </doxygen2rst>
+
+Global functions
+============================
+
+<doxygen2rst function=WelsGetDecoderCapability> function:WelsGetDecoderCapability </doxygen2rst>
+
+<doxygen2rst function=WelsCreateDecoder> function:WelsCreateDecoder </doxygen2rst>
+
+<doxygen2rst function=WelsDestroyDecoder> function:WelsDestroyDecoder </doxygen2rst>

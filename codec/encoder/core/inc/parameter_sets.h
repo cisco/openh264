@@ -147,7 +147,7 @@ uint8_t		uiChromaQpIndexOffset;
 //	/* potential application for High profile */
 
 //	bool		bPicOrderPresentFlag;
-
+bool    bEntropyCodingModeFlag;
 bool		bDeblockingFilterControlPresentFlag;
 
 //	bool		bConstainedIntraPredFlag;

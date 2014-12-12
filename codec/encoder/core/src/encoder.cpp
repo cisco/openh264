@@ -152,8 +152,9 @@ void WelsInitBGDFunc (SWelsFuncPtrList* pFuncList, const bool kbEnableBackground
  * \param	pEncCtx		sWelsEncCtx*
  * \return	successful - 0; otherwise none 0 for failed
  */
-int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* pParam, uint32_t uiCpuFlag) {
+int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam, uint32_t uiCpuFlag) {
   int32_t iReturn = ENC_RETURN_SUCCESS;
+  SWelsFuncPtrList* pFuncList = pEncCtx->pFuncList;
   bool bScreenContent = (SCREEN_CONTENT_REAL_TIME == pParam->iUsageType);
 
   /* Functionality utilization of CPU instructions dependency */
@@ -209,7 +210,7 @@ int32_t InitFunctionPointers (SWelsFuncPtrList* pFuncList, SWelsSvcCodingParam* 
   /*init pixel average function*/
   /*get one column or row pixel when refinement*/
   WelsInitMcFuncs (pFuncList, uiCpuFlag);
-  InitCoeffFunc (pFuncList, uiCpuFlag);
+  InitCoeffFunc (pFuncList,uiCpuFlag,pParam->iEntropyCodingModeFlag);
 
   WelsInitEncodingFuncs (pFuncList, uiCpuFlag);
   WelsInitReconstructionFuncs (pFuncList, uiCpuFlag);

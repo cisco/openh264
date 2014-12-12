@@ -1,0 +1,25 @@
+.. contents::
+    :local:
+
+1. Overview
+---------------------
+<doxygen2rst page=Overview> Overview </doxygen2rst>
+
+2. Page index
+---------------------
+    - `ISVCEncoder <wiki/ISVCEncoder>`_
+    - `ISVCDecoder <wiki/ISVCDecoder>`_
+    - `Example code for encoder usage <wiki/UsageExampleForEncoder>`_
+    - `Example code for decoder usage <wiki/UsageExampleForDecoder>`_
+    - `How to update wiki page <wiki/API2Wiki>`_
+
+3. Classes
+---------------------
+
+ - `ISVCEncoder <wiki/ISVCEncoder>`_
+ - `ISVCDecoder <wiki/ISVCDecoder>`_
+ - `Types and Structures <wiki/TypesAndStructures>`_
+
+4. License
+---------------------
+<doxygen2rst page=License> License </doxygen2rst>

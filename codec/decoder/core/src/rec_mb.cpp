@@ -164,24 +164,7 @@ int32_t RecI16x16Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLe
   return ERR_NONE;
 }
 
-typedef struct TagMCRefMember {
-  uint8_t* pDstY;
-  uint8_t* pDstU;
-  uint8_t* pDstV;
 
-  uint8_t* pSrcY;
-  uint8_t* pSrcU;
-  uint8_t* pSrcV;
-
-  int32_t iSrcLineLuma;
-  int32_t iSrcLineChroma;
-
-  int32_t iDstLineLuma;
-  int32_t iDstLineChroma;
-
-  int32_t iPicWidth;
-  int32_t iPicHeight;
-} sMCRefMember;
 //according to current 8*8 block ref_index to gain reference picture
 static inline void GetRefPic (sMCRefMember* pMCRefMem, PWelsDecoderContext pCtx, int8_t* pRefIdxList,
                               int32_t iIndex) {
@@ -202,32 +185,18 @@ static inline void GetRefPic (sMCRefMember* pMCRefMem, PWelsDecoderContext pCtx,
 #ifndef MC_FLOW_SIMPLE_JUDGE
 #define MC_FLOW_SIMPLE_JUDGE 1
 #endif //MC_FLOW_SIMPLE_JUDGE
-static inline void BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t iYOffset, SMcFunc* pMCFunc,
+void BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t iYOffset, SMcFunc* pMCFunc,
                            int32_t iBlkWidth, int32_t iBlkHeight, int16_t iMVs[2]) {
-  int32_t iExpandWidth = PADDING_LENGTH;
-  int32_t	iExpandHeight = PADDING_LENGTH;
-
-
-  int16_t iMVX = iMVs[0] >> 2;
-  int16_t iMVY = iMVs[1] >> 2;
-  int32_t iMVOffsetLuma = iMVX + iMVY * pMCRefMem->iSrcLineLuma;
-  int32_t iMVOffsetChroma = (iMVX >> 1) + (iMVY >> 1) * pMCRefMem->iSrcLineChroma;
-
   int32_t iFullMVx = (iXOffset << 2) + iMVs[0]; //quarter pixel
   int32_t iFullMVy = (iYOffset << 2) + iMVs[1];
-  int32_t iIntMVx = iFullMVx >> 2;//integer pixel
-  int32_t iIntMVy = iFullMVy >> 2;
+  iFullMVx = WELS_CLIP3 (iFullMVx, ((-PADDING_LENGTH + 2) << 2), ((pMCRefMem->iPicWidth + PADDING_LENGTH - 19) << 2));
+  iFullMVy = WELS_CLIP3 (iFullMVy, ((-PADDING_LENGTH + 2) << 2), ((pMCRefMem->iPicHeight + PADDING_LENGTH - 19) << 2));
 
-  int32_t iSrcPixOffsetLuma = iXOffset + iYOffset * pMCRefMem->iSrcLineLuma;
-  int32_t iSrcPixOffsetChroma = (iXOffset >> 1) + (iYOffset >> 1) * pMCRefMem->iSrcLineChroma;
+  int32_t iSrcPixOffsetLuma = (iFullMVx >> 2) + (iFullMVy >> 2) * pMCRefMem->iSrcLineLuma;
+  int32_t iSrcPixOffsetChroma = (iFullMVx >> 3) + (iFullMVy >> 3) * pMCRefMem->iSrcLineChroma;
 
   int32_t iBlkWidthChroma = iBlkWidth >> 1;
   int32_t iBlkHeightChroma = iBlkHeight >> 1;
-  int32_t iPicWidthChroma = pMCRefMem->iPicWidth >> 1;
-  int32_t iPicHeightChroma = pMCRefMem->iPicHeight >> 1;
-
-  //the offset only for luma padding if MV violation as there was 5-tap (-2, -1, 0, 1, 2) filter for luma (horizon and vertical)
-  int32_t iPadOffset = 2 + (pMCRefMem->iSrcLineLuma << 1); //(-2, -2) pixel location as the starting point
 
   uint8_t* pSrcY = pMCRefMem->pSrcY + iSrcPixOffsetLuma;
   uint8_t* pSrcU = pMCRefMem->pSrcU + iSrcPixOffsetChroma;
@@ -235,58 +204,14 @@ static inline void BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t iY
   uint8_t* pDstY = pMCRefMem->pDstY;
   uint8_t* pDstU = pMCRefMem->pDstU;
   uint8_t* pDstV = pMCRefMem->pDstV;
-  bool bExpand = false;
 
-  ENFORCE_STACK_ALIGN_1D (uint8_t, uiExpandBuf, (PADDING_LENGTH + 6) * (PADDING_LENGTH + 6), 16);
+  pMCFunc->pMcLumaFunc (pSrcY, pMCRefMem->iSrcLineLuma, pDstY, pMCRefMem->iDstLineLuma, iFullMVx, iFullMVy, iBlkWidth,
+                        iBlkHeight);
+  pMCFunc->pMcChromaFunc (pSrcU, pMCRefMem->iSrcLineChroma, pDstU, pMCRefMem->iDstLineChroma, iFullMVx, iFullMVy,
+                          iBlkWidthChroma, iBlkHeightChroma);
+  pMCFunc->pMcChromaFunc (pSrcV, pMCRefMem->iSrcLineChroma, pDstV, pMCRefMem->iDstLineChroma, iFullMVx, iFullMVy,
+                          iBlkWidthChroma, iBlkHeightChroma);
 
-  if (iFullMVx & 0x07) {
-    iExpandWidth -= 3;
-  }
-  if (iFullMVy & 0x07) {
-    iExpandHeight -= 3;
-  }
-
-#ifdef MC_FLOW_SIMPLE_JUDGE
-  if (iIntMVx < -iExpandWidth ||
-      iIntMVy < -iExpandHeight ||
-      iIntMVx + iBlkWidth > pMCRefMem->iPicWidth - 1 + iExpandWidth ||
-      iIntMVy + iBlkHeight > pMCRefMem->iPicHeight - 1 + iExpandHeight)
-#else
-  if (iIntMVx < -iExpandWidth ||
-      iIntMVy < -iExpandHeight ||
-      iIntMVx + PADDING_LENGTH > pMCRefMem->iPicWidth + iExpandWidth ||
-      iIntMVy + PADDING_LENGTH > pMCRefMem->iPicHeight + iExpandHeight)
-#endif
-  {
-    FillBufForMc (uiExpandBuf, 21, pSrcY, pMCRefMem->iSrcLineLuma, iMVOffsetLuma - iPadOffset,
-                  iBlkWidth + 5, iBlkHeight + 5, iIntMVx - 2, iIntMVy - 2, pMCRefMem->iPicWidth, pMCRefMem->iPicHeight);
-    pMCFunc->pMcLumaFunc (uiExpandBuf + 44, 21, pDstY, pMCRefMem->iDstLineLuma, iFullMVx, iFullMVy, iBlkWidth,
-                          iBlkHeight); //44=2+2*21
-    bExpand = true;
-  } else {
-    pSrcY += iMVOffsetLuma;
-    pMCFunc->pMcLumaFunc (pSrcY, pMCRefMem->iSrcLineLuma, pDstY, pMCRefMem->iDstLineLuma, iFullMVx, iFullMVy, iBlkWidth,
-                          iBlkHeight);
-  }
-
-  if (bExpand) {
-    FillBufForMc (uiExpandBuf, 21, pSrcU, pMCRefMem->iSrcLineChroma, iMVOffsetChroma, iBlkWidthChroma + 1,
-                  iBlkHeightChroma + 1, iFullMVx >> 3, iFullMVy >> 3, iPicWidthChroma, iPicHeightChroma);
-    pMCFunc->pMcChromaFunc (uiExpandBuf, 21, pDstU, pMCRefMem->iDstLineChroma, iFullMVx, iFullMVy, iBlkWidthChroma,
-                            iBlkHeightChroma);
-
-    FillBufForMc (uiExpandBuf, 21, pSrcV, pMCRefMem->iSrcLineChroma, iMVOffsetChroma, iBlkWidthChroma + 1,
-                  iBlkHeightChroma + 1, iFullMVx >> 3, iFullMVy >> 3, iPicWidthChroma, iPicHeightChroma);
-    pMCFunc->pMcChromaFunc (uiExpandBuf, 21, pDstV, pMCRefMem->iDstLineChroma, iFullMVx, iFullMVy, iBlkWidthChroma,
-                            iBlkHeightChroma);
-  } else {
-    pSrcU += iMVOffsetChroma;
-    pSrcV += iMVOffsetChroma;
-    pMCFunc->pMcChromaFunc (pSrcU, pMCRefMem->iSrcLineChroma, pDstU, pMCRefMem->iDstLineChroma, iFullMVx, iFullMVy,
-                            iBlkWidthChroma, iBlkHeightChroma);
-    pMCFunc->pMcChromaFunc (pSrcV, pMCRefMem->iSrcLineChroma, pDstV, pMCRefMem->iDstLineChroma, iFullMVx, iFullMVy,
-                            iBlkWidthChroma, iBlkHeightChroma);
-  }
 }
 
 void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDecoderContext pCtx) {
@@ -462,90 +387,6 @@ int32_t RecChroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLeve
   }
 
   return ERR_NONE;
-}
-
-void FillBufForMc (uint8_t* pBuf, int32_t iBufStride, uint8_t* pSrc, int32_t iSrcStride, int32_t iSrcOffset,
-                   int32_t iBlockWidth, int32_t iBlockHeight, int32_t iSrcX, int32_t iSrcY, int32_t iPicWidth, int32_t iPicHeight) {
-  int32_t iY;
-  int32_t iStartY, iStartX, iEndY, iEndX;
-  int32_t iOffsetAdj = 0;
-  int32_t iAddrSrc, iAddrBuf;
-  int32_t iNum, iNum1;
-  uint8_t* pBufSrc, *pBufDst;
-  uint8_t* pBufSrc1, *pBufDst1;
-
-  if (iSrcY >= iPicHeight) {
-    iOffsetAdj += (iPicHeight - 1 - iSrcY) * iSrcStride;
-    iSrcY = iPicHeight - 1;
-  } else if (iSrcY <= -iBlockHeight) {
-    iOffsetAdj += (1 - iBlockHeight - iSrcY) * iSrcStride;
-    iSrcY = 1 - iBlockHeight;
-  }
-  if (iSrcX >= iPicWidth) {
-    iOffsetAdj += (iPicWidth - 1 - iSrcX);
-    iSrcX = iPicWidth - 1;
-  } else if (iSrcX <= -iBlockWidth) {
-    iOffsetAdj += (1 - iBlockWidth - iSrcX);
-    iSrcX = 1 - iBlockWidth;
-  }
-
-  iOffsetAdj += iSrcOffset;
-
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#define MIN(a,b) ((a) > (b) ? (b) : (a))
-
-  iStartY = MAX (0, -iSrcY);
-  iStartX = MAX (0, -iSrcX);
-  iEndY = MIN (iBlockHeight, iPicHeight - iSrcY);
-  iEndX = MIN (iBlockWidth, iPicWidth - iSrcX);
-
-  // copy existing part
-  iAddrSrc = iStartX + iStartY * iSrcStride;
-  iAddrBuf = iStartX + iStartY * iBufStride;
-  iNum = iEndX - iStartX;
-  for (iY = iStartY; iY < iEndY; iY++) {
-    memcpy (pBuf + iAddrBuf, pSrc + iOffsetAdj + iAddrSrc, iNum);
-    iAddrSrc += iSrcStride;
-    iAddrBuf += iBufStride;
-  }
-
-  //top
-  pBufSrc = pBuf + iStartX + iStartY * iBufStride;
-  pBufDst = pBuf + iStartX;
-  iNum = iEndX - iStartX;
-  for (iY = 0; iY < iStartY; iY++) {
-    memcpy (pBufDst, pBufSrc, iNum);
-    pBufDst += iBufStride;
-  }
-
-  //bottom
-  pBufSrc = pBuf + iStartX + (iEndY - 1) * iBufStride;
-  pBufDst = pBuf + iStartX + iEndY * iBufStride;
-  iNum = iEndX - iStartX;
-  for (iY = iEndY; iY < iBlockHeight; iY++) {
-    memcpy (pBufDst, pBufSrc, iNum);
-    pBufDst += iBufStride;
-  }
-
-
-  pBufSrc = pBuf + iStartX;
-  pBufDst = pBuf;
-  iNum = iStartX;
-
-  pBufSrc1 = pBuf + iEndX - 1;
-  pBufDst1 = pBuf + iEndX;
-  iNum1 = iBlockWidth - iEndX;
-  for (iY = 0; iY < iBlockHeight; iY++) {
-    //left
-    memset (pBufDst, pBufSrc[0], iNum);
-    pBufDst += iBufStride;
-    pBufSrc += iBufStride;
-
-    //right
-    memset (pBufDst1, pBufSrc1[0], iNum1);
-    pBufDst1 += iBufStride;
-    pBufSrc1 += iBufStride;
-  }
 }
 
 } // namespace WelsDec

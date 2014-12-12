@@ -111,15 +111,12 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
   char*       pCurPath; // record current lib path such as:/pData/pData/com.wels.enc/lib/
 
   bool		bDeblockingParallelFlag;	// deblocking filter parallelization control flag
-
+  int32_t   iBitsVaryPercentage;
   short
   iCountThreadsNum;                       //              # derived from disable_multiple_slice_idc (=0 or >1) means;
 
   int8_t		iDecompStages;		// GOP size dependency
   int32_t  iMaxNumRefFrame;
-
-//setting this according to link type in use MAY invoke some algorithms targeting higher coding efficiency
-  bool bIsLosslessLink;
 
  public:
   TagWelsSvcCodingParam() {
@@ -139,7 +136,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
     param.iComplexityMode = MEDIUM_COMPLEXITY;
     param.iTargetBitrate			= 0;	// overall target bitrate introduced in RC module
-    param.iMaxBitrate             = MAX_BIT_RATE;
+    param.iMaxBitrate         = UNSPECIFIED_BIT_RATE;
     param.iMultipleThreadIdc		= 1;
 
     param.iLTRRefNum				= 0;
@@ -157,7 +154,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     /* Rate Control */
     param.iRCMode			= RC_QUALITY_MODE;
     param.iPaddingFlag	= 0;
-
+    param.iEntropyCodingModeFlag = 0;
     param.bEnableDenoise				= false;	// denoise control
     param.bEnableSceneChangeDetect	= true;		// scene change detection control
     param.bEnableBackgroundDetection	= true;		// background detection control
@@ -173,7 +170,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     param.iMinQp = 0;
     param.iUsageType = CAMERA_VIDEO_REAL_TIME;
     param.uiMaxNalSize = 0;
-
+    param.bIsLosslessLink = false;
     for (int32_t iLayer = 0; iLayer < MAX_SPATIAL_LAYER_NUM; iLayer++) {
       param.sSpatialLayers[iLayer].uiProfileIdc = PRO_BASELINE;
       param.sSpatialLayers[iLayer].uiLevelIdc = LEVEL_5_0;
@@ -182,7 +179,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       param.sSpatialLayers[iLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
       param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 1500;
       param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceNum = 1;
-
+      param.sSpatialLayers[iLayer].iMaxSpatialBitrate = UNSPECIFIED_BIT_RATE;
       const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
       for (int32_t idx = 0; idx < kiLesserSliceNum; idx++)
         param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceMbNum[idx] = 960;
@@ -205,22 +202,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     iCountThreadsNum		= 1;	//		# derived from disable_multiple_slice_idc (=0 or >1) means;
 
     iDecompStages				= 0;	// GOP size dependency, unknown here and be revised later
-    iComplexityMode = MEDIUM_COMPLEXITY;
-    memset (sDependencyLayers, 0, sizeof (SSpatialLayerInternal)*MAX_DEPENDENCY_LAYER);
-    memset (sSpatialLayers, 0 , sizeof (SSpatialLayerConfig)*MAX_SPATIAL_LAYER_NUM);
-
-
-    //init multi-slice
-    sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
-    sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceSizeConstraint    = 1500;
-    sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum      = 1;
-
-    const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
-    for (int32_t idx = 0; idx < kiLesserSliceNum; idx++)
-      sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceMbNum[idx] = 960;
-    sSpatialLayers[0].iDLayerQp = SVC_QUALITY_BASE_QP;
-
-    bIsLosslessLink = false;
+    iBitsVaryPercentage = 0;
   }
 
   int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam) {
@@ -240,7 +222,8 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
     int8_t iIdxSpatial	= 0;
     EProfileIdc uiProfileIdc		= PRO_BASELINE;
-
+    if (iEntropyCodingModeFlag)
+      uiProfileIdc = PRO_MAIN;
     SSpatialLayerInternal* pDlp		= &sDependencyLayers[0];
 
     while (iIdxSpatial < iSpatialLayerNum) {
@@ -298,7 +281,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     iLoopFilterDisableIdc	= pCodingParam.iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries,
     iLoopFilterAlphaC0Offset = pCodingParam.iLoopFilterAlphaC0Offset;	// AlphaOffset: valid range [-6, 6], default 0
     iLoopFilterBetaOffset = pCodingParam.iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0
-
+    iEntropyCodingModeFlag = pCodingParam.iEntropyCodingModeFlag;
     bEnableFrameCroppingFlag	= pCodingParam.bEnableFrameCroppingFlag;
 
     /* Rate Control */
@@ -459,7 +442,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     const uint8_t* pTemporalIdList	= &g_kuiTemporalIdListTable[iDecStages][0];
     SSpatialLayerInternal* pDlp				= &sDependencyLayers[0];
     SSpatialLayerConfig* pSpatialLayer = &sSpatialLayers[0];
-    EProfileIdc uiProfileIdc				= PRO_BASELINE;
+    EProfileIdc uiProfileIdc = iEntropyCodingModeFlag ? PRO_MAIN : PRO_BASELINE;
     int8_t i						= 0;
 
     while (i < iSpatialLayerNum) {
@@ -492,7 +475,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
         return ENC_RETURN_INVALIDINPUT;
       }
 
-      uiProfileIdc	= PRO_SCALABLE_BASELINE;
+      uiProfileIdc	= iEntropyCodingModeFlag ? PRO_SCALABLE_HIGH : PRO_SCALABLE_BASELINE;
       ++ pDlp;
       ++ pSpatialLayer;
       ++ i;

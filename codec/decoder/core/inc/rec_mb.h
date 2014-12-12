@@ -48,6 +48,27 @@
 #include "decoder_context.h"
 
 namespace WelsDec {
+typedef struct TagMCRefMember {
+  uint8_t* pDstY;
+  uint8_t* pDstU;
+  uint8_t* pDstV;
+
+  uint8_t* pSrcY;
+  uint8_t* pSrcU;
+  uint8_t* pSrcV;
+
+  int32_t iSrcLineLuma;
+  int32_t iSrcLineChroma;
+
+  int32_t iDstLineLuma;
+  int32_t iDstLineChroma;
+
+  int32_t iPicWidth;
+  int32_t iPicHeight;
+} sMCRefMember;
+
+void BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t iYOffset, SMcFunc* pMCFunc,
+                           int32_t iBlkWidth, int32_t iBlkHeight, int16_t iMVs[2]);
 
 void WelsFillRecNeededMbInfo (PWelsDecoderContext pCtx, bool bOutput, PDqLayer pCurLayer);
 
@@ -62,9 +83,6 @@ int32_t RecI16x16Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLe
 int32_t RecChroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
 
 void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDecoderContext pCtx);
-
-void FillBufForMc (uint8_t* pBuf, int32_t iBufStride, uint8_t* pSrc, int32_t iSrcStride, int32_t iSrcOffset,
-                   int32_t iBlockWidth, int32_t iBlockHeight, int32_t iSrcX, int32_t iSrcY, int32_t iPicWidth, int32_t iPicHeight);
 
 } // namespace WelsDec
 

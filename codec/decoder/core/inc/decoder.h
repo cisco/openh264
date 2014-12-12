@@ -68,7 +68,7 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
  * \note	N/A
  *************************************************************************************
  */
-int32_t WelsInitDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx);
+int32_t WelsInitDecoder (PWelsDecoderContext pCtx, const bool bParseOnly, SLogContext* pLogCtx);
 
 /*!
  *************************************************************************************
@@ -101,7 +101,7 @@ void WelsEndDecoder (PWelsDecoderContext pCtx);
  */
 
 int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const int32_t kiBsLen,
-                      uint8_t** ppDst, SBufferInfo* pDstBufInfo);
+                      uint8_t** ppDst, SBufferInfo* pDstBufInfo, SParserBsInfo* pDstBsInfo);
 
 /*
  *	request memory blocks for decoder avc part
@@ -132,11 +132,17 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
 
 void AssignFuncPointerForRec (PWelsDecoderContext pCtx);
 
-void ResetParameterSetsState (PWelsDecoderContext pCtx);
-
 void GetVclNalTemporalId (PWelsDecoderContext pCtx); //get the info that whether or not have VCL NAL in current AU,
 //and if YES, get the temporal ID
 
+//reset decoder number related statistics info
+void ResetDecStatNums (SDecoderStatistics* pDecStat);
+//update information when freezing occurs, including IDR/non-IDR number
+void UpdateDecStatFreezingInfo (const bool kbIdrFlag, SDecoderStatistics* pDecStat);
+//update information when no freezing occurs, including QP, correct IDR number, ECed IDR number
+void UpdateDecStatNoFreezingInfo (PWelsDecoderContext pCtx);
+//update decoder statistics information
+void UpdateDecStat (PWelsDecoderContext pCtx, const bool kbOutput);
 #ifdef __cplusplus
 }
 #endif//__cplusplus

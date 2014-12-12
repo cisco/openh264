@@ -54,6 +54,7 @@ typedef void (*PWelsLogCallbackFunc) (void* pCtx, const int32_t iLevel, const ch
 typedef struct TagLogContext {
   PWelsLogCallbackFunc pfLog;
   void* pLogCtx;
+  void* pCodecInstance;
 } SLogContext;
 
 

@@ -44,6 +44,7 @@ class welsCodecTrace {
   welsCodecTrace();
   ~welsCodecTrace();
 
+  void SetCodecInstance (void* pCodecInstance);
   void SetTraceLevel (const int32_t kiLevel);
   void SetTraceCallback (WelsTraceCallback func);
   void SetTraceCallbackContext (void* pCtx);

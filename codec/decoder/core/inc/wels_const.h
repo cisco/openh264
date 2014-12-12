@@ -96,4 +96,10 @@
 #define MAX_ACCESS_UNIT_CAPACITY 7077888 //Maximum AU size in bytes for level 5.2 for single frame
 #define MAX_MACROBLOCK_CAPACITY 5000 //Maximal legal MB capacity, 15000 bits is enough
 
+enum {
+    BASE_MB = 0,
+    NON_AVC_REWRITE_ENHANCE_MB =1,
+    AVC_REWRITE_ENHANCE_MB = 2
+};
+
 #endif//WELS_CONSTANCE_H__
