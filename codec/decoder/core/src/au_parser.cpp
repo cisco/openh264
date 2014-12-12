@@ -415,6 +415,8 @@ bool CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeade
     return true;
   if (pLastSliceHeader->iPpsId != pCurSliceHeader->iPpsId)
     return true;
+  if (pLastSliceHeader->pSps->iSpsId != pCurSliceHeader->pSps->iSpsId)
+    return true;
   if (pLastSliceHeader->bFieldPicFlag != pCurSliceHeader->bFieldPicFlag)
     return true;
   if (pLastSliceHeader->bBottomFiledFlag != pCurSliceHeader->bBottomFiledFlag)
@@ -439,7 +441,10 @@ bool CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeade
     if (pLastSliceHeader->iDeltaPicOrderCnt[1] != pCurSliceHeader->iDeltaPicOrderCnt[1])
       return true;
   }
-
+  if(memcmp(pLastSliceHeader->pPps, pCurSliceHeader->pPps, sizeof(SPps)) != 0
+      || memcmp(pLastSliceHeader->pSps, pCurSliceHeader->pSps, sizeof(SSps)) != 0) {
+      return true;
+  }
   return false;
 }
 
