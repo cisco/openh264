@@ -143,6 +143,8 @@ void UpdateDecStatFreezingInfo (const bool kbIdrFlag, SDecoderStatistics* pDecSt
 void UpdateDecStatNoFreezingInfo (PWelsDecoderContext pCtx);
 //update decoder statistics information
 void UpdateDecStat (PWelsDecoderContext pCtx, const bool kbOutput);
+//Destroy picutre buffer
+void DestroyPicBuff (PPicBuff* ppPicBuf);
 #ifdef __cplusplus
 }
 #endif//__cplusplus

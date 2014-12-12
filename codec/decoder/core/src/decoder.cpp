@@ -76,11 +76,15 @@ static int32_t CreatePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, cons
   pPicBuf->ppPic = (PPicture*)WelsMalloc (kiSize * sizeof (PPicture), "PPicture*");
 
   if (NULL == pPicBuf->ppPic) {
+    DestroyPicBuff (&pPicBuf);
     return 1;
   }
   for (iPicIdx = 0; iPicIdx < kiSize; ++ iPicIdx) {
     PPicture pPic = AllocPicture (pCtx, kiPicWidth, kiPicHeight);
     if (NULL == pPic) {
+      for (iPicIdx-- ; iPicIdx >= 0; iPicIdx--) {
+        FreePicture (pPicBuf->ppPic[iPicIdx]);
+      }
       return 1;
     }
     pPicBuf->ppPic[iPicIdx] = pPic;
@@ -112,6 +116,7 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   pPicNewBuf->ppPic = (PPicture*)WelsMalloc (kiNewSize * sizeof (PPicture), "PPicture*");
 
   if (NULL == pPicNewBuf->ppPic) {
+    DestroyPicBuff (&pPicNewBuf);
     return 1;
   }
   // copy old PicBuf to new PicBuf
@@ -122,6 +127,9 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   for (iPicIdx = kiOldSize; iPicIdx < kiNewSize; ++ iPicIdx) {
     PPicture pPic = AllocPicture (pCtx, kiPicWidth, kiPicHeight);
     if (NULL == pPic) {
+      for (iPicIdx-- ; iPicIdx >= kiOldSize; iPicIdx--) {
+        FreePicture (pPicNewBuf->ppPic[iPicIdx]);
+      }
       return 1;
     }
     pPicNewBuf->ppPic[iPicIdx] = pPic;
@@ -168,6 +176,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   pPicNewBuf->ppPic = (PPicture*)WelsMalloc (kiNewSize * sizeof (PPicture), "PPicture*");
 
   if (NULL == pPicNewBuf->ppPic) {
+    DestroyPicBuff (&pPicNewBuf);
     return 1;
   }
 
@@ -223,7 +232,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   return 0;
 }
 
-static void DestroyPicBuff (PPicBuff* ppPicBuf) {
+void DestroyPicBuff (PPicBuff* ppPicBuf) {
   PPicBuff pPicBuf = NULL;
 
   if (NULL == ppPicBuf || NULL == *ppPicBuf)
