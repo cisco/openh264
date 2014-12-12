@@ -125,7 +125,7 @@ void EncoderInterfaceTest::EncodeOneIDRandP (ISVCEncoder* pPtrEnc) {
   int iResult;
   iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  //EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeIDR));
+  EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeIDR));
 
   pSrcPic->uiTimeStamp += 30;
   iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
@@ -622,7 +622,13 @@ TEST_F (EncoderInterfaceTest, ForceIntraFrame) {
 
   //call next frame to be IDR
   pPtrEnc->ForceIntraFrame (bIDR);
-  EncodeOneIDRandP (pPtrEnc);
+  int iCount = 0;
+  do {
+    iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+    pSrcPic->uiTimeStamp += 30;
+  } while ((sFbi.eFrameType == static_cast<int> (videoFrameTypeSkip)) && (iCount ++ < 100));
+  EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeIDR));
 
   pPtrEnc->Uninitialize();
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
@@ -662,7 +668,13 @@ TEST_F (EncoderInterfaceTest, ForceIntraFrameWithTemporal) {
 
   //call next frame to be IDR
   pPtrEnc->ForceIntraFrame (bIDR);
-  EncodeOneIDRandP (pPtrEnc);
+  int iCount = 0;
+  do {
+    iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+    pSrcPic->uiTimeStamp += 30;
+  } while ((sFbi.eFrameType == static_cast<int> (videoFrameTypeSkip)) && (iCount ++ < 100));
+  EXPECT_EQ (sFbi.eFrameType, static_cast<int> (videoFrameTypeIDR));
 
   pPtrEnc->Uninitialize();
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
