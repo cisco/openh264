@@ -45,6 +45,10 @@ void InitErrorCon (PWelsDecoderContext pCtx) {
       || (pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR)
       || (pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE)
       || (pCtx->eErrorConMethod == ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE)) {
+    if ((pCtx->eErrorConMethod != ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE)
+        && (pCtx->eErrorConMethod != ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE)) {
+      pCtx->bFreezeOutput = false;
+    }
     pCtx->sCopyFunc.pCopyLumaFunc = WelsCopy16x16_c;
     pCtx->sCopyFunc.pCopyChromaFunc = WelsCopy8x8_c;
 

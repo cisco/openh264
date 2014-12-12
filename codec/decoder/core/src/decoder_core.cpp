@@ -397,11 +397,6 @@ int32_t WelsInitMemory (PWelsDecoderContext pCtx) {
 
   pCtx->uiTargetDqId			= (uint8_t) - 1;
   pCtx->bEndOfStreamFlag	= false;
-  pCtx->iImgWidthInPixel	= 0;
-  pCtx->iImgHeightInPixel	= 0;
-  pCtx->iLastImgWidthInPixel	= 0;
-  pCtx->iLastImgHeightInPixel	= 0;
-  pCtx->bFreezeOutput = false;
 
   return ERR_NONE;
 }
@@ -1083,7 +1078,7 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
     pCtx->sMb.pMbCorrectlyDecodedFlag[i] = (bool*) WelsMalloc (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (bool),
                                            "pCtx->sMb.pMbCorrectlyDecodedFlag[]");
     pCtx->sMb.pMbRefConcealedFlag[i] = (bool*) WelsMalloc (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (bool),
-                                                           "pCtx->pMbRefConcealedFlag[]");
+                                       "pCtx->pMbRefConcealedFlag[]");
 
     // check memory block valid due above allocated..
     WELS_VERIFY_RETURN_IF (ERR_INFO_OUT_OF_MEMORY,
