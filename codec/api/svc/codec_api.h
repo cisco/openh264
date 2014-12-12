@@ -168,13 +168,14 @@ typedef unsigned char bool;
   *  param.iPicWidth = width;
   *  param.iPicHeight = height;
   *  param.iTargetBitrate = 5000000;
-  *  param.iInputCsp = videoFormatI420;
   *  encoder_->Initialize (&param);
   * @endcode
   *
   * Step3:set option, set option during encoding process
   * @code
   *  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &g_LevelSetting);
+  *  int videoFormat = videoFormatI420;
+  *  encoder_->SetOption (ENCODER_OPTION_DATAFORMAT, &videoFormat);
   * @endcode
   *
   * Step4: encode and  store ouput bistream
@@ -231,7 +232,6 @@ typedef unsigned char bool;
   *  param.iPicWidth = width;
   *  param.iPicHeight = height;
   *  param.iTargetBitrate = 5000000;
-  *  param.iInputCsp = videoFormatI420;
   *  param.bEnableDenoise = denoise;
   *  param.iSpatialLayerNum = layers;
   *  //SM_DYN_SLICE don't support multi-thread now
@@ -252,6 +252,8 @@ typedef unsigned char bool;
   *  }
   *  param.iTargetBitrate *= param.iSpatialLayerNum;
   *  encoder_->InitializeExt (&param);
+  *  int videoFormat = videoFormatI420;
+  *  encoder_->SetOption (ENCODER_OPTION_DATAFORMAT, &videoFormat);
   *
   * @endcode
   */
