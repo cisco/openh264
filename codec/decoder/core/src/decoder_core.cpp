@@ -1318,6 +1318,18 @@ void ForceClearCurrentNal (PAccessUnit pAu) {
     -- pAu->uiAvailUnitsNum;
 }
 
+void ForceResetParaSetStatusAndAUList (PWelsDecoderContext pCtx) {
+  pCtx->bSpsExistAheadFlag = false;
+  pCtx->bSubspsExistAheadFlag = false;
+  pCtx->bPpsExistAheadFlag = false;
+
+  // Force clear the AU list
+  pCtx->pAccessUnitList->uiAvailUnitsNum	= 0;
+  pCtx->pAccessUnitList->uiActualUnitsNum	= 0;
+  pCtx->pAccessUnitList->uiStartPos		= 0;
+  pCtx->pAccessUnitList->uiEndPos		= 0;
+  pCtx->pAccessUnitList->bCompletedAuFlag	= false;
+}
 
 void CheckAvailNalUnitsListContinuity (PWelsDecoderContext pCtx, int32_t iStartIdx, int32_t iEndIdx) {
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
