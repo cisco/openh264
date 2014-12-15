@@ -271,7 +271,9 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
         if (uiAvailNalNum > 1) {
           pCurAu->uiEndPos = uiAvailNalNum - 2;
-          pCtx->bAuReadyFlag = true;
+          if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+            pCtx->bAuReadyFlag = true;
+          }
         }
         pCtx->iErrorCode |= dsBitstreamError;
         return NULL;
@@ -291,7 +293,9 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
         if (uiAvailNalNum > 1) {
           pCurAu->uiEndPos = uiAvailNalNum - 2;
-          pCtx->bAuReadyFlag = true;
+          if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+            pCtx->bAuReadyFlag = true;
+          }
         }
         pCtx->iErrorCode |= dsBitstreamError;
         return NULL;
@@ -340,7 +344,9 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
       ForceClearCurrentNal (pCurAu);
       if (uiAvailNalNum > 1) {
         pCurAu->uiEndPos = uiAvailNalNum - 2;
-        pCtx->bAuReadyFlag = true;
+        if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+          pCtx->bAuReadyFlag = true;
+        }
       }
       WelsLog (pLogCtx, WELS_LOG_ERROR, "NAL_UNIT_CODED_SLICE: InitBits() fail due invalid access.");
       pCtx->iErrorCode	|= dsBitstreamError;
@@ -357,7 +363,9 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
       if (uiAvailNalNum > 1) {
         pCurAu->uiEndPos = uiAvailNalNum - 2;
-        pCtx->bAuReadyFlag = true;
+        if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+          pCtx->bAuReadyFlag = true;
+        }
       }
       pCtx->iErrorCode |= dsBitstreamError;
       return NULL;
