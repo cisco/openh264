@@ -110,7 +110,7 @@ runPostAction()
 
   if [ ${TestType} = "TravisTest" ]
   then
-  if [-d ${FinalResultDir} ]
+  if [ -d ${FinalResultDir} ]
       then
           ${EncoderTestDir}/Scripts/run_SafeDelete.sh ${FinalResultDir}
   fi
