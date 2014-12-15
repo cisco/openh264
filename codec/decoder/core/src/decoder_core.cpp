@@ -2140,6 +2140,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
 
 bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
   PAccessUnit pAu = pCtx->pAccessUnitList;
+  if (pAu->uiAvailUnitsNum == 0)
+    return true;
   PNalUnit pCurNal = pAu->pNalUnitsList[pAu->uiEndPos];
   if ((pCtx->iTotalNumMbRec != 0)
       && (CheckAccessUnitBoundaryExt (&pCtx->sLastNalHdrExt, &pCurNal->sNalHeaderExt, &pCtx->sLastSliceHeader,

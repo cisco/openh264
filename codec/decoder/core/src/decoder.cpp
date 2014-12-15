@@ -626,23 +626,25 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
           pDstNal[iDstIdx] = pDstNal[iDstIdx + 1] = pDstNal[iDstIdx + 2] = pDstNal[iDstIdx + 3] =
                                0; // set 4 reserved bytes to zero
           pNalPayload	= ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
-          if (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1)) {
-            CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
-          }
-          if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType) && pNalPayload) {
-            iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes, pSrcNal - 3, iSrcIdx + 3);
-          }
-          if (pCtx->bAuReadyFlag) {
-            ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
+          if (pNalPayload) { //parse correct
+            if (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1)) {
+              CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
+            }
+            if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType)) {
+              iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes, pSrcNal - 3, iSrcIdx + 3);
+            }
+            if (pCtx->bAuReadyFlag) {
+              ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
 
-            if ((dsOutOfMemory | dsNoParamSets) & pCtx->iErrorCode) {
+              if ((dsOutOfMemory | dsNoParamSets) & pCtx->iErrorCode) {
 #ifdef LONG_TERM_REF
-              pCtx->bParamSetsLostFlag = true;
+                pCtx->bParamSetsLostFlag = true;
 #else
-              pCtx->bReferenceLostAtT0Flag = true;
+                pCtx->bReferenceLostAtT0Flag = true;
 #endif
-              if (dsOutOfMemory & pCtx->iErrorCode) {
-                return pCtx->iErrorCode;
+                if (dsOutOfMemory & pCtx->iErrorCode) {
+                  return pCtx->iErrorCode;
+                }
               }
             }
           }
@@ -682,22 +684,24 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
     pDstNal[iDstIdx] = pDstNal[iDstIdx + 1] = pDstNal[iDstIdx + 2] = pDstNal[iDstIdx + 3] =
                          0; // set 4 reserved bytes to zero
     pNalPayload = ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
-    if (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1)) {
-      CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
-    }
-    if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType) && pNalPayload) {
-      iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes, pSrcNal - 3, iSrcIdx + 3);
-    }
-    if (pCtx->bAuReadyFlag) {
-      ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
+    if (pNalPayload) { //parse correct
+      if (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1)) {
+        CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
+      }
+      if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType)) {
+        iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes, pSrcNal - 3, iSrcIdx + 3);
+      }
+      if (pCtx->bAuReadyFlag) {
+        ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
 
-      if ((dsOutOfMemory | dsNoParamSets) & pCtx->iErrorCode) {
+        if ((dsOutOfMemory | dsNoParamSets) & pCtx->iErrorCode) {
 #ifdef LONG_TERM_REF
-        pCtx->bParamSetsLostFlag = true;
+          pCtx->bParamSetsLostFlag = true;
 #else
-        pCtx->bReferenceLostAtT0Flag = true;
+          pCtx->bReferenceLostAtT0Flag = true;
 #endif
-        return pCtx->iErrorCode;
+          return pCtx->iErrorCode;
+        }
       }
     }
     if (iRet) {
