@@ -198,8 +198,8 @@ void DoMbECMvCopy (PWelsDecoderContext pCtx, PPicture pDec, PPicture pRef, int32
     } else {
       iScale0 = pCtx->pECRefPic[0]->iFramePoc - iCurrPoc;
       iScale1 = pRef->iFramePoc - iCurrPoc;
-      iMVs[0] = pCtx->iECMVs[0][0] * iScale1 / iScale0;
-      iMVs[1] = pCtx->iECMVs[0][1] * iScale1 / iScale0;
+      iMVs[0] = iScale0 == 0 ? 0 : pCtx->iECMVs[0][0] * iScale1 / iScale0;
+      iMVs[1] = iScale0 == 0 ? 0 : pCtx->iECMVs[0][1] * iScale1 / iScale0;
     }
     pMCRefMem->pDstY = pDst[0];
     pMCRefMem->pDstU = pDst[1];
