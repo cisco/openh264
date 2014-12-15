@@ -116,10 +116,7 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   }
   // copy old PicBuf to new PicBuf
   memcpy (pPicNewBuf->ppPic, pPicOldBuf->ppPic, kiOldSize * sizeof (PPicture));
-  // initialize context in queue
-  pPicNewBuf->iCapacity	 = kiNewSize;
-  pPicNewBuf->iCurrentIdx = pPicOldBuf->iCurrentIdx;
-  *ppPicBuf			 = pPicNewBuf;
+
 
   // increase new PicBuf
   for (iPicIdx = kiOldSize; iPicIdx < kiNewSize; ++ iPicIdx) {
@@ -129,7 +126,18 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     }
     pPicNewBuf->ppPic[iPicIdx] = pPic;
   }
-
+  // initialize context in queue
+  pPicNewBuf->iCapacity	 = kiNewSize;
+  pPicNewBuf->iCurrentIdx = pPicOldBuf->iCurrentIdx;
+  *ppPicBuf			 = pPicNewBuf;
+  
+  for(int32_t i = 0; i < pPicNewBuf->iCapacity; i++) {
+    pPicNewBuf->ppPic[i]->bUsedAsRef = false;
+    pPicNewBuf->ppPic[i]->bIsLongRef = false;
+    pPicNewBuf->ppPic[i]->uiRefCount = 0;
+    pPicNewBuf->ppPic[i]->bAvailableFlag = true;
+    pPicNewBuf->ppPic[i]->bIsComplete = false;
+  }
   // remove old PicBuf
   if (pPicOldBuf->ppPic != NULL) {
     WelsFree (pPicOldBuf->ppPic, "pPicOldBuf->queue");
@@ -138,7 +146,7 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   pPicOldBuf->iCapacity	= 0;
   pPicOldBuf->iCurrentIdx = 0;
   WelsFree (pPicOldBuf, "pPicOldBuf");
-
+  pPicOldBuf = NULL;
   return 0;
 }
 
@@ -195,6 +203,13 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   pPicNewBuf->iCapacity	 = kiNewSize;
   *ppPicBuf			 = pPicNewBuf;
 
+  for(int32_t i = 0; i < pPicNewBuf->iCapacity; i++) {
+    pPicNewBuf->ppPic[i]->bUsedAsRef = false;
+    pPicNewBuf->ppPic[i]->bIsLongRef = false;
+    pPicNewBuf->ppPic[i]->uiRefCount = 0;
+    pPicNewBuf->ppPic[i]->bAvailableFlag = true;
+    pPicNewBuf->ppPic[i]->bIsComplete = false;
+  }
   // remove old PicBuf
   if (pPicOldBuf->ppPic != NULL) {
     WelsFree (pPicOldBuf->ppPic, "pPicOldBuf->queue");
@@ -203,6 +218,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   pPicOldBuf->iCapacity	= 0;
   pPicOldBuf->iCurrentIdx = 0;
   WelsFree (pPicOldBuf, "pPicOldBuf");
+  pPicOldBuf = NULL;
 
   return 0;
 }
