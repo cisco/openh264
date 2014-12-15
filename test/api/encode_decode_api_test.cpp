@@ -2322,9 +2322,9 @@ const uint32_t kiFrameRate = 12; //DO NOT CHANGE!
 const uint32_t kiFrameNum = 100; //DO NOT CHANGE!
 const uint32_t kiMaxBsSize = 10000000; //DO NOT CHANGE!
 const char* pHashStr[] = { //DO NOT CHANGE!
-  "be28b28101023f92b0c994fc63531890d28307d0",
-  "3be320b5af1164cb88519b214e4698f11b3e4eb1",
-  "4ed8aa9a107119ff7b1a8821dc757ccc343ffd0b"
+  "02a5c2dd29af76812f9486d64dd1f4bb6f799405",
+  "45dc93584b9a4f8de60d47c0b5254d78541428e6",
+  "d62c2115520207444d481ddde0ea60d938a15c72"
 };
 
 class DecodeParseAPI : public EncodeDecodeTestBase {

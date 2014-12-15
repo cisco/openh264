@@ -77,7 +77,7 @@ runUpdateSHA1TablePostAction()
     if [[  "$FileName"  =~ UpdateSHA1Table.csv$ ]]
     then
       BitStreamName=`echo $FileName | awk 'BEGIN {FS=".264"} {print $1}'`
-      SHA1TableName=${BitStreamName}.264_AllCase_SHA1_Table.csv
+      SHA1TableName=${BitStreamName}.264_AllCases_SHA1_Table.csv
       ./Scripts/run_SafeDelete.sh  ${SHA1TableFolder}/${SHA1TableName} >>${DeletedLog}
       cp  $file   ${SHA1TableFolder}/${SHA1TableName}
     fi
