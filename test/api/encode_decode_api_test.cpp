@@ -2057,11 +2057,11 @@ TEST_F (EncodeDecodeTestAPI, Engine_SVC_Switch_P) {
 }
 
 TEST_F (EncodeDecodeTestAPI, SetOptionEncParamExt) {
-  int iWidth       = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 2, MAX_WIDTH);
-  int iHeight      = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1)  + 1) << 1, 2, MAX_HEIGHT);
+  int iSpatialLayerNum = 4;
+  int iWidth       = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 1 << iSpatialLayerNum, MAX_WIDTH);
+  int iHeight      = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1)  + 1) << 1, 1 << iSpatialLayerNum, MAX_HEIGHT);
   float fFrameRate = rand() + 0.5f;
   int iEncFrameNum = WelsClip3 ((rand() % ENCODE_FRAME_NUM) + 1, 1, ENCODE_FRAME_NUM);
-  int iSpatialLayerNum = 4;
   int iSliceNum        = 1;
   encoder_->GetDefaultParams (&param_);
   prepareParam (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate);
