@@ -98,8 +98,11 @@ int32_t WelsCheckRefFrameLimitation (SLogContext* pLogCtx, SWelsSvcCodingParam* 
       WelsLog (pLogCtx, WELS_LOG_WARNING, "change level to level5.0");
     }
     iRefFrame = g_ksLevelLimits[pSpatialLayer->uiLevelIdc - 1].uiMaxDPBMbs / uiPicInMBs;
-    if (iRefFrame < pParam->iMaxNumRefFrame)
+    if (iRefFrame < pParam->iMaxNumRefFrame) {
       pParam->iMaxNumRefFrame = iRefFrame;
+      if (pParam->iMaxNumRefFrame < pParam->iNumRefFrame)
+        pParam->iNumRefFrame = pParam->iMaxNumRefFrame;
+    }
     if (pParam->iMaxNumRefFrame < 1) {
       pParam->iMaxNumRefFrame = 1;
       WelsLog (pLogCtx, WELS_LOG_ERROR, "error Level setting (%d)", pSpatialLayer->uiLevelIdc);
