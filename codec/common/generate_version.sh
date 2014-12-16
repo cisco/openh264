@@ -14,13 +14,13 @@ fi
 GIT_VERSION='"'$GIT_VERSION'"'
 rm -f config.git-hash
 
-cat codec/common/inc/version.h.template | sed "s/\$FULL_VERSION/$GIT_VERSION/g" > codec/common/inc/version.h.new
-if cmp codec/common/inc/version.h.new codec/common/inc/version.h > /dev/null 2>&1; then
+cat codec/common/inc/version_gen.h.template | sed "s/\$FULL_VERSION/$GIT_VERSION/g" > codec/common/inc/version_gen.h.new
+if cmp codec/common/inc/version_gen.h.new codec/common/inc/version_gen.h > /dev/null 2>&1; then
     # Identical to old version, don't touch it (to avoid unnecessary rebuilds)
-    rm codec/common/inc/version.h.new
-    echo "Keeping existing codec/common/inc/version.h"
+    rm codec/common/inc/version_gen.h.new
+    echo "Keeping existing codec/common/inc/version_gen.h"
     exit 0
 fi
-mv codec/common/inc/version.h.new codec/common/inc/version.h
+mv codec/common/inc/version_gen.h.new codec/common/inc/version_gen.h
 
-echo "Generated codec/common/inc/version.h"
+echo "Generated codec/common/inc/version_gen.h"
