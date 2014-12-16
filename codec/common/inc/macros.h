@@ -197,6 +197,14 @@ static inline uint8_t WelsClip1 (int32_t iX) {
 #define WELS_CLIP3(iX, iY, iZ) ((iX) < (iY) ? (iY) : ((iX) > (iZ) ? (iZ) : (iX)))
 #endif //WELS_CLIP3
 
+template<typename T> T WelsClip3(T iX, T iY, T iZ) {
+  if (iX < iY)
+    return iY;
+  if (iX > iZ)
+    return iZ;
+  return iX;
+}
+
 /*
  * Description: to check variable validation and return the specified result
  *	iResult:	value to be checked

@@ -26,7 +26,7 @@ if (iNum==0) { \
   iTc[0] = iTc[1] = iTc[2] = iTc[3] = 25; \
   pBase[0] = pRef[0] = 128; \
   for (int i = 1; i < iWidth*iWidth; i++) { \
-  pBase[i] = pRef[i] = WELS_CLIP3( pBase[i-1] -16 + rand()%32, 0, 255 ); \
+  pBase[i] = pRef[i] = WelsClip3( pBase[i-1] -16 + rand()%32, 0, 255 ); \
   } \
 } else if (iNum==1) { \
   iAlpha = 4; \
@@ -34,7 +34,7 @@ if (iNum==0) { \
   iTc[0] = iTc[1] = iTc[2] = iTc[3] = 9; \
   pBase[0] = pRef[0] = 128; \
   for (int i = 1; i < iWidth*iWidth; i++) { \
-  pBase[i] = pRef[i] = WELS_CLIP3( pBase[i-1] -4 + rand()%8, 0, 255 ); \
+  pBase[i] = pRef[i] = WelsClip3( pBase[i-1] -4 + rand()%8, 0, 255 ); \
   } \
 } else { \
   iAlpha = rand() % 256; \

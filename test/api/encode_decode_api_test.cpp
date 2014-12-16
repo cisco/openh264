@@ -221,8 +221,8 @@ void EncodeDecodeTestAPI::InitialEncDec (int iWidth, int iHeight) {
 
 void EncodeDecodeTestAPI::RandomParamExtCombination() {
 
-  param_.iPicWidth  = WELS_CLIP3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 2, MAX_WIDTH);
-  param_.iPicHeight = WELS_CLIP3 ((((rand() % MAX_HEIGHT) >> 1) + 1) << 1, 2, MAX_HEIGHT);
+  param_.iPicWidth  = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 2, MAX_WIDTH);
+  param_.iPicHeight = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1) + 1) << 1, 2, MAX_HEIGHT);
 
   param_.fMaxFrameRate      = rand() % FRAME_RATE_RANGE + 0.5f;
   param_.iUsageType         = static_cast<EUsageType> (rand() % 2);
@@ -271,8 +271,8 @@ void EncodeDecodeTestAPI::RandomParamExtCombination() {
       //to do: profile and level id
       //pSpatialLayer->uiProfileIdc        = 0;
       //pSpatialLayer->uiLevelIdc          = 0;
-      pSpatialLayer->iVideoWidth         = WELS_CLIP3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 2, MAX_WIDTH);
-      pSpatialLayer->iVideoHeight        = WELS_CLIP3 ((((rand() % MAX_HEIGHT) >> 1) + 1) << 1, 2, MAX_HEIGHT);
+      pSpatialLayer->iVideoWidth         = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 2, MAX_WIDTH);
+      pSpatialLayer->iVideoHeight        = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1) + 1) << 1, 2, MAX_HEIGHT);
       pSpatialLayer->fFrameRate          = rand() % FRAME_RATE_RANGE + 0.5f;
       pSpatialLayer->iMaxSpatialBitrate  = rand() % BIT_RATE_RANGE;
       pSpatialLayer->iSpatialBitrate     = rand() % BIT_RATE_RANGE;
@@ -2057,10 +2057,10 @@ TEST_F (EncodeDecodeTestAPI, Engine_SVC_Switch_P) {
 }
 
 TEST_F (EncodeDecodeTestAPI, SetOptionEncParamExt) {
-  int iWidth       = WELS_CLIP3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 2, MAX_WIDTH);
-  int iHeight      = WELS_CLIP3 ((((rand() % MAX_HEIGHT) >> 1)  + 1) << 1, 2, MAX_HEIGHT);
+  int iWidth       = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 2, MAX_WIDTH);
+  int iHeight      = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1)  + 1) << 1, 2, MAX_HEIGHT);
   float fFrameRate = rand() + 0.5f;
-  int iEncFrameNum = WELS_CLIP3 ((rand() % ENCODE_FRAME_NUM) + 1, 1, ENCODE_FRAME_NUM);
+  int iEncFrameNum = WelsClip3 ((rand() % ENCODE_FRAME_NUM) + 1, 1, ENCODE_FRAME_NUM);
   int iSpatialLayerNum = 4;
   int iSliceNum        = 1;
   encoder_->GetDefaultParams (&param_);
