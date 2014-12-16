@@ -455,6 +455,8 @@ void GetValidEncParamBase (SEncParamBase* pEncParamBase) {
   pEncParamBase->iPicWidth = VALID_SIZE (pEncParamBase->iPicWidth);
   pEncParamBase->iPicHeight = VALID_SIZE (pEncParamBase->iPicHeight);
   pEncParamBase->iTargetBitrate = rand() + 1; //!=0
+  // Force a bitrate of at least w*h/50, otherwise we will only get skipped frames
+  pEncParamBase->iTargetBitrate = WELS_CLIP3 (pEncParamBase->iTargetBitrate, pEncParamBase->iPicWidth * pEncParamBase->iPicHeight / 50, 100000000);
   int32_t iLevelMaxBitrate = WelsCommon::g_ksLevelLimits[LEVEL_5_0 - 1].uiMaxBR * CpbBrNalFactor;
   if (pEncParamBase->iTargetBitrate > iLevelMaxBitrate)
     pEncParamBase->iTargetBitrate = iLevelMaxBitrate;
