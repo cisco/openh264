@@ -325,12 +325,11 @@ runSingleCasePostAction()
     ${TargetBitstreamSize}, ${BenchmarkBitstreamSize}, ${TargetYUVSize}, ${BenchmarkYUVSize},\
     ${CaseInfo}, ${EncoderCommand} "
   echo "${PassStatusInfo}">>${AllCasePassStatusFile}
-  if [ "$DiffFlag" = "0:passed!"  ]
+  if [ "$DiffFlag" != "0:passed!"  ]
   then
-   echo "${TargetSHA1}, ${TargetMD5},${TargetBitstreamSize}, ${TargetYUVSize},${CaseInfo}">>${UpdateSHA1TableFile}
-  else
     echo "${PassStatusInfo}">>${UnpassCaseFile}
   fi
+   echo "${TargetSHA1}, ${TargetMD5},${TargetBitstreamSize}, ${TargetYUVSize},${CaseInfo}">>${UpdateSHA1TableFile}
   ./run_SafeDelete.sh ${BitstreamTarget} >>${AllCaseConsoleLogFile}
 }
 #usage runOutputPassNum
