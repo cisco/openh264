@@ -47,9 +47,12 @@
 
 namespace WelsEnc {
 
+typedef struct TagWelsEncCtx sWelsEncCtx;
 typedef struct TagWelsFuncPointerList SWelsFuncPtrList;
+typedef struct TagVAAFrameInfo SVAAFrameInfo;
 
 typedef struct TagWelsME SWelsME;
+typedef struct TagWelsMD SWelsMD;
 
 typedef void (*PSetMemoryZero) (void* pDst, int32_t iSize);
 typedef void (*PDctFunc) (int16_t* pDct, uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2);
@@ -115,26 +118,26 @@ typedef struct tagDeblockingFunc {
 
 typedef  void (*PSetNoneZeroCountZeroFunc) (int8_t* pNonZeroCount);
 
-typedef int32_t (*PIntraFineMdFunc) (void* pEncCtx, void* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
-typedef void (*PInterFineMdFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, int32_t bestCost);
-typedef bool (*PInterMdFirstIntraModeFunc) (void* pEncCtx, void* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
+typedef int32_t (*PIntraFineMdFunc) (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
+typedef void (*PInterFineMdFunc) (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* slice, SMB* pCurMb, int32_t bestCost);
+typedef bool (*PInterMdFirstIntraModeFunc) (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
 
 typedef void (*PFillInterNeighborCacheFunc) (SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth, int8_t* pVaaBgMbFlag);
 typedef void (*PAccumulateSadFunc) (uint32_t* pSumDiff, int32_t* pGomForegroundBlockNum, int32_t* iSad8x8,
                                     int8_t* pVaaBgMbFlag);//for RC
-typedef bool (*PDynamicSlicingStepBackFunc) (void* pEncCtx, void* pSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
+typedef bool (*PDynamicSlicingStepBackFunc) (sWelsEncCtx* pEncCtx, SSlice* pSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
     SDynamicSlicingStack* pDynamicSlicingStack); // 2010.8.17
 
-typedef bool (*PInterMdBackgroundDecisionFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb,
+typedef bool (*PInterMdBackgroundDecisionFunc) (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* slice, SMB* pCurMb,
     SMbCache* pMbCache, bool* pKeepPskip);
 typedef void (*PInterMdBackgroundInfoUpdateFunc) (SDqLayer* pCurLayer,  SMB* pCurMb, const bool bFlag,
     const int32_t kiRefPictureType);
 
-typedef bool (*PInterMdScrollingPSkipDecisionFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb,
+typedef bool (*PInterMdScrollingPSkipDecisionFunc) (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* slice, SMB* pCurMb,
     SMbCache* pMbCache);
-typedef void (*PSetScrollingMv) (void* pVaa, void* pMd);
+typedef void (*PSetScrollingMv) (SVAAFrameInfo* pVaa, SWelsMD* pMd);
 
-typedef void (*PInterMdFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache);
+typedef void (*PInterMdFunc) (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache);
 
 typedef int32_t (*PSampleSadSatdCostFunc) (uint8_t*, int32_t, uint8_t*, int32_t);
 typedef void (*PSample4SadCostFunc) (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
@@ -145,13 +148,13 @@ typedef int32_t (*PIntraPred8x8Combined3Func) (uint8_t*, int32_t, uint8_t*, int3
     uint8_t*, uint8_t*);
 
 typedef uint32_t (*PSampleSadHor8Func) (uint8_t*, int32_t, uint8_t*, int32_t, uint16_t*, int32_t*);
-typedef void (*PMotionSearchFunc) (SWelsFuncPtrList* pFuncList, void* pCurDqLayer, void* pMe,
-                                   void* pSlice);
+typedef void (*PMotionSearchFunc) (SWelsFuncPtrList* pFuncList, SDqLayer* pCurDqLayer, SWelsME* pMe,
+                                   SSlice* pSlice);
 typedef void (*PSearchMethodFunc) (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlice, const int32_t kiEncStride,
                                    const int32_t kiRefStride);
-typedef void (*PCalculateSatdFunc) (PSampleSadSatdCostFunc pSatd, void* vpMe, const int32_t kiEncStride,
+typedef void (*PCalculateSatdFunc) (PSampleSadSatdCostFunc pSatd, SWelsME* pMe, const int32_t kiEncStride,
                                     const int32_t kiRefStride);
-typedef bool (*PCheckDirectionalMv) (PSampleSadSatdCostFunc pSad, void* vpMe,
+typedef bool (*PCheckDirectionalMv) (PSampleSadSatdCostFunc pSad, SWelsME* pMe,
                                      const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
                                      int32_t& iBestSadCost);
 typedef void (*PLineFullSearchFunc) (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
@@ -193,15 +196,15 @@ typedef int32_t (*PGetVarianceFromIntraVaaFunc) (uint8_t* pSampelY, const int32_
 typedef uint8_t (*PGetMbSignFromInterVaaFunc) (int32_t* pSad8x8);
 typedef void (*PUpdateMbMvFunc) (SMVUnitXY* pMvUnit, const SMVUnitXY ksMv);
 
-typedef bool (*PBuildRefListFunc) (void* pCtx, const int32_t iPOC, int32_t iBestLtrRefIdx);
-typedef void (*PMarkPicFunc) (void* pCtx);
-typedef bool (*PUpdateRefListFunc) (void* pCtx);
-typedef void (*PEndofUpdateRefListFunc) (void* pCtx);
-typedef void (*PAfterBuildRefListFunc) (void* pCtx);
+typedef bool (*PBuildRefListFunc) (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRefIdx);
+typedef void (*PMarkPicFunc) (sWelsEncCtx* pCtx);
+typedef bool (*PUpdateRefListFunc) (sWelsEncCtx* pCtx);
+typedef void (*PEndofUpdateRefListFunc) (sWelsEncCtx* pCtx);
+typedef void (*PAfterBuildRefListFunc) (sWelsEncCtx* pCtx);
 
 typedef  int32_t (*PCavlcParamCalFunc) (int16_t* pCoff, uint8_t* pRun, int16_t* pLevel, int32_t* pTotalCoeffs,
                                         int32_t iEndIdx);
-typedef int32_t (*PWelsSpatialWriteMbSyn) (void* pCtx, SSlice* pSlice, SMB* pCurMb);
+typedef int32_t (*PWelsSpatialWriteMbSyn) (sWelsEncCtx* pCtx, SSlice* pSlice, SMB* pCurMb);
 typedef void (*PStashMBStatus) (SDynamicSlicingStack* pDss, SSlice* pSlice, int32_t iMbSkipRun);
 typedef int32_t (*PStashPopMBStatus) (SDynamicSlicingStack* pDss, SSlice* pSlice);
 

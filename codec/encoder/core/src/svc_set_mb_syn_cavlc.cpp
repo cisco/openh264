@@ -220,8 +220,7 @@ int32_t CheckBitstreamBuffer (const uint32_t	kuiSliceIdx, sWelsEncCtx* pEncCtx, 
 }
 
 //============================Base Layer CAVLC Writing===============================
-int32_t WelsSpatialWriteMbSyn (void* pCtx, SSlice* pSlice, SMB* pCurMb) {
-  sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
+int32_t WelsSpatialWriteMbSyn (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb) {
   SBitStringAux* pBs = pSlice->pSliceBsa;
   SMbCache* pMbCache = &pSlice->sMbCacheInfo;
   const uint8_t kuiChromaQpIndexOffset = pEncCtx->pCurDqLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;

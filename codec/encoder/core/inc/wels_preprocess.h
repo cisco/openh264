@@ -77,7 +77,7 @@ typedef struct {
   unsigned char*		pBestBlockStaticIdc;
 } SRefInfoParam;
 
-typedef struct {
+typedef struct TagVAAFrameInfo {
   SVAACalcResult		sVaaCalcInfo;
   SAdaptiveQuantizationParam sAdaptiveQuantParam;
   SComplexityAnalysisParam sComplexityAnalysisParam;
