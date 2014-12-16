@@ -538,7 +538,7 @@ int32_t WelsEncoderApplyBitVaryRang(SLogContext* pLogCtx, SWelsSvcCodingParam* p
     const int32_t iNumLayers = pParam->iSpatialLayerNum;
     for (int32_t i = 0; i < iNumLayers; i++) {
         pLayerParam = & (pParam->sSpatialLayers[i]);
-        pLayerParam->iMaxSpatialBitrate = WELS_MIN(pLayerParam->iSpatialBitrate * (1+ iRang/100.0),pLayerParam->iMaxSpatialBitrate);
+        pLayerParam->iMaxSpatialBitrate = WELS_MIN((int) (pLayerParam->iSpatialBitrate * (1+ iRang/100.0)),pLayerParam->iMaxSpatialBitrate);
         if (WelsBitRateVerification (pLogCtx, pLayerParam, i) != ENC_RETURN_SUCCESS)
             return ENC_RETURN_UNSUPPORTED_PARA;
         WelsLog (pLogCtx, WELS_LOG_INFO,
