@@ -3639,7 +3639,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
 
 #if GOM_TRACE_FLAG
-      WelsLog (pLogCtx, WELS_LOG_INFO, "[RC] encoding_qp%d Padding: %d", pCtx->uiDependencyId,
+      WelsLog (pLogCtx, WELS_LOG_INFO, "[RC] dependency ID = %d,encoding_qp = %d Padding: %d", pCtx->uiDependencyId,
+               pCtx->iGlobalQp,
                pCtx->pWelsSvcRc[pCtx->uiDependencyId].iPaddingSize);
 #endif
       if (iPaddingNalSize <= 0)
