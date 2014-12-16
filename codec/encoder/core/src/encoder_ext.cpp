@@ -95,8 +95,8 @@ int32_t WelsBitRateVerification (SLogContext* pLogCtx, SSpatialLayerConfig* pLay
                pLayerParam->iMaxSpatialBitrate);
     }
     WelsLog (pLogCtx, WELS_LOG_INFO,
-               "Level is changed from (%d) to (%d) according to the maxbitrate",
-               iCurLevel, pLayerParam->uiLevelIdc);
+             "Level is changed from (%d) to (%d) according to the maxbitrate",
+             iCurLevel, pLayerParam->uiLevelIdc);
   }
   if (pLayerParam->iMaxSpatialBitrate < pLayerParam->iSpatialBitrate) {
     WelsLog (pLogCtx, WELS_LOG_ERROR,
@@ -533,18 +533,19 @@ int32_t WelsEncoderApplyBitRate (SLogContext* pLogCtx, SWelsSvcCodingParam* pPar
   }
   return ENC_RETURN_SUCCESS;
 }
-int32_t WelsEncoderApplyBitVaryRang(SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iRang){
-    SSpatialLayerConfig* pLayerParam;
-    const int32_t iNumLayers = pParam->iSpatialLayerNum;
-    for (int32_t i = 0; i < iNumLayers; i++) {
-        pLayerParam = & (pParam->sSpatialLayers[i]);
-        pLayerParam->iMaxSpatialBitrate = WELS_MIN((int) (pLayerParam->iSpatialBitrate * (1+ iRang/100.0)),pLayerParam->iMaxSpatialBitrate);
-        if (WelsBitRateVerification (pLogCtx, pLayerParam, i) != ENC_RETURN_SUCCESS)
-            return ENC_RETURN_UNSUPPORTED_PARA;
-        WelsLog (pLogCtx, WELS_LOG_INFO,
-                 "WelsEncoderApplyBitVaryRang:UpdateMaxBitrate layerId= %d,iMaxSpatialBitrate = %d", i, pLayerParam->iMaxSpatialBitrate);
-    }
-    return ENC_RETURN_SUCCESS;
+int32_t WelsEncoderApplyBitVaryRang (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iRang) {
+  SSpatialLayerConfig* pLayerParam;
+  const int32_t iNumLayers = pParam->iSpatialLayerNum;
+  for (int32_t i = 0; i < iNumLayers; i++) {
+    pLayerParam = & (pParam->sSpatialLayers[i]);
+    pLayerParam->iMaxSpatialBitrate = WELS_MIN ((int) (pLayerParam->iSpatialBitrate * (1 + iRang / 100.0)),
+                                      pLayerParam->iMaxSpatialBitrate);
+    if (WelsBitRateVerification (pLogCtx, pLayerParam, i) != ENC_RETURN_SUCCESS)
+      return ENC_RETURN_UNSUPPORTED_PARA;
+    WelsLog (pLogCtx, WELS_LOG_INFO,
+             "WelsEncoderApplyBitVaryRang:UpdateMaxBitrate layerId= %d,iMaxSpatialBitrate = %d", i, pLayerParam->iMaxSpatialBitrate);
+  }
+  return ENC_RETURN_SUCCESS;
 }
 
 /*!
@@ -2293,8 +2294,8 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
         WelsEventSignal (& (*ppCtx)->pSliceThreading->pThreadMasterEvent[iThreadIdx]);
         res = WelsThreadJoin ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx]);	// waiting thread exit
         WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO, "WelsUninitEncoderExt(), pthread_join(pThreadHandles%d) return %d..",
-                  iThreadIdx,
-                  res);
+                 iThreadIdx,
+                 res);
         (*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx] = 0;
       }
       ++ iThreadIdx;
@@ -3101,7 +3102,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   iSpatialNum = pCtx->pVpp->BuildSpatialPicList (pCtx, pSrcPic);
 
   if (pCtx->pSvcParam->bEnableFrameSkip) {
-    UpdateMaxBrCheckWindowStatus(pCtx, iSpatialNum, pSrcPic->uiTimeStamp);
+    UpdateMaxBrCheckWindowStatus (pCtx, iSpatialNum, pSrcPic->uiTimeStamp);
   }
 
   if (iSpatialNum < 1) {	// skip due to temporal layer settings (different frame rate)
@@ -3114,10 +3115,10 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
   eFrameType = DecideFrameType (pCtx, iSpatialNum);
   if (eFrameType == videoFrameTypeSkip) {
-    UpdateBufferWhenFrameSkipped(pCtx, iSpatialNum);
+    UpdateBufferWhenFrameSkipped (pCtx, iSpatialNum);
     pFbi->eFrameType = eFrameType;
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, skip one frame, continual skipped %d frames",
-      pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
+             pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
     return ENC_RETURN_SUCCESS;
   }
 
@@ -3125,7 +3126,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   if (CheckFrameSkipBasedMaxbr (pCtx, iSpatialNum, eFrameType, (uint32_t)pSrcPic->uiTimeStamp)) {
     pFbi->eFrameType = videoFrameTypeSkip;
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, skip one frame, continual skipped %d frames",
-      pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
+             pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
     return ENC_RETURN_SUCCESS;
   }
 
