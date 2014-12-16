@@ -2061,8 +2061,12 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
             }
           }
         }
-        if (bAllRefComplete && (pCtx->sRefPic.uiRefCount[LIST_0] > 0 || pCtx->eSliceType != I_SLICE)) {
-          bAllRefComplete &= bCheckRefPicturesComplete (pCtx);
+        if (bAllRefComplete && pCtx->eSliceType != I_SLICE) {
+          if (pCtx->sRefPic.uiRefCount[LIST_0] > 0) {
+            bAllRefComplete &= CheckRefPicturesComplete (pCtx);
+          } else {
+            bAllRefComplete = false;
+          }
         }
       }
 #if defined (_DEBUG) &&  !defined (CODEC_FOR_TESTBED)
@@ -2182,7 +2186,7 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
   return ERR_NONE;
 }
 
-bool bCheckRefPicturesComplete (PWelsDecoderContext pCtx) {
+bool CheckRefPicturesComplete (PWelsDecoderContext pCtx) {
   // Multi Reference, RefIdx may differ
   bool bAllRefComplete = true;
   int32_t iRealMbIdx;
