@@ -603,6 +603,7 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
   }
   pStatistics->fLatestFrameRate = m_pEncContext->pWelsSvcRc->fLatestFrameRate; //TODO: finish the calculation in RC
   pStatistics->uiBitRate = m_pEncContext->pWelsSvcRc->iActualBitRate; //TODO: finish the calculation in RC
+  pStatistics->uiAverageFrameQP = m_pEncContext->pWelsSvcRc->iAverageFrameQp;
 
   if (videoFrameTypeIDR == eFrameType || videoFrameTypeI == eFrameType) {
     pStatistics->uiIDRSentNum ++;
@@ -631,11 +632,11 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
 
       WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
                "EncoderStatistics: %dx%d, SpeedInMs: %f, fAverageFrameRate=%f, \
-               LastFrameRate=%f, LatestBitRate=%d, uiInputFrameCount=%d, uiSkippedFrameCount=%d, \
+               LastFrameRate=%f, LatestBitRate=%d, LastFrameQP=%d, uiInputFrameCount=%d, uiSkippedFrameCount=%d, \
                uiResolutionChangeTimes=%d, uIDRReqNum=%d, uIDRSentNum=%d, uLTRSentNum=NA",
                pStatistics->uiWidth, pStatistics->uiHeight,
                pStatistics->fAverageFrameSpeedInMs, pStatistics->fAverageFrameRate,
-               pStatistics->fLatestFrameRate, pStatistics->uiBitRate,
+               pStatistics->fLatestFrameRate, pStatistics->uiBitRate, pStatistics->uiAverageFrameQP,
                pStatistics->uiInputFrameCount, pStatistics->uiSkippedFrameCount,
                pStatistics->uiResolutionChangeTimes, pStatistics->uiIDRReqNum, pStatistics->uiIDRSentNum);
       //TODO: the following statistics will be calculated and added later
