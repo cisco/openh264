@@ -250,7 +250,6 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
 
       AdaptiveQuantCalculation (pCtx->pVaa, pCurPic, pRefPic);
     }
-    AnalyzePictureComplexity (pCtx, pCurPic, pRefPic, kiDidx, bCalculateBGD);
     WelsExchangeSpatialPictures (&m_pLastSpatialPicture[kiDidx][1], &m_pLastSpatialPicture[kiDidx][0]);
   }
   return 0;
@@ -735,8 +734,6 @@ void CWelsPreProcess::AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCu
   SWelsSvcCodingParam* pSvcParam = pCtx->pSvcParam;
   int32_t iComplexityAnalysisMode = 0;
 
-  if (pSvcParam->iRCMode == RC_OFF_MODE)
-    return;
   if (pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
     SVAAFrameInfoExt* pVaaExt		= static_cast<SVAAFrameInfoExt*> (pCtx->pVaa);
     SComplexityAnalysisScreenParam* sComplexityAnalysisParam	= &pVaaExt->sComplexityScreenParam;
@@ -806,7 +803,8 @@ void CWelsPreProcess::AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCu
     sComplexityAnalysisParam->iComplexityAnalysisMode = iComplexityAnalysisMode;
     sComplexityAnalysisParam->pCalcResult = & (pVaaInfo->sVaaCalcInfo);
     sComplexityAnalysisParam->pBackgroundMbFlag = pVaaInfo->pVaaBackgroundMbFlag;
-    SetRefMbType (pCtx, & (sComplexityAnalysisParam->uiRefMbType), pRefPicture->iPictureType);
+    if(pRefPicture)
+      SetRefMbType (pCtx, & (sComplexityAnalysisParam->uiRefMbType), pRefPicture->iPictureType);
     sComplexityAnalysisParam->iCalcBgd = bCalculateBGD;
     sComplexityAnalysisParam->iFrameComplexity = 0;
 
@@ -833,11 +831,13 @@ void CWelsPreProcess::AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCu
       sSrcPixMap.sRect.iRectHeight = pCurPicture->iHeightInPixel;
       sSrcPixMap.eFormat = VIDEO_FORMAT_I420;
 
-      sRefPixMap.pPixel[0] = pRefPicture->pData[0];
-      sRefPixMap.iSizeInBits = g_kiPixMapSizeInBits;
-      sRefPixMap.iStride[0] = pRefPicture->iLineSize[0];
-      sRefPixMap.sRect.iRectWidth = pRefPicture->iWidthInPixel;
-      sRefPixMap.sRect.iRectHeight = pRefPicture->iHeightInPixel;
+      if(pRefPicture){
+        sRefPixMap.pPixel[0] = pRefPicture->pData[0];
+        sRefPixMap.iSizeInBits = g_kiPixMapSizeInBits;
+        sRefPixMap.iStride[0] = pRefPicture->iLineSize[0];
+        sRefPixMap.sRect.iRectWidth = pRefPicture->iWidthInPixel;
+        sRefPixMap.sRect.iRectHeight = pRefPicture->iHeightInPixel;
+      }
       sRefPixMap.eFormat = VIDEO_FORMAT_I420;
 
       iRet = m_pInterfaceVp->Set (iMethodIdx, (void*)sComplexityAnalysisParam);
