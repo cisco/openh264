@@ -550,7 +550,8 @@ void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
            pParam->iLoopFilterDisableIdc
           );
   int32_t i = 0;
-  int32_t iSpatialLayers = (pParam->iSpatialLayerNum < MAX_SPATIAL_LAYER_NUM)?(pParam->iSpatialLayerNum):MAX_SPATIAL_LAYER_NUM;
+  int32_t iSpatialLayers = (pParam->iSpatialLayerNum < MAX_SPATIAL_LAYER_NUM) ? (pParam->iSpatialLayerNum) :
+                           MAX_SPATIAL_LAYER_NUM;
   while (i < iSpatialLayers) {
     SSpatialLayerConfig* pSpatialCfg = &pParam->sSpatialLayers[i];
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
@@ -1047,8 +1048,9 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   break;
   case ENCODER_OPTION_BITS_VARY_PERCENTAGE: {
     int32_t iValue = * (static_cast<int32_t*> (pOption));
-    m_pEncContext->pSvcParam->iBitsVaryPercentage = WELS_CLIP3(iValue,0,100);
-    WelsEncoderApplyBitVaryRang(&m_pWelsTrace->m_sLogCtx, m_pEncContext->pSvcParam, m_pEncContext->pSvcParam->iBitsVaryPercentage);
+    m_pEncContext->pSvcParam->iBitsVaryPercentage = WELS_CLIP3 (iValue, 0, 100);
+    WelsEncoderApplyBitVaryRang (&m_pWelsTrace->m_sLogCtx, m_pEncContext->pSvcParam,
+                                 m_pEncContext->pSvcParam->iBitsVaryPercentage);
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_BITS_VARY_PERCENTAGE,iBitsVaryPercentage = %d", iValue);
   }
