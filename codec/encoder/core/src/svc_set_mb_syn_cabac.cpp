@@ -575,8 +575,7 @@ void WelsInitSliceCabac (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
   WelsCabacEncodeInit (&pSlice->sCabacCtx, pBs->pBufPtr, pBs->pBufEnd);
 }
 
-int32_t WelsSpatialWriteMbSynCabac (void* pCtx, SSlice* pSlice, SMB* pCurMb) {
-  sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
+int32_t WelsSpatialWriteMbSynCabac (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb) {
   SCabacCtx* pCabacCtx = &pSlice->sCabacCtx;
   SMbCache* pMbCache	= &pSlice->sMbCacheInfo;
   const uint16_t uiMbType = pCurMb->uiMbType;

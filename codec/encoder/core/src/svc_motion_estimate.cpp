@@ -159,10 +159,7 @@ void WelsInitMeFunc (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag, bool bScre
  * \return  NONE
  */
 
-void WelsMotionEstimateSearch (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice) {
-  SDqLayer* pCurDqLayer      = (SDqLayer*)pLplayer;
-  SWelsME* pMe            = (SWelsME*)pLpme;
-  SSlice* pSlice          = (SSlice*)pLpslice;
+void WelsMotionEstimateSearch (SWelsFuncPtrList* pFuncList, SDqLayer* pCurDqLayer, SWelsME* pMe, SSlice* pSlice) {
   const int32_t kiStrideEnc = pCurDqLayer->iEncStride[0];
   const int32_t kiStrideRef = pCurDqLayer->pRefPic->iLineSize[0];
 
@@ -176,9 +173,7 @@ void WelsMotionEstimateSearch (SWelsFuncPtrList* pFuncList, void* pLplayer, void
                               kiStrideRef);
 }
 
-void WelsMotionEstimateSearchStatic (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice) {
-  SDqLayer* pCurDqLayer      = (SDqLayer*)pLplayer;
-  SWelsME* pMe            = (SWelsME*)pLpme;
+void WelsMotionEstimateSearchStatic (SWelsFuncPtrList* pFuncList, SDqLayer* pCurDqLayer, SWelsME* pMe, SSlice* pLpslice) {
   const int32_t kiStrideEnc = pCurDqLayer->iEncStride[0];
   const int32_t kiStrideRef = pCurDqLayer->pRefPic->iLineSize[0];
 
@@ -191,9 +186,7 @@ void WelsMotionEstimateSearchStatic (SWelsFuncPtrList* pFuncList, void* pLplayer
                               kiStrideRef);
 }
 
-void WelsMotionEstimateSearchScrolled (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice) {
-  SDqLayer* pCurDqLayer      = (SDqLayer*)pLplayer;
-  SWelsME* pMe            = (SWelsME*)pLpme;
+void WelsMotionEstimateSearchScrolled (SWelsFuncPtrList* pFuncList, SDqLayer* pCurDqLayer, SWelsME* pMe, SSlice* pSlice) {
   const int32_t kiStrideEnc = pCurDqLayer->iEncStride[0];
   const int32_t kiStrideRef = pCurDqLayer->pRefPic->iLineSize[0];
 
@@ -280,14 +273,13 @@ bool WelsMotionEstimateInitialPoint (SWelsFuncPtrList* pFuncList, SWelsME* pMe, 
   return false;
 }
 
-void CalculateSatdCost (PSampleSadSatdCostFunc pSatd, void* vpMe,
+void CalculateSatdCost (PSampleSadSatdCostFunc pSatd, SWelsME* pMe,
                         const int32_t kiEncStride, const int32_t kiRefStride) {
-  SWelsME* pMe             = static_cast<SWelsME*> (vpMe);
   pMe->uSadPredISatd.uiSatd = pSatd (pMe->pEncMb, kiEncStride, pMe->pRefMb, kiRefStride);
   pMe->uiSatdCost = pMe->uSadPredISatd.uiSatd + COST_MVD (pMe->pMvdCost, pMe->sMv.iMvX - pMe->sMvp.iMvX,
                     pMe->sMv.iMvY - pMe->sMvp.iMvY);
 }
-void NotCalculateSatdCost (PSampleSadSatdCostFunc pSatd, void* vpMe,
+void NotCalculateSatdCost (PSampleSadSatdCostFunc pSatd, SWelsME* pMe,
                            const int32_t kiEncStride, const int32_t kiRefStride) {
 }
 
@@ -380,10 +372,9 @@ void WelsDiamondSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlic
 /////////////////////////
 // DirectionalMv Basics
 /////////////////////////
-bool CheckDirectionalMv (PSampleSadSatdCostFunc pSad, void* vpMe,
+bool CheckDirectionalMv (PSampleSadSatdCostFunc pSad, SWelsME* pMe,
                          const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
                          int32_t& iBestSadCost) {
-  SWelsME* pMe             = static_cast<SWelsME*> (vpMe);
   const int16_t kiMvX = pMe->sDirectionalMv.iMvX;
   const int16_t kiMvY = pMe->sDirectionalMv.iMvY;
 
@@ -402,7 +393,7 @@ bool CheckDirectionalMv (PSampleSadSatdCostFunc pSad, void* vpMe,
   return false;
 }
 
-bool CheckDirectionalMvFalse (PSampleSadSatdCostFunc pSad, void* vpMe,
+bool CheckDirectionalMvFalse (PSampleSadSatdCostFunc pSad, SWelsME* vpMe,
                               const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
                               int32_t& iBestSadCost) {
   return false;
