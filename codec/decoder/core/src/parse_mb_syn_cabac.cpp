@@ -844,7 +844,7 @@ int32_t ParseResidualBlockCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroC
         sTCoeff[pScanTable[j]] = pSignificantMap[j];
       ++j;
     } while (j < 16);
-  } else if (iResProperty == CHROMA_DC_U) {
+  } else if (iResProperty == CHROMA_DC_U || iResProperty == CHROMA_DC_V) {
     do {
       if (pSignificantMap[j] != 0)
         sTCoeff[pScanTable[j]] = pSignificantMap[j] * pDeQuantMul[0];
