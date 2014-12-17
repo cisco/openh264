@@ -550,7 +550,8 @@ void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
            pParam->iLoopFilterDisableIdc
           );
   int32_t i = 0;
-  while (i < pParam->iSpatialLayerNum) {
+  int32_t iSpatialLayers = (pParam->iSpatialLayerNum < MAX_SPATIAL_LAYER_NUM)?(pParam->iSpatialLayerNum):MAX_SPATIAL_LAYER_NUM;
+  while (i < iSpatialLayers) {
     SSpatialLayerConfig* pSpatialCfg = &pParam->sSpatialLayers[i];
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "sSpatialLayers[%d]: .iVideoWidth= %d; .iVideoHeight= %d; .fFrameRate= %.6ff; .iSpatialBitrate= %d; .iMaxSpatialBitrate= %d; .sSliceCfg.uiSliceMode= %d; .sSliceCfg.sSliceArgument.iSliceNum= %d; .sSliceCfg.sSliceArgument.uiSliceSizeConstraint= %d;\
