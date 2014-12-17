@@ -119,6 +119,8 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
       if (pRef != NULL) {
         // IDR lost, set new
         pRef->bIsComplete = false; // Set complete flag to false for lost IDR ref picture
+        pRef->iSpsId = pCtx->pSps->iSpsId;
+        pRef->iPpsId = pCtx->pPps->iPpsId;
         pCtx->iErrorCode |= dsDataErrorConcealed;
         bool bCopyPrevious = ((ERROR_CON_FRAME_COPY_CROSS_IDR == pCtx->eErrorConMethod)
                               || (ERROR_CON_SLICE_COPY_CROSS_IDR == pCtx->eErrorConMethod)
@@ -260,8 +262,8 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
 
   pCtx->pDec->uiQualityId = pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.uiQualityId;
   pCtx->pDec->uiTemporalId = pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.uiTemporalId;
-  pCtx->pDec->iSpsId = pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iSpsId;
-  pCtx->pDec->iPpsId = pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iPpsId;
+  pCtx->pDec->iSpsId = pCtx->pSps->iSpsId;
+  pCtx->pDec->iPpsId = pCtx->pPps->iPpsId;
 
   for (j = pCurAU->uiStartPos; j <= pCurAU->uiEndPos; j++) {
     if (pCurAU->pNalUnitsList[j]->sNalHeaderExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_IDR

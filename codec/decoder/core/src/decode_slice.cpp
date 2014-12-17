@@ -79,8 +79,8 @@ int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx) {
   pCurLayer->iMbXyIndex = iNextMbXyIndex;
 
   if (0 == iNextMbXyIndex) {
-    pCurLayer->pDec->iSpsId = pSliceHeader->iSpsId;
-    pCurLayer->pDec->iPpsId = pSliceHeader->iPpsId;
+    pCurLayer->pDec->iSpsId = pCtx->pSps->iSpsId;
+    pCurLayer->pDec->iPpsId = pCtx->pPps->iPpsId;
 
     pCurLayer->pDec->uiQualityId = pCurLayer->sLayerInfo.sNalHeaderExt.uiQualityId;
   }
@@ -744,6 +744,9 @@ int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
     int32_t iQpDelta, iId8x8, iId4x4;
 
     WELS_READ_VERIFY (ParseDeltaQpCabac (pCtx, iQpDelta));
+    if (iQpDelta > 25 || iQpDelta < -26) { //out of iQpDelta range
+      return ERR_INFO_INVALID_QP;
+    }
     pCurLayer->pLumaQp[iMbXy] = (pSlice->iLastMbQp + iQpDelta + 52) % 52; //update last_mb_qp
     pSlice->iLastMbQp = pCurLayer->pLumaQp[iMbXy];
     pCurLayer->pChromaQp[iMbXy] = g_kuiChromaQpTable[WELS_CLIP3 (pSlice->iLastMbQp +
