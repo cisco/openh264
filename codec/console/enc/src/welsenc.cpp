@@ -109,7 +109,7 @@ static int     g_iCtrlC = 0;
 static void    SigIntHandler (int a) {
   g_iCtrlC = 1;
 }
-static int     g_LevelSetting = -1;
+static int     g_LevelSetting = WELS_LOG_ERROR;
 
 int ParseLayerConfig (CReadConfig& cRdLayerCfg, const int iLayer, SEncParamExt& pSvcParam, SFilesSet& sFileSet) {
   if (!cRdLayerCfg.ExistFile()) {
@@ -710,9 +710,7 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
     iRet = 1;
     goto INSIDE_MEM_FREE;
   }
-  if (g_LevelSetting >= 0) {
-    pPtrEnc->SetOption (ENCODER_OPTION_TRACE_LEVEL, &g_LevelSetting);
-  }
+  pPtrEnc->SetOption (ENCODER_OPTION_TRACE_LEVEL, &g_LevelSetting);
   //finish reading the configurations
   iSourceWidth = pSrcPic->iPicWidth;
   iSourceHeight = pSrcPic->iPicHeight;
