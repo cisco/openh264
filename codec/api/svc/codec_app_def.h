@@ -60,6 +60,19 @@
 #define UNSPECIFIED_BIT_RATE 0          ///< to do: add detail comment
 
 /**
+ * @brief Struct of OpenH264 version
+ */
+///
+/// E.g. SDK version is 1.2.0.0, major version number is 1, minor version number is 2, and revision number is 0.
+typedef struct  _tagVersion
+{
+  unsigned int uMajor;				///< The major version number
+  unsigned int uMinor;				///< The minor version number
+  unsigned int uRevision;				///< The revision number
+  unsigned int uReserved;				///< The reserved number, it should be 0.
+}Openh264Version;
+
+/**
 * @brief Decoding status
 */
 typedef enum {
