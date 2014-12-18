@@ -70,7 +70,7 @@ typedef struct  _tagVersion
   unsigned int uMinor;				///< The minor version number
   unsigned int uRevision;				///< The revision number
   unsigned int uReserved;				///< The reserved number, it should be 0.
-}Openh264Version;
+} OpenH264Version;
 
 /**
 * @brief Decoding status
