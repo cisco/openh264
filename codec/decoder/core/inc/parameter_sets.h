@@ -167,12 +167,16 @@ typedef struct TagPps {
   bool		bRedundantPicCntPresentFlag;
   bool		bWeightedPredFlag;
   uint8_t		uiWeightedBipredIdc;
-  bool bTransform_8x8_mode_flag;
+
+  bool    bTransform8x8ModeFlag;
   //Add for scalinglist support
   bool    bPicScalingMatrixPresentFlag;
   bool    bPicScalingListPresentFlag[12];
   uint8_t  iScalingList4x4[6][16];
   uint8_t  iScalingList8x8[6][64];
+
+  int32_t iSecondChromaQPIndexOffset; //second_chroma_qp_index_offset
+
 } SPps, *PPps;
 
 } // namespace WelsDec

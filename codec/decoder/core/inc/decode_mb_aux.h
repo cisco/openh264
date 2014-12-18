@@ -39,6 +39,7 @@
 namespace WelsDec {
 
 void IdctResAddPred_c (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
+void IdctResAddPred8x8_c (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
 
 #if defined(__cplusplus)
 extern "C" {

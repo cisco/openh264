@@ -380,6 +380,507 @@ void WelsI4x4LumaPredHD_c (uint8_t* pPred, const int32_t kiStride) {
   ST32A4 (pPred + kiStride3, LD32 (kuiList));
 }
 
+void WelsI8x8LumaPredV_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail) {
+  uint64_t uiTop = 0;
+  int32_t iStride[8];
+  uint8_t uiPixelFilterT[8];
+  int32_t i;
+
+  for (iStride[0] = 0, i = 1; i < 8; i++) {
+    iStride[i] = iStride[i - 1] + kiStride;
+  }
+
+  uiPixelFilterT[0] = bTLAvail ? ((pPred[-1 - kiStride] + (pPred[-kiStride] << 1) + pPred[1 - kiStride] + 2) >> 2) : ((
+                        pPred[-kiStride] * 3 + pPred[1 - kiStride] + 2) >> 2);
+  for (i = 1; i < 7; i++) {
+    uiPixelFilterT[i] = ((pPred[i - 1 - kiStride] + (pPred[i - kiStride] << 1) + pPred[i + 1 - kiStride] + 2) >> 2);
+  }
+  uiPixelFilterT[7] = bTRAvail ? ((pPred[6 - kiStride] + (pPred[7 - kiStride] << 1) + pPred[8 - kiStride] + 2) >> 2) : ((
+                        pPred[6 - kiStride] + pPred[7 - kiStride] * 3 + 2) >> 2);
+
+  // 8-89
+  for (i = 7; i >= 0; i--) {
+    uiTop = ((uiTop << 8) | uiPixelFilterT[i]);
+  }
+
+  for (i = 0; i < 8; i++) {
+    ST64A8 (pPred + kiStride * i, uiTop);
+  }
+}
+
+void WelsI8x8LumaPredH_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail) {
+  uint64_t uiLeft;
+  int32_t iStride[8];
+  uint8_t uiPixelFilterL[8];
+  int32_t i;
+
+  for (iStride[0] = 0, i = 1; i < 8; i++) {
+    iStride[i] = iStride[i - 1] + kiStride;
+  }
+
+  uiPixelFilterL[0] = bTLAvail ? ((pPred[-1 - kiStride] + (pPred[-1] << 1) + pPred[-1 + iStride[1]] + 2) >> 2) : ((
+                        pPred[-1] * 3 + pPred[-1 + iStride[1]] + 2) >> 2);
+  for (i = 1; i < 7; i++) {
+    uiPixelFilterL[i] = ((pPred[-1 + iStride[i - 1]] + (pPred[-1 + iStride[i]] << 1) + pPred[-1 + iStride[i + 1]] + 2) >>
+                         2);
+  }
+  uiPixelFilterL[7] = ((pPred[-1 + iStride[6]] + pPred[-1 + iStride[7]] * 3 + 2) >> 2);
+
+  // 8-90
+  for (i = 0; i < 8; i++) {
+    uiLeft = 0x0101010101010101U * uiPixelFilterL[i];
+    ST64A8 (pPred + iStride[i], uiLeft);
+  }
+}
+
+void WelsI8x8LumaPredDc_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail) {
+  int32_t iStride[8];
+  uint8_t uiPixelFilterL[8];
+  uint8_t uiPixelFilterT[8];
+  uint16_t uiTotal = 0;
+  int32_t i;
+
+  for (iStride[0] = 0, i = 1; i < 8; i++) {
+    iStride[i] = iStride[i - 1] + kiStride;
+  }
+
+  uiPixelFilterL[0] = bTLAvail ? ((pPred[-1 - kiStride] + (pPred[-1] << 1) + pPred[-1 + iStride[1]] + 2) >> 2) : ((
+                        pPred[-1] * 3 + pPred[-1 + iStride[1]] + 2) >> 2);
+  uiPixelFilterT[0] = bTLAvail ? ((pPred[-1 - kiStride] + (pPred[-kiStride] << 1) + pPred[1 - kiStride] + 2) >> 2) : ((
+                        pPred[-kiStride] * 3 + pPred[1 - kiStride] + 2) >> 2);
+  for (i = 1; i < 7; i++) {
+    uiPixelFilterL[i] = ((pPred[-1 + iStride[i - 1]] + (pPred[-1 + iStride[i]] << 1) + pPred[-1 + iStride[i + 1]] + 2) >>
+                         2);
+    uiPixelFilterT[i] = ((pPred[i - 1 - kiStride] + (pPred[i - kiStride] << 1) + pPred[i + 1 - kiStride] + 2) >> 2);
+  }
+  uiPixelFilterL[7] = ((pPred[-1 + iStride[6]] + pPred[-1 + iStride[7]] * 3 + 2) >> 2);
+  uiPixelFilterT[7] = bTRAvail ? ((pPred[6 - kiStride] + (pPred[7 - kiStride] << 1) + pPred[8 - kiStride] + 2) >> 2) : ((
+                        pPred[6 - kiStride] + pPred[7 - kiStride] * 3 + 2) >> 2);
+
+  // 8-91
+  for (i = 0; i < 8; i++) {
+    uiTotal += uiPixelFilterL[i];
+    uiTotal += uiPixelFilterT[i];
+  }
+
+  const uint8_t kuiMean = ((uiTotal + 8) >> 4);
+  const uint64_t kuiMean64 = 0x0101010101010101U * kuiMean;
+
+  for (i = 0; i < 8; i++) {
+    ST64A8 (pPred + iStride[i], kuiMean64);
+  }
+}
+
+void WelsI8x8LumaPredDcLeft_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail) {
+  int32_t iStride[8];
+  uint8_t uiPixelFilterL[8];
+  uint16_t uiTotal = 0;
+  int32_t i;
+
+  for (iStride[0] = 0, i = 1; i < 8; i++) {
+    iStride[i] = iStride[i - 1] + kiStride;
+  }
+
+  uiPixelFilterL[0] = bTLAvail ? ((pPred[-1 - kiStride] + (pPred[-1] << 1) + pPred[-1 + iStride[1]] + 2) >> 2) : ((
+                        pPred[-1] * 3 + pPred[-1 + iStride[1]] + 2) >> 2);
+  for (i = 1; i < 7; i++) {
+    uiPixelFilterL[i] = ((pPred[-1 + iStride[i - 1]] + (pPred[-1 + iStride[i]] << 1) + pPred[-1 + iStride[i + 1]] + 2) >>
+                         2);
+  }
+  uiPixelFilterL[7] = ((pPred[-1 + iStride[6]] + pPred[-1 + iStride[7]] * 3 + 2) >> 2);
+
+  // 8-92
+  for (i = 0; i < 8; i++) {
+    uiTotal += uiPixelFilterL[i];
+  }
+
+  const uint8_t kuiMean = ((uiTotal + 4) >> 3);
+  const uint64_t kuiMean64 = 0x0101010101010101U * kuiMean;
+
+  for (i = 0; i < 8; i++) {
+    ST64A8 (pPred + iStride[i], kuiMean64);
+  }
+}
+
+void WelsI8x8LumaPredDcTop_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail) {
+  int32_t iStride[8];
+  uint8_t uiPixelFilterT[8];
+  uint16_t uiTotal = 0;
+  int32_t i;
+
+  for (iStride[0] = 0, i = 1; i < 8; i++) {
+    iStride[i] = iStride[i - 1] + kiStride;
+  }
+
+  uiPixelFilterT[0] = bTLAvail ? ((pPred[-1 - kiStride] + (pPred[-kiStride] << 1) + pPred[1 - kiStride] + 2) >> 2) : ((
+                        pPred[-kiStride] * 3 + pPred[1 - kiStride] + 2) >> 2);
+  for (i = 1; i < 7; i++) {
+    uiPixelFilterT[i] = ((pPred[i - 1 - kiStride] + (pPred[i - kiStride] << 1) + pPred[i + 1 - kiStride] + 2) >> 2);
+  }
+  uiPixelFilterT[7] = bTRAvail ? ((pPred[6 - kiStride] + (pPred[7 - kiStride] << 1) + pPred[8 - kiStride] + 2) >> 2) : ((
+                        pPred[6 - kiStride] + pPred[7 - kiStride] * 3 + 2) >> 2);
+
+  // 8-93
+  for (i = 0; i < 8; i++) {
+    uiTotal += uiPixelFilterT[i];
+  }
+
+  const uint8_t kuiMean = ((uiTotal + 4) >> 3);
+  const uint64_t kuiMean64 = 0x0101010101010101U * kuiMean;
+
+  for (i = 0; i < 8; i++) {
+    ST64A8 (pPred + iStride[i], kuiMean64);
+  }
+}
+
+void WelsI8x8LumaPredDcNA_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail) {
+  // for normal 8 bit depth, 8-94
+  const uint64_t kuiDC64		= 0x8080808080808080U;
+
+  int32_t iStride[8];
+  int32_t i;
+  ST64A8 (pPred, kuiDC64);
+  for (iStride[0] = 0, i = 1; i < 8; i++) {
+    iStride[i] = iStride[i - 1] + kiStride;
+    ST64A8 (pPred + iStride[i], kuiDC64);
+  }
+}
+
+/*down pLeft*/
+void WelsI8x8LumaPredDDL_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail) {
+  // Top and Top-right available
+  int32_t iStride[8];
+  uint8_t uiPixelFilterT[16];
+  int32_t i, j;
+
+  for (iStride[0] = 0, i = 1; i < 8; i++) {
+    iStride[i] = iStride[i - 1] + kiStride;
+  }
+
+  uiPixelFilterT[0] = bTLAvail ? ((pPred[-1 - kiStride] + (pPred[-kiStride] << 1) + pPred[1 - kiStride] + 2) >> 2) : ((
+                        pPred[-kiStride] * 3 + pPred[1 - kiStride] + 2) >> 2);
+  for (i = 1; i < 15; i++) {
+    uiPixelFilterT[i] = ((pPred[i - 1 - kiStride] + (pPred[i - kiStride] << 1) + pPred[i + 1 - kiStride] + 2) >> 2);
+  }
+  uiPixelFilterT[15] = ((pPred[14 - kiStride] + pPred[15 - kiStride] * 3 + 2) >> 2);
+
+  for (i = 0; i < 8; i++) { // y
+    for (j = 0; j < 8; j++) { // x
+      if (i == 7 && j == 7) { // 8-95
+        pPred[j + iStride[i]] = (uiPixelFilterT[14] + 3 * uiPixelFilterT[15] + 2) >> 2;
+      } else { // 8-96
+        pPred[j + iStride[i]] = (uiPixelFilterT[i + j] + (uiPixelFilterT[i + j + 1] << 1) + uiPixelFilterT[i + j + 2] + 2) >> 2;
+      }
+    }
+  }
+}
+
+/*down pLeft*/
+void WelsI8x8LumaPredDDLTop_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail) {
+  // Top available and Top-right unavailable
+  int32_t iStride[8];
+  uint8_t uiPixelFilterT[16];
+  int32_t i, j;
+
+  for (iStride[0] = 0, i = 1; i < 8; i++) {
+    iStride[i] = iStride[i - 1] + kiStride;
+  }
+
+  uiPixelFilterT[0] = bTLAvail ? ((pPred[-1 - kiStride] + (pPred[-kiStride] << 1) + pPred[1 - kiStride] + 2) >> 2) : ((
+                        pPred[-kiStride] * 3 + pPred[1 - kiStride] + 2) >> 2);
+  for (i = 1; i < 7; i++) {
+    uiPixelFilterT[i] = ((pPred[i - 1 - kiStride] + (pPred[i - kiStride] << 1) + pPred[i + 1 - kiStride] + 2) >> 2);
+  }
+  // p[x, -1] x=8...15 are replaced with p[7, -1]
+  uiPixelFilterT[7] = ((pPred[6 - kiStride] + pPred[7 - kiStride] * 3 + 2) >> 2);
+  for (i = 8; i < 16; i++) {
+    uiPixelFilterT[i] = pPred[7 - kiStride];
+  }
+
+  for (i = 0; i < 8; i++) { // y
+    for (j = 0; j < 8; j++) { // x
+      if (i == 7 && j == 7) { // 8-95
+        pPred[j + iStride[i]] = (uiPixelFilterT[14] + 3 * uiPixelFilterT[15] + 2) >> 2;
+      } else { // 8-96
+        pPred[j + iStride[i]] = (uiPixelFilterT[i + j] + (uiPixelFilterT[i + j + 1] << 1) + uiPixelFilterT[i + j + 2] + 2) >> 2;
+      }
+    }
+  }
+}
+
+/*down right*/
+void WelsI8x8LumaPredDDR_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail) {
+  // The TopLeft, Top, Left are all available under this mode
+  int32_t iStride[8];
+  uint8_t uiPixelFilterTL;
+  uint8_t uiPixelFilterL[8];
+  uint8_t uiPixelFilterT[8];
+  int32_t i, j;
+
+  for (iStride[0] = 0, i = 1; i < 8; i++) {
+    iStride[i] = iStride[i - 1] + kiStride;
+  }
+
+  uiPixelFilterTL = (pPred[-1] + (pPred[-1 - kiStride] << 1) + pPred[-kiStride] + 2) >> 2;
+
+  uiPixelFilterL[0] = ((pPred[-1 - kiStride] + (pPred[-1] << 1) + pPred[-1 + iStride[1]] + 2) >> 2);
+  uiPixelFilterT[0] = ((pPred[-1 - kiStride] + (pPred[-kiStride] << 1) + pPred[1 - kiStride] + 2) >> 2);
+  for (i = 1; i < 7; i++) {
+    uiPixelFilterL[i] = ((pPred[-1 + iStride[i - 1]] + (pPred[-1 + iStride[i]] << 1) + pPred[-1 + iStride[i + 1]] + 2) >>
+                         2);
+    uiPixelFilterT[i] = ((pPred[i - 1 - kiStride] + (pPred[i - kiStride] << 1) + pPred[i + 1 - kiStride] + 2) >> 2);
+  }
+  uiPixelFilterL[7] = ((pPred[-1 + iStride[6]] + pPred[-1 + iStride[7]] * 3 + 2) >> 2);
+  uiPixelFilterT[7] = bTRAvail ? ((pPred[6 - kiStride] + (pPred[7 - kiStride] << 1) + pPred[8 - kiStride] + 2) >> 2) : ((
+                        pPred[6 - kiStride] + pPred[7 - kiStride] * 3 + 2) >> 2);
+
+  for (i = 0; i < 8; i++) { // y
+    // 8-98, x < y-1
+    for (j = 0; j < (i - 1); j++) {
+      pPred[j + iStride[i]] = (uiPixelFilterL[i - j - 2] + (uiPixelFilterL[i - j - 1] << 1) + uiPixelFilterL[i - j] + 2) >> 2;
+    }
+    // 8-98, special case, x == y-1
+    if (i >= 1) {
+      j = i - 1;
+      pPred[j + iStride[i]] = (uiPixelFilterTL + (uiPixelFilterL[0] << 1) + uiPixelFilterL[1] + 2) >> 2;
+    }
+    // 8-99, x==y
+    j = i;
+    pPred[j + iStride[i]] = (uiPixelFilterT[0] + (uiPixelFilterTL << 1) + uiPixelFilterL[0] + 2) >> 2;
+    // 8-97, special case, x == y+1
+    if (i < 7) {
+      j = i + 1;
+      pPred[j + iStride[i]] = (uiPixelFilterTL + (uiPixelFilterT[0] << 1) + uiPixelFilterT[1] + 2) >> 2;
+    }
+    for (j = i + 2; j < 8; j++) { // 8-97, x > y+1
+      pPred[j + iStride[i]] = (uiPixelFilterT[j - i - 2] + (uiPixelFilterT[j - i - 1] << 1) + uiPixelFilterT[j - i] + 2) >> 2;
+    }
+  }
+}
+
+/*vertical pLeft*/
+void WelsI8x8LumaPredVL_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail) {
+  // Top and Top-right available
+  int32_t iStride[8];
+  uint8_t uiPixelFilterT[16];
+  int32_t i, j;
+
+  for (iStride[0] = 0, i = 1; i < 8; i++) {
+    iStride[i] = iStride[i - 1] + kiStride;
+  }
+
+  uiPixelFilterT[0] = bTLAvail ? ((pPred[-1 - kiStride] + (pPred[-kiStride] << 1) + pPred[1 - kiStride] + 2) >> 2) : ((
+                        pPred[-kiStride] * 3 + pPred[1 - kiStride] + 2) >> 2);
+  for (i = 1; i < 15; i++) {
+    uiPixelFilterT[i] = ((pPred[i - 1 - kiStride] + (pPred[i - kiStride] << 1) + pPred[i + 1 - kiStride] + 2) >> 2);
+  }
+  uiPixelFilterT[15] = ((pPred[14 - kiStride] + pPred[15 - kiStride] * 3 + 2) >> 2);
+
+  for (i = 0; i < 8; i++) { // y
+    if ((i & 0x01) == 0) { // 8-108
+      for (j = 0; j < 8; j++) { // x
+        pPred[j + iStride[i]] = (uiPixelFilterT[j + (i >> 1)] + uiPixelFilterT[j + (i >> 1) + 1] + 1) >> 1;
+      }
+    } else {  // 8-109
+      for (j = 0; j < 8; j++) { // x
+        pPred[j + iStride[i]] = (uiPixelFilterT[j + (i >> 1)] + (uiPixelFilterT[j + (i >> 1) + 1] << 1) + uiPixelFilterT[j +
+                                 (i >> 1) + 2] + 2) >> 2;
+      }
+    }
+  }
+}
+
+/*vertical pLeft*/
+void WelsI8x8LumaPredVLTop_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail) {
+  // Top available and Top-right unavailable
+  int32_t iStride[8];
+  uint8_t uiPixelFilterT[16];
+  int32_t i, j;
+
+  for (iStride[0] = 0, i = 1; i < 8; i++) {
+    iStride[i] = iStride[i - 1] + kiStride;
+  }
+
+  uiPixelFilterT[0] = bTLAvail ? ((pPred[-1 - kiStride] + (pPred[-kiStride] << 1) + pPred[1 - kiStride] + 2) >> 2) : ((
+                        pPred[-kiStride] * 3 + pPred[1 - kiStride] + 2) >> 2);
+  for (i = 1; i < 7; i++) {
+    uiPixelFilterT[i] = ((pPred[i - 1 - kiStride] + (pPred[i - kiStride] << 1) + pPred[i + 1 - kiStride] + 2) >> 2);
+  }
+  // p[x, -1] x=8...15 are replaced with p[7, -1]
+  uiPixelFilterT[7] = ((pPred[6 - kiStride] + pPred[7 - kiStride] * 3 + 2) >> 2);
+  for (i = 8; i < 16; i++) {
+    uiPixelFilterT[i] = pPred[7 - kiStride];
+  }
+
+  for (i = 0; i < 8; i++) { // y
+    if ((i & 0x01) == 0) { // 8-108
+      for (j = 0; j < 8; j++) { // x
+        pPred[j + iStride[i]] = (uiPixelFilterT[j + (i >> 1)] + uiPixelFilterT[j + (i >> 1) + 1] + 1) >> 1;
+      }
+    } else {  // 8-109
+      for (j = 0; j < 8; j++) { // x
+        pPred[j + iStride[i]] = (uiPixelFilterT[j + (i >> 1)] + (uiPixelFilterT[j + (i >> 1) + 1] << 1) + uiPixelFilterT[j +
+                                 (i >> 1) + 2] + 2) >> 2;
+      }
+    }
+  }
+}
+
+/*vertical right*/
+void WelsI8x8LumaPredVR_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail) {
+  // The TopLeft, Top, Left are always available under this mode
+  int32_t iStride[8];
+  uint8_t uiPixelFilterTL;
+  uint8_t uiPixelFilterL[8];
+  uint8_t uiPixelFilterT[8];
+  int32_t i, j;
+  int32_t izVR, izVRDiv;
+
+  for (iStride[0] = 0, i = 1; i < 8; i++) {
+    iStride[i] = iStride[i - 1] + kiStride;
+  }
+
+  uiPixelFilterTL = (pPred[-1] + (pPred[-1 - kiStride] << 1) + pPred[-kiStride] + 2) >> 2;
+
+  uiPixelFilterL[0] = ((pPred[-1 - kiStride] + (pPred[-1] << 1) + pPred[-1 + iStride[1]] + 2) >> 2);
+  uiPixelFilterT[0] = ((pPred[-1 - kiStride] + (pPred[-kiStride] << 1) + pPred[1 - kiStride] + 2) >> 2);
+  for (i = 1; i < 7; i++) {
+    uiPixelFilterL[i] = ((pPred[-1 + iStride[i - 1]] + (pPred[-1 + iStride[i]] << 1) + pPred[-1 + iStride[i + 1]] + 2) >>
+                         2);
+    uiPixelFilterT[i] = ((pPred[i - 1 - kiStride] + (pPred[i - kiStride] << 1) + pPred[i + 1 - kiStride] + 2) >> 2);
+  }
+  uiPixelFilterL[7] = ((pPred[-1 + iStride[6]] + pPred[-1 + iStride[7]] * 3 + 2) >> 2);
+  uiPixelFilterT[7] = bTRAvail ? ((pPred[6 - kiStride] + (pPred[7 - kiStride] << 1) + pPred[8 - kiStride] + 2) >> 2) : ((
+                        pPred[6 - kiStride] + pPred[7 - kiStride] * 3 + 2) >> 2);
+
+  for (i = 0; i < 8; i++) { // y
+    for (j = 0; j < 8; j++) { // x
+      izVR = (j << 1) - i; // 2 * x - y
+      izVRDiv = j - (i >> 1);
+      if (izVR >= 0) {
+        if ((izVR & 0x01) == 0) {  // 8-100
+          if (izVRDiv > 0) {
+            pPred[j + iStride[i]] = (uiPixelFilterT[izVRDiv - 1] + uiPixelFilterT[izVRDiv] + 1) >> 1;
+          } else {
+            pPred[j + iStride[i]] = (uiPixelFilterTL + uiPixelFilterT[0] + 1) >> 1;
+          }
+        } else { // 8-101
+          if (izVRDiv > 1) {
+            pPred[j + iStride[i]] = (uiPixelFilterT[izVRDiv - 2] + (uiPixelFilterT[izVRDiv - 1] << 1) + uiPixelFilterT[izVRDiv] + 2)
+                                    >> 2;
+          } else {
+            pPred[j + iStride[i]] = (uiPixelFilterTL + (uiPixelFilterT[0] << 1) + uiPixelFilterT[1] + 2) >> 2;
+          }
+        }
+      } else if (izVR == -1) { // 8-102
+        pPred[j + iStride[i]] = (uiPixelFilterL[0] + (uiPixelFilterTL << 1) + uiPixelFilterT[0] + 2) >> 2;
+      } else if (izVR < -2) { // 8-103
+        pPred[j + iStride[i]] = (uiPixelFilterL[-izVR - 1] + (uiPixelFilterL[-izVR - 2] << 1) + uiPixelFilterL[-izVR - 3] + 2)
+                                >> 2;
+      } else { // izVR==-2, 8-103, special case
+        pPred[j + iStride[i]] = (uiPixelFilterL[1] + (uiPixelFilterL[0] << 1) + uiPixelFilterTL + 2) >> 2;
+      }
+    }
+  }
+}
+
+/*horizontal up*/
+void WelsI8x8LumaPredHU_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail) {
+  int32_t iStride[8];
+  uint8_t uiPixelFilterL[8];
+  int32_t i, j;
+  int32_t izHU;
+
+  for (iStride[0] = 0, i = 1; i < 8; i++) {
+    iStride[i] = iStride[i - 1] + kiStride;
+  }
+
+  uiPixelFilterL[0] = bTLAvail ? ((pPred[-1 - kiStride] + (pPred[-1] << 1) + pPred[-1 + iStride[1]] + 2) >> 2) : ((
+                        pPred[-1] * 3 + pPred[-1 + iStride[1]] + 2) >> 2);
+  for (i = 1; i < 7; i++) {
+    uiPixelFilterL[i] = ((pPred[-1 + iStride[i - 1]] + (pPred[-1 + iStride[i]] << 1) + pPred[-1 + iStride[i + 1]] + 2) >>
+                         2);
+  }
+  uiPixelFilterL[7] = ((pPred[-1 + iStride[6]] + pPred[-1 + iStride[7]] * 3 + 2) >> 2);
+
+  for (i = 0; i < 8; i++) { // y
+    for (j = 0; j < 8; j++) { // x
+      izHU = j + (i << 1); // x + 2 * y
+      if (izHU < 13) {
+        if ((izHU & 0x01) == 0) {  // 8-110
+          pPred[j + iStride[i]] = (uiPixelFilterL[izHU >> 1] + uiPixelFilterL[1 + (izHU >> 1)] + 1) >> 1;
+        } else { // 8-111
+          pPred[j + iStride[i]] = (uiPixelFilterL[izHU >> 1] + (uiPixelFilterL[1 + (izHU >> 1)] << 1) + uiPixelFilterL[2 +
+                                   (izHU >> 1)] + 2) >> 2;
+        }
+      } else if (izHU == 13) { // 8-112
+        pPred[j + iStride[i]] = (uiPixelFilterL[6] + 3 * uiPixelFilterL[7] + 2) >> 2;
+      } else { // 8-113
+        pPred[j + iStride[i]] = uiPixelFilterL[7];
+      }
+    }
+  }
+}
+
+/*horizontal down*/
+void WelsI8x8LumaPredHD_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail) {
+  // The TopLeft, Top, Left are all available under this mode
+  int32_t iStride[8];
+  uint8_t uiPixelFilterTL;
+  uint8_t uiPixelFilterL[8];
+  uint8_t uiPixelFilterT[8];
+  int32_t i, j;
+  int32_t izHD, izHDDiv;
+
+  for (iStride[0] = 0, i = 1; i < 8; i++) {
+    iStride[i] = iStride[i - 1] + kiStride;
+  }
+
+  uiPixelFilterTL = (pPred[-1] + (pPred[-1 - kiStride] << 1) + pPred[-kiStride] + 2) >> 2;
+
+  uiPixelFilterL[0] = ((pPred[-1 - kiStride] + (pPred[-1] << 1) + pPred[-1 + iStride[1]] + 2) >> 2);
+  uiPixelFilterT[0] = ((pPred[-1 - kiStride] + (pPred[-kiStride] << 1) + pPred[1 - kiStride] + 2) >> 2);
+  for (i = 1; i < 7; i++) {
+    uiPixelFilterL[i] = ((pPred[-1 + iStride[i - 1]] + (pPred[-1 + iStride[i]] << 1) + pPred[-1 + iStride[i + 1]] + 2) >>
+                         2);
+    uiPixelFilterT[i] = ((pPred[i - 1 - kiStride] + (pPred[i - kiStride] << 1) + pPred[i + 1 - kiStride] + 2) >> 2);
+  }
+  uiPixelFilterL[7] = ((pPred[-1 + iStride[6]] + pPred[-1 + iStride[7]] * 3 + 2) >> 2);
+  uiPixelFilterT[7] = bTRAvail ? ((pPred[6 - kiStride] + (pPred[7 - kiStride] << 1) + pPred[8 - kiStride] + 2) >> 2) : ((
+                        pPred[6 - kiStride] + pPred[7 - kiStride] * 3 + 2) >> 2);
+
+  for (i = 0; i < 8; i++) { // y
+    for (j = 0; j < 8; j++) { // x
+      izHD = (i << 1) - j; // 2*y - x
+      izHDDiv = i - (j >> 1);
+      if (izHD >= 0) {
+        if ((izHD & 0x01) == 0) {  // 8-104
+          if (izHDDiv == 0) {
+            pPred[j + iStride[i]] = (uiPixelFilterTL + uiPixelFilterL[0] + 1) >> 1;
+          } else {
+            pPred[j + iStride[i]] = (uiPixelFilterL[izHDDiv - 1] + uiPixelFilterL[izHDDiv] + 1) >> 1;
+          }
+        } else {  // 8-105
+          if (izHDDiv == 1) {
+            pPred[j + iStride[i]] = (uiPixelFilterTL + (uiPixelFilterL[0] << 1) + uiPixelFilterL[1] + 2) >> 2;
+          } else {
+            pPred[j + iStride[i]] = (uiPixelFilterL[izHDDiv - 2] + (uiPixelFilterL[izHDDiv - 1] << 1) + uiPixelFilterL[izHDDiv] + 2)
+                                    >> 2;
+          }
+        }
+      } else if (izHD == -1) { // 8-106
+        pPred[j + iStride[i]] = (uiPixelFilterL[0] + (uiPixelFilterTL << 1) + uiPixelFilterT[0] + 2) >> 2;
+      } else if (izHD < -2) { // 8-107
+        pPred[j + iStride[i]] = (uiPixelFilterT[-izHD - 1] + (uiPixelFilterT[-izHD - 2] << 1) + uiPixelFilterT[-izHD - 3] + 2)
+                                >> 2;
+      } else { // 8-107 special case, izHD==-2
+        pPred[j + iStride[i]] = (uiPixelFilterT[1] + (uiPixelFilterT[0] << 1) + uiPixelFilterTL + 2) >> 2;
+      }
+    }
+  }
+}
+
+
 void WelsIChromaPredV_c (uint8_t* pPred, const int32_t kiStride) {
   const uint64_t kuiVal64	= LD64A8 (&pPred[-kiStride]);
   const int32_t kiStride2	= kiStride  << 1;

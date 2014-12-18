@@ -232,6 +232,18 @@ static inline int32_t BsGetTrailingBits (uint8_t* pBuf) {
 
   return 0;
 }
+
+/*
+ *      Check whether there is more rbsp data for processing
+ */
+static inline bool CheckMoreRBSPData(PBitStringAux pBsAux) {
+  if ((pBsAux->iBits - ((pBsAux->pCurBuf - pBsAux->pStartBuf - 2) << 3) - pBsAux->iLeftBits) > 1) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 //define macros to check syntax elements
 #define WELS_CHECK_SE_BOTH_ERROR(val, lower_bound, upper_bound, syntax_name, ret_code) do {\
 if ((val < lower_bound) || (val > upper_bound)) {\

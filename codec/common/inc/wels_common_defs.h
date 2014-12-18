@@ -65,9 +65,12 @@ extern const uint8_t g_kuiMbCountScan4Idx[24];
 extern const uint8_t g_kuiCache30ScanIdx[16];
 extern const uint8_t g_kuiCache48CountScan4Idx[24];
 
+extern const uint8_t g_kuiMatrixV[6][8][8];
+
 extern const uint8_t g_kuiDequantScaling4x4Default[2][16];
 extern const uint8_t g_kuiDequantScaling8x8Default[2][64];
-extern const  ALIGNED_DECLARE (uint16_t, g_kuiDequantCoeff[52][8], 16);
+extern const ALIGNED_DECLARE (uint16_t, g_kuiDequantCoeff[52][8], 16);
+extern const ALIGNED_DECLARE (uint16_t, g_kuiDequantCoeff8x8[52][64], 16);
 extern const uint8_t g_kuiChromaQpTable[52];
 
 extern const uint8_t g_kuiCabacRangeLps[64][4];
@@ -279,6 +282,8 @@ typedef struct TagNalUnitHeaderExt {
 #define MB_TYPE_INTRA     (MB_TYPE_INTRA4x4 | MB_TYPE_INTRA16x16 | MB_TYPE_INTRA8x8 | MB_TYPE_INTRA_PCM)
 #define MB_TYPE_INTER     (MB_TYPE_16x16 | MB_TYPE_16x8 | MB_TYPE_8x16 | MB_TYPE_8x8 | MB_TYPE_8x8_REF0 | MB_TYPE_SKIP)
 #define IS_INTRA4x4(type) ( MB_TYPE_INTRA4x4 == (type) )
+#define IS_INTRA8x8(type) ( MB_TYPE_INTRA8x8 == (type) )
+#define IS_INTRANxN(type) ( MB_TYPE_INTRA4x4 == (type) || MB_TYPE_INTRA8x8 == (type) )
 #define IS_INTRA16x16(type) ( MB_TYPE_INTRA16x16 == (type) )
 #define IS_INTRA(type) ( (type)&MB_TYPE_INTRA )
 #define IS_INTER(type) ( (type)&MB_TYPE_INTER )
@@ -304,6 +309,7 @@ typedef struct TagNalUnitHeaderExt {
 #define I16_PRED_DC_128  6
 #define I16_PRED_DC_A  7
 //////////intra4x4   Luma
+// Here, I8x8 also use these definitions
 #define I4_PRED_INVALID    0
 #define I4_PRED_V        0
 #define I4_PRED_H        1

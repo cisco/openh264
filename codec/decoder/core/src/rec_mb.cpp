@@ -61,11 +61,65 @@ void WelsFillRecNeededMbInfo (PWelsDecoderContext pCtx, bool bOutput, PDqLayer p
   }
 }
 
+int32_t RecI8x8Mb (int32_t iMbXy, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
+  RecI8x8Luma (iMbXy, pCtx, pScoeffLevel, pDqLayer);
+  RecI4x4Chroma (iMbXy, pCtx, pScoeffLevel, pDqLayer);
+  return ERR_NONE;
+}
+
+int32_t RecI8x8Luma (int32_t iMbXy, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
+  /*****get local variable from outer variable********/
+  /*prediction info*/
+  uint8_t* pPred = pDqLayer->pPred[0];
+
+  int32_t iLumaStride = pDqLayer->iLumaStride;
+  int32_t* pBlockOffset = pCtx->iDecBlockOffsetArray;
+  PGetIntraPred8x8Func* pGetI8x8LumaPredFunc = pCtx->pGetI8x8LumaPredFunc;
+
+  int8_t* pIntra8x8PredMode = pDqLayer->pIntra4x4FinalMode[iMbXy]; // I_NxN
+  int16_t* pRS = pScoeffLevel;
+  /*itransform info*/
+  PIdctResAddPredFunc	pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc8x8;
+
+  /*************local variable********************/
+  uint8_t i = 0;
+  bool bTLAvail[4], bTRAvail[4];
+  // Top-Right : Left : Top-Left : Top
+  bTLAvail[0] = !! (pDqLayer->pIntraNxNAvailFlag[iMbXy] & 0x02);
+  bTLAvail[1] = !! (pDqLayer->pIntraNxNAvailFlag[iMbXy] & 0x01);
+  bTLAvail[2] = !! (pDqLayer->pIntraNxNAvailFlag[iMbXy] & 0x04);
+  bTLAvail[3] = true;
+
+  bTRAvail[0] = !! (pDqLayer->pIntraNxNAvailFlag[iMbXy] & 0x01);
+  bTRAvail[1] = !! (pDqLayer->pIntraNxNAvailFlag[iMbXy] & 0x08);
+  bTRAvail[2] = true;
+  bTRAvail[3] = false;
+
+  /*************real process*********************/
+  for (i = 0; i < 4; i++) {
+
+    uint8_t* pPredI8x8 = pPred + pBlockOffset[i << 2];
+    uint8_t uiMode = pIntra8x8PredMode[g_kuiScan4[i << 2]];
+
+    pGetI8x8LumaPredFunc[uiMode] (pPredI8x8, iLumaStride, bTLAvail[i], bTRAvail[i]);
+
+    int32_t iIndex = g_kuiMbCountScan4Idx[i << 2];
+    if (pDqLayer->pNzc[iMbXy][iIndex] || pDqLayer->pNzc[iMbXy][iIndex + 1] || pDqLayer->pNzc[iMbXy][iIndex + 4]
+        || pDqLayer->pNzc[iMbXy][iIndex + 5]) {
+      int16_t* pRSI8x8 = &pRS[i << 6];
+      pIdctResAddPredFunc (pPredI8x8, iLumaStride, pRSI8x8);
+    }
+  }
+
+  return ERR_NONE;
+}
+
 int32_t RecI4x4Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
   RecI4x4Luma (iMBXY, pCtx, pScoeffLevel, pDqLayer);
   RecI4x4Chroma (iMBXY, pCtx, pScoeffLevel, pDqLayer);
   return ERR_NONE;
 }
+
 
 int32_t RecI4x4Luma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
   /*****get local variable from outer variable********/

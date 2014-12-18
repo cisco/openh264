@@ -60,6 +60,21 @@ void WelsI4x4LumaPredVR_c (uint8_t* pPred, const int32_t kiStride);
 void WelsI4x4LumaPredHU_c (uint8_t* pPred, const int32_t kiStride);
 void WelsI4x4LumaPredHD_c (uint8_t* pPred, const int32_t kiStride);
 
+void WelsI8x8LumaPredV_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail);
+void WelsI8x8LumaPredH_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail);
+void WelsI8x8LumaPredDc_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail);
+void WelsI8x8LumaPredDcLeft_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail);
+void WelsI8x8LumaPredDcTop_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail);
+void WelsI8x8LumaPredDcNA_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail);
+void WelsI8x8LumaPredDDL_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail);
+void WelsI8x8LumaPredDDLTop_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail);
+void WelsI8x8LumaPredDDR_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail);
+void WelsI8x8LumaPredVL_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail);
+void WelsI8x8LumaPredVLTop_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail);
+void WelsI8x8LumaPredVR_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail);
+void WelsI8x8LumaPredHU_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail);
+void WelsI8x8LumaPredHD_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail);
+
 void WelsIChromaPredV_c (uint8_t* pPred, const int32_t kiStride);
 void WelsIChromaPredH_c (uint8_t* pPred, const int32_t kiStride);
 void WelsIChromaPredPlane_c (uint8_t* pPred, const int32_t kiStride);
@@ -95,8 +110,6 @@ void WelsDecoderIChromaPredH_mmx (uint8_t* pPred, const int32_t kiStride);
 void WelsDecoderIChromaPredV_mmx (uint8_t* pPred, const int32_t kiStride);
 void WelsDecoderIChromaPredDcLeft_mmx (uint8_t* pPred, const int32_t kiStride);
 void WelsDecoderIChromaPredDcNA_mmx (uint8_t* pPred, const int32_t kiStride);
-
-
 
 void WelsDecoderI4x4LumaPredH_sse2 (uint8_t* pPred, const int32_t kiStride);
 void WelsDecoderI4x4LumaPredDDR_mmx (uint8_t* pPred, const int32_t kiStride);

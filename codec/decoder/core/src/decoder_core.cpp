@@ -1238,11 +1238,16 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
                                   int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pRefIndex[][]");
     pCtx->sMb.pLumaQp[i] = (int8_t*)WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
                            "pCtx->sMb.pLumaQp[]");
+    pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i] = (bool*)WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
+          bool),
+        "pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[]");
+    pCtx->sMb.pTransformSize8x8Flag[i] = (bool*)WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (bool),
+                                         "pCtx->sMb.pTransformSize8x8Flag[]");
     pCtx->sMb.pChromaQp[i] = (int8_t (*)[2])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t) * 2,
                              "pCtx->sMb.pChromaQp[]");
     pCtx->sMb.pMvd[i][0] = (int16_t (*)[16][2])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
                              int16_t) * MV_A * MB_BLOCK4x4_NUM, "pCtx->sMb.pMvd[][]");
-    pCtx->sMb.pCbfDc[i] = (uint8_t*)WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (uint8_t),
+    pCtx->sMb.pCbfDc[i] = (uint16_t*)WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (uint16_t),
                           "pCtx->sMb.pCbfDc[]");
     pCtx->sMb.pNzc[i] = (int8_t (*)[24])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t) * 24,
                         "pCtx->sMb.pNzc[]");
@@ -1255,6 +1260,8 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
                                   "pCtx->sMb.pIntraPredMode[]");
     pCtx->sMb.pIntra4x4FinalMode[i] = (int8_t (*)[MB_BLOCK4x4_NUM])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
                                       sizeof (int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pIntra4x4FinalMode[]");
+    pCtx->sMb.pIntraNxNAvailFlag[i] = (uint8_t (*))WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
+                                      "pCtx->sMb.pIntraNxNAvailFlag");
     pCtx->sMb.pChromaPredMode[i] = (int8_t*)WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
                                    "pCtx->sMb.pChromaPredMode[]");
     pCtx->sMb.pCbp[i] = (int8_t*)WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
@@ -1341,6 +1348,18 @@ void UninitialDqLayersContext (PWelsDecoderContext pCtx) {
       pCtx->sMb.pRefIndex[i][0] = NULL;
     }
 
+    if (pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i]) {
+      WelsFree (pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i], "pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[]");
+
+      pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i] = NULL;
+    }
+
+    if (pCtx->sMb.pTransformSize8x8Flag[i]) {
+      WelsFree (pCtx->sMb.pTransformSize8x8Flag[i], "pCtx->sMb.pTransformSize8x8Flag[]");
+
+      pCtx->sMb.pTransformSize8x8Flag[i] = NULL;
+    }
+
     if (pCtx->sMb.pLumaQp[i]) {
       WelsFree (pCtx->sMb.pLumaQp[i], "pCtx->sMb.pLumaQp[]");
 
@@ -1391,6 +1410,12 @@ void UninitialDqLayersContext (PWelsDecoderContext pCtx) {
       WelsFree (pCtx->sMb.pIntra4x4FinalMode[i], "pCtx->sMb.pIntra4x4FinalMode[]");
 
       pCtx->sMb.pIntra4x4FinalMode[i] = NULL;
+    }
+
+    if (pCtx->sMb.pIntraNxNAvailFlag[i]) {
+      WelsFree (pCtx->sMb.pIntraNxNAvailFlag[i], "pCtx->sMb.pIntraNxNAvailFlag");
+
+      pCtx->sMb.pIntraNxNAvailFlag[i] = NULL;
     }
 
     if (pCtx->sMb.pChromaPredMode[i]) {
@@ -1989,7 +2014,7 @@ static inline void InitDqLayerInfo (PDqLayer pDqLayer, PLayerInfo pLayerInfo, PN
   if (kuiQualityId == BASE_QUALITY_ID) {
     pDqLayer->pRefPicListReordering		= &pSh->pRefPicListReordering;
     pDqLayer->pRefPicMarking		= &pSh->sRefMarking;
-    
+
     if (pSh->pPps->bWeightedPredFlag) {
       pDqLayer->bUseWeightPredictionFlag = true;
       pDqLayer->pPredWeightTable    = &pSh->sPredWeightTable;
@@ -2029,6 +2054,8 @@ void InitCurDqLayerData (PWelsDecoderContext pCtx, PDqLayer pCurDq) {
     pCurDq->pSliceIdc		= pCtx->sMb.pSliceIdc[0];
     pCurDq->pMv[0]			= pCtx->sMb.pMv[0][0];
     pCurDq->pRefIndex[0]    = pCtx->sMb.pRefIndex[0][0];
+    pCurDq->pNoSubMbPartSizeLessThan8x8Flag = pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[0];
+    pCurDq->pTransformSize8x8Flag = pCtx->sMb.pTransformSize8x8Flag[0];
     pCurDq->pLumaQp         = pCtx->sMb.pLumaQp[0];
     pCurDq->pChromaQp       = pCtx->sMb.pChromaQp[0];
     pCurDq->pMvd[0]       = pCtx->sMb.pMvd[0][0];
@@ -2038,6 +2065,7 @@ void InitCurDqLayerData (PWelsDecoderContext pCtx, PDqLayer pCurDq) {
     pCurDq->pScaledTCoeff   = pCtx->sMb.pScaledTCoeff[0];
     pCurDq->pIntraPredMode  = pCtx->sMb.pIntraPredMode[0];
     pCurDq->pIntra4x4FinalMode = pCtx->sMb.pIntra4x4FinalMode[0];
+    pCurDq->pIntraNxNAvailFlag = pCtx->sMb.pIntraNxNAvailFlag[0];
     pCurDq->pChromaPredMode = pCtx->sMb.pChromaPredMode[0];
     pCurDq->pCbp            = pCtx->sMb.pCbp[0];
     pCurDq->pSubMbType      = pCtx->sMb.pSubMbType[0];
