@@ -469,6 +469,7 @@ void DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc) {
 #define SLICE_HEADER_INTER_LAYER_ALPHAC0_BETA_OFFSET_MIN -12
 #define SLICE_HEADER_INTER_LAYER_ALPHAC0_BETA_OFFSET_MAX 12
 #define MAX_NUM_REF_IDX_L0_ACTIVE_MINUS1 15
+#define SLICE_HEADER_CABAC_INIT_IDC_MAX 2
 /*
  *	decode_slice_header_avc
  *	Parse slice header of bitstream in avc for storing data structure
@@ -729,6 +730,8 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     if (pSliceHead->eSliceType != I_SLICE && pSliceHead->eSliceType != SI_SLICE) {
       WELS_READ_VERIFY (BsGetUe (pBs, &uiCode));
       pSliceHead->iCabacInitIdc = uiCode;
+      WELS_CHECK_SE_UPPER_ERROR (pSliceHead->iCabacInitIdc, SLICE_HEADER_CABAC_INIT_IDC_MAX, "cabac_init_idc",
+                                 ERR_INFO_INVALID_CABAC_INIT_IDC);
     } else
       pSliceHead->iCabacInitIdc = 0;
   }
