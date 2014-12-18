@@ -54,7 +54,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   const int32_t kiTotalNumMbInCurLayer = pCurDq->iMbWidth * pCurDq->iMbHeight;
   bool bFrameCompleteFlag = true;
 
-  if (pCtx->bNewSeqBegin) {
+  if (pPic->bNewSeqBegin) {
     memcpy (& (pCtx->sFrameCrop), & (pCurDq->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.pSps->sFrameCrop),
             sizeof (SPosOffset)); //confirmed_safe_unsafe_usage
 #ifdef LONG_TERM_REF
@@ -123,7 +123,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   }
   if (pCtx->bFreezeOutput) {
     pDstInfo->iBufferStatus = 0;
-    if (pCtx->bNewSeqBegin) {
+    if (pPic->bNewSeqBegin) {
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "DecodeFrameConstruction():New sequence detected, but freezed.");
     }
   }
@@ -1929,6 +1929,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         pCtx->iErrorCode |= dsOutOfMemory;
         return ERR_INFO_REF_COUNT_OVERFLOW;
       }
+      pCtx->pDec->bNewSeqBegin = pCtx->bNewSeqBegin; //set flag for start decoding
     }
     pCtx->pDec->uiTimeStamp = pNalCur->uiTimeStamp;
 
@@ -2123,8 +2124,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
           return ERR_NONE;
         }
       }
+      pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //store latest decoded picture for EC
       if (uiNalRefIdc > 0) {
-        pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //store latest decoded picture for EC
         iRet = WelsMarkAsRef (pCtx);
         if (iRet != ERR_NONE) {
           if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
@@ -2135,12 +2136,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         ExpandReferencingPicture (pCtx->pDec->pData, pCtx->pDec->iWidthInPixel, pCtx->pDec->iHeightInPixel,
                                   pCtx->pDec->iLinesize,
                                   pCtx->sExpandPicFunc.pfExpandLumaPicture, pCtx->sExpandPicFunc.pfExpandChromaPicture);
-        pCtx->pDec = NULL;
-      } else if (pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR
-                 || pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE) {
-        pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //store latest decoded picture for MV Copy EC
-        pCtx->pDec = NULL;
       }
+      pCtx->pDec = NULL; //after frame decoding, always set to NULL
     }
 
     // need update frame_num due current frame is well decoded
@@ -2169,18 +2166,17 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
         pCtx->pDec->iPpsId = pCtx->pPps->iPpsId;
 
         DecodeFrameConstruction (pCtx, ppDst, pDstInfo);
+        pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //save ECed pic for future use
         if (pCtx->sLastNalHdrExt.sNalUnitHeader.uiNalRefIdc > 0) {
-          pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //save ECed pic for future use
           MarkECFrameAsRef (pCtx);
-        } else if (pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR
-                   || pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE) {
-          pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //save ECed pic for future MV Copy use
-          pCtx->pDec = NULL;
         }
       } else {
-        if (DecodeFrameConstruction (pCtx, ppDst, pDstInfo))
+        if (DecodeFrameConstruction (pCtx, ppDst, pDstInfo)) {
+          pCtx->pDec = NULL;
           return false;
+        }
       }
+      pCtx->pDec = NULL;
       pCtx->iPrevFrameNum = pCtx->sLastSliceHeader.iFrameNum; //save frame_num
       if (pCtx->bLastHasMmco5)
         pCtx->iPrevFrameNum = 0;

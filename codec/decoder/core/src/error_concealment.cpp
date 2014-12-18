@@ -425,13 +425,11 @@ void DoErrorConSliceMVCopy (PWelsDecoderContext pCtx) {
 int32_t MarkECFrameAsRef (PWelsDecoderContext pCtx) {
   int32_t iRet = WelsMarkAsRef (pCtx);
   if (iRet != ERR_NONE) {
-    pCtx->pDec = NULL;
     return iRet;
   }
   ExpandReferencingPicture (pCtx->pDec->pData, pCtx->pDec->iWidthInPixel, pCtx->pDec->iHeightInPixel,
                             pCtx->pDec->iLinesize,
                             pCtx->sExpandPicFunc.pfExpandLumaPicture, pCtx->sExpandPicFunc.pfExpandChromaPicture);
-  pCtx->pDec = NULL;
 
   return ERR_NONE;
 }
