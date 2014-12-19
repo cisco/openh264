@@ -1,6 +1,25 @@
 
 Releases
 -----------
+v1.3.0
+------
+- Removed manual API document, now using wiki: https://github.com/cisco/openh264/wiki (0af48e5 for v1.3.0)
+- Added API version in API header files
+- Added pkg-config file
+- Added decoder support of parsing only (bParseOnly) for only parsing bit stream but not decoding
+- Added timestamp and max nal size in gmp-openh264.cpp when calling encoding
+- Added timestamp info in decoder input and return structure
+- Added support of level 9 in decoder
+- Added total length of the encoded frame in encoder return structure
+- Added SetOption(ENCODER_OPTION_SVC_ENCODE_PARAM_BASE,&base) for encoder
+- Set constraint set 0 and 1 flags for non-scalable
+- Improved error concealment algorithms and provide more modes of error-concealment
+- Improved rate control algorithms and reference selection algorithms for screen content encoding 
+- Added encoder and decoder statistics interface
+- Improved input parameter checking and logging
+- Bug fixes, warning reductions, and test improvements
+
+-----------
 v1.2.0
 ------
 - Add and modify encoder APIs related to rate control and screen content encoding
@@ -25,6 +44,10 @@ Binaries
 -----------
 These binary releases are distributed under this license:
 http://www.openh264.org/BINARY_LICENSE.txt
+
+v1.3.0
+------
+// to be added
 
 v1.2.0
 ------
