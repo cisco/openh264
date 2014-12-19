@@ -27,12 +27,12 @@ echo "" >>codec_ver.h
 echo "#include \"codec_app_def.h\"" >>codec_ver.h
 echo "" >>codec_ver.h
 
-echo "static const Openh264Version g_stCodecVersion  = {$1};"|tr '.' ',' >>codec_ver.h
-echo "static const char* g_strCodecVer  = \"Openh264 version:$1\";" >>codec_ver.h
+echo "static const OpenH264Version g_stCodecVersion  = {$1};"|tr '.' ',' >>codec_ver.h
+echo "static const char* g_strCodecVer  = \"OpenH264 version:$1\";" >>codec_ver.h
 #if [ "$2"x = ""x ]; then
-#echo "static const char* g_strCodecBuildNum = \"Openh264 revision:$revision\";" >> codec_ver.h
+#echo "static const char* g_strCodecBuildNum = \"OpenH264 revision:$revision\";" >> codec_ver.h
 #else
-#echo "static const char* g_strCodecBuildNum = \"Openh264 build:$2, OpenH264 revision:$revision\";" >> codec_ver.h
+#echo "static const char* g_strCodecBuildNum = \"OpenH264 build:$2, OpenH264 revision:$revision\";" >> codec_ver.h
 #fi
 echo "" >>codec_ver.h
 

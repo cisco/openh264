@@ -531,6 +531,11 @@ long WelsCreateDecoder (ISVCDecoder** ppDecoder);
 */
 void WelsDestroyDecoder (ISVCDecoder* pDecoder);
 
+/** @brief   Get codec version
+ *  @return  The linked codec version
+*/
+OpenH264Version WelsGetCodecVersion ();
+
 #ifdef __cplusplus
 }
 #endif
