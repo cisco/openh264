@@ -643,6 +643,8 @@ TEST_F (EncoderInterfaceTest, ForceIntraFrameWithTemporal) {
   sEncParamExt.iPicWidth = MB_SIZE + abs ((rand() * 2) % (MAX_WIDTH - MB_SIZE));
   sEncParamExt.iPicHeight = MB_SIZE + abs ((rand() * 2) % (MAX_HEIGHT - MB_SIZE));
   sEncParamExt.iTargetBitrate = rand() + 1; //!=0
+  // Force a bitrate of at least w*h/50, otherwise we will only get skipped frames
+  sEncParamExt.iTargetBitrate = WELS_CLIP3 (sEncParamExt.iTargetBitrate, sEncParamExt.iPicWidth * sEncParamExt.iPicHeight / 50, 100000000);
   int32_t iLevelMaxBitrate = WelsCommon::g_ksLevelLimits[LEVEL_5_0 - 1].uiMaxBR * CpbBrNalFactor;
   if (sEncParamExt.iTargetBitrate > iLevelMaxBitrate)
     sEncParamExt.iTargetBitrate = iLevelMaxBitrate;
