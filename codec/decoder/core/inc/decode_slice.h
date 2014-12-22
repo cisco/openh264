@@ -59,7 +59,7 @@ int32_t WelsMbIntraPredictionConstruction (PWelsDecoderContext pCtx, PDqLayer pC
 int32_t WelsMbInterSampleConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer,
                                        uint8_t* pDstY, uint8_t* pDstU, uint8_t* pDstV, int32_t iStrideL, int32_t iStrideC);
 int32_t WelsMbInterConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer);
-void WelsLumaDcDequantIdct (int16_t* pBlock, int32_t iQp);
+void WelsLumaDcDequantIdct (int16_t* pBlock, int32_t iQp,PWelsDecoderContext pCtx);
 int32_t WelsMbInterPrediction (PWelsDecoderContext pCtx, PDqLayer pCurLayer);
 void WelsChromaDcIdct (int16_t* pBlock);
 

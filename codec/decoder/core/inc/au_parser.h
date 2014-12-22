@@ -133,9 +133,24 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
 
 /*!
  *************************************************************************************
+ * \brief to parse scaling list message payload
+ *
+ * \param  PPS SPS scaling list matrix     message to be parsed output
+ * \param pBsAux    bitstream reader auxiliary
+ *
+ * \return  0 - successed
+ *    1 - failed
+ *
+ * \note  Call it in case scaling matrix present at sps or pps
+ *************************************************************************************
+*/
+int32_t SetScalingListValue (uint8_t *pScalingList,int iScalingListNum,bool* bUseDefaultScalingMatrixFlag,PBitStringAux pBsAux);
+int32_t ParseScalingList(PSps pSps,PBitStringAux pBs,bool bPPS,bool *bScalingListPresentFlag,uint8_t(*iScalingList4x4)[16],uint8_t(*iScalingList8x8)[64]);
+/*!
+ *************************************************************************************
  * \brief	to parse SEI message payload
  *
- * \param 	pSei		sei message to be parsed output
+ * \param	pSei		sei message to be parsed output
  * \param	pBsAux		bitstream reader auxiliary
  *
  * \return	0 - successed

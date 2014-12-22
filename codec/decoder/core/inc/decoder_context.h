@@ -409,6 +409,15 @@ bool bRPLRError;
 int32_t iECMVs[16][2];
 PPicture pECRefPic[16];
 unsigned long long uiTimeStamp;
+// To support scaling list HP
+uint16_t  pDequant_coeff_buffer4x4[6][52][16];
+uint16_t  pDequant_coeff_buffer8x8[6][52][64];
+uint16_t (*pDequant_coeff4x4[6])[16];// 4x4 sclaing list value pointer
+uint16_t (*pDequant_coeff8x8[6])[64];//64 residual coeff ,with 6 kinds of residual type, 52 qp level
+int iDequantCoeffPpsid;//When a new pps actived, reinitialised the scaling list value
+bool bDequantCoeff4x4Init;
+bool bSpsLatePps;
+bool bUseScalingList;
 } SWelsDecoderContext, *PWelsDecoderContext;
 
 static inline void ResetActiveSPSForEachLayer (PWelsDecoderContext pCtx) {
