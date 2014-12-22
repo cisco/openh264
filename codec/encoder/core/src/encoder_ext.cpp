@@ -3101,8 +3101,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   // perform csc/denoise/downsample/padding, generate spatial layers
   iSpatialNum = pCtx->pVpp->BuildSpatialPicList (pCtx, pSrcPic);
 
-  if (pCtx->pSvcParam->bEnableFrameSkip) {
-    UpdateMaxBrCheckWindowStatus (pCtx, iSpatialNum, pSrcPic->uiTimeStamp);
+  if (pCtx->pFuncList->pfRc.pfWelsUpdateMaxBrWindowStatus) {
+    pCtx->pFuncList->pfRc.pfWelsUpdateMaxBrWindowStatus (pCtx, iSpatialNum, pSrcPic->uiTimeStamp);
   }
 
   if (iSpatialNum < 1) {	// skip due to temporal layer settings (different frame rate)
@@ -3115,7 +3115,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
   eFrameType = DecideFrameType (pCtx, iSpatialNum);
   if (eFrameType == videoFrameTypeSkip) {
-    UpdateBufferWhenFrameSkipped (pCtx, iSpatialNum);
+    if (pCtx->pFuncList->pfRc.pfWelsUpdateBufferWhenSkip)
+      pCtx->pFuncList->pfRc.pfWelsUpdateBufferWhenSkip (pCtx, iSpatialNum);
     pFbi->eFrameType = eFrameType;
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, skip one frame, continual skipped %d frames",
              pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
@@ -3123,11 +3124,15 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   }
 
   //loop each layer to check if have skip frame when RC and frame skip enable
-  if (CheckFrameSkipBasedMaxbr (pCtx, iSpatialNum, eFrameType, (uint32_t)pSrcPic->uiTimeStamp)) {
-    pFbi->eFrameType = videoFrameTypeSkip;
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, skip one frame, continual skipped %d frames",
-             pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
-    return ENC_RETURN_SUCCESS;
+  if (pCtx->pFuncList->pfRc.pfWelsCheckSkipBasedMaxbr) {
+    bool bSkip = pCtx->pFuncList->pfRc.pfWelsCheckSkipBasedMaxbr (pCtx, iSpatialNum, eFrameType,
+                 (uint32_t)pSrcPic->uiTimeStamp);
+    if (bSkip) {
+      pFbi->eFrameType = videoFrameTypeSkip;
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, skip one frame, continual skipped %d frames",
+               pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
+      return ENC_RETURN_SUCCESS;
+    }
   }
 
   pCtx->iContinualSkipFrames = 0;

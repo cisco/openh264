@@ -1296,6 +1296,9 @@ void  WelsRcInitModule (void* pCtx, RC_MODES iRcMode) {
     pRcf->pfWelsRcPictureInfoUpdate = WelsRcPictureInfoUpdateDisable;
     pRcf->pfWelsRcMbInit = WelsRcMbInitDisable;
     pRcf->pfWelsRcMbInfoUpdate = WelsRcMbInfoUpdateDisable;
+    pRcf->pfWelsCheckSkipBasedMaxbr = NULL;
+    pRcf->pfWelsUpdateBufferWhenSkip = NULL;
+    pRcf->pfWelsUpdateMaxBrWindowStatus = NULL;
     break;
   case RC_BUFFERBASED_MODE:
     pRcf->pfWelsRcPictureInit = WelRcPictureInitBufferBasedQp;
@@ -1303,6 +1306,10 @@ void  WelsRcInitModule (void* pCtx, RC_MODES iRcMode) {
     pRcf->pfWelsRcPictureInfoUpdate = WelsRcPictureInfoUpdateDisable;
     pRcf->pfWelsRcMbInit = WelsRcMbInitDisable;
     pRcf->pfWelsRcMbInfoUpdate = WelsRcMbInfoUpdateDisable;
+    pRcf->pfWelsCheckSkipBasedMaxbr = NULL;
+    pRcf->pfWelsUpdateBufferWhenSkip = NULL;
+    pRcf->pfWelsUpdateMaxBrWindowStatus = NULL;
+
     break;
   case RC_BITRATE_MODE:
     if (pEncCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
@@ -1311,6 +1318,10 @@ void  WelsRcInitModule (void* pCtx, RC_MODES iRcMode) {
       pRcf->pfWelsRcPictureInfoUpdate = WelsRcPictureInfoUpdateScc;
       pRcf->pfWelsRcMbInit = WelsRcMbInitScc;
       pRcf->pfWelsRcMbInfoUpdate = WelsRcMbInfoUpdateDisable;
+      pRcf->pfWelsCheckSkipBasedMaxbr = CheckFrameSkipBasedMaxbr;
+      pRcf->pfWelsUpdateBufferWhenSkip = NULL;
+      pRcf->pfWelsUpdateMaxBrWindowStatus = NULL;
+
       InitRcModuleScc (pEncCtx);
 
     } else {
@@ -1319,6 +1330,10 @@ void  WelsRcInitModule (void* pCtx, RC_MODES iRcMode) {
       pRcf->pfWelsRcPictureInfoUpdate = WelsRcPictureInfoUpdateGom;
       pRcf->pfWelsRcMbInit = WelsRcMbInitGom;
       pRcf->pfWelsRcMbInfoUpdate = WelsRcMbInfoUpdateGom;
+      pRcf->pfWelsCheckSkipBasedMaxbr = CheckFrameSkipBasedMaxbr;
+      pRcf->pfWelsUpdateBufferWhenSkip = UpdateBufferWhenFrameSkipped;
+      pRcf->pfWelsUpdateMaxBrWindowStatus = UpdateMaxBrCheckWindowStatus;
+
     }
     break;
   case RC_QUALITY_MODE:
@@ -1328,6 +1343,10 @@ void  WelsRcInitModule (void* pCtx, RC_MODES iRcMode) {
     pRcf->pfWelsRcPictureInfoUpdate = WelsRcPictureInfoUpdateGom;
     pRcf->pfWelsRcMbInit = WelsRcMbInitGom;
     pRcf->pfWelsRcMbInfoUpdate = WelsRcMbInfoUpdateGom;
+    pRcf->pfWelsCheckSkipBasedMaxbr = CheckFrameSkipBasedMaxbr;
+    pRcf->pfWelsUpdateBufferWhenSkip = UpdateBufferWhenFrameSkipped;
+    pRcf->pfWelsUpdateMaxBrWindowStatus = UpdateMaxBrCheckWindowStatus;
+
     break;
   }
 
