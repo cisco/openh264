@@ -185,6 +185,8 @@ ERR_INFO_INVALID_MMCO_REF_NUM_NOT_ENOUGH,
 ERR_INFO_INVALID_MMCO_LONG_TERM_IDX_EXCEED_MAX,
 //for CABAC
 ERR_CABAC_NO_BS_TO_READ,
+//for scaling list
+ERR_SCALING_LIST_DELTA_SCALE,
 };
 //-----------------------------------------------------------------------------------------------------------
 

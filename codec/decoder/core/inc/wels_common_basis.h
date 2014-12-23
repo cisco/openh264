@@ -132,6 +132,12 @@ typedef int32_t SubMbType;
 #define CHROMA_DC_V  7
 #define CHROMA_AC_U  8
 #define CHROMA_AC_V  9
+#define LUMA_DC_AC_INTRA 10
+#define LUMA_DC_AC_INTER 11
+#define CHROMA_DC_U_INTER  12
+#define CHROMA_DC_V_INTER  13
+#define CHROMA_AC_U_INTER  14
+#define CHROMA_AC_V_INTER  15
 
 typedef struct TagReadBitsCache {
     uint32_t uiCache32Bit;
@@ -149,6 +155,59 @@ static const uint8_t g_kuiZigzagScan[16] = { //4*4block residual zig-zag scan or
     7, 11, 14, 15,
 };
 
+
+static inline void GetMbResProperty(int32_t * pMBproperty,int32_t* pResidualProperty,bool bCavlc)
+{
+ switch(*pResidualProperty)
+  {
+  case CHROMA_AC_U:
+	  *pMBproperty = 1;
+	  *pResidualProperty = bCavlc ? CHROMA_AC : CHROMA_AC_U;
+	  break;
+  case CHROMA_AC_V:
+	  *pMBproperty = 2;
+	  *pResidualProperty = bCavlc ? CHROMA_AC : CHROMA_AC_V;
+	  break;
+  case LUMA_DC_AC_INTRA:
+	  *pMBproperty = 0;
+	  *pResidualProperty = LUMA_DC_AC;
+	  break;
+  case CHROMA_DC_U:
+      *pMBproperty = 1;
+	  *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_U;
+      break;
+ case CHROMA_DC_V:
+	  *pMBproperty = 2;
+	  *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_V;
+	  break;
+  case I16_LUMA_AC:
+	  *pMBproperty = 0;
+	  break;
+  case I16_LUMA_DC:
+	  *pMBproperty = 0;
+	  break;
+  case LUMA_DC_AC_INTER:
+	  *pMBproperty = 3;
+      *pResidualProperty = LUMA_DC_AC;
+	  break;
+  case CHROMA_DC_U_INTER:
+      *pMBproperty = 4;
+	  *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_U;
+      break;
+  case CHROMA_DC_V_INTER:
+	  *pMBproperty = 5;
+	  *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_V;
+	  break;
+ case CHROMA_AC_U_INTER:
+	  *pMBproperty = 4;
+	  *pResidualProperty =  bCavlc ? CHROMA_AC : CHROMA_AC_U;
+	  break;
+ case CHROMA_AC_V_INTER:
+	  *pMBproperty = 5;
+	  *pResidualProperty =  bCavlc ?CHROMA_AC:CHROMA_AC_V;
+	  break;
+ }
+  }
 
 typedef struct TagI16PredInfo {
     int8_t iPredMode;

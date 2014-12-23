@@ -88,7 +88,11 @@ typedef struct TagSps {
   bool		bQpPrimeYZeroTransfBypassFlag;
   bool		bSeqScalingMatrixPresentFlag;
   bool		bSeqScalingListPresentFlag[12];
-  const SLevelLimits* pSLevelLimits;
+  //Add scaling list supporting
+  uint8_t  iScalingList4x4[6][16];
+  uint8_t  iScalingList8x8[6][64];
+
+const SLevelLimits* pSLevelLimits;
 } SSps, *PSps;
 
 
@@ -163,7 +167,12 @@ typedef struct TagPps {
   bool		bRedundantPicCntPresentFlag;
   bool		bWeightedPredFlag;
   uint8_t		uiWeightedBipredIdc;
-
+  bool bTransform_8x8_mode_flag;
+  //Add for scalinglist support
+  bool    bPicScalingMatrixPresentFlag;
+  bool    bPicScalingListPresentFlag[12];
+  uint8_t  iScalingList4x4[6][16];
+  uint8_t  iScalingList8x8[6][64];
 } SPps, *PPps;
 
 } // namespace WelsDec

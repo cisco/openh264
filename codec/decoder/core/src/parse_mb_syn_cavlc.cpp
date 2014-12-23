@@ -236,8 +236,8 @@ void WelsFillCacheConstrain0Intra4x4 (PWelsNeighAvail pNeighAvail, uint8_t* pNon
   }
 }
 
-void WelsFillCacheInterCabac(PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int16_t iMvArray[LIST_A][30][MV_A], int16_t iMvdCache[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30], PDqLayer pCurLayer)
-{
+void WelsFillCacheInterCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int16_t iMvArray[LIST_A][30][MV_A],
+                              int16_t iMvdCache[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30], PDqLayer pCurLayer) {
   int32_t iCurXy      = pCurLayer->iMbXyIndex;
   int32_t iTopXy      = 0;
   int32_t iLeftXy     = 0;
@@ -267,10 +267,10 @@ void WelsFillCacheInterCabac(PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCount
     ST32 (iMvArray[0][18], LD32 (pCurLayer->pMv[0][iLeftXy][11]));
     ST32 (iMvArray[0][24], LD32 (pCurLayer->pMv[0][iLeftXy][15]));
 
-    ST32(iMvdCache[0][ 6], LD32(pCurLayer->pMvd[0][iLeftXy][ 3]));
-    ST32(iMvdCache[0][12], LD32(pCurLayer->pMvd[0][iLeftXy][ 7]));
-    ST32(iMvdCache[0][18], LD32(pCurLayer->pMvd[0][iLeftXy][11]));
-    ST32(iMvdCache[0][24], LD32(pCurLayer->pMvd[0][iLeftXy][15]));
+    ST32 (iMvdCache[0][ 6], LD32 (pCurLayer->pMvd[0][iLeftXy][ 3]));
+    ST32 (iMvdCache[0][12], LD32 (pCurLayer->pMvd[0][iLeftXy][ 7]));
+    ST32 (iMvdCache[0][18], LD32 (pCurLayer->pMvd[0][iLeftXy][11]));
+    ST32 (iMvdCache[0][24], LD32 (pCurLayer->pMvd[0][iLeftXy][15]));
 
     iRefIdxArray[0][ 6] = pCurLayer->pRefIndex[0][iLeftXy][ 3];
     iRefIdxArray[0][12] = pCurLayer->pRefIndex[0][iLeftXy][ 7];
@@ -282,31 +282,31 @@ void WelsFillCacheInterCabac(PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCount
     ST32 (iMvArray[0][18], 0);
     ST32 (iMvArray[0][24], 0);
 
-    ST32(iMvdCache[0][ 6], 0);
-    ST32(iMvdCache[0][12], 0);
-    ST32(iMvdCache[0][18], 0);
-    ST32(iMvdCache[0][24], 0);
+    ST32 (iMvdCache[0][ 6], 0);
+    ST32 (iMvdCache[0][12], 0);
+    ST32 (iMvdCache[0][18], 0);
+    ST32 (iMvdCache[0][24], 0);
 
 
     if (0 == pNeighAvail->iLeftAvail) { //not available
       iRefIdxArray[0][ 6] =
-      iRefIdxArray[0][12] =
-      iRefIdxArray[0][18] =
-      iRefIdxArray[0][24] = REF_NOT_AVAIL;
+        iRefIdxArray[0][12] =
+          iRefIdxArray[0][18] =
+            iRefIdxArray[0][24] = REF_NOT_AVAIL;
     } else { //available but is intra mb type
       iRefIdxArray[0][ 6] =
-      iRefIdxArray[0][12] =
-      iRefIdxArray[0][18] =
-      iRefIdxArray[0][24] = REF_NOT_IN_LIST;
+        iRefIdxArray[0][12] =
+          iRefIdxArray[0][18] =
+            iRefIdxArray[0][24] = REF_NOT_IN_LIST;
     }
   }
   if (pNeighAvail->iLeftTopAvail && IS_INTER (pNeighAvail->iLeftTopType)) {
     ST32 (iMvArray[0][0], LD32 (pCurLayer->pMv[0][iLeftTopXy][15]));
-    ST32(iMvdCache[0][0], LD32(pCurLayer->pMvd[0][iLeftTopXy][15]));
+    ST32 (iMvdCache[0][0], LD32 (pCurLayer->pMvd[0][iLeftTopXy][15]));
     iRefIdxArray[0][0] = pCurLayer->pRefIndex[0][iLeftTopXy][15];
   } else {
     ST32 (iMvArray[0][0], 0);
-    ST32(iMvdCache[0][0], 0);
+    ST32 (iMvdCache[0][0], 0);
     if (0 == pNeighAvail->iLeftTopAvail) { //not available
       iRefIdxArray[0][0] = REF_NOT_AVAIL;
     } else { //available but is intra mb type
@@ -317,30 +317,30 @@ void WelsFillCacheInterCabac(PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCount
   if (pNeighAvail->iTopAvail && IS_INTER (pNeighAvail->iTopType)) {
     ST64 (iMvArray[0][1], LD64 (pCurLayer->pMv[0][iTopXy][12]));
     ST64 (iMvArray[0][3], LD64 (pCurLayer->pMv[0][iTopXy][14]));
-    ST64(iMvdCache[0][1], LD64(pCurLayer->pMvd[0][iTopXy][12]));
-    ST64(iMvdCache[0][3], LD64(pCurLayer->pMvd[0][iTopXy][14]));
+    ST64 (iMvdCache[0][1], LD64 (pCurLayer->pMvd[0][iTopXy][12]));
+    ST64 (iMvdCache[0][3], LD64 (pCurLayer->pMvd[0][iTopXy][14]));
     ST32 (&iRefIdxArray[0][1], LD32 (&pCurLayer->pRefIndex[0][iTopXy][12]));
   } else {
     ST64 (iMvArray[0][1], 0);
     ST64 (iMvArray[0][3], 0);
-    ST64(iMvdCache[0][1], 0);
-    ST64(iMvdCache[0][3], 0);
+    ST64 (iMvdCache[0][1], 0);
+    ST64 (iMvdCache[0][3], 0);
     if (0 == pNeighAvail->iTopAvail) { //not available
       iRefIdxArray[0][1] =
-      iRefIdxArray[0][2] =
-      iRefIdxArray[0][3] =
-      iRefIdxArray[0][4] = REF_NOT_AVAIL;
+        iRefIdxArray[0][2] =
+          iRefIdxArray[0][3] =
+            iRefIdxArray[0][4] = REF_NOT_AVAIL;
     } else { //available but is intra mb type
       iRefIdxArray[0][1] =
-      iRefIdxArray[0][2] =
-      iRefIdxArray[0][3] =
-      iRefIdxArray[0][4] = REF_NOT_IN_LIST;
+        iRefIdxArray[0][2] =
+          iRefIdxArray[0][3] =
+            iRefIdxArray[0][4] = REF_NOT_IN_LIST;
     }
   }
 
   if (pNeighAvail->iRightTopAvail && IS_INTER (pNeighAvail->iRightTopType)) {
     ST32 (iMvArray[0][5], LD32 (pCurLayer->pMv[0][iRightTopXy][12]));
-    ST32(iMvdCache[0][5], LD32(pCurLayer->pMvd[0][iRightTopXy][12]));
+    ST32 (iMvdCache[0][5], LD32 (pCurLayer->pMvd[0][iRightTopXy][12]));
     iRefIdxArray[0][5] = pCurLayer->pRefIndex[0][iRightTopXy][12];
   } else {
     ST32 (iMvArray[0][5], 0);
@@ -357,21 +357,20 @@ void WelsFillCacheInterCabac(PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCount
   ST32 (iMvArray[0][11], 0);
   ST32 (iMvArray[0][17], 0);
   ST32 (iMvArray[0][23], 0);
-  ST32(iMvdCache[0][ 9], 0);
-  ST32(iMvdCache[0][21], 0);
-  ST32(iMvdCache[0][11], 0);
-  ST32(iMvdCache[0][17], 0);
-  ST32(iMvdCache[0][23], 0);
+  ST32 (iMvdCache[0][ 9], 0);
+  ST32 (iMvdCache[0][21], 0);
+  ST32 (iMvdCache[0][11], 0);
+  ST32 (iMvdCache[0][17], 0);
+  ST32 (iMvdCache[0][23], 0);
   iRefIdxArray[0][ 9] =
-  iRefIdxArray[0][21] =
-  iRefIdxArray[0][11] =
-  iRefIdxArray[0][17] =
-  iRefIdxArray[0][23] = REF_NOT_AVAIL;
+    iRefIdxArray[0][21] =
+      iRefIdxArray[0][11] =
+        iRefIdxArray[0][17] =
+          iRefIdxArray[0][23] = REF_NOT_AVAIL;
 }
 
 void WelsFillCacheInter (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
-                         int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30], PDqLayer pCurLayer)
-{
+                         int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30], PDqLayer pCurLayer) {
   int32_t iCurXy      = pCurLayer->iMbXyIndex;
   int32_t iTopXy      = 0;
   int32_t iLeftXy     = 0;
@@ -798,7 +797,13 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
   int32_t iLevel[16], iZerosLeft, iCoeffNum;
   int32_t  iRun[16];
   int32_t iCurNonZeroCacheIdx, i;
-  const uint16_t* kpDequantCoeff = g_kuiDequantCoeff[uiQp];
+
+
+  int32_t iMbResProperty = 0;
+  GetMbResProperty (&iMbResProperty, &iResidualProperty, 1);
+  const uint16_t* kpDequantCoeff = pCtx->bUseScalingList ? pCtx->pDequant_coeff4x4[iMbResProperty][uiQp] :
+                                   g_kuiDequantCoeff[uiQp];
+
   int8_t nA, nB, nC;
   uint8_t uiTotalCoeff, uiTrailingOnes;
   int32_t iUsedBits = 0;
@@ -867,7 +872,7 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
       int32_t j;
       iCoeffNum += iRun[i] + 1; //FIXME add 1 earlier ?
       j          = kpZigzagTable[ iCoeffNum ];
-      pTCoeff[j] = iLevel[i] * kpDequantCoeff[0];
+      pTCoeff[j] = pCtx->bUseScalingList ? (iLevel[i] * kpDequantCoeff[0]) >> 4 : (iLevel[i] * kpDequantCoeff[0]);
     }
   } else if (iResidualProperty == I16_LUMA_DC) { //DC coefficent, only call in Intra_16x16, base_mode_flag = 0
     for (i = uiTotalCoeff - 1; i >= 0; --i) { //FIXME merge into rundecode?
@@ -881,7 +886,7 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
       int32_t j;
       iCoeffNum += iRun[i] + 1; //FIXME add 1 earlier ?
       j          = kpZigzagTable[ iCoeffNum ];
-      pTCoeff[j] = iLevel[i] * kpDequantCoeff[j & 0x07];
+      pTCoeff[j] = pCtx->bUseScalingList ? (iLevel[i] * kpDequantCoeff[j]) >> 4 : (iLevel[i] * kpDequantCoeff[j & 0x07]);
     }
   }
 

@@ -65,6 +65,8 @@ extern const uint8_t g_kuiMbCountScan4Idx[24];
 extern const uint8_t g_kuiCache30ScanIdx[16];
 extern const uint8_t g_kuiCache48CountScan4Idx[24];
 
+extern const uint8_t g_kuiDequantScaling4x4Default[2][16];
+extern const uint8_t g_kuiDequantScaling8x8Default[2][64];
 extern const  ALIGNED_DECLARE (uint16_t, g_kuiDequantCoeff[52][8], 16);
 extern const uint8_t g_kuiChromaQpTable[52];
 

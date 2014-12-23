@@ -821,10 +821,14 @@ int32_t ParseResidualBlockCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroC
                                  const uint8_t* pScanTable, int32_t iResProperty, short* sTCoeff, /*int mb_mode*/ uint8_t uiQp,
                                  PWelsDecoderContext pCtx) {
   int32_t iCurNzCacheIdx;
-  const uint16_t* pDeQuantMul = g_kuiDequantCoeff[uiQp];
   uint32_t uiTotalCoeffNum = 0;
   uint32_t uiCbpBit;
   int32_t pSignificantMap[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+  int32_t iMbResProperty;
+  GetMbResProperty (&iMbResProperty, &iResProperty, false);
+  const uint16_t* pDeQuantMul = (pCtx->bUseScalingList) ? pCtx->pDequant_coeff4x4[iMbResProperty][uiQp] :
+                                g_kuiDequantCoeff[uiQp];
 
   WELS_READ_VERIFY (ParseCbfInfoCabac (pNeighAvail, pNonZeroCountCache, iIndex, iResProperty, pCtx, uiCbpBit));
   if (uiCbpBit) { //has coeff
@@ -847,13 +851,15 @@ int32_t ParseResidualBlockCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroC
   } else if (iResProperty == CHROMA_DC_U || iResProperty == CHROMA_DC_V) {
     do {
       if (pSignificantMap[j] != 0)
-        sTCoeff[pScanTable[j]] = pSignificantMap[j] * pDeQuantMul[0];
+        sTCoeff[pScanTable[j]] = pCtx->bUseScalingList ? (pSignificantMap[j] * pDeQuantMul[0]) >> 4 :
+                                 (pSignificantMap[j] * pDeQuantMul[0]);
       ++j;
     } while (j < 16);
   } else { //luma ac, chroma ac
     do {
       if (pSignificantMap[j] != 0)
-        sTCoeff[pScanTable[j]] = pSignificantMap[j] * pDeQuantMul[pScanTable[j] & 0x07];
+        sTCoeff[pScanTable[j]] = pCtx->bUseScalingList ? (pSignificantMap[j] * pDeQuantMul[pScanTable[j]] >> 4) :
+                                 pSignificantMap[j] * pDeQuantMul[pScanTable[j] & 0x07];
       ++j;
     } while (j < 16);
   }

@@ -833,6 +833,8 @@ bool CheckSpsActive (PWelsDecoderContext pCtx, PSps pSps, bool bUseSubsetFlag) {
 #define  PPS_PIC_INIT_QP_QS_MAX 51
 #define  PPS_CHROMA_QP_INDEX_OFFSET_MIN -12
 #define  PPS_CHROMA_QP_INDEX_OFFSET_MAX 12
+#define  SCALING_LIST_DELTA_SCALE_MAX 127
+#define SCALING_LIST_DELTA_SCALE_MIN -128
 
 /*!
  *************************************************************************************
@@ -935,12 +937,16 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //seq_scaling_matrix_present_flag
     pSps->bSeqScalingMatrixPresentFlag	= !!uiCode;
 
-    if (pSps->bSeqScalingMatrixPresentFlag) {	// For high profile, it is not used in current application. FIXME
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
-               "ParseSps(): seq_scaling_matrix_present_flag (%d). Feature not supported.",
-               pSps->bSeqScalingMatrixPresentFlag);
-      return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_NON_BASELINE);
-    }
+    if (pSps->bSeqScalingMatrixPresentFlag)// For high profile, it is not used in current application. FIXME
+
+      WELS_READ_VERIFY (ParseScalingList (pSps, pBs, 0, pSps->bSeqScalingListPresentFlag, pSps->iScalingList4x4,
+                                          pSps->iScalingList8x8));
+    //if exist, to parse scalinglist matrix value
+
+    //  WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
+    //         "ParseSps(): seq_scaling_matrix_present_flag (%d). Feature not supported.",
+    //       pSps->bSeqScalingMatrixPresentFlag);
+    //return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_NON_BASELINE);
   }
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //log2_max_frame_num_minus4
   WELS_CHECK_SE_UPPER_ERROR (uiCode, SPS_LOG2_MAX_FRAME_NUM_MINUS4_MAX, "log2_max_frame_num_minus4",
@@ -1307,6 +1313,22 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
   pPps->bConstainedIntraPredFlag              = !!uiCode;
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //redundant_pic_cnt_present_flag
   pPps->bRedundantPicCntPresentFlag           = !!uiCode;
+//going on to parse high profile syntax, need fix me
+  WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode));
+  pPps->bTransform_8x8_mode_flag = !!uiCode;
+  WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode));
+  pPps->bPicScalingMatrixPresentFlag = !!uiCode;
+  if (pPps->bPicScalingMatrixPresentFlag) {
+    if (pCtx->bSpsAvailFlags[pPps->iSpsId])
+      WELS_READ_VERIFY (ParseScalingList (&pCtx->sSpsBuffer[pPps->iSpsId], pBsAux, 1, pPps->bPicScalingListPresentFlag,
+                                          pPps->iScalingList4x4, pPps->iScalingList8x8));
+    else {
+      pCtx->bSpsLatePps = true;
+      WELS_READ_VERIFY (ParseScalingList (NULL, pBsAux, 1, pPps->bPicScalingListPresentFlag, pPps->iScalingList4x4,
+                                          pPps->iScalingList8x8));
+    }
+  }
+
   if (pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
     PNalUnit pLastNalUnit = pCtx->pAccessUnitList->pNalUnitsList[pCtx->pAccessUnitList->uiAvailUnitsNum - 1];
     PPps pLastPps = pLastNalUnit->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pPps;
@@ -1354,6 +1376,113 @@ int32_t ParseSei (void* pSei, PBitStringAux pBsAux) {	// reserved Sei_Msg type
 
 
   return ERR_NONE;
+}
+/*
+ *************************************************************************************
+ * \brief	to parse scalinglist message payload
+ *
+ * \param	pps sps scaling list matrix		 message to be parsed output
+ * \param	pBsAux		bitstream reader auxiliary
+ *
+ * \return	0 - successed
+ *		1 - failed
+ *
+ * \note	Call it in case scaling list matrix present at sps or pps level
+ *************************************************************************************
+ */
+int32_t SetScalingListValue (uint8_t* pScalingList, int iScalingListNum, bool* bUseDefaultScalingMatrixFlag,
+                             PBitStringAux pBsAux) {	// reserved Sei_Msg type
+  int iLastScale = 8;
+  int iNextScale = 8;
+  int iDeltaScale;
+  int32_t iCode;
+  for (int j = 0; j < iScalingListNum; j++) {
+    if (iNextScale != 0) {
+      WELS_READ_VERIFY (BsGetSe (pBsAux, &iCode));
+      WELS_CHECK_SE_BOTH_ERROR_NOLOG (iCode, SCALING_LIST_DELTA_SCALE_MIN, SCALING_LIST_DELTA_SCALE_MAX, "DeltaScale",
+                                      ERR_SCALING_LIST_DELTA_SCALE);
+      iDeltaScale = iCode;
+      iNextScale = (iLastScale + iDeltaScale + 256) % 256;
+      *bUseDefaultScalingMatrixFlag = (j == 0 && iNextScale == 0);
+      if (*bUseDefaultScalingMatrixFlag)
+        break;
+    }
+    pScalingList[g_kuiZigzagScan[j]] = (iNextScale == 0) ? iLastScale : iNextScale;
+    iLastScale = pScalingList[g_kuiZigzagScan[j]];
+  }
+
+
+  return ERR_NONE;
+}
+
+int32_t ParseScalingList (PSps pSps, PBitStringAux pBs, bool bPPS, bool* pScalingListPresentFlag,
+                          uint8_t (*iScalingList4x4)[16], uint8_t (*iScalingList8x8)[64]) {
+  uint32_t uiScalingListNum;
+  uint32_t uiCode;
+  int32_t iRetTmp;
+  bool bUseDefaultScalingMatrixFlag4x4 = false;
+  bool bUseDefaultScalingMatrixFlag8x8 = false;
+  bool bInit = false;
+  const uint8_t* defaultScaling[4];
+
+  if (pSps != NULL) {
+    uiScalingListNum = (pSps->uiChromaFormatIdc != 3) ? 8 : 12;
+    bInit = bPPS && pSps->bSeqScalingMatrixPresentFlag;
+  } else
+    uiScalingListNum = 12;
+
+//Init default_scaling_list value for sps or pps
+  defaultScaling[0] = bInit ? pSps->iScalingList4x4[0] : g_kuiDequantScaling4x4Default[0];
+  defaultScaling[1] = bInit ? pSps->iScalingList4x4[3] : g_kuiDequantScaling4x4Default[1];
+  defaultScaling[2] = bInit ? pSps->iScalingList8x8[0] : g_kuiDequantScaling8x8Default[0];
+  defaultScaling[3] = bInit ? pSps->iScalingList8x8[1] : g_kuiDequantScaling8x8Default[1];
+
+  for (int i = 0; i < uiScalingListNum; i++) {
+    WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode));
+    pScalingListPresentFlag[i] = !!uiCode;
+    if (!!uiCode) {
+      if (i < 6) {
+        iRetTmp = SetScalingListValue (iScalingList4x4[i], 16, &bUseDefaultScalingMatrixFlag4x4, pBs);
+        if (iRetTmp == ERR_NONE) {
+          if (bUseDefaultScalingMatrixFlag4x4) {
+            bUseDefaultScalingMatrixFlag4x4 = false;
+            memcpy (iScalingList4x4[i], g_kuiDequantScaling4x4Default[i / 3], sizeof (uint8_t) * 16);
+          }
+        } else
+          return iRetTmp;
+
+      } else {
+        SetScalingListValue (iScalingList8x8[i - 6], 64, &bUseDefaultScalingMatrixFlag8x8, pBs);
+        //if(iRetTmp == ERR_NONE)
+        //{
+        if (bUseDefaultScalingMatrixFlag8x8) {
+          bUseDefaultScalingMatrixFlag8x8 = false;
+          memcpy (iScalingList8x8[i - 6], g_kuiDequantScaling8x8Default[ (i - 6) & 1], sizeof (uint8_t) * 64);
+        }
+        // }
+
+        //else
+        // return iRetTmp;
+      }
+
+    } else {
+      if (i < 6) {
+        if ((i != 0) && (i != 3))
+          memcpy (iScalingList4x4[i], iScalingList4x4[i - 1], sizeof (uint8_t) * 16);
+        else
+          memcpy (iScalingList4x4[i], defaultScaling[i / 3], sizeof (uint8_t) * 16);
+
+      } else {
+        if ((i == 6) || (i == 7))
+          memcpy (iScalingList8x8[i - 6], defaultScaling[ (i & 1) + 2], sizeof (uint8_t) * 64);
+        else
+          memcpy (iScalingList8x8[i - 6], iScalingList8x8[ (i - 6) / 3], sizeof (uint8_t) * 64);
+
+      }
+    }
+  }
+  return ERR_NONE;
+
 }
 
 /*!
