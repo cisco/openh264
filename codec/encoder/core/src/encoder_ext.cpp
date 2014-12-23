@@ -157,6 +157,7 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
   }
   for (i = 0; i < pCfg->iSpatialLayerNum; ++ i) {
     SSpatialLayerInternal* fDlp = &pCfg->sDependencyLayers[i];
+    SSpatialLayerConfig* pConfig = &pCfg->sSpatialLayers[i];
     if (fDlp->fOutputFrameRate > fDlp->fInputFrameRate || (fDlp->fInputFrameRate >= -fEpsn
         && fDlp->fInputFrameRate <= fEpsn)
         || (fDlp->fOutputFrameRate >= -fEpsn && fDlp->fOutputFrameRate <= fEpsn)) {
@@ -170,6 +171,7 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
                "AUTO CORRECT: Invalid settings in input frame rate(%.6f) and output frame rate(%.6f) of layer #%d config file: iResult of output frame rate divided by input frame rate should be power of 2(i.e,in/pOut=2^n). \n Auto correcting Output Framerate to Input Framerate %f!\n",
                fDlp->fInputFrameRate, fDlp->fOutputFrameRate, i, fDlp->fInputFrameRate);
       fDlp->fOutputFrameRate = fDlp->fInputFrameRate;
+      pConfig->fFrameRate = fDlp->fOutputFrameRate;
     }
   }
 
@@ -483,7 +485,8 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
 
 
 void WelsEncoderApplyFrameRate (SWelsSvcCodingParam* pParam) {
-  SSpatialLayerInternal* pLayerParam;
+  SSpatialLayerInternal* pLayerParamInternal;
+  SSpatialLayerConfig* pLayerParam;
   const float kfEpsn = 0.000001f;
   const int32_t kiNumLayer = pParam->iSpatialLayerNum;
   int32_t i;
@@ -493,14 +496,15 @@ void WelsEncoderApplyFrameRate (SWelsSvcCodingParam* pParam) {
 
   //set input frame rate to each layer
   for (i = 0; i < kiNumLayer; i++) {
-    pLayerParam = & (pParam->sDependencyLayers[i]);
-
-    fRatio = pLayerParam->fOutputFrameRate / pLayerParam->fInputFrameRate;
-    if ((kfMaxFrameRate - pLayerParam->fInputFrameRate) > kfEpsn
-        || (kfMaxFrameRate - pLayerParam->fInputFrameRate) < -kfEpsn) {
-      pLayerParam->fInputFrameRate = kfMaxFrameRate;
+    pLayerParamInternal = & (pParam->sDependencyLayers[i]);
+    pLayerParam = & (pParam->sSpatialLayers[i]);
+    fRatio = pLayerParamInternal->fOutputFrameRate / pLayerParamInternal->fInputFrameRate;
+    if ((kfMaxFrameRate - pLayerParamInternal->fInputFrameRate) > kfEpsn
+        || (kfMaxFrameRate - pLayerParamInternal->fInputFrameRate) < -kfEpsn) {
+      pLayerParamInternal->fInputFrameRate = kfMaxFrameRate;
       fTargetOutputFrameRate = kfMaxFrameRate * fRatio;
-      pLayerParam->fOutputFrameRate = (fTargetOutputFrameRate >= 6) ? fTargetOutputFrameRate : (pLayerParam->fInputFrameRate);
+      pLayerParamInternal->fOutputFrameRate = (fTargetOutputFrameRate >= 6) ? fTargetOutputFrameRate : (pLayerParamInternal->fInputFrameRate);
+      pLayerParam->fFrameRate = pLayerParamInternal->fOutputFrameRate;
       //TODO:{Sijia} from design, there is no sense to have temporal layer when under 6fps even with such setting?
     }
   }
