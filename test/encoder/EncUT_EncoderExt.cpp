@@ -210,7 +210,7 @@ TEST_F (EncoderInterfaceTest, EncoderAdditionalOptionSetTest) {
   eOptionId = ENCODER_OPTION_BITRATE;
   SBitrateInfo sInfo, sReturn;
   sInfo.iBitrate = rand() % 100000 - 100;
-  sInfo.iLayer = static_cast<LAYER_NUM> (pParamExt->iSpatialLayerNum);
+  sInfo.iLayer = static_cast<LAYER_NUM> (pParamExt->iSpatialLayerNum - 1);
   iResult = pPtrEnc->SetOption (eOptionId, &sInfo);
   pPtrEnc->GetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, pParamExt);
   if (sInfo.iBitrate <= 0)
@@ -220,7 +220,7 @@ TEST_F (EncoderInterfaceTest, EncoderAdditionalOptionSetTest) {
     EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
   } else {
     EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-    sReturn.iLayer = static_cast<LAYER_NUM> (pParamExt->iSpatialLayerNum);
+    sReturn.iLayer = static_cast<LAYER_NUM> (pParamExt->iSpatialLayerNum - 1);
     iResult = pPtrEnc->GetOption (eOptionId, &sReturn);
     EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
     EXPECT_EQ (WELS_CLIP3 (sInfo.iBitrate, 1, 2147483647), sReturn.iBitrate);
@@ -232,7 +232,7 @@ TEST_F (EncoderInterfaceTest, EncoderAdditionalOptionSetTest) {
 
   eOptionId = ENCODER_OPTION_MAX_BITRATE;
   sInfo.iBitrate = rand() % 100000 - 100;
-  sInfo.iLayer = static_cast<LAYER_NUM> (pParamExt->iSpatialLayerNum);
+  sInfo.iLayer = static_cast<LAYER_NUM> (pParamExt->iSpatialLayerNum - 1);
   iResult = pPtrEnc->SetOption (eOptionId, &sInfo);
   pPtrEnc->GetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, pParamExt);
   if (sInfo.iBitrate <= 0)
@@ -242,7 +242,7 @@ TEST_F (EncoderInterfaceTest, EncoderAdditionalOptionSetTest) {
     EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
   } else {
     EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-    sReturn.iLayer = static_cast<LAYER_NUM> (pParamExt->iSpatialLayerNum);
+    sReturn.iLayer = static_cast<LAYER_NUM> (pParamExt->iSpatialLayerNum - 1);
     iResult = pPtrEnc->GetOption (eOptionId, &sReturn);
     EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
     EXPECT_EQ (WELS_CLIP3 (sInfo.iBitrate, 1, 2147483647), sReturn.iBitrate);
