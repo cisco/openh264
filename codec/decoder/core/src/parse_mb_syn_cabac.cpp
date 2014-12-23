@@ -825,7 +825,7 @@ int32_t ParseResidualBlockCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroC
   uint32_t uiCbpBit;
   int32_t pSignificantMap[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-  int32_t iMbResProperty;
+  int32_t iMbResProperty = 0;
   GetMbResProperty (&iMbResProperty, &iResProperty, false);
   const uint16_t* pDeQuantMul = (pCtx->bUseScalingList) ? pCtx->pDequant_coeff4x4[iMbResProperty][uiQp] :
                                 g_kuiDequantCoeff[uiQp];
