@@ -107,7 +107,40 @@ int32_t WelsBitRateVerification (SLogContext* pLogCtx, SSpatialLayerConfig* pLay
   return ENC_RETURN_SUCCESS;
 }
 
-
+void CheckProfileSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iLayer, EProfileIdc uiProfileIdc) {
+  SSpatialLayerConfig* pLayerInfo = &pParam->sSpatialLayers[iLayer];
+  pLayerInfo->uiProfileIdc = uiProfileIdc;
+  if ((iLayer == SPATIAL_LAYER_0) && (uiProfileIdc != PRO_BASELINE)) {
+    pLayerInfo->uiProfileIdc = PRO_BASELINE;
+    WelsLog (pLogCtx, WELS_LOG_WARNING, "doesn't support profile(%d),change to baseline profile",
+             uiProfileIdc);
+  }
+  if (iLayer > SPATIAL_LAYER_0) {
+    if ((uiProfileIdc != PRO_BASELINE) || (uiProfileIdc != PRO_SCALABLE_BASELINE)) {
+      pLayerInfo->uiProfileIdc = PRO_BASELINE;
+      WelsLog (pLogCtx, WELS_LOG_WARNING, "doesn't support profile(%d),change to baseline profile",
+               uiProfileIdc);
+    }
+  }
+}
+void CheckLevelSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iLayer, ELevelIdc uiLevelIdc) {
+  SSpatialLayerConfig* pLayerInfo = &pParam->sSpatialLayers[iLayer];
+  pLayerInfo->uiLevelIdc = uiLevelIdc;
+  if ((uiLevelIdc < LEVEL_1_0) || (uiLevelIdc > LEVEL_5_2)) {
+    pLayerInfo->uiLevelIdc = LEVEL_1_0;
+    WelsLog (pLogCtx, WELS_LOG_WARNING, "doesn't support level(%d) change to LEVEL_1_0", uiLevelIdc);
+  }
+}
+void CheckReferenceNumSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iNumRef) {
+  int32_t iRefUpperBound = (pParam->iUsageType == CAMERA_VIDEO_REAL_TIME) ?
+                           MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA : MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN;
+  pParam->iNumRefFrame = iNumRef;
+  if ((iNumRef < MIN_REF_PIC_COUNT) || (iNumRef > iRefUpperBound)) {
+    pParam->iNumRefFrame = AUTO_REF_PIC_COUNT;
+    WelsLog (pLogCtx, WELS_LOG_WARNING,
+             "doesn't support the number of reference frame(%d) change to auto select mode", iNumRef);
+  }
+}
 /*!
  * \brief	validate checking in parameter configuration
  * \pParam	pParam		SWelsSvcCodingParam*
@@ -309,6 +342,8 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
                pSpatialLayer->sSliceCfg.uiSliceMode, pCodingParam->uiMaxNalSize);
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
+    CheckProfileSetting (pLogCtx, pCodingParam, i, pSpatialLayer->uiProfileIdc);
+    CheckLevelSetting (pLogCtx, pCodingParam, i, pSpatialLayer->uiLevelIdc);
     //check pSlice settings under multi-pSlice
     if (kiPicWidth <= 16 && kiPicHeight <= 16) {
       //only have one MB, set to single_slice
@@ -3272,7 +3307,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     if ((pSvcParam->iRCMode != RC_OFF_MODE))
       pCtx->pVpp->AnalyzePictureComplexity (pCtx, pCtx->pEncPic, ((pCtx->eSliceType == P_SLICE)
                                             && (pCtx->iNumRef0 > 0)) ? pCtx->pRefList0[0] : NULL,
-                                            iCurDid,(pCtx->eSliceType == P_SLICE)&&(pSvcParam->bEnableBackgroundDetection));
+                                            iCurDid, (pCtx->eSliceType == P_SLICE) && (pSvcParam->bEnableBackgroundDetection));
     WelsUpdateRefSyntax (pCtx,  pCtx->iPOC,
                          eFrameType);	//get reordering syntax used for writing slice header and transmit to encoder.
     PrefetchReferencePicture (pCtx, eFrameType);	// update reference picture for current pDq layer
