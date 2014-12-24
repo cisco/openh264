@@ -921,10 +921,8 @@ int32_t WelsDecodeMbCabacPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
 }
 // Calculate deqaunt coeff scaling list value
 int32_t  WelsCalcDeqCoeffScalingList (PWelsDecoderContext pCtx) {
-  int32_t iScalingListNum = 0;
   if (pCtx->pSps->bSeqScalingMatrixPresentFlag || pCtx->pPps->bPicScalingMatrixPresentFlag) {
     pCtx->bUseScalingList = true;
-    iScalingListNum = (pCtx->pSps->uiChromaFormatIdc != 3) ? 8 : 12;
 
     if (!pCtx->bDequantCoeff4x4Init || (pCtx->iDequantCoeffPpsid != pCtx->pPps->iPpsId)) {
       int i, q, x;

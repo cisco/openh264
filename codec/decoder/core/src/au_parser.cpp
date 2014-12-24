@@ -1437,7 +1437,7 @@ int32_t ParseScalingList (PSps pSps, PBitStringAux pBs, bool bPPS, bool* pScalin
   defaultScaling[2] = bInit ? pSps->iScalingList8x8[0] : g_kuiDequantScaling8x8Default[0];
   defaultScaling[3] = bInit ? pSps->iScalingList8x8[1] : g_kuiDequantScaling8x8Default[1];
 
-  for (int i = 0; i < uiScalingListNum; i++) {
+  for (unsigned int i = 0; i < uiScalingListNum; i++) {
     WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode));
     pScalingListPresentFlag[i] = !!uiCode;
     if (!!uiCode) {
