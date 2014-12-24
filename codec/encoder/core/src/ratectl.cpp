@@ -773,7 +773,7 @@ bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pEncCtx, int32_t iSpatialNum, EVideo
   SSpatialPicIndex* pSpatialIndexMap = &pEncCtx->sSpatialIndexMap[0];
   bool bSkipMustFlag = false;
   if (pEncCtx->pSvcParam->bEnableFrameSkip) {
-    if ((RC_QUALITY_MODE == pEncCtx->pSvcParam->iRCMode) || (RC_BITRATE_MODE == pEncCtx->pSvcParam->iRCMode)) {
+    if ((RC_QUALITY_MODE == pEncCtx->pSvcParam->iRCMode) || (RC_BITRATE_MODE == pEncCtx->pSvcParam->iRCMode)|| (RC_TIMESTAMP_MODE == pEncCtx->pSvcParam->iRCMode)) {
 
       for (int32_t i = 0; i < iSpatialNum; i++) {
         if (UNSPECIFIED_BIT_RATE == pEncCtx->pSvcParam->sSpatialLayers[i].iMaxSpatialBitrate) {
@@ -1288,9 +1288,18 @@ void  WelsRcInitModule (sWelsEncCtx* pEncCtx, RC_MODES iRcMode) {
     pRcf->pfWelsCheckSkipBasedMaxbr = NULL;
     pRcf->pfWelsUpdateBufferWhenSkip = NULL;
     pRcf->pfWelsUpdateMaxBrWindowStatus = NULL;
-
     break;
   case RC_BITRATE_MODE:
+    pRcf->pfWelsRcPictureInit = WelsRcPictureInitGom;
+    pRcf->pfWelsRcPicDelayJudge = WelsRcFrameDelayJudge;
+    pRcf->pfWelsRcPictureInfoUpdate = WelsRcPictureInfoUpdateGom;
+    pRcf->pfWelsRcMbInit = WelsRcMbInitGom;
+    pRcf->pfWelsRcMbInfoUpdate = WelsRcMbInfoUpdateGom;
+    pRcf->pfWelsCheckSkipBasedMaxbr = CheckFrameSkipBasedMaxbr;
+    pRcf->pfWelsUpdateBufferWhenSkip = UpdateBufferWhenFrameSkipped;
+    pRcf->pfWelsUpdateMaxBrWindowStatus = UpdateMaxBrCheckWindowStatus;
+    break;
+  case RC_TIMESTAMP_MODE:
     if (pEncCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
       pRcf->pfWelsRcPictureInit = WelRcPictureInitScc;
       pRcf->pfWelsRcPicDelayJudge = WelsRcFrameDelayJudgeScc;
@@ -1304,15 +1313,7 @@ void  WelsRcInitModule (sWelsEncCtx* pEncCtx, RC_MODES iRcMode) {
       InitRcModuleScc (pEncCtx);
 
     } else {
-      pRcf->pfWelsRcPictureInit = WelsRcPictureInitGom;
-      pRcf->pfWelsRcPicDelayJudge = WelsRcFrameDelayJudge;
-      pRcf->pfWelsRcPictureInfoUpdate = WelsRcPictureInfoUpdateGom;
-      pRcf->pfWelsRcMbInit = WelsRcMbInitGom;
-      pRcf->pfWelsRcMbInfoUpdate = WelsRcMbInfoUpdateGom;
-      pRcf->pfWelsCheckSkipBasedMaxbr = CheckFrameSkipBasedMaxbr;
-      pRcf->pfWelsUpdateBufferWhenSkip = UpdateBufferWhenFrameSkipped;
-      pRcf->pfWelsUpdateMaxBrWindowStatus = UpdateMaxBrCheckWindowStatus;
-
+      WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO, "to be done in the future");
     }
     break;
   case RC_QUALITY_MODE:
