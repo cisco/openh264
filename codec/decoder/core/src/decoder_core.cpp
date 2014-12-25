@@ -562,10 +562,17 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_PPS_ID);
   }
 
-  if (pCtx->iOverwriteFlags & OVERWRITE_PPS)
-    pPps    = &pCtx->sPpsBuffer[MAX_PPS_COUNT];
-  else
+  if (pCtx->iOverwriteFlags & OVERWRITE_PPS) {
+    if (pCtx->pAccessUnitList->uiAvailUnitsNum > 1) {
+      pPps    = &pCtx->sPpsBuffer[MAX_PPS_COUNT];
+    } else {
+      memcpy (&pCtx->sPpsBuffer[pCtx->sPpsBuffer[MAX_PPS_COUNT].iPpsId], &pCtx->sPpsBuffer[MAX_PPS_COUNT], sizeof (SPps));
+      pCtx->iOverwriteFlags ^= OVERWRITE_PPS;
+      pPps = &pCtx->sPpsBuffer[iPpsId];
+    }
+  } else {
     pPps    = &pCtx->sPpsBuffer[iPpsId];
+  }
 
   if (pPps->uiNumSliceGroups == 0) {
     WelsLog (pLogCtx, WELS_LOG_WARNING, "Invalid PPS referenced");
@@ -574,10 +581,19 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   }
 
   if (kbExtensionFlag) {
-    if (pCtx->iOverwriteFlags & OVERWRITE_SUBSETSPS)
-      pSubsetSps	= &pCtx->sSubsetSpsBuffer[MAX_SPS_COUNT];
-    else
-      pSubsetSps	= &pCtx->sSubsetSpsBuffer[pPps->iSpsId];
+    if (pCtx->iOverwriteFlags & OVERWRITE_SUBSETSPS) {
+      if (pCtx->pAccessUnitList->uiAvailUnitsNum > 1) {
+        pSubsetSps	= &pCtx->sSubsetSpsBuffer[MAX_SPS_COUNT];
+      } else {
+        memcpy (&pCtx->sSubsetSpsBuffer[pCtx->sSubsetSpsBuffer[MAX_SPS_COUNT].sSps.iSpsId],
+                &pCtx->sSubsetSpsBuffer[MAX_SPS_COUNT], sizeof (SSubsetSps));
+        pCtx->iOverwriteFlags ^= OVERWRITE_SUBSETSPS;
+        pSubsetSps	= &pCtx->sSubsetSpsBuffer[pPps->iSpsId];
+        ResetActiveSPSForEachLayer (pCtx);
+      }
+    } else {
+      pSubsetSps      = &pCtx->sSubsetSpsBuffer[pPps->iSpsId];
+    }
     pSps		= &pSubsetSps->sSps;
     if (pCtx->bSubspsAvailFlags[pPps->iSpsId] == false) {
       WelsLog (pLogCtx, WELS_LOG_ERROR, "SPS id is invalid!");
@@ -590,10 +606,18 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
       pCtx->iErrorCode |= dsNoParamSets;
       return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SPS_ID);
     }
-    if (pCtx->iOverwriteFlags & OVERWRITE_SPS)
-      pSps		= &pCtx->sSpsBuffer[MAX_SPS_COUNT];
-    else
+    if (pCtx->iOverwriteFlags & OVERWRITE_SPS) {
+      if (pCtx->pAccessUnitList->uiAvailUnitsNum > 1) {
+        pSps		= &pCtx->sSpsBuffer[MAX_SPS_COUNT];
+      } else {
+        memcpy (&pCtx->sSpsBuffer[pCtx->sSpsBuffer[MAX_SPS_COUNT].iSpsId], &pCtx->sSpsBuffer[MAX_SPS_COUNT], sizeof (SSps));
+        pCtx->iOverwriteFlags ^= OVERWRITE_SPS;
+        pSps		= &pCtx->sSpsBuffer[pPps->iSpsId];
+        ResetActiveSPSForEachLayer (pCtx);
+      }
+    } else {
       pSps		= &pCtx->sSpsBuffer[pPps->iSpsId];
+    }
   }
   pSliceHead->iPpsId = iPpsId;
   pSliceHead->iSpsId = pPps->iSpsId;
