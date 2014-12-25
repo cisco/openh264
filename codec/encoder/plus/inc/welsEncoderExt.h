@@ -98,9 +98,6 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
 
  private:
   int InitializeInternal (SWelsSvcCodingParam* argv);
-  void CheckProfileSetting (int32_t iLayer, EProfileIdc uiProfileIdc);
-  void CheckLevelSetting (int32_t iLayer, ELevelIdc uiLevelIdc);
-  void CheckReferenceNumSetting (int32_t iNumRef);
   void TraceParamInfo(SEncParamExt *pParam);
   void UpdateStatistics(const int64_t kiCurrentFrameTs, EVideoFrameType eFrameType,  const int32_t kiCurrentFrameSize, const int64_t kiCurrentFrameMs);
 
