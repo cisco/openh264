@@ -126,7 +126,10 @@ void CheckProfileSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int
 void CheckLevelSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iLayer, ELevelIdc uiLevelIdc) {
   SSpatialLayerConfig* pLayerInfo = &pParam->sSpatialLayers[iLayer];
   pLayerInfo->uiLevelIdc = uiLevelIdc;
-  if ((uiLevelIdc < LEVEL_1_0) || (uiLevelIdc > LEVEL_5_2)) {
+  if (uiLevelIdc == LEVEL_UNKNOWN) {
+    pLayerInfo->uiLevelIdc = LEVEL_1_0;
+    WelsLog (pLogCtx, WELS_LOG_INFO, "change LEVEL_UNKNOWN to LEVEL_1_0");
+  } else if ((uiLevelIdc < LEVEL_1_0) || (uiLevelIdc > LEVEL_5_2)) {
     pLayerInfo->uiLevelIdc = LEVEL_1_0;
     WelsLog (pLogCtx, WELS_LOG_WARNING, "doesn't support level(%d) change to LEVEL_1_0", uiLevelIdc);
   }
