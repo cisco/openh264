@@ -306,25 +306,49 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
       if (pCtx->bParseOnly) {
         pCurNal->sNalData.sVclNal.pNalPos = pSavedData->pCurPos;
-        pCurNal->sNalData.sVclNal.iNalLength = iSrcNalLen - NAL_UNIT_HEADER_EXT_SIZE;
-        if (pCurNal->sNalHeaderExt.bIdrFlag) {
-          * (pSrcNal + 3) &= 0xE0;
-          * (pSrcNal + 3) |= 0x05;
-        } else {
-          * (pSrcNal + 3) &= 0xE0;
-          * (pSrcNal + 3) |= 0x01;
+        int32_t iTrailingZeroByte = 0;
+        while (pSrcNal[iSrcNalLen - iTrailingZeroByte - 1] == 0x0) //remove final trailing 0 bytes
+          iTrailingZeroByte++;
+        int32_t iActualLen = iSrcNalLen - iTrailingZeroByte;
+        pCurNal->sNalData.sVclNal.iNalLength = iActualLen - NAL_UNIT_HEADER_EXT_SIZE;
+        //unify start code as 0x0001
+        int32_t iCurrStartByte = 4; //4 for 0x0001, 3 for 0x001
+        if (pSrcNal[0] == 0x0 && pSrcNal[1] == 0x0 && pSrcNal[2] == 0x1) { //if 0x001
+          iCurrStartByte = 3;
+          pCurNal->sNalData.sVclNal.iNalLength++;
         }
-        memcpy (pSavedData->pCurPos, pSrcNal, 4);
-        pSavedData->pCurPos += 4;
-        memcpy (pSavedData->pCurPos, pSrcNal + 7, iSrcNalLen - 7);
-        pSavedData->pCurPos += iSrcNalLen - 7;
+        if (pCurNal->sNalHeaderExt.bIdrFlag) {
+          * (pSrcNal + iCurrStartByte) &= 0xE0;
+          * (pSrcNal + iCurrStartByte) |= 0x05;
+        } else {
+          * (pSrcNal + iCurrStartByte) &= 0xE0;
+          * (pSrcNal + iCurrStartByte) |= 0x01;
+        }
+        pSavedData->pCurPos[0] = pSavedData->pCurPos[1] = pSavedData->pCurPos[2] = 0x0;
+        pSavedData->pCurPos[3] = 0x1;
+        pSavedData->pCurPos[4] = * (pSrcNal + iCurrStartByte);
+        pSavedData->pCurPos += 5;
+        int32_t iOffset = iCurrStartByte + 1 + NAL_UNIT_HEADER_EXT_SIZE;
+        memcpy (pSavedData->pCurPos, pSrcNal + iOffset, iActualLen - iOffset);
+        pSavedData->pCurPos += iActualLen - iOffset;
       }
     } else {
       if (pCtx->bParseOnly) {
         pCurNal->sNalData.sVclNal.pNalPos = pSavedData->pCurPos;
-        pCurNal->sNalData.sVclNal.iNalLength = iSrcNalLen;
-        memcpy (pSavedData->pCurPos, pSrcNal, iSrcNalLen);
-        pSavedData->pCurPos += iSrcNalLen;
+        int32_t iTrailingZeroByte = 0;
+        while (pSrcNal[iSrcNalLen - iTrailingZeroByte - 1] == 0x0) //remove final trailing 0 bytes
+          iTrailingZeroByte++;
+        int32_t iActualLen = iSrcNalLen - iTrailingZeroByte;
+        pCurNal->sNalData.sVclNal.iNalLength = iActualLen;
+        //unify start code as 0x0001
+        int32_t iStartDeltaByte = 0; //0 for 0x0001, 1 for 0x001
+        if (pSrcNal[0] == 0x0 && pSrcNal[1] == 0x0 && pSrcNal[2] == 0x1) { //if 0x001
+          pSavedData->pCurPos[0] = 0x0;
+          iStartDeltaByte = 1;
+          pCurNal->sNalData.sVclNal.iNalLength++;
+        }
+        memcpy (pSavedData->pCurPos + iStartDeltaByte, pSrcNal, iActualLen);
+        pSavedData->pCurPos += iStartDeltaByte + iActualLen;
       }
       if (NAL_UNIT_PREFIX == pCtx->sPrefixNal.sNalHeaderExt.sNalUnitHeader.eNalUnitType) {
         if (pCtx->sPrefixNal.sNalData.sPrefixNal.bPrefixNalCorrectFlag) {
@@ -449,9 +473,9 @@ bool CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeade
     if (pLastSliceHeader->iDeltaPicOrderCnt[1] != pCurSliceHeader->iDeltaPicOrderCnt[1])
       return true;
   }
-  if(memcmp(pLastSliceHeader->pPps, pCurSliceHeader->pPps, sizeof(SPps)) != 0
-      || memcmp(pLastSliceHeader->pSps, pCurSliceHeader->pSps, sizeof(SSps)) != 0) {
-      return true;
+  if (memcmp (pLastSliceHeader->pPps, pCurSliceHeader->pPps, sizeof (SPps)) != 0
+      || memcmp (pLastSliceHeader->pSps, pCurSliceHeader->pSps, sizeof (SSps)) != 0) {
+    return true;
   }
   return false;
 }
@@ -1065,8 +1089,19 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     if (!kbUseSubsetFlag) { //SPS
       SSpsBsInfo* pSpsBs = &pCtx->sSpsBsInfo [iSpsId];
       pSpsBs->iSpsId = iSpsId;
-      memcpy (pSpsBs->pSpsBsBuf, pSrcNal, kSrcNalLen);
-      pSpsBs->uiSpsBsLen = (uint32_t) kSrcNalLen;
+      int32_t iTrailingZeroByte = 0;
+      while (pSrcNal[kSrcNalLen - iTrailingZeroByte - 1] == 0x0) //remove final trailing 0 bytes
+        iTrailingZeroByte++;
+      int32_t iActualLen = kSrcNalLen - iTrailingZeroByte;
+      pSpsBs->uiSpsBsLen = (uint16_t) iActualLen;
+      //unify start code as 0x0001
+      int32_t iStartDeltaByte = 0; //0 for 0x0001, 1 for 0x001
+      if (pSrcNal[0] == 0x0 && pSrcNal[1] == 0x0 && pSrcNal[2] == 0x1) { //if 0x001
+        pSpsBs->pSpsBsBuf[0] = 0x0; //add 0 to form 0x0001
+        iStartDeltaByte++;
+        pSpsBs->uiSpsBsLen++;
+      }
+      memcpy (pSpsBs->pSpsBsBuf + iStartDeltaByte, pSrcNal, iActualLen);
     } else { //subset SPS
       SSpsBsInfo* pSpsBs = &pCtx->sSubsetSpsBsInfo [iSpsId];
       pSpsBs->iSpsId = iSpsId;
@@ -1353,8 +1388,19 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
     }
     SPpsBsInfo* pPpsBs = &pCtx->sPpsBsInfo [uiPpsId];
     pPpsBs->iPpsId = (int32_t) uiPpsId;
-    memcpy (pPpsBs->pPpsBsBuf, pSrcNal, kSrcNalLen);
-    pPpsBs->uiPpsBsLen = kSrcNalLen;
+    int32_t iTrailingZeroByte = 0;
+    while (pSrcNal[kSrcNalLen - iTrailingZeroByte - 1] == 0x0) //remove final trailing 0 bytes
+      iTrailingZeroByte++;
+    int32_t iActualLen = kSrcNalLen - iTrailingZeroByte;
+    pPpsBs->uiPpsBsLen = (uint16_t) iActualLen;
+    //unify start code as 0x0001
+    int32_t iStartDeltaByte = 0; //0 for 0x0001, 1 for 0x001
+    if (pSrcNal[0] == 0x0 && pSrcNal[1] == 0x0 && pSrcNal[2] == 0x1) { //if 0x001
+      pPpsBs->pPpsBsBuf[0] = 0x0; //add 0 to form 0x0001
+      iStartDeltaByte++;
+      pPpsBs->uiPpsBsLen++;
+    }
+    memcpy (pPpsBs->pPpsBsBuf + iStartDeltaByte, pSrcNal, iActualLen);
   }
   return ERR_NONE;
 }
