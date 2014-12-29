@@ -3938,6 +3938,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
 
     // keep below values unchanged as before
     pOldParam->bEnableSSEI		= pNewParam->bEnableSSEI;
+    pOldParam->bSimulcastAVC		= pNewParam->bSimulcastAVC;
     pOldParam->bEnableFrameCroppingFlag	= pNewParam->bEnableFrameCroppingFlag;	// enable frame cropping flag
 
     /* Motion search */

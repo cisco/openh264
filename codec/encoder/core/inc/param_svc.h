@@ -142,7 +142,8 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     param.iLTRRefNum				= 0;
     param.iLtrMarkPeriod			= 30;	//the min distance of two int32_t references
 
-    param.bEnableSSEI					= true;
+    param.bEnableSSEI					= false;
+    param.bSimulcastAVC       = false;
     param.bEnableFrameCroppingFlag	= true;	// enable frame cropping flag: true alwayse in application
     // false: Streaming Video Sharing; true: Video Conferencing Meeting;
 
@@ -320,6 +321,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
     /* For ssei information */
     bEnableSSEI		= pCodingParam.bEnableSSEI;
+    bSimulcastAVC		= pCodingParam.bSimulcastAVC;
 
     /* Layer definition */
     iSpatialLayerNum	= (int8_t)WELS_CLIP3 (pCodingParam.iSpatialLayerNum, 1,

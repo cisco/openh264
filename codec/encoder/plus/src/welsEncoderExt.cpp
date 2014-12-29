@@ -886,7 +886,8 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   case ENCODER_OPTION_ENABLE_SSEI: {
     bool iValue = * ((bool*)pOption);
     m_pEncContext->pSvcParam->bEnableSSEI = iValue;
-    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, " CWelsH264SVCEncoder::SetOption enable SSEI = %d ",
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             " CWelsH264SVCEncoder::SetOption enable SSEI = %d -- this is not supported yet",
              m_pEncContext->pSvcParam->bEnableSSEI);
   }
   break;
