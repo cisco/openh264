@@ -258,6 +258,11 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
     return dsInitialOptExpected;
 
   if (eOptID == DECODER_OPTION_DATAFORMAT) { // Set color space of decoding output frame
+    if (m_pDecContext->bParseOnly) {
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
+               "CWelsDecoder::SetOption for data format meaningless for parseonly.");
+      return cmResultSuccess;
+    }
     if (pOption == NULL)
       return cmInitParaError;
 
