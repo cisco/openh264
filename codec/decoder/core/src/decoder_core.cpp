@@ -1290,7 +1290,7 @@ void UninitialDqLayersContext (PWelsDecoderContext pCtx) {
 
 void ResetCurrentAccessUnit (PWelsDecoderContext pCtx) {
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
-
+  pCurAu->uiStartPos            = 0;
   pCurAu->uiEndPos		= 0;
   pCurAu->bCompletedAuFlag	= false;
   if (pCurAu->uiActualUnitsNum > 0) {
@@ -1335,6 +1335,7 @@ void ForceResetCurrentAccessUnit (PAccessUnit pAu) {
   else
     pAu->uiAvailUnitsNum	= 0;
   pAu->uiActualUnitsNum	= 0;
+  pAu->uiStartPos       = 0;
   pAu->uiEndPos		= 0;
   pAu->bCompletedAuFlag	= false;
 }
