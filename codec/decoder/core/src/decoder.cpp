@@ -306,7 +306,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->pPicBuff[LIST_1]		= NULL;
 
   pCtx->bAvcBasedFlag			= true;
-  pCtx->eErrorConMethod = ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
+  pCtx->eErrorConMethod = ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
   pCtx->pPreviousDecodedPictureInDpb = NULL;
   pCtx->sDecoderStatistics.iAvgLumaQp = -1;
 
