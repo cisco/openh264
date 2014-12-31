@@ -2337,7 +2337,7 @@ class DecodeParseAPI : public EncodeDecodeTestBase {
       decoder_->Uninitialize();
     SDecodingParam decParam;
     memset (&decParam, 0, sizeof (SDecodingParam));
-    decParam.eOutputColorFormat = videoFormatI420;
+    decParam.eOutputColorFormat = videoFormatRGB;
     decParam.uiTargetDqLayer = UCHAR_MAX;
     decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
     decParam.bParseOnly = true;
