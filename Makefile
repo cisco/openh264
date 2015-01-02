@@ -220,7 +220,7 @@ $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX): $(LIBPREFIX)$(MODULE_NAME).$(SHAR
 endif
 
 $(PROJECT_NAME).pc: $(PROJECT_NAME).pc.in
-	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(VERSION);' < $(PROJECT_NAME).pc.in > $(PROJECT_NAME).pc
+	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(VERSION);' < $(PROJECT_NAME).pc.in > $@
 
 install-headers:
 	mkdir -p $(PREFIX)/include/wels
