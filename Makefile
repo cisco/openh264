@@ -237,7 +237,7 @@ install-shared: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) install-headers $
 		cp -a $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) $(SHAREDLIB_DIR); \
 	fi
 	mkdir -p $(PREFIX)/lib/pkgconfig
-	install -m 444 $(PROJECT_NAME).pc $(PREFIX)/lib/pkgconfig
+	install -m 644 $(PROJECT_NAME).pc $(PREFIX)/lib/pkgconfig
 ifneq ($(EXTRA_LIBRARY),)
 	install -m 644 $(EXTRA_LIBRARY) $(PREFIX)/lib
 endif
