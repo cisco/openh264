@@ -28,6 +28,7 @@ MODULE_NAME=gmpopenh264
 GMP_API_BRANCH=Firefox36
 CCASFLAGS=$(CFLAGS)
 VERSION=1.3
+STATIC_LDFLAGS=-lstdc++
 
 ifeq (,$(wildcard $(SRC_PATH)gmp-api))
 HAVE_GMP_API=No
@@ -220,7 +221,7 @@ $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX): $(LIBPREFIX)$(MODULE_NAME).$(SHAR
 endif
 
 $(PROJECT_NAME).pc: $(PROJECT_NAME).pc.in
-	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(VERSION);' < $(PROJECT_NAME).pc.in > $@
+	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(VERSION);' -e 's;@LIBS_PRIVATE@;$(STATIC_LDFLAGS);' < $(PROJECT_NAME).pc.in > $@
 
 install-headers:
 	mkdir -p $(PREFIX)/include/wels
