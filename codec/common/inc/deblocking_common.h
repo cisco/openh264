@@ -15,6 +15,8 @@ void DeblockChromaLt4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int
                           int8_t* pTc);
 void DeblockChromaEq4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
 
+void WelsNonZeroCount_c (int8_t* pNonZeroCount);
+
 #if defined(__cplusplus)
 extern "C" {
 #endif//__cplusplus
@@ -32,6 +34,7 @@ void DeblockChromaLt4V_ssse3 (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride,
 void DeblockChromaEq4H_ssse3 (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
 void DeblockChromaLt4H_ssse3 (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
                               int8_t* pTC);
+void WelsNonZeroCount_sse2 (int8_t* pNonZeroCount);
 #endif
 
 #if defined(HAVE_NEON)
@@ -48,6 +51,7 @@ void DeblockChromaEq4V_neon (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, 
 void DeblockChromaLt4H_neon (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
                              int8_t* pTC);
 void DeblockChromaEq4H_neon (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
+void WelsNonZeroCount_neon (int8_t* pNonZeroCount);
 #endif
 
 #if defined(HAVE_NEON_AARCH64)
@@ -61,6 +65,7 @@ void DeblockChromaEq4V_AArch64_neon (uint8_t* pPixCb, uint8_t* pPixCr, int32_t i
 void DeblockChromaLt4H_AArch64_neon (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
                                      int8_t* pTC);
 void DeblockChromaEq4H_AArch64_neon (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
+void WelsNonZeroCount_AArch64_neon (int8_t* pNonZeroCount);
 #endif
 #if defined(__cplusplus)
 }

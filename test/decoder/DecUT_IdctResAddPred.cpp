@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "macros.h"
 #include "decode_mb_aux.h"
-#include "../../codec/decoder/core/src/decode_slice.cpp"
+#include "deblocking.h"
 using namespace WelsDec;
 void IdctResAddPred_ref (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) {
   int16_t iSrc[16];
@@ -98,7 +98,7 @@ TEST(DecoderDecodeMbAux, method) \
 {\
     int8_t iNonZeroCount[2][24];\
     for(int32_t i = 0; i < 24; i++) {\
-        iNonZeroCount[0][i] = iNonZeroCount[1][i] = (rand() % 256)-128;\
+        iNonZeroCount[0][i] = iNonZeroCount[1][i] = (rand() % 25);\
     }\
     method(iNonZeroCount[0]);\
     SetNonZeroCount_ref(iNonZeroCount[1]);\
@@ -106,7 +106,7 @@ TEST(DecoderDecodeMbAux, method) \
         ASSERT_EQ (iNonZeroCount[0][i], iNonZeroCount[1][i]);\
     }\
     for(int32_t i =0; i<24; i++) {\
-        iNonZeroCount[0][i] = iNonZeroCount[1][i] = -128;\
+        iNonZeroCount[0][i] = iNonZeroCount[1][i] = 0;\
     }\
     method(iNonZeroCount[0]);\
     SetNonZeroCount_ref(iNonZeroCount[1]);\
@@ -114,7 +114,7 @@ TEST(DecoderDecodeMbAux, method) \
         ASSERT_EQ (iNonZeroCount[0][i], iNonZeroCount[1][i]);\
     }\
     for(int32_t i =0; i<24; i++) {\
-        iNonZeroCount[0][i] = iNonZeroCount[1][i] = 127;\
+        iNonZeroCount[0][i] = iNonZeroCount[1][i] = 16;\
     }\
     method(iNonZeroCount[0]);\
     SetNonZeroCount_ref(iNonZeroCount[1]);\
@@ -123,12 +123,16 @@ TEST(DecoderDecodeMbAux, method) \
     }\
 }
 
-GENERATE_SETNONZEROCOUNT (SetNonZeroCount_c)
+GENERATE_SETNONZEROCOUNT (WelsNonZeroCount_c)
+
+#if defined(X86_ASM)
+GENERATE_SETNONZEROCOUNT (WelsNonZeroCount_sse2)
+#endif
 
 #if defined(HAVE_NEON)
-GENERATE_SETNONZEROCOUNT (SetNonZeroCount_neon)
+GENERATE_SETNONZEROCOUNT (WelsNonZeroCount_neon)
 #endif
 
 #if defined(HAVE_NEON_AARCH64)
-GENERATE_SETNONZEROCOUNT (SetNonZeroCount_AArch64_neon)
+GENERATE_SETNONZEROCOUNT (WelsNonZeroCount_AArch64_neon)
 #endif
