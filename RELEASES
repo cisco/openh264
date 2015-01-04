@@ -47,7 +47,13 @@ http://www.openh264.org/BINARY_LICENSE.txt
 
 v1.3.0
 ------
-// to be added
+http://ciscobinary.openh264.org/libopenh264-1.3.0-android19.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.3.0-linux32.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.3.0-linux64.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.3.0-osx32.dylib.bz2
+http://ciscobinary.openh264.org/libopenh264-1.3.0-osx64.dylib.bz2
+http://ciscobinary.openh264.org/openh264-1.3.0-win32msvc.dll.bz2
+http://ciscobinary.openh264.org/openh264-1.3.0-win64msvc.dll.bz2
 
 v1.2.0
 ------
