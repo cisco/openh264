@@ -1231,4 +1231,8 @@ OpenH264Version WelsGetCodecVersion() {
   (void) g_strCodecVer; // Avoid warnings about unused static variables
   return g_stCodecVersion;
 }
+
+void WelsGetCodecVersionEx (OpenH264Version* pVersion) {
+  *pVersion = g_stCodecVersion;
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////

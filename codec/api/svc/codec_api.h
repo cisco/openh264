@@ -532,9 +532,15 @@ long WelsCreateDecoder (ISVCDecoder** ppDecoder);
 void WelsDestroyDecoder (ISVCDecoder* pDecoder);
 
 /** @brief   Get codec version
+ *           Note, this function isn't ABI compatible between MSVC and Mingw.
  *  @return  The linked codec version
 */
 OpenH264Version WelsGetCodecVersion (void);
+
+/** @brief   Get codec version
+ *  @param   pVersion  struct to fill in with the version
+*/
+void WelsGetCodecVersionEx (OpenH264Version *pVersion);
 
 #ifdef __cplusplus
 }
