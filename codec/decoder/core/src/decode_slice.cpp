@@ -90,12 +90,14 @@ int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx) {
       break;
     }
 
-    if (WelsTargetMbConstruction (pCtx)) {
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
-               "WelsTargetSliceConstruction():::MB(%d, %d) construction error. pCurSlice_type:%d",
-               pCurLayer->iMbX, pCurLayer->iMbY, pCurSlice->eSliceType);
+    if (!pCtx->bParseOnly) { //for parse only, actual recon MB unnecessary
+      if (WelsTargetMbConstruction (pCtx)) {
+        WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
+                 "WelsTargetSliceConstruction():::MB(%d, %d) construction error. pCurSlice_type:%d",
+                 pCurLayer->iMbX, pCurLayer->iMbY, pCurSlice->eSliceType);
 
-      return -1;
+        return -1;
+      }
     }
 
     ++iCountNumMb;
@@ -130,6 +132,9 @@ int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx) {
   pCtx->pDec->iHeightInPixel = iCurLayerHeight;
 
   if ((pCurSlice->eSliceType != I_SLICE) && (pCurSlice->eSliceType != P_SLICE))
+    return 0;
+
+  if (pCtx->bParseOnly) //for parse only, deblocking should not go on
     return 0;
 
   pDeblockMb = WelsDeblockingMb;
