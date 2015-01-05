@@ -134,7 +134,8 @@ int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx) {
 
   pDeblockMb = WelsDeblockingMb;
 
-  if (1 == pSliceHeader->uiDisableDeblockingFilterIdc) {
+  if (1 == pSliceHeader->uiDisableDeblockingFilterIdc
+      || pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer.iTotalMbInCurSlice <= 0) {
     return 0;//NO_SUPPORTED_FILTER_IDX
   } else {
     WelsDeblockingFilterSlice (pCtx, pDeblockMb);

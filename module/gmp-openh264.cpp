@@ -589,7 +589,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
     memset (&param, 0, sizeof (param));
     param.eOutputColorFormat = videoFormatI420;
     param.uiTargetDqLayer = UCHAR_MAX;  // Default value
-    param.eEcActiveIdc = ERROR_CON_SLICE_COPY; // Error concealment on.
+    param.eEcActiveIdc = ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE; // Error concealment on.
     param.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
 
     if (decoder_->Initialize (&param)) {

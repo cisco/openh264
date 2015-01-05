@@ -75,7 +75,8 @@ int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize) {
   (*ppAu)->uiCountUnitsNum	= kuiSize;
   (*ppAu)->uiAvailUnitsNum	= 0;
   (*ppAu)->uiActualUnitsNum	= 0;
-  (*ppAu)->uiEndPos		    = 0;
+  (*ppAu)->uiStartPos           = 0;
+  (*ppAu)->uiEndPos		= 0;
   (*ppAu)->bCompletedAuFlag	= false;
 
   return 0;
