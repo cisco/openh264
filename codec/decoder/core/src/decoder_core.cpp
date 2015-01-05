@@ -45,6 +45,8 @@
 
 namespace WelsDec {
 static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
+  if (pDstInfo == NULL) //parse only usage
+    return -1;
   PDqLayer pCurDq = pCtx->pCurDqLayer;
   PPicture pPic = pCtx->pDec;
 
@@ -1760,7 +1762,7 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
   iErr = DecodeCurrentAccessUnit (pCtx, ppDst, pDstInfo);
 
   if (pCtx->bParseOnly) {
-    if (dsErrorFree == pCtx->iErrorCode) {
+    if ((dsErrorFree == pCtx->iErrorCode) && (pCtx->iTotalNumMbRec == pCtx->pSps->iMbHeight * pCtx->pSps->iMbWidth)) {
       SParserBsInfo* pParser = pCtx->pParserBsInfo;
       uint8_t* pDstBuf = pParser->pDstBuff;
       SNalUnit* pCurNal = NULL;
@@ -1804,6 +1806,10 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
       pCtx->pParserBsInfo->iNalNum = 0;
       pCtx->pParserBsInfo->iSpsWidthInPixel = 0;
       pCtx->pParserBsInfo->iSpsHeightInPixel = 0;
+      if (dsErrorFree == pCtx->iErrorCode) { //frame not complete
+        pCtx->iTotalNumMbRec = 0;
+        pCtx->iErrorCode |= dsFramePending;
+      }
     }
   }
 
@@ -2082,12 +2088,10 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
           }
         }
 
-        if (!pCtx->bParseOnly) {
-          if (bReconstructSlice) {
-            if (WelsDecodeConstructSlice (pCtx, pNalCur)) {
-              pCtx->pDec->bIsComplete = false; // reconstruction error, directly set the flag false
-              return -1;
-            }
+        if (bReconstructSlice) {
+          if (WelsDecodeConstructSlice (pCtx, pNalCur)) {
+            pCtx->pDec->bIsComplete = false; // reconstruction error, directly set the flag false
+            return -1;
           }
         }
         if (bAllRefComplete && pCtx->eSliceType != I_SLICE) {
@@ -2158,7 +2162,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
             return iRet;
           }
         }
-        ExpandReferencingPicture (pCtx->pDec->pData, pCtx->pDec->iWidthInPixel, pCtx->pDec->iHeightInPixel,
+        if (!pCtx->bParseOnly)
+          ExpandReferencingPicture (pCtx->pDec->pData, pCtx->pDec->iWidthInPixel, pCtx->pDec->iHeightInPixel,
                                   pCtx->pDec->iLinesize,
                                   pCtx->sExpandPicFunc.pfExpandLumaPicture, pCtx->sExpandPicFunc.pfExpandChromaPicture);
       }
