@@ -553,16 +553,12 @@ bs_mv_check_jump1:
 #endif
 
 WELS_ASM_AARCH64_FUNC_BEGIN WelsNonZeroCount_AArch64_neon
+    mov w1, #1
+    dup v3.8b, w1
     ld1 {v0.8b, v1.8b, v2.8b}, [x0]
-    ins v0.d[1], v1.d[0]
-    uzp1 v0.2d, v0.2d, v1.2d
-    cmeq v0.16b, v0.16b, #0
-    cmeq v2.8b, v2.8b, #0
-    mvn v0.16b, v0.16b
-    mvn v2.8b, v2.8b
-    abs v0.16b, v0.16b
-    abs v2.8b, v2.8b
-    ins v1.d[0], v0.d[1]
+    umin  v0.8b, v0.8b, v3.8b
+    umin  v1.8b, v1.8b, v3.8b
+    umin  v2.8b, v2.8b, v3.8b
     st1 {v0.8b, v1.8b, v2.8b}, [x0]
 WELS_ASM_AARCH64_FUNC_END
 

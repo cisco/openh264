@@ -180,6 +180,13 @@ void DeblockChromaEq4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int
   DeblockChromaEq4_c (pPixCb, pPixCr, 1, iStride, iAlpha, iBeta);
 }
 
+void WelsNonZeroCount_c (int8_t* pNonZeroCount) {
+  int32_t i;
+  for (i = 0; i < 24; i++) {
+    pNonZeroCount[i] = !!pNonZeroCount[i];
+  }
+}
+
 #ifdef X86_ASM
 extern "C" {
   void DeblockLumaLt4H_ssse3 (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTc) {
