@@ -212,7 +212,7 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
   }
 
   if ((pCfg->iRCMode != RC_OFF_MODE) && (pCfg->iRCMode != RC_QUALITY_MODE) && (pCfg->iRCMode != RC_BUFFERBASED_MODE)
-      && (pCfg->iRCMode != RC_BITRATE_MODE)&& (pCfg->iRCMode != RC_TIMESTAMP_MODE)) {
+      && (pCfg->iRCMode != RC_BITRATE_MODE) && (pCfg->iRCMode != RC_TIMESTAMP_MODE)) {
     WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidation(),Invalid iRCMode = %d", pCfg->iRCMode);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
@@ -541,7 +541,8 @@ void WelsEncoderApplyFrameRate (SWelsSvcCodingParam* pParam) {
         || (kfMaxFrameRate - pLayerParamInternal->fInputFrameRate) < -kfEpsn) {
       pLayerParamInternal->fInputFrameRate = kfMaxFrameRate;
       fTargetOutputFrameRate = kfMaxFrameRate * fRatio;
-      pLayerParamInternal->fOutputFrameRate = (fTargetOutputFrameRate >= 6) ? fTargetOutputFrameRate : (pLayerParamInternal->fInputFrameRate);
+      pLayerParamInternal->fOutputFrameRate = (fTargetOutputFrameRate >= 6) ? fTargetOutputFrameRate :
+                                              (pLayerParamInternal->fInputFrameRate);
       pLayerParam->fFrameRate = pLayerParamInternal->fOutputFrameRate;
       //TODO:{Sijia} from design, there is no sense to have temporal layer when under 6fps even with such setting?
     }
@@ -3824,7 +3825,9 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
                  || pOldParam->SUsedPicRect.iHeight != pNewParam->SUsedPicRect.iHeight) ||
                 (pOldParam->bEnableLongTermReference != pNewParam->bEnableLongTermReference) ||
                 (pOldParam->iLTRRefNum != pNewParam->iLTRRefNum) ||
-                (pOldParam->iMultipleThreadIdc != pNewParam->iMultipleThreadIdc);
+                (pOldParam->iMultipleThreadIdc != pNewParam->iMultipleThreadIdc) ||
+                (pOldParam->bEnableBackgroundDetection != pNewParam->bEnableBackgroundDetection) ||
+                (pOldParam->bEnableAdaptiveQuant != pNewParam->bEnableAdaptiveQuant);
   if (pNewParam->iMaxNumRefFrame > pOldParam->iMaxNumRefFrame) {
     bNeedReset = true;
   }
