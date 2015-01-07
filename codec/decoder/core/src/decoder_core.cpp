@@ -1801,6 +1801,7 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
         memcpy (pDstBuf, pNalBs, iNalLen);
         pDstBuf += iNalLen;
       }
+      pCtx->iTotalNumMbRec = 0;
     } else { //error
       pCtx->pParserBsInfo->uiOutBsTimeStamp = 0;
       pCtx->pParserBsInfo->iNalNum = 0;
