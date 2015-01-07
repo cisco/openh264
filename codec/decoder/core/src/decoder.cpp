@@ -717,6 +717,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
     iConsumedBytes = 0;
     pDstNal[iDstIdx] = pDstNal[iDstIdx + 1] = pDstNal[iDstIdx + 2] = pDstNal[iDstIdx + 3] =
                          0; // set 4 reserved bytes to zero
+    pRawData->pCurPos = pDstNal + iDstIdx + 4; //init, increase 4 reserved zero bytes, used to store the next NAL
     pNalPayload = ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
     if (pNalPayload) { //parse correct
       if (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1)) {
@@ -749,7 +750,6 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
       }
       return pCtx->iErrorCode;
     }
-    pRawData->pCurPos = pDstNal + iDstIdx + 4; //init, increase 4 reserved zero bytes, used to store the next NAL
   } else { /* no supplementary picture payload input, but stored a picture */
     PAccessUnit pCurAu	=
       pCtx->pAccessUnitList;	// current access unit, it will never point to NULL after decode's successful initialization
