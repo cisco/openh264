@@ -22,6 +22,7 @@ V=Yes
 PREFIX=/usr/local
 SHARED=-shared
 OBJ=o
+DESTDIR=
 SHAREDLIB_DIR=$(PREFIX)/lib
 PROJECT_NAME=openh264
 MODULE_NAME=gmpopenh264
@@ -227,27 +228,27 @@ $(PROJECT_NAME)-static.pc: $(PROJECT_NAME).pc.in
 	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(VERSION);' -e 's;@LIBS@;$(STATIC_LDFLAGS);' -e 's;@LIBS_PRIVATE@;;' < $(PROJECT_NAME).pc.in > $@
 
 install-headers:
-	mkdir -p $(PREFIX)/include/wels
-	install -m 644 codec/api/svc/codec*.h $(PREFIX)/include/wels
+	mkdir -p $(DESTDIR)/$(PREFIX)/include/wels
+	install -m 644 codec/api/svc/codec*.h $(DESTDIR)/$(PREFIX)/include/wels
 
 install-static-lib: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) install-headers
-	mkdir -p $(PREFIX)/lib
-	install -m 644 $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(PREFIX)/lib
+	mkdir -p $(DESTDIR)/$(PREFIX)/lib
+	install -m 644 $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(DESTDIR)/$(PREFIX)/lib
 
 install-static: install-static-lib $(PROJECT_NAME)-static.pc
 	mkdir -p $(PREFIX)/lib/pkgconfig
 	install -m 644 $(PROJECT_NAME)-static.pc $(PREFIX)/lib/pkgconfig/$(PROJECT_NAME).pc
 
 install-shared: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) install-headers $(PROJECT_NAME).pc
-	mkdir -p $(SHAREDLIB_DIR)
-	install -m 755 $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXVER) $(SHAREDLIB_DIR)
+	mkdir -p $(DESTDIR)/$(SHAREDLIB_DIR)
+	install -m 755 $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXVER) $(DESTDIR)/$(SHAREDLIB_DIR)
 	if [ "$(SHAREDLIBSUFFIXVER)" != "$(SHAREDLIBSUFFIX)" ]; then \
-		cp -a $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) $(SHAREDLIB_DIR); \
+		cp -a $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) $(DESTDIR)/$(SHAREDLIB_DIR); \
 	fi
-	mkdir -p $(PREFIX)/lib/pkgconfig
-	install -m 644 $(PROJECT_NAME).pc $(PREFIX)/lib/pkgconfig
+	mkdir -p $(DESTDIR)/$(PREFIX)/lib/pkgconfig
+	install -m 644 $(PROJECT_NAME).pc $(DESTDIR)/$(PREFIX)/lib/pkgconfig
 ifneq ($(EXTRA_LIBRARY),)
-	install -m 644 $(EXTRA_LIBRARY) $(PREFIX)/lib
+	install -m 644 $(EXTRA_LIBRARY) $(DESTDIR)/$(PREFIX)/lib
 endif
 
 install: install-static-lib install-shared
