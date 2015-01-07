@@ -236,8 +236,8 @@ install-static-lib: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) install-headers
 	install -m 644 $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(DESTDIR)/$(PREFIX)/lib
 
 install-static: install-static-lib $(PROJECT_NAME)-static.pc
-	mkdir -p $(PREFIX)/lib/pkgconfig
-	install -m 644 $(PROJECT_NAME)-static.pc $(PREFIX)/lib/pkgconfig/$(PROJECT_NAME).pc
+	mkdir -p $(DESTDIR)/$(PREFIX)/lib/pkgconfig
+	install -m 644 $(PROJECT_NAME)-static.pc $(DESTDIR)/$(PREFIX)/lib/pkgconfig/$(PROJECT_NAME).pc
 
 install-shared: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) install-headers $(PROJECT_NAME).pc
 	mkdir -p $(DESTDIR)/$(SHAREDLIB_DIR)
