@@ -22,12 +22,14 @@ V=Yes
 PREFIX=/usr/local
 SHARED=-shared
 OBJ=o
+DESTDIR=
 SHAREDLIB_DIR=$(PREFIX)/lib
 PROJECT_NAME=openh264
 MODULE_NAME=gmpopenh264
 GMP_API_BRANCH=Firefox36
 CCASFLAGS=$(CFLAGS)
-VERSION=1.2
+VERSION=1.3
+STATIC_LDFLAGS=-lstdc++
 
 ifeq (,$(wildcard $(SRC_PATH)gmp-api))
 HAVE_GMP_API=No
@@ -125,7 +127,7 @@ API_TEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) -I$(SRC_PATH)test -I$(SRC_PATH)t
 COMMON_UNITTEST_INCLUDES += $(CODEC_UNITTEST_INCLUDES) $(DECODER_INCLUDES) -I$(SRC_PATH)test -I$(SRC_PATH)test/common
 MODULE_INCLUDES += -I$(SRC_PATH)gmp-api
 
-.PHONY: test gtest-bootstrap clean $(PROJECT_NAME).pc
+.PHONY: test gtest-bootstrap clean $(PROJECT_NAME).pc $(PROJECT_NAME)-static.pc
 
 all: libraries binaries
 
@@ -220,29 +222,36 @@ $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX): $(LIBPREFIX)$(MODULE_NAME).$(SHAR
 endif
 
 $(PROJECT_NAME).pc: $(PROJECT_NAME).pc.in
-	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(VERSION);' < $(PROJECT_NAME).pc.in > $(PROJECT_NAME).pc
+	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(VERSION);' -e 's;@LIBS@;;' -e 's;@LIBS_PRIVATE@;$(STATIC_LDFLAGS);' < $(PROJECT_NAME).pc.in > $@
+
+$(PROJECT_NAME)-static.pc: $(PROJECT_NAME).pc.in
+	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(VERSION);' -e 's;@LIBS@;$(STATIC_LDFLAGS);' -e 's;@LIBS_PRIVATE@;;' < $(PROJECT_NAME).pc.in > $@
 
 install-headers:
-	mkdir -p $(PREFIX)/include/wels
-	install -m 644 codec/api/svc/codec*.h $(PREFIX)/include/wels
+	mkdir -p $(DESTDIR)/$(PREFIX)/include/wels
+	install -m 644 codec/api/svc/codec*.h $(DESTDIR)/$(PREFIX)/include/wels
 
-install-static: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) install-headers
-	mkdir -p $(PREFIX)/lib
-	install -m 644 $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(PREFIX)/lib
+install-static-lib: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) install-headers
+	mkdir -p $(DESTDIR)/$(PREFIX)/lib
+	install -m 644 $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(DESTDIR)/$(PREFIX)/lib
+
+install-static: install-static-lib $(PROJECT_NAME)-static.pc
+	mkdir -p $(DESTDIR)/$(PREFIX)/lib/pkgconfig
+	install -m 644 $(PROJECT_NAME)-static.pc $(DESTDIR)/$(PREFIX)/lib/pkgconfig/$(PROJECT_NAME).pc
 
 install-shared: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) install-headers $(PROJECT_NAME).pc
-	mkdir -p $(SHAREDLIB_DIR)
-	install -m 755 $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXVER) $(SHAREDLIB_DIR)
+	mkdir -p $(DESTDIR)/$(SHAREDLIB_DIR)
+	install -m 755 $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXVER) $(DESTDIR)/$(SHAREDLIB_DIR)
 	if [ "$(SHAREDLIBSUFFIXVER)" != "$(SHAREDLIBSUFFIX)" ]; then \
-		cp -a $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) $(SHAREDLIB_DIR); \
+		cp -a $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) $(DESTDIR)/$(SHAREDLIB_DIR); \
 	fi
-	mkdir -p $(PREFIX)/lib/pkgconfig
-	install -m 444 $(PROJECT_NAME).pc $(PREFIX)/lib/pkgconfig
+	mkdir -p $(DESTDIR)/$(PREFIX)/lib/pkgconfig
+	install -m 644 $(PROJECT_NAME).pc $(DESTDIR)/$(PREFIX)/lib/pkgconfig
 ifneq ($(EXTRA_LIBRARY),)
-	install -m 644 $(EXTRA_LIBRARY) $(PREFIX)/lib
+	install -m 644 $(EXTRA_LIBRARY) $(DESTDIR)/$(PREFIX)/lib
 endif
 
-install: install-static install-shared
+install: install-static-lib install-shared
 	@:
 
 ifeq ($(HAVE_GTEST),Yes)
