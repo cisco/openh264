@@ -138,6 +138,7 @@ void EncoderInterfaceTest::InitializeParamExt() {
   pParamExt->iTargetBitrate = 50000;
   pParamExt->iTemporalLayerNum = 3;
   pParamExt->iSpatialLayerNum = 1;
+  pParamExt->iNumRefFrame = AUTO_REF_PIC_COUNT;
   pParamExt->sSpatialLayers[0].iVideoHeight = pParamExt->iPicHeight;
   pParamExt->sSpatialLayers[0].iVideoWidth = pParamExt->iPicWidth;
   pParamExt->sSpatialLayers[0].iSpatialBitrate = 50000;
@@ -278,6 +279,7 @@ TEST_F (EncoderInterfaceTest, TemporalLayerSettingTest) {
   pParamExt->sSpatialLayers[0].iSpatialBitrate = 50000;
   pParamExt->iTemporalLayerNum = 1;
   pParamExt->iSpatialLayerNum = 1;
+  pParamExt->iNumRefFrame = AUTO_REF_PIC_COUNT;
 
   for (int i = 0; i < 2; i++) {
     pParamExt->iUsageType = ((i == 0) ? SCREEN_CONTENT_REAL_TIME : CAMERA_VIDEO_REAL_TIME);

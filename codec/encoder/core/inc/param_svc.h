@@ -135,7 +135,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     param.fMaxFrameRate		= MAX_FRAME_RATE;	// maximal frame rate [Hz / fps]
 
     param.iComplexityMode = MEDIUM_COMPLEXITY;
-    param.iTargetBitrate			= 0;	// overall target bitrate introduced in RC module
+    param.iTargetBitrate			= UNSPECIFIED_BIT_RATE;	// overall target bitrate introduced in RC module
     param.iMaxBitrate         = UNSPECIFIED_BIT_RATE;
     param.iMultipleThreadIdc		= 1;
 
@@ -189,7 +189,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
   void FillDefault() {
     FillDefault (*this);
     uiGopSize			= 1;			// GOP size (at maximal frame rate: 16)
-    iMaxNumRefFrame = 1;
+    iMaxNumRefFrame = AUTO_REF_PIC_COUNT;
     SUsedPicRect.iLeft	=
       SUsedPicRect.iTop	=
         SUsedPicRect.iWidth	=
@@ -335,26 +335,15 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     else if (uiIntraPeriod & (uiGopSize - 1))	// none multiple of GOP size
       uiIntraPeriod = ((uiIntraPeriod + uiGopSize - 1) / uiGopSize) * uiGopSize;
 
-    if (iUsageType == SCREEN_CONTENT_REAL_TIME) {
-      if (bEnableLongTermReference) {
-        iLTRRefNum = LONG_TERM_REF_NUM_SCREEN;
-        if (iNumRefFrame == AUTO_REF_PIC_COUNT)
-          iNumRefFrame = WELS_MAX (1, WELS_LOG2 (uiGopSize)) + iLTRRefNum;
-      } else {
-        iLTRRefNum = 0;
-
-        if (iNumRefFrame == AUTO_REF_PIC_COUNT)
-          iNumRefFrame = WELS_MAX (1, uiGopSize >> 1);
-      }
-    } else {
-      iLTRRefNum = bEnableLongTermReference ? LONG_TERM_REF_NUM : 0;
-      if (iNumRefFrame == AUTO_REF_PIC_COUNT) {
-        iNumRefFrame		= ((uiGopSize >> 1) > 1) ? ((uiGopSize >> 1) + iLTRRefNum) : (MIN_REF_PIC_COUNT + iLTRRefNum);
-        iNumRefFrame		= WELS_CLIP3 (iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA);
-      }
+    if (((pCodingParam.iNumRefFrame != AUTO_REF_PIC_COUNT)
+         && ((pCodingParam.iNumRefFrame > MAX_REF_PIC_COUNT) || (pCodingParam.iNumRefFrame < MIN_REF_PIC_COUNT)))
+        || ((iNumRefFrame != AUTO_REF_PIC_COUNT) && (pCodingParam.iNumRefFrame == AUTO_REF_PIC_COUNT))) {
+      iNumRefFrame  = pCodingParam.iNumRefFrame;
     }
-    if (iNumRefFrame > iMaxNumRefFrame)
+    if ((iNumRefFrame != AUTO_REF_PIC_COUNT) && (iNumRefFrame > iMaxNumRefFrame)) {
       iMaxNumRefFrame = iNumRefFrame;
+    }
+    iLTRRefNum  = (pCodingParam.bEnableLongTermReference ? pCodingParam.iLTRRefNum : 0);
     iLtrMarkPeriod  = pCodingParam.iLtrMarkPeriod;
 
     bPrefixNalAddingCtrl	= pCodingParam.bPrefixNalAddingCtrl;
