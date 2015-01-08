@@ -1762,7 +1762,8 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
   iErr = DecodeCurrentAccessUnit (pCtx, ppDst, pDstInfo);
 
   if (pCtx->bParseOnly) {
-    if ((dsErrorFree == pCtx->iErrorCode) && ((uint32_t) pCtx->iTotalNumMbRec == pCtx->pSps->iMbHeight * pCtx->pSps->iMbWidth)) {
+    if ((dsErrorFree == pCtx->iErrorCode)
+        && ((uint32_t) pCtx->iTotalNumMbRec == pCtx->pSps->iMbHeight * pCtx->pSps->iMbWidth)) {
       SParserBsInfo* pParser = pCtx->pParserBsInfo;
       uint8_t* pDstBuf = pParser->pDstBuff;
       SNalUnit* pCurNal = NULL;
@@ -2128,6 +2129,10 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
     pCtx->pDec->bIsComplete = bAllRefComplete;
     if (!pCtx->pDec->bIsComplete) {  // Ref pictures ECed, result in ECed
       pCtx->iErrorCode |= dsDataErrorConcealed;
+    } else if (pCtx->bParseOnly) {
+      pCtx->pDec->bIsComplete = (pCtx->iTotalNumMbRec == pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight);
+      if (!pCtx->pDec->bIsComplete)
+        return -1;
     }
 
     // A dq layer decoded here
@@ -2165,8 +2170,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         }
         if (!pCtx->bParseOnly)
           ExpandReferencingPicture (pCtx->pDec->pData, pCtx->pDec->iWidthInPixel, pCtx->pDec->iHeightInPixel,
-                                  pCtx->pDec->iLinesize,
-                                  pCtx->sExpandPicFunc.pfExpandLumaPicture, pCtx->sExpandPicFunc.pfExpandChromaPicture);
+                                    pCtx->pDec->iLinesize,
+                                    pCtx->sExpandPicFunc.pfExpandLumaPicture, pCtx->sExpandPicFunc.pfExpandChromaPicture);
       }
       pCtx->pDec = NULL; //after frame decoding, always set to NULL
     }
