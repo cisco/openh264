@@ -108,6 +108,8 @@ static int32_t WelsCheckNumRefSetting (SLogContext* pLogCtx, SWelsSvcCodingParam
                                 MIN_REF_PIC_COUNT,
                                 (pParam->iUsageType == CAMERA_VIDEO_REAL_TIME) ? MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA :
                                 MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN);
+
+  // to adjust default or invalid input, in case pParam->iNumRefFrame do not have a valid value for the next step
   if (pParam->iNumRefFrame == AUTO_REF_PIC_COUNT) {
     pParam->iNumRefFrame = iNeededRefNum;
   } else if (pParam->iNumRefFrame < iNeededRefNum) {
@@ -120,6 +122,7 @@ static int32_t WelsCheckNumRefSetting (SLogContext* pLogCtx, SWelsSvcCodingParam
     pParam->iNumRefFrame = iNeededRefNum;
   }
 
+  // after adjustment, do the following:
   // if the setting is larger than needed, we will use the needed, and write the max into sps and for memory to wait for further expanding
   if (pParam->iMaxNumRefFrame < pParam->iNumRefFrame) {
     pParam->iMaxNumRefFrame = pParam->iNumRefFrame;
