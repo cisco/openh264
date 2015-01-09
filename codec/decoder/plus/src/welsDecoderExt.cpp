@@ -568,6 +568,7 @@ DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
     m_pDecContext->uiTimeStamp = 0;
   }
   WelsDecodeBs (m_pDecContext, kpSrc, kiSrcLen, NULL, NULL, pDstInfo);
+  m_pDecContext->bInstantDecFlag = false; //reset no-delay flag
 
   return (DECODING_STATE) m_pDecContext->iErrorCode;
 }
