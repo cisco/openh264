@@ -269,11 +269,11 @@ int32_t CWelsPreProcess::UpdateSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCodin
       InitLastSpatialPictures (pCtx);
       return 1;
     }
-    if (pParam->bEnableLongTermReference && pCtx->bLongTermRefFlag[kiDidx][iCurTid]) {
+    if (pCtx->bRefOfCurTidIsLtr[kiDidx][iCurTid]) {
       const int32_t kiAvailableLtrPos = m_uiSpatialLayersInTemporal[kiDidx] + pCtx->pVaa->uiMarkLongTermPicIdx;
       WelsExchangeSpatialPictures (&m_pSpatialPic[kiDidx][kiAvailableLtrPos],
                                    &m_pSpatialPic[kiDidx][iCurTid]);
-      pCtx->bLongTermRefFlag[kiDidx][iCurTid] = false;
+      pCtx->bRefOfCurTidIsLtr[kiDidx][iCurTid] = false;
     }
     WelsExchangeSpatialPictures (&m_pSpatialPic[kiDidx][kiCurPos],
                                    &m_pSpatialPic[kiDidx][iCurTid]);

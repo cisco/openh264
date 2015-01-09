@@ -3727,11 +3727,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       WelsSwapDqLayers (pCtx);
     }
 
-    if (pSvcParam->bEnableLongTermReference && (pCtx->pLtr[pCtx->uiDependencyId].bLTRMarkingFlag
-        && (pCtx->pLtr[pCtx->uiDependencyId].iLTRMarkMode == LTR_DELAY_MARK))) {
-      pCtx->bLongTermRefFlag[iDidIdx][0] = true;
-    }
-
     if (pCtx->pVpp->UpdateSpatialPictures (pCtx, pSvcParam, iCurTid, iDidIdx) != 0) {
       ForceCodingIDR (pCtx);
       WelsLog (pLogCtx, WELS_LOG_WARNING, "WelsEncoderEncodeExt(), Logic Error Found in temporal level. ForceCodingIDR!");
@@ -3742,7 +3737,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
     if (pSvcParam->bEnableLongTermReference && ((pCtx->pLtr[pCtx->uiDependencyId].bLTRMarkingFlag
         && (pCtx->pLtr[pCtx->uiDependencyId].iLTRMarkMode == LTR_DIRECT_MARK)) || eFrameType == videoFrameTypeIDR)) {
-      pCtx->bLongTermRefFlag[iDidIdx][iCurTid] = true;
+      pCtx->bRefOfCurTidIsLtr[iDidIdx][iCurTid] = true;
     }
   }
 
