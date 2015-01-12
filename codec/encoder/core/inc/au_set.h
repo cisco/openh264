@@ -141,7 +141,8 @@ int32_t WelsInitPps (SWelsPPS* pPps,
                      const bool kbDeblockingFilterPresentFlag,
                      const bool kbUsingSubsetSps,
                      const bool kbEntropyCodingModeFlag);
-int32_t WelsCheckRefFrameLimitation (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam);
+int32_t WelsCheckRefFrameLimitationNumRefFirst (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam);
+int32_t WelsCheckRefFrameLimitationLevelIdcFirst (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam);
 int32_t WelsAdjustLevel( SSpatialLayerConfig* pSpatialLayer);
 }
 #endif//WELS_ACCESS_UNIT_PARSER_H__
