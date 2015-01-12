@@ -45,8 +45,6 @@
 
 namespace WelsDec {
 static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
-  if (pDstInfo == NULL) //parse only usage
-    return -1;
   PDqLayer pCurDq = pCtx->pCurDqLayer;
   PPicture pPic = pCtx->pDec;
 
@@ -88,6 +86,15 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   }
 
   pCtx->iTotalNumMbRec = 0;
+
+  if (pCtx->bParseOnly) { //should exit for parse only to prevent access NULL pDstInfo
+    if (bFrameCompleteFlag)
+      return 0;
+    else { //incomplete frame
+      pCtx->pDec->bIsComplete = false;
+      return -1;
+    }
+  }
 
   //////output:::normal path
   pDstInfo->uiOutYuvTimeStamp = pPic->uiTimeStamp;
@@ -1741,6 +1748,10 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
     ForceResetCurrentAccessUnit (pCtx->pAccessUnitList);
     if (!pCtx->bParseOnly)
       pDstInfo->iBufferStatus = 0;
+    pCtx->bNewSeqBegin = pCtx->bNewSeqBegin || pCtx->bNextNewSeqBegin;
+    pCtx->bNextNewSeqBegin = false; // reset it
+    if (pCtx->bNewSeqBegin)
+      ResetActiveSPSForEachLayer (pCtx);
     return iErr;
   }
 
@@ -1758,12 +1769,10 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
     }
   }
 
-
   iErr = DecodeCurrentAccessUnit (pCtx, ppDst, pDstInfo);
 
   if (pCtx->bParseOnly) {
-    if ((dsErrorFree == pCtx->iErrorCode)
-        && ((uint32_t) pCtx->iTotalNumMbRec == pCtx->pSps->iMbHeight * pCtx->pSps->iMbWidth)) {
+    if ((dsErrorFree == pCtx->iErrorCode) && (iErr == 0)) { //frame complete, output
       SParserBsInfo* pParser = pCtx->pParserBsInfo;
       uint8_t* pDstBuf = pParser->pDstBuff;
       SNalUnit* pCurNal = NULL;
@@ -1802,14 +1811,12 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
         memcpy (pDstBuf, pNalBs, iNalLen);
         pDstBuf += iNalLen;
       }
-      pCtx->iTotalNumMbRec = 0;
     } else { //error
       pCtx->pParserBsInfo->uiOutBsTimeStamp = 0;
       pCtx->pParserBsInfo->iNalNum = 0;
       pCtx->pParserBsInfo->iSpsWidthInPixel = 0;
       pCtx->pParserBsInfo->iSpsHeightInPixel = 0;
       if (dsErrorFree == pCtx->iErrorCode) { //frame not complete
-        pCtx->iTotalNumMbRec = 0;
         pCtx->iErrorCode |= dsFramePending;
       }
     }
@@ -2129,10 +2136,6 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
     pCtx->pDec->bIsComplete = bAllRefComplete;
     if (!pCtx->pDec->bIsComplete) {  // Ref pictures ECed, result in ECed
       pCtx->iErrorCode |= dsDataErrorConcealed;
-    } else if (pCtx->bParseOnly) {
-      pCtx->pDec->bIsComplete = (pCtx->iTotalNumMbRec == pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight);
-      if (!pCtx->pDec->bIsComplete)
-        return -1;
     }
 
     // A dq layer decoded here
@@ -2144,8 +2147,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
 #endif//#if !CODEC_FOR_TESTBED
 
     if (dq_cur->uiLayerDqId == kuiTargetLayerDqId) {
-      if (!pCtx->bParseOnly) {
-        if (!pCtx->bInstantDecFlag) {
+      if (!pCtx->bInstantDecFlag) {
+        if (!pCtx->bParseOnly) {
           //Do error concealment here
           if ((NeedErrorCon (pCtx)) && (pCtx->eErrorConMethod != ERROR_CON_DISABLE)) {
             ImplementErrorCon (pCtx);
@@ -2154,11 +2157,12 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
             pCtx->pDec->iPpsId = pCtx->pPps->iPpsId;
           }
         }
-
-        if (DecodeFrameConstruction (pCtx, ppDst, pDstInfo)) {
-          return ERR_NONE;
-        }
       }
+
+      iRet = DecodeFrameConstruction (pCtx, ppDst, pDstInfo);
+      if (iRet)
+        return iRet;
+
       pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //store latest decoded picture for EC
       if (uiNalRefIdc > 0) {
         iRet = WelsMarkAsRef (pCtx);
