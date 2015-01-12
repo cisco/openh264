@@ -64,8 +64,7 @@
  */
 ///
 /// E.g. SDK version is 1.2.0.0, major version number is 1, minor version number is 2, and revision number is 0.
-typedef struct  _tagVersion
-{
+typedef struct  _tagVersion {
   unsigned int uMajor;				///< The major version number
   unsigned int uMinor;				///< The minor version number
   unsigned int uRevision;				///< The revision number
@@ -423,7 +422,8 @@ typedef struct TagEncParamExt {
   int               iNumRefFrame;      ///< number of reference frame used
   bool    bEnableSpsPpsIdAddition;     ///< false:not adjust ID in SPS/PPS; true: adjust ID in SPS/PPS
   bool    bPrefixNalAddingCtrl;        ///< false:not use Prefix NAL; true: use Prefix NAL
-  bool    bEnableSSEI;                 ///< false:not use SSEI; true: use SSEI
+  bool    bEnableSSEI;                 ///< false:not use SSEI; true: use SSEI -- TODO: planning to remove the interface of SSEI
+  bool    bSimulcastAVC;               ///< (when encoding more than 1 spatial layer) false: use SVC syntax for higher layers; true: use Simulcast AVC -- coming soon
   int     iPaddingFlag;                ///< 0:disable padding;1:padding
   int     iEntropyCodingModeFlag;      ///< 0:CAVLC  1:CABAC.
 
@@ -640,7 +640,8 @@ typedef struct TagVideoDecoderStatistics {
   unsigned int uiEcIDRNum;                     ///< number of actual unintegrity IDR or not received but eced
   unsigned int uiEcFrameNum;                   ///<
   unsigned int uiIDRLostNum;                   ///< number of whole lost IDR
-  unsigned int uiFreezingIDRNum;               ///< number of freezing IDR with error (partly received), under resolution change
+  unsigned int
+  uiFreezingIDRNum;               ///< number of freezing IDR with error (partly received), under resolution change
   unsigned int uiFreezingNonIDRNum;            ///< number of freezing non-IDR with error
   int iAvgLumaQp;                              ///< average luma QP. default: -1, no correct frame outputted
 
