@@ -259,6 +259,13 @@ WELS_EXTERN WelsDecoderI16x16LumaPredPlane_sse2
     pmullw  xmm7,   xmm6
     psubw   xmm7,   xmm0
 
+    ; Indicate that xmm2 is fully initialized. Its actual value doesn't
+    ; matter in SUMW_HORIZON below, but after being used in LOAD_COLUMN above,
+    ; valgrind thinks that xmm2 contains uninitalized data (if the columns outside
+    ; of the left are uninitialized, such as in DecUT_IntraPrediction), which taints
+    ; r2d below, even if actually isn't based on the uninitialized data.
+    pxor xmm2, xmm2
+
     SUMW_HORIZON   xmm7,xmm0,xmm2
     movd    r2d,   xmm7         ; V
     movsx   r2, r2w
