@@ -231,7 +231,7 @@ void EncodeDecodeTestAPI::RandomParamExtCombination() {
   param_.iSpatialLayerNum   = rand() % SPATIAL_LAYER_NUM_RANGE;
 
   param_.uiIntraPeriod      = rand() - 1;
-  param_.iNumRefFrame       = rand();
+  param_.iNumRefFrame       = AUTO_REF_PIC_COUNT;
   param_.iMultipleThreadIdc = rand();
 
   param_.bEnableSpsPpsIdAddition   = (rand() % 2 == 0) ? false : true;
