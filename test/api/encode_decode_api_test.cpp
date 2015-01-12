@@ -97,6 +97,7 @@ class EncodeDecodeTestBase : public ::testing::TestWithParam<EncodeDecodeFilePar
     param_.iRCMode = RC_OFF_MODE; //rc off
     param_.iMultipleThreadIdc = 1; //single thread
     param_.iSpatialLayerNum = iLayers;
+    param_.iNumRefFrame = AUTO_REF_PIC_COUNT;
     for (int i = 0; i < iLayers; i++) {
       param_.sSpatialLayers[i].iVideoWidth = width >> (iLayers - i - 1);
       param_.sSpatialLayers[i].iVideoHeight = height >> (iLayers - i - 1);
@@ -230,7 +231,7 @@ void EncodeDecodeTestAPI::RandomParamExtCombination() {
   param_.iSpatialLayerNum   = rand() % SPATIAL_LAYER_NUM_RANGE;
 
   param_.uiIntraPeriod      = rand() - 1;
-  param_.iNumRefFrame       = rand();
+  param_.iNumRefFrame       = AUTO_REF_PIC_COUNT;
   param_.iMultipleThreadIdc = rand();
 
   param_.bEnableSpsPpsIdAddition   = (rand() % 2 == 0) ? false : true;
