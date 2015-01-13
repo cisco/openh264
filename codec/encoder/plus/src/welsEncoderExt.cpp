@@ -317,8 +317,7 @@ int CWelsH264SVCEncoder::InitializeInternal (SWelsSvcCodingParam* pCfg) {
       pCfg->iNumRefFrame		= WELS_CLIP3 (pCfg->iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA);
     }
   }
-  if (pCfg->iNumRefFrame > pCfg->iMaxNumRefFrame)
-    pCfg->iMaxNumRefFrame = pCfg->iNumRefFrame;
+
   if (pCfg->iLtrMarkPeriod == 0) {
     pCfg->iLtrMarkPeriod = 30;
   }
