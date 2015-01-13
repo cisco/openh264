@@ -548,6 +548,16 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
   FrameStats stats_;
 };
 
+uint16_t readU16BE(const uint8_t* in) {
+  return in[0] << 8 | in[1];
+}
+
+void copyWithStartCode(std::vector<uint8_t>& out, const uint8_t* in, size_t size) {
+  static const uint8_t code[] = { 0x00, 0x00, 0x00, 0x01 };
+  out.insert(out.end(), code, code + sizeof(code));
+  out.insert(out.end(), in, in + size);
+}
+
 class OpenH264VideoDecoder : public GMPVideoDecoder {
  public:
   OpenH264VideoDecoder (GMPVideoHost* hostAPI) :
@@ -599,6 +609,43 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
       GMPLOG (GL_ERROR, "Couldn't initialize decoder");
       Error (GMPGenericErr);
       return;
+    }
+
+    if (aCodecSpecific && aCodecSpecificSize >= sizeof(GMPVideoCodecH264)) {
+      std::vector<uint8_t> annexb;
+
+      // Convert the AVCC data, starting at the byte containing
+      // numOfSequenceParameterSets, to Annex B format.
+      const uint8_t* avcc = aCodecSpecific + offsetof(GMPVideoCodecH264, mAVCC.mNumSPS);
+
+      static const int kSPSMask = (1 << 5) - 1;
+      uint8_t spsCount = *avcc++ & kSPSMask;
+      for (int i = 0; i < spsCount; ++i) {
+        size_t size = readU16BE(avcc);
+        avcc += 2;
+        copyWithStartCode(annexb, avcc, size);
+        avcc += size;
+      }
+
+      uint8_t ppsCount = *avcc++;
+      for (int i = 0; i < ppsCount; ++i) {
+        size_t size = readU16BE(avcc);
+        avcc += 2;
+        copyWithStartCode(annexb, avcc, size);
+        avcc += size;
+      }
+
+      SBufferInfo decoded;
+      memset (&decoded, 0, sizeof (decoded));
+      unsigned char* data[3] = {nullptr, nullptr, nullptr};
+      DECODING_STATE dState = decoder_->DecodeFrame2 (&*annexb.begin(),
+                                                      annexb.size(),
+                                                      data,
+                                                      &decoded);
+      if (dState) {
+        GMPLOG (GL_ERROR, "Decoding error dState=" << dState);
+      }
+      GMPLOG (GL_ERROR, "InitDecode iBufferStatus=" << decoded.iBufferStatus);
     }
   }
 
