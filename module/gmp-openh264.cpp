@@ -653,9 +653,15 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
   }
 
   virtual void Reset() {
+    if (callback_) {
+      callback_->ResetComplete ();
+    }
   }
 
   virtual void Drain() {
+    if (callback_) {
+      callback_->DrainComplete ();
+    }
   }
 
   virtual void DecodingComplete() {
@@ -713,11 +719,14 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
 
     // If we don't actually have data, just abort.
     if (!valid) {
+      GMPLOG (GL_ERROR, "No valid data decoded");
       Error (GMPDecodeErr);
       return;
     }
 
     if (decoded->iBufferStatus != 1) {
+      GMPLOG (GL_ERROR, "iBufferStatus=" << decoded->iBufferStatus);
+      callback_->InputDataExhausted();
       return;
     }
 
