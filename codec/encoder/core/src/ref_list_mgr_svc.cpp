@@ -289,8 +289,10 @@ static inline void LTRMarkProcess (sWelsEncCtx* pCtx) {
     }
   }
 
-  if ((pLtr->iLTRMarkMode == LTR_DELAY_MARK && pLtr->bLTRMarkingFlag) || ((pLtr->iLTRMarkMode == LTR_DIRECT_MARK)
-      && (bMoveLtrFromShortToLong))) {
+  if ((pLtr->iLTRMarkMode == LTR_DELAY_MARK && pLtr->bLTRMarkingFlag)
+      || ((pLtr->iLTRMarkMode == LTR_DIRECT_MARK) && (bMoveLtrFromShortToLong))) {
+    pCtx->bRefOfCurTidIsLtr[pCtx->uiDependencyId][pCtx->uiTemporalId] = true;
+
     if (pRefList->uiLongRefCount > 0) {
       memmove (&pRefList->pLongRefList[1], &pRefList->pLongRefList[0],
                pRefList->uiLongRefCount * sizeof (SPicture*));	// confirmed_safe_unsafe_usage
@@ -595,6 +597,9 @@ bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRe
   } else {	// safe for IDR
     WelsResetRefList (pCtx);  //for IDR, SHOULD reset pRef list.
     ResetLtrState (&pCtx->pLtr[pCtx->uiDependencyId]); //SHOULD update it when IDR.
+    for (int32_t k = 0; k < MAX_TEMPORAL_LEVEL; k++) {
+      pCtx->bRefOfCurTidIsLtr[pCtx->uiDependencyId][k] = false;
+    }
     pCtx->pRefList0[0]	= NULL;
   }
 

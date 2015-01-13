@@ -201,7 +201,7 @@ typedef struct TagWelsEncCtx {
 
   SSpatialPicIndex			sSpatialIndexMap[MAX_DEPENDENCY_LAYER];
 
-  bool						bLongTermRefFlag[MAX_DEPENDENCY_LAYER][MAX_TEMPORAL_LEVEL + 1/*+LONG_TERM_REF_NUM*/];
+  bool						bRefOfCurTidIsLtr[MAX_DEPENDENCY_LAYER][MAX_TEMPORAL_LEVEL];
   uint16_t        uiIdrPicId;		// IDR picture id: [0, 65535], this one is used for LTR
 
   int16_t						iMaxSliceCount;// maximal count number of slices for all layers observation

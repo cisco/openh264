@@ -145,6 +145,7 @@ class CWelsPreProcess {
   int32_t WelsPreprocessCreate();
   int32_t WelsPreprocessDestroy();
   int32_t InitLastSpatialPictures (sWelsEncCtx* pEncCtx);
+  int32_t GetCurPicPosition(const int32_t kiDidx);
 
  private:
   int32_t SingleLayerPreprocess (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrc, Scaled_Picture* m_sScaledPicture);
