@@ -75,7 +75,7 @@ int32_t AssignMbMapMultipleSlices (SSliceCtx* pSliceSeg, const SSliceConfig* kpM
     int32_t iSliceNum = pSliceSeg->iSliceNumInFrame, uiSliceIdx = 0;
 
     while (uiSliceIdx < iSliceNum) {
-      const int16_t kiFirstMb = uiSliceIdx * kiMbWidth;
+      const int32_t kiFirstMb = uiSliceIdx * kiMbWidth;
       pSliceSeg->pCountMbNumInSlice[uiSliceIdx]	= kiMbWidth;
       pSliceSeg->pFirstMbInSlice[uiSliceIdx]		= kiFirstMb;
       WelsSetMemMultiplebytes_c(pSliceSeg->pOverallMbMap + kiFirstMb, uiSliceIdx,
@@ -91,7 +91,7 @@ int32_t AssignMbMapMultipleSlices (SSliceCtx* pSliceSeg, const SSliceConfig* kpM
     const int32_t kiCountNumMbInFrame		= pSliceSeg->iMbNumInFrame;
     const int32_t kiCountSliceNumInFrame	= pSliceSeg->iSliceNumInFrame;
     uint16_t iSliceIdx						= 0;
-    int16_t iMbIdx							= 0;
+    int32_t iMbIdx							= 0;
 
     do {
       const int32_t kiCurRunLength	= kpSlicesAssignList[iSliceIdx];
@@ -398,7 +398,7 @@ int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pOverallMbMap)
     pSliceSeg->iSliceNumInFrame	= 1;
 
-    pSliceSeg->pFirstMbInSlice	= (int16_t*)pMa->WelsMalloc (pSliceSeg->iSliceNumInFrame * sizeof (int16_t),
+    pSliceSeg->pFirstMbInSlice	= (int32_t*)pMa->WelsMalloc (pSliceSeg->iSliceNumInFrame * sizeof (int32_t),
                                   "pSliceSeg->pFirstMbInSlice");
 
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pFirstMbInSlice)
@@ -437,7 +437,7 @@ int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
 
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pCountMbNumInSlice)
 
-    pSliceSeg->pFirstMbInSlice		= (int16_t*)pMa->WelsMalloc (pSliceSeg->iSliceNumInFrame * sizeof (int16_t),
+    pSliceSeg->pFirstMbInSlice		= (int32_t*)pMa->WelsMalloc (pSliceSeg->iSliceNumInFrame * sizeof (int32_t),
                                     "pSliceSeg->pFirstMbInSlice");
 
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pFirstMbInSlice)
@@ -552,7 +552,7 @@ void UninitSlicePEncCtx (SSliceCtx* pSliceCtx, CMemoryAlign* pMa) {
  *
  * \return	uiSliceIdc - successful; -1 - failed;
  */
-uint16_t WelsMbToSliceIdc (SSliceCtx* pSliceCtx, const int16_t kiMbXY) {
+uint16_t WelsMbToSliceIdc (SSliceCtx* pSliceCtx, const int32_t kiMbXY) {
   if (NULL != pSliceCtx && kiMbXY < pSliceCtx->iMbNumInFrame && kiMbXY >= 0)
     return pSliceCtx->pOverallMbMap[ kiMbXY ];
   return (uint16_t) (-1);
@@ -578,7 +578,7 @@ int32_t WelsGetFirstMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kuiSliceIdc) 
  *
  * \return	next_mb - successful; -1 - failed;
  */
-int32_t WelsGetNextMbOfSlice (SSliceCtx* pSliceCtx, const int16_t kiMbXY) {
+int32_t WelsGetNextMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY) {
   if (NULL != pSliceCtx) {
     SSliceCtx* pSliceSeg = pSliceCtx;
     if (NULL == pSliceSeg || kiMbXY < 0 || kiMbXY >= pSliceSeg->iMbNumInFrame)
@@ -612,7 +612,7 @@ int32_t WelsGetNextMbOfSlice (SSliceCtx* pSliceCtx, const int16_t kiMbXY) {
  *
  * \return	prev_mb - successful; -1 - failed;
  */
-int32_t WelsGetPrevMbOfSlice (SSliceCtx* pSliceCtx, const int16_t kiMbXY) {
+int32_t WelsGetPrevMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY) {
   if (NULL != pSliceCtx) {
     SSliceCtx* pSliceSeg = pSliceCtx;
     if (NULL == pSliceSeg || kiMbXY < 0 || kiMbXY >= pSliceSeg->iMbNumInFrame)
