@@ -13,7 +13,6 @@ CCAS = gas-preprocessor.pl -as-type armasm -force-thumb -- armasm
 CCASFLAGS = -nologo -DHAVE_NEON
 endif
 
-PROJECT_NAME=openh264
 CC=cl
 CXX=cl
 AR=lib
@@ -41,5 +40,5 @@ SHAREDLIBSUFFIX=dll
 SHAREDLIBSUFFIXVER=$(SHAREDLIBSUFFIX)
 SHARED=-LD
 EXTRA_LIBRARY=$(PROJECT_NAME)_dll.lib
-SHLDFLAGS=-link -Fd$(PROJECT_NAME).pdb -def:$(PROJECT_NAME).def -implib:$(EXTRA_LIBRARY)
+SHLDFLAGS=-link -Fd$(PROJECT_NAME).pdb -def:open264.def -implib:$(EXTRA_LIBRARY)
 STATIC_LDFLAGS=
