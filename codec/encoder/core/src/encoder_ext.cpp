@@ -4021,7 +4021,7 @@ int32_t WelsEncoderApplyLTR (SLogContext* pLogCtx, sWelsEncCtx** ppCtx, SLTRConf
   }
   if (iNumRefFrame > sConfig.iMaxNumRefFrame) {
     WelsLog (pLogCtx, WELS_LOG_WARNING,
-             " CWelsH264SVCEncoder::SetOption LTR flag = %d and number = %d: Required number of reference increased to %d and iMaxNumRefFrame is adjusted",
+             " CWelsH264SVCEncoder::SetOption LTR flag = %d and number = %d: Required number of reference increased to %d and iMaxNumRefFrame is adjusted (from %d)",
              sConfig.bEnableLongTermReference, sConfig.iLTRRefNum, iNumRefFrame, sConfig.iMaxNumRefFrame);
     sConfig.iMaxNumRefFrame = iNumRefFrame;
   }
