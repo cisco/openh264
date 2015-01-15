@@ -3150,7 +3150,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   pFbi->uiTimeStamp = pSrcPic->uiTimeStamp;
   // perform csc/denoise/downsample/padding, generate spatial layers
   iSpatialNum = pCtx->pVpp->BuildSpatialPicList (pCtx, pSrcPic);
-
   if (pCtx->pFuncList->pfRc.pfWelsUpdateMaxBrWindowStatus) {
     pCtx->pFuncList->pfRc.pfWelsUpdateMaxBrWindowStatus (pCtx, iSpatialNum, pSrcPic->uiTimeStamp);
   }
@@ -3319,15 +3318,16 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 #ifdef LONG_TERM_REF_DUMP
     DumpRef (pCtx);
 #endif
-    if ((pSvcParam->iRCMode != RC_OFF_MODE))
+
+    if (pSvcParam->iRCMode != RC_OFF_MODE)
       pCtx->pVpp->AnalyzePictureComplexity (pCtx, pCtx->pEncPic, ((pCtx->eSliceType == P_SLICE)
                                             && (pCtx->iNumRef0 > 0)) ? pCtx->pRefList0[0] : NULL,
-                                            iCurDid, (pCtx->eSliceType == P_SLICE) && (pSvcParam->bEnableBackgroundDetection));
+                                            iCurDid, (pCtx->eSliceType == P_SLICE) && pSvcParam->bEnableBackgroundDetection);
     WelsUpdateRefSyntax (pCtx,  pCtx->iPOC,
                          eFrameType);	//get reordering syntax used for writing slice header and transmit to encoder.
     PrefetchReferencePicture (pCtx, eFrameType);	// update reference picture for current pDq layer
 
-    pCtx->pFuncList->pfRc.pfWelsRcPictureInit (pCtx);
+    pCtx->pFuncList->pfRc.pfWelsRcPictureInit (pCtx, pSrcPic->uiTimeStamp);
     PreprocessSliceCoding (pCtx);	// MUST be called after pfWelsRcPictureInit() and WelsInitCurrentLayer()
 
     //TODO Complexity Calculation here for screen content

@@ -187,9 +187,7 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaSad (SPixMap* pSrcPixMap, SPixM
   int32_t*  pGomForegroundBlockNum = (int32_t*)m_sComplexityAnalysisParam.pGomForegroundBlockNum;
   int32_t*  pGomComplexity = (int32_t*)m_sComplexityAnalysisParam.pGomComplexity;
 
-
   uint32_t uiGomSad = 0, uiFrameSad = 0;
-
   InitGomSadFunc (m_pfGomSad, m_sComplexityAnalysisParam.iCalcBgd);
 
   for (int32_t j = 0; j < iGomMbNum; j ++) {
@@ -212,11 +210,9 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaSad (SPixMap* pSrcPixMap, SPixM
       iMbEndIndex = WELS_MIN (iMbEndIndex + iMbWidth , iGomMbEndIndex);
 
     } while (--iGomMbRowNum);
-
     pGomComplexity[j] = uiGomSad;
     uiFrameSad += pGomComplexity[j];
   }
-
   m_sComplexityAnalysisParam.iFrameComplexity = uiFrameSad;
 }
 
@@ -237,7 +233,7 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaVar (SPixMap* pSrcPixMap, SPixM
 
   SVAACalcResult* pVaaCalcResults = m_sComplexityAnalysisParam.pCalcResult;
   int32_t*  pGomComplexity = (int32_t*)m_sComplexityAnalysisParam.pGomComplexity;
-
+  uint32_t  uiFrameSad = 0;
 
   uint32_t uiSampleSum = 0, uiSquareSum = 0;
 
@@ -266,7 +262,9 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaVar (SPixMap* pSrcPixMap, SPixM
     } while (--iGomMbRowNum);
 
     pGomComplexity[j] = uiSquareSum - (uiSampleSum * uiSampleSum / iGomSampleNum);
+    uiFrameSad += pGomComplexity[j];
   }
+  m_sComplexityAnalysisParam.iFrameComplexity = uiFrameSad;
 }
 
 

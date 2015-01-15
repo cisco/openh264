@@ -228,7 +228,6 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
     if (pSvcParam->bEnableBackgroundDetection) {
       BackgroundDetection (pCtx->pVaa, pCurPic, pRefPic, bCalculateBGD && pRefPic->iPictureType != I_SLICE);
     }
-
     if (bNeededMbAq) {
       AdaptiveQuantCalculation (pCtx->pVaa, pCurPic, pRefPic);
     }
@@ -795,17 +794,20 @@ void CWelsPreProcess::AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCu
 
     if (pSvcParam->iRCMode == RC_QUALITY_MODE && pCtx->eSliceType == P_SLICE) {
       iComplexityAnalysisMode = FRAME_SAD;
-    } else if (((pSvcParam->iRCMode == RC_BITRATE_MODE)||(pSvcParam->iRCMode == RC_TIMESTAMP_MODE)) && pCtx->eSliceType == P_SLICE) {
+    } else if (((pSvcParam->iRCMode == RC_BITRATE_MODE) || (pSvcParam->iRCMode == RC_TIMESTAMP_MODE))
+               && pCtx->eSliceType == P_SLICE) {
       iComplexityAnalysisMode = GOM_SAD;
-    } else if (((pSvcParam->iRCMode == RC_BITRATE_MODE)||(pSvcParam->iRCMode == RC_TIMESTAMP_MODE)) && pCtx->eSliceType == I_SLICE) {
+    } else if (((pSvcParam->iRCMode == RC_BITRATE_MODE) || (pSvcParam->iRCMode == RC_TIMESTAMP_MODE))
+               && pCtx->eSliceType == I_SLICE) {
       iComplexityAnalysisMode = GOM_VAR;
     } else {
       return;
     }
+
     sComplexityAnalysisParam->iComplexityAnalysisMode = iComplexityAnalysisMode;
     sComplexityAnalysisParam->pCalcResult = & (pVaaInfo->sVaaCalcInfo);
     sComplexityAnalysisParam->pBackgroundMbFlag = pVaaInfo->pVaaBackgroundMbFlag;
-    if(pRefPicture)
+    if (pRefPicture)
       SetRefMbType (pCtx, & (sComplexityAnalysisParam->uiRefMbType), pRefPicture->iPictureType);
     sComplexityAnalysisParam->iCalcBgd = bCalculateBGD;
     sComplexityAnalysisParam->iFrameComplexity = 0;
@@ -833,7 +835,7 @@ void CWelsPreProcess::AnalyzePictureComplexity (sWelsEncCtx* pCtx, SPicture* pCu
       sSrcPixMap.sRect.iRectHeight = pCurPicture->iHeightInPixel;
       sSrcPixMap.eFormat = VIDEO_FORMAT_I420;
 
-      if(pRefPicture){
+      if (pRefPicture) {
         sRefPixMap.pPixel[0] = pRefPicture->pData[0];
         sRefPixMap.iSizeInBits = g_kiPixMapSizeInBits;
         sRefPixMap.iStride[0] = pRefPicture->iLineSize[0];
