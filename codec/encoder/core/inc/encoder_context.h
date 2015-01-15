@@ -191,6 +191,7 @@ typedef struct TagWelsEncCtx {
   SSubsetSps*					pSubsetArray;	// MAX_SPS_COUNT by standard compatible
   SSubsetSps*					pSubsetSps;
   int32_t						iSpsNum;	// number of pSps used
+  int32_t						iSubsetSpsNum;	// number of pSps used
   int32_t						iPpsNum;	// number of pPps used
 
 // Output
@@ -216,6 +217,7 @@ typedef struct TagWelsEncCtx {
   pDqIdcMap;	// overall DQ map of full scalability in specific frame (All full D/T/Q layers involved)												// pDqIdcMap[dq_index] for each SDqIdc pData
 
   SParaSetOffset				sPSOVector;
+  SParaSetOffset*				pPSOVector;
   CMemoryAlign*				pMemAlign;
 
 #if defined(STAT_OUTPUT)

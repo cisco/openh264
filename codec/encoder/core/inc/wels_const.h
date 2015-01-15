@@ -171,6 +171,7 @@
 
 #define UNAVAILABLE_DQ_ID		((uint8_t)(-1))
 #define LAYER_NUM_EXCHANGEABLE	2
+#define INVALID_ID		(-1)
 
 #define NAL_HEADER_ADD_0X30BYTES 50
 
