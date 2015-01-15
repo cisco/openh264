@@ -3323,8 +3323,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       pCtx->pVpp->AnalyzePictureComplexity (pCtx, pCtx->pEncPic, ((pCtx->eSliceType == P_SLICE)
                                             && (pCtx->iNumRef0 > 0)) ? pCtx->pRefList0[0] : NULL,
                                             iCurDid, (pCtx->eSliceType == P_SLICE) && pSvcParam->bEnableBackgroundDetection);
-    WelsLog (pLogCtx, WELS_LOG_INFO, "pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity= %d",
-             pCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity);
     WelsUpdateRefSyntax (pCtx,  pCtx->iPOC,
                          eFrameType);	//get reordering syntax used for writing slice header and transmit to encoder.
     PrefetchReferencePicture (pCtx, eFrameType);	// update reference picture for current pDq layer
@@ -3829,9 +3827,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
                  || pOldParam->SUsedPicRect.iHeight != pNewParam->SUsedPicRect.iHeight) ||
                 (pOldParam->bEnableLongTermReference != pNewParam->bEnableLongTermReference) ||
                 (pOldParam->iLTRRefNum != pNewParam->iLTRRefNum) ||
-                (pOldParam->iMultipleThreadIdc != pNewParam->iMultipleThreadIdc) ||
-                (pOldParam->bEnableBackgroundDetection != pNewParam->bEnableBackgroundDetection) ||
-                (pOldParam->bEnableAdaptiveQuant != pNewParam->bEnableAdaptiveQuant);
+                (pOldParam->iMultipleThreadIdc != pNewParam->iMultipleThreadIdc));
   if (pNewParam->iMaxNumRefFrame > pOldParam->iMaxNumRefFrame) {
     bNeedReset = true;
   }
