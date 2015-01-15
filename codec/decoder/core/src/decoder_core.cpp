@@ -2078,6 +2078,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
                      "reference picture introduced by this frame is lost during transmission! uiTId: %d",
                      pNalCur->sNalHeaderExt.uiTemporalId);
             if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+              if (pCtx->iTotalNumMbRec == 0)
+                pCtx->pDec = NULL;
               return iRet;
             }
           }
@@ -2093,6 +2095,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
           bAllRefComplete = false;
           HandleReferenceLostL0 (pCtx, pNalCur);
           if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+            if (pCtx->iTotalNumMbRec == 0)
+              pCtx->pDec = NULL;
             return iRet;
           }
         }
