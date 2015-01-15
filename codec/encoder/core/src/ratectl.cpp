@@ -959,7 +959,7 @@ void RcUpdateFrameComplexity (sWelsEncCtx* pEncCtx) {
   if (pTOverRc->iPFrameNum > 255)
     pTOverRc->iPFrameNum = 255;
   WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
-           "RcUpdateFrameComplexity iFrameDqBits = %d,iQStep= %d,pTOverRc->iLinearCmplx = %lld", pWelsSvcRc->iFrameDqBits,
+           "RcUpdateFrameComplexity iFrameDqBits = %d,iQStep= %d,pTOverRc->iLinearCmplx = %"PRId64, pWelsSvcRc->iFrameDqBits,
            pWelsSvcRc->iQStep, pTOverRc->iLinearCmplx);
 }
 
@@ -1356,7 +1356,7 @@ void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
     iLumaQp = WELS_CLIP3 (iLumaQp,  GOM_MIN_QP_MODE, GOM_MAX_QP_MODE);
 
     WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
-             "[Rc]P iTl = %d,iLumaQp = %d,iQStep = %d,iTargetBits = %d,iBufferFullnessSkip =%d,iMaxTh=%d,iMinTh = %d,iFrameComplexity= %d,iCmplxRatio=%lld",
+             "[Rc]P iTl = %d,iLumaQp = %d,iQStep = %d,iTargetBits = %d,iBufferFullnessSkip =%d,iMaxTh=%d,iMinTh = %d,iFrameComplexity= %d,iCmplxRatio=%"PRId64,
              iTl, iLumaQp, pWelsSvcRc->iQStep, pWelsSvcRc->iTargetBits, pWelsSvcRc->iBufferFullnessSkip, iMaxTh, iMinTh,
              pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity, iCmplxRatio);
   }
