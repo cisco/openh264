@@ -1180,8 +1180,6 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
 
   if (PRO_SCALABLE_BASELINE == uiProfileIdc || PRO_SCALABLE_HIGH == uiProfileIdc)
     pCtx->bAvcBasedFlag	= false;
-  else
-    pCtx->bAvcBasedFlag	= true;	// added for avc base pBs
 
   *pPicWidth	= pSps->iMbWidth << 4;
   *pPicHeight	= pSps->iMbHeight << 4;
