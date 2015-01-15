@@ -78,10 +78,10 @@ typedef struct SlicepEncCtx_s {
 SliceModeEnum		uiSliceMode;			/* 0: single slice in frame; 1: multiple slices in frame; */
 int16_t			iMbWidth;			/* width of picture size in mb */
 int16_t			iMbHeight;			/* height of picture size in mb */
-int16_t			iSliceNumInFrame;	/* count number of slices in frame; */
+int32_t			iSliceNumInFrame;	/* count number of slices in frame; */
 int32_t			iMbNumInFrame;	/* count number of MBs in frame */
 uint16_t*			pOverallMbMap;	/* overall MB map in frame, store virtual slice idc; */
-int16_t*			pFirstMbInSlice;	/* first MB address top-left based in every slice respectively; */
+int32_t*			pFirstMbInSlice;	/* first MB address top-left based in every slice respectively; */
 int32_t*			pCountMbNumInSlice;	/* count number of MBs in every slice respectively; */
 uint32_t		uiSliceSizeConstraint;/*in byte*/
 int32_t			iMaxSliceNumConstraint;/*maximal number of slices constraint*/
@@ -140,7 +140,7 @@ void UninitSlicePEncCtx (SSliceCtx* pSliceCtx, CMemoryAlign* pMa);
  *
  * \return	uiSliceIdc - successful; (uint8_t)(-1) - failed;
  */
-uint16_t WelsMbToSliceIdc (SSliceCtx* pSliceCtx, const int16_t kiMbXY);
+uint16_t WelsMbToSliceIdc (SSliceCtx* pSliceCtx, const int32_t kiMbXY);
 
 /*!
  * \brief	Get first mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
@@ -160,7 +160,7 @@ int32_t WelsGetFirstMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiSliceIdc);
  *
  * \return	next_mb - successful; -1 - failed;
  */
-int32_t WelsGetNextMbOfSlice (SSliceCtx* pSliceCtx, const int16_t kiMbXY);
+int32_t WelsGetNextMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY);
 
 /*!
  * \brief	Get previous mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
@@ -170,7 +170,7 @@ int32_t WelsGetNextMbOfSlice (SSliceCtx* pSliceCtx, const int16_t kiMbXY);
  *
  * \return	prev_mb - successful; -1 - failed;
  */
-int32_t WelsGetPrevMbOfSlice (SSliceCtx* pSliceCtx, const int16_t kiMbXY);
+int32_t WelsGetPrevMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY);
 
 /*!
  * \brief	Get number of mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)

@@ -50,9 +50,9 @@ typedef struct TagMB {
 /*************************mb_layer() syntax and generated********************************/
 /*mb_layer():*/
 Mb_Type		uiMbType;	// including MB detailed partition type, number and type of reference list
-int16_t		iMbXY;		// offset position of MB top left point based
-int16_t		iMbX;		// position of MB in horizontal axis
-int16_t		iMbY;		// position of MB in vertical axis
+int32_t		iMbXY;		// offset position of MB top left point based
+int16_t		iMbX;		// position of MB in horizontal axis [0..32767]
+int16_t		iMbY;		// position of MB in vertical axis [0..32767]
 
 uint8_t		uiNeighborAvail;	// avail && same_slice: LEFT_MB_POS:0x01, TOP_MB_POS:0x02, TOPRIGHT_MB_POS = 0x04 ,TOPLEFT_MB_POS = 0x08;
 uint8_t		uiCbp;
