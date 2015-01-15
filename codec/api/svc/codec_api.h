@@ -114,6 +114,8 @@ typedef unsigned char bool;
   *        this can be done in a loop until data ends
   * @code
   *  //for Decoding only
+  *  iRet = DecodeFrameNoDelay(pBuf, iSize, pData, &sDstBufInfo);
+  *  //or
   *  iRet = DecodeFrame2(pBuf, iSize, pData, &sDstBufInfo);
   *  //for Parsing only
   *  iRet = DecodeParser(pBuf, iSize, &sDstParseInfo);
@@ -126,10 +128,11 @@ typedef unsigned char bool;
   *      output pData[0], pData[1], pData[2];
   *  }
   * //for Parsing only, sDstParseInfo can be used for, e.g., HW decoding
-  *  if (sDstBufInfo.iBufferStatus==1){
+  *  if (sDstBufInfo.iNalNum > 0){
   *      Hardware decoding sDstParseInfo;
   *  }
-  *  //no-delay decoding can be realized by directly calling decoder again with NULL input, as in the following. In this case, decoder would immediately reconstruct the input data. This can also be used similarly for Parsing only. Consequent decoding error and output indication should also be considered as above.
+  *  //no-delay decoding can be realized by directly calling DecodeFrameNoDelay(), which is the recommended usage.
+  *  //no-delay decoding can also be realized by directly calling DecodeFrame2() again with NULL input, as in the following. In this case, decoder would immediately reconstruct the input data. This can also be used similarly for Parsing only. Consequent decoding error and output indication should also be considered as above.
   *  iRet = DecodeFrame2(NULL, 0, pData, &sDstBufInfo);
   *  judge iRet, sDstBufInfo.iBufferStatus ...
   * @endcode
@@ -369,6 +372,23 @@ class ISVCDecoder {
       int& iWidth,
       int& iHeight) = 0;
 
+/**
+  * @brief    For slice level DecodeFrameNoDelay() (4 parameters input),
+  *           whatever the function return value is, the output data
+  *           of I420 format will only be available when pDstInfo->iBufferStatus == 1,.
+  *           This function will parse and reconstruct the input frame immediately if it is complete
+  *           It is recommended as the main decoding function for H.264/AVC format input
+  * @param   pSrc the h264 stream to be decoded
+  * @param   iSrcLen the length of h264 stream
+  * @param   ppDst buffer pointer of decoded data (YUV)
+  * @param   pDstInfo information provided to API(width, height, etc.)
+  * @return  0 - success; otherwise -failed;
+  */
+  virtual DECODING_STATE EXTAPI DecodeFrameNoDelay (const unsigned char* pSrc,
+      const int iSrcLen,
+      unsigned char** ppDst,
+      SBufferInfo* pDstInfo) = 0;
+
   /**
   * @brief    For slice level DecodeFrame2() (4 parameters input),
   *           whatever the function return value is, the output data
@@ -471,6 +491,11 @@ DECODING_STATE (*DecodeFrame) (ISVCDecoder*, const unsigned char* pSrc,
                                int* pStride,
                                int* iWidth,
                                int* iHeight);
+
+DECODING_STATE (*DecodeFrameNoDelay) (ISVCDecoder*, const unsigned char* pSrc,
+                                const int iSrcLen,
+                                unsigned char** ppDst,
+                                SBufferInfo* pDstInfo);
 
 DECODING_STATE (*DecodeFrame2) (ISVCDecoder*, const unsigned char* pSrc,
                                 const int iSrcLen,

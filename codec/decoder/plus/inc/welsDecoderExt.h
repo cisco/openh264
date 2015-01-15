@@ -81,6 +81,11 @@ virtual DECODING_STATE EXTAPI DecodeFrame (const unsigned char* kpSrc,
     int& iWidth,
     int& iHeight);
 
+virtual DECODING_STATE EXTAPI DecodeFrameNoDelay (const unsigned char* kpSrc,
+    const int kiSrcLen,
+    unsigned char** ppDst,
+    SBufferInfo* pDstInfo);
+
 virtual DECODING_STATE EXTAPI DecodeFrame2 (const unsigned char* kpSrc,
     const int kiSrcLen,
     unsigned char** ppDst,

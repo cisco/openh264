@@ -171,7 +171,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
 #if defined ( STICK_STREAM_SIZE )
     if (fpTrack) {
       fread (pInfo, 4, sizeof (unsigned long), fpTrack);
-      iSliceSize = static_cast<int32_t>(pInfo[2]);
+      iSliceSize = static_cast<int32_t> (pInfo[2]);
     }
 #else
     for (i = 0; i < iFileSize; i++) {
@@ -182,6 +182,11 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     }
     iSliceSize = i;
 #endif
+
+    if (iSliceSize < 4) { //too small size, no effective data, ignore
+      iBufPos += iSliceSize;
+      continue;
+    }
 
 //for coverage test purpose
     int32_t iOutputColorFormat;
@@ -211,7 +216,11 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     uiTimeStamp ++;
     memset (&sDstBufInfo, 0, sizeof (SBufferInfo));
     sDstBufInfo.uiInBsTimeStamp = uiTimeStamp;
+#ifndef NO_DELAY_DECODING
+    pDecoder->DecodeFrameNoDelay (pBuf + iBufPos, iSliceSize, pData, &sDstBufInfo);
+#else
     pDecoder->DecodeFrame2 (pBuf + iBufPos, iSliceSize, pData, &sDstBufInfo);
+#endif
 
     if (sDstBufInfo.iBufferStatus == 1) {
       pDst[0] = pData[0];
@@ -272,36 +281,6 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     iBufPos += iSliceSize;
     ++ iSliceIndex;
   }
-
-  // Get pending last frame
-  pData[0] = NULL;
-  pData[1] = NULL;
-  pData[2] = NULL;
-  memset (&sDstBufInfo, 0, sizeof (SBufferInfo));
-
-  pDecoder->DecodeFrame2 (NULL, 0, pData, &sDstBufInfo);
-  if (sDstBufInfo.iBufferStatus == 1) {
-    pDst[0] = pData[0];
-    pDst[1] = pData[1];
-    pDst[2] = pData[2];
-  }
-
-  if (sDstBufInfo.iBufferStatus == 1) {
-    cOutputModule.Process ((void**)pDst, &sDstBufInfo, pYuvFile);
-    iWidth  = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
-    iHeight = sDstBufInfo.UsrData.sSystemBuffer.iHeight;
-
-    if (pOptionFile != NULL) {
-      /* Anyway, we need write in case of final frame decoding */
-      fwrite (&iFrameCount, sizeof (iFrameCount), 1, pOptionFile);
-      fwrite (&iWidth , sizeof (iWidth) , 1, pOptionFile);
-      fwrite (&iHeight, sizeof (iHeight), 1, pOptionFile);
-      iLastWidth	= iWidth;
-      iLastHeight	= iHeight;
-    }
-    ++ iFrameCount;
-  }
-
 
 #if defined ( STICK_STREAM_SIZE )
   if (fpTrack) {
