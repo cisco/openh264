@@ -622,7 +622,9 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
 
     case GMP_BufferLength32: {
       uint8_t* start_code = inputFrame->Buffer();
-      while (start_code < inputFrame->Buffer() + inputFrame->Size()) {
+      // start code should be at least four bytes from the end or we risk
+      // reading/writing outside the buffer.
+      while (start_code < inputFrame->Buffer() + inputFrame->Size() - 4) {
         static const uint8_t code[] = { 0x00, 0x00, 0x00, 0x01 };
         uint8_t* lenp = start_code;
         start_code += * (reinterpret_cast<int32_t*> (lenp));
