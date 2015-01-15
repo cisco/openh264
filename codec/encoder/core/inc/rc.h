@@ -250,7 +250,7 @@ int32_t   iActualBitRate; // TODO: to complete later
 float     fLatestFrameRate; // TODO: to complete later
 } SWelsSvcRc;
 
-typedef  void (*PWelsRCPictureInitFunc) (sWelsEncCtx* pCtx);
+typedef  void (*PWelsRCPictureInitFunc) (sWelsEncCtx* pCtx,long long uiTimeStamp);
 typedef  void (*PWelsRCPictureDelayJudgeFunc) (sWelsEncCtx* pCtx, EVideoFrameType eFrameType, long long uiTimeStamp);
 typedef  void (*PWelsRCPictureInfoUpdateFunc) (sWelsEncCtx* pCtx, int32_t iLayerSize);
 typedef  void (*PWelsRCMBInfoUpdateFunc) (sWelsEncCtx* pCtx, SMB* pCurMb, int32_t iCostLuma, SSlice* pSlice);
