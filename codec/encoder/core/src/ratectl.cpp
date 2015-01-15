@@ -1367,7 +1367,7 @@ void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
 
   RcInitSliceInformation (pEncCtx);
   RcInitGomParameters (pEncCtx);
-  float fInstantFps = (uiTimeStamp - pWelsSvcRc->uiLastTimeStamp) > 0 ? (1000.0 / (uiTimeStamp -
+  float fInstantFps = (uiTimeStamp - pWelsSvcRc->uiLastTimeStamp) > 0 ? (1000.0f / (uiTimeStamp -
                       pWelsSvcRc->uiLastTimeStamp)) : 0;
   WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
            "[Rc]pEncCtx->iGlobalQp= %d,uiTimeStamp = %lld,uiLastTimeStamp = %lld,InstantFps = %f,settingFps = %f",
