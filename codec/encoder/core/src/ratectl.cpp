@@ -1285,12 +1285,12 @@ void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
       if ((pDLayerParam->fFrameRate > EPSN) && (pDLayerParam->iVideoWidth && pDLayerParam->iVideoHeight))
         dBpp = (double) (pDLayerParam->iSpatialBitrate) / (double) (pDLayerParam->fFrameRate * pDLayerParam->iVideoWidth *
                pDLayerParam->iVideoHeight);
-      pWelsSvcRc->iInitialQp = 50 - dBpp * 10 * 4;
+      pWelsSvcRc->iInitialQp = (int32_t) (50 - dBpp * 10 * 4);
       pWelsSvcRc->iInitialQp = WELS_CLIP3 (pWelsSvcRc->iInitialQp, MIN_IDR_QP, MAX_IDR_QP);
 
       iLumaQp = pWelsSvcRc->iInitialQp;
-      pWelsSvcRc->iTargetBits = (double) (pDLayerParam->iSpatialBitrate) / (double) (pDLayerParam->fFrameRate) *
-                                IDR_BITRATE_RATIO;
+      pWelsSvcRc->iTargetBits = (int32_t) ((double) (pDLayerParam->iSpatialBitrate) / (double) (pDLayerParam->fFrameRate) *
+                                IDR_BITRATE_RATIO);
 
       WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
                "[Rc] First IDR iSpatialBitrate = %d,iBufferFullnessSkip = %d,iTargetBits= %d,dBpp = %f,initQp = %d",
@@ -1301,8 +1301,8 @@ void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
 
       int32_t iMaxTh = pWelsSvcRc->iBufferSizeSkip - pWelsSvcRc->iBufferFullnessSkip;
       int32_t iMinTh = iMaxTh / 2;
-      pWelsSvcRc->iTargetBits = (double) (pDLayerParam->iSpatialBitrate) / (double) (pDLayerParam->fFrameRate) *
-                                IDR_BITRATE_RATIO;
+      pWelsSvcRc->iTargetBits = (int32_t) ((double) (pDLayerParam->iSpatialBitrate) / (double) (pDLayerParam->fFrameRate) *
+                                IDR_BITRATE_RATIO);
       if (iMaxTh > 0) {
         pWelsSvcRc->iTargetBits = WELS_CLIP3 (pWelsSvcRc->iTargetBits, iMinTh, iMaxTh);
 
@@ -1331,7 +1331,7 @@ void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
 
     SSpatialLayerInternal* pDLayerParamInternal     = &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
     const int32_t kiGopSize	= (1 << pDLayerParamInternal->iDecompositionStages);
-    int32_t iAverageFrameSize = (double) (pDLayerParam->iSpatialBitrate) / (double) (pDLayerParam->fFrameRate);
+    int32_t iAverageFrameSize = (int32_t) ((double) (pDLayerParam->iSpatialBitrate) / (double) (pDLayerParam->fFrameRate));
     const int32_t kiGopBits	= iAverageFrameSize * kiGopSize;
     int64_t iCmplxRatio = WELS_DIV_ROUND64 (pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity * INT_MULTIPLY,
                                             pTOverRc->iFrameCmplxMean);
