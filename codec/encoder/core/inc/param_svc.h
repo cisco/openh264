@@ -162,7 +162,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     param.bEnableAdaptiveQuant		= true;		// adaptive quantization control
     param.bEnableFrameSkip		= true;		// frame skipping
     param.bEnableLongTermReference	= false;	// long term reference control
-    param.bEnableSpsPpsIdAddition	= true;		// pSps pPps id addition control
+    param.iSpsPpsIdStrategy	= INCREASING_ID;		// pSps pPps id addition control
     param.bPrefixNalAddingCtrl		= false;		// prefix NAL adding control
     param.iSpatialLayerNum		= 1;		// number of dependency(Spatial/CGS) layers used to be encoded
     param.iTemporalLayerNum			= 1;		// number of temporal layer specified
@@ -350,8 +350,8 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
     bPrefixNalAddingCtrl	= pCodingParam.bPrefixNalAddingCtrl;
 
-    bEnableSpsPpsIdAddition =
-      pCodingParam.bEnableSpsPpsIdAddition;//For SVC meeting application, to avoid mosaic issue caused by cross-IDR reference.
+    iSpsPpsIdStrategy =
+      pCodingParam.iSpsPpsIdStrategy;//For SVC meeting application, to avoid mosaic issue caused by cross-IDR reference.
     //SHOULD enable this feature.
 
     SSpatialLayerInternal* pDlp		= &sDependencyLayers[0];
@@ -476,6 +476,18 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
   }
 
 } SWelsSvcCodingParam;
+
+
+typedef struct TagExistingParasetList {
+  SWelsSPS            sSps[MAX_SPS_COUNT];
+  SSubsetSps          sSubsetSps[MAX_SPS_COUNT];
+  SWelsPPS            sPps[MAX_PPS_COUNT];
+
+  uint32_t	          uiInUseSpsNum;
+  uint32_t	          uiInUseSubsetSpsNum;
+  uint32_t	          uiInUsePpsNum;
+} SExistingParasetList;
+
 
 static inline int32_t FreeCodingParam (SWelsSvcCodingParam** pParam, CMemoryAlign* pMa) {
   if (pParam == NULL || *pParam == NULL || pMa == NULL)

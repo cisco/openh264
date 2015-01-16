@@ -332,7 +332,7 @@ int CWelsH264SVCEncoder::InitializeInternal (SWelsSvcCodingParam* pCfg) {
   m_iMaxPicHeight	= pCfg->iPicHeight;
 
   TraceParamInfo (pCfg);
-  if (WelsInitEncoderExt (&m_pEncContext, pCfg, &m_pWelsTrace->m_sLogCtx)) {
+  if (WelsInitEncoderExt (&m_pEncContext, pCfg, &m_pWelsTrace->m_sLogCtx, NULL)) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "CWelsH264SVCEncoder::Initialize(), WelsInitEncoderExt failed.");
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_DEBUG,
              "Problematic Input Base Param: iUsageType=%d, Resolution=%dx%d, FR=%f, TLayerNum=%d, DLayerNum=%d",
@@ -477,6 +477,7 @@ int CWelsH264SVCEncoder::ForceIntraFrame (bool bIDR) {
   }
   WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
            "CWelsH264SVCEncoder::ForceIntraFrame(), bIDR= %d", bIDR);
+
   ForceCodingIDR (m_pEncContext);
 
   m_pEncContext->sEncoderStatistics.uiIDRReqNum++;
@@ -486,8 +487,8 @@ int CWelsH264SVCEncoder::ForceIntraFrame (bool bIDR) {
 void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
   WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
            "iUsageType = %d,iPicWidth= %d;iPicHeight= %d;iTargetBitrate= %d;iMaxBitrate= %d;iRCMode= %d;iPaddingFlag= %d;iTemporalLayerNum= %d;iSpatialLayerNum= %d;fFrameRate= %.6ff;uiIntraPeriod= %d;\
-             bEnableSpsPpsIdAddition = %d;bPrefixNalAddingCtrl = %d;bEnableDenoise= %d;bEnableBackgroundDetection= %d;bEnableAdaptiveQuant= %d;bEnableFrameSkip= %d;bEnableLongTermReference= %d;iLtrMarkPeriod= %d;\
-             iComplexityMode = %d;iNumRefFrame = %d;iEntropyCodingModeFlag = %d;uiMaxNalSize = %d;iLTRRefNum = %d;iMultipleThreadIdc = %d;iLoopFilterDisableIdc = %d",
+             iSpsPpsIdStrategy = %d;bPrefixNalAddingCtrl = %d;bEnableDenoise= %d;bEnableBackgroundDetection= %d;bEnableAdaptiveQuant= %d;bEnableFrameSkip= %d;bEnableLongTermReference= %d;iLtrMarkPeriod= %d;\
+             iComplexityMode = %d;iNumRefFrame = %d;iEntropyCodingModeFlag = %d;uiMaxNalSize = %d;iLTRRefNum = %d;iMultipleThreadIdc = %d;iLoopFilterDisableIdc = %d (offset(alpha/beta): %d,%d)",
            pParam->iUsageType,
            pParam->iPicWidth,
            pParam->iPicHeight,
@@ -499,7 +500,7 @@ void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
            pParam->iSpatialLayerNum,
            pParam->fMaxFrameRate,
            pParam->uiIntraPeriod,
-           pParam->bEnableSpsPpsIdAddition,
+           pParam->iSpsPpsIdStrategy,
            pParam->bPrefixNalAddingCtrl,
            pParam->bEnableDenoise,
            pParam->bEnableBackgroundDetection,
@@ -513,7 +514,9 @@ void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
            pParam->uiMaxNalSize,
            pParam->iLTRRefNum,
            pParam->iMultipleThreadIdc,
-           pParam->iLoopFilterDisableIdc
+           pParam->iLoopFilterDisableIdc,
+           pParam->iLoopFilterAlphaC0Offset,
+           pParam->iLoopFilterBetaOffset
           );
   int32_t i = 0;
   int32_t iSpatialLayers = (pParam->iSpatialLayerNum < MAX_SPATIAL_LAYER_NUM) ? (pParam->iSpatialLayerNum) :
@@ -706,16 +709,26 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
 #endif//OUTPUT_BIT_STREAM
     if (sEncodingParam.iSpatialLayerNum < 1
         || sEncodingParam.iSpatialLayerNum > MAX_SPATIAL_LAYER_NUM) {	// verify number of spatial layer
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+               "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, iSpatialLayerNum(%d) failed!",
+               sEncodingParam.iSpatialLayerNum);
       return cmInitParaError;
     }
 
     if (sConfig.ParamTranscode (sEncodingParam)) {
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+               "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, ParamTranscode failed!");
       return cmInitParaError;
     }
     if (sConfig.iSpatialLayerNum < 1) {
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+               "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, iSpatialLayerNum(%d) failed!",
+               sConfig.iSpatialLayerNum);
       return cmInitParaError;
     }
     if (sConfig.DetermineTemporalSettings()) {
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+               "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, DetermineTemporalSettings failed!");
       return cmInitParaError;
     }
 
@@ -898,11 +911,17 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   }
   break;
   case ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION: {
-    bool iValue = * ((bool*)pOption);
-
-    m_pEncContext->pSvcParam->bEnableSpsPpsIdAddition = iValue;
-    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, " CWelsH264SVCEncoder::SetOption enable SPS/PPS ID = %d ",
-             m_pEncContext->pSvcParam->bEnableSpsPpsIdAddition);
+    int32_t iValue = * ((int32_t*)pOption);
+    if (((iValue > INCREASING_ID) || (m_pEncContext->pSvcParam->iSpsPpsIdStrategy > INCREASING_ID))
+        && m_pEncContext->pSvcParam->iSpsPpsIdStrategy != iValue) {
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
+               " CWelsH264SVCEncoder::SetOption iSpsPpsIdStrategy changing in the middle of call is NOT allowed for iSpsPpsIdStrategy>INCREASING_ID: existing setting is %d and the new one is %d",
+               m_pEncContext->pSvcParam->iSpsPpsIdStrategy, iValue);
+      return cmInitParaError;
+    }
+    m_pEncContext->pSvcParam->iSpsPpsIdStrategy = iValue;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, " CWelsH264SVCEncoder::SetOption iSpsPpsIdStrategy = %d ",
+             m_pEncContext->pSvcParam->iSpsPpsIdStrategy);
   }
   break;
   case ENCODER_OPTION_CURRENT_PATH: {

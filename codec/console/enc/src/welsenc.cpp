@@ -232,8 +232,8 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
         pSvcParam.uiIntraPeriod	= atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("MaxNalSize") == 0) {
         pSvcParam.uiMaxNalSize = atoi (strTag[1].c_str());
-      } else if (strTag[0].compare ("EnableSpsPpsIDAddition") == 0) {
-        pSvcParam.bEnableSpsPpsIdAddition	= atoi (strTag[1].c_str()) ? true : false;
+      } else if (strTag[0].compare ("SpsPpsIDStrategy") == 0) {
+        pSvcParam.iSpsPpsIdStrategy	= atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("EnableScalableSEI") == 0) {
         pSvcParam.bEnableSSEI	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableFrameCropping") == 0) {
@@ -421,7 +421,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       pSvcParam.uiMaxNalSize = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-spsid") && (n < argc))
-      pSvcParam.bEnableSpsPpsIdAddition = atoi (argv[n++]) ? true : false;
+      pSvcParam.iSpsPpsIdStrategy = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-cabac") && (n < argc))
       pSvcParam.iEntropyCodingModeFlag = atoi (argv[n++]);
@@ -591,7 +591,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.bEnableLongTermReference  = 0; // long term reference control
   sParam.iLtrMarkPeriod = 30;
   sParam.uiIntraPeriod		= 320;		// period of Intra frame
-  sParam.bEnableSpsPpsIdAddition = 1;
+  sParam.iSpsPpsIdStrategy = INCREASING_ID;
   sParam.bPrefixNalAddingCtrl = 0;
   sParam.iComplexityMode = MEDIUM_COMPLEXITY;
   int iIndexLayer = 0;

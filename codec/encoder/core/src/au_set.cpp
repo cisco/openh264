@@ -336,27 +336,27 @@ int32_t WelsWriteSubsetSpsSyntax (SSubsetSps* pSubsetSps, SBitStringAux* pBitStr
  * \note	Call it in case EWelsNalUnitType is PPS.
  *************************************************************************************
  */
-int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, SParaSetOffset* sPSOVector) {
+int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, SParaSetOffset* pPSOVector) {
   SBitStringAux* pLocalBitStringAux = pBitStringAux;
 
-  bool bUsedSubset    =  sPSOVector->bPpsIdMappingIntoSubsetsps[pPps->iPpsId];
-  int32_t iParameterSetType = (bUsedSubset ? PARA_SET_TYPE_SUBSETSPS : PARA_SET_TYPE_AVCSPS);
+  const int32_t kiParameterSetType = (pPSOVector != NULL) ? (pPSOVector->bPpsIdMappingIntoSubsetsps[pPps->iPpsId] ?
+                                     PARA_SET_TYPE_SUBSETSPS : PARA_SET_TYPE_AVCSPS) : 0;
 
-  BsWriteUE (pLocalBitStringAux, pPps->iPpsId +
-             sPSOVector->sParaSetOffsetVariable[PARA_SET_TYPE_PPS].iParaSetIdDelta[pPps->iPpsId]);
-  BsWriteUE (pLocalBitStringAux, pPps->iSpsId +
-             sPSOVector->sParaSetOffsetVariable[iParameterSetType].iParaSetIdDelta[pPps->iSpsId]);
+  BsWriteUE (pLocalBitStringAux, pPps->iPpsId
+             + ((pPSOVector != NULL) ? (pPSOVector->sParaSetOffsetVariable[PARA_SET_TYPE_PPS].iParaSetIdDelta[pPps->iPpsId]) : 0));
+  BsWriteUE (pLocalBitStringAux, pPps->iSpsId
+             + ((pPSOVector != NULL) ? (pPSOVector->sParaSetOffsetVariable[kiParameterSetType].iParaSetIdDelta[pPps->iSpsId]) : 0));
 
 #if _DEBUG
   //SParaSetOffset use, 110421
-  if (sPSOVector->bEnableSpsPpsIdAddition) {
+  if ((pPSOVector != NULL) && (INCREASING_ID & pPSOVector->iSpsPpsIdStrategy)) {
     const int32_t kiTmpSpsIdInBs = pPps->iSpsId +
-                                   sPSOVector->sParaSetOffsetVariable[iParameterSetType].iParaSetIdDelta[pPps->iSpsId];
+                                   pPSOVector->sParaSetOffsetVariable[kiParameterSetType].iParaSetIdDelta[pPps->iSpsId];
     const int32_t tmp_pps_id_in_bs = pPps->iPpsId +
-                                     sPSOVector->sParaSetOffsetVariable[PARA_SET_TYPE_PPS].iParaSetIdDelta[pPps->iPpsId];
+                                     pPSOVector->sParaSetOffsetVariable[PARA_SET_TYPE_PPS].iParaSetIdDelta[pPps->iPpsId];
     assert (MAX_SPS_COUNT > kiTmpSpsIdInBs);
     assert (MAX_PPS_COUNT > tmp_pps_id_in_bs);
-    assert (sPSOVector->sParaSetOffsetVariable[iParameterSetType].bUsedParaSetIdInBs[kiTmpSpsIdInBs]);
+    assert (pPSOVector->sParaSetOffsetVariable[kiParameterSetType].bUsedParaSetIdInBs[kiTmpSpsIdInBs]);
   }
 #endif
 

@@ -75,7 +75,8 @@ void GomValidCheck (const int32_t kiMbWidth, const int32_t kiMbHeight, int32_t* 
  * \param	para		SWelsSvcCodingParam*
  * \return	successful - 0; otherwise none 0 for failed
  */
-int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pPara, SLogContext* pLogCtx);
+int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pPara, SLogContext* pLogCtx,
+                            SExistingParasetList* pExistingParasetList);
 
 /*!
  * \brief	uninitialize Wels encoder core library

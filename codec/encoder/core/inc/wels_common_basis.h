@@ -83,9 +83,15 @@ typedef struct TagParaSetOffset {
   bool
   bPpsIdMappingIntoSubsetsps[MAX_DQ_LAYER_NUM/*+1*/];	// need not extra +1 due no MGS and FMO case so far
 
+  int32_t  iPpsIdList[MAX_DQ_LAYER_NUM][MAX_PPS_COUNT]; //index0: max pps types; index1: for differnt IDRs, if only index0=1, index1 can reach MAX_PPS_COUNT
+
 #if _DEBUG
-  bool                  bEnableSpsPpsIdAddition;
+  int32_t  iSpsPpsIdStrategy;
 #endif
+
+  uint32_t uiInUseSpsNum;
+  uint32_t uiInUseSubsetSpsNum;
+  uint32_t uiInUsePpsNum;
 } SParaSetOffset;
 
 
