@@ -30,6 +30,8 @@ TEST (SetMemZeroFunTest, WelsSetMemZero) {
   if (uiCpuFlag & WELS_CPU_SSE2) {
     sFuncPtrList.pfSetMemZeroSize64Aligned16	= WelsSetMemZeroAligned64_sse2;	// confirmed_safe_unsafe_usage
   }
+#else
+  (void) uiCpuFlag; // Avoid warnings if no assembly is enabled
 #endif//X86_ASM
 
 #if defined(HAVE_NEON)
