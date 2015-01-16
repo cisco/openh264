@@ -191,7 +191,7 @@ TEST_F (EncoderInterfaceTest, EncoderOptionSetTest) {
   pSrcPic->uiTimeStamp += 30;
 
   eOptionId = ENCODER_OPTION_FRAME_RATE;
-  fValue = static_cast<int> (rand() % 60 - 5);
+  fValue = static_cast<float> (rand() % 60 - 5);
   iResult = pPtrEnc->SetOption (eOptionId, &fValue);
 
   if (fValue <= 0)
