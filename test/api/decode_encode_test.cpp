@@ -83,7 +83,7 @@ class DecodeEncodeTest : public ::testing::TestWithParam<DecodeEncodeFileParam>,
         break;
       }
     }
-    return buf_.PopFront (static_cast<uint8_t*> (ptr), len);
+    return (int) buf_.PopFront (static_cast<uint8_t*> (ptr), len);
   }
 
  protected:

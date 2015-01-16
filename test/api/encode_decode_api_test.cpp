@@ -726,7 +726,7 @@ void ExtractDidNal (SFrameBSInfo* pBsInfo, int& iSrcLen, std::vector<SLostSim>* 
 int SimulateNALLoss (const unsigned char* pSrc,  int& iSrcLen, std::vector<SLostSim>* p_SLostSim,
                      const char* pLossChars, bool bLossPara, int& iLossIdx, bool& bVCLLoss) {
   unsigned char* pDst = new unsigned char[iSrcLen];
-  int iLossCharLen = strlen (pLossChars);
+  int iLossCharLen = (int) strlen (pLossChars);
   int iSkipedBytes = 0;
   int iDstLen = 0;
   int iBufPos = 0;
@@ -2400,10 +2400,10 @@ class DecodeParseAPI : public EncodeDecodeTestBase {
 
   void EncodeOneFrame (int iIdx) {
     int iFrameSize = iWidth_ * iHeight_ * 3 / 2;
-    int iSize = fread (buf_.data(), sizeof (char), iFrameSize, fYuv_);
+    int iSize = (int) fread (buf_.data(), sizeof (char), iFrameSize, fYuv_);
     if (feof (fYuv_) || iSize != iFrameSize) {
       rewind (fYuv_);
-      iSize = fread (buf_.data(), sizeof (char), iFrameSize, fYuv_);
+      iSize = (int) fread (buf_.data(), sizeof (char), iFrameSize, fYuv_);
       ASSERT_TRUE (iSize == iFrameSize);
     }
     int rv = encoder_->EncodeFrame (&EncPic, &info);
