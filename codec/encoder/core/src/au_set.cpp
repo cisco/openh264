@@ -349,7 +349,7 @@ int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, SParaS
 
 #if _DEBUG
   //SParaSetOffset use, 110421
-  if ((pPSOVector != NULL) && (INCREASING_ID & pPSOVector->iSpsPpsIdStrategy)) {
+  if ((pPSOVector != NULL) && (INCREASING_ID & pPSOVector->eSpsPpsIdStrategy)) {
     const int32_t kiTmpSpsIdInBs = pPps->iSpsId +
                                    pPSOVector->sParaSetOffsetVariable[kiParameterSetType].iParaSetIdDelta[pPps->iSpsId];
     const int32_t tmp_pps_id_in_bs = pPps->iPpsId +

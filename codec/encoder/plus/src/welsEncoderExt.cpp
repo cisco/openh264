@@ -487,7 +487,7 @@ int CWelsH264SVCEncoder::ForceIntraFrame (bool bIDR) {
 void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
   WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
            "iUsageType = %d,iPicWidth= %d;iPicHeight= %d;iTargetBitrate= %d;iMaxBitrate= %d;iRCMode= %d;iPaddingFlag= %d;iTemporalLayerNum= %d;iSpatialLayerNum= %d;fFrameRate= %.6ff;uiIntraPeriod= %d;\
-             iSpsPpsIdStrategy = %d;bPrefixNalAddingCtrl = %d;bEnableDenoise= %d;bEnableBackgroundDetection= %d;bEnableAdaptiveQuant= %d;bEnableFrameSkip= %d;bEnableLongTermReference= %d;iLtrMarkPeriod= %d;\
+             eSpsPpsIdStrategy = %d;bPrefixNalAddingCtrl = %d;bEnableDenoise= %d;bEnableBackgroundDetection= %d;bEnableAdaptiveQuant= %d;bEnableFrameSkip= %d;bEnableLongTermReference= %d;iLtrMarkPeriod= %d;\
              iComplexityMode = %d;iNumRefFrame = %d;iEntropyCodingModeFlag = %d;uiMaxNalSize = %d;iLTRRefNum = %d;iMultipleThreadIdc = %d;iLoopFilterDisableIdc = %d (offset(alpha/beta): %d,%d)",
            pParam->iUsageType,
            pParam->iPicWidth,
@@ -500,7 +500,7 @@ void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
            pParam->iSpatialLayerNum,
            pParam->fMaxFrameRate,
            pParam->uiIntraPeriod,
-           pParam->iSpsPpsIdStrategy,
+           pParam->eSpsPpsIdStrategy,
            pParam->bPrefixNalAddingCtrl,
            pParam->bEnableDenoise,
            pParam->bEnableBackgroundDetection,
@@ -912,16 +912,16 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   break;
   case ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION: {
     int32_t iValue = * ((int32_t*)pOption);
-    if (((iValue > INCREASING_ID) || (m_pEncContext->pSvcParam->iSpsPpsIdStrategy > INCREASING_ID))
-        && m_pEncContext->pSvcParam->iSpsPpsIdStrategy != iValue) {
+    if (((iValue > INCREASING_ID) || (m_pEncContext->pSvcParam->eSpsPpsIdStrategy > INCREASING_ID))
+        && m_pEncContext->pSvcParam->eSpsPpsIdStrategy != iValue) {
       WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
-               " CWelsH264SVCEncoder::SetOption iSpsPpsIdStrategy changing in the middle of call is NOT allowed for iSpsPpsIdStrategy>INCREASING_ID: existing setting is %d and the new one is %d",
-               m_pEncContext->pSvcParam->iSpsPpsIdStrategy, iValue);
+               " CWelsH264SVCEncoder::SetOption eSpsPpsIdStrategy changing in the middle of call is NOT allowed for eSpsPpsIdStrategy>INCREASING_ID: existing setting is %d and the new one is %d",
+               m_pEncContext->pSvcParam->eSpsPpsIdStrategy, iValue);
       return cmInitParaError;
     }
-    m_pEncContext->pSvcParam->iSpsPpsIdStrategy = iValue;
-    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, " CWelsH264SVCEncoder::SetOption iSpsPpsIdStrategy = %d ",
-             m_pEncContext->pSvcParam->iSpsPpsIdStrategy);
+    m_pEncContext->pSvcParam->eSpsPpsIdStrategy = iValue;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, " CWelsH264SVCEncoder::SetOption eSpsPpsIdStrategy = %d ",
+             m_pEncContext->pSvcParam->eSpsPpsIdStrategy);
   }
   break;
   case ENCODER_OPTION_CURRENT_PATH: {
