@@ -48,7 +48,7 @@ ifeq ($(BUILDTYPE), Release)
 CFLAGS += $(CFLAGS_OPT)
 USE_ASM = Yes
 else
-CFLAGS = $(CFLAGS_DEBUG)
+CFLAGS += $(CFLAGS_DEBUG)
 USE_ASM = No
 endif
 
