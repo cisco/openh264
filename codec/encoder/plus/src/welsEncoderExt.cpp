@@ -911,7 +911,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   }
   break;
   case ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION: {
-    int32_t iValue = * ((int32_t*)pOption);
+    EParameterSetStrategy iValue = * (static_cast<EParameterSetStrategy*>(pOption));
     if (((iValue > INCREASING_ID) || (m_pEncContext->pSvcParam->eSpsPpsIdStrategy > INCREASING_ID))
         && m_pEncContext->pSvcParam->eSpsPpsIdStrategy != iValue) {
       WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
