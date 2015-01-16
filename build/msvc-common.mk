@@ -10,7 +10,7 @@ else
 endif
 ifeq ($(ASM_ARCH), arm)
 CCAS = gas-preprocessor.pl -as-type armasm -force-thumb -- armasm
-CCASFLAGS = -nologo -DHAVE_NEON
+CCASFLAGS = -nologo -DHAVE_NEON -ignore 4509
 endif
 
 CC=cl
