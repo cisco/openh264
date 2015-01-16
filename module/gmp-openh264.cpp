@@ -62,7 +62,10 @@
 #endif
 
 // This is for supporting older versions which do not have support for nullptr.
-#if defined(__clang__)
+#if defined(nullptr)
+# define GMP_HAVE_NULLPTR
+
+#elif defined(__clang__)
 # ifndef __has_extension
 # define __has_extension __has_feature
 # endif
