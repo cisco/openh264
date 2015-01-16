@@ -605,23 +605,17 @@ int CUtils::CheckOS() {
   OSVERSIONINFOEX osvi;
   ZeroMemory (&osvi, sizeof (OSVERSIONINFOEX));
   osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
+  osvi.dwPlatformId = VER_PLATFORM_WIN32_NT;
+  osvi.dwMajorVersion = 6; // Vista
+  DWORDLONG condmask = VerSetConditionMask (VerSetConditionMask (0, VER_MAJORVERSION, VER_GREATER_EQUAL),
+                       VER_PLATFORMID, VER_EQUAL);
 
-  if (!GetVersionEx ((OSVERSIONINFO*) &osvi)) {
-    osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-    if (! GetVersionEx ((OSVERSIONINFO*) &osvi))
-      return iType;
-  }
-
-  switch (osvi.dwPlatformId) {
-  case VER_PLATFORM_WIN32_NT:
-    if (osvi.dwMajorVersion >= 6)
-      iType = OS_VISTA_UPPER;
-    else if (osvi.dwMajorVersion == 5)
+  if (VerifyVersionInfo (&osvi, VER_MAJORVERSION | VER_PLATFORMID, condmask)) {
+    iType = OS_VISTA_UPPER;
+  } else {
+    osvi.dwMajorVersion = 5; // XP/2000
+    if (VerifyVersionInfo (&osvi, VER_MAJORVERSION | VER_PLATFORMID, condmask))
       iType = OS_XP;
-    break;
-
-  default:
-    break;
   }
 #endif
 
