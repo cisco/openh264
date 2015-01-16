@@ -117,6 +117,7 @@ TEST_F (ParameterSetStrategyTest, FindExistingSps) {
   iFoundId = FindExistingSps (&sParam2, bUseSubsetSps, iDlayerIndex, iDlayerCount, iCurSpsInUse,
                               m_pSpsArray, m_pSubsetArray);
   EXPECT_EQ (iFoundId, INVALID_ID);
+  (void) iRet; // Not using iRet at the moment
 }
 
 
