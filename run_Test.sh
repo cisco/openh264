@@ -35,10 +35,10 @@ runInputParamCheck()
 #usage: runUnitTest
 runUnitTest()
 {
-  make -B ENABLE64BIT=Yes BUILDTYPE=Release all plugin test
-  make -B ENABLE64BIT=Yes BUILDTYPE=Debug   all plugin test
-  make -B ENABLE64BIT=No  BUILDTYPE=Release all plugin test
-  make -B ENABLE64BIT=No  BUILDTYPE=Debug   all plugin test
+  CFLAGS=-Werror make -B ENABLE64BIT=Yes BUILDTYPE=Release all plugin test
+  CFLAGS=-Werror make -B ENABLE64BIT=Yes BUILDTYPE=Debug   all plugin test
+  CFLAGS=-Werror make -B ENABLE64BIT=No  BUILDTYPE=Release all plugin test
+  CFLAGS=-Werror make -B ENABLE64BIT=No  BUILDTYPE=Debug   all plugin test
   return $?
 }
 #usage: runPrepareAndBinaryTest $TestBitStream
