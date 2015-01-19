@@ -233,7 +233,27 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
       } else if (strTag[0].compare ("MaxNalSize") == 0) {
         pSvcParam.uiMaxNalSize = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("SpsPpsIDStrategy") == 0) {
-        pSvcParam.eSpsPpsIdStrategy	= atoi (strTag[1].c_str());
+        int32_t iValue	= atoi (strTag[1].c_str());
+        switch (iValue) {
+          case 0:
+            pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
+            break;
+          case 0x01:
+            pSvcParam.eSpsPpsIdStrategy  = INCREASING_ID;
+            break;
+          case 0x02:
+            pSvcParam.eSpsPpsIdStrategy  = SPS_LISTING;
+            break;
+          case 0x03:
+            pSvcParam.eSpsPpsIdStrategy  = SPS_LISTING_AND_PPS_INCREASING;
+            break;
+          case 0x06:
+            pSvcParam.eSpsPpsIdStrategy  = SPS_PPS_LISTING;
+            break;
+          default:
+            pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
+            break;
+        }
       } else if (strTag[0].compare ("EnableScalableSEI") == 0) {
         pSvcParam.bEnableSSEI	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableFrameCropping") == 0) {
