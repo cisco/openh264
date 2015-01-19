@@ -37,6 +37,7 @@ using namespace WelsCommon;
 #define MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA (6)
 #define MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN (8)
 
+#define GET_MB_WIDTH(x) (((x) + 15)/16)
 
 typedef struct SLost_Sim {
   WelsCommon::EWelsNalUnitType eNalType;
@@ -148,11 +149,11 @@ class EncodeDecodeTestBase : public ::testing::TestWithParam<EncodeDecodeFilePar
 
 
   virtual int GetRandWidth() {
-    return (WELS_CLIP3 ((((rand() % MAX_WIDTH) >> 1) + 1) << 1, 2, MAX_WIDTH));
+    return WelsClip3 ((((rand() % MAX_WIDTH) >> 1) + 1) << 1, 2, MAX_WIDTH);
   }
 
   virtual int GetRandHeight() {
-    return (WELS_CLIP3 ((((rand() % MAX_HEIGHT) >> 1) + 1) << 1, 2, MAX_HEIGHT));
+    return WelsClip3 ((((rand() % MAX_HEIGHT) >> 1) + 1) << 1, 2, MAX_HEIGHT);
   }
 
  protected:
@@ -2591,14 +2592,14 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
   sParam1.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
   //prepare param2
   memcpy (&sParam2, &sParam1, sizeof (SEncParamExt));
-  while (sParam2.iPicWidth == sParam1.iPicWidth) {
+  while (GET_MB_WIDTH (sParam2.iPicWidth) == GET_MB_WIDTH (sParam1.iPicWidth)) {
     sParam2.iPicWidth = GetRandWidth();
   }
   prepareParam (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
   sParam2.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
   //prepare param3
   memcpy (&sParam3, &sParam1, sizeof (SEncParamExt));
-  while (sParam3.iPicHeight == sParam1.iPicHeight) {
+  while (GET_MB_WIDTH (sParam3.iPicHeight) == GET_MB_WIDTH (sParam1.iPicHeight)) {
     sParam3.iPicHeight = GetRandHeight();
   }
   prepareParam (iSpatialLayerNum, iSliceNum, sParam3.iPicWidth, sParam3.iPicHeight, fFrameRate, &sParam3);
@@ -2682,7 +2683,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
   ASSERT_TRUE (rv == cmResultSuccess) << "rv = " << rv;
 }
 
-#define DEBUG_FILE_SAVE5
+//#define DEBUG_FILE_SAVE5
 TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING2) {
   //usage 3: 2 Params with different num_ref, encode IDR0, P1, IDR2;
   //the bs will show two SPS and different PPS
@@ -2768,7 +2769,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
 
   int max_count = 65; // make it more then twice as MAX_SPS_COUNT
   std::vector<int> vWidthTable;
-  vWidthTable.push_back (sParam1.iPicWidth);
+  vWidthTable.push_back (GET_MB_WIDTH (sParam1.iPicWidth));
 
   std::vector<int>::iterator vWidthTableIt;
   for (int times = 0; times < max_count; times++) {
@@ -2776,9 +2777,9 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
     memcpy (&sParam2, &sParam1, sizeof (SEncParamExt));
     do {
       sParam2.iPicWidth = GetRandWidth();
-      vWidthTableIt = std::find (vWidthTable.begin(), vWidthTable.end(), sParam2.iPicWidth);
-    } while (vWidthTableIt == vWidthTable.end());
-    vWidthTable.push_back (sParam2.iPicWidth);
+      vWidthTableIt = std::find (vWidthTable.begin(), vWidthTable.end(), GET_MB_WIDTH (sParam2.iPicWidth));
+    } while (vWidthTableIt != vWidthTable.end());
+    vWidthTable.push_back (GET_MB_WIDTH (sParam2.iPicWidth));
     prepareParam (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
     sParam2.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
 
@@ -2889,7 +2890,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_PPS_LISTING2) {
   sParam1.eSpsPpsIdStrategy = SPS_PPS_LISTING;
   //prepare param2
   memcpy (&sParam2, &sParam1, sizeof (SEncParamExt));
-  while (sParam2.iPicWidth == sParam1.iPicWidth) {
+  while (GET_MB_WIDTH (sParam2.iPicWidth) == GET_MB_WIDTH (sParam1.iPicWidth)) {
     sParam2.iPicWidth = GetRandWidth();
   }
   prepareParam (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
@@ -2948,14 +2949,15 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_PPS_LISTING3) {
   sParam1.eSpsPpsIdStrategy = SPS_PPS_LISTING;
   //prepare param2
   memcpy (&sParam2, &sParam1, sizeof (SEncParamExt));
-  while (sParam2.iPicWidth == sParam1.iPicWidth) {
+  while (GET_MB_WIDTH (sParam2.iPicWidth) == GET_MB_WIDTH (sParam1.iPicWidth)) {
     sParam2.iPicWidth = GetRandWidth();
   }
   prepareParam (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
   sParam2.eSpsPpsIdStrategy = SPS_PPS_LISTING;
   //prepare param3
   memcpy (&sParam3, &sParam1, sizeof (SEncParamExt));
-  while (sParam3.iPicWidth == sParam1.iPicWidth || sParam3.iPicWidth == sParam2.iPicWidth) {
+  while (GET_MB_WIDTH (sParam3.iPicWidth) == GET_MB_WIDTH (sParam1.iPicWidth) ||
+         GET_MB_WIDTH (sParam3.iPicWidth) == GET_MB_WIDTH (sParam2.iPicWidth)) {
     sParam3.iPicWidth = GetRandWidth();
   }
   prepareParam (iSpatialLayerNum, iSliceNum, sParam3.iPicWidth, sParam3.iPicHeight, fFrameRate, &sParam3);
