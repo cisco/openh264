@@ -420,9 +420,31 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
     else if (!strcmp (pCommand, "-nalsize") && (n < argc))
       pSvcParam.uiMaxNalSize = atoi (argv[n++]);
 
-    else if (!strcmp (pCommand, "-spsid") && (n < argc))
-      pSvcParam.eSpsPpsIdStrategy = atoi (argv[n++]);
-
+    else if (!strcmp (pCommand, "-spsid") && (n < argc)) {
+      int32_t iValue = atoi (argv[n++]);
+      switch (iValue) {
+        case 0:
+          pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
+          break;
+        case 0x01:
+          pSvcParam.eSpsPpsIdStrategy  = INCREASING_ID;
+          break;
+        case 0x02:
+          pSvcParam.eSpsPpsIdStrategy  = SPS_LISTING;
+          break;
+        case 0x03:
+          pSvcParam.eSpsPpsIdStrategy  = SPS_LISTING_AND_PPS_INCREASING;
+          break;
+        case 0x06:
+          pSvcParam.eSpsPpsIdStrategy  = SPS_PPS_LISTING;
+          break;
+        default:
+          WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
+                   " CWelsH264SVCEncoder::SetOption eSpsPpsIdStrategy(%d) not in valid range, set to CONSTANT_ID", iValue);
+          pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
+          break;
+      }
+    }
     else if (!strcmp (pCommand, "-cabac") && (n < argc))
       pSvcParam.iEntropyCodingModeFlag = atoi (argv[n++]);
 
