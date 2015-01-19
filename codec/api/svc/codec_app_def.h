@@ -432,7 +432,7 @@ typedef struct TagEncParamExt {
   ECOMPLEXITY_MODE iComplexityMode;
   unsigned int      uiIntraPeriod;     ///< period of Intra frame
   int               iNumRefFrame;      ///< number of reference frame used
-  int     iSpsPpsIdStrategy;       ///< different stategy in adjust ID in SPS/PPS: 0- constant ID, 1-additional ID, 6-mapping and additional
+  EParameterSetStrategy     eSpsPpsIdStrategy;       ///< different stategy in adjust ID in SPS/PPS: 0- constant ID, 1-additional ID, 6-mapping and additional
   bool    bPrefixNalAddingCtrl;        ///< false:not use Prefix NAL; true: use Prefix NAL
   bool    bEnableSSEI;                 ///< false:not use SSEI; true: use SSEI -- TODO: planning to remove the interface of SSEI
   bool    bSimulcastAVC;               ///< (when encoding more than 1 spatial layer) false: use SVC syntax for higher layers; true: use Simulcast AVC -- coming soon
