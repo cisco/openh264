@@ -323,10 +323,10 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
     pCodingParam->bDeblockingParallelFlag = true;
   }
 
-  if (pCodingParam->iSpatialLayerNum > 1 && (SPS_LISTING & pCodingParam->iSpsPpsIdStrategy)) {
+  if (pCodingParam->iSpatialLayerNum > 1 && (SPS_LISTING & pCodingParam->eSpsPpsIdStrategy)) {
     WelsLog (pLogCtx, WELS_LOG_INFO,
-             "ParamValidationExt(), iSpsPpsIdStrategy adjusted to CONSTANT_ID");
-    pCodingParam->iSpsPpsIdStrategy = CONSTANT_ID;
+             "ParamValidationExt(), eSpsPpsIdStrategy adjusted to CONSTANT_ID");
+    pCodingParam->eSpsPpsIdStrategy = CONSTANT_ID;
   }
 
   for (i = 0; i < pCodingParam->iSpatialLayerNum; ++ i) {
@@ -674,9 +674,9 @@ static inline int32_t AcquireLayersNals (sWelsEncCtx** ppCtx, SWelsSvcCodingPara
   // count parasets
   iCountNumNals += 1 + iNumDependencyLayers + (iCountNumLayers << 1) +
                    iCountNumLayers // plus iCountNumLayers for reserved application
-                   + ((SPS_LISTING & pParam->iSpsPpsIdStrategy) ? MAX_SPS_COUNT : 0) //for Sps
-                   + (((SPS_LISTING & pParam->iSpsPpsIdStrategy) && (iNumDependencyLayers > 1)) ? MAX_SPS_COUNT : 0) //for SubsetSps
-                   + ((SPS_PPS_LISTING == pParam->iSpsPpsIdStrategy) ? MAX_PPS_COUNT : 0);
+                   + ((SPS_LISTING & pParam->eSpsPpsIdStrategy) ? MAX_SPS_COUNT : 0) //for Sps
+                   + (((SPS_LISTING & pParam->eSpsPpsIdStrategy) && (iNumDependencyLayers > 1)) ? MAX_SPS_COUNT : 0) //for SubsetSps
+                   + ((SPS_PPS_LISTING == pParam->eSpsPpsIdStrategy) ? MAX_PPS_COUNT : 0);
 
   // to check number of layers / nals / slices dependencies, 12/8/2010
   if (iCountNumLayers > MAX_LAYER_NUM_OF_FRAME) {
@@ -1172,7 +1172,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
 
   // for dynamically malloc for parameter sets memory instead of maximal items for standard to reduce size, 3/18/2010
   // SPS
-  if (! (SPS_LISTING & pParam->iSpsPpsIdStrategy)) {
+  if (! (SPS_LISTING & pParam->eSpsPpsIdStrategy)) {
     (*ppCtx)->pSpsArray	= (SWelsSPS*)pMa->WelsMalloc (sizeof (SWelsSPS), "pSpsArray");
     WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pSpsArray), FreeMemorySvc (ppCtx))
     if (iDlayerCount > 1) {
@@ -1180,7 +1180,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
       WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pSubsetArray), FreeMemorySvc (ppCtx))
     }
   } else {
-    // pParam->iSpsPpsIdStrategy == SPS_LISTING_AND_PPS_INCREASING
+    // pParam->eSpsPpsIdStrategy == SPS_LISTING_AND_PPS_INCREASING
     // new memory
     (*ppCtx)->pSpsArray	= (SWelsSPS*)pMa->WelsMalloc (MAX_SPS_COUNT * sizeof (SWelsSPS), "pSpsArray");
     WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pSpsArray), FreeMemorySvc (ppCtx))
@@ -1197,7 +1197,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
     }
   }
   // PPS
-  if (! (SPS_PPS_LISTING == pParam->iSpsPpsIdStrategy)) {
+  if (! (SPS_PPS_LISTING == pParam->eSpsPpsIdStrategy)) {
     (*ppCtx)->pPPSArray	= (SWelsPPS*)pMa->WelsMalloc (iDlayerCount * sizeof (SWelsPPS), "pPPSArray");
     WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pPPSArray), FreeMemorySvc (ppCtx))
   } else {
@@ -1212,7 +1212,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
     }
   }
 
-  if (INCREASING_ID & pParam->iSpsPpsIdStrategy) {
+  if (INCREASING_ID & pParam->eSpsPpsIdStrategy) {
     (*ppCtx)->pPSOVector = & ((*ppCtx)->sPSOVector);
   } else {
     (*ppCtx)->pPSOVector = NULL;
@@ -1229,11 +1229,11 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
 
     pDqIdc->uiSpatialId	= iDlayerIndex;
 
-    if (! (SPS_LISTING & pParam->iSpsPpsIdStrategy)) {
+    if (! (SPS_LISTING & pParam->eSpsPpsIdStrategy)) {
       WelsGenerateNewSps (*ppCtx, bUseSubsetSps, iDlayerIndex,
                           iDlayerCount, iSpsId, pSps, pSubsetSps);
     } else {
-      //SPS_LISTING_AND_PPS_INCREASING == pParam->iSpsPpsIdStrategy
+      //SPS_LISTING_AND_PPS_INCREASING == pParam->eSpsPpsIdStrategy
       //check if the current param can fit in an existing SPS
       const int32_t kiFoundSpsId = FindExistingSps ((*ppCtx)->pSvcParam, bUseSubsetSps, iDlayerIndex, iDlayerCount,
                                    bUseSubsetSps ? ((*ppCtx)->sPSOVector.uiInUseSubsetSpsNum) : ((*ppCtx)->sPSOVector.uiInUseSpsNum),
@@ -1251,7 +1251,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
         }
       } else {
         //if no, generate a new SPS as usual
-        if ((SPS_PPS_LISTING == pParam->iSpsPpsIdStrategy) && (MAX_PPS_COUNT <= (*ppCtx)->sPSOVector.uiInUsePpsNum)) {
+        if ((SPS_PPS_LISTING == pParam->eSpsPpsIdStrategy) && (MAX_PPS_COUNT <= (*ppCtx)->sPSOVector.uiInUsePpsNum)) {
           //check if we can generate new SPS or not
           WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_ERROR,
                    "InitDqLayers(), cannot generate new SPS under the SPS_PPS_LISTING mode!");
@@ -1260,7 +1260,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
 
         iSpsId = (!bUseSubsetSps) ? ((*ppCtx)->sPSOVector.uiInUseSpsNum++) : ((*ppCtx)->sPSOVector.uiInUseSubsetSpsNum++);
         if (iSpsId >= MAX_SPS_COUNT) {
-          if (SPS_PPS_LISTING == pParam->iSpsPpsIdStrategy) {
+          if (SPS_PPS_LISTING == pParam->eSpsPpsIdStrategy) {
             WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_ERROR,
                      "InitDqLayers(), cannot generate new SPS under the SPS_PPS_LISTING mode!");
             return ENC_RETURN_UNSUPPORTED_PARA;
@@ -1281,7 +1281,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
       }
     }
 
-    if (! (SPS_PPS_LISTING == pParam->iSpsPpsIdStrategy)) {
+    if (! (SPS_PPS_LISTING == pParam->eSpsPpsIdStrategy)) {
       pPps	= & (*ppCtx)->pPPSArray[iPpsId];
       // initialize pPps
       WelsInitPps (pPps, pSps, pSubsetSps, iPpsId, true, bUseSubsetSps, pParam->iEntropyCodingModeFlag != 0);
@@ -1336,11 +1336,11 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
 
     ++ iDlayerIndex;
   }
-  if (SPS_LISTING & pParam->iSpsPpsIdStrategy) {
+  if (SPS_LISTING & pParam->eSpsPpsIdStrategy) {
     (*ppCtx)->iSpsNum = (*ppCtx)->sPSOVector.uiInUseSpsNum;
     (*ppCtx)->iSubsetSpsNum = (*ppCtx)->sPSOVector.uiInUseSubsetSpsNum;
   }
-  if (SPS_PPS_LISTING == pParam->iSpsPpsIdStrategy) {
+  if (SPS_PPS_LISTING == pParam->eSpsPpsIdStrategy) {
     (*ppCtx)->iPpsNum = (*ppCtx)->sPSOVector.uiInUsePpsNum;
   }
   return ENC_RETURN_SUCCESS;
@@ -2798,7 +2798,7 @@ void WelsInitCurrentLayer (sWelsEncCtx* pCtx,
   int32_t iCurPpsId = pDqIdc->iPpsId;
   int32_t iCurSpsId = pDqIdc->iSpsId;
 
-  if (SPS_PPS_LISTING == pParam->iSpsPpsIdStrategy) {
+  if (SPS_PPS_LISTING == pParam->eSpsPpsIdStrategy) {
     iCurPpsId = pCtx->sPSOVector.iPpsIdList[pDqIdc->iPpsId][WELS_ABS (pCtx->uiIdrPicId - 1) % MAX_PPS_COUNT];
   }
 
@@ -3117,21 +3117,21 @@ int32_t WelsWriteParameterSets (sWelsEncCtx* pCtx, int32_t* pNalLen, int32_t* pN
   while (iIdx < pCtx->iSpsNum) {
     iNal	= pCtx->pOut->iNalIndex;
 
-    if (INCREASING_ID == pCtx->pSvcParam->iSpsPpsIdStrategy) {
+    if (INCREASING_ID == pCtx->pSvcParam->eSpsPpsIdStrategy) {
 #if _DEBUG
-      pCtx->sPSOVector.iSpsPpsIdStrategy = INCREASING_ID;
+      pCtx->sPSOVector.eSpsPpsIdStrategy = INCREASING_ID;
       assert (iIdx < MAX_DQ_LAYER_NUM);
 #endif
 
       ParasetIdAdditionIdAdjust (& (pCtx->sPSOVector.sParaSetOffsetVariable[PARA_SET_TYPE_AVCSPS]),
                                  pCtx->pSpsArray[0].uiSpsId,
                                  MAX_SPS_COUNT);
-    } else if (CONSTANT_ID == pCtx->pSvcParam->iSpsPpsIdStrategy) {
+    } else if (CONSTANT_ID == pCtx->pSvcParam->eSpsPpsIdStrategy) {
       memset (& (pCtx->sPSOVector), 0, sizeof (pCtx->sPSOVector));
     }
 
     /* generate sequence parameters set */
-    iId	= (SPS_LISTING & pCtx->pSvcParam->iSpsPpsIdStrategy) ? iIdx : 0;
+    iId	= (SPS_LISTING & pCtx->pSvcParam->eSpsPpsIdStrategy) ? iIdx : 0;
 
     WelsLoadNal (pCtx->pOut, NAL_UNIT_SPS, NRI_PRI_HIGHEST);
     WelsWriteSpsNal (&pCtx->pSpsArray[iId], &pCtx->pOut->sBsWrite,
@@ -3157,9 +3157,9 @@ int32_t WelsWriteParameterSets (sWelsEncCtx* pCtx, int32_t* pNalLen, int32_t* pN
   while (iIdx < pCtx->iSubsetSpsNum) {
     iNal	= pCtx->pOut->iNalIndex;
 
-    if (INCREASING_ID == pCtx->pSvcParam->iSpsPpsIdStrategy) {
+    if (INCREASING_ID == pCtx->pSvcParam->eSpsPpsIdStrategy) {
 #if _DEBUG
-      pCtx->sPSOVector.iSpsPpsIdStrategy = INCREASING_ID;
+      pCtx->sPSOVector.eSpsPpsIdStrategy = INCREASING_ID;
       assert (iIdx < MAX_DQ_LAYER_NUM);
 #endif
 
@@ -3193,7 +3193,7 @@ int32_t WelsWriteParameterSets (sWelsEncCtx* pCtx, int32_t* pNalLen, int32_t* pN
 
   /* write all PPS */
   iIdx = 0;
-  if ((SPS_PPS_LISTING == pCtx->pSvcParam->iSpsPpsIdStrategy) && (pCtx->iPpsNum < MAX_PPS_COUNT)) {
+  if ((SPS_PPS_LISTING == pCtx->pSvcParam->eSpsPpsIdStrategy) && (pCtx->iPpsNum < MAX_PPS_COUNT)) {
     assert (pCtx->iPpsNum <= MAX_DQ_LAYER_NUM);
 
     //Generate PPS LIST
@@ -3216,7 +3216,7 @@ int32_t WelsWriteParameterSets (sWelsEncCtx* pCtx, int32_t* pNalLen, int32_t* pN
   }
 
   while (iIdx < pCtx->iPpsNum) {
-    if ((INCREASING_ID & pCtx->pSvcParam->iSpsPpsIdStrategy)) {
+    if ((INCREASING_ID & pCtx->pSvcParam->eSpsPpsIdStrategy)) {
       //para_set_type = 2: PPS, use MAX_PPS_COUNT
       ParasetIdAdditionIdAdjust (&pCtx->sPSOVector.sParaSetOffsetVariable[PARA_SET_TYPE_PPS], pCtx->pPPSArray[iIdx].iPpsId,
                                  MAX_PPS_COUNT);
@@ -3226,7 +3226,7 @@ int32_t WelsWriteParameterSets (sWelsEncCtx* pCtx, int32_t* pNalLen, int32_t* pN
     /* generate picture parameter set */
     WelsLoadNal (pCtx->pOut, NAL_UNIT_PPS, NRI_PRI_HIGHEST);
     WelsWritePpsSyntax (&pCtx->pPPSArray[iIdx], &pCtx->pOut->sBsWrite,
-                        ((SPS_PPS_LISTING != pCtx->pSvcParam->iSpsPpsIdStrategy)) ? (& (pCtx->sPSOVector)) : NULL);
+                        ((SPS_PPS_LISTING != pCtx->pSvcParam->eSpsPpsIdStrategy)) ? (& (pCtx->sPSOVector)) : NULL);
     WelsUnloadNal (pCtx->pOut);
 
     iReturn = WelsEncodeNal (&pCtx->pOut->sNalList[iNal], NULL,
@@ -4124,7 +4124,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
                 (pOldParam->iMultipleThreadIdc != pNewParam->iMultipleThreadIdc) ||
                 (pOldParam->bEnableBackgroundDetection != pNewParam->bEnableBackgroundDetection) ||
                 (pOldParam->bEnableAdaptiveQuant != pNewParam->bEnableAdaptiveQuant) ||
-                (pOldParam->iSpsPpsIdStrategy != pNewParam->iSpsPpsIdStrategy);
+                (pOldParam->eSpsPpsIdStrategy != pNewParam->eSpsPpsIdStrategy);
   if (pNewParam->iMaxNumRefFrame > pOldParam->iMaxNumRefFrame) {
     bNeedReset = true;
   }
@@ -4173,7 +4173,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
   if (bNeedReset) {
     SLogContext sLogCtx = (*ppCtx)->sLogCtx;
 
-    int32_t iOldSpsPpsIdStrategy = pOldParam->iSpsPpsIdStrategy;
+    int32_t iOldSpsPpsIdStrategy = pOldParam->eSpsPpsIdStrategy;
     SParaSetOffsetVariable sTmpPsoVariable[PARA_SET_TYPE];
     int32_t  iTmpPpsIdList[MAX_DQ_LAYER_NUM * MAX_PPS_COUNT];
     uint16_t uiTmpIdrPicId = (*ppCtx)->uiIdrPicId;//this is for LTR!
@@ -4183,7 +4183,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     SExistingParasetList sExistingParasetList;
     SExistingParasetList* pExistingParasetList = NULL;
 
-    if ((CONSTANT_ID != iOldSpsPpsIdStrategy) && (CONSTANT_ID != pNewParam->iSpsPpsIdStrategy)) {
+    if ((CONSTANT_ID != iOldSpsPpsIdStrategy) && (CONSTANT_ID != pNewParam->eSpsPpsIdStrategy)) {
       for (int32_t k = 0; k < PARA_SET_TYPE; k++) {
         memset (((*ppCtx)->sPSOVector.sParaSetOffsetVariable[k].bUsedParaSetIdInBs), 0, MAX_PPS_COUNT * sizeof (bool));
       }
@@ -4191,7 +4191,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
               (PARA_SET_TYPE)*sizeof (SParaSetOffsetVariable)); // confirmed_safe_unsafe_usage
 
       if ((SPS_LISTING & iOldSpsPpsIdStrategy)
-          && (SPS_LISTING & pNewParam->iSpsPpsIdStrategy)) {
+          && (SPS_LISTING & pNewParam->eSpsPpsIdStrategy)) {
         pExistingParasetList = &sExistingParasetList;
         sExistingParasetList.uiInUseSpsNum = (*ppCtx)->sPSOVector.uiInUseSpsNum;
         sExistingParasetList.uiInUseSubsetSpsNum = (*ppCtx)->sPSOVector.uiInUseSubsetSpsNum;
@@ -4200,7 +4200,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
       }
 
       if ((SPS_PPS_LISTING == iOldSpsPpsIdStrategy)
-          && (SPS_PPS_LISTING == pNewParam->iSpsPpsIdStrategy)) {
+          && (SPS_PPS_LISTING == pNewParam->eSpsPpsIdStrategy)) {
         pExistingParasetList = &sExistingParasetList;
         sExistingParasetList.uiInUseSpsNum = (*ppCtx)->sPSOVector.uiInUseSpsNum;
         sExistingParasetList.uiInUseSubsetSpsNum = (*ppCtx)->sPSOVector.uiInUseSubsetSpsNum;
@@ -4230,14 +4230,14 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     //for sEncoderStatistics
     (*ppCtx)->sEncoderStatistics = sTempEncoderStatistics;
 
-    //load back the needed structure for iSpsPpsIdStrategy
-    if ((CONSTANT_ID != iOldSpsPpsIdStrategy) && (CONSTANT_ID != pNewParam->iSpsPpsIdStrategy)) {
+    //load back the needed structure for eSpsPpsIdStrategy
+    if ((CONSTANT_ID != iOldSpsPpsIdStrategy) && (CONSTANT_ID != pNewParam->eSpsPpsIdStrategy)) {
       memcpy ((*ppCtx)->sPSOVector.sParaSetOffsetVariable, sTmpPsoVariable,
               (PARA_SET_TYPE)*sizeof (SParaSetOffsetVariable)); // confirmed_safe_unsafe_usage
     }
 
     if ((SPS_PPS_LISTING == iOldSpsPpsIdStrategy)
-        && (SPS_PPS_LISTING == pNewParam->iSpsPpsIdStrategy)) {
+        && (SPS_PPS_LISTING == pNewParam->eSpsPpsIdStrategy)) {
       memcpy (((*ppCtx)->sPSOVector.iPpsIdList), iTmpPpsIdList, MAX_DQ_LAYER_NUM * MAX_PPS_COUNT * sizeof (int32_t));
     }
   } else {
@@ -4254,7 +4254,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     pOldParam->fMaxFrameRate	= pNewParam->fMaxFrameRate;		// maximal frame rate [Hz / fps]
     pOldParam->iComplexityMode	= pNewParam->iComplexityMode;			// color space of input sequence
     pOldParam->uiIntraPeriod		= pNewParam->uiIntraPeriod;		// intra period (multiple of GOP size as desired)
-    pOldParam->iSpsPpsIdStrategy = pNewParam->iSpsPpsIdStrategy;
+    pOldParam->eSpsPpsIdStrategy = pNewParam->eSpsPpsIdStrategy;
     pOldParam->bPrefixNalAddingCtrl = pNewParam->bPrefixNalAddingCtrl;
     pOldParam->iNumRefFrame		= pNewParam->iNumRefFrame;		// number of reference frame used
     pOldParam->uiGopSize = pNewParam->uiGopSize;

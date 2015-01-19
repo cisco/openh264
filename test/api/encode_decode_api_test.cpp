@@ -260,7 +260,27 @@ void EncodeDecodeTestAPI::RandomParamExtCombination() {
   param_.iNumRefFrame       = AUTO_REF_PIC_COUNT;
   param_.iMultipleThreadIdc = rand();
 
-  param_.iSpsPpsIdStrategy   = rand() % 3;
+  int iValue   = rand() % 7;
+  switch (iValue) {
+    case 0:
+      param_.eSpsPpsIdStrategy  = CONSTANT_ID;
+      break;
+    case 0x01:
+      param_.eSpsPpsIdStrategy  = INCREASING_ID;
+      break;
+    case 0x02:
+      param_.eSpsPpsIdStrategy  = SPS_LISTING;
+      break;
+    case 0x03:
+      param_.eSpsPpsIdStrategy  = SPS_LISTING_AND_PPS_INCREASING;
+      break;
+    case 0x06:
+      param_.eSpsPpsIdStrategy  = SPS_PPS_LISTING;
+      break;
+    default:
+      param_.eSpsPpsIdStrategy  = CONSTANT_ID;
+      break;
+  }
   param_.bPrefixNalAddingCtrl      = (rand() % 2 == 0) ? false : true;
   param_.bEnableSSEI               = (rand() % 2 == 0) ? false : true;
   param_.iPaddingFlag              = rand() % 2;
@@ -2234,7 +2254,7 @@ TEST_F (DecodeCrashTestAPI, DecoderCrashTest) {
     param_.iRCMode = RC_BITRATE_MODE;
     param_.iTargetBitrate = p.iTarBitrate;
     param_.uiIntraPeriod = 0;
-    param_.iSpsPpsIdStrategy = INCREASING_ID;
+    param_.eSpsPpsIdStrategy = INCREASING_ID;
     param_.bEnableBackgroundDetection = true;
     param_.bEnableSceneChangeDetect = true;
     param_.bPrefixNalAddingCtrl = true;
@@ -2568,21 +2588,21 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
   SEncParamExt   sParam3;
   encoder_->GetDefaultParams (&sParam1);
   prepareParam (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
-  sParam1.iSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
+  sParam1.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
   //prepare param2
   memcpy (&sParam2, &sParam1, sizeof (SEncParamExt));
   while (sParam2.iPicWidth == sParam1.iPicWidth) {
     sParam2.iPicWidth = GetRandWidth();
   }
   prepareParam (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
-  sParam2.iSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
+  sParam2.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
   //prepare param3
   memcpy (&sParam3, &sParam1, sizeof (SEncParamExt));
   while (sParam3.iPicHeight == sParam1.iPicHeight) {
     sParam3.iPicHeight = GetRandHeight();
   }
   prepareParam (iSpatialLayerNum, iSliceNum, sParam3.iPicWidth, sParam3.iPicHeight, fFrameRate, &sParam3);
-  sParam3.iSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
+  sParam3.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
 
   //prepare output if needed
   FILE* fEnc =  NULL;
@@ -2679,12 +2699,12 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
   SEncParamExt   sParam2;
   encoder_->GetDefaultParams (&sParam1);
   prepareParam (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
-  sParam1.iSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
+  sParam1.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
   sParam1.iTemporalLayerNum = 1;
   //prepare param2
   memcpy (&sParam2, &sParam1, sizeof (SEncParamExt));
   prepareParam (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
-  sParam2.iSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
+  sParam2.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
   sParam2.iTemporalLayerNum = 3;
 
   //prepare output if needed
@@ -2734,7 +2754,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
   SEncParamExt   sParam2;
   encoder_->GetDefaultParams (&sParam1);
   prepareParam (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
-  sParam1.iSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
+  sParam1.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
 
   //prepare output if needed
   FILE* fEnc =  NULL;
@@ -2760,7 +2780,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
     } while (vWidthTableIt == vWidthTable.end());
     vWidthTable.push_back (sParam2.iPicWidth);
     prepareParam (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
-    sParam2.iSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
+    sParam2.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
 
     rv = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam2);
     ASSERT_TRUE (rv == cmResultSuccess) << "SetOption Failed sParam2: rv = " << rv << ", sParam2.iPicWidth=" <<
@@ -2801,7 +2821,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_PPS_LISTING1) {
   SEncParamExt   sParam1;
   encoder_->GetDefaultParams (&sParam1);
   prepareParam (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
-  sParam1.iSpsPpsIdStrategy = SPS_PPS_LISTING;
+  sParam1.eSpsPpsIdStrategy = SPS_PPS_LISTING;
 
   //prepare output if needed
   FILE* fEnc =  NULL;
@@ -2866,14 +2886,14 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_PPS_LISTING2) {
   SEncParamExt   sParam2;
   encoder_->GetDefaultParams (&sParam1);
   prepareParam (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
-  sParam1.iSpsPpsIdStrategy = SPS_PPS_LISTING;
+  sParam1.eSpsPpsIdStrategy = SPS_PPS_LISTING;
   //prepare param2
   memcpy (&sParam2, &sParam1, sizeof (SEncParamExt));
   while (sParam2.iPicWidth == sParam1.iPicWidth) {
     sParam2.iPicWidth = GetRandWidth();
   }
   prepareParam (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
-  sParam2.iSpsPpsIdStrategy = SPS_PPS_LISTING;
+  sParam2.eSpsPpsIdStrategy = SPS_PPS_LISTING;
 
   //prepare output if needed
   FILE* fEnc =  NULL;
@@ -2925,21 +2945,21 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_PPS_LISTING3) {
   SEncParamExt   sParam3;
   encoder_->GetDefaultParams (&sParam1);
   prepareParam (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
-  sParam1.iSpsPpsIdStrategy = SPS_PPS_LISTING;
+  sParam1.eSpsPpsIdStrategy = SPS_PPS_LISTING;
   //prepare param2
   memcpy (&sParam2, &sParam1, sizeof (SEncParamExt));
   while (sParam2.iPicWidth == sParam1.iPicWidth) {
     sParam2.iPicWidth = GetRandWidth();
   }
   prepareParam (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
-  sParam2.iSpsPpsIdStrategy = SPS_PPS_LISTING;
+  sParam2.eSpsPpsIdStrategy = SPS_PPS_LISTING;
   //prepare param3
   memcpy (&sParam3, &sParam1, sizeof (SEncParamExt));
   while (sParam3.iPicWidth == sParam1.iPicWidth || sParam3.iPicWidth == sParam2.iPicWidth) {
     sParam3.iPicWidth = GetRandWidth();
   }
   prepareParam (iSpatialLayerNum, iSliceNum, sParam3.iPicWidth, sParam3.iPicHeight, fFrameRate, &sParam3);
-  sParam3.iSpsPpsIdStrategy = SPS_PPS_LISTING;
+  sParam3.eSpsPpsIdStrategy = SPS_PPS_LISTING;
 
   //prepare output if needed
   FILE* fEnc =  NULL;

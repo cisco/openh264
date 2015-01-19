@@ -86,7 +86,7 @@ typedef struct TagParaSetOffset {
   int32_t  iPpsIdList[MAX_DQ_LAYER_NUM][MAX_PPS_COUNT]; //index0: max pps types; index1: for differnt IDRs, if only index0=1, index1 can reach MAX_PPS_COUNT
 
 #if _DEBUG
-  int32_t  iSpsPpsIdStrategy;
+  int32_t  eSpsPpsIdStrategy;
 #endif
 
   uint32_t uiInUseSpsNum;
