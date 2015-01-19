@@ -459,7 +459,6 @@ int32_t WelsOpenDecoder (PWelsDecoderContext pCtx) {
   //initial MC function pointer--
   int iRet = ERR_NONE;
   InitMcFunc (& (pCtx->sMcFunc), pCtx->uiCpuFlag);
-  InitErrorCon (pCtx);
 
   InitExpandPictureFunc (& (pCtx->sExpandPicFunc), pCtx->uiCpuFlag);
   AssignFuncPointerForRec (pCtx);
@@ -525,6 +524,7 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
 
   if (pCtx->bParseOnly) //parse only, disable EC method
     pCtx->eErrorConMethod = ERROR_CON_DISABLE;
+  InitErrorCon (pCtx);
 
   if (VIDEO_BITSTREAM_SVC == pCtx->pParam->sVideoProperty.eVideoBsType ||
       VIDEO_BITSTREAM_AVC == pCtx->pParam->sVideoProperty.eVideoBsType) {
