@@ -81,7 +81,7 @@ void DecoderInterfaceTest::Init() {
   m_sDecParam.eOutputColorFormat = (EVideoFormatType) (rand() % 100);
   m_sDecParam.uiCpuLoad = rand() % 100;
   m_sDecParam.uiTargetDqLayer = rand() % 100;
-  m_sDecParam.eEcActiveIdc = (ERROR_CON_IDC) (rand() & 3);
+  m_sDecParam.eEcActiveIdc = (ERROR_CON_IDC) (rand() & 7);
   m_sDecParam.sVideoProperty.size = sizeof (SVideoProperty);
   m_sDecParam.sVideoProperty.eVideoBsType = (VIDEO_BITSTREAM_TYPE) (rand() % 3);
 
@@ -379,7 +379,33 @@ void DecoderInterfaceTest::TestLtrMarkedFrameNum() {
 
 //DECODER_OPTION_ERROR_CON_IDC
 void DecoderInterfaceTest::TestErrorConIdc() {
-  //TODO
+  int iTmp, iOut;
+  CM_RETURN eRet;
+
+  Init();
+
+  //Test GetOption
+  //invalid input
+  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_ERROR_CON_IDC, NULL);
+  EXPECT_EQ (eRet, cmInitParaError);
+
+  //Test GetOption
+  //valid input
+  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_ERROR_CON_IDC, &iOut);
+  EXPECT_EQ (eRet, cmResultSuccess);
+
+  //Test SetOption
+  iTmp = rand() & 7;
+  eRet = (CM_RETURN) m_pDec->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iTmp);
+  EXPECT_EQ (eRet, cmResultSuccess);
+
+  //Test GetOption
+  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_ERROR_CON_IDC, &iOut);
+  EXPECT_EQ (eRet, cmResultSuccess);
+  EXPECT_EQ (iTmp, iOut);
+
+  Uninit();
+
 }
 
 //DECODER_OPTION_TRACE_LEVEL
