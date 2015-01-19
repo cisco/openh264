@@ -15,7 +15,7 @@ class FileInputStream : public InputStream {
       return -1;
     }
     file_.read (static_cast<char*> (ptr), len);
-    return file_.gcount();
+    return (int) file_.gcount();
   }
  private:
   std::ifstream file_;

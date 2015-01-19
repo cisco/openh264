@@ -250,14 +250,14 @@ TEST_F (MotionEstimateRangeTest, TestWelsMotionCrossSearch) {
   SWelsFuncPtrList sFuncList;
   SWelsME sMe;
   SSlice sSlice;
-  int32_t iUsageType = 1;
+  bool bUsageType = true;
   uint8_t* pRef = m_pRefStart + PADDING_LENGTH * m_iWidthExt + PADDING_LENGTH;
   const int32_t kiMaxBlock16Sad = 72000;//a rough number
 
   memset (&sSlice, 0, sizeof (sSlice));
   memset (&sMe, 0, sizeof (sMe));
   WelsInitSampleSadFunc (&sFuncList, 0); //test c functions
-  WelsInitMeFunc (&sFuncList, 0, iUsageType);
+  WelsInitMeFunc (&sFuncList, 0, bUsageType);
 
   RandomPixelDataGenerator (m_pSrc, m_iWidth, m_iHeight, m_iWidth);
   RandomPixelDataGenerator (m_pRefStart, m_iWidthExt, m_iHeightExt, m_iWidthExt);

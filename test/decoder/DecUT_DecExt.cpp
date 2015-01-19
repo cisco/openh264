@@ -122,9 +122,9 @@ void DecoderInterfaceTest::DecoderBs (const char* sFileName) {
 
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + sFileName;
-  ASSERT_TRUE (pH264File = fopen (filename.c_str(), "rb"));
+  ASSERT_TRUE ((pH264File = fopen (filename.c_str(), "rb")) != NULL);
 #else
-  ASSERT_TRUE (pH264File = fopen (sFileName, "rb"));
+  ASSERT_TRUE ((pH264File = fopen (sFileName, "rb")) != NULL);
 #endif
   fseek (pH264File, 0L, SEEK_END);
   iFileSize = (int32_t) ftell (pH264File);
@@ -271,7 +271,7 @@ void DecoderInterfaceTest::TestEndOfStream() {
     EXPECT_EQ (eRet, cmResultSuccess);
     eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_END_OF_STREAM, &iOut);
     EXPECT_EQ (eRet, cmResultSuccess);
-    EXPECT_EQ (iOut, iTmp != 0);
+    EXPECT_EQ (iOut, iTmp != 0 ? 1 : 0);
   }
 
   //set false as input
@@ -281,7 +281,7 @@ void DecoderInterfaceTest::TestEndOfStream() {
   eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_END_OF_STREAM, &iOut);
   EXPECT_EQ (eRet, cmResultSuccess);
 
-  EXPECT_EQ (iOut, false);
+  EXPECT_EQ (iOut, 0);
 
   //set true as input
   iTmp = true;
@@ -290,24 +290,24 @@ void DecoderInterfaceTest::TestEndOfStream() {
   eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_END_OF_STREAM, &iOut);
   EXPECT_EQ (eRet, cmResultSuccess);
 
-  EXPECT_EQ (iOut, true);
+  EXPECT_EQ (iOut, 1);
 
   //Mock data packet in
   //Test NULL data input for decoder, should be true for EOS
   eRet = (CM_RETURN) m_pDec->DecodeFrame2 (NULL, 0, m_pData, &m_sBufferInfo);
   EXPECT_EQ (eRet, 0); //decode should return OK
   eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_END_OF_STREAM, &iOut);
-  EXPECT_EQ (iOut, true); //decoder should have EOS == true
+  EXPECT_EQ (iOut, 1); //decoder should have EOS == true
 
   //Test valid data input for decoder, should be false for EOS
   MockPacketType (NAL_UNIT_UNSPEC_0, 50);
   eRet = (CM_RETURN) m_pDec->DecodeFrame2 (m_szBuffer, m_iBufLength, m_pData, &m_sBufferInfo);
   eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_END_OF_STREAM, &iOut);
-  EXPECT_EQ (iOut, false); //decoder should have EOS == false
+  EXPECT_EQ (iOut, 0); //decoder should have EOS == false
   //Test NULL data input for decoder, should be true for EOS
   eRet = (CM_RETURN) m_pDec->DecodeFrame2 (NULL, 0, m_pData, &m_sBufferInfo);
   eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_END_OF_STREAM, &iOut);
-  EXPECT_EQ (iOut, true); //decoder should have EOS == true
+  EXPECT_EQ (iOut, 1); //decoder should have EOS == true
 
   Uninit();
 }

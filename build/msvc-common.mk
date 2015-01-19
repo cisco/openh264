@@ -10,7 +10,7 @@ else
 endif
 ifeq ($(ASM_ARCH), arm)
 CCAS = gas-preprocessor.pl -as-type armasm -force-thumb -- armasm
-CCASFLAGS = -nologo -DHAVE_NEON
+CCASFLAGS = -nologo -DHAVE_NEON -ignore 4509
 endif
 
 CC=cl
@@ -42,3 +42,4 @@ SHARED=-LD
 EXTRA_LIBRARY=$(PROJECT_NAME)_dll.lib
 SHLDFLAGS=-Fd$(PROJECT_NAME).pdb -link -def:openh264.def -implib:$(EXTRA_LIBRARY)
 STATIC_LDFLAGS=
+CODEC_UNITTEST_CFLAGS=-D_CRT_SECURE_NO_WARNINGS

@@ -726,7 +726,7 @@ void ExtractDidNal (SFrameBSInfo* pBsInfo, int& iSrcLen, std::vector<SLostSim>* 
 int SimulateNALLoss (const unsigned char* pSrc,  int& iSrcLen, std::vector<SLostSim>* p_SLostSim,
                      const char* pLossChars, bool bLossPara, int& iLossIdx, bool& bVCLLoss) {
   unsigned char* pDst = new unsigned char[iSrcLen];
-  int iLossCharLen = strlen (pLossChars);
+  int iLossCharLen = (int) strlen (pLossChars);
   int iSkipedBytes = 0;
   int iDstLen = 0;
   int iBufPos = 0;
@@ -815,7 +815,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_ALLIDR) {
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   int32_t iSpsPpsIdAddition = 1;
   encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
-  int32_t iIDRPeriod = pow (2.0f, (param_.iTemporalLayerNum - 1)) * ((rand() % 5) + 1);
+  int32_t iIDRPeriod = (int32_t) pow (2.0f, (param_.iTemporalLayerNum - 1)) * ((rand() % 5) + 1);
   encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
   SLTRConfig sLtrConfigVal;
   sLtrConfigVal.bEnableLongTermReference = 1;
@@ -1594,7 +1594,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //no output
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   //Ref picture is ECed, so current status is ECed, when EC disable, NO output
-  EXPECT_TRUE (rv & 32);
+  EXPECT_TRUE ((rv & 32) != 0);
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
   iIdx++;
 
@@ -1689,10 +1689,10 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_SLICE_COPY);
   rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
-  EXPECT_TRUE (rv & 32); //parse correct, but reconstruct ECed
+  EXPECT_TRUE ((rv & 32) != 0); //parse correct, but reconstruct ECed
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //ECed output for frame 0
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //ECed status, reconstruction current frame 1
-  EXPECT_TRUE (rv & 32); //decoder ECed status
+  EXPECT_TRUE ((rv & 32) != 0); //decoder ECed status
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //ECed output for frame 1
   iIdx++;
 
@@ -1713,7 +1713,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   EXPECT_EQ (rv, 0); //parse correct
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   // Ref picture is ECed, so reconstructed picture is ECed
-  EXPECT_TRUE (rv & 32);
+  EXPECT_TRUE ((rv & 32) != 0);
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
   iIdx++;
 
@@ -1734,7 +1734,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   EXPECT_EQ (rv, 0); //parse correct
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
-  EXPECT_TRUE (rv & 32);
+  EXPECT_TRUE ((rv & 32) != 0);
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //slice loss
   iIdx++;
 
@@ -1858,10 +1858,10 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
   EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_SLICE_COPY);
   rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
-  EXPECT_TRUE (rv & 32); //parse OK but frame 2 ECed
+  EXPECT_TRUE ((rv & 32) != 0); //parse OK but frame 2 ECed
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //slice loss but ECed output Frame 2
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
-  EXPECT_TRUE (rv & 32);
+  EXPECT_TRUE ((rv & 32) != 0);
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //slice loss
   iIdx++;
 
@@ -1955,7 +1955,7 @@ TEST_F (EncodeDecodeTestAPI, Engine_SVC_Switch_I) {
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   int32_t iSpsPpsIdAddition = 1;
   encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
-  int32_t iIDRPeriod = pow (2.0f, (param_.iTemporalLayerNum - 1)) * ((rand() % 5) + 1);
+  int32_t iIDRPeriod = (int32_t) pow (2.0f, (param_.iTemporalLayerNum - 1)) * ((rand() % 5) + 1);
   encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
   SLTRConfig sLtrConfigVal;
   sLtrConfigVal.bEnableLongTermReference = 1;
@@ -2400,10 +2400,10 @@ class DecodeParseAPI : public EncodeDecodeTestBase {
 
   void EncodeOneFrame (int iIdx) {
     int iFrameSize = iWidth_ * iHeight_ * 3 / 2;
-    int iSize = fread (buf_.data(), sizeof (char), iFrameSize, fYuv_);
+    int iSize = (int) fread (buf_.data(), sizeof (char), iFrameSize, fYuv_);
     if (feof (fYuv_) || iSize != iFrameSize) {
       rewind (fYuv_);
-      iSize = fread (buf_.data(), sizeof (char), iFrameSize, fYuv_);
+      iSize = (int) fread (buf_.data(), sizeof (char), iFrameSize, fYuv_);
       ASSERT_TRUE (iSize == iFrameSize);
     }
     int rv = encoder_->EncodeFrame (&EncPic, &info);
