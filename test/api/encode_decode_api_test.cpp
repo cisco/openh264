@@ -2683,7 +2683,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
   ASSERT_TRUE (rv == cmResultSuccess) << "rv = " << rv;
 }
 
-#define DEBUG_FILE_SAVE5
+//#define DEBUG_FILE_SAVE5
 TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING2) {
   //usage 3: 2 Params with different num_ref, encode IDR0, P1, IDR2;
   //the bs will show two SPS and different PPS
