@@ -730,11 +730,11 @@ int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx, const 
   WelsSliceHeaderExtInit (pEncCtx, pCurLayer, pCurSlice);
 
   g_pWelsWriteSliceHeader[pCurSlice->bSliceHeaderExtFlag] (pEncCtx, pBs, pCurLayer, pCurSlice,
-      ((SPS_PPS_LISTING != pEncCtx->pSvcParam->iSpsPpsIdStrategy) ? (&
+      ((SPS_PPS_LISTING != pEncCtx->pSvcParam->eSpsPpsIdStrategy) ? (&
           (pEncCtx->sPSOVector.sParaSetOffsetVariable[PARA_SET_TYPE_PPS].iParaSetIdDelta[0])) : NULL));
 
 #if _DEBUG
-  if (INCREASING_ID & pEncCtx->sPSOVector.iSpsPpsIdStrategy) {
+  if (INCREASING_ID & pEncCtx->sPSOVector.eSpsPpsIdStrategy) {
     const int32_t kiEncoderPpsId    = pCurSlice->sSliceHeaderExt.sSliceHeader.pPps->iPpsId;
     const int32_t kiTmpPpsIdInBs = kiEncoderPpsId +
                                    pEncCtx->sPSOVector.sParaSetOffsetVariable[PARA_SET_TYPE_PPS].iParaSetIdDelta[ kiEncoderPpsId ];

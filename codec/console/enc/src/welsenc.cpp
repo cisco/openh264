@@ -233,7 +233,27 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
       } else if (strTag[0].compare ("MaxNalSize") == 0) {
         pSvcParam.uiMaxNalSize = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("SpsPpsIDStrategy") == 0) {
-        pSvcParam.iSpsPpsIdStrategy	= atoi (strTag[1].c_str());
+        int32_t iValue	= atoi (strTag[1].c_str());
+        switch (iValue) {
+          case 0:
+            pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
+            break;
+          case 0x01:
+            pSvcParam.eSpsPpsIdStrategy  = INCREASING_ID;
+            break;
+          case 0x02:
+            pSvcParam.eSpsPpsIdStrategy  = SPS_LISTING;
+            break;
+          case 0x03:
+            pSvcParam.eSpsPpsIdStrategy  = SPS_LISTING_AND_PPS_INCREASING;
+            break;
+          case 0x06:
+            pSvcParam.eSpsPpsIdStrategy  = SPS_PPS_LISTING;
+            break;
+          default:
+            pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
+            break;
+        }
       } else if (strTag[0].compare ("EnableScalableSEI") == 0) {
         pSvcParam.bEnableSSEI	= atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableFrameCropping") == 0) {
@@ -420,9 +440,29 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
     else if (!strcmp (pCommand, "-nalsize") && (n < argc))
       pSvcParam.uiMaxNalSize = atoi (argv[n++]);
 
-    else if (!strcmp (pCommand, "-spsid") && (n < argc))
-      pSvcParam.iSpsPpsIdStrategy = atoi (argv[n++]);
-
+    else if (!strcmp (pCommand, "-spsid") && (n < argc)) {
+      int32_t iValue = atoi (argv[n++]);
+      switch (iValue) {
+        case 0:
+          pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
+          break;
+        case 0x01:
+          pSvcParam.eSpsPpsIdStrategy  = INCREASING_ID;
+          break;
+        case 0x02:
+          pSvcParam.eSpsPpsIdStrategy  = SPS_LISTING;
+          break;
+        case 0x03:
+          pSvcParam.eSpsPpsIdStrategy  = SPS_LISTING_AND_PPS_INCREASING;
+          break;
+        case 0x06:
+          pSvcParam.eSpsPpsIdStrategy  = SPS_PPS_LISTING;
+          break;
+        default:
+          pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
+          break;
+      }
+    }
     else if (!strcmp (pCommand, "-cabac") && (n < argc))
       pSvcParam.iEntropyCodingModeFlag = atoi (argv[n++]);
 
@@ -591,7 +631,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.bEnableLongTermReference  = 0; // long term reference control
   sParam.iLtrMarkPeriod = 30;
   sParam.uiIntraPeriod		= 320;		// period of Intra frame
-  sParam.iSpsPpsIdStrategy = INCREASING_ID;
+  sParam.eSpsPpsIdStrategy = INCREASING_ID;
   sParam.bPrefixNalAddingCtrl = 0;
   sParam.iComplexityMode = MEDIUM_COMPLEXITY;
   int iIndexLayer = 0;

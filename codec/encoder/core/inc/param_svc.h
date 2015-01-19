@@ -162,7 +162,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     param.bEnableAdaptiveQuant		= true;		// adaptive quantization control
     param.bEnableFrameSkip		= true;		// frame skipping
     param.bEnableLongTermReference	= false;	// long term reference control
-    param.iSpsPpsIdStrategy	= INCREASING_ID;		// pSps pPps id addition control
+    param.eSpsPpsIdStrategy	= INCREASING_ID;		// pSps pPps id addition control
     param.bPrefixNalAddingCtrl		= false;		// prefix NAL adding control
     param.iSpatialLayerNum		= 1;		// number of dependency(Spatial/CGS) layers used to be encoded
     param.iTemporalLayerNum			= 1;		// number of temporal layer specified
@@ -350,8 +350,8 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
     bPrefixNalAddingCtrl	= pCodingParam.bPrefixNalAddingCtrl;
 
-    iSpsPpsIdStrategy =
-      pCodingParam.iSpsPpsIdStrategy;//For SVC meeting application, to avoid mosaic issue caused by cross-IDR reference.
+    eSpsPpsIdStrategy =
+      pCodingParam.eSpsPpsIdStrategy;//For SVC meeting application, to avoid mosaic issue caused by cross-IDR reference.
     //SHOULD enable this feature.
 
     SSpatialLayerInternal* pDlp		= &sDependencyLayers[0];
