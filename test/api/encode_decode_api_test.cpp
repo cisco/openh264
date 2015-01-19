@@ -149,11 +149,11 @@ class EncodeDecodeTestBase : public ::testing::TestWithParam<EncodeDecodeFilePar
 
 
   virtual int GetRandWidth() {
-    return (WELS_CLIP3 ((((rand() % MAX_WIDTH) >> 1) + 1) << 1, 2, MAX_WIDTH));
+    return WelsClip3 ((((rand() % MAX_WIDTH) >> 1) + 1) << 1, 2, MAX_WIDTH);
   }
 
   virtual int GetRandHeight() {
-    return (WELS_CLIP3 ((((rand() % MAX_HEIGHT) >> 1) + 1) << 1, 2, MAX_HEIGHT));
+    return WelsClip3 ((((rand() % MAX_HEIGHT) >> 1) + 1) << 1, 2, MAX_HEIGHT);
   }
 
  protected:
