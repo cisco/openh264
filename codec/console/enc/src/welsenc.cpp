@@ -439,8 +439,6 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
           pSvcParam.eSpsPpsIdStrategy  = SPS_PPS_LISTING;
           break;
         default:
-          WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
-                   " CWelsH264SVCEncoder::SetOption eSpsPpsIdStrategy(%d) not in valid range, set to CONSTANT_ID", iValue);
           pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
           break;
       }
