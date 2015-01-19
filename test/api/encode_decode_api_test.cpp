@@ -2777,7 +2777,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
     do {
       sParam2.iPicWidth = GetRandWidth();
       vWidthTableIt = std::find (vWidthTable.begin(), vWidthTable.end(), sParam2.iPicWidth);
-    } while (vWidthTableIt == vWidthTable.end());
+    } while (vWidthTableIt != vWidthTable.end());
     vWidthTable.push_back (sParam2.iPicWidth);
     prepareParam (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
     sParam2.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
