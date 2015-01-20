@@ -76,11 +76,6 @@ int32_t WelsBitRateVerification (SLogContext* pLogCtx, SSpatialLayerConfig* pLay
              pLayerParam->iSpatialBitrate);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
-  if (pLayerParam->iMaxSpatialBitrate == pLayerParam->iSpatialBitrate) {
-    WelsLog (pLogCtx, WELS_LOG_INFO,
-             "Setting MaxSpatialBitrate (%d) the same at SpatialBitrate (%d) will make the actual bit rate lower than SpatialBitrate",
-             pLayerParam->iMaxSpatialBitrate, pLayerParam->iSpatialBitrate);
-  }
   int32_t iLevelMaxBitrate = g_ksLevelLimits[pLayerParam->uiLevelIdc - 1].uiMaxBR * CpbBrNalFactor;
   if (pLayerParam->iMaxSpatialBitrate == UNSPECIFIED_BIT_RATE) {
     pLayerParam->iMaxSpatialBitrate = iLevelMaxBitrate;
@@ -90,15 +85,21 @@ int32_t WelsBitRateVerification (SLogContext* pLogCtx, SSpatialLayerConfig* pLay
   if (pLayerParam->iMaxSpatialBitrate > iLevelMaxBitrate) {
     ELevelIdc iCurLevel = pLayerParam->uiLevelIdc;
     if (WelsAdjustLevel (pLayerParam)) {
+      int32_t iLevel52MaxBitrate = g_ksLevelLimits[LEVEL_NUMBER - 1].uiMaxBR * CpbBrNalFactor;
       WelsLog (pLogCtx, WELS_LOG_WARNING,
-               "MaxSpatialBitrate (%d) is larger that the limitation LEVEL_5_2, the setting will be invalid",
-               pLayerParam->iMaxSpatialBitrate);
+               "MaxSpatialBitrate (%d) is larger that the limitation LEVEL_5_2, the setting will be invalid, and will use max-br (%d) of LEVEL_5_2",
+               pLayerParam->iMaxSpatialBitrate, iLevel52MaxBitrate);
+      pLayerParam->iMaxSpatialBitrate = iLevel52MaxBitrate;
     }
     WelsLog (pLogCtx, WELS_LOG_INFO,
              "Level is changed from (%d) to (%d) according to the maxbitrate",
              iCurLevel, pLayerParam->uiLevelIdc);
   }
-  if (pLayerParam->iMaxSpatialBitrate < pLayerParam->iSpatialBitrate) {
+  if (pLayerParam->iMaxSpatialBitrate == pLayerParam->iSpatialBitrate) {
+    WelsLog (pLogCtx, WELS_LOG_INFO,
+             "Setting MaxSpatialBitrate (%d) the same at SpatialBitrate (%d) will make the actual bit rate lower than SpatialBitrate",
+             pLayerParam->iMaxSpatialBitrate, pLayerParam->iSpatialBitrate);
+  } else if (pLayerParam->iMaxSpatialBitrate < pLayerParam->iSpatialBitrate) {
     WelsLog (pLogCtx, WELS_LOG_ERROR,
              "MaxSpatialBitrate (%d) should be larger than SpatialBitrate (%d), considering it as error setting",
              pLayerParam->iMaxSpatialBitrate, pLayerParam->iSpatialBitrate);
