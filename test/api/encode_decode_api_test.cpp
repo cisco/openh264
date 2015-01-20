@@ -327,6 +327,9 @@ void EncodeDecodeTestAPI::RandomParamExtCombination() {
 
 
       pSpatialLayer->sSliceCfg.uiSliceMode = static_cast<SliceModeEnum> (rand() % SLICE_MODE_NUM);
+      if (pSpatialLayer->sSliceCfg.uiSliceMode != SM_DYN_SLICE) {
+        param_.uiMaxNalSize       = 0;
+      }
       pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum = rand();
       pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint = rand();
     }
