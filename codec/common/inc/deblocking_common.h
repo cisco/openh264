@@ -15,6 +15,14 @@ void DeblockChromaLt4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int
                           int8_t* pTc);
 void DeblockChromaEq4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
 
+void DeblockChromaLt4V2_c (uint8_t* pPixCbCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
+                          int8_t* pTc);
+void DeblockChromaEq4V2_c (uint8_t* pPixCbCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
+
+void DeblockChromaLt4H2_c (uint8_t* pPixCbCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
+                          int8_t* pTc);
+void DeblockChromaEq4H2_c (uint8_t* pPixCbCr,int32_t iStride, int32_t iAlpha, int32_t iBeta);
+
 void WelsNonZeroCount_c (int8_t* pNonZeroCount);
 
 #if defined(__cplusplus)

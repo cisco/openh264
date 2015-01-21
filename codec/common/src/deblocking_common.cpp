@@ -1,5 +1,6 @@
 #include "deblocking_common.h"
 #include "macros.h"
+
 //  C code only
 void DeblockLumaLt4_c (uint8_t* pPix, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha, int32_t iBeta,
                        int8_t* pTc) {
@@ -178,6 +179,70 @@ void DeblockChromaEq4V_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int
 }
 void DeblockChromaEq4H_c (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
   DeblockChromaEq4_c (pPixCb, pPixCr, 1, iStride, iAlpha, iBeta);
+}
+
+void DeblockChromaLt42_c (uint8_t* pPixCbCr, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha,
+                          int32_t iBeta, int8_t* pTc) {
+  int32_t p0, p1, q0, q1, iDeta;
+  bool bDetaP0Q0, bDetaP1P0, bDetaQ1Q0;
+
+  for (int32_t i = 0; i < 8; i++) {
+    int32_t iTc0 = pTc[i >> 1];
+    if (iTc0 > 0) {
+      p0 = pPixCbCr[-iStrideX];
+      p1 = pPixCbCr[-2 * iStrideX];
+      q0 = pPixCbCr[0];
+      q1 = pPixCbCr[iStrideX];
+
+      bDetaP0Q0 =  WELS_ABS (p0 - q0) < iAlpha;
+      bDetaP1P0 =  WELS_ABS (p1 - p0) < iBeta;
+      bDetaQ1Q0 = WELS_ABS (q1 - q0) < iBeta;
+      if (bDetaP0Q0 && bDetaP1P0 &&	bDetaQ1Q0) {
+        iDeta = WELS_CLIP3 ((((q0 - p0) << 2) + (p1 - q1) + 4) >> 3, -iTc0, iTc0);
+        pPixCbCr[-iStrideX] = WelsClip1 (p0 + iDeta);     /* p0' */
+        pPixCbCr[0]  = WelsClip1 (q0 - iDeta);     /* q0' */
+      }
+
+
+    }
+    pPixCbCr += iStrideY;
+  }
+}
+void DeblockChromaEq42_c (uint8_t* pPixCbCr, int32_t iStrideX, int32_t iStrideY, int32_t iAlpha,
+                          int32_t iBeta) {
+  int32_t p0, p1, q0, q1;
+  bool bDetaP0Q0, bDetaP1P0, bDetaQ1Q0;
+  for (int32_t i = 0; i < 8; i++) {
+    p0 = pPixCbCr[-iStrideX];
+    p1 = pPixCbCr[-2 * iStrideX];
+    q0 = pPixCbCr[0];
+    q1 = pPixCbCr[iStrideX];
+    bDetaP0Q0 = WELS_ABS (p0 - q0) < iAlpha;
+    bDetaP1P0 = WELS_ABS (p1 - p0) < iBeta;
+    bDetaQ1Q0 = WELS_ABS (q1 - q0) < iBeta;
+    if (bDetaP0Q0 && bDetaP1P0 && bDetaQ1Q0) {
+      pPixCbCr[-iStrideX] = ((p1 << 1) + p0 + q1 + 2) >> 2;     /* p0' */
+      pPixCbCr[0]  = ((q1 << 1) + q0 + p1 + 2) >> 2;     /* q0' */
+    }
+
+    pPixCbCr += iStrideY;
+  }
+}
+
+void DeblockChromaLt4V2_c (uint8_t* pPixCbCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
+                           int8_t* tc) {
+  DeblockChromaLt42_c (pPixCbCr, iStride, 1, iAlpha, iBeta, tc);
+}
+void DeblockChromaLt4H2_c (uint8_t* pPixCbCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
+                           int8_t* tc) {
+
+  DeblockChromaLt42_c (pPixCbCr, 1, iStride, iAlpha, iBeta, tc);
+}
+void DeblockChromaEq4V2_c (uint8_t* pPixCbCr, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
+  DeblockChromaEq42_c (pPixCbCr, iStride, 1, iAlpha, iBeta);
+}
+void DeblockChromaEq4H2_c (uint8_t* pPixCbCr, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
+  DeblockChromaEq42_c (pPixCbCr, 1, iStride, iAlpha, iBeta);
 }
 
 void WelsNonZeroCount_c (int8_t* pNonZeroCount) {

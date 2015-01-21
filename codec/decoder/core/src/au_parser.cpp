@@ -1336,30 +1336,39 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
   pPps->iPicInitQs = PIC_INIT_QS_OFFSET + iCode;
   WELS_CHECK_SE_BOTH_ERROR (pPps->iPicInitQs, PPS_PIC_INIT_QP_QS_MIN, PPS_PIC_INIT_QP_QS_MAX, "pic_init_qs_minus26 + 26",
                             GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_PIC_INIT_QS));
-  WELS_READ_VERIFY (BsGetSe (pBsAux, &iCode)); //chroma_qp_index_offset
-  pPps->iChromaQpIndexOffset                  = iCode;
-  WELS_CHECK_SE_BOTH_ERROR (pPps->iChromaQpIndexOffset, PPS_CHROMA_QP_INDEX_OFFSET_MIN, PPS_CHROMA_QP_INDEX_OFFSET_MAX,
+  WELS_READ_VERIFY (BsGetSe (pBsAux, &iCode)); //chroma_qp_index_offset,cb
+  pPps->iChromaQpIndexOffset[0]                  = iCode;
+  WELS_CHECK_SE_BOTH_ERROR (pPps->iChromaQpIndexOffset[0], PPS_CHROMA_QP_INDEX_OFFSET_MIN, PPS_CHROMA_QP_INDEX_OFFSET_MAX,
                             "chroma_qp_index_offset", GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_CHROMA_QP_INDEX_OFFSET));
+  pPps->iChromaQpIndexOffset[1] = pPps->iChromaQpIndexOffset[0];//init cr qp offset
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //deblocking_filter_control_present_flag
   pPps->bDeblockingFilterControlPresentFlag   = !!uiCode;
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //constrained_intra_pred_flag
   pPps->bConstainedIntraPredFlag              = !!uiCode;
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //redundant_pic_cnt_present_flag
   pPps->bRedundantPicCntPresentFlag           = !!uiCode;
+  /*TODO: to judge whether going on to parse*/
 //going on to parse high profile syntax, need fix me
-  WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode));
-  pPps->bTransform_8x8_mode_flag = !!uiCode;
-  WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode));
-  pPps->bPicScalingMatrixPresentFlag = !!uiCode;
-  if (pPps->bPicScalingMatrixPresentFlag) {
-    if (pCtx->bSpsAvailFlags[pPps->iSpsId])
-      WELS_READ_VERIFY (ParseScalingList (&pCtx->sSpsBuffer[pPps->iSpsId], pBsAux, 1, pPps->bPicScalingListPresentFlag,
-                                          pPps->iScalingList4x4, pPps->iScalingList8x8));
-    else {
-      pCtx->bSpsLatePps = true;
-      WELS_READ_VERIFY (ParseScalingList (NULL, pBsAux, 1, pPps->bPicScalingListPresentFlag, pPps->iScalingList4x4,
-                                          pPps->iScalingList8x8));
+  if (0) {
+    WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode));
+    pPps->bTransform_8x8_mode_flag = !!uiCode;
+    WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode));
+    pPps->bPicScalingMatrixPresentFlag = !!uiCode;
+    if (pPps->bPicScalingMatrixPresentFlag) {
+      if (pCtx->bSpsAvailFlags[pPps->iSpsId])
+        WELS_READ_VERIFY (ParseScalingList (&pCtx->sSpsBuffer[pPps->iSpsId], pBsAux, 1, pPps->bPicScalingListPresentFlag,
+                                            pPps->iScalingList4x4, pPps->iScalingList8x8));
+      else {
+        pCtx->bSpsLatePps = true;
+        WELS_READ_VERIFY (ParseScalingList (NULL, pBsAux, 1, pPps->bPicScalingListPresentFlag, pPps->iScalingList4x4,
+                                            pPps->iScalingList8x8));
+      }
     }
+    //add second chroma qp parsing process
+    WELS_READ_VERIFY (BsGetSe (pBsAux, &iCode)); //chroma_qp_index_offset,cr
+    pPps->iChromaQpIndexOffset[1]               = iCode;
+    WELS_CHECK_SE_BOTH_ERROR (pPps->iChromaQpIndexOffset[1], PPS_CHROMA_QP_INDEX_OFFSET_MIN, PPS_CHROMA_QP_INDEX_OFFSET_MAX,
+                              "second_chroma_qp_index_offset", GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_CHROMA_QP_INDEX_OFFSET));
   }
 
   if (pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
