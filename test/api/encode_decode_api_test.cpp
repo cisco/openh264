@@ -90,7 +90,6 @@ class EncodeDecodeTestBase : public ::testing::TestWithParam<EncodeDecodeFilePar
   }
 
   virtual void prepareParam (int iLayers, int iSlices, int width, int height, float framerate, SEncParamExt* pParam) {
-    memset (pParam, 0, sizeof (SEncParamExt));
     pParam->iUsageType = CAMERA_VIDEO_REAL_TIME;
     pParam->iPicWidth = width;
     pParam->iPicHeight = height;
@@ -180,7 +179,14 @@ class EncodeDecodeTestAPI : public EncodeDecodeTestBase {
     EncodeDecodeTestBase::TearDown();
   }
 
-  void prepareParam (int iLayers, int iSlices, int width, int height, float framerate, SEncParamExt* pParam) {
+  void prepareParam0 (int iLayers, int iSlices, int width, int height, float framerate, SEncParamExt* pParam) {
+    memset (pParam, 0, sizeof (SEncParamExt));
+    EncodeDecodeTestBase::prepareParam (iLayers, iSlices, width, height, framerate, pParam);
+  }
+
+  void prepareParamDefault (int iLayers, int iSlices, int width, int height, float framerate, SEncParamExt* pParam) {
+    memset (pParam, 0, sizeof (SEncParamExt));
+    encoder_->GetDefaultParams (pParam);
     EncodeDecodeTestBase::prepareParam (iLayers, iSlices, width, height, framerate, pParam);
   }
 
@@ -263,24 +269,24 @@ void EncodeDecodeTestAPI::RandomParamExtCombination() {
 
   int iValue   = rand() % 7;
   switch (iValue) {
-    case 0:
-      param_.eSpsPpsIdStrategy  = CONSTANT_ID;
-      break;
-    case 0x01:
-      param_.eSpsPpsIdStrategy  = INCREASING_ID;
-      break;
-    case 0x02:
-      param_.eSpsPpsIdStrategy  = SPS_LISTING;
-      break;
-    case 0x03:
-      param_.eSpsPpsIdStrategy  = SPS_LISTING_AND_PPS_INCREASING;
-      break;
-    case 0x06:
-      param_.eSpsPpsIdStrategy  = SPS_PPS_LISTING;
-      break;
-    default:
-      param_.eSpsPpsIdStrategy  = CONSTANT_ID;
-      break;
+  case 0:
+    param_.eSpsPpsIdStrategy  = CONSTANT_ID;
+    break;
+  case 0x01:
+    param_.eSpsPpsIdStrategy  = INCREASING_ID;
+    break;
+  case 0x02:
+    param_.eSpsPpsIdStrategy  = SPS_LISTING;
+    break;
+  case 0x03:
+    param_.eSpsPpsIdStrategy  = SPS_LISTING_AND_PPS_INCREASING;
+    break;
+  case 0x06:
+    param_.eSpsPpsIdStrategy  = SPS_PPS_LISTING;
+    break;
+  default:
+    param_.eSpsPpsIdStrategy  = CONSTANT_ID;
+    break;
   }
   param_.bPrefixNalAddingCtrl      = (rand() % 2 == 0) ? false : true;
   param_.bEnableSSEI               = (rand() % 2 == 0) ? false : true;
@@ -509,7 +515,7 @@ static const EncodeDecodeFileParamBase kFileParamArray[] = {
 
 TEST_P (EncodeDecodeTestAPI, DecoderVclNal) {
   EncodeDecodeFileParamBase p = GetParam();
-  prepareParam (1, p.slicenum, p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, p.slicenum, p.width, p.height, p.frameRate, &param_);
   encoder_->Uninitialize();
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
@@ -545,7 +551,7 @@ TEST_P (EncodeDecodeTestAPI, DecoderVclNal) {
 
 TEST_P (EncodeDecodeTestAPI, GetOptionFramenum) {
   EncodeDecodeFileParamBase p = GetParam();
-  prepareParam (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   encoder_->Uninitialize();
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
@@ -582,7 +588,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionFramenum) {
 
 TEST_P (EncodeDecodeTestAPI, GetOptionIDR) {
   EncodeDecodeFileParamBase p = GetParam();
-  prepareParam (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   encoder_->Uninitialize();
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
@@ -824,7 +830,7 @@ int SimulateNALLoss (const unsigned char* pSrc,  int& iSrcLen, std::vector<SLost
 
 TEST_P (EncodeDecodeTestAPI, GetOptionLTR_ALLIDR) {
   EncodeDecodeFileParamBase p = GetParam();
-  prepareParam (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   encoder_->Uninitialize();
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
@@ -857,7 +863,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_ALLLTR) {
   SLTRMarkingFeedback m_LTR_Marking_Feedback;
   SLTRRecoverRequest m_LTR_Recover_Request;
   EncodeDecodeFileParamBase p = GetParam();
-  prepareParam (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   encoder_->Uninitialize();
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
@@ -916,7 +922,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_Engine) {
   SLTRRecoverRequest m_LTR_Recover_Request;
   m_LTR_Recover_Request.uiIDRPicId = 0;
   EncodeDecodeFileParamBase p = GetParam();
-  prepareParam (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   encoder_->Uninitialize();
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
@@ -966,7 +972,7 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_DISABLE) {
   SLTRRecoverRequest m_LTR_Recover_Request;
   m_LTR_Recover_Request.uiIDRPicId = 0;
   EncodeDecodeFileParamBase p = GetParam();
-  prepareParam (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   param_.bEnableLongTermReference = true;
   param_.iLTRRefNum = 1;
   encoder_->Uninitialize();
@@ -1033,7 +1039,7 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_SLICE_COPY) {
   SLTRRecoverRequest m_LTR_Recover_Request;
   m_LTR_Recover_Request.uiIDRPicId = 0;
   EncodeDecodeFileParamBase p = GetParam();
-  prepareParam (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   encoder_->Uninitialize();
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
@@ -1084,7 +1090,7 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_SLICE_COPY) {
 
 TEST_P (EncodeDecodeTestAPI, InOutTimeStamp) {
   EncodeDecodeFileParamBase p = GetParam();
-  prepareParam (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   encoder_->Uninitialize();
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
@@ -1134,7 +1140,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_NOPREFIX) {
   SLTRRecoverRequest m_LTR_Recover_Request;
   m_LTR_Recover_Request.uiIDRPicId = 0;
   EncodeDecodeFileParamBase p = GetParam();
-  prepareParam (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   param_.bPrefixNalAddingCtrl = false;
   param_.iTemporalLayerNum = (rand() % 4) + 1;
   encoder_->Uninitialize();
@@ -1203,7 +1209,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_WITH_PREFIX_NOLOSS) {
   SLTRRecoverRequest m_LTR_Recover_Request;
   m_LTR_Recover_Request.uiIDRPicId = 0;
   EncodeDecodeFileParamBase p = GetParam();
-  prepareParam (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   param_.bPrefixNalAddingCtrl = true;
   param_.iTemporalLayerNum = (rand() % 4) + 1;
   param_.iSpatialLayerNum = 1;
@@ -1258,7 +1264,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_SVC_L1_NOLOSS) {
   SLTRRecoverRequest m_LTR_Recover_Request;
   m_LTR_Recover_Request.uiIDRPicId = 0;
   EncodeDecodeFileParamBase p = GetParam();
-  prepareParam (2, p.slicenum,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (2, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   param_.iTemporalLayerNum = (rand() % 4) + 1;
   param_.iSpatialLayerNum = 2;
   encoder_->Uninitialize();
@@ -1314,7 +1320,7 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace) {
   SLTRRecoverRequest m_LTR_Recover_Request;
   m_LTR_Recover_Request.uiIDRPicId = 0;
   EncodeDecodeFileParamBase p = GetParam();
-  prepareParam (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   param_.iSpatialLayerNum = 1;
 
   int rv = encoder_->InitializeExt (&param_);
@@ -1378,7 +1384,7 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace_NULL) {
   SLTRRecoverRequest m_LTR_Recover_Request;
   m_LTR_Recover_Request.uiIDRPicId = 0;
   EncodeDecodeFileParamBase p = GetParam();
-  prepareParam (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   param_.iSpatialLayerNum = 1;
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
@@ -1441,7 +1447,7 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECIDC_GeneralSliceChange) {
   uint32_t uiEcIdc;
   uint32_t uiGet;
   EncodeDecodeFileParamBase p = GetParam();
-  prepareParam (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   param_.iSpatialLayerNum = 1;
   encoder_->Uninitialize();
   int rv = encoder_->InitializeExt (&param_);
@@ -1521,7 +1527,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   uint32_t uiEcIdc;
   uint32_t uiGet;
   EncodeDecodeFileParamBase p = kFileParamArray[0];
-  prepareParam (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   param_.iSpatialLayerNum = 1;
   encoder_->Uninitialize();
   int rv = encoder_->InitializeExt (&param_);
@@ -1660,7 +1666,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   uint32_t uiEcIdc = 2; //default set as SLICE_COPY
   uint32_t uiGet;
   EncodeDecodeFileParamBase p = kFileParamArray[0];
-  prepareParam (1, 2,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, 2,  p.width, p.height, p.frameRate, &param_);
   param_.iSpatialLayerNum = 1;
   encoder_->Uninitialize();
   int rv = encoder_->InitializeExt (&param_);
@@ -1793,7 +1799,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   uint32_t uiEcIdc;
   uint32_t uiGet;
   EncodeDecodeFileParamBase p = kFileParamArray[0];
-  prepareParam (1, 2,  p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (1, 2,  p.width, p.height, p.frameRate, &param_);
   param_.iSpatialLayerNum = 1;
   encoder_->Uninitialize();
   int rv = encoder_->InitializeExt (&param_);
@@ -1962,7 +1968,7 @@ TEST_F (EncodeDecodeTestAPI, Engine_SVC_Switch_I) {
   EncodeDecodeFileParamBase p = kSVCSwitch[0];
   p.width = p.width << 2;
   p.height = p.height << 2;
-  prepareParam (4, p.slicenum, p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (4, p.slicenum, p.width, p.height, p.frameRate, &param_);
   param_.iTemporalLayerNum = (rand() % 4) + 1;
   param_.iSpatialLayerNum = 4;
   encoder_->Uninitialize();
@@ -2027,7 +2033,7 @@ TEST_F (EncodeDecodeTestAPI, Engine_SVC_Switch_P) {
   int iLastDid = 0;
   p.width = p.width << 2;
   p.height = p.height << 2;
-  prepareParam (4, p.slicenum, p.width, p.height, p.frameRate, &param_);
+  prepareParamDefault (4, p.slicenum, p.width, p.height, p.frameRate, &param_);
   param_.iTemporalLayerNum = (rand() % 4) + 1;
   param_.iSpatialLayerNum = 4;
   encoder_->Uninitialize();
@@ -2113,7 +2119,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionEncParamExt) {
   int iEncFrameNum = WelsClip3 ((rand() % ENCODE_FRAME_NUM) + 1, 1, ENCODE_FRAME_NUM);
   int iSliceNum        = 1;
   encoder_->GetDefaultParams (&param_);
-  prepareParam (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &param_);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &param_);
 
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
@@ -2177,6 +2183,7 @@ class DecodeCrashTestAPI : public EncodeDecodeTestBase {
   }
 
   void prepareParam (int iLayerNum, int iSliceNum, int width, int height, float framerate, SEncParamExt* pParam) {
+    memset (pParam, 0, sizeof (SEncParamExt));
     EncodeDecodeTestBase::prepareParam (iLayerNum, iSliceNum,  width, height, framerate, pParam);
   }
 
@@ -2431,6 +2438,11 @@ class DecodeParseAPI : public EncodeDecodeTestBase {
     ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
   }
 
+  void prepareParam (int iLayerNum, int iSliceNum, int width, int height, float framerate, SEncParamExt* pParam) {
+    memset (pParam, 0, sizeof (SEncParamExt));
+    EncodeDecodeTestBase::prepareParam (iLayerNum, iSliceNum,  width, height, framerate, pParam);
+  }
+
  protected:
   SParserBsInfo BsInfo_;
   FILE* fYuv_;
@@ -2588,21 +2600,21 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
   SEncParamExt   sParam2;
   SEncParamExt   sParam3;
   encoder_->GetDefaultParams (&sParam1);
-  prepareParam (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
   sParam1.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
   //prepare param2
   memcpy (&sParam2, &sParam1, sizeof (SEncParamExt));
   while (GET_MB_WIDTH (sParam2.iPicWidth) == GET_MB_WIDTH (sParam1.iPicWidth)) {
     sParam2.iPicWidth = GetRandWidth();
   }
-  prepareParam (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
   sParam2.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
   //prepare param3
   memcpy (&sParam3, &sParam1, sizeof (SEncParamExt));
   while (GET_MB_WIDTH (sParam3.iPicHeight) == GET_MB_WIDTH (sParam1.iPicHeight)) {
     sParam3.iPicHeight = GetRandHeight();
   }
-  prepareParam (iSpatialLayerNum, iSliceNum, sParam3.iPicWidth, sParam3.iPicHeight, fFrameRate, &sParam3);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, sParam3.iPicWidth, sParam3.iPicHeight, fFrameRate, &sParam3);
   sParam3.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
 
   //prepare output if needed
@@ -2699,12 +2711,12 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
   SEncParamExt   sParam1;
   SEncParamExt   sParam2;
   encoder_->GetDefaultParams (&sParam1);
-  prepareParam (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
   sParam1.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
   sParam1.iTemporalLayerNum = 1;
   //prepare param2
   memcpy (&sParam2, &sParam1, sizeof (SEncParamExt));
-  prepareParam (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
   sParam2.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
   sParam2.iTemporalLayerNum = 3;
 
@@ -2754,7 +2766,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
   SEncParamExt   sParam1;
   SEncParamExt   sParam2;
   encoder_->GetDefaultParams (&sParam1);
-  prepareParam (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
   sParam1.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
 
   //prepare output if needed
@@ -2780,7 +2792,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
       vWidthTableIt = std::find (vWidthTable.begin(), vWidthTable.end(), GET_MB_WIDTH (sParam2.iPicWidth));
     } while (vWidthTableIt != vWidthTable.end());
     vWidthTable.push_back (GET_MB_WIDTH (sParam2.iPicWidth));
-    prepareParam (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
+    prepareParamDefault (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
     sParam2.eSpsPpsIdStrategy = SPS_LISTING_AND_PPS_INCREASING;
 
     rv = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam2);
@@ -2821,7 +2833,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_PPS_LISTING1) {
   // prepare params
   SEncParamExt   sParam1;
   encoder_->GetDefaultParams (&sParam1);
-  prepareParam (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
   sParam1.eSpsPpsIdStrategy = SPS_PPS_LISTING;
 
   //prepare output if needed
@@ -2886,14 +2898,14 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_PPS_LISTING2) {
   SEncParamExt   sParam1;
   SEncParamExt   sParam2;
   encoder_->GetDefaultParams (&sParam1);
-  prepareParam (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
   sParam1.eSpsPpsIdStrategy = SPS_PPS_LISTING;
   //prepare param2
   memcpy (&sParam2, &sParam1, sizeof (SEncParamExt));
   while (GET_MB_WIDTH (sParam2.iPicWidth) == GET_MB_WIDTH (sParam1.iPicWidth)) {
     sParam2.iPicWidth = GetRandWidth();
   }
-  prepareParam (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
   sParam2.eSpsPpsIdStrategy = SPS_PPS_LISTING;
 
   //prepare output if needed
@@ -2945,14 +2957,14 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_PPS_LISTING3) {
   SEncParamExt   sParam2;
   SEncParamExt   sParam3;
   encoder_->GetDefaultParams (&sParam1);
-  prepareParam (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
   sParam1.eSpsPpsIdStrategy = SPS_PPS_LISTING;
   //prepare param2
   memcpy (&sParam2, &sParam1, sizeof (SEncParamExt));
   while (GET_MB_WIDTH (sParam2.iPicWidth) == GET_MB_WIDTH (sParam1.iPicWidth)) {
     sParam2.iPicWidth = GetRandWidth();
   }
-  prepareParam (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
   sParam2.eSpsPpsIdStrategy = SPS_PPS_LISTING;
   //prepare param3
   memcpy (&sParam3, &sParam1, sizeof (SEncParamExt));
@@ -2960,7 +2972,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_PPS_LISTING3) {
          GET_MB_WIDTH (sParam3.iPicWidth) == GET_MB_WIDTH (sParam2.iPicWidth)) {
     sParam3.iPicWidth = GetRandWidth();
   }
-  prepareParam (iSpatialLayerNum, iSliceNum, sParam3.iPicWidth, sParam3.iPicHeight, fFrameRate, &sParam3);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, sParam3.iPicWidth, sParam3.iPicHeight, fFrameRate, &sParam3);
   sParam3.eSpsPpsIdStrategy = SPS_PPS_LISTING;
 
   //prepare output if needed
