@@ -641,7 +641,7 @@ TEST (DecoderDeblocking, FilteringEdgeChromaHV) {
   sFilter.pLoopf->pfChromaDeblockingEQ4Hor = &UT_DeblockingFuncChromaEQ4Func;
   sFilter.pLoopf->pfChromaDeblockingEQ4Ver = &UT_DeblockingFuncChromaEQ4Func;
 
-  int8_t iChromaQP[9];
+  int8_t iChromaQP[9][2];
   sDqLayer.pChromaQp = iChromaQP;
 
   uint8_t iCb[9] = {0};
@@ -656,7 +656,7 @@ TEST (DecoderDeblocking, FilteringEdgeChromaHV) {
 
 #define UT_DB_CHROMA_TEST(iFlag, iQP, iV0, iV1, iV2) \
   iBoundryFlag = iFlag; \
-  memset(iChromaQP, iQP, sizeof(int8_t)*9); \
+  memset(iChromaQP, iQP, sizeof(int8_t)*9*2); \
   memset(iCb, 0, sizeof(uint8_t)*9); \
   memset(iCr, 0, sizeof(uint8_t)*9); \
   FilteringEdgeChromaHV(&sDqLayer, &sFilter, iBoundryFlag); \
@@ -894,7 +894,7 @@ TEST (Deblocking, WelsDeblockingMb) {
   sFilter.iCsStride[1] = 2;
 
   int8_t iLumaQP[50] = {0};
-  int8_t iChromaQP[9] = {0};
+  int8_t iChromaQP[9][2] = {{0, 0}};
   sDqLayer.pLumaQp = iLumaQP;
   sDqLayer.pChromaQp = iChromaQP;
 
@@ -910,7 +910,7 @@ TEST (Deblocking, WelsDeblockingMb) {
 
 #define UT_DB_MACROBLOCK_TEST( iBoundFlag, iQP, iLumaV0, iLumaV1, iLumaV2, iChromaV0, iChromaV1, iChromaV2 ) \
   memset(sDqLayer.pLumaQp, iQP, sizeof(int8_t)*50); \
-  memset(sDqLayer.pChromaQp, iQP, sizeof(int8_t)*9); \
+  memset(sDqLayer.pChromaQp, iQP, sizeof(int8_t)*9*2); \
   memset(sFilter.pCsData[0], 0, sizeof(int8_t)*50); \
   memset(sFilter.pCsData[1], 0, sizeof(int8_t)*9); \
   memset(sFilter.pCsData[2], 0, sizeof(int8_t)*9); \
