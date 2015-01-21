@@ -95,6 +95,8 @@ static int32_t WelsCheckNumRefSetting (SLogContext* pLogCtx, SWelsSvcCodingParam
     WelsLog (pLogCtx, WELS_LOG_WARNING, "iLTRRefNum(%d) does not equal to currently supported %d, will be reset",
              pParam->iLTRRefNum, iCurrentSupportedLtrNum);
     pParam->iLTRRefNum = iCurrentSupportedLtrNum;
+  } else if (!pParam->bEnableLongTermReference) {
+    pParam->iLTRRefNum = 0;
   }
 
   //TODO: here is a fix needed here, the most reasonable value should be:
@@ -104,11 +106,11 @@ static int32_t WelsCheckNumRefSetting (SLogContext* pLogCtx, SWelsSvcCodingParam
                             ? (WELS_MAX (1, WELS_LOG2 (pParam->uiGopSize)))
                             : (WELS_MAX (1, (pParam->uiGopSize >> 1))));
   int32_t iNeededRefNum = (pParam->uiIntraPeriod != 1) ? (iCurrentStrNum + pParam->iLTRRefNum) : 0;
+
   iNeededRefNum		= WELS_CLIP3 (iNeededRefNum,
                                 MIN_REF_PIC_COUNT,
                                 (pParam->iUsageType == CAMERA_VIDEO_REAL_TIME) ? MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA :
                                 MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN);
-
   // to adjust default or invalid input, in case pParam->iNumRefFrame do not have a valid value for the next step
   if (pParam->iNumRefFrame == AUTO_REF_PIC_COUNT) {
     pParam->iNumRefFrame = iNeededRefNum;
