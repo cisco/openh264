@@ -92,7 +92,10 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
   int32_t iFrameCount = 0;
   int32_t iEndOfStreamFlag = 0;
   int32_t iColorFormat = videoFormatInternal;
-
+  //for coverage test purpose
+  int32_t iErrorConMethod = (int32_t) ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
+  pDecoder->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iErrorConMethod);
+  //~end for
   CUtils cOutputModule;
   double dElapsed = 0;
 
@@ -205,8 +208,6 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     pDecoder->GetOption (DECODER_OPTION_VCL_NAL, &iFeedbackVclNalInAu);
     int32_t iFeedbackTidInAu;
     pDecoder->GetOption (DECODER_OPTION_TEMPORAL_ID, &iFeedbackTidInAu);
-    int32_t iErrorConMethod = (int32_t) ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
-    pDecoder->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iErrorConMethod);
 //~end for
 
     iStart = WelsTime();
@@ -324,7 +325,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
 
   SDecodingParam sDecParam = {0};
   string strInputFile (""), strOutputFile (""), strOptionFile ("");
-  int iLevelSetting = -1;
+  int iLevelSetting = (int) WELS_LOG_WARNING;
 
   sDecParam.sVideoProperty.size = sizeof (sDecParam.sVideoProperty);
 
