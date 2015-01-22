@@ -421,9 +421,11 @@ bool bUseScalingList;
 } SWelsDecoderContext, *PWelsDecoderContext;
 
 static inline void ResetActiveSPSForEachLayer (PWelsDecoderContext pCtx) {
-for (int i = 0; i < MAX_LAYER_NUM; i++) {
-  pCtx->pActiveLayerSps[i] = NULL;
-}
+  if ( pCtx->iTotalNumMbRec == 0 ) {
+    for (int i = 0; i < MAX_LAYER_NUM; i++) {
+      pCtx->pActiveLayerSps[i] = NULL;
+    }
+  }
 }
 //#ifdef __cplusplus
 //}
