@@ -155,7 +155,7 @@ typedef struct TagPps {
 
   int32_t		iPicInitQp;
   int32_t		iPicInitQs;
-  int32_t		iChromaQpIndexOffset;
+  int32_t		iChromaQpIndexOffset[2];//cb,cr
 
   bool		bEntropyCodingModeFlag;
   bool		bPicOrderPresentFlag;

@@ -69,7 +69,7 @@ struct TagDqLayer {
   int16_t	(*pMvd[LIST_A])[MB_BLOCK4x4_NUM][MV_A];
   int8_t	(*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM];
   int8_t*  pLumaQp;
-  int8_t*  pChromaQp;
+  int8_t  (*pChromaQp)[2];
   int8_t*  pCbp;
   uint8_t *pCbfDc;
   int8_t (*pNzc)[24];

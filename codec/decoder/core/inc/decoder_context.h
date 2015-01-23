@@ -164,7 +164,7 @@ int32_t	iCsStride[2];	// Cs stride
 EWelsSliceType  eSliceType;
 int8_t	iSliceAlphaC0Offset;
 int8_t	iSliceBetaOffset;
-int8_t  iChromaQP;
+int8_t  iChromaQP[2];
 int8_t  iLumaQP;
 struct TagDeblockingFunc*  pLoopf;
 } SDeblockingFilter, *PDeblockingFilter;
@@ -177,6 +177,10 @@ typedef void (*PChromaDeblockingLT4Func) (uint8_t* iSampleCb, uint8_t* iSampleCr
     int32_t iBeta, int8_t* iTc);
 typedef void (*PChromaDeblockingEQ4Func) (uint8_t* iSampleCb, uint8_t* iSampleCr, int32_t iStride, int32_t iAlpha,
     int32_t iBeta);
+    typedef void (*PChromaDeblockingLT4Func2) (uint8_t* iSampleCbr,int32_t iStride, int32_t iAlpha,
+    int32_t iBeta,int8_t* iTc);
+    typedef void (*PChromaDeblockingEQ4Func2) (uint8_t* iSampleCbr,int32_t iStride, int32_t iAlpha,
+    int32_t iBeta);
 
 typedef struct TagDeblockingFunc {
 PLumaDeblockingLT4Func    pfLumaDeblockingLT4Ver;
@@ -188,6 +192,12 @@ PChromaDeblockingLT4Func  pfChromaDeblockingLT4Ver;
 PChromaDeblockingEQ4Func  pfChromaDeblockingEQ4Ver;
 PChromaDeblockingLT4Func  pfChromaDeblockingLT4Hor;
 PChromaDeblockingEQ4Func  pfChromaDeblockingEQ4Hor;
+
+PChromaDeblockingLT4Func2  pfChromaDeblockingLT4Ver2;
+PChromaDeblockingEQ4Func2  pfChromaDeblockingEQ4Ver2;
+PChromaDeblockingLT4Func2  pfChromaDeblockingLT4Hor2;
+PChromaDeblockingEQ4Func2  pfChromaDeblockingEQ4Hor2; 
+
 } SDeblockingFunc, *PDeblockingFunc;
 
 typedef void (*PWelsNonZeroCountFunc) (int8_t* pNonZeroCount);
@@ -260,7 +270,7 @@ struct {
   int16_t	(*pMv[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM][MV_A]; //[LAYER_NUM_EXCHANGEABLE   MB_BLOCK4x4_NUM*]
   int8_t	(*pRefIndex[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM];
   int8_t*	pLumaQp[LAYER_NUM_EXCHANGEABLE];	/*mb luma_qp*/
-  int8_t*	pChromaQp[LAYER_NUM_EXCHANGEABLE];					/*mb chroma_qp*/
+  int8_t	(*pChromaQp[LAYER_NUM_EXCHANGEABLE])[2];					/*mb chroma_qp*/
   int16_t	(*pMvd[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM][MV_A]; //[LAYER_NUM_EXCHANGEABLE   MB_BLOCK4x4_NUM*]
   uint8_t *pCbfDc[LAYER_NUM_EXCHANGEABLE];
   int8_t	(*pNzc[LAYER_NUM_EXCHANGEABLE])[24];
