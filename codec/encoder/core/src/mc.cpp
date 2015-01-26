@@ -765,9 +765,8 @@ void EncMcChroma_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t*
 }
 #endif
 
-typedef void (*PixelAvgFunc) (uint8_t*, int32_t, const uint8_t*, int32_t, const uint8_t*, int32_t, int32_t);
 void WelsInitMcFuncs (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
-  static const PixelAvgFunc pfPixAvgFunc[2] = {PixelAvgWidthEq8_c, PixelAvgWidthEq16_c};
+  static const PWelsSampleAveragingFunc pfPixAvgFunc[2] = {PixelAvgWidthEq8_c, PixelAvgWidthEq16_c};
 
   static const PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16[16] = { //[y*4+x]
     McCopyWidthEq16_c,     McHorVer10WidthEq16_c, McHorVer20WidthEq16_c, McHorVer30WidthEq16_c,
