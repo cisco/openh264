@@ -134,9 +134,9 @@ static inline void McCopyWidthEq16_c (const uint8_t* pSrc, int32_t iSrcStride, u
 //--------------------Luma sample MC------------------//
 
 static inline int32_t HorFilterInput16bit_c (const int16_t* pSrc) {
-  int32_t iPix05 = pSrc[-2] + pSrc[3];
-  int32_t iPix14 = pSrc[-1] + pSrc[2];
-  int32_t iPix23 = pSrc[ 0] + pSrc[1];
+  int32_t iPix05 = pSrc[0] + pSrc[5];
+  int32_t iPix14 = pSrc[1] + pSrc[4];
+  int32_t iPix23 = pSrc[2] + pSrc[3];
 
   return (iPix05 - (iPix14 * 5) + (iPix23 * 20));
 }
@@ -213,7 +213,7 @@ static inline void McHorVer22_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_
       iTmp[j] = FilterInput8bitWithStride_c (pSrc - 2 + j, iSrcStride);
     }
     for (k = 0; k < iWidth; k++) {
-      pDst[k] = WelsClip1 ((HorFilterInput16bit_c (&iTmp[2 + k]) + 512) >> 10);
+      pDst[k] = WelsClip1 ((HorFilterInput16bit_c (&iTmp[k]) + 512) >> 10);
     }
     pSrc += iSrcStride;
     pDst += iDstStride;
