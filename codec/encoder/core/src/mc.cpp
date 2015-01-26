@@ -125,7 +125,7 @@ static inline int32_t HorFilter_c (const uint8_t* pSrc) {
   return (iPix05 - ((iPix14 << 2) + iPix14) + (iPix23 << 4) + (iPix23 << 2));
 }
 
-static inline int32_t HorFilterInput16bit1_c (int16_t* pSrc) {
+static inline int32_t HorFilterInput16bit1_c (const int16_t* pSrc) {
   int32_t iPix05 = pSrc[-2] + pSrc[3];
   int32_t iPix14 = pSrc[-1] + pSrc[2];
   int32_t iPix23 = pSrc[ 0] + pSrc[1];
