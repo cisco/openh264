@@ -681,7 +681,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
     memset (&decoded, 0, sizeof (decoded));
     unsigned char* data[3] = {nullptr, nullptr, nullptr};
 
-    dState = decoder_->DecodeFrame2 (inputFrame->Buffer(),
+    dState = decoder_->DecodeFrameNoDelay (inputFrame->Buffer(),
                                      inputFrame->Size(),
                                      data,
                                      &decoded);
