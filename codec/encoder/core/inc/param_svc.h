@@ -246,7 +246,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
       sSpatialLayers->iDLayerQp = SVC_QUALITY_BASE_QP;
 
-      uiProfileIdc	= PRO_SCALABLE_BASELINE;
+      uiProfileIdc	= (!bSimulcastAVC) ? PRO_SCALABLE_BASELINE : PRO_BASELINE;
       ++ pDlp;
       ++ iIdxSpatial;
     }
@@ -287,6 +287,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
     /* Rate Control */
     iRCMode = pCodingParam.iRCMode;    // rc mode
+    bSimulcastAVC = pCodingParam.bSimulcastAVC;
     iPaddingFlag = pCodingParam.iPaddingFlag;
 
     iTargetBitrate		= pCodingParam.iTargetBitrate;	// target bitrate
@@ -404,7 +405,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
       pSpatialLayer->iDLayerQp = pCodingParam.sSpatialLayers[iIdxSpatial].iDLayerQp;
 
-      uiProfileIdc	= PRO_SCALABLE_BASELINE;
+      uiProfileIdc	= (!bSimulcastAVC) ? PRO_SCALABLE_BASELINE : PRO_BASELINE;
       ++ pDlp;
       ++ pSpatialLayer;
       ++ iIdxSpatial;
@@ -474,7 +475,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
         return ENC_RETURN_INVALIDINPUT;
       }
 
-      uiProfileIdc	= iEntropyCodingModeFlag ? PRO_SCALABLE_HIGH : PRO_SCALABLE_BASELINE;
+      uiProfileIdc	= iEntropyCodingModeFlag ? PRO_SCALABLE_HIGH : ((!bSimulcastAVC) ? PRO_SCALABLE_BASELINE : PRO_BASELINE);
       ++ pDlp;
       ++ pSpatialLayer;
       ++ i;
