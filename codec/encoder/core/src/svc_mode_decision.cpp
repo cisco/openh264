@@ -415,8 +415,8 @@ void SvcMdSCDMbEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCach
   }
   //MC
   pFunc->sMcFuncs.pfLumaQuarpelMc[0] (pRefLuma + iOffsetY, iLineSizeY, pDstLuma, 16, 16);
-  pFunc->sMcFuncs.pfChromaMc (pRefCb + iOffsetUV, iLineSizeUV, pDstCb, 8, sMvp, 8, 8);
-  pFunc->sMcFuncs.pfChromaMc (pRefCr + iOffsetUV, iLineSizeUV, pDstCr, 8, sMvp, 8, 8);
+  pFunc->sMcFuncs.pfChromaMc (pRefCb + iOffsetUV, iLineSizeUV, pDstCb, 8, sMvp.iMvX, sMvp.iMvY, 8, 8);
+  pFunc->sMcFuncs.pfChromaMc (pRefCr + iOffsetUV, iLineSizeUV, pDstCr, 8, sMvp.iMvX, sMvp.iMvY, 8, 8);
 
   pCurMb->uiCbp = 0;
   pWelsMd->iCostLuma = 0;

@@ -367,11 +367,11 @@ static inline void McCopy_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* p
 }
 
 void McChroma_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                 SMVUnitXY mv, int32_t iWidth, int32_t iHeight)
+                 int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight)
 //pSrc has been added the offset of mv
 {
-  const int32_t kiDx = mv.iMvX & 0x07;
-  const int32_t kiDy = mv.iMvY & 0x07;
+  const int32_t kiDx = iMvX & 0x07;
+  const int32_t kiDy = iMvY & 0x07;
 
   if (0 == kiDx && 0 == kiDy) {
     McCopy_c (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
@@ -543,9 +543,9 @@ static inline void McCopy_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t
 typedef void (*McChromaWidthEqx) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                   const uint8_t* pABCD, int32_t iHeigh);
 void McChroma_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                    SMVUnitXY sMv, int32_t iWidth, int32_t iHeight) {
-  const int32_t kiD8x = sMv.iMvX & 0x07;
-  const int32_t kiD8y = sMv.iMvY & 0x07;
+                    int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
+  const int32_t kiD8x = iMvX & 0x07;
+  const int32_t kiD8y = iMvY & 0x07;
   static const McChromaWidthEqx kpfFuncs[2] = {
     McChromaWidthEq4_mmx,
     McChromaWidthEq8_sse2
@@ -559,9 +559,9 @@ void McChroma_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int3
 }
 
 void McChroma_ssse3 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                     SMVUnitXY sMv, int32_t iWidth, int32_t iHeight) {
-  const int32_t kiD8x = sMv.iMvX & 0x07;
-  const int32_t kiD8y = sMv.iMvY & 0x07;
+                     int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
+  const int32_t kiD8x = iMvX & 0x07;
+  const int32_t kiD8y = iMvY & 0x07;
 
   static const McChromaWidthEqx kpfFuncs[2] = {
     McChromaWidthEq4_mmx,
@@ -651,9 +651,9 @@ void EncMcHorVer33_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
   PixelAvgWidthEq16_neon (pDst, iDstStride, pTmp, &pTmp[256], iHeight);
 }
 void EncMcChroma_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                       SMVUnitXY sMv, int32_t iWidth, int32_t iHeight) {
-  const int32_t kiD8x = sMv.iMvX & 0x07;
-  const int32_t kiD8y = sMv.iMvY & 0x07;
+                       int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
+  const int32_t kiD8x = iMvX & 0x07;
+  const int32_t kiD8y = iMvY & 0x07;
   if (0 == kiD8x && 0 == kiD8y) {
     if (8 == iWidth)
       McCopyWidthEq8_neon (pSrc, iSrcStride, pDst, iDstStride, iHeight);
@@ -748,9 +748,9 @@ void EncMcHorVer33_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_
   PixelAvgWidthEq16_AArch64_neon (pDst, iDstStride, pTmp, 16, &pTmp[256], 16, iHeight);
 }
 void EncMcChroma_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                               SMVUnitXY sMv, int32_t iWidth, int32_t iHeight) {
-  const int32_t kiD8x = sMv.iMvX & 0x07;
-  const int32_t kiD8y = sMv.iMvY & 0x07;
+                               int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
+  const int32_t kiD8x = iMvX & 0x07;
+  const int32_t kiD8y = iMvY & 0x07;
   if (0 == kiD8x && 0 == kiD8y) {
     if (8 == iWidth)
       McCopyWidthEq8_AArch64_neon (pSrc, iSrcStride, pDst, iDstStride, iHeight);
