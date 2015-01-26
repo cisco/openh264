@@ -9,19 +9,19 @@ using namespace WelsDec;
 #define MC_BUFF_HEIGHT 30
 
 /**********************MC Unit Test Anchor Code Begin******************************/
-bool bQpelNeeded[4][4] = {
+static bool bQpelNeeded[4][4] = {
   { false, true, false, true },
   { true,  true,  true, true },
   { false, true, false, true },
   { true,  true,  true, true }
 };
-int32_t iHpelRef0Array[4][4] = {
+static int32_t iHpelRef0Array[4][4] = {
   { 0, 1, 1, 1 },
   { 0, 1, 1, 1 },
   { 2, 3, 3, 3 },
   { 0, 1, 1, 1 }
 };
-int32_t iHpelRef1Array[4][4] = {
+static int32_t iHpelRef1Array[4][4] = {
   { 0, 0, 0, 0 },
   { 2, 2, 3, 2 },
   { 2, 2, 3, 2 },
@@ -32,8 +32,8 @@ static inline uint8_t Clip255 (int32_t x) {
   return ((x & ~255) ? (-x) >> 31 & 255 : x);
 }
 
-void MCCopyAnchor (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
-                   int32_t iHeight) {
+static void MCCopyAnchor (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
+                          int32_t iHeight) {
   for (int32_t y = 0; y < iHeight; y++) {
     memcpy (pDst, pSrc, iWidth * sizeof (uint8_t));
     pSrc += iSrcStride;
@@ -41,8 +41,8 @@ void MCCopyAnchor (uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDs
   }
 }
 
-void MCHalfPelFilterAnchor (uint8_t* pDstH, uint8_t* pDstV, uint8_t* pDstHV, uint8_t* pSrc,
-                            int32_t iStride, int32_t iWidth, int32_t iHeight, int16_t* pBuf) {
+static void MCHalfPelFilterAnchor (uint8_t* pDstH, uint8_t* pDstV, uint8_t* pDstHV, uint8_t* pSrc,
+                                   int32_t iStride, int32_t iWidth, int32_t iHeight, int16_t* pBuf) {
   for (int32_t y = 0; y < iHeight; y++) {
     for (int32_t x = 0; x < iWidth; x++)
       pDstH[x] = Clip255 ((FILTER6TAP (pSrc, x, 1) + 16) >> 5);
@@ -60,9 +60,9 @@ void MCHalfPelFilterAnchor (uint8_t* pDstH, uint8_t* pDstV, uint8_t* pDstHV, uin
   }
 }
 
-void PixelAvgAnchor (uint8_t* pDst,  int32_t iDstStride,
-                     uint8_t* pSrc1, int32_t iSrc1Stride,
-                     uint8_t* pSrc2, int32_t iSrc2Stride, int32_t iWidth, int32_t iHeight) {
+static void PixelAvgAnchor (uint8_t* pDst,  int32_t iDstStride,
+                            uint8_t* pSrc1, int32_t iSrc1Stride,
+                            uint8_t* pSrc2, int32_t iSrc2Stride, int32_t iWidth, int32_t iHeight) {
   for (int32_t y = 0; y < iHeight; y++) {
     for (int32_t x = 0; x < iWidth; x++)
       pDst[x] = (pSrc1[x] + pSrc2[x] + 1) >> 1;
@@ -72,8 +72,8 @@ void PixelAvgAnchor (uint8_t* pDst,  int32_t iDstStride,
   }
 }
 
-void MCLumaAnchor (uint8_t* pDst,    int32_t iDstStride, uint8_t* pSrc[4], int32_t iSrcStride,
-                   int32_t iMvX, int32_t iMvY, int32_t iWidth, int32_t iHeight) {
+static void MCLumaAnchor (uint8_t* pDst, int32_t iDstStride, uint8_t* pSrc[4], int32_t iSrcStride,
+                          int32_t iMvX, int32_t iMvY, int32_t iWidth, int32_t iHeight) {
   int32_t iMvXIdx = iMvX & 3;
   int32_t iMvYIdx = iMvY & 3;
   int32_t iOffset = (iMvY >> 2) * iSrcStride + (iMvX >> 2);
@@ -87,8 +87,8 @@ void MCLumaAnchor (uint8_t* pDst,    int32_t iDstStride, uint8_t* pSrc[4], int32
   }
 }
 
-void MCChromaAnchor (uint8_t* pDstU, uint8_t* pDstV, int32_t iDstStride, uint8_t* pSrc, int32_t iSrcStride,
-                     int32_t iMvX, int32_t iMvY, int32_t iWidth, int32_t iHeight) {
+static void MCChromaAnchor (uint8_t* pDstU, uint8_t* pDstV, int32_t iDstStride, uint8_t* pSrc, int32_t iSrcStride,
+                            int32_t iMvX, int32_t iMvY, int32_t iWidth, int32_t iHeight) {
   uint8_t* pSrcTmp;
   pSrc += (iMvY >> 3) * iSrcStride + (iMvX >> 3) * 2;
   pSrcTmp = &pSrc[iSrcStride];
