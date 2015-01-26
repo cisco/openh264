@@ -116,7 +116,7 @@ void MCChromaAnchor (uint8_t* pDstU, uint8_t* pDstV, int32_t iDstStride, uint8_t
 }
 
 /**********************MC Unit Test OPENH264 Code Begin******************************/
-#define DEF_MCCOPYTEST(iH,iW, forceC) \
+#define DEF_MCCOPYTEST(iW,iH, forceC) \
 TEST(McCopy_c,iW##x##iH) \
 {                             \
     SMcFunc sMcFunc;      \
@@ -158,8 +158,8 @@ TEST(McCopy_c,iW##x##iH) \
 }
 
 DEF_MCCOPYTEST (2, 2, 1)
-DEF_MCCOPYTEST (2, 4, 0)
-DEF_MCCOPYTEST (4, 2, 1)
+DEF_MCCOPYTEST (2, 4, 1)
+DEF_MCCOPYTEST (4, 2, 0)
 DEF_MCCOPYTEST (4, 4, 0)
 DEF_MCCOPYTEST (4, 8, 0)
 DEF_MCCOPYTEST (8, 4, 0)
