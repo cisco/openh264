@@ -58,6 +58,7 @@ welsCodecTrace::welsCodecTrace() {
 
   m_sLogCtx.pLogCtx = this;
   m_sLogCtx.pfLog = StaticCodecTrace;
+  m_sLogCtx.pCodecInstance = NULL;
 }
 
 welsCodecTrace::~welsCodecTrace() {
