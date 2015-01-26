@@ -338,12 +338,12 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
 
   // eSpsPpsIdStrategy checkings
   if (pCodingParam->iSpatialLayerNum > 1 && (SPS_LISTING & pCodingParam->eSpsPpsIdStrategy)) {
-    WelsLog (pLogCtx, WELS_LOG_INFO,
+    WelsLog (pLogCtx, WELS_LOG_WARNING,
              "ParamValidationExt(), eSpsPpsIdStrategy setting (%d) with multiple SpatialLayers (%d) not supported! eSpsPpsIdStrategy adjusted to CONSTANT_ID", pCodingParam->eSpsPpsIdStrategy, pCodingParam->iSpatialLayerNum);
     pCodingParam->eSpsPpsIdStrategy = CONSTANT_ID;
   }
   if (pCodingParam->iUsageType == SCREEN_CONTENT_REAL_TIME && (SPS_LISTING & pCodingParam->eSpsPpsIdStrategy)) {
-    WelsLog (pLogCtx, WELS_LOG_INFO,
+    WelsLog (pLogCtx, WELS_LOG_WARNING,
              "ParamValidationExt(), eSpsPpsIdStrategy setting (%d) with iUsageType (%d) not supported! eSpsPpsIdStrategy adjusted to CONSTANT_ID", pCodingParam->eSpsPpsIdStrategy, pCodingParam->iUsageType);
     pCodingParam->eSpsPpsIdStrategy = CONSTANT_ID;
   }
