@@ -475,7 +475,8 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
         return ENC_RETURN_INVALIDINPUT;
       }
 
-      uiProfileIdc	= iEntropyCodingModeFlag ? PRO_SCALABLE_HIGH : ((!bSimulcastAVC) ? PRO_SCALABLE_BASELINE : PRO_BASELINE);
+      uiProfileIdc	= bSimulcastAVC ? (iEntropyCodingModeFlag ? PRO_HIGH : PRO_BASELINE) :
+                      (iEntropyCodingModeFlag ? PRO_SCALABLE_HIGH : PRO_SCALABLE_BASELINE);
       ++ pDlp;
       ++ pSpatialLayer;
       ++ i;
