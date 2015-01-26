@@ -583,7 +583,7 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
     pStatistics->uiLTRSentNum ++;
   }
 
-  m_pEncContext->iTotalEncodedBits += kiCurrentFrameSize;
+  m_pEncContext->iTotalEncodedBits += (kiCurrentFrameSize<<3);
 
   if (m_pEncContext->iStatisticsLogInterval > 0) {
     int64_t iTimeDiff = kiCurrentFrameTs - m_pEncContext->iLastStatisticsLogTs;
