@@ -10,6 +10,7 @@ ENCODER_UNITTEST_CPP_SRCS=\
 	$(ENCODER_UNITTEST_SRCDIR)/EncUT_MBCopy.cpp\
 	$(ENCODER_UNITTEST_SRCDIR)/EncUT_MemoryAlloc.cpp\
 	$(ENCODER_UNITTEST_SRCDIR)/EncUT_MemoryZero.cpp\
+	$(ENCODER_UNITTEST_SRCDIR)/EncUT_MotionCompensation.cpp\
 	$(ENCODER_UNITTEST_SRCDIR)/EncUT_MotionEstimate.cpp\
 	$(ENCODER_UNITTEST_SRCDIR)/EncUT_ParameterSetStrategy.cpp\
 	$(ENCODER_UNITTEST_SRCDIR)/EncUT_Reconstruct.cpp\
