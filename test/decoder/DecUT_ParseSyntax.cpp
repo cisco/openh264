@@ -165,6 +165,7 @@ void DecoderParseSyntaxTest::Init() {
     m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);
   }
   CM_RETURN eRet = (CM_RETURN)Initialize (&m_sDecParam, m_pCtx, &m_pWelsTrace->m_sLogCtx);
+  (void) eRet;
 }
 
 void DecoderParseSyntaxTest::Uninit() {
@@ -195,9 +196,9 @@ void DecoderParseSyntaxTest::DecodeBs (const char* sFileName) {
 
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + sFileName;
-  ASSERT_TRUE (pH264File = fopen (filename.c_str(), "rb"));
+  ASSERT_TRUE ((pH264File = fopen (filename.c_str(), "rb")) != NULL);
 #else
-  ASSERT_TRUE (pH264File = fopen (sFileName, "rb"));
+  ASSERT_TRUE ((pH264File = fopen (sFileName, "rb")) != NULL);
 #endif
   fseek (pH264File, 0L, SEEK_END);
   iFileSize = (int32_t) ftell (pH264File);
