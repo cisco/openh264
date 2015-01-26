@@ -250,19 +250,19 @@ void DecoderParseSyntaxTest::TestScalingList() {
   DecodeBs ("res/BA_MW_D.264");
   ASSERT_TRUE (m_pCtx->sSpsBuffer[0].bSeqScalingMatrixPresentFlag == false);
   EXPECT_EQ (0, memcmp (iScalingListPPS, m_pCtx->sSpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));;
-  ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bSeqScalingMatrixPresentFlag == false);
+  ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bPicScalingMatrixPresentFlag == false);
   EXPECT_EQ (0, memcmp (iScalingListPPS, m_pCtx->sPpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));;
   Uninit();
   //Scalinglist value just written into sps and pps
   Init();
-  DecodeBs ("test_scalinglist_jm.264");
+  DecodeBs ("res/test_scalinglist_jm.264");
   ASSERT_TRUE (m_pCtx->sSpsBuffer[0].bSeqScalingMatrixPresentFlag);
   for (int i = 0; i < 6; i++) {
     EXPECT_EQ (0, memcmp (iScalingList[i], m_pCtx->sSpsBuffer[0].iScalingList4x4[i], 16 * sizeof (uint8_t)));
   }
 
-  ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bSeqScalingMatrixPresentFlag);
-  EXPECT_EQ (0, memcmp (iScalingList, m_pCtx->sPpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
+  ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bPicScalingMatrixPresentFlag == false);
+  EXPECT_EQ (0, memcmp (iScalingListPPS, m_pCtx->sPpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
   Uninit();
 
 
