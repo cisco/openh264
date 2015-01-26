@@ -140,13 +140,6 @@ int32_t WelsCheckRefFrameLimitationNumRefFirst (SLogContext* pLogCtx, SWelsSvcCo
     // we take num-ref as the honored setting but it conflicts with temporal and LTR
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
-  for (int32_t i = 0; i < pParam->iSpatialLayerNum; ++ i) {
-    SSpatialLayerConfig* pSpatialLayer = &pParam->sSpatialLayers[i];
-    // when it is NumRefFirst and level is unknown, the level can be set to the lowest and be adjusted later
-    if (pSpatialLayer->uiLevelIdc == LEVEL_UNKNOWN) {
-      pSpatialLayer->uiLevelIdc = LEVEL_1_0;
-    }
-  }
   return ENC_RETURN_SUCCESS;
 }
 int32_t WelsCheckRefFrameLimitationLevelIdcFirst (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam) {
@@ -484,7 +477,7 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
     uiLevel = LEVEL_1_1;
     pSps->bConstraintSet3Flag = true;
   }
-  if (pLayerParam->uiLevelIdc < uiLevel) {
+  if ((pLayerParam->uiLevelIdc == LEVEL_UNKNOWN) || (pLayerParam->uiLevelIdc < uiLevel)) {
     pLayerParam->uiLevelIdc = uiLevel;
   }
   pSps->iLevelIdc = g_kuiLevelMaps[pLayerParam->uiLevelIdc - 1];
