@@ -18,24 +18,19 @@ static void McLumaFunc (SMcFunc* pFuncs, const uint8_t* pSrc, int32_t iSrcStride
 
 #define CHROMA_FUNC sMcFunc.pfChromaMc
 
-#define PREFIX Enc
-
-#define DEF_MCCOPYTESTS(pfx)    \
-DEF_MCCOPYTEST (pfx, 16, 8, 0)  \
-DEF_MCCOPYTEST (pfx, 16, 16, 0)
-
-#define DEF_LUMA_MCTEST(pfx,a,b) \
-DEF_LUMA_MCTEST_SUBCASE(pfx,a,b,16,8) \
-DEF_LUMA_MCTEST_SUBCASE(pfx,a,b,16,16)
-
-#define DEF_CHROMA_MCTEST(pfx,a,b) \
-DEF_CHROMA_MCTEST_SUBCASE(pfx,a,b,4,2) \
-DEF_CHROMA_MCTEST_SUBCASE(pfx,a,b,4,4) \
-DEF_CHROMA_MCTEST_SUBCASE(pfx,a,b,4,8) \
-DEF_CHROMA_MCTEST_SUBCASE(pfx,a,b,8,4) \
-DEF_CHROMA_MCTEST_SUBCASE(pfx,a,b,8,8)
-
 #include "mc_test_common.h"
+
+DEF_MCCOPYTEST (Enc, 16, 8, 0)
+DEF_MCCOPYTEST (Enc, 16, 16, 0)
+
+DEF_LUMA_MCTEST (Enc, 16, 8)
+DEF_LUMA_MCTEST (Enc, 16, 16)
+
+DEF_CHROMA_MCTEST (Enc, 4, 2)
+DEF_CHROMA_MCTEST (Enc, 4, 4)
+DEF_CHROMA_MCTEST (Enc, 4, 8)
+DEF_CHROMA_MCTEST (Enc, 8, 4)
+DEF_CHROMA_MCTEST (Enc, 8, 8)
 
 TEST (EncMcAvg, PixelAvg) {
   SMcFunc sMcFunc;
