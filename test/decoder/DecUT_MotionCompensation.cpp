@@ -1,8 +1,6 @@
 #include <gtest/gtest.h>
 #include "codec_def.h"
 #include "mc.h"
-#include "mem_align.h"
-#include "cpu_core.h"
 #include "cpu.h"
 using namespace WelsDec;
 
