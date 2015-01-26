@@ -713,6 +713,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
 
     // If we don't actually have data, just abort.
     if (!valid) {
+      Error (GMPDecodeErr);
       return;
     }
 
