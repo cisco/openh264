@@ -153,6 +153,7 @@ void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pS
 
 int32_t WelsDecodeAccessUnitStart (PWelsDecoderContext pCtx);
 void WelsDecodeAccessUnitEnd (PWelsDecoderContext pCtx);
+void DecodeFinishUpdate (PWelsDecoderContext pCtx);
 
 void ForceResetCurrentAccessUnit (PAccessUnit pAu);
 void ForceClearCurrentNal (PAccessUnit pAu);

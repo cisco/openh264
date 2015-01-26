@@ -178,6 +178,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
 
   switch (pNalUnitHeader->eNalUnitType) {
+  case NAL_UNIT_AU_DELIMITER:
   case NAL_UNIT_SEI:
     if (pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
       pCtx->pAccessUnitList->uiEndPos = pCtx->pAccessUnitList->uiAvailUnitsNum - 1;
