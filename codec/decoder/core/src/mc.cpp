@@ -133,7 +133,7 @@ static inline void McCopyWidthEq16_c (const uint8_t* pSrc, int32_t iSrcStride, u
 
 //--------------------Luma sample MC------------------//
 
-static inline int32_t HorFilterInput16bit_c (int16_t* pSrc) {
+static inline int32_t HorFilterInput16bit_c (const int16_t* pSrc) {
   int32_t iPix05 = pSrc[-2] + pSrc[3];
   int32_t iPix14 = pSrc[-1] + pSrc[2];
   int32_t iPix23 = pSrc[ 0] + pSrc[1];
