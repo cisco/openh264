@@ -125,10 +125,10 @@ static inline int32_t HorFilter_c (const uint8_t* pSrc) {
   return (iPix05 - ((iPix14 << 2) + iPix14) + (iPix23 << 4) + (iPix23 << 2));
 }
 
-static inline int32_t HorFilterInput16bit1_c (int16_t* pSrc) {
-  int32_t iPix05 = pSrc[-2] + pSrc[3];
-  int32_t iPix14 = pSrc[-1] + pSrc[2];
-  int32_t iPix23 = pSrc[ 0] + pSrc[1];
+static inline int32_t HorFilterInput16bit1_c (const int16_t* pSrc) {
+  int32_t iPix05 = pSrc[0] + pSrc[5];
+  int32_t iPix14 = pSrc[1] + pSrc[4];
+  int32_t iPix23 = pSrc[2] + pSrc[3];
 
   return (iPix05 - ((iPix14 << 2) + iPix14) + (iPix23 << 4) + (iPix23 << 2));
 }
@@ -203,7 +203,7 @@ static inline void McHorVer22WidthEq16_c (const uint8_t* pSrc, int32_t iSrcStrid
       pTmp[j] = VerFilter_c (pSrc - 2 + j, iSrcStride);
     }
     for (k = 0; k < 16; k++) {
-      pDst[k] = WelsClip1 ((HorFilterInput16bit1_c (&pTmp[2 + k]) + 512) >> 10);
+      pDst[k] = WelsClip1 ((HorFilterInput16bit1_c (&pTmp[k]) + 512) >> 10);
     }
     pSrc += iSrcStride;
     pDst += iDstStride;
@@ -342,7 +342,7 @@ static inline void McHorVer22_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_
       pTmp[j] = VerFilter_c (pSrc - 2 + j, iSrcStride);
     }
     for (k = 0; k < iWidth; k++) {
-      pDst[k] = WelsClip1 ((HorFilterInput16bit1_c (&pTmp[2 + k]) + 512) >> 10);
+      pDst[k] = WelsClip1 ((HorFilterInput16bit1_c (&pTmp[k]) + 512) >> 10);
     }
     pSrc += iSrcStride;
     pDst += iDstStride;
@@ -367,11 +367,11 @@ static inline void McCopy_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* p
 }
 
 void McChroma_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                 SMVUnitXY mv, int32_t iWidth, int32_t iHeight)
+                 int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight)
 //pSrc has been added the offset of mv
 {
-  const int32_t kiDx = mv.iMvX & 0x07;
-  const int32_t kiDy = mv.iMvY & 0x07;
+  const int32_t kiDx = iMvX & 0x07;
+  const int32_t kiDy = iMvY & 0x07;
 
   if (0 == kiDx && 0 == kiDy) {
     McCopy_c (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
@@ -543,9 +543,9 @@ static inline void McCopy_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t
 typedef void (*McChromaWidthEqx) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                   const uint8_t* pABCD, int32_t iHeigh);
 void McChroma_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                    SMVUnitXY sMv, int32_t iWidth, int32_t iHeight) {
-  const int32_t kiD8x = sMv.iMvX & 0x07;
-  const int32_t kiD8y = sMv.iMvY & 0x07;
+                    int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
+  const int32_t kiD8x = iMvX & 0x07;
+  const int32_t kiD8y = iMvY & 0x07;
   static const McChromaWidthEqx kpfFuncs[2] = {
     McChromaWidthEq4_mmx,
     McChromaWidthEq8_sse2
@@ -559,9 +559,9 @@ void McChroma_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int3
 }
 
 void McChroma_ssse3 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                     SMVUnitXY sMv, int32_t iWidth, int32_t iHeight) {
-  const int32_t kiD8x = sMv.iMvX & 0x07;
-  const int32_t kiD8y = sMv.iMvY & 0x07;
+                     int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
+  const int32_t kiD8x = iMvX & 0x07;
+  const int32_t kiD8y = iMvY & 0x07;
 
   static const McChromaWidthEqx kpfFuncs[2] = {
     McChromaWidthEq4_mmx,
@@ -651,9 +651,9 @@ void EncMcHorVer33_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
   PixelAvgWidthEq16_neon (pDst, iDstStride, pTmp, &pTmp[256], iHeight);
 }
 void EncMcChroma_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                       SMVUnitXY sMv, int32_t iWidth, int32_t iHeight) {
-  const int32_t kiD8x = sMv.iMvX & 0x07;
-  const int32_t kiD8y = sMv.iMvY & 0x07;
+                       int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
+  const int32_t kiD8x = iMvX & 0x07;
+  const int32_t kiD8y = iMvY & 0x07;
   if (0 == kiD8x && 0 == kiD8y) {
     if (8 == iWidth)
       McCopyWidthEq8_neon (pSrc, iSrcStride, pDst, iDstStride, iHeight);
@@ -748,9 +748,9 @@ void EncMcHorVer33_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_
   PixelAvgWidthEq16_AArch64_neon (pDst, iDstStride, pTmp, 16, &pTmp[256], 16, iHeight);
 }
 void EncMcChroma_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                               SMVUnitXY sMv, int32_t iWidth, int32_t iHeight) {
-  const int32_t kiD8x = sMv.iMvX & 0x07;
-  const int32_t kiD8y = sMv.iMvY & 0x07;
+                               int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
+  const int32_t kiD8x = iMvX & 0x07;
+  const int32_t kiD8y = iMvY & 0x07;
   if (0 == kiD8x && 0 == kiD8y) {
     if (8 == iWidth)
       McCopyWidthEq8_AArch64_neon (pSrc, iSrcStride, pDst, iDstStride, iHeight);
@@ -765,9 +765,8 @@ void EncMcChroma_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t*
 }
 #endif
 
-typedef void (*PixelAvgFunc) (uint8_t*, int32_t, const uint8_t*, int32_t, const uint8_t*, int32_t, int32_t);
-void WelsInitMcFuncs (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
-  static const PixelAvgFunc pfPixAvgFunc[2] = {PixelAvgWidthEq8_c, PixelAvgWidthEq16_c};
+void WelsInitMcFuncs (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
+  static const PWelsSampleAveragingFunc pfPixAvgFunc[2] = {PixelAvgWidthEq8_c, PixelAvgWidthEq16_c};
 
   static const PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16[16] = { //[y*4+x]
     McCopyWidthEq16_c,     McHorVer10WidthEq16_c, McHorVer20WidthEq16_c, McHorVer30WidthEq16_c,
@@ -799,50 +798,50 @@ void WelsInitMcFuncs (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
     McHorVer03WidthEq16_AArch64_neon,    EncMcHorVer13_AArch64_neon,         EncMcHorVer23_AArch64_neon,          EncMcHorVer33_AArch64_neon
   };
 #endif
-  pFuncList->sMcFuncs.pfLumaHalfpelHor = McHorVer20_c;
-  pFuncList->sMcFuncs.pfLumaHalfpelVer = McHorVer02_c;
-  pFuncList->sMcFuncs.pfLumaHalfpelCen = McHorVer22_c;
-  memcpy (pFuncList->sMcFuncs.pfSampleAveraging, pfPixAvgFunc, sizeof (pfPixAvgFunc));
-  pFuncList->sMcFuncs.pfChromaMc	= McChroma_c;
-  memcpy (pFuncList->sMcFuncs.pfLumaQuarpelMc, pWelsMcFuncWidthEq16, sizeof (pWelsMcFuncWidthEq16));
+  pMcFuncs->pfLumaHalfpelHor = McHorVer20_c;
+  pMcFuncs->pfLumaHalfpelVer = McHorVer02_c;
+  pMcFuncs->pfLumaHalfpelCen = McHorVer22_c;
+  memcpy (pMcFuncs->pfSampleAveraging, pfPixAvgFunc, sizeof (pfPixAvgFunc));
+  pMcFuncs->pfChromaMc	= McChroma_c;
+  memcpy (pMcFuncs->pfLumaQuarpelMc, pWelsMcFuncWidthEq16, sizeof (pWelsMcFuncWidthEq16));
 #if defined (X86_ASM)
   if (uiCpuFlag & WELS_CPU_SSE2) {
-    pFuncList->sMcFuncs.pfLumaHalfpelHor = McHorVer20Width9Or17_sse2;
-    pFuncList->sMcFuncs.pfLumaHalfpelVer = McHorVer02Height9Or17_sse2;
-    pFuncList->sMcFuncs.pfLumaHalfpelCen = McHorVer22Width9Or17Height9Or17_sse2;
-    pFuncList->sMcFuncs.pfSampleAveraging[0] = PixelAvgWidthEq8_mmx;
-    pFuncList->sMcFuncs.pfSampleAveraging[1] = PixelAvgWidthEq16_sse2;
-    pFuncList->sMcFuncs.pfChromaMc = McChroma_sse2;
-    memcpy (pFuncList->sMcFuncs.pfLumaQuarpelMc, pWelsMcFuncWidthEq16_sse2, sizeof (pWelsMcFuncWidthEq16_sse2));
+    pMcFuncs->pfLumaHalfpelHor = McHorVer20Width9Or17_sse2;
+    pMcFuncs->pfLumaHalfpelVer = McHorVer02Height9Or17_sse2;
+    pMcFuncs->pfLumaHalfpelCen = McHorVer22Width9Or17Height9Or17_sse2;
+    pMcFuncs->pfSampleAveraging[0] = PixelAvgWidthEq8_mmx;
+    pMcFuncs->pfSampleAveraging[1] = PixelAvgWidthEq16_sse2;
+    pMcFuncs->pfChromaMc = McChroma_sse2;
+    memcpy (pMcFuncs->pfLumaQuarpelMc, pWelsMcFuncWidthEq16_sse2, sizeof (pWelsMcFuncWidthEq16_sse2));
   }
 
   if (uiCpuFlag & WELS_CPU_SSSE3) {
-    pFuncList->sMcFuncs.pfChromaMc = McChroma_ssse3;
+    pMcFuncs->pfChromaMc = McChroma_ssse3;
   }
 
 #endif //(X86_ASM)
 
 #if defined(HAVE_NEON)
   if (uiCpuFlag & WELS_CPU_NEON) {
-    memcpy (pFuncList->sMcFuncs.pfLumaQuarpelMc, pWelsMcFuncWidthEq16_neon, sizeof (pWelsMcFuncWidthEq16_neon));
-    pFuncList->sMcFuncs.pfChromaMc	= EncMcChroma_neon;
-    pFuncList->sMcFuncs.pfSampleAveraging[0] = PixStrideAvgWidthEq8_neon;
-    pFuncList->sMcFuncs.pfSampleAveraging[1] = PixStrideAvgWidthEq16_neon;
-    pFuncList->sMcFuncs.pfLumaHalfpelHor = McHorVer20Width9Or17_neon;//iWidth+1:8/16
-    pFuncList->sMcFuncs.pfLumaHalfpelVer = McHorVer02Height9Or17_neon;//heigh+1:8/16
-    pFuncList->sMcFuncs.pfLumaHalfpelCen = McHorVer22Width9Or17Height9Or17_neon;//iWidth+1/heigh+1
+    memcpy (pMcFuncs->pfLumaQuarpelMc, pWelsMcFuncWidthEq16_neon, sizeof (pWelsMcFuncWidthEq16_neon));
+    pMcFuncs->pfChromaMc	= EncMcChroma_neon;
+    pMcFuncs->pfSampleAveraging[0] = PixStrideAvgWidthEq8_neon;
+    pMcFuncs->pfSampleAveraging[1] = PixStrideAvgWidthEq16_neon;
+    pMcFuncs->pfLumaHalfpelHor = McHorVer20Width9Or17_neon;//iWidth+1:8/16
+    pMcFuncs->pfLumaHalfpelVer = McHorVer02Height9Or17_neon;//heigh+1:8/16
+    pMcFuncs->pfLumaHalfpelCen = McHorVer22Width9Or17Height9Or17_neon;//iWidth+1/heigh+1
   }
 #endif
 #if defined(HAVE_NEON_AARCH64)
   if (uiCpuFlag & WELS_CPU_NEON) {
-    memcpy (pFuncList->sMcFuncs.pfLumaQuarpelMc, pWelsMcFuncWidthEq16_AArch64_neon,
+    memcpy (pMcFuncs->pfLumaQuarpelMc, pWelsMcFuncWidthEq16_AArch64_neon,
             sizeof (pWelsMcFuncWidthEq16_AArch64_neon));
-    pFuncList->sMcFuncs.pfChromaMc	= EncMcChroma_AArch64_neon;
-    pFuncList->sMcFuncs.pfSampleAveraging[0] = PixStrideAvgWidthEq8_AArch64_neon;
-    pFuncList->sMcFuncs.pfSampleAveraging[1] = PixStrideAvgWidthEq16_AArch64_neon;
-    pFuncList->sMcFuncs.pfLumaHalfpelHor = McHorVer20Width9Or17_AArch64_neon;//iWidth+1:8/16
-    pFuncList->sMcFuncs.pfLumaHalfpelVer = McHorVer02Height9Or17_AArch64_neon;//heigh+1:8/16
-    pFuncList->sMcFuncs.pfLumaHalfpelCen = McHorVer22Width9Or17Height9Or17_AArch64_neon;//iWidth+1/heigh+1
+    pMcFuncs->pfChromaMc	= EncMcChroma_AArch64_neon;
+    pMcFuncs->pfSampleAveraging[0] = PixStrideAvgWidthEq8_AArch64_neon;
+    pMcFuncs->pfSampleAveraging[1] = PixStrideAvgWidthEq16_AArch64_neon;
+    pMcFuncs->pfLumaHalfpelHor = McHorVer20Width9Or17_AArch64_neon;//iWidth+1:8/16
+    pMcFuncs->pfLumaHalfpelVer = McHorVer02Height9Or17_AArch64_neon;//heigh+1:8/16
+    pMcFuncs->pfLumaHalfpelCen = McHorVer22Width9Or17Height9Or17_AArch64_neon;//iWidth+1/heigh+1
   }
 #endif
 }

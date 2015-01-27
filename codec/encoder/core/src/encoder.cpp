@@ -209,7 +209,7 @@ int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam,
   /* Motion compensation */
   /*init pixel average function*/
   /*get one column or row pixel when refinement*/
-  WelsInitMcFuncs (pFuncList, uiCpuFlag);
+  WelsInitMcFuncs (&pFuncList->sMcFuncs, uiCpuFlag);
   InitCoeffFunc (pFuncList,uiCpuFlag,pParam->iEntropyCodingModeFlag);
 
   WelsInitEncodingFuncs (pFuncList, uiCpuFlag);

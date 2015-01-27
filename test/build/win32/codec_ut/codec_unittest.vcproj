@@ -415,6 +415,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\encoder\EncUT_MotionCompensation.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\encoder\EncUT_MotionEstimate.cpp"
 				>
 			</File>

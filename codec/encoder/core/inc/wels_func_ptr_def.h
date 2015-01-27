@@ -75,7 +75,7 @@ typedef int32_t (*PQuantizationHadamardFunc) (int16_t* pRes, const int16_t kiFF,
     int16_t* pBlock);
 
 typedef void (*PWelsMcFunc) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                             SMVUnitXY mv, int32_t iWidth, int32_t iHeight);
+                             int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight);
 
 typedef void (*PWelsLumaHalfpelMcFunc) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                         int32_t iWidth, int32_t iHeight);
