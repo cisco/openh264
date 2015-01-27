@@ -395,6 +395,17 @@ void McChroma_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t
     }
   }
 }
+void McLuma_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+               int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
+  static const PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16[16] = { //[y*4+x]
+    McCopyWidthEq16_c,     McHorVer10WidthEq16_c, McHorVer20WidthEq16_c, McHorVer30WidthEq16_c,
+    McHorVer01WidthEq16_c, McHorVer11WidthEq16_c, McHorVer21WidthEq16_c, McHorVer31WidthEq16_c,
+    McHorVer02WidthEq16_c, McHorVer12WidthEq16_c, McHorVer22WidthEq16_c, McHorVer32WidthEq16_c,
+    McHorVer03WidthEq16_c, McHorVer13WidthEq16_c, McHorVer23WidthEq16_c, McHorVer33WidthEq16_c
+  };
+  uint8_t uiMvpIdx = ((iMvY & 0x03) << 2) + (iMvX & 0x03);
+  pWelsMcFuncWidthEq16[uiMvpIdx] (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+}
 //***************************************************************************//
 //                       MMXEXT and SSE2 implementation                      //
 //***************************************************************************//
@@ -575,6 +586,17 @@ void McChroma_ssse3 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int
 
 }
 
+void McLuma_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                  int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
+  static const PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16_sse2[16] = {
+    McCopyWidthEq16_sse2,     McHorVer10WidthEq16_sse2, McHorVer20WidthEq16_sse2, McHorVer30WidthEq16_sse2,
+    McHorVer01WidthEq16_sse2, McHorVer11WidthEq16_sse2, McHorVer21WidthEq16_sse2, McHorVer31WidthEq16_sse2,
+    McHorVer02WidthEq16_sse2, McHorVer12WidthEq16_sse2, McHorVer22WidthEq16_sse2, McHorVer32WidthEq16_sse2,
+    McHorVer03WidthEq16_sse2, McHorVer13WidthEq16_sse2, McHorVer23WidthEq16_sse2, McHorVer33WidthEq16_sse2
+  };
+  uint8_t uiMvpIdx = ((iMvY & 0x03) << 2) + (iMvX & 0x03);
+  pWelsMcFuncWidthEq16_sse2[uiMvpIdx] (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+}
 #endif //X86_ASM
 
 //***************************************************************************//
@@ -665,6 +687,17 @@ void EncMcChroma_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, i
     else //if(4 == iWidth)
       McChromaWidthEq4_neon (pSrc, iSrcStride, pDst, iDstStride, (int32_t*) (g_kuiABCD[kiD8y][kiD8x]), iHeight);
   }
+}
+void EncMcLuma_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                     int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
+  static const PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16_neon[16] = { //[x][y]
+    McCopyWidthEq16_neon,        McHorVer10WidthEq16_neon,   McHorVer20WidthEq16_neon,    McHorVer30WidthEq16_neon,
+    McHorVer01WidthEq16_neon,    EncMcHorVer11_neon,         EncMcHorVer21_neon,          EncMcHorVer31_neon,
+    McHorVer02WidthEq16_neon,    EncMcHorVer12_neon,         McHorVer22WidthEq16_neon,    EncMcHorVer32_neon,
+    McHorVer03WidthEq16_neon,    EncMcHorVer13_neon,         EncMcHorVer23_neon,          EncMcHorVer33_neon
+  };
+  uint8_t uiMvpIdx = ((iMvY & 0x03) << 2) + (iMvX & 0x03);
+  pWelsMcFuncWidthEq16_neon[uiMvpIdx] (pSrc, iSrcStride, pDst, iDstStride, iHeight);
 }
 #endif
 
@@ -763,47 +796,28 @@ void EncMcChroma_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t*
       McChromaWidthEq4_AArch64_neon (pSrc, iSrcStride, pDst, iDstStride, (int32_t*) (g_kuiABCD[kiD8y][kiD8x]), iHeight);
   }
 }
-#endif
-
-void WelsInitMcFuncs (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
-  static const PWelsSampleAveragingFunc pfPixAvgFunc[2] = {PixelAvgWidthEq8_c, PixelAvgWidthEq16_c};
-
-  static const PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16[16] = { //[y*4+x]
-    McCopyWidthEq16_c,     McHorVer10WidthEq16_c, McHorVer20WidthEq16_c, McHorVer30WidthEq16_c,
-    McHorVer01WidthEq16_c, McHorVer11WidthEq16_c, McHorVer21WidthEq16_c, McHorVer31WidthEq16_c,
-    McHorVer02WidthEq16_c, McHorVer12WidthEq16_c, McHorVer22WidthEq16_c, McHorVer32WidthEq16_c,
-    McHorVer03WidthEq16_c, McHorVer13WidthEq16_c, McHorVer23WidthEq16_c, McHorVer33WidthEq16_c
-  };
-#if defined (X86_ASM)
-  static const PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16_sse2[16] = {
-    McCopyWidthEq16_sse2,     McHorVer10WidthEq16_sse2, McHorVer20WidthEq16_sse2, McHorVer30WidthEq16_sse2,
-    McHorVer01WidthEq16_sse2, McHorVer11WidthEq16_sse2, McHorVer21WidthEq16_sse2, McHorVer31WidthEq16_sse2,
-    McHorVer02WidthEq16_sse2, McHorVer12WidthEq16_sse2, McHorVer22WidthEq16_sse2, McHorVer32WidthEq16_sse2,
-    McHorVer03WidthEq16_sse2, McHorVer13WidthEq16_sse2, McHorVer23WidthEq16_sse2, McHorVer33WidthEq16_sse2
-  };
-#endif
-#if defined(HAVE_NEON)
-  static const PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16_neon[16] = { //[x][y]
-    McCopyWidthEq16_neon,        McHorVer10WidthEq16_neon,   McHorVer20WidthEq16_neon,    McHorVer30WidthEq16_neon,
-    McHorVer01WidthEq16_neon,    EncMcHorVer11_neon,         EncMcHorVer21_neon,          EncMcHorVer31_neon,
-    McHorVer02WidthEq16_neon,    EncMcHorVer12_neon,         McHorVer22WidthEq16_neon,    EncMcHorVer32_neon,
-    McHorVer03WidthEq16_neon,    EncMcHorVer13_neon,         EncMcHorVer23_neon,          EncMcHorVer33_neon
-  };
-#endif
-#if defined(HAVE_NEON_AARCH64)
+void EncMcLuma_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                             int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
   static const PWelsLumaQuarpelMcFunc pWelsMcFuncWidthEq16_AArch64_neon[16] = { //[x][y]
     McCopyWidthEq16_AArch64_neon,        McHorVer10WidthEq16_AArch64_neon,   McHorVer20WidthEq16_AArch64_neon,    McHorVer30WidthEq16_AArch64_neon,
     McHorVer01WidthEq16_AArch64_neon,    EncMcHorVer11_AArch64_neon,         EncMcHorVer21_AArch64_neon,          EncMcHorVer31_AArch64_neon,
     McHorVer02WidthEq16_AArch64_neon,    EncMcHorVer12_AArch64_neon,         McHorVer22WidthEq16_AArch64_neon,    EncMcHorVer32_AArch64_neon,
     McHorVer03WidthEq16_AArch64_neon,    EncMcHorVer13_AArch64_neon,         EncMcHorVer23_AArch64_neon,          EncMcHorVer33_AArch64_neon
   };
+  uint8_t uiMvpIdx = ((iMvY & 0x03) << 2) + (iMvX & 0x03);
+  pWelsMcFuncWidthEq16_AArch64_neon[uiMvpIdx] (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+}
 #endif
+
+void WelsInitMcFuncs (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
+  static const PWelsSampleAveragingFunc pfPixAvgFunc[2] = {PixelAvgWidthEq8_c, PixelAvgWidthEq16_c};
+
   pMcFuncs->pfLumaHalfpelHor = McHorVer20_c;
   pMcFuncs->pfLumaHalfpelVer = McHorVer02_c;
   pMcFuncs->pfLumaHalfpelCen = McHorVer22_c;
   memcpy (pMcFuncs->pfSampleAveraging, pfPixAvgFunc, sizeof (pfPixAvgFunc));
   pMcFuncs->pfChromaMc	= McChroma_c;
-  memcpy (pMcFuncs->pfLumaQuarpelMc, pWelsMcFuncWidthEq16, sizeof (pWelsMcFuncWidthEq16));
+  pMcFuncs->pfLumaMc	= McLuma_c;
 #if defined (X86_ASM)
   if (uiCpuFlag & WELS_CPU_SSE2) {
     pMcFuncs->pfLumaHalfpelHor = McHorVer20Width9Or17_sse2;
@@ -812,7 +826,7 @@ void WelsInitMcFuncs (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
     pMcFuncs->pfSampleAveraging[0] = PixelAvgWidthEq8_mmx;
     pMcFuncs->pfSampleAveraging[1] = PixelAvgWidthEq16_sse2;
     pMcFuncs->pfChromaMc = McChroma_sse2;
-    memcpy (pMcFuncs->pfLumaQuarpelMc, pWelsMcFuncWidthEq16_sse2, sizeof (pWelsMcFuncWidthEq16_sse2));
+    pMcFuncs->pfLumaMc = McLuma_sse2;
   }
 
   if (uiCpuFlag & WELS_CPU_SSSE3) {
@@ -823,7 +837,7 @@ void WelsInitMcFuncs (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
 
 #if defined(HAVE_NEON)
   if (uiCpuFlag & WELS_CPU_NEON) {
-    memcpy (pMcFuncs->pfLumaQuarpelMc, pWelsMcFuncWidthEq16_neon, sizeof (pWelsMcFuncWidthEq16_neon));
+    pMcFuncs->pfLumaMc          = EncMcLuma_neon;
     pMcFuncs->pfChromaMc	= EncMcChroma_neon;
     pMcFuncs->pfSampleAveraging[0] = PixStrideAvgWidthEq8_neon;
     pMcFuncs->pfSampleAveraging[1] = PixStrideAvgWidthEq16_neon;
@@ -834,8 +848,7 @@ void WelsInitMcFuncs (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
 #endif
 #if defined(HAVE_NEON_AARCH64)
   if (uiCpuFlag & WELS_CPU_NEON) {
-    memcpy (pMcFuncs->pfLumaQuarpelMc, pWelsMcFuncWidthEq16_AArch64_neon,
-            sizeof (pWelsMcFuncWidthEq16_AArch64_neon));
+    pMcFuncs->pfLumaMc          = EncMcLuma_AArch64_neon;
     pMcFuncs->pfChromaMc	= EncMcChroma_AArch64_neon;
     pMcFuncs->pfSampleAveraging[0] = PixStrideAvgWidthEq8_AArch64_neon;
     pMcFuncs->pfSampleAveraging[1] = PixStrideAvgWidthEq16_AArch64_neon;

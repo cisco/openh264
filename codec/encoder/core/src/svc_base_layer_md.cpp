@@ -1247,7 +1247,7 @@ void WelsMdBackgroundMbEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb,
     pDstCr	= pMbCache->pMemPredChroma + 64;
   }
   //MC
-  pFunc->sMcFuncs.pfLumaQuarpelMc[0] (pRefLuma, iLineSizeY, pDstLuma, 16, 16);
+  pFunc->sMcFuncs.pfLumaMc (pRefLuma, iLineSizeY, pDstLuma, 16, 0, 0, 16, 16);
   pFunc->sMcFuncs.pfChromaMc (pRefCb, iLineSizeUV, pDstCb, 8, sMvp.iMvX, sMvp.iMvY, 8, 8); //Cb
   pFunc->sMcFuncs.pfChromaMc (pRefCr, iLineSizeUV, pDstCr, 8, sMvp.iMvX, sMvp.iMvY, 8, 8); //Cr
 
@@ -1313,7 +1313,6 @@ bool WelsMdPSkipEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCac
   uint8_t* pDstCr   = pMbCache->pSkipMb + 256 + 64;
 
   SMVUnitXY sMvp = { 0 };
-  uint8_t uiMvpIdx;
   int32_t n;
 
   int32_t iEncStride		= pCurLayer->iEncStride[0];
@@ -1343,8 +1342,7 @@ bool WelsMdPSkipEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCac
 
   //luma
   pRefLuma += sQpelMvp.iMvY * iLineSizeY + sQpelMvp.iMvX;
-  uiMvpIdx = ((sMvp.iMvY & 0x03) << 2) + (sMvp.iMvX & 0x03);
-  pFunc->sMcFuncs.pfLumaQuarpelMc[uiMvpIdx] (pRefLuma, iLineSizeY, pDstLuma, 16, 16);
+  pFunc->sMcFuncs.pfLumaMc (pRefLuma, iLineSizeY, pDstLuma, 16, sMvp.iMvX, sMvp.iMvY, 16, 16);
   iSadCostLuma    = pFunc->sSampleDealingFuncs.pfSampleSad[BLOCK_16x16] (pMbCache->SPicData.pEncMb[0],
                     pCurLayer->iEncStride[0], pDstLuma, 16);
 

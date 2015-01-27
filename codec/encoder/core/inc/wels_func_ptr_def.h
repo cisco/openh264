@@ -89,7 +89,7 @@ typedef struct TagMcFunc {
   PWelsLumaHalfpelMcFunc      pfLumaHalfpelCen;
   PWelsMcFunc                         pfChromaMc;
 
-  PWelsLumaQuarpelMcFunc      pfLumaQuarpelMc[16];
+  PWelsMcFunc                 pfLumaMc;
   PWelsSampleAveragingFunc    pfSampleAveraging[2];
 } SMcFunc;
 
