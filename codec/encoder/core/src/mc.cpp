@@ -816,8 +816,8 @@ void WelsInitMcFuncs (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
   pMcFuncs->pfLumaHalfpelVer = McHorVer02_c;
   pMcFuncs->pfLumaHalfpelCen = McHorVer22_c;
   memcpy (pMcFuncs->pfSampleAveraging, pfPixAvgFunc, sizeof (pfPixAvgFunc));
-  pMcFuncs->pfChromaMc	= McChroma_c;
-  pMcFuncs->pfLumaMc	= McLuma_c;
+  pMcFuncs->pMcChromaFunc    = McChroma_c;
+  pMcFuncs->pMcLumaFunc      = McLuma_c;
 #if defined (X86_ASM)
   if (uiCpuFlag & WELS_CPU_SSE2) {
     pMcFuncs->pfLumaHalfpelHor = McHorVer20Width9Or17_sse2;
@@ -825,20 +825,20 @@ void WelsInitMcFuncs (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
     pMcFuncs->pfLumaHalfpelCen = McHorVer22Width9Or17Height9Or17_sse2;
     pMcFuncs->pfSampleAveraging[0] = PixelAvgWidthEq8_mmx;
     pMcFuncs->pfSampleAveraging[1] = PixelAvgWidthEq16_sse2;
-    pMcFuncs->pfChromaMc = McChroma_sse2;
-    pMcFuncs->pfLumaMc = McLuma_sse2;
+    pMcFuncs->pMcChromaFunc    = McChroma_sse2;
+    pMcFuncs->pMcLumaFunc      = McLuma_sse2;
   }
 
   if (uiCpuFlag & WELS_CPU_SSSE3) {
-    pMcFuncs->pfChromaMc = McChroma_ssse3;
+    pMcFuncs->pMcChromaFunc = McChroma_ssse3;
   }
 
 #endif //(X86_ASM)
 
 #if defined(HAVE_NEON)
   if (uiCpuFlag & WELS_CPU_NEON) {
-    pMcFuncs->pfLumaMc          = EncMcLuma_neon;
-    pMcFuncs->pfChromaMc	= EncMcChroma_neon;
+    pMcFuncs->pMcLumaFunc      = EncMcLuma_neon;
+    pMcFuncs->pMcChromaFunc    = EncMcChroma_neon;
     pMcFuncs->pfSampleAveraging[0] = PixStrideAvgWidthEq8_neon;
     pMcFuncs->pfSampleAveraging[1] = PixStrideAvgWidthEq16_neon;
     pMcFuncs->pfLumaHalfpelHor = McHorVer20Width9Or17_neon;//iWidth+1:8/16
@@ -848,8 +848,8 @@ void WelsInitMcFuncs (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
 #endif
 #if defined(HAVE_NEON_AARCH64)
   if (uiCpuFlag & WELS_CPU_NEON) {
-    pMcFuncs->pfLumaMc          = EncMcLuma_AArch64_neon;
-    pMcFuncs->pfChromaMc	= EncMcChroma_AArch64_neon;
+    pMcFuncs->pMcLumaFunc      = EncMcLuma_AArch64_neon;
+    pMcFuncs->pMcChromaFunc    = EncMcChroma_AArch64_neon;
     pMcFuncs->pfSampleAveraging[0] = PixStrideAvgWidthEq8_AArch64_neon;
     pMcFuncs->pfSampleAveraging[1] = PixStrideAvgWidthEq16_AArch64_neon;
     pMcFuncs->pfLumaHalfpelHor = McHorVer20Width9Or17_AArch64_neon;//iWidth+1:8/16
