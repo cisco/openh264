@@ -4,10 +4,6 @@
 #include "cpu.h"
 using namespace WelsDec;
 
-#define LUMA_FUNC sMcFunc.pMcLumaFunc
-
-#define CHROMA_FUNC sMcFunc.pMcChromaFunc
-
 #include "mc_test_common.h"
 
 DEF_MCCOPYTEST (, 2, 2)

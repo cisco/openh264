@@ -138,7 +138,7 @@ TEST(pfx##McCopy_c,iW##x##iH) \
       memset(uDstAnchor,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE);\
       memset(uDstTest,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE);  \
       MCCopyAnchor(uSrcAnchor[0],MC_BUFF_SRC_STRIDE,uDstAnchor[0],MC_BUFF_DST_STRIDE,iW,iH);   \
-      LUMA_FUNC(uSrcTest[0],MC_BUFF_SRC_STRIDE,uDstTest[0],MC_BUFF_DST_STRIDE,0,0,iW,iH); \
+      sMcFunc.pMcLumaFunc(uSrcTest[0],MC_BUFF_SRC_STRIDE,uDstTest[0],MC_BUFF_DST_STRIDE,0,0,iW,iH); \
       for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)   \
       {                                                                             \
         for(int32_t i=0;i<MC_BUFF_DST_STRIDE;i++)                                  \
@@ -188,7 +188,7 @@ TEST(pfx##McHorVer,iW##x##iH)  \
       memset(uDstTest,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE); \
       MCHalfPelFilterAnchor(uSrcInputAnchor[1],uSrcInputAnchor[2],uSrcInputAnchor[3],uSrcInputAnchor[0],MC_BUFF_SRC_STRIDE,iW+1,iH+1,pBuf+4); \
       MCLumaAnchor(uDstAnchor[0],MC_BUFF_DST_STRIDE,uSrcInputAnchor,MC_BUFF_SRC_STRIDE,a,b,iW,iH); \
-      LUMA_FUNC(&uSrcTest[4][4],MC_BUFF_SRC_STRIDE,uDstTest[0],MC_BUFF_DST_STRIDE,a,b,iW,iH);\
+      sMcFunc.pMcLumaFunc(&uSrcTest[4][4],MC_BUFF_SRC_STRIDE,uDstTest[0],MC_BUFF_DST_STRIDE,a,b,iW,iH);\
       for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)   \
       {                                                                             \
           for(int32_t i=0;i<MC_BUFF_DST_STRIDE;i++)                                  \
@@ -235,7 +235,7 @@ TEST(pfx##McChroma,iW##x##iH)  \
       memset(uDstAnchor2,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE); \
       memset(uDstTest,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE);     \
       MCChromaAnchor(uDstAnchor1[0],uDstAnchor2[0],MC_BUFF_DST_STRIDE,uSrcAnchor[0],MC_BUFF_SRC_STRIDE*2,a,b,iW,iH); \
-      CHROMA_FUNC(uSrcTest[0],MC_BUFF_SRC_STRIDE,uDstTest[0],MC_BUFF_DST_STRIDE,a,b,iW,iH);\
+      sMcFunc.pMcChromaFunc(uSrcTest[0],MC_BUFF_SRC_STRIDE,uDstTest[0],MC_BUFF_DST_STRIDE,a,b,iW,iH);\
       for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)   \
       {                                                                             \
           for(int32_t i=0;i<MC_BUFF_DST_STRIDE;i++)                                  \

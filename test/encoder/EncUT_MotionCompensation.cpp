@@ -6,10 +6,6 @@ using namespace WelsEnc;
 
 #define InitMcFunc WelsInitMcFuncs
 
-#define LUMA_FUNC sMcFunc.pMcLumaFunc
-
-#define CHROMA_FUNC sMcFunc.pMcChromaFunc
-
 #include "mc_test_common.h"
 
 DEF_MCCOPYTEST (Enc, 16, 8)
