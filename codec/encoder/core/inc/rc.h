@@ -110,6 +110,7 @@ enum {
 
 //bits allocation
 #define MAX_BITS_VARY_PERCENTAGE 100 //bits vary range in percentage
+#define MAX_BITS_VARY_PERCENTAGE_x3d2 150 //bits vary range in percentage * 3/2
 #define INT_MULTIPLY 100 // use to multiply in Double to Int Conversion, should be same as AQ_QSTEP_INT_MULTIPLY in WelsVP
 #define WEIGHT_MULTIPLY 2000
 #define REMAIN_BITS_TH (1)

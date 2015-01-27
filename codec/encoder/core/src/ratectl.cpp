@@ -226,7 +226,7 @@ void RcUpdateBitrateFps (sWelsEncCtx* pEncCtx) {
 
   int32_t iTargetVaryRange = ((MAX_BITS_VARY_PERCENTAGE - pWelsSvcRc->iRcVaryRatio) >> 1);
   int32_t iMinBitsRatio = MAX_BITS_VARY_PERCENTAGE - iTargetVaryRange;
-  int32_t iMaxBitsRatio = MAX_BITS_VARY_PERCENTAGE * FRAME_iTargetBits_VARY_RANGE;
+  int32_t iMaxBitsRatio = MAX_BITS_VARY_PERCENTAGE_x3d2;
 
   for (i = 0; i <= kiHighestTid; i++) {
     const int64_t kdConstraitBits = kiGopBits * pTOverRc[i].iTlayerWeight;
