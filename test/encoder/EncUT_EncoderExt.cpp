@@ -934,12 +934,12 @@ TEST_F (EncoderInterfaceTest, SkipFrameCheck) {
   EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
 
   SEncoderStatistics sEncoderStatistics;
-  for (int i = 0; i < 20; i++) {
+  for (int i = 0; i < 50; i++) {
     PrepareOneSrcFrame();
     pSrcPic->uiTimeStamp = i * 33;
     iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
 
-    if (i == 10) {
+    if (i == 25) {
       sEncParamExt.fMaxFrameRate = 28;
       sEncParamExt.sSpatialLayers[0].fFrameRate = 28;
       sEncParamExt.sSpatialLayers[0].iSpatialBitrate = 500000;
@@ -949,7 +949,7 @@ TEST_F (EncoderInterfaceTest, SkipFrameCheck) {
 
   }
   iResult = pPtrEnc->GetOption (ENCODER_OPTION_GET_STATISTICS, &sEncoderStatistics);
-  EXPECT_TRUE ((sEncoderStatistics.uiInputFrameCount - sEncoderStatistics.uiSkippedFrameCount) > 1)
+  EXPECT_TRUE ((sEncoderStatistics.uiInputFrameCount - sEncoderStatistics.uiSkippedFrameCount) > 2)
       << "uiInputFrameCount = " << sEncoderStatistics.uiInputFrameCount << ", uiSkippedFrameCount = " <<
       sEncoderStatistics.uiSkippedFrameCount;
   // finish
