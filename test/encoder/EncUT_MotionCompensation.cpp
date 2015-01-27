@@ -6,8 +6,7 @@ using namespace WelsEnc;
 
 #define InitMcFunc WelsInitMcFuncs
 
-#define LUMA_FUNC(funcs, src, srcstride, dst, dststride, mvx, mvy, width, height) \
-  sMcFunc.pfLumaMc (src, srcstride, dst, dststride, mvx, mvy, width, height)
+#define LUMA_FUNC sMcFunc.pfLumaMc
 
 #define CHROMA_FUNC sMcFunc.pfChromaMc
 

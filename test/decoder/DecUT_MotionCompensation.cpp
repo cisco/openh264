@@ -4,8 +4,7 @@
 #include "cpu.h"
 using namespace WelsDec;
 
-#define LUMA_FUNC(funcs, src, srcstride, dst, dststride, mvx, mvy, width, height) \
-  sMcFunc.pMcLumaFunc (src, srcstride, dst, dststride, mvx, mvy, width, height)
+#define LUMA_FUNC sMcFunc.pMcLumaFunc
 
 #define CHROMA_FUNC sMcFunc.pMcChromaFunc
 
