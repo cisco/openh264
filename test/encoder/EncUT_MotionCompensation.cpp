@@ -20,8 +20,8 @@ static void McLumaFunc (SMcFunc* pFuncs, const uint8_t* pSrc, int32_t iSrcStride
 
 #include "mc_test_common.h"
 
-DEF_MCCOPYTEST (Enc, 16, 8, 0)
-DEF_MCCOPYTEST (Enc, 16, 16, 0)
+DEF_MCCOPYTEST (Enc, 16, 8)
+DEF_MCCOPYTEST (Enc, 16, 16)
 
 DEF_LUMA_MCTEST (Enc, 16, 8)
 DEF_LUMA_MCTEST (Enc, 16, 16)
