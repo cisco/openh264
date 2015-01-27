@@ -165,6 +165,7 @@ void DecoderParseSyntaxTest::Init() {
     m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);
   }
   CM_RETURN eRet = (CM_RETURN)Initialize (&m_sDecParam, m_pCtx, &m_pWelsTrace->m_sLogCtx);
+  (void) eRet;
 }
 
 void DecoderParseSyntaxTest::Uninit() {
@@ -195,9 +196,9 @@ void DecoderParseSyntaxTest::DecodeBs (const char* sFileName) {
 
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + sFileName;
-  ASSERT_TRUE (pH264File = fopen (filename.c_str(), "rb"));
+  ASSERT_TRUE ((pH264File = fopen (filename.c_str(), "rb")) != NULL);
 #else
-  ASSERT_TRUE (pH264File = fopen (sFileName, "rb"));
+  ASSERT_TRUE ((pH264File = fopen (sFileName, "rb")) != NULL);
 #endif
   fseek (pH264File, 0L, SEEK_END);
   iFileSize = (int32_t) ftell (pH264File);
@@ -250,19 +251,19 @@ void DecoderParseSyntaxTest::TestScalingList() {
   DecodeBs ("res/BA_MW_D.264");
   ASSERT_TRUE (m_pCtx->sSpsBuffer[0].bSeqScalingMatrixPresentFlag == false);
   EXPECT_EQ (0, memcmp (iScalingListPPS, m_pCtx->sSpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));;
-  ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bSeqScalingMatrixPresentFlag == false);
+  ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bPicScalingMatrixPresentFlag == false);
   EXPECT_EQ (0, memcmp (iScalingListPPS, m_pCtx->sPpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));;
   Uninit();
   //Scalinglist value just written into sps and pps
   Init();
-  DecodeBs ("test_scalinglist_jm.264");
+  DecodeBs ("res/test_scalinglist_jm.264");
   ASSERT_TRUE (m_pCtx->sSpsBuffer[0].bSeqScalingMatrixPresentFlag);
   for (int i = 0; i < 6; i++) {
     EXPECT_EQ (0, memcmp (iScalingList[i], m_pCtx->sSpsBuffer[0].iScalingList4x4[i], 16 * sizeof (uint8_t)));
   }
 
-  ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bSeqScalingMatrixPresentFlag);
-  EXPECT_EQ (0, memcmp (iScalingList, m_pCtx->sPpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
+  ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bPicScalingMatrixPresentFlag == false);
+  EXPECT_EQ (0, memcmp (iScalingListPPS, m_pCtx->sPpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
   Uninit();
 
 
