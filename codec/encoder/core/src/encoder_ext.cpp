@@ -71,9 +71,10 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
 
 
 int32_t WelsBitRateVerification (SLogContext* pLogCtx, SSpatialLayerConfig* pLayerParam, int32_t iLayerId) {
-  if (pLayerParam->iSpatialBitrate <= 0) {
-    WelsLog (pLogCtx, WELS_LOG_ERROR, "Invalid bitrate settings in layer %d, bitrate= %d", iLayerId,
-             pLayerParam->iSpatialBitrate);
+  if ((pLayerParam->iSpatialBitrate <= 0)
+      || (static_cast<float> (pLayerParam->iSpatialBitrate) < pLayerParam->fFrameRate)) {
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "Invalid bitrate settings in layer %d, bitrate= %d at FrameRate(%f)", iLayerId,
+             pLayerParam->iSpatialBitrate, pLayerParam->fFrameRate);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
 
