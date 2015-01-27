@@ -333,9 +333,15 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
     pCodingParam->bDeblockingParallelFlag = true;
   }
 
+  // eSpsPpsIdStrategy checkings
   if (pCodingParam->iSpatialLayerNum > 1 && (SPS_LISTING & pCodingParam->eSpsPpsIdStrategy)) {
-    WelsLog (pLogCtx, WELS_LOG_INFO,
-             "ParamValidationExt(), eSpsPpsIdStrategy adjusted to CONSTANT_ID");
+    WelsLog (pLogCtx, WELS_LOG_WARNING,
+             "ParamValidationExt(), eSpsPpsIdStrategy setting (%d) with multiple SpatialLayers (%d) not supported! eSpsPpsIdStrategy adjusted to CONSTANT_ID", pCodingParam->eSpsPpsIdStrategy, pCodingParam->iSpatialLayerNum);
+    pCodingParam->eSpsPpsIdStrategy = CONSTANT_ID;
+  }
+  if (pCodingParam->iUsageType == SCREEN_CONTENT_REAL_TIME && (SPS_LISTING & pCodingParam->eSpsPpsIdStrategy)) {
+    WelsLog (pLogCtx, WELS_LOG_WARNING,
+             "ParamValidationExt(), eSpsPpsIdStrategy setting (%d) with iUsageType (%d) not supported! eSpsPpsIdStrategy adjusted to CONSTANT_ID", pCodingParam->eSpsPpsIdStrategy, pCodingParam->iUsageType);
     pCodingParam->eSpsPpsIdStrategy = CONSTANT_ID;
   }
 
@@ -1721,8 +1727,9 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
     return 1;
   }
 
-  iNonVclLayersBsSizeCount = SSEI_BUFFER_SIZE + pParam->iSpatialLayerNum * SPS_BUFFER_SIZE +
-                             (1 + pParam->iSpatialLayerNum) * PPS_BUFFER_SIZE;
+  const int32_t kiSpsSize = (pParam->eSpsPpsIdStrategy & SPS_LISTING) ? (MAX_SPS_COUNT * SPS_BUFFER_SIZE): (pParam->iSpatialLayerNum * SPS_BUFFER_SIZE);
+  const int32_t kiPpsSize = (pParam->eSpsPpsIdStrategy & SPS_PPS_LISTING) ? (MAX_PPS_COUNT * SPS_BUFFER_SIZE) : ((1 + pParam->iSpatialLayerNum) * PPS_BUFFER_SIZE);
+  iNonVclLayersBsSizeCount = SSEI_BUFFER_SIZE + kiSpsSize + kiPpsSize;
 
   int32_t iLayerBsSize = 0;
   iIndex = 0;
