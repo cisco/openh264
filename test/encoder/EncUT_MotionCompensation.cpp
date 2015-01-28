@@ -1,10 +1,9 @@
 #include <gtest/gtest.h>
 #include "codec_def.h"
+#include "macros.h"
 #include "mc.h"
 #include "cpu.h"
-using namespace WelsEnc;
-
-#define InitMcFunc WelsInitMcFuncs
+using namespace WelsCommon;
 
 #include "mc_test_common.h"
 
@@ -27,7 +26,7 @@ TEST (EncMcAvg, PixelAvg) {
       int32_t width = 8 << w;
       int32_t height = 16;
       uint32_t uiCpuFlag = k == 0 ? 0 : WelsCPUFeatureDetect (NULL);
-      WelsInitMcFuncs (&sMcFunc, uiCpuFlag);
+      InitMcFunc (&sMcFunc, uiCpuFlag);
       uint8_t uSrc1[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE];
       uint8_t uSrc2[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE];
       ENFORCE_STACK_ALIGN_2D (uint8_t, uDstAnchor, MC_BUFF_HEIGHT, MC_BUFF_DST_STRIDE, 16);
@@ -76,7 +75,7 @@ TEST (EncMcHalfpel, LumaHalfpel) {
       }
 
       uint32_t uiCpuFlag = k == 0 ? 0 : WelsCPUFeatureDetect (NULL);
-      WelsInitMcFuncs (&sMcFunc, uiCpuFlag);
+      InitMcFunc (&sMcFunc, uiCpuFlag);
 
       MCHalfPelFilterAnchor (uAnchors[1], uAnchors[2], uAnchors[3], uAnchors[0], MC_BUFF_SRC_STRIDE, width, height, pBuf + 4);
       sMcFunc.pfLumaHalfpelHor (&uSrcTest[4][4], MC_BUFF_SRC_STRIDE, uDstTest[0], MC_BUFF_DST_STRIDE, width + 1, height);

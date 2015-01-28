@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
 #include "codec_def.h"
+#include "macros.h"
 #include "mc.h"
 #include "cpu.h"
-using namespace WelsDec;
+using namespace WelsCommon;
 
 #include "mc_test_common.h"
 
