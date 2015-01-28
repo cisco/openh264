@@ -110,9 +110,10 @@ enum {
 
 //bits allocation
 #define MAX_BITS_VARY_PERCENTAGE 100 //bits vary range in percentage
+#define MAX_BITS_VARY_PERCENTAGE_x3d2 150 //bits vary range in percentage * 3/2
 #define INT_MULTIPLY 100 // use to multiply in Double to Int Conversion, should be same as AQ_QSTEP_INT_MULTIPLY in WelsVP
 #define WEIGHT_MULTIPLY 2000
-#define REMAIN_BITS_TH (10) // *INT_MULTIPLY
+#define REMAIN_BITS_TH (1)
 #define VGOP_BITS_PERCENTAGE_DIFF 5
 #define IDR_BITRATE_RATIO  4
 #define FRAME_iTargetBits_VARY_RANGE 50 // *INT_MULTIPLY
@@ -175,8 +176,8 @@ int32_t   iBitRate;
 int32_t   iPreviousBitrate;
 int32_t   iPreviousGopSize;
 double    fFrameRate;
-int64_t   iBitsPerFrame; // *INT_MULTIPLY
-int64_t   iMaxBitsPerFrame; // *INT_MULTIPLY
+int32_t   iBitsPerFrame;
+int32_t   iMaxBitsPerFrame;
 double    dPreviousFps;
 
 // bits allocation and status
@@ -226,8 +227,8 @@ int32_t   iLastCalculatedQScale;
 
 //for skip frame and padding
 int32_t   iBufferSizeSkip;
-int32_t   iBufferFullnessSkip;
-int32_t   iBufferMaxBRFullness[TIME_WINDOW_TOTAL];//0: EVEN_TIME_WINDOW; 1: ODD_TIME_WINDOW
+int64_t   iBufferFullnessSkip;
+int64_t   iBufferMaxBRFullness[TIME_WINDOW_TOTAL];//0: EVEN_TIME_WINDOW; 1: ODD_TIME_WINDOW
 int32_t   iPredFrameBit;
 bool      bNeedShiftWindowCheck[TIME_WINDOW_TOTAL];
 int32_t   iBufferSizePadding;
