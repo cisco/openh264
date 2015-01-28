@@ -667,6 +667,24 @@ void McChroma_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int3
     McChromaWithFragMv_c (pSrc, iSrcStride, pDst, iDstStride, iMvX, iMvY, iWidth, iHeight);
 }
 
+void McChroma_ssse3 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                     int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
+  static const PMcChromaWidthExtFunc kpMcChromaWidthFuncs[2] = {
+    McChromaWidthEq4_mmx,
+    McChromaWidthEq8_ssse3
+  };
+  const int32_t kiD8x = iMvX & 0x07;
+  const int32_t kiD8y = iMvY & 0x07;
+  if (kiD8x == 0 && kiD8y == 0) {
+    McCopy_sse2 (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
+    return;
+  }
+  if (iWidth != 2) {
+    kpMcChromaWidthFuncs[iWidth >> 3] (pSrc, iSrcStride, pDst, iDstStride, g_kuiABCD[kiD8y][kiD8x], iHeight);
+  } else
+    McChromaWithFragMv_c (pSrc, iSrcStride, pDst, iDstStride, iMvX, iMvY, iWidth, iHeight);
+}
+
 #endif //X86_ASM
 //***************************************************************************//
 //                       NEON implementation                      //
@@ -1198,6 +1216,9 @@ void InitMcFunc (SMcFunc* pMcFunc, int32_t iCpu) {
   if (iCpu & WELS_CPU_SSE2) {
     pMcFunc->pMcLumaFunc   = McLuma_sse2;
     pMcFunc->pMcChromaFunc = McChroma_sse2;
+  }
+  if (iCpu & WELS_CPU_SSSE3) {
+    pMcFunc->pMcChromaFunc = McChroma_ssse3;
   }
 #endif //(X86_ASM)
 }
