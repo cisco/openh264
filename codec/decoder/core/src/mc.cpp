@@ -678,8 +678,10 @@ void McCopy_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_
     McCopyWidthEq16_neon (pSrc, iSrcStride, pDst, iDstStride, iHeight);
   else if (8 == iWidth)
     McCopyWidthEq8_neon (pSrc, iSrcStride, pDst, iDstStride, iHeight);
-  else
+  else if (4 == iWidth)
     McCopyWidthEq4_neon (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  else
+    McCopyWidthEq2_c (pSrc, iSrcStride, pDst, iDstStride, iHeight);
 }
 void McHorVer20_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                       int32_t iWidth, int32_t iHeight) {
@@ -929,8 +931,10 @@ void McCopy_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst
     McCopyWidthEq16_AArch64_neon (pSrc, iSrcStride, pDst, iDstStride, iHeight);
   else if (8 == iWidth)
     McCopyWidthEq8_AArch64_neon (pSrc, iSrcStride, pDst, iDstStride, iHeight);
-  else
+  else if (4 == iWidth)
     McCopyWidthEq4_AArch64_neon (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  else
+    McCopyWidthEq2_c (pSrc, iSrcStride, pDst, iDstStride, iHeight);
 }
 void McHorVer20_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                               int32_t iWidth, int32_t iHeight) {
