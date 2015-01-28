@@ -79,7 +79,7 @@ TEST (EncMcHalfpel, LumaHalfpel) {
       uAnchors[2] = &uAnchor[2][4][4];
       uAnchors[3] = &uAnchor[3][4][4];
 
-      memset (uAnchor, 0, 4 * sizeof (uint8_t)*MC_BUFF_HEIGHT * MC_BUFF_DST_STRIDE);
+      memset (uAnchor, 0, 4 * sizeof (uint8_t)*MC_BUFF_HEIGHT * MC_BUFF_SRC_STRIDE);
       memset (uDstTest, 0, sizeof (uint8_t)*MC_BUFF_HEIGHT * MC_BUFF_DST_STRIDE);
       for (int32_t j = 0; j < MC_BUFF_HEIGHT; j++) {
         for (int32_t i = 0; i < MC_BUFF_SRC_STRIDE; i++) {
