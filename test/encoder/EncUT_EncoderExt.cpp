@@ -899,7 +899,7 @@ TEST_F (EncoderInterfaceTest, SkipFrameCheck) {
   sEncParamExt.iPicHeight = 640;
   sEncParamExt.iTargetBitrate = 573000;
   sEncParamExt.iRCMode = RC_BITRATE_MODE;
-  sEncParamExt.fMaxFrameRate = 28.248587;
+  sEncParamExt.fMaxFrameRate = 28.248587f;
 
   sEncParamExt.iTemporalLayerNum = 3;
   sEncParamExt.iSpatialLayerNum = 1;
@@ -912,7 +912,7 @@ TEST_F (EncoderInterfaceTest, SkipFrameCheck) {
   sEncParamExt.sSpatialLayers[0].uiLevelIdc = LEVEL_5_0;
   sEncParamExt.sSpatialLayers[0].iVideoWidth = 360;
   sEncParamExt.sSpatialLayers[0].iVideoHeight = 640;
-  sEncParamExt.sSpatialLayers[0].fFrameRate = 28.248587;
+  sEncParamExt.sSpatialLayers[0].fFrameRate = 28.248587f;
   sEncParamExt.sSpatialLayers[0].iSpatialBitrate = 573000;
   sEncParamExt.sSpatialLayers[0].iMaxSpatialBitrate = 895839855;
   sEncParamExt.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
