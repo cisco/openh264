@@ -40,8 +40,8 @@ TEST (EncMcAvg, PixelAvg) {
       }
       PixelAvgAnchor (uDstAnchor[0], MC_BUFF_DST_STRIDE, uSrc1[0], MC_BUFF_SRC_STRIDE, uSrc2[0], MC_BUFF_SRC_STRIDE, width,
                       height);
-      sMcFunc.pfSampleAveraging[w] (uDstTest[0], MC_BUFF_DST_STRIDE, uSrc1[0], MC_BUFF_SRC_STRIDE, uSrc2[0],
-                                    MC_BUFF_SRC_STRIDE, height);
+      sMcFunc.pfSampleAveraging (uDstTest[0], MC_BUFF_DST_STRIDE, uSrc1[0], MC_BUFF_SRC_STRIDE, uSrc2[0],
+                                 MC_BUFF_SRC_STRIDE, width, height);
       for (int32_t j = 0; j < height; j++) {
         for (int32_t i = 0; i < width; i++) {
           ASSERT_EQ (uDstAnchor[j][i], uDstTest[j][i]);

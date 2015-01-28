@@ -41,6 +41,9 @@
 #include "mc.h"
 #include "cpu_core.h"
 
+typedef void (*PWelsSampleWidthAveragingFunc) (uint8_t*, int32_t, const uint8_t*, int32_t, const uint8_t*,
+    int32_t, int32_t);
+
 namespace WelsEnc {
 /*------------------weight for chroma fraction pixel interpolation------------------*/
 //kuiA = (8 - dx) * (8 - dy);
@@ -406,6 +409,14 @@ void McLuma_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t i
   uint8_t uiMvpIdx = ((iMvY & 0x03) << 2) + (iMvX & 0x03);
   pWelsMcFuncWidthEq16[uiMvpIdx] (pSrc, iSrcStride, pDst, iDstStride, iHeight);
 }
+void PixelAvg_c (uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcAStride,
+                 const uint8_t* pSrcB, int32_t iSrcBStride, int32_t iWidth, int32_t iHeight) {
+  static const PWelsSampleWidthAveragingFunc kpfFuncs[2] = {
+    PixelAvgWidthEq8_c,
+    PixelAvgWidthEq16_c
+  };
+  kpfFuncs[iWidth >> 4] (pDst, iDstStride, pSrcA, iSrcAStride, pSrcB, iSrcBStride, iHeight);
+}
 //***************************************************************************//
 //                       MMXEXT and SSE2 implementation                      //
 //***************************************************************************//
@@ -597,6 +608,14 @@ void McLuma_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_
   uint8_t uiMvpIdx = ((iMvY & 0x03) << 2) + (iMvX & 0x03);
   pWelsMcFuncWidthEq16_sse2[uiMvpIdx] (pSrc, iSrcStride, pDst, iDstStride, iHeight);
 }
+void PixelAvg_sse2 (uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcAStride,
+                    const uint8_t* pSrcB, int32_t iSrcBStride, int32_t iWidth, int32_t iHeight) {
+  static const PWelsSampleWidthAveragingFunc kpfFuncs[2] = {
+    PixelAvgWidthEq8_mmx,
+    PixelAvgWidthEq16_sse2
+  };
+  kpfFuncs[iWidth >> 4] (pDst, iDstStride, pSrcA, iSrcAStride, pSrcB, iSrcBStride, iHeight);
+}
 #endif //X86_ASM
 
 //***************************************************************************//
@@ -698,6 +717,14 @@ void EncMcLuma_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int
   };
   uint8_t uiMvpIdx = ((iMvY & 0x03) << 2) + (iMvX & 0x03);
   pWelsMcFuncWidthEq16_neon[uiMvpIdx] (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+}
+void PixelAvg_neon (uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcAStride,
+                    const uint8_t* pSrcB, int32_t iSrcBStride, int32_t iWidth, int32_t iHeight) {
+  static const PWelsSampleWidthAveragingFunc kpfFuncs[2] = {
+    PixStrideAvgWidthEq8_neon,
+    PixStrideAvgWidthEq16_neon
+  };
+  kpfFuncs[iWidth >> 4] (pDst, iDstStride, pSrcA, iSrcAStride, pSrcB, iSrcBStride, iHeight);
 }
 #endif
 
@@ -807,15 +834,21 @@ void EncMcLuma_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* p
   uint8_t uiMvpIdx = ((iMvY & 0x03) << 2) + (iMvX & 0x03);
   pWelsMcFuncWidthEq16_AArch64_neon[uiMvpIdx] (pSrc, iSrcStride, pDst, iDstStride, iHeight);
 }
+void PixelAvg_AArch64_neon (uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcAStride,
+                            const uint8_t* pSrcB, int32_t iSrcBStride, int32_t iWidth, int32_t iHeight) {
+  static const PWelsSampleWidthAveragingFunc kpfFuncs[2] = {
+    PixStrideAvgWidthEq8_AArch64_neon,
+    PixStrideAvgWidthEq16_AArch64_neon
+  };
+  kpfFuncs[iWidth >> 4] (pDst, iDstStride, pSrcA, iSrcAStride, pSrcB, iSrcBStride, iHeight);
+}
 #endif
 
 void WelsInitMcFuncs (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
-  static const PWelsSampleAveragingFunc pfPixAvgFunc[2] = {PixelAvgWidthEq8_c, PixelAvgWidthEq16_c};
-
   pMcFuncs->pfLumaHalfpelHor = McHorVer20_c;
   pMcFuncs->pfLumaHalfpelVer = McHorVer02_c;
   pMcFuncs->pfLumaHalfpelCen = McHorVer22_c;
-  memcpy (pMcFuncs->pfSampleAveraging, pfPixAvgFunc, sizeof (pfPixAvgFunc));
+  pMcFuncs->pfSampleAveraging = PixelAvg_c;
   pMcFuncs->pMcChromaFunc    = McChroma_c;
   pMcFuncs->pMcLumaFunc      = McLuma_c;
 #if defined (X86_ASM)
@@ -823,8 +856,7 @@ void WelsInitMcFuncs (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
     pMcFuncs->pfLumaHalfpelHor = McHorVer20Width9Or17_sse2;
     pMcFuncs->pfLumaHalfpelVer = McHorVer02Height9Or17_sse2;
     pMcFuncs->pfLumaHalfpelCen = McHorVer22Width9Or17Height9Or17_sse2;
-    pMcFuncs->pfSampleAveraging[0] = PixelAvgWidthEq8_mmx;
-    pMcFuncs->pfSampleAveraging[1] = PixelAvgWidthEq16_sse2;
+    pMcFuncs->pfSampleAveraging = PixelAvg_sse2;
     pMcFuncs->pMcChromaFunc    = McChroma_sse2;
     pMcFuncs->pMcLumaFunc      = McLuma_sse2;
   }
@@ -839,8 +871,7 @@ void WelsInitMcFuncs (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
   if (uiCpuFlag & WELS_CPU_NEON) {
     pMcFuncs->pMcLumaFunc      = EncMcLuma_neon;
     pMcFuncs->pMcChromaFunc    = EncMcChroma_neon;
-    pMcFuncs->pfSampleAveraging[0] = PixStrideAvgWidthEq8_neon;
-    pMcFuncs->pfSampleAveraging[1] = PixStrideAvgWidthEq16_neon;
+    pMcFuncs->pfSampleAveraging = PixelAvg_neon;
     pMcFuncs->pfLumaHalfpelHor = McHorVer20Width9Or17_neon;//iWidth+1:8/16
     pMcFuncs->pfLumaHalfpelVer = McHorVer02Height9Or17_neon;//heigh+1:8/16
     pMcFuncs->pfLumaHalfpelCen = McHorVer22Width9Or17Height9Or17_neon;//iWidth+1/heigh+1
@@ -850,8 +881,7 @@ void WelsInitMcFuncs (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
   if (uiCpuFlag & WELS_CPU_NEON) {
     pMcFuncs->pMcLumaFunc      = EncMcLuma_AArch64_neon;
     pMcFuncs->pMcChromaFunc    = EncMcChroma_AArch64_neon;
-    pMcFuncs->pfSampleAveraging[0] = PixStrideAvgWidthEq8_AArch64_neon;
-    pMcFuncs->pfSampleAveraging[1] = PixStrideAvgWidthEq16_AArch64_neon;
+    pMcFuncs->pfSampleAveraging = PixelAvg_AArch64_neon;
     pMcFuncs->pfLumaHalfpelHor = McHorVer20Width9Or17_AArch64_neon;//iWidth+1:8/16
     pMcFuncs->pfLumaHalfpelVer = McHorVer02Height9Or17_AArch64_neon;//heigh+1:8/16
     pMcFuncs->pfLumaHalfpelCen = McHorVer22Width9Or17Height9Or17_AArch64_neon;//iWidth+1/heigh+1

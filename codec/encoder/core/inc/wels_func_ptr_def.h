@@ -81,7 +81,7 @@ typedef void (*PWelsLumaHalfpelMcFunc) (const uint8_t* pSrc, int32_t iSrcStride,
                                         int32_t iWidth, int32_t iHeight);
 typedef void (*PWelsLumaQuarpelMcFunc) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                         int32_t iHeight);
-typedef void (*PWelsSampleAveragingFunc) (uint8_t*, int32_t, const uint8_t*, int32_t, const uint8_t*, int32_t, int32_t);
+typedef void (*PWelsSampleAveragingFunc) (uint8_t*, int32_t, const uint8_t*, int32_t, const uint8_t*, int32_t, int32_t, int32_t);
 
 typedef struct TagMcFunc {
   PWelsLumaHalfpelMcFunc      pfLumaHalfpelHor;
@@ -90,7 +90,7 @@ typedef struct TagMcFunc {
   PWelsMcFunc                 pMcChromaFunc;
 
   PWelsMcFunc                 pMcLumaFunc;
-  PWelsSampleAveragingFunc    pfSampleAveraging[2];
+  PWelsSampleAveragingFunc    pfSampleAveraging;
 } SMcFunc;
 
 typedef void (*PLumaDeblockingLT4Func) (uint8_t* iSampleY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* iTc);
