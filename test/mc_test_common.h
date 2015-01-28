@@ -108,8 +108,8 @@ static void MCChromaAnchor (uint8_t* pDstU, uint8_t* pDstV, int32_t iDstStride, 
 }
 
 /**********************MC Unit Test OPENH264 Code Begin******************************/
-#define DEF_MCCOPYTEST(pfx, iW,iH) \
-TEST(pfx##McCopy_c,iW##x##iH) \
+#define DEF_MCCOPYTEST(iW,iH) \
+TEST(McCopy_c,iW##x##iH) \
 {                             \
     SMcFunc sMcFunc;      \
     int32_t iCpuCores = 1; \
@@ -149,8 +149,8 @@ TEST(pfx##McCopy_c,iW##x##iH) \
     }\
 }
 
-#define DEF_LUMA_MCTEST(pfx,iW,iH) \
-TEST(pfx##McHorVer,iW##x##iH)  \
+#define DEF_LUMA_MCTEST(iW,iH) \
+TEST(McHorVer,iW##x##iH)  \
 {                       \
     for (int32_t a = 0; a < 4; a++) { \
     for (int32_t b = 0; b < 4; b++) { \
@@ -201,8 +201,8 @@ TEST(pfx##McHorVer,iW##x##iH)  \
     }\
 }
 
-#define DEF_CHROMA_MCTEST(pfx,iW,iH) \
-TEST(pfx##McChroma,iW##x##iH)  \
+#define DEF_CHROMA_MCTEST(iW,iH) \
+TEST(McChroma,iW##x##iH)  \
 {                       \
     for (int32_t a = 0; a < 8; a++) { \
     for (int32_t b = 0; b < 8; b++) { \

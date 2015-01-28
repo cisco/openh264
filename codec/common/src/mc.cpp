@@ -214,7 +214,7 @@ static inline void McHorVer02_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_
 static inline void McHorVer22_c (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                  int32_t iWidth,
                                  int32_t iHeight) {
-  int16_t iTmp[16 + 5]; //16
+  int16_t iTmp[17 + 5];
   int32_t i, j, k;
 
   for (i = 0; i < iHeight; i++) {
