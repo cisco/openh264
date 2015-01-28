@@ -49,7 +49,8 @@ static void MCHalfPelFilterAnchor (uint8_t* pDstH, uint8_t* pDstV, uint8_t* pDst
       pDstH[x] = Clip255 ((FILTER6TAP (pSrc, x, 1) + 16) >> 5);
     for (int32_t x = -2; x < iWidth + 3; x++) {
       int32_t v = FILTER6TAP (pSrc, x, iStride);
-      pDstV[x] = Clip255 ((v + 16) >> 5);
+      if (x >= 0 && x < iWidth)
+        pDstV[x] = Clip255 ((v + 16) >> 5);
       pBuf[x + 2] = v;
     }
     for (int32_t x = 0; x < iWidth; x++)
