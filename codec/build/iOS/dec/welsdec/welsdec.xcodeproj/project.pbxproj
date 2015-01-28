@@ -33,7 +33,6 @@
 		6A3E814219D79AE900C19C1F /* cabac_decoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A3E814119D79AE900C19C1F /* cabac_decoder.cpp */; };
 		6A3E814419D7A40600C19C1F /* parse_mb_syn_cabac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A3E814319D7A40600C19C1F /* parse_mb_syn_cabac.cpp */; };
 		6C749B6A197CC6E600A111F9 /* block_add_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 6C749B69197CC6E600A111F9 /* block_add_aarch64_neon.S */; };
-		9ABF4382193EB60900A6BD61 /* expand_pic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ABF4381193EB60900A6BD61 /* expand_pic.cpp */; };
 		9AED66561946A1DE009A3567 /* welsCodecTrace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9AED66551946A1DE009A3567 /* welsCodecTrace.cpp */; };
 		9AED66591946A203009A3567 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9AED66581946A203009A3567 /* utils.cpp */; };
 		F0B204FC18FD23D8005DA23F /* error_concealment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F0B204FB18FD23D8005DA23F /* error_concealment.cpp */; };
@@ -116,8 +115,6 @@
 		6A3E814319D7A40600C19C1F /* parse_mb_syn_cabac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = parse_mb_syn_cabac.cpp; sourceTree = "<group>"; };
 		6A3E814519D7A40D00C19C1F /* parse_mb_syn_cabac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parse_mb_syn_cabac.h; sourceTree = "<group>"; };
 		6C749B69197CC6E600A111F9 /* block_add_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = block_add_aarch64_neon.S; path = arm64/block_add_aarch64_neon.S; sourceTree = "<group>"; };
-		9ABF4380193EB5F700A6BD61 /* expand_pic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = expand_pic.h; path = ../../../common/inc/expand_pic.h; sourceTree = "<group>"; };
-		9ABF4381193EB60900A6BD61 /* expand_pic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = expand_pic.cpp; path = ../../../common/src/expand_pic.cpp; sourceTree = "<group>"; };
 		9AED66551946A1DE009A3567 /* welsCodecTrace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = welsCodecTrace.cpp; path = ../../../common/src/welsCodecTrace.cpp; sourceTree = "<group>"; };
 		9AED66571946A1EB009A3567 /* welsCodecTrace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = welsCodecTrace.h; path = ../../../common/inc/welsCodecTrace.h; sourceTree = "<group>"; };
 		9AED66581946A203009A3567 /* utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utils.cpp; path = ../../../common/src/utils.cpp; sourceTree = "<group>"; };
@@ -200,7 +197,6 @@
 				6A3E814519D7A40D00C19C1F /* parse_mb_syn_cabac.h */,
 				6A3E814019D79AD900C19C1F /* cabac_decoder.h */,
 				9AED665A1946A21D009A3567 /* utils.h */,
-				9ABF4380193EB5F700A6BD61 /* expand_pic.h */,
 				F0B204FA18FD23CF005DA23F /* error_concealment.h */,
 				4CE4464518BC5EAA0017DF25 /* as264_common.h */,
 				4CE4464618BC5EAA0017DF25 /* au_parser.h */,
@@ -243,7 +239,6 @@
 				6A3E814319D7A40600C19C1F /* parse_mb_syn_cabac.cpp */,
 				6A3E814119D79AE900C19C1F /* cabac_decoder.cpp */,
 				9AED66581946A203009A3567 /* utils.cpp */,
-				9ABF4381193EB60900A6BD61 /* expand_pic.cpp */,
 				F0B204FB18FD23D8005DA23F /* error_concealment.cpp */,
 				4CE4466718BC5EAA0017DF25 /* au_parser.cpp */,
 				4CE4466818BC5EAA0017DF25 /* bit_stream.cpp */,
@@ -362,7 +357,6 @@
 				4CE4469318BC5EAB0017DF25 /* fmo.cpp in Sources */,
 				4CE4469118BC5EAB0017DF25 /* decoder_data_tables.cpp in Sources */,
 				4CE4469718BC5EAB0017DF25 /* mem_align.cpp in Sources */,
-				9ABF4382193EB60900A6BD61 /* expand_pic.cpp in Sources */,
 				4CE4469518BC5EAB0017DF25 /* manage_dec_ref.cpp in Sources */,
 				4CE4468A18BC5EAB0017DF25 /* au_parser.cpp in Sources */,
 				4CE4469918BC5EAB0017DF25 /* mv_pred.cpp in Sources */,
