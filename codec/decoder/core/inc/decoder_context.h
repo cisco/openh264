@@ -55,6 +55,7 @@
 #include "crt_util_safe_x.h"
 #include "mb_cache.h"
 #include "expand_pic.h"
+#include "mc.h"
 
 namespace WelsDec {
 #define MAX_PRED_MODE_ID_I16x16  3
@@ -141,13 +142,6 @@ uint8_t				uiShortRefCount[LIST_A];
 uint8_t				uiLongRefCount[LIST_A];	// dependend on ref pic module
 int32_t				iMaxLongTermFrameIdx;
 } SRefPic, *PRefPic;
-
-typedef void (*PWelsMcFunc) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                             int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight);
-typedef struct TagMcFunc {
-PWelsMcFunc pMcLumaFunc;
-PWelsMcFunc pMcChromaFunc;
-} SMcFunc;
 
 typedef void (*PCopyFunc) (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS);
 typedef struct TagCopyFunc {

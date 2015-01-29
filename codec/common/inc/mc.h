@@ -30,10 +30,35 @@
  *
  */
 
-#ifndef MC_COMMON_H
-#define MC_COMMON_H
+#ifndef MC_H
+#define MC_H
 
 #include "typedefs.h"
+
+typedef void (*PWelsMcFunc) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                             int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight);
+
+typedef void (*PWelsLumaHalfpelMcFunc) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                                        int32_t iWidth, int32_t iHeight);
+typedef void (*PWelsSampleAveragingFunc) (uint8_t*, int32_t, const uint8_t*, int32_t, const uint8_t*, int32_t,
+    int32_t, int32_t);
+
+typedef struct TagMcFunc {
+  PWelsLumaHalfpelMcFunc      pfLumaHalfpelHor;
+  PWelsLumaHalfpelMcFunc      pfLumaHalfpelVer;
+  PWelsLumaHalfpelMcFunc      pfLumaHalfpelCen;
+  PWelsMcFunc                 pMcChromaFunc;
+
+  PWelsMcFunc                 pMcLumaFunc;
+  PWelsSampleAveragingFunc    pfSampleAveraging;
+} SMcFunc;
+
+namespace WelsCommon {
+
+void InitMcFunc (SMcFunc* pMcFunc, uint32_t iCpu);
+
+} // namespace WelsCommon
+
 
 #if defined(__cplusplus)
 extern "C" {
@@ -272,4 +297,4 @@ void McChromaWidthEq8_ssse3 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* p
 }
 #endif//__cplusplus
 
-#endif//MC_COMMON_H
+#endif//MC_H

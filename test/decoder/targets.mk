@@ -6,7 +6,6 @@ DECODER_UNITTEST_CPP_SRCS=\
 	$(DECODER_UNITTEST_SRCDIR)/DecUT_ErrorConcealment.cpp\
 	$(DECODER_UNITTEST_SRCDIR)/DecUT_IdctResAddPred.cpp\
 	$(DECODER_UNITTEST_SRCDIR)/DecUT_IntraPrediction.cpp\
-	$(DECODER_UNITTEST_SRCDIR)/DecUT_MotionCompensation.cpp\
 	$(DECODER_UNITTEST_SRCDIR)/DecUT_ParseSyntax.cpp\
 	$(DECODER_UNITTEST_SRCDIR)/DecUT_PredMv.cpp\
 

@@ -386,7 +386,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\src\mc.cpp"
+				RelativePath="..\..\..\common\src\mc.cpp"
 				>
 			</File>
 			<File
@@ -563,11 +563,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\mc.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\common\inc\mc_common.h"
+				RelativePath="..\..\..\common\inc\mc.h"
 				>
 			</File>
 			<File

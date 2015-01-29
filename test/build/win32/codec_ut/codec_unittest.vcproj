@@ -623,42 +623,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\decoder\DecUT_MotionCompensation.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="..\..\..\decoder\DecUT_ParseSyntax.cpp"
 				>
 				<FileConfiguration
