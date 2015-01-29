@@ -28,7 +28,7 @@ PROJECT_NAME=openh264
 MODULE_NAME=gmpopenh264
 GMP_API_BRANCH=Firefox36
 CCASFLAGS=$(CFLAGS)
-VERSION=1.3
+VERSION=1.4
 STATIC_LDFLAGS=-lstdc++
 
 ifeq (,$(wildcard $(SRC_PATH)gmp-api))
