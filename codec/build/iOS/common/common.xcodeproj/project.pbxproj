@@ -19,6 +19,7 @@
 		4CE443D918B722CD0017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443D818B722CD0017DF25 /* Foundation.framework */; };
 		53C1C9BC193F0FB000404D8F /* expand_pic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C1C9BB193F0FB000404D8F /* expand_pic.cpp */; };
 		5BA8F2C019603F5F00011CE4 /* common_tables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BA8F2BF19603F5F00011CE4 /* common_tables.cpp */; };
+		5BD896BA1A7B839B00D32B7D /* memory_align.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BD896B91A7B839B00D32B7D /* memory_align.cpp */; };
 		5BDD15ED1A79027600B6CA2E /* mc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD15EC1A79027600B6CA2E /* mc.cpp */; };
 		F0B204F918FD23BF005DA23F /* copy_mb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F0B204F818FD23BF005DA23F /* copy_mb.cpp */; };
 		F556A8241906673900E156A8 /* arm_arch64_common_macro.S in Sources */ = {isa = PBXBuildFile; fileRef = F556A8221906673900E156A8 /* arm_arch64_common_macro.S */; };
@@ -70,6 +71,8 @@
 		53C1C9BB193F0FB000404D8F /* expand_pic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = expand_pic.cpp; sourceTree = "<group>"; };
 		5BA8F2BE19603F3500011CE4 /* wels_common_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wels_common_defs.h; sourceTree = "<group>"; };
 		5BA8F2BF19603F5F00011CE4 /* common_tables.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = common_tables.cpp; sourceTree = "<group>"; };
+		5BD896B81A7B837700D32B7D /* memory_align.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memory_align.h; sourceTree = "<group>"; };
+		5BD896B91A7B839B00D32B7D /* memory_align.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = memory_align.cpp; sourceTree = "<group>"; };
 		5BDD15EB1A79026A00B6CA2E /* mc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mc.h; sourceTree = "<group>"; };
 		5BDD15EC1A79027600B6CA2E /* mc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mc.cpp; sourceTree = "<group>"; };
 		F0B204F718FD23B6005DA23F /* copy_mb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = copy_mb.h; sourceTree = "<group>"; };
@@ -127,6 +130,7 @@
 				4C3406BE18D96EA600DFA14A /* macros.h */,
 				5BDD15EB1A79026A00B6CA2E /* mc.h */,
 				4C3406C018D96EA600DFA14A /* measure_time.h */,
+				5BD896B81A7B837700D32B7D /* memory_align.h */,
 				4C3406C118D96EA600DFA14A /* typedefs.h */,
 				5BA8F2BE19603F3500011CE4 /* wels_common_defs.h */,
 				4C3406C218D96EA600DFA14A /* WelsThreadLib.h */,
@@ -146,6 +150,7 @@
 				53C1C9BB193F0FB000404D8F /* expand_pic.cpp */,
 				4C3406C618D96EA600DFA14A /* deblocking_common.cpp */,
 				5BDD15EC1A79027600B6CA2E /* mc.cpp */,
+				5BD896B91A7B839B00D32B7D /* memory_align.cpp */,
 				4C3406C818D96EA600DFA14A /* WelsThreadLib.cpp */,
 			);
 			path = src;
@@ -260,6 +265,7 @@
 				F5AC94FF193EB7D800F58154 /* deblocking_aarch64_neon.S in Sources */,
 				4C3406CE18D96EA600DFA14A /* crt_util_safe_x.cpp in Sources */,
 				F791965919D3BE2200F60C6B /* intra_pred_common.cpp in Sources */,
+				5BD896BA1A7B839B00D32B7D /* memory_align.cpp in Sources */,
 				4C3406CF18D96EA600DFA14A /* deblocking_common.cpp in Sources */,
 				5BA8F2C019603F5F00011CE4 /* common_tables.cpp in Sources */,
 				F791965419D3B89D00F60C6B /* intra_pred_common_aarch64_neon.S in Sources */,

@@ -3,8 +3,8 @@
 #include "memory_align.h"
 #include "utils/DataGenerator.h"
 
-using namespace WelsEnc;
 #include "encode_mb_aux.h"
+using namespace WelsEnc;
 
 ALIGNED_DECLARE (const int16_t, g_kiQuantInterFFCompare[104][8], 16) = {
   /* 0*/	{   0,     1,     0,     1,     1,     1,     1,     1 },

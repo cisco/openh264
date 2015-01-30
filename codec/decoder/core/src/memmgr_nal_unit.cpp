@@ -39,7 +39,7 @@
  *
  *****************************************************************************/
 #include "memmgr_nal_unit.h"
-#include "mem_align.h"
+#include "memory_align.h"
 
 namespace WelsDec {
 

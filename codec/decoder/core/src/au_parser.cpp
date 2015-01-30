@@ -44,7 +44,7 @@
 #include "memmgr_nal_unit.h"
 #include "decoder_core.h"
 #include "bit_stream.h"
-#include "mem_align.h"
+#include "memory_align.h"
 
 namespace WelsDec {
 /*!

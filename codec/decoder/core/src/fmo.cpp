@@ -39,7 +39,7 @@
  */
 
 #include "fmo.h"
-#include "mem_align.h"
+#include "memory_align.h"
 
 namespace WelsDec {
 

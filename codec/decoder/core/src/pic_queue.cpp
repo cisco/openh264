@@ -40,7 +40,7 @@
 #include "pic_queue.h"
 #include "decoder_context.h"
 #include "codec_def.h"
-#include "mem_align.h"
+#include "memory_align.h"
 
 namespace WelsDec {
 

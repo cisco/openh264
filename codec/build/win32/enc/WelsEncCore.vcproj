@@ -394,7 +394,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\src\memory_align.cpp"
+				RelativePath="..\..\..\common\src\memory_align.cpp"
 				>
 			</File>
 			<File
@@ -575,7 +575,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\memory_align.h"
+				RelativePath="..\..\..\common\inc\memory_align.h"
 				>
 			</File>
 			<File

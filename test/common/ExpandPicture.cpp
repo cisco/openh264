@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "codec_def.h"
 #include "expand_pic.h"
-#include "mem_align.h"
+#include "memory_align.h"
 #include "decoder_context.h"
 #include "cpu.h"
 #include "cpu_core.h"

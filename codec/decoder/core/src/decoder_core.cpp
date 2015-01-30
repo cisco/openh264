@@ -40,7 +40,7 @@
 #include "expand_pic.h"
 #include "decoder.h"
 #include "decode_mb_aux.h"
-#include "mem_align.h"
+#include "memory_align.h"
 #include "error_concealment.h"
 
 namespace WelsDec {

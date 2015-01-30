@@ -44,7 +44,7 @@
 #include "welsCodecTrace.h"
 #include "codec_def.h"
 #include "typedefs.h"
-#include "mem_align.h"
+#include "memory_align.h"
 #include "utils.h"
 #include "version.h"
 

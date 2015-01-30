@@ -384,7 +384,7 @@
 				Filter="h;hpp;hxx;hm;inl"
 				>
 				<File
-					RelativePath="..\..\..\decoder\core\inc\mem_align.h"
+					RelativePath="..\..\..\common\inc\mem_align.h"
 					>
 				</File>
 				<File

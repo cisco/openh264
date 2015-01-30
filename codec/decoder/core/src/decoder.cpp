@@ -51,7 +51,7 @@
 #include "expand_pic.h"
 #include "decode_slice.h"
 #include "error_concealment.h"
-#include "mem_align.h"
+#include "memory_align.h"
 
 namespace WelsDec {
 

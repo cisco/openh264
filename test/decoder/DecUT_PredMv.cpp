@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "wels_common_basis.h"
-#include "mem_align.h"
+#include "memory_align.h"
 #include "mv_pred.h"
 #include "ls_defines.h"
 
