@@ -88,6 +88,10 @@ void EncoderInterfaceTest::PrepareOneSrcFrame() {
   pSrcPic->iPicWidth = pParamExt->iPicWidth;
   pSrcPic->iPicHeight = pParamExt->iPicHeight;
 
+  m_iWidth = pParamExt->iPicWidth;
+  m_iHeight = pParamExt->iPicHeight;
+  m_iPicResSize =  m_iWidth * m_iHeight * 3 >> 1;
+
   pYUV[0] = rand() % 256;
   for (int i = 1; i < m_iPicResSize; i++) {
     if ((i % 256) == 0)
