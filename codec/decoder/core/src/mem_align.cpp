@@ -44,7 +44,7 @@ int32_t iCountMalloc = 0;
 #endif
 //
 
-void* WelsMalloc (const uint32_t kuiSize, const char* kpTag) {
+void* WelsMallocz (const uint32_t kuiSize, const char* kpTag) {
   const int32_t kiSizeVoidPtr	= sizeof (void**);
   const int32_t kiSizeInt		= sizeof (int32_t);
   const int32_t kiAlignBytes	= 15;

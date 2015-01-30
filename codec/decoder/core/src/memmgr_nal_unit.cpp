@@ -58,7 +58,7 @@ int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize) {
     MemFreeNalList (ppAu);
   }
 
-  pBase = (uint8_t*)WelsMalloc (kuiCountSize, "Access Unit");
+  pBase = (uint8_t*)WelsMallocz (kuiCountSize, "Access Unit");
   if (pBase == NULL)
     return 1;
   pPtr = pBase;

@@ -59,7 +59,7 @@ extern "C" {
 * \note	N/A
 *************************************************************************************
 */
-void* WelsMalloc (const uint32_t kuiSize, const char* kpTag);
+void* WelsMallocz (const uint32_t kuiSize, const char* kpTag);
 
 /*!
 *************************************************************************************

@@ -133,7 +133,7 @@ static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const 
 
 
   WelsFree (pFmo->pMbAllocMap, "_fmo->pMbAllocMap");
-  pFmo->pMbAllocMap	= (uint8_t*)WelsMalloc (iNumMb * sizeof (uint8_t), "_fmo->pMbAllocMap");
+  pFmo->pMbAllocMap	= (uint8_t*)WelsMallocz (iNumMb * sizeof (uint8_t), "_fmo->pMbAllocMap");
   WELS_VERIFY_RETURN_IF (1, (NULL == pFmo->pMbAllocMap))	// out of memory
 
   pFmo->iCountMbNum	= iNumMb;

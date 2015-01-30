@@ -1111,7 +1111,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
 
       //re-write subset SPS to SPS
       SBitStringAux sSubsetSpsBs;
-      uint8_t* pBsBuf = static_cast<uint8_t*> (WelsMalloc (SPS_PPS_BS_SIZE + 4,
+      uint8_t* pBsBuf = static_cast<uint8_t*> (WelsMallocz (SPS_PPS_BS_SIZE + 4,
                         "Temp buffer for parse only usage.")); //to reserve 4 bytes for UVLC writing buffer
       if (NULL == pBsBuf) {
         pCtx->iErrorCode |= dsOutOfMemory;
