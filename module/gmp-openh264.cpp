@@ -226,6 +226,8 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
 
     // Translate parameters.
     param.iUsageType = CAMERA_VIDEO_REAL_TIME;
+    if(codecSettings.mMode == kGMPScreensharing)
+      param.iUsageType = SCREEN_CONTENT_REAL_TIME;
     param.iPicWidth = codecSettings.mWidth;
     param.iPicHeight = codecSettings.mHeight;
     param.iRCMode = RC_BITRATE_MODE;
