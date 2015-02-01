@@ -12,9 +12,6 @@ ifeq ($(ARCH), arm)
     LDFLAGS += -march=armv7-a -Wl,--fix-cortex-a8
     APP_ABI = armeabi-v7a
   endif
-  ifeq (Yes, $(USE_ASM))
-    ASMFLAGS += -march=armv7-a -mfpu=neon
-  endif
 else ifeq ($(ARCH), arm64)
   APP_ABI = arm64-v8a
 else ifeq ($(ARCH), x86)

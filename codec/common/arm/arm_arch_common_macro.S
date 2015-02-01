@@ -50,6 +50,8 @@ mov pc, lr
 
 .section .note.GNU-stack,"",%progbits // Mark stack as non-executable
 .text
+.arch armv7-a
+.fpu neon
 
 .macro WELS_ASM_FUNC_BEGIN funcName
 .align 2
