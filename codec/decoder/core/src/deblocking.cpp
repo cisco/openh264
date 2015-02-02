@@ -633,7 +633,7 @@ void FilteringEdgeChromaHV (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, in
   }
 
   pFilter->iChromaQP[0]   = pCurQp[0];
-  pFilter->iChromaQP[1]   = pCurQp[1];;
+  pFilter->iChromaQP[1]   = pCurQp[1];
   if (pFilter->iChromaQP[0] == pFilter->iChromaQP[1]) {
     GET_ALPHA_BETA_FROM_QP (pFilter->iChromaQP[0], pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha,
                             iBeta);

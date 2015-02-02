@@ -707,7 +707,7 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
   FILE* fpGolden = NULL;
 #endif
 #if defined ( STICK_STREAM_SIZE )
-  FILE* fTrackStream = fopen ("coding_size.stream", "wb");;
+  FILE* fTrackStream = fopen ("coding_size.stream", "wb");
 #endif
   SFilesSet fs;
   // for configuration file
