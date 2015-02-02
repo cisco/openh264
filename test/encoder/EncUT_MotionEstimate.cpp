@@ -278,7 +278,7 @@ TEST_F (MotionEstimateRangeTest, TestWelsMotionCrossSearch) {
       sMe.iCurMeBlockPixX = (iMbx << 4);
       sMe.iCurMeBlockPixY = (iMby << 4);
       sMe.pRefMb = pRef + sMe.iCurMeBlockPixX + sMe.iCurMeBlockPixY * m_iWidthExt;
-      sMe.pEncMb = m_pSrc + sMe.iCurMeBlockPixX + sMe.iCurMeBlockPixY * m_iWidth;;
+      sMe.pEncMb = m_pSrc + sMe.iCurMeBlockPixX + sMe.iCurMeBlockPixY * m_iWidth;
       sMe.uiSadCost = sMe.uiSatdCost = kiMaxBlock16Sad;
       sMe.pColoRefMb = sMe.pRefMb;
       WelsMotionCrossSearch (&sFuncList, &sMe, &sSlice, m_iWidth, m_iWidthExt);

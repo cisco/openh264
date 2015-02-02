@@ -322,7 +322,7 @@ EResult CComplexityAnalysisScreen::Process (int32_t nType, SPixMap* pSrc, SPixMa
   } else if (!bScrollFlag || ((iScrollMvX == 0) && (iScrollMvY == 0))) {
     GomComplexityAnalysisInter (pSrc, pRef, 0);
   } else {
-    GomComplexityAnalysisInter (pSrc, pRef, 1);;
+    GomComplexityAnalysisInter (pSrc, pRef, 1);
   }
 
   return RET_SUCCESS;

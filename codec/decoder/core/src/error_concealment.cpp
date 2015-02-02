@@ -125,7 +125,7 @@ void DoErrorConSliceCopy (PWelsDecoderContext pCtx) {
         if (pSrcPic != NULL) {
           iSrcStride = pSrcPic->iLinesize[0];
           //Y component
-          pDstData = pDstPic->pData[0] + iMbY * 16 * iDstStride + iMbX * 16;;
+          pDstData = pDstPic->pData[0] + iMbY * 16 * iDstStride + iMbX * 16;
           pSrcData = pSrcPic->pData[0] + iMbY * 16 * iSrcStride + iMbX * 16;
           pCtx->sCopyFunc.pCopyLumaFunc (pDstData, iDstStride, pSrcData, iSrcStride);
           //U component

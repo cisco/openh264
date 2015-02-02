@@ -564,7 +564,7 @@ void RcInitGomParameters (sWelsEncCtx* pEncCtx) {
   const int32_t kiGlobalQp			= pEncCtx->iGlobalQp;
 
   pWelsSvcRc->iAverageFrameQp = 0;
-  pWelsSvcRc->iMinFrameQp = 51;;
+  pWelsSvcRc->iMinFrameQp = 51;
   pWelsSvcRc->iMaxFrameQp = 0;
   for (int32_t i = 0; i < kiSliceNum; ++i) {
     pSOverRc->iComplexityIndexSlice	= 0;
