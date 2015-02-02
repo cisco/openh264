@@ -31,8 +31,8 @@
  */
 
 //wels_const.h
-#ifndef WELS_CONSTANCE_H__
-#define WELS_CONSTANCE_H__
+#ifndef WELS_CONST_H__
+#define WELS_CONST_H__
 
 // Miscellaneous sizing infos
 #ifndef MAX_FNAME_LEN
@@ -102,4 +102,4 @@ enum {
     AVC_REWRITE_ENHANCE_MB = 2
 };
 
-#endif//WELS_CONSTANCE_H__
+#endif//WELS_CONST_H__

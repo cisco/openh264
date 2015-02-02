@@ -31,8 +31,8 @@
  */
 
 //wels_const.h
-#ifndef WELS_CONSTANCE_H__
-#define WELS_CONSTANCE_H__
+#ifndef WELS_CONST_H__
+#define WELS_CONST_H__
 
 #include "as264_common.h"	//  to communicate with specific macros there, 3/18/2010
 #include "codec_app_def.h"
@@ -215,4 +215,4 @@ enum {
 };
 //TODO: need to complete the return checking in encoder and fill in more types if needed
 
-#endif//WELS_CONSTANCE_H__
+#endif//WELS_CONST_H__
