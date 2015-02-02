@@ -61,7 +61,7 @@ SHAREDLIBVERSION=0
 include $(SRC_PATH)build/platform-$(OS).mk
 
 
-CFLAGS +=
+CFLAGS += -DGENERATED_VERSION_HEADER
 LDFLAGS +=
 
 ifeq (Yes, $(GCOV))
