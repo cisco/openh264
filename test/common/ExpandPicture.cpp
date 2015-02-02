@@ -2,14 +2,16 @@
 #include "codec_def.h"
 #include "expand_pic.h"
 #include "memory_align.h"
-#include "decoder_context.h"
 #include "cpu.h"
 #include "cpu_core.h"
+#include "macros.h"
+#include "wels_const_common.h"
+
 #define EXPAND_PIC_TEST_NUM 10
 #define H264_PADDING_LENGTH_LUMA (PADDING_LENGTH)
 #define H264_PADDING_LENGTH_CHROMA (PADDING_LENGTH>>1)
 
-using namespace WelsDec;
+using namespace WelsCommon;
 
 void H264ExpandPictureLumaAnchor_c (uint8_t* pDst, int32_t iStride, int32_t iPicWidth, int32_t iPicHeight) {
   uint8_t* pTmp = pDst;
