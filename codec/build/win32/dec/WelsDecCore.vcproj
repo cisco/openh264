@@ -823,6 +823,10 @@
 					RelativePath="..\..\..\decoder\core\inc\wels_const.h"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\common\inc\wels_const_common.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"

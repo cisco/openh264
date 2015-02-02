@@ -723,6 +723,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\common\inc\wels_const_common.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\encoder\core\inc\wels_func_ptr_def.h"
 				>
 			</File>

@@ -69,6 +69,7 @@
 		4CE443E918B722CD0017DF25 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		53C1C9BA193F0F9E00404D8F /* expand_pic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = expand_pic.h; sourceTree = "<group>"; };
 		53C1C9BB193F0FB000404D8F /* expand_pic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = expand_pic.cpp; sourceTree = "<group>"; };
+		5B9196F91A7F8BA40075D641 /* wels_const_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wels_const_common.h; sourceTree = "<group>"; };
 		5BA8F2BE19603F3500011CE4 /* wels_common_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wels_common_defs.h; sourceTree = "<group>"; };
 		5BA8F2BF19603F5F00011CE4 /* common_tables.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = common_tables.cpp; sourceTree = "<group>"; };
 		5BD896B81A7B837700D32B7D /* memory_align.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memory_align.h; sourceTree = "<group>"; };
@@ -133,6 +134,7 @@
 				5BD896B81A7B837700D32B7D /* memory_align.h */,
 				4C3406C118D96EA600DFA14A /* typedefs.h */,
 				5BA8F2BE19603F3500011CE4 /* wels_common_defs.h */,
+				5B9196F91A7F8BA40075D641 /* wels_const_common.h */,
 				4C3406C218D96EA600DFA14A /* WelsThreadLib.h */,
 			);
 			path = inc;
