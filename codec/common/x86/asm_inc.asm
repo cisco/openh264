@@ -60,9 +60,9 @@
 ; Macros
 ;***********************************************************************
 
-DEFAULT REL
-
 %ifdef WIN64 ; Windows x64 ;************************************
+
+DEFAULT REL
 
 BITS 64
 
@@ -113,6 +113,8 @@ BITS 64
 %define  retrd          eax
 
 %elifdef UNIX64 ; Unix x64 ;************************************
+
+DEFAULT REL
 
 BITS 64
 
