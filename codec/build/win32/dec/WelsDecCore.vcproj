@@ -752,7 +752,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\decoder\core\inc\mem_align.h"
+					RelativePath="..\..\..\common\inc\memory_align.h"
 					>
 				</File>
 				<File
@@ -909,7 +909,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\decoder\core\src\mem_align.cpp"
+					RelativePath="..\..\..\common\src\memory_align.cpp"
 					>
 				</File>
 				<File

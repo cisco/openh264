@@ -48,6 +48,8 @@
 #include "codec_app_def.h"
 #include "set_mb_syn_cabac.h"
 
+using namespace WelsCommon;
+
 namespace WelsEnc {
 
 

@@ -20,7 +20,6 @@
 		4CE4469318BC5EAB0017DF25 /* fmo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4467018BC5EAA0017DF25 /* fmo.cpp */; };
 		4CE4469418BC5EAB0017DF25 /* get_intra_predictor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4467118BC5EAA0017DF25 /* get_intra_predictor.cpp */; };
 		4CE4469518BC5EAB0017DF25 /* manage_dec_ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4467218BC5EAA0017DF25 /* manage_dec_ref.cpp */; };
-		4CE4469718BC5EAB0017DF25 /* mem_align.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4467418BC5EAA0017DF25 /* mem_align.cpp */; };
 		4CE4469818BC5EAB0017DF25 /* memmgr_nal_unit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4467518BC5EAA0017DF25 /* memmgr_nal_unit.cpp */; };
 		4CE4469918BC5EAB0017DF25 /* mv_pred.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4467618BC5EAA0017DF25 /* mv_pred.cpp */; };
 		4CE4469A18BC5EAB0017DF25 /* parse_mb_syn_cavlc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4467718BC5EAA0017DF25 /* parse_mb_syn_cavlc.cpp */; };
@@ -71,7 +70,6 @@
 		4CE4465318BC5EAA0017DF25 /* get_intra_predictor.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = get_intra_predictor.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		4CE4465418BC5EAA0017DF25 /* manage_dec_ref.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = manage_dec_ref.h; sourceTree = "<group>"; };
 		4CE4465518BC5EAA0017DF25 /* mb_cache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mb_cache.h; sourceTree = "<group>"; };
-		4CE4465718BC5EAA0017DF25 /* mem_align.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mem_align.h; sourceTree = "<group>"; };
 		4CE4465818BC5EAA0017DF25 /* memmgr_nal_unit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memmgr_nal_unit.h; sourceTree = "<group>"; };
 		4CE4465918BC5EAA0017DF25 /* mv_pred.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mv_pred.h; sourceTree = "<group>"; };
 		4CE4465A18BC5EAA0017DF25 /* nal_prefix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nal_prefix.h; sourceTree = "<group>"; };
@@ -96,7 +94,6 @@
 		4CE4467018BC5EAA0017DF25 /* fmo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fmo.cpp; sourceTree = "<group>"; };
 		4CE4467118BC5EAA0017DF25 /* get_intra_predictor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = get_intra_predictor.cpp; sourceTree = "<group>"; };
 		4CE4467218BC5EAA0017DF25 /* manage_dec_ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = manage_dec_ref.cpp; sourceTree = "<group>"; };
-		4CE4467418BC5EAA0017DF25 /* mem_align.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mem_align.cpp; sourceTree = "<group>"; };
 		4CE4467518BC5EAA0017DF25 /* memmgr_nal_unit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = memmgr_nal_unit.cpp; sourceTree = "<group>"; };
 		4CE4467618BC5EAA0017DF25 /* mv_pred.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mv_pred.cpp; sourceTree = "<group>"; };
 		4CE4467718BC5EAA0017DF25 /* parse_mb_syn_cavlc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = parse_mb_syn_cavlc.cpp; sourceTree = "<group>"; };
@@ -211,7 +208,6 @@
 				4CE4465318BC5EAA0017DF25 /* get_intra_predictor.h */,
 				4CE4465418BC5EAA0017DF25 /* manage_dec_ref.h */,
 				4CE4465518BC5EAA0017DF25 /* mb_cache.h */,
-				4CE4465718BC5EAA0017DF25 /* mem_align.h */,
 				4CE4465818BC5EAA0017DF25 /* memmgr_nal_unit.h */,
 				4CE4465918BC5EAA0017DF25 /* mv_pred.h */,
 				4CE4465A18BC5EAA0017DF25 /* nal_prefix.h */,
@@ -247,7 +243,6 @@
 				4CE4467018BC5EAA0017DF25 /* fmo.cpp */,
 				4CE4467118BC5EAA0017DF25 /* get_intra_predictor.cpp */,
 				4CE4467218BC5EAA0017DF25 /* manage_dec_ref.cpp */,
-				4CE4467418BC5EAA0017DF25 /* mem_align.cpp */,
 				4CE4467518BC5EAA0017DF25 /* memmgr_nal_unit.cpp */,
 				4CE4467618BC5EAA0017DF25 /* mv_pred.cpp */,
 				4CE4467718BC5EAA0017DF25 /* parse_mb_syn_cavlc.cpp */,
@@ -351,7 +346,6 @@
 				4CE4469F18BC5EAB0017DF25 /* welsDecoderExt.cpp in Sources */,
 				4CE4469318BC5EAB0017DF25 /* fmo.cpp in Sources */,
 				4CE4469118BC5EAB0017DF25 /* decoder_data_tables.cpp in Sources */,
-				4CE4469718BC5EAB0017DF25 /* mem_align.cpp in Sources */,
 				4CE4469518BC5EAB0017DF25 /* manage_dec_ref.cpp in Sources */,
 				4CE4468A18BC5EAB0017DF25 /* au_parser.cpp in Sources */,
 				4CE4469918BC5EAB0017DF25 /* mv_pred.cpp in Sources */,

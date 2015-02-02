@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "wels_common_basis.h"
-#include "mem_align.h"
+#include "memory_align.h"
 #include "mv_pred.h"
 #include "ls_defines.h"
 
@@ -414,22 +414,22 @@ void AnchorPredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
 
 int32_t AllocLayerData (PDqLayer pDqLayer) {
 
-  pDqLayer->pSliceIdc = (int32_t*) WelsMalloc (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (int32_t),
+  pDqLayer->pSliceIdc = (int32_t*) WelsMallocz (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (int32_t),
                         "pDqLayer->pSliceIdc");
   if (pDqLayer->pSliceIdc == NULL)
     return 1;
 
-  pDqLayer->pMbType = (int8_t*) WelsMalloc (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (int8_t),
+  pDqLayer->pMbType = (int8_t*) WelsMallocz (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (int8_t),
                       "pDqLayer->pMbType");
   if (pDqLayer->pMbType == NULL)
     return 1;
 
-  pDqLayer->pMv[0] = (int16_t (*)[MB_BLOCK4x4_NUM][MV_A]) WelsMalloc (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (
+  pDqLayer->pMv[0] = (int16_t (*)[MB_BLOCK4x4_NUM][MV_A]) WelsMallocz (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (
                        int16_t) * MV_A * MB_BLOCK4x4_NUM, "pDqLayer->pMv");
   if (pDqLayer->pMv[0] == NULL)
     return 1;
 
-  pDqLayer->pRefIndex[0] = (int8_t (*)[MB_BLOCK4x4_NUM]) WelsMalloc (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (
+  pDqLayer->pRefIndex[0] = (int8_t (*)[MB_BLOCK4x4_NUM]) WelsMallocz (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (
                              int8_t) * MB_BLOCK4x4_NUM, "pDqLayer->pRefIndex");
   if (pDqLayer->pRefIndex[0] == NULL)
     return 1;

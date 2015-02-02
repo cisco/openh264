@@ -8,6 +8,7 @@ COMMON_CPP_SRCS=\
 	$(COMMON_SRCDIR)/src/expand_pic.cpp\
 	$(COMMON_SRCDIR)/src/intra_pred_common.cpp\
 	$(COMMON_SRCDIR)/src/mc.cpp\
+	$(COMMON_SRCDIR)/src/memory_align.cpp\
 	$(COMMON_SRCDIR)/src/sad_common.cpp\
 	$(COMMON_SRCDIR)/src/utils.cpp\
 	$(COMMON_SRCDIR)/src/welsCodecTrace.cpp\

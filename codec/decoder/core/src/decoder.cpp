@@ -51,7 +51,7 @@
 #include "expand_pic.h"
 #include "decode_slice.h"
 #include "error_concealment.h"
-#include "mem_align.h"
+#include "memory_align.h"
 
 namespace WelsDec {
 
@@ -67,13 +67,13 @@ static int32_t CreatePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, cons
     return 1;
   }
 
-  pPicBuf	= (PPicBuff)WelsMalloc (sizeof (SPicBuff), "PPicBuff");
+  pPicBuf	= (PPicBuff)WelsMallocz (sizeof (SPicBuff), "PPicBuff");
 
   if (NULL == pPicBuf) {
     return 1;
   }
 
-  pPicBuf->ppPic = (PPicture*)WelsMalloc (kiSize * sizeof (PPicture), "PPicture*");
+  pPicBuf->ppPic = (PPicture*)WelsMallocz (kiSize * sizeof (PPicture), "PPicture*");
 
   if (NULL == pPicBuf->ppPic) {
     pPicBuf->iCapacity = 0;
@@ -109,13 +109,13 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     return 1;
   }
 
-  pPicNewBuf	= (PPicBuff)WelsMalloc (sizeof (SPicBuff), "PPicBuff");
+  pPicNewBuf	= (PPicBuff)WelsMallocz (sizeof (SPicBuff), "PPicBuff");
 
   if (NULL == pPicNewBuf) {
     return 1;
   }
 
-  pPicNewBuf->ppPic = (PPicture*)WelsMalloc (kiNewSize * sizeof (PPicture), "PPicture*");
+  pPicNewBuf->ppPic = (PPicture*)WelsMallocz (kiNewSize * sizeof (PPicture), "PPicture*");
 
   if (NULL == pPicNewBuf->ppPic) {
     pPicNewBuf->iCapacity = 0;
@@ -171,13 +171,13 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     return 1;
   }
 
-  pPicNewBuf	= (PPicBuff)WelsMalloc (sizeof (SPicBuff), "PPicBuff");
+  pPicNewBuf	= (PPicBuff)WelsMallocz (sizeof (SPicBuff), "PPicBuff");
 
   if (NULL == pPicNewBuf) {
     return 1;
   }
 
-  pPicNewBuf->ppPic = (PPicture*)WelsMalloc (kiNewSize * sizeof (PPicture), "PPicture*");
+  pPicNewBuf->ppPic = (PPicture*)WelsMallocz (kiNewSize * sizeof (PPicture), "PPicture*");
 
   if (NULL == pPicNewBuf->ppPic) {
     pPicNewBuf->iCapacity	 = 0;
@@ -417,7 +417,7 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
   pCtx->pDec		        = NULL;			// need prefetch a new pic due to spatial size changed
 
   if (pCtx->pCabacDecEngine == NULL)
-    pCtx->pCabacDecEngine = (SWelsCabacDecEngine*) WelsMalloc (sizeof (SWelsCabacDecEngine), "pCtx->pCabacDecEngine");
+    pCtx->pCabacDecEngine = (SWelsCabacDecEngine*) WelsMallocz (sizeof (SWelsCabacDecEngine), "pCtx->pCabacDecEngine");
 
   return ERR_NONE;
 }
@@ -508,7 +508,7 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
   if (NULL == pCtx || NULL == kpParam)
     return 1;
 
-  pCtx->pParam	= (SDecodingParam*)WelsMalloc (sizeof (SDecodingParam), "SDecodingParam");
+  pCtx->pParam	= (SDecodingParam*)WelsMallocz (sizeof (SDecodingParam), "SDecodingParam");
 
   if (NULL == pCtx->pParam)
     return 1;

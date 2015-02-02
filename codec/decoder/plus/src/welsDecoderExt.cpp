@@ -44,7 +44,7 @@
 #include "welsCodecTrace.h"
 #include "codec_def.h"
 #include "typedefs.h"
-#include "mem_align.h"
+#include "memory_align.h"
 #include "utils.h"
 #include "version.h"
 
@@ -240,7 +240,7 @@ int32_t CWelsDecoder::InitDecoder (const bool bParseOnly) {
 
   if (m_pDecContext) //free
     UninitDecoder();
-  m_pDecContext	= (PWelsDecoderContext)WelsMalloc (sizeof (SWelsDecoderContext), "m_pDecContext");
+  m_pDecContext	= (PWelsDecoderContext)WelsMallocz (sizeof (SWelsDecoderContext), "m_pDecContext");
   if (NULL == m_pDecContext)
     return cmMallocMemeError;
 
