@@ -68,8 +68,7 @@ static void TestOutPutTrace (void* ctx, int level, const char* string) {
   EXPECT_LE (level, pTraceUnit->iTarLevel);
 }
 
-class EncodeDecodeTestBase : public ::testing::TestWithParam<EncodeDecodeFileParamBase>,
-  public BaseEncoderTest, public BaseDecoderTest {
+class EncodeDecodeTestBase : public BaseEncoderTest, public BaseDecoderTest {
  public:
   uint8_t iRandValue;
  public:
@@ -167,7 +166,7 @@ class EncodeDecodeTestBase : public ::testing::TestWithParam<EncodeDecodeFilePar
   STraceUnit* pTraceInfo;
 };
 
-class EncodeDecodeTestAPI : public EncodeDecodeTestBase {
+class EncodeDecodeTestAPIBase : public EncodeDecodeTestBase {
  public:
   uint8_t iRandValue;
  public:
@@ -227,7 +226,17 @@ class EncodeDecodeTestAPI : public EncodeDecodeTestBase {
   }
 };
 
-void EncodeDecodeTestAPI::InitialEncDec (int iWidth, int iHeight) {
+class EncodeDecodeTestAPI : public ::testing::TestWithParam<EncodeDecodeFileParamBase>, public EncodeDecodeTestAPIBase {
+  void SetUp() {
+    EncodeDecodeTestAPIBase::SetUp();
+  }
+
+  void TearDown() {
+    EncodeDecodeTestAPIBase::TearDown();
+  }
+};
+
+void EncodeDecodeTestAPIBase::InitialEncDec (int iWidth, int iHeight) {
 
   // for encoder
   // I420: 1(Y) + 1/4(U) + 1/4(V)
@@ -253,7 +262,7 @@ void EncodeDecodeTestAPI::InitialEncDec (int iWidth, int iHeight) {
   iRandValue = rand() % 256;
 }
 
-void EncodeDecodeTestAPI::RandomParamExtCombination() {
+void EncodeDecodeTestAPIBase::RandomParamExtCombination() {
 
   param_.iPicWidth  = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 2, MAX_WIDTH);
   param_.iPicHeight = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1) + 1) << 1, 2, MAX_HEIGHT);
@@ -342,7 +351,7 @@ void EncodeDecodeTestAPI::RandomParamExtCombination() {
   }
 }
 
-void EncodeDecodeTestAPI::ValidateParamExtCombination() {
+void EncodeDecodeTestAPIBase::ValidateParamExtCombination() {
 
   bool bDynSliceModeFlag   = false;
   unsigned int uiGOPSize   = 0;
@@ -451,7 +460,7 @@ void EncodeDecodeTestAPI::ValidateParamExtCombination() {
 }
 
 
-void EncodeDecodeTestAPI::SliceParamValidationForMode2 (int iSpatialIdx) {
+void EncodeDecodeTestAPIBase::SliceParamValidationForMode2 (int iSpatialIdx) {
 
   unsigned int uiMbWidth          = 0;
   unsigned int uiMbHeight         = 0;
@@ -488,7 +497,7 @@ void EncodeDecodeTestAPI::SliceParamValidationForMode2 (int iSpatialIdx) {
   param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceNum = uiActualSliceCount;
 
 }
-void EncodeDecodeTestAPI::SliceParamValidationForMode3 (int iSpatialIdx) {
+void EncodeDecodeTestAPIBase::SliceParamValidationForMode3 (int iSpatialIdx) {
 
   unsigned int uiMbHeight         = 0;
 
@@ -501,7 +510,7 @@ void EncodeDecodeTestAPI::SliceParamValidationForMode3 (int iSpatialIdx) {
 
 }
 
-void EncodeDecodeTestAPI::SliceParamValidationForMode4() {
+void EncodeDecodeTestAPIBase::SliceParamValidationForMode4() {
   //slice mode of all spatial layer should be set as SM_DYN_SLICE
   for (int iSpatialIdx = 0; iSpatialIdx < param_.iSpatialLayerNum; iSpatialIdx++) {
     param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 600;
@@ -1443,7 +1452,7 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace_NULL) {
   }
 }
 
-INSTANTIATE_TEST_CASE_P (EncodeDecodeTestBase, EncodeDecodeTestAPI,
+INSTANTIATE_TEST_CASE_P (EncodeDecodeTestAPIBase, EncodeDecodeTestAPI,
                          ::testing::ValuesIn (kFileParamArray));
 
 TEST_P (EncodeDecodeTestAPI, SetOptionECIDC_GeneralSliceChange) {
@@ -1531,6 +1540,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   uint32_t uiGet;
   EncodeDecodeFileParamBase p = kFileParamArray[0];
   prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
+
   param_.iSpatialLayerNum = 1;
   encoder_->Uninitialize();
   int rv = encoder_->InitializeExt (&param_);
@@ -1551,7 +1561,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   int iIdx = 0;
   int len = 0;
   unsigned char* pData[3] = { NULL };
-
   InitialEncDec (p.width, p.height);
   //Frame 0: IDR, EC_IDC=DISABLE, loss = 0
   EncodeOneFrame (1);
@@ -1656,7 +1665,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   EXPECT_TRUE (rv != 0); //not sure if previous data drop would be detected in construction
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 1);
   iIdx++;
-
 }
 
 //This case contain 2 slices per picture for IDR loss
@@ -2165,7 +2173,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionEncParamExt) {
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
 }
 
-class DecodeCrashTestAPI : public EncodeDecodeTestBase {
+class DecodeCrashTestAPI : public ::testing::TestWithParam<EncodeDecodeFileParamBase>, public EncodeDecodeTestBase {
  public:
   uint8_t iRandValue;
  public:
@@ -2386,7 +2394,7 @@ const char* pHashStr[] = { //DO NOT CHANGE!
   "eb9d853b7daec03052c4850027ac94adc84c3a7e"
 };
 
-class DecodeParseAPI : public EncodeDecodeTestBase {
+class DecodeParseAPI : public ::testing::TestWithParam<EncodeDecodeFileParamBase>, public EncodeDecodeTestBase {
  public:
   void SetUp() {
     SHA1Reset (&ctx_);
@@ -3241,4 +3249,113 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVC) {
 #endif
   }
 }
+
+struct EncodeOptionParam {
+  int iCaseId;
+  int iNumframes;
+  int iWidth;
+  int iHeight;
+  int iQp;
+  int uiMaxNalLen;
+  float fFramerate;
+  int iThreads;
+};
+
+static const EncodeOptionParam kOptionParamArray[] = {
+  {0, 30, 600, 460, 1, 400, 15.0, 1},
+  {1, 30, 340, 96, 24, 1000, 30.0, 1},
+  {2, 30, 140, 196, 51, 500, 7.5, 1},
+  {3, 30, 110, 296, 50, 500, 7.5, 1},
+  {4, 30, 104, 416, 44, 500, 7.5, 1},
+  {5, 30, 16, 16, 2, 500, 7.5, 1},
+  {6, 30, 32, 16, 2, 500, 7.5, 1},
+  {7, 30, 600, 460, 1, 400, 15.0, 4},
+  {8, 30, 340, 96, 24, 1000, 30.0, 2},
+  {9, 30, 140, 196, 51, 500, 7.5, 3},
+  {10, 30, 110, 296, 50, 500, 7.5, 2},
+  {11, 30, 104, 416, 44, 500, 7.5, 2},
+  {12, 30, 16, 16, 2, 500, 7.5, 3},
+  {13, 30, 32, 16, 2, 500, 7.5, 3},
+};
+
+class EncodeTestAPI : public ::testing::TestWithParam<EncodeOptionParam>, public ::EncodeDecodeTestAPIBase {
+ public:
+  void SetUp() {
+    EncodeDecodeTestAPIBase::SetUp();
+  }
+
+  void TearDown() {
+    EncodeDecodeTestAPIBase::TearDown();
+  }
+  void EncodeOneFrameAllRandom (int iCheckTypeIndex) {
+    int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
+    uint8_t* ptr = buf_.data();
+    for (int i = 0; i < frameSize; i++) {
+      ptr[i] = rand() % 256;
+    }
+    int rv = encoder_->EncodeFrame (&EncPic, &info);
+    if (0 == iCheckTypeIndex)
+      ASSERT_TRUE (rv == cmResultSuccess);
+    else if (1 == iCheckTypeIndex)
+      ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+  }
+};
+
+INSTANTIATE_TEST_CASE_P (EncodeDecodeTestAPIBase, EncodeTestAPI,
+                         ::testing::ValuesIn (kOptionParamArray));
+
+TEST_P (EncodeTestAPI, SetEncOptionNalSize) {
+  EncodeOptionParam p = GetParam();
+  memset (&param_, 0, sizeof (SEncParamExt));
+  encoder_->GetDefaultParams (&param_);
+  param_.uiMaxNalSize = p.uiMaxNalLen;
+  param_.iTemporalLayerNum = (rand() % 4) + 1;
+  param_.iSpatialLayerNum = 1;
+  param_.iUsageType = CAMERA_VIDEO_REAL_TIME;
+  param_.iPicWidth = p.iWidth;
+  param_.iPicHeight = p.iHeight;
+  param_.fMaxFrameRate = p.fFramerate;
+  param_.iRCMode = RC_OFF_MODE; //rc off
+  param_.iMultipleThreadIdc = p.iThreads;
+  param_.iNumRefFrame = AUTO_REF_PIC_COUNT;
+  param_.sSpatialLayers[0].iVideoWidth = p.iWidth ;
+  param_.sSpatialLayers[0].iVideoHeight = p.iHeight;
+  param_.sSpatialLayers[0].fFrameRate = p.fFramerate;
+  param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_DYN_SLICE;
+
+  encoder_->Uninitialize();
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == cmResultSuccess);
+  InitialEncDec (p.iWidth, p.iHeight);
+
+  int32_t iTraceLevel = WELS_LOG_QUIET;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  int32_t iSpsPpsIdAddition = 1;
+  encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
+  int32_t iIDRPeriod = (int32_t) pow (2.0f, (param_.iTemporalLayerNum - 1)) * ((rand() % 5) + 1);
+  encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
+  int iIdx = 0;
+  while (iIdx <= p.iNumframes) {
+    EncodeOneFrameAllRandom (1);
+    int iLayer = 0;
+    while (iLayer < info.iLayerNum) {
+      SLayerBSInfo* pLayerBsInfo = &info.sLayerInfo[iLayer];
+      if (pLayerBsInfo != NULL) {
+        int iNalIdx = WELS_MAX (pLayerBsInfo->iNalCount - 2, 0); // ignore last slice under single slice mode
+        do {
+          if (p.iCaseId <
+              6) { // ignore the case that 2 MBs in one picture, and the multithreads case, enable them when code is ready
+            ASSERT_GE (((int)param_.uiMaxNalSize), pLayerBsInfo->pNalLengthInByte[iNalIdx]);
+          }
+          -- iNalIdx;
+        } while (iNalIdx >= 0);
+      }
+      ++ iLayer;
+    }
+    iIdx++;
+  }
+}
+
+
 
