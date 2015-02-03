@@ -444,6 +444,10 @@ int32_t ParseIntra4x4Mode (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail
   pCurDqLayer->pIntraPredMode[iMbXy][4] = pIntraPredMode[4 + 8 * 1];
   pCurDqLayer->pIntraPredMode[iMbXy][5] = pIntraPredMode[4 + 8 * 2];
   pCurDqLayer->pIntraPredMode[iMbXy][6] = pIntraPredMode[4 + 8 * 3];
+
+  if (pCtx->pSps->uiChromaFormatIdc == 0)//no need parse chroma
+    return ERR_NONE;
+
   if (pCurDqLayer->sLayerInfo.pPps->bEntropyCodingModeFlag) {
     WELS_READ_VERIFY (ParseIntraPredModeChromaCabac (pCtx, uiNeighAvail, iCode));
     if (iCode > MAX_PRED_MODE_ID_CHROMA) {
@@ -462,7 +466,6 @@ int32_t ParseIntra4x4Mode (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail
       || CheckIntraChromaPredMode (uiNeighAvail, &pCurDqLayer->pChromaPredMode[iMbXy])) {
     return ERR_INFO_INVALID_I_CHROMA_PRED_MODE;
   }
-
   return ERR_NONE;
 }
 
@@ -478,6 +481,9 @@ int32_t ParseIntra16x16Mode (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAva
                                &pCurDqLayer->pIntraPredMode[iMbXy][7])) { //invalid iPredMode, must stop decoding
     return ERR_INFO_INVALID_I16x16_PRED_MODE;
   }
+  if (pCtx->pSps->uiChromaFormatIdc == 0)
+    return ERR_NONE;
+
   if (pCurDqLayer->sLayerInfo.pPps->bEntropyCodingModeFlag) {
     WELS_READ_VERIFY (ParseIntraPredModeChromaCabac (pCtx, uiNeighAvail, iCode));
     if (iCode > MAX_PRED_MODE_ID_CHROMA) {
@@ -519,6 +525,9 @@ int32_t WelsDecodeMbCabacISliceBaseMode0 (PWelsDecoderContext pCtx, uint32_t& ui
   WELS_READ_VERIFY (ParseMBTypeISliceCabac (pCtx, &sNeighAvail, uiMbType));
   if (uiMbType > 25) {
     return ERR_INFO_INVALID_MB_TYPE;
+  } else if (!pCtx->pSps->uiChromaFormatIdc && ((uiMbType >= 5 && uiMbType <= 12) || (uiMbType >= 17
+             && uiMbType <= 24))) {
+    return ERR_INFO_INVALID_MB_TYPE;
   } else if (25 == uiMbType) {   //I_PCM
     WELS_READ_VERIFY (ParseIPCMInfoCabac (pCtx));
     pSlice->iLastDeltaQp = 0;
@@ -536,18 +545,17 @@ int32_t WelsDecodeMbCabacISliceBaseMode0 (PWelsDecoderContext pCtx, uint32_t& ui
     WELS_READ_VERIFY (ParseCbpInfoCabac (pCtx, &sNeighAvail, uiCbp));
     pCurLayer->pCbp[iMbXy] = uiCbp;
     pSlice->iLastDeltaQp = uiCbp == 0 ? 0 : pSlice->iLastDeltaQp;
-    uiCbpChroma = uiCbp >> 4;
+    uiCbpChroma = pCtx->pSps->uiChromaFormatIdc ? uiCbp >> 4 : 0;
     uiCbpLuma = uiCbp & 15;
   } else { //I16x16;
     pCurLayer->pMbType[iMbXy] = MB_TYPE_INTRA16x16;
     pCurLayer->pIntraPredMode[iMbXy][7] = (uiMbType - 1) & 3;
     pCurLayer->pCbp[iMbXy] = g_kuiI16CbpTable[ (uiMbType - 1) >> 2];
-    uiCbpChroma = pCurLayer->pCbp[iMbXy] >> 4;
+    uiCbpChroma = pCtx->pSps->uiChromaFormatIdc ? pCurLayer->pCbp[iMbXy] >> 4 : 0 ;
     uiCbpLuma = pCurLayer->pCbp[iMbXy] & 15;
     WelsFillCacheNonZeroCount (&sNeighAvail, pNonZeroCount, pCurLayer);
     WELS_READ_VERIFY (ParseIntra16x16Mode (pCtx, &sNeighAvail, pBsAux, pCurLayer));
   }
-
 
   ST32 (&pCurLayer->pNzc[iMbXy][0], 0);
   ST32 (&pCurLayer->pNzc[iMbXy][4], 0);
@@ -705,9 +713,10 @@ int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
     pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
   } else { //Intra mode
     uiMbType -= 5;
-    if (uiMbType > 25) {
+    if (uiMbType > 25)
       return ERR_INFO_INVALID_MB_TYPE;
-    }
+    if (!pCtx->pSps->uiChromaFormatIdc && ((uiMbType >= 5 && uiMbType <= 12) || (uiMbType >= 17 && uiMbType <= 24)))
+      return ERR_INFO_INVALID_MB_TYPE;
 
     if (25 == uiMbType) {   //I_PCM
       WELS_READ_VERIFY (ParseIPCMInfoCabac (pCtx));
@@ -727,28 +736,13 @@ int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
         pCurLayer->pMbType[iMbXy] = MB_TYPE_INTRA16x16;
         pCurLayer->pIntraPredMode[iMbXy][7] = (uiMbType - 1) & 3;
         pCurLayer->pCbp[iMbXy] = g_kuiI16CbpTable[ (uiMbType - 1) >> 2];
-        uiCbpChroma = pCurLayer->pCbp[iMbXy] >> 4;
+        uiCbpChroma = pCtx->pSps->uiChromaFormatIdc ? pCurLayer->pCbp[iMbXy] >> 4 : 0;
         uiCbpLuma = pCurLayer->pCbp[iMbXy] & 15;
         WelsFillCacheNonZeroCount (pNeighAvail, pNonZeroCount, pCurLayer);
         WELS_READ_VERIFY (ParseIntra16x16Mode (pCtx, pNeighAvail, pBsAux, pCurLayer));
       }
     }
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   ST32 (&pCurLayer->pNzc[iMbXy][0], 0);
   ST32 (&pCurLayer->pNzc[iMbXy][4], 0);
@@ -759,9 +753,10 @@ int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
 
   if (MB_TYPE_INTRA16x16 != pCurLayer->pMbType[iMbXy]) {
     WELS_READ_VERIFY (ParseCbpInfoCabac (pCtx, pNeighAvail, uiCbp));
+
     pCurLayer->pCbp[iMbXy] = uiCbp;
     pSlice->iLastDeltaQp = uiCbp == 0 ? 0 : pSlice->iLastDeltaQp;
-    uiCbpChroma = pCurLayer->pCbp[iMbXy] >> 4;
+    uiCbpChroma = pCtx->pSps->uiChromaFormatIdc ? pCurLayer->pCbp[iMbXy] >> 4 : 0 ;
     uiCbpLuma = pCurLayer->pCbp[iMbXy] & 15;
   }
 
@@ -1104,9 +1099,10 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
 
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //uiMbType
   uiMbType = uiCode;
-  if (uiMbType > 25) {
+  if (uiMbType > 25)
     return ERR_INFO_INVALID_MB_TYPE;
-  }
+  if (!pCtx->pSps->uiChromaFormatIdc && ((uiMbType >= 5 && uiMbType <= 12) || (uiMbType >= 17 && uiMbType <= 24)))
+    return ERR_INFO_INVALID_MB_TYPE;
 
   if (25 == uiMbType) {
     int32_t iDecStrideL = pCurLayer->pDec->iLinesize[0];
@@ -1169,11 +1165,15 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
     WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //coded_block_pattern
     uiCbp = uiCode;
     //G.9.1 Alternative parsing process for coded pBlock pattern
-    if (uiCbp > 47)
+    if (pCtx->pSps->uiChromaFormatIdc && (uiCbp > 47))
+      return ERR_INFO_INVALID_CBP;
+    if (!pCtx->pSps->uiChromaFormatIdc && (uiCbp > 15))
       return ERR_INFO_INVALID_CBP;
 
-    uiCbp = g_kuiIntra4x4CbpTable[uiCbp];
-
+    if (pCtx->pSps->uiChromaFormatIdc)
+      uiCbp = g_kuiIntra4x4CbpTable[uiCbp];
+    else
+      uiCbp = g_kuiIntra4x4CbpTable400[uiCbp];
     pCurLayer->pCbp[iMbXy] = uiCbp;
     uiCbpC = uiCbp >> 4;
     uiCbpL = uiCbp & 15;
@@ -1181,7 +1181,7 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
     pCurLayer->pMbType[iMbXy] = MB_TYPE_INTRA16x16;
     pCurLayer->pIntraPredMode[iMbXy][7] = (uiMbType - 1) & 3;
     pCurLayer->pCbp[iMbXy] = g_kuiI16CbpTable[ (uiMbType - 1) >> 2];
-    uiCbpC = pCurLayer->pCbp[iMbXy] >> 4;
+    uiCbpC = pCtx->pSps->uiChromaFormatIdc ? pCurLayer->pCbp[iMbXy] >> 4 : 0;
     uiCbpL = pCurLayer->pCbp[iMbXy] & 15;
     WelsFillCacheNonZeroCount (&sNeighAvail, pNonZeroCount, pCurLayer);
     WELS_READ_VERIFY (ParseIntra16x16Mode (pCtx, &sNeighAvail, pBs, pCurLayer));
@@ -1398,9 +1398,10 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
     }
   } else { //intra MB type
     uiMbType -= 5;
-    if (uiMbType > 25) {
+    if (uiMbType > 25)
       return ERR_INFO_INVALID_MB_TYPE;
-    }
+    if (!pCtx->pSps->uiChromaFormatIdc && ((uiMbType >= 5 && uiMbType <= 12) || (uiMbType >= 17 && uiMbType <= 24)))
+      return ERR_INFO_INVALID_MB_TYPE;
 
     if (25 == uiMbType) {
       int32_t iDecStrideL = pCurLayer->pDec->iLinesize[0];
@@ -1471,7 +1472,7 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
         pCurLayer->pMbType[iMbXy] = MB_TYPE_INTRA16x16;
         pCurLayer->pIntraPredMode[iMbXy][7] = (uiMbType - 1) & 3;
         pCurLayer->pCbp[iMbXy] = g_kuiI16CbpTable[ (uiMbType - 1) >> 2];
-        uiCbpC = pCurLayer->pCbp[iMbXy] >> 4;
+        uiCbpC = pCtx->pSps->uiChromaFormatIdc ? pCurLayer->pCbp[iMbXy] >> 4 : 0;
         uiCbpL = pCurLayer->pCbp[iMbXy] & 15;
         WelsFillCacheNonZeroCount (&sNeighAvail, pNonZeroCount, pCurLayer);
         if (ParseIntra16x16Mode (pCtx, &sNeighAvail, pBs, pCurLayer)) {
@@ -1485,13 +1486,15 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
     WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //coded_block_pattern
     uiCbp = uiCode;
     {
-      if (uiCbp > 47)
+      if (pCtx->pSps->uiChromaFormatIdc && (uiCbp > 47))
         return ERR_INFO_INVALID_CBP;
-
+      if (!pCtx->pSps->uiChromaFormatIdc && (uiCbp > 15))
+        return ERR_INFO_INVALID_CBP;
       if (MB_TYPE_INTRA4x4 == pCurLayer->pMbType[iMbXy]) {
-        uiCbp = g_kuiIntra4x4CbpTable[uiCbp];
+
+        uiCbp = pCtx->pSps->uiChromaFormatIdc ? g_kuiIntra4x4CbpTable[uiCbp] : g_kuiIntra4x4CbpTable400[uiCbp];
       } else //inter
-        uiCbp = g_kuiInterCbpTable[uiCbp];
+        uiCbp = pCtx->pSps->uiChromaFormatIdc ?  g_kuiInterCbpTable[uiCbp] : g_kuiInterCbpTable400[uiCbp];
     }
 
     pCurLayer->pCbp[iMbXy] = uiCbp;
