@@ -669,6 +669,10 @@ int32_t ParseCbpInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail
   if (pCbpBit[3])
     uiCbp += 0x08;
 
+  if (pCtx->pSps->uiChromaFormatIdc == 0)//monochroma
+    return ERR_NONE;
+
+
   //Chroma: bit by bit
   iIdxB = pNeighAvail->iTopAvail  && (pNeighAvail->iTopType  == MB_TYPE_INTRA_PCM || (pNeighAvail->iTopCbp  >> 4));
   iIdxA = pNeighAvail->iLeftAvail && (pNeighAvail->iLeftType == MB_TYPE_INTRA_PCM || (pNeighAvail->iLeftCbp >> 4));
@@ -687,7 +691,9 @@ int32_t ParseCbpInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail
                                       pCtx->pCabacCtx + NEW_CTX_OFFSET_CBP + 2 * CTX_NUM_CBP + iCtxInc,
                                       pCbpBit[5]));
     uiCbp += 1 << (4 + pCbpBit[5]);
+
   }
+
   return ERR_NONE;
 }
 
