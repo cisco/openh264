@@ -832,18 +832,30 @@ bool CheckSpsActive (PWelsDecoderContext pCtx, PSps pSps, bool bUseSubsetFlag) {
   if (bUseSubsetFlag) {
     if (pSps->iMbWidth > 0  && pSps->iMbHeight > 0 && pCtx->bSubspsAvailFlags[pSps->iSpsId]
         && pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
-      PSps pNextUsedSps =
-        pCtx->pAccessUnitList->pNalUnitsList[pCtx->pAccessUnitList->uiStartPos]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
-      if (pNextUsedSps->iSpsId == pSps->iSpsId)
-        return true;
+      int i = 0, iNum = (int32_t) pCtx->pAccessUnitList->uiAvailUnitsNum;
+      while (i < iNum) {
+        PNalUnit pNalUnit = pCtx->pAccessUnitList->pNalUnitsList[i];
+        if (pNalUnit->sNalData.sVclNal.bSliceHeaderExtFlag) { //ext data
+          PSps pNextUsedSps = pNalUnit->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
+          if (pNextUsedSps->iSpsId == pSps->iSpsId)
+            return true;
+        }
+        ++i;
+      }
     }
   } else {
     if (pSps->iMbWidth > 0  && pSps->iMbHeight > 0 && pCtx->bSpsAvailFlags[pSps->iSpsId]
         && pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
-      PSps pNextUsedSps =
-        pCtx->pAccessUnitList->pNalUnitsList[pCtx->pAccessUnitList->uiStartPos]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
-      if (pNextUsedSps->iSpsId == pSps->iSpsId)
-        return true;
+      int i = 0, iNum = (int32_t) pCtx->pAccessUnitList->uiAvailUnitsNum;
+      while (i < iNum) {
+        PNalUnit pNalUnit = pCtx->pAccessUnitList->pNalUnitsList[i];
+        if (!pNalUnit->sNalData.sVclNal.bSliceHeaderExtFlag) { //non-ext data
+          PSps pNextUsedSps = pNalUnit->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
+          if (pNextUsedSps->iSpsId == pSps->iSpsId)
+            return true;
+        }
+        ++i;
+      }
     }
   }
   return false;
