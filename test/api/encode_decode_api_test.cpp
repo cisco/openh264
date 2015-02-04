@@ -3175,7 +3175,7 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVC) {
   int iIdx = 0;
 
   //create decoder
-  for (int iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
+  for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
     pBsBuf[iIdx] = static_cast<unsigned char*> (malloc (iWidth * iHeight * 3 * sizeof (unsigned char) / 2));
     aLen[iIdx] = 0;
 
