@@ -610,17 +610,17 @@ w8_xy_01_mc_luma_loop
     pld         [r0]
     pld         [r0, r1]
     vshr.u16    q15, q14, #2            ;;// 5
-	ldr		r6, [r0]		;//r6=src[0]
-	add r0, r1
-	ldr		r7, [r0]		;//r7=src[1]
-	add r0, r1
+    ldr		r6, [r0]		;//r6=src[0]
+    add r0, r1
+    ldr		r7, [r0]		;//r7=src[1]
+    add r0, r1
 
     vmov        d0, r4, r5
     vmov        d1, r5, r6
     vmov        d2, r6, r7
 
-	ldr		r4, [r0]		;//r4=src[2]
-	add r0, r1	
+    ldr		r4, [r0]		;//r4=src[2]
+    add r0, r1
     vmov        d3, r7, r4
     ldr         r7, [sp, #16]
 
@@ -810,25 +810,25 @@ w8_xy_03_mc_luma_loop
     pld         [r0]
     pld         [r0, r1]
     vmov.u16    q14, #0x0014            ;// 20
-	ldr		r4, [r0]		;//r4=src[-2]
-	add r0, r1
-	ldr		r5, [r0]		;//r5=src[-1]
-	add r0, r1
+    ldr		r4, [r0]		;//r4=src[-2]
+    add r0, r1
+    ldr		r5, [r0]		;//r5=src[-1]
+    add r0, r1
 
     pld         [r0]
     pld         [r0, r1]
     vshr.u16    q15, q14, #2            ;// 5
-	ldr		r6, [r0]		;//r6=src[0]
-	add r0, r1
-	ldr		r7, [r0]		;//r7=src[1]
-	add r0, r1
+    ldr		r6, [r0]		;//r6=src[0]
+    add r0, r1
+    ldr		r7, [r0]		;//r7=src[1]
+    add r0, r1
 
     vmov        d0, r4, r5
     vmov        d1, r5, r6
     vmov        d2, r6, r7
 
-	ldr		r4, [r0]		;//r4=src[2]	
-	add r0, r1	
+    ldr		r4, [r0]		;//r4=src[2]
+    add r0, r1
     vmov        d3, r7, r4
     ldr         r7, [sp, #16]
 
@@ -836,33 +836,33 @@ w4_xy_03_mc_luma_loop
 
 ;//  pld         [r0]
     ;//using reserving r4
-	ldr		r5, [r0]		;//r5=src[3]
-	add r0, r1
-	ldr		r6, [r0]		;//r6=src[0]
-	add r0, r1
+    ldr		r5, [r0]		;//r5=src[3]
+    add r0, r1
+    ldr		r6, [r0]		;//r6=src[0]
+    add r0, r1
     vmov        d4, r4, r5
     vmov        d5, r5, r6          ;//reserved r6
 
     FILTER_6TAG_8BITS_AVERAGE_WITH_1    d0, d1, d2, d3, d4, d5, d16, q14, q15
     vmov        r4, r5, d16
-	str	r4, [r2]			;//write 1st 4Byte
-	add r2, r3
-	str	r5, [r2]			;//write 2nd 4Byte
-	add r2, r3
-		
-	ldr		r5, [r0]		;//r5=src[1]
-	add r0, r1
-	ldr		r4, [r0]		;//r4=src[2]
-	add r0, r1
+    str	r4, [r2]			;//write 1st 4Byte
+    add r2, r3
+    str	r5, [r2]			;//write 2nd 4Byte
+    add r2, r3
+
+    ldr		r5, [r0]		;//r5=src[1]
+    add r0, r1
+    ldr		r4, [r0]		;//r4=src[2]
+    add r0, r1
     vmov        d0, r6, r5
     vmov        d1, r5, r4          ;//reserved r4
 
     FILTER_6TAG_8BITS_AVERAGE_WITH_1    d2, d3, d4, d5, d0, d1, d16, q14, q15
     vmov        r5, r6, d16
-	str	r5, [r2]			;//write 3rd 4Byte
-	add r2, r3
-	str	r6, [r2]			;//write 4th 4Byte
-	add r2, r3
+    str	r5, [r2]			;//write 3rd 4Byte
+    add r2, r3
+    str	r6, [r2]			;//write 4th 4Byte
+    add r2, r3
 
     ;//d4, d5, d0, d1 --> d0, d1, d2, d3
     vmov    q1, q0
@@ -1018,25 +1018,25 @@ w8_v_mc_luma_loop
     pld         [r0]
     pld         [r0, r1]
     vmov.u16    q14, #0x0014            ;// 20
-	ldr		r4, [r0]		;//r4=src[-2]
-	add r0, r1
-	ldr		r5, [r0]		;//r5=src[-1]
-	add r0, r1
+    ldr		r4, [r0]		;//r4=src[-2]
+    add r0, r1
+    ldr		r5, [r0]		;//r5=src[-1]
+    add r0, r1
 
     pld         [r0]
     pld         [r0, r1]
     vshr.u16    q15, q14, #2            ;// 5
-	ldr		r6, [r0]		;//r6=src[0]
-	add r0, r1
-	ldr		r7, [r0]		;//r7=src[1]
-	add r0, r1
+    ldr		r6, [r0]		;//r6=src[0]
+    add r0, r1
+    ldr		r7, [r0]		;//r7=src[1]
+    add r0, r1
 
     vmov        d0, r4, r5
     vmov        d1, r5, r6
     vmov        d2, r6, r7
 
-	ldr		r4, [r0]		;//r4=src[2]
-	add r0, r1	
+    ldr		r4, [r0]		;//r4=src[2]
+    add r0, r1
     vmov        d3, r7, r4
     ldr         r7, [sp, #16]
 
@@ -1044,33 +1044,33 @@ w4_v_mc_luma_loop
 
 ;//  pld         [r0]
     ;//using reserving r4
-	ldr		r5, [r0]		;//r5=src[3]
-	add r0, r1
-	ldr		r6, [r0]		;//r6=src[0]
-	add r0, r1	
+     ldr		r5, [r0]		;//r5=src[3]
+     add r0, r1
+     ldr		r6, [r0]		;//r6=src[0]
+     add r0, r1
     vmov        d4, r4, r5
     vmov        d5, r5, r6          ;//reserved r6
 
     FILTER_6TAG_8BITS   d0, d1, d2, d3, d4, d5, d16, q14, q15
     vmov        r4, r5, d16
-	str	r4, [r2]			;//write 1st 4Byte
-	add r2, r3
-	str	r5, [r2]			;//write 2nd 4Byte
-	add r2, r3
-		
-	ldr		r5, [r0]		;//r5=src[1]
-	add r0, r1
-	ldr		r4, [r0]		;//r4=src[2]
-	add r0, r1
+    str	r4, [r2]			;//write 1st 4Byte
+    add r2, r3
+    str	r5, [r2]			;//write 2nd 4Byte
+    add r2, r3
+
+    ldr		r5, [r0]		;//r5=src[1]
+    add r0, r1
+    ldr		r4, [r0]		;//r4=src[2]
+    add r0, r1
     vmov        d0, r6, r5
     vmov        d1, r5, r4          ;//reserved r4
 
     FILTER_6TAG_8BITS   d2, d3, d4, d5, d0, d1, d16, q14, q15
     vmov        r5, r6, d16
-	str	r5, [r2]			;//write 3rd 4Byte
-	add r2, r3
-	str	r6, [r2]			;//write 4th 4Byte
-	add r2, r3
+    str	r5, [r2]			;//write 3rd 4Byte
+    add r2, r3
+    str	r6, [r2]			;//write 4th 4Byte
+    add r2, r3
 
     ;//d4, d5, d0, d1 --> d0, d1, d2, d3
     vmov    q1, q0
@@ -1413,14 +1413,14 @@ w8_copy_loop
     push        {r4, r5, r6}
     ldr         r4, [sp, #12]
 w4_copy_loop
-	ldr		r5, [r0]
-	add r0, r1
-	ldr		r6, [r0]
-	add r0, r1
-	str		r5, [r2]	
-	add r2, r3
-	str		r6, [r2]
-	add r2, r3
+    ldr		r5, [r0]
+    add r0, r1
+    ldr		r6, [r0]
+    add r0, r1
+    str		r5, [r2]
+    add r2, r3
+    str		r6, [r2]
+    add r2, r3
 
     sub         r4, #2
     cmp         r4, #0
@@ -1519,10 +1519,10 @@ w4_pix_avg_loop
     AVERAGE_TWO_8BITS       d0, d0, d1
     vmov        r5, r6, d0
 
-	str		r5, [r0]	
-	add r0, r1
-	str		r6, [r0]
-	add r0, r1
+    str		r5, [r0]
+    add r0, r1
+    str		r6, [r0]
+    add r0, r1
 
     sub         r4, #2
     cmp         r4, #0

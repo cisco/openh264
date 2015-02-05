@@ -30,7 +30,7 @@
 ; *
 ; */
 
- MACRO 
+ MACRO
 WELS_ASM_FUNC_BEGIN    $p1
  ALIGN 2
  GLOBAL $p1

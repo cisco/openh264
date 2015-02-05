@@ -40,7 +40,7 @@
 ;//The table for SIMD instruction {(8,7,6,5,4,3,2,1) * 5}
 CONST0_GET_I16X16_LUMA_PRED_PLANE DCD  0x191e2328, 0x050a0f14
 
-;//The table for SIMD instruction {-7,-6,-5,-4,-3,-2,-1,0}                
+;//The table for SIMD instruction {-7,-6,-5,-4,-3,-2,-1,0}
 CONST1_GET_I16X16_LUMA_PRED_PLANE DCD 0xfcfbfaf9, 0x00fffefd
 
 ;//Table {{1,2,3,4,1,2,3,4}*17}

@@ -802,11 +802,11 @@ BS_COMPARE_MV $0, $1, $2, $3, $4, $5, $6
 MEND
 
  MACRO
-BS_MV_CHECK $0, $1, $2, $3, $4, $5, $6 
+BS_MV_CHECK $0, $1, $2, $3, $4, $5, $6
     ;vldm   $0, {q0,q1,q2,q3}
-	vld1.32  {q0,q1}, [$0]
-	add      r6, $0, #32
-	vld1.32  {q2,q3}, [r6]
+    vld1.32  {q0,q1}, [$0]
+    add      r6, $0, #32
+    vld1.32  {q2,q3}, [r6]
 
     ;/* Arrenge the input data --- TOP */
     ands     r6, $1, #2
