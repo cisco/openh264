@@ -172,7 +172,7 @@ int32_t   iRcVaryPercentage;
 int32_t   iRcVaryRatio;
 
 int32_t   iInitialQp; //initial qp
-int32_t   iBitRate;
+int64_t   iBitRate; // Note: although the max bit rate is 240000*1200 which can be represented by int32, but there are many multipler of this iBitRate in the calculation of RC, so use int64 to avoid type conversion at all such places
 int32_t   iPreviousBitrate;
 int32_t   iPreviousGopSize;
 double    fFrameRate;
@@ -186,7 +186,7 @@ int32_t   iTargetBits;
 int32_t   iCurrentBitsLevel;//0:normal; 1:limited; 2:exceeded.
 
 int32_t   iIdrNum;
-int32_t   iIntraComplexity;
+int64_t   iIntraComplexity; //255*255(MaxMbSAD)*36864(MaxFS) make the highest bit of 32-bit integer 1
 int32_t   iIntraMbCount;
 
 int8_t    iTlOfFrames[VGOP_SIZE];

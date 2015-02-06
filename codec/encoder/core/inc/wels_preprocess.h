@@ -62,9 +62,9 @@ typedef  struct {
 
 
 typedef struct {
-  int32_t iMinFrameComplexity;
-  int32_t iMinFrameComplexity08;
-  int32_t iMinFrameComplexity11;
+  int64_t iMinFrameComplexity;
+  int64_t iMinFrameComplexity08;
+  int64_t iMinFrameComplexity11;
 
   int32_t iMinFrameNumGap;
   int32_t iMinFrameQp;
@@ -176,9 +176,9 @@ class CWelsPreProcess {
   void GetAvailableRefList (SPicture** pSrcPicList, uint8_t iCurTid, const int32_t iClosestLtrFrameNum,
                             SRefInfoParam* pAvailableRefList, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum);
   void InitRefJudgement (SRefJudgement* pRefJudgement);
-  bool JudgeBestRef (SPicture* pRefPic, const SRefJudgement& sRefJudgement, const int32_t iFrameComplexity,
+  bool JudgeBestRef (SPicture* pRefPic, const SRefJudgement& sRefJudgement, const int64_t iFrameComplexity,
                      const bool bIsClosestLtrFrame);
-  void SaveBestRefToJudgement (const int32_t iRefPictureAvQP, const int32_t iComplexity, SRefJudgement* pRefJudgement);
+  void SaveBestRefToJudgement (const int32_t iRefPictureAvQP, const int64_t iComplexity, SRefJudgement* pRefJudgement);
   void SaveBestRefToLocal (SRefInfoParam* pRefPicInfo, const SSceneChangeResult& sSceneChangeResult,
                            SRefInfoParam* pRefSaved);
   void SaveBestRefToVaa (SRefInfoParam& sRefSaved, SRefInfoParam* pVaaBestRef);
