@@ -163,7 +163,7 @@ typedef struct {
 typedef struct {
   ESceneChangeIdc eSceneChangeIdc; // SIMILAR_SCENE, MEDIUM_CHANGED_SCENE, LARGE_CHANGED_SCENE
   int             iMotionBlockNum; // Number of motion blocks
-  int             iFrameComplexity; // frame complexity
+  long long       iFrameComplexity; // frame complexity
   unsigned char* pStaticBlockIdc;   // static block idc
   SScrollDetectionParam sScrollResult; //results from scroll detection
 } SSceneChangeResult;
@@ -222,7 +222,7 @@ typedef struct {
   int  iComplexityAnalysisMode;
   int  iCalcBgd;
   int  iMbNumInGom;
-  int  iFrameComplexity;
+  long long  iFrameComplexity;
   int*  pGomComplexity;
   int*  pGomForegroundBlockNum;
   signed char*  pBackgroundMbFlag;
@@ -234,7 +234,7 @@ typedef struct {
   int  iMbRowInGom;
   int*  pGomComplexity;
   int  iGomNumInFrame;
-  int  iFrameComplexity;
+  long long  iFrameComplexity; //255*255(MaxMbSAD)*36864(MaxFS) make the highest bit of 32-bit integer 1
   int  iIdrFlag;
   SScrollDetectionParam sScrollResult;
 } SComplexityAnalysisScreenParam;

@@ -955,13 +955,13 @@ void CWelsPreProcess::InitRefJudgement (SRefJudgement* pRefJudgement) {
   pRefJudgement->iMinFrameQp = INT_MAX;
 }
 bool CWelsPreProcess::JudgeBestRef (SPicture* pRefPic, const SRefJudgement& sRefJudgement,
-                                    const int32_t iFrameComplexity, const bool bIsClosestLtrFrame) {
+                                    const int64_t iFrameComplexity, const bool bIsClosestLtrFrame) {
   return (bIsClosestLtrFrame ? (iFrameComplexity < sRefJudgement.iMinFrameComplexity11) :
           ((iFrameComplexity < sRefJudgement.iMinFrameComplexity08) || ((iFrameComplexity <= sRefJudgement.iMinFrameComplexity11)
               && (pRefPic->iFrameAverageQp < sRefJudgement.iMinFrameQp))));
 }
 
-void CWelsPreProcess::SaveBestRefToJudgement (const int32_t iRefPictureAvQP, const int32_t iComplexity,
+void CWelsPreProcess::SaveBestRefToJudgement (const int32_t iRefPictureAvQP, const int64_t iComplexity,
     SRefJudgement* pRefJudgement) {
   pRefJudgement->iMinFrameQp = iRefPictureAvQP;
   pRefJudgement->iMinFrameComplexity =  iComplexity;
@@ -1077,7 +1077,7 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
     if (ret == 0) {
       m_pInterfaceVp->Get (iSceneChangeMethodIdx, (void*)&sSceneChangeResult);
 
-      const int32_t iFrameComplexity = sSceneChangeResult.iFrameComplexity;
+      const int64_t iFrameComplexity = sSceneChangeResult.iFrameComplexity;
       const int32_t iSceneDetectIdc = sSceneChangeResult.eSceneChangeIdc;
       const int32_t iMotionBlockNum = sSceneChangeResult.iMotionBlockNum;
 
