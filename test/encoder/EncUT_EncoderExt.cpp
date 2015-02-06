@@ -491,13 +491,9 @@ TEST_F (EncoderInterfaceTest, BasicInitializeTest) {
   GetValidEncParamBase (&sEncParamBase);
 
   int iResult = pPtrEnc->Initialize (&sEncParamBase);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  if (iResult != cmResultSuccess) {
-    fprintf (stderr, "Unexpected ParamBase? \
-             iUsageType=%d, Pic=%dx%d, TargetBitrate=%d, iRCMode=%d, fMaxFrameRate=%.1f\n",
-             sEncParamBase.iUsageType, sEncParamBase.iPicWidth, sEncParamBase.iPicHeight,
-             sEncParamBase.iTargetBitrate, sEncParamBase.iRCMode, sEncParamBase.fMaxFrameRate);
-  }
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess)) << "iUsageType = " << sEncParamBase.iUsageType <<
+      ", iPicWidth = " << sEncParamBase.iPicWidth << ", iPicHeight = " << sEncParamBase.iPicHeight << ", iTargetBitrate = " <<
+      sEncParamBase.iTargetBitrate << ", fMaxFrameRate = " << sEncParamBase.fMaxFrameRate;
 
   PrepareOneSrcFrame();
 
@@ -514,13 +510,9 @@ TEST_F (EncoderInterfaceTest, BaseParamSettingTest) {
   GetValidEncParamBase (&sEncParamBase);
 
   int iResult = pPtrEnc->Initialize (&sEncParamBase);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  if (iResult != cmResultSuccess) {
-    fprintf (stderr, "Unexpected ParamBase? \
-                 iUsageType=%d, Pic=%dx%d, TargetBitrate=%d, iRCMode=%d, fMaxFrameRate=%.1f\n",
-             sEncParamBase.iUsageType, sEncParamBase.iPicWidth, sEncParamBase.iPicHeight,
-             sEncParamBase.iTargetBitrate, sEncParamBase.iRCMode, sEncParamBase.fMaxFrameRate);
-  }
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess)) << "iUsageType = " << sEncParamBase.iUsageType <<
+      ", iPicWidth = " << sEncParamBase.iPicWidth << ", iPicHeight = " << sEncParamBase.iPicHeight << ", iTargetBitrate = " <<
+      sEncParamBase.iTargetBitrate << ", fMaxFrameRate = " << sEncParamBase.fMaxFrameRate;
 
   PrepareOneSrcFrame();
 
@@ -630,13 +622,9 @@ TEST_F (EncoderInterfaceTest, ForceIntraFrame) {
   GetValidEncParamBase (&sEncParamBase);
 
   int iResult = pPtrEnc->Initialize (&sEncParamBase);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  if (iResult != cmResultSuccess) {
-    fprintf (stderr, "Unexpected ParamBase? \
-             iUsageType=%d, Pic=%dx%d, TargetBitrate=%d, iRCMode=%d, fMaxFrameRate=%.1f\n",
-             sEncParamBase.iUsageType, sEncParamBase.iPicWidth, sEncParamBase.iPicHeight,
-             sEncParamBase.iTargetBitrate, sEncParamBase.iRCMode, sEncParamBase.fMaxFrameRate);
-  }
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess)) << "iUsageType = " << sEncParamBase.iUsageType <<
+      ", iPicWidth = " << sEncParamBase.iPicWidth << ", iPicHeight = " << sEncParamBase.iPicHeight << ", iTargetBitrate = " <<
+      sEncParamBase.iTargetBitrate << ", fMaxFrameRate = " << sEncParamBase.fMaxFrameRate;
 
   PrepareOneSrcFrame();
 
@@ -680,13 +668,9 @@ TEST_F (EncoderInterfaceTest, ForceIntraFrameWithTemporal) {
   sEncParamExt.iTemporalLayerNum = (iTargetTemporalLayerNum > 2) ? iTargetTemporalLayerNum : 2;
 
   int iResult = pPtrEnc->InitializeExt (&sEncParamExt);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  if (iResult != cmResultSuccess) {
-    fprintf (stderr, "Unexpected ParamBase? \
-             iUsageType=%d, Pic=%dx%d, TargetBitrate=%d, iRCMode=%d, fMaxFrameRate=%.1f\n",
-             sEncParamExt.iUsageType, sEncParamExt.iPicWidth, sEncParamExt.iPicHeight,
-             sEncParamExt.iTargetBitrate, sEncParamExt.iRCMode, sEncParamExt.fMaxFrameRate);
-  }
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess)) << "iUsageType = " << sEncParamExt.iUsageType <<
+      ", iPicWidth = " << sEncParamExt.iPicWidth << ", iPicHeight = " << sEncParamExt.iPicHeight << ", iTargetBitrate = " <<
+      sEncParamExt.iTargetBitrate << ", fMaxFrameRate = " << sEncParamExt.fMaxFrameRate;
 
   PrepareOneSrcFrame();
 
@@ -712,13 +696,9 @@ TEST_F (EncoderInterfaceTest, EncodeParameterSets) {
   GetValidEncParamBase (&sEncParamBase);
 
   int iResult = pPtrEnc->Initialize (&sEncParamBase);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  if (iResult != cmResultSuccess) {
-    fprintf (stderr, "Unexpected ParamBase? \
-             iUsageType=%d, Pic=%dx%d, TargetBitrate=%d, iRCMode=%d, fMaxFrameRate=%.1f\n",
-             sEncParamBase.iUsageType, sEncParamBase.iPicWidth, sEncParamBase.iPicHeight,
-             sEncParamBase.iTargetBitrate, sEncParamBase.iRCMode, sEncParamBase.fMaxFrameRate);
-  }
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess)) << "iUsageType = " << sEncParamBase.iUsageType <<
+      ", iPicWidth = " << sEncParamBase.iPicWidth << ", iPicHeight = " << sEncParamBase.iPicHeight << ", iTargetBitrate = " <<
+      sEncParamBase.iTargetBitrate << ", fMaxFrameRate = " << sEncParamBase.fMaxFrameRate;
   PrepareOneSrcFrame();
   EncodeOneIDRandP (pPtrEnc);
 
@@ -801,13 +781,9 @@ TEST_F (EncoderInterfaceTest, GetStatistics) {
   GetValidEncParamBase (&sEncParamBase);
 
   int iResult = pPtrEnc->Initialize (&sEncParamBase);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  if (iResult != cmResultSuccess) {
-    fprintf (stderr, "Unexpected ParamBase? \
-             iUsageType=%d, Pic=%dx%d, TargetBitrate=%d, iRCMode=%d, fMaxFrameRate=%.1f\n",
-             sEncParamBase.iUsageType, sEncParamBase.iPicWidth, sEncParamBase.iPicHeight,
-             sEncParamBase.iTargetBitrate, sEncParamBase.iRCMode, sEncParamBase.fMaxFrameRate);
-  }
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess)) << "iUsageType = " << sEncParamBase.iUsageType <<
+      ", iPicWidth = " << sEncParamBase.iPicWidth << ", iPicHeight = " << sEncParamBase.iPicHeight << ", iTargetBitrate = " <<
+      sEncParamBase.iTargetBitrate << ", fMaxFrameRate = " << sEncParamBase.fMaxFrameRate;
 
   PrepareOneSrcFrame();
   EncodeOneIDRandP (pPtrEnc);
@@ -868,13 +844,9 @@ TEST_F (EncoderInterfaceTest, FrameSizeCheck) {
   GetValidEncParamBase (&sEncParamBase);
 
   int iResult = pPtrEnc->Initialize (&sEncParamBase);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  if (iResult != cmResultSuccess) {
-    fprintf (stderr, "Unexpected ParamBase? \
-             iUsageType=%d, Pic=%dx%d, TargetBitrate=%d, iRCMode=%d, fMaxFrameRate=%.1f\n",
-             sEncParamBase.iUsageType, sEncParamBase.iPicWidth, sEncParamBase.iPicHeight,
-             sEncParamBase.iTargetBitrate, sEncParamBase.iRCMode, sEncParamBase.fMaxFrameRate);
-  }
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess)) << "iUsageType = " << sEncParamBase.iUsageType <<
+      ", iPicWidth = " << sEncParamBase.iPicWidth << ", iPicHeight = " << sEncParamBase.iPicHeight << ", iTargetBitrate = " <<
+      sEncParamBase.iTargetBitrate << ", fMaxFrameRate = " << sEncParamBase.fMaxFrameRate;
 
   PrepareOneSrcFrame();
   iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
@@ -925,13 +897,9 @@ TEST_F (EncoderInterfaceTest, SkipFrameCheck) {
   pParamExt->iPicHeight = sEncParamExt.sSpatialLayers[0].iVideoHeight;
 
   iResult = pPtrEnc->InitializeExt (&sEncParamExt);
-  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-  if (iResult != cmResultSuccess) {
-    fprintf (stderr, "Unexpected sEncParamExt? \
-             iUsageType=%d, Pic=%dx%d, TargetBitrate=%d, iRCMode=%d, fMaxFrameRate=%.1f\n",
-             sEncParamExt.iUsageType, sEncParamExt.iPicWidth, sEncParamExt.iPicHeight,
-             sEncParamExt.iTargetBitrate, sEncParamExt.iRCMode, sEncParamExt.fMaxFrameRate);
-  }
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess)) << "iUsageType = " << sEncParamExt.iUsageType <<
+      ", iPicWidth = " << sEncParamExt.iPicWidth << ", iPicHeight = " << sEncParamExt.iPicHeight << ", iTargetBitrate = " <<
+      sEncParamExt.iTargetBitrate << ", fMaxFrameRate = " << sEncParamExt.fMaxFrameRate;
 
   int iInterval = 300;
   iResult = pPtrEnc->SetOption (ENCODER_OPTION_STATISTICS_LOG_INTERVAL, &iInterval);
