@@ -89,10 +89,6 @@ typedef struct TagParaSetOffset {
   int32_t  eSpsPpsIdStrategy;
 #endif
 
-  uint32_t uiNeededSpsNum;
-  uint32_t uiNeededSubsetSpsNum;
-  uint32_t uiNeededPpsNum;
-
   uint32_t uiInUseSpsNum;
   uint32_t uiInUseSubsetSpsNum;
   uint32_t uiInUsePpsNum;
