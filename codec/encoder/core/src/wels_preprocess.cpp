@@ -45,6 +45,9 @@ namespace WelsEnc {
 int32_t WelsInitScaledPic (SWelsSvcCodingParam* pParam,  Scaled_Picture*  pScaledPic, CMemoryAlign* pMemoryAlign);
 bool  JudgeNeedOfScaling (SWelsSvcCodingParam* pParam, Scaled_Picture* pScaledPic);
 void    FreeScaledPic (Scaled_Picture*  pScaledPic, CMemoryAlign* pMemoryAlign);
+void  WelsMoveMemory_c (uint8_t* pDstY, uint8_t* pDstU, uint8_t* pDstV,  int32_t iDstStrideY, int32_t iDstStrideUV,
+                        uint8_t* pSrcY, uint8_t* pSrcU, uint8_t* pSrcV, int32_t iSrcStrideY, int32_t iSrcStrideUV, int32_t iWidth,
+                        int32_t iHeight);
 
 //******* table definition ***********************************************************************//
 const uint8_t g_kuiRefTemporalIdx[MAX_TEMPORAL_LEVEL][MAX_GOP_SIZE] = {
@@ -329,7 +332,7 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
     iShrinkWidth = pScaledPicture->iScaledWidth[iDependencyId];
     iShrinkHeight = pScaledPicture->iScaledHeight[iDependencyId];
   }
-  DownsamplePadding (pSrcPic, pDstPic, iSrcWidth, iSrcHeight, iShrinkWidth, iShrinkHeight, iTargetWidth, iTargetHeight);
+  DownsamplePadding (pSrcPic, pDstPic, iSrcWidth, iSrcHeight, iShrinkWidth, iShrinkHeight, iTargetWidth, iTargetHeight, false);
 
   if (pSvcParam->bEnableSceneChangeDetect && !pCtx->pVaa->bIdrPeriodFlag) {
     if (pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
@@ -384,7 +387,7 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
         pDstPic	= m_pSpatialPic[iDependencyId][iPicturePos];	// small
         iShrinkWidth = pScaledPicture->iScaledWidth[iDependencyId];
         iShrinkHeight = pScaledPicture->iScaledHeight[iDependencyId];
-        DownsamplePadding (pSrcPic, pDstPic, iSrcWidth, iSrcHeight, iShrinkWidth, iShrinkHeight, iTargetWidth, iTargetHeight);
+        DownsamplePadding (pSrcPic, pDstPic, iSrcWidth, iSrcHeight, iShrinkWidth, iShrinkHeight, iTargetWidth, iTargetHeight, true);
 
         WelsUpdateSpatialIdxMap (pCtx, iActualSpatialLayerNum - 1, pDstPic, iDependencyId);
 
@@ -534,7 +537,7 @@ bool CWelsPreProcess::DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPi
 }
 
 int32_t CWelsPreProcess::DownsamplePadding (SPicture* pSrc, SPicture* pDstPic,  int32_t iSrcWidth, int32_t iSrcHeight,
-    int32_t iShrinkWidth, int32_t iShrinkHeight, int32_t iTargetWidth, int32_t iTargetHeight) {
+    int32_t iShrinkWidth, int32_t iShrinkHeight, int32_t iTargetWidth, int32_t iTargetHeight, bool bForceCopy) {
   int32_t iRet = 0;
   SPixMap sSrcPixMap;
   SPixMap sDstPicMap;
@@ -551,7 +554,7 @@ int32_t CWelsPreProcess::DownsamplePadding (SPicture* pSrc, SPicture* pDstPic,  
   sSrcPixMap.iStride[2]  = pSrc->iLineSize[2];
   sSrcPixMap.eFormat     = VIDEO_FORMAT_I420;
 
-  if (iSrcWidth != iShrinkWidth || iSrcHeight != iShrinkHeight) {
+  if (iSrcWidth != iShrinkWidth || iSrcHeight != iShrinkHeight || bForceCopy) {
     int32_t iMethodIdx = METHOD_DOWNSAMPLE;
     sDstPicMap.pPixel[0]   = pDstPic->pData[0];
     sDstPicMap.pPixel[1]   = pDstPic->pData[1];
@@ -564,7 +567,13 @@ int32_t CWelsPreProcess::DownsamplePadding (SPicture* pSrc, SPicture* pDstPic,  
     sDstPicMap.iStride[2]  = pDstPic->iLineSize[2];
     sDstPicMap.eFormat     = VIDEO_FORMAT_I420;
 
-    iRet = m_pInterfaceVp->Process (iMethodIdx, &sSrcPixMap, &sDstPicMap);
+    if (iSrcWidth != iShrinkWidth || iSrcHeight != iShrinkHeight) {
+      iRet = m_pInterfaceVp->Process (iMethodIdx, &sSrcPixMap, &sDstPicMap);
+    } else {
+      WelsMoveMemory_c (pDstPic->pData[0], pDstPic->pData[1], pDstPic->pData[2], pDstPic->iLineSize[0], pDstPic->iLineSize[1],
+                        pSrc->pData[0], pSrc->pData[1], pSrc->pData[2], pSrc->iLineSize[0], pSrc->iLineSize[1],
+                        iSrcWidth, iSrcHeight);
+    }
   } else {
     memcpy (&sDstPicMap, &sSrcPixMap, sizeof (sDstPicMap));	// confirmed_safe_unsafe_usage
   }
