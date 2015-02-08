@@ -38,13 +38,13 @@ OS Support
 - Windows 64-bit and 32-bit
 - Mac OS X 64-bit and 32-bit
 - Linux 64-bit and 32-bit
-- Android 32-bit
+- Android 64-bit and 32-bit
 - iOS 64-bit and 32-bit
 
 Processor Support
 -----------------
 - Intel x86 optionally with MMX/SSE (no AVX yet, help is welcome)
-- ARMv7 optionally with NEON
+- ARMv7 optionally with NEON, AArch64 optionally with NEON
 - Any architecture using C/C++ fallback functions
 
 Building the Library
