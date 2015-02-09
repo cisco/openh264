@@ -3030,7 +3030,8 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_PPS_LISTING3) {
 
 
 TEST_F (EncodeDecodeTestAPI, SimulcastSVC) {
-  int iSpatialLayerNum = WelsClip3 ((rand() % MAX_SPATIAL_LAYER_NUM), 2, MAX_SPATIAL_LAYER_NUM);
+#define LAYER_NUM (4)
+  int iSpatialLayerNum = WelsClip3 ((rand() % LAYER_NUM), 2, LAYER_NUM);
   int iWidth       = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 1 << iSpatialLayerNum, MAX_WIDTH);
   int iHeight      = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1)  + 1) << 1, 1 << iSpatialLayerNum, MAX_HEIGHT);
   float fFrameRate = rand() + 0.5f;
@@ -3042,12 +3043,12 @@ TEST_F (EncodeDecodeTestAPI, SimulcastSVC) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
 
-  unsigned char*  pBsBuf[MAX_SPATIAL_LAYER_NUM];
-  int aLen[MAX_SPATIAL_LAYER_NUM] = {0};
-  ISVCDecoder* decoder[MAX_SPATIAL_LAYER_NUM];
+  unsigned char*  pBsBuf[LAYER_NUM];
+  int aLen[LAYER_NUM] = {0};
+  ISVCDecoder* decoder[LAYER_NUM];
 
 #ifdef DEBUG_FILE_SAVE2
-  FILE* fEnc[MAX_SPATIAL_LAYER_NUM] = { NULL };
+  FILE* fEnc[LAYER_NUM] = { NULL };
   fEnc[0] = fopen ("enc0.264", "wb");
   fEnc[1] = fopen ("enc1.264", "wb");
   fEnc[2] = fopen ("enc2.264", "wb");
@@ -3058,12 +3059,11 @@ TEST_F (EncodeDecodeTestAPI, SimulcastSVC) {
   int iIdx = 0;
   for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
     pBsBuf[iIdx] = static_cast<unsigned char*> (malloc (iWidth * iHeight * 3 * sizeof (unsigned char) / 2));
-    EXPECT_TRUE (pBsBuf[iIdx] != NULL);
     aLen[iIdx] = 0;
 
     long rv = WelsCreateDecoder (&decoder[iIdx]);
     ASSERT_EQ (0, rv);
-    EXPECT_TRUE (decoder[iIdx] != NULL);
+    ASSERT_TRUE (decoder[iIdx] != NULL);
 
     SDecodingParam decParam;
     memset (&decParam, 0, sizeof (SDecodingParam));
@@ -3144,7 +3144,8 @@ TEST_F (EncodeDecodeTestAPI, SimulcastSVC) {
 
 TEST_F (EncodeDecodeTestAPI, SimulcastAVC) {
 //#define DEBUG_FILE_SAVE3
-  int iSpatialLayerNum = WelsClip3 ((rand() % MAX_SPATIAL_LAYER_NUM), 2, MAX_SPATIAL_LAYER_NUM);
+#define LAYER_NUM (4)
+  int iSpatialLayerNum = WelsClip3 ((rand() % LAYER_NUM), 2, LAYER_NUM);
   int iWidth       = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 1 << iSpatialLayerNum, MAX_WIDTH);
   int iHeight      = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1)  + 1) << 1, 1 << iSpatialLayerNum, MAX_HEIGHT);
   float fFrameRate = rand() + 0.5f;
@@ -3159,12 +3160,12 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVC) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
 
-  unsigned char*  pBsBuf[MAX_SPATIAL_LAYER_NUM];
-  int aLen[MAX_SPATIAL_LAYER_NUM] = {0};
-  ISVCDecoder* decoder[MAX_SPATIAL_LAYER_NUM];
+  unsigned char*  pBsBuf[LAYER_NUM];
+  int aLen[LAYER_NUM] = {0};
+  ISVCDecoder* decoder[LAYER_NUM];
 
 #ifdef DEBUG_FILE_SAVE3
-  FILE* fEnc[MAX_SPATIAL_LAYER_NUM];
+  FILE* fEnc[LAYER_NUM];
   fEnc[0] = fopen ("enc0.264", "wb");
   fEnc[1] = fopen ("enc1.264", "wb");
   fEnc[2] = fopen ("enc2.264", "wb");
@@ -3176,12 +3177,11 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVC) {
   //create decoder
   for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
     pBsBuf[iIdx] = static_cast<unsigned char*> (malloc (iWidth * iHeight * 3 * sizeof (unsigned char) / 2));
-    EXPECT_TRUE (pBsBuf[iIdx] != NULL);
     aLen[iIdx] = 0;
 
     long rv = WelsCreateDecoder (&decoder[iIdx]);
     ASSERT_EQ (0, rv);
-    EXPECT_TRUE (decoder[iIdx] != NULL);
+    ASSERT_TRUE (decoder[iIdx] != NULL);
 
     SDecodingParam decParam;
     memset (&decParam, 0, sizeof (SDecodingParam));
