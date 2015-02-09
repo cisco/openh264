@@ -3210,6 +3210,9 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVC) {
     for (int iLayer = 0; iLayer < info.iLayerNum; ++iLayer) {
       iLayerLen = 0;
       const SLayerBSInfo& layerInfo = info.sLayerInfo[iLayer];
+      const int kiFirstNalType = ((* (layerInfo.pBsBuf + 4)) & 0x1f);
+      ASSERT_TRUE ((kiFirstNalType == NAL_SPS) || (kiFirstNalType == NAL_PPS) || (kiFirstNalType == NAL_SLICE)
+                   || (kiFirstNalType == NAL_SLICE_IDR) || (kiFirstNalType == NAL_SEI));
       for (int iNal = 0; iNal < layerInfo.iNalCount; ++iNal) {
         iLayerLen += layerInfo.pNalLengthInByte[iNal];
       }
