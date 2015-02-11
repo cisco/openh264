@@ -355,6 +355,13 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
     pCodingParam->eSpsPpsIdStrategy = INCREASING_ID;
   }
 
+  if (pCodingParam->bSimulcastAVC && pCodingParam->bPrefixNalAddingCtrl) {
+    WelsLog (pLogCtx, WELS_LOG_INFO,
+             "ParamValidationExt(), bSimulcastAVC(%d) is not compatible with bPrefixNalAddingCtrl(%d) true, adjusted bPrefixNalAddingCtrl to false",
+             pCodingParam->eSpsPpsIdStrategy, pCodingParam->bSimulcastAVC);
+    pCodingParam->bPrefixNalAddingCtrl = false;
+  }
+
   for (i = 0; i < pCodingParam->iSpatialLayerNum; ++ i) {
     SSpatialLayerConfig* pSpatialLayer = &pCodingParam->sSpatialLayers[i];
     const int32_t kiPicWidth = pSpatialLayer->iVideoWidth;
@@ -3689,9 +3696,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
     iNalIdxInLayer	= 0;
     bAvcBased	= ((pSvcParam->bSimulcastAVC) || (iCurDid == BASE_DEPENDENCY_ID));
-    pCtx->bNeedPrefixNalFlag	= (bAvcBased &&
+    pCtx->bNeedPrefixNalFlag	= ((!pSvcParam->bSimulcastAVC) && (bAvcBased &&
                                  (pSvcParam->bPrefixNalAddingCtrl ||
-                                  (pSvcParam->iSpatialLayerNum > 1)));
+                                  (pSvcParam->iSpatialLayerNum > 1))));
 
     if (eFrameType == videoFrameTypeP) {
       eNalType	= bAvcBased ? NAL_UNIT_CODED_SLICE : NAL_UNIT_CODED_SLICE_EXT;
