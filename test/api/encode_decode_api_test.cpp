@@ -224,6 +224,80 @@ class EncodeDecodeTestAPIBase : public EncodeDecodeTestBase {
       fwrite (info.sLayerInfo[0].pBsBuf, iLen, 1, pfEnc);
     }
   }
+
+  void TestOneSimulcastAVC (SEncParamExt* pParam, ISVCDecoder** decoder, unsigned char** pBsBuf, int iSpatialLayerNum,
+                            int iEncFrameNum,
+                            int iCallTimes) {
+//#define DEBUG_FILE_SAVE4
+    int aLen[MAX_SPATIAL_LAYER_NUM] = {0, 0, 0, 0};
+#ifdef DEBUG_FILE_SAVE4
+    FILE* fEnc[MAX_SPATIAL_LAYER_NUM];
+    if (iCallTimes == 0) {
+      fEnc[0] = fopen ("enc00.264", "wb");
+      fEnc[1] = fopen ("enc01.264", "wb");
+      fEnc[2] = fopen ("enc02.264", "wb");
+      fEnc[3] = fopen ("enc03.264", "wb");
+    } else {
+      fEnc[0] = fopen ("enc10.264", "wb");
+      fEnc[1] = fopen ("enc11.264", "wb");
+      fEnc[2] = fopen ("enc12.264", "wb");
+      fEnc[3] = fopen ("enc13.264", "wb");
+    }
+#endif
+
+    int rv = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, pParam);
+    ASSERT_TRUE (rv == cmResultSuccess) << "SetOption Failed pParam: rv = " << rv;
+
+    int iIdx;
+    //begin testing
+    for (int iFrame = 0; iFrame < iEncFrameNum; iFrame++) {
+      int iResult;
+      int iLayerLen = 0;
+      unsigned char* pData[3] = { NULL };
+
+      InitialEncDec (pParam->iPicWidth, pParam->iPicHeight);
+      EncodeOneFrame (0);
+
+      // init
+      for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
+        aLen[iIdx] = 0;
+      }
+      for (int iLayer = 0; iLayer < info.iLayerNum; ++iLayer) {
+        iLayerLen = 0;
+        const SLayerBSInfo& layerInfo = info.sLayerInfo[iLayer];
+        for (int iNal = 0; iNal < layerInfo.iNalCount; ++iNal) {
+          iLayerLen += layerInfo.pNalLengthInByte[iNal];
+        }
+
+        iIdx = layerInfo.uiSpatialId;
+        EXPECT_TRUE (iIdx < iSpatialLayerNum) << "iIdx = " << iIdx << ", iSpatialLayerNum = " << iSpatialLayerNum;
+        memcpy ((pBsBuf[iIdx] + aLen[iIdx]), layerInfo.pBsBuf, iLayerLen * sizeof (unsigned char));
+        aLen[iIdx] += iLayerLen;
+      }
+
+      for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
+        pData[0] = pData[1] = pData[2] = 0;
+        memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+
+#ifdef DEBUG_FILE_SAVE4
+        fwrite (pBsBuf[iIdx], aLen[iIdx], 1, fEnc[iIdx]);
+#endif
+        iResult = decoder[iIdx]->DecodeFrame2 (pBsBuf[iIdx], aLen[iIdx], pData, &dstBufInfo_);
+        EXPECT_TRUE (iResult == cmResultSuccess) << "iResult=" << iResult << ", LayerIdx=" << iIdx;
+
+        iResult = decoder[iIdx]->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_);
+        EXPECT_TRUE (iResult == cmResultSuccess) << "iResult=" << iResult << ", LayerIdx=" << iIdx;
+        EXPECT_EQ (dstBufInfo_.iBufferStatus, 1) << "LayerIdx=" << iIdx;
+      }
+    }
+
+#ifdef DEBUG_FILE_SAVE4
+    fclose (fEnc[0]);
+    fclose (fEnc[1]);
+    fclose (fEnc[2]);
+    fclose (fEnc[3]);
+#endif
+  }
 };
 
 class EncodeDecodeTestAPI : public ::testing::TestWithParam<EncodeDecodeFileParamBase>, public EncodeDecodeTestAPIBase {
@@ -3194,7 +3268,7 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVC) {
     ASSERT_EQ (0, rv);
   }
 
-  iEncFrameNum = 1;
+  iEncFrameNum = 10;
   for (int iFrame = 0; iFrame < iEncFrameNum; iFrame++) {
     int iResult;
     int iLayerLen = 0;
@@ -3237,7 +3311,6 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVC) {
       EXPECT_TRUE (iResult == cmResultSuccess) << "iResult=" << iResult << "LayerIdx=" << iIdx;
       EXPECT_EQ (dstBufInfo_.iBufferStatus, 1) << "LayerIdx=" << iIdx;
     }
-
   }
 
   for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
@@ -3247,9 +3320,72 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVC) {
       decoder[iIdx]->Uninitialize();
       WelsDestroyDecoder (decoder[iIdx]);
     }
-#ifdef DEBUG_FILE_SAVE3
-    fclose (fEnc[iIdx]);
-#endif
+  }
+}
+
+TEST_F (EncodeDecodeTestAPI, SimulcastAVC_SPS_PPS_LISTING) {
+  int iSpatialLayerNum = WelsClip3 ((rand() % MAX_SPATIAL_LAYER_NUM), 2, MAX_SPATIAL_LAYER_NUM);;
+  int iWidth       = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 1 << iSpatialLayerNum, MAX_WIDTH);
+  int iHeight      = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1)  + 1) << 1, 1 << iSpatialLayerNum, MAX_HEIGHT);
+  float fFrameRate = rand() + 0.5f;
+  int iEncFrameNum = WelsClip3 ((rand() % ENCODE_FRAME_NUM) + 1, 1, ENCODE_FRAME_NUM);
+  int iSliceNum        = 1;
+
+  // prepare params
+  SEncParamExt   sParam1;
+  SEncParamExt   sParam2;
+  encoder_->GetDefaultParams (&sParam1);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
+  //set flag of SPS_PPS_LISTING
+  sParam1.eSpsPpsIdStrategy = SPS_PPS_LISTING;//SPS_LISTING;//
+  //set flag of bSimulcastAVC
+  sParam1.bSimulcastAVC = true;
+  //prepare param2
+  memcpy (&sParam2, &sParam1, sizeof (SEncParamExt));
+  sParam2.sSpatialLayers[0].iVideoWidth = (sParam1.sSpatialLayers[0].iVideoWidth / 2);
+  sParam2.sSpatialLayers[0].iVideoHeight = (sParam1.sSpatialLayers[0].iVideoHeight / 2);
+
+  int rv = encoder_->InitializeExt (&sParam1);
+  ASSERT_TRUE (rv == cmResultSuccess) << "Init Failed sParam1: rv = " << rv;;
+  rv = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam2);
+  ASSERT_TRUE (rv == cmResultSuccess) << "SetOption Failed sParam2: rv = " << rv;
+
+  unsigned char*  pBsBuf[MAX_SPATIAL_LAYER_NUM];
+  ISVCDecoder* decoder[MAX_SPATIAL_LAYER_NUM];
+
+  int iIdx = 0;
+
+  //create decoder
+  for (int iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
+    pBsBuf[iIdx] = static_cast<unsigned char*> (malloc (iWidth * iHeight * 3 * sizeof (unsigned char) / 2));
+    EXPECT_TRUE (pBsBuf[iIdx] != NULL);
+
+    long rv = WelsCreateDecoder (&decoder[iIdx]);
+    ASSERT_EQ (0, rv);
+    EXPECT_TRUE (decoder[iIdx] != NULL);
+
+    SDecodingParam decParam;
+    memset (&decParam, 0, sizeof (SDecodingParam));
+    decParam.eOutputColorFormat  = videoFormatI420;
+    decParam.uiTargetDqLayer = UCHAR_MAX;
+    decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
+    decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
+
+    rv = decoder[iIdx]->Initialize (&decParam);
+    ASSERT_EQ (0, rv);
+  }
+
+  TestOneSimulcastAVC (&sParam1, decoder, pBsBuf, iSpatialLayerNum, iEncFrameNum, 0);
+  TestOneSimulcastAVC (&sParam2, decoder, pBsBuf, iSpatialLayerNum, iEncFrameNum, 1);
+
+  for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
+    free (pBsBuf[iIdx]);
+
+    if (decoder[iIdx] != NULL) {
+      decoder[iIdx]->Uninitialize();
+      WelsDestroyDecoder (decoder[iIdx]);
+    }
+
   }
 }
 
@@ -3398,5 +3534,4 @@ TEST_P (EncodeTestAPI, SetEncOptionSize) {
     fclose (pFile);
   }
 }
-
 
