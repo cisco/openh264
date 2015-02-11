@@ -3254,31 +3254,49 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVC) {
 }
 
 struct EncodeOptionParam {
-  int iCaseId;
+  bool bTestNalSize;
+  bool bAllRandom;
+  bool bTestDecoder;
   int iNumframes;
   int iWidth;
   int iHeight;
   int iQp;
+  SliceModeEnum eSliceMode;
   int uiMaxNalLen;
   float fFramerate;
   int iThreads;
+  std::string sFileSave;
 };
 
 static const EncodeOptionParam kOptionParamArray[] = {
-  {0, 30, 600, 460, 1, 450, 15.0, 1},
-  {1, 30, 340, 96, 24, 1000, 30.0, 1},
-  {2, 30, 140, 196, 51, 500, 7.5, 1},
-  {3, 30, 110, 296, 50, 500, 7.5, 1},
-  {4, 30, 104, 416, 44, 500, 7.5, 1},
-  {5, 30, 16, 16, 2, 500, 7.5, 1},
-  {6, 30, 32, 16, 2, 500, 7.5, 1},
-  {7, 30, 600, 460, 1, 450, 15.0, 4},
-  {8, 30, 340, 96, 24, 1000, 30.0, 2},
-  {9, 30, 140, 196, 51, 500, 7.5, 3},
-  {10, 30, 110, 296, 50, 500, 7.5, 2},
-  {11, 30, 104, 416, 44, 500, 7.5, 2},
-  {12, 30, 16, 16, 2, 500, 7.5, 3},
-  {13, 30, 32, 16, 2, 500, 7.5, 3},
+  {true, true, false, 30, 600, 460, 1, SM_DYN_SLICE, 450, 15.0, 1, ""},
+  {true, true, false, 30, 340, 96, 24, SM_DYN_SLICE, 1000, 30.0, 1, ""},
+  {true, true, false, 30, 140, 196, 51, SM_DYN_SLICE, 500, 7.5, 1, ""},
+  {true, true, false, 30, 110, 296, 50, SM_DYN_SLICE, 500, 7.5, 1, ""},
+  {true, true, false, 30, 104, 416, 44, SM_DYN_SLICE, 500, 7.5, 1, ""},
+  {true, true, false, 30, 16, 16, 2, SM_DYN_SLICE, 500, 7.5, 1, ""},
+  {true, false, true, 30, 600, 460, 1, SM_DYN_SLICE, 450, 15.0, 1, ""},
+  {true, false, true, 30, 340, 96, 24, SM_DYN_SLICE, 1000, 30.0, 1, ""},
+  {true, false, true, 30, 140, 196, 51, SM_DYN_SLICE, 500, 7.5, 1, ""},
+  {true, false, true, 30, 110, 296, 50, SM_DYN_SLICE, 500, 7.5, 1, ""},
+  {true, false, true, 30, 104, 416, 44, SM_DYN_SLICE, 500, 7.5, 1, ""},
+  {true, false, true, 30, 16, 16, 2, SM_DYN_SLICE, 500, 7.5, 1, ""},
+  // enable the following when all random input is supported
+  //{true, true, true, 30, 600, 460, 1, SM_DYN_SLICE, 450, 15.0, 1, ""},
+  //{true, true, true, 30, 340, 96, 24, SM_DYN_SLICE, 1000, 30.0, 1, ""},
+  //{true, true, true, 30, 140, 196, 51, SM_DYN_SLICE, 500, 7.5, 1, ""},
+  //{true, true, true, 30, 110, 296, 50, SM_DYN_SLICE, 500, 7.5, 1, ""},
+  //{true, true, true, 30, 104, 416, 44, SM_DYN_SLICE, 500, 7.5, 1, ""},
+  //{true, true, true, 30, 16, 16, 2, SM_DYN_SLICE, 500, 7.5, 1, ""},
+  {false, false, true, 3, 4096, 2304, 2, SM_SINGLE_SLICE, 0, 7.5, 1, ""}, // large picture size
+  {false, true, false, 30, 32, 16, 2, SM_DYN_SLICE, 500, 7.5, 1, ""},
+  {false, true, false, 30, 600, 460, 1, SM_DYN_SLICE, 450, 15.0, 4, ""},
+  {false, true, false, 30, 340, 96, 24, SM_DYN_SLICE, 1000, 30.0, 2, ""},
+  {false, true, false, 30, 140, 196, 51, SM_DYN_SLICE, 500, 7.5, 3, ""},
+  {false, true, false, 30, 110, 296, 50, SM_DYN_SLICE, 500, 7.5, 2, ""},
+  {false, true, false, 30, 104, 416, 44, SM_DYN_SLICE, 500, 7.5, 2, ""},
+  {false, true, false, 30, 16, 16, 2, SM_DYN_SLICE, 500, 7.5, 3, ""},
+  {false, true, false, 30, 32, 16, 2, SM_DYN_SLICE, 500, 7.5, 3, ""},
 };
 
 class EncodeTestAPI : public ::testing::TestWithParam<EncodeOptionParam>, public ::EncodeDecodeTestAPIBase {
@@ -3290,11 +3308,12 @@ class EncodeTestAPI : public ::testing::TestWithParam<EncodeOptionParam>, public
   void TearDown() {
     EncodeDecodeTestAPIBase::TearDown();
   }
-  void EncodeOneFrameAllRandom (int iCheckTypeIndex) {
+  void EncodeOneFrameRandom (int iCheckTypeIndex, bool bAllRandom) {
     int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
     uint8_t* ptr = buf_.data();
+    uint8_t uiVal = rand() % 256;
     for (int i = 0; i < frameSize; i++) {
-      ptr[i] = rand() % 256;
+      ptr[i] = bAllRandom? (rand() % 256) :uiVal;
     }
     int rv = encoder_->EncodeFrame (&EncPic, &info);
     if (0 == iCheckTypeIndex)
@@ -3307,8 +3326,13 @@ class EncodeTestAPI : public ::testing::TestWithParam<EncodeOptionParam>, public
 INSTANTIATE_TEST_CASE_P (EncodeDecodeTestAPIBase, EncodeTestAPI,
                          ::testing::ValuesIn (kOptionParamArray));
 
-TEST_P (EncodeTestAPI, SetEncOptionNalSize) {
+TEST_P (EncodeTestAPI, SetEncOptionSize) {
+  srand(1002);
   EncodeOptionParam p = GetParam();
+  FILE * pFile = NULL;
+  if(!p.sFileSave.empty()) {
+    pFile = fopen(p.sFileSave.c_str(), "wb");
+  }
   memset (&param_, 0, sizeof (SEncParamExt));
   encoder_->GetDefaultParams (&param_);
   param_.uiMaxNalSize = p.uiMaxNalLen;
@@ -3324,7 +3348,7 @@ TEST_P (EncodeTestAPI, SetEncOptionNalSize) {
   param_.sSpatialLayers[0].iVideoWidth = p.iWidth ;
   param_.sSpatialLayers[0].iVideoHeight = p.iHeight;
   param_.sSpatialLayers[0].fFrameRate = p.fFramerate;
-  param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_DYN_SLICE;
+  param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = p.eSliceMode;
 
   encoder_->Uninitialize();
   int rv = encoder_->InitializeExt (&param_);
@@ -3339,16 +3363,28 @@ TEST_P (EncodeTestAPI, SetEncOptionNalSize) {
   int32_t iIDRPeriod = (int32_t) pow (2.0f, (param_.iTemporalLayerNum - 1)) * ((rand() % 5) + 1);
   encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
   int iIdx = 0;
+  int iLen;
+  unsigned char* pData[3] = { NULL };
   while (iIdx <= p.iNumframes) {
-    EncodeOneFrameAllRandom (1);
+    EncodeOneFrameRandom (0, p.bAllRandom);
+    encToDecData(info, iLen);
+    if( pFile ) {
+      fwrite (info.sLayerInfo[0].pBsBuf, iLen, 1, pFile);
+      fflush (pFile);
+    }
+    memset(&dstBufInfo_, 0, sizeof(SBufferInfo));
+    if(iLen && p.bTestDecoder) {
+      rv = decoder_->DecodeFrameNoDelay(info.sLayerInfo[0].pBsBuf, iLen, pData, &dstBufInfo_);
+      ASSERT_EQ(rv, 0);
+      ASSERT_EQ(dstBufInfo_.iBufferStatus, 1);
+    }
     int iLayer = 0;
     while (iLayer < info.iLayerNum) {
       SLayerBSInfo* pLayerBsInfo = &info.sLayerInfo[iLayer];
       if (pLayerBsInfo != NULL) {
         int iNalIdx = WELS_MAX (pLayerBsInfo->iNalCount - 2, 0); // ignore last slice under single slice mode
         do {
-          if (p.iCaseId <
-              6) { // ignore the case that 2 MBs in one picture, and the multithreads case, enable them when code is ready
+          if (p.bTestNalSize) { // ignore the case that 2 MBs in one picture, and the multithreads case, enable them when code is ready
             ASSERT_GE (((int)param_.uiMaxNalSize), pLayerBsInfo->pNalLengthInByte[iNalIdx]);
           }
           -- iNalIdx;
@@ -3358,7 +3394,9 @@ TEST_P (EncodeTestAPI, SetEncOptionNalSize) {
     }
     iIdx++;
   }
+  if( pFile ) {
+    fclose (pFile);
+  }
 }
-
 
 
