@@ -948,11 +948,17 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
 
     WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //chroma_format_idc
     pSps->uiChromaFormatIdc = uiCode;
-    if (pSps->uiChromaFormatIdc != 1) {
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "ParseSps(): chroma_format_idc (%d) = 1 supported.",
+//    if (pSps->uiChromaFormatIdc != 1) {
+//      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "ParseSps(): chroma_format_idc (%d) = 1 supported.",
+//               pSps->uiChromaFormatIdc);
+//      return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_NON_BASELINE);
+//    }
+    if (pSps->uiChromaFormatIdc > 1) {
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "ParseSps(): chroma_format_idc (%d) <=1 supported.",
                pSps->uiChromaFormatIdc);
       return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_NON_BASELINE);
-    }
+
+    }// To support 4:0:0; 4:2:0
     pSps->uiChromaArrayType = pSps->uiChromaFormatIdc;
     WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //bit_depth_luma_minus8
     if (uiCode != 0) {
