@@ -3444,6 +3444,7 @@ int32_t GetSubSequenceId (sWelsEncCtx* pCtx, EVideoFrameType eFrameType) {
   return iSubSeqId;
 }
 
+// writing parasets for (simulcast) svc
 int32_t WriteSsvcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
                           SLayerBSInfo*& pLayerBsInfo, int32_t& iLayerNum, int32_t& iFrameSize) {
   int32_t iNonVclSize = 0, iCountNal = 0, iReturn;
@@ -3466,6 +3467,7 @@ int32_t WriteSsvcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
   return iReturn;
 }
 
+// writing parasets for simulcast avc
 int32_t WriteSavcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
                           SLayerBSInfo*& pLayerBsInfo, int32_t& iLayerNum, int32_t& iFrameSize) {
   int32_t iNonVclSize = 0, iCountNal = 0, iReturn;
@@ -3543,6 +3545,7 @@ int32_t WriteSavcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
   return iReturn;
 }
 
+//cover the logic of simulcast avc + sps_pps_listing
 int32_t WriteSavcParaset_Listing (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
                                   SLayerBSInfo*& pLayerBsInfo, int32_t& iLayerNum, int32_t& iFrameSize) {
   int32_t iNonVclSize = 0, iCountNal = 0, iReturn;
