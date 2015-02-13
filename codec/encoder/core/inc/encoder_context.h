@@ -246,8 +246,8 @@ typedef struct TagWelsEncCtx {
 
   uint32_t GetNeededSpsNum() {
     if (0 == sPSOVector.uiNeededSpsNum) {
-      sPSOVector.uiNeededSpsNum = ((SPS_LISTING & pSvcParam->eSpsPpsIdStrategy) ? (MAX_SPS_COUNT) :
-                                   ((pSvcParam->bSimulcastAVC) ? (pSvcParam->iSpatialLayerNum) : (1)));
+      sPSOVector.uiNeededSpsNum = ((SPS_LISTING & pSvcParam->eSpsPpsIdStrategy) ? (MAX_SPS_COUNT) : (1));
+      sPSOVector.uiNeededSpsNum *= ((pSvcParam->bSimulcastAVC) ? (pSvcParam->iSpatialLayerNum) : (1));
     }
     return sPSOVector.uiNeededSpsNum;
   }
@@ -264,6 +264,7 @@ typedef struct TagWelsEncCtx {
     if (0 == sPSOVector.uiNeededPpsNum) {
       sPSOVector.uiNeededPpsNum = ((pSvcParam->eSpsPpsIdStrategy & SPS_PPS_LISTING) ? (MAX_PPS_COUNT) :
                                    (1 + pSvcParam->iSpatialLayerNum));
+      sPSOVector.uiNeededPpsNum *= ((pSvcParam->bSimulcastAVC) ? (pSvcParam->iSpatialLayerNum) : (1));
     }
     return sPSOVector.uiNeededPpsNum;
   }
