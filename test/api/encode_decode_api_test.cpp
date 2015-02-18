@@ -3401,7 +3401,7 @@ struct EncodeOptionParam {
   int uiMaxNalLen;
   float fFramerate;
   int iThreads;
-  std::string sFileSave;
+  const char* sFileSave;
 };
 
 static const EncodeOptionParam kOptionParamArray[] = {
@@ -3466,8 +3466,8 @@ TEST_P (EncodeTestAPI, SetEncOptionSize) {
   srand(1002);
   EncodeOptionParam p = GetParam();
   FILE * pFile = NULL;
-  if(!p.sFileSave.empty()) {
-    pFile = fopen(p.sFileSave.c_str(), "wb");
+  if (p.sFileSave != NULL && strlen(p.sFileSave) > 0) {
+    pFile = fopen(p.sFileSave, "wb");
   }
   memset (&param_, 0, sizeof (SEncParamExt));
   encoder_->GetDefaultParams (&param_);
