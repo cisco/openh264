@@ -134,7 +134,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
 
   pCtx->pArgDec                   = NULL;
 
-  pCtx->iOutputColorFormat		= videoFormatI420;	// yuv in default
+  pCtx->eOutputColorFormat		= videoFormatI420;	// yuv in default
   pCtx->bHaveGotMemory			= false;	// not ever request memory blocks for decoder context related
   pCtx->uiCpuFlag					= 0;
 
@@ -160,7 +160,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->pPicBuff[LIST_1]		= NULL;
 
   pCtx->bAvcBasedFlag			= true;
-  pCtx->iErrorConMethod = ERROR_CON_SLICE_COPY;
+  pCtx->eErrorConMethod = ERROR_CON_SLICE_COPY;
   pCtx->pPreviousDecodedPictureInDpb = NULL;
 
 }
@@ -331,8 +331,8 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
     return 1;
 
   memcpy (pCtx->pParam, kpParam, sizeof (SDecodingParam));
-  pCtx->iOutputColorFormat	= pCtx->pParam->iOutputColorFormat;
-  pCtx->bErrorResilienceFlag	= pCtx->pParam->uiEcActiveFlag ? true : false;
+  pCtx->eOutputColorFormat	= pCtx->pParam->eOutputColorFormat;
+  pCtx->eErrorConMethod = pCtx->pParam->eEcActiveIdc;
 
   if (VIDEO_BITSTREAM_SVC == pCtx->pParam->sVideoProperty.eVideoBsType ||
       VIDEO_BITSTREAM_AVC == pCtx->pParam->sVideoProperty.eVideoBsType) {
@@ -341,7 +341,7 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
     pCtx->eVideoType = VIDEO_BITSTREAM_DEFAULT;
   }
 
-  WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "eVideoType: %d\n", pCtx->eVideoType);
+  WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "eVideoType: %d", pCtx->eVideoType);
 
   return 0;
 }
@@ -462,6 +462,9 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 
           iConsumedBytes = 0;
           pNalPayload	= ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
+          if ((pCtx->eErrorConMethod != ERROR_CON_DISABLE) && (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1))) {
+            CheckAndDoEC (pCtx, ppDst, pDstBufInfo);
+          }
           if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType) && pNalPayload) {
             iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes);
           }
@@ -474,7 +477,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 #else
               pCtx->bReferenceLostAtT0Flag = true;
 #endif
-              ResetParameterSetsState (pCtx);
+              if ((pCtx->eErrorConMethod == ERROR_CON_DISABLE) || (dsOutOfMemory & pCtx->iErrorCode))
+                ResetParameterSetsState (pCtx);
 
               if (dsOutOfMemory & pCtx->iErrorCode) {
                 return pCtx->iErrorCode;
@@ -489,7 +493,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 #else
               pCtx->bReferenceLostAtT0Flag = true;
 #endif
-              ResetParameterSetsState (pCtx);
+              if ((pCtx->eErrorConMethod == ERROR_CON_DISABLE) || (dsOutOfMemory & pCtx->iErrorCode))
+                ResetParameterSetsState (pCtx);
             }
             return pCtx->iErrorCode;
           }
@@ -517,7 +522,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 
     iConsumedBytes = 0;
     pNalPayload = ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
-    if ((pCtx->iErrorConMethod != ERROR_CON_DISABLE) && (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1))) {
+    if ((pCtx->eErrorConMethod != ERROR_CON_DISABLE) && (IS_VCL_NAL (pCtx->sCurNalHead.eNalUnitType, 1))) {
       CheckAndDoEC (pCtx, ppDst, pDstBufInfo);
     }
     if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType) && pNalPayload) {
@@ -532,7 +537,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 #else
         pCtx->bReferenceLostAtT0Flag = true;
 #endif
-        ResetParameterSetsState (pCtx);
+        if ((pCtx->eErrorConMethod == ERROR_CON_DISABLE) || (dsOutOfMemory & pCtx->iErrorCode))
+          ResetParameterSetsState (pCtx);
         return pCtx->iErrorCode;
       }
     }
@@ -567,7 +573,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 #else
         pCtx->bReferenceLostAtT0Flag = true;
 #endif
-        ResetParameterSetsState (pCtx);
+        if ((pCtx->eErrorConMethod == ERROR_CON_DISABLE) || (dsOutOfMemory & pCtx->iErrorCode))
+          ResetParameterSetsState (pCtx);
         return pCtx->iErrorCode;
       }
     }
@@ -582,9 +589,15 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 int32_t DecoderSetCsp (PWelsDecoderContext pCtx, const int32_t kiColorFormat) {
   WELS_VERIFY_RETURN_IF (1, (NULL == pCtx));
 
-  pCtx->iOutputColorFormat	= kiColorFormat;
+  pCtx->eOutputColorFormat	= (EVideoFormatType) kiColorFormat;
   if (pCtx->pParam != NULL) {
-    pCtx->pParam->iOutputColorFormat	= kiColorFormat;
+    pCtx->pParam->eOutputColorFormat	= (EVideoFormatType) kiColorFormat;
+  }
+
+  //For now, support only videoFormatI420!
+  if (kiColorFormat != (int32_t) videoFormatI420) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "Support I420 output only for now! Change to I420...");
+    pCtx->pParam->eOutputColorFormat = pCtx->eOutputColorFormat = videoFormatI420;
   }
 
   return 0;
@@ -607,7 +620,7 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
   iErr = WelsRequestMem (pCtx, kiMbWidth, kiMbHeight);	// common memory used
   if (ERR_NONE != iErr) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
-             "SyncPictureResolutionExt()::WelsRequestMem--buffer allocated failure.\n");
+             "SyncPictureResolutionExt()::WelsRequestMem--buffer allocated failure.");
     pCtx->iErrorCode = dsOutOfMemory;
     return iErr;
   }
@@ -615,7 +628,7 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
   iErr = InitialDqLayersContext (pCtx, kiPicWidth, kiPicHeight);
   if (ERR_NONE != iErr) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
-             "SyncPictureResolutionExt()::InitialDqLayersContext--buffer allocated failure.\n");
+             "SyncPictureResolutionExt()::InitialDqLayersContext--buffer allocated failure.");
     pCtx->iErrorCode = dsOutOfMemory;
   }
 
@@ -683,7 +696,7 @@ void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
 
 #if defined(HAVE_NEON_AARCH64)
   if (pCtx->uiCpuFlag & WELS_CPU_NEON) {
-    //pCtx->pIdctResAddPredFunc	= IdctResAddPred_neon;
+    pCtx->pIdctResAddPredFunc	= IdctResAddPred_AArch64_neon;
 
     pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_AArch64_neon;
     pCtx->pGetI16x16LumaPredFunc[I16_PRED_P]  = WelsDecoderI16x16LumaPredPlane_AArch64_neon;

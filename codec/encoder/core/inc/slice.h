@@ -44,7 +44,7 @@
 #include "bit_stream.h"
 
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 /*******************************sub struct of slice header****************************/
 

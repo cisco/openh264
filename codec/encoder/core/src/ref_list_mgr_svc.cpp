@@ -34,7 +34,7 @@
 #include "ref_list_mgr_svc.h"
 #include "utils.h"
 #include "picture_handle.h"
-namespace WelsSVCEnc {
+namespace WelsEnc {
 /*
  *	set picture as unreferenced
  */
@@ -127,6 +127,7 @@ static void DeleteNonSceneLTR (sWelsEncCtx* pCtx) {
         (pCtx->uiTemporalId < pRef->uiTemporalId || pCtx->bCurFrameMarkedAsSceneLtr)) {
       SetUnref (pRef);
       DeleteLTRFromLongList (pCtx, i);
+      i--;
     }
   }
 }
@@ -178,7 +179,7 @@ static inline void DeleteInvalidLTR (sWelsEncCtx* pCtx) {
       if (CompareFrameNum (pLongRefList[i]->iFrameNum , pLtr->iLastCorFrameNumDec, iMaxFrameNumPlus1) == FRAME_NUM_BIGGER
           && (CompareFrameNum (pLongRefList[i]->iFrameNum , pLtr->iCurFrameNumInDec,
                                iMaxFrameNumPlus1) & (FRAME_NUM_EQUAL | FRAME_NUM_SMALLER))) {
-        WelsLog (pLogCtx, WELS_LOG_WARNING, "LTR ,invalid LTR delete ,long_term_idx = %d , iFrameNum =%d \n",
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "LTR ,invalid LTR delete ,long_term_idx = %d , iFrameNum =%d ",
                  pLongRefList[i]->iLongTermPicNum, pLongRefList[i]->iFrameNum);
         SetUnref (pLongRefList[i]);
         DeleteLTRFromLongList (pCtx, i);
@@ -191,7 +192,7 @@ static inline void DeleteInvalidLTR (sWelsEncCtx* pCtx) {
                  && (CompareFrameNum (pLongRefList[i]->iMarkFrameNum, pLtr->iCurFrameNumInDec ,
                                       iMaxFrameNumPlus1) & (FRAME_NUM_EQUAL | FRAME_NUM_SMALLER))
                  && pLtr->iLTRMarkMode == LTR_DELAY_MARK)	{
-        WelsLog (pLogCtx, WELS_LOG_WARNING, "LTR ,iMarkFrameNum invalid LTR delete ,long_term_idx = %d , iFrameNum =%d \n",
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "LTR ,iMarkFrameNum invalid LTR delete ,long_term_idx = %d , iFrameNum =%d ",
                  pLongRefList[i]->iLongTermPicNum, pLongRefList[i]->iFrameNum);
         SetUnref (pLongRefList[i]);
         DeleteLTRFromLongList (pCtx, i);
@@ -314,6 +315,10 @@ static inline void LTRMarkProcess (sWelsEncCtx* pCtx) {
     }
     pLongRefList[0]	 = pShortRefList[i];
     pRefList->uiLongRefCount++;
+    if (pRefList->uiLongRefCount > pCtx->pSvcParam->iLTRRefNum) {
+      SetUnref (pRefList->pLongRefList[pRefList->uiLongRefCount - 1]);
+      DeleteLTRFromLongList (pCtx, pRefList->uiLongRefCount - 1);
+    }
     DeleteSTRFromShortList (pCtx, i);
   }
 }
@@ -601,7 +606,7 @@ bool WelsBuildRefList (void* pEncCtx, const int32_t iPOC, int32_t iBestLtrRefIdx
         if (pRef != NULL && pRef->bUsedAsRef && pRef->iFramePoc >= 0 && pRef->uiTemporalId <= kuiTid) {
           pCtx->pRefList0[pCtx->iNumRef0++]	= pRef;
           WelsLog (& (pCtx->sLogCtx), WELS_LOG_DETAIL,
-                   "WelsBuildRefList pCtx->uiTemporalId = %d,pRef->iFrameNum = %d,pRef->uiTemporalId = %d\n",
+                   "WelsBuildRefList pCtx->uiTemporalId = %d,pRef->iFrameNum = %d,pRef->uiTemporalId = %d",
                    pCtx->uiTemporalId, pRef->iFrameNum, pRef->uiTemporalId);
           break;
         }
@@ -644,9 +649,9 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
     if (pCtx->iNumRef0 > 0) {
       if ((!pCtx->pRefList0[0]->bIsLongRef) || (!pCtx->pSvcParam->bEnableLongTermReference)) {
         if (iAbsDiffPicNumMinus1 < 0) {
-          WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1:%d\n", iAbsDiffPicNumMinus1);
+          WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1:%d", iAbsDiffPicNumMinus1);
           iAbsDiffPicNumMinus1 += (1 << (pCtx->pSps->uiLog2MaxFrameNum));
-          WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1< 0, update as:%d\n",
+          WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1< 0, update as:%d",
                    iAbsDiffPicNumMinus1);
         }
 
@@ -777,11 +782,11 @@ bool WelsBuildRefListScreen (void* pEncCtx, const int32_t iPOC, int32_t iBestLtr
             pCtx->pCurDqLayer->pRefOri[pCtx->iNumRef0] = pRefOri;
             pCtx->pRefList0[pCtx->iNumRef0++] = pRefPic;
             WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
-                     "WelsBuildRefListScreen(), ref !current iFrameNum = %d, ref iFrameNum = %d,LTR number = %d,iNumRef = %d ref is Scene LTR = %d\n",
+                     "WelsBuildRefListScreen(), ref !current iFrameNum = %d, ref iFrameNum = %d,LTR number = %d,iNumRef = %d ref is Scene LTR = %d",
                      pCtx->iFrameNum, pCtx->pRefList0[pCtx->iNumRef0 - 1]->iFrameNum, pRefList->uiLongRefCount, iNumRef,
                      pRefPic->bIsSceneLTR);
             WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
-                     "WelsBuildRefListScreen pCtx->uiTemporalId = %d,pRef->iFrameNum = %d,pRef->uiTemporalId = %d\n",
+                     "WelsBuildRefListScreen pCtx->uiTemporalId = %d,pRef->iFrameNum = %d,pRef->uiTemporalId = %d",
                      pCtx->uiTemporalId, pRefPic->iFrameNum, pRefPic->uiTemporalId);
           }
         }
@@ -794,7 +799,7 @@ bool WelsBuildRefListScreen (void* pEncCtx, const int32_t iPOC, int32_t iBestLtr
             pCtx->pCurDqLayer->pRefOri[pCtx->iNumRef0] = pRefOri;
             pCtx->pRefList0[pCtx->iNumRef0++] = pRefList->pLongRefList[i];
             WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
-                     "WelsBuildRefListScreen(), ref !current iFrameNum = %d, ref iFrameNum = %d,LTR number = %d\n",
+                     "WelsBuildRefListScreen(), ref !current iFrameNum = %d, ref iFrameNum = %d,LTR number = %d",
                      pCtx->iFrameNum, pCtx->pRefList0[pCtx->iNumRef0 - 1]->iFrameNum, pRefList->uiLongRefCount);
             break;
           }
@@ -911,5 +916,5 @@ void InitRefListMgrFunc (SWelsFuncPtrList* pFuncList, EUsageType eUsageType) {
     pFuncList->pUpdateRefList =   WelsUpdateRefList;
   }
 }
-} // namespace WelsSVCEnc
+} // namespace WelsEnc
 

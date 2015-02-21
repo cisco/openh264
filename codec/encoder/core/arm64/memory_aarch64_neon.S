@@ -36,26 +36,26 @@
 
 
 WELS_ASM_AARCH64_FUNC_BEGIN WelsSetMemZero_AArch64_neon
-  eor v0.16b, v0.16b, v0.16b
-  cmp x1, #32
-  b.eq mem_zero_32_neon_start
-  b.lt mem_zero_24_neon_start
+    eor v0.16b, v0.16b, v0.16b
+    cmp x1, #32
+    b.eq mem_zero_32_neon_start
+    b.lt mem_zero_24_neon_start
 mem_zero_loop:
-  subs x1, x1, #64
-  st1 {v0.16b}, [x0], #16
-  st1 {v0.16b}, [x0], #16
-  st1 {v0.16b}, [x0], #16
-  st1 {v0.16b}, [x0], #16
-  b.ne mem_zero_loop
-  b mem_zero_end
+    subs x1, x1, #64
+    st1 {v0.16b}, [x0], #16
+    st1 {v0.16b}, [x0], #16
+    st1 {v0.16b}, [x0], #16
+    st1 {v0.16b}, [x0], #16
+    b.ne mem_zero_loop
+    b mem_zero_end
 
 mem_zero_32_neon_start:
-  st1 {v0.16b}, [x0], #16
-  st1 {v0.16b}, [x0], #16
-  b mem_zero_end
+    st1 {v0.16b}, [x0], #16
+    st1 {v0.16b}, [x0], #16
+    b mem_zero_end
 mem_zero_24_neon_start:
-  st1 {v0.16b}, [x0], #16
-  st1 {v0.8b}, [x0], #8
+    st1 {v0.16b}, [x0], #16
+    st1 {v0.8b}, [x0], #8
 mem_zero_end:
 
 WELS_ASM_AARCH64_FUNC_END

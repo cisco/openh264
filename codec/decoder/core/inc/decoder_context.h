@@ -168,15 +168,14 @@ SLogContext sLogCtx;
 // Input
 void*				pArgDec;			// structured arguments for decoder, reserved here for extension in the future
 
-SDataBuffer       	sRawData;
+SDataBuffer                     sRawData;
 
 // Configuration
-SDecodingParam*    	pParam;
+SDecodingParam*                 pParam;
 uint32_t			uiCpuFlag;			// CPU compatibility detected
 
-int32_t				iOutputColorFormat;		// color space format to be outputed
+EVideoFormatType eOutputColorFormat;		// color space format to be outputed
 VIDEO_BITSTREAM_TYPE eVideoType; //indicate the type of video to decide whether or not to do qp_delta error detection.
-bool				bErrorResilienceFlag;		// error resilience flag
 bool				bHaveGotMemory;	// global memory for decoder context related ever requested?
 
 int32_t				iImgWidthInPixel;	// width of image in pixel reconstruction picture to be output
@@ -287,7 +286,7 @@ uint16_t            uiCurIdrPicId;
 bool       bNewSeqBegin;
 bool       bNextNewSeqBegin;
 int        iOverwriteFlags;
-int32_t iErrorConMethod; //
+ERROR_CON_IDC eErrorConMethod; //
 PPicture pPreviousDecodedPictureInDpb; //pointer to previously decoded picture in DPB for error concealment
 PGetIntraPredFunc pGetI16x16LumaPredFunc[7];		//h264_predict_copy_16x16;
 PGetIntraPredFunc pGetI4x4LumaPredFunc[14];		// h264_predict_4x4_t

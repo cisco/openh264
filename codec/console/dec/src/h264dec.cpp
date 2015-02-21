@@ -198,7 +198,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     pDecoder->GetOption (DECODER_OPTION_VCL_NAL, &iFeedbackVclNalInAu);
     int32_t iFeedbackTidInAu;
     pDecoder->GetOption (DECODER_OPTION_TEMPORAL_ID, &iFeedbackTidInAu);
-    int32_t iErrorConMethod = ERROR_CON_SLICE_COPY;
+    int32_t iErrorConMethod = (int32_t) ERROR_CON_SLICE_COPY;
     pDecoder->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iErrorConMethod);
 //~end for
 
@@ -349,9 +349,9 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
           } else if (strTag[0].compare ("TargetDQID") == 0) {
             sDecParam.uiTargetDqLayer	= (uint8_t)atol (strTag[1].c_str());
           } else if (strTag[0].compare ("OutColorFormat") == 0) {
-            sDecParam.iOutputColorFormat = atoi (strTag[1].c_str());
-          } else if (strTag[0].compare ("ErrorConcealmentFlag") == 0) {
-            sDecParam.uiEcActiveFlag	= (uint8_t)atol (strTag[1].c_str());
+            sDecParam.eOutputColorFormat = (EVideoFormatType) atoi (strTag[1].c_str());
+          } else if (strTag[0].compare ("ErrorConcealmentIdc") == 0) {
+            sDecParam.eEcActiveIdc = (ERROR_CON_IDC)atol (strTag[1].c_str());
           } else if (strTag[0].compare ("CPULoad") == 0) {
             sDecParam.uiCpuLoad	= (uint32_t)atol (strTag[1].c_str());
           } else if (strTag[0].compare ("VideoBitstreamType") == 0) {
@@ -366,17 +366,17 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
     } else if (strstr (pArgV[1],
                        ".264")) { // no output dump yuv file, just try to render the decoded pictures //confirmed_safe_unsafe_usage
       strInputFile	= pArgV[1];
-      sDecParam.iOutputColorFormat          = videoFormatI420;
+      sDecParam.eOutputColorFormat          = videoFormatI420;
       sDecParam.uiTargetDqLayer	          = (uint8_t) - 1;
-      sDecParam.uiEcActiveFlag	          = 1;
+      sDecParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
       sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
     }
   } else { //iArgC > 2
     strInputFile	= pArgV[1];
     strOutputFile	= pArgV[2];
-    sDecParam.iOutputColorFormat	= videoFormatI420;
+    sDecParam.eOutputColorFormat	= videoFormatI420;
     sDecParam.uiTargetDqLayer	= (uint8_t) - 1;
-    sDecParam.uiEcActiveFlag	= 1;
+    sDecParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
     sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
     if (iArgC > 3) {
       for (int i = 3; i < iArgC; i++) {

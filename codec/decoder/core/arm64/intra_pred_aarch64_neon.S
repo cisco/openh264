@@ -308,7 +308,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderIChromaPredDcTop_AArch64_neon
 .endr
 WELS_ASM_AARCH64_FUNC_END
 
-.align 16
+.align 4
 intra_1_to_4: .short 17*1, 17*2, 17*3, 17*4, 17*1, 17*2, 17*3, 17*4
 intra_m3_to_p4: .short -3, -2, -1, 0, 1, 2, 3, 4
 
@@ -457,7 +457,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsDecoderI16x16LumaPredDcLeft_AArch64_neon
 WELS_ASM_AARCH64_FUNC_END
 
 
-.align 16
+.align 4
 intra_1_to_8: .short 5, 10, 15, 20, 25, 30, 35, 40
 intra_m7_to_p8: .short -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8
 

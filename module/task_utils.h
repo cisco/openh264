@@ -13,6 +13,9 @@
 class gmp_args_base : public GMPTask {
  public:
   void Run() = 0;
+  void Destroy() {
+    delete this;
+  }
 };
 
 // The generated file contains four major function templates

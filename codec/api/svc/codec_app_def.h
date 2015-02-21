@@ -89,7 +89,7 @@ typedef enum {
 
   ENCODER_LTR_RECOVERY_REQUEST,
   ENCODER_LTR_MARKING_FEEDBACK,
-  ENCOCER_LTR_MARKING_PERIOD,
+  ENCODER_LTR_MARKING_PERIOD,
   ENCODER_OPTION_LTR,
   ENCODER_OPTION_COMPLEXITY,
 
@@ -178,6 +178,10 @@ typedef struct {
 } SLTRMarkingFeedback;
 
 typedef struct {
+  bool   bEnableLongTermReference; // 1: on, 0: off
+  int	   iLTRRefNum;
+}SLTRConfig;
+typedef struct {
   unsigned int
   uiSliceMbNum[MAX_SLICES_NUM_TMP];  //here we use a tmp fixed value since MAX_SLICES_NUM is not defined here and its definition may be changed;
   unsigned int		uiSliceNum;
@@ -198,6 +202,7 @@ typedef enum {
   RC_QUALITY_MODE = 0,      //Quality mode
   RC_BITRATE_MODE = 1,   //Bitrate mode
   RC_LOW_BW_MODE = 2, //bitrate limited mode
+  RC_BUFFERBASED_MODE = 3,//no bitrate control,only using buffer status,adjust the video quality
   RC_OFF_MODE = -1,    // rate control off mode
 } RC_MODES;
 
@@ -324,7 +329,7 @@ typedef struct TagEncParamExt {
   unsigned int uiMaxNalSize;
 
   /*LTR settings*/
-  bool     bEnableLongTermReference; // 0: on, 1: off
+  bool     bEnableLongTermReference; // 1: on, 0: off
   int	   iLTRRefNum;
   unsigned int      iLtrMarkPeriod;
 
@@ -354,11 +359,11 @@ typedef struct {
 typedef struct TagSVCDecodingParam {
   char*		pFileNameRestructed;	// File name of restructed frame used for PSNR calculation based debug
 
-  int				iOutputColorFormat;	// color space format to be outputed, EVideoFormatType specified in codec_def.h
+  EVideoFormatType eOutputColorFormat;	// color space format to be outputed, EVideoFormatType specified in codec_def.h
   unsigned int	uiCpuLoad;		// CPU load
   unsigned char	uiTargetDqLayer;	// Setting target dq layer id
 
-  unsigned char	uiEcActiveFlag;		// Whether active error concealment feature in decoder
+  ERROR_CON_IDC eEcActiveIdc;		// Whether active error concealment feature in decoder
 
   SVideoProperty   sVideoProperty;
 } SDecodingParam, *PDecodingParam;
@@ -424,4 +429,17 @@ typedef struct TagDeliveryStatus {
   int iDropFrameType; // the frame type that is dropped
   int iDropFrameSize; // the frame size that is dropped
 } SDeliveryStatus;
+
+typedef struct TagDecoderCapability {
+  int iProfileIdc;
+  int iProfileIop;
+  int iLevelIdc;
+  int iMaxMbps;
+  int iMaxFs;
+  int iMaxCpb;
+  int iMaxDpb;
+  int iMaxBr;
+  bool bRedPicCap;
+} SDecoderCapability;
+
 #endif//WELS_VIDEO_CODEC_APPLICATION_DEFINITION_H__

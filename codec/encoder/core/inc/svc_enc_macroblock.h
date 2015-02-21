@@ -39,7 +39,7 @@
 #include "wels_common_basis.h"
 #include "macros.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 //struct Mb_s;
 

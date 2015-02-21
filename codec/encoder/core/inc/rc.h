@@ -48,12 +48,10 @@
 #include "svc_enc_macroblock.h"
 #include "slice.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 //trace
 #define GOM_TRACE_FLAG 0
 #define GOM_H_SCC               8
-#define    WELS_RC_DISABLE        0
-#define    WELS_RC_GOM            1
 
 enum {
 BITS_NORMAL,
@@ -71,6 +69,8 @@ GOM_MAX_QP_MODE       = 36,
 MAX_LOW_BR_QP			= 42,
 MIN_IDR_QP            = 26,
 MAX_IDR_QP            = 32,
+MIN_SCREEN_QP         = 26,
+MAX_SCREEN_QP         = 32,
 DELTA_QP              = 2,
 DELTA_QP_BGD_THD      = 3,
 
@@ -232,7 +232,7 @@ PWelsRCMBInitFunc				pfWelsRcMbInit;
 PWelsRCMBInfoUpdateFunc			pfWelsRcMbInfoUpdate;
 } SWelsRcFunc;
  
-void WelsRcInitModule (void* pCtx,  int32_t iModule);
+void WelsRcInitModule (void* pCtx,RC_MODES iRcMode);
 void WelsRcFreeMemory (void* pCtx);
  
 }

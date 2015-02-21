@@ -1,5 +1,5 @@
 ARCH = arm
-include build/platform-arch.mk
+include $(SRC_PATH)build/platform-arch.mk
 SHAREDLIBSUFFIX = so
 NDKLEVEL = 12
 ifeq ($(ARCH), arm)
@@ -12,13 +12,20 @@ ifeq ($(ARCH), arm)
   ifeq (Yes, $(USE_ASM))
     ASMFLAGS += -march=armv7-a -mfpu=neon
   endif
+else ifeq ($(ARCH), arm64)
+  APP_ABI = arm64-v8a
 else ifeq ($(ARCH), x86)
-    APP_ABI = x86
+  APP_ABI = x86
   ifeq (Yes, $(USE_ASM))
-    ASMFLAGS += -f elf32
+    ASMFLAGS += -f elf
+  endif
+else ifeq ($(ARCH), x86_64)
+  APP_ABI = x86_64
+  ifeq (Yes, $(USE_ASM))
+    ASMFLAGS += -f elf64
   endif
 else
-    APP_ABI = $(ARCH)
+  APP_ABI = $(ARCH)
 endif
 
 ifndef NDKROOT
@@ -28,7 +35,7 @@ ifndef TARGET
 $(error TARGET is not set)
 endif
 
-TOOLCHAINPREFIX = $(shell NDK_PROJECT_PATH=./codec/build/android/dec make --no-print-dir -f $(NDKROOT)/build/core/build-local.mk DUMP_TOOLCHAIN_PREFIX APP_ABI=$(APP_ABI))
+TOOLCHAINPREFIX = $(shell NDK_PROJECT_PATH=$(SRC_PATH)/codec/build/android/dec make --no-print-dir -f $(NDKROOT)/build/core/build-local.mk DUMP_TOOLCHAIN_PREFIX APP_ABI=$(APP_ABI))
 
 SYSROOT = $(NDKROOT)/platforms/android-$(NDKLEVEL)/arch-$(ARCH)
 CXX = $(TOOLCHAINPREFIX)g++
@@ -37,7 +44,13 @@ AR = $(TOOLCHAINPREFIX)ar
 CFLAGS += -DANDROID_NDK -fpic --sysroot=$(SYSROOT) -MMD -MP
 CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS += --sysroot=$(SYSROOT)
-SHLDFLAGS = -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,-soname,lib$(PROJECT_NAME).so
+SHLDFLAGS = -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-soname,lib$(PROJECT_NAME).so
+
+ifneq ($(CXX),$(wildcard $(CXX)))
+ifneq ($(CXX).exe,$(wildcard $(CXX).exe))
+$(error Compiler not found, bad NDKROOT or ARCH?)
+endif
+endif
 
 STL_INCLUDES = \
     -I$(NDKROOT)/sources/cxx-stl/stlport/stlport
@@ -50,6 +63,7 @@ CODEC_UNITTEST_LDFLAGS_SUFFIX = $(STL_LIB)
 MODULE_INCLUDES = $(STL_INCLUDES)
 MODULE_LDFLAGS = $(STL_LIB)
 
+ifeq (./,$(SRC_PATH))
 binaries : decdemo encdemo
 
 decdemo: libraries
@@ -64,6 +78,12 @@ clean_Android_dec:
 	-cd ./codec/build/android/dec && $(NDKROOT)/ndk-build APP_ABI=$(APP_ABI) clean && ant clean
 clean_Android_enc:
 	-cd ./codec/build/android/enc && $(NDKROOT)/ndk-build APP_ABI=$(APP_ABI) clean && ant clean
+else
+all:
+	@:
+clean_Android:
+	@:
+endif
 
 COMMON_INCLUDES += -I$(NDKROOT)/sources/android/cpufeatures
 COMMON_OBJS += $(COMMON_SRCDIR)/src/cpu-features.$(OBJ)

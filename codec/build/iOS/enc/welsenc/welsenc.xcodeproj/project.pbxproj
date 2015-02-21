@@ -45,6 +45,8 @@
 		4CE4472918BC605C0017DF25 /* svc_set_mb_syn_cavlc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446F818BC605C0017DF25 /* svc_set_mb_syn_cavlc.cpp */; };
 		4CE4472B18BC605C0017DF25 /* wels_preprocess.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446FA18BC605C0017DF25 /* wels_preprocess.cpp */; };
 		4CE4472E18BC605C0017DF25 /* welsEncoderExt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE4470618BC605C0017DF25 /* welsEncoderExt.cpp */; };
+		6CA38DA31991CACE003EAAE0 /* svc_motion_estimation.S in Sources */ = {isa = PBXBuildFile; fileRef = 6CA38DA21991CACE003EAAE0 /* svc_motion_estimation.S */; };
+		6CA38DA51991D31A003EAAE0 /* svc_motion_estimation_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 6CA38DA41991D31A003EAAE0 /* svc_motion_estimation_aarch64_neon.S */; };
 		9AED665019469FC1009A3567 /* welsCodecTrace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9AED664C19469FC1009A3567 /* welsCodecTrace.cpp */; };
 		9AED66661946A2B3009A3567 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9AED66651946A2B3009A3567 /* utils.cpp */; };
 		F5617A50196A833A006E2B20 /* reconstruct_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F5617A4F196A833A006E2B20 /* reconstruct_aarch64_neon.S */; };
@@ -64,6 +66,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		04FE0684196FD9370004D7CE /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = version.h; path = ../../../common/inc/version.h; sourceTree = "<group>"; };
 		4C23BC5F195A77E0003B81FC /* intra_pred_sad_3_opt_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = intra_pred_sad_3_opt_aarch64_neon.S; path = arm64/intra_pred_sad_3_opt_aarch64_neon.S; sourceTree = "<group>"; };
 		4C34066618C57D0400DFA14A /* intra_pred_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = intra_pred_neon.S; sourceTree = "<group>"; };
 		4C34066718C57D0400DFA14A /* intra_pred_sad_3_opt_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = intra_pred_sad_3_opt_neon.S; sourceTree = "<group>"; };
@@ -153,6 +156,8 @@
 		4CE446FE18BC605C0017DF25 /* welsEncoderExt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = welsEncoderExt.h; sourceTree = "<group>"; };
 		4CE4470418BC605C0017DF25 /* wels_enc_export.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = wels_enc_export.def; sourceTree = "<group>"; };
 		4CE4470618BC605C0017DF25 /* welsEncoderExt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = welsEncoderExt.cpp; sourceTree = "<group>"; };
+		6CA38DA21991CACE003EAAE0 /* svc_motion_estimation.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = svc_motion_estimation.S; sourceTree = "<group>"; };
+		6CA38DA41991D31A003EAAE0 /* svc_motion_estimation_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = svc_motion_estimation_aarch64_neon.S; path = arm64/svc_motion_estimation_aarch64_neon.S; sourceTree = "<group>"; };
 		9AED664819469FAF009A3567 /* welsCodecTrace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = welsCodecTrace.h; path = ../../../common/inc/welsCodecTrace.h; sourceTree = "<group>"; };
 		9AED664C19469FC1009A3567 /* welsCodecTrace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = welsCodecTrace.cpp; path = ../../../common/src/welsCodecTrace.cpp; sourceTree = "<group>"; };
 		9AED66651946A2B3009A3567 /* utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utils.cpp; path = ../../../common/src/utils.cpp; sourceTree = "<group>"; };
@@ -176,6 +181,7 @@
 		4C34066418C57D0400DFA14A /* arm */ = {
 			isa = PBXGroup;
 			children = (
+				6CA38DA21991CACE003EAAE0 /* svc_motion_estimation.S */,
 				4C34066618C57D0400DFA14A /* intra_pred_neon.S */,
 				4C34066718C57D0400DFA14A /* intra_pred_sad_3_opt_neon.S */,
 				4C34066918C57D0400DFA14A /* memory_neon.S */,
@@ -188,6 +194,7 @@
 		4CB8F2B219235FAC005D6386 /* arm64 */ = {
 			isa = PBXGroup;
 			children = (
+				6CA38DA41991D31A003EAAE0 /* svc_motion_estimation_aarch64_neon.S */,
 				F5BE8004196B913200ED02ED /* memory_aarch64_neon.S */,
 				F5617A4F196A833A006E2B20 /* reconstruct_aarch64_neon.S */,
 				4C23BC5F195A77E0003B81FC /* intra_pred_sad_3_opt_aarch64_neon.S */,
@@ -347,6 +354,7 @@
 		4CE446FC18BC605C0017DF25 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				04FE0684196FD9370004D7CE /* version.h */,
 				9AED664819469FAF009A3567 /* welsCodecTrace.h */,
 				4CE446FE18BC605C0017DF25 /* welsEncoderExt.h */,
 			);
@@ -421,6 +429,7 @@
 				4CE4471D18BC605C0017DF25 /* property.cpp in Sources */,
 				4CE4471018BC605C0017DF25 /* decode_mb_aux.cpp in Sources */,
 				4CE4472018BC605C0017DF25 /* sample.cpp in Sources */,
+				6CA38DA31991CACE003EAAE0 /* svc_motion_estimation.S in Sources */,
 				4CE4471318BC605C0017DF25 /* encoder_data_tables.cpp in Sources */,
 				4C34067118C57D0400DFA14A /* pixel_neon.S in Sources */,
 				9AED665019469FC1009A3567 /* welsCodecTrace.cpp in Sources */,
@@ -453,6 +462,7 @@
 				4CE4471218BC605C0017DF25 /* encoder.cpp in Sources */,
 				4CE4471618BC605C0017DF25 /* get_intra_predictor.cpp in Sources */,
 				4CE4472E18BC605C0017DF25 /* welsEncoderExt.cpp in Sources */,
+				6CA38DA51991D31A003EAAE0 /* svc_motion_estimation_aarch64_neon.S in Sources */,
 				4CE4471418BC605C0017DF25 /* encoder_ext.cpp in Sources */,
 				4C34067218C57D0400DFA14A /* reconstruct_neon.S in Sources */,
 			);
@@ -492,7 +502,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
@@ -523,7 +533,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -553,14 +563,13 @@
 				);
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"$(SRCROOT)/../../../../common/inc",
 					"$(SRCROOT)/../../../../processing/interface",
 					"$(SRCROOT)/../../../../api/svc",
 					"$(SRCROOT)/../../../../common/arm",
 					"$(SRCROOT)/../../../../common/arm64",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
-				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -591,13 +600,13 @@
 				);
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"$(SRCROOT)/../../../../common/inc",
 					"$(SRCROOT)/../../../../processing/interface",
 					"$(SRCROOT)/../../../../api/svc",
 					"$(SRCROOT)/../../../../common/arm",
 					"$(SRCROOT)/../../../../common/arm64",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

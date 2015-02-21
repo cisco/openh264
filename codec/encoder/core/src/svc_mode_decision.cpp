@@ -45,7 +45,7 @@
 #include "svc_base_layer_md.h"
 #include "svc_mode_decision.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 //////////////
 // MD for enhancement layers
@@ -662,4 +662,4 @@ void SetScrollingMvToMd (void* pVaa, void* pMd) {
 void SetScrollingMvToMdNull (void* pVaa, void* pWelsMd) {
 }
 
-} // namespace WelsSVCEnc
+} // namespace WelsEnc

@@ -71,12 +71,6 @@ class ISVCEncoder {
    * return: 0 - success; otherwise - failed;
    */
   virtual int EXTAPI EncodeParameterSets (SFrameBSInfo* pBsInfo) = 0;
-
-  /*
-   * return: 0 - success; otherwise - failed;
-   */
-  virtual int EXTAPI PauseFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo) = 0;
-
   /*
    * return: 0 - success; otherwise - failed;
    */
@@ -151,8 +145,6 @@ int (*Uninitialize) (ISVCEncoder*);
 int (*EncodeFrame) (ISVCEncoder*, const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo);
 int (*EncodeParameterSets) (ISVCEncoder*, SFrameBSInfo* pBsInfo);
 
-int (*PauseFrame) (ISVCEncoder*, const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo);
-
 int (*ForceIntraFrame) (ISVCEncoder*, bool bIDR);
 
 int (*SetOption) (ISVCEncoder*, ENCODER_OPTION eOptionId, void* pOption);
@@ -196,6 +188,7 @@ typedef void (*WelsTraceCallback) (void* ctx, int level, const char* string);
 int  WelsCreateSVCEncoder (ISVCEncoder** ppEncoder);
 void WelsDestroySVCEncoder (ISVCEncoder* pEncoder);
 
+int WelsGetDecoderCapability (SDecoderCapability* pDecCapability);
 long WelsCreateDecoder (ISVCDecoder** ppDecoder);
 void WelsDestroyDecoder (ISVCDecoder* pDecoder);
 

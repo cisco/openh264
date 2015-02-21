@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "memory_align.h"
 
-using namespace WelsSVCEnc;
+using namespace WelsEnc;
 
 //Tests of WelsGetCacheLineSize Begin
 TEST (MemoryAlignTest, GetCacheLineSize_LoopWithin16K) {

@@ -38,7 +38,7 @@
 #include "wels_common_basis.h"
 #include "slice.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 ///////////////////////////////////NAL Unit prefix/headers///////////////////////////////////
 
 /* NAL Unix Header in AVC, refer to Page 56 in JVT X201wcm */

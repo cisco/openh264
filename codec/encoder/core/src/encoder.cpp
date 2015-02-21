@@ -55,7 +55,7 @@
 #include "slice_multi_threading.h"
 
 //  global   function  pointers  definition
-namespace WelsSVCEnc {
+namespace WelsEnc {
 /* Motion compensation */
 
 
@@ -363,10 +363,13 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
  * \brief	Dump reconstruction for dependency layer
  */
 
-extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName, const int8_t kiDid, bool bAppend) {
+extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName, const int8_t kiDid, bool bAppend, SDqLayer* pDqLayer) {
   WelsFileHandle* pDumpRecFile = NULL;
   int32_t iWrittenSize											= 0;
   const char* openMode = bAppend ? "ab" : "wb";
+  SWelsSPS* pSpsTmp = (kiDid> BASE_DEPENDENCY_ID)? &(pDqLayer->sLayerInfo.pSubsetSpsP->pSps) : pDqLayer->sLayerInfo.pSpsP;
+  bool bFrameCroppingFlag = pSpsTmp->bFrameCroppingFlag;
+  SCropOffset* pFrameCrop = &pSpsTmp->sFrameCrop;
 
   if (NULL == pCurPicture || NULL == kpFileName || kiDid >= MAX_DEPENDENCY_LAYER)
     return;
@@ -385,13 +388,14 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName
     int32_t i = 0;
     int32_t j = 0;
     const int32_t kiStrideY	= pCurPicture->iLineSize[0];
-    const int32_t kiLumaWidth	= pCurPicture->iWidthInPixel;
-    const int32_t kiLumaHeight	= pCurPicture->iHeightInPixel;
+    const int32_t kiLumaWidth	= bFrameCroppingFlag?(pCurPicture->iWidthInPixel-(( pFrameCrop->iCropLeft + pFrameCrop->iCropRight ) << 1 )) : pCurPicture->iWidthInPixel;
+    const int32_t kiLumaHeight	= bFrameCroppingFlag?(pCurPicture->iHeightInPixel-(( pFrameCrop->iCropTop + pFrameCrop->iCropBottom ) << 1 )) : pCurPicture->iHeightInPixel;
     const int32_t kiChromaWidth	= kiLumaWidth >> 1;
     const int32_t kiChromaHeight	= kiLumaHeight >> 1;
-
+    uint8_t* pSrc = NULL;
+    pSrc = bFrameCroppingFlag ? (pCurPicture->pData[0] + kiStrideY * ( pFrameCrop->iCropTop << 1 ) + ( pFrameCrop->iCropLeft << 1 )) : pCurPicture->pData[0];
     for (j = 0; j < kiLumaHeight; ++ j) {
-      iWrittenSize = WelsFwrite (&pCurPicture->pData[0][j * kiStrideY], 1, kiLumaWidth, pDumpRecFile);
+      iWrittenSize = WelsFwrite (pSrc + j * kiStrideY, 1, kiLumaWidth, pDumpRecFile);
       assert (iWrittenSize == kiLumaWidth);
       if (iWrittenSize < kiLumaWidth) {
         assert (0);	// make no sense for us if writing failed
@@ -401,8 +405,9 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName
     }
     for (i = 1; i < I420_PLANES; ++ i) {
       const int32_t kiStrideUV = pCurPicture->iLineSize[i];
+      pSrc = bFrameCroppingFlag ? (pCurPicture->pData[i] + kiStrideUV * pFrameCrop->iCropTop + pFrameCrop->iCropLeft) : pCurPicture->pData[i];
       for (j = 0; j < kiChromaHeight; ++ j) {
-        iWrittenSize = WelsFwrite (&pCurPicture->pData[i][j * kiStrideUV], 1, kiChromaWidth, pDumpRecFile);
+        iWrittenSize = WelsFwrite (pSrc + j * kiStrideUV, 1, kiChromaWidth, pDumpRecFile);
         assert (iWrittenSize == kiChromaWidth);
         if (iWrittenSize < kiChromaWidth) {
           assert (0);	// make no sense for us if writing failed
@@ -420,8 +425,12 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName
  * \brief	Dump the reconstruction pictures
  */
 
-void DumpRecFrame (SPicture* pCurPicture, const char* kpFileName, bool bAppend) {
+void DumpRecFrame (SPicture* pCurPicture, const char* kpFileName, const int8_t kiDid, bool bAppend, SDqLayer* pDqLayer) {
   WelsFileHandle* pDumpRecFile				= NULL;
+  SWelsSPS* pSpsTmp = (kiDid> BASE_DEPENDENCY_ID)? &(pDqLayer->sLayerInfo.pSubsetSpsP->pSps) : pDqLayer->sLayerInfo.pSpsP;
+  bool bFrameCroppingFlag = pSpsTmp->bFrameCroppingFlag;
+  SCropOffset* pFrameCrop = &pSpsTmp->sFrameCrop;
+
   int32_t iWrittenSize			= 0;
   const char* openMode = bAppend ? "ab" : "wb";
 
@@ -440,13 +449,14 @@ void DumpRecFrame (SPicture* pCurPicture, const char* kpFileName, bool bAppend) 
     int32_t i = 0;
     int32_t j = 0;
     const int32_t kiStrideY	= pCurPicture->iLineSize[0];
-    const int32_t kiLumaWidth	= pCurPicture->iWidthInPixel;
-    const int32_t kiLumaHeight	= pCurPicture->iHeightInPixel;
+    const int32_t kiLumaWidth	= bFrameCroppingFlag ? (pCurPicture->iWidthInPixel-(( pFrameCrop->iCropLeft + pFrameCrop->iCropRight ) << 1 )) : pCurPicture->iWidthInPixel;
+    const int32_t kiLumaHeight	= bFrameCroppingFlag ? (pCurPicture->iHeightInPixel-(( pFrameCrop->iCropTop + pFrameCrop->iCropBottom ) << 1 )) : pCurPicture->iHeightInPixel;
     const int32_t kiChromaWidth	= kiLumaWidth >> 1;
     const int32_t kiChromaHeight	= kiLumaHeight >> 1;
-
+    uint8_t* pSrc = NULL;
+    pSrc = bFrameCroppingFlag ? (pCurPicture->pData[0] + kiStrideY * ( pFrameCrop->iCropTop << 1 ) + ( pFrameCrop->iCropLeft << 1 )) : pCurPicture->pData[0];
     for (j = 0; j < kiLumaHeight; ++ j) {
-      iWrittenSize = WelsFwrite (&pCurPicture->pData[0][j * kiStrideY], 1, kiLumaWidth, pDumpRecFile);
+      iWrittenSize = WelsFwrite (pSrc + j * kiStrideY, 1, kiLumaWidth, pDumpRecFile);
       assert (iWrittenSize == kiLumaWidth);
       if (iWrittenSize < kiLumaWidth) {
         assert (0);	// make no sense for us if writing failed
@@ -456,8 +466,9 @@ void DumpRecFrame (SPicture* pCurPicture, const char* kpFileName, bool bAppend) 
     }
     for (i = 1; i < I420_PLANES; ++ i) {
       const int32_t kiStrideUV = pCurPicture->iLineSize[i];
+      pSrc = bFrameCroppingFlag ? (pCurPicture->pData[i] + kiStrideUV * pFrameCrop->iCropTop + pFrameCrop->iCropLeft) : pCurPicture->pData[i];
       for (j = 0; j < kiChromaHeight; ++ j) {
-        iWrittenSize = WelsFwrite (&pCurPicture->pData[i][j * kiStrideUV], 1, kiChromaWidth, pDumpRecFile);
+        iWrittenSize = WelsFwrite (pSrc + j * kiStrideUV, 1, kiChromaWidth, pDumpRecFile);
         assert (iWrittenSize == kiChromaWidth);
         if (iWrittenSize < kiChromaWidth) {
           assert (0);	// make no sense for us if writing failed

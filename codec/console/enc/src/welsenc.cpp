@@ -84,7 +84,7 @@
 
 #include <iostream>
 using namespace std;
-using namespace WelsSVCEnc;
+using namespace WelsEnc;
 
 /*
  *	Layer Context
@@ -348,7 +348,7 @@ void PrintHelp() {
   printf ("  -sw     the source width\n");
   printf ("  -sh     the source height\n");
   printf ("  -frms   Number of total frames to be encoded\n");
-  printf ("  -gop    GOPSize - GOP size (1,2,4,8, default: 1)\n");
+  printf ("  -numtl  Temporal layer number (default: 1)\n");
   printf ("  -iper   Intra period (default: -1) : must be a power of 2 of GOP size (or -1)\n");
   printf ("  -nalsize the Maximum NAL size. which should be larger than the each layer slicesize when slice mode equals to SM_DYN_SLICE\n");
   printf ("  -spsid   Enable id adding in SPS/PPS per IDR \n");

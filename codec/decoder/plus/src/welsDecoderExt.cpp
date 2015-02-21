@@ -46,6 +46,7 @@
 #include "typedefs.h"
 #include "mem_align.h"
 #include "utils.h"
+#include "version.h"
 
 //#include "macros.h"
 #include "decoder.h"
@@ -64,7 +65,6 @@ extern "C" {
 #include <stdio.h>
 #include <stdarg.h>
 #include <sys/types.h>
-#include <sys/timeb.h>
 #else
 #include <sys/time.h>
 #endif
@@ -211,7 +211,8 @@ void CWelsDecoder::UninitDecoder (void) {
   if (NULL == m_pDecContext)
     return;
 
-  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::uninit_decoder()..");
+  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::uninit_decoder(), openh264 codec version = %s.",
+           VERSION_NUMBER);
 
   WelsEndDecoder (m_pDecContext);
 
@@ -265,7 +266,7 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
       iVal = ERROR_CON_SLICE_COPY;
     else
       iVal = * ((int*)pOption); //EC method
-    m_pDecContext->iErrorConMethod = iVal;
+    m_pDecContext->eErrorConMethod = (ERROR_CON_IDC) iVal;
     return cmResultSuccess;
   } else if (eOptID == DECODER_OPTION_TRACE_LEVEL) {
     if (m_pWelsTrace) {
@@ -303,7 +304,7 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
     return cmInitParaError;
 
   if (DECODER_OPTION_DATAFORMAT == eOptID) {
-    iVal = m_pDecContext->iOutputColorFormat;
+    iVal = (int32_t) m_pDecContext->eOutputColorFormat;
     * ((int*)pOption)	= iVal;
     return cmResultSuccess;
   } else if (DECODER_OPTION_END_OF_STREAM == eOptID) {
@@ -339,7 +340,7 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
     * ((int*)pOption) = iVal;
     return cmResultSuccess;
   } else if (DECODER_OPTION_ERROR_CON_IDC == eOptID) {
-    iVal = m_pDecContext->iErrorConMethod;
+    iVal = (int) m_pDecContext->eErrorConMethod;
     * ((int*)pOption) = iVal;
     return cmResultSuccess;
   }
@@ -399,7 +400,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     //for AVC bitstream (excluding AVC with temporal scalability, including TP), as long as error occur, SHOULD notify upper layer key frame loss.
     if ((IS_PARAM_SETS_NALS (eNalType) || NAL_UNIT_CODED_SLICE_IDR == eNalType) ||
         (VIDEO_BITSTREAM_AVC == m_pDecContext->eVideoType)) {
-      if (m_pDecContext->iErrorConMethod == ERROR_CON_DISABLE) {
+      if (m_pDecContext->eErrorConMethod == ERROR_CON_DISABLE) {
 #ifdef LONG_TERM_REF
         m_pDecContext->bParamSetsLostFlag = true;
 #else
@@ -475,7 +476,24 @@ DECODING_STATE CWelsDecoder::DecodeFrameEx (const unsigned char* kpSrc,
 
 
 using namespace WelsDec;
+/*
+*       WelsGetDecoderCapability
+*       @return: DecCapability information
+*/
+int WelsGetDecoderCapability(SDecoderCapability* pDecCapability) {
+  memset (pDecCapability, 0, sizeof (SDecoderCapability));
+  pDecCapability->iProfileIdc = 66; //Baseline
+  pDecCapability->iProfileIop = 0xE0; //11100000b
+  pDecCapability->iLevelIdc = 32; //level_idc = 3.2
+  pDecCapability->iMaxMbps = 216000; //from level_idc = 3.2
+  pDecCapability->iMaxFs = 5120; //from level_idc = 3.2
+  pDecCapability->iMaxCpb = 20000; //from level_idc = 3.2
+  pDecCapability->iMaxDpb = 20480; //from level_idc = 3.2
+  pDecCapability->iMaxBr = 20000; //from level_idc = 3.2
+  pDecCapability->bRedPicCap = 0; //not support redundant pic
 
+  return ERR_NONE;
+}
 /* WINAPI is indeed in prefix due to sync to application layer callings!! */
 
 /*

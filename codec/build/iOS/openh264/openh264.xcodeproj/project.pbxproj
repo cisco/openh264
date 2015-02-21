@@ -1,0 +1,356 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		54D5364C196CC907005442F9 /* openh264 */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 54D5364D196CC907005442F9 /* Build configuration list for PBXAggregateTarget "openh264" */;
+			buildPhases = (
+			);
+			dependencies = (
+				54D53651196CCC40005442F9 /* PBXTargetDependency */,
+				54D53653196CCC40005442F9 /* PBXTargetDependency */,
+				54D53655196CCC40005442F9 /* PBXTargetDependency */,
+				54D53657196CCC40005442F9 /* PBXTargetDependency */,
+			);
+			name = openh264;
+			productName = openh264;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXContainerItemProxy section */
+		54D53638196CC8CB005442F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 54D53634196CC8CB005442F9 /* common.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4CE443D518B722CD0017DF25;
+			remoteInfo = common;
+		};
+		54D5363E196CC8DA005442F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 54D5363A196CC8DA005442F9 /* welsdec.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4CE4427918B6FC360017DF25;
+			remoteInfo = welsdec;
+		};
+		54D53644196CC8E6005442F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 54D53640196CC8E6005442F9 /* welsenc.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4CE4431118B6FFA00017DF25;
+			remoteInfo = welsenc;
+		};
+		54D5364A196CC8F3005442F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 54D53646196CC8F3005442F9 /* processing.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5499477C196A3F3900BA3D87;
+			remoteInfo = processing;
+		};
+		54D53650196CCC40005442F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 54D53646196CC8F3005442F9 /* processing.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 5499477B196A3F3900BA3D87;
+			remoteInfo = processing;
+		};
+		54D53652196CCC40005442F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 54D53640196CC8E6005442F9 /* welsenc.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 4CE4431018B6FFA00017DF25;
+			remoteInfo = welsenc;
+		};
+		54D53654196CCC40005442F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 54D5363A196CC8DA005442F9 /* welsdec.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 4CE4427818B6FC360017DF25;
+			remoteInfo = welsdec;
+		};
+		54D53656196CCC40005442F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 54D53634196CC8CB005442F9 /* common.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 4CE443D418B722CD0017DF25;
+			remoteInfo = common;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		54D53634196CC8CB005442F9 /* common.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = common.xcodeproj; path = ../common/common.xcodeproj; sourceTree = "<group>"; };
+		54D5363A196CC8DA005442F9 /* welsdec.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = welsdec.xcodeproj; path = ../dec/welsdec/welsdec.xcodeproj; sourceTree = "<group>"; };
+		54D53640196CC8E6005442F9 /* welsenc.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = welsenc.xcodeproj; path = ../enc/welsenc/welsenc.xcodeproj; sourceTree = "<group>"; };
+		54D53646196CC8F3005442F9 /* processing.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = processing.xcodeproj; path = ../processing/processing.xcodeproj; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		54D53602196CC76D005442F9 = {
+			isa = PBXGroup;
+			children = (
+				54D5360D196CC76D005442F9 /* Frameworks */,
+				54D5360C196CC76D005442F9 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		54D5360C196CC76D005442F9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		54D5360D196CC76D005442F9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				54D53646196CC8F3005442F9 /* processing.xcodeproj */,
+				54D53640196CC8E6005442F9 /* welsenc.xcodeproj */,
+				54D5363A196CC8DA005442F9 /* welsdec.xcodeproj */,
+				54D53634196CC8CB005442F9 /* common.xcodeproj */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		54D53635196CC8CB005442F9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				54D53639196CC8CB005442F9 /* libcommon.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		54D5363B196CC8DA005442F9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				54D5363F196CC8DA005442F9 /* libwelsdec.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		54D53641196CC8E6005442F9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				54D53645196CC8E6005442F9 /* libwelsenc.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		54D53647196CC8F3005442F9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				54D5364B196CC8F3005442F9 /* libprocessing.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		54D53603196CC76D005442F9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = com.cisco;
+			};
+			buildConfigurationList = 54D53606196CC76D005442F9 /* Build configuration list for PBXProject "openh264" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 54D53602196CC76D005442F9;
+			productRefGroup = 54D5360C196CC76D005442F9 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 54D53635196CC8CB005442F9 /* Products */;
+					ProjectRef = 54D53634196CC8CB005442F9 /* common.xcodeproj */;
+				},
+				{
+					ProductGroup = 54D53647196CC8F3005442F9 /* Products */;
+					ProjectRef = 54D53646196CC8F3005442F9 /* processing.xcodeproj */;
+				},
+				{
+					ProductGroup = 54D5363B196CC8DA005442F9 /* Products */;
+					ProjectRef = 54D5363A196CC8DA005442F9 /* welsdec.xcodeproj */;
+				},
+				{
+					ProductGroup = 54D53641196CC8E6005442F9 /* Products */;
+					ProjectRef = 54D53640196CC8E6005442F9 /* welsenc.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				54D5364C196CC907005442F9 /* openh264 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		54D53639196CC8CB005442F9 /* libcommon.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libcommon.a;
+			remoteRef = 54D53638196CC8CB005442F9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		54D5363F196CC8DA005442F9 /* libwelsdec.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libwelsdec.a;
+			remoteRef = 54D5363E196CC8DA005442F9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		54D53645196CC8E6005442F9 /* libwelsenc.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libwelsenc.a;
+			remoteRef = 54D53644196CC8E6005442F9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		54D5364B196CC8F3005442F9 /* libprocessing.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libprocessing.a;
+			remoteRef = 54D5364A196CC8F3005442F9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXTargetDependency section */
+		54D53651196CCC40005442F9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = processing;
+			targetProxy = 54D53650196CCC40005442F9 /* PBXContainerItemProxy */;
+		};
+		54D53653196CCC40005442F9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = welsenc;
+			targetProxy = 54D53652196CCC40005442F9 /* PBXContainerItemProxy */;
+		};
+		54D53655196CCC40005442F9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = welsdec;
+			targetProxy = 54D53654196CCC40005442F9 /* PBXContainerItemProxy */;
+		};
+		54D53657196CCC40005442F9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = common;
+			targetProxy = 54D53656196CCC40005442F9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		54D5362C196CC76D005442F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		54D5362D196CC76D005442F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		54D5364E196CC907005442F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		54D5364F196CC907005442F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		54D53606196CC76D005442F9 /* Build configuration list for PBXProject "openh264" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				54D5362C196CC76D005442F9 /* Debug */,
+				54D5362D196CC76D005442F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		54D5364D196CC907005442F9 /* Build configuration list for PBXAggregateTarget "openh264" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				54D5364E196CC907005442F9 /* Debug */,
+				54D5364F196CC907005442F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 54D53603196CC76D005442F9 /* Project object */;
+}

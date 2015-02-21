@@ -20,8 +20,8 @@
 	<Configurations>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\..\..\..\..\bin\win32\Release"
-			IntermediateDirectory=".\..\..\..\obj\decoder\plus\Release"
+			OutputDirectory=".\..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -53,9 +53,6 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				AssemblerListingLocation=".\..\..\..\obj\decoder\plus\Release/"
-				ObjectFile=".\..\..\..\obj\decoder\plus\Release/"
-				ProgramDataBaseFileName=".\..\..\..\obj\decoder\plus\Release/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -77,9 +74,6 @@
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\..\..\decoder\plus\src\wels_dec_export.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)\welsdec.pdb"
-				GenerateMapFile="true"
-				MapFileName="$(OutDir)\welsdec.map"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="2"
 				ImportLibrary="$(OutDir)\welsdec.lib"
@@ -96,7 +90,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				OutputFile=".\..\..\..\..\bin\win32\Release/WelsDecPlus.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -110,8 +103,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory=".\..\..\..\..\bin\win64\Release"
-			IntermediateDirectory=".\..\..\..\obj\decoder\plus\Release"
+			OutputDirectory=".\..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -143,9 +136,6 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				AssemblerListingLocation=".\..\..\..\obj\decoder\plus\Release/"
-				ObjectFile=".\..\..\..\obj\decoder\plus\Release/"
-				ProgramDataBaseFileName=".\..\..\..\obj\decoder\plus\Release/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -167,9 +157,6 @@
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\..\..\decoder\plus\src\wels_dec_export.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)\welsdec.pdb"
-				GenerateMapFile="true"
-				MapFileName="$(OutDir)\welsdec.map"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="2"
 				ImportLibrary="$(OutDir)\welsdec.lib"
@@ -186,7 +173,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				OutputFile=".\..\..\..\..\bin\win32\Release/WelsDecPlus.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -200,8 +186,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\..\..\..\..\bin\win32\Debug"
-			IntermediateDirectory=".\..\..\..\obj\decoder\plus\debug"
+			OutputDirectory=".\..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -231,9 +217,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				AssemblerListingLocation=".\..\..\..\obj\decoder\plus\debug/"
-				ObjectFile=".\..\..\..\obj\decoder\plus\debug/"
-				ProgramDataBaseFileName=".\..\..\..\obj\decoder\plus\debug/"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -255,7 +238,6 @@
 				LinkIncremental="2"
 				ModuleDefinitionFile="..\..\..\decoder\plus\src\wels_dec_export.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)\welsdec.pdb"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="2"
 				ImportLibrary="$(OutDir)\welsdec.lib"
@@ -272,7 +254,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				OutputFile=".\..\..\..\..\bin\win32\Debug/WelsDecPlus.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -286,8 +267,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory=".\..\..\..\..\bin\win64\Debug"
-			IntermediateDirectory=".\..\..\..\obj\decoder\plus\debug"
+			OutputDirectory=".\..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -317,9 +298,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				AssemblerListingLocation=".\..\..\..\obj\decoder\plus\debug/"
-				ObjectFile=".\..\..\..\obj\decoder\plus\debug/"
-				ProgramDataBaseFileName=".\..\..\..\obj\decoder\plus\debug/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -341,7 +319,6 @@
 				LinkIncremental="2"
 				ModuleDefinitionFile="..\..\..\decoder\plus\src\wels_dec_export.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)\welsdec.pdb"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="2"
 				ImportLibrary="$(OutDir)\welsdec.lib"
@@ -358,7 +335,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				OutputFile=".\..\..\..\..\bin\win32\Debug/WelsDecPlus.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"

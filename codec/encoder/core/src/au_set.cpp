@@ -41,50 +41,21 @@
 #include "au_set.h"
 #include "svc_enc_golomb.h"
 #include "macros.h"
-namespace WelsSVCEnc {
 
+#include "wels_common_defs.h"
 
-#define LEVEL_NUMBER 16
+using namespace WelsCommon;
 
-typedef struct TagLevelLimit {
-  uint8_t iLevelIdc;
-  uint32_t uiMaxMbPS; // Max MBs processing speed
-  uint32_t uiMaxFS; // Max Frame size
-  uint32_t uiMaxDPBMB; //Max DPB MB Size
-  uint32_t uiMaxBR; //Max Bitrate
-} SLevelLimit;
+namespace WelsEnc {
 
-const SLevelLimit g_ksLevelLimit[LEVEL_NUMBER] = {
-  { 10,   1485,    99,	  396,     64 },                 //10
-  { 9,    1485,    99,	  396,    128 },                 //9 (1b)
-  { 11,   3000,   396,	  900,    192 },                 //11
-  { 12,   6000,   396,	 2376,    384 },                 //12
-  { 13,  11880,   396,	 2376,    768 },                 //13
-
-  { 20,  11880,   396,    2376,   2000 },                 //20
-  { 21,  19800,   792,    4752,   4000 },                 //21
-  { 22,  20250,  1620,    8100,   4000 },                 //22
-
-  { 30,  40500,  1620,    8100,  10000 },                 //30
-  { 31, 108000,  3600,   18000,  14000 },                 //31
-  { 32, 216000,  5120,   20480,  20000 },                 //32
-
-  { 40, 245760,  8192,   32768,  20000 },                 //40
-  { 41, 245760,  8192,   32768,  50000 },                 //41
-  { 42, 491520,  8192,   34816,  50000 },                 //42
-
-  { 50, 589824, 22080,  110400, 135000 },                 //50
-  { 51, 983040, 36864,  184320, 240000 }                  //51
-};
-
-static inline int32_t WelsCheckLevelLimitation (const SWelsSPS* kpSps, const SLevelLimit* kpLevelLimit,
+static inline int32_t WelsCheckLevelLimitation (const SWelsSPS* kpSps, const SLevelLimits* kpLevelLimit,
     float fFrameRate, int32_t iTargetBitRate) {
   uint32_t uiPicWidthInMBs = kpSps->iMbWidth;
   uint32_t uiPicHeightInMBs = kpSps->iMbHeight;
   uint32_t uiPicInMBs = uiPicWidthInMBs * uiPicHeightInMBs;
   uint32_t uiNumRefFrames = kpSps->iNumRefFrames;
 
-  if (kpLevelLimit->uiMaxMbPS < (uint32_t) (uiPicInMBs * fFrameRate))
+  if (kpLevelLimit->uiMaxMBPS < (uint32_t) (uiPicInMBs * fFrameRate))
     return 0;
   if (kpLevelLimit->uiMaxFS < uiPicInMBs)
     return 0;
@@ -92,7 +63,7 @@ static inline int32_t WelsCheckLevelLimitation (const SWelsSPS* kpSps, const SLe
     return 0;
   if ((kpLevelLimit->uiMaxFS << 3) < (uiPicHeightInMBs * uiPicHeightInMBs))
     return 0;
-  if (kpLevelLimit->uiMaxDPBMB < uiNumRefFrames * uiPicInMBs)
+  if (kpLevelLimit->uiMaxDPBMbs < uiNumRefFrames * uiPicInMBs)
     return 0;
   if (iTargetBitRate
       && ((int32_t) kpLevelLimit->uiMaxBR  * 1200) < iTargetBitRate)    //RC enabled, considering bitrate constraint
@@ -112,14 +83,14 @@ int32_t WelsCheckRefFrameLimitation (SLogContext* pLogCtx, SWelsSvcCodingParam* 
     uint32_t uiPicInMBs = ((pSpatialLayer->iVideoHeight + 15) >> 4) * ((pSpatialLayer->iVideoWidth + 15) >> 4);
     if (pSpatialLayer->uiLevelIdc == LEVEL_UNKNOWN) {
       pSpatialLayer->uiLevelIdc = LEVEL_5_0;
-      WelsLog (pLogCtx, WELS_LOG_WARNING, "change level to level5.0\n");
+      WelsLog (pLogCtx, WELS_LOG_WARNING, "change level to level5.0");
     }
-    iRefFrame = g_ksLevelLimit[pSpatialLayer->uiLevelIdc - 1].uiMaxDPBMB / uiPicInMBs;
+    iRefFrame = g_ksLevelLimits[pSpatialLayer->uiLevelIdc - 1].uiMaxDPBMbs / uiPicInMBs;
     if (iRefFrame < pParam->iMaxNumRefFrame)
       pParam->iMaxNumRefFrame = iRefFrame;
     if (pParam->iMaxNumRefFrame < 1) {
       pParam->iMaxNumRefFrame = 1;
-      WelsLog (pLogCtx, WELS_LOG_ERROR, "error Level setting (%d)\n", pSpatialLayer->uiLevelIdc);
+      WelsLog (pLogCtx, WELS_LOG_ERROR, "error Level setting (%d)", pSpatialLayer->uiLevelIdc);
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
   }
@@ -129,8 +100,8 @@ int32_t WelsCheckRefFrameLimitation (SLogContext* pLogCtx, SWelsSvcCodingParam* 
 static inline int32_t WelsGetLevelIdc (const SWelsSPS* kpSps, float fFrameRate, int32_t iTargetBitRate) {
   int32_t iOrder;
   for (iOrder = 0; iOrder < LEVEL_NUMBER; iOrder++) {
-    if (WelsCheckLevelLimitation (kpSps, & (g_ksLevelLimit[iOrder]), fFrameRate, iTargetBitRate)) {
-      return (int32_t) (g_ksLevelLimit[iOrder].iLevelIdc);
+    if (WelsCheckLevelLimitation (kpSps, & (g_ksLevelLimits[iOrder]), fFrameRate, iTargetBitRate)) {
+      return (int32_t) (g_ksLevelLimits[iOrder].uiLevelIdc);
     }
   }
   return 51; //final decision: select the biggest level
@@ -383,15 +354,8 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
   pSps->iMbWidth	= (pLayerParam->iVideoWidth + 15) >> 4;
   pSps->iMbHeight	= (pLayerParam->iVideoHeight + 15) >> 4;
 
-  if (0 == kuiIntraPeriod) {
-    //max value of both iFrameNum and POC are 2^16-1, in our encoder, iPOC=2*iFrameNum, so max of iFrameNum should be 2^15-1.--
-    pSps->uiLog2MaxFrameNum = 15;//16;
-  } else {
-    pSps->uiLog2MaxFrameNum	= 4;
-    while ((uint32_t) (1 << pSps->uiLog2MaxFrameNum) <= kuiIntraPeriod) {
-      ++ pSps->uiLog2MaxFrameNum;
-    }
-  }
+  //max value of both iFrameNum and POC are 2^16-1, in our encoder, iPOC=2*iFrameNum, so max of iFrameNum should be 2^15-1.--
+  pSps->uiLog2MaxFrameNum = 15;//16;
   pSps->iLog2MaxPocLsb	= 1 + pSps->uiLog2MaxFrameNum;
 
   pSps->iNumRefFrames	= kiNumRefFrame;	/* min pRef size when fifo pRef operation*/
@@ -501,4 +465,4 @@ int32_t WelsInitPps (SWelsPPS* pPps,
 
   return 0;
 }
-} // namespace WelsSVCEnc
+} // namespace WelsEnc

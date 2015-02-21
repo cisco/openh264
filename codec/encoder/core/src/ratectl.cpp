@@ -47,7 +47,7 @@
 #include "svc_enc_golomb.h"
 
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 //#define _TEST_TEMP_RC_
 #ifdef _TEST_TEMP_RC_
@@ -348,11 +348,11 @@ void RcTraceVGopBitrate (sWelsEncCtx* pEncCtx) {
 #ifdef _TEST_TEMP_Rc_
     fprintf (fp_vgop, "%d\n", WELS_ROUND ((double)iTotalBits / iFrameInVGop));
 #endif
-    WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO, "[Rc] VGOPbitrate%d: %d \n", kiDid, iVGopBitrate);
+    WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO, "[Rc] VGOPbitrate%d: %d ", kiDid, iVGopBitrate);
     if (iTotalBits > 0) {
       iTid = 0;
       while (iTid <= kiHighestTid) {
-        WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO, "T%d=%8.3f \n", iTid, (double) (pTOverRc[iTid].iGopBitsDq / iTotalBits));
+        WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO, "T%d=%8.3f ", iTid, (double) (pTOverRc[iTid].iGopBitsDq / iTotalBits));
         ++ iTid;
       }
     }
@@ -709,9 +709,7 @@ void   RcVBufferCalculationSkip (sWelsEncCtx* pEncCtx) {
       || (dIncPercent > pWelsSvcRc->iRcVaryPercentage)) {
     pEncCtx->iSkipFrameFlag = 1;
     pWelsSvcRc->iBufferFullnessSkip = pWelsSvcRc->iBufferFullnessSkip - kiOutputBits;
-#ifdef FRAME_INFO_OUTPUT
-    fprintf (stderr, "skip one frame\n");
-#endif
+    WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO,"skip one frame");
   }
 
   if (pWelsSvcRc->iBufferFullnessSkip < 0)
@@ -759,8 +757,8 @@ void RcVBufferCalculationPadding (sWelsEncCtx* pEncCtx) {
 void RcTraceFrameBits (sWelsEncCtx* pEncCtx) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
 
-  WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO,
-           "[Rc] encoding_qp%d, qp = %3d, index = %8d, iTid = %1d, used = %8d, target = %8d, remaingbits = %8d\n",
+  WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
+           "[Rc] encoding_qp%d, qp = %3d, index = %8d, iTid = %1d, used = %8d, target = %8d, remaingbits = %8d",
            pEncCtx->uiDependencyId, pWelsSvcRc->iAverageFrameQp, pEncCtx->iFrameIndex, pEncCtx->uiTemporalId,
            pWelsSvcRc->iFrameDqBits,
            pWelsSvcRc->iTargetBits, pWelsSvcRc->iRemainingBits);
@@ -888,10 +886,7 @@ void  WelsRcPictureInfoUpdateGom (void* pCtx, int32_t layer_size) {
   }
   pWelsSvcRc->iRemainingBits -= pWelsSvcRc->iFrameDqBits;
 
-#if GOM_TRACE_FLAG
   RcTraceFrameBits (pEncCtx);
-#endif
-
 
   if (pEncCtx->pSvcParam->bEnableFrameSkip /*&&
       pEncCtx->uiDependencyId == pEncCtx->pSvcParam->iSpatialLayerNum - 1*/) {
@@ -999,20 +994,43 @@ void  WelsRcMbInitDisable (void* pCtx, SMB* pCurMb, SSlice* pSlice) {
 void  WelsRcMbInfoUpdateDisable (void* pCtx, SMB* pCurMb, int32_t iCostLuma, SSlice* pSlice) {
 }
 
+void WelRcPictureInitBufferBasedQp (void* pCtx) {
+  sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
+  SVAAFrameInfo* pVaa			= static_cast<SVAAFrameInfo*> (pEncCtx->pVaa);
 
-void  WelsRcInitModule (void* pCtx,  int32_t iModule) {
+  int32_t iMinQp = MIN_SCREEN_QP;
+  if (pVaa->eSceneChangeIdc == LARGE_CHANGED_SCENE)
+    iMinQp = MIN_SCREEN_QP + 2;
+  else if (pVaa->eSceneChangeIdc == MEDIUM_CHANGED_SCENE)
+    iMinQp = MIN_SCREEN_QP + 1;
+  else
+    iMinQp = MIN_SCREEN_QP;
+
+  pEncCtx->iGlobalQp += pEncCtx->iDropNumber;
+  pEncCtx->iGlobalQp = WELS_CLIP3 (pEncCtx->iGlobalQp, iMinQp, MAX_SCREEN_QP);
+}
+void  WelsRcInitModule (void* pCtx, RC_MODES iRcMode) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
   SWelsRcFunc*   pRcf = &pEncCtx->pFuncList->pfRc;
 
-  switch (iModule) {
-  case WELS_RC_DISABLE:
+  switch (iRcMode) {
+  case RC_OFF_MODE:
     pRcf->pfWelsRcPictureInit = WelsRcPictureInitDisable;
     pRcf->pfWelsRcPicDelayJudge = NULL;
     pRcf->pfWelsRcPictureInfoUpdate = WelsRcPictureInfoUpdateDisable;
     pRcf->pfWelsRcMbInit = WelsRcMbInitDisable;
     pRcf->pfWelsRcMbInfoUpdate = WelsRcMbInfoUpdateDisable;
     break;
-  case WELS_RC_GOM:
+  case RC_BUFFERBASED_MODE:
+    pRcf->pfWelsRcPictureInit = WelRcPictureInitBufferBasedQp;
+    pRcf->pfWelsRcPicDelayJudge = NULL;
+    pRcf->pfWelsRcPictureInfoUpdate = WelsRcPictureInfoUpdateDisable;
+    pRcf->pfWelsRcMbInit = WelsRcMbInitDisable;
+    pRcf->pfWelsRcMbInfoUpdate = WelsRcMbInfoUpdateDisable;
+    break;
+  case RC_QUALITY_MODE:
+  case RC_BITRATE_MODE:
+  case RC_LOW_BW_MODE:
   default:
     pRcf->pfWelsRcPictureInit = WelsRcPictureInitGom;
     pRcf->pfWelsRcPicDelayJudge = WelsRcFrameDelayJudge;

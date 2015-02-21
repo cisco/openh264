@@ -34,7 +34,7 @@
 
 #include "typedefs.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 #ifdef X86_ASM
 extern "C"

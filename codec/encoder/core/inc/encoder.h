@@ -42,7 +42,7 @@
 
 #include "encoder_context.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 /*!
  * \brief	request specific memory for SVC
  * \param	pEncCtx		sWelsEncCtx*
@@ -91,12 +91,12 @@ int32_t GetTemporalLevel (SSpatialLayerInternal* fDlp, const int32_t kiFrameNum,
  * \brief	Dump reconstruction for dependency layer
  */
 
-extern "C" void DumpDependencyRec (SPicture* pSrcPic, const char* kpFileName, const int8_t kiDid, bool bAppend);
+extern "C" void DumpDependencyRec (SPicture* pSrcPic, const char* kpFileName, const int8_t kiDid, bool bAppend, SDqLayer* pDqLayer);
 
 /*!
  * \brief	Dump the reconstruction pictures
  */
-void DumpRecFrame (SPicture* pSrcPic, const char* kpFileName, bool bAppend);
+void DumpRecFrame (SPicture* pSrcPic, const char* kpFileName, const int8_t kiDid, bool bAppend, SDqLayer* pDqLayer);
 
 
 /*!

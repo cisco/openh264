@@ -3,7 +3,7 @@
 #include "svc_enc_golomb.h"
 #include "macros.h"
 
-using namespace WelsSVCEnc;
+using namespace WelsEnc;
 
 const double g_kdLog2Factor = 1.0 / log (2.0);
 

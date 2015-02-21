@@ -38,7 +38,7 @@
 #include "as264_common.h"
 #include "wels_common_basis.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 #define LIST_SIZE      0x10000    //(256*256)
 typedef struct TagScreenBlockFeatureStorage {
 //Input
@@ -54,6 +54,7 @@ uint16_t*  pLocationPointer;  // buffer of position array
 int32_t    iActualListSize;      // actual list size
 uint32_t uiSadCostThreshold[BLOCK_SIZE_ALL];
 bool      bRefBlockFeatureCalculated; // flag of whether pre-process is done
+uint16_t **pFeatureValuePointerList;//uint16_t* pFeatureValuePointerList[WELS_MAX (LIST_SIZE_SUM_16x16, LIST_SIZE_MSE_16x16)]
 } SScreenBlockFeatureStorage; //should be stored with RefPic, one for each frame
 
 /*
@@ -111,7 +112,7 @@ SScreenBlockFeatureStorage* pScreenBlockFeatureStorage;
 //  int32_t    planes;      // planes of YUV
 //}Rs_Picture_t;
 
-}  // end of namespace WelsSVCEnc {
+}  // end of namespace WelsEnc {
 
 #endif//WELS_PICTURE_H__
 

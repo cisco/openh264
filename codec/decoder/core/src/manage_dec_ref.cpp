@@ -112,7 +112,7 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
 
   if ((pCtx->sRefPic.uiShortRefCount[LIST_0] + pCtx->sRefPic.uiLongRefCount[LIST_0] <= 0) && (pCtx->eSliceType != I_SLICE
       && pCtx->eSliceType != SI_SLICE)) {
-    if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) { //IDR lost!, recover it for future decoding with data all set to 0
+    if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) { //IDR lost!, recover it for future decoding with data all set to 0
       PPicture pRef = PrefetchPic (pCtx->pPicBuff[0]);
       if (pRef != NULL) {
         memset (pRef->pData[0], 128, pRef->iLinesize[0] * pRef->iHeightInPixel);
@@ -121,9 +121,11 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
         pRef->iFrameNum = 0;
         pRef->iFramePoc = 0;
         pRef->uiTemporalId = pRef->uiQualityId = 0;
+        ExpandReferencingPicture (pRef->pData, pRef->iWidthInPixel, pRef->iHeightInPixel, pRef->iLinesize,
+                                  pCtx->sExpandPicFunc.pfExpandLumaPicture, pCtx->sExpandPicFunc.pfExpandChromaPicture);
         AddShortTermToList (&pCtx->sRefPic, pRef);
       } else {
-        WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "WelsInitRefList()::PrefetchPic for EC errors.\n");
+        WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "WelsInitRefList()::PrefetchPic for EC errors.");
         pCtx->iErrorCode |= dsOutOfMemory;
         return ERR_INFO_REF_COUNT_OVERFLOW;
       }
@@ -187,7 +189,7 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
           if (ppRefList[i]->iFrameNum == iPredFrameNum && !ppRefList[i]->bIsLongRef) {
             if ((pNalHeaderExt->uiQualityId == ppRefList[i]->uiQualityId)
                 && (pSliceHeader->iSpsId != ppRefList[i]->iSpsId)) {   //check;
-              WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "WelsReorderRefList()::::BASE LAYER::::iSpsId:%d, ref_sps_id:%d\n",
+              WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "WelsReorderRefList()::::BASE LAYER::::iSpsId:%d, ref_sps_id:%d",
                        pSliceHeader->iSpsId, ppRefList[i]->iSpsId);
               pCtx->iErrorCode = dsNoParamSets;	//cross-IDR reference frame selection, SHOULD request IDR.--
               return ERR_INFO_REFERENCE_PIC_LOST;
@@ -204,7 +206,7 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
               pRefPicListReorderSyn->sReorderingSyn[LIST_0][iReorderingIndex].uiLongTermPicNum) {
             if ((pNalHeaderExt->uiQualityId == ppRefList[i]->uiQualityId)
                 && (pSliceHeader->iSpsId != ppRefList[i]->iSpsId)) {    //check;
-              WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "WelsReorderRefList()::::BASE LAYER::::iSpsId:%d, ref_sps_id:%d\n",
+              WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "WelsReorderRefList()::::BASE LAYER::::iSpsId:%d, ref_sps_id:%d",
                        pSliceHeader->iSpsId, ppRefList[i]->iSpsId);
               pCtx->iErrorCode = dsNoParamSets;	//cross-IDR reference frame selection, SHOULD request IDR.--
               return ERR_INFO_REFERENCE_PIC_LOST;
@@ -257,7 +259,7 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
     if (pRefPicMarking->bAdaptiveRefPicMarkingModeFlag) {
       iRet = MMCO (pCtx, pRefPicMarking);
       if (iRet != ERR_NONE) {
-        if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) {
+        if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
           iRet = RemainOneBufferInDpbForEC (pCtx);
         } else {
           return iRet;
@@ -272,7 +274,7 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
     } else {
       iRet = SlidingWindow (pCtx);
       if (iRet != ERR_NONE) {
-        if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) {
+        if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
           iRet = RemainOneBufferInDpbForEC (pCtx);
         } else {
           return iRet;
@@ -283,7 +285,7 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
 
   if (!pCtx->pDec->bIsLongRef) {
     if (pRefPic->uiLongRefCount[LIST_0] + pRefPic->uiShortRefCount[LIST_0] >= WELS_MAX (1, pCtx->pSps->iNumRefFrames)) {
-      if (pCtx->iErrorConMethod != ERROR_CON_DISABLE) {
+      if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
         iRet = RemainOneBufferInDpbForEC (pCtx);
       } else {
         return ERR_INFO_INVALID_MMCO_REF_NUM_OVERFLOW;
@@ -328,13 +330,13 @@ static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType,
   case MMCO_SHORT2UNUSED:
     pPic = WelsDelShortFromListSetUnref (pRefPic, iShortFrameNum);
     if (pPic == NULL) {
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "MMCO_SHORT2UNUSED: delete a empty entry from short term list\n");
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "MMCO_SHORT2UNUSED: delete a empty entry from short term list");
     }
     break;
   case MMCO_LONG2UNUSED:
     pPic = WelsDelLongFromListSetUnref (pRefPic, uiLongTermPicNum);
     if (pPic == NULL) {
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "MMCO_LONG2UNUSED: delete a empty entry from long term list\n");
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "MMCO_LONG2UNUSED: delete a empty entry from long term list");
     }
     break;
   case MMCO_SHORT2LONG:
@@ -343,14 +345,14 @@ static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType,
     }
     pPic = WelsDelShortFromList (pRefPic, iShortFrameNum);
     if (pPic == NULL) {
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "MMCO_LONG2LONG: delete a empty entry from short term list\n");
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "MMCO_LONG2LONG: delete a empty entry from short term list");
       break;
     }
     WelsDelLongFromListSetUnref (pRefPic, iLongTermFrameIdx);
 #ifdef LONG_TERM_REF
     pCtx->bCurAuContainLtrMarkSeFlag = true;
     pCtx->iFrameNumOfAuMarkedLtr      = iShortFrameNum;
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "ex_mark_avc():::MMCO_SHORT2LONG:::LTR marking....iFrameNum: %d\n",
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "ex_mark_avc():::MMCO_SHORT2LONG:::LTR marking....iFrameNum: %d",
              pCtx->iFrameNumOfAuMarkedLtr);
 #endif
 
@@ -379,7 +381,7 @@ static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType,
 #ifdef LONG_TERM_REF
     pCtx->bCurAuContainLtrMarkSeFlag = true;
     pCtx->iFrameNumOfAuMarkedLtr      = pCtx->iFrameNum;
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "ex_mark_avc():::MMCO_LONG:::LTR marking....iFrameNum: %d\n",
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "ex_mark_avc():::MMCO_LONG:::LTR marking....iFrameNum: %d",
              pCtx->iFrameNum);
 #endif
     iRet = AddLongTermToList (pRefPic, pCtx->pDec, iLongTermFrameIdx);
@@ -565,7 +567,7 @@ static int32_t RemainOneBufferInDpbForEC (PWelsDecoderContext pCtx) {
   }
   if (pRefPic->uiShortRefCount[0] + pRefPic->uiLongRefCount[0] >=
       pCtx->pSps->iNumRefFrames) { //fail to remain one empty buffer in DPB
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "RemainOneBufferInDpbForEC(): empty one DPB failed for EC!\n");
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "RemainOneBufferInDpbForEC(): empty one DPB failed for EC!");
     iRet = ERR_INFO_REF_COUNT_OVERFLOW;
   }
 

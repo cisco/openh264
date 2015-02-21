@@ -53,6 +53,7 @@ ENCODER_ASM_ARM_SRCS=\
 	$(ENCODER_SRCDIR)/core/arm/memory_neon.S\
 	$(ENCODER_SRCDIR)/core/arm/pixel_neon.S\
 	$(ENCODER_SRCDIR)/core/arm/reconstruct_neon.S\
+	$(ENCODER_SRCDIR)/core/arm/svc_motion_estimation.S\
 
 ENCODER_OBJS += $(ENCODER_ASM_ARM_SRCS:.S=.$(OBJ))
 endif
@@ -64,6 +65,7 @@ ENCODER_ASM_ARM64_SRCS=\
 	$(ENCODER_SRCDIR)/core/arm64/memory_aarch64_neon.S\
 	$(ENCODER_SRCDIR)/core/arm64/pixel_aarch64_neon.S\
 	$(ENCODER_SRCDIR)/core/arm64/reconstruct_aarch64_neon.S\
+	$(ENCODER_SRCDIR)/core/arm64/svc_motion_estimation_aarch64_neon.S\
 
 ENCODER_OBJS += $(ENCODER_ASM_ARM64_SRCS:.S=.$(OBJ))
 endif

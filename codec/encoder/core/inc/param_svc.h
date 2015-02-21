@@ -51,7 +51,7 @@
 #include "svc_enc_slice_segment.h"
 #include "as264_common.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 #define   INVALID_TEMPORAL_ID   ((uint8_t)0xff)
 
@@ -292,9 +292,6 @@ int32_t ParamTranscode (const SEncParamExt& pCodingParam) {
 
   /* Deblocking loop filter */
   iLoopFilterDisableIdc	= pCodingParam.iLoopFilterDisableIdc;	// 0: on, 1: off, 2: on except for slice boundaries,
-  if (iLoopFilterDisableIdc == 0
-      && iMultipleThreadIdc != 1) // Loop filter requested to be enabled, with threading enabled
-    iLoopFilterDisableIdc = 2; // Disable loop filter on slice boundaries since that's not allowed with multithreading
   iLoopFilterAlphaC0Offset = pCodingParam.iLoopFilterAlphaC0Offset;	// AlphaOffset: valid range [-6, 6], default 0
   iLoopFilterBetaOffset = pCodingParam.iLoopFilterBetaOffset;	// BetaOffset:	valid range [-6, 6], default 0
 
@@ -513,6 +510,6 @@ if (NULL == pCodingParam)
 return 0;
 }
 
-}//end of namespace WelsSVCEnc
+}//end of namespace WelsEnc
 
 #endif//WELS_ENCODER_PARAMETER_SVC_H__

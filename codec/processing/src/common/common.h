@@ -69,6 +69,12 @@ int32_t WelsProcessingSampleSad8x8_neon (uint8_t*, int32_t, uint8_t*, int32_t);
 WELSVP_EXTERN_C_END
 #endif
 
+#ifdef HAVE_NEON_AARCH64
+WELSVP_EXTERN_C_BEGIN
+int32_t WelsProcessingSampleSad8x8_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+WELSVP_EXTERN_C_END
+#endif
+
 WELSVP_NAMESPACE_END
 
 #endif

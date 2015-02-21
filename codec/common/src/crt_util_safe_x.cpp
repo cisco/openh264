@@ -51,7 +51,6 @@
 #endif //!_MSC_VER
 #else
 #include <sys/time.h>
-#include <sys/timeb.h>
 #endif //_WIN32
 
 #include "macros.h"

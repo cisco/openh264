@@ -43,7 +43,7 @@
 #include "typedefs.h"
 #include "encoder_context.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 /*!
  * \brief	initialize source picture body
@@ -108,7 +108,7 @@ int32_t ForceCodingIDR (sWelsEncCtx* pCtx);
 int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNew);
 void WelsEncoderApplyFrameRate (SWelsSvcCodingParam* pParam);
 void WelsEncoderApplyBitRate (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iLayer);
-
+void WelsEncoderApplyLTR (SLogContext* pLogCtx, sWelsEncCtx*pCtx,SLTRConfig* pLTRValue);
 int32_t FilterLTRRecoveryRequest (sWelsEncCtx* pCtx, SLTRRecoverRequest* pLTRRecoverRequest);
 
 void FilterLTRMarkingFeedback (sWelsEncCtx* pCtx, SLTRMarkingFeedback* pLTRMarkingFeedback);

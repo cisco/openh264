@@ -44,7 +44,7 @@
 #include "encoder_context.h"
 #include "wels_func_ptr_def.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 #define CAMERA_STARTMV_RANGE (64)
 #define  ITERATIVE_TIMES  (16)
 #define CAMERA_MV_RANGE (CAMERA_STARTMV_RANGE+ITERATIVE_TIMES)
@@ -200,9 +200,9 @@ bool CheckDirectionalMvFalse (PSampleSadSatdCostFunc pSad, void* vpMe,
 
 // Cross Search Basics
 void LineFullSearch_c (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
-                       uint16_t* pMvdTable, const int32_t kiFixedMvd,
+                       uint16_t* pMvdTable,
                        const int32_t kiEncStride, const int32_t kiRefStride,
-                       const int32_t kiMinPos, const int32_t kiMaxPos,
+                       const int16_t kiMinMv, const int16_t kiMaxMv,
                        const bool bVerticalSearch);
 #ifdef X86_ASM
 extern "C"
@@ -212,14 +212,14 @@ uint32_t SampleSad16x16Hor8_sse41 (uint8_t*, int32_t, uint8_t*, int32_t, uint16_
 }
 
 void VerticalFullSearchUsingSSE41 (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
-                                   uint16_t* pMvdTable, const int32_t kiFixedMvd,
+                                   uint16_t* pMvdTable,
                                    const int32_t kiEncStride, const int32_t kiRefStride,
-                                   const int32_t kiMinPos, const int32_t kiMaxPos,
+                                   const int16_t kiMinMv, const int16_t kiMaxMv,
                                    const bool bVerticalSearch);
 void HorizontalFullSearchUsingSSE41 (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
-                                     uint16_t* pMvdTable, const int32_t kiFixedMvd,
+                                     uint16_t* pMvdTable,
                                      const int32_t kiEncStride, const int32_t kiRefStride,
-                                     const int32_t kiMinPos, const int32_t kiMaxPos,
+                                     const int16_t kiMinMv, const int16_t kiMaxMv,
                                      const bool bVerticalSearch);
 #endif
 void WelsMotionCrossSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlice,
@@ -236,6 +236,10 @@ void WelsDiamondCrossSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* 
 #define FMESWITCH_DEFAULT_GOODFRAME_NUM (2)
 #define FMESWITCH_MBSAD_THRESHOLD   30 // empirically set.
 
+void InitializeHashforFeature_c (uint32_t* pTimesOfFeatureValue, uint16_t* pBuf, const int32_t kiListSize,
+                                 uint16_t** pLocationOfFeature, uint16_t** pFeatureValuePointerList);
+void FillQpelLocationByFeatureValue_c (uint16_t* pFeatureOfBlock, const int32_t kiWidth, const int32_t kiHeight,
+                                       uint16_t** pFeatureValuePointerList);
 int32_t SumOf8x8SingleBlock_c (uint8_t* pRef, const int32_t kiRefStride);
 int32_t SumOf16x16SingleBlock_c (uint8_t* pRef, const int32_t kiRefStride);
 void SumOf8x8BlockOfFrame_c (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
@@ -244,6 +248,61 @@ void SumOf8x8BlockOfFrame_c (uint8_t* pRefPicture, const int32_t kiWidth, const 
 void SumOf16x16BlockOfFrame_c (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
                                const int32_t kiRefStride,
                                uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+
+#ifdef X86_ASM
+extern "C"
+{
+void InitializeHashforFeature_sse2 (uint32_t* pTimesOfFeatureValue, uint16_t* pBuf, const int32_t kiListSize,
+                                     uint16_t** pLocationOfFeature, uint16_t** pFeatureValuePointerList);
+void FillQpelLocationByFeatureValue_sse2 (uint16_t* pFeatureOfBlock, const int32_t kiWidth, const int32_t kiHeight,
+                                           uint16_t** pFeatureValuePointerList);
+int32_t SumOf8x8SingleBlock_sse2 (uint8_t* pRef, const int32_t kiRefStride);
+int32_t SumOf16x16SingleBlock_sse2 (uint8_t* pRef, const int32_t kiRefStride);
+void SumOf8x8BlockOfFrame_sse2 (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
+                const int32_t kiRefStride, uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+void SumOf16x16BlockOfFrame_sse2 (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
+                const int32_t kiRefStride, uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+void SumOf8x8BlockOfFrame_sse4 (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
+                const int32_t kiRefStride, uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+void SumOf16x16BlockOfFrame_sse4 (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
+                const int32_t kiRefStride, uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+}
+#endif
+#ifdef HAVE_NEON
+extern "C"
+{
+void InitializeHashforFeature_neon (uint32_t* pTimesOfFeatureValue, uint16_t* pBuf, const int32_t kiListSize,
+                                    uint16_t** pLocationOfFeature, uint16_t** pFeatureValuePointerList);
+void FillQpelLocationByFeatureValue_neon (uint16_t* pFeatureOfBlock, const int32_t kiWidth, const int32_t kiHeight,
+                                          uint16_t** pFeatureValuePointerList);
+int32_t SumOf8x8SingleBlock_neon (uint8_t* pRef, const int32_t kiRefStride);
+int32_t SumOf16x16SingleBlock_neon (uint8_t* pRef, const int32_t kiRefStride);
+void SumOf8x8BlockOfFrame_neon (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
+                                const int32_t kiRefStride,
+                                uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+void SumOf16x16BlockOfFrame_neon (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
+                                  const int32_t kiRefStride,
+                                  uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+}
+#endif
+
+#ifdef HAVE_NEON_AARCH64
+extern "C"
+{
+void InitializeHashforFeature_AArch64_neon (uint32_t* pTimesOfFeatureValue, uint16_t* pBuf, const int32_t kiListSize,
+                                    uint16_t** pLocationOfFeature, uint16_t** pFeatureValuePointerList);
+void FillQpelLocationByFeatureValue_AArch64_neon (uint16_t* pFeatureOfBlock, const int32_t kiWidth, const int32_t kiHeight,
+                                          uint16_t** pFeatureValuePointerList);
+int32_t SumOf8x8SingleBlock_AArch64_neon (uint8_t* pRef, const int32_t kiRefStride);
+int32_t SumOf16x16SingleBlock_AArch64_neon (uint8_t* pRef, const int32_t kiRefStride);
+void SumOf8x8BlockOfFrame_AArch64_neon (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
+                                const int32_t kiRefStride,
+                                uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+void SumOf16x16BlockOfFrame_AArch64_neon (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
+                                  const int32_t kiRefStride,
+                                  uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+}
+#endif
 int32_t RequestScreenBlockFeatureStorage (CMemoryAlign* pMa, const int32_t kiFrameWidth,  const int32_t kiFrameHeight,
     const int32_t iNeedFeatureStorage,
     SScreenBlockFeatureStorage* pScreenBlockFeatureStorage);

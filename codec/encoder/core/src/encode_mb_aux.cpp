@@ -34,7 +34,7 @@
 #include "ls_defines.h"
 #include "encode_mb_aux.h"
 #include "cpu_core.h"
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 ALIGNED_DECLARE (const int16_t, g_kiQuantInterFF[58][8], 16) = {
   /* 0*/ {   0,   1,   0,   1,   1,   1,   1,   1 },

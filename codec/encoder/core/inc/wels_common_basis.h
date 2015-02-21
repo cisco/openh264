@@ -43,7 +43,7 @@
 
 using namespace WelsCommon;
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 
 
 struct SMVUnitXY {			// each 4 Bytes

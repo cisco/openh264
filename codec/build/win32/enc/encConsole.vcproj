@@ -20,8 +20,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\..\..\..\..\bin\win32\Debug"
-			IntermediateDirectory=".\..\..\..\obj\encConsole\Debug"
+			OutputDirectory=".\..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -51,9 +51,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				AssemblerListingLocation=".\..\..\..\obj\encConsole\Debug/"
-				ObjectFile=".\..\..\..\obj\encConsole\Debug/"
-				ProgramDataBaseFileName=".\..\..\..\obj\encConsole\Debug/"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -74,9 +71,6 @@
 				OutputFile="$(OutDir)\encConsole.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)\encConsole.pdb"
-				GenerateMapFile="true"
-				MapFileName="$(OutDir)\encConsole.map"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="2"
@@ -107,8 +101,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory=".\..\..\..\..\bin\win64\Debug"
-			IntermediateDirectory=".\..\..\..\obj\encConsole\Debug"
+			OutputDirectory=".\..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -138,9 +132,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				AssemblerListingLocation=".\..\..\..\obj\encConsole\Debug/"
-				ObjectFile=".\..\..\..\obj\encConsole\Debug/"
-				ProgramDataBaseFileName=".\..\..\..\obj\encConsole\Debug/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -161,9 +152,6 @@
 				OutputFile="$(OutDir)\encConsole.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)\encConsole.pdb"
-				GenerateMapFile="true"
-				MapFileName="$(OutDir)\encConsole.map"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="2"
@@ -194,8 +182,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\..\..\..\..\bin\win32\Release"
-			IntermediateDirectory=".\..\..\..\obj\encConsole\Release"
+			OutputDirectory=".\..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -226,9 +214,6 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				AssemblerListingLocation=".\..\..\..\obj\encConsole\Release/"
-				ObjectFile=".\..\..\..\obj\encConsole\Release/"
-				ProgramDataBaseFileName=".\..\..\..\obj\encConsole\Release/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -249,9 +234,6 @@
 				OutputFile="$(OutDir)\encConsole.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)\encConsole.pdb"
-				GenerateMapFile="false"
-				MapExports="false"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="2"
@@ -282,8 +264,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory=".\..\..\..\..\bin\win64\Release"
-			IntermediateDirectory=".\..\..\..\obj\encConsole\Release"
+			OutputDirectory=".\..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -314,9 +296,6 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				AssemblerListingLocation=".\..\..\..\obj\encConsole\Release/"
-				ObjectFile=".\..\..\..\obj\encConsole\Release/"
-				ProgramDataBaseFileName=".\..\..\..\obj\encConsole\Release/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -337,9 +316,6 @@
 				OutputFile="$(OutDir)\encConsole.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)\encConsole.pdb"
-				GenerateMapFile="false"
-				MapExports="false"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="2"

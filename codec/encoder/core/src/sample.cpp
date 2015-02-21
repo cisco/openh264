@@ -44,7 +44,7 @@
 #include "mc.h"
 #include "cpu_core.h"
 
-namespace WelsSVCEnc {
+namespace WelsEnc {
 int32_t WelsSampleSatd4x4_c (uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2) {
   int32_t iSatdSum = 0;
   int32_t pSampleMix[4][4] = {{ 0 }};
@@ -443,4 +443,4 @@ void WelsInitSampleSadFunc (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
 #endif
 }
 
-} // namespace WelsSVCEnc
+} // namespace WelsEnc

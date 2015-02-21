@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "utils/HashFunctions.h"
 #include "BaseDecoderTest.h"
+#include <string>
 
 static void UpdateHashFromPlane (SHA1Context* ctx, const uint8_t* plane,
                                  int width, int height, int stride) {
@@ -8,6 +9,27 @@ static void UpdateHashFromPlane (SHA1Context* ctx, const uint8_t* plane,
     SHA1Input (ctx, plane, width);
     plane += stride;
   }
+}
+
+class DecoderCapabilityTest : public ::testing::Test {
+ public:
+  virtual void SetUp() {}
+  virtual void TearDown() {}
+};
+
+TEST_F (DecoderCapabilityTest, JustInit) {
+  SDecoderCapability sDecCap;
+  int iRet = WelsGetDecoderCapability (&sDecCap);
+  ASSERT_TRUE (iRet == 0);
+  EXPECT_EQ (sDecCap.iProfileIdc, 66);
+  EXPECT_EQ (sDecCap.iProfileIop, 0xE0);
+  EXPECT_EQ (sDecCap.iLevelIdc, 32);
+  EXPECT_EQ (sDecCap.iMaxMbps, 216000);
+  EXPECT_EQ (sDecCap.iMaxFs, 5120);
+  EXPECT_EQ (sDecCap.iMaxCpb, 20000);
+  EXPECT_EQ (sDecCap.iMaxDpb, 20480);
+  EXPECT_EQ (sDecCap.iMaxBr, 20000);
+  EXPECT_EQ (sDecCap.bRedPicCap, 0);
 }
 
 
@@ -52,7 +74,12 @@ class DecoderOutputTest : public ::testing::WithParamInterface<FileParam>,
 
 TEST_P (DecoderOutputTest, CompareOutput) {
   FileParam p = GetParam();
+#if defined(ANDROID_NDK)
+  std::string filename = std::string ("/sdcard/") + p.fileName;
+  DecodeFile (filename.c_str(), this);
+#else
   DecodeFile (p.fileName, this);
+#endif
 
   unsigned char digest[SHA_DIGEST_LENGTH];
   SHA1Result (&ctx_, digest);
@@ -60,7 +87,6 @@ TEST_P (DecoderOutputTest, CompareOutput) {
     CompareHash (digest, p.hashStr);
   }
 }
-
 static const FileParam kFileParamArray[] = {
   {"res/test_vd_1d.264", "5827d2338b79ff82cd091c707823e466197281d3"},
   {"res/test_vd_rc.264", "eea02e97bfec89d0418593a8abaaf55d02eaa1ca"},

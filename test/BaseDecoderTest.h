@@ -34,11 +34,11 @@ class BaseDecoderTest {
 
   bool Open (const char* fileName);
   bool DecodeNextFrame (Callback* cbk);
+  ISVCDecoder* decoder_;
 
  private:
   void DecodeFrame (const uint8_t* src, int sliceSize, Callback* cbk);
 
-  ISVCDecoder* decoder_;
   std::ifstream file_;
   BufferedData buf_;
   enum {
