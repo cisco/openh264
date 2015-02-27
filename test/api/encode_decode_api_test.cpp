@@ -3463,7 +3463,6 @@ INSTANTIATE_TEST_CASE_P (EncodeDecodeTestAPIBase, EncodeTestAPI,
                          ::testing::ValuesIn (kOptionParamArray));
 
 TEST_P (EncodeTestAPI, SetEncOptionSize) {
-  srand(1002);
   EncodeOptionParam p = GetParam();
   FILE * pFile = NULL;
   if (p.sFileSave != NULL && strlen(p.sFileSave) > 0) {
