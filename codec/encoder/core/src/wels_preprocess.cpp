@@ -430,9 +430,9 @@ bool JudgeNeedOfScaling (SWelsSvcCodingParam* pParam, Scaled_Picture* pScaledPic
 
     if (iInputWidthXDstHeight > iInputHeightXDstWidth) {
       pScaledPicture->iScaledWidth[iSpatialIdx] = iCurDstWidth;
-      pScaledPicture->iScaledHeight[iSpatialIdx] = WELS_MAX (iInputHeightXDstWidth / kiInputPicWidth, 2);
+      pScaledPicture->iScaledHeight[iSpatialIdx] = WELS_MAX (iInputHeightXDstWidth / kiInputPicWidth, 4);
     } else {
-      pScaledPicture->iScaledWidth[iSpatialIdx] = WELS_MAX (iInputWidthXDstHeight / kiInputPicHeight, 2);
+      pScaledPicture->iScaledWidth[iSpatialIdx] = WELS_MAX (iInputWidthXDstHeight / kiInputPicHeight, 4);
       pScaledPicture->iScaledHeight[iSpatialIdx] = iCurDstHeight;
     }
   }
