@@ -1448,6 +1448,7 @@ void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurM
   case MB_TYPE_16x16:
     //luma
     InitMeRefinePointer (&sMeRefine, pMbCache, 0);
+    sMeRefine.pfCopyBlockByMode = pEncCtx->pFuncList->pfCopy16x16NotAligned; // dst can be align with 16 bytes, but not sure at pSrc, 12/29/2011
     MeRefineFracPixel (pEncCtx, pDstLuma, &pWelsMd->sMe.sMe16x16, &sMeRefine, 16, 16);
     UpdateP16x16MotionInfo (pMbCache, pCurMb, pWelsMd->uiRef, &pWelsMd->sMe.sMe16x16.sMv);
 
@@ -1474,6 +1475,7 @@ void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurM
 
   case MB_TYPE_16x8:
     iPixStride = 0;
+    sMeRefine.pfCopyBlockByMode = pEncCtx->pFuncList->pfCopy16x8NotAligned; // dst can be align with 16 bytes, but not sure at pSrc, 12/29/2011
     for (i = 0; i < 2; i++) {
       //luma
       iIdx = i << 3;
@@ -1503,6 +1505,7 @@ void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurM
 
   case MB_TYPE_8x16:
     iPixStride = 0;
+    sMeRefine.pfCopyBlockByMode = pEncCtx->pFuncList->pfCopy8x16Aligned;
     for (i = 0; i < 2; i++) {
       //luma
       iIdx = i << 2;
@@ -1528,8 +1531,8 @@ void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurM
       pEncCtx->pFuncList->sMcFuncs.pMcChromaFunc (pTmpRefCr, iLineSizeRefUV, pTmpDstCr, 8, pMv->iMvX, pMv->iMvY, 4, 8); //Cr
     }
     break;
-
   case MB_TYPE_8x8:
+    sMeRefine.pfCopyBlockByMode = pEncCtx->pFuncList->pfCopy8x8Aligned;
     for (i = 0; i < 4; i++) {
       int32_t iBlk8Idx = i << 2; //0, 4, 8, 12
       int32_t	iBlk4X, iBlk4Y;
