@@ -3046,6 +3046,10 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
       pCurLayer->pFeatureSearchPreparation->uiFMEGoodFrameCount = FMESWITCH_DEFAULT_GOODFRAME_NUM;
     }
   }
+
+  // update some layer dependent variable to save judgements in mb-level
+  pCurLayer->bSatdInMdFlag = ((pFuncList->sSampleDealingFuncs.pfMeCost == pFuncList->sSampleDealingFuncs.pfSampleSatd)
+                              && (pFuncList->sSampleDealingFuncs.pfMdCost == pFuncList->sSampleDealingFuncs.pfSampleSatd));
 }
 
 /*!

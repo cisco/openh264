@@ -122,7 +122,7 @@ uint8_t* pHalfPixHV;
 uint8_t* pQuarPixBest;
 uint8_t* pQuarPixTmp;
 
-PCopyFunc    pfCopyBlockByMode;
+PCopyFunc pfCopyBlockByMode;
 } SMeRefinePointer;
 
 void FillNeighborCacheIntra (SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth/*, bool constrained_intra_pred_flag*/);
