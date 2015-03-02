@@ -77,7 +77,6 @@
 #define MAX_BUFFERED_NUM 3 //mamixum stored number of AU|packet to prevent overwrite
 #define MAX_ACCESS_UNIT_CAPACITY 7077888 //Maximum AU size in bytes for level 5.2 for single frame
 #define MAX_MACROBLOCK_CAPACITY 5000 //Maximal legal MB capacity, 15000 bits is enough
-
 enum {
     BASE_MB = 0,
     NON_AVC_REWRITE_ENHANCE_MB =1,

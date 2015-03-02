@@ -566,10 +566,18 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
 
   //add check PPS available here
   if (pCtx->bPpsAvailFlags[iPpsId] == false) {
-    WelsLog (pLogCtx, WELS_LOG_ERROR, "PPS id is invalid!");
+    pCtx->sDecoderStatistics.iPpsReportErrorNum++;
+    if (pCtx->iPPSLastInvalidId != iPpsId) {
+      WelsLog (pLogCtx, WELS_LOG_ERROR, "PPS id (%d) is invalid, previous id (%d) error ignored (%d)!", iPpsId, pCtx->iPPSLastInvalidId, pCtx->iPPSInvalidNum);
+      pCtx->iPPSLastInvalidId = iPpsId;
+      pCtx->iPPSInvalidNum = 0;
+    } else {
+      pCtx->iPPSInvalidNum++;
+    }
     pCtx->iErrorCode |= dsNoParamSets;
     return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_PPS_ID);
   }
+  pCtx->iPPSLastInvalidId = -1;
 
   pPps    = &pCtx->sPpsBuffer[iPpsId];
 
@@ -583,16 +591,32 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     pSubsetSps      = &pCtx->sSubsetSpsBuffer[pPps->iSpsId];
     pSps		= &pSubsetSps->sSps;
     if (pCtx->bSubspsAvailFlags[pPps->iSpsId] == false) {
-      WelsLog (pLogCtx, WELS_LOG_ERROR, "SPS id is invalid!");
+      pCtx->sDecoderStatistics.iSubSpsReportErrorNum++;
+      if (pCtx->iSubSPSLastInvalidId != pPps->iSpsId) {
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "Sub SPS id (%d) is invalid, previous id (%d) error ignored (%d)!", pPps->iSpsId, pCtx->iSubSPSLastInvalidId, pCtx->iSubSPSInvalidNum);
+        pCtx->iSubSPSLastInvalidId = pPps->iSpsId;
+        pCtx->iSubSPSInvalidNum = 0;
+      } else {
+        pCtx->iSubSPSInvalidNum++;
+      }
       pCtx->iErrorCode |= dsNoParamSets;
       return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SPS_ID);
     }
+    pCtx->iSubSPSLastInvalidId = -1;
   } else {
     if (pCtx->bSpsAvailFlags[pPps->iSpsId] == false) {
-      WelsLog (pLogCtx, WELS_LOG_ERROR, "SPS id is invalid!");
+      pCtx->sDecoderStatistics.iSpsReportErrorNum++;
+      if (pCtx->iSPSLastInvalidId != pPps->iSpsId) {
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "SPS id (%d) is invalid, previous id (%d) error ignored (%d)!", pPps->iSpsId, pCtx->iSPSLastInvalidId, pCtx->iSPSInvalidNum);
+        pCtx->iSPSLastInvalidId = pPps->iSpsId;
+        pCtx->iSPSInvalidNum = 0;
+      } else {
+        pCtx->iSPSInvalidNum++;
+      }
       pCtx->iErrorCode |= dsNoParamSets;
       return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SPS_ID);
     }
+    pCtx->iSPSLastInvalidId = -1;
     pSps		= &pCtx->sSpsBuffer[pPps->iSpsId];
   }
   pSliceHead->iPpsId = iPpsId;
@@ -2051,7 +2075,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
             pCtx->bRPLRError = true;
             bAllRefComplete = false; // RPLR error, set ref pictures complete flag false
             HandleReferenceLost (pCtx, pNalCur);
-            WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
+            WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
                      "reference picture introduced by this frame is lost during transmission! uiTId: %d",
                      pNalCur->sNalHeaderExt.uiTemporalId);
             if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {

@@ -335,9 +335,20 @@ bool				bSpsExistAheadFlag;	// whether does SPS NAL exist ahead of sequence?
 bool				bSubspsExistAheadFlag;// whether does Subset SPS NAL exist ahead of sequence?
 bool				bPpsExistAheadFlag;	// whether does PPS NAL exist ahead of sequence?
 
+int32_t			iSpsErrorIgnored;
+int32_t			iSubSpsErrorIgnored;
+int32_t			iPpsErrorIgnored;
+  
 bool				bSpsAvailFlags[MAX_SPS_COUNT];
 bool				bSubspsAvailFlags[MAX_SPS_COUNT];
 bool				bPpsAvailFlags[MAX_PPS_COUNT];
+int32_t     iPPSLastInvalidId;
+int32_t     iPPSInvalidNum;
+int32_t     iSPSLastInvalidId;
+int32_t     iSPSInvalidNum;
+int32_t     iSubSPSLastInvalidId;
+int32_t     iSubSPSInvalidNum;
+  
 bool				bReferenceLostAtT0Flag;
 int32_t     iTotalNumMbRec; //record current number of decoded MB
 #ifdef LONG_TERM_REF

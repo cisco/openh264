@@ -146,36 +146,47 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
   if (! (IS_SEI_NAL (pNalUnitHeader->eNalUnitType) || IS_SPS_NAL (pNalUnitHeader->eNalUnitType)
          || pCtx->bSpsExistAheadFlag)) {
-    if (pCtx->bPrintFrameErrorTraceFlag) {
+    if (pCtx->bPrintFrameErrorTraceFlag && pCtx->iSpsErrorIgnored == 0) {
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "parse_nal(), no exist Sequence Parameter Sets ahead of sequence when try to decode NAL(type:%d).",
                pNalUnitHeader->eNalUnitType);
+    } else {
+      pCtx->iSpsErrorIgnored++;
     }
+    pCtx->sDecoderStatistics.iSpsNoExistNalNum++;
     pCtx->iErrorCode	= dsNoParamSets;
     return NULL;
   }
+  pCtx->iSpsErrorIgnored = 0;
   if (! (IS_SEI_NAL (pNalUnitHeader->eNalUnitType) || IS_PARAM_SETS_NALS (pNalUnitHeader->eNalUnitType)
          || pCtx->bPpsExistAheadFlag)) {
-    if (pCtx->bPrintFrameErrorTraceFlag) {
+    if (pCtx->bPrintFrameErrorTraceFlag && pCtx->iPpsErrorIgnored == 0) {
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "parse_nal(), no exist Picture Parameter Sets ahead of sequence when try to decode NAL(type:%d).",
                pNalUnitHeader->eNalUnitType);
+    } else {
+      pCtx->iPpsErrorIgnored++;
     }
+    pCtx->sDecoderStatistics.iPpsNoExistNalNum++;
     pCtx->iErrorCode	= dsNoParamSets;
     return NULL;
   }
+  pCtx->iPpsErrorIgnored = 0;
   if ((IS_VCL_NAL_AVC_BASE (pNalUnitHeader->eNalUnitType) && ! (pCtx->bSpsExistAheadFlag || pCtx->bPpsExistAheadFlag)) ||
       (IS_NEW_INTRODUCED_SVC_NAL (pNalUnitHeader->eNalUnitType) && ! (pCtx->bSpsExistAheadFlag || pCtx->bSubspsExistAheadFlag
           || pCtx->bPpsExistAheadFlag))) {
-    if (pCtx->bPrintFrameErrorTraceFlag) {
+    if (pCtx->bPrintFrameErrorTraceFlag && pCtx->iSubSpsErrorIgnored == 0) {
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "ParseNalHeader(), no exist Parameter Sets ahead of sequence when try to decode slice(type:%d).",
                pNalUnitHeader->eNalUnitType);
+    } else {
+      pCtx->iSubSpsErrorIgnored++;
     }
+    pCtx->sDecoderStatistics.iSubSpsNoExistNalNum++;
     pCtx->iErrorCode	|= dsNoParamSets;
     return NULL;
   }
-
+  pCtx->iSubSpsErrorIgnored = 0;
 
   switch (pNalUnitHeader->eNalUnitType) {
   case NAL_UNIT_AU_DELIMITER:

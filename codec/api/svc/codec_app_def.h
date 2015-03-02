@@ -659,7 +659,12 @@ typedef struct TagVideoDecoderStatistics {
   uiFreezingIDRNum;               ///< number of freezing IDR with error (partly received), under resolution change
   unsigned int uiFreezingNonIDRNum;            ///< number of freezing non-IDR with error
   int iAvgLumaQp;                              ///< average luma QP. default: -1, no correct frame outputted
-
+  int iSpsReportErrorNum;             ///< number of Sps Invalid report
+  int iSubSpsReportErrorNum;          ///< number of SubSps Invalid report
+  int iPpsReportErrorNum;             ///< number of Pps Invalid report
+  int			iSpsNoExistNalNum;          ///< number of Sps NoExist Nal
+  int			iSubSpsNoExistNalNum;       ///< number of SubSps NoExist Nal
+  int			iPpsNoExistNalNum;          ///< number of Pps NoExist Nal
 } SDecoderStatistics; // in building, coming soon
 
 #endif//WELS_VIDEO_CODEC_APPLICATION_DEFINITION_H__
