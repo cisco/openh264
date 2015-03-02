@@ -62,18 +62,22 @@ using namespace std;
 #endif
 //using namespace WelsDec;
 
-//#define STICK_STREAM_SIZE	// For Demo interfaces test with track file of integrated frames
 //#define NO_DELAY_DECODING	// For Demo interfaces test with no delay decoding
 
 void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, const char* kpOuputFileName,
-                         int32_t& iWidth, int32_t& iHeight, const char* pOptionFileName) {
+                         int32_t& iWidth, int32_t& iHeight, const char* pOptionFileName, const char* pLengthFileName) {
   FILE* pH264File	  = NULL;
   FILE* pYuvFile	  = NULL;
   FILE* pOptionFile = NULL;
-#if defined ( STICK_STREAM_SIZE )
-  FILE* fpTrack = fopen ("3.len", "rb");
-  unsigned long pInfo[4];
-#endif// STICK_STREAM_SIZE
+// Lenght input mode support
+  FILE* fpTrack = NULL;
+  if (pLengthFileName != NULL) {
+    fpTrack = fopen (pLengthFileName, "rb");
+    if (fpTrack == NULL)
+      printf ("Length file open ERROR!\n");
+  }
+  int32_t pInfo[4];
+
   unsigned long long uiTimeStamp = 0;
   int64_t iStart = 0, iEnd = 0, iTotal = 0;
   int32_t iSliceSize;
@@ -170,22 +174,20 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
         pDecoder->SetOption (DECODER_OPTION_END_OF_STREAM, (void*)&iEndOfStreamFlag);
       break;
     }
-
-#if defined ( STICK_STREAM_SIZE )
+// Read length from file if needed
     if (fpTrack) {
-      fread (pInfo, 4, sizeof (unsigned long), fpTrack);
+      if (fread (pInfo, 4, sizeof (int32_t), fpTrack) < 4)
+        return;
       iSliceSize = static_cast<int32_t> (pInfo[2]);
-    }
-#else
-    for (i = 0; i < iFileSize; i++) {
-      if ((pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 0 && pBuf[iBufPos + i + 3] == 1
-           && i > 0) || (pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 1 && i > 0)) {
-        break;
+    } else {
+      for (i = 0; i < iFileSize; i++) {
+        if ((pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 0 && pBuf[iBufPos + i + 3] == 1
+             && i > 0) || (pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 1 && i > 0)) {
+          break;
+        }
       }
+      iSliceSize = i;
     }
-    iSliceSize = i;
-#endif
-
     if (iSliceSize < 4) { //too small size, no effective data, ignore
       iBufPos += iSliceSize;
       continue;
@@ -283,12 +285,10 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     ++ iSliceIndex;
   }
 
-#if defined ( STICK_STREAM_SIZE )
   if (fpTrack) {
     fclose (fpTrack);
     fpTrack = NULL;
   }
-#endif// STICK_STREAM_SIZE
 
   dElapsed = iTotal / 1e6;
   fprintf (stderr, "-------------------------------------------------------\n");
@@ -324,7 +324,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
   ISVCDecoder* pDecoder = NULL;
 
   SDecodingParam sDecParam = {0};
-  string strInputFile (""), strOutputFile (""), strOptionFile ("");
+  string strInputFile (""), strOutputFile (""), strOptionFile (""), strLengthFile ("");
   int iLevelSetting = (int) WELS_LOG_WARNING;
 
   sDecParam.sVideoProperty.size = sizeof (sDecParam.sVideoProperty);
@@ -411,6 +411,13 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
             printf ("trace level not specified.\n");
             return 1;
           }
+        } else if (!strcmp (cmd, "-length")) {
+          if (i + 1 < iArgC)
+            strLengthFile = pArgV[++i];
+          else {
+            printf ("lenght file not specified.\n");
+            return 1;
+          }
         }
       }
     }
@@ -449,7 +456,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
 
   H264DecodeInstance (pDecoder, strInputFile.c_str(), !strOutputFile.empty() ? strOutputFile.c_str() : NULL, iWidth,
                       iHeight,
-                      (!strOptionFile.empty() ? strOptionFile.c_str() : NULL));
+                      (!strOptionFile.empty() ? strOptionFile.c_str() : NULL), (!strLengthFile.empty() ? strLengthFile.c_str() : NULL));
 
   if (sDecParam.pFileNameRestructed != NULL) {
     delete []sDecParam.pFileNameRestructed;
