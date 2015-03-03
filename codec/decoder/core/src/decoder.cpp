@@ -1001,7 +1001,7 @@ void UpdateDecStatNoFreezingInfo (PWelsDecoderContext pCtx) {
     pDecStat->iAvgLumaQp = iTotalQp;
   } else
     pDecStat->iAvgLumaQp = (int) ((uint64_t) (pDecStat->iAvgLumaQp * pDecStat->uiDecodedFrameCount + iTotalQp) /
-                           (pDecStat->uiDecodedFrameCount + 1));
+                                  (pDecStat->uiDecodedFrameCount + 1));
 
   //update IDR number
   if (pCurDq->sLayerInfo.sNalHeaderExt.bIdrFlag) {

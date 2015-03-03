@@ -568,7 +568,8 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   if (pCtx->bPpsAvailFlags[iPpsId] == false) {
     pCtx->sDecoderStatistics.iPpsReportErrorNum++;
     if (pCtx->iPPSLastInvalidId != iPpsId) {
-      WelsLog (pLogCtx, WELS_LOG_ERROR, "PPS id (%d) is invalid, previous id (%d) error ignored (%d)!", iPpsId, pCtx->iPPSLastInvalidId, pCtx->iPPSInvalidNum);
+      WelsLog (pLogCtx, WELS_LOG_ERROR, "PPS id (%d) is invalid, previous id (%d) error ignored (%d)!", iPpsId,
+               pCtx->iPPSLastInvalidId, pCtx->iPPSInvalidNum);
       pCtx->iPPSLastInvalidId = iPpsId;
       pCtx->iPPSInvalidNum = 0;
     } else {
@@ -593,7 +594,8 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     if (pCtx->bSubspsAvailFlags[pPps->iSpsId] == false) {
       pCtx->sDecoderStatistics.iSubSpsReportErrorNum++;
       if (pCtx->iSubSPSLastInvalidId != pPps->iSpsId) {
-        WelsLog (pLogCtx, WELS_LOG_ERROR, "Sub SPS id (%d) is invalid, previous id (%d) error ignored (%d)!", pPps->iSpsId, pCtx->iSubSPSLastInvalidId, pCtx->iSubSPSInvalidNum);
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "Sub SPS id (%d) is invalid, previous id (%d) error ignored (%d)!", pPps->iSpsId,
+                 pCtx->iSubSPSLastInvalidId, pCtx->iSubSPSInvalidNum);
         pCtx->iSubSPSLastInvalidId = pPps->iSpsId;
         pCtx->iSubSPSInvalidNum = 0;
       } else {
@@ -607,7 +609,8 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     if (pCtx->bSpsAvailFlags[pPps->iSpsId] == false) {
       pCtx->sDecoderStatistics.iSpsReportErrorNum++;
       if (pCtx->iSPSLastInvalidId != pPps->iSpsId) {
-        WelsLog (pLogCtx, WELS_LOG_ERROR, "SPS id (%d) is invalid, previous id (%d) error ignored (%d)!", pPps->iSpsId, pCtx->iSPSLastInvalidId, pCtx->iSPSInvalidNum);
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "SPS id (%d) is invalid, previous id (%d) error ignored (%d)!", pPps->iSpsId,
+                 pCtx->iSPSLastInvalidId, pCtx->iSPSInvalidNum);
         pCtx->iSPSLastInvalidId = pPps->iSpsId;
         pCtx->iSPSInvalidNum = 0;
       } else {
@@ -1066,7 +1069,8 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
                            "pCtx->sMb.pMbType[]");
     pCtx->sMb.pMv[i][0] = (int16_t (*)[16][2])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
                             int16_t) * MV_A * MB_BLOCK4x4_NUM, "pCtx->sMb.pMv[][]");
-    pCtx->sMb.pRefIndex[i][0] = (int8_t (*)[MB_BLOCK4x4_NUM])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
+    pCtx->sMb.pRefIndex[i][0] = (int8_t (*)[MB_BLOCK4x4_NUM])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
+                                sizeof (
                                   int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pRefIndex[][]");
     pCtx->sMb.pLumaQp[i] = (int8_t*)WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
                            "pCtx->sMb.pLumaQp[]");
@@ -1082,7 +1086,8 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
                           "pCtx->sMb.pNzcRs[]");
     pCtx->sMb.pScaledTCoeff[i] = (int16_t (*)[MB_COEFF_LIST_SIZE])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
                                  sizeof (int16_t) * MB_COEFF_LIST_SIZE, "pCtx->sMb.pScaledTCoeff[]");
-    pCtx->sMb.pIntraPredMode[i] = (int8_t (*)[8])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t) * 8,
+    pCtx->sMb.pIntraPredMode[i] = (int8_t (*)[8])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
+                                    int8_t) * 8,
                                   "pCtx->sMb.pIntraPredMode[]");
     pCtx->sMb.pIntra4x4FinalMode[i] = (int8_t (*)[MB_BLOCK4x4_NUM])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
                                       sizeof (int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pIntra4x4FinalMode[]");
@@ -1090,7 +1095,8 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
                                    "pCtx->sMb.pChromaPredMode[]");
     pCtx->sMb.pCbp[i] = (int8_t*)WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
                         "pCtx->sMb.pCbp[]");
-    pCtx->sMb.pSubMbType[i] = (int8_t (*)[MB_PARTITION_SIZE])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
+    pCtx->sMb.pSubMbType[i] = (int8_t (*)[MB_PARTITION_SIZE])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
+                              sizeof (
                                 int8_t) * MB_PARTITION_SIZE, "pCtx->sMb.pSubMbType[]");
     pCtx->sMb.pSliceIdc[i] = (int32_t*) WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int32_t),
                              "pCtx->sMb.pSliceIdc[]");	// using int32_t for slice_idc, 4/21/2010
