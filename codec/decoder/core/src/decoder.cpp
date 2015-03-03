@@ -311,7 +311,15 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->sDecoderStatistics.iAvgLumaQp = -1;
   pCtx->bSpsLatePps = false;
   pCtx->bUseScalingList = false;
-
+  pCtx->iSpsErrorIgnored = 0;
+  pCtx->iSubSpsErrorIgnored = 0;
+  pCtx->iPpsErrorIgnored = 0;
+  pCtx->iPPSInvalidNum = 0;
+  pCtx->iPPSLastInvalidId = -1;
+  pCtx->iSPSInvalidNum = 0;
+  pCtx->iSPSLastInvalidId = -1;
+  pCtx->iSubSPSInvalidNum = 0;
+  pCtx->iSubSPSLastInvalidId = -1;
 }
 
 /*
@@ -993,7 +1001,7 @@ void UpdateDecStatNoFreezingInfo (PWelsDecoderContext pCtx) {
     pDecStat->iAvgLumaQp = iTotalQp;
   } else
     pDecStat->iAvgLumaQp = (int) ((uint64_t) (pDecStat->iAvgLumaQp * pDecStat->uiDecodedFrameCount + iTotalQp) /
-                           (pDecStat->uiDecodedFrameCount + 1));
+                                  (pDecStat->uiDecodedFrameCount + 1));
 
   //update IDR number
   if (pCurDq->sLayerInfo.sNalHeaderExt.bIdrFlag) {
