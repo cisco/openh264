@@ -185,7 +185,7 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
     if (pCfg->bEnableSceneChangeDetect == false) {
       pCfg->bEnableSceneChangeDetect = true;
       WelsLog (pLogCtx, WELS_LOG_WARNING,
-               "ParamValidation(), screen change detection should be turned on,change bEnableSceneChangeDetect as true");
+               "ParamValidation(), screen change detection should be turned on, change bEnableSceneChangeDetect as true");
     }
 
   }
@@ -196,12 +196,22 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
       SSpatialLayerConfig* fDlp = &pCfg->sSpatialLayers[i];
       if ((fDlp->iVideoWidth > iFinalWidth) || (fDlp->iVideoHeight > iFinalHeight)) {
         WelsLog (pLogCtx, WELS_LOG_ERROR,
-                 "ParamValidation,Invalid resolution layer(%d) resolution(%d x %d) shoudl be less than the highest spatial layer resolution(%d x %d) ",
+                 "ParamValidation,Invalid resolution layer(%d) resolution(%d x %d) should be less than the highest spatial layer resolution(%d x %d) ",
                  i, fDlp->iVideoWidth, fDlp->iVideoHeight, iFinalWidth, iFinalHeight);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
     }
   }
+
+  if (!CheckInRangeCloseOpen (pCfg->iLoopFilterDisableIdc, DEBLOCKING_IDC_0, DEBLOCKING_IDC_2 + 1) ||
+      !CheckInRangeCloseOpen (pCfg->iLoopFilterAlphaC0Offset, DEBLOCKING_OFFSET_MINUS, DEBLOCKING_OFFSET + 1) ||
+      !CheckInRangeCloseOpen (pCfg->iLoopFilterBetaOffset, DEBLOCKING_OFFSET_MINUS, DEBLOCKING_OFFSET + 1)) {
+    WelsLog (pLogCtx, WELS_LOG_ERROR,
+             "ParamValidation, Invalid iLoopFilterDisableIdc(%d) or iLoopFilterAlphaC0Offset(%d) or iLoopFilterBetaOffset(%d)!",
+             pCfg->iLoopFilterDisableIdc, pCfg->iLoopFilterAlphaC0Offset, pCfg->iLoopFilterBetaOffset);
+    return ENC_RETURN_UNSUPPORTED_PARA;
+  }
+
   for (i = 0; i < pCfg->iSpatialLayerNum; ++ i) {
     SSpatialLayerInternal* fDlp = &pCfg->sDependencyLayers[i];
     SSpatialLayerConfig* pConfig = &pCfg->sSpatialLayers[i];
@@ -312,12 +322,6 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
     WelsLog (pLogCtx, WELS_LOG_ERROR,
              "ParamValidationExt(), uiIntraPeriod(%d) should be multiple of uiGopSize(%d) or -1 specified!",
              pCodingParam->uiIntraPeriod, pCodingParam->uiGopSize);
-    return ENC_RETURN_UNSUPPORTED_PARA;
-  }
-  if (pCodingParam->iLoopFilterDisableIdc < 0 || pCodingParam->iLoopFilterDisableIdc > 6) {
-    WelsLog (pLogCtx, WELS_LOG_ERROR,
-             "ParamValidationExt(), iLoopFilterDisableIdc(%d) must be between 0 and 6",
-             pCodingParam->iLoopFilterDisableIdc);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
 
