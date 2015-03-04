@@ -2487,9 +2487,6 @@ class DecodeParseAPI : public ::testing::TestWithParam<EncodeDecodeFileParamBase
     int rv = decoder_->Initialize (&decParam);
     ASSERT_EQ (0, rv);
     memset (&BsInfo_, 0, sizeof (SParserBsInfo));
-    BsInfo_.pDstBuff = NULL;
-    BsInfo_.pDstBuff = new unsigned char [kiMaxBsSize];
-    ASSERT_TRUE (BsInfo_.pDstBuff != NULL);
     fYuv_ = fopen ("./res/CiscoVT2people_160x96_6fps.yuv", "rb");
     ASSERT_TRUE (fYuv_ != NULL);
     iWidth_ = kiWidth;
@@ -2497,10 +2494,6 @@ class DecodeParseAPI : public ::testing::TestWithParam<EncodeDecodeFileParamBase
   }
   void TearDown() {
     EncodeDecodeTestBase::TearDown();
-    if (BsInfo_.pDstBuff) {
-      delete[] BsInfo_.pDstBuff;
-      BsInfo_.pDstBuff = NULL;
-    }
     fclose (fYuv_);
   }
 
@@ -3449,7 +3442,7 @@ class EncodeTestAPI : public ::testing::TestWithParam<EncodeOptionParam>, public
     uint8_t* ptr = buf_.data();
     uint8_t uiVal = rand() % 256;
     for (int i = 0; i < frameSize; i++) {
-      ptr[i] = bAllRandom? (rand() % 256) :uiVal;
+      ptr[i] = bAllRandom ? (rand() % 256) : uiVal;
     }
     int rv = encoder_->EncodeFrame (&EncPic, &info);
     if (0 == iCheckTypeIndex)
@@ -3464,9 +3457,9 @@ INSTANTIATE_TEST_CASE_P (EncodeDecodeTestAPIBase, EncodeTestAPI,
 
 TEST_P (EncodeTestAPI, SetEncOptionSize) {
   EncodeOptionParam p = GetParam();
-  FILE * pFile = NULL;
-  if (p.sFileSave != NULL && strlen(p.sFileSave) > 0) {
-    pFile = fopen(p.sFileSave, "wb");
+  FILE* pFile = NULL;
+  if (p.sFileSave != NULL && strlen (p.sFileSave) > 0) {
+    pFile = fopen (p.sFileSave, "wb");
   }
   memset (&param_, 0, sizeof (SEncParamExt));
   encoder_->GetDefaultParams (&param_);
@@ -3502,16 +3495,16 @@ TEST_P (EncodeTestAPI, SetEncOptionSize) {
   unsigned char* pData[3] = { NULL };
   while (iIdx <= p.iNumframes) {
     EncodeOneFrameRandom (0, p.bAllRandom);
-    encToDecData(info, iLen);
-    if( pFile ) {
+    encToDecData (info, iLen);
+    if (pFile) {
       fwrite (info.sLayerInfo[0].pBsBuf, iLen, 1, pFile);
       fflush (pFile);
     }
-    memset(&dstBufInfo_, 0, sizeof(SBufferInfo));
-    if(iLen && p.bTestDecoder) {
-      rv = decoder_->DecodeFrameNoDelay(info.sLayerInfo[0].pBsBuf, iLen, pData, &dstBufInfo_);
-      ASSERT_EQ(rv, 0);
-      ASSERT_EQ(dstBufInfo_.iBufferStatus, 1);
+    memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+    if (iLen && p.bTestDecoder) {
+      rv = decoder_->DecodeFrameNoDelay (info.sLayerInfo[0].pBsBuf, iLen, pData, &dstBufInfo_);
+      ASSERT_EQ (rv, 0);
+      ASSERT_EQ (dstBufInfo_.iBufferStatus, 1);
     }
     int iLayer = 0;
     while (iLayer < info.iLayerNum) {
@@ -3529,7 +3522,7 @@ TEST_P (EncodeTestAPI, SetEncOptionSize) {
     }
     iIdx++;
   }
-  if( pFile ) {
+  if (pFile) {
     fclose (pFile);
   }
 }
