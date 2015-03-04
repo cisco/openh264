@@ -68,7 +68,7 @@ struct {
   bool	bLumaWeightFlag;
   bool	bChromaWeightFlag;
 } sPredList[LIST_A];
-} SPredWeightTabSyn;
+} SPredWeightTabSyn,*PPredWeightTabSyn;
 
 /* Decoded reference picture marking syntax, refer to Page 66 in JVT X201wcm */
 typedef struct TagRefPicMarking {

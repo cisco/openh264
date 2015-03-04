@@ -179,6 +179,78 @@ inline int32_t  WelsDecodeConstructSlice (PWelsDecoderContext pCtx, PNalUnit pCu
   return iRet;
 }
 
+int32_t ParsePredWeightedTable (PBitStringAux pBs, PSliceHeader pSh) {
+  uint32_t uiCode;
+  int32_t iList = 0;
+  int32_t iCode;
+
+  WELS_READ_VERIFY (BsGetUe (pBs, &uiCode));
+  WELS_CHECK_SE_BOTH_ERROR_NOLOG (uiCode, 0, 7, "luma_log2_weight_denom",
+                                  GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_LUMA_LOG2_WEIGHT_DENOM));
+  pSh->sPredWeightTable.uiLumaLog2WeightDenom = uiCode;
+  if (pSh->pSps->uiChromaArrayType != 0) {
+    WELS_READ_VERIFY (BsGetUe (pBs, &uiCode));
+    WELS_CHECK_SE_BOTH_ERROR_NOLOG (uiCode, 0, 7, "chroma_log2_weight_denom",
+                                    GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_CHROMA_LOG2_WEIGHT_DENOM));
+    pSh->sPredWeightTable.uiChromaLog2WeightDenom = uiCode;
+  }
+
+
+  do {
+
+    for (int i = 0; i < pSh->uiRefCount[iList]; i++) {
+      //luma
+      WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode));
+      if (!!uiCode) {
+
+        WELS_READ_VERIFY (BsGetSe (pBs, &iCode));
+        WELS_CHECK_SE_BOTH_ERROR_NOLOG (iCode, -128, 127, "luma_weight",
+                                        GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_LUMA_WEIGHT));
+        pSh->sPredWeightTable.sPredList[iList].iLumaWeight[i] = iCode;
+
+        WELS_READ_VERIFY (BsGetSe (pBs, &iCode));
+        WELS_CHECK_SE_BOTH_ERROR_NOLOG (iCode, -128, 127, "luma_offset",
+                                        GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_LUMA_OFFSET));
+        pSh->sPredWeightTable.sPredList[iList].iLumaOffset[i] = iCode;
+      } else {
+        pSh->sPredWeightTable.sPredList[iList].iLumaWeight[i] = 1 << (pSh->sPredWeightTable.uiLumaLog2WeightDenom);
+        pSh->sPredWeightTable.sPredList[iList].iLumaOffset[i] = 0;
+
+      }
+      //chroma
+      if (pSh->pSps->uiChromaArrayType == 0)
+        continue;
+
+      WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode));
+      if (!!uiCode) {
+        for (int j = 0; j < 2; j++) {
+
+
+          WELS_READ_VERIFY (BsGetSe (pBs, &iCode));
+          WELS_CHECK_SE_BOTH_ERROR_NOLOG (iCode, -128, 127, "chroma_weight",
+                                          GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_CHROMA_WEIGHT));
+          pSh->sPredWeightTable.sPredList[iList].iChromaWeight[i][j] = iCode;
+
+          WELS_READ_VERIFY (BsGetSe (pBs, &iCode));
+          WELS_CHECK_SE_BOTH_ERROR_NOLOG (iCode, -128, 127, "chroma_offset",
+                                          GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_CHROMA_OFFSET));
+          pSh->sPredWeightTable.sPredList[iList].iChromaOffset[i][j] = iCode;
+        }
+      } else {
+        for (int j = 0; j < 2; j++) {
+
+
+          pSh->sPredWeightTable.sPredList[iList].iChromaWeight[i][j] = 1 << (pSh->sPredWeightTable.uiChromaLog2WeightDenom);
+          pSh->sPredWeightTable.sPredList[iList].iChromaOffset[i][j] = 0;
+        }
+      }
+
+    }
+    ++iList;
+  } while (iList < LIST_1);//TODO: SUPPORT LIST_A
+  return ERR_NONE;
+}
+
 /*
  *	Predeclared function routines ..
  */
@@ -726,6 +798,14 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     if (iRet != ERR_NONE) {
       WelsLog (pLogCtx, WELS_LOG_WARNING, "invalid ref pPic list reordering syntaxs!");
       return iRet;
+    }
+
+    if (pPps->bWeightedPredFlag && (uiSliceType == P_SLICE)) {
+      iRet = ParsePredWeightedTable (pBs, pSliceHead);
+      if (iRet != ERR_NONE) {
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "invalid weighted prediction syntaxs!");
+        return iRet;
+      }
     }
 
     if (kbExtensionFlag) {
@@ -1876,6 +1956,14 @@ static inline void InitDqLayerInfo (PDqLayer pDqLayer, PLayerInfo pLayerInfo, PN
   if (kuiQualityId == BASE_QUALITY_ID) {
     pDqLayer->pRefPicListReordering		= &pSh->pRefPicListReordering;
     pDqLayer->pRefPicMarking		= &pSh->sRefMarking;
+    
+    if (pSh->pPps->bWeightedPredFlag) {
+      pDqLayer->bUseWeightPredictionFlag = true;
+      pDqLayer->pPredWeightTable    = &pSh->sPredWeightTable;
+
+    } else
+      pDqLayer->bUseWeightPredictionFlag = false;
+
     pDqLayer->pRefPicBaseMarking	= &pShExt->sRefBasePicMarking;
   }
 
