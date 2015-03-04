@@ -574,7 +574,10 @@ DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
 
   m_pDecContext->iErrorCode = dsErrorFree; //initialize at the starting of AU decoding.
   m_pDecContext->eErrorConMethod = ERROR_CON_DISABLE; //add protection to disable EC here.
-  m_pDecContext->pParserBsInfo = pDstInfo;
+  if (!m_pDecContext->bFramePending) { //frame complete
+    m_pDecContext->pParserBsInfo->iNalNum = 0;
+    memset (m_pDecContext->pParserBsInfo->iNalLenInByte, 0, MAX_NAL_UNITS_IN_LAYER);
+  }
   pDstInfo->iNalNum = 0;
   pDstInfo->iSpsWidthInPixel = pDstInfo->iSpsHeightInPixel = 0;
   if (pDstInfo) {
@@ -584,6 +587,10 @@ DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
     m_pDecContext->uiTimeStamp = 0;
   }
   WelsDecodeBs (m_pDecContext, kpSrc, kiSrcLen, NULL, NULL, pDstInfo);
+  if (!m_pDecContext->bFramePending && m_pDecContext->pParserBsInfo->iNalNum) {
+    memcpy (pDstInfo, m_pDecContext->pParserBsInfo, sizeof (SParserBsInfo));
+  }
+
   m_pDecContext->bInstantDecFlag = false; //reset no-delay flag
 
   return (DECODING_STATE) m_pDecContext->iErrorCode;
