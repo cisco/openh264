@@ -366,11 +366,14 @@ typedef struct TagWelsDecoderContext {
 
 //for Parse only
   bool bParseOnly;
+  bool bFramePending;
+  int32_t iNalNum;
+  int32_t iNalLenInByte[MAX_NAL_UNITS_IN_LAYER];
   SSpsBsInfo sSpsBsInfo [MAX_SPS_COUNT];
   SSpsBsInfo sSubsetSpsBsInfo [MAX_PPS_COUNT];
   SPpsBsInfo sPpsBsInfo [MAX_PPS_COUNT];
   SParserBsInfo* pParserBsInfo;
-
+ 
   PPicture pPreviousDecodedPictureInDpb; //pointer to previously decoded picture in DPB for error concealment
   PGetIntraPredFunc pGetI16x16LumaPredFunc[7];		//h264_predict_copy_16x16;
   PGetIntraPredFunc pGetI4x4LumaPredFunc[14];		// h264_predict_4x4_t
