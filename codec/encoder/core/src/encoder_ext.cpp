@@ -2982,6 +2982,8 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
       pFuncList->pfCalculateSatd = CalculateSatdCost;
       pFuncList->pfInterFineMd = WelsMdInterFinePartition;
     }
+  } else {
+    pFuncList->sSampleDealingFuncs.pfMeCost = NULL;
   }
 
   //to init at each frame will be needed when dealing with hybrid content (camera+screen)
