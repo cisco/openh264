@@ -4,17 +4,17 @@ Releases
 v1.4.0
 ------
 - Decoder new interface of DecodeFrameNoDelay
-- Decoder bug fixes when for Error Concealment disabled
-- Bug fixes for ParseOnly functions
-- Bug fixes for encoding large frame size (>32767MBs)
-- Fixes to avoid valgrind warnings, potential crash and calculation overflow
 - Added new encoder and decoder statistics
-- Improvements in code structure, assembly, input parameter checking, logging, UT and comments
 - Added option for generating pdb in windows builds
 - Added new rate control mode (RC_TIMESTAMP_MODE) for inconstant frame rate input
 - Added new Sps/Pps strategies for real-time video
 — Added support for simulcast avc
+- Improvements in code structure, assembly, input parameter checking, logging, UT and comments
 - In gmp-openh264, return decoder error correctly and other fixes
+- Decoder bug fixes when for Error Concealment disabled
+- Bug fixes for ParseOnly functions
+- Bug fixes for encoding large frame size (>32767MBs)
+- Fixes to avoid valgrind warnings, potential crash and calculation overflow
 
 -----------
 v1.3.1
