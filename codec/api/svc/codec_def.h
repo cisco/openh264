@@ -121,6 +121,17 @@ enum ENalPriority {
 #define FRAME_NUM_PARAM_SET		(-1)
 #define FRAME_NUM_IDR			0
 
+/**
+ * @brief eDeblockingIdc
+ */
+enum {
+  DEBLOCKING_IDC_0 = 0,
+  DEBLOCKING_IDC_1 = 1,
+  DEBLOCKING_IDC_2 = 2
+};
+#define DEBLOCKING_OFFSET (6)
+#define DEBLOCKING_OFFSET_MINUS (-6)
+
 /* Error Tools definition */
 typedef unsigned short ERR_TOOL;
 

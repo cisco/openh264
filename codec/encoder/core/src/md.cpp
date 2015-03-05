@@ -598,8 +598,7 @@ void MeRefineFracPixel (sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME*
   int32_t iCurCost;
   int32_t iBestHalfPix;
 
-  if ((pFunc->sSampleDealingFuncs.pfMeCost == pFunc->sSampleDealingFuncs.pfSampleSatd)
-      && (pFunc->sSampleDealingFuncs.pfMdCost == pFunc->sSampleDealingFuncs.pfSampleSatd)) {
+  if (pEncCtx->pCurDqLayer->bSatdInMdFlag) {
     iBestCost = pMe->uSadPredISatd.uiSatd + COST_MVD (pMe->pMvdCost, iMvx - pMe->sMvp.iMvX, iMvy - pMe->sMvp.iMvY);
   } else {
     iBestCost = pFunc->sSampleDealingFuncs.pfMeCost[pMe->uiBlockSize] (pEncData, kiStrideEnc, pRef, kiStrideRef) +
@@ -765,17 +764,8 @@ void MeRefineFracPixel (sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME*
     pBestPredInter = pRef;
     iInterBlk4Stride = kiStrideRef;
   }
-  if (MB_WIDTH_LUMA == iWidth && MB_HEIGHT_LUMA == iHeight) { //P16x16
-    pFunc->pfCopy16x16NotAligned (pMemPredInterMb, MB_WIDTH_LUMA, pBestPredInter,
-                                  iInterBlk4Stride);	// dst can be align with 16 bytes, but not sure at pSrc, 12/29/2011
-  } else if (MB_WIDTH_LUMA == iWidth && MB_HEIGHT_CHROMA == iHeight) { //P16x8
-    pFunc->pfCopy16x8NotAligned (pMemPredInterMb, MB_WIDTH_LUMA, pBestPredInter,
-                                 iInterBlk4Stride);	// dst can be align with 16 bytes, but not sure at pSrc, 12/29/2011
-  } else if (MB_WIDTH_CHROMA == iWidth && MB_HEIGHT_LUMA == iHeight) { //P8x16
-    pFunc->pfCopy8x16Aligned (pMemPredInterMb, MB_WIDTH_LUMA, pBestPredInter, iInterBlk4Stride);
-  } else { //P8x8
-    pFunc->pfCopy8x8Aligned (pMemPredInterMb, MB_WIDTH_LUMA, pBestPredInter, iInterBlk4Stride);
-  }
+  pMeRefine->pfCopyBlockByMode (pMemPredInterMb, MB_WIDTH_LUMA, pBestPredInter,
+                                iInterBlk4Stride);
 }
 
 void InitBlkStrideWithRef (int32_t* pBlkStride, const int32_t kiStrideRef) {
