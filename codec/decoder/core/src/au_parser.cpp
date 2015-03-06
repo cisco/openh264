@@ -960,11 +960,13 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
 
     WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //chroma_format_idc
     pSps->uiChromaFormatIdc = uiCode;
-//    if (pSps->uiChromaFormatIdc != 1) {
-//      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "ParseSps(): chroma_format_idc (%d) = 1 supported.",
-//               pSps->uiChromaFormatIdc);
-//      return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_NON_BASELINE);
-//    }
+#ifdef DISABLE_HP_BRANCH_1_4
+    if (pSps->uiChromaFormatIdc != 1) {
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "ParseSps(): chroma_format_idc (%d) = 1 supported.",
+               pSps->uiChromaFormatIdc);
+      return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_NON_BASELINE);
+    }
+#endif
     if (pSps->uiChromaFormatIdc > 1) {
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "ParseSps(): chroma_format_idc (%d) <=1 supported.",
                pSps->uiChromaFormatIdc);
@@ -991,16 +993,18 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //seq_scaling_matrix_present_flag
     pSps->bSeqScalingMatrixPresentFlag	= !!uiCode;
 
-    if (pSps->bSeqScalingMatrixPresentFlag)// For high profile, it is not used in current application. FIXME
-
+    if (pSps->bSeqScalingMatrixPresentFlag) {// For high profile, it is not used in current application. FIXME
+#ifndef DISABLE_HP_BRANCH_1_4
       WELS_READ_VERIFY (ParseScalingList (pSps, pBs, 0, pSps->bSeqScalingListPresentFlag, pSps->iScalingList4x4,
                                           pSps->iScalingList8x8));
     //if exist, to parse scalinglist matrix value
-
-    //  WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
-    //         "ParseSps(): seq_scaling_matrix_present_flag (%d). Feature not supported.",
-    //       pSps->bSeqScalingMatrixPresentFlag);
-    //return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_NON_BASELINE);
+#else
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
+             "ParseSps(): seq_scaling_matrix_present_flag (%d). Feature not supported.",
+           pSps->bSeqScalingMatrixPresentFlag);
+      return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_NON_BASELINE);
+#endif
+    }
   }
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //log2_max_frame_num_minus4
   WELS_CHECK_SE_UPPER_ERROR (uiCode, SPS_LOG2_MAX_FRAME_NUM_MINUS4_MAX, "log2_max_frame_num_minus4",
@@ -1353,13 +1357,21 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
   pPps->bWeightedPredFlag  = !!uiCode;
   WELS_READ_VERIFY (BsGetBits (pBsAux, 2, &uiCode)); //weighted_bipred_idc
   pPps->uiWeightedBipredIdc = uiCode;
+#ifdef DISABLE_HP_BRANCH_1_4
+  if (pPps->bWeightedPredFlag || pPps->uiWeightedBipredIdc != 0) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
+             "ParsePps(): weighted_pred_flag (%d) weighted_bipred_idc (%d) neither supported.\n",
+             pPps->bWeightedPredFlag, pPps->uiWeightedBipredIdc);
+    return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_WP);
+  }
+#else
   if (pPps->uiWeightedBipredIdc != 0) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
              "ParsePps(): weighted_bipred_idc (%d) not supported.\n",
              pPps->uiWeightedBipredIdc);
     return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_WP);
   }
-
+#endif
   WELS_READ_VERIFY (BsGetSe (pBsAux, &iCode)); //pic_init_qp_minus26
   pPps->iPicInitQp = PIC_INIT_QP_OFFSET + iCode;
   WELS_CHECK_SE_BOTH_ERROR (pPps->iPicInitQp, PPS_PIC_INIT_QP_QS_MIN, PPS_PIC_INIT_QP_QS_MAX, "pic_init_qp_minus26 + 26",
@@ -1381,28 +1393,27 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
   pPps->bRedundantPicCntPresentFlag           = !!uiCode;
   /*TODO: to judge whether going on to parse*/
 //going on to parse high profile syntax, need fix me
-  if (0) {
-    WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode));
-    pPps->bTransform_8x8_mode_flag = !!uiCode;
-    WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode));
-    pPps->bPicScalingMatrixPresentFlag = !!uiCode;
-    if (pPps->bPicScalingMatrixPresentFlag) {
-      if (pCtx->bSpsAvailFlags[pPps->iSpsId])
-        WELS_READ_VERIFY (ParseScalingList (&pCtx->sSpsBuffer[pPps->iSpsId], pBsAux, 1, pPps->bPicScalingListPresentFlag,
+#ifndef DISABLE_HP_BRANCH_1_4
+  WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode));
+  pPps->bTransform_8x8_mode_flag = !!uiCode;
+  WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode));
+  pPps->bPicScalingMatrixPresentFlag = !!uiCode;
+  if (pPps->bPicScalingMatrixPresentFlag) {
+    if (pCtx->bSpsAvailFlags[pPps->iSpsId])
+      WELS_READ_VERIFY (ParseScalingList (&pCtx->sSpsBuffer[pPps->iSpsId], pBsAux, 1, pPps->bPicScalingListPresentFlag,
                                             pPps->iScalingList4x4, pPps->iScalingList8x8));
-      else {
-        pCtx->bSpsLatePps = true;
-        WELS_READ_VERIFY (ParseScalingList (NULL, pBsAux, 1, pPps->bPicScalingListPresentFlag, pPps->iScalingList4x4,
-                                            pPps->iScalingList8x8));
-      }
+    else {
+      pCtx->bSpsLatePps = true;
+      WELS_READ_VERIFY (ParseScalingList (NULL, pBsAux, 1, pPps->bPicScalingListPresentFlag, pPps->iScalingList4x4,
+                                          pPps->iScalingList8x8));
     }
-    //add second chroma qp parsing process
-    WELS_READ_VERIFY (BsGetSe (pBsAux, &iCode)); //chroma_qp_index_offset,cr
-    pPps->iChromaQpIndexOffset[1]               = iCode;
-    WELS_CHECK_SE_BOTH_ERROR (pPps->iChromaQpIndexOffset[1], PPS_CHROMA_QP_INDEX_OFFSET_MIN, PPS_CHROMA_QP_INDEX_OFFSET_MAX,
-                              "second_chroma_qp_index_offset", GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_CHROMA_QP_INDEX_OFFSET));
   }
-
+  //add second chroma qp parsing process
+  WELS_READ_VERIFY (BsGetSe (pBsAux, &iCode)); //chroma_qp_index_offset,cr
+  pPps->iChromaQpIndexOffset[1]               = iCode;
+  WELS_CHECK_SE_BOTH_ERROR (pPps->iChromaQpIndexOffset[1], PPS_CHROMA_QP_INDEX_OFFSET_MIN, PPS_CHROMA_QP_INDEX_OFFSET_MAX,
+                            "second_chroma_qp_index_offset", GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_CHROMA_QP_INDEX_OFFSET));
+#endif
   if (pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
     PNalUnit pLastNalUnit = pCtx->pAccessUnitList->pNalUnitsList[pCtx->pAccessUnitList->uiAvailUnitsNum - 1];
     PPps pLastPps = pLastNalUnit->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pPps;
