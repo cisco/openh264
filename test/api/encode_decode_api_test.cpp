@@ -2217,8 +2217,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionEncParamExt) {
     int iResult;
     int len = 0;
     unsigned char* pData[3] = { NULL };
-    int iTotalSliceSize = 0;
-
 
     RandomParamExtCombination();
     iResult = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &param_);
@@ -2235,11 +2233,11 @@ TEST_F (EncodeDecodeTestAPI, SetOptionEncParamExt) {
       pData[0] = pData[1] = pData[2] = 0;
       memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
 
-      iResult = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, iTotalSliceSize, pData, &dstBufInfo_);
+      iResult = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
       ASSERT_TRUE (iResult == cmResultSuccess);
       iResult = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_);
       ASSERT_TRUE (iResult == cmResultSuccess);
-      EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+      EXPECT_EQ (dstBufInfo_.iBufferStatus, 1);
     }
   }
 
