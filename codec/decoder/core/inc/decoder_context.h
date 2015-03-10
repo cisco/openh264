@@ -51,7 +51,6 @@
 #include "pic_queue.h"
 #include "vlc_decoder.h"
 #include "fmo.h"
-#include "as264_common.h" // for LONG_TERM_REF macro,can be delete if not need this macro
 #include "crt_util_safe_x.h"
 #include "mb_cache.h"
 #include "expand_pic.h"
@@ -63,6 +62,7 @@ namespace WelsDec {
 #define MAX_PRED_MODE_ID_I4x4    8
 #define  WELS_QP_MAX    51
 
+#define LONG_TERM_REF
 typedef struct SWels_Cabac_Element {
   uint8_t uiState;
   uint8_t uiMPS;

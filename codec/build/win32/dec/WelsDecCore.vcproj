@@ -641,10 +641,6 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="..\..\..\decoder\core\inc\as264_common.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\decoder\core\inc\au_parser.h"
 				>
 			</File>
