@@ -54,7 +54,6 @@
 		4CE4427918B6FC360017DF25 /* libwelsdec.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libwelsdec.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE4427C18B6FC360017DF25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4CE4428D18B6FC360017DF25 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		4CE4464518BC5EAA0017DF25 /* as264_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = as264_common.h; sourceTree = "<group>"; };
 		4CE4464618BC5EAA0017DF25 /* au_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = au_parser.h; sourceTree = "<group>"; };
 		4CE4464718BC5EAA0017DF25 /* bit_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bit_stream.h; sourceTree = "<group>"; };
 		4CE4464818BC5EAA0017DF25 /* deblocking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = deblocking.h; sourceTree = "<group>"; };
@@ -192,7 +191,6 @@
 				6A3E814019D79AD900C19C1F /* cabac_decoder.h */,
 				9AED665A1946A21D009A3567 /* utils.h */,
 				F0B204FA18FD23CF005DA23F /* error_concealment.h */,
-				4CE4464518BC5EAA0017DF25 /* as264_common.h */,
 				4CE4464618BC5EAA0017DF25 /* au_parser.h */,
 				4CE4464718BC5EAA0017DF25 /* bit_stream.h */,
 				4CE4464818BC5EAA0017DF25 /* deblocking.h */,
