@@ -1315,7 +1315,7 @@ void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
                                               pWelsSvcRc->iCost2BitsIntra), pWelsSvcRc->iTargetBits);
         iLumaQp = RcConvertQStep2Qp (pWelsSvcRc->iQStep);
 
-        iLumaQp = WELS_CLIP3 (iLumaQp, pEncCtx->iGlobalQp - DELTA_QP_BGD_THD, pEncCtx->iGlobalQp + DELTA_QP_BGD_THD);
+        iLumaQp = WELS_CLIP3 (iLumaQp, pWelsSvcRc->iLastCalculatedQScale - DELTA_QP_BGD_THD, pWelsSvcRc->iLastCalculatedQScale + DELTA_QP_BGD_THD);
 
       } else {
         iLumaQp = pWelsSvcRc->iLastCalculatedQScale + DELTA_QP_BGD_THD;
@@ -1352,7 +1352,7 @@ void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
 
         pWelsSvcRc->iQStep = WELS_DIV_ROUND ((pTOverRc->iLinearCmplx * iCmplxRatio), (pWelsSvcRc->iTargetBits * INT_MULTIPLY));
         iLumaQp = RcConvertQStep2Qp (pWelsSvcRc->iQStep);
-        iLumaQp = WELS_CLIP3 (iLumaQp, pEncCtx->iGlobalQp - DELTA_QP_BGD_THD, pEncCtx->iGlobalQp + DELTA_QP_BGD_THD);
+        iLumaQp = WELS_CLIP3 (iLumaQp, pWelsSvcRc->iLastCalculatedQScale - DELTA_QP_BGD_THD, pWelsSvcRc->iLastCalculatedQScale + DELTA_QP_BGD_THD);
       }
     } else {
       iLumaQp = pWelsSvcRc->iLastCalculatedQScale + DELTA_QP_BGD_THD;
@@ -1375,8 +1375,8 @@ void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
   float fInstantFps = (uiTimeStamp - pWelsSvcRc->uiLastTimeStamp) > 0 ? (1000.0f / (uiTimeStamp -
                       pWelsSvcRc->uiLastTimeStamp)) : 0;
   WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
-           "[Rc]pEncCtx->iGlobalQp= %d,uiTimeStamp = %lld,uiLastTimeStamp = %lld,InstantFps = %f,settingFps = %f",
-           pEncCtx->iGlobalQp, uiTimeStamp, pWelsSvcRc->uiLastTimeStamp,
+           "[Rc]Tid = %d,Did = %d,pEncCtx->iGlobalQp= %d,iLumaQp = %d,uiTimeStamp = %lld,uiLastTimeStamp = %lld,InstantFps = %f,settingFps = %f",pEncCtx->uiTemporalId,pEncCtx->uiDependencyId,
+           pEncCtx->iGlobalQp, iLumaQp,uiTimeStamp, pWelsSvcRc->uiLastTimeStamp,
            fInstantFps, pDLayerParam->fFrameRate);
   pWelsSvcRc->uiLastTimeStamp = uiTimeStamp;
 
