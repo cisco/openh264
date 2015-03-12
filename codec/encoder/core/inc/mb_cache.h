@@ -35,7 +35,6 @@
 #define WELS_MACROBLOCK_CACHE_H__
 
 #include "typedefs.h"
-#include "wels_common_basis.h"
 #include "wels_const.h"
 #include "macros.h"
 

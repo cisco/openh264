@@ -40,7 +40,6 @@
 #include <string.h>
 #include "typedefs.h"
 #include "macros.h"
-#include "wels_common_defs.h"
 #include "set_mb_syn_cabac.h"
 #include "encoder.h"
 

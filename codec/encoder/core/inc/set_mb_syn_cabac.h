@@ -42,8 +42,10 @@
 #define SET_MB_SYN_CABAC_H_
 
 #include "typedefs.h"
-#include "bit_stream.h"
 #include "wels_common_defs.h"
+
+using namespace WelsCommon;
+
 namespace WelsEnc {
 
 #define  WELS_QP_MAX    51

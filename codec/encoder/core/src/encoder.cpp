@@ -48,6 +48,7 @@
 #include "mc.h"
 #include "sample.h"
 
+#include "svc_enc_golomb.h"
 #include "svc_base_layer_md.h"
 #include "svc_mode_decision.h"
 #include "set_mb_syn_cavlc.h"

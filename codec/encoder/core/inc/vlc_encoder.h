@@ -33,7 +33,6 @@
 #ifndef WELS_VLC_ENCODER_H__
 #define WELS_VLC_ENCODER_H__
 
-#include "bit_stream.h"
 #include "svc_enc_golomb.h"
 
 /************************************************************************/

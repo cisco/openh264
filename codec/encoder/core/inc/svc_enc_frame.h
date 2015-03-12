@@ -42,7 +42,6 @@
 #include "slice.h"
 #include "picture.h"
 #include "svc_enc_macroblock.h"
-#include "bit_stream.h"
 
 
 #include "svc_enc_slice_segment.h"

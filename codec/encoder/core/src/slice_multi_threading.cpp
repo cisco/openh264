@@ -651,7 +651,7 @@ int32_t WriteSliceBs (sWelsEncCtx* pCtx, uint8_t* pSliceBsBuf, const int32_t iSl
   int32_t iNalIdx					= 0;
   int32_t iNalSize					= 0;
   int32_t iReturn = ENC_RETURN_SUCCESS;
-  const int32_t kiWrittenLength = (int32_t) (pSliceBs->sBsWrite.pBufPtr - pSliceBs->sBsWrite.pBuf);
+  const int32_t kiWrittenLength = (int32_t) (pSliceBs->sBsWrite.pCurBuf - pSliceBs->sBsWrite.pStartBuf);
 
   iSliceSize				= 0;
   assert (kiNalCnt <= 2);
