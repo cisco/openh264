@@ -65,7 +65,7 @@ The codec and demo can be built by
 
 Valid `**ANDROID_TARGET**` can be found in `**ANDROID_SDK**/platforms`, such as `android-12`.
 You can also set `ARCH`, `NDKLEVEL` according to your device and NDK version.
-`ARCH` specifies the architecture of android device. Currently only `arm` and `x86` are supported, the default is `arm`.
+`ARCH` specifies the architecture of android device. Currently `arm`, `arm64`, `x86` and `x86_64` are supported, the default is `arm`. (`mips` and `mips64` can also be used, but there's no specific optimization for those architectures.)
 `NDKLEVEL` specifies android api level, the api level can be 12-19, the default is 12.
 
 By default these commands build for the `armeabi-v7a` ABI. To build for the other android
