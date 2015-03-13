@@ -75,7 +75,7 @@ uint8_t		iLevelIdc;
 //	bool		bDirect8x8InferenceFlag;
 bool		bFrameCroppingFlag;
 
-//	bool		bVuiParamPresentFlag;
+bool		bVuiParamPresentFlag;
 //	bool		bTimingInfoPresentFlag;
 //	bool		bFixedFrameRateFlag;
 

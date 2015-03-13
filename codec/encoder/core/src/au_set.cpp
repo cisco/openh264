@@ -196,6 +196,32 @@ static inline ELevelIdc WelsGetLevelIdc (const SWelsSPS* kpSps, float fFrameRate
   return LEVEL_5_1; //final decision: select the biggest level
 }
 
+int32_t WelsWriteVUI (SWelsSPS* pSps, SBitStringAux* pBitStringAux) {
+  SBitStringAux* pLocalBitStringAux = pBitStringAux;
+  assert (pSps != NULL && pBitStringAux != NULL);
+
+  BsWriteOneBit (pLocalBitStringAux, false); //aspect_ratio_info_present_flag
+  BsWriteOneBit (pLocalBitStringAux, false); //overscan_info_present_flag
+  BsWriteOneBit (pLocalBitStringAux, false); //video_signal_type_present_flag
+  BsWriteOneBit (pLocalBitStringAux, false); //chroma_loc_info_present_flag
+  BsWriteOneBit (pLocalBitStringAux, false); //timing_info_present_flag
+  BsWriteOneBit (pLocalBitStringAux, false); //nal_hrd_parameters_present_flag
+  BsWriteOneBit (pLocalBitStringAux, false); //vcl_hrd_parameters_present_flag
+  BsWriteOneBit (pLocalBitStringAux, false); //pic_struct_present_flag
+  BsWriteOneBit (pLocalBitStringAux, true); //bitstream_restriction_flag
+
+  //
+  BsWriteOneBit (pLocalBitStringAux, false); //motion_vectors_over_pic_boundaries_flag
+  BsWriteUE (pLocalBitStringAux, 0); //max_bytes_per_pic_denom
+  BsWriteUE (pLocalBitStringAux, 0); //max_bits_per_mb_denom
+  BsWriteUE (pLocalBitStringAux, 0); //log2_max_mv_length_horizontal
+  BsWriteUE (pLocalBitStringAux, 0); //log2_max_mv_length_vertical
+
+  BsWriteUE (pLocalBitStringAux, 0); //max_num_reorder_frames
+  BsWriteUE (pLocalBitStringAux, pSps->iNumRefFrames); //max_dec_frame_buffering
+
+  return 0;
+}
 
 /*!
  *************************************************************************************
@@ -210,7 +236,7 @@ static inline ELevelIdc WelsGetLevelIdc (const SWelsSPS* kpSps, float fFrameRate
  * \note	Call it in case EWelsNalUnitType is SPS.
  *************************************************************************************
  */
-int32_t WelsWriteSpsSyntax (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_t* pSpsIdDelta) {
+int32_t WelsWriteSpsSyntax (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_t* pSpsIdDelta, bool bBaseLayer) {
   SBitStringAux* pLocalBitStringAux = pBitStringAux;
 
   assert (pSps != NULL && pBitStringAux != NULL);
@@ -255,14 +281,15 @@ int32_t WelsWriteSpsSyntax (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_
     BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropBottom);	// frame_crop_bottom_offset
   }
 
-  BsWriteOneBit (pLocalBitStringAux, 0/*pSps->bVuiParamPresentFlag*/);	// vui_parameters_present_flag
-
+  BsWriteOneBit (pLocalBitStringAux, pSps->bVuiParamPresentFlag);	// vui_parameters_present_flag
+  if (pSps->bVuiParamPresentFlag && bBaseLayer)
+    WelsWriteVUI (pSps, pBitStringAux);
   return 0;
 }
 
 
 int32_t WelsWriteSpsNal (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_t* pSpsIdDelta) {
-  WelsWriteSpsSyntax (pSps, pBitStringAux, pSpsIdDelta);
+  WelsWriteSpsSyntax (pSps, pBitStringAux, pSpsIdDelta, true);
 
   BsRbspTrailingBits (pBitStringAux);
 
@@ -286,7 +313,7 @@ int32_t WelsWriteSpsNal (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_t* 
 int32_t WelsWriteSubsetSpsSyntax (SSubsetSps* pSubsetSps, SBitStringAux* pBitStringAux , int32_t* pSpsIdDelta) {
   SWelsSPS* pSps = &pSubsetSps->pSps;
 
-  WelsWriteSpsSyntax (pSps, pBitStringAux, pSpsIdDelta);
+  WelsWriteSpsSyntax (pSps, pBitStringAux, pSpsIdDelta, false);
 
   if (pSps->uiProfileIdc == PRO_SCALABLE_BASELINE || pSps->uiProfileIdc == PRO_SCALABLE_HIGH) {
     SSpsSvcExt* pSubsetSpsExt = &pSubsetSps->sSpsSvcExt;
@@ -481,6 +508,7 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
     pLayerParam->uiLevelIdc = uiLevel;
   }
   pSps->iLevelIdc = g_kuiLevelMaps[pLayerParam->uiLevelIdc - 1];
+  pSps->bVuiParamPresentFlag = true;
   return 0;
 }
 
