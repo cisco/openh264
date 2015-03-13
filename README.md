@@ -108,6 +108,19 @@ export LIB="C:\Program Files (x86)\Windows Kits\8.0\Lib\Win8\um\x86;C:\Program F
 
 Then add 'OS=msvc' to the make line of the 'For All Platforms' instructions.
 
+For Windows Phone builds
+------------------------
+
+Follow the instructions above for normal Windows builds, but use `OS=msvc-wp`
+instead of `OS=msvc`. You will also need gas-preprocessor (as mentioned below
+"Building the Library").
+
+If building for Windows Phone with MSVC 2013, there's no included bat file that sets the lib paths to the Windows Phone kit, but that can be done with a command like this:
+
+    export LIB="c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\store\arm;c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\arm;c:\Program Files (x86)\Windows Phone Kits\8.1\lib\arm"
+
+This is only necessary for building the DLL; the static library can be built without setting this.
+
 For All Platforms
 -------------------
 From the main project directory:
