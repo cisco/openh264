@@ -211,11 +211,11 @@ int32_t WelsWriteVUI (SWelsSPS* pSps, SBitStringAux* pBitStringAux) {
   BsWriteOneBit (pLocalBitStringAux, true); //bitstream_restriction_flag
 
   //
-  BsWriteOneBit (pLocalBitStringAux, false); //motion_vectors_over_pic_boundaries_flag
+  BsWriteOneBit (pLocalBitStringAux, true); //motion_vectors_over_pic_boundaries_flag
   BsWriteUE (pLocalBitStringAux, 0); //max_bytes_per_pic_denom
   BsWriteUE (pLocalBitStringAux, 0); //max_bits_per_mb_denom
-  BsWriteUE (pLocalBitStringAux, 0); //log2_max_mv_length_horizontal
-  BsWriteUE (pLocalBitStringAux, 0); //log2_max_mv_length_vertical
+  BsWriteUE (pLocalBitStringAux, 16); //log2_max_mv_length_horizontal
+  BsWriteUE (pLocalBitStringAux, 16); //log2_max_mv_length_vertical
 
   BsWriteUE (pLocalBitStringAux, 0); //max_num_reorder_frames
   BsWriteUE (pLocalBitStringAux, pSps->iNumRefFrames); //max_dec_frame_buffering
