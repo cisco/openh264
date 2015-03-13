@@ -110,9 +110,9 @@ Then add `OS=msvc` to the make line of the 'For All Platforms' instructions.
 For All Platforms
 -------------------
 From the main project directory:
-- `make` for automatically detecting 32/64bit and building accordingly
-- `make ENABLE64BIT=No` for 32bit builds
-- `make ENABLE64BIT=Yes` for 64bit builds
+- `make` for automatically detecting architecture and building accordingly
+- `make ARCH=i386` for x86 32bit builds
+- `make ARCH=x86_64` for x86 64bit builds
 - `make V=No` for a silent build (not showing the actual compiler commands)
 
 The command line programs `h264enc` and `h264dec` will appear in the main project directory.
