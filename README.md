@@ -83,9 +83,8 @@ make based build system from the command line. Build with
     make OS=ios ARCH=**ARCH**
 
 Valid values for `**ARCH**` are the normal iOS architecture names such as
-`armv7`, `armv7s`, `arm64`, and `i386` and `x86_64` for the simulator. Additionally,
-one might need to add `SDK=X.Y` to the make command line in case the default
-SDK version isn't available. Another settable iOS specific parameter
+`armv7`, `armv7s`, `arm64`, and `i386` and `x86_64` for the simulator.
+Another settable iOS specific parameter
 is `SDK_MIN`, specifying the minimum deployment target for the built library.
 For other details on building using make on the command line, see
 'For All Platforms' below.
