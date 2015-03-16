@@ -42,7 +42,6 @@
 #define SET_MB_SYN_CAVLC_H_
 
 #include "typedefs.h"
-#include "bit_stream.h"
 #include "wels_func_ptr_def.h"
 
 namespace WelsEnc {

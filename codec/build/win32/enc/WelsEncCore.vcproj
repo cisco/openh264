@@ -494,11 +494,7 @@
 				RelativePath="..\..\..\encoder\core\inc\au_set.h"
 				>
 			</File>
-			<File
-				RelativePath="..\..\..\encoder\core\inc\bit_stream.h"
-				>
-			</File>
-			<File
+                        <File
 				RelativePath="..\..\..\common\inc\copy_mb.h"
 				>
 			</File>
@@ -548,6 +544,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\encoder\core\inc\get_intra_predictor.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\inc\golomb_common.h"
 				>
 			</File>
 			<File
@@ -715,7 +715,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\wels_common_defs.h"
+				RelativePath="..\..\..\common\inc\wels_common_defs.h"
 				>
 			</File>
 			<File

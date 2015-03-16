@@ -41,7 +41,6 @@
 #include "picture.h"
 #include "parameter_sets.h"
 #include "svc_enc_slice_segment.h"
-#include "bit_stream.h"
 #include "set_mb_syn_cabac.h"
 
 namespace WelsEnc {

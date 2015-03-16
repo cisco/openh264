@@ -49,6 +49,38 @@ const  ALIGNED_DECLARE (uint8_t, g_kuiZeroLeftMap[16], 16) = {
   0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7
 };
 
+
+/*
+ *	Exponential Golomb codes encoding routines
+ */
+
+#define    CAVLC_BS_INIT( pBs )  \
+  uint8_t  * pBufPtr = pBs->pCurBuf; \
+  uint32_t   uiCurBits = pBs->uiCurBits; \
+  int32_t    iLeftBits = pBs->iLeftBits;
+
+#define    CAVLC_BS_UNINIT( pBs ) \
+  pBs->pCurBuf = pBufPtr;  \
+  pBs->uiCurBits = uiCurBits;  \
+  pBs->iLeftBits = iLeftBits;
+
+#define    CAVLC_BS_WRITE( n,  v ) \
+  {  \
+  if ( (n) < iLeftBits ) {\
+  uiCurBits = (uiCurBits<<(n))|(v);\
+  iLeftBits -= (n);\
+  }\
+  else {\
+  (n) -= iLeftBits;\
+  uiCurBits = (uiCurBits<<iLeftBits) | ((v)>>(n));\
+  WRITE_BE_32(pBufPtr, uiCurBits);\
+  pBufPtr += 4;\
+  uiCurBits = (v) & ((1<<(n))-1);\
+  iLeftBits = 32 - (n);\
+  }\
+  } ;
+
+
 int32_t CavlcParamCal_c (int16_t* pCoffLevel, uint8_t* pRun, int16_t* pLevel, int32_t* pTotalCoeff ,
                          int32_t iLastIndex) {
   int32_t iTotalZeros = 0;
@@ -201,7 +233,7 @@ int32_t  WriteBlockResidualCavlc (SWelsFuncPtrList* pFuncList, int16_t* pCoffLev
 
 void StashMBStatusCavlc (SDynamicSlicingStack* pDss, SSlice* pSlice, int32_t iMbSkipRun) {
   SBitStringAux* pBs = pSlice->pSliceBsa;
-  pDss->pBsStackBufPtr	= pBs->pBufPtr;
+  pDss->pBsStackBufPtr	= pBs->pCurBuf;
   pDss->uiBsStackCurBits	= pBs->uiCurBits;
   pDss->iBsStackLeftBits	= pBs->iLeftBits;
   pDss->uiLastMbQp =  pSlice->uiLastMbQp;
@@ -209,7 +241,7 @@ void StashMBStatusCavlc (SDynamicSlicingStack* pDss, SSlice* pSlice, int32_t iMb
 }
 int32_t StashPopMBStatusCavlc (SDynamicSlicingStack* pDss, SSlice* pSlice) {
   SBitStringAux* pBs = pSlice->pSliceBsa;
-  pBs->pBufPtr		= pDss->pBsStackBufPtr;
+  pBs->pCurBuf		= pDss->pBsStackBufPtr;
   pBs->uiCurBits	= pDss->uiBsStackCurBits;
   pBs->iLeftBits	= pDss->iBsStackLeftBits;
   pSlice->uiLastMbQp = pDss->uiLastMbQp;
@@ -232,14 +264,14 @@ void WelsWriteSliceEndSyn (SSlice* pSlice, bool bEntropyCodingModeFlag) {
   SBitStringAux* pBs = pSlice->pSliceBsa;
   if (bEntropyCodingModeFlag) {
     WelsCabacEncodeFlush (&pSlice->sCabacCtx);
-    pBs->pBufPtr = WelsCabacEncodeGetPtr (&pSlice->sCabacCtx);
+    pBs->pCurBuf = WelsCabacEncodeGetPtr (&pSlice->sCabacCtx);
 
   } else {
     BsRbspTrailingBits (pBs);
     BsFlush (pBs);
   }
 }
-void InitCoeffFunc (SWelsFuncPtrList* pFuncList, const uint32_t uiCpuFlag,int32_t iEntropyCodingModeFlag) {
+void InitCoeffFunc (SWelsFuncPtrList* pFuncList, const uint32_t uiCpuFlag, int32_t iEntropyCodingModeFlag) {
   pFuncList->pfCavlcParamCal = CavlcParamCal_c;
 
 #if defined(X86_ASM)

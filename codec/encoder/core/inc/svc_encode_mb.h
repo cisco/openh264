@@ -44,7 +44,6 @@
 #include "typedefs.h"
 #include "wels_common_basis.h"
 #include "slice.h"
-#include "bit_stream.h"
 #include "encoder_context.h"
 #include "wels_func_ptr_def.h"
 

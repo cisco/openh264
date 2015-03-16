@@ -35,7 +35,6 @@
 #define WELS_NAL_UNIT_PREFIX_H__
 
 #include "typedefs.h"
-#include "wels_common_basis.h"
 #include "slice.h"
 
 namespace WelsEnc {

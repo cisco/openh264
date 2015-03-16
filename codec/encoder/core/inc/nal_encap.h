@@ -41,7 +41,6 @@
 #define WELS_NAL_UNIT_ENCAPSULATION_H__
 
 #include "typedefs.h"
-#include "bit_stream.h"
 #include "nal_prefix.h"
 
 //SBitStringAux

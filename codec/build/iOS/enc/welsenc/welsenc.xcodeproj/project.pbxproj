@@ -154,6 +154,7 @@
 		4CE4470618BC605C0017DF25 /* welsEncoderExt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = welsEncoderExt.cpp; sourceTree = "<group>"; };
 		6CA38DA21991CACE003EAAE0 /* svc_motion_estimation.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = svc_motion_estimation.S; sourceTree = "<group>"; };
 		6CA38DA41991D31A003EAAE0 /* svc_motion_estimation_aarch64_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = svc_motion_estimation_aarch64_neon.S; path = arm64/svc_motion_estimation_aarch64_neon.S; sourceTree = "<group>"; };
+		98FE4C1A1AB0200C0031E2B4 /* golomb_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = golomb_common.h; path = ../../../common/inc/golomb_common.h; sourceTree = "<group>"; };
 		9AED664819469FAF009A3567 /* welsCodecTrace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = welsCodecTrace.h; path = ../../../common/inc/welsCodecTrace.h; sourceTree = "<group>"; };
 		9AED664C19469FC1009A3567 /* welsCodecTrace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = welsCodecTrace.cpp; path = ../../../common/src/welsCodecTrace.cpp; sourceTree = "<group>"; };
 		9AED66651946A2B3009A3567 /* utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utils.cpp; path = ../../../common/src/utils.cpp; sourceTree = "<group>"; };
@@ -254,6 +255,7 @@
 		4CE446A918BC605C0017DF25 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				98FE4C1A1AB0200C0031E2B4 /* golomb_common.h */,
 				F7E9997F19EBD3CE009B1021 /* svc_set_mb_syn.h */,
 				F7E9997E19EBD3C6009B1021 /* set_mb_syn_cabac.h */,
 				9AED66671946A2C4009A3567 /* utils.h */,

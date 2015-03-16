@@ -46,7 +46,6 @@
 #include "codec_def.h"
 #include "macros.h"
 #include "wels_const.h"
-#include "wels_common_basis.h"
 #include "rc.h"
 #include "svc_enc_slice_segment.h"
 #include "as264_common.h"

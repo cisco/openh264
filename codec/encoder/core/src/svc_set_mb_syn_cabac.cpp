@@ -474,7 +474,8 @@ int32_t WelsCalNonZeroCount2x2Block (int16_t* pBlock) {
   }
   return iCount;
 }
-int32_t WelsWriteMbResidualCabac (SWelsFuncPtrList* pFuncList,SSlice* pSlice, SMbCache* sMbCacheInfo, SMB* pCurMb, SCabacCtx* pCabacCtx,
+int32_t WelsWriteMbResidualCabac (SWelsFuncPtrList* pFuncList, SSlice* pSlice, SMbCache* sMbCacheInfo, SMB* pCurMb,
+                                  SCabacCtx* pCabacCtx,
                                   int16_t iMbWidth, uint32_t uiChromaQpIndexOffset) {
 
   const uint16_t uiMbType = pCurMb->uiMbType;
@@ -498,7 +499,7 @@ int32_t WelsWriteMbResidualCabac (SWelsFuncPtrList* pFuncList,SSlice* pSlice, SM
 
     if (uiMbType == MB_TYPE_INTRA16x16) {
       //Luma DC
-      int iNonZeroCount = pFuncList->pfGetNoneZeroCount(pMbCache->pDct->iLumaI16x16Dc);
+      int iNonZeroCount = pFuncList->pfGetNoneZeroCount (pMbCache->pDct->iLumaI16x16Dc);
       WelsWriteBlockResidualCabac (pMbCache, pCurMb, iMbWidth, pCabacCtx, LUMA_DC, 0, iNonZeroCount,
                                    pMbCache->pDct->iLumaI16x16Dc, 15);
       if (iNonZeroCount)
@@ -572,7 +573,7 @@ void WelsInitSliceCabac (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
 
   /* init cabac */
   WelsCabacContextInit (pEncCtx, &pSlice->sCabacCtx, pSlice->iCabacInitIdc);
-  WelsCabacEncodeInit (&pSlice->sCabacCtx, pBs->pBufPtr, pBs->pBufEnd);
+  WelsCabacEncodeInit (&pSlice->sCabacCtx, pBs->pCurBuf, pBs->pEndBuf);
 }
 
 int32_t WelsSpatialWriteMbSynCabac (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb) {
@@ -680,7 +681,8 @@ int32_t WelsSpatialWriteMbSynCabac (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* p
     if (uiMbType != MB_TYPE_INTRA16x16) {
       WelsCabacMbCbp (pCurMb, iMbWidth, pCabacCtx);
     }
-    iRet = WelsWriteMbResidualCabac (pEncCtx->pFuncList,pSlice, pMbCache, pCurMb, pCabacCtx, iMbWidth, uiChromaQpIndexOffset);
+    iRet = WelsWriteMbResidualCabac (pEncCtx->pFuncList, pSlice, pMbCache, pCurMb, pCabacCtx, iMbWidth,
+                                     uiChromaQpIndexOffset);
   }
   if (!IS_INTRA (pCurMb->uiMbType))
     pCurMb->uiChromPredMode = 0;

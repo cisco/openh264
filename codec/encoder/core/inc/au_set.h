@@ -42,7 +42,6 @@
 #ifndef WELS_ACCESS_UNIT_WRITER_H__
 #define WELS_ACCESS_UNIT_WRITER_H__
 
-#include "bit_stream.h"
 #include "parameter_sets.h"
 #include "param_svc.h"
 #include "utils.h"
