@@ -4097,7 +4097,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
     pCtx->pFuncList->pfRc.pfWelsRcPictureInfoUpdate (pCtx, iLayerSize);
     RcTraceFrameBits (pCtx, pSrcPic->uiTimeStamp);
-    pCtx->pDecPic->iFrameAverageQp = pCtx->pWelsSvcRc->iAverageFrameQp;
+    pCtx->pDecPic->iFrameAverageQp = pCtx->pWelsSvcRc[iDidIdx].iAverageFrameQp;
 
     //update scc related
     pCtx->pFuncList->pfUpdateFMESwitch (pCtx->pCurDqLayer);
