@@ -936,19 +936,32 @@ int32_t  WelsCalcDeqCoeffScalingList (PWelsDecoderContext pCtx) {
     pCtx->bUseScalingList = true;
 
     if (!pCtx->bDequantCoeff4x4Init || (pCtx->iDequantCoeffPpsid != pCtx->pPps->iPpsId)) {
-      int i, q, x;
+      int i, q, x, y;
       // Rewrite pps scaling list for scalingList present flag=0
       if (pCtx->bSpsLatePps) {
-        for (i = 0; i < 6; i++) {
-          if (!pCtx->pSps->bSeqScalingListPresentFlag[i]) {
-            if (i == 0 || i == 3)
-              memcpy (pCtx->pPps->iScalingList4x4[i], pCtx->pSps->iScalingList4x4[i], 16 * sizeof (uint8_t));
-            else
-              memcpy (pCtx->pPps->iScalingList4x4[i], pCtx->pPps->iScalingList4x4[i - 1], 16 * sizeof (uint8_t));
+        for (i = 0; i < 12; i++) {
+          //if (!pCtx->pSps->bSeqScalingListPresentFlag[i]) {
+          if (!pCtx->pPps->bPicScalingListPresentFlag[i]) {
+            if (i < 6) {
+
+
+              if (i == 0 || i == 3)
+                memcpy (pCtx->pPps->iScalingList4x4[i], pCtx->pSps->iScalingList4x4[i], 16 * sizeof (uint8_t));
+              else
+                memcpy (pCtx->pPps->iScalingList4x4[i], pCtx->pPps->iScalingList4x4[i - 1], 16 * sizeof (uint8_t));
+            } else {
+
+              if (i == 6 || i == 7)
+                memcpy (pCtx->pPps->iScalingList8x8[ i - 6 ], pCtx->pSps->iScalingList8x8[ i - 6 ], 64 * sizeof (uint8_t));
+              else
+                memcpy (pCtx->pPps->iScalingList8x8[ i - 6 ], pCtx->pPps->iScalingList8x8[i - 8], 64 * sizeof (uint8_t));
+
+
+            }
 
           }
         }
-        //TO DO, SUPPORT 8x8 SCALINGlist
+
 
       }
       //Init dequant coeff value for different QP
@@ -959,10 +972,17 @@ int32_t  WelsCalcDeqCoeffScalingList (PWelsDecoderContext pCtx) {
             pCtx->pDequant_coeff4x4[i][q][x] = pCtx->pPps->bPicScalingMatrixPresentFlag ? pCtx->pPps->iScalingList4x4[i][x] *
                                                g_kuiDequantCoeff[q][x & 0x07] : pCtx->pSps->iScalingList4x4[i][x] * g_kuiDequantCoeff[q][x & 0x07];
           }
+          for (y = 0; y < 64; y++) {
+            pCtx->pDequant_coeff8x8[i][q][y] = pCtx->pPps->bPicScalingMatrixPresentFlag ? pCtx->pPps->iScalingList8x8[i][y] *
+                                               g_kuiDequantCoeff[q][x & 0x07] : pCtx->pSps->iScalingList8x8[i][y] * g_kuiDequantCoeff[q][x &
+                                                   0x07];//pseudo-code ,holding for 8x8transform into
+          }
         }
       }
 
+
       pCtx->bDequantCoeff4x4Init = true;
+      pCtx->iDequantCoeffPpsid = pCtx->pPps->iPpsId;
     }
   } else
     pCtx->bUseScalingList = false;

@@ -1504,7 +1504,7 @@ int32_t ParseScalingList (PSps pSps, PBitStringAux pBs, bool bPPS, bool* pScalin
                           uint8_t (*iScalingList4x4)[16], uint8_t (*iScalingList8x8)[64]) {
   uint32_t uiScalingListNum;
   uint32_t uiCode;
-  int32_t iRetTmp;
+
   bool bUseDefaultScalingMatrixFlag4x4 = false;
   bool bUseDefaultScalingMatrixFlag8x8 = false;
   bool bInit = false;
@@ -1526,28 +1526,21 @@ int32_t ParseScalingList (PSps pSps, PBitStringAux pBs, bool bPPS, bool* pScalin
     WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode));
     pScalingListPresentFlag[i] = !!uiCode;
     if (!!uiCode) {
-      if (i < 6) {
-        iRetTmp = SetScalingListValue (iScalingList4x4[i], 16, &bUseDefaultScalingMatrixFlag4x4, pBs);
-        if (iRetTmp == ERR_NONE) {
-          if (bUseDefaultScalingMatrixFlag4x4) {
-            bUseDefaultScalingMatrixFlag4x4 = false;
-            memcpy (iScalingList4x4[i], g_kuiDequantScaling4x4Default[i / 3], sizeof (uint8_t) * 16);
-          }
-        } else
-          return iRetTmp;
+      if (i < 6) {//4x4 scaling list
+        WELS_READ_VERIFY (SetScalingListValue (iScalingList4x4[i], 16, &bUseDefaultScalingMatrixFlag4x4, pBs));
+        if (bUseDefaultScalingMatrixFlag4x4) {
+          bUseDefaultScalingMatrixFlag4x4 = false;
+          memcpy (iScalingList4x4[i], g_kuiDequantScaling4x4Default[i / 3], sizeof (uint8_t) * 16);
+        }
+
 
       } else {
-        SetScalingListValue (iScalingList8x8[i - 6], 64, &bUseDefaultScalingMatrixFlag8x8, pBs);
-        //if(iRetTmp == ERR_NONE)
-        //{
+        WELS_READ_VERIFY (SetScalingListValue (iScalingList8x8[i - 6], 64, &bUseDefaultScalingMatrixFlag8x8, pBs));
+
         if (bUseDefaultScalingMatrixFlag8x8) {
           bUseDefaultScalingMatrixFlag8x8 = false;
           memcpy (iScalingList8x8[i - 6], g_kuiDequantScaling8x8Default[ (i - 6) & 1], sizeof (uint8_t) * 64);
         }
-        // }
-
-        //else
-        // return iRetTmp;
       }
 
     } else {
@@ -1561,7 +1554,7 @@ int32_t ParseScalingList (PSps pSps, PBitStringAux pBs, bool bPPS, bool* pScalin
         if ((i == 6) || (i == 7))
           memcpy (iScalingList8x8[i - 6], defaultScaling[ (i & 1) + 2], sizeof (uint8_t) * 64);
         else
-          memcpy (iScalingList8x8[i - 6], iScalingList8x8[ (i - 6) / 3], sizeof (uint8_t) * 64);
+          memcpy (iScalingList8x8[i - 6], iScalingList8x8[i - 8], sizeof (uint8_t) * 64);
 
       }
     }
