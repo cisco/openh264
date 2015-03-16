@@ -4097,7 +4097,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
     pCtx->pFuncList->pfRc.pfWelsRcPictureInfoUpdate (pCtx, iLayerSize);
     RcTraceFrameBits (pCtx, pSrcPic->uiTimeStamp);
-    pCtx->pDecPic->iFrameAverageQp = pCtx->pWelsSvcRc->iAverageFrameQp;
+    pCtx->pDecPic->iFrameAverageQp = pCtx->pWelsSvcRc[iDidIdx].iAverageFrameQp;
 
     //update scc related
     pCtx->pFuncList->pfUpdateFMESwitch (pCtx->pCurDqLayer);
@@ -4763,17 +4763,19 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   pMA->WelsFree (pCurLayer->pSliceEncCtx->pCountMbNumInSlice, "pSliceSeg->pCountMbNumInSlice");
   pCurLayer->pSliceEncCtx->pCountMbNumInSlice = pCountMbNumInSlice;
 
+  //deal with rate control variables
+  const int32_t kiCurDid = pCtx->uiDependencyId;
   SRCSlicing* pSlcingOverRc = (SRCSlicing*)pMA->WelsMalloc (iMaxSliceNum * sizeof (SRCSlicing), "SlicingOverRC");
   if (NULL == pSlcingOverRc) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
              "CWelsH264SVCEncoder::DynSliceRealloc: realloc pSlcingOverRc not successful");
     return ENC_RETURN_MEMALLOCERR;
   }
-  memcpy (pSlcingOverRc, pCtx->pWelsSvcRc->pSlicingOverRc, sizeof (SRCSlicing) * iMaxSliceNumOld);
+  memcpy (pSlcingOverRc, pCtx->pWelsSvcRc[kiCurDid].pSlicingOverRc, sizeof (SRCSlicing) * iMaxSliceNumOld);
   uiSliceIdx = iMaxSliceNumOld;
   SRCSlicing* pSORC = &pSlcingOverRc[uiSliceIdx];
-  const int32_t kiBitsPerMb		= WELS_DIV_ROUND (pCtx->pWelsSvcRc->iTargetBits * INT_MULTIPLY,
-                                pCtx->pWelsSvcRc->iNumberMbFrame);
+  const int32_t kiBitsPerMb		= WELS_DIV_ROUND (pCtx->pWelsSvcRc[kiCurDid].iTargetBits * INT_MULTIPLY,
+                                pCtx->pWelsSvcRc[kiCurDid].iNumberMbFrame);
   while (uiSliceIdx < iMaxSliceNum) {
     pSORC->iComplexityIndexSlice = 0;
     pSORC->iCalculatedQpSlice = pCtx->iGlobalQp;
@@ -4786,8 +4788,8 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
     pSORC ++;
     uiSliceIdx ++;
   }
-  pMA->WelsFree (pCtx->pWelsSvcRc->pSlicingOverRc, "SlicingOverRC");
-  pCtx->pWelsSvcRc->pSlicingOverRc = pSlcingOverRc;
+  pMA->WelsFree (pCtx->pWelsSvcRc[kiCurDid].pSlicingOverRc, "SlicingOverRC");
+  pCtx->pWelsSvcRc[kiCurDid].pSlicingOverRc = pSlcingOverRc;
 
   if (pCtx->iMaxSliceCount < iMaxSliceNum)
     pCtx->iMaxSliceCount = iMaxSliceNum;
