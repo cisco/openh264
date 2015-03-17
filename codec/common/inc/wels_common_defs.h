@@ -226,6 +226,39 @@ typedef struct TagBitStringAux {
   // need pointer to next byte start position in case 0 bit left then 8 instead
 } SBitStringAux, *PBitStringAux;
 
+/* AVC MB types*/
+#define MB_TYPE_INTRA4x4    0x00000001
+#define MB_TYPE_INTRA16x16  0x00000002
+#define MB_TYPE_INTRA8x8    0x00000003
+#define MB_TYPE_INTRA_PCM   0x00000004
+#define MB_TYPE_INTRA_BL    0x00000005
+
+#define MB_TYPE_16x16       0x00000006
+#define MB_TYPE_16x8        0x00000007
+#define MB_TYPE_8x16        0x00000008
+#define MB_TYPE_8x8         0x00000009
+#define MB_TYPE_8x8_REF0    0x0000000a
+#define SUB_MB_TYPE_8x8     0x0000000b
+#define SUB_MB_TYPE_8x4     0x0000000c
+#define SUB_MB_TYPE_4x8     0x0000000d
+#define SUB_MB_TYPE_4x4     0x0000000e
+#define MB_TYPE_SKIP        0x0000000f
+#define MB_TYPE_DIRECT2     0x00000010
+
+#define IS_INTRA4x4(type) ( MB_TYPE_INTRA4x4 == (type) )
+#define IS_INTRA16x16(type) ( MB_TYPE_INTRA16x16 == (type) )
+#define IS_INTRA(type) ( (type) > 0 && (type) < 5 )
+#define IS_INTER(type) ( (type) > 5 && (type) < 16 )
+
+#define IS_SKIP(type) ( (type) == MB_TYPE_SKIP )
+#define IS_SVC_INTER(type) IS_INTER(type)
+#define IS_I_BL(type) ( (type) == MB_TYPE_INTRA_BL )
+#define IS_SVC_INTRA(type) ( IS_I_BL(type) || IS_INTRA(type) )
+#define IS_Inter_8x8(type) ( (type) == MB_TYPE_8x8)
+
+#define REF_NOT_AVAIL   -2
+#define REF_NOT_IN_LIST -1  //intra
+
 /////////intra16x16  Luma
 #define I16_PRED_INVALID   -1
 #define I16_PRED_V       0
