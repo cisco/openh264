@@ -994,6 +994,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_ALLLTR) {
     m_LTR_Recover_Request.uiFeedbackType = LTR_RECOVERY_REQUEST;
     m_LTR_Recover_Request.iCurrentFrameNum = rand() % 2 == 1 ? -rand() % 10000 : rand() % 10000;
     m_LTR_Recover_Request.uiIDRPicId = rand() % 2 == 1 ? -rand() % 10000 : rand() % 10000;
+    m_LTR_Recover_Request.iLastCorrectFrameNum = rand() % 2 == 1 ? -rand() % 10000 : rand() % 10000;
     encoder_->SetOption (ENCODER_LTR_RECOVERY_REQUEST, &m_LTR_Recover_Request);
     m_LTR_Marking_Feedback.uiFeedbackType = rand() % 2 == 1 ? LTR_MARKING_SUCCESS : LTR_MARKING_FAILED;
     m_LTR_Marking_Feedback.uiIDRPicId = rand() % 2 == 1 ? -rand() % 10000 : rand() % 10000;
