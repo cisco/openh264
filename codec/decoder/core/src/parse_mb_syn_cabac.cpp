@@ -315,7 +315,7 @@ int32_t ParseIntraPredModeChromaCabac (PWelsDecoderContext pCtx, uint8_t uiNeigh
   uint32_t uiCode;
   int32_t iIdxA, iIdxB, iCtxInc;
   int8_t* pChromaPredMode = pCtx->pCurDqLayer->pChromaPredMode;
-  int8_t* pMbType = pCtx->pCurDqLayer->pMbType;
+  int16_t* pMbType = pCtx->pCurDqLayer->pMbType;
   int32_t iLeftAvail     = uiNeighAvail & 0x04;
   int32_t iTopAvail      = uiNeighAvail & 0x01;
 
@@ -722,10 +722,10 @@ int32_t ParseCbfInfoCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNzcCache, int3
   int32_t iTopBlkXy = iCurrBlkXy - pCtx->pCurDqLayer->iMbWidth; //default value: MB neighboring
   int32_t iLeftBlkXy = iCurrBlkXy - 1; //default value: MB neighboring
   uint8_t* pCbfDc = pCtx->pCurDqLayer->pCbfDc;
-  int8_t* pMbType = pCtx->pCurDqLayer->pMbType;
+  int16_t* pMbType = pCtx->pCurDqLayer->pMbType;
   int32_t iCtxInc;
   uiCbfBit = 0;
-  nA = nB = IS_INTRA (pMbType[iCurrBlkXy]);
+  nA = nB = (int8_t)!!IS_INTRA (pMbType[iCurrBlkXy]);
 
   if (iResProperty == I16_LUMA_DC || iResProperty == CHROMA_DC_U || iResProperty == CHROMA_DC_V) { //DC
     if (pNeighAvail->iTopAvail)

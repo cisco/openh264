@@ -898,10 +898,10 @@ TEST (Deblocking, WelsDeblockingMb) {
   sDqLayer.pLumaQp = iLumaQP;
   sDqLayer.pChromaQp = iChromaQP;
 
-  int8_t iMbType[2];
+  int16_t iMbType[2];
   sDqLayer.pMbType = iMbType;
-  sDqLayer.pMbType[0] = 0x01;
-  sDqLayer.pMbType[1] = 0x01;
+  sDqLayer.pMbType[0] = MB_TYPE_INTRA4x4;
+  sDqLayer.pMbType[1] = MB_TYPE_INTRA4x4;
 
   sFilter.iSliceAlphaC0Offset = 0;
   sFilter.iSliceBetaOffset = 0;
@@ -922,31 +922,31 @@ TEST (Deblocking, WelsDeblockingMb) {
   EXPECT_TRUE(iCb[2<<1]==iChromaV1 && iCr[2<<1]==iChromaV1)<<iQP<<" "<<sDqLayer.pMbType[1]; \
   EXPECT_TRUE(iCb[(2<<1)*sFilter.iCsStride[1]]==iChromaV2 && iCr[(2<<1)*sFilter.iCsStride[1]]==iChromaV2)<<iQP<<" "<<sDqLayer.pMbType[1];
 
-  // QP>16, LEFT & TOP, Intra mode 0x01
+  // QP>16, LEFT & TOP, Intra mode MB_TYPE_INTRA4x4 
   iQP = 16 + rand() % 35;
-  sDqLayer.pMbType[1] = 0x01;
+  sDqLayer.pMbType[1] = MB_TYPE_INTRA4x4;
   UT_DB_MACROBLOCK_TEST (0x03, iQP, 2, 1, 1, 2, 1, 1)
 
-  // QP>16, LEFT & TOP, Intra mode 0x02
+  // QP>16, LEFT & TOP, Intra mode MB_TYPE_INTRA16x16 
   iQP = 16 + rand() % 35;
-  sDqLayer.pMbType[1] = 0x02;
+  sDqLayer.pMbType[1] = MB_TYPE_INTRA16x16;
   UT_DB_MACROBLOCK_TEST (0x03, iQP, 2, 1, 1, 2, 1, 1)
 
   // MbType==0x03, Intra8x8 has not been supported now.
 
-  // QP>16, LEFT & TOP, Intra mode 0x04
+  // QP>16, LEFT & TOP, Intra mode MB_TYPE_INTRA_PCM 
   iQP = 16 + rand() % 35;
-  sDqLayer.pMbType[1] = 0x04;
+  sDqLayer.pMbType[1] = MB_TYPE_INTRA_PCM;
   UT_DB_MACROBLOCK_TEST (0x03, iQP, 2, 1, 1, 2, 1, 1)
 
   // QP>16, LEFT & TOP, neighbor is Intra
   iQP = 16 + rand() % 35;
-  sDqLayer.pMbType[0] = 0x02;
-  sDqLayer.pMbType[1] = 0x0f; // Internal SKIP, Bs==0
+  sDqLayer.pMbType[0] = MB_TYPE_INTRA16x16;
+  sDqLayer.pMbType[1] = MB_TYPE_SKIP; // Internal SKIP, Bs==0
   UT_DB_MACROBLOCK_TEST (0x03, iQP, 2, 0, 0, 2, 0, 0)
 
   // QP<15, no output
   iQP = rand() % 16;
-  sDqLayer.pMbType[1] = 0x04;
+  sDqLayer.pMbType[1] = MB_TYPE_INTRA_PCM;
   UT_DB_MACROBLOCK_TEST (0x03, iQP, 0, 0, 0, 0, 0, 0)
 }

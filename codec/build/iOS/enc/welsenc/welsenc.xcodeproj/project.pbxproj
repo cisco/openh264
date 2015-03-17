@@ -81,7 +81,6 @@
 		4CE4432518B6FFA00017DF25 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		4CE446AA18BC605C0017DF25 /* as264_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = as264_common.h; sourceTree = "<group>"; };
 		4CE446AB18BC605C0017DF25 /* au_set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = au_set.h; sourceTree = "<group>"; };
-		4CE446AC18BC605C0017DF25 /* bit_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bit_stream.h; sourceTree = "<group>"; };
 		4CE446AE18BC605C0017DF25 /* deblocking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = deblocking.h; sourceTree = "<group>"; };
 		4CE446AF18BC605C0017DF25 /* decode_mb_aux.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = decode_mb_aux.h; sourceTree = "<group>"; };
 		4CE446B018BC605C0017DF25 /* dq_map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dq_map.h; sourceTree = "<group>"; };
@@ -262,7 +261,6 @@
 				4CDBFB9D18E5068D0025A767 /* wels_transpose_matrix.h */,
 				4CE446AA18BC605C0017DF25 /* as264_common.h */,
 				4CE446AB18BC605C0017DF25 /* au_set.h */,
-				4CE446AC18BC605C0017DF25 /* bit_stream.h */,
 				4CE446AE18BC605C0017DF25 /* deblocking.h */,
 				4CE446AF18BC605C0017DF25 /* decode_mb_aux.h */,
 				4CE446B018BC605C0017DF25 /* dq_map.h */,

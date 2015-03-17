@@ -129,7 +129,6 @@ enum EMbPosition {
   BOTTOMLEFT_MB_POS	= 0x80,	//
   MB_POS_A  = 0x100
 };
-#define MB_ON_PIC_BOUNDRY			(RIGHT_MB_POS|BOTTOM_MB_POS|LEFT_MB_POS|TOP_MB_POS)
 
 /* MB Type & Sub-MB Type */
 typedef uint32_t Mb_Type;
@@ -143,55 +142,7 @@ typedef uint32_t Mb_Type;
 #define	MB_BTMRIGHT_BIT		6
 #define	MB_BTMLEFT_BIT		7
 
-
-/* AVC types*/
-#define MB_TYPE_INTRA4x4		0x00000001
-#define MB_TYPE_INTRA16x16		0x00000002
-#define MB_TYPE_INTRA_PCM		0x00000004
-#define MB_TYPE_16x16			0x00000008
-#define MB_TYPE_16x8			0x00000010
-#define MB_TYPE_8x16			0x00000020
-#define MB_TYPE_8x8				0x00000040
-#define MB_TYPE_8x8_REF0		0x00000080
-
-#define MB_TYPE_SKIP			0x00000100
-#define MB_TYPE_P0L0			0x00000200
-#define MB_TYPE_P1L0			0x00000400
-#define MB_TYPE_P0L1			0x00000800
-#define MB_TYPE_P1L1			0x00001000
-#define MB_TYPE_L0				(MB_TYPE_P0L0 | MB_TYPE_P1L0)
-#define MB_TYPE_L1				(MB_TYPE_P0L1 | MB_TYPE_P1L1)
-#define MB_TYPE_L0L1			(MB_TYPE_L0   | MB_TYPE_L1)
-#define MB_TYPE_QUANT			0x00002000
-#define MB_TYPE_CBP				0x00004000
-/* SVC extension types */
-#define MB_TYPE_INTRA_BL		0x00008000// I_BL new MB type derived H.264 SVC specific
-
 #define MB_TYPE_BACKGROUND		0x00010000  // conditional BG skip_mb
-
-
-#define MB_TYPE_INTRA			(MB_TYPE_INTRA4x4 | MB_TYPE_INTRA16x16 | MB_TYPE_INTRA_PCM)
-#define MB_TYPE_INTER			(MB_TYPE_16x16 | MB_TYPE_16x8 | MB_TYPE_8x16 | MB_TYPE_8x8 | MB_TYPE_8x8_REF0)
-#define SUB_TYPE_8x8			(MB_TYPE_8x8 | MB_TYPE_8x8_REF0)
-
-#define MB_TYPE_UNAVAILABLE		0xFF000000
-#define REF_NOT_AVAIL    -2
-#define REF_NOT_IN_LIST -1    //intra
-#define	REF_PIC_REORDER_DEFAULT	true
-
-#define IS_INTRA4x4(type) ( MB_TYPE_INTRA4x4 == (type) )
-#define IS_INTRA16x16(type) ( MB_TYPE_INTRA16x16 == (type) )
-#define IS_INTRA(type) ((type)&MB_TYPE_INTRA)
-#define IS_INTER(type) ((type)&MB_TYPE_INTER)
-
-#define IS_SKIP(type) ( (type) == MB_TYPE_SKIP )
-#define IS_SVC_INTER(type) ( IS_INTER(type) || IS_SKIP(type) )
-#define IS_I_BL(type) ( (type) == MB_TYPE_INTRA_BL )
-#define IS_SVC_INTRA(type) ( IS_I_BL(type) || IS_INTRA(type) )
-#define IS_SUB8x8(type) ((type)&SUB_TYPE_8x8)
-#define IS_Inter_8x8(type) ( (type) == MB_TYPE_8x8)
-
-
 
 enum {
   Intra4x4			= 0,
