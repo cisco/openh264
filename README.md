@@ -40,6 +40,7 @@ OS Support
 - Linux 64-bit and 32-bit
 - Android 64-bit and 32-bit
 - iOS 64-bit and 32-bit
+- Windows Phone 32-bit
 
 Processor Support
 -----------------
