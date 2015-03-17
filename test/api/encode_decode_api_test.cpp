@@ -3398,7 +3398,7 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVC_SPS_PPS_LISTING) {
   int iIdx = 0;
 
   //create decoder
-  for (int iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
+  for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
     pBsBuf[iIdx] = static_cast<unsigned char*> (malloc (iWidth * iHeight * 3 * sizeof (unsigned char) / 2));
     EXPECT_TRUE (pBsBuf[iIdx] != NULL);
 
