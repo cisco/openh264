@@ -54,26 +54,6 @@ extern const uint8_t g_kCache30ScanIdx[16];
 extern const uint8_t g_kNonZeroScanIdxC[4];
 /* Profile IDC */
 typedef uint8_t		ProfileIdc;
-enum {
-PRO_BASELINE	= 66,
-PRO_MAIN		= 77,
-PRO_EXTENDED	= 88,
-PRO_HIGH		= 100,
-PRO_HIGH10		= 110,
-PRO_HIGH422		= 122,
-PRO_HIGH444		= 144,
-PRO_CAVLC444	= 244,
-
-PRO_SCALABLE_BASELINE	= 83,
-PRO_SCALABLE_HIGH		= 86
-};
-
-/* Picture Size */
-typedef struct TagPictureSize {
-int32_t	iWidth;
-int32_t iHeight;
-} SPictureSize;
-
 
 /* Position Offset structure */
 typedef struct TagPosOffset {
@@ -83,45 +63,9 @@ int32_t	iRightOffset;
 int32_t	iBottomOffset;
 } SPosOffset;
 
-enum EMbPosition { //
-MB_LEFT     = 0x01,	// A
-MB_TOP      = 0x02,	// B
-MB_TOPRIGHT = 0x04,	// C
-MB_TOPLEFT	= 0x08,	// D,
-MB_PRIVATE  = 0x10
-};
 /* MB Type & Sub-MB Type */
 typedef int32_t MbType;
 typedef int32_t SubMbType;
-
-#define MB_TYPE_INTRA4x4       0x01
-#define MB_TYPE_INTRA16x16     0x02
-#define MB_TYPE_INTRA8x8       0x03
-#define MB_TYPE_INTRA_PCM      0x04
-
-#define MB_TYPE_INTRA_BL       0x05// I_BL new MB type
-
-#define MB_TYPE_16x16          0x06
-#define MB_TYPE_16x8           0x07
-#define MB_TYPE_8x16           0x08
-#define MB_TYPE_8x8            0x09
-#define MB_TYPE_8x8_REF0       0x0a
-
-#define SUB_MB_TYPE_8x8        0x0b
-#define SUB_MB_TYPE_8x4        0x0c
-#define SUB_MB_TYPE_4x8        0x0d
-#define SUB_MB_TYPE_4x4        0x0e
-#define MB_TYPE_SKIP           0x0f
-#define MB_TYPE_DIRECT2        0x10
-#define not_available		   0x20
-
-#define IS_INTRA4x4(type) ( MB_TYPE_INTRA4x4 == (type) )
-#define IS_INTRA16x16(type) ( MB_TYPE_INTRA16x16 == (type) )
-#define IS_INTRA(type) ( (type) > 0 && (type) < 5 )
-#define IS_INTER(type) ( (type) > 5 && (type) < 16 )
-
-#define IS_I_BL(type) ( (type) == MB_TYPE_INTRA_BL )
-#define IS_SUB8x8(type) (MB_TYPE_8x8 == (type) || MB_TYPE_8x8_REF0 == (type))
 
 #define I16_LUMA_DC  1
 #define I16_LUMA_AC  2
@@ -138,12 +82,6 @@ typedef int32_t SubMbType;
 #define CHROMA_DC_V_INTER  13
 #define CHROMA_AC_U_INTER  14
 #define CHROMA_AC_V_INTER  15
-
-typedef struct TagReadBitsCache {
-    uint32_t uiCache32Bit;
-    uint8_t  uiRemainBits;
-    uint8_t*  pBuf;
-} SReadBitsCache;
 
 #define SHIFT_BUFFER(pBitsCache)	{	pBitsCache->pBuf+=2; pBitsCache->uiRemainBits += 16; pBitsCache->uiCache32Bit |= (((pBitsCache->pBuf[2] << 8) | pBitsCache->pBuf[3]) << (32 - pBitsCache->uiRemainBits));	}
 #define POP_BUFFER(pBitsCache, iCount)	{ pBitsCache->uiCache32Bit <<= iCount;	pBitsCache->uiRemainBits -= iCount;	}
