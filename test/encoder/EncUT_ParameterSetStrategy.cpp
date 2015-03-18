@@ -73,18 +73,18 @@ TEST_F (ParameterSetStrategyTest, FindExistingSps) {
   pDlayerParam	= & (sParam1.sSpatialLayers[iDlayerIndex]);
   iRet = WelsInitSps (m_pSpsArrayPointer, pDlayerParam, &sParam1.sDependencyLayers[iDlayerIndex], sParam1.uiIntraPeriod,
                       sParam1.iMaxNumRefFrame,
-                      iCurSpsId, sParam1.bEnableFrameCroppingFlag, sParam1.iRCMode != RC_OFF_MODE, iDlayerCount);
+                      iCurSpsId, sParam1.bEnableFrameCroppingFlag, sParam1.iRCMode != RC_OFF_MODE, iDlayerCount, false);
 
   // try finding #0
   iFoundId = FindExistingSps (&sParam1, bUseSubsetSps, iDlayerIndex, iDlayerCount, iCurSpsInUse,
-                              m_pSpsArray, m_pSubsetArray);
+                              m_pSpsArray, m_pSubsetArray, false);
   EXPECT_EQ (iFoundId, iCurSpsId);
 
   // try not finding
   SWelsSvcCodingParam sParam2 = sParam1;
   sParam2.iMaxNumRefFrame ++;
   iFoundId = FindExistingSps (&sParam2, bUseSubsetSps, iDlayerIndex, iDlayerCount, iCurSpsInUse,
-                              m_pSpsArray, m_pSubsetArray);
+                              m_pSpsArray, m_pSubsetArray, false);
   EXPECT_EQ (iFoundId, INVALID_ID);
 
   // add new sps
@@ -93,17 +93,17 @@ TEST_F (ParameterSetStrategyTest, FindExistingSps) {
   pDlayerParam	= & (sParam2.sSpatialLayers[iDlayerIndex]);
   iRet = WelsInitSps (m_pSpsArrayPointer, pDlayerParam, &sParam2.sDependencyLayers[iDlayerIndex], sParam2.uiIntraPeriod,
                       sParam2.iMaxNumRefFrame,
-                      iCurSpsId, sParam2.bEnableFrameCroppingFlag, sParam2.iRCMode != RC_OFF_MODE, iDlayerCount);
+                      iCurSpsId, sParam2.bEnableFrameCroppingFlag, sParam2.iRCMode != RC_OFF_MODE, iDlayerCount, false);
   iCurSpsInUse = 2;
 
   // try finding #1
   iFoundId = FindExistingSps (&sParam2, bUseSubsetSps, iDlayerIndex, iDlayerCount, iCurSpsInUse,
-                              m_pSpsArray, m_pSubsetArray);
+                              m_pSpsArray, m_pSubsetArray, false);
   EXPECT_EQ (iFoundId, iCurSpsId);
 
   // try finding #0
   iFoundId = FindExistingSps (&sParam1, bUseSubsetSps, iDlayerIndex, iDlayerCount, iCurSpsInUse,
-                              m_pSpsArray, m_pSubsetArray);
+                              m_pSpsArray, m_pSubsetArray, false);
   EXPECT_EQ (iFoundId, 0);
 
   // try not finding
@@ -115,7 +115,7 @@ TEST_F (ParameterSetStrategyTest, FindExistingSps) {
   }
 
   iFoundId = FindExistingSps (&sParam2, bUseSubsetSps, iDlayerIndex, iDlayerCount, iCurSpsInUse,
-                              m_pSpsArray, m_pSubsetArray);
+                              m_pSpsArray, m_pSubsetArray, false);
   EXPECT_EQ (iFoundId, INVALID_ID);
   (void) iRet; // Not using iRet at the moment
 }

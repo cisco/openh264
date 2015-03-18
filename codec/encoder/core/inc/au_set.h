@@ -106,7 +106,7 @@ int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, SParaS
 int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialLayerInternal* pLayerParamInternal,
                      const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame,
                      const uint32_t kiSpsId, const bool kbEnableFrameCropping, bool bEnableRc,
-                     const int32_t kiDlayerCount);
+                     const int32_t kiDlayerCount,bool bSVCBaselayer);
 
 /*!
  * \brief	initialize subset pSps based on configurable parameters in svc
@@ -120,7 +120,8 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
 int32_t WelsInitSubsetSps (SSubsetSps* pSubsetSps, SSpatialLayerConfig* pLayerParam,
                            SSpatialLayerInternal* pLayerParamInternal,
                            const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame,
-                           const uint32_t kiSpsId, const bool kbEnableFrameCropping, bool bEnableRc);
+                           const uint32_t kiSpsId, const bool kbEnableFrameCropping, bool bEnableRc,
+                           const int32_t kiDlayerCount);
 
 /*!
  * \brief	initialize pPps based on configurable parameters and pSps(subset pSps) in svc
@@ -160,6 +161,7 @@ int32_t WelsAdjustLevel (SSpatialLayerConfig* pSpatialLayer);
 int32_t FindExistingSps (SWelsSvcCodingParam* pParam, const bool kbUseSubsetSps, const int32_t iDlayerIndex,
                          const int32_t iDlayerCount,  const int32_t iSpsNumInUse,
                          SWelsSPS* pSpsArray,
-                         SSubsetSps* pSubsetArray);
+                         SSubsetSps* pSubsetArray,
+                         bool bSVCBaselayer);
 }
 #endif//WELS_ACCESS_UNIT_PARSER_H__
