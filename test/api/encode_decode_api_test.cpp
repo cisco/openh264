@@ -1707,7 +1707,7 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //no output
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   //Ref picture is ECed, so current status is ECed, when EC disable, NO output
-  EXPECT_TRUE ((rv & 32) != 0);
+  EXPECT_TRUE (rv != 0);
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
   iIdx++;
 

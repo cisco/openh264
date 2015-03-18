@@ -68,7 +68,7 @@ uint8_t		iLevelIdc;
 //	uint8_t		uiBitDepthChroma;		//=8
 /* TO BE CONTINUE: POC type 1 */
 //	bool		bDeltaPicOrderAlwaysZeroFlag;
-//	bool		bGapsInFrameNumValueAllowedFlag;	//=true
+bool		bGapsInFrameNumValueAllowedFlag;
 
 //	bool		bFrameMbsOnlyFlag;
 //	bool		bMbaffFlag;	// MB Adapative Frame Field
