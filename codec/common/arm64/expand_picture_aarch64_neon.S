@@ -46,8 +46,8 @@ _expand_picture_luma_loop2:
     add x6, x4, #1
     ld1r {v0.16b}, [x7], x1
     ld1r {v2.16b}, [x4], x1
-    mov.16b v1, v0
-    mov.16b v3, v2
+    mov v1.16b, v0.16b
+    mov v3.16b, v2.16b
     st2 {v0.16b, v1.16b}, [x5]
     st2 {v2.16b, v3.16b}, [x6]
     sub x8, x8, #1
