@@ -898,7 +898,7 @@ void FreeMbCache (SMbCache* pMbCache, CMemoryAlign* pMa) {
 
 static int32_t WelsGenerateNewSps (sWelsEncCtx* pCtx, const bool kbUseSubsetSps, const int32_t iDlayerIndex,
                                    const int32_t iDlayerCount, const int32_t kiSpsId,
-                                   SWelsSPS*& pSps, SSubsetSps*& pSubsetSps) {
+                                   SWelsSPS*& pSps, SSubsetSps*& pSubsetSps, bool bSVCBaselayer) {
   int32_t iRet = 0;
 
   if (!kbUseSubsetSps) {
@@ -914,11 +914,12 @@ static int32_t WelsGenerateNewSps (sWelsEncCtx* pCtx, const bool kbUseSubsetSps,
   if (!kbUseSubsetSps) {
     iRet = WelsInitSps (pSps, pDlayerParam, &pParam->sDependencyLayers[iDlayerIndex], pParam->uiIntraPeriod,
                         pParam->iMaxNumRefFrame,
-                        kiSpsId, pParam->bEnableFrameCroppingFlag, pParam->iRCMode != RC_OFF_MODE, iDlayerCount);
+                        kiSpsId, pParam->bEnableFrameCroppingFlag, pParam->iRCMode != RC_OFF_MODE, iDlayerCount,
+                        bSVCBaselayer);
   } else {
     iRet = WelsInitSubsetSps (pSubsetSps, pDlayerParam, &pParam->sDependencyLayers[iDlayerIndex], pParam->uiIntraPeriod,
                               pParam->iMaxNumRefFrame,
-                              kiSpsId, pParam->bEnableFrameCroppingFlag, pParam->iRCMode != RC_OFF_MODE);
+                              kiSpsId, pParam->bEnableFrameCroppingFlag, pParam->iRCMode != RC_OFF_MODE, iDlayerCount);
   }
   return iRet;
 }
@@ -978,7 +979,7 @@ static bool CheckMatchedSubsetSps (SSubsetSps* const pSubsetSps1, SSubsetSps* co
 int32_t FindExistingSps (SWelsSvcCodingParam* pParam, const bool kbUseSubsetSps, const int32_t iDlayerIndex,
                          const int32_t iDlayerCount, const int32_t iSpsNumInUse,
                          SWelsSPS* pSpsArray,
-                         SSubsetSps* pSubsetArray) {
+                         SSubsetSps* pSubsetArray, bool bSVCBaseLayer) {
   SSpatialLayerConfig* pDlayerParam	= &pParam->sSpatialLayers[iDlayerIndex];
 
   assert (iSpsNumInUse <= MAX_SPS_COUNT);
@@ -986,7 +987,8 @@ int32_t FindExistingSps (SWelsSvcCodingParam* pParam, const bool kbUseSubsetSps,
     SWelsSPS sTmpSps;
     WelsInitSps (&sTmpSps, pDlayerParam, &pParam->sDependencyLayers[iDlayerIndex], pParam->uiIntraPeriod,
                  pParam->iMaxNumRefFrame,
-                 0, pParam->bEnableFrameCroppingFlag, pParam->iRCMode != RC_OFF_MODE, iDlayerCount);
+                 0, pParam->bEnableFrameCroppingFlag, pParam->iRCMode != RC_OFF_MODE, iDlayerCount,
+                 bSVCBaseLayer);
     for (int32_t iId = 0; iId < iSpsNumInUse; iId++) {
       if (CheckMatchedSps (&sTmpSps, &pSpsArray[iId])) {
         return iId;
@@ -996,7 +998,7 @@ int32_t FindExistingSps (SWelsSvcCodingParam* pParam, const bool kbUseSubsetSps,
     SSubsetSps sTmpSubsetSps;
     WelsInitSubsetSps (&sTmpSubsetSps, pDlayerParam, &pParam->sDependencyLayers[iDlayerIndex], pParam->uiIntraPeriod,
                        pParam->iMaxNumRefFrame,
-                       0, pParam->bEnableFrameCroppingFlag, pParam->iRCMode != RC_OFF_MODE);
+                       0, pParam->bEnableFrameCroppingFlag, pParam->iRCMode != RC_OFF_MODE, iDlayerCount);
 
     for (int32_t iId = 0; iId < iSpsNumInUse; iId++) {
       if (CheckMatchedSubsetSps (&sTmpSubsetSps, &pSubsetArray[iId])) {
@@ -1258,19 +1260,20 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
     SDqIdc* pDqIdc		= & (*ppCtx)->pDqIdcMap[iDlayerIndex];
     const bool bUseSubsetSps			= (!pParam->bSimulcastAVC) && (iDlayerIndex > BASE_DEPENDENCY_ID);
     SSpatialLayerConfig* pDlayerParam	= &pParam->sSpatialLayers[iDlayerIndex];
-
+    bool bSvcBaselayer = (!pParam->bSimulcastAVC) && (iDlayerCount > BASE_DEPENDENCY_ID)
+                         && (iDlayerIndex == BASE_DEPENDENCY_ID);
     pDqIdc->uiSpatialId	= iDlayerIndex;
 
     if (! (SPS_LISTING & pParam->eSpsPpsIdStrategy)) {
       WelsGenerateNewSps (*ppCtx, bUseSubsetSps, iDlayerIndex,
-                          iDlayerCount, iSpsId, pSps, pSubsetSps);
+                          iDlayerCount, iSpsId, pSps, pSubsetSps, bSvcBaselayer);
     } else {
       //SPS_LISTING_AND_PPS_INCREASING == pParam->eSpsPpsIdStrategy
       //check if the current param can fit in an existing SPS
       const int32_t kiFoundSpsId = FindExistingSps ((*ppCtx)->pSvcParam, bUseSubsetSps, iDlayerIndex, iDlayerCount,
                                    bUseSubsetSps ? ((*ppCtx)->sPSOVector.uiInUseSubsetSpsNum) : ((*ppCtx)->sPSOVector.uiInUseSpsNum),
                                    (*ppCtx)->pSpsArray,
-                                   (*ppCtx)->pSubsetArray);
+                                   (*ppCtx)->pSubsetArray, bSvcBaselayer);
 
 
       if (INVALID_ID != kiFoundSpsId) {
@@ -1309,7 +1312,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
         }
 
         WelsGenerateNewSps (*ppCtx, bUseSubsetSps, iDlayerIndex,
-                            iDlayerCount, iSpsId, pSps, pSubsetSps);
+                            iDlayerCount, iSpsId, pSps, pSubsetSps, bSvcBaselayer);
       }
     }
 

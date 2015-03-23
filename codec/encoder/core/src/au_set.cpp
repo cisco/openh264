@@ -267,7 +267,7 @@ int32_t WelsWriteSpsSyntax (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_
   BsWriteUE (pLocalBitStringAux, pSps->iLog2MaxPocLsb - 4);	// log2_max_pic_order_cnt_lsb_minus4
 
   BsWriteUE (pLocalBitStringAux, pSps->iNumRefFrames);		// max_num_ref_frames
-  BsWriteOneBit (pLocalBitStringAux, true/*pSps->bGapsInFrameNumValueAllowedFlag*/);	// bGapsInFrameNumValueAllowedFlag
+  BsWriteOneBit (pLocalBitStringAux, pSps->bGapsInFrameNumValueAllowedFlag); //gaps_in_frame_numvalue_allowed_flag
   BsWriteUE (pLocalBitStringAux, pSps->iMbWidth - 1);		// pic_width_in_mbs_minus1
   BsWriteUE (pLocalBitStringAux, pSps->iMbHeight - 1);		// pic_height_in_map_units_minus1
   BsWriteOneBit (pLocalBitStringAux, true/*pSps->bFrameMbsOnlyFlag*/);	// bFrameMbsOnlyFlag
@@ -464,7 +464,7 @@ static inline bool WelsGetPaddingOffset (int32_t iActualWidth, int32_t iActualHe
 int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialLayerInternal* pLayerParamInternal,
                      const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame,
                      const uint32_t kuiSpsId, const bool kbEnableFrameCropping, bool bEnableRc,
-                     const int32_t kiDlayerCount) {
+                     const int32_t kiDlayerCount, bool bSVCBaselayer) {
   memset (pSps, 0, sizeof (SWelsSPS));
   pSps->uiSpsId		= kuiSpsId;
   pSps->iMbWidth	= (pLayerParam->iVideoWidth + 15) >> 4;
@@ -483,7 +483,6 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
   } else {
     pSps->bFrameCroppingFlag	= false;
   }
-
   pSps->uiProfileIdc	= pLayerParam->uiProfileIdc ? pLayerParam->uiProfileIdc : PRO_BASELINE;
   if (pLayerParam->uiProfileIdc == PRO_BASELINE) {
     pSps->bConstraintSet0Flag = true;
@@ -491,7 +490,7 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
   if (pLayerParam->uiProfileIdc <= PRO_MAIN) {
     pSps->bConstraintSet1Flag = true;
   }
-  if (kiDlayerCount > 1) {
+  if ((kiDlayerCount > 1) && bSVCBaselayer) {
     pSps->bConstraintSet2Flag = true;
   }
 
@@ -508,6 +507,13 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
     pLayerParam->uiLevelIdc = uiLevel;
   }
   pSps->iLevelIdc = g_kuiLevelMaps[pLayerParam->uiLevelIdc - 1];
+
+  //bGapsInFrameNumValueAllowedFlag is false when only spatial layer number and temporal layer number is 1, and ltr is 0.
+  if ((kiDlayerCount == 1) && (pSps->iNumRefFrames == 1))
+    pSps->bGapsInFrameNumValueAllowedFlag = false;
+  else
+    pSps->bGapsInFrameNumValueAllowedFlag = true;
+
   pSps->bVuiParamPresentFlag = true;
   return 0;
 }
@@ -516,13 +522,14 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
 int32_t WelsInitSubsetSps (SSubsetSps* pSubsetSps, SSpatialLayerConfig* pLayerParam,
                            SSpatialLayerInternal* pLayerParamInternal,
                            const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame,
-                           const uint32_t kuiSpsId, const bool kbEnableFrameCropping, bool bEnableRc) {
+                           const uint32_t kuiSpsId, const bool kbEnableFrameCropping, bool bEnableRc,
+                           const int32_t kiDlayerCount) {
   SWelsSPS* pSps = &pSubsetSps->pSps;
 
   memset (pSubsetSps, 0, sizeof (SSubsetSps));
 
   WelsInitSps (pSps, pLayerParam, pLayerParamInternal, kuiIntraPeriod, kiNumRefFrame, kuiSpsId, kbEnableFrameCropping,
-               bEnableRc, 1);
+               bEnableRc, kiDlayerCount, false);
 
   pSps->uiProfileIdc	= (pLayerParam->uiProfileIdc >= PRO_SCALABLE_BASELINE) ? pLayerParam->uiProfileIdc :
                         PRO_SCALABLE_BASELINE;
