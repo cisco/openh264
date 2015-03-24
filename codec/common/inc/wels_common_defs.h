@@ -226,6 +226,36 @@ typedef struct TagBitStringAux {
   // need pointer to next byte start position in case 0 bit left then 8 instead
 } SBitStringAux, *PBitStringAux;
 
+/* NAL Unix Header in AVC, refer to Page 56 in JVT X201wcm */
+typedef struct TagNalUnitHeader {
+  uint8_t             uiForbiddenZeroBit;
+  uint8_t             uiNalRefIdc;
+  EWelsNalUnitType    eNalUnitType;
+  uint8_t             uiReservedOneByte;		// only padding usage
+} SNalUnitHeader, *PNalUnitHeader;
+
+/* NAL Unit Header in scalable extension syntax, refer to Page 390 in JVT X201wcm */
+typedef struct TagNalUnitHeaderExt {
+  SNalUnitHeader	sNalUnitHeader;
+
+  //	uint8_t		reserved_one_bit;
+  bool      bIdrFlag;
+  uint8_t   uiPriorityId;
+  int8_t    iNoInterLayerPredFlag;	// change as int8_t to support 3 values probably in encoder
+  uint8_t   uiDependencyId;
+
+  uint8_t   uiQualityId;
+  uint8_t   uiTemporalId;
+  bool      bUseRefBasePicFlag;
+  bool      bDiscardableFlag;
+
+  bool      bOutputFlag;
+  uint8_t   uiReservedThree2Bits;
+  // Derived variable(s)
+  uint8_t   uiLayerDqId;
+  bool      bNalExtFlag;
+} SNalUnitHeaderExt, *PNalUnitHeaderExt;
+
 /* AVC MB types*/
 #define MB_TYPE_INTRA4x4    0x00000001
 #define MB_TYPE_INTRA16x16  0x00000002

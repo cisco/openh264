@@ -47,12 +47,12 @@ void WelsLoadNal (SWelsEncoderOutput* pEncoderOuput, const int32_t/*EWelsNalUnit
                   const int32_t/*EWelsNalRefIdc*/ kiNalRefIdc) {
   SWelsEncoderOutput* pWelsEncoderOuput	= pEncoderOuput;
   SWelsNalRaw* pRawNal			= &pWelsEncoderOuput->sNalList[ pWelsEncoderOuput->iNalIndex ];
-  SNalUnitHeader* sNalHeader	= &pRawNal->sNalExt.sNalHeader;
+  SNalUnitHeader* sNalUnitHeader	= &pRawNal->sNalExt.sNalUnitHeader;
   const int32_t kiStartPos		= (BsGetBitsPos (&pWelsEncoderOuput->sBsWrite) >> 3);
 
-  sNalHeader->eNalUnitType	= (EWelsNalUnitType)kiType;
-  sNalHeader->uiNalRefIdc		= (EWelsNalRefIdc)kiNalRefIdc;
-  sNalHeader->uiForbiddenZeroBit	= 0;
+  sNalUnitHeader->eNalUnitType	= (EWelsNalUnitType)kiType;
+  sNalUnitHeader->uiNalRefIdc		= (EWelsNalRefIdc)kiNalRefIdc;
+  sNalUnitHeader->uiForbiddenZeroBit	= 0;
 
   pRawNal->pRawData		= &pWelsEncoderOuput->pBsBuffer[kiStartPos];
   pRawNal->iStartPos	 = kiStartPos;
@@ -81,13 +81,13 @@ void WelsLoadNalForSlice (SWelsSliceBs* pSliceBsIn, const int32_t/*EWelsNalUnitT
                           const int32_t/*EWelsNalRefIdc*/ kiNalRefIdc) {
   SWelsSliceBs* pSliceBs		    = pSliceBsIn;
   SWelsNalRaw* pRawNal		= &pSliceBs->sNalList[ pSliceBs->iNalIndex ];
-  SNalUnitHeader* sNalHeader	= &pRawNal->sNalExt.sNalHeader;
+  SNalUnitHeader* sNalUnitHeader	= &pRawNal->sNalExt.sNalUnitHeader;
   SBitStringAux* pBitStringAux	= &pSliceBs->sBsWrite;
   const int32_t kiStartPos		    = (BsGetBitsPos (pBitStringAux) >> 3);
 
-  sNalHeader->eNalUnitType	= (EWelsNalUnitType)kiType;
-  sNalHeader->uiNalRefIdc		= (EWelsNalRefIdc)kiNalRefIdc;
-  sNalHeader->uiForbiddenZeroBit	= 0;
+  sNalUnitHeader->eNalUnitType	= (EWelsNalUnitType)kiType;
+  sNalUnitHeader->uiNalRefIdc		= (EWelsNalRefIdc)kiNalRefIdc;
+  sNalUnitHeader->uiForbiddenZeroBit	= 0;
 
   pRawNal->pRawData		= &pSliceBs->pBsBuffer[kiStartPos];
   pRawNal->iStartPos	 = kiStartPos;
@@ -122,8 +122,8 @@ void WelsUnloadNalForSlice (SWelsSliceBs* pSliceBsIn) {
 //TODO 2: complete the realloc&copy
 int32_t WelsEncodeNal (SWelsNalRaw* pRawNal, void* pNalHeaderExt, const int32_t kiDstBufferLen, void* pDst,
                        int32_t* pDstLen) {
-  const bool kbNALExt = pRawNal->sNalExt.sNalHeader.eNalUnitType == NAL_UNIT_PREFIX
-                        || pRawNal->sNalExt.sNalHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_EXT;
+  const bool kbNALExt = pRawNal->sNalExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_PREFIX
+                        || pRawNal->sNalExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_EXT;
   int32_t iAssumedNeededLength		= NAL_HEADER_SIZE + (kbNALExt ? 3 : 0) + pRawNal->iPayloadSize + 1;
   WELS_VERIFY_RETURN_IF (ENC_RETURN_UNEXPECTED, (iAssumedNeededLength <= 0))
 
@@ -145,7 +145,8 @@ int32_t WelsEncodeNal (SWelsNalRaw* pRawNal, void* pNalHeaderExt, const int32_t 
   pDstPointer += 4;
 
   /* NAL Unit Header */
-  *pDstPointer++	= (pRawNal->sNalExt.sNalHeader.uiNalRefIdc << 5) | (pRawNal->sNalExt.sNalHeader.eNalUnitType & 0x1f);
+  *pDstPointer++	= (pRawNal->sNalExt.sNalUnitHeader.uiNalRefIdc << 5) | (pRawNal->sNalExt.sNalUnitHeader.eNalUnitType &
+                    0x1f);
 
   if (kbNALExt) {
     SNalUnitHeaderExt* sNalExt	= (SNalUnitHeaderExt*)pNalHeaderExt;

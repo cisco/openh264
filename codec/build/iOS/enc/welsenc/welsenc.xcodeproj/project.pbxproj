@@ -94,7 +94,6 @@
 		4CE446BB18BC605C0017DF25 /* mt_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mt_defs.h; sourceTree = "<group>"; };
 		4CE446BC18BC605C0017DF25 /* mv_pred.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mv_pred.h; sourceTree = "<group>"; };
 		4CE446BD18BC605C0017DF25 /* nal_encap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nal_encap.h; sourceTree = "<group>"; };
-		4CE446BE18BC605C0017DF25 /* nal_prefix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nal_prefix.h; sourceTree = "<group>"; };
 		4CE446BF18BC605C0017DF25 /* param_svc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = param_svc.h; sourceTree = "<group>"; };
 		4CE446C018BC605C0017DF25 /* parameter_sets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parameter_sets.h; sourceTree = "<group>"; };
 		4CE446C118BC605C0017DF25 /* picture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = picture.h; sourceTree = "<group>"; };
@@ -274,7 +273,6 @@
 				4CE446BB18BC605C0017DF25 /* mt_defs.h */,
 				4CE446BC18BC605C0017DF25 /* mv_pred.h */,
 				4CE446BD18BC605C0017DF25 /* nal_encap.h */,
-				4CE446BE18BC605C0017DF25 /* nal_prefix.h */,
 				4CE446BF18BC605C0017DF25 /* param_svc.h */,
 				4CE446C018BC605C0017DF25 /* parameter_sets.h */,
 				4CE446C118BC605C0017DF25 /* picture.h */,
