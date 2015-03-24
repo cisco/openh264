@@ -45,6 +45,13 @@
 
 namespace WelsDec {
 #define MAX_LEVEL_PREFIX 15
+
+typedef struct TagReadBitsCache {
+  uint32_t uiCache32Bit;
+  uint8_t  uiRemainBits;
+  uint8_t*  pBuf;
+} SReadBitsCache;
+
 void GetNeighborAvailMbType (PWelsNeighAvail pNeighAvail, PDqLayer pCurLayer) {
   int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
   int32_t iCurXy, iTopXy = 0, iLeftXy = 0, iLeftTopXy = 0, iRightTopXy = 0;

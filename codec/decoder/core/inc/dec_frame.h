@@ -63,7 +63,7 @@ struct TagDqLayer {
 
   PBitStringAux		pBitStringAux;	// pointer to SBitStringAux
   PFmo				pFmo;		// Current fmo context pointer used
-  int8_t*  pMbType;
+  int16_t*  pMbType;
   int32_t* pSliceIdc;				// using int32_t for slice_idc
   int16_t	(*pMv[LIST_A])[MB_BLOCK4x4_NUM][MV_A];
   int16_t	(*pMvd[LIST_A])[MB_BLOCK4x4_NUM][MV_A];
@@ -126,7 +126,7 @@ typedef struct TagGpuAvcLayer {
   SLayerInfo				sLayerInfo;
   PBitStringAux			pBitStringAux;	// pointer to SBitStringAux
 
-  int8_t*					pMbType;
+  int16_t*					pMbType;
   int32_t*					pSliceIdc;	// using int32_t for slice_idc
   int8_t*					pLumaQp;
   int8_t*					pCbp;

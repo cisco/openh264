@@ -259,7 +259,7 @@ typedef struct TagWelsDecoderContext {
   iDecBlockOffsetArray[24];	// address talbe for sub 4x4 block in intra4x4_mb, so no need to caculta the address every time.
 
   struct {
-    int8_t*  pMbType[LAYER_NUM_EXCHANGEABLE];                      /* mb type */
+    int16_t*  pMbType[LAYER_NUM_EXCHANGEABLE];                      /* mb type */
     int16_t	(*pMv[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM][MV_A]; //[LAYER_NUM_EXCHANGEABLE   MB_BLOCK4x4_NUM*]
     int8_t	(*pRefIndex[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM];
     int8_t*	pLumaQp[LAYER_NUM_EXCHANGEABLE];	/*mb luma_qp*/
