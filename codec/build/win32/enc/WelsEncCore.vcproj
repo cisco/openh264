@@ -494,7 +494,7 @@
 				RelativePath="..\..\..\encoder\core\inc\au_set.h"
 				>
 			</File>
-                        <File
+			<File
 				RelativePath="..\..\..\common\inc\copy_mb.h"
 				>
 			</File>
