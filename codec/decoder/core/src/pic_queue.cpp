@@ -90,9 +90,9 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
   } else {
     pPic->pBuffer[0]	= static_cast<uint8_t*> (WelsMallocz (iLumaSize /* luma */
                         + (iChromaSize << 1) /* Cb,Cr */, "_pic->buffer[0]"));
-    memset (pPic->pBuffer[0], 128, (iLumaSize + (iChromaSize << 1)));
-
     WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pBuffer[0], FreePicture (pPic));
+
+    memset (pPic->pBuffer[0], 128, (iLumaSize + (iChromaSize << 1)));
     pPic->iLinesize[0] = iPicWidth;
     pPic->iLinesize[1] = pPic->iLinesize[2] = iPicChromaWidth;
     pPic->pBuffer[1]	= pPic->pBuffer[0] + iLumaSize;
