@@ -52,5 +52,12 @@
 /* MB height in pixels for specified colorspace I420 usually used in codec */
 #define MB_HEIGHT_LUMA		16
 #define MB_HEIGHT_CHROMA	(MB_HEIGHT_LUMA>>1)
+#define MB_COEFF_LIST_SIZE	(256+((MB_WIDTH_CHROMA*MB_HEIGHT_CHROMA)<<1))
+#define MB_PARTITION_SIZE       4	// Macroblock partition size in 8x8 sub-blocks
+#define MB_BLOCK4x4_NUM	        16
+#define MB_BLOCK8x8_NUM	        4
+#define MAX_SPS_COUNT	        32	// Count number of SPS
+#define BASE_QUALITY_ID	        0
+
 
 #endif//WELS_CONST_COMMON_H__

@@ -45,29 +45,15 @@
 
 #define STATISTICS_LOG_INTERVAL_MS (5000) // output statistics log every 5s
 
-/* Some list size */
-#define MB_COEFF_LIST_SIZE	(256+((MB_WIDTH_CHROMA*MB_HEIGHT_CHROMA)<<1))
-#define MB_REQ_LUMA_CACHE_SIZE	40	// 8x5 Size of MB cache only luma component required to store
-#define MB_REQ_ALL_CACHE_SIZE	48	// 8x6 Size of MB cache all components required to store
-#define MB_LUMA_CACHE_SIZE		26	// 5x5+1
-#define MB_CHROMA_CACHE_SIZE	10	// 3x3+1
-
-#define MB_PARTITION_SIZE		4	// Macroblock partition size in 8x8 sub-blocks
-#define MB_SUB_PARTITION_SIZE	4	// Sub partition size in a 8x8 sub-block
-#define MB_BLOCK4x4_NUM				16
 #define INTRA_4x4_MODE_NUM		8
-#define MB_BLOCK8x8_NUM				4
 #define MB_LUMA_CHROMA_BLOCK4x4_NUM  24
 
-#define NAL_UNIT_HEADER_SVC_EXT_SIZE	3	// Size of NAL unit header for SVC extension in byte
-
-#define MAX_SPS_COUNT			32	// Count number of SPS
-#define MAX_PPS_COUNT_LIMITED 	57// limit the max ID of PPS because of known limitation of receiver endpoints
-#define MAX_PPS_COUNT 			(MAX_PPS_COUNT_LIMITED)//in Standard is 256	// Count number of PPS
+#define MAX_PPS_COUNT_LIMITED           57// limit the max ID of PPS because of known limitation of receiver endpoints
+#define MAX_PPS_COUNT                   (MAX_PPS_COUNT_LIMITED)//in Standard is 256	// Count number of PPS
 
 #define PARA_SET_TYPE			3 // SPS+PPS
-#define PARA_SET_TYPE_AVCSPS	0
-#define PARA_SET_TYPE_SUBSETSPS	1
+#define PARA_SET_TYPE_AVCSPS	        0
+#define PARA_SET_TYPE_SUBSETSPS         1
 #define PARA_SET_TYPE_PPS		2
 
 #define MAX_VERTICAL_MV_RANGE   1024  //TODO, for allocate enough memory for transpose
@@ -79,13 +65,8 @@
 #define MIN_BIT_RATE			1	// minimal bit rate need support
 
 #define SVC_QUALITY_BASE_QP		26
-#define SVC_QUALITY_DELTA_QP	(-3)
-
 #define MAX_SLICEGROUP_IDS		8	// Count number of SSlice Groups
 #define MAX_THREADS_NUM			4	// assume to support up to 4 logical cores(threads)
-
-#define ALIGN_RBSP_LEN_FIX		4
-
 
 #define INTPEL_NEEDED_MARGIN	(3)  // for safe sub-pel MC
 
@@ -146,21 +127,12 @@
 #define MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA		(MAX_SHORT_REF_COUNT+LONG_TERM_REF_NUM)	// <= MAX_REF_PIC_COUNT, memory saved if <
 #define MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN		(MAX_SHORT_REF_COUNT+LONG_TERM_REF_NUM_SCREEN)	// <= MAX_REF_PIC_COUNT, memory saved if <
 
-#define BASE_QUALITY_ID			0
 #define BASE_DEPENDENCY_ID		0
-#define BASE_DQ_ID				0
-#define MAX_DQ_ID				((uint8_t)-1)
 #define MAX_DQ_LAYER_NUM		(MAX_DEPENDENCY_LAYER/**MAX_QUALITY_LEVEL*/)
 
-#define UNAVAILABLE_DQ_ID		((uint8_t)(-1))
-#define LAYER_NUM_EXCHANGEABLE	2
 #define INVALID_ID		(-1)
 
 #define NAL_HEADER_ADD_0X30BYTES 50
-
-#define MAX_NAL_UNIT_NUM_IN_AU	256	// predefined maximal number of NAL Units in an access unit
-#define MAX_ACCESS_UINT_CAPACITY	(1<<20)	// Maximal AU capacity in bytes: 1024 KB predefined
-#define MAX_ACCESS_UNIT_CACHE_NUM	2	// Maximal Access Unit(AU) cache number to be processed, denote current AU and the next coming AU.
 
 #define SLICE_NUM_EXPAND_COEF 2
 
