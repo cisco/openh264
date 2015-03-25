@@ -41,7 +41,10 @@
 #define WELS_NAL_UNIT_ENCAPSULATION_H__
 
 #include "typedefs.h"
-#include "nal_prefix.h"
+#include "wels_common_defs.h"
+#include "wels_const.h"
+
+using namespace WelsCommon;
 
 //SBitStringAux
 namespace WelsEnc {

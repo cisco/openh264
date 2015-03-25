@@ -2815,7 +2815,7 @@ void WelsInitCurrentLayer (sWelsEncCtx* pCtx,
   const bool kbUseSubsetSpsFlag = (!pParam->bSimulcastAVC) && (kiCurDid > BASE_DEPENDENCY_ID);
   SSpatialLayerConfig* fDlp				= &pParam->sSpatialLayers[kiCurDid];
   SNalUnitHeaderExt* pNalHdExt	= &pCurDq->sLayerInfo.sNalHeaderExt;
-  SNalUnitHeader* pNalHd			= &pNalHdExt->sNalHeader;
+  SNalUnitHeader* pNalHd			= &pNalHdExt->sNalUnitHeader;
   SDqIdc* pDqIdc						= &pCtx->pDqIdcMap[kiCurDid];
   int32_t iIdx						= 0;
   int32_t iSliceCount				= 0;

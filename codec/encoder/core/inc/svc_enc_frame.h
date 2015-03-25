@@ -38,7 +38,6 @@
 #include "wels_const.h"
 #include "wels_common_basis.h"
 #include "parameter_sets.h"
-#include "nal_prefix.h"
 #include "slice.h"
 #include "picture.h"
 #include "svc_enc_macroblock.h"

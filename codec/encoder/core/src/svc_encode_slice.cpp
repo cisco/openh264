@@ -267,7 +267,7 @@ void WelsSliceHeaderWrite (sWelsEncCtx* pCtx, SBitStringAux* pBs, SDqLayer* pCur
   if (!pNalHead->bIdrFlag)
     WriteReferenceReorder (pBs, pSliceHeader);
 
-  if (pNalHead->sNalHeader.uiNalRefIdc) {
+  if (pNalHead->sNalUnitHeader.uiNalRefIdc) {
     WriteRefPicMarking (pBs, pSliceHeader, pNalHead);
   }
 
@@ -335,7 +335,7 @@ void WelsSliceHeaderExtWrite (sWelsEncCtx* pCtx, SBitStringAux* pBs, SDqLayer* p
   if (!pNalHead->bIdrFlag)
     WriteReferenceReorder (pBs, pSliceHeader);
 
-  if (pNalHead->sNalHeader.uiNalRefIdc) {
+  if (pNalHead->sNalUnitHeader.uiNalRefIdc) {
     WriteRefPicMarking (pBs, pSliceHeader, pNalHead);
 
     if (!pSubSps->sSpsSvcExt.bSliceHeaderRestrictionFlag) {
@@ -839,7 +839,7 @@ void AddSliceBoundary (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, SSliceCtx* pSlic
 
   //init next pSlice info
   pNextSlice->bSliceHeaderExtFlag =
-    (NAL_UNIT_CODED_SLICE_EXT == pCurLayer->sLayerInfo.sNalHeaderExt.sNalHeader.eNalUnitType);
+    (NAL_UNIT_CODED_SLICE_EXT == pCurLayer->sLayerInfo.sNalHeaderExt.sNalUnitHeader.eNalUnitType);
   memcpy (&pNextSlice->sSliceHeaderExt, &pCurSlice->sSliceHeaderExt,
           sizeof (SSliceHeaderExt));	// confirmed_safe_unsafe_usage
 
