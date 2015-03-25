@@ -280,10 +280,12 @@ int32_t WelsWriteSpsSyntax (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_
     BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropTop);	// frame_crop_top_offset
     BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropBottom);	// frame_crop_bottom_offset
   }
-
-  BsWriteOneBit (pLocalBitStringAux, pSps->bVuiParamPresentFlag);	// vui_parameters_present_flag
-  if (pSps->bVuiParamPresentFlag && bBaseLayer)
+  if (bBaseLayer) {
+    BsWriteOneBit (pLocalBitStringAux, true);	// vui_parameters_present_flag
     WelsWriteVUI (pSps, pBitStringAux);
+  } else {
+    BsWriteOneBit (pLocalBitStringAux, false);
+  }
   return 0;
 }
 
