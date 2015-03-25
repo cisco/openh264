@@ -591,10 +591,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\nal_prefix.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\encoder\core\inc\param_svc.h"
 				>
 			</File>
@@ -692,10 +688,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\encoder\core\inc\svc_set_mb_syn_cavlc.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\encoder\core\inc\trace.h"
 				>
 			</File>
 			<File
