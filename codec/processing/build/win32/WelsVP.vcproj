@@ -811,7 +811,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="scrolldetection"
+			Name="ScrollDetection"
 			>
 			<File
 				RelativePath="..\..\src\scrolldetection\ScrollDetection.cpp"
