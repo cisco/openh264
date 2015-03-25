@@ -125,7 +125,7 @@ void CheckProfileSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int
   SSpatialLayerConfig* pLayerInfo = &pParam->sSpatialLayers[iLayer];
   if (PRO_UNKNOWN == uiProfileIdc) {
     pLayerInfo->uiProfileIdc = (((iLayer == SPATIAL_LAYER_0)
-                                 && pParam->bSimulcastAVC) ? PRO_BASELINE : PRO_SCALABLE_BASELINE);
+                                 || pParam->bSimulcastAVC) ? PRO_BASELINE : PRO_SCALABLE_BASELINE);
   } else {
     pLayerInfo->uiProfileIdc = uiProfileIdc;
     if ((iLayer == SPATIAL_LAYER_0) && (uiProfileIdc != PRO_BASELINE)) {
