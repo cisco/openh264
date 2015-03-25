@@ -123,17 +123,27 @@ int32_t WelsBitRateVerification (SLogContext* pLogCtx, SSpatialLayerConfig* pLay
 
 void CheckProfileSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iLayer, EProfileIdc uiProfileIdc) {
   SSpatialLayerConfig* pLayerInfo = &pParam->sSpatialLayers[iLayer];
-  pLayerInfo->uiProfileIdc = uiProfileIdc;
-  if ((iLayer == SPATIAL_LAYER_0) && (uiProfileIdc != PRO_BASELINE)) {
-    pLayerInfo->uiProfileIdc = PRO_BASELINE;
-    WelsLog (pLogCtx, WELS_LOG_WARNING, "doesn't support profile(%d),change to baseline profile",
-             uiProfileIdc);
-  }
-  if (iLayer > SPATIAL_LAYER_0) {
-    if ((uiProfileIdc != PRO_BASELINE) || (uiProfileIdc != PRO_SCALABLE_BASELINE)) {
-      pLayerInfo->uiProfileIdc = PRO_BASELINE;
-      WelsLog (pLogCtx, WELS_LOG_WARNING, "doesn't support profile(%d),change to baseline profile",
+  if (PRO_UNKNOWN == uiProfileIdc) {
+    pLayerInfo->uiProfileIdc = (((iLayer == SPATIAL_LAYER_0)
+                                 || pParam->bSimulcastAVC) ? PRO_BASELINE : PRO_SCALABLE_BASELINE);
+  } else {
+    pLayerInfo->uiProfileIdc = uiProfileIdc;
+    if ((iLayer == SPATIAL_LAYER_0) && (uiProfileIdc != PRO_BASELINE)) {
+      WelsLog (pLogCtx, WELS_LOG_WARNING, "doesn't support profile(%d), change to baseline profile",
                uiProfileIdc);
+      pLayerInfo->uiProfileIdc = PRO_BASELINE;
+    }
+    if (iLayer > SPATIAL_LAYER_0) {
+      if (pParam->bSimulcastAVC && (uiProfileIdc != PRO_BASELINE)) {
+        pLayerInfo->uiProfileIdc = PRO_BASELINE;
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "doesn't support profile(%d) with bSimulcastAVC, change to baseline profile",
+                 uiProfileIdc);
+      }
+      if ((uiProfileIdc != PRO_BASELINE) || (uiProfileIdc != PRO_SCALABLE_BASELINE)) {
+        pLayerInfo->uiProfileIdc = PRO_BASELINE;
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "doesn't support profile(%d), change to baseline profile",
+                 uiProfileIdc);
+      }
     }
   }
 }
