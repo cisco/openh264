@@ -46,6 +46,7 @@
 #include "parameter_sets.h"
 #include "decoder_context.h"
 
+#define DISABLE_HP_BRANCH_1_4
 namespace WelsDec {
 
 /*!
