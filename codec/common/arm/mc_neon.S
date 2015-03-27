@@ -162,7 +162,7 @@
 //  }
 .endm
 
-.macro FILTER_SINGLE_TAG_8BITS arg0, arg1,arg2, arg3, arg4,arg5     // when width=17/9, used
+.macro FILTER_SINGLE_TAG_8BITS arg0, arg1,arg2, arg3, arg4     // when width=17/9, used
 //  {   // input: src_d{Y[0][1][2][3][4][5]X, the even of working_q2}
     vrev64.8    \arg2, \arg0                // X[5][4][3][2][1][0]O
     vaddl.u8    \arg3, \arg0, \arg2         // each 16bits, *[50][41][32][23][14][05]*
