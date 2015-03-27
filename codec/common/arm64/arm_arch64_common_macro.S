@@ -32,6 +32,8 @@
 
 #ifdef __APPLE__
 
+.text
+
 .macro WELS_ASM_AARCH64_FUNC_BEGIN
 .align 2
 .globl _$0

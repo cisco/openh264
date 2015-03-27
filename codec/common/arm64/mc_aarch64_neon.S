@@ -31,7 +31,6 @@
  */
 
 #ifdef HAVE_NEON_AARCH64
-.text
 #include "arm_arch64_common_macro.S"
 .align 4
 filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0

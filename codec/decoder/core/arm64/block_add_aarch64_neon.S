@@ -31,7 +31,6 @@
  */
 
 #ifdef HAVE_NEON_AARCH64
-.text
 #include "arm_arch64_common_macro.S"
 #ifdef __APPLE__
 .macro ROW_TRANSFORM_1_STEP

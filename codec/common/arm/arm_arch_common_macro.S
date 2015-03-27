@@ -36,6 +36,8 @@
 
 #ifdef __APPLE__
 
+.text
+
 .macro WELS_ASM_FUNC_BEGIN
 .align 2
 .arm

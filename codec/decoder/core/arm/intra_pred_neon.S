@@ -32,7 +32,6 @@
 
 #ifdef  HAVE_NEON
 //Global macro
-.text
 #include "arm_arch_common_macro.S"
 
 #ifdef __APPLE__

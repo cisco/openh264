@@ -31,7 +31,6 @@
  */
 
 #ifdef HAVE_NEON
-.text
 #include "arm_arch_common_macro.S"
 
 
