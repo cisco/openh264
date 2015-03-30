@@ -31,40 +31,7 @@
  */
 
 #ifdef HAVE_NEON
-.text
 #include "arm_arch_common_macro.S"
-
-#ifdef __APPLE__
-
-.macro ABS_SUB_SUM_16BYTES
-    vld1.32 {q15}, [$0], $2
-    vld1.32 {q14}, [$1], $2
-    vabal.u8 $3, d30, d28
-    vabal.u8 $4, d31, d29
-.endm
-
-.macro ABS_SUB_SUM_8x16BYTES
-    vld1.32 {q15}, [$0], $2
-    vld1.32 {q14}, [$1], $2
-    vabdl.u8 $3, d30, d28
-    vabdl.u8 $4, d31, d29
-
-    ABS_SUB_SUM_16BYTES $0, $1, $2, $3, $4
-    ABS_SUB_SUM_16BYTES $0, $1, $2, $3, $4
-    ABS_SUB_SUM_16BYTES $0, $1, $2, $3, $4
-    ABS_SUB_SUM_16BYTES $0, $1, $2, $3, $4
-    ABS_SUB_SUM_16BYTES $0, $1, $2, $3, $4
-    ABS_SUB_SUM_16BYTES $0, $1, $2, $3, $4
-    ABS_SUB_SUM_16BYTES $0, $1, $2, $3, $4
-.endm
-
-.macro SAD_8X16BITS
-    vadd.u16 d31, $0, $1
-    vpaddl.u16 d31, d31
-    vpaddl.u32 $2, d31
-.endm
-
-#else
 
 .macro ABS_SUB_SUM_16BYTES arg0, arg1, arg2, arg3, arg4
     vld1.32 {q15}, [\arg0], \arg2
@@ -93,7 +60,6 @@
     vpaddl.u16 d31, d31
     vpaddl.u32 \arg2, d31
 .endm
-#endif
 
 
 WELS_ASM_FUNC_BEGIN VAACalcSad_neon
@@ -160,52 +126,6 @@ vaa_calc_sad_loop1:
 WELS_ASM_FUNC_END
 
 
-#ifdef __APPLE__
-.macro SAD_SD_MAD_16BYTES
-    vld1.32 {q0}, [$0], $2
-    vld1.32 {q1}, [$1], $2
-
-    vpadal.u8 $3, q0
-    vpadal.u8 $4, q1
-
-    vabd.u8 q0, q0, q1
-    vmax.u8 $5, q0
-    vpadal.u8 $6, q0
-.endm
-
-.macro SAD_SD_MAD_8x16BYTES
-    vld1.32 {q0}, [$0], $2
-    vld1.32 {q1}, [$1], $2
-
-    vpaddl.u8 q2, q0
-    vpaddl.u8 q3, q1
-
-    vabd.u8 $3, q0, q1
-    vpaddl.u8 $4, $3       //abs_diff
-
-
-    SAD_SD_MAD_16BYTES $0,$1,$2,q2,q3,$3,$4
-    SAD_SD_MAD_16BYTES $0,$1,$2,q2,q3,$3,$4
-    SAD_SD_MAD_16BYTES $0,$1,$2,q2,q3,$3,$4
-    SAD_SD_MAD_16BYTES $0,$1,$2,q2,q3,$3,$4
-    SAD_SD_MAD_16BYTES $0,$1,$2,q2,q3,$3,$4
-    SAD_SD_MAD_16BYTES $0,$1,$2,q2,q3,$3,$4
-    SAD_SD_MAD_16BYTES $0,$1,$2,q2,q3,$3,$4
-
-    vsub.u16 $5, q2, q3
-.endm
-
-.macro SAD_SD_MAD_CALC
-    vpmax.u8 d0, $0, $1 //8bytes
-    vpmax.u8 d0, d0, d0 //4bytes
-    vpmax.u8 $2, d0, d0 //2bytes
-
-    vpaddl.u16 $3, $3
-    vpaddl.u32 $3, $3
-    vpaddl.s16 $4, $4
-    vpaddl.s32 $4, $4
-.endm
-#else
 .macro SAD_SD_MAD_16BYTES arg0, arg1, arg2, arg3, arg4, arg5, arg6
     vld1.32 {q0}, [\arg0], \arg2
     vld1.32 {q1}, [\arg1], \arg2
@@ -250,7 +170,6 @@ WELS_ASM_FUNC_END
     vpaddl.s16 \arg4, \arg4
     vpaddl.s32 \arg4, \arg4
 .endm
-#endif
 
 WELS_ASM_FUNC_BEGIN VAACalcSadBgd_neon
 
@@ -314,165 +233,6 @@ vaa_calc_sad_bgd_loop1:
 WELS_ASM_FUNC_END
 
 
-#ifdef __APPLE__
-.macro SSD_MUL_SUM_16BYTES_RESET
-    vmull.u8 $3, $0, $0
-    vpaddl.u16 $2, $3
-
-    vmull.u8 $3, $1, $1
-    vpadal.u16 $2, $3
-.endm
-
-.macro SSD_MUL_SUM_16BYTES
-    vmull.u8 $3, $0, $0
-    vpadal.u16 $2, $3
-
-    vmull.u8 $3, $1, $1
-    vpadal.u16 $2, $3
-.endm
-
-.macro SAD_SSD_BGD_16
-    vld1.8 {q0}, [$0], $2 //load cur_row
-
-    vpadal.u8 q3, q0    //add cur_row together
-    vpadal.u8 q4, q1    //add ref_row together
-
-    vabd.u8 q2, q0, q1  //abs_diff
-
-    vmax.u8 q5, q2                              //l_mad for 16 bytes reset for every 8x16
-
-    vpadal.u8 $3, q2                            //l_sad for 16 bytes reset for every 8x16
-
-    SSD_MUL_SUM_16BYTES d4,d5, q8, q11          //q8 for l_sqiff    reset for every 16x16
-
-    vld1.8 {q1}, [$1], $2 //load ref_row
-    vpadal.u8 q9, q0                            //q9 for l_sum      reset for every 16x16
-
-    SSD_MUL_SUM_16BYTES d0,d1, q10, q11         //q10 for lsqsum    reset for every 16x16
-.endm
-
-//the last row of a 16x16 block
-.macro SAD_SSD_BGD_16_end
-    vld1.8 {q0}, [$0], $1 //load cur_row
-
-    vpadal.u8 q3, q0    //add cur_row together
-    vpadal.u8 q4, q1    //add ref_row together
-
-    vabd.u8 q2, q0, q1  //abs_diff
-
-    vmax.u8 q5, q2                              //l_mad for 16 bytes reset for every 8x16
-
-    vpadal.u8 $2, q2                            //l_sad for 16 bytes reset for every 8x16
-
-    SSD_MUL_SUM_16BYTES d4,d5, q8, q11          //q8 for l_sqiff    reset for every 16x16
-
-    vpadal.u8 q9, q0                            //q9 for l_sum      reset for every 16x16
-
-    SSD_MUL_SUM_16BYTES d0,d1, q10, q11         //q10 for lsqsum    reset for every 16x16
-.endm
-
-//for the begin of a 8x16 block, use some instructions to reset the register
-.macro SAD_SSD_BGD_16_RESET_8x8
-    vld1.8 {q0}, [$0], $2 //load cur_row
-
-    vpaddl.u8 q3, q0    //add cur_row together
-    vpaddl.u8 q4, q1    //add ref_row together
-
-    vabd.u8 q2, q0, q1  //abs_diff
-
-    vmov q5,q2         //calculate max and avoid reset to zero, l_mad for 16 bytes reset for every 8x16
-
-    vpaddl.u8 $3, q2                            //l_sad for 16 bytes reset for every 8x16
-
-
-    SSD_MUL_SUM_16BYTES d4,d5, q8, q11          //q8 for l_sqiff    reset for every 16x16
-
-    vld1.8 {q1}, [$1], $2 //load ref_row
-
-    vpadal.u8 q9, q0                            //q9 for l_sum      reset for every 16x16
-
-    SSD_MUL_SUM_16BYTES d0,d1, q10, q11         //q10 for lsqsum    reset for every 16x16
-.endm
-
-//for the begin of a 16x16 block, use some instructions to reset the register
-.macro SAD_SSD_BGD_16_RESET_16x16
-    vld1.8 {q0}, [$0], $2 //load cur_row
-    vld1.8 {q1}, [$1], $2 //load ref_row
-
-    vpaddl.u8 q3, q0    //add cur_row together
-    vpaddl.u8 q4, q1    //add ref_row together
-
-    vabd.u8 q2, q0, q1  //abs_diff
-
-    vmov q5,q2         //calculate max and avoid reset to zero, l_mad for 16 bytes reset for every 8x16
-
-    vpaddl.u8 $3, q2                            //l_sad for 16 bytes reset for every 8x16
-
-    SSD_MUL_SUM_16BYTES_RESET d4,d5,q8, q11         //q8 for l_sqiff    reset for every 16x16
-
-    vld1.8 {q1}, [$1], $2 //load ref_row
-
-    vpaddl.u8 q9, q0                                //q9 for l_sum      reset for every 16x16
-
-    SSD_MUL_SUM_16BYTES_RESET d0,d1,q10,q11         //q10 for lsqsum    reset for every 16x16
-.endm
-
-//for each 8x16 block
-.macro SAD_SSD_BGD_CALC_8x16
-
-    vpmax.u8 d10, d10, d11 //4 numbers
-    vpmax.u8 d10, d10, d10 //2 numbers
-    vpmax.u8 d10, d10, d10 //1 number1
-
-    vmov $0, d10            //d26 d27 keeps the l_mad
-
-    //p_sd8x8           fix me
-    vpaddl.u16 q3, q3
-    vpaddl.u16 q4, q4
-
-    vsub.i32 $1, q3, q4
-    vpaddl.u32 $1, $1
-
-    //psad8x8
-    vpaddl.u16 $2, $2
-    vpaddl.u32 $2, $2
-
-    //psadframe
-    vadd.i32 q12, $2
-.endm
-
-.macro SAD_SSD_BGD_16x16
-    //for one 8x16
-    SAD_SSD_BGD_16_RESET_16x16 $0, $1, $2, q6
-    SAD_SSD_BGD_16 $0, $1, $2, q6
-    SAD_SSD_BGD_16 $0, $1, $2, q6
-    SAD_SSD_BGD_16 $0, $1, $2, q6
-    SAD_SSD_BGD_16 $0, $1, $2, q6
-    SAD_SSD_BGD_16 $0, $1, $2, q6
-    SAD_SSD_BGD_16 $0, $1, $2, q6
-    SAD_SSD_BGD_16 $0, $1, $2, q6
-
-    SAD_SSD_BGD_CALC_8x16 d26, q14, q6
-
-    //for another 8x16
-    SAD_SSD_BGD_16_RESET_8x8 $0, $1, $2, q7
-    SAD_SSD_BGD_16 $0, $1, $2, q7
-    SAD_SSD_BGD_16 $0, $1, $2, q7
-    SAD_SSD_BGD_16 $0, $1, $2, q7
-    SAD_SSD_BGD_16 $0, $1, $2, q7
-    SAD_SSD_BGD_16 $0, $1, $2, q7
-    SAD_SSD_BGD_16 $0, $1, $2, q7
-    SAD_SSD_BGD_16_end $0, $2, q7
-
-    SAD_SSD_BGD_CALC_8x16 d27, q15, q7
-.endm
-
-.macro SSD_SAD_SD_MAD_PADDL
-    vpaddl.s16 $0, $0
-    vpaddl.s32 $0, $0
-    vadd.i32 $1, $1, $2
-.endm
-#else
 .macro SSD_MUL_SUM_16BYTES_RESET arg0, arg1, arg2, arg3
     vmull.u8   \arg3, \arg0, \arg0
     vpaddl.u16 \arg2, \arg3
@@ -630,7 +390,6 @@ WELS_ASM_FUNC_END
     vpaddl.s32 \arg0, \arg0
     vadd.i32 \arg1, \arg1, \arg2
 .endm
-#endif
 
 
 WELS_ASM_FUNC_BEGIN VAACalcSadSsdBgd_neon
@@ -712,105 +471,6 @@ bne vaa_calc_sad_ssd_bgd_height_loop
 WELS_ASM_FUNC_END
 
 
-#ifdef __APPLE__
-.macro SAD_VAR_16
-    vld1.8 {q0}, [$0], $2 //load cur_row
-
-    vpadal.u8 q3, q0    //add cur_row together
-    vpadal.u8 q4, q1    //add ref_row together
-
-    vabd.u8 q2, q0, q1  //abs_diff
-
-    vpadal.u8 $3, q2                            //l_sad for 16 bytes reset for every 8x16
-
-    vld1.8 {q1}, [$1], $2
-
-    vpadal.u8 q9, q0                            //q9 for l_sum      reset for every 16x16
-
-    SSD_MUL_SUM_16BYTES d0,d1, q10, q11         //q10 for lsqsum    reset for every 16x16
-.endm
-
-.macro SAD_VAR_16_END
-    vld1.8 {q0}, [$0], $1 //load cur_row
-
-    vpadal.u8 q3, q0    //add cur_row together
-    vpadal.u8 q4, q1    //add ref_row together
-
-    vabd.u8 q2, q0, q1  //abs_diff
-
-    vpadal.u8 $2, q2                            //l_sad for 16 bytes reset for every 8x16
-
-    vpadal.u8 q9, q0                            //q9 for l_sum      reset for every 16x16
-
-    SSD_MUL_SUM_16BYTES d0,d1, q10, q11         //q10 for lsqsum    reset for every 16x16
-.endm
-
-.macro SAD_VAR_16_RESET_16x16
-    vld1.8 {q0}, [$0], $2 //load cur_row
-    vld1.8 {q1}, [$1], $2
-
-    vpaddl.u8 q3, q0    //add cur_row together
-    vpaddl.u8 q4, q1    //add ref_row together
-
-    vabd.u8 q2, q0, q1  //abs_diff
-
-    vpaddl.u8 $3, q2                            //l_sad for 16 bytes reset for every 8x16
-
-    vld1.8 {q1}, [$1], $2
-
-    vpaddl.u8 q9, q0                            //q9 for l_sum      reset for every 16x16
-
-    SSD_MUL_SUM_16BYTES_RESET d0,d1, q10, q11
-.endm
-
-.macro SAD_VAR_16_RESET_8x8
-    vld1.8 {q0}, [$0], $2 //load cur_row
-
-    vpaddl.u8 q3, q0    //add cur_row together
-    vpaddl.u8 q4, q1    //add ref_row together
-
-    vabd.u8 q2, q0, q1  //abs_diff
-
-    vpaddl.u8 $3, q2                            //l_sad for 16 bytes reset for every 8x16
-
-    vld1.8 {q1}, [$1], $2
-
-    vpadal.u8 q9, q0                            //q9 for l_sum      reset for every 16x16
-
-    SSD_MUL_SUM_16BYTES d0,d1, q10, q11         //q10 for lsqsum    reset for every 16x16
-.endm
-
-.macro SAD_VAR_16x16
-    //for one 8x16
-    SAD_VAR_16_RESET_16x16 $0, $1, $2, q6
-    SAD_VAR_16 $0, $1, $2, q6
-    SAD_VAR_16 $0, $1, $2, q6
-    SAD_VAR_16 $0, $1, $2, q6
-    SAD_VAR_16 $0, $1, $2, q6
-    SAD_VAR_16 $0, $1, $2, q6
-    SAD_VAR_16 $0, $1, $2, q6
-    SAD_VAR_16 $0, $1, $2, q6
-
-    vpaddl.u16 q6, q6
-    vpaddl.u32 q6, q6
-    vadd.i32 q12, q6
-
-    //for another 8x16
-    SAD_VAR_16_RESET_8x8 $0, $1, $2, q7
-    SAD_VAR_16 $0, $1, $2, q7
-    SAD_VAR_16 $0, $1, $2, q7
-    SAD_VAR_16 $0, $1, $2, q7
-    SAD_VAR_16 $0, $1, $2, q7
-    SAD_VAR_16 $0, $1, $2, q7
-    SAD_VAR_16 $0, $1, $2, q7
-    SAD_VAR_16_END $0, $2, q7
-
-    vpaddl.u16 q7, q7
-    vpaddl.u32 q7, q7
-
-    vadd.i32 q12, q7
-.endm
-#else
 .macro SAD_VAR_16 arg0, arg1, arg2, arg3
     vld1.8 {q0}, [\arg0], \arg2 //load cur_row
 
@@ -909,7 +569,6 @@ WELS_ASM_FUNC_END
 
     vadd.i32 q12, q7
 .endm
-#endif
 
 
 WELS_ASM_FUNC_BEGIN VAACalcSadVar_neon
@@ -971,62 +630,6 @@ bne vaa_calc_sad_var_height_loop
 WELS_ASM_FUNC_END
 
 
-#ifdef __APPLE__
-.macro SAD_SSD_16
-    SAD_VAR_16 $0, $1, $2, $3
-
-    SSD_MUL_SUM_16BYTES d4,d5,q8, q11
-.endm
-
-.macro SAD_SSD_16_END
-    SAD_VAR_16_END $0, $1, $2
-
-    SSD_MUL_SUM_16BYTES d4,d5,q8, q11           //q8 for l_sqiff    reset for every 16x16
-.endm
-
-.macro SAD_SSD_16_RESET_16x16
-    SAD_VAR_16_RESET_16x16 $0, $1, $2, $3
-
-    SSD_MUL_SUM_16BYTES_RESET d4,d5,q8, q11         //q8 for l_sqiff    reset for every 16x16
-.endm
-
-.macro SAD_SSD_16_RESET_8x8
-    SAD_VAR_16_RESET_8x8 $0, $1, $2, $3
-
-    SSD_MUL_SUM_16BYTES d4,d5,q8, q11           //q8 for l_sqiff    reset for every 16x16
-.endm
-
-.macro SAD_SSD_16x16
-    //for one 8x16
-    SAD_SSD_16_RESET_16x16 $0, $1, $2, q6
-    SAD_SSD_16 $0, $1, $2, q6
-    SAD_SSD_16 $0, $1, $2, q6
-    SAD_SSD_16 $0, $1, $2, q6
-    SAD_SSD_16 $0, $1, $2, q6
-    SAD_SSD_16 $0, $1, $2, q6
-    SAD_SSD_16 $0, $1, $2, q6
-    SAD_SSD_16 $0, $1, $2, q6
-
-    vpaddl.u16 q6, q6
-    vpaddl.u32 q6, q6
-    vadd.i32 q12, q6
-
-    //for another 8x16
-    SAD_SSD_16_RESET_8x8 $0, $1, $2, q7
-    SAD_SSD_16 $0, $1, $2, q7
-    SAD_SSD_16 $0, $1, $2, q7
-    SAD_SSD_16 $0, $1, $2, q7
-    SAD_SSD_16 $0, $1, $2, q7
-    SAD_SSD_16 $0, $1, $2, q7
-    SAD_SSD_16 $0, $1, $2, q7
-    SAD_SSD_16_END $0, $2, q7
-
-    vpaddl.u16 q7, q7
-    vpaddl.u32 q7, q7
-
-    vadd.i32 q12, q7
-.endm
-#else
 .macro SAD_SSD_16 arg0, arg1, arg2, arg3
     SAD_VAR_16 \arg0, \arg1, \arg2, \arg3
 
@@ -1081,7 +684,6 @@ WELS_ASM_FUNC_END
 
     vadd.i32 q12, q7
 .endm
-#endif
 
 
 WELS_ASM_FUNC_BEGIN VAACalcSadSsd_neon

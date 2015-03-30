@@ -31,83 +31,8 @@
  */
 
 #ifdef  HAVE_NEON_AARCH64
-.text
 #include "arm_arch64_common_macro.S"
 
-#ifdef __APPLE__
-.macro LOAD_ALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, src*, src_stride
-    ld1 {$0.d}[0], [$4], $5
-    ld1 {$1.d}[0], [$4], $5
-    ld1 {$2.d}[0], [$4], $5
-    ld1 {$3.d}[0], [$4], $5
-//  }
-.endm
-
-.macro STORE_ALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, dst*, dst_stride
-    st1 {$0.d}[0], [$4], $5
-    st1 {$1.d}[0], [$4], $5
-    st1 {$2.d}[0], [$4], $5
-    st1 {$3.d}[0], [$4], $5
-//  }
-.endm
-
-.macro LOAD_UNALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, src*, src_stride
-    ld1 {$0.8b}, [$4], $5
-    ld1 {$1.8b}, [$4], $5
-    ld1 {$2.8b}, [$4], $5
-    ld1 {$3.8b}, [$4], $5
-//  }
-.endm
-
-.macro STORE_UNALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, dst*, dst_stride
-    st1 {$0.8b}, [$4], $5
-    st1 {$1.8b}, [$4], $5
-    st1 {$2.8b}, [$4], $5
-    st1 {$3.8b}, [$4], $5
-//  }
-.endm
-
-.macro LOAD16_ALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, src*, src_stride
-    ld1 {$0.2d}, [$4], $5
-    ld1 {$1.2d}, [$4], $5
-    ld1 {$2.2d}, [$4], $5
-    ld1 {$3.2d}, [$4], $5
-//  }
-.endm
-
-.macro STORE16_ALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, dst*, dst_stride
-    st1 {$0.2d}, [$4], $5
-    st1 {$1.2d}, [$4], $5
-    st1 {$2.2d}, [$4], $5
-    st1 {$3.2d}, [$4], $5
-//  }
-.endm
-
-.macro LOAD16_UNALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, src*, src_stride
-    ld1 {$0.16b}, [$4], $5
-    ld1 {$1.16b}, [$4], $5
-    ld1 {$2.16b}, [$4], $5
-    ld1 {$3.16b}, [$4], $5
-//  }
-.endm
-
-.macro STORE16_UNALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, dst*, dst_stride
-    st1 {$0.16b}, [$4], $5
-    st1 {$1.16b}, [$4], $5
-    st1 {$2.16b}, [$4], $5
-    st1 {$3.16b}, [$4], $5
-//  }
-.endm
-
-#else
 .macro LOAD_ALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
 //  {   //  input: $0~$3, src*, src_stride
     ld1 {\arg0\().d}[0], [\arg4], \arg5
@@ -179,8 +104,6 @@
     st1 {\arg3\().16b}, [\arg4], \arg5
 //  }
 .endm
-
-#endif
 
 
 WELS_ASM_AARCH64_FUNC_BEGIN WelsCopy8x8_AArch64_neon

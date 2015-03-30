@@ -31,7 +31,6 @@
  */
 
 #ifdef HAVE_NEON_AARCH64
-.text
 #include "arm_arch64_common_macro.S"
 
 WELS_ASM_AARCH64_FUNC_BEGIN ExpandPictureLuma_AArch64_neon
