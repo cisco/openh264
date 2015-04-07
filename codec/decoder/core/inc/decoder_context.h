@@ -367,6 +367,7 @@ typedef struct TagWelsDecoderContext {
 //for Parse only
   bool bParseOnly;
   bool bFramePending;
+  bool bFrameFinish;
   int32_t iNalNum;
   int32_t iNalLenInByte[MAX_NAL_UNITS_IN_LAYER];
   SSpsBsInfo sSpsBsInfo [MAX_SPS_COUNT];
