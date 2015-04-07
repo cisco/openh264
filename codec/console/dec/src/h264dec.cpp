@@ -54,6 +54,13 @@
 
 
 using namespace std;
+
+#if defined (WINDOWS_PHONE)
+double g_dDecTime = 0.0;
+float  g_fDecFPS = 0.0;
+int    g_iDecodedFrameNum = 0;
+#endif
+
 #if defined(ANDROID_NDK)
 #define LOG_TAG "welsdec"
 #define LOGI(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
@@ -296,6 +303,12 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
            iWidth, iHeight, iFrameCount, dElapsed, (iFrameCount * 1.0) / dElapsed);
   fprintf (stderr, "-------------------------------------------------------\n");
 
+#if defined (WINDOWS_PHONE)
+  g_dDecTime = dElapsed;
+  g_fDecFPS = (iFrameCount * 1.0) / dElapsed;
+  g_iDecodedFrameNum = iFrameCount;
+#endif
+
   // coverity scan uninitial
 label_exit:
   if (pBuf) {
@@ -316,7 +329,7 @@ label_exit:
   }
 }
 
-#if (defined(ANDROID_NDK)||defined(APPLE_IOS))
+#if (defined(ANDROID_NDK)||defined(APPLE_IOS) || defined (WINDOWS_PHONE))
 int32_t DecMain (int32_t iArgC, char* pArgV[]) {
 #else
 int32_t main (int32_t iArgC, char* pArgV[]) {

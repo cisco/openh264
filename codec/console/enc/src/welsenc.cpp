@@ -44,6 +44,12 @@
 #endif//ONLY_ENC_FRAMES_NUM
 #define ONLY_ENC_FRAMES_NUM		INT_MAX // 2, INT_MAX	// type the num you try to encode here, 2, 10, etc
 
+#if defined (WINDOWS_PHONE)
+float   g_fFPS           = 0.0;
+double  g_dEncoderTime   = 0.0;
+int     g_iEncodedFrame  = 0;
+#endif
+
 #if defined (ANDROID_NDK)
 #define LOG_TAG "welsenc"
 #define LOGI(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
@@ -912,6 +918,11 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
     printf ("Width:		%d\nHeight:		%d\nFrames:		%d\nencode time:	%f sec\nFPS:		%f fps\n",
             sSvcParam.iPicWidth, sSvcParam.iPicHeight,
             iActualFrameEncodedCount, dElapsed, (iActualFrameEncodedCount * 1.0) / dElapsed);
+#if defined (WINDOWS_PHONE)
+	g_fFPS = (iActualFrameEncodedCount * 1.0) / dElapsed;
+	g_dEncoderTime = dElapsed;
+	g_iEncodedFrame = iActualFrameEncodedCount;
+#endif
   }
 INSIDE_MEM_FREE:
   if (pFpBs) {
@@ -987,7 +998,7 @@ void DestroySVCEncHandle (ISVCEncoder* pEncoder) {
 /****************************************************************************
  * main:
  ****************************************************************************/
-#if defined(ANDROID_NDK) || defined(APPLE_IOS)
+#if defined(ANDROID_NDK) || defined(APPLE_IOS) || defined (WINDOWS_PHONE)
 extern "C" int EncMain (int argc, char** argv)
 #else
 int main (int argc, char** argv)
