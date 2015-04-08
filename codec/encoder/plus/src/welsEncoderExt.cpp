@@ -554,14 +554,13 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
   pStatistics->uiWidth = m_pEncContext->pSvcParam->sDependencyLayers[iMaxDid].iActualWidth;
   pStatistics->uiHeight = m_pEncContext->pSvcParam->sDependencyLayers[iMaxDid].iActualHeight;
 
-  int32_t iProcessedFrameCount = pStatistics->uiInputFrameCount - pStatistics->uiSkippedFrameCount;
   const bool kbCurrentFrameSkipped = (videoFrameTypeSkip == eFrameType);
-  if (!kbCurrentFrameSkipped && (iProcessedFrameCount + 1) != 0) {
-    pStatistics->fAverageFrameSpeedInMs = (iProcessedFrameCount * pStatistics->fAverageFrameSpeedInMs +
-                                           kiCurrentFrameMs) / (iProcessedFrameCount + 1);
-  }
   pStatistics->uiInputFrameCount ++;
   pStatistics->uiSkippedFrameCount += (kbCurrentFrameSkipped ? 1 : 0);
+  int32_t iProcessedFrameCount = pStatistics->uiInputFrameCount - pStatistics->uiSkippedFrameCount;
+  if (!kbCurrentFrameSkipped && iProcessedFrameCount != 0) {
+    pStatistics->fAverageFrameSpeedInMs += (kiCurrentFrameMs - pStatistics->fAverageFrameSpeedInMs)/iProcessedFrameCount;
+  }
 
   // rate control related
   if (0 != m_pEncContext->uiStartTimestamp) {
@@ -583,7 +582,7 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
     pStatistics->uiLTRSentNum ++;
   }
 
-  m_pEncContext->iTotalEncodedBits += (kiCurrentFrameSize << 3);
+  m_pEncContext->iTotalEncodedBytes += kiCurrentFrameSize;
 
   const int32_t kiDeltaFrames = static_cast<int32_t> (pStatistics->uiInputFrameCount -
                                 m_pEncContext->iLastStatisticsFrameCount);
@@ -593,13 +592,13 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
       pStatistics->fLatestFrameRate = static_cast<float> ((pStatistics->uiInputFrameCount -
                                       m_pEncContext->iLastStatisticsFrameCount) * 1000 /
                                       kiTimeDiff);
-      pStatistics->uiBitRate = static_cast<unsigned int> ((m_pEncContext->iTotalEncodedBits -
-                               m_pEncContext->iLastStatisticsBits) * 1000 / kiTimeDiff);
+      pStatistics->uiBitRate = static_cast<unsigned int> ((m_pEncContext->iTotalEncodedBytes -
+                               m_pEncContext->iLastStatisticsBytes) * 8 * 1000 / kiTimeDiff);
     }
 
     // update variables
     pStatistics->iStatisticsTs = kiCurrentFrameTs;
-    m_pEncContext->iLastStatisticsBits = m_pEncContext->iTotalEncodedBits;
+    m_pEncContext->iLastStatisticsBytes = m_pEncContext->iTotalEncodedBytes;
     m_pEncContext->iLastStatisticsFrameCount = pStatistics->uiInputFrameCount;
 
     //TODO: the following statistics will be calculated and added later
@@ -611,12 +610,13 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
       WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
                "EncoderStatistics: %dx%d, SpeedInMs: %f, fAverageFrameRate=%f, \
                LastFrameRate=%f, LatestBitRate=%d, LastFrameQP=%d, uiInputFrameCount=%d, uiSkippedFrameCount=%d, \
-               uiResolutionChangeTimes=%d, uIDRReqNum=%d, uIDRSentNum=%d, uLTRSentNum=NA",
+               uiResolutionChangeTimes=%d, uIDRReqNum=%d, uIDRSentNum=%d, uLTRSentNum=NA, iTotalEncodedBytes=%"PRId64,
                pStatistics->uiWidth, pStatistics->uiHeight,
                pStatistics->fAverageFrameSpeedInMs, pStatistics->fAverageFrameRate,
                pStatistics->fLatestFrameRate, pStatistics->uiBitRate, pStatistics->uiAverageFrameQP,
                pStatistics->uiInputFrameCount, pStatistics->uiSkippedFrameCount,
-               pStatistics->uiResolutionChangeTimes, pStatistics->uiIDRReqNum, pStatistics->uiIDRSentNum);
+               pStatistics->uiResolutionChangeTimes, pStatistics->uiIDRReqNum, pStatistics->uiIDRSentNum,
+               m_pEncContext->iTotalEncodedBytes);
       m_pEncContext->iLastStatisticsLogTs = kiCurrentFrameTs;
     }
   }
