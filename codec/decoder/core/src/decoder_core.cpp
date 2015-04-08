@@ -74,7 +74,6 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
 
   if (pCtx->bParseOnly) { //should exit for parse only to prevent access NULL pDstInfo
     PAccessUnit pCurAu = pCtx->pAccessUnitList;
-    static bool bFirstIDR = true;
     if (dsErrorFree == pCtx->iErrorCode) { //correct decoding, add to data buffer
       SParserBsInfo* pParser = pCtx->pParserBsInfo;
       SNalUnit* pCurNal = NULL;
@@ -94,7 +93,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
       pParser->iSpsHeightInPixel = (pCtx->pSps->iMbHeight << 4);
 
       if (pCurAu->pNalUnitsList [iIdx]->sNalHeaderExt.bIdrFlag) { //IDR
-        if (bFirstIDR) { //add required sps/pps
+        if (pCtx->bFrameFinish) { //add required sps/pps
           bool bSubSps = (NAL_UNIT_CODED_SLICE_EXT == pCurAu->pNalUnitsList [iIdx]->sNalHeaderExt.sNalUnitHeader.eNalUnitType);
           SSpsBsInfo* pSpsBs = NULL;
           SPpsBsInfo* pPpsBs = NULL;
@@ -111,10 +110,10 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
           memcpy (pDstBuf, pPpsBs->pPpsBsBuf, pPpsBs->uiPpsBsLen);
           pParser->iNalLenInByte [pParser->iNalNum ++] = pPpsBs->uiPpsBsLen;
           pDstBuf += pPpsBs->uiPpsBsLen;
-          bFirstIDR = false;
+          pCtx->bFrameFinish = false;
         }
       } else { //IDR required SPS, PPS
-        bFirstIDR = true;
+        pCtx->bFrameFinish = true;
       }
       //then VCL data re-write
       while (iIdx <= iEndIdx) {
@@ -2364,6 +2363,7 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
       }
     } else if (pCtx->bParseOnly) { //clear parse only internal data status
       pCtx->pParserBsInfo->iNalNum = 0;
+      pCtx->bFrameFinish = true; //clear frame pending status here!
     } else {
       if (DecodeFrameConstruction (pCtx, ppDst, pDstInfo)) {
         pCtx->pDec = NULL;
