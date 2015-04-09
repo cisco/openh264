@@ -57,7 +57,7 @@
 #define PARA_SET_TYPE_PPS		2
 
 #define MAX_VERTICAL_MV_RANGE   1024  //TODO, for allocate enough memory for transpose
-#define MAX_FRAME_RATE			30	// maximal frame rate to support
+#define MAX_FRAME_RATE			60	// maximal frame rate to support
 #define MIN_FRAME_RATE			1	// minimal frame rate need support
 
 #define MAX_BIT_RATE			INT_MAX	// maximal bit rate to support
