@@ -112,8 +112,6 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
           pDstBuf += pPpsBs->uiPpsBsLen;
           pCtx->bFrameFinish = false;
         }
-      } else { //IDR required SPS, PPS
-        pCtx->bFrameFinish = true;
       }
       //then VCL data re-write
       while (iIdx <= iEndIdx) {
@@ -127,9 +125,11 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
       if (pCtx->iTotalNumMbRec == kiTotalNumMbInCurLayer) { //frame complete
         pCtx->iTotalNumMbRec = 0;
         pCtx->bFramePending = false;
+        pCtx->bFrameFinish = true; //finish current frame and mark it
       } else if (pCtx->iTotalNumMbRec != 0) { //frame incomplete
         pCtx->bFramePending = true;
         pCtx->pDec->bIsComplete = false;
+        pCtx->bFrameFinish = false; //current frame not finished
         pCtx->iErrorCode |= dsFramePending;
         return -1;
         //pCtx->pParserBsInfo->iNalNum = 0;
@@ -2099,6 +2099,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         pCtx->iErrorCode |= dsOutOfMemory;
         return ERR_INFO_REF_COUNT_OVERFLOW;
       }
+      pCtx->pDec->bNewSeqBegin = pCtx->bNewSeqBegin; //set flag for start decoding
+    } else if (pCtx->iTotalNumMbRec == 0) { //pDec != NULL, already start
       pCtx->pDec->bNewSeqBegin = pCtx->bNewSeqBegin; //set flag for start decoding
     }
     pCtx->pDec->uiTimeStamp = pNalCur->uiTimeStamp;
