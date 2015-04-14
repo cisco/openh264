@@ -378,6 +378,7 @@ void PrintHelp() {
   printf ("  -sw          the source width\n");
   printf ("  -sh          the source height\n");
   printf ("  -frms        Number of total frames to be encoded\n");
+  printf ("  -frin        input frame rate\n");
   printf ("  -numtl       Temporal layer number (default: 1)\n");
   printf ("  -iper        Intra period (default: -1) : must be a power of 2 of GOP size (or -1)\n");
   printf ("  -nalsize     the Maximum NAL size. which should be larger than the each layer slicesize when slice mode equals to SM_DYN_SLICE\n");
@@ -436,6 +437,9 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
 
     else if (!strcmp (pCommand, "-frms") && (n < argc))
       sFileSet.uiFrameToBeCoded = atoi (argv[n++]);
+
+    else if (!strcmp (pCommand, "-frin") && (n < argc))
+      pSvcParam.fMaxFrameRate = atof (argv[n++]);
 
     else if (!strcmp (pCommand, "-numtl") && (n < argc))
       pSvcParam.iTemporalLayerNum = atoi (argv[n++]);
