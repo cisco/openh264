@@ -923,9 +923,9 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
             sSvcParam.iPicWidth, sSvcParam.iPicHeight,
             iActualFrameEncodedCount, dElapsed, (iActualFrameEncodedCount * 1.0) / dElapsed);
 #if defined (WINDOWS_PHONE)
-	g_fFPS = (iActualFrameEncodedCount * 1.0) / dElapsed;
-	g_dEncoderTime = dElapsed;
-	g_iEncodedFrame = iActualFrameEncodedCount;
+    g_fFPS = (iActualFrameEncodedCount * 1.0) / dElapsed;
+    g_dEncoderTime = dElapsed;
+    g_iEncodedFrame = iActualFrameEncodedCount;
 #endif
   }
 INSIDE_MEM_FREE:
