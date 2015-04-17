@@ -162,7 +162,9 @@ ifeq ($(HAVE_GTEST),Yes)
 test: codec_unittest$(EXEEXT)
 ifneq (android,$(OS))
 ifneq (ios,$(OS))
+ifneq (msvc-wp,$(OS))
 	./codec_unittest
+endif
 endif
 endif
 
