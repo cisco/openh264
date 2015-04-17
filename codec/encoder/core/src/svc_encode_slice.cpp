@@ -260,7 +260,7 @@ void WelsSliceHeaderWrite (sWelsEncCtx* pCtx, SBitStringAux* pBs, SDqLayer* pCur
   if (P_SLICE == pSliceHeader->eSliceType) {
     BsWriteOneBit (pBs, pSliceHeader->bNumRefIdxActiveOverrideFlag);
     if (pSliceHeader->bNumRefIdxActiveOverrideFlag) {
-      BsWriteUE (pBs, pSliceHeader->uiNumRefIdxL0Active - 1);
+      BsWriteUE (pBs, WELS_CLIP3(pSliceHeader->uiNumRefIdxL0Active - 1, 0, MAX_REF_PIC_COUNT));
     }
   }
 
@@ -328,7 +328,7 @@ void WelsSliceHeaderExtWrite (sWelsEncCtx* pCtx, SBitStringAux* pBs, SDqLayer* p
   if (P_SLICE == pSliceHeader->eSliceType) {
     BsWriteOneBit (pBs, pSliceHeader->bNumRefIdxActiveOverrideFlag);
     if (pSliceHeader->bNumRefIdxActiveOverrideFlag) {
-      BsWriteUE (pBs, pSliceHeader->uiNumRefIdxL0Active - 1);
+      BsWriteUE (pBs, WELS_CLIP3(pSliceHeader->uiNumRefIdxL0Active - 1, 0, MAX_REF_PIC_COUNT));
     }
   }
 

@@ -778,13 +778,11 @@ bool WelsBuildRefListScreen (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBes
           if (pRefPic->uiTemporalId <= pCtx->uiTemporalId && (!pCtx->bCurFrameMarkedAsSceneLtr || pRefPic->bIsSceneLTR)) {
             pCtx->pCurDqLayer->pRefOri[pCtx->iNumRef0] = pRefOri;
             pCtx->pRefList0[pCtx->iNumRef0++] = pRefPic;
-            WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
-                     "WelsBuildRefListScreen(), ref !current iFrameNum = %d, ref iFrameNum = %d,LTR number = %d,iNumRef = %d ref is Scene LTR = %d",
-                     pCtx->iFrameNum, pCtx->pRefList0[pCtx->iNumRef0 - 1]->iFrameNum, pRefList->uiLongRefCount, iNumRef,
-                     pRefPic->bIsSceneLTR);
-            WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
-                     "WelsBuildRefListScreen pCtx->uiTemporalId = %d,pRef->iFrameNum = %d,pRef->uiTemporalId = %d",
-                     pCtx->uiTemporalId, pRefPic->iFrameNum, pRefPic->uiTemporalId);
+            WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
+                     "WelsBuildRefListScreen(), current iFrameNum = %d, current Tid = %d, ref iFrameNum = %d, ref uiTemporalId = %d, ref is Scene LTR = %d, LTR count = %d,iNumRef = %d",
+                     pCtx->iFrameNum, pCtx->uiTemporalId,
+                     pRefPic->iFrameNum, pRefPic->uiTemporalId, pRefPic->bIsSceneLTR,
+                     pRefList->uiLongRefCount, iNumRef);
           }
         }
       } else {
@@ -795,7 +793,7 @@ bool WelsBuildRefListScreen (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBes
                      || pRefList->pLongRefList[i]->uiTemporalId < pCtx->uiTemporalId)	{
             pCtx->pCurDqLayer->pRefOri[pCtx->iNumRef0] = pRefOri;
             pCtx->pRefList0[pCtx->iNumRef0++] = pRefList->pLongRefList[i];
-            WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
+            WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
                      "WelsBuildRefListScreen(), ref !current iFrameNum = %d, ref iFrameNum = %d,LTR number = %d",
                      pCtx->iFrameNum, pCtx->pRefList0[pCtx->iNumRef0 - 1]->iFrameNum, pRefList->uiLongRefCount);
             break;

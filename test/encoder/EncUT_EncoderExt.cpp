@@ -195,7 +195,7 @@ TEST_F (EncoderInterfaceTest, EncoderOptionSetTest) {
   pSrcPic->uiTimeStamp += 30;
 
   eOptionId = ENCODER_OPTION_FRAME_RATE;
-  fValue = static_cast<float> (rand() % 60 - 5);
+  fValue = static_cast<float> (rand() % 100 - 5);
   iResult = pPtrEnc->SetOption (eOptionId, &fValue);
 
   if (fValue <= 0)
@@ -205,7 +205,7 @@ TEST_F (EncoderInterfaceTest, EncoderOptionSetTest) {
 
     iResult = pPtrEnc->GetOption (eOptionId, &fReturn);
     EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-    EXPECT_EQ (WELS_CLIP3 (fValue, 1, 30), fReturn);
+    EXPECT_EQ (WELS_CLIP3 (fValue, 1, 60), fReturn);
   }
   PrepareOneSrcFrame();
   iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
@@ -599,21 +599,21 @@ TEST_F (EncoderInterfaceTest, BasicInitializeTestAutoAdjustment) {
   GetValidEncParamBase (&sEncParamBase);
   sEncParamBase.fMaxFrameRate = 50000;
   EncodeOneFrame (&sEncParamBase);
-  EXPECT_LE (sEncParamBase.fMaxFrameRate, 30.0);
+  EXPECT_LE (sEncParamBase.fMaxFrameRate, 60.0);
   EXPECT_GE (sEncParamBase.fMaxFrameRate, 1.0);
 
   // fMaxFrameRate = 0
   GetValidEncParamBase (&sEncParamBase);
   sEncParamBase.fMaxFrameRate = 0;
   EncodeOneFrame (&sEncParamBase);
-  EXPECT_LE (sEncParamBase.fMaxFrameRate, 30.0);
+  EXPECT_LE (sEncParamBase.fMaxFrameRate, 60.0);
   EXPECT_GE (sEncParamBase.fMaxFrameRate, 1.0);
 
   // fMaxFrameRate = -1
   GetValidEncParamBase (&sEncParamBase);
   sEncParamBase.fMaxFrameRate = -1;
   EncodeOneFrame (&sEncParamBase);
-  EXPECT_LE (sEncParamBase.fMaxFrameRate, 30.0);
+  EXPECT_LE (sEncParamBase.fMaxFrameRate, 60.0);
   EXPECT_GE (sEncParamBase.fMaxFrameRate, 1.0);
 }
 
