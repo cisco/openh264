@@ -397,8 +397,7 @@ goto :EOF
   echo DestDir is %DestDir%
   if "%vOSType%"=="msvc-wp" (
      set aFileList=%DllFile% %LibFile% %PDBFile% %UTDllFile%
-  )
-  else (
+  ) else (
      set aFileList=%DllFile% %LibFile% %PDBFile% %UTBinFile% %EncBinFile% %DecBinFile%
   )
   for %%k in (%aFileList%) do (
