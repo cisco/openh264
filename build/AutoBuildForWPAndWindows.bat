@@ -383,9 +383,18 @@ goto :EOF
   set vConfiguration=%1
   set vBuildOption=%2
   cd %RootDir%
-  set FullDestDir=%BinDir%\%vArcType%-%vConfiguration%-ASM-%vASMFlag%
+  if "%vArcType%"=="arm" (
+    set vBinDirName=ARM
+  ) else if "%vArcType%"=="i386" (
+    set vBinDirName=Win32
+  ) else (
+    set vBinDirName=x64
+  )
+  set ArchDestDir=%BinDir%\%vBinDirName%
+  set FullDestDir=%BinDir%\%vBinDirName%\%vConfiguration%
   echo copying dll files to destination folder...
   echo FullDestDir is %FullDestDir%
+  if not exist %ArchDestDir% md %ArchDestDir%
   if exist %FullDestDir% (
     rd /s /q %FullDestDir%
   )
@@ -393,7 +402,7 @@ goto :EOF
 
   echo current dir is:
   cd
-  set DestDir=bin/%vArcType%-%vConfiguration%-ASM-%vASMFlag%
+  set DestDir=bin/%vBinDirName%/%vConfiguration%
   echo DestDir is %DestDir%
   if "%vOSType%"=="msvc-wp" (
      set aFileList=%DllFile% %LibFile% %PDBFile% %UTDllFile%
