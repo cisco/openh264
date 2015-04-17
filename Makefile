@@ -193,14 +193,15 @@ endif
 endif
 endif
 
-ifneq (ios, $(OS))
-ifeq (msvc-wp, $(OS))
-libraries: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) $(LIBPREFIX)ut.$(SHAREDLIBSUFFIX)
-else
-libraries: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX)
-endif
-else
 libraries: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX)
+
+# No point in building dylib for ios
+ifneq (ios, $(OS))
+libraries: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX)
+endif
+
+ifeq (msvc-wp, $(OS))
+libraries: $(LIBPREFIX)ut.$(SHAREDLIBSUFFIX)
 endif
 
 LIBRARIES += $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXVER)
