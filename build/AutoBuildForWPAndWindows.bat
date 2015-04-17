@@ -78,6 +78,7 @@ rem ***********************************************
   set DllFile=openh264.dll
   set LibFile=openh264.lib
   set PDBFile=openh264.pdb
+  set UTDllFile=ut.dll
   set UTBinFile=codec_unittest.exe
   set EncBinFile=h264enc.exe
   set DecBinFile=h264dec.exe
@@ -394,7 +395,12 @@ goto :EOF
   cd
   set DestDir=bin/%vArcType%-%vConfiguration%-ASM-%vASMFlag%
   echo DestDir is %DestDir%
-  set aFileList=%DllFile% %LibFile% %PDBFile% %UTBinFile% %EncBinFile% %DecBinFile%
+  if "%vOSType%"=="msvc-wp" (
+     set aFileList=%DllFile% %LibFile% %PDBFile% %UTDllFile%
+  )
+  else (
+     set aFileList=%DllFile% %LibFile% %PDBFile% %UTBinFile% %EncBinFile% %DecBinFile%
+  )
   for %%k in (%aFileList%) do (
     bash -c "cp -f  %%k  %DestDir%"
   )
