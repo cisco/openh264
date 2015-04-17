@@ -270,7 +270,10 @@ endif
 install: install-static-lib install-shared
 	@:
 
-ifeq ($(HAVE_GTEST),Yes)
+ifneq ($(HAVE_GTEST),Yes)
+binaries:
+	@:
+else
 include $(SRC_PATH)build/gtest-targets.mk
 include $(SRC_PATH)test/api/targets.mk
 include $(SRC_PATH)test/decoder/targets.mk
@@ -325,9 +328,6 @@ endif
 endif
 endif
 
-else
-binaries:
-	@:
 endif
 
 -include $(OBJS:.$(OBJ)=.d)
