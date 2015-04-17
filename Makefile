@@ -183,14 +183,20 @@ endif
 
 ifneq (android, $(OS))
 ifneq (ios, $(OS))
+ifneq (msvc-wp, $(OS))
 include $(SRC_PATH)codec/console/dec/targets.mk
 include $(SRC_PATH)codec/console/enc/targets.mk
 include $(SRC_PATH)codec/console/common/targets.mk
 endif
 endif
+endif
 
 ifneq (ios, $(OS))
+ifeq (msvc-wp, $(OS))
+libraries: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) $(LIBPREFIX)ut.$(SHAREDLIBSUFFIX)
+else
 libraries: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX)
+endif
 else
 libraries: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX)
 endif
@@ -278,7 +284,7 @@ $(LIBPREFIX)ut.$(LIBSUFFIX): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $
 LIBRARIES +=$(LIBPREFIX)ut.$(SHAREDLIBSUFFIX)
 $(LIBPREFIX)ut.$(SHAREDLIBSUFFIX): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(PROCESSING_UNITTEST_OBJS) $(API_TEST_OBJS) $(COMMON_UNITTEST_OBJS)  $(CODEC_UNITTEST_DEPS)
 	$(QUIET)rm -f $@
-	$(QUIET_CXX)$(CXX) $(SHARED) $(CXX_LINK_O) $+ $(LDFLAGS) $(CODEC_UNITTEST_LDFLAGS)
+	$(QUIET_CXX)$(CXX) $(SHARED) $(CXX_LINK_O) $+ $(LDFLAGS) $(UTSHLDFLAGS) $(CODEC_UNITTEST_LDFLAGS)
 
 binaries: codec_unittest$(EXEEXT)
 BINARIES += codec_unittest$(EXEEXT)
@@ -301,12 +307,17 @@ codec_unittest$(EXEEXT):
 	@:
 endif
 else
+ifneq (msvc-wp,$(OS))
 codec_unittest$(EXEEXT): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(PROCESSING_UNITTEST_OBJS) $(API_TEST_OBJS) $(COMMON_UNITTEST_OBJS) $(CODEC_UNITTEST_DEPS) | res
 	$(QUIET)rm -f $@
 	$(QUIET_CXX)$(CXX) $(CXX_LINK_O) $+ $(CODEC_UNITTEST_LDFLAGS) $(LDFLAGS)
 
 res:
 	$(QUIET)if [ ! -e res ]; then ln -s $(SRC_PATH)res .; fi
+else
+codec_unittest$(EXEEXT):
+	@:
+endif
 
 endif
 endif

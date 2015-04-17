@@ -2,10 +2,11 @@ ARCH = arm
 include $(SRC_PATH)build/msvc-common.mk
 CFLAGS_OPT += -MD
 CFLAGS_DEBUG += -MDd
-CFLAGS += -DWINAPI_FAMILY=WINAPI_FAMILY_PHONE_APP
+CFLAGS += -DWINAPI_FAMILY=WINAPI_FAMILY_PHONE_APP -DWINDOWS_PHONE
 # Ignore warnings about the main function prototype when building with -ZW
 CXXFLAGS += -ZW -wd4447
 LDFLAGS += -nodefaultlib:kernel32.lib -nodefaultlib:ole32.lib WindowsPhoneCore.lib
+UTSHLDFLAGS=-def:ut.def
 # Ignore warnings about code built with -ZW in .lib files
 AR_OPTS += -ignore:4264
 
