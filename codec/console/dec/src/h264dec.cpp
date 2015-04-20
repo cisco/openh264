@@ -305,7 +305,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
 
 #if defined (WINDOWS_PHONE)
   g_dDecTime = dElapsed;
-  g_fDecFPS = (iFrameCount * 1.0) / dElapsed;
+  g_fDecFPS = (iFrameCount * 1.0f) / (float) dElapsed;
   g_iDecodedFrameNum = iFrameCount;
 #endif
 

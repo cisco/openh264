@@ -439,7 +439,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       sFileSet.uiFrameToBeCoded = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-frin") && (n < argc))
-      pSvcParam.fMaxFrameRate = atof (argv[n++]);
+      pSvcParam.fMaxFrameRate = (float) atof (argv[n++]);
 
     else if (!strcmp (pCommand, "-numtl") && (n < argc))
       pSvcParam.iTemporalLayerNum = atoi (argv[n++]);
@@ -923,9 +923,9 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
             sSvcParam.iPicWidth, sSvcParam.iPicHeight,
             iActualFrameEncodedCount, dElapsed, (iActualFrameEncodedCount * 1.0) / dElapsed);
 #if defined (WINDOWS_PHONE)
-	g_fFPS = (iActualFrameEncodedCount * 1.0) / dElapsed;
-	g_dEncoderTime = dElapsed;
-	g_iEncodedFrame = iActualFrameEncodedCount;
+    g_fFPS = (iActualFrameEncodedCount * 1.0f) / (float) dElapsed;
+    g_dEncoderTime = dElapsed;
+    g_iEncodedFrame = iActualFrameEncodedCount;
 #endif
   }
 INSIDE_MEM_FREE:
