@@ -55,3 +55,8 @@ echo "" >>codec_ver.h
 echo "#endif  // CODEC_VER_H" >>codec_ver.h
 
 mv -f codec_ver.h ../api/svc/codec_ver.h
+
+# Ignore non-utf8 chars in the input
+export LC_ALL=C
+cat ../../openh264.rc.template | sed "s/\$MAJOR/$major/g" | sed "s/\$MINOR/$minor/g" | sed "s/\$REVISION/$revnr/g" | sed "s/\$RESERVED/$resnr/g" > openh264.rc.tmp
+mv openh264.rc.tmp ../../openh264.rc
