@@ -369,10 +369,10 @@ rem ***********************************************
 :Build
   set vConfiguration=%1
   cd  %RootDir%
-  echo bash -c "make OS=%vOSType%  ARCH=%vArcType% ENABLE64BIT=%vEnable64BitFlag% USE_ASM=%vASMFlag% BUILDTYPE=%vConfiguration% clean"
-  echo bash -c "make OS=%vOSType%  ARCH=%vArcType% ENABLE64BIT=%vEnable64BitFlag% USE_ASM=%vASMFlag% BUILDTYPE=%vConfiguration%"
-  bash -c "make OS=%vOSType%  ARCH=%vArcType% ENABLE64BIT=%vEnable64BitFlag% USE_ASM=%vASMFlag% BUILDTYPE=%vConfiguration% clean"
-  bash -c "make OS=%vOSType%  ARCH=%vArcType% ENABLE64BIT=%vEnable64BitFlag% USE_ASM=%vASMFlag% BUILDTYPE=%vConfiguration%"
+  echo bash -c "make OS=%vOSType%  ARCH=%vArcType% USE_ASM=%vASMFlag% BUILDTYPE=%vConfiguration% clean"
+  echo bash -c "make OS=%vOSType%  ARCH=%vArcType% USE_ASM=%vASMFlag% BUILDTYPE=%vConfiguration%"
+  bash -c "make OS=%vOSType%  ARCH=%vArcType% USE_ASM=%vASMFlag% BUILDTYPE=%vConfiguration% clean"
+  bash -c "make OS=%vOSType%  ARCH=%vArcType% USE_ASM=%vASMFlag% BUILDTYPE=%vConfiguration%"
   if not %ERRORLEVEL%==0 (
     set BuildFlag=1
   )
