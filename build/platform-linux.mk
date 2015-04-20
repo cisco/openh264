@@ -5,7 +5,7 @@ SHLDFLAGS = -Wl,-soname,$(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXVER)
 CFLAGS += -Wall -fno-strict-aliasing -fPIC -MMD -MP
 LDFLAGS += -lpthread
 ifeq ($(ASM_ARCH), x86)
-ifeq ($(ENABLE64BIT), Yes)
+ifeq ($(ARCH), x86_64)
 ASMFLAGS += -f elf64
 else
 ASMFLAGS += -f elf

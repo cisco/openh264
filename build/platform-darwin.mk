@@ -10,7 +10,7 @@ CFLAGS += -Wall -fPIC -MMD -MP
 LDFLAGS += -lpthread
 ifeq ($(ASM_ARCH), x86)
 ASMFLAGS += -DPREFIX
-ifeq ($(ENABLE64BIT), Yes)
+ifeq ($(ARCH), x86_64)
 ASMFLAGS += -f macho64
 else
 ASMFLAGS += -f macho
