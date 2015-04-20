@@ -44,3 +44,6 @@ LDFLAGS += -link
 SHLDFLAGS=-pdb:$(PROJECT_NAME).pdb -def:openh264.def -implib:$(EXTRA_LIBRARY)
 STATIC_LDFLAGS=
 CODEC_UNITTEST_CFLAGS=-D_CRT_SECURE_NO_WARNINGS
+
+%.res: %.rc
+	$(QUIET_RC)rc -nologo $<

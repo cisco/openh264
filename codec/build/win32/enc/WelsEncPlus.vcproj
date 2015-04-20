@@ -395,7 +395,7 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 			<File
-				RelativePath="..\..\..\encoder\plus\res\welsenc.rc"
+				RelativePath="..\..\..\..\openh264.rc"
 				>
 			</File>
 		</Filter>

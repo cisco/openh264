@@ -4,6 +4,7 @@ vpath %.cc $(SRC_PATH)
 vpath %.cpp $(SRC_PATH)
 vpath %.asm $(SRC_PATH)
 vpath %.S $(SRC_PATH)
+vpath %.rc $(SRC_PATH)
 
 OS=$(shell uname | tr A-Z a-z | tr -d \\-[:digit:].)
 ARCH=$(shell uname -m)
@@ -76,6 +77,7 @@ ifneq ($(V),Yes)
     QUIET_CCAS = @printf "CCAS\t$@\n";
     QUIET_ASM = @printf "ASM\t$@\n";
     QUIET_AR  = @printf "AR\t$@\n";
+    QUIET_RC  = @printf "RC\t$@\n";
     QUIET     = @
 endif
 
@@ -148,7 +150,7 @@ clean:
 ifeq (android,$(OS))
 clean: clean_Android
 endif
-	$(QUIET)rm -f $(OBJS) $(OBJS:.$(OBJ)=.d) $(OBJS:.$(OBJ)=.obj) $(LIBRARIES) $(BINARIES) *.lib *.a *.dylib *.dll *.so *.exe *.pdb *.exp *.pc
+	$(QUIET)rm -f $(OBJS) $(OBJS:.$(OBJ)=.d) $(OBJS:.$(OBJ)=.obj) $(LIBRARIES) $(BINARIES) *.lib *.a *.dylib *.dll *.so *.exe *.pdb *.exp *.pc *.res
 
 gmp-bootstrap:
 	if [ ! -d gmp-api ] ; then git clone https://github.com/mozilla/gmp-api gmp-api ; fi
