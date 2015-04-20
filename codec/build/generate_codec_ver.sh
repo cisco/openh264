@@ -27,8 +27,17 @@ echo "" >>codec_ver.h
 echo "#include \"codec_app_def.h\"" >>codec_ver.h
 echo "" >>codec_ver.h
 
-echo "static const OpenH264Version g_stCodecVersion  = {$1};"|tr '.' ',' >>codec_ver.h
-echo "static const char* const g_strCodecVer  = \"OpenH264 version:$1\";" >>codec_ver.h
+fullver="$1"
+major="${1%%.*}"
+tmp=${1#*.}
+minor="${tmp%%.*}"
+tmp=${tmp#*.}
+revnr="${tmp%%.*}"
+tmp=${tmp#*.}
+resnr="${tmp%%.*}"
+
+echo "static const OpenH264Version g_stCodecVersion  = {$major,$minor,$revnr,$resnr};" >>codec_ver.h
+echo "static const char* const g_strCodecVer  = \"OpenH264 version:$fullver\";" >>codec_ver.h
 #if [ "$2"x = ""x ]; then
 #echo "static const char* const g_strCodecBuildNum = \"OpenH264 revision:$revision\";" >> codec_ver.h
 #else
@@ -37,16 +46,10 @@ echo "static const char* const g_strCodecVer  = \"OpenH264 version:$1\";" >>code
 echo "" >>codec_ver.h
 
 #define OPENH264_MAJOR 1, #define OPENH264_MINOR 2 #define OPENH264_REVISION 3 #define OPENH264_RESERVED 0
-echo "#define OPENH264_MAJOR (${1%%.*})" >>codec_ver.h
-
-tmp=${1#*.}
-echo "#define OPENH264_MINOR (${tmp%%.*})" >>codec_ver.h
-
-tmp=${tmp#*.}
-echo "#define OPENH264_REVISION (${tmp%%.*})" >>codec_ver.h
-
-tmp=${tmp#*.}
-echo "#define OPENH264_RESERVED (${tmp%%.*})" >>codec_ver.h
+echo "#define OPENH264_MAJOR ($major)" >>codec_ver.h
+echo "#define OPENH264_MINOR ($minor)" >>codec_ver.h
+echo "#define OPENH264_REVISION ($revnr)" >>codec_ver.h
+echo "#define OPENH264_RESERVED ($resnr)" >>codec_ver.h
 echo "" >>codec_ver.h
 
 echo "#endif  // CODEC_VER_H" >>codec_ver.h
