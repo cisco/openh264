@@ -1,6 +1,7 @@
 # Object files
 *.o
 *.obj
+*.res
 
 # Dependency files
 *.d
