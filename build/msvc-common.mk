@@ -1,6 +1,6 @@
 include $(SRC_PATH)build/arch.mk
 ifeq ($(ASM_ARCH), x86)
-ifeq ($(ENABLE64BIT), Yes)
+ifeq ($(ARCH), x86_64)
 ASMFLAGS += -f win64
 ASMFLAGS_PLATFORM = -DWIN64
 else
