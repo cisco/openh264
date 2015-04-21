@@ -91,8 +91,15 @@ typedef struct {
 #define NEW_CTX_OFFSET_LAST 166
 #define NEW_CTX_OFFSET_ONE 227
 #define NEW_CTX_OFFSET_ABS 232
+#define NEW_CTX_OFFSET_TS_8x8_FLAG 399
 #define CTX_NUM_MVD 7
 #define CTX_NUM_CBP 4
+// Table 9-34 in Page 270
+#define NEW_CTX_OFFSET_TRANSFORM_SIZE_8X8_FLAG  399
+#define NEW_CTX_OFFSET_MAP_8x8  402
+#define NEW_CTX_OFFSET_LAST_8x8 417
+#define NEW_CTX_OFFSET_ONE_8x8  426
+#define NEW_CTX_OFFSET_ABS_8x8  431 // Puzzle, where is the definition?
 
 typedef struct TagDataBuffer {
   uint8_t* pHead;
@@ -130,6 +137,8 @@ typedef void (*PGetIntraPredFunc) (uint8_t* pPred, const int32_t kiLumaStride);
 typedef void (*PIdctResAddPredFunc) (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
 typedef void (*PExpandPictureFunc) (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicWidth,
                                     const int32_t kiPicHeight);
+
+typedef void (*PGetIntraPred8x8Func) (uint8_t* pPred, const int32_t kiLumaStride, bool bTLAvail, bool bTRAvail);
 
 /**/
 typedef struct TagRefPic {
@@ -262,15 +271,18 @@ typedef struct TagWelsDecoderContext {
     int16_t*  pMbType[LAYER_NUM_EXCHANGEABLE];                      /* mb type */
     int16_t	(*pMv[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM][MV_A]; //[LAYER_NUM_EXCHANGEABLE   MB_BLOCK4x4_NUM*]
     int8_t	(*pRefIndex[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM];
+    bool*   pNoSubMbPartSizeLessThan8x8Flag[LAYER_NUM_EXCHANGEABLE];
+    bool*   pTransformSize8x8Flag[LAYER_NUM_EXCHANGEABLE];
     int8_t*	pLumaQp[LAYER_NUM_EXCHANGEABLE];	/*mb luma_qp*/
     int8_t	(*pChromaQp[LAYER_NUM_EXCHANGEABLE])[2];					/*mb chroma_qp*/
     int16_t	(*pMvd[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM][MV_A]; //[LAYER_NUM_EXCHANGEABLE   MB_BLOCK4x4_NUM*]
-    uint8_t* pCbfDc[LAYER_NUM_EXCHANGEABLE];
+    uint16_t* pCbfDc[LAYER_NUM_EXCHANGEABLE];
     int8_t	(*pNzc[LAYER_NUM_EXCHANGEABLE])[24];
     int8_t	(*pNzcRs[LAYER_NUM_EXCHANGEABLE])[24];
     int16_t (*pScaledTCoeff[LAYER_NUM_EXCHANGEABLE])[MB_COEFF_LIST_SIZE]; /*need be aligned*/
     int8_t	(*pIntraPredMode[LAYER_NUM_EXCHANGEABLE])[8]; //0~3 top4x4 ; 4~6 left 4x4; 7 intra16x16
     int8_t (*pIntra4x4FinalMode[LAYER_NUM_EXCHANGEABLE])[MB_BLOCK4x4_NUM];
+    uint8_t*  pIntraNxNAvailFlag[LAYER_NUM_EXCHANGEABLE];
     int8_t*  pChromaPredMode[LAYER_NUM_EXCHANGEABLE];
     int8_t*  pCbp[LAYER_NUM_EXCHANGEABLE];
     uint8_t (*pMotionPredFlag[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_PARTITION_SIZE]; // 8x8
@@ -283,7 +295,6 @@ typedef struct TagWelsDecoderContext {
     uint32_t iMbWidth;
     uint32_t iMbHeight;
   } sMb;
-
 
 // reconstruction picture
   PPicture			pDec;			//pointer to current picture being reconstructed
@@ -381,6 +392,9 @@ typedef struct TagWelsDecoderContext {
   PGetIntraPredFunc pGetIChromaPredFunc[7];		// h264_predict_8x8_t
   PIdctResAddPredFunc	pIdctResAddPredFunc;
   SMcFunc				sMcFunc;
+  //Transform8x8
+  PGetIntraPred8x8Func pGetI8x8LumaPredFunc[14];
+  PIdctResAddPredFunc	pIdctResAddPredFunc8x8;
 
 //For error concealment
   SCopyFunc sCopyFunc;
@@ -395,8 +409,8 @@ typedef struct TagWelsDecoderContext {
   int32_t iCurSeqIntervalMaxPicWidth;
   int32_t iCurSeqIntervalMaxPicHeight;
 
-  PWelsFillNeighborMbInfoIntra4x4Func  pFillInfoCacheIntra4x4Func;
-  PWelsMapNeighToSample pMap4x4NeighToSampleFunc;
+  PWelsFillNeighborMbInfoIntra4x4Func  pFillInfoCacheIntraNxNFunc;
+  PWelsMapNeighToSample pMapNxNNeighToSampleFunc;
   PWelsMap16NeighToSample pMap16x16NeighToSampleFunc;
 
 //feedback whether or not have VCL in current AU, and the temporal ID

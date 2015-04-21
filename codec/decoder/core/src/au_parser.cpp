@@ -124,6 +124,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
       uiBsZero = pSrcRbsp[iIndex];
       if (0 == uiBsZero) {
         --iNalSize;
+        ++ (*pConsumedBytes);
         --iIndex;
       } else {
         break;
@@ -991,16 +992,10 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //seq_scaling_matrix_present_flag
     pSps->bSeqScalingMatrixPresentFlag	= !!uiCode;
 
-    if (pSps->bSeqScalingMatrixPresentFlag)// For high profile, it is not used in current application. FIXME
-
+    if (pSps->bSeqScalingMatrixPresentFlag) {
       WELS_READ_VERIFY (ParseScalingList (pSps, pBs, 0, pSps->bSeqScalingListPresentFlag, pSps->iScalingList4x4,
                                           pSps->iScalingList8x8));
-    //if exist, to parse scalinglist matrix value
-
-    //  WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
-    //         "ParseSps(): seq_scaling_matrix_present_flag (%d). Feature not supported.",
-    //       pSps->bSeqScalingMatrixPresentFlag);
-    //return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_NON_BASELINE);
+    }
   }
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //log2_max_frame_num_minus4
   WELS_CHECK_SE_UPPER_ERROR (uiCode, SPS_LOG2_MAX_FRAME_NUM_MINUS4_MAX, "log2_max_frame_num_minus4",
@@ -1379,28 +1374,27 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
   pPps->bConstainedIntraPredFlag              = !!uiCode;
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //redundant_pic_cnt_present_flag
   pPps->bRedundantPicCntPresentFlag           = !!uiCode;
-  /*TODO: to judge whether going on to parse*/
-//going on to parse high profile syntax, need fix me
-  if (0) {
-    WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode));
-    pPps->bTransform_8x8_mode_flag = !!uiCode;
-    WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode));
+
+  if (CheckMoreRBSPData (pBsAux)) {
+    WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //transform_8x8_mode_flag
+    pPps->bTransform8x8ModeFlag = !!uiCode;
+    WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //pic_scaling_matrix_present_flag
     pPps->bPicScalingMatrixPresentFlag = !!uiCode;
     if (pPps->bPicScalingMatrixPresentFlag) {
-      if (pCtx->bSpsAvailFlags[pPps->iSpsId])
+      if (pCtx->bSpsAvailFlags[pPps->iSpsId]) {
         WELS_READ_VERIFY (ParseScalingList (&pCtx->sSpsBuffer[pPps->iSpsId], pBsAux, 1, pPps->bPicScalingListPresentFlag,
                                             pPps->iScalingList4x4, pPps->iScalingList8x8));
-      else {
+      } else {
         pCtx->bSpsLatePps = true;
         WELS_READ_VERIFY (ParseScalingList (NULL, pBsAux, 1, pPps->bPicScalingListPresentFlag, pPps->iScalingList4x4,
                                             pPps->iScalingList8x8));
       }
     }
-    //add second chroma qp parsing process
-    WELS_READ_VERIFY (BsGetSe (pBsAux, &iCode)); //chroma_qp_index_offset,cr
-    pPps->iChromaQpIndexOffset[1]               = iCode;
-    WELS_CHECK_SE_BOTH_ERROR (pPps->iChromaQpIndexOffset[1], PPS_CHROMA_QP_INDEX_OFFSET_MIN, PPS_CHROMA_QP_INDEX_OFFSET_MAX,
-                              "second_chroma_qp_index_offset", GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_CHROMA_QP_INDEX_OFFSET));
+    WELS_READ_VERIFY (BsGetSe (pBsAux, &iCode)); //second_chroma_qp_index_offset
+    pPps->iChromaQpIndexOffset[1] = iCode;
+    WELS_CHECK_SE_BOTH_ERROR (pPps->iChromaQpIndexOffset[1], PPS_CHROMA_QP_INDEX_OFFSET_MIN,
+                              PPS_CHROMA_QP_INDEX_OFFSET_MAX, "chroma_qp_index_offset", GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS,
+                                  ERR_INFO_INVALID_CHROMA_QP_INDEX_OFFSET));
   }
 
   if (pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
@@ -1481,6 +1475,7 @@ int32_t SetScalingListValue (uint8_t* pScalingList, int iScalingListNum, bool* b
   int iNextScale = 8;
   int iDeltaScale;
   int32_t iCode;
+  int32_t iIdx;
   for (int j = 0; j < iScalingListNum; j++) {
     if (iNextScale != 0) {
       WELS_READ_VERIFY (BsGetSe (pBsAux, &iCode));
@@ -1492,8 +1487,9 @@ int32_t SetScalingListValue (uint8_t* pScalingList, int iScalingListNum, bool* b
       if (*bUseDefaultScalingMatrixFlag)
         break;
     }
-    pScalingList[g_kuiZigzagScan[j]] = (iNextScale == 0) ? iLastScale : iNextScale;
-    iLastScale = pScalingList[g_kuiZigzagScan[j]];
+    iIdx = iScalingListNum == 16 ? g_kuiZigzagScan[j] : g_kuiZigzagScan8x8[j];
+    pScalingList[iIdx] = (iNextScale == 0) ? iLastScale : iNextScale;
+    iLastScale = pScalingList[iIdx];
   }
 
 

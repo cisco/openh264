@@ -72,16 +72,19 @@ typedef int32_t SubMbType;
 #define LUMA_DC_AC   3
 #define CHROMA_DC    4
 #define CHROMA_AC    5
-#define CHROMA_DC_U  6
-#define CHROMA_DC_V  7
-#define CHROMA_AC_U  8
-#define CHROMA_AC_V  9
-#define LUMA_DC_AC_INTRA 10
-#define LUMA_DC_AC_INTER 11
-#define CHROMA_DC_U_INTER  12
-#define CHROMA_DC_V_INTER  13
-#define CHROMA_AC_U_INTER  14
-#define CHROMA_AC_V_INTER  15
+#define LUMA_DC_AC_8  6
+#define CHROMA_DC_U  7
+#define CHROMA_DC_V  8
+#define CHROMA_AC_U  9
+#define CHROMA_AC_V  10
+#define LUMA_DC_AC_INTRA 11
+#define LUMA_DC_AC_INTER 12
+#define CHROMA_DC_U_INTER  13
+#define CHROMA_DC_V_INTER  14
+#define CHROMA_AC_U_INTER  15
+#define CHROMA_AC_V_INTER  16
+#define LUMA_DC_AC_INTRA_8  17
+#define LUMA_DC_AC_INTER_8  18
 
 #define SHIFT_BUFFER(pBitsCache)	{	pBitsCache->pBuf+=2; pBitsCache->uiRemainBits += 16; pBitsCache->uiCache32Bit |= (((pBitsCache->pBuf[2] << 8) | pBitsCache->pBuf[3]) << (32 - pBitsCache->uiRemainBits));	}
 #define POP_BUFFER(pBitsCache, iCount)	{ pBitsCache->uiCache32Bit <<= iCount;	pBitsCache->uiRemainBits -= iCount;	}
@@ -93,6 +96,38 @@ static const uint8_t g_kuiZigzagScan[16] = { //4*4block residual zig-zag scan or
     7, 11, 14, 15,
 };
 
+static const uint8_t g_kuiZigzagScan8x8[64] = { //8x8 block residual zig-zag scan order
+    0,  1,  8,  16, 9,  2,  3,  10,
+    17, 24, 32, 25, 18, 11, 4,  5,
+    12, 19, 26, 33, 40, 48, 41, 34,
+    27, 20, 13, 6,  7,  14, 21, 28,
+    35, 42, 49, 56, 57, 50, 43, 36,
+    29, 22, 15, 23, 30, 37, 44, 51,
+    58, 59, 52, 45, 38, 31, 39, 46,
+    53, 60, 61, 54, 47, 55, 62, 63,
+};
+
+static const uint8_t g_kuiIdx2CtxSignificantCoeffFlag8x8[64] = {  // Table 9-43, Page 289
+    0,  1,  2,  3,  4,  5,  5,  4,
+    4,  3,  3,  4,  4,  4,  5,  5,
+    4,  4,  4,  4,  3,  3,  6,  7,
+    7,  7,  8,  9, 10,  9,  8,  7,
+    7,  6, 11, 12, 13, 11,  6,  7,
+    8,  9, 14, 10,  9,  8,  6, 11,
+    12, 13, 11, 6,  9, 14, 10,  9,
+    11, 12, 13, 11 ,14, 10, 12, 14,
+};
+
+static const uint8_t g_kuiIdx2CtxLastSignificantCoeffFlag8x8[64] = { // Table 9-43, Page 289
+    0,  1,  1,  1,  1,  1,  1,  1,
+    1,  1,  1,  1,  1,  1,  1,  1,
+    2,  2,  2,  2,  2,  2,  2,  2,
+    2,  2,  2,  2,  2,  2,  2,  2,
+    3,  3,  3,  3,  3,  3,  3,  3,
+    4,  4,  4,  4,  4,  4,  4,  4,
+    5,  5,  5,  5,  6,  6,  6,  6,
+    7,  7,  7,  7,  8,  8,  8,  8,
+};
 
 static inline void GetMbResProperty(int32_t * pMBproperty,int32_t* pResidualProperty,bool bCavlc)
 {
@@ -142,8 +177,17 @@ static inline void GetMbResProperty(int32_t * pMBproperty,int32_t* pResidualProp
 	  break;
  case CHROMA_AC_V_INTER:
 	  *pMBproperty = 5;
-	  *pResidualProperty =  bCavlc ?CHROMA_AC:CHROMA_AC_V;
+	  *pResidualProperty =  bCavlc ? CHROMA_AC : CHROMA_AC_V;
 	  break;
+    // Reference to Table 7-2
+ case LUMA_DC_AC_INTRA_8:
+    *pMBproperty = 6;
+    *pResidualProperty = LUMA_DC_AC_8;
+    break;
+ case LUMA_DC_AC_INTER_8:
+    *pMBproperty = 7;
+    *pResidualProperty = LUMA_DC_AC_8;
+    break;
  }
   }
 

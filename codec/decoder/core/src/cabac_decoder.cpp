@@ -74,7 +74,7 @@ int32_t InitCabacDecEngineFromBS (PWelsCabacDecEngine pDecEngine, PBitStringAux 
   uint8_t* pCurr;
 
   pCurr = pBsAux->pCurBuf - iRemainingBytes;
-  if(pCurr >= (pBsAux->pEndBuf - 1)) {
+  if (pCurr >= (pBsAux->pEndBuf - 1)) {
     return ERR_INFO_INVALID_ACCESS;
   }
   pDecEngine->uiOffset = ((pCurr[0] << 16) | (pCurr[1] << 8) | pCurr[2]);

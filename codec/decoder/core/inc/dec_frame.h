@@ -68,10 +68,12 @@ struct TagDqLayer {
   int16_t	(*pMv[LIST_A])[MB_BLOCK4x4_NUM][MV_A];
   int16_t	(*pMvd[LIST_A])[MB_BLOCK4x4_NUM][MV_A];
   int8_t	(*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM];
+  bool*    pNoSubMbPartSizeLessThan8x8Flag;
+  bool*    pTransformSize8x8Flag;
   int8_t*  pLumaQp;
   int8_t  (*pChromaQp)[2];
   int8_t*  pCbp;
-  uint8_t *pCbfDc;
+  uint16_t *pCbfDc;
   int8_t (*pNzc)[24];
   int8_t (*pNzcRs)[24];
   int8_t*  pResidualPredFlag;
@@ -81,6 +83,7 @@ struct TagDqLayer {
   int16_t (*pScaledTCoeff)[MB_COEFF_LIST_SIZE];
   int8_t (*pIntraPredMode)[8];  //0~3 top4x4 ; 4~6 left 4x4; 7 intra16x16
   int8_t (*pIntra4x4FinalMode)[MB_BLOCK4x4_NUM];
+  uint8_t  *pIntraNxNAvailFlag;
   int8_t*  pChromaPredMode;
   //uint8_t (*motion_pred_flag[LIST_A])[MB_PARTITION_SIZE]; // 8x8
   int8_t (*pSubMbType)[MB_SUB_PARTITION_SIZE];
@@ -132,7 +135,6 @@ typedef struct TagGpuAvcLayer {
   int8_t*					pCbp;
   int8_t	(*pNzc)[24];
   int8_t	(*pIntraPredMode)[8];     //0~3 top4x4 ; 4~6 left 4x4; 7 intra16x16
-
   int32_t					iMbX;
   int32_t					iMbY;
   int32_t					iMbXyIndex;

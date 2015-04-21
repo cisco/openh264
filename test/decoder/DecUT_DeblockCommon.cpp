@@ -721,6 +721,10 @@ TEST (DecoderDeblocking, FilteringEdgeLumaHV) {
   sDqLayer.iMbY = 0; //Only for test easy
   sDqLayer.iMbXyIndex = 1;  // this function has NO iMbXyIndex validation
 
+  bool bTSize8x8Flag[50] = {false};
+  sDqLayer.pTransformSize8x8Flag = bTSize8x8Flag;
+  sDqLayer.pTransformSize8x8Flag[sDqLayer.iMbXyIndex] = false;
+
 #define UT_DB_LUMA_TEST(iFlag, iQP, iV0, iV1, iV2) \
   iBoundryFlag = iFlag; \
   memset(iLumaQP, iQP, sizeof(int8_t)*50); \
@@ -776,6 +780,10 @@ TEST (DecoderDeblocking, DeblockingBsMarginalMBAvcbase) {
 
   sDqLayer.pMv[0] = (int16_t (*) [16][2])&iLayerMv[0];
   sDqLayer.pMv[1] = (int16_t (*) [16][2])&iLayerMv[1];
+
+  bool bTSize8x8Flag[50] = {false};
+  sDqLayer.pTransformSize8x8Flag = bTSize8x8Flag;
+  memset (bTSize8x8Flag, 0, sizeof (bool) * 50);
 
 #define UT_DB_CLEAN_STATUS \
   memset(iNoZeroCount, 0, sizeof(int8_t)*24*2); \
@@ -883,6 +891,10 @@ TEST (Deblocking, WelsDeblockingMb) {
   sDqLayer.iMbXyIndex = 1;
   sDqLayer.iMbWidth = 1;
 
+  bool bTSize8x8Flag[50] = {false};
+  sDqLayer.pTransformSize8x8Flag = bTSize8x8Flag;
+  memset (bTSize8x8Flag, 0, sizeof (bool) * 50);
+
   uint8_t iY[50] = {0};
   sFilter.pCsData[0] = iY;
   sFilter.iCsStride[0] = 4;
@@ -922,19 +934,19 @@ TEST (Deblocking, WelsDeblockingMb) {
   EXPECT_TRUE(iCb[2<<1]==iChromaV1 && iCr[2<<1]==iChromaV1)<<iQP<<" "<<sDqLayer.pMbType[1]; \
   EXPECT_TRUE(iCb[(2<<1)*sFilter.iCsStride[1]]==iChromaV2 && iCr[(2<<1)*sFilter.iCsStride[1]]==iChromaV2)<<iQP<<" "<<sDqLayer.pMbType[1];
 
-  // QP>16, LEFT & TOP, Intra mode MB_TYPE_INTRA4x4 
+  // QP>16, LEFT & TOP, Intra mode MB_TYPE_INTRA4x4
   iQP = 16 + rand() % 35;
   sDqLayer.pMbType[1] = MB_TYPE_INTRA4x4;
   UT_DB_MACROBLOCK_TEST (0x03, iQP, 2, 1, 1, 2, 1, 1)
 
-  // QP>16, LEFT & TOP, Intra mode MB_TYPE_INTRA16x16 
+  // QP>16, LEFT & TOP, Intra mode MB_TYPE_INTRA16x16
   iQP = 16 + rand() % 35;
   sDqLayer.pMbType[1] = MB_TYPE_INTRA16x16;
   UT_DB_MACROBLOCK_TEST (0x03, iQP, 2, 1, 1, 2, 1, 1)
 
   // MbType==0x03, Intra8x8 has not been supported now.
 
-  // QP>16, LEFT & TOP, Intra mode MB_TYPE_INTRA_PCM 
+  // QP>16, LEFT & TOP, Intra mode MB_TYPE_INTRA_PCM
   iQP = 16 + rand() % 35;
   sDqLayer.pMbType[1] = MB_TYPE_INTRA_PCM;
   UT_DB_MACROBLOCK_TEST (0x03, iQP, 2, 1, 1, 2, 1, 1)

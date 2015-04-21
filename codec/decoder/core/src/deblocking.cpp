@@ -136,6 +136,19 @@ static const uint8_t g_kuiTableBIdx[2][8] = {
   },
 };
 
+static const uint8_t g_kuiTableB8x8Idx[2][16] = {
+  {
+    0,  1,  4,  5,  8,  9,  12, 13,   // 0   1 |  2  3
+    2,  3,  6,  7, 10, 11,  14, 15    // 4   5 |  6  7
+  },                                  // ------------
+  // 8   9 | 10 11
+  {
+    // 12 13 | 14 15
+    0,  1,  4,  5,  2,  3,  6,  7,
+    8,  9,  12, 13, 10, 11, 14, 15
+  },
+};
+
 #define TC0_TBL_LOOKUP(tc, iIndexA, pBS, bChroma) \
 {\
 	tc[0] = g_kiTc0Table(iIndexA)[pBS[0]] + bChroma;\
@@ -170,7 +183,22 @@ void inline DeblockingBSInsideMBAvsbase (int8_t* pNnzTab, uint8_t nBS[2][4][4], 
   nBS[0][2][3] = (pNnzTab[13] | pNnzTab[14]) << iLShiftFactor;
   nBS[0][3][3] = (pNnzTab[14] | pNnzTab[15]) << iLShiftFactor;
   * (uint32_t*)nBS[1][3] = (uiNnz32b2 | uiNnz32b3) << iLShiftFactor;
+}
 
+void inline DeblockingBSInsideMBAvsbase8x8 (int8_t* pNnzTab, uint8_t nBS[2][4][4], int32_t iLShiftFactor) {
+  int8_t i8x8NnzTab[4];
+  for (int32_t i = 0; i < 4; i++) {
+    int32_t iBlkIdx = i << 2;
+    i8x8NnzTab[i] = (pNnzTab[g_kuiMbCountScan4Idx[iBlkIdx]] | pNnzTab[g_kuiMbCountScan4Idx[iBlkIdx + 1]] |
+                     pNnzTab[g_kuiMbCountScan4Idx[iBlkIdx + 2]] | pNnzTab[g_kuiMbCountScan4Idx[iBlkIdx + 3]]);
+  }
+
+  //vertical
+  nBS[0][2][0] = nBS[0][2][1] = (i8x8NnzTab[0] | i8x8NnzTab[1]) << iLShiftFactor;
+  nBS[0][2][2] = nBS[0][2][3] = (i8x8NnzTab[2] | i8x8NnzTab[3]) << iLShiftFactor;
+  //horizontal
+  nBS[1][2][0] = nBS[1][2][1] = (i8x8NnzTab[0] | i8x8NnzTab[2]) << iLShiftFactor;
+  nBS[1][2][2] = nBS[1][2][3] = (i8x8NnzTab[1] | i8x8NnzTab[3]) << iLShiftFactor;
 }
 
 void static inline DeblockingBSInsideMBNormal (PDqLayer pCurDqLayer, uint8_t nBS[2][4][4], int8_t* pNnzTab,
@@ -179,73 +207,148 @@ void static inline DeblockingBSInsideMBNormal (PDqLayer pCurDqLayer, uint8_t nBS
   int8_t* iRefIndex = pCurDqLayer->pRefIndex[LIST_0][iMbXy];
   ENFORCE_STACK_ALIGN_1D (uint8_t, uiBsx4, 4, 4);
 
-  uiNnz32b0 = * (uint32_t*) (pNnzTab + 0);
-  uiNnz32b1 = * (uint32_t*) (pNnzTab + 4);
-  uiNnz32b2 = * (uint32_t*) (pNnzTab + 8);
-  uiNnz32b3 = * (uint32_t*) (pNnzTab + 12);
+  int8_t i8x8NnzTab[4];
 
-  for (int i = 0; i < 3; i++)
-    uiBsx4[i] = pNnzTab[i] | pNnzTab[i + 1];
-  nBS[0][1][0] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 1, 0);
-  nBS[0][2][0] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 2, 1);
-  nBS[0][3][0] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 3, 2);
+  if (pCurDqLayer->pTransformSize8x8Flag[iMbXy]) {
+    for (int32_t i = 0; i < 4; i++) {
+      int32_t iBlkIdx = i << 2;
+      i8x8NnzTab[i] = (pNnzTab[g_kuiMbCountScan4Idx[iBlkIdx]] | pNnzTab[g_kuiMbCountScan4Idx[iBlkIdx + 1]] |
+                       pNnzTab[g_kuiMbCountScan4Idx[iBlkIdx + 2]] | pNnzTab[g_kuiMbCountScan4Idx[iBlkIdx + 3]]);
+    }
+    //vertical
+    nBS[0][2][0] = nBS[0][2][1] = BS_EDGE ((i8x8NnzTab[0] | i8x8NnzTab[1]), iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy],
+                                           g_kuiMbCountScan4Idx[1 << 2], g_kuiMbCountScan4Idx[0]);
+    nBS[0][2][2] = nBS[0][2][3] = BS_EDGE ((i8x8NnzTab[2] | i8x8NnzTab[3]), iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy],
+                                           g_kuiMbCountScan4Idx[3 << 2], g_kuiMbCountScan4Idx[2 << 2]);
 
-  for (int i = 0; i < 3; i++)
-    uiBsx4[i] = pNnzTab[4 + i] | pNnzTab[4 + i + 1];
-  nBS[0][1][1] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 5, 4);
-  nBS[0][2][1] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 6, 5);
-  nBS[0][3][1] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 7, 6);
+    //horizontal
+    nBS[1][2][0] = nBS[1][2][1] = BS_EDGE ((i8x8NnzTab[0] | i8x8NnzTab[2]), iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy],
+                                           g_kuiMbCountScan4Idx[2 << 2], g_kuiMbCountScan4Idx[0]);
+    nBS[1][2][2] = nBS[1][2][3] = BS_EDGE ((i8x8NnzTab[1] | i8x8NnzTab[3]), iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy],
+                                           g_kuiMbCountScan4Idx[3 << 2], g_kuiMbCountScan4Idx[1 << 2]);
+  } else {
+    uiNnz32b0 = * (uint32_t*) (pNnzTab + 0);
+    uiNnz32b1 = * (uint32_t*) (pNnzTab + 4);
+    uiNnz32b2 = * (uint32_t*) (pNnzTab + 8);
+    uiNnz32b3 = * (uint32_t*) (pNnzTab + 12);
 
-  for (int i = 0; i < 3; i++)
-    uiBsx4[i] = pNnzTab[8 + i] | pNnzTab[8 + i + 1];
-  nBS[0][1][2] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 9, 8);
-  nBS[0][2][2] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 10, 9);
-  nBS[0][3][2] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 11, 10);
+    for (int i = 0; i < 3; i++)
+      uiBsx4[i] = pNnzTab[i] | pNnzTab[i + 1];
+    nBS[0][1][0] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 1, 0);
+    nBS[0][2][0] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 2, 1);
+    nBS[0][3][0] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 3, 2);
 
-  for (int i = 0; i < 3; i++)
-    uiBsx4[i] = pNnzTab[12 + i] | pNnzTab[12 + i + 1];
-  nBS[0][1][3] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 13, 12);
-  nBS[0][2][3] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 14, 13);
-  nBS[0][3][3] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 15, 14);
+    for (int i = 0; i < 3; i++)
+      uiBsx4[i] = pNnzTab[4 + i] | pNnzTab[4 + i + 1];
+    nBS[0][1][1] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 5, 4);
+    nBS[0][2][1] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 6, 5);
+    nBS[0][3][1] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 7, 6);
 
-  // horizontal
-  * (uint32_t*)uiBsx4 = (uiNnz32b0 | uiNnz32b1);
-  nBS[1][1][0] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 4, 0);
-  nBS[1][1][1] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 5, 1);
-  nBS[1][1][2] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 6, 2);
-  nBS[1][1][3] = BS_EDGE (uiBsx4[3], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 7, 3);
+    for (int i = 0; i < 3; i++)
+      uiBsx4[i] = pNnzTab[8 + i] | pNnzTab[8 + i + 1];
+    nBS[0][1][2] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 9, 8);
+    nBS[0][2][2] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 10, 9);
+    nBS[0][3][2] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 11, 10);
 
-  * (uint32_t*)uiBsx4 = (uiNnz32b1 | uiNnz32b2);
-  nBS[1][2][0] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 8, 4);
-  nBS[1][2][1] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 9, 5);
-  nBS[1][2][2] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 10, 6);
-  nBS[1][2][3] = BS_EDGE (uiBsx4[3], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 11, 7);
+    for (int i = 0; i < 3; i++)
+      uiBsx4[i] = pNnzTab[12 + i] | pNnzTab[12 + i + 1];
+    nBS[0][1][3] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 13, 12);
+    nBS[0][2][3] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 14, 13);
+    nBS[0][3][3] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 15, 14);
 
-  * (uint32_t*)uiBsx4 = (uiNnz32b2 | uiNnz32b3);
-  nBS[1][3][0] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 12, 8);
-  nBS[1][3][1] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 13, 9);
-  nBS[1][3][2] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 14, 10);
-  nBS[1][3][3] = BS_EDGE (uiBsx4[3], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 15, 11);
+    // horizontal
+    * (uint32_t*)uiBsx4 = (uiNnz32b0 | uiNnz32b1);
+    nBS[1][1][0] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 4, 0);
+    nBS[1][1][1] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 5, 1);
+    nBS[1][1][2] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 6, 2);
+    nBS[1][1][3] = BS_EDGE (uiBsx4[3], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 7, 3);
+
+    * (uint32_t*)uiBsx4 = (uiNnz32b1 | uiNnz32b2);
+    nBS[1][2][0] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 8, 4);
+    nBS[1][2][1] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 9, 5);
+    nBS[1][2][2] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 10, 6);
+    nBS[1][2][3] = BS_EDGE (uiBsx4[3], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 11, 7);
+
+    * (uint32_t*)uiBsx4 = (uiNnz32b2 | uiNnz32b3);
+    nBS[1][3][0] = BS_EDGE (uiBsx4[0], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 12, 8);
+    nBS[1][3][1] = BS_EDGE (uiBsx4[1], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 13, 9);
+    nBS[1][3][2] = BS_EDGE (uiBsx4[2], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 14, 10);
+    nBS[1][3][3] = BS_EDGE (uiBsx4[3], iRefIndex, pCurDqLayer->pMv[LIST_0][iMbXy], 15, 11);
+  }
 }
 
 uint32_t DeblockingBsMarginalMBAvcbase (PDqLayer pCurDqLayer, int32_t iEdge, int32_t iNeighMb, int32_t iMbXy) {
-  int32_t i;
+  int32_t i, j;
   uint32_t uiBSx4;
-  //uint8_t* bS = static_cast<uint8_t*>(&uiBSx4);
   uint8_t* pBS = (uint8_t*) (&uiBSx4);
-  const uint8_t* pBIdx  = &g_kuiTableBIdx[iEdge][0];
-  const uint8_t* pBnIdx = &g_kuiTableBIdx[iEdge][4];
+  const uint8_t* pBIdx      = &g_kuiTableBIdx[iEdge][0];
+  const uint8_t* pBnIdx     = &g_kuiTableBIdx[iEdge][4];
+  const uint8_t* pB8x8Idx   = &g_kuiTableB8x8Idx[iEdge][0];
+  const uint8_t* pBn8x8Idx  = &g_kuiTableB8x8Idx[iEdge][8];
 
-  for (i = 0; i < 4; i++) {
-    if (pCurDqLayer->pNzc[iMbXy][*pBIdx] | pCurDqLayer->pNzc[iNeighMb][*pBnIdx]) {
-      pBS[i] = 2;
-    } else {
-      pBS[i] = MB_BS_MV (pCurDqLayer->pRefIndex[LIST_0], pCurDqLayer->pMv[LIST_0], iMbXy, iNeighMb, *pBIdx,
-                         *pBnIdx);
+  if (pCurDqLayer->pTransformSize8x8Flag[iMbXy] && pCurDqLayer->pTransformSize8x8Flag[iNeighMb]) {
+    for (i = 0; i < 2; i++) {
+      uint8_t uiNzc = 0;
+      for (j = 0; uiNzc == 0 && j < 4; j++) {
+        uiNzc |= (pCurDqLayer->pNzc[iMbXy][* (pB8x8Idx + j)] | pCurDqLayer->pNzc[iNeighMb][* (pBn8x8Idx + j)]);
+      }
+      if (uiNzc) {
+        pBS[i << 1] = pBS[1 + (i << 1)] = 2;
+      } else {
+        pBS[i << 1] = pBS[1 + (i << 1)] = MB_BS_MV (pCurDqLayer->pRefIndex[LIST_0], pCurDqLayer->pMv[LIST_0], iMbXy, iNeighMb,
+                                          *pB8x8Idx, *pBn8x8Idx);
+      }
+      pB8x8Idx += 4;
+      pBn8x8Idx += 4;
     }
-    pBIdx++;
-    pBnIdx++;
+  } else if (pCurDqLayer->pTransformSize8x8Flag[iMbXy]) {
+    for (i = 0; i < 2; i++) {
+      uint8_t uiNzc = 0;
+      for (j = 0; uiNzc == 0 && j < 4; j++) {
+        uiNzc |= pCurDqLayer->pNzc[iMbXy][* (pB8x8Idx + j)];
+      }
+      for (j = 0; j < 2; j++) {
+        if (uiNzc | pCurDqLayer->pNzc[iNeighMb][*pBnIdx]) {
+          pBS[j + (i << 1)] = 2;
+        } else {
+          pBS[j + (i << 1)] = MB_BS_MV (pCurDqLayer->pRefIndex[LIST_0], pCurDqLayer->pMv[LIST_0], iMbXy, iNeighMb, *pB8x8Idx,
+                                        *pBnIdx);
+        }
+        pBnIdx++;
+      }
+      pB8x8Idx += 4;
+    }
+  } else if (pCurDqLayer->pTransformSize8x8Flag[iNeighMb]) {
+    for (i = 0; i < 2; i++) {
+      uint8_t uiNzc = 0;
+      for (j = 0; uiNzc == 0 && j < 4; j++) {
+        uiNzc |= pCurDqLayer->pNzc[iNeighMb][* (pBn8x8Idx + j)];
+      }
+      for (j = 0; j < 2; j++) {
+        if (uiNzc | pCurDqLayer->pNzc[iMbXy][*pBIdx]) {
+          pBS[j + (i << 1)] = 2;
+        } else {
+          pBS[j + (i << 1)] = MB_BS_MV (pCurDqLayer->pRefIndex[LIST_0], pCurDqLayer->pMv[LIST_0], iMbXy, iNeighMb, *pBIdx,
+                                        *pBn8x8Idx);
+        }
+        pBIdx++;
+      }
+      pBn8x8Idx += 4;
+    }
+  } else {
+    // only 4x4 transform
+    for (i = 0; i < 4; i++) {
+      if (pCurDqLayer->pNzc[iMbXy][*pBIdx] | pCurDqLayer->pNzc[iNeighMb][*pBnIdx]) {
+        pBS[i] = 2;
+      } else {
+        pBS[i] = MB_BS_MV (pCurDqLayer->pRefIndex[LIST_0], pCurDqLayer->pMv[LIST_0], iMbXy, iNeighMb, *pBIdx,
+                           *pBnIdx);
+      }
+      pBIdx++;
+      pBnIdx++;
+    }
   }
+
   return uiBSx4;
 }
 int32_t DeblockingAvailableNoInterlayer (PDqLayer pCurDqLayer, int32_t iFilterIdc) {
@@ -501,7 +604,7 @@ void DeblockingInterMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint8_
   pFilter->iChromaQP[0] = pCurChromaQp[0];
   pFilter->iChromaQP[1] = pCurChromaQp[1];
 
-  if (* (uint32_t*)nBS[0][1] != 0) {
+  if (* (uint32_t*)nBS[0][1] != 0 && !pCurDqLayer->pTransformSize8x8Flag[iMbXyIndex]) {
     FilteringEdgeLumaV (pFilter, &pDestY[1 << 2], iLineSize, nBS[0][1]);
   }
 
@@ -510,7 +613,7 @@ void DeblockingInterMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint8_
     FilteringEdgeChromaV (pFilter, &pDestCb[2 << 1], &pDestCr[2 << 1], iLineSizeUV, nBS[0][2]);
   }
 
-  if (* (uint32_t*)nBS[0][3] != 0) {
+  if (* (uint32_t*)nBS[0][3] != 0  && !pCurDqLayer->pTransformSize8x8Flag[iMbXyIndex]) {
     FilteringEdgeLumaV (pFilter, &pDestY[3 << 2], iLineSize, nBS[0][3]);
   }
 
@@ -536,7 +639,7 @@ void DeblockingInterMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint8_
   pFilter->iChromaQP[0] = pCurChromaQp[0];
   pFilter->iChromaQP[1] = pCurChromaQp[1];
 
-  if (* (uint32_t*)nBS[1][1] != 0) {
+  if (* (uint32_t*)nBS[1][1] != 0  && !pCurDqLayer->pTransformSize8x8Flag[iMbXyIndex]) {
     FilteringEdgeLumaH (pFilter, &pDestY[ (1 << 2)*iLineSize], iLineSize, nBS[1][1]);
   }
 
@@ -546,7 +649,7 @@ void DeblockingInterMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint8_
                           nBS[1][2]);
   }
 
-  if (* (uint32_t*)nBS[1][3] != 0) {
+  if (* (uint32_t*)nBS[1][3] != 0  && !pCurDqLayer->pTransformSize8x8Flag[iMbXyIndex]) {
     FilteringEdgeLumaH (pFilter, &pDestY[ (3 << 2)*iLineSize], iLineSize, nBS[1][3]);
   }
 }
@@ -581,9 +684,16 @@ void FilteringEdgeLumaHV (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int3
                           iBeta);
   if (iAlpha | iBeta) {
     TC0_TBL_LOOKUP (iTc, iIndexA, uiBSx4, 0);
-    pFilter->pLoopf->pfLumaDeblockingLT4Hor (&pDestY[1 << 2], iLineSize, iAlpha, iBeta, iTc);
+
+    if (!pCurDqLayer->pTransformSize8x8Flag[iMbXyIndex]) {
+      pFilter->pLoopf->pfLumaDeblockingLT4Hor (&pDestY[1 << 2], iLineSize, iAlpha, iBeta, iTc);
+    }
+
     pFilter->pLoopf->pfLumaDeblockingLT4Hor (&pDestY[2 << 2], iLineSize, iAlpha, iBeta, iTc);
-    pFilter->pLoopf->pfLumaDeblockingLT4Hor (&pDestY[3 << 2], iLineSize, iAlpha, iBeta, iTc);
+
+    if (!pCurDqLayer->pTransformSize8x8Flag[iMbXyIndex]) {
+      pFilter->pLoopf->pfLumaDeblockingLT4Hor (&pDestY[3 << 2], iLineSize, iAlpha, iBeta, iTc);
+    }
   }
 
   // luma h
@@ -594,9 +704,15 @@ void FilteringEdgeLumaHV (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int3
 
   pFilter->iLumaQP   = iCurQp;
   if (iAlpha | iBeta) {
-    pFilter->pLoopf->pfLumaDeblockingLT4Ver (&pDestY[ (1 << 2)*iLineSize], iLineSize, iAlpha, iBeta, iTc);
+    if (!pCurDqLayer->pTransformSize8x8Flag[iMbXyIndex]) {
+      pFilter->pLoopf->pfLumaDeblockingLT4Ver (&pDestY[ (1 << 2)*iLineSize], iLineSize, iAlpha, iBeta, iTc);
+    }
+
     pFilter->pLoopf->pfLumaDeblockingLT4Ver (&pDestY[ (2 << 2)*iLineSize], iLineSize, iAlpha, iBeta, iTc);
-    pFilter->pLoopf->pfLumaDeblockingLT4Ver (&pDestY[ (3 << 2)*iLineSize], iLineSize, iAlpha, iBeta, iTc);
+
+    if (!pCurDqLayer->pTransformSize8x8Flag[iMbXyIndex]) {
+      pFilter->pLoopf->pfLumaDeblockingLT4Ver (&pDestY[ (3 << 2)*iLineSize], iLineSize, iAlpha, iBeta, iTc);
+    }
   }
 }
 void FilteringEdgeChromaHV (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag) {
@@ -705,6 +821,7 @@ void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t
 
   switch (iCurMbType) {
   case MB_TYPE_INTRA4x4:
+  case MB_TYPE_INTRA8x8:
   case MB_TYPE_INTRA16x16:
   case MB_TYPE_INTRA_PCM:
     DeblockingIntraMb (pCurDqLayer, pFilter, iBoundryFlag);
@@ -728,7 +845,11 @@ void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t
     //SKIP MB_16x16 or others
     if (iCurMbType != MB_TYPE_SKIP) {
       if (iCurMbType == MB_TYPE_16x16) {
-        DeblockingBSInsideMBAvsbase (pCurDqLayer->pNzc[iMbXyIndex], nBS, 1);
+        if (!pCurDqLayer->pTransformSize8x8Flag[pCurDqLayer->iMbXyIndex]) {
+          DeblockingBSInsideMBAvsbase (pCurDqLayer->pNzc[iMbXyIndex], nBS, 1);
+        } else {
+          DeblockingBSInsideMBAvsbase8x8 (pCurDqLayer->pNzc[iMbXyIndex], nBS, 1);
+        }
       } else {
         DeblockingBSInsideMBNormal (pCurDqLayer, nBS, pCurDqLayer->pNzc[iMbXyIndex], iMbXyIndex);
       }
@@ -839,8 +960,8 @@ void  DeblockingInit (SDeblockingFunc*  pFunc,  int32_t iCpu) {
   if (iCpu & WELS_CPU_SSSE3) {
     pFunc->pfLumaDeblockingLT4Ver	= DeblockLumaLt4V_ssse3;
     pFunc->pfLumaDeblockingEQ4Ver	= DeblockLumaEq4V_ssse3;
-    pFunc->pfLumaDeblockingLT4Hor   = DeblockLumaLt4H_ssse3;
-    pFunc->pfLumaDeblockingEQ4Hor   = DeblockLumaEq4H_ssse3;
+    pFunc->pfLumaDeblockingLT4Hor       = DeblockLumaLt4H_ssse3;
+    pFunc->pfLumaDeblockingEQ4Hor       = DeblockLumaEq4H_ssse3;
     pFunc->pfChromaDeblockingLT4Ver	= DeblockChromaLt4V_ssse3;
     pFunc->pfChromaDeblockingEQ4Ver	= DeblockChromaEq4V_ssse3;
     pFunc->pfChromaDeblockingLT4Hor	= DeblockChromaLt4H_ssse3;

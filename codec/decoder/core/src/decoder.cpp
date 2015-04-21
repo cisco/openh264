@@ -862,6 +862,21 @@ void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
   pCtx->pGetI4x4LumaPredFunc[I4_PRED_HU    ] = WelsI4x4LumaPredHU_c;
   pCtx->pGetI4x4LumaPredFunc[I4_PRED_HD    ] = WelsI4x4LumaPredHD_c;
 
+  pCtx->pGetI8x8LumaPredFunc[I4_PRED_V     ] = WelsI8x8LumaPredV_c;
+  pCtx->pGetI8x8LumaPredFunc[I4_PRED_H     ] = WelsI8x8LumaPredH_c;
+  pCtx->pGetI8x8LumaPredFunc[I4_PRED_DC    ] = WelsI8x8LumaPredDc_c;
+  pCtx->pGetI8x8LumaPredFunc[I4_PRED_DC_L  ] = WelsI8x8LumaPredDcLeft_c;
+  pCtx->pGetI8x8LumaPredFunc[I4_PRED_DC_T  ] = WelsI8x8LumaPredDcTop_c;
+  pCtx->pGetI8x8LumaPredFunc[I4_PRED_DC_128] = WelsI8x8LumaPredDcNA_c;
+  pCtx->pGetI8x8LumaPredFunc[I4_PRED_DDL    ] = WelsI8x8LumaPredDDL_c;
+  pCtx->pGetI8x8LumaPredFunc[I4_PRED_DDL_TOP] = WelsI8x8LumaPredDDLTop_c;
+  pCtx->pGetI8x8LumaPredFunc[I4_PRED_DDR    ] = WelsI8x8LumaPredDDR_c;
+  pCtx->pGetI8x8LumaPredFunc[I4_PRED_VL    ] = WelsI8x8LumaPredVL_c;
+  pCtx->pGetI8x8LumaPredFunc[I4_PRED_VL_TOP] = WelsI8x8LumaPredVLTop_c;
+  pCtx->pGetI8x8LumaPredFunc[I4_PRED_VR    ] = WelsI8x8LumaPredVR_c;
+  pCtx->pGetI8x8LumaPredFunc[I4_PRED_HU    ] = WelsI8x8LumaPredHU_c;
+  pCtx->pGetI8x8LumaPredFunc[I4_PRED_HD    ] = WelsI8x8LumaPredHD_c;
+
   pCtx->pGetIChromaPredFunc[C_PRED_DC    ] = WelsIChromaPredDc_c;
   pCtx->pGetIChromaPredFunc[C_PRED_H     ] = WelsIChromaPredH_c;
   pCtx->pGetIChromaPredFunc[C_PRED_V     ] = WelsIChromaPredV_c;
@@ -871,6 +886,8 @@ void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
   pCtx->pGetIChromaPredFunc[C_PRED_DC_128] = WelsIChromaPredDcNA_c;
 
   pCtx->pIdctResAddPredFunc	= IdctResAddPred_c;
+
+  pCtx->pIdctResAddPredFunc8x8 = IdctResAddPred8x8_c;
 
 #if defined(HAVE_NEON)
   if (pCtx->uiCpuFlag & WELS_CPU_NEON) {
@@ -931,7 +948,7 @@ void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
   if (pCtx->uiCpuFlag & WELS_CPU_MMXEXT) {
     pCtx->pIdctResAddPredFunc	= IdctResAddPred_mmx;
 
-    /////////mmx code opt---
+    ///////mmx code opt---
     pCtx->pGetIChromaPredFunc[C_PRED_H]      = WelsDecoderIChromaPredH_mmx;
     pCtx->pGetIChromaPredFunc[C_PRED_V]      = WelsDecoderIChromaPredV_mmx;
     pCtx->pGetIChromaPredFunc[C_PRED_DC_L  ] = WelsDecoderIChromaPredDcLeft_mmx;
