@@ -60,6 +60,9 @@ CFLAGS += -fsanitize=address
 LDFLAGS += -fsanitize=address
 endif
 
+# Make sure the all target is the first one
+all: libraries binaries
+
 include $(SRC_PATH)build/platform-$(OS).mk
 
 
@@ -138,8 +141,6 @@ API_TEST_CFLAGS += $(CODEC_UNITTEST_CFLAGS)
 COMMON_UNITTEST_CFLAGS += $(CODEC_UNITTEST_CFLAGS)
 
 .PHONY: test gtest-bootstrap clean $(PROJECT_NAME).pc $(PROJECT_NAME)-static.pc
-
-all: libraries binaries
 
 generate-version:
 	$(QUIET)cd $(SRC_PATH) && sh ./codec/common/generate_version.sh

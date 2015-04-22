@@ -79,8 +79,6 @@ clean_Android_dec:
 clean_Android_enc:
 	-cd ./codec/build/android/enc && $(NDKROOT)/ndk-build APP_ABI=$(APP_ABI) clean && ant clean
 else
-all:
-	@:
 clean_Android:
 	@:
 endif
