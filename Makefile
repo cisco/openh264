@@ -76,13 +76,13 @@ endif
 
 #### No user-serviceable parts below this line
 ifneq ($(V),Yes)
-    QUIET_CXX = @printf "CXX\t$@\n";
-    QUIET_CC  = @printf "CC\t$@\n";
+    QUIET_CXX  = @printf "CXX\t$@\n";
+    QUIET_CC   = @printf "CC\t$@\n";
     QUIET_CCAS = @printf "CCAS\t$@\n";
-    QUIET_ASM = @printf "ASM\t$@\n";
-    QUIET_AR  = @printf "AR\t$@\n";
-    QUIET_RC  = @printf "RC\t$@\n";
-    QUIET     = @
+    QUIET_ASM  = @printf "ASM\t$@\n";
+    QUIET_AR   = @printf "AR\t$@\n";
+    QUIET_RC   = @printf "RC\t$@\n";
+    QUIET      = @
 endif
 
 
