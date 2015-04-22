@@ -29,8 +29,10 @@ PROJECT_NAME=openh264
 MODULE_NAME=gmpopenh264
 GMP_API_BRANCH=Firefox39
 CCASFLAGS=$(CFLAGS)
-VERSION=1.4
 STATIC_LDFLAGS=-lstdc++
+
+VERSION=1.4
+SHAREDLIBVERSION=0
 
 ifeq (,$(wildcard $(SRC_PATH)gmp-api))
 HAVE_GMP_API=No
@@ -58,7 +60,6 @@ CFLAGS += -fsanitize=address
 LDFLAGS += -fsanitize=address
 endif
 
-SHAREDLIBVERSION=0
 include $(SRC_PATH)build/platform-$(OS).mk
 
 
