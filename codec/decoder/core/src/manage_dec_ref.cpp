@@ -296,13 +296,18 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
       }
 
     } else {
-      iRet = SlidingWindow (pCtx);
-      if (iRet != ERR_NONE) {
-        if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
-          iRet = RemainOneBufferInDpbForEC (pCtx);
-        } else {
-          return iRet;
+      if (pRefPic->uiShortRefCount[0] > 0) {
+        iRet = SlidingWindow (pCtx);
+        if (iRet != ERR_NONE) {
+          if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
+            iRet = RemainOneBufferInDpbForEC (pCtx);
+          } else {
+            return iRet;
+          }
         }
+      } else {
+        WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "No reference picture in buffer");
+        return ERR_INFO_INVALID_MMCO_REF_NUM_NOT_ENOUGH;
       }
     }
   }
@@ -573,20 +578,20 @@ static int32_t RemainOneBufferInDpbForEC (PWelsDecoderContext pCtx) {
   if (pRefPic->uiShortRefCount[0] > 0) {
     iRet = SlidingWindow (pCtx);
   } else { //all LTR, remove the smallest long_term_frame_idx
-    uint32_t uiLongTermFrameIdx = 0;
-    uint32_t uiMaxLongTermFrameIdx = pRefPic->iMaxLongTermFrameIdx;
+    int32_t iLongTermFrameIdx = 0;
+    int32_t iMaxLongTermFrameIdx = pRefPic->iMaxLongTermFrameIdx;
 #ifdef LONG_TERM_REF
-    uint32_t uiCurrLTRFrameIdx = GetLTRFrameIndex (pRefPic, pCtx->iFrameNumOfAuMarkedLtr);
+    int32_t iCurrLTRFrameIdx = GetLTRFrameIndex (pRefPic, pCtx->iFrameNumOfAuMarkedLtr);
 #endif
-    while ((pRefPic->uiLongRefCount[0] >= pCtx->pSps->iNumRefFrames) && (uiLongTermFrameIdx <= uiMaxLongTermFrameIdx)) {
+    while ((pRefPic->uiLongRefCount[0] >= pCtx->pSps->iNumRefFrames) && (iLongTermFrameIdx <= iMaxLongTermFrameIdx)) {
 #ifdef LONG_TERM_REF
-      if (uiLongTermFrameIdx == uiCurrLTRFrameIdx) {
-        uiLongTermFrameIdx++;
+      if (iLongTermFrameIdx == iCurrLTRFrameIdx) {
+        iLongTermFrameIdx++;
         continue;
       }
 #endif
-      WelsDelLongFromListSetUnref (pRefPic, uiLongTermFrameIdx);
-      uiLongTermFrameIdx++;
+      WelsDelLongFromListSetUnref (pRefPic, iLongTermFrameIdx);
+      iLongTermFrameIdx++;
     }
   }
   if (pRefPic->uiShortRefCount[0] + pRefPic->uiLongRefCount[0] >=
