@@ -177,7 +177,7 @@ endif
 
 else
 test:
-	@echo "./gtest : No such file or directory."
+	@echo "./gtest: No such file or directory."
 	@echo "You do not have gtest. Run make gtest-bootstrap to get gtest"
 endif
 
@@ -227,7 +227,7 @@ plugin: $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX)
 LIBRARIES += $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIXVER)
 else
 plugin:
-	@echo "./gmp-api : No such file or directory."
+	@echo "./gmp-api: No such file or directory."
 	@echo "You do not have gmp-api.  Run make gmp-bootstrap to get the gmp-api headers."
 endif
 

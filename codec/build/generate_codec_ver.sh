@@ -4,14 +4,14 @@
 #
 
 if [ "$1"x = ""x ]; then
-	echo "Please input the version number as : major_ver.minor_ver.patch.reserve"
+	echo "Please input the version number as: major_ver.minor_ver.patch.reserve"
 	exit 127
 fi
 
 codec_ver=`echo "$1" | egrep  "^([0-9]+[.]){3}[0-9]+$"`
 
 if [ $? -ne 0 ]; then
-	echo "Please input the version number as : major_ver.minor_ver.patch.reserve"
+	echo "Please input the version number as: major_ver.minor_ver.patch.reserve"
 	exit 127
 fi
 

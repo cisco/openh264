@@ -339,9 +339,9 @@ runOutputPassNum()
   echo ""
   echo "***********************************************************"
   echo "${TestSequenceName}"
-  echo "total case  Num is :  ${TotalCaseNum}"
-  echo "pass  case  Num is : ${PassCaseNum}"
-  echo "unpass case Num is : ${UnpassCaseNum} "
+  echo "total case  Num is: ${TotalCaseNum}"
+  echo "pass  case  Num is: ${PassCaseNum}"
+  echo "unpass case Num is: ${UnpassCaseNum}"
   echo "***********************************************************"
   echo ""
 }

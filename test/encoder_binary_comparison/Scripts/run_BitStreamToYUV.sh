@@ -83,7 +83,7 @@ run_RegularizeYUVName()
   RegularizedYUVName="${BitStreamName}_${aDecodedYUVInfo[0]}x${aDecodedYUVInfo[1]}.yuv"
   mv -f  ${OrignName}   ${RegularizedYUVName}
   echo ""
-  echo "file :  ${OrignName}   has been renamed as :${RegularizedYUVName}"
+  echo "file: ${OrignName}   has been renamed as: ${RegularizedYUVName}"
   echo ""
   return 0
 }
