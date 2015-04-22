@@ -64,7 +64,7 @@ MODULE_INCLUDES = $(STL_INCLUDES)
 MODULE_LDFLAGS = $(STL_LIB)
 
 ifeq (./,$(SRC_PATH))
-binaries : decdemo encdemo
+binaries: decdemo encdemo
 
 decdemo: libraries
 	cd ./codec/build/android/dec && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
