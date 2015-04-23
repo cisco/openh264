@@ -423,6 +423,10 @@ static int32_t SlidingWindow (PWelsDecoderContext pCtx) {
   int32_t i = 0;
 
   if (pCtx->sRefPic.uiShortRefCount[LIST_0] + pCtx->sRefPic.uiLongRefCount[LIST_0] >= pCtx->pSps->iNumRefFrames) {
+    if (pCtx->sRefPic.uiShortRefCount[LIST_0] == 0) {
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "No reference picture in short term list when sliding window");
+      return ERR_INFO_INVALID_MMCO_REF_NUM_NOT_ENOUGH;
+    }
     for (i = pRefPic->uiShortRefCount[LIST_0] - 1; i >= 0; i--) {
       pPic = WelsDelShortFromList (pRefPic, pRefPic->pShortRefList[LIST_0][i]->iFrameNum);
       if (pPic) {
@@ -573,20 +577,20 @@ static int32_t RemainOneBufferInDpbForEC (PWelsDecoderContext pCtx) {
   if (pRefPic->uiShortRefCount[0] > 0) {
     iRet = SlidingWindow (pCtx);
   } else { //all LTR, remove the smallest long_term_frame_idx
-    uint32_t uiLongTermFrameIdx = 0;
-    uint32_t uiMaxLongTermFrameIdx = pRefPic->iMaxLongTermFrameIdx;
+    int32_t iLongTermFrameIdx = 0;
+    int32_t iMaxLongTermFrameIdx = pRefPic->iMaxLongTermFrameIdx;
 #ifdef LONG_TERM_REF
-    uint32_t uiCurrLTRFrameIdx = GetLTRFrameIndex (pRefPic, pCtx->iFrameNumOfAuMarkedLtr);
+    int32_t iCurrLTRFrameIdx = GetLTRFrameIndex (pRefPic, pCtx->iFrameNumOfAuMarkedLtr);
 #endif
-    while ((pRefPic->uiLongRefCount[0] >= pCtx->pSps->iNumRefFrames) && (uiLongTermFrameIdx <= uiMaxLongTermFrameIdx)) {
+    while ((pRefPic->uiLongRefCount[0] >= pCtx->pSps->iNumRefFrames) && (iLongTermFrameIdx <= iMaxLongTermFrameIdx)) {
 #ifdef LONG_TERM_REF
-      if (uiLongTermFrameIdx == uiCurrLTRFrameIdx) {
-        uiLongTermFrameIdx++;
+      if (iLongTermFrameIdx == iCurrLTRFrameIdx) {
+        iLongTermFrameIdx++;
         continue;
       }
 #endif
-      WelsDelLongFromListSetUnref (pRefPic, uiLongTermFrameIdx);
-      uiLongTermFrameIdx++;
+      WelsDelLongFromListSetUnref (pRefPic, iLongTermFrameIdx);
+      iLongTermFrameIdx++;
     }
   }
   if (pRefPic->uiShortRefCount[0] + pRefPic->uiLongRefCount[0] >=
