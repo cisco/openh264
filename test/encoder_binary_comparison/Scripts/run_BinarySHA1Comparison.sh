@@ -56,25 +56,25 @@ runGlobalVariableDef()
 runEncoderCommandInital()
 {
   aEncoderCommandSet=( -utype  -frms  -numl   -numtl \
-  				-sw -sh  "-dw 0"  "-dh 0" "-dw 1" "-dh 1" "-dw 2" "-dh 2" "-dw 3" "-dh 3" \
-  				"-frout 0" "-frout 1" "-frout 2" "-frout 3" \
-  				"-lqp 0" "-lqp 1" "-lqp 2" "-lqp 3" \
-  				-rc -tarb "-ltarb 0" 	"-ltarb 1" "-ltarb 2" "-ltarb 3" \
-  				"-slcmd 0" "-slcnum 0" "-slcmd 1" "-slcnum 1"\
-  				"-slcmd 2" "-slcnum 2" "-slcmd 3" "-slcnum 3"\
-  				-nalsize \
-  				-iper   -thread    -ltr \
-  				-db  -denois    -scene    -bgd    -aq )
+                                -sw -sh  "-dw 0"  "-dh 0" "-dw 1" "-dh 1" "-dw 2" "-dh 2" "-dw 3" "-dh 3" \
+                                "-frout 0" "-frout 1" "-frout 2" "-frout 3" \
+                                "-lqp 0" "-lqp 1" "-lqp 2" "-lqp 3" \
+                                -rc -tarb "-ltarb 0"    "-ltarb 1" "-ltarb 2" "-ltarb 3" \
+                                "-slcmd 0" "-slcnum 0" "-slcmd 1" "-slcnum 1"\
+                                "-slcmd 2" "-slcnum 2" "-slcmd 3" "-slcnum 3"\
+                                -nalsize \
+                                -iper   -thread    -ltr \
+                                -db  -denois    -scene    -bgd    -aq )
   aEncoderCommandName=(usagetype  frms  numl   numtl \
-  				sw sh  dw0 dh0 dw1 dh1 dw2 dh2 dw3 dh3 \
-  				frout0 frout1 frout2 frout3 \
-  				lqp0 lqp1 lqp2 lqp3 \
-  				rc tarb ltarb0 	ltarb1 ltarb2 ltarb3 \
-  				slcmd0 slcnum0 slcmd1 slcnum1 \
-  				slcmd2 slcnum2 slcmd3 slcnum3 \
-  				MaxNalSZ  \
-  				iper   thread  ltr \
-  				db  denois  scene  bgd  aq )
+                                sw sh  dw0 dh0 dw1 dh1 dw2 dh2 dw3 dh3 \
+                                frout0 frout1 frout2 frout3 \
+                                lqp0 lqp1 lqp2 lqp3 \
+                                rc tarb ltarb0  ltarb1 ltarb2 ltarb3 \
+                                slcmd0 slcnum0 slcmd1 slcnum1 \
+                                slcmd2 slcnum2 slcmd3 slcnum3 \
+                                MaxNalSZ  \
+                                iper   thread  ltr \
+                                db  denois  scene  bgd  aq )
   NumParameter=${#aEncoderCommandSet[@]}
   for ((i=0;i<NumParameter; i++))
   do
@@ -103,27 +103,27 @@ runGlobalVariableInitial()
   UpdateSHA1TableFile="${FinalResultPath}/${TestSequenceName}_UpdateSHA1Table.csv"
   HeadLine1="BitMatched Status, SHA-1-Target, SHA-1-Benchmark, MD5-Target, MD5-Benchmark,\
             Bitstream-Target,Bitstream-Benchmark,YUV-Target,YUV-Benchmark,\
-  		-utype,  -frms,  -numl,  -numtl, -sw, -sh,\
-  		-dw 0, -dh 0, -dw 1, -dh 1, -dw 2, -dh 2, -dw 3, -dh 3,\
-  		-frout 0,  -frout 1, -frout 2, -frout 3,\
-  		-lqp 0, -lqp 1, -lqp 2, -lqp 3,\
-  		-rc, -tarb, -ltarb 0, -ltarb 1, -ltarb 2, -ltarb 3,\
-  		-slcmd 0, -slcnum 0, -slcmd 1, -slcnum 1,\
-  		-slcmd 2, -slcnum 2, -slcmd 3, -slcnum 3,\
-  		-nalsize,\
-  		-iper, -thread, -ltr, -db, -denois,\
-  		-scene,  -bgd ,  -aq, "
+                -utype,  -frms,  -numl,  -numtl, -sw, -sh,\
+                -dw 0, -dh 0, -dw 1, -dh 1, -dw 2, -dh 2, -dw 3, -dh 3,\
+                -frout 0,  -frout 1, -frout 2, -frout 3,\
+                -lqp 0, -lqp 1, -lqp 2, -lqp 3,\
+                -rc, -tarb, -ltarb 0, -ltarb 1, -ltarb 2, -ltarb 3,\
+                -slcmd 0, -slcnum 0, -slcmd 1, -slcnum 1,\
+                -slcmd 2, -slcnum 2, -slcmd 3, -slcnum 3,\
+                -nalsize,\
+                -iper, -thread, -ltr, -db, -denois,\
+                -scene,  -bgd ,  -aq, "
   HeadLine2="SHA-1 Value, MD5String, BitStreamSize, YUVSize, \
-  		-utype,  -frms,  -numl,  -numtl, -sw, -sh,\
-  		-dw 0, -dh 0, -dw 1, -dh 1,-dw 2, -dh 2, -dw 3, -dh 3,\
-  		-frout 0,  -frout 1, -frout 2, -frout 3,\
-  		-lqp 0, -lqp 1, -lqp 2, -lqp 3,\
-  		-rc, -tarb, -ltarb 0, -ltarb 1, -ltarb 2, -ltarb 3,\
-  		-slcmd 0, -slcnum 0, -slcmd 1, -slcnum 1,\
-  		-slcmd 2, -slcnum 2, -slcmd 3, -slcnum 3,\
-  		-nalsize,\
-  		-iper, -thread, -ltr, -db, -denois,\
-  		-scene  , bgd  , -aq "
+                -utype,  -frms,  -numl,  -numtl, -sw, -sh,\
+                -dw 0, -dh 0, -dw 1, -dh 1,-dw 2, -dh 2, -dw 3, -dh 3,\
+                -frout 0,  -frout 1, -frout 2, -frout 3,\
+                -lqp 0, -lqp 1, -lqp 2, -lqp 3,\
+                -rc, -tarb, -ltarb 0, -ltarb 1, -ltarb 2, -ltarb 3,\
+                -slcmd 0, -slcnum 0, -slcmd 1, -slcnum 1,\
+                -slcmd 2, -slcnum 2, -slcmd 3, -slcnum 3,\
+                -nalsize,\
+                -iper, -thread, -ltr, -db, -denois,\
+                -scene  , bgd  , -aq "
   echo ${HeadLine1}>${AllCasePassStatusFile}
   echo ${HeadLine1}>${UnpassCaseFile}
   echo ${HeadLine2}>${UpdateSHA1TableFile}
@@ -152,8 +152,8 @@ runParseCaseInfo()
 {
   if [ $#  -lt 1  ]
   then
-  	echo "no parameter!"
-  	return 1
+        echo "no parameter!"
+        return 1
   fi
   local TempData=""
   local CaseData=$@
@@ -169,18 +169,18 @@ runParseCaseInfo()
   let "TempParamFlag=0"
   for((i=0; i<$NumParameter; i++))
   do
-  	for ParnmIndex in ${aTempParamIndex[@]}
-  	do
-  	  if [  $i -eq ${ParnmIndex} ]
-  	  then
-  			let "TempParamFlag=1"
-  	  fi
-  	done
-  	if [ ${TempParamFlag} -eq 0 ]
-  	then
-  		BitstreamPrefix=${BitstreamPrefix}_${aEncoderCommandName[$i]}_${aEncoderCommandValue[$i]}
-  	fi
-  	let "TempParamFlag=0"
+        for ParnmIndex in ${aTempParamIndex[@]}
+        do
+          if [  $i -eq ${ParnmIndex} ]
+          then
+                        let "TempParamFlag=1"
+          fi
+        done
+        if [ ${TempParamFlag} -eq 0 ]
+        then
+                BitstreamPrefix=${BitstreamPrefix}_${aEncoderCommandName[$i]}_${aEncoderCommandValue[$i]}
+        fi
+        let "TempParamFlag=0"
   done
 
   BitstreamTarget=${TempDataPath}/${TestSequenceName}_${BitstreamPrefix}_codec_target.264
@@ -195,44 +195,44 @@ runEncodeOneCase()
 
   for ((i=4; i<${NumParameter}; i++))
   do
-  	ParamCommand="${ParamCommand} ${aEncoderCommandSet[$i]}  ${aEncoderCommandValue[$i]} "
+        ParamCommand="${ParamCommand} ${aEncoderCommandSet[$i]}  ${aEncoderCommandValue[$i]} "
   done
   for((i=0;i<4;i++))
   do
-  	aRecYUVFileList[$i]="${TempDataPath}/${TestYUVName}_rec${i}.yuv"
+        aRecYUVFileList[$i]="${TempDataPath}/${TestYUVName}_rec${i}.yuv"
   done
   ParamCommand="${aEncoderCommandSet[0]} ${aEncoderCommandValue[0]} ${aEncoderCommandSet[1]}  ${aEncoderCommandValue[1]} \
-  			 ${aEncoderCommandSet[2]}  ${aEncoderCommandValue[2]} \
-  			-lconfig 0 layer0.cfg -lconfig 1 layer1.cfg -lconfig 2 layer2.cfg  -lconfig 3 layer3.cfg  \
-  			${aEncoderCommandSet[3]}  ${aEncoderCommandValue[3]}  \
-  			${ParamCommand}"
+                         ${aEncoderCommandSet[2]}  ${aEncoderCommandValue[2]} \
+                        -lconfig 0 layer0.cfg -lconfig 1 layer1.cfg -lconfig 2 layer2.cfg  -lconfig 3 layer3.cfg  \
+                        ${aEncoderCommandSet[3]}  ${aEncoderCommandValue[3]}  \
+                        ${ParamCommand}"
   echo ""
   echo "---------------Encode One Case-------------------------------------------"
   echo "case line is :"
   EncoderCommand="./h264enc  welsenc.cfg    ${ParamCommand} -bf   ${BitStreamFile} \
-  			-drec 0 ${aRecYUVFileList[0]} -drec 1 ${aRecYUVFileList[1]} \
-  			-drec 2 ${aRecYUVFileList[2]} -drec 3 ${aRecYUVFileList[3]} \
-  			-org ${TestSequencePath}/${TestSequenceName}"
+                        -drec 0 ${aRecYUVFileList[0]} -drec 1 ${aRecYUVFileList[1]} \
+                        -drec 2 ${aRecYUVFileList[2]} -drec 3 ${aRecYUVFileList[3]} \
+                        -org ${TestSequencePath}/${TestSequenceName}"
   echo ${EncoderCommand}
   echo -e  "\n\n"
   ./h264enc  welsenc.cfg    ${ParamCommand} -bf   ${BitStreamFile} \
-  			-drec 0 ${aRecYUVFileList[0]} -drec 1 ${aRecYUVFileList[1]} \
-  			-drec 2 ${aRecYUVFileList[2]} -drec 3 ${aRecYUVFileList[3]} \
-  			-org ${TestSequencePath}/${TestSequenceName} 2>${EncoderLogFile}
+                        -drec 0 ${aRecYUVFileList[0]} -drec 1 ${aRecYUVFileList[1]} \
+                        -drec 2 ${aRecYUVFileList[2]} -drec 3 ${aRecYUVFileList[3]} \
+                        -org ${TestSequencePath}/${TestSequenceName} 2>${EncoderLogFile}
   if [ $? -eq 0  ]
   then
-  	let "EncoderFlag=0"
+        let "EncoderFlag=0"
   else
-  	let "EncoderFlag=1"
+        let "EncoderFlag=1"
   fi
 
   #delete the core down file as core down files for disk space limitation
   for file in  ./core*
   do
-  	if [ -e ${file} ]
-  	then
-  		./run_SafeDelete.sh  ${file}
-  	fi
+        if [ -e ${file} ]
+        then
+                ./run_SafeDelete.sh  ${file}
+        fi
   done
   return 0
 }
