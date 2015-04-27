@@ -29,8 +29,10 @@ PROJECT_NAME=openh264
 MODULE_NAME=gmpopenh264
 GMP_API_BRANCH=Firefox39
 CCASFLAGS=$(CFLAGS)
-VERSION=1.4
 STATIC_LDFLAGS=-lstdc++
+
+VERSION=1.4
+SHAREDLIBVERSION=0
 
 ifeq (,$(wildcard $(SRC_PATH)gmp-api))
 HAVE_GMP_API=No
@@ -58,7 +60,9 @@ CFLAGS += -fsanitize=address
 LDFLAGS += -fsanitize=address
 endif
 
-SHAREDLIBVERSION=0
+# Make sure the all target is the first one
+all: libraries binaries
+
 include $(SRC_PATH)build/platform-$(OS).mk
 
 
@@ -72,13 +76,13 @@ endif
 
 #### No user-serviceable parts below this line
 ifneq ($(V),Yes)
-    QUIET_CXX = @printf "CXX\t$@\n";
-    QUIET_CC  = @printf "CC\t$@\n";
+    QUIET_CXX  = @printf "CXX\t$@\n";
+    QUIET_CC   = @printf "CC\t$@\n";
     QUIET_CCAS = @printf "CCAS\t$@\n";
-    QUIET_ASM = @printf "ASM\t$@\n";
-    QUIET_AR  = @printf "AR\t$@\n";
-    QUIET_RC  = @printf "RC\t$@\n";
-    QUIET     = @
+    QUIET_ASM  = @printf "ASM\t$@\n";
+    QUIET_AR   = @printf "AR\t$@\n";
+    QUIET_RC   = @printf "RC\t$@\n";
+    QUIET      = @
 endif
 
 
@@ -138,8 +142,6 @@ COMMON_UNITTEST_CFLAGS += $(CODEC_UNITTEST_CFLAGS)
 
 .PHONY: test gtest-bootstrap clean $(PROJECT_NAME).pc $(PROJECT_NAME)-static.pc
 
-all: libraries binaries
-
 generate-version:
 	$(QUIET)cd $(SRC_PATH) && sh ./codec/common/generate_version.sh
 
@@ -176,7 +178,7 @@ endif
 
 else
 test:
-	@echo "./gtest : No such file or directory."
+	@echo "./gtest: No such file or directory."
 	@echo "You do not have gtest. Run make gtest-bootstrap to get gtest"
 endif
 
@@ -226,7 +228,7 @@ plugin: $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX)
 LIBRARIES += $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIXVER)
 else
 plugin:
-	@echo "./gmp-api : No such file or directory."
+	@echo "./gmp-api: No such file or directory."
 	@echo "You do not have gmp-api.  Run make gmp-bootstrap to get the gmp-api headers."
 endif
 
