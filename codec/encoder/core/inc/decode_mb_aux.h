@@ -70,7 +70,7 @@ void WelsIDctRecI16x16Dc_sse2 (uint8_t* pRec, int32_t iStride, uint8_t* pPredict
                                int16_t* pDctDc);
 #endif//X86_ASM
 
-#ifdef	HAVE_NEON
+#ifdef HAVE_NEON
 void WelsDequantFour4x4_neon (int16_t* pDct, const uint16_t* kpMF);
 void WelsDequant4x4_neon (int16_t* pDct, const uint16_t* kpMF);
 void WelsDequantIHadamard4x4_neon (int16_t* pRes, const uint16_t kuiMF);
@@ -81,7 +81,7 @@ void WelsIDctRecI16x16Dc_neon (uint8_t* pRec, int32_t iStride, uint8_t* pPredict
                                int16_t* pDctDc);
 #endif
 
-#ifdef	HAVE_NEON_AARCH64
+#ifdef HAVE_NEON_AARCH64
 void WelsDequantFour4x4_AArch64_neon (int16_t* pDct, const uint16_t* kpMF);
 void WelsDequant4x4_AArch64_neon (int16_t* pDct, const uint16_t* kpMF);
 void WelsDequantIHadamard4x4_AArch64_neon (int16_t* pRes, const uint16_t kuiMF);

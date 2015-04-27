@@ -30,7 +30,7 @@
  *
  */
 
-#ifdef  HAVE_NEON_AARCH64
+#ifdef HAVE_NEON_AARCH64
 #include "arm_arch64_common_macro.S"
 
 .macro ZERO_COUNT_IN_2_QUARWORD arg0, arg1, arg2

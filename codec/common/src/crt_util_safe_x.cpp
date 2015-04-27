@@ -56,9 +56,9 @@
 #include "macros.h"
 #include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross platforms
 
-#if  defined(_WIN32) && defined(_MSC_VER)
+#if defined(_WIN32) && defined(_MSC_VER)
 
-#if  defined(_MSC_VER) && (_MSC_VER>=1500)
+#if defined(_MSC_VER) && (_MSC_VER>=1500)
 
 int32_t WelsSnprintf (char* pBuffer,  int32_t iSizeOfBuffer, const char* kpFormat, ...) {
   va_list  pArgPtr;

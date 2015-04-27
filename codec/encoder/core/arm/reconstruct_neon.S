@@ -30,7 +30,7 @@
  *
  */
 
-#ifdef  HAVE_NEON
+#ifdef HAVE_NEON
 #include "arm_arch_common_macro.S"
 
 .macro LOAD_4x4_DATA_FOR_DCT arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7

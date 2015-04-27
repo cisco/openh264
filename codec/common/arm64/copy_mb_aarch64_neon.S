@@ -30,7 +30,7 @@
  *
  */
 
-#ifdef  HAVE_NEON_AARCH64
+#ifdef HAVE_NEON_AARCH64
 #include "arm_arch64_common_macro.S"
 
 .macro LOAD_ALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5

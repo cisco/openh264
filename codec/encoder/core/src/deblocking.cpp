@@ -776,12 +776,12 @@ void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
 
 void WelsBlockFuncInit (PSetNoneZeroCountZeroFunc* pfSetNZCZero,  int32_t iCpu) {
   *pfSetNZCZero = WelsNonZeroCount_c;
-#ifdef	HAVE_NEON
+#ifdef HAVE_NEON
   if (iCpu & WELS_CPU_NEON) {
     *pfSetNZCZero = WelsNonZeroCount_neon;
   }
 #endif
-#ifdef	HAVE_NEON_AARCH64
+#ifdef HAVE_NEON_AARCH64
   if (iCpu & WELS_CPU_NEON) {
     *pfSetNZCZero = WelsNonZeroCount_AArch64_neon;
   }

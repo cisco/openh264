@@ -2005,7 +2005,7 @@ void WelsBlockFuncInit (SBlockFunc*   pFunc,  int32_t iCpu) {
   pFunc->pWelsBlockZero16x16Func	    = WelsBlockZero16x16_c;
   pFunc->pWelsBlockZero8x8Func          = WelsBlockZero8x8_c;
 
-#ifdef	HAVE_NEON
+#ifdef HAVE_NEON
   if (iCpu & WELS_CPU_NEON) {
     pFunc->pWelsSetNonZeroCountFunc		= WelsNonZeroCount_neon;
     pFunc->pWelsBlockZero16x16Func	    = WelsBlockZero16x16_neon;
@@ -2013,7 +2013,7 @@ void WelsBlockFuncInit (SBlockFunc*   pFunc,  int32_t iCpu) {
   }
 #endif
 
-#ifdef	HAVE_NEON_AARCH64
+#ifdef HAVE_NEON_AARCH64
   if (iCpu & WELS_CPU_NEON) {
     pFunc->pWelsSetNonZeroCountFunc		= WelsNonZeroCount_AArch64_neon;
     pFunc->pWelsBlockZero16x16Func	    = WelsBlockZero16x16_AArch64_neon;
