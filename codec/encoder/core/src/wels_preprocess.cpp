@@ -1232,7 +1232,7 @@ void CWelsPreProcess::UpdateSrcList (SPicture*	pCurPicture, const int32_t kiCurD
   //pRefSrcList[0] is for current frame
   if (pCurPicture->bUsedAsRef || pCurPicture->bIsLongRef) {
     if (pCurPicture->iPictureType == P_SLICE && pCurPicture->uiTemporalId != 0) {
-      for (int iRefIdx = kuiShortRefCount - 1; iRefIdx >= 0; --iRefIdx)	{
+      for (int iRefIdx = kuiShortRefCount - 1; iRefIdx >= 0; --iRefIdx) {
         WelsExchangeSpatialPictures (&pRefSrcList[iRefIdx + 1],
                                      &pRefSrcList[iRefIdx]);
       }

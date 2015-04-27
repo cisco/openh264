@@ -745,7 +745,7 @@ long IsKeyFrameLost (ISVCDecoder* pDecoder, SLTRRecoverRequest* p_LTR_Recover_Re
     bLost = NO_RECOVERY_REQUSET;
   } else if (hr & dsNoParamSets) {
     bLost = IDR_RECOVERY_REQUEST;
-  } else if (((hr & dsRefLost) && (1 == temple_id)) || ((dsErrorFree != hr) && (0 == temple_id)))	{
+  } else if (((hr & dsRefLost) && (1 == temple_id)) || ((dsErrorFree != hr) && (0 == temple_id))) {
     bLost = LTR_RECOVERY_REQUEST;
   } else {
     bLost = NO_RECOVERY_REQUSET;
@@ -765,14 +765,14 @@ void LTRRecoveryRequest (ISVCDecoder* pDecoder, ISVCEncoder* pEncoder, SLTRRecov
   if (m_P2PmodeFlag) {
     if (bKLost == IDR_RECOVERY_REQUEST) {
       pEncoder->ForceIntraFrame (true);
-    } else if (bKLost == LTR_RECOVERY_REQUEST)	{
+    } else if (bKLost == LTR_RECOVERY_REQUEST) {
       p_LTR_Recover_Request->uiFeedbackType = LTR_RECOVERY_REQUEST;
       pDecoder->GetOption (DECODER_OPTION_FRAME_NUM, &p_LTR_Recover_Request->iCurrentFrameNum);
       pDecoder->GetOption (DECODER_OPTION_IDR_PIC_ID, &p_LTR_Recover_Request->uiIDRPicId);
       pEncoder->SetOption (ENCODER_LTR_RECOVERY_REQUEST, p_LTR_Recover_Request);
     }
   } else {
-    if (bKLost == IDR_RECOVERY_REQUEST || bKLost == LTR_RECOVERY_REQUEST)	{
+    if (bKLost == IDR_RECOVERY_REQUEST || bKLost == LTR_RECOVERY_REQUEST) {
       p_LTR_Recover_Request->uiFeedbackType = IDR_RECOVERY_REQUEST;
       pEncoder->ForceIntraFrame (true);
     }

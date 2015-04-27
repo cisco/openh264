@@ -214,7 +214,7 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
   AndroidCpuFamily cpuFamily = ANDROID_CPU_FAMILY_UNKNOWN;
   uint64_t         uiFeatures = 0;
   cpuFamily = android_getCpuFamily();
-  if (cpuFamily == ANDROID_CPU_FAMILY_ARM)	{
+  if (cpuFamily == ANDROID_CPU_FAMILY_ARM) {
     uiFeatures = android_getCpuFeatures();
     if (uiFeatures & ANDROID_CPU_ARM_FEATURE_ARMv7) {
       uiCPU |= WELS_CPU_ARMv7;
