@@ -154,15 +154,15 @@ enum {
 * @brief Information of coded Slice(=NAL)(s)
 */
 typedef struct SliceInformation {
-  unsigned char* pBufferOfSlices;	 ///< base buffer of coded slice(s)
+  unsigned char* pBufferOfSlices;    ///< base buffer of coded slice(s)
   int            iCodedSliceCount;   ///< number of coded slices
-  unsigned int*	 pLengthOfSlices;	 ///< array of slices length accordingly by number of slice
+  unsigned int*  pLengthOfSlices;    ///< array of slices length accordingly by number of slice
   int            iFecType;           ///< FEC type[0, 50%FEC, 100%FEC]
-  unsigned char	 uiSliceIdx;         ///< index of slice in frame [FMO: 0,..,uiSliceCount-1; No FMO: 0]
-  unsigned char	 uiSliceCount;       ///< count number of slice in frame [FMO: 2-8; No FMO: 1]
+  unsigned char  uiSliceIdx;         ///< index of slice in frame [FMO: 0,..,uiSliceCount-1; No FMO: 0]
+  unsigned char  uiSliceCount;       ///< count number of slice in frame [FMO: 2-8; No FMO: 1]
   char           iFrameIndex;        ///< index of frame[-1, .., idr_interval-1]
-  unsigned char	 uiNalRefIdc;        ///< NRI, priority level of slice(NAL)
-  unsigned char	 uiNalType;          ///< NAL type
+  unsigned char  uiNalRefIdc;        ///< NRI, priority level of slice(NAL)
+  unsigned char  uiNalType;          ///< NAL type
   unsigned char
   uiContainingFinalNal;              ///< whether final NAL is involved in buffer of coded slices, flag used in Pause feature in T27
 } SliceInfo, *PSliceInfo;

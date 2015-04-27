@@ -65,10 +65,10 @@
 ///
 /// E.g. SDK version is 1.2.0.0, major version number is 1, minor version number is 2, and revision number is 0.
 typedef struct  _tagVersion {
-  unsigned int uMajor;				///< The major version number
-  unsigned int uMinor;				///< The minor version number
-  unsigned int uRevision;				///< The revision number
-  unsigned int uReserved;				///< The reserved number, it should be 0.
+  unsigned int uMajor;                  ///< The major version number
+  unsigned int uMinor;                  ///< The minor version number
+  unsigned int uRevision;               ///< The revision number
+  unsigned int uReserved;               ///< The reserved number, it should be 0.
 } OpenH264Version;
 
 /**
@@ -355,10 +355,10 @@ typedef struct {
 * @brief  Structure for spatial layer configuration
 */
 typedef struct {
-  int	iVideoWidth;           ///< width of picture in luminance samples of a layer
-  int	iVideoHeight;          ///< height of picture in luminance samples of a layer
-  float	fFrameRate;            ///< frame rate specified for a layer
-  int	iSpatialBitrate;       ///< target bitrate for a spatial layer
+  int   iVideoWidth;           ///< width of picture in luminance samples of a layer
+  int   iVideoHeight;          ///< height of picture in luminance samples of a layer
+  float fFrameRate;            ///< frame rate specified for a layer
+  int   iSpatialBitrate;       ///< target bitrate for a spatial layer
   int   iMaxSpatialBitrate;    ///< maximum  bitrate for a spatial layer
   EProfileIdc  uiProfileIdc;   ///< value of profile IDC (PRO_UNKNOWN for auto-detection)
   ELevelIdc    uiLevelIdc;     ///< value of profile IDC (0 for auto-detection)
@@ -406,7 +406,7 @@ typedef struct TagEncParamBase {
 
   int       iPicWidth;        ///< width of picture in luminance samples (the maximum of all layers if multiple spatial layers presents)
   int       iPicHeight;       ///< height of picture in luminance samples((the maximum of all layers if multiple spatial layers presents)
-  int       iTargetBitrate;	  ///< target bitrate desired
+  int       iTargetBitrate;   ///< target bitrate desired
   RC_MODES  iRCMode;          ///< rate control mode
   float     fMaxFrameRate;    ///< maximal input frame rate
 
@@ -420,7 +420,7 @@ typedef struct TagEncParamExt {
   iUsageType;                          ///< application type;1.CAMERA_VIDEO_REAL_TIME:camera video signal;2.SCREEN_CONTENT_REAL_TIME:screen content signal;
 
   int       iPicWidth;                 ///< width of picture in luminance samples (the maximum of all layers if multiple spatial layers presents)
-  int       iPicHeight;			       ///< height of picture in luminance samples((the maximum of all layers if multiple spatial layers presents)
+  int       iPicHeight;                ///< height of picture in luminance samples((the maximum of all layers if multiple spatial layers presents)
   int       iTargetBitrate;            ///< target bitrate desired
   RC_MODES  iRCMode;                   ///< rate control mode
   float     fMaxFrameRate;             ///< maximal input frame rate
@@ -458,7 +458,7 @@ typedef struct TagEncParamExt {
   /* Deblocking loop filter */
   int       iLoopFilterDisableIdc;     ///< 0: on, 1: off, 2: on except for slice boundaries
   int       iLoopFilterAlphaC0Offset;  ///< AlphaOffset: valid range [-6, 6], default 0
-  int       iLoopFilterBetaOffset;	   ///< BetaOffset:	valid range [-6, 6], default 0
+  int       iLoopFilterBetaOffset;     ///< BetaOffset: valid range [-6, 6], default 0
   /*pre-processing feature*/
   bool    bEnableDenoise;              ///< denoise control
   bool    bEnableBackgroundDetection;  ///< background detection control //VAA_BACKGROUND_DETECTION //BGD cmd
@@ -481,11 +481,11 @@ typedef struct {
 * @brief SVC Decoding Parameters, reserved here and potential applicable in the future
 */
 typedef struct TagSVCDecodingParam {
-  char*		pFileNameRestructed;       ///< file name of reconstructed frame used for PSNR calculation based debug
+  char*     pFileNameRestructed;       ///< file name of reconstructed frame used for PSNR calculation based debug
 
   EVideoFormatType eOutputColorFormat; ///< color space format to be outputed, EVideoFormatType specified in codec_def.h
-  unsigned int	uiCpuLoad;             ///< CPU load
-  unsigned char	uiTargetDqLayer;       ///< setting target dq layer id
+  unsigned int  uiCpuLoad;             ///< CPU load
+  unsigned char uiTargetDqLayer;       ///< setting target dq layer id
 
   ERROR_CON_IDC eEcActiveIdc;          ///< whether active error concealment feature in decoder
   bool bParseOnly;                     ///< decoder for parse only, no reconstruction. When it is true, SPS/PPS size should not exceed SPS_PPS_BS_SIZE (128). Otherwise, it will return error info
@@ -504,27 +504,27 @@ typedef struct {
   unsigned char uiLayerType;
 
   int   iNalCount;              ///< count number of NAL coded already
-  int*  pNalLengthInByte;	    ///< length of NAL size in byte from 0 to iNalCount-1
-  unsigned char*  pBsBuf;		///< buffer of bitstream contained
+  int*  pNalLengthInByte;       ///< length of NAL size in byte from 0 to iNalCount-1
+  unsigned char*  pBsBuf;       ///< buffer of bitstream contained
 } SLayerBSInfo, *PLayerBSInfo;
 
 /**
 * @brief Frame bit stream info
 */
 typedef struct {
-  int		iTemporalId;	   ///< temporal ID
+  int iTemporalId;              ///< temporal ID
 
   /**
   * The sub sequence layers are ordered hierarchically based on their dependency on each other so that any picture in a layer shall not be
   * predicted from any picture on any higher layer.
   */
-  int	    iSubSeqId;         ///< refer to D.2.11 Sub-sequence information SEI message semantics
+  int iSubSeqId;                ///< refer to D.2.11 Sub-sequence information SEI message semantics
 
-  int		iLayerNum;
-  SLayerBSInfo	sLayerInfo[MAX_LAYER_NUM_OF_FRAME];
+  int           iLayerNum;
+  SLayerBSInfo  sLayerInfo[MAX_LAYER_NUM_OF_FRAME];
 
   EVideoFrameType eFrameType;
-  int   iFrameSizeInBytes;
+  int iFrameSizeInBytes;
   long long uiTimeStamp;
 } SFrameBSInfo, *PFrameBSInfo;
 
@@ -532,9 +532,9 @@ typedef struct {
 *  @brief Structure for source picture
 */
 typedef struct Source_Picture_s {
-  int       iColorFormat;	       ///< color space type
-  int       iStride[4];		       ///< stride for each plane pData
-  unsigned char*  pData[4];		   ///< plane pData
+  int       iColorFormat;          ///< color space type
+  int       iStride[4];            ///< stride for each plane pData
+  unsigned char*  pData[4];        ///< plane pData
   int       iPicWidth;             ///< luma picture width in x coordinate
   int       iPicHeight;            ///< luma picture height in y coordinate
   long long uiTimeStamp;
@@ -640,31 +640,30 @@ typedef struct TagVideoEncoderStatistics {
 * @brief  Structure for decoder statistics
 */
 typedef struct TagVideoDecoderStatistics {
-  unsigned int uiWidth;	                       ///< the width of encode/decode frame
+  unsigned int uiWidth;                        ///< the width of encode/decode frame
   unsigned int uiHeight;                       ///< the height of encode/decode frame
   float fAverageFrameSpeedInMs;                ///< average_Decoding_Time
   float fActualAverageFrameSpeedInMs;          ///< actual average_Decoding_Time, including freezing pictures
   unsigned int uiDecodedFrameCount;            ///< number of frames
   unsigned int uiResolutionChangeTimes;        ///< uiResolutionChangeTimes
-  unsigned int uiIDRCorrectNum;	               ///< number of correct IDR received
+  unsigned int uiIDRCorrectNum;                ///< number of correct IDR received
   //EC on related
   unsigned int
   uiAvgEcRatio;                                ///< when EC is on, the average ratio of total EC areas, can be an indicator of reconstruction quality
   unsigned int
-  uiAvgEcPropRatio;                                ///< when EC is on, the rough average ratio of propogate EC areas, can be an indicator of reconstruction quality
+  uiAvgEcPropRatio;                            ///< when EC is on, the rough average ratio of propogate EC areas, can be an indicator of reconstruction quality
   unsigned int uiEcIDRNum;                     ///< number of actual unintegrity IDR or not received but eced
   unsigned int uiEcFrameNum;                   ///<
   unsigned int uiIDRLostNum;                   ///< number of whole lost IDR
-  unsigned int
-  uiFreezingIDRNum;               ///< number of freezing IDR with error (partly received), under resolution change
+  unsigned int uiFreezingIDRNum;               ///< number of freezing IDR with error (partly received), under resolution change
   unsigned int uiFreezingNonIDRNum;            ///< number of freezing non-IDR with error
   int iAvgLumaQp;                              ///< average luma QP. default: -1, no correct frame outputted
-  int iSpsReportErrorNum;             ///< number of Sps Invalid report
-  int iSubSpsReportErrorNum;          ///< number of SubSps Invalid report
-  int iPpsReportErrorNum;             ///< number of Pps Invalid report
-  int			iSpsNoExistNalNum;          ///< number of Sps NoExist Nal
-  int			iSubSpsNoExistNalNum;       ///< number of SubSps NoExist Nal
-  int			iPpsNoExistNalNum;          ///< number of Pps NoExist Nal
+  int iSpsReportErrorNum;                      ///< number of Sps Invalid report
+  int iSubSpsReportErrorNum;                   ///< number of SubSps Invalid report
+  int iPpsReportErrorNum;                      ///< number of Pps Invalid report
+  int iSpsNoExistNalNum;                       ///< number of Sps NoExist Nal
+  int iSubSpsNoExistNalNum;                    ///< number of SubSps NoExist Nal
+  int iPpsNoExistNalNum;                       ///< number of Pps NoExist Nal
 } SDecoderStatistics; // in building, coming soon
 
 #endif//WELS_VIDEO_CODEC_APPLICATION_DEFINITION_H__
