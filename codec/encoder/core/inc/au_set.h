@@ -29,12 +29,12 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	au_set.h
+ * \file    au_set.h
  *
- * \brief	Interfaces introduced in Access Unit level based writer
+ * \brief   Interfaces introduced in Access Unit level based writer
  *
- * \date	05/18/2009 Created
- *			05/21/2009 Added init_sps and init_pps
+ * \date    05/18/2009 Created
+ *          05/21/2009 Added init_sps and init_pps
  *
  *************************************************************************************
  */

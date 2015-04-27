@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	nal_encap.h
+ * \file    nal_encap.h
  *
- * \brief	NAL pRawNal pData encapsulation
+ * \brief   NAL pRawNal pData encapsulation
  *
- * \date	2/4/2009 Created
+ * \date    2/4/2009 Created
  *
  *************************************************************************************
  */

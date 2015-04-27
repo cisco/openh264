@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	slice_segment.h
+ * \file    slice_segment.h
  *
- * \brief	SSlice segment routine (Single slice/multiple slice/fmo arrangement exclusive)
+ * \brief   SSlice segment routine (Single slice/multiple slice/fmo arrangement exclusive)
  *
- * \date	2/4/2009 Created
+ * \date    2/4/2009 Created
  *
  *************************************************************************************
  */

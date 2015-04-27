@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	set_mb_syn_cabac.h
+ * \file    set_mb_syn_cabac.h
  *
- * \brief	Seting all syntax elements of mb and encoding residual with cabac
+ * \brief   Seting all syntax elements of mb and encoding residual with cabac
  *
- * \date	09/27/2014 Created
+ * \date    09/27/2014 Created
  *
  *************************************************************************************
  */

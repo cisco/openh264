@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	svc_encode_slice.h
+ * \file    svc_encode_slice.h
  *
- * \brief	svc encoding slice
+ * \brief   svc encoding slice
  *
- * \date	2009.07.27 Created
+ * \date    2009.07.27 Created
  *
  *************************************************************************************
  */

@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	svc_mode_decision.h
+ * \file    svc_mode_decision.h
  *
- * \brief	SVC Spatial Enhancement Layer MD
+ * \brief   SVC Spatial Enhancement Layer MD
  *
- * \date	2009.7.29 Created
+ * \date    2009.7.29 Created
  *
  *************************************************************************************
  */

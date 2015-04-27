@@ -29,10 +29,10 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \brief	Tool kits for decoder
- *		( malloc, realloc, free, log output and PSNR calculation and so on )
+ * \brief   Tool kits for decoder
+ *          ( malloc, realloc, free, log output and PSNR calculation and so on )
  *
- * \date	03/10/2009 Created
+ * \date    03/10/2009 Created
  *
  *************************************************************************************
  */

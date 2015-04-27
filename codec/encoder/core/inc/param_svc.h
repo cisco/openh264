@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	param_svc.h
+ * \file    param_svc.h
  *
- * \brief	Configurable parameters in H.264/SVC Encoder
+ * \brief   Configurable parameters in H.264/SVC Encoder
  *
- * \date	4/20/2009 Created
+ * \date    4/20/2009 Created
  *
  *************************************************************************************
  */

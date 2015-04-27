@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	utils.c
+ * \file    utils.c
  *
- * \brief	common tool/function utilization
+ * \brief   common tool/function utilization
  *
- * \date	03/10/2009 Created
+ * \date    03/10/2009 Created
  *
  *************************************************************************************
  */

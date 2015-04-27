@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	golomb_common.h
+ * \file    golomb_common.h
  *
- * \brief	Exponential Golomb entropy coding/decoding routine
+ * \brief   Exponential Golomb entropy coding/decoding routine
  *
- * \date	03/12/2015 Created
+ * \date    03/12/2015 Created
  *
  *************************************************************************************
  */

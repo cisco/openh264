@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	crt_util_safe_x.h
+ * \file    crt_util_safe_x.h
  *
- * \brief	Safe CRT like util for cross platfroms support
+ * \brief   Safe CRT like util for cross platfroms support
  *
- * \date	06/04/2010 Created
+ * \date    06/04/2010 Created
  *
  *************************************************************************************
  */

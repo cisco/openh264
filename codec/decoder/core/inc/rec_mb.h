@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	rec_mb.h
+ * \file    rec_mb.h
  *
- * \brief	interfaces for all macroblock decoding process after mb syntax parsing and residual decoding with cavlc.
+ * \brief   interfaces for all macroblock decoding process after mb syntax parsing and residual decoding with cavlc.
  *
- * \date	3/4/2009 Created
+ * \date    3/4/2009 Created
  *
  *************************************************************************************
  */

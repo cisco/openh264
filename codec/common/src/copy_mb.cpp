@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	copy_mb.cpp
+ * \file    copy_mb.cpp
  *
- * \brief	copy MB YUV data
+ * \brief   copy MB YUV data
  *
- * \date	2014.04.14 Created
+ * \date    2014.04.14 Created
  *
  *************************************************************************************
  */

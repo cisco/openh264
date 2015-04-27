@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	au_parser.c
+ * \file    au_parser.c
  *
- * \brief	Interfaces introduced in Access Unit level based parser
+ * \brief   Interfaces introduced in Access Unit level based parser
  *
- * \date	03/10/2009 Created
+ * \date    03/10/2009 Created
  *
  *************************************************************************************
  */

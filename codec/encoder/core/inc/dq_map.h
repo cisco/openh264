@@ -29,13 +29,13 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	dq_map.h
+ * \file    dq_map.h
  *
- * \brief	Dependency Quality layer IDC mapping for cross layer selection and jumpping.
- *			DQ layer idc map for svc encoding, might be a better scheme than that of design before,
- *			can aware idc of referencing layer and that idc of successive layer to be coded
+ * \brief   Dependency Quality layer IDC mapping for cross layer selection and jumpping.
+ *          DQ layer idc map for svc encoding, might be a better scheme than that of design before,
+ *          can aware idc of referencing layer and that idc of successive layer to be coded
  *
- * \date	4/22/2009 Created
+ * \date    4/22/2009 Created
  *
  *************************************************************************************
  */

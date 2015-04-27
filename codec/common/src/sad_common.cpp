@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	sample.c
+ * \file    sample.c
  *
- * \brief	compute SAD and SATD
+ * \brief   compute SAD and SATD
  *
- * \date	2009.06.02 Created
+ * \date    2009.06.02 Created
  *
  *************************************************************************************
  */

@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	md.c
+ * \file    md.c
  *
- * \brief	mode decision
+ * \brief   mode decision
  *
- * \date	2009.05.14 Created
+ * \date    2009.05.14 Created
  *
  *************************************************************************************
  */

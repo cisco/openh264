@@ -28,7 +28,7 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- *	decoder_core.c:	Wels decoder framework core implementation
+ *      decoder_core.c: Wels decoder framework core implementation
  */
 
 #include "decoder_core.h"

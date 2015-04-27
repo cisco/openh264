@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	svc_base_layer_md.h
+ * \file    svc_base_layer_md.h
  *
- * \brief	mode decision
+ * \brief   mode decision
  *
- * \date	2009.08.10 Created
+ * \date    2009.08.10 Created
  *
  *************************************************************************************
  */

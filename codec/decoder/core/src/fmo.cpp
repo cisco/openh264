@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	fmo.c
+ * \file    fmo.c
  *
- * \brief	Flexible Macroblock Ordering implementation
+ * \brief   Flexible Macroblock Ordering implementation
  *
- * \date	2/4/2009 Created
+ * \date    2/4/2009 Created
  *
  *************************************************************************************
  */

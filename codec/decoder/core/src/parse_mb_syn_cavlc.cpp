@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	parse_mb_syn_cavlc.c
+ * \file    parse_mb_syn_cavlc.c
  *
- * \brief	Interfaces implementation for parsing the syntax of MB
+ * \brief   Interfaces implementation for parsing the syntax of MB
  *
- * \date	03/17/2009 Created
+ * \date    03/17/2009 Created
  *
  *************************************************************************************
  */

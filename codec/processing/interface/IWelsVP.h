@@ -29,9 +29,9 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	    :  IWelsVP.h
+ * \file        :  IWelsVP.h
  *
- * \brief	    :  Interface of wels video processor class
+ * \brief       :  Interface of wels video processor class
  *
  * \date        :  2011/01/04
  *

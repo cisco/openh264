@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	extern.h
+ * \file    extern.h
  *
- * \brief	extern interfaces between core and plus of wels encoder
+ * \brief   extern interfaces between core and plus of wels encoder
  *
- * \date	4/21/2009 Created
+ * \date    4/21/2009 Created
  *
  *************************************************************************************
  */

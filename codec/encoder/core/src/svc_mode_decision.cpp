@@ -29,13 +29,13 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	svc_mode_decision.c
+ * \file    svc_mode_decision.c
  *
  * \brief Algorithmetic MD for:
  * - multi-spatial Enhancement Layer MD;
  * - Scrolling PSkip Decision for screen content
  *
- * \date	2009.7.29
+ * \date    2009.7.29
  *
 
  **************************************************************************************

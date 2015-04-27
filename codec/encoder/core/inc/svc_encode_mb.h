@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	encode_mb.h
+ * \file    encode_mb.h
  *
- * \brief	interface for mb encoding
+ * \brief   interface for mb encoding
  *
- * \date	5/21/2009 Created
+ * \date    5/21/2009 Created
  *
  *************************************************************************************
  */

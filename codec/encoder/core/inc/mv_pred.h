@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	mv_pred.h
+ * \file    mv_pred.h
  *
- * \brief	Get MV predictor and update motion vector of mb cache
+ * \brief   Get MV predictor and update motion vector of mb cache
  *
- * \date	05/22/2009 Created
+ * \date    05/22/2009 Created
  *
  *************************************************************************************
  */

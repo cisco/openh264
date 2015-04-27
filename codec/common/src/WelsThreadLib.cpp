@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	WelsThreadLib.c
+ * \file    WelsThreadLib.c
  *
- * \brief	Interfaces introduced in thread programming
+ * \brief   Interfaces introduced in thread programming
  *
- * \date	11/17/2009 Created
+ * \date    11/17/2009 Created
  *
  *************************************************************************************
  */

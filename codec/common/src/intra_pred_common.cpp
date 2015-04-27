@@ -29,13 +29,13 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	get_intra_predictor.c
+ * \file    get_intra_predictor.c
  *
- * \brief	implementation for get intra predictor about 16x16, 4x4, chroma.
+ * \brief   implementation for get intra predictor about 16x16, 4x4, chroma.
  *
- * \date	4/2/2009 Created
- *			9/14/2009 C level based optimization with high performance gained.
- *				[const, using ST32/ST64 to replace memset, memcpy and memmove etc.]
+ * \date    4/2/2009 Created
+ *          9/14/2009 C level based optimization with high performance gained.
+ *              [const, using ST32/ST64 to replace memset, memcpy and memmove etc.]
  *
  *************************************************************************************
  */

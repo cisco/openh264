@@ -28,7 +28,7 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- *	cabac_decoder.cpp:	deals with cabac state transition and related functions
+ *      cabac_decoder.cpp:      deals with cabac state transition and related functions
  */
 #include "cabac_decoder.h"
 namespace WelsDec {

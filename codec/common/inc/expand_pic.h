@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file		expand_pic.h
+ * \file    expand_pic.h
  *
- * \brief		Interface for expanding reconstructed picture to be used for reference
+ * \brief   Interface for expanding reconstructed picture to be used for reference
  *
- * \date		06/08/2009
+ * \date    06/08/2009
  *************************************************************************************
  */
 

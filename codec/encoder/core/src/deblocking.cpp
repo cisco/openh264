@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	deblocking.c
+ * \file    deblocking.c
  *
- * \brief	Interfaces introduced in frame deblocking filtering
+ * \brief   Interfaces introduced in frame deblocking filtering
  *
- * \date	08/03/2009 Created
+ * \date    08/03/2009 Created
  *
  *************************************************************************************
  */

@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	cpu_core.h
+ * \file    cpu_core.h
  *
- * \brief	cpu core feature detection
+ * \brief   cpu core feature detection
  *
- * \date	4/24/2009 Created
+ * \date    4/24/2009 Created
  *
  *************************************************************************************
  */

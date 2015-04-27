@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	common.h
+ * \file    common.h
  *
- * \brief	common flag definitions
+ * \brief   common flag definitions
  *
- * \date	7/6/2009 Created
+ * \date    7/6/2009 Created
  *
  *************************************************************************************
  */

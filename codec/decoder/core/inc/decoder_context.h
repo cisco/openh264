@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	decoder_context.h
+ * \file    decoder_context.h
  *
- * \brief	mainly interface introduced in Wels decoder side
+ * \brief   mainly interface introduced in Wels decoder side
  *
- * \date	3/4/2009 Created
+ * \date    3/4/2009 Created
  *
  *************************************************************************************
  */

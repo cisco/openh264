@@ -28,7 +28,7 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- *	error_concealment.cpp:	Wels decoder error concealment implementation
+ *      error_concealment.cpp:  Wels decoder error concealment implementation
  */
 
 #include "error_code.h"

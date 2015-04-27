@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	mt_defs.h
+ * \file    mt_defs.h
  *
- * \brief	Main macros for multiple threading implementation
+ * \brief   Main macros for multiple threading implementation
  *
- * \date	2/26/2010 Created
+ * \date    2/26/2010 Created
  *
  *************************************************************************************
  */

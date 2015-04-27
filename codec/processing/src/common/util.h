@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	    :  util.h
+ * \file        :  util.h
  *
- * \brief	    :  utils for wels video processor class
+ * \brief       :  utils for wels video processor class
  *
  * \date        :  2011/01/04
  *
