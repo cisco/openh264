@@ -19,7 +19,7 @@ ANDROID_SDK_PATH=${ANDROID_HOME}
 ANDROID_NDK_PATH=${ANDROID_NDK_HOME}
 if [ "#${ANDROID_SDK_PATH}" = "#" ]
 then
-echo Please set ANDROID_HOME with the path of Android SDK 
+echo Please set ANDROID_HOME with the path of Android SDK
 exit 1
 fi
 if [ "#${ANDROID_NDK_PATH}" = "#" ]

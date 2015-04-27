@@ -105,7 +105,7 @@ struct TagDqLayer {
   int32_t					iInterLayerSliceBetaOffset;
   //SPosOffset			sScaledRefLayer;
   int32_t					iSliceGroupChangeCycle;
-  
+
   PRefPicListReorderSyn	pRefPicListReordering;
   PPredWeightTabSyn     pPredWeightTable;
   PRefPicMarking          pRefPicMarking; // Decoded reference picture marking syntaxs

@@ -52,7 +52,7 @@ runGetPerformanceInfo_openh264()
 
         if [[  $line =~ "encode time"  ]]
 		then
-			EncodeTime=`echo $line | awk 'BEGIN {FS=":"} {print $'${seperatorNum}'}'` 	
+			EncodeTime=`echo $line | awk 'BEGIN {FS=":"} {print $'${seperatorNum}'}'`
 		fi
         if [[ $line =~ "height" ]]
         then

@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
 
 //				String path = getIntent().getStringExtra("path");
 //				if (path.length() <=0)
-//				{ 
+//				{
 //					path = "/sdcard/codec_unittest.xml";
 //				}
 				String path = "/sdcard/codec_unittest.xml";

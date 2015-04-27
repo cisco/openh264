@@ -231,7 +231,7 @@ static const SI4PredInfo g_ksI4PredInfo[9] = {
     { I4_PRED_HU, 1, 0, 0},
 };
 
-static const uint8_t g_kuiI16CbpTable[6] = {0, 16, 32, 15, 31, 47}; 
+static const uint8_t g_kuiI16CbpTable[6] = {0, 16, 32, 15, 31, 47};
 
 
 typedef struct TagPartMbInfo {
