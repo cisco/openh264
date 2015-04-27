@@ -77,11 +77,11 @@ void	BilateralLumaFilter8_c (uint8_t* pSample, int32_t iStride) {
 
 /***************************************************************************
 5x5 filter:
-1	1	2	1	1
-1	2	4	2	1
-2	4	20	4	2
-1	2	4	2	1
-1	1	2	1	1
+1   1   2   1   1
+1   2   4   2   1
+2   4   20  4   2
+1   2   4   2   1
+1   1   2   1   1
 ***************************************************************************/
 #define SUM_LINE1(pSample)	(pSample[0] +(pSample[1]) +(pSample[2]<<1)  + pSample[3] + pSample[4])
 #define SUM_LINE2(pSample)	(pSample[0] +(pSample[1]<<1) +(pSample[2]<<2)  +(pSample[3]<<1) +pSample[4])
@@ -107,9 +107,9 @@ void	WaverageChromaFilter8_c (uint8_t* pSample, int32_t iStride) {
 
 /***************************************************************************
 edge of y/uv use a 3x3 Gauss filter, radius = 1:
-1	2	1
-2	4	2
-1	2	1
+1   2   1
+2   4   2
+1   2   1
 ***************************************************************************/
 void	Gauss3x3Filter (uint8_t* pSrc, int32_t iStride) {
   int32_t nSum = 0;
