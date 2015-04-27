@@ -46,4 +46,4 @@ STATIC_LDFLAGS=
 CODEC_UNITTEST_CFLAGS=-D_CRT_SECURE_NO_WARNINGS
 
 %.res: %.rc
-	$(QUIET_RC)rc -nologo $<
+	$(QUIET_RC)rc $<
