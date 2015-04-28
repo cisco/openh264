@@ -251,8 +251,8 @@ _hash_assign_with_copy_x4:
     st1 {v2.16b, v3.16b}, [x4], #32
 
 _assign_next:
-	subs x5, x5, #4
-	cbnz x5, _hash_assign_loop_x4
+    subs x5, x5, #4
+    cbnz x5, _hash_assign_loop_x4
 
     and x5, x2, x9
     cbz x5, _hash_assign_end
