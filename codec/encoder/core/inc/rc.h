@@ -211,7 +211,7 @@ int32_t   iFrameCodedInVGop;
 int32_t   iSkipFrameInVGop;
 int32_t   iGopNumberInVGop;
 int32_t   iGopIndexInVGop;
- 
+
 int32_t   iSkipQpValue;
 int32_t   iQpRangeUpperInFrame;
 int32_t   iQpRangeLowerInFrame;
