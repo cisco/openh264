@@ -36,7 +36,7 @@ revnr="${tmp%%.*}"
 tmp=${tmp#*.}
 resnr="${tmp%%.*}"
 
-echo "static const OpenH264Version g_stCodecVersion  = {$major,$minor,$revnr,$resnr};" >>codec_ver.h
+echo "static const OpenH264Version g_stCodecVersion  = {$major, $minor, $revnr, $resnr};" >>codec_ver.h
 echo "static const char* const g_strCodecVer  = \"OpenH264 version:$fullver\";" >>codec_ver.h
 #if [ "$2"x = ""x ]; then
 #echo "static const char* const g_strCodecBuildNum = \"OpenH264 revision:$revision\";" >> codec_ver.h
