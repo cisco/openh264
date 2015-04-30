@@ -121,7 +121,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
   TagWelsSvcCodingParam() {
     FillDefault();
   }
-  ~TagWelsSvcCodingParam()	{}
+  ~TagWelsSvcCodingParam() {}
 
   static void FillDefault (SEncParamExt& param) {
     memset (&param, 0, sizeof (param));
