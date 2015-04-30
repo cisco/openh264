@@ -31,7 +31,7 @@
  */
 
 
-#ifdef  HAVE_NEON
+#ifdef HAVE_NEON
 #include "arm_arch_common_macro.S"
 
 WELS_ASM_FUNC_BEGIN WelsI16x16LumaPredV_neon

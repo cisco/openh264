@@ -30,7 +30,7 @@
  *
  */
 
-#ifdef  HAVE_NEON
+#ifdef HAVE_NEON
 
 #include "arm_arch_common_macro.S"
 
