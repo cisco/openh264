@@ -961,11 +961,13 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
 
     WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //chroma_format_idc
     pSps->uiChromaFormatIdc = uiCode;
-//    if (pSps->uiChromaFormatIdc != 1) {
-//      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "ParseSps(): chroma_format_idc (%d) = 1 supported.",
-//               pSps->uiChromaFormatIdc);
-//      return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_NON_BASELINE);
-//    }
+#ifdef DISABLE_HP_BRANCH_1_4
+    if (pSps->uiChromaFormatIdc != 1) {
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "ParseSps(): chroma_format_idc (%d) = 1 supported.",
+               pSps->uiChromaFormatIdc);
+      return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_NON_BASELINE);
+    }
+#endif
     if (pSps->uiChromaFormatIdc > 1) {
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "ParseSps(): chroma_format_idc (%d) <=1 supported.",
                pSps->uiChromaFormatIdc);
@@ -993,8 +995,15 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     pSps->bSeqScalingMatrixPresentFlag	= !!uiCode;
 
     if (pSps->bSeqScalingMatrixPresentFlag) {
+#ifndef DISABLE_HP_BRANCH_1_4
       WELS_READ_VERIFY (ParseScalingList (pSps, pBs, 0, pSps->bSeqScalingListPresentFlag, pSps->iScalingList4x4,
                                           pSps->iScalingList8x8));
+#else
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
+               "ParseSps(): seq_scaling_matrix_present_flag (%d). Feature not supported.",
+               pSps->bSeqScalingMatrixPresentFlag);
+      return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_NON_BASELINE);
+#endif
     }
   }
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //log2_max_frame_num_minus4
@@ -1348,13 +1357,21 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
   pPps->bWeightedPredFlag  = !!uiCode;
   WELS_READ_VERIFY (BsGetBits (pBsAux, 2, &uiCode)); //weighted_bipred_idc
   pPps->uiWeightedBipredIdc = uiCode;
+#ifdef DISABLE_HP_BRANCH_1_4
+  if (pPps->bWeightedPredFlag || pPps->uiWeightedBipredIdc != 0) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
+             "ParsePps(): weighted_pred_flag (%d) weighted_bipred_idc (%d) neither supported.\n",
+             pPps->bWeightedPredFlag, pPps->uiWeightedBipredIdc);
+    return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_WP);
+  }
+#else
   if (pPps->uiWeightedBipredIdc != 0) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
              "ParsePps(): weighted_bipred_idc (%d) not supported.\n",
              pPps->uiWeightedBipredIdc);
     return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_WP);
   }
-
+#endif
   WELS_READ_VERIFY (BsGetSe (pBsAux, &iCode)); //pic_init_qp_minus26
   pPps->iPicInitQp = PIC_INIT_QP_OFFSET + iCode;
   WELS_CHECK_SE_BOTH_ERROR (pPps->iPicInitQp, PPS_PIC_INIT_QP_QS_MIN, PPS_PIC_INIT_QP_QS_MAX, "pic_init_qp_minus26 + 26",
@@ -1374,7 +1391,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
   pPps->bConstainedIntraPredFlag              = !!uiCode;
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //redundant_pic_cnt_present_flag
   pPps->bRedundantPicCntPresentFlag           = !!uiCode;
-
+#ifndef DISABLE_HP_BRANCH_1_4
   if (CheckMoreRBSPData (pBsAux)) {
     WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //transform_8x8_mode_flag
     pPps->bTransform8x8ModeFlag = !!uiCode;
@@ -1396,7 +1413,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
                               PPS_CHROMA_QP_INDEX_OFFSET_MAX, "chroma_qp_index_offset", GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS,
                                   ERR_INFO_INVALID_CHROMA_QP_INDEX_OFFSET));
   }
-
+#endif
   if (pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
     PNalUnit pLastNalUnit = pCtx->pAccessUnitList->pNalUnitsList[pCtx->pAccessUnitList->uiAvailUnitsNum - 1];
     PPps pLastPps = pLastNalUnit->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pPps;
@@ -1442,7 +1459,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
  *************************************************************************************
  * \brief	to parse SEI message payload
  *
- * \param 	pSei		sei message to be parsed output
+ * \param     pSei		sei message to be parsed output
  * \param	pBsAux		bitstream reader auxiliary
  *
  * \return	0 - successed
