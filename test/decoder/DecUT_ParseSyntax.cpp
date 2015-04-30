@@ -272,7 +272,7 @@ void DecoderParseSyntaxTest::TestScalingList() {
 //TEST here for whole tests
 TEST_F (DecoderParseSyntaxTest, DecoderParseSyntaxTestAll) {
 
-  TestScalingList();
+  //TestScalingList(); Disable ScalingUTTest in Branch1.4
 
 }
 
