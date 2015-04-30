@@ -150,7 +150,7 @@ void EncoderInterfaceTest::InitializeParamExt() {
 
 TEST_F (EncoderInterfaceTest, EncoderOptionSetTest) {
   int iResult, iValue, iReturn;
-  float fValue, fReturn;
+  float fFrameRate, fReturn;
   int uiTraceLevel = WELS_LOG_QUIET;
 
   pPtrEnc->SetOption (ENCODER_OPTION_TRACE_LEVEL, &uiTraceLevel);
@@ -195,17 +195,17 @@ TEST_F (EncoderInterfaceTest, EncoderOptionSetTest) {
   pSrcPic->uiTimeStamp += 30;
 
   eOptionId = ENCODER_OPTION_FRAME_RATE;
-  fValue = static_cast<float> (rand() % 100 - 5);
-  iResult = pPtrEnc->SetOption (eOptionId, &fValue);
+  fFrameRate = static_cast<float> (rand() % 100 - 5);
+  iResult = pPtrEnc->SetOption (eOptionId, &fFrameRate);
 
-  if (fValue <= 0)
+  if (fFrameRate <= 0)
     EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
   else {
     EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
 
     iResult = pPtrEnc->GetOption (eOptionId, &fReturn);
     EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-    EXPECT_EQ (WELS_CLIP3 (fValue, 1, 60), fReturn);
+    EXPECT_EQ (WELS_CLIP3 (fFrameRate, 1, 60), fReturn);
   }
   PrepareOneSrcFrame();
   iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
@@ -240,7 +240,7 @@ TEST_F (EncoderInterfaceTest, EncoderOptionSetTest) {
   sInfo.iLayer = SPATIAL_LAYER_0;
   iResult = pPtrEnc->SetOption (eOptionId, &sInfo);
   pPtrEnc->GetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, pParamExt);
-  if (sInfo.iBitrate <= 0)
+  if (sInfo.iBitrate <= 0 || pParamExt->sSpatialLayers[sInfo.iLayer].iSpatialBitrate <= (int) (fFrameRate + 0.5f))
     EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
   else if (pParamExt->sSpatialLayers[sInfo.iLayer].iSpatialBitrate >
            pParamExt->sSpatialLayers[sInfo.iLayer].iMaxSpatialBitrate) {
