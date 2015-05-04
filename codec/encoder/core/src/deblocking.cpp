@@ -48,25 +48,25 @@ namespace WelsEnc {
 #define g_kiTc0Table(x)   g_kiTc0Table[(x)]
 
 #define MB_BS_MV(sCurMv, sNeighMv, uiBIdx, uiBnIdx) \
-	(\
-	( WELS_ABS( sCurMv[uiBIdx].iMvX - sNeighMv[uiBnIdx].iMvX ) >= 4 ) ||\
-	( WELS_ABS( sCurMv[uiBIdx].iMvY - sNeighMv[uiBnIdx].iMvY ) >= 4 )\
-	)
+  (\
+  ( WELS_ABS( sCurMv[uiBIdx].iMvX - sNeighMv[uiBnIdx].iMvX ) >= 4 ) ||\
+  ( WELS_ABS( sCurMv[uiBIdx].iMvY - sNeighMv[uiBnIdx].iMvY ) >= 4 )\
+  )
 
 #define SMB_EDGE_MV(uiRefIndex, sMotionVector, uiBIdx, uiBnIdx) \
-	(\
-	!!((WELS_ABS(sMotionVector[uiBIdx].iMvX - sMotionVector[uiBnIdx].iMvX) &(~3)) | (WELS_ABS(sMotionVector[uiBIdx].iMvY - sMotionVector[uiBnIdx].iMvY) &(~3)))\
-	)
+  (\
+  !!((WELS_ABS(sMotionVector[uiBIdx].iMvX - sMotionVector[uiBnIdx].iMvX) &(~3)) | (WELS_ABS(sMotionVector[uiBIdx].iMvY - sMotionVector[uiBnIdx].iMvY) &(~3)))\
+  )
 
 #define BS_EDGE(bsx1, uiRefIndex, sMotionVector, uiBIdx, uiBnIdx) \
-	( (bsx1|SMB_EDGE_MV(uiRefIndex, sMotionVector, uiBIdx, uiBnIdx))<<(bsx1?1:0))
+  ( (bsx1|SMB_EDGE_MV(uiRefIndex, sMotionVector, uiBIdx, uiBnIdx))<<(bsx1?1:0))
 
 #define GET_ALPHA_BETA_FROM_QP(QP, iAlphaOffset, iBetaOffset, iIdexA, iAlpha, iBeta) \
 {\
-	iIdexA = (QP + iAlphaOffset);\
-	iIdexA = CLIP3_QP_0_51(iIdexA);\
-	iAlpha = g_kuiAlphaTable(iIdexA);\
-	iBeta  = g_kiBetaTable((CLIP3_QP_0_51(QP + iBetaOffset)));\
+  iIdexA = (QP + iAlphaOffset);\
+  iIdexA = CLIP3_QP_0_51(iIdexA);\
+  iAlpha = g_kuiAlphaTable(iIdexA);\
+  iBeta  = g_kiBetaTable((CLIP3_QP_0_51(QP + iBetaOffset)));\
 }
 
 static const uint8_t g_kuiAlphaTable[52 + 12] = { //this table refers to Table 8-16 in H.264/AVC standard
@@ -117,10 +117,10 @@ static const uint8_t g_kuiTableBIdx[2][8] = {
 
 #define TC0_TBL_LOOKUP(iTc, iIdexA, pBS, bchroma) \
 {\
-	iTc[0] = g_kiTc0Table(iIdexA)[pBS[0]] + bchroma;\
-	iTc[1] = g_kiTc0Table(iIdexA)[pBS[1]] + bchroma;\
-	iTc[2] = g_kiTc0Table(iIdexA)[pBS[2]] + bchroma;\
-	iTc[3] = g_kiTc0Table(iIdexA)[pBS[3]] + bchroma;\
+  iTc[0] = g_kiTc0Table(iIdexA)[pBS[0]] + bchroma;\
+  iTc[1] = g_kiTc0Table(iIdexA)[pBS[1]] + bchroma;\
+  iTc[2] = g_kiTc0Table(iIdexA)[pBS[2]] + bchroma;\
+  iTc[3] = g_kiTc0Table(iIdexA)[pBS[3]] + bchroma;\
 }
 
 void inline DeblockingBSInsideMBAvsbase (int8_t* pNnzTab, uint8_t uiBS[2][4][4], int32_t iLShiftFactor) {

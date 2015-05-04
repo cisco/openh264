@@ -81,9 +81,9 @@ namespace WelsDec {
 
 #define GET_ALPHA_BETA_FROM_QP(iQp, iAlphaOffset, iBetaOffset, iIndex, iAlpha, iBeta) \
 {\
-	iIndex = (iQp + iAlphaOffset);\
-	iAlpha = g_kuiAlphaTable(iIndex);\
-	iBeta  = g_kiBetaTable((iQp + iBetaOffset));\
+  iIndex = (iQp + iAlphaOffset);\
+  iAlpha = g_kuiAlphaTable(iIndex);\
+  iBeta  = g_kiBetaTable((iQp + iBetaOffset));\
 }
 
 static const uint8_t g_kuiAlphaTable[52 + 24] = { //this table refers to Table 8-16 in H.264/AVC standard
@@ -151,10 +151,10 @@ static const uint8_t g_kuiTableB8x8Idx[2][16] = {
 
 #define TC0_TBL_LOOKUP(tc, iIndexA, pBS, bChroma) \
 {\
-	tc[0] = g_kiTc0Table(iIndexA)[pBS[0]] + bChroma;\
-	tc[1] = g_kiTc0Table(iIndexA)[pBS[1]] + bChroma;\
-	tc[2] = g_kiTc0Table(iIndexA)[pBS[2]] + bChroma;\
-	tc[3] = g_kiTc0Table(iIndexA)[pBS[3]] + bChroma;\
+  tc[0] = g_kiTc0Table(iIndexA)[pBS[0]] + bChroma;\
+  tc[1] = g_kiTc0Table(iIndexA)[pBS[1]] + bChroma;\
+  tc[2] = g_kiTc0Table(iIndexA)[pBS[2]] + bChroma;\
+  tc[3] = g_kiTc0Table(iIndexA)[pBS[3]] + bChroma;\
 }
 
 void inline DeblockingBSInsideMBAvsbase (int8_t* pNnzTab, uint8_t nBS[2][4][4], int32_t iLShiftFactor) {
