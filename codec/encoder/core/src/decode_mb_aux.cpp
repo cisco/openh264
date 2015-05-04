@@ -249,49 +249,49 @@ void WelsGetEncBlockStrideOffset (int32_t* pBlock, const int32_t kiStrideY, cons
 }
 
 void WelsInitReconstructionFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
-  pFuncList->pfDequantization4x4			= WelsDequant4x4_c;
-  pFuncList->pfDequantizationFour4x4		= WelsDequantFour4x4_c;
-  pFuncList->pfDequantizationIHadamard4x4	= WelsDequantIHadamard4x4_c;
+  pFuncList->pfDequantization4x4            = WelsDequant4x4_c;
+  pFuncList->pfDequantizationFour4x4        = WelsDequantFour4x4_c;
+  pFuncList->pfDequantizationIHadamard4x4   = WelsDequantIHadamard4x4_c;
 
-  pFuncList->pfIDctT4		= WelsIDctT4Rec_c;
-  pFuncList->pfIDctFourT4		= WelsIDctFourT4Rec_c;
-  pFuncList->pfIDctI16x16Dc = WelsIDctRecI16x16Dc_c;
+  pFuncList->pfIDctT4           = WelsIDctT4Rec_c;
+  pFuncList->pfIDctFourT4       = WelsIDctFourT4Rec_c;
+  pFuncList->pfIDctI16x16Dc     = WelsIDctRecI16x16Dc_c;
 
 #if defined(X86_ASM)
   if (uiCpuFlag & WELS_CPU_MMXEXT) {
-    pFuncList->pfIDctT4		= WelsIDctT4Rec_mmx;
+    pFuncList->pfIDctT4         = WelsIDctT4Rec_mmx;
   }
   if (uiCpuFlag & WELS_CPU_SSE2) {
-    pFuncList->pfDequantization4x4			= WelsDequant4x4_sse2;
-    pFuncList->pfDequantizationFour4x4		= WelsDequantFour4x4_sse2;
-    pFuncList->pfDequantizationIHadamard4x4	= WelsDequantIHadamard4x4_sse2;
+    pFuncList->pfDequantization4x4          = WelsDequant4x4_sse2;
+    pFuncList->pfDequantizationFour4x4      = WelsDequantFour4x4_sse2;
+    pFuncList->pfDequantizationIHadamard4x4 = WelsDequantIHadamard4x4_sse2;
 
-    pFuncList->pfIDctFourT4		= WelsIDctFourT4Rec_sse2;
-    pFuncList->pfIDctI16x16Dc = WelsIDctRecI16x16Dc_sse2;
+    pFuncList->pfIDctFourT4     = WelsIDctFourT4Rec_sse2;
+    pFuncList->pfIDctI16x16Dc   = WelsIDctRecI16x16Dc_sse2;
   }
 #endif//X86_ASM
 
 #if defined(HAVE_NEON)
   if (uiCpuFlag & WELS_CPU_NEON) {
-    pFuncList->pfDequantization4x4			= WelsDequant4x4_neon;
-    pFuncList->pfDequantizationFour4x4		= WelsDequantFour4x4_neon;
-    pFuncList->pfDequantizationIHadamard4x4	= WelsDequantIHadamard4x4_neon;
+    pFuncList->pfDequantization4x4          = WelsDequant4x4_neon;
+    pFuncList->pfDequantizationFour4x4      = WelsDequantFour4x4_neon;
+    pFuncList->pfDequantizationIHadamard4x4 = WelsDequantIHadamard4x4_neon;
 
-    pFuncList->pfIDctFourT4		= WelsIDctFourT4Rec_neon;
-    pFuncList->pfIDctT4		= WelsIDctT4Rec_neon;
-    pFuncList->pfIDctI16x16Dc = WelsIDctRecI16x16Dc_neon;
+    pFuncList->pfIDctFourT4     = WelsIDctFourT4Rec_neon;
+    pFuncList->pfIDctT4         = WelsIDctT4Rec_neon;
+    pFuncList->pfIDctI16x16Dc   = WelsIDctRecI16x16Dc_neon;
   }
 #endif
 
 #if defined(HAVE_NEON_AARCH64)
   if (uiCpuFlag & WELS_CPU_NEON) {
-    pFuncList->pfDequantization4x4			= WelsDequant4x4_AArch64_neon;
-    pFuncList->pfDequantizationFour4x4		= WelsDequantFour4x4_AArch64_neon;
-    pFuncList->pfDequantizationIHadamard4x4	= WelsDequantIHadamard4x4_AArch64_neon;
+    pFuncList->pfDequantization4x4          = WelsDequant4x4_AArch64_neon;
+    pFuncList->pfDequantizationFour4x4      = WelsDequantFour4x4_AArch64_neon;
+    pFuncList->pfDequantizationIHadamard4x4 = WelsDequantIHadamard4x4_AArch64_neon;
 
-    pFuncList->pfIDctFourT4		= WelsIDctFourT4Rec_AArch64_neon;
-    pFuncList->pfIDctT4		= WelsIDctT4Rec_AArch64_neon;
-    pFuncList->pfIDctI16x16Dc = WelsIDctRecI16x16Dc_AArch64_neon;
+    pFuncList->pfIDctFourT4     = WelsIDctFourT4Rec_AArch64_neon;
+    pFuncList->pfIDctT4         = WelsIDctT4Rec_AArch64_neon;
+    pFuncList->pfIDctI16x16Dc   = WelsIDctRecI16x16Dc_AArch64_neon;
   }
 #endif
 }

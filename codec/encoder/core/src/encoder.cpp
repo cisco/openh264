@@ -159,33 +159,33 @@ int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam,
   bool bScreenContent = (SCREEN_CONTENT_REAL_TIME == pParam->iUsageType);
 
   /* Functionality utilization of CPU instructions dependency */
-  pFuncList->pfSetMemZeroSize8	= WelsSetMemZero_c;		// confirmed_safe_unsafe_usage
-  pFuncList->pfSetMemZeroSize64Aligned16	= WelsSetMemZero_c;	// confirmed_safe_unsafe_usage
-  pFuncList->pfSetMemZeroSize64	= WelsSetMemZero_c;	// confirmed_safe_unsafe_usage
+  pFuncList->pfSetMemZeroSize8              = WelsSetMemZero_c;             // confirmed_safe_unsafe_usage
+  pFuncList->pfSetMemZeroSize64Aligned16    = WelsSetMemZero_c;     // confirmed_safe_unsafe_usage
+  pFuncList->pfSetMemZeroSize64             = WelsSetMemZero_c;     // confirmed_safe_unsafe_usage
 #if defined(X86_ASM)
   if (uiCpuFlag & WELS_CPU_MMXEXT) {
-    pFuncList->pfSetMemZeroSize8	= WelsSetMemZeroSize8_mmx;		// confirmed_safe_unsafe_usage
-    pFuncList->pfSetMemZeroSize64Aligned16	= WelsSetMemZeroSize64_mmx;	// confirmed_safe_unsafe_usage
-    pFuncList->pfSetMemZeroSize64	= WelsSetMemZeroSize64_mmx;	// confirmed_safe_unsafe_usage
+    pFuncList->pfSetMemZeroSize8            = WelsSetMemZeroSize8_mmx;              // confirmed_safe_unsafe_usage
+    pFuncList->pfSetMemZeroSize64Aligned16  = WelsSetMemZeroSize64_mmx;     // confirmed_safe_unsafe_usage
+    pFuncList->pfSetMemZeroSize64           = WelsSetMemZeroSize64_mmx;     // confirmed_safe_unsafe_usage
   }
   if (uiCpuFlag & WELS_CPU_SSE2) {
-    pFuncList->pfSetMemZeroSize64Aligned16	= WelsSetMemZeroAligned64_sse2;	// confirmed_safe_unsafe_usage
+    pFuncList->pfSetMemZeroSize64Aligned16  = WelsSetMemZeroAligned64_sse2; // confirmed_safe_unsafe_usage
   }
 #endif//X86_ASM
 
 #if defined(HAVE_NEON)
   if (uiCpuFlag & WELS_CPU_NEON) {
-    pFuncList->pfSetMemZeroSize8	= WelsSetMemZero_neon;
-    pFuncList->pfSetMemZeroSize64Aligned16	= WelsSetMemZero_neon;
-    pFuncList->pfSetMemZeroSize64	= WelsSetMemZero_neon;
+    pFuncList->pfSetMemZeroSize8            = WelsSetMemZero_neon;
+    pFuncList->pfSetMemZeroSize64Aligned16  = WelsSetMemZero_neon;
+    pFuncList->pfSetMemZeroSize64           = WelsSetMemZero_neon;
   }
 #endif
 
 #if defined(HAVE_NEON_AARCH64)
   if (uiCpuFlag & WELS_CPU_NEON) {
-    pFuncList->pfSetMemZeroSize8	= WelsSetMemZero_AArch64_neon;
-    pFuncList->pfSetMemZeroSize64Aligned16	= WelsSetMemZero_AArch64_neon;
-    pFuncList->pfSetMemZeroSize64	= WelsSetMemZero_AArch64_neon;
+    pFuncList->pfSetMemZeroSize8            = WelsSetMemZero_AArch64_neon;
+    pFuncList->pfSetMemZeroSize64Aligned16  = WelsSetMemZero_AArch64_neon;
+    pFuncList->pfSetMemZeroSize64           = WelsSetMemZero_AArch64_neon;
   }
 #endif
 

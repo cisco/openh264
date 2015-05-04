@@ -885,13 +885,13 @@ void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
   pCtx->pGetIChromaPredFunc[C_PRED_DC_T  ] = WelsIChromaPredDcTop_c;
   pCtx->pGetIChromaPredFunc[C_PRED_DC_128] = WelsIChromaPredDcNA_c;
 
-  pCtx->pIdctResAddPredFunc	= IdctResAddPred_c;
+  pCtx->pIdctResAddPredFunc     = IdctResAddPred_c;
 
-  pCtx->pIdctResAddPredFunc8x8 = IdctResAddPred8x8_c;
+  pCtx->pIdctResAddPredFunc8x8  = IdctResAddPred8x8_c;
 
 #if defined(HAVE_NEON)
   if (pCtx->uiCpuFlag & WELS_CPU_NEON) {
-    pCtx->pIdctResAddPredFunc	= IdctResAddPred_neon;
+    pCtx->pIdctResAddPredFunc   = IdctResAddPred_neon;
 
     pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_neon;
     pCtx->pGetI16x16LumaPredFunc[I16_PRED_P]  = WelsDecoderI16x16LumaPredPlane_neon;
@@ -916,7 +916,7 @@ void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
 
 #if defined(HAVE_NEON_AARCH64)
   if (pCtx->uiCpuFlag & WELS_CPU_NEON) {
-    pCtx->pIdctResAddPredFunc	= IdctResAddPred_AArch64_neon;
+    pCtx->pIdctResAddPredFunc   = IdctResAddPred_AArch64_neon;
 
     pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_AArch64_neon;
     pCtx->pGetI16x16LumaPredFunc[I16_PRED_P]  = WelsDecoderI16x16LumaPredPlane_AArch64_neon;
@@ -946,7 +946,7 @@ void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
 
 #if defined(X86_ASM)
   if (pCtx->uiCpuFlag & WELS_CPU_MMXEXT) {
-    pCtx->pIdctResAddPredFunc	= IdctResAddPred_mmx;
+    pCtx->pIdctResAddPredFunc   = IdctResAddPred_mmx;
 
     ///////mmx code opt---
     pCtx->pGetIChromaPredFunc[C_PRED_H]      = WelsDecoderIChromaPredH_mmx;
