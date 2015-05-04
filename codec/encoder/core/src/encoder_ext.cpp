@@ -2321,26 +2321,26 @@ int32_t InitSliceSettings (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPar
 void OutputCpuFeaturesLog (SLogContext* pLogCtx, uint32_t uiCpuFeatureFlags, uint32_t uiCpuCores,
                            int32_t iCacheLineSize) {
   // welstracer output
-  WelsLog (pLogCtx, WELS_LOG_INFO, "WELS CPU features/capacities (0x%x) detected: \t"	\
-           "HTT:      %c, "	\
-           "MMX:      %c, "	\
-           "MMXEX:    %c, "	\
-           "SSE:      %c, "	\
-           "SSE2:     %c, "	\
-           "SSE3:     %c, "	\
-           "SSSE3:    %c, "	\
-           "SSE4.1:   %c, "	\
-           "SSE4.2:   %c, "	\
-           "AVX:      %c, "	\
-           "FMA:      %c, "	\
-           "X87-FPU:  %c, "	\
-           "3DNOW:    %c, "	\
-           "3DNOWEX:  %c, "	\
-           "ALTIVEC:  %c, "	\
-           "CMOV:     %c, "	\
-           "MOVBE:    %c, "	\
-           "AES:      %c, "	\
-           "NUMBER OF LOGIC PROCESSORS ON CHIP: %d, "	\
+  WelsLog (pLogCtx, WELS_LOG_INFO, "WELS CPU features/capacities (0x%x) detected: \t"
+           "HTT:      %c, "
+           "MMX:      %c, "
+           "MMXEX:    %c, "
+           "SSE:      %c, "
+           "SSE2:     %c, "
+           "SSE3:     %c, "
+           "SSSE3:    %c, "
+           "SSE4.1:   %c, "
+           "SSE4.2:   %c, "
+           "AVX:      %c, "
+           "FMA:      %c, "
+           "X87-FPU:  %c, "
+           "3DNOW:    %c, "
+           "3DNOWEX:  %c, "
+           "ALTIVEC:  %c, "
+           "CMOV:     %c, "
+           "MOVBE:    %c, "
+           "AES:      %c, "
+           "NUMBER OF LOGIC PROCESSORS ON CHIP: %d, "
            "CPU CACHE LINE SIZE (BYTES):        %d",
            uiCpuFeatureFlags,
            (uiCpuFeatureFlags & WELS_CPU_HTT) ? 'Y' : 'N',
