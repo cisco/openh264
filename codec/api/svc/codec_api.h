@@ -77,40 +77,40 @@ typedef unsigned char bool;
   *  //decoder declaration
   *  ISVCDecoder *pSvcDecoder;
   *  //input: encoded bitstream start position; should include start code prefix
-  *	 unsigned char *pBuf =...;
+  *  unsigned char *pBuf =...;
   *  //input: encoded bit stream length; should include the size of start code prefix
-  *	 int iSize =...;
+  *  int iSize =...;
   *  //output: [0~2] for Y,U,V buffer for Decoding only
-  *	 unsigned char *pData[3] =...;
+  *  unsigned char *pData[3] =...;
   *  //in-out: for Decoding only: declare and initialize the output buffer info, this should never co-exist with Parsing only
   *  SBufferInfo sDstBufInfo;
-  *	 memset(&sDstBufInfo, 0, sizeof(SBufferInfo));
+  *  memset(&sDstBufInfo, 0, sizeof(SBufferInfo));
   *  //in-out: for Parsing only: declare and initialize the output bitstream buffer info for parse only, this should never co-exist with Decoding only
   *  SParserBsInfo sDstParseInfo;
-  *      memset(&sDstParseInfo, 0, sizeof(SParserBsInfo));
-  *      sDstParseInfo.pDstBuff = new unsigned char[PARSE_SIZE]; //In Parsing only, allocate enough buffer to save transcoded bitstream for a frame
+  *  memset(&sDstParseInfo, 0, sizeof(SParserBsInfo));
+  *  sDstParseInfo.pDstBuff = new unsigned char[PARSE_SIZE]; //In Parsing only, allocate enough buffer to save transcoded bitstream for a frame
   *
   * @endcode
   *
-  *	Step 2:decoder creation
+  * Step 2:decoder creation
   * @code
   *  CreateDecoder(pSvcDecoder);
   * @endcode
   *
-  *	Step 3:declare required parameter, used to differentiate Decoding only and Parsing only
+  * Step 3:declare required parameter, used to differentiate Decoding only and Parsing only
   * @code
   *  SDecodingParam sDecParam = {0};
-  *	 sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_AVC;
+  *  sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_AVC;
   *  //for Parsing only, the assignment is mandatory
   *  sDecParam.bParseOnly = true;
   * @endcode
   *
-  *	Step 4:initialize the parameter and decoder context, allocate memory
+  * Step 4:initialize the parameter and decoder context, allocate memory
   * @code
   *  Initialize(&sDecParam);
   * @endcode
   *
-  *	Step 5:do actual decoding process in slice level;
+  * Step 5:do actual decoding process in slice level;
   *        this can be done in a loop until data ends
   * @code
   *  //for Decoding only
@@ -120,8 +120,8 @@ typedef unsigned char bool;
   *  //for Parsing only
   *  iRet = DecodeParser(pBuf, iSize, &sDstParseInfo);
   *  //decode failed
-  *	 If (iRet != 0){
-  *	     RequestIDR or something like that.
+  *  If (iRet != 0){
+  *      RequestIDR or something like that.
   *  }
   *  //for Decoding only, pData can be used for render.
   *  if (sDstBufInfo.iBufferStatus==1){
@@ -137,12 +137,12 @@ typedef unsigned char bool;
   *  judge iRet, sDstBufInfo.iBufferStatus ...
   * @endcode
   *
-  *	Step 6:uninitialize the decoder and memory free
+  * Step 6:uninitialize the decoder and memory free
   * @code
   *  Uninitialize();
   * @endcode
   *
-  *	Step 7:destroy the decoder
+  * Step 7:destroy the decoder
   * @code
   *  DestroyDecoder();
   * @endcode
