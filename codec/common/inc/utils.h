@@ -42,7 +42,7 @@
 #include <stdarg.h>
 #include "typedefs.h"
 
-#define MAX_LOG_SIZE	1024
+#define MAX_LOG_SIZE    1024
 #define MAX_WIDTH      (4096)
 #define MAX_HEIGHT     (2304)//MAX_FS_LEVEL51 (36864); MAX_FS_LEVEL51*256/4096 = 2304
 /*

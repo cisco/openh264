@@ -41,19 +41,19 @@
 
 #include "codec_def.h"
 /* Constants */
-#define MAX_TEMPORAL_LAYER_NUM		4
-#define MAX_SPATIAL_LAYER_NUM		4
-#define MAX_QUALITY_LAYER_NUM		4
+#define MAX_TEMPORAL_LAYER_NUM          4
+#define MAX_SPATIAL_LAYER_NUM           4
+#define MAX_QUALITY_LAYER_NUM           4
 
-#define MAX_LAYER_NUM_OF_FRAME		128
-#define MAX_NAL_UNITS_IN_LAYER		128	///< predetermined here, adjust it later if need
+#define MAX_LAYER_NUM_OF_FRAME          128
+#define MAX_NAL_UNITS_IN_LAYER          128     ///< predetermined here, adjust it later if need
 
-#define MAX_RTP_PAYLOAD_LEN		1000
-#define AVERAGE_RTP_PAYLOAD_LEN		800
+#define MAX_RTP_PAYLOAD_LEN             1000
+#define AVERAGE_RTP_PAYLOAD_LEN         800
 
 
-#define SAVED_NALUNIT_NUM_TMP		( (MAX_SPATIAL_LAYER_NUM*MAX_QUALITY_LAYER_NUM) + 1 + MAX_SPATIAL_LAYER_NUM )  ///< SPS/PPS + SEI/SSEI + PADDING_NAL
-#define MAX_SLICES_NUM_TMP			( ( MAX_NAL_UNITS_IN_LAYER - SAVED_NALUNIT_NUM_TMP ) / 3 )
+#define SAVED_NALUNIT_NUM_TMP           ( (MAX_SPATIAL_LAYER_NUM*MAX_QUALITY_LAYER_NUM) + 1 + MAX_SPATIAL_LAYER_NUM )  ///< SPS/PPS + SEI/SSEI + PADDING_NAL
+#define MAX_SLICES_NUM_TMP              ( ( MAX_NAL_UNITS_IN_LAYER - SAVED_NALUNIT_NUM_TMP ) / 3 )
 
 
 #define AUTO_REF_PIC_COUNT  -1          ///< encoder selects the number of reference frame automatically
@@ -148,13 +148,13 @@ typedef enum {
 */
 typedef enum {
   DECODER_OPTION_DATAFORMAT = 0,        ///< color format, now supports 23 only (I420)
-  DECODER_OPTION_END_OF_STREAM,	        ///< end of stream flag
+  DECODER_OPTION_END_OF_STREAM,         ///< end of stream flag
   DECODER_OPTION_VCL_NAL,               ///< feedback whether or not have VCL NAL in current AU for application layer
   DECODER_OPTION_TEMPORAL_ID,           ///< feedback temporal id for application layer
   DECODER_OPTION_FRAME_NUM,             ///< feedback current decoded frame number
-  DECODER_OPTION_IDR_PIC_ID,	        ///< feedback current frame belong to which IDR period
-  DECODER_OPTION_LTR_MARKING_FLAG,	    ///< feedback wether current frame mark a LTR
-  DECODER_OPTION_LTR_MARKED_FRAME_NUM,	///< feedback frame num marked by current Frame
+  DECODER_OPTION_IDR_PIC_ID,            ///< feedback current frame belong to which IDR period
+  DECODER_OPTION_LTR_MARKING_FLAG,      ///< feedback wether current frame mark a LTR
+  DECODER_OPTION_LTR_MARKED_FRAME_NUM,  ///< feedback frame num marked by current Frame
   DECODER_OPTION_ERROR_CON_IDC,         ///< not finished yet, indicate decoder error concealment status, in progress
   DECODER_OPTION_TRACE_LEVEL,
   DECODER_OPTION_TRACE_CALLBACK,        ///< a void (*)(void* context, int level, const char* message) function which receives log messages
@@ -267,12 +267,12 @@ typedef struct {
 * @brief Enumerate the type of slice mode
 */
 typedef enum {
-  SM_SINGLE_SLICE         = 0, ///<	| SliceNum==1
-  SM_FIXEDSLCNUM_SLICE    = 1, ///<	| according to SliceNum        | enabled dynamic slicing for multi-thread
-  SM_RASTER_SLICE         = 2, ///<	| according to SlicesAssign    | need input of MB numbers each slice. In addition, if other constraint in SSliceArgument is presented, need to follow the constraints. Typically if MB num and slice size are both constrained, re-encoding may be involved.
+  SM_SINGLE_SLICE         = 0, ///< | SliceNum==1
+  SM_FIXEDSLCNUM_SLICE    = 1, ///< | according to SliceNum        | enabled dynamic slicing for multi-thread
+  SM_RASTER_SLICE         = 2, ///< | according to SlicesAssign    | need input of MB numbers each slice. In addition, if other constraint in SSliceArgument is presented, need to follow the constraints. Typically if MB num and slice size are both constrained, re-encoding may be involved.
   SM_ROWMB_SLICE          = 3, ///< | according to PictureMBHeight | typical of single row of mbs each slice + slice size constraint which including re-encoding
-  SM_DYN_SLICE            = 4, ///<	| according to SliceSize       | dynamic slicing (have no idea about slice_nums until encoding current frame)
-  SM_AUTO_SLICE           = 5, ///<	| according to thread number
+  SM_DYN_SLICE            = 4, ///< | according to SliceSize       | dynamic slicing (have no idea about slice_nums until encoding current frame)
+  SM_AUTO_SLICE           = 5, ///< | according to thread number
   SM_RESERVED             = 6
 } SliceModeEnum;
 
@@ -292,17 +292,17 @@ typedef enum {
 */
 typedef enum {
   PRO_UNKNOWN   = 0,
-  PRO_BASELINE	= 66,
-  PRO_MAIN		= 77,
-  PRO_EXTENDED	= 88,
-  PRO_HIGH		= 100,
-  PRO_HIGH10	= 110,
-  PRO_HIGH422	= 122,
+  PRO_BASELINE  = 66,
+  PRO_MAIN      = 77,
+  PRO_EXTENDED  = 88,
+  PRO_HIGH      = 100,
+  PRO_HIGH10    = 110,
+  PRO_HIGH422   = 122,
   PRO_HIGH444   = 144,
-  PRO_CAVLC444	= 244,
+  PRO_CAVLC444  = 244,
 
-  PRO_SCALABLE_BASELINE	= 83,
-  PRO_SCALABLE_HIGH		= 86
+  PRO_SCALABLE_BASELINE = 83,
+  PRO_SCALABLE_HIGH     = 86
 } EProfileIdc;
 
 /**
@@ -341,7 +341,7 @@ enum {
   WELS_LOG_DETAIL      = 1 << 4,        ///< per packet/frame log
   WELS_LOG_RESV        = 1 << 5,        ///< resversed log iLevel
   WELS_LOG_LEVEL_COUNT = 6,
-  WELS_LOG_DEFAULT     = WELS_LOG_WARNING	///< default log iLevel in Wels codec
+  WELS_LOG_DEFAULT     = WELS_LOG_WARNING   ///< default log iLevel in Wels codec
 };
 
 /**

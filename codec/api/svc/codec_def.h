@@ -118,8 +118,8 @@ enum ENalPriority {
 #define IS_IDR_NAL(eNalRefIdc, eNalType) \
 ( (eNalRefIdc == NAL_PRIORITY_HIGHEST) && (eNalType == NAL_SLICE_IDR) )
 
-#define FRAME_NUM_PARAM_SET		(-1)
-#define FRAME_NUM_IDR			0
+#define FRAME_NUM_PARAM_SET     (-1)
+#define FRAME_NUM_IDR           0
 
 /**
  * @brief eDeblockingIdc
@@ -146,7 +146,7 @@ enum {
   ET_IR_R2 = 0x08,          ///< Intra Refresh in predifined 5% MB
   ET_IR_R3 = 0x10,          ///< Intra Refresh in predifined 10% MB
   ET_FEC_HALF = 0x20,       ///< Forward Error Correction in 50% redundency mode
-  ET_FEC_FULL	= 0x40,     ///< Forward Error Correction in 100% redundency mode
+  ET_FEC_FULL = 0x40,       ///< Forward Error Correction in 100% redundency mode
   ET_RFS = 0x80             ///< Reference Frame Selection
 };
 

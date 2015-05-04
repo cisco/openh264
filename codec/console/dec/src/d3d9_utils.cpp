@@ -39,11 +39,11 @@ void Write2File (FILE* pFp, unsigned char* pData[3], int iStride[2], int iWidth,
 #ifdef ENABLE_DISPLAY_MODULE
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define IDM_ABOUT						104
-#define IDM_EXIT						105
-#define IDI_TESTSHARESURFACE	        107
-#define IDI_SMALL						108
-#define IDC_TESTSHARESURFACE	        109
+#define IDM_ABOUT                       104
+#define IDM_EXIT                        105
+#define IDI_TESTSHARESURFACE            107
+#define IDI_SMALL                       108
+#define IDC_TESTSHARESURFACE            109
 
 #define NV12_FORMAT  MAKEFOURCC('N','V','1','2')
 

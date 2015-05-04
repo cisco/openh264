@@ -40,17 +40,17 @@
 #include "property.h"
 #include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross_platforms
 namespace WelsEnc {
-#define WELS_CODE_NAME	"Wels"
-#define WELS_LIB_NAME	"Encoder"
+#define WELS_CODE_NAME  "Wels"
+#define WELS_LIB_NAME   "Encoder"
 
-#define WELS_VERSION_INT	0x000001	// v 0.0.1
-#define WELS_VERSION_STR	"0.0.1"
+#define WELS_VERSION_INT        0x000001        // v 0.0.1
+#define WELS_VERSION_STR        "0.0.1"
 
-#define WELS_BUILD_NUM		"090420"	// yymmdd
+#define WELS_BUILD_NUM          "090420"        // yymmdd
 
 //////////////summary information//////////////
 
-#define WELS_IDENT		WELS_CODE_NAME WELS_LIB_NAME "v" WELS_VERSION_STR "b" WELS_BUILD_NUM
+#define WELS_IDENT              WELS_CODE_NAME WELS_LIB_NAME "v" WELS_VERSION_STR "b" WELS_BUILD_NUM
 
 /*!
  * \brief   get code name

@@ -58,16 +58,16 @@ WELSVP_NAMESPACE_BEGIN
 #define MAX_HEIGHT     (2304)//MAX_FS_LEVEL51 (36864); MAX_FS_LEVEL51*256/4096 = 2304
 
 #define MB_WIDTH_LUMA  (16)
-#define PESN		   (1e-6)	// desired float precision
+#define PESN               (1e-6)       // desired float precision
 #define AQ_INT_MULTIPLY                   10000000
 #define AQ_TIME_INT_MULTIPLY                   10000
 #define AQ_QSTEP_INT_MULTIPLY                   100
 #define AQ_PESN 10 // (1e-6)*AQ_INT_MULTIPLY
 
-#define MB_TYPE_INTRA4x4		0x00000001
-#define MB_TYPE_INTRA16x16	0x00000002
-#define MB_TYPE_INTRA_PCM		0x00000004
-#define MB_TYPE_INTRA			  (MB_TYPE_INTRA4x4 | MB_TYPE_INTRA16x16 | MB_TYPE_INTRA_PCM)
+#define MB_TYPE_INTRA4x4                0x00000001
+#define MB_TYPE_INTRA16x16              0x00000002
+#define MB_TYPE_INTRA_PCM               0x00000004
+#define MB_TYPE_INTRA                     (MB_TYPE_INTRA4x4 | MB_TYPE_INTRA16x16 | MB_TYPE_INTRA_PCM)
 #define IS_INTRA(type) ((type)&MB_TYPE_INTRA)
 
 #define WELS_MAX(x, y)	((x) > (y) ? (x) : (y))

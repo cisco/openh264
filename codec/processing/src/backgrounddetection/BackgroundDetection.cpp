@@ -39,16 +39,16 @@ WELSVP_NAMESPACE_BEGIN
 #define BGD_OU_SIZE         (1<<LOG2_BGD_OU_SIZE)
 #define BGD_OU_SIZE_UV      (BGD_OU_SIZE>>1)
 #define BGD_THD_SAD         (2*BGD_OU_SIZE*BGD_OU_SIZE)
-#define	BGD_THD_ASD_UV      (4*BGD_OU_SIZE_UV)
+#define BGD_THD_ASD_UV      (4*BGD_OU_SIZE_UV)
 #define LOG2_MB_SIZE        (4)
 #define OU_SIZE_IN_MB       (BGD_OU_SIZE >> 4)
 #define Q_FACTOR            (8)
 #define BGD_DELTA_QP_THD    (3)
 
-#define OU_LEFT		(0x01)
-#define OU_RIGHT	(0x02)
-#define OU_TOP		(0x04)
-#define OU_BOTTOM	(0x08)
+#define OU_LEFT         (0x01)
+#define OU_RIGHT        (0x02)
+#define OU_TOP          (0x04)
+#define OU_BOTTOM       (0x08)
 
 CBackgroundDetection::CBackgroundDetection (int32_t iCpuFlag) {
   m_eMethod = METHOD_BACKGROUND_DETECTION;

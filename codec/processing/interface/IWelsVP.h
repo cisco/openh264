@@ -56,9 +56,9 @@ typedef enum {
   RET_FAILED           = -1,
   RET_INVALIDPARAM     = -2,
   RET_OUTOFMEMORY      = -3,
-  RET_NOTSUPPORTED       = -4,
+  RET_NOTSUPPORTED     = -4,
   RET_UNEXPECTED       = -5,
-  RET_NEEDREINIT		  = -6
+  RET_NEEDREINIT       = -6
 } EResult;
 
 typedef enum {
@@ -80,7 +80,7 @@ typedef enum {
   VIDEO_FORMAT_I420       = 23,   /* yuv 4:2:0 planar */
   VIDEO_FORMAT_YV12       = 24,   /* yuv 4:2:0 planar */
   VIDEO_FORMAT_INTERNAL   = 25,   /* Only Used for SVC decoder testbed */
-  VIDEO_FORMAT_NV12		= 26,	/* y planar + uv packed */
+  VIDEO_FORMAT_NV12       = 26,   /* y planar + uv packed */
   VIDEO_FORMAT_I422       = 27,   /* yuv 4:2:2 planar */
   VIDEO_FORMAT_I444       = 28,   /* yuv 4:4:4 planar */
   VIDEO_FORMAT_YUYV       = 20,   /* yuv 4:2:2 packed */
@@ -124,13 +124,13 @@ typedef enum {
   METHOD_DENOISE              ,
   METHOD_SCENE_CHANGE_DETECTION_VIDEO ,
   METHOD_SCENE_CHANGE_DETECTION_SCREEN ,
-  METHOD_DOWNSAMPLE			  ,
+  METHOD_DOWNSAMPLE            ,
   METHOD_VAA_STATISTICS        ,
   METHOD_BACKGROUND_DETECTION  ,
   METHOD_ADAPTIVE_QUANT ,
   METHOD_COMPLEXITY_ANALYSIS   ,
   METHOD_COMPLEXITY_ANALYSIS_SCREEN,
-  METHOD_IMAGE_ROTATE		  ,
+  METHOD_IMAGE_ROTATE          ,
   METHOD_SCROLL_DETECTION,
   METHOD_MASK
 } EMethods;
