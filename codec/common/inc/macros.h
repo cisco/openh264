@@ -81,7 +81,7 @@
 #endif//_MSC_VER
 
 
-#ifndef	WELS_ALIGN
+#ifndef WELS_ALIGN
 #define WELS_ALIGN(x, n)	(((x)+(n)-1)&~((n)-1))
 #endif//WELS_ALIGN
 
