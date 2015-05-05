@@ -28,7 +28,7 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- *	cabac_decoder.cpp:	cabac parse for syntax elements
+ *	parse_mb_syn_cabac.cpp:	cabac parse for syntax elements
  */
 #include "parse_mb_syn_cabac.h"
 #include "mv_pred.h"

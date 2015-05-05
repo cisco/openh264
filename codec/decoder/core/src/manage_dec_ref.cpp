@@ -29,7 +29,7 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- *  manage_ref_pic.cpp
+ *  manage_dec_ref.cpp
  *
  *  Abstract
  *      Implementation for managing reference picture
