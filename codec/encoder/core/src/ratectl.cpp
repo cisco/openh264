@@ -889,8 +889,8 @@ void RcTraceFrameBits (sWelsEncCtx* pEncCtx, long long uiTimeStamp) {
     pWelsSvcRc->iPredFrameBit = pWelsSvcRc->iFrameDqBits;
 
   WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
-           "[Rc] Frame timestamp = %lld, Frame type =%d, encoding_qp = %d, average qp = %3d, max qp = %3d, min qp = %3d, index = %8d,\
-    iTid = %1d, used = %8d, bitsperframe = %8d, target = %8d, remaingbits = %8d, skipbuffersize = %8d",
+           "[Rc] Frame timestamp = %lld, Frame type =%d, encoding_qp = %d, average qp = %3d, max qp = %3d, min qp = %3d, index = %8d, "
+           "iTid = %1d, used = %8d, bitsperframe = %8d, target = %8d, remaingbits = %8d, skipbuffersize = %8d",
            uiTimeStamp, pEncCtx->eSliceType, pEncCtx->iGlobalQp, pWelsSvcRc->iAverageFrameQp, pWelsSvcRc->iMaxFrameQp,
            pWelsSvcRc->iMinFrameQp,
            pEncCtx->iFrameIndex, pEncCtx->uiTemporalId, pWelsSvcRc->iFrameDqBits, pWelsSvcRc->iBitsPerFrame,
