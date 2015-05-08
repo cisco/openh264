@@ -280,33 +280,33 @@ bool GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,
     iGomSize = kiMbWidth * GOM_ROW_MODE0_360P;
   else
     iGomSize = kiMbWidth * GOM_ROW_MODE0_720P;
+  // GOM boundary aligned
+  int32_t iNumMbAssigning = WELS_DIV_ROUND (INT_MULTIPLY * kiMbNumPerSlice, iGomSize * INT_MULTIPLY) * iGomSize;
+  int32_t iCurNumMbAssigning = 0;
 
   iMinimalMbNum	= iGomSize;
-  iMaximalMbNum	= kiMbNumInFrame - (kuiSliceNum - 1) * iMinimalMbNum;
-
   while (uiSliceIdx + 1 < kuiSliceNum) {
-    // GOM boundary aligned
-    int32_t iNumMbAssigning = WELS_DIV_ROUND (INT_MULTIPLY * kiMbNumPerSlice, iGomSize * INT_MULTIPLY) * iGomSize;
+    iMaximalMbNum	= iNumMbLeft - (kuiSliceNum - uiSliceIdx - 1) * iMinimalMbNum;	// get maximal num_mb in left parts
 
     // make sure one GOM at least in each slice for safe
     if (iNumMbAssigning < iMinimalMbNum)
-      iNumMbAssigning	= iMinimalMbNum;
+      iCurNumMbAssigning	= iMinimalMbNum;
     else if (iNumMbAssigning > iMaximalMbNum)
-      iNumMbAssigning	= iMaximalMbNum;
+      iCurNumMbAssigning	= ( iMaximalMbNum / iGomSize ) * iGomSize;
+    else
+      iCurNumMbAssigning = iNumMbAssigning;
 
-    if (iNumMbAssigning <= 0) {
+    if (iCurNumMbAssigning <= 0) {
       return false;
     }
 
-    iNumMbLeft -= iNumMbAssigning;
+    iNumMbLeft -= iCurNumMbAssigning;
     if (iNumMbLeft <= 0)  {
       return false;
     }
 
-    pSlicesAssignList[uiSliceIdx]	= iNumMbAssigning;
-
+    pSlicesAssignList[uiSliceIdx]	= iCurNumMbAssigning;
     ++ uiSliceIdx;
-    iMaximalMbNum	= iNumMbLeft - (kuiSliceNum - uiSliceIdx - 1) * iMinimalMbNum;	// get maximal num_mb in left parts
   }
   pSlicesAssignList[uiSliceIdx] = iNumMbLeft;
 
