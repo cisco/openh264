@@ -67,6 +67,7 @@
 #define WELS_CPU_MOVBE		0x00008000	/* MOVBE instruction */
 #define WELS_CPU_AES		0x00010000	/* AES instruction extensions */
 #define WELS_CPU_FMA		0x00020000	/* AVX VEX FMA instruction sets */
+#define WELS_CPU_AVX2		0x00040000	/* AVX2 */
 
 #define WELS_CPU_CACHELINE_16    0x10000000    /* CacheLine Size 16 */
 #define WELS_CPU_CACHELINE_32    0x20000000    /* CacheLine Size 32 */
