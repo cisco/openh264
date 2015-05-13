@@ -3968,7 +3968,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
           t_bs_append = WelsTime() - t_bs_append;
           if (pCtx->pSliceThreading->pFSliceDiff) {
             fprintf (pCtx->pSliceThreading->pFSliceDiff,
-                     "%6"PRId64" us consumed at AppendSliceToFrameBs() for coding_idx: %d iDid: %d qid: %d\n",
+                     "%6" PRId64 " us consumed at AppendSliceToFrameBs() for coding_idx: %d iDid: %d qid: %d\n",
                      t_bs_append, pCtx->iCodingIndex, iCurDid, 0);
           }
 #endif//MT_DEBUG
