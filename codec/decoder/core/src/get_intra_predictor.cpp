@@ -428,7 +428,7 @@ void WelsI8x8LumaPredH_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail,
 
   // 8-90
   for (i = 0; i < 8; i++) {
-    uiLeft = 0x0101010101010101U * uiPixelFilterL[i];
+    uiLeft = 0x0101010101010101ULL * uiPixelFilterL[i];
     ST64A8 (pPred + iStride[i], uiLeft);
   }
 }
@@ -464,7 +464,7 @@ void WelsI8x8LumaPredDc_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail
   }
 
   const uint8_t kuiMean = ((uiTotal + 8) >> 4);
-  const uint64_t kuiMean64 = 0x0101010101010101U * kuiMean;
+  const uint64_t kuiMean64 = 0x0101010101010101ULL * kuiMean;
 
   for (i = 0; i < 8; i++) {
     ST64A8 (pPred + iStride[i], kuiMean64);
@@ -495,7 +495,7 @@ void WelsI8x8LumaPredDcLeft_c (uint8_t* pPred, const int32_t kiStride, bool bTLA
   }
 
   const uint8_t kuiMean = ((uiTotal + 4) >> 3);
-  const uint64_t kuiMean64 = 0x0101010101010101U * kuiMean;
+  const uint64_t kuiMean64 = 0x0101010101010101ULL * kuiMean;
 
   for (i = 0; i < 8; i++) {
     ST64A8 (pPred + iStride[i], kuiMean64);
@@ -526,7 +526,7 @@ void WelsI8x8LumaPredDcTop_c (uint8_t* pPred, const int32_t kiStride, bool bTLAv
   }
 
   const uint8_t kuiMean = ((uiTotal + 4) >> 3);
-  const uint64_t kuiMean64 = 0x0101010101010101U * kuiMean;
+  const uint64_t kuiMean64 = 0x0101010101010101ULL * kuiMean;
 
   for (i = 0; i < 8; i++) {
     ST64A8 (pPred + iStride[i], kuiMean64);
@@ -535,7 +535,7 @@ void WelsI8x8LumaPredDcTop_c (uint8_t* pPred, const int32_t kiStride, bool bTLAv
 
 void WelsI8x8LumaPredDcNA_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail) {
   // for normal 8 bit depth, 8-94
-  const uint64_t kuiDC64		= 0x8080808080808080U;
+  const uint64_t kuiDC64		= 0x8080808080808080ULL;
 
   int32_t iStride[8];
   int32_t i;
