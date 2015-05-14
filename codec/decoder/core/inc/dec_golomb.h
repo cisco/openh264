@@ -58,20 +58,20 @@ namespace WelsDec {
   if (iReadBytes > iAllowedBytes+1) { \
     return ERR_INFO_READ_OVERFLOW; \
   } \
-	iCurBits |= ((uint32_t)((pBufPtr[0] << 8) | pBufPtr[1])) << (iLeftBits); \
-	iLeftBits -= 16; \
-	pBufPtr +=2; \
+  iCurBits |= ((uint32_t)((pBufPtr[0] << 8) | pBufPtr[1])) << (iLeftBits); \
+  iLeftBits -= 16; \
+  pBufPtr +=2; \
 }
 #define NEED_BITS(iCurBits, pBufPtr, iLeftBits, iAllowedBytes, iReadBytes) { \
-	if( iLeftBits > 0 ) { \
-	GET_WORD(iCurBits, pBufPtr, iLeftBits, iAllowedBytes, iReadBytes); \
-	} \
+  if (iLeftBits > 0) { \
+    GET_WORD(iCurBits, pBufPtr, iLeftBits, iAllowedBytes, iReadBytes); \
+  } \
 }
 #define UBITS(iCurBits, iNumBits) (iCurBits>>(32-(iNumBits)))
 #define DUMP_BITS(iCurBits, pBufPtr, iLeftBits, iNumBits, iAllowedBytes, iReadBytes) { \
-	iCurBits <<= (iNumBits); \
-	iLeftBits += (iNumBits); \
-	NEED_BITS(iCurBits, pBufPtr, iLeftBits, iAllowedBytes, iReadBytes); \
+  iCurBits <<= (iNumBits); \
+  iLeftBits += (iNumBits); \
+  NEED_BITS(iCurBits, pBufPtr, iLeftBits, iAllowedBytes, iReadBytes); \
 }
 
 static inline int32_t BsGetBits (PBitStringAux pBs, int32_t iNumBits, uint32_t* pCode) {

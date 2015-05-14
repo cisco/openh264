@@ -497,16 +497,16 @@ int32_t PredIntra4x4Mode (int8_t* pIntraPredMode, int32_t iIdx4) {
 
 #define CHECK_I16_MODE(a, b, c, d)                           \
                       ((a == g_ksI16PredInfo[a].iPredMode) &&  \
-					   (b >= g_ksI16PredInfo[a].iLeftAvail) && \
-					   (c >= g_ksI16PredInfo[a].iTopAvail) &&  \
-					   (d >= g_ksI16PredInfo[a].iLeftTopAvail));
+                       (b >= g_ksI16PredInfo[a].iLeftAvail) && \
+                       (c >= g_ksI16PredInfo[a].iTopAvail) &&  \
+                       (d >= g_ksI16PredInfo[a].iLeftTopAvail));
 #define CHECK_CHROMA_MODE(a, b, c, d)                              \
-	                     ((a == g_ksChromaPredInfo[a].iPredMode) &&  \
-					      (b >= g_ksChromaPredInfo[a].iLeftAvail) && \
-					      (c >= g_ksChromaPredInfo[a].iTopAvail) &&  \
-					      (d >= g_ksChromaPredInfo[a].iLeftTopAvail));
+                        ((a == g_ksChromaPredInfo[a].iPredMode) &&  \
+                         (b >= g_ksChromaPredInfo[a].iLeftAvail) && \
+                         (c >= g_ksChromaPredInfo[a].iTopAvail) &&  \
+                         (d >= g_ksChromaPredInfo[a].iLeftTopAvail));
 #define CHECK_I4_MODE(a, b, c, d)                              \
-	                 ((a == g_ksI4PredInfo[a].iPredMode) &&      \
+                     ((a == g_ksI4PredInfo[a].iPredMode) &&      \
                       (b >= g_ksI4PredInfo[a].iLeftAvail) &&     \
                       (c >= g_ksI4PredInfo[a].iTopAvail) &&      \
                       (d >= g_ksI4PredInfo[a].iLeftTopAvail));

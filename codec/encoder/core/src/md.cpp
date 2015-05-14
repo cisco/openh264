@@ -522,10 +522,10 @@ typedef struct TagQuarParams {
 } SQuarRefineParams;
 
 #define SWITCH_BEST_TMP_BUF(prev_best, curr_best){\
-	pParams->iBestCost = iCurCost;\
-	pTmp = prev_best;\
-	prev_best = curr_best;\
-	curr_best = pTmp;\
+  pParams->iBestCost = iCurCost;\
+  pTmp = prev_best;\
+  prev_best = curr_best;\
+  curr_best = pTmp;\
 }
 #define CALC_COST(me_buf, lm) ( pFunc->sSampleDealingFuncs.pfMeCost[kuiPixel](pEncMb, iStrideEnc, me_buf, ME_REFINE_BUF_STRIDE) + lm )
 

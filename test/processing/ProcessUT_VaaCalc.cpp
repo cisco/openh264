@@ -576,20 +576,20 @@ TEST (VAACalcFuncTest, func) { \
         if (0 == (m_uiCpuFeatureFlag & CPUFLAGS)) \
             return; \
     } \
-	ENFORCE_STACK_ALIGN_1D (uint8_t, cur_data_c, BUFFER_SIZE, 16); \
+    ENFORCE_STACK_ALIGN_1D (uint8_t, cur_data_c, BUFFER_SIZE, 16); \
     ENFORCE_STACK_ALIGN_1D (uint8_t, ref_data_c, BUFFER_SIZE, 16); \
     ENFORCE_STACK_ALIGN_1D (int32_t, psad8x8_c, BUFFER_SIZE/64, 16); \
-	int32_t pic_width_c; \
-	int32_t pic_height_c; \
-	int32_t pic_stride_c; \
-	int32_t psadframe_c; \
-	ENFORCE_STACK_ALIGN_1D (uint8_t, cur_data_a, BUFFER_SIZE, 16); \
+    int32_t pic_width_c; \
+    int32_t pic_height_c; \
+    int32_t pic_stride_c; \
+    int32_t psadframe_c; \
+    ENFORCE_STACK_ALIGN_1D (uint8_t, cur_data_a, BUFFER_SIZE, 16); \
     ENFORCE_STACK_ALIGN_1D (uint8_t, ref_data_a, BUFFER_SIZE, 16); \
     ENFORCE_STACK_ALIGN_1D (int32_t, psad8x8_a, BUFFER_SIZE/64, 16); \
-	int32_t pic_width_a; \
-	int32_t pic_height_a; \
-	int32_t pic_stride_a; \
-	int32_t psadframe_a; \
+    int32_t pic_width_a; \
+    int32_t pic_height_a; \
+    int32_t pic_stride_a; \
+    int32_t psadframe_a; \
     pic_width_c  = pic_width_a = 320-16; \
     pic_height_c = pic_height_a = 320; \
     pic_stride_c = pic_stride_a = 320; \
