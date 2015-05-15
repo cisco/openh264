@@ -54,7 +54,7 @@
 #endif //_WIN32
 
 #include "macros.h"
-#include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross platforms
+#include "crt_util_safe_x.h" // Safe CRT routines like utils for cross platforms
 
 #if defined(_WIN32) && defined(_MSC_VER)
 

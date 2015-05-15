@@ -156,7 +156,7 @@ void UpdateP16x16MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int8_t kiRef
 
   ST32 (pCurMb->pRefIndex, kuiRef32);
   // update pMv range from 0~15
-  memcpy (pCurMb->sMv, uiMvBuf, sizeof (uiMvBuf));	// confirmed_safe_unsafe_usage
+  memcpy (pCurMb->sMv, uiMvBuf, sizeof (uiMvBuf)); // confirmed_safe_unsafe_usage
 
   /*
    * blocks 0: 7~10, 1: 13~16, 2: 19~22, 3: 25~28
@@ -209,7 +209,7 @@ void UpdateP16x8MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPar
   const uint16_t kuiRef16       = BUTTERFLY1x2 (kiRef);
 
   ST16 (&pCurMb->pRefIndex[ (kiPartIdx >> 2)], kuiRef16);
-  memcpy (&pCurMb->sMv[kiScan4Idx], uiMvBuf, sizeof (uiMvBuf));	// confirmed_safe_unsafe_usage
+  memcpy (&pCurMb->sMv[kiScan4Idx], uiMvBuf, sizeof (uiMvBuf)); // confirmed_safe_unsafe_usage
 
   /*
   * blocks 0: g_kuiCache30ScanIdx[iPartIdx]~g_kuiCache30ScanIdx[iPartIdx]+3, 1: g_kuiCache30ScanIdx[iPartIdx]+6~g_kuiCache30ScanIdx[iPartIdx]+9

@@ -921,7 +921,7 @@ void WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFun
       } else {
         ++iNextMbXyIndex;
       }
-      if (-1 == iNextMbXyIndex || iNextMbXyIndex >= iTotalMbCount) {	// slice group boundary or end of a frame
+      if (-1 == iNextMbXyIndex || iNextMbXyIndex >= iTotalMbCount) { // slice group boundary or end of a frame
         break;
       }
 

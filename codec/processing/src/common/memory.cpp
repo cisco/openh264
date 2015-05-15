@@ -95,7 +95,7 @@ void* WelsRealloc (void* pPointer, uint32_t* pRealSize, const uint32_t kuiSize, 
   const uint32_t kuiOldSize = *pRealSize;
   uint32_t kuiNewSize = 0;
   void* pLocalPointer = NULL;
-  if (kuiOldSize >= kuiSize)	// large enough of original block, so do nothing
+  if (kuiOldSize >= kuiSize) // large enough of original block, so do nothing
     return (pPointer);
 
   // new request
@@ -111,7 +111,7 @@ void* WelsRealloc (void* pPointer, uint32_t* pRealSize, const uint32_t kuiSize, 
     return NULL;
   }
 
-  return NULL;	// something wrong
+  return NULL; // something wrong
 }
 
 WELSVP_NAMESPACE_END

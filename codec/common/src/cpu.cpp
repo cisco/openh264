@@ -96,7 +96,7 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
     uiCPU |= WELS_CPU_CMOV;
   }
   if ((!strcmp ((const char*)chVendorName, CPU_Vendor_INTEL)) ||
-      (!strcmp ((const char*)chVendorName, CPU_Vendor_AMD))) {	// confirmed_safe_unsafe_usage
+      (!strcmp ((const char*)chVendorName, CPU_Vendor_AMD))) { // confirmed_safe_unsafe_usage
     if (uiFeatureD & 0x10000000) {
       /* Multi-Threading checking: contains of multiple logic processors */
       uiCPU |= WELS_CPU_HTT;
@@ -165,7 +165,7 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
   WelsCPUId (0x80000000, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);
 
   if ((!strcmp ((const char*)chVendorName, CPU_Vendor_AMD))
-      && (uiFeatureA >= 0x80000001)) {	// confirmed_safe_unsafe_usage
+      && (uiFeatureA >= 0x80000001)) { // confirmed_safe_unsafe_usage
     WelsCPUId (0x80000001, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);
     if (uiFeatureD & 0x00400000) {
       uiCPU |= WELS_CPU_MMXEXT;
@@ -175,7 +175,7 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
     }
   }
 
-  if (!strcmp ((const char*)chVendorName, CPU_Vendor_INTEL)) {	// confirmed_safe_unsafe_usage
+  if (!strcmp ((const char*)chVendorName, CPU_Vendor_INTEL)) { // confirmed_safe_unsafe_usage
     int32_t  family, model;
 
     WelsCPUId (1, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);
@@ -189,11 +189,11 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
 
   // get cache line size
   if ((!strcmp ((const char*)chVendorName, CPU_Vendor_INTEL))
-      || ! (strcmp ((const char*)chVendorName, CPU_Vendor_CYRIX))) {	// confirmed_safe_unsafe_usage
+      || ! (strcmp ((const char*)chVendorName, CPU_Vendor_CYRIX))) { // confirmed_safe_unsafe_usage
     WelsCPUId (1, &uiFeatureA, &uiFeatureB, &uiFeatureC, &uiFeatureD);
 
     CacheLineSize = (uiFeatureB & 0xff00) >>
-                    5;	// ((clflush_line_size >> 8) << 3), CLFLUSH_line_size * 8 = CacheLineSize_in_byte
+                    5; // ((clflush_line_size >> 8) << 3), CLFLUSH_line_size * 8 = CacheLineSize_in_byte
 
     if (CacheLineSize == 128) {
       uiCPU |= WELS_CPU_CACHELINE_128;

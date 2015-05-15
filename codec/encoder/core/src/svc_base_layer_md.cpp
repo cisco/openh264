@@ -1779,7 +1779,7 @@ void WelsMdInterSecondaryModesEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlic
 void WelsMdIntraSecondaryModesEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache) {
   SWelsFuncPtrList* pFunc = pEncCtx->pFuncList;
   //initial prediction memory for I_4x4
-  pFunc->pfIntraFineMd (pEncCtx, pWelsMd, pCurMb, pMbCache);			//WelsMdIntraFinePartitionVaa
+  pFunc->pfIntraFineMd (pEncCtx, pWelsMd, pCurMb, pMbCache); //WelsMdIntraFinePartitionVaa
 
   //add pEnc&rec to MD--2010.3.15
   if (IS_INTRA16x16 (pCurMb->uiMbType)) {

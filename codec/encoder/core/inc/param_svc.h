@@ -336,7 +336,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     uiIntraPeriod       = pCodingParam.uiIntraPeriod;// intra period (multiple of GOP size as desired)
     if (uiIntraPeriod == (uint32_t) (-1))
       uiIntraPeriod = 0;
-    else if (uiIntraPeriod & (uiGopSize - 1))	// none multiple of GOP size
+    else if (uiIntraPeriod & (uiGopSize - 1)) // none multiple of GOP size
       uiIntraPeriod = ((uiIntraPeriod + uiGopSize - 1) / uiGopSize) * uiGopSize;
 
     if (((pCodingParam.iNumRefFrame != AUTO_REF_PIC_COUNT)
@@ -400,7 +400,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
         = pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.sSliceArgument.uiSliceNum;
       const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
       memcpy (pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceMbNum,
-              pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.sSliceArgument.uiSliceMbNum,	// confirmed_safe_unsafe_usage
+              pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.sSliceArgument.uiSliceMbNum, // confirmed_safe_unsafe_usage
               kiLesserSliceNum * sizeof (uint32_t)) ;
 
       pSpatialLayer->iDLayerQp = pCodingParam.sSpatialLayers[iIdxSpatial].iDLayerQp;
@@ -454,7 +454,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       int8_t iMaxTemporalId = 0;
 
       memset (pDlp->uiCodingIdx2TemporalId, INVALID_TEMPORAL_ID, sizeof (pDlp->uiCodingIdx2TemporalId));
-      pSpatialLayer->uiProfileIdc = uiProfileIdc;	// PRO_BASELINE, PRO_SCALABLE_BASELINE;
+      pSpatialLayer->uiProfileIdc = uiProfileIdc; // PRO_BASELINE, PRO_SCALABLE_BASELINE;
 
       iNotCodedMask = (1 << (kuiLogFactorInOutRate + kuiLogFactorMaxInRate)) - 1;
       for (uint32_t uiFrameIdx = 0; uiFrameIdx <= uiGopSize; ++ uiFrameIdx) {

@@ -118,7 +118,7 @@ int32_t AssignMbMapMultipleSlices (SSliceCtx* pSliceSeg, const SSliceConfig* kpM
       pSliceSeg->pCountMbNumInSlice[iSliceIdx] = kiCountNumMbInFrame;
       iSliceIdx++;
     } while (iSliceIdx < kiMaxSliceNum);
-  } else {	// any else uiSliceMode?
+  } else { // any else uiSliceMode?
     assert (0);
   }
 
@@ -239,8 +239,8 @@ bool GomValidCheckSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, u
   while (true) {
     if (kiCountNumMb < iGomSize * (int32_t) iSliceNum) {
       -- iSliceNum;
-      iSliceNum = iSliceNum - (iSliceNum & 0x01);	// verfiy even num for multiple slices case
-      if (iSliceNum < 2)	// for safe
+      iSliceNum = iSliceNum - (iSliceNum & 0x01); // verfiy even num for multiple slices case
+      if (iSliceNum < 2) // for safe
         break;
       continue;
     }
@@ -598,7 +598,7 @@ int32_t WelsGetNextMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY) {
           return iNextMbIdx;
         return -1;
       } else
-        return -1;	// reserved here for other multiple slice type
+        return -1; // reserved here for other multiple slice type
     }
   } else
     return -1;
@@ -680,7 +680,7 @@ int32_t DynamicAdjustSlicePEncCtxAll (SSliceCtx* pSliceCtx,
     ++ iSliceIdx;
   }
   if (iSameRunLenFlag) {
-    return 1;	// do not need adjust it due to same running length as before to save complexity
+    return 1; // do not need adjust it due to same running length as before to save complexity
   }
 
   iSliceIdx = 0;

@@ -64,5 +64,5 @@ class CReadConfig {
   unsigned int      m_iLines;
 };
 
-#endif	// READ_CONFIG_H__
+#endif // READ_CONFIG_H__
 

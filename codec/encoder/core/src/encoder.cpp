@@ -52,7 +52,7 @@
 #include "svc_base_layer_md.h"
 #include "svc_mode_decision.h"
 #include "set_mb_syn_cavlc.h"
-#include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross_platforms
+#include "crt_util_safe_x.h" // Safe CRT routines like utils for cross_platforms
 #include "slice_multi_threading.h"
 
 //  global   function  pointers  definition
@@ -131,7 +131,7 @@ int32_t InitPic (const void* kpSrc, const int32_t kiColorspace, const int32_t ki
       pSrcPic->iColorFormat = kiColorspace | videoFormatVFlip;
     break;
   default:
-    return 2;	// any else?
+    return 2; // any else?
   }
 
   return 0;
@@ -286,7 +286,7 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType) {
     pEncCtx->eNalPriority = NRI_PRI_HIGHEST;
 
     // rc_init_gop
-  } else {	// B pictures are not supported now, any else?
+  } else { // B pictures are not supported now, any else?
     assert (0);
   }
 
@@ -380,7 +380,7 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName
   if (NULL == pCurPicture || NULL == kpFileName || kiDid >= MAX_DEPENDENCY_LAYER)
     return;
 
-  if (strlen (kpFileName) > 0)	// confirmed_safe_unsafe_usage
+  if (strlen (kpFileName) > 0) // confirmed_safe_unsafe_usage
     pDumpRecFile = WelsFopen (kpFileName, openMode);
   else {
     char sDependencyRecFileName[16] = {0};
@@ -407,7 +407,7 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName
       iWrittenSize = WelsFwrite (pSrc + j * kiStrideY, 1, kiLumaWidth, pDumpRecFile);
       assert (iWrittenSize == kiLumaWidth);
       if (iWrittenSize < kiLumaWidth) {
-        assert (0);	// make no sense for us if writing failed
+        assert (0); // make no sense for us if writing failed
         WelsFclose (pDumpRecFile);
         return;
       }
@@ -420,7 +420,7 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName
         iWrittenSize = WelsFwrite (pSrc + j * kiStrideUV, 1, kiChromaWidth, pDumpRecFile);
         assert (iWrittenSize == kiChromaWidth);
         if (iWrittenSize < kiChromaWidth) {
-          assert (0);	// make no sense for us if writing failed
+          assert (0); // make no sense for us if writing failed
           WelsFclose (pDumpRecFile);
           return;
         }
@@ -474,7 +474,7 @@ void DumpRecFrame (SPicture* pCurPicture, const char* kpFileName, const int8_t k
       iWrittenSize = WelsFwrite (pSrc + j * kiStrideY, 1, kiLumaWidth, pDumpRecFile);
       assert (iWrittenSize == kiLumaWidth);
       if (iWrittenSize < kiLumaWidth) {
-        assert (0);	// make no sense for us if writing failed
+        assert (0); // make no sense for us if writing failed
         WelsFclose (pDumpRecFile);
         return;
       }
@@ -487,7 +487,7 @@ void DumpRecFrame (SPicture* pCurPicture, const char* kpFileName, const int8_t k
         iWrittenSize = WelsFwrite (pSrc + j * kiStrideUV, 1, kiChromaWidth, pDumpRecFile);
         assert (iWrittenSize == kiChromaWidth);
         if (iWrittenSize < kiChromaWidth) {
-          assert (0);	// make no sense for us if writing failed
+          assert (0); // make no sense for us if writing failed
           WelsFclose (pDumpRecFile);
           return;
         }
@@ -501,7 +501,7 @@ void DumpRecFrame (SPicture* pCurPicture, const char* kpFileName, const int8_t k
 
 
 /***********************************************************************************/
-void WelsSetMemZero_c (void* pDst, int32_t iSize) {	// confirmed_safe_unsafe_usage
+void WelsSetMemZero_c (void* pDst, int32_t iSize) { // confirmed_safe_unsafe_usage
   memset (pDst, 0, iSize);
 }
 }

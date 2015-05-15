@@ -55,7 +55,7 @@ void BilateralLumaFilter8_c (uint8_t* pSample, int32_t iStride) {
     pCurLine = pSample - iStride - DENOISE_GRAY_RADIUS;
     for (y = 0; y < 3; y++) {
       for (x = 0; x < 3; x++) {
-        if (x == 1 && y == 1) continue;			// except center point
+        if (x == 1 && y == 1) continue; // except center point
         iCurSample = pCurLine[x];
         iCurWeight = WELS_ABS (iCurSample - iCenterSample);
         iGreyDiff = 32 - iCurWeight;

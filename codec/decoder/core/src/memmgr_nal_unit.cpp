@@ -101,7 +101,7 @@ int32_t ExpandNalUnitList (PAccessUnit* ppAu, const int32_t kiOrgSize, const int
     PAccessUnit pTmp = NULL;
     int32_t iIdx = 0;
 
-    if (MemInitNalList (&pTmp, kiExpSize))	// request new list with expanding
+    if (MemInitNalList (&pTmp, kiExpSize)) // request new list with expanding
       return 1;
 
     do {
@@ -115,7 +115,7 @@ int32_t ExpandNalUnitList (PAccessUnit* ppAu, const int32_t kiOrgSize, const int
     pTmp->uiEndPos              = (*ppAu)->uiEndPos;
     pTmp->bCompletedAuFlag      = (*ppAu)->bCompletedAuFlag;
 
-    MemFreeNalList (ppAu);	// free old list
+    MemFreeNalList (ppAu); // free old list
     *ppAu = pTmp;
     return 0;
   }
@@ -130,16 +130,16 @@ PNalUnit MemGetNextNal (PAccessUnit* ppAu) {
   PAccessUnit pAu = *ppAu;
   PNalUnit pNu = NULL;
 
-  if (pAu->uiAvailUnitsNum >= pAu->uiCountUnitsNum) {	// need expand list
+  if (pAu->uiAvailUnitsNum >= pAu->uiCountUnitsNum) { // need expand list
     const uint32_t kuiExpandingSize = pAu->uiCountUnitsNum + (MAX_NAL_UNIT_NUM_IN_AU >> 1);
     if (ExpandNalUnitList (ppAu, pAu->uiCountUnitsNum, kuiExpandingSize))
-      return NULL;	// out of memory
+      return NULL; // out of memory
     pAu = *ppAu;
   }
 
-  pNu = pAu->pNalUnitsList[pAu->uiAvailUnitsNum++];	// ready for next nal position
+  pNu = pAu->pNalUnitsList[pAu->uiAvailUnitsNum++]; // ready for next nal position
 
-  memset (pNu, 0, sizeof (SNalUnit));	// Please do not remove this for cache intend!!
+  memset (pNu, 0, sizeof (SNalUnit)); // Please do not remove this for cache intend!!
 
   return pNu;
 }

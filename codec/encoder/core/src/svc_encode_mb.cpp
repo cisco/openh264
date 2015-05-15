@@ -220,7 +220,7 @@ void WelsEncInterY (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCache
 
   if (iSingleCtrMb < 6) {  //from JVT-O079
     iNoneZeroCountMbDcAc = 0;
-    pfSetMemZeroSize64 (pRes,  768);	// confirmed_safe_unsafe_usage
+    pfSetMemZeroSize64 (pRes,  768); // confirmed_safe_unsafe_usage
   } else {
     const uint8_t* kpNoneZeroCountIdx = g_kuiMbCountScan4Idx;
     for (i = 0; i < 4; i++) {
@@ -233,8 +233,8 @@ void WelsEncInterY (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCache
         }
         pfDequantizationFour4x4 (pRes, g_kuiDequantCoeff[uiQp]);
         pCurMb->uiCbp |= 1 << i;
-      } else {	// set zero for an 8x8 pBlock
-        pfSetMemZeroSize64 (pRes, 128);	// confirmed_safe_unsafe_usage
+      } else { // set zero for an 8x8 pBlock
+        pfSetMemZeroSize64 (pRes, 128); // confirmed_safe_unsafe_usage
         kpNoneZeroCountIdx += 4;
         pBlock += 64;
       }
@@ -285,8 +285,8 @@ void    WelsEncRecUV (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCac
   }
   pRes -= 64;
 
-  if (iSingleCtr8x8 < 7) {	//from JVT-O079
-    pfSetMemZeroSize64 (pRes, 128);	// confirmed_safe_unsafe_usage
+  if (iSingleCtr8x8 < 7) { //from JVT-O079
+    pfSetMemZeroSize64 (pRes, 128); // confirmed_safe_unsafe_usage
     ST16 (&pCurMb->pNonZeroCount[16 + uiNoneZeroCountOffset], 0);
     ST16 (&pCurMb->pNonZeroCount[20 + uiNoneZeroCountOffset], 0);
   } else {
@@ -339,7 +339,7 @@ bool WelsTryPYskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
     pEncCtx->pFuncList->pfQuantizationFour4x4Max (pRes, pFF,  pMF, (int16_t*)aMax);
 
     for (j = 0; j < 4; j++) {
-      if (aMax[j] > 1) return false;	// iSingleCtrMb += 9, can't be P_SKIP
+      if (aMax[j] > 1) return false; // iSingleCtrMb += 9, can't be P_SKIP
       else if (aMax[j] == 1) {
         pEncCtx->pFuncList->pfScan4x4 (pBlock, pRes); //
         iSingleCtrMb += pEncCtx->pFuncList->pfCalculateSingleCtr4x4 (pBlock);

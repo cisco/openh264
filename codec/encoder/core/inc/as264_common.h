@@ -50,7 +50,7 @@ $(TargetPath)
 /****************************************************************************
  * Options for algorithm, usually change bitrate
  ****************************************************************************/
-#define DISABLE_FMO_FEATURE	//
+#define DISABLE_FMO_FEATURE             //
 
 /****************************************************************************
  * Options for optimization, not change bitrate
@@ -59,7 +59,7 @@ $(TargetPath)
 #define SINGLE_REF_FRAME            // need to disable it when use multi-reference
 
 
-#if defined(WELS_TESTBED)	    // for SGE testing
+#if defined(WELS_TESTBED)               // for SGE testing
 #define ENABLE_FRAME_DUMP
 
 #ifdef FRAME_INFO_OUTPUT
@@ -68,7 +68,7 @@ $(TargetPath)
 #endif//WELS_TESTBED
 
 
-#if defined(__UNITTEST__)	// for unittest
+#if defined(__UNITTEST__)               // for unittest
 #ifndef ENABLE_FRAME_DUMP
 #define ENABLE_FRAME_DUMP
 #endif//ENABLE_FRAME_DUMP
@@ -80,7 +80,7 @@ $(TargetPath)
 //
 //#define FRAME_INFO_OUTPUT
 //#define LAYER_INFO_OUTPUT
-//#define SLICE_INFO_OUTPUT		// useful in multiple slice coding track
+//#define SLICE_INFO_OUTPUT             // useful in multiple slice coding track
 //#define MB_TYPES_INFO_OUTPUT
 
 

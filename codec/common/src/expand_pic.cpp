@@ -51,8 +51,8 @@ static inline void ExpandPictureLuma_c (uint8_t* pDst, const int32_t kiStride, c
     uint8_t* pBottom        = pDstLastLine + kiStrides;
 
     // pad pTop and pBottom
-    memcpy (pTop, pTmp, kiPicW);				// confirmed_safe_unsafe_usage
-    memcpy (pBottom, pDstLastLine, kiPicW);	// confirmed_safe_unsafe_usage
+    memcpy (pTop, pTmp, kiPicW);                // confirmed_safe_unsafe_usage
+    memcpy (pBottom, pDstLastLine, kiPicW);     // confirmed_safe_unsafe_usage
 
     // pad corners
     memset (pTop - kiPaddingLen, kuiTL, kiPaddingLen); //pTop left
@@ -91,8 +91,8 @@ static inline void ExpandPictureChroma_c (uint8_t* pDst, const int32_t kiStride,
     uint8_t* pBottom        = pDstLastLine + kiStrides;
 
     // pad pTop and pBottom
-    memcpy (pTop, pTmp, kiPicW);				// confirmed_safe_unsafe_usage
-    memcpy (pBottom, pDstLastLine, kiPicW);	// confirmed_safe_unsafe_usage
+    memcpy (pTop, pTmp, kiPicW);                // confirmed_safe_unsafe_usage
+    memcpy (pBottom, pDstLastLine, kiPicW);     // confirmed_safe_unsafe_usage
 
     // pad corners
     memset (pTop - kiPaddingLen, kuiTL, kiPaddingLen); //pTop left
@@ -160,7 +160,7 @@ void ExpandReferencingPicture (uint8_t* pData[3], int32_t iWidth, int32_t iHeigh
   pExpLuma (pPicY, iStride[0], kiWidthY, kiHeightY);
   if (kiWidthUV >= 16) {
     // fix coding picture size as 16x16
-    const bool kbChrAligned = /*(iWidthUV >= 16) && */ ((kiWidthUV & 0x0F) == 0);	// chroma planes: (16+iWidthUV) & 15
+    const bool kbChrAligned = /*(iWidthUV >= 16) && */ ((kiWidthUV & 0x0F) == 0); // chroma planes: (16+iWidthUV) & 15
     pExpChrom[kbChrAligned] (pPicCb, iStride[1], kiWidthUV, kiHeightUV);
     pExpChrom[kbChrAligned] (pPicCr, iStride[2], kiWidthUV, kiHeightUV);
   } else {

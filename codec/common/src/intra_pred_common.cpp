@@ -61,7 +61,7 @@ void WelsI16x16LumaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStrid
 void WelsI16x16LumaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
   int32_t iStridex15 = (kiStride << 4) - kiStride;
   int32_t iPredStride = 16;
-  int32_t iPredStridex15 = 240;	//(iPredStride<<4)-iPredStride;
+  int32_t iPredStridex15 = 240; //(iPredStride<<4)-iPredStride;
   uint8_t i = 15;
 
   do {

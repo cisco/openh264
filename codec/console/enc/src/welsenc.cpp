@@ -148,7 +148,7 @@ int ParseLayerConfig (CReadConfig& cRdLayerCfg, const int iLayer, SEncParamExt& 
         if (kiLen >= sizeof (sFileSet.sRecFileName[iLayer]))
           return -1;
         sFileSet.sRecFileName[iLayer][kiLen] = '\0';
-        strncpy (sFileSet.sRecFileName[iLayer], strTag[1].c_str(), kiLen);	// confirmed_safe_unsafe_usage
+        strncpy (sFileSet.sRecFileName[iLayer], strTag[1].c_str(), kiLen); // confirmed_safe_unsafe_usage
       } else if (strTag[0].compare ("ProfileIdc") == 0) {
         pDLayer->uiProfileIdc = (EProfileIdc)atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("FRExt") == 0) {
@@ -200,9 +200,9 @@ int ParseLayerConfig (CReadConfig& cRdLayerCfg, const int iLayer, SEncParamExt& 
   pDLayer->iDLayerQp             = sLayerCtx.iDLayerQp;
   pDLayer->sSliceCfg.uiSliceMode = sLayerCtx.sSliceCfg.uiSliceMode;
 
-  memcpy (&pDLayer->sSliceCfg, &sLayerCtx.sSliceCfg, sizeof (SSliceConfig));	// confirmed_safe_unsafe_usage
+  memcpy (&pDLayer->sSliceCfg, &sLayerCtx.sSliceCfg, sizeof (SSliceConfig)); // confirmed_safe_unsafe_usage
   memcpy (&pDLayer->sSliceCfg.sSliceArgument.uiSliceMbNum[0], &sLayerCtx.sSliceCfg.sSliceArgument.uiSliceMbNum[0],
-          sizeof (sLayerCtx.sSliceCfg.sSliceArgument.uiSliceMbNum));	// confirmed_safe_unsafe_usage
+          sizeof (sLayerCtx.sSliceCfg.sSliceArgument.uiSliceMbNum)); // confirmed_safe_unsafe_usage
 
   return 0;
 }
@@ -539,7 +539,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       if (iLen >= sizeof (sFileSet.sRecFileName[iLayer]))
         return 1;
       sFileSet.sRecFileName[iLayer][iLen] = '\0';
-      strncpy (sFileSet.sRecFileName[iLayer], argv[n++], iLen);	// confirmed_safe_unsafe_usage
+      strncpy (sFileSet.sRecFileName[iLayer], argv[n++], iLen); // confirmed_safe_unsafe_usage
     } else if (!strcmp (pCommand, "-dw") && (n + 1 < argc)) {
       unsigned int iLayer = atoi (argv[n++]);
       SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
@@ -794,7 +794,7 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
 
   iTotalFrameMax = (int32_t)fs.uiFrameToBeCoded;
 
-  if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) {	// SVC encoder initialization
+  if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) { // SVC encoder initialization
     fprintf (stderr, "SVC encoder Initialize failed\n");
     iRet = 1;
     goto INSIDE_MEM_FREE;
@@ -900,7 +900,7 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
             delete [] pUCArry;
           }
 #endif
-          fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs);	// write pure bit stream into file
+          fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs); // write pure bit stream into file
           iFrameSize += iLayerSize;
         }
         ++ iLayer;
@@ -910,7 +910,7 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
         fwrite (&iFrameSize, 1, sizeof (int), fTrackStream);
       }
 #endif//STICK_STREAM_SIZE
-      ++ iActualFrameEncodedCount;	// excluding skipped frame time
+      ++ iActualFrameEncodedCount; // excluding skipped frame time
     } else {
       fprintf (stderr, "EncodeFrame(), ret: %d, frame index: %d.\n", iEncFrames, iFrameIdx);
     }

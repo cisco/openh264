@@ -121,7 +121,7 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
     pWelsSvcRc->iNumberMbFrame = iMbWidth * (pDLayerParam->iVideoHeight >> 4);
     pWelsSvcRc->iSliceNum = pSliceCtx->iSliceNumInFrame;
 
-    pWelsSvcRc->iRcVaryPercentage = pEncCtx->pSvcParam->iBitsVaryPercentage;	// % -- for temp
+    pWelsSvcRc->iRcVaryPercentage = pEncCtx->pSvcParam->iBitsVaryPercentage; // % -- for temp
     pWelsSvcRc->iRcVaryRatio = pWelsSvcRc->iRcVaryPercentage;
 
     pWelsSvcRc->iSkipBufferRatio  = SKIP_RATIO;
@@ -665,13 +665,13 @@ void RcCalculateGomQp (sWelsEncCtx* pEncCtx, SMB* pCurMb, int32_t iSliceId) {
   } else {
 //globe decision
     iBitsRatio = 10000 * iLeftBits / (iTargetLeftBits + 1);
-    if (iBitsRatio < 8409)		//2^(-1.5/6)*10000
+    if (iBitsRatio < 8409)              //2^(-1.5/6)*10000
       pSOverRc->iCalculatedQpSlice += 2;
-    else if (iBitsRatio < 9439)	//2^(-0.5/6)*10000
+    else if (iBitsRatio < 9439)         //2^(-0.5/6)*10000
       pSOverRc->iCalculatedQpSlice += 1;
-    else if (iBitsRatio > 10600)		//2^(0.5/6)*10000
+    else if (iBitsRatio > 10600)        //2^(0.5/6)*10000
       pSOverRc->iCalculatedQpSlice -= 1;
-    else if (iBitsRatio > 11900)		//2^(1.5/6)*10000
+    else if (iBitsRatio > 11900)        //2^(1.5/6)*10000
       pSOverRc->iCalculatedQpSlice -= 2;
   }
 
@@ -884,7 +884,7 @@ void RcVBufferCalculationPadding (sWelsEncCtx* pEncCtx) {
 
   if (pWelsSvcRc->iBufferFullnessPadding < kiBufferThreshold) {
     pWelsSvcRc->iPaddingSize = -pWelsSvcRc->iBufferFullnessPadding;
-    pWelsSvcRc->iPaddingSize >>= 3;	// /8
+    pWelsSvcRc->iPaddingSize >>= 3; // /8
     pWelsSvcRc->iBufferFullnessPadding = 0;
   } else
     pWelsSvcRc->iPaddingSize = 0;
@@ -996,7 +996,7 @@ void  WelsRcPictureInitGom (sWelsEncCtx* pEncCtx, long long uiTimeStamp) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
 
   if (pEncCtx->eSliceType == I_SLICE) {
-    if (0 == pWelsSvcRc->iIdrNum) {	//iIdrNum == 0 means encoder has been initialed
+    if (0 == pWelsSvcRc->iIdrNum) { //iIdrNum == 0 means encoder has been initialed
       RcInitRefreshParameter (pEncCtx);
     }
   }
@@ -1296,7 +1296,7 @@ void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
   int32_t iLumaQp = pWelsSvcRc->iLastCalculatedQScale;
   //decide one frame bits allocated
   if (pEncCtx->eSliceType == I_SLICE) {
-    if (0 == pWelsSvcRc->iIdrNum) {	//iIdrNum == 0 means encoder has been initialed
+    if (0 == pWelsSvcRc->iIdrNum) { //iIdrNum == 0 means encoder has been initialed
       RcInitRefreshParameter (pEncCtx);
       double dBpp = 0.05;
       if ((pDLayerParam->fFrameRate > EPSN) && (pDLayerParam->iVideoWidth && pDLayerParam->iVideoHeight))

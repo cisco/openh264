@@ -139,7 +139,7 @@ static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const 
   pFmo->iCountMbNum = iNumMb;
 
   if (kpPps->uiNumSliceGroups < 2 && iNumMb > 0) { // only one slice group, exactly it is single slice based
-    memset (pFmo->pMbAllocMap, 0,  iNumMb * sizeof (int8_t));	// for safe
+    memset (pFmo->pMbAllocMap, 0,  iNumMb * sizeof (int8_t));   // for safe
 
     pFmo->iSliceGroupCount = 1;
 

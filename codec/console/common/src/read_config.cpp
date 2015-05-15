@@ -53,7 +53,7 @@ CReadConfig::CReadConfig (const char* kpConfigFileName)
   : m_pCfgFile (0)
   , m_strCfgFileName (kpConfigFileName)
   , m_iLines (0) {
-  if (strlen (kpConfigFileName) > 0) {	// confirmed_safe_unsafe_usage
+  if (strlen (kpConfigFileName) > 0) { // confirmed_safe_unsafe_usage
     m_pCfgFile = fopen (kpConfigFileName, "r");
   }
 }
@@ -75,7 +75,7 @@ CReadConfig::~CReadConfig() {
 }
 
 void CReadConfig::Openf (const char* kpStrFile) {
-  if (kpStrFile != NULL && strlen (kpStrFile) > 0) {	// confirmed_safe_unsafe_usage
+  if (kpStrFile != NULL && strlen (kpStrFile) > 0) { // confirmed_safe_unsafe_usage
     m_strCfgFileName = kpStrFile;
     m_pCfgFile = fopen (kpStrFile, "r");
   }

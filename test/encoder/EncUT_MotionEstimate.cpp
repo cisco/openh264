@@ -338,7 +338,7 @@ void MotionEstimateTest::DoLineTest (PLineFullSearchFunc func, bool vertical) {
     const int32_t iCurMeBlockQpelPixX = ((iCurMeBlockPixX) << 2);
     const int32_t iCurMeBlockPixY = sMe.iCurMeBlockPixY;
     const int32_t iCurMeBlockQpelPixY = ((iCurMeBlockPixY) << 2);
-    uint16_t* pMvdCostX = sMe.pMvdCost - iCurMeBlockQpelPixX - sMe.sMvp.iMvX;	//do the offset here
+    uint16_t* pMvdCostX = sMe.pMvdCost - iCurMeBlockQpelPixX - sMe.sMvp.iMvX; //do the offset here
     uint16_t* pMvdCostY = sMe.pMvdCost - iCurMeBlockQpelPixY - sMe.sMvp.iMvY;
     uint16_t* pMvdCost = vertical ? pMvdCostY : pMvdCostX;
     int iSize = vertical ? m_iHeight : m_iWidth;

@@ -243,13 +243,13 @@ int32_t WelsWriteSpsSyntax (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_
 
   BsWriteBits (pLocalBitStringAux, 8, pSps->uiProfileIdc);
 
-  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet0Flag);	// bConstraintSet0Flag
-  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet1Flag);	// bConstraintSet1Flag
-  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet2Flag);	// bConstraintSet2Flag
-  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet3Flag);	// bConstraintSet3Flag
-  BsWriteBits (pLocalBitStringAux, 4, 0);							// reserved_zero_4bits, equal to 0
-  BsWriteBits (pLocalBitStringAux, 8, pSps->iLevelIdc);				// iLevelIdc
-  BsWriteUE (pLocalBitStringAux, pSps->uiSpsId + pSpsIdDelta[pSps->uiSpsId]);					     // seq_parameter_set_id
+  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet0Flag);        // bConstraintSet0Flag
+  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet1Flag);        // bConstraintSet1Flag
+  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet2Flag);        // bConstraintSet2Flag
+  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet3Flag);        // bConstraintSet3Flag
+  BsWriteBits (pLocalBitStringAux, 4, 0);                               // reserved_zero_4bits, equal to 0
+  BsWriteBits (pLocalBitStringAux, 8, pSps->iLevelIdc);                 // iLevelIdc
+  BsWriteUE (pLocalBitStringAux, pSps->uiSpsId + pSpsIdDelta[pSps->uiSpsId]);        // seq_parameter_set_id
 
   if (PRO_SCALABLE_BASELINE == pSps->uiProfileIdc || PRO_SCALABLE_HIGH == pSps->uiProfileIdc ||
       PRO_HIGH == pSps->uiProfileIdc || PRO_HIGH10 == pSps->uiProfileIdc ||
@@ -262,26 +262,26 @@ int32_t WelsWriteSpsSyntax (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_
     BsWriteOneBit (pLocalBitStringAux, 0); //seq_scaling_matrix_present_flag
   }
 
-  BsWriteUE (pLocalBitStringAux, pSps->uiLog2MaxFrameNum - 4);	// log2_max_frame_num_minus4
-  BsWriteUE (pLocalBitStringAux, 0/*pSps->uiPocType*/);		     // pic_order_cnt_type
-  BsWriteUE (pLocalBitStringAux, pSps->iLog2MaxPocLsb - 4);	// log2_max_pic_order_cnt_lsb_minus4
+  BsWriteUE (pLocalBitStringAux, pSps->uiLog2MaxFrameNum - 4);  // log2_max_frame_num_minus4
+  BsWriteUE (pLocalBitStringAux, 0/*pSps->uiPocType*/);         // pic_order_cnt_type
+  BsWriteUE (pLocalBitStringAux, pSps->iLog2MaxPocLsb - 4);     // log2_max_pic_order_cnt_lsb_minus4
 
-  BsWriteUE (pLocalBitStringAux, pSps->iNumRefFrames);		// max_num_ref_frames
+  BsWriteUE (pLocalBitStringAux, pSps->iNumRefFrames);          // max_num_ref_frames
   BsWriteOneBit (pLocalBitStringAux, pSps->bGapsInFrameNumValueAllowedFlag); //gaps_in_frame_numvalue_allowed_flag
-  BsWriteUE (pLocalBitStringAux, pSps->iMbWidth - 1);		// pic_width_in_mbs_minus1
-  BsWriteUE (pLocalBitStringAux, pSps->iMbHeight - 1);		// pic_height_in_map_units_minus1
-  BsWriteOneBit (pLocalBitStringAux, true/*pSps->bFrameMbsOnlyFlag*/);	// bFrameMbsOnlyFlag
+  BsWriteUE (pLocalBitStringAux, pSps->iMbWidth - 1);           // pic_width_in_mbs_minus1
+  BsWriteUE (pLocalBitStringAux, pSps->iMbHeight - 1);          // pic_height_in_map_units_minus1
+  BsWriteOneBit (pLocalBitStringAux, true/*pSps->bFrameMbsOnlyFlag*/);  // bFrameMbsOnlyFlag
 
-  BsWriteOneBit (pLocalBitStringAux, 0/*pSps->bDirect8x8InferenceFlag*/);	// direct_8x8_inference_flag
-  BsWriteOneBit (pLocalBitStringAux, pSps->bFrameCroppingFlag);	// bFrameCroppingFlag
+  BsWriteOneBit (pLocalBitStringAux, 0/*pSps->bDirect8x8InferenceFlag*/);       // direct_8x8_inference_flag
+  BsWriteOneBit (pLocalBitStringAux, pSps->bFrameCroppingFlag); // bFrameCroppingFlag
   if (pSps->bFrameCroppingFlag) {
-    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropLeft);	// frame_crop_left_offset
-    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropRight);	// frame_crop_right_offset
-    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropTop);	// frame_crop_top_offset
-    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropBottom);	// frame_crop_bottom_offset
+    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropLeft);         // frame_crop_left_offset
+    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropRight);        // frame_crop_right_offset
+    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropTop);          // frame_crop_top_offset
+    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropBottom);       // frame_crop_bottom_offset
   }
   if (bBaseLayer) {
-    BsWriteOneBit (pLocalBitStringAux, true);	// vui_parameters_present_flag
+    BsWriteOneBit (pLocalBitStringAux, true);   // vui_parameters_present_flag
     WelsWriteVUI (pSps, pBitStringAux);
   } else {
     BsWriteOneBit (pLocalBitStringAux, false);

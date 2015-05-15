@@ -547,8 +547,8 @@ int32_t RecChroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLeve
   uint8_t uiCbpC = pDqLayer->pCbp[iMBXY] >> 4;
 
   if (1 == uiCbpC || 2 == uiCbpC) {
-    WelsChromaDcIdct (pScoeffLevel + 256);	// 256 = 16*16
-    WelsChromaDcIdct (pScoeffLevel + 320);	// 256 = 16*16
+    WelsChromaDcIdct (pScoeffLevel + 256);      // 256 = 16*16
+    WelsChromaDcIdct (pScoeffLevel + 320);      // 256 = 16*16
     for (i = 0; i < 2; i++) {
       int16_t* pRS = pScoeffLevel + 256 + (i << 6);
       uint8_t* pPred = pDqLayer->pPred[i + 1];

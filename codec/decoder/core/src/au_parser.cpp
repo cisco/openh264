@@ -603,7 +603,7 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
       }
     }
     iErr = ParseSps (pCtx, pBs, &iPicWidth, &iPicHeight, pSrcNal, kSrcNalLen);
-    if (ERR_NONE != iErr) {	// modified for pSps/pSubsetSps invalid, 12/1/2009
+    if (ERR_NONE != iErr) { // modified for pSps/pSubsetSps invalid, 12/1/2009
       if (pCtx->eErrorConMethod == ERROR_CON_DISABLE)
         pCtx->iErrorCode |= dsNoParamSets;
       else
@@ -625,7 +625,7 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
       }
     }
     iErr = ParsePps (pCtx, &pCtx->sPpsBuffer[0], pBs, pSrcNal, kSrcNalLen);
-    if (ERR_NONE != iErr) {	// modified for pps invalid, 12/1/2009
+    if (ERR_NONE != iErr) { // modified for pps invalid, 12/1/2009
       if (pCtx->eErrorConMethod == ERROR_CON_DISABLE)
         pCtx->iErrorCode |= dsNoParamSets;
       else
@@ -934,7 +934,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   WELS_READ_VERIFY (BsGetBits (pBs, 8, &uiCode)); // level_idc
   uiLevelIdc = uiCode;
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //seq_parameter_set_id
-  if (uiCode >= MAX_SPS_COUNT) {	// Modified to check invalid negative iSpsId, 12/1/2009
+  if (uiCode >= MAX_SPS_COUNT) { // Modified to check invalid negative iSpsId, 12/1/2009
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, " iSpsId is out of range! \n");
     return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_SPS_ID_OVERFLOW);
   }
@@ -1451,7 +1451,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
  * \note    Call it in case eNalUnitType is NAL_UNIT_SEI.
  *************************************************************************************
  */
-int32_t ParseSei (void* pSei, PBitStringAux pBsAux) {	// reserved Sei_Msg type
+int32_t ParseSei (void* pSei, PBitStringAux pBsAux) { // reserved Sei_Msg type
 
 
   return ERR_NONE;
@@ -1470,7 +1470,7 @@ int32_t ParseSei (void* pSei, PBitStringAux pBsAux) {	// reserved Sei_Msg type
  *************************************************************************************
  */
 int32_t SetScalingListValue (uint8_t* pScalingList, int iScalingListNum, bool* bUseDefaultScalingMatrixFlag,
-                             PBitStringAux pBsAux) {	// reserved Sei_Msg type
+                             PBitStringAux pBsAux) { // reserved Sei_Msg type
   int iLastScale = 8;
   int iNextScale = 8;
   int iDeltaScale;

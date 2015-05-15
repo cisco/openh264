@@ -48,7 +48,7 @@ void ResetLtrState (SLTRState* pLtr) {
   // LTR mark
   pLtr->iLTRMarkMode = LTR_DIRECT_MARK;
   pLtr->iLTRMarkSuccessNum = 0; //successful marked num
-  pLtr->bLTRMarkingFlag = false;	//decide whether current frame marked as LTR
+  pLtr->bLTRMarkingFlag = false; //decide whether current frame marked as LTR
   pLtr->bLTRMarkEnable = false; //when LTR is confirmed and the interval is no smaller than the marking period
   pLtr->iCurLtrIdx = 0;
   memset (&pLtr->iLastLtrIdx , 0 , sizeof (pLtr->iLastLtrIdx)) ;
@@ -295,7 +295,7 @@ static inline void LTRMarkProcess (sWelsEncCtx* pCtx) {
 
     if (pRefList->uiLongRefCount > 0) {
       memmove (&pRefList->pLongRefList[1], &pRefList->pLongRefList[0],
-               pRefList->uiLongRefCount * sizeof (SPicture*));	// confirmed_safe_unsafe_usage
+               pRefList->uiLongRefCount * sizeof (SPicture*)); // confirmed_safe_unsafe_usage
     }
     pLongRefList[0] = pShortRefList[i];
     pRefList->uiLongRefCount++;
@@ -364,7 +364,7 @@ bool WelsUpdateRefList (sWelsEncCtx* pCtx) {
     return false;
 
   if (NULL != pCtx->pDecPic) {
-#if !defined(ENABLE_FRAME_DUMP)	// to save complexity, 1/6/2009
+#if !defined(ENABLE_FRAME_DUMP) // to save complexity, 1/6/2009
     if ((pParamD->iHighestTemporalId == 0) || (kuiTid < pParamD->iHighestTemporalId))
 #endif// !ENABLE_FRAME_DUMP
       // Expanding picture for future reference
@@ -409,7 +409,7 @@ bool WelsUpdateRefList (sWelsEncCtx* pCtx) {
         DeleteSTRFromShortList (pCtx, 0);
       }
     }
-  } else {	// in case IDR currently coding
+  } else { // in case IDR currently coding
     if (pCtx->pSvcParam->bEnableLongTermReference) {
       LTRMarkProcess (pCtx);
 
@@ -594,7 +594,7 @@ bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRe
         }
       }
     }
-  } else {	// safe for IDR
+  } else { // safe for IDR
     WelsResetRefList (pCtx);  //for IDR, SHOULD reset pRef list.
     ResetLtrState (&pCtx->pLtr[pCtx->uiDependencyId]); //SHOULD update it when IDR.
     for (int32_t k = 0; k < MAX_TEMPORAL_LEVEL; k++) {
@@ -725,7 +725,7 @@ bool WelsUpdateRefListScreen (sWelsEncCtx* pCtx) {
     return false;
 
   if (NULL != pCtx->pDecPic) {
-#if !defined(ENABLE_FRAME_DUMP)	// to save complexity, 1/6/2009
+#if !defined(ENABLE_FRAME_DUMP) // to save complexity, 1/6/2009
     if ((pParamD->iHighestTemporalId == 0) || (kuiTid < pParamD->iHighestTemporalId))
 #endif// !ENABLE_FRAME_DUMP
       // Expanding picture for future reference
@@ -749,7 +749,7 @@ bool WelsUpdateRefListScreen (sWelsEncCtx* pCtx) {
     LTRMarkProcessScreen (pCtx);
     pLtr->bLTRMarkingFlag = false;
     ++pLtr->uiLtrMarkInterval;
-  } else {	// in case IDR currently coding
+  } else { // in case IDR currently coding
     LTRMarkProcessScreen (pCtx);
     pLtr->iCurLtrIdx = 1;
     pLtr->iSceneLtrIdx = 1;

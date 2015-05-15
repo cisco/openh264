@@ -95,7 +95,7 @@ void WelsI4x4LumaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride)
   const uint8_t kuiVec2[4] = {kuiHor2, kuiHor2, kuiHor2, kuiHor2};
   const uint8_t kuiVec3[4] = {kuiHor3, kuiHor3, kuiHor3, kuiHor3};
   const uint8_t kuiVec4[4] = {kuiHor4, kuiHor4, kuiHor4, kuiHor4};
-  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16)	// TobeCont'd about assign opt as follows
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16) // TobeCont'd about assign opt as follows
   ST32 (&uiSrc[0], LD32 (kuiVec1));
   ST32 (&uiSrc[4], LD32 (kuiVec2));
   ST32 (&uiSrc[8], LD32 (kuiVec3));
@@ -419,7 +419,7 @@ void WelsIChromaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) 
   uint8_t i = 7;
 
   do {
-    const uint8_t kuiLeft = pRef[iStridex7 - 1];	// pLeft value
+    const uint8_t kuiLeft = pRef[iStridex7 - 1]; // pLeft value
     uint64_t kuiSrc64 = (uint64_t) (0x0101010101010101ULL * kuiLeft);
     ST64 (pPred + iI8x8Stridex7, kuiSrc64);
 

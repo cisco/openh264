@@ -272,7 +272,7 @@ void DestroyPicBuff (PPicBuff* ppPicBuf) {
  */
 void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   int32_t iCpuCores               = 1;
-  memset (pCtx, 0, sizeof (SWelsDecoderContext));	// fill zero first
+  memset (pCtx, 0, sizeof (SWelsDecoderContext));       // fill zero first
   pCtx->sLogCtx = *pLogCtx;
 
   pCtx->pArgDec                   = NULL;
@@ -369,14 +369,14 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
   pCtx->iPicQueueNumber = iPicQueueSize;
   if (pCtx->pPicBuff[LIST_0] != NULL
       && pCtx->pPicBuff[LIST_0]->iCapacity ==
-      iPicQueueSize)	// comparing current picture queue size requested and previous allocation picture queue
-    bNeedChangePicQueue	= false;
+      iPicQueueSize) // comparing current picture queue size requested and previous allocation picture queue
+    bNeedChangePicQueue = false;
   // HD based pic buffer need consider memory size consumed when switch from 720p to other lower size
   WELS_VERIFY_RETURN_IF (ERR_NONE, pCtx->bHaveGotMemory && (kiPicWidth == pCtx->iImgWidthInPixel
-                         && kiPicHeight == pCtx->iImgHeightInPixel) && (!bNeedChangePicQueue))	// have same scaled buffer
+                         && kiPicHeight == pCtx->iImgHeightInPixel) && (!bNeedChangePicQueue)) // have same scaled buffer
 
   // sync update pRefList
-  WelsResetRefPic (pCtx);	// added to sync update ref list due to pictures are free
+  WelsResetRefPic (pCtx); // added to sync update ref list due to pictures are free
 
   if (pCtx->bHaveGotMemory && (kiPicWidth == pCtx->iImgWidthInPixel && kiPicHeight == pCtx->iImgHeightInPixel)
       && pCtx->pPicBuff[LIST_0] != NULL && pCtx->pPicBuff[LIST_0]->iCapacity != iPicQueueSize) {
@@ -621,7 +621,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
     int32_t iSrcIdx        = 0; //the index of source bit-stream till now after parsing one or more NALs
     int32_t iSrcConsumed   = 0; // consumed bit count of source bs
     int32_t iDstIdx        = 0; //the size of current NAL after 0x03 removal and 00 00 01 removal
-    int32_t iSrcLength     = 0;	//the total size of current AU or NAL
+    int32_t iSrcLength     = 0; //the total size of current AU or NAL
     int32_t iRet = 0;
     int32_t iConsumedBytes = 0;
     int32_t iOffset        = 0;
@@ -820,7 +820,7 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
   const int32_t kiPicWidth    = kiMbWidth << 4;
   const int32_t kiPicHeight   = kiMbHeight << 4;
 
-  iErr = WelsRequestMem (pCtx, kiMbWidth, kiMbHeight);	// common memory used
+  iErr = WelsRequestMem (pCtx, kiMbWidth, kiMbHeight); // common memory used
   if (ERR_NONE != iErr) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
              "SyncPictureResolutionExt()::WelsRequestMem--buffer allocated failure.");

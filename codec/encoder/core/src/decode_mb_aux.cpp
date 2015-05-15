@@ -172,8 +172,8 @@ void WelsIDctT4Rec_c (uint8_t* pRec, int32_t iStride, uint8_t* pPred, int32_t iP
 
   for (i = 0; i < 4; i ++) { //horizon
     int32_t iIdx = i << 2;
-    const int32_t kiHorSumU = pDct[iIdx] + pDct[iIdx + 2];	// add 0-2
-    const int32_t kiHorDelU = pDct[iIdx] - pDct[iIdx + 2];	// sub 0-2
+    const int32_t kiHorSumU = pDct[iIdx] + pDct[iIdx + 2];      // add 0-2
+    const int32_t kiHorDelU = pDct[iIdx] - pDct[iIdx + 2];      // sub 0-2
     const int32_t kiHorSumD = pDct[iIdx + 1] + (pDct[iIdx + 3] >> 1);
     const int32_t kiHorDelD = (pDct[iIdx + 1] >> 1) - pDct[iIdx + 3];
 

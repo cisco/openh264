@@ -60,7 +60,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
 #ifdef LONG_TERM_REF
     pCtx->bParamSetsLostFlag      = false;
 #else
-    pCtx->bReferenceLostAtT0Flag = false;	// need initialize it due new seq, 6/4/2010
+    pCtx->bReferenceLostAtT0Flag = false; // need initialize it due new seq, 6/4/2010
 #endif //LONG_TERM_REF
     if (pCtx->iTotalNumMbRec == kiTotalNumMbInCurLayer) {
       pCtx->bPrintFrameErrorTraceFlag = true;
@@ -354,7 +354,7 @@ int32_t ParseRefPicListReordering (PBitStringAux pBs, PSliceHeader pSh) {
           WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //abs_diff_pic_num_minus1
           WELS_CHECK_SE_UPPER_ERROR_NOLOG (uiCode, (uint32_t) (1 << pSps->uiLog2MaxFrameNum), "abs_diff_pic_num_minus1",
                                            GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_REF_REORDERING));
-          pRefPicListReordering->sReorderingSyn[iList][iIdx].uiAbsDiffPicNumMinus1 = uiCode;	// uiAbsDiffPicNumMinus1
+          pRefPicListReordering->sReorderingSyn[iList][iIdx].uiAbsDiffPicNumMinus1 = uiCode; // uiAbsDiffPicNumMinus1
         } else if (kuiIdc == 2) {
           WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //long_term_pic_num
           pRefPicListReordering->sReorderingSyn[iList][iIdx].uiLongTermPicNum = uiCode;
@@ -1186,7 +1186,7 @@ int32_t UpdateAccessUnit (PWelsDecoderContext pCtx) {
       ++ uiActualIdx;
     }
     if (uiActualIdx ==
-        pCurAu->uiActualUnitsNum) {	// no found IDR nal within incoming AU, need exit to avoid mosaic issue, 11/19/2009
+        pCurAu->uiActualUnitsNum) { // no found IDR nal within incoming AU, need exit to avoid mosaic issue, 11/19/2009
 
       pCtx->sDecoderStatistics.uiIDRLostNum++;
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
@@ -1215,7 +1215,7 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
   pCtx->sMb.iMbHeight = (kiMaxHeight + 15) >> 4;
 
   if (pCtx->bInitialDqLayersMem && kiMaxWidth <= pCtx->iPicWidthReq
-      && kiMaxHeight <= pCtx->iPicHeightReq)	// have same dimension memory, skipped
+      && kiMaxHeight <= pCtx->iPicHeightReq) // have same dimension memory, skipped
     return ERR_NONE;
 
 
@@ -1270,7 +1270,7 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
                               sizeof (
                                 int8_t) * MB_PARTITION_SIZE, "pCtx->sMb.pSubMbType[]");
     pCtx->sMb.pSliceIdc[i] = (int32_t*) WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int32_t),
-                             "pCtx->sMb.pSliceIdc[]");	// using int32_t for slice_idc, 4/21/2010
+                             "pCtx->sMb.pSliceIdc[]"); // using int32_t for slice_idc, 4/21/2010
     pCtx->sMb.pResidualPredFlag[i] = (int8_t*) WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
                                      "pCtx->sMb.pResidualPredFlag[]");
     //pCtx->sMb.pMotionPredFlag[i] = (uint8_t *) WelsMallocz(pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(uint8_t), "pCtx->sMb.pMotionPredFlag[]");
@@ -2146,7 +2146,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
     GetI4LumaIChromaAddrTable (pCtx->iDecBlockOffsetArray, pCtx->pDec->iLinesize[0], pCtx->pDec->iLinesize[1]);
 
     if (pNalCur->sNalHeaderExt.uiLayerDqId > kuiTargetLayerDqId) { // confirmed pNalCur will never be NULL
-      break;	// Per formance it need not to decode the remaining bits any more due to given uiLayerDqId required, 9/2/2009
+      break; // Per formance it need not to decode the remaining bits any more due to given uiLayerDqId required, 9/2/2009
     }
 
     memset (&pLayerInfo, 0, sizeof (SLayerInfo));

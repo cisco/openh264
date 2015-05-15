@@ -56,7 +56,7 @@
 #include "svc_encode_slice.h"
 #include "deblocking.h"
 #include "svc_enc_golomb.h"
-#include "crt_util_safe_x.h"	// for safe crt like calls
+#include "crt_util_safe_x.h" // for safe crt like calls
 #include "rc.h"
 
 #include "cpu.h"
@@ -225,7 +225,7 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
     iMinimalMbNum = iNumMbInEachGom;
   }
 
-  if (kiCountSliceNum < 2 || (kiCountSliceNum & 0x01))	// we need suppose uiSliceNum is even for multiple threading
+  if (kiCountSliceNum < 2 || (kiCountSliceNum & 0x01)) // we need suppose uiSliceNum is even for multiple threading
     return;
 
   iMaximalMbNum = kiCountNumMb - (kiCountSliceNum - 1) * iMinimalMbNum;
@@ -252,7 +252,7 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
     assert (iNumMbAssigning > 0);
 
     iMbNumLeft -= iNumMbAssigning;
-    if (iMbNumLeft <= 0) {	// error due to we can not support slice_skip now yet, do not adjust this time
+    if (iMbNumLeft <= 0) { // error due to we can not support slice_skip now yet, do not adjust this time
       assert (0);
       return;
     }
@@ -543,7 +543,7 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
         assert (pSliceBs->bSliceCodedFlag);
 #endif//MT_DEBUG_BS_WR
 
-        memmove (pCtx->pFrameBs + pCtx->iPosBsBuffer, pSliceBs->pBs, pSliceBs->uiBsPos);	// confirmed_safe_unsafe_usage
+        memmove (pCtx->pFrameBs + pCtx->iPosBsBuffer, pSliceBs->pBs, pSliceBs->uiBsPos); // confirmed_safe_unsafe_usage
         pCtx->iPosBsBuffer += pSliceBs->uiBsPos;
 
         iLayerSize += pSliceBs->uiBsPos;
@@ -575,7 +575,7 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
             int32_t iNalIdx = 0;
             const int32_t iCountNal = pSliceBs->iNalIndex;
 
-            memmove (pCtx->pFrameBs + pCtx->iPosBsBuffer, pSliceBs->pBs, pSliceBs->uiBsPos);	// confirmed_safe_unsafe_usage
+            memmove (pCtx->pFrameBs + pCtx->iPosBsBuffer, pSliceBs->pBs, pSliceBs->uiBsPos); // confirmed_safe_unsafe_usage
             pCtx->iPosBsBuffer += pSliceBs->uiBsPos;
 
             iLayerSize += pSliceBs->uiBsPos;
@@ -714,7 +714,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
     iWaitRet = WelsMultipleEventsWaitSingleBlocking (iEventCount,
                &pEventsList[0],
                &pEncPEncCtx->pSliceThreading->pThreadMasterEvent[iEventIdx]); // blocking until at least one event is signalled
-    if (WELS_THREAD_ERROR_WAIT_OBJECT_0 == iWaitRet) {	// start pSlice coding signal waited
+    if (WELS_THREAD_ERROR_WAIT_OBJECT_0 == iWaitRet) { // start pSlice coding signal waited
       SLayerBSInfo* pLbi = pPrivateData->pLayerBs;
       const int32_t kiCurDid            = pEncPEncCtx->uiDependencyId;
       const int32_t kiCurTid            = pEncPEncCtx->uiTemporalId;
@@ -822,7 +822,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 #endif//MT_DEBUG_BS_WR
 
         WelsEventSignal (
-          &pEncPEncCtx->pSliceThreading->pSliceCodedEvent[iEventIdx]);	// mean finished coding current pSlice
+          &pEncPEncCtx->pSliceThreading->pSliceCodedEvent[iEventIdx]); // mean finished coding current pSlice
         WelsEventSignal (
           &pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent);
       } else { // for SM_DYN_SLICE parallelization
@@ -925,10 +925,10 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
           iSliceIdx += kiSliceIdxStep;
         }
 
-        if (uiThrdRet)	// any exception??
+        if (uiThrdRet) // any exception??
           break;
 
-        WelsEventSignal (&pEncPEncCtx->pSliceThreading->pSliceCodedEvent[iEventIdx]);	// mean finished coding current pSlice
+        WelsEventSignal (&pEncPEncCtx->pSliceThreading->pSliceCodedEvent[iEventIdx]); // mean finished coding current pSlice
         WelsEventSignal (&pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent);
       }
     } else if (WELS_THREAD_ERROR_WAIT_OBJECT_0 + 1 == iWaitRet) { // exit thread signal
@@ -940,7 +940,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
       pCurDq = pEncPEncCtx->pCurDqLayer;
       UpdateMbListNeighborParallel (pCurDq->pSliceEncCtx, pCurDq->sMbDataP, iSliceIdx);
       WelsEventSignal (
-        &pEncPEncCtx->pSliceThreading->pFinUpdateMbListEvent[iEventIdx]);	// mean finished update pMb list for this pSlice
+        &pEncPEncCtx->pSliceThreading->pFinUpdateMbListEvent[iEventIdx]); // mean finished update pMb list for this pSlice
     } else { // WELS_THREAD_ERROR_WAIT_TIMEOUT, or WELS_THREAD_ERROR_WAIT_FAILED
       WelsLog (& (pEncPEncCtx->sLogCtx), WELS_LOG_WARNING,
                "[MT] CodingSliceThreadProc(), waiting pReadySliceCodingEvent[%d] failed(%d) and thread%d terminated!", iEventIdx,
@@ -1061,7 +1061,7 @@ int32_t AdjustEnhanceLayer (sWelsEncCtx* pCtx, int32_t iCurDid) {
                                           && pCtx->pSvcParam->iMultipleThreadIdc >= pCtx->pSvcParam->sSpatialLayers[iCurDid -
                                               1].sSliceCfg.sSliceArgument.uiSliceNum);
 
-  if (kbModelingFromSpatial) {	// using spatial base layer for complexity estimation
+  if (kbModelingFromSpatial) { // using spatial base layer for complexity estimation
     // do not need adjust due to not different at both slices of consumed time
     iNeedAdj = NeedDynamicAdjust (pCtx->pSliceThreading->pSliceConsumeTime[iCurDid - 1],
                                   pCtx->pCurDqLayer->pSliceEncCtx->iSliceNumInFrame);
@@ -1071,7 +1071,7 @@ int32_t AdjustEnhanceLayer (sWelsEncCtx* pCtx, int32_t iCurDid) {
                             pCtx->pSliceThreading->pSliceComplexRatio[iCurDid - 1],
                             iCurDid
                            );
-  } else {	// use temporal layer for complexity estimation
+  } else { // use temporal layer for complexity estimation
     // do not need adjust due to not different at both slices of consumed time
     iNeedAdj = NeedDynamicAdjust (pCtx->pSliceThreading->pSliceConsumeTime[iCurDid],
                                   pCtx->pCurDqLayer->pSliceEncCtx->iSliceNumInFrame);

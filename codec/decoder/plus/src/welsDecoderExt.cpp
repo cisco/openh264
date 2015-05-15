@@ -59,7 +59,7 @@ extern "C" {
 #include "manage_dec_ref.h"
 }
 #include "error_code.h"
-#include "crt_util_safe_x.h"	// Safe CRT routines like util for cross platforms
+#include "crt_util_safe_x.h" // Safe CRT routines like util for cross platforms
 #include <time.h>
 #if defined(_WIN32) /*&& defined(_DEBUG)*/
 
@@ -471,7 +471,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
   m_pDecContext->bInstantDecFlag = false; //reset no-delay flag
   if (m_pDecContext->iErrorCode) {
     EWelsNalUnitType eNalType =
-      NAL_UNIT_UNSPEC_0;	//for NBR, IDR frames are expected to decode as followed if error decoding an IDR currently
+      NAL_UNIT_UNSPEC_0; //for NBR, IDR frames are expected to decode as followed if error decoding an IDR currently
 
     eNalType = m_pDecContext->sCurNalHead.eNalUnitType;
 

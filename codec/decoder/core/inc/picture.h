@@ -82,7 +82,7 @@ bool bNewSeqBegin;
 int32_t iMbEcedNum;
 int32_t iMbEcedPropNum;
 int32_t iMbNum;
-} SPicture, *PPicture;	// "Picture" declaration is comflict with Mac system
+} SPicture, *PPicture; // "Picture" declaration is comflict with Mac system
 
 } // namespace WelsDec
 

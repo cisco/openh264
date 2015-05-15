@@ -55,7 +55,7 @@
 #include "crt_util_safe_x.h"
 #include "utils.h"
 
-#include "mt_defs.h"	// for multiple threadin,
+#include "mt_defs.h" // for multiple threadin,
 #include "WelsThreadLib.h"
 
 namespace WelsEnc {

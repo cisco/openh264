@@ -182,7 +182,7 @@ void WriteReferenceReorder (SBitStringAux* pBs, SSliceHeader* sSliceHeader) {
   uint8_t eSliceType                        = sSliceHeader->eSliceType % 5;
   int16_t n = 0;
 
-  if (I_SLICE != eSliceType && SI_SLICE != eSliceType) {	// !I && !SI
+  if (I_SLICE != eSliceType && SI_SLICE != eSliceType) { // !I && !SI
     BsWriteOneBit (pBs, true);
 //    {
     uint16_t uiReorderingOfPicNumsIdc;
@@ -598,7 +598,7 @@ TRY_REENCODING:
     if (DynSlcJudgeSliceBoundaryStepBack (pEncCtx, pSlice, pSliceCtx, pCurMb, &sDss)) { //islice
       pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pSlice);
       pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId] = iCurMbIdx -
-          1;	// update pLastCodedMbIdxOfPartition, need to -1 due to stepping back
+          1; // update pLastCodedMbIdxOfPartition, need to -1 due to stepping back
       ++ pCurLayer->pNumSliceCodedOfPartition[kiPartitionId];
 
       break;
@@ -620,7 +620,7 @@ TRY_REENCODING:
     if (iNextMbIdx == -1 || iNextMbIdx >= kiTotalNumMb || iNumMbCoded >= kiTotalNumMb) {
       pSliceCtx->pCountMbNumInSlice[kiSliceIdx] = iCurMbIdx - pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId];
       pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId] =
-        iCurMbIdx;	// update pLastCodedMbIdxOfPartition, finish coding, use iCurMbIdx directly
+        iCurMbIdx; // update pLastCodedMbIdxOfPartition, finish coding, use iCurMbIdx directly
       break;
     }
   }
@@ -841,7 +841,7 @@ void AddSliceBoundary (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, SSliceCtx* pSlic
   pNextSlice->bSliceHeaderExtFlag =
     (NAL_UNIT_CODED_SLICE_EXT == pCurLayer->sLayerInfo.sNalHeaderExt.sNalUnitHeader.eNalUnitType);
   memcpy (&pNextSlice->sSliceHeaderExt, &pCurSlice->sSliceHeaderExt,
-          sizeof (SSliceHeaderExt));	// confirmed_safe_unsafe_usage
+          sizeof (SSliceHeaderExt)); // confirmed_safe_unsafe_usage
 
   pSliceCtx->pFirstMbInSlice[iNextSliceIdc] = iFirstMbIdxOfNextSlice;
   WelsSetMemMultiplebytes_c (pSliceCtx->pOverallMbMap + iFirstMbIdxOfNextSlice, iNextSliceIdc,
@@ -1111,7 +1111,7 @@ TRY_REENCODING:
     if (DynSlcJudgeSliceBoundaryStepBack (pEncCtx, pSlice, pSliceCtx, pCurMb, &sDss)) {
       pSlice->iMbSkipRun = pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pSlice);
       pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId] = iCurMbIdx -
-          1;	// update pLastCodedMbIdxOfPartition, need to -1 due to stepping back
+          1; // update pLastCodedMbIdxOfPartition, need to -1 due to stepping back
       ++ pCurLayer->pNumSliceCodedOfPartition[kiPartitionId];
 
       break;
@@ -1134,7 +1134,7 @@ TRY_REENCODING:
     //whether all of MB in current pSlice encoded or not
     if (iNextMbIdx == -1 || iNextMbIdx >= kiTotalNumMb || iNumMbCoded >= kiTotalNumMb) {
       pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId] =
-        iCurMbIdx;	// update pLastCodedMbIdxOfPartition, finish coding, use pCurMb_idx directly
+        iCurMbIdx; // update pLastCodedMbIdxOfPartition, finish coding, use pCurMb_idx directly
       break;
     }
   }

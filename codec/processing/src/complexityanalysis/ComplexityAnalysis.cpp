@@ -375,7 +375,7 @@ void CComplexityAnalysisScreen::GomComplexityAnalysisIntra (SPixMap* pSrc) {
     pTmpCur = pPtrY;
 
     for (int32_t i = 0; i < iBlockWidth; i++) {
-      iBlockSadH = iBlockSadV = 0x7fffffff;	// INT_MAX
+      iBlockSadH = iBlockSadV = 0x7fffffff; // INT_MAX
       if (j > 0) {
         m_pIntraFunc[0] (iMemPredMb, pTmpCur, iStrideY);
         iBlockSadH = m_pSadFunc (pTmpCur, iStrideY, iMemPredMb, 16);
@@ -457,7 +457,7 @@ void CComplexityAnalysisScreen::GomComplexityAnalysisInter (SPixMap* pSrc, SPixM
 
       }
 
-      iBlockSadH = iBlockSadV = 0x7fffffff;	// INT_MAX
+      iBlockSadH = iBlockSadV = 0x7fffffff; // INT_MAX
 
       if (j > 0) {
         m_pIntraFunc[0] (iMemPredMb, pTmpCur, iStrideY);
