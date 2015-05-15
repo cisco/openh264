@@ -78,7 +78,7 @@ extern const int8_t g_kiCabacGlobalContextIdx[WELS_CONTEXT_COUNT][4][2];
 extern const uint8_t g_kuiStateTransTable[64][2];
 extern const uint32_t g_kuiGolombUELength[256];
 /*
- *	NAL Unit Type (5 Bits)
+ *  NAL Unit Type (5 Bits)
  */
 enum EWelsNalUnitType {
   NAL_UNIT_UNSPEC_0             = 0,
@@ -116,7 +116,7 @@ enum EWelsNalUnitType {
 };
 
 /*
- *	NAL Reference IDC (2 Bits)
+ *  NAL Reference IDC (2 Bits)
  */
 
 enum EWelsNalRefIdc {
@@ -137,7 +137,7 @@ enum EVclType {
 };
 
 /*
- *	vcl type map for given NAL unit type and corresponding H264 type (0: AVC; 1: SVC).
+ *  vcl type map for given NAL unit type and corresponding H264 type (0: AVC; 1: SVC).
  */
 extern const EVclType g_keTypeMap[32][2];
 
@@ -202,7 +202,7 @@ enum EChromaComp {
 
 
 /*
- *	Memory Management Control Operation (MMCO) code
+ *  Memory Management Control Operation (MMCO) code
  */
 enum EMmcoCode {
   MMCO_END		= 0,
@@ -215,7 +215,7 @@ enum EMmcoCode {
 };
 
 /*
- *	Bit-stream auxiliary reading / writing
+ *  Bit-stream auxiliary reading / writing
  */
 typedef struct TagBitStringAux {
   uint8_t* pStartBuf;	// buffer to start position

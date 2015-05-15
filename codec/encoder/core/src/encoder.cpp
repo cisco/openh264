@@ -61,12 +61,12 @@ namespace WelsEnc {
 
 
 /*!
- * \brief	initialize source picture body
- * \param	pSrc		SSourcePicture*
- * \param	csp		internal csp format
- * \param	iWidth	widht of picture in pixels
- * \param	iHeight	iHeight of picture in pixels
- * \return	successful - 0; otherwise none 0 for failed
+ * \brief   initialize source picture body
+ * \param   pSrc        SSourcePicture*
+ * \param   csp         internal csp format
+ * \param   iWidth      widht of picture in pixels
+ * \param   iHeight     iHeight of picture in pixels
+ * \return  successful - 0; otherwise none 0 for failed
  */
 int32_t InitPic (const void* kpSrc, const int32_t kiColorspace, const int32_t kiWidth, const int32_t kiHeight) {
   SSourcePicture* pSrcPic = (SSourcePicture*)kpSrc;
@@ -149,9 +149,9 @@ void WelsInitBGDFunc (SWelsFuncPtrList* pFuncList, const bool kbEnableBackground
 }
 
 /*!
- * \brief	initialize function pointers that potentially used in Wels encoding
- * \param	pEncCtx		sWelsEncCtx*
- * \return	successful - 0; otherwise none 0 for failed
+ * \brief   initialize function pointers that potentially used in Wels encoding
+ * \param   pEncCtx     sWelsEncCtx*
+ * \return  successful - 0; otherwise none 0 for failed
  */
 int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam, uint32_t uiCpuFlag) {
   int32_t iReturn = ENC_RETURN_SUCCESS;
@@ -227,7 +227,7 @@ int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam,
 }
 
 /*!
- * \brief	initialize frame coding
+ * \brief   initialize frame coding
  */
 void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType) {
   // for bitstream writing
@@ -364,7 +364,7 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
 }
 
 /*!
- * \brief	Dump reconstruction for dependency layer
+ * \brief   Dump reconstruction for dependency layer
  */
 
 extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName, const int8_t kiDid, bool bAppend,
@@ -432,7 +432,7 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName
 }
 
 /*!
- * \brief	Dump the reconstruction pictures
+ * \brief   Dump the reconstruction pictures
  */
 
 void DumpRecFrame (SPicture* pCurPicture, const char* kpFileName, const int8_t kiDid, bool bAppend,

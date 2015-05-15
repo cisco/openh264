@@ -49,7 +49,7 @@ namespace WelsEnc {
 
 
 /*
- *	Reference picture list reordering syntax, refer to page 64 in JVT X201wcm
+ *  Reference picture list reordering syntax, refer to page 64 in JVT X201wcm
  */
 typedef struct TagRefPicListReorderSyntax {
 struct {

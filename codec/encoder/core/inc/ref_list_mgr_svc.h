@@ -61,25 +61,25 @@ FRAME_NUM_OVER_MAX = 0x08
 } COMPARE_FRAME_NUM;
 
 /*
-*	reset LTR marking , recovery ,feedback state to default
+*   reset LTR marking , recovery ,feedback state to default
 */
 void ResetLtrState (SLTRState* pLtr);
 /*
- *	reset reference picture list
+ *  reset reference picture list
  */
 void WelsResetRefList (sWelsEncCtx* pCtx);
 
 /*
- *	update reference picture list
+ *  update reference picture list
  */
 bool WelsUpdateRefList (sWelsEncCtx* pCtx);
 /*
- *	build reference picture list
+ *  build reference picture list
  */
 bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t kiPOC, int32_t iBestLtrRefIdx);
 
 /*
- *	update syntax for reference base related
+ *  update syntax for reference base related
  */
 void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t kiPOC, const int32_t kiFrameType);
 
@@ -89,7 +89,7 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t kiPOC, const int32_t 
 */
 bool CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx);
 /*
-*	decide whether current frame include long term reference mark and update long term reference mark syntax
+*   decide whether current frame include long term reference mark and update long term reference mark syntax
 */
 void WelsMarkPic (sWelsEncCtx* pCtx);
 

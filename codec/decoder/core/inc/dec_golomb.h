@@ -84,7 +84,7 @@ static inline int32_t BsGetBits (PBitStringAux pBs, int32_t iNumBits, uint32_t* 
 }
 
 /*
- *	Exponential Golomb codes decoding routines
+ *  Exponential Golomb codes decoding routines
  */
 
 // for data sharing cross modules and try to reduce size of binary generated, 12/10/2009
@@ -122,7 +122,7 @@ static inline uint32_t GetPrefixBits (uint32_t uiValue) {
 }
 
 /*
- *	Read one bit from bit stream followed
+ *  Read one bit from bit stream followed
  */
 static inline uint32_t BsGetOneBit (PBitStringAux pBs, uint32_t* pCode) {
   return (BsGetBits (pBs, 1, pCode));
@@ -185,7 +185,7 @@ static inline uint32_t BsGetUe (PBitStringAux pBs, uint32_t* pCode) {
 
 
 /*
- *	Read signed exp golomb codes
+ *  Read signed exp golomb codes
  */
 static inline int32_t BsGetSe (PBitStringAux pBs, int32_t* pCode) {
   uint32_t uiCodeNum;
@@ -216,7 +216,7 @@ static inline int32_t BsGetTe0 (PBitStringAux pBs, int32_t iRange, uint32_t* pCo
 }
 
 /*
- *	Get number of trailing bits
+ *  Get number of trailing bits
  */
 static inline int32_t BsGetTrailingBits (uint8_t* pBuf) {
 // TODO

@@ -37,7 +37,7 @@
 namespace WelsEnc {
 
 /*
-*	reset LTR marking , recovery ,feedback state to default
+*   reset LTR marking , recovery ,feedback state to default
 */
 void ResetLtrState (SLTRState* pLtr) {
   pLtr->bReceivedT0LostFlag	= false;
@@ -60,7 +60,7 @@ void ResetLtrState (SLTRState* pLtr) {
 }
 
 /*
- *	reset reference picture list
+ *  reset reference picture list
  */
 void WelsResetRefList (sWelsEncCtx* pCtx) {
   SRefList* pRefList = pCtx->ppRefPicListExt[pCtx->uiDependencyId];
@@ -146,7 +146,7 @@ static inline int32_t CompareFrameNum (int32_t iFrameNumA, int32_t iFrameNumB, i
 
 }
 /*
-*	delete failed mark according LTR recovery pRequest
+*   delete failed mark according LTR recovery pRequest
 */
 static inline void DeleteInvalidLTR (sWelsEncCtx* pCtx) {
   SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
@@ -188,7 +188,7 @@ static inline void DeleteInvalidLTR (sWelsEncCtx* pCtx) {
 
 }
 /*
-*	handle LTR Mark feedback message
+*   handle LTR Mark feedback message
 */
 static inline void HandleLTRMarkFeedback (sWelsEncCtx* pCtx) {
   SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
@@ -243,7 +243,7 @@ static inline void HandleLTRMarkFeedback (sWelsEncCtx* pCtx) {
   }
 }
 /*
- *	LTR mark process
+ *  LTR mark process
  */
 static inline void LTRMarkProcess (sWelsEncCtx* pCtx) {
   SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
@@ -344,7 +344,7 @@ static void PrefetchNextBuffer (sWelsEncCtx* pCtx) {
 }
 
 /*
- *	update reference picture list
+ *  update reference picture list
  */
 bool WelsUpdateRefList (sWelsEncCtx* pCtx) {
   SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
@@ -552,7 +552,7 @@ void FilterLTRMarkingFeedback (sWelsEncCtx* pCtx, SLTRMarkingFeedback* pLTRMarki
 }
 
 /*
- *	build reference picture list
+ *  build reference picture list
  */
 bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRefIdx) {
   SRefList* pRefList		=  pCtx->ppRefPicListExt[pCtx->uiDependencyId];
@@ -562,9 +562,9 @@ bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRe
   uint32_t i				= 0;
 
   // to support any type of cur_dq->mgs_control
-  //	[ 0:	using current layer to do ME/MC;
-  //	  -1:	using store base layer to do ME/MC;
-  //	  2:	using highest layer to do ME/MC; ]
+  //    [ 0:    using current layer to do ME/MC;
+  //     -1:    using store base layer to do ME/MC;
+  //      2:    using highest layer to do ME/MC; ]
 
   // build reference list 0/1 if applicable
 
@@ -623,7 +623,7 @@ static void UpdateBlockStatic (sWelsEncCtx* pCtx) {
 }
 
 /*
- *	update syntax for reference base related
+ *  update syntax for reference base related
  */
 void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t uiFrameType) {
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];

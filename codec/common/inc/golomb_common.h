@@ -56,13 +56,13 @@ namespace WelsCommon {
 
 
 /*!
- * \brief	initialize bitstream writing
+ * \brief   initialize bitstream writing
  *
- * \param	pBs		Bit string auxiliary pointer
- * \param	pBuf	bit-stream pBuffer
- * \param	iSize	iSize in bits for decoder; iSize in bytes for encoder
+ * \param   pBs     Bit string auxiliary pointer
+ * \param   pBuf    bit-stream pBuffer
+ * \param   iSize   iSize in bits for decoder; iSize in bytes for encoder
  *
- * \return	iSize of pBuffer pData in byte; failed in -1 return
+ * \return  iSize of pBuffer pData in byte; failed in -1 return
  */
 static inline int32_t InitBits (SBitStringAux* pBs, const uint8_t* kpBuf, const int32_t kiSize) {
   uint8_t* ptr = (uint8_t*)kpBuf;
@@ -92,7 +92,7 @@ static inline int32_t BsWriteBits (PBitStringAux pBitString, int32_t iLen, const
 }
 
 /*
- *	Write 1 bit
+ *  Write 1 bit
  */
 static inline int32_t BsWriteOneBit (PBitStringAux pBitString, const uint32_t kuiValue) {
   BsWriteBits (pBitString, 1, kuiValue);
@@ -108,7 +108,7 @@ static inline int32_t BsFlush (PBitStringAux pBitString) {
 }
 
 /*
- *	Write unsigned exp golomb codes
+ *  Write unsigned exp golomb codes
  */
 
 static inline int32_t BsWriteUE (PBitStringAux pBitString, const uint32_t kuiValue) {
@@ -135,7 +135,7 @@ static inline int32_t BsWriteUE (PBitStringAux pBitString, const uint32_t kuiVal
 }
 
 /*
- *	Write signed exp golomb codes
+ *  Write signed exp golomb codes
  */
 static inline int32_t BsWriteSE (PBitStringAux pBitString, const int32_t kiValue) {
   uint32_t iTmpValue;
@@ -153,7 +153,7 @@ static inline int32_t BsWriteSE (PBitStringAux pBitString, const int32_t kiValue
 
 
 /*
- *	Write RBSP trailing bits
+ *  Write RBSP trailing bits
  */
 static inline int32_t BsRbspTrailingBits (PBitStringAux pBitString) {
   BsWriteOneBit (pBitString, 1);

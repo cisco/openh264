@@ -55,9 +55,9 @@ extern "C" {
 #endif//__cplusplus
 
 /*!
- * \brief	time cost measure utilization
- * \param	void
- * \return	time elapsed since run (unit: microsecond)
+ * \brief   time cost measure utilization
+ * \param   void
+ * \return  time elapsed since run (unit: microsecond)
  */
 
 static inline int64_t WelsTime (void) {

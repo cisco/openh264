@@ -207,8 +207,8 @@ template<typename T> T WelsClip3(T iX, T iY, T iZ) {
 
 /*
  * Description: to check variable validation and return the specified result
- *	iResult:	value to be checked
- *	iExpected:	the expected value
+ *  iResult:    value to be checked
+ *  iExpected:  the expected value
  */
 #ifndef WELS_VERIFY_RETURN_IFNEQ
 #define WELS_VERIFY_RETURN_IFNEQ(iResult, iExpected) \
@@ -219,8 +219,8 @@ template<typename T> T WelsClip3(T iX, T iY, T iZ) {
 
 /*
  * Description: to check variable validation and return the specified result
- *	iResult:	value to be return
- *	bCaseIf:	negative condition to be verified
+ *  iResult:    value to be return
+ *  bCaseIf:    negative condition to be verified
  */
 #ifndef WELS_VERIFY_RETURN_IF
 #define WELS_VERIFY_RETURN_IF(iResult, bCaseIf) \
@@ -230,11 +230,11 @@ template<typename T> T WelsClip3(T iX, T iY, T iZ) {
 #endif//#if WELS_VERIFY_RETURN_IF
 
 /*
- *	Description: to check variable validation and return the specified result
- *		with correspoinding process advance.
- *	 result:	value to be return
- *	 case_if:	negative condition to be verified
- *	 proc:		process need perform
+ *  Description: to check variable validation and return the specified result
+ *      with correspoinding process advance.
+ *   result:    value to be return
+ *   case_if:   negative condition to be verified
+ *   proc:      process need perform
  */
 #ifndef WELS_VERIFY_RETURN_PROC_IF
 #define WELS_VERIFY_RETURN_PROC_IF(iResult, bCaseIf, fProc) \

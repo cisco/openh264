@@ -68,7 +68,7 @@ inline  void   WelsUpdateSpatialIdxMap (sWelsEncCtx* pEncCtx, int32_t iPos, SPic
 
 /***************************************************************************
 *
-*	implement of the interface
+*   implement of the interface
 *
 ***************************************************************************/
 
@@ -285,8 +285,8 @@ int32_t CWelsPreProcess::UpdateSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCodin
 
 
 /*
-*	SingleLayerPreprocess: down sampling if applicable
-*  @return:	exact number of spatial layers need to encoder indeed
+*   SingleLayerPreprocess: down sampling if applicable
+*  @return: exact number of spatial layers need to encoder indeed
 */
 int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSourcePicture* kpSrc,
     Scaled_Picture* pScaledPicture) {
@@ -405,7 +405,7 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
 
 
 /*!
- * \brief	Whether input picture need be scaled?
+ * \brief   Whether input picture need be scaled?
  */
 bool JudgeNeedOfScaling (SWelsSvcCodingParam* pParam, Scaled_Picture* pScaledPicture) {
   const int32_t kiInputPicWidth	= pParam->SUsedPicRect.iWidth;
@@ -1195,10 +1195,10 @@ int32_t CWelsPreProcess::UpdateBlockIdcForScreen (uint8_t*  pCurBlockStaticPoint
 }
 
 /*!
-* \brief	exchange two picture pData planes
-* \param	ppPic1		picture pointer to picture 1
-* \param	ppPic2		picture pointer to picture 2
-* \return	none
+* \brief    exchange two picture pData planes
+* \param    ppPic1      picture pointer to picture 1
+* \param    ppPic2      picture pointer to picture 2
+* \return   none
 */
 void CWelsPreProcess::WelsExchangeSpatialPictures (SPicture** ppPic1, SPicture** ppPic2) {
   SPicture* tmp	= *ppPic1;

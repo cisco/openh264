@@ -80,22 +80,22 @@ void WelsLog (SLogContext* logCtx, int32_t iLevel, const char* kpFmt, ...) {
 #endif//CALC_PSNR
 
 /*
- *	PSNR calculation routines
+ *  PSNR calculation routines
  */
 /*!
  *************************************************************************************
- * \brief	PSNR calculation utilization in Wels
+ * \brief   PSNR calculation utilization in Wels
  *
- * \param	pTarPic		target picture to be calculated in Picture pData format
- * \param	iTarStride	stride of target picture pData pBuffer
- * \param 	pRefPic		base referencing picture samples
- * \param	iRefStride	stride of reference picture pData pBuffer
- * \param	iWidth		picture iWidth in pixel
- * \param	iHeight		picture iHeight in pixel
+ * \param   pTarPic     target picture to be calculated in Picture pData format
+ * \param   iTarStride  stride of target picture pData pBuffer
+ * \param   pRefPic     base referencing picture samples
+ * \param   iRefStride  stride of reference picture pData pBuffer
+ * \param   iWidth      picture iWidth in pixel
+ * \param   iHeight     picture iHeight in pixel
  *
- * \return	actual PSNR result;
+ * \return  actual PSNR result;
  *
- * \note	N/A
+ * \note    N/A
  *************************************************************************************
  */
 float WelsCalcPsnr (const void* kpTarPic,

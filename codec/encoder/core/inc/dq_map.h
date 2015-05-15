@@ -44,7 +44,7 @@
 
 namespace WelsEnc {
 /*
- *	Dependency Quality IDC
+ *  Dependency Quality IDC
  */
 
 typedef struct TagDqIdc {

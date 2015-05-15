@@ -41,7 +41,7 @@
 #define WELS_CPU_CORE_FEATURE_DETECTION_H__
 
 /*
- *	WELS CPU feature flags
+ *  WELS CPU feature flags
  */
 #define WELS_CPU_MMX        0x00000001    /* mmx */
 #define WELS_CPU_MMXEXT     0x00000002    /* mmx-ext*/
@@ -80,7 +80,7 @@
 #define WELS_CPU_NEON       0x000004    /* NEON */
 
 /*
- *	Interfaces for CPU core feature detection as below
+ *  Interfaces for CPU core feature detection as below
  */
 
 #endif//WELS_CPU_CORE_FEATURE_DETECTION_H__

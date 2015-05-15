@@ -101,7 +101,7 @@ int32_t   iFrameAverageQp;
 SScreenBlockFeatureStorage* pScreenBlockFeatureStorage;
 
   /*
-   *	set picture as unreferenced
+   *    set picture as unreferenced
    */
   void SetUnref () {
       iFramePoc		= -1;

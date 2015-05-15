@@ -46,7 +46,7 @@
 #include "WelsThreadLib.h"
 
 /*
- *	MT_DEBUG: output trace MT related into log file
+ *  MT_DEBUG: output trace MT related into log file
  */
 //#define MT_DEBUG
 //#define ENABLE_TRACE_MT

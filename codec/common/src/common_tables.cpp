@@ -146,7 +146,7 @@ const uint8_t g_kuiChromaQpTable[52] = {
 };
 
 /*
- *	vcl type map for given NAL unit type and corresponding H264 type (0: AVC; 1: SVC).
+ *  vcl type map for given NAL unit type and corresponding H264 type (0: AVC; 1: SVC).
  */
 const EVclType g_keTypeMap[32][2] = {
   { NON_VCL,    NON_VCL },      // 0: NAL_UNIT_UNSPEC_0

@@ -122,9 +122,9 @@ int32_t ExpandNalUnitList (PAccessUnit* ppAu, const int32_t kiOrgSize, const int
 }
 
 /*
- *	MemGetNextNal
- *	Get next NAL Unit for using.
- *	Need expand NAL Unit list if exceeding count number of available NAL Units withing an Access Unit
+ *  MemGetNextNal
+ *  Get next NAL Unit for using.
+ *  Need expand NAL Unit list if exceeding count number of available NAL Units withing an Access Unit
  */
 PNalUnit MemGetNextNal (PAccessUnit* ppAu) {
   PAccessUnit pAu = *ppAu;

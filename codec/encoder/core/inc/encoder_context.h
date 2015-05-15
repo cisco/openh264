@@ -61,7 +61,7 @@
 namespace WelsEnc {
 
 /*
- *	reference list for each quality layer in SVC
+ *  reference list for each quality layer in SVC
  */
 typedef struct TagRefList {
   SPicture*					pShortRefList[1 + MAX_SHORT_REF_COUNT]; // reference list 0 - int16_t

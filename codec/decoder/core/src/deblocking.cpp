@@ -862,11 +862,11 @@ void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t
 }
 
 /*!
- * \brief	AVC slice deblocking filtering target layer
+ * \brief   AVC slice deblocking filtering target layer
  *
- * \param	dec			Wels avc decoder context
+ * \param   dec         Wels avc decoder context
  *
- * \return	NONE
+ * \return  NONE
  */
 void WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFunc pDeblockMb) {
   PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
@@ -931,12 +931,12 @@ void WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFun
   }
 }
 /*!
- * \brief	deblocking module initialize
+ * \brief   deblocking module initialize
  *
- * \param	pf
+ * \param   pf
  *          cpu
  *
- * \return	NONE
+ * \return  NONE
  */
 
 void  DeblockingInit (SDeblockingFunc*  pFunc,  int32_t iCpu) {

@@ -93,7 +93,7 @@ using namespace std;
 using namespace WelsEnc;
 
 /*
- *	Layer Context
+ *  Layer Context
  */
 typedef struct LayerpEncCtx_s {
   int32_t				iDLayerQp;

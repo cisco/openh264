@@ -43,13 +43,13 @@ using namespace WelsCommon;
 namespace WelsDec {
 
 /*!
- * \brief	input bits for decoder or initialize bitstream writing in encoder
+ * \brief   input bits for decoder or initialize bitstream writing in encoder
  *
- * \param	pBitString	Bit string auxiliary pointer
- * \param	kpBuf		bit-stream buffer
- * \param	kiSize	    size in bits for decoder; size in bytes for encoder
+ * \param   pBitString  Bit string auxiliary pointer
+ * \param   kpBuf       bit-stream buffer
+ * \param   kiSize      size in bits for decoder; size in bytes for encoder
  *
- * \return	size of buffer data in byte; failed in -1 return
+ * \return  size of buffer data in byte; failed in -1 return
  */
 int32_t DecInitBits (PBitStringAux pBitString, const uint8_t* kpBuf, const int32_t kiSize);
 

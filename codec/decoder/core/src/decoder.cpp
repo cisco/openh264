@@ -323,12 +323,12 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
 }
 
 /*
- *	destory_mb_blocks
+ *  destory_mb_blocks
  */
 
 
 /*
- *	get size of reference picture list in target layer incoming, = (iNumRefFrames
+ *  get size of reference picture list in target layer incoming, = (iNumRefFrames
  */
 static inline int32_t GetTargetRefListSize (PWelsDecoderContext pCtx) {
   int32_t iNumRefFrames	= 0;
@@ -350,7 +350,7 @@ static inline int32_t GetTargetRefListSize (PWelsDecoderContext pCtx) {
 }
 
 /*
- *	request memory blocks for decoder avc part
+ *  request memory blocks for decoder avc part
  */
 int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight) {
   const int32_t kiPicWidth	= kiMbWidth << 4;
@@ -431,7 +431,7 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
 }
 
 /*
- *	free memory blocks in avc
+ *  free memory blocks in avc
  */
 void WelsFreeMem (PWelsDecoderContext pCtx) {
   int32_t iListIdx = 0;
@@ -460,7 +460,7 @@ void WelsFreeMem (PWelsDecoderContext pCtx) {
 }
 
 /*!
- * \brief	Open decoder
+ * \brief   Open decoder
  */
 int32_t WelsOpenDecoder (PWelsDecoderContext pCtx) {
   // function pointers
@@ -492,7 +492,7 @@ int32_t WelsOpenDecoder (PWelsDecoderContext pCtx) {
 }
 
 /*!
- * \brief	Close decoder
+ * \brief   Close decoder
  */
 void WelsCloseDecoder (PWelsDecoderContext pCtx) {
   WelsFreeMem (pCtx);
@@ -511,7 +511,7 @@ void WelsCloseDecoder (PWelsDecoderContext pCtx) {
 }
 
 /*!
- * \brief	configure decoder parameters
+ * \brief   configure decoder parameters
  */
 int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpParam) {
   if (NULL == pCtx || NULL == kpParam)
@@ -549,14 +549,14 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
 
 /*!
  *************************************************************************************
- * \brief	Initialize Wels decoder parameters and memory
+ * \brief   Initialize Wels decoder parameters and memory
  *
- * \param 	pCtx input context to be initialized at first stage
+ * \param   pCtx input context to be initialized at first stage
  *
- * \return	0 - successed
- * \return	1 - failed
+ * \return  0 - successed
+ * \return  1 - failed
  *
- * \note	N/A
+ * \note    N/A
  *************************************************************************************
  */
 int32_t WelsInitDecoder (PWelsDecoderContext pCtx, const bool bParseOnly, SLogContext* pLogCtx) {
@@ -574,13 +574,13 @@ int32_t WelsInitDecoder (PWelsDecoderContext pCtx, const bool bParseOnly, SLogCo
 
 /*!
  *************************************************************************************
- * \brief	Uninitialize Wels decoder parameters and memory
+ * \brief   Uninitialize Wels decoder parameters and memory
  *
- * \param 	pCtx input context to be uninitialized at release stage
+ * \param   pCtx input context to be uninitialized at release stage
  *
- * \return	NONE
+ * \return  NONE
  *
- * \note	N/A
+ * \note    N/A
  *************************************************************************************
  */
 void WelsEndDecoder (PWelsDecoderContext pCtx) {
@@ -598,18 +598,18 @@ void GetVclNalTemporalId (PWelsDecoderContext pCtx) {
 
 /*!
  *************************************************************************************
- * \brief	First entrance to decoding core interface.
+ * \brief   First entrance to decoding core interface.
  *
- * \param 	pCtx	        decoder context
- * \param	pBufBs	        bit streaming buffer
- * \param	kBsLen	        size in bytes length of bit streaming buffer input
- * \param	ppDst	        picture payload data to be output
- * \param	pDstBufInfo	    buf information of ouput data
+ * \param   pCtx            decoder context
+ * \param   pBufBs          bit streaming buffer
+ * \param   kBsLen          size in bytes length of bit streaming buffer input
+ * \param   ppDst           picture payload data to be output
+ * \param   pDstBufInfo     buf information of ouput data
  *
- * \return	0 - successed
- * \return	1 - failed
+ * \return  0 - successed
+ * \return  1 - failed
  *
- * \note	N/A
+ * \note    N/A
  *************************************************************************************
  */
 int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const int32_t kiBsLen,
@@ -807,13 +807,13 @@ int32_t DecoderSetCsp (PWelsDecoderContext pCtx, const int32_t kiColorFormat) {
 }
 
 /*!
- * \brief	make sure synchonozization picture resolution (get from slice header) among different parts (i.e, memory related and so on)
- *			over decoder internal
+ * \brief   make sure synchonozization picture resolution (get from slice header) among different parts (i.e, memory related and so on)
+ *          over decoder internal
  * ( MB coordinate and parts of data within decoder context structure )
- * \param	pCtx		Wels decoder context
- * \param	iMbWidth	MB width
- * \pram	iMbHeight	MB height
- * \return	0 - successful; none 0 - something wrong
+ * \param   pCtx        Wels decoder context
+ * \param   iMbWidth    MB width
+ * \pram    iMbHeight   MB height
+ * \return  0 - successful; none 0 - something wrong
  */
 int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight) {
   int32_t iErr = ERR_NONE;

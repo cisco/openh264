@@ -166,9 +166,9 @@ void CheckReferenceNumSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam
   }
 }
 /*!
- * \brief	validate checking in parameter configuration
- * \pParam	pParam		SWelsSvcCodingParam*
- * \return	successful - 0; otherwise none 0 for failed
+ * \brief   validate checking in parameter configuration
+ * \pParam  pParam      SWelsSvcCodingParam*
+ * \return  successful - 0; otherwise none 0 for failed
  */
 int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
   const float fEpsn = 0.000001f;
@@ -654,12 +654,12 @@ int32_t WelsEncoderApplyBitVaryRang (SLogContext* pLogCtx, SWelsSvcCodingParam* 
 }
 
 /*!
- * \brief	acquire count number of layers and NALs based on configurable paramters dependency
- * \pParam	pCtx				sWelsEncCtx*
- * \pParam	pParam			SWelsSvcCodingParam*
- * \pParam	pCountLayers	pointer of count number of layers indeed
- * \pParam	iCountNals		pointer of count number of nals indeed
- * \return	0 - successful; otherwise failed
+ * \brief   acquire count number of layers and NALs based on configurable paramters dependency
+ * \pParam  pCtx            sWelsEncCtx*
+ * \pParam  pParam          SWelsSvcCodingParam*
+ * \pParam  pCountLayers    pointer of count number of layers indeed
+ * \pParam  iCountNals      pointer of count number of nals indeed
+ * \return  0 - successful; otherwise failed
  */
 static inline int32_t AcquireLayersNals (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pParam, int32_t* pCountLayers,
     int32_t* pCountNals) {
@@ -1054,9 +1054,9 @@ int32_t FindExistingPps (SWelsSPS* pSps, SSubsetSps* pSubsetSps, const bool kbUs
 }
 
 /*!
- * \brief	initialize ppDqLayerList and slicepEncCtx_list due to count number of layers available
- * \pParam	pCtx			sWelsEncCtx*
- * \return	0 - successful; otherwise failed
+ * \brief   initialize ppDqLayerList and slicepEncCtx_list due to count number of layers available
+ * \pParam  pCtx            sWelsEncCtx*
+ * \return  0 - successful; otherwise failed
  */
 static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingParasetList) {
   SWelsSvcCodingParam* pParam	= NULL;
@@ -1671,9 +1671,9 @@ void ReleaseMemoryVaaScreen (SVAAFrameInfo* pVaa,  CMemoryAlign* pMa, const int3
   }
 }
 /*!
- * \brief	request specific memory for SVC
- * \pParam	pEncCtx		sWelsEncCtx*
- * \return	successful - 0; otherwise none 0 for failed
+ * \brief   request specific memory for SVC
+ * \pParam  pEncCtx     sWelsEncCtx*
+ * \return  successful - 0; otherwise none 0 for failed
  */
 void GetMvMvdRange (SWelsSvcCodingParam* pParam, int32_t& iMvRange, int32_t& iMvdRange) {
   ELevelIdc iMinLevelIdc = LEVEL_5_2;
@@ -1941,9 +1941,9 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
 
 
 /*!
- * \brief	free memory	in SVC core encoder
- * \pParam	pEncCtx		sWelsEncCtx*
- * \return	none
+ * \brief   free memory in SVC core encoder
+ * \pParam  pEncCtx     sWelsEncCtx*
+ * \return  none
  */
 void FreeMemorySvc (sWelsEncCtx** ppCtx) {
   if (NULL != *ppCtx) {
@@ -2316,7 +2316,7 @@ int32_t InitSliceSettings (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPar
 }
 
 /*!
- * \brief	log output for cpu features/capabilities
+ * \brief   log output for cpu features/capabilities
  */
 void OutputCpuFeaturesLog (SLogContext* pLogCtx, uint32_t uiCpuFeatureFlags, uint32_t uiCpuCores,
                            int32_t iCacheLineSize) {
@@ -2412,10 +2412,10 @@ int32_t GetMultipleThreadIdc (SLogContext* pLogCtx, SWelsSvcCodingParam* pCoding
 }
 
 /*!
- * \brief	initialize Wels avc encoder core library
- * \pParam	ppCtx		sWelsEncCtx**
- * \pParam	pParam		SWelsSvcCodingParam*
- * \return	successful - 0; otherwise none 0 for failed
+ * \brief   initialize Wels avc encoder core library
+ * \pParam  ppCtx       sWelsEncCtx**
+ * \pParam  pParam      SWelsSvcCodingParam*
+ * \return  successful - 0; otherwise none 0 for failed
  */
 int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingParam, SLogContext* pLogCtx,
                             SExistingParasetList* pExistingParasetList) {
@@ -2605,9 +2605,9 @@ void StatOverallEncodingExt (sWelsEncCtx* pCtx) {
 }
 #endif
 /*!
- * \brief	uninitialize Wels encoder core library
- * \pParam	pEncCtx		sWelsEncCtx*
- * \return	none
+ * \brief   uninitialize Wels encoder core library
+ * \pParam  pEncCtx     sWelsEncCtx*
+ * \return  none
  */
 void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
   if (NULL == ppCtx || NULL == *ppCtx)
@@ -2650,7 +2650,7 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
 }
 
 /*!
- * \brief	get temporal level due to configuration and coding context
+ * \brief   get temporal level due to configuration and coding context
  */
 int32_t GetTemporalLevel (SSpatialLayerInternal* fDlp, const int32_t kiFrameNum, const int32_t kiGopSize) {
   const int32_t kiCodingIdx	= kiFrameNum & (kiGopSize - 1);
@@ -2810,7 +2810,7 @@ void WelsInitCurrentDlayerMltslc (sWelsEncCtx* pCtx, int32_t iPartitionNum) {
 }
 
 /*!
- * \brief	initialize current layer
+ * \brief   initialize current layer
  */
 void WelsInitCurrentLayer (sWelsEncCtx* pCtx,
                            const int32_t kiWidth,
@@ -3072,7 +3072,7 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
 }
 
 /*!
- * \brief	swap pDq layers between current pDq layer and reference pDq layer
+ * \brief   swap pDq layers between current pDq layer and reference pDq layer
  */
 
 static inline void WelsSwapDqLayers (sWelsEncCtx* pCtx) {
@@ -3087,7 +3087,7 @@ static inline void WelsSwapDqLayers (sWelsEncCtx* pCtx) {
 }
 
 /*!
- * \brief	prefetch reference picture after WelsBuildRefList
+ * \brief   prefetch reference picture after WelsBuildRefList
  */
 static inline void PrefetchReferencePicture (sWelsEncCtx* pCtx, const EVideoFrameType keFrameType) {
   SSlice* pSliceBase = &pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[0];
@@ -3208,8 +3208,8 @@ void UpdatePpsList (sWelsEncCtx* pCtx) {
 }
 
 /*!
- * \brief	write all parameter sets introduced in SVC extension
- * \return	writing results, success or error
+ * \brief   write all parameter sets introduced in SVC extension
+ * \return  writing results, success or error
  */
 int32_t WelsWriteParameterSets (sWelsEncCtx* pCtx, int32_t* pNalLen, int32_t* pNumNal, int32_t* pTotalLength) {
   int32_t iSize	= 0;
@@ -3652,12 +3652,12 @@ int32_t WriteSavcParaset_Listing (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
 }
 
 /*!
- * \brief	core svc encoding process
+ * \brief   core svc encoding process
  *
- * \pParam	pCtx			sWelsEncCtx*, encoder context
- * \pParam	pFbi			FrameBSInfo*
- * \pParam	pSrcPic			Source Picture
- * \return	EFrameType (videoFrameTypeIDR/videoFrameTypeI/videoFrameTypeP)
+ * \pParam  pCtx            sWelsEncCtx*, encoder context
+ * \pParam  pFbi            FrameBSInfo*
+ * \pParam  pSrcPic         Source Picture
+ * \return  EFrameType (videoFrameTypeIDR/videoFrameTypeI/videoFrameTypeP)
  */
 int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSourcePicture* pSrcPic) {
   if (pCtx == NULL) {
@@ -4364,8 +4364,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 }
 
 /*!
- * \brief	Wels SVC encoder parameters adjustment
- *			SVC adjustment results in new requirement in memory blocks adjustment
+ * \brief   Wels SVC encoder parameters adjustment
+ *          SVC adjustment results in new requirement in memory blocks adjustment
  */
 int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewParam) {
   SWelsSvcCodingParam* pOldParam		= NULL;

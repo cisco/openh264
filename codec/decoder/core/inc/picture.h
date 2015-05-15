@@ -39,8 +39,8 @@
 namespace WelsDec {
 
 /*
- *	Reconstructed Picture definition
- *	It is used to express reference picture, also consequent reconstruction picture for output
+ *  Reconstructed Picture definition
+ *  It is used to express reference picture, also consequent reconstruction picture for output
  */
 typedef struct TagPicture {
 /************************************payload data*********************************/

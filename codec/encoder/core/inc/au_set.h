@@ -48,15 +48,15 @@
 namespace WelsEnc {
 /*!
  *************************************************************************************
- * \brief	to write Sequence Parameter Set (SPS)
+ * \brief   to write Sequence Parameter Set (SPS)
  *
- * \param 	pSps     	SWelsSPS to be wrote
- * \param	bs_aux		bitstream writer auxiliary
+ * \param   pSps        SWelsSPS to be wrote
+ * \param   bs_aux      bitstream writer auxiliary
  *
- * \return	0 - successed
- *		    1 - failed
+ * \return  0 - successed
+ *          1 - failed
  *
- * \note	Call it in case EWelsNalUnitType is SPS.
+ * \note    Call it in case EWelsNalUnitType is SPS.
  *************************************************************************************
  */
 
@@ -65,15 +65,15 @@ int32_t WelsWriteSpsNal (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_t* 
 
 /*!
  *************************************************************************************
- * \brief	to write SubSet Sequence Parameter Set
+ * \brief   to write SubSet Sequence Parameter Set
  *
- * \param 	sub_sps		subset pSps parsed
- * \param	bs_aux		bitstream writer auxiliary
+ * \param   sub_sps     subset pSps parsed
+ * \param   bs_aux      bitstream writer auxiliary
  *
- * \return	0 - successed
- *		    1 - failed
+ * \return  0 - successed
+ *          1 - failed
  *
- * \note	Call it in case EWelsNalUnitType is SubSet SPS.
+ * \note    Call it in case EWelsNalUnitType is SubSet SPS.
  *************************************************************************************
  */
 int32_t WelsWriteSubsetSpsSyntax (SSubsetSps* pSubsetSps, SBitStringAux* pBitStringAux , int32_t* pSpsIdDelta);
@@ -81,27 +81,27 @@ int32_t WelsWriteSubsetSpsSyntax (SSubsetSps* pSubsetSps, SBitStringAux* pBitStr
 
 /*!
  *************************************************************************************
- * \brief	to write Picture Parameter Set (PPS)
+ * \brief   to write Picture Parameter Set (PPS)
  *
- * \param 	pPps     	pPps
- * \param	bs_aux		bitstream writer auxiliary
+ * \param   pPps        pPps
+ * \param   bs_aux      bitstream writer auxiliary
  *
- * \return	0 - successed
- *		    1 - failed
+ * \return  0 - successed
+ *          1 - failed
  *
- * \note	Call it in case EWelsNalUnitType is PPS.
+ * \note    Call it in case EWelsNalUnitType is PPS.
  *************************************************************************************
  */
 int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, SParaSetOffset* sPSOVector);
 
 /*!
- * \brief	initialize pSps based on configurable parameters in svc
- * \param	pSps				SWelsSPS*
- * \param   pLayerParam     SSpatialLayerConfig  dependency layer parameter
- * \param	pLayerParamInternal		SSpatialLayerInternal*, internal dependency layer parameter
- * \param	iSpsId			SPS Id
- * \return	0 - successful
- *			1 - failed
+ * \brief   initialize pSps based on configurable parameters in svc
+ * \param   pSps                SWelsSPS*
+ * \param   pLayerParam         SSpatialLayerConfig  dependency layer parameter
+ * \param   pLayerParamInternal SSpatialLayerInternal*, internal dependency layer parameter
+ * \param   iSpsId              SPS Id
+ * \return  0 - successful
+ *          1 - failed
  */
 int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialLayerInternal* pLayerParamInternal,
                      const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame,
@@ -109,13 +109,13 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
                      const int32_t kiDlayerCount,bool bSVCBaselayer);
 
 /*!
- * \brief	initialize subset pSps based on configurable parameters in svc
- * \param	pSubsetSps		SSubsetSps*
- * \param   pLayerParam     SSpatialLayerConfig  dependency layer parameter
- * \param	pLayerParamInternal		SSpatialLayerInternal*, internal dependency layer parameter
- * \param	kiSpsId			SPS Id
- * \return	0 - successful
- *			1 - failed
+ * \brief   initialize subset pSps based on configurable parameters in svc
+ * \param   pSubsetSps          SSubsetSps*
+ * \param   pLayerParam         SSpatialLayerConfig  dependency layer parameter
+ * \param   pLayerParamInternal SSpatialLayerInternal*, internal dependency layer parameter
+ * \param   kiSpsId             SPS Id
+ * \return  0 - successful
+ *          1 - failed
  */
 int32_t WelsInitSubsetSps (SSubsetSps* pSubsetSps, SSpatialLayerConfig* pLayerParam,
                            SSpatialLayerInternal* pLayerParamInternal,
@@ -124,15 +124,15 @@ int32_t WelsInitSubsetSps (SSubsetSps* pSubsetSps, SSpatialLayerConfig* pLayerPa
                            const int32_t kiDlayerCount);
 
 /*!
- * \brief	initialize pPps based on configurable parameters and pSps(subset pSps) in svc
- * \param	pPps							SWelsPPS*
- * \param	pSps							SWelsSPS*
- * \param	pSubsetSps					SSubsetSps*
- * \param   kbDeblockingFilterPresentFlag			bool
- * \param	kiPpsId						PPS Id
- * \param	kbUsingSubsetSps					bool
- * \return	0 - successful
- *			1 - failed
+ * \brief   initialize pPps based on configurable parameters and pSps(subset pSps) in svc
+ * \param   pPps                            SWelsPPS*
+ * \param   pSps                            SWelsSPS*
+ * \param   pSubsetSps                      SSubsetSps*
+ * \param   kbDeblockingFilterPresentFlag   bool
+ * \param   kiPpsId                         PPS Id
+ * \param   kbUsingSubsetSps                bool
+ * \return  0 - successful
+ *          1 - failed
  */
 int32_t WelsInitPps (SWelsPPS* pPps,
                      SWelsSPS* pSps,
@@ -148,15 +148,15 @@ int32_t WelsCheckRefFrameLimitationLevelIdcFirst (SLogContext* pLogCtx, SWelsSvc
 int32_t WelsAdjustLevel (SSpatialLayerConfig* pSpatialLayer);
 
 /*!
- * \brief	check if the current parameter can found a presenting sps
- * \param	pParam		      the current encoding paramter in SWelsSvcCodingParam
- * \param	kbUseSubsetSps	bool
- * \param	iDlayerIndex		int, the index of current D layer
- * \param	iDlayerCount	  int, the number of total D layer
- * \param pSpsArray			  array of all the stored SPSs
- * \param	pSubsetArray		array of all the stored Subset-SPSs
- * \return	0 - successful
- *			   -1 - cannot find existing SPS for current encoder parameter
+ * \brief   check if the current parameter can found a presenting sps
+ * \param   pParam          the current encoding paramter in SWelsSvcCodingParam
+ * \param   kbUseSubsetSps  bool
+ * \param   iDlayerIndex    int, the index of current D layer
+ * \param   iDlayerCount    int, the number of total D layer
+ * \param pSpsArray         array of all the stored SPSs
+ * \param   pSubsetArray    array of all the stored Subset-SPSs
+ * \return  0 - successful
+ *         -1 - cannot find existing SPS for current encoder parameter
  */
 int32_t FindExistingSps (SWelsSvcCodingParam* pParam, const bool kbUseSubsetSps, const int32_t iDlayerIndex,
                          const int32_t iDlayerCount,  const int32_t iSpsNumInUse,
