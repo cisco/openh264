@@ -448,8 +448,8 @@ void WelsPMbChromaEncode (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb) {
   int16_t* pCurRS				= pMbCache->pCoeffLevel + 256;
   uint8_t* pBestPred			= pMbCache->pMemPredChroma;
 
-  pFunc->pfDctFourT4 (pCurRS,		pMbCache->SPicData.pEncMb[1],	kiEncStride,		pBestPred,		8);
-  pFunc->pfDctFourT4 (pCurRS + 64,	pMbCache->SPicData.pEncMb[2],	kiEncStride,		pBestPred + 64,	8);
+  pFunc->pfDctFourT4 (pCurRS,       pMbCache->SPicData.pEncMb[1],   kiEncStride,    pBestPred,      8);
+  pFunc->pfDctFourT4 (pCurRS + 64,  pMbCache->SPicData.pEncMb[2],   kiEncStride,    pBestPred + 64, 8);
 
   WelsEncRecUV (pFunc, pCurMb, pMbCache, pCurRS, 1);
   WelsEncRecUV (pFunc, pCurMb, pMbCache, pCurRS + 64, 2);

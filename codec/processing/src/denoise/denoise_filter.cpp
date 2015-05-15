@@ -117,9 +117,9 @@ void	Gauss3x3Filter (uint8_t* pSrc, int32_t iStride) {
   uint8_t* pCurLine2 = pCurLine1 + iStride;
   uint8_t* pCurLine3 = pCurLine2 + iStride;
 
-  nSum =	 pCurLine1[0]		+ (pCurLine1[1] << 1) +  pCurLine1[2]		+
-           (pCurLine2[0] << 1)	+ (pCurLine2[1] << 2) + (pCurLine2[2] << 1) +
-           pCurLine3[0]		+ (pCurLine3[1] << 1) +  pCurLine3[2];
+  nSum =  pCurLine1[0]       + (pCurLine1[1] << 1) +  pCurLine1[2]       +
+         (pCurLine2[0] << 1) + (pCurLine2[1] << 2) + (pCurLine2[2] << 1) +
+          pCurLine3[0]       + (pCurLine3[1] << 1) +  pCurLine3[2];
   *pSrc = nSum >> 4;
 }
 
