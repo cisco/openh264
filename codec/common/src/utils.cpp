@@ -104,7 +104,7 @@ float WelsCalcPsnr (const void* kpTarPic,
                     const int32_t kiRefStride,
                     const int32_t kiWidth,
                     const int32_t kiHeight) {
-  int64_t	iSqe = 0;
+  int64_t iSqe = 0;
   int32_t x, y;
   uint8_t* pTar = (uint8_t*)kpTarPic;
   uint8_t* pRef = (uint8_t*)kpRefPic;

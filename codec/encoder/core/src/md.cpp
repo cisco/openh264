@@ -559,7 +559,7 @@ inline void MeRefineQuarPixel (SWelsFuncPtrList* pFunc, SWelsME* pMe, SMeRefineP
   }
   //==========================(1, 0)=========================//
   pSampleAvg (pMeRefine->pQuarPixTmp, ME_REFINE_BUF_STRIDE, pParams->pSrcA[3],
-              ME_REFINE_BUF_STRIDE,	pParams->pSrcB[3], pParams->iStrideB,  kiWidth, kiHeight);
+              ME_REFINE_BUF_STRIDE, pParams->pSrcB[3], pParams->iStrideB,  kiWidth, kiHeight);
 
   iCurCost = CALC_COST (pMeRefine->pQuarPixTmp, pParams->iLms[3]);
   if (iCurCost < pParams->iBestCost) {

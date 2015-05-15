@@ -59,7 +59,7 @@ namespace WelsEnc {
 extern const uint8_t g_kuiSmb4AddrIn256[16];
 extern const uint8_t g_kuiCache12_8x8RefIdx[4];
 
-typedef	struct TagDCTCoeff {
+typedef struct TagDCTCoeff {
 //ALIGNED_DECLARE( int16_t, residual_ac[16], 16 ); //I_16x16
 int16_t iLumaBlock[16][16]; //based on block4x4 luma DC/AC
 //ALIGNED_DECLARE( int16_t, iLumaI16x16Dc[16], 16 ); //I_16x16 DC

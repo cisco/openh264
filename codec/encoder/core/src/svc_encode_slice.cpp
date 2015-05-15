@@ -700,11 +700,11 @@ int32_t WelsCodePOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
 
 // 1st index: 0: for P pSlice; 1: for I pSlice;
 // 2nd index: 0: for non-dynamic pSlice; 1: for dynamic I pSlice;
-static const PWelsCodingSliceFunc	g_pWelsSliceCoding[2][2] = {
-  { WelsCodePSlice, WelsCodePOverDynamicSlice },	// P SSlice
-  { WelsISliceMdEnc, WelsISliceMdEncDynamic }	// I SSlice
+static const PWelsCodingSliceFunc g_pWelsSliceCoding[2][2] = {
+  { WelsCodePSlice, WelsCodePOverDynamicSlice }, // P SSlice
+  { WelsISliceMdEnc, WelsISliceMdEncDynamic }    // I SSlice
 };
-static const PWelsSliceHeaderWriteFunc		g_pWelsWriteSliceHeader[2] = {	// 0: for base; 1: for ext;
+static const PWelsSliceHeaderWriteFunc g_pWelsWriteSliceHeader[2] = {  // 0: for base; 1: for ext;
   WelsSliceHeaderWrite,
   WelsSliceHeaderExtWrite
 };
@@ -913,7 +913,7 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
 
     if ((kbSliceNumReachConstraint || !kbSliceIdxNotExceedConstraint)
         && kbCurMbNotLastMbOfCurPartition
-        && JUMPPACKETSIZE_JUDGE (uiLen,	iCurMbIdx,
+        && JUMPPACKETSIZE_JUDGE (uiLen, iCurMbIdx,
                                  pSliceCtx->uiSliceSizeConstraint - ((kiLastMbIdxInPartition - iCurMbIdx) <<
                                      (pCurSlice->uiAssumeLog2BytePerMb) //assume each MB consumes these byte under largest QP
                                                                     ))

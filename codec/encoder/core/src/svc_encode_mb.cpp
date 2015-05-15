@@ -344,7 +344,7 @@ bool WelsTryPYskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
         pEncCtx->pFuncList->pfScan4x4 (pBlock, pRes); //
         iSingleCtrMb += pEncCtx->pFuncList->pfCalculateSingleCtr4x4 (pBlock);
       }
-      if (iSingleCtrMb >= 6) 	return false; //from JVT-O079
+      if (iSingleCtrMb >= 6) return false; //from JVT-O079
       pRes += 16;
       pBlock += 16;
     }
@@ -370,7 +370,7 @@ bool    WelsTryPUVskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, i
     pEncCtx->pFuncList->pfQuantizationFour4x4Max (pRes, pFF,  pMF, (int16_t*)aMax);
 
     for (j = 0; j < 4; j++) {
-      if (aMax[j] > 1)		return false;	// iSingleCtrMb += 9, can't be P_SKIP
+      if (aMax[j] > 1) return false;   // iSingleCtrMb += 9, can't be P_SKIP
       else if (aMax[j] == 1) {
         pEncCtx->pFuncList->pfScan4x4Ac (pBlock, pRes);
         iSingleCtrMb += pEncCtx->pFuncList->pfCalculateSingleCtr4x4 (pBlock);

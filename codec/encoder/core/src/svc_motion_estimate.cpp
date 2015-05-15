@@ -864,7 +864,7 @@ bool CalculateFeatureOfBlock (SWelsFuncPtrList* pFunc, SPicture* pRef,
   return true;
 }
 
-void PerformFMEPreprocess (SWelsFuncPtrList* pFunc, SPicture* pRef, uint16_t*	pFeatureOfBlock,
+void PerformFMEPreprocess (SWelsFuncPtrList* pFunc, SPicture* pRef, uint16_t* pFeatureOfBlock,
                            SScreenBlockFeatureStorage* pScreenBlockFeatureStorage) {
   pScreenBlockFeatureStorage->pFeatureOfBlockPointer = pFeatureOfBlock;
   pScreenBlockFeatureStorage->bRefBlockFeatureCalculated = CalculateFeatureOfBlock (pFunc, pRef,
