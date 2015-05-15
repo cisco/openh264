@@ -417,7 +417,7 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount,
     WELS_EVENT* event_list, WELS_EVENT* master_event) {
   uint32_t nIdx = 0;
   uint32_t uiCountSignals = 0;
-  uint32_t uiSignalFlag	= 0;	// UGLY: suppose maximal event number up to 32
+  uint32_t uiSignalFlag = 0;    // UGLY: suppose maximal event number up to 32
 
   if (nCount == 0 || nCount > (sizeof (uint32_t) << 3))
     return WELS_THREAD_ERROR_WAIT_FAILED;

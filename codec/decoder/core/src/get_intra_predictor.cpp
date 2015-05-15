@@ -112,7 +112,7 @@ void WelsI4x4LumaPredDcTop_c (uint8_t* pPred, const int32_t kiStride) {
 }
 
 void WelsI4x4LumaPredDcNA_c (uint8_t* pPred, const int32_t kiStride) {
-  const uint32_t kuiDC32		= 0x80808080U;
+  const uint32_t kuiDC32 = 0x80808080U;
 
   ST32A4 (pPred                             , kuiDC32);
   ST32A4 (pPred + kiStride                  , kuiDC32);
@@ -534,7 +534,7 @@ void WelsI8x8LumaPredDcTop_c (uint8_t* pPred, const int32_t kiStride, bool bTLAv
 
 void WelsI8x8LumaPredDcNA_c (uint8_t* pPred, const int32_t kiStride, bool bTLAvail, bool bTRAvail) {
   // for normal 8 bit depth, 8-94
-  const uint64_t kuiDC64		= 0x8080808080808080ULL;
+  const uint64_t kuiDC64 = 0x8080808080808080ULL;
 
   int32_t iStride[8];
   int32_t i;

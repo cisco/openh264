@@ -163,7 +163,7 @@ CWelsH264SVCEncoder::~CWelsH264SVCEncoder() {
 
 void CWelsH264SVCEncoder::InitEncoder (void) {
 
-  m_pWelsTrace	= new welsCodecTrace();
+  m_pWelsTrace = new welsCodecTrace();
   if (m_pWelsTrace == NULL) {
     return;
   }
@@ -257,7 +257,7 @@ int CWelsH264SVCEncoder::InitializeInternal (SWelsSvcCodingParam* pCfg) {
     return cmInitParaError;
   }
   if (pCfg->iTemporalLayerNum < 1)
-    pCfg->iTemporalLayerNum	= 1;
+    pCfg->iTemporalLayerNum = 1;
   if (pCfg->iTemporalLayerNum > MAX_TEMPORAL_LEVEL) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
              "CWelsH264SVCEncoder::Initialize(), invalid iTemporalLayerNum= %d, valid at range of [1, %d].",
@@ -312,9 +312,9 @@ int CWelsH264SVCEncoder::InitializeInternal (SWelsSvcCodingParam* pCfg) {
   } else {
     pCfg->iLTRRefNum = pCfg->bEnableLongTermReference ? LONG_TERM_REF_NUM : 0;
     if (pCfg->iNumRefFrame == AUTO_REF_PIC_COUNT) {
-      pCfg->iNumRefFrame		= ((pCfg->uiGopSize >> 1) > 1) ? ((pCfg->uiGopSize >> 1) + pCfg->iLTRRefNum) :
+      pCfg->iNumRefFrame = ((pCfg->uiGopSize >> 1) > 1) ? ((pCfg->uiGopSize >> 1) + pCfg->iLTRRefNum) :
                               (MIN_REF_PIC_COUNT + pCfg->iLTRRefNum);
-      pCfg->iNumRefFrame		= WELS_CLIP3 (pCfg->iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA);
+      pCfg->iNumRefFrame = WELS_CLIP3 (pCfg->iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA);
     }
   }
 
@@ -360,7 +360,7 @@ int32_t CWelsH264SVCEncoder::Uninitialize() {
 
   if (NULL != m_pEncContext) {
     WelsUninitEncoderExt (&m_pEncContext);
-    m_pEncContext	= NULL;
+    m_pEncContext = NULL;
   }
 
   m_bInitialFlag = false;
@@ -671,8 +671,8 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
              "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_DATAFORMAT, m_iCspInternal= 0x%x", m_iCspInternal);
   }
   break;
-  case ENCODER_OPTION_IDR_INTERVAL: {	// IDR Interval
-    int32_t iValue	= * ((int32_t*)pOption);
+  case ENCODER_OPTION_IDR_INTERVAL: { // IDR Interval
+    int32_t iValue = * ((int32_t*)pOption);
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_IDR_INTERVAL iValue= %d", iValue);
     if (iValue < -1 || iValue == 0)
@@ -680,7 +680,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     if (iValue == (int32_t)m_pEncContext->pSvcParam->uiIntraPeriod) {
       return cmResultSuccess;
     }
-    m_pEncContext->pSvcParam->uiIntraPeriod	= (uint32_t)iValue;
+    m_pEncContext->pSvcParam->uiIntraPeriod = (uint32_t)iValue;
   }
   break;
   case ENCODER_OPTION_SVC_ENCODE_PARAM_BASE: { // SVC Encoding Parameter
@@ -769,8 +769,8 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     }
   }
   break;
-  case ENCODER_OPTION_FRAME_RATE: {	// Maximal input frame rate
-    float iValue	= * ((float*)pOption);
+  case ENCODER_OPTION_FRAME_RATE: { // Maximal input frame rate
+    float iValue = * ((float*)pOption);
     if (iValue <= 0) {
       return cmInitParaError;
     }
@@ -791,7 +791,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
                iBitrate);
       return cmInitParaError;
     }
-    iBitrate	= WELS_CLIP3 (iBitrate, MIN_BIT_RATE, MAX_BIT_RATE);
+    iBitrate = WELS_CLIP3 (iBitrate, MIN_BIT_RATE, MAX_BIT_RATE);
     switch (pInfo->iLayer) {
     case SPATIAL_LAYER_ALL:
       m_pEncContext->pSvcParam->iTargetBitrate = iBitrate;
@@ -837,7 +837,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
                iBitrate);
       return cmInitParaError;
     }
-    iBitrate	= WELS_CLIP3 (iBitrate, MIN_BIT_RATE, MAX_BIT_RATE);
+    iBitrate = WELS_CLIP3 (iBitrate, MIN_BIT_RATE, MAX_BIT_RATE);
     switch (pInfo->iLayer) {
     case SPATIAL_LAYER_ALL:
       m_pEncContext->pSvcParam->iMaxBitrate = iBitrate;
@@ -875,7 +875,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   break;
   case ENCODER_OPTION_RC_MODE: {	// 0:quality mode;1:bit-rate mode;2:bitrate limited mode
     int32_t iValue = * ((int32_t*)pOption);
-    m_pEncContext->pSvcParam->iRCMode	= (RC_MODES) iValue;
+    m_pEncContext->pSvcParam->iRCMode = (RC_MODES) iValue;
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_RC_MODE iRCMode= %d ",
              iValue);
@@ -883,7 +883,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   break;
   case ENCODER_PADDING_PADDING: {	// 0:disable padding;1:padding
     int32_t iValue = * ((int32_t*)pOption);
-    m_pEncContext->pSvcParam->iPaddingFlag	= iValue;
+    m_pEncContext->pSvcParam->iPaddingFlag = iValue;
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "CWelsH264SVCEncoder::SetOption():ENCODER_PADDING_PADDING iPaddingFlag= %d ",
              iValue);
@@ -1114,7 +1114,7 @@ int CWelsH264SVCEncoder::GetOption (ENCODER_OPTION eOptionId, void* pOption) {
   case ENCODER_OPTION_DATAFORMAT: {	// Input color space
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "CWelsH264SVCEncoder::GetOption():ENCODER_OPTION_DATAFORMAT, m_iCspInternal= 0x%x", m_iCspInternal);
-    * ((int32_t*)pOption)	= m_iCspInternal;
+    * ((int32_t*)pOption) = m_iCspInternal;
   }
   break;
   case ENCODER_OPTION_IDR_INTERVAL: {	// IDR Interval
@@ -1141,7 +1141,7 @@ int CWelsH264SVCEncoder::GetOption (ENCODER_OPTION eOptionId, void* pOption) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "CWelsH264SVCEncoder::GetOption():ENCODER_OPTION_FRAME_RATE, fMaxFrameRate = %.6ff",
              m_pEncContext->pSvcParam->fMaxFrameRate);
-    * ((float*)pOption)	= m_pEncContext->pSvcParam->fMaxFrameRate;
+    * ((float*)pOption) = m_pEncContext->pSvcParam->fMaxFrameRate;
   }
   break;
   case ENCODER_OPTION_BITRATE: {	// Target bit-rate
@@ -1196,7 +1196,7 @@ int CWelsH264SVCEncoder::GetOption (ENCODER_OPTION eOptionId, void* pOption) {
   }
   break;
   case ENCODER_OPTION_STATISTICS_LOG_INTERVAL: {
-    * ((int32_t*)pOption)	= m_pEncContext->iStatisticsLogInterval;
+    * ((int32_t*)pOption) = m_pEncContext->iStatisticsLogInterval;
   }
   break;
   case ENCODER_OPTION_COMPLEXITY: {

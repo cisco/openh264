@@ -192,7 +192,7 @@ void WelsEncInterY (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCache
   const int16_t* pMF = g_kiQuantMF[uiQp];
   const int16_t* pFF = g_kiQuantInterFF[uiQp];
   int16_t aMax[16];
-  int32_t i, j, iNoneZeroCountMbDcAc	= 0, iNoneZeroCount = 0;
+  int32_t i, j, iNoneZeroCountMbDcAc = 0, iNoneZeroCount = 0;
 
   for (i = 0; i < 4; i++) {
     pfQuantizationFour4x4Max (pRes, pFF,  pMF, aMax + (i << 2));
@@ -259,7 +259,7 @@ void    WelsEncRecUV (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCac
   uint8_t uiSubMbIdx                                    = 16 + ((iUV - 1) << 2); //uiSubMbIdx == 16 or 20
   int16_t* iChromaDc = pMbCache->pDct->iChromaDc[iUV - 1], *pBlock = pMbCache->pDct->iChromaBlock[ (iUV - 1) << 2];
   int16_t aDct2x2[4], j, aMax[4];
-  int32_t iSingleCtr8x8		= 0;
+  int32_t iSingleCtr8x8 = 0;
   const int16_t* pMF = g_kiQuantMF[kiQp];
   const int16_t* pFF = g_kiQuantInterFF[ (!kiInterFlag) * 6 + kiQp];
 
@@ -326,7 +326,7 @@ void    WelsRecPskip (SDqLayer* pCurLayer, SWelsFuncPtrList* pFuncList, SMB* pCu
 }
 
 bool WelsTryPYskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
-  int32_t iSingleCtrMb	= 0;
+  int32_t iSingleCtrMb = 0;
   int16_t* pRes = pMbCache->pCoeffLevel;
   const uint8_t kuiQp = pCurMb->uiLumaQp;
 

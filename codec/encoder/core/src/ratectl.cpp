@@ -180,7 +180,7 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
 
 void RcInitTlWeight (sWelsEncCtx* pEncCtx) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
-  SRCTemporal* pTOverRc	= pWelsSvcRc->pTemporalOverRc;
+  SRCTemporal* pTOverRc = pWelsSvcRc->pTemporalOverRc;
   SSpatialLayerInternal* pDLayerParam =  &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
   const int32_t kiDecompositionStages = pDLayerParam->iDecompositionStages;
   const int32_t kiHighestTid = pDLayerParam->iHighestTemporalId;
@@ -193,7 +193,7 @@ void RcInitTlWeight (sWelsEncCtx* pEncCtx) {
 
   n = 0;
   while (n <= kiHighestTid) {
-    pTOverRc[n].iTlayerWeight	= iWeightArray[kiDecompositionStages][n];
+    pTOverRc[n].iTlayerWeight = iWeightArray[kiDecompositionStages][n];
     ++ n;
   }
 //Calculate the frame index for the current frame and its reference frame
@@ -296,7 +296,7 @@ void RcInitRefreshParameter (sWelsEncCtx* pEncCtx) {
 
   pWelsSvcRc->iGopIndexInVGop = 0;
   pWelsSvcRc->iRemainingBits = 0;
-  pWelsSvcRc->iBitsPerFrame	= 0;
+  pWelsSvcRc->iBitsPerFrame = 0;
 
 //Backup the initial bitrate and fps
   pWelsSvcRc->iPreviousBitrate  = pDLayerParam->iSpatialBitrate;
@@ -422,7 +422,7 @@ void RcInitIdrQp (sWelsEncCtx* pEncCtx) {
 }
 
 void RcCalculateIdrQp (sWelsEncCtx* pEncCtx) {
-  SWelsSvcRc* pWelsSvcRc			= &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
+  SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
 //obtain the idr qp using previous idr complexity
   if (pWelsSvcRc->iNumberMbFrame != pWelsSvcRc->iIntraMbCount) {
     pWelsSvcRc->iIntraComplexity = pWelsSvcRc->iIntraComplexity * pWelsSvcRc->iNumberMbFrame /
@@ -687,7 +687,7 @@ void RcCalculateGomQp (sWelsEncCtx* pEncCtx, SMB* pCurMb, int32_t iSliceId) {
 
 void   RcVBufferCalculationSkip (sWelsEncCtx* pEncCtx) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
-  SRCTemporal* pTOverRc		= pWelsSvcRc->pTemporalOverRc;
+  SRCTemporal* pTOverRc = pWelsSvcRc->pTemporalOverRc;
   const int32_t kiOutputBits = pWelsSvcRc->iBitsPerFrame;
   const int32_t kiOutputMaxBits = pWelsSvcRc->iMaxBitsPerFrame;
 //condition 1: whole pBuffer fullness
@@ -803,7 +803,7 @@ void UpdateBufferWhenFrameSkipped (sWelsEncCtx* pEncCtx, int32_t iSpatialNum) {
   SSpatialPicIndex* pSpatialIndexMap = &pEncCtx->sSpatialIndexMap[0];
 
   for (int32_t i = 0; i < iSpatialNum; i++) {
-    int32_t iCurDid	= (pSpatialIndexMap + i)->iDid;
+    int32_t iCurDid = (pSpatialIndexMap + i)->iDid;
     SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[iCurDid];
     const int32_t kiOutputBits = pWelsSvcRc->iBitsPerFrame;
     const int32_t kiOutputMaxBits = pWelsSvcRc->iMaxBitsPerFrame;
@@ -831,7 +831,7 @@ void UpdateMaxBrCheckWindowStatus (sWelsEncCtx* pEncCtx, int32_t iSpatialNum, co
     pEncCtx->iCheckWindowCurrentTs = pEncCtx->iCheckWindowStartTs = uiTimeStamp;
     pEncCtx->bCheckWindowStatusRefreshFlag = true;
     for (int32_t i = 0; i < iSpatialNum; i++) {
-      int32_t iCurDid	= (pSpatialIndexMap + i)->iDid;
+      int32_t iCurDid = (pSpatialIndexMap + i)->iDid;
       pEncCtx->pWelsSvcRc[iCurDid].iBufferFullnessSkip = 0;
       pEncCtx->pWelsSvcRc[iCurDid].iBufferMaxBRFullness[ODD_TIME_WINDOW] = 0;
       pEncCtx->pWelsSvcRc[iCurDid].iBufferMaxBRFullness[EVEN_TIME_WINDOW] = 0;
@@ -844,7 +844,7 @@ void UpdateMaxBrCheckWindowStatus (sWelsEncCtx* pEncCtx, int32_t iSpatialNum, co
   if (pEncCtx->iCheckWindowInterval >= (TIME_CHECK_WINDOW >> 1) && !pEncCtx->bCheckWindowShiftResetFlag) {
     pEncCtx->bCheckWindowShiftResetFlag = true;
     for (int32_t i = 0; i < iSpatialNum; i++) {
-      int32_t iCurDid	= (pSpatialIndexMap + i)->iDid;
+      int32_t iCurDid = (pSpatialIndexMap + i)->iDid;
       if (pEncCtx->pWelsSvcRc[iCurDid].iBufferMaxBRFullness[ODD_TIME_WINDOW] > 0
           && pEncCtx->pWelsSvcRc[iCurDid].iBufferMaxBRFullness[ODD_TIME_WINDOW] !=
           pEncCtx->pWelsSvcRc[iCurDid].iBufferMaxBRFullness[0]) {
@@ -863,7 +863,7 @@ void UpdateMaxBrCheckWindowStatus (sWelsEncCtx* pEncCtx, int32_t iSpatialNum, co
     pEncCtx->iCheckWindowInterval = 0;
     pEncCtx->bCheckWindowShiftResetFlag = false;
     for (int32_t i = 0; i < iSpatialNum; i++) {
-      int32_t iCurDid	= (pSpatialIndexMap + i)->iDid;
+      int32_t iCurDid = (pSpatialIndexMap + i)->iDid;
       if (pEncCtx->pWelsSvcRc[iCurDid].iBufferMaxBRFullness[EVEN_TIME_WINDOW] > 0) {
         pEncCtx->pWelsSvcRc[iCurDid].bNeedShiftWindowCheck[ODD_TIME_WINDOW] = true;
       } else {
@@ -912,7 +912,7 @@ void RcTraceFrameBits (sWelsEncCtx* pEncCtx, long long uiTimeStamp) {
 
 void RcUpdatePictureQpBits (sWelsEncCtx* pEncCtx, int32_t iCodedBits) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
-  SRCSlicing* pSOverRc		= &pWelsSvcRc->pSlicingOverRc[0];
+  SRCSlicing* pSOverRc = &pWelsSvcRc->pSlicingOverRc[0];
   SSliceCtx* pCurSliceCtx = pEncCtx->pCurDqLayer->pSliceEncCtx;
   int32_t iTotalQp = 0, iTotalMb = 0;
   int32_t i;
@@ -1095,10 +1095,10 @@ void WelsRcMbInfoUpdateGom (sWelsEncCtx* pEncCtx, SMB* pCurMb, int32_t iCostLuma
 
 void  WelsRcPictureInitDisable (sWelsEncCtx* pEncCtx, long long uiTimeStamp) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
-  SSpatialLayerConfig* pDLayerParam		= &pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId];
+  SSpatialLayerConfig* pDLayerParam = &pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId];
   const int32_t kiQp = pDLayerParam->iDLayerQp;
 
-  pEncCtx->iGlobalQp	= RcCalculateCascadingQp (pEncCtx, kiQp);
+  pEncCtx->iGlobalQp = RcCalculateCascadingQp (pEncCtx, kiQp);
 
   if (pEncCtx->pSvcParam->bEnableAdaptiveQuant && (pEncCtx->eSliceType == P_SLICE)) {
     pEncCtx->iGlobalQp = WELS_CLIP3 ((pEncCtx->iGlobalQp * INT_MULTIPLY -
@@ -1114,9 +1114,9 @@ void  WelsRcPictureInfoUpdateDisable (sWelsEncCtx* pEncCtx, int32_t iLayerSize) 
 }
 
 void  WelsRcMbInitDisable (sWelsEncCtx* pEncCtx, SMB* pCurMb, SSlice* pSlice) {
-  int32_t iLumaQp					= pEncCtx->iGlobalQp;
+  int32_t iLumaQp = pEncCtx->iGlobalQp;
 
-  SDqLayer* pCurLayer				= pEncCtx->pCurDqLayer;
+  SDqLayer* pCurLayer = pEncCtx->pCurDqLayer;
   const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
 
 
@@ -1134,7 +1134,7 @@ void  WelsRcMbInfoUpdateDisable (sWelsEncCtx* pEncCtx, SMB* pCurMb, int32_t iCos
 }
 
 void WelRcPictureInitBufferBasedQp (sWelsEncCtx* pEncCtx, long long uiTimeStamp) {
-  SVAAFrameInfo* pVaa			= static_cast<SVAAFrameInfo*> (pEncCtx->pVaa);
+  SVAAFrameInfo* pVaa = static_cast<SVAAFrameInfo*> (pEncCtx->pVaa);
 
   int32_t iMinQp = MIN_SCREEN_QP;
   if (pVaa->eSceneChangeIdc == LARGE_CHANGED_SCENE)
@@ -1292,7 +1292,7 @@ void WelsRcFrameDelayJudgeTimeStamp (sWelsEncCtx* pEncCtx, EVideoFrameType eFram
 }
 void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
-  SSpatialLayerConfig* pDLayerParam			= &pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId];
+  SSpatialLayerConfig* pDLayerParam = &pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId];
   int32_t iLumaQp = pWelsSvcRc->iLastCalculatedQScale;
   //decide one frame bits allocated
   if (pEncCtx->eSliceType == I_SLICE) {

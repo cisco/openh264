@@ -307,7 +307,7 @@ void WelsMdIntraInit (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, con
   }
 
   //step 2. initial pWelsMd
-  pCurMb->uiCbp			= 0;
+  pCurMb->uiCbp = 0;
 
   //step 4: locating scaled_tcoeff
 
@@ -327,7 +327,7 @@ void WelsMdInterInit (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb, const i
   const int32_t kiMbWidth = pCurLayer->iMbWidth;
   const int32_t kiMbHeight = pCurLayer->iMbHeight;
 
-  pMbCache->pEncSad		= &pCurLayer->pDecPic->pMbSkipSad[kiMbXY];
+  pMbCache->pEncSad = &pCurLayer->pDecPic->pMbSkipSad[kiMbXY];
 
   //step 1. load neighbor cache
   pEncCtx->pFuncList->pfFillInterNeighborCache (pMbCache, pCurMb, kiMbWidth,
@@ -351,7 +351,7 @@ void WelsMdInterInit (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb, const i
     pMbCache->SPicData.pRefMb[2]        += MB_WIDTH_CHROMA;
   }
 
-  pMbCache->uiRefMbType	= pCurLayer->pRefPic->uiRefMbType[kiMbXY];
+  pMbCache->uiRefMbType = pCurLayer->pRefPic->uiRefMbType[kiMbXY];
   pMbCache->bCollocatedPredFlag = false;
 
   //comment: sometimes, mode decision process may skip the md_p16x16 and md_pskip function,
@@ -449,7 +449,7 @@ int32_t WelsMdI4x4 (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCach
 #endif//X86_ASM
 
   for (i = 0; i < 16; i++) {
-    const int32_t kiOffset	= kpNeighborIntraToI4x4[i];
+    const int32_t kiOffset = kpNeighborIntraToI4x4[i];
 
     //step 1: locating current 4x4 block position in pEnc and pDecMb
     iCoordinateX = kpCoordinateIdxX[i];
@@ -866,7 +866,7 @@ int32_t WelsMdI4x4Fast (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMb
 
 int32_t WelsMdIntraChroma (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SMbCache* pMbCache, int32_t iLambda) {
   const int8_t* kpAvailMode;
-  int32_t iAvailCount				= 0;
+  int32_t iAvailCount = 0;
   int32_t iChmaIdx = 0;
   uint8_t* pPredIntraChma[2]    = {pMbCache->pMemPredChroma, pMbCache->pMemPredChroma + 128};
   uint8_t* pDstChma             = pPredIntraChma[0];
@@ -920,12 +920,12 @@ int32_t WelsMdIntraChroma (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SMbCa
         iBestMode = iCurMode;
         iBestCost = iCurCost;
         iChmaIdx = iChmaIdx ^ 0x01;
-        pDstChma	= pPredIntraChma[iChmaIdx];
+        pDstChma = pPredIntraChma[iChmaIdx];
       }
     }
   }
 
-  pMbCache->pBestPredIntraChroma	= pPredIntraChma[iChmaIdx ^ 0x01];
+  pMbCache->pBestPredIntraChroma = pPredIntraChma[iChmaIdx ^ 0x01];
   pMbCache->uiChmaI8x8Mode = iBestMode;
   return iBestCost;
 }
@@ -1039,7 +1039,7 @@ int32_t WelsMdP16x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pW
     sMe16x8->iCurMeBlockPixY = pWelsMd->iMbPixY + iPixelY;
     sMe16x8->uSadPredISatd.uiSadPred = pWelsMd->iSadPredMb >> 1;
 
-    pSlice->sMvc[0]	= sMe16x8->sMvBase;
+    pSlice->sMvc[0] = sMe16x8->sMvBase;
     pSlice->uiMvcNum = 1;
 
     PredInter16x8Mv (pMbCache, i << 3, 0, & (sMe16x8->sMvp));
@@ -1583,7 +1583,7 @@ void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurM
 
 }
 bool WelsMdFirstIntraMode (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache) {
-  SWelsFuncPtrList* pFunc	= pEncCtx->pFuncList;
+  SWelsFuncPtrList* pFunc = pEncCtx->pFuncList;
 
   int32_t iCostI16x16 = WelsMdI16x16 (pFunc, pEncCtx->pCurDqLayer, pMbCache, pWelsMd->iLambda);
 
@@ -1719,7 +1719,7 @@ void WelsMdInterDecidedPskip (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb,
 //////
 void WelsMdInterEncode (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache) {
   SWelsFuncPtrList* pFunc = pEncCtx->pFuncList;
-  SDqLayer* pCurDqLayer	= pEncCtx->pCurDqLayer;
+  SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
 
   //add pEnc&rec to MD--2010.3.15
   const int32_t kiCsStrideY = pCurDqLayer->iCsStride[0];

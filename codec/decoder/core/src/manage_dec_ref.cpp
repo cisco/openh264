@@ -87,7 +87,7 @@ void WelsResetRefPic (PWelsDecoderContext pCtx) {
   PRefPic pRefPic = &pCtx->sRefPic;
   pCtx->sRefPic.uiLongRefCount[LIST_0] = pCtx->sRefPic.uiShortRefCount[LIST_0] = 0;
 
-  pRefPic->uiRefCount[LIST_0]	= 0;
+  pRefPic->uiRefCount[LIST_0] = 0;
 
   for (i = 0; i < MAX_SHORT_REF_COUNT; i++) {
     if (pRefPic->pShortRefList[LIST_0][i] != NULL) {

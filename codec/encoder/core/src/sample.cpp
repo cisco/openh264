@@ -220,7 +220,7 @@ int32_t WelsSampleSatdIntra8x8Combined3_c (uint8_t* pDecCb, int32_t iDecStride, 
     iBestCost = iCurCost;
   }
 
-  *pBestMode	= iBestMode;
+  *pBestMode = iBestMode;
 
   return iBestCost;
 

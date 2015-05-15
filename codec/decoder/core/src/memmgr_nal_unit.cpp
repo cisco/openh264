@@ -64,7 +64,7 @@ int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize) {
   pPtr = pBase;
   *ppAu = (PAccessUnit)pPtr;
   pPtr += kuiSizeAu;
-  (*ppAu)->pNalUnitsList	= (PNalUnit*)pPtr;
+  (*ppAu)->pNalUnitsList = (PNalUnit*)pPtr;
   pPtr += kuiSizeNalUnitPtr;
   do {
     (*ppAu)->pNalUnitsList[uiIdx] = (PNalUnit)pPtr;

@@ -157,7 +157,7 @@ void IdctResAddPred8x8_c (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) 
     iRes[ (7 << 3) + i] = b[0] - b[7];
   }
 
-  uint8_t* pDst			= pPred;
+  uint8_t* pDst = pPred;
   for (int i = 0; i < 8; i++) {
     for (int j = 0; j < 8; j++) {
       pDst[i * kiStride + j] = WelsClip1 (((32 + iRes[ (i << 3) + j]) >> 6) + pDst[i * kiStride + j]);
@@ -167,7 +167,7 @@ void IdctResAddPred8x8_c (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) 
 }
 
 void GetI4LumaIChromaAddrTable (int32_t* pBlockOffset, const int32_t kiYStride, const int32_t kiUVStride) {
-  int32_t* pOffset	   = pBlockOffset;
+  int32_t* pOffset = pBlockOffset;
   int32_t i;
   const uint8_t kuiScan0 = g_kuiScan8[0];
 

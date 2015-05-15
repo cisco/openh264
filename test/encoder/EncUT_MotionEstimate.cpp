@@ -41,7 +41,7 @@ class MotionEstimateTest : public ::testing::Test {
     m_iWidth = 64;//size of search window
     m_iHeight = 64;//size of search window
     m_iMaxSearchBlock = 16;
-    m_uiMvdTableSize	= (1 + (648 << 1));
+    m_uiMvdTableSize = (1 + (648 << 1));
 
     pMa = new CMemoryAlign (0);
     m_pRefData = static_cast<uint8_t*>
@@ -405,7 +405,7 @@ class FeatureMotionEstimateTest : public ::testing::Test {
     m_iWidth = 64;//size of search window
     m_iHeight = 64;//size of search window
     m_iMaxSearchBlock = 8;
-    m_uiMvdTableSize	= (1 + (648 << 1));
+    m_uiMvdTableSize = (1 + (648 << 1));
 
     m_pMa = new CMemoryAlign (16);
     ASSERT_TRUE (NULL != m_pMa);

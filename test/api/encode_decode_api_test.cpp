@@ -575,7 +575,7 @@ void EncodeDecodeTestAPIBase::SliceParamValidationForMode3 (int iSpatialIdx) {
 
   unsigned int uiMbHeight         = 0;
 
-  uiMbHeight	 = (param_.iPicHeight + 15) >> 4;
+  uiMbHeight = (param_.iPicHeight + 15) >> 4;
 
   //change slice mode to SM_SINGLE_SLICE
   if (uiMbHeight >  MAX_SLICES_NUM) {

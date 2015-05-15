@@ -240,7 +240,7 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType) {
     ++pEncCtx->iFrameIndex;
 
     if (pEncCtx->iPOC < (1 << pEncCtx->pSps->iLog2MaxPocLsb) - 2)     // if iPOC type is no 0, this need be modification
-      pEncCtx->iPOC			+= 2;	// for POC type 0
+      pEncCtx->iPOC += 2;   // for POC type 0
     else
       pEncCtx->iPOC = 0;
 
@@ -248,7 +248,7 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType) {
       if (pEncCtx->iFrameNum < (1 << pEncCtx->pSps->uiLog2MaxFrameNum) - 1)
         ++ pEncCtx->iFrameNum;
       else
-        pEncCtx->iFrameNum	= 0;	// if iFrameNum overflow
+        pEncCtx->iFrameNum = 0;    // if iFrameNum overflow
     }
     pEncCtx->eNalType           = NAL_UNIT_CODED_SLICE;
     pEncCtx->eSliceType         = P_SLICE;
@@ -270,7 +270,7 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType) {
     // rc_init_gop
   } else if (keFrameType == videoFrameTypeI) {
     if (pEncCtx->iPOC < (1 << pEncCtx->pSps->iLog2MaxPocLsb) - 2)     // if iPOC type is no 0, this need be modification
-      pEncCtx->iPOC			+= 2;	// for POC type 0
+      pEncCtx->iPOC += 2;   // for POC type 0
     else
       pEncCtx->iPOC = 0;
 
@@ -278,7 +278,7 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType) {
       if (pEncCtx->iFrameNum < (1 << pEncCtx->pSps->uiLog2MaxFrameNum) - 1)
         ++ pEncCtx->iFrameNum;
       else
-        pEncCtx->iFrameNum	= 0;	// if iFrameNum overflow
+        pEncCtx->iFrameNum = 0;    // if iFrameNum overflow
     }
 
     pEncCtx->eNalType     = NAL_UNIT_CODED_SLICE;
@@ -296,7 +296,7 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType) {
 }
 
 EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum) {
-  SWelsSvcCodingParam* pSvcParam	= pEncCtx->pSvcParam;
+  SWelsSvcCodingParam* pSvcParam = pEncCtx->pSvcParam;
   EVideoFrameType iFrameType = videoFrameTypeInvalid;
   bool bSceneChangeFlag = false;
 
@@ -370,7 +370,7 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
 extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName, const int8_t kiDid, bool bAppend,
                                    SDqLayer* pDqLayer) {
   WelsFileHandle* pDumpRecFile = NULL;
-  int32_t iWrittenSize											= 0;
+  int32_t iWrittenSize = 0;
   const char* openMode = bAppend ? "ab" : "wb";
   SWelsSPS* pSpsTmp = (kiDid > BASE_DEPENDENCY_ID) ? & (pDqLayer->sLayerInfo.pSubsetSpsP->pSps) :
                       pDqLayer->sLayerInfo.pSpsP;
@@ -384,8 +384,8 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName
     pDumpRecFile = WelsFopen (kpFileName, openMode);
   else {
     char sDependencyRecFileName[16] = {0};
-    WelsSnprintf (sDependencyRecFileName, 16, "rec%d.yuv", kiDid);	// confirmed_safe_unsafe_usage
-    pDumpRecFile	= WelsFopen (sDependencyRecFileName, openMode);
+    WelsSnprintf (sDependencyRecFileName, 16, "rec%d.yuv", kiDid); // confirmed_safe_unsafe_usage
+    pDumpRecFile = WelsFopen (sDependencyRecFileName, openMode);
   }
   if (NULL != pDumpRecFile && bAppend)
     WelsFseek (pDumpRecFile, 0, SEEK_END);
@@ -437,22 +437,22 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName
 
 void DumpRecFrame (SPicture* pCurPicture, const char* kpFileName, const int8_t kiDid, bool bAppend,
                    SDqLayer* pDqLayer) {
-  WelsFileHandle* pDumpRecFile				= NULL;
+  WelsFileHandle* pDumpRecFile = NULL;
   SWelsSPS* pSpsTmp = (kiDid > BASE_DEPENDENCY_ID) ? & (pDqLayer->sLayerInfo.pSubsetSpsP->pSps) :
                       pDqLayer->sLayerInfo.pSpsP;
   bool bFrameCroppingFlag = pSpsTmp->bFrameCroppingFlag;
   SCropOffset* pFrameCrop = &pSpsTmp->sFrameCrop;
 
-  int32_t iWrittenSize			= 0;
+  int32_t iWrittenSize = 0;
   const char* openMode = bAppend ? "ab" : "wb";
 
   if (NULL == pCurPicture || NULL == kpFileName)
     return;
 
-  if (strlen (kpFileName) > 0) {	// confirmed_safe_unsafe_usage
-    pDumpRecFile	= WelsFopen (kpFileName, openMode);
+  if (strlen (kpFileName) > 0) { // confirmed_safe_unsafe_usage
+    pDumpRecFile = WelsFopen (kpFileName, openMode);
   } else {
-    pDumpRecFile	= WelsFopen ("rec.yuv", openMode);
+    pDumpRecFile = WelsFopen ("rec.yuv", openMode);
   }
   if (NULL != pDumpRecFile && bAppend)
     WelsFseek (pDumpRecFile, 0, SEEK_END);

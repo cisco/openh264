@@ -79,7 +79,7 @@ int32_t RecI8x8Luma (int32_t iMbXy, PWelsDecoderContext pCtx, int16_t* pScoeffLe
   int8_t* pIntra8x8PredMode = pDqLayer->pIntra4x4FinalMode[iMbXy]; // I_NxN
   int16_t* pRS = pScoeffLevel;
   /*itransform info*/
-  PIdctResAddPredFunc	pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc8x8;
+  PIdctResAddPredFunc pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc8x8;
 
   /*************local variable********************/
   uint8_t i = 0;
@@ -133,7 +133,7 @@ int32_t RecI4x4Luma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLe
   int8_t* pIntra4x4PredMode = pDqLayer->pIntra4x4FinalMode[iMBXY];
   int16_t* pRS = pScoeffLevel;
   /*itransform info*/
-  PIdctResAddPredFunc	pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc;
+  PIdctResAddPredFunc pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc;
 
 
   /*************local variable********************/

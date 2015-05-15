@@ -538,7 +538,7 @@ inline void MeRefineQuarPixel (SWelsFuncPtrList* pFunc, SWelsME* pMe, SMeRefineP
 
   iCurCost = CALC_COST (pMeRefine->pQuarPixTmp, pParams->iLms[0]);
   if (iCurCost < pParams->iBestCost) {
-    pParams->iBestQuarPix =	ME_QUAR_PIXEL_TOP;
+    pParams->iBestQuarPix = ME_QUAR_PIXEL_TOP;
     SWITCH_BEST_TMP_BUF (pMeRefine->pQuarPixBest, pMeRefine->pQuarPixTmp);
   }
   //=========================(0, 1)=======================//

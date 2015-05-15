@@ -90,7 +90,7 @@ long CReadConfig::ReadLine (std::string* pVal, const int kiValSize/* = 4*/) {
   bool bCommentFlag = false;
 
   while (n < kiValSize) {
-    pVal[n]	= "";
+    pVal[n] = "";
     ++ n;
   }
 
@@ -109,7 +109,7 @@ long CReadConfig::ReadLine (std::string* pVal, const int kiValSize/* = 4*/) {
           break;
         if (! (*strTags).empty()) {
           ++ nTagNum;
-          strTags	= &pVal[nTagNum];
+          strTags = &pVal[nTagNum];
         }
       } else
         *strTags += kCh;

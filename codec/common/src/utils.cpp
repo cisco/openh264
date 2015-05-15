@@ -115,7 +115,7 @@ float WelsCalcPsnr (const void* kpTarPic,
   for (y = 0; y < kiHeight; ++ y) {	// OPTable !!
     for (x = 0; x < kiWidth; ++ x) {
       const int32_t kiT = pTar[y * kiTarStride + x] - pRef[y * kiRefStride + x];
-      iSqe	+= kiT * kiT;
+      iSqe += kiT * kiT;
     }
   }
   if (0 == iSqe) {

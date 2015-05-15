@@ -120,7 +120,7 @@ void WelsMdInterMbEnhancelayer (sWelsEncCtx* pEncCtx, SWelsMD* pMd, SSlice* pSli
 
 // do initiation for noILP (needed by ILFMD)
 SMB* GetRefMb (SDqLayer* pCurLayer, SMB* pCurMb) {
-  const SDqLayer*  kpRefLayer		= pCurLayer->pRefLayer;
+  const SDqLayer*  kpRefLayer = pCurLayer->pRefLayer;
   const int32_t  kiRefMbIdx = (pCurMb->iMbY >> 1) * kpRefLayer->iMbWidth + (pCurMb->iMbX >>
                               1); //because current lower layer is half size on both vertical and horizontal
   return (&kpRefLayer->sMbDataP[kiRefMbIdx]);
@@ -244,7 +244,7 @@ bool WelsMdInterJudgeBGDPskip (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* p
     //TODO: consider reusing this result of ChromaCheck when SCDSkip needs this as well
 
     if (CheckChromaCost (pEncCtx, pWelsMd, pMbCache, pCurMb->iMbXY)) {
-      SMVUnitXY	sVaaPredSkipMv = { 0 };
+      SMVUnitXY sVaaPredSkipMv = { 0 };
       PredSkipMv (pMbCache, &sVaaPredSkipMv);
       WelsMdBackgroundMbEnc (pEncCtx, pWelsMd, pCurMb, pMbCache, pSlice, (LD32 (&sVaaPredSkipMv) == 0));
       return true;
@@ -320,7 +320,7 @@ inline bool CheckBorder (int32_t iMbX, int32_t iMbY, int32_t iScrollMvX, int32_t
 
 
 bool JudgeStaticSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWelsMD* pWelsMd) {
-  SDqLayer* pCurDqLayer			= pEncCtx->pCurDqLayer;
+  SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
   const int32_t kiMbX = pCurMb->iMbX;
   const int32_t kiMbY = pCurMb->iMbY;
 
@@ -347,7 +347,7 @@ bool JudgeStaticSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWe
 }
 
 bool JudgeScrollSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWelsMD* pWelsMd) {
-  SDqLayer* pCurDqLayer			= pEncCtx->pCurDqLayer;
+  SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
   const int32_t kiMbX = pCurMb->iMbX;
   const int32_t kiMbY = pCurMb->iMbY;
   const int32_t kiMbWidth = pCurDqLayer->iMbWidth;
@@ -516,7 +516,7 @@ void SetBlockStaticIdcToMd (void* pVaa, SWelsMD* pWelsMd, SMB* pCurMb, SDqLayer*
 // Scene Change Detection (SCD) PSkip Decision for screen content
 ////////////////////////
 bool WelsMdInterJudgeSCDPskip (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache) {
-  SDqLayer* pCurDqLayer			= pEncCtx->pCurDqLayer;
+  SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
 
   SetBlockStaticIdcToMd (pEncCtx->pVaa, pWelsMd, pCurMb, pCurDqLayer);
 
@@ -634,7 +634,7 @@ void WelsMdInterFinePartitionVaaOnScreen (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd
 // SetScrollingMvToMd
 //
 void SetScrollingMvToMd (SVAAFrameInfo* pVaa, SWelsMD* pWelsMd) {
-  SVAAFrameInfoExt* pVaaExt		= static_cast<SVAAFrameInfoExt*> (pVaa);
+  SVAAFrameInfoExt* pVaaExt = static_cast<SVAAFrameInfoExt*> (pVaa);
 
   SMVUnitXY          sTempMv;
   sTempMv.iMvX = pVaaExt->sScrollDetectInfo.iScrollMvX;

@@ -40,7 +40,7 @@ namespace WelsEnc {
 *   reset LTR marking , recovery ,feedback state to default
 */
 void ResetLtrState (SLTRState* pLtr) {
-  pLtr->bReceivedT0LostFlag	= false;
+  pLtr->bReceivedT0LostFlag = false;
   pLtr->iLastRecoverFrameNum = 0;
   pLtr->iLastCorFrameNumDec = -1;
   pLtr->iCurFrameNumInDec = -1;
@@ -149,7 +149,7 @@ static inline int32_t CompareFrameNum (int32_t iFrameNumA, int32_t iFrameNumB, i
 *   delete failed mark according LTR recovery pRequest
 */
 static inline void DeleteInvalidLTR (sWelsEncCtx* pCtx) {
-  SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
+  SRefList* pRefList = pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SPicture** pLongRefList = pRefList->pLongRefList;
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
   int32_t iMaxFrameNumPlus1 = (1 << pCtx->pSps->uiLog2MaxFrameNum);
@@ -246,7 +246,7 @@ static inline void HandleLTRMarkFeedback (sWelsEncCtx* pCtx) {
  *  LTR mark process
  */
 static inline void LTRMarkProcess (sWelsEncCtx* pCtx) {
-  SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
+  SRefList* pRefList = pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SPicture** pLongRefList = pRefList->pLongRefList;
   SPicture** pShortRefList = pRefList->pShortRefList;
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
@@ -297,7 +297,7 @@ static inline void LTRMarkProcess (sWelsEncCtx* pCtx) {
       memmove (&pRefList->pLongRefList[1], &pRefList->pLongRefList[0],
                pRefList->uiLongRefCount * sizeof (SPicture*));	// confirmed_safe_unsafe_usage
     }
-    pLongRefList[0]	 = pShortRefList[i];
+    pLongRefList[0] = pShortRefList[i];
     pRefList->uiLongRefCount++;
     if (pRefList->uiLongRefCount > pCtx->pSvcParam->iLTRRefNum) {
       pRefList->pLongRefList[pRefList->uiLongRefCount - 1]->SetUnref();
@@ -308,7 +308,7 @@ static inline void LTRMarkProcess (sWelsEncCtx* pCtx) {
 }
 
 static inline void LTRMarkProcessScreen (sWelsEncCtx* pCtx) {
-  SRefList* pRefList		= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
+  SRefList* pRefList = pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SPicture** pLongRefList = pRefList->pLongRefList;
   int32_t iLtrIdx =  pCtx->pDecPic->iLongTermPicNum;
   pCtx->pVaa->uiMarkLongTermPicIdx = pCtx->pDecPic->iLongTermPicNum;
@@ -428,7 +428,7 @@ bool WelsUpdateRefList (sWelsEncCtx* pCtx) {
 
 bool CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx) {
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
-  SRefList* pRefList	= pCtx->ppRefPicListExt[pCtx->uiDependencyId];
+  SRefList* pRefList = pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SPicture** pLongRefList = pRefList->pLongRefList;
   int32_t iGoPFrameNumInterval = ((pCtx->pSvcParam->uiGopSize >> 1) > 1) ? (pCtx->pSvcParam->uiGopSize >> 1) : (1);
   int32_t iMaxFrameNumPlus1 = (1 << pCtx->pSps->uiLog2MaxFrameNum);
@@ -446,7 +446,7 @@ bool CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx) {
 }
 void WelsMarkPic (sWelsEncCtx* pCtx) {
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
-  const int32_t kiCountSliceNum			= GetCurrentSliceNum (pCtx->pCurDqLayer->pSliceEncCtx);
+  const int32_t kiCountSliceNum = GetCurrentSliceNum (pCtx->pCurDqLayer->pSliceEncCtx);
   int32_t iGoPFrameNumInterval = ((pCtx->pSvcParam->uiGopSize >> 1) > 1) ? (pCtx->pSvcParam->uiGopSize >> 1) : (1);
   int32_t iSliceIdx = 0;
 
@@ -568,7 +568,7 @@ bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRe
 
   // build reference list 0/1 if applicable
 
-  pCtx->iNumRef0	= 0;
+  pCtx->iNumRef0 = 0;
 
   if (pCtx->eSliceType != I_SLICE) {
     if (pCtx->pSvcParam->bEnableLongTermReference && pLtr->bReceivedT0LostFlag && pCtx->uiTemporalId == 0) {
@@ -586,7 +586,7 @@ bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRe
       for (i = 0; i < pRefList->uiShortRefCount; ++ i) {
         SPicture* pRef = pRefList->pShortRefList[i];
         if (pRef != NULL && pRef->bUsedAsRef && pRef->iFramePoc >= 0 && pRef->uiTemporalId <= kuiTid) {
-          pCtx->pRefList0[pCtx->iNumRef0++]	= pRef;
+          pCtx->pRefList0[pCtx->iNumRef0++] = pRef;
           WelsLog (& (pCtx->sLogCtx), WELS_LOG_DETAIL,
                    "WelsBuildRefList pCtx->uiTemporalId = %d,pRef->iFrameNum = %d,pRef->uiTemporalId = %d",
                    pCtx->uiTemporalId, pRef->iFrameNum, pRef->uiTemporalId);
@@ -600,7 +600,7 @@ bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRe
     for (int32_t k = 0; k < MAX_TEMPORAL_LEVEL; k++) {
       pCtx->bRefOfCurTidIsLtr[pCtx->uiDependencyId][k] = false;
     }
-    pCtx->pRefList0[0]	= NULL;
+    pCtx->pRefList0[0] = NULL;
   }
 
   if (pCtx->iNumRef0 > kiNumRef)
@@ -609,7 +609,7 @@ bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRe
 }
 
 static void UpdateBlockStatic (sWelsEncCtx* pCtx) {
-  SVAAFrameInfoExt* pVaaExt			= static_cast<SVAAFrameInfoExt*> (pCtx->pVaa);
+  SVAAFrameInfoExt* pVaaExt = static_cast<SVAAFrameInfoExt*> (pCtx->pVaa);
   assert (pCtx->iNumRef0 == 1); //multi-ref is not support yet?
   for (int32_t idx = 0; idx < pCtx->iNumRef0; idx++) {
     //TODO: we need to re-factor the source picture storage first,
@@ -761,10 +761,10 @@ bool WelsUpdateRefListScreen (sWelsEncCtx* pCtx) {
   return true;
 }
 bool WelsBuildRefListScreen (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRefIdx) {
-  SRefList* pRefList		=  pCtx->ppRefPicListExt[pCtx->uiDependencyId];
+  SRefList* pRefList = pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SWelsSvcCodingParam* pParam = pCtx->pSvcParam;
   SVAAFrameInfoExt* pVaaExt = static_cast<SVAAFrameInfoExt*> (pCtx->pVaa);
-  const int32_t iNumRef	= pParam->iNumRefFrame;
+  const int32_t iNumRef = pParam->iNumRefFrame;
   pCtx->iNumRef0 = 0;
 
   if (pCtx->eSliceType != I_SLICE) {
@@ -805,7 +805,7 @@ bool WelsBuildRefListScreen (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBes
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
              "WelsBuildRefListScreen(), CurrentFramePoc=%d, isLTR=%d", iPOC, pCtx->bCurFrameMarkedAsSceneLtr);
     for (int j = 0; j < iNumRef; j++) {
-      SPicture*	 pARefPicture = pRefList->pLongRefList[j];
+      SPicture* pARefPicture = pRefList->pLongRefList[j];
       if (pARefPicture != NULL) {
         WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
                  "WelsBuildRefListScreen()\tRefLot[%d]: iPoc=%d, iPictureType=%d, bUsedAsRef=%d, bIsLongRef=%d, bIsSceneLTR=%d, uiTemporalId=%d, iFrameNum=%d, iMarkFrameNum=%d, iLongTermPicNum=%d, uiRecieveConfirmed=%d",
@@ -828,7 +828,7 @@ bool WelsBuildRefListScreen (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBes
     // dealing with IDR
     WelsResetRefList (pCtx);  //for IDR, SHOULD reset pRef list.
     ResetLtrState (&pCtx->pLtr[pCtx->uiDependencyId]); //SHOULD update it when IDR.
-    pCtx->pRefList0[0]	= NULL;
+    pCtx->pRefList0[0] = NULL;
   }
   if (pCtx->iNumRef0 > iNumRef) {
     pCtx->iNumRef0 = iNumRef;
@@ -850,8 +850,8 @@ void WelsMarkPicScreen (sWelsEncCtx* pCtx) {
     iMaxActualLtrIdx = pCtx->pSvcParam->iNumRefFrame - STR_ROOM - 1 -  WELS_MAX (iMaxTid , 1);
 
   SRefList* pRefList =  pCtx->ppRefPicListExt[pCtx->uiDependencyId];
-  SPicture** ppLongRefList		=  pRefList->pLongRefList;
-  const int32_t iNumRef	= pCtx->pSvcParam->iNumRefFrame;
+  SPicture** ppLongRefList = pRefList->pLongRefList;
+  const int32_t iNumRef = pCtx->pSvcParam->iNumRefFrame;
   int32_t i;
   const int32_t iLongRefNum = iNumRef - STR_ROOM;
   const bool bIsRefListNotFull = pRefList->uiLongRefCount < iLongRefNum;
@@ -876,7 +876,7 @@ void WelsMarkPicScreen (sWelsEncCtx* pCtx) {
           }
         }
       } else {
-        int32_t iRefNum_t[MAX_TEMPORAL_LAYER_NUM] =	 {0};
+        int32_t iRefNum_t[MAX_TEMPORAL_LAYER_NUM] = {0};
         for (i = 0 ; i < pRefList->uiLongRefCount ; ++i) {
           if (ppLongRefList[i]->bUsedAsRef && ppLongRefList[i]->bIsLongRef && (!ppLongRefList[i]->bIsSceneLTR)) {
             ++iRefNum_t[ ppLongRefList[i]->uiTemporalId ];

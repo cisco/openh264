@@ -104,22 +104,21 @@ void WelsI4x4LumaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride)
   WelsFillingPred8x2to16 (pPred, uiSrc);
 }
 void WelsI4x4LumaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
-  const uint8_t kuiDcValue	= (pRef[-1] + pRef[kiStride - 1] + pRef[ (kiStride << 1) - 1] + pRef[ (kiStride << 1) +
-                               kiStride - 1] +
+  const uint8_t kuiDcValue = (pRef[-1] + pRef[kiStride - 1] + pRef[ (kiStride << 1) - 1] + pRef[ (kiStride << 1) + kiStride - 1] +
                                pRef[-kiStride] + pRef[1 - kiStride] + pRef[2 - kiStride] + pRef[3 - kiStride] + 4) >> 3;
 
   WelsFillingPred1to16 (pPred, kuiDcValue);
 }
 
 void WelsI4x4LumaPredDcLeft_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
-  const uint8_t kuiDcValue	= (pRef[-1] + pRef[kiStride - 1] + pRef[ (kiStride << 1) - 1] + pRef[ (kiStride << 1) +
+  const uint8_t kuiDcValue = (pRef[-1] + pRef[kiStride - 1] + pRef[ (kiStride << 1) - 1] + pRef[ (kiStride << 1) +
                                kiStride - 1] + 2) >> 2;
 
   WelsFillingPred1to16 (pPred, kuiDcValue);
 }
 
 void WelsI4x4LumaPredDcTop_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
-  const uint8_t kuiDcValue	= (pRef[-kiStride] + pRef[1 - kiStride] + pRef[2 - kiStride] + pRef[3 - kiStride] + 2) >> 2;
+  const uint8_t kuiDcValue = (pRef[-kiStride] + pRef[1 - kiStride] + pRef[2 - kiStride] + pRef[3 - kiStride] + 2) >> 2;
 
   WelsFillingPred1to16 (pPred, kuiDcValue);
 }
@@ -463,8 +462,8 @@ void WelsIChromaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride)
   const int32_t kuiL6 = kuiL5 + kiStride;
   const int32_t kuiL7 = kuiL6 + kiStride;
   /*caculate the iMean value*/
-  const uint8_t kuiMean1	= (pRef[-kiStride] + pRef[1 - kiStride] + pRef[2 - kiStride] + pRef[3 - kiStride] +
-                             pRef[-1] + pRef[kuiL1] + pRef[kuiL2] + pRef[kuiL3] + 4) >> 3;
+  const uint8_t kuiMean1 = (pRef[-kiStride] + pRef[1 - kiStride] + pRef[2 - kiStride] + pRef[3 - kiStride] +
+                            pRef[-1] + pRef[kuiL1] + pRef[kuiL2] + pRef[kuiL3] + 4) >> 3;
   const uint32_t kuiSum2 = pRef[4 - kiStride] + pRef[5 - kiStride] + pRef[6 - kiStride] + pRef[7 - kiStride];
   const uint32_t kuiSum3 = pRef[kuiL4] + pRef[kuiL5] + pRef[kuiL6] + pRef[kuiL7];
   const uint8_t kuiMean2 = (kuiSum2 + 2) >> 2;

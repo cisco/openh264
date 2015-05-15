@@ -49,9 +49,9 @@ CMemoryAlign::CMemoryAlign (const uint32_t kuiCacheLineSize)
 #endif//MEMORY_MONITOR
 {
   if ((kuiCacheLineSize == 0) || (kuiCacheLineSize & 0x0f))
-    m_nCacheLineSize	= 0x10;
+    m_nCacheLineSize = 0x10;
   else
-    m_nCacheLineSize	= kuiCacheLineSize;
+    m_nCacheLineSize = kuiCacheLineSize;
 }
 
 CMemoryAlign::~CMemoryAlign() {

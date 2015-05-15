@@ -107,7 +107,7 @@ static int32_t WelsCheckNumRefSetting (SLogContext* pLogCtx, SWelsSvcCodingParam
                             : (WELS_MAX (1, (pParam->uiGopSize >> 1))));
   int32_t iNeededRefNum = (pParam->uiIntraPeriod != 1) ? (iCurrentStrNum + pParam->iLTRRefNum) : 0;
 
-  iNeededRefNum		= WELS_CLIP3 (iNeededRefNum,
+  iNeededRefNum = WELS_CLIP3 (iNeededRefNum,
                                 MIN_REF_PIC_COUNT,
                                 (pParam->iUsageType == CAMERA_VIDEO_REAL_TIME) ? MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA :
                                 MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN);
@@ -474,18 +474,18 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
 
   //max value of both iFrameNum and POC are 2^16-1, in our encoder, iPOC=2*iFrameNum, so max of iFrameNum should be 2^15-1.--
   pSps->uiLog2MaxFrameNum = 15;//16;
-  pSps->iLog2MaxPocLsb	= 1 + pSps->uiLog2MaxFrameNum;
+  pSps->iLog2MaxPocLsb = 1 + pSps->uiLog2MaxFrameNum;
 
-  pSps->iNumRefFrames	= kiNumRefFrame;	/* min pRef size when fifo pRef operation*/
+  pSps->iNumRefFrames = kiNumRefFrame;        /* min pRef size when fifo pRef operation*/
 
   if (kbEnableFrameCropping) {
     // TODO: get frame_crop_left_offset, frame_crop_right_offset, frame_crop_top_offset, frame_crop_bottom_offset
     pSps->bFrameCroppingFlag = WelsGetPaddingOffset (pLayerParamInternal->iActualWidth, pLayerParamInternal->iActualHeight,
                                pLayerParam->iVideoWidth, pLayerParam->iVideoHeight, pSps->sFrameCrop);
   } else {
-    pSps->bFrameCroppingFlag	= false;
+    pSps->bFrameCroppingFlag = false;
   }
-  pSps->uiProfileIdc	= pLayerParam->uiProfileIdc ? pLayerParam->uiProfileIdc : PRO_BASELINE;
+  pSps->uiProfileIdc = pLayerParam->uiProfileIdc ? pLayerParam->uiProfileIdc : PRO_BASELINE;
   if (pLayerParam->uiProfileIdc == PRO_BASELINE) {
     pSps->bConstraintSet0Flag = true;
   }
@@ -496,7 +496,7 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
     pSps->bConstraintSet2Flag = true;
   }
 
-  ELevelIdc uiLevel	= WelsGetLevelIdc (pSps, pLayerParamInternal->fOutputFrameRate, pLayerParam->iSpatialBitrate);
+  ELevelIdc uiLevel = WelsGetLevelIdc (pSps, pLayerParamInternal->fOutputFrameRate, pLayerParam->iSpatialBitrate);
   //update level
   //for Scalable Baseline, Scalable High, and Scalable High Intra profiles.If level_idc is equal to 9, the indicated level is level 1b.
   //for the Baseline, Constrained Baseline, Main, and Extended profiles,If level_idc is equal to 11 and constraint_set3_flag is equal to 1, the indicated level is level 1b.
@@ -533,7 +533,7 @@ int32_t WelsInitSubsetSps (SSubsetSps* pSubsetSps, SSpatialLayerConfig* pLayerPa
   WelsInitSps (pSps, pLayerParam, pLayerParamInternal, kuiIntraPeriod, kiNumRefFrame, kuiSpsId, kbEnableFrameCropping,
                bEnableRc, kiDlayerCount, false);
 
-  pSps->uiProfileIdc	= (pLayerParam->uiProfileIdc >= PRO_SCALABLE_BASELINE) ? pLayerParam->uiProfileIdc :
+  pSps->uiProfileIdc = (pLayerParam->uiProfileIdc >= PRO_SCALABLE_BASELINE) ? pLayerParam->uiProfileIdc :
                         PRO_SCALABLE_BASELINE;
 
   pSubsetSps->sSpsSvcExt.iExtendedSpatialScalability    = 0;    /* ESS is 0 in default */
@@ -558,26 +558,26 @@ int32_t WelsInitPps (SWelsPPS* pPps,
     assert (pSps != NULL);
     if (NULL == pSps)
       return 1;
-    pUsedSps	= pSps;
+    pUsedSps = pSps;
   } else {
     assert (pSubsetSps != NULL);
     if (NULL == pSubsetSps)
       return 1;
-    pUsedSps	= &pSubsetSps->pSps;
+    pUsedSps = &pSubsetSps->pSps;
   }
 
   /* fill picture parameter set syntax */
-  pPps->iPpsId		= kuiPpsId;
-  pPps->iSpsId		= pUsedSps->uiSpsId;
+  pPps->iPpsId = kuiPpsId;
+  pPps->iSpsId = pUsedSps->uiSpsId;
   pPps->bEntropyCodingModeFlag = kbEntropyCodingModeFlag;
 #if !defined(DISABLE_FMO_FEATURE)
-  pPps->uiNumSliceGroups =  1;	//param->qos_param.sliceGroupCount;
+  pPps->uiNumSliceGroups = 1; //param->qos_param.sliceGroupCount;
   if (pPps->uiNumSliceGroups > 1) {
-    pPps->uiSliceGroupMapType = 0;	//param->qos_param.sliceGroupType;
+    pPps->uiSliceGroupMapType = 0; //param->qos_param.sliceGroupType;
     if (pPps->uiSliceGroupMapType == 0) {
       uint32_t uiGroup = 0;
       while (uiGroup < pPps->uiNumSliceGroups) {
-        pPps->uiRunLength[uiGroup]	= 25;
+        pPps->uiRunLength[uiGroup] = 25;
         ++ uiGroup;
       }
     } else if (pPps->uiSliceGroupMapType == 2) {

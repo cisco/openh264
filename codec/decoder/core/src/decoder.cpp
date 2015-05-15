@@ -67,7 +67,7 @@ static int32_t CreatePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, cons
     return 1;
   }
 
-  pPicBuf	= (PPicBuff)WelsMallocz (sizeof (SPicBuff), "PPicBuff");
+  pPicBuf = (PPicBuff)WelsMallocz (sizeof (SPicBuff), "PPicBuff");
 
   if (NULL == pPicBuf) {
     return 1;
@@ -109,7 +109,7 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     return 1;
   }
 
-  pPicNewBuf	= (PPicBuff)WelsMallocz (sizeof (SPicBuff), "PPicBuff");
+  pPicNewBuf = (PPicBuff)WelsMallocz (sizeof (SPicBuff), "PPicBuff");
 
   if (NULL == pPicNewBuf) {
     return 1;
@@ -153,9 +153,9 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
 // remove old PicBuf
   if (pPicOldBuf->ppPic != NULL) {
     WelsFree (pPicOldBuf->ppPic, "pPicOldBuf->queue");
-    pPicOldBuf->ppPic	= NULL;
+    pPicOldBuf->ppPic = NULL;
   }
-  pPicOldBuf->iCapacity	= 0;
+  pPicOldBuf->iCapacity = 0;
   pPicOldBuf->iCurrentIdx = 0;
   WelsFree (pPicOldBuf, "pPicOldBuf");
   pPicOldBuf = NULL;
@@ -171,7 +171,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     return 1;
   }
 
-  pPicNewBuf	= (PPicBuff)WelsMallocz (sizeof (SPicBuff), "PPicBuff");
+  pPicNewBuf = (PPicBuff)WelsMallocz (sizeof (SPicBuff), "PPicBuff");
 
   if (NULL == pPicNewBuf) {
     return 1;
@@ -180,7 +180,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   pPicNewBuf->ppPic = (PPicture*)WelsMallocz (kiNewSize * sizeof (PPicture), "PPicture*");
 
   if (NULL == pPicNewBuf->ppPic) {
-    pPicNewBuf->iCapacity	 = 0;
+    pPicNewBuf->iCapacity = 0;
     DestroyPicBuff (&pPicNewBuf);
     return 1;
   }
@@ -227,9 +227,9 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   // remove old PicBuf
   if (pPicOldBuf->ppPic != NULL) {
     WelsFree (pPicOldBuf->ppPic, "pPicOldBuf->queue");
-    pPicOldBuf->ppPic	= NULL;
+    pPicOldBuf->ppPic = NULL;
   }
-  pPicOldBuf->iCapacity	= 0;
+  pPicOldBuf->iCapacity = 0;
   pPicOldBuf->iCurrentIdx = 0;
   WelsFree (pPicOldBuf, "pPicOldBuf");
   pPicOldBuf = NULL;
@@ -257,9 +257,9 @@ void DestroyPicBuff (PPicBuff* ppPicBuf) {
 
     WelsFree (pPicBuf->ppPic, "pPicBuf->queue");
 
-    pPicBuf->ppPic	= NULL;
+    pPicBuf->ppPic = NULL;
   }
-  pPicBuf->iCapacity	= 0;
+  pPicBuf->iCapacity = 0;
   pPicBuf->iCurrentIdx = 0;
 
   WelsFree (pPicBuf, "pPicBuf");
@@ -331,7 +331,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
  *  get size of reference picture list in target layer incoming, = (iNumRefFrames
  */
 static inline int32_t GetTargetRefListSize (PWelsDecoderContext pCtx) {
-  int32_t iNumRefFrames	= 0;
+  int32_t iNumRefFrames = 0;
   // +2 for EC MV Copy buffer exchange
   if ((pCtx == NULL) || (pCtx->pSps == NULL)) {
     iNumRefFrames = MAX_REF_PIC_COUNT + 2;
@@ -365,7 +365,7 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
 
   // Fixed the issue about different gop size over last, 5/17/2010
   // get picture queue size currently
-  iPicQueueSize	= GetTargetRefListSize (pCtx);	// adaptive size of picture queue, = (pSps->iNumRefFrames x 2)
+  iPicQueueSize = GetTargetRefListSize (pCtx);  // adaptive size of picture queue, = (pSps->iNumRefFrames x 2)
   pCtx->iPicQueueNumber = iPicQueueSize;
   if (pCtx->pPicBuff[LIST_0] != NULL
       && pCtx->pPicBuff[LIST_0]->iCapacity ==
@@ -482,7 +482,7 @@ int32_t WelsOpenDecoder (PWelsDecoderContext pCtx) {
 #ifdef LONG_TERM_REF
   pCtx->bParamSetsLostFlag = true;
 #else
-  pCtx->bReferenceLostAtT0Flag	= true;	// should be true to waiting IDR at incoming AU bits following, 6/4/2010
+  pCtx->bReferenceLostAtT0Flag = true; // should be true to waiting IDR at incoming AU bits following, 6/4/2010
 #endif //LONG_TERM_REF
   pCtx->bNewSeqBegin = true;
   pCtx->bPrintFrameErrorTraceFlag = true;
@@ -517,13 +517,13 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
   if (NULL == pCtx || NULL == kpParam)
     return 1;
 
-  pCtx->pParam	= (SDecodingParam*)WelsMallocz (sizeof (SDecodingParam), "SDecodingParam");
+  pCtx->pParam = (SDecodingParam*)WelsMallocz (sizeof (SDecodingParam), "SDecodingParam");
 
   if (NULL == pCtx->pParam)
     return 1;
 
   memcpy (pCtx->pParam, kpParam, sizeof (SDecodingParam));
-  pCtx->eOutputColorFormat	= pCtx->pParam->eOutputColorFormat;
+  pCtx->eOutputColorFormat = pCtx->pParam->eOutputColorFormat;
   if (!pCtx->bParseOnly) {
     int32_t iRet = DecoderSetCsp (pCtx, pCtx->pParam->eOutputColorFormat);
     if (iRet)
@@ -668,7 +668,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
           iConsumedBytes = 0;
           pDstNal[iDstIdx] = pDstNal[iDstIdx + 1] = pDstNal[iDstIdx + 2] = pDstNal[iDstIdx + 3] =
                                0; // set 4 reserved bytes to zero
-          pNalPayload	= ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
+          pNalPayload = ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
           if (pNalPayload) { //parse correct
             if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType)) {
               iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes, pSrcNal - 3, iSrcIdx + 3);
@@ -758,8 +758,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
       return pCtx->iErrorCode;
     }
   } else { /* no supplementary picture payload input, but stored a picture */
-    PAccessUnit pCurAu	=
-      pCtx->pAccessUnitList;	// current access unit, it will never point to NULL after decode's successful initialization
+    PAccessUnit pCurAu =
+      pCtx->pAccessUnitList; // current access unit, it will never point to NULL after decode's successful initialization
 
     if (pCurAu->uiAvailUnitsNum == 0) {
       return pCtx->iErrorCode;
@@ -789,9 +789,9 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 int32_t DecoderSetCsp (PWelsDecoderContext pCtx, const int32_t kiColorFormat) {
   WELS_VERIFY_RETURN_IF (1, (NULL == pCtx));
 
-  pCtx->eOutputColorFormat	= (EVideoFormatType) kiColorFormat;
+  pCtx->eOutputColorFormat = (EVideoFormatType) kiColorFormat;
   if (pCtx->pParam != NULL) {
-    pCtx->pParam->eOutputColorFormat	= (EVideoFormatType) kiColorFormat;
+    pCtx->pParam->eOutputColorFormat = (EVideoFormatType) kiColorFormat;
   }
 
   //For now, support only videoFormatI420!

@@ -105,7 +105,7 @@ void* WelsRealloc (void* pPointer, uint32_t* pRealSize, const uint32_t kuiSize, 
 
   pLocalPointer = InternalReallocate (pPointer, kuiNewSize, pTag);
   if (NULL != pLocalPointer) {
-    *pRealSize	= kuiNewSize;
+    *pRealSize = kuiNewSize;
     return (pLocalPointer);
   } else {
     return NULL;

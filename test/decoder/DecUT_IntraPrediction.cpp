@@ -488,12 +488,11 @@ void WelsIChromaPredDcLeft_ref (uint8_t* pPred, const int32_t kiStride) {
 }
 
 void WelsIChromaPredDcTop_ref (uint8_t* pPred, const int32_t kiStride) {
-  int32_t iTmp			= (kiStride << 3) - kiStride;
+  int32_t iTmp = (kiStride << 3) - kiStride;
   /*caculate the kMean value*/
-  const uint8_t kuiM1	    = (pPred[-kiStride] + pPred[1 - kiStride] + pPred[2 - kiStride] + pPred[3 - kiStride] + 2) >> 2;
-  const uint8_t kuiM2	    = (pPred[4 - kiStride] + pPred[5 - kiStride] + pPred[6 - kiStride] + pPred[7 - kiStride] + 2) >>
-                            2;
-  const uint8_t kuiM[8]	= {kuiM1, kuiM1, kuiM1, kuiM1, kuiM2, kuiM2, kuiM2, kuiM2};
+  const uint8_t kuiM1 = (pPred[-kiStride] + pPred[1 - kiStride] + pPred[2 - kiStride] + pPred[3 - kiStride] + 2) >> 2;
+  const uint8_t kuiM2 = (pPred[4 - kiStride] + pPred[5 - kiStride] + pPred[6 - kiStride] + pPred[7 - kiStride] + 2) >> 2;
+  const uint8_t kuiM[8] = {kuiM1, kuiM1, kuiM1, kuiM1, kuiM2, kuiM2, kuiM2, kuiM2};
 
   uint8_t i = 7;
 

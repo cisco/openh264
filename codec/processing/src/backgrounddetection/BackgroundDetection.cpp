@@ -278,7 +278,7 @@ inline void CBackgroundDetection::ForegroundDilation (SBackgroundOU* pBackground
 
       // chroma component check
       if (pBackgroundOU->iBackgroundFlag == 1) {
-        int8_t	iNeighbourForegroundFlags = !pOUNeighbours[0]->iBackgroundFlag | ((!pOUNeighbours[1]->iBackgroundFlag) << 1)
+        int8_t iNeighbourForegroundFlags = !pOUNeighbours[0]->iBackgroundFlag | ((!pOUNeighbours[1]->iBackgroundFlag) << 1)
                                             | ((!pOUNeighbours[2]->iBackgroundFlag) << 2) | ((!pOUNeighbours[3]->iBackgroundFlag) << 3);
         pBackgroundOU->iBackgroundFlag = !ForegroundDilation23Chroma (iNeighbourForegroundFlags, iChromaSampleStartPos,
                                          iPicStrideUV, pBgdParam);
@@ -291,9 +291,9 @@ inline void CBackgroundDetection::ForegroundDilation (SBackgroundOU* pBackground
 }
 inline void CBackgroundDetection::BackgroundErosion (SBackgroundOU* pBackgroundOU, SBackgroundOU* pOUNeighbours[]) {
   if (pBackgroundOU->iMaxDiffSubSd <= (BGD_OU_SIZE * Q_FACTOR)) { //BGD_OU_SIZE*BGD_OU_SIZE>>2
-    int32_t	iSumNeighBackgroundFlags = pOUNeighbours[0]->iBackgroundFlag + pOUNeighbours[1]->iBackgroundFlag +
+    int32_t iSumNeighBackgroundFlags = pOUNeighbours[0]->iBackgroundFlag + pOUNeighbours[1]->iBackgroundFlag +
                                        pOUNeighbours[2]->iBackgroundFlag + pOUNeighbours[3]->iBackgroundFlag;
-    int32_t	sumNbrBGsad = (pOUNeighbours[0]->iSAD & (-pOUNeighbours[0]->iBackgroundFlag)) + (pOUNeighbours[2]->iSAD &
+    int32_t sumNbrBGsad = (pOUNeighbours[0]->iSAD & (-pOUNeighbours[0]->iBackgroundFlag)) + (pOUNeighbours[2]->iSAD &
                           (-pOUNeighbours[2]->iBackgroundFlag))
                           + (pOUNeighbours[1]->iSAD & (-pOUNeighbours[1]->iBackgroundFlag)) + (pOUNeighbours[3]->iSAD &
                               (-pOUNeighbours[3]->iBackgroundFlag));

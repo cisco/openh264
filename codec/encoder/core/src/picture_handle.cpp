@@ -59,7 +59,7 @@ SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth , const int32_t
   int32_t iLumaSize             = 0;
   int32_t iChromaSize           = 0;
 
-  pPic	= static_cast<SPicture*> (pMa->WelsMallocz (sizeof (SPicture), "pPic"));
+  pPic = static_cast<SPicture*> (pMa->WelsMallocz (sizeof (SPicture), "pPic"));
 
   WELS_VERIFY_RETURN_IF (NULL, NULL == pPic);
 
@@ -95,10 +95,10 @@ SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth , const int32_t
   if (bNeedMbInfo) {
     const uint32_t kuiCountMbNum = ((15 + kiWidth) >> 4) * ((15 + kiHeight) >> 4);
 
-    pPic->uiRefMbType	= (uint32_t*)pMa->WelsMallocz (kuiCountMbNum * sizeof (uint32_t), "pPic->uiRefMbType");
+    pPic->uiRefMbType = (uint32_t*)pMa->WelsMallocz (kuiCountMbNum * sizeof (uint32_t), "pPic->uiRefMbType");
     WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->uiRefMbType, FreePicture (pMa, &pPic));
 
-    pPic->pRefMbQp	= (uint8_t*)pMa->WelsMallocz (kuiCountMbNum * sizeof (uint8_t), "pPic->pRefMbQp");
+    pPic->pRefMbQp = (uint8_t*)pMa->WelsMallocz (kuiCountMbNum * sizeof (uint8_t), "pPic->pRefMbQp");
     WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pRefMbQp, FreePicture (pMa, &pPic));
 
     pPic->sMvList           = static_cast<SMVUnitXY*> (pMa->WelsMallocz (kuiCountMbNum * sizeof (SMVUnitXY),

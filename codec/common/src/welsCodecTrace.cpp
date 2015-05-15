@@ -90,7 +90,7 @@ void welsCodecTrace::SetCodecInstance (void* pCodecInstance) {
 
 void welsCodecTrace::SetTraceLevel (const int32_t iLevel) {
   if (iLevel >= 0)
-    m_iTraceLevel	= iLevel;
+    m_iTraceLevel = iLevel;
 }
 
 void welsCodecTrace::SetTraceCallback (WelsTraceCallback func) {

@@ -39,7 +39,7 @@ namespace WelsEnc {
  ****************************************************************************/
 void WelsIHadamard4x4Dc (int16_t* pRes) { //pBuffer size : 4x4
   int16_t iTemp[4];
-  int32_t i	= 4;
+  int32_t i = 4;
 
   while (--i >= 0) {
     const int32_t kiIdx  = i << 2;

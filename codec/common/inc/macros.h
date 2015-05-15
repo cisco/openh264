@@ -152,14 +152,14 @@ static inline int32_t WelsMedian (int32_t iX,  int32_t iY, int32_t iZ) {
   int32_t iMin = iX, iMax = iX;
 
   if (iY < iMin)
-    iMin	= iY;
+    iMin = iY;
   else
     iMax = iY;
 
   if (iZ < iMin)
-    iMin	= iZ;
+    iMin = iZ;
   else if (iZ > iMax)
-    iMax	= iZ;
+    iMax = iZ;
 
   return (iX + iY + iZ) - (iMin + iMax);
 }

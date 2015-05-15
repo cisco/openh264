@@ -94,7 +94,7 @@ void UninitDecoder (PWelsDecoderContext pCtx) {
   WelsEndDecoder (pCtx);
   if (NULL != pCtx) {
     free (pCtx);
-    pCtx	= NULL;
+    pCtx = NULL;
   }
 
 }
@@ -160,7 +160,7 @@ void DecoderParseSyntaxTest::Init() {
   //
   m_pCtx = (PWelsDecoderContext)malloc (sizeof (SWelsDecoderContext));
 
-  m_pWelsTrace	= new welsCodecTrace();
+  m_pWelsTrace = new welsCodecTrace();
   if (m_pWelsTrace != NULL) {
     m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);
   }

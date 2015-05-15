@@ -226,7 +226,7 @@ int32_t WelsSpatialWriteMbSyn (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb
   const uint8_t kuiChromaQpIndexOffset = pEncCtx->pCurDqLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
 
   if (IS_SKIP (pCurMb->uiMbType)) {
-    pCurMb->uiLumaQp	= pSlice->uiLastMbQp;
+    pCurMb->uiLumaQp = pSlice->uiLastMbQp;
     pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp + kuiChromaQpIndexOffset)];
 
     pSlice->iMbSkipRun++;

@@ -69,7 +69,7 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
   int32_t iLumaSize         = 0;
   int32_t iChromaSize       = 0;
 
-  pPic	= (PPicture) WelsMallocz (sizeof (SPicture), "PPicture");
+  pPic = (PPicture) WelsMallocz (sizeof (SPicture), "PPicture");
   WELS_VERIFY_RETURN_IF (NULL, NULL == pPic);
 
   memset (pPic, 0, sizeof (SPicture));
@@ -88,7 +88,7 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
     pPic->iLinesize[0] = iPicWidth;
     pPic->iLinesize[1] = pPic->iLinesize[2] = iPicChromaWidth;
   } else {
-    pPic->pBuffer[0]	= static_cast<uint8_t*> (WelsMallocz (iLumaSize /* luma */
+    pPic->pBuffer[0] = static_cast<uint8_t*> (WelsMallocz (iLumaSize /* luma */
                         + (iChromaSize << 1) /* Cb,Cr */, "_pic->buffer[0]"));
     WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pBuffer[0], FreePicture (pPic));
 

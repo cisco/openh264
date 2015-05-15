@@ -1133,8 +1133,8 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
     uint32_t uiSubMbType;
 
     if (MB_TYPE_8x8_REF0 == pCurDqLayer->pMbType[iMbXy]) {
-      iRefCount[0]	=
-        iRefCount[1]	= 1;
+      iRefCount[0] =
+        iRefCount[1] = 1;
     }
 
     //uiSubMbType, partition
