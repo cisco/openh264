@@ -773,6 +773,8 @@ TEST (DecoderDeblocking, DeblockingBsMarginalMBAvcbase) {
   int8_t iNoZeroCount[24 * 2]; // (*pNzc)[24]
   int8_t iLayerRefIndex[2][16 * 2]; // (*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM];
   int16_t iLayerMv[2][16 * 2][2]; //(*pMv[LIST_A])[MB_BLOCK4x4_NUM][MV_A];
+  uint32_t uiBSx4;
+  uint8_t* pBS = (uint8_t*) (&uiBSx4);
 
   sDqLayer.pNzc = (int8_t (*)[24])iNoZeroCount;
   sDqLayer.pRefIndex[0] = (int8_t (*)[16])&iLayerRefIndex[0];
@@ -790,6 +792,10 @@ TEST (DecoderDeblocking, DeblockingBsMarginalMBAvcbase) {
   memset(iLayerRefIndex, 0, sizeof(int8_t)*2*16*2); \
   memset(iLayerMv, 0, sizeof(int16_t)*2*16*2*2);
 
+#define SET_REF_VALUE(value, pos) \
+  uiBSx4 = 0; \
+  pBS[pos] = value;
+
   int32_t iCurrBlock, iNeighborBlock;
 
   /* Cycle for each block and its neighboring block */
@@ -801,21 +807,24 @@ TEST (DecoderDeblocking, DeblockingBsMarginalMBAvcbase) {
       // (1) iEdge == 0, current block NoZeroCount != 0
       UT_DB_CLEAN_STATUS
       iNoZeroCount[0 * 24 + iCurrBlock] = 1; // Current MB_block position
+      SET_REF_VALUE(2, iPos);
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (2u << (iPos * 8))) << iEdge << " " << iPos << " NoZeroCount!=0";
+                   0) == uiBSx4) << iEdge << " " << iPos << " NoZeroCount!=0";
 
       // (2) iEdge == 0, neighbor block NoZeroCount != 0
       UT_DB_CLEAN_STATUS
       iNoZeroCount[1 * 24 + iNeighborBlock ] = 1; // Neighbor MB_block position
+      SET_REF_VALUE(2, iPos);
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (2u << (iPos * 8))) << iEdge << " " << iPos << " NoZeroCount!=0";
+                   0) == uiBSx4) << iEdge << " " << iPos << " NoZeroCount!=0";
 
       // (3) iEdge == 0, reference idx diff
       UT_DB_CLEAN_STATUS
       iLayerRefIndex[0][0 * 16 + iCurrBlock] = 0;
       iLayerRefIndex[0][1 * 16 + iNeighborBlock] = 1;
+      SET_REF_VALUE(1, iPos);
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (1u << (iPos * 8))) << iEdge << " " << iPos << " Ref idx diff";
+                   0) == uiBSx4) << iEdge << " " << iPos << " Ref idx diff";
 
       // (4) iEdge == 0, abs(mv diff) < 4
       UT_DB_CLEAN_STATUS
@@ -837,35 +846,41 @@ TEST (DecoderDeblocking, DeblockingBsMarginalMBAvcbase) {
       // (5) iEdge == 0, abs(mv diff) > 4
       UT_DB_CLEAN_STATUS
       iLayerMv[0][0 * 16 + iCurrBlock][0] = 4;
+      SET_REF_VALUE(1, iPos);
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (1u << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == 4";
+                   0) == uiBSx4) << iEdge << " " << iPos << " diff_mv == 4";
 
       UT_DB_CLEAN_STATUS
       iLayerMv[0][0 * 16 + iCurrBlock][1] = 4;
+      SET_REF_VALUE(1, iPos);
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (1u << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == 4";
+                   0) == uiBSx4) << iEdge << " " << iPos << " diff_mv == 4";
 
       UT_DB_CLEAN_STATUS
       iLayerMv[0][1 * 16 + iNeighborBlock][0] = 4;
+      SET_REF_VALUE(1, iPos);
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (1u << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == 4";
+                   0) == uiBSx4) << iEdge << " " << iPos << " diff_mv == 4";
 
       UT_DB_CLEAN_STATUS
       iLayerMv[0][1 * 16 + iNeighborBlock][1] = 4;
+      SET_REF_VALUE(1, iPos);
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (1u << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == 4";
+                   0) == uiBSx4) << iEdge << " " << iPos << " diff_mv == 4";
 
       UT_DB_CLEAN_STATUS
       iLayerMv[0][0 * 16 + iCurrBlock][0] = -2048;
       iLayerMv[0][1 * 16 + iNeighborBlock][0] = 2047;
+      SET_REF_VALUE(1, iPos);
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (1u << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == maximum";
+                   0) == uiBSx4) << iEdge << " " << iPos << " diff_mv == maximum";
 
       UT_DB_CLEAN_STATUS
       iLayerMv[0][0 * 16 + iCurrBlock][1] = -2048;
       iLayerMv[0][1 * 16 + iNeighborBlock][1] = 2047;
+      SET_REF_VALUE(1, iPos);
       EXPECT_TRUE (DeblockingBsMarginalMBAvcbase (&sDqLayer, iEdge, 1,
-                   0) == (1u << (iPos * 8))) << iEdge << " " << iPos << " diff_mv == maximum";
+                   0) == uiBSx4) << iEdge << " " << iPos << " diff_mv == maximum";
     }
   }
 }
