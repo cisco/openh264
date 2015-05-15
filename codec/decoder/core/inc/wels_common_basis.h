@@ -129,67 +129,65 @@ static const uint8_t g_kuiIdx2CtxLastSignificantCoeffFlag8x8[64] = { // Table 9-
     7,  7,  7,  7,  8,  8,  8,  8,
 };
 
-static inline void GetMbResProperty(int32_t * pMBproperty,int32_t* pResidualProperty,bool bCavlc)
-{
- switch(*pResidualProperty)
-  {
+static inline void GetMbResProperty (int32_t* pMBproperty, int32_t* pResidualProperty, bool bCavlc) {
+  switch (*pResidualProperty) {
   case CHROMA_AC_U:
-	  *pMBproperty = 1;
-	  *pResidualProperty = bCavlc ? CHROMA_AC : CHROMA_AC_U;
-	  break;
+    *pMBproperty = 1;
+    *pResidualProperty = bCavlc ? CHROMA_AC : CHROMA_AC_U;
+    break;
   case CHROMA_AC_V:
-	  *pMBproperty = 2;
-	  *pResidualProperty = bCavlc ? CHROMA_AC : CHROMA_AC_V;
-	  break;
+    *pMBproperty = 2;
+    *pResidualProperty = bCavlc ? CHROMA_AC : CHROMA_AC_V;
+    break;
   case LUMA_DC_AC_INTRA:
-	  *pMBproperty = 0;
-	  *pResidualProperty = LUMA_DC_AC;
-	  break;
+    *pMBproperty = 0;
+    *pResidualProperty = LUMA_DC_AC;
+    break;
   case CHROMA_DC_U:
-      *pMBproperty = 1;
-	  *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_U;
-      break;
- case CHROMA_DC_V:
-	  *pMBproperty = 2;
-	  *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_V;
-	  break;
+    *pMBproperty = 1;
+    *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_U;
+    break;
+  case CHROMA_DC_V:
+    *pMBproperty = 2;
+    *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_V;
+    break;
   case I16_LUMA_AC:
-	  *pMBproperty = 0;
-	  break;
+    *pMBproperty = 0;
+    break;
   case I16_LUMA_DC:
-	  *pMBproperty = 0;
-	  break;
+    *pMBproperty = 0;
+    break;
   case LUMA_DC_AC_INTER:
-	  *pMBproperty = 3;
-      *pResidualProperty = LUMA_DC_AC;
-	  break;
+    *pMBproperty = 3;
+    *pResidualProperty = LUMA_DC_AC;
+    break;
   case CHROMA_DC_U_INTER:
-      *pMBproperty = 4;
-	  *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_U;
-      break;
+    *pMBproperty = 4;
+    *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_U;
+    break;
   case CHROMA_DC_V_INTER:
-	  *pMBproperty = 5;
-	  *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_V;
-	  break;
- case CHROMA_AC_U_INTER:
-	  *pMBproperty = 4;
-	  *pResidualProperty =  bCavlc ? CHROMA_AC : CHROMA_AC_U;
-	  break;
- case CHROMA_AC_V_INTER:
-	  *pMBproperty = 5;
-	  *pResidualProperty =  bCavlc ? CHROMA_AC : CHROMA_AC_V;
-	  break;
-    // Reference to Table 7-2
- case LUMA_DC_AC_INTRA_8:
+    *pMBproperty = 5;
+    *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_V;
+    break;
+  case CHROMA_AC_U_INTER:
+    *pMBproperty = 4;
+    *pResidualProperty =  bCavlc ? CHROMA_AC : CHROMA_AC_U;
+    break;
+  case CHROMA_AC_V_INTER:
+    *pMBproperty = 5;
+    *pResidualProperty =  bCavlc ? CHROMA_AC : CHROMA_AC_V;
+    break;
+  // Reference to Table 7-2
+  case LUMA_DC_AC_INTRA_8:
     *pMBproperty = 6;
     *pResidualProperty = LUMA_DC_AC_8;
     break;
- case LUMA_DC_AC_INTER_8:
+  case LUMA_DC_AC_INTER_8:
     *pMBproperty = 7;
     *pResidualProperty = LUMA_DC_AC_8;
     break;
- }
   }
+}
 
 typedef struct TagI16PredInfo {
     int8_t iPredMode;
