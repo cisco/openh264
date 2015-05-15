@@ -38,25 +38,25 @@
 
 /* Some list size */
 
-#define MB_SUB_PARTITION_SIZE	4	// Sub partition size in a 8x8 sub-block
-#define NAL_UNIT_HEADER_EXT_SIZE	3	// Size of NAL unit header for extension in byte
-#define MAX_PPS_COUNT                   256	// Count number of PPS
+#define MB_SUB_PARTITION_SIZE           4       // Sub partition size in a 8x8 sub-block
+#define NAL_UNIT_HEADER_EXT_SIZE        3       // Size of NAL unit header for extension in byte
+#define MAX_PPS_COUNT                   256     // Count number of PPS
 
-#define MAX_REF_PIC_COUNT		16		// MAX Short + Long reference pictures
-#define MIN_REF_PIC_COUNT		1		// minimal count number of reference pictures, 1 short + 2 key reference based?
-#define MAX_SHORT_REF_COUNT		16		// maximal count number of short reference pictures
-#define MAX_LONG_REF_COUNT		16		// maximal count number of long reference pictures
+#define MAX_REF_PIC_COUNT               16              // MAX Short + Long reference pictures
+#define MIN_REF_PIC_COUNT               1               // minimal count number of reference pictures, 1 short + 2 key reference based?
+#define MAX_SHORT_REF_COUNT             16              // maximal count number of short reference pictures
+#define MAX_LONG_REF_COUNT              16              // maximal count number of long reference pictures
 
-#define MAX_MMCO_COUNT			66
+#define MAX_MMCO_COUNT                  66
 
-#define MAX_SLICEGROUP_IDS		8	// Count number of Slice Groups
+#define MAX_SLICEGROUP_IDS              8       // Count number of Slice Groups
 
-#define MAX_LAYER_NUM   8
+#define MAX_LAYER_NUM                   8
 
-#define LAYER_NUM_EXCHANGEABLE	1
+#define LAYER_NUM_EXCHANGEABLE          1
 
-#define MAX_NAL_UNIT_NUM_IN_AU	32	// predefined maximal number of NAL Units in an access unit
-#define MIN_ACCESS_UNIT_CAPACITY	1048576	// Min AU capacity in bytes: (1<<20) = 1024 KB predefined
+#define MAX_NAL_UNIT_NUM_IN_AU          32      // predefined maximal number of NAL Units in an access unit
+#define MIN_ACCESS_UNIT_CAPACITY        1048576 // Min AU capacity in bytes: (1<<20) = 1024 KB predefined
 #define MAX_BUFFERED_NUM 3 //mamixum stored number of AU|packet to prevent overwrite
 #define MAX_ACCESS_UNIT_CAPACITY 7077888 //Maximum AU size in bytes for level 5.2 for single frame
 #define MAX_MACROBLOCK_CAPACITY 5000 //Maximal legal MB capacity, 15000 bits is enough

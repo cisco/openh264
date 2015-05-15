@@ -52,7 +52,7 @@ namespace WelsDec {
  * InitBsBuffer
  * Memory allocation for Bitstream Buffer
  * return:
- *	0 - success; otherwise returned error_no defined in error_no.h.
+ *  0 - success; otherwise returned error_no defined in error_no.h.
  */
 int32_t InitBsBuffer (PWelsDecoderContext pCtx);
 
@@ -61,7 +61,7 @@ int32_t InitBsBuffer (PWelsDecoderContext pCtx);
  * Expand current BS buffer and copy its content
  * new buffer size will consider input size as a reference
  * return:
- *	0 - success; otherwise returned error_no defined in error_no.h.
+ *  0 - success; otherwise returned error_no defined in error_no.h.
  */
 int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen);
 
@@ -77,7 +77,7 @@ int32_t CheckBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen);
  * Especially for:
  * rbsp_au_buffer, cur_dq_layer_ptr and ref_dq_layer_ptr in MB info cache.
  * return:
- *	0 - success; otherwise returned error_no defined in error_no.h.
+ *  0 - success; otherwise returned error_no defined in error_no.h.
  */
 int32_t WelsInitMemory (PWelsDecoderContext pCtx);
 
@@ -89,33 +89,33 @@ int32_t WelsInitMemory (PWelsDecoderContext pCtx);
 void WelsFreeMemory (PWelsDecoderContext pCtx);
 
 /*!
- * \brief	request memory when maximal picture width and height are available
+ * \brief   request memory when maximal picture width and height are available
  */
 int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWidth, const int32_t kiMaxHeight);
 
 /*!
- * \brief	free dq layer context memory related
+ * \brief   free dq layer context memory related
  */
 void UninitialDqLayersContext (PWelsDecoderContext pCtx);
 
 /*
- *	DecodeNalHeaderExt
- *	Trigger condition: NAL_UNIT_TYPE = NAL_UNIT_PREFIX or NAL_UNIT_CODED_SLICE_EXT
- *	Parameter:
- *	pNal:	target NALUnit ptr
- *	pSrc:	NAL Unit bitstream
+ *  DecodeNalHeaderExt
+ *  Trigger condition: NAL_UNIT_TYPE = NAL_UNIT_PREFIX or NAL_UNIT_CODED_SLICE_EXT
+ *  Parameter:
+ *  pNal:   target NALUnit ptr
+ *  pSrc:   NAL Unit bitstream
  */
 void DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc);
 
 /*
- *	ParseSliceHeaderSyntaxs
- *	Parse slice header of bitstream
+ *  ParseSliceHeaderSyntaxs
+ *  Parse slice header of bitstream
  */
 int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, const bool kbExtensionFlag);
 /*
- *	Copy relative syntax elements of NALUnitHeaderExt, sRefPicBaseMarking and bStoreRefBasePicFlag in prefix nal unit.
- *	pSrc:	mark as decoded prefix NAL
- *	pDst:	succeeded VCL NAL based AVC (I/P Slice)
+ *  Copy relative syntax elements of NALUnitHeaderExt, sRefPicBaseMarking and bStoreRefBasePicFlag in prefix nal unit.
+ *  pSrc:   mark as decoded prefix NAL
+ *  pDst:   succeeded VCL NAL based AVC (I/P Slice)
  */
 bool PrefetchNalHeaderExtSyntax (PWelsDecoderContext pCtx, PNalUnit const kpDst, PNalUnit const kpSrc);
 
@@ -125,12 +125,12 @@ bool PrefetchNalHeaderExtSyntax (PWelsDecoderContext pCtx, PNalUnit const kpDst,
  * construct an access unit for given input bitstream, maybe partial NAL Unit, one or more Units are involved to
  * joint a collective access unit.
  * parameter\
- *	buf:		bitstream data buffer
- *	bit_len:	size in bit length of data
- *	buf_len:	size in byte length of data
- *	coded_au:	mark an Access Unit decoding finished
+ *  buf:        bitstream data buffer
+ *  bit_len:    size in bit length of data
+ *  buf_len:    size in byte length of data
+ *  coded_au:   mark an Access Unit decoding finished
  * return:
- *	0 - success; otherwise returned error_no defined in error_no.h
+ *  0 - success; otherwise returned error_no defined in error_no.h
  */
 int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo);
 
@@ -146,7 +146,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
  */
 bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** pDst, SBufferInfo* pDstInfo);
 /*
- *	Prepare current dq layer context initialization.
+ *  Prepare current dq layer context initialization.
  */
 void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pSps, PPps pPps);
 

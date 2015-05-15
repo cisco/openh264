@@ -43,7 +43,7 @@
 namespace WelsDec {
 
 /*
- *	Reference picture list reordering syntax, refer to page 64 in JVT X201wcm
+ *  Reference picture list reordering syntax, refer to page 64 in JVT X201wcm
  */
 typedef struct TagRefPicListReorderSyntax {
 struct {
@@ -55,7 +55,7 @@ bool		bRefPicListReorderingFlag[LIST_A];
 } SRefPicListReorderSyn, *PRefPicListReorderSyn;
 
 /*
- *	Prediction weight table syntax, refer to page 65 in JVT X201wcm
+ *  Prediction weight table syntax, refer to page 65 in JVT X201wcm
  */
 typedef struct TagPredWeightTabSyntax {
 uint32_t	uiLumaLog2WeightDenom;

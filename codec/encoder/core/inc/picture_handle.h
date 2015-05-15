@@ -45,20 +45,20 @@
 
 namespace WelsEnc {
 /*!
- * \brief	alloc picture pData with borders for each plane based width and height of picture
- * \param	kiWidth				width of picture in pixels
- * \param	kiHeight				height of picture in pixels
- * \param	bNeedMbInfo		need pData allocation
- * \pram	iNeedFeatureStorage		need storage for FME
- * \return	successful if effective picture pointer returned, otherwise failed with NULL
+ * \brief   alloc picture pData with borders for each plane based width and height of picture
+ * \param   kiWidth                 width of picture in pixels
+ * \param   kiHeight                height of picture in pixels
+ * \param   bNeedMbInfo             need pData allocation
+ * \pram    iNeedFeatureStorage     need storage for FME
+ * \return  successful if effective picture pointer returned, otherwise failed with NULL
  */
 SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth, const int32_t kiHeight, bool bNeedMbInfo,
                         int32_t iNeedFeatureStorage);
 
 /*!
- * \brief	free picture pData planes
- * \param	pic		picture pointer to be destoryed
- * \return	none
+ * \brief   free picture pData planes
+ * \param   pic     picture pointer to be destoryed
+ * \return  none
  */
 void FreePicture (CMemoryAlign* pMa, SPicture** ppPic);
 

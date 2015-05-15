@@ -44,12 +44,12 @@
 namespace WelsDec {
 
 /*!
- * \brief	Generate MB allocated map for interleaved slice group (TYPE 0)
+ * \brief   Generate MB allocated map for interleaved slice group (TYPE 0)
  *
- * \param	pFmo	fmo context
- * \param	pPps	pps context
+ * \param   pFmo    fmo context
+ * \param   pPps    pps context
  *
- * \return	0 - successful; none 0 - failed
+ * \return  0 - successful; none 0 - failed
  */
 static inline int32_t FmoGenerateMbAllocMapType0 (PFmo pFmo, PPps pPps) {
   uint32_t uiNumSliceGroups = 0;
@@ -79,13 +79,13 @@ static inline int32_t FmoGenerateMbAllocMapType0 (PFmo pFmo, PPps pPps) {
 }
 
 /*!
- * \brief	Generate MB allocated map for dispersed slice group (TYPE 1)
+ * \brief   Generate MB allocated map for dispersed slice group (TYPE 1)
  *
- * \param	pFmo	fmo context
- * \param	pPps	pps context
- * \param	iMbWidth	MB width
+ * \param   pFmo        fmo context
+ * \param   pPps        pps context
+ * \param   iMbWidth    MB width
  *
- * \return	0 - successful; none 0 - failed
+ * \return  0 - successful; none 0 - failed
  */
 static inline int32_t FmoGenerateMbAllocMapType1 (PFmo pFmo, PPps pPps, const int32_t kiMbWidth) {
   uint32_t uiNumSliceGroups = 0;
@@ -106,14 +106,14 @@ static inline int32_t FmoGenerateMbAllocMapType1 (PFmo pFmo, PPps pPps, const in
 }
 
 /*!
- * \brief	Generate MB allocated map for various type of slice group cases (TYPE 0, .., 6)
+ * \brief   Generate MB allocated map for various type of slice group cases (TYPE 0, .., 6)
  *
- * \param	pFmo		fmo context
- * \param	pPps		pps context
- * \param	kiMbWidth	MB width
- * \param	kiMbHeight	MB height
+ * \param   pFmo        fmo context
+ * \param   pPps        pps context
+ * \param   kiMbWidth   MB width
+ * \param   kiMbHeight  MB height
  *
- * \return	0 - successful; none 0 - failed
+ * \return  0 - successful; none 0 - failed
  */
 static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const int32_t kiMbWidth,
     const int32_t kiMbHeight) {
@@ -177,14 +177,14 @@ static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const 
 }
 
 /*!
- * \brief	Initialize Wels Flexible Macroblock Ordering (FMO)
+ * \brief   Initialize Wels Flexible Macroblock Ordering (FMO)
  *
- * \param	pFmo		Wels fmo to be initialized
- * \param	pPps	pps argument
- * \param	kiMbWidth	mb width
- * \param	kiMbHeight	mb height
+ * \param   pFmo        Wels fmo to be initialized
+ * \param   pPps        pps argument
+ * \param   kiMbWidth   mb width
+ * \param   kiMbHeight  mb height
  *
- * \return	0 - successful; none 0 - failed;
+ * \return  0 - successful; none 0 - failed;
  */
 int32_t	InitFmo (PFmo pFmo, PPps pPps, const int32_t kiMbWidth, const int32_t kiMbHeight) {
   return FmoGenerateSliceGroup (pFmo, pPps, kiMbWidth, kiMbHeight);
@@ -192,13 +192,13 @@ int32_t	InitFmo (PFmo pFmo, PPps pPps, const int32_t kiMbWidth, const int32_t ki
 
 
 /*!
- * \brief	Uninitialize Wels Flexible Macroblock Ordering (FMO) list
+ * \brief   Uninitialize Wels Flexible Macroblock Ordering (FMO) list
  *
- * \param	pFmo		Wels base fmo ptr to be uninitialized
- * \param	kiCnt		count number of PPS per list
- * \param	kiAvail		count available number of PPS in list
+ * \param   pFmo        Wels base fmo ptr to be uninitialized
+ * \param   kiCnt       count number of PPS per list
+ * \param   kiAvail     count available number of PPS in list
  *
- * \return	NONE
+ * \return  NONE
  */
 void UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail) {
   PFmo pIter = pFmo;
@@ -229,14 +229,14 @@ void UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail) {
 }
 
 /*!
- * \brief	detect parameter sets are changed or not
+ * \brief   detect parameter sets are changed or not
  *
- * \param	pFmo				fmo context
- * \param	kiCountNumMb		(iMbWidth * iMbHeight) in Sps
- * \param	iSliceGroupType	slice group type if fmo is exactly enabled
- * \param	iSliceGroupCount	slice group count if fmo is exactly enabled
+ * \param   pFmo                fmo context
+ * \param   kiCountNumMb        (iMbWidth * iMbHeight) in Sps
+ * \param   iSliceGroupType     slice group type if fmo is exactly enabled
+ * \param   iSliceGroupCount    slice group count if fmo is exactly enabled
  *
- * \return	true - changed or not initialized yet; false - not change at all
+ * \return  true - changed or not initialized yet; false - not change at all
  */
 bool FmoParamSetsChanged (PFmo pFmo, const int32_t kiCountNumMb, const int32_t kiSliceGroupType,
                           const int32_t kiSliceGroupCount) {
@@ -249,14 +249,14 @@ bool FmoParamSetsChanged (PFmo pFmo, const int32_t kiCountNumMb, const int32_t k
 }
 
 /*!
- * \brief	update/insert FMO parameter unit
+ * \brief   update/insert FMO parameter unit
  *
- * \param	_fmo	FMO context
- * \param	_sps	PSps
- * \param	_pps	PPps
- * \param	pActiveFmoNum	int32_t* [in/out]
+ * \param   _fmo    FMO context
+ * \param   _sps    PSps
+ * \param   _pps    PPps
+ * \param   pActiveFmoNum   int32_t* [in/out]
  *
- * \return	true - update/insert successfully; false - failed;
+ * \return  true - update/insert successfully; false - failed;
  */
 bool FmoParamUpdate (PFmo pFmo, PSps pSps, PPps pPps, int32_t* pActiveFmoNum) {
   const uint32_t kuiMbWidth = pSps->iMbWidth;
@@ -281,12 +281,12 @@ bool FmoParamUpdate (PFmo pFmo, PSps pSps, PPps pPps, int32_t* pActiveFmoNum) {
 }
 
 /*!
- * \brief	Convert kMbXy to slice group idc correspondingly
+ * \brief   Convert kMbXy to slice group idc correspondingly
  *
- * \param	pFmo		Wels fmo context
- * \param	kMbXy		kMbXy to be converted
+ * \param   pFmo        Wels fmo context
+ * \param   kMbXy       kMbXy to be converted
  *
- * \return	slice group idc - successful; -1 - failed;
+ * \return  slice group idc - successful; -1 - failed;
  */
 int32_t FmoMbToSliceGroup (PFmo pFmo, const MB_XY_T kiMbXy) {
   const int32_t kiMbNum	= pFmo->iCountMbNum;
@@ -299,12 +299,12 @@ int32_t FmoMbToSliceGroup (PFmo pFmo, const MB_XY_T kiMbXy) {
 }
 
 /*!
- * \brief	Get successive mb to be processed with given current kMbXy
+ * \brief   Get successive mb to be processed with given current kMbXy
  *
- * \param	pFmo			Wels fmo context
- * \param	kMbXy			current kMbXy
+ * \param   pFmo            Wels fmo context
+ * \param   kMbXy           current kMbXy
  *
- * \return	iNextMb - successful; -1 - failed;
+ * \return  iNextMb - successful; -1 - failed;
  */
 MB_XY_T FmoNextMb (PFmo pFmo, const MB_XY_T kiMbXy) {
   const int32_t kiTotalMb			= pFmo->iCountMbNum;

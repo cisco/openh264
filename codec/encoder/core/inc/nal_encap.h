@@ -51,7 +51,7 @@ namespace WelsEnc {
 
 #define NAL_HEADER_SIZE (4)
 /*
- *	Raw payload pData for NAL unit, AVC/SVC compatible
+ *  Raw payload pData for NAL unit, AVC/SVC compatible
  */
 typedef struct TagWelsNalRaw {
 uint8_t*				pRawData;		// pRawNal payload for slice pData
@@ -63,7 +63,7 @@ int32_t iStartPos; //NAL start position in buffer
 } SWelsNalRaw;
 
 /*
- *	Encoder majoy output pData
+ *  Encoder majoy output pData
  */
 typedef struct TagWelsEncoderOutput {
 uint8_t*				pBsBuffer;			// overall bitstream pBuffer allocation for a coded picture, recycling use intend.
@@ -103,40 +103,40 @@ bool				bSliceCodedFlag;
 } SWelsSliceBs;
 
 /*!
- * \brief	load an initialize NAL pRawNal pData
+ * \brief   load an initialize NAL pRawNal pData
  */
 void WelsLoadNal (SWelsEncoderOutput* pEncoderOuput, const int32_t/*EWelsNalUnitType*/ kiType,
                   const int32_t/*EWelsNalRefIdc*/ kiNalRefIdc);
 
 /*!
- * \brief	unload pRawNal NAL
+ * \brief   unload pRawNal NAL
  */
 void WelsUnloadNal (SWelsEncoderOutput* pEncoderOuput);
 
 /*!
- * \brief	load an initialize NAL pRawNal pData
+ * \brief   load an initialize NAL pRawNal pData
  */
 void WelsLoadNalForSlice (SWelsSliceBs* pSliceBs, const int32_t/*EWelsNalUnitType*/ kiType,
                           const int32_t/*EWelsNalRefIdc*/ kiNalRefIdc);
 
 /*!
- * \brief	unload pRawNal NAL
+ * \brief   unload pRawNal NAL
  */
 void WelsUnloadNalForSlice (SWelsSliceBs* pSliceBs);
 
 /*!
- * \brief	encode NAL with emulation forbidden three bytes checking
- * \param	pDst			pDst NAL pData
- * \param	pDstLen		length of pDst NAL output
- * \param	annexeb		annexeb flag
- * \param	pRawNal			pRawNal NAL pData
- * \return	ERR_CODE
+ * \brief   encode NAL with emulation forbidden three bytes checking
+ * \param   pDst        pDst NAL pData
+ * \param   pDstLen     length of pDst NAL output
+ * \param   annexeb     annexeb flag
+ * \param   pRawNal     pRawNal NAL pData
+ * \return  ERR_CODE
  */
 int32_t WelsEncodeNal (SWelsNalRaw* pRawNal, void* pNalHeaderExt, const int32_t kiDstBufferLen, void* pDst,
                        int32_t* pDstLen);
 
 /*!
- * \brief	write prefix nal
+ * \brief   write prefix nal
  */
 int32_t WelsWriteSVCPrefixNal (SBitStringAux* pBitStringAux, const int32_t keNalRefIdc, const bool kbIdrFlag);
 }

@@ -57,7 +57,7 @@
 namespace WelsEnc {
 
 /*
- *	CWelsH264SVCEncoder class implementation
+ *  CWelsH264SVCEncoder class implementation
  */
 CWelsH264SVCEncoder::CWelsH264SVCEncoder()
   :	m_pEncContext (NULL),
@@ -178,7 +178,7 @@ int CWelsH264SVCEncoder::GetDefaultParams (SEncParamExt* argv) {
 }
 
 /*
- *	SVC Encoder Initialization
+ *  SVC Encoder Initialization
  */
 int CWelsH264SVCEncoder::Initialize (const SEncParamBase* argv) {
   if (m_pWelsTrace == NULL) {
@@ -348,7 +348,7 @@ int CWelsH264SVCEncoder::InitializeInternal (SWelsSvcCodingParam* pCfg) {
 }
 
 /*
- *	SVC Encoder Uninitialization
+ *  SVC Encoder Uninitialization
  */
 int32_t CWelsH264SVCEncoder::Uninitialize() {
   if (!m_bInitialFlag) {
@@ -370,7 +370,7 @@ int32_t CWelsH264SVCEncoder::Uninitialize() {
 
 
 /*
- *	SVC core encoding
+ *  SVC core encoding
  */
 int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo) {
   if (! (kpSrcPic && m_bInitialFlag && pBsInfo)) {
@@ -469,7 +469,7 @@ int CWelsH264SVCEncoder::EncodeParameterSets (SFrameBSInfo* pBsInfo) {
 }
 
 /*
- *	Force key frame
+ *  Force key frame
  */
 int CWelsH264SVCEncoder::ForceIntraFrame (bool bIDR) {
   if (! (m_pEncContext && m_bInitialFlag)) {

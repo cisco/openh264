@@ -51,7 +51,7 @@ const  ALIGNED_DECLARE (uint8_t, g_kuiZeroLeftMap[16], 16) = {
 
 
 /*
- *	Exponential Golomb codes encoding routines
+ *  Exponential Golomb codes encoding routines
  */
 
 #define    CAVLC_BS_INIT( pBs )  \

@@ -41,15 +41,15 @@
 namespace WelsEnc {
 
 /*
- *	MB Cache information, such one cache should be defined within a slice
+ *  MB Cache information, such one cache should be defined within a slice
  */
 /*
- * Cache for Luma				Cache for Chroma(Cb, Cr)
+ * Cache for Luma               Cache for Chroma(Cb, Cr)
  *
- *	TL T T T T					TL T T
- *	 L - - - -					 L - -
- *	 L - - - -					 L - - TR
- *	 L - - - -
+ *  TL T T T T                  TL T T
+ *   L - - - -                   L - -
+ *   L - - - -                   L - - TR
+ *   L - - - -
  *   L - - - - TR
  *
  */

@@ -43,12 +43,12 @@
 namespace WelsDec {
 
 typedef enum TagWelsErr {
-ERR_NONE				= 0,
-ERR_INVALID_PARAMETERS	= 1,
-ERR_MALLOC_FAILED		= 2,
-ERR_API_FAILED			= 3,
+ERR_NONE                = 0,
+ERR_INVALID_PARAMETERS  = 1,
+ERR_MALLOC_FAILED       = 2,
+ERR_API_FAILED          = 3,
 
-ERR_BOUND				= 31
+ERR_BOUND               = 31
 } EWelsErr;
 
 /*
@@ -75,12 +75,12 @@ ERR_LEVEL_MB_DATA
 
 /* More detailed error information, maximal value is 65535 */
 //-----------------------------------------------------------------------------------------------------------
-#define ERR_INFO_COMMON_BASE		1
-#define ERR_INFO_SYNTAX_BASE		1001
-#define ERR_INFO_LOGIC_BASE		10001
+#define ERR_INFO_COMMON_BASE        1
+#define ERR_INFO_SYNTAX_BASE        1001
+#define ERR_INFO_LOGIC_BASE         10001
 enum {
 /* Error from common system level: 1-1000 */
-ERR_INFO_OUT_OF_MEMORY		= ERR_INFO_COMMON_BASE,
+ERR_INFO_OUT_OF_MEMORY      = ERR_INFO_COMMON_BASE,
 ERR_INFO_INVALID_ACCESS,
 ERR_INFO_INVALID_PTR,
 ERR_INFO_INVALID_PARAM,
@@ -93,9 +93,9 @@ ERR_INFO_READ_FAULT,
 ERR_INFO_READ_OVERFLOW,
 ERR_INFO_READ_LEADING_ZERO,
 /* Error from H.264 syntax elements parser: 1001-10000 */
-ERR_INFO_NO_PREFIX_CODE		= ERR_INFO_SYNTAX_BASE,	// No start prefix code indication
-ERR_INFO_NO_PARAM_SETS, 					// No SPS and/ PPS before sequence header
-ERR_INFO_PARAM_SETS_NOT_INTEGRATED,			// Parameters sets (sps/pps) are not integrated at all before to decode VCL nal
+ERR_INFO_NO_PREFIX_CODE         = ERR_INFO_SYNTAX_BASE, // No start prefix code indication
+ERR_INFO_NO_PARAM_SETS,                                 // No SPS and/ PPS before sequence header
+ERR_INFO_PARAM_SETS_NOT_INTEGRATED,                     // Parameters sets (sps/pps) are not integrated at all before to decode VCL nal
 ERR_INFO_SPS_ID_OVERFLOW,
 ERR_INFO_PPS_ID_OVERFLOW,
 ERR_INFO_INVALID_PROFILE_IDC,
@@ -179,7 +179,7 @@ ERR_INFO_INVALID_REF_MARKING,
 ERR_INFO_INVALID_REF_REORDERING,
 
 /* Error from corresponding logic, 10001-65535 */
-ERR_INFO_NO_IDR_PIC		= ERR_INFO_LOGIC_BASE,	// NO IDR picture available before sequence header
+ERR_INFO_NO_IDR_PIC             = ERR_INFO_LOGIC_BASE,  // NO IDR picture available before sequence header
 ERR_INFO_EC_NO_NEIGHBOUR_MBS,
 ERR_INFO_EC_UNEXPECTED_MB_TYPE,
 ERR_INFO_EC_NO_ENOUGH_NEIGHBOUR_MBS,

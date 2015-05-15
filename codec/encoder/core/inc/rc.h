@@ -69,7 +69,7 @@ enum {
 //qp information
   GOM_MIN_QP_MODE       = 12,
   GOM_MAX_QP_MODE       = 36,
-  MAX_LOW_BR_QP			= 42,
+  MAX_LOW_BR_QP         = 42,
   MIN_IDR_QP            = 26,
   MAX_IDR_QP            = 32,
   MIN_SCREEN_QP         = 26,

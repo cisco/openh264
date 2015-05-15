@@ -51,7 +51,7 @@ namespace WelsDec {
 #endif//MB_XY_T
 
 /*!
- * \brief	Wels Flexible Macroblock Ordering (FMO)
+ * \brief   Wels Flexible Macroblock Ordering (FMO)
  */
 typedef struct TagFmo {
 uint8_t*		pMbAllocMap;
@@ -64,47 +64,47 @@ uint8_t		uiReserved[3];		// reserved padding bytes
 
 
 /*!
- * \brief	Initialize Wels Flexible Macroblock Ordering (FMO)
+ * \brief   Initialize Wels Flexible Macroblock Ordering (FMO)
  *
- * \param	pFmo		Wels fmo to be initialized
- * \param	pPps		PPps
- * \param	kiMbWidth	mb width
- * \param	kiMbHeight	mb height
+ * \param   pFmo        Wels fmo to be initialized
+ * \param   pPps        PPps
+ * \param   kiMbWidth   mb width
+ * \param   kiMbHeight  mb height
  *
- * \return	0 - successful; none 0 - failed;
+ * \return  0 - successful; none 0 - failed;
  */
 int32_t	InitFmo (PFmo pFmo, PPps pPps, const int32_t kiMbWidth, const int32_t kiMbHeight);
 
 /*!
- * \brief	Uninitialize Wels Flexible Macroblock Ordering (FMO) list
+ * \brief   Uninitialize Wels Flexible Macroblock Ordering (FMO) list
  *
- * \param	pFmo		Wels base fmo ptr to be uninitialized
- * \param	kiCnt		count number of PPS per list
- * \param	kiAvail		count available number of PPS in list
+ * \param   pFmo        Wels base fmo ptr to be uninitialized
+ * \param   kiCnt       count number of PPS per list
+ * \param   kiAvail     count available number of PPS in list
  *
- * \return	NONE
+ * \return  NONE
  */
 void UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail);
 
 /*!
- * \brief	update/insert FMO parameter unit
+ * \brief   update/insert FMO parameter unit
  *
- * \param	pFmo	FMO context
- * \param	pSps	PSps
- * \param	pPps	PPps
- * \param	pActiveFmoNum	int32_t* [in/out]
+ * \param   pFmo    FMO context
+ * \param   pSps    PSps
+ * \param   pPps    PPps
+ * \param   pActiveFmoNum   int32_t* [in/out]
  *
- * \return	true - update/insert successfully; false - failed;
+ * \return  true - update/insert successfully; false - failed;
  */
 bool FmoParamUpdate (PFmo pFmo, PSps pSps, PPps pPps, int32_t* pActiveFmoNum);
 
 /*!
- * \brief	Get successive mb to be processed with given current mb_xy
+ * \brief   Get successive mb to be processed with given current mb_xy
  *
- * \param	pFmo			Wels fmo context
- * \param	iMbXy			current mb_xy
+ * \param   pFmo            Wels fmo context
+ * \param   iMbXy           current mb_xy
  *
- * \return	iNextMb - successful; -1 - failed;
+ * \return  iNextMb - successful; -1 - failed;
  */
 MB_XY_T FmoNextMb (PFmo pFmo, const MB_XY_T kiMbXy);
 

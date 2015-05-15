@@ -185,10 +185,10 @@ class CWelsPreProcess {
   void SaveBestRefToVaa (SRefInfoParam& sRefSaved, SRefInfoParam* pVaaBestRef);
 
   /*!
-  * \brief	exchange two picture pData planes
-  * \param	ppPic1		picture pointer to picture 1
-  * \param	ppPic2		picture pointer to picture 2
-  * \return	none
+  * \brief  exchange two picture pData planes
+  * \param  ppPic1      picture pointer to picture 1
+  * \param  ppPic2      picture pointer to picture 2
+  * \return none
   */
   void WelsExchangeSpatialPictures (SPicture** ppPic1, SPicture** ppPic2);
 

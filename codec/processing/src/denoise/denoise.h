@@ -52,7 +52,7 @@
 #define DENOISE_GRAY_SIGMA  (2)
 
 #define UV_WINDOWS_RADIUS   (2)
-#define TAIL_OF_LINE8		(7)
+#define TAIL_OF_LINE8       (7)
 
 #define DENOISE_Y_COMPONENT (1)
 #define DENOISE_U_COMPONENT (2)

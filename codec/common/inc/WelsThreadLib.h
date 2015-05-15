@@ -93,11 +93,11 @@ typedef  struct _WelsLogicalProcessorInfo {
   int32_t    ProcessorCount;
 } WelsLogicalProcessInfo;
 
-#define    WELS_THREAD_ERROR_OK					0
-#define    WELS_THREAD_ERROR_GENERAL			((uint32_t)(-1))
-#define    WELS_THREAD_ERROR_WAIT_OBJECT_0		0
-#define	   WELS_THREAD_ERROR_WAIT_TIMEOUT		((uint32_t)0x00000102L)
-#define	   WELS_THREAD_ERROR_WAIT_FAILED		WELS_THREAD_ERROR_GENERAL
+#define    WELS_THREAD_ERROR_OK                                 0
+#define    WELS_THREAD_ERROR_GENERAL                    ((uint32_t)(-1))
+#define    WELS_THREAD_ERROR_WAIT_OBJECT_0              0
+#define    WELS_THREAD_ERROR_WAIT_TIMEOUT               ((uint32_t)0x00000102L)
+#define    WELS_THREAD_ERROR_WAIT_FAILED                WELS_THREAD_ERROR_GENERAL
 
 WELS_THREAD_ERROR_CODE    WelsMutexInit (WELS_MUTEX*    mutex);
 WELS_THREAD_ERROR_CODE    WelsMutexLock (WELS_MUTEX*    mutex);

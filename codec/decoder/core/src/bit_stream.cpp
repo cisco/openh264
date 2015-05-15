@@ -59,13 +59,13 @@ int32_t InitReadBits (PBitStringAux pBitString, intX_t iEndOffset) {
 }
 
 /*!
- * \brief	input bits for decoder or initialize bitstream writing in encoder
+ * \brief   input bits for decoder or initialize bitstream writing in encoder
  *
- * \param	pBitString	Bit string auxiliary pointer
- * \param	kpBuf		bit-stream buffer
- * \param	kiSize	    size in bits for decoder; size in bytes for encoder
+ * \param   pBitString  Bit string auxiliary pointer
+ * \param   kpBuf       bit-stream buffer
+ * \param   kiSize      size in bits for decoder; size in bytes for encoder
  *
- * \return	0: success, other: fail
+ * \return  0: success, other: fail
  */
 int32_t DecInitBits (PBitStringAux pBitString, const uint8_t* kpBuf, const int32_t kiSize) {
   const int32_t kiSizeBuf = (kiSize + 7) >> 3;

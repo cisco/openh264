@@ -315,7 +315,7 @@ int32_t ParsePredWeightedTable (PBitStringAux pBs, PSliceHeader pSh) {
 }
 
 /*
- *	Predeclared function routines ..
+ *  Predeclared function routines ..
  */
 int32_t ParseRefPicListReordering (PBitStringAux pBs, PSliceHeader pSh) {
   int32_t iList = 0;
@@ -538,7 +538,7 @@ int32_t CheckBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen) {
  * Especially for:
  * rbsp_au_buffer, cur_dq_layer_ptr and ref_dq_layer_ptr in MB info cache.
  * return:
- *	0 - success; otherwise returned error_no defined in error_no.h.
+ *  0 - success; otherwise returned error_no defined in error_no.h.
 */
 int32_t WelsInitMemory (PWelsDecoderContext pCtx) {
   if (pCtx == NULL) {
@@ -600,11 +600,11 @@ void WelsFreeMemory (PWelsDecoderContext pCtx) {
   }
 }
 /*
- *	DecodeNalHeaderExt
- *	Trigger condition: NAL_UNIT_TYPE = NAL_UNIT_PREFIX or NAL_UNIT_CODED_SLICE_EXT
- *	Parameter:
- *	pNal:	target NALUnit ptr
- *	pSrc:	NAL Unit bitstream
+ *  DecodeNalHeaderExt
+ *  Trigger condition: NAL_UNIT_TYPE = NAL_UNIT_PREFIX or NAL_UNIT_CODED_SLICE_EXT
+ *  Parameter:
+ *  pNal:   target NALUnit ptr
+ *  pSrc:   NAL Unit bitstream
  */
 void DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc) {
   PNalUnitHeaderExt pHeaderExt = &pNal->sNalHeaderExt;
@@ -636,8 +636,8 @@ void DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc) {
 #define MAX_NUM_REF_IDX_L0_ACTIVE_MINUS1 15
 #define SLICE_HEADER_CABAC_INIT_IDC_MAX 2
 /*
- *	decode_slice_header_avc
- *	Parse slice header of bitstream in avc for storing data structure
+ *  decode_slice_header_avc
+ *  Parse slice header of bitstream in avc for storing data structure
  */
 int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, const bool kbExtensionFlag) {
   PNalUnit const kpCurNal				= pCtx->pAccessUnitList->pNalUnitsList[pCtx->pAccessUnitList->uiAvailUnitsNum - 1];
@@ -1108,9 +1108,9 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
 }
 
 /*
- *	Copy relative syntax elements of NALUnitHeaderExt, sRefPicBaseMarking and bStoreRefBasePicFlag in prefix nal unit.
- *	pSrc:	mark as decoded prefix NAL
- *	ppDst:	succeeded VCL NAL based AVC (I/P Slice)
+ *  Copy relative syntax elements of NALUnitHeaderExt, sRefPicBaseMarking and bStoreRefBasePicFlag in prefix nal unit.
+ *  pSrc:   mark as decoded prefix NAL
+ *  ppDst:  succeeded VCL NAL based AVC (I/P Slice)
  */
 bool PrefetchNalHeaderExtSyntax (PWelsDecoderContext pCtx, PNalUnit const kppDst, PNalUnit const kpSrc) {
   PNalUnitHeaderExt pNalHdrExtD	= NULL, pNalHdrExtS = NULL;
@@ -1507,9 +1507,9 @@ void ResetCurrentAccessUnit (PWelsDecoderContext pCtx) {
 }
 
 /*!
- * \brief	Force reset current Acess Unit Nal list in case error parsing/decoding in current AU
+ * \brief   Force reset current Acess Unit Nal list in case error parsing/decoding in current AU
  * \author
- * \history	11/16/2009
+ * \history 11/16/2009
  */
 void ForceResetCurrentAccessUnit (PAccessUnit pAu) {
   uint32_t uiSucAuIdx	= pAu->uiEndPos + 1;
@@ -1929,12 +1929,12 @@ void DecodeFinishUpdate (PWelsDecoderContext pCtx) {
  * construct an access unit for given input bitstream, maybe partial NAL Unit, one or more Units are involved to
  * joint a collective access unit.
  * parameter\
- *	buf:		bitstream data buffer
- *	bit_len:	size in bit length of data
- *	buf_len:	size in byte length of data
- *	coded_au:	mark an Access Unit decoding finished
+ *  buf:        bitstream data buffer
+ *  bit_len:    size in bit length of data
+ *  buf_len:    size in byte length of data
+ *  coded_au:   mark an Access Unit decoding finished
  * return:
- *	0 - success; otherwise returned error_no defined in error_no.h
+ *  0 - success; otherwise returned error_no defined in error_no.h
  */
 int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
   int32_t iErr;
@@ -2152,7 +2152,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
     memset (&pLayerInfo, 0, sizeof (SLayerInfo));
 
     /*
-     *	Loop decoding for slices (even FMO and/ multiple slices) within a dq layer
+     *  Loop decoding for slices (even FMO and/ multiple slices) within a dq layer
      */
     while (iIdx <= iEndIdx) {
       bool         bReconstructSlice;

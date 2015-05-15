@@ -58,22 +58,22 @@ namespace WelsEnc {
 // in case MT and PACKING_ONE_SLICE_PER_LAYER, MAX_SLICES_NUM should not be exceeding MAX_LAYER_NUM_OF_FRAME
 // for AVC cases, maximal resolution we can support up to (?x1024) for SM_ROWMB_SLICE slice mode
 // fine solution for MAX_SLICES_NUM, need us use the variable instead of MACRO for any resolution combining any multiple-slice mode adaptive
-#define SAVED_NALUNIT_NUM			( (MAX_SPATIAL_LAYER_NUM*MAX_QUALITY_LAYER_NUM) + 1 + MAX_SPATIAL_LAYER_NUM ) // SPS/PPS + SEI/SSEI + PADDING_NAL
-#define MAX_SLICES_NUM				( ( MAX_NAL_UNITS_IN_LAYER - SAVED_NALUNIT_NUM ) / 3 )	// Also MAX_SLICES_NUM need constrained by implementation: uiSliceIdc allocated in SSliceCtx.pOverallMbMap need a byte range as expected
-#define AVERSLICENUM_CONSTRAINT		(MAX_SLICES_NUM)			// used in sNalList initialization,
+#define SAVED_NALUNIT_NUM                       ( (MAX_SPATIAL_LAYER_NUM*MAX_QUALITY_LAYER_NUM) + 1 + MAX_SPATIAL_LAYER_NUM ) // SPS/PPS + SEI/SSEI + PADDING_NAL
+#define MAX_SLICES_NUM                          ( ( MAX_NAL_UNITS_IN_LAYER - SAVED_NALUNIT_NUM ) / 3 )  // Also MAX_SLICES_NUM need constrained by implementation: uiSliceIdc allocated in SSliceCtx.pOverallMbMap need a byte range as expected
+#define AVERSLICENUM_CONSTRAINT         (MAX_SLICES_NUM)                        // used in sNalList initialization,
 
-#define MIN_NUM_MB_PER_SLICE		48							// (128/16 * 96/16), addressing the lowest resolution for multiple slicing is 128x96 above
+#define MIN_NUM_MB_PER_SLICE                    48                                                      // (128/16 * 96/16), addressing the lowest resolution for multiple slicing is 128x96 above
 
-#define DEFAULT_MAXPACKETSIZE_CONSTRAINT	(1200)		//in bytes
-//#define MINPACKETSIZE_CONSTRAINT			(1200)
+#define DEFAULT_MAXPACKETSIZE_CONSTRAINT        (1200)          //in bytes
+//#define MINPACKETSIZE_CONSTRAINT                (1200)
 
-#define AVER_MARGIN_BYTES						( 100 ) //in bytes
-#define JUMPPACKETSIZE_CONSTRAINT(max_byte)			( max_byte - AVER_MARGIN_BYTES ) //in bytes
-#define JUMPPACKETSIZE_JUDGE(len,mb_idx,max_byte)	 ( (len) > JUMPPACKETSIZE_CONSTRAINT(max_byte) ) //( (mb_idx+1)%40/*16slice for compare*/ == 0 )	//
+#define AVER_MARGIN_BYTES                       ( 100 ) //in bytes
+#define JUMPPACKETSIZE_CONSTRAINT(max_byte)             ( max_byte - AVER_MARGIN_BYTES ) //in bytes
+#define JUMPPACKETSIZE_JUDGE(len,mb_idx,max_byte)       ( (len) > JUMPPACKETSIZE_CONSTRAINT(max_byte) ) //( (mb_idx+1)%40/*16slice for compare*/ == 0 )        //
 //cur_mb_idx is for early tests, can be omit in optimization
 
 /*!
- * \brief	SSlice context
+ * \brief   SSlice context
  */
 /* Single/multiple slices */
 typedef struct SlicepEncCtx_s {
@@ -104,17 +104,17 @@ uint8_t   uiLastMbQp;
 } SDynamicSlicingStack;
 
 /*!
- * \brief	Initialize Wels SSlice context (Single/multiple slices and FMO)
+ * \brief   Initialize Wels SSlice context (Single/multiple slices and FMO)
  *
- * \param	pSliceCtx		SSlice context to be initialized
- * \param	bFmoUseFlag	flag of using fmo
- * \param	iMbWidth		MB width
- * \param	iMbHeight		MB height
- * \param	uiSliceMode		slice mode
- * \param	mul_slice_arg	argument for multiple slice if it is applicable
- * \param	pPpsArg			argument for pPps parameter
+ * \param   pSliceCtx       SSlice context to be initialized
+ * \param   bFmoUseFlag     flag of using fmo
+ * \param   iMbWidth        MB width
+ * \param   iMbHeight       MB height
+ * \param   uiSliceMode     slice mode
+ * \param   mul_slice_arg   argument for multiple slice if it is applicable
+ * \param   pPpsArg         argument for pPps parameter
  *
- * \return	0 - successful; none 0 - failed;
+ * \return  0 - successful; none 0 - failed;
  */
 int32_t InitSlicePEncCtx (SSliceCtx* pSliceCtx,
                           CMemoryAlign* pMa,
@@ -126,66 +126,66 @@ int32_t InitSlicePEncCtx (SSliceCtx* pSliceCtx,
 
 
 /*!
- * \brief	Uninitialize Wels SSlice context (Single/multiple slices and FMO)
+ * \brief   Uninitialize Wels SSlice context (Single/multiple slices and FMO)
  *
- * \param	pSliceCtx		SSlice context to be initialized
+ * \param   pSliceCtx       SSlice context to be initialized
  *
- * \return	NONE;
+ * \return  NONE;
  */
 void UninitSlicePEncCtx (SSliceCtx* pSliceCtx, CMemoryAlign* pMa);
 
 /*!
- * \brief	Get slice idc for given iMbXY (apply in Single/multiple slices and FMO)
+ * \brief   Get slice idc for given iMbXY (apply in Single/multiple slices and FMO)
  *
- * \param	pSliceCtx		SSlice context
- * \param	kiMbXY			MB xy index
+ * \param   pSliceCtx       SSlice context
+ * \param   kiMbXY          MB xy index
  *
- * \return	uiSliceIdc - successful; (uint8_t)(-1) - failed;
+ * \return  uiSliceIdc - successful; (uint8_t)(-1) - failed;
  */
 uint16_t WelsMbToSliceIdc (SSliceCtx* pSliceCtx, const int32_t kiMbXY);
 
 /*!
- * \brief	Get first mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
+ * \brief   Get first mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param	pSliceCtx		SSlice context
- * \param	kiSliceIdc		slice idc
+ * \param   pSliceCtx       SSlice context
+ * \param   kiSliceIdc      slice idc
  *
- * \return	first_mb - successful; -1 - failed;
+ * \return  first_mb - successful; -1 - failed;
  */
 int32_t WelsGetFirstMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiSliceIdc);
 
 /*!
- * \brief	Get successive mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
+ * \brief   Get successive mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param	pSliceCtx		SSlice context
- * \param	kiMbXY			MB xy index
+ * \param   pSliceCtx       SSlice context
+ * \param   kiMbXY          MB xy index
  *
- * \return	next_mb - successful; -1 - failed;
+ * \return  next_mb - successful; -1 - failed;
  */
 int32_t WelsGetNextMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY);
 
 /*!
- * \brief	Get previous mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
+ * \brief   Get previous mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param	pSliceCtx		SSlice context
- * \param	kiMbXY			MB xy index
+ * \param   pSliceCtx       SSlice context
+ * \param   kiMbXY          MB xy index
  *
- * \return	prev_mb - successful; -1 - failed;
+ * \return  prev_mb - successful; -1 - failed;
  */
 int32_t WelsGetPrevMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY);
 
 /*!
- * \brief	Get number of mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
+ * \brief   Get number of mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param	pSliceCtx		SSlice context
- * \param	kiSliceIdc		slice/slice_group idc
+ * \param   pSliceCtx       SSlice context
+ * \param   kiSliceIdc      slice/slice_group idc
  *
- * \return	count_num_of_mb - successful; -1 - failed;
+ * \return  count_num_of_mb - successful; -1 - failed;
  */
 int32_t WelsGetNumMbInSlice (SSliceCtx* pSliceCtx, const int32_t kiSliceIdc);
 
 /*!
- *	Get slice count for multiple slice segment
+ *  Get slice count for multiple slice segment
  *
  */
 int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceConfig* pMso);

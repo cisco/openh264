@@ -78,13 +78,13 @@ namespace WelsDec {
 //////////////////////////////////////////////////////////////////////
 
 /***************************************************************************
-*	Description:
-*			class CWelsDecoder constructor function, do initialization	and
+*   Description:
+*       class CWelsDecoder constructor function, do initialization  and
 *       alloc memory required
 *
-*	Input parameters: none
+*   Input parameters: none
 *
-*	return: none
+*   return: none
 ***************************************************************************/
 CWelsDecoder::CWelsDecoder (void)
   :	m_pDecContext (NULL),
@@ -155,12 +155,12 @@ CWelsDecoder::CWelsDecoder (void)
 }
 
 /***************************************************************************
-*	Description:
-*			class CWelsDecoder destructor function, destroy allocced memory
+*   Description:
+*       class CWelsDecoder destructor function, destroy allocced memory
 *
-*	Input parameters: none
+*   Input parameters: none
 *
-*	return: none
+*   return: none
 ***************************************************************************/
 CWelsDecoder::~CWelsDecoder() {
   if (m_pWelsTrace != NULL) {
@@ -327,7 +327,7 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
 }
 
 /*
- *	Get Option
+ *  Get Option
  */
 long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
   int iVal = 0;
@@ -669,8 +669,8 @@ int WelsGetDecoderCapability (SDecoderCapability* pDecCapability) {
 /* WINAPI is indeed in prefix due to sync to application layer callings!! */
 
 /*
-*	WelsCreateDecoder
-*	@return:	success in return 0, otherwise failed.
+*   WelsCreateDecoder
+*   @return:    success in return 0, otherwise failed.
 */
 long WelsCreateDecoder (ISVCDecoder** ppDecoder) {
 
@@ -688,7 +688,7 @@ long WelsCreateDecoder (ISVCDecoder** ppDecoder) {
 }
 
 /*
-*	WelsDestroyDecoder
+*   WelsDestroyDecoder
 */
 void WelsDestroyDecoder (ISVCDecoder* pDecoder) {
   if (NULL != pDecoder) {

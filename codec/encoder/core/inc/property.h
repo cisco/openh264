@@ -46,34 +46,34 @@ namespace WelsEnc {
 
 
 /*!
- * \brief	get code name
- * \param	pBuf	pBuffer to restore code name
- * \param	iSize	size of pBuffer overall
- * \return	actual size of pBuffer used; 0 returned in failure
+ * \brief   get code name
+ * \param   pBuf    pBuffer to restore code name
+ * \param   iSize   size of pBuffer overall
+ * \return  actual size of pBuffer used; 0 returned in failure
  */
 int32_t GetCodeName (char* pBuf, int32_t iSize);
 
 /*!
- * \brief	get library/module name
- * \param	pBuf	pBuffer to restore module name
- * \param	iSize	size of pBuffer overall
- * \return	actual size of pBuffer used; 0 returned in failure
+ * \brief   get library/module name
+ * \param   pBuf    pBuffer to restore module name
+ * \param   iSize   size of pBuffer overall
+ * \return  actual size of pBuffer used; 0 returned in failure
  */
 int32_t GetLibName (char* pBuf, int32_t iSize);
 
 /*!
- * \brief	get version number
- * \param	pBuf	pBuffer to restore version number
- * \param	iSize	size of pBuffer overall
- * \return	actual size of pBuffer used; 0 returned in failure
+ * \brief   get version number
+ * \param   pBuf    pBuffer to restore version number
+ * \param   iSize   size of pBuffer overall
+ * \return  actual size of pBuffer used; 0 returned in failure
  */
 int32_t GetVerNum (char* pBuf, int32_t iSize);
 
 /*!
- * \brief	get identify information
- * \param	pBuf	pBuffer to restore indentify information
- * \param	iSize	size of pBuffer overall
- * \return	actual size of pBuffer used; 0 returned in failure
+ * \brief   get identify information
+ * \param   pBuf    pBuffer to restore indentify information
+ * \param   iSize   size of pBuffer overall
+ * \return  actual size of pBuffer used; 0 returned in failure
  */
 int32_t GetIdentInfo (char* pBuf, int32_t iSize);
 }

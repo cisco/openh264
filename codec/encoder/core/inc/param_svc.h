@@ -57,10 +57,10 @@ namespace WelsEnc {
 extern const uint8_t   g_kuiTemporalIdListTable[MAX_TEMPORAL_LEVEL][MAX_GOP_SIZE + 1];
 
 /*!
-* \brief	get Logarithms base 2 of (upper/base)
-* \param	base	based scaler
-* \param	upper	input upper value
-* \return	2 based scaling factor
+* \brief    get Logarithms base 2 of (upper/base)
+* \param    base    based scaler
+* \param    upper   input upper value
+* \return   2 based scaling factor
 */
 static inline uint32_t GetLogFactor (float base, float upper) {
   const double dLog2factor	= log10 (1.0 * upper / base) / log10 (2.0);
@@ -74,7 +74,7 @@ static inline uint32_t GetLogFactor (float base, float upper) {
 }
 
 /*
- *	Dependency Layer Parameter
+ *  Dependency Layer Parameter
  */
 typedef struct TagDLayerParam {
   int32_t		iActualWidth;			// input source picture actual width
@@ -93,7 +93,7 @@ typedef struct TagDLayerParam {
 } SSpatialLayerInternal;
 
 /*
- *	Cisco OpenH264 Encoder Parameter Configuration
+ *  Cisco OpenH264 Encoder Parameter Configuration
  */
 typedef struct TagWelsSvcCodingParam: SEncParamExt {
   SSpatialLayerInternal	sDependencyLayers[MAX_DEPENDENCY_LAYER];
@@ -432,9 +432,9 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
   }
 
   /*!
-  * \brief	determined key coding tables for temporal scalability, uiProfileIdc etc for each spatial layer settings
-  * \param	SWelsSvcCodingParam, and carried with known GOP size, max, input and output frame rate of each spatial
-  * \return	NONE (should ensure valid parameter before this procedure)
+  * \brief  determined key coding tables for temporal scalability, uiProfileIdc etc for each spatial layer settings
+  * \param  SWelsSvcCodingParam, and carried with known GOP size, max, input and output frame rate of each spatial
+  * \return NONE (should ensure valid parameter before this procedure)
   */
   int32_t DetermineTemporalSettings() {
     const int32_t iDecStages		= WELS_LOG2 (

@@ -47,8 +47,8 @@
 namespace WelsEnc {
 
 /*
- *	Frame level in SVC DQLayer instead.
- *	Dependency-Quaility layer struction definition for SVC extension of H.264/AVC
+ *  Frame level in SVC DQLayer instead.
+ *  Dependency-Quaility layer struction definition for SVC extension of H.264/AVC
  */
 
 ///////////////////////////////////DQ Layer level///////////////////////////////////

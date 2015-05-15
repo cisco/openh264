@@ -53,7 +53,7 @@ namespace WelsEnc {
 
 
 /*
- *	Get size of unsigned exp golomb codes
+ *  Get size of unsigned exp golomb codes
  */
 static inline uint32_t BsSizeUE (const uint32_t kiValue) {
 if (256 > kiValue) {
@@ -79,7 +79,7 @@ if (256 > kiValue) {
 }
 
 /*
- *	Get size of signed exp golomb codes
+ *  Get size of signed exp golomb codes
  */
 static inline uint32_t BsSizeSE (const int32_t kiValue) {
 uint32_t iTmpValue;
@@ -95,7 +95,7 @@ if (0 == kiValue) {
 }
 
 /*
- *	Write truncated exp golomb codes
+ *  Write truncated exp golomb codes
  */
 static inline void BsWriteTE (SBitStringAux* pBs, const int32_t kiX, const uint32_t kuiValue) {
 if (1 == kiX) {

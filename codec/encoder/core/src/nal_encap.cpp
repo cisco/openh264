@@ -41,7 +41,7 @@
 #include "ls_defines.h"
 namespace WelsEnc {
 /*!
- * \brief	load an initialize NAL pRawNal pData
+ * \brief   load an initialize NAL pRawNal pData
  */
 void WelsLoadNal (SWelsEncoderOutput* pEncoderOuput, const int32_t/*EWelsNalUnitType*/ kiType,
                   const int32_t/*EWelsNalRefIdc*/ kiNalRefIdc) {
@@ -60,7 +60,7 @@ void WelsLoadNal (SWelsEncoderOutput* pEncoderOuput, const int32_t/*EWelsNalUnit
 }
 
 /*!
- * \brief	unload pRawNal NAL
+ * \brief   unload pRawNal NAL
  */
 void WelsUnloadNal (SWelsEncoderOutput* pEncoderOuput) {
   SWelsEncoderOutput*	pWelsEncoderOuput = pEncoderOuput;
@@ -75,7 +75,7 @@ void WelsUnloadNal (SWelsEncoderOutput* pEncoderOuput) {
 }
 
 /*!
- * \brief	load an initialize NAL pRawNal pData
+ * \brief   load an initialize NAL pRawNal pData
  */
 void WelsLoadNalForSlice (SWelsSliceBs* pSliceBsIn, const int32_t/*EWelsNalUnitType*/ kiType,
                           const int32_t/*EWelsNalRefIdc*/ kiNalRefIdc) {
@@ -95,7 +95,7 @@ void WelsLoadNalForSlice (SWelsSliceBs* pSliceBsIn, const int32_t/*EWelsNalUnitT
 }
 
 /*!
- * \brief	unload pRawNal NAL
+ * \brief   unload pRawNal NAL
  */
 void WelsUnloadNalForSlice (SWelsSliceBs* pSliceBsIn) {
   SWelsSliceBs* pSliceBs	        = pSliceBsIn;
@@ -111,12 +111,12 @@ void WelsUnloadNalForSlice (SWelsSliceBs* pSliceBsIn) {
 }
 
 /*!
- * \brief	encode NAL with emulation forbidden three bytes checking
- * \param	pDst			pDst NAL pData
- * \param	pDstLen		length of pDst NAL output
- * \param	annexeb		annexeb flag
- * \param	pRawNal			pRawNal NAL pData
- * \return	ERRCODE
+ * \brief   encode NAL with emulation forbidden three bytes checking
+ * \param   pDst        pDst NAL pData
+ * \param   pDstLen     length of pDst NAL output
+ * \param   annexeb     annexeb flag
+ * \param   pRawNal     pRawNal NAL pData
+ * \return  ERRCODE
  */
 //TODO 1: refactor the calling of this func in multi-thread
 //TODO 2: complete the realloc&copy
@@ -186,7 +186,7 @@ int32_t WelsEncodeNal (SWelsNalRaw* pRawNal, void* pNalHeaderExt, const int32_t 
 }
 
 /*!
- * \brief	write prefix nal
+ * \brief   write prefix nal
  */
 int32_t WelsWriteSVCPrefixNal (SBitStringAux* pBitStringAux, const int32_t kiNalRefIdc,
                                const bool kbIdrFlag) {

@@ -112,46 +112,46 @@ typedef struct TagCropOffset {
 /* Transform Type */
 
 enum ETransType {
-  T_4x4	= 0,
-  T_8x8	= 1,
-  T_16x16	= 2,
-  T_PCM	= 3
+  T_4x4     = 0,
+  T_8x8     = 1,
+  T_16x16   = 2,
+  T_PCM     = 3
 };
 
 enum EMbPosition {
-  LEFT_MB_POS     = 0x01,	// A
-  TOP_MB_POS      = 0x02,	// B
-  TOPRIGHT_MB_POS = 0x04,	// C
-  TOPLEFT_MB_POS	= 0x08,	// D,
-  RIGHT_MB_POS	= 0x10,	//  add followed four case to reuse when intra up-sample
-  BOTTOM_MB_POS	= 0x20,	//
-  BOTTOMRIGHT_MB_POS = 0x40,	//
-  BOTTOMLEFT_MB_POS	= 0x80,	//
-  MB_POS_A  = 0x100
+  LEFT_MB_POS           = 0x01, // A
+  TOP_MB_POS            = 0x02, // B
+  TOPRIGHT_MB_POS       = 0x04, // C
+  TOPLEFT_MB_POS        = 0x08, // D,
+  RIGHT_MB_POS          = 0x10, //  add followed four case to reuse when intra up-sample
+  BOTTOM_MB_POS         = 0x20, //
+  BOTTOMRIGHT_MB_POS    = 0x40, //
+  BOTTOMLEFT_MB_POS     = 0x80, //
+  MB_POS_A              = 0x100
 };
 
 /* MB Type & Sub-MB Type */
 typedef uint32_t Mb_Type;
 
-#define	MB_LEFT_BIT			0// add to use in intra up-sample
-#define	MB_TOP_BIT			1
-#define	MB_TOPRIGHT_BIT		2
-#define	MB_TOPLEFT_BIT		3
-#define	MB_RIGHT_BIT		4
-#define	MB_BOTTOM_BIT		5
-#define	MB_BTMRIGHT_BIT		6
-#define	MB_BTMLEFT_BIT		7
+#define MB_LEFT_BIT             0// add to use in intra up-sample
+#define MB_TOP_BIT              1
+#define MB_TOPRIGHT_BIT         2
+#define MB_TOPLEFT_BIT          3
+#define MB_RIGHT_BIT            4
+#define MB_BOTTOM_BIT           5
+#define MB_BTMRIGHT_BIT         6
+#define MB_BTMLEFT_BIT          7
 
-#define MB_TYPE_BACKGROUND		0x00010000  // conditional BG skip_mb
+#define MB_TYPE_BACKGROUND      0x00010000  // conditional BG skip_mb
 
 enum {
-  Intra4x4			= 0,
-  Intra16x16			= 1,
-  Inter16x16			= 2,
-  Inter16x8			= 3,
-  Inter8x16			= 4,
-  Inter8x8			= 5,
-  PSkip				= 6
+  Intra4x4      = 0,
+  Intra16x16    = 1,
+  Inter16x16    = 2,
+  Inter16x8     = 3,
+  Inter8x16     = 4,
+  Inter8x8      = 5,
+  PSkip         = 6
 };
 
 
