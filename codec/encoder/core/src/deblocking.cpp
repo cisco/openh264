@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	deblocking.c
+ * \file    deblocking.c
  *
- * \brief	Interfaces introduced in frame deblocking filtering
+ * \brief   Interfaces introduced in frame deblocking filtering
  *
- * \date	08/03/2009 Created
+ * \date    08/03/2009 Created
  *
  *************************************************************************************
  */
@@ -794,64 +794,64 @@ void WelsBlockFuncInit (PSetNoneZeroCountZeroFunc* pfSetNZCZero,  int32_t iCpu) 
 }
 
 void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
-  pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_c;
-  pFunc->pfLumaDeblockingEQ4Ver		= DeblockLumaEq4V_c;
-  pFunc->pfLumaDeblockingLT4Hor		= DeblockLumaLt4H_c;
-  pFunc->pfLumaDeblockingEQ4Hor		= DeblockLumaEq4H_c;
+  pFunc->pfLumaDeblockingLT4Ver     = DeblockLumaLt4V_c;
+  pFunc->pfLumaDeblockingEQ4Ver     = DeblockLumaEq4V_c;
+  pFunc->pfLumaDeblockingLT4Hor     = DeblockLumaLt4H_c;
+  pFunc->pfLumaDeblockingEQ4Hor     = DeblockLumaEq4H_c;
 
-  pFunc->pfChromaDeblockingLT4Ver	= DeblockChromaLt4V_c;
-  pFunc->pfChromaDeblockingEQ4Ver	= DeblockChromaEq4V_c;
-  pFunc->pfChromaDeblockingLT4Hor	= DeblockChromaLt4H_c;
-  pFunc->pfChromaDeblockingEQ4Hor	= DeblockChromaEq4H_c;
+  pFunc->pfChromaDeblockingLT4Ver   = DeblockChromaLt4V_c;
+  pFunc->pfChromaDeblockingEQ4Ver   = DeblockChromaEq4V_c;
+  pFunc->pfChromaDeblockingLT4Hor   = DeblockChromaLt4H_c;
+  pFunc->pfChromaDeblockingEQ4Hor   = DeblockChromaEq4H_c;
 
-  pFunc->pfDeblockingBSCalc             = DeblockingBSCalc_c;
+  pFunc->pfDeblockingBSCalc         = DeblockingBSCalc_c;
 
 
 #ifdef X86_ASM
   if (iCpu & WELS_CPU_SSSE3) {
-    pFunc->pfLumaDeblockingLT4Ver	= DeblockLumaLt4V_ssse3;
-    pFunc->pfLumaDeblockingEQ4Ver	= DeblockLumaEq4V_ssse3;
-    pFunc->pfLumaDeblockingLT4Hor       = DeblockLumaLt4H_ssse3;
-    pFunc->pfLumaDeblockingEQ4Hor       = DeblockLumaEq4H_ssse3;
-    pFunc->pfChromaDeblockingLT4Ver	= DeblockChromaLt4V_ssse3;
-    pFunc->pfChromaDeblockingEQ4Ver	= DeblockChromaEq4V_ssse3;
-    pFunc->pfChromaDeblockingLT4Hor	= DeblockChromaLt4H_ssse3;
-    pFunc->pfChromaDeblockingEQ4Hor	= DeblockChromaEq4H_ssse3;
+    pFunc->pfLumaDeblockingLT4Ver   = DeblockLumaLt4V_ssse3;
+    pFunc->pfLumaDeblockingEQ4Ver   = DeblockLumaEq4V_ssse3;
+    pFunc->pfLumaDeblockingLT4Hor   = DeblockLumaLt4H_ssse3;
+    pFunc->pfLumaDeblockingEQ4Hor   = DeblockLumaEq4H_ssse3;
+    pFunc->pfChromaDeblockingLT4Ver = DeblockChromaLt4V_ssse3;
+    pFunc->pfChromaDeblockingEQ4Ver = DeblockChromaEq4V_ssse3;
+    pFunc->pfChromaDeblockingLT4Hor = DeblockChromaLt4H_ssse3;
+    pFunc->pfChromaDeblockingEQ4Hor = DeblockChromaEq4H_ssse3;
   }
 #endif
 
 #if defined(HAVE_NEON)
   if (iCpu & WELS_CPU_NEON) {
-    pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_neon;
-    pFunc->pfLumaDeblockingEQ4Ver		= DeblockLumaEq4V_neon;
-    pFunc->pfLumaDeblockingLT4Hor		= DeblockLumaLt4H_neon;
-    pFunc->pfLumaDeblockingEQ4Hor		= DeblockLumaEq4H_neon;
+    pFunc->pfLumaDeblockingLT4Ver   = DeblockLumaLt4V_neon;
+    pFunc->pfLumaDeblockingEQ4Ver   = DeblockLumaEq4V_neon;
+    pFunc->pfLumaDeblockingLT4Hor   = DeblockLumaLt4H_neon;
+    pFunc->pfLumaDeblockingEQ4Hor   = DeblockLumaEq4H_neon;
 
-    pFunc->pfChromaDeblockingLT4Ver     = DeblockChromaLt4V_neon;
-    pFunc->pfChromaDeblockingEQ4Ver     = DeblockChromaEq4V_neon;
-    pFunc->pfChromaDeblockingLT4Hor     = DeblockChromaLt4H_neon;
-    pFunc->pfChromaDeblockingEQ4Hor     = DeblockChromaEq4H_neon;
+    pFunc->pfChromaDeblockingLT4Ver = DeblockChromaLt4V_neon;
+    pFunc->pfChromaDeblockingEQ4Ver = DeblockChromaEq4V_neon;
+    pFunc->pfChromaDeblockingLT4Hor = DeblockChromaLt4H_neon;
+    pFunc->pfChromaDeblockingEQ4Hor = DeblockChromaEq4H_neon;
 
 #if defined(SINGLE_REF_FRAME)
-    pFunc->pfDeblockingBSCalc           = DeblockingBSCalc_neon;
+    pFunc->pfDeblockingBSCalc       = DeblockingBSCalc_neon;
 #endif
   }
 #endif
 
 #if defined(HAVE_NEON_AARCH64)
   if (iCpu & WELS_CPU_NEON) {
-    pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_AArch64_neon;
-    pFunc->pfLumaDeblockingEQ4Ver		= DeblockLumaEq4V_AArch64_neon;
-    pFunc->pfLumaDeblockingLT4Hor		= DeblockLumaLt4H_AArch64_neon;
-    pFunc->pfLumaDeblockingEQ4Hor		= DeblockLumaEq4H_AArch64_neon;
+    pFunc->pfLumaDeblockingLT4Ver   = DeblockLumaLt4V_AArch64_neon;
+    pFunc->pfLumaDeblockingEQ4Ver   = DeblockLumaEq4V_AArch64_neon;
+    pFunc->pfLumaDeblockingLT4Hor   = DeblockLumaLt4H_AArch64_neon;
+    pFunc->pfLumaDeblockingEQ4Hor   = DeblockLumaEq4H_AArch64_neon;
 
-    pFunc->pfChromaDeblockingLT4Ver     = DeblockChromaLt4V_AArch64_neon;
-    pFunc->pfChromaDeblockingEQ4Ver     = DeblockChromaEq4V_AArch64_neon;
-    pFunc->pfChromaDeblockingLT4Hor     = DeblockChromaLt4H_AArch64_neon;
-    pFunc->pfChromaDeblockingEQ4Hor     = DeblockChromaEq4H_AArch64_neon;
+    pFunc->pfChromaDeblockingLT4Ver = DeblockChromaLt4V_AArch64_neon;
+    pFunc->pfChromaDeblockingEQ4Ver = DeblockChromaEq4V_AArch64_neon;
+    pFunc->pfChromaDeblockingLT4Hor = DeblockChromaLt4H_AArch64_neon;
+    pFunc->pfChromaDeblockingEQ4Hor = DeblockChromaEq4H_AArch64_neon;
 
 #if defined(SINGLE_REF_FRAME)
-    pFunc->pfDeblockingBSCalc           = DeblockingBSCalc_AArch64_neon;
+    pFunc->pfDeblockingBSCalc       = DeblockingBSCalc_AArch64_neon;
 #endif
   }
 #endif

@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	encoder_ext.c
+ * \file    encoder_ext.c
  *
- * \brief	core encoder for SVC
+ * \brief   core encoder for SVC
  *
- * \date	7/24/2009 Created
+ * \date    7/24/2009 Created
  *
  *************************************************************************************
  */

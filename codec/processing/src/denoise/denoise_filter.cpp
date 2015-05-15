@@ -28,11 +28,11 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	svc_preprocess.h
+ * \file    svc_preprocess.h
  *
- * \brief	svc denoising
+ * \brief   svc denoising
  *
- * \date	4/1/2010 Created
+ * \date    4/1/2010 Created
  *
  */
 

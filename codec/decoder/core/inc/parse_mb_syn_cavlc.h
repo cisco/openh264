@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	parse_mb_syn_cavlc.h
+ * \file    parse_mb_syn_cavlc.h
  *
- * \brief	Parsing all syntax elements of mb and decoding residual with cavlc
+ * \brief   Parsing all syntax elements of mb and decoding residual with cavlc
  *
- * \date	03/17/2009 Created
+ * \date    03/17/2009 Created
  *
  *************************************************************************************
  */

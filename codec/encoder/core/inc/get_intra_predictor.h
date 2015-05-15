@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	get_intra_predictor.h
+ * \file    get_intra_predictor.h
  *
- * \brief	interfaces for get intra predictor about 16x16, 4x4, chroma.
+ * \brief   interfaces for get intra predictor about 16x16, 4x4, chroma.
  *
- * \date	4/2/2009 Created
+ * \date    4/2/2009 Created
  *
  *************************************************************************************
  */

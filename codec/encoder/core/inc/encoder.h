@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	encoder.h
+ * \file    encoder.h
  *
- * \brief	core encoder
+ * \brief   core encoder
  *
- * \date	5/14/2009
+ * \date    5/14/2009
  *
  *************************************************************************************
  */

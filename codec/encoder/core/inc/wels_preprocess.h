@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	wels_preprocess.h
+ * \file    wels_preprocess.h
  *
- * \brief	interface of video pre-process plugins
+ * \brief   interface of video pre-process plugins
  *
- * \date	03/15/2011
+ * \date    03/15/2011
  *
  * \description : this class is designed as an interface to unify video pre-processing
  *                class implement sets such as denoise,colorspace conversion etc...

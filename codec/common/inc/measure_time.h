@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	measure_time.h
+ * \file    measure_time.h
  *
- * \brief	time cost measure utilization
+ * \brief   time cost measure utilization
  *
- * \date	04/28/2009 Created
+ * \date    04/28/2009 Created
  *
  *************************************************************************************
  */

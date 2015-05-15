@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	macros.h
+ * \file    macros.h
  *
- * \brief	MACRO based tool utilization
+ * \brief   MACRO based tool utilization
  *
- * \date	3/13/2009 Created
+ * \date    3/13/2009 Created
  *
  *************************************************************************************
  */

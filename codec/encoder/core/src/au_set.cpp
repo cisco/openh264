@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	au_set.c
+ * \file    au_set.c
  *
- * \brief	Interfaces introduced in Access Unit level based writer
+ * \brief   Interfaces introduced in Access Unit level based writer
  *
- * \date	05/18/2009 Created
+ * \date    05/18/2009 Created
  *
  *************************************************************************************
  */

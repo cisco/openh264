@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	svc_set_mb_syn_cabac.cpp
+ * \file    svc_set_mb_syn_cabac.cpp
  *
- * \brief	wrtie cabac syntax
+ * \brief   wrtie cabac syntax
  *
- * \date	9/28/2014 Created
+ * \date    9/28/2014 Created
  *
  *************************************************************************************
  */

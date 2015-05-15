@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	stat.h
+ * \file    stat.h
  *
- * \brief	statistical pData information
+ * \brief   statistical pData information
  *
- * \date	4/22/2009 Created
+ * \date    4/22/2009 Created
  *
  *************************************************************************************
  */

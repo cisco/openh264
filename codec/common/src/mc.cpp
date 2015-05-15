@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	mc.c
+ * \file    mc.c
  *
- * \brief	Interfaces implementation for motion compensation
+ * \brief   Interfaces implementation for motion compensation
  *
- * \date	03/17/2009 Created
+ * \date    03/17/2009 Created
  *
  *************************************************************************************
  */

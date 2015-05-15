@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	    :  vaacalculation.h
+ * \file        :  vaacalculation.h
  *
- * \brief	    :  pVaa calculation class of wels video processor class
+ * \brief       :  pVaa calculation class of wels video processor class
  *
  * \date        :  2011/03/18
  *

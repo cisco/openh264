@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	error_code.h
+ * \file    error_code.h
  *
- * \brief	Error codes used in Wels decoder side
+ * \brief   Error codes used in Wels decoder side
  *
- * \date	3/4/2009 Created
+ * \date    3/4/2009 Created
  *
  *************************************************************************************
  */

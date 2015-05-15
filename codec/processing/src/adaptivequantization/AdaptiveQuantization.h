@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	        :  AdaptiveQuantization.h
+ * \file         :  AdaptiveQuantization.h
  *
- * \brief	    :  adaptive quantization class of wels video processor class
+ * \brief        :  adaptive quantization class of wels video processor class
  *
  * \date         :  2011/03/21
  *

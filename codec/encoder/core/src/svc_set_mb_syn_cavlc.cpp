@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	svc_set_mb_syn_cavlc.h
+ * \file    svc_set_mb_syn_cavlc.h
  *
- * \brief	Seting all syntax elements of mb and decoding residual with cavlc
+ * \brief   Seting all syntax elements of mb and decoding residual with cavlc
  *
- * \date	2009.8.12 Created
+ * \date    2009.8.12 Created
  *
  *************************************************************************************
  */

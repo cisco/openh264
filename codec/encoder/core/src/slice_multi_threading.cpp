@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	slice_multi_threading.h
+ * \file    slice_multi_threading.h
  *
- * \brief	pSlice based multiple threading
+ * \brief   pSlice based multiple threading
  *
- * \date	04/16/2010 Created
+ * \date    04/16/2010 Created
  *
  *************************************************************************************
  */

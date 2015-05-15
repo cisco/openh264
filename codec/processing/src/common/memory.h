@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	    :  memory.h
+ * \file        :  memory.h
  *
- * \brief	    :  memory definition for wels video processor class
+ * \brief       :  memory definition for wels video processor class
  *
  * \date        :  2011/02/22
  *

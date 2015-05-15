@@ -28,11 +28,11 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	au_parser.h
+ * \file    au_parser.h
  *
- * \brief	Interfaces introduced in Access Unit level based parser
+ * \brief   Interfaces introduced in Access Unit level based parser
  *
- * \date	03/10/2009 Created
+ * \date    03/10/2009 Created
  *
  *************************************************************************************
  */

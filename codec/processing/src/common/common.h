@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	        :  SceneChangeDetectionCommon.h
+ * \file         :  SceneChangeDetectionCommon.h
  *
- * \brief	    :  scene change detection class of wels video processor class
+ * \brief        :  scene change detection class of wels video processor class
  *
  * \date         :  2011/03/14
  *

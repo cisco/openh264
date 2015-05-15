@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	md.c
+ * \file    md.c
  *
- * \brief	mode decision
+ * \brief   mode decision
  *
- * \date	2009.05.14 Created
+ * \date    2009.05.14 Created
  *
  *************************************************************************************
  */
@@ -475,21 +475,21 @@ int32_t AnalysisVaaInfoIntra_c (uint8_t* pDataY, const int32_t kiLineSize) {
 
 // for pfGetVarianceFromIntraVaa function ptr adaptive by CPU features, 6/7/2010
 void InitIntraAnalysisVaaInfo (SWelsFuncPtrList* pFuncList, const uint32_t kuiCpuFlag) {
-  pFuncList->pfGetVarianceFromIntraVaa		= AnalysisVaaInfoIntra_c;
-  pFuncList->pfGetMbSignFromInterVaa	= MdInterAnalysisVaaInfo_c;
-  pFuncList->pfUpdateMbMv					= UpdateMbMv_c;
+  pFuncList->pfGetVarianceFromIntraVaa      = AnalysisVaaInfoIntra_c;
+  pFuncList->pfGetMbSignFromInterVaa        = MdInterAnalysisVaaInfo_c;
+  pFuncList->pfUpdateMbMv                   = UpdateMbMv_c;
 
 #if defined(X86_ASM)
   if ((kuiCpuFlag & WELS_CPU_SSE2) == WELS_CPU_SSE2) {
-    pFuncList->pfGetVarianceFromIntraVaa		= AnalysisVaaInfoIntra_sse2;
-    pFuncList->pfGetMbSignFromInterVaa	= MdInterAnalysisVaaInfo_sse2;
-    pFuncList->pfUpdateMbMv					= UpdateMbMv_sse2;
+    pFuncList->pfGetVarianceFromIntraVaa    = AnalysisVaaInfoIntra_sse2;
+    pFuncList->pfGetMbSignFromInterVaa      = MdInterAnalysisVaaInfo_sse2;
+    pFuncList->pfUpdateMbMv                 = UpdateMbMv_sse2;
   }
   if ((kuiCpuFlag & WELS_CPU_SSSE3) == WELS_CPU_SSSE3) {
-    pFuncList->pfGetVarianceFromIntraVaa	= AnalysisVaaInfoIntra_ssse3;
+    pFuncList->pfGetVarianceFromIntraVaa    = AnalysisVaaInfoIntra_ssse3;
   }
   if ((kuiCpuFlag & WELS_CPU_SSE41) == WELS_CPU_SSE41) {
-    pFuncList->pfGetMbSignFromInterVaa	= MdInterAnalysisVaaInfo_sse41;
+    pFuncList->pfGetMbSignFromInterVaa      = MdInterAnalysisVaaInfo_sse41;
   }
 #endif//X86_ASM
 }

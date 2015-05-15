@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	decoder.h
+ * \file    decoder.h
  *
- * \brief	Interfaces introduced in decoder system architecture
+ * \brief   Interfaces introduced in decoder system architecture
  *
- * \date	03/10/2009 Created
+ * \date    03/10/2009 Created
  *
  *************************************************************************************
  */

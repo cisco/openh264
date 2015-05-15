@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	slice_multi_threading.c
+ * \file    slice_multi_threading.c
  *
- * \brief	slice based multiple threading
+ * \brief   slice based multiple threading
  *
- * \date	04/16/2010 Created
+ * \date    04/16/2010 Created
  *
  *************************************************************************************
  */

@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	svc_set_mb_syn.h
+ * \file    svc_set_mb_syn.h
  *
- * \brief	Seting all syntax elements of mb and encoding residual with cavlc and cabac
+ * \brief   Seting all syntax elements of mb and encoding residual with cavlc and cabac
  *
- * \date	2009.8.12 Created
+ * \date    2009.8.12 Created
  *
  *************************************************************************************
  */

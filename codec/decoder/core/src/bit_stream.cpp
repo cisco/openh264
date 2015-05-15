@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	bit_stream.cpp
+ * \file    bit_stream.cpp
  *
- * \brief	Reading / writing bit-stream
+ * \brief   Reading / writing bit-stream
  *
- * \date	03/10/2009 Created
+ * \date    03/10/2009 Created
  *
  *************************************************************************************
  */

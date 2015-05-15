@@ -28,11 +28,11 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	d3d9_utils.h
+ * \file    d3d9_utils.h
  *
- * \brief	interface of d3d9 render module
+ * \brief   interface of d3d9 render module
  *
- * \date	Created 12/14/2010
+ * \date    Created 12/14/2010
  *
  * \description : 1. Rendering in Vista and upper : D3D9Ex method, support host memory / shared surface input
  *                2. Rendering in XP : D3D9 method w/o device lost handling, support host memory input

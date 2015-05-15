@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	picture_handle.c
+ * \file    picture_handle.c
  *
- * \brief	picture pData handling
+ * \brief   picture pData handling
  *
- * \date	5/20/2009 Created
+ * \date    5/20/2009 Created
  *
  *************************************************************************************/
 #include "picture_handle.h"

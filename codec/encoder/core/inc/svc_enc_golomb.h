@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	svc_enc_golomb.h
+ * \file    svc_enc_golomb.h
  *
- * \brief	Exponential Golomb entropy coding routine
+ * \brief   Exponential Golomb entropy coding routine
  *
- * \date	03/13/2009 Created
+ * \date    03/13/2009 Created
  *
  *************************************************************************************
  */

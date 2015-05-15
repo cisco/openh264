@@ -28,11 +28,11 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	parse_mb_syn_cabac.h
+ * \file    parse_mb_syn_cabac.h
  *
- * \brief	cabac parse for syntax elements
+ * \brief   cabac parse for syntax elements
  *
- * \date	10/10/2014 Created
+ * \date    10/10/2014 Created
  *
  *************************************************************************************
  */

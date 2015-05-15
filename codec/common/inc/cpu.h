@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	cpu.h
+ * \file    cpu.h
  *
- * \brief	CPU feature compatibility detection
+ * \brief   CPU feature compatibility detection
  *
- * \date	04/29/2009 Created
+ * \date    04/29/2009 Created
  *
  *************************************************************************************
  */

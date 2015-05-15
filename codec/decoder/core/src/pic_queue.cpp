@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	pic_queue.c
+ * \file    pic_queue.c
  *
- * \brief	Recycled piture queue implementation
+ * \brief   Recycled piture queue implementation
  *
- * \date	03/13/2009 Created
+ * \date    03/13/2009 Created
  *
  *************************************************************************************
  */

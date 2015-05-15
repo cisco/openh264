@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file		encode_mb.c
+ * \file    encode_mb.c
  *
- * \brief		Implementaion for pCurMb encoding
+ * \brief   Implementaion for pCurMb encoding
  *
- * \date		05/19/2009 Created
+ * \date    05/19/2009 Created
  *************************************************************************************
  */
 

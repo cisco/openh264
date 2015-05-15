@@ -35,8 +35,8 @@
  *      Interface for managing reference picture in svc encoder side
  *
  *  History
- *		09/01/2008 Created
- *		08/07/2009 Ported
+ *      09/01/2008 Created
+ *      08/07/2009 Ported
  *
  *****************************************************************************/
 #if !defined(REFERENCE_PICTURE_LIST_MANAGEMENT_SVC_H__)

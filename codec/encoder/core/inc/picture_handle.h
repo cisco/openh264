@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	picture_handle.h
+ * \file    picture_handle.h
  *
- * \brief	picture pData handling
+ * \brief   picture pData handling
  *
- * \date	5/20/2009 Created
+ * \date    5/20/2009 Created
  *
  *************************************************************************************/
 #if !defined(WELS_ENCODER_PICTURE_HANDLE_H__)

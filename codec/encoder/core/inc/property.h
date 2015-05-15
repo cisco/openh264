@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	property.h
+ * \file    property.h
  *
- * \brief	CODE name, library module and corresponding version are included
+ * \brief   CODE name, library module and corresponding version are included
  *
- * \date	03/10/2009 Created
+ * \date    03/10/2009 Created
  *
  *************************************************************************************
  */
