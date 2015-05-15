@@ -36,11 +36,11 @@ WELSVP_NAMESPACE_BEGIN
 /////////////////////////////////////////////////////////////////////////////////
 
 void* WelsMalloc (const uint32_t kuiSize, char* pTag) {
-  const int32_t kiSizeVoidPointer	= sizeof (void**);
-  const int32_t kiSizeInt32		= sizeof (int32_t);
-  const int32_t kiAlignedBytes	= ALIGNBYTES - 1;
+  const int32_t kiSizeVoidPointer       = sizeof (void**);
+  const int32_t kiSizeInt32             = sizeof (int32_t);
+  const int32_t kiAlignedBytes          = ALIGNBYTES - 1;
 
-  uint8_t* pBuf		= (uint8_t*) ::malloc (kuiSize + kiAlignedBytes + kiSizeVoidPointer + kiSizeInt32);
+  uint8_t* pBuf         = (uint8_t*) ::malloc (kuiSize + kiAlignedBytes + kiSizeVoidPointer + kiSizeInt32);
   uint8_t* pAlignedBuf = NULL;
 
   if (NULL == pBuf)

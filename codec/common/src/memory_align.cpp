@@ -61,14 +61,14 @@ CMemoryAlign::~CMemoryAlign() {
 }
 
 void* WelsMalloc (const uint32_t kuiSize, const char* kpTag, const uint32_t kiAlign) {
-  const int32_t kiSizeOfVoidPointer	= sizeof (void**);
-  const int32_t kiSizeOfInt				= sizeof (int32_t);
-  const int32_t kiAlignedBytes		= kiAlign - 1;
-  const int32_t kiTrialRequestedSize	= kuiSize + kiAlignedBytes + kiSizeOfVoidPointer + kiSizeOfInt;
-  const int32_t kiActualRequestedSize	= kiTrialRequestedSize;
-  const uint32_t kiPayloadSize			= kuiSize;
+  const int32_t kiSizeOfVoidPointer     = sizeof (void**);
+  const int32_t kiSizeOfInt             = sizeof (int32_t);
+  const int32_t kiAlignedBytes          = kiAlign - 1;
+  const int32_t kiTrialRequestedSize    = kuiSize + kiAlignedBytes + kiSizeOfVoidPointer + kiSizeOfInt;
+  const int32_t kiActualRequestedSize   = kiTrialRequestedSize;
+  const uint32_t kiPayloadSize          = kuiSize;
 
-  uint8_t* pBuf		= (uint8_t*) malloc (kiActualRequestedSize);
+  uint8_t* pBuf = (uint8_t*) malloc (kiActualRequestedSize);
 #ifdef MEMORY_CHECK
   if (fpMemChkPoint == NULL) {
     m_fpMemChkPoint    = fopen ("./enc_mem_check_point.txt",  "at+");

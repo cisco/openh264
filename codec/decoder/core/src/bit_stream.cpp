@@ -74,9 +74,9 @@ int32_t DecInitBits (PBitStringAux pBitString, const uint8_t* kpBuf, const int32
   if (NULL == pTmp)
     return ERR_INFO_INVALID_ACCESS;
 
-  pBitString->pStartBuf   = pTmp;				// buffer to start position
-  pBitString->pEndBuf	    = pTmp + kiSizeBuf;	// buffer + length
-  pBitString->iBits	    = kiSize;				// count bits of overall bitstreaming inputindex;
+  pBitString->pStartBuf = pTmp;             // buffer to start position
+  pBitString->pEndBuf   = pTmp + kiSizeBuf; // buffer + length
+  pBitString->iBits     = kiSize;           // count bits of overall bitstreaming inputindex;
   pBitString->pCurBuf   = pBitString->pStartBuf;
   int32_t iErr = InitReadBits (pBitString, 0);
   if (iErr) {

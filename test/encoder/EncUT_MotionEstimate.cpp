@@ -142,9 +142,9 @@ class MotionEstimateRangeTest : public ::testing::Test {
     m_iMvRange = m_iUsageType ? EXPANDED_MV_RANGE : CAMERA_STARTMV_RANGE;
     m_iMvdRange = (m_iUsageType ? EXPANDED_MVD_RANGE : ((m_iNumDependencyLayers == 1) ? CAMERA_MVD_RANGE :
                    CAMERA_HIGHLAYER_MVD_RANGE));
-    m_uiMvdInterTableSize	= (m_iMvdRange << 2); //intepel*4=qpel
-    m_uiMvdInterTableStride	=  1 + (m_uiMvdInterTableSize << 1);//qpel_mv_range*2=(+/-);
-    m_uiMvdCacheAlignedSize	= m_uiMvdInterTableStride * sizeof (uint16_t);
+    m_uiMvdInterTableSize       = (m_iMvdRange << 2); //intepel*4=qpel
+    m_uiMvdInterTableStride     =  1 + (m_uiMvdInterTableSize << 1);//qpel_mv_range*2=(+/-);
+    m_uiMvdCacheAlignedSize     = m_uiMvdInterTableStride * sizeof (uint16_t);
 
     m_pMa = new CMemoryAlign (16);
     ASSERT_TRUE (NULL != m_pMa);

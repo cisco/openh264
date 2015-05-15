@@ -138,8 +138,8 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
     return NULL; //uiForbiddenZeroBit should always equal to 0
   }
 
-  pNalUnitHeader->uiNalRefIdc		= (uint8_t) (pNal[0] >> 5);			// uiNalRefIdc
-  pNalUnitHeader->eNalUnitType		= (EWelsNalUnitType) (pNal[0] & 0x1f);	// eNalUnitType
+  pNalUnitHeader->uiNalRefIdc   = (uint8_t) (pNal[0] >> 5);             // uiNalRefIdc
+  pNalUnitHeader->eNalUnitType  = (EWelsNalUnitType) (pNal[0] & 0x1f);  // eNalUnitType
 
   ++pNal;
   --iNalSize;
@@ -241,8 +241,8 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
     *pConsumedBytes += NAL_UNIT_HEADER_EXT_SIZE;
 
     pCurNal->sNalHeaderExt.sNalUnitHeader.uiForbiddenZeroBit = pNalUnitHeader->uiForbiddenZeroBit;
-    pCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc		  = pNalUnitHeader->uiNalRefIdc;
-    pCurNal->sNalHeaderExt.sNalUnitHeader.eNalUnitType	      = pNalUnitHeader->eNalUnitType;
+    pCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc        = pNalUnitHeader->uiNalRefIdc;
+    pCurNal->sNalHeaderExt.sNalUnitHeader.eNalUnitType       = pNalUnitHeader->eNalUnitType;
     if (pNalUnitHeader->uiNalRefIdc != 0) {
       pBs = &pCtx->sBs;
       iBitSize = (iNalSize << 3) - BsGetTrailingBits (pNal + iNalSize - 1); // convert into bit
@@ -272,9 +272,9 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
     }
     pCurNal->uiTimeStamp = pCtx->uiTimeStamp;
     pCurNal->sNalHeaderExt.sNalUnitHeader.uiForbiddenZeroBit = pNalUnitHeader->uiForbiddenZeroBit;
-    pCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc		  = pNalUnitHeader->uiNalRefIdc;
-    pCurNal->sNalHeaderExt.sNalUnitHeader.eNalUnitType	  = pNalUnitHeader->eNalUnitType;
-    pCurAu	      = pCtx->pAccessUnitList;
+    pCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc        = pNalUnitHeader->uiNalRefIdc;
+    pCurNal->sNalHeaderExt.sNalUnitHeader.eNalUnitType       = pNalUnitHeader->eNalUnitType;
+    pCurAu        = pCtx->pAccessUnitList;
     uiAvailNalNum = pCurAu->uiAvailUnitsNum;
 
 
@@ -576,12 +576,12 @@ bool CheckNextAuNewSeq (PWelsDecoderContext pCtx, const PNalUnit kpCurNal, const
  */
 int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t kiSrcLen, uint8_t* pSrcNal,
                         const int32_t kSrcNalLen) {
-  PBitStringAux	pBs = NULL;
-  EWelsNalUnitType eNalType	= NAL_UNIT_UNSPEC_0; // make initial value as unspecified
-  int32_t iPicWidth		= 0;
-  int32_t iPicHeight		= 0;
-  int32_t iBitSize		= 0;
-  int32_t iErr				= ERR_NONE;
+  PBitStringAux pBs = NULL;
+  EWelsNalUnitType eNalType     = NAL_UNIT_UNSPEC_0; // make initial value as unspecified
+  int32_t iPicWidth             = 0;
+  int32_t iPicHeight            = 0;
+  int32_t iBitSize              = 0;
+  int32_t iErr                  = ERR_NONE;
   if (kiSrcLen <= 0)
     return iErr;
 
@@ -674,8 +674,8 @@ int32_t ParseRefBasePicMarking (PBitStringAux pBs, PRefBasePicMarking pRefBasePi
 
       if (kuiMmco == MMCO_SHORT2UNUSED) {
         WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //difference_of_base_pic_nums_minus1
-        pRefBasePicMarking->mmco_base[iIdx].uiDiffOfPicNums	= 1 + uiCode;
-        pRefBasePicMarking->mmco_base[iIdx].iShortFrameNum	= 0;
+        pRefBasePicMarking->mmco_base[iIdx].uiDiffOfPicNums = 1 + uiCode;
+        pRefBasePicMarking->mmco_base[iIdx].iShortFrameNum  = 0;
       } else if (kuiMmco == MMCO_LONG2UNUSED) {
         WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //long_term_base_pic_num
         pRefBasePicMarking->mmco_base[iIdx].uiLongTermPicNum	= uiCode;
@@ -747,8 +747,8 @@ int32_t DecodeSpsSvcExt (PWelsDecoderContext pCtx, PSubsetSps pSpsExt, PBitStrin
   WELS_READ_VERIFY (BsGetBits (pBs, 2, &uiCode)); //chroma_phase_y_plus1
   pExt->uiChromaPhaseYPlus1		= uiCode;
 
-  pExt->uiSeqRefLayerChromaPhaseXPlus1Flag	= pExt->uiChromaPhaseXPlus1Flag;
-  pExt->uiSeqRefLayerChromaPhaseYPlus1		= pExt->uiChromaPhaseYPlus1;
+  pExt->uiSeqRefLayerChromaPhaseXPlus1Flag = pExt->uiChromaPhaseXPlus1Flag;
+  pExt->uiSeqRefLayerChromaPhaseYPlus1     = pExt->uiChromaPhaseYPlus1;
   memset (&pExt->sSeqScaledRefLayer, 0, sizeof (SPosOffset));
 
   if (pExt->uiExtendedSpatialScalability == 1) {
@@ -948,11 +948,11 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_NON_BASELINE);
   } else pSps->pSLevelLimits = pSLevelLimits;
   // syntax elements in default
-  pSps->uiChromaFormatIdc	= 1;
+  pSps->uiChromaFormatIdc = 1;
 
-  pSps->uiProfileIdc	= uiProfileIdc;
-  pSps->uiLevelIdc	= uiLevelIdc;
-  pSps->iSpsId		= iSpsId;
+  pSps->uiProfileIdc = uiProfileIdc;
+  pSps->uiLevelIdc   = uiLevelIdc;
+  pSps->iSpsId       = iSpsId;
 
   if (PRO_SCALABLE_BASELINE == uiProfileIdc || PRO_SCALABLE_HIGH == uiProfileIdc ||
       PRO_HIGH == uiProfileIdc || PRO_HIGH10 == uiProfileIdc ||
@@ -1100,10 +1100,10 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
       return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_CROPPING_DATA);
     }
   } else {
-    pSps->sFrameCrop.iLeftOffset	= 0;				// frame_crop_left_offset
-    pSps->sFrameCrop.iRightOffset	= 0;				// frame_crop_right_offset
-    pSps->sFrameCrop.iTopOffset		= 0;				// frame_crop_top_offset
-    pSps->sFrameCrop.iBottomOffset	= 0;				// frame_crop_bottom_offset
+    pSps->sFrameCrop.iLeftOffset   = 0; // frame_crop_left_offset
+    pSps->sFrameCrop.iRightOffset  = 0; // frame_crop_right_offset
+    pSps->sFrameCrop.iTopOffset    = 0; // frame_crop_top_offset
+    pSps->sFrameCrop.iBottomOffset = 0; // frame_crop_bottom_offset
   }
   WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //vui_parameters_present_flag
   pSps->bVuiParamPresentFlag			= !!uiCode;
@@ -1208,8 +1208,8 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   if (PRO_SCALABLE_BASELINE == uiProfileIdc || PRO_SCALABLE_HIGH == uiProfileIdc)
     pCtx->bAvcBasedFlag	= false;
 
-  *pPicWidth	= pSps->iMbWidth << 4;
-  *pPicHeight	= pSps->iMbHeight << 4;
+  *pPicWidth  = pSps->iMbWidth << 4;
+  *pPicHeight = pSps->iMbHeight << 4;
   PSps pTmpSps = NULL;
   if (kbUseSubsetFlag) {
     pTmpSps = &pCtx->sSubsetSpsBuffer[iSpsId].sSps;

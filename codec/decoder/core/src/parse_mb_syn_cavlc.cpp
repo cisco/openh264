@@ -990,8 +990,8 @@ int32_t WelsResidualBlockCavlc8x8 (SVlcTable* pVlcTable, uint8_t* pNonZeroCountC
 
 int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30],
                         PBitStringAux pBs) {
-  PSlice pSlice				= &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer;
-  PSliceHeader pSliceHeader	= &pSlice->sSliceHeaderExt.sSliceHeader;
+  PSlice pSlice                 = &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer;
+  PSliceHeader pSliceHeader     = &pSlice->sSliceHeaderExt.sSliceHeader;
   PPicture* ppRefPic = pCtx->sRefPic.pRefList[LIST_0];
   int32_t iRefCount[2];
   PDqLayer pCurDqLayer = pCtx->pCurDqLayer;

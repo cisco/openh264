@@ -124,8 +124,8 @@ CWelsH264SVCEncoder::CWelsH264SVCEncoder()
   m_pFileBs     = WelsFopen (strStreamFileName, "wb");
   m_pFileBsSize = WelsFopen (strLenFileName, "wb");
 
-  m_bSwitch	= false;
-  m_iSwitchTimes	= 0;
+  m_bSwitch      = false;
+  m_iSwitchTimes = 0;
 #endif//OUTPUT_BIT_STREAM
 
   InitEncoder();
@@ -149,8 +149,8 @@ CWelsH264SVCEncoder::~CWelsH264SVCEncoder() {
     WelsFclose (m_pFileBsSize);
     m_pFileBsSize = NULL;
   }
-  m_bSwitch	= false;
-  m_iSwitchTimes	= 0;
+  m_bSwitch = false;
+  m_iSwitchTimes = 0;
 #endif//OUTPUT_BIT_STREAM
 
   Uninitialize();
@@ -323,13 +323,13 @@ int CWelsH264SVCEncoder::InitializeInternal (SWelsSvcCodingParam* pCfg) {
   }
 
   const int32_t kiDecStages = WELS_LOG2 (pCfg->uiGopSize);
-  pCfg->iTemporalLayerNum	= (int8_t) (1 + kiDecStages);
-  pCfg->iLoopFilterAlphaC0Offset	= WELS_CLIP3 (pCfg->iLoopFilterAlphaC0Offset, -6, 6);
-  pCfg->iLoopFilterBetaOffset		= WELS_CLIP3 (pCfg->iLoopFilterBetaOffset, -6, 6);
+  pCfg->iTemporalLayerNum        = (int8_t) (1 + kiDecStages);
+  pCfg->iLoopFilterAlphaC0Offset = WELS_CLIP3 (pCfg->iLoopFilterAlphaC0Offset, -6, 6);
+  pCfg->iLoopFilterBetaOffset    = WELS_CLIP3 (pCfg->iLoopFilterBetaOffset, -6, 6);
 
   // decide property list size between INIT_TYPE_PARAMETER_BASED/INIT_TYPE_CONFIG_BASED
-  m_iMaxPicWidth	= pCfg->iPicWidth;
-  m_iMaxPicHeight	= pCfg->iPicHeight;
+  m_iMaxPicWidth  = pCfg->iPicWidth;
+  m_iMaxPicHeight = pCfg->iPicHeight;
 
   TraceParamInfo (pCfg);
   if (WelsInitEncoderExt (&m_pEncContext, pCfg, &m_pWelsTrace->m_sLogCtx, NULL)) {
@@ -683,9 +683,9 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     m_pEncContext->pSvcParam->uiIntraPeriod	= (uint32_t)iValue;
   }
   break;
-  case ENCODER_OPTION_SVC_ENCODE_PARAM_BASE: {	// SVC Encoding Parameter
-    SEncParamBase		sEncodingParam;
-    SWelsSvcCodingParam	sConfig;
+  case ENCODER_OPTION_SVC_ENCODE_PARAM_BASE: { // SVC Encoding Parameter
+    SEncParamBase sEncodingParam;
+    SWelsSvcCodingParam sConfig;
     int32_t iTargetWidth = 0;
     int32_t iTargetHeight = 0;
 
@@ -694,12 +694,12 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
       return cmInitParaError;
     }
     /* New configuration available here */
-    iTargetWidth	= sConfig.iPicWidth;
-    iTargetHeight	= sConfig.iPicHeight;
+    iTargetWidth        = sConfig.iPicWidth;
+    iTargetHeight       = sConfig.iPicHeight;
     if (m_iMaxPicWidth != iTargetWidth
         || m_iMaxPicHeight != iTargetHeight) {
-      m_iMaxPicWidth	= iTargetWidth;
-      m_iMaxPicHeight	= iTargetHeight;
+      m_iMaxPicWidth    = iTargetWidth;
+      m_iMaxPicHeight   = iTargetHeight;
     }
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_SVC_ENCODE_PARAM_BASE iUsageType = %d,iPicWidth= %d;iPicHeight= %d;iTargetBitrate= %d;fMaxFrameRate=  %.6ff;iRCMode= %d",
@@ -715,9 +715,9 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   }
   break;
 
-  case ENCODER_OPTION_SVC_ENCODE_PARAM_EXT: {	// SVC Encoding Parameter
-    SEncParamExt		sEncodingParam;
-    SWelsSvcCodingParam	sConfig;
+  case ENCODER_OPTION_SVC_ENCODE_PARAM_EXT: { // SVC Encoding Parameter
+    SEncParamExt sEncodingParam;
+    SWelsSvcCodingParam sConfig;
     int32_t iTargetWidth = 0;
     int32_t iTargetHeight = 0;
 
@@ -756,12 +756,12 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     }
 
     /* New configuration available here */
-    iTargetWidth	= sConfig.iPicWidth;
-    iTargetHeight	= sConfig.iPicHeight;
+    iTargetWidth        = sConfig.iPicWidth;
+    iTargetHeight       = sConfig.iPicHeight;
     if (m_iMaxPicWidth != iTargetWidth
         || m_iMaxPicHeight != iTargetHeight) {
-      m_iMaxPicWidth	= iTargetWidth;
-      m_iMaxPicHeight	= iTargetHeight;
+      m_iMaxPicWidth    = iTargetWidth;
+      m_iMaxPicHeight   = iTargetHeight;
     }
     /* Check every field whether there is new request for memory block changed or else, Oct. 24, 2008 */
     if (WelsEncoderParamAdjust (&m_pEncContext, &sConfig)) {

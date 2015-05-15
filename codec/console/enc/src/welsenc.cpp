@@ -197,8 +197,8 @@ int ParseLayerConfig (CReadConfig& cRdLayerCfg, const int iLayer, SEncParamExt& 
       }
     }
   }
-  pDLayer->iDLayerQp	= sLayerCtx.iDLayerQp;
-  pDLayer->sSliceCfg.uiSliceMode		= sLayerCtx.sSliceCfg.uiSliceMode;
+  pDLayer->iDLayerQp             = sLayerCtx.iDLayerQp;
+  pDLayer->sSliceCfg.uiSliceMode = sLayerCtx.sSliceCfg.uiSliceMode;
 
   memcpy (&pDLayer->sSliceCfg, &sLayerCtx.sSliceCfg, sizeof (SSliceConfig));	// confirmed_safe_unsafe_usage
   memcpy (&pDLayer->sSliceCfg.sSliceArgument.uiSliceMbNum[0], &sLayerCtx.sSliceCfg.sSliceArgument.uiSliceMbNum[0],
@@ -626,59 +626,59 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
 int FillSpecificParameters (SEncParamExt& sParam) {
   /* Test for temporal, spatial, SNR scalability */
   sParam.iUsageType = CAMERA_VIDEO_REAL_TIME;
-  sParam.fMaxFrameRate	= 60.0f;		// input frame rate
-  sParam.iPicWidth		= 1280;			// width of picture in samples
-  sParam.iPicHeight	= 720;			// height of picture in samples
-  sParam.iTargetBitrate = 2500000;		// target bitrate desired
+  sParam.fMaxFrameRate  = 60.0f;                // input frame rate
+  sParam.iPicWidth      = 1280;                 // width of picture in samples
+  sParam.iPicHeight     = 720;                  // height of picture in samples
+  sParam.iTargetBitrate = 2500000;              // target bitrate desired
   sParam.iMaxBitrate    = UNSPECIFIED_BIT_RATE;
-  sParam.iRCMode       = RC_QUALITY_MODE;       //  rc mode control
-  sParam.iTemporalLayerNum = 3;	// layer number at temporal level
-  sParam.iSpatialLayerNum	= 4;	// layer number at spatial level
+  sParam.iRCMode        = RC_QUALITY_MODE;      //  rc mode control
+  sParam.iTemporalLayerNum = 3;    // layer number at temporal level
+  sParam.iSpatialLayerNum  = 4;    // layer number at spatial level
   sParam.bEnableDenoise    = 0;    // denoise control
   sParam.bEnableBackgroundDetection = 1; // background detection control
   sParam.bEnableAdaptiveQuant       = 1; // adaptive quantization control
   sParam.bEnableFrameSkip           = 1; // frame skipping
-  sParam.bEnableLongTermReference  = 0; // long term reference control
+  sParam.bEnableLongTermReference   = 0; // long term reference control
   sParam.iLtrMarkPeriod = 30;
-  sParam.uiIntraPeriod		= 320;		// period of Intra frame
+  sParam.uiIntraPeriod  = 320;           // period of Intra frame
   sParam.eSpsPpsIdStrategy = INCREASING_ID;
   sParam.bPrefixNalAddingCtrl = 0;
   sParam.iComplexityMode = MEDIUM_COMPLEXITY;
   int iIndexLayer = 0;
-  sParam.sSpatialLayers[iIndexLayer].uiProfileIdc	= PRO_BASELINE;
-  sParam.sSpatialLayers[iIndexLayer].iVideoWidth	= 160;
-  sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 90;
-  sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 7.5f;
-  sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 64000;
-  sParam.sSpatialLayers[iIndexLayer].iMaxSpatialBitrate     = UNSPECIFIED_BIT_RATE;
+  sParam.sSpatialLayers[iIndexLayer].uiProfileIdc       = PRO_BASELINE;
+  sParam.sSpatialLayers[iIndexLayer].iVideoWidth        = 160;
+  sParam.sSpatialLayers[iIndexLayer].iVideoHeight       = 90;
+  sParam.sSpatialLayers[iIndexLayer].fFrameRate         = 7.5f;
+  sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate    = 64000;
+  sParam.sSpatialLayers[iIndexLayer].iMaxSpatialBitrate    = UNSPECIFIED_BIT_RATE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
 
   ++ iIndexLayer;
-  sParam.sSpatialLayers[iIndexLayer].uiProfileIdc	= PRO_SCALABLE_BASELINE;
-  sParam.sSpatialLayers[iIndexLayer].iVideoWidth	= 320;
-  sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 180;
-  sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 15.0f;
-  sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 160000;
-  sParam.sSpatialLayers[iIndexLayer].iMaxSpatialBitrate     = UNSPECIFIED_BIT_RATE;
+  sParam.sSpatialLayers[iIndexLayer].uiProfileIdc       = PRO_SCALABLE_BASELINE;
+  sParam.sSpatialLayers[iIndexLayer].iVideoWidth        = 320;
+  sParam.sSpatialLayers[iIndexLayer].iVideoHeight       = 180;
+  sParam.sSpatialLayers[iIndexLayer].fFrameRate         = 15.0f;
+  sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate    = 160000;
+  sParam.sSpatialLayers[iIndexLayer].iMaxSpatialBitrate    = UNSPECIFIED_BIT_RATE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
 
   ++ iIndexLayer;
-  sParam.sSpatialLayers[iIndexLayer].uiProfileIdc	= PRO_SCALABLE_BASELINE;
-  sParam.sSpatialLayers[iIndexLayer].iVideoWidth	= 640;
-  sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 360;
-  sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 30.0f;
-  sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 512000;
-  sParam.sSpatialLayers[iIndexLayer].iMaxSpatialBitrate     = UNSPECIFIED_BIT_RATE;
+  sParam.sSpatialLayers[iIndexLayer].uiProfileIdc       = PRO_SCALABLE_BASELINE;
+  sParam.sSpatialLayers[iIndexLayer].iVideoWidth        = 640;
+  sParam.sSpatialLayers[iIndexLayer].iVideoHeight       = 360;
+  sParam.sSpatialLayers[iIndexLayer].fFrameRate         = 30.0f;
+  sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate    = 512000;
+  sParam.sSpatialLayers[iIndexLayer].iMaxSpatialBitrate    = UNSPECIFIED_BIT_RATE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.sSliceArgument.uiSliceNum = 1;
 
   ++ iIndexLayer;
-  sParam.sSpatialLayers[iIndexLayer].uiProfileIdc	= PRO_SCALABLE_BASELINE;
-  sParam.sSpatialLayers[iIndexLayer].iVideoWidth	= 1280;
-  sParam.sSpatialLayers[iIndexLayer].iVideoHeight	= 720;
-  sParam.sSpatialLayers[iIndexLayer].fFrameRate	= 30.0f;
-  sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate		= 1500000;
-  sParam.sSpatialLayers[iIndexLayer].iMaxSpatialBitrate     = UNSPECIFIED_BIT_RATE;
+  sParam.sSpatialLayers[iIndexLayer].uiProfileIdc       = PRO_SCALABLE_BASELINE;
+  sParam.sSpatialLayers[iIndexLayer].iVideoWidth        = 1280;
+  sParam.sSpatialLayers[iIndexLayer].iVideoHeight       = 720;
+  sParam.sSpatialLayers[iIndexLayer].fFrameRate         = 30.0f;
+  sParam.sSpatialLayers[iIndexLayer].iSpatialBitrate    = 1500000;
+  sParam.sSpatialLayers[iIndexLayer].iMaxSpatialBitrate    = UNSPECIFIED_BIT_RATE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
   sParam.sSpatialLayers[iIndexLayer].sSliceCfg.sSliceArgument.uiSliceNum = 1;
 

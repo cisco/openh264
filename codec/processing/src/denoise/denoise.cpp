@@ -46,7 +46,7 @@ CDenoiser::CDenoiser (int32_t iCpuFlag) {
 
   m_uiSpaceRadius = DENOISE_GRAY_RADIUS;
   m_fSigmaGrey  = DENOISE_GRAY_SIGMA;
-  m_uiType		 = DENOISE_ALL_COMPONENT;
+  m_uiType      = DENOISE_ALL_COMPONENT;
   InitDenoiseFunc (m_pfDenoise, m_CPUFlag);
 }
 

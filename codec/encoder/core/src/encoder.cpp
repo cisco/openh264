@@ -74,9 +74,9 @@ int32_t InitPic (const void* kpSrc, const int32_t kiColorspace, const int32_t ki
   if (NULL == pSrcPic || kiWidth == 0 || kiHeight == 0)
     return 1;
 
-  pSrcPic->iColorFormat	= kiColorspace;
-  pSrcPic->iPicWidth		= kiWidth;
-  pSrcPic->iPicHeight		= kiHeight;
+  pSrcPic->iColorFormat = kiColorspace;
+  pSrcPic->iPicWidth    = kiWidth;
+  pSrcPic->iPicHeight   = kiHeight;
 
   //currently encoder only supports videoFormatI420.
   if ((kiColorspace & (~videoFormatVFlip)) != videoFormatI420)
@@ -84,32 +84,32 @@ int32_t InitPic (const void* kpSrc, const int32_t kiColorspace, const int32_t ki
   switch (kiColorspace & (~videoFormatVFlip)) {
   case videoFormatI420:
   case videoFormatYV12:
-    pSrcPic->pData[0]	= NULL;
-    pSrcPic->pData[1]	= NULL;
-    pSrcPic->pData[2]	= NULL;
-    pSrcPic->pData[3]	= NULL;
-    pSrcPic->iStride[0]	= kiWidth;
-    pSrcPic->iStride[2]	= pSrcPic->iStride[1] = kiWidth >> 1;
-    pSrcPic->iStride[3]	= 0;
+    pSrcPic->pData[0]   = NULL;
+    pSrcPic->pData[1]   = NULL;
+    pSrcPic->pData[2]   = NULL;
+    pSrcPic->pData[3]   = NULL;
+    pSrcPic->iStride[0] = kiWidth;
+    pSrcPic->iStride[2] = pSrcPic->iStride[1] = kiWidth >> 1;
+    pSrcPic->iStride[3] = 0;
     break;
   case videoFormatYUY2:
   case videoFormatYVYU:
   case videoFormatUYVY:
-    pSrcPic->pData[0]	= NULL;
-    pSrcPic->pData[1]	= NULL;
-    pSrcPic->pData[2]	= NULL;
-    pSrcPic->pData[3]	= NULL;
-    pSrcPic->iStride[0]	= CALC_BI_STRIDE (kiWidth,  16);
-    pSrcPic->iStride[3]	= pSrcPic->iStride[2] = pSrcPic->iStride[1] = 0;
+    pSrcPic->pData[0]   = NULL;
+    pSrcPic->pData[1]   = NULL;
+    pSrcPic->pData[2]   = NULL;
+    pSrcPic->pData[3]   = NULL;
+    pSrcPic->iStride[0] = CALC_BI_STRIDE (kiWidth,  16);
+    pSrcPic->iStride[3] = pSrcPic->iStride[2] = pSrcPic->iStride[1] = 0;
     break;
   case videoFormatRGB:
   case videoFormatBGR:
-    pSrcPic->pData[0]	= NULL;
-    pSrcPic->pData[1]	= NULL;
-    pSrcPic->pData[2]	= NULL;
-    pSrcPic->pData[3]	= NULL;
-    pSrcPic->iStride[0]	= CALC_BI_STRIDE (kiWidth, 24);
-    pSrcPic->iStride[3]	= pSrcPic->iStride[2] = pSrcPic->iStride[1] = 0;
+    pSrcPic->pData[0]   = NULL;
+    pSrcPic->pData[1]   = NULL;
+    pSrcPic->pData[2]   = NULL;
+    pSrcPic->pData[3]   = NULL;
+    pSrcPic->iStride[0] = CALC_BI_STRIDE (kiWidth, 24);
+    pSrcPic->iStride[3] = pSrcPic->iStride[2] = pSrcPic->iStride[1] = 0;
     if (kiColorspace & videoFormatVFlip)
       pSrcPic->iColorFormat = kiColorspace & (~videoFormatVFlip);
     else
@@ -119,12 +119,12 @@ int32_t InitPic (const void* kpSrc, const int32_t kiColorspace, const int32_t ki
   case videoFormatRGBA:
   case videoFormatARGB:
   case videoFormatABGR:
-    pSrcPic->pData[0]	= NULL;
-    pSrcPic->pData[1]	= NULL;
-    pSrcPic->pData[2]	= NULL;
-    pSrcPic->pData[3]	= NULL;
-    pSrcPic->iStride[0]	= kiWidth << 2;
-    pSrcPic->iStride[3]	= pSrcPic->iStride[2] = pSrcPic->iStride[1] = 0;
+    pSrcPic->pData[0]   = NULL;
+    pSrcPic->pData[1]   = NULL;
+    pSrcPic->pData[2]   = NULL;
+    pSrcPic->pData[3]   = NULL;
+    pSrcPic->iStride[0] = kiWidth << 2;
+    pSrcPic->iStride[3] = pSrcPic->iStride[2] = pSrcPic->iStride[1] = 0;
     if (kiColorspace & videoFormatVFlip)
       pSrcPic->iColorFormat = kiColorspace & (~videoFormatVFlip);
     else
@@ -231,8 +231,8 @@ int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam,
  */
 void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType) {
   // for bitstream writing
-  pEncCtx->iPosBsBuffer		= 0;	// reset bs pBuffer position
-  pEncCtx->pOut->iNalIndex		= 0;	// reset NAL index
+  pEncCtx->iPosBsBuffer         = 0;    // reset bs pBuffer position
+  pEncCtx->pOut->iNalIndex      = 0;    // reset NAL index
 
   InitBits (&pEncCtx->pOut->sBsWrite, pEncCtx->pOut->pBsBuffer, pEncCtx->pOut->uiSize);
 
@@ -250,20 +250,20 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType) {
       else
         pEncCtx->iFrameNum	= 0;	// if iFrameNum overflow
     }
-    pEncCtx->eNalType		= NAL_UNIT_CODED_SLICE;
-    pEncCtx->eSliceType	= P_SLICE;
-    pEncCtx->eNalPriority	= NRI_PRI_HIGH;
+    pEncCtx->eNalType           = NAL_UNIT_CODED_SLICE;
+    pEncCtx->eSliceType         = P_SLICE;
+    pEncCtx->eNalPriority       = NRI_PRI_HIGH;
   } else if (keFrameType == videoFrameTypeIDR) {
-    pEncCtx->iFrameNum		= 0;
-    pEncCtx->iPOC			= 0;
+    pEncCtx->iFrameNum          = 0;
+    pEncCtx->iPOC               = 0;
     pEncCtx->bEncCurFrmAsIdrFlag = false;
     pEncCtx->iFrameIndex = 0;
 
-    pEncCtx->eNalType		= NAL_UNIT_CODED_SLICE_IDR;
-    pEncCtx->eSliceType	= I_SLICE;
-    pEncCtx->eNalPriority	= NRI_PRI_HIGHEST;
+    pEncCtx->eNalType           = NAL_UNIT_CODED_SLICE_IDR;
+    pEncCtx->eSliceType         = I_SLICE;
+    pEncCtx->eNalPriority       = NRI_PRI_HIGHEST;
 
-    pEncCtx->iCodingIndex	= 0;
+    pEncCtx->iCodingIndex       = 0;
 
     // reset_ref_list
 
@@ -281,9 +281,9 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType) {
         pEncCtx->iFrameNum	= 0;	// if iFrameNum overflow
     }
 
-    pEncCtx->eNalType		= NAL_UNIT_CODED_SLICE;
-    pEncCtx->eSliceType	= I_SLICE;
-    pEncCtx->eNalPriority	= NRI_PRI_HIGHEST;
+    pEncCtx->eNalType     = NAL_UNIT_CODED_SLICE;
+    pEncCtx->eSliceType   = I_SLICE;
+    pEncCtx->eNalPriority = NRI_PRI_HIGHEST;
 
     // rc_init_gop
   } else {	// B pictures are not supported now, any else?
@@ -393,13 +393,13 @@ extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName
   if (NULL != pDumpRecFile) {
     int32_t i = 0;
     int32_t j = 0;
-    const int32_t kiStrideY	= pCurPicture->iLineSize[0];
-    const int32_t kiLumaWidth	= bFrameCroppingFlag ? (pCurPicture->iWidthInPixel - ((pFrameCrop->iCropLeft +
-                                pFrameCrop->iCropRight) << 1)) : pCurPicture->iWidthInPixel;
-    const int32_t kiLumaHeight	= bFrameCroppingFlag ? (pCurPicture->iHeightInPixel - ((pFrameCrop->iCropTop +
-                                  pFrameCrop->iCropBottom) << 1)) : pCurPicture->iHeightInPixel;
-    const int32_t kiChromaWidth	= kiLumaWidth >> 1;
-    const int32_t kiChromaHeight	= kiLumaHeight >> 1;
+    const int32_t kiStrideY      = pCurPicture->iLineSize[0];
+    const int32_t kiLumaWidth    = bFrameCroppingFlag ? (pCurPicture->iWidthInPixel - ((pFrameCrop->iCropLeft +
+                                   pFrameCrop->iCropRight) << 1)) : pCurPicture->iWidthInPixel;
+    const int32_t kiLumaHeight   = bFrameCroppingFlag ? (pCurPicture->iHeightInPixel - ((pFrameCrop->iCropTop +
+                                   pFrameCrop->iCropBottom) << 1)) : pCurPicture->iHeightInPixel;
+    const int32_t kiChromaWidth  = kiLumaWidth >> 1;
+    const int32_t kiChromaHeight = kiLumaHeight >> 1;
     uint8_t* pSrc = NULL;
     pSrc = bFrameCroppingFlag ? (pCurPicture->pData[0] + kiStrideY * (pFrameCrop->iCropTop << 1) +
                                  (pFrameCrop->iCropLeft << 1)) : pCurPicture->pData[0];
@@ -460,13 +460,13 @@ void DumpRecFrame (SPicture* pCurPicture, const char* kpFileName, const int8_t k
   if (NULL != pDumpRecFile) {
     int32_t i = 0;
     int32_t j = 0;
-    const int32_t kiStrideY	= pCurPicture->iLineSize[0];
-    const int32_t kiLumaWidth	= bFrameCroppingFlag ? (pCurPicture->iWidthInPixel - ((pFrameCrop->iCropLeft +
-                                pFrameCrop->iCropRight) << 1)) : pCurPicture->iWidthInPixel;
-    const int32_t kiLumaHeight	= bFrameCroppingFlag ? (pCurPicture->iHeightInPixel - ((pFrameCrop->iCropTop +
-                                  pFrameCrop->iCropBottom) << 1)) : pCurPicture->iHeightInPixel;
-    const int32_t kiChromaWidth	= kiLumaWidth >> 1;
-    const int32_t kiChromaHeight	= kiLumaHeight >> 1;
+    const int32_t kiStrideY      = pCurPicture->iLineSize[0];
+    const int32_t kiLumaWidth    = bFrameCroppingFlag ? (pCurPicture->iWidthInPixel - ((pFrameCrop->iCropLeft +
+                                   pFrameCrop->iCropRight) << 1)) : pCurPicture->iWidthInPixel;
+    const int32_t kiLumaHeight   = bFrameCroppingFlag ? (pCurPicture->iHeightInPixel - ((pFrameCrop->iCropTop +
+                                   pFrameCrop->iCropBottom) << 1)) : pCurPicture->iHeightInPixel;
+    const int32_t kiChromaWidth  = kiLumaWidth >> 1;
+    const int32_t kiChromaHeight = kiLumaHeight >> 1;
     uint8_t* pSrc = NULL;
     pSrc = bFrameCroppingFlag ? (pCurPicture->pData[0] + kiStrideY * (pFrameCrop->iCropTop << 1) +
                                  (pFrameCrop->iCropLeft << 1)) : pCurPicture->pData[0];

@@ -233,18 +233,18 @@ int32_t  WriteBlockResidualCavlc (SWelsFuncPtrList* pFuncList, int16_t* pCoffLev
 
 void StashMBStatusCavlc (SDynamicSlicingStack* pDss, SSlice* pSlice, int32_t iMbSkipRun) {
   SBitStringAux* pBs = pSlice->pSliceBsa;
-  pDss->pBsStackBufPtr	= pBs->pCurBuf;
-  pDss->uiBsStackCurBits	= pBs->uiCurBits;
-  pDss->iBsStackLeftBits	= pBs->iLeftBits;
-  pDss->uiLastMbQp =  pSlice->uiLastMbQp;
+  pDss->pBsStackBufPtr          = pBs->pCurBuf;
+  pDss->uiBsStackCurBits        = pBs->uiCurBits;
+  pDss->iBsStackLeftBits        = pBs->iLeftBits;
+  pDss->uiLastMbQp              = pSlice->uiLastMbQp;
   pDss->iMbSkipRunStack = iMbSkipRun;
 }
 int32_t StashPopMBStatusCavlc (SDynamicSlicingStack* pDss, SSlice* pSlice) {
   SBitStringAux* pBs = pSlice->pSliceBsa;
-  pBs->pCurBuf		= pDss->pBsStackBufPtr;
-  pBs->uiCurBits	= pDss->uiBsStackCurBits;
-  pBs->iLeftBits	= pDss->iBsStackLeftBits;
-  pSlice->uiLastMbQp = pDss->uiLastMbQp;
+  pBs->pCurBuf          = pDss->pBsStackBufPtr;
+  pBs->uiCurBits        = pDss->uiBsStackCurBits;
+  pBs->iLeftBits        = pDss->iBsStackLeftBits;
+  pSlice->uiLastMbQp    = pDss->uiLastMbQp;
   return pDss->iMbSkipRunStack;
 }
 void StashMBStatusCabac (SDynamicSlicingStack* pDss, SSlice* pSlice, int32_t iMbSkipRun) {

@@ -36,19 +36,19 @@
 // rewrite it (split into luma & chroma) that is helpful for mmx/sse2 optimization perform, 9/27/2009
 static inline void ExpandPictureLuma_c (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicW,
                                         const int32_t kiPicH) {
-  uint8_t* pTmp				= pDst;
-  uint8_t* pDstLastLine		= pTmp + (kiPicH - 1) * kiStride;
-  const int32_t kiPaddingLen	= PADDING_LENGTH;
-  const uint8_t kuiTL			= pTmp[0];
-  const uint8_t kuiTR			= pTmp[kiPicW - 1];
-  const uint8_t kuiBL			= pDstLastLine[0];
-  const uint8_t kuiBR			= pDstLastLine[kiPicW - 1];
-  int32_t i					= 0;
+  uint8_t* pTmp              = pDst;
+  uint8_t* pDstLastLine      = pTmp + (kiPicH - 1) * kiStride;
+  const int32_t kiPaddingLen = PADDING_LENGTH;
+  const uint8_t kuiTL        = pTmp[0];
+  const uint8_t kuiTR        = pTmp[kiPicW - 1];
+  const uint8_t kuiBL        = pDstLastLine[0];
+  const uint8_t kuiBR        = pDstLastLine[kiPicW - 1];
+  int32_t i                  = 0;
 
   do {
-    const int32_t kiStrides	= (1 + i) * kiStride;
-    uint8_t* pTop			= pTmp - kiStrides;
-    uint8_t* pBottom			= pDstLastLine + kiStrides;
+    const int32_t kiStrides = (1 + i) * kiStride;
+    uint8_t* pTop           = pTmp - kiStrides;
+    uint8_t* pBottom        = pDstLastLine + kiStrides;
 
     // pad pTop and pBottom
     memcpy (pTop, pTmp, kiPicW);				// confirmed_safe_unsafe_usage
@@ -76,19 +76,19 @@ static inline void ExpandPictureLuma_c (uint8_t* pDst, const int32_t kiStride, c
 
 static inline void ExpandPictureChroma_c (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicW,
     const int32_t kiPicH) {
-  uint8_t* pTmp				= pDst;
-  uint8_t* pDstLastLine		= pTmp + (kiPicH - 1) * kiStride;
-  const int32_t kiPaddingLen	= (PADDING_LENGTH >> 1);
-  const uint8_t kuiTL			= pTmp[0];
-  const uint8_t kuiTR			= pTmp[kiPicW - 1];
-  const uint8_t kuiBL			= pDstLastLine[0];
-  const uint8_t kuiBR			= pDstLastLine[kiPicW - 1];
-  int32_t i					= 0;
+  uint8_t* pTmp                 = pDst;
+  uint8_t* pDstLastLine         = pTmp + (kiPicH - 1) * kiStride;
+  const int32_t kiPaddingLen    = (PADDING_LENGTH >> 1);
+  const uint8_t kuiTL           = pTmp[0];
+  const uint8_t kuiTR           = pTmp[kiPicW - 1];
+  const uint8_t kuiBL           = pDstLastLine[0];
+  const uint8_t kuiBR           = pDstLastLine[kiPicW - 1];
+  int32_t i                     = 0;
 
   do {
-    const int32_t kiStrides	= (1 + i) * kiStride;
-    uint8_t* pTop			= pTmp - kiStrides;
-    uint8_t* pBottom			= pDstLastLine + kiStrides;
+    const int32_t kiStrides = (1 + i) * kiStride;
+    uint8_t* pTop           = pTmp - kiStrides;
+    uint8_t* pBottom        = pDstLastLine + kiStrides;
 
     // pad pTop and pBottom
     memcpy (pTop, pTmp, kiPicW);				// confirmed_safe_unsafe_usage
@@ -147,13 +147,13 @@ void InitExpandPictureFunc (SExpandPicFunc* pExpandPicFunc, const uint32_t kuiCP
 void ExpandReferencingPicture (uint8_t* pData[3], int32_t iWidth, int32_t iHeight, int32_t iStride[3],
                                PExpandPictureFunc pExpLuma, PExpandPictureFunc pExpChrom[2]) {
   /*local variable*/
-  uint8_t* pPicY	= pData[0];
+  uint8_t* pPicY  = pData[0];
   uint8_t* pPicCb = pData[1];
   uint8_t* pPicCr = pData[2];
-  const int32_t kiWidthY	= iWidth;
-  const int32_t kiHeightY	= iHeight;
-  const int32_t kiWidthUV	= kiWidthY >> 1;
-  const int32_t kiHeightUV	= kiHeightY >> 1;
+  const int32_t kiWidthY    = iWidth;
+  const int32_t kiHeightY   = iHeight;
+  const int32_t kiWidthUV   = kiWidthY >> 1;
+  const int32_t kiHeightUV  = kiHeightY >> 1;
 
 
 

@@ -543,15 +543,15 @@ void EncodeDecodeTestAPIBase::SliceParamValidationForMode2 (int iSpatialIdx) {
   unsigned int uiSliceIdx         = 0;
   unsigned int uiActualSliceCount = 0;
 
-  uiMbWidth	     = (param_.iPicWidth + 15) >> 4;
-  uiMbHeight	 = (param_.iPicHeight + 15) >> 4;
+  uiMbWidth      = (param_.iPicWidth  + 15) >> 4;
+  uiMbHeight     = (param_.iPicHeight + 15) >> 4;
   uiMbNumInFrame = uiMbWidth * uiMbHeight;
 
   uiSliceIdx = 0;
   while (uiSliceIdx < MAX_SLICES_NUM) {
     param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceMbNum[uiSliceIdx] = rand() % uiMbNumInFrame;
-    uiCountMb			+= param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceMbNum[uiSliceIdx];
-    uiActualSliceCount	 =  uiSliceIdx + 1;
+    uiCountMb           += param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceMbNum[uiSliceIdx];
+    uiActualSliceCount   =  uiSliceIdx + 1;
 
     if (uiCountMb >= uiMbNumInFrame) {
       break;

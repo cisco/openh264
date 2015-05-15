@@ -54,43 +54,43 @@ SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth , const int32_t
   int32_t iPicWidth = 0;
   int32_t iPicHeight = 0;
 
-  int32_t iPicChromaWidth	= 0;
-  int32_t iPicChromaHeight	= 0;
-  int32_t iLumaSize			= 0;
-  int32_t iChromaSize			= 0;
+  int32_t iPicChromaWidth       = 0;
+  int32_t iPicChromaHeight      = 0;
+  int32_t iLumaSize             = 0;
+  int32_t iChromaSize           = 0;
 
   pPic	= static_cast<SPicture*> (pMa->WelsMallocz (sizeof (SPicture), "pPic"));
 
   WELS_VERIFY_RETURN_IF (NULL, NULL == pPic);
 
-  iPicWidth	= WELS_ALIGN (kiWidth, MB_WIDTH_LUMA) + (PADDING_LENGTH << 1);	// with width of horizon
-  iPicHeight	= WELS_ALIGN (kiHeight, MB_HEIGHT_LUMA) + (PADDING_LENGTH << 1);	// with height of vertical
-  iPicChromaWidth	= iPicWidth >> 1;
-  iPicChromaHeight	= iPicHeight >> 1;
-  iPicWidth	= WELS_ALIGN (iPicWidth,
-                          32);	// 32(or 16 for chroma below) to match original imp. here instead of cache_line_size
-  iPicChromaWidth	= WELS_ALIGN (iPicChromaWidth, 16);
-  iLumaSize	= iPicWidth * iPicHeight;
-  iChromaSize	= iPicChromaWidth * iPicChromaHeight;
+  iPicWidth         = WELS_ALIGN (kiWidth, MB_WIDTH_LUMA) + (PADDING_LENGTH << 1);  // with width of horizon
+  iPicHeight        = WELS_ALIGN (kiHeight, MB_HEIGHT_LUMA) + (PADDING_LENGTH << 1);        // with height of vertical
+  iPicChromaWidth   = iPicWidth >> 1;
+  iPicChromaHeight  = iPicHeight >> 1;
+  iPicWidth         = WELS_ALIGN (iPicWidth,
+                          32);  // 32(or 16 for chroma below) to match original imp. here instead of cache_line_size
+  iPicChromaWidth   = WELS_ALIGN (iPicChromaWidth, 16);
+  iLumaSize         = iPicWidth * iPicHeight;
+  iChromaSize       = iPicChromaWidth * iPicChromaHeight;
 
-  pPic->pBuffer	= (uint8_t*)pMa->WelsMalloc (iLumaSize /* luma */
+  pPic->pBuffer = (uint8_t*)pMa->WelsMalloc (iLumaSize /* luma */
                   + (iChromaSize << 1) /* Cb,Cr */
                   , "pPic->pBuffer");
   WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pBuffer, FreePicture (pMa, &pPic));
-  pPic->iLineSize[0]	= iPicWidth;
-  pPic->iLineSize[1]	= pPic->iLineSize[2]	= iPicChromaWidth;
-  pPic->pData[0]	= pPic->pBuffer + (1 + pPic->iLineSize[0]) * PADDING_LENGTH;
-  pPic->pData[1]	= pPic->pBuffer + iLumaSize + (((1 + pPic->iLineSize[1]) * PADDING_LENGTH) >> 1);
-  pPic->pData[2]	= pPic->pBuffer + iLumaSize + iChromaSize + (((1 + pPic->iLineSize[2]) * PADDING_LENGTH) >> 1);
+  pPic->iLineSize[0]    = iPicWidth;
+  pPic->iLineSize[1]    = pPic->iLineSize[2]    = iPicChromaWidth;
+  pPic->pData[0]        = pPic->pBuffer + (1 + pPic->iLineSize[0]) * PADDING_LENGTH;
+  pPic->pData[1]        = pPic->pBuffer + iLumaSize + (((1 + pPic->iLineSize[1]) * PADDING_LENGTH) >> 1);
+  pPic->pData[2]        = pPic->pBuffer + iLumaSize + iChromaSize + (((1 + pPic->iLineSize[2]) * PADDING_LENGTH) >> 1);
 
-  pPic->iWidthInPixel	= kiWidth;
-  pPic->iHeightInPixel	= kiHeight;
-  pPic->iFrameNum			= -1;
+  pPic->iWidthInPixel   = kiWidth;
+  pPic->iHeightInPixel  = kiHeight;
+  pPic->iFrameNum       = -1;
 
-  pPic->bIsLongRef		= false;
+  pPic->bIsLongRef      = false;
   pPic->iLongTermPicNum = -1;
   pPic->uiRecieveConfirmed = 0;
-  pPic->iMarkFrameNum	= -1;
+  pPic->iMarkFrameNum   = -1;
 
   if (bNeedMbInfo) {
     const uint32_t kuiCountMbNum = ((15 + kiWidth) >> 4) * ((15 + kiHeight) >> 4);
@@ -134,22 +134,22 @@ void FreePicture (CMemoryAlign* pMa, SPicture** ppPic) {
       pMa->WelsFree (pPic->pBuffer, "pPic->pBuffer");
       pPic->pBuffer = NULL;
     }
-    pPic->pBuffer		= NULL;
-    pPic->pData[0]	=
-      pPic->pData[1]	=
-        pPic->pData[2]	= NULL;
-    pPic->iLineSize[0] =
-      pPic->iLineSize[1] =
+    pPic->pBuffer          = NULL;
+    pPic->pData[0]         =
+      pPic->pData[1]       =
+        pPic->pData[2]     = NULL;
+    pPic->iLineSize[0]     =
+      pPic->iLineSize[1]   =
         pPic->iLineSize[2] = 0;
 
-    pPic->iWidthInPixel		= 0;
-    pPic->iHeightInPixel	= 0;
-    pPic->iFrameNum			= -1;
+    pPic->iWidthInPixel         = 0;
+    pPic->iHeightInPixel        = 0;
+    pPic->iFrameNum             = -1;
 
-    pPic->bIsLongRef		= false;
-    pPic->uiRecieveConfirmed  = 0;
-    pPic->iLongTermPicNum  = -1;
-    pPic->iMarkFrameNum		= -1;
+    pPic->bIsLongRef            = false;
+    pPic->uiRecieveConfirmed    = 0;
+    pPic->iLongTermPicNum       = -1;
+    pPic->iMarkFrameNum         = -1;
 
     if (pPic->uiRefMbType) {
       pMa->WelsFree (pPic->uiRefMbType, "pPic->uiRefMbType");

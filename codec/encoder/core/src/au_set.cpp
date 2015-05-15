@@ -468,9 +468,9 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
                      const uint32_t kuiSpsId, const bool kbEnableFrameCropping, bool bEnableRc,
                      const int32_t kiDlayerCount, bool bSVCBaselayer) {
   memset (pSps, 0, sizeof (SWelsSPS));
-  pSps->uiSpsId		= kuiSpsId;
-  pSps->iMbWidth	= (pLayerParam->iVideoWidth + 15) >> 4;
-  pSps->iMbHeight	= (pLayerParam->iVideoHeight + 15) >> 4;
+  pSps->uiSpsId         = kuiSpsId;
+  pSps->iMbWidth        = (pLayerParam->iVideoWidth + 15) >> 4;
+  pSps->iMbHeight       = (pLayerParam->iVideoHeight + 15) >> 4;
 
   //max value of both iFrameNum and POC are 2^16-1, in our encoder, iPOC=2*iFrameNum, so max of iFrameNum should be 2^15-1.--
   pSps->uiLog2MaxFrameNum = 15;//16;
@@ -536,9 +536,9 @@ int32_t WelsInitSubsetSps (SSubsetSps* pSubsetSps, SSpatialLayerConfig* pLayerPa
   pSps->uiProfileIdc	= (pLayerParam->uiProfileIdc >= PRO_SCALABLE_BASELINE) ? pLayerParam->uiProfileIdc :
                         PRO_SCALABLE_BASELINE;
 
-  pSubsetSps->sSpsSvcExt.iExtendedSpatialScalability	= 0;	/* ESS is 0 in default */
-  pSubsetSps->sSpsSvcExt.bAdaptiveTcoeffLevelPredFlag	= false;
-  pSubsetSps->sSpsSvcExt.bSeqTcoeffLevelPredFlag	= false;
+  pSubsetSps->sSpsSvcExt.iExtendedSpatialScalability    = 0;    /* ESS is 0 in default */
+  pSubsetSps->sSpsSvcExt.bAdaptiveTcoeffLevelPredFlag   = false;
+  pSubsetSps->sSpsSvcExt.bSeqTcoeffLevelPredFlag        = false;
   pSubsetSps->sSpsSvcExt.bSliceHeaderRestrictionFlag = true;
 
   return 0;
@@ -594,11 +594,11 @@ int32_t WelsInitPps (SWelsPPS* pPps,
   }
 #endif//!DISABLE_FMO_FEATURE
 
-  pPps->iPicInitQp							= 26;
-  pPps->iPicInitQs							= 26;
+  pPps->iPicInitQp = 26;
+  pPps->iPicInitQs = 26;
 
-  pPps->uiChromaQpIndexOffset					= 0;
-  pPps->bDeblockingFilterControlPresentFlag	= kbDeblockingFilterPresentFlag;
+  pPps->uiChromaQpIndexOffset                   = 0;
+  pPps->bDeblockingFilterControlPresentFlag     = kbDeblockingFilterPresentFlag;
 
   return 0;
 }

@@ -9,7 +9,7 @@ using namespace WelsEnc;
 
 TEST (GetIntraPredictorTest, TestGetI4x4LumaPredV) {
   uint8_t* pPred = new uint8_t[64];
-  uint8_t*	pRef  = new uint8_t[64];
+  uint8_t* pRef  = new uint8_t[64];
   for (int i = 0; i < 64; i++)
     pRef[i] = rand() % 256;
 
@@ -137,8 +137,8 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredDDLTop) {
 
 TEST (GetIntraPredictorTest, TestGetI4x4LumaPredDDR) {
   const int32_t kiStride = rand() % 256 + 16;
-  const int32_t kiStride2	= kiStride << 1;
-  const int32_t kiStride3	= kiStride + kiStride2;
+  const int32_t kiStride2 = kiStride << 1;
+  const int32_t kiStride3 = kiStride + kiStride2;
 
   uint8_t* pPred = new uint8_t[64];
   uint8_t* pRef  = new uint8_t[kiStride3 + kiStride + 1];

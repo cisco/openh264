@@ -72,12 +72,12 @@ int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize) {
     ++ uiIdx;
   } while (uiIdx < kuiSize);
 
-  (*ppAu)->uiCountUnitsNum	= kuiSize;
-  (*ppAu)->uiAvailUnitsNum	= 0;
-  (*ppAu)->uiActualUnitsNum	= 0;
+  (*ppAu)->uiCountUnitsNum      = kuiSize;
+  (*ppAu)->uiAvailUnitsNum      = 0;
+  (*ppAu)->uiActualUnitsNum     = 0;
   (*ppAu)->uiStartPos           = 0;
-  (*ppAu)->uiEndPos		= 0;
-  (*ppAu)->bCompletedAuFlag	= false;
+  (*ppAu)->uiEndPos             = 0;
+  (*ppAu)->bCompletedAuFlag     = false;
 
   return 0;
 }
@@ -109,11 +109,11 @@ int32_t ExpandNalUnitList (PAccessUnit* ppAu, const int32_t kiOrgSize, const int
       ++ iIdx;
     } while (iIdx < kiOrgSize);
 
-    pTmp->uiCountUnitsNum	= kiExpSize;
-    pTmp->uiAvailUnitsNum	= (*ppAu)->uiAvailUnitsNum;
-    pTmp->uiActualUnitsNum	= (*ppAu)->uiActualUnitsNum;
-    pTmp->uiEndPos		    = (*ppAu)->uiEndPos;
-    pTmp->bCompletedAuFlag	= (*ppAu)->bCompletedAuFlag;
+    pTmp->uiCountUnitsNum       = kiExpSize;
+    pTmp->uiAvailUnitsNum       = (*ppAu)->uiAvailUnitsNum;
+    pTmp->uiActualUnitsNum      = (*ppAu)->uiActualUnitsNum;
+    pTmp->uiEndPos              = (*ppAu)->uiEndPos;
+    pTmp->bCompletedAuFlag      = (*ppAu)->bCompletedAuFlag;
 
     MemFreeNalList (ppAu);	// free old list
     *ppAu = pTmp;

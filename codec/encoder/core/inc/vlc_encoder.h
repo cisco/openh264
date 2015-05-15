@@ -57,8 +57,8 @@ extern const ALIGNED_DECLARE (uint8_t, g_kuiEncNcMapTable[18], 16);
 
 static inline int32_t WriteTotalCoeffTrailingones (SBitStringAux* pBs, uint8_t uiNc, uint8_t uiTotalCoeff,
     uint8_t uiTrailingOnes) {
-const uint8_t kuiNcIdx		= g_kuiEncNcMapTable[uiNc];
-const uint8_t* kpCoeffToken	= &g_kuiVlcCoeffToken[kuiNcIdx][uiTotalCoeff][uiTrailingOnes][0];
+const uint8_t kuiNcIdx      = g_kuiEncNcMapTable[uiNc];
+const uint8_t* kpCoeffToken = &g_kuiVlcCoeffToken[kuiNcIdx][uiTotalCoeff][uiTrailingOnes][0];
 return BsWriteBits (pBs,  kpCoeffToken[1], kpCoeffToken[0]);
 }
 

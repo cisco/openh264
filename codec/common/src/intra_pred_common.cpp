@@ -65,8 +65,8 @@ void WelsI16x16LumaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStrid
   uint8_t i = 15;
 
   do {
-    const uint8_t kuiSrc8	= pRef[iStridex15 - 1];
-    const uint64_t kuiV64	= (uint64_t) (0x0101010101010101ULL * kuiSrc8);
+    const uint8_t kuiSrc8 = pRef[iStridex15 - 1];
+    const uint64_t kuiV64 = (uint64_t) (0x0101010101010101ULL * kuiSrc8);
     ST64 (&pPred[iPredStridex15], kuiV64);
     ST64 (&pPred[iPredStridex15 + 8], kuiV64);
 

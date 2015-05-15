@@ -350,8 +350,8 @@ EResult CComplexityAnalysisScreen::Get (int32_t nType, void* pParam) {
 void CComplexityAnalysisScreen::GomComplexityAnalysisIntra (SPixMap* pSrc) {
   int32_t iWidth                  = pSrc->sRect.iRectWidth;
   int32_t iHeight                 = pSrc->sRect.iRectHeight;
-  int32_t iBlockWidth            = iWidth  >> 4;
-  int32_t iBlockHeight	       = iHeight >> 4;
+  int32_t iBlockWidth             = iWidth  >> 4;
+  int32_t iBlockHeight            = iHeight >> 4;
 
   int32_t iBlockSadH, iBlockSadV, iGomSad = 0;
   int32_t iIdx = 0;
@@ -406,8 +406,8 @@ void CComplexityAnalysisScreen::GomComplexityAnalysisIntra (SPixMap* pSrc) {
 void CComplexityAnalysisScreen::GomComplexityAnalysisInter (SPixMap* pSrc, SPixMap* pRef, bool bScrollFlag) {
   int32_t iWidth                  = pSrc->sRect.iRectWidth;
   int32_t iHeight                 = pSrc->sRect.iRectHeight;
-  int32_t iBlockWidth            = iWidth  >> 4;
-  int32_t iBlockHeight	       = iHeight >> 4;
+  int32_t iBlockWidth             = iWidth  >> 4;
+  int32_t iBlockHeight            = iHeight >> 4;
 
   int32_t iInterSad, iScrollSad, iBlockSadH, iBlockSadV, iGomSad = 0;
   int32_t iIdx = 0;

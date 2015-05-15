@@ -93,9 +93,9 @@ static int32_t CreatePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, cons
   }
 
 // initialize context in queue
-  pPicBuf->iCapacity	 = kiSize;
+  pPicBuf->iCapacity   = kiSize;
   pPicBuf->iCurrentIdx = 0;
-  * ppPicBuf			 = pPicBuf;
+  * ppPicBuf           = pPicBuf;
 
   return 0;
 }
@@ -139,9 +139,9 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   memcpy (pPicNewBuf->ppPic, pPicOldBuf->ppPic, kiOldSize * sizeof (PPicture));
 
 // initialize context in queue
-  pPicNewBuf->iCapacity	 = kiNewSize;
+  pPicNewBuf->iCapacity   = kiNewSize;
   pPicNewBuf->iCurrentIdx = pPicOldBuf->iCurrentIdx;
-  * ppPicBuf			 = pPicNewBuf;
+  * ppPicBuf              = pPicNewBuf;
 
   for (int32_t i = 0; i < pPicNewBuf->iCapacity; i++) {
     pPicNewBuf->ppPic[i]->bUsedAsRef = false;
@@ -214,8 +214,8 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   }
 
   // initialize context in queue
-  pPicNewBuf->iCapacity	 = kiNewSize;
-  *ppPicBuf			 = pPicNewBuf;
+  pPicNewBuf->iCapacity = kiNewSize;
+  *ppPicBuf             = pPicNewBuf;
 
   for (int32_t i = 0; i < pPicNewBuf->iCapacity; i++) {
     pPicNewBuf->ppPic[i]->bUsedAsRef = false;
@@ -277,35 +277,35 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
 
   pCtx->pArgDec                   = NULL;
 
-  pCtx->eOutputColorFormat		= videoFormatI420;	// yuv in default
-  pCtx->bHaveGotMemory			= false;	// not ever request memory blocks for decoder context related
-  pCtx->uiCpuFlag					= 0;
+  pCtx->eOutputColorFormat        = videoFormatI420;    // yuv in default
+  pCtx->bHaveGotMemory            = false;              // not ever request memory blocks for decoder context related
+  pCtx->uiCpuFlag                 = 0;
 
-  pCtx->bAuReadyFlag				= 0; // au data is not ready
+  pCtx->bAuReadyFlag              = 0;                  // au data is not ready
   pCtx->bCabacInited = false;
 
   pCtx->uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores);
 
-  pCtx->iImgWidthInPixel		= 0;
-  pCtx->iImgHeightInPixel		= 0;		// alloc picture data when picture size is available
-  pCtx->iLastImgWidthInPixel		= 0;
-  pCtx->iLastImgHeightInPixel		= 0;
+  pCtx->iImgWidthInPixel          = 0;
+  pCtx->iImgHeightInPixel         = 0;                  // alloc picture data when picture size is available
+  pCtx->iLastImgWidthInPixel      = 0;
+  pCtx->iLastImgHeightInPixel     = 0;
   pCtx->bFreezeOutput = true;
 
-  pCtx->iFrameNum				= -1;
-  pCtx->iPrevFrameNum			= -1;
-  pCtx->iErrorCode			= ERR_NONE;
+  pCtx->iFrameNum                 = -1;
+  pCtx->iPrevFrameNum             = -1;
+  pCtx->iErrorCode                = ERR_NONE;
 
-  pCtx->pDec					= NULL;
+  pCtx->pDec                      = NULL;
 
   WelsResetRefPic (pCtx);
 
-  pCtx->iActiveFmoNum			= 0;
+  pCtx->iActiveFmoNum             = 0;
 
-  pCtx->pPicBuff[LIST_0]		= NULL;
-  pCtx->pPicBuff[LIST_1]		= NULL;
+  pCtx->pPicBuff[LIST_0]          = NULL;
+  pCtx->pPicBuff[LIST_1]          = NULL;
 
-  pCtx->bAvcBasedFlag			= true;
+  pCtx->bAvcBasedFlag             = true;
   pCtx->eErrorConMethod = ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
   pCtx->pPreviousDecodedPictureInDpb = NULL;
   pCtx->sDecoderStatistics.iAvgLumaQp = -1;
@@ -353,13 +353,13 @@ static inline int32_t GetTargetRefListSize (PWelsDecoderContext pCtx) {
  *  request memory blocks for decoder avc part
  */
 int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight) {
-  const int32_t kiPicWidth	= kiMbWidth << 4;
-  const int32_t kiPicHeight	= kiMbHeight << 4;
+  const int32_t kiPicWidth      = kiMbWidth << 4;
+  const int32_t kiPicHeight     = kiMbHeight << 4;
   int32_t iErr = ERR_NONE;
 
-  int32_t iListIdx			= 0;	//, mb_blocks	= 0;
-  int32_t	iPicQueueSize		= 0;	// adaptive size of picture queue, = (pSps->iNumRefFrames x 2)
-  bool  bNeedChangePicQueue	= true;
+  int32_t iListIdx              = 0;    //, mb_blocks   = 0;
+  int32_t iPicQueueSize         = 0;    // adaptive size of picture queue, = (pSps->iNumRefFrames x 2)
+  bool  bNeedChangePicQueue     = true;
 
   WELS_VERIFY_RETURN_IF (ERR_INFO_INVALID_PARAM, (NULL == pCtx || kiPicWidth <= 0 || kiPicHeight <= 0))
 
@@ -418,11 +418,11 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
     return iErr;
 
 
-  pCtx->iImgWidthInPixel	= kiPicWidth;	// target width of image to be reconstruted while decoding
-  pCtx->iImgHeightInPixel	= kiPicHeight;	// target height of image to be reconstruted while decoding
+  pCtx->iImgWidthInPixel    = kiPicWidth;   // target width of image to be reconstruted while decoding
+  pCtx->iImgHeightInPixel   = kiPicHeight;  // target height of image to be reconstruted while decoding
 
-  pCtx->bHaveGotMemory	= true;			// global memory for decoder context related is requested
-  pCtx->pDec		        = NULL;			// need prefetch a new pic due to spatial size changed
+  pCtx->bHaveGotMemory      = true;         // global memory for decoder context related is requested
+  pCtx->pDec                = NULL;         // need prefetch a new pic due to spatial size changed
 
   if (pCtx->pCabacDecEngine == NULL)
     pCtx->pCabacDecEngine = (SWelsCabacDecEngine*) WelsMallocz (sizeof (SWelsCabacDecEngine), "pCtx->pCabacDecEngine");
@@ -450,12 +450,12 @@ void WelsFreeMem (PWelsDecoderContext pCtx) {
   }
 
   // added for safe memory
-  pCtx->iImgWidthInPixel	= 0;
+  pCtx->iImgWidthInPixel  = 0;
   pCtx->iImgHeightInPixel = 0;
-  pCtx->iLastImgWidthInPixel	= 0;
+  pCtx->iLastImgWidthInPixel  = 0;
   pCtx->iLastImgHeightInPixel = 0;
   pCtx->bFreezeOutput = true;
-  pCtx->bHaveGotMemory	= false;
+  pCtx->bHaveGotMemory = false;
   WelsFree (pCtx->pCabacDecEngine, "pCtx->pCabacDecEngine");
 }
 
@@ -660,8 +660,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
           ((pSrcNal[2 + iSrcIdx] == 0x03) || (pSrcNal[2 + iSrcIdx] == 0x01))) {
         if (pSrcNal[2 + iSrcIdx] == 0x03) {
           ST16 (pDstNal + iDstIdx, 0);
-          iDstIdx	+= 2;
-          iSrcIdx	+= 3;
+          iDstIdx      += 2;
+          iSrcIdx      += 3;
           iSrcConsumed += 3;
         } else {
 
@@ -817,7 +817,7 @@ int32_t DecoderSetCsp (PWelsDecoderContext pCtx, const int32_t kiColorFormat) {
  */
 int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight) {
   int32_t iErr = ERR_NONE;
-  const int32_t kiPicWidth	= kiMbWidth << 4;
+  const int32_t kiPicWidth    = kiMbWidth << 4;
   const int32_t kiPicHeight   = kiMbHeight << 4;
 
   iErr = WelsRequestMem (pCtx, kiMbWidth, kiMbHeight);	// common memory used

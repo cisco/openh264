@@ -73,8 +73,8 @@ int    g_iDecodedFrameNum = 0;
 
 void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, const char* kpOuputFileName,
                          int32_t& iWidth, int32_t& iHeight, const char* pOptionFileName, const char* pLengthFileName) {
-  FILE* pH264File	  = NULL;
-  FILE* pYuvFile	  = NULL;
+  FILE* pH264File   = NULL;
+  FILE* pYuvFile    = NULL;
   FILE* pOptionFile = NULL;
 // Lenght input mode support
   FILE* fpTrack = NULL;
@@ -237,8 +237,8 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
       pDst[1] = pData[1];
       pDst[2] = pData[2];
     }
-    iEnd	= WelsTime();
-    iTotal	+= iEnd - iStart;
+    iEnd    = WelsTime();
+    iTotal += iEnd - iStart;
     if (sDstBufInfo.iBufferStatus == 1) {
       cOutputModule.Process ((void**)pDst, &sDstBufInfo, pYuvFile);
       iWidth  = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
@@ -269,8 +269,8 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
       pDst[1] = pData[1];
       pDst[2] = pData[2];
     }
-    iEnd	= WelsTime();
-    iTotal	+= iEnd - iStart;
+    iEnd    = WelsTime();
+    iTotal += iEnd - iStart;
     if (sDstBufInfo.iBufferStatus == 1) {
       cOutputModule.Process ((void**)pDst, &sDstBufInfo, pYuvFile);
       iWidth  = sDstBufInfo.UsrData.sSystemBuffer.iWidth;

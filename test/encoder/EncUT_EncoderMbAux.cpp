@@ -421,8 +421,8 @@ void WelsHadamardT4DcAnchor (int16_t* pLumaDc, int16_t* pDct) {
   int32_t i, iIdx;
   for (i = 0 ; i < 16 ; i += 4) {
     iIdx = ((i & 0x08) << 4) + ((i & 0x04) << 3);
-    s[0] = pDct[iIdx ]	 + pDct[iIdx + 80];
-    s[3] = pDct[iIdx ]	 - pDct[iIdx + 80];
+    s[0] = pDct[iIdx ]     + pDct[iIdx + 80];
+    s[3] = pDct[iIdx ]     - pDct[iIdx + 80];
     s[1] = pDct[iIdx + 16] + pDct[iIdx + 64];
     s[2] = pDct[iIdx + 16] - pDct[iIdx + 64];
     p[i  ] = s[0] + s[1];

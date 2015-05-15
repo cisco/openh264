@@ -374,8 +374,8 @@ int32_t ParseIntraPredModeChromaCabac (PWelsDecoderContext pCtx, uint8_t uiNeigh
 
 int32_t ParseInterMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
                                    int16_t pMotionVector[LIST_A][30][MV_A], int16_t pMvdCache[LIST_A][30][MV_A], int8_t pRefIndex[LIST_A][30]) {
-  PSlice pSlice				= &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer;
-  PSliceHeader pSliceHeader	= &pSlice->sSliceHeaderExt.sSliceHeader;
+  PSlice pSlice                 = &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer;
+  PSliceHeader pSliceHeader     = &pSlice->sSliceHeaderExt.sSliceHeader;
   PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
   PPicture* ppRefPic = pCtx->sRefPic.pRefList[LIST_0];
   int32_t pRefCount[2];

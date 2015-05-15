@@ -45,31 +45,31 @@ namespace WelsEnc {
  */
 void WelsLoadNal (SWelsEncoderOutput* pEncoderOuput, const int32_t/*EWelsNalUnitType*/ kiType,
                   const int32_t/*EWelsNalRefIdc*/ kiNalRefIdc) {
-  SWelsEncoderOutput* pWelsEncoderOuput	= pEncoderOuput;
-  SWelsNalRaw* pRawNal			= &pWelsEncoderOuput->sNalList[ pWelsEncoderOuput->iNalIndex ];
-  SNalUnitHeader* sNalUnitHeader	= &pRawNal->sNalExt.sNalUnitHeader;
-  const int32_t kiStartPos		= (BsGetBitsPos (&pWelsEncoderOuput->sBsWrite) >> 3);
+  SWelsEncoderOutput* pWelsEncoderOuput = pEncoderOuput;
+  SWelsNalRaw* pRawNal                  = &pWelsEncoderOuput->sNalList[ pWelsEncoderOuput->iNalIndex ];
+  SNalUnitHeader* sNalUnitHeader        = &pRawNal->sNalExt.sNalUnitHeader;
+  const int32_t kiStartPos              = (BsGetBitsPos (&pWelsEncoderOuput->sBsWrite) >> 3);
 
-  sNalUnitHeader->eNalUnitType	= (EWelsNalUnitType)kiType;
-  sNalUnitHeader->uiNalRefIdc		= (EWelsNalRefIdc)kiNalRefIdc;
-  sNalUnitHeader->uiForbiddenZeroBit	= 0;
+  sNalUnitHeader->eNalUnitType          = (EWelsNalUnitType)kiType;
+  sNalUnitHeader->uiNalRefIdc           = (EWelsNalRefIdc)kiNalRefIdc;
+  sNalUnitHeader->uiForbiddenZeroBit    = 0;
 
-  pRawNal->pRawData		= &pWelsEncoderOuput->pBsBuffer[kiStartPos];
-  pRawNal->iStartPos	 = kiStartPos;
-  pRawNal->iPayloadSize	= 0;
+  pRawNal->pRawData     = &pWelsEncoderOuput->pBsBuffer[kiStartPos];
+  pRawNal->iStartPos    = kiStartPos;
+  pRawNal->iPayloadSize = 0;
 }
 
 /*!
  * \brief   unload pRawNal NAL
  */
 void WelsUnloadNal (SWelsEncoderOutput* pEncoderOuput) {
-  SWelsEncoderOutput*	pWelsEncoderOuput = pEncoderOuput;
-  int32_t*	pIdx			= &pWelsEncoderOuput->iNalIndex;
-  SWelsNalRaw* pRawNal		= &pWelsEncoderOuput->sNalList[ *pIdx ];
-  const int32_t kiEndPos		= (BsGetBitsPos (&pWelsEncoderOuput->sBsWrite) >> 3);
+  SWelsEncoderOutput*   pWelsEncoderOuput = pEncoderOuput;
+  int32_t*      pIdx            = &pWelsEncoderOuput->iNalIndex;
+  SWelsNalRaw* pRawNal          = &pWelsEncoderOuput->sNalList[ *pIdx ];
+  const int32_t kiEndPos        = (BsGetBitsPos (&pWelsEncoderOuput->sBsWrite) >> 3);
 
   /* count payload size of pRawNal NAL */
-  pRawNal->iPayloadSize	= kiEndPos - pRawNal->iStartPos;
+  pRawNal->iPayloadSize = kiEndPos - pRawNal->iStartPos;
 
   ++ (*pIdx);
 }
@@ -79,33 +79,33 @@ void WelsUnloadNal (SWelsEncoderOutput* pEncoderOuput) {
  */
 void WelsLoadNalForSlice (SWelsSliceBs* pSliceBsIn, const int32_t/*EWelsNalUnitType*/ kiType,
                           const int32_t/*EWelsNalRefIdc*/ kiNalRefIdc) {
-  SWelsSliceBs* pSliceBs		    = pSliceBsIn;
-  SWelsNalRaw* pRawNal		= &pSliceBs->sNalList[ pSliceBs->iNalIndex ];
-  SNalUnitHeader* sNalUnitHeader	= &pRawNal->sNalExt.sNalUnitHeader;
-  SBitStringAux* pBitStringAux	= &pSliceBs->sBsWrite;
-  const int32_t kiStartPos		    = (BsGetBitsPos (pBitStringAux) >> 3);
+  SWelsSliceBs* pSliceBs                = pSliceBsIn;
+  SWelsNalRaw* pRawNal                  = &pSliceBs->sNalList[ pSliceBs->iNalIndex ];
+  SNalUnitHeader* sNalUnitHeader        = &pRawNal->sNalExt.sNalUnitHeader;
+  SBitStringAux* pBitStringAux          = &pSliceBs->sBsWrite;
+  const int32_t kiStartPos              = (BsGetBitsPos (pBitStringAux) >> 3);
 
-  sNalUnitHeader->eNalUnitType	= (EWelsNalUnitType)kiType;
-  sNalUnitHeader->uiNalRefIdc		= (EWelsNalRefIdc)kiNalRefIdc;
-  sNalUnitHeader->uiForbiddenZeroBit	= 0;
+  sNalUnitHeader->eNalUnitType          = (EWelsNalUnitType)kiType;
+  sNalUnitHeader->uiNalRefIdc           = (EWelsNalRefIdc)kiNalRefIdc;
+  sNalUnitHeader->uiForbiddenZeroBit    = 0;
 
-  pRawNal->pRawData		= &pSliceBs->pBsBuffer[kiStartPos];
-  pRawNal->iStartPos	 = kiStartPos;
-  pRawNal->iPayloadSize	= 0;
+  pRawNal->pRawData     = &pSliceBs->pBsBuffer[kiStartPos];
+  pRawNal->iStartPos    = kiStartPos;
+  pRawNal->iPayloadSize = 0;
 }
 
 /*!
  * \brief   unload pRawNal NAL
  */
 void WelsUnloadNalForSlice (SWelsSliceBs* pSliceBsIn) {
-  SWelsSliceBs* pSliceBs	        = pSliceBsIn;
-  int32_t*	pIdx			            = &pSliceBs->iNalIndex;
-  SWelsNalRaw* pRawNal		= &pSliceBs->sNalList[ *pIdx ];
-  SBitStringAux* pBitStringAux	= &pSliceBs->sBsWrite;
-  const int32_t kiEndPos		        = (BsGetBitsPos (pBitStringAux) >> 3);
+  SWelsSliceBs* pSliceBs        = pSliceBsIn;
+  int32_t*      pIdx            = &pSliceBs->iNalIndex;
+  SWelsNalRaw* pRawNal          = &pSliceBs->sNalList[ *pIdx ];
+  SBitStringAux* pBitStringAux  = &pSliceBs->sBsWrite;
+  const int32_t kiEndPos        = (BsGetBitsPos (pBitStringAux) >> 3);
 
   /* count payload size of pRawNal NAL */
-  pRawNal->iPayloadSize	= kiEndPos - pRawNal->iStartPos;
+  pRawNal->iPayloadSize = kiEndPos - pRawNal->iStartPos;
 
   ++ (*pIdx);
 }
@@ -132,12 +132,12 @@ int32_t WelsEncodeNal (SWelsNalRaw* pRawNal, void* pNalHeaderExt, const int32_t 
     return ENC_RETURN_MEMALLOCERR;
     //TODO: call the realloc&copy instead
   }
-  uint8_t* pDstStart	    = (uint8_t*)pDst;
-  uint8_t* pDstPointer	= pDstStart;
-  uint8_t* pSrcPointer	= pRawNal->pRawData;
-  uint8_t* pSrcEnd		= pRawNal->pRawData + pRawNal->iPayloadSize;
-  int32_t iZeroCount		= 0;
-  int32_t iNalLength		= 0;
+  uint8_t* pDstStart    = (uint8_t*)pDst;
+  uint8_t* pDstPointer  = pDstStart;
+  uint8_t* pSrcPointer  = pRawNal->pRawData;
+  uint8_t* pSrcEnd      = pRawNal->pRawData + pRawNal->iPayloadSize;
+  int32_t iZeroCount    = 0;
+  int32_t iNalLength    = 0;
   *pDstLen = 0;
 
   static const uint8_t kuiStartCodePrefix[NAL_HEADER_SIZE] = { 0, 0, 0, 1 };
