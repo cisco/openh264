@@ -97,7 +97,8 @@ void FillQpelLocationByFeatureValue_ref (uint16_t* pFeatureOfBlock, const int32_
   for (int32_t y = 0; y < kiHeight; y++) {
     for (int32_t x = 0; x < kiWidth; x++) {
       uint16_t uiFeature = pSrcPointer[x];
-      ST32 (&pFeatureValuePointerList[uiFeature][0], ((iQpelY << 16) | (x << 2)));
+      pFeatureValuePointerList[uiFeature][0] = x << 2;
+      pFeatureValuePointerList[uiFeature][1] = iQpelY;
       pFeatureValuePointerList[uiFeature] += 2;
     }
     iQpelY += 4;
