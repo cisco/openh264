@@ -3418,7 +3418,7 @@ int32_t ForceCodingIDR (sWelsEncCtx* pCtx) {
 
   pCtx->bEncCurFrmAsIdrFlag = true;
   pCtx->iCodingIndex	= 0;
-
+  pCtx->bCheckWindowStatusRefreshFlag = false;
   return 0;
 }
 
