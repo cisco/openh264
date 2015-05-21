@@ -1976,7 +1976,7 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
   WelsDecodeAccessUnitEnd (pCtx);
 
   if (ERR_NONE != iErr) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "returned error from decoding:[0x%x]", iErr);
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "returned error from decoding:[0x%x]", iErr);
     return iErr;
   }
 
