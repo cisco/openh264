@@ -537,7 +537,7 @@ typedef struct Source_Picture_s {
   unsigned char*  pData[4];        ///< plane pData
   int       iPicWidth;             ///< luma picture width in x coordinate
   int       iPicHeight;            ///< luma picture height in y coordinate
-  long long uiTimeStamp;
+  long long uiTimeStamp;           ///< timestamp of the source picture, unit: millisecond
 } SSourcePicture;
 /**
 * @brief Structure for bit rate info

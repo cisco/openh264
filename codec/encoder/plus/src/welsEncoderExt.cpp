@@ -597,7 +597,8 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
     }
 
     if (m_pEncContext->pSvcParam->iRCMode == RC_QUALITY_MODE || m_pEncContext->pSvcParam->iRCMode == RC_BITRATE_MODE) {
-      if (WELS_ABS (pStatistics->fLatestFrameRate - m_pEncContext->pSvcParam->fMaxFrameRate) > 5) {
+      if ((pStatistics->fLatestFrameRate > 0)
+          && WELS_ABS (m_pEncContext->pSvcParam->fMaxFrameRate - pStatistics->fLatestFrameRate) > 5) {
         WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
                  "Actual Input Framerate %f is different from framerate in setting %f, suggest to use other rate control modes",
                  pStatistics->fLatestFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate);
