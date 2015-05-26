@@ -934,29 +934,29 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   }
   break;
   case ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION: {
-    int32_t iValue = * (static_cast<int32_t*>(pOption));
+    int32_t iValue = * (static_cast<int32_t*> (pOption));
     EParameterSetStrategy eNewStrategy = CONSTANT_ID;
     switch (iValue) {
-      case 0:
-        eNewStrategy = CONSTANT_ID;
-        break;
-      case 0x01:
-        eNewStrategy = INCREASING_ID;
-        break;
-      case 0x02:
-        eNewStrategy = SPS_LISTING;
-        break;
-      case 0x03:
-        eNewStrategy = SPS_LISTING_AND_PPS_INCREASING;
-        break;
-      case 0x06:
-        eNewStrategy = SPS_PPS_LISTING;
-        break;
-      default:
-        WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
-                 " CWelsH264SVCEncoder::SetOption eSpsPpsIdStrategy(%d) not in valid range, unchanged! existing=%d",
-                 iValue, m_pEncContext->pSvcParam->eSpsPpsIdStrategy);
-        break;
+    case 0:
+      eNewStrategy = CONSTANT_ID;
+      break;
+    case 0x01:
+      eNewStrategy = INCREASING_ID;
+      break;
+    case 0x02:
+      eNewStrategy = SPS_LISTING;
+      break;
+    case 0x03:
+      eNewStrategy = SPS_LISTING_AND_PPS_INCREASING;
+      break;
+    case 0x06:
+      eNewStrategy = SPS_PPS_LISTING;
+      break;
+    default:
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
+               " CWelsH264SVCEncoder::SetOption eSpsPpsIdStrategy(%d) not in valid range, unchanged! existing=%d",
+               iValue, m_pEncContext->pSvcParam->eSpsPpsIdStrategy);
+      break;
     }
 
     if (((eNewStrategy & SPS_LISTING) || (m_pEncContext->pSvcParam->eSpsPpsIdStrategy & SPS_LISTING))

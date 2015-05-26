@@ -927,3 +927,112 @@ TEST_F (EncoderInterfaceTest, SkipFrameCheck) {
   // finish
   pPtrEnc->Uninitialize();
 }
+
+TEST_F (EncoderInterfaceTest, DiffResolutionCheck) {
+  SEncParamExt sEncParamExt;
+  int iResult = pPtrEnc->GetDefaultParams (&sEncParamExt);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+
+  //actual encode param: iUsageType = 0, spatial_layer_num = 1, temporal_layer_num = 3, frame_rate = 28.248587, target_bitrate = 573000, denoise =0, background_detection = 1, adaptive_quant = 1, enable_crop_pic = 1, scenechange_detection = 0, enable_long_term_reference = 0, ltr_mark_period = 30, ltr_ref_num = 0, enable_multiple_slice = 1, padding = 0, rc_mode = 1, enable_frame_skip = 1, max_bitrate = 573000, max_nalu_size = 0s
+  //actual encode param: spatial 0: width=360, height=640, frame_rate=28.248587, spatial_bitrate=573000, max_layer_bitrate =895839855, max_nalu_size=0, slice_mode=1,this=0x7c62ee48
+  sEncParamExt.iUsageType = CAMERA_VIDEO_REAL_TIME;
+  sEncParamExt.iPicWidth = 360;
+  sEncParamExt.iPicHeight = 640;
+  sEncParamExt.iTargetBitrate = 1000000;
+  sEncParamExt.iRCMode = RC_BITRATE_MODE;
+  sEncParamExt.fMaxFrameRate = 24;
+
+  sEncParamExt.iTemporalLayerNum = 3;
+  sEncParamExt.iSpatialLayerNum = 3;
+  sEncParamExt.bEnableLongTermReference = 0;
+  sEncParamExt.bEnableSceneChangeDetect = 0;
+  sEncParamExt.bEnableFrameSkip = 1;
+  sEncParamExt.uiMaxNalSize = 0;
+
+  sEncParamExt.sSpatialLayers[0].uiLevelIdc = LEVEL_UNKNOWN;
+  sEncParamExt.sSpatialLayers[0].iVideoWidth = 90;
+  sEncParamExt.sSpatialLayers[0].iVideoHeight = 160;
+  sEncParamExt.sSpatialLayers[0].fFrameRate = 6;
+  sEncParamExt.sSpatialLayers[0].iSpatialBitrate = 80000;
+  sEncParamExt.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+
+  sEncParamExt.sSpatialLayers[1].uiLevelIdc = LEVEL_UNKNOWN;
+  sEncParamExt.sSpatialLayers[1].iVideoWidth = 180;
+  sEncParamExt.sSpatialLayers[1].iVideoHeight = 320;
+  sEncParamExt.sSpatialLayers[1].fFrameRate = 12;
+  sEncParamExt.sSpatialLayers[1].iSpatialBitrate = 200000;
+  sEncParamExt.sSpatialLayers[1].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+
+  sEncParamExt.sSpatialLayers[2].uiLevelIdc = LEVEL_UNKNOWN;
+  sEncParamExt.sSpatialLayers[2].iVideoWidth = 360;
+  sEncParamExt.sSpatialLayers[2].iVideoHeight = 640;
+  sEncParamExt.sSpatialLayers[2].fFrameRate = 24;
+  sEncParamExt.sSpatialLayers[2].iSpatialBitrate = 600000;
+  sEncParamExt.sSpatialLayers[2].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+
+  pParamExt->iPicWidth = sEncParamExt.iPicWidth;
+  pParamExt->iPicHeight = sEncParamExt.iPicWidth;
+
+  iResult = pPtrEnc->InitializeExt (&sEncParamExt);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess)) << "iUsageType = " << sEncParamExt.iUsageType <<
+      ", iPicWidth = " << sEncParamExt.iPicWidth << ", iPicHeight = " << sEncParamExt.iPicHeight << ", iTargetBitrate = " <<
+      sEncParamExt.iTargetBitrate << ", fMaxFrameRate = " << sEncParamExt.fMaxFrameRate;
+
+  PrepareOneSrcFrame();
+  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  pSrcPic->uiTimeStamp += 30;
+
+  //correct setting
+  sEncParamExt.iSpatialLayerNum = 2;
+  sEncParamExt.sSpatialLayers[1].uiLevelIdc = LEVEL_UNKNOWN;
+  sEncParamExt.sSpatialLayers[1].iVideoWidth = 360;
+  sEncParamExt.sSpatialLayers[1].iVideoHeight = 640;
+  sEncParamExt.sSpatialLayers[1].fFrameRate = 24;
+  sEncParamExt.sSpatialLayers[1].iSpatialBitrate = 600000;
+  iResult = pPtrEnc->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sEncParamExt);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+
+  PrepareOneSrcFrame();
+  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  pSrcPic->uiTimeStamp += 30;
+
+  //incorrect setting
+  int uiTraceLevel = WELS_LOG_QUIET;
+  pPtrEnc->SetOption (ENCODER_OPTION_TRACE_LEVEL, &uiTraceLevel);
+
+  sEncParamExt.sSpatialLayers[1].iVideoWidth = 90;
+  sEncParamExt.sSpatialLayers[1].iVideoHeight = 160;
+  sEncParamExt.sSpatialLayers[1].fFrameRate = 6;
+  sEncParamExt.sSpatialLayers[1].iSpatialBitrate = 80000;
+
+  sEncParamExt.sSpatialLayers[0].iVideoWidth = 360;
+  sEncParamExt.sSpatialLayers[0].iVideoHeight = 640;
+  sEncParamExt.sSpatialLayers[0].fFrameRate = 24;
+  sEncParamExt.sSpatialLayers[0].iSpatialBitrate = 600000;
+  iResult = pPtrEnc->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sEncParamExt);
+  EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
+
+  //incorrect setting
+  sEncParamExt.iSpatialLayerNum = 3;
+  sEncParamExt.sSpatialLayers[1].iVideoWidth = 90;
+  sEncParamExt.sSpatialLayers[1].iVideoHeight = 160;
+  sEncParamExt.sSpatialLayers[1].fFrameRate = 6;
+  sEncParamExt.sSpatialLayers[1].iSpatialBitrate = 80000;
+
+  sEncParamExt.sSpatialLayers[0].iVideoWidth = 180;
+  sEncParamExt.sSpatialLayers[0].iVideoHeight = 320;
+  sEncParamExt.sSpatialLayers[0].fFrameRate = 12;
+  sEncParamExt.sSpatialLayers[0].iSpatialBitrate = 200000;
+
+  sEncParamExt.sSpatialLayers[2].iVideoWidth = 360;
+  sEncParamExt.sSpatialLayers[2].iVideoHeight = 640;
+  sEncParamExt.sSpatialLayers[2].fFrameRate = 24;
+  sEncParamExt.sSpatialLayers[2].iSpatialBitrate = 600000;
+  iResult = pPtrEnc->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sEncParamExt);
+  EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
+
+  // finish
+  pPtrEnc->Uninitialize();
+}

@@ -200,14 +200,13 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
 
   }
   if (pCfg->iSpatialLayerNum > 1) {
-    int32_t iFinalWidth = pCfg->sSpatialLayers[pCfg->iSpatialLayerNum - 1].iVideoWidth;
-    int32_t iFinalHeight = pCfg->sSpatialLayers[pCfg->iSpatialLayerNum - 1].iVideoHeight;
-    for (i = 0; i < (pCfg->iSpatialLayerNum - 1); i++) {
-      SSpatialLayerConfig* fDlp = &pCfg->sSpatialLayers[i];
-      if ((fDlp->iVideoWidth > iFinalWidth) || (fDlp->iVideoHeight > iFinalHeight)) {
+    for (i = pCfg->iSpatialLayerNum - 1; i > 0; i--) {
+      SSpatialLayerConfig* fDlpUp = &pCfg->sSpatialLayers[i];
+      SSpatialLayerConfig* fDlp = &pCfg->sSpatialLayers[i-1];
+      if ((fDlp->iVideoWidth > fDlpUp->iVideoWidth) || (fDlp->iVideoHeight > fDlpUp->iVideoHeight)) {
         WelsLog (pLogCtx, WELS_LOG_ERROR,
-                 "ParamValidation,Invalid resolution layer(%d) resolution(%d x %d) should be less than the highest spatial layer resolution(%d x %d) ",
-                 i, fDlp->iVideoWidth, fDlp->iVideoHeight, iFinalWidth, iFinalHeight);
+                 "ParamValidation,Invalid resolution layer(%d) resolution(%d x %d) should be less than the upper spatial layer resolution(%d x %d) ",
+                 i, fDlp->iVideoWidth, fDlp->iVideoHeight, fDlpUp->iVideoWidth, fDlpUp->iVideoHeight);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
     }
