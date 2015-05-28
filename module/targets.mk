@@ -1,4 +1,4 @@
-MODULE_SRCDIR=module
+MODULE_SRCDIR=$(SRC_PATH)/module
 MODULE_CPP_SRCS=\
 	$(MODULE_SRCDIR)/gmp-openh264.cpp\
 
