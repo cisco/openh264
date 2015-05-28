@@ -1,4 +1,4 @@
-COMMON_SRCDIR=codec/common
+COMMON_SRCDIR=$(SRC_PATH)/codec/common
 COMMON_CPP_SRCS=\
 	$(COMMON_SRCDIR)/src/common_tables.cpp\
 	$(COMMON_SRCDIR)/src/copy_mb.cpp\

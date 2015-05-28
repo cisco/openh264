@@ -1,4 +1,4 @@
-DECODER_SRCDIR=codec/decoder
+DECODER_SRCDIR=$(SRC_PATH)/codec/decoder
 DECODER_CPP_SRCS=\
 	$(DECODER_SRCDIR)/core/src/au_parser.cpp\
 	$(DECODER_SRCDIR)/core/src/bit_stream.cpp\

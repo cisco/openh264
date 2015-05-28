@@ -1,4 +1,4 @@
-ENCODER_SRCDIR=codec/encoder
+ENCODER_SRCDIR=$(SRC_PATH)/codec/encoder
 ENCODER_CPP_SRCS=\
 	$(ENCODER_SRCDIR)/core/src/au_set.cpp\
 	$(ENCODER_SRCDIR)/core/src/deblocking.cpp\

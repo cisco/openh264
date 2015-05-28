@@ -1,4 +1,4 @@
-PROCESSING_SRCDIR=codec/processing
+PROCESSING_SRCDIR=$(SRC_PATH)/codec/processing
 PROCESSING_CPP_SRCS=\
 	$(PROCESSING_SRCDIR)/src/adaptivequantization/AdaptiveQuantization.cpp\
 	$(PROCESSING_SRCDIR)/src/backgrounddetection/BackgroundDetection.cpp\

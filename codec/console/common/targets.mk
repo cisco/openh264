@@ -1,4 +1,4 @@
-CONSOLE_COMMON_SRCDIR=codec/console/common
+CONSOLE_COMMON_SRCDIR=$(SRC_PATH)/codec/console/common
 CONSOLE_COMMON_CPP_SRCS=\
 	$(CONSOLE_COMMON_SRCDIR)/src/read_config.cpp\
 

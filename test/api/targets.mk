@@ -1,4 +1,4 @@
-API_TEST_SRCDIR=test/api
+API_TEST_SRCDIR=$(SRC_PATH)/test/api
 API_TEST_CPP_SRCS=\
 	$(API_TEST_SRCDIR)/BaseDecoderTest.cpp\
 	$(API_TEST_SRCDIR)/BaseEncoderTest.cpp\
