@@ -5,6 +5,7 @@ vpath %.cpp $(SRC_PATH)
 vpath %.asm $(SRC_PATH)
 vpath %.S $(SRC_PATH)
 vpath %.rc $(SRC_PATH)
+vpath %.pc.in $(SRC_PATH)
 
 OS=$(shell uname | tr A-Z a-z | tr -d \\-[:digit:].)
 ARCH=$(shell uname -m)
@@ -241,10 +242,10 @@ $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX): $(LIBPREFIX)$(MODULE_NAME).$(SHAR
 	$(QUIET)ln -sfn $+ $@
 endif
 
-$(PROJECT_NAME).pc: $(SRC_PATH)/$(PROJECT_NAME).pc.in
+$(PROJECT_NAME).pc: $(PROJECT_NAME).pc.in
 	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(VERSION);' -e 's;@LIBS@;;' -e 's;@LIBS_PRIVATE@;$(STATIC_LDFLAGS);' < $< > $@
 
-$(PROJECT_NAME)-static.pc: $(SRC_PATH)/$(PROJECT_NAME).pc.in
+$(PROJECT_NAME)-static.pc: $(PROJECT_NAME).pc.in
 	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(VERSION);' -e 's;@LIBS@;$(STATIC_LDFLAGS);' -e 's;@LIBS_PRIVATE@;;' < $< > $@
 
 install-headers:
