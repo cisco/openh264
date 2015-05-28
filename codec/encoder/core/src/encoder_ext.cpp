@@ -4607,6 +4607,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
       pOldDlp->iSpatialBitrate	= pNewDlp->iSpatialBitrate;
 
       pOldDlp->uiProfileIdc		= pNewDlp->uiProfileIdc;			// value of profile IDC (0 for auto-detection)
+      pOldDlp->iDLayerQp		= pNewDlp->iDLayerQp;
 
       /* Derived variants below */
       pOldDlpInternal->iTemporalResolution	= pNewDlpInternal->iTemporalResolution;
