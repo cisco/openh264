@@ -241,15 +241,15 @@ $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX): $(LIBPREFIX)$(MODULE_NAME).$(SHAR
 	$(QUIET)ln -sfn $+ $@
 endif
 
-$(PROJECT_NAME).pc: $(PROJECT_NAME).pc.in
-	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(VERSION);' -e 's;@LIBS@;;' -e 's;@LIBS_PRIVATE@;$(STATIC_LDFLAGS);' < $(PROJECT_NAME).pc.in > $@
+$(PROJECT_NAME).pc: $(SRC_PATH)/$(PROJECT_NAME).pc.in
+	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(VERSION);' -e 's;@LIBS@;;' -e 's;@LIBS_PRIVATE@;$(STATIC_LDFLAGS);' < $< > $@
 
-$(PROJECT_NAME)-static.pc: $(PROJECT_NAME).pc.in
-	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(VERSION);' -e 's;@LIBS@;$(STATIC_LDFLAGS);' -e 's;@LIBS_PRIVATE@;;' < $(PROJECT_NAME).pc.in > $@
+$(PROJECT_NAME)-static.pc: $(SRC_PATH)/$(PROJECT_NAME).pc.in
+	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@VERSION@;$(VERSION);' -e 's;@LIBS@;$(STATIC_LDFLAGS);' -e 's;@LIBS_PRIVATE@;;' < $< > $@
 
 install-headers:
 	mkdir -p $(DESTDIR)$(PREFIX)/include/wels
-	install -m 644 codec/api/svc/codec*.h $(DESTDIR)$(PREFIX)/include/wels
+	install -m 644 $(SRC_PATH)/codec/api/svc/codec*.h $(DESTDIR)$(PREFIX)/include/wels
 
 install-static-lib: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) install-headers
 	mkdir -p $(DESTDIR)$(PREFIX)/lib
