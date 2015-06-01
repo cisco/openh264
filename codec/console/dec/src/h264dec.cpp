@@ -145,14 +145,19 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
       fprintf (stderr, "Extra optional file: %s..\n", pOptionFileName);
   }
 
-  printf ("------------------------------------------------------\n");
 
+
+
+  // DECODING IS STARTING HERE //
+  printf ("------------------------------------------------------\n");
+  // Reading the file size //
   fseek (pH264File, 0L, SEEK_END);
   iFileSize = (int32_t) ftell (pH264File);
   if (iFileSize <= 0) {
     fprintf (stderr, "Current Bit Stream File is too small, read error!!!!\n");
     goto label_exit;
   }
+  // Coming back at the begining of the file //
   fseek (pH264File, 0L, SEEK_SET);
 
   pBuf = new uint8_t[iFileSize + 4];
@@ -161,6 +166,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     goto label_exit;
   }
 
+  // Loading the WHOLE h264 video file in memory */
   if (fread (pBuf, 1, iFileSize, pH264File) != (uint32_t)iFileSize) {
     fprintf (stderr, "Unable to read whole file\n");
     goto label_exit;
