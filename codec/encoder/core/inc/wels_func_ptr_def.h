@@ -155,7 +155,7 @@ typedef void (*PCalculateBlockFeatureOfFrame) (uint8_t* pRef, const int32_t kiWi
 typedef int32_t (*PCalculateSingleBlockFeature) (uint8_t* pRef, const int32_t kiRefStride);
 typedef void (*PUpdateFMESwitch) (SDqLayer* pCurLayer);
 
-#define     MAX_BLOCK_TYPE 5 // prev 7
+#define     MAX_BLOCK_TYPE BLOCK_SIZE_ALL
 typedef struct TagSampleDealingFunc {
   PSampleSadSatdCostFunc            pfSampleSad[MAX_BLOCK_TYPE];
   PSampleSadSatdCostFunc            pfSampleSatd[MAX_BLOCK_TYPE];
@@ -235,8 +235,10 @@ struct TagWelsFuncPointerList {
   PCopyFunc      pfCopy8x8Aligned;    //svc_encode_slice.c svc_mode_decision.c svc_base_layer_md.c md.c
   PCopyFunc    pfCopy16x8NotAligned;  //for MeRefineFracPixel 16x8 based
   PCopyFunc    pfCopy8x16Aligned;    //for MeRefineFracPixel 8x16 based
+  PCopyFunc      pfCopy4x4;    //not sure if aligned or not, need further tune
+  PCopyFunc      pfCopy8x4;    //not sure if aligned or not, need further tune
+  PCopyFunc      pfCopy4x8;    //not sure if aligned or not, need further tune
 
-  //svc_encode_mb.c encode_mb_aux.c
   PDctFunc          pfDctT4;
   PDctFunc                pfDctFourT4;
 

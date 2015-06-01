@@ -467,7 +467,9 @@ void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
     pFuncList->pfCopy16x16NotAligned    = WelsCopy16x16_c;
   pFuncList->pfCopy16x8NotAligned       = WelsCopy16x8_c;
   pFuncList->pfCopy8x16Aligned          = WelsCopy8x16_c;
-
+  pFuncList->pfCopy4x4           = WelsCopy4x4_c;
+  pFuncList->pfCopy8x4           = WelsCopy8x4_c;
+  pFuncList->pfCopy4x8           = WelsCopy4x8_c;
   pFuncList->pfQuantizationHadamard2x2          = WelsHadamardQuant2x2_c;
   pFuncList->pfQuantizationHadamard2x2Skip      = WelsHadamardQuant2x2Skip_c;
   pFuncList->pfTransformHadamard4x4Dc           = WelsHadamardT4Dc_c;
