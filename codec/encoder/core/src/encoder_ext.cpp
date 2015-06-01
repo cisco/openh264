@@ -200,14 +200,13 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
 
   }
   if (pCfg->iSpatialLayerNum > 1) {
-    int32_t iFinalWidth = pCfg->sSpatialLayers[pCfg->iSpatialLayerNum - 1].iVideoWidth;
-    int32_t iFinalHeight = pCfg->sSpatialLayers[pCfg->iSpatialLayerNum - 1].iVideoHeight;
-    for (i = 0; i < (pCfg->iSpatialLayerNum - 1); i++) {
-      SSpatialLayerConfig* fDlp = &pCfg->sSpatialLayers[i];
-      if ((fDlp->iVideoWidth > iFinalWidth) || (fDlp->iVideoHeight > iFinalHeight)) {
+    for (i = pCfg->iSpatialLayerNum - 1; i > 0; i--) {
+      SSpatialLayerConfig* fDlpUp = &pCfg->sSpatialLayers[i];
+      SSpatialLayerConfig* fDlp = &pCfg->sSpatialLayers[i-1];
+      if ((fDlp->iVideoWidth > fDlpUp->iVideoWidth) || (fDlp->iVideoHeight > fDlpUp->iVideoHeight)) {
         WelsLog (pLogCtx, WELS_LOG_ERROR,
-                 "ParamValidation,Invalid resolution layer(%d) resolution(%d x %d) should be less than the highest spatial layer resolution(%d x %d) ",
-                 i, fDlp->iVideoWidth, fDlp->iVideoHeight, iFinalWidth, iFinalHeight);
+                 "ParamValidation,Invalid resolution layer(%d) resolution(%d x %d) should be less than the upper spatial layer resolution(%d x %d) ",
+                 i, fDlp->iVideoWidth, fDlp->iVideoHeight, fDlpUp->iVideoWidth, fDlpUp->iVideoHeight);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
     }
@@ -2438,7 +2437,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   iRet	=	pCodingParam->DetermineTemporalSettings();
   if (iRet != ENC_RETURN_SUCCESS) {
     WelsLog (pLogCtx, WELS_LOG_ERROR,
-             "WelsInitEncoderExt(), DetermineTemporalSettings failed return %d (check in/out frame rate and temporal layer setting!)",
+             "WelsInitEncoderExt(), DetermineTemporalSettings failed return %d (check in/out frame rate and temporal layer setting! -- in/out = 2^x, x <= temppral_layer_num)",
              iRet);
     return iRet;
   }
@@ -3708,7 +3707,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   if (iSpatialNum < 1) {	// skip due to temporal layer settings (different frame rate)
     ++ pCtx->iCodingIndex;
     pFbi->eFrameType = videoFrameTypeSkip;
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, skip one frame, continual skipped %d frames",
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, skip one frame due to preprocessing return (temporal layer settings or else), continual skipped %d frames",
              pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
     return ENC_RETURN_SUCCESS;
   }
@@ -3718,7 +3717,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     if (pCtx->pFuncList->pfRc.pfWelsUpdateBufferWhenSkip)
       pCtx->pFuncList->pfRc.pfWelsUpdateBufferWhenSkip (pCtx, iSpatialNum);
     pFbi->eFrameType = eFrameType;
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, skip one frame, continual skipped %d frames",
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, skip one frame due to target_br, continual skipped %d frames",
              pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
     return ENC_RETURN_SUCCESS;
   }
@@ -3729,7 +3728,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                  (uint32_t)pSrcPic->uiTimeStamp);
     if (bSkip) {
       pFbi->eFrameType = videoFrameTypeSkip;
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, skip one frame, continual skipped %d frames",
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, skip one frame due to max_br, continual skipped %d frames",
                pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
       return ENC_RETURN_SUCCESS;
     }
