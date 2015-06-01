@@ -46,5 +46,4 @@ STATIC_LDFLAGS=
 CODEC_UNITTEST_CFLAGS=-D_CRT_SECURE_NO_WARNINGS
 
 %.res: %.rc
-	# //fo is required instead of /fo because of msys interpreting it as a path otherwise
-	$(QUIET_RC)rc //fo $@ $<
+	$(QUIET_RC)rc -fo $@ $<
