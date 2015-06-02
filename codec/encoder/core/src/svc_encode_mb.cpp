@@ -174,7 +174,7 @@ void WelsEncRecI4x4Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, uin
     pFuncList->pfDequantization4x4 (pResI4x4, g_kuiDequantCoeff[uiQp]);
     pFuncList->pfIDctT4 (pPredI4x4, iRecStride, pBestPred, 4, pResI4x4);
   } else
-    WelsCopy4x4 (pPredI4x4, iRecStride, pBestPred, 4);
+    pFuncList->pfCopy4x4 (pPredI4x4, iRecStride, pBestPred, 4);
 }
 
 void WelsEncInterY (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCache) {

@@ -79,7 +79,7 @@ ALIGNED_DECLARE (int8_t, iIntraPredMode[48], 16);
 //	must follow with iNonZeroCoeffCount!
 
 int32_t     iSadCost[4];			//avail 1; unavail 0
-SMVUnitXY  sMbMvp[MB_BLOCK8x8_NUM];// for write bs
+SMVUnitXY  sMbMvp[MB_BLOCK4x4_NUM];// for write bs
 
 //for residual decoding (recovery) at the side of Encoder
 int16_t* pCoeffLevel;		// tmep

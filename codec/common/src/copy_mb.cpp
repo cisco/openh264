@@ -45,7 +45,7 @@
 /****************************************************************************
  * Copy functions
  ****************************************************************************/
-void WelsCopy4x4 (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS) {
+void WelsCopy4x4_c (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS) {
   const int32_t kiSrcStride2 = iStrideS << 1;
   const int32_t kiSrcStride3 = iStrideS + kiSrcStride2;
   const int32_t kiDstStride2 = iStrideD << 1;
@@ -55,6 +55,14 @@ void WelsCopy4x4 (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrid
   ST32 (pDst + iStrideD,	LD32 (pSrc + iStrideS));
   ST32 (pDst + kiDstStride2, LD32 (pSrc + kiSrcStride2));
   ST32 (pDst + kiDstStride3, LD32 (pSrc + kiSrcStride3));
+}
+void WelsCopy8x4_c (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS) {
+  WelsCopy4x4_c (pDst, iStrideD, pSrc, iStrideS);
+  WelsCopy4x4_c (pDst + 4, iStrideD, pSrc + 4, iStrideS);
+}
+void WelsCopy4x8_c (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS) {
+  WelsCopy4x4_c (pDst, iStrideD, pSrc, iStrideS);
+  WelsCopy4x4_c (pDst + (iStrideD << 2), iStrideD, pSrc + (iStrideS << 2), iStrideS);
 }
 void WelsCopy8x8_c (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS) {
   int32_t i;

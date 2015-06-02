@@ -241,7 +241,9 @@ TEST(EncodeMbAuxTest, function) { \
       EXPECT_EQ(ref_dst[i*iDStride+j], dst[i*iDStride+j]); \
 }
 
-GENERATE_UT_FOR_COPY (4, 4, WelsCopy4x4);
+GENERATE_UT_FOR_COPY (4, 4, WelsCopy4x4_c);
+GENERATE_UT_FOR_COPY (8, 4, WelsCopy8x4_c);
+GENERATE_UT_FOR_COPY (4, 8, WelsCopy4x8_c);
 GENERATE_UT_FOR_COPY (8, 8, WelsCopy8x8_c);
 GENERATE_UT_FOR_COPY (8, 16, WelsCopy8x16_c);
 GENERATE_UT_FOR_COPY (16, 8, WelsCopy16x8_c);

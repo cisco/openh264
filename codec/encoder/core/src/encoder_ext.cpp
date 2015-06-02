@@ -2982,7 +2982,9 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
       pFuncList->pfSearchMethod[BLOCK_16x8] =
         pFuncList->pfSearchMethod[BLOCK_8x16] =
           pFuncList->pfSearchMethod[BLOCK_8x8] =
-            pFuncList->pfSearchMethod[BLOCK_4x4] = WelsDiamondSearch;
+            pFuncList->pfSearchMethod[BLOCK_4x4] =
+              pFuncList->pfSearchMethod[BLOCK_8x4] =
+                pFuncList->pfSearchMethod[BLOCK_4x8] = WelsDiamondSearch;
     pFuncList->pfFirstIntraMode = WelsMdFirstIntraMode;
     pFuncList->sSampleDealingFuncs.pfMeCost = pCtx->pFuncList->sSampleDealingFuncs.pfSampleSatd;
     pFuncList->pfSetScrollingMv = SetScrollingMvToMdNull;
