@@ -184,6 +184,8 @@ void H264DecodeInstance(ISVCDecoder* pDecoder, const char* kpH264FileName,
 		goto label_exit;
 	}
 
+	// --------------------------------- //
+	// LOOPING OVER ALL AVAILABLE FRAMES //
 	while (true) {
 
 		if (iBufPos >= iFileSize) {
