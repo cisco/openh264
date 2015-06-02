@@ -399,14 +399,8 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
     unsigned char** ppDst,
     SBufferInfo* pDstInfo) {
   int iRet;
-  SBufferInfo sTmpBufferInfo;
   iRet = (int) DecodeFrame2 (kpSrc, kiSrcLen, ppDst, pDstInfo);
-  memcpy (&sTmpBufferInfo, pDstInfo, sizeof (SBufferInfo));
   iRet |= DecodeFrame2 (NULL, 0, ppDst, pDstInfo);
-  if ((pDstInfo->iBufferStatus == 0) && (sTmpBufferInfo.iBufferStatus == 1)) {
-    memcpy (pDstInfo, &sTmpBufferInfo, sizeof (SBufferInfo));
-  }
-
   return (DECODING_STATE) iRet;
 }
 
