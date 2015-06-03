@@ -150,7 +150,7 @@ class CWelsPreProcess {
  private:
   int32_t SingleLayerPreprocess (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrc, Scaled_Picture* m_sScaledPicture);
 
-  void	BilateralDenoising (SPicture* pSrc, const int32_t iWidth, const int32_t iHeight);
+  void  BilateralDenoising (SPicture* pSrc, const int32_t iWidth, const int32_t iHeight);
   bool  DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture);
   int32_t DownsamplePadding (SPicture* pSrc, SPicture* pDstPic,  int32_t iSrcWidth, int32_t iSrcHeight,
                              int32_t iShrinkWidth, int32_t iShrinkHeight, int32_t iTargetWidth, int32_t iTargetHeight,

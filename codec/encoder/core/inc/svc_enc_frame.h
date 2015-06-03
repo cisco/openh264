@@ -53,8 +53,8 @@ namespace WelsEnc {
 
 ///////////////////////////////////DQ Layer level///////////////////////////////////
 
-typedef struct TagDqLayer	SDqLayer;
-typedef SDqLayer*            pDqLayer;
+typedef struct TagDqLayer   SDqLayer;
+typedef SDqLayer*           pDqLayer;
 
 typedef struct TagFeatureSearchPreparation {
 SScreenBlockFeatureStorage*     pRefBlockFeature;//point the the ref frame storage

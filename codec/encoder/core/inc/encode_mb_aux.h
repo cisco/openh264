@@ -44,10 +44,10 @@ int32_t WelsGetNoneZeroCount_c (int16_t* pLevel);
 /****************************************************************************
  * Scan and Score functions
  ****************************************************************************/
-void	WelsScan4x4Ac_c (int16_t* pZigValue, int16_t* pDct);
-void	WelsScan4x4Dc (int16_t* pLevel, int16_t* pDct);
-void	WelsScan4x4DcAc_c (int16_t* pLevel, int16_t* pDct);
-int32_t		WelsCalculateSingleCtr4x4_c (int16_t* pDct);
+void    WelsScan4x4Ac_c (int16_t* pZigValue, int16_t* pDct);
+void    WelsScan4x4Dc (int16_t* pLevel, int16_t* pDct);
+void    WelsScan4x4DcAc_c (int16_t* pLevel, int16_t* pDct);
+int32_t WelsCalculateSingleCtr4x4_c (int16_t* pDct);
 
 /****************************************************************************
  * HDM and Quant functions
