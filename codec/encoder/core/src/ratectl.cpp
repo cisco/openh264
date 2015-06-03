@@ -900,9 +900,9 @@ void RcTraceFrameBits (sWelsEncCtx* pEncCtx, long long uiTimeStamp) {
     pWelsSvcRc->iPredFrameBit = pWelsSvcRc->iFrameDqBits;
 
   WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
-           "[Rc] Frame timestamp = %lld, Frame type = %d, encoding_qp = %d, average qp = %d, max qp = %d, min qp = %d, index = %d, "
+           "[Rc]Layer %d: Frame timestamp = %lld, Frame type = %d, encoding_qp = %d, average qp = %d, max qp = %d, min qp = %d, index = %d, "
            "iTid = %d, used = %d, bitsperframe = %d, target = %d, remaingbits = %d, skipbuffersize = %d",
-           uiTimeStamp, pEncCtx->eSliceType, pEncCtx->iGlobalQp, pWelsSvcRc->iAverageFrameQp, pWelsSvcRc->iMaxFrameQp,
+           pEncCtx->uiDependencyId, uiTimeStamp, pEncCtx->eSliceType, pEncCtx->iGlobalQp, pWelsSvcRc->iAverageFrameQp, pWelsSvcRc->iMaxFrameQp,
            pWelsSvcRc->iMinFrameQp,
            pEncCtx->iFrameIndex, pEncCtx->uiTemporalId, pWelsSvcRc->iFrameDqBits, pWelsSvcRc->iBitsPerFrame,
            pWelsSvcRc->iTargetBits, pWelsSvcRc->iRemainingBits, pWelsSvcRc->iBufferSizeSkip);
