@@ -30,7 +30,7 @@
  *
  */
 
-//picture.h	-	reconstruction picture/ reference picture/ residual picture are declared here
+//picture.h     -       reconstruction picture/ reference picture/ residual picture are declared here
 #ifndef WELS_PICTURE_H__
 #define WELS_PICTURE_H__
 

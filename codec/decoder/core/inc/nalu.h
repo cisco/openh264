@@ -30,7 +30,7 @@
  *
  */
 
-//nalu.h:	NAL Unit definition
+//nalu.h:       NAL Unit definition
 #ifndef WELS_NAL_UNIT_H__
 #define WELS_NAL_UNIT_H__
 

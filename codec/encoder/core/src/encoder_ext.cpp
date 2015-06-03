@@ -348,8 +348,8 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
 
   //about iMultipleThreadIdc, bDeblockingParallelFlag, iLoopFilterDisableIdc, & uiSliceMode
   // (1) Single Thread
-  //	if (THREAD==1)//single thread
-  //		no parallel_deblocking: bDeblockingParallelFlag = 0;
+  //    if (THREAD==1)//single thread
+  //            no parallel_deblocking: bDeblockingParallelFlag = 0;
   // (2) Multi Thread: see uiSliceMode decision
   if (pCodingParam->iMultipleThreadIdc == 1) {
     //now is single thread. no parallel deblocking, set flag=0

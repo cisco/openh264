@@ -368,8 +368,8 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
 
   // generate other spacial layer
   // pSrc is
-  //	-- padded input pic, if downsample should be applied to generate highest layer, [if] block above
-  //	-- highest layer, if no downsampling, [else] block above
+  //    -- padded input pic, if downsample should be applied to generate highest layer, [if] block above
+  //    -- highest layer, if no downsampling, [else] block above
   if (pSvcParam->iSpatialLayerNum > 1) {
     while (iDependencyId >= 0) {
       pDlayerParamInternal = &pSvcParam->sDependencyLayers[iDependencyId];

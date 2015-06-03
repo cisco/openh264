@@ -30,7 +30,7 @@
  *
  */
 
-//nal_prefix.h	-	definitions for NAL Unit Header(/Ext) and PrefixNALUnit
+//nal_prefix.h  -       definitions for NAL Unit Header(/Ext) and PrefixNALUnit
 #ifndef WELS_NAL_UNIT_PREFIX_H__
 #define WELS_NAL_UNIT_PREFIX_H__
 

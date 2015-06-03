@@ -203,7 +203,7 @@ bool CheckRasterMultiSliceSetting (const int32_t kiMbNumInFrame, SSliceArgument*
   } else if (iActualSliceCount < MAX_SLICES_NUM) {
     //where ( iCountMb < iMbNumInFrame )
     //can do correction:
-    //	make the last uiSliceMbNum the left num
+    //  make the last uiSliceMbNum the left num
     pSlicesAssignList[iActualSliceCount] = kiMbNumInFrame - iCountMb;
     iActualSliceCount += 1;
   } else {
@@ -426,7 +426,7 @@ int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
 
     WelsSetMemMultiplebytes_c(pSliceSeg->pOverallMbMap, 0, kiCountMbNum, sizeof(uint16_t));
 
-    //SM_DYN_SLICE: init, set pSliceSeg->iSliceNumInFrame	= 1;
+    //SM_DYN_SLICE: init, set pSliceSeg->iSliceNumInFrame = 1;
     pSliceSeg->iSliceNumInFrame = GetInitialSliceNum (kiMbWidth, kiMbHeight, pMso);
 
     if (-1 == pSliceSeg->iSliceNumInFrame)
