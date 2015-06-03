@@ -363,7 +363,10 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
   }
 
   virtual void EncodingComplete() {
-    delete this;
+    // Synchronously delete on main thread.
+    g_platform_api->syncrunonmainthread (WrapTask (
+      this,
+      &OpenH264VideoEncoder::EncodingComplete_m));
   }
 
  private:
@@ -540,6 +543,9 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
     frame->Destroy();
   }
 
+  void EncodingComplete_m() {
+    delete this;
+  }
 
  private:
   GMPVideoHost* host_;
@@ -715,7 +721,10 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
   }
 
   virtual void DecodingComplete() {
-    delete this;
+    // Synchronously delete on main thread.
+    g_platform_api->syncrunonmainthread (WrapTask (
+      this,
+      &OpenH264VideoDecoder::DecodingComplete_m));
   }
 
  private:
@@ -821,6 +830,10 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
     callback_->Decoded (frame);
 
     stats_.FrameOut();
+  }
+
+  void DecodingComplete_m() {
+    delete this;
   }
 
   GMPVideoHost* host_;
