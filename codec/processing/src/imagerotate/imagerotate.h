@@ -58,9 +58,9 @@ ImageRotateFunc   ImageRotate180D_c;
 ImageRotateFunc   ImageRotate270D_c;
 
 typedef struct {
-  ImageRotateFuncPtr		pfImageRotate90D;
-  ImageRotateFuncPtr		pfImageRotate180D;
-  ImageRotateFuncPtr		pfImageRotate270D;
+  ImageRotateFuncPtr    pfImageRotate90D;
+  ImageRotateFuncPtr    pfImageRotate180D;
+  ImageRotateFuncPtr    pfImageRotate270D;
 } SImageRotateFuncs;
 
 class CImageRotating : public IStrategy {

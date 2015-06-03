@@ -96,8 +96,8 @@ using namespace WelsEnc;
  *  Layer Context
  */
 typedef struct LayerpEncCtx_s {
-  int32_t				iDLayerQp;
-  SSliceConfig	sSliceCfg;
+  int32_t       iDLayerQp;
+  SSliceConfig  sSliceCfg;
 } SLayerPEncCtx;
 
 typedef struct tagFilesSet {

@@ -46,9 +46,9 @@ using namespace WelsCommon;
 namespace WelsEnc {
 
 
-struct SMVUnitXY {			// each 4 Bytes
-  int16_t		iMvX;
-  int16_t		iMvY;
+struct SMVUnitXY { // each 4 Bytes
+  int16_t iMvX;
+  int16_t iMvY;
  public:
   SMVUnitXY& sDeltaMv (const SMVUnitXY& _v0, const SMVUnitXY& _v1) {
     iMvX = _v0.iMvX - _v1.iMvX;
@@ -62,17 +62,17 @@ struct SMVUnitXY {			// each 4 Bytes
   };
 };
 
-typedef struct TagMVComponentUnit {		// each 	LIST_0/LIST_1
-  SMVUnitXY	sMotionVectorCache[5 * 6 - 1];			// Luma only: 5 x 6 - 1 = 29 D-Words
-  int8_t		iRefIndexCache[5 * 6];			// Luma only: 5 x 6 = 30 bytes
+typedef struct TagMVComponentUnit {             // each LIST_0/LIST_1
+  SMVUnitXY     sMotionVectorCache[5 * 6 - 1];  // Luma only: 5 x 6 - 1 = 29 D-Words
+  int8_t        iRefIndexCache[5 * 6];          // Luma only: 5 x 6 = 30 bytes
 } SMVComponentUnit, *PMVComponentUnit;
 
 
 typedef struct TagParaSetOffsetVariable {
-  int32_t 	iParaSetIdDelta[MAX_DQ_LAYER_NUM/*+1*/];	//mark delta between SPS_ID_in_bs and sps_id_in_encoder, can be minus, for each dq-layer
+  int32_t       iParaSetIdDelta[MAX_DQ_LAYER_NUM/*+1*/];//mark delta between SPS_ID_in_bs and sps_id_in_encoder, can be minus, for each dq-layer
 //need not extra +1 due no MGS and FMO case so far
-  bool		bUsedParaSetIdInBs[MAX_PPS_COUNT];	//mark the used SPS_ID with 1
-  uint32_t	uiNextParaSetIdToUseInBs;					//mark the next SPS_ID_in_bs, for all layers
+  bool          bUsedParaSetIdInBs[MAX_PPS_COUNT];      //mark the used SPS_ID with 1
+  uint32_t      uiNextParaSetIdToUseInBs;               //mark the next SPS_ID_in_bs, for all layers
 } SParaSetOffsetVariable;
 
 typedef struct TagParaSetOffset {
@@ -81,7 +81,7 @@ typedef struct TagParaSetOffset {
   sParaSetOffsetVariable[PARA_SET_TYPE]; //PARA_SET_TYPE=3; paraset_type = 0: AVC_SPS; =1: Subset_SPS; =2: PPS
 //in PSO design, "bPpsIdMappingIntoSubsetsps" uses the current para of current IDR period
   bool
-  bPpsIdMappingIntoSubsetsps[MAX_DQ_LAYER_NUM/*+1*/];	// need not extra +1 due no MGS and FMO case so far
+  bPpsIdMappingIntoSubsetsps[MAX_DQ_LAYER_NUM/*+1*/];   // need not extra +1 due no MGS and FMO case so far
 
   int32_t  iPpsIdList[MAX_DQ_LAYER_NUM][MAX_PPS_COUNT]; //index0: max pps types; index1: for differnt IDRs, if only index0=1, index1 can reach MAX_PPS_COUNT
 
@@ -102,10 +102,10 @@ typedef struct TagParaSetOffset {
 
 /* Position Offset structure */
 typedef struct TagCropOffset {
-  int16_t	iCropLeft;
-  int16_t	iCropRight;
-  int16_t	iCropTop;
-  int16_t	iCropBottom;
+  int16_t       iCropLeft;
+  int16_t       iCropRight;
+  int16_t       iCropTop;
+  int16_t       iCropBottom;
 } SCropOffset;
 
 

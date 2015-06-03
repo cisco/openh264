@@ -82,11 +82,11 @@ typedef VAACalcSadVarFunc*		 PVAACalcSadVarFunc;
 typedef VAACalcSadSsdFunc*		 PVAACalcSadSsdFunc;
 
 typedef  struct TagVaaFuncs {
-  PVAACalcSadBgdFunc		pfVAACalcSadBgd;
-  PVAACalcSadSsdBgdFunc	pfVAACalcSadSsdBgd;
-  PVAACalcSadFunc			pfVAACalcSad;
-  PVAACalcSadVarFunc		pfVAACalcSadVar;
-  PVAACalcSadSsdFunc		pfVAACalcSadSsd;
+  PVAACalcSadBgdFunc    pfVAACalcSadBgd;
+  PVAACalcSadSsdBgdFunc pfVAACalcSadSsdBgd;
+  PVAACalcSadFunc       pfVAACalcSad;
+  PVAACalcSadVarFunc    pfVAACalcSadVar;
+  PVAACalcSadSsdFunc    pfVAACalcSadSsd;
 } SVaaFuncs;
 
 

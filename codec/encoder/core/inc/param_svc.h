@@ -77,18 +77,18 @@ static inline uint32_t GetLogFactor (float base, float upper) {
  *  Dependency Layer Parameter
  */
 typedef struct TagDLayerParam {
-  int32_t		iActualWidth;			// input source picture actual width
-  int32_t		iActualHeight;			// input source picture actual height
-  int32_t		iTemporalResolution;
-  int32_t		iDecompositionStages;
-  uint8_t     uiCodingIdx2TemporalId[ (1 << MAX_TEMPORAL_LEVEL) + 1];
+  int32_t       iActualWidth;                   // input source picture actual width
+  int32_t       iActualHeight;                  // input source picture actual height
+  int32_t       iTemporalResolution;
+  int32_t       iDecompositionStages;
+  uint8_t       uiCodingIdx2TemporalId[ (1 << MAX_TEMPORAL_LEVEL) + 1];
 
-  int8_t		iHighestTemporalId;
-  float		fInputFrameRate;		// input frame rate
-  float		fOutputFrameRate;		// output frame rate
+  int8_t        iHighestTemporalId;
+  float         fInputFrameRate;                // input frame rate
+  float         fOutputFrameRate;               // output frame rate
 
 #ifdef ENABLE_FRAME_DUMP
-  char		sRecFileName[MAX_FNAME_LEN];	// file to be constructed
+  char          sRecFileName[MAX_FNAME_LEN];    // file to be constructed
 #endif//ENABLE_FRAME_DUMP
 } SSpatialLayerInternal;
 
@@ -96,25 +96,25 @@ typedef struct TagDLayerParam {
  *  Cisco OpenH264 Encoder Parameter Configuration
  */
 typedef struct TagWelsSvcCodingParam: SEncParamExt {
-  SSpatialLayerInternal	sDependencyLayers[MAX_DEPENDENCY_LAYER];
+  SSpatialLayerInternal sDependencyLayers[MAX_DEPENDENCY_LAYER];
 
   /* General */
-  uint32_t	uiGopSize;			// GOP size (at maximal frame rate: 16)
+  uint32_t uiGopSize;                      // GOP size (at maximal frame rate: 16)
   struct {
     int32_t iLeft;
     int32_t iTop;
     int32_t iWidth;
     int32_t iHeight;
-  } SUsedPicRect;	// the rect in input picture that encoder actually used
+  } SUsedPicRect;       // the rect in input picture that encoder actually used
 
   char*       pCurPath; // record current lib path such as:/pData/pData/com.wels.enc/lib/
 
-  bool		bDeblockingParallelFlag;	// deblocking filter parallelization control flag
+  bool      bDeblockingParallelFlag;        // deblocking filter parallelization control flag
   int32_t   iBitsVaryPercentage;
   short
   iCountThreadsNum;                       //              # derived from disable_multiple_slice_idc (=0 or >1) means;
 
-  int8_t		iDecompStages;		// GOP size dependency
+  int8_t   iDecompStages;          // GOP size dependency
   int32_t  iMaxNumRefFrame;
 
  public:
@@ -492,9 +492,9 @@ typedef struct TagExistingParasetList {
   SSubsetSps          sSubsetSps[MAX_SPS_COUNT];
   SWelsPPS            sPps[MAX_PPS_COUNT];
 
-  uint32_t	          uiInUseSpsNum;
-  uint32_t	          uiInUseSubsetSpsNum;
-  uint32_t	          uiInUsePpsNum;
+  uint32_t            uiInUseSpsNum;
+  uint32_t            uiInUseSubsetSpsNum;
+  uint32_t            uiInUsePpsNum;
 } SExistingParasetList;
 
 

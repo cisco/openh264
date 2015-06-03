@@ -48,9 +48,9 @@ namespace WelsEnc {
  */
 
 typedef struct TagDqIdc {
-uint16_t	iPpsId;			// pPps id
-uint8_t	iSpsId;			// pSps id
-int8_t		uiSpatialId;	// spatial id
+uint16_t    iPpsId;         // pPps id
+uint8_t     iSpsId;         // pSps id
+int8_t      uiSpatialId;    // spatial id
 } SDqIdc;
 
 }

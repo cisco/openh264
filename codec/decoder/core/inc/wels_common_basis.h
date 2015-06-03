@@ -53,14 +53,14 @@ extern const uint8_t g_kCache26ScanIdx[16];
 extern const uint8_t g_kCache30ScanIdx[16];
 extern const uint8_t g_kNonZeroScanIdxC[4];
 /* Profile IDC */
-typedef uint8_t		ProfileIdc;
+typedef uint8_t ProfileIdc;
 
 /* Position Offset structure */
 typedef struct TagPosOffset {
-int32_t	iLeftOffset;
-int32_t	iTopOffset;
-int32_t	iRightOffset;
-int32_t	iBottomOffset;
+int32_t iLeftOffset;
+int32_t iTopOffset;
+int32_t iRightOffset;
+int32_t iBottomOffset;
 } SPosOffset;
 
 /* MB Type & Sub-MB Type */
@@ -215,7 +215,7 @@ typedef struct TagI4PredInfo {
     int8_t iLeftAvail;
     int8_t iTopAvail;
     int8_t iLeftTopAvail;
-    //	int8_t right_top_avail; //when right_top unavailable but top avail, we can pad the right-top with the rightmost pixel of top
+    // int8_t right_top_avail; //when right_top unavailable but top avail, we can pad the right-top with the rightmost pixel of top
 } SI4PredInfo;
 static const SI4PredInfo g_ksI4PredInfo[9] = {
     {  I4_PRED_V, 0, 1, 0},

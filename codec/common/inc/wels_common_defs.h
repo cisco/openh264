@@ -239,9 +239,9 @@ typedef struct TagNalUnitHeader {
 
 /* NAL Unit Header in scalable extension syntax, refer to Page 390 in JVT X201wcm */
 typedef struct TagNalUnitHeaderExt {
-  SNalUnitHeader	sNalUnitHeader;
+  SNalUnitHeader      sNalUnitHeader;
 
-  //	uint8_t		reserved_one_bit;
+  // uint8_t   reserved_one_bit;
   bool      bIdrFlag;
   uint8_t   uiPriorityId;
   int8_t    iNoInterLayerPredFlag;	// change as int8_t to support 3 values probably in encoder

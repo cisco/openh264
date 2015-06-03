@@ -135,7 +135,7 @@ class DecoderParseSyntaxTest : public ::testing::Test {
   unsigned char m_szBuffer[BUF_SIZE]; //for mocking packet
   int m_iBufLength; //record the valid data in m_szBuffer
   PWelsDecoderContext m_pCtx;
-  welsCodecTrace*	m_pWelsTrace;
+  welsCodecTrace* m_pWelsTrace;
 
 };
 

@@ -33,11 +33,11 @@ class ParameterSetStrategyTest : public ::testing::Test {
   void GenerateParam (SWelsSvcCodingParam* pParam);
  public:
   CMemoryAlign* pMa;
-  SWelsSPS*						m_pSpsArray;
-  SSubsetSps*					m_pSubsetArray;
+  SWelsSPS*     m_pSpsArray;
+  SSubsetSps*   m_pSubsetArray;
 
-  SWelsSPS*						m_pSpsArrayPointer;
-  SSubsetSps*					m_pSubsetArrayPointer;
+  SWelsSPS*     m_pSpsArrayPointer;
+  SSubsetSps*   m_pSubsetArrayPointer;
 
 };
 
