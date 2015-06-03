@@ -60,7 +60,7 @@ namespace WelsEnc {
  *  CWelsH264SVCEncoder class implementation
  */
 CWelsH264SVCEncoder::CWelsH264SVCEncoder()
-  :	m_pEncContext (NULL),
+  : m_pEncContext (NULL),
     m_pWelsTrace (NULL),
     m_iMaxPicWidth (0),
     m_iMaxPicHeight (0),
