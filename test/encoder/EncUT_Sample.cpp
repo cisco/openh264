@@ -207,9 +207,9 @@ TEST_F (SadSatdCFuncTest, WelsSampleSad8x4_c) {
 }
 
 TEST_F (SadSatdCFuncTest, WelsSampleSad4x8_c) {
-  for (int i = 0; i < (m_iStrideA << 2); i++)
+  for (int i = 0; i < (m_iStrideA << 3); i++)
     m_pPixSrcA[i] = rand() % 256;
-  for (int i = 0; i < (m_iStrideB << 2); i++)
+  for (int i = 0; i < (m_iStrideB << 3); i++)
     m_pPixSrcB[i] = rand() % 256;
   uint8_t* pPixA = m_pPixSrcA;
   uint8_t* pPixB = m_pPixSrcB;
@@ -504,9 +504,9 @@ TEST_F (SadSatdCFuncTest, WelsSampleSadFour8x4_c) {
 }
 
 TEST_F (SadSatdCFuncTest, WelsSampleSadFour4x8_c) {
-  for (int i = 0; i < (m_iStrideA << 3); i++)
+  for (int i = 0; i < (m_iStrideA << 4); i++)
     m_pPixSrcA[i] = rand() % 256;
-  for (int i = 0; i < (m_iStrideB << 3); i++)
+  for (int i = 0; i < (m_iStrideB << 4); i++)
     m_pPixSrcB[i] = rand() % 256;
   uint8_t* pPixA = m_pPixSrcA;
   uint8_t* pPixB = m_pPixSrcB + m_iStrideB;
