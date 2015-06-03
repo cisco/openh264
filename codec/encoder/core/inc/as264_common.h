@@ -55,8 +55,8 @@ $(TargetPath)
 /****************************************************************************
  * Options for optimization, not change bitrate
  ****************************************************************************/
-//#undef	X86_ASM			// X86_ASM is included in project preprocessor definitions, undef it when need to disable asm code
-#define SINGLE_REF_FRAME		// need to disable it when use multi-reference
+//#undef        X86_ASM             // X86_ASM is included in project preprocessor definitions, undef it when need to disable asm code
+#define SINGLE_REF_FRAME            // need to disable it when use multi-reference
 
 
 #if defined(WELS_TESTBED)	    // for SGE testing

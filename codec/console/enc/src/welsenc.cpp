@@ -42,7 +42,7 @@
 #ifdef ONLY_ENC_FRAMES_NUM
 #undef ONLY_ENC_FRAMES_NUM
 #endif//ONLY_ENC_FRAMES_NUM
-#define ONLY_ENC_FRAMES_NUM		INT_MAX // 2, INT_MAX	// type the num you try to encode here, 2, 10, etc
+#define ONLY_ENC_FRAMES_NUM INT_MAX // 2, INT_MAX // type the num you try to encode here, 2, 10, etc
 
 #if defined (WINDOWS_PHONE)
 float   g_fFPS           = 0.0;

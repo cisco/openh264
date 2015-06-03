@@ -277,7 +277,7 @@ TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_sse2) {
 #endif
 #define WELS_ABS_LC(a) ((sign ^ (int32_t)(a)) - sign)
 #define NEW_QUANT(pDct, ff, mf) (((ff)+ WELS_ABS_LC(pDct))*(mf)) >>16
-#define WELS_NEW_QUANT(pDct,ff,mf)	WELS_ABS_LC(NEW_QUANT(pDct, ff, mf))
+#define WELS_NEW_QUANT(pDct,ff,mf) WELS_ABS_LC(NEW_QUANT(pDct, ff, mf))
 void WelsQuantFour4x4MaxAnchor (int16_t* pDct, int16_t* ff,  int16_t* mf, int16_t* max) {
   int32_t i, j, k, sign;
   int16_t max_abs;

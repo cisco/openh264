@@ -160,7 +160,7 @@ ALIGNED_DECLARE (const int16_t, g_kiQuantMF[52][8], 16) = {
  ****************************************************************************/
 #define WELS_ABS_LC(a) ((iSign ^ (int32_t)(a)) - iSign)
 #define NEW_QUANT(pDct, iFF, iMF) (((iFF)+ WELS_ABS_LC(pDct))*(iMF)) >>16
-#define WELS_NEW_QUANT(pDct,iFF,iMF)	WELS_ABS_LC(NEW_QUANT(pDct, iFF, iMF))
+#define WELS_NEW_QUANT(pDct,iFF,iMF) WELS_ABS_LC(NEW_QUANT(pDct, iFF, iMF))
 void WelsQuant4x4_c (int16_t* pDct, const int16_t* pFF,  const int16_t* pMF) {
   int32_t i, j, iSign;
   for (i = 0; i < 16; i += 4) {

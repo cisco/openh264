@@ -70,7 +70,7 @@
 #if defined(_MSC_VER)
 
 #if(_MSC_VER < 1700)
-#define inline	__inline
+#define inline __inline
 #endif
 
 #define ALIGNED_DECLARE( type, var, n ) __declspec(align(n)) type var
@@ -82,51 +82,51 @@
 
 
 #ifndef WELS_ALIGN
-#define WELS_ALIGN(x, n)	(((x)+(n)-1)&~((n)-1))
+#define WELS_ALIGN(x, n) (((x)+(n)-1)&~((n)-1))
 #endif//WELS_ALIGN
 
 
 #if 1 // Alternative implementation of WELS_MAX and WELS_MIN
 #ifndef WELS_MAX
-#define WELS_MAX(x, y)	((x) > (y) ? (x) : (y))
+#define WELS_MAX(x, y) ((x) > (y) ? (x) : (y))
 #endif//WELS_MAX
 
 #ifndef WELS_MIN
-#define WELS_MIN(x, y)	((x) < (y) ? (x) : (y))
+#define WELS_MIN(x, y) ((x) < (y) ? (x) : (y))
 #endif//WELS_MIN
 #else // Alternative implementation of WELS_MAX and WELS_MIN
 #ifndef WELS_MAX
-#define WELS_MAX(x, y)	((x) - (((x)-(y))&(((x)-(y))>>31)))
+#define WELS_MAX(x, y) ((x) - (((x)-(y))&(((x)-(y))>>31)))
 #endif//WELS_MAX
 
 #ifndef WELS_MIN
-#define WELS_MIN(x, y)	((y) + (((x)-(y))&(((x)-(y))>>31)))
+#define WELS_MIN(x, y) ((y) + (((x)-(y))&(((x)-(y))>>31)))
 #endif//WELS_MIN
 #endif // Alternative implementation of WELS_MAX and WELS_MIN
 
 
 #ifndef WELS_CEIL
-#define WELS_CEIL(x)	ceil(x)	// FIXME: low complexity instead of math library used
+#define WELS_CEIL(x) ceil(x) // FIXME: low complexity instead of math library used
 #endif//WELS_CEIL
 
 #ifndef WELS_FLOOR
-#define WELS_FLOOR(x)	floor(x)	// FIXME: low complexity instead of math library used
+#define WELS_FLOOR(x) floor(x)        // FIXME: low complexity instead of math library used
 #endif//WELS_FLOOR
 
 #ifndef WELS_ROUND
-#define WELS_ROUND(x)	((int32_t)(0.5+(x)))
+#define WELS_ROUND(x) ((int32_t)(0.5+(x)))
 #endif//WELS_ROUND
 
 #ifndef WELS_ROUND64
-#define WELS_ROUND64(x)	((int64_t)(0.5+(x)))
+#define WELS_ROUND64(x) ((int64_t)(0.5+(x)))
 #endif//WELS_ROUND
 
 #ifndef WELS_DIV_ROUND
-#define WELS_DIV_ROUND(x,y)	((int32_t)((y)==0?((x)/((y)+1)):(((y)/2+(x))/(y))))
+#define WELS_DIV_ROUND(x,y) ((int32_t)((y)==0?((x)/((y)+1)):(((y)/2+(x))/(y))))
 #endif//WELS_DIV_ROUND
 
 #ifndef WELS_DIV_ROUND64
-#define WELS_DIV_ROUND64(x,y)	((int64_t)((y)==0?((x)/((y)+1)):(((y)/2+(x))/(y))))
+#define WELS_DIV_ROUND64(x,y) ((int64_t)((y)==0?((x)/((y)+1)):(((y)/2+(x))/(y))))
 #endif//WELS_DIV_ROUND64
 
 #define WELS_NON_ZERO_COUNT_AVERAGE(nC,nA,nB) {         \
@@ -253,7 +253,7 @@ static inline int32_t WELS_LOG2 (uint32_t v) {
 
 }
 
-#define CLIP3_QP_0_51(q)		WELS_CLIP3(q, 0, 51)	// ((q) < (0) ? (0) : ((q) > (51) ? (51) : (q)))
+#define CLIP3_QP_0_51(q) WELS_CLIP3(q, 0, 51) // ((q) < (0) ? (0) : ((q) > (51) ? (51) : (q)))
 #define   CALC_BI_STRIDE(width,bitcount)  ((((width * bitcount) + 31) & ~31) >> 3)
 
 

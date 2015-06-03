@@ -86,8 +86,8 @@ typedef int32_t SubMbType;
 #define LUMA_DC_AC_INTRA_8  17
 #define LUMA_DC_AC_INTER_8  18
 
-#define SHIFT_BUFFER(pBitsCache)	{	pBitsCache->pBuf+=2; pBitsCache->uiRemainBits += 16; pBitsCache->uiCache32Bit |= (((pBitsCache->pBuf[2] << 8) | pBitsCache->pBuf[3]) << (32 - pBitsCache->uiRemainBits));	}
-#define POP_BUFFER(pBitsCache, iCount)	{ pBitsCache->uiCache32Bit <<= iCount;	pBitsCache->uiRemainBits -= iCount;	}
+#define SHIFT_BUFFER(pBitsCache)        { pBitsCache->pBuf+=2; pBitsCache->uiRemainBits += 16; pBitsCache->uiCache32Bit |= (((pBitsCache->pBuf[2] << 8) | pBitsCache->pBuf[3]) << (32 - pBitsCache->uiRemainBits)); }
+#define POP_BUFFER(pBitsCache, iCount)  { pBitsCache->uiCache32Bit <<= iCount;  pBitsCache->uiRemainBits -= iCount; }
 
 static const uint8_t g_kuiZigzagScan[16] = { //4*4block residual zig-zag scan order
     0,  1,  4,  8,

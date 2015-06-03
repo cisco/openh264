@@ -116,15 +116,15 @@ STRUCTA (64, 8);
 #endif /* !__GNUC__ */
 
 #ifndef INTD16
-#define INTD16	LD16
+#define INTD16 LD16
 #endif//INTD16
 
 #ifndef INTD32
-#define INTD32	LD32
+#define INTD32 LD32
 #endif//INTD32
 
 #ifndef INTD64
-#define INTD64	LD64
+#define INTD64 LD64
 #endif//INTD64
 
 #endif//___LD_ST_MACROS___

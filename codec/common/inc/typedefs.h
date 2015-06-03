@@ -80,7 +80,7 @@ typedef int32_t intX_t;
 #ifdef EPSN
 #undef EPSN
 #endif//EPSN
-#define EPSN	  (0.000001f) // (1e-6)	// desired float precision
+#define EPSN (0.000001f) // (1e-6) // desired float precision
 
 #endif //WELS_TYPE_DEFINES_H__
 
