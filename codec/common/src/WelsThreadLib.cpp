@@ -312,12 +312,12 @@ WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_n
 
 WELS_THREAD_ERROR_CODE   WelsEventSignal (WELS_EVENT* event) {
   WELS_THREAD_ERROR_CODE err = 0;
-//	int32_t val = 0;
-//	sem_getvalue(event, &val);
-//	fprintf( stderr, "before signal it, val= %d..\n",val );
+//  int32_t val = 0;
+//  sem_getvalue(event, &val);
+//  fprintf( stderr, "before signal it, val= %d..\n",val );
   err = sem_post (*event);
-//	sem_getvalue(event, &val);
-//	fprintf( stderr, "after signal it, val= %d..\n",val );
+//  sem_getvalue(event, &val);
+//  fprintf( stderr, "after signal it, val= %d..\n",val );
   return err;
 }
 
@@ -429,7 +429,7 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount,
 
       if ((uiSignalFlag & kuiBitwiseFlag) != kuiBitwiseFlag) { // non-blocking mode
         int32_t err = 0;
-//				fprintf( stderr, "sem_wait(): start to wait event %d..\n", nIdx );
+//        fprintf( stderr, "sem_wait(): start to wait event %d..\n", nIdx );
         if (master_event == NULL) {
           err = sem_wait (event_list[nIdx]);
         } else {
@@ -445,11 +445,11 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount,
             }
           }
         }
-//				fprintf( stderr, "sem_wait(): wait event %d result %d errno %d..\n", nIdx, err, errno );
+//        fprintf( stderr, "sem_wait(): wait event %d result %d errno %d..\n", nIdx, err, errno );
         if (WELS_THREAD_ERROR_OK == err) {
-//					int32_t val = 0;
-//					sem_getvalue(&event_list[nIdx], &val);
-//					fprintf( stderr, "after sem_timedwait(), event_list[%d] semaphore value= %d..\n", nIdx, val);
+//          int32_t val = 0;
+//          sem_getvalue(&event_list[nIdx], &val);
+//          fprintf( stderr, "after sem_timedwait(), event_list[%d] semaphore value= %d..\n", nIdx, val);
 
           uiSignalFlag |= kuiBitwiseFlag;
           ++ uiCountSignals;

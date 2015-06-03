@@ -152,7 +152,7 @@ int ParseLayerConfig (CReadConfig& cRdLayerCfg, const int iLayer, SEncParamExt& 
       } else if (strTag[0].compare ("ProfileIdc") == 0) {
         pDLayer->uiProfileIdc	= (EProfileIdc)atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("FRExt") == 0) {
-        //					pDLayer->frext_mode	= (bool)atoi(strTag[1].c_str());
+//        pDLayer->frext_mode = (bool)atoi(strTag[1].c_str());
       } else if (strTag[0].compare ("SpatialBitrate") == 0) {
         pDLayer->iSpatialBitrate	= 1000 * atoi (strTag[1].c_str());
         if (pSvcParam.iRCMode != RC_OFF_MODE) {

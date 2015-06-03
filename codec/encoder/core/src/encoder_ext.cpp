@@ -686,7 +686,7 @@ static inline int32_t AcquireLayersNals (sWelsEncCtx** ppCtx, SWelsSvcCodingPara
 
   do {
     SSpatialLayerConfig* pDLayer = &pParam->sSpatialLayers[iDIndex];
-//		pDLayer->ptr_cfg = pParam;
+//    pDLayer->ptr_cfg = pParam;
     int32_t iOrgNumNals = iCountNumNals;
 
     //Note: Sep. 2010

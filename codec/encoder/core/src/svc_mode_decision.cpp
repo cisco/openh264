@@ -353,7 +353,7 @@ bool JudgeScrollSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWe
   const int32_t kiMbY = pCurMb->iMbY;
   const int32_t kiMbWidth = pCurDqLayer->iMbWidth;
   const int32_t kiMbHeight = pCurDqLayer->iMbHeight;
-  //	const int32_t block_width = mb_width << 1;
+  // const int32_t block_width = mb_width << 1;
   SVAAFrameInfoExt_t* pVaaExt = static_cast<SVAAFrameInfoExt_t*> (pEncCtx->pVaa);
 
   bool bTryScrollSkip = false;

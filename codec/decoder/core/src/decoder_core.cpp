@@ -1432,9 +1432,9 @@ void UninitialDqLayersContext (PWelsDecoderContext pCtx) {
 
     //      if (pCtx->sMb.pMotionPredFlag[i])
     //{
-    //	WelsFree( pCtx->sMb.pMotionPredFlag[i], "pCtx->sMb.pMotionPredFlag[]" );
+    //  WelsFree( pCtx->sMb.pMotionPredFlag[i], "pCtx->sMb.pMotionPredFlag[]" );
 
-    //	pCtx->sMb.pMotionPredFlag[i] = NULL;
+    //  pCtx->sMb.pMotionPredFlag[i] = NULL;
     //}
 
     if (pCtx->sMb.pSubMbType[i]) {

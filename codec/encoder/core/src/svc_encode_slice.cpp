@@ -184,7 +184,7 @@ void WriteReferenceReorder (SBitStringAux* pBs, SSliceHeader* sSliceHeader) {
 
   if (I_SLICE != eSliceType && SI_SLICE != eSliceType) {	// !I && !SI
     BsWriteOneBit (pBs, true);
-//		{
+//    {
     uint16_t uiReorderingOfPicNumsIdc;
     do {
       uiReorderingOfPicNumsIdc = pRefOrdering->SReorderingSyntax[n].uiReorderingOfPicNumsIdc;
@@ -196,7 +196,7 @@ void WriteReferenceReorder (SBitStringAux* pBs, SSliceHeader* sSliceHeader) {
 
       n ++;
     } while (3 != uiReorderingOfPicNumsIdc);
-//		}
+//    }
   }
 }
 
@@ -324,7 +324,7 @@ void WelsSliceHeaderExtWrite (sWelsEncCtx* pCtx, SBitStringAux* pBs, SDqLayer* p
   }
 
   BsWriteBits (pBs, pSps->iLog2MaxPocLsb, pSliceHeader->iPicOrderCntLsb);
-//	{
+//  {
   if (P_SLICE == pSliceHeader->eSliceType) {
     BsWriteOneBit (pBs, pSliceHeader->bNumRefIdxActiveOverrideFlag);
     if (pSliceHeader->bNumRefIdxActiveOverrideFlag) {
@@ -342,7 +342,7 @@ void WelsSliceHeaderExtWrite (sWelsEncCtx* pCtx, SBitStringAux* pBs, SDqLayer* p
       BsWriteOneBit (pBs, pSliceHeadExt->bStoreRefBasePicFlag);
     }
   }
-//	}
+//  }
 
 
   if (pPps->bEntropyCodingModeFlag && pSliceHeader->eSliceType  != I_SLICE) {

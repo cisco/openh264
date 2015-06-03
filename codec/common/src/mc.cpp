@@ -965,7 +965,7 @@ void McLuma_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_
     {McHorVer20_neon,    McHorVer21_neon, McHorVer22_neon,    McHorVer23_neon},
     {McHorVer30_neon, McHorVer31_neon, McHorVer32_neon, McHorVer33_neon},
   };
-  //	pSrc += (iMvY >> 2) * iSrcStride + (iMvX >> 2);
+  // pSrc += (iMvY >> 2) * iSrcStride + (iMvX >> 2);
   pWelsMcFunc[iMvX & 0x03][iMvY & 0x03] (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
 }
 void McChroma_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
@@ -1248,7 +1248,7 @@ void McLuma_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst
     {McHorVer20_AArch64_neon,    McHorVer21_AArch64_neon, McHorVer22_AArch64_neon,    McHorVer23_AArch64_neon},
     {McHorVer30_AArch64_neon, McHorVer31_AArch64_neon, McHorVer32_AArch64_neon, McHorVer33_AArch64_neon},
   };
-  //	pSrc += (iMvY >> 2) * iSrcStride + (iMvX >> 2);
+  // pSrc += (iMvY >> 2) * iSrcStride + (iMvX >> 2);
   pWelsMcFunc[iMvX & 0x03][iMvY & 0x03] (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
 }
 void McChroma_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,

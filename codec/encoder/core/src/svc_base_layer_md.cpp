@@ -531,7 +531,7 @@ int32_t WelsMdI4x4 (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCach
       *pRemIntra4x4PredModeFlag  = (iFinalMode < iPredMode ? iFinalMode : (iFinalMode - 1));
     }
     pRemIntra4x4PredModeFlag++;
-    //	pCurMb->pIntra4x4PredMode[g_kuiMbCountScan4Idx[i]] = iFinalMode;
+    // pCurMb->pIntra4x4PredMode[g_kuiMbCountScan4Idx[i]] = iFinalMode;
     pMbCache->iIntraPredMode[kpCache48CountScan4[i]] = iFinalMode;
 
     //step 6: encoding I_4x4
@@ -578,9 +578,9 @@ int32_t WelsMdI4x4Fast (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMb
 #endif//X86_ASM
 
   for (i = 0; i < 16; i++) {
-    const int32_t kiOffset	= kpNeighborIntraToI4x4[i];
-//		const int32_t i_next	= (1+i) & 15;												// next loop
-//		const uint8_t dummy_byte= pIntra4x4AvailCount[pNeighborIntraToI4x4[i_next]];	// prefetch pIntra4x4AvailCount of next loop to avoid cache missed
+    const int32_t kiOffset = kpNeighborIntraToI4x4[i];
+//    const int32_t i_next = (1+i) & 15; // next loop
+//    const uint8_t dummy_byte= pIntra4x4AvailCount[pNeighborIntraToI4x4[i_next]]; // prefetch pIntra4x4AvailCount of next loop to avoid cache missed
 
     //step 1: locating current 4x4 block position in pEnc and pDecMb
     iCoordinateX = kpCoordinateIdxX[i];
@@ -851,7 +851,7 @@ int32_t WelsMdI4x4Fast (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMb
       *pRemIntra4x4PredModeFlag  = (iFinalMode < iPredMode ? iFinalMode : (iFinalMode - 1));
     }
     pRemIntra4x4PredModeFlag++;
-    //	pCurMb->pIntra4x4PredMode[scan4[i]] = iFinalMode;
+    // pCurMb->pIntra4x4PredMode[scan4[i]] = iFinalMode;
     pMbCache->iIntraPredMode[kpCache48CountScan4[i]] = iFinalMode;
     //step 6: encoding I_4x4
     WelsEncRecI4x4Y (pEncCtx, pCurMb, pMbCache, i);
@@ -908,8 +908,8 @@ int32_t WelsMdIntraChroma (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SMbCa
 
       assert (iCurMode >= 0 && iCurMode < 7);
 
-      //		pDstCb	= &pMbCache->mem_pred_intra_cb[iCurMode<<6];
-      //		pDstCr	= &pMbCache->mem_pred_intra_cr[iCurMode<<6];
+      // pDstCb = &pMbCache->mem_pred_intra_cb[iCurMode<<6];
+      // pDstCr = &pMbCache->mem_pred_intra_cr[iCurMode<<6];
       pFunc->pfGetChromaPred[iCurMode] (pDstChma, pDecCb, kiLineSizeDec); //Cb
       iCurCost = pFunc->sSampleDealingFuncs.pfMdCost[BLOCK_8x8] (pDstChma, 8, pEncCb, kiLineSizeEnc);
 
@@ -1112,17 +1112,17 @@ int32_t WelsMdP8x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWe
     pFunc->pfMotionSearch[pWelsMd->iBlock8x8StaticIdc[i]] (pFunc, pCurDqLayer, sMe8x8, pSlice);
     UpdateP8x8Motion2Cache (pMbCache, i << 2, pWelsMd->uiRef, & (sMe8x8->sMv));
     iCostP8x8 += sMe8x8->uiSatdCost;
-//		sMe8x8++;
+//    sMe8x8++;
   }
   return iCostP8x8;
 }
 
 void WelsMdInterFinePartition (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb, int32_t iBestCost) {
   SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
-//	SMbCache *pMbCache = &pSlice->sMbCacheInfo;
+//  SMbCache *pMbCache = &pSlice->sMbCacheInfo;
   int32_t iCost = 0;
 
-//	WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP8x8, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
+//  WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP8x8, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
 
   iCost = WelsMdP8x8 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
 
@@ -1130,7 +1130,7 @@ void WelsMdInterFinePartition (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* p
     int32_t iCostPart;
     pCurMb->uiMbType = MB_TYPE_8x8;
 
-//		WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP16x8, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
+//    WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP16x8, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
     iCostPart = WelsMdP16x8 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
     if (iCostPart <= iCost) {
       iCost = iCostPart;
@@ -1138,7 +1138,7 @@ void WelsMdInterFinePartition (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* p
       //pCurMb->mb_partition = 2;
     }
 
-//		WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP8x16, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
+//    WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP8x16, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
     iCostPart = WelsMdP8x16 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
     if (iCostPart <= iCost) {
       iCost = iCostPart;
@@ -1151,7 +1151,7 @@ void WelsMdInterFinePartition (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* p
 void WelsMdInterFinePartitionVaa (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb,
                                   int32_t iBestCost) {
   SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
-//	SMbCache *pMbCache = &pSlice->sMbCacheInfo;
+//  SMbCache *pMbCache = &pSlice->sMbCacheInfo;
   int32_t iCostP8x16, iCostP16x8, iCostP8x8;
   uint8_t uiMbSign = pEncCtx->pFuncList->pfGetMbSignFromInterVaa (&pEncCtx->pVaa->sVaaCalcInfo.pSad8x8[pCurMb->iMbXY][0]);
 
@@ -1159,12 +1159,12 @@ void WelsMdInterFinePartitionVaa (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice
     return;
   }
 
-//	iCost = pWelsMd->sMe16x16.uiSatdCost;
+//  iCost = pWelsMd->sMe16x16.uiSatdCost;
 
   switch (uiMbSign) {
   case 3:
   case 12:
-//		WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP16x8, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
+//    WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP16x8, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
     iCostP16x8 = WelsMdP16x8 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
     if (iCostP16x8 < iBestCost) {
       iBestCost = iCostP16x8;
@@ -1175,7 +1175,7 @@ void WelsMdInterFinePartitionVaa (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice
 
   case 5:
   case 10:
-//		WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP8x16, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
+//    WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP8x16, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
     iCostP8x16 = WelsMdP8x16 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
     if (iCostP8x16 < iBestCost) {
       iBestCost = iCostP8x16;

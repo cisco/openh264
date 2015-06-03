@@ -442,7 +442,7 @@ int32_t AnalysisVaaInfoIntra_c (uint8_t* pDataY, const int32_t kiLineSize) {
   int32_t i = 0, j = 0, num = 0;
   int32_t iSumAvg = 0, iSumSqr = 0;
 
-//	analysis_vaa_info_intra_core_c( pDataY, iLineSize, pBlock );
+//  analysis_vaa_info_intra_core_c( pDataY, iLineSize, pBlock );
   for (; j < 16; j += 4) {
     num = 0;
     for (i = 0; i < 16; i += 4, num ++) {

@@ -266,7 +266,7 @@ int CWelsH264SVCEncoder::InitializeInternal (SWelsSvcCodingParam* pCfg) {
     return cmInitParaError;
   }
 
-  //	assert( cfg.uiGopSize >= 1 && ( cfg.uiIntraPeriod && (cfg.uiIntraPeriod % cfg.uiGopSize) == 0) );
+  // assert( cfg.uiGopSize >= 1 && ( cfg.uiIntraPeriod && (cfg.uiIntraPeriod % cfg.uiGopSize) == 0) );
 
   if (pCfg->uiGopSize < 1 || pCfg->uiGopSize > MAX_GOP_SIZE) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
@@ -1231,7 +1231,7 @@ void CWelsH264SVCEncoder::DumpSrcPicture (const uint8_t* pSrc) {
   case videoFormatYV12:
     WelsStrcat (strFileName, 256, "yuv");	// confirmed_safe_unsafe_usage
     pFile = WelsFopen (strFileName, "ab+");
-    //				WelsLog( &m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "WELS_CSP_I420, m_iCspInternal= 0x%x", m_iCspInternal);
+    // WelsLog( &m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "WELS_CSP_I420, m_iCspInternal= 0x%x", m_iCspInternal);
     if (NULL != pFile) {
       fwrite (pSrc, sizeof (uint8_t), (iDataLength * 3) >> 1, pFile);
       fflush (pFile);
@@ -1249,7 +1249,7 @@ void CWelsH264SVCEncoder::DumpSrcPicture (const uint8_t* pSrc) {
   case videoFormatBGR:
     WelsStrcat (strFileName, 256, "bgr");	// confirmed_safe_unsafe_usage
     pFile = WelsFopen (strFileName, "ab+");
-    //				WelsLog( &m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "WELS_CSP_BGR, m_iCspInternal= 0x%x", m_iCspInternal);
+    // WelsLog( &m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "WELS_CSP_BGR, m_iCspInternal= 0x%x", m_iCspInternal);
     if (NULL != pFile) {
       fwrite (pSrc, sizeof (uint8_t), iDataLength * 3, pFile);
       fflush (pFile);

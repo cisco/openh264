@@ -72,7 +72,7 @@ void GeneralBilinearFastDownsampler_ref (uint8_t* pDst, const int32_t kiDstStrid
       x += 1;
       x >>= 1;
       //x = (((__int64)(SCALE_BIG - 1 - iFu))*(SCALE_BIG - 1 - fv)*a + ((__int64)iFu)*(SCALE_BIG - 1 -fv)*b + ((__int64)(SCALE_BIG - 1 -iFu))*fv*c +
-      //		 ((__int64)iFu)*fv*d + (1 << (2*SCALE_BIT_BIG-1)) ) >> (2*SCALE_BIT_BIG);
+      // ((__int64)iFu)*fv*d + (1 << (2*SCALE_BIT_BIG-1)) ) >> (2*SCALE_BIT_BIG);
       x = WELS_CLAMP (x, 0, 255);
       *pByDst++ = (uint8_t)x;
 
