@@ -844,6 +844,9 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
     goto INSIDE_MEM_FREE;
   }
 
+
+  // --------------------------------- //
+  // ENCODING PROCESS STARTS HERE, LOOPING OVER ALL AVAILABLE FRAMES //
   iFrameIdx = 0;
   while (iFrameIdx < iTotalFrameMax && (((int32_t)fs.uiFrameToBeCoded <= 0)
                                         || (iFrameIdx < (int32_t)fs.uiFrameToBeCoded))) {
@@ -900,6 +903,8 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
             delete [] pUCArry;
           }
 #endif
+
+          fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs);	// write pure bit stream into file
           fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs);	// write pure bit stream into file
           iFrameSize += iLayerSize;
         }
@@ -1022,6 +1027,8 @@ int main (int argc, char** argv)
   /* Control-C handler */
   signal (SIGINT, SigIntHandler);
 
+  argc = 2;
+  argv[1] = "/home/joachim/Documents/openH264-git/openh264/testbin/welsenc.cfg";
   iRet = CreateSVCEncHandle (&pSVCEncoder);
   if (iRet) {
     cout << "WelsCreateSVCEncoder() failed!!" << endl;

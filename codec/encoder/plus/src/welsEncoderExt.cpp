@@ -393,6 +393,7 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
 #ifdef DUMP_SRC_PICTURE
   DumpSrcPicture (pSrc);
 #endif // DUMP_SRC_PICTURE
+
   return kiEncoderReturn;
 }
 
