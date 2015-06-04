@@ -1392,11 +1392,11 @@ bool WelsMdPSkipEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCac
     iEncStride = pEncCtx->pCurDqLayer->iEncStride[1];
     pEncMb = pMbCache->SPicData.pEncMb[1];
     pEncBlockOffset = pStrideEncBlockOffset + 16;
-    pFunc->pfDctFourT4 (pMbCache->pCoeffLevel + 256, & (pEncMb[*pEncBlockOffset]), iEncStride,	pMbCache->pSkipMb + 256, 8);
+    pFunc->pfDctFourT4 (pMbCache->pCoeffLevel + 256, & (pEncMb[*pEncBlockOffset]), iEncStride, pMbCache->pSkipMb + 256, 8);
     if (WelsTryPUVskip (pEncCtx, pCurMb, pMbCache, 1)) {
       pEncMb = pMbCache->SPicData.pEncMb[2];
       pEncBlockOffset = pStrideEncBlockOffset + 20;
-      pFunc->pfDctFourT4 (pMbCache->pCoeffLevel + 320, & (pEncMb[*pEncBlockOffset]), iEncStride,	pMbCache->pSkipMb + 320, 8);
+      pFunc->pfDctFourT4 (pMbCache->pCoeffLevel + 320, & (pEncMb[*pEncBlockOffset]), iEncStride, pMbCache->pSkipMb + 320, 8);
       if (WelsTryPUVskip (pEncCtx, pCurMb, pMbCache, 2)) {
         //update motion info to current MB
         ST32 (pCurMb->pRefIndex, 0);
@@ -1539,7 +1539,7 @@ void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurM
     sMeRefine.pfCopyBlockByMode = pFunc->pfCopy8x8Aligned;
     for (i = 0; i < 4; i++) {
       int32_t iBlk8Idx = i << 2; //0, 4, 8, 12
-      int32_t	iBlk4X, iBlk4Y;
+      int32_t iBlk4X, iBlk4Y;
 
       pCurMb->pRefIndex[i] = pWelsMd->uiRef;
 

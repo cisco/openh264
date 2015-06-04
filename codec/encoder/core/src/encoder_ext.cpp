@@ -935,12 +935,12 @@ static int32_t WelsGenerateNewSps (sWelsEncCtx* pCtx, const bool kbUseSubsetSps,
 
 static bool CheckMatchedSps (SWelsSPS* const pSps1, SWelsSPS* const pSps2) {
 
-  if ((pSps1->iMbWidth	!= pSps2->iMbWidth)
+  if ((pSps1->iMbWidth != pSps2->iMbWidth)
       || (pSps1->iMbHeight != pSps2->iMbHeight)) {
     return false;
   }
 
-  if ((pSps1->uiLog2MaxFrameNum	!= pSps2->uiLog2MaxFrameNum)
+  if ((pSps1->uiLog2MaxFrameNum != pSps2->uiLog2MaxFrameNum)
       || (pSps1->iLog2MaxPocLsb != pSps2->iLog2MaxPocLsb)) {
     return false;
   }
@@ -949,7 +949,7 @@ static bool CheckMatchedSps (SWelsSPS* const pSps1, SWelsSPS* const pSps2) {
     return false;
   }
 
-  if ((pSps1->bFrameCroppingFlag	!= pSps2->bFrameCroppingFlag)
+  if ((pSps1->bFrameCroppingFlag != pSps2->bFrameCroppingFlag)
       || (pSps1->sFrameCrop.iCropLeft != pSps2->sFrameCrop.iCropLeft)
       || (pSps1->sFrameCrop.iCropRight != pSps2->sFrameCrop.iCropRight)
       || (pSps1->sFrameCrop.iCropTop != pSps2->sFrameCrop.iCropTop)
@@ -975,8 +975,8 @@ static bool CheckMatchedSubsetSps (SSubsetSps* const pSubsetSps1, SSubsetSps* co
     return false;
   }
 
-  if ((pSubsetSps1->sSpsSvcExt.iExtendedSpatialScalability	!= pSubsetSps2->sSpsSvcExt.iExtendedSpatialScalability)
-      || (pSubsetSps1->sSpsSvcExt.bAdaptiveTcoeffLevelPredFlag	!= pSubsetSps2->sSpsSvcExt.bAdaptiveTcoeffLevelPredFlag)
+  if ((pSubsetSps1->sSpsSvcExt.iExtendedSpatialScalability      != pSubsetSps2->sSpsSvcExt.iExtendedSpatialScalability)
+      || (pSubsetSps1->sSpsSvcExt.bAdaptiveTcoeffLevelPredFlag  != pSubsetSps2->sSpsSvcExt.bAdaptiveTcoeffLevelPredFlag)
       || (pSubsetSps1->sSpsSvcExt.bSeqTcoeffLevelPredFlag != pSubsetSps2->sSpsSvcExt.bSeqTcoeffLevelPredFlag)
       || (pSubsetSps1->sSpsSvcExt.bSliceHeaderRestrictionFlag != pSubsetSps2->sSpsSvcExt.bSliceHeaderRestrictionFlag)) {
     return false;

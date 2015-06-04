@@ -208,7 +208,7 @@ void WelsSpatialWriteSubMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurM
   }
 }
 
-int32_t CheckBitstreamBuffer (const uint32_t	kuiSliceIdx, sWelsEncCtx* pEncCtx,  SBitStringAux* pBs) {
+int32_t CheckBitstreamBuffer (const uint32_t kuiSliceIdx, sWelsEncCtx* pEncCtx, SBitStringAux* pBs) {
   const intX_t iLeftLength = pBs->pEndBuf - pBs->pCurBuf - 1;
   assert (iLeftLength > 0);
 

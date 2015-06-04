@@ -582,7 +582,7 @@ int32_t CWelsPreProcess::DownsamplePadding (SPicture* pSrc, SPicture* pDstPic,  
   iShrinkWidth -= (iShrinkWidth & 1);
   iShrinkHeight -= (iShrinkHeight & 1);
   Padding ((uint8_t*)sDstPicMap.pPixel[0], (uint8_t*)sDstPicMap.pPixel[1], (uint8_t*)sDstPicMap.pPixel[2],
-           sDstPicMap.iStride[0], sDstPicMap.iStride[1],	iShrinkWidth, iTargetWidth, iShrinkHeight, iTargetHeight);
+           sDstPicMap.iStride[0], sDstPicMap.iStride[1], iShrinkWidth, iTargetWidth, iShrinkHeight, iTargetHeight);
 
   return iRet;
 }
@@ -1209,7 +1209,7 @@ void CWelsPreProcess::WelsExchangeSpatialPictures (SPicture** ppPic1, SPicture**
   *ppPic2 = tmp;
 }
 
-void CWelsPreProcess::UpdateSrcListLosslessScreenRefSelectionWithLtr (SPicture*	pCurPicture, const int32_t kiCurDid,
+void CWelsPreProcess::UpdateSrcListLosslessScreenRefSelectionWithLtr (SPicture* pCurPicture, const int32_t kiCurDid,
     const int32_t kuiMarkLongTermPicIdx, SPicture** pLongRefList) {
   SPicture** pLongRefSrcList = &m_pSpatialPic[kiCurDid][0];
   for (int32_t i = 0; i < MAX_REF_PIC_COUNT; ++i) {
@@ -1225,7 +1225,7 @@ void CWelsPreProcess::UpdateSrcListLosslessScreenRefSelectionWithLtr (SPicture*	
   m_iAvaliableRefInSpatialPicList = MAX_REF_PIC_COUNT;
   (GetCurrentFrameFromOrigList (kiCurDid))->SetUnref();
 }
-void CWelsPreProcess::UpdateSrcList (SPicture*	pCurPicture, const int32_t kiCurDid, SPicture** pShortRefList,
+void CWelsPreProcess::UpdateSrcList (SPicture* pCurPicture, const int32_t kiCurDid, SPicture** pShortRefList,
                                      const uint32_t kuiShortRefCount) {
   SPicture** pRefSrcList = &m_pSpatialPic[kiCurDid][0];
 

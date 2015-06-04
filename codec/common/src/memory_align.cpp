@@ -45,7 +45,7 @@ static uint32_t nCountRequestNum;
 
 CMemoryAlign::CMemoryAlign (const uint32_t kuiCacheLineSize)
 #ifdef MEMORY_MONITOR
-  :	m_nMemoryUsageInBytes (0)
+  : m_nMemoryUsageInBytes (0)
 #endif//MEMORY_MONITOR
 {
   if ((kuiCacheLineSize == 0) || (kuiCacheLineSize & 0x0f))

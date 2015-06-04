@@ -54,10 +54,10 @@ namespace WelsDec {
 void WelsI4x4LumaPredV_c (uint8_t* pPred, const int32_t kiStride) {
   const uint32_t kuiVal = LD32A4 (pPred - kiStride);
 
-  ST32A4 (pPred						    , kuiVal);
-  ST32A4 (pPred + kiStride				, kuiVal);
-  ST32A4 (pPred + (kiStride << 1)			, kuiVal);
-  ST32A4 (pPred + (kiStride << 1) + kiStride	, kuiVal);
+  ST32A4 (pPred                                 , kuiVal);
+  ST32A4 (pPred + kiStride                      , kuiVal);
+  ST32A4 (pPred + (kiStride << 1)               , kuiVal);
+  ST32A4 (pPred + (kiStride << 1) + kiStride    , kuiVal);
 }
 
 void WelsI4x4LumaPredH_c (uint8_t* pPred, const int32_t kiStride) {
@@ -68,7 +68,7 @@ void WelsI4x4LumaPredH_c (uint8_t* pPred, const int32_t kiStride) {
   const uint32_t kuiL2 = 0x01010101U * pPred[-1 + kiStride2];
   const uint32_t kuiL3 = 0x01010101U * pPred[-1 + kiStride3];
 
-  ST32A4 (pPred          , kuiL0);
+  ST32A4 (pPred            , kuiL0);
   ST32A4 (pPred + kiStride , kuiL1);
   ST32A4 (pPred + kiStride2, kuiL2);
   ST32A4 (pPred + kiStride3, kuiL3);
@@ -81,7 +81,7 @@ void WelsI4x4LumaPredDc_c (uint8_t* pPred, const int32_t kiStride) {
                            pPred[-kiStride] + pPred[-kiStride + 1] + pPred[-kiStride + 2] + pPred[-kiStride + 3] + 4) >> 3;
   const uint32_t kuiMean32 = 0x01010101U * kuiMean;
 
-  ST32A4 (pPred          , kuiMean32);
+  ST32A4 (pPred            , kuiMean32);
   ST32A4 (pPred + kiStride , kuiMean32);
   ST32A4 (pPred + kiStride2, kuiMean32);
   ST32A4 (pPred + kiStride3, kuiMean32);
@@ -93,7 +93,7 @@ void WelsI4x4LumaPredDcLeft_c (uint8_t* pPred, const int32_t kiStride) {
   const uint8_t kuiMean	= (pPred[-1] + pPred[-1 + kiStride] + pPred[-1 + kiStride2] + pPred[-1 + kiStride3] + 2) >> 2;
   const uint32_t kuiMean32 = 0x01010101U * kuiMean;
 
-  ST32A4 (pPred          , kuiMean32);
+  ST32A4 (pPred            , kuiMean32);
   ST32A4 (pPred + kiStride , kuiMean32);
   ST32A4 (pPred + kiStride2, kuiMean32);
   ST32A4 (pPred + kiStride3, kuiMean32);
@@ -106,7 +106,7 @@ void WelsI4x4LumaPredDcTop_c (uint8_t* pPred, const int32_t kiStride) {
                           2;
   const uint32_t kuiMean32 = 0x01010101U * kuiMean;
 
-  ST32A4 (pPred          , kuiMean32);
+  ST32A4 (pPred            , kuiMean32);
   ST32A4 (pPred + kiStride , kuiMean32);
   ST32A4 (pPred + kiStride2, kuiMean32);
   ST32A4 (pPred + kiStride3, kuiMean32);
@@ -115,9 +115,9 @@ void WelsI4x4LumaPredDcTop_c (uint8_t* pPred, const int32_t kiStride) {
 void WelsI4x4LumaPredDcNA_c (uint8_t* pPred, const int32_t kiStride) {
   const uint32_t kuiDC32		= 0x80808080U;
 
-  ST32A4 (pPred                       , kuiDC32);
-  ST32A4 (pPred + kiStride              , kuiDC32);
-  ST32A4 (pPred + (kiStride << 1)         , kuiDC32);
+  ST32A4 (pPred                             , kuiDC32);
+  ST32A4 (pPred + kiStride                  , kuiDC32);
+  ST32A4 (pPred + (kiStride << 1)           , kuiDC32);
   ST32A4 (pPred + (kiStride << 1) + kiStride, kuiDC32);
 }
 
@@ -144,7 +144,7 @@ void WelsI4x4LumaPredDDL_c (uint8_t* pPred, const int32_t kiStride) {
   const uint8_t kuiDDL6	= (2 + kuiT6 + kuiT7 + (kuiT7 << 1)) >> 2;	// kDDL6
   const uint8_t kuiList[8] = { kuiDDL0, kuiDDL1, kuiDDL2, kuiDDL3, kuiDDL4, kuiDDL5, kuiDDL6, 0 };
 
-  ST32A4 (pPred          , LD32 (kuiList));
+  ST32A4 (pPred            , LD32 (kuiList));
   ST32A4 (pPred + kiStride , LD32 (kuiList + 1));
   ST32A4 (pPred + kiStride2, LD32 (kuiList + 2));
   ST32A4 (pPred + kiStride3, LD32 (kuiList + 3));
@@ -170,7 +170,7 @@ void WelsI4x4LumaPredDDLTop_c (uint8_t* pPred, const int32_t kiStride) {
   const uint8_t kuiDLT3	= kuiT33 >> 1;			// kDLT3
   const uint8_t kuiList[8] = { kuiDLT0, kuiDLT1, kuiDLT2, kuiDLT3, kuiDLT3, kuiDLT3, kuiDLT3 , kuiDLT3 };
 
-  ST32A4 (pPred,           LD32 (kuiList));
+  ST32A4 (pPred,             LD32 (kuiList));
   ST32A4 (pPred + kiStride,  LD32 (kuiList + 1));
   ST32A4 (pPred + kiStride2, LD32 (kuiList + 2));
   ST32A4 (pPred + kiStride3, LD32 (kuiList + 3));
@@ -210,7 +210,7 @@ void WelsI4x4LumaPredDDR_c (uint8_t* pPred, const int32_t kiStride) {
   const uint8_t kuiDDR6	= (kuiL12 + kuiL23) >> 2;	// kuiDDR6
   const uint8_t kuiList[8] = { kuiDDR6, kuiDDR5, kuiDDR4, kuiDDR0, kuiDDR1, kuiDDR2, kuiDDR3, 0	};
 
-  ST32A4 (pPred          , LD32 (kuiList + 3));
+  ST32A4 (pPred            , LD32 (kuiList + 3));
   ST32A4 (pPred + kiStride , LD32 (kuiList + 2));
   ST32A4 (pPred + kiStride2, LD32 (kuiList + 1));
   ST32A4 (pPred + kiStride3, LD32 (kuiList));
@@ -248,7 +248,7 @@ void WelsI4x4LumaPredVL_c (uint8_t* pPred, const int32_t kiStride) {
   const uint8_t kuiVL9		= (kuiT45 + kuiT56) >> 2;	// kuiVL9
   const uint8_t kuiList[10]	= { kuiVL0, kuiVL1, kuiVL2, kuiVL3, kuiVL4, kuiVL5, kuiVL6, kuiVL7, kuiVL8, kuiVL9 };
 
-  ST32A4 (pPred,           LD32 (kuiList));
+  ST32A4 (pPred,             LD32 (kuiList));
   ST32A4 (pPred + kiStride,  LD32 (kuiList + 5));
   ST32A4 (pPred + kiStride2, LD32 (kuiList + 1));
   ST32A4 (pPred + kiStride3, LD32 (kuiList + 6));
@@ -278,7 +278,7 @@ void WelsI4x4LumaPredVLTop_c (uint8_t* pPred, const int32_t kiStride) {
   const uint8_t kuiVL7		= kuiVL3;
   const uint8_t kuiList[10]	= { kuiVL0, kuiVL1, kuiVL2, kuiVL3, kuiVL3, kuiVL4, kuiVL5, kuiVL6, kuiVL7, kuiVL7 };
 
-  ST32A4 (pPred          , LD32 (kuiList));
+  ST32A4 (pPred            , LD32 (kuiList));
   ST32A4 (pPred + kiStride , LD32 (kuiList + 5));
   ST32A4 (pPred + kiStride2, LD32 (kuiList + 1));
   ST32A4 (pPred + kiStride3, LD32 (kuiList + 6));
@@ -310,7 +310,7 @@ void WelsI4x4LumaPredVR_c (uint8_t* pPred, const int32_t kiStride) {
   const uint8_t kuiVR9		= (2 + kuiL0 + (kuiL1 << 1) + kuiL2) >> 2;	// kuiVR9
   const uint8_t kuiList[10]	= { kuiVR8, kuiVR0, kuiVR1, kuiVR2, kuiVR3, kuiVR9, kuiVR4, kuiVR5, kuiVR6, kuiVR7 };
 
-  ST32A4 (pPred          , LD32 (kuiList + 1));
+  ST32A4 (pPred            , LD32 (kuiList + 1));
   ST32A4 (pPred + kiStride , LD32 (kuiList + 6));
   ST32A4 (pPred + kiStride2, LD32 (kuiList));
   ST32A4 (pPred + kiStride3, LD32 (kuiList + 5));
@@ -336,7 +336,7 @@ void WelsI4x4LumaPredHU_c (uint8_t* pPred, const int32_t kiStride) {
   const uint8_t kuiHU5		= (1 + kuiL23 + (kuiL3 << 1)) >> 2;
   const uint8_t kuiList[10]	= { kuiHU0, kuiHU1, kuiHU2, kuiHU3, kuiHU4, kuiHU5, kuiL3, kuiL3, kuiL3, kuiL3 };
 
-  ST32A4 (pPred          , LD32 (kuiList));
+  ST32A4 (pPred            , LD32 (kuiList));
   ST32A4 (pPred + kiStride , LD32 (kuiList + 2));
   ST32A4 (pPred + kiStride2, LD32 (kuiList + 4));
   ST32A4 (pPred + kiStride3, LD32 (kuiList + 6));
@@ -374,7 +374,7 @@ void WelsI4x4LumaPredHD_c (uint8_t* pPred, const int32_t kiStride) {
   const uint8_t kuiHD9	    = (kuiL12 + kuiL23) >> 2;
   const uint8_t kuiList[10]	= { kuiHD8, kuiHD9, kuiHD6, kuiHD7, kuiHD4, kuiHD5, kuiHD0, kuiHD1, kuiHD2, kuiHD3 };
 
-  ST32A4 (pPred          , LD32 (kuiList + 6));
+  ST32A4 (pPred            , LD32 (kuiList + 6));
   ST32A4 (pPred + kiStride , LD32 (kuiList + 4));
   ST32A4 (pPred + kiStride2, LD32 (kuiList + 2));
   ST32A4 (pPred + kiStride3, LD32 (kuiList));

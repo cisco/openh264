@@ -45,10 +45,10 @@
 
 namespace WelsEnc {
 void WelsDctMb (int16_t* pRes, uint8_t* pEncMb, int32_t iEncStride, uint8_t* pBestPred, PDctFunc pfDctFourT4) {
-  pfDctFourT4 (pRes,			    pEncMb,							    iEncStride, pBestPred,			16);
-  pfDctFourT4 (pRes + 64,		pEncMb + 8,						    iEncStride, pBestPred + 8,		16);
-  pfDctFourT4 (pRes + 128,	pEncMb + 8 * iEncStride,		iEncStride, pBestPred + 128,	16);
-  pfDctFourT4 (pRes + 192,	pEncMb + 8 * iEncStride + 8,	iEncStride, pBestPred + 136,	16);
+  pfDctFourT4 (pRes,       pEncMb,                      iEncStride, pBestPred,       16);
+  pfDctFourT4 (pRes + 64,  pEncMb + 8,                  iEncStride, pBestPred + 8,   16);
+  pfDctFourT4 (pRes + 128, pEncMb + 8 * iEncStride,     iEncStride, pBestPred + 128, 16);
+  pfDctFourT4 (pRes + 192, pEncMb + 8 * iEncStride + 8, iEncStride, pBestPred + 136, 16);
 }
 
 void WelsEncRecI16x16Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
@@ -77,7 +77,7 @@ void WelsEncRecI16x16Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
 
   for (i = 0; i < 4; i++) {
     pFuncList->pfQuantizationFour4x4 (pRes, pFF,  pMF);
-    pFuncList->pfScan4x4Ac (pBlock,		pRes);
+    pFuncList->pfScan4x4Ac (pBlock,      pRes);
     pFuncList->pfScan4x4Ac (pBlock + 16, pRes + 16);
     pFuncList->pfScan4x4Ac (pBlock + 32, pRes + 32);
     pFuncList->pfScan4x4Ac (pBlock + 48, pRes + 48);
@@ -126,12 +126,12 @@ void WelsEncRecI16x16Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
     pRes[224] = aDctT4Dc[14];
     pRes[240] = aDctT4Dc[15];
 
-    pFuncList->pfIDctFourT4 (pPred,					              kiRecStride, pBestPred,		       16, pRes);
-    pFuncList->pfIDctFourT4 (pPred + 8,				          kiRecStride, pBestPred + 8,	   16, pRes + 64);
-    pFuncList->pfIDctFourT4 (pPred + kiRecStride * 8,	      kiRecStride, pBestPred + 128,  16, pRes + 128);
+    pFuncList->pfIDctFourT4 (pPred,                       kiRecStride, pBestPred,        16, pRes);
+    pFuncList->pfIDctFourT4 (pPred + 8,                   kiRecStride, pBestPred + 8,    16, pRes + 64);
+    pFuncList->pfIDctFourT4 (pPred + kiRecStride * 8,     kiRecStride, pBestPred + 128,  16, pRes + 128);
     pFuncList->pfIDctFourT4 (pPred + kiRecStride * 8 + 8, kiRecStride, pBestPred + 136,  16, pRes + 192);
   } else if (uiCountI16x16Dc > 0) {
-    pFuncList->pfIDctI16x16Dc (pPred,	kiRecStride, pBestPred,	16, aDctT4Dc);
+    pFuncList->pfIDctI16x16Dc (pPred, kiRecStride, pBestPred, 16, aDctT4Dc);
   } else {
     pFuncList->pfCopy16x16Aligned (pPred, kiRecStride, pBestPred, 16);
   }
@@ -319,10 +319,10 @@ void    WelsRecPskip (SDqLayer* pCurLayer, SWelsFuncPtrList* pFuncList, SMB* pCu
   int32_t* iRecStride	= pCurLayer->iCsStride;
   uint8_t** pCsMb		= &pMbCache->SPicData.pCsMb[0];
 
-  pFuncList->pfCopy16x16Aligned (pCsMb[0],	*iRecStride++,	pMbCache->pSkipMb,		16);
-  pFuncList->pfCopy8x8Aligned (pCsMb[1],	*iRecStride++,	pMbCache->pSkipMb + 256,	8);
-  pFuncList->pfCopy8x8Aligned (pCsMb[2],	*iRecStride,	pMbCache->pSkipMb + 320,	8);
-  pFuncList->pfSetMemZeroSize8 (pCurMb->pNonZeroCount,	24);
+  pFuncList->pfCopy16x16Aligned (pCsMb[0],  *iRecStride++,  pMbCache->pSkipMb,       16);
+  pFuncList->pfCopy8x8Aligned (pCsMb[1],    *iRecStride++,  pMbCache->pSkipMb + 256, 8);
+  pFuncList->pfCopy8x8Aligned (pCsMb[2],    *iRecStride,    pMbCache->pSkipMb + 320, 8);
+  pFuncList->pfSetMemZeroSize8 (pCurMb->pNonZeroCount,  24);
 }
 
 bool WelsTryPYskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
@@ -344,7 +344,7 @@ bool WelsTryPYskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
         pEncCtx->pFuncList->pfScan4x4 (pBlock, pRes); //
         iSingleCtrMb += pEncCtx->pFuncList->pfCalculateSingleCtr4x4 (pBlock);
       }
-      if (iSingleCtrMb >= 6) 	return false; //from JVT-O079
+      if (iSingleCtrMb >= 6) return false; //from JVT-O079
       pRes += 16;
       pBlock += 16;
     }
@@ -370,7 +370,7 @@ bool    WelsTryPUVskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, i
     pEncCtx->pFuncList->pfQuantizationFour4x4Max (pRes, pFF,  pMF, (int16_t*)aMax);
 
     for (j = 0; j < 4; j++) {
-      if (aMax[j] > 1)		return false;	// iSingleCtrMb += 9, can't be P_SKIP
+      if (aMax[j] > 1) return false;   // iSingleCtrMb += 9, can't be P_SKIP
       else if (aMax[j] == 1) {
         pEncCtx->pFuncList->pfScan4x4Ac (pBlock, pRes);
         iSingleCtrMb += pEncCtx->pFuncList->pfCalculateSingleCtr4x4 (pBlock);

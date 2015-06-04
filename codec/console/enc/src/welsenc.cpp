@@ -706,7 +706,7 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
   FILE* pFileYUV = NULL;
   int32_t iActualFrameEncodedCount = 0;
   int32_t iFrameIdx = 0;
-  int32_t	iTotalFrameMax = -1;
+  int32_t iTotalFrameMax = -1;
   uint8_t* pYUV = NULL;
   SSourcePicture* pSrcPic = NULL;
   uint32_t iSourceWidth, iSourceHeight, kiPicResSize;

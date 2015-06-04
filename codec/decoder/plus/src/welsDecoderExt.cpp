@@ -87,7 +87,7 @@ namespace WelsDec {
 *   return: none
 ***************************************************************************/
 CWelsDecoder::CWelsDecoder (void)
-  :	m_pDecContext (NULL),
+  : m_pDecContext (NULL),
     m_pWelsTrace (NULL) {
 #ifdef OUTPUT_BIT_STREAM
   char chFileName[1024] = { 0 };  //for .264
