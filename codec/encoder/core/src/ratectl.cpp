@@ -154,8 +154,9 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
 
     pWelsSvcRc->iNumberMbGom   = iMbWidth * iGomRowMode0;
 
-    pWelsSvcRc->iMinQp = GOM_MIN_QP_MODE;
-    pWelsSvcRc->iMaxQp = GOM_MAX_QP_MODE;
+    pWelsSvcRc->iMinQp = pEncCtx->pSvcParam->iMinQp;
+
+    pWelsSvcRc->iMaxQp = pEncCtx->pSvcParam->iMaxQp;
 
     pWelsSvcRc->iFrameDeltaQpUpper = LAST_FRAME_QP_RANGE_UPPER_MODE1 - ((LAST_FRAME_QP_RANGE_UPPER_MODE1 -
                                      LAST_FRAME_QP_RANGE_UPPER_MODE0) * pWelsSvcRc->iRcVaryRatio / MAX_BITS_VARY_PERCENTAGE);
@@ -414,7 +415,7 @@ void RcInitIdrQp (sWelsEncCtx* pEncCtx) {
       break;
   }
   pWelsSvcRc->iInitialQp = dInitialQPArray[iBppIndex][i];
-  pWelsSvcRc->iInitialQp = WELS_CLIP3 (pWelsSvcRc->iInitialQp, MIN_IDR_QP, MAX_IDR_QP);
+  pWelsSvcRc->iInitialQp = WELS_CLIP3 (pWelsSvcRc->iInitialQp, pEncCtx->pSvcParam->iMinQp, pEncCtx->pSvcParam->iMaxQp);
   pEncCtx->iGlobalQp = pWelsSvcRc->iInitialQp;
   pWelsSvcRc->iQStep = RcConvertQp2QStep (pEncCtx->iGlobalQp);
   pWelsSvcRc->iLastCalculatedQScale = pEncCtx->iGlobalQp;
@@ -429,7 +430,7 @@ void RcCalculateIdrQp (sWelsEncCtx* pEncCtx) {
   }
   pWelsSvcRc->iInitialQp = RcConvertQStep2Qp (WELS_DIV_ROUND (pWelsSvcRc->iIntraComplexity,
                            pWelsSvcRc->iTargetBits));
-  pWelsSvcRc->iInitialQp = WELS_CLIP3 (pWelsSvcRc->iInitialQp, MIN_IDR_QP, MAX_IDR_QP);
+  pWelsSvcRc->iInitialQp = WELS_CLIP3 (pWelsSvcRc->iInitialQp, pEncCtx->pSvcParam->iMinQp, pEncCtx->pSvcParam->iMaxQp);
   pEncCtx->iGlobalQp = pWelsSvcRc->iInitialQp;
   pWelsSvcRc->iQStep = RcConvertQp2QStep (pEncCtx->iGlobalQp);
   pWelsSvcRc->iLastCalculatedQScale = pEncCtx->iGlobalQp;
@@ -460,14 +461,14 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
     iLumaQp = WELS_CLIP3 (iLumaQp,
                           pWelsSvcRc->iLastCalculatedQScale - pWelsSvcRc->iFrameDeltaQpLower + iDeltaQpTemporal,
                           pWelsSvcRc->iLastCalculatedQScale + pWelsSvcRc->iFrameDeltaQpUpper + iDeltaQpTemporal);
-    iLumaQp = WELS_CLIP3 (iLumaQp,  GOM_MIN_QP_MODE, MAX_LOW_BR_QP);
+    iLumaQp = WELS_CLIP3 (iLumaQp,  pEncCtx->pSvcParam->iMinQp, pEncCtx->pSvcParam->iMaxQp);
 
     pWelsSvcRc->iQStep = RcConvertQp2QStep (iLumaQp);
     pWelsSvcRc->iLastCalculatedQScale = iLumaQp;
 
     if (pEncCtx->pSvcParam->bEnableAdaptiveQuant) {
       iLumaQp = WELS_CLIP3 ((iLumaQp * INT_MULTIPLY - pEncCtx->pVaa->sAdaptiveQuantParam.iAverMotionTextureIndexToDeltaQp) /
-                            INT_MULTIPLY, GOM_MIN_QP_MODE, MAX_LOW_BR_QP);
+                            INT_MULTIPLY, pEncCtx->pSvcParam->iMinQp, pEncCtx->pSvcParam->iMaxQp);
     }
 
     pEncCtx->iGlobalQp = iLumaQp;
@@ -497,7 +498,7 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
                           pWelsSvcRc->iLastCalculatedQScale + pWelsSvcRc->iFrameDeltaQpUpper + iDeltaQpTemporal);
   }
 
-  iLumaQp = WELS_CLIP3 (iLumaQp,  GOM_MIN_QP_MODE, GOM_MAX_QP_MODE);
+  iLumaQp = WELS_CLIP3 (iLumaQp,  pEncCtx->pSvcParam->iMinQp, pEncCtx->pSvcParam->iMaxQp);
 
   pWelsSvcRc->iQStep = RcConvertQp2QStep (iLumaQp);
   pWelsSvcRc->iLastCalculatedQScale = iLumaQp;

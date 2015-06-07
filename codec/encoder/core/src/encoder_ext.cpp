@@ -202,7 +202,7 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
   if (pCfg->iSpatialLayerNum > 1) {
     for (i = pCfg->iSpatialLayerNum - 1; i > 0; i--) {
       SSpatialLayerConfig* fDlpUp = &pCfg->sSpatialLayers[i];
-      SSpatialLayerConfig* fDlp = &pCfg->sSpatialLayers[i-1];
+      SSpatialLayerConfig* fDlp = &pCfg->sSpatialLayers[i - 1];
       if ((fDlp->iVideoWidth > fDlpUp->iVideoWidth) || (fDlp->iVideoHeight > fDlpUp->iVideoHeight)) {
         WelsLog (pLogCtx, WELS_LOG_ERROR,
                  "ParamValidation,Invalid resolution layer(%d) resolution(%d x %d) should be less than the upper spatial layer resolution(%d x %d) ",
@@ -271,6 +271,18 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
         WelsLog (pLogCtx, WELS_LOG_WARNING,
                  "bEnableFrameSkip = %d,bitrate can't be controlled for RC_QUALITY_MODE,RC_BITRATE_MODE and RC_TIMESTAMP_MODE without enabling skip frame.",
                  pCfg->bEnableFrameSkip);
+    if (pCfg->iRCMode == RC_QUALITY_MODE) {
+      pCfg->iMinQp = WELS_CLIP3 (pCfg->iMinQp , GOM_MIN_QP_MODE, GOM_MAX_QP_MODE);
+      pCfg->iMaxQp = WELS_CLIP3 (pCfg->iMaxQp , GOM_MIN_QP_MODE, GOM_MAX_QP_MODE);
+      if (pCfg->iMaxQp < pCfg->iMinQp)
+        pCfg->iMaxQp = GOM_MAX_QP_MODE;
+    } else {
+      pCfg->iMinQp = WELS_CLIP3 (pCfg->iMinQp , 0, 51);
+      pCfg->iMaxQp = WELS_CLIP3 (pCfg->iMaxQp , 0, 51);
+      if (pCfg->iMaxQp < pCfg->iMinQp)
+        pCfg->iMaxQp = 51;
+
+    }
   }
   // ref-frames validation
   if (((pCfg->iUsageType == CAMERA_VIDEO_REAL_TIME) || (pCfg->iUsageType == SCREEN_CONTENT_REAL_TIME))
@@ -3709,7 +3721,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   if (iSpatialNum < 1) {	// skip due to temporal layer settings (different frame rate)
     ++ pCtx->iCodingIndex;
     pFbi->eFrameType = videoFrameTypeSkip;
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, skip one frame due to preprocessing return (temporal layer settings or else), continual skipped %d frames",
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
+             "[Rc] Frame timestamp = %lld, skip one frame due to preprocessing return (temporal layer settings or else), continual skipped %d frames",
              pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
     return ENC_RETURN_SUCCESS;
   }
@@ -3719,7 +3732,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     if (pCtx->pFuncList->pfRc.pfWelsUpdateBufferWhenSkip)
       pCtx->pFuncList->pfRc.pfWelsUpdateBufferWhenSkip (pCtx, iSpatialNum);
     pFbi->eFrameType = eFrameType;
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, skip one frame due to target_br, continual skipped %d frames",
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
+             "[Rc] Frame timestamp = %lld, skip one frame due to target_br, continual skipped %d frames",
              pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
     return ENC_RETURN_SUCCESS;
   }
@@ -3730,7 +3744,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                  (uint32_t)pSrcPic->uiTimeStamp);
     if (bSkip) {
       pFbi->eFrameType = videoFrameTypeSkip;
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "[Rc] Frame timestamp = %lld, skip one frame due to max_br, continual skipped %d frames",
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
+               "[Rc] Frame timestamp = %lld, skip one frame due to max_br, continual skipped %d frames",
                pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
       return ENC_RETURN_SUCCESS;
     }
