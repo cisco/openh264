@@ -177,6 +177,32 @@ int CWelsH264SVCEncoder::GetDefaultParams (SEncParamExt* argv) {
   return cmResultSuccess;
 }
 
+
+/*
+ * On-the-fly param changes for SVC Encoder
+ */
+ void CWelsH264SVCEncoder::OnTheFlyParamModifUP (){
+
+	WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsH264SVCEncoder::InitEncoder(), openh264 codec version = %s",
+			VERSION_NUMBER);
+
+	m_pEncContext->pSvcParam->sSpatialLayers[0].iSpatialBitrate *= 4;
+	m_pEncContext->pSvcParam->iTargetBitrate *= 4;
+	m_pEncContext->pSvcParam->iMaxBitrate *= 4;
+}
+
+void CWelsH264SVCEncoder::OnTheFlyParamModifDOWN (){
+
+	WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsH264SVCEncoder::InitEncoder(), openh264 codec version = %s",
+			VERSION_NUMBER);
+
+	m_pEncContext->pSvcParam->sSpatialLayers[0].iSpatialBitrate *= 1/4;
+	m_pEncContext->pSvcParam->iTargetBitrate *= 1/4;
+	m_pEncContext->pSvcParam->iMaxBitrate *= 1/4;
+
+}
+
+
 /*
  *  SVC Encoder Initialization
  */
@@ -417,7 +443,7 @@ int CWelsH264SVCEncoder ::EncodeFrameInternal (const SSourcePicture*  pSrcPic, S
   ///////////////////for test
 #ifdef OUTPUT_BIT_STREAM
   if (pBsInfo->eFrameType != videoFrameTypeInvalid && pBsInfo->eFrameType != videoFrameTypeSkip) {
-    SLayerBSInfo* pLayer = NULL;
+    SLayerBSInfo* pLayer = NULL;<<<<
     int32_t i = 0, j = 0, iCurLayerBits = 0, total_bits = 0;
 
     if (m_bSwitch) {

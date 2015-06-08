@@ -270,6 +270,14 @@ typedef unsigned char bool;
 */
 class ISVCEncoder {
  public:
+
+  /**
+   * @brief	Modify the bitrate on the fly
+   */
+  virtual void EXTAPI OnTheFlyParamModifUP () = 0;
+  virtual void EXTAPI OnTheFlyParamModifDOWN () = 0;
+
+
   /**
   * @brief  Initialize the encoder
   * @param  pParam  basic encoder parameter
