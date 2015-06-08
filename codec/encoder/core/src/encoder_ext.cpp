@@ -3844,15 +3844,12 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
     pCtx->pFuncList->pMarkPic (pCtx);
     if (!pCtx->pFuncList->pBuildRefList (pCtx, pCtx->iPOC, 0)) {
-      pCtx->pVpp->UpdateSpatialPictures (pCtx, pSvcParam, iCurTid, iDidIdx);
-      // Force coding IDR as followed
-      ForceCodingIDR (pCtx);
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "WelsEncoderEncodeExt(), WelsBuildRefList failed for P frames, pCtx->iNumRef0= %d. ForceCodingIDR!",
                pCtx->iNumRef0);
-      pFbi->eFrameType = videoFrameTypeIDR;
+      eFrameType = videoFrameTypeIDR;
       pCtx->iEncoderError = ENC_RETURN_CORRECTED;
-      return ENC_RETURN_CORRECTED;
+      break;
     }
     if (pCtx->eSliceType != I_SLICE) {
       pCtx->pFuncList->pAfterBuildRefList (pCtx);
@@ -4119,13 +4116,10 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     // reference picture list update
     if (eNalRefIdc != NRI_PRI_LOWEST) {
       if (!pCtx->pFuncList->pUpdateRefList (pCtx)) {
-        pCtx->pVpp->UpdateSpatialPictures (pCtx, pSvcParam, iCurTid, iDidIdx);
-        // Force coding IDR as followed
-        ForceCodingIDR (pCtx);
         WelsLog (pLogCtx, WELS_LOG_WARNING, "WelsEncoderEncodeExt(), WelsUpdateRefList failed. ForceCodingIDR!");
         //the above is to set the next frame to be IDR
-        pFbi->eFrameType = eFrameType;
-        return ENC_RETURN_CORRECTED;
+        pCtx->iEncoderError = ENC_RETURN_CORRECTED;
+        break;
       }
     }
 
@@ -4276,7 +4270,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       WelsSwapDqLayers (pCtx);
     }
 
-    if (pCtx->pVpp->UpdateSpatialPictures (pCtx, pSvcParam, iCurTid, iDidIdx) != 0) {
+    if ((pCtx->pVpp->UpdateSpatialPictures (pCtx, pSvcParam, iCurTid, iDidIdx) != 0)
+      || (ENC_RETURN_CORRECTED == pCtx->iEncoderError)) {
       ForceCodingIDR (pCtx);
       WelsLog (pLogCtx, WELS_LOG_WARNING, "WelsEncoderEncodeExt(), Logic Error Found in temporal level. ForceCodingIDR!");
       //the above is to set the next frame IDR
