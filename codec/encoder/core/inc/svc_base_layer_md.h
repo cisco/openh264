@@ -63,6 +63,9 @@ int32_t WelsMdP16x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* p
 int32_t WelsMdP16x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWelsMd, SSlice* pSlice);
 int32_t WelsMdP8x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWelsMd, SSlice* pSlice);
 int32_t WelsMdP8x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWelsMd, SSlice* pSlice);
+int32_t WelsMdP4x4 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWelsMd, SSlice* pSlice, const int32_t ki8x8Idx);
+int32_t WelsMdP8x4 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWelsMd, SSlice* pSlice, const int32_t ki8x8Idx);
+int32_t WelsMdP4x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWelsMd, SSlice* pSlice, const int32_t ki8x8Idx);
 /*static*/  void WelsMdInterInit (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb, const int32_t kiSliceFirstMbXY);
 /*static*/ void WelsMdInterFinePartition (sWelsEncCtx* pEnc, SWelsMD* pMd, SSlice* pSlice, SMB* pCurMb, int32_t bestCost);
 /*static*/ void WelsMdInterFinePartitionVaa (sWelsEncCtx* pEnc, SWelsMD* pMd, SSlice* pSlice, SMB* pCurMb, int32_t bestCost);

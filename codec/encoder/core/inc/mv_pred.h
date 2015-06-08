@@ -84,6 +84,30 @@ void UpdateP8x8MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPart
                            SMVUnitXY* pMv);
 
 /*!
+ * \brief   update pMv and uiRefIndex cache for current MB and pMbCache, only for P_4x4
+ * \param
+ * \param
+ */
+void UpdateP4x4MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartIdx, const int8_t kiRef,
+                           SMVUnitXY* pMv);
+
+/*!
+ * \brief   update pMv and uiRefIndex cache for current MB and pMbCache, only for P_8x4
+ * \param
+ * \param
+ */
+void UpdateP8x4MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartIdx, const int8_t kiRef,
+                           SMVUnitXY* pMv);
+
+/*!
+ * \brief   update pMv and uiRefIndex cache for current MB and pMbCache, only for P_4x8
+ * \param
+ * \param
+ */
+void UpdateP4x8MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartIdx, const int8_t kiRef,
+                           SMVUnitXY* pMv);
+
+/*!
  * \brief   get the motion predictor for 4*4 or 8*8 or 16*16 block
  * \param
  * \param   output mvp_x and mvp_y
@@ -135,11 +159,33 @@ void UpdateP16x8Motion2Cache (SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef,
  * \param
  */
 void UpdateP8x16Motion2Cache (SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* pMv);
+
 /*!
  * \brief   only update pMv cache for current MB, only for P_8x8
  * \param
  * \param
  */
 void UpdateP8x8Motion2Cache (SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* pMv);
+
+/*!
+ * \brief   only update pMv cache for current MB, only for P_4x4
+ * \param
+ * \param
+ */
+void UpdateP4x4Motion2Cache (SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* pMv);
+
+/*!
+ * \brief   only update pMv cache for current MB, only for P_8x4
+ * \param
+ * \param
+ */
+void UpdateP8x4Motion2Cache (SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* pMv);
+
+/*!
+ * \brief   only update pMv cache for current MB, only for P_4x8
+ * \param
+ * \param
+ */
+void UpdateP4x8Motion2Cache (SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* pMv);
 }
 #endif//WELS_MV_PRED_H__
