@@ -87,7 +87,7 @@ ifneq ($(V),Yes)
 endif
 
 
-INCLUDES += -I$(SRC_PATH)codec/api/svc -I$(SRC_PATH)codec/common/inc
+INCLUDES += -I$(SRC_PATH)codec/api/svc -I$(SRC_PATH)codec/common/inc -Icodec/common/inc
 
 DECODER_INCLUDES += \
     -I$(SRC_PATH)codec/decoder/core/inc \
@@ -144,7 +144,7 @@ COMMON_UNITTEST_CFLAGS += $(CODEC_UNITTEST_CFLAGS)
 .PHONY: test gtest-bootstrap clean $(PROJECT_NAME).pc $(PROJECT_NAME)-static.pc
 
 generate-version:
-	$(QUIET)cd $(SRC_PATH) && sh ./codec/common/generate_version.sh
+	$(QUIET)sh $(SRC_PATH)codec/common/generate_version.sh $(SRC_PATH)
 
 codec/decoder/plus/src/welsDecoderExt.$(OBJ): | generate-version
 codec/encoder/plus/src/welsEncoderExt.$(OBJ): | generate-version

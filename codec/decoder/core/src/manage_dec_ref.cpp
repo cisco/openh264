@@ -267,7 +267,7 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
 
   for (j = pCurAU->uiStartPos; j <= pCurAU->uiEndPos; j++) {
     if (pCurAU->pNalUnitsList[j]->sNalHeaderExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_IDR
-        ||	pCurAU->pNalUnitsList[j]->sNalHeaderExt.bIdrFlag) {
+        || pCurAU->pNalUnitsList[j]->sNalHeaderExt.bIdrFlag) {
       bIsIDRAU = true;
       break;
     }

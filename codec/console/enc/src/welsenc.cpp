@@ -626,7 +626,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
 int FillSpecificParameters (SEncParamExt& sParam) {
   /* Test for temporal, spatial, SNR scalability */
   sParam.iUsageType = CAMERA_VIDEO_REAL_TIME;
-  sParam.fMaxFrameRate	= 30.0f;		// input frame rate
+  sParam.fMaxFrameRate	= 60.0f;		// input frame rate
   sParam.iPicWidth		= 1280;			// width of picture in samples
   sParam.iPicHeight	= 720;			// height of picture in samples
   sParam.iTargetBitrate = 2500000;		// target bitrate desired
@@ -706,7 +706,7 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
   FILE* pFileYUV = NULL;
   int32_t iActualFrameEncodedCount = 0;
   int32_t iFrameIdx = 0;
-  int32_t	iTotalFrameMax = -1;
+  int32_t iTotalFrameMax = -1;
   uint8_t* pYUV = NULL;
   SSourcePicture* pSrcPic = NULL;
   uint32_t iSourceWidth, iSourceHeight, kiPicResSize;

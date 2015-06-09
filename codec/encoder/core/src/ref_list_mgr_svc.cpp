@@ -166,7 +166,7 @@ static inline void DeleteInvalidLTR (sWelsEncCtx* pCtx) {
         pLongRefList[i]->SetUnref();
         DeleteLTRFromLongList (pCtx, i);
         pLtr->bLTRMarkEnable = true;
-        if (pRefList->uiLongRefCount == 0) 	{
+        if (pRefList->uiLongRefCount == 0) {
           pCtx->bEncCurFrmAsIdrFlag = true;
         }
       } else if (CompareFrameNum (pLongRefList[i]->iMarkFrameNum , pLtr->iLastCorFrameNumDec ,
@@ -179,7 +179,7 @@ static inline void DeleteInvalidLTR (sWelsEncCtx* pCtx) {
         pLongRefList[i]->SetUnref();
         DeleteLTRFromLongList (pCtx, i);
         pLtr->bLTRMarkEnable = true;
-        if (pRefList->uiLongRefCount == 0) 	{
+        if (pRefList->uiLongRefCount == 0) {
           pCtx->bEncCurFrmAsIdrFlag = true;
         }
       }

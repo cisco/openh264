@@ -358,8 +358,8 @@ typedef struct {
   int   iVideoWidth;           ///< width of picture in luminance samples of a layer
   int   iVideoHeight;          ///< height of picture in luminance samples of a layer
   float fFrameRate;            ///< frame rate specified for a layer
-  int   iSpatialBitrate;       ///< target bitrate for a spatial layer
-  int   iMaxSpatialBitrate;    ///< maximum  bitrate for a spatial layer
+  int   iSpatialBitrate;       ///< target bitrate for a spatial layer, in unit of bps
+  int   iMaxSpatialBitrate;    ///< maximum  bitrate for a spatial layer, in unit of bps
   EProfileIdc  uiProfileIdc;   ///< value of profile IDC (PRO_UNKNOWN for auto-detection)
   ELevelIdc    uiLevelIdc;     ///< value of profile IDC (0 for auto-detection)
   int          iDLayerQp;      ///< value of level IDC (0 for auto-detection)
@@ -406,7 +406,7 @@ typedef struct TagEncParamBase {
 
   int       iPicWidth;        ///< width of picture in luminance samples (the maximum of all layers if multiple spatial layers presents)
   int       iPicHeight;       ///< height of picture in luminance samples((the maximum of all layers if multiple spatial layers presents)
-  int       iTargetBitrate;   ///< target bitrate desired
+  int       iTargetBitrate;   ///< target bitrate desired, in unit of bps
   RC_MODES  iRCMode;          ///< rate control mode
   float     fMaxFrameRate;    ///< maximal input frame rate
 
@@ -421,7 +421,7 @@ typedef struct TagEncParamExt {
 
   int       iPicWidth;                 ///< width of picture in luminance samples (the maximum of all layers if multiple spatial layers presents)
   int       iPicHeight;                ///< height of picture in luminance samples((the maximum of all layers if multiple spatial layers presents)
-  int       iTargetBitrate;            ///< target bitrate desired
+  int       iTargetBitrate;            ///< target bitrate desired, in unit of bps
   RC_MODES  iRCMode;                   ///< rate control mode
   float     fMaxFrameRate;             ///< maximal input frame rate
 
@@ -442,7 +442,7 @@ typedef struct TagEncParamExt {
 
   /* rc control */
   bool    bEnableFrameSkip;            ///< False: don't skip frame even if VBV buffer overflow.True: allow skipping frames to keep the bitrate within limits
-  int     iMaxBitrate;                 ///< the maximum bitrate
+  int     iMaxBitrate;                 ///< the maximum bitrate, in unit of bps, set it to UNSPECIFIED_BIT_RATE if not needed
   int     iMaxQp;                      ///< the maximum QP encoder supports
   int     iMinQp;                      ///< the minmum QP encoder supports
   unsigned int uiMaxNalSize;           ///< the maximum NAL size.  This value should be not 0 for dynamic slice mode
@@ -537,7 +537,7 @@ typedef struct Source_Picture_s {
   unsigned char*  pData[4];        ///< plane pData
   int       iPicWidth;             ///< luma picture width in x coordinate
   int       iPicHeight;            ///< luma picture height in y coordinate
-  long long uiTimeStamp;
+  long long uiTimeStamp;           ///< timestamp of the source picture, unit: millisecond
 } SSourcePicture;
 /**
 * @brief Structure for bit rate info

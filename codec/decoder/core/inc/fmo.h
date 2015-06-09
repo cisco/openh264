@@ -73,7 +73,7 @@ uint8_t		uiReserved[3];		// reserved padding bytes
  *
  * \return  0 - successful; none 0 - failed;
  */
-int32_t	InitFmo (PFmo pFmo, PPps pPps, const int32_t kiMbWidth, const int32_t kiMbHeight);
+int32_t InitFmo (PFmo pFmo, PPps pPps, const int32_t kiMbWidth, const int32_t kiMbHeight);
 
 /*!
  * \brief   Uninitialize Wels Flexible Macroblock Ordering (FMO) list

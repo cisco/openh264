@@ -660,9 +660,9 @@ void WelsInitIntraPredFuncs (SWelsFuncPtrList* pFuncList, const uint32_t kuiCpuF
     pFuncList->pfGetLumaI16x16Pred[I16_PRED_DC] = WelsI16x16LumaPredDc_neon;
     pFuncList->pfGetLumaI16x16Pred[I16_PRED_P] = WelsI16x16LumaPredPlane_neon;
 
-    pFuncList->pfGetChromaPred[C_PRED_DC]	= WelsIChromaPredDc_neon;
-    pFuncList->pfGetChromaPred[C_PRED_V]	= WelsIChromaPredV_neon;
-    pFuncList->pfGetChromaPred[C_PRED_P]	= WelsIChromaPredPlane_neon;
+    pFuncList->pfGetChromaPred[C_PRED_DC]   = WelsIChromaPredDc_neon;
+    pFuncList->pfGetChromaPred[C_PRED_V]    = WelsIChromaPredV_neon;
+    pFuncList->pfGetChromaPred[C_PRED_P]    = WelsIChromaPredPlane_neon;
     pFuncList->pfGetChromaPred[C_PRED_H]    = WelsIChromaPredH_neon;
   }
 #endif
@@ -715,9 +715,9 @@ void WelsInitIntraPredFuncs (SWelsFuncPtrList* pFuncList, const uint32_t kuiCpuF
     pFuncList->pfGetLumaI16x16Pred[I16_PRED_DC] = WelsI16x16LumaPredDc_sse2;
     pFuncList->pfGetLumaI16x16Pred[I16_PRED_P] = WelsI16x16LumaPredPlane_sse2;
 
-    pFuncList->pfGetChromaPred[C_PRED_DC]	= WelsIChromaPredDc_sse2;
-    pFuncList->pfGetChromaPred[C_PRED_V]	= WelsIChromaPredV_sse2;
-    pFuncList->pfGetChromaPred[C_PRED_P]	= WelsIChromaPredPlane_sse2;
+    pFuncList->pfGetChromaPred[C_PRED_DC]   = WelsIChromaPredDc_sse2;
+    pFuncList->pfGetChromaPred[C_PRED_V]    = WelsIChromaPredV_sse2;
+    pFuncList->pfGetChromaPred[C_PRED_P]    = WelsIChromaPredPlane_sse2;
   }
 #endif
 }

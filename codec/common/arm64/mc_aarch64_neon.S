@@ -1534,33 +1534,51 @@ w4_pix_avg_loop:
 WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN McChromaWidthEq8_AArch64_neon
-    ld4r {v4.8b, v5.8b, v6.8b, v7.8b}, [x4] //load A/B/C/D
+    ld4r {v16.8b, v17.8b, v18.8b, v19.8b}, [x4] //load A/B/C/D
     ld1 {v0.16b}, [x0], x1  // src[x]
     ext v1.16b, v0.16b, v0.16b, #1  // src[x+1]
 w8_mc_chroma_loop:
     ld1 {v2.16b}, [x0], x1  // src[x+stride]
     ext v3.16b, v2.16b, v2.16b, #1  // src[x+stride+1]
-    ld1 {v18.16b}, [x0], x1  // src[x+2*stride]
-    ext v19.16b, v18.16b, v18.16b, #1  // src[x+2*stride+1]
+    ld1 {v4.16b}, [x0], x1  // src[x+2*stride]
+    ext v5.16b, v4.16b, v4.16b, #1  // src[x+2*stride+1]
+    ld1 {v6.16b}, [x0], x1  // src[x+3*stride]
+    ext v7.16b, v6.16b, v6.16b, #1  // src[x+3*stride+1]
+    ld1 {v30.16b}, [x0], x1  // src[x+4*stride]
+    ext v31.16b, v30.16b, v30.16b, #1  // src[x+4*stride+1]
 
-    umull v16.8h, v0.8b, v4.8b
-    umlal v16.8h, v1.8b, v5.8b
-    umlal v16.8h, v2.8b, v6.8b
-    umlal v16.8h, v3.8b, v7.8b
-    rshrn v17.8b, v16.8h, #6
-    st1 {v17.8b}, [x2], x3
+    umull v8.8h, v0.8b, v16.8b
+    umull v10.8h, v2.8b, v16.8b
+    umull v12.8h, v4.8b, v16.8b
+    umull v14.8h, v6.8b, v16.8b
 
+    umlal v8.8h, v1.8b, v17.8b
+    umlal v10.8h, v3.8b, v17.8b
+    umlal v12.8h, v5.8b, v17.8b
+    umlal v14.8h, v7.8b, v17.8b
 
-    umull v16.8h, v2.8b, v4.8b
-    umlal v16.8h, v3.8b, v5.8b
-    umlal v16.8h, v18.8b, v6.8b
-    umlal v16.8h, v19.8b, v7.8b
-    rshrn v17.8b, v16.8h, #6
-    st1 {v17.8b}, [x2], x3
+    umlal v8.8h, v2.8b, v18.8b
+    umlal v10.8h, v4.8b, v18.8b
+    umlal v12.8h, v6.8b, v18.8b
+    umlal v14.8h, v30.8b, v18.8b
 
-    mov v0.16b, v18.16b
-    mov v1.16b, v19.16b
-    sub x5, x5, #2
+    umlal v8.8h, v3.8b, v19.8b
+    umlal v10.8h, v5.8b, v19.8b
+    umlal v12.8h, v7.8b, v19.8b
+    umlal v14.8h, v31.8b, v19.8b
+
+    rshrn v9.8b, v8.8h, #6
+    st1 {v9.8b}, [x2], x3
+    rshrn v11.8b, v10.8h, #6
+    st1 {v11.8b}, [x2], x3
+    rshrn v13.8b, v12.8h, #6
+    st1 {v13.8b}, [x2], x3
+    rshrn v15.8b, v14.8h, #6
+    st1 {v15.8b}, [x2], x3
+
+    mov v0.16b, v30.16b
+    mov v1.16b, v31.16b
+    sub x5, x5, #4
     cbnz x5, w8_mc_chroma_loop
 WELS_ASM_AARCH64_FUNC_END
 

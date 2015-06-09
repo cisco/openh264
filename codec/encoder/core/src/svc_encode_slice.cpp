@@ -448,8 +448,8 @@ void WelsPMbChromaEncode (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb) {
   int16_t* pCurRS				= pMbCache->pCoeffLevel + 256;
   uint8_t* pBestPred			= pMbCache->pMemPredChroma;
 
-  pFunc->pfDctFourT4 (pCurRS,		pMbCache->SPicData.pEncMb[1],	kiEncStride,		pBestPred,		8);
-  pFunc->pfDctFourT4 (pCurRS + 64,	pMbCache->SPicData.pEncMb[2],	kiEncStride,		pBestPred + 64,	8);
+  pFunc->pfDctFourT4 (pCurRS,       pMbCache->SPicData.pEncMb[1],   kiEncStride,    pBestPred,      8);
+  pFunc->pfDctFourT4 (pCurRS + 64,  pMbCache->SPicData.pEncMb[2],   kiEncStride,    pBestPred + 64, 8);
 
   WelsEncRecUV (pFunc, pCurMb, pMbCache, pCurRS, 1);
   WelsEncRecUV (pFunc, pCurMb, pMbCache, pCurRS + 64, 2);
@@ -700,11 +700,11 @@ int32_t WelsCodePOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
 
 // 1st index: 0: for P pSlice; 1: for I pSlice;
 // 2nd index: 0: for non-dynamic pSlice; 1: for dynamic I pSlice;
-static const PWelsCodingSliceFunc	g_pWelsSliceCoding[2][2] = {
-  { WelsCodePSlice, WelsCodePOverDynamicSlice },	// P SSlice
-  { WelsISliceMdEnc, WelsISliceMdEncDynamic }	// I SSlice
+static const PWelsCodingSliceFunc g_pWelsSliceCoding[2][2] = {
+  { WelsCodePSlice, WelsCodePOverDynamicSlice }, // P SSlice
+  { WelsISliceMdEnc, WelsISliceMdEncDynamic }    // I SSlice
 };
-static const PWelsSliceHeaderWriteFunc		g_pWelsWriteSliceHeader[2] = {	// 0: for base; 1: for ext;
+static const PWelsSliceHeaderWriteFunc g_pWelsWriteSliceHeader[2] = {  // 0: for base; 1: for ext;
   WelsSliceHeaderWrite,
   WelsSliceHeaderExtWrite
 };
@@ -913,7 +913,7 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
 
     if ((kbSliceNumReachConstraint || !kbSliceIdxNotExceedConstraint)
         && kbCurMbNotLastMbOfCurPartition
-        && JUMPPACKETSIZE_JUDGE (uiLen,	iCurMbIdx,
+        && JUMPPACKETSIZE_JUDGE (uiLen, iCurMbIdx,
                                  pSliceCtx->uiSliceSizeConstraint - ((kiLastMbIdxInPartition - iCurMbIdx) <<
                                      (pCurSlice->uiAssumeLog2BytePerMb) //assume each MB consumes these byte under largest QP
                                                                     ))

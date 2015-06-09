@@ -247,8 +247,8 @@ bool GomValidCheckSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, u
     break;
   }
 
-  if (*pSliceNum	!= iSliceNum) {
-    *pSliceNum	= (0 != iSliceNum) ? iSliceNum : 1;
+  if (*pSliceNum != iSliceNum) {
+    *pSliceNum = (0 != iSliceNum) ? iSliceNum : 1;
     return false;
   }
   return true;

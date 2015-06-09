@@ -120,6 +120,6 @@ SDqLayer*				pRefLayer;		// pointer to referencing dq_layer of current layer to 
 ///////////////////////////////////////////////////////////////////////
 
 // frame structure for svc
-typedef SDqLayer	SWelsSvcFrame;
+typedef SDqLayer SWelsSvcFrame;
 }
 #endif//WELS_SVC_EXTENSION_LAYER_H__

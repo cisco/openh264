@@ -136,9 +136,9 @@ class CWelsPreProcess {
   SPicture* GetCurrentFrameFromOrigList (int32_t iDIdx) {
     return m_pSpatialPic[iDIdx][0];
   }
-  void UpdateSrcList (SPicture*	pCurPicture, const int32_t kiCurDid, SPicture** pShortRefList,
+  void UpdateSrcList (SPicture* pCurPicture, const int32_t kiCurDid, SPicture** pShortRefList,
                       const uint32_t kuiShortRefCount);
-  void UpdateSrcListLosslessScreenRefSelectionWithLtr (SPicture*	pCurPicture, const int32_t kiCurDid,
+  void UpdateSrcListLosslessScreenRefSelectionWithLtr (SPicture* pCurPicture, const int32_t kiCurDid,
       const int32_t kuiMarkLongTermPicIdx, SPicture** pLongRefList);
 
  private:
