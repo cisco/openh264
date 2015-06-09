@@ -2345,7 +2345,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
     }
 
     // need update frame_num due current frame is well decoded
-    pCtx->iPrevFrameNum	= pSh->iFrameNum;
+    if (pCurAu->pNalUnitsList[pCurAu->uiStartPos]->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc > 0)
+      pCtx->iPrevFrameNum	= pSh->iFrameNum;
     if (pCtx->bLastHasMmco5)
       pCtx->iPrevFrameNum = 0;
   }
@@ -2403,7 +2404,8 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
       }
     }
     pCtx->pDec = NULL;
-    pCtx->iPrevFrameNum = pCtx->sLastSliceHeader.iFrameNum; //save frame_num
+    if (pAu->pNalUnitsList[pAu->uiStartPos]->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc > 0)
+      pCtx->iPrevFrameNum = pCtx->sLastSliceHeader.iFrameNum; //save frame_num
     if (pCtx->bLastHasMmco5)
       pCtx->iPrevFrameNum = 0;
   }
