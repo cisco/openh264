@@ -314,7 +314,7 @@ WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer20WidthEq8_AArch64_neon
     sub x0, x0, #2
-    stp q8,q9, [sp,#-32]!
+    stp d8,d9, [sp,#-16]!
     movi v8.8h, #20, lsl #0
     movi v9.8h, #5, lsl #0
 w8_h_mc_luma_loop:
@@ -363,7 +363,7 @@ w8_h_mc_luma_loop:
     VEC4_ST1_8BITS_8ELEMENT x2, x3, v1, v3, v5, v7
     cbnz x4, w8_h_mc_luma_loop
 
-    ldp q8,q9,[sp],#32
+    ldp d8,d9,[sp],#16
 WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer20WidthEq4_AArch64_neon
@@ -425,7 +425,7 @@ WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer10WidthEq8_AArch64_neon
     sub x0, x0, #2
-    stp q8,q9, [sp,#-32]!
+    stp d8,d9, [sp,#-16]!
     movi v8.8h, #20, lsl #0
     movi v9.8h, #5, lsl #0
 w8_xy_10_mc_luma_loop:
@@ -476,7 +476,7 @@ w8_xy_10_mc_luma_loop:
     VEC4_ST1_8BITS_8ELEMENT x2, x3, v1, v3, v5, v7
     cbnz x4, w8_xy_10_mc_luma_loop
 
-    ldp q8,q9,[sp],#32
+    ldp d8,d9,[sp],#16
 WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer10WidthEq4_AArch64_neon
@@ -539,7 +539,7 @@ WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer30WidthEq8_AArch64_neon
     sub x0, x0, #2
-    stp q8,q9, [sp,#-32]!
+    stp d8,d9, [sp,#-16]!
     movi v8.8h, #20, lsl #0
     movi v9.8h, #5, lsl #0
 w8_xy_30_mc_luma_loop:
@@ -590,7 +590,7 @@ w8_xy_30_mc_luma_loop:
     VEC4_ST1_8BITS_8ELEMENT x2, x3, v1, v3, v5, v7
     cbnz x4, w8_xy_30_mc_luma_loop
 
-    ldp q8,q9,[sp],#32
+    ldp d8,d9,[sp],#32
 WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer30WidthEq4_AArch64_neon
