@@ -109,7 +109,7 @@ bool CompareImage (uint8_t* pSrc0, uint8_t* pSrc1, int32_t iSize) {
 }
 
 TEST (ExpandPicture, ExpandPictureLuma) {
-  SExpandPicFunc	    sExpandPicFunc;
+  SExpandPicFunc sExpandPicFunc;
   int32_t iCpuCores = 1;
   uint32_t uiCpuFlag = 0;
   for (int32_t k = 0; k < 2; k++) {
@@ -151,7 +151,7 @@ TEST (ExpandPicture, ExpandPictureLuma) {
 }
 
 TEST (ExpandPicture, ExpandPictureChroma) {
-  SExpandPicFunc	    sExpandPicFunc;
+  SExpandPicFunc sExpandPicFunc;
   int32_t iCpuCores = 1;
   uint32_t uiCpuFlag = 0;
   for (int32_t k = 0; k < 2; k++) {
@@ -197,7 +197,7 @@ TEST (ExpandPicture, ExpandPictureChroma) {
 }
 
 TEST (ExpandPicture, ExpandPicForMotion) {
-  SExpandPicFunc	    sExpandPicFunc;
+  SExpandPicFunc sExpandPicFunc;
   int32_t iCpuCores = 1;
   uint32_t uiCpuFlag = 0;
   for (int32_t k = 0; k < 2; k++) {

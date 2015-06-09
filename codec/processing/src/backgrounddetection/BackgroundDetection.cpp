@@ -261,7 +261,7 @@ inline bool CBackgroundDetection::ForegroundDilation23Chroma (int8_t iNeighbourF
 }
 
 inline void CBackgroundDetection::ForegroundDilation (SBackgroundOU* pBackgroundOU, SBackgroundOU* pOUNeighbours[],
-    vBGDParam* pBgdParam, int32_t	iChromaSampleStartPos) {
+    vBGDParam* pBgdParam, int32_t iChromaSampleStartPos) {
   int32_t iPicStrideUV	= pBgdParam->iStride[1];
   int32_t iSumNeighBackgroundFlags	= pOUNeighbours[0]->iBackgroundFlag + pOUNeighbours[1]->iBackgroundFlag +
                                       pOUNeighbours[2]->iBackgroundFlag + pOUNeighbours[3]->iBackgroundFlag;

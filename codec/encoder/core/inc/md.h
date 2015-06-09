@@ -109,6 +109,9 @@ struct {
   SWelsME			sMe8x8[4];
   SWelsME			sMe16x8[2];
   SWelsME			sMe8x16[2];
+  SWelsME			sMe4x4[4][4];
+  SWelsME			sMe8x4[4][2];
+  SWelsME			sMe4x8[4][2];
 //		SMVUnitXY		i_mvbs[MB_BLOCK8x8_NUM];	//scaled MVB
 } sMe;
 

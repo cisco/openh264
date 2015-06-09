@@ -908,8 +908,8 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   PSps pSps				= NULL;
   PSubsetSps pSubsetSps	= NULL;
   SNalUnitHeader* pNalHead = &pCtx->sCurNalHead;
-  ProfileIdc	uiProfileIdc;
-  uint8_t	uiLevelIdc;
+  ProfileIdc uiProfileIdc;
+  uint8_t uiLevelIdc;
   int32_t iSpsId;
   uint32_t uiCode;
   int32_t iCode;

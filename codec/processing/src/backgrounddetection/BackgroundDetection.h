@@ -87,7 +87,7 @@ class CBackgroundDetection : public IStrategy {
   inline bool   ForegroundDilation23Chroma (int8_t iNeighbourForegroundFlags, int32_t iStartSamplePos,
       int32_t iPicStrideUV, vBGDParam* pBgdParam);//Foreground_Dilation_2_3_Chroma
   inline void     ForegroundDilation (SBackgroundOU* pBackgroundOU, SBackgroundOU* pOUNeighbours[], vBGDParam* pBgdParam,
-                                      int32_t	iChromaSampleStartPos);
+                                      int32_t iChromaSampleStartPos);
   inline void     BackgroundErosion (SBackgroundOU* pBackgroundOU, SBackgroundOU* pOUNeighbours[]);
   inline void     SetBackgroundMbFlag (int8_t* pBackgroundMbFlag, int32_t iPicWidthInMb, int32_t iBackgroundMbFlag);
   inline void     UpperOUForegroundCheck (SBackgroundOU* pCurOU, int8_t* pBackgroundMbFlag, int32_t iPicWidthInOU,

@@ -833,7 +833,7 @@ int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
   if (uiMbType < 4) { //Inter mode
     int16_t pMotionVector[LIST_A][30][MV_A];
     int16_t pMvdCache[LIST_A][30][MV_A];
-    int8_t	pRefIndex[LIST_A][30];
+    int8_t  pRefIndex[LIST_A][30];
     pCurLayer->pMbType[iMbXy] = g_ksInterMbTypeInfo[uiMbType].iType;
     WelsFillCacheInterCabac (pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex, pCurLayer);
     WELS_READ_VERIFY (ParseInterMotionInfoCabac (pCtx, pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex));
@@ -1605,7 +1605,7 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
   uiMbType = uiCode;
   if (uiMbType < 5) { //inter MB type
     int16_t iMotionVector[LIST_A][30][MV_A];
-    int8_t	iRefIndex[LIST_A][30];
+    int8_t  iRefIndex[LIST_A][30];
     pCurLayer->pMbType[iMbXy] = g_ksInterMbTypeInfo[uiMbType].iType;
     WelsFillCacheInter (&sNeighAvail, pNonZeroCount, iMotionVector, iRefIndex, pCurLayer);
 

@@ -188,6 +188,42 @@ TEST_F (SadSatdCFuncTest, WelsSampleSad4x4_c) {
   EXPECT_EQ (WelsSampleSad4x4_c (m_pPixSrcA, m_iStrideA, m_pPixSrcB, m_iStrideB), iSumSad);
 }
 
+TEST_F (SadSatdCFuncTest, WelsSampleSad8x4_c) {
+  for (int i = 0; i < (m_iStrideA << 2); i++)
+    m_pPixSrcA[i] = rand() % 256;
+  for (int i = 0; i < (m_iStrideB << 2); i++)
+    m_pPixSrcB[i] = rand() % 256;
+  uint8_t* pPixA = m_pPixSrcA;
+  uint8_t* pPixB = m_pPixSrcB;
+
+  int32_t iSumSad = 0;
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 8; j++)
+      iSumSad += abs (pPixA[j] - pPixB[j]);
+    pPixA += m_iStrideA;
+    pPixB += m_iStrideB;
+  }
+  EXPECT_EQ (WelsSampleSad8x4_c (m_pPixSrcA, m_iStrideA, m_pPixSrcB, m_iStrideB), iSumSad);
+}
+
+TEST_F (SadSatdCFuncTest, WelsSampleSad4x8_c) {
+  for (int i = 0; i < (m_iStrideA << 3); i++)
+    m_pPixSrcA[i] = rand() % 256;
+  for (int i = 0; i < (m_iStrideB << 3); i++)
+    m_pPixSrcB[i] = rand() % 256;
+  uint8_t* pPixA = m_pPixSrcA;
+  uint8_t* pPixB = m_pPixSrcB;
+
+  int32_t iSumSad = 0;
+  for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 4; j++)
+      iSumSad += abs (pPixA[j] - pPixB[j]);
+    pPixA += m_iStrideA;
+    pPixB += m_iStrideB;
+  }
+  EXPECT_EQ (WelsSampleSad4x8_c (m_pPixSrcA, m_iStrideA, m_pPixSrcB, m_iStrideB), iSumSad);
+}
+
 TEST_F (SadSatdCFuncTest, WelsSampleSad8x8_c) {
   for (int i = 0; i < (m_iStrideA << 3); i++)
     m_pPixSrcA[i] = rand() % 256;
@@ -444,6 +480,51 @@ TEST_F (SadSatdCFuncTest, WelsSampleSadFour4x4_c) {
   EXPECT_EQ (m_pSad[0] + m_pSad[1] + m_pSad[2] + m_pSad[3], iSumSad);
 }
 
+TEST_F (SadSatdCFuncTest, WelsSampleSadFour8x4_c) {
+  for (int i = 0; i < (m_iStrideA << 3); i++)
+    m_pPixSrcA[i] = rand() % 256;
+  for (int i = 0; i < (m_iStrideB << 3); i++)
+    m_pPixSrcB[i] = rand() % 256;
+  uint8_t* pPixA = m_pPixSrcA;
+  uint8_t* pPixB = m_pPixSrcB + m_iStrideB;
+
+  int32_t iSumSad = 0;
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 8; j++) {
+      iSumSad += abs (pPixA[j] - pPixB[j - 1]);
+      iSumSad += abs (pPixA[j] - pPixB[j + 1]);
+      iSumSad += abs (pPixA[j] - pPixB[j - m_iStrideB]);
+      iSumSad += abs (pPixA[j] - pPixB[j + m_iStrideB]);
+    }
+    pPixA += m_iStrideA;
+    pPixB += m_iStrideB;
+  }
+  WelsSampleSadFour8x4_c (m_pPixSrcA, m_iStrideA, m_pPixSrcB + m_iStrideB, m_iStrideB, m_pSad);
+  EXPECT_EQ (m_pSad[0] + m_pSad[1] + m_pSad[2] + m_pSad[3], iSumSad);
+}
+
+TEST_F (SadSatdCFuncTest, WelsSampleSadFour4x8_c) {
+  for (int i = 0; i < (m_iStrideA << 4); i++)
+    m_pPixSrcA[i] = rand() % 256;
+  for (int i = 0; i < (m_iStrideB << 4); i++)
+    m_pPixSrcB[i] = rand() % 256;
+  uint8_t* pPixA = m_pPixSrcA;
+  uint8_t* pPixB = m_pPixSrcB + m_iStrideB;
+
+  int32_t iSumSad = 0;
+  for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 4; j++) {
+      iSumSad += abs (pPixA[j] - pPixB[j - 1]);
+      iSumSad += abs (pPixA[j] - pPixB[j + 1]);
+      iSumSad += abs (pPixA[j] - pPixB[j - m_iStrideB]);
+      iSumSad += abs (pPixA[j] - pPixB[j + m_iStrideB]);
+    }
+    pPixA += m_iStrideA;
+    pPixB += m_iStrideB;
+  }
+  WelsSampleSadFour4x8_c (m_pPixSrcA, m_iStrideA, m_pPixSrcB + m_iStrideB, m_iStrideB, m_pSad);
+  EXPECT_EQ (m_pSad[0] + m_pSad[1] + m_pSad[2] + m_pSad[3], iSumSad);
+}
 
 class SadSatdAssemblyFuncTest : public testing::Test {
  public:
