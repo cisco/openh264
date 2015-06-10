@@ -59,7 +59,7 @@ extern "C" {
 #include "manage_dec_ref.h"
 }
 #include "error_code.h"
-#include "crt_util_safe_x.h"	// Safe CRT routines like util for cross platforms
+#include "crt_util_safe_x.h" // Safe CRT routines like util for cross platforms
 #include <time.h>
 #if defined(_WIN32) /*&& defined(_DEBUG)*/
 
@@ -102,7 +102,7 @@ CWelsDecoder::CWelsDecoder (void)
 #endif//OUTPUT_BIT_STREAM
 
 
-  m_pWelsTrace	= new welsCodecTrace();
+  m_pWelsTrace = new welsCodecTrace();
   if (m_pWelsTrace != NULL) {
     m_pWelsTrace->SetCodecInstance (this);
     m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);
@@ -227,7 +227,7 @@ void CWelsDecoder::UninitDecoder (void) {
   if (NULL != m_pDecContext) {
     WelsFree (m_pDecContext, "m_pDecContext");
 
-    m_pDecContext	= NULL;
+    m_pDecContext = NULL;
   }
 
 }
@@ -240,7 +240,7 @@ int32_t CWelsDecoder::InitDecoder (const bool bParseOnly) {
 
   if (m_pDecContext) //free
     UninitDecoder();
-  m_pDecContext	= (PWelsDecoderContext)WelsMallocz (sizeof (SWelsDecoderContext), "m_pDecContext");
+  m_pDecContext = (PWelsDecoderContext)WelsMallocz (sizeof (SWelsDecoderContext), "m_pDecContext");
   if (NULL == m_pDecContext)
     return cmMallocMemeError;
 
@@ -266,23 +266,23 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
     if (pOption == NULL)
       return cmInitParaError;
 
-    iVal = * ((int*)pOption);	// is_rgb
+    iVal = * ((int*)pOption); // is_rgb
 
     return DecoderSetCsp (m_pDecContext, iVal);
   } else if (eOptID == DECODER_OPTION_END_OF_STREAM) { // Indicate bit-stream of the final frame to be decoded
     if (pOption == NULL)
       return cmInitParaError;
 
-    iVal	= * ((int*)pOption);	// boolean value for whether enabled End Of Stream flag
+    iVal = * ((int*)pOption); // boolean value for whether enabled End Of Stream flag
 
-    m_pDecContext->bEndOfStreamFlag	= iVal ? true : false;
+    m_pDecContext->bEndOfStreamFlag = iVal ? true : false;
 
     return cmResultSuccess;
   } else if (eOptID == DECODER_OPTION_ERROR_CON_IDC) { // Indicate error concealment status
     if (pOption == NULL)
       return cmInitParaError;
 
-    iVal	= * ((int*)pOption);	// int value for error concealment idc
+    iVal = * ((int*)pOption); // int value for error concealment idc
     iVal = WELS_CLIP3 (iVal, (int32_t) ERROR_CON_DISABLE, (int32_t) ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE);
     m_pDecContext->eErrorConMethod = (ERROR_CON_IDC) iVal;
     if ((m_pDecContext->bParseOnly) && (m_pDecContext->eErrorConMethod != ERROR_CON_DISABLE)) {
@@ -340,11 +340,11 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
 
   if (DECODER_OPTION_DATAFORMAT == eOptID) {
     iVal = (int32_t) m_pDecContext->eOutputColorFormat;
-    * ((int*)pOption)	= iVal;
+    * ((int*)pOption) = iVal;
     return cmResultSuccess;
   } else if (DECODER_OPTION_END_OF_STREAM == eOptID) {
-    iVal	= m_pDecContext->bEndOfStreamFlag;
-    * ((int*)pOption)	= iVal;
+    iVal = m_pDecContext->bEndOfStreamFlag;
+    * ((int*)pOption) = iVal;
     return cmResultSuccess;
   }
 #ifdef LONG_TERM_REF
@@ -471,9 +471,9 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
   m_pDecContext->bInstantDecFlag = false; //reset no-delay flag
   if (m_pDecContext->iErrorCode) {
     EWelsNalUnitType eNalType =
-      NAL_UNIT_UNSPEC_0;	//for NBR, IDR frames are expected to decode as followed if error decoding an IDR currently
+      NAL_UNIT_UNSPEC_0; //for NBR, IDR frames are expected to decode as followed if error decoding an IDR currently
 
-    eNalType	= m_pDecContext->sCurNalHead.eNalUnitType;
+    eNalType = m_pDecContext->sCurNalHead.eNalUnitType;
 
     if (m_pDecContext->iErrorCode & dsOutOfMemory) {
       ForceResetParaSetStatusAndAUList (m_pDecContext);
@@ -638,7 +638,7 @@ DECODING_STATE CWelsDecoder::DecodeFrameEx (const unsigned char* kpSrc,
     int& iWidth,
     int& iHeight,
     int& iColorFormat) {
-  DECODING_STATE	 state = dsErrorFree;
+  DECODING_STATE state = dsErrorFree;
 
   return state;
 }
@@ -678,7 +678,7 @@ long WelsCreateDecoder (ISVCDecoder** ppDecoder) {
     return ERR_INVALID_PARAMETERS;
   }
 
-  *ppDecoder	= new CWelsDecoder();
+  *ppDecoder = new CWelsDecoder();
 
   if (NULL == *ppDecoder) {
     return ERR_MALLOC_FAILED;

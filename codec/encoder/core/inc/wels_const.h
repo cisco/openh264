@@ -34,7 +34,7 @@
 #ifndef WELS_CONST_H__
 #define WELS_CONST_H__
 
-#include "as264_common.h"	//  to communicate with specific macros there, 3/18/2010
+#include "as264_common.h" //  to communicate with specific macros there, 3/18/2010
 #include "codec_app_def.h"
 #include "wels_const_common.h"
 

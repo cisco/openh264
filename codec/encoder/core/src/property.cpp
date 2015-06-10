@@ -38,7 +38,7 @@
  *************************************************************************************
  */
 #include "property.h"
-#include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross_platforms
+#include "crt_util_safe_x.h" // Safe CRT routines like utils for cross_platforms
 namespace WelsEnc {
 #define WELS_CODE_NAME  "Wels"
 #define WELS_LIB_NAME   "Encoder"
@@ -64,11 +64,11 @@ int32_t GetCodeName (char* pBuf, int32_t iSize) {
   if (NULL == pBuf)
     return 0;
 
-  iLen = (int32_t)strlen (WELS_CODE_NAME);	// confirmed_safe_unsafe_usage
+  iLen = (int32_t)strlen (WELS_CODE_NAME); // confirmed_safe_unsafe_usage
   if (iSize <= iLen)
     return 0;
 
-  WelsStrncpy (pBuf, iSize, WELS_CODE_NAME);	// confirmed_safe_unsafe_usage
+  WelsStrncpy (pBuf, iSize, WELS_CODE_NAME); // confirmed_safe_unsafe_usage
 
   return iLen;
 }
@@ -85,11 +85,11 @@ int32_t GetLibName (char* pBuf, int32_t iSize) {
   if (NULL == pBuf)
     return 0;
 
-  iLen	= (int32_t)strlen (WELS_LIB_NAME);	// confirmed_safe_unsafe_usage
+  iLen = (int32_t)strlen (WELS_LIB_NAME); // confirmed_safe_unsafe_usage
   if (iSize <= iLen)
     return 0;
 
-  WelsStrncpy (pBuf, iSize, WELS_LIB_NAME);	// confirmed_safe_unsafe_usage
+  WelsStrncpy (pBuf, iSize, WELS_LIB_NAME); // confirmed_safe_unsafe_usage
 
   return iLen;
 }
@@ -106,11 +106,11 @@ int32_t GetVerNum (char* pBuf, int32_t iSize) {
   if (NULL == pBuf)
     return 0;
 
-  iLen	= (int32_t)strlen (WELS_VERSION_STR);	// confirmed_safe_unsafe_usage
+  iLen = (int32_t)strlen (WELS_VERSION_STR); // confirmed_safe_unsafe_usage
   if (iSize <= iLen)
     return 0;
 
-  WelsStrncpy (pBuf, iSize, WELS_VERSION_STR);	// confirmed_safe_unsafe_usage
+  WelsStrncpy (pBuf, iSize, WELS_VERSION_STR); // confirmed_safe_unsafe_usage
 
   return iLen;
 }
@@ -127,11 +127,11 @@ int32_t GetIdentInfo (char* pBuf, int32_t iSize) {
   if (NULL == pBuf)
     return 0;
 
-  iLen	= (int32_t)strlen (WELS_IDENT);	// confirmed_safe_unsafe_usage
+  iLen = (int32_t)strlen (WELS_IDENT); // confirmed_safe_unsafe_usage
   if (iSize <= iLen)
     return 0;
 
-  WelsStrncpy (pBuf, iSize, WELS_IDENT);	// confirmed_safe_unsafe_usage
+  WelsStrncpy (pBuf, iSize, WELS_IDENT); // confirmed_safe_unsafe_usage
 
   return iLen;
 }

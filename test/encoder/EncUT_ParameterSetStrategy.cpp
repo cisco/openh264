@@ -16,9 +16,9 @@ class ParameterSetStrategyTest : public ::testing::Test {
     m_pSubsetArray = NULL;
 
     pMa = new CMemoryAlign (0);
-    m_pSpsArray	= (SWelsSPS*)pMa->WelsMalloc (MAX_SPS_COUNT * sizeof (SWelsSPS), "m_pSpsArray");
+    m_pSpsArray = (SWelsSPS*)pMa->WelsMalloc (MAX_SPS_COUNT * sizeof (SWelsSPS), "m_pSpsArray");
     ASSERT_TRUE (NULL != m_pSpsArray);
-    m_pSubsetArray	= (SSubsetSps*)pMa->WelsMalloc (MAX_SPS_COUNT * sizeof (SSubsetSps), "m_pSubsetArray");
+    m_pSubsetArray = (SSubsetSps*)pMa->WelsMalloc (MAX_SPS_COUNT * sizeof (SSubsetSps), "m_pSubsetArray");
     ASSERT_TRUE (NULL != m_pSubsetArray);
 
     m_pSpsArrayPointer = &m_pSpsArray[0];
@@ -33,11 +33,11 @@ class ParameterSetStrategyTest : public ::testing::Test {
   void GenerateParam (SWelsSvcCodingParam* pParam);
  public:
   CMemoryAlign* pMa;
-  SWelsSPS*						m_pSpsArray;
-  SSubsetSps*					m_pSubsetArray;
+  SWelsSPS*     m_pSpsArray;
+  SSubsetSps*   m_pSubsetArray;
 
-  SWelsSPS*						m_pSpsArrayPointer;
-  SSubsetSps*					m_pSubsetArrayPointer;
+  SWelsSPS*     m_pSpsArrayPointer;
+  SSubsetSps*   m_pSubsetArrayPointer;
 
 };
 
@@ -70,7 +70,7 @@ TEST_F (ParameterSetStrategyTest, FindExistingSps) {
   int iCurSpsInUse = 1;
   m_pSpsArrayPointer = &m_pSpsArray[iCurSpsId];
 
-  pDlayerParam	= & (sParam1.sSpatialLayers[iDlayerIndex]);
+  pDlayerParam = & (sParam1.sSpatialLayers[iDlayerIndex]);
   iRet = WelsInitSps (m_pSpsArrayPointer, pDlayerParam, &sParam1.sDependencyLayers[iDlayerIndex], sParam1.uiIntraPeriod,
                       sParam1.iMaxNumRefFrame,
                       iCurSpsId, sParam1.bEnableFrameCroppingFlag, sParam1.iRCMode != RC_OFF_MODE, iDlayerCount, false);
@@ -90,7 +90,7 @@ TEST_F (ParameterSetStrategyTest, FindExistingSps) {
   // add new sps
   iCurSpsId = 1;
   m_pSpsArrayPointer = &m_pSpsArray[iCurSpsId];
-  pDlayerParam	= & (sParam2.sSpatialLayers[iDlayerIndex]);
+  pDlayerParam = & (sParam2.sSpatialLayers[iDlayerIndex]);
   iRet = WelsInitSps (m_pSpsArrayPointer, pDlayerParam, &sParam2.sDependencyLayers[iDlayerIndex], sParam2.uiIntraPeriod,
                       sParam2.iMaxNumRefFrame,
                       iCurSpsId, sParam2.bEnableFrameCroppingFlag, sParam2.iRCMode != RC_OFF_MODE, iDlayerCount, false);

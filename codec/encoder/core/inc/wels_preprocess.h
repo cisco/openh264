@@ -55,9 +55,9 @@ namespace WelsEnc {
 typedef struct TagWelsEncCtx sWelsEncCtx;
 
 typedef  struct {
-  SPicture*	pScaledInputPicture;
-  int32_t		iScaledWidth[MAX_DEPENDENCY_LAYER];
-  int32_t     iScaledHeight[MAX_DEPENDENCY_LAYER];
+  SPicture*     pScaledInputPicture;
+  int32_t       iScaledWidth[MAX_DEPENDENCY_LAYER];
+  int32_t       iScaledHeight[MAX_DEPENDENCY_LAYER];
 } Scaled_Picture;
 
 
@@ -74,29 +74,29 @@ typedef struct {
   SPicture*   pRefPicture;
   int32_t     iSrcListIdx;   //idx in  h->spatial_pic[base_did];
   bool        bSceneLtrFlag;
-  unsigned char*		pBestBlockStaticIdc;
+  unsigned char*        pBestBlockStaticIdc;
 } SRefInfoParam;
 
 typedef struct TagVAAFrameInfo {
-  SVAACalcResult		sVaaCalcInfo;
+  SVAACalcResult        sVaaCalcInfo;
   SAdaptiveQuantizationParam sAdaptiveQuantParam;
   SComplexityAnalysisParam sComplexityAnalysisParam;
 
-  int32_t			iPicWidth;			// maximal iWidth of picture in samples for svc coding
-  int32_t			iPicHeight;			// maximal iHeight of picture in samples for svc coding
-  int32_t         iPicStride;         //luma
-  int32_t			iPicStrideUV;
+  int32_t       iPicWidth;          // maximal iWidth of picture in samples for svc coding
+  int32_t       iPicHeight;         // maximal iHeight of picture in samples for svc coding
+  int32_t       iPicStride;         //luma
+  int32_t       iPicStrideUV;
 
-  uint8_t*         pRefY; //pRef
-  uint8_t*         pCurY; //cur
-  uint8_t*         pRefU; //pRef
-  uint8_t*         pCurU; //cur
-  uint8_t*         pRefV; //pRef
-  uint8_t*         pCurV; //cur
+  uint8_t*      pRefY; //pRef
+  uint8_t*      pCurY; //cur
+  uint8_t*      pRefU; //pRef
+  uint8_t*      pCurU; //cur
+  uint8_t*      pRefV; //pRef
+  uint8_t*      pCurV; //cur
 
-  int8_t*			pVaaBackgroundMbFlag;
-  uint8_t         uiValidLongTermPicIdx;
-  uint8_t         uiMarkLongTermPicIdx;
+  int8_t*       pVaaBackgroundMbFlag;
+  uint8_t       uiValidLongTermPicIdx;
+  uint8_t       uiMarkLongTermPicIdx;
 
   ESceneChangeIdc eSceneChangeIdc;
   bool          bSceneChangeFlag;
@@ -150,7 +150,7 @@ class CWelsPreProcess {
  private:
   int32_t SingleLayerPreprocess (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrc, Scaled_Picture* m_sScaledPicture);
 
-  void	BilateralDenoising (SPicture* pSrc, const int32_t iWidth, const int32_t iHeight);
+  void  BilateralDenoising (SPicture* pSrc, const int32_t iWidth, const int32_t iHeight);
   bool  DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture);
   int32_t DownsamplePadding (SPicture* pSrc, SPicture* pDstPic,  int32_t iSrcWidth, int32_t iSrcHeight,
                              int32_t iShrinkWidth, int32_t iShrinkHeight, int32_t iTargetWidth, int32_t iTargetHeight,
@@ -194,7 +194,7 @@ class CWelsPreProcess {
 
  private:
   Scaled_Picture   m_sScaledPicture;
-  SPicture*	   m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];
+  SPicture*        m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];
   IWelsVP*         m_pInterfaceVp;
   sWelsEncCtx*     m_pEncCtx;
   bool             m_bInitDone;

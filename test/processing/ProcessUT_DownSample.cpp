@@ -11,11 +11,11 @@ using namespace WelsVP;
 void DyadicBilinearDownsampler_ref (uint8_t* pDst, const int32_t kiDstStride,
                                     uint8_t* pSrc, const int32_t kiSrcStride,
                                     const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
-  uint8_t* pDstLine	= pDst;
-  uint8_t* pSrcLine	= pSrc;
-  const int32_t kiSrcStridex2	= kiSrcStride << 1;
-  const int32_t kiDstWidth		= kiSrcWidth >> 1;
-  const int32_t kiDstHeight	= kiSrcHeight >> 1;
+  uint8_t* pDstLine = pDst;
+  uint8_t* pSrcLine = pSrc;
+  const int32_t kiSrcStridex2 = kiSrcStride << 1;
+  const int32_t kiDstWidth    = kiSrcWidth  >> 1;
+  const int32_t kiDstHeight   = kiSrcHeight >> 1;
 
   for (int32_t j = 0; j < kiDstHeight; j ++) {
     for (int32_t i = 0; i < kiDstWidth; i ++) {
@@ -25,8 +25,8 @@ void DyadicBilinearDownsampler_ref (uint8_t* pDst, const int32_t kiDstStride,
 
       pDstLine[i] = (uint8_t) ((kiTempRow1 + kiTempRow2 + 1) >> 1);
     }
-    pDstLine	+= kiDstStride;
-    pSrcLine	+= kiSrcStridex2;
+    pDstLine += kiDstStride;
+    pSrcLine += kiSrcStridex2;
   }
 }
 
@@ -72,7 +72,7 @@ void GeneralBilinearFastDownsampler_ref (uint8_t* pDst, const int32_t kiDstStrid
       x += 1;
       x >>= 1;
       //x = (((__int64)(SCALE_BIG - 1 - iFu))*(SCALE_BIG - 1 - fv)*a + ((__int64)iFu)*(SCALE_BIG - 1 -fv)*b + ((__int64)(SCALE_BIG - 1 -iFu))*fv*c +
-      //		 ((__int64)iFu)*fv*d + (1 << (2*SCALE_BIT_BIG-1)) ) >> (2*SCALE_BIT_BIG);
+      // ((__int64)iFu)*fv*d + (1 << (2*SCALE_BIT_BIG-1)) ) >> (2*SCALE_BIT_BIG);
       x = WELS_CLAMP (x, 0, 255);
       *pByDst++ = (uint8_t)x;
 

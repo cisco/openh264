@@ -41,7 +41,7 @@ class MotionEstimateTest : public ::testing::Test {
     m_iWidth = 64;//size of search window
     m_iHeight = 64;//size of search window
     m_iMaxSearchBlock = 16;
-    m_uiMvdTableSize	= (1 + (648 << 1));
+    m_uiMvdTableSize = (1 + (648 << 1));
 
     pMa = new CMemoryAlign (0);
     m_pRefData = static_cast<uint8_t*>
@@ -142,9 +142,9 @@ class MotionEstimateRangeTest : public ::testing::Test {
     m_iMvRange = m_iUsageType ? EXPANDED_MV_RANGE : CAMERA_STARTMV_RANGE;
     m_iMvdRange = (m_iUsageType ? EXPANDED_MVD_RANGE : ((m_iNumDependencyLayers == 1) ? CAMERA_MVD_RANGE :
                    CAMERA_HIGHLAYER_MVD_RANGE));
-    m_uiMvdInterTableSize	= (m_iMvdRange << 2); //intepel*4=qpel
-    m_uiMvdInterTableStride	=  1 + (m_uiMvdInterTableSize << 1);//qpel_mv_range*2=(+/-);
-    m_uiMvdCacheAlignedSize	= m_uiMvdInterTableStride * sizeof (uint16_t);
+    m_uiMvdInterTableSize       = (m_iMvdRange << 2); //intepel*4=qpel
+    m_uiMvdInterTableStride     =  1 + (m_uiMvdInterTableSize << 1);//qpel_mv_range*2=(+/-);
+    m_uiMvdCacheAlignedSize     = m_uiMvdInterTableStride * sizeof (uint16_t);
 
     m_pMa = new CMemoryAlign (16);
     ASSERT_TRUE (NULL != m_pMa);
@@ -338,7 +338,7 @@ void MotionEstimateTest::DoLineTest (PLineFullSearchFunc func, bool vertical) {
     const int32_t iCurMeBlockQpelPixX = ((iCurMeBlockPixX) << 2);
     const int32_t iCurMeBlockPixY = sMe.iCurMeBlockPixY;
     const int32_t iCurMeBlockQpelPixY = ((iCurMeBlockPixY) << 2);
-    uint16_t* pMvdCostX = sMe.pMvdCost - iCurMeBlockQpelPixX - sMe.sMvp.iMvX;	//do the offset here
+    uint16_t* pMvdCostX = sMe.pMvdCost - iCurMeBlockQpelPixX - sMe.sMvp.iMvX; //do the offset here
     uint16_t* pMvdCostY = sMe.pMvdCost - iCurMeBlockQpelPixY - sMe.sMvp.iMvY;
     uint16_t* pMvdCost = vertical ? pMvdCostY : pMvdCostX;
     int iSize = vertical ? m_iHeight : m_iWidth;
@@ -405,7 +405,7 @@ class FeatureMotionEstimateTest : public ::testing::Test {
     m_iWidth = 64;//size of search window
     m_iHeight = 64;//size of search window
     m_iMaxSearchBlock = 8;
-    m_uiMvdTableSize	= (1 + (648 << 1));
+    m_uiMvdTableSize = (1 + (648 << 1));
 
     m_pMa = new CMemoryAlign (16);
     ASSERT_TRUE (NULL != m_pMa);

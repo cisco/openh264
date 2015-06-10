@@ -169,15 +169,15 @@ typedef struct {
 } SSceneChangeResult;
 
 typedef struct {
-  unsigned char* pCurY;					// Y data of current frame
-  unsigned char* pRefY;					// Y data of pRef frame for diff calc
-  int (*pSad8x8)[4];				// sad of 8x8, every 4 in the same 16x16 get together
-  int* pSsd16x16;					// sum of square difference of 16x16
-  int* pSum16x16;					// sum of 16x16
-  int* pSumOfSquare16x16;					// sum of square of 16x16
-  int	(*pSumOfDiff8x8)[4];
+  unsigned char* pCurY;             // Y data of current frame
+  unsigned char* pRefY;             // Y data of pRef frame for diff calc
+  int (*pSad8x8)[4];                // sad of 8x8, every 4 in the same 16x16 get together
+  int* pSsd16x16;                   // sum of square difference of 16x16
+  int* pSum16x16;                   // sum of 16x16
+  int* pSumOfSquare16x16;           // sum of square of 16x16
+  int   (*pSumOfDiff8x8)[4];
   unsigned char (*pMad8x8)[4];
-  int iFrameSad;					// sad of frame
+  int iFrameSad;                    // sad of frame
 } SVAACalcResult;
 
 typedef struct {
@@ -185,11 +185,11 @@ typedef struct {
   int iCalcBgd;
   int iCalcSsd;
   int iReserved;
-  SVAACalcResult*	pCalcResult;
+  SVAACalcResult*  pCalcResult;
 } SVAACalcParam;
 
 typedef struct {
-  signed char*		pBackgroundMbFlag;
+  signed char*     pBackgroundMbFlag;
   SVAACalcResult*  pCalcRes;
 } SBGDInterface;
 
@@ -204,12 +204,12 @@ typedef struct {
 } SMotionTextureUnit;
 
 typedef struct {
-  int					iAdaptiveQuantMode; // 0:quality mode, 1:bitrates mode
-  SVAACalcResult*		pCalcResult;
+  int                  iAdaptiveQuantMode; // 0:quality mode, 1:bitrates mode
+  SVAACalcResult*      pCalcResult;
   SMotionTextureUnit*  pMotionTextureUnit;
 
-  signed char*			pMotionTextureIndexToDeltaQp;
-  int				iAverMotionTextureIndexToDeltaQp; // *AQ_STEP_INT_MULTIPLY
+  signed char*      pMotionTextureIndexToDeltaQp;
+  int               iAverMotionTextureIndexToDeltaQp; // *AQ_STEP_INT_MULTIPLY
 } SAdaptiveQuantizationParam;
 
 typedef enum {

@@ -60,7 +60,7 @@ typedef    HANDLE                    WELS_EVENT;
 #define    WELS_THREAD_ROUTINE_TYPE         DWORD  WINAPI
 #define    WELS_THREAD_ROUTINE_RETURN(rc)   return (DWORD)rc;
 
-#else	// NON-WINDOWS
+#else // NON-WINDOWS
 
 #include <stdlib.h>
 #include <unistd.h>

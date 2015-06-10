@@ -543,15 +543,15 @@ void EncodeDecodeTestAPIBase::SliceParamValidationForMode2 (int iSpatialIdx) {
   unsigned int uiSliceIdx         = 0;
   unsigned int uiActualSliceCount = 0;
 
-  uiMbWidth	     = (param_.iPicWidth + 15) >> 4;
-  uiMbHeight	 = (param_.iPicHeight + 15) >> 4;
+  uiMbWidth      = (param_.iPicWidth  + 15) >> 4;
+  uiMbHeight     = (param_.iPicHeight + 15) >> 4;
   uiMbNumInFrame = uiMbWidth * uiMbHeight;
 
   uiSliceIdx = 0;
   while (uiSliceIdx < MAX_SLICES_NUM) {
     param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceMbNum[uiSliceIdx] = rand() % uiMbNumInFrame;
-    uiCountMb			+= param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceMbNum[uiSliceIdx];
-    uiActualSliceCount	 =  uiSliceIdx + 1;
+    uiCountMb           += param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceMbNum[uiSliceIdx];
+    uiActualSliceCount   =  uiSliceIdx + 1;
 
     if (uiCountMb >= uiMbNumInFrame) {
       break;
@@ -575,7 +575,7 @@ void EncodeDecodeTestAPIBase::SliceParamValidationForMode3 (int iSpatialIdx) {
 
   unsigned int uiMbHeight         = 0;
 
-  uiMbHeight	 = (param_.iPicHeight + 15) >> 4;
+  uiMbHeight = (param_.iPicHeight + 15) >> 4;
 
   //change slice mode to SM_SINGLE_SLICE
   if (uiMbHeight >  MAX_SLICES_NUM) {
@@ -819,7 +819,7 @@ void ExtractDidNal (SFrameBSInfo* pBsInfo, int& iSrcLen, std::vector<SLostSim>* 
       } else {
         iPrefix = 0;
       }
-      tmpSLostSim.eNalType = (EWelsNalUnitType) ((* (pSrcPtr + iPrefix)) & 0x1f);	// eNalUnitType
+      tmpSLostSim.eNalType = (EWelsNalUnitType) ((* (pSrcPtr + iPrefix)) & 0x1f); // eNalUnitType
       bLost = (ToRemainDidNal ((pSrcPtr + iPrefix + 2), tmpSLostSim.eNalType, iTarDid)) ? false : true;
       tmpSLostSim.isLost = bLost;
       p_SLostSim->push_back (tmpSLostSim);
@@ -852,7 +852,7 @@ int SimulateNALLoss (const unsigned char* pSrc,  int& iSrcLen, std::vector<SLost
   for (i = 0; i < iSrcLen;) {
     if (pSrc[i] == 0 && pSrc[i + 1] == 0 && pSrc[i + 2] == 0 && pSrc[i + 3] == 1) {
       if (i - iBufPos) {
-        tmpSLostSim.eNalType = (EWelsNalUnitType) ((* (pSrc + iBufPos + ilastprefixlen)) & 0x1f);	// eNalUnitType
+        tmpSLostSim.eNalType = (EWelsNalUnitType) ((* (pSrc + iBufPos + ilastprefixlen)) & 0x1f); // eNalUnitType
         bLost = iLossIdx < iLossCharLen ? (pLossChars[iLossIdx] == '1') : (rand() % 2 == 1);
         bLost = (!bLossPara) && (IS_PARAM_SETS_NALS (tmpSLostSim.eNalType)) ? false : bLost;
         iLossIdx++;
@@ -871,7 +871,7 @@ int SimulateNALLoss (const unsigned char* pSrc,  int& iSrcLen, std::vector<SLost
       i = i + 4;
     } else if (pSrc[i] == 0 && pSrc[i + 1] == 0 && pSrc[i + 2] == 1) {
       if (i - iBufPos) {
-        tmpSLostSim.eNalType = (EWelsNalUnitType) ((* (pSrc + iBufPos + ilastprefixlen)) & 0x1f);	// eNalUnitType
+        tmpSLostSim.eNalType = (EWelsNalUnitType) ((* (pSrc + iBufPos + ilastprefixlen)) & 0x1f); // eNalUnitType
         bLost = iLossIdx < iLossCharLen ? (pLossChars[iLossIdx] == '1') : (rand() % 2 == 1);
         bLost = (!bLossPara) && (IS_PARAM_SETS_NALS (tmpSLostSim.eNalType)) ? false : bLost;
         iLossIdx++;
@@ -893,7 +893,7 @@ int SimulateNALLoss (const unsigned char* pSrc,  int& iSrcLen, std::vector<SLost
     }
   }
   if (i - iBufPos) {
-    tmpSLostSim.eNalType = (EWelsNalUnitType) ((* (pSrc + iBufPos + ilastprefixlen)) & 0x1f);	// eNalUnitType
+    tmpSLostSim.eNalType = (EWelsNalUnitType) ((* (pSrc + iBufPos + ilastprefixlen)) & 0x1f); // eNalUnitType
     bLost = iLossIdx < iLossCharLen ? (pLossChars[iLossIdx] == '1') : (rand() % 2 == 1);
     bLost = (!bLossPara) && (IS_PARAM_SETS_NALS (tmpSLostSim.eNalType)) ? false : bLost;
     iLossIdx++;

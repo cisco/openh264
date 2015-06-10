@@ -53,14 +53,14 @@ extern const uint8_t g_kCache26ScanIdx[16];
 extern const uint8_t g_kCache30ScanIdx[16];
 extern const uint8_t g_kNonZeroScanIdxC[4];
 /* Profile IDC */
-typedef uint8_t		ProfileIdc;
+typedef uint8_t ProfileIdc;
 
 /* Position Offset structure */
 typedef struct TagPosOffset {
-int32_t	iLeftOffset;
-int32_t	iTopOffset;
-int32_t	iRightOffset;
-int32_t	iBottomOffset;
+int32_t iLeftOffset;
+int32_t iTopOffset;
+int32_t iRightOffset;
+int32_t iBottomOffset;
 } SPosOffset;
 
 /* MB Type & Sub-MB Type */
@@ -86,8 +86,8 @@ typedef int32_t SubMbType;
 #define LUMA_DC_AC_INTRA_8  17
 #define LUMA_DC_AC_INTER_8  18
 
-#define SHIFT_BUFFER(pBitsCache)	{	pBitsCache->pBuf+=2; pBitsCache->uiRemainBits += 16; pBitsCache->uiCache32Bit |= (((pBitsCache->pBuf[2] << 8) | pBitsCache->pBuf[3]) << (32 - pBitsCache->uiRemainBits));	}
-#define POP_BUFFER(pBitsCache, iCount)	{ pBitsCache->uiCache32Bit <<= iCount;	pBitsCache->uiRemainBits -= iCount;	}
+#define SHIFT_BUFFER(pBitsCache)        { pBitsCache->pBuf+=2; pBitsCache->uiRemainBits += 16; pBitsCache->uiCache32Bit |= (((pBitsCache->pBuf[2] << 8) | pBitsCache->pBuf[3]) << (32 - pBitsCache->uiRemainBits)); }
+#define POP_BUFFER(pBitsCache, iCount)  { pBitsCache->uiCache32Bit <<= iCount;  pBitsCache->uiRemainBits -= iCount; }
 
 static const uint8_t g_kuiZigzagScan[16] = { //4*4block residual zig-zag scan order
     0,  1,  4,  8,
@@ -129,67 +129,65 @@ static const uint8_t g_kuiIdx2CtxLastSignificantCoeffFlag8x8[64] = { // Table 9-
     7,  7,  7,  7,  8,  8,  8,  8,
 };
 
-static inline void GetMbResProperty(int32_t * pMBproperty,int32_t* pResidualProperty,bool bCavlc)
-{
- switch(*pResidualProperty)
-  {
+static inline void GetMbResProperty (int32_t* pMBproperty, int32_t* pResidualProperty, bool bCavlc) {
+  switch (*pResidualProperty) {
   case CHROMA_AC_U:
-	  *pMBproperty = 1;
-	  *pResidualProperty = bCavlc ? CHROMA_AC : CHROMA_AC_U;
-	  break;
+    *pMBproperty = 1;
+    *pResidualProperty = bCavlc ? CHROMA_AC : CHROMA_AC_U;
+    break;
   case CHROMA_AC_V:
-	  *pMBproperty = 2;
-	  *pResidualProperty = bCavlc ? CHROMA_AC : CHROMA_AC_V;
-	  break;
+    *pMBproperty = 2;
+    *pResidualProperty = bCavlc ? CHROMA_AC : CHROMA_AC_V;
+    break;
   case LUMA_DC_AC_INTRA:
-	  *pMBproperty = 0;
-	  *pResidualProperty = LUMA_DC_AC;
-	  break;
+    *pMBproperty = 0;
+    *pResidualProperty = LUMA_DC_AC;
+    break;
   case CHROMA_DC_U:
-      *pMBproperty = 1;
-	  *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_U;
-      break;
- case CHROMA_DC_V:
-	  *pMBproperty = 2;
-	  *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_V;
-	  break;
+    *pMBproperty = 1;
+    *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_U;
+    break;
+  case CHROMA_DC_V:
+    *pMBproperty = 2;
+    *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_V;
+    break;
   case I16_LUMA_AC:
-	  *pMBproperty = 0;
-	  break;
+    *pMBproperty = 0;
+    break;
   case I16_LUMA_DC:
-	  *pMBproperty = 0;
-	  break;
+    *pMBproperty = 0;
+    break;
   case LUMA_DC_AC_INTER:
-	  *pMBproperty = 3;
-      *pResidualProperty = LUMA_DC_AC;
-	  break;
+    *pMBproperty = 3;
+    *pResidualProperty = LUMA_DC_AC;
+    break;
   case CHROMA_DC_U_INTER:
-      *pMBproperty = 4;
-	  *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_U;
-      break;
+    *pMBproperty = 4;
+    *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_U;
+    break;
   case CHROMA_DC_V_INTER:
-	  *pMBproperty = 5;
-	  *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_V;
-	  break;
- case CHROMA_AC_U_INTER:
-	  *pMBproperty = 4;
-	  *pResidualProperty =  bCavlc ? CHROMA_AC : CHROMA_AC_U;
-	  break;
- case CHROMA_AC_V_INTER:
-	  *pMBproperty = 5;
-	  *pResidualProperty =  bCavlc ? CHROMA_AC : CHROMA_AC_V;
-	  break;
-    // Reference to Table 7-2
- case LUMA_DC_AC_INTRA_8:
+    *pMBproperty = 5;
+    *pResidualProperty =  bCavlc ? CHROMA_DC : CHROMA_DC_V;
+    break;
+  case CHROMA_AC_U_INTER:
+    *pMBproperty = 4;
+    *pResidualProperty =  bCavlc ? CHROMA_AC : CHROMA_AC_U;
+    break;
+  case CHROMA_AC_V_INTER:
+    *pMBproperty = 5;
+    *pResidualProperty =  bCavlc ? CHROMA_AC : CHROMA_AC_V;
+    break;
+  // Reference to Table 7-2
+  case LUMA_DC_AC_INTRA_8:
     *pMBproperty = 6;
     *pResidualProperty = LUMA_DC_AC_8;
     break;
- case LUMA_DC_AC_INTER_8:
+  case LUMA_DC_AC_INTER_8:
     *pMBproperty = 7;
     *pResidualProperty = LUMA_DC_AC_8;
     break;
- }
   }
+}
 
 typedef struct TagI16PredInfo {
     int8_t iPredMode;
@@ -217,7 +215,7 @@ typedef struct TagI4PredInfo {
     int8_t iLeftAvail;
     int8_t iTopAvail;
     int8_t iLeftTopAvail;
-    //	int8_t right_top_avail; //when right_top unavailable but top avail, we can pad the right-top with the rightmost pixel of top
+    // int8_t right_top_avail; //when right_top unavailable but top avail, we can pad the right-top with the rightmost pixel of top
 } SI4PredInfo;
 static const SI4PredInfo g_ksI4PredInfo[9] = {
     {  I4_PRED_V, 0, 1, 0},

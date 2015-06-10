@@ -57,8 +57,8 @@ const uint32_t g_kuiInterCbpMap[48] = {
 
 //============================Enhance Layer CAVLC Writing===========================
 void WelsSpatialWriteMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb) {
-  SMbCache* pMbCache	= &pSlice->sMbCacheInfo;
-  SBitStringAux* pBs	= pSlice->pSliceBsa;
+  SMbCache* pMbCache = &pSlice->sMbCacheInfo;
+  SBitStringAux* pBs = pSlice->pSliceBsa;
   SSliceHeaderExt* pSliceHeadExt = &pSlice->sSliceHeaderExt;
   int32_t iNumRefIdxl0ActiveMinus1 = pSliceHeadExt->sSliceHeader.uiNumRefIdxL0Active - 1;
 
@@ -169,8 +169,8 @@ void WelsSpatialWriteMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb) 
 }
 
 void WelsSpatialWriteSubMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb) {
-  SMbCache* pMbCache	= &pSlice->sMbCacheInfo;
-  SBitStringAux* pBs	= pSlice->pSliceBsa;
+  SMbCache* pMbCache = &pSlice->sMbCacheInfo;
+  SBitStringAux* pBs = pSlice->pSliceBsa;
   SSliceHeaderExt* pSliceHeadExt = &pSlice->sSliceHeaderExt;
 
   int32_t iNumRefIdxl0ActiveMinus1 = pSliceHeadExt->sSliceHeader.uiNumRefIdxL0Active - 1;
@@ -226,7 +226,7 @@ int32_t WelsSpatialWriteMbSyn (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb
   const uint8_t kuiChromaQpIndexOffset = pEncCtx->pCurDqLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
 
   if (IS_SKIP (pCurMb->uiMbType)) {
-    pCurMb->uiLumaQp	= pSlice->uiLastMbQp;
+    pCurMb->uiLumaQp = pSlice->uiLastMbQp;
     pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp + kuiChromaQpIndexOffset)];
 
     pSlice->iMbSkipRun++;
@@ -271,10 +271,10 @@ int32_t WelsSpatialWriteMbSyn (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb
 
 int32_t WelsWriteMbResidual (SWelsFuncPtrList* pFuncList, SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux* pBs) {
   int32_t i;
-  Mb_Type uiMbType					= pCurMb->uiMbType;
-  const int32_t kiCbpChroma		= pCurMb->uiCbp >> 4;
-  const int32_t kiCbpLuma			= pCurMb->uiCbp & 0x0F;
-  int8_t* pNonZeroCoeffCount	= sMbCacheInfo->iNonZeroCoeffCount;
+  Mb_Type uiMbType              = pCurMb->uiMbType;
+  const int32_t kiCbpChroma     = pCurMb->uiCbp >> 4;
+  const int32_t kiCbpLuma       = pCurMb->uiCbp & 0x0F;
+  int8_t* pNonZeroCoeffCount    = sMbCacheInfo->iNonZeroCoeffCount;
   int16_t* pBlock;
   int8_t iA, iB, iC;
 
