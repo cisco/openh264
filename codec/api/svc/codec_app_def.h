@@ -112,6 +112,7 @@ typedef enum {
   ENCODER_OPTION_MAX_BITRATE,
   ENCODER_OPTION_INTER_SPATIAL_PRED,
   ENCODER_OPTION_RC_MODE,
+  ENCODER_OPTION_RC_FRAME_SKIP,
   ENCODER_PADDING_PADDING,                   ///< 0:disable padding;1:padding
 
   ENCODER_OPTION_PROFILE,                    ///< assgin the profile for each layer

@@ -278,6 +278,7 @@ void UpdateBufferWhenFrameSkipped(sWelsEncCtx* pCtx, int32_t iSpatialNum);
 void UpdateMaxBrCheckWindowStatus(sWelsEncCtx* pCtx, int32_t iSpatialNum, const long long uiTimeStamp);
 void RcTraceFrameBits (sWelsEncCtx* pEncCtx, long long uiTimeStamp);
 void WelsRcInitModule (sWelsEncCtx* pCtx, RC_MODES iRcMode);
+void WelsRcInitFuncPointers (sWelsEncCtx* pEncCtx, RC_MODES iRcMode);
 void WelsRcFreeMemory (sWelsEncCtx* pCtx);
 
 }

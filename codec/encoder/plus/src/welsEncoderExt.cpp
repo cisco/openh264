@@ -877,8 +877,23 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     int32_t iValue = * ((int32_t*)pOption);
     m_pEncContext->pSvcParam->iRCMode = (RC_MODES) iValue;
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_RC_MODE iRCMode= %d ",
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_RC_MODE iRCMode= %d (Note: not suggest changing RC-mode in middle of encoding)",
              iValue);
+    WelsRcInitFuncPointers(m_pEncContext, m_pEncContext->pSvcParam->iRCMode);
+  }
+  break;
+  case ENCODER_OPTION_RC_FRAME_SKIP: { // 0:FRAME-SKIP disabled;1:FRAME-SKIP enabled
+    bool bValue = * ((bool*)pOption);
+    if (m_pEncContext->pSvcParam->iRCMode != RC_OFF_MODE) {
+      m_pEncContext->pSvcParam->bEnableFrameSkip = bValue;
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+               "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_RC_FRAME_SKIP, frame-skip setting(%d)",
+               bValue);
+    } else {
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+               "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_RC_FRAME_SKIP, rc off, frame-skip setting(%d) un-useful",
+               bValue);
+    }
   }
   break;
   case ENCODER_PADDING_PADDING: { // 0:disable padding;1:padding

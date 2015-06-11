@@ -1420,7 +1420,8 @@ void  WelsRcPictureInfoUpdateGomTimeStamp (sWelsEncCtx* pEncCtx, int32_t iLayerS
     RcVBufferCalculationPadding (pEncCtx);
   pWelsSvcRc->iFrameCodedInVGop++;
 }
-void  WelsRcInitModule (sWelsEncCtx* pEncCtx, RC_MODES iRcMode) {
+
+void  WelsRcInitFuncPointers (sWelsEncCtx* pEncCtx, RC_MODES iRcMode) {
   SWelsRcFunc*   pRcf = &pEncCtx->pFuncList->pfRc;
   switch (iRcMode) {
   case RC_OFF_MODE:
@@ -1485,7 +1486,10 @@ void  WelsRcInitModule (sWelsEncCtx* pEncCtx, RC_MODES iRcMode) {
 
     break;
   }
+}
 
+void  WelsRcInitModule (sWelsEncCtx* pEncCtx, RC_MODES iRcMode) {
+  WelsRcInitFuncPointers (pEncCtx, iRcMode);
   RcInitSequenceParameter (pEncCtx);
 }
 
