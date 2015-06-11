@@ -590,7 +590,7 @@ w8_xy_30_mc_luma_loop:
     VEC4_ST1_8BITS_8ELEMENT x2, x3, v1, v3, v5, v7
     cbnz x4, w8_xy_30_mc_luma_loop
 
-    ldp d8,d9,[sp],#32
+    ldp d8,d9,[sp],#16
 WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer30WidthEq4_AArch64_neon
