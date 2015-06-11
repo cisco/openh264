@@ -40,6 +40,7 @@ namespace WelsCommon {
 #ifdef MEMORY_CHECK
 static FILE*    fpMemChkPoint;
 static uint32_t nCountRequestNum;
+static int32_t  iMemoryLength;
 #endif
 
 
@@ -71,8 +72,8 @@ void* WelsMalloc (const uint32_t kuiSize, const char* kpTag, const uint32_t kiAl
   uint8_t* pBuf = (uint8_t*) malloc (kiActualRequestedSize);
 #ifdef MEMORY_CHECK
   if (fpMemChkPoint == NULL) {
-    m_fpMemChkPoint    = fopen ("./enc_mem_check_point.txt",  "at+");
-    m_nCountRequestNum = 0;
+    fpMemChkPoint    = fopen ("./enc_mem_check_point.txt",  "at+");
+    nCountRequestNum = 0;
   }
 
   if (fpMemChkPoint != NULL) {
@@ -101,10 +102,10 @@ void* WelsMalloc (const uint32_t kuiSize, const char* kpTag, const uint32_t kiAl
 void WelsFree (void* pPointer, const char* kpTag) {
   if (pPointer) {
 #ifdef MEMORY_CHECK
-    if (m_fpMemChkPoint != NULL) {
+    if (fpMemChkPoint != NULL) {
       if (kpTag != NULL)
         fprintf (fpMemChkPoint, "WelsFree(), 0x%x - %s: \t%d\t bytes \n", (void*) (* (((void**) pPointer) - 1)), kpTag,
-                 kiMemoryLength);
+                 iMemoryLength);
       else
         fprintf (fpMemChkPoint, "WelsFree(), 0x%x \n", (void*) (* (((void**) pPointer) - 1)));
       fflush (fpMemChkPoint);
@@ -129,9 +130,9 @@ void* CMemoryAlign::WelsMalloc (const uint32_t kuiSize, const char* kpTag) {
   void* pPointer = WelsCommon::WelsMalloc (kuiSize, kpTag, m_nCacheLineSize);
 #ifdef MEMORY_MONITOR
   if (pPointer != NULL) {
-    const int32_t kiMemoryLength = * ((int32_t*) ((uint8_t*)pPointer - sizeof (void**) - sizeof (
+    const int32_t iMemoryLength = * ((int32_t*) ((uint8_t*)pPointer - sizeof (void**) - sizeof (
                                         int32_t))) + m_nCacheLineSize - 1 + sizeof (void**) + sizeof (int32_t);
-    m_nMemoryUsageInBytes += kiMemoryLength;
+    m_nMemoryUsageInBytes += iMemoryLength;
   }
 #endif//MEMORY_MONITOR
   return pPointer;
@@ -140,9 +141,9 @@ void* CMemoryAlign::WelsMalloc (const uint32_t kuiSize, const char* kpTag) {
 void CMemoryAlign::WelsFree (void* pPointer, const char* kpTag) {
   if (pPointer) {
 #ifdef MEMORY_MONITOR
-    const int32_t kiMemoryLength = * ((int32_t*) ((uint8_t*)pPointer - sizeof (void**) - sizeof (
+    const int32_t iMemoryLength = * ((int32_t*) ((uint8_t*)pPointer - sizeof (void**) - sizeof (
                                         int32_t))) + m_nCacheLineSize - 1 + sizeof (void**) + sizeof (int32_t);
-    m_nMemoryUsageInBytes -= kiMemoryLength;
+    m_nMemoryUsageInBytes -= iMemoryLength;
 #endif//MEMORY_MONITOR
   }
   WelsCommon::WelsFree (pPointer, kpTag);
