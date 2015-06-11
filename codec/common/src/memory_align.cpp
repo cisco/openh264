@@ -40,7 +40,7 @@ namespace WelsCommon {
 #ifdef MEMORY_CHECK
 static FILE*    fpMemChkPoint;
 static uint32_t nCountRequestNum;
-static int32_t  iMemoryLength;
+static int32_t  g_iMemoryLength;
 #endif
 
 
@@ -105,7 +105,7 @@ void WelsFree (void* pPointer, const char* kpTag) {
     if (fpMemChkPoint != NULL) {
       if (kpTag != NULL)
         fprintf (fpMemChkPoint, "WelsFree(), 0x%x - %s: \t%d\t bytes \n", (void*) (* (((void**) pPointer) - 1)), kpTag,
-                 iMemoryLength);
+                 g_iMemoryLength);
       else
         fprintf (fpMemChkPoint, "WelsFree(), 0x%x \n", (void*) (* (((void**) pPointer) - 1)));
       fflush (fpMemChkPoint);
@@ -130,22 +130,28 @@ void* CMemoryAlign::WelsMalloc (const uint32_t kuiSize, const char* kpTag) {
   void* pPointer = WelsCommon::WelsMalloc (kuiSize, kpTag, m_nCacheLineSize);
 #ifdef MEMORY_MONITOR
   if (pPointer != NULL) {
-    iMemoryLength = * ((int32_t*) ((uint8_t*)pPointer - sizeof (void**) - sizeof (
+    const int32_t kiMemoryLength = * ((int32_t*) ((uint8_t*)pPointer - sizeof (void**) - sizeof (
                                         int32_t))) + m_nCacheLineSize - 1 + sizeof (void**) + sizeof (int32_t);
-    m_nMemoryUsageInBytes += iMemoryLength;
+    m_nMemoryUsageInBytes += kiMemoryLength;
+#ifdef MEMORY_CHECK
+    g_iMemoryLength = kiMemoryLength;
+#endif
   }
 #endif//MEMORY_MONITOR
   return pPointer;
 }
 
 void CMemoryAlign::WelsFree (void* pPointer, const char* kpTag) {
-  if (pPointer) {
 #ifdef MEMORY_MONITOR
-    iMemoryLength = * ((int32_t*) ((uint8_t*)pPointer - sizeof (void**) - sizeof (
+  if (pPointer) {
+    const int32_t kiMemoryLength = * ((int32_t*) ((uint8_t*)pPointer - sizeof (void**) - sizeof (
                                         int32_t))) + m_nCacheLineSize - 1 + sizeof (void**) + sizeof (int32_t);
-    m_nMemoryUsageInBytes -= iMemoryLength;
-#endif//MEMORY_MONITOR
+    m_nMemoryUsageInBytes -= kiMemoryLength;
+#ifdef MEMORY_CHECK
+    g_iMemoryLength = kiMemoryLength;
+#endif
   }
+#endif//MEMORY_MONITOR
   WelsCommon::WelsFree (pPointer, kpTag);
 }
 
