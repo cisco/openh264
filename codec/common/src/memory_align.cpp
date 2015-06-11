@@ -130,7 +130,7 @@ void* CMemoryAlign::WelsMalloc (const uint32_t kuiSize, const char* kpTag) {
   void* pPointer = WelsCommon::WelsMalloc (kuiSize, kpTag, m_nCacheLineSize);
 #ifdef MEMORY_MONITOR
   if (pPointer != NULL) {
-    const int32_t iMemoryLength = * ((int32_t*) ((uint8_t*)pPointer - sizeof (void**) - sizeof (
+    iMemoryLength = * ((int32_t*) ((uint8_t*)pPointer - sizeof (void**) - sizeof (
                                         int32_t))) + m_nCacheLineSize - 1 + sizeof (void**) + sizeof (int32_t);
     m_nMemoryUsageInBytes += iMemoryLength;
   }
@@ -141,7 +141,7 @@ void* CMemoryAlign::WelsMalloc (const uint32_t kuiSize, const char* kpTag) {
 void CMemoryAlign::WelsFree (void* pPointer, const char* kpTag) {
   if (pPointer) {
 #ifdef MEMORY_MONITOR
-    const int32_t iMemoryLength = * ((int32_t*) ((uint8_t*)pPointer - sizeof (void**) - sizeof (
+    iMemoryLength = * ((int32_t*) ((uint8_t*)pPointer - sizeof (void**) - sizeof (
                                         int32_t))) + m_nCacheLineSize - 1 + sizeof (void**) + sizeof (int32_t);
     m_nMemoryUsageInBytes -= iMemoryLength;
 #endif//MEMORY_MONITOR
