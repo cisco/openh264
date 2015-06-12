@@ -196,9 +196,9 @@ void CWelsH264SVCEncoder::OnTheFlyParamModifDOWN (){
 	WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsH264SVCEncoder::InitEncoder(), openh264 codec version = %s",
 			VERSION_NUMBER);
 
-	m_pEncContext->pSvcParam->sSpatialLayers[0].iSpatialBitrate *= 1/4;
-	m_pEncContext->pSvcParam->iTargetBitrate *= 1/4;
-	m_pEncContext->pSvcParam->iMaxBitrate *= 1/4;
+	m_pEncContext->pSvcParam->sSpatialLayers[0].iSpatialBitrate *= 0.25;
+	m_pEncContext->pSvcParam->iTargetBitrate *= 0.25;
+	m_pEncContext->pSvcParam->iMaxBitrate *= 0.25;
 
 }
 

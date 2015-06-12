@@ -875,19 +875,8 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
                                         || (iFrameIdx < (int32_t)fs.uiFrameToBeCoded))) {
 
 	if (cnt > 100 && flipou == 1){
-
-		sSvcParam.iTargetBitrate = sSvcParam.iTargetBitrate*8;
-		sSvcParam.iMaxBitrate = sSvcParam.iMaxBitrate*8;
-		(sSvcParam.sSpatialLayers[0]).iSpatialBitrate = (sSvcParam.sSpatialLayers[0]).iSpatialBitrate*8;
-		if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) {	// SVC encoder initialization
-			fprintf (stderr, "SVC encoder Initialize failed\n");
-			iRet = 1;
-			goto INSIDE_MEM_FREE;
-		}
-		//pPtrEnc->OnTheFlyParamModifUP();
-		//pPtrEnc->OnTheFlyParamModifUP();
+		pPtrEnc->OnTheFlyParamModifUP();
 		flipou = 0;
-		printf("lala\n");
 	}
 	if (cnt < 100 && flipou == 0 ){
 		pPtrEnc->OnTheFlyParamModifDOWN();
