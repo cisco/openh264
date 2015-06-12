@@ -868,41 +868,54 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
 		goto INSIDE_MEM_FREE;
 	}*/
 
-	//pPtrEnc->OnTheFlyParamModifUP();
-
-
   while (iFrameIdx < iTotalFrameMax && (((int32_t)fs.uiFrameToBeCoded <= 0)
                                         || (iFrameIdx < (int32_t)fs.uiFrameToBeCoded))) {
 
-	if (cnt > 100 && flipou == 1){
+	if (cnt % 10  == 0 && flipou == 1){
+		pPtrEnc->OnTheFlyParamModifUP();
+		flipou = 0;
+	}
+	else if (cnt % 10  == 0 && flipou == 0 && cnt >= 121){
+		pPtrEnc->OnTheFlyParamModifDOWN();
+		flipou = 1;
+	}
+/*:	if (cnt > 150 && flipou == 1){
 
-		sSvcParam.iTargetBitrate = sSvcParam.iTargetBitrate*8;
-		sSvcParam.iMaxBitrate = sSvcParam.iMaxBitrate*8;
-		(sSvcParam.sSpatialLayers[0]).iSpatialBitrate = (sSvcParam.sSpatialLayers[0]).iSpatialBitrate*8;
+		//sSvcParam.iTargetBitrate = sSvcParam.iTargetBitrate*8;
+		//sSvcParam.iMaxBitrate = sSvcParam.iMaxBitrate*8;
+		//(sSvcParam.sSpatialLayers[0]).iSpatialBitrate = (sSvcParam.sSpatialLayers[0]).iSpatialBitrate*8;
+		//if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) {	// SVC encoder initialization
+		//	fprintf (stderr, "SVC encoder Initialize failed\n");
+		//	iRet = 1;
+		//	goto INSIDE_MEM_FREE;
+		//}
+		//pPtrEnc->OnTheFlyParamModifUP();
+		pPtrEnc->OnTheFlyParamModifUP();
+		flipou = 2;
+		printf("1\n");
+	}
+	if ( cnt > 76 && flipou == 0 ){
+		//sSvcParam.iTargetBitrate = sSvcParam.iTargetBitrate * 0.5;
+		//sSvcParam.iMaxBitrate = sSvcParam.iMaxBitrate * 0.5;
+		(sSvcParam.sSpatialLayers[0]).iSpatialBitrate = (sSvcParam.sSpatialLayers[0]).iSpatialBitrate * 0.25;
 		if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) {	// SVC encoder initialization
 			fprintf (stderr, "SVC encoder Initialize failed\n");
 			iRet = 1;
 			goto INSIDE_MEM_FREE;
 		}
-		//pPtrEnc->OnTheFlyParamModifUP();
-		//pPtrEnc->OnTheFlyParamModifUP();
-		flipou = 0;
-		printf("lala\n");
-	}
-	if (cnt < 100 && flipou == 0 ){
-		pPtrEnc->OnTheFlyParamModifDOWN();
+		//pPtrEnc->OnTheFlyParamModifDOWN();
 		flipou = 1;
+		printf("0\n");
 	}
-/*	if ( cnt % 50 == 0 && flipou == 0 ){
+	if (cnt > 250 && flipou == 2){
 		pPtrEnc->OnTheFlyParamModifDOWN();
-		flipou = 1;
-	}
-	else if ( cnt % 10 == 0 && cnt % 50 != 0 && flipou == 1 ) {
-		pPtrEnc->OnTheFlyParamModifUP();
-		flipou = 0;
+		flipou = 3;
+		printf("2\n");
 	}*/
+
 	cnt++;
-	(cnt % 25) ? cnt = cnt * 1 : printf("frame idx = %d\n", cnt);
+	if (cnt % 25 == 0)
+		pPtrEnc->print();
 
 #ifdef ONLY_ENC_FRAMES_NUM
     // Only encoded some limited frames here
