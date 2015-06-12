@@ -868,30 +868,20 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
 		goto INSIDE_MEM_FREE;
 	}*/
 
-	//pPtrEnc->OnTheFlyParamModifUP();
-
-
   while (iFrameIdx < iTotalFrameMax && (((int32_t)fs.uiFrameToBeCoded <= 0)
                                         || (iFrameIdx < (int32_t)fs.uiFrameToBeCoded))) {
 
-	if (cnt > 100 && flipou == 1){
+	if (cnt % 10  == 0 && flipou == 1){
 		pPtrEnc->OnTheFlyParamModifUP();
 		flipou = 0;
 	}
-	if (cnt < 100 && flipou == 0 ){
+	else if (cnt % 10  == 0 && flipou == 0 && cnt >= 121){
 		pPtrEnc->OnTheFlyParamModifDOWN();
 		flipou = 1;
 	}
-/*	if ( cnt % 50 == 0 && flipou == 0 ){
-		pPtrEnc->OnTheFlyParamModifDOWN();
-		flipou = 1;
-	}
-	else if ( cnt % 10 == 0 && cnt % 50 != 0 && flipou == 1 ) {
-		pPtrEnc->OnTheFlyParamModifUP();
-		flipou = 0;
-	}*/
 	cnt++;
-	(cnt % 25) ? cnt = cnt * 1 : printf("frame idx = %d\n", cnt);
+	if (cnt % 25 == 0)
+		pPtrEnc->print();
 
 #ifdef ONLY_ENC_FRAMES_NUM
     // Only encoded some limited frames here

@@ -67,6 +67,8 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
    */
   virtual void EXTAPI OnTheFlyParamModifUP ();
   virtual void EXTAPI OnTheFlyParamModifDOWN ();
+  virtual void print();
+
   virtual int EXTAPI Initialize (const SEncParamBase* argv);
   virtual int EXTAPI InitializeExt (const SEncParamExt* argv);
 

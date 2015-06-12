@@ -183,23 +183,27 @@ int CWelsH264SVCEncoder::GetDefaultParams (SEncParamExt* argv) {
  */
  void CWelsH264SVCEncoder::OnTheFlyParamModifUP (){
 
-	WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsH264SVCEncoder::InitEncoder(), openh264 codec version = %s",
-			VERSION_NUMBER);
-
 	m_pEncContext->pSvcParam->sSpatialLayers[0].iSpatialBitrate *= 4;
-	m_pEncContext->pSvcParam->iTargetBitrate *= 4;
-	m_pEncContext->pSvcParam->iMaxBitrate *= 4;
+	//m_pEncContext->pSvcParam->iTargetBitrate *= 2;
+	//m_pEncContext->pSvcParam->iMaxBitrate *= 2;
 }
 
 void CWelsH264SVCEncoder::OnTheFlyParamModifDOWN (){
 
-	WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsH264SVCEncoder::InitEncoder(), openh264 codec version = %s",
-			VERSION_NUMBER);
+	m_pEncContext->pSvcParam->sSpatialLayers[0].iSpatialBitrate *= 0.25;
+	//m_pEncContext->pSvcParam->iTargetBitrate *= 0.5;
+	//m_pEncContext->pSvcParam->iMaxBitrate *= 0.5;
 
+<<<<<<< HEAD
+}
+=======
 	m_pEncContext->pSvcParam->sSpatialLayers[0].iSpatialBitrate *= 0.25;
 	m_pEncContext->pSvcParam->iTargetBitrate *= 0.25;
 	m_pEncContext->pSvcParam->iMaxBitrate *= 0.25;
+>>>>>>> master
 
+void CWelsH264SVCEncoder::print(){
+	printf("Bitrate iSpatialBitrate is %d\n", m_pEncContext->pSvcParam->sSpatialLayers[0].iSpatialBitrate);
 }
 
 

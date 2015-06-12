@@ -276,6 +276,7 @@ class ISVCEncoder {
    */
   virtual void EXTAPI OnTheFlyParamModifUP () = 0;
   virtual void EXTAPI OnTheFlyParamModifDOWN () = 0;
+  virtual void print () = 0;
 
 
   /**
