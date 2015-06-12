@@ -64,23 +64,23 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
   int32_t iPicWidth = 0;
   int32_t iPicHeight = 0;
 
-  int32_t iPicChromaWidth	= 0;
-  int32_t iPicChromaHeight	= 0;
-  int32_t iLumaSize			= 0;
-  int32_t iChromaSize			= 0;
+  int32_t iPicChromaWidth   = 0;
+  int32_t iPicChromaHeight  = 0;
+  int32_t iLumaSize         = 0;
+  int32_t iChromaSize       = 0;
 
-  pPic	= (PPicture) WelsMallocz (sizeof (SPicture), "PPicture");
+  pPic = (PPicture) WelsMallocz (sizeof (SPicture), "PPicture");
   WELS_VERIFY_RETURN_IF (NULL, NULL == pPic);
 
   memset (pPic, 0, sizeof (SPicture));
 
   iPicWidth = WELS_ALIGN (kiPicWidth + (PADDING_LENGTH << 1), PICTURE_RESOLUTION_ALIGNMENT);
   iPicHeight = WELS_ALIGN (kiPicHeight + (PADDING_LENGTH << 1), PICTURE_RESOLUTION_ALIGNMENT);
-  iPicChromaWidth	= iPicWidth >> 1;
-  iPicChromaHeight	= iPicHeight >> 1;
+  iPicChromaWidth   = iPicWidth >> 1;
+  iPicChromaHeight  = iPicHeight >> 1;
 
-  iLumaSize	= iPicWidth * iPicHeight;
-  iChromaSize	= iPicChromaWidth * iPicChromaHeight;
+  iLumaSize     = iPicWidth * iPicHeight;
+  iChromaSize   = iPicChromaWidth * iPicChromaHeight;
 
   if (pCtx->bParseOnly) {
     pPic->pBuffer[0] = pPic->pBuffer[1] = pPic->pBuffer[2] = NULL;
@@ -88,23 +88,23 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
     pPic->iLinesize[0] = iPicWidth;
     pPic->iLinesize[1] = pPic->iLinesize[2] = iPicChromaWidth;
   } else {
-    pPic->pBuffer[0]	= static_cast<uint8_t*> (WelsMallocz (iLumaSize /* luma */
+    pPic->pBuffer[0] = static_cast<uint8_t*> (WelsMallocz (iLumaSize /* luma */
                         + (iChromaSize << 1) /* Cb,Cr */, "_pic->buffer[0]"));
     WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pBuffer[0], FreePicture (pPic));
 
     memset (pPic->pBuffer[0], 128, (iLumaSize + (iChromaSize << 1)));
     pPic->iLinesize[0] = iPicWidth;
     pPic->iLinesize[1] = pPic->iLinesize[2] = iPicChromaWidth;
-    pPic->pBuffer[1]	= pPic->pBuffer[0] + iLumaSize;
-    pPic->pBuffer[2]	= pPic->pBuffer[1] + iChromaSize;
-    pPic->pData[0]	= pPic->pBuffer[0] + (1 + pPic->iLinesize[0]) * PADDING_LENGTH;
-    pPic->pData[1]	= pPic->pBuffer[1] + /*WELS_ALIGN*/ (((1 + pPic->iLinesize[1]) * PADDING_LENGTH) >> 1);
-    pPic->pData[2]	= pPic->pBuffer[2] + /*WELS_ALIGN*/ (((1 + pPic->iLinesize[2]) * PADDING_LENGTH) >> 1);
+    pPic->pBuffer[1]   = pPic->pBuffer[0] + iLumaSize;
+    pPic->pBuffer[2]   = pPic->pBuffer[1] + iChromaSize;
+    pPic->pData[0]     = pPic->pBuffer[0] + (1 + pPic->iLinesize[0]) * PADDING_LENGTH;
+    pPic->pData[1]     = pPic->pBuffer[1] + /*WELS_ALIGN*/ (((1 + pPic->iLinesize[1]) * PADDING_LENGTH) >> 1);
+    pPic->pData[2]     = pPic->pBuffer[2] + /*WELS_ALIGN*/ (((1 + pPic->iLinesize[2]) * PADDING_LENGTH) >> 1);
   }
-  pPic->iPlanes		= 3;	// yv12 in default
-  pPic->iWidthInPixel	= kiPicWidth;
+  pPic->iPlanes        = 3;    // yv12 in default
+  pPic->iWidthInPixel  = kiPicWidth;
   pPic->iHeightInPixel = kiPicHeight;
-  pPic->iFrameNum		= -1;
+  pPic->iFrameNum      = -1;
   pPic->bAvailableFlag = true;
 
   return pPic;

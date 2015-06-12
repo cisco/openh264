@@ -68,10 +68,10 @@ CMemoryAlign (const CMemoryAlign& kcMa);
 CMemoryAlign& operator= (const CMemoryAlign& kcMa);
 
  protected:
-uint32_t	m_nCacheLineSize;
+uint32_t        m_nCacheLineSize;
 
 #ifdef MEMORY_MONITOR
-uint32_t	m_nMemoryUsageInBytes;
+uint32_t        m_nMemoryUsageInBytes;
 #endif//MEMORY_MONITOR
 };
 

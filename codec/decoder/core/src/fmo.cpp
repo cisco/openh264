@@ -93,7 +93,7 @@ static inline int32_t FmoGenerateMbAllocMapType1 (PFmo pFmo, PPps pPps, const in
   int32_t i = 0;
   WELS_VERIFY_RETURN_IF (1, (NULL == pFmo || NULL == pPps))
   uiNumSliceGroups = pPps->uiNumSliceGroups;
-  iMbNum			 = pFmo->iCountMbNum;
+  iMbNum = pFmo->iCountMbNum;
   WELS_VERIFY_RETURN_IF (1, (NULL == pFmo->pMbAllocMap || iMbNum <= 0 || kiMbWidth == 0
                              || uiNumSliceGroups >= MAX_SLICEGROUP_IDS))
 
@@ -117,14 +117,14 @@ static inline int32_t FmoGenerateMbAllocMapType1 (PFmo pFmo, PPps pPps, const in
  */
 static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const int32_t kiMbWidth,
     const int32_t kiMbHeight) {
-  int32_t iNumMb	= 0;
-  int32_t iErr		= 0;
-  bool	bResolutionChanged = false;
+  int32_t iNumMb = 0;
+  int32_t iErr   = 0;
+  bool bResolutionChanged = false;
 
   // the cases we would not like
   WELS_VERIFY_RETURN_IF (1, (NULL == pFmo || NULL == kpPps))
 
-  iNumMb	= pFmo->iCountMbNum;
+  iNumMb        = pFmo->iCountMbNum;
 
   iNumMb = kiMbWidth * kiMbHeight;
 
@@ -133,15 +133,15 @@ static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const 
 
 
   WelsFree (pFmo->pMbAllocMap, "_fmo->pMbAllocMap");
-  pFmo->pMbAllocMap	= (uint8_t*)WelsMallocz (iNumMb * sizeof (uint8_t), "_fmo->pMbAllocMap");
-  WELS_VERIFY_RETURN_IF (1, (NULL == pFmo->pMbAllocMap))	// out of memory
+  pFmo->pMbAllocMap = (uint8_t*)WelsMallocz (iNumMb * sizeof (uint8_t), "_fmo->pMbAllocMap");
+  WELS_VERIFY_RETURN_IF (1, (NULL == pFmo->pMbAllocMap)) // out of memory
 
-  pFmo->iCountMbNum	= iNumMb;
+  pFmo->iCountMbNum = iNumMb;
 
   if (kpPps->uiNumSliceGroups < 2 && iNumMb > 0) { // only one slice group, exactly it is single slice based
-    memset (pFmo->pMbAllocMap, 0,  iNumMb * sizeof (int8_t));	// for safe
+    memset (pFmo->pMbAllocMap, 0,  iNumMb * sizeof (int8_t));   // for safe
 
-    pFmo->iSliceGroupCount		= 1;
+    pFmo->iSliceGroupCount = 1;
 
     return 0;
   }
@@ -150,7 +150,7 @@ static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const 
       || ((int32_t)kpPps->uiNumSliceGroups != pFmo->iSliceGroupCount)) {
     switch (kpPps->uiSliceGroupMapType) {
     case 0:
-      iErr	= FmoGenerateMbAllocMapType0 (pFmo, kpPps);
+      iErr = FmoGenerateMbAllocMapType0 (pFmo, kpPps);
       break;
     case 1:
       iErr = FmoGenerateMbAllocMapType1 (pFmo, kpPps, kiMbWidth);
@@ -161,16 +161,16 @@ static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const 
     case 5:
     case 6:
       // Reserve for others slice group type
-      iErr	= 1;
+      iErr = 1;
       break;
     default:
       return 1;
     }
   }
 
-  if (0 == iErr) {	// well now
-    pFmo->iSliceGroupCount	= kpPps->uiNumSliceGroups;
-    pFmo->iSliceGroupType	= kpPps->uiSliceGroupMapType;
+  if (0 == iErr) {      // well now
+    pFmo->iSliceGroupCount = kpPps->uiNumSliceGroups;
+    pFmo->iSliceGroupType  = kpPps->uiSliceGroupMapType;
   }
 
   return iErr;
@@ -213,12 +213,12 @@ void UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail) {
       if (NULL != pIter->pMbAllocMap) {
         WelsFree (pIter->pMbAllocMap, "pIter->pMbAllocMap");
 
-        pIter->pMbAllocMap	= NULL;
+        pIter->pMbAllocMap = NULL;
       }
-      pIter->iSliceGroupCount	= 0;
-      pIter->iSliceGroupType	= -1;
-      pIter->iCountMbNum		= 0;
-      pIter->bActiveFlag		= false;
+      pIter->iSliceGroupCount   = 0;
+      pIter->iSliceGroupType    = -1;
+      pIter->iCountMbNum        = 0;
+      pIter->bActiveFlag        = false;
       ++ iFreeNodes;
       if (iFreeNodes >= kiAvail)
         break;
@@ -272,7 +272,7 @@ bool FmoParamUpdate (PFmo pFmo, PSps pSps, PPps pPps, int32_t* pActiveFmoNum) {
     } else {
       if (!pFmo->bActiveFlag && *pActiveFmoNum < MAX_PPS_COUNT) {
         ++ (*pActiveFmoNum);
-        pFmo->bActiveFlag	= true;
+        pFmo->bActiveFlag = true;
       }
     }
   }
@@ -289,8 +289,8 @@ bool FmoParamUpdate (PFmo pFmo, PSps pSps, PPps pPps, int32_t* pActiveFmoNum) {
  * \return  slice group idc - successful; -1 - failed;
  */
 int32_t FmoMbToSliceGroup (PFmo pFmo, const MB_XY_T kiMbXy) {
-  const int32_t kiMbNum	= pFmo->iCountMbNum;
-  const uint8_t* kpMbMap	= pFmo->pMbAllocMap;
+  const int32_t kiMbNum  = pFmo->iCountMbNum;
+  const uint8_t* kpMbMap = pFmo->pMbAllocMap;
 
   if (kiMbXy < 0 || kiMbXy >= kiMbNum || kpMbMap == NULL)
     return -1;
@@ -307,10 +307,10 @@ int32_t FmoMbToSliceGroup (PFmo pFmo, const MB_XY_T kiMbXy) {
  * \return  iNextMb - successful; -1 - failed;
  */
 MB_XY_T FmoNextMb (PFmo pFmo, const MB_XY_T kiMbXy) {
-  const int32_t kiTotalMb			= pFmo->iCountMbNum;
-  const uint8_t* kpMbMap			= pFmo->pMbAllocMap;
-  MB_XY_T iNextMb					= kiMbXy;
-  const uint8_t kuiSliceGroupIdc	= (uint8_t)FmoMbToSliceGroup (pFmo, kiMbXy);
+  const int32_t kiTotalMb               = pFmo->iCountMbNum;
+  const uint8_t* kpMbMap                = pFmo->pMbAllocMap;
+  MB_XY_T iNextMb                       = kiMbXy;
+  const uint8_t kuiSliceGroupIdc        = (uint8_t)FmoMbToSliceGroup (pFmo, kiMbXy);
 
   if (kuiSliceGroupIdc == (uint8_t) (-1))
     return -1;
@@ -318,7 +318,7 @@ MB_XY_T FmoNextMb (PFmo pFmo, const MB_XY_T kiMbXy) {
   do {
     ++ iNextMb;
     if (iNextMb >= kiTotalMb) {
-      iNextMb	= -1;
+      iNextMb = -1;
       break;
     }
     if (kpMbMap[iNextMb] == kuiSliceGroupIdc) {

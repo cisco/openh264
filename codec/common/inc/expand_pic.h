@@ -46,7 +46,7 @@
 extern "C" {
 #endif//__cplusplus
 
-#define PADDING_LENGTH			32 // reference extension
+#define PADDING_LENGTH 32 // reference extension
 
 #if defined(X86_ASM)
 void ExpandPictureLuma_sse2 (uint8_t* pDst,

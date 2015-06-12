@@ -87,11 +87,11 @@ void CVAACalculation::InitVaaFuncs (SVaaFuncs& sVaaFuncs, int32_t iCpuFlag) {
 }
 
 EResult CVAACalculation::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap) {
-  uint8_t* pCurData	= (uint8_t*)pSrcPixMap->pPixel[0];
-  uint8_t* pRefData	= (uint8_t*)pRefPixMap->pPixel[0];
-  int32_t iPicWidth	= pSrcPixMap->sRect.iRectWidth;
-  int32_t iPicHeight	= pSrcPixMap->sRect.iRectHeight;
-  int32_t iPicStride	= pSrcPixMap->iStride[0];
+  uint8_t* pCurData     = (uint8_t*)pSrcPixMap->pPixel[0];
+  uint8_t* pRefData     = (uint8_t*)pRefPixMap->pPixel[0];
+  int32_t iPicWidth     = pSrcPixMap->sRect.iRectWidth;
+  int32_t iPicHeight    = pSrcPixMap->sRect.iRectHeight;
+  int32_t iPicStride    = pSrcPixMap->iStride[0];
 
   SVAACalcResult* pResult = m_sCalcParam.pCalcResult;
 

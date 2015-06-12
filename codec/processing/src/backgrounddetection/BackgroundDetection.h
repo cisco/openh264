@@ -49,12 +49,12 @@
 WELSVP_NAMESPACE_BEGIN
 
 typedef struct {
-  int32_t	iBackgroundFlag;
-  int32_t	iSAD;
-  int32_t	iSD;
-  int32_t	iMAD;
-  int32_t	iMinSubMad;
-  int32_t	iMaxDiffSubSd;
+  int32_t       iBackgroundFlag;
+  int32_t       iSAD;
+  int32_t       iSD;
+  int32_t       iMAD;
+  int32_t       iMinSubMad;
+  int32_t       iMaxDiffSubSd;
 } SBackgroundOU;
 
 class CBackgroundDetection : public IStrategy {
@@ -69,11 +69,11 @@ class CBackgroundDetection : public IStrategy {
   struct vBGDParam {
     uint8_t*   pCur[3];
     uint8_t*   pRef[3];
-    int32_t	   iBgdWidth;
-    int32_t	   iBgdHeight;
+    int32_t    iBgdWidth;
+    int32_t    iBgdHeight;
     int32_t    iStride[3];
-    SBackgroundOU*  	pOU_array;
-    int8_t*  	pBackgroundMbFlag;
+    SBackgroundOU*   pOU_array;
+    int8_t*    pBackgroundMbFlag;
     SVAACalcResult*  pCalcRes;
   } m_BgdParam;
 

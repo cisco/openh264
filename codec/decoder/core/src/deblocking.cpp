@@ -815,7 +815,7 @@ void DeblockingIntraMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_
 void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag) {
   uint8_t nBS[2][4][4] = {{{ 0 }}};
 
-  int32_t iMbXyIndex	= pCurDqLayer->iMbXyIndex;
+  int32_t iMbXyIndex  = pCurDqLayer->iMbXyIndex;
   int32_t iCurMbType  = pCurDqLayer->pMbType[iMbXyIndex];
   int32_t iMbNb;
 
@@ -921,7 +921,7 @@ void WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFun
       } else {
         ++iNextMbXyIndex;
       }
-      if (-1 == iNextMbXyIndex || iNextMbXyIndex >= iTotalMbCount) {	// slice group boundary or end of a frame
+      if (-1 == iNextMbXyIndex || iNextMbXyIndex >= iTotalMbCount) { // slice group boundary or end of a frame
         break;
       }
 

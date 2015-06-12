@@ -7,9 +7,9 @@ using namespace WelsDec;
 void IdctResAddPred_ref (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) {
   int16_t iSrc[16];
 
-  uint8_t* pDst			= pPred;
-  const int32_t kiStride2	= kiStride << 1;
-  const int32_t kiStride3	= kiStride + kiStride2;
+  uint8_t* pDst             = pPred;
+  const int32_t kiStride2   = kiStride << 1;
+  const int32_t kiStride3   = kiStride + kiStride2;
   int32_t i;
 
   for (i = 0; i < 4; i++) {
@@ -26,16 +26,16 @@ void IdctResAddPred_ref (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) {
   }
 
   for (i = 0; i < 4; i++) {
-    int32_t kT1	= iSrc[i]	+ iSrc[i + 8];
-    int32_t kT2	= iSrc[i + 4] + (iSrc[i + 12] >> 1);
-    int32_t kT3	= (32 + kT1 + kT2) >> 6;
-    int32_t kT4	= (32 + kT1 - kT2) >> 6;
+    int32_t kT1 = iSrc[i]     +  iSrc[i + 8];
+    int32_t kT2 = iSrc[i + 4] + (iSrc[i + 12] >> 1);
+    int32_t kT3 = (32 + kT1 + kT2) >> 6;
+    int32_t kT4 = (32 + kT1 - kT2) >> 6;
 
     pDst[i] = WelsClip1 (kT3 + pPred[i]);
     pDst[i + kiStride3] = WelsClip1 (kT4 + pPred[i + kiStride3]);
 
-    kT1	= iSrc[i] - iSrc[i + 8];
-    kT2	= (iSrc[i + 4] >> 1) - iSrc[i + 12];
+    kT1 =  iSrc[i]           - iSrc[i + 8];
+    kT2 = (iSrc[i + 4] >> 1) - iSrc[i + 12];
     pDst[i + kiStride] = WelsClip1 (((32 + kT1 + kT2) >> 6) + pDst[i + kiStride]);
     pDst[i + kiStride2] = WelsClip1 (((32 + kT1 - kT2) >> 6) + pDst[i + kiStride2]);
   }

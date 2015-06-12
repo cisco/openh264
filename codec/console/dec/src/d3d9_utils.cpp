@@ -465,18 +465,18 @@ HRESULT InitWindow (HWND* hWnd) {
   const TCHAR kszWindowClass[] = TEXT ("Wels Decoder Class");
 
   WNDCLASSEX sWndClassEx = {0};
-  sWndClassEx.cbSize          = sizeof (WNDCLASSEX);
-  sWndClassEx.style			= CS_HREDRAW | CS_VREDRAW;
-  sWndClassEx.lpfnWndProc	    = (WNDPROC)WndProc;
-  sWndClassEx.cbClsExtra		= 0;
-  sWndClassEx.cbWndExtra		= 0;
-  sWndClassEx.hInstance		= GetModuleHandle (NULL);
-  sWndClassEx.hIcon			= LoadIcon (sWndClassEx.hInstance, (LPCTSTR)IDI_TESTSHARESURFACE);
-  sWndClassEx.hCursor		    = LoadCursor (NULL, IDC_ARROW);
-  sWndClassEx.hbrBackground	= (HBRUSH) (COLOR_WINDOW + 1);
-  sWndClassEx.lpszMenuName	= (LPCSTR)IDC_TESTSHARESURFACE;
-  sWndClassEx.lpszClassName	= kszWindowClass;
-  sWndClassEx.hIconSm		    = LoadIcon (sWndClassEx.hInstance, (LPCTSTR)IDI_SMALL);
+  sWndClassEx.cbSize            = sizeof (WNDCLASSEX);
+  sWndClassEx.style             = CS_HREDRAW | CS_VREDRAW;
+  sWndClassEx.lpfnWndProc       = (WNDPROC)WndProc;
+  sWndClassEx.cbClsExtra        = 0;
+  sWndClassEx.cbWndExtra        = 0;
+  sWndClassEx.hInstance         = GetModuleHandle (NULL);
+  sWndClassEx.hIcon             = LoadIcon (sWndClassEx.hInstance, (LPCTSTR)IDI_TESTSHARESURFACE);
+  sWndClassEx.hCursor           = LoadCursor (NULL, IDC_ARROW);
+  sWndClassEx.hbrBackground     = (HBRUSH) (COLOR_WINDOW + 1);
+  sWndClassEx.lpszMenuName      = (LPCSTR)IDC_TESTSHARESURFACE;
+  sWndClassEx.lpszClassName     = kszWindowClass;
+  sWndClassEx.hIconSm           = LoadIcon (sWndClassEx.hInstance, (LPCTSTR)IDI_SMALL);
 
   if (!RegisterClassEx (&sWndClassEx))
     return E_FAIL;

@@ -218,14 +218,14 @@ enum EMmcoCode {
  *  Bit-stream auxiliary reading / writing
  */
 typedef struct TagBitStringAux {
-  uint8_t* pStartBuf;	// buffer to start position
-  uint8_t* pEndBuf;	// buffer + length
+  uint8_t* pStartBuf;   // buffer to start position
+  uint8_t* pEndBuf;     // buffer + length
   int32_t  iBits;       // count bits of overall bitstreaming input
 
   intX_t   iIndex;      //only for cavlc usage
-  uint8_t* pCurBuf;	// current reading position
+  uint8_t* pCurBuf;     // current reading position
   uint32_t uiCurBits;
-  int32_t  iLeftBits;	// count number of available bits left ([1, 8]),
+  int32_t  iLeftBits;   // count number of available bits left ([1, 8]),
   // need pointer to next byte start position in case 0 bit left then 8 instead
 } SBitStringAux, *PBitStringAux;
 
@@ -234,17 +234,17 @@ typedef struct TagNalUnitHeader {
   uint8_t             uiForbiddenZeroBit;
   uint8_t             uiNalRefIdc;
   EWelsNalUnitType    eNalUnitType;
-  uint8_t             uiReservedOneByte;		// only padding usage
+  uint8_t             uiReservedOneByte;                // only padding usage
 } SNalUnitHeader, *PNalUnitHeader;
 
 /* NAL Unit Header in scalable extension syntax, refer to Page 390 in JVT X201wcm */
 typedef struct TagNalUnitHeaderExt {
-  SNalUnitHeader	sNalUnitHeader;
+  SNalUnitHeader      sNalUnitHeader;
 
-  //	uint8_t		reserved_one_bit;
+  // uint8_t   reserved_one_bit;
   bool      bIdrFlag;
   uint8_t   uiPriorityId;
-  int8_t    iNoInterLayerPredFlag;	// change as int8_t to support 3 values probably in encoder
+  int8_t    iNoInterLayerPredFlag;      // change as int8_t to support 3 values probably in encoder
   uint8_t   uiDependencyId;
 
   uint8_t   uiQualityId;

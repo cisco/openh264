@@ -66,8 +66,8 @@ EResult CAdaptiveQuantization::Process (int32_t iType, SPixMap* pSrcPixMap, SPix
   SMotionTextureUnit* pMotionTexture = NULL;
   SVAACalcResult*     pVaaCalcResults = NULL;
   int32_t   iMotionTextureIndexToDeltaQp = 0;
-  int32_t	 iAverMotionTextureIndexToDeltaQp = 0;	// double to uint32
-  int64_t iAverageMotionIndex = 0;	// double to float
+  int32_t iAverMotionTextureIndexToDeltaQp = 0;  // double to uint32
+  int64_t iAverageMotionIndex = 0;      // double to float
   int64_t iAverageTextureIndex = 0;
 
   int64_t iQStep = 0;

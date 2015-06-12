@@ -139,14 +139,14 @@ EResult CDownsampling::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDs
 
 int32_t CDownsampling::GetAlignedIndex (const int32_t kiSrcWidth) {
   int32_t iAlignIndex;
-  if ((kiSrcWidth & 0x1f) == 0)	// x32
-    iAlignIndex	= 0;
-  else if ((kiSrcWidth & 0x0f) == 0)	// x16
-    iAlignIndex	= 1;
-  else if ((kiSrcWidth & 0x07) == 0)	// x8
-    iAlignIndex	= 2;
+  if ((kiSrcWidth & 0x1f) == 0)         // x32
+    iAlignIndex = 0;
+  else if ((kiSrcWidth & 0x0f) == 0)    // x16
+    iAlignIndex = 1;
+  else if ((kiSrcWidth & 0x07) == 0)    // x8
+    iAlignIndex = 2;
   else
-    iAlignIndex	= 3;
+    iAlignIndex = 3;
   return iAlignIndex;
 }
 

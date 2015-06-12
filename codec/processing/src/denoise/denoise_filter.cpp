@@ -55,7 +55,7 @@ void BilateralLumaFilter8_c (uint8_t* pSample, int32_t iStride) {
     pCurLine = pSample - iStride - DENOISE_GRAY_RADIUS;
     for (y = 0; y < 3; y++) {
       for (x = 0; x < 3; x++) {
-        if (x == 1 && y == 1) continue;			// except center point
+        if (x == 1 && y == 1) continue; // except center point
         iCurSample = pCurLine[x];
         iCurWeight = WELS_ABS (iCurSample - iCenterSample);
         iGreyDiff = 32 - iCurWeight;
@@ -83,9 +83,9 @@ void BilateralLumaFilter8_c (uint8_t* pSample, int32_t iStride) {
 1   2   4   2   1
 1   1   2   1   1
 ***************************************************************************/
-#define SUM_LINE1(pSample)	(pSample[0] +(pSample[1]) +(pSample[2]<<1)  + pSample[3] + pSample[4])
-#define SUM_LINE2(pSample)	(pSample[0] +(pSample[1]<<1) +(pSample[2]<<2)  +(pSample[3]<<1) +pSample[4])
-#define SUM_LINE3(pSample)	((pSample[0]<<1) +(pSample[1]<<2) +(pSample[2]*20)  +(pSample[3]<<2) +(pSample[4]<<1))
+#define SUM_LINE1(pSample)       (pSample[0]     +(pSample[1])    +(pSample[2]<<1)  + pSample[3]     + pSample[4])
+#define SUM_LINE2(pSample)       (pSample[0]     +(pSample[1]<<1) +(pSample[2]<<2)  +(pSample[3]<<1) + pSample[4])
+#define SUM_LINE3(pSample)      ((pSample[0]<<1) +(pSample[1]<<2) +(pSample[2]*20)  +(pSample[3]<<2) +(pSample[4]<<1))
 void WaverageChromaFilter8_c (uint8_t* pSample, int32_t iStride) {
   int32_t sum;
   uint8_t* pStartPixels = pSample - UV_WINDOWS_RADIUS * iStride - UV_WINDOWS_RADIUS;

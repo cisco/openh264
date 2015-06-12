@@ -106,8 +106,8 @@ virtual long EXTAPI SetOption (DECODER_OPTION eOptID, void* pOption);
 virtual long EXTAPI GetOption (DECODER_OPTION eOptID, void* pOption);
 
  private:
-PWelsDecoderContext 				m_pDecContext;
-welsCodecTrace*			m_pWelsTrace;
+PWelsDecoderContext     m_pDecContext;
+welsCodecTrace*         m_pWelsTrace;
 
 int32_t InitDecoder (const bool);
 void UninitDecoder (void);

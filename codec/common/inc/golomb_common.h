@@ -67,11 +67,11 @@ namespace WelsCommon {
 static inline int32_t InitBits (SBitStringAux* pBs, const uint8_t* kpBuf, const int32_t kiSize) {
   uint8_t* ptr = (uint8_t*)kpBuf;
 
-  pBs->pStartBuf	= ptr;
-  pBs->pCurBuf	= ptr;
-  pBs->pEndBuf	= ptr + kiSize;
-  pBs->iLeftBits	= 32;
-  pBs->uiCurBits	= 0;
+  pBs->pStartBuf = ptr;
+  pBs->pCurBuf   = ptr;
+  pBs->pEndBuf   = ptr + kiSize;
+  pBs->iLeftBits = 32;
+  pBs->uiCurBits = 0;
 
   return kiSize;
 }
