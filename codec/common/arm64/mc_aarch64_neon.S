@@ -208,6 +208,87 @@ filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
     //   }
 .endm
 
+.macro VEC4_LD1_8BITS_16ELEMENT arg0, arg1, arg2, arg3, arg4, arg5
+//{//load 16bytes * 4rows
+    ld1 {\arg2\().16b}, [\arg0], \arg1
+    ld1 {\arg3\().16b}, [\arg0], \arg1
+    ld1 {\arg4\().16b}, [\arg0], \arg1
+    ld1 {\arg5\().16b}, [\arg0], \arg1
+//}
+.endm
+
+.macro VEC4_ST1_8BITS_8ELEMENT arg0, arg1, arg2, arg3, arg4, arg5
+//{
+    st1 {\arg2\().8b}, [\arg0], \arg1
+    st1 {\arg3\().8b}, [\arg0], \arg1
+    st1 {\arg4\().8b}, [\arg0], \arg1
+    st1 {\arg5\().8b}, [\arg0], \arg1
+//}
+.endm
+
+.macro VEC4_UADDL_8BITS arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11
+//{
+    uaddl \arg8\().8h, \arg0\().8b, \arg1\().8b
+    uaddl \arg9\().8h, \arg2\().8b, \arg3\().8b
+    uaddl \arg10\().8h, \arg4\().8b, \arg5\().8b
+    uaddl \arg11\().8h, \arg6\().8b, \arg7\().8b
+//}
+.endm
+
+.macro VEC4_UADDL2_8BITS arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11
+//{
+    uaddl \arg8\().8h, \arg0\().16b, \arg1\().16b
+    uaddl \arg9\().8h, \arg2\().16b, \arg3\().16b
+    uaddl \arg10\().8h, \arg4\().16b, \arg5\().16b
+    uaddl \arg11\().8h, \arg6\().16b, \arg7\().16b
+//}
+.endm
+
+.macro VEC4_MLS_16BITS arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11
+//{
+    mls   \arg8\().8h, \arg0\().8h, \arg1\().8h
+    mls   \arg9\().8h, \arg2\().8h, \arg3\().8h
+    mls   \arg10\().8h, \arg4\().8h, \arg5\().8h
+    mls   \arg11\().8h, \arg6\().8h, \arg7\().8h
+//}
+.endm
+
+.macro VEC4_MLA_16BITS arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11
+//{
+    mla   \arg8\().8h, \arg0\().8h, \arg1\().8h
+    mla   \arg9\().8h, \arg2\().8h, \arg3\().8h
+    mla   \arg10\().8h, \arg4\().8h, \arg5\().8h
+    mla   \arg11\().8h, \arg6\().8h, \arg7\().8h
+//}
+.endm
+
+.macro VEC4_SQRSHRUN_16BITS_SHIFT5 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
+//{
+    sqrshrun \arg4\().8b, \arg0\().8h, #5
+    sqrshrun \arg5\().8b, \arg1\().8h, #5
+    sqrshrun \arg6\().8b, \arg2\().8h, #5
+    sqrshrun \arg7\().8b, \arg3\().8h, #5
+//}
+.endm
+
+.macro VEC4_SQRSHRUN2_16BITS_SHIFT5 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
+//{
+    sqrshrun2 \arg4\().16b, \arg0\().8h, #5
+    sqrshrun2 \arg5\().16b, \arg1\().8h, #5
+    sqrshrun2 \arg6\().16b, \arg2\().8h, #5
+    sqrshrun2 \arg7\().16b, \arg3\().8h, #5
+//}
+.endm
+
+.macro VEC4_RSHRN_16BITS_SHIFT1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7
+//{
+    rshrn \arg4\().8b, \arg0\().8h, #1
+    rshrn \arg5\().8b, \arg1\().8h, #1
+    rshrn \arg6\().8b, \arg2\().8h, #1
+    rshrn \arg7\().8b, \arg3\().8h, #1
+//}
+.endm
+
 //(const uint8_t* pSrc {x0}, int32_t iSrcStride{x1}, uint8_t* pDst{x2}, int32_t iDstStride{x3}, int32_t iHeight{x4})
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer20WidthEq16_AArch64_neon
     sub x0, x0, #2
@@ -233,23 +314,56 @@ WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer20WidthEq8_AArch64_neon
     sub x0, x0, #2
-    movi v0.8h, #20, lsl #0
-    movi v1.8h, #5, lsl #0
+    stp d8,d9, [sp,#-16]!
+    movi v8.8h, #20, lsl #0
+    movi v9.8h, #5, lsl #0
 w8_h_mc_luma_loop:
-    ld1 {v2.16b}, [x0], x1 //only use 13(8+5); v2=src[-2]
+    VEC4_LD1_8BITS_16ELEMENT x0, x1, v16, v20, v24, v28    //load src[-2] in v16,v20,v24,v28 for 4 row; only use 13(8+5);
+    sub x4, x4, #4
 
-    //prfm pldl1strm, [x0]
-    ext v5.16b, v2.16b, v4.16b, #1    //v5=src[-1]
-    ext v6.16b, v2.16b, v4.16b, #2    //v6=src[0]
-    ext v7.16b, v2.16b, v4.16b, #3    //v7=src[1]
-    ext v16.16b, v2.16b, v4.16b, #4   //v16=src[2]
-    ext v17.16b, v2.16b, v4.16b, #5   //v17=src[3]
+    //1st row:
+    ext v17.16b, v16.16b, v16.16b, #5  //src[3]
+    ext v18.16b, v16.16b, v16.16b, #1  //src[-1]
+    ext v19.16b, v16.16b, v16.16b, #4  //src[2]
+    //2nd row:
+    ext v21.16b, v20.16b, v20.16b, #5  //src[3]
+    ext v22.16b, v20.16b, v20.16b, #1  //src[-1]
+    ext v23.16b, v20.16b, v20.16b, #4  //src[2]
+    //3rd row:
+    ext v25.16b, v24.16b, v24.16b, #5  //src[3]
+    ext v26.16b, v24.16b, v24.16b, #1  //src[-1]
+    ext v27.16b, v24.16b, v24.16b, #4  //src[2]
+    //4th row:
+    ext v29.16b, v28.16b, v28.16b, #5  //src[3]
+    ext v30.16b, v28.16b, v28.16b, #1  //src[-1]
+    ext v31.16b, v28.16b, v28.16b, #4  //src[2]
 
-    FILTER_6TAG_8BITS1 v2, v5, v6, v7, v16, v17, v20, v0, v1
+    VEC4_UADDL_8BITS v16, v17, v20, v21, v24, v25, v28, v29, v0, v2, v4, v6   //v0/v2/v4/v6=src[-2]+src[3]
+    VEC4_UADDL_8BITS v18, v19, v22, v23, v26, v27, v30, v31, v1, v3, v5, v7 //v1/v3/v5/v7=src[-1]+src[2]
+    VEC4_MLS_16BITS v1, v9, v3, v9, v5, v9, v7, v9, v0, v2, v4, v6  //v0/v2/v4/v6 -= 5*(src[-1]+src[2])
 
-    sub x4, x4, #1
-    st1 {v20.8b}, [x2], x3 //write 8Byte
+    //1st row:
+    ext v18.16b, v16.16b, v16.16b, #2  //src[0]
+    ext v19.16b, v16.16b, v16.16b, #3  //src[1]
+    //2nd row:
+    ext v22.16b, v20.16b, v20.16b, #2  //src[0]
+    ext v23.16b, v20.16b, v20.16b, #3  //src[1]
+    //3rd row:
+    ext v26.16b, v24.16b, v24.16b, #2  //src[0]
+    ext v27.16b, v24.16b, v24.16b, #3  //src[1]
+    //4th row:
+    ext v30.16b, v28.16b, v28.16b, #2  //src[0]
+    ext v31.16b, v28.16b, v28.16b, #3  //src[1]
+
+    VEC4_UADDL_8BITS v18, v19, v22, v23, v26, v27, v30, v31, v1, v3, v5, v7 //v1/v3/v5/v7=src[0]+src[1]
+    VEC4_MLA_16BITS v1, v8, v3, v8, v5, v8, v7, v8, v0, v2, v4, v6  //v0/v2/v4/v6+=20*(src[0]+src[1])
+
+    VEC4_SQRSHRUN_16BITS_SHIFT5 v0, v2, v4, v6, v1, v3, v5, v7
+
+    VEC4_ST1_8BITS_8ELEMENT x2, x3, v1, v3, v5, v7
     cbnz x4, w8_h_mc_luma_loop
+
+    ldp d8,d9,[sp],#16
 WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer20WidthEq4_AArch64_neon
@@ -309,26 +423,60 @@ w16_xy_10_mc_luma_loop:
     cbnz x4, w16_xy_10_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
-
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer10WidthEq8_AArch64_neon
     sub x0, x0, #2
-    movi v0.8h, #20, lsl #0
-    movi v1.8h, #5, lsl #0
+    stp d8,d9, [sp,#-16]!
+    movi v8.8h, #20, lsl #0
+    movi v9.8h, #5, lsl #0
 w8_xy_10_mc_luma_loop:
-    ld1 {v2.16b}, [x0], x1 //only use 13(8+5); v2=src[-2]
+    VEC4_LD1_8BITS_16ELEMENT x0, x1, v16, v20, v24, v28    //load src[-2] in v16,v20,v24,v28 for 4 row; only use 13(8+5);
+    sub x4, x4, #4
 
-    //prfm pldl1strm, [x0]
-    ext v5.16b, v2.16b, v4.16b, #1    //v5=src[-1]
-    ext v6.16b, v2.16b, v4.16b, #2    //v6=src[0]
-    ext v7.16b, v2.16b, v4.16b, #3    //v7=src[1]
-    ext v16.16b, v2.16b, v4.16b, #4   //v16=src[2]
-    ext v17.16b, v2.16b, v4.16b, #5   //v17=src[3]
+    //1st row:
+    ext v17.16b, v16.16b, v16.16b, #5  //src[3]
+    ext v18.16b, v16.16b, v16.16b, #1  //src[-1]
+    ext v19.16b, v16.16b, v16.16b, #4  //src[2]
+    //2nd row:
+    ext v21.16b, v20.16b, v20.16b, #5  //src[3]
+    ext v22.16b, v20.16b, v20.16b, #1  //src[-1]
+    ext v23.16b, v20.16b, v20.16b, #4  //src[2]
+    //3rd row:
+    ext v25.16b, v24.16b, v24.16b, #5  //src[3]
+    ext v26.16b, v24.16b, v24.16b, #1  //src[-1]
+    ext v27.16b, v24.16b, v24.16b, #4  //src[2]
+    //4th row:
+    ext v29.16b, v28.16b, v28.16b, #5  //src[3]
+    ext v30.16b, v28.16b, v28.16b, #1  //src[-1]
+    ext v31.16b, v28.16b, v28.16b, #4  //src[2]
 
-    FILTER_6TAG_8BITS1_AVERAGE_WITH_0 v2, v5, v6, v7, v16, v17, v20, v0, v1
+    VEC4_UADDL_8BITS v16, v17, v20, v21, v24, v25, v28, v29, v0, v2, v4, v6   //v0/v2/v4/v6=src[-2]+src[3]
+    VEC4_UADDL_8BITS v18, v19, v22, v23, v26, v27, v30, v31, v1, v3, v5, v7 //v1/v3/v5/v7=src[-1]+src[2]
+    VEC4_MLS_16BITS v1, v9, v3, v9, v5, v9, v7, v9, v0, v2, v4, v6  //v0/v2/v4/v6 -= 5*(src[-1]+src[2])
 
-    sub x4, x4, #1
-    st1 {v20.8b}, [x2], x3 //write 8Byte
+    //1st row:
+    ext v18.16b, v16.16b, v16.16b, #2  //src[0]
+    ext v19.16b, v16.16b, v16.16b, #3  //src[1]
+    //2nd row:
+    ext v22.16b, v20.16b, v20.16b, #2  //src[0]
+    ext v23.16b, v20.16b, v20.16b, #3  //src[1]
+    //3rd row:
+    ext v26.16b, v24.16b, v24.16b, #2  //src[0]
+    ext v27.16b, v24.16b, v24.16b, #3  //src[1]
+    //4th row:
+    ext v30.16b, v28.16b, v28.16b, #2  //src[0]
+    ext v31.16b, v28.16b, v28.16b, #3  //src[1]
+
+    VEC4_UADDL_8BITS v18, v19, v22, v23, v26, v27, v30, v31, v1, v3, v5, v7 //v1/v3/v5/v7=src[0]+src[1]
+    VEC4_MLA_16BITS v1, v8, v3, v8, v5, v8, v7, v8, v0, v2, v4, v6  //v0/v2/v4/v6+=20*(src[0]+src[1])
+    VEC4_SQRSHRUN_16BITS_SHIFT5 v0, v2, v4, v6, v1, v3, v5, v7
+
+    VEC4_UADDL_8BITS v1, v18, v3, v22, v5, v26, v7, v30, v0, v2, v4, v6   //average with arc[0]
+    VEC4_RSHRN_16BITS_SHIFT1 v0, v2, v4, v6, v1, v3, v5, v7
+
+    VEC4_ST1_8BITS_8ELEMENT x2, x3, v1, v3, v5, v7
     cbnz x4, w8_xy_10_mc_luma_loop
+
+    ldp d8,d9,[sp],#16
 WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer10WidthEq4_AArch64_neon
@@ -389,26 +537,60 @@ w16_xy_30_mc_luma_loop:
     cbnz x4, w16_xy_30_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
-
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer30WidthEq8_AArch64_neon
     sub x0, x0, #2
-    movi v0.8h, #20, lsl #0
-    movi v1.8h, #5, lsl #0
+    stp d8,d9, [sp,#-16]!
+    movi v8.8h, #20, lsl #0
+    movi v9.8h, #5, lsl #0
 w8_xy_30_mc_luma_loop:
-    ld1 {v2.16b}, [x0], x1 //only use 13(8+5); v2=src[-2]
+    VEC4_LD1_8BITS_16ELEMENT x0, x1, v16, v20, v24, v28    //load src[-2] in v16,v20,v24,v28 for 4 row; only use 13(8+5);
+    sub x4, x4, #4
 
-    //prfm pldl1strm, [x0]
-    ext v5.16b, v2.16b, v4.16b, #1    //v5=src[-1]
-    ext v6.16b, v2.16b, v4.16b, #2    //v6=src[0]
-    ext v7.16b, v2.16b, v4.16b, #3    //v7=src[1]
-    ext v16.16b, v2.16b, v4.16b, #4   //v16=src[2]
-    ext v17.16b, v2.16b, v4.16b, #5   //v17=src[3]
+    //1st row:
+    ext v17.16b, v16.16b, v16.16b, #5  //src[3]
+    ext v18.16b, v16.16b, v16.16b, #1  //src[-1]
+    ext v19.16b, v16.16b, v16.16b, #4  //src[2]
+    //2nd row:
+    ext v21.16b, v20.16b, v20.16b, #5  //src[3]
+    ext v22.16b, v20.16b, v20.16b, #1  //src[-1]
+    ext v23.16b, v20.16b, v20.16b, #4  //src[2]
+    //3rd row:
+    ext v25.16b, v24.16b, v24.16b, #5  //src[3]
+    ext v26.16b, v24.16b, v24.16b, #1  //src[-1]
+    ext v27.16b, v24.16b, v24.16b, #4  //src[2]
+    //4th row:
+    ext v29.16b, v28.16b, v28.16b, #5  //src[3]
+    ext v30.16b, v28.16b, v28.16b, #1  //src[-1]
+    ext v31.16b, v28.16b, v28.16b, #4  //src[2]
 
-    FILTER_6TAG_8BITS1_AVERAGE_WITH_1 v2, v5, v6, v7, v16, v17, v20, v0, v1
+    VEC4_UADDL_8BITS v16, v17, v20, v21, v24, v25, v28, v29, v0, v2, v4, v6   //v0/v2/v4/v6=src[-2]+src[3]
+    VEC4_UADDL_8BITS v18, v19, v22, v23, v26, v27, v30, v31, v1, v3, v5, v7 //v1/v3/v5/v7=src[-1]+src[2]
+    VEC4_MLS_16BITS v1, v9, v3, v9, v5, v9, v7, v9, v0, v2, v4, v6  //v0/v2/v4/v6 -= 5*(src[-1]+src[2])
 
-    sub x4, x4, #1
-    st1 {v20.8b}, [x2], x3 //write 8Byte
+    //1st row:
+    ext v18.16b, v16.16b, v16.16b, #2  //src[0]
+    ext v19.16b, v16.16b, v16.16b, #3  //src[1]
+    //2nd row:
+    ext v22.16b, v20.16b, v20.16b, #2  //src[0]
+    ext v23.16b, v20.16b, v20.16b, #3  //src[1]
+    //3rd row:
+    ext v26.16b, v24.16b, v24.16b, #2  //src[0]
+    ext v27.16b, v24.16b, v24.16b, #3  //src[1]
+    //4th row:
+    ext v30.16b, v28.16b, v28.16b, #2  //src[0]
+    ext v31.16b, v28.16b, v28.16b, #3  //src[1]
+
+    VEC4_UADDL_8BITS v18, v19, v22, v23, v26, v27, v30, v31, v1, v3, v5, v7 //v1/v3/v5/v7=src[0]+src[1]
+    VEC4_MLA_16BITS v1, v8, v3, v8, v5, v8, v7, v8, v0, v2, v4, v6  //v0/v2/v4/v6+=20*(src[0]+src[1])
+    VEC4_SQRSHRUN_16BITS_SHIFT5 v0, v2, v4, v6, v1, v3, v5, v7
+
+    VEC4_UADDL_8BITS v1, v19, v3, v23, v5, v27, v7, v31, v0, v2, v4, v6   //average with arc[0]
+    VEC4_RSHRN_16BITS_SHIFT1 v0, v2, v4, v6, v1, v3, v5, v7
+
+    VEC4_ST1_8BITS_8ELEMENT x2, x3, v1, v3, v5, v7
     cbnz x4, w8_xy_30_mc_luma_loop
+
+    ldp d8,d9,[sp],#16
 WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer30WidthEq4_AArch64_neon
@@ -529,56 +711,44 @@ w16_xy_01_mc_luma_loop:
     cbnz x4, w16_xy_01_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
-
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer01WidthEq8_AArch64_neon
     sub x0, x0, x1, lsl #1
-    movi v0.8h, #20, lsl #0
-    movi v1.8h, #5, lsl #0
+    movi v30.8h, #20, lsl #0
+    movi v31.8h, #5, lsl #0
 
-    //prfm pldl1strm, [x0]
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v2.8b}, [x0], x1 // v2=src[-2*stride]
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v3.8b}, [x0], x1 // v3=src[-1*stride]
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v4.8b}, [x0], x1 // v4=src[0*stride]
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v5.8b}, [x0], x1 // v5=src[1*stride]
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v6.8b}, [x0], x1 // v6=src[2*stride]
-
+    ld1 {v16.8b}, [x0], x1 // v16=src[-2*stride]
+    ld1 {v17.8b}, [x0], x1 // v17=src[-1*stride]
+    ld1 {v18.8b}, [x0], x1 // v18=src[0*stride]
+    ld1 {v19.8b}, [x0], x1 // v19=src[1*stride]
+    ld1 {v20.8b}, [x0], x1 // v20=src[2*stride]
 
 w8_xy_01_mc_luma_loop:
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v7.8b}, [x0], x1 // v7=src[3*stride]
-    FILTER_6TAG_8BITS1_AVERAGE_WITH_0 v2, v3, v4, v5, v6, v7, v20, v0, v1
-    st1 {v20.8b}, [x2], x3 //write 8Byte : 0 line
+    ld1 {v21.8b}, [x0], x1 // v21=src[3*stride]
+    ld1 {v22.8b}, [x0], x1 // v22=src[4*stride]
+    ld1 {v23.8b}, [x0], x1 // v23=src[5*stride]
+    ld1 {v24.8b}, [x0], x1 // v24=src[6*stride]
 
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v2.8b}, [x0], x1 // v2=src[3*stride]
-    FILTER_6TAG_8BITS1_AVERAGE_WITH_0 v3, v4, v5, v6, v7, v2, v20, v0, v1
-    st1 {v20.8b}, [x2], x3 //write 8Byte : 1 line
+    VEC4_UADDL_8BITS v16, v21, v17, v22, v18, v23, v19, v24, v0, v2, v4, v6 //v0/v2/v4/v6 =src[-2]+src[3]
+    VEC4_UADDL_8BITS v17, v20, v18, v21, v19, v22, v20, v23, v1, v3, v5, v7 //v1/v3/v5/v7 =src[-1]+src[2]
+    VEC4_MLS_16BITS v1, v31, v3, v31, v5, v31, v7, v31, v0, v2, v4, v6  //v0/v2/v4/v6 -=5*(src[-1]+src[2])
+    VEC4_UADDL_8BITS v18, v19, v19, v20, v20, v21, v21, v22, v1, v3, v5, v7 //v1/v3/v5/v7 =src[0]+src[1]
+    VEC4_MLA_16BITS v1, v30, v3, v30, v5, v30, v7, v30, v0, v2, v4, v6  //v0/v2/v4/v6 += 20*(src[0]+src[1])
+    VEC4_SQRSHRUN_16BITS_SHIFT5 v0, v2, v4, v6, v1, v3, v5, v7
 
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v3.8b}, [x0], x1 // v3=src[3*stride]
-    FILTER_6TAG_8BITS1_AVERAGE_WITH_0 v4, v5, v6, v7, v2, v3, v20, v0, v1
-    st1 {v20.8b}, [x2], x3 //write 8Byte : 2 line
+    VEC4_UADDL_8BITS v1, v18, v3, v19, v5, v20, v7, v21, v0, v2, v4, v6 //v0/v2/v4/v6 = average with src[0]
+    VEC4_RSHRN_16BITS_SHIFT1 v0, v2, v4, v6, v1, v3, v5, v7
 
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v4.8b}, [x0], x1 // v4=src[3*stride]
-    FILTER_6TAG_8BITS1_AVERAGE_WITH_0 v5, v6, v7, v2, v3, v4, v20, v0, v1
-    st1 {v20.8b}, [x2], x3 //write 8Byte : 3 line
+    VEC4_ST1_8BITS_8ELEMENT x2, x3, v1, v3, v5, v7  //store 8bytes*4row
 
-    mov v5.16b, v3.16b
-    mov v3.16b, v7.16b
-    mov v7.16b, v2.16b
-    mov v2.16b, v6.16b
-    mov v6.16b, v4.16b
-    mov v4.16b, v7.16b
     sub x4, x4, #4
+    mov v16.16b, v20.16b
+    mov v17.16b, v21.16b
+    mov v18.16b, v22.16b
+    mov v19.16b, v23.16b
+    mov v20.16b, v24.16b
+
     cbnz x4, w8_xy_01_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
-
 
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer01WidthEq4_AArch64_neon
     sub x0, x0, x1, lsl #1
@@ -718,56 +888,44 @@ w16_xy_03_mc_luma_loop:
     cbnz x4, w16_xy_03_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
-
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer03WidthEq8_AArch64_neon
     sub x0, x0, x1, lsl #1
-    movi v0.8h, #20, lsl #0
-    movi v1.8h, #5, lsl #0
+    movi v30.8h, #20, lsl #0
+    movi v31.8h, #5, lsl #0
 
-    //prfm pldl1strm, [x0]
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v2.8b}, [x0], x1 // v2=src[-2*stride]
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v3.8b}, [x0], x1 // v3=src[-1*stride]
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v4.8b}, [x0], x1 // v4=src[0*stride]
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v5.8b}, [x0], x1 // v5=src[1*stride]
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v6.8b}, [x0], x1 // v6=src[2*stride]
-
+    ld1 {v16.8b}, [x0], x1 // v16=src[-2*stride]
+    ld1 {v17.8b}, [x0], x1 // v17=src[-1*stride]
+    ld1 {v18.8b}, [x0], x1 // v18=src[0*stride]
+    ld1 {v19.8b}, [x0], x1 // v19=src[1*stride]
+    ld1 {v20.8b}, [x0], x1 // v20=src[2*stride]
 
 w8_xy_03_mc_luma_loop:
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v7.8b}, [x0], x1 // v7=src[3*stride]
-    FILTER_6TAG_8BITS1_AVERAGE_WITH_1 v2, v3, v4, v5, v6, v7, v20, v0, v1
-    st1 {v20.8b}, [x2], x3 //write 8Byte : 0 line
+    ld1 {v21.8b}, [x0], x1 // v21=src[3*stride]
+    ld1 {v22.8b}, [x0], x1 // v22=src[4*stride]
+    ld1 {v23.8b}, [x0], x1 // v23=src[5*stride]
+    ld1 {v24.8b}, [x0], x1 // v24=src[6*stride]
 
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v2.8b}, [x0], x1 // v2=src[3*stride]
-    FILTER_6TAG_8BITS1_AVERAGE_WITH_1 v3, v4, v5, v6, v7, v2, v20, v0, v1
-    st1 {v20.8b}, [x2], x3 //write 8Byte : 1 line
+    VEC4_UADDL_8BITS v16, v21, v17, v22, v18, v23, v19, v24, v0, v2, v4, v6 //v0/v2/v4/v6 =src[-2]+src[3]
+    VEC4_UADDL_8BITS v17, v20, v18, v21, v19, v22, v20, v23, v1, v3, v5, v7 //v1/v3/v5/v7 =src[-1]+src[2]
+    VEC4_MLS_16BITS v1, v31, v3, v31, v5, v31, v7, v31, v0, v2, v4, v6  //v0/v2/v4/v6 -=5*(src[-1]+src[2])
+    VEC4_UADDL_8BITS v18, v19, v19, v20, v20, v21, v21, v22, v1, v3, v5, v7 //v1/v3/v5/v7 =src[0]+src[1]
+    VEC4_MLA_16BITS v1, v30, v3, v30, v5, v30, v7, v30, v0, v2, v4, v6  //v0/v2/v4/v6 += 20*(src[0]+src[1])
+    VEC4_SQRSHRUN_16BITS_SHIFT5 v0, v2, v4, v6, v1, v3, v5, v7
 
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v3.8b}, [x0], x1 // v3=src[3*stride]
-    FILTER_6TAG_8BITS1_AVERAGE_WITH_1 v4, v5, v6, v7, v2, v3, v20, v0, v1
-    st1 {v20.8b}, [x2], x3 //write 8Byte : 2 line
+    VEC4_UADDL_8BITS v1, v19, v3, v20, v5, v21, v7, v22, v0, v2, v4, v6 //v0/v2/v4/v6 = average with src[0]
+    VEC4_RSHRN_16BITS_SHIFT1 v0, v2, v4, v6, v1, v3, v5, v7
 
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v4.8b}, [x0], x1 // v4=src[3*stride]
-    FILTER_6TAG_8BITS1_AVERAGE_WITH_1 v5, v6, v7, v2, v3, v4, v20, v0, v1
-    st1 {v20.8b}, [x2], x3 //write 8Byte : 3 line
+    VEC4_ST1_8BITS_8ELEMENT x2, x3, v1, v3, v5, v7  //store 8bytes*4row
 
-    mov v5.16b, v3.16b
-    mov v3.16b, v7.16b
-    mov v7.16b, v2.16b
-    mov v2.16b, v6.16b
-    mov v6.16b, v4.16b
-    mov v4.16b, v7.16b
     sub x4, x4, #4
+    mov v16.16b, v20.16b
+    mov v17.16b, v21.16b
+    mov v18.16b, v22.16b
+    mov v19.16b, v23.16b
+    mov v20.16b, v24.16b
+
     cbnz x4, w8_xy_03_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
-
 
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer03WidthEq4_AArch64_neon
     sub x0, x0, x1, lsl #1
@@ -907,56 +1065,40 @@ w16_xy_02_mc_luma_loop:
     cbnz x4, w16_xy_02_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
-
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer02WidthEq8_AArch64_neon
     sub x0, x0, x1, lsl #1
-    movi v0.8h, #20, lsl #0
-    movi v1.8h, #5, lsl #0
+    movi v30.8h, #20, lsl #0
+    movi v31.8h, #5, lsl #0
 
-    //prfm pldl1strm, [x0]
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v2.8b}, [x0], x1 // v2=src[-2*stride]
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v3.8b}, [x0], x1 // v3=src[-1*stride]
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v4.8b}, [x0], x1 // v4=src[0*stride]
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v5.8b}, [x0], x1 // v5=src[1*stride]
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v6.8b}, [x0], x1 // v6=src[2*stride]
-
+    ld1 {v16.8b}, [x0], x1 // v16=src[-2*stride]
+    ld1 {v17.8b}, [x0], x1 // v17=src[-1*stride]
+    ld1 {v18.8b}, [x0], x1 // v18=src[0*stride]
+    ld1 {v19.8b}, [x0], x1 // v19=src[1*stride]
+    ld1 {v20.8b}, [x0], x1 // v20=src[2*stride]
 
 w8_xy_02_mc_luma_loop:
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v7.8b}, [x0], x1 // v7=src[3*stride]
-    FILTER_6TAG_8BITS1 v2, v3, v4, v5, v6, v7, v20, v0, v1
-    st1 {v20.8b}, [x2], x3 //write 8Byte : 0 line
+    ld1 {v21.8b}, [x0], x1 // v21=src[3*stride]
+    ld1 {v22.8b}, [x0], x1 // v22=src[4*stride]
+    ld1 {v23.8b}, [x0], x1 // v23=src[5*stride]
+    ld1 {v24.8b}, [x0], x1 // v24=src[6*stride]
 
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v2.8b}, [x0], x1 // v2=src[3*stride]
-    FILTER_6TAG_8BITS1 v3, v4, v5, v6, v7, v2, v20, v0, v1
-    st1 {v20.8b}, [x2], x3 //write 8Byte : 1 line
+    VEC4_UADDL_8BITS v16, v21, v17, v22, v18, v23, v19, v24, v0, v2, v4, v6 //v0/v2/v4/v6 =src[-2]+src[3]
+    VEC4_UADDL_8BITS v17, v20, v18, v21, v19, v22, v20, v23, v1, v3, v5, v7 //v1/v3/v5/v7 =src[-1]+src[2]
+    VEC4_MLS_16BITS v1, v31, v3, v31, v5, v31, v7, v31, v0, v2, v4, v6  //v0/v2/v4/v6 -=5*(src[-1]+src[2])
+    VEC4_UADDL_8BITS v18, v19, v19, v20, v20, v21, v21, v22, v1, v3, v5, v7 //v1/v3/v5/v7 =src[0]+src[1]
+    VEC4_MLA_16BITS v1, v30, v3, v30, v5, v30, v7, v30, v0, v2, v4, v6  //v0/v2/v4/v6 += 20*(src[0]+src[1])
+    VEC4_SQRSHRUN_16BITS_SHIFT5 v0, v2, v4, v6, v1, v3, v5, v7
+    VEC4_ST1_8BITS_8ELEMENT x2, x3, v1, v3, v5, v7  //store 8bytes*4row
 
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v3.8b}, [x0], x1 // v3=src[3*stride]
-    FILTER_6TAG_8BITS1 v4, v5, v6, v7, v2, v3, v20, v0, v1
-    st1 {v20.8b}, [x2], x3 //write 8Byte : 2 line
-
-    //prfm pldl1strm, [x0, x1]
-    ld1 {v4.8b}, [x0], x1 // v4=src[3*stride]
-    FILTER_6TAG_8BITS1 v5, v6, v7, v2, v3, v4, v20, v0, v1
-    st1 {v20.8b}, [x2], x3 //write 8Byte : 3 line
-
-    mov v5.16b, v3.16b
-    mov v3.16b, v7.16b
-    mov v7.16b, v2.16b
-    mov v2.16b, v6.16b
-    mov v6.16b, v4.16b
-    mov v4.16b, v7.16b
     sub x4, x4, #4
+    mov v16.16b, v20.16b
+    mov v17.16b, v21.16b
+    mov v18.16b, v22.16b
+    mov v19.16b, v23.16b
+    mov v20.16b, v24.16b
+
     cbnz x4, w8_xy_02_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
-
 
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer02WidthEq4_AArch64_neon
     sub x0, x0, x1, lsl #1
@@ -1534,50 +1676,56 @@ w4_pix_avg_loop:
 WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN McChromaWidthEq8_AArch64_neon
-    ld4r {v16.8b, v17.8b, v18.8b, v19.8b}, [x4] //load A/B/C/D
-    ld1 {v0.16b}, [x0], x1  // src[x]
-    ext v1.16b, v0.16b, v0.16b, #1  // src[x+1]
+    ld4r {v28.8b, v29.8b, v30.8b, v31.8b}, [x4] //load A/B/C/D
+    ld1 {v16.16b}, [x0], x1  // src[x]
+    ext v17.16b, v16.16b, v16.16b, #1  // src[x+1]
 w8_mc_chroma_loop:
-    ld1 {v2.16b}, [x0], x1  // src[x+stride]
-    ext v3.16b, v2.16b, v2.16b, #1  // src[x+stride+1]
-    ld1 {v4.16b}, [x0], x1  // src[x+2*stride]
-    ext v5.16b, v4.16b, v4.16b, #1  // src[x+2*stride+1]
-    ld1 {v6.16b}, [x0], x1  // src[x+3*stride]
-    ext v7.16b, v6.16b, v6.16b, #1  // src[x+3*stride+1]
-    ld1 {v30.16b}, [x0], x1  // src[x+4*stride]
-    ext v31.16b, v30.16b, v30.16b, #1  // src[x+4*stride+1]
+    ld1 {v18.16b}, [x0], x1  // src[x+stride]
+    ext v19.16b, v18.16b, v18.16b, #1  // src[x+stride+1]
 
-    umull v8.8h, v0.8b, v16.8b
-    umull v10.8h, v2.8b, v16.8b
-    umull v12.8h, v4.8b, v16.8b
-    umull v14.8h, v6.8b, v16.8b
+    ld1 {v20.16b}, [x0], x1  // src[x+2*stride]
+    ext v21.16b, v20.16b, v20.16b, #1  // src[x+2*stride+1]
 
-    umlal v8.8h, v1.8b, v17.8b
-    umlal v10.8h, v3.8b, v17.8b
-    umlal v12.8h, v5.8b, v17.8b
-    umlal v14.8h, v7.8b, v17.8b
+    ld1 {v22.16b}, [x0], x1  // src[x+3*stride]
+    ext v23.16b, v22.16b, v22.16b, #1  // src[x+3*stride+1]
 
-    umlal v8.8h, v2.8b, v18.8b
-    umlal v10.8h, v4.8b, v18.8b
-    umlal v12.8h, v6.8b, v18.8b
-    umlal v14.8h, v30.8b, v18.8b
+    ld1 {v24.16b}, [x0], x1  // src[x+4*stride]
+    ext v25.16b, v24.16b, v24.16b, #1  // src[x+4*stride+1]
 
-    umlal v8.8h, v3.8b, v19.8b
-    umlal v10.8h, v5.8b, v19.8b
-    umlal v12.8h, v7.8b, v19.8b
-    umlal v14.8h, v31.8b, v19.8b
+    umull v0.8h, v16.8b, v28.8b
+    umull v2.8h, v18.8b, v28.8b
+    umull v4.8h, v20.8b, v28.8b
+    umull v6.8h, v22.8b, v28.8b
 
-    rshrn v9.8b, v8.8h, #6
-    st1 {v9.8b}, [x2], x3
-    rshrn v11.8b, v10.8h, #6
-    st1 {v11.8b}, [x2], x3
-    rshrn v13.8b, v12.8h, #6
-    st1 {v13.8b}, [x2], x3
-    rshrn v15.8b, v14.8h, #6
-    st1 {v15.8b}, [x2], x3
+    umlal v0.8h, v17.8b, v29.8b
+    umlal v2.8h, v19.8b, v29.8b
+    umlal v4.8h, v21.8b, v29.8b
+    umlal v6.8h, v23.8b, v29.8b
 
-    mov v0.16b, v30.16b
-    mov v1.16b, v31.16b
+    umlal v0.8h, v18.8b, v30.8b
+    umlal v2.8h, v20.8b, v30.8b
+    umlal v4.8h, v22.8b, v30.8b
+    umlal v6.8h, v24.8b, v30.8b
+
+    umlal v0.8h, v19.8b, v31.8b
+    umlal v2.8h, v21.8b, v31.8b
+    umlal v4.8h, v23.8b, v31.8b
+    umlal v6.8h, v25.8b, v31.8b
+
+    rshrn v1.8b, v0.8h, #6
+    st1 {v1.8b}, [x2], x3
+
+    rshrn v3.8b, v2.8h, #6
+    st1 {v3.8b}, [x2], x3
+
+    rshrn v5.8b, v4.8h, #6
+    st1 {v5.8b}, [x2], x3
+
+    rshrn v7.8b, v6.8h, #6
+    st1 {v7.8b}, [x2], x3
+
+    mov v16.16b, v24.16b
+    mov v17.16b, v25.16b
     sub x5, x5, #4
     cbnz x5, w8_mc_chroma_loop
 WELS_ASM_AARCH64_FUNC_END

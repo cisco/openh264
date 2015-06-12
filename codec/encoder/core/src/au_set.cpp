@@ -107,7 +107,7 @@ static int32_t WelsCheckNumRefSetting (SLogContext* pLogCtx, SWelsSvcCodingParam
                             : (WELS_MAX (1, (pParam->uiGopSize >> 1))));
   int32_t iNeededRefNum = (pParam->uiIntraPeriod != 1) ? (iCurrentStrNum + pParam->iLTRRefNum) : 0;
 
-  iNeededRefNum		= WELS_CLIP3 (iNeededRefNum,
+  iNeededRefNum = WELS_CLIP3 (iNeededRefNum,
                                 MIN_REF_PIC_COUNT,
                                 (pParam->iUsageType == CAMERA_VIDEO_REAL_TIME) ? MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA :
                                 MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN);
@@ -243,13 +243,13 @@ int32_t WelsWriteSpsSyntax (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_
 
   BsWriteBits (pLocalBitStringAux, 8, pSps->uiProfileIdc);
 
-  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet0Flag);	// bConstraintSet0Flag
-  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet1Flag);	// bConstraintSet1Flag
-  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet2Flag);	// bConstraintSet2Flag
-  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet3Flag);	// bConstraintSet3Flag
-  BsWriteBits (pLocalBitStringAux, 4, 0);							// reserved_zero_4bits, equal to 0
-  BsWriteBits (pLocalBitStringAux, 8, pSps->iLevelIdc);				// iLevelIdc
-  BsWriteUE (pLocalBitStringAux, pSps->uiSpsId + pSpsIdDelta[pSps->uiSpsId]);					     // seq_parameter_set_id
+  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet0Flag);        // bConstraintSet0Flag
+  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet1Flag);        // bConstraintSet1Flag
+  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet2Flag);        // bConstraintSet2Flag
+  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet3Flag);        // bConstraintSet3Flag
+  BsWriteBits (pLocalBitStringAux, 4, 0);                               // reserved_zero_4bits, equal to 0
+  BsWriteBits (pLocalBitStringAux, 8, pSps->iLevelIdc);                 // iLevelIdc
+  BsWriteUE (pLocalBitStringAux, pSps->uiSpsId + pSpsIdDelta[pSps->uiSpsId]);        // seq_parameter_set_id
 
   if (PRO_SCALABLE_BASELINE == pSps->uiProfileIdc || PRO_SCALABLE_HIGH == pSps->uiProfileIdc ||
       PRO_HIGH == pSps->uiProfileIdc || PRO_HIGH10 == pSps->uiProfileIdc ||
@@ -262,26 +262,26 @@ int32_t WelsWriteSpsSyntax (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_
     BsWriteOneBit (pLocalBitStringAux, 0); //seq_scaling_matrix_present_flag
   }
 
-  BsWriteUE (pLocalBitStringAux, pSps->uiLog2MaxFrameNum - 4);	// log2_max_frame_num_minus4
-  BsWriteUE (pLocalBitStringAux, 0/*pSps->uiPocType*/);		     // pic_order_cnt_type
-  BsWriteUE (pLocalBitStringAux, pSps->iLog2MaxPocLsb - 4);	// log2_max_pic_order_cnt_lsb_minus4
+  BsWriteUE (pLocalBitStringAux, pSps->uiLog2MaxFrameNum - 4);  // log2_max_frame_num_minus4
+  BsWriteUE (pLocalBitStringAux, 0/*pSps->uiPocType*/);         // pic_order_cnt_type
+  BsWriteUE (pLocalBitStringAux, pSps->iLog2MaxPocLsb - 4);     // log2_max_pic_order_cnt_lsb_minus4
 
-  BsWriteUE (pLocalBitStringAux, pSps->iNumRefFrames);		// max_num_ref_frames
+  BsWriteUE (pLocalBitStringAux, pSps->iNumRefFrames);          // max_num_ref_frames
   BsWriteOneBit (pLocalBitStringAux, pSps->bGapsInFrameNumValueAllowedFlag); //gaps_in_frame_numvalue_allowed_flag
-  BsWriteUE (pLocalBitStringAux, pSps->iMbWidth - 1);		// pic_width_in_mbs_minus1
-  BsWriteUE (pLocalBitStringAux, pSps->iMbHeight - 1);		// pic_height_in_map_units_minus1
-  BsWriteOneBit (pLocalBitStringAux, true/*pSps->bFrameMbsOnlyFlag*/);	// bFrameMbsOnlyFlag
+  BsWriteUE (pLocalBitStringAux, pSps->iMbWidth - 1);           // pic_width_in_mbs_minus1
+  BsWriteUE (pLocalBitStringAux, pSps->iMbHeight - 1);          // pic_height_in_map_units_minus1
+  BsWriteOneBit (pLocalBitStringAux, true/*pSps->bFrameMbsOnlyFlag*/);  // bFrameMbsOnlyFlag
 
-  BsWriteOneBit (pLocalBitStringAux, 0/*pSps->bDirect8x8InferenceFlag*/);	// direct_8x8_inference_flag
-  BsWriteOneBit (pLocalBitStringAux, pSps->bFrameCroppingFlag);	// bFrameCroppingFlag
+  BsWriteOneBit (pLocalBitStringAux, 0/*pSps->bDirect8x8InferenceFlag*/);       // direct_8x8_inference_flag
+  BsWriteOneBit (pLocalBitStringAux, pSps->bFrameCroppingFlag); // bFrameCroppingFlag
   if (pSps->bFrameCroppingFlag) {
-    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropLeft);	// frame_crop_left_offset
-    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropRight);	// frame_crop_right_offset
-    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropTop);	// frame_crop_top_offset
-    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropBottom);	// frame_crop_bottom_offset
+    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropLeft);         // frame_crop_left_offset
+    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropRight);        // frame_crop_right_offset
+    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropTop);          // frame_crop_top_offset
+    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropBottom);       // frame_crop_bottom_offset
   }
   if (bBaseLayer) {
-    BsWriteOneBit (pLocalBitStringAux, true);	// vui_parameters_present_flag
+    BsWriteOneBit (pLocalBitStringAux, true);   // vui_parameters_present_flag
     WelsWriteVUI (pSps, pBitStringAux);
   } else {
     BsWriteOneBit (pLocalBitStringAux, false);
@@ -468,24 +468,24 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
                      const uint32_t kuiSpsId, const bool kbEnableFrameCropping, bool bEnableRc,
                      const int32_t kiDlayerCount, bool bSVCBaselayer) {
   memset (pSps, 0, sizeof (SWelsSPS));
-  pSps->uiSpsId		= kuiSpsId;
-  pSps->iMbWidth	= (pLayerParam->iVideoWidth + 15) >> 4;
-  pSps->iMbHeight	= (pLayerParam->iVideoHeight + 15) >> 4;
+  pSps->uiSpsId         = kuiSpsId;
+  pSps->iMbWidth        = (pLayerParam->iVideoWidth + 15) >> 4;
+  pSps->iMbHeight       = (pLayerParam->iVideoHeight + 15) >> 4;
 
   //max value of both iFrameNum and POC are 2^16-1, in our encoder, iPOC=2*iFrameNum, so max of iFrameNum should be 2^15-1.--
   pSps->uiLog2MaxFrameNum = 15;//16;
-  pSps->iLog2MaxPocLsb	= 1 + pSps->uiLog2MaxFrameNum;
+  pSps->iLog2MaxPocLsb = 1 + pSps->uiLog2MaxFrameNum;
 
-  pSps->iNumRefFrames	= kiNumRefFrame;	/* min pRef size when fifo pRef operation*/
+  pSps->iNumRefFrames = kiNumRefFrame;        /* min pRef size when fifo pRef operation*/
 
   if (kbEnableFrameCropping) {
     // TODO: get frame_crop_left_offset, frame_crop_right_offset, frame_crop_top_offset, frame_crop_bottom_offset
     pSps->bFrameCroppingFlag = WelsGetPaddingOffset (pLayerParamInternal->iActualWidth, pLayerParamInternal->iActualHeight,
                                pLayerParam->iVideoWidth, pLayerParam->iVideoHeight, pSps->sFrameCrop);
   } else {
-    pSps->bFrameCroppingFlag	= false;
+    pSps->bFrameCroppingFlag = false;
   }
-  pSps->uiProfileIdc	= pLayerParam->uiProfileIdc ? pLayerParam->uiProfileIdc : PRO_BASELINE;
+  pSps->uiProfileIdc = pLayerParam->uiProfileIdc ? pLayerParam->uiProfileIdc : PRO_BASELINE;
   if (pLayerParam->uiProfileIdc == PRO_BASELINE) {
     pSps->bConstraintSet0Flag = true;
   }
@@ -496,7 +496,7 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
     pSps->bConstraintSet2Flag = true;
   }
 
-  ELevelIdc uiLevel	= WelsGetLevelIdc (pSps, pLayerParamInternal->fOutputFrameRate, pLayerParam->iSpatialBitrate);
+  ELevelIdc uiLevel = WelsGetLevelIdc (pSps, pLayerParamInternal->fOutputFrameRate, pLayerParam->iSpatialBitrate);
   //update level
   //for Scalable Baseline, Scalable High, and Scalable High Intra profiles.If level_idc is equal to 9, the indicated level is level 1b.
   //for the Baseline, Constrained Baseline, Main, and Extended profiles,If level_idc is equal to 11 and constraint_set3_flag is equal to 1, the indicated level is level 1b.
@@ -533,12 +533,12 @@ int32_t WelsInitSubsetSps (SSubsetSps* pSubsetSps, SSpatialLayerConfig* pLayerPa
   WelsInitSps (pSps, pLayerParam, pLayerParamInternal, kuiIntraPeriod, kiNumRefFrame, kuiSpsId, kbEnableFrameCropping,
                bEnableRc, kiDlayerCount, false);
 
-  pSps->uiProfileIdc	= (pLayerParam->uiProfileIdc >= PRO_SCALABLE_BASELINE) ? pLayerParam->uiProfileIdc :
+  pSps->uiProfileIdc = (pLayerParam->uiProfileIdc >= PRO_SCALABLE_BASELINE) ? pLayerParam->uiProfileIdc :
                         PRO_SCALABLE_BASELINE;
 
-  pSubsetSps->sSpsSvcExt.iExtendedSpatialScalability	= 0;	/* ESS is 0 in default */
-  pSubsetSps->sSpsSvcExt.bAdaptiveTcoeffLevelPredFlag	= false;
-  pSubsetSps->sSpsSvcExt.bSeqTcoeffLevelPredFlag	= false;
+  pSubsetSps->sSpsSvcExt.iExtendedSpatialScalability    = 0;    /* ESS is 0 in default */
+  pSubsetSps->sSpsSvcExt.bAdaptiveTcoeffLevelPredFlag   = false;
+  pSubsetSps->sSpsSvcExt.bSeqTcoeffLevelPredFlag        = false;
   pSubsetSps->sSpsSvcExt.bSliceHeaderRestrictionFlag = true;
 
   return 0;
@@ -558,26 +558,26 @@ int32_t WelsInitPps (SWelsPPS* pPps,
     assert (pSps != NULL);
     if (NULL == pSps)
       return 1;
-    pUsedSps	= pSps;
+    pUsedSps = pSps;
   } else {
     assert (pSubsetSps != NULL);
     if (NULL == pSubsetSps)
       return 1;
-    pUsedSps	= &pSubsetSps->pSps;
+    pUsedSps = &pSubsetSps->pSps;
   }
 
   /* fill picture parameter set syntax */
-  pPps->iPpsId		= kuiPpsId;
-  pPps->iSpsId		= pUsedSps->uiSpsId;
+  pPps->iPpsId = kuiPpsId;
+  pPps->iSpsId = pUsedSps->uiSpsId;
   pPps->bEntropyCodingModeFlag = kbEntropyCodingModeFlag;
 #if !defined(DISABLE_FMO_FEATURE)
-  pPps->uiNumSliceGroups =  1;	//param->qos_param.sliceGroupCount;
+  pPps->uiNumSliceGroups = 1; //param->qos_param.sliceGroupCount;
   if (pPps->uiNumSliceGroups > 1) {
-    pPps->uiSliceGroupMapType = 0;	//param->qos_param.sliceGroupType;
+    pPps->uiSliceGroupMapType = 0; //param->qos_param.sliceGroupType;
     if (pPps->uiSliceGroupMapType == 0) {
       uint32_t uiGroup = 0;
       while (uiGroup < pPps->uiNumSliceGroups) {
-        pPps->uiRunLength[uiGroup]	= 25;
+        pPps->uiRunLength[uiGroup] = 25;
         ++ uiGroup;
       }
     } else if (pPps->uiSliceGroupMapType == 2) {
@@ -594,11 +594,11 @@ int32_t WelsInitPps (SWelsPPS* pPps,
   }
 #endif//!DISABLE_FMO_FEATURE
 
-  pPps->iPicInitQp							= 26;
-  pPps->iPicInitQs							= 26;
+  pPps->iPicInitQp = 26;
+  pPps->iPicInitQs = 26;
 
-  pPps->uiChromaQpIndexOffset					= 0;
-  pPps->bDeblockingFilterControlPresentFlag	= kbDeblockingFilterPresentFlag;
+  pPps->uiChromaQpIndexOffset                   = 0;
+  pPps->bDeblockingFilterControlPresentFlag     = kbDeblockingFilterPresentFlag;
 
   return 0;
 }

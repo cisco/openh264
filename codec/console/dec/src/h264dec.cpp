@@ -68,7 +68,7 @@ int g_iDecodedFrameNum = 0;
 #endif
 //using namespace WelsDec;
 
-//#define NO_DELAY_DECODING	// For Demo interfaces test with no delay decoding
+//#define NO_DELAY_DECODING // For Demo interfaces test with no delay decoding
 
 void H264DecodeInstance(ISVCDecoder* pDecoder, const char* kpH264FileName,
 		const char* kpOuputFileName, int32_t& iWidth, int32_t& iHeight,
@@ -195,6 +195,7 @@ void H264DecodeInstance(ISVCDecoder* pDecoder, const char* kpH264FileName,
 						(void*) &iEndOfStreamFlag);
 			break;
 		}
+
 // Read length from file if needed
 		if (fpTrack) {
 			if (fread(pInfo, 4, sizeof(int32_t), fpTrack) < 4)
@@ -310,6 +311,7 @@ void H264DecodeInstance(ISVCDecoder* pDecoder, const char* kpH264FileName,
 			}
 			++ iFrameCount;
 		}
+
 #endif
 		iBufPos += iSliceSize;
 		++iSliceIndex;
@@ -514,4 +516,5 @@ int32_t main(int32_t iArgC, char* pArgV[]) {
 	}
 
 	return 0;
+
 }

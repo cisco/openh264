@@ -203,7 +203,7 @@ int32_t   iMinFrameQp;
 int32_t   iMaxFrameQp;
 int32_t   iNumberMbFrame;
 int32_t   iNumberMbGom;
-int32_t	  iSliceNum;
+int32_t   iSliceNum;
 int32_t   iGomSize;
 
 int32_t   iSkipFrameNum;
@@ -237,7 +237,7 @@ int32_t   iPaddingSize;
 int32_t   iPaddingBitrateStat;
 bool      bSkipFlag;
 
-SRCSlicing*	pSlicingOverRc;
+SRCSlicing*     pSlicingOverRc;
 SRCTemporal* pTemporalOverRc;
 
 //for scc
@@ -262,11 +262,11 @@ typedef  void (*PWelsUpdateBufferWhenFrameSkippedFunc)(sWelsEncCtx* pCtx, int32_
 typedef  void (*PWelsUpdateMaxBrCheckWindowStatusFunc)(sWelsEncCtx* pCtx, int32_t iSpatialNum, const long long uiTimeStamp);
 
 typedef  struct  WelsRcFunc_s {
-PWelsRCPictureInitFunc			pfWelsRcPictureInit;
-PWelsRCPictureDelayJudgeFunc      pfWelsRcPicDelayJudge;
-PWelsRCPictureInfoUpdateFunc	pfWelsRcPictureInfoUpdate;
-PWelsRCMBInitFunc				pfWelsRcMbInit;
-PWelsRCMBInfoUpdateFunc			pfWelsRcMbInfoUpdate;
+PWelsRCPictureInitFunc          pfWelsRcPictureInit;
+PWelsRCPictureDelayJudgeFunc    pfWelsRcPicDelayJudge;
+PWelsRCPictureInfoUpdateFunc    pfWelsRcPictureInfoUpdate;
+PWelsRCMBInitFunc               pfWelsRcMbInit;
+PWelsRCMBInfoUpdateFunc         pfWelsRcMbInfoUpdate;
 PWelsCheckFrameSkipBasedMaxbrFunc pfWelsCheckSkipBasedMaxbr;
 PWelsUpdateBufferWhenFrameSkippedFunc pfWelsUpdateBufferWhenSkip;
 PWelsUpdateMaxBrCheckWindowStatusFunc pfWelsUpdateMaxBrWindowStatus;

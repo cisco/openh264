@@ -179,7 +179,7 @@ int32_t WelsSampleSatdIntra4x4Combined3_c (uint8_t* pDec, int32_t iDecStride, ui
     iBestCost = iCurCost;
   }
 
-  memcpy (pDst, uiLocalBuffer[iBestMode], 16 * sizeof (uint8_t));	// confirmed_safe_unsafe_usage
+  memcpy (pDst, uiLocalBuffer[iBestMode], 16 * sizeof (uint8_t)); // confirmed_safe_unsafe_usage
   *pBestMode = iBestMode;
 
   return iBestCost;
@@ -220,7 +220,7 @@ int32_t WelsSampleSatdIntra8x8Combined3_c (uint8_t* pDecCb, int32_t iDecStride, 
     iBestCost = iCurCost;
   }
 
-  *pBestMode	= iBestMode;
+  *pBestMode = iBestMode;
 
   return iBestCost;
 

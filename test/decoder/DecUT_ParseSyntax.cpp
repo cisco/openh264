@@ -94,7 +94,7 @@ void UninitDecoder (PWelsDecoderContext pCtx) {
   WelsEndDecoder (pCtx);
   if (NULL != pCtx) {
     free (pCtx);
-    pCtx	= NULL;
+    pCtx = NULL;
   }
 
 }
@@ -135,7 +135,7 @@ class DecoderParseSyntaxTest : public ::testing::Test {
   unsigned char m_szBuffer[BUF_SIZE]; //for mocking packet
   int m_iBufLength; //record the valid data in m_szBuffer
   PWelsDecoderContext m_pCtx;
-  welsCodecTrace*	m_pWelsTrace;
+  welsCodecTrace* m_pWelsTrace;
 
 };
 
@@ -160,7 +160,7 @@ void DecoderParseSyntaxTest::Init() {
   //
   m_pCtx = (PWelsDecoderContext)malloc (sizeof (SWelsDecoderContext));
 
-  m_pWelsTrace	= new welsCodecTrace();
+  m_pWelsTrace = new welsCodecTrace();
   if (m_pWelsTrace != NULL) {
     m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);
   }

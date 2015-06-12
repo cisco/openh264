@@ -64,7 +64,7 @@ int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize) {
   pPtr = pBase;
   *ppAu = (PAccessUnit)pPtr;
   pPtr += kuiSizeAu;
-  (*ppAu)->pNalUnitsList	= (PNalUnit*)pPtr;
+  (*ppAu)->pNalUnitsList = (PNalUnit*)pPtr;
   pPtr += kuiSizeNalUnitPtr;
   do {
     (*ppAu)->pNalUnitsList[uiIdx] = (PNalUnit)pPtr;
@@ -72,12 +72,12 @@ int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize) {
     ++ uiIdx;
   } while (uiIdx < kuiSize);
 
-  (*ppAu)->uiCountUnitsNum	= kuiSize;
-  (*ppAu)->uiAvailUnitsNum	= 0;
-  (*ppAu)->uiActualUnitsNum	= 0;
+  (*ppAu)->uiCountUnitsNum      = kuiSize;
+  (*ppAu)->uiAvailUnitsNum      = 0;
+  (*ppAu)->uiActualUnitsNum     = 0;
   (*ppAu)->uiStartPos           = 0;
-  (*ppAu)->uiEndPos		= 0;
-  (*ppAu)->bCompletedAuFlag	= false;
+  (*ppAu)->uiEndPos             = 0;
+  (*ppAu)->bCompletedAuFlag     = false;
 
   return 0;
 }
@@ -101,7 +101,7 @@ int32_t ExpandNalUnitList (PAccessUnit* ppAu, const int32_t kiOrgSize, const int
     PAccessUnit pTmp = NULL;
     int32_t iIdx = 0;
 
-    if (MemInitNalList (&pTmp, kiExpSize))	// request new list with expanding
+    if (MemInitNalList (&pTmp, kiExpSize)) // request new list with expanding
       return 1;
 
     do {
@@ -109,13 +109,13 @@ int32_t ExpandNalUnitList (PAccessUnit* ppAu, const int32_t kiOrgSize, const int
       ++ iIdx;
     } while (iIdx < kiOrgSize);
 
-    pTmp->uiCountUnitsNum	= kiExpSize;
-    pTmp->uiAvailUnitsNum	= (*ppAu)->uiAvailUnitsNum;
-    pTmp->uiActualUnitsNum	= (*ppAu)->uiActualUnitsNum;
-    pTmp->uiEndPos		    = (*ppAu)->uiEndPos;
-    pTmp->bCompletedAuFlag	= (*ppAu)->bCompletedAuFlag;
+    pTmp->uiCountUnitsNum       = kiExpSize;
+    pTmp->uiAvailUnitsNum       = (*ppAu)->uiAvailUnitsNum;
+    pTmp->uiActualUnitsNum      = (*ppAu)->uiActualUnitsNum;
+    pTmp->uiEndPos              = (*ppAu)->uiEndPos;
+    pTmp->bCompletedAuFlag      = (*ppAu)->bCompletedAuFlag;
 
-    MemFreeNalList (ppAu);	// free old list
+    MemFreeNalList (ppAu); // free old list
     *ppAu = pTmp;
     return 0;
   }
@@ -130,16 +130,16 @@ PNalUnit MemGetNextNal (PAccessUnit* ppAu) {
   PAccessUnit pAu = *ppAu;
   PNalUnit pNu = NULL;
 
-  if (pAu->uiAvailUnitsNum >= pAu->uiCountUnitsNum) {	// need expand list
+  if (pAu->uiAvailUnitsNum >= pAu->uiCountUnitsNum) { // need expand list
     const uint32_t kuiExpandingSize = pAu->uiCountUnitsNum + (MAX_NAL_UNIT_NUM_IN_AU >> 1);
     if (ExpandNalUnitList (ppAu, pAu->uiCountUnitsNum, kuiExpandingSize))
-      return NULL;	// out of memory
+      return NULL; // out of memory
     pAu = *ppAu;
   }
 
-  pNu = pAu->pNalUnitsList[pAu->uiAvailUnitsNum++];	// ready for next nal position
+  pNu = pAu->pNalUnitsList[pAu->uiAvailUnitsNum++]; // ready for next nal position
 
-  memset (pNu, 0, sizeof (SNalUnit));	// Please do not remove this for cache intend!!
+  memset (pNu, 0, sizeof (SNalUnit)); // Please do not remove this for cache intend!!
 
   return pNu;
 }

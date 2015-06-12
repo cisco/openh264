@@ -58,7 +58,7 @@ namespace WelsCommon {
 //iB = dx * (8 - dy);
 //iC = (8 - dx) * dy;
 //iD = dx * dy
-static const uint8_t g_kuiABCD[8][8][4] = {	//g_kA[dy][dx], g_kB[dy][dx], g_kC[dy][dx], g_kD[dy][dx]
+static const uint8_t g_kuiABCD[8][8][4] = { //g_kA[dy][dx], g_kB[dy][dx], g_kC[dy][dx], g_kD[dy][dx]
   {
     {64, 0, 0, 0}, {56, 8, 0, 0}, {48, 16, 0, 0}, {40, 24, 0, 0},
     {32, 32, 0, 0}, {24, 40, 0, 0}, {16, 48, 0, 0}, {8, 56, 0, 0}
@@ -965,7 +965,7 @@ void McLuma_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_
     {McHorVer20_neon,    McHorVer21_neon, McHorVer22_neon,    McHorVer23_neon},
     {McHorVer30_neon, McHorVer31_neon, McHorVer32_neon, McHorVer33_neon},
   };
-  //	pSrc += (iMvY >> 2) * iSrcStride + (iMvX >> 2);
+  // pSrc += (iMvY >> 2) * iSrcStride + (iMvX >> 2);
   pWelsMcFunc[iMvX & 0x03][iMvY & 0x03] (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
 }
 void McChroma_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
@@ -1248,7 +1248,7 @@ void McLuma_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst
     {McHorVer20_AArch64_neon,    McHorVer21_AArch64_neon, McHorVer22_AArch64_neon,    McHorVer23_AArch64_neon},
     {McHorVer30_AArch64_neon, McHorVer31_AArch64_neon, McHorVer32_AArch64_neon, McHorVer33_AArch64_neon},
   };
-  //	pSrc += (iMvY >> 2) * iSrcStride + (iMvX >> 2);
+  // pSrc += (iMvY >> 2) * iSrcStride + (iMvX >> 2);
   pWelsMcFunc[iMvX & 0x03][iMvY & 0x03] (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
 }
 void McChroma_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,

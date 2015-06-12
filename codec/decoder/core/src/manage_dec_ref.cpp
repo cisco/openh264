@@ -87,7 +87,7 @@ void WelsResetRefPic (PWelsDecoderContext pCtx) {
   PRefPic pRefPic = &pCtx->sRefPic;
   pCtx->sRefPic.uiLongRefCount[LIST_0] = pCtx->sRefPic.uiShortRefCount[LIST_0] = 0;
 
-  pRefPic->uiRefCount[LIST_0]	= 0;
+  pRefPic->uiRefCount[LIST_0] = 0;
 
   for (i = 0; i < MAX_SHORT_REF_COUNT; i++) {
     if (pRefPic->pShortRefList[LIST_0][i] != NULL) {
@@ -213,7 +213,7 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
                 && (pSliceHeader->iSpsId != ppRefList[i]->iSpsId)) {   //check;
               WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "WelsReorderRefList()::::BASE LAYER::::iSpsId:%d, ref_sps_id:%d",
                        pSliceHeader->iSpsId, ppRefList[i]->iSpsId);
-              pCtx->iErrorCode = dsNoParamSets;	//cross-IDR reference frame selection, SHOULD request IDR.--
+              pCtx->iErrorCode = dsNoParamSets; //cross-IDR reference frame selection, SHOULD request IDR.--
               return ERR_INFO_REFERENCE_PIC_LOST;
             } else {
               break;
@@ -230,7 +230,7 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
                 && (pSliceHeader->iSpsId != ppRefList[i]->iSpsId)) {    //check;
               WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "WelsReorderRefList()::::BASE LAYER::::iSpsId:%d, ref_sps_id:%d",
                        pSliceHeader->iSpsId, ppRefList[i]->iSpsId);
-              pCtx->iErrorCode = dsNoParamSets;	//cross-IDR reference frame selection, SHOULD request IDR.--
+              pCtx->iErrorCode = dsNoParamSets; //cross-IDR reference frame selection, SHOULD request IDR.--
               return ERR_INFO_REFERENCE_PIC_LOST;
             } else {
               break;

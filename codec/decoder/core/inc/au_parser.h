@@ -159,7 +159,7 @@ int32_t ParseScalingList(PSps pSps,PBitStringAux pBs,bool bPPS,bool *bScalingLis
  * \note    Call it in case eNalUnitType is NAL_UNIT_SEI.
  *************************************************************************************
  */
-int32_t ParseSei (void* pSei, PBitStringAux pBsAux);	// reserved Sei_Msg type
+int32_t ParseSei (void* pSei, PBitStringAux pBsAux); // reserved Sei_Msg type
 
 /*!
  *************************************************************************************

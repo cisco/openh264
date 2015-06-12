@@ -42,7 +42,7 @@ TEST (IntraSadSatdFuncTest, func) { \
   const int32_t iLineSizeEnc = 32; \
   int32_t tmpa, tmpb; \
   int32_t iBestMode_c, iBestMode_a, iLambda = 50; \
-  int32_t lambda[2]						= {iLambda << 2, iLambda}; \
+  int32_t lambda[2] = {iLambda << 2, iLambda}; \
   int32_t iPredMode = rand() % 3; \
   if (ASM) {\
     int32_t iCpuCores = 0; \

@@ -160,7 +160,7 @@ ALIGNED_DECLARE (const int16_t, g_kiQuantMF[52][8], 16) = {
  ****************************************************************************/
 #define WELS_ABS_LC(a) ((iSign ^ (int32_t)(a)) - iSign)
 #define NEW_QUANT(pDct, iFF, iMF) (((iFF)+ WELS_ABS_LC(pDct))*(iMF)) >>16
-#define WELS_NEW_QUANT(pDct,iFF,iMF)	WELS_ABS_LC(NEW_QUANT(pDct, iFF, iMF))
+#define WELS_NEW_QUANT(pDct,iFF,iMF) WELS_ABS_LC(NEW_QUANT(pDct, iFF, iMF))
 void WelsQuant4x4_c (int16_t* pDct, const int16_t* pFF,  const int16_t* pMF) {
   int32_t i, j, iSign;
   for (i = 0; i < 16; i += 4) {
@@ -283,24 +283,24 @@ void WelsHadamardT4Dc_c (int16_t* pLumaDc, int16_t* pDct) {
 
   for (i = 0 ; i < 16 ; i += 4) {
     iIdx = ((i & 0x08) << 4) + ((i & 0x04) << 3);
-    s[0] = pDct[iIdx ]	+ pDct[iIdx + 80];
-    s[3] = pDct[iIdx ]	- pDct[iIdx + 80];
-    s[1] = pDct[iIdx + 16]	+ pDct[iIdx + 64];
-    s[2] = pDct[iIdx + 16]	- pDct[iIdx + 64];
+    s[0] = pDct[iIdx ]     + pDct[iIdx + 80];
+    s[3] = pDct[iIdx ]     - pDct[iIdx + 80];
+    s[1] = pDct[iIdx + 16] + pDct[iIdx + 64];
+    s[2] = pDct[iIdx + 16] - pDct[iIdx + 64];
 
-    p[i  ] = s[0] + s[1];
+    p[i  ]   = s[0] + s[1];
     p[i + 2] = s[0] - s[1];
     p[i + 1] = s[3] + s[2];
     p[i + 3] = s[3] - s[2];
   }
 
   for (i = 0 ; i < 4 ; i ++) {
-    s[0] = p[i ]	+ p[i + 12];
-    s[3] = p[i ]	- p[i + 12];
-    s[1] = p[i + 4]	+ p[i + 8];
-    s[2] = p[i + 4]	- p[i + 8];
+    s[0] = p[i ]    + p[i + 12];
+    s[3] = p[i ]    - p[i + 12];
+    s[1] = p[i + 4] + p[i + 8];
+    s[2] = p[i + 4] - p[i + 8];
 
-    pLumaDc[i  ] = WELS_CLIP3 ((s[0] + s[1] + 1) >> 1, -32768, 32767);
+    pLumaDc[i  ]    = WELS_CLIP3 ((s[0] + s[1] + 1) >> 1, -32768, 32767);
     pLumaDc[i + 8 ] = WELS_CLIP3 ((s[0] - s[1] + 1) >> 1, -32768, 32767);
     pLumaDc[i + 4 ] = WELS_CLIP3 ((s[3] + s[2] + 1) >> 1, -32768, 32767);
     pLumaDc[i + 12] = WELS_CLIP3 ((s[3] - s[2] + 1) >> 1, -32768, 32767);
@@ -331,7 +331,7 @@ void WelsDctT4_c (int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t* pP
     s[1] = pData[kiI1] + pData[kiI2];
     s[2] = pData[kiI1] - pData[kiI2];
 
-    pDct[i ] = s[0] + s[1];
+    pDct[i ]   = s[0] + s[1];
     pDct[kiI2] = s[0] - s[1];
     pDct[kiI1] = (s[3] << 1) + s[2];
     pDct[kiI3] = s[3] - (s[2] << 1);
@@ -339,16 +339,16 @@ void WelsDctT4_c (int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t* pP
 
   /* vertical transform */
   for (i = 0 ; i < 4 ; i ++) {
-    const int32_t kiI4	= 4 + i;
-    const int32_t kiI8	= 8 + i;
-    const int32_t kiI12	= 12 + i;
+    const int32_t kiI4  = 4 + i;
+    const int32_t kiI8  = 8 + i;
+    const int32_t kiI12 = 12 + i;
 
     s[0] = pDct[i ] + pDct[kiI12];
     s[3] = pDct[i ] - pDct[kiI12];
     s[1] = pDct[kiI4] + pDct[kiI8 ];
     s[2] = pDct[kiI4] - pDct[kiI8 ];
 
-    pDct[i  ] = s[0] + s[1];
+    pDct[i  ]   = s[0] + s[1];
     pDct[kiI8 ] = s[0] - s[1];
     pDct[kiI4 ] = (s[3] << 1) + s[2];
     pDct[kiI12] = s[3] - (s[2] << 1);
@@ -359,9 +359,9 @@ void WelsDctFourT4_c (int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t
   int32_t stride_1 = iStride1 << 2;
   int32_t stride_2 = iStride2 << 2;
 
-  WelsDctT4_c (pDct,      &pPixel1[0],          iStride1, &pPixel2[0],          iStride2);
-  WelsDctT4_c (pDct + 16, &pPixel1[4],          iStride1, &pPixel2[4],          iStride2);
-  WelsDctT4_c (pDct + 32, &pPixel1[stride_1  ], iStride1, &pPixel2[stride_2  ], iStride2);
+  WelsDctT4_c (pDct,      &pPixel1[0],            iStride1, &pPixel2[0],            iStride2);
+  WelsDctT4_c (pDct + 16, &pPixel1[4],            iStride1, &pPixel2[4],            iStride2);
+  WelsDctT4_c (pDct + 32, &pPixel1[stride_1    ], iStride1, &pPixel2[stride_2    ], iStride2);
   WelsDctT4_c (pDct + 48, &pPixel1[stride_1 + 4], iStride1, &pPixel2[stride_2 + 4], iStride2);
 }
 

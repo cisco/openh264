@@ -36,11 +36,11 @@ WELSVP_NAMESPACE_BEGIN
 /////////////////////////////////////////////////////////////////////////////////
 
 void* WelsMalloc (const uint32_t kuiSize, char* pTag) {
-  const int32_t kiSizeVoidPointer	= sizeof (void**);
-  const int32_t kiSizeInt32		= sizeof (int32_t);
-  const int32_t kiAlignedBytes	= ALIGNBYTES - 1;
+  const int32_t kiSizeVoidPointer       = sizeof (void**);
+  const int32_t kiSizeInt32             = sizeof (int32_t);
+  const int32_t kiAlignedBytes          = ALIGNBYTES - 1;
 
-  uint8_t* pBuf		= (uint8_t*) ::malloc (kuiSize + kiAlignedBytes + kiSizeVoidPointer + kiSizeInt32);
+  uint8_t* pBuf         = (uint8_t*) ::malloc (kuiSize + kiAlignedBytes + kiSizeVoidPointer + kiSizeInt32);
   uint8_t* pAlignedBuf = NULL;
 
   if (NULL == pBuf)
@@ -95,7 +95,7 @@ void* WelsRealloc (void* pPointer, uint32_t* pRealSize, const uint32_t kuiSize, 
   const uint32_t kuiOldSize = *pRealSize;
   uint32_t kuiNewSize = 0;
   void* pLocalPointer = NULL;
-  if (kuiOldSize >= kuiSize)	// large enough of original block, so do nothing
+  if (kuiOldSize >= kuiSize) // large enough of original block, so do nothing
     return (pPointer);
 
   // new request
@@ -105,13 +105,13 @@ void* WelsRealloc (void* pPointer, uint32_t* pRealSize, const uint32_t kuiSize, 
 
   pLocalPointer = InternalReallocate (pPointer, kuiNewSize, pTag);
   if (NULL != pLocalPointer) {
-    *pRealSize	= kuiNewSize;
+    *pRealSize = kuiNewSize;
     return (pLocalPointer);
   } else {
     return NULL;
   }
 
-  return NULL;	// something wrong
+  return NULL; // something wrong
 }
 
 WELSVP_NAMESPACE_END

@@ -116,7 +116,7 @@ int32_t EncodeFrame (sWelsEncCtx* pEncCtx,
 /**********************************************************************************
  * memzero Function
 ***********************************************************************************/
-void WelsSetMemZero_c (void* pDst, int32_t iSize);	// confirmed_safe_unsafe_usage
+void WelsSetMemZero_c (void* pDst, int32_t iSize); // confirmed_safe_unsafe_usage
 
 #if defined(__cplusplus)
 extern "C" {

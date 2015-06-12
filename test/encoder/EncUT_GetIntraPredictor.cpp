@@ -9,7 +9,7 @@ using namespace WelsEnc;
 
 TEST (GetIntraPredictorTest, TestGetI4x4LumaPredV) {
   uint8_t* pPred = new uint8_t[64];
-  uint8_t*	pRef  = new uint8_t[64];
+  uint8_t* pRef  = new uint8_t[64];
   for (int i = 0; i < 64; i++)
     pRef[i] = rand() % 256;
 
@@ -85,7 +85,7 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredDDL) {
   const uint8_t kuiDDL4 = (2 + kuiT4 + kuiT6 + (kuiT5 << 1)) >> 2;
   const uint8_t kuiDDL5 = (2 + kuiT5 + kuiT7 + (kuiT6 << 1)) >> 2;
   const uint8_t kuiDDL6 = (2 + kuiT6 + kuiT7 + (kuiT7 << 1)) >> 2;
-  ENFORCE_STACK_ALIGN_1D (uint8_t, uiV, 16, 16)	// TobeCont'd about assign opt as follows
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiV, 16, 16) // TobeCont'd about assign opt as follows
   uiV[0] = kuiDDL0;
   uiV[1] = uiV[4] = kuiDDL1;
   uiV[2] = uiV[5] = uiV[8] = kuiDDL2;
@@ -137,8 +137,8 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredDDLTop) {
 
 TEST (GetIntraPredictorTest, TestGetI4x4LumaPredDDR) {
   const int32_t kiStride = rand() % 256 + 16;
-  const int32_t kiStride2	= kiStride << 1;
-  const int32_t kiStride3	= kiStride + kiStride2;
+  const int32_t kiStride2 = kiStride << 1;
+  const int32_t kiStride3 = kiStride + kiStride2;
 
   uint8_t* pPred = new uint8_t[64];
   uint8_t* pRef  = new uint8_t[kiStride3 + kiStride + 1];
@@ -248,7 +248,7 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredVLTop) {
 
   pRef++;
 
-  uint8_t* pTopLeft = &pRef[-kiStride - 1];	// top-left
+  uint8_t* pTopLeft = &pRef[-kiStride - 1]; // top-left
 
   const uint8_t kuiT0   = * (pTopLeft + 1);
   const uint8_t kuiT1   = * (pTopLeft + 2);
@@ -295,7 +295,7 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredVR) {
 
   pRef += kiStride + 1;
 
-  const uint8_t kuiLT  = pRef[-kiStride - 1];	// top-left
+  const uint8_t kuiLT  = pRef[-kiStride - 1]; // top-left
   const uint8_t kuiL0  = pRef[-1];
   const uint8_t kuiL1  = pRef[kiStride - 1];
   const uint8_t kuiL2  = pRef[kiStride2 - 1];
@@ -313,7 +313,7 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredVR) {
   const uint8_t kuiVR7 = (2 + kuiT1 + (kuiT2 << 1) + kuiT3) >> 2;
   const uint8_t kuiVR8 = (2 + kuiLT + (kuiL0 << 1) + kuiL1) >> 2;
   const uint8_t kuiVR9 = (2 + kuiL0 + (kuiL1 << 1) + kuiL2) >> 2;
-  ENFORCE_STACK_ALIGN_1D (uint8_t, uiV, 16, 16)	// TobeCont'd about assign opt as follows
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiV, 16, 16) // TobeCont'd about assign opt as follows
   uiV[0] = uiV[9] = kuiVR0;
   uiV[1] = uiV[10] = kuiVR1;
   uiV[2] = uiV[11] = kuiVR2;
@@ -362,7 +362,7 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredHU) {
   const uint8_t kuiHU3  = (kuiL12 + kuiL23) >> 2;
   const uint8_t kuiHU4  = kuiL23 >> 1;
   const uint8_t kuiHU5  = (1 + kuiL23 + (kuiL3 << 1)) >> 2;
-  ENFORCE_STACK_ALIGN_1D (uint8_t, uiV, 16, 16)	// TobeCont'd about assign opt as follows
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiV, 16, 16) // TobeCont'd about assign opt as follows
   uiV[0] = kuiHU0;
   uiV[1] = kuiHU1;
   uiV[2] = uiV[4] = kuiHU2;
@@ -395,7 +395,7 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredHD) {
 
   pRef += kiStride + 1;
 
-  const uint8_t kuiLT  = pRef[-kiStride - 1];	// top-left
+  const uint8_t kuiLT  = pRef[-kiStride - 1]; // top-left
   const uint8_t kuiL0  = pRef[-1];
   const uint8_t kuiL1  = pRef[kiStride - 1];
   const uint8_t kuiL2  = pRef[kiStride2 - 1];
@@ -413,7 +413,7 @@ TEST (GetIntraPredictorTest, TestGetI4x4LumaPredHD) {
   const uint8_t kuiHD7 = (2 + kuiL0 + (kuiL1 << 1) + kuiL2) >> 2;
   const uint8_t kuiHD8 = (1 + kuiL2 + kuiL3) >> 1;
   const uint8_t kuiHD9 = (2 + kuiL1 + (kuiL2 << 1) + kuiL3) >> 2;
-  ENFORCE_STACK_ALIGN_1D (uint8_t, uiV, 16, 16)	// TobeCont'd about assign opt as follows
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiV, 16, 16) // TobeCont'd about assign opt as follows
   uiV[0] = uiV[6] = kuiHD0;
   uiV[1] = uiV[7] = kuiHD1;
   uiV[2] = kuiHD2;

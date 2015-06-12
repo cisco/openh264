@@ -62,7 +62,7 @@ STRUCTA (64, 2);
 STRUCTA (64, 4);
 STRUCTA (64, 8);
 //#define _USE_STRUCT_INT_CVT
-//	#ifdef _USE_STRUCT_INT_CVT
+//#ifdef _USE_STRUCT_INT_CVT
 #define ST16(a, b) (((struct tagUnaligned_16 *) (a))->l) = (b)
 #define ST32(a, b) (((struct tagUnaligned_32 *) (a))->l) = (b)
 #define ST64(a, b) (((struct tagUnaligned_64 *) (a))->l) = (b)
@@ -81,11 +81,11 @@ STRUCTA (64, 8);
 #define ST64A2(a, b) STA(a, b, 64, 2)
 #define ST64A4(a, b) STA(a, b, 64, 4)
 #define ST64A8(a, b) STA(a, b, 64, 8)
-//	#else
-//		inline void __ST16(void *dst, uint16_t v) { memcpy(dst, &v, 2); }
-//		inline void __ST32(void *dst, uint32_t v) { memcpy(dst, &v, 4); }
+//#else
+//inline void __ST16(void *dst, uint16_t v) { memcpy(dst, &v, 2); }
+//inline void __ST32(void *dst, uint32_t v) { memcpy(dst, &v, 4); }
 //inline void __ST64(void *dst, uint64_t v) { memcpy(dst, &v, 8); }
-//	#endif
+//#endif
 
 #else
 
@@ -116,15 +116,15 @@ STRUCTA (64, 8);
 #endif /* !__GNUC__ */
 
 #ifndef INTD16
-#define INTD16	LD16
+#define INTD16 LD16
 #endif//INTD16
 
 #ifndef INTD32
-#define INTD32	LD32
+#define INTD32 LD32
 #endif//INTD32
 
 #ifndef INTD64
-#define INTD64	LD64
+#define INTD64 LD64
 #endif//INTD64
 
 #endif//___LD_ST_MACROS___

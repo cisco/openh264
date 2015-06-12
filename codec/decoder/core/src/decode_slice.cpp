@@ -120,7 +120,7 @@ int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx) {
     } else {
       ++iNextMbXyIndex;
     }
-    if (-1 == iNextMbXyIndex || iNextMbXyIndex >= iTotalMbTargetLayer) {	// slice group boundary or end of a frame
+    if (-1 == iNextMbXyIndex || iNextMbXyIndex >= iTotalMbTargetLayer) { // slice group boundary or end of a frame
       break;
     }
     pCurLayer->iMbX  = iNextMbXyIndex % pCurLayer->iMbWidth;
@@ -155,8 +155,8 @@ int32_t WelsMbInterSampleConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLa
   int32_t iMbXy = pCurLayer->iMbXyIndex;
   int32_t i, iIndex, iOffset;
 
-  WelsChromaDcIdct (pCurLayer->pScaledTCoeff[iMbXy] + 256);	// 256 = 16*16
-  WelsChromaDcIdct (pCurLayer->pScaledTCoeff[iMbXy] + 320);	// 320 = 16*16 + 16*4
+  WelsChromaDcIdct (pCurLayer->pScaledTCoeff[iMbXy] + 256);     // 256 = 16*16
+  WelsChromaDcIdct (pCurLayer->pScaledTCoeff[iMbXy] + 320);     // 320 = 16*16 + 16*4
 
   if (pCurLayer->pTransformSize8x8Flag[iMbXy]) {
     for (i = 0; i < 4; i++) {
@@ -227,7 +227,7 @@ void WelsLumaDcDequantIdct (int16_t* pBlock, int32_t iQp, PWelsDecoderContext pC
     const int32_t kiX1 = kiOffset + kiXOffset[2];
     const int32_t kiX2 = STRIDE + kiOffset;
     const int32_t kiX3 = kiOffset + kiXOffset[3];
-    const int32_t kiI4 = i << 2;	// 4*i
+    const int32_t kiI4 = i << 2; // 4*i
     const int32_t kiZ0 = pBlk[kiOffset] + pBlk[kiX1];
     const int32_t kiZ1 = pBlk[kiOffset] - pBlk[kiX1];
     const int32_t kiZ2 = pBlk[kiX2] - pBlk[kiX3];
@@ -601,10 +601,10 @@ int32_t ParseIntra16x16Mode (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAva
 }
 
 int32_t WelsDecodeMbCabacISliceBaseMode0 (PWelsDecoderContext pCtx, uint32_t& uiEosFlag) {
-  PDqLayer pCurLayer		 = pCtx->pCurDqLayer;
-  PBitStringAux pBsAux		 = pCurLayer->pBitStringAux;
-  PSlice pSlice			 = &pCurLayer->sLayerInfo.sSliceInLayer;
-  PSliceHeader pSliceHeader		 = &pSlice->sSliceHeaderExt.sSliceHeader;
+  PDqLayer pCurLayer             = pCtx->pCurDqLayer;
+  PBitStringAux pBsAux           = pCurLayer->pBitStringAux;
+  PSlice pSlice                  = &pCurLayer->sLayerInfo.sSliceInLayer;
+  PSliceHeader pSliceHeader      = &pSlice->sSliceHeaderExt.sSliceHeader;
   SWelsNeighAvail sNeighAvail;
   int32_t iScanIdxStart = pSlice->sSliceHeaderExt.uiScanIdxStart;
   int32_t iScanIdxEnd   = pSlice->sSliceHeaderExt.uiScanIdxEnd;
@@ -812,10 +812,10 @@ int32_t WelsDecodeMbCabacISlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
 }
 
 int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail, uint32_t& uiEosFlag) {
-  PDqLayer pCurLayer		 = pCtx->pCurDqLayer;
-  PBitStringAux pBsAux		 = pCurLayer->pBitStringAux;
-  PSlice pSlice			 = &pCurLayer->sLayerInfo.sSliceInLayer;
-  PSliceHeader pSliceHeader		 = &pSlice->sSliceHeaderExt.sSliceHeader;
+  PDqLayer pCurLayer             = pCtx->pCurDqLayer;
+  PBitStringAux pBsAux           = pCurLayer->pBitStringAux;
+  PSlice pSlice                  = &pCurLayer->sLayerInfo.sSliceInLayer;
+  PSliceHeader pSliceHeader      = &pSlice->sSliceHeaderExt.sSliceHeader;
 
   int32_t iScanIdxStart = pSlice->sSliceHeaderExt.uiScanIdxStart;
   int32_t iScanIdxEnd   = pSlice->sSliceHeaderExt.uiScanIdxEnd;
@@ -1048,9 +1048,9 @@ int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
 }
 
 int32_t WelsDecodeMbCabacPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uint32_t& uiEosFlag) {
-  PDqLayer pCurLayer		 = pCtx->pCurDqLayer;
-  PSlice pSlice			 = &pCurLayer->sLayerInfo.sSliceInLayer;
-  PSliceHeader pSliceHeader		 = &pSlice->sSliceHeaderExt.sSliceHeader;
+  PDqLayer pCurLayer             = pCtx->pCurDqLayer;
+  PSlice pSlice                  = &pCurLayer->sLayerInfo.sSliceInLayer;
+  PSliceHeader pSliceHeader      = &pSlice->sSliceHeaderExt.sSliceHeader;
   PPicture* ppRefPic = pCtx->sRefPic.pRefList[LIST_0];
   uint32_t uiCode;
   int32_t iMbXy = pCurLayer->iMbXyIndex;
@@ -1227,7 +1227,7 @@ int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNal
   pCurLayer->iMbXyIndex = iNextMbXyIndex;
 
   do {
-    if ((-1 == iNextMbXyIndex) || (iNextMbXyIndex >= kiCountNumMb)) {	// slice group boundary or end of a frame
+    if ((-1 == iNextMbXyIndex) || (iNextMbXyIndex >= kiCountNumMb)) { // slice group boundary or end of a frame
       break;
     }
 
@@ -1260,10 +1260,10 @@ int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNal
 
 int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
   SVlcTable* pVlcTable     = &pCtx->sVlcTable;
-  PDqLayer pCurLayer		 = pCtx->pCurDqLayer;
-  PBitStringAux pBs		 = pCurLayer->pBitStringAux;
-  PSlice pSlice			 = &pCurLayer->sLayerInfo.sSliceInLayer;
-  PSliceHeader pSliceHeader		     = &pSlice->sSliceHeaderExt.sSliceHeader;
+  PDqLayer pCurLayer             = pCtx->pCurDqLayer;
+  PBitStringAux pBs              = pCurLayer->pBitStringAux;
+  PSlice pSlice                  = &pCurLayer->sLayerInfo.sSliceInLayer;
+  PSliceHeader pSliceHeader      = &pSlice->sSliceHeaderExt.sSliceHeader;
 
   SWelsNeighAvail sNeighAvail;
   int32_t iMbResProperty;
@@ -1564,7 +1564,7 @@ int32_t WelsDecodeMbCavlcISlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
   // check whether there is left bits to read next time in case multiple slices
   iUsedBits = ((pBs->pCurBuf - pBs->pStartBuf) << 3) - (16 - pBs->iLeftBits);
   // sub 1, for stop bit
-  if ((iUsedBits == (pBs->iBits - 1)) && (0 >= pCurLayer->sLayerInfo.sSliceInLayer.iMbSkipRun)) {	// slice boundary
+  if ((iUsedBits == (pBs->iBits - 1)) && (0 >= pCurLayer->sLayerInfo.sSliceInLayer.iMbSkipRun)) { // slice boundary
     uiEosFlag = 1;
   }
   if (iUsedBits > (pBs->iBits -
@@ -1579,10 +1579,10 @@ int32_t WelsDecodeMbCavlcISlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
 
 int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
   SVlcTable* pVlcTable     = &pCtx->sVlcTable;
-  PDqLayer pCurLayer		 = pCtx->pCurDqLayer;
-  PBitStringAux pBs		 = pCurLayer->pBitStringAux;
-  PSlice pSlice			 = &pCurLayer->sLayerInfo.sSliceInLayer;
-  PSliceHeader pSliceHeader		     = &pSlice->sSliceHeaderExt.sSliceHeader;
+  PDqLayer pCurLayer             = pCtx->pCurDqLayer;
+  PBitStringAux pBs              = pCurLayer->pBitStringAux;
+  PSlice pSlice                  = &pCurLayer->sLayerInfo.sSliceInLayer;
+  PSliceHeader pSliceHeader      = &pSlice->sSliceHeaderExt.sSliceHeader;
 
   int32_t iScanIdxStart = pSlice->sSliceHeaderExt.uiScanIdxStart;
   int32_t iScanIdxEnd   = pSlice->sSliceHeaderExt.uiScanIdxEnd;
@@ -1909,10 +1909,10 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
 }
 
 int32_t WelsDecodeMbCavlcPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uint32_t& uiEosFlag) {
-  PDqLayer pCurLayer		 = pCtx->pCurDqLayer;
-  PBitStringAux pBs		 = pCurLayer->pBitStringAux;
-  PSlice pSlice			 = &pCurLayer->sLayerInfo.sSliceInLayer;
-  PSliceHeader pSliceHeader		    = &pSlice->sSliceHeaderExt.sSliceHeader;
+  PDqLayer pCurLayer             = pCtx->pCurDqLayer;
+  PBitStringAux pBs              = pCurLayer->pBitStringAux;
+  PSlice pSlice                  = &pCurLayer->sLayerInfo.sSliceInLayer;
+  PSliceHeader pSliceHeader      = &pSlice->sSliceHeaderExt.sSliceHeader;
   PPicture* ppRefPic = pCtx->sRefPic.pRefList[LIST_0];
   intX_t iUsedBits;
   const int32_t iMbXy = pCurLayer->iMbXyIndex;
@@ -1987,7 +1987,7 @@ int32_t WelsDecodeMbCavlcPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
   // check whether there is left bits to read next time in case multiple slices
   iUsedBits = ((pBs->pCurBuf - pBs->pStartBuf) << 3) - (16 - pBs->iLeftBits);
   // sub 1, for stop bit
-  if ((iUsedBits == (pBs->iBits - 1)) && (0 >= pCurLayer->sLayerInfo.sSliceInLayer.iMbSkipRun)) {	// slice boundary
+  if ((iUsedBits == (pBs->iBits - 1)) && (0 >= pCurLayer->sLayerInfo.sSliceInLayer.iMbSkipRun)) { // slice boundary
     uiEosFlag = 1;
   }
   if (iUsedBits > (pBs->iBits -

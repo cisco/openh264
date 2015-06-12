@@ -30,7 +30,7 @@
  *
  */
 
-//bit_stream.h	-	bit-stream reading and / writing auxiliary data
+//bit_stream.h  -       bit-stream reading and / writing auxiliary data
 #ifndef WELS_BIT_STREAM_H__
 #define WELS_BIT_STREAM_H__
 

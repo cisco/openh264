@@ -69,9 +69,9 @@ int32_t CheckLine (uint8_t* pData, int32_t iWidth) {
 
 int32_t SelectTestLine (uint8_t* pY, int32_t iWidth, int32_t iHeight, int32_t iPicHeight,
                         int32_t iStride, int32_t iOffsetX, int32_t iOffsetY) {
-  const int32_t kiHalfHeight	= iHeight >> 1;
-  const int32_t kiMidPos		= iOffsetY + kiHalfHeight;
-  int32_t TestPos			= kiMidPos;
+  const int32_t kiHalfHeight    = iHeight >> 1;
+  const int32_t kiMidPos        = iOffsetY + kiHalfHeight;
+  int32_t TestPos               = kiMidPos;
   int32_t iOffsetAbs;
   uint8_t* pTmp;
 
