@@ -694,7 +694,6 @@ int FillSpecificParameters (SEncParamExt& sParam) {
 
 int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFile) {
   int iRet				= 0;
-
   if (pPtrEnc == NULL)
     return 1;
 
@@ -749,6 +748,8 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
       goto INSIDE_MEM_FREE;
     }
     iRet = ParseConfig (cRdCfg, pSrcPic, sSvcParam, fs);
+    printf("TargetBitrate: %d\n", sSvcParam.iTargetBitrate);
+    printf("Spatial Bitrate = %d\n", (sSvcParam.sSpatialLayers[0]).iSpatialBitrate);
     if (iRet) {
       fprintf (stderr, "parse svc parameter config file failed.\n");
       iRet = 1;
@@ -844,9 +845,64 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
     goto INSIDE_MEM_FREE;
   }
 
+
+  // --------------------------------- //
+  // ENCODING PROCESS STARTS HERE, LOOPING OVER ALL AVAILABLE FRAMES //
   iFrameIdx = 0;
+  int flipou;
+  flipou = 0;
+  int cnt;
+  cnt = 0;
+
+//  (sSvcParam.sSpatialLayers[0]).iSpatialBitrate = (sSvcParam.sSpatialLayers[0]).iSpatialBitrate/2;
+//  SSpatialLayerConfig* pDLayer;
+//  pDLayer = &sSvcParam.sSpatialLayers[0];
+//  pDLayer->iSpatialBitrate /= 2;
+
+  /*sSvcParam.iTargetBitrate = sSvcParam.iTargetBitrate/4;
+	sSvcParam.iMaxBitrate = sSvcParam.iMaxBitrate/4;
+	(sSvcParam.sSpatialLayers[0]).iSpatialBitrate = (sSvcParam.sSpatialLayers[0]).iSpatialBitrate/4;
+	if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) {	// SVC encoder initialization
+		fprintf (stderr, "SVC encoder Initialize failed\n");
+		iRet = 1;
+		goto INSIDE_MEM_FREE;
+	}*/
+
+	//pPtrEnc->OnTheFlyParamModifUP();
+
+
   while (iFrameIdx < iTotalFrameMax && (((int32_t)fs.uiFrameToBeCoded <= 0)
                                         || (iFrameIdx < (int32_t)fs.uiFrameToBeCoded))) {
+
+	if (cnt > 100 && flipou == 1){
+
+		sSvcParam.iTargetBitrate = sSvcParam.iTargetBitrate*8;
+		sSvcParam.iMaxBitrate = sSvcParam.iMaxBitrate*8;
+		(sSvcParam.sSpatialLayers[0]).iSpatialBitrate = (sSvcParam.sSpatialLayers[0]).iSpatialBitrate*8;
+		if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) {	// SVC encoder initialization
+			fprintf (stderr, "SVC encoder Initialize failed\n");
+			iRet = 1;
+			goto INSIDE_MEM_FREE;
+		}
+		//pPtrEnc->OnTheFlyParamModifUP();
+		//pPtrEnc->OnTheFlyParamModifUP();
+		flipou = 0;
+		printf("lala\n");
+	}
+	if (cnt < 100 && flipou == 0 ){
+		pPtrEnc->OnTheFlyParamModifDOWN();
+		flipou = 1;
+	}
+/*	if ( cnt % 50 == 0 && flipou == 0 ){
+		pPtrEnc->OnTheFlyParamModifDOWN();
+		flipou = 1;
+	}
+	else if ( cnt % 10 == 0 && cnt % 50 != 0 && flipou == 1 ) {
+		pPtrEnc->OnTheFlyParamModifUP();
+		flipou = 0;
+	}*/
+	cnt++;
+	(cnt % 25) ? cnt = cnt * 1 : printf("frame idx = %d\n", cnt);
 
 #ifdef ONLY_ENC_FRAMES_NUM
     // Only encoded some limited frames here
@@ -900,6 +956,7 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
             delete [] pUCArry;
           }
 #endif
+
           fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs);	// write pure bit stream into file
           iFrameSize += iLayerSize;
         }
@@ -1022,6 +1079,8 @@ int main (int argc, char** argv)
   /* Control-C handler */
   signal (SIGINT, SigIntHandler);
 
+  argc = 2;
+  argv[1] = "/home/joachim/Documents/openH264-git/openh264/testbin/welsenc.cfg";
   iRet = CreateSVCEncHandle (&pSVCEncoder);
   if (iRet) {
     cout << "WelsCreateSVCEncoder() failed!!" << endl;
