@@ -879,40 +879,6 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
 		pPtrEnc->OnTheFlyParamModifDOWN();
 		flipou = 1;
 	}
-/*:	if (cnt > 150 && flipou == 1){
-
-		//sSvcParam.iTargetBitrate = sSvcParam.iTargetBitrate*8;
-		//sSvcParam.iMaxBitrate = sSvcParam.iMaxBitrate*8;
-		//(sSvcParam.sSpatialLayers[0]).iSpatialBitrate = (sSvcParam.sSpatialLayers[0]).iSpatialBitrate*8;
-		//if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) {	// SVC encoder initialization
-		//	fprintf (stderr, "SVC encoder Initialize failed\n");
-		//	iRet = 1;
-		//	goto INSIDE_MEM_FREE;
-		//}
-		//pPtrEnc->OnTheFlyParamModifUP();
-		pPtrEnc->OnTheFlyParamModifUP();
-		flipou = 2;
-		printf("1\n");
-	}
-	if ( cnt > 76 && flipou == 0 ){
-		//sSvcParam.iTargetBitrate = sSvcParam.iTargetBitrate * 0.5;
-		//sSvcParam.iMaxBitrate = sSvcParam.iMaxBitrate * 0.5;
-		(sSvcParam.sSpatialLayers[0]).iSpatialBitrate = (sSvcParam.sSpatialLayers[0]).iSpatialBitrate * 0.25;
-		if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) {	// SVC encoder initialization
-			fprintf (stderr, "SVC encoder Initialize failed\n");
-			iRet = 1;
-			goto INSIDE_MEM_FREE;
-		}
-		//pPtrEnc->OnTheFlyParamModifDOWN();
-		flipou = 1;
-		printf("0\n");
-	}
-	if (cnt > 250 && flipou == 2){
-		pPtrEnc->OnTheFlyParamModifDOWN();
-		flipou = 3;
-		printf("2\n");
-	}*/
-
 	cnt++;
 	if (cnt % 25 == 0)
 		pPtrEnc->print();
