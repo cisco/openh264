@@ -308,7 +308,31 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
         }
       } else if (strTag[0].compare ("EnableDenoise") == 0) {
         pSvcParam.bEnableDenoise = atoi (strTag[1].c_str()) ? true : false;
-      } else if (strTag[0].compare ("EnableSceneChangeDetection") == 0) {
+      }
+      /* MDC Parameters */
+      else if (strTag[0].compare ("MDCType") == 0) {
+          pSvcParam.MDCType = atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("MDCTotalDesNum") == 0) {
+          pSvcParam.MDCTotalDesNum = atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("MDCDesNum") == 0) {
+          pSvcParam.MDCDesNum = atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("MDCFrameChangeRate") == 0) {
+          pSvcParam.MDCFrameChangeRate = atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("MDCSliceArg") == 0) {
+          pSvcParam.MDCSliceArg = atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("MDBitreate1") == 0) {
+          pSvcParam.MDBitrate[0] = atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("MDBitreate2") == 0) {
+          pSvcParam.MDBitrate[1] = atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("MDBitreate3") == 0) {
+          pSvcParam.MDBitrate[2] = atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("MDBitreate4") == 0) {
+          pSvcParam.MDBitrate[3] = atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("MDBitreate5") == 0) {
+          pSvcParam.MDBitrate[4] = atoi (strTag[1].c_str());
+      }
+      // END MD Parameters
+      else if (strTag[0].compare ("EnableSceneChangeDetection") == 0) {
         pSvcParam.bEnableSceneChangeDetect = atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableBackgroundDetection") == 0) {
         pSvcParam.bEnableBackgroundDetection = atoi (strTag[1].c_str()) ? true : false;

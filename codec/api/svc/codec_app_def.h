@@ -475,7 +475,7 @@ typedef struct TagEncParamExt {
   int		MDCDesNum; // #0,1,2,3...
   int 		MDCFrameChangeRate; // #Value
   int 		MDCSliceArg; // #Value
-  int 		MDCBitrate[MAX_DESCRIPTION_NUMBER]; //#Value
+  int 		MDBitrate[MAX_DESCRIPTION_NUMBER]; //#Value
 
 
 } SEncParamExt;
