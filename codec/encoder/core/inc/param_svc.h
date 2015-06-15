@@ -191,7 +191,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     param.MDCDesNum = 0;
     param.MDCFrameChangeRate = 0;
     param.MDCSliceArg = 0;
-    for(int i  = 0; i < MAX_DESCRIPTION_NUMBER; i++)
+    for(int i = 0; i < MAX_DESCRIPTION_NUMBER; i++)
     	param.MDBitrate[i] = 0;
   }
 

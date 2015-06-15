@@ -181,6 +181,10 @@ int CWelsH264SVCEncoder::GetDefaultParams (SEncParamExt* argv) {
 /*
  * On-the-fly param changes for SVC Encoder
  */
+void CWelsH264SVCEncoder::OnTheFlyBitrateModif (int bitrate){
+	m_pEncContext->pSvcParam->sSpatialLayers[0].iSpatialBitrate = bitrate;
+}
+
  void CWelsH264SVCEncoder::OnTheFlyParamModifUP (){
 
 	m_pEncContext->pSvcParam->sSpatialLayers[0].iSpatialBitrate *= 4;

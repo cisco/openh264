@@ -274,6 +274,7 @@ class ISVCEncoder {
   /**
    * @brief	Modify the bitrate on the fly
    */
+  virtual void EXTAPI OnTheFlyBitrateModif (int bitrate) = 0;
   virtual void EXTAPI OnTheFlyParamModifUP () = 0;
   virtual void EXTAPI OnTheFlyParamModifDOWN () = 0;
   virtual void print () = 0;

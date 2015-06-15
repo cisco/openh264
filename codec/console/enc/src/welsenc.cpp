@@ -309,7 +309,7 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
       } else if (strTag[0].compare ("EnableDenoise") == 0) {
         pSvcParam.bEnableDenoise = atoi (strTag[1].c_str()) ? true : false;
       }
-      /* MDC Parameters */
+      // MDC Parameters //
       else if (strTag[0].compare ("MDCType") == 0) {
           pSvcParam.MDCType = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("MDCTotalDesNum") == 0) {
@@ -320,16 +320,17 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
           pSvcParam.MDCFrameChangeRate = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("MDCSliceArg") == 0) {
           pSvcParam.MDCSliceArg = atoi (strTag[1].c_str());
-      } else if (strTag[0].compare ("MDBitreate1") == 0) {
-          pSvcParam.MDBitrate[0] = atoi (strTag[1].c_str());
-      } else if (strTag[0].compare ("MDBitreate2") == 0) {
-          pSvcParam.MDBitrate[1] = atoi (strTag[1].c_str());
-      } else if (strTag[0].compare ("MDBitreate3") == 0) {
-          pSvcParam.MDBitrate[2] = atoi (strTag[1].c_str());
-      } else if (strTag[0].compare ("MDBitreate4") == 0) {
-          pSvcParam.MDBitrate[3] = atoi (strTag[1].c_str());
-      } else if (strTag[0].compare ("MDBitreate5") == 0) {
-          pSvcParam.MDBitrate[4] = atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("MDBitrate1") == 0) {
+          pSvcParam.MDBitrate[0] = atoi (strTag[1].c_str()) * 1000;
+          printf("MDCBitrate is %d\n ", pSvcParam.MDBitrate[0]);
+      } else if (strTag[0].compare ("MDBitrate2") == 0) {
+          pSvcParam.MDBitrate[1] = atoi (strTag[1].c_str()) * 1000;
+      } else if (strTag[0].compare ("MDBitrate3") == 0) {
+          pSvcParam.MDBitrate[2] = atoi (strTag[1].c_str()) * 1000;
+      } else if (strTag[0].compare ("MDBitrate4") == 0) {
+          pSvcParam.MDBitrate[3] = atoi (strTag[1].c_str()) * 1000;
+      } else if (strTag[0].compare ("MDBitrate5") == 0) {
+          pSvcParam.MDBitrate[4] = atoi (strTag[1].c_str()) * 1000;
       }
       // END MD Parameters
       else if (strTag[0].compare ("EnableSceneChangeDetection") == 0) {
@@ -774,6 +775,7 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
       goto INSIDE_MEM_FREE;
     }
     iRet = ParseConfig (cRdCfg, pSrcPic, sSvcParam, fs);
+
     printf("TargetBitrate: %d\n", sSvcParam.iTargetBitrate);
     printf("Spatial Bitrate = %d\n", (sSvcParam.sSpatialLayers[0]).iSpatialBitrate);
     if (iRet) {
@@ -787,6 +789,7 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
     iRet = 1;
     goto INSIDE_MEM_FREE;
   }
+
   pPtrEnc->SetOption (ENCODER_OPTION_TRACE_LEVEL, &g_LevelSetting);
   //finish reading the configurations
   iSourceWidth = pSrcPic->iPicWidth;
@@ -895,19 +898,24 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
 	}*/
 
   while (iFrameIdx < iTotalFrameMax && (((int32_t)fs.uiFrameToBeCoded <= 0)
-                                        || (iFrameIdx < (int32_t)fs.uiFrameToBeCoded))) {
+		  || (iFrameIdx < (int32_t)fs.uiFrameToBeCoded))) {
 
-	if (cnt % 10  == 0 && flipou == 1){
-		pPtrEnc->OnTheFlyParamModifUP();
-		flipou = 0;
-	}
-	else if (cnt % 10  == 0 && flipou == 0 && cnt >= 121){
-		pPtrEnc->OnTheFlyParamModifDOWN();
-		flipou = 1;
-	}
-	cnt++;
-	if (cnt % 25 == 0)
-		pPtrEnc->print();
+
+	  if (sSvcParam.MDCType == 1){
+		  if (cnt % sSvcParam.MDCFrameChangeRate == 0 && flipou == 1){
+			  pPtrEnc->OnTheFlyBitrateModif(sSvcParam.MDBitrate[0]);
+			  //pPtrEnc->OnTheFlyParamModifUP();
+			  flipou = 0;
+		  }
+		  else if (cnt % sSvcParam.MDCFrameChangeRate == 0 && flipou == 0){
+			  pPtrEnc->OnTheFlyBitrateModif(sSvcParam.MDBitrate[1]);
+			  //pPtrEnc->OnTheFlyParamModifDOWN();
+			  flipou = 1;
+		  }
+	  }
+	  cnt++;
+	  if (cnt % 25 == 0)
+		  pPtrEnc->print();
 
 #ifdef ONLY_ENC_FRAMES_NUM
     // Only encoded some limited frames here
