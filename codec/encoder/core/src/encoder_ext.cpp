@@ -2395,22 +2395,18 @@ int32_t GetMultipleThreadIdc (SLogContext* pLogCtx, SWelsSvcCodingParam* pCoding
   iCacheLineSize = 16; // 16 bytes aligned in default
 #endif//X86_ASM
 
-#if defined(DYNAMIC_DETECT_CPU_CORES)
   if (pCodingParam->iMultipleThreadIdc > 0)
     uiCpuCores = pCodingParam->iMultipleThreadIdc;
   else {
     if (uiCpuCores ==
-        0) // cpuid not supported or doesn't expose the number of cores, use high level system API as followed to detect number of pysical/logic processor
+        0) { // cpuid not supported or doesn't expose the number of cores, use high level system API as followed to detect number of pysical/logic processor
       uiCpuCores = DynamicDetectCpuCores();
-    // So far so many cpu cores up to MAX_THREADS_NUM mean for server platforms,
+    }// So far so many cpu cores up to MAX_THREADS_NUM mean for server platforms,
     // for client application here it is constrained by maximal to MAX_THREADS_NUM
-    if (uiCpuCores > MAX_THREADS_NUM) // MAX_THREADS_NUM
-      uiCpuCores = MAX_THREADS_NUM; // MAX_THREADS_NUM
-    else if (uiCpuCores < 1) // just for safe
-      uiCpuCores = 1;
+    if ((pCodingParam->iUsageType == CAMERA_VIDEO_REAL_TIME) || (pCodingParam->iUsageType == SCREEN_CONTENT_REAL_TIME)) {
+      uiCpuCores -= 1; // minus 1 for REAL_TIME video, for the processing needed by other threads
+    }
   }
-#endif//DYNAMIC_DETECT_CPU_CORES
-
   uiCpuCores = WELS_CLIP3 (uiCpuCores, 1, MAX_THREADS_NUM);
 
   if (InitSliceSettings (pLogCtx, pCodingParam, uiCpuCores, &iSliceNum)) {
