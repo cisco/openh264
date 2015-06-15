@@ -472,7 +472,7 @@ typedef struct TagEncParamExt {
   /* Multiple Description Encoding param extension */
   int		MDCType; // #1 <=> GOP #2 <=> FRAME #3 <=> Slice #4 <=> Forced
   int 		MDCTotalDesNum; // #Value
-  int		MDCDesNum; //  #0,1,2,3...
+  int		MDCDesNum; // #0,1,2,3...
   int 		MDCFrameChangeRate; // #Value
   int 		MDCSliceArg; // #Value
   int 		MDCBitrate[MAX_DESCRIPTION_NUMBER]; //#Value
