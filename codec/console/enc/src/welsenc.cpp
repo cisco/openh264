@@ -883,20 +883,6 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
   int cnt;
   cnt = 0;
 
-//  (sSvcParam.sSpatialLayers[0]).iSpatialBitrate = (sSvcParam.sSpatialLayers[0]).iSpatialBitrate/2;
-//  SSpatialLayerConfig* pDLayer;
-//  pDLayer = &sSvcParam.sSpatialLayers[0];
-//  pDLayer->iSpatialBitrate /= 2;
-
-  /*sSvcParam.iTargetBitrate = sSvcParam.iTargetBitrate/4;
-	sSvcParam.iMaxBitrate = sSvcParam.iMaxBitrate/4;
-	(sSvcParam.sSpatialLayers[0]).iSpatialBitrate = (sSvcParam.sSpatialLayers[0]).iSpatialBitrate/4;
-	if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) {	// SVC encoder initialization
-		fprintf (stderr, "SVC encoder Initialize failed\n");
-		iRet = 1;
-		goto INSIDE_MEM_FREE;
-	}*/
-
   while (iFrameIdx < iTotalFrameMax && (((int32_t)fs.uiFrameToBeCoded <= 0)
 		  || (iFrameIdx < (int32_t)fs.uiFrameToBeCoded))) {
 
@@ -904,18 +890,16 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
 	  if (sSvcParam.MDCType == 1){
 		  if (cnt % sSvcParam.MDCFrameChangeRate == 0 && flipou == 1){
 			  pPtrEnc->OnTheFlyBitrateModif(sSvcParam.MDBitrate[0]);
-			  //pPtrEnc->OnTheFlyParamModifUP();
 			  flipou = 0;
 		  }
 		  else if (cnt % sSvcParam.MDCFrameChangeRate == 0 && flipou == 0){
 			  pPtrEnc->OnTheFlyBitrateModif(sSvcParam.MDBitrate[1]);
-			  //pPtrEnc->OnTheFlyParamModifDOWN();
 			  flipou = 1;
 		  }
 	  }
-	  cnt++;
-	  if (cnt % 25 == 0)
+	  if (cnt % 10 == 0)
 		  pPtrEnc->print();
+	  cnt++;
 
 #ifdef ONLY_ENC_FRAMES_NUM
     // Only encoded some limited frames here
