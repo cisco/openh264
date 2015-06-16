@@ -44,7 +44,7 @@
 
 namespace WelsDec {
 
-void FreePicture (PPicture pPic);
+void FreePicture (PPicture pPic, CMemoryAlign* pMa);
 
 
 ///////////////////////////////////Recycled queue management for pictures///////////////////////////////////
@@ -68,8 +68,9 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
   int32_t iPicChromaHeight  = 0;
   int32_t iLumaSize         = 0;
   int32_t iChromaSize       = 0;
+  CMemoryAlign* pMa = pCtx->pMemAlign;
 
-  pPic = (PPicture) WelsMallocz (sizeof (SPicture), "PPicture");
+  pPic = (PPicture) pMa->WelsMallocz (sizeof (SPicture), "PPicture");
   WELS_VERIFY_RETURN_IF (NULL, NULL == pPic);
 
   memset (pPic, 0, sizeof (SPicture));
@@ -88,9 +89,9 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
     pPic->iLinesize[0] = iPicWidth;
     pPic->iLinesize[1] = pPic->iLinesize[2] = iPicChromaWidth;
   } else {
-    pPic->pBuffer[0] = static_cast<uint8_t*> (WelsMallocz (iLumaSize /* luma */
-                        + (iChromaSize << 1) /* Cb,Cr */, "_pic->buffer[0]"));
-    WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pBuffer[0], FreePicture (pPic));
+    pPic->pBuffer[0] = static_cast<uint8_t*> (pMa->WelsMallocz (iLumaSize /* luma */
+                       + (iChromaSize << 1) /* Cb,Cr */, "_pic->buffer[0]"));
+    WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pBuffer[0], FreePicture (pPic, pMa));
 
     memset (pPic->pBuffer[0], 128, (iLumaSize + (iChromaSize << 1)));
     pPic->iLinesize[0] = iPicWidth;
@@ -110,14 +111,14 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
   return pPic;
 }
 
-void FreePicture (PPicture pPic) {
+void FreePicture (PPicture pPic, CMemoryAlign* pMa) {
   if (NULL != pPic) {
 
     if (pPic->pBuffer[0]) {
-      WelsFree (pPic->pBuffer[0], "pPic->pBuffer[0]");
+      pMa->WelsFree (pPic->pBuffer[0], "pPic->pBuffer[0]");
     }
 
-    WelsFree (pPic, "pPic");
+    pMa->WelsFree (pPic, "pPic");
 
     pPic = NULL;
   }

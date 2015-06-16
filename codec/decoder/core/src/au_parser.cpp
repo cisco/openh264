@@ -264,7 +264,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
   case NAL_UNIT_CODED_SLICE_IDR: {
     PAccessUnit pCurAu = NULL;
     uint32_t uiAvailNalNum;
-    pCurNal = MemGetNextNal (&pCtx->pAccessUnitList);
+    pCurNal = MemGetNextNal (&pCtx->pAccessUnitList, pCtx->pMemAlign);
     if (NULL == pCurNal) {
       WelsLog (pLogCtx, WELS_LOG_ERROR, "MemGetNextNal() fail due out of memory.");
       pCtx->iErrorCode |= dsOutOfMemory;
@@ -1138,7 +1138,9 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
 
       //re-write subset SPS to SPS
       SBitStringAux sSubsetSpsBs;
-      uint8_t* pBsBuf = static_cast<uint8_t*> (WelsMallocz (SPS_PPS_BS_SIZE + 4,
+      CMemoryAlign* pMa = pCtx->pMemAlign;
+
+      uint8_t* pBsBuf = static_cast<uint8_t*> (pMa->WelsMallocz (SPS_PPS_BS_SIZE + 4,
                         "Temp buffer for parse only usage.")); //to reserve 4 bytes for UVLC writing buffer
       if (NULL == pBsBuf) {
         pCtx->iErrorCode |= dsOutOfMemory;
@@ -1188,7 +1190,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
       RBSP2EBSP (pSpsBs->pSpsBsBuf + 5, sSubsetSpsBs.pStartBuf, iRbspSize);
       pSpsBs->uiSpsBsLen = (uint16_t) (sSubsetSpsBs.pCurBuf - sSubsetSpsBs.pStartBuf + 5);
       if (pBsBuf) {
-        WelsFree (pBsBuf, "pBsBuf for parse only usage");
+        pMa->WelsFree (pBsBuf, "pBsBuf for parse only usage");
       }
     }
   }
@@ -1572,7 +1574,7 @@ int32_t ResetFmoList (PWelsDecoderContext pCtx) {
   int32_t iCountNum = 0;
   if (NULL != pCtx) {
     // Fixed memory leak due to PPS_ID might not be continuous sometimes, 1/5/2010
-    UninitFmoList (&pCtx->sFmoList[0], MAX_PPS_COUNT, pCtx->iActiveFmoNum);
+    UninitFmoList (&pCtx->sFmoList[0], MAX_PPS_COUNT, pCtx->iActiveFmoNum, pCtx->pMemAlign);
     iCountNum = pCtx->iActiveFmoNum;
     pCtx->iActiveFmoNum = 0;
   }

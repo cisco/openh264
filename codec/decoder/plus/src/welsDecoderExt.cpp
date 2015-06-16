@@ -219,10 +219,18 @@ void CWelsDecoder::UninitDecoder (void) {
   if (NULL == m_pDecContext)
     return;
 
-  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::uninit_decoder(), openh264 codec version = %s.",
+  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::UninitDecoder(), openh264 codec version = %s.",
            VERSION_NUMBER);
 
   WelsEndDecoder (m_pDecContext);
+
+  if (m_pDecContext->pMemAlign != NULL) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsDecoder::UninitDecoder(), verify memory usage (%d bytes) after free..",
+             m_pDecContext->pMemAlign->WelsGetMemoryUsage());
+    delete m_pDecContext->pMemAlign;
+    m_pDecContext->pMemAlign = NULL;
+  }
 
   if (NULL != m_pDecContext) {
     WelsFree (m_pDecContext, "m_pDecContext");
@@ -243,6 +251,9 @@ int32_t CWelsDecoder::InitDecoder (const bool bParseOnly) {
   m_pDecContext = (PWelsDecoderContext)WelsMallocz (sizeof (SWelsDecoderContext), "m_pDecContext");
   if (NULL == m_pDecContext)
     return cmMallocMemeError;
+  int32_t iCacheLineSize = 16;   // on chip cache line size in byte
+  m_pDecContext->pMemAlign = new CMemoryAlign (iCacheLineSize);
+  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == m_pDecContext->pMemAlign), UninitDecoder())
 
   return WelsInitDecoder (m_pDecContext, bParseOnly, &m_pWelsTrace->m_sLogCtx);
 }
@@ -409,10 +420,10 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
   //ppTmpDst[2] = ppDst[2];
   iRet |= DecodeFrame2 (NULL, 0, ppDst, pDstInfo);
   //if ((pDstInfo->iBufferStatus == 0) && (sTmpBufferInfo.iBufferStatus == 1)) {
-    //memcpy (pDstInfo, &sTmpBufferInfo, sizeof (SBufferInfo));
-    //ppDst[0] = ppTmpDst[0];
-    //ppDst[1] = ppTmpDst[1];
-    //ppDst[2] = ppTmpDst[2];
+  //memcpy (pDstInfo, &sTmpBufferInfo, sizeof (SBufferInfo));
+  //ppDst[0] = ppTmpDst[0];
+  //ppDst[1] = ppTmpDst[1];
+  //ppDst[2] = ppTmpDst[2];
   //}
 
   return (DECODING_STATE) iRet;

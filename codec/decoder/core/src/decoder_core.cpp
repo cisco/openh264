@@ -456,27 +456,29 @@ int32_t InitBsBuffer (PWelsDecoderContext pCtx) {
   if (pCtx == NULL)
     return ERR_INFO_INVALID_PTR;
 
+  CMemoryAlign* pMa = pCtx->pMemAlign;
+
   pCtx->iMaxBsBufferSizeInByte = MIN_ACCESS_UNIT_CAPACITY * MAX_BUFFERED_NUM;
-  if ((pCtx->sRawData.pHead = static_cast<uint8_t*> (WelsMallocz (pCtx->iMaxBsBufferSizeInByte,
+  if ((pCtx->sRawData.pHead = static_cast<uint8_t*> (pMa->WelsMallocz (pCtx->iMaxBsBufferSizeInByte,
                               "pCtx->sRawData.pHead"))) == NULL) {
     return ERR_INFO_OUT_OF_MEMORY;
   }
   pCtx->sRawData.pStartPos = pCtx->sRawData.pCurPos = pCtx->sRawData.pHead;
   pCtx->sRawData.pEnd = pCtx->sRawData.pHead + pCtx->iMaxBsBufferSizeInByte;
   if (pCtx->bParseOnly) {
-    pCtx->pParserBsInfo = static_cast<SParserBsInfo*> (WelsMallocz (sizeof (SParserBsInfo), "pCtx->pParserBsInfo"));
+    pCtx->pParserBsInfo = static_cast<SParserBsInfo*> (pMa->WelsMallocz (sizeof (SParserBsInfo), "pCtx->pParserBsInfo"));
     if (pCtx->pParserBsInfo == NULL) {
       return ERR_INFO_OUT_OF_MEMORY;
     }
     memset (pCtx->pParserBsInfo, 0, sizeof (SParserBsInfo));
-    pCtx->pParserBsInfo->pDstBuff = static_cast<uint8_t*> (WelsMallocz (MAX_ACCESS_UNIT_CAPACITY * sizeof (uint8_t),
+    pCtx->pParserBsInfo->pDstBuff = static_cast<uint8_t*> (pMa->WelsMallocz (MAX_ACCESS_UNIT_CAPACITY * sizeof (uint8_t),
                                     "pCtx->pParserBsInfo->pDstBuff"));
     if (pCtx->pParserBsInfo->pDstBuff == NULL) {
       return ERR_INFO_OUT_OF_MEMORY;
     }
     memset (pCtx->pParserBsInfo->pDstBuff, 0, MAX_ACCESS_UNIT_CAPACITY * sizeof (uint8_t));
 
-    if ((pCtx->sSavedData.pHead = static_cast<uint8_t*> (WelsMallocz (pCtx->iMaxBsBufferSizeInByte,
+    if ((pCtx->sSavedData.pHead = static_cast<uint8_t*> (pMa->WelsMallocz (pCtx->iMaxBsBufferSizeInByte,
                                   "pCtx->sSavedData.pHead"))) == NULL) {
       return ERR_INFO_OUT_OF_MEMORY;
     }
@@ -492,7 +494,8 @@ int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int kiSrcLen) {
   int32_t iExpandStepShift = 1;
   int32_t iNewBuffLen = WELS_MAX ((kiSrcLen * MAX_BUFFERED_NUM), (pCtx->iMaxBsBufferSizeInByte << iExpandStepShift));
   //allocate new bs buffer
-  uint8_t* pNewBsBuff = static_cast<uint8_t*> (WelsMallocz (iNewBuffLen, "pCtx->sRawData.pHead"));
+  CMemoryAlign* pMa = pCtx->pMemAlign;
+  uint8_t* pNewBsBuff = static_cast<uint8_t*> (pMa->WelsMallocz (iNewBuffLen, "pCtx->sRawData.pHead"));
   if (pNewBsBuff == NULL)
     return ERR_INFO_OUT_OF_MEMORY;
 
@@ -510,7 +513,7 @@ int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int kiSrcLen) {
   pCtx->sRawData.pStartPos = pNewBsBuff + (pCtx->sRawData.pStartPos - pCtx->sRawData.pHead);
   pCtx->sRawData.pCurPos = pNewBsBuff + (pCtx->sRawData.pCurPos - pCtx->sRawData.pHead);
   pCtx->sRawData.pEnd = pNewBsBuff + iNewBuffLen;
-  WelsFree (pCtx->sRawData.pHead, "pCtx->sRawData.pHead");
+  pMa->WelsFree (pCtx->sRawData.pHead, "pCtx->sRawData.pHead");
   pCtx->sRawData.pHead = pNewBsBuff;
   return ERR_NONE;
 }
@@ -545,7 +548,7 @@ int32_t WelsInitMemory (PWelsDecoderContext pCtx) {
     return ERR_INFO_INVALID_PTR;
   }
 
-  if (MemInitNalList (&pCtx->pAccessUnitList, MAX_NAL_UNIT_NUM_IN_AU) != 0)
+  if (MemInitNalList (&pCtx->pAccessUnitList, MAX_NAL_UNIT_NUM_IN_AU, pCtx->pMemAlign) != 0)
     return ERR_INFO_OUT_OF_MEMORY;
 
   if (InitBsBuffer (pCtx) != 0)
@@ -566,16 +569,18 @@ void WelsFreeMemory (PWelsDecoderContext pCtx) {
   if (pCtx == NULL)
     return;
 
+  CMemoryAlign* pMa = pCtx->pMemAlign;
+
   if (NULL != pCtx->pParam) {
-    WelsFree (pCtx->pParam, "pCtx->pParam");
+    pMa->WelsFree (pCtx->pParam, "pCtx->pParam");
 
     pCtx->pParam = NULL;
   }
 
-  MemFreeNalList (&pCtx->pAccessUnitList);
+  MemFreeNalList (&pCtx->pAccessUnitList, pMa);
 
   if (pCtx->sRawData.pHead) {
-    WelsFree (pCtx->sRawData.pHead, "pCtx->sRawData->pHead");
+    pMa->WelsFree (pCtx->sRawData.pHead, "pCtx->sRawData->pHead");
   }
   pCtx->sRawData.pHead                = NULL;
   pCtx->sRawData.pEnd                 = NULL;
@@ -583,7 +588,7 @@ void WelsFreeMemory (PWelsDecoderContext pCtx) {
   pCtx->sRawData.pCurPos              = NULL;
   if (pCtx->bParseOnly) {
     if (pCtx->sSavedData.pHead) {
-      WelsFree (pCtx->sSavedData.pHead, "pCtx->sSavedData->pHead");
+      pMa->WelsFree (pCtx->sSavedData.pHead, "pCtx->sSavedData->pHead");
     }
     pCtx->sSavedData.pHead                = NULL;
     pCtx->sSavedData.pEnd                 = NULL;
@@ -591,10 +596,10 @@ void WelsFreeMemory (PWelsDecoderContext pCtx) {
     pCtx->sSavedData.pCurPos              = NULL;
     if (pCtx->pParserBsInfo) {
       if (pCtx->pParserBsInfo->pDstBuff) {
-        WelsFree (pCtx->pParserBsInfo->pDstBuff, "pCtx->pParserBsInfo->pDstBuff");
+        pMa->WelsFree (pCtx->pParserBsInfo->pDstBuff, "pCtx->pParserBsInfo->pDstBuff");
         pCtx->pParserBsInfo->pDstBuff = NULL;
       }
-      WelsFree (pCtx->pParserBsInfo, "pCtx->pParserBsInfo");
+      pMa->WelsFree (pCtx->pParserBsInfo, "pCtx->pParserBsInfo");
       pCtx->pParserBsInfo = NULL;
     }
   }
@@ -640,7 +645,8 @@ void DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc) {
  *  Parse slice header of bitstream in avc for storing data structure
  */
 int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, const bool kbExtensionFlag) {
-  PNalUnit const kpCurNal               = pCtx->pAccessUnitList->pNalUnitsList[pCtx->pAccessUnitList->uiAvailUnitsNum - 1];
+  PNalUnit const kpCurNal               = pCtx->pAccessUnitList->pNalUnitsList[pCtx->pAccessUnitList->uiAvailUnitsNum -
+                                          1];
 
   PNalUnitHeaderExt pNalHeaderExt       = NULL;
   PSliceHeader pSliceHead               = NULL;
@@ -970,7 +976,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   }
 
   bSgChangeCycleInvolved = (pPps->uiNumSliceGroups > 1 && pPps->uiSliceGroupMapType >= 3
-                             && pPps->uiSliceGroupMapType <= 5);
+                            && pPps->uiSliceGroupMapType <= 5);
   if (kbExtensionFlag && bSgChangeCycleInvolved)
     bSgChangeCycleInvolved = (bSgChangeCycleInvolved && (uiQualityId == BASE_QUALITY_ID));
   if (bSgChangeCycleInvolved) {
@@ -1030,7 +1036,8 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
         pos.iRightOffset  = pSubsetSps->sSpsSvcExt.sSeqScaledRefLayer.iRightOffset;
         pos.iBottomOffset = pSubsetSps->sSpsSvcExt.sSeqScaledRefLayer.iBottomOffset * (2 - pSps->bFrameMbsOnlyFlag);
         //memcpy(&pSliceHeadExt->sScaledRefLayer, &pos, sizeof(SPosOffset));//confirmed_safe_unsafe_usage
-        pSliceHeadExt->iScaledRefLayerPicWidthInSampleLuma  = (pSliceHead->iMbWidth << 4) - (pos.iLeftOffset + pos.iRightOffset);
+        pSliceHeadExt->iScaledRefLayerPicWidthInSampleLuma  = (pSliceHead->iMbWidth << 4) -
+            (pos.iLeftOffset + pos.iRightOffset);
         pSliceHeadExt->iScaledRefLayerPicHeightInSampleLuma = (pSliceHead->iMbHeight << 4) -
             (pos.iTopOffset + pos.iBottomOffset) / (1 + pSliceHead->bFieldPicFlag);
       }
@@ -1218,68 +1225,75 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
       && kiMaxHeight <= pCtx->iPicHeightReq) // have same dimension memory, skipped
     return ERR_NONE;
 
+  CMemoryAlign* pMa = pCtx->pMemAlign;
 
   UninitialDqLayersContext (pCtx);
 
   do {
-    PDqLayer pDq = (PDqLayer)WelsMallocz (sizeof (SDqLayer), "PDqLayer");
+    PDqLayer pDq = (PDqLayer)pMa->WelsMallocz (sizeof (SDqLayer), "PDqLayer");
 
     if (pDq == NULL)
       return ERR_INFO_OUT_OF_MEMORY;
 
     memset (pDq, 0, sizeof (SDqLayer));
 
-    pCtx->sMb.pMbType[i] = (int16_t*)WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int16_t),
+    pCtx->sMb.pMbType[i] = (int16_t*)pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int16_t),
                            "pCtx->sMb.pMbType[]");
-    pCtx->sMb.pMv[i][0] = (int16_t (*)[16][2])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
+    pCtx->sMb.pMv[i][0] = (int16_t (*)[16][2])pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
                             int16_t) * MV_A * MB_BLOCK4x4_NUM, "pCtx->sMb.pMv[][]");
-    pCtx->sMb.pRefIndex[i][0] = (int8_t (*)[MB_BLOCK4x4_NUM])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
+    pCtx->sMb.pRefIndex[i][0] = (int8_t (*)[MB_BLOCK4x4_NUM])pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
                                 sizeof (
                                   int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pRefIndex[][]");
-    pCtx->sMb.pLumaQp[i] = (int8_t*)WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
+    pCtx->sMb.pLumaQp[i] = (int8_t*)pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
                            "pCtx->sMb.pLumaQp[]");
-    pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i] = (bool*)WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
+    pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i] = (bool*)pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
+        sizeof (
           bool),
         "pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[]");
-    pCtx->sMb.pTransformSize8x8Flag[i] = (bool*)WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (bool),
+    pCtx->sMb.pTransformSize8x8Flag[i] = (bool*)pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (bool),
                                          "pCtx->sMb.pTransformSize8x8Flag[]");
-    pCtx->sMb.pChromaQp[i] = (int8_t (*)[2])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t) * 2,
+    pCtx->sMb.pChromaQp[i] = (int8_t (*)[2])pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
+                               int8_t) * 2,
                              "pCtx->sMb.pChromaQp[]");
-    pCtx->sMb.pMvd[i][0] = (int16_t (*)[16][2])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
+    pCtx->sMb.pMvd[i][0] = (int16_t (*)[16][2])pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
                              int16_t) * MV_A * MB_BLOCK4x4_NUM, "pCtx->sMb.pMvd[][]");
-    pCtx->sMb.pCbfDc[i] = (uint16_t*)WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (uint16_t),
+    pCtx->sMb.pCbfDc[i] = (uint16_t*)pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (uint16_t),
                           "pCtx->sMb.pCbfDc[]");
-    pCtx->sMb.pNzc[i] = (int8_t (*)[24])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t) * 24,
+    pCtx->sMb.pNzc[i] = (int8_t (*)[24])pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t) * 24,
                         "pCtx->sMb.pNzc[]");
-    pCtx->sMb.pNzcRs[i] = (int8_t (*)[24])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t) * 24,
+    pCtx->sMb.pNzcRs[i] = (int8_t (*)[24])pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t) * 24,
                           "pCtx->sMb.pNzcRs[]");
-    pCtx->sMb.pScaledTCoeff[i] = (int16_t (*)[MB_COEFF_LIST_SIZE])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
+    pCtx->sMb.pScaledTCoeff[i] = (int16_t (*)[MB_COEFF_LIST_SIZE])pMa->WelsMallocz (pCtx->sMb.iMbWidth *
+                                 pCtx->sMb.iMbHeight *
                                  sizeof (int16_t) * MB_COEFF_LIST_SIZE, "pCtx->sMb.pScaledTCoeff[]");
-    pCtx->sMb.pIntraPredMode[i] = (int8_t (*)[8])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
+    pCtx->sMb.pIntraPredMode[i] = (int8_t (*)[8])pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
                                     int8_t) * 8,
                                   "pCtx->sMb.pIntraPredMode[]");
-    pCtx->sMb.pIntra4x4FinalMode[i] = (int8_t (*)[MB_BLOCK4x4_NUM])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
+    pCtx->sMb.pIntra4x4FinalMode[i] = (int8_t (*)[MB_BLOCK4x4_NUM])pMa->WelsMallocz (pCtx->sMb.iMbWidth *
+                                      pCtx->sMb.iMbHeight *
                                       sizeof (int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pIntra4x4FinalMode[]");
-    pCtx->sMb.pIntraNxNAvailFlag[i] = (uint8_t (*))WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
+    pCtx->sMb.pIntraNxNAvailFlag[i] = (uint8_t (*))pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
+                                        int8_t),
                                       "pCtx->sMb.pIntraNxNAvailFlag");
-    pCtx->sMb.pChromaPredMode[i] = (int8_t*)WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
+    pCtx->sMb.pChromaPredMode[i] = (int8_t*)pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
                                    "pCtx->sMb.pChromaPredMode[]");
-    pCtx->sMb.pCbp[i] = (int8_t*)WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
+    pCtx->sMb.pCbp[i] = (int8_t*)pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
                         "pCtx->sMb.pCbp[]");
-    pCtx->sMb.pSubMbType[i] = (int8_t (*)[MB_PARTITION_SIZE])WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
+    pCtx->sMb.pSubMbType[i] = (int8_t (*)[MB_PARTITION_SIZE])pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
                               sizeof (
                                 int8_t) * MB_PARTITION_SIZE, "pCtx->sMb.pSubMbType[]");
-    pCtx->sMb.pSliceIdc[i] = (int32_t*) WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int32_t),
+    pCtx->sMb.pSliceIdc[i] = (int32_t*) pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int32_t),
                              "pCtx->sMb.pSliceIdc[]"); // using int32_t for slice_idc, 4/21/2010
-    pCtx->sMb.pResidualPredFlag[i] = (int8_t*) WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
+    pCtx->sMb.pResidualPredFlag[i] = (int8_t*) pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
                                      "pCtx->sMb.pResidualPredFlag[]");
-    //pCtx->sMb.pMotionPredFlag[i] = (uint8_t *) WelsMallocz(pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(uint8_t), "pCtx->sMb.pMotionPredFlag[]");
-    pCtx->sMb.pInterPredictionDoneFlag[i] = (int8_t*) WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
+    //pCtx->sMb.pMotionPredFlag[i] = (uint8_t *) pMa->WelsMallocz(pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(uint8_t), "pCtx->sMb.pMotionPredFlag[]");
+    pCtx->sMb.pInterPredictionDoneFlag[i] = (int8_t*) pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
         int8_t), "pCtx->sMb.pInterPredictionDoneFlag[]");
 
-    pCtx->sMb.pMbCorrectlyDecodedFlag[i] = (bool*) WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (bool),
+    pCtx->sMb.pMbCorrectlyDecodedFlag[i] = (bool*) pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
+        bool),
                                            "pCtx->sMb.pMbCorrectlyDecodedFlag[]");
-    pCtx->sMb.pMbRefConcealedFlag[i] = (bool*) WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (bool),
+    pCtx->sMb.pMbRefConcealedFlag[i] = (bool*) pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (bool),
                                        "pCtx->pMbRefConcealedFlag[]");
 
     // check memory block valid due above allocated..
@@ -1322,6 +1336,7 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
 
 void UninitialDqLayersContext (PWelsDecoderContext pCtx) {
   int32_t i = 0;
+  CMemoryAlign* pMa = pCtx->pMemAlign;
 
   do {
     PDqLayer pDq = pCtx->pDqLayersList[i];
@@ -1331,146 +1346,146 @@ void UninitialDqLayersContext (PWelsDecoderContext pCtx) {
     }
 
     if (pCtx->sMb.pMbType[i]) {
-      WelsFree (pCtx->sMb.pMbType[i], "pCtx->sMb.pMbType[]");
+      pMa->WelsFree (pCtx->sMb.pMbType[i], "pCtx->sMb.pMbType[]");
 
       pCtx->sMb.pMbType[i] = NULL;
     }
 
     if (pCtx->sMb.pMv[i][0]) {
-      WelsFree (pCtx->sMb.pMv[i][0], "pCtx->sMb.pMv[][]");
+      pMa->WelsFree (pCtx->sMb.pMv[i][0], "pCtx->sMb.pMv[][]");
 
       pCtx->sMb.pMv[i][0] = NULL;
     }
 
     if (pCtx->sMb.pRefIndex[i][0]) {
-      WelsFree (pCtx->sMb.pRefIndex[i][0], "pCtx->sMb.pRefIndex[][]");
+      pMa->WelsFree (pCtx->sMb.pRefIndex[i][0], "pCtx->sMb.pRefIndex[][]");
 
       pCtx->sMb.pRefIndex[i][0] = NULL;
     }
 
     if (pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i]) {
-      WelsFree (pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i], "pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[]");
+      pMa->WelsFree (pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i], "pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[]");
 
       pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i] = NULL;
     }
 
     if (pCtx->sMb.pTransformSize8x8Flag[i]) {
-      WelsFree (pCtx->sMb.pTransformSize8x8Flag[i], "pCtx->sMb.pTransformSize8x8Flag[]");
+      pMa->WelsFree (pCtx->sMb.pTransformSize8x8Flag[i], "pCtx->sMb.pTransformSize8x8Flag[]");
 
       pCtx->sMb.pTransformSize8x8Flag[i] = NULL;
     }
 
     if (pCtx->sMb.pLumaQp[i]) {
-      WelsFree (pCtx->sMb.pLumaQp[i], "pCtx->sMb.pLumaQp[]");
+      pMa->WelsFree (pCtx->sMb.pLumaQp[i], "pCtx->sMb.pLumaQp[]");
 
       pCtx->sMb.pLumaQp[i] = NULL;
     }
 
     if (pCtx->sMb.pChromaQp[i]) {
-      WelsFree (pCtx->sMb.pChromaQp[i], "pCtx->sMb.pChromaQp[]");
+      pMa->WelsFree (pCtx->sMb.pChromaQp[i], "pCtx->sMb.pChromaQp[]");
 
       pCtx->sMb.pChromaQp[i] = NULL;
     }
 
     if (pCtx->sMb.pMvd[i][0]) {
-      WelsFree (pCtx->sMb.pMvd[i][0], "pCtx->sMb.pMvd[][]");
+      pMa->WelsFree (pCtx->sMb.pMvd[i][0], "pCtx->sMb.pMvd[][]");
       pCtx->sMb.pMvd[i][0] = NULL;
     }
 
     if (pCtx->sMb.pCbfDc[i]) {
-      WelsFree (pCtx->sMb.pCbfDc[i], "pCtx->sMb.pCbfDc[]");
+      pMa->WelsFree (pCtx->sMb.pCbfDc[i], "pCtx->sMb.pCbfDc[]");
       pCtx->sMb.pCbfDc[i] = NULL;
     }
 
     if (pCtx->sMb.pNzc[i]) {
-      WelsFree (pCtx->sMb.pNzc[i], "pCtx->sMb.pNzc[]");
+      pMa->WelsFree (pCtx->sMb.pNzc[i], "pCtx->sMb.pNzc[]");
 
       pCtx->sMb.pNzc[i] = NULL;
     }
 
     if (pCtx->sMb.pNzcRs[i]) {
-      WelsFree (pCtx->sMb.pNzcRs[i], "pCtx->sMb.pNzcRs[]");
+      pMa->WelsFree (pCtx->sMb.pNzcRs[i], "pCtx->sMb.pNzcRs[]");
 
       pCtx->sMb.pNzcRs[i] = NULL;
     }
 
     if (pCtx->sMb.pScaledTCoeff[i]) {
-      WelsFree (pCtx->sMb.pScaledTCoeff[i], "pCtx->sMb.pScaledTCoeff[]");
+      pMa->WelsFree (pCtx->sMb.pScaledTCoeff[i], "pCtx->sMb.pScaledTCoeff[]");
 
       pCtx->sMb.pScaledTCoeff[i] = NULL;
     }
 
     if (pCtx->sMb.pIntraPredMode[i]) {
-      WelsFree (pCtx->sMb.pIntraPredMode[i], "pCtx->sMb.pIntraPredMode[]");
+      pMa->WelsFree (pCtx->sMb.pIntraPredMode[i], "pCtx->sMb.pIntraPredMode[]");
 
       pCtx->sMb.pIntraPredMode[i] = NULL;
     }
 
     if (pCtx->sMb.pIntra4x4FinalMode[i]) {
-      WelsFree (pCtx->sMb.pIntra4x4FinalMode[i], "pCtx->sMb.pIntra4x4FinalMode[]");
+      pMa->WelsFree (pCtx->sMb.pIntra4x4FinalMode[i], "pCtx->sMb.pIntra4x4FinalMode[]");
 
       pCtx->sMb.pIntra4x4FinalMode[i] = NULL;
     }
 
     if (pCtx->sMb.pIntraNxNAvailFlag[i]) {
-      WelsFree (pCtx->sMb.pIntraNxNAvailFlag[i], "pCtx->sMb.pIntraNxNAvailFlag");
+      pMa->WelsFree (pCtx->sMb.pIntraNxNAvailFlag[i], "pCtx->sMb.pIntraNxNAvailFlag");
 
       pCtx->sMb.pIntraNxNAvailFlag[i] = NULL;
     }
 
     if (pCtx->sMb.pChromaPredMode[i]) {
-      WelsFree (pCtx->sMb.pChromaPredMode[i], "pCtx->sMb.pChromaPredMode[]");
+      pMa->WelsFree (pCtx->sMb.pChromaPredMode[i], "pCtx->sMb.pChromaPredMode[]");
 
       pCtx->sMb.pChromaPredMode[i] = NULL;
     }
 
     if (pCtx->sMb.pCbp[i]) {
-      WelsFree (pCtx->sMb.pCbp[i], "pCtx->sMb.pCbp[]");
+      pMa->WelsFree (pCtx->sMb.pCbp[i], "pCtx->sMb.pCbp[]");
 
       pCtx->sMb.pCbp[i] = NULL;
     }
 
     //      if (pCtx->sMb.pMotionPredFlag[i])
     //{
-    //  WelsFree( pCtx->sMb.pMotionPredFlag[i], "pCtx->sMb.pMotionPredFlag[]" );
+    //  pMa->WelsFree( pCtx->sMb.pMotionPredFlag[i], "pCtx->sMb.pMotionPredFlag[]" );
 
     //  pCtx->sMb.pMotionPredFlag[i] = NULL;
     //}
 
     if (pCtx->sMb.pSubMbType[i]) {
-      WelsFree (pCtx->sMb.pSubMbType[i], "pCtx->sMb.pSubMbType[]");
+      pMa->WelsFree (pCtx->sMb.pSubMbType[i], "pCtx->sMb.pSubMbType[]");
 
       pCtx->sMb.pSubMbType[i] = NULL;
     }
 
     if (pCtx->sMb.pSliceIdc[i]) {
-      WelsFree (pCtx->sMb.pSliceIdc[i], "pCtx->sMb.pSliceIdc[]");
+      pMa->WelsFree (pCtx->sMb.pSliceIdc[i], "pCtx->sMb.pSliceIdc[]");
 
       pCtx->sMb.pSliceIdc[i] = NULL;
     }
 
     if (pCtx->sMb.pResidualPredFlag[i]) {
-      WelsFree (pCtx->sMb.pResidualPredFlag[i], "pCtx->sMb.pResidualPredFlag[]");
+      pMa->WelsFree (pCtx->sMb.pResidualPredFlag[i], "pCtx->sMb.pResidualPredFlag[]");
 
       pCtx->sMb.pResidualPredFlag[i] = NULL;
     }
 
     if (pCtx->sMb.pInterPredictionDoneFlag[i]) {
-      WelsFree (pCtx->sMb.pInterPredictionDoneFlag[i], "pCtx->sMb.pInterPredictionDoneFlag[]");
+      pMa->WelsFree (pCtx->sMb.pInterPredictionDoneFlag[i], "pCtx->sMb.pInterPredictionDoneFlag[]");
 
       pCtx->sMb.pInterPredictionDoneFlag[i] = NULL;
     }
 
     if (pCtx->sMb.pMbCorrectlyDecodedFlag[i]) {
-      WelsFree (pCtx->sMb.pMbCorrectlyDecodedFlag[i], "pCtx->sMb.pMbCorrectlyDecodedFlag[]");
+      pMa->WelsFree (pCtx->sMb.pMbCorrectlyDecodedFlag[i], "pCtx->sMb.pMbCorrectlyDecodedFlag[]");
       pCtx->sMb.pMbCorrectlyDecodedFlag[i] = NULL;
     }
 
     if (pCtx->sMb.pMbRefConcealedFlag[i]) {
-      WelsFree (pCtx->sMb.pMbRefConcealedFlag[i], "pCtx->sMb.pMbRefConcealedFlag[]");
+      pMa->WelsFree (pCtx->sMb.pMbRefConcealedFlag[i], "pCtx->sMb.pMbRefConcealedFlag[]");
       pCtx->sMb.pMbRefConcealedFlag[i] = NULL;
     }
-    WelsFree (pDq, "pDq");
+    pMa->WelsFree (pDq, "pDq");
 
     pDq = NULL;
     pCtx->pDqLayersList[i] = NULL;
@@ -2184,7 +2199,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       pLayerInfo.pSubsetSps = pShExt->pSubsetSps;
 
       pCtx->pFmo = &pCtx->sFmoList[iPpsId];
-      if (!FmoParamUpdate (pCtx->pFmo, pLayerInfo.pSps, pLayerInfo.pPps, &pCtx->iActiveFmoNum)) {
+      if (!FmoParamUpdate (pCtx->pFmo, pLayerInfo.pSps, pLayerInfo.pPps, &pCtx->iActiveFmoNum, pCtx->pMemAlign)) {
         pCtx->iErrorCode |= dsBitstreamError;
         WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "DecodeCurrentAccessUnit(), FmoParamUpdate failed, eSliceType: %d.",
                  pSh->eSliceType);
@@ -2192,7 +2207,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       }
 
       bFreshSliceAvailable = (iCurrIdD != iLastIdD
-                               || iCurrIdQ != iLastIdQ);        // do not need condition of (first_mb == 0) due multiple slices might be disorder
+                              || iCurrIdQ != iLastIdQ);        // do not need condition of (first_mb == 0) due multiple slices might be disorder
 
       WelsDqLayerDecodeStart (pCtx, pNalCur, pLayerInfo.pSps, pLayerInfo.pPps);
 
