@@ -2403,9 +2403,6 @@ int32_t GetMultipleThreadIdc (SLogContext* pLogCtx, SWelsSvcCodingParam* pCoding
       uiCpuCores = DynamicDetectCpuCores();
     }// So far so many cpu cores up to MAX_THREADS_NUM mean for server platforms,
     // for client application here it is constrained by maximal to MAX_THREADS_NUM
-    if ((pCodingParam->iUsageType == CAMERA_VIDEO_REAL_TIME) || (pCodingParam->iUsageType == SCREEN_CONTENT_REAL_TIME)) {
-      uiCpuCores -= 1; // minus 1 for REAL_TIME video, for the processing needed by other threads
-    }
   }
   uiCpuCores = WELS_CLIP3 (uiCpuCores, 1, MAX_THREADS_NUM);
 
