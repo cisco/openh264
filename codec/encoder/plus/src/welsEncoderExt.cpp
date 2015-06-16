@@ -177,6 +177,34 @@ int CWelsH264SVCEncoder::GetDefaultParams (SEncParamExt* argv) {
   return cmResultSuccess;
 }
 
+
+/*
+ * On-the-fly param changes for SVC Encoder
+ */
+void CWelsH264SVCEncoder::OnTheFlyBitrateModif (int bitrate){
+	m_pEncContext->pSvcParam->sSpatialLayers[0].iSpatialBitrate = bitrate;
+}
+
+ void CWelsH264SVCEncoder::OnTheFlyParamModifUP (){
+
+	m_pEncContext->pSvcParam->sSpatialLayers[0].iSpatialBitrate *= 4;
+	//m_pEncContext->pSvcParam->iTargetBitrate *= 2;
+	//m_pEncContext->pSvcParam->iMaxBitrate *= 2;
+}
+
+void CWelsH264SVCEncoder::OnTheFlyParamModifDOWN (){
+
+	m_pEncContext->pSvcParam->sSpatialLayers[0].iSpatialBitrate *= 0.25;
+	//m_pEncContext->pSvcsParam->iTargetBitrate *= 0.5;
+	//m_pEncContext->pSvcParam->iMaxBitrate *= 0.5;
+
+}
+
+void CWelsH264SVCEncoder::print(){
+	printf("Bitrate iSpatialBitrate is %d\n", m_pEncContext->pSvcParam->sSpatialLayers[0].iSpatialBitrate);
+}
+
+
 /*
  *  SVC Encoder Initialization
  */
@@ -393,6 +421,7 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
 #ifdef DUMP_SRC_PICTURE
   DumpSrcPicture (pSrc);
 #endif // DUMP_SRC_PICTURE
+
   return kiEncoderReturn;
 }
 
@@ -416,7 +445,7 @@ int CWelsH264SVCEncoder ::EncodeFrameInternal (const SSourcePicture*  pSrcPic, S
   ///////////////////for test
 #ifdef OUTPUT_BIT_STREAM
   if (pBsInfo->eFrameType != videoFrameTypeInvalid && pBsInfo->eFrameType != videoFrameTypeSkip) {
-    SLayerBSInfo* pLayer = NULL;
+    SLayerBSInfo* pLayer = NULL;<<<<
     int32_t i = 0, j = 0, iCurLayerBits = 0, total_bits = 0;
 
     if (m_bSwitch) {

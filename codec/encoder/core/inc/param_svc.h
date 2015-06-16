@@ -184,6 +184,15 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       for (int32_t idx = 0; idx < kiLesserSliceNum; idx++)
         param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceMbNum[idx] = 960;
     }
+
+    /* MDC add-on */
+    param.MDCType = 0;
+    param.MDCTotalDesNum = 0;
+    param.MDCDesNum = 0;
+    param.MDCFrameChangeRate = 0;
+    param.MDCSliceArg = 0;
+    for(int i = 0; i < MAX_DESCRIPTION_NUMBER; i++)
+    	param.MDBitrate[i] = 0;
   }
 
   void FillDefault() {

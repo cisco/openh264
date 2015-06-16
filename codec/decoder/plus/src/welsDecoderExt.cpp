@@ -469,6 +469,10 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
   WelsDecodeBs (m_pDecContext, kpSrc, kiSrcLen, ppDst,
                 pDstInfo, NULL); //iErrorCode has been modified in this function
   m_pDecContext->bInstantDecFlag = false; //reset no-delay flag
+
+
+  // ------------------------------------------------------- //
+  // Checking the god behavior of decoding
   if (m_pDecContext->iErrorCode) {
     EWelsNalUnitType eNalType =
       NAL_UNIT_UNSPEC_0; //for NBR, IDR frames are expected to decode as followed if error decoding an IDR currently
@@ -537,8 +541,9 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
     return (DECODING_STATE) m_pDecContext->iErrorCode;
   }
-  // else Error free, the current codec works well
 
+  // --------------------------------------------- //
+  // else Error free, the current codec works well
   if (pDstInfo->iBufferStatus == 1) {
 
     m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;

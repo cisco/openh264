@@ -3776,6 +3776,17 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   pCtx->pCurDqLayer             = pCtx->ppDqLayerList[pSpatialIndexMap->iDid];
   pCtx->pCurDqLayer->pRefLayer  = NULL;
 
+
+
+
+
+
+
+
+
+
+  //// ---------------------------------------------------- ?? //
+  // WHILE LOOP ////////////////////
   while (iSpatialIdx < iSpatialNum) {
     const int32_t iDidIdx       = (pSpatialIndexMap + iSpatialIdx)->iDid;       // get iDid
     SSpatialLayerConfig* pParam = &pSvcParam->sSpatialLayers[iDidIdx];
@@ -3883,6 +3894,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     PrefetchReferencePicture (pCtx, eFrameType); // update reference picture for current pDq layer
 
     pCtx->pFuncList->pfRc.pfWelsRcPictureInit (pCtx, pSrcPic->uiTimeStamp);
+/* JO: Motion estimation and block detection*/
     PreprocessSliceCoding (pCtx); // MUST be called after pfWelsRcPictureInit() and WelsInitCurrentLayer()
 
     //TODO Complexity Calculation here for screen content
@@ -3901,7 +3913,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       }
 
       WelsLoadNal (pCtx->pOut, eNalType, eNalRefIdc);
-
+/* JO: Coding one slice here */
       pCtx->iEncoderError = WelsCodeOneSlice (pCtx, 0, eNalType);
       WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
 
@@ -3932,6 +3944,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     } else {
       //other multi-slice uiSliceMode
       int32_t iRet = 0;
+      printf("LALALA\n");
       // THREAD_FULLY_FIRE_MODE/THREAD_PICK_UP_MODE for any mode of non-SM_DYN_SLICE
       if ((SM_DYN_SLICE != pParam->sSliceCfg.uiSliceMode) && (pSvcParam->iMultipleThreadIdc > 1)) {
         iSliceCount = GetCurrentSliceNum (pCtx->pCurDqLayer->pSliceEncCtx);
@@ -4037,6 +4050,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
           iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, iSliceCount);
         }
       }
+
       // THREAD_FULLY_FIRE_MODE && SM_DYN_SLICE
       else if ((SM_DYN_SLICE == pParam->sSliceCfg.uiSliceMode) && (pSvcParam->iMultipleThreadIdc > 1)) {
         const int32_t kiPartitionCnt = pCtx->iActiveThreadsNum; //pSvcParam->iCountThreadsNum;

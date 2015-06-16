@@ -55,6 +55,7 @@
 #define SAVED_NALUNIT_NUM_TMP           ( (MAX_SPATIAL_LAYER_NUM*MAX_QUALITY_LAYER_NUM) + 1 + MAX_SPATIAL_LAYER_NUM )  ///< SPS/PPS + SEI/SSEI + PADDING_NAL
 #define MAX_SLICES_NUM_TMP              ( ( MAX_NAL_UNITS_IN_LAYER - SAVED_NALUNIT_NUM_TMP ) / 3 )
 
+#define MAX_DESCRIPTION_NUMBER			20 // Assume there won't be more than 20 descriptions per content
 
 #define AUTO_REF_PIC_COUNT  -1          ///< encoder selects the number of reference frame automatically
 #define UNSPECIFIED_BIT_RATE 0          ///< to do: add detail comment
@@ -467,6 +468,16 @@ typedef struct TagEncParamExt {
   bool    bEnableSceneChangeDetect;
 
   bool    bIsLosslessLink;            ///<  LTR advanced setting
+
+  /* Multiple Description Encoding param extension */
+  int		MDCType; // #1 <=> GOP #2 <=> FRAME #3 <=> Slice #4 <=> Forced
+  int 		MDCTotalDesNum; // #Value
+  int		MDCDesNum; // #0,1,2,3...
+  int 		MDCFrameChangeRate; // #Value
+  int 		MDCSliceArg; // #Value
+  int 		MDBitrate[MAX_DESCRIPTION_NUMBER]; //#Value
+
+
 } SEncParamExt;
 
 /**
