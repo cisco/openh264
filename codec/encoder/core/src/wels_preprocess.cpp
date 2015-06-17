@@ -252,12 +252,11 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
 
       AdaptiveQuantCalculation (pCtx->pVaa, pCurPic, pRefPic);
     }
-    WelsExchangeSpatialPictures (&m_pLastSpatialPicture[kiDidx][1], &m_pLastSpatialPicture[kiDidx][0]);
   }
   return 0;
 }
 
-int32_t CWelsPreProcess::GetCurPicPosition(const int32_t kiDidx) {
+int32_t CWelsPreProcess::GetCurPicPosition (const int32_t kiDidx) {
   return (m_uiSpatialLayersInTemporal[kiDidx] - 1);
 }
 
@@ -265,7 +264,10 @@ int32_t CWelsPreProcess::UpdateSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCodin
     const int8_t iCurTid, const int32_t kiDidx) {
   if (pCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME)
     return 0;
-  const int32_t kiCurPos = GetCurPicPosition(kiDidx);
+
+  WelsExchangeSpatialPictures (&m_pLastSpatialPicture[kiDidx][1], &m_pLastSpatialPicture[kiDidx][0]);
+
+  const int32_t kiCurPos = GetCurPicPosition (kiDidx);
   if (iCurTid < kiCurPos || pParam->iDecompStages == 0) {
     if ((iCurTid >= MAX_TEMPORAL_LEVEL) || (kiCurPos > MAX_TEMPORAL_LEVEL)) {
       InitLastSpatialPictures (pCtx);
@@ -278,7 +280,7 @@ int32_t CWelsPreProcess::UpdateSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCodin
       pCtx->bRefOfCurTidIsLtr[kiDidx][iCurTid] = false;
     }
     WelsExchangeSpatialPictures (&m_pSpatialPic[kiDidx][kiCurPos],
-                                   &m_pSpatialPic[kiDidx][iCurTid]);
+                                 &m_pSpatialPic[kiDidx][iCurTid]);
   }
   return 0;
 }
@@ -332,7 +334,8 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
     iShrinkWidth = pScaledPicture->iScaledWidth[iDependencyId];
     iShrinkHeight = pScaledPicture->iScaledHeight[iDependencyId];
   }
-  DownsamplePadding (pSrcPic, pDstPic, iSrcWidth, iSrcHeight, iShrinkWidth, iShrinkHeight, iTargetWidth, iTargetHeight, false);
+  DownsamplePadding (pSrcPic, pDstPic, iSrcWidth, iSrcHeight, iShrinkWidth, iShrinkHeight, iTargetWidth, iTargetHeight,
+                     false);
 
   if (pSvcParam->bEnableSceneChangeDetect && !pCtx->pVaa->bIdrPeriodFlag) {
     if (pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
@@ -387,7 +390,8 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
         pDstPic = m_pSpatialPic[iDependencyId][iPicturePos]; // small
         iShrinkWidth = pScaledPicture->iScaledWidth[iDependencyId];
         iShrinkHeight = pScaledPicture->iScaledHeight[iDependencyId];
-        DownsamplePadding (pSrcPic, pDstPic, iSrcWidth, iSrcHeight, iShrinkWidth, iShrinkHeight, iTargetWidth, iTargetHeight, true);
+        DownsamplePadding (pSrcPic, pDstPic, iSrcWidth, iSrcHeight, iShrinkWidth, iShrinkHeight, iTargetWidth, iTargetHeight,
+                           true);
 
         WelsUpdateSpatialIdxMap (pCtx, iActualSpatialLayerNum - 1, pDstPic, iDependencyId);
 
