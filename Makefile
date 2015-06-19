@@ -25,6 +25,7 @@ PREFIX=/usr/local
 SHARED=-shared
 OBJ=o
 DESTDIR=
+LIBDIR_NAME=lib
 SHAREDLIB_DIR=$(PREFIX)/lib
 PROJECT_NAME=openh264
 MODULE_NAME=gmpopenh264
@@ -253,12 +254,12 @@ install-headers:
 	install -m 644 $(SRC_PATH)/codec/api/svc/codec*.h $(DESTDIR)$(PREFIX)/include/wels
 
 install-static-lib: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) install-headers
-	mkdir -p $(DESTDIR)$(PREFIX)/lib
-	install -m 644 $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(DESTDIR)$(PREFIX)/lib
+	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)
+	install -m 644 $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)
 
 install-static: install-static-lib $(PROJECT_NAME)-static.pc
-	mkdir -p $(DESTDIR)$(PREFIX)/lib/pkgconfig
-	install -m 644 $(PROJECT_NAME)-static.pc $(DESTDIR)$(PREFIX)/lib/pkgconfig/$(PROJECT_NAME).pc
+	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)/pkgconfig
+	install -m 644 $(PROJECT_NAME)-static.pc $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)/pkgconfig/$(PROJECT_NAME).pc
 
 install-shared: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) install-headers $(PROJECT_NAME).pc
 	mkdir -p $(DESTDIR)$(SHAREDLIB_DIR)
@@ -266,10 +267,10 @@ install-shared: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) install-headers $
 	if [ "$(SHAREDLIBSUFFIXVER)" != "$(SHAREDLIBSUFFIX)" ]; then \
 		cp -a $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) $(DESTDIR)$(SHAREDLIB_DIR); \
 	fi
-	mkdir -p $(DESTDIR)$(PREFIX)/lib/pkgconfig
-	install -m 644 $(PROJECT_NAME).pc $(DESTDIR)$(PREFIX)/lib/pkgconfig
+	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)/pkgconfig
+	install -m 644 $(PROJECT_NAME).pc $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)/pkgconfig
 ifneq ($(EXTRA_LIBRARY),)
-	install -m 644 $(EXTRA_LIBRARY) $(DESTDIR)$(PREFIX)/lib
+	install -m 644 $(EXTRA_LIBRARY) $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)
 endif
 
 install: install-static-lib install-shared
