@@ -55,6 +55,7 @@
 #include "mb_cache.h"
 #include "expand_pic.h"
 #include "mc.h"
+#include "memory_align.h"
 
 namespace WelsDec {
 #define MAX_PRED_MODE_ID_I16x16  3
@@ -449,6 +450,7 @@ typedef struct TagWelsDecoderContext {
   bool bDequantCoeff4x4Init;
   bool bSpsLatePps;
   bool bUseScalingList;
+  CMemoryAlign*     pMemAlign;
 } SWelsDecoderContext, *PWelsDecoderContext;
 
 static inline void ResetActiveSPSForEachLayer (PWelsDecoderContext pCtx) {

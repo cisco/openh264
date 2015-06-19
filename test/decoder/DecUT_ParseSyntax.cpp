@@ -65,6 +65,11 @@ int32_t InitDecoder (const bool bParseOnly, PWelsDecoderContext pCtx, SLogContex
   if (NULL == pCtx)
     return cmMallocMemeError;
 
+  if (NULL == pCtx->pMemAlign) {
+    pCtx->pMemAlign = new CMemoryAlign (16);
+    if (NULL == pCtx->pMemAlign)
+      return cmMallocMemeError;
+  }
 
   return WelsInitDecoder (pCtx, bParseOnly, pLogCtx);
 }
@@ -92,6 +97,10 @@ void UninitDecoder (PWelsDecoderContext pCtx) {
     return;
 
   WelsEndDecoder (pCtx);
+  if (NULL != pCtx->pMemAlign) {
+    delete pCtx->pMemAlign;
+    pCtx->pMemAlign = NULL;
+  }
   if (NULL != pCtx) {
     free (pCtx);
     pCtx = NULL;
@@ -160,6 +169,7 @@ void DecoderParseSyntaxTest::Init() {
   //
   m_pCtx = (PWelsDecoderContext)malloc (sizeof (SWelsDecoderContext));
 
+  memset (m_pCtx, 0, sizeof (SWelsDecoderContext));
   m_pWelsTrace = new welsCodecTrace();
   if (m_pWelsTrace != NULL) {
     m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);

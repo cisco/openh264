@@ -116,7 +116,7 @@ static inline int32_t FmoGenerateMbAllocMapType1 (PFmo pFmo, PPps pPps, const in
  * \return  0 - successful; none 0 - failed
  */
 static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const int32_t kiMbWidth,
-    const int32_t kiMbHeight) {
+    const int32_t kiMbHeight, CMemoryAlign* pMa) {
   int32_t iNumMb = 0;
   int32_t iErr   = 0;
   bool bResolutionChanged = false;
@@ -131,9 +131,8 @@ static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const 
   if (0 == iNumMb)
     return 1;
 
-
-  WelsFree (pFmo->pMbAllocMap, "_fmo->pMbAllocMap");
-  pFmo->pMbAllocMap = (uint8_t*)WelsMallocz (iNumMb * sizeof (uint8_t), "_fmo->pMbAllocMap");
+  pMa->WelsFree (pFmo->pMbAllocMap, "_fmo->pMbAllocMap");
+  pFmo->pMbAllocMap = (uint8_t*)pMa->WelsMallocz (iNumMb * sizeof (uint8_t), "_fmo->pMbAllocMap");
   WELS_VERIFY_RETURN_IF (1, (NULL == pFmo->pMbAllocMap)) // out of memory
 
   pFmo->iCountMbNum = iNumMb;
@@ -186,8 +185,8 @@ static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const 
  *
  * \return  0 - successful; none 0 - failed;
  */
-int32_t InitFmo (PFmo pFmo, PPps pPps, const int32_t kiMbWidth, const int32_t kiMbHeight) {
-  return FmoGenerateSliceGroup (pFmo, pPps, kiMbWidth, kiMbHeight);
+int32_t InitFmo (PFmo pFmo, PPps pPps, const int32_t kiMbWidth, const int32_t kiMbHeight, CMemoryAlign* pMa) {
+  return FmoGenerateSliceGroup (pFmo, pPps, kiMbWidth, kiMbHeight, pMa);
 }
 
 
@@ -200,7 +199,7 @@ int32_t InitFmo (PFmo pFmo, PPps pPps, const int32_t kiMbWidth, const int32_t ki
  *
  * \return  NONE
  */
-void UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail) {
+void UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail, CMemoryAlign* pMa) {
   PFmo pIter = pFmo;
   int32_t i = 0;
   int32_t iFreeNodes = 0;
@@ -211,7 +210,7 @@ void UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail) {
   while (i < kiCnt) {
     if (pIter != NULL && pIter->bActiveFlag) {
       if (NULL != pIter->pMbAllocMap) {
-        WelsFree (pIter->pMbAllocMap, "pIter->pMbAllocMap");
+        pMa->WelsFree (pIter->pMbAllocMap, "pIter->pMbAllocMap");
 
         pIter->pMbAllocMap = NULL;
       }
@@ -258,7 +257,7 @@ bool FmoParamSetsChanged (PFmo pFmo, const int32_t kiCountNumMb, const int32_t k
  *
  * \return  true - update/insert successfully; false - failed;
  */
-bool FmoParamUpdate (PFmo pFmo, PSps pSps, PPps pPps, int32_t* pActiveFmoNum) {
+bool FmoParamUpdate (PFmo pFmo, PSps pSps, PPps pPps, int32_t* pActiveFmoNum, CMemoryAlign* pMa) {
   const uint32_t kuiMbWidth = pSps->iMbWidth;
   const uint32_t kuiMbHeight = pSps->iMbHeight;
 
@@ -267,7 +266,7 @@ bool FmoParamUpdate (PFmo pFmo, PSps pSps, PPps pPps, int32_t* pActiveFmoNum) {
                            pPps->uiSliceGroupMapType,
                            pPps->uiNumSliceGroups)) {
 
-    if (InitFmo (pFmo, pPps, kuiMbWidth, kuiMbHeight)) {
+    if (InitFmo (pFmo, pPps, kuiMbWidth, kuiMbHeight, pMa)) {
       return false;
     } else {
       if (!pFmo->bActiveFlag && *pActiveFmoNum < MAX_PPS_COUNT) {
