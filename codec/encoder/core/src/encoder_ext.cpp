@@ -271,18 +271,21 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
         WelsLog (pLogCtx, WELS_LOG_WARNING,
                  "bEnableFrameSkip = %d,bitrate can't be controlled for RC_QUALITY_MODE,RC_BITRATE_MODE and RC_TIMESTAMP_MODE without enabling skip frame.",
                  pCfg->bEnableFrameSkip);
+
     if (pCfg->iRCMode == RC_QUALITY_MODE) {
-      pCfg->iMinQp = WELS_CLIP3 (pCfg->iMinQp , GOM_MIN_QP_MODE, GOM_MAX_QP_MODE);
-      pCfg->iMaxQp = WELS_CLIP3 (pCfg->iMaxQp , GOM_MIN_QP_MODE, GOM_MAX_QP_MODE);
-      if (pCfg->iMaxQp < pCfg->iMinQp)
-        pCfg->iMaxQp = GOM_MAX_QP_MODE;
+      pCfg->iMinQp = GOM_MIN_QP_MODE;
+      pCfg->iMaxQp = GOM_MAX_QP_MODE;
+    } else if (pCfg->iUsageType == SCREEN_CONTENT_REAL_TIME) {
+      pCfg->iMinQp = MIN_SCREEN_QP;
+      pCfg->iMaxQp = MAX_SCREEN_QP;
     } else {
+      if (pCfg->iMaxQp < pCfg->iMinQp)
+        pCfg->iMaxQp = pCfg->iMinQp + 5;
       pCfg->iMinQp = WELS_CLIP3 (pCfg->iMinQp , 0, 51);
       pCfg->iMaxQp = WELS_CLIP3 (pCfg->iMaxQp , 0, 51);
-      if (pCfg->iMaxQp < pCfg->iMinQp)
-        pCfg->iMaxQp = 51;
 
     }
+
   }
   // ref-frames validation
   if (((pCfg->iUsageType == CAMERA_VIDEO_REAL_TIME) || (pCfg->iUsageType == SCREEN_CONTENT_REAL_TIME))
