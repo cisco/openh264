@@ -822,6 +822,12 @@ void UpdateBufferWhenFrameSkipped (sWelsEncCtx* pEncCtx, int32_t iSpatialNum) {
 
   }
   pEncCtx->iContinualSkipFrames++;
+  if ( ( pEncCtx->iContinualSkipFrames % 3 ) == 0 ) {
+    //output a warning when iContinualSkipFrames is large enough, which may indicate subjective quality problem
+    //note that here iContinualSkipFrames must be >0, so the log output will be 3/6/....
+    WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_WARNING, "[Rc] iContinualSkipFrames(%d) is large",
+             pEncCtx->iContinualSkipFrames);
+  }
 }
 void UpdateMaxBrCheckWindowStatus (sWelsEncCtx* pEncCtx, int32_t iSpatialNum, const long long uiTimeStamp) {
   SSpatialPicIndex* pSpatialIndexMap = &pEncCtx->sSpatialIndexMap[0];
@@ -873,6 +879,16 @@ void UpdateMaxBrCheckWindowStatus (sWelsEncCtx* pEncCtx, int32_t iSpatialNum, co
     }
   }
   return;
+}
+
+bool WelsRcPostFrameSkipping (sWelsEncCtx* pCtx, const int32_t iDid, const long long uiTimeStamp) {
+  //TODO: put in the decision of rate-control
+  return false;
+}
+
+void WelsRcPostFrameSkippedUpdate (sWelsEncCtx* pCtx, const int32_t iDid) {
+  //TODO: do something to update buffers after post-skipping is done
+  //let RC know post-skipping happened and adjust strategy accordingly
 }
 
 void RcVBufferCalculationPadding (sWelsEncCtx* pEncCtx) {
@@ -1433,6 +1449,7 @@ void  WelsRcInitFuncPointers (sWelsEncCtx* pEncCtx, RC_MODES iRcMode) {
     pRcf->pfWelsCheckSkipBasedMaxbr = NULL;
     pRcf->pfWelsUpdateBufferWhenSkip = NULL;
     pRcf->pfWelsUpdateMaxBrWindowStatus = NULL;
+    pRcf->pfWelsRcPostFrameSkipping = NULL;
     break;
   case RC_BUFFERBASED_MODE:
     pRcf->pfWelsRcPictureInit = WelRcPictureInitBufferBasedQp;
@@ -1443,6 +1460,7 @@ void  WelsRcInitFuncPointers (sWelsEncCtx* pEncCtx, RC_MODES iRcMode) {
     pRcf->pfWelsCheckSkipBasedMaxbr = NULL;
     pRcf->pfWelsUpdateBufferWhenSkip = NULL;
     pRcf->pfWelsUpdateMaxBrWindowStatus = NULL;
+    pRcf->pfWelsRcPostFrameSkipping = NULL;
     break;
   case RC_BITRATE_MODE:
     pRcf->pfWelsRcPictureInit = WelsRcPictureInitGom;
@@ -1453,6 +1471,18 @@ void  WelsRcInitFuncPointers (sWelsEncCtx* pEncCtx, RC_MODES iRcMode) {
     pRcf->pfWelsCheckSkipBasedMaxbr = CheckFrameSkipBasedMaxbr;
     pRcf->pfWelsUpdateBufferWhenSkip = UpdateBufferWhenFrameSkipped;
     pRcf->pfWelsUpdateMaxBrWindowStatus = UpdateMaxBrCheckWindowStatus;
+    pRcf->pfWelsRcPostFrameSkipping = WelsRcPostFrameSkipping;
+    break;
+  case RC_BITRATE_MODE_POST_SKIP:
+    pRcf->pfWelsRcPictureInit = WelsRcPictureInitGom;
+    pRcf->pfWelsRcPicDelayJudge = WelsRcFrameDelayJudge;
+    pRcf->pfWelsRcPictureInfoUpdate = WelsRcPictureInfoUpdateGom;
+    pRcf->pfWelsRcMbInit = WelsRcMbInitGom;
+    pRcf->pfWelsRcMbInfoUpdate = WelsRcMbInfoUpdateGom;
+    pRcf->pfWelsCheckSkipBasedMaxbr = CheckFrameSkipBasedMaxbr;
+    pRcf->pfWelsUpdateBufferWhenSkip = UpdateBufferWhenFrameSkipped;
+    pRcf->pfWelsUpdateMaxBrWindowStatus = UpdateMaxBrCheckWindowStatus;
+    pRcf->pfWelsRcPostFrameSkipping = WelsRcPostFrameSkipping;
     break;
   case RC_TIMESTAMP_MODE:
     if (pEncCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
@@ -1471,6 +1501,7 @@ void  WelsRcInitFuncPointers (sWelsEncCtx* pEncCtx, RC_MODES iRcMode) {
     pRcf->pfWelsCheckSkipBasedMaxbr = CheckFrameSkipBasedMaxbr;
     pRcf->pfWelsUpdateBufferWhenSkip = NULL;
     pRcf->pfWelsUpdateMaxBrWindowStatus = NULL;
+    pRcf->pfWelsRcPostFrameSkipping = NULL;
     InitRcModuleTimeStamp (pEncCtx);
     break;
   case RC_QUALITY_MODE:
@@ -1483,7 +1514,7 @@ void  WelsRcInitFuncPointers (sWelsEncCtx* pEncCtx, RC_MODES iRcMode) {
     pRcf->pfWelsCheckSkipBasedMaxbr = CheckFrameSkipBasedMaxbr;
     pRcf->pfWelsUpdateBufferWhenSkip = UpdateBufferWhenFrameSkipped;
     pRcf->pfWelsUpdateMaxBrWindowStatus = UpdateMaxBrCheckWindowStatus;
-
+    pRcf->pfWelsRcPostFrameSkipping = NULL;
     break;
   }
 }
