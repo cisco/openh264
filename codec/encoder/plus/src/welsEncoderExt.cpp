@@ -598,7 +598,7 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
       if (WELS_ABS (pStatistics->fLatestFrameRate - m_pEncContext->pSvcParam->fMaxFrameRate) > 30) {
         WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
                  "Actual input fLatestFrameRate = %f is quite different from framerate in setting %f, please check setting or timestamp unit (ms), cur_Ts = %" PRId64 " start_Ts = %" PRId64,
-                 pStatistics->fLatestFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate, kiCurrentFrameTs, pStatistics->iStatisticsTs);
+                 pStatistics->fLatestFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate, kiCurrentFrameTs, static_cast<int64_t> (pStatistics->iStatisticsTs) );
       }
 
       if (m_pEncContext->pSvcParam->iRCMode == RC_QUALITY_MODE || m_pEncContext->pSvcParam->iRCMode == RC_BITRATE_MODE) {
