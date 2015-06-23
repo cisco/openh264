@@ -594,14 +594,20 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
                                       kiTimeDiff);
       pStatistics->uiBitRate = static_cast<unsigned int> ((m_pEncContext->iTotalEncodedBytes -
                                m_pEncContext->iLastStatisticsBytes) * 8 * 1000 / kiTimeDiff);
-    }
 
-    if (m_pEncContext->pSvcParam->iRCMode == RC_QUALITY_MODE || m_pEncContext->pSvcParam->iRCMode == RC_BITRATE_MODE) {
-      if ((pStatistics->fLatestFrameRate > 0)
-          && WELS_ABS (m_pEncContext->pSvcParam->fMaxFrameRate - pStatistics->fLatestFrameRate) > 5) {
+      if (WELS_ABS (pStatistics->fLatestFrameRate - m_pEncContext->pSvcParam->fMaxFrameRate) > 30) {
         WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
-                 "Actual Input Framerate %f is different from framerate in setting %f, suggest to use other rate control modes",
-                 pStatistics->fLatestFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate);
+                 "Actual input fLatestFrameRate = %f is quite different from framerate in setting %f, please check setting or timestamp unit (ms), cur_Ts = %" PRId64 " start_Ts = %" PRId64,
+                 pStatistics->fLatestFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate, kiCurrentFrameTs, pStatistics->iStatisticsTs);
+      }
+
+      if (m_pEncContext->pSvcParam->iRCMode == RC_QUALITY_MODE || m_pEncContext->pSvcParam->iRCMode == RC_BITRATE_MODE) {
+        if ((pStatistics->fLatestFrameRate > 0)
+            && WELS_ABS (m_pEncContext->pSvcParam->fMaxFrameRate - pStatistics->fLatestFrameRate) > 5) {
+          WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
+                   "Actual input framerate %f is different from framerate in setting %f, suggest to use other rate control modes",
+                   pStatistics->fLatestFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate);
+        }
       }
     }
 
@@ -616,18 +622,17 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
   if (m_pEncContext->iStatisticsLogInterval > 0) {
     const int64_t kiTimeDiff = kiCurrentFrameTs - m_pEncContext->iLastStatisticsLogTs;
     if ((kiTimeDiff > m_pEncContext->iStatisticsLogInterval) || (0 == pStatistics->uiInputFrameCount % 300)) {
-
       if (WELS_ABS (pStatistics->fAverageFrameRate - m_pEncContext->pSvcParam->fMaxFrameRate) > 30) {
         WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
-                 "Actual Input Framerate %f is quite different from framerate in setting %f, please check setting or timestamp unit (ms)",
-                 pStatistics->fAverageFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate);
+                 "Actual input framerate fAverageFrameRate = %f is quite different from framerate in setting %f, please check setting or timestamp unit (ms), start_Ts = %" PRId64,
+                 pStatistics->fAverageFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate, m_pEncContext->uiStartTimestamp);
       }
 
       WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
                "EncoderStatistics: %dx%d, SpeedInMs: %f, fAverageFrameRate=%f, "
                "LastFrameRate=%f, LatestBitRate=%d, LastFrameQP=%d, uiInputFrameCount=%d, uiSkippedFrameCount=%d, "
                "uiResolutionChangeTimes=%d, uIDRReqNum=%d, uIDRSentNum=%d, uLTRSentNum=NA, iTotalEncodedBytes=%" PRId64
-               "at Ts = %" PRId64,
+               " at Ts = %" PRId64,
                pStatistics->uiWidth, pStatistics->uiHeight,
                pStatistics->fAverageFrameSpeedInMs, pStatistics->fAverageFrameRate,
                pStatistics->fLatestFrameRate, pStatistics->uiBitRate, pStatistics->uiAverageFrameQP,
