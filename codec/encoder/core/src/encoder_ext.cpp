@@ -279,10 +279,10 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
       pCfg->iMinQp = MIN_SCREEN_QP;
       pCfg->iMaxQp = MAX_SCREEN_QP;
     } else {
-      if (pCfg->iMaxQp < pCfg->iMinQp)
-        pCfg->iMaxQp = pCfg->iMinQp + 5;
-      pCfg->iMinQp = WELS_CLIP3 (pCfg->iMinQp , 0, 51);
+      pCfg->iMinQp = WELS_CLIP3 (pCfg->iMinQp , GOM_MIN_QP_MODE, 51);
       pCfg->iMaxQp = WELS_CLIP3 (pCfg->iMaxQp , 0, 51);
+      if (pCfg->iMaxQp <= pCfg->iMinQp)
+        pCfg->iMaxQp = 51;
 
     }
 
