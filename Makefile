@@ -14,7 +14,7 @@ LIBSUFFIX=a
 CCAS=$(CC)
 CXX_O=-o $@
 CXX_LINK_O=-o $@
-AR_OPTS=cr $@
+AR_OPTS=cr
 LINK_LOCAL_DIR=-L.
 LINK_LIB=-l$(1)
 CFLAGS_OPT=-O3
@@ -70,6 +70,7 @@ include $(SRC_PATH)build/platform-$(OS).mk
 
 CFLAGS += -DGENERATED_VERSION_HEADER
 LDFLAGS +=
+AR_OPTS += $@
 
 ifeq (Yes, $(GCOV))
 CFLAGS += -fprofile-arcs -ftest-coverage
