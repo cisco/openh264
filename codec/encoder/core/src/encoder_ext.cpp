@@ -3658,6 +3658,57 @@ int32_t WriteSavcParaset_Listing (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
   return iReturn;
 }
 
+void StackBackEncoderStatus (sWelsEncCtx* pEncCtx,
+                             EVideoFrameType keFrameType) {
+  // for bitstream writing
+  pEncCtx->iPosBsBuffer	 = 0;	// reset bs pBuffer position
+  pEncCtx->pOut->iNalIndex	 = 0;	// reset NAL index
+
+  InitBits (&pEncCtx->pOut->sBsWrite, pEncCtx->pOut->pBsBuffer, pEncCtx->pOut->uiSize);
+  if ((keFrameType == videoFrameTypeP) || (keFrameType == videoFrameTypeI)) {
+    pEncCtx->iFrameIndex --;
+    if (pEncCtx->iPOC != 0) {
+      pEncCtx->iPOC	 -= 2;
+    } else {
+      pEncCtx->iPOC	= (1 << pEncCtx->pSps->iLog2MaxPocLsb) - 2;
+    }
+
+    if (pEncCtx->eLastNalPriority != 0) {
+      if (pEncCtx->iFrameNum != 0) {
+        pEncCtx->iFrameNum --;
+      } else {
+        pEncCtx->iFrameNum = (1 << pEncCtx->pSps->uiLog2MaxFrameNum) - 1;
+      }
+    }
+
+    pEncCtx->eNalType	 = NAL_UNIT_CODED_SLICE;
+    pEncCtx->eSliceType	= P_SLICE;
+    pEncCtx->eNalPriority	= pEncCtx->eLastNalPriority;
+  } else if (keFrameType == videoFrameTypeIDR) {
+    pEncCtx->uiIdrPicId --;
+
+    //set the next frame to be IDR
+    ForceCodingIDR (pEncCtx);
+  } else {	// B pictures are not supported now, any else?
+    assert (0);
+  }
+
+  // no need to stack back RC info since the info is still useful for later RQ model calculation
+  // no need to stack back MB slicing info for dynamic balancing, since the info is still refer-able
+}
+
+void ClearFrameBsInfo (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi) {
+  pFbi->sLayerInfo[0].pBsBuf	= pCtx->pFrameBs;
+  pFbi->sLayerInfo[0].pNalLengthInByte = pCtx->pOut->pNalLen;
+
+  for (int i = 0; i < pFbi->iLayerNum; i++) {
+    pFbi->sLayerInfo[i].iNalCount = 0;
+  }
+  pFbi->iLayerNum = 0;
+  pFbi->iFrameSizeInBytes = 0;
+  pFbi->eFrameType = videoFrameTypeSkip;
+}
+
 /*!
  * \brief   core svc encoding process
  *
@@ -4101,6 +4152,28 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         pLayerBsInfo->uiQualityId       = 0;
         pLayerBsInfo->iNalCount         = iNalIdxInLayer;
       }
+    }
+
+    if (NULL != pCtx->pFuncList->pfRc.pfWelsRcPostFrameSkipping
+        && pCtx->pFuncList->pfRc.pfWelsRcPostFrameSkipping (pCtx, iCurDid, pSrcPic->uiTimeStamp)) {
+
+      StackBackEncoderStatus (pCtx, eFrameType);
+      ClearFrameBsInfo (pCtx, pFbi);
+
+      iFrameSize = 0;
+      iLayerSize = 0;
+      iLayerNum = 0;
+
+      if (pCtx->pFuncList->pfRc.pfWelsUpdateBufferWhenSkip) {
+        pCtx->pFuncList->pfRc.pfWelsUpdateBufferWhenSkip (pCtx, iSpatialNum);
+      }
+
+      WelsRcPostFrameSkippedUpdate(pCtx, iCurDid);
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
+               "[Rc] Frame timestamp = %lld, skip one frame due to post skip, continual skipped %d frames",
+               pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
+      pCtx->iEncoderError = ENC_RETURN_SUCCESS;
+      return ENC_RETURN_SUCCESS;
     }
 
     // deblocking filter
