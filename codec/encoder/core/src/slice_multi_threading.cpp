@@ -69,6 +69,12 @@
 #define MT_TRACE_LOG(x, ...)
 #endif
 
+#define WELS_THREAD_SIGNAL_AND_BREAK(CodedEventList, CodedMasterEvent, iEventIdx) {  \
+    WelsEventSignal(&CodedEventList[iEventIdx]);  \
+    WelsEventSignal (&CodedMasterEvent);  \
+    break;  \
+}
+
 namespace WelsEnc {
 void UpdateMbListNeighborParallel (SSliceCtx* pSliceCtx,
                                    SMB* pMbList,
@@ -766,7 +772,9 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         iReturn = WelsCodeOneSlice (pEncPEncCtx, iSliceIdx, eNalType);
         if (ENC_RETURN_SUCCESS != iReturn) {
           uiThrdRet = iReturn;
-          break;
+          WELS_THREAD_SIGNAL_AND_BREAK(pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
+                                       pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
+                                       iEventIdx);
         }
 
         WelsUnloadNalForSlice (pSliceBs);
@@ -776,14 +784,18 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
           iReturn = WriteSliceToFrameBs (pEncPEncCtx, pLbi, pLbi->pBsBuf, iSliceIdx, iSliceSize);
           if (ENC_RETURN_SUCCESS != iReturn) {
             uiThrdRet = iReturn;
-            break;
+            WELS_THREAD_SIGNAL_AND_BREAK(pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
+                                         pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
+                                         iEventIdx);
           }
           pEncPEncCtx->iPosBsBuffer += iSliceSize;
         } else {
           iReturn = WriteSliceBs (pEncPEncCtx, pSliceBs->pBs, iSliceIdx, iSliceSize);
           if (ENC_RETURN_SUCCESS != iReturn) {
             uiThrdRet = iReturn;
-            break;
+            WELS_THREAD_SIGNAL_AND_BREAK(pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
+                                         pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
+                                         iEventIdx);
           }
         }
 
@@ -846,7 +858,9 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
             // TODO: need exception handler for not large enough of MAX_SLICES_NUM related memory usage
             // No idea about its solution due MAX_SLICES_NUM is fixed lenght in relevent pData structure
             uiThrdRet = 1;
-            break;
+            WELS_THREAD_SIGNAL_AND_BREAK(pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
+                                         pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
+                                         iEventIdx);
           }
 
           pSlice                = &pCurDq->sLayerInfo.pSliceInLayer[iSliceIdx];
@@ -873,7 +887,9 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
           iReturn = WelsCodeOneSlice (pEncPEncCtx, iSliceIdx, eNalType);
           if (ENC_RETURN_SUCCESS != iReturn) {
             uiThrdRet = iReturn;
-            break;
+            WELS_THREAD_SIGNAL_AND_BREAK(pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
+                                         pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
+                                         iEventIdx);
           }
 
           WelsUnloadNalForSlice (pSliceBs);
@@ -885,14 +901,18 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
                                            iSliceSize);
             if (ENC_RETURN_SUCCESS != iReturn) {
               uiThrdRet = iReturn;
-              break;
+              WELS_THREAD_SIGNAL_AND_BREAK(pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
+                                           pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
+                                           iEventIdx);
             }
             pEncPEncCtx->iPosBsBuffer += iSliceSize;
           } else {
-            iSliceSize = WriteSliceBs (pEncPEncCtx, pSliceBs->pBs, iSliceIdx, iSliceSize);
+            iReturn = WriteSliceBs (pEncPEncCtx, pSliceBs->pBs, iSliceIdx, iSliceSize);
             if (ENC_RETURN_SUCCESS != iReturn) {
               uiThrdRet = iReturn;
-              break;
+              WELS_THREAD_SIGNAL_AND_BREAK(pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
+                                           pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
+                                           iEventIdx);
             }
           }
 
@@ -926,7 +946,11 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         }
 
         if (uiThrdRet) // any exception??
-          break;
+        {
+          WELS_THREAD_SIGNAL_AND_BREAK(pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
+                                       pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
+                                       iEventIdx);
+        }
 
         WelsEventSignal (&pEncPEncCtx->pSliceThreading->pSliceCodedEvent[iEventIdx]); // mean finished coding current pSlice
         WelsEventSignal (&pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent);
