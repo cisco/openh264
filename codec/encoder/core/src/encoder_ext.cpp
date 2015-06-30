@@ -1067,6 +1067,25 @@ int32_t FindExistingPps (SWelsSPS* pSps, SSubsetSps* pSubsetSps, const bool kbUs
   return INVALID_ID;
 }
 
+static inline int32_t InitpSliceInLayer (sWelsEncCtx** ppCtx, SDqLayer* pDqLayer, CMemoryAlign* pMa,
+    const int32_t iMaxSliceNum, bool bMultithread) {
+  int32_t iSliceIdx = 0;
+  while (iSliceIdx < iMaxSliceNum) {
+    SSlice* pSlice = &pDqLayer->sLayerInfo.pSliceInLayer[iSliceIdx];
+    pSlice->uiSliceIdx = iSliceIdx;
+    if (bMultithread)
+      pSlice->pSliceBsa = & (*ppCtx)->pSliceBs[iSliceIdx].sBsWrite;
+    else
+      pSlice->pSliceBsa = & (*ppCtx)->pOut->sBsWrite;
+    if (AllocMbCacheAligned (&pSlice->sMbCacheInfo, pMa)) {
+      FreeMemorySvc (ppCtx);
+      return ENC_RETURN_MEMALLOCERR;
+    }
+    ++ iSliceIdx;
+  }
+  return ENC_RETURN_SUCCESS;
+}
+
 /*!
  * \brief   initialize ppDqLayerList and slicepEncCtx_list due to count number of layers available
  * \pParam  pCtx            sWelsEncCtx*
@@ -1161,35 +1180,11 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
     pDqLayer->iMbWidth  = kiMbW;
     pDqLayer->iMbHeight = kiMbH;
     {
-      int32_t iSliceIdx = 0;
       pDqLayer->sLayerInfo.pSliceInLayer = (SSlice*)pMa->WelsMallocz (sizeof (SSlice) * iMaxSliceNum, "pSliceInLayer");
-
       WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pDqLayer->sLayerInfo.pSliceInLayer), FreeMemorySvc (ppCtx))
-      if (iMaxSliceNum > 1) {
-        while (iSliceIdx < iMaxSliceNum) {
-          SSlice* pSlice = &pDqLayer->sLayerInfo.pSliceInLayer[iSliceIdx];
-          pSlice->uiSliceIdx = iSliceIdx;
-          if (pParam->iMultipleThreadIdc > 1)
-            pSlice->pSliceBsa = & (*ppCtx)->pSliceBs[iSliceIdx].sBsWrite;
-          else
-            pSlice->pSliceBsa = & (*ppCtx)->pOut->sBsWrite;
-          if (AllocMbCacheAligned (&pSlice->sMbCacheInfo, pMa)) {
-            FreeMemorySvc (ppCtx);
-            return 1;
-          }
-          ++ iSliceIdx;
-        }
-      }
-      // fix issue in case single pSlice coding might be inclusive exist in variant spatial layer setting, also introducing multi-pSlice modes
-      else { // only one pSlice
-        SSlice* pSlice = &pDqLayer->sLayerInfo.pSliceInLayer[0];
-        pSlice->uiSliceIdx = 0;
-        pSlice->pSliceBsa  = & (*ppCtx)->pOut->sBsWrite;
-        if (AllocMbCacheAligned (&pSlice->sMbCacheInfo, pMa)) {
-          FreeMemorySvc (ppCtx);
-          return 1;
-        }
-      }
+
+      int32_t iReturn = InitpSliceInLayer (ppCtx, pDqLayer, pMa, iMaxSliceNum, pParam->iMultipleThreadIdc > 1);
+      WELS_VERIFY_RETURN_PROC_IF (1, (ENC_RETURN_SUCCESS != iReturn), FreeMemorySvc (ppCtx))
     }
 
     //deblocking parameters initialization
