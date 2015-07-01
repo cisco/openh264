@@ -4061,9 +4061,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                 // pick up succeeding slice for threading
                 // thread_id equal to iEventId per implementation here
                 pCtx->pSliceThreading->pThreadPEncCtx[iEventId].iSliceIndex = iIndexOfSliceToBeCoded;
+                SetOneSliceBsBufferUnderMultithread(pCtx, iEventId, iIndexOfSliceToBeCoded);
                 WelsEventSignal (&pCtx->pSliceThreading->pReadySliceCodingEvent[iEventId]);
                 WelsEventSignal (&pCtx->pSliceThreading->pThreadMasterEvent[iEventId]);
-
                 ++ iIndexOfSliceToBeCoded;
               } else { // no other slices left for coding
                 -- iNumThreadsRunning;

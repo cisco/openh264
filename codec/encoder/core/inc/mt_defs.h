@@ -87,6 +87,7 @@ int32_t*                        pSliceComplexRatio[MAX_DEPENDENCY_LAYER]; // *IN
 FILE*                           pFSliceDiff;    // file handle for debug
 #endif//MT_DEBUG
 
+uint8_t*                        pThreadBsBuffer[MAX_THREADS_NUM]; //actual memory for slice buffer
 } SSliceThreading;
 
 #endif//MULTIPLE_THREADING_DEFINES_H__
