@@ -295,7 +295,7 @@ int32_t SetMultiSliceBuffer (sWelsEncCtx** ppCtx, CMemoryAlign* pMa, SSliceThrea
   if (NULL == (*ppCtx)->pSliceBs) {
     return ENC_RETURN_MEMALLOCERR;
   }
-  if (iSlice1Len <= 0) {
+  if (iSlice0Len <= 0) {
     return ENC_RETURN_UNEXPECTED;
   }
   //slice 0
