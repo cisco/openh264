@@ -1292,8 +1292,10 @@ void InitMcFunc (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
 #if defined (X86_ASM)
   if (uiCpuFlag & WELS_CPU_SSE2) {
     pMcFuncs->pfLumaHalfpelHor  = McHorVer20Width9Or17_sse2;
+#if 1 //could not work well for sub8x8: should disable it for now, or bugfix for it!
     pMcFuncs->pfLumaHalfpelVer  = McHorVer02Height9Or17_sse2;
     pMcFuncs->pfLumaHalfpelCen  = McHorVer22Width9Or17Height9Or17_sse2;
+#endif
     pMcFuncs->pfSampleAveraging = PixelAvg_sse2;
     pMcFuncs->pMcChromaFunc     = McChroma_sse2;
     pMcFuncs->pMcLumaFunc       = McLuma_sse2;
