@@ -483,6 +483,12 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* p
 
   return WELS_THREAD_ERROR_OK;
 
+#elif defined(__EMSCRIPTEN__)
+
+  // There is not yet a way to determine CPU count in emscripten JS environment.
+  pInfo->ProcessorCount = 1;
+  return WELS_THREAD_ERROR_OK;
+
 #else
 
   size_t len = sizeof (pInfo->ProcessorCount);
