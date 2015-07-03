@@ -332,7 +332,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   int16_t iMaxSliceNum          = 1;
   int32_t iReturn = ENC_RETURN_SUCCESS;
   bool    bDynamicSlice = false;
-  int32_t iMaxSliceSizeConstraint = 0;
+  uint32_t uiMaxSliceSizeConstraint = 0;
 
   if (NULL == ppCtx || NULL == pCodingParam || NULL == *ppCtx || iCountBsLen <= 0)
     return 1;
@@ -375,8 +375,8 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 
     if (pMso->uiSliceMode == SM_DYN_SLICE) {
       bDynamicSlice = true;
-      if (iMaxSliceSizeConstraint < pMso->sSliceArgument.uiSliceSizeConstraint) {
-        iMaxSliceSizeConstraint = pMso->sSliceArgument.uiSliceSizeConstraint;
+      if (uiMaxSliceSizeConstraint < pMso->sSliceArgument.uiSliceSizeConstraint) {
+        uiMaxSliceSizeConstraint = pMso->sSliceArgument.uiSliceSizeConstraint;
       }
     }
     ++ iIdx;
@@ -443,7 +443,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   MT_TRACE_LOG (*ppCtx, WELS_LOG_INFO, "[MT] Open pSliceCodedMasterEvent named(%s) ret%d err%d", name, err, errno);
 
   iReturn = SetMultiSliceBuffer (ppCtx, pMa, pSmt, iMaxSliceNum,
-                                 iTargetSpatialBsSize, //TODO: may use iMaxSliceSizeConstraint<<1 when bDynamicSlice, but need more twist
+                                 iTargetSpatialBsSize, //TODO: may use uiMaxSliceSizeConstraint<<1 when bDynamicSlice, but need more twist
                                  iCountBsLen,
                                  bDynamicSlice);
   WELS_VERIFY_RETURN_PROC_IF (iReturn, (ENC_RETURN_SUCCESS != iReturn), FreeMemorySvc (ppCtx))
