@@ -862,8 +862,8 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
   const int32_t  kiPartitaionId = pCurSlice->uiSliceIdx % kiActiveThreadsNum;
   const int32_t  kiLastMbIdxInPartition = pEncCtx->pCurDqLayer->pLastMbIdxOfPartition[kiPartitaionId];
 
-  const bool    kbCurMbNotFirstMbOfCurSlice      = (pSliceCtx->pOverallMbMap[iCurMbIdx] ==
-      pSliceCtx->pOverallMbMap[iCurMbIdx - 1]);
+  const bool    kbCurMbNotFirstMbOfCurSlice      = ((iCurMbIdx > 0) && (pSliceCtx->pOverallMbMap[iCurMbIdx] ==
+      pSliceCtx->pOverallMbMap[iCurMbIdx - 1]));
   const bool    kbCurMbNotLastMbOfCurPartition = iCurMbIdx < kiLastMbIdxInPartition;
 
   if (pCurSlice->bDynamicSlicingSliceSizeCtrlFlag)
