@@ -228,13 +228,19 @@ void McHorVer20Width17_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, ui
                                      int32_t iHeight);// width+1
 void McHorVer20Width9_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                     int32_t iHeight);// width+1
+void McHorVer20Width5_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                                    int32_t iHeight);// width+1
 void McHorVer02Height17_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                       int32_t iHeight);// height+1
 void McHorVer02Height9_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                      int32_t iHeight);// height+1
+void McHorVer02Height5_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                                     int32_t iHeight);// height+1
 void McHorVer22Width17_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                      int32_t iHeight);//width+1&&height+1
 void McHorVer22Width9_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                                    int32_t iHeight);//width+1&&height+1
+void McHorVer22Width5_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                     int32_t iHeight);//width+1&&height+1
 #endif
 
