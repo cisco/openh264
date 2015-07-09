@@ -402,7 +402,7 @@ int CWelsH264SVCEncoder ::EncodeFrameInternal (const SSourcePicture*  pSrcPic, S
   const int32_t kiEncoderReturn = WelsEncoderEncodeExt (m_pEncContext, pBsInfo, pSrcPic);
   const int64_t kiCurrentFrameMs = (WelsTime() - kiBeforeFrameUs) / 1000;
 
-  if (kiEncoderReturn == ENC_RETURN_MEMALLOCERR) {
+  if ((kiEncoderReturn == ENC_RETURN_MEMALLOCERR) || (kiEncoderReturn == ENC_RETURN_MEMOVERFLOWFOUND) || (kiEncoderReturn == ENC_RETURN_VLCOVERFLOWFOUND)) {
     WelsUninitEncoderExt (&m_pEncContext);
     return cmMallocMemeError;
   } else if ((kiEncoderReturn != ENC_RETURN_SUCCESS) && (kiEncoderReturn == ENC_RETURN_CORRECTED)) {

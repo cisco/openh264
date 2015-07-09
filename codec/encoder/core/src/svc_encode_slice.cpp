@@ -516,7 +516,7 @@ TRY_REENCODING:
 
 
     iEncReturn = pEncCtx->pFuncList->pfWelsSpatialWriteMbSyn (pEncCtx, pSlice, pCurMb);
-    if (iEncReturn == ENC_RETURN_VLCOVERFLOWFOUND) {
+    if ((iEncReturn == ENC_RETURN_VLCOVERFLOWFOUND) && (pCurMb->uiLumaQp < 50)) {
       pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pSlice);
       UpdateQpForOverflow (pCurMb, kuiChromaQpIndexOffset);
       goto TRY_REENCODING;
@@ -585,7 +585,7 @@ TRY_REENCODING:
     UpdateNonZeroCountCache (pCurMb, pMbCache);
 
     iEncReturn = pEncCtx->pFuncList->pfWelsSpatialWriteMbSyn (pEncCtx, pSlice, pCurMb);
-    if (iEncReturn == ENC_RETURN_VLCOVERFLOWFOUND) {
+    if (iEncReturn == ENC_RETURN_VLCOVERFLOWFOUND && (pCurMb->uiLumaQp < 50)) {
       pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pSlice);
       UpdateQpForOverflow (pCurMb, kuiChromaQpIndexOffset);
       goto TRY_REENCODING;
@@ -991,7 +991,7 @@ TRY_REENCODING:
     //step (6): begin to write bit stream; if the pSlice size is controlled, the writing may be skipped
 
     iEncReturn = pEncCtx->pFuncList->pfWelsSpatialWriteMbSyn (pEncCtx, pSlice, pCurMb);
-    if (iEncReturn == ENC_RETURN_VLCOVERFLOWFOUND) {
+    if (iEncReturn == ENC_RETURN_VLCOVERFLOWFOUND && (pCurMb->uiLumaQp < 50)) {
       pSlice->iMbSkipRun = pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pSlice);
       UpdateQpForOverflow (pCurMb, kuiChromaQpIndexOffset);
       goto TRY_REENCODING;
@@ -1097,7 +1097,7 @@ TRY_REENCODING:
 
 
     iEncReturn = pEncCtx->pFuncList->pfWelsSpatialWriteMbSyn (pEncCtx, pSlice, pCurMb);
-    if (iEncReturn == ENC_RETURN_VLCOVERFLOWFOUND) {
+    if (iEncReturn == ENC_RETURN_VLCOVERFLOWFOUND  && (pCurMb->uiLumaQp < 50)) {
       pSlice->iMbSkipRun = pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pSlice);
       UpdateQpForOverflow (pCurMb, kuiChromaQpIndexOffset);
       goto TRY_REENCODING;
