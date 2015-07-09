@@ -622,7 +622,7 @@ void WelsMdInterFinePartitionVaaOnScreen (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd
   if (iCostP8x8 < iBestCost) {
     iBestCost = iCostP8x8;
     pCurMb->uiMbType = MB_TYPE_8x8;
-    pCurMb->uiSubMbType[0] = pCurMb->uiSubMbType[1] = pCurMb->uiSubMbType[2] = pCurMb->uiSubMbType[3] = SUB_MB_TYPE_8x8;
+    memset (pCurMb->uiSubMbType, SUB_MB_TYPE_8x8, 4);
 #if 0 //Disable for sub8x8 modes for now
     iBestCost = 0;
     //reset neighbor info for sub8x8

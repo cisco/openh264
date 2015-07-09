@@ -55,7 +55,7 @@ struct SMVUnitXY { // each 4 Bytes
     iMvY = _v0.iMvY - _v1.iMvY;
     return (*this);
   };
-  SMVUnitXY& sAssginMv (const SMVUnitXY& _v0) {
+  SMVUnitXY& sAssignMv (const SMVUnitXY& _v0) {
     iMvX = _v0.iMvX;
     iMvY = _v0.iMvY;
     return (*this);
