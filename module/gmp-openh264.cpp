@@ -53,8 +53,6 @@
 #include "codec_app_def.h"
 #include "codec_api.h"
 
-#include "task_utils.h"
-
 #if defined(_MSC_VER)
 #define PUBLIC_FUNC __declspec(dllexport)
 #else
@@ -91,6 +89,8 @@
 # define nullptr __null
 #endif
 
+#include "task_utils.h"
+
 static int g_log_level = 0;
 
 #define GMPLOG(l, x) do { \
@@ -116,7 +116,7 @@ const char* kLogStrings[] = {
 };
 
 
-static GMPPlatformAPI* g_platform_api = nullptr;
+GMPPlatformAPI* g_platform_api = nullptr;
 
 class OpenH264VideoEncoder;
 
@@ -179,7 +179,7 @@ class FrameStats {
   const std::string type_;
 };
 
-class OpenH264VideoEncoder : public GMPVideoEncoder {
+class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
  public:
   OpenH264VideoEncoder (GMPVideoHost* hostAPI) :
     host_ (hostAPI),
@@ -187,11 +187,9 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
     encoder_ (nullptr),
     max_payload_size_ (0),
     callback_ (nullptr),
-    stats_ ("Encoder") {}
-
-  virtual ~OpenH264VideoEncoder() {
-    worker_thread_->Join();
-  }
+    stats_ ("Encoder") {
+      AddRef();
+    }
 
   virtual void InitEncode (const GMPVideoCodec& codecSettings,
                            const uint8_t* aCodecSpecific,
@@ -285,7 +283,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
 
     assert (aFrameTypesLength != 0);
 
-    worker_thread_->Post (WrapTask (
+    worker_thread_->Post (WrapTaskRefCounted (
                             this, &OpenH264VideoEncoder::Encode_w,
                             inputImage,
                             (aFrameTypes)[0]));
@@ -363,10 +361,14 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
   }
 
   virtual void EncodingComplete() {
-    delete this;
+    Release();
   }
 
  private:
+  virtual ~OpenH264VideoEncoder() {
+    worker_thread_->Join();
+  }
+
   void Error (GMPErr error) {
     if (callback_) {
       callback_->Error (error);
@@ -560,17 +562,16 @@ void copyWithStartCode(std::vector<uint8_t>& out, const uint8_t* in, size_t size
   out.insert(out.end(), in, in + size);
 }
 
-class OpenH264VideoDecoder : public GMPVideoDecoder {
+class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
  public:
   OpenH264VideoDecoder (GMPVideoHost* hostAPI) :
     host_ (hostAPI),
     worker_thread_ (nullptr),
     callback_ (nullptr),
     decoder_ (nullptr),
-    stats_ ("Decoder") {}
-
-  virtual ~OpenH264VideoDecoder() {
-  }
+    stats_ ("Decoder") {
+      AddRef();
+    }
 
   virtual void InitDecode (const GMPVideoCodec& codecSettings,
                            const uint8_t* aCodecSpecific,
@@ -691,7 +692,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
       break;
     }
     DECODING_STATE dState = dsErrorFree;
-    worker_thread_->Post (WrapTask (
+    worker_thread_->Post (WrapTaskRefCounted (
                             this, &OpenH264VideoDecoder::Decode_w,
                             inputFrame,
                             missingFrames,
@@ -715,10 +716,13 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
   }
 
   virtual void DecodingComplete() {
-    delete this;
+    Release();
   }
 
  private:
+  virtual ~OpenH264VideoDecoder() {
+  }
+
   void Error (GMPErr error) {
     if (callback_) {
       callback_->Error (error);
