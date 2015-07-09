@@ -3071,6 +3071,20 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
   // update some layer dependent variable to save judgements in mb-level
   pCurLayer->bSatdInMdFlag = ((pFuncList->sSampleDealingFuncs.pfMeCost == pFuncList->sSampleDealingFuncs.pfSampleSatd)
                               && (pFuncList->sSampleDealingFuncs.pfMdCost == pFuncList->sSampleDealingFuncs.pfSampleSatd));
+
+  const int32_t kiCurDid            = pCtx->uiDependencyId;
+  const int32_t kiCurTid            = pCtx->uiTemporalId;
+  if (pCurLayer->bDeblockingParallelFlag && (pCurLayer->iLoopFilterDisableIdc != 1)
+#if !defined(ENABLE_FRAME_DUMP)
+      && ( NRI_PRI_LOWEST != pCtx->eNalPriority )
+      && (pCtx->pSvcParam->sDependencyLayers[kiCurDid].iHighestTemporalId == 0
+          || kiCurTid < pCtx->pSvcParam->sDependencyLayers[kiCurDid].iHighestTemporalId)
+#endif// !ENABLE_FRAME_DUMP
+     ) {
+    pFuncList->pfDeblocking.pfDeblockingFilterSlice = DeblockingFilterSliceAvcbase;
+  } else {
+    pFuncList->pfDeblocking.pfDeblockingFilterSlice = DeblockingFilterSliceAvcbaseNull;
+  }
 }
 
 /*!

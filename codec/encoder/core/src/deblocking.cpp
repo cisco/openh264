@@ -739,6 +739,9 @@ void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, co
   }
 }
 
+void DeblockingFilterSliceAvcbaseNull (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, const int32_t kiSliceIdx) {
+}
+
 void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
   const int32_t kiCurDid                = pEnc->uiDependencyId;
   SWelsSvcCodingParam* pSvcParam        = pEnc->pSvcParam;
