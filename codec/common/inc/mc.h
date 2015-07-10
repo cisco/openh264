@@ -287,14 +287,24 @@ void PixelAvgWidthEq16_sse2 (uint8_t* pDst, int32_t iDstStride, const uint8_t* p
 void McHorVer20Width9Or17_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                 int32_t iWidth,
                                 int32_t iHeight);
+void McHorVer20Width5_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                                int32_t iWidth, int32_t iHeight);
 
 void McHorVer02Height9Or17_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                  int32_t iWidth,
                                  int32_t iHeight);
+void McHorVer02Height5_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                                 int32_t iWidth, int32_t iHeight);
 
 void McHorVer22HorFirst_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pTap, int32_t iTapStride,
                               int32_t iWidth,
                               int32_t iHeight);
+void McHorVer22Width5HorFirst_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pTap, int32_t iTapStride,
+                              int32_t iWidth, int32_t iHeight);
+void McHorVer22Width4VerLastAlign_sse2 (const uint8_t* pTap, int32_t iTapStride, uint8_t* pDst, int32_t iDstStride,
+                                        int32_t iWidth, int32_t iHeight);
+void McHorVer22Width4VerLastUnAlign_sse2 (const uint8_t* pTap, int32_t iTapStride, uint8_t* pDst, int32_t iDstStride,
+		int32_t iWidth, int32_t iHeight);
 
 //***************************************************************************//
 //                       SSSE3 definition                                    //
