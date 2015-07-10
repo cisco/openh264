@@ -753,7 +753,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
     if (WELS_THREAD_ERROR_WAIT_OBJECT_0 == iWaitRet) { // start pSlice coding signal waited
       SLayerBSInfo* pLbi = pPrivateData->pLayerBs;
       const int32_t kiCurDid            = pEncPEncCtx->uiDependencyId;
-      const int32_t kiCurTid            = pEncPEncCtx->uiTemporalId;
       SWelsSvcCodingParam* pCodingParam = pEncPEncCtx->pSvcParam;
       SSpatialLayerConfig* pParamD      = &pCodingParam->sSpatialLayers[kiCurDid];
 
@@ -829,15 +828,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
           }
         }
 
-        if (pCurDq->bDeblockingParallelFlag && pSlice->sSliceHeaderExt.sSliceHeader.uiDisableDeblockingFilterIdc != 1
-#if !defined(ENABLE_FRAME_DUMP)
-            && (eNalRefIdc != NRI_PRI_LOWEST) &&
-            (pCodingParam->sDependencyLayers[kiCurDid].iHighestTemporalId == 0
-             || kiCurTid < pCodingParam->sDependencyLayers[kiCurDid].iHighestTemporalId)
-#endif// !ENABLE_FRAME_DUMP
-           ) {
-          DeblockingFilterSliceAvcbase (pCurDq, pEncPEncCtx->pFuncList, iSliceIdx);
-        }
+        pEncPEncCtx->pFuncList->pfDeblocking.pfDeblockingFilterSlice (pCurDq, pEncPEncCtx->pFuncList, iSliceIdx);
 
         if (bDsaFlag) {
           pEncPEncCtx->pSliceThreading->pSliceConsumeTime[pEncPEncCtx->uiDependencyId][iSliceIdx] = (uint32_t) (
@@ -947,15 +938,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
             }
           }
 
-          if (pCurDq->bDeblockingParallelFlag && pSlice->sSliceHeaderExt.sSliceHeader.uiDisableDeblockingFilterIdc != 1
-#if !defined(ENABLE_FRAME_DUMP)
-              && (eNalRefIdc != NRI_PRI_LOWEST) &&
-              (pCodingParam->sDependencyLayers[kiCurDid].iHighestTemporalId == 0
-               || kiCurTid < pCodingParam->sDependencyLayers[kiCurDid].iHighestTemporalId)
-#endif// !ENABLE_FRAME_DUMP
-             ) {
-            DeblockingFilterSliceAvcbase (pCurDq, pEncPEncCtx->pFuncList, iSliceIdx);
-          }
+          pEncPEncCtx->pFuncList->pfDeblocking.pfDeblockingFilterSlice (pCurDq, pEncPEncCtx->pFuncList, iSliceIdx);
 
 #if defined(SLICE_INFO_OUTPUT)
           fprintf (stderr,
