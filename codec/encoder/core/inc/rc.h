@@ -272,7 +272,7 @@ PWelsCheckFrameSkipBasedMaxbrFunc pfWelsCheckSkipBasedMaxbr;
 PWelsUpdateBufferWhenFrameSkippedFunc pfWelsUpdateBufferWhenSkip;
 PWelsUpdateMaxBrCheckWindowStatusFunc pfWelsUpdateMaxBrWindowStatus;
 
-PWelsRCPostFrameSkippingFunc			pfWelsRcPostFrameSkipping;
+PWelsRCPostFrameSkippingFunc    pfWelsRcPostFrameSkipping;
 } SWelsRcFunc;
 
 bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pCtx, int32_t iSpatialNum, EVideoFrameType eFrameType,

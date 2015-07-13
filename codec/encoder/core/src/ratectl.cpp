@@ -1127,9 +1127,9 @@ void  WelsRcPictureInfoUpdateDisable (sWelsEncCtx* pEncCtx, int32_t iLayerSize) 
 }
 
 void  WelsRcMbInitDisable (sWelsEncCtx* pEncCtx, SMB* pCurMb, SSlice* pSlice) {
-  int32_t iLumaQp					= pEncCtx->iGlobalQp;
+  int32_t iLumaQp = pEncCtx->iGlobalQp;
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
-  SDqLayer* pCurLayer				= pEncCtx->pCurDqLayer;
+  SDqLayer* pCurLayer = pEncCtx->pCurDqLayer;
 
   const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
 
@@ -1149,7 +1149,7 @@ void  WelsRcMbInfoUpdateDisable (sWelsEncCtx* pEncCtx, SMB* pCurMb, int32_t iCos
 
 void WelRcPictureInitBufferBasedQp (sWelsEncCtx* pEncCtx, long long uiTimeStamp) {
 
-  SVAAFrameInfo* pVaa			= static_cast<SVAAFrameInfo*> (pEncCtx->pVaa);
+  SVAAFrameInfo* pVaa = static_cast<SVAAFrameInfo*> (pEncCtx->pVaa);
   SWelsSvcRc* pWelsSvcRc =  &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
 
   int32_t iMinQp = MIN_SCREEN_QP;

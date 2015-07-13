@@ -305,8 +305,8 @@ void UpdateP8x8MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPart
 void UpdateP4x4MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartIdx, const int8_t kiRef,
                            SMVUnitXY* pMv) {
   SMVComponentUnit* pMvComp = &pMbCache->sMvComponents;
-  const int16_t kiScan4Idx		= g_kuiMbCountScan4Idx[kiPartIdx];
-  const int16_t kiCacheIdx		= g_kuiCache30ScanIdx[kiPartIdx];
+  const int16_t kiScan4Idx  = g_kuiMbCountScan4Idx[kiPartIdx];
+  const int16_t kiCacheIdx  = g_kuiCache30ScanIdx[kiPartIdx];
 
   //mb
   pCurMb->sMv[kiScan4Idx] = *pMv;
@@ -318,8 +318,8 @@ void UpdateP4x4MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPart
 void UpdateP8x4MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartIdx, const int8_t kiRef,
                            SMVUnitXY* pMv) {
   SMVComponentUnit* pMvComp = &pMbCache->sMvComponents;
-  const int16_t kiScan4Idx		= g_kuiMbCountScan4Idx[kiPartIdx];
-  const int16_t kiCacheIdx		= g_kuiCache30ScanIdx[kiPartIdx];
+  const int16_t kiScan4Idx  = g_kuiMbCountScan4Idx[kiPartIdx];
+  const int16_t kiCacheIdx  = g_kuiCache30ScanIdx[kiPartIdx];
 
   //mb
   pCurMb->sMv[    kiScan4Idx] = *pMv;
@@ -334,8 +334,8 @@ void UpdateP8x4MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPart
 void UpdateP4x8MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartIdx, const int8_t kiRef,
                            SMVUnitXY* pMv) {
   SMVComponentUnit* pMvComp = &pMbCache->sMvComponents;
-  const int16_t kiScan4Idx		= g_kuiMbCountScan4Idx[kiPartIdx];
-  const int16_t kiCacheIdx		= g_kuiCache30ScanIdx[kiPartIdx];
+  const int16_t kiScan4Idx  = g_kuiMbCountScan4Idx[kiPartIdx];
+  const int16_t kiCacheIdx  = g_kuiCache30ScanIdx[kiPartIdx];
 
   //mb
   pCurMb->sMv[    kiScan4Idx] = *pMv;
