@@ -59,7 +59,7 @@ static inline int32_t FmoGenerateMbAllocMapType0 (PFmo pFmo, PPps pPps) {
   WELS_VERIFY_RETURN_IF (1, (NULL == pFmo || NULL == pPps))
   uiNumSliceGroups = pPps->uiNumSliceGroups;
   iMbNum = pFmo->iCountMbNum;
-  WELS_VERIFY_RETURN_IF (1, (NULL == pFmo->pMbAllocMap || iMbNum <= 0 || uiNumSliceGroups >= MAX_SLICEGROUP_IDS))
+  WELS_VERIFY_RETURN_IF (1, (NULL == pFmo->pMbAllocMap || iMbNum <= 0 || uiNumSliceGroups > MAX_SLICEGROUP_IDS))
 
   do {
     uint8_t uiGroup = 0;
@@ -95,7 +95,7 @@ static inline int32_t FmoGenerateMbAllocMapType1 (PFmo pFmo, PPps pPps, const in
   uiNumSliceGroups = pPps->uiNumSliceGroups;
   iMbNum = pFmo->iCountMbNum;
   WELS_VERIFY_RETURN_IF (1, (NULL == pFmo->pMbAllocMap || iMbNum <= 0 || kiMbWidth == 0
-                             || uiNumSliceGroups >= MAX_SLICEGROUP_IDS))
+                             || uiNumSliceGroups > MAX_SLICEGROUP_IDS))
 
   do {
     pFmo->pMbAllocMap[i] = (uint8_t) (((i % kiMbWidth) + (((i / kiMbWidth) * uiNumSliceGroups) >> 1)) % uiNumSliceGroups);
