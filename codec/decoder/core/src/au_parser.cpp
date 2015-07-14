@@ -440,19 +440,13 @@ bool CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeade
   }
 
   // Subclause 7.4.1.2.5
-  if (pLastSliceHeader->iRedundantPicCnt < pCurSliceHeader->iRedundantPicCnt)
-    return false;
-  else if (pLastSliceHeader->iRedundantPicCnt > pCurSliceHeader->iRedundantPicCnt)
+  if (pLastSliceHeader->iRedundantPicCnt > pCurSliceHeader->iRedundantPicCnt)
     return true;
 
   // Subclause G7.4.1.2.4
-  if (pLastNalHdrExt->uiDependencyId < pCurNalHeaderExt->uiDependencyId)
-    return false;
-  else if (pLastNalHdrExt->uiDependencyId > pCurNalHeaderExt->uiDependencyId)
+  if (pLastNalHdrExt->uiDependencyId > pCurNalHeaderExt->uiDependencyId)
     return true;
-  if (pLastNalHdrExt->uiQualityId < pCurNalHeaderExt->uiQualityId)
-    return false;
-  else if (pLastNalHdrExt->uiQualityId > pCurNalHeaderExt->uiQualityId)
+  if (pLastNalHdrExt->uiQualityId > pCurNalHeaderExt->uiQualityId)
     return true;
 
   // Subclause 7.4.1.2.4
