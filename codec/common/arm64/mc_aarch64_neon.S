@@ -1818,6 +1818,30 @@ w9_h_mc_luma_loop:
 WELS_ASM_AARCH64_FUNC_END
 
 
+WELS_ASM_AARCH64_FUNC_BEGIN McHorVer20Width5_AArch64_neon
+    sub x0, x0, #2
+    sub x3, x3, #4
+    mov x5, #4
+    movi v0.8h, #20, lsl #0
+    movi v1.8h, #5, lsl #0
+w5_h_mc_luma_loop:
+    ld1 {v2.16b}, [x0], x1 //only use 10(5+5); v2=src[-2]
+
+    ext v5.16b, v2.16b, v4.16b, #1    //v5=src[-1]
+    ext v6.16b, v2.16b, v4.16b, #2    //v6=src[0]
+    ext v7.16b, v2.16b, v4.16b, #3    //v7=src[1]
+    ext v16.16b, v2.16b, v4.16b, #4   //v16=src[2]
+    ext v17.16b, v2.16b, v4.16b, #5   //v17=src[3]
+
+    FILTER_6TAG_8BITS1 v2, v5, v6, v7, v16, v17, v20, v0, v1
+    st1 {v20.s}[0], [x2], x5 //write 4Byte
+    st1 {v20.b}[4], [x2], x3 //write 5th Byte
+
+    sub x4, x4, #1
+    cbnz x4, w5_h_mc_luma_loop
+WELS_ASM_AARCH64_FUNC_END
+
+
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer22Width17_AArch64_neon
     stp d8, d9, [sp,#-16]!
     stp d10, d11, [sp,#-16]!
@@ -2116,6 +2140,98 @@ w9_hv_mc_luma_loop:
     st1 {v26.b}[0], [x2], x3 //write 8th Byte : 0 line
 WELS_ASM_AARCH64_FUNC_END
 
+
+WELS_ASM_AARCH64_FUNC_BEGIN McHorVer22Width5_AArch64_neon
+    sub x0, x0, #2
+    sub x0, x0, x1, lsl #1
+    movi v0.8h, #20, lsl #0
+    movi v1.8h, #5, lsl #0
+    sub x3, x3, #4
+    mov x5, #4
+    ldr q29, filter_para
+    sub x4, x4, #1
+
+    //prfm pldl1strm, [x0]
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v2.16b}, [x0], x1 // v2=src[-2*stride]
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v3.16b}, [x0], x1 // v5=src[-1*stride]
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v4.16b}, [x0], x1 // v8=src[0*stride]
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v5.16b}, [x0], x1 // v11=src[1*stride]
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v6.16b}, [x0], x1 // v14=src[2*stride]
+
+w5_hv_mc_luma_loop:
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v7.16b}, [x0], x1 // v7=src[3*stride]
+    // vertical filtered into v20/v21
+    FILTER_6TAG_8BITS_TO_16BITS1 v2, v3, v4, v5, v6, v7, v20, v0, v1
+    FILTER_6TAG_8BITS_TO_16BITS2 v2, v3, v4, v5, v6, v7, v21, v0, v1
+    // horizon filtered
+    UNPACK_2_16BITS_TO_ABC  v20, v21, v23, v24, v25
+    FILTER_3_IN_16BITS_TO_8BITS1 v23, v24, v25, v26 //output to v26[0]
+    st1 {v26.s}[0], [x2], x5 //write 0:3Byte : 0 line
+    st1 {v26.b}[4], [x2], x3 //write 5th Byte : 0 line
+
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v2.16b}, [x0], x1 // v2=src[4*stride]
+    // vertical filtered into v20/v21
+    FILTER_6TAG_8BITS_TO_16BITS1 v3, v4, v5, v6, v7, v2, v20, v0, v1
+    FILTER_6TAG_8BITS_TO_16BITS2 v3, v4, v5, v6, v7, v2, v21, v0, v1
+    // horizon filtered
+    UNPACK_2_16BITS_TO_ABC  v20, v21, v23, v24, v25
+    FILTER_3_IN_16BITS_TO_8BITS1 v23, v24, v25, v26 //output to v26[0]
+    st1 {v26.s}[0], [x2], x5 //write 0:3Byte : 1 line
+    st1 {v26.b}[4], [x2], x3 //write 5th Byte : 1 line
+
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v3.16b}, [x0], x1 // v3=src[5*stride]
+    // vertical filtered into v20/v21
+    FILTER_6TAG_8BITS_TO_16BITS1 v4, v5, v6, v7, v2, v3, v20, v0, v1
+    FILTER_6TAG_8BITS_TO_16BITS2 v4, v5, v6, v7, v2, v3, v21, v0, v1
+    // horizon filtered
+    UNPACK_2_16BITS_TO_ABC  v20, v21, v23, v24, v25
+    FILTER_3_IN_16BITS_TO_8BITS1 v23, v24, v25, v26 //output to v26[0]
+    st1 {v26.s}[0], [x2], x5 //write 0:3Byte : 2 line
+    st1 {v26.b}[4], [x2], x3 //write 5th Byte : 2 line
+
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v4.16b}, [x0], x1 // v4=src[6*stride]
+    // vertical filtered into v20/v21
+    FILTER_6TAG_8BITS_TO_16BITS1 v5, v6, v7, v2, v3, v4, v20, v0, v1
+    FILTER_6TAG_8BITS_TO_16BITS2 v5, v6, v7, v2, v3, v4, v21, v0, v1
+    // horizon filtered
+    UNPACK_2_16BITS_TO_ABC  v20, v21, v23, v24, v25
+    FILTER_3_IN_16BITS_TO_8BITS1 v23, v24, v25, v26 //output to v26[0]
+    st1 {v26.s}[0], [x2], x5 //write 0:3Byte : 3 line
+    st1 {v26.b}[4], [x2], x3 //write 5th Byte : 3 line
+
+
+    mov v5.16b, v3.16b
+    mov v3.16b, v7.16b
+    mov v30.16b, v2.16b
+    mov v2.16b, v6.16b
+    mov v6.16b, v4.16b
+    mov v4.16b, v30.16b
+
+    sub x4, x4, #4
+    cbnz x4, w5_hv_mc_luma_loop
+
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v7.16b}, [x0], x1 // v7=src[3*stride]
+    // vertical filtered into v20/v21
+    FILTER_6TAG_8BITS_TO_16BITS1 v2, v3, v4, v5, v6, v7, v20, v0, v1
+    FILTER_6TAG_8BITS_TO_16BITS2 v2, v3, v4, v5, v6, v7, v21, v0, v1
+    // horizon filtered
+    UNPACK_2_16BITS_TO_ABC  v20, v21, v23, v24, v25
+    FILTER_3_IN_16BITS_TO_8BITS1 v23, v24, v25, v26 //output to v26[0]
+    st1 {v26.s}[0], [x2], x5 //write 0:3Byte : 0 line
+    st1 {v26.b}[4], [x2], x3 //write 5th Byte : 0 line
+WELS_ASM_AARCH64_FUNC_END
+
+
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer02Height17_AArch64_neon
     sub x0, x0, x1, lsl #1
     movi v0.8h, #20, lsl #0
@@ -2257,6 +2373,62 @@ w9_v_mc_luma_loop:
     ld1 {v7.8b}, [x0], x1 // v7=src[3*stride]
     FILTER_6TAG_8BITS1 v2, v3, v4, v5, v6, v7, v20, v0, v1
     st1 {v20.8b}, [x2], x3 //write 8Byte : 0 line
+WELS_ASM_AARCH64_FUNC_END
+
+
+WELS_ASM_AARCH64_FUNC_BEGIN McHorVer02Height5_AArch64_neon
+    sub x0, x0, x1, lsl #1
+    movi v0.8h, #20, lsl #0
+    movi v1.8h, #5, lsl #0
+    sub x4, x4, #1
+
+    //prfm pldl1strm, [x0]
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v2.8b}, [x0], x1 // v2=src[-2*stride]
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v3.8b}, [x0], x1 // v3=src[-1*stride]
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v4.8b}, [x0], x1 // v4=src[0*stride]
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v5.8b}, [x0], x1 // v5=src[1*stride]
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v6.8b}, [x0], x1 // v6=src[2*stride]
+
+w5_v_mc_luma_loop:
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v7.8b}, [x0], x1 // v7=src[3*stride]
+    FILTER_6TAG_8BITS1 v2, v3, v4, v5, v6, v7, v20, v0, v1
+    st1 {v20.s}[0], [x2], x3 //write 4Byte : 0 line
+
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v2.8b}, [x0], x1 // v2=src[4*stride]
+    FILTER_6TAG_8BITS1 v3, v4, v5, v6, v7, v2, v20, v0, v1
+    st1 {v20.s}[0], [x2], x3 //write 4Byte : 1 line
+
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v3.8b}, [x0], x1 // v3=src[5*stride]
+    FILTER_6TAG_8BITS1 v4, v5, v6, v7, v2, v3, v20, v0, v1
+    st1 {v20.s}[0], [x2], x3 //write 4Byte : 2 line
+
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v4.8b}, [x0], x1 // v4=src[6*stride]
+    FILTER_6TAG_8BITS1 v5, v6, v7, v2, v3, v4, v20, v0, v1
+    st1 {v20.s}[0], [x2], x3 //write 4Byte : 3 line
+
+    mov v5.16b, v3.16b
+    mov v3.16b, v7.16b
+    mov v7.16b, v2.16b
+    mov v2.16b, v6.16b
+    mov v6.16b, v4.16b
+    mov v4.16b, v7.16b
+    sub x4, x4, #4
+    cbnz x4, w5_v_mc_luma_loop
+
+    //prfm pldl1strm, [x0, x1]
+    ld1 {v7.8b}, [x0], x1 // v7=src[3*stride]
+    FILTER_6TAG_8BITS1 v2, v3, v4, v5, v6, v7, v20, v0, v1
+    st1 {v20.s}[0], [x2], x3 //write 4Byte : 0 line
+
 WELS_ASM_AARCH64_FUNC_END
 
 #endif
