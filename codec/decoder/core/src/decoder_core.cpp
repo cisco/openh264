@@ -857,6 +857,10 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     WELS_CHECK_SE_UPPER_ERROR (uiCode, SLICE_HEADER_REDUNDANT_PIC_CNT_MAX, "redundant_pic_cnt",
                                GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_REDUNDANT_PIC_CNT));
     pSliceHead->iRedundantPicCnt = uiCode;
+    if (pSliceHead->iRedundantPicCnt > 0) {
+      WelsLog (pLogCtx, WELS_LOG_WARNING, "Redundant picture not supported!");
+      return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_REDUNDANT_PIC_CNT);
+    }
   }
 
   //set defaults, might be overriden a few line later
