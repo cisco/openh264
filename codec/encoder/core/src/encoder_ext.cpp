@@ -1781,10 +1781,10 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
       bDynamicSlice = true;
       uiMaxSliceNumEstimation = WELS_MIN (AVERSLICENUM_CONSTRAINT,
                                           (iLayerBsSize / pMso->sSliceArgument.uiSliceSizeConstraint) + 1);
-      (*ppCtx)->iMaxSliceCount = WELS_MAX ((*ppCtx)->iMaxSliceCount, uiMaxSliceNumEstimation);
+      (*ppCtx)->iMaxSliceCount = WELS_MAX ((*ppCtx)->iMaxSliceCount, (int) uiMaxSliceNumEstimation);
       iSliceBufferSize = (WELS_MAX(pMso->sSliceArgument.uiSliceSizeConstraint, iLayerBsSize/uiMaxSliceNumEstimation)<<1) + MAX_MACROBLOCK_SIZE_IN_BYTE_x2;
     } else {
-      (*ppCtx)->iMaxSliceCount = WELS_MAX ((*ppCtx)->iMaxSliceCount, pMso->sSliceArgument.uiSliceNum);
+      (*ppCtx)->iMaxSliceCount = WELS_MAX ((*ppCtx)->iMaxSliceCount, (int) pMso->sSliceArgument.uiSliceNum);
       iSliceBufferSize = ((iLayerBsSize / pMso->sSliceArgument.uiSliceNum)<<1) + MAX_MACROBLOCK_SIZE_IN_BYTE_x2;
     }
     iMaxSliceBufferSize = WELS_MAX(iMaxSliceBufferSize, iSliceBufferSize);
