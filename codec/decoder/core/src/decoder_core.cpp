@@ -2416,8 +2416,10 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
       pCtx->bFrameFinish = true; //clear frame pending status here!
     } else {
       if (DecodeFrameConstruction (pCtx, ppDst, pDstInfo)) {
-        if (pCtx->sLastNalHdrExt.sNalUnitHeader.uiNalRefIdc > 0)
+        if ((pCtx->sLastNalHdrExt.sNalUnitHeader.uiNalRefIdc > 0) && (pCtx->sLastNalHdrExt.uiTemporalId == 0))
           pCtx->iErrorCode |= dsNoParamSets;
+        else
+          pCtx->iErrorCode |= dsBitstreamError;
         pCtx->pDec = NULL;
         return false;
       }
