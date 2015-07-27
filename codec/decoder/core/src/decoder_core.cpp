@@ -791,6 +791,13 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
 
   pSliceHeadExt->pSubsetSps = pSubsetSps;
 
+  if (pSps->iNumRefFrames == 0) {
+    if ((uiSliceType != I_SLICE) && (uiSliceType != SI_SLICE)) {
+      WelsLog (pLogCtx, WELS_LOG_WARNING, "slice_type (%d) not supported for num_ref_frames = 0.", uiSliceType);
+      return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SLICE_TYPE);
+    }
+  }
+
   bIdrFlag = (!kbExtensionFlag && eNalType == NAL_UNIT_CODED_SLICE_IDR) || (kbExtensionFlag && pNalHeaderExt->bIdrFlag);
   pSliceHead->bIdrFlag = bIdrFlag;
 
