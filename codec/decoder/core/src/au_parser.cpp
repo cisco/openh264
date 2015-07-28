@@ -1395,18 +1395,13 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
                                   ERR_INFO_INVALID_CHROMA_QP_INDEX_OFFSET));
   }
 
-  if (pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
-    PNalUnit pLastNalUnit = pCtx->pAccessUnitList->pNalUnitsList[pCtx->pAccessUnitList->uiAvailUnitsNum - 1];
-    PPps pLastPps = pLastNalUnit->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pPps;
-    // the active pps is overwrite, write to a temp place
-    if (pLastPps == &pCtx->sPpsBuffer[uiPpsId] && memcmp (&pCtx->sPpsBuffer[uiPpsId], pPps, sizeof (*pPps)) != 0) {
+  if (pCtx->pPps != NULL && pCtx->pPps->iPpsId == pPps->iPpsId) {
+    if (memcmp (pCtx->pPps, pPps, sizeof (*pPps)) != 0) {
       memcpy (&pCtx->sPpsBuffer[MAX_PPS_COUNT], pPps, sizeof (SPps));
       pCtx->iOverwriteFlags |= OVERWRITE_PPS;
       pCtx->bAuReadyFlag = true;
-      pCtx->pAccessUnitList->uiEndPos = pCtx->pAccessUnitList->uiAvailUnitsNum - 1;
-    } else {
-      memcpy (&pCtx->sPpsBuffer[uiPpsId], pPps, sizeof (SPps));
-      pCtx->bPpsAvailFlags[uiPpsId] = true;
+      pCtx->pAccessUnitList->uiEndPos = (pCtx->pAccessUnitList->uiAvailUnitsNum > 0 ? (pCtx->pAccessUnitList->uiAvailUnitsNum
+                                         - 1) : 0);
     }
   } else {
     memcpy (&pCtx->sPpsBuffer[uiPpsId], pPps, sizeof (SPps));
