@@ -943,6 +943,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   } else pSps->pSLevelLimits = pSLevelLimits;
   // syntax elements in default
   pSps->uiChromaFormatIdc = 1;
+  pSps->uiChromaArrayType = 1;
 
   pSps->uiProfileIdc = uiProfileIdc;
   pSps->uiLevelIdc   = uiLevelIdc;
