@@ -65,7 +65,7 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
                            int32_t iCurDid);
 
 int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pParam, const int32_t kiCountBsLen,
-                           const int32_t kiTargetSpatialBsSize);
+                           const int32_t kiTargetSpatialBsSize, bool bDynamicSlice);
 
 void ReleaseMtResource (sWelsEncCtx** ppCtx);
 

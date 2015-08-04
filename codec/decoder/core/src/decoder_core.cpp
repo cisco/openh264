@@ -791,6 +791,13 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
 
   pSliceHeadExt->pSubsetSps = pSubsetSps;
 
+  if (pSps->iNumRefFrames == 0) {
+    if ((uiSliceType != I_SLICE) && (uiSliceType != SI_SLICE)) {
+      WelsLog (pLogCtx, WELS_LOG_WARNING, "slice_type (%d) not supported for num_ref_frames = 0.", uiSliceType);
+      return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SLICE_TYPE);
+    }
+  }
+
   bIdrFlag = (!kbExtensionFlag && eNalType == NAL_UNIT_CODED_SLICE_IDR) || (kbExtensionFlag && pNalHeaderExt->bIdrFlag);
   pSliceHead->bIdrFlag = bIdrFlag;
 
@@ -857,6 +864,10 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     WELS_CHECK_SE_UPPER_ERROR (uiCode, SLICE_HEADER_REDUNDANT_PIC_CNT_MAX, "redundant_pic_cnt",
                                GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_REDUNDANT_PIC_CNT));
     pSliceHead->iRedundantPicCnt = uiCode;
+    if (pSliceHead->iRedundantPicCnt > 0) {
+      WelsLog (pLogCtx, WELS_LOG_WARNING, "Redundant picture not supported!");
+      return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_REDUNDANT_PIC_CNT);
+    }
   }
 
   //set defaults, might be overriden a few line later
@@ -2412,8 +2423,10 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
       pCtx->bFrameFinish = true; //clear frame pending status here!
     } else {
       if (DecodeFrameConstruction (pCtx, ppDst, pDstInfo)) {
-        if (pCtx->sLastNalHdrExt.sNalUnitHeader.uiNalRefIdc > 0)
+        if ((pCtx->sLastNalHdrExt.sNalUnitHeader.uiNalRefIdc > 0) && (pCtx->sLastNalHdrExt.uiTemporalId == 0))
           pCtx->iErrorCode |= dsNoParamSets;
+        else
+          pCtx->iErrorCode |= dsBitstreamError;
         pCtx->pDec = NULL;
         return false;
       }
