@@ -3474,6 +3474,8 @@ static const EncodeOptionParam kOptionParamArray[] = {
   {false, true, false, 30, 104, 416, 44, SM_DYN_SLICE, 500, 7.5, 2, ""},
   {false, true, false, 30, 16, 16, 2, SM_DYN_SLICE, 500, 7.5, 3, ""},
   {false, true, false, 30, 32, 16, 2, SM_DYN_SLICE, 500, 7.5, 3, ""},
+  {false, false, true, 30, 600, 460, 1, SM_FIXEDSLCNUM_SLICE, 0, 15.0, 4, ""},
+  {false, false, true, 30, 600, 460, 1, SM_AUTO_SLICE, 0, 15.0, 4, ""},
 };
 
 class EncodeTestAPI : public ::testing::TestWithParam<EncodeOptionParam>, public ::EncodeDecodeTestAPIBase {
@@ -3494,9 +3496,9 @@ class EncodeTestAPI : public ::testing::TestWithParam<EncodeOptionParam>, public
     }
     int rv = encoder_->EncodeFrame (&EncPic, &info);
     if (0 == iCheckTypeIndex)
-      ASSERT_TRUE (rv == cmResultSuccess);
+      ASSERT_TRUE (rv == cmResultSuccess) << "rv=" << rv;
     else if (1 == iCheckTypeIndex)
-      ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+      ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason) << "rv=" << rv;
   }
 };
 
@@ -3525,6 +3527,9 @@ TEST_P (EncodeTestAPI, SetEncOptionSize) {
   param_.sSpatialLayers[0].iVideoHeight = p.iHeight;
   param_.sSpatialLayers[0].fFrameRate = p.fFramerate;
   param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = p.eSliceMode;
+  if (SM_AUTO_SLICE == p.eSliceMode || SM_FIXEDSLCNUM_SLICE == p.eSliceMode ) {
+    param_.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = 8;
+  }
 
   encoder_->Uninitialize();
   int rv = encoder_->InitializeExt (&param_);
