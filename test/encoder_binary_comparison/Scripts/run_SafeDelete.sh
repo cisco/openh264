@@ -8,10 +8,10 @@
 #       -- For more detail,please refer to file AboutTest.
 #
 #brief:
-#       -- Usage: ./run_SafeDelere.sh  $DeleteItermPath
-#            eg:    1  ./run_SafeDelere.sh  tempdata.info        --->delete only one file
-#            eg:    2  ./run_SafeDelere.sh  ../TempDataFolder    --->delete entire folder
-#                      ./run_SafeDelere.sh  /opt/TempData/ABC    --->delete entire folder ABC
+#       -- Usage: ./run_SafeDelete.sh  $DeleteItermPath
+#            eg:    1  ./run_SafeDelete.sh  tempdata.info        --->delete only one file
+#            eg:    2  ./run_SafeDelete.sh  ../TempDataFolder    --->delete entire folder
+#                      ./run_SafeDelete.sh  /opt/TempData/ABC    --->delete entire folder ABC
 #
 # date:  10/06/2014 Created
 #*******************************************************************************
@@ -148,7 +148,7 @@ runUserNameCheck()
     echo ""
     echo "*********************************************"
     echo "delete files under root is not allowed"
-    echo "detected by run_SafeDelere.sh"
+    echo "detected by run_SafeDelete.sh"
     return 1
   else
     echo ""
@@ -177,7 +177,7 @@ runFolderLocationCheck()
     echo "*********************************************"
     echo "FileDepth is  $FileDirDepth, and it is less thab the minimum depth(5)"
     echo "unsafe delete! try to delete non-project related files: $FileDir"
-    echo "detected by run_SafeDelere.sh"
+    echo "detected by run_SafeDelete.sh"
     return 1
   fi
 
@@ -190,7 +190,7 @@ runSafeDelete()
   #parameter check!
   if [ ! $# -eq 1  ]
   then
-    echo "usage runSafeDelete \FileFullPath"
+    echo "usage runSafeDelete \$FileFullPath"
     return 1
    fi
 
@@ -215,8 +215,8 @@ runSafeDelete()
   then
     FullPath=`runGetFileFullPath  ${PathInfo} `
   else
-    echo "delete iterm does not exist"
-    echo "detected by run_SafeDelere.sh"
+    echo "delete item does not exist"
+    echo "detected by run_SafeDelete.sh"
     return 1
   fi
 

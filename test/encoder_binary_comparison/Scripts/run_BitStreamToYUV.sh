@@ -53,9 +53,8 @@ run_BitStream2YUV()
     return 1
   fi
   local BitStreamName=$1
-  local OutputYUVNAMe=$2
+  local OutputYUVName=$2
   local LogFile=$3
-
   if [ ! -f ${BitStreamName}  ]
   then
     echo "bit stream file does not exist!"
@@ -63,8 +62,7 @@ run_BitStream2YUV()
     return 1
   fi
   #decode bitstream
-  ./h264dec  ${BitStreamName}  ${OutputYUVNAMe} 2> ${LogFile}
-
+  ./h264dec  ${BitStreamName}  ${OutputYUVName} 2> ${LogFile}
   return 0
 }
 #usage: run_RegularizeYUVName $BitstreamName $OutputYUVName $LogFile
@@ -79,18 +77,14 @@ run_RegularizeYUVName()
   local OrignName=$2
   local LogFile=$3
   local RegularizedYUVName=""
-
   declare -a aDecodedYUVInfo
-
   aDecodedYUVInfo=(`run_ParseDecoderLog  ${LogFile}`)
-
   BitStreamName=`echo ${BitStreamName} | awk 'BEGIN {FS="/"} {print $NF}'`
   RegularizedYUVName="${BitStreamName}_${aDecodedYUVInfo[0]}x${aDecodedYUVInfo[1]}.yuv"
   mv -f  ${OrignName}   ${RegularizedYUVName}
   echo ""
-  echo "file :  ${OrignName}   has been renamed as :${RegularizedYUVName}"
+  echo "file: ${OrignName}   has been renamed as: ${RegularizedYUVName}"
   echo ""
-
   return 0
 }
 #usage: runMain  ${BitStreamName}
@@ -98,16 +92,14 @@ runMain()
 {
   if [ ! $# -eq 1 ]
   then
-    echo "usage: runMain  ${BitStreamName} "
+    echo "usage: runMain  \${BitStreamName} "
     return 1
   fi
-
   local BitStreameFile=$1
   local BitSteamName=`echo ${BitStreameFile} | awk 'BEGIN {FS="/"} {print $NF}'`
   local DecoderLogFile="${BitSteamName}_h264dec.log"
   local DecodedYUVName="${BitSteamName}_dec.yuv"
   local RegularizedName=""
-
   #**********************
   #decoded test bit stream
   run_BitStream2YUV  ${BitStreameFile}  ${DecodedYUVName}  ${DecoderLogFile}
@@ -116,16 +108,11 @@ runMain()
       echo "bit stream decoded  failed!"
     return 1
   fi
-
-
   #*********************
   #regularized  YUV name
   run_RegularizeYUVName  ${BitStreameFile}  ${DecodedYUVName}  ${DecoderLogFile}
-
   return 0
 }
 BitStreamFile=$1
 runMain  ${BitStreamFile}
-
-
 

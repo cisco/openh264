@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	set_mb_syn_cavlc.h
+ * \file    set_mb_syn_cavlc.h
  *
- * \brief	Seting all syntax elements of mb and decoding residual with cavlc
+ * \brief   Seting all syntax elements of mb and decoding residual with cavlc
  *
- * \date	05/19/2009 Created
+ * \date    05/19/2009 Created
  *
  *************************************************************************************
  */
@@ -42,7 +42,6 @@
 #define SET_MB_SYN_CAVLC_H_
 
 #include "typedefs.h"
-#include "bit_stream.h"
 #include "wels_func_ptr_def.h"
 
 namespace WelsEnc {

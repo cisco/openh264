@@ -59,10 +59,10 @@ class CReadConfig {
   const std::string& GetFileName();
 
  private:
-  FILE*			m_pCfgFile;
-  std::string			m_strCfgFileName;
-  unsigned int	m_iLines;
+  FILE*             m_pCfgFile;
+  std::string       m_strCfgFileName;
+  unsigned int      m_iLines;
 };
 
-#endif	// READ_CONFIG_H__
+#endif // READ_CONFIG_H__
 

@@ -30,47 +30,9 @@
  *
  */
 
-#ifdef  HAVE_NEON
-.text
+#ifdef HAVE_NEON
 #include "arm_arch_common_macro.S"
 
-#ifdef __APPLE__
-.macro LOAD_ALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, src*, src_stride
-    vld1.64 {$0}, [$4,:128], $5
-    vld1.64 {$1}, [$4,:128], $5
-    vld1.64 {$2}, [$4,:128], $5
-    vld1.64 {$3}, [$4,:128], $5
-//  }
-.endm
-
-.macro STORE_ALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, dst*, dst_stride
-    vst1.64 {$0}, [$4,:128], $5
-    vst1.64 {$1}, [$4,:128], $5
-    vst1.64 {$2}, [$4,:128], $5
-    vst1.64 {$3}, [$4,:128], $5
-//  }
-.endm
-
-.macro LOAD_UNALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, src*, src_stride
-    vld1.64 {$0}, [$4], $5
-    vld1.64 {$1}, [$4], $5
-    vld1.64 {$2}, [$4], $5
-    vld1.64 {$3}, [$4], $5
-//  }
-.endm
-
-.macro STORE_UNALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, dst*, dst_stride
-    vst1.64 {$0}, [$4], $5
-    vst1.64 {$1}, [$4], $5
-    vst1.64 {$2}, [$4], $5
-    vst1.64 {$3}, [$4], $5
-//  }
-.endm
-#else
 .macro LOAD_ALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
 //  {   //  input: \arg0~\arg3, src*, src_stride
     vld1.64 {\arg0}, [\arg4,:128], \arg5
@@ -106,8 +68,6 @@
     vst1.64 {\arg3}, [\arg4], \arg5
 //  }
 .endm
-
-#endif
 
 
 WELS_ASM_FUNC_BEGIN WelsCopy8x8_neon

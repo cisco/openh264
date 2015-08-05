@@ -1,6 +1,6 @@
 include $(SRC_PATH)build/arch.mk
 ifeq ($(ASM_ARCH), x86)
-ifeq ($(ENABLE64BIT), Yes)
+ifeq ($(ARCH), x86_64)
 ASMFLAGS += -f win64
 ASMFLAGS_PLATFORM = -DWIN64
 else
@@ -10,7 +10,7 @@ else
 endif
 ifeq ($(ASM_ARCH), arm)
 CCAS = gas-preprocessor.pl -as-type armasm -force-thumb -- armasm
-CCASFLAGS = -nologo -DHAVE_NEON
+CCASFLAGS = -nologo -DHAVE_NEON -ignore 4509
 endif
 
 CC=cl
@@ -22,7 +22,7 @@ CXX_O=-Fo$@
 # it unconditionally. The same issue can also be worked around by adding
 # -DGTEST_HAS_TR1_TUPLE=0 instead, but we prefer this version since it
 # matches what gtest itself does.
-CFLAGS += -nologo -W3 -EHsc -fp:precise -Zc:wchar_t -Zc:forScope -D_VARIADIC_MAX=10
+CFLAGS += -nologo -Fd$(PROJECT_NAME).pdb -W3 -EHsc -fp:precise -Zc:wchar_t -Zc:forScope -D_VARIADIC_MAX=10
 CXX_LINK_O=-nologo -Fe$@
 AR_OPTS=-nologo -out:$@
 CFLAGS_OPT=-O2 -Ob1 -Oy- -Zi -GF -Gm- -GS -Gy -DNDEBUG
@@ -35,7 +35,15 @@ LIBSUFFIX=lib
 LIBPREFIX=
 EXEEXT=.exe
 OBJ=obj
+SHAREDLIB_DIR = $(PREFIX)/bin
 SHAREDLIBSUFFIX=dll
+SHAREDLIBSUFFIXVER=$(SHAREDLIBSUFFIX)
 SHARED=-LD
-SHLDFLAGS=-link -def:openh264.def -implib:$(PROJECT_NAME)_dll.lib
 EXTRA_LIBRARY=$(PROJECT_NAME)_dll.lib
+LDFLAGS += -link
+SHLDFLAGS=-pdb:$(PROJECT_NAME).pdb -def:$(SRC_PATH)openh264.def -implib:$(EXTRA_LIBRARY)
+STATIC_LDFLAGS=
+CODEC_UNITTEST_CFLAGS=-D_CRT_SECURE_NO_WARNINGS
+
+%.res: %.rc
+	$(QUIET_RC)rc -fo $@ $<

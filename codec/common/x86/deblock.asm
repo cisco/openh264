@@ -5276,3 +5276,14 @@ WELS_EXTERN DeblockLumaTransposeV2H_sse2
     pop      r3
     ret
 
+WELS_EXTERN WelsNonZeroCount_sse2
+    %assign  push_num 0
+    LOAD_1_PARA
+    movdqu  xmm0, [r0]
+    movq    xmm1, [r0+16]
+    WELS_DB1 xmm2
+    pminub  xmm0, xmm2
+    pminub  xmm1, xmm2
+    movdqu  [r0], xmm0
+    movq    [r0+16], xmm1
+    ret

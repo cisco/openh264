@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	svc_encode_slice.h
+ * \file    svc_encode_slice.h
  *
- * \brief	svc encoding slice
+ * \brief   svc encoding slice
  *
- * \date	2009.07.27 Created
+ * \date    2009.07.27 Created
  *
  *************************************************************************************
  */
@@ -76,8 +76,8 @@ int32_t WelsPSliceMdEnc (sWelsEncCtx* pEncCtx, SSlice* pSlice,  const bool kbIsH
 int32_t WelsPSliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice,  const bool kbIsHighestDlayerFlag);
 
 //encapsulation func: store base rec, highest Dependency Layer(only one quality) rec, single layer rec
-int32_t WelsISliceMdEnc (sWelsEncCtx* pEncCtx, SSlice* pSlice);	// for intra non-dynamic slice
-int32_t WelsISliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice);	// for intra dynamic slice
+int32_t WelsISliceMdEnc (sWelsEncCtx* pEncCtx, SSlice* pSlice);         // for intra non-dynamic slice
+int32_t WelsISliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice);  // for intra dynamic slice
 
 int32_t WelsCodePSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice);
 int32_t WelsCodePOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice);
@@ -94,9 +94,9 @@ void UpdateMbNeighbourInfoForNextSlice (SSliceCtx* pSliceCtx,
 void AddSliceBoundary (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
                        int32_t iNextSliceFirstMbIdx, const int32_t kiLastMbIdxInPartition);
 int32_t WelsMdInterMbLoop (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pMd,
-                           const int32_t kiSliceFirstMbXY);	// for inter non-dynamic slice
+                           const int32_t kiSliceFirstMbXY); // for inter non-dynamic slice
 int32_t WelsMdInterMbLoopOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pMd,
-    const int32_t kiSliceFirstMbXY);	// for inter dynamic slice
+    const int32_t kiSliceFirstMbXY); // for inter dynamic slice
 
 
 bool DynSlcJudgeSliceBoundaryStepBack (void* pEncCtx, void* pSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,

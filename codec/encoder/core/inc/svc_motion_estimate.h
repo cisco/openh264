@@ -144,9 +144,9 @@ void WelsInitMeFunc (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag, bool bScre
  *
  * \return  NONE
  */
-void WelsMotionEstimateSearch (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice);
-void WelsMotionEstimateSearchStatic (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice);
-void WelsMotionEstimateSearchScrolled (SWelsFuncPtrList* pFuncList, void* pLplayer, void* pLpme, void* pLpslice);
+void WelsMotionEstimateSearch (SWelsFuncPtrList* pFuncList, SDqLayer* pLplayer, SWelsME* pLpme, SSlice* pLpslice);
+void WelsMotionEstimateSearchStatic (SWelsFuncPtrList* pFuncList, SDqLayer* pLplayer, SWelsME* pLpme, SSlice* pLpslice);
+void WelsMotionEstimateSearchScrolled (SWelsFuncPtrList* pFuncList, SDqLayer* pLplayer, SWelsME* pLpme, SSlice* pLpslice);
 /*!
  * \brief  BL mb motion estimate initial point testing
  *
@@ -188,13 +188,13 @@ void WelsDiamondSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlic
 bool WelsMeSadCostSelect (int32_t* pSadCost, const uint16_t* kpMvdCost, int32_t* pBestCost, const int32_t kiDx,
                           const int32_t kiDy, int32_t* pIx, int32_t* pIy);
 
-void CalculateSatdCost (PSampleSadSatdCostFunc pSatd, void* vpMe, const int32_t kiEncStride, const int32_t kiRefStride);
-void NotCalculateSatdCost (PSampleSadSatdCostFunc pSatd, void* vpMe, const int32_t kiEncStride,
+void CalculateSatdCost (PSampleSadSatdCostFunc pSatd, SWelsME* pMe, const int32_t kiEncStride, const int32_t kiRefStride);
+void NotCalculateSatdCost (PSampleSadSatdCostFunc pSatd, SWelsME* pMe, const int32_t kiEncStride,
                            const int32_t kiRefStride);
-bool CheckDirectionalMv (PSampleSadSatdCostFunc pSad, void* vpMe,
+bool CheckDirectionalMv (PSampleSadSatdCostFunc pSad, SWelsME* pMe,
                          const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
                          int32_t& iBestSadCost);
-bool CheckDirectionalMvFalse (PSampleSadSatdCostFunc pSad, void* vpMe,
+bool CheckDirectionalMvFalse (PSampleSadSatdCostFunc pSad, SWelsME* pMe,
                               const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
                               int32_t& iBestSadCost);
 

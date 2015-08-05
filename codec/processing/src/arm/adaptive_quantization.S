@@ -31,24 +31,14 @@
  */
 
 #ifdef HAVE_NEON
-.text
 #include "arm_arch_common_macro.S"
 
-#ifdef __APPLE__
-.macro SQR_ADD_16BYTES
-    vmull.u8 q3, $0, $0
-    vmull.u8 q8, $1, $1
-    vpadal.u16 $2, q3
-    vpadal.u16 $2, q8
-.endm
-#else
 .macro SQR_ADD_16BYTES arg0, arg1, arg2
     vmull.u8 q3, \arg0, \arg0
     vmull.u8 q8, \arg1, \arg1
     vpadal.u16 \arg2, q3
     vpadal.u16 \arg2, q8
 .endm
-#endif
 
 
 WELS_ASM_FUNC_BEGIN SampleVariance16x16_neon

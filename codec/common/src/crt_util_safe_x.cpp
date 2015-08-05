@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	crt_utils_safe_x.cpp
+ * \file    crt_utils_safe_x.cpp
  *
- * \brief	common tool/function utilization
+ * \brief   common tool/function utilization
  *
- * \date	03/10/2009 Created
+ * \date    03/10/2009 Created
  *
  *************************************************************************************
  */
@@ -54,11 +54,11 @@
 #endif //_WIN32
 
 #include "macros.h"
-#include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross platforms
+#include "crt_util_safe_x.h" // Safe CRT routines like utils for cross platforms
 
-#if  defined(_WIN32) && defined(_MSC_VER)
+#if defined(_WIN32) && defined(_MSC_VER)
 
-#if  defined(_MSC_VER) && (_MSC_VER>=1500)
+#if defined(_MSC_VER) && (_MSC_VER>=1500)
 
 int32_t WelsSnprintf (char* pBuffer,  int32_t iSizeOfBuffer, const char* kpFormat, ...) {
   va_list  pArgPtr;

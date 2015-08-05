@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	mv_pred.h
+ * \file    mv_pred.h
  *
- * \brief	Get MV predictor and update motion vector of mb cache
+ * \brief   Get MV predictor and update motion vector of mb cache
  *
- * \date	05/22/2009 Created
+ * \date    05/22/2009 Created
  *
  *************************************************************************************
  */
@@ -86,7 +86,7 @@ void UpdateP8x8MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPart
 /*!
  * \brief   get the motion predictor for 4*4 or 8*8 or 16*16 block
  * \param
- * \param 	output mvp_x and mvp_y
+ * \param   output mvp_x and mvp_y
  */
 void PredMv (const SMVComponentUnit* kpMvComp, int8_t iPartIdx, int8_t iPartW, int32_t iRef, SMVUnitXY* sMvp);
 
@@ -94,7 +94,7 @@ void PredMv (const SMVComponentUnit* kpMvComp, int8_t iPartIdx, int8_t iPartW, i
 /*!
  * \brief   get the motion predictor for SKIP MB
  * \param
- * \param 	output mvp_x and mvp_y
+ * \param   output mvp_x and mvp_y
  */
 void PredSkipMv (SMbCache* pMbCache, SMVUnitXY* sMvp);
 
@@ -102,7 +102,7 @@ void PredSkipMv (SMbCache* pMbCache, SMVUnitXY* sMvp);
 /*!
  * \brief   get the motion predictor for inter16x8 MB
  * \param
- * \param 	output mvp_x and mvp_y
+ * \param   output mvp_x and mvp_y
  */
 void PredInter16x8Mv (SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* sMvp);
 
@@ -110,7 +110,7 @@ void PredInter16x8Mv (SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnit
 /*!
  * \brief   get the motion predictor for inter8x16 MB
  * \param
- * \param 	output mvp_x and mvp_y
+ * \param   output mvp_x and mvp_y
  */
 void PredInter8x16Mv (SMbCache* pMbCache, int32_t iPartIdx, int8_t iRef, SMVUnitXY* sMvp);
 

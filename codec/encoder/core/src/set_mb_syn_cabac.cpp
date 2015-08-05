@@ -29,18 +29,17 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	set_mb_syn_cabac.cpp
+ * \file    set_mb_syn_cabac.cpp
  *
- * \brief	cabac coding engine
+ * \brief   cabac coding engine
  *
- * \date	10/11/2014 Created
+ * \date    10/11/2014 Created
  *
  *************************************************************************************
  */
 #include <string.h>
 #include "typedefs.h"
 #include "macros.h"
-#include "wels_common_defs.h"
 #include "set_mb_syn_cabac.h"
 #include "encoder.h"
 

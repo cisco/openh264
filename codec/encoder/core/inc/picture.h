@@ -101,21 +101,21 @@ int32_t   iFrameAverageQp;
 SScreenBlockFeatureStorage* pScreenBlockFeatureStorage;
 
   /*
-   *	set picture as unreferenced
+   *    set picture as unreferenced
    */
   void SetUnref () {
-      iFramePoc		= -1;
-      iFrameNum		= -1;
-      uiTemporalId	=
-        uiSpatialId		=
-        iLongTermPicNum = -1;
-      bIsLongRef	= false;
+      iFramePoc          = -1;
+      iFrameNum          = -1;
+      uiTemporalId       =
+        uiSpatialId      =
+        iLongTermPicNum  = -1;
+      bIsLongRef         = false;
       uiRecieveConfirmed = RECIEVE_FAILED;
-      iMarkFrameNum = -1;
-      bUsedAsRef	= false;
+      iMarkFrameNum      = -1;
+      bUsedAsRef         = false;
 
       if (NULL != pScreenBlockFeatureStorage)
-        pScreenBlockFeatureStorage->bRefBlockFeatureCalculated	= false;
+        pScreenBlockFeatureStorage->bRefBlockFeatureCalculated = false;
   }
 
 } SPicture;

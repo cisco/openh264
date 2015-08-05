@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	deblocking.h
+ * \file    deblocking.h
  *
- * \brief	Interfaces introduced in frame deblocking filtering
+ * \brief   Interfaces introduced in frame deblocking filtering
  *
- * \date	05/14/2009 Created
+ * \date    05/14/2009 Created
  *
  *************************************************************************************
  */
@@ -46,35 +46,35 @@
 namespace WelsDec {
 
 /*!
- * \brief	deblocking module initialize
+ * \brief   deblocking module initialize
  *
- * \param	pf
+ * \param   pf
  *          cpu
  *
- * \return	NONE
+ * \return  NONE
  */
 
 void  DeblockingInit (PDeblockingFunc pDeblockingFunc,  int32_t iCpu);
 
 
 /*!
- * \brief	deblocking filtering target slice
+ * \brief   deblocking filtering target slice
  *
- * \param	dec			Wels decoder context
+ * \param   dec         Wels decoder context
  *
- * \return	NONE
+ * \return  NONE
  */
 void WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFunc pDeblockMb);
 
 /*!
- * \brief	pixel deblocking filtering
+ * \brief   pixel deblocking filtering
  *
- * \param	filter			      deblocking filter
- * \param	pix	                  pixel value
- * \param	stride	              frame stride
- * \param	bs	                  boundary strength
+ * \param   filter                deblocking filter
+ * \param   pix                   pixel value
+ * \param   stride                frame stride
+ * \param   bs                    boundary strength
  *
- * \return	NONE
+ * \return  NONE
  */
 
 uint32_t DeblockingBsMarginalMBAvcbase (PDqLayer pCurDqLayer, int32_t iEdge, int32_t iNeighMb, int32_t iMbXy);

@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	        :  AdaptiveQuantization.h
+ * \file         :  AdaptiveQuantization.h
  *
- * \brief	    :  adaptive quantization class of wels video processor class
+ * \brief        :  adaptive quantization class of wels video processor class
  *
  * \date         :  2011/03/21
  *
@@ -87,8 +87,8 @@ class CAdaptiveQuantization : public IStrategy {
   void WelsInitVarFunc (PVarFunc& pfVar, int32_t iCpuFlag);
 
  private:
-  PVarFunc			                   m_pfVar;
-  int32_t                                  m_CPUFlag;
+  PVarFunc                      m_pfVar;
+  int32_t                       m_CPUFlag;
   SAdaptiveQuantizationParam    m_sAdaptiveQuantParam;
 };
 

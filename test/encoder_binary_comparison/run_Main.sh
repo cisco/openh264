@@ -1,5 +1,4 @@
 #!/bin/bash
-
 #*******************************************************************************
 #Encoder Binary comparison test model
 #       -- Compared with benchmark version using SHA-1 string
@@ -32,9 +31,7 @@ runTestTypeCheck()
     echo "usage:   runTestTypeCheck  \${TestType}"
     exit 1
   fi
-
   local TestType=$1
-
   echo "TestType is ${TestType}"
   if [ "${TestType}" = "LocalTest" ]
   then
@@ -53,7 +50,6 @@ runLocalTestPostAction()
 {
   ./Scripts/run_SafeDelete.sh   ${AllTestDataFolder} >>${DeletedLog}
   ./Scripts/run_SafeDelete.sh   ./Codec >>${DeletedLog}
-
   echo -e "\n\n\n"
   echo -e "\033[32m *************************************************************** \033[0m"
   echo -e "\033[32m  Local test completed, \033[0m"
@@ -75,19 +71,17 @@ runUpdateSHA1TablePostAction()
   local BitStreamName=""
   local SHA1TableName=""
   local FileName=""
-
   for file in ${FinalResultFolder}/*
   do
     FileName=`echo $file | awk 'BEGIN {FS="/"} {print $NF}'`
     if [[  "$FileName"  =~ UpdateSHA1Table.csv$ ]]
     then
       BitStreamName=`echo $FileName | awk 'BEGIN {FS=".264"} {print $1}'`
-      SHA1TableName=${BitStreamName}.264_AllCase_SHA1_Table.csv
+      SHA1TableName=${BitStreamName}.264_AllCases_SHA1_Table.csv
       ./Scripts/run_SafeDelete.sh  ${SHA1TableFolder}/${SHA1TableName} >>${DeletedLog}
       cp  $file   ${SHA1TableFolder}/${SHA1TableName}
     fi
   done
-
   ./Scripts/run_SafeDelete.sh  ${AllTestDataFolder}>>${DeletedLog}
   ./Scripts/run_SafeDelete.sh  ${FinalResultFolder}>>${DeletedLog}
   ./Scripts/run_SafeDelete.sh  ./Codec>>${DeletedLog}
@@ -97,7 +91,6 @@ runUpdateSHA1TablePostAction()
   echo -e "\n"
   echo -e "\033[32m *************************************************************** \033[0m"
   echo -e "\n\n"
-
 }
 #usage:   --./run_Main.sh  LocalTest
 #      or --./run_Main.sh  UpdateSHA1Table
@@ -117,7 +110,6 @@ runMain()
   AllTestDataFolder="AllTestData"
   DeletedLog="Delete.log"
   runTestTypeCheck  ${TestType}
-
   # 32 -->32 bits release version;64 -->64 bits release version
   ./run_PrepareAllTestData.sh  32
   if [ ! $? -eq 0 ]
@@ -125,7 +117,6 @@ runMain()
     echo "failed to prepare test space for all test data!"
     exit 1
   fi
-
   #test all cases
   let "Flag=0"
   for Bitsream in  ./SHA1Table/*.csv
@@ -133,7 +124,7 @@ runMain()
     BitStreamName=`echo ${Bitsream} | awk 'BEGIN {FS="/"}  {print $NF} ' `
     BitStreamName=`echo ${BitStreamName} | awk 'BEGIN {FS="_AllCase"}  {print $1} ' `
     echo -e  "\n\n\n"
-    ./run_OneBitStream.sh   ${BitStreamName}
+    ./run_OneBitStream.sh   ${BitStreamName} ${TestType}
     if [ ! $? -eq 0 ]
     then
       let "Flag=1"
@@ -147,7 +138,6 @@ runMain()
   then
     runUpdateSHA1TablePostAction
   fi
-
  }
 TestType=$1
 runMain  ${TestType}

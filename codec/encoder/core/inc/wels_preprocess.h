@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	wels_preprocess.h
+ * \file    wels_preprocess.h
  *
- * \brief	interface of video pre-process plugins
+ * \brief   interface of video pre-process plugins
  *
- * \date	03/15/2011
+ * \date    03/15/2011
  *
  * \description : this class is designed as an interface to unify video pre-processing
  *                class implement sets such as denoise,colorspace conversion etc...
@@ -55,16 +55,16 @@ namespace WelsEnc {
 typedef struct TagWelsEncCtx sWelsEncCtx;
 
 typedef  struct {
-  SPicture*	pScaledInputPicture;
-  int32_t		iScaledWidth[MAX_DEPENDENCY_LAYER];
-  int32_t     iScaledHeight[MAX_DEPENDENCY_LAYER];
+  SPicture*     pScaledInputPicture;
+  int32_t       iScaledWidth[MAX_DEPENDENCY_LAYER];
+  int32_t       iScaledHeight[MAX_DEPENDENCY_LAYER];
 } Scaled_Picture;
 
 
 typedef struct {
-  int32_t iMinFrameComplexity;
-  int32_t iMinFrameComplexity08;
-  int32_t iMinFrameComplexity11;
+  int64_t iMinFrameComplexity;
+  int64_t iMinFrameComplexity08;
+  int64_t iMinFrameComplexity11;
 
   int32_t iMinFrameNumGap;
   int32_t iMinFrameQp;
@@ -74,29 +74,29 @@ typedef struct {
   SPicture*   pRefPicture;
   int32_t     iSrcListIdx;   //idx in  h->spatial_pic[base_did];
   bool        bSceneLtrFlag;
-  unsigned char*		pBestBlockStaticIdc;
+  unsigned char*        pBestBlockStaticIdc;
 } SRefInfoParam;
 
-typedef struct {
-  SVAACalcResult		sVaaCalcInfo;
+typedef struct TagVAAFrameInfo {
+  SVAACalcResult        sVaaCalcInfo;
   SAdaptiveQuantizationParam sAdaptiveQuantParam;
   SComplexityAnalysisParam sComplexityAnalysisParam;
 
-  int32_t			iPicWidth;			// maximal iWidth of picture in samples for svc coding
-  int32_t			iPicHeight;			// maximal iHeight of picture in samples for svc coding
-  int32_t         iPicStride;         //luma
-  int32_t			iPicStrideUV;
+  int32_t       iPicWidth;          // maximal iWidth of picture in samples for svc coding
+  int32_t       iPicHeight;         // maximal iHeight of picture in samples for svc coding
+  int32_t       iPicStride;         //luma
+  int32_t       iPicStrideUV;
 
-  uint8_t*         pRefY; //pRef
-  uint8_t*         pCurY; //cur
-  uint8_t*         pRefU; //pRef
-  uint8_t*         pCurU; //cur
-  uint8_t*         pRefV; //pRef
-  uint8_t*         pCurV; //cur
+  uint8_t*      pRefY; //pRef
+  uint8_t*      pCurY; //cur
+  uint8_t*      pRefU; //pRef
+  uint8_t*      pCurU; //cur
+  uint8_t*      pRefV; //pRef
+  uint8_t*      pCurV; //cur
 
-  int8_t*			pVaaBackgroundMbFlag;
-  uint8_t         uiValidLongTermPicIdx;
-  uint8_t         uiMarkLongTermPicIdx;
+  int8_t*       pVaaBackgroundMbFlag;
+  uint8_t       uiValidLongTermPicIdx;
+  uint8_t       uiMarkLongTermPicIdx;
 
   ESceneChangeIdc eSceneChangeIdc;
   bool          bSceneChangeFlag;
@@ -136,23 +136,25 @@ class CWelsPreProcess {
   SPicture* GetCurrentFrameFromOrigList (int32_t iDIdx) {
     return m_pSpatialPic[iDIdx][0];
   }
-  void UpdateSrcList (SPicture*	pCurPicture, const int32_t kiCurDid, SPicture** pShortRefList,
+  void UpdateSrcList (SPicture* pCurPicture, const int32_t kiCurDid, SPicture** pShortRefList,
                       const uint32_t kuiShortRefCount);
-  void UpdateSrcListLosslessScreenRefSelectionWithLtr (SPicture*	pCurPicture, const int32_t kiCurDid,
+  void UpdateSrcListLosslessScreenRefSelectionWithLtr (SPicture* pCurPicture, const int32_t kiCurDid,
       const int32_t kuiMarkLongTermPicIdx, SPicture** pLongRefList);
 
  private:
   int32_t WelsPreprocessCreate();
   int32_t WelsPreprocessDestroy();
   int32_t InitLastSpatialPictures (sWelsEncCtx* pEncCtx);
+  int32_t GetCurPicPosition(const int32_t kiDidx);
 
  private:
   int32_t SingleLayerPreprocess (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrc, Scaled_Picture* m_sScaledPicture);
 
-  void	BilateralDenoising (SPicture* pSrc, const int32_t iWidth, const int32_t iHeight);
+  void  BilateralDenoising (SPicture* pSrc, const int32_t iWidth, const int32_t iHeight);
   bool  DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture);
   int32_t DownsamplePadding (SPicture* pSrc, SPicture* pDstPic,  int32_t iSrcWidth, int32_t iSrcHeight,
-                             int32_t iShrinkWidth, int32_t iShrinkHeight, int32_t iTargetWidth, int32_t iTargetHeight);
+                             int32_t iShrinkWidth, int32_t iShrinkHeight, int32_t iTargetWidth, int32_t iTargetHeight,
+                             bool bForceCopy);
 
   void    VaaCalculation (SVAAFrameInfo* pVaaInfo, SPicture* pCurPicture, SPicture* pRefPicture, bool bCalculateSQDiff,
                           bool bCalculateVar, bool bCalculateBGD);
@@ -175,24 +177,24 @@ class CWelsPreProcess {
   void GetAvailableRefList (SPicture** pSrcPicList, uint8_t iCurTid, const int32_t iClosestLtrFrameNum,
                             SRefInfoParam* pAvailableRefList, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum);
   void InitRefJudgement (SRefJudgement* pRefJudgement);
-  bool JudgeBestRef (SPicture* pRefPic, const SRefJudgement& sRefJudgement, const int32_t iFrameComplexity,
+  bool JudgeBestRef (SPicture* pRefPic, const SRefJudgement& sRefJudgement, const int64_t iFrameComplexity,
                      const bool bIsClosestLtrFrame);
-  void SaveBestRefToJudgement (const int32_t iRefPictureAvQP, const int32_t iComplexity, SRefJudgement* pRefJudgement);
+  void SaveBestRefToJudgement (const int32_t iRefPictureAvQP, const int64_t iComplexity, SRefJudgement* pRefJudgement);
   void SaveBestRefToLocal (SRefInfoParam* pRefPicInfo, const SSceneChangeResult& sSceneChangeResult,
                            SRefInfoParam* pRefSaved);
   void SaveBestRefToVaa (SRefInfoParam& sRefSaved, SRefInfoParam* pVaaBestRef);
 
   /*!
-  * \brief	exchange two picture pData planes
-  * \param	ppPic1		picture pointer to picture 1
-  * \param	ppPic2		picture pointer to picture 2
-  * \return	none
+  * \brief  exchange two picture pData planes
+  * \param  ppPic1      picture pointer to picture 1
+  * \param  ppPic2      picture pointer to picture 2
+  * \return none
   */
   void WelsExchangeSpatialPictures (SPicture** ppPic1, SPicture** ppPic2);
 
  private:
   Scaled_Picture   m_sScaledPicture;
-  SPicture*	   m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];
+  SPicture*        m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];
   IWelsVP*         m_pInterfaceVp;
   sWelsEncCtx*     m_pEncCtx;
   bool             m_bInitDone;

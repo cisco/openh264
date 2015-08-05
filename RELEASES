@@ -1,6 +1,47 @@
 
 Releases
 -----------
+v1.4.0
+------
+- Decoder new interface of DecodeFrameNoDelay
+- Added new encoder and decoder statistics
+- Added option for generating pdb in windows builds
+- Added new rate control mode (RC_TIMESTAMP_MODE) for inconstant frame rate input
+- Added new Sps/Pps strategies for real-time video
+— Added support for simulcast avc
+- Improvements in code structure, assembly, input parameter checking, logging, UT and comments
+- In gmp-openh264, return decoder error correctly and other fixes
+- Decoder bug fixes when for Error Concealment disabled
+- Bug fixes for ParseOnly functions
+- Bug fixes for encoding large frame size (>32767MBs)
+- Fixes to avoid valgrind warnings, potential crash and calculation overflow
+
+-----------
+v1.3.1
+------
+- Fixed and enhanced protection to avoid crash when reading lossy bitstreams
+- Adjust the default mode of Error Concealment used by gmp-openh264
+
+-----------
+v1.3.0
+------
+- Removed manual API document, now using wiki: https://github.com/cisco/openh264/wiki (0af48e5 for v1.3.0)
+- Added API version in API header files
+- Added pkg-config file
+- Added decoder support of parsing only (bParseOnly) for only parsing bit stream but not decoding
+- Added timestamp and max nal size in gmp-openh264.cpp when calling encoding
+- Added timestamp info in decoder input and return structure
+- Added support of level 9 in decoder
+- Added total length of the encoded frame in encoder return structure
+- Added SetOption(ENCODER_OPTION_SVC_ENCODE_PARAM_BASE,&base) for encoder
+- Set constraint set 0 and 1 flags for non-scalable
+- Improved error concealment algorithms and provide more modes of error-concealment
+- Improved rate control algorithms and reference selection algorithms for screen content encoding 
+- Added encoder and decoder statistics interface
+- Improved input parameter checking and logging
+- Bug fixes, warning reductions, and test improvements
+
+-----------
 v1.2.0
 ------
 - Add and modify encoder APIs related to rate control and screen content encoding
@@ -25,6 +66,36 @@ Binaries
 -----------
 These binary releases are distributed under this license:
 http://www.openh264.org/BINARY_LICENSE.txt
+
+v1.4.0
+------
+http://ciscobinary.openh264.org/libopenh264-1.4.0-android19.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.4.0-linux32.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.4.0-linux64.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.4.0-osx32.dylib.bz2
+http://ciscobinary.openh264.org/libopenh264-1.4.0-osx64.dylib.bz2
+http://ciscobinary.openh264.org/openh264-1.4.0-win32msvc.dll.bz2
+http://ciscobinary.openh264.org/openh264-1.4.0-win64msvc.dll.bz2
+
+v1.3.1
+------
+http://ciscobinary.openh264.org/libopenh264-1.3.1-android19.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.3.1-linux32.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.3.1-linux64.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.3.1-osx32.dylib.bz2
+http://ciscobinary.openh264.org/libopenh264-1.3.1-osx64.dylib.bz2
+http://ciscobinary.openh264.org/openh264-1.3.1-win32msvc.dll.bz2
+http://ciscobinary.openh264.org/openh264-1.3.1-win64msvc.dll.bz2
+
+v1.3.0
+------
+http://ciscobinary.openh264.org/libopenh264-1.3.0-android19.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.3.0-linux32.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.3.0-linux64.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.3.0-osx32.dylib.bz2
+http://ciscobinary.openh264.org/libopenh264-1.3.0-osx64.dylib.bz2
+http://ciscobinary.openh264.org/openh264-1.3.0-win32msvc.dll.bz2
+http://ciscobinary.openh264.org/openh264-1.3.0-win64msvc.dll.bz2
 
 v1.2.0
 ------

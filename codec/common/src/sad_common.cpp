@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	sample.c
+ * \file    sample.c
  *
- * \brief	compute SAD and SATD
+ * \brief   compute SAD and SATD
  *
- * \date	2009.06.02 Created
+ * \date    2009.06.02 Created
  *
  *************************************************************************************
  */
@@ -56,6 +56,20 @@ int32_t WelsSampleSad4x4_c (uint8_t* pSample1, int32_t iStride1, uint8_t* pSampl
     pSrc2 += iStride2;
   }
 
+  return iSadSum;
+}
+
+int32_t WelsSampleSad8x4_c (uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2) {
+  int32_t iSadSum = 0;
+  iSadSum += WelsSampleSad4x4_c (pSample1,     iStride1, pSample2,     iStride2);
+  iSadSum += WelsSampleSad4x4_c (pSample1 + 4, iStride1, pSample2 + 4, iStride2);
+  return iSadSum;
+}
+
+int32_t WelsSampleSad4x8_c (uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2) {
+  int32_t iSadSum = 0;
+  iSadSum += WelsSampleSad4x4_c (pSample1,                   iStride1, pSample2,                   iStride2);
+  iSadSum += WelsSampleSad4x4_c (pSample1 + (iStride1 << 2), iStride1, pSample2 + (iStride2 << 2), iStride2);
   return iSadSum;
 }
 
@@ -136,4 +150,16 @@ void WelsSampleSadFour4x4_c (uint8_t* iSample1, int32_t iStride1, uint8_t* iSamp
   * (pSad + 1) = WelsSampleSad4x4_c (iSample1, iStride1, (iSample2 + iStride2), iStride2);
   * (pSad + 2) = WelsSampleSad4x4_c (iSample1, iStride1, (iSample2 - 1), iStride2);
   * (pSad + 3) = WelsSampleSad4x4_c (iSample1, iStride1, (iSample2 + 1), iStride2);
+}
+void WelsSampleSadFour8x4_c (uint8_t* iSample1, int32_t iStride1, uint8_t* iSample2, int32_t iStride2, int32_t* pSad) {
+  * (pSad)     = WelsSampleSad8x4_c (iSample1, iStride1, (iSample2 - iStride2), iStride2);
+  * (pSad + 1) = WelsSampleSad8x4_c (iSample1, iStride1, (iSample2 + iStride2), iStride2);
+  * (pSad + 2) = WelsSampleSad8x4_c (iSample1, iStride1, (iSample2 - 1), iStride2);
+  * (pSad + 3) = WelsSampleSad8x4_c (iSample1, iStride1, (iSample2 + 1), iStride2);
+}
+void WelsSampleSadFour4x8_c (uint8_t* iSample1, int32_t iStride1, uint8_t* iSample2, int32_t iStride2, int32_t* pSad) {
+  * (pSad)     = WelsSampleSad4x8_c (iSample1, iStride1, (iSample2 - iStride2), iStride2);
+  * (pSad + 1) = WelsSampleSad4x8_c (iSample1, iStride1, (iSample2 + iStride2), iStride2);
+  * (pSad + 2) = WelsSampleSad4x8_c (iSample1, iStride1, (iSample2 - 1), iStride2);
+  * (pSad + 3) = WelsSampleSad4x8_c (iSample1, iStride1, (iSample2 + 1), iStride2);
 }

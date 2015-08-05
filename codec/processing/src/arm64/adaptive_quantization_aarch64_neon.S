@@ -31,7 +31,6 @@
  */
 
 #ifdef HAVE_NEON_AARCH64
-.text
 #include "arm_arch64_common_macro.S"
 WELS_ASM_AARCH64_FUNC_BEGIN SampleVariance16x16_AArch64_neon
     ld1   {v1.16b}, [x0], x1 //save the ref data (16bytes)

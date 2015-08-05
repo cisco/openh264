@@ -5,13 +5,13 @@
 #include <string.h>
 
 
-#if (defined(ANDROID_NDK)||defined(APPLE_IOS))
+#if (defined(ANDROID_NDK)||defined(APPLE_IOS)||defined(WINDOWS_PHONE))
 int CodecUtMain (int argc , char** argv) {
 #else
 int main (int argc, char** argv) {
 #endif
 
-#if (defined(ANDROID_NDK)||defined(APPLE_IOS))
+#if (defined(ANDROID_NDK)||defined(APPLE_IOS)||defined(WINDOWS_PHONE))
   char xmlPath[1024] = "";
   sprintf (xmlPath, "xml:%s", argv[1]);
   ::testing::GTEST_FLAG (output) = xmlPath;

@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	    :  util.h
+ * \file        :  util.h
  *
- * \brief	    :  utils for wels video processor class
+ * \brief       :  utils for wels video processor class
  *
  * \date        :  2011/01/04
  *
@@ -58,27 +58,27 @@ WELSVP_NAMESPACE_BEGIN
 #define MAX_HEIGHT     (2304)//MAX_FS_LEVEL51 (36864); MAX_FS_LEVEL51*256/4096 = 2304
 
 #define MB_WIDTH_LUMA  (16)
-#define PESN		   (1e-6)	// desired float precision
+#define PESN               (1e-6)       // desired float precision
 #define AQ_INT_MULTIPLY                   10000000
 #define AQ_TIME_INT_MULTIPLY                   10000
 #define AQ_QSTEP_INT_MULTIPLY                   100
 #define AQ_PESN 10 // (1e-6)*AQ_INT_MULTIPLY
 
-#define MB_TYPE_INTRA4x4		0x00000001
-#define MB_TYPE_INTRA16x16	0x00000002
-#define MB_TYPE_INTRA_PCM		0x00000004
-#define MB_TYPE_INTRA			  (MB_TYPE_INTRA4x4 | MB_TYPE_INTRA16x16 | MB_TYPE_INTRA_PCM)
+#define MB_TYPE_INTRA4x4                0x00000001
+#define MB_TYPE_INTRA16x16              0x00000002
+#define MB_TYPE_INTRA_PCM               0x00000004
+#define MB_TYPE_INTRA                     (MB_TYPE_INTRA4x4 | MB_TYPE_INTRA16x16 | MB_TYPE_INTRA_PCM)
 #define IS_INTRA(type) ((type)&MB_TYPE_INTRA)
 
-#define WELS_MAX(x, y)	((x) > (y) ? (x) : (y))
-#define WELS_MIN(x, y)	((x) < (y) ? (x) : (y))
+#define WELS_MAX(x, y) ((x) > (y) ? (x) : (y))
+#define WELS_MIN(x, y) ((x) < (y) ? (x) : (y))
 
 #ifndef WELS_SIGN
-#define WELS_SIGN(a)	((int32_t)(a) >> 31)
+#define WELS_SIGN(a) ((int32_t)(a) >> 31)
 #endif
 
 #ifndef WELS_ABS
-#define WELS_ABS(a)		((WELS_SIGN(a) ^ (int32_t)(a)) - WELS_SIGN(a))
+#define WELS_ABS(a) ((WELS_SIGN(a) ^ (int32_t)(a)) - WELS_SIGN(a))
 #endif
 
 #define WELS_CLAMP(x, minv, maxv)  WELS_MIN(WELS_MAX(x, minv), maxv)

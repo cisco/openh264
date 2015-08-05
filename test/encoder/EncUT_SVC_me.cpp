@@ -97,7 +97,8 @@ void FillQpelLocationByFeatureValue_ref (uint16_t* pFeatureOfBlock, const int32_
   for (int32_t y = 0; y < kiHeight; y++) {
     for (int32_t x = 0; x < kiWidth; x++) {
       uint16_t uiFeature = pSrcPointer[x];
-      ST32 (&pFeatureValuePointerList[uiFeature][0], ((iQpelY << 16) | (x << 2)));
+      pFeatureValuePointerList[uiFeature][0] = x << 2;
+      pFeatureValuePointerList[uiFeature][1] = iQpelY;
       pFeatureValuePointerList[uiFeature] += 2;
     }
     iQpelY += 4;
@@ -105,8 +106,11 @@ void FillQpelLocationByFeatureValue_ref (uint16_t* pFeatureOfBlock, const int32_
   }
 }
 
-#define GENERATE_SumOfSingleBlock(anchor, method) \
+#define GENERATE_SumOfSingleBlock(anchor, method, flag) \
 TEST (SVC_ME_FunTest, method) {\
+  uint32_t uiCPUFlags = WelsCPUFeatureDetect(NULL); \
+  if ((uiCPUFlags & flag) == 0 && flag != 0) \
+    return; \
   ENFORCE_STACK_ALIGN_1D (uint8_t,  uiRefBuf,   16*320, 16);\
   int32_t iRes[2];\
   for (int32_t k = 0; k < SVC_ME_TEST_NUM; k++) {\
@@ -117,22 +121,22 @@ TEST (SVC_ME_FunTest, method) {\
   }\
 }
 
-GENERATE_SumOfSingleBlock (SumOf8x8SingleBlock_ref, SumOf8x8SingleBlock_c)
-GENERATE_SumOfSingleBlock (SumOf16x16SingleBlock_ref, SumOf16x16SingleBlock_c)
+GENERATE_SumOfSingleBlock (SumOf8x8SingleBlock_ref, SumOf8x8SingleBlock_c, 0)
+GENERATE_SumOfSingleBlock (SumOf16x16SingleBlock_ref, SumOf16x16SingleBlock_c, 0)
 
 #ifdef X86_ASM
-GENERATE_SumOfSingleBlock (SumOf8x8SingleBlock_ref, SumOf8x8SingleBlock_sse2)
-GENERATE_SumOfSingleBlock (SumOf16x16SingleBlock_ref, SumOf16x16SingleBlock_sse2)
+GENERATE_SumOfSingleBlock (SumOf8x8SingleBlock_ref, SumOf8x8SingleBlock_sse2, WELS_CPU_SSE2)
+GENERATE_SumOfSingleBlock (SumOf16x16SingleBlock_ref, SumOf16x16SingleBlock_sse2, WELS_CPU_SSE2)
 #endif
 
 #ifdef HAVE_NEON
-GENERATE_SumOfSingleBlock (SumOf8x8SingleBlock_ref, SumOf8x8SingleBlock_neon)
-GENERATE_SumOfSingleBlock (SumOf16x16SingleBlock_ref, SumOf16x16SingleBlock_neon)
+GENERATE_SumOfSingleBlock (SumOf8x8SingleBlock_ref, SumOf8x8SingleBlock_neon, WELS_CPU_NEON)
+GENERATE_SumOfSingleBlock (SumOf16x16SingleBlock_ref, SumOf16x16SingleBlock_neon, WELS_CPU_NEON)
 #endif
 
 #ifdef HAVE_NEON_AARCH64
-GENERATE_SumOfSingleBlock (SumOf8x8SingleBlock_ref, SumOf8x8SingleBlock_AArch64_neon)
-GENERATE_SumOfSingleBlock (SumOf16x16SingleBlock_ref, SumOf16x16SingleBlock_AArch64_neon)
+GENERATE_SumOfSingleBlock (SumOf8x8SingleBlock_ref, SumOf8x8SingleBlock_AArch64_neon, WELS_CPU_NEON)
+GENERATE_SumOfSingleBlock (SumOf16x16SingleBlock_ref, SumOf16x16SingleBlock_AArch64_neon, WELS_CPU_NEON)
 #endif
 
 
@@ -140,8 +144,11 @@ GENERATE_SumOfSingleBlock (SumOf16x16SingleBlock_ref, SumOf16x16SingleBlock_AArc
 _tp *_nbuff = new _tp[(_sz)+(_al)-1]; \
 _tp *_nm = _nbuff + ((_al)-1) - (((uintptr_t)(_nbuff + ((_al)-1)) & ((_al)-1))/sizeof(_tp));
 
-#define GENERATE_SumOfFrame(anchor, method, kiWidth, kiHeight) \
+#define GENERATE_SumOfFrame(anchor, method, kiWidth, kiHeight, flag) \
 TEST (SVC_ME_FunTest, method##_##kiWidth##x##kiHeight) {\
+uint32_t uiCPUFlags = WelsCPUFeatureDetect(NULL); \
+if ((uiCPUFlags & flag) == 0 && flag != 0) \
+  return; \
 ENFORCE_NEW_ALIGN_1D (uint8_t, pRefPicture, pRefPictureBuff, ((kiHeight+16)*((((kiWidth+15)>>4)<<4)+16)), 16) \
 ENFORCE_NEW_ALIGN_1D (uint16_t, pFeatureOfBlock1, pFeatureOfBlockBuff1, (kiWidth*kiHeight), 16) \
 ENFORCE_NEW_ALIGN_1D (uint16_t, pFeatureOfBlock2, pFeatureOfBlockBuff2, (kiWidth*kiHeight), 16) \
@@ -164,8 +171,11 @@ delete[] pFeatureOfBlockBuff1; \
 delete[] pFeatureOfBlockBuff2; \
 }
 
-#define GENERATE_InitializeHashforFeature(anchor, method, kiWidth, kiHeight) \
+#define GENERATE_InitializeHashforFeature(anchor, method, kiWidth, kiHeight, flag) \
 TEST (SVC_ME_FunTest, method##_##kiWidth##x##kiHeight) {\
+uint32_t uiCPUFlags = WelsCPUFeatureDetect(NULL); \
+if ((uiCPUFlags & flag) == 0 && flag != 0) \
+  return; \
 ENFORCE_NEW_ALIGN_1D (uint8_t, pRefPicture, pRefPictureBuff, ((kiHeight+16)*((((kiWidth+15)>>4)<<4)+16)), 16) \
 ENFORCE_NEW_ALIGN_1D (uint16_t, pFeatureOfBlock, pFeatureOfBlockBuff, (kiWidth*kiHeight), 16) \
 ENFORCE_NEW_ALIGN_1D (uint16_t, pLocation1, pLocationBuff1, (kiWidth*kiHeight)*2, 16) \
@@ -201,8 +211,11 @@ delete[] pFeaturePointValueList1Buff; \
 }
 
 
-#define GENERATE_FillQpelLocationByFeatureValue(anchor, method, kiWidth, kiHeight) \
+#define GENERATE_FillQpelLocationByFeatureValue(anchor, method, kiWidth, kiHeight, flag) \
 TEST (SVC_ME_FunTest, method##_##kiWidth##x##kiHeight) {\
+uint32_t uiCPUFlags = WelsCPUFeatureDetect(NULL); \
+if ((uiCPUFlags & flag) == 0 && flag != 0) \
+  return; \
 ENFORCE_NEW_ALIGN_1D (uint8_t, pRefPicture, pRefPictureBuff, ((kiHeight+16)*((((kiWidth+15)>>4)<<4)+16)), 16) \
 ENFORCE_NEW_ALIGN_1D (uint16_t, pFeatureOfBlock, pFeatureOfBlockBuff, (kiWidth*kiHeight), 16) \
 ENFORCE_NEW_ALIGN_1D (uint16_t, pLocation1, pLocationBuff1, (kiWidth*kiHeight)*2, 16) \
@@ -240,68 +253,70 @@ delete[] pLocationFeature1Buff; \
 delete[] pFeaturePointValueList1Buff; \
 }
 
-GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_c, 10, 10)
-GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_c, 16, 16)
-GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_c, 640, 320)
-GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_c, 640, 320)
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_c, 10, 10, 0)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_c, 16, 16, 0)
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_c, 640, 320, 0)
+GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_c, 640, 320, 0)
 #ifdef X86_ASM
-GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_sse2, 10, 10)
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_sse2, 10, 10, WELS_CPU_SSE2)
 GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_sse2, 16,
-    16)
-GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_sse2, 640, 320)
+    16, WELS_CPU_SSE2)
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_sse2, 640, 320, WELS_CPU_SSE2)
 GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_sse2, 640,
-    320)
+    320, WELS_CPU_SSE2)
 #endif
 
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_c, 1, 1)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_c, 1, 1)
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_c, 1, 320)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_c, 1, 320)
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_c, 640, 320)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_c, 640, 320)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_c, 1, 1, 0)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_c, 1, 1, 0)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_c, 1, 320, 0)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_c, 1, 320, 0)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_c, 640, 320, 0)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_c, 640, 320, 0)
 
 #ifdef X86_ASM
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse2, 6, 6)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse2, 6, 6)
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse2, 6, 320)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse2, 6, 320)
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse2, 640, 320)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse2, 640, 320)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse2, 6, 6, WELS_CPU_SSE2)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse2, 6, 6, WELS_CPU_SSE2)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse2, 6, 320, WELS_CPU_SSE2)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse2, 6, 320, WELS_CPU_SSE2)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse2, 640, 320, WELS_CPU_SSE2)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse2, 640, 320, WELS_CPU_SSE2)
 
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse4, 8, 2)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse4, 16, 2)
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse4, 8, 320)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse4, 16, 320)
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse4, 640, 320)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse4, 640, 320)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse4, 8, 2, WELS_CPU_SSE41)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse4, 16, 2, WELS_CPU_SSE41)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse4, 8, 320, WELS_CPU_SSE41)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse4, 16, 320, WELS_CPU_SSE41)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse4, 640, 320, WELS_CPU_SSE41)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse4, 640, 320, WELS_CPU_SSE41)
 #endif
 
 #ifdef HAVE_NEON
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 1, 1)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 1, 1)
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 1, 320)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 1, 320)
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 640, 320)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 640, 320)
-GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_neon, 10, 10)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 1, 1, WELS_CPU_NEON)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 1, 1, WELS_CPU_NEON)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 1, 320, WELS_CPU_NEON)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 1, 320, WELS_CPU_NEON)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_neon, 640, 320, WELS_CPU_NEON)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_neon, 640, 320, WELS_CPU_NEON)
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_neon, 10, 10, WELS_CPU_NEON)
 GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_neon, 16,
-    16)
-GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_neon, 640, 320)
+    16, WELS_CPU_NEON)
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_neon, 640, 320, WELS_CPU_NEON)
 GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, FillQpelLocationByFeatureValue_neon, 640,
-    320)
+    320, WELS_CPU_NEON)
 #endif
 
 #ifdef HAVE_NEON_AARCH64
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_AArch64_neon, 1, 1)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_AArch64_neon, 1, 1)
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_AArch64_neon, 1, 320)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_AArch64_neon, 1, 320)
-GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_AArch64_neon, 640, 320)
-GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_AArch64_neon, 640, 320)
-GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_AArch64_neon, 10, 10)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_AArch64_neon, 1, 1, WELS_CPU_NEON)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_AArch64_neon, 1, 1, WELS_CPU_NEON)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_AArch64_neon, 1, 320, WELS_CPU_NEON)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_AArch64_neon, 1, 320, WELS_CPU_NEON)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_AArch64_neon, 640, 320, WELS_CPU_NEON)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_AArch64_neon, 640, 320, WELS_CPU_NEON)
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_AArch64_neon, 10, 10,
+    WELS_CPU_NEON)
 GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref,
-    FillQpelLocationByFeatureValue_AArch64_neon, 16, 16)
-GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_AArch64_neon, 640, 320)
+    FillQpelLocationByFeatureValue_AArch64_neon, 16, 16, WELS_CPU_NEON)
+GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashforFeature_AArch64_neon, 640, 320,
+    WELS_CPU_NEON)
 GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref,
-    FillQpelLocationByFeatureValue_AArch64_neon, 640, 320)
+    FillQpelLocationByFeatureValue_AArch64_neon, 640, 320, WELS_CPU_NEON)
 #endif

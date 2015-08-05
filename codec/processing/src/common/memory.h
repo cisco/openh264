@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	    :  memory.h
+ * \file        :  memory.h
  *
- * \brief	    :  memory definition for wels video processor class
+ * \brief       :  memory definition for wels video processor class
  *
  * \date        :  2011/02/22
  *
@@ -61,43 +61,43 @@ inline int32_t WelsMemcmp (const void* kpBuf1, const void* kpBuf2, uint32_t uiSi
 
 /*!
 *************************************************************************************
-* \brief	malloc with zero filled utilization in Wels
+* \brief    malloc with zero filled utilization in Wels
 *
-* \param 	i_size	uiSize of memory block required
+* \param    i_size  uiSize of memory block required
 *
-* \return	allocated memory pointer exactly, failed in case of NULL return
+* \return   allocated memory pointer exactly, failed in case of NULL return
 *
-* \note	N/A
+* \note N/A
 *************************************************************************************
 */
 void* WelsMalloc (const uint32_t kuiSize, char* pTag = NULL);
 
 /*!
 *************************************************************************************
-* \brief	free utilization in Wels
+* \brief    free utilization in Wels
 *
-* \param 	p	data pointer to be free.
-*			i.e, uint8_t *p = actual data to be free, argv = &p.
+* \param    p   data pointer to be free.
+*           i.e, uint8_t *p = actual data to be free, argv = &p.
 *
-* \return	NONE
+* \return   NONE
 *
-* \note	N/A
+* \note N/A
 *************************************************************************************
 */
 void WelsFree (void* pPointer, char* pTag = NULL);
 
 /*!
 *************************************************************************************
-* \brief	reallocation in Wels. Do nothing and continue using old block
-*		in case the block is large enough currently
+* \brief    reallocation in Wels. Do nothing and continue using old block
+*       in case the block is large enough currently
 *
-* \param 	p	    memory block required in old time
-* \param	i_size	new uiSize of memory block requested
-* \param	sz_real	pointer to the old uiSize of memory block
+* \param    p       memory block required in old time
+* \param    i_size  new uiSize of memory block requested
+* \param    sz_real pointer to the old uiSize of memory block
 *
-* \return	reallocated memory pointer exactly, failed in case of NULL return
+* \return   reallocated memory pointer exactly, failed in case of NULL return
 *
-* \note	N/A
+* \note N/A
 *************************************************************************************
 */
 void* WelsRealloc (void*  pPointer, uint32_t* pRealSize, const uint32_t kuiSize, char* pTag = NULL);

@@ -49,6 +49,9 @@
 #include "slice.h"
 
 namespace WelsEnc {
+
+typedef struct TagWelsEncCtx sWelsEncCtx;
+
 //trace
 #define GOM_TRACE_FLAG 0
 #define GOM_H_SCC               8
@@ -66,7 +69,7 @@ enum {
 //qp information
   GOM_MIN_QP_MODE       = 12,
   GOM_MAX_QP_MODE       = 36,
-  MAX_LOW_BR_QP			= 42,
+  MAX_LOW_BR_QP         = 42,
   MIN_IDR_QP            = 26,
   MAX_IDR_QP            = 32,
   MIN_SCREEN_QP         = 26,
@@ -107,9 +110,10 @@ enum {
 
 //bits allocation
 #define MAX_BITS_VARY_PERCENTAGE 100 //bits vary range in percentage
+#define MAX_BITS_VARY_PERCENTAGE_x3d2 150 //bits vary range in percentage * 3/2
 #define INT_MULTIPLY 100 // use to multiply in Double to Int Conversion, should be same as AQ_QSTEP_INT_MULTIPLY in WelsVP
 #define WEIGHT_MULTIPLY 2000
-#define REMAIN_BITS_TH (10) // *INT_MULTIPLY
+#define REMAIN_BITS_TH (1)
 #define VGOP_BITS_PERCENTAGE_DIFF 5
 #define IDR_BITRATE_RATIO  4
 #define FRAME_iTargetBits_VARY_RANGE 50 // *INT_MULTIPLY
@@ -119,9 +123,22 @@ enum {
 #define SMOOTH_FACTOR_MIN_VALUE 2 // *INT_MULTIPLY
 //#define VGOP_BITS_MIN_RATIO 0.8
 //skip and padding
+#define TIME_CHECK_WINDOW 5000 // ms
 #define SKIP_RATIO  50 // *INT_MULTIPLY
+#define LAST_FRAME_PREDICT_WEIGHT 0.5
 #define PADDING_BUFFER_RATIO 50 // *INT_MULTIPLY
 #define PADDING_THRESHOLD    5 //*INT_MULTIPLY
+
+#define VIRTUAL_BUFFER_LOW_TH   120 //*INT_MULTIPLY
+#define VIRTUAL_BUFFER_HIGH_TH  180 //*INT_MULTIPLY
+
+#define _BITS_RANGE 0
+
+enum {
+  EVEN_TIME_WINDOW  =0,
+  ODD_TIME_WINDOW   =1,
+  TIME_WINDOW_TOTAL =2
+};
 
 typedef struct TagRCSlicing {
 int32_t   iComplexityIndexSlice;
@@ -152,14 +169,15 @@ int32_t   iFrameCmplxMean;
 
 typedef struct TagWelsRc {
 int32_t   iRcVaryPercentage;
-int32_t    iRcVaryRatio;
+int32_t   iRcVaryRatio;
 
 int32_t   iInitialQp; //initial qp
-int32_t   iBitRate;
+int64_t   iBitRate; // Note: although the max bit rate is 240000*1200 which can be represented by int32, but there are many multipler of this iBitRate in the calculation of RC, so use int64 to avoid type conversion at all such places
 int32_t   iPreviousBitrate;
 int32_t   iPreviousGopSize;
 double    fFrameRate;
-int64_t   iBitsPerFrame; // *INT_MULTIPLY
+int32_t   iBitsPerFrame;
+int32_t   iMaxBitsPerFrame;
 double    dPreviousFps;
 
 // bits allocation and status
@@ -168,7 +186,7 @@ int32_t   iTargetBits;
 int32_t   iCurrentBitsLevel;//0:normal; 1:limited; 2:exceeded.
 
 int32_t   iIdrNum;
-int32_t   iIntraComplexity;
+int64_t   iIntraComplexity; //255*255(MaxMbSAD)*36864(MaxFS) make the highest bit of 32-bit integer 1
 int32_t   iIntraMbCount;
 
 int8_t    iTlOfFrames[VGOP_SIZE];
@@ -185,7 +203,7 @@ int32_t   iMinFrameQp;
 int32_t   iMaxFrameQp;
 int32_t   iNumberMbFrame;
 int32_t   iNumberMbGom;
-int32_t	iSliceNum;
+int32_t   iSliceNum;
 int32_t   iGomSize;
 
 int32_t   iSkipFrameNum;
@@ -193,7 +211,7 @@ int32_t   iFrameCodedInVGop;
 int32_t   iSkipFrameInVGop;
 int32_t   iGopNumberInVGop;
 int32_t   iGopIndexInVGop;
- 
+
 int32_t   iSkipQpValue;
 int32_t   iQpRangeUpperInFrame;
 int32_t   iQpRangeLowerInFrame;
@@ -201,22 +219,25 @@ int32_t   iMinQp;
 int32_t   iMaxQp;
 //int32_t   delta_adaptive_qp;
 int32_t   iSkipBufferRatio;
- 
+
 int32_t   iQStep; // *INT_MULTIPLY
 int32_t   iFrameDeltaQpUpper;
 int32_t   iFrameDeltaQpLower;
 int32_t   iLastCalculatedQScale;
- 
+
 //for skip frame and padding
 int32_t   iBufferSizeSkip;
-int32_t   iBufferFullnessSkip;
+int64_t   iBufferFullnessSkip;
+int64_t   iBufferMaxBRFullness[TIME_WINDOW_TOTAL];//0: EVEN_TIME_WINDOW; 1: ODD_TIME_WINDOW
+int32_t   iPredFrameBit;
+bool      bNeedShiftWindowCheck[TIME_WINDOW_TOTAL];
 int32_t   iBufferSizePadding;
 int32_t   iBufferFullnessPadding;
 int32_t   iPaddingSize;
 int32_t   iPaddingBitrateStat;
 bool      bSkipFlag;
 
-SRCSlicing*	pSlicingOverRc;
+SRCSlicing*     pSlicingOverRc;
 SRCTemporal* pTemporalOverRc;
 
 //for scc
@@ -230,23 +251,41 @@ int32_t   iActualBitRate; // TODO: to complete later
 float     fLatestFrameRate; // TODO: to complete later
 } SWelsSvcRc;
 
-typedef  void (*PWelsRCPictureInitFunc) (void* pCtx);
-typedef  void (*PWelsRCPictureDelayJudgeFunc) (void* pCtx, EVideoFrameType eFrameType, long long uiTimeStamp);
-typedef  void (*PWelsRCPictureInfoUpdateFunc) (void* pCtx, int32_t iLayerSize);
-typedef  void (*PWelsRCMBInfoUpdateFunc) (void* pCtx, SMB* pCurMb, int32_t iCostLuma, SSlice* pSlice);
-typedef  void (*PWelsRCMBInitFunc) (void* pCtx, SMB* pCurMb, SSlice* pSlice);
+typedef  void (*PWelsRCPictureInitFunc) (sWelsEncCtx* pCtx,long long uiTimeStamp);
+typedef  void (*PWelsRCPictureDelayJudgeFunc) (sWelsEncCtx* pCtx, EVideoFrameType eFrameType, long long uiTimeStamp);
+typedef  void (*PWelsRCPictureInfoUpdateFunc) (sWelsEncCtx* pCtx, int32_t iLayerSize);
+typedef  void (*PWelsRCMBInfoUpdateFunc) (sWelsEncCtx* pCtx, SMB* pCurMb, int32_t iCostLuma, SSlice* pSlice);
+typedef  void (*PWelsRCMBInitFunc) (sWelsEncCtx* pCtx, SMB* pCurMb, SSlice* pSlice);
+typedef  bool (*PWelsCheckFrameSkipBasedMaxbrFunc) (sWelsEncCtx* pCtx, int32_t iSpatialNum, EVideoFrameType eFrameType,
+                                   const uint32_t uiTimeStamp);
+typedef  void (*PWelsUpdateBufferWhenFrameSkippedFunc)(sWelsEncCtx* pCtx, int32_t iSpatialNum);
+typedef  void (*PWelsUpdateMaxBrCheckWindowStatusFunc)(sWelsEncCtx* pCtx, int32_t iSpatialNum, const long long uiTimeStamp);
+typedef  bool (*PWelsRCPostFrameSkippingFunc)(sWelsEncCtx* pCtx, const int32_t iDid, const long long uiTimeStamp);
 
 typedef  struct  WelsRcFunc_s {
-PWelsRCPictureInitFunc			pfWelsRcPictureInit;
-PWelsRCPictureDelayJudgeFunc      pfWelsRcPicDelayJudge;
-PWelsRCPictureInfoUpdateFunc	pfWelsRcPictureInfoUpdate;
-PWelsRCMBInitFunc				pfWelsRcMbInit;
-PWelsRCMBInfoUpdateFunc			pfWelsRcMbInfoUpdate;
+PWelsRCPictureInitFunc          pfWelsRcPictureInit;
+PWelsRCPictureDelayJudgeFunc    pfWelsRcPicDelayJudge;
+PWelsRCPictureInfoUpdateFunc    pfWelsRcPictureInfoUpdate;
+PWelsRCMBInitFunc               pfWelsRcMbInit;
+PWelsRCMBInfoUpdateFunc         pfWelsRcMbInfoUpdate;
+PWelsCheckFrameSkipBasedMaxbrFunc pfWelsCheckSkipBasedMaxbr;
+PWelsUpdateBufferWhenFrameSkippedFunc pfWelsUpdateBufferWhenSkip;
+PWelsUpdateMaxBrCheckWindowStatusFunc pfWelsUpdateMaxBrWindowStatus;
+
+PWelsRCPostFrameSkippingFunc			pfWelsRcPostFrameSkipping;
 } SWelsRcFunc;
 
-void RcTraceFrameBits (void* pEncCtx, long long uiTimeStamp);
-void WelsRcInitModule (void* pCtx, RC_MODES iRcMode);
-void WelsRcFreeMemory (void* pCtx);
+bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pCtx, int32_t iSpatialNum, EVideoFrameType eFrameType,
+  const uint32_t uiTimeStamp);
+void UpdateBufferWhenFrameSkipped(sWelsEncCtx* pCtx, int32_t iSpatialNum);
+void UpdateMaxBrCheckWindowStatus(sWelsEncCtx* pCtx, int32_t iSpatialNum, const long long uiTimeStamp);
+bool WelsRcPostFrameSkipping(sWelsEncCtx* pCtx, const int32_t iDid, const long long uiTimeStamp);
+void WelsRcPostFrameSkippedUpdate (sWelsEncCtx* pCtx, const int32_t iDid);
+
+void RcTraceFrameBits (sWelsEncCtx* pEncCtx, long long uiTimeStamp);
+void WelsRcInitModule (sWelsEncCtx* pCtx, RC_MODES iRcMode);
+void WelsRcInitFuncPointers (sWelsEncCtx* pEncCtx, RC_MODES iRcMode);
+void WelsRcFreeMemory (sWelsEncCtx* pCtx);
 
 }
 #endif //RC_H

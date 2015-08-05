@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	bit_stream.cpp
+ * \file    bit_stream.cpp
  *
- * \brief	Reading / writing bit-stream
+ * \brief   Reading / writing bit-stream
  *
- * \date	03/10/2009 Created
+ * \date    03/10/2009 Created
  *
  *************************************************************************************
  */
@@ -59,139 +59,30 @@ int32_t InitReadBits (PBitStringAux pBitString, intX_t iEndOffset) {
 }
 
 /*!
- * \brief	input bits for decoder or initialize bitstream writing in encoder
+ * \brief   input bits for decoder or initialize bitstream writing in encoder
  *
- * \param	pBitString	Bit string auxiliary pointer
- * \param	kpBuf		bit-stream buffer
- * \param	kiSize	    size in bits for decoder; size in bytes for encoder
+ * \param   pBitString  Bit string auxiliary pointer
+ * \param   kpBuf       bit-stream buffer
+ * \param   kiSize      size in bits for decoder; size in bytes for encoder
  *
- * \return	0: success, other: fail
+ * \return  0: success, other: fail
  */
-int32_t InitBits (PBitStringAux pBitString, const uint8_t* kpBuf, const int32_t kiSize) {
+int32_t DecInitBits (PBitStringAux pBitString, const uint8_t* kpBuf, const int32_t kiSize) {
   const int32_t kiSizeBuf = (kiSize + 7) >> 3;
   uint8_t* pTmp = (uint8_t*)kpBuf;
 
   if (NULL == pTmp)
     return ERR_INFO_INVALID_ACCESS;
 
-  pBitString->pStartBuf   = pTmp;				// buffer to start position
-  pBitString->pEndBuf	    = pTmp + kiSizeBuf;	// buffer + length
-  pBitString->iBits	    = kiSize;				// count bits of overall bitstreaming inputindex;
+  pBitString->pStartBuf = pTmp;             // buffer to start position
+  pBitString->pEndBuf   = pTmp + kiSizeBuf; // buffer + length
+  pBitString->iBits     = kiSize;           // count bits of overall bitstreaming inputindex;
   pBitString->pCurBuf   = pBitString->pStartBuf;
   int32_t iErr = InitReadBits (pBitString, 0);
   if (iErr) {
     return iErr;
   }
   return ERR_NONE;
-}
-
-//Following for write bs in decoder
-void DecInitBitsForEncoding (PBitStringAux pBitString, uint8_t* pBuf, const int32_t kiSize) {
-  uint8_t* pPtr = pBuf;
-  pBitString->pStartBuf = pPtr;
-  pBitString->pCurBuf = pPtr;
-  pBitString->pEndBuf = pPtr + kiSize;
-  pBitString->iLeftBits = 32;
-  pBitString->uiCurBits = 0;
-}
-
-#define WRITE_BE_32(ptr, val) do { \
-    (ptr)[0] = (val) >> 24; \
-    (ptr)[1] = (val) >> 16; \
-    (ptr)[2] = (val) >>  8; \
-    (ptr)[3] = (val) >>  0; \
-  } while (0);
-
-int32_t DecBsWriteBits (PBitStringAux pBitString, int32_t iLen, const uint32_t kuiValue) {
-  if (iLen < pBitString->iLeftBits) {
-    pBitString->uiCurBits = (pBitString->uiCurBits << iLen) | kuiValue;
-    pBitString->iLeftBits -= iLen;
-  } else {
-    iLen -= pBitString->iLeftBits;
-    pBitString->uiCurBits = (pBitString->uiCurBits << pBitString->iLeftBits) | (kuiValue >> iLen);
-    WRITE_BE_32 (pBitString->pCurBuf, pBitString->uiCurBits);
-    pBitString->pCurBuf += 4;
-    pBitString->uiCurBits = kuiValue & ((1 << iLen) - 1);
-    pBitString->iLeftBits = 32 - iLen;
-  }
-  return 0;
-}
-
-int32_t DecBsWriteOneBit (PBitStringAux pBitString, const uint32_t kuiValue) {
-  DecBsWriteBits (pBitString, 1, kuiValue);
-  return 0;
-}
-
-int32_t DecBsFlush (PBitStringAux pBitString) {
-  WRITE_BE_32 (pBitString->pCurBuf, pBitString->uiCurBits << pBitString->iLeftBits);
-  pBitString->pCurBuf += 4 - pBitString->iLeftBits / 8;
-  pBitString->iLeftBits = 32;
-  pBitString->uiCurBits = 0;
-  return 0;
-}
-
-const uint32_t g_kuiDecGolombUELength[256] = {
-  1,  3,  3,  5,  5,  5,  5,  7,  7,  7,  7,  7,  7,  7,  7,     //14
-  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9, //30
-  11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,//46
-  11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,//62
-  13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13,//
-  13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13,
-  13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13,
-  13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13,
-  15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-  15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-  15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-  15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-  15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-  15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-  15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-  15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-  17
-};
-
-int32_t DecBsWriteUe (PBitStringAux pBitString, const uint32_t kuiValue) {
-  uint32_t iTmpValue = kuiValue + 1;
-  if (256 > kuiValue) {
-    DecBsWriteBits (pBitString, g_kuiDecGolombUELength[kuiValue], kuiValue + 1);
-  } else {
-    uint32_t n = 0;
-    if (iTmpValue & 0xffff0000) {
-      iTmpValue >>= 16;
-      n += 16;
-    }
-    if (iTmpValue & 0xff) {
-      iTmpValue >>= 8;
-      n += 8;
-    }
-
-    //n += (g_kuiDecGolombUELength[iTmpValue] >> 1);
-
-    n += (g_kuiDecGolombUELength[iTmpValue - 1] >> 1);
-    DecBsWriteBits (pBitString, (n << 1) + 1, kuiValue + 1);
-  }
-  return 0;
-}
-
-int32_t DecBsWriteSe (PBitStringAux pBitString, const int32_t kiValue) {
-  uint32_t iTmpValue;
-  if (0 == kiValue) {
-    DecBsWriteOneBit (pBitString, 1);
-  } else if (0 < kiValue) {
-    iTmpValue = (kiValue << 1) - 1;
-    DecBsWriteUe (pBitString, iTmpValue);
-  } else {
-    iTmpValue = ((-kiValue) << 1);
-    DecBsWriteUe (pBitString, iTmpValue);
-  }
-  return 0;
-}
-
-int32_t DecBsRbspTrailingBits (PBitStringAux pBitString) {
-  DecBsWriteOneBit (pBitString, 1);
-  DecBsFlush (pBitString);
-
-  return 0;
 }
 
 void RBSP2EBSP (uint8_t* pDstBuf, uint8_t* pSrcBuf, const int32_t kiSize) {

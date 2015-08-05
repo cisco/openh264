@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	WelsThreadLib.h
+ * \file    WelsThreadLib.h
  *
- * \brief	Interfaces introduced in thread programming
+ * \brief   Interfaces introduced in thread programming
  *
- * \date	11/17/2009 Created
+ * \date    11/17/2009 Created
  *
  *************************************************************************************
  */
@@ -60,7 +60,7 @@ typedef    HANDLE                    WELS_EVENT;
 #define    WELS_THREAD_ROUTINE_TYPE         DWORD  WINAPI
 #define    WELS_THREAD_ROUTINE_RETURN(rc)   return (DWORD)rc;
 
-#else	// NON-WINDOWS
+#else // NON-WINDOWS
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -93,11 +93,11 @@ typedef  struct _WelsLogicalProcessorInfo {
   int32_t    ProcessorCount;
 } WelsLogicalProcessInfo;
 
-#define    WELS_THREAD_ERROR_OK					0
-#define    WELS_THREAD_ERROR_GENERAL			((uint32_t)(-1))
-#define    WELS_THREAD_ERROR_WAIT_OBJECT_0		0
-#define	   WELS_THREAD_ERROR_WAIT_TIMEOUT		((uint32_t)0x00000102L)
-#define	   WELS_THREAD_ERROR_WAIT_FAILED		WELS_THREAD_ERROR_GENERAL
+#define    WELS_THREAD_ERROR_OK                                 0
+#define    WELS_THREAD_ERROR_GENERAL                    ((uint32_t)(-1))
+#define    WELS_THREAD_ERROR_WAIT_OBJECT_0              0
+#define    WELS_THREAD_ERROR_WAIT_TIMEOUT               ((uint32_t)0x00000102L)
+#define    WELS_THREAD_ERROR_WAIT_FAILED                WELS_THREAD_ERROR_GENERAL
 
 WELS_THREAD_ERROR_CODE    WelsMutexInit (WELS_MUTEX*    mutex);
 WELS_THREAD_ERROR_CODE    WelsMutexLock (WELS_MUTEX*    mutex);

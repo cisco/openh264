@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	error_code.h
+ * \file    error_code.h
  *
- * \brief	Error codes used in Wels decoder side
+ * \brief   Error codes used in Wels decoder side
  *
- * \date	3/4/2009 Created
+ * \date    3/4/2009 Created
  *
  *************************************************************************************
  */
@@ -43,12 +43,12 @@
 namespace WelsDec {
 
 typedef enum TagWelsErr {
-ERR_NONE				= 0,
-ERR_INVALID_PARAMETERS	= 1,
-ERR_MALLOC_FAILED		= 2,
-ERR_API_FAILED			= 3,
+ERR_NONE                = 0,
+ERR_INVALID_PARAMETERS  = 1,
+ERR_MALLOC_FAILED       = 2,
+ERR_API_FAILED          = 3,
 
-ERR_BOUND				= 31
+ERR_BOUND               = 31
 } EWelsErr;
 
 /*
@@ -56,7 +56,7 @@ ERR_BOUND				= 31
  * ERR_NO = (ERR_LEVEL_FROM (HIGH WORD) << 16) | (ERR_INFO_FROM (LOW WORD))
  *
  */
-#define GENERATE_ERROR_NO(iErrLevel, iErrInfo)	((iErrLevel << 16) | (iErrInfo & 0xFFFF))
+#define GENERATE_ERROR_NO(iErrLevel, iErrInfo) ((iErrLevel << 16) | (iErrInfo & 0xFFFF))
 #define ERR_INVALID_INTRA4X4_MODE -1
 
 /* ERR_LEVEL */
@@ -75,12 +75,12 @@ ERR_LEVEL_MB_DATA
 
 /* More detailed error information, maximal value is 65535 */
 //-----------------------------------------------------------------------------------------------------------
-#define ERR_INFO_COMMON_BASE		1
-#define ERR_INFO_SYNTAX_BASE		1001
-#define ERR_INFO_LOGIC_BASE		10001
+#define ERR_INFO_COMMON_BASE        1
+#define ERR_INFO_SYNTAX_BASE        1001
+#define ERR_INFO_LOGIC_BASE         10001
 enum {
 /* Error from common system level: 1-1000 */
-ERR_INFO_OUT_OF_MEMORY		= ERR_INFO_COMMON_BASE,
+ERR_INFO_OUT_OF_MEMORY      = ERR_INFO_COMMON_BASE,
 ERR_INFO_INVALID_ACCESS,
 ERR_INFO_INVALID_PTR,
 ERR_INFO_INVALID_PARAM,
@@ -93,9 +93,9 @@ ERR_INFO_READ_FAULT,
 ERR_INFO_READ_OVERFLOW,
 ERR_INFO_READ_LEADING_ZERO,
 /* Error from H.264 syntax elements parser: 1001-10000 */
-ERR_INFO_NO_PREFIX_CODE		= ERR_INFO_SYNTAX_BASE,	// No start prefix code indication
-ERR_INFO_NO_PARAM_SETS, 					// No SPS and/ PPS before sequence header
-ERR_INFO_PARAM_SETS_NOT_INTEGRATED,			// Parameters sets (sps/pps) are not integrated at all before to decode VCL nal
+ERR_INFO_NO_PREFIX_CODE         = ERR_INFO_SYNTAX_BASE, // No start prefix code indication
+ERR_INFO_NO_PARAM_SETS,                                 // No SPS and/ PPS before sequence header
+ERR_INFO_PARAM_SETS_NOT_INTEGRATED,                     // Parameters sets (sps/pps) are not integrated at all before to decode VCL nal
 ERR_INFO_SPS_ID_OVERFLOW,
 ERR_INFO_PPS_ID_OVERFLOW,
 ERR_INFO_INVALID_PROFILE_IDC,
@@ -104,6 +104,7 @@ ERR_INFO_INVALID_POC_TYPE,
 ERR_INFO_INVALID_MB_SIZE_INFO,
 ERR_INFO_REF_COUNT_OVERFLOW,
 ERR_INFO_CROPPING_NO_SUPPORTED,
+ERR_INFO_INVALID_CROPPING_DATA,
 ERR_INFO_INVALID_SLICEGROUP,
 ERR_INFO_INVALID_SLICEGROUP_MAP_TYPE,
 ERR_INFO_INVALID_FRAME_NUM,
@@ -117,6 +118,7 @@ ERR_INFO_INVALID_SLICE_ALPHA_C0_OFFSET_DIV2,
 ERR_INFO_INVALID_SLICE_BETA_OFFSET_DIV2,
 ERR_INFO_FMO_INIT_FAIL,
 ERR_INFO_SLICE_TYPE_OVERFLOW,
+ERR_INFO_INVALID_CABAC_INIT_IDC,
 ERR_INFO_INVALID_QP,
 ERR_INFO_INVALID_PIC_INIT_QS,
 ERR_INFO_INVALID_CHROMA_QP_INDEX_OFFSET,
@@ -145,6 +147,13 @@ ERR_INFO_INVALID_I4x4_PRED_MODE,
 ERR_INFO_INVALID_I16x16_PRED_MODE,
 ERR_INFO_INVALID_I_CHROMA_PRED_MODE,
 
+ERR_INFO_INVALID_LUMA_LOG2_WEIGHT_DENOM,
+ERR_INFO_INVALID_CHROMA_LOG2_WEIGHT_DENOM,
+ERR_INFO_INVALID_LUMA_WEIGHT,
+ERR_INFO_INVALID_CHROMA_WEIGHT,
+ERR_INFO_INVALID_LUMA_OFFSET,
+ERR_INFO_INVALID_CHROMA_OFFSET,
+
 ERR_INFO_UNSUPPORTED_NON_BASELINE,
 ERR_INFO_UNSUPPORTED_FMOTYPE,
 ERR_INFO_UNSUPPORTED_MBAFF,
@@ -154,6 +163,7 @@ ERR_INFO_UNSUPPORTED_SPSI,
 ERR_INFO_UNSUPPORTED_MGS,
 ERR_INFO_UNSUPPORTED_BIPRED,
 ERR_INFO_UNSUPPORTED_WP,
+ERR_INFO_UNSUPPORTED_SLICESKIP,
 
 ERR_INFO_FRAMES_LOST,
 ERR_INFO_DEPENDENCY_SPATIAL_LAYER_LOST,
@@ -169,7 +179,7 @@ ERR_INFO_INVALID_REF_MARKING,
 ERR_INFO_INVALID_REF_REORDERING,
 
 /* Error from corresponding logic, 10001-65535 */
-ERR_INFO_NO_IDR_PIC		= ERR_INFO_LOGIC_BASE,	// NO IDR picture available before sequence header
+ERR_INFO_NO_IDR_PIC             = ERR_INFO_LOGIC_BASE,  // NO IDR picture available before sequence header
 ERR_INFO_EC_NO_NEIGHBOUR_MBS,
 ERR_INFO_EC_UNEXPECTED_MB_TYPE,
 ERR_INFO_EC_NO_ENOUGH_NEIGHBOUR_MBS,
@@ -183,6 +193,8 @@ ERR_INFO_INVALID_MMCO_REF_NUM_NOT_ENOUGH,
 ERR_INFO_INVALID_MMCO_LONG_TERM_IDX_EXCEED_MAX,
 //for CABAC
 ERR_CABAC_NO_BS_TO_READ,
+//for scaling list
+ERR_SCALING_LIST_DELTA_SCALE,
 };
 //-----------------------------------------------------------------------------------------------------------
 

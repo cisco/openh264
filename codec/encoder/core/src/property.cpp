@@ -29,34 +29,34 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	property.c
+ * \file    property.c
  *
- * \brief	CODE name, library module and corresponding version are included
+ * \brief   CODE name, library module and corresponding version are included
  *
- * \date	03/10/2009 Created
+ * \date    03/10/2009 Created
  *
  *************************************************************************************
  */
 #include "property.h"
-#include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross_platforms
+#include "crt_util_safe_x.h" // Safe CRT routines like utils for cross_platforms
 namespace WelsEnc {
-#define WELS_CODE_NAME	"Wels"
-#define WELS_LIB_NAME	"Encoder"
+#define WELS_CODE_NAME  "Wels"
+#define WELS_LIB_NAME   "Encoder"
 
-#define WELS_VERSION_INT	0x000001	// v 0.0.1
-#define WELS_VERSION_STR	"0.0.1"
+#define WELS_VERSION_INT        0x000001        // v 0.0.1
+#define WELS_VERSION_STR        "0.0.1"
 
-#define WELS_BUILD_NUM		"090420"	// yymmdd
+#define WELS_BUILD_NUM          "090420"        // yymmdd
 
 //////////////summary information//////////////
 
-#define WELS_IDENT		WELS_CODE_NAME WELS_LIB_NAME "v" WELS_VERSION_STR "b" WELS_BUILD_NUM
+#define WELS_IDENT              WELS_CODE_NAME WELS_LIB_NAME "v" WELS_VERSION_STR "b" WELS_BUILD_NUM
 
 /*!
- * \brief	get code name
- * \param	pBuf	pBuffer to restore code name
- * \param	iSize	size of pBuffer overall
- * \return	actual size of pBuffer used; 0 returned in failure
+ * \brief   get code name
+ * \param   pBuf    pBuffer to restore code name
+ * \param   iSize   size of pBuffer overall
+ * \return  actual size of pBuffer used; 0 returned in failure
  */
 int32_t GetCodeName (char* pBuf, int32_t iSize) {
   int32_t iLen = 0;
@@ -64,20 +64,20 @@ int32_t GetCodeName (char* pBuf, int32_t iSize) {
   if (NULL == pBuf)
     return 0;
 
-  iLen = (int32_t)strlen (WELS_CODE_NAME);	// confirmed_safe_unsafe_usage
+  iLen = (int32_t)strlen (WELS_CODE_NAME); // confirmed_safe_unsafe_usage
   if (iSize <= iLen)
     return 0;
 
-  WelsStrncpy (pBuf, iSize, WELS_CODE_NAME);	// confirmed_safe_unsafe_usage
+  WelsStrncpy (pBuf, iSize, WELS_CODE_NAME); // confirmed_safe_unsafe_usage
 
   return iLen;
 }
 
 /*!
- * \brief	get library/module name
- * \param	pBuf	pBuffer to restore module name
- * \param	iSize	size of pBuffer overall
- * \return	actual size of pBuffer used; 0 returned in failure
+ * \brief   get library/module name
+ * \param   pBuf    pBuffer to restore module name
+ * \param   iSize   size of pBuffer overall
+ * \return  actual size of pBuffer used; 0 returned in failure
  */
 int32_t GetLibName (char* pBuf, int32_t iSize) {
   int32_t iLen = 0;
@@ -85,20 +85,20 @@ int32_t GetLibName (char* pBuf, int32_t iSize) {
   if (NULL == pBuf)
     return 0;
 
-  iLen	= (int32_t)strlen (WELS_LIB_NAME);	// confirmed_safe_unsafe_usage
+  iLen = (int32_t)strlen (WELS_LIB_NAME); // confirmed_safe_unsafe_usage
   if (iSize <= iLen)
     return 0;
 
-  WelsStrncpy (pBuf, iSize, WELS_LIB_NAME);	// confirmed_safe_unsafe_usage
+  WelsStrncpy (pBuf, iSize, WELS_LIB_NAME); // confirmed_safe_unsafe_usage
 
   return iLen;
 }
 
 /*!
- * \brief	get version number
- * \param	pBuf	pBuffer to restore version number
- * \param	iSize	size of pBuffer overall
- * \return	actual size of pBuffer used; 0 returned in failure
+ * \brief   get version number
+ * \param   pBuf    pBuffer to restore version number
+ * \param   iSize   size of pBuffer overall
+ * \return  actual size of pBuffer used; 0 returned in failure
  */
 int32_t GetVerNum (char* pBuf, int32_t iSize) {
   int32_t iLen = 0;
@@ -106,20 +106,20 @@ int32_t GetVerNum (char* pBuf, int32_t iSize) {
   if (NULL == pBuf)
     return 0;
 
-  iLen	= (int32_t)strlen (WELS_VERSION_STR);	// confirmed_safe_unsafe_usage
+  iLen = (int32_t)strlen (WELS_VERSION_STR); // confirmed_safe_unsafe_usage
   if (iSize <= iLen)
     return 0;
 
-  WelsStrncpy (pBuf, iSize, WELS_VERSION_STR);	// confirmed_safe_unsafe_usage
+  WelsStrncpy (pBuf, iSize, WELS_VERSION_STR); // confirmed_safe_unsafe_usage
 
   return iLen;
 }
 
 /*!
- * \brief	get identify information
- * \param	pBuf	pBuffer to restore indentify information
- * \param	iSize	size of pBuffer overall
- * \return	actual size of pBuffer used; 0 returned in failure
+ * \brief   get identify information
+ * \param   pBuf    pBuffer to restore indentify information
+ * \param   iSize   size of pBuffer overall
+ * \return  actual size of pBuffer used; 0 returned in failure
  */
 int32_t GetIdentInfo (char* pBuf, int32_t iSize) {
   int32_t iLen = 0;
@@ -127,11 +127,11 @@ int32_t GetIdentInfo (char* pBuf, int32_t iSize) {
   if (NULL == pBuf)
     return 0;
 
-  iLen	= (int32_t)strlen (WELS_IDENT);	// confirmed_safe_unsafe_usage
+  iLen = (int32_t)strlen (WELS_IDENT); // confirmed_safe_unsafe_usage
   if (iSize <= iLen)
     return 0;
 
-  WelsStrncpy (pBuf, iSize, WELS_IDENT);	// confirmed_safe_unsafe_usage
+  WelsStrncpy (pBuf, iSize, WELS_IDENT); // confirmed_safe_unsafe_usage
 
   return iLen;
 }

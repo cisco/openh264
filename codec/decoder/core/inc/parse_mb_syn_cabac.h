@@ -28,11 +28,11 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	parse_mb_syn_cabac.h
+ * \file    parse_mb_syn_cabac.h
  *
- * \brief	cabac parse for syntax elements
+ * \brief   cabac parse for syntax elements
  *
- * \date	10/10/2014 Created
+ * \date    10/10/2014 Created
  *
  *************************************************************************************
  */
@@ -46,6 +46,7 @@ int32_t ParseEndOfSliceCabac (PWelsDecoderContext pCtx, uint32_t& uiBinVal);
 int32_t ParseSkipFlagCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail, uint32_t& uiSkip);
 int32_t ParseMBTypeISliceCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail, uint32_t& uiBinVal);
 int32_t ParseMBTypePSliceCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail, uint32_t& uiBinVal);
+int32_t ParseTransformSize8x8FlagCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail, bool& bTransformSize8x8Flag);
 int32_t ParseSubMBTypeCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail, uint32_t& uiSubMbType);
 int32_t ParseIntraPredModeLumaCabac (PWelsDecoderContext pCtx, int32_t& iBinVal);
 int32_t ParseIntraPredModeChromaCabac (PWelsDecoderContext pCtx, uint8_t uiNeighAvail, int32_t& iBinVal);
@@ -64,6 +65,9 @@ int32_t ParseSignificantMapCabac (int32_t* pSignificantMap, int32_t iResProperty
                                   uint32_t& uiBinVal);
 int32_t ParseSignificantCoeffCabac (int32_t* significant, int32_t iResProperty, PWelsDecoderContext pCtx);
 int32_t ParseResidualBlockCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCountCache, SBitStringAux* pBsAux,
+                                 int32_t index, int32_t iMaxNumCoeff, const uint8_t* pScanTable, int32_t iResProperty, int16_t* sTCoeff, uint8_t uiQp,
+                                 PWelsDecoderContext pCtx);
+int32_t ParseResidualBlockCabac8x8 (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCountCache, SBitStringAux* pBsAux,
                                  int32_t index, int32_t iMaxNumCoeff, const uint8_t* pScanTable, int32_t iResProperty, int16_t* sTCoeff, uint8_t uiQp,
                                  PWelsDecoderContext pCtx);
 int32_t ParseIPCMInfoCabac (PWelsDecoderContext pCtx);

@@ -30,121 +30,9 @@
  *
  */
 
-#ifdef  HAVE_NEON
-.text
+#ifdef HAVE_NEON
 #include "arm_arch_common_macro.S"
 
-#ifdef __APPLE__
-.macro AVERAGE_TWO_8BITS
-//  {   // input:dst_d, src_d A and B; working: q13
-    vaddl.u8    q13, $2, $1
-    vrshrn.u16      $0, q13, #1
-//  }
-.endm
-
-.macro FILTER_6TAG_8BITS
-//  {   // input:src[-2], src[-1], src[0], src[1], src[2], src[3], dst_d, multiplier a/b; working: q12, q13
-    vaddl.u8    q12, $0, $5 //q12=src[-2]+src[3]
-    vaddl.u8    q13, $2, $3 //src[0]+src[1]
-    vmla.u16    q12, q13, $7    //q12 += 20*(src[0]+src[1]), 2 cycles
-    vaddl.u8    q13, $1, $4 //src[-1]+src[2]
-    vmls.s16    q12, q13, $8    //q12 -= 5*(src[-1]+src[2]), 2 cycles
-    vqrshrun.s16        $6, q12, #5
-//  }
-.endm
-
-.macro FILTER_SINGLE_TAG_8BITS      // when width=17/9, used
-//  {   // input: src_d{Y[0][1][2][3][4][5]X, the even of working_q2},
-    vrev64.8    $2, $0              // X[5][4][3][2][1][0]O
-    vaddl.u8    $3, $0, $2          // each 16bits, *[50][41][32][23][14][05]*
-    vmul.s16    $0, $2, $1          // 0+1*[50]-5*[41]+20[32]
-    vpadd.s16   $0, $0, $0
-    vpadd.s16   $0, $0, $0
-    vqrshrun.s16    $0, $4, #5
-//  }
-.endm
-
-.macro FILTER_6TAG_8BITS_AVERAGE_WITH_0
-//  {   // input:src[-2], src[-1], src[0], src[1], src[2], src[3], dst_d, multiplier a/b; working: q12, q13
-    vaddl.u8    q12, $0, $5 //q12=src[-2]+src[3]
-    vaddl.u8    q13, $2, $3 //src[0]+src[1]
-    vmla.u16    q12, q13, $7    //q12 += 20*(src[0]+src[1]), 2 cycles
-    vaddl.u8    q13, $1, $4 //src[-1]+src[2]
-    vmls.s16    q12, q13, $8    //q12 -= 5*(src[-1]+src[2]), 2 cycles
-    vqrshrun.s16        $6, q12, #5
-    vaddl.u8    q13, $2, $6
-    vrshrn.u16      $6, q13, #1
-//  }
-.endm
-
-.macro FILTER_6TAG_8BITS_AVERAGE_WITH_1
-//  {   // input:src[-2], src[-1], src[0], src[1], src[2], src[3], dst_d, multiplier a/b; working: q12, q13
-    vaddl.u8    q12, $0, $5 //q12=src[-2]+src[3]
-    vaddl.u8    q13, $2, $3 //src[0]+src[1]
-    vmla.u16    q12, q13, $7    //q12 += 20*(src[0]+src[1]), 2 cycles
-    vaddl.u8    q13, $1, $4 //src[-1]+src[2]
-    vmls.s16    q12, q13, $8    //q12 -= 5*(src[-1]+src[2]), 2 cycles
-    vqrshrun.s16        $6, q12, #5
-    vaddl.u8    q13, $3, $6
-    vrshrn.u16      $6, q13, #1
-//  }
-.endm
-
-.macro FILTER_6TAG_8BITS_TO_16BITS
-//  {   // input:d_src[-2], d_src[-1], d_src[0], d_src[1], d_src[2], d_src[3], dst_q, multiplier a/b; working:q13
-    vaddl.u8    $6, $0, $5      //dst_q=src[-2]+src[3]
-    vaddl.u8    q13, $2, $3 //src[0]+src[1]
-    vmla.u16    $6, q13, $7 //dst_q += 20*(src[0]+src[1]), 2 cycles
-    vaddl.u8    q13, $1, $4 //src[-1]+src[2]
-    vmls.s16    $6, q13, $8 //dst_q -= 5*(src[-1]+src[2]), 2 cycles
-//  }
-.endm
-
-.macro FILTER_3_IN_16BITS_TO_8BITS
-//  {   // input:a, b, c, dst_d;
-    vsub.s16    $0, $0, $1          //a-b
-    vshr.s16    $0, $0, #2          //(a-b)/4
-    vsub.s16    $0, $0, $1          //(a-b)/4-b
-    vadd.s16    $0, $0, $2          //(a-b)/4-b+c
-    vshr.s16    $0, $0, #2          //((a-b)/4-b+c)/4
-    vadd.s16    $0, $0, $2          //((a-b)/4-b+c)/4+c = (a-5*b+20*c)/16
-    vqrshrun.s16    $3, $0, #6      //(+32)>>6
-//  }
-.endm
-
-.macro UNPACK_2_16BITS_TO_ABC
-//  {   // input:q_src[-2:5], q_src[6:13](avail 8+5)/q_src[6:**](avail 4+5), dst_a, dst_b, dst_c;
-    vext.16 $4, $0, $1, #2      //src[0]
-    vext.16 $3, $0, $1, #3      //src[1]
-    vadd.s16    $4, $3                  //c=src[0]+src[1]
-
-    vext.16 $3, $0, $1, #1      //src[-1]
-    vext.16 $2, $0, $1, #4      //src[2]
-    vadd.s16    $3, $2                  //b=src[-1]+src[2]
-
-    vext.16 $2, $0, $1, #5      //src[3]
-    vadd.s16    $2, $0                  //a=src[-2]+src[3]
-//  }
-.endm
-
-.macro UNPACK_1_IN_8x16BITS_TO_8BITS
-//  {   // each 16bits; input: d_dst, d_src[0:3] (even), d_src[4:5]+%% (odd)
-    vext.16 $3, $3, $3, #7  // 0x????, [0][1][2][3][4][5],
-    vrev64.16   $1, $1
-    vadd.u16    $2, $1              // C[2+3],B[1+4],A[0+5],
-    vshr.s64    $1, $2, #16
-    vshr.s64    $0, $2, #32     // Output: C $2, B $1, A $0
-
-    vsub.s16    $0, $0, $1          //a-b
-    vshr.s16    $0, $0, #2          //(a-b)/4
-    vsub.s16    $0, $0, $1          //(a-b)/4-b
-    vadd.s16    $0, $0, $2          //(a-b)/4-b+c
-    vshr.s16    $0, $0, #2          //((a-b)/4-b+c)/4
-    vadd.s16    $1, $0, $2          //((a-b)/4-b+c)/4+c = (a-5*b+20*c)/16
-    vqrshrun.s16    $0, $3, #6      //(+32)>>6
-//  }
-.endm
-#else
 .macro AVERAGE_TWO_8BITS arg0, arg1, arg2
 //  {   // input:dst_d, src_d A and B; working: q13
     vaddl.u8    q13, \arg2, \arg1
@@ -163,7 +51,7 @@
 //  }
 .endm
 
-.macro FILTER_SINGLE_TAG_8BITS arg0, arg1,arg2, arg3, arg4,arg5     // when width=17/9, used
+.macro FILTER_SINGLE_TAG_8BITS arg0, arg1,arg2, arg3, arg4     // when width=17/9, used
 //  {   // input: src_d{Y[0][1][2][3][4][5]X, the even of working_q2}
     vrev64.8    \arg2, \arg0                // X[5][4][3][2][1][0]O
     vaddl.u8    \arg3, \arg0, \arg2         // each 16bits, *[50][41][32][23][14][05]*
@@ -254,7 +142,6 @@
     vqrshrun.s16    \arg0, \arg3, #6        //(+32)>>6
 //  }
 .endm
-#endif
 
 WELS_ASM_FUNC_BEGIN McHorVer20WidthEq16_neon
     push        {r4}

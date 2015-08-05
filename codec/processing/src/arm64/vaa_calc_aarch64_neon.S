@@ -31,32 +31,8 @@
  */
 
 #ifdef HAVE_NEON_AARCH64
-.text
 #include "arm_arch64_common_macro.S"
 
-#ifdef __APPLE__
-.macro ABS_SUB_SUM_16BYTES
-    ld1     {v0.16b}, [x0], x4
-    ld1     {v1.16b}, [x1], x4
-    uabal   $0, v0.8b, v1.8b
-    uabal2  $1, v0.16b,v1.16b
-.endm
-
-.macro ABS_SUB_SUM_8x16BYTES
-    ld1     {v0.16b}, [x0], x4
-    ld1     {v1.16b}, [x1], x4
-    uabdl   $0, v0.8b, v1.8b
-    uabdl2  $1, v0.16b,v1.16b
-
-    ABS_SUB_SUM_16BYTES $0, $1
-    ABS_SUB_SUM_16BYTES $0, $1
-    ABS_SUB_SUM_16BYTES $0, $1
-    ABS_SUB_SUM_16BYTES $0, $1
-    ABS_SUB_SUM_16BYTES $0, $1
-    ABS_SUB_SUM_16BYTES $0, $1
-    ABS_SUB_SUM_16BYTES $0, $1
-.endm
-#else
 .macro ABS_SUB_SUM_16BYTES arg0, arg1
     ld1     {v0.16b}, [x0], x4
     ld1     {v1.16b}, [x1], x4
@@ -78,7 +54,6 @@
     ABS_SUB_SUM_16BYTES \arg0, \arg1
     ABS_SUB_SUM_16BYTES \arg0, \arg1
 .endm
-#endif
 
 /*
  * void vaa_calc_sad_neon(uint8_t *cur_data, uint8_t *ref_data, int32_t pic_width, int32_t pic_height, int32_t pic_stride,

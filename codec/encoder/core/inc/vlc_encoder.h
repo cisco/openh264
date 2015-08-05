@@ -33,7 +33,6 @@
 #ifndef WELS_VLC_ENCODER_H__
 #define WELS_VLC_ENCODER_H__
 
-#include "bit_stream.h"
 #include "svc_enc_golomb.h"
 
 /************************************************************************/
@@ -58,14 +57,14 @@ extern const ALIGNED_DECLARE (uint8_t, g_kuiEncNcMapTable[18], 16);
 
 static inline int32_t WriteTotalCoeffTrailingones (SBitStringAux* pBs, uint8_t uiNc, uint8_t uiTotalCoeff,
     uint8_t uiTrailingOnes) {
-const uint8_t kuiNcIdx		= g_kuiEncNcMapTable[uiNc];
-const uint8_t* kpCoeffToken	= &g_kuiVlcCoeffToken[kuiNcIdx][uiTotalCoeff][uiTrailingOnes][0];
+const uint8_t kuiNcIdx      = g_kuiEncNcMapTable[uiNc];
+const uint8_t* kpCoeffToken = &g_kuiVlcCoeffToken[kuiNcIdx][uiTotalCoeff][uiTrailingOnes][0];
 return BsWriteBits (pBs,  kpCoeffToken[1], kpCoeffToken[0]);
 }
 
 static inline int32_t WriteTotalcoeffTrailingonesChroma (SBitStringAux* pBs, uint8_t uiTotalCoeff,
     uint8_t uiTrailingOnes) {
-const uint8_t* kpCoeffToken	= &g_kuiVlcCoeffToken[4][uiTotalCoeff][uiTrailingOnes][0];
+const uint8_t* kpCoeffToken = &g_kuiVlcCoeffToken[4][uiTotalCoeff][uiTrailingOnes][0];
 return BsWriteBits (pBs, kpCoeffToken[1], kpCoeffToken[0]);
 }
 
@@ -76,7 +75,7 @@ return 0;
 }
 
 static inline int32_t WriteTotalZeros (SBitStringAux* pBs, uint32_t uiTotalCoeff, uint32_t uiTotalZeros) {
-const uint8_t* kpTotalZeros	= &g_kuiVlcTotalZeros[uiTotalCoeff][uiTotalZeros][0];
+const uint8_t* kpTotalZeros = &g_kuiVlcTotalZeros[uiTotalCoeff][uiTotalZeros][0];
 return BsWriteBits (pBs, kpTotalZeros[1], kpTotalZeros[0]);
 }
 

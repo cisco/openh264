@@ -29,7 +29,7 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- *  \file	manage_dec_ref.h
+ *  \file   manage_dec_ref.h
  *
  *  Abstract
  *      Interface for managing reference picture

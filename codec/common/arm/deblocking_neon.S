@@ -31,129 +31,9 @@
  */
 
 #ifdef HAVE_NEON
-.text
 
 #include "arm_arch_common_macro.S"
 
-#ifdef __APPLE__
-.macro JMP_IF_128BITS_IS_ZERO
-    vorr.s16    $2, $0, $1
-    vmov        r3, r2, $2
-    orr         r3, r3, r2
-    cmp         r3, #0
-.endm
-
-.macro MASK_MATRIX
-    vabd.u8 $6, $1, $2
-    vcgt.u8 $6, $4, $6
-
-    vabd.u8 $4, $0, $1
-    vclt.u8 $4, $4, $5
-    vand.u8 $6, $6, $4
-
-    vabd.u8 $4, $3, $2
-    vclt.u8 $4, $4, $5
-    vand.u8 $6, $6, $4
-.endm
-
-
-.macro DIFF_LUMA_LT4_P1_Q1
-    vmov.i8 $9, #128
-    vrhadd.u8   $8, $2, $3
-    vhadd.u8    $8, $0, $8
-    vsub.s8 $8, $8, $9
-    vsub.s8 $9, $1, $9
-    vqsub.s8    $8, $8, $9
-    vmax.s8 $8, $8, $5
-    vmin.s8 $8, $8, $6
-    vabd.u8 $9, $0, $2
-    vclt.u8 $9, $9, $4
-    vand.s8 $8, $8, $9
-    vand.s8 $8, $8, $7
-    vadd.u8 $8, $1, $8
-    vabs.s8 $9, $9
-.endm
-
-.macro DIFF_LUMA_LT4_P0_Q0
-    vsubl.u8    $5, $0, $3
-    vsubl.u8    $6, $2, $1
-    vshl.s16    $6, $6, #2
-    vadd.s16    $5, $5, $6
-    vqrshrn.s16     $4, $5, #3
-.endm
-
-.macro DIFF_LUMA_EQ4_P2P1P0
-    vaddl.u8    q4, $1, $2
-    vaddl.u8    q5, $3, $4
-    vadd.u16    q5, q4, q5
-
-    vaddl.u8    q4, $0, $1
-    vshl.u16    q4, q4, #1
-    vadd.u16    q4, q5, q4
-
-    vrshrn.u16      $0, q5, #2
-    vrshrn.u16      $7, q4, #3
-
-    vshl.u16    q5, q5, #1
-    vsubl.u8    q4, $5, $1
-    vadd.u16    q5, q4,q5
-
-    vaddl.u8    q4, $2, $5
-    vaddw.u8    q4, q4, $2
-    vaddw.u8    q4, q4, $3
-
-    vrshrn.u16      d10,q5, #3
-    vrshrn.u16      d8, q4, #2
-    vbsl.u8     $6, d10, d8
-.endm
-
-.macro DIFF_LUMA_EQ4_MASK
-    vmov    $3, $2
-    vbsl.u8 $3, $0, $1
-.endm
-
-.macro DIFF_CHROMA_EQ4_P0Q0
-    vaddl.u8    $4, $0, $3
-    vaddw.u8    $5, $4, $1
-    vaddw.u8    $6, $4, $2
-    vaddw.u8    $5, $5, $0
-
-    vaddw.u8    $6, $6, $3
-    vrshrn.u16      $7, $5, #2
-    vrshrn.u16      $8, $6, #2
-.endm
-
-.macro LOAD_CHROMA_DATA_4
-    vld4.u8 {$0[$8],$1[$8],$2[$8],$3[$8]}, [r0], r2
-    vld4.u8 {$4[$8],$5[$8],$6[$8],$7[$8]}, [r1], r2
-.endm
-
-.macro STORE_CHROMA_DATA_4
-    vst4.u8 {$0[$8],$1[$8],$2[$8],$3[$8]}, [r0], r2
-    vst4.u8 {$4[$8],$5[$8],$6[$8],$7[$8]}, [r1], r2
-.endm
-
-.macro LOAD_LUMA_DATA_3
-    vld3.u8 {$0[$6],$1[$6],$2[$6]}, [r2], r1
-    vld3.u8 {$3[$6],$4[$6],$5[$6]}, [r0], r1
-.endm
-
-.macro STORE_LUMA_DATA_4
-    vst4.u8 {$0[$4],$1[$4],$2[$4],$3[$4]}, [r0], r1
-    vst4.u8 {$0[$5],$1[$5],$2[$5],$3[$5]}, [r2], r1
-.endm
-
-.macro STORE_LUMA_DATA_3
-    vst3.u8 {$0[$6],$1[$6],$2[$6]}, [r3], r1
-    vst3.u8 {$3[$6],$4[$6],$5[$6]}, [r0], r1
-.endm
-
-.macro EXTRACT_DELTA_INTO_TWO_PART
-    vcge.s8 $1, $0, #0
-    vand    $1, $0, $1
-    vsub.s8 $0, $1, $0
-.endm
-#else
 .macro JMP_IF_128BITS_IS_ZERO arg0, arg1, arg2
     vorr.s16    \arg2, \arg0, \arg1
     vmov        r3, r2, \arg2
@@ -270,7 +150,6 @@
     vand    \arg1, \arg0, \arg1
     vsub.s8 \arg0, \arg1, \arg0
 .endm
-#endif
 
 WELS_ASM_FUNC_BEGIN DeblockLumaLt4V_neon
     vpush   {q4-q7}
@@ -834,113 +713,14 @@ WELS_ASM_FUNC_END
 
 
 WELS_ASM_FUNC_BEGIN WelsNonZeroCount_neon
-
-    vld1.64 {d0-d2}, [r0]
-
-    vceq.s8 q0, q0, #0
-    vceq.s8 d2, d2, #0
-    vmvn    q0, q0
-    vmvn    d2, d2
-    vabs.s8 q0, q0
-    vabs.s8 d2, d2
-
-    vst1.64 {d0-d2}, [r0]
+    mov       r1, #1
+    vdup.8    q2, r1
+    vld1.64   {d0,d1,d2}, [r0]
+    vmin.s8   q0, q0, q2
+    vmin.s8   d2, d2, d4
+    vst1.64   {d0,d1,d2}, [r0]
 WELS_ASM_FUNC_END
 
-#ifdef __APPLE__
-.macro BS_NZC_CHECK
-    vld1.8   {d0,d1}, [$0]
-    /* Arrenge the input data --- TOP */
-    ands     r6, $1, #2
-    beq      bs_nzc_check_jump0
-
-    sub      r6, $0, $2, lsl #4
-    sub      r6, r6, $2, lsl #3
-    add      r6, #12
-    vld1.32  d3[1], [r6]
-
-bs_nzc_check_jump0:
-    vext.8   q1, q1, q0, #12
-    vadd.u8  $3, q0, q1
-
-
-    /* Arrenge the input data --- LEFT */
-    ands     r6, $1, #1
-    beq      bs_nzc_check_jump1
-
-    sub      r6, $0, #21
-    add      r7, r6, #4
-    vld1.8   d3[4], [r6]
-    add      r6, r7, #4
-    vld1.8   d3[5], [r7]
-    add      r7, r6, #4
-    vld1.8   d3[6], [r6]
-    vld1.8   d3[7], [r7]
-
-bs_nzc_check_jump1:
-    vzip.8   d0, d1
-    vzip.8   d0, d1
-    vext.8   q1, q1, q0, #12
-    vadd.u8  $4, q0, q1
-.endm
-
-.macro BS_COMPARE_MV //in: $0,$1(const),$2(const),$3(const),$4(const); out:$5, $6
-    mov       r6, #4
-    vabd.s16  q8, $0, $1
-    vabd.s16  q9, $1, $2
-    vdup.s16  $0, r6
-    vabd.s16  q10, $2, $3
-    vabd.s16  q11, $3, $4
-
-    vcge.s16  q8, $0
-    vcge.s16  q9, $0
-    vcge.s16  q10, $0
-    vcge.s16  q11, $0
-
-    vpadd.i16 d16, d16, d17
-    vpadd.i16 d17, d18, d19
-    vpadd.i16 d18, d20, d21
-    vpadd.i16 d19, d22, d23
-
-    vaddhn.i16  $5, q8, q8
-    vaddhn.i16  $6, q9, q9
-.endm
-
-.macro BS_MV_CHECK
-    vldm   $0, {q0,q1,q2,q3}
-
-    /* Arrenge the input data --- TOP */
-    ands     r6, $1, #2
-    beq      bs_mv_check_jump0
-
-    sub      r6, $0, $2, lsl #6
-    add      r6, #48
-    vld1.8   {d8, d9}, [r6]
-
-bs_mv_check_jump0:
-    BS_COMPARE_MV  q4, q0, q1, q2, q3, $3, $4
-
-    /* Arrenge the input data --- LEFT */
-    ands     r6, $1, #1
-    beq      bs_mv_check_jump1
-
-    sub      r6, $0, #52
-    add      r7, r6, #16
-    vld1.32   d8[0], [r6]
-    add      r6, r7, #16
-    vld1.32   d8[1], [r7]
-    add      r7, r6, #16
-    vld1.32   d9[0], [r6]
-    vld1.32   d9[1], [r7]
-
-bs_mv_check_jump1:
-    vzip.32   q0, q2
-    vzip.32   q1, q3
-    vzip.32   q0, q1
-    vzip.32   q2, q3
-    BS_COMPARE_MV  q4, q0, q1, q2, q3, $5, $6
-.endm
-#else
 .macro BS_NZC_CHECK  arg0, arg1, arg2, arg3, arg4
     vld1.8   {d0,d1}, [\arg0]
     /* Arrenge the input data --- TOP */
@@ -1033,7 +813,6 @@ bs_mv_check_jump1:
     vzip.32   q2, q3
     BS_COMPARE_MV  q4, q0, q1, q2, q3, \arg5, \arg6
 .endm
-#endif
 
 
 WELS_ASM_FUNC_BEGIN DeblockingBSCalcEnc_neon

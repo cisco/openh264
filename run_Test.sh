@@ -35,21 +35,22 @@ runInputParamCheck()
 #usage: runUnitTest
 runUnitTest()
 {
-  make -B ENABLE64BIT=Yes BUILDTYPE=Release all plugin test
-  make -B ENABLE64BIT=Yes BUILDTYPE=Debug   all plugin test
-  make -B ENABLE64BIT=No  BUILDTYPE=Release all plugin test
-  make -B ENABLE64BIT=No  BUILDTYPE=Debug   all plugin test
+  CFLAGS=-Werror make -B ENABLE64BIT=Yes BUILDTYPE=Release all plugin test
+  CFLAGS=-Werror make -B ENABLE64BIT=Yes BUILDTYPE=Debug   all plugin test
+  CFLAGS=-Werror make -B ENABLE64BIT=No  BUILDTYPE=Release all plugin test
+  CFLAGS=-Werror make -B ENABLE64BIT=No  BUILDTYPE=Debug   all plugin test
   return $?
 }
 #usage: runPrepareAndBinaryTest $TestBitStream
 runPrepareAndBinaryTest()
 {
-  if [ ! $# -eq 1  ]
+  if [ ! $# -eq 2  ]
   then
     echo "usage: runPrepareAndBinaryTest  \$TestBitStream"
     exit 1
   fi
   local TestBitStream=$1
+  local TestType=$2
   local WorkingDir=`pwd`
   local BinaryTestDir="test/encoder_binary_comparison"
   local TestSpacePrepareLog="AllTestSpacePrepare.log"
@@ -59,7 +60,7 @@ runPrepareAndBinaryTest()
   echo ""
   echo " binary compare test, test bit stream is ${TestBitStream}"
   echo ""
-  ./test/encoder_binary_comparison/run_OneBitStream.sh  ${TestBitStream}
+./test/encoder_binary_comparison/run_OneBitStream.sh  ${TestBitStream} ${TestType}
   return $?
 }
 #usage:runMain  ${TestType}  ${TestBitStream}
@@ -83,7 +84,7 @@ runMain()
   if [  "${TestType}"  = "BinaryCompare" ]
   then
     set -e
-    runPrepareAndBinaryTest ${TestBitStream}
+    runPrepareAndBinaryTest ${TestBitStream} TravisTest
     return $?
   fi
 }

@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	       :  BackgroundDetection.h
+ * \file        :  BackgroundDetection.h
  *
- * \brief	     :  background detection class of wels video processor class
+ * \brief       :  background detection class of wels video processor class
  *
  * \date        :  2011/03/17
  *
@@ -49,12 +49,12 @@
 WELSVP_NAMESPACE_BEGIN
 
 typedef struct {
-  int32_t	iBackgroundFlag;
-  int32_t	iSAD;
-  int32_t	iSD;
-  int32_t	iMAD;
-  int32_t	iMinSubMad;
-  int32_t	iMaxDiffSubSd;
+  int32_t       iBackgroundFlag;
+  int32_t       iSAD;
+  int32_t       iSD;
+  int32_t       iMAD;
+  int32_t       iMinSubMad;
+  int32_t       iMaxDiffSubSd;
 } SBackgroundOU;
 
 class CBackgroundDetection : public IStrategy {
@@ -69,11 +69,11 @@ class CBackgroundDetection : public IStrategy {
   struct vBGDParam {
     uint8_t*   pCur[3];
     uint8_t*   pRef[3];
-    int32_t	   iBgdWidth;
-    int32_t	   iBgdHeight;
+    int32_t    iBgdWidth;
+    int32_t    iBgdHeight;
     int32_t    iStride[3];
-    SBackgroundOU*  	pOU_array;
-    int8_t*  	pBackgroundMbFlag;
+    SBackgroundOU*   pOU_array;
+    int8_t*    pBackgroundMbFlag;
     SVAACalcResult*  pCalcRes;
   } m_BgdParam;
 
@@ -87,7 +87,7 @@ class CBackgroundDetection : public IStrategy {
   inline bool   ForegroundDilation23Chroma (int8_t iNeighbourForegroundFlags, int32_t iStartSamplePos,
       int32_t iPicStrideUV, vBGDParam* pBgdParam);//Foreground_Dilation_2_3_Chroma
   inline void     ForegroundDilation (SBackgroundOU* pBackgroundOU, SBackgroundOU* pOUNeighbours[], vBGDParam* pBgdParam,
-                                      int32_t	iChromaSampleStartPos);
+                                      int32_t iChromaSampleStartPos);
   inline void     BackgroundErosion (SBackgroundOU* pBackgroundOU, SBackgroundOU* pOUNeighbours[]);
   inline void     SetBackgroundMbFlag (int8_t* pBackgroundMbFlag, int32_t iPicWidthInMb, int32_t iBackgroundMbFlag);
   inline void     UpperOUForegroundCheck (SBackgroundOU* pCurOU, int8_t* pBackgroundMbFlag, int32_t iPicWidthInOU,

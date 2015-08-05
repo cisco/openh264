@@ -31,42 +31,7 @@
  */
 
 #ifdef HAVE_NEON
-.text
 #include "arm_arch_common_macro.S"
-#ifdef __APPLE__
-
-.macro ROW_TRANSFORM_1_STEP
-//  {   //  input: src_d[0]~[3], output: e_q[0]~[3]; working: $8 $9
-    vaddl.s16       $4, $0, $2          //int32 e[i][0] = src[0] + src[2];
-    vsubl.s16       $5, $0, $2          //int32 e[i][1] = src[0] - src[2];
-    vshr.s16        $8, $1, #1
-    vshr.s16        $9, $3, #1
-    vsubl.s16       $6, $8, $3          //int32 e[i][2] = (src[1]>>1)-src[3];
-    vaddl.s16       $7, $1, $9          //int32 e[i][3] = src[1] + (src[3]>>1);
-//  }
-.endm
-
-.macro TRANSFORM_4BYTES // both row & col transform used
-//  {   //  output: f_q[0]~[3], input: e_q[0]~[3];
-    vadd.s32        $0, $4, $7          //int16 f[i][0] = e[i][0] + e[i][3];
-    vadd.s32        $1, $5, $6          //int16 f[i][1] = e[i][1] + e[i][2];
-    vsub.s32        $2, $5, $6          //int16 f[i][2] = e[i][1] - e[i][2];
-    vsub.s32        $3, $4, $7          //int16 f[i][3] = e[i][0] - e[i][3];
-//  }
-.endm
-
-.macro COL_TRANSFORM_1_STEP
-//  {   //  input: src_q[0]~[3], output: e_q[0]~[3];
-    vadd.s32        $4, $0, $2          //int32 e[0][j] = f[0][j] + f[2][j];
-    vsub.s32        $5, $0, $2          //int32 e[1][j] = f[0][j] - f[2][j];
-    vshr.s32        $6, $1, #1
-    vshr.s32        $7, $3, #1
-    vsub.s32        $6, $6, $3          //int32 e[2][j] = (f[1][j]>>1) - f[3][j];
-    vadd.s32        $7, $1, $7          //int32 e[3][j] = f[1][j] + (f[3][j]>>1);
-//  }
-.endm
-
-#else
 
 .macro ROW_TRANSFORM_1_STEP arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
 //  {   //  input: src_d[0]~[3], output: e_q[0]~[3]; working: $8 $9
@@ -98,19 +63,6 @@
     vadd.s32        \arg7, \arg1, \arg7         //int32 e[3][j] = f[1][j] + (f[3][j]>>1);
 //  }
 .endm
-#endif
-// r0    int8_t* non_zero_count,
-WELS_ASM_FUNC_BEGIN SetNonZeroCount_neon
-    vld1.64 {d0-d2}, [r0]
-    vceq.s8 q0, q0, #0
-    vceq.s8 d2, d2, #0
-    vmvn    q0, q0
-    vmvn    d2, d2
-    vabs.s8 q0, q0
-    vabs.s8 d2, d2
-    vst1.64 {d0-d2}, [r0]
-WELS_ASM_FUNC_END
-
 
 //  uint8_t *pred, const int32_t stride, int16_t *rs
 WELS_ASM_FUNC_BEGIN IdctResAddPred_neon

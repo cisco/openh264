@@ -29,9 +29,9 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	    :  IWelsVP.h
+ * \file        :  IWelsVP.h
  *
- * \brief	    :  Interface of wels video processor class
+ * \brief       :  Interface of wels video processor class
  *
  * \date        :  2011/01/04
  *
@@ -56,9 +56,9 @@ typedef enum {
   RET_FAILED           = -1,
   RET_INVALIDPARAM     = -2,
   RET_OUTOFMEMORY      = -3,
-  RET_NOTSUPPORTED       = -4,
+  RET_NOTSUPPORTED     = -4,
   RET_UNEXPECTED       = -5,
-  RET_NEEDREINIT		  = -6
+  RET_NEEDREINIT       = -6
 } EResult;
 
 typedef enum {
@@ -80,7 +80,7 @@ typedef enum {
   VIDEO_FORMAT_I420       = 23,   /* yuv 4:2:0 planar */
   VIDEO_FORMAT_YV12       = 24,   /* yuv 4:2:0 planar */
   VIDEO_FORMAT_INTERNAL   = 25,   /* Only Used for SVC decoder testbed */
-  VIDEO_FORMAT_NV12		= 26,	/* y planar + uv packed */
+  VIDEO_FORMAT_NV12       = 26,   /* y planar + uv packed */
   VIDEO_FORMAT_I422       = 27,   /* yuv 4:2:2 planar */
   VIDEO_FORMAT_I444       = 28,   /* yuv 4:4:4 planar */
   VIDEO_FORMAT_YUYV       = 20,   /* yuv 4:2:2 packed */
@@ -124,13 +124,13 @@ typedef enum {
   METHOD_DENOISE              ,
   METHOD_SCENE_CHANGE_DETECTION_VIDEO ,
   METHOD_SCENE_CHANGE_DETECTION_SCREEN ,
-  METHOD_DOWNSAMPLE			  ,
+  METHOD_DOWNSAMPLE            ,
   METHOD_VAA_STATISTICS        ,
   METHOD_BACKGROUND_DETECTION  ,
   METHOD_ADAPTIVE_QUANT ,
   METHOD_COMPLEXITY_ANALYSIS   ,
   METHOD_COMPLEXITY_ANALYSIS_SCREEN,
-  METHOD_IMAGE_ROTATE		  ,
+  METHOD_IMAGE_ROTATE          ,
   METHOD_SCROLL_DETECTION,
   METHOD_MASK
 } EMethods;
@@ -163,21 +163,21 @@ typedef struct {
 typedef struct {
   ESceneChangeIdc eSceneChangeIdc; // SIMILAR_SCENE, MEDIUM_CHANGED_SCENE, LARGE_CHANGED_SCENE
   int             iMotionBlockNum; // Number of motion blocks
-  int             iFrameComplexity; // frame complexity
+  long long       iFrameComplexity; // frame complexity
   unsigned char* pStaticBlockIdc;   // static block idc
   SScrollDetectionParam sScrollResult; //results from scroll detection
 } SSceneChangeResult;
 
 typedef struct {
-  unsigned char* pCurY;					// Y data of current frame
-  unsigned char* pRefY;					// Y data of pRef frame for diff calc
-  int (*pSad8x8)[4];				// sad of 8x8, every 4 in the same 16x16 get together
-  int* pSsd16x16;					// sum of square difference of 16x16
-  int* pSum16x16;					// sum of 16x16
-  int* pSumOfSquare16x16;					// sum of square of 16x16
-  int	(*pSumOfDiff8x8)[4];
+  unsigned char* pCurY;             // Y data of current frame
+  unsigned char* pRefY;             // Y data of pRef frame for diff calc
+  int (*pSad8x8)[4];                // sad of 8x8, every 4 in the same 16x16 get together
+  int* pSsd16x16;                   // sum of square difference of 16x16
+  int* pSum16x16;                   // sum of 16x16
+  int* pSumOfSquare16x16;           // sum of square of 16x16
+  int   (*pSumOfDiff8x8)[4];
   unsigned char (*pMad8x8)[4];
-  int iFrameSad;					// sad of frame
+  int iFrameSad;                    // sad of frame
 } SVAACalcResult;
 
 typedef struct {
@@ -185,11 +185,11 @@ typedef struct {
   int iCalcBgd;
   int iCalcSsd;
   int iReserved;
-  SVAACalcResult*	pCalcResult;
+  SVAACalcResult*  pCalcResult;
 } SVAACalcParam;
 
 typedef struct {
-  signed char*		pBackgroundMbFlag;
+  signed char*     pBackgroundMbFlag;
   SVAACalcResult*  pCalcRes;
 } SBGDInterface;
 
@@ -204,12 +204,12 @@ typedef struct {
 } SMotionTextureUnit;
 
 typedef struct {
-  int					iAdaptiveQuantMode; // 0:quality mode, 1:bitrates mode
-  SVAACalcResult*		pCalcResult;
+  int                  iAdaptiveQuantMode; // 0:quality mode, 1:bitrates mode
+  SVAACalcResult*      pCalcResult;
   SMotionTextureUnit*  pMotionTextureUnit;
 
-  signed char*			pMotionTextureIndexToDeltaQp;
-  int				iAverMotionTextureIndexToDeltaQp; // *AQ_STEP_INT_MULTIPLY
+  signed char*      pMotionTextureIndexToDeltaQp;
+  int               iAverMotionTextureIndexToDeltaQp; // *AQ_STEP_INT_MULTIPLY
 } SAdaptiveQuantizationParam;
 
 typedef enum {
@@ -222,7 +222,7 @@ typedef struct {
   int  iComplexityAnalysisMode;
   int  iCalcBgd;
   int  iMbNumInGom;
-  int  iFrameComplexity;
+  long long  iFrameComplexity;
   int*  pGomComplexity;
   int*  pGomForegroundBlockNum;
   signed char*  pBackgroundMbFlag;
@@ -234,7 +234,7 @@ typedef struct {
   int  iMbRowInGom;
   int*  pGomComplexity;
   int  iGomNumInFrame;
-  int  iFrameComplexity;
+  long long  iFrameComplexity; //255*255(MaxMbSAD)*36864(MaxFS) make the highest bit of 32-bit integer 1
   int  iIdrFlag;
   SScrollDetectionParam sScrollResult;
 } SComplexityAnalysisScreenParam;

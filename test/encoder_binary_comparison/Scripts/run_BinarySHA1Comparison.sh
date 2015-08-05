@@ -5,8 +5,7 @@
 #       -- Test bit stream under folder  openh264/res
 #       -- SHA-1 string of Benchmark version for  all cases  of all bit streams
 #           under folder  openh264/test/encoder_binary_comparion/SHA1Table
-#       -- For more detail,please refer to file AboutTest¡£
-#
+#       -- For more detail,please refer to file AboutTest?¡ê
 #brief:
 #       -- Test all cases in SHA1TableFile
 #          1) Generate SHA1 string for each case
@@ -38,10 +37,12 @@ runGlobalVariableDef()
   #xxx.csv
   AllCasePassStatusFile=""
   #for encoder command
-  declare -a EncoderCommandSet
-  declare -a EncoderCommandName
-  declare -a EncoderCommandValue
+  declare -a aEncoderCommandSet
+  declare -a aEncoderCommandName
+  declare -a aEncoderCommandValue
+  declare -a aRecYUVFileList
   #encoder parameters  change based on the case info
+  let "EncoderFlag = 0"
   CaseInfo=""
   BitStreamFile=""
   DiffFlag=""
@@ -54,42 +55,32 @@ runGlobalVariableDef()
 #usage runEncoderCommandInital
 runEncoderCommandInital()
 {
-    EncoderCommandSet=(-frms        \
-                        -numtl      \
-                        -scrsig     \
-                        -rc         \
-                        -tarb       \
-                        "-lqp 0"    \
-                        -iper       \
-                        "-slcmd 0"  \
-                        "-slcnum 0" \
-                        -thread     \
-                        -ltr        \
-                        -db         \
-                        -nalsize    \
-                        -denois     \
-                        -scene      \
-                        -bgd        \
-                        -aq)
-    EncoderCommandName=(FrEcoded     \
-                        NumTempLayer \
-                        ContentSig   \
-                        RC           \
-                        BitRate      \
-                        QP           \
-                        IntraPeriod  \
-                        SlcMd        \
-                        SlcMum       \
-                        ThrMum       \
-                        LTR          \
-                        LFilterIDC   \
-                        MacNalSize   \
-                        DenoiseFlag  \
-                        SceneChangeFlag \
-                        BackgroundFlag  \
-                        AQFlag)
-  EncoderCommandValue=(0 0 0 0 0    0 0 0 0 0    0 0 0 0 0   0 0)
-  NumParameter=${#EncoderCommandSet[@]}
+  aEncoderCommandSet=( -utype  -frms  -numl   -numtl \
+                                -sw -sh  "-dw 0"  "-dh 0" "-dw 1" "-dh 1" "-dw 2" "-dh 2" "-dw 3" "-dh 3" \
+                                "-frout 0" "-frout 1" "-frout 2" "-frout 3" \
+                                "-lqp 0" "-lqp 1" "-lqp 2" "-lqp 3" \
+                                -rc -tarb "-ltarb 0"    "-ltarb 1" "-ltarb 2" "-ltarb 3" \
+                                "-slcmd 0" "-slcnum 0" "-slcmd 1" "-slcnum 1"\
+                                "-slcmd 2" "-slcnum 2" "-slcmd 3" "-slcnum 3"\
+                                -nalsize \
+                                -iper   -thread    -ltr \
+                                -db  -denois    -scene    -bgd    -aq )
+  aEncoderCommandName=(usagetype  frms  numl   numtl \
+                                sw sh  dw0 dh0 dw1 dh1 dw2 dh2 dw3 dh3 \
+                                frout0 frout1 frout2 frout3 \
+                                lqp0 lqp1 lqp2 lqp3 \
+                                rc tarb ltarb0  ltarb1 ltarb2 ltarb3 \
+                                slcmd0 slcnum0 slcmd1 slcnum1 \
+                                slcmd2 slcnum2 slcmd3 slcnum3 \
+                                MaxNalSZ  \
+                                iper   thread  ltr \
+                                db  denois  scene  bgd  aq )
+  NumParameter=${#aEncoderCommandSet[@]}
+  for ((i=0;i<NumParameter; i++))
+  do
+    aEncoderCommandValue[$i]=0
+  done
+
 }
 runGlobalVariableInitial()
 {
@@ -110,35 +101,33 @@ runGlobalVariableInitial()
   AllCasePassStatusFile="${FinalResultPath}/${TestSequenceName}_AllCaseOutput.csv"
   UnpassCaseFile="${FinalResultPath}/${TestSequenceName}_unpassCaseOutput.csv"
   UpdateSHA1TableFile="${FinalResultPath}/${TestSequenceName}_UpdateSHA1Table.csv"
-  echo    "BitMatched Status,                      \
-            SHA-1-Target, SHA-1-Benchmark,         \
-            MD5-Target, MD5-Benchmark,             \
-            Bitstream-Target,Bitstream-Benchmark,  \
-            YUV-Target,YUV-Benchmark,              \
-            -frms, -numtl, -scrsig, -rc,           \
-            -tarb, -lqp 0, -iper,                  \
-            -slcmd 0,-slcnum 0, -thread,           \
-            -ltr, -db, -nalsize,-denois,           \
-            -scene,     -bgd,    -aq">${AllCasePassStatusFile}
+  HeadLine1="BitMatched Status, SHA-1-Target, SHA-1-Benchmark, MD5-Target, MD5-Benchmark,\
+            Bitstream-Target,Bitstream-Benchmark,YUV-Target,YUV-Benchmark,\
+                -utype,  -frms,  -numl,  -numtl, -sw, -sh,\
+                -dw 0, -dh 0, -dw 1, -dh 1, -dw 2, -dh 2, -dw 3, -dh 3,\
+                -frout 0,  -frout 1, -frout 2, -frout 3,\
+                -lqp 0, -lqp 1, -lqp 2, -lqp 3,\
+                -rc, -tarb, -ltarb 0, -ltarb 1, -ltarb 2, -ltarb 3,\
+                -slcmd 0, -slcnum 0, -slcmd 1, -slcnum 1,\
+                -slcmd 2, -slcnum 2, -slcmd 3, -slcnum 3,\
+                -nalsize,\
+                -iper, -thread, -ltr, -db, -denois,\
+                -scene,  -bgd ,  -aq, "
+  HeadLine2="SHA-1 Value, MD5String, BitStreamSize, YUVSize, \
+                -utype,  -frms,  -numl,  -numtl, -sw, -sh,\
+                -dw 0, -dh 0, -dw 1, -dh 1,-dw 2, -dh 2, -dw 3, -dh 3,\
+                -frout 0,  -frout 1, -frout 2, -frout 3,\
+                -lqp 0, -lqp 1, -lqp 2, -lqp 3,\
+                -rc, -tarb, -ltarb 0, -ltarb 1, -ltarb 2, -ltarb 3,\
+                -slcmd 0, -slcnum 0, -slcmd 1, -slcnum 1,\
+                -slcmd 2, -slcnum 2, -slcmd 3, -slcnum 3,\
+                -nalsize,\
+                -iper, -thread, -ltr, -db, -denois,\
+                -scene  , bgd  , -aq "
+  echo ${HeadLine1}>${AllCasePassStatusFile}
+  echo ${HeadLine1}>${UnpassCaseFile}
+  echo ${HeadLine2}>${UpdateSHA1TableFile}
 
-  echo   "BitMatched Status,                   \
-            SHA-1-Target, SHA-1-Benchmark,       \
-            MD5-Target, MD5-Benchmark,           \
-            Bitstream-Target,Bitstream-Benchmark,\
-            YUV-Target,YUV-Benchmark,            \
-            -frms, -numtl, -scrsig, -rc,         \
-            -tarb, -lqp 0, -iper,                \
-            -slcmd 0,-slcnum 0, -thread,         \
-            -ltr, -db, -nalsize,-denois,         \
-            -scene,     -bgd,    -aq">${UnpassCaseFile}
-
-  echo    "SHA-1 Value,                        \
-            MD5String, BitStreamSize, YUVSize, \
-            -frms, -numtl, -scrsig, -rc,       \
-            -tarb, -lqp 0, -iper,              \
-            -slcmd 0,-slcnum 0, -thread,       \
-            -ltr, -db, -MaxNalSize,-denois,    \
-            -scene,     -bgd,    -aq">${UpdateSHA1TableFile}
   #intial Commandline parameters
   runEncoderCommandInital
   let "TotalCaseNum=0"
@@ -163,70 +152,89 @@ runParseCaseInfo()
 {
   if [ $#  -lt 1  ]
   then
-    echo "runParseCaseInfo \$CaseData"
-    return 1
+        echo "no parameter!"
+        return 1
   fi
-    local TempData=""
-  local BitstreamPrefix=""
+  local TempData=""
   local CaseData=$@
+  local BitstreamPrefix=""
   BenchmarkSHA1=`echo $CaseData |awk 'BEGIN {FS="[,\r]"} {print $1} ' `
   BenchmarkMD5=`echo $CaseData |awk 'BEGIN {FS="[,\r]"} {print $2} ' `
   BenchmarkYUVSize=`echo $CaseData |awk 'BEGIN {FS="[,\r]"} {print $4} ' `
   BenchmarkBitstreamSize=`echo $CaseData |awk 'BEGIN {FS="[,\r]"} {print $3} ' `
+
+  declare -a aTempParamIndex=( 6 7 8 9 10 11 12 13    15 16 17   19 20 21     24 25 26 27   30 31 32 33 34 35 )
   TempData=`echo $CaseData |awk 'BEGIN {FS="[,\r]"} {for(i=5;i<=NF;i++) printf(" %s",$i)} ' `
-  EncoderCommandValue=(${TempData})
+  aEncoderCommandValue=(${TempData})
+  let "TempParamFlag=0"
   for((i=0; i<$NumParameter; i++))
   do
-    BitstreamPrefix=${BitstreamPrefix}_${EncoderCommandName[$i]}_${EncoderCommandValue[$i]}
+        for ParnmIndex in ${aTempParamIndex[@]}
+        do
+          if [  $i -eq ${ParnmIndex} ]
+          then
+                        let "TempParamFlag=1"
+          fi
+        done
+        if [ ${TempParamFlag} -eq 0 ]
+        then
+                BitstreamPrefix=${BitstreamPrefix}_${aEncoderCommandName[$i]}_${aEncoderCommandValue[$i]}
+        fi
+        let "TempParamFlag=0"
   done
+
   BitstreamTarget=${TempDataPath}/${TestSequenceName}_${BitstreamPrefix}_codec_target.264
   echo ""
   echo "BitstreamPrefix is ${BitstreamPrefix}"
   echo ""
 }
-#called  by  runAllCaseTest
-#usage  runEncodeOneCase
 runEncodeOneCase()
 {
-        BitStreamFile=${BitstreamTarget}
-        CaseCommand=" ${ConfigureFile} \
-                -numl 1                      \
-                -lconfig 0 layer2.cfg        \
-                -sw   ${PicW} -sh   ${PicH}  \
-                -dw 0 ${PicW} -dh 0 ${PicH}  \
-                -frout 0  30                 \
-                -ltarb 0  ${EncoderCommandValue[4]}                 \
-                ${EncoderCommandSet[0]}  ${EncoderCommandValue[0]}  \
-                ${EncoderCommandSet[1]}  ${EncoderCommandValue[1]}  \
-                ${EncoderCommandSet[2]}  ${EncoderCommandValue[2]}  \
-                ${EncoderCommandSet[3]}  ${EncoderCommandValue[3]}  \
-                ${EncoderCommandSet[4]}  ${EncoderCommandValue[4]}  \
-                ${EncoderCommandSet[5]}  ${EncoderCommandValue[5]}  \
-                ${EncoderCommandSet[6]}  ${EncoderCommandValue[6]}  \
-                ${EncoderCommandSet[7]}  ${EncoderCommandValue[7]}  \
-                ${EncoderCommandSet[8]}  ${EncoderCommandValue[8]}  \
-                ${EncoderCommandSet[9]}  ${EncoderCommandValue[9]}  \
-                ${EncoderCommandSet[10]} ${EncoderCommandValue[10]} \
-                ${EncoderCommandSet[11]} ${EncoderCommandValue[11]} \
-                ${EncoderCommandSet[12]} ${EncoderCommandValue[12]} \
-                ${EncoderCommandSet[13]} ${EncoderCommandValue[13]} \
-                ${EncoderCommandSet[14]} ${EncoderCommandValue[14]} \
-                ${EncoderCommandSet[15]} ${EncoderCommandValue[15]} \
-                ${EncoderCommandSet[16]} ${EncoderCommandValue[16]}"
-  echo ${EncoderCommandSet[@]}
-  echo ${EncoderCommandValue[@]}
-  echo ${EncoderCommandSet[11]}
-  echo ${EncoderCommandValue[11]}
-  echo ${EncoderCommandSet[12]}
-  echo ${EncoderCommandValue[12]}
-  EncoderCommand="./h264enc  ${CaseCommand} -bf   ${BitStreamFile}  -org   ${TestSequencePath}/${TestSequenceName} "
+  local ParamCommand=""
+  BitStreamFile=${BitstreamTarget}
+
+  for ((i=4; i<${NumParameter}; i++))
+  do
+        ParamCommand="${ParamCommand} ${aEncoderCommandSet[$i]}  ${aEncoderCommandValue[$i]} "
+  done
+  for((i=0;i<4;i++))
+  do
+        aRecYUVFileList[$i]="${TempDataPath}/${TestYUVName}_rec${i}.yuv"
+  done
+  ParamCommand="${aEncoderCommandSet[0]} ${aEncoderCommandValue[0]} ${aEncoderCommandSet[1]}  ${aEncoderCommandValue[1]} \
+                         ${aEncoderCommandSet[2]}  ${aEncoderCommandValue[2]} \
+                        -lconfig 0 layer0.cfg -lconfig 1 layer1.cfg -lconfig 2 layer2.cfg  -lconfig 3 layer3.cfg  \
+                        ${aEncoderCommandSet[3]}  ${aEncoderCommandValue[3]}  \
+                        ${ParamCommand}"
   echo ""
+  echo "---------------Encode One Case-------------------------------------------"
   echo "case line is :"
-  echo "   ${EncoderCommand}"
+  EncoderCommand="./h264enc  welsenc.cfg    ${ParamCommand} -bf   ${BitStreamFile} \
+                        -drec 0 ${aRecYUVFileList[0]} -drec 1 ${aRecYUVFileList[1]} \
+                        -drec 2 ${aRecYUVFileList[2]} -drec 3 ${aRecYUVFileList[3]} \
+                        -org ${TestSequencePath}/${TestSequenceName}"
+  echo ${EncoderCommand}
   echo -e  "\n\n"
-        ./h264enc ${CaseCommand}      \
-                -bf ${BitStreamFile}  \
-                -org  ${TestSequencePath}/${TestSequenceName} 2>${EncoderLogFile}
+  ./h264enc  welsenc.cfg    ${ParamCommand} -bf   ${BitStreamFile} \
+                        -drec 0 ${aRecYUVFileList[0]} -drec 1 ${aRecYUVFileList[1]} \
+                        -drec 2 ${aRecYUVFileList[2]} -drec 3 ${aRecYUVFileList[3]} \
+                        -org ${TestSequencePath}/${TestSequenceName} 2>${EncoderLogFile}
+  if [ $? -eq 0  ]
+  then
+        let "EncoderFlag=0"
+  else
+        let "EncoderFlag=1"
+  fi
+
+  #delete the core down file as core down files for disk space limitation
+  for file in  ./core*
+  do
+        if [ -e ${file} ]
+        then
+                ./run_SafeDelete.sh  ${file}
+        fi
+  done
+  return 0
 }
 #usage? runGetFileSize  $FileName
 runGetFileSize()
@@ -251,15 +259,31 @@ runBitStreamVerify()
   echo "******************************************"
   echo "Bit streamSHA1 value comparison.... "
   #*******************************************
+  TargetSHA1="NULL"
+  TargetMD5="NULL"
+  TargetYUVSize="NULL"
+  TargetBitstreamSize="NULL"
+
+  if [ ${EncoderFlag} -eq 1 ]
+  then
+    let "UnpassCaseNum++"
+  echo "1:unpassed! encoder initial failed or crash!"
+    DiffFlag="1:unpassed! encoder initial failed or crash!"
+    return 1
+  fi
+
   if [ ! -s ${BitStreamFile} ]
   then
     let "UnpassCaseNum++"
+  echo "2:unpassed! 0 bits--bit stream"
     DiffFlag="2:unpassed! 0 bits--bit stream"
     return 1
   fi
   #*******************************************
   #*******************************************
-  #SHA1(run_Test.sh)= fde74d9e8194d0cf28991a0481c7158a033ec920
+  echo ""
+  echo "${BitStreamFile}"
+  #SHA1
   TargetSHA1=`openssl sha1  ${BitStreamFile}`
   TargetSHA1=`echo ${TargetSHA1} | awk '{print $2}' `
   TargetMD5=`openssl md5   ${BitStreamFile}`
@@ -268,19 +292,19 @@ runBitStreamVerify()
   TargetBitstreamSize=`runGetFileSize   ${BitStreamFile}`
   if [[   "${TargetSHA1}"  =~  "${BenchmarkSHA1}"  ]]
   then
-    echo "bitstream pass!      SHA1--${TargetSHA1}  ----- ${BenchmarkSHA1}"
-    echo "bitstream pass!      MD5-- ${TargetMD5}  ----- ${BenchmarkMD5}"
-    echo "YUV size  pass!      size--${TargetYUVSize}--${BenchmarkYUVSize} "
-    echo "BitStreamSize pass!  size--${TargetBitstreamSize}--${BenchmarkBitstreamSize}"
+    echo "bitstream pass!      SHA1--${TargetSHA1} ----- ${BenchmarkSHA1}"
+    echo "MD5 info:            MD5--${TargetMD5} ----- ${BenchmarkMD5}"
+    echo "YUV size info:       size--${TargetYUVSize} ---- ${BenchmarkYUVSize} "
+    echo "BitStreamSize info:  size--${TargetBitstreamSize} ---- ${BenchmarkBitstreamSize}"
     DiffFlag="0:passed!"
     let "PassCaseNum++"
     return 0
   else
     echo "!!! SHA1 string not match: ${TargetSHA1}  ----- ${BenchmarkSHA1}  "
-    echo "bitstream pass!      MD5-- ${TargetMD5}  ----- ${BenchmarkMD5}"
-    echo "YUV size  pass!      size--${TargetYUVSize}--${BenchmarkYUVSize} "
-    echo "BitStreamSize pass!  size--${TargetBitstreamSize}--${BenchmarkBitstreamSize}"
-    DiffFlag="1:unpassed!"
+    echo "MD5 info:            MD5--${TargetMD5} ----- ${BenchmarkMD5}"
+    echo "YUV size info:       size--${TargetYUVSize} ---- ${BenchmarkYUVSize} "
+    echo "BitStreamSize info:  size--${TargetBitstreamSize} ---- ${BenchmarkBitstreamSize}"
+    DiffFlag="3:unpassed!"
     let "UnpassCaseNum++"
     return 1
   fi
@@ -297,13 +321,15 @@ runSingleCasePostAction()
   fi
   local CaseData=$@
   CaseInfo=`echo $CaseData | awk 'BEGIN {FS="[,\r]"} {for(i=5;i<=NF;i++) printf(" %s,",$i)} '`
-    echo "${DiffFlag}, ${TargetSHA1}, ${BenchmarkSHA1}, {TargetMD5}, ${BenchmarkMD5},  \
-    ${TargetBitstreamSize} , ${BenchmarkBitstreamSize},\
-    ${TargetYUVSize},  ${BenchmarkYUVSize},\
-    ${CaseInfo}, ${EncoderCommand} "  >>${AllCasePassStatusFile}
-
-    echo "${TargetSHA1}, ${TargetMD5},${TargetBitstreamSize}, ${TargetYUVSize},${CaseInfo}">>${UpdateSHA1TableFile}
-
+  PassStatusInfo="${DiffFlag}, ${TargetSHA1}, ${BenchmarkSHA1}, ${TargetMD5}, ${BenchmarkMD5},\
+    ${TargetBitstreamSize}, ${BenchmarkBitstreamSize}, ${TargetYUVSize}, ${BenchmarkYUVSize},\
+    ${CaseInfo}, ${EncoderCommand} "
+  echo "${PassStatusInfo}">>${AllCasePassStatusFile}
+  if [ "$DiffFlag" != "0:passed!"  ]
+  then
+    echo "${PassStatusInfo}">>${UnpassCaseFile}
+  fi
+   echo "${TargetSHA1}, ${TargetMD5},${TargetBitstreamSize}, ${TargetYUVSize},${CaseInfo}">>${UpdateSHA1TableFile}
   ./run_SafeDelete.sh ${BitstreamTarget} >>${AllCaseConsoleLogFile}
 }
 #usage runOutputPassNum
@@ -313,9 +339,9 @@ runOutputPassNum()
   echo ""
   echo "***********************************************************"
   echo "${TestSequenceName}"
-  echo "total case  Num is :  ${TotalCaseNum}"
-  echo "pass  case  Num is : ${PassCaseNum}"
-  echo "unpass case Num is : ${UnpassCaseNum} "
+  echo "total case  Num is: ${TotalCaseNum}"
+  echo "pass  case  Num is: ${PassCaseNum}"
+  echo "unpass case Num is: ${UnpassCaseNum}"
   echo "***********************************************************"
   echo ""
 }
@@ -343,23 +369,19 @@ runAllCaseTest()
       then
         if [  "$DiffFlag" = "0:passed!"   ]
         then
-          echo -e "\033[32m    OK!   ${TestSequenceName} Case Index ${TotalCaseNum}:SHA-1(Current--Benchmark): ${TargetSHA1}  ----- ${BenchmarkSHA1}  \033[0m"
-          echo -e "\033[32m            ----MD5 (Current--Benchmark): ${TargetMD5}, ${BenchmarkMD5} \033[0m"
+          echo -e "\033[32m    OK!   ${TestSequenceName} Case Index ${TotalCaseNum}:SHA-1(Current--Benchmark): ${TargetSHA1}-----${BenchmarkSHA1}  \033[0m"
+          echo -e "\033[32m            ----MD5 (Current--Benchmark): ${TargetMD5}-----${BenchmarkMD5} \033[0m"
           echo -e "\033[32m            ----BitstreamSize:  ${TargetBitstreamSize},  ${BenchmarkBitstreamSize}   YUVSize:  ${TargetYUVSize}, ${BenchmarkYUVSize}  \033[0m"
         fi
       fi
       #******************************************
       if [ ! "$DiffFlag" = "0:passed!"  ]
       then
-        echo -e "\033[31m    Failed! ${TestSequenceName} Case Index ${TotalCaseNum}:SHA-1(Current--Benchmark): ${TargetSHA1}  ----- ${BenchmarkSHA1}  \033[0m"
-        echo -e "\033[31m            ----MD5 (Current--Benchmark): ${TargetMD5}, ${BenchmarkMD5} \033[0m"
+        echo -e "\033[31m    Failed! ${TestSequenceName} Case Index ${TotalCaseNum}:SHA-1(Current--Benchmark): ${TargetSHA1}-----${BenchmarkSHA1}  \033[0m"
+        echo -e "\033[31m            ----MD5 (Current--Benchmark): ${TargetMD5}-----${BenchmarkMD5} \033[0m"
         echo -e "\033[31m            ----BitstreamSize:  ${TargetBitstreamSize},  ${BenchmarkBitstreamSize}   YUVSize:  ${TargetYUVSize}, ${BenchmarkYUVSize}  \033[0m"
         EncoderLogInfo=`cat  ${EncoderLogFile}`
         echo -e "\033[31m           ${EncoderLogInfo}   \033[0m"
-        echo "${DiffFlag}, ${TargetSHA1}, ${BenchmarkSHA1}, ${TargetMD5}, ${BenchmarkMD5},  \
-            ${TargetBitstreamSize} , ${BenchmarkBitstreamSize},   \
-            ${TargetYUVSize},  ${BenchmarkYUVSize},  \
-            ${CaseInfo}, ${EncoderCommand}  ">>${UnpassCaseFile}
       fi
       runSingleCasePostAction  ${CaseData}
       let "TotalCaseNum++"

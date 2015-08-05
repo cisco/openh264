@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	        :  SceneChangeDetection.h
+ * \file         :  SceneChangeDetection.h
  *
- * \brief	    :  scene change detection class of wels video processor class
+ * \brief        :  scene change detection class of wels video processor class
  *
  * \date         :  2011/03/14
  *
@@ -104,7 +104,7 @@ class CSceneChangeDetectorVideo {
     iCurRowStride  = sLocalParam.iCurStride << 3;
 
     for (int32_t j = 0; j < sLocalParam.iBlock8x8Height; j++) {
-      pRefTmp	= pRefY;
+      pRefTmp = pRefY;
       pCurTmp = pCurY;
       for (int32_t i = 0; i < sLocalParam.iBlock8x8Width; i++) {
         int32_t iSad = m_pfSad (pCurTmp, sLocalParam.iCurStride, pRefTmp, sLocalParam.iRefStride);
@@ -154,7 +154,7 @@ class CSceneChangeDetectorScreen : public CSceneChangeDetectorVideo {
     iCurRowStride  = sLocalParam.iCurStride << 3;
 
     for (int32_t j = 0; j < sLocalParam.iBlock8x8Height; j++) {
-      pRefTmp	= pRefY;
+      pRefTmp = pRefY;
       pCurTmp = pCurY;
       for (int32_t i = 0; i < sLocalParam.iBlock8x8Width; i++) {
         int32_t iBlockPointX = i << 3;
@@ -216,7 +216,7 @@ class CSceneChangeDetection : public IStrategy {
     int32_t iBlock8x8Num = m_sLocalParam.iBlock8x8Width * m_sLocalParam.iBlock8x8Height;
     int32_t iSceneChangeThresholdLarge = WelsStaticCast (int32_t,
                                          m_cDetector.GetSceneChangeMotionRatioLarge() * iBlock8x8Num + 0.5f + PESN);
-    int32_t iSceneChangeThresholdMedium	= WelsStaticCast (int32_t,
+    int32_t iSceneChangeThresholdMedium = WelsStaticCast (int32_t,
                                           m_cDetector.GetSceneChangeMotionRatioMedium() * iBlock8x8Num + 0.5f + PESN);
 
     m_sSceneChangeParam.iMotionBlockNum = 0;

@@ -4,30 +4,30 @@
 runGetPerformanceInfo_openh264()
 {
 
-	if [ ! $# -eq 2 ]
-	then
-		echo "not enough parameters!"
-		echo "usage: ${0} [android/ios] ${PerformanceLogFile}"
-		return 1
-	fi
+        if [ ! $# -eq 2 ]
+        then
+                echo "not enough parameters!"
+                echo "usage: ${0} [android/ios] ${PerformanceLogFile}"
+                return 1
+        fi
 
-	local PerformanceLogFile=$2
+        local PerformanceLogFile=$2
     local FileName=""
-	local Width=""
-	local Height=""
-	local Frames=""
-	local FPS=""
-	local EncodeTime=""
+        local Width=""
+        local Height=""
+        local Frames=""
+        local FPS=""
+        local EncodeTime=""
     if [ $1 = "android" ]
     then seperatorNum=3
     else
         seperatorNum=2
     fi
 
-	while read line
-	do
-		if [[ $line =~ "enc yuv file"  ]]
-		then
+        while read line
+        do
+                if [[ $line =~ "enc yuv file"  ]]
+                then
             FileName=`echo $line | awk 'BEGIN {FS="enc yuv file"} {print $2}'`
             FileName=`echo $FileName | awk 'BEGIN {FS=":"} {print $2}'`
         fi
@@ -51,9 +51,9 @@ runGetPerformanceInfo_openh264()
         fi
 
         if [[  $line =~ "encode time"  ]]
-		then
-			EncodeTime=`echo $line | awk 'BEGIN {FS=":"} {print $'${seperatorNum}'}'` 	
-		fi
+                then
+                        EncodeTime=`echo $line | awk 'BEGIN {FS=":"} {print $'${seperatorNum}'}'`
+                fi
         if [[ $line =~ "height" ]]
         then
             Height=`echo $line | awk 'BEGIN {FS=":"} {print $'${seperatorNum}'}'`
@@ -70,7 +70,7 @@ runGetPerformanceInfo_openh264()
        fi
       fi
 
-	done <${PerformanceLogFile}
+        done <${PerformanceLogFile}
 
 
 }

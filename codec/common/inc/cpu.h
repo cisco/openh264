@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	cpu.h
+ * \file    cpu.h
  *
- * \brief	CPU feature compatibility detection
+ * \brief   CPU feature compatibility detection
  *
- * \date	04/29/2009 Created
+ * \date    04/29/2009 Created
  *
  *************************************************************************************
  */
@@ -50,7 +50,7 @@ extern "C" {
 
 #if defined(X86_ASM)
 /*
- *	cpuid support verify routine
+ *  cpuid support verify routine
  *  return 0 if cpuid is not supported by cpu
  */
 int32_t  WelsCPUIdVerify();
@@ -63,7 +63,7 @@ int32_t WelsCPUSupportFMA (uint32_t eax, uint32_t ecx);
 void WelsEmms();
 
 /*
- *	clear FPU registers states for potential float based calculation if support
+ *  clear FPU registers states for potential float based calculation if support
  */
 void     WelsCPURestore (const uint32_t kuiCPU);
 

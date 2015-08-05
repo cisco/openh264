@@ -32,6 +32,8 @@
 
 #ifdef __APPLE__
 
+.text
+
 .macro WELS_ASM_AARCH64_FUNC_BEGIN
 .align 2
 .globl _$0
@@ -57,14 +59,6 @@ ret
 .macro WELS_ASM_AARCH64_FUNC_END
 ret
 .endfunc
-.endm
-
-.macro mov.16b arg0, arg1
-    mov \arg0\().16b, \arg1\().16b
-.endm
-
-.macro mov.8b arg0, arg1
-    mov \arg0\().8b, \arg1\().8b
 .endm
 
 #endif

@@ -386,7 +386,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\src\mc.cpp"
+				RelativePath="..\..\..\common\src\mc.cpp"
 				>
 			</File>
 			<File
@@ -394,7 +394,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\src\memory_align.cpp"
+				RelativePath="..\..\..\common\src\memory_align.cpp"
 				>
 			</File>
 			<File
@@ -495,10 +495,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\bit_stream.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\common\inc\copy_mb.h"
 				>
 			</File>
@@ -551,6 +547,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\common\inc\golomb_common.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\common\inc\ls_defines.h"
 				>
 			</File>
@@ -563,11 +563,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\mc.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\common\inc\mc_common.h"
+				RelativePath="..\..\..\common\inc\mc.h"
 				>
 			</File>
 			<File
@@ -579,7 +575,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\memory_align.h"
+				RelativePath="..\..\..\common\inc\memory_align.h"
 				>
 			</File>
 			<File
@@ -592,10 +588,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\encoder\core\inc\nal_encap.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\encoder\core\inc\nal_prefix.h"
 				>
 			</File>
 			<File
@@ -699,10 +691,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\trace.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\common\inc\typedefs.h"
 				>
 			</File>
@@ -719,11 +707,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\wels_common_defs.h"
+				RelativePath="..\..\..\common\inc\wels_common_defs.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\encoder\core\inc\wels_const.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\inc\wels_const_common.h"
 				>
 			</File>
 			<File

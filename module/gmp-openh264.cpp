@@ -62,7 +62,10 @@
 #endif
 
 // This is for supporting older versions which do not have support for nullptr.
-#if defined(__clang__)
+#if defined(nullptr)
+# define GMP_HAVE_NULLPTR
+
+#elif defined(__clang__)
 # ifndef __has_extension
 # define __has_extension __has_feature
 # endif
@@ -223,6 +226,8 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
 
     // Translate parameters.
     param.iUsageType = CAMERA_VIDEO_REAL_TIME;
+    if(codecSettings.mMode == kGMPScreensharing)
+      param.iUsageType = SCREEN_CONTENT_REAL_TIME;
     param.iPicWidth = codecSettings.mWidth;
     param.iPicHeight = codecSettings.mHeight;
     param.iRCMode = RC_BITRATE_MODE;
@@ -545,6 +550,16 @@ class OpenH264VideoEncoder : public GMPVideoEncoder {
   FrameStats stats_;
 };
 
+uint16_t readU16BE(const uint8_t* in) {
+  return in[0] << 8 | in[1];
+}
+
+void copyWithStartCode(std::vector<uint8_t>& out, const uint8_t* in, size_t size) {
+  static const uint8_t code[] = { 0x00, 0x00, 0x00, 0x01 };
+  out.insert(out.end(), code, code + sizeof(code));
+  out.insert(out.end(), in, in + size);
+}
+
 class OpenH264VideoDecoder : public GMPVideoDecoder {
  public:
   OpenH264VideoDecoder (GMPVideoHost* hostAPI) :
@@ -589,13 +604,51 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
     memset (&param, 0, sizeof (param));
     param.eOutputColorFormat = videoFormatI420;
     param.uiTargetDqLayer = UCHAR_MAX;  // Default value
-    param.eEcActiveIdc = ERROR_CON_SLICE_COPY; // Error concealment on.
+    param.eEcActiveIdc = ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE; // Error concealment on.
+    param.sVideoProperty.size = sizeof(param.sVideoProperty);
     param.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
 
     if (decoder_->Initialize (&param)) {
       GMPLOG (GL_ERROR, "Couldn't initialize decoder");
       Error (GMPGenericErr);
       return;
+    }
+
+    if (aCodecSpecific && aCodecSpecificSize >= sizeof(GMPVideoCodecH264)) {
+      std::vector<uint8_t> annexb;
+
+      // Convert the AVCC data, starting at the byte containing
+      // numOfSequenceParameterSets, to Annex B format.
+      const uint8_t* avcc = aCodecSpecific + offsetof(GMPVideoCodecH264, mAVCC.mNumSPS);
+
+      static const int kSPSMask = (1 << 5) - 1;
+      uint8_t spsCount = *avcc++ & kSPSMask;
+      for (int i = 0; i < spsCount; ++i) {
+        size_t size = readU16BE(avcc);
+        avcc += 2;
+        copyWithStartCode(annexb, avcc, size);
+        avcc += size;
+      }
+
+      uint8_t ppsCount = *avcc++;
+      for (int i = 0; i < ppsCount; ++i) {
+        size_t size = readU16BE(avcc);
+        avcc += 2;
+        copyWithStartCode(annexb, avcc, size);
+        avcc += size;
+      }
+
+      SBufferInfo decoded;
+      memset (&decoded, 0, sizeof (decoded));
+      unsigned char* data[3] = {nullptr, nullptr, nullptr};
+      DECODING_STATE dState = decoder_->DecodeFrame2 (&*annexb.begin(),
+                                                      annexb.size(),
+                                                      data,
+                                                      &decoded);
+      if (dState) {
+        GMPLOG (GL_ERROR, "Decoding error dState=" << dState);
+      }
+      GMPLOG (GL_ERROR, "InitDecode iBufferStatus=" << decoded.iBufferStatus);
     }
   }
 
@@ -622,7 +675,9 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
 
     case GMP_BufferLength32: {
       uint8_t* start_code = inputFrame->Buffer();
-      while (start_code < inputFrame->Buffer() + inputFrame->Size()) {
+      // start code should be at least four bytes from the end or we risk
+      // reading/writing outside the buffer.
+      while (start_code < inputFrame->Buffer() + inputFrame->Size() - 4) {
         static const uint8_t code[] = { 0x00, 0x00, 0x00, 0x01 };
         uint8_t* lenp = start_code;
         start_code += * (reinterpret_cast<int32_t*> (lenp));
@@ -648,9 +703,15 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
   }
 
   virtual void Reset() {
+    if (callback_) {
+      callback_->ResetComplete ();
+    }
   }
 
   virtual void Drain() {
+    if (callback_) {
+      callback_->DrainComplete ();
+    }
   }
 
   virtual void DecodingComplete() {
@@ -676,7 +737,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
     memset (&decoded, 0, sizeof (decoded));
     unsigned char* data[3] = {nullptr, nullptr, nullptr};
 
-    dState = decoder_->DecodeFrame2 (inputFrame->Buffer(),
+    dState = decoder_->DecodeFrameNoDelay (inputFrame->Buffer(),
                                      inputFrame->Size(),
                                      data,
                                      &decoded);
@@ -708,10 +769,14 @@ class OpenH264VideoDecoder : public GMPVideoDecoder {
 
     // If we don't actually have data, just abort.
     if (!valid) {
+      GMPLOG (GL_ERROR, "No valid data decoded");
+      Error (GMPDecodeErr);
       return;
     }
 
     if (decoded->iBufferStatus != 1) {
+      GMPLOG (GL_ERROR, "iBufferStatus=" << decoded->iBufferStatus);
+      callback_->InputDataExhausted();
       return;
     }
 

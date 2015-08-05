@@ -42,8 +42,11 @@ void SampleVariance16x16_ref (uint8_t* pRefY, int32_t iRefStride, uint8_t* pSrcY
   pMotionTexture->uiTextureIndex = (uiCurSquare >> 8) - (uiCurSum * uiCurSum);
 }
 
-#define GENERATE_AQTEST(method) \
+#define GENERATE_AQTEST(method, flag) \
 TEST (AdaptiveQuantization, method) {\
+  uint32_t uiCPUFlags = WelsCPUFeatureDetect(NULL); \
+  if ((uiCPUFlags & flag) == 0 && flag != 0) \
+    return; \
   ENFORCE_STACK_ALIGN_1D (uint8_t, pRefY,32*16,16)\
   ENFORCE_STACK_ALIGN_1D (uint8_t, pSrcY,48*16,16)\
   SMotionTextureUnit pMotionTexture[2];\
@@ -61,16 +64,16 @@ TEST (AdaptiveQuantization, method) {\
   ASSERT_EQ(pMotionTexture[0].uiMotionIndex,pMotionTexture[1].uiMotionIndex);\
 }
 
-GENERATE_AQTEST (SampleVariance16x16_c)
+GENERATE_AQTEST (SampleVariance16x16_c, 0)
 #if defined(X86_ASM)
-GENERATE_AQTEST (SampleVariance16x16_sse2)
+GENERATE_AQTEST (SampleVariance16x16_sse2, WELS_CPU_SSE2)
 #endif
 
 #if defined(HAVE_NEON)
-GENERATE_AQTEST (SampleVariance16x16_neon)
+GENERATE_AQTEST (SampleVariance16x16_neon, WELS_CPU_NEON)
 #endif
 
 #if defined(HAVE_NEON_AARCH64)
-GENERATE_AQTEST (SampleVariance16x16_AArch64_neon)
+GENERATE_AQTEST (SampleVariance16x16_AArch64_neon, WELS_CPU_NEON)
 #endif
 

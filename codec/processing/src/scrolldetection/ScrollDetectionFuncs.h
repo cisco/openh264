@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	        :  ScrollDetectionFuncs.h
+ * \file         :  ScrollDetectionFuncs.h
  *
- * \brief	    :  scroll detection class of wels video processor class
+ * \brief        :  scroll detection class of wels video processor class
  *
  * \date         :  2011/04/26
  *
@@ -45,10 +45,10 @@ WELSVP_NAMESPACE_BEGIN
 #define CHECK_OFFSET 25
 #define MAX_SCROLL_MV_Y 511
 #define REGION_NUMBER 9
-#define RECORD_COLOR(a, x)	\
-{	\
-  int32_t _t = (uint8_t)(a);	\
-  x[_t>>5] |= (1 << (_t&31)); \
+#define RECORD_COLOR(a, x)      \
+{                               \
+  int32_t _t = (uint8_t)(a);    \
+  x[_t>>5] |= (1 << (_t&31));   \
 }
 
 int32_t CheckLine (uint8_t* pData, int32_t iWidth);

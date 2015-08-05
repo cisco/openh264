@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	    :  downsample.h
+ * \file        :  downsample.h
  *
- * \brief	    :  image rotate class of wels video processor class
+ * \brief       :  image rotate class of wels video processor class
  *
  * \date        :  2011/04/06
  *
@@ -51,16 +51,16 @@ WELSVP_NAMESPACE_BEGIN
 typedef void (ImageRotateFunc) (uint8_t* pSrc, uint32_t uiBytesPerPixel, uint32_t iWidth, uint32_t iHeight,
                                 uint8_t* pDst);
 
-typedef ImageRotateFunc*		ImageRotateFuncPtr;
+typedef ImageRotateFunc* ImageRotateFuncPtr;
 
 ImageRotateFunc   ImageRotate90D_c;
 ImageRotateFunc   ImageRotate180D_c;
 ImageRotateFunc   ImageRotate270D_c;
 
 typedef struct {
-  ImageRotateFuncPtr		pfImageRotate90D;
-  ImageRotateFuncPtr		pfImageRotate180D;
-  ImageRotateFuncPtr		pfImageRotate270D;
+  ImageRotateFuncPtr    pfImageRotate90D;
+  ImageRotateFuncPtr    pfImageRotate180D;
+  ImageRotateFuncPtr    pfImageRotate270D;
 } SImageRotateFuncs;
 
 class CImageRotating : public IStrategy {

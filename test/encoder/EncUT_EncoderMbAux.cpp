@@ -241,7 +241,9 @@ TEST(EncodeMbAuxTest, function) { \
       EXPECT_EQ(ref_dst[i*iDStride+j], dst[i*iDStride+j]); \
 }
 
-GENERATE_UT_FOR_COPY (4, 4, WelsCopy4x4);
+GENERATE_UT_FOR_COPY (4, 4, WelsCopy4x4_c);
+GENERATE_UT_FOR_COPY (8, 4, WelsCopy8x4_c);
+GENERATE_UT_FOR_COPY (4, 8, WelsCopy4x8_c);
 GENERATE_UT_FOR_COPY (8, 8, WelsCopy8x8_c);
 GENERATE_UT_FOR_COPY (8, 16, WelsCopy8x16_c);
 GENERATE_UT_FOR_COPY (16, 8, WelsCopy16x8_c);
@@ -275,7 +277,7 @@ TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_sse2) {
 #endif
 #define WELS_ABS_LC(a) ((sign ^ (int32_t)(a)) - sign)
 #define NEW_QUANT(pDct, ff, mf) (((ff)+ WELS_ABS_LC(pDct))*(mf)) >>16
-#define WELS_NEW_QUANT(pDct,ff,mf)	WELS_ABS_LC(NEW_QUANT(pDct, ff, mf))
+#define WELS_NEW_QUANT(pDct,ff,mf) WELS_ABS_LC(NEW_QUANT(pDct, ff, mf))
 void WelsQuantFour4x4MaxAnchor (int16_t* pDct, int16_t* ff,  int16_t* mf, int16_t* max) {
   int32_t i, j, k, sign;
   int16_t max_abs;
@@ -419,8 +421,8 @@ void WelsHadamardT4DcAnchor (int16_t* pLumaDc, int16_t* pDct) {
   int32_t i, iIdx;
   for (i = 0 ; i < 16 ; i += 4) {
     iIdx = ((i & 0x08) << 4) + ((i & 0x04) << 3);
-    s[0] = pDct[iIdx ]	 + pDct[iIdx + 80];
-    s[3] = pDct[iIdx ]	 - pDct[iIdx + 80];
+    s[0] = pDct[iIdx ]     + pDct[iIdx + 80];
+    s[3] = pDct[iIdx ]     - pDct[iIdx + 80];
     s[1] = pDct[iIdx + 16] + pDct[iIdx + 64];
     s[2] = pDct[iIdx + 16] - pDct[iIdx + 64];
     p[i  ] = s[0] + s[1];
