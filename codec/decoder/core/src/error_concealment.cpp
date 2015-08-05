@@ -93,6 +93,8 @@ void DoErrorConFrameCopy (PWelsDecoderContext pCtx) {
     memset (pDstPic->pData[0], 128, uiHeightInPixelY * iStrideY);
     memset (pDstPic->pData[1], 128, (uiHeightInPixelY >> 1) * iStrideUV);
     memset (pDstPic->pData[2], 128, (uiHeightInPixelY >> 1) * iStrideUV);
+  } else if (pSrcPic == pDstPic) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "DoErrorConFrameCopy()::EC memcpy overlap.");
   } else { //has ref pic here
     memcpy (pDstPic->pData[0], pSrcPic->pData[0], uiHeightInPixelY * iStrideY);
     memcpy (pDstPic->pData[1], pSrcPic->pData[1], (uiHeightInPixelY >> 1) * iStrideUV);
@@ -117,6 +119,10 @@ void DoErrorConSliceCopy (PWelsDecoderContext pCtx) {
   uint8_t* pSrcData, *pDstData;
   uint32_t iSrcStride; // = pSrcPic->iLinesize[0];
   uint32_t iDstStride = pDstPic->iLinesize[0];
+  if (pSrcPic == pDstPic) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "DoErrorConSliceCopy()::EC memcpy overlap.");
+    return;
+  }
   for (int32_t iMbY = 0; iMbY < iMbHeight; ++iMbY) {
     for (int32_t iMbX = 0; iMbX < iMbWidth; ++iMbX) {
       iMbXyIndex = iMbY * iMbWidth + iMbX;
@@ -384,7 +390,8 @@ void DoErrorConSliceMVCopy (PWelsDecoderContext pCtx) {
     sMCRefMem.iPicHeight = pDstPic->iHeightInPixel;
     if (pDstPic == pSrcPic) {
       // output error info, EC will be ignored in DoMbECMvCopy
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "DoErrorConSliceMVCopy()::pPreviousPic and pDec use same buffer, ignored.");
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "DoErrorConSliceMVCopy()::EC memcpy overlap.");
+      return;
     }
   }
 
