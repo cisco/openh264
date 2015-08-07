@@ -179,6 +179,7 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
   PSliceHeader pSliceHeader = &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader;
   PPicture pPic = NULL;
   PPicture* ppRefList = pCtx->sRefPic.pRefList[LIST_0];
+  int32_t iMaxRefIdx = pCtx->pSps->iNumRefFrames + 1;
   int32_t iRefCount = pCtx->sRefPic.uiRefCount[LIST_0];
   int32_t iPredFrameNum = pSliceHeader->iFrameNum;
   int32_t iMaxPicNum = 1 << pSliceHeader->pSps->uiLog2MaxFrameNum;
@@ -209,8 +210,8 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
         }
         iPredFrameNum &= iMaxPicNum - 1;
 
-        for (i = iRefCount - 1; i >= iReorderingIndex; i--) {
-          if (ppRefList[i]->iFrameNum == iPredFrameNum && !ppRefList[i]->bIsLongRef) {
+        for (i = iMaxRefIdx - 1; i >= 0; i--) {
+          if (ppRefList[i] != NULL && ppRefList[i]->iFrameNum == iPredFrameNum && !ppRefList[i]->bIsLongRef) {
             if ((pNalHeaderExt->uiQualityId == ppRefList[i]->uiQualityId)
                 && (pSliceHeader->iSpsId != ppRefList[i]->iSpsId)) {   //check;
               WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "WelsReorderRefList()::::BASE LAYER::::iSpsId:%d, ref_sps_id:%d",
@@ -224,8 +225,8 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
         }
 
       } else if (uiReorderingOfPicNumsIdc == 2) {
-        for (i = iRefCount - 1; i >= iReorderingIndex; i--) {
-          if (ppRefList[i]->bIsLongRef
+        for (i = iMaxRefIdx - 1; i >= 0; i--) {
+          if (ppRefList[i] != NULL && ppRefList[i]->bIsLongRef
               && ppRefList[i]->iLongTermFrameIdx ==
               pRefPicListReorderSyn->sReorderingSyn[LIST_0][iReorderingIndex].uiLongTermPicNum) {
             if ((pNalHeaderExt->uiQualityId == ppRefList[i]->uiQualityId)
@@ -240,12 +241,17 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
           }
         }
       }
-      if (i < iReorderingIndex) {
+      if (i < 0) {
         return ERR_INFO_REFERENCE_PIC_LOST;
       }
       pPic = ppRefList[i];
-      memmove (&ppRefList[1 + iReorderingIndex], &ppRefList[iReorderingIndex],
-               (i - iReorderingIndex)*sizeof (PPicture)); //confirmed_safe_unsafe_usage
+      if (i > iReorderingIndex) {
+        memmove (&ppRefList[1 + iReorderingIndex], &ppRefList[iReorderingIndex],
+                 (i - iReorderingIndex)*sizeof (PPicture)); //confirmed_safe_unsafe_usage
+      } else if (i < iReorderingIndex) {
+        memmove (&ppRefList[1 + iReorderingIndex], &ppRefList[iReorderingIndex],
+                 (iMaxRefIdx - 1 - iReorderingIndex)*sizeof (PPicture));
+      }
       ppRefList[iReorderingIndex] = pPic;
       iReorderingIndex++;
     }
