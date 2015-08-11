@@ -197,7 +197,8 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
   }
 
   if (pRefPicListReorderSyn->bRefPicListReorderingFlag[LIST_0]) {
-    while (pRefPicListReorderSyn->sReorderingSyn[LIST_0][iReorderingIndex].uiReorderingOfPicNumsIdc != 3) {
+    while ((iReorderingIndex < iMaxRefIdx)
+           && (pRefPicListReorderSyn->sReorderingSyn[LIST_0][iReorderingIndex].uiReorderingOfPicNumsIdc != 3)) {
       uint16_t uiReorderingOfPicNumsIdc =
         pRefPicListReorderSyn->sReorderingSyn[LIST_0][iReorderingIndex].uiReorderingOfPicNumsIdc;
       if (uiReorderingOfPicNumsIdc < 2) {
