@@ -669,10 +669,15 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
           (0 == LD16 (pSrcNal + iSrcIdx)) &&
           ((pSrcNal[2 + iSrcIdx] == 0x03) || (pSrcNal[2 + iSrcIdx] == 0x01))) {
         if (pSrcNal[2 + iSrcIdx] == 0x03) {
-          ST16 (pDstNal + iDstIdx, 0);
-          iDstIdx      += 2;
-          iSrcIdx      += 3;
-          iSrcConsumed += 3;
+          if ((3 + iSrcConsumed < iSrcLength) && pSrcNal[3 + iSrcIdx] > 0x03) {
+            pCtx->iErrorCode |= dsBitstreamError;
+            return pCtx->iErrorCode;
+          } else {
+            ST16 (pDstNal + iDstIdx, 0);
+            iDstIdx      += 2;
+            iSrcIdx      += 3;
+            iSrcConsumed += 3;
+          }
         } else {
 
           iConsumedBytes = 0;
