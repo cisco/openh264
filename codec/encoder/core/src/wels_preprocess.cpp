@@ -1037,7 +1037,7 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
                                           (pCurPicture->iHeightInPixel >> 3) * STATIC_SCENE_MOTION_RATIO));
   const uint8_t iCurTid = GetTemporalLevel (&pSvcParam->sDependencyLayers[m_pEncCtx->sSpatialIndexMap[0].iDid],
                           m_pEncCtx->iCodingIndex, pSvcParam->uiGopSize);
-  const int32_t iClosestLtrFrameNum = pCtx->pLtr[iTargetDid].iLastLtrIdx[iCurTid];//TBD
+  const int32_t iClosestLtrFrameNum = (iCurTid != INVALID_TEMPORAL_ID ?  pCtx->pLtr[iTargetDid].iLastLtrIdx[iCurTid] : -1);//TBD
   if (pSvcParam->bEnableLongTermReference) {
     GetAvailableRefListLosslessScreenRefSelection (pSrcPicList, iCurTid, iClosestLtrFrameNum, &sAvailableRefList[0],
         iAvailableRefNum,
