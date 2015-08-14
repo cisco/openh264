@@ -105,7 +105,7 @@ long CReadConfig::ReadLine (std::string* pVal, const int kiValSize/* = 4*/) {
       bCommentFlag = true;
     if (!bCommentFlag) {
       if (kCh == '\t' || kCh == ' ') {
-        if (nTagNum >= kiValSize)
+        if (nTagNum >= kiValSize-1)
           break;
         if (! (*strTags).empty()) {
           ++ nTagNum;
