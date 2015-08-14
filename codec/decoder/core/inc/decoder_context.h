@@ -143,9 +143,9 @@ typedef void (*PGetIntraPred8x8Func) (uint8_t* pPred, const int32_t kiLumaStride
 
 /**/
 typedef struct TagRefPic {
-  PPicture      pRefList[LIST_A][MAX_REF_PIC_COUNT];    // reference picture marking plus FIFO scheme
-  PPicture      pShortRefList[LIST_A][MAX_SHORT_REF_COUNT];
-  PPicture      pLongRefList[LIST_A][MAX_LONG_REF_COUNT];
+  PPicture      pRefList[LIST_A][MAX_DPB_COUNT];    // reference picture marking plus FIFO scheme
+  PPicture      pShortRefList[LIST_A][MAX_DPB_COUNT];
+  PPicture      pLongRefList[LIST_A][MAX_DPB_COUNT];
   uint8_t       uiRefCount[LIST_A];
   uint8_t       uiShortRefCount[LIST_A];
   uint8_t       uiLongRefCount[LIST_A]; // dependend on ref pic module

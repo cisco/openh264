@@ -89,7 +89,7 @@ void WelsResetRefPic (PWelsDecoderContext pCtx) {
 
   pRefPic->uiRefCount[LIST_0] = 0;
 
-  for (i = 0; i < MAX_SHORT_REF_COUNT; i++) {
+  for (i = 0; i < MAX_DPB_COUNT; i++) {
     if (pRefPic->pShortRefList[LIST_0][i] != NULL) {
       SetUnRef (pRefPic->pShortRefList[LIST_0][i]);
       pRefPic->pShortRefList[LIST_0][i] = NULL;
@@ -97,7 +97,7 @@ void WelsResetRefPic (PWelsDecoderContext pCtx) {
   }
   pRefPic->uiShortRefCount[LIST_0] = 0;
 
-  for (i = 0; i < MAX_LONG_REF_COUNT; i++) {
+  for (i = 0; i < MAX_DPB_COUNT; i++) {
     if (pRefPic->pLongRefList[LIST_0][i] != NULL) {
       SetUnRef (pRefPic->pLongRefList[LIST_0][i]);
       pRefPic->pLongRefList[LIST_0][i] = NULL;
@@ -158,7 +158,7 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
 
   PPicture* ppShoreRefList = pCtx->sRefPic.pShortRefList[LIST_0];
   PPicture* ppLongRefList  = pCtx->sRefPic.pLongRefList[LIST_0];
-  memset (pCtx->sRefPic.pRefList[LIST_0], 0, MAX_REF_PIC_COUNT * sizeof (PPicture));
+  memset (pCtx->sRefPic.pRefList[LIST_0], 0, MAX_DPB_COUNT * sizeof (PPicture));
   //short
   for (i = 0; i < pCtx->sRefPic.uiShortRefCount[LIST_0]; ++i) {
     pCtx->sRefPic.pRefList[LIST_0][iCount++ ] = ppShoreRefList[i];
@@ -179,7 +179,7 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
   PSliceHeader pSliceHeader = &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader;
   PPicture pPic = NULL;
   PPicture* ppRefList = pCtx->sRefPic.pRefList[LIST_0];
-  int32_t iMaxRefIdx = pCtx->pSps->iNumRefFrames + 1;
+  int32_t iMaxRefIdx = pCtx->pSps->iNumRefFrames;
   int32_t iRefCount = pCtx->sRefPic.uiRefCount[LIST_0];
   int32_t iPredFrameNum = pSliceHeader->iFrameNum;
   int32_t iMaxPicNum = 1 << pSliceHeader->pSps->uiLog2MaxFrameNum;
@@ -251,7 +251,7 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
                  (i - iReorderingIndex)*sizeof (PPicture)); //confirmed_safe_unsafe_usage
       } else if (i < iReorderingIndex) {
         memmove (&ppRefList[1 + iReorderingIndex], &ppRefList[iReorderingIndex],
-                 (iMaxRefIdx - 1 - iReorderingIndex)*sizeof (PPicture));
+                 (iMaxRefIdx - iReorderingIndex)*sizeof (PPicture));
       }
       ppRefList[iReorderingIndex] = pPic;
       iReorderingIndex++;
