@@ -296,7 +296,8 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     if (iMaxBitrate < iTargetBitrate) {
       iMaxBitrate  = iTargetBitrate;
     }
-
+    iMaxQp = pCodingParam.iMaxQp;
+    iMinQp = pCodingParam.iMinQp;
     uiMaxNalSize          = pCodingParam.uiMaxNalSize;
     /* Denoise Control */
     bEnableDenoise = pCodingParam.bEnableDenoise ? true : false;    // Denoise Control  // only support 0 or 1 now
