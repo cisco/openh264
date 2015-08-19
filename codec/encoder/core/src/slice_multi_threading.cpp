@@ -764,7 +764,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         WelsUnloadNalForSlice (pSliceBs);
 
         int32_t iLeftBufferSize = (iSliceIdx > 0) ?
-                                  (pSliceBs->uiSize - (int32_t) (pSliceBs->sBsWrite.pCurBuf - pSliceBs->sBsWrite.pStartBuf))
+                                  (pSliceBs->uiSize - pSliceBs->uiBsPos)
                                   : (pEncPEncCtx->iFrameBsSize - pEncPEncCtx->iPosBsBuffer);
         iReturn = WriteSliceBs (pEncPEncCtx, pSliceBs->pBs,
                                 &pSliceBs->iNalLen[0],
@@ -883,7 +883,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
             pEncPEncCtx->iPosBsBuffer += iSliceSize;
           } else {
             iReturn = WriteSliceBs (pEncPEncCtx, pSliceBs->pBs, &pSliceBs->iNalLen[0],
-                                    pSliceBs->uiSize - (int32_t) (pSliceBs->sBsWrite.pCurBuf - pSliceBs->sBsWrite.pStartBuf),
+                                    pSliceBs->uiSize - pSliceBs->uiBsPos,
                                     iSliceIdx, iSliceSize);
             if (ENC_RETURN_SUCCESS != iReturn) {
               uiThrdRet = iReturn;
