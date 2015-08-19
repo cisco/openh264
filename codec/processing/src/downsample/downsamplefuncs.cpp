@@ -68,6 +68,53 @@ void DyadicBilinearDownsampler_c (uint8_t* pDst, const int32_t kiDstStride,
   }
 }
 
+void DyadicBilinearQuarterDownsampler_c (uint8_t* pDst, const int32_t kiDstStride,
+    uint8_t* pSrc, const int32_t kiSrcStride,
+    const int32_t kiSrcWidth, const int32_t kiSrcHeight)
+
+{
+  uint8_t* pDstLine     = pDst;
+  uint8_t* pSrcLine     = pSrc;
+  const int32_t kiSrcStridex4   = kiSrcStride << 2;
+  const int32_t kiDstWidth      = kiSrcWidth  >> 2;
+  const int32_t kiDstHeight     = kiSrcHeight >> 2;
+
+  for (int32_t j = 0; j < kiDstHeight; j ++) {
+    for (int32_t i = 0; i < kiDstWidth; i ++) {
+      const int32_t kiSrcX = i << 2;
+      const int32_t kiTempRow1 = (pSrcLine[kiSrcX] + pSrcLine[kiSrcX + 1] + 1) >> 1;
+      const int32_t kiTempRow2 = (pSrcLine[kiSrcX + kiSrcStride] + pSrcLine[kiSrcX + kiSrcStride + 1] + 1) >> 1;
+
+      pDstLine[i] = (uint8_t) ((kiTempRow1 + kiTempRow2 + 1) >> 1);
+    }
+    pDstLine    += kiDstStride;
+    pSrcLine    += kiSrcStridex4;
+  }
+}
+
+void DyadicBilinearOneThirdDownsampler_c (uint8_t* pDst, const int32_t kiDstStride,
+    uint8_t* pSrc, const int32_t kiSrcStride,
+    const int32_t kiSrcWidth, const int32_t kiDstHeight)
+
+{
+  uint8_t* pDstLine     = pDst;
+  uint8_t* pSrcLine     = pSrc;
+  const int32_t kiSrcStridex3   = kiSrcStride * 3;
+  const int32_t kiDstWidth      = kiSrcWidth / 3;
+
+  for (int32_t j = 0; j < kiDstHeight; j ++) {
+    for (int32_t i = 0; i < kiDstWidth; i ++) {
+      const int32_t kiSrcX = i * 3;
+      const int32_t kiTempRow1 = (pSrcLine[kiSrcX] + pSrcLine[kiSrcX + 1] + 1) >> 1;
+      const int32_t kiTempRow2 = (pSrcLine[kiSrcX + kiSrcStride] + pSrcLine[kiSrcX + kiSrcStride + 1] + 1) >> 1;
+
+      pDstLine[i] = (uint8_t) ((kiTempRow1 + kiTempRow2 + 1) >> 1);
+    }
+    pDstLine    += kiDstStride;
+    pSrcLine    += kiSrcStridex3;
+  }
+}
+
 void GeneralBilinearFastDownsampler_c (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
                                        const int32_t kiDstHeight,
                                        uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
