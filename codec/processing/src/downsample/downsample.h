@@ -54,20 +54,29 @@ typedef void (HalveDownsampleFunc) (uint8_t* pDst, const int32_t kiDstStride,
                                     uint8_t* pSrc, const int32_t kiSrcStride,
                                     const int32_t kiSrcWidth, const int32_t kiSrcHeight);
 
+typedef void (SpecificDownsampleFunc) (uint8_t* pDst, const int32_t kiDstStride,
+                                    uint8_t* pSrc, const int32_t kiSrcStride,
+                                    const int32_t kiSrcWidth, const int32_t kiSrcHeight);
+
 typedef void (GeneralDownsampleFunc) (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
                                       const int32_t kiDstHeight,
                                       uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight);
 
 typedef HalveDownsampleFunc*    PHalveDownsampleFunc;
+typedef SpecificDownsampleFunc* PSpecificDownsampleFunc;
 typedef GeneralDownsampleFunc*  PGeneralDownsampleFunc;
 
-HalveDownsampleFunc   DyadicBilinearDownsampler_c;
-GeneralDownsampleFunc GeneralBilinearFastDownsampler_c;
-GeneralDownsampleFunc GeneralBilinearAccurateDownsampler_c;
+HalveDownsampleFunc		DyadicBilinearDownsampler_c;
+GeneralDownsampleFunc 	GeneralBilinearFastDownsampler_c;
+GeneralDownsampleFunc 	GeneralBilinearAccurateDownsampler_c;
+SpecificDownsampleFunc	DyadicBilinearQuarterDownsampler_c;
+SpecificDownsampleFunc  DyadicBilinearOneThirdDownsampler_c;
 
 typedef struct {
   // align_index: 0 = x32; 1 = x16; 2 = x8; 3 = common case left;
   PHalveDownsampleFunc          pfHalfAverage[4];
+  PSpecificDownsampleFunc       pfQuarterDownsampler;
+  PSpecificDownsampleFunc       pfOneThirdDownsampler;
   PGeneralDownsampleFunc        pfGeneralRatioLuma;
   PGeneralDownsampleFunc        pfGeneralRatioChroma;
 } SDownsampleFuncs;
