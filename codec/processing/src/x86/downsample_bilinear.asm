@@ -67,6 +67,22 @@ shufb_mask_high:
 add_extra_half:
     dd 16384,0,0,0
 
+shufb_mask_quarter:
+db 00h, 04h, 08h, 0ch, 80h, 80h, 80h, 80h, 01h, 05h, 09h, 0dh, 80h, 80h, 80h, 80h
+
+shufb_mask_onethird_low_1:
+db 00h, 03h, 06h, 09h, 0ch, 0fh, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h
+shufb_mask_onethird_low_2:
+db 80h, 80h, 80h, 80h, 80h, 80h, 02h, 05h, 08h, 0bh, 0eh, 80h, 80h, 80h, 80h, 80h
+shufb_mask_onethird_low_3:
+db 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 01h, 04h, 07h, 0ah, 0dh
+
+shufb_mask_onethird_high_1:
+db 01h, 04h, 07h, 0ah, 0dh, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h
+shufb_mask_onethird_high_2:
+db 80h, 80h, 80h, 80h, 80h, 00h, 03h, 06h, 09h, 0ch, 0fh, 80h, 80h, 80h, 80h, 80h
+shufb_mask_onethird_high_3:
+db 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 02h, 05h, 08h, 0bh, 0eh
 
 ;***********************************************************************
 ; Code
@@ -1896,3 +1912,686 @@ FAST_LAST_ROW_END:
     pop     r12
     ret
 %endif
+
+;***********************************************************************
+;   void DyadicBilinearOneThirdDownsampler_ssse3(    unsigned char* pDst, const int iDstStride,
+;                   unsigned char* pSrc, const int iSrcStride,
+;                   const int iSrcWidth, const int iSrcHeight );
+;***********************************************************************
+WELS_EXTERN DyadicBilinearOneThirdDownsampler_ssse3
+%ifdef X86_32
+    push r6
+    %assign push_num 1
+%else
+    %assign push_num 0
+%endif
+    LOAD_6_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    SIGN_EXTENSION r4, r4d
+    SIGN_EXTENSION r5, r5d
+
+%ifndef X86_32
+    push r12
+    mov r12, r4
+%endif
+
+    mov r6, r1             ;Save the tailer for the unasigned size
+    imul r6, r5
+    add r6, r0
+    movdqa xmm7, [r6]
+
+.yloops_onethird_sse3:
+%ifdef X86_32
+    mov r4, arg5
+%else
+    mov r4, r12
+%endif
+
+    mov r6, r0        ;save base address
+    ; each loop = source bandwidth: 48 bytes
+.xloops_onethird_sse3:
+    ; 1st part horizonal loop: x48 bytes
+    ;               mem  hi<-       ->lo
+    ;1st Line Src:  xmm0: F * e E * d D * c C * b B * a A
+    ;               xmm2: k K * j J * i I * h H * g G * f
+    ;               xmm2: * p P * o O * n N * m M * l L *
+    ;
+    ;2nd Line Src:  xmm2: F' *  e' E' *  d' D' *  c' C' *  b' B' *  a' A'
+    ;               xmm1: k' K' *  j' J' *  i' I' *  h' H' *  g' G' *  f'
+    ;               xmm1: *  p' P' *  o' O' *  n' N' *  m' M' *  l' L' *
+    ;=> target:
+    ;: P O N M L K J I H G F E D C B A
+    ;: p o n m l k j i h g f e d c b a
+    ;: P' ..                          A'
+    ;: p' ..                          a'
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;1st line
+    movdqa xmm0, [r2]                         ;F * e E * d D * c C * b B * a A
+    movdqa xmm1, xmm0
+    movdqa xmm5, [shufb_mask_onethird_low_1]
+    movdqa xmm6, [shufb_mask_onethird_high_1]
+    pshufb xmm0, xmm5                           ;0 0 0 0 0 0 0 0 0 0 F E D C B A -> xmm0
+    pshufb xmm1, xmm6                           ;0 0 0 0 0 0 0 0 0 0 0 e d c b a -> xmm1
+
+    movdqa xmm2, [r2+16]                      ;k K * j J * i I * h H * g G * f
+    movdqa xmm3, xmm2
+    movdqa xmm5, [shufb_mask_onethird_low_2]
+    movdqa xmm6, [shufb_mask_onethird_high_2]
+    pshufb xmm2, xmm5                           ;0 0 0 0 0 K J I H G 0 0 0 0 0 0 -> xmm2
+    pshufb xmm3, xmm6                           ;0 0 0 0 0 k j i h g f 0 0 0 0 0 -> xmm3
+
+    paddusb xmm0, xmm2                          ;0 0 0 0 0 K J I H G F E D C B A -> xmm0
+    paddusb xmm1, xmm3                          ;0 0 0 0 0 k j i h g f e d c b a -> xmm1
+
+    movdqa xmm2, [r2+32]                      ;* p P * o O * n N * m M * l L *
+    movdqa xmm3, xmm2
+    movdqa xmm5, [shufb_mask_onethird_low_3]
+    movdqa xmm6, [shufb_mask_onethird_high_3]
+    pshufb xmm2, xmm5                           ;P O N M L 0 0 0 0 0 0 0 0 0 0 0 -> xmm2
+    pshufb xmm3, xmm6                           ;p o n m l 0 0 0 0 0 0 0 0 0 0 0 -> xmm3
+
+    paddusb xmm0, xmm2                          ;P O N M L K J I H G F E D C B A -> xmm0
+    paddusb xmm1, xmm3                          ;p o n m l k j i h g f e d c b a -> xmm1
+    pavgb xmm0, xmm1                            ;1st line average                -> xmm0
+
+    ;2nd line
+    movdqa xmm2, [r2+r3]                      ;F' *  e' E' *  d' D' *  c' C' *  b' B' *  a' A'
+    movdqa xmm3, xmm2
+    movdqa xmm5, [shufb_mask_onethird_low_1]
+    movdqa xmm6, [shufb_mask_onethird_high_1]
+    pshufb xmm2, xmm5                           ;0 0 0 0 0 0 0 0 0 0 F' E' D' C' B' A' -> xmm2
+    pshufb xmm3, xmm6                           ;0 0 0 0 0 0 0 0 0 0 0  e' d' c' b' a' -> xmm3
+
+    movdqa xmm1, [r2+r3+16]                   ;k' K' *  j' J' *  i' I' *  h' H' *  g' G' *  f'
+    movdqa xmm4, xmm1
+    movdqa xmm5, [shufb_mask_onethird_low_2]
+    movdqa xmm6, [shufb_mask_onethird_high_2]
+    pshufb xmm1, xmm5                           ;0 0 0 0 0 K' J' I' H' G' 0  0 0 0 0 0 -> xmm1
+    pshufb xmm4, xmm6                           ;0 0 0 0 0 k' j' i' h' g' f' 0 0 0 0 0 -> xmm4
+
+    paddusb xmm2, xmm1                          ;0 0 0 0 0 K' J' I' H' G' F' E' D' C' B' A' -> xmm2
+    paddusb xmm3, xmm4                          ;0 0 0 0 0 k' j' i' h' g' f' e' d' c' b' a' -> xmm3
+
+    movdqa xmm1, [r2+r3+32]                   ; *  p' P' *  o' O' *  n' N' *  m' M' *  l' L' *
+    movdqa xmm4, xmm1
+    movdqa xmm5, [shufb_mask_onethird_low_3]
+    movdqa xmm6, [shufb_mask_onethird_high_3]
+    pshufb xmm1, xmm5                           ;P' O' N' M' L' 0 0 0 0 0 0 0 0 0 0 0 -> xmm1
+    pshufb xmm4, xmm6                           ;p' o' n' m' l' 0 0 0 0 0 0 0 0 0 0 0 -> xmm4
+
+    paddusb xmm2, xmm1                          ;P' O' N' M' L' K' J' I' H' G' F' E' D' C' B' A' -> xmm2
+    paddusb xmm3, xmm4                          ;p' o' n' m' l' k' j' i' h' g' f' e' d' c' b' a' -> xmm3
+    pavgb xmm2, xmm3                            ;2nd line average                                -> xmm2
+
+    pavgb xmm0, xmm2                            ; bytes-average(1st line , 2nd line )
+
+    ; write pDst
+    movdqa [r0], xmm0                           ;write result in dst
+
+    ; next SMB
+    lea r2, [r2+48]                             ;current src address
+    lea r0, [r0+16]                             ;current dst address
+
+    sub r4, 48                                  ;xloops counter
+    cmp r4, 0
+    jg near .xloops_onethird_sse3
+
+    sub r6, r0                                  ;offset = base address - current address
+    lea r2, [r2+2*r3]                           ;
+    lea r2, [r2+r3]                             ;
+    lea r2, [r2+2*r6]                           ;current line + 3 lines
+    lea r2, [r2+r6]
+    lea r0, [r0+r1]
+    lea r0, [r0+r6]                             ;current dst lien + 1 line
+
+    dec r5
+    jg near .yloops_onethird_sse3
+
+    movdqa [r0], xmm7                           ;restore the tailer for the unasigned size
+
+%ifndef X86_32
+    pop r12
+%endif
+
+    POP_XMM
+    LOAD_6_PARA_POP
+%ifdef X86_32
+    pop r6
+%endif
+    ret
+
+;***********************************************************************
+;   void DyadicBilinearOneThirdDownsampler_sse4(    unsigned char* pDst, const int iDstStride,
+;                   unsigned char* pSrc, const int iSrcStride,
+;                   const int iSrcWidth, const int iSrcHeight );
+;***********************************************************************
+WELS_EXTERN DyadicBilinearOneThirdDownsampler_sse4
+%ifdef X86_32
+    push r6
+    %assign push_num 1
+%else
+    %assign push_num 0
+%endif
+    LOAD_6_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    SIGN_EXTENSION r4, r4d
+    SIGN_EXTENSION r5, r5d
+
+%ifndef X86_32
+    push r12
+    mov r12, r4
+%endif
+
+    mov r6, r1             ;Save the tailer for the unasigned size
+    imul r6, r5
+    add r6, r0
+    movdqa xmm7, [r6]
+
+.yloops_onethird_sse4:
+%ifdef X86_32
+    mov r4, arg5
+%else
+    mov r4, r12
+%endif
+
+    mov r6, r0        ;save base address
+    ; each loop = source bandwidth: 48 bytes
+.xloops_onethird_sse4:
+    ; 1st part horizonal loop: x48 bytes
+    ;               mem  hi<-       ->lo
+    ;1st Line Src:  xmm0: F * e E * d D * c C * b B * a A
+    ;               xmm2: k K * j J * i I * h H * g G * f
+    ;               xmm2: * p P * o O * n N * m M * l L *
+    ;
+    ;2nd Line Src:  xmm2: F' *  e' E' *  d' D' *  c' C' *  b' B' *  a' A'
+    ;               xmm1: k' K' *  j' J' *  i' I' *  h' H' *  g' G' *  f'
+    ;               xmm1: *  p' P' *  o' O' *  n' N' *  m' M' *  l' L' *
+    ;=> target:
+    ;: P O N M L K J I H G F E D C B A
+    ;: p o n m l k j i h g f e d c b a
+    ;: P' ..                          A'
+    ;: p' ..                          a'
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;1st line
+    movntdqa xmm0, [r2]                         ;F * e E * d D * c C * b B * a A
+    movdqa xmm1, xmm0
+    movdqa xmm5, [shufb_mask_onethird_low_1]
+    movdqa xmm6, [shufb_mask_onethird_high_1]
+    pshufb xmm0, xmm5                           ;0 0 0 0 0 0 0 0 0 0 F E D C B A -> xmm0
+    pshufb xmm1, xmm6                           ;0 0 0 0 0 0 0 0 0 0 0 e d c b a -> xmm1
+
+    movntdqa xmm2, [r2+16]                      ;k K * j J * i I * h H * g G * f
+    movdqa xmm3, xmm2
+    movdqa xmm5, [shufb_mask_onethird_low_2]
+    movdqa xmm6, [shufb_mask_onethird_high_2]
+    pshufb xmm2, xmm5                           ;0 0 0 0 0 K J I H G 0 0 0 0 0 0 -> xmm2
+    pshufb xmm3, xmm6                           ;0 0 0 0 0 k j i h g f 0 0 0 0 0 -> xmm3
+
+    paddusb xmm0, xmm2                          ;0 0 0 0 0 K J I H G F E D C B A -> xmm0
+    paddusb xmm1, xmm3                          ;0 0 0 0 0 k j i h g f e d c b a -> xmm1
+
+    movntdqa xmm2, [r2+32]                      ;* p P * o O * n N * m M * l L *
+    movdqa xmm3, xmm2
+    movdqa xmm5, [shufb_mask_onethird_low_3]
+    movdqa xmm6, [shufb_mask_onethird_high_3]
+    pshufb xmm2, xmm5                           ;P O N M L 0 0 0 0 0 0 0 0 0 0 0 -> xmm2
+    pshufb xmm3, xmm6                           ;p o n m l 0 0 0 0 0 0 0 0 0 0 0 -> xmm3
+
+    paddusb xmm0, xmm2                          ;P O N M L K J I H G F E D C B A -> xmm0
+    paddusb xmm1, xmm3                          ;p o n m l k j i h g f e d c b a -> xmm1
+    pavgb xmm0, xmm1                            ;1st line average                -> xmm0
+
+    ;2nd line
+    movntdqa xmm2, [r2+r3]                      ;F' *  e' E' *  d' D' *  c' C' *  b' B' *  a' A'
+    movdqa xmm3, xmm2
+    movdqa xmm5, [shufb_mask_onethird_low_1]
+    movdqa xmm6, [shufb_mask_onethird_high_1]
+    pshufb xmm2, xmm5                           ;0 0 0 0 0 0 0 0 0 0 F' E' D' C' B' A' -> xmm2
+    pshufb xmm3, xmm6                           ;0 0 0 0 0 0 0 0 0 0 0  e' d' c' b' a' -> xmm3
+
+    movntdqa xmm1, [r2+r3+16]                   ;k' K' *  j' J' *  i' I' *  h' H' *  g' G' *  f'
+    movdqa xmm4, xmm1
+    movdqa xmm5, [shufb_mask_onethird_low_2]
+    movdqa xmm6, [shufb_mask_onethird_high_2]
+    pshufb xmm1, xmm5                           ;0 0 0 0 0 K' J' I' H' G' 0  0 0 0 0 0 -> xmm1
+    pshufb xmm4, xmm6                           ;0 0 0 0 0 k' j' i' h' g' f' 0 0 0 0 0 -> xmm4
+
+    paddusb xmm2, xmm1                          ;0 0 0 0 0 K' J' I' H' G' F' E' D' C' B' A' -> xmm2
+    paddusb xmm3, xmm4                          ;0 0 0 0 0 k' j' i' h' g' f' e' d' c' b' a' -> xmm3
+
+    movntdqa xmm1, [r2+r3+32]                   ; *  p' P' *  o' O' *  n' N' *  m' M' *  l' L' *
+    movdqa xmm4, xmm1
+    movdqa xmm5, [shufb_mask_onethird_low_3]
+    movdqa xmm6, [shufb_mask_onethird_high_3]
+    pshufb xmm1, xmm5                           ;P' O' N' M' L' 0 0 0 0 0 0 0 0 0 0 0 -> xmm1
+    pshufb xmm4, xmm6                           ;p' o' n' m' l' 0 0 0 0 0 0 0 0 0 0 0 -> xmm4
+
+    paddusb xmm2, xmm1                          ;P' O' N' M' L' K' J' I' H' G' F' E' D' C' B' A' -> xmm2
+    paddusb xmm3, xmm4                          ;p' o' n' m' l' k' j' i' h' g' f' e' d' c' b' a' -> xmm3
+    pavgb xmm2, xmm3                            ;2nd line average                                -> xmm2
+
+    pavgb xmm0, xmm2                            ; bytes-average(1st line , 2nd line )
+
+    ; write pDst
+    movdqa [r0], xmm0                           ;write result in dst
+
+    ; next SMB
+    lea r2, [r2+48]                             ;current src address
+    lea r0, [r0+16]                             ;current dst address
+
+    sub r4, 48                                  ;xloops counter
+    cmp r4, 0
+    jg near .xloops_onethird_sse4
+
+    sub r6, r0                                  ;offset = base address - current address
+    lea r2, [r2+2*r3]                           ;
+    lea r2, [r2+r3]                             ;
+    lea r2, [r2+2*r6]                           ;current line + 3 lines
+    lea r2, [r2+r6]
+    lea r0, [r0+r1]
+    lea r0, [r0+r6]                             ;current dst lien + 1 line
+
+    dec r5
+    jg near .yloops_onethird_sse4
+
+    movdqa [r0], xmm7                           ;restore the tailer for the unasigned size
+
+%ifndef X86_32
+    pop r12
+%endif
+
+    POP_XMM
+    LOAD_6_PARA_POP
+%ifdef X86_32
+    pop r6
+%endif
+    ret
+
+;***********************************************************************
+;   void DyadicBilinearQuarterDownsampler_sse( unsigned char* pDst, const int iDstStride,
+;                   unsigned char* pSrc, const int iSrcStride,
+;                   const int iSrcWidth, const int iSrcHeight );
+;***********************************************************************
+WELS_EXTERN DyadicBilinearQuarterDownsampler_sse
+%ifdef X86_32
+    push r6
+    %assign push_num 1
+%else
+    %assign push_num 0
+%endif
+    LOAD_6_PARA
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    SIGN_EXTENSION r4, r4d
+    SIGN_EXTENSION r5, r5d
+
+%ifndef X86_32
+    push r12
+    mov r12, r4
+%endif
+    sar r5, $02            ; iSrcHeight >> 2
+
+    mov r6, r1             ;Save the tailer for the unasigned size
+    imul r6, r5
+    add r6, r0
+    movq xmm7, [r6]
+
+.yloops_quarter_sse:
+%ifdef X86_32
+    mov r4, arg5
+%else
+    mov r4, r12
+%endif
+
+    mov r6, r0        ;save base address
+    ; each loop = source bandwidth: 32 bytes
+.xloops_quarter_sse:
+    ; 1st part horizonal loop: x16 bytes
+    ;               mem  hi<-       ->lo
+    ;1st Line Src:  mm0: d D c C b B a A    mm1: h H g G f F e E
+    ;2nd Line Src:  mm2: l L k K j J i I    mm3: p P o O n N m M
+    ;
+    ;=> target:
+    ;: G E C A,
+    ;:
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    movq mm0, [r2]         ; 1st pSrc line
+    movq mm1, [r2+8]       ; 1st pSrc line + 8
+    movq mm2, [r2+r3]     ; 2nd pSrc line
+    movq mm3, [r2+r3+8]   ; 2nd pSrc line + 8
+
+    pshufw mm0, mm0, 0d8h    ; x X x X c C a A
+    pshufw mm1, mm1, 0d8h    ; x X x X g G e E
+    pshufw mm2, mm2, 0d8h    ; x X x X k K i I
+    pshufw mm3, mm3, 0d8h    ; x X x X o O m M
+
+    punpckldq mm0, mm1       ; g G e E c C a A
+    punpckldq mm2, mm3       ; o O m M k K i I
+
+    ; to handle mm0,mm2
+    pshufw mm4, mm0, 0d8h       ;g G c C e E a A
+    pshufw mm5, mm4, 04eh       ;e E a A g G c C
+    punpcklbw mm4, mm5          ;g e G E c a C A  -> mm4
+    pshufw mm4, mm4, 0d8h       ;g e c a G E C A  -> mm4
+
+    pshufw mm5, mm2, 0d8h       ;o O k K m M i I
+    pshufw mm6, mm5, 04eh       ;m M i I o O k K
+    punpcklbw mm5, mm6          ;o m O M k i K I
+    pshufw mm5, mm5, 0d8h       ;o m k i O M K I  -> mm5
+
+    ; to handle mm4, mm5
+    movq mm0, mm4
+    punpckldq mm0, mm6          ;x x x x G E C A
+    punpckhdq mm4, mm6          ;x x x x g e c a
+
+    movq mm1, mm5
+    punpckldq mm1, mm6          ;x x x x O M K I
+    punpckhdq mm5, mm6          ;x x x x o m k i
+
+    ; avg within MB horizon width (8 x 2 lines)
+    pavgb mm0, mm4      ; (A+a+1)>>1, .., (H+h+1)>>1, temp_row1
+    pavgb mm1, mm5      ; (I+i+1)>>1, .., (P+p+1)>>1, temp_row2
+    pavgb mm0, mm1      ; (temp_row1+temp_row2+1)>>1, pending here and wait another horizonal part done then write memory once
+
+    ; 2nd part horizonal loop: x16 bytes
+    movq mm1, [r2+16]      ; 1st pSrc line + 16
+    movq mm2, [r2+24]      ; 1st pSrc line + 24
+    movq mm3, [r2+r3+16]  ; 2nd pSrc line + 16
+    movq mm4, [r2+r3+24]  ; 2nd pSrc line + 24
+
+    pshufw mm1, mm1, 0d8h
+    pshufw mm2, mm2, 0d8h
+    pshufw mm3, mm3, 0d8h
+    pshufw mm4, mm4, 0d8h
+
+    punpckldq mm1, mm2
+    punpckldq mm3, mm4
+
+    ; to handle mm1, mm3
+    pshufw mm4, mm1, 0d8h
+    pshufw mm5, mm4, 04eh
+    punpcklbw mm4, mm5
+    pshufw mm4, mm4, 0d8h
+
+    pshufw mm5, mm3, 0d8h
+    pshufw mm6, mm5, 04eh
+    punpcklbw mm5, mm6
+    pshufw mm5, mm5, 0d8h
+
+    ; to handle mm4, mm5
+    movq mm2, mm4
+    punpckldq mm2, mm6
+    punpckhdq mm4, mm6
+
+    movq mm3, mm5
+    punpckldq mm3, mm6
+    punpckhdq mm5, mm6
+
+    ; avg within MB horizon width (8 x 2 lines)
+    pavgb mm2, mm4      ; (A+a+1)>>1, .., (H+h+1)>>1, temp_row1
+    pavgb mm3, mm5      ; (I+i+1)>>1, .., (P+p+1)>>1, temp_row2
+    pavgb mm2, mm3      ; (temp_row1+temp_row2+1)>>1, done in another 2nd horizonal part
+
+    movd [r0  ], mm0
+    movd [r0+4], mm2
+
+    ; next SMB
+    lea r2, [r2+32]
+    lea r0, [r0+8]
+
+    sub r4, 32
+    cmp r4, 0
+    jg near .xloops_quarter_sse
+
+    sub  r6, r0
+    ; next line
+    lea r2, [r2+4*r3]    ; next 4 end of lines
+    lea r2, [r2+4*r6]    ; reset to base 0 [- 4 * iDstWidth]
+    lea r0, [r0+r1]
+    lea r0, [r0+r6]      ; reset to base 0 [- iDstWidth]
+
+    dec r5
+    jg near .yloops_quarter_sse
+
+    movq [r0], xmm7      ;restored the tailer for the unasigned size
+
+    WELSEMMS
+%ifndef X86_32
+    pop r12
+%endif
+    LOAD_6_PARA_POP
+%ifdef X86_32
+    pop r6
+%endif
+    ret
+
+;***********************************************************************
+;   void DyadicBilinearQuarterDownsampler_ssse3(   unsigned char* pDst, const int iDstStride,
+;                   unsigned char* pSrc, const int iSrcStride,
+;                   const int iSrcWidth, const int iSrcHeight );
+;***********************************************************************
+WELS_EXTERN DyadicBilinearQuarterDownsampler_ssse3
+    ;push ebx
+    ;push edx
+    ;push esi
+    ;push edi
+    ;push ebp
+
+    ;mov edi, [esp+24]   ; pDst
+    ;mov edx, [esp+28]   ; iDstStride
+    ;mov esi, [esp+32]   ; pSrc
+    ;mov ecx, [esp+36]   ; iSrcStride
+    ;mov ebp, [esp+44]   ; iSrcHeight
+%ifdef X86_32
+    push r6
+    %assign push_num 1
+%else
+    %assign push_num 0
+%endif
+    LOAD_6_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    SIGN_EXTENSION r4, r4d
+    SIGN_EXTENSION r5, r5d
+
+%ifndef X86_32
+    push r12
+    mov r12, r4
+%endif
+    sar r5, $02            ; iSrcHeight >> 2
+
+    mov r6, r1             ;Save the tailer for the unasigned size
+    imul r6, r5
+    add r6, r0
+    movq xmm7, [r6]
+
+    movdqa xmm6, [shufb_mask_quarter]
+.yloops_quarter_sse3:
+    ;mov eax, [esp+40]   ; iSrcWidth
+    ;sar eax, $02            ; iSrcWidth >> 2
+    ;mov ebx, eax        ; iDstWidth restored at ebx
+    ;sar eax, $04            ; (iSrcWidth >> 2) / 16     ; loop count = num_of_mb
+    ;neg ebx             ; - (iSrcWidth >> 2)
+%ifdef X86_32
+    mov r4, arg5
+%else
+    mov r4, r12
+%endif
+
+    mov r6, r0
+    ; each loop = source bandwidth: 32 bytes
+.xloops_quarter_sse3:
+    ; 1st part horizonal loop: x32 bytes
+    ;               mem  hi<-       ->lo
+    ;1st Line Src:  xmm0: h H g G f F e E d D c C b B a A
+    ;               xmm1: p P o O n N m M l L k K j J i I
+    ;2nd Line Src:  xmm2: h H g G f F e E d D c C b B a A
+    ;               xmm3: p P o O n N m M l L k K j J i I
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    movdqa xmm0, [r2]          ; 1st_src_line
+    movdqa xmm1, [r2+16]       ; 1st_src_line + 16
+    movdqa xmm2, [r2+r3]       ; 2nd_src_line
+    movdqa xmm3, [r2+r3+16]    ; 2nd_src_line + 16
+
+    pshufb xmm0, xmm6           ;1st line: 0 0 0 0 g e c a 0 0 0 0 G E C A
+    pshufb xmm1, xmm6           ;1st line: 0 0 0 0 o m k i 0 0 0 0 O M K I
+    pshufb xmm2, xmm6           ;2nd line: 0 0 0 0 g e c a 0 0 0 0 G E C A
+    pshufb xmm3, xmm6           ;2nd line: 0 0 0 0 o m k i 0 0 0 0 O M K I
+
+    movdqa xmm4, xmm0
+    movdqa xmm5, xmm2
+    punpckldq xmm0, xmm1        ;1st line: 0 0 0 0 0 0 0 0 O M K I G E C A -> xmm0
+    punpckhdq xmm4, xmm1        ;1st line: 0 0 0 0 0 0 0 0 o m k i g e c a -> xmm4
+    punpckldq xmm2, xmm3        ;2nd line: 0 0 0 0 0 0 0 0 O M K I G E C A -> xmm2
+    punpckhdq xmm5, xmm3        ;2nd line: 0 0 0 0 0 0 0 0 o m k i g e c a -> xmm5
+
+    pavgb xmm0, xmm4
+    pavgb xmm2, xmm5
+    pavgb xmm0, xmm2            ;average
+
+    ; write pDst
+    movq [r0], xmm0
+
+    ; next SMB
+    lea r2, [r2+32]
+    lea r0, [r0+8]
+
+    sub r4, 32
+    cmp r4, 0
+    jg near .xloops_quarter_sse3
+
+    sub r6, r0
+    ; next line
+    lea r2, [r2+4*r3]    ; next end of lines
+    lea r2, [r2+4*r6]    ; reset to base 0 [- 4 * iDstWidth]
+    lea r0, [r0+r1]
+    lea r0, [r0+r6]      ; reset to base 0 [- iDstWidth]
+
+    dec r5
+    jg near .yloops_quarter_sse3
+
+    movq [r0], xmm7      ;restored the tailer for the unasigned size
+
+%ifndef X86_32
+    pop r12
+%endif
+
+    POP_XMM
+    LOAD_6_PARA_POP
+%ifdef X86_32
+    pop r6
+%endif
+    ret
+
+;***********************************************************************
+;   void DyadicBilinearQuarterDownsampler_sse4(    unsigned char* pDst, const int iDstStride,
+;                   unsigned char* pSrc, const int iSrcStride,
+;                   const int iSrcWidth, const int iSrcHeight );
+;***********************************************************************
+WELS_EXTERN DyadicBilinearQuarterDownsampler_sse4
+%ifdef X86_32
+    push r6
+    %assign push_num 1
+%else
+    %assign push_num 0
+%endif
+    LOAD_6_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    SIGN_EXTENSION r4, r4d
+    SIGN_EXTENSION r5, r5d
+
+%ifndef X86_32
+    push r12
+    mov r12, r4
+%endif
+    sar r5, $02            ; iSrcHeight >> 2
+
+    mov r6, r1             ;Save the tailer for the unasigned size
+    imul r6, r5
+    add r6, r0
+    movq xmm7, [r6]
+
+    movdqa xmm6, [shufb_mask_quarter]    ;mask
+
+.yloops_quarter_sse4:
+%ifdef X86_32
+    mov r4, arg5
+%else
+    mov r4, r12
+%endif
+
+    mov r6, r0
+    ; each loop = source bandwidth: 32 bytes
+.xloops_quarter_sse4:
+    ; 1st part horizonal loop: x16 bytes
+    ;               mem  hi<-       ->lo
+    ;1st Line Src:  xmm0: h H g G f F e E d D c C b B a A
+    ;               xmm1: p P o O n N m M l L k K j J i I
+    ;2nd Line Src:  xmm2: h H g G f F e E d D c C b B a A
+    ;               xmm3: p P o O n N m M l L k K j J i I
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    movntdqa xmm0, [r2]            ; 1st_src_line
+    movntdqa xmm1, [r2+16]         ; 1st_src_line + 16
+    movntdqa xmm2, [r2+r3]         ; 2nd_src_line
+    movntdqa xmm3, [r2+r3+16]      ; 2nd_src_line + 16
+
+    pshufb xmm0, xmm6               ;1st line: 0 0 0 0 g e c a 0 0 0 0 G E C A
+    pshufb xmm1, xmm6               ;1st line: 0 0 0 0 o m k i 0 0 0 0 O M K I
+    pshufb xmm2, xmm6               ;2nd line: 0 0 0 0 g e c a 0 0 0 0 G E C A
+    pshufb xmm3, xmm6               ;2nd line: 0 0 0 0 o m k i 0 0 0 0 O M K I
+
+    movdqa xmm4, xmm0
+    movdqa xmm5, xmm2
+    punpckldq xmm0, xmm1            ;1st line: 0 0 0 0 0 0 0 0 O M K I G E C A -> xmm0
+    punpckhdq xmm4, xmm1            ;1st line: 0 0 0 0 0 0 0 0 o m k i g e c a -> xmm4
+    punpckldq xmm2, xmm3            ;2nd line: 0 0 0 0 0 0 0 0 O M K I G E C A -> xmm2
+    punpckhdq xmm5, xmm3            ;2nd line: 0 0 0 0 0 0 0 0 o m k i g e c a -> xmm5
+
+    pavgb xmm0, xmm4
+    pavgb xmm2, xmm5
+    pavgb xmm0, xmm2                ;average
+
+    ; write pDst
+    movq [r0], xmm0
+
+    ; next SMB
+    lea r2, [r2+32]
+    lea r0, [r0+8]
+
+    sub r4, 32
+    cmp r4, 0
+    jg near .xloops_quarter_sse4
+
+    sub r6, r0
+    lea r2, [r2+4*r3]    ; next end of lines
+    lea r2, [r2+4*r6]    ; reset to base 0 [- 2 * iDstWidth]
+    lea r0, [r0+r1]
+    lea r0, [r0+r6]      ; reset to base 0 [- iDstWidth]
+
+    dec r5
+    jg near .yloops_quarter_sse4
+
+    movq [r0], xmm7      ;restore the tailer for the unasigned size
+
+%ifndef X86_32
+    pop r12
+%endif
+
+    POP_XMM
+    LOAD_6_PARA_POP
+%ifdef X86_32
+    pop r6
+%endif
+    ret
+
