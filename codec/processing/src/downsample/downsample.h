@@ -67,16 +67,16 @@ typedef SpecificDownsampleFunc* PSpecificDownsampleFunc;
 typedef GeneralDownsampleFunc*  PGeneralDownsampleFunc;
 
 HalveDownsampleFunc		DyadicBilinearDownsampler_c;
-GeneralDownsampleFunc 	GeneralBilinearFastDownsampler_c;
-GeneralDownsampleFunc 	GeneralBilinearAccurateDownsampler_c;
-SpecificDownsampleFunc	DyadicBilinearQuarterDownsampler_c;
+GeneralDownsampleFunc GeneralBilinearFastDownsampler_c;
+GeneralDownsampleFunc GeneralBilinearAccurateDownsampler_c;
 SpecificDownsampleFunc  DyadicBilinearOneThirdDownsampler_c;
+SpecificDownsampleFunc	DyadicBilinearQuarterDownsampler_c;
 
 typedef struct {
     // align_index: 0 = x32; 1 = x16; 2 = x8; 3 = common case left;
     PHalveDownsampleFunc          pfHalfAverage[4];
-    PSpecificDownsampleFunc       pfQuarterDownsampler;
     PSpecificDownsampleFunc       pfOneThirdDownsampler;
+    PSpecificDownsampleFunc       pfQuarterDownsampler;
     PGeneralDownsampleFunc        pfGeneralRatioLuma;
     PGeneralDownsampleFunc        pfGeneralRatioChroma;
 } SDownsampleFuncs;
