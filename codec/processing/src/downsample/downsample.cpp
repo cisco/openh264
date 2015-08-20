@@ -62,6 +62,7 @@ void CDownsampling::InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc,  int
         sDownsampleFunc.pfHalfAverage[0]    = DyadicBilinearDownsamplerWidthx32_sse;
         sDownsampleFunc.pfHalfAverage[1]    = DyadicBilinearDownsamplerWidthx16_sse;
         sDownsampleFunc.pfHalfAverage[2]    = DyadicBilinearDownsamplerWidthx8_sse;
+        sDownsampleFunc.pfQuarterDownsampler = DyadicBilinearQuarterDownsampler_sse;
     }
     if (iCpuFlag & WELS_CPU_SSE2) {
         sDownsampleFunc.pfGeneralRatioChroma = GeneralBilinearAccurateDownsamplerWrap_sse2;
@@ -70,10 +71,14 @@ void CDownsampling::InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc,  int
     if (iCpuFlag & WELS_CPU_SSSE3) {
         sDownsampleFunc.pfHalfAverage[0]    = DyadicBilinearDownsamplerWidthx32_ssse3;
         sDownsampleFunc.pfHalfAverage[1]    = DyadicBilinearDownsamplerWidthx16_ssse3;
+        sDownsampleFunc.pfOneThirdDownsampler = DyadicBilinearOneThirdDownsamplerWrap_ssse3;
+        sDownsampleFunc.pfQuarterDownsampler  = DyadicBilinearQuarterDownsampler_ssse3;
     }
     if (iCpuFlag & WELS_CPU_SSE41) {
         sDownsampleFunc.pfHalfAverage[0]    = DyadicBilinearDownsamplerWidthx32_sse4;
         sDownsampleFunc.pfHalfAverage[1]    = DyadicBilinearDownsamplerWidthx16_sse4;
+        sDownsampleFunc.pfOneThirdDownsampler = DyadicBilinearOneThirdDownsamplerWrap_sse4;
+        sDownsampleFunc.pfQuarterDownsampler  = DyadicBilinearQuarterDownsampler_sse4;
     }
 #endif//X86_ASM
 
@@ -83,6 +88,8 @@ void CDownsampling::InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc,  int
         sDownsampleFunc.pfHalfAverage[1] = DyadicBilinearDownsampler_neon;
         sDownsampleFunc.pfHalfAverage[2] = DyadicBilinearDownsampler_neon;
         sDownsampleFunc.pfHalfAverage[3] = DyadicBilinearDownsampler_neon;
+        sDownsampleFunc.pfOneThirdDownsampler = DyadicBilinearOneThirdDownsampler_neon;
+        sDownsampleFunc.pfQuarterDownsampler  = DyadicBilinearQuarterDownsampler_neon;
         sDownsampleFunc.pfGeneralRatioChroma = GeneralBilinearAccurateDownsamplerWrap_neon;
         sDownsampleFunc.pfGeneralRatioLuma   = GeneralBilinearAccurateDownsamplerWrap_neon;
     }
@@ -94,6 +101,8 @@ void CDownsampling::InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc,  int
         sDownsampleFunc.pfHalfAverage[1] = DyadicBilinearDownsampler_AArch64_neon;
         sDownsampleFunc.pfHalfAverage[2] = DyadicBilinearDownsampler_AArch64_neon;
         sDownsampleFunc.pfHalfAverage[3] = DyadicBilinearDownsampler_AArch64_neon;
+        sDownsampleFunc.pfOneThirdDownsampler = DyadicBilinearOneThirdDownsamplerWrap_AArch64_neon;
+        sDownsampleFunc.pfQuarterDownsampler  = DyadicBilinearQuarterDownsampler_AArch64_neon;
         sDownsampleFunc.pfGeneralRatioChroma = GeneralBilinearAccurateDownsamplerWrap_AArch64_neon;
         sDownsampleFunc.pfGeneralRatioLuma   = GeneralBilinearAccurateDownsamplerWrap_AArch64_neon;
     }

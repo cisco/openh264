@@ -275,6 +275,21 @@ void GeneralBilinearAccurateDownsamplerWrap_sse2 (uint8_t* pDst, const int32_t k
     GeneralBilinearAccurateDownsampler_sse2 (pDst, kiDstStride, kiDstWidth, kiDstHeight,
             pSrc, kiSrcStride, uiScalex, uiScaley);
 }
+
+void DyadicBilinearOneThirdDownsamplerWrap_ssse3 (uint8_t* pDst, const int32_t kiDstStride,
+        uint8_t* pSrc, const int32_t kiSrcStride,
+        const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
+    const int32_t kiDstHeight = kiSrcHeight/3;
+    DyadicBilinearOneThirdDownsampler_ssse3 (pDst, kiDstStride, pSrc, kiSrcStride, kiSrcWidth, kiDstHeight);
+}
+
+void DyadicBilinearOneThirdDownsamplerWrap_sse4 (uint8_t* pDst, const int32_t kiDstStride,
+        uint8_t* pSrc, const int32_t kiSrcStride,
+        const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
+    const int32_t kiDstHeight = kiSrcHeight/3;
+    DyadicBilinearOneThirdDownsampler_sse4 (pDst, kiDstStride, pSrc, kiSrcStride, kiSrcWidth, kiDstHeight);
+
+}
 #endif //X86_ASM
 
 #ifdef HAVE_NEON
@@ -288,6 +303,15 @@ void GeneralBilinearAccurateDownsamplerWrap_neon (uint8_t* pDst, const int32_t k
     GeneralBilinearAccurateDownsampler_neon (pDst, kiDstStride, kiDstWidth, kiDstHeight, pSrc, kiSrcStride, uiScalex,
             uiScaley);
 }
+
+void DyadicBilinearOneThirdDownsamplerWrap_neon (uint8_t* pDst, const int32_t kiDstStride,
+        uint8_t* pSrc, const int32_t kiSrcStride,
+        const int32_t kiSrcWidth, const int32_t kiSrcHeight)
+
+{
+    const int32_t kiDstHeight = kiSrcHeight/3;
+    DyadicBilinearOneThirdDownsampler_neon (pDst, kiDstStride, pSrc, kiSrcStride, kiSrcWidth, kiDstHeight);
+}
 #endif
 
 #ifdef HAVE_NEON_AARCH64
@@ -300,6 +324,15 @@ void GeneralBilinearAccurateDownsamplerWrap_AArch64_neon (uint8_t* pDst, const i
     uint32_t uiScaley = WELS_ROUND ((float)kiSrcHeight / (float)kiDstHeight * kuiScale);
     GeneralBilinearAccurateDownsampler_AArch64_neon (pDst, kiDstStride, kiDstWidth, kiDstHeight, pSrc, kiSrcStride,
             uiScalex, uiScaley);
+}
+
+void DyadicBilinearOneThirdDownsamplerWrap_AArch64_neon (uint8_t* pDst, const int32_t kiDstStride,
+        uint8_t* pSrc, const int32_t kiSrcStride,
+        const int32_t kiSrcWidth, const int32_t kiSrcHeight)
+
+{
+    const int32_t kiDstHeight = kiSrcHeight/3;
+    DyadicBilinearOneThirdDownsampler_AArch64_neon (pDst, kiDstStride, pSrc, kiSrcStride, kiSrcWidth, kiDstHeight);
 }
 #endif
 WELSVP_NAMESPACE_END
