@@ -56,7 +56,7 @@ typedef void (HalveDownsampleFunc) (uint8_t* pDst, const int32_t kiDstStride,
 
 typedef void (SpecificDownsampleFunc) (uint8_t* pDst, const int32_t kiDstStride,
                                        uint8_t* pSrc, const int32_t kiSrcStride,
-                                       const int32_t kiSrcWidth, const int32_t kiSrcHeight);
+                                       const int32_t kiSrcWidth, const int32_t kiHeight);
 
 typedef void (GeneralDownsampleFunc) (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
                                       const int32_t kiDstHeight,
@@ -73,12 +73,12 @@ SpecificDownsampleFunc  DyadicBilinearOneThirdDownsampler_c;
 SpecificDownsampleFunc	DyadicBilinearQuarterDownsampler_c;
 
 typedef struct {
-    // align_index: 0 = x32; 1 = x16; 2 = x8; 3 = common case left;
-    PHalveDownsampleFunc          pfHalfAverage[4];
-    PSpecificDownsampleFunc       pfOneThirdDownsampler;
-    PSpecificDownsampleFunc       pfQuarterDownsampler;
-    PGeneralDownsampleFunc        pfGeneralRatioLuma;
-    PGeneralDownsampleFunc        pfGeneralRatioChroma;
+  // align_index: 0 = x32; 1 = x16; 2 = x8; 3 = common case left;
+  PHalveDownsampleFunc          pfHalfAverage[4];
+  PSpecificDownsampleFunc       pfOneThirdDownsampler;
+  PSpecificDownsampleFunc       pfQuarterDownsampler;
+  PGeneralDownsampleFunc        pfGeneralRatioLuma;
+  PGeneralDownsampleFunc        pfGeneralRatioChroma;
 } SDownsampleFuncs;
 
 
@@ -109,16 +109,12 @@ SpecificDownsampleFunc  DyadicBilinearQuarterDownsampler_ssse3;
 SpecificDownsampleFunc  DyadicBilinearQuarterDownsampler_sse4;
 
 void GeneralBilinearFastDownsampler_sse2 (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
-        const int32_t kiDstHeight, uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX, const uint32_t kuiScaleY);
+    const int32_t kiDstHeight, uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX,
+    const uint32_t kuiScaleY);
 void GeneralBilinearAccurateDownsampler_sse2 (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
-        const int32_t kiDstHeight, uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX, const uint32_t kuiScaleY);
+    const int32_t kiDstHeight, uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX,
+    const uint32_t kuiScaleY);
 
-void DyadicBilinearOneThirdDownsamplerWrap_ssse3 (uint8_t* pDst, const int32_t kiDstStride,
-        uint8_t* pSrc, const int32_t kiSrcStride,
-        const int32_t kiSrcWidth, const int32_t kiSrcHeight);
-void DyadicBilinearOneThirdDownsamplerWrap_sse4 (uint8_t* pDst, const int32_t kiDstStride,
-        uint8_t* pSrc, const int32_t kiSrcStride,
-        const int32_t kiSrcWidth, const int32_t kiSrcHeight);
 WELSVP_EXTERN_C_END
 #endif
 
@@ -136,12 +132,9 @@ SpecificDownsampleFunc  DyadicBilinearOneThirdDownsampler_neon;
 SpecificDownsampleFunc  DyadicBilinearQuarterDownsampler_neon;
 
 void GeneralBilinearAccurateDownsampler_neon (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
-        const int32_t kiDstHeight,
-        uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX, const uint32_t kuiScaleY);
+    const int32_t kiDstHeight,
+    uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX, const uint32_t kuiScaleY);
 
-void DyadicBilinearOneThirdDownsamplerWrap_neon (uint8_t* pDst, const int32_t kiDstStride,
-        uint8_t* pSrc, const int32_t kiSrcStride,
-        const int32_t kiSrcWidth, const int32_t kiSrcHeight);
 WELSVP_EXTERN_C_END
 #endif
 
@@ -158,33 +151,29 @@ SpecificDownsampleFunc  DyadicBilinearOneThirdDownsampler_AArch64_neon;
 
 SpecificDownsampleFunc  DyadicBilinearQuarterDownsampler_AArch64_neon;
 
-void GeneralBilinearAccurateDownsampler_AArch64_neon (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth, const int32_t kiDstHeight,
-        uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX, const uint32_t kuiScaleY);
-
-void DyadicBilinearOneThirdDownsamplerWrap_AArch64_neon (uint8_t* pDst, const int32_t kiDstStride,
-        uint8_t* pSrc, const int32_t kiSrcStride,
-        const int32_t kiSrcWidth, const int32_t kiSrcHeight);
-
+void GeneralBilinearAccurateDownsampler_AArch64_neon (uint8_t* pDst, const int32_t kiDstStride,
+    const int32_t kiDstWidth, const int32_t kiDstHeight,
+    uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX, const uint32_t kuiScaleY);
 
 WELSVP_EXTERN_C_END
 #endif
 
 
 class CDownsampling : public IStrategy {
-public:
-    CDownsampling (int32_t iCpuFlag);
-    ~CDownsampling();
+ public:
+  CDownsampling (int32_t iCpuFlag);
+  ~CDownsampling();
 
-    EResult Process (int32_t iType, SPixMap* pSrc, SPixMap* pDst);
+  EResult Process (int32_t iType, SPixMap* pSrc, SPixMap* pDst);
 
-private:
-    void InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc, int32_t iCpuFlag);
+ private:
+  void InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc, int32_t iCpuFlag);
 
-    int32_t GetAlignedIndex (const int32_t kiSrcWidth);
+  int32_t GetAlignedIndex (const int32_t kiSrcWidth);
 
-private:
-    SDownsampleFuncs m_pfDownsample;
-    int32_t  m_iCPUFlag;
+ private:
+  SDownsampleFuncs m_pfDownsample;
+  int32_t  m_iCPUFlag;
 };
 
 WELSVP_NAMESPACE_END
