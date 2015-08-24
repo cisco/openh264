@@ -89,8 +89,10 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
       uint8_t* pNalBs = NULL;
       pParser->uiOutBsTimeStamp = (pCurAu->pNalUnitsList [iIdx]) ? pCurAu->pNalUnitsList [iIdx]->uiTimeStamp : 0;
       //pParser->iNalNum = 0;
-      pParser->iSpsWidthInPixel = (pCtx->pSps->iMbWidth << 4);
-      pParser->iSpsHeightInPixel = (pCtx->pSps->iMbHeight << 4);
+      pParser->iSpsWidthInPixel = (pCtx->pSps->iMbWidth << 4) - ((pCtx->pSps->sFrameCrop.iLeftOffset +
+                                  pCtx->pSps->sFrameCrop.iRightOffset) << 1);
+      pParser->iSpsHeightInPixel = (pCtx->pSps->iMbHeight << 4) - ((pCtx->pSps->sFrameCrop.iTopOffset +
+                                   pCtx->pSps->sFrameCrop.iBottomOffset) << 1);
 
       if (pCurAu->pNalUnitsList [iIdx]->sNalHeaderExt.bIdrFlag) { //IDR
         if (pCtx->bFrameFinish) { //add required sps/pps
