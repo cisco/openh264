@@ -92,6 +92,7 @@ ERR_INFO_WRITE_FAULT,
 ERR_INFO_READ_FAULT,
 ERR_INFO_READ_OVERFLOW,
 ERR_INFO_READ_LEADING_ZERO,
+ERR_INFO_NULL_CONTEXT,
 /* Error from H.264 syntax elements parser: 1001-10000 */
 ERR_INFO_NO_PREFIX_CODE         = ERR_INFO_SYNTAX_BASE, // No start prefix code indication
 ERR_INFO_NO_PARAM_SETS,                                 // No SPS and/ PPS before sequence header
