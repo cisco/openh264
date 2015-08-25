@@ -243,8 +243,9 @@ void CWelsDecoder::UninitDecoder (void) {
 // the return value of this function is not suitable, it need report failure info to upper layer.
 int32_t CWelsDecoder::InitDecoder (const bool bParseOnly) {
 
-  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::init_decoder(), openh264 codec version = %s",
-           VERSION_NUMBER);
+  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+           "CWelsDecoder::init_decoder(), openh264 codec version = %s, ParseOnly = %d",
+           VERSION_NUMBER, (int32_t)bParseOnly);
 
   if (m_pDecContext) //free
     UninitDecoder();
