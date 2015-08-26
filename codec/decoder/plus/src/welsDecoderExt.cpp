@@ -259,6 +259,18 @@ int32_t CWelsDecoder::InitDecoder (const bool bParseOnly) {
   return WelsInitDecoder (m_pDecContext, bParseOnly, &m_pWelsTrace->m_sLogCtx);
 }
 
+int32_t CWelsDecoder::ResetDecoder() {
+  // TBC: need to be modified when context and trace point are null
+  if (m_pDecContext != NULL && m_pWelsTrace != NULL) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "ResetDecoder(), context error code is %d",
+             m_pDecContext->iErrorCode);
+    return InitDecoder (m_pDecContext->bParseOnly);
+  } else if (m_pWelsTrace != NULL) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "ResetDecoder() failed as decoder context null");
+  }
+  return ERR_INFO_UNINIT;
+}
+
 /*
  * Set Option
  */
@@ -488,7 +500,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     eNalType = m_pDecContext->sCurNalHead.eNalUnitType;
 
     if (m_pDecContext->iErrorCode & dsOutOfMemory) {
-      ForceResetParaSetStatusAndAUList (m_pDecContext);
+      ResetDecoder();
     }
     //for AVC bitstream (excluding AVC with temporal scalability, including TP), as long as error occur, SHOULD notify upper layer key frame loss.
     if ((IS_PARAM_SETS_NALS (eNalType) || NAL_UNIT_CODED_SLICE_IDR == eNalType) ||
