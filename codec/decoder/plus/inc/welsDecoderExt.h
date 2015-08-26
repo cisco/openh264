@@ -111,6 +111,7 @@ welsCodecTrace*         m_pWelsTrace;
 
 int32_t InitDecoder (const bool);
 void UninitDecoder (void);
+int32_t ResetDecoder();
 
 #ifdef OUTPUT_BIT_STREAM
 WelsFileHandle* m_pFBS;
