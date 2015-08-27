@@ -48,3 +48,7 @@ testbin/test.yuv
 
 # pkg-config file
 *.pc
+
+# editor files
+*~
+
