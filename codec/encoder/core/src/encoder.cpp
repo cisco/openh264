@@ -233,6 +233,7 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType) {
   // for bitstream writing
   pEncCtx->iPosBsBuffer         = 0;    // reset bs pBuffer position
   pEncCtx->pOut->iNalIndex      = 0;    // reset NAL index
+  pEncCtx->pOut->iLayerBsIndex  = 0;    // reset index of Layer Bs
 
   InitBits (&pEncCtx->pOut->sBsWrite, pEncCtx->pOut->pBsBuffer, pEncCtx->pOut->uiSize);
 

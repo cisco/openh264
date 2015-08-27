@@ -77,7 +77,7 @@ int32_t*        pNalLen;
 int32_t         iCountNals;             // count number of NAL in list
 // SVC: num_sps (MAX_D) + num_pps (MAX_D) + num_vcl (MAX_D * MAX_Q)
 int32_t         iNalIndex;              // coding NAL currently, 0 based
-
+int32_t         iLayerBsIndex;          // layer index of  bit stream for SFrameBsIfo
 // bool            bAnnexBFlag;            // annexeb flag, to figure it pOut the packetization mode whether need 4 bytes (0 0 0 1) of start code prefix
 } SWelsEncoderOutput;
 

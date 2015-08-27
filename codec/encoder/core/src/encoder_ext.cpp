@@ -1812,8 +1812,9 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pOut->sNalList), FreeMemorySvc (ppCtx))
   (*ppCtx)->pOut->pNalLen = (int32_t*)pMa->WelsMallocz (iCountNals * sizeof (int32_t), "pOut->pNalLen");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pOut->pNalLen), FreeMemorySvc (ppCtx))
-  (*ppCtx)->pOut->iCountNals = iCountNals;
-  (*ppCtx)->pOut->iNalIndex = 0;
+  (*ppCtx)->pOut->iCountNals    = iCountNals;
+  (*ppCtx)->pOut->iNalIndex     = 0;
+  (*ppCtx)->pOut->iLayerBsIndex = 0;
 
 
   (*ppCtx)->pFrameBs = (uint8_t*)pMa->WelsMalloc (iTotalLength, "pFrameBs");
@@ -3520,8 +3521,10 @@ int32_t WriteSsvcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
 
   //point to next pLayerBsInfo
   ++ pLayerBsInfo;
+  ++ pCtx->pOut->iLayerBsIndex;
   pLayerBsInfo->pBsBuf           = pCtx->pFrameBs + pCtx->iPosBsBuffer;
   pLayerBsInfo->pNalLengthInByte = (pLayerBsInfo - 1)->pNalLengthInByte + iCountNal;
+
   //update for external countings
   ++ iLayerNum;
   iFrameSize += iNonVclSize;
@@ -3557,6 +3560,7 @@ int32_t WriteSavcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
 
     //point to next pLayerBsInfo
     ++ pLayerBsInfo;
+    ++ pCtx->pOut->iLayerBsIndex;
     pLayerBsInfo->pBsBuf           = pCtx->pFrameBs + pCtx->iPosBsBuffer;
     pLayerBsInfo->pNalLengthInByte = (pLayerBsInfo - 1)->pNalLengthInByte + iCountNal;
     //update for external countings
@@ -3588,6 +3592,7 @@ int32_t WriteSavcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
 
     //point to next pLayerBsInfo
     ++ pLayerBsInfo;
+    ++ pCtx->pOut->iLayerBsIndex;
     pLayerBsInfo->pBsBuf           = pCtx->pFrameBs + pCtx->iPosBsBuffer;
     pLayerBsInfo->pNalLengthInByte = (pLayerBsInfo - 1)->pNalLengthInByte + iCountNal;
     //update for external countings
@@ -3636,6 +3641,7 @@ int32_t WriteSavcParaset_Listing (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
 
     //point to next pLayerBsInfo
     ++ pLayerBsInfo;
+    ++ pCtx->pOut->iLayerBsIndex;
     pLayerBsInfo->pBsBuf           = pCtx->pFrameBs + pCtx->iPosBsBuffer;
     pLayerBsInfo->pNalLengthInByte = (pLayerBsInfo - 1)->pNalLengthInByte + iCountNal;
     //update for external countings
@@ -3671,6 +3677,7 @@ int32_t WriteSavcParaset_Listing (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
 
     //point to next pLayerBsInfo
     ++ pLayerBsInfo;
+    ++ pCtx->pOut->iLayerBsIndex;
     pLayerBsInfo->pBsBuf           = pCtx->pFrameBs + pCtx->iPosBsBuffer;
     pLayerBsInfo->pNalLengthInByte = (pLayerBsInfo - 1)->pNalLengthInByte + iCountNal;
     //update for external countings
@@ -3692,8 +3699,9 @@ int32_t WriteSavcParaset_Listing (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
 void StackBackEncoderStatus (sWelsEncCtx* pEncCtx,
                              EVideoFrameType keFrameType) {
   // for bitstream writing
-  pEncCtx->iPosBsBuffer      = 0;   // reset bs pBuffer position
-  pEncCtx->pOut->iNalIndex   = 0;   // reset NAL index
+  pEncCtx->iPosBsBuffer        = 0;   // reset bs pBuffer position
+  pEncCtx->pOut->iNalIndex     = 0;   // reset NAL index
+  pEncCtx->pOut->iLayerBsIndex = 0;   // reset index of Layer Bs
 
   InitBits (&pEncCtx->pOut->sBsWrite, pEncCtx->pOut->pBsBuffer, pEncCtx->pOut->uiSize);
   if ((keFrameType == videoFrameTypeP) || (keFrameType == videoFrameTypeI)) {
@@ -4033,7 +4041,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
           iRet = FiredSliceThreads (pCtx, &pCtx->pSliceThreading->pThreadPEncCtx[0],
                                     &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
                                     &pCtx->pSliceThreading->pThreadMasterEvent[0],
-                                    pLayerBsInfo, iSliceCount, pCtx->pCurDqLayer->pSliceEncCtx, false);
+                                    pFbi, iSliceCount, pCtx->pCurDqLayer->pSliceEncCtx, false);
           if (iRet) {
             WelsLog (pLogCtx, WELS_LOG_ERROR,
                      "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!",
@@ -4073,7 +4081,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
           iRet = FiredSliceThreads (pCtx, &pCtx->pSliceThreading->pThreadPEncCtx[0],
                                     &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
                                     &pCtx->pSliceThreading->pThreadMasterEvent[0],
-                                    pLayerBsInfo, iNumThreadsRunning, pCtx->pCurDqLayer->pSliceEncCtx, false);
+                                    pFbi, iNumThreadsRunning, pCtx->pCurDqLayer->pSliceEncCtx, false);
           if (iRet) {
             WelsLog (pLogCtx, WELS_LOG_ERROR,
                      "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!",
@@ -4120,7 +4128,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         iRet = FiredSliceThreads (pCtx, &pCtx->pSliceThreading->pThreadPEncCtx[0],
                                   &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
                                   &pCtx->pSliceThreading->pThreadMasterEvent[0],
-                                  pLayerBsInfo, kiPartitionCnt, pCtx->pCurDqLayer->pSliceEncCtx, true);
+                                  pFbi, kiPartitionCnt, pCtx->pCurDqLayer->pSliceEncCtx, true);
         if (iRet) {
           WelsLog (pLogCtx, WELS_LOG_ERROR,
                    "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!",
@@ -4332,6 +4340,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     iCountNal = pLayerBsInfo->iNalCount;
     ++ iLayerNum;
     ++ pLayerBsInfo;
+    ++ pCtx->pOut->iLayerBsIndex;
 
     pLayerBsInfo->pBsBuf = pCtx->pFrameBs + pCtx->iPosBsBuffer;
     pLayerBsInfo->pNalLengthInByte = (pLayerBsInfo - 1)->pNalLengthInByte + iCountNal;
@@ -4360,6 +4369,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       pLayerBsInfo->iNalCount           = 1;
       pLayerBsInfo->pNalLengthInByte[0] = iPaddingNalSize;
       ++ pLayerBsInfo;
+      ++ pCtx->pOut->iLayerBsIndex;
       pLayerBsInfo->pBsBuf           = pCtx->pFrameBs + pCtx->iPosBsBuffer;
       pLayerBsInfo->pNalLengthInByte = (pLayerBsInfo - 1)->pNalLengthInByte + 1;
       ++ iLayerNum;
@@ -4928,6 +4938,7 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   pCurLayer->pSliceEncCtx->iMaxSliceNumConstraint = iMaxSliceNum;
   return ENC_RETURN_SUCCESS;
 }
+
 int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
                                  SFrameBSInfo* pFrameBSInfo,
                                  SLayerBSInfo* pLayerBsInfo,
