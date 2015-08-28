@@ -57,7 +57,7 @@
 
 typedef struct TagSliceThreadPrivateData {
 void*           pWelsPEncCtx;
-SLayerBSInfo*   pLayerBs;
+SFrameBSInfo*   pFrameBsInfo;
 int32_t         iSliceIndex;    // slice index, zero based
 int32_t         iThreadIndex;   // thread index, zero based
 

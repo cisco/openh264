@@ -80,8 +80,8 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg);
 int32_t CreateSliceThreads (sWelsEncCtx* pCtx);
 
 int32_t FiredSliceThreads (sWelsEncCtx* pCtx, SSliceThreadPrivateData* pPriData, WELS_EVENT* pEventsList,
-                           WELS_EVENT* pMasterEventsList, SLayerBSInfo* pLayerBsInfo,
-                           const uint32_t kuiNumThreads/*, int32_t *iLayerNum*/, SSliceCtx* pSliceCtx, const bool kbIsDynamicSlicingMode);
+                           WELS_EVENT* pMasterEventsList, SFrameBSInfo* pFrameBsInfo,
+                           const uint32_t kuiNumThreads, SSliceCtx* pSliceCtx, const bool kbIsDynamicSlicingMode);
 
 int32_t DynamicDetectCpuCores();
 
