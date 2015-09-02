@@ -3865,7 +3865,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   while (iSpatialIdx < iSpatialNum) {
     const int32_t iDidIdx       = (pSpatialIndexMap + iSpatialIdx)->iDid;       // get iDid
     SSpatialLayerConfig* pParam = &pSvcParam->sSpatialLayers[iDidIdx];
-
+    int32_t  iDecompositionStages = pSvcParam->sDependencyLayers[iSpatialIdx].iDecompositionStages;
     pCtx->uiDependencyId        = iCurDid = (int8_t)iDidIdx;
     pCtx->pVpp->AnalyzeSpatialPic (pCtx, iDidIdx);
 
@@ -3923,9 +3923,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     }
     if (iCurTid == 0 || pCtx->eSliceType == I_SLICE)
       eNalRefIdc = NRI_PRI_HIGHEST;
-    else if (iCurTid == pSvcParam->iDecompStages)
+    else if (iCurTid == iDecompositionStages)
       eNalRefIdc = NRI_PRI_LOWEST;
-    else if (1 + iCurTid == pSvcParam->iDecompStages)
+    else if (1 + iCurTid == iDecompositionStages)
       eNalRefIdc = NRI_PRI_LOW;
     else // more details for other temporal layers?
       eNalRefIdc = NRI_PRI_HIGHEST;
