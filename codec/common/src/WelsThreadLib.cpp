@@ -476,10 +476,21 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* p
 
   CPU_ZERO (&cpuset);
 
-  if (!sched_getaffinity (0, sizeof (cpuset), &cpuset))
+  if (!sched_getaffinity (0, sizeof (cpuset), &cpuset)) {
+#ifdef CPU_COUNT
     pInfo->ProcessorCount = CPU_COUNT (&cpuset);
-  else
+#else
+    int32_t count = 0;
+    for (int i = 0; i < CPU_SETSIZE; i++) {
+      if (CPU_ISSET(i, &cpuset)) {
+        count++;
+      }
+    }
+    pInfo->ProcessorCount = count;
+#endif
+  } else {
     pInfo->ProcessorCount = 1;
+  }
 
   return WELS_THREAD_ERROR_OK;
 
