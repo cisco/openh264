@@ -10,7 +10,7 @@ class EncoderInterfaceTest : public ::testing::Test {
 #define MB_SIZE (16)
 #define MAX_WIDTH (3840)
 #define MAX_HEIGHT (2160)
-#define VALID_SIZE(iSize) (((iSize)>1)?(iSize):1)
+#define VALID_SIZE(iSize) (((iSize)>16)?(iSize):16)
 #define MEM_VARY_SIZE (512)
 #define IMAGE_VARY_SIZE (512)
 #define TEST_FRAMES (30)
@@ -87,9 +87,10 @@ void EncoderInterfaceTest::PrepareOneSrcFrame() {
   pSrcPic->uiTimeStamp = 0;
   pSrcPic->iPicWidth = pParamExt->iPicWidth;
   pSrcPic->iPicHeight = pParamExt->iPicHeight;
-
-  m_iWidth = pParamExt->iPicWidth;
-  m_iHeight = pParamExt->iPicHeight;
+  pSrcPic->iPicWidth = VALID_SIZE (pParamExt->iPicWidth);
+  pSrcPic->iPicHeight = VALID_SIZE (pParamExt->iPicHeight);
+  m_iWidth = pSrcPic->iPicWidth;
+  m_iHeight = pSrcPic->iPicHeight;
   m_iPicResSize =  m_iWidth * m_iHeight * 3 >> 1;
 
   pYUV[0] = rand() % 256;
