@@ -185,6 +185,10 @@ int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePi
     pSvcParam->SUsedPicRect.iTop  = 0;
     pSvcParam->SUsedPicRect.iWidth = ((kpSrcPic->iPicWidth >> 1) << 1);
     pSvcParam->SUsedPicRect.iHeight = ((kpSrcPic->iPicHeight >> 1) << 1);
+    if((pSvcParam->SUsedPicRect.iWidth<16)||((pSvcParam->SUsedPicRect.iHeight<16))){
+      WelsLog ( & (pCtx->sLogCtx), WELS_LOG_ERROR, "Don't support width(%d) or height(%d) which is less than 16 ",pSvcParam->SUsedPicRect.iWidth,pSvcParam->SUsedPicRect.iHeight);
+      return -1;
+    }
     if (WelsPreprocessReset (pCtx) != 0)
       return -1;
 
