@@ -264,7 +264,14 @@ int32_t CWelsDecoder::ResetDecoder() {
   if (m_pDecContext != NULL && m_pWelsTrace != NULL) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "ResetDecoder(), context error code is %d",
              m_pDecContext->iErrorCode);
-    return InitDecoder (m_pDecContext->bParseOnly);
+    SDecodingParam sPrevParam;
+    memcpy (&sPrevParam, m_pDecContext->pParam, sizeof (SDecodingParam));
+
+    int32_t iRet = InitDecoder (m_pDecContext->bParseOnly);
+    if (iRet)
+      return iRet;
+
+    return DecoderConfigParam (m_pDecContext, &sPrevParam);
   } else if (m_pWelsTrace != NULL) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "ResetDecoder() failed as decoder context null");
   }
@@ -308,7 +315,7 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
 
     iVal = * ((int*)pOption); // int value for error concealment idc
     iVal = WELS_CLIP3 (iVal, (int32_t) ERROR_CON_DISABLE, (int32_t) ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE);
-    m_pDecContext->eErrorConMethod = (ERROR_CON_IDC) iVal;
+    m_pDecContext->pParam->eEcActiveIdc = m_pDecContext->eErrorConMethod = (ERROR_CON_IDC) iVal;
     if ((m_pDecContext->bParseOnly) && (m_pDecContext->eErrorConMethod != ERROR_CON_DISABLE)) {
       WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
                "CWelsDecoder::SetOption for ERROR_CON_IDC = %d not allowd for parse only!.", iVal);
