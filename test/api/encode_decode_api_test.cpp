@@ -147,11 +147,11 @@ class EncodeDecodeTestBase : public BaseEncoderTest, public BaseDecoderTest {
 
 
   virtual int GetRandWidth() {
-    return WelsClip3 ((((rand() % MAX_WIDTH) >> 1) + 1) << 1, 2, MAX_WIDTH);
+    return WelsClip3 ((((rand() % MAX_WIDTH) >> 1) + 1) << 1, 16, MAX_WIDTH);
   }
 
   virtual int GetRandHeight() {
-    return WelsClip3 ((((rand() % MAX_HEIGHT) >> 1) + 1) << 1, 2, MAX_HEIGHT);
+    return WelsClip3 ((((rand() % MAX_HEIGHT) >> 1) + 1) << 1, 16, MAX_HEIGHT);
   }
 
  protected:
