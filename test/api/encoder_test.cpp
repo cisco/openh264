@@ -131,7 +131,7 @@ static const EncodeFileParam kFileParamArray[] = {
   },
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    "a4707845cacc437fb52010eb020fca6d4bc1102d", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SINGLE_SLICE, false, 4, false, false, false
+    "2b5965c752e1f722592c3ce9a1eb82445c9dbaa3", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SINGLE_SLICE, false, 4, false, false, false
   },
   // the following values may be adjusted for times since we start tuning the strategy
   {
