@@ -62,10 +62,16 @@ CFLAGS += -fsanitize=address
 LDFLAGS += -fsanitize=address
 endif
 
+ifneq (,$findstring($(OS),netbsd openbsd freebsd))
+OSCLASS=bsd
+else
+OSCLASS=$(OS)
+endif
+
 # Make sure the all target is the first one
 all: libraries binaries
 
-include $(SRC_PATH)build/platform-$(OS).mk
+include $(SRC_PATH)build/platform-$(OSCLASS).mk
 
 
 CFLAGS += -DGENERATED_VERSION_HEADER

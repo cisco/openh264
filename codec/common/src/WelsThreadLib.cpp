@@ -504,7 +504,12 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* p
 
   size_t len = sizeof (pInfo->ProcessorCount);
 
+#if defined(__OpenBSD__)
+  int scname[] = { CTL_HW, HW_NCPU };
+  if (sysctl (scname, 2, &pInfo->ProcessorCount, &len, NULL, 0) == -1)
+#else
   if (sysctlbyname (HW_NCPU_NAME, &pInfo->ProcessorCount, &len, NULL, 0) == -1)
+#endif
     pInfo->ProcessorCount = 1;
 
   return WELS_THREAD_ERROR_OK;
