@@ -35,7 +35,7 @@ STATIC_LDFLAGS=-lstdc++
 
 VERSION=1.4
 SHAREDLIBVERSION=0
-
+#
 ifeq (,$(wildcard $(SRC_PATH)gmp-api))
 HAVE_GMP_API=No
 else
