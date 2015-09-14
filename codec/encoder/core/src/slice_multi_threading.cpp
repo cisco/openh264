@@ -1008,7 +1008,7 @@ int32_t FiredSliceThreads (sWelsEncCtx* pCtx, SSliceThreadPrivateData* pPriData,
 
   iIdx = 0;
   while (iIdx < kiEventCnt) {
-	pPriData[iIdx].pFrameBsInfo = pFrameBsInfo;
+    pPriData[iIdx].pFrameBsInfo = pFrameBsInfo;
     pPriData[iIdx].iSliceIndex  = iIdx;
     SetOneSliceBsBufferUnderMultithread (pCtx, iIdx, iIdx);
     if (pEventsList[iIdx])

@@ -66,11 +66,11 @@ typedef HalveDownsampleFunc*    PHalveDownsampleFunc;
 typedef SpecificDownsampleFunc* PSpecificDownsampleFunc;
 typedef GeneralDownsampleFunc*  PGeneralDownsampleFunc;
 
-HalveDownsampleFunc		DyadicBilinearDownsampler_c;
+HalveDownsampleFunc     DyadicBilinearDownsampler_c;
 GeneralDownsampleFunc GeneralBilinearFastDownsampler_c;
 GeneralDownsampleFunc GeneralBilinearAccurateDownsampler_c;
 SpecificDownsampleFunc  DyadicBilinearOneThirdDownsampler_c;
-SpecificDownsampleFunc	DyadicBilinearQuarterDownsampler_c;
+SpecificDownsampleFunc  DyadicBilinearQuarterDownsampler_c;
 
 typedef struct {
   // align_index: 0 = x32; 1 = x16; 2 = x8; 3 = common case left;
