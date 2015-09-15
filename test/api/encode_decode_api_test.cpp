@@ -36,7 +36,7 @@ using namespace WelsCommon;
 #define LONG_TERM_REF_NUM_SCREEN (4)
 #define MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA (6)
 #define MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN (8)
-
+#define VALID_SIZE(iSize) (((iSize)>16)?(iSize):16)
 #define GET_MB_WIDTH(x) (((x) + 15)/16)
 
 typedef struct SLost_Sim {
@@ -3372,7 +3372,8 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVC_SPS_PPS_LISTING) {
   float fFrameRate = rand() + 0.5f;
   int iEncFrameNum = WelsClip3 ((rand() % ENCODE_FRAME_NUM) + 1, 1, ENCODE_FRAME_NUM);
   int iSliceNum        = 1;
-
+  iWidth = VALID_SIZE(iWidth);
+  iHeight = VALID_SIZE(iHeight);
   // prepare params
   SEncParamExt   sParam1;
   SEncParamExt   sParam2;
