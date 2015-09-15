@@ -382,7 +382,7 @@ comp_ds_bilinear_onethird_loop0:
     add lr, #48
     cmp lr, r4
     movcs lr, #0
-    addcs r6, r3, lsl #1
+    addcs r6, r6, r3, lsl #1
     addcs r6, r6, r3
     movcs r2, r6
     addcs r7, r2, r3
@@ -441,7 +441,7 @@ comp_ds_bilinear_quarter_loop0:
     add lr, #64
     cmp lr, r4
     movcs lr, #0
-    addcs r6, r3, lsl #2
+    addcs r6, r6, r3, lsl #2
     movcs r2, r6
     addcs r7, r2, r3
     addcs r8, r1
