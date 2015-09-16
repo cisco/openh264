@@ -401,36 +401,36 @@ static inline void McHorVer22WidthEq16_sse2 (const uint8_t* pSrc, int32_t iSrcSt
 }
 
 void McHorVer20Width5Or9Or17_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-		int32_t iWidth, int32_t iHeight) {
-	if (iWidth == 17 || iWidth == 9)
-		McHorVer20Width9Or17_sse2 (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
-	else //if (iWidth == 5)
-		McHorVer20Width5_sse2 (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
+        int32_t iWidth, int32_t iHeight) {
+    if (iWidth == 17 || iWidth == 9)
+        McHorVer20Width9Or17_sse2 (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
+    else //if (iWidth == 5)
+        McHorVer20Width5_sse2 (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
 }
 
 void McHorVer02Height5Or9Or17_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-		int32_t iWidth, int32_t iHeight) {
-	if (iWidth == 16 || iWidth == 8)
-		McHorVer02Height9Or17_sse2 (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
-	else //if (iWidth == 4)
-		McHorVer02Height5_sse2 (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
+        int32_t iWidth, int32_t iHeight) {
+    if (iWidth == 16 || iWidth == 8)
+        McHorVer02Height9Or17_sse2 (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
+    else //if (iWidth == 4)
+        McHorVer02Height5_sse2 (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
 }
 
 void McHorVer22Width5Or9Or17Height5Or9Or17_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-		int32_t iWidth, int32_t iHeight) {
-	ENFORCE_STACK_ALIGN_2D (int16_t, pTap, 22, 24, 16)
-	if (iWidth == 17 || iWidth == 9){
-		int32_t tmp1 = 2 * (iWidth - 8);
-		McHorVer22HorFirst_sse2 (pSrc - 2, iSrcStride, (uint8_t*)pTap, 48, iWidth, iHeight + 5);
-		McHorVer22Width8VerLastAlign_sse2 ((uint8_t*)pTap,  48, pDst, iDstStride, iWidth - 1, iHeight);
-		McHorVer22Width8VerLastUnAlign_sse2 ((uint8_t*)pTap + tmp1,  48, pDst + iWidth - 8, iDstStride, 8, iHeight);
-	}
-	else{ //if(iWidth == 5)
-		int32_t tmp1 = 2 * (iWidth - 4);
-		McHorVer22Width5HorFirst_sse2 (pSrc - 2, iSrcStride, (uint8_t*)pTap, 48, iWidth, iHeight + 5);
-		McHorVer22Width4VerLastAlign_sse2 ((uint8_t*)pTap,  48, pDst, iDstStride, iWidth - 1, iHeight);
-		McHorVer22Width4VerLastUnAlign_sse2 ((uint8_t*)pTap + tmp1,  48, pDst + iWidth - 4, iDstStride, 4, iHeight);
-	} 
+        int32_t iWidth, int32_t iHeight) {
+    ENFORCE_STACK_ALIGN_2D (int16_t, pTap, 22, 24, 16)
+    if (iWidth == 17 || iWidth == 9){
+        int32_t tmp1 = 2 * (iWidth - 8);
+        McHorVer22HorFirst_sse2 (pSrc - 2, iSrcStride, (uint8_t*)pTap, 48, iWidth, iHeight + 5);
+        McHorVer22Width8VerLastAlign_sse2 ((uint8_t*)pTap,  48, pDst, iDstStride, iWidth - 1, iHeight);
+        McHorVer22Width8VerLastUnAlign_sse2 ((uint8_t*)pTap + tmp1,  48, pDst + iWidth - 8, iDstStride, 8, iHeight);
+    }
+    else{ //if(iWidth == 5)
+        int32_t tmp1 = 2 * (iWidth - 4);
+        McHorVer22Width5HorFirst_sse2 (pSrc - 2, iSrcStride, (uint8_t*)pTap, 48, iWidth, iHeight + 5);
+        McHorVer22Width4VerLastAlign_sse2 ((uint8_t*)pTap,  48, pDst, iDstStride, iWidth - 1, iHeight);
+        McHorVer22Width4VerLastUnAlign_sse2 ((uint8_t*)pTap + tmp1,  48, pDst + iWidth - 4, iDstStride, 4, iHeight);
+    }
 
 }
 
