@@ -7,7 +7,7 @@ vpath %.S $(SRC_PATH)
 vpath %.rc $(SRC_PATH)
 vpath %.pc.in $(SRC_PATH)
 
-OS=$(shell uname | tr A-Z a-z | tr -d \\-[:digit:].)
+OS=$(shell uname | tr A-Z a-z | tr -d \\-[:digit:]. | sed -E 's/^(net|open|free)bsd/bsd/')
 ARCH=$(shell uname -m)
 LIBPREFIX=lib
 LIBSUFFIX=a
