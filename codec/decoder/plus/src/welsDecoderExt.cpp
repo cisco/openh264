@@ -198,11 +198,7 @@ long CWelsDecoder::Initialize (const SDecodingParam* pParam) {
   }
 
   // H.264 decoder initialization,including memory allocation,then open it ready to decode
-  iRet = InitDecoder (pParam->bParseOnly);
-  if (iRet)
-    return iRet;
-
-  iRet = DecoderConfigParam (m_pDecContext, pParam);
+  iRet = InitDecoder (pParam);
   if (iRet)
     return iRet;
 
@@ -241,11 +237,11 @@ void CWelsDecoder::UninitDecoder (void) {
 }
 
 // the return value of this function is not suitable, it need report failure info to upper layer.
-int32_t CWelsDecoder::InitDecoder (const bool bParseOnly) {
+int32_t CWelsDecoder::InitDecoder (const SDecodingParam* pParam) {
 
   WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
            "CWelsDecoder::init_decoder(), openh264 codec version = %s, ParseOnly = %d",
-           VERSION_NUMBER, (int32_t)bParseOnly);
+           VERSION_NUMBER, (int32_t)pParam->bParseOnly);
 
   if (m_pDecContext) //free
     UninitDecoder();
@@ -256,7 +252,17 @@ int32_t CWelsDecoder::InitDecoder (const bool bParseOnly) {
   m_pDecContext->pMemAlign = new CMemoryAlign (iCacheLineSize);
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == m_pDecContext->pMemAlign), UninitDecoder())
 
-  return WelsInitDecoder (m_pDecContext, bParseOnly, &m_pWelsTrace->m_sLogCtx);
+  WELS_VERIFY_RETURN_PROC_IF (cmInitParaError, WelsInitDecoder (m_pDecContext, pParam->bParseOnly,
+                              &m_pWelsTrace->m_sLogCtx), UninitDecoder())
+
+  //check param and update decoder context
+  m_pDecContext->pParam = (SDecodingParam*) m_pDecContext->pMemAlign->WelsMallocz (sizeof (SDecodingParam),
+                          "SDecodingParam");
+  WELS_VERIFY_RETURN_PROC_IF (cmMallocMemeError, (NULL == m_pDecContext->pParam), UninitDecoder());
+  int32_t iRet = DecoderConfigParam (m_pDecContext, pParam);
+  WELS_VERIFY_RETURN_IFNEQ (iRet, cmResultSuccess);
+
+  return cmResultSuccess;
 }
 
 int32_t CWelsDecoder::ResetDecoder() {
@@ -267,11 +273,7 @@ int32_t CWelsDecoder::ResetDecoder() {
     SDecodingParam sPrevParam;
     memcpy (&sPrevParam, m_pDecContext->pParam, sizeof (SDecodingParam));
 
-    int32_t iRet = InitDecoder (m_pDecContext->bParseOnly);
-    if (iRet)
-      return iRet;
-
-    return DecoderConfigParam (m_pDecContext, &sPrevParam);
+    WELS_VERIFY_RETURN_PROC_IF (cmInitParaError, InitDecoder (&sPrevParam), UninitDecoder());
   } else if (m_pWelsTrace != NULL) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "ResetDecoder() failed as decoder context null");
   }

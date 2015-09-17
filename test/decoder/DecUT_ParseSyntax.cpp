@@ -58,40 +58,6 @@ DECODING_STATE DecodeFrame (const unsigned char* kpSrc,
   return dsErrorFree;
 }
 
-
-int32_t InitDecoder (const bool bParseOnly, PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
-
-
-  if (NULL == pCtx)
-    return cmMallocMemeError;
-
-  if (NULL == pCtx->pMemAlign) {
-    pCtx->pMemAlign = new CMemoryAlign (16);
-    if (NULL == pCtx->pMemAlign)
-      return cmMallocMemeError;
-  }
-
-  return WelsInitDecoder (pCtx, bParseOnly, pLogCtx);
-}
-
-long Initialize (const SDecodingParam* pParam, PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
-  int iRet = ERR_NONE;
-  if (pParam == NULL) {
-    return cmInitParaError;
-  }
-
-  // H.264 decoder initialization,including memory allocation,then open it ready to decode
-  iRet = InitDecoder (pParam->bParseOnly, pCtx, pLogCtx);
-  if (iRet)
-    return iRet;
-
-  iRet = DecoderConfigParam (pCtx, pParam);
-  if (iRet)
-    return iRet;
-
-  return cmResultSuccess;
-}
-
 void UninitDecoder (PWelsDecoderContext pCtx) {
   if (NULL == pCtx)
     return;
@@ -107,6 +73,43 @@ void UninitDecoder (PWelsDecoderContext pCtx) {
   }
 
 }
+
+int32_t InitDecoder (const SDecodingParam* pParam, PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
+
+
+  if (NULL == pCtx)
+    return cmMallocMemeError;
+
+  if (NULL == pCtx->pMemAlign) {
+    pCtx->pMemAlign = new CMemoryAlign (16);
+    if (NULL == pCtx->pMemAlign)
+      return cmMallocMemeError;
+  }
+
+  WELS_VERIFY_RETURN_PROC_IF (cmInitParaError, WelsInitDecoder (pCtx, pParam->bParseOnly, pLogCtx), UninitDecoder (pCtx));
+  //check param and update decoder context
+  pCtx->pParam = (SDecodingParam*) pCtx->pMemAlign->WelsMallocz (sizeof (SDecodingParam), "SDecodingParam");
+  WELS_VERIFY_RETURN_PROC_IF (cmMallocMemeError, (NULL == pCtx->pParam), UninitDecoder (pCtx));
+  int32_t iRet = DecoderConfigParam (pCtx, pCtx->pParam);
+  WELS_VERIFY_RETURN_IFNEQ (iRet, cmResultSuccess);
+
+  return cmResultSuccess;
+}
+
+long Initialize (const SDecodingParam* pParam, PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
+  int iRet = ERR_NONE;
+  if (pParam == NULL) {
+    return cmInitParaError;
+  }
+
+  // H.264 decoder initialization,including memory allocation,then open it ready to decode
+  iRet = InitDecoder (pParam, pCtx, pLogCtx);
+  if (iRet)
+    return iRet;
+
+  return cmResultSuccess;
+}
+
 class DecoderParseSyntaxTest : public ::testing::Test {
  public:
   virtual void SetUp() {
