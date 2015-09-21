@@ -226,6 +226,41 @@ int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam,
   return iReturn;
 }
 
+void UpdateFrameNum(sWelsEncCtx* pEncCtx) {
+  bool bNeedFrameNumIncreasing = false;
+  for (int32_t i=0; i<MAX_DEPENDENCY_LAYER; i++) {
+    if (NRI_PRI_LOWEST != pEncCtx->eLastNalPriority[i]) {
+      bNeedFrameNumIncreasing = true;
+    }
+  }
+  if (bNeedFrameNumIncreasing) {
+    if (pEncCtx->iFrameNum < (1 << pEncCtx->pSps->uiLog2MaxFrameNum) - 1)
+      ++ pEncCtx->iFrameNum;
+    else
+      pEncCtx->iFrameNum = 0;    // if iFrameNum overflow
+  }
+  for (int32_t i=0; i<MAX_DEPENDENCY_LAYER; i++) {
+    pEncCtx->eLastNalPriority[i] = NRI_PRI_LOWEST;
+  }
+}
+
+
+void LoadBackFrameNum(sWelsEncCtx* pEncCtx) {
+    bool bNeedFrameNumIncreasing = false;
+    for (int32_t i=0; i<MAX_DEPENDENCY_LAYER; i++) {
+      if (NRI_PRI_LOWEST != pEncCtx->eLastNalPriority[i]) {
+        bNeedFrameNumIncreasing = true;
+      }
+    }
+    if (bNeedFrameNumIncreasing) {
+      if (pEncCtx->iFrameNum != 0) {
+        pEncCtx->iFrameNum --;
+      } else {
+        pEncCtx->iFrameNum = (1 << pEncCtx->pSps->uiLog2MaxFrameNum) - 1;
+      }
+    }
+}
+
 /*!
  * \brief   initialize frame coding
  */
@@ -245,12 +280,8 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType) {
     else
       pEncCtx->iPOC = 0;
 
-    if (pEncCtx->eLastNalPriority != 0) {
-      if (pEncCtx->iFrameNum < (1 << pEncCtx->pSps->uiLog2MaxFrameNum) - 1)
-        ++ pEncCtx->iFrameNum;
-      else
-        pEncCtx->iFrameNum = 0;    // if iFrameNum overflow
-    }
+    UpdateFrameNum(pEncCtx);
+
     pEncCtx->eNalType           = NAL_UNIT_CODED_SLICE;
     pEncCtx->eSliceType         = P_SLICE;
     pEncCtx->eNalPriority       = NRI_PRI_HIGH;
@@ -275,12 +306,7 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType) {
     else
       pEncCtx->iPOC = 0;
 
-    if (pEncCtx->eLastNalPriority != 0) {
-      if (pEncCtx->iFrameNum < (1 << pEncCtx->pSps->uiLog2MaxFrameNum) - 1)
-        ++ pEncCtx->iFrameNum;
-      else
-        pEncCtx->iFrameNum = 0;    // if iFrameNum overflow
-    }
+    UpdateFrameNum(pEncCtx);
 
     pEncCtx->eNalType     = NAL_UNIT_CODED_SLICE;
     pEncCtx->eSliceType   = I_SLICE;
