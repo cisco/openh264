@@ -83,6 +83,7 @@ int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* _param,
  * \brief   initialize frame coding
  */
 void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType);
+void LoadBackFrameNum(sWelsEncCtx* pEncCtx);
 
 EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum);
 
