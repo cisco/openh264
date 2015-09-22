@@ -2360,6 +2360,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       if (uiNalRefIdc > 0) {
         iRet = WelsMarkAsRef (pCtx);
         if (iRet != ERR_NONE) {
+          if (iRet == ERR_INFO_DUPLICATE_FRAME_NUM)
+            pCtx->iErrorCode |= dsBitstreamError;
           if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
             pCtx->pDec = NULL;
             return iRet;
