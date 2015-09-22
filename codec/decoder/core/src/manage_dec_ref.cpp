@@ -294,6 +294,7 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
       if (iRet != ERR_NONE) {
         if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
           iRet = RemainOneBufferInDpbForEC (pCtx);
+          WELS_VERIFY_RETURN_IF (iRet, iRet);
         } else {
           return iRet;
         }
@@ -309,6 +310,7 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
       if (iRet != ERR_NONE) {
         if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
           iRet = RemainOneBufferInDpbForEC (pCtx);
+          WELS_VERIFY_RETURN_IF (iRet, iRet);
         } else {
           return iRet;
         }
@@ -320,11 +322,12 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
     if (pRefPic->uiLongRefCount[LIST_0] + pRefPic->uiShortRefCount[LIST_0] >= WELS_MAX (1, pCtx->pSps->iNumRefFrames)) {
       if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
         iRet = RemainOneBufferInDpbForEC (pCtx);
+        WELS_VERIFY_RETURN_IF (iRet, iRet);
       } else {
         return ERR_INFO_INVALID_MMCO_REF_NUM_OVERFLOW;
       }
     }
-    AddShortTermToList (pRefPic, pCtx->pDec);
+    iRet = AddShortTermToList (pRefPic, pCtx->pDec);
   }
 
   return iRet;
@@ -515,6 +518,15 @@ static int32_t AddShortTermToList (PRefPic pRefPic, PPicture pPic) {
   pPic->bIsLongRef = false;
   pPic->iLongTermFrameIdx = -1;
   if (pRefPic->uiShortRefCount[LIST_0] > 0) {
+    // Check the duplicate frame_num in short ref list
+    for (int32_t iPos = 0; iPos < pRefPic->uiShortRefCount[LIST_0]; iPos++) {
+      if (pPic->iFrameNum == pRefPic->pShortRefList[LIST_0][iPos]->iFrameNum) {
+        // Replace the previous ref pic with the new one with the same frame_num
+        pRefPic->pShortRefList[LIST_0][iPos] = pPic;
+        return ERR_INFO_DUPLICATE_FRAME_NUM;
+      }
+    }
+
     memmove (&pRefPic->pShortRefList[LIST_0][1], &pRefPic->pShortRefList[LIST_0][0],
              pRefPic->uiShortRefCount[LIST_0]*sizeof (PPicture));//confirmed_safe_unsafe_usage
   }
