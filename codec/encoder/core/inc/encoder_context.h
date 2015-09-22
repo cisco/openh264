@@ -156,7 +156,7 @@ typedef struct TagWelsEncCtx {
   EWelsSliceType    eSliceType;             // currently coding slice type
   EWelsNalUnitType  eNalType;               // NAL type
   EWelsNalRefIdc    eNalPriority;           // NAL_Reference_Idc currently
-  EWelsNalRefIdc    eLastNalPriority;       // NAL_Reference_Idc in last frame
+  EWelsNalRefIdc    eLastNalPriority[MAX_DEPENDENCY_LAYER];       // NAL_Reference_Idc in last frame
   uint8_t           iNumRef0;
 
   uint8_t           uiDependencyId;         // Idc of dependecy layer to be coded

@@ -3481,7 +3481,7 @@ int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst) {
   pLayerBsInfo->uiLayerType   = NON_VIDEO_CODING_LAYER;
   pLayerBsInfo->iNalCount     = iCountNal;
 
-  pCtx->eLastNalPriority      = NRI_PRI_HIGHEST;
+  //pCtx->eLastNalPriority      = NRI_PRI_HIGHEST;
   pFbi->iLayerNum             = 1;
   pFbi->eFrameType            = videoFrameTypeInvalid;
 
@@ -3712,17 +3712,10 @@ void StackBackEncoderStatus (sWelsEncCtx* pEncCtx,
       pEncCtx->iPOC = (1 << pEncCtx->pSps->iLog2MaxPocLsb) - 2;
     }
 
-    if (pEncCtx->eLastNalPriority != 0) {
-      if (pEncCtx->iFrameNum != 0) {
-        pEncCtx->iFrameNum --;
-      } else {
-        pEncCtx->iFrameNum = (1 << pEncCtx->pSps->uiLog2MaxFrameNum) - 1;
-      }
-    }
-
+    LoadBackFrameNum(pEncCtx);
     pEncCtx->eNalType     = NAL_UNIT_CODED_SLICE;
     pEncCtx->eSliceType   = P_SLICE;
-    pEncCtx->eNalPriority = pEncCtx->eLastNalPriority;
+    //pEncCtx->eNalPriority = pEncCtx->eLastNalPriority; //not need this since eNalPriority will be updated at the beginning of coding a frame
   } else if (keFrameType == videoFrameTypeIDR) {
     pEncCtx->uiIdrPicId --;
 
@@ -3865,7 +3858,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   while (iSpatialIdx < iSpatialNum) {
     const int32_t iDidIdx       = (pSpatialIndexMap + iSpatialIdx)->iDid;       // get iDid
     SSpatialLayerConfig* pParam = &pSvcParam->sSpatialLayers[iDidIdx];
-    int32_t  iDecompositionStages = pSvcParam->sDependencyLayers[iSpatialIdx].iDecompositionStages;
+    int32_t  iDecompositionStages = pSvcParam->sDependencyLayers[iDidIdx].iDecompositionStages;
     pCtx->uiDependencyId        = iCurDid = (int8_t)iDidIdx;
     pCtx->pVpp->AnalyzeSpatialPic (pCtx, iDidIdx);
 
@@ -4387,6 +4380,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 #endif//#if defined(MT_DEBUG)
     }
 
+    pCtx->eLastNalPriority[iDidIdx] = eNalRefIdc;
     ++ iSpatialIdx;
 
     if (iCurDid + 1 < pSvcParam->iSpatialLayerNum) {
@@ -4447,7 +4441,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   }
 
   ++ pCtx->iCodingIndex;
-  pCtx->eLastNalPriority = eNalRefIdc;
   pFbi->iLayerNum = iLayerNum;
   pFbi->iSubSeqId = GetSubSequenceId (pCtx, eFrameType);
 
