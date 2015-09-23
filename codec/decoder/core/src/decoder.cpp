@@ -525,19 +525,20 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
   if (NULL == pCtx || NULL == kpParam)
     return 1;
 
-  CMemoryAlign* pMa = pCtx->pMemAlign;
-
-  pCtx->pParam = (SDecodingParam*)pMa->WelsMallocz (sizeof (SDecodingParam), "SDecodingParam");
-
-  if (NULL == pCtx->pParam)
-    return 1;
-
   memcpy (pCtx->pParam, kpParam, sizeof (SDecodingParam));
   pCtx->eOutputColorFormat = pCtx->pParam->eOutputColorFormat;
   if (!pCtx->bParseOnly) {
     int32_t iRet = DecoderSetCsp (pCtx, pCtx->pParam->eOutputColorFormat);
     if (iRet)
       return iRet;
+  }
+  if ((pCtx->pParam->eEcActiveIdc > ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE)
+      || (pCtx->pParam->eEcActiveIdc < ERROR_CON_DISABLE)) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
+             "eErrorConMethod (%D) not in range: (%d - %d). Set as default value: (%d).", pCtx->pParam->eEcActiveIdc,
+             ERROR_CON_DISABLE, ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE,
+             ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE);
+    pCtx->pParam->eEcActiveIdc = ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
   }
   pCtx->eErrorConMethod = pCtx->pParam->eEcActiveIdc;
 
