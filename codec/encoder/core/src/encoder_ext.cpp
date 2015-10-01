@@ -3116,8 +3116,6 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
 
 static inline void WelsSwapDqLayers (sWelsEncCtx* pCtx, const int32_t kiNextDqIdx) {
   // swap and assign reference
-  const int32_t kiDid           = pCtx->uiDependencyId;
-
   SDqLayer* pTmpLayer           = pCtx->ppDqLayerList[kiNextDqIdx];
   SDqLayer* pRefLayer           = pCtx->pCurDqLayer;
   pCtx->pCurDqLayer             = pTmpLayer;
