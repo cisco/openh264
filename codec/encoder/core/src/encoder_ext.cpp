@@ -3114,10 +3114,9 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
  * \brief   swap pDq layers between current pDq layer and reference pDq layer
  */
 
-static inline void WelsSwapDqLayers (sWelsEncCtx* pCtx) {
+static inline void WelsSwapDqLayers (sWelsEncCtx* pCtx, const int32_t kiNextDqIdx) {
   // swap and assign reference
   const int32_t kiDid           = pCtx->uiDependencyId;
-  const int32_t kiNextDqIdx     = 1 + kiDid;
 
   SDqLayer* pTmpLayer           = pCtx->ppDqLayerList[kiNextDqIdx];
   SDqLayer* pRefLayer           = pCtx->pCurDqLayer;
@@ -4384,7 +4383,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     ++ iSpatialIdx;
 
     if (iCurDid + 1 < pSvcParam->iSpatialLayerNum) {
-      WelsSwapDqLayers (pCtx);
+      //for next layer, note that iSpatialIdx has been ++ so it is pointer to next layer
+      WelsSwapDqLayers (pCtx, (pSpatialIndexMap + iSpatialIdx)->iDid);
     }
 
     if (pCtx->pVpp->UpdateSpatialPictures (pCtx, pSvcParam, iCurTid, iDidIdx) != 0) {
@@ -4400,7 +4400,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         && (pCtx->pLtr[pCtx->uiDependencyId].iLTRMarkMode == LTR_DIRECT_MARK)) || eFrameType == videoFrameTypeIDR)) {
       pCtx->bRefOfCurTidIsLtr[iDidIdx][iCurTid] = true;
     }
-  }
+  }//end of (iSpatialIdx/iSpatialNum)
 
   if (ENC_RETURN_CORRECTED == pCtx->iEncoderError) {
     pCtx->pVpp->UpdateSpatialPictures (pCtx, pSvcParam, iCurTid, (pSpatialIndexMap + iSpatialIdx)->iDid);
@@ -4448,8 +4448,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
            iLayerNum,
            pFbi->iSubSeqId, iFrameSize);
   for (int32_t i = 0; i < iLayerNum; i++)
-    WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsEncoderEncodeExt() OutputInfo iLayerId = %d,iNalType = %d,iNalCount = %d", i,
-             pFbi->sLayerInfo[i].uiLayerType, pFbi->sLayerInfo[i].iNalCount);
+    WelsLog (pLogCtx, WELS_LOG_DEBUG,
+             "WelsEncoderEncodeExt() OutputInfo iLayerId = %d,iNalType = %d,iNalCount = %d, first Nal Length=%d", i,
+             pFbi->sLayerInfo[i].uiLayerType, pFbi->sLayerInfo[i].iNalCount, pFbi->sLayerInfo[i].pNalLengthInByte[0]);
   WelsEmms();
 
   pFbi->eFrameType = eFrameType;

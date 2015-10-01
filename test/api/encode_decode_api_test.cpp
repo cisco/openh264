@@ -3596,7 +3596,7 @@ TEST_P (EncodeTestAPI, SetEncOptionSize) {
 
 
 TEST_F (EncodeDecodeTestAPI, SimulcastAVCDiffFps) {
-//#define DEBUG_FILE_SAVE3
+//#define DEBUG_FILE_SAVE_SimulcastAVCDiffFps
   int iSpatialLayerNum = WelsClip3 ((rand() % MAX_SPATIAL_LAYER_NUM), 2, MAX_SPATIAL_LAYER_NUM);
   int iWidth       = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 1 << iSpatialLayerNum, MAX_WIDTH);
   int iHeight      = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1)  + 1) << 1, 1 << iSpatialLayerNum, MAX_HEIGHT);
@@ -3608,10 +3608,7 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVCDiffFps) {
 
   //set flag of bSimulcastAVC
   param_.bSimulcastAVC = true;
-  param_.iTemporalLayerNum = 3;
-
-  int rv = encoder_->InitializeExt (&param_);
-  ASSERT_TRUE (rv == cmResultSuccess);
+  param_.iTemporalLayerNum = (rand() % 2) ? 3 : 4;
 
   unsigned char*  pBsBuf[MAX_SPATIAL_LAYER_NUM];
   int aLen[MAX_SPATIAL_LAYER_NUM] = {0};
@@ -3648,10 +3645,10 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVCDiffFps) {
     ASSERT_EQ (0, rv);
   }
 
-#define PATTERN_NUM (16)
+#define PATTERN_NUM (18)
   const int32_t iTemporalPattern[PATTERN_NUM][MAX_SPATIAL_LAYER_NUM] = { {2, 1, 1, 1}, {2, 2, 2, 1}, {4, 1, 1, 1}, {4, 2, 1, 1},
-    {1, 2, 1, 1}, {1, 1, 2, 1}, {1, 4, 1, 1}, {2, 4, 2, 1}, {1, 4, 2, 1},
-    {1, 2, 2, 1}, {1, 2, 4, 1},
+    {1, 2, 1, 1}, {1, 1, 2, 1}, {1, 4, 1, 1}, {2, 4, 2, 1}, {1, 4, 2, 1}, {1, 4, 4, 1},
+    {1, 2, 2, 1}, {2, 1, 2, 1}, {1, 2, 4, 1},
     {1, 1, 1, 2}, {1, 2, 2, 2}, {1, 2, 2, 4}, {1, 2, 4, 2}, {1, 4, 4, 4},
   };
   for (int iPatternIdx = 0; iPatternIdx < PATTERN_NUM; iPatternIdx++) {
@@ -3659,7 +3656,11 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVCDiffFps) {
       param_.sSpatialLayers[i].fFrameRate = (fFrameRate / iTemporalPattern[iPatternIdx][i]);
     }
 
+    int rv = encoder_->InitializeExt (&param_);
+    ASSERT_TRUE (rv == cmResultSuccess);
+
     iEncFrameNum = 10;
+    int iInsertIdr = rand() % iEncFrameNum;
     for (int iFrame = 0; iFrame < iEncFrameNum; iFrame++) {
       int iResult;
       int iLayerLen = 0;
@@ -3668,7 +3669,11 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVCDiffFps) {
       InitialEncDec (param_.iPicWidth, param_.iPicHeight);
       EncodeOneFrame (0);
 
-      // init
+      if (iInsertIdr == iFrame) {
+        encoder_->ForceIntraFrame (true);
+      }
+
+      // init aLen for the current frame
       for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
         aLen[iIdx] = 0;
       }
@@ -3700,7 +3705,7 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVCDiffFps) {
           EXPECT_TRUE (iResult == cmResultSuccess) << "iResult=" << iResult << "LayerIdx=" << iIdx;
 
           iResult = decoder[iIdx]->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_);
-          EXPECT_TRUE (iResult == cmResultSuccess) << "iResult=" << iResult << "LayerIdx=" << iIdx;
+          EXPECT_TRUE (iResult == cmResultSuccess) << "iResult=" << iResult << "LayerIdx=" << iIdx << iPatternIdx;
           EXPECT_EQ (dstBufInfo_.iBufferStatus, 1) << "LayerIdx=" << iIdx;
         }
       }
@@ -3716,12 +3721,10 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVCDiffFps) {
     }
   }
 #ifdef DEBUG_FILE_SAVE_SimulcastAVCDiffFps
-  for (int i = 0; i <)MAX_SPATIAL_LAYER_NUM;
-  i++) {
+  for (int i = 0; i < MAX_SPATIAL_LAYER_NUM; i++) {
     fclose (fEnc[i]);
   }
 #endif
 }
-
 
 
