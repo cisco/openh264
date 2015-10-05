@@ -3458,6 +3458,9 @@ int32_t ForceCodingIDR (sWelsEncCtx* pCtx) {
   pCtx->bEncCurFrmAsIdrFlag = true;
   pCtx->iCodingIndex = 0;
   pCtx->bCheckWindowStatusRefreshFlag = false;
+
+  WelsLog (&pCtx->sLogCtx, WELS_LOG_INFO, "ForceCodingIDR at InputFrameCount=%d\n",
+           pCtx->sEncoderStatistics.uiInputFrameCount);
   return 0;
 }
 
