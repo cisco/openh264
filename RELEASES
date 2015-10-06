@@ -6,9 +6,8 @@ v1.5.0
 (since 3a75956fb2584cca84a95ba1fcbc72fa2c91f98d 3/5/2015 -- remove this line later)
 (is the desciption of constrain-hp support accurate?)
 - Added Codec demo and auto build script for WP8
-- Decoder support of transform_8x8_mode_flag=1
-- Decoder support of Scaling list syntax
-- Decoder/Encoder support of CABAC
+- Decoder support of 'Constrained High Profile' of H.264
+- Encoder support of CABAC of H.264
 - Encoder support of input frame rate 60
 - Improved syntax of gaps_in_frame_num_value_allowed_flag in encoder
 - Improved memory usage for multi-threading in encoder
@@ -20,6 +19,15 @@ v1.5.0
 - Fixes to avoid valgrind warnings, potential crash and calculation overflow
 - Merged files for decoder/encoder and remove unused files
 - Improvements on build scripts, UT, error-protection in decoder, input param checking in encoder, assembly for 64bit support, downsampling, logging and documentation
+
+Note:
+'Constrained High Profile' = 'Constrained Baseline Profile' plus:
+- CABAC
+- 8x8 transform
+- QP scaling matrices
+- QP per chroma component
+- Mono 4:0:0
+- Weighted prediction
 
 v1.4.0
 ------
