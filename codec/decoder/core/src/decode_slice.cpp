@@ -1453,7 +1453,7 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
     } else { //non-MB_TYPE_INTRA16x16
       if (pCurLayer->pTransformSize8x8Flag[iMbXy]) {
         for (iId8x8 = 0; iId8x8 < 4; iId8x8++) {
-          iMbResProperty = (IS_INTRA (pCurLayer->pMbType[iMbXy])) ? LUMA_DC_AC_INTRA : LUMA_DC_AC_INTER;
+          iMbResProperty = (IS_INTRA (pCurLayer->pMbType[iMbXy])) ? LUMA_DC_AC_INTRA_8 : LUMA_DC_AC_INTER_8;
           if (uiCbpL & (1 << iId8x8)) {
             int32_t iIndex = (iId8x8 << 2);
             for (iId4x4 = 0; iId4x4 < 4; iId4x4++) {
@@ -1815,7 +1815,7 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
     } else { //non-MB_TYPE_INTRA16x16
       if (pCurLayer->pTransformSize8x8Flag[iMbXy]) {
         for (iId8x8 = 0; iId8x8 < 4; iId8x8++) {
-          iMbResProperty = (IS_INTRA (pCurLayer->pMbType[iMbXy])) ? LUMA_DC_AC_INTRA : LUMA_DC_AC_INTER;
+          iMbResProperty = (IS_INTRA (pCurLayer->pMbType[iMbXy])) ? LUMA_DC_AC_INTRA_8 : LUMA_DC_AC_INTER_8;
           if (uiCbpL & (1 << iId8x8)) {
             int32_t iIndex = (iId8x8 << 2);
             for (iId4x4 = 0; iId4x4 < 4; iId4x4++) {
