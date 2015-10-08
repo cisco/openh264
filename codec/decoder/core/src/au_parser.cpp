@@ -837,31 +837,39 @@ bool CheckSpsActive (PWelsDecoderContext pCtx, PSps pSps, bool bUseSubsetFlag) {
   }
   // Pre-active, will be used soon
   if (bUseSubsetFlag) {
-    if (pSps->iMbWidth > 0  && pSps->iMbHeight > 0 && pCtx->bSubspsAvailFlags[pSps->iSpsId]
-        && pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
-      int i = 0, iNum = (int32_t) pCtx->pAccessUnitList->uiAvailUnitsNum;
-      while (i < iNum) {
-        PNalUnit pNalUnit = pCtx->pAccessUnitList->pNalUnitsList[i];
-        if (pNalUnit->sNalData.sVclNal.bSliceHeaderExtFlag) { //ext data
-          PSps pNextUsedSps = pNalUnit->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
-          if (pNextUsedSps->iSpsId == pSps->iSpsId)
-            return true;
+    if (pSps->iMbWidth > 0 && pSps->iMbHeight > 0 && pCtx->bSubspsAvailFlags[pSps->iSpsId]) {
+      if (pCtx->iTotalNumMbRec > 0) {
+        return true;
+      }
+      if (pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
+        int i = 0, iNum = (int32_t) pCtx->pAccessUnitList->uiAvailUnitsNum;
+        while (i < iNum) {
+          PNalUnit pNalUnit = pCtx->pAccessUnitList->pNalUnitsList[i];
+          if (pNalUnit->sNalData.sVclNal.bSliceHeaderExtFlag) { //ext data
+            PSps pNextUsedSps = pNalUnit->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
+            if (pNextUsedSps->iSpsId == pSps->iSpsId)
+              return true;
+          }
+          ++i;
         }
-        ++i;
       }
     }
   } else {
-    if (pSps->iMbWidth > 0  && pSps->iMbHeight > 0 && pCtx->bSpsAvailFlags[pSps->iSpsId]
-        && pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
-      int i = 0, iNum = (int32_t) pCtx->pAccessUnitList->uiAvailUnitsNum;
-      while (i < iNum) {
-        PNalUnit pNalUnit = pCtx->pAccessUnitList->pNalUnitsList[i];
-        if (!pNalUnit->sNalData.sVclNal.bSliceHeaderExtFlag) { //non-ext data
-          PSps pNextUsedSps = pNalUnit->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
-          if (pNextUsedSps->iSpsId == pSps->iSpsId)
-            return true;
+    if (pSps->iMbWidth > 0 && pSps->iMbHeight > 0 && pCtx->bSpsAvailFlags[pSps->iSpsId]) {
+      if (pCtx->iTotalNumMbRec > 0) {
+        return true;
+      }
+      if (pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
+        int i = 0, iNum = (int32_t) pCtx->pAccessUnitList->uiAvailUnitsNum;
+        while (i < iNum) {
+          PNalUnit pNalUnit = pCtx->pAccessUnitList->pNalUnitsList[i];
+          if (!pNalUnit->sNalData.sVclNal.bSliceHeaderExtFlag) { //non-ext data
+            PSps pNextUsedSps = pNalUnit->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
+            if (pNextUsedSps->iSpsId == pSps->iSpsId)
+              return true;
+          }
+          ++i;
         }
-        ++i;
       }
     }
   }
@@ -1035,8 +1043,8 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   pSps->bGapsInFrameNumValueAllowedFlag = !!uiCode;
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //pic_width_in_mbs_minus1
   pSps->iMbWidth = PIC_WIDTH_IN_MBS_OFFSET + uiCode;
-  if (pSps->iMbWidth > MAX_MB_SIZE) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "pic_width_in_mbs(%d) exceeds the maximum allowed!", pSps->iMbWidth);
+  if (pSps->iMbWidth > MAX_MB_SIZE || pSps->iMbWidth == 0) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "pic_width_in_mbs(%d) invalid!", pSps->iMbWidth);
     return  GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_MAX_MB_SIZE);
   }
   if (((uint64_t)pSps->iMbWidth * (uint64_t)pSps->iMbWidth) > (uint64_t) (8 * pSLevelLimits->uiMaxFS)) {
@@ -1045,8 +1053,8 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   }
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //pic_height_in_map_units_minus1
   pSps->iMbHeight = PIC_HEIGHT_IN_MAP_UNITS_OFFSET + uiCode;
-  if (pSps->iMbHeight > MAX_MB_SIZE) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "pic_height_in_mbs(%d) exceeds the maximum allowed!", pSps->iMbHeight);
+  if (pSps->iMbHeight > MAX_MB_SIZE || pSps->iMbHeight == 0) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "pic_height_in_mbs(%d) invalid!", pSps->iMbHeight);
     return  GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_MAX_MB_SIZE);
   }
   if (((uint64_t)pSps->iMbHeight * (uint64_t)pSps->iMbHeight) > (uint64_t) (8 * pSLevelLimits->uiMaxFS)) {
