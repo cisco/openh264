@@ -204,7 +204,7 @@ class EncodeDecodeTestAPIBase : public EncodeDecodeTestBase {
     if (0 == iCheckTypeIndex)
       ASSERT_TRUE (rv == cmResultSuccess);
     else if (1 == iCheckTypeIndex)
-      ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+      ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnknownReason);
   }
 
   void EncDecOneFrame (const int iWidth, const int iHeight, const int iFrame, FILE* pfEnc) {
@@ -990,7 +990,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_ALLLTR) {
     if (m_LTR_Recover_Request.uiFeedbackType == IDR_RECOVERY_REQUEST) {
       ASSERT_TRUE (info.eFrameType == videoFrameTypeIDR);
     }
-    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnknownReason);
     m_LTR_Recover_Request.uiFeedbackType = LTR_RECOVERY_REQUEST;
     m_LTR_Recover_Request.iCurrentFrameNum = rand() % 2 == 1 ? -rand() % 10000 : rand() % 10000;
     m_LTR_Recover_Request.uiIDRPicId = rand() % 2 == 1 ? -rand() % 10000 : rand() % 10000;
@@ -2277,7 +2277,7 @@ class DecodeCrashTestAPI : public ::testing::TestWithParam<EncodeDecodeFileParam
     memset (buf_.data(), iRandValue, (frameSize >> 2));
     memset (buf_.data() + (frameSize >> 2), rand() % 256, (frameSize - (frameSize >> 2)));
     int rv = encoder_->EncodeFrame (&EncPic, &info);
-    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnknownReason);
   }
  protected:
   unsigned char* ucBuf_;
@@ -2562,7 +2562,7 @@ class DecodeParseAPI : public ::testing::TestWithParam<EncodeDecodeFileParamBase
       ASSERT_TRUE (iSize == iFrameSize);
     }
     int rv = encoder_->EncodeFrame (&EncPic, &info);
-    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason);
+    ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnknownReason);
   }
 
   void prepareParam (int iLayerNum, int iSliceNum, int width, int height, float framerate, SEncParamExt* pParam) {
@@ -3505,7 +3505,7 @@ class EncodeTestAPI : public ::testing::TestWithParam<EncodeOptionParam>, public
     if (0 == iCheckTypeIndex)
       ASSERT_TRUE (rv == cmResultSuccess) << "rv=" << rv;
     else if (1 == iCheckTypeIndex)
-      ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnkonwReason) << "rv=" << rv;
+      ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnknownReason) << "rv=" << rv;
   }
 };
 
