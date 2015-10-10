@@ -358,13 +358,15 @@ static inline int32_t GetTargetRefListSize (PWelsDecoderContext pCtx) {
 /*
  *  request memory blocks for decoder avc part
  */
-int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight) {
+int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight,
+                        bool& bReallocFlag) {
   const int32_t kiPicWidth      = kiMbWidth << 4;
   const int32_t kiPicHeight     = kiMbHeight << 4;
   int32_t iErr = ERR_NONE;
 
   int32_t iListIdx              = 0;    //, mb_blocks   = 0;
   int32_t iPicQueueSize         = 0;    // adaptive size of picture queue, = (pSps->iNumRefFrames x 2)
+  bReallocFlag                  = false;
   bool  bNeedChangePicQueue     = true;
   CMemoryAlign* pMa = pCtx->pMemAlign;
 
@@ -434,6 +436,8 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
   if (pCtx->pCabacDecEngine == NULL)
     pCtx->pCabacDecEngine = (SWelsCabacDecEngine*) pMa->WelsMallocz (sizeof (SWelsCabacDecEngine), "pCtx->pCabacDecEngine");
   WELS_VERIFY_RETURN_IF (ERR_INFO_OUT_OF_MEMORY, (NULL == pCtx->pCabacDecEngine))
+
+  bReallocFlag              = true;         // memory re-allocation successfully finished
   return ERR_NONE;
 }
 
@@ -836,7 +840,8 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
   const int32_t kiPicWidth    = kiMbWidth << 4;
   const int32_t kiPicHeight   = kiMbHeight << 4;
 
-  iErr = WelsRequestMem (pCtx, kiMbWidth, kiMbHeight); // common memory used
+  bool bReallocFlag = false;
+  iErr = WelsRequestMem (pCtx, kiMbWidth, kiMbHeight, bReallocFlag); // common memory used
   if (ERR_NONE != iErr) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
              "SyncPictureResolutionExt()::WelsRequestMem--buffer allocated failure.");
@@ -851,8 +856,10 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
     pCtx->iErrorCode = dsOutOfMemory;
   }
 #if defined(MEMORY_MONITOR)
-  WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "SyncPictureResolutionExt(), overall memory usage: %llu bytes",
-           static_cast<unsigned long long> (sizeof (SWelsDecoderContext) + pCtx->pMemAlign->WelsGetMemoryUsage()));
+  if (bReallocFlag) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "SyncPictureResolutionExt(), overall memory usage: %llu bytes",
+             static_cast<unsigned long long> (sizeof (SWelsDecoderContext) + pCtx->pMemAlign->WelsGetMemoryUsage()));
+  }
 #endif//MEMORY_MONITOR
   return iErr;
 }
