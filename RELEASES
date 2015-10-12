@@ -3,8 +3,6 @@ Releases
 -----------
 v1.5.0
 ------
-(since 3a75956fb2584cca84a95ba1fcbc72fa2c91f98d 3/5/2015 -- remove this line later)
-(is the desciption of constrain-hp support accurate?)
 - Correct a typo in codec return value (github issue#2046, cmUnkonwReason -> cmUnknownReason)
 - Added Codec demo and auto build script for WP8
 - Decoder support of 'Constrained High Profile' of H.264
@@ -27,7 +25,7 @@ Note:
 - 8x8 transform
 - QP scaling matrices
 - QP per chroma component
-- Mono 4:0:0
+- Mono 4:0:0 (experimental)
 - Weighted prediction
 
 v1.4.0
