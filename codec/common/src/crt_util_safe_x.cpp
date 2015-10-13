@@ -75,8 +75,8 @@ int32_t WelsSnprintf (char* pBuffer,  int32_t iSizeOfBuffer, const char* kpForma
   return iRc;
 }
 
-char* WelsStrncpy (char* pDest, uint32_t uiSizeInBytes, const char* kpSrc) {
-  strncpy_s (pDest, uiSizeInBytes, kpSrc, _TRUNCATE);
+char* WelsStrncpy (char* pDest, int32_t iSizeInBytes, const char* kpSrc) {
+  strncpy_s (pDest, iSizeInBytes, kpSrc, _TRUNCATE);
 
   return pDest;
 }
