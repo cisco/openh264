@@ -243,7 +243,7 @@ int32_t WelsStrftime (char* pBuffer, int32_t iSize, const char* kpFormat, const 
 
 
 char* WelsStrcat (char* pDest, uint32_t uiSizeInBytes, const char* kpSrc) {
-  uint32_t uiCurLen = strlen (pDest);
+  uint32_t uiCurLen = (uint32_t) strlen (pDest);
   if (uiSizeInBytes > uiCurLen)
     return WelsStrncpy (pDest + uiCurLen, uiSizeInBytes - uiCurLen, kpSrc);
   return pDest;
