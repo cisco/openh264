@@ -79,7 +79,7 @@ typedef struct TagWelsTime {
 
 int32_t   WelsSnprintf (char* buffer,  int32_t sizeOfBuffer,  const char* format, ...);
 char*   WelsStrncpy (char* dest, int32_t sizeInBytes, const char* src);
-char*   WelsStrcat (char* dest, int32_t sizeInBytes, const char* src);
+char*   WelsStrcat (char* dest, uint32_t sizeInBytes, const char* src);
 int32_t   WelsVsnprintf (char* buffer, int32_t sizeOfBuffer, const char* format, va_list argptr);
 
 WelsFileHandle*        WelsFopen (const char* filename,  const char* mode);
