@@ -215,8 +215,8 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
     SUsedPicRect.iLeft = 0;
     SUsedPicRect.iTop  = 0;
-    SUsedPicRect.iWidth = ((iPicWidth >> 1) << 1);
-    SUsedPicRect.iHeight = ((iPicHeight >> 1) << 1);
+    SUsedPicRect.iWidth = ((iPicWidth >> 1) * (1 << 1));
+    SUsedPicRect.iHeight = ((iPicHeight >> 1) * (1 << 1));
 
     iRCMode = pCodingParam.iRCMode;    // rc mode
 
