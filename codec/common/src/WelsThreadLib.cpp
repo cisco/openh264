@@ -274,8 +274,14 @@ WELS_THREAD_HANDLE        WelsThreadSelf() {
 
 WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* p_event, const char* event_name) {
 #ifdef __APPLE__
-  if (p_event == NULL || event_name == NULL)
+  if (p_event == NULL) {
     return WELS_THREAD_ERROR_GENERAL;
+  }
+  char    strSuffix[16] = { 0 };
+  if (NULL == event_name) {
+    sprintf (strSuffix, "WelsSem%ld_p%ld", (intptr_t)p_event, (long) (getpid()));
+    event_name = &strSuffix[0];
+  }
   *p_event = sem_open (event_name, O_CREAT, (S_IRUSR | S_IWUSR)/*0600*/, 0);
   if (*p_event == (sem_t*)SEM_FAILED) {
     sem_unlink (event_name);
@@ -321,8 +327,16 @@ WELS_THREAD_ERROR_CODE   WelsEventSignal (WELS_EVENT* event) {
   return err;
 }
 
-WELS_THREAD_ERROR_CODE   WelsEventWait (WELS_EVENT* event) {
+WELS_THREAD_ERROR_CODE WelsEventWait (WELS_EVENT* event) {
   return sem_wait (*event); // blocking until signaled
+}
+
+void WelsSleep (uint32_t dwMilliSecond) {
+#ifdef  WIN32
+  ::Sleep (dwMilliSecond);
+#else
+  usleep (dwMilliSecond * 1000);
+#endif
 }
 
 WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t dwMilliseconds) {

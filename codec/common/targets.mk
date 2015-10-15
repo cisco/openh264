@@ -12,7 +12,10 @@ COMMON_CPP_SRCS=\
 	$(COMMON_SRCDIR)/src/sad_common.cpp\
 	$(COMMON_SRCDIR)/src/utils.cpp\
 	$(COMMON_SRCDIR)/src/welsCodecTrace.cpp\
+	$(COMMON_SRCDIR)/src/WelsTaskThread.cpp\
+	$(COMMON_SRCDIR)/src/WelsThread.cpp\
 	$(COMMON_SRCDIR)/src/WelsThreadLib.cpp\
+	$(COMMON_SRCDIR)/src/WelsThreadPool.cpp\
 
 COMMON_OBJS += $(COMMON_CPP_SRCS:.cpp=.$(OBJ))
 

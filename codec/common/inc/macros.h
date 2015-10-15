@@ -205,6 +205,11 @@ template<typename T> T WelsClip3(T iX, T iY, T iZ) {
   return iX;
 }
 
+#define DISALLOW_COPY_AND_ASSIGN(cclass) \
+private:	\
+cclass(const cclass &);	\
+cclass& operator=(const cclass &);
+
 /*
  * Description: to check variable validation and return the specified result
  *  iResult:    value to be checked
