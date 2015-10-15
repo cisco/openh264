@@ -91,7 +91,6 @@ class CWelsCircleQueue {
             return true;
           }
         }
-
       }
     }
     return false;
@@ -121,7 +120,7 @@ class CWelsCircleQueue {
       m_iCurrentListEnd = 0;
     }
     if (m_iCurrentListEnd == m_iCurrentListStart) {
-      int32_t ret = ExpandList();
+      int32_t ret = ExpandQueue();
       if (ret) {
         return 1;
       }
@@ -129,7 +128,7 @@ class CWelsCircleQueue {
     return 0;
   }
 
-  int32_t ExpandList() {
+  int32_t ExpandQueue() {
     TNodeType** tmpCurrentTaskQueue = static_cast<TNodeType**> (malloc (m_iMaxNodeCount * 2 * sizeof (TNodeType*)));
     if (tmpCurrentTaskQueue == NULL) {
       return 1;
@@ -158,7 +157,6 @@ class CWelsCircleQueue {
   int32_t m_iMaxNodeCount;
   TNodeType** m_pCurrentQueue;
 };
-
 
 }
 

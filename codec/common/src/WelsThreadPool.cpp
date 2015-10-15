@@ -52,6 +52,7 @@ CWelsThreadPool::CWelsThreadPool (IWelsThreadPoolSink* pSink, int32_t iMaxThread
   m_pSink (pSink) {
   m_cWaitedTasks = new CWelsCircleQueue<IWelsTask>();
   m_cIdleThreads = new CWelsCircleQueue<CWelsTaskThread>();
+  m_cBusyThreads = new CWelsList<CWelsTaskThread>();
   m_iMaxThreadNum = 0;
 
   Init (iMaxThreadNum);
@@ -63,16 +64,17 @@ CWelsThreadPool::~CWelsThreadPool() {
 
   delete m_cWaitedTasks;
   delete m_cIdleThreads;
+  delete m_cBusyThreads;
 }
 
 WELS_THREAD_ERROR_CODE CWelsThreadPool::OnTaskStart (CWelsTaskThread* pThread, IWelsTask* pTask) {
-  AddThreadToBusyMap (pThread);
+  AddThreadToBusyList (pThread);
 
   return WELS_THREAD_ERROR_OK;
 }
 
 WELS_THREAD_ERROR_CODE CWelsThreadPool::OnTaskStop (CWelsTaskThread* pThread, IWelsTask* pTask) {
-  RemoveThreadFromBusyMap (pThread);
+  RemoveThreadFromBusyList (pThread);
   AddThreadToIdleQueue (pThread);
 
   if (m_pSink) {
@@ -198,36 +200,19 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::AddThreadToIdleQueue (CWelsTaskThread* p
   return WELS_THREAD_ERROR_OK;
 }
 
-WELS_THREAD_ERROR_CODE CWelsThreadPool::AddThreadToBusyMap (CWelsTaskThread* pThread) {
+WELS_THREAD_ERROR_CODE CWelsThreadPool::AddThreadToBusyList (CWelsTaskThread* pThread) {
   CWelsAutoLock cLock (m_cLockBusyTasks);
-
-  uintptr_t id = pThread->GetID();
-
-  std::map<uintptr_t, CWelsTaskThread*>::iterator iter = m_cBusyThreads.find (id);
-
-  if (iter != m_cBusyThreads.end()) {
-    return WELS_THREAD_ERROR_GENERAL;
-  }
-
-  m_cBusyThreads[id] = pThread;
-
+  m_cBusyThreads->push_back (pThread);
   return WELS_THREAD_ERROR_OK;
 }
 
-WELS_THREAD_ERROR_CODE CWelsThreadPool::RemoveThreadFromBusyMap (CWelsTaskThread* pThread) {
+WELS_THREAD_ERROR_CODE CWelsThreadPool::RemoveThreadFromBusyList (CWelsTaskThread* pThread) {
   CWelsAutoLock cLock (m_cLockBusyTasks);
-
-  uintptr_t  id = pThread->GetID();
-
-  std::map<uintptr_t, CWelsTaskThread*>::iterator iter = m_cBusyThreads.find (id);
-
-  if (iter != m_cBusyThreads.end()) {
-    m_cBusyThreads.erase (iter);
+  if (m_cBusyThreads->erase(pThread)) {
+      return WELS_THREAD_ERROR_OK;
   } else {
-    return WELS_THREAD_ERROR_GENERAL;
+        return WELS_THREAD_ERROR_GENERAL;
   }
-
-  return WELS_THREAD_ERROR_OK;
 }
 
 void  CWelsThreadPool::AddTaskToWaitedList (IWelsTask* pTask) {
@@ -250,7 +235,7 @@ CWelsTaskThread*   CWelsThreadPool::GetIdleThread() {
 }
 
 int32_t  CWelsThreadPool::GetBusyThreadNum() {
-  return static_cast<int32_t> (m_cBusyThreads.size());
+  return static_cast<int32_t> (m_cBusyThreads->size());
 }
 
 int32_t  CWelsThreadPool::GetIdleThreadNum() {

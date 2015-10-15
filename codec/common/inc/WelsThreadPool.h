@@ -47,6 +47,7 @@
 #include "WelsTask.h"
 #include "WelsTaskThread.h"
 #include "WelsCircleQueue.h"
+#include "WelsList.h"
 
 namespace WelsCommon {
 
@@ -84,8 +85,8 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   WELS_THREAD_ERROR_CODE CreateIdleThread();
   void           DestroyThread (CWelsTaskThread* pThread);
   WELS_THREAD_ERROR_CODE AddThreadToIdleQueue (CWelsTaskThread* pThread);
-  WELS_THREAD_ERROR_CODE AddThreadToBusyMap (CWelsTaskThread* pThread);
-  WELS_THREAD_ERROR_CODE RemoveThreadFromBusyMap (CWelsTaskThread* pThread);
+  WELS_THREAD_ERROR_CODE AddThreadToBusyList (CWelsTaskThread* pThread);
+  WELS_THREAD_ERROR_CODE RemoveThreadFromBusyList (CWelsTaskThread* pThread);
   void           AddTaskToWaitedList (IWelsTask* pTask);
   CWelsTaskThread*   GetIdleThread();
   IWelsTask*         GetWaitedTask();
@@ -99,7 +100,7 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   //std::list<IWelsTask*>    m_cWaitedTasks;
   CWelsCircleQueue<IWelsTask>* m_cWaitedTasks;
   CWelsCircleQueue<CWelsTaskThread>* m_cIdleThreads;
-  std::map<uintptr_t, CWelsTaskThread*>  m_cBusyThreads;
+  CWelsList<CWelsTaskThread>* m_cBusyThreads;
   IWelsThreadPoolSink*   m_pSink;
 
   CWelsLock   m_cLockPool;
