@@ -43,9 +43,10 @@
 #define _WELS_THREAD_POOL_H_
 
 #include <map>
-
+#include <stdio.h>
 #include "WelsTask.h"
 #include "WelsTaskThread.h"
+#include "WelsCircleQueue.h"
 
 namespace WelsCommon {
 
@@ -54,7 +55,6 @@ class IWelsThreadPoolSink {
   virtual WELS_THREAD_ERROR_CODE OnTaskExecuted (IWelsTask* pTask) = 0;
   virtual WELS_THREAD_ERROR_CODE OnTaskCancelled (IWelsTask* pTask) = 0;
 };
-
 
 class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
  public:
@@ -96,7 +96,8 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
 
  private:
   int32_t   m_iMaxThreadNum;
-  std::list<IWelsTask*>    m_cWaitedTasks;
+  //std::list<IWelsTask*>    m_cWaitedTasks;
+  CWelsCircleQueue<IWelsTask>* m_cWaitedTasks;
   std::map<uintptr_t, CWelsTaskThread*>  m_cIdleThreads;
   std::map<uintptr_t, CWelsTaskThread*>  m_cBusyThreads;
   IWelsThreadPoolSink*   m_pSink;

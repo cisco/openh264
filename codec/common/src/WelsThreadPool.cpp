@@ -50,6 +50,7 @@ namespace WelsCommon {
 
 CWelsThreadPool::CWelsThreadPool (IWelsThreadPoolSink* pSink, int32_t iMaxThreadNum) :
   m_pSink (pSink) {
+  m_cWaitedTasks = new CWelsCircleQueue<IWelsTask>();
   m_iMaxThreadNum = 0;
 
   Init (iMaxThreadNum);
@@ -58,6 +59,8 @@ CWelsThreadPool::CWelsThreadPool (IWelsThreadPoolSink* pSink, int32_t iMaxThread
 
 CWelsThreadPool::~CWelsThreadPool() {
   Uninit();
+
+  delete m_cWaitedTasks;
 }
 
 WELS_THREAD_ERROR_CODE CWelsThreadPool::OnTaskStart (CWelsTaskThread* pThread, IWelsTask* pTask) {
@@ -239,7 +242,7 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::RemoveThreadFromBusyMap (CWelsTaskThread
 void  CWelsThreadPool::AddTaskToWaitedList (IWelsTask* pTask) {
   CWelsAutoLock  cLock (m_cLockWaitedTasks);
 
-  m_cWaitedTasks.push_back (pTask);
+  m_cWaitedTasks->push_back (pTask);
   return;
 }
 
@@ -267,37 +270,30 @@ int32_t  CWelsThreadPool::GetIdleThreadNum() {
 }
 
 int32_t  CWelsThreadPool::GetWaitedTaskNum() {
-  return static_cast<int32_t> (m_cWaitedTasks.size());
+  return m_cWaitedTasks->size();
 }
 
 IWelsTask* CWelsThreadPool::GetWaitedTask() {
   CWelsAutoLock lock (m_cLockWaitedTasks);
-
-  if (m_cWaitedTasks.size() == 0) {
+  if (m_cWaitedTasks->size() == 0) {
     return NULL;
   }
 
-  std::list<IWelsTask*>::iterator it = m_cWaitedTasks.begin();
-  IWelsTask* pTask = *it;
+  IWelsTask* pTask = m_cWaitedTasks->begin();
 
-  m_cWaitedTasks.pop_front();
+  m_cWaitedTasks->pop_front();
 
   return pTask;
 }
 
 void  CWelsThreadPool::ClearWaitedTasks() {
   CWelsAutoLock cLock (m_cLockWaitedTasks);
-
-  std::list<IWelsTask*>::iterator iter = m_cWaitedTasks.begin();
-
   if (m_pSink) {
-    while (iter != m_cWaitedTasks.end()) {
-      m_pSink->OnTaskCancelled (*iter);
-      ++ iter;
+    while (0 != m_cWaitedTasks->size()) {
+      m_pSink->OnTaskCancelled (m_cWaitedTasks->begin());
+      m_cWaitedTasks->pop_front();
     }
   }
-
-  m_cWaitedTasks.clear();
 }
 
 }
