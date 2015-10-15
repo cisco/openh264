@@ -193,3 +193,4 @@ TEST (CWelsCircleQueue, CWelsCircleQueueOnThread) {
   delete pTaskThread3;
 }
 #endif
+

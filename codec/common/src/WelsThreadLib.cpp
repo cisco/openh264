@@ -71,6 +71,7 @@
 
 #ifdef WINAPI_FAMILY
 #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#define WP80
 using namespace Platform;
 using namespace Windows::Foundation;
 using namespace Windows::System::Threading;
@@ -174,9 +175,30 @@ WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_n
   return WELS_THREAD_ERROR_OK;
 }
 
+#ifndef WP80
 void WelsSleep (uint32_t dwMilliSecond) {
   ::Sleep (dwMilliSecond);
 }
+#else
+void WelsSleep (uint32_t dwMilliSecond) {
+  static WELS_EVENT hSleepEvent = NULL;
+  if (!hSleepEvent) {
+    WELS_EVENT hLocalSleepEvent = NULL;
+    WELS_THREAD_ERROR_CODE ret = WelsEventOpen (&hLocalSleepEvent);
+    if (WELS_THREAD_ERROR_OK != ret) {
+      return;
+    }
+    WELS_EVENT hPreviousEvent = InterlockedCompareExchangePointerRelease (&hSleepEvent, hLocalSleepEvent, NULL);
+    if (hPreviousEvent) {
+      WelsEventClose (&hLocalSleepEvent);
+    }
+    //On this singleton usage idea of using InterlockedCompareExchangePointerRelease:
+    //   similar idea of can be found at msdn blog when introducing InterlockedCompareExchangePointerRelease
+  }
+
+  WaitForSingleObject (hSleepEvent, dwMilliSecond);
+}
+#endif
 
 WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_THREAD_ROUTINE  routine,
     void* arg, WELS_THREAD_ATTR attr) {
@@ -229,7 +251,7 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* p
   return WELS_THREAD_ERROR_OK;
 }
 
-#else
+#else //platform: #ifdef _WIN32
 
 WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_THREAD_ROUTINE  routine,
     void* arg, WELS_THREAD_ATTR attr) {
