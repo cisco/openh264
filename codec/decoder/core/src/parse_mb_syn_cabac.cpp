@@ -889,7 +889,7 @@ int32_t ParseResidualBlockCabac8x8 (PWelsNeighAvail pNeighAvail, uint8_t* pNonZe
     do {
       if (pSignificantMap[j] != 0) {
         i = pScanTable[ j ];
-        sTCoeff[i] = uiQp >= 36 ? ((pSignificantMap[j] * pDeQuantMul[i]) << (uiQp / 6 - 6)) : ((
+        sTCoeff[i] = uiQp >= 36 ? ((pSignificantMap[j] * pDeQuantMul[i]) * (1 << (uiQp / 6 - 6))) : ((
                        pSignificantMap[j] * pDeQuantMul[i] + (1 << (5 - uiQp / 6))) >> (6 - uiQp / 6));
       }
       ++j;

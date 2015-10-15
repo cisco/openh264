@@ -336,10 +336,10 @@ inline void SetMvWithinIntegerMvRange (const int32_t kiMbWidth, const int32_t ki
                                        const int32_t kiMbY,
                                        const int32_t kiMaxMvRange,
                                        SMVUnitXY* pMvMin, SMVUnitXY* pMvMax) {
-pMvMin->iMvX = WELS_MAX (-1 * ((kiMbX + 1) << 4) + INTPEL_NEEDED_MARGIN, -1 * kiMaxMvRange);
-pMvMin->iMvY = WELS_MAX (-1 * ((kiMbY + 1) << 4) + INTPEL_NEEDED_MARGIN, -1 * kiMaxMvRange);
-pMvMax->iMvX = WELS_MIN (((kiMbWidth - kiMbX) << 4) - INTPEL_NEEDED_MARGIN, kiMaxMvRange);
-pMvMax->iMvY = WELS_MIN (((kiMbHeight - kiMbY) << 4) - INTPEL_NEEDED_MARGIN, kiMaxMvRange);
+pMvMin->iMvX = WELS_MAX (-1 * ((kiMbX + 1) * (1 << 4)) + INTPEL_NEEDED_MARGIN, -1 * kiMaxMvRange);
+pMvMin->iMvY = WELS_MAX (-1 * ((kiMbY + 1) * (1 << 4)) + INTPEL_NEEDED_MARGIN, -1 * kiMaxMvRange);
+pMvMax->iMvX = WELS_MIN (((kiMbWidth - kiMbX) * (1 << 4)) - INTPEL_NEEDED_MARGIN, kiMaxMvRange);
+pMvMax->iMvY = WELS_MIN (((kiMbHeight - kiMbY) * (1 << 4)) - INTPEL_NEEDED_MARGIN, kiMaxMvRange);
 }
 
 inline bool CheckMvInRange (const SMVUnitXY ksCurrentMv, const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv) {

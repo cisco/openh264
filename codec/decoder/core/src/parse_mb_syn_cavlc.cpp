@@ -981,7 +981,7 @@ int32_t WelsResidualBlockCavlc8x8 (SVlcTable* pVlcTable, uint8_t* pNonZeroCountC
     iCoeffNum += iRun[i] + 1; //FIXME add 1 earlier ?
     j = (iCoeffNum << 2) + iIdx4x4;
     j          = kpZigzagTable[ j ];
-    pTCoeff[j] = uiQp >= 36 ? ((iLevel[i] * kpDequantCoeff[j]) << (uiQp / 6 - 6))
+    pTCoeff[j] = uiQp >= 36 ? ((iLevel[i] * kpDequantCoeff[j]) * (1 << (uiQp / 6 - 6)))
                  : ((iLevel[i] * kpDequantCoeff[j] + (1 << (5 - uiQp / 6))) >> (6 - uiQp / 6));
   }
 
