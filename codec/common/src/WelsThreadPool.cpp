@@ -235,11 +235,11 @@ CWelsTaskThread*   CWelsThreadPool::GetIdleThread() {
 }
 
 int32_t  CWelsThreadPool::GetBusyThreadNum() {
-  return static_cast<int32_t> (m_cBusyThreads->size());
+  return m_cBusyThreads->size();
 }
 
 int32_t  CWelsThreadPool::GetIdleThreadNum() {
-  return static_cast<int32_t> (m_cIdleThreads->size());
+  return m_cIdleThreads->size();
 }
 
 int32_t  CWelsThreadPool::GetWaitedTaskNum() {

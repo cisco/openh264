@@ -42,7 +42,6 @@
 #ifndef _WELS_THREAD_POOL_H_
 #define _WELS_THREAD_POOL_H_
 
-#include <map>
 #include <stdio.h>
 #include "WelsTask.h"
 #include "WelsTaskThread.h"
@@ -97,7 +96,6 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
 
  private:
   int32_t   m_iMaxThreadNum;
-  //std::list<IWelsTask*>    m_cWaitedTasks;
   CWelsCircleQueue<IWelsTask>* m_cWaitedTasks;
   CWelsCircleQueue<CWelsTaskThread>* m_cIdleThreads;
   CWelsList<CWelsTaskThread>* m_cBusyThreads;
