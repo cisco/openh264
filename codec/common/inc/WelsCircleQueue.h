@@ -66,6 +66,54 @@ class CWelsCircleQueue {
   }
 
   int32_t push_back (TNodeType* pNode) {
+    if ((NULL != pNode) && (find (pNode))) {      //not checking NULL for easier testing
+      return 1;
+    }
+    return InternalPushBack (pNode);
+  }
+
+  bool find (TNodeType* pNode) {
+    if (size() > 0) {
+      if (m_iCurrentListEnd > m_iCurrentListStart) {
+        for (int32_t idx = m_iCurrentListStart; idx < m_iCurrentListEnd; idx++) {
+          if (pNode == m_pCurrentQueue[idx]) {
+            return true;
+          }
+        }
+      } else {
+        for (int32_t idx = m_iCurrentListStart; idx < m_iMaxNodeCount; idx++) {
+          if (pNode == m_pCurrentQueue[idx]) {
+            return true;
+          }
+        }
+        for (int32_t idx = 0; idx < m_iCurrentListEnd; idx++) {
+          if (pNode == m_pCurrentQueue[idx]) {
+            return true;
+          }
+        }
+
+      }
+    }
+    return false;
+  }
+
+  void pop_front() {
+    if (size() > 0) {
+      m_pCurrentQueue[m_iCurrentListStart] = NULL;
+      m_iCurrentListStart = ((m_iCurrentListStart < (m_iMaxNodeCount - 1))
+                             ? (m_iCurrentListStart + 1)
+                             : 0);
+    }
+  }
+
+  TNodeType* begin() {
+    if (size() > 0) {
+      return m_pCurrentQueue[m_iCurrentListStart];
+    }
+    return NULL;
+  }
+ private:
+  int32_t InternalPushBack (TNodeType* pNode) {
     m_pCurrentQueue[m_iCurrentListEnd] = pNode;
     m_iCurrentListEnd ++;
 
@@ -81,19 +129,6 @@ class CWelsCircleQueue {
     return 0;
   }
 
-  void pop_front() {
-    if (size() > 0) {
-      m_pCurrentQueue[m_iCurrentListStart] = NULL;
-      m_iCurrentListStart = ((m_iCurrentListStart < (m_iMaxNodeCount - 1))
-                             ? (m_iCurrentListStart + 1)
-                             : 0);
-    }
-  }
-
-  TNodeType* begin() {
-    return m_pCurrentQueue[m_iCurrentListStart];
-  }
- private:
   int32_t ExpandList() {
     TNodeType** tmpCurrentTaskQueue = static_cast<TNodeType**> (malloc (m_iMaxNodeCount * 2 * sizeof (TNodeType*)));
     if (tmpCurrentTaskQueue == NULL) {

@@ -83,7 +83,7 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
 
   WELS_THREAD_ERROR_CODE CreateIdleThread();
   void           DestroyThread (CWelsTaskThread* pThread);
-  WELS_THREAD_ERROR_CODE AddThreadToIdleMap (CWelsTaskThread* pThread);
+  WELS_THREAD_ERROR_CODE AddThreadToIdleQueue (CWelsTaskThread* pThread);
   WELS_THREAD_ERROR_CODE AddThreadToBusyMap (CWelsTaskThread* pThread);
   WELS_THREAD_ERROR_CODE RemoveThreadFromBusyMap (CWelsTaskThread* pThread);
   void           AddTaskToWaitedList (IWelsTask* pTask);
@@ -98,7 +98,7 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   int32_t   m_iMaxThreadNum;
   //std::list<IWelsTask*>    m_cWaitedTasks;
   CWelsCircleQueue<IWelsTask>* m_cWaitedTasks;
-  std::map<uintptr_t, CWelsTaskThread*>  m_cIdleThreads;
+  CWelsCircleQueue<CWelsTaskThread>* m_cIdleThreads;
   std::map<uintptr_t, CWelsTaskThread*>  m_cBusyThreads;
   IWelsThreadPoolSink*   m_pSink;
 
