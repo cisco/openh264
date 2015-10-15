@@ -835,6 +835,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\common\CWelsListTest.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\common\ExpandPicture.cpp"
 				>
 				<FileConfiguration
