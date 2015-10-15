@@ -333,8 +333,8 @@ void WelsDctT4_c (int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t* pP
 
     pDct[i ]   = s[0] + s[1];
     pDct[kiI2] = s[0] - s[1];
-    pDct[kiI1] = (s[3] << 1) + s[2];
-    pDct[kiI3] = s[3] - (s[2] << 1);
+    pDct[kiI1] = (s[3] * (1 << 1)) + s[2];
+    pDct[kiI3] = s[3] - (s[2] * (1 << 1));
   }
 
   /* vertical transform */
@@ -350,8 +350,8 @@ void WelsDctT4_c (int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t* pP
 
     pDct[i  ]   = s[0] + s[1];
     pDct[kiI8 ] = s[0] - s[1];
-    pDct[kiI4 ] = (s[3] << 1) + s[2];
-    pDct[kiI12] = s[3] - (s[2] << 1);
+    pDct[kiI4 ] = (s[3] * (1 << 1)) + s[2];
+    pDct[kiI12] = s[3] - (s[2] * (1 << 1));
   }
 }
 

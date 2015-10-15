@@ -165,7 +165,7 @@ int32_t  WriteBlockResidualCavlc (SWelsFuncPtrList* pFuncList, int16_t* pCoffLev
   for (i = iTrailingOnes; i < iTotalCoeffs; i++) {
     int32_t iVal = iLevel[i];
 
-    iLevelCode = (iVal - 1) << 1;
+    iLevelCode = (iVal - 1) * (1 << 1);
     uiSign = (iLevelCode >> 31);
     iLevelCode = (iLevelCode ^ uiSign) + (uiSign << 1);
     iLevelCode -= ((i == iTrailingOnes) && (iTrailingOnes < 3)) << 1;

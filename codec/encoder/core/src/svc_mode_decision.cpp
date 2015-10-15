@@ -133,8 +133,8 @@ void SetMvBaseEnhancelayer (SWelsMD* pMd, SMB* pCurMb, const SMB* kpRefMb) {
     SMVUnitXY sMv;
     int32_t iRefMbPartIdx = ((pCurMb->iMbY & 0x01) << 1) + (pCurMb->iMbX & 0x01); //may be need modified
     int32_t iScan4RefPartIdx = g_kuiMbCountScan4Idx[ (iRefMbPartIdx << 2)];
-    sMv.iMvX = kpRefMb->sMv[iScan4RefPartIdx].iMvX << 1;
-    sMv.iMvY = kpRefMb->sMv[iScan4RefPartIdx].iMvY << 1;
+    sMv.iMvX = kpRefMb->sMv[iScan4RefPartIdx].iMvX * (1 << 1);
+    sMv.iMvY = kpRefMb->sMv[iScan4RefPartIdx].iMvY * (1 << 1);
 
     pMd->sMe.sMe16x16.sMvBase = sMv;
 

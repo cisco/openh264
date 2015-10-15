@@ -122,7 +122,7 @@ void anchor_DeblockingLumaNormal (uint8_t* pPix, int32_t iStrideX, int32_t iStri
         iTc++;
       }
       // 8-467,468,469
-      iDelta = WELS_CLIP3 (((((q[0] - p[0]) << 2) + (p[1] - q[1]) + 4) >> 3), -1 * iTc, iTc);
+      iDelta = WELS_CLIP3 (((((q[0] - p[0]) * (1 << 2)) + (p[1] - q[1]) + 4) >> 3), -1 * iTc, iTc);
       pPix[iStrideX * -1] = WELS_CLIP3 ((p[0] + iDelta), 0, 255);
       pPix[0] = WELS_CLIP3 ((q[0] - iDelta), 0, 255);
     }
@@ -194,7 +194,7 @@ void anchor_DeblockingChromaNormal (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iS
     // filterSampleFlag, 8-460
     if (abs (p[0] - q[0]) < iAlpha && abs (p[1] - p[0]) < iBeta && abs (q[1] - q[0]) < iBeta) {
       // 8-467, 468, 469
-      iDelta = WELS_CLIP3 (((((q[0] - p[0]) << 2) + (p[1] - q[1]) + 4) >> 3), -1 * iTc, iTc);
+      iDelta = WELS_CLIP3 (((((q[0] - p[0]) * (1 << 2)) + (p[1] - q[1]) + 4) >> 3), -1 * iTc, iTc);
       pPixCb[iStrideX * -1] = WELS_CLIP3 ((p[0] + iDelta), 0, 255);
       pPixCb[iStrideX * 0 ] = WELS_CLIP3 ((q[0] - iDelta), 0, 255);
     }
@@ -209,7 +209,7 @@ void anchor_DeblockingChromaNormal (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iS
     // filterSampleFlag, 8-460
     if (abs (p[0] - q[0]) < iAlpha && abs (p[1] - p[0]) < iBeta && abs (q[1] - q[0]) < iBeta) {
       // 8-467, 468, 469
-      iDelta = WELS_CLIP3 (((((q[0] - p[0]) << 2) + (p[1] - q[1]) + 4) >> 3), -1 * iTc, iTc);
+      iDelta = WELS_CLIP3 (((((q[0] - p[0]) * (1 << 2)) + (p[1] - q[1]) + 4) >> 3), -1 * iTc, iTc);
       pPixCr[iStrideX * -1] = WELS_CLIP3 ((p[0] + iDelta), 0, 255);
       pPixCr[iStrideX * 0 ] = WELS_CLIP3 ((q[0] - iDelta), 0, 255);
     }
