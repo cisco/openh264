@@ -28,7 +28,6 @@
 		4CE4471A18BC605C0017DF25 /* mv_pred.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446E918BC605C0017DF25 /* mv_pred.cpp */; };
 		4CE4471B18BC605C0017DF25 /* nal_encap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446EA18BC605C0017DF25 /* nal_encap.cpp */; };
 		4CE4471C18BC605C0017DF25 /* picture_handle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446EB18BC605C0017DF25 /* picture_handle.cpp */; };
-		4CE4471D18BC605C0017DF25 /* property.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446EC18BC605C0017DF25 /* property.cpp */; };
 		4CE4471E18BC605C0017DF25 /* ratectl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446ED18BC605C0017DF25 /* ratectl.cpp */; };
 		4CE4471F18BC605C0017DF25 /* ref_list_mgr_svc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446EE18BC605C0017DF25 /* ref_list_mgr_svc.cpp */; };
 		4CE4472018BC605C0017DF25 /* sample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CE446EF18BC605C0017DF25 /* sample.cpp */; };
@@ -98,7 +97,6 @@
 		4CE446C018BC605C0017DF25 /* parameter_sets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parameter_sets.h; sourceTree = "<group>"; };
 		4CE446C118BC605C0017DF25 /* picture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = picture.h; sourceTree = "<group>"; };
 		4CE446C218BC605C0017DF25 /* picture_handle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = picture_handle.h; sourceTree = "<group>"; };
-		4CE446C318BC605C0017DF25 /* property.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = property.h; sourceTree = "<group>"; };
 		4CE446C418BC605C0017DF25 /* rc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rc.h; sourceTree = "<group>"; };
 		4CE446C518BC605C0017DF25 /* ref_list_mgr_svc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ref_list_mgr_svc.h; sourceTree = "<group>"; };
 		4CE446C618BC605C0017DF25 /* sample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sample.h; sourceTree = "<group>"; };
@@ -133,7 +131,6 @@
 		4CE446E918BC605C0017DF25 /* mv_pred.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mv_pred.cpp; sourceTree = "<group>"; };
 		4CE446EA18BC605C0017DF25 /* nal_encap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = nal_encap.cpp; sourceTree = "<group>"; };
 		4CE446EB18BC605C0017DF25 /* picture_handle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = picture_handle.cpp; sourceTree = "<group>"; };
-		4CE446EC18BC605C0017DF25 /* property.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = property.cpp; sourceTree = "<group>"; };
 		4CE446ED18BC605C0017DF25 /* ratectl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ratectl.cpp; sourceTree = "<group>"; };
 		4CE446EE18BC605C0017DF25 /* ref_list_mgr_svc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ref_list_mgr_svc.cpp; sourceTree = "<group>"; };
 		4CE446EF18BC605C0017DF25 /* sample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sample.cpp; sourceTree = "<group>"; };
@@ -277,7 +274,6 @@
 				4CE446C018BC605C0017DF25 /* parameter_sets.h */,
 				4CE446C118BC605C0017DF25 /* picture.h */,
 				4CE446C218BC605C0017DF25 /* picture_handle.h */,
-				4CE446C318BC605C0017DF25 /* property.h */,
 				4CE446C418BC605C0017DF25 /* rc.h */,
 				4CE446C518BC605C0017DF25 /* ref_list_mgr_svc.h */,
 				4CE446C618BC605C0017DF25 /* sample.h */,
@@ -322,7 +318,6 @@
 				4CE446E918BC605C0017DF25 /* mv_pred.cpp */,
 				4CE446EA18BC605C0017DF25 /* nal_encap.cpp */,
 				4CE446EB18BC605C0017DF25 /* picture_handle.cpp */,
-				4CE446EC18BC605C0017DF25 /* property.cpp */,
 				4CE446ED18BC605C0017DF25 /* ratectl.cpp */,
 				4CE446EE18BC605C0017DF25 /* ref_list_mgr_svc.cpp */,
 				4CE446EF18BC605C0017DF25 /* sample.cpp */,
@@ -424,7 +419,6 @@
 				4CE4471118BC605C0017DF25 /* encode_mb_aux.cpp in Sources */,
 				4CE4472718BC605C0017DF25 /* svc_mode_decision.cpp in Sources */,
 				4CE4472818BC605C0017DF25 /* svc_motion_estimate.cpp in Sources */,
-				4CE4471D18BC605C0017DF25 /* property.cpp in Sources */,
 				4CE4471018BC605C0017DF25 /* decode_mb_aux.cpp in Sources */,
 				4CE4472018BC605C0017DF25 /* sample.cpp in Sources */,
 				6CA38DA31991CACE003EAAE0 /* svc_motion_estimation.S in Sources */,
