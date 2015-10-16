@@ -337,7 +337,7 @@ static int32_t MMCO (PWelsDecoderContext pCtx, PRefPicMarking pRefPicMarking) {
   PSps pSps = pCtx->pCurDqLayer->sLayerInfo.pSps;
   int32_t i = 0;
   int32_t iRet = ERR_NONE;
-  for (i = 0; pRefPicMarking->sMmcoRef[i].uiMmcoType != MMCO_END; i++) {
+  for (i = 0; i < MAX_MMCO_COUNT && pRefPicMarking->sMmcoRef[i].uiMmcoType != MMCO_END; i++) {
     uint32_t uiMmcoType = pRefPicMarking->sMmcoRef[i].uiMmcoType;
     int32_t iShortFrameNum = (pCtx->iFrameNum - pRefPicMarking->sMmcoRef[i].iDiffOfPicNum) & ((
                                1 << pSps->uiLog2MaxFrameNum) - 1);
@@ -351,6 +351,9 @@ static int32_t MMCO (PWelsDecoderContext pCtx, PRefPicMarking pRefPicMarking) {
     if (iRet != ERR_NONE) {
       return iRet;
     }
+  }
+  if (i == MAX_MMCO_COUNT) { //although Rec does not handle this condition, we here prohibit too many MMCO op
+    return ERR_INFO_INVALID_MMCO_NUM;
   }
 
   return ERR_NONE;
