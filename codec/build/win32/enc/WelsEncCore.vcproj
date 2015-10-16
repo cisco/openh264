@@ -474,7 +474,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\common\src\WelsTaskThread.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\src\WelsThread.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\common\src\WelsThreadLib.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\src\WelsThreadPool.cpp"
 				>
 			</File>
 		</Filter>
