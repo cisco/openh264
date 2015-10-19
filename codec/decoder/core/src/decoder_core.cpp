@@ -389,25 +389,25 @@ int32_t ParseDecRefPicMarking (PWelsDecoderContext pCtx, PBitStringAux pBs, PSli
       int32_t iIdx = 0;
       do {
         WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //memory_management_control_operation
-        const int32_t kiMmco = uiCode;
+        const uint32_t kuiMmco = uiCode;
 
-        kpRefMarking->sMmcoRef[iIdx].uiMmcoType = kiMmco;
-        if (kiMmco == MMCO_END)
+        kpRefMarking->sMmcoRef[iIdx].uiMmcoType = kuiMmco;
+        if (kuiMmco == MMCO_END)
           break;
 
-        if (kiMmco == MMCO_SHORT2UNUSED || kiMmco == MMCO_SHORT2LONG) {
+        if (kuiMmco == MMCO_SHORT2UNUSED || kuiMmco == MMCO_SHORT2LONG) {
           WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //difference_of_pic_nums_minus1
           kpRefMarking->sMmcoRef[iIdx].iDiffOfPicNum = 1 + uiCode;
           kpRefMarking->sMmcoRef[iIdx].iShortFrameNum = (pSh->iFrameNum - kpRefMarking->sMmcoRef[iIdx].iDiffOfPicNum) & ((
                 1 << pSps->uiLog2MaxFrameNum) - 1);
-        } else if (kiMmco == MMCO_LONG2UNUSED) {
+        } else if (kuiMmco == MMCO_LONG2UNUSED) {
           WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //long_term_pic_num
           kpRefMarking->sMmcoRef[iIdx].uiLongTermPicNum = uiCode;
         }
-        if (kiMmco == MMCO_SHORT2LONG || kiMmco == MMCO_LONG) {
+        if (kuiMmco == MMCO_SHORT2LONG || kuiMmco == MMCO_LONG) {
           WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //long_term_frame_idx
           kpRefMarking->sMmcoRef[iIdx].iLongTermFrameIdx = uiCode;
-        } else if (kiMmco == MMCO_SET_MAX_LONG) {
+        } else if (kuiMmco == MMCO_SET_MAX_LONG) {
           WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //max_long_term_frame_idx_plus1
           kpRefMarking->sMmcoRef[iIdx].iMaxLongTermFrameIdx = -1 + uiCode;
         }
@@ -690,6 +690,8 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
 
   // first_mb_in_slice
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //first_mb_in_slice
+  WELS_CHECK_SE_UPPER_ERROR (uiCode, 36863u, "first_mb_in_slice", GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER,
+                             ERR_INFO_INVALID_FIRST_MB_IN_SLICE));
   pSliceHead->iFirstMbInSlice = uiCode;
 
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //slice_type
@@ -721,12 +723,9 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   pSliceHead->eSliceType = static_cast <EWelsSliceType> (uiSliceType);
 
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //pic_parameter_set_id
+  WELS_CHECK_SE_UPPER_ERROR (uiCode, MAX_PPS_COUNT, "iPpsId out of range", GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER,
+                             ERR_INFO_PPS_ID_OVERFLOW));
   iPpsId = uiCode;
-
-  if (iPpsId >= MAX_PPS_COUNT) {
-    WelsLog (pLogCtx, WELS_LOG_WARNING, "iPpsId out of range");
-    return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_PPS_ID_OVERFLOW);
-  }
 
   //add check PPS available here
   if (pCtx->bPpsAvailFlags[iPpsId] == false) {
@@ -939,9 +938,8 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   if (pPps->bEntropyCodingModeFlag) {
     if (pSliceHead->eSliceType != I_SLICE && pSliceHead->eSliceType != SI_SLICE) {
       WELS_READ_VERIFY (BsGetUe (pBs, &uiCode));
+      WELS_CHECK_SE_UPPER_ERROR (uiCode, SLICE_HEADER_CABAC_INIT_IDC_MAX, "cabac_init_idc", ERR_INFO_INVALID_CABAC_INIT_IDC);
       pSliceHead->iCabacInitIdc = uiCode;
-      WELS_CHECK_SE_UPPER_ERROR (pSliceHead->iCabacInitIdc, SLICE_HEADER_CABAC_INIT_IDC_MAX, "cabac_init_idc",
-                                 ERR_INFO_INVALID_CABAC_INIT_IDC);
     } else
       pSliceHead->iCabacInitIdc = 0;
   }
