@@ -273,8 +273,8 @@ int32_t DecodeExpBypassCabac (PWelsCabacDecEngine pDecEngine, int32_t iCount, ui
       iSymTmp += (1 << iCount);
       ++iCount;
     }
-  } while (uiCode != 0 && iCount != 31);
-  if (iCount == 31) {
+  } while (uiCode != 0 && iCount != 16);
+  if (iCount == 16) {
     return ERR_CABAC_UNEXPECTED_VALUE;
   }
 

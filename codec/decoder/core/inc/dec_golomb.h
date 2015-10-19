@@ -179,7 +179,7 @@ static inline uint32_t BsGetUe (PBitStringAux pBs, uint32_t* pCode) {
     DUMP_BITS (pBs->uiCurBits, pBs->pCurBuf, pBs->iLeftBits, iLeadingZeroBits, iAllowedBytes, iReadBytes);
   }
 
-  *pCode = ((1 << iLeadingZeroBits) - 1 + iValue);
+  *pCode = ((1u << iLeadingZeroBits) - 1 + iValue);
   return ERR_NONE;
 }
 
