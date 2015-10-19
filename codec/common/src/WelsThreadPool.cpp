@@ -39,9 +39,6 @@
  */
 
 
-#include <list>
-#include <map>
-
 #include "typedefs.h"
 #include "WelsThreadPool.h"
 
