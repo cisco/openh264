@@ -723,7 +723,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   pSliceHead->eSliceType = static_cast <EWelsSliceType> (uiSliceType);
 
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //pic_parameter_set_id
-  WELS_CHECK_SE_UPPER_ERROR (uiCode, MAX_PPS_COUNT, "iPpsId out of range", GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER,
+  WELS_CHECK_SE_UPPER_ERROR (uiCode, (MAX_PPS_COUNT - 1), "iPpsId out of range", GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER,
                              ERR_INFO_PPS_ID_OVERFLOW));
   iPpsId = uiCode;
 
@@ -807,7 +807,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_NO_PARAM_SETS);
   }
   // check first_mb_in_slice
-  WELS_CHECK_SE_UPPER_ERROR ((uint32_t) (pSliceHead->iFirstMbInSlice), pSps->uiTotalMbCount, "first_mb_in_slice",
+  WELS_CHECK_SE_UPPER_ERROR ((uint32_t) (pSliceHead->iFirstMbInSlice), (pSps->uiTotalMbCount - 1), "first_mb_in_slice",
                              GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_FIRST_MB_IN_SLICE));
   WELS_READ_VERIFY (BsGetBits (pBs, pSps->uiLog2MaxFrameNum, &uiCode)); //frame_num
   pSliceHead->iFrameNum = uiCode;
