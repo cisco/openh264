@@ -43,6 +43,7 @@
 #define _WELS_CIRCLE_QUEUE_H_
 
 #include "typedefs.h"
+#include <stdlib.h>
 
 namespace WelsCommon {
 
