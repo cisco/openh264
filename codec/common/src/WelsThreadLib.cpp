@@ -302,7 +302,7 @@ WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* p_event, const char* event_
   if (p_event == NULL) {
     return WELS_THREAD_ERROR_GENERAL;
   }
-  char    strSuffix[16] = { 0 };
+  char    strSuffix[100] = { 0 };
   if (NULL == event_name) {
     sprintf (strSuffix, "WelsSem%ld_p%ld", (intptr_t)p_event, (long) (getpid()));
     event_name = &strSuffix[0];
@@ -341,6 +341,10 @@ WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_n
 #endif
 }
 
+void WelsSleep (uint32_t dwMilliSecond) {
+  usleep (dwMilliSecond * 1000);
+}
+
 WELS_THREAD_ERROR_CODE   WelsEventSignal (WELS_EVENT* event) {
   WELS_THREAD_ERROR_CODE err = 0;
 //  int32_t val = 0;
@@ -354,10 +358,6 @@ WELS_THREAD_ERROR_CODE   WelsEventSignal (WELS_EVENT* event) {
 
 WELS_THREAD_ERROR_CODE WelsEventWait (WELS_EVENT* event) {
   return sem_wait (*event); // blocking until signaled
-}
-
-void WelsSleep (uint32_t dwMilliSecond) {
-  usleep (dwMilliSecond * 1000);
 }
 
 WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t dwMilliseconds) {

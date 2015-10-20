@@ -45,6 +45,7 @@ using namespace WelsCommon;
 
 namespace WelsEnc {
 
+typedef int32_t WelsErrorType;
 
 struct SMVUnitXY { // each 4 Bytes
   int16_t iMvX;

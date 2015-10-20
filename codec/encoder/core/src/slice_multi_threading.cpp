@@ -62,6 +62,7 @@
 #include "cpu.h"
 
 #include "measure_time.h"
+#include "wels_task_management.h"
 
 #if defined(ENABLE_TRACE_MT)
 #define MT_TRACE_LOG(x, ...) WelsLog(x, __VA_ARGS__)
@@ -443,6 +444,10 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   iReturn = WelsMutexInit (&pSmt->mutexSliceNumUpdate);
   WELS_VERIFY_RETURN_PROC_IF (1, (WELS_THREAD_ERROR_OK != iReturn), FreeMemorySvc (ppCtx))
 
+  memset(&pSmt->bThreadBsBufferUsage, 0, MAX_THREADS_NUM * sizeof(bool));
+  iReturn = WelsMutexInit (&pSmt->mutexThreadBsBufferUsage);
+  WELS_VERIFY_RETURN_PROC_IF (1, (WELS_THREAD_ERROR_OK != iReturn), FreeMemorySvc (ppCtx))
+
   iReturn = WelsMutexInit (& (*ppCtx)->mutexEncoderError);
   WELS_VERIFY_RETURN_PROC_IF (1, (WELS_THREAD_ERROR_OK != iReturn), FreeMemorySvc (ppCtx))
 
@@ -496,6 +501,7 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
   WelsEventClose (&pSmt->pSliceCodedMasterEvent, ename);
 
   WelsMutexDestroy (&pSmt->mutexSliceNumUpdate);
+  WelsMutexDestroy (&pSmt->mutexThreadBsBufferUsage);
   WelsMutexDestroy (& ((*ppCtx)->mutexEncoderError));
 
   if (pSmt->pThreadPEncCtx != NULL) {
@@ -509,6 +515,7 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
       pSmt->pThreadBsBuffer[i] = NULL;
     }
   }
+  memset(&pSmt->bThreadBsBufferUsage, 0, MAX_THREADS_NUM * sizeof(bool));
 
   pSliceB = (*ppCtx)->pSliceBs;
   iIdx = 0;

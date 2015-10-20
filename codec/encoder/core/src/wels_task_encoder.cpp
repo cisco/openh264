@@ -1,0 +1,208 @@
+/*!
+ * \copy
+ *     Copyright (c)  2009-2015, Cisco Systems
+ *     All rights reserved.
+ *
+ *     Redistribution and use in source and binary forms, with or without
+ *     modification, are permitted provided that the following conditions
+ *     are met:
+ *
+ *        * Redistributions of source code must retain the above copyright
+ *          notice, this list of conditions and the following disclaimer.
+ *
+ *        * Redistributions in binary form must reproduce the above copyright
+ *          notice, this list of conditions and the following disclaimer in
+ *          the documentation and/or other materials provided with the
+ *          distribution.
+ *
+ *     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *     FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *     COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *     INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *     BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *     CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *     POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * \file    wels_task_encoder.h
+ *
+ * \brief   interface for encoder tasks
+ *
+ * \date    07/06/2015 Created
+ *
+ *************************************************************************************
+ */
+
+#include <string.h>
+#include <assert.h>
+
+#include "typedefs.h"
+#include "utils.h"
+#include "measure_time.h"
+#include "WelsTask.h"
+
+#include "wels_task_base.h"
+#include "wels_task_encoder.h"
+
+#include "svc_enc_golomb.h"
+#include "svc_encode_slice.h"
+#include "slice_multi_threading.h"
+
+namespace WelsEnc {
+
+CWelsSliceEncodingTask::CWelsSliceEncodingTask (sWelsEncCtx* pCtx, const int32_t iSliceIdx) {
+  m_pCtx = pCtx;
+  m_iSliceIdx = iSliceIdx;
+}
+
+CWelsSliceEncodingTask::~CWelsSliceEncodingTask() {
+}
+
+WelsErrorType CWelsSliceEncodingTask::SetBoundary (int32_t iStartIdx,  int32_t iEndIdx) {
+  m_iStartMbIdx = iStartIdx;
+  m_iEndMbIdx = iEndIdx;
+  return ENC_RETURN_SUCCESS;
+}
+
+int32_t CWelsSliceEncodingTask::QueryEmptyThread (bool* pThreadBsBufferUsage) {
+  for (int32_t k = 0; k < MAX_THREADS_NUM; k++) {
+    if (pThreadBsBufferUsage[k] == false) {
+      pThreadBsBufferUsage[k] = true;
+      return k;
+    }
+  }
+  return -1;
+}
+
+WelsErrorType CWelsSliceEncodingTask::InitTask() {
+  m_eNalType          = m_pCtx->eNalType;
+  m_eNalRefIdc        = m_pCtx->eNalPriority;
+  m_bNeedPrefix       = m_pCtx->bNeedPrefixNalFlag;
+
+  WelsMutexLock (&m_pCtx->pSliceThreading->mutexThreadBsBufferUsage);
+  m_iThreadIdx = QueryEmptyThread (m_pCtx->pSliceThreading->bThreadBsBufferUsage);
+  WelsMutexUnlock (&m_pCtx->pSliceThreading->mutexThreadBsBufferUsage);
+  if (m_iThreadIdx < 0) {
+    printf ("cannot find avaialble thread %d\n", m_iThreadIdx);
+    return ENC_RETURN_UNEXPECTED;
+  }
+  SetOneSliceBsBufferUnderMultithread (m_pCtx, m_iSliceIdx, m_iThreadIdx);
+
+  m_pSlice = &m_pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[m_iSliceIdx];
+  m_pSliceBs = &m_pCtx->pSliceBs[m_iSliceIdx];
+
+  m_pSliceBs->uiBsPos       = 0;
+  m_pSliceBs->iNalIndex     = 0;
+
+  assert ((void*) (&m_pSliceBs->sBsWrite) == (void*)m_pSlice->pSliceBsa);
+  InitBits (&m_pSliceBs->sBsWrite, m_pSliceBs->pBsBuffer, m_pSliceBs->uiSize);
+
+  return ENC_RETURN_SUCCESS;
+}
+void CWelsSliceEncodingTask::FinishTask() {
+  WelsMutexLock (&m_pCtx->pSliceThreading->mutexThreadBsBufferUsage);
+  m_pCtx->pSliceThreading->bThreadBsBufferUsage[m_iThreadIdx] = false;
+  WelsMutexUnlock (&m_pCtx->pSliceThreading->mutexThreadBsBufferUsage);
+}
+
+WelsErrorType CWelsSliceEncodingTask::Execute() {
+  WelsThreadSetName ("OpenH264Enc_CWelsSliceEncodingTask_Execute");
+
+#if MT_DEBUG_BS_WR
+  m_pSliceBs->bSliceCodedFlag = false;
+#endif//MT_DEBUG_BS_WR
+
+  if (m_bNeedPrefix) {
+    if (m_eNalRefIdc != NRI_PRI_LOWEST) {
+      WelsLoadNalForSlice (m_pSliceBs, NAL_UNIT_PREFIX, m_eNalRefIdc);
+      WelsWriteSVCPrefixNal (&m_pSliceBs->sBsWrite, m_eNalRefIdc, (NAL_UNIT_CODED_SLICE_IDR == m_eNalType));
+      WelsUnloadNalForSlice (m_pSliceBs);
+    } else { // No Prefix NAL Unit RBSP syntax here, but need add NAL Unit Header extension
+      WelsLoadNalForSlice (m_pSliceBs, NAL_UNIT_PREFIX, m_eNalRefIdc);
+      // No need write any syntax of prefix NAL Unit RBSP here
+      WelsUnloadNalForSlice (m_pSliceBs);
+    }
+  }
+
+  WelsLoadNalForSlice (m_pSliceBs, m_eNalType, m_eNalRefIdc);
+  int32_t iReturn = WelsCodeOneSlice (m_pCtx, m_iSliceIdx, m_eNalType);
+  if (ENC_RETURN_SUCCESS != iReturn) {
+    return iReturn;
+  }
+  WelsUnloadNalForSlice (m_pSliceBs);
+
+  m_iSliceSize = 0;
+  int32_t iLeftBufferSize = (m_iSliceIdx > 0) ? (m_pSliceBs->uiSize - (int32_t) (m_pSliceBs->sBsWrite.pCurBuf -
+                            m_pSliceBs->sBsWrite.pStartBuf)) : (m_pCtx->iFrameBsSize - m_pCtx->iPosBsBuffer);
+  iReturn = WriteSliceBs (m_pCtx, m_pSliceBs->pBs,
+                          &m_pSliceBs->iNalLen[0],
+                          iLeftBufferSize,
+                          m_iSliceIdx, m_iSliceSize);
+  if (ENC_RETURN_SUCCESS != iReturn) {
+    return iReturn;
+  }
+  if (0 == m_iSliceIdx) {
+    m_pCtx->iPosBsBuffer += m_iSliceSize;
+  }
+
+  m_pCtx->pFuncList->pfDeblocking.pfDeblockingFilterSlice (m_pCtx->pCurDqLayer, m_pCtx->pFuncList, m_iSliceIdx);
+
+#if defined(SLICE_INFO_OUTPUT)
+  fprintf (stderr,
+           "@pSlice=%-6d sliceType:%c idc:%d size:%-6d\n",
+           m_iSliceIdx,
+           (pEncPEncCtx->eSliceType == P_SLICE ? 'P' : 'I'),
+           eNalRefIdc,
+           iSliceSize
+          );
+#endif//SLICE_INFO_OUTPUT
+
+#if MT_DEBUG_BS_WR
+  m_pSliceBs->bSliceCodedFlag = true;
+#endif//MT_DEBUG_BS_WR
+
+  return ENC_RETURN_SUCCESS;
+}
+
+
+// CWelsLoadBalancingSlicingEncodingTask
+CWelsLoadBalancingSlicingEncodingTask::CWelsLoadBalancingSlicingEncodingTask (sWelsEncCtx* pCtx,
+    const int32_t iSliceIdx) :
+  CWelsSliceEncodingTask (pCtx, iSliceIdx) {
+}
+
+CWelsLoadBalancingSlicingEncodingTask::~CWelsLoadBalancingSlicingEncodingTask() {
+}
+
+WelsErrorType CWelsLoadBalancingSlicingEncodingTask::InitTask() {
+  WelsErrorType iReturn = CWelsSliceEncodingTask::InitTask();
+  if (ENC_RETURN_SUCCESS != iReturn) {
+    return iReturn;
+  }
+
+  m_iSliceStart = WelsTime();
+  return ENC_RETURN_SUCCESS;
+}
+
+void CWelsLoadBalancingSlicingEncodingTask::FinishTask() {
+  CWelsSliceEncodingTask::FinishTask();
+
+  m_pCtx->pSliceThreading->pSliceConsumeTime[m_uiDependencyId][m_iSliceIdx] = (uint32_t) (WelsTime() - m_iSliceStart);
+  WelsLog (&m_pCtx->sLogCtx, WELS_LOG_DEBUG,
+           "[MT] CodingSliceThreadProc(), coding_idx %d, um_iSliceIdx %d, pSliceConsumeTime %d, iSliceSize %d, pFirstMbInSlice %d, count_num_mb_in_slice %d",
+           m_pCtx->iCodingIndex,
+           m_iSliceIdx,
+           m_pCtx->pSliceThreading->pSliceConsumeTime[m_uiDependencyId][m_iSliceIdx],
+           m_iSliceSize,
+           m_pCtx->pCurDqLayer->pSliceEncCtx->pFirstMbInSlice[m_iSliceIdx],
+           m_pCtx->pCurDqLayer->pSliceEncCtx->pCountMbNumInSlice[m_iSliceIdx]);
+}
+
+}
+
+

@@ -474,6 +474,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\encoder\core\src\wels_task_base.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\encoder\core\src\wels_task_encoder.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\encoder\core\src\wels_task_management.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\common\src\WelsTaskThread.cpp"
 				>
 			</File>

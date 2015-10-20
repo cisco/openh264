@@ -29,31 +29,27 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file    WelsTask.h
+ * \file    wels_task_base.cpp
  *
- * \brief   Interfaces introduced in thread pool
+ * \brief   function for base task
  *
  * \date    5/09/2012 Created
  *
  *************************************************************************************
  */
 
-#ifndef _WELS_TASK_H_
-#define _WELS_TASK_H_
+#include "wels_task_base.h"
 
-#include "codec_def.h"
+namespace WelsEnc {
 
-namespace WelsCommon {
+CWelsBaseTask::CWelsBaseTask() {
+}
 
-class IWelsTask {
- public:
-  virtual ~IWelsTask() { }
+CWelsBaseTask::~CWelsBaseTask() {
+}
 
-  virtual int Execute() = 0;
-};
 
 }
 
-#endif
 
 
