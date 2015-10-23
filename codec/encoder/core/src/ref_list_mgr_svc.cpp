@@ -637,6 +637,13 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
   if (pCtx->iNumRef0 > 0)
     iAbsDiffPicNumMinus1 = pCtx->iFrameNum - (pCtx->pRefList0[0]->iFrameNum) - 1;
 
+  if (iAbsDiffPicNumMinus1 < 0) {
+    WelsLog(&(pCtx->sLogCtx), WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1:%d", iAbsDiffPicNumMinus1);
+    iAbsDiffPicNumMinus1 += (1 << (pCtx->pSps->uiLog2MaxFrameNum));
+    WelsLog(&(pCtx->sLogCtx), WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1< 0, update as:%d",
+             iAbsDiffPicNumMinus1);
+  }
+
   for (iIdx = 0; iIdx < kiCountSliceNum; iIdx++) {
     SSliceHeaderExt*    pSliceHdrExt        = &pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[iIdx].sSliceHeaderExt;
     SSliceHeader*       pSliceHdr           = &pSliceHdrExt->sSliceHeader;
@@ -647,12 +654,6 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
     pSliceHdr->uiRefCount = pCtx->iNumRef0;
     if (pCtx->iNumRef0 > 0) {
       if ((!pCtx->pRefList0[0]->bIsLongRef) || (!pCtx->pSvcParam->bEnableLongTermReference)) {
-        if (iAbsDiffPicNumMinus1 < 0) {
-          WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1:%d", iAbsDiffPicNumMinus1);
-          iAbsDiffPicNumMinus1 += (1 << (pCtx->pSps->uiLog2MaxFrameNum));
-          WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1< 0, update as:%d",
-                   iAbsDiffPicNumMinus1);
-        }
 
         pRefReorder->SReorderingSyntax[0].uiReorderingOfPicNumsIdc = 0;
         pRefReorder->SReorderingSyntax[0].uiAbsDiffPicNumMinus1    = iAbsDiffPicNumMinus1;
