@@ -60,6 +60,7 @@
 
 namespace WelsEnc {
 
+class IWelsTaskManage;
 /*
  *  reference list for each quality layer in SVC
  */
@@ -133,6 +134,7 @@ typedef struct TagWelsEncCtx {
   SWelsFuncPtrList* pFuncList;
 
   SSliceThreading*  pSliceThreading;
+  //IWelsTaskManage*  pTaskManage; //was planning to put it under CWelsH264SVCEncoder but it may be updated (lock/no lock) when param is changed
 
 // SSlice context
   SSliceCtx*        pSliceCtxList;// slice context table for each dependency quality layer

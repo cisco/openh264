@@ -99,6 +99,11 @@ void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t 
 #endif//defined(MT_DEBUG)
 
 void SetOneSliceBsBufferUnderMultithread(sWelsEncCtx* pCtx, const int32_t kiThreadIdx, const int32_t iSliceIdx);
+int32_t WriteSliceBs (sWelsEncCtx* pCtx, uint8_t* pDst,
+                        int32_t* pNalLen,
+                        int32_t iTotalLeftLength,
+                        const int32_t iSliceIdx,
+                        int32_t& iSliceSize);
 }
 
 #endif//SVC_SLICE_MULTIPLE_THREADING_H__
