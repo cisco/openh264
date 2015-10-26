@@ -41,7 +41,9 @@
 #include "set_mb_syn_cabac.h"
 #include "svc_enc_golomb.h"
 
-namespace WelsEnc {
+using namespace WelsEnc;
+
+namespace {
 
 static const uint16_t uiSignificantCoeffFlagOffset[5] = {0, 15, 29, 44, 47};
 static const uint16_t uiLastCoeffFlagOffset[5] = {0, 15, 29, 44, 47};
@@ -455,21 +457,17 @@ void  WelsWriteBlockResidualCabac (SMbCache* pMbCache, SMB* pCurMb, uint32_t iMb
                                    ECtxBlockCat eCtxBlockCat, int16_t  iIdx, int16_t iNonZeroCount, int16_t* pBlock, int16_t iEndIdx) {
   int32_t iCtx = WelsGetMbCtxCabac (pMbCache, pCurMb, iMbWidth, eCtxBlockCat, iIdx);
   if (iNonZeroCount) {
-    ENFORCE_STACK_ALIGN_1D (int16_t, iAbsLevel, 16, 16);
-    ENFORCE_STACK_ALIGN_1D (int16_t, iSignLevel, 16, 16);
+    int16_t iLevel[16];
     const int32_t iCtxSig = 105 + uiSignificantCoeffFlagOffset[eCtxBlockCat];
     const int32_t iCtxLast = 166 + uiLastCoeffFlagOffset[eCtxBlockCat];
     const int32_t iCtxLevel = 227 + uiCoeffAbsLevelMinus1Offset[eCtxBlockCat];
     int32_t iNonZeroIdx = 0;
     int32_t i = 0;
-    int32_t iNumAbsLevelEq1 = 0;
-    int32_t iNumAbsLevelGt1 = 0;
 
     WelsCabacEncodeDecision (pCabacCtx, iCtx, 1);
     while (1) {
       if (pBlock[i]) {
-        iSignLevel[iNonZeroIdx] = pBlock[i] < 0;
-        iAbsLevel[iNonZeroIdx] = WELS_ABS (pBlock[i]) - 1;
+        iLevel[iNonZeroIdx] = pBlock[i];
 
         iNonZeroIdx++;
         WelsCabacEncodeDecision (pCabacCtx, iCtxSig + i, 1);
@@ -483,33 +481,38 @@ void  WelsWriteBlockResidualCabac (SMbCache* pMbCache, SMB* pCurMb, uint32_t iMb
         WelsCabacEncodeDecision (pCabacCtx, iCtxSig + i, 0);
       i++;
       if (i == iEndIdx) {
-        iSignLevel[iNonZeroIdx]   = pBlock[i] < 0;
-        iAbsLevel[iNonZeroIdx] = WELS_ABS (pBlock[i]) - 1;
+        iLevel[iNonZeroIdx] = pBlock[i];
         iNonZeroIdx++;
         break;
       }
     }
+
+    int32_t iNumAbsLevelGt1 = 0;
+    int32_t iCtx1 = iCtxLevel + 1;
+
     do {
       int32_t iPrefix = 0;
       iNonZeroIdx--;
-      iPrefix = WELS_MIN (iAbsLevel[iNonZeroIdx], 14);
+      iPrefix = WELS_ABS (iLevel[iNonZeroIdx]) - 1;
       if (iPrefix) {
-        iCtx = iCtxLevel + ((iNumAbsLevelGt1 != 0) ? 0 : WELS_MIN (4, 1 + iNumAbsLevelEq1));
+        iPrefix = WELS_MIN (iPrefix, 14);
+        iCtx = WELS_MIN (iCtxLevel + 4, iCtx1);
         WelsCabacEncodeDecision (pCabacCtx, iCtx, 1);
-        iCtx = iCtxLevel + 5 + WELS_MIN (4 - (eCtxBlockCat == CHROMA_DC), iNumAbsLevelGt1);
-        for (i = 0; i < iPrefix - 1; i++)
+        iNumAbsLevelGt1++;
+        iCtx = iCtxLevel + 4 + WELS_MIN (5 - (eCtxBlockCat == CHROMA_DC), iNumAbsLevelGt1);
+        for (i = 1; i < iPrefix; i++)
           WelsCabacEncodeDecision (pCabacCtx, iCtx, 1);
-        if (iPrefix < 14)
+        if (WELS_ABS (iLevel[iNonZeroIdx]) < 15)
           WelsCabacEncodeDecision (pCabacCtx, iCtx, 0);
         else
-          WelsCabacEncodeUeBypass (pCabacCtx, 0, iAbsLevel[iNonZeroIdx] - 14);
-        iNumAbsLevelGt1++;
+          WelsCabacEncodeUeBypass (pCabacCtx, 0, WELS_ABS (iLevel[iNonZeroIdx]) - 15);
+        iCtx1 = iCtxLevel;
       } else {
-        iCtx = iCtxLevel + ((iNumAbsLevelGt1 != 0) ? 0 : WELS_MIN (4, 1 + iNumAbsLevelEq1));
+        iCtx = WELS_MIN (iCtxLevel + 4, iCtx1);
         WelsCabacEncodeDecision (pCabacCtx, iCtx, 0);
-        iNumAbsLevelEq1++;
+        iCtx1 += iNumAbsLevelGt1 == 0;
       }
-      WelsCabacEncodeBypassOne (pCabacCtx, iSignLevel[iNonZeroIdx]);
+      WelsCabacEncodeBypassOne (pCabacCtx, iLevel[iNonZeroIdx] < 0);
     } while (iNonZeroIdx > 0);
 
   } else {
@@ -519,12 +522,10 @@ void  WelsWriteBlockResidualCabac (SMbCache* pMbCache, SMB* pCurMb, uint32_t iMb
 
 }
 int32_t WelsCalNonZeroCount2x2Block (int16_t* pBlock) {
-  int32_t iCount = 0;
-  for (int16_t i = 0; i < 4; i++) {
-    if (pBlock[i])
-      iCount++;
-  }
-  return iCount;
+  return (pBlock[0] != 0)
+       + (pBlock[1] != 0)
+       + (pBlock[2] != 0)
+       + (pBlock[3] != 0);
 }
 int32_t WelsWriteMbResidualCabac (SWelsFuncPtrList* pFuncList, SSlice* pSlice, SMbCache* sMbCacheInfo, SMB* pCurMb,
                                   SCabacCtx* pCabacCtx,
@@ -617,6 +618,10 @@ int32_t WelsWriteMbResidualCabac (SWelsFuncPtrList* pFuncList, SSlice* pSlice, S
   }
   return 0;
 }
+
+} // anon ns.
+
+namespace WelsEnc {
 
 void WelsInitSliceCabac (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
   /* alignment needed */
