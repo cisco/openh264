@@ -72,6 +72,8 @@ namespace WelsEnc {
 #define JUMPPACKETSIZE_JUDGE(len,mb_idx,max_byte)       ( (len) > JUMPPACKETSIZE_CONSTRAINT(max_byte) ) //( (mb_idx+1)%40/*16slice for compare*/ == 0 )        //
 //cur_mb_idx is for early tests, can be omit in optimization
 
+typedef struct TagSlice SSlice;
+typedef struct TagWelsEncCtx sWelsEncCtx;
 /*!
  * \brief   SSlice context
  */
@@ -190,6 +192,7 @@ int32_t WelsGetNumMbInSlice (SSliceCtx* pSliceCtx, const int32_t kiSliceIdc);
  */
 int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceConfig* pMso);
 int32_t GetCurrentSliceNum (const SSliceCtx* kpSliceCtx);
+SSlice* GetSliceByIndex(sWelsEncCtx* pCtx, const int32_t kiSliceIdc);
 
 //checking valid para
 int32_t DynamicMaxSliceNumConstraint (uint32_t uiMaximumNum, int32_t uiConsumedNum, uint32_t uiDulplicateTimes);
