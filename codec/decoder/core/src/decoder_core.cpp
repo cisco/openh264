@@ -72,7 +72,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
     }
   }
 
-  if (pCtx->bParseOnly) { //should exit for parse only to prevent access NULL pDstInfo
+  if (pCtx->pParam->bParseOnly) { //should exit for parse only to prevent access NULL pDstInfo
     PAccessUnit pCurAu = pCtx->pAccessUnitList;
     if (dsErrorFree == pCtx->iErrorCode) { //correct decoding, add to data buffer
       SParserBsInfo* pParser = pCtx->pParserBsInfo;
@@ -467,7 +467,7 @@ int32_t InitBsBuffer (PWelsDecoderContext pCtx) {
   }
   pCtx->sRawData.pStartPos = pCtx->sRawData.pCurPos = pCtx->sRawData.pHead;
   pCtx->sRawData.pEnd = pCtx->sRawData.pHead + pCtx->iMaxBsBufferSizeInByte;
-  if (pCtx->bParseOnly) {
+  if (pCtx->pParam->bParseOnly) {
     pCtx->pParserBsInfo = static_cast<SParserBsInfo*> (pMa->WelsMallocz (sizeof (SParserBsInfo), "pCtx->pParserBsInfo"));
     if (pCtx->pParserBsInfo == NULL) {
       return ERR_INFO_OUT_OF_MEMORY;
@@ -538,14 +538,14 @@ int32_t CheckBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen) {
 }
 
 /*
- * WelsInitMemory
+ * WelsInitStaticMemory
  * Memory request for new introduced data
  * Especially for:
  * rbsp_au_buffer, cur_dq_layer_ptr and ref_dq_layer_ptr in MB info cache.
  * return:
  *  0 - success; otherwise returned error_no defined in error_no.h.
 */
-int32_t WelsInitMemory (PWelsDecoderContext pCtx) {
+int32_t WelsInitStaticMemory (PWelsDecoderContext pCtx) {
   if (pCtx == NULL) {
     return ERR_INFO_INVALID_PTR;
   }
@@ -563,21 +563,15 @@ int32_t WelsInitMemory (PWelsDecoderContext pCtx) {
 }
 
 /*
- * WelsFreeMemory
- * Free memory introduced in WelsInitMemory at destruction of decoder.
+ * WelsFreeStaticMemory
+ * Free memory introduced in WelsInitStaticMemory at destruction of decoder.
  *
  */
-void WelsFreeMemory (PWelsDecoderContext pCtx) {
+void WelsFreeStaticMemory (PWelsDecoderContext pCtx) {
   if (pCtx == NULL)
     return;
 
   CMemoryAlign* pMa = pCtx->pMemAlign;
-
-  if (NULL != pCtx->pParam) {
-    pMa->WelsFree (pCtx->pParam, "pCtx->pParam");
-
-    pCtx->pParam = NULL;
-  }
 
   MemFreeNalList (&pCtx->pAccessUnitList, pMa);
 
@@ -588,7 +582,7 @@ void WelsFreeMemory (PWelsDecoderContext pCtx) {
   pCtx->sRawData.pEnd                 = NULL;
   pCtx->sRawData.pStartPos            = NULL;
   pCtx->sRawData.pCurPos              = NULL;
-  if (pCtx->bParseOnly) {
+  if (pCtx->pParam->bParseOnly) {
     if (pCtx->sSavedData.pHead) {
       pMa->WelsFree (pCtx->sSavedData.pHead, "pCtx->sSavedData->pHead");
     }
@@ -604,6 +598,12 @@ void WelsFreeMemory (PWelsDecoderContext pCtx) {
       pMa->WelsFree (pCtx->pParserBsInfo, "pCtx->pParserBsInfo");
       pCtx->pParserBsInfo = NULL;
     }
+  }
+
+  if (NULL != pCtx->pParam) {
+    pMa->WelsFree (pCtx->pParam, "pCtx->pParam");
+
+    pCtx->pParam = NULL;
   }
 }
 /*
@@ -723,8 +723,9 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   pSliceHead->eSliceType = static_cast <EWelsSliceType> (uiSliceType);
 
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //pic_parameter_set_id
-  WELS_CHECK_SE_UPPER_ERROR (uiCode, (MAX_PPS_COUNT - 1), "iPpsId out of range", GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER,
-                             ERR_INFO_PPS_ID_OVERFLOW));
+  WELS_CHECK_SE_UPPER_ERROR (uiCode, (MAX_PPS_COUNT - 1), "iPpsId out of range",
+                             GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER,
+                                 ERR_INFO_PPS_ID_OVERFLOW));
   iPpsId = uiCode;
 
   //add check PPS available here
@@ -1974,7 +1975,7 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
 
   if (ERR_NONE != iErr) {
     ForceResetCurrentAccessUnit (pCtx->pAccessUnitList);
-    if (!pCtx->bParseOnly)
+    if (!pCtx->pParam->bParseOnly)
       pDstInfo->iBufferStatus = 0;
     pCtx->bNewSeqBegin = pCtx->bNewSeqBegin || pCtx->bNextNewSeqBegin;
     pCtx->bNextNewSeqBegin = false; // reset it
@@ -2339,7 +2340,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
 
     if (dq_cur->uiLayerDqId == kuiTargetLayerDqId) {
       if (!pCtx->bInstantDecFlag) {
-        if (!pCtx->bParseOnly) {
+        if (!pCtx->pParam->bParseOnly) {
           //Do error concealment here
           if ((NeedErrorCon (pCtx)) && (pCtx->eErrorConMethod != ERROR_CON_DISABLE)) {
             ImplementErrorCon (pCtx);
@@ -2365,7 +2366,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
             return iRet;
           }
         }
-        if (!pCtx->bParseOnly)
+        if (!pCtx->pParam->bParseOnly)
           ExpandReferencingPicture (pCtx->pDec->pData, pCtx->pDec->iWidthInPixel, pCtx->pDec->iHeightInPixel,
                                     pCtx->pDec->iLinesize,
                                     pCtx->sExpandPicFunc.pfExpandLumaPicture, pCtx->sExpandPicFunc.pfExpandChromaPicture);
@@ -2421,7 +2422,7 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
       if (pCtx->sLastNalHdrExt.sNalUnitHeader.uiNalRefIdc > 0) {
         MarkECFrameAsRef (pCtx);
       }
-    } else if (pCtx->bParseOnly) { //clear parse only internal data status
+    } else if (pCtx->pParam->bParseOnly) { //clear parse only internal data status
       pCtx->pParserBsInfo->iNalNum = 0;
       pCtx->bFrameFinish = true; //clear frame pending status here!
     } else {
