@@ -2286,11 +2286,11 @@ int32_t InitSliceSettings (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPar
         iMaxSliceCount = iSliceNum;
       break;
     case SM_AUTO_SLICE:
-      iMaxSliceCount = MAX_SLICES_NUM;
       pDlp->sSliceCfg.sSliceArgument.uiSliceNum = kiCpuCores;
-      if (pDlp->sSliceCfg.sSliceArgument.uiSliceNum > iMaxSliceCount) {
-        pDlp->sSliceCfg.sSliceArgument.uiSliceNum = iMaxSliceCount;
+      if (pDlp->sSliceCfg.sSliceArgument.uiSliceNum > MAX_SLICES_NUM) {
+        pDlp->sSliceCfg.sSliceArgument.uiSliceNum = MAX_SLICES_NUM;
       }
+      iMaxSliceCount = WELS_MAX(iMaxSliceCount, pDlp->sSliceCfg.sSliceArgument.uiSliceNum);
       if (pDlp->sSliceCfg.sSliceArgument.uiSliceNum == 1) {
         WelsLog (pLogCtx, WELS_LOG_DEBUG,
                  "InitSliceSettings(), uiSliceNum(%d) you set for SM_AUTO_SLICE, now turn to SM_SINGLE_SLICE type!",
