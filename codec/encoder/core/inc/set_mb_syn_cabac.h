@@ -76,7 +76,7 @@ typedef struct TagCabacCtx {
 void WelsCabacContextInit (void* pCtx, SCabacCtx* pCbCtx, int32_t iModel);
 void WelsCabacEncodeInit (SCabacCtx* pCbCtx, uint8_t* pBuf,  uint8_t* pEnd);
 inline void WelsCabacEncodeDecision (SCabacCtx* pCbCtx, int32_t iCtx, uint32_t uiBin);
-inline void WelsCabacEncodeBypassOne (SCabacCtx* pCbCtx, uint32_t uiBin);
+inline void WelsCabacEncodeBypassOne (SCabacCtx* pCbCtx, int32_t uiBin);
 void WelsCabacEncodeTerminate (SCabacCtx* pCbCtx, uint32_t uiBin);
 void WelsCabacEncodeUeBypass (SCabacCtx* pCbCtx, int32_t iExpBits, uint32_t uiVal);
 void WelsCabacEncodeFlush (SCabacCtx* pCbCtx);
@@ -116,7 +116,7 @@ void WelsCabacEncodeDecision (SCabacCtx* pCbCtx, int32_t iCtx, uint32_t uiBin) {
   }
 }
 
-void WelsCabacEncodeBypassOne (SCabacCtx* pCbCtx, uint32_t uiBin) {
+void WelsCabacEncodeBypassOne (SCabacCtx* pCbCtx, int32_t uiBin) {
   const uint32_t kuiBinBitmask = -uiBin;
   pCbCtx->m_iRenormCnt++;
   WelsCabacEncodeUpdateLow_ (pCbCtx);
