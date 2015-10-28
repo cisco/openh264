@@ -444,11 +444,42 @@ bool CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx) {
 
   return true;
 }
-void WelsMarkPic (sWelsEncCtx* pCtx) {
-  SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
-  const int32_t kiCountSliceNum = GetCurrentSliceNum (pCtx->pCurDqLayer->pSliceEncCtx);
-  int32_t iGoPFrameNumInterval = ((pCtx->pSvcParam->uiGopSize >> 1) > 1) ? (pCtx->pSvcParam->uiGopSize >> 1) : (1);
+void WlesMarkMMCORefInfo(sWelsEncCtx* pCtx, SLTRState* pLtr,
+                         SSlice* pSliceList, const int32_t kiCountSliceNum) {
   int32_t iSliceIdx = 0;
+  int32_t iGoPFrameNumInterval = ((pCtx->pSvcParam->uiGopSize >> 1) > 1) ? (pCtx->pSvcParam->uiGopSize >> 1) : (1);
+
+  for (iSliceIdx = 0; iSliceIdx < kiCountSliceNum; iSliceIdx++) {
+    SSliceHeaderExt*    pSliceHdrExt = &pSliceList[iSliceIdx].sSliceHeaderExt;
+    SSliceHeader*       pSliceHdr = &pSliceHdrExt->sSliceHeader;
+    SRefPicMarking*     pRefPicMark = &pSliceHdr->sRefMarking;
+
+    memset(pRefPicMark, 0, sizeof(SRefPicMarking));
+
+    if (pCtx->pSvcParam->bEnableLongTermReference && pLtr->bLTRMarkingFlag) {
+      if (pLtr->iLTRMarkMode == LTR_DIRECT_MARK) {
+        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iMaxLongTermFrameIdx = LONG_TERM_REF_NUM - 1;
+        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_SET_MAX_LONG;
+
+        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iDiffOfPicNum = iGoPFrameNumInterval;
+        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_SHORT2UNUSED;
+
+        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iLongTermFrameIdx = pLtr->iCurLtrIdx;
+        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_LONG;
+      }
+      else if (pLtr->iLTRMarkMode == LTR_DELAY_MARK) {
+        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iDiffOfPicNum = iGoPFrameNumInterval;
+        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iLongTermFrameIdx = pLtr->iCurLtrIdx;
+        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_SHORT2LONG;
+      }
+    }
+  }
+
+}
+void WelsMarkPic (sWelsEncCtx* pCtx) {
+  SLTRState* pLtr               = &pCtx->pLtr[pCtx->uiDependencyId];
+  const int32_t kiCountSliceNum = GetCurrentSliceNum (pCtx->pCurDqLayer->pSliceEncCtx);
+  SSlice* pSliceList            = NULL;
 
   if (pCtx->pSvcParam->bEnableLongTermReference && pLtr->bLTRMarkEnable && pCtx->uiTemporalId == 0) {
     if (!pLtr->bReceivedT0LostFlag && pLtr->uiLtrMarkInterval > pCtx->pSvcParam->iLtrMarkPeriod
@@ -466,29 +497,14 @@ void WelsMarkPic (sWelsEncCtx* pCtx) {
     }
   }
 
-  for (iSliceIdx = 0; iSliceIdx < kiCountSliceNum; iSliceIdx++) {
-    SSliceHeaderExt*    pSliceHdrExt    = &pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[iSliceIdx].sSliceHeaderExt;
-    SSliceHeader*       pSliceHdr       = &pSliceHdrExt->sSliceHeader;
-    SRefPicMarking*     pRefPicMark     = &pSliceHdr->sRefMarking;
-
-    memset (pRefPicMark, 0, sizeof (SRefPicMarking));
-
-    if (pCtx->pSvcParam->bEnableLongTermReference && pLtr->bLTRMarkingFlag) {
-      if (pLtr->iLTRMarkMode == LTR_DIRECT_MARK) {
-        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iMaxLongTermFrameIdx = LONG_TERM_REF_NUM - 1;
-        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_SET_MAX_LONG;
-
-        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iDiffOfPicNum = iGoPFrameNumInterval;
-        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_SHORT2UNUSED;
-
-        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iLongTermFrameIdx = pLtr->iCurLtrIdx;
-        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_LONG;
-      } else if (pLtr->iLTRMarkMode == LTR_DELAY_MARK) {
-        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iDiffOfPicNum = iGoPFrameNumInterval;
-        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iLongTermFrameIdx = pLtr->iCurLtrIdx;
-        pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_SHORT2LONG;
-      }
-    }
+  if (pCtx->iActiveThreadsNum > 1) {
+    //will replace with thread-base pslice buffer later
+    pSliceList = pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer;
+    WlesMarkMMCORefInfo(pCtx, pLtr, pSliceList, kiCountSliceNum);
+  }
+  else {
+    pSliceList = pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer;
+    WlesMarkMMCORefInfo(pCtx, pLtr, pSliceList, kiCountSliceNum);
   }
 }
 
