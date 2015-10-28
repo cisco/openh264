@@ -2886,6 +2886,8 @@ void WelsInitCurrentLayer (sWelsEncCtx* pCtx,
       pBaseSlice->sSliceHeaderExt.sSliceHeader.pSps     = &pCtx->pSpsArray[iCurSpsId];
   }
 
+  pBaseSlice->bSliceHeaderExtFlag = (NAL_UNIT_CODED_SLICE_EXT == pCtx->eNalType);
+
   pSlice = pBaseSlice;
   iIdx = 1;
   while (iIdx < iSliceCount) {
@@ -2894,6 +2896,7 @@ void WelsInitCurrentLayer (sWelsEncCtx* pCtx,
     pSlice->sSliceHeaderExt.sSliceHeader.pPps   = pBaseSlice->sSliceHeaderExt.sSliceHeader.pPps;
     pSlice->sSliceHeaderExt.sSliceHeader.iSpsId = pBaseSlice->sSliceHeaderExt.sSliceHeader.iSpsId;
     pSlice->sSliceHeaderExt.sSliceHeader.pSps   = pBaseSlice->sSliceHeaderExt.sSliceHeader.pSps;
+    pSlice->bSliceHeaderExtFlag                 = pBaseSlice->bSliceHeaderExtFlag;
     ++ iIdx;
   }
 
@@ -2906,16 +2909,6 @@ void WelsInitCurrentLayer (sWelsEncCtx* pCtx,
   pNalHdExt->bIdrFlag                   = (pCtx->iFrameNum == 0) && ((pCtx->eNalType == NAL_UNIT_CODED_SLICE_IDR)
                                           || (pCtx->eSliceType == I_SLICE));
   pNalHdExt->uiTemporalId               = pCtx->uiTemporalId;
-
-  pBaseSlice->bSliceHeaderExtFlag       = (NAL_UNIT_CODED_SLICE_EXT == pNalHd->eNalUnitType);
-
-  pSlice = pBaseSlice;
-  iIdx = 1;
-  while (iIdx < iSliceCount) {
-    ++ pSlice;
-    pSlice->bSliceHeaderExtFlag = pBaseSlice->bSliceHeaderExtFlag;
-    ++ iIdx;
-  }
 
   // pEncPic pData
   pCurDq->pEncData[0]   = pEncPic->pData[0];
