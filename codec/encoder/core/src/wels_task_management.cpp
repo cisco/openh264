@@ -41,6 +41,7 @@
 #include <assert.h>
 
 #include "typedefs.h"
+#include "utils.h"
 #include "WelsLock.h"
 #include "memory_align.h"
 
@@ -74,8 +75,8 @@ IWelsTaskManage*   IWelsTaskManage::CreateTaskManage (sWelsEncCtx* pCtx, bool bN
 
 CWelsTaskManageBase::CWelsTaskManageBase()
   : m_pEncCtx (NULL),
-    m_iTaskNum (0),
     m_pThreadPool (NULL),
+    m_iTaskNum (0),
     m_iWaitTaskNum (0) {
   m_cTaskList = new TASKLIST_TYPE();
   WelsEventOpen (&m_hTaskEvent);
@@ -120,8 +121,9 @@ WelsErrorType CWelsTaskManageBase::CreateTasks (sWelsEncCtx* pEncCtx, const int3
 }
 
 void CWelsTaskManageBase::DestroyTasks() {
-  if (m_iTaskNum == 0)
+  if (m_iTaskNum == 0) {
     return;
+  }
 
   if (m_cTaskList->size() != m_iTaskNum) {
     //printf("m_cTaskList %d %d\n", static_cast<int32_t>(m_cTaskList->size()), m_iTaskNum);
@@ -133,41 +135,47 @@ void CWelsTaskManageBase::DestroyTasks() {
     WELS_DELETE_OP (pTask);
     m_cTaskList->pop_front();
   }
+  //WelsLog (&m_pEncCtx->sLogCtx, WELS_LOG_INFO,
+  //         "[MT] CWelsTaskManageParallel()DestroyTasks, cleaned %d tasks", m_iTaskNum);
+  //printf ("[MT] CWelsTaskManageBase() DestroyTasks, cleaned %d tasks\n", m_iTaskNum);
   m_iTaskNum = 0;
 }
 
-void CWelsTaskManageBase::InitFrame() {
+void  CWelsTaskManageBase::OnTaskMinusOne() {
+  WelsCommon::CWelsAutoLock cAutoLock (m_cWaitTaskNumLock);
+  m_iWaitTaskNum --;
+  if (m_iWaitTaskNum <= 0) {
+    WelsEventSignal (&m_hTaskEvent);
+  }
+  //printf("OnTaskMinusOne m_iWaitTaskNum=%d\n", m_iWaitTaskNum);
 }
 
-WelsErrorType  CWelsTaskManageBase::ExecuteTasks() {
-  m_iWaitTaskNum = static_cast<int32_t> (m_cTaskList->size());
-  while (NULL != m_cTaskList->begin()) {
-    m_pThreadPool->QueueTask (m_cTaskList->begin());
-    m_cTaskList->pop_front();
-  }
-  WelsEventWait (&m_hTaskEvent);
-
+WelsErrorType  CWelsTaskManageBase::OnTaskCancelled (WelsCommon::IWelsTask* pTask) {
+  OnTaskMinusOne();
   return ENC_RETURN_SUCCESS;
 }
 
 WelsErrorType  CWelsTaskManageBase::OnTaskExecuted (WelsCommon::IWelsTask* pTask) {
-  WelsCommon::CWelsAutoLock cAutoLock (m_cWaitTaskNumLock);
-  m_iWaitTaskNum --;
-  //WELS_INFO_TRACE("Waiting Task Num: " << m_iWaitTaskNum);
-  if (m_iWaitTaskNum == 0) {
-    WelsEventSignal (&m_hTaskEvent);
-    //WELS_INFO_TRACE("Tasks over ");
-  }
-
+  OnTaskMinusOne();
   return ENC_RETURN_SUCCESS;
 }
 
-WelsErrorType  CWelsTaskManageBase::OnTaskCancelled (WelsCommon::IWelsTask* pTask) {
-  WelsCommon::CWelsAutoLock cAutoLock (m_cWaitTaskNumLock);
-  m_iWaitTaskNum --;
-  if (m_iWaitTaskNum == 0) {
-    WelsEventSignal (&m_hTaskEvent);
+void CWelsTaskManageBase::InitFrame (const int32_t kiCurDid) {
+  m_iWaitTaskNum = m_pEncCtx->pSvcParam->sSpatialLayers[kiCurDid].sSliceCfg.sSliceArgument.uiSliceNum;
+  //printf("InitFrame m_iWaitTaskNum=%d, slice_mode=%d\n", m_iWaitTaskNum, m_pEncCtx->pSvcParam->sSpatialLayers[kiCurDid].sSliceCfg.uiSliceMode);
+  //TODO: update mbmap;
+}
+
+WelsErrorType  CWelsTaskManageBase::ExecuteTasks() {
+  //printf("ExecuteTasks m_iWaitTaskNum=%d\n", m_iWaitTaskNum);
+  int32_t iCurrentTaskCount = m_iWaitTaskNum; //if directly use m_iWaitTaskNum in the loop make cause sync problem
+  int32_t iIdx = 0;
+   while (iIdx < iCurrentTaskCount) {
+    m_pThreadPool->QueueTask (m_cTaskList->GetIndexNode(iIdx));
+    iIdx ++;
   }
+  WelsEventWait (&m_hTaskEvent);
+
   return ENC_RETURN_SUCCESS;
 }
 

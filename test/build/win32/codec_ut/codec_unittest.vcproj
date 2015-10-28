@@ -866,6 +866,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath="..\..\..\common\WelsThreadPoolTest.cpp"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

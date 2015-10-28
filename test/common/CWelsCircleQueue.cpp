@@ -194,3 +194,50 @@ TEST (CWelsCircleQueue, CWelsCircleQueueOnThread) {
 }
 #endif
 
+
+TEST (CWelsCircleQueue, CWelsCircleQueueReadWithIdx) {
+  CWelsCircleQueue<int32_t> cThreadQueue;
+  const int kiIncreaseNum = (rand() % 1000) + 1;
+  const int kiDecreaseNum = rand() % kiIncreaseNum;
+
+  int32_t* pInput = static_cast<int32_t*> (malloc (kiIncreaseNum * 10 * sizeof (int32_t)));
+  if (!pInput) {
+    return;
+  }
+  for (int32_t i = 0; i < kiIncreaseNum * 10; i++) {
+    pInput[i] = i;
+  }
+
+  for (int j = 0; j < 10; j++) {
+    const int iBias = j * (kiIncreaseNum - kiDecreaseNum);
+    for (int i = 0; i < kiIncreaseNum; i++) {
+      cThreadQueue.push_back (&pInput[i + kiIncreaseNum * j]);
+    }
+    EXPECT_TRUE (kiIncreaseNum + iBias == cThreadQueue.size()) << "after push size=" <<
+        cThreadQueue.size() ;
+
+    EXPECT_TRUE ((kiDecreaseNum * j) == * (cThreadQueue.begin()));
+
+    for (int i = 0; i < kiIncreaseNum; i++) {
+      EXPECT_TRUE ((i + kiIncreaseNum * j) == * (cThreadQueue.GetIndexNode (i + iBias)));
+    }
+    for (int i = 0; i < cThreadQueue.size(); i++) {
+      EXPECT_TRUE ((i + kiDecreaseNum * j) == * (cThreadQueue.GetIndexNode (i)));
+    }
+
+    for (int i = kiDecreaseNum; i > 0; i--) {
+      cThreadQueue.pop_front();
+    }
+    EXPECT_TRUE ((j + 1) * (kiIncreaseNum - kiDecreaseNum) == cThreadQueue.size()) << "after pop size=" <<
+        cThreadQueue.size() ;
+
+    EXPECT_TRUE ((kiDecreaseNum * (j + 1)) == * (cThreadQueue.begin()));
+  }
+
+  //clean-up
+  while (NULL != cThreadQueue.begin()) {
+    cThreadQueue.pop_front();
+  }
+  EXPECT_TRUE (0 == cThreadQueue.size());
+  free (pInput);
+}

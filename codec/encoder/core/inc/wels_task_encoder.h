@@ -61,6 +61,7 @@ class CWelsSliceEncodingTask : public CWelsBaseTask {
 
   virtual WelsErrorType Execute();
   virtual WelsErrorType InitTask();
+  virtual WelsErrorType ExecuteTask();
   virtual void FinishTask();
 
   virtual uint32_t        GetTaskType() const {

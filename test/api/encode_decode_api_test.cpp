@@ -3727,4 +3727,71 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVCDiffFps) {
 #endif
 }
 
+TEST_F (EncodeDecodeTestAPI, DiffSlicingInDlayer) {
+  int iSpatialLayerNum = 3;
+  int iWidth       = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, (64 << 2), MAX_WIDTH);
+  int iHeight      = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1)  + 1) << 1, (64 << 2), 2240);//TODO: use MAX_HEIGHT after the limit is removed
+  float fFrameRate = rand() + 0.5f;
+  int iEncFrameNum = WelsClip3 ((rand() % ENCODE_FRAME_NUM) + 1, 1, ENCODE_FRAME_NUM);
 
+  // prepare params
+  SEncParamExt   sParam;
+  encoder_->GetDefaultParams (&sParam);
+  prepareParamDefault (iSpatialLayerNum, 1, iWidth, iHeight, fFrameRate, &sParam);
+  sParam.iMultipleThreadIdc = (rand()%4) + 1;
+  sParam.bSimulcastAVC = 1;
+  sParam.sSpatialLayers[0].iVideoWidth = (iWidth >> 2);
+  sParam.sSpatialLayers[0].iVideoHeight = (iHeight >> 2);
+  sParam.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_ROWMB_SLICE;
+
+  sParam.sSpatialLayers[1].iVideoWidth = (iWidth >> 1);
+  sParam.sSpatialLayers[1].iVideoHeight = (iHeight >> 1);
+  sParam.sSpatialLayers[1].sSliceCfg.uiSliceMode = SM_RASTER_SLICE;
+  sParam.sSpatialLayers[1].sSliceCfg.sSliceArgument.uiSliceMbNum[0] = 30;
+  sParam.sSpatialLayers[1].sSliceCfg.sSliceArgument.uiSliceMbNum[1] = 32;
+
+  sParam.sSpatialLayers[2].iVideoWidth = iWidth;
+  sParam.sSpatialLayers[2].iVideoHeight = iHeight;
+  sParam.sSpatialLayers[2].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  sParam.sSpatialLayers[2].sSliceCfg.sSliceArgument.uiSliceNum = 4;
+
+  int rv = encoder_->InitializeExt (&sParam);
+  ASSERT_TRUE (rv == cmResultSuccess) << "Init Failed sParam: rv = " << rv;;
+
+  unsigned char*  pBsBuf[MAX_SPATIAL_LAYER_NUM];
+  ISVCDecoder* decoder[MAX_SPATIAL_LAYER_NUM];
+
+  int iIdx = 0;
+
+  //create decoder
+  for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
+    pBsBuf[iIdx] = static_cast<unsigned char*> (malloc (iWidth * iHeight * 3 * sizeof (unsigned char) / 2));
+    EXPECT_TRUE (pBsBuf[iIdx] != NULL);
+
+    long rv = WelsCreateDecoder (&decoder[iIdx]);
+    ASSERT_EQ (0, rv);
+    EXPECT_TRUE (decoder[iIdx] != NULL);
+
+    SDecodingParam decParam;
+    memset (&decParam, 0, sizeof (SDecodingParam));
+    decParam.eOutputColorFormat  = videoFormatI420;
+    decParam.uiTargetDqLayer = UCHAR_MAX;
+    decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
+    decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
+
+    rv = decoder[iIdx]->Initialize (&decParam);
+    ASSERT_EQ (0, rv);
+  }
+
+  TestOneSimulcastAVC (&sParam, decoder, pBsBuf, iSpatialLayerNum, iEncFrameNum, 0);
+
+  for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
+    free (pBsBuf[iIdx]);
+
+    if (decoder[iIdx] != NULL) {
+      decoder[iIdx]->Uninitialize();
+      WelsDestroyDecoder (decoder[iIdx]);
+    }
+
+  }
+}

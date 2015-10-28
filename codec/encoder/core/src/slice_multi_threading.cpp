@@ -333,6 +333,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   int32_t iIdx                  = 0;
   int16_t iMaxSliceNum          = 1;
   int32_t iReturn = ENC_RETURN_SUCCESS;
+  bool bWillUseTaskManage = false;
 
   if (NULL == ppCtx || NULL == pCodingParam || NULL == *ppCtx || iCountBsLen <= 0)
     return 1;
@@ -371,6 +372,10 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
     } else {
       pSmt->pSliceConsumeTime[iIdx]     = NULL;
       pSmt->pSliceComplexRatio[iIdx]    = NULL;
+    }
+
+    if ( pMso->uiSliceMode == SM_FIXEDSLCNUM_SLICE || pMso->uiSliceMode == SM_RASTER_SLICE || pMso->uiSliceMode == SM_ROWMB_SLICE) {
+      bWillUseTaskManage = true;
     }
     ++ iIdx;
   }
@@ -430,9 +435,11 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
     pSmt->pThreadBsBuffer[iIdx] = NULL;
   }
 
+  //previous conflict
   WelsSnprintf (name, SEM_NAME_MAX, "scm%s", pSmt->eventNamespace);
   err = WelsEventOpen (&pSmt->pSliceCodedMasterEvent, name);
   MT_TRACE_LOG (*ppCtx, WELS_LOG_INFO, "[MT] Open pSliceCodedMasterEvent named(%s) ret%d err%d", name, err, errno);
+  //previous conflict ends
 
 
   iReturn = SetMultiSliceBuffer (ppCtx, pMa, pSmt, iMaxSliceNum,
@@ -443,6 +450,11 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 
   iReturn = WelsMutexInit (&pSmt->mutexSliceNumUpdate);
   WELS_VERIFY_RETURN_PROC_IF (1, (WELS_THREAD_ERROR_OK != iReturn), FreeMemorySvc (ppCtx))
+
+  if (bWillUseTaskManage) {
+    (*ppCtx)->pTaskManage = IWelsTaskManage::CreateTaskManage(*ppCtx, bDynamicSlice);
+    WELS_VERIFY_RETURN_PROC_IF (iReturn, (NULL == (*ppCtx)->pTaskManage), FreeMemorySvc (ppCtx))
+  }
 
   memset(&pSmt->bThreadBsBufferUsage, 0, MAX_THREADS_NUM * sizeof(bool));
   iReturn = WelsMutexInit (&pSmt->mutexThreadBsBufferUsage);
@@ -530,6 +542,12 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
     pMa->WelsFree ((*ppCtx)->pSliceBs, "pSliceBs");
     (*ppCtx)->pSliceBs = NULL;
   }
+
+  if ((*ppCtx)->pTaskManage != NULL) {
+    delete (*ppCtx)->pTaskManage;
+    (*ppCtx)->pTaskManage = NULL;
+  }
+
   iIdx = 0;
   while (iIdx < pCodingParam->iSpatialLayerNum) {
     if (pSmt->pSliceConsumeTime[iIdx]) {
@@ -1171,6 +1189,7 @@ void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t 
 void SetOneSliceBsBufferUnderMultithread (sWelsEncCtx* pCtx, const int32_t kiThreadIdx, const int32_t iSliceIdx) {
   pCtx->pSliceBs[iSliceIdx].pBsBuffer = pCtx->pSliceThreading->pThreadBsBuffer[kiThreadIdx];
   pCtx->pSliceBs[iSliceIdx].uiBsPos = 0;
+  //printf("SetOneSliceBsBufferUnderMultithread, thread %d, slice %d, buffer=%x\n", kiThreadIdx, iSliceIdx, pCtx->pSliceBs[iSliceIdx].pBsBuffer);
 }
 }
 
