@@ -115,11 +115,11 @@ void WelsCabacEncodeUpdateLowNontrivial_ (SCabacCtx* pCbCtx) {
       PropagateCarry (pBufCur, pCbCtx->m_pBufStart);
 
     if (CABAC_LOW_WIDTH > 32) {
-      WRITE_BE_32 (pBufCur, uiLow >> 31);
+      WRITE_BE_32 (pBufCur, (uint32_t) (uiLow >> 31));
       pBufCur += 4;
     }
-    *pBufCur++ = uiLow >> 23;
-    *pBufCur++ = uiLow >> 15;
+    *pBufCur++ = (uint8_t) (uiLow >> 23);
+    *pBufCur++ = (uint8_t) (uiLow >> 15);
     iRenormCnt -= kiInc;
     iLowBitCnt = 15;
     uiLow &= (1u << iLowBitCnt) - 1;
@@ -193,7 +193,7 @@ void WelsCabacEncodeFlush (SCabacCtx* pCbCtx) {
   if (uiLow & cabac_low_t (1) << (CABAC_LOW_WIDTH - 1))
     PropagateCarry (pBufCur, pCbCtx->m_pBufStart);
   for (; (iLowBitCnt -= 8) >= 0; uiLow <<= 8)
-    *pBufCur++ = uiLow >> (CABAC_LOW_WIDTH - 9);
+    *pBufCur++ = (uint8_t) (uiLow >> (CABAC_LOW_WIDTH - 9));
 
   pCbCtx->m_pBufCur = pBufCur;
 }
