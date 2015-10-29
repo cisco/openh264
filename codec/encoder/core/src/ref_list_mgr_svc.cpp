@@ -36,6 +36,7 @@
 #include "picture_handle.h"
 namespace WelsEnc {
 
+#define STR_ROOM 1
 /*
 *   reset LTR marking , recovery ,feedback state to default
 */
@@ -638,16 +639,57 @@ static void UpdateBlockStatic (sWelsEncCtx* pCtx) {
   }
 }
 
+void WelsUpdateSliceHeaderSyntax(sWelsEncCtx* pCtx,  const int32_t iAbsDiffPicNumMinus1,
+                                 SSlice* pSliceList, const int32_t uiFrameType) {
+  const int32_t kiCountSliceNum = GetCurrentSliceNum(pCtx->pCurDqLayer->pSliceEncCtx);
+  SLTRState* pLtr               = &pCtx->pLtr[pCtx->uiDependencyId];
+  int32_t iIdx = 0;
+
+  assert(kiCountSliceNum > 0);
+
+  for (iIdx = 0; iIdx < kiCountSliceNum; iIdx++) {
+    SSliceHeaderExt*    pSliceHdrExt = &pSliceList[iIdx].sSliceHeaderExt;
+    SSliceHeader*       pSliceHdr = &pSliceHdrExt->sSliceHeader;
+    SRefPicListReorderSyntax* pRefReorder = &pSliceHdr->sRefReordering;
+    SRefPicMarking* pRefPicMark = &pSliceHdr->sRefMarking;
+
+    /*syntax for num_ref_idx_l0_active_minus1*/
+    pSliceHdr->uiRefCount = pCtx->iNumRef0;
+    if (pCtx->iNumRef0 > 0) {
+      if ((!pCtx->pRefList0[0]->bIsLongRef) || (!pCtx->pSvcParam->bEnableLongTermReference)) {
+        pRefReorder->SReorderingSyntax[0].uiReorderingOfPicNumsIdc = 0;
+        pRefReorder->SReorderingSyntax[0].uiAbsDiffPicNumMinus1 = iAbsDiffPicNumMinus1;
+        pRefReorder->SReorderingSyntax[1].uiReorderingOfPicNumsIdc = 3;
+      }
+      else {
+        pRefReorder->SReorderingSyntax[0].uiReorderingOfPicNumsIdc = 2;
+        pRefReorder->SReorderingSyntax[0].iLongTermPicNum = pCtx->pRefList0[0]->iLongTermPicNum;
+        pRefReorder->SReorderingSyntax[1].uiReorderingOfPicNumsIdc = 3;
+      }
+    }
+
+    /*syntax for dec_ref_pic_marking()*/
+    if (videoFrameTypeIDR == uiFrameType) {
+      pRefPicMark->bNoOutputOfPriorPicsFlag = false;
+      pRefPicMark->bLongTermRefFlag = pCtx->pSvcParam->bEnableLongTermReference;
+    }
+    else {
+      if (pCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME)
+        pRefPicMark->bAdaptiveRefPicMarkingModeFlag = pCtx->pSvcParam->bEnableLongTermReference;
+      else
+        pRefPicMark->bAdaptiveRefPicMarkingModeFlag = (pCtx->pSvcParam->bEnableLongTermReference
+                                                       && pLtr->bLTRMarkingFlag) ? (true) : (false);
+    }
+  }
+}
+
 /*
  *  update syntax for reference base related
  */
 void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t uiFrameType) {
-  SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
-  int32_t iIdx                          = 0;
-  const int32_t kiCountSliceNum         = GetCurrentSliceNum (pCtx->pCurDqLayer->pSliceEncCtx);
-  int32_t iAbsDiffPicNumMinus1          = -1;
 
-  assert (kiCountSliceNum > 0);
+  int32_t iAbsDiffPicNumMinus1   = -1;
+  SSlice* pSliceList = NULL;
 
   /*syntax for ref_pic_list_reordering()*/
   if (pCtx->iNumRef0 > 0)
@@ -660,39 +702,15 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
              iAbsDiffPicNumMinus1);
   }
 
-  for (iIdx = 0; iIdx < kiCountSliceNum; iIdx++) {
-    SSliceHeaderExt*    pSliceHdrExt        = &pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[iIdx].sSliceHeaderExt;
-    SSliceHeader*       pSliceHdr           = &pSliceHdrExt->sSliceHeader;
-    SRefPicListReorderSyntax* pRefReorder   = &pSliceHdr->sRefReordering;
-    SRefPicMarking* pRefPicMark             = &pSliceHdr->sRefMarking;
-
-    /*syntax for num_ref_idx_l0_active_minus1*/
-    pSliceHdr->uiRefCount = pCtx->iNumRef0;
-    if (pCtx->iNumRef0 > 0) {
-      if ((!pCtx->pRefList0[0]->bIsLongRef) || (!pCtx->pSvcParam->bEnableLongTermReference)) {
-
-        pRefReorder->SReorderingSyntax[0].uiReorderingOfPicNumsIdc = 0;
-        pRefReorder->SReorderingSyntax[0].uiAbsDiffPicNumMinus1    = iAbsDiffPicNumMinus1;
-        pRefReorder->SReorderingSyntax[1].uiReorderingOfPicNumsIdc = 3;
-      } else {
-        pRefReorder->SReorderingSyntax[0].uiReorderingOfPicNumsIdc = 2;
-        pRefReorder->SReorderingSyntax[0].iLongTermPicNum = pCtx->pRefList0[0]->iLongTermPicNum;
-        pRefReorder->SReorderingSyntax[1].uiReorderingOfPicNumsIdc = 3;
-      }
-    }
-
-    /*syntax for dec_ref_pic_marking()*/
-    if (videoFrameTypeIDR == uiFrameType) {
-      pRefPicMark->bNoOutputOfPriorPicsFlag = false;
-      pRefPicMark->bLongTermRefFlag = pCtx->pSvcParam->bEnableLongTermReference;
-    } else {
-      if (pCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME)
-        pRefPicMark->bAdaptiveRefPicMarkingModeFlag = pCtx->pSvcParam->bEnableLongTermReference;
-      else
-        pRefPicMark->bAdaptiveRefPicMarkingModeFlag = (pCtx->pSvcParam->bEnableLongTermReference
-            && pLtr->bLTRMarkingFlag) ? (true) : (false);
-    }
+  if (pCtx->iActiveThreadsNum >0) {
+    // to do: will replace with thread based buffer later
+    pSliceList = pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer;
+  } else {
+    pSliceList = pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer;
   }
+
+  WelsUpdateSliceHeaderSyntax(pCtx, iAbsDiffPicNumMinus1,pSliceList, uiFrameType);
+
 }
 
 static inline void UpdateOriginalPicInfo (SPicture* pOrigPic, SPicture* pReconPic) {
@@ -858,11 +876,32 @@ static inline bool IsValidFrameNum (const int32_t kiFrameNum) {
   return (kiFrameNum < (1 << 30)); // TODO: use the original judge first, may be improved
 }
 
+void WlesMarkMMCORefInfoScreen(sWelsEncCtx* pCtx, SLTRState* pLtr,
+                               SSlice* pSliceList, const int32_t kiCountSliceNum) {
+  const int32_t iMaxLtrIdx = pCtx->pSvcParam->iNumRefFrame - STR_ROOM - 1;
+
+  for (int32_t iSliceIdx = 0; iSliceIdx < kiCountSliceNum; iSliceIdx++) {
+    SSliceHeaderExt*    pSliceHdrExt = &pSliceList[iSliceIdx].sSliceHeaderExt;
+    SSliceHeader*       pSliceHdr = &pSliceHdrExt->sSliceHeader;
+    SRefPicMarking*     pRefPicMark = &pSliceHdr->sRefMarking;
+
+    memset(pRefPicMark, 0, sizeof(SRefPicMarking));
+    if (pCtx->pSvcParam->bEnableLongTermReference) {
+      pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iMaxLongTermFrameIdx = iMaxLtrIdx;
+      pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_SET_MAX_LONG;
+
+      pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iLongTermFrameIdx = pLtr->iCurLtrIdx;
+      pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_LONG;
+    }
+  }
+}
+
 void WelsMarkPicScreen (sWelsEncCtx* pCtx) {
-#define STR_ROOM 1
-  SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
-  int32_t iMaxTid = WELS_LOG2 (pCtx->pSvcParam->uiGopSize);
+  SLTRState* pLtr          = &pCtx->pLtr[pCtx->uiDependencyId];
+  int32_t iMaxTid          = WELS_LOG2 (pCtx->pSvcParam->uiGopSize);
   int32_t iMaxActualLtrIdx = -1;
+  SSlice* pSliceList       = NULL;
+
   if (pCtx->pSvcParam->bEnableLongTermReference)
     iMaxActualLtrIdx = pCtx->pSvcParam->iNumRefFrame - STR_ROOM - 1 -  WELS_MAX (iMaxTid , 1);
 
@@ -933,22 +972,17 @@ void WelsMarkPicScreen (sWelsEncCtx* pCtx) {
     }
   }
 
-  const int32_t iMaxLtrIdx = pCtx->pSvcParam->iNumRefFrame - STR_ROOM - 1;
-  const int32_t iSliceNum = GetCurrentSliceNum (pCtx->pCurDqLayer->pSliceEncCtx);
-  for (int32_t iSliceIdx = 0; iSliceIdx < iSliceNum; iSliceIdx++) {
-    SSliceHeaderExt*    pSliceHdrExt    = &pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[iSliceIdx].sSliceHeaderExt;
-    SSliceHeader*       pSliceHdr       = &pSliceHdrExt->sSliceHeader;
-    SRefPicMarking*     pRefPicMark     = &pSliceHdr->sRefMarking;
+  const int32_t iSliceNum = GetCurrentSliceNum(pCtx->pCurDqLayer->pSliceEncCtx);
 
-    memset (pRefPicMark, 0, sizeof (SRefPicMarking));
-    if (pCtx->pSvcParam->bEnableLongTermReference) {
-      pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iMaxLongTermFrameIdx = iMaxLtrIdx;
-      pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_SET_MAX_LONG;
-
-      pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iLongTermFrameIdx = pLtr->iCurLtrIdx;
-      pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_LONG;
-    }
+  if (pCtx->iActiveThreadsNum > 1) {
+    // to do: will replace with thread based buffer later
+    pSliceList = pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer;
   }
+  else {
+    pSliceList = pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer;
+  }
+  WlesMarkMMCORefInfoScreen(pCtx, pLtr, pSliceList, iSliceNum);
+
   return;
 }
 
