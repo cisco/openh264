@@ -4018,7 +4018,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                    iSliceCount);
           return ENC_RETURN_UNEXPECTED;
         }
-        //note: the old codes are removed at commit: 8caeac1
+        //note: the old codes are removed at commit: 3e0ee69
         pLayerBsInfo->pBsBuf = pCtx->pFrameBs + pCtx->iPosBsBuffer;
         pLayerBsInfo->uiLayerType   = VIDEO_CODING_LAYER;
         pLayerBsInfo->uiSpatialId   = pCtx->uiDependencyId;
