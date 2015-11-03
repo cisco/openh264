@@ -63,6 +63,18 @@ CWelsSliceEncodingTask::CWelsSliceEncodingTask (sWelsEncCtx* pCtx, const int32_t
 CWelsSliceEncodingTask::~CWelsSliceEncodingTask() {
 }
 
+WelsErrorType CWelsSliceEncodingTask::Execute() {
+  WelsThreadSetName ("OpenH264Enc_CWelsSliceEncodingTask_Execute");
+
+  int32_t iReturn = InitTask();
+  WELS_VERIFY_RETURN_IFNEQ (iReturn, ENC_RETURN_SUCCESS)
+
+  iReturn = ExecuteTask();
+
+  FinishTask();
+  return ENC_RETURN_SUCCESS;
+}
+
 WelsErrorType CWelsSliceEncodingTask::SetBoundary (int32_t iStartIdx,  int32_t iEndIdx) {
   m_iStartMbIdx = iStartIdx;
   m_iEndMbIdx = iEndIdx;
@@ -88,10 +100,11 @@ WelsErrorType CWelsSliceEncodingTask::InitTask() {
   m_iThreadIdx = QueryEmptyThread (m_pCtx->pSliceThreading->bThreadBsBufferUsage);
   WelsMutexUnlock (&m_pCtx->pSliceThreading->mutexThreadBsBufferUsage);
   if (m_iThreadIdx < 0) {
-    printf ("cannot find avaialble thread %d\n", m_iThreadIdx);
+    WelsLog (&m_pCtx->sLogCtx, WELS_LOG_WARNING,
+             "[MT] CWelsSliceEncodingTask InitTask(), Cannot find available thread for m_iSliceIdx = %d", m_iSliceIdx);
     return ENC_RETURN_UNEXPECTED;
   }
-  SetOneSliceBsBufferUnderMultithread (m_pCtx, m_iSliceIdx, m_iThreadIdx);
+  SetOneSliceBsBufferUnderMultithread (m_pCtx, m_iThreadIdx, m_iSliceIdx);
 
   m_pSlice = &m_pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[m_iSliceIdx];
   m_pSliceBs = &m_pCtx->pSliceBs[m_iSliceIdx];
@@ -101,18 +114,18 @@ WelsErrorType CWelsSliceEncodingTask::InitTask() {
 
   assert ((void*) (&m_pSliceBs->sBsWrite) == (void*)m_pSlice->pSliceBsa);
   InitBits (&m_pSliceBs->sBsWrite, m_pSliceBs->pBsBuffer, m_pSliceBs->uiSize);
+  //printf ("CWelsSliceEncodingTask_InitTask slice %d\n", m_iSliceIdx);
 
   return ENC_RETURN_SUCCESS;
 }
+
 void CWelsSliceEncodingTask::FinishTask() {
   WelsMutexLock (&m_pCtx->pSliceThreading->mutexThreadBsBufferUsage);
   m_pCtx->pSliceThreading->bThreadBsBufferUsage[m_iThreadIdx] = false;
   WelsMutexUnlock (&m_pCtx->pSliceThreading->mutexThreadBsBufferUsage);
 }
 
-WelsErrorType CWelsSliceEncodingTask::Execute() {
-  WelsThreadSetName ("OpenH264Enc_CWelsSliceEncodingTask_Execute");
-
+WelsErrorType CWelsSliceEncodingTask::ExecuteTask() {
 #if MT_DEBUG_BS_WR
   m_pSliceBs->bSliceCodedFlag = false;
 #endif//MT_DEBUG_BS_WR
@@ -144,6 +157,10 @@ WelsErrorType CWelsSliceEncodingTask::Execute() {
                           iLeftBufferSize,
                           m_iSliceIdx, m_iSliceSize);
   if (ENC_RETURN_SUCCESS != iReturn) {
+    WelsLog (&m_pCtx->sLogCtx, WELS_LOG_WARNING,
+             "[MT] CWelsSliceEncodingTask ExecuteTask(), WriteSliceBs not successful: coding_idx %d, um_iSliceIdx %d",
+             m_pCtx->iCodingIndex,
+             m_iSliceIdx);
     return iReturn;
   }
   if (0 == m_iSliceIdx) {
@@ -152,15 +169,11 @@ WelsErrorType CWelsSliceEncodingTask::Execute() {
 
   m_pCtx->pFuncList->pfDeblocking.pfDeblockingFilterSlice (m_pCtx->pCurDqLayer, m_pCtx->pFuncList, m_iSliceIdx);
 
-#if defined(SLICE_INFO_OUTPUT)
-  fprintf (stderr,
-           "@pSlice=%-6d sliceType:%c idc:%d size:%-6d\n",
-           m_iSliceIdx,
-           (pEncPEncCtx->eSliceType == P_SLICE ? 'P' : 'I'),
-           eNalRefIdc,
-           iSliceSize
-          );
-#endif//SLICE_INFO_OUTPUT
+  WelsLog (&m_pCtx->sLogCtx, WELS_LOG_DETAIL,
+           "@pSlice=%-6d sliceType:%c idc:%d size:%-6d",  m_iSliceIdx,
+           (m_pCtx->eSliceType == P_SLICE ? 'P' : 'I'),
+           m_eNalRefIdc,
+           m_iSliceSize);
 
 #if MT_DEBUG_BS_WR
   m_pSliceBs->bSliceCodedFlag = true;

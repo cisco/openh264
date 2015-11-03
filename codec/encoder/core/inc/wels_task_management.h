@@ -56,7 +56,7 @@ class IWelsTaskManage {
   virtual WelsErrorType   Init (sWelsEncCtx*   pEncCtx) = 0;
   virtual void            Uninit() = 0;
 
-  virtual void            InitFrame() {}
+  virtual void            InitFrame (const int32_t kiCurDid) {}
   virtual WelsErrorType   ExecuteTasks() = 0;
 
   static IWelsTaskManage* CreateTaskManage (sWelsEncCtx* pCtx, bool bNeedLock);
@@ -75,7 +75,7 @@ class  CWelsTaskManageBase : public IWelsTaskManage, public WelsCommon::IWelsThr
   virtual WelsErrorType   Init (sWelsEncCtx*   pEncCtx);
   void    Uninit();
 
-  virtual void            InitFrame();
+  virtual void            InitFrame (const int32_t kiCurDid);
   virtual WelsErrorType   ExecuteTasks();
 
   //IWelsThreadPoolSink
@@ -88,13 +88,13 @@ class  CWelsTaskManageBase : public IWelsTaskManage, public WelsCommon::IWelsThr
 
  protected:
   sWelsEncCtx*    m_pEncCtx;
+  WelsCommon::CWelsThreadPool*   m_pThreadPool;
 
   TASKLIST_TYPE*   m_cTaskList;
   int32_t         m_iTaskNum;
 
   //SLICE_PAIR_LIST *m_cSliceList;
 
-  WelsCommon::CWelsThreadPool*   m_pThreadPool;
   int32_t         m_iThreadNum;
 
   int32_t          m_iWaitTaskNum;
@@ -104,6 +104,7 @@ class  CWelsTaskManageBase : public IWelsTaskManage, public WelsCommon::IWelsThr
 
  private:
   DISALLOW_COPY_AND_ASSIGN (CWelsTaskManageBase);
+  void  OnTaskMinusOne();
 };
 
 class  CWelsTaskManageOne : public CWelsTaskManageBase {

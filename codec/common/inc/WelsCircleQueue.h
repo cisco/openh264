@@ -112,6 +112,18 @@ class CWelsCircleQueue {
     }
     return NULL;
   }
+
+  TNodeType* GetIndexNode (const int32_t iIdx) {
+    if (size() > 0) {
+      if ((iIdx + m_iCurrentListStart) < m_iMaxNodeCount) {
+        return m_pCurrentQueue[m_iCurrentListStart + iIdx];
+      } else {
+        return m_pCurrentQueue[m_iCurrentListStart + iIdx - m_iMaxNodeCount];
+      }
+    }
+    return NULL;
+  }
+
  private:
   int32_t InternalPushBack (TNodeType* pNode) {
     m_pCurrentQueue[m_iCurrentListEnd] = pNode;

@@ -313,6 +313,7 @@ WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* p_event, const char* event_
     *p_event = NULL;
     return WELS_THREAD_ERROR_GENERAL;
   } else {
+    //printf("event_open:%x, %s\n", p_event, event_name);
     return WELS_THREAD_ERROR_OK;
   }
 #else
@@ -329,6 +330,7 @@ WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* p_event, const char* event_
 #endif
 }
 WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_name) {
+  //printf("event_close:%x, %s\n", event, event_name);
 #ifdef __APPLE__
   WELS_THREAD_ERROR_CODE err = sem_close (*event); // match with sem_open
   if (event_name)

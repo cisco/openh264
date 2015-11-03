@@ -2930,6 +2930,10 @@ void WelsInitCurrentLayer (sWelsEncCtx* pCtx,
   } else {
     pCurDq->bBaseLayerAvailableFlag = false;
   }
+
+  if (pCtx->pTaskManage) {
+    pCtx->pTaskManage->InitFrame(kiCurDid);
+  }
 }
 
 static inline void SetFastCodingFunc (SWelsFuncPtrList* pFuncList) {
@@ -4016,7 +4020,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                    iSliceCount);
           return ENC_RETURN_UNEXPECTED;
         }
-
+        if (SM_AUTO_SLICE == pParam->sSliceCfg.uiSliceMode) {
         if (pSvcParam->iCountThreadsNum >= iSliceCount) {       //THREAD_FULLY_FIRE_MODE
 #if defined(MT_DEBUG)
           int64_t t_bs_append = 0;
@@ -4104,6 +4108,19 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
           // all slices are finished coding here
           // append exclusive slice 0 bs to pFrameBs
           iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, iSliceCount);
+        }
+
+        } else {
+                  pLayerBsInfo->pBsBuf = pCtx->pFrameBs + pCtx->iPosBsBuffer;
+                pLayerBsInfo->uiLayerType   = VIDEO_CODING_LAYER;
+                pLayerBsInfo->uiSpatialId   = pCtx->uiDependencyId;
+                pLayerBsInfo->uiTemporalId  = pCtx->uiTemporalId;
+                pLayerBsInfo->uiQualityId   = 0;
+                pLayerBsInfo->iNalCount     = 0;
+                pCtx->pSliceBs[0].pBs = pLayerBsInfo->pBsBuf;
+
+                pCtx->pTaskManage->ExecuteTasks();
+                iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, iSliceCount);
         }
       }
       // THREAD_FULLY_FIRE_MODE && SM_DYN_SLICE
