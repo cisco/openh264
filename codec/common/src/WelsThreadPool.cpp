@@ -37,8 +37,6 @@
  *
  *************************************************************************************
  */
-
-
 #include "typedefs.h"
 #include "WelsThreadPool.h"
 
@@ -167,7 +165,6 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::QueueTask (IWelsTask* pTask) {
   AddTaskToWaitedList (pTask);
 
   SignalThread();
-
   return WELS_THREAD_ERROR_OK;
 }
 

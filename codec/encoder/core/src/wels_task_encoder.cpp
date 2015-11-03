@@ -99,6 +99,10 @@ WelsErrorType CWelsSliceEncodingTask::InitTask() {
   WelsMutexLock (&m_pCtx->pSliceThreading->mutexThreadBsBufferUsage);
   m_iThreadIdx = QueryEmptyThread (m_pCtx->pSliceThreading->bThreadBsBufferUsage);
   WelsMutexUnlock (&m_pCtx->pSliceThreading->mutexThreadBsBufferUsage);
+
+  WelsLog (&m_pCtx->sLogCtx, WELS_LOG_DEBUG,
+           "[MT] CWelsSliceEncodingTask()InitTask for m_iSliceIdx %d, lock thread %d",
+           m_iSliceIdx, m_iThreadIdx);
   if (m_iThreadIdx < 0) {
     WelsLog (&m_pCtx->sLogCtx, WELS_LOG_WARNING,
              "[MT] CWelsSliceEncodingTask InitTask(), Cannot find available thread for m_iSliceIdx = %d", m_iSliceIdx);
@@ -123,6 +127,10 @@ void CWelsSliceEncodingTask::FinishTask() {
   WelsMutexLock (&m_pCtx->pSliceThreading->mutexThreadBsBufferUsage);
   m_pCtx->pSliceThreading->bThreadBsBufferUsage[m_iThreadIdx] = false;
   WelsMutexUnlock (&m_pCtx->pSliceThreading->mutexThreadBsBufferUsage);
+
+  WelsLog (&m_pCtx->sLogCtx, WELS_LOG_DEBUG,
+           "[MT] CWelsSliceEncodingTask()FinishTask for m_iSliceIdx %d, unlock thread %d",
+           m_iSliceIdx, m_iThreadIdx);
 }
 
 WelsErrorType CWelsSliceEncodingTask::ExecuteTask() {
@@ -199,6 +207,10 @@ WelsErrorType CWelsLoadBalancingSlicingEncodingTask::InitTask() {
   }
 
   m_iSliceStart = WelsTime();
+  WelsLog (&m_pCtx->sLogCtx, WELS_LOG_DEBUG,
+           "[MT] CWelsLoadBalancingSlicingEncodingTask()InitTask for m_iSliceIdx %d at %" PRId64,
+           m_iSliceIdx, m_iSliceStart);
+
   return ENC_RETURN_SUCCESS;
 }
 
@@ -207,7 +219,7 @@ void CWelsLoadBalancingSlicingEncodingTask::FinishTask() {
 
   m_pCtx->pSliceThreading->pSliceConsumeTime[m_uiDependencyId][m_iSliceIdx] = (uint32_t) (WelsTime() - m_iSliceStart);
   WelsLog (&m_pCtx->sLogCtx, WELS_LOG_DEBUG,
-           "[MT] CodingSliceThreadProc(), coding_idx %d, um_iSliceIdx %d, pSliceConsumeTime %d, iSliceSize %d, pFirstMbInSlice %d, count_num_mb_in_slice %d",
+           "[MT] CWelsLoadBalancingSlicingEncodingTask()FinishTask, coding_idx %d, um_iSliceIdx %d, pSliceConsumeTime %d, iSliceSize %d, pFirstMbInSlice %d, count_num_mb_in_slice %d",
            m_pCtx->iCodingIndex,
            m_iSliceIdx,
            m_pCtx->pSliceThreading->pSliceConsumeTime[m_uiDependencyId][m_iSliceIdx],

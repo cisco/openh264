@@ -59,6 +59,7 @@ IWelsTaskManage*   IWelsTaskManage::CreateTaskManage (sWelsEncCtx* pCtx, bool bN
   if (NULL == pCtx) {
     return NULL;
   }
+
   IWelsTaskManage* pTaskManage;
   if (bNeedLock) {
     pTaskManage = WELS_NEW_OP (CWelsTaskManageParallel(), CWelsTaskManageParallel);

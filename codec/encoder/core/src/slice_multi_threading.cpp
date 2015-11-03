@@ -374,7 +374,8 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
       pSmt->pSliceComplexRatio[iIdx]    = NULL;
     }
 
-    if ( pMso->uiSliceMode == SM_FIXEDSLCNUM_SLICE || pMso->uiSliceMode == SM_RASTER_SLICE || pMso->uiSliceMode == SM_ROWMB_SLICE) {
+    if ( pMso->uiSliceMode == SM_FIXEDSLCNUM_SLICE || pMso->uiSliceMode == SM_RASTER_SLICE
+        || pMso->uiSliceMode == SM_ROWMB_SLICE || pMso->uiSliceMode == SM_AUTO_SLICE) {
       bWillUseTaskManage = true;
     }
     ++ iIdx;
@@ -440,7 +441,6 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   err = WelsEventOpen (&pSmt->pSliceCodedMasterEvent, name);
   MT_TRACE_LOG (*ppCtx, WELS_LOG_INFO, "[MT] Open pSliceCodedMasterEvent named(%s) ret%d err%d", name, err, errno);
   //previous conflict ends
-
 
   iReturn = SetMultiSliceBuffer (ppCtx, pMa, pSmt, iMaxSliceNum,
                                  iMaxSliceBufferSize,
@@ -883,6 +883,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
               WelsUnloadNalForSlice (pSliceBs);
             }
           }
+
 
           WelsLoadNalForSlice (pSliceBs, eNalType, eNalRefIdc);
 

@@ -4004,6 +4004,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       int32_t iRet = 0;
       // THREAD_FULLY_FIRE_MODE/THREAD_PICK_UP_MODE for any mode of non-SM_DYN_SLICE
       if ((SM_DYN_SLICE != pParam->sSliceCfg.uiSliceMode) && (pSvcParam->iMultipleThreadIdc > 1)) {
+
         iSliceCount = GetCurrentSliceNum (pCtx->pCurDqLayer->pSliceEncCtx);
         if (iLayerNum + 1 >= MAX_LAYER_NUM_OF_FRAME) { // check available layer_bs_info for further writing as followed
           WelsLog (pLogCtx, WELS_LOG_ERROR,
@@ -4017,108 +4018,17 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                    iSliceCount);
           return ENC_RETURN_UNEXPECTED;
         }
-        if (SM_AUTO_SLICE == pParam->sSliceCfg.uiSliceMode) {
-        if (pSvcParam->iCountThreadsNum >= iSliceCount) {       //THREAD_FULLY_FIRE_MODE
-#if defined(MT_DEBUG)
-          int64_t t_bs_append = 0;
-#endif
+        //note: the old codes are removed at commit: 8caeac1
+        pLayerBsInfo->pBsBuf = pCtx->pFrameBs + pCtx->iPosBsBuffer;
+        pLayerBsInfo->uiLayerType   = VIDEO_CODING_LAYER;
+        pLayerBsInfo->uiSpatialId   = pCtx->uiDependencyId;
+        pLayerBsInfo->uiTemporalId  = pCtx->uiTemporalId;
+        pLayerBsInfo->uiQualityId   = 0;
+        pLayerBsInfo->iNalCount     = 0;
+        pCtx->pSliceBs[0].pBs = pLayerBsInfo->pBsBuf;
 
-          pCtx->iActiveThreadsNum = iSliceCount;
-          // to fire slice coding threads
-          iRet = FiredSliceThreads (pCtx, &pCtx->pSliceThreading->pThreadPEncCtx[0],
-                                    &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
-                                    &pCtx->pSliceThreading->pThreadMasterEvent[0],
-                                    pFbi, iSliceCount, pCtx->pCurDqLayer->pSliceEncCtx, false);
-          if (iRet) {
-            WelsLog (pLogCtx, WELS_LOG_ERROR,
-                     "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!",
-                     iRet, pSvcParam->iCountThreadsNum, iSliceCount, pParam->sSliceCfg.uiSliceMode, pSvcParam->iMultipleThreadIdc);
-            return ENC_RETURN_UNEXPECTED;
-          }
-
-          WelsMultipleEventsWaitAllBlocking (iSliceCount, &pCtx->pSliceThreading->pSliceCodedEvent[0],
-                                             &pCtx->pSliceThreading->pSliceCodedMasterEvent);
-
-
-          // all slices are finished coding here
-          WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
-
-          // append exclusive slice 0 bs to pFrameBs
-#if defined(MT_DEBUG)
-          t_bs_append = WelsTime();
-#endif//MT_DEBUG
-          iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, iSliceCount);
-#if defined(MT_DEBUG)
-          t_bs_append = WelsTime() - t_bs_append;
-          if (pCtx->pSliceThreading->pFSliceDiff) {
-            fprintf (pCtx->pSliceThreading->pFSliceDiff,
-                     "%6" PRId64 " us consumed at AppendSliceToFrameBs() for coding_idx: %d iDid: %d qid: %d\n",
-                     t_bs_append, pCtx->iCodingIndex, iCurDid, 0);
-          }
-#endif//MT_DEBUG
-        } else { //THREAD_PICK_UP_MODE
-          int32_t iNumThreadsRunning = 0;
-          int32_t iNumThreadsScheduled = 0;
-          int32_t iIndexOfSliceToBeCoded = 0;
-
-          pCtx->iActiveThreadsNum   = pSvcParam->iCountThreadsNum;
-          iNumThreadsScheduled      = pCtx->iActiveThreadsNum;
-          iNumThreadsRunning        = iNumThreadsScheduled;
-          // to fire slice coding threads
-          iRet = FiredSliceThreads (pCtx, &pCtx->pSliceThreading->pThreadPEncCtx[0],
-                                    &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
-                                    &pCtx->pSliceThreading->pThreadMasterEvent[0],
-                                    pFbi, iNumThreadsRunning, pCtx->pCurDqLayer->pSliceEncCtx, false);
-          if (iRet) {
-            WelsLog (pLogCtx, WELS_LOG_ERROR,
-                     "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iCountThreadsNum= %d, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!",
-                     iRet, pSvcParam->iCountThreadsNum, iSliceCount, pParam->sSliceCfg.uiSliceMode, pSvcParam->iMultipleThreadIdc);
-            return ENC_RETURN_UNEXPECTED;
-          }
-
-          iIndexOfSliceToBeCoded = iNumThreadsRunning;
-          while (1) {
-            if (iIndexOfSliceToBeCoded >= iSliceCount && iNumThreadsRunning <= 0)
-              break;
-            WELS_THREAD_ERROR_CODE lwait = 0;
-            int32_t iEventId = -1;
-
-            lwait = WelsMultipleEventsWaitSingleBlocking (iNumThreadsScheduled,
-                    &pCtx->pSliceThreading->pSliceCodedEvent[0],
-                    &pCtx->pSliceThreading->pSliceCodedMasterEvent);
-            iEventId = (int32_t) (lwait - WELS_THREAD_ERROR_WAIT_OBJECT_0);
-            if (iEventId >= 0 && iEventId < iNumThreadsScheduled) {
-              if (iIndexOfSliceToBeCoded < iSliceCount) {
-                // pick up succeeding slice for threading
-                // thread_id equal to iEventId per implementation here
-                pCtx->pSliceThreading->pThreadPEncCtx[iEventId].iSliceIndex = iIndexOfSliceToBeCoded;
-                SetOneSliceBsBufferUnderMultithread (pCtx, iEventId, iIndexOfSliceToBeCoded);
-                WelsEventSignal (&pCtx->pSliceThreading->pReadySliceCodingEvent[iEventId]);
-                WelsEventSignal (&pCtx->pSliceThreading->pThreadMasterEvent[iEventId]);
-                ++ iIndexOfSliceToBeCoded;
-              } else { // no other slices left for coding
-                -- iNumThreadsRunning;
-              }
-            }
-          }//while(1)
-
-          // all slices are finished coding here
-          // append exclusive slice 0 bs to pFrameBs
-          iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, iSliceCount);
-        }
-
-        } else {
-                  pLayerBsInfo->pBsBuf = pCtx->pFrameBs + pCtx->iPosBsBuffer;
-                pLayerBsInfo->uiLayerType   = VIDEO_CODING_LAYER;
-                pLayerBsInfo->uiSpatialId   = pCtx->uiDependencyId;
-                pLayerBsInfo->uiTemporalId  = pCtx->uiTemporalId;
-                pLayerBsInfo->uiQualityId   = 0;
-                pLayerBsInfo->iNalCount     = 0;
-                pCtx->pSliceBs[0].pBs = pLayerBsInfo->pBsBuf;
-
-                pCtx->pTaskManage->ExecuteTasks();
-                iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, iSliceCount);
-        }
+        pCtx->pTaskManage->ExecuteTasks();
+        iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, iSliceCount);
       }
       // THREAD_FULLY_FIRE_MODE && SM_DYN_SLICE
       else if ((SM_DYN_SLICE == pParam->sSliceCfg.uiSliceMode) && (pSvcParam->iMultipleThreadIdc > 1)) {
