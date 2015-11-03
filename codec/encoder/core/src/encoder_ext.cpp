@@ -3975,6 +3975,11 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
       WelsLoadNal (pCtx->pOut, eNalType, eNalRefIdc);
 
+      //the following line is to fix a problem with a specific setting as in test DiffSlicingInDlayerMixed:
+      //      (multi-th on with SM_SINGLE_SLICE in one of the D layers)
+      //TODO: this may not be needed any more after the slice buffer refactoring
+      pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[0].pSliceBsa = &(pCtx->pOut->sBsWrite);
+
       pCtx->iEncoderError = WelsCodeOneSlice (pCtx, 0, eNalType);
       WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
 
