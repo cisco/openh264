@@ -122,6 +122,20 @@ class CWelsConstrainedSizeSlicingEncodingTask : public CWelsSliceEncodingTask {
 };
 */
 
+class CWelsUpdateMbMapTask : public CWelsBaseTask {
+ public:
+  CWelsUpdateMbMapTask (sWelsEncCtx* pCtx, const int32_t iSliceIdx);
+  virtual ~CWelsUpdateMbMapTask();
+
+  virtual WelsErrorType Execute();
+
+  virtual uint32_t        GetTaskType() const {
+    return WELS_ENC_TASK_PREENCODING;
+  }
+ protected:
+  sWelsEncCtx* m_pCtx;
+  int32_t m_iSliceIdx;
+};
 
 }       //namespace
 #endif  //header guard
