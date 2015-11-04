@@ -361,6 +361,8 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
   }
 
   virtual void EncodingComplete() {
+    // Release the reference to the callback, because it is no longer safe to call it
+    callback_ = nullptr;
     Release();
   }
 
@@ -532,7 +534,9 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
     info.mBufferType = GMP_BufferLength32;
     info.mCodecSpecific.mH264.mSimulcastIdx = 0;
 
-    callback_->Encoded (f, reinterpret_cast<uint8_t*> (&info), sizeof (info));
+    if (callback_) {
+      callback_->Encoded (f, reinterpret_cast<uint8_t*> (&info), sizeof (info));
+    }
 
     stats_.FrameOut();
   }
@@ -716,6 +720,8 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
   }
 
   virtual void DecodingComplete() {
+    // Release the reference to the callback, because it is no longer safe to call it
+    callback_ = nullptr;
     Release();
   }
 
@@ -780,7 +786,9 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
 
     if (decoded->iBufferStatus != 1) {
       GMPLOG (GL_ERROR, "iBufferStatus=" << decoded->iBufferStatus);
-      callback_->InputDataExhausted();
+      if (callback_) {
+        callback_->InputDataExhausted();
+      }
       return;
     }
 
@@ -822,7 +830,9 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
             << frame->AllocatedSize (kGMPYPlane));
     frame->SetTimestamp (inputFrame->TimeStamp());
     frame->SetDuration (inputFrame->Duration());
-    callback_->Decoded (frame);
+    if (callback_) {
+      callback_->Decoded (frame);
+    }
 
     stats_.FrameOut();
   }
