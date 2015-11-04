@@ -1,6 +1,7 @@
 #ifndef _WELS_THREAD_POOL_TEST_H_
 #define _WELS_THREAD_POOL_TEST_H_
 
+#include "WelsLock.h"
 #include "WelsThreadPool.h"
 
 using namespace WelsCommon;
@@ -14,12 +15,14 @@ class CThreadPoolTest : public IWelsThreadPoolSink {
   ~CThreadPoolTest() {}
 
   virtual int32_t OnTaskExecuted (IWelsTask* pTask) {
+    WelsCommon::CWelsAutoLock cAutoLock (m_cTaskCountLock);
     m_iTaskCount ++;
     //printf("Task execute over count is %d\n", m_iTaskCount);
     return cmResultSuccess;
   }
 
   virtual int32_t OnTaskCancelled (IWelsTask* pTask) {
+    WelsCommon::CWelsAutoLock cAutoLock (m_cTaskCountLock);
     m_iTaskCount ++;
     //printf("Task execute cancelled count is %d\n", m_iTaskCount);
     return cmResultSuccess;
@@ -31,6 +34,7 @@ class CThreadPoolTest : public IWelsThreadPoolSink {
 
  private:
   int32_t  m_iTaskCount;
+  WelsCommon::CWelsLock  m_cTaskCountLock;
 };
 
 
