@@ -582,7 +582,7 @@ void RcCalculateMbQp (sWelsEncCtx* pEncCtx, SMB* pCurMb, const int32_t kiSliceId
   const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
   if (pEncCtx->pSvcParam->bEnableAdaptiveQuant) {
     iLumaQp   = (int8_t)WELS_CLIP3 (iLumaQp +
-                                    pEncCtx->pVaa->sAdaptiveQuantParam.pMotionTextureIndexToDeltaQp[pCurMb->iMbXY], pWelsSvcRc->iMinQp, 51);
+                                    pEncCtx->pVaa->sAdaptiveQuantParam.pMotionTextureIndexToDeltaQp[pCurMb->iMbXY], pWelsSvcRc->iMinQp, pWelsSvcRc->iMaxQp);
   }
   pCurMb->uiChromaQp    = g_kuiChromaQpTable[CLIP3_QP_0_51 (iLumaQp + kuiChromaQpIndexOffset)];
   pCurMb->uiLumaQp      = iLumaQp;
@@ -1076,8 +1076,7 @@ void WelsRcMbInitGom (sWelsEncCtx* pEncCtx, SMB* pCurMb, SSlice* pSlice) {
   const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
 
   pSOverRc->iBsPosSlice = BsGetBitsPos (bs);
-
-  if (pEncCtx->eSliceType == I_SLICE) {
+  if((pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE)&&(pEncCtx->eSliceType == I_SLICE)){
     pCurMb->uiLumaQp   = pEncCtx->iGlobalQp;
     pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp + kuiChromaQpIndexOffset)];
     return;
