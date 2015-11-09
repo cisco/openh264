@@ -368,8 +368,23 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
 
  private:
   virtual ~OpenH264VideoEncoder() {
-    worker_thread_->Join();
+    // Tear down the internal encoder
+    TearDownEncoder();
   }
+
+   void TearDownEncoder() {
+     // Stop the worker thread first
+     if (worker_thread_) {
+       worker_thread_->Join();
+       worker_thread_ = nullptr;
+     }
+
+     // Destroy OpenH264 encoder
+     if (encoder_) {
+       WelsDestroySVCEncoder(encoder_);
+       encoder_ = nullptr;
+     }
+   }
 
   void Error (GMPErr error) {
     if (callback_) {
@@ -727,8 +742,23 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
 
  private:
   virtual ~OpenH264VideoDecoder() {
+    // Tear down the internal decoder
+    TearDownDecoder();
   }
 
+  void TearDownDecoder() {
+    // Stop the worker thread first
+    if (worker_thread_) {
+      worker_thread_->Join();
+      worker_thread_ = nullptr;
+    }
+
+    // Destroy OpenH264 decoder
+    if (decoder_) {
+      WelsDestroyDecoder(decoder_);
+      decoder_ = nullptr;
+    }
+  }
   void Error (GMPErr error) {
     if (callback_) {
       callback_->Error (error);
