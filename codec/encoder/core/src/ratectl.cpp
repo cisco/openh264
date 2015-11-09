@@ -672,10 +672,6 @@ void RcCalculateGomQp (sWelsEncCtx* pEncCtx, SMB* pCurMb, int32_t iSliceId) {
   }
   pSOverRc->iCalculatedQpSlice = WELS_CLIP3 (pSOverRc->iCalculatedQpSlice, pWelsSvcRc->iMinQp, pWelsSvcRc->iMaxQp);
 
-  if (! (((pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE) || (pEncCtx->pSvcParam->iRCMode == RC_TIMESTAMP_MODE))
-         && (pEncCtx->pSvcParam->bEnableFrameSkip == false)))
-    pSOverRc->iCalculatedQpSlice = WELS_CLIP3 (pSOverRc->iCalculatedQpSlice, pWelsSvcRc->iMinQp, pWelsSvcRc->iMaxQp);
-
   pSOverRc->iGomBitsSlice = 0;
 
 }
