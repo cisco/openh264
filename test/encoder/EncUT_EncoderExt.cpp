@@ -892,7 +892,7 @@ TEST_F (EncoderInterfaceTest, SkipFrameCheck) {
   sEncParamExt.sSpatialLayers[0].fFrameRate = 28.248587f;
   sEncParamExt.sSpatialLayers[0].iSpatialBitrate = 573000;
   sEncParamExt.sSpatialLayers[0].iMaxSpatialBitrate = 895839855;
-  sEncParamExt.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  sEncParamExt.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
 
   pParamExt->iPicWidth = sEncParamExt.sSpatialLayers[0].iVideoWidth;
   pParamExt->iPicHeight = sEncParamExt.sSpatialLayers[0].iVideoHeight;
@@ -955,21 +955,21 @@ TEST_F (EncoderInterfaceTest, DiffResolutionCheck) {
   sEncParamExt.sSpatialLayers[0].iVideoHeight = 160;
   sEncParamExt.sSpatialLayers[0].fFrameRate = 6;
   sEncParamExt.sSpatialLayers[0].iSpatialBitrate = 80000;
-  sEncParamExt.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  sEncParamExt.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
 
   sEncParamExt.sSpatialLayers[1].uiLevelIdc = LEVEL_UNKNOWN;
   sEncParamExt.sSpatialLayers[1].iVideoWidth = 180;
   sEncParamExt.sSpatialLayers[1].iVideoHeight = 320;
   sEncParamExt.sSpatialLayers[1].fFrameRate = 12;
   sEncParamExt.sSpatialLayers[1].iSpatialBitrate = 200000;
-  sEncParamExt.sSpatialLayers[1].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  sEncParamExt.sSpatialLayers[1].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
 
   sEncParamExt.sSpatialLayers[2].uiLevelIdc = LEVEL_UNKNOWN;
   sEncParamExt.sSpatialLayers[2].iVideoWidth = 360;
   sEncParamExt.sSpatialLayers[2].iVideoHeight = 640;
   sEncParamExt.sSpatialLayers[2].fFrameRate = 24;
   sEncParamExt.sSpatialLayers[2].iSpatialBitrate = 600000;
-  sEncParamExt.sSpatialLayers[2].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  sEncParamExt.sSpatialLayers[2].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
 
   pParamExt->iPicWidth = sEncParamExt.iPicWidth;
   pParamExt->iPicHeight = sEncParamExt.iPicWidth;

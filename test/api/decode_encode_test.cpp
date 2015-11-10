@@ -107,7 +107,7 @@ void DecEncFileParamToParamExt (DecodeEncodeFileParam* pDecEncFileParam, SEncPar
   pEnxParamExt->iEntropyCodingModeFlag    = 0;
 
   for (int i = 0; i < pEnxParamExt->iSpatialLayerNum; i++) {
-    pEnxParamExt->sSpatialLayers[i].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
+    pEnxParamExt->sSpatialLayers[i].sSliceArgument.uiSliceMode = SM_SINGLE_SLICE;
   }
 
 }

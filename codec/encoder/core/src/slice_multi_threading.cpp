@@ -360,11 +360,12 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 
   iIdx = 0;
   while (iIdx < iNumSpatialLayers) {
-    SSliceConfig* pMso = &pPara->sSpatialLayers[iIdx].sSliceCfg;
-    const int32_t kiSliceNum = pMso->sSliceArgument.uiSliceNum;
-    if (((pMso->uiSliceMode == SM_FIXEDSLCNUM_SLICE) || (pMso->uiSliceMode == SM_AUTO_SLICE))
-        && pPara->iMultipleThreadIdc > 1
-        && pPara->iMultipleThreadIdc >= kiSliceNum) {
+    SSliceArgument* pSliceArgument = &pPara->sSpatialLayers[iIdx].sSliceArgument;
+    const int32_t kiSliceNum = pSliceArgument->uiSliceNum;
+    if ((pSliceArgument->uiSliceMode == SM_FIXEDSLCNUM_SLICE)
+        && (pPara->bUseLoadBalancing)
+        && (pPara->iMultipleThreadIdc > 1)
+        && (pPara->iMultipleThreadIdc >= kiSliceNum)) {
       pSmt->pSliceConsumeTime[iIdx] = (uint32_t*)pMa->WelsMallocz (kiSliceNum * sizeof (uint32_t), "pSliceConsumeTime[]");
       WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pSmt->pSliceConsumeTime[iIdx]), FreeMemorySvc (ppCtx))
       pSmt->pSliceComplexRatio[iIdx] = (int32_t*)pMa->WelsMalloc (kiSliceNum * sizeof (int32_t), "pSliceComplexRatio[]");
@@ -374,8 +375,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
       pSmt->pSliceComplexRatio[iIdx]    = NULL;
     }
 
-    if ( pMso->uiSliceMode == SM_FIXEDSLCNUM_SLICE || pMso->uiSliceMode == SM_RASTER_SLICE
-        || pMso->uiSliceMode == SM_ROWMB_SLICE || pMso->uiSliceMode == SM_AUTO_SLICE) {
+    if ( pSliceArgument->uiSliceMode == SM_FIXEDSLCNUM_SLICE || pSliceArgument->uiSliceMode == SM_RASTER_SLICE) {
       bWillUseTaskManage = true;
     }
     ++ iIdx;
@@ -576,7 +576,7 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
   SWelsSvcCodingParam* pCodingParam     = pCtx->pSvcParam;
   SSpatialLayerConfig* pDlp             = &pCodingParam->sSpatialLayers[pCtx->uiDependencyId];
   SWelsSliceBs* pSliceBs                = NULL;
-  const bool kbIsDynamicSlicingMode     = (pDlp->sSliceCfg.uiSliceMode == SM_DYN_SLICE);
+  const bool kbIsDynamicSlicingMode     = (pDlp->sSliceArgument.uiSliceMode == SM_SIZELIMITED_SLICE);
 
   int32_t iLayerSize    = 0;
   int32_t iNalIdxBase   = pLbi->iNalCount;
@@ -613,7 +613,7 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
       ++ iSliceIdx;
       ++ pSliceBs;
     }
-  } else { // for SM_DYN_SLICE
+  } else { // for SM_SIZELIMITED_SLICE
     const int32_t kiPartitionCnt        = iSliceCount;
     int32_t iPartitionIdx               = 0;
 
@@ -744,17 +744,16 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
       eNalRefIdc        = pEncPEncCtx->eNalPriority;
       bNeedPrefix       = pEncPEncCtx->bNeedPrefixNalFlag;
 
-      if (pParamD->sSliceCfg.uiSliceMode != SM_DYN_SLICE) {
+      if (pParamD->sSliceArgument.uiSliceMode != SM_SIZELIMITED_SLICE) {
         int64_t iSliceStart = 0;
         bool bDsaFlag = false;
         iSliceIdx               = pPrivateData->iSliceIndex;
         pSlice                  = &pCurDq->sLayerInfo.pSliceInLayer[iSliceIdx];
         pSliceBs                = &pEncPEncCtx->pSliceBs[iSliceIdx];
 
-        bDsaFlag = (((pParamD->sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE)
-                      || (pParamD->sSliceCfg.uiSliceMode == SM_AUTO_SLICE)) &&
+        bDsaFlag = ((pParamD->sSliceArgument.uiSliceMode == SM_FIXEDSLCNUM_SLICE) &&
                      pCodingParam->iMultipleThreadIdc > 1 &&
-                     pCodingParam->iMultipleThreadIdc >= pParamD->sSliceCfg.sSliceArgument.uiSliceNum);
+                     pCodingParam->iMultipleThreadIdc >= pParamD->sSliceArgument.uiSliceNum);
         if (bDsaFlag)
           iSliceStart = WelsTime();
 
@@ -838,7 +837,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
           &pEncPEncCtx->pSliceThreading->pSliceCodedEvent[iEventIdx]); // mean finished coding current pSlice
         WelsEventSignal (
           &pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent);
-      } else { // for SM_DYN_SLICE parallelization
+      } else { // for SM_SIZELIMITED_SLICE parallelization
         SSliceCtx* pSliceCtx                    = pCurDq->pSliceEncCtx;
         const int32_t kiPartitionId             = iThreadIdx;
         const int32_t kiSliceIdxStep            = pEncPEncCtx->iActiveThreadsNum;
@@ -1090,9 +1089,9 @@ int32_t AdjustEnhanceLayer (sWelsEncCtx* pCtx, int32_t iCurDid) {
   // if using spatial base layer for complexity estimation
 
   const bool kbModelingFromSpatial = (pCtx->pCurDqLayer->pRefLayer != NULL && iCurDid > 0)
-                                      && (pCtx->pSvcParam->sSpatialLayers[iCurDid - 1].sSliceCfg.uiSliceMode == SM_FIXEDSLCNUM_SLICE
+                                      && (pCtx->pSvcParam->sSpatialLayers[iCurDid - 1].sSliceArgument.uiSliceMode == SM_FIXEDSLCNUM_SLICE
                                           && pCtx->pSvcParam->iMultipleThreadIdc >= pCtx->pSvcParam->sSpatialLayers[iCurDid -
-                                              1].sSliceCfg.sSliceArgument.uiSliceNum);
+                                              1].sSliceArgument.uiSliceNum);
 
   if (kbModelingFromSpatial) { // using spatial base layer for complexity estimation
     // do not need adjust due to not different at both slices of consumed time
@@ -1156,13 +1155,13 @@ void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t 
   while (iSpatialIdx < iSpatialNum) {
     const int32_t kiDid         = pDidList[iSpatialIdx];
     SSpatialLayerInternal* pDlp = &pPara->sDependencyLayers[kiDid];
-    SSliceConfig* pMso          = &pDlp->sSliceCfg;
+    SSliceConfig* pSliceArgument          = &pDlp->sSliceArgument;
     SDqLayer* pCurDq            = pCtx->ppDqLayerList[kiDid];
     SSliceCtx* pSliceCtx = pCurDq->pSliceEncCtx;
     const uint32_t kuiCountSliceNum = pSliceCtx->iSliceNumInFrame;
     if (pCtx->pSliceThreading) {
       if (pCtx->pSliceThreading->pFSliceDiff
-          && ((pMso->uiSliceMode == SM_FIXEDSLCNUM_SLICE) || (pMso->uiSliceMode == SM_AUTO_SLICE))
+          && ((pSliceArgument->uiSliceMode == SM_FIXEDSLCNUM_SLICE) || (pSliceArgument->uiSliceMode == SM_AUTO_SLICE))
           && pPara->iMultipleThreadIdc > 1
           && pPara->iMultipleThreadIdc >= kuiCountSliceNum) {
         uint32_t i = 0;

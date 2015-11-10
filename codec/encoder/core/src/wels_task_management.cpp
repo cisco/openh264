@@ -162,7 +162,7 @@ WelsErrorType  CWelsTaskManageBase::OnTaskExecuted (WelsCommon::IWelsTask* pTask
 }
 
 void CWelsTaskManageBase::InitFrame (const int32_t kiCurDid) {
-  m_iWaitTaskNum = m_pEncCtx->pSvcParam->sSpatialLayers[kiCurDid].sSliceCfg.sSliceArgument.uiSliceNum;
+  m_iWaitTaskNum = m_pEncCtx->pSvcParam->sSpatialLayers[kiCurDid].sSliceArgument.uiSliceNum;
   //printf("InitFrame m_iWaitTaskNum=%d, slice_mode=%d\n", m_iWaitTaskNum, m_pEncCtx->pSvcParam->sSpatialLayers[kiCurDid].sSliceCfg.uiSliceMode);
   //TODO: update mbmap;
 }

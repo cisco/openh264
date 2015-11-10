@@ -169,9 +169,8 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
 
     RcInitLayerMemory (pWelsSvcRc, pEncCtx->pMemAlign, 1 + pEncCtx->pSvcParam->sDependencyLayers[j].iHighestTemporalId);
 
-    bMultiSliceMode = ((SM_RASTER_SLICE == pDLayerParam->sSliceCfg.uiSliceMode) ||
-                       (SM_ROWMB_SLICE  == pDLayerParam->sSliceCfg.uiSliceMode) ||
-                       (SM_DYN_SLICE    == pDLayerParam->sSliceCfg.uiSliceMode));
+    bMultiSliceMode = ((SM_RASTER_SLICE == pDLayerParam->sSliceArgument.uiSliceMode) ||
+                       (SM_SIZELIMITED_SLICE    == pDLayerParam->sSliceArgument.uiSliceMode));
     if (bMultiSliceMode)
       pWelsSvcRc->iNumberMbGom = pWelsSvcRc->iNumberMbFrame;
   }
