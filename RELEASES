@@ -1,6 +1,10 @@
 
 Releases
 -----------
+v1.5.1
+------
+- Bug fixes for GMP Plugin
+
 v1.5.0
 ------
 - Correct a typo in codec return value (github issue#2046, cmUnkonwReason -> cmUnknownReason)
