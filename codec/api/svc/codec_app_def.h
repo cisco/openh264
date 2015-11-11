@@ -255,29 +255,6 @@ typedef struct {
 } SLTRConfig;
 
 /**
-* @brief Structure for slice argument
-*/
-typedef struct {
-  unsigned int
-  uiSliceMbNum[MAX_SLICES_NUM_TMP];        ///< only used when uiSliceMode=2;here we use a tmp fixed value since MAX_SLICES_NUM is not defined here and its definition may be changed;
-  unsigned int      uiSliceNum;            ///< only used when uiSliceMode=1
-  unsigned int      uiSliceSizeConstraint; ///< only used when uiSliceMode=4
-} SSliceArgument;                          ///< not all the elements in this argument will be used, how it will be used depends on uiSliceMode; please refer to SliceModeEnum
-
-/**
-* @brief Enumerate the type of slice mode
-*/
-typedef enum {
-  SM_SINGLE_SLICE         = 0, ///< | SliceNum==1
-  SM_FIXEDSLCNUM_SLICE    = 1, ///< | according to SliceNum        | enabled dynamic slicing for multi-thread
-  SM_RASTER_SLICE         = 2, ///< | according to SlicesAssign    | need input of MB numbers each slice. In addition, if other constraint in SSliceArgument is presented, need to follow the constraints. Typically if MB num and slice size are both constrained, re-encoding may be involved.
-  SM_ROWMB_SLICE          = 3, ///< | according to PictureMBHeight | typical of single row of mbs each slice + slice size constraint which including re-encoding
-  SM_DYN_SLICE            = 4, ///< | according to SliceSize       | dynamic slicing (have no idea about slice_nums until encoding current frame)
-  SM_AUTO_SLICE           = 5, ///< | according to thread number
-  SM_RESERVED             = 6
-} SliceModeEnum;
-
-/**
 * @brief Enumerate the type of rate control mode
 */
 typedef enum {
@@ -347,12 +324,26 @@ enum {
 };
 
 /**
-* @brief Structure for slice configuration
-*/
+ * @brief Enumerate the type of slice mode
+ */
+typedef enum {
+  SM_SINGLE_SLICE         = 0, ///< | SliceNum==1
+  SM_FIXEDSLCNUM_SLICE    = 1, ///< | according to SliceNum        | enabled dynamic slicing for multi-thread
+  SM_RASTER_SLICE         = 2, ///< | according to SlicesAssign    | need input of MB numbers each slice. In addition, if other constraint in SSliceArgument is presented, need to follow the constraints. Typically if MB num and slice size are both constrained, re-encoding may be involved.
+  SM_SIZELIMITED_SLICE           = 3, ///< | according to SliceSize       | slicing according to size, the slicing will be dynamic(have no idea about slice_nums until encoding current frame)
+  SM_RESERVED             = 4
+} SliceModeEnum;
+
+/**
+ * @brief Structure for slice argument
+ */
 typedef struct {
   SliceModeEnum uiSliceMode;    ///< by default, uiSliceMode will be SM_SINGLE_SLICE
-  SSliceArgument sSliceArgument;
-} SSliceConfig;
+  unsigned int  uiSliceNum;     ///< only used when uiSliceMode=1, when uiSliceNum=0 means auto design it with cpu core number
+  unsigned int  uiSliceMbNum[MAX_SLICES_NUM_TMP]; ///< only used when uiSliceMode=2; when =0 means setting one MB row a slice
+  unsigned int  uiSliceSizeConstraint; ///< now only used when uiSliceMode=4
+} SSliceArgument;
+
 /**
 * @brief  Structure for spatial layer configuration
 */
@@ -366,7 +357,7 @@ typedef struct {
   ELevelIdc    uiLevelIdc;     ///< value of profile IDC (0 for auto-detection)
   int          iDLayerQp;      ///< value of level IDC (0 for auto-detection)
 
-  SSliceConfig sSliceCfg;      ///< slice configuration for a layer
+  SSliceArgument sSliceArgument;
 } SSpatialLayerConfig;
 
 /**
@@ -456,6 +447,7 @@ typedef struct TagEncParamExt {
   /* multi-thread settings*/
   unsigned short
   iMultipleThreadIdc;                  ///< 1 # 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; lager than 1: count number of threads;
+  bool  bUseLoadBalancing; ///< only used when uiSliceMode=1 or 3, will change slicing of a picture during the run-time of multi-thread encoding, so the result of each run may be different
 
   /* Deblocking loop filter */
   int       iLoopFilterDisableIdc;     ///< 0: on, 1: off, 2: on except for slice boundaries

@@ -123,7 +123,7 @@ int32_t InitSlicePEncCtx (SSliceCtx* pSliceCtx,
                           bool bFmoUseFlag,
                           int32_t iMbWidth,
                           int32_t iMbHeight,
-                          SSliceConfig* pMulSliceOption,
+                          SSliceArgument* pSliceArgument,
                           void* pPpsArg);
 
 
@@ -190,7 +190,7 @@ int32_t WelsGetNumMbInSlice (SSliceCtx* pSliceCtx, const int32_t kiSliceIdc);
  *  Get slice count for multiple slice segment
  *
  */
-int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceConfig* pMso);
+int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceArgument* pSliceArgument);
 int32_t GetCurrentSliceNum (const SSliceCtx* kpSliceCtx);
 SSlice* GetSliceByIndex(sWelsEncCtx* pCtx, const int32_t kiSliceIdc);
 

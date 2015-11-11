@@ -101,8 +101,8 @@ class EncodeDecodeTestBase : public BaseEncoderTest, public BaseDecoderTest {
       pParam->sSpatialLayers[i].iVideoWidth = width >> (iLayers - i - 1);
       pParam->sSpatialLayers[i].iVideoHeight = height >> (iLayers - i - 1);
       pParam->sSpatialLayers[i].fFrameRate = framerate;
-      pParam->sSpatialLayers[i].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
-      pParam->sSpatialLayers[i].sSliceCfg.sSliceArgument.uiSliceNum = iSlices;
+      pParam->sSpatialLayers[i].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+      pParam->sSpatialLayers[i].sSliceArgument.uiSliceNum = iSlices;
     }
   }
 
@@ -415,12 +415,12 @@ void EncodeDecodeTestAPIBase::RandomParamExtCombination() {
       pSpatialLayer->iSpatialBitrate     = rand() % BIT_RATE_RANGE;
 
 
-      pSpatialLayer->sSliceCfg.uiSliceMode = static_cast<SliceModeEnum> (rand() % SLICE_MODE_NUM);
-      if (pSpatialLayer->sSliceCfg.uiSliceMode != SM_DYN_SLICE) {
+      pSpatialLayer->sSliceArgument.uiSliceMode = static_cast<SliceModeEnum> (rand() % SLICE_MODE_NUM);
+      if (pSpatialLayer->sSliceArgument.uiSliceMode != SM_SIZELIMITED_SLICE) {
         param_.uiMaxNalSize       = 0;
       }
-      pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum = rand();
-      pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint = rand();
+      pSpatialLayer->sSliceArgument.uiSliceNum = rand();
+      pSpatialLayer->sSliceArgument.uiSliceSizeConstraint = rand();
     }
   }
 }
@@ -482,31 +482,30 @@ void EncodeDecodeTestAPIBase::ValidateParamExtCombination() {
     pSpatialLayer->iSpatialBitrate     = WELS_CLIP3 (pSpatialLayer->iSpatialBitrate, 1, pSpatialLayer->iMaxSpatialBitrate);
     iTotalBitRate += pSpatialLayer->iSpatialBitrate;
 
-    uiSliceNum  = pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum;
-    pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum = WELS_CLIP3 (uiSliceNum, 1, MAX_SLICES_NUM);
-    pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 0;
+    uiSliceNum  = pSpatialLayer->sSliceArgument.uiSliceNum;
+    pSpatialLayer->sSliceArgument.uiSliceNum = WELS_CLIP3 (uiSliceNum, 1, MAX_SLICES_NUM);
+    pSpatialLayer->sSliceArgument.uiSliceSizeConstraint = 0;
 
 
     //for SM_FIXEDSLCNUM_SLICE
     // to do will add this when GOM bug fixed
-    if (SM_FIXEDSLCNUM_SLICE == pSpatialLayer->sSliceCfg.uiSliceMode) {
-      pSpatialLayer->sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
+    if (SM_FIXEDSLCNUM_SLICE == pSpatialLayer->sSliceArgument.uiSliceMode) {
+      pSpatialLayer->sSliceArgument.uiSliceMode = SM_SINGLE_SLICE;
     }
 
-    //for slice mode = SM_DYN_SLICE
-    if (SM_DYN_SLICE == pSpatialLayer->sSliceCfg.uiSliceMode) {
+    //for slice mode = SM_SIZELIMITED_SLICE
+    if (SM_SIZELIMITED_SLICE == pSpatialLayer->sSliceArgument.uiSliceMode) {
       bDynSliceModeFlag = true;
     }
 
     //for slice mode = SM_RASTER_SLICE
-    if (SM_RASTER_SLICE == pSpatialLayer->sSliceCfg.uiSliceMode) {
-      SliceParamValidationForMode2 (iSpatialIdx);
+    if (SM_RASTER_SLICE == pSpatialLayer->sSliceArgument.uiSliceMode) {
+      if (0!=pSpatialLayer->sSliceArgument.uiSliceMbNum[0]) {
+        SliceParamValidationForMode2 (iSpatialIdx);
+      } else {
+        SliceParamValidationForMode3 (iSpatialIdx);
+      }
     }
-    //for slice mode = SM_ROWMB_SLICE
-    if (SM_ROWMB_SLICE == pSpatialLayer->sSliceCfg.uiSliceMode) {
-      SliceParamValidationForMode3 (iSpatialIdx);
-    }
-
   }
 
   //for RC
@@ -526,7 +525,7 @@ void EncodeDecodeTestAPIBase::ValidateParamExtCombination() {
   param_.iMinQp       = iMinQP;
   param_.uiMaxNalSize = 0;
 
-  //for slice mode = SM_DYN_SLICE
+  //for slice mode = SM_SIZELIMITED_SLICE
   if (true == bDynSliceModeFlag) {
     SliceParamValidationForMode4();
   }
@@ -549,8 +548,8 @@ void EncodeDecodeTestAPIBase::SliceParamValidationForMode2 (int iSpatialIdx) {
 
   uiSliceIdx = 0;
   while (uiSliceIdx < MAX_SLICES_NUM) {
-    param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceMbNum[uiSliceIdx] = rand() % uiMbNumInFrame;
-    uiCountMb           += param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceMbNum[uiSliceIdx];
+    param_.sSpatialLayers[iSpatialIdx].sSliceArgument.uiSliceMbNum[uiSliceIdx] = rand() % uiMbNumInFrame;
+    uiCountMb           += param_.sSpatialLayers[iSpatialIdx].sSliceArgument.uiSliceMbNum[uiSliceIdx];
     uiActualSliceCount   =  uiSliceIdx + 1;
 
     if (uiCountMb >= uiMbNumInFrame) {
@@ -561,14 +560,14 @@ void EncodeDecodeTestAPIBase::SliceParamValidationForMode2 (int iSpatialIdx) {
   }
 
   if (uiCountMb >= uiMbNumInFrame) {
-    param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceMbNum[uiActualSliceCount - 1] -=
+    param_.sSpatialLayers[iSpatialIdx].sSliceArgument.uiSliceMbNum[uiActualSliceCount - 1] -=
       (uiCountMb - uiMbNumInFrame);
 
   } else {
-    param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceMbNum[uiActualSliceCount - 1 ] +=
+    param_.sSpatialLayers[iSpatialIdx].sSliceArgument.uiSliceMbNum[uiActualSliceCount - 1 ] +=
       (uiMbNumInFrame - uiCountMb);
   }
-  param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceNum = uiActualSliceCount;
+  param_.sSpatialLayers[iSpatialIdx].sSliceArgument.uiSliceNum = uiActualSliceCount;
 
 }
 void EncodeDecodeTestAPIBase::SliceParamValidationForMode3 (int iSpatialIdx) {
@@ -579,16 +578,16 @@ void EncodeDecodeTestAPIBase::SliceParamValidationForMode3 (int iSpatialIdx) {
 
   //change slice mode to SM_SINGLE_SLICE
   if (uiMbHeight >  MAX_SLICES_NUM) {
-    param_.sSpatialLayers[iSpatialIdx].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
+    param_.sSpatialLayers[iSpatialIdx].sSliceArgument.uiSliceMode = SM_SINGLE_SLICE;
   }
 
 }
 
 void EncodeDecodeTestAPIBase::SliceParamValidationForMode4() {
-  //slice mode of all spatial layer should be set as SM_DYN_SLICE
+  //slice mode of all spatial layer should be set as SM_SIZELIMITED_SLICE
   for (int iSpatialIdx = 0; iSpatialIdx < param_.iSpatialLayerNum; iSpatialIdx++) {
-    param_.sSpatialLayers[iSpatialIdx].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 600;
-    param_.sSpatialLayers[iSpatialIdx].sSliceCfg.uiSliceMode = SM_DYN_SLICE;
+    param_.sSpatialLayers[iSpatialIdx].sSliceArgument.uiSliceSizeConstraint = 600;
+    param_.sSpatialLayers[iSpatialIdx].sSliceArgument.uiSliceMode = SM_SIZELIMITED_SLICE;
   }
   param_.uiMaxNalSize = 1500;
 }
@@ -2385,12 +2384,12 @@ TEST_F (DecodeCrashTestAPI, DecoderCrashTest) {
     param_.iMultipleThreadIdc = 0;
     param_.sSpatialLayers[0].iSpatialBitrate = p.iTarBitrate;
     param_.sSpatialLayers[0].iMaxSpatialBitrate = p.iTarBitrate << 1;
-    param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = (rand() % 2) ? SM_DYN_SLICE : SM_SINGLE_SLICE;
-    if (param_.sSpatialLayers[0].sSliceCfg.uiSliceMode == SM_DYN_SLICE) {
-      param_.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 1400;
+    param_.sSpatialLayers[0].sSliceArgument.uiSliceMode = (rand() % 2) ? SM_SIZELIMITED_SLICE : SM_SINGLE_SLICE;
+    if (param_.sSpatialLayers[0].sSliceArgument.uiSliceMode == SM_SIZELIMITED_SLICE) {
+      param_.sSpatialLayers[0].sSliceArgument.uiSliceSizeConstraint = 1400;
       param_.uiMaxNalSize = 1400;
     } else {
-      param_.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 0;
+      param_.sSpatialLayers[0].sSliceArgument.uiSliceSizeConstraint = 0;
       param_.uiMaxNalSize = 0;
     }
 
@@ -3454,35 +3453,35 @@ struct EncodeOptionParam {
 };
 
 static const EncodeOptionParam kOptionParamArray[] = {
-  {true, true, false, 30, 600, 460, 1, SM_DYN_SLICE, 450, 15.0, 1, ""},
-  {true, true, false, 30, 340, 96, 24, SM_DYN_SLICE, 1000, 30.0, 1, ""},
-  {true, true, false, 30, 140, 196, 51, SM_DYN_SLICE, 500, 7.5, 1, ""},
-  {true, true, false, 30, 110, 296, 50, SM_DYN_SLICE, 500, 7.5, 1, ""},
-  {true, true, false, 30, 104, 416, 44, SM_DYN_SLICE, 500, 7.5, 1, ""},
-  {true, true, false, 30, 16, 16, 2, SM_DYN_SLICE, 500, 7.5, 1, ""},
-  {true, false, true, 30, 600, 460, 1, SM_DYN_SLICE, 450, 15.0, 1, ""},
-  {true, false, true, 30, 340, 96, 24, SM_DYN_SLICE, 1000, 30.0, 1, ""},
-  {true, false, true, 30, 140, 196, 51, SM_DYN_SLICE, 500, 7.5, 1, ""},
-  {true, false, true, 30, 110, 296, 50, SM_DYN_SLICE, 500, 7.5, 1, ""},
-  {true, false, true, 30, 104, 416, 44, SM_DYN_SLICE, 500, 7.5, 1, ""},
-  {true, false, true, 30, 16, 16, 2, SM_DYN_SLICE, 500, 7.5, 1, ""},
-  {true, true, true, 30, 600, 460, 1, SM_DYN_SLICE, 450, 15.0, 1, ""},
-  {true, true, true, 30, 340, 96, 24, SM_DYN_SLICE, 1000, 30.0, 1, ""},
-  {true, true, true, 30, 140, 196, 51, SM_DYN_SLICE, 500, 7.5, 1, ""},
-  {true, true, true, 30, 110, 296, 50, SM_DYN_SLICE, 500, 7.5, 1, ""},
-  {true, true, true, 30, 104, 416, 44, SM_DYN_SLICE, 500, 7.5, 1, ""},
-  {true, true, true, 30, 16, 16, 2, SM_DYN_SLICE, 500, 7.5, 1, ""},
+  {true, true, false, 30, 600, 460, 1, SM_SIZELIMITED_SLICE, 450, 15.0, 1, ""},
+  {true, true, false, 30, 340, 96, 24, SM_SIZELIMITED_SLICE, 1000, 30.0, 1, ""},
+  {true, true, false, 30, 140, 196, 51, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
+  {true, true, false, 30, 110, 296, 50, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
+  {true, true, false, 30, 104, 416, 44, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
+  {true, true, false, 30, 16, 16, 2, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
+  {true, false, true, 30, 600, 460, 1, SM_SIZELIMITED_SLICE, 450, 15.0, 1, ""},
+  {true, false, true, 30, 340, 96, 24, SM_SIZELIMITED_SLICE, 1000, 30.0, 1, ""},
+  {true, false, true, 30, 140, 196, 51, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
+  {true, false, true, 30, 110, 296, 50, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
+  {true, false, true, 30, 104, 416, 44, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
+  {true, false, true, 30, 16, 16, 2, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
+  {true, true, true, 30, 600, 460, 1, SM_SIZELIMITED_SLICE, 450, 15.0, 1, ""},
+  {true, true, true, 30, 340, 96, 24, SM_SIZELIMITED_SLICE, 1000, 30.0, 1, ""},
+  {true, true, true, 30, 140, 196, 51, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
+  {true, true, true, 30, 110, 296, 50, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
+  {true, true, true, 30, 104, 416, 44, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
+  {true, true, true, 30, 16, 16, 2, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
   {false, false, true, 3, 4096, 2304, 2, SM_SINGLE_SLICE, 0, 7.5, 1, ""}, // large picture size
-  {false, true, false, 30, 32, 16, 2, SM_DYN_SLICE, 500, 7.5, 1, ""},
-  {false, true, false, 30, 600, 460, 1, SM_DYN_SLICE, 450, 15.0, 4, ""},
-  {false, true, false, 30, 340, 96, 24, SM_DYN_SLICE, 1000, 30.0, 2, ""},
-  {false, true, false, 30, 140, 196, 51, SM_DYN_SLICE, 500, 7.5, 3, ""},
-  {false, true, false, 30, 110, 296, 50, SM_DYN_SLICE, 500, 7.5, 2, ""},
-  {false, true, false, 30, 104, 416, 44, SM_DYN_SLICE, 500, 7.5, 2, ""},
-  {false, true, false, 30, 16, 16, 2, SM_DYN_SLICE, 500, 7.5, 3, ""},
-  {false, true, false, 30, 32, 16, 2, SM_DYN_SLICE, 500, 7.5, 3, ""},
+  {false, true, false, 30, 32, 16, 2, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
+  {false, true, false, 30, 600, 460, 1, SM_SIZELIMITED_SLICE, 450, 15.0, 4, ""},
+  {false, true, false, 30, 340, 96, 24, SM_SIZELIMITED_SLICE, 1000, 30.0, 2, ""},
+  {false, true, false, 30, 140, 196, 51, SM_SIZELIMITED_SLICE, 500, 7.5, 3, ""},
+  {false, true, false, 30, 110, 296, 50, SM_SIZELIMITED_SLICE, 500, 7.5, 2, ""},
+  {false, true, false, 30, 104, 416, 44, SM_SIZELIMITED_SLICE, 500, 7.5, 2, ""},
+  {false, true, false, 30, 16, 16, 2, SM_SIZELIMITED_SLICE, 500, 7.5, 3, ""},
+  {false, true, false, 30, 32, 16, 2, SM_SIZELIMITED_SLICE, 500, 7.5, 3, ""},
   {false, false, true, 30, 600, 460, 1, SM_FIXEDSLCNUM_SLICE, 0, 15.0, 4, ""},
-  {false, false, true, 30, 600, 460, 1, SM_AUTO_SLICE, 0, 15.0, 4, ""},
+  {false, false, true, 30, 600, 460, 1, SM_FIXEDSLCNUM_SLICE, 0, 15.0, 8, ""},
 };
 
 class EncodeTestAPI : public ::testing::TestWithParam<EncodeOptionParam>, public ::EncodeDecodeTestAPIBase {
@@ -3533,9 +3532,9 @@ TEST_P (EncodeTestAPI, SetEncOptionSize) {
   param_.sSpatialLayers[0].iVideoWidth = p.iWidth ;
   param_.sSpatialLayers[0].iVideoHeight = p.iHeight;
   param_.sSpatialLayers[0].fFrameRate = p.fFramerate;
-  param_.sSpatialLayers[0].sSliceCfg.uiSliceMode = p.eSliceMode;
-  if (SM_AUTO_SLICE == p.eSliceMode || SM_FIXEDSLCNUM_SLICE == p.eSliceMode ) {
-    param_.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = 8;
+  param_.sSpatialLayers[0].sSliceArgument.uiSliceMode = p.eSliceMode;
+  if ( SM_FIXEDSLCNUM_SLICE == p.eSliceMode ) {
+    param_.sSpatialLayers[0].sSliceArgument.uiSliceNum = 8;
   }
 
   encoder_->Uninitialize();
@@ -3555,7 +3554,7 @@ TEST_P (EncodeTestAPI, SetEncOptionSize) {
   unsigned char* pData[3] = { NULL };
 
   //FIXME: remove this after the multi-thread case is correctly handled in encoder
-  if (p.iThreads>1 && SM_DYN_SLICE == p.eSliceMode) {
+  if (p.iThreads>1 && SM_SIZELIMITED_SLICE == p.eSliceMode) {
     p.bAllRandom = false;
   }
 
@@ -3742,18 +3741,19 @@ TEST_F (EncodeDecodeTestAPI, DiffSlicingInDlayer) {
   sParam.bSimulcastAVC = 1;
   sParam.sSpatialLayers[0].iVideoWidth = (iWidth >> 2);
   sParam.sSpatialLayers[0].iVideoHeight = (iHeight >> 2);
-  sParam.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_ROWMB_SLICE;
+  sParam.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_RASTER_SLICE;
+  sParam.sSpatialLayers[1].sSliceArgument.uiSliceMbNum[0] = 0;
 
   sParam.sSpatialLayers[1].iVideoWidth = (iWidth >> 1);
   sParam.sSpatialLayers[1].iVideoHeight = (iHeight >> 1);
-  sParam.sSpatialLayers[1].sSliceCfg.uiSliceMode = SM_RASTER_SLICE;
-  sParam.sSpatialLayers[1].sSliceCfg.sSliceArgument.uiSliceMbNum[0] = 30;
-  sParam.sSpatialLayers[1].sSliceCfg.sSliceArgument.uiSliceMbNum[1] = 32;
+  sParam.sSpatialLayers[1].sSliceArgument.uiSliceMode = SM_RASTER_SLICE;
+  sParam.sSpatialLayers[1].sSliceArgument.uiSliceMbNum[0] = 30;
+  sParam.sSpatialLayers[1].sSliceArgument.uiSliceMbNum[1] = 32;
 
   sParam.sSpatialLayers[2].iVideoWidth = iWidth;
   sParam.sSpatialLayers[2].iVideoHeight = iHeight;
-  sParam.sSpatialLayers[2].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
-  sParam.sSpatialLayers[2].sSliceCfg.sSliceArgument.uiSliceNum = (rand() % 30) + 1;
+  sParam.sSpatialLayers[2].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  sParam.sSpatialLayers[2].sSliceArgument.uiSliceNum = (rand() % 30) + 1;
 
   int rv = encoder_->InitializeExt (&sParam);
   ASSERT_TRUE (rv == cmResultSuccess) << "Init Failed sParam: rv = " << rv;;
@@ -3812,12 +3812,12 @@ TEST_F (EncodeDecodeTestAPI, DiffSlicingInDlayerMixed) {
   sParam.bSimulcastAVC = 1;
   sParam.sSpatialLayers[0].iVideoWidth = (iWidth >> 2);
   sParam.sSpatialLayers[0].iVideoHeight = (iHeight >> 2);
-  sParam.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_ROWMB_SLICE;
+  sParam.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_RASTER_SLICE;
 
   sParam.sSpatialLayers[1].iVideoWidth = iWidth;
   sParam.sSpatialLayers[1].iVideoHeight = iHeight;
-  sParam.sSpatialLayers[1].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
-  sParam.sSpatialLayers[1].sSliceCfg.sSliceArgument.uiSliceNum = 1;
+  sParam.sSpatialLayers[1].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  sParam.sSpatialLayers[1].sSliceArgument.uiSliceNum = 1;
 
   int rv = encoder_->InitializeExt (&sParam);
   ASSERT_TRUE (rv == cmResultSuccess) << "Init Failed sParam: rv = " << rv;;
@@ -3876,8 +3876,8 @@ TEST_F (EncodeDecodeTestAPI, ThreadNumAndSliceNum) {
   sParam.bSimulcastAVC = 1;
   sParam.sSpatialLayers[0].iVideoWidth = iWidth;
   sParam.sSpatialLayers[0].iVideoHeight = iHeight;
-  sParam.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
-  sParam.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = (rand() % 2) ? (sParam.iMultipleThreadIdc + 1) :
+  sParam.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  sParam.sSpatialLayers[0].sSliceArgument.uiSliceNum = (rand() % 2) ? (sParam.iMultipleThreadIdc + 1) :
       (sParam.iMultipleThreadIdc - 1);
 
   int rv = encoder_->InitializeExt (&sParam);

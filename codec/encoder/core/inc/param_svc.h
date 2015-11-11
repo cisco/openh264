@@ -137,6 +137,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     param.iTargetBitrate        = UNSPECIFIED_BIT_RATE; // overall target bitrate introduced in RC module
     param.iMaxBitrate           = UNSPECIFIED_BIT_RATE;
     param.iMultipleThreadIdc    = 1;
+    param.bUseLoadBalancing = true;
 
     param.iLTRRefNum            = 0;
     param.iLtrMarkPeriod        = 30;   //the min distance of two int32_t references
@@ -176,13 +177,15 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       param.sSpatialLayers[iLayer].uiLevelIdc = LEVEL_UNKNOWN;
       param.sSpatialLayers[iLayer].iDLayerQp = SVC_QUALITY_BASE_QP;
       param.sSpatialLayers[iLayer].fFrameRate = param.fMaxFrameRate;
-      param.sSpatialLayers[iLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
-      param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 1500;
-      param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceNum = 1;
+
       param.sSpatialLayers[iLayer].iMaxSpatialBitrate = UNSPECIFIED_BIT_RATE;
+
+      param.sSpatialLayers[iLayer].sSliceArgument.uiSliceMode = SM_SINGLE_SLICE;
+      param.sSpatialLayers[iLayer].sSliceArgument.uiSliceNum = 0; //AUTO, using number of CPU cores
+      param.sSpatialLayers[iLayer].sSliceArgument.uiSliceSizeConstraint = 1500;
       const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
       for (int32_t idx = 0; idx < kiLesserSliceNum; idx++)
-        param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceMbNum[idx] = 960;
+        param.sSpatialLayers[iLayer].sSliceArgument.uiSliceMbNum[idx] = 0; //default, using one row a slice if uiSliceMode is SM_RASTER_MODE
     }
   }
 
@@ -394,15 +397,11 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
         pCodingParam.sSpatialLayers[iIdxSpatial].iMaxSpatialBitrate;
 
       //multi slice
-      pSpatialLayer->sSliceCfg.uiSliceMode = pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.uiSliceMode;
-      pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint
-        = (uint32_t) (pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.sSliceArgument.uiSliceSizeConstraint);
-      pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum
-        = pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.sSliceArgument.uiSliceNum;
-      const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
-      memcpy (pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceMbNum,
-              pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.sSliceArgument.uiSliceMbNum, // confirmed_safe_unsafe_usage
-              kiLesserSliceNum * sizeof (uint32_t)) ;
+      pSpatialLayer->sSliceArgument = pCodingParam.sSpatialLayers[iIdxSpatial].sSliceArgument;
+
+      memcpy (&(pSpatialLayer->sSliceArgument),
+              &(pCodingParam.sSpatialLayers[iIdxSpatial].sSliceArgument), // confirmed_safe_unsafe_usage
+              sizeof (SSliceArgument)) ;
 
       pSpatialLayer->iDLayerQp = pCodingParam.sSpatialLayers[iIdxSpatial].iDLayerQp;
 

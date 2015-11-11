@@ -524,16 +524,16 @@ void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
   while (i < iSpatialLayers) {
     SSpatialLayerConfig* pSpatialCfg = &pParam->sSpatialLayers[i];
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-             "sSpatialLayers[%d]: .iVideoWidth= %d; .iVideoHeight= %d; .fFrameRate= %.6ff; .iSpatialBitrate= %d; .iMaxSpatialBitrate= %d; .sSliceCfg.uiSliceMode= %d; .sSliceCfg.sSliceArgument.iSliceNum= %d; .sSliceCfg.sSliceArgument.uiSliceSizeConstraint= %d;"
+             "sSpatialLayers[%d]: .iVideoWidth= %d; .iVideoHeight= %d; .fFrameRate= %.6ff; .iSpatialBitrate= %d; .iMaxSpatialBitrate= %d; .sSliceArgument.uiSliceMode= %d; .sSliceArgument.iSliceNum= %d; .sSliceArgument.uiSliceSizeConstraint= %d;"
              "uiProfileIdc = %d;uiLevelIdc = %d",
              i, pSpatialCfg->iVideoWidth,
              pSpatialCfg->iVideoHeight,
              pSpatialCfg->fFrameRate,
              pSpatialCfg->iSpatialBitrate,
              pSpatialCfg->iMaxSpatialBitrate,
-             pSpatialCfg->sSliceCfg.uiSliceMode,
-             pSpatialCfg->sSliceCfg.sSliceArgument.uiSliceNum,
-             pSpatialCfg->sSliceCfg.sSliceArgument.uiSliceSizeConstraint,
+             pSpatialCfg->sSliceArgument.uiSliceMode,
+             pSpatialCfg->sSliceArgument.uiSliceNum,
+             pSpatialCfg->sSliceArgument.uiSliceSizeConstraint,
              pSpatialCfg->uiProfileIdc,
              pSpatialCfg->uiLevelIdc
             );

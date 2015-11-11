@@ -256,8 +256,8 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
 
     //for controlling the NAL size (normally for packetization-mode=0)
     if (maxPayloadSize != 0) {
-      layer->sSliceCfg.uiSliceMode = SM_DYN_SLICE;
-      layer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint = maxPayloadSize;
+      layer->sSliceArgument.uiSliceMode = SM_SIZELIMITED_SLICE;
+      layer->sSliceArgument.uiSliceSizeConstraint = maxPayloadSize;
     }
     rv = encoder_->InitializeExt (&param);
     if (rv) {
