@@ -90,8 +90,8 @@ class CWelsSliceEncodingTask : public CWelsBaseTask {
 
 class CWelsLoadBalancingSlicingEncodingTask : public CWelsSliceEncodingTask {
  public:
-  CWelsLoadBalancingSlicingEncodingTask (sWelsEncCtx* pCtx, const int32_t iSliceIdx);
-  ~CWelsLoadBalancingSlicingEncodingTask();
+  CWelsLoadBalancingSlicingEncodingTask(sWelsEncCtx* pCtx, const int32_t iSliceIdx) : CWelsSliceEncodingTask (pCtx, iSliceIdx) {
+  };
 
   virtual WelsErrorType InitTask();
   virtual void FinishTask();
