@@ -14,7 +14,7 @@ TEST (EncoderTaskManagement, CWelsTaskManageBase) {
   sCtx.pSvcParam = &sWelsSvcCodingParam;
   sWelsSvcCodingParam.iMultipleThreadIdc = 4;
   sCtx.iMaxSliceCount = 35;
-  IWelsTaskManage*  pTaskManage = IWelsTaskManage::CreateTaskManage (&sCtx, false);
+  IWelsTaskManage*  pTaskManage = IWelsTaskManage::CreateTaskManage (&sCtx, 1, false);
   ASSERT_TRUE (NULL != pTaskManage);
 
   delete pTaskManage;
@@ -27,7 +27,22 @@ TEST (EncoderTaskManagement, CWelsTaskManageParallel) {
   sCtx.pSvcParam = &sWelsSvcCodingParam;
   sWelsSvcCodingParam.iMultipleThreadIdc = 4;
   sCtx.iMaxSliceCount = 35;
-  IWelsTaskManage*  pTaskManage = IWelsTaskManage::CreateTaskManage (&sCtx, true);
+  IWelsTaskManage*  pTaskManage = IWelsTaskManage::CreateTaskManage (&sCtx, 1, true);
+  ASSERT_TRUE (NULL != pTaskManage);
+
+  delete pTaskManage;
+}
+
+TEST (EncoderTaskManagement, CWelsTaskManageMultiD) {
+  sWelsEncCtx sCtx;
+  SWelsSvcCodingParam sWelsSvcCodingParam;
+
+  sCtx.pSvcParam = &sWelsSvcCodingParam;
+  sWelsSvcCodingParam.iMultipleThreadIdc = 4;
+  sWelsSvcCodingParam.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = 35;
+  sCtx.iMaxSliceCount = 35;
+
+  IWelsTaskManage*  pTaskManage = IWelsTaskManage::CreateTaskManage (&sCtx, 4, true);
   ASSERT_TRUE (NULL != pTaskManage);
 
   delete pTaskManage;
