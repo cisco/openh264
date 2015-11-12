@@ -382,6 +382,11 @@ int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
 
       pSliceSeg->pCountMbNumInSlice = NULL;
     }
+    if (NULL != pSliceSeg->pSliceConsumeTime) {
+      pMa->WelsFree (pSliceSeg->pSliceConsumeTime, "pSliceSeg->pSliceConsumeTime");
+
+      pSliceSeg->pSliceConsumeTime = NULL;
+    }
     // just for safe
     pSliceSeg->iSliceNumInFrame = 0;
     pSliceSeg->iMbNumInFrame    = 0;
@@ -405,6 +410,7 @@ int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
                                     "pSliceSeg->pCountMbNumInSlice");
 
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pCountMbNumInSlice)
+    pSliceSeg->pSliceConsumeTime = NULL;
     pSliceSeg->uiSliceMode              = uiSliceMode;
     pSliceSeg->iMbWidth                 = kiMbWidth;
     pSliceSeg->iMbHeight                = kiMbHeight;
@@ -419,27 +425,29 @@ int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
       return 1;
 
     pSliceSeg->pOverallMbMap = (uint16_t*)pMa->WelsMalloc (kiCountMbNum * sizeof (uint16_t), "pSliceSeg->pOverallMbMap");
-
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pOverallMbMap)
 
     WelsSetMemMultiplebytes_c(pSliceSeg->pOverallMbMap, 0, kiCountMbNum, sizeof(uint16_t));
 
     //SM_SIZELIMITED_SLICE: init, set pSliceSeg->iSliceNumInFrame = 1;
     pSliceSeg->iSliceNumInFrame = GetInitialSliceNum (kiMbWidth, kiMbHeight, pSliceArgument);
-
     if (-1 == pSliceSeg->iSliceNumInFrame)
       return 1;
 
     pSliceSeg->pCountMbNumInSlice = (int32_t*)pMa->WelsMalloc (pSliceSeg->iSliceNumInFrame * sizeof (int32_t),
                                     "pSliceSeg->pCountMbNumInSlice");
-
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pCountMbNumInSlice)
 
     pSliceSeg->pFirstMbInSlice = (int32_t*)pMa->WelsMalloc (pSliceSeg->iSliceNumInFrame * sizeof (int32_t),
                                     "pSliceSeg->pFirstMbInSlice");
-
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pFirstMbInSlice)
+
+    pSliceSeg->pSliceConsumeTime = (uint32_t*)pMa->WelsMalloc (pSliceSeg->iSliceNumInFrame * sizeof (uint32_t),
+                                                             "pSliceSeg->pSliceConsumeTime");
+    WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pSliceConsumeTime)
+
     pSliceSeg->uiSliceMode      = pSliceArgument->uiSliceMode;
+
     pSliceSeg->iMbWidth         = kiMbWidth;
     pSliceSeg->iMbHeight        = kiMbHeight;
     pSliceSeg->iMbNumInFrame    = kiCountMbNum;
@@ -487,6 +495,11 @@ void UninitSliceSegment (SSliceCtx* pSliceSeg, CMemoryAlign* pMa) {
       pMa->WelsFree (pSliceSeg->pCountMbNumInSlice, "pSliceSeg->pCountMbNumInSlice");
 
       pSliceSeg->pCountMbNumInSlice = NULL;
+    }
+    if (NULL != pSliceSeg->pSliceConsumeTime) {
+      pMa->WelsFree (pSliceSeg->pSliceConsumeTime, "pSliceSeg->pSliceConsumeTime");
+
+      pSliceSeg->pSliceConsumeTime = NULL;
     }
 
     pSliceSeg->iMbNumInFrame    = 0;
