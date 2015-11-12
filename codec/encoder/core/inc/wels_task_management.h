@@ -44,10 +44,9 @@
 #include "wels_common_basis.h"
 #include "WelsLock.h"
 #include "WelsThreadPool.h"
+#include "wels_task_base.h"
 
 namespace WelsEnc {
-
-class CWelsBaseTask;
 
 class IWelsTaskManage {
  public:
@@ -57,7 +56,7 @@ class IWelsTaskManage {
   virtual void            Uninit() = 0;
 
   virtual void            InitFrame (const int32_t kiCurDid) {}
-  virtual WelsErrorType   ExecuteTasks() = 0;
+  virtual WelsErrorType   ExecuteTasks(const CWelsBaseTask::ETaskType iTaskType = CWelsBaseTask::WELS_ENC_TASK_ENCODING) = 0;
 
   static IWelsTaskManage* CreateTaskManage (sWelsEncCtx* pCtx, bool bNeedLock);
 };
@@ -76,7 +75,7 @@ class  CWelsTaskManageBase : public IWelsTaskManage, public WelsCommon::IWelsThr
   void    Uninit();
 
   virtual void            InitFrame (const int32_t kiCurDid);
-  virtual WelsErrorType   ExecuteTasks();
+  virtual WelsErrorType   ExecuteTasks(const CWelsBaseTask::ETaskType iTaskType = CWelsBaseTask::WELS_ENC_TASK_ENCODING);
 
   //IWelsThreadPoolSink
   virtual WelsErrorType  OnTaskExecuted (WelsCommon::IWelsTask* pTask);
@@ -85,12 +84,15 @@ class  CWelsTaskManageBase : public IWelsTaskManage, public WelsCommon::IWelsThr
  protected:
   virtual  WelsErrorType  CreateTasks (sWelsEncCtx* pEncCtx, const int32_t kiTaskCount);
   void                    DestroyTasks();
+  WelsErrorType  ExecuteTaskList(TASKLIST_TYPE* pTargetTaskList);
 
  protected:
   sWelsEncCtx*    m_pEncCtx;
   WelsCommon::CWelsThreadPool*   m_pThreadPool;
 
-  TASKLIST_TYPE*   m_cTaskList;
+  TASKLIST_TYPE*   m_pcAllTaskList[CWelsBaseTask::WELS_ENC_TASK_ALL];
+  TASKLIST_TYPE*   m_cEncodingTaskList;
+  TASKLIST_TYPE*   m_cPreEncodingTaskList;
   int32_t         m_iTaskNum;
 
   //SLICE_PAIR_LIST *m_cSliceList;
@@ -113,12 +115,12 @@ class  CWelsTaskManageOne : public CWelsTaskManageBase {
   virtual ~CWelsTaskManageOne();
 
   WelsErrorType   Init (sWelsEncCtx* pEncCtx);
-  virtual WelsErrorType  ExecuteTasks();
+  virtual WelsErrorType  ExecuteTasks(const CWelsBaseTask::ETaskType iTaskType = CWelsBaseTask::WELS_ENC_TASK_ENCODING);
 };
 
 class  CWelsTaskManageParallel : public CWelsTaskManageBase {
  public:
-  virtual WelsErrorType  ExecuteTasks();
+  virtual WelsErrorType  ExecuteTasks(const CWelsBaseTask::ETaskType iTaskType = CWelsBaseTask::WELS_ENC_TASK_ENCODING);
 
  protected:
   virtual  WelsErrorType  CreateTasks (sWelsEncCtx* pEncCtx, const int32_t kiTaskCount);

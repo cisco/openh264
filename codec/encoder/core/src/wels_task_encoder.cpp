@@ -228,6 +228,20 @@ void CWelsLoadBalancingSlicingEncodingTask::FinishTask() {
            m_pCtx->pCurDqLayer->pSliceEncCtx->pCountMbNumInSlice[m_iSliceIdx]);
 }
 
+
+CWelsUpdateMbMapTask::CWelsUpdateMbMapTask (sWelsEncCtx* pCtx, const int32_t iSliceIdx) {
+  m_pCtx = pCtx;
+  m_iSliceIdx = iSliceIdx;
+}
+
+CWelsUpdateMbMapTask::~CWelsUpdateMbMapTask() {
+}
+
+WelsErrorType CWelsUpdateMbMapTask::Execute() {
+  UpdateMbListNeighborParallel (m_pCtx->pCurDqLayer->pSliceEncCtx, m_pCtx->pCurDqLayer->sMbDataP, m_iSliceIdx);
+  return ENC_RETURN_SUCCESS;
+}
+
 }
 
 
