@@ -39,7 +39,7 @@ TEST (EncoderTaskManagement, CWelsTaskManageMultiD) {
 
   sCtx.pSvcParam = &sWelsSvcCodingParam;
   sWelsSvcCodingParam.iMultipleThreadIdc = 4;
-  sWelsSvcCodingParam.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = 35;
+  sWelsSvcCodingParam.sSpatialLayers[0].sSliceArgument.uiSliceNum = 35;
   sCtx.iMaxSliceCount = 35;
 
   IWelsTaskManage*  pTaskManage = IWelsTaskManage::CreateTaskManage (&sCtx, 4, true);
