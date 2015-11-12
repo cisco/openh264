@@ -536,7 +536,7 @@ void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
              pSpatialCfg->sSliceArgument.uiSliceSizeConstraint,
              pSpatialCfg->uiProfileIdc,
              pSpatialCfg->uiLevelIdc
-            );
+             );
     ++ i;
   }
 }

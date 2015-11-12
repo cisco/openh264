@@ -452,7 +452,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   WELS_VERIFY_RETURN_PROC_IF (1, (WELS_THREAD_ERROR_OK != iReturn), FreeMemorySvc (ppCtx))
 
   if (bWillUseTaskManage) {
-    (*ppCtx)->pTaskManage = IWelsTaskManage::CreateTaskManage(*ppCtx, bDynamicSlice);
+    (*ppCtx)->pTaskManage = IWelsTaskManage::CreateTaskManage(*ppCtx, iNumSpatialLayers, bDynamicSlice);
     WELS_VERIFY_RETURN_PROC_IF (iReturn, (NULL == (*ppCtx)->pTaskManage), FreeMemorySvc (ppCtx))
   }
 
