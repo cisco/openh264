@@ -361,7 +361,8 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
   }
 
   virtual void EncodingComplete() {
-    // Release the reference to the callback, because it is no longer safe to call it
+    // Release the reference to the external objects, because it is no longer safe to call them
+    host_     = nullptr;
     callback_ = nullptr;
     Release();
   }
@@ -481,12 +482,18 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
 
   void Encode_m (GMPVideoi420Frame* frame, SFrameBSInfo* encoded,
                  GMPVideoFrameType frame_type) {
+    // Attach a self-destructor so that this dies on return.
+    SelfDestruct<GMPVideoi420Frame> ifd (frame);
+    
+    if (!host_) {
+      return;
+    }
+    
     // Now return the encoded data back to the parent.
     GMPVideoFrame* ftmp;
     GMPErr err = host_->CreateFrame (kGMPEncodedVideoFrame, &ftmp);
     if (err != GMPNoErr) {
       GMPLOG (GL_ERROR, "Error creating encoded frame");
-      frame->Destroy();
       return;
     }
 
@@ -513,7 +520,6 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
     if (err != GMPNoErr) {
       GMPLOG (GL_ERROR, "Error allocating frame data");
       f->Destroy();
-      frame->Destroy();
       return;
     }
 
@@ -538,9 +544,6 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
             << f->Size()
             << " timestamp="
             << f->TimeStamp());
-
-    // Destroy the frame.
-    frame->Destroy();
 
     // Return the encoded frame.
     GMPCodecSpecificInfo info;
@@ -735,7 +738,8 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
   }
 
   virtual void DecodingComplete() {
-    // Release the reference to the callback, because it is no longer safe to call it
+    // Release the reference to the external objects, because it is no longer safe to call them
+    host_     = nullptr;
     callback_ = nullptr;
     Release();
   }
@@ -836,6 +840,10 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
 
     GMPVideoFrame* ftmp = nullptr;
 
+    if (!host_) {
+      return;
+    }
+    
     // Translate the image.
     GMPErr err = host_->CreateFrame (kGMPI420VideoFrame, &ftmp);
     if (err != GMPNoErr) {
