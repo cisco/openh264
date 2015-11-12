@@ -3938,8 +3938,8 @@ TEST_F (EncodeDecodeTestAPI, TriggerLoadBalancing) {
   sParam.bSimulcastAVC = 1;
   sParam.sSpatialLayers[0].iVideoWidth = iWidth;
   sParam.sSpatialLayers[0].iVideoHeight = iHeight;
-  sParam.sSpatialLayers[0].sSliceCfg.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
-  sParam.sSpatialLayers[0].sSliceCfg.sSliceArgument.uiSliceNum = sParam.iMultipleThreadIdc;
+  sParam.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  sParam.sSpatialLayers[0].sSliceArgument.uiSliceNum = sParam.iMultipleThreadIdc;
 
   int rv = encoder_->InitializeExt (&sParam);
   ASSERT_TRUE (rv == cmResultSuccess) << "Init Failed sParam: rv = " << rv;;
