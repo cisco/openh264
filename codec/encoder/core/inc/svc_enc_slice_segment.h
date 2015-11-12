@@ -89,6 +89,8 @@ int32_t*                pFirstMbInSlice;        /* first MB address top-left bas
 int32_t*                pCountMbNumInSlice;     /* count number of MBs in every slice respectively; */
 uint32_t                uiSliceSizeConstraint;  /* in byte */
 int32_t                 iMaxSliceNumConstraint; /* maximal number of slices constraint */
+
+uint32_t*               pSliceConsumeTime;
 } SSliceCtx;
 
 

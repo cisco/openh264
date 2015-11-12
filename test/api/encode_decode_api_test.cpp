@@ -3921,3 +3921,122 @@ TEST_F (EncodeDecodeTestAPI, ThreadNumAndSliceNum) {
   }
 }
 
+
+TEST_F (EncodeDecodeTestAPI, TriggerLoadBalancing) {
+  int iSpatialLayerNum = 1;
+  int iWidth       = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, (64 << 2), MAX_WIDTH);
+  int iHeight      = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1)  + 1) << 1, (64 << 2),
+                                2240);//TODO: use MAX_HEIGHT after the limit is removed
+  float fFrameRate = rand() + 0.5f;
+  int iEncFrameNum = WelsClip3 ((rand() % ENCODE_FRAME_NUM) + 1, 1, ENCODE_FRAME_NUM);
+
+  // prepare params
+  SEncParamExt   sParam;
+  encoder_->GetDefaultParams (&sParam);
+  prepareParamDefault (iSpatialLayerNum, 1, iWidth, iHeight, fFrameRate, &sParam);
+  sParam.iMultipleThreadIdc = (rand() % 8) + 1;
+  sParam.bSimulcastAVC = 1;
+  sParam.sSpatialLayers[0].iVideoWidth = iWidth;
+  sParam.sSpatialLayers[0].iVideoHeight = iHeight;
+  sParam.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  sParam.sSpatialLayers[0].sSliceArgument.uiSliceNum = sParam.iMultipleThreadIdc;
+
+  int rv = encoder_->InitializeExt (&sParam);
+  ASSERT_TRUE (rv == cmResultSuccess) << "Init Failed sParam: rv = " << rv;;
+
+  unsigned char*  pBsBuf[MAX_SPATIAL_LAYER_NUM];
+  ISVCDecoder* decoder[MAX_SPATIAL_LAYER_NUM];
+
+  int iIdx = 0;
+  int aLen[MAX_SPATIAL_LAYER_NUM] = {};
+
+  //create decoder
+  for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
+    pBsBuf[iIdx] = static_cast<unsigned char*> (malloc (iWidth * iHeight * 3 * sizeof (unsigned char) / 2));
+    EXPECT_TRUE (pBsBuf[iIdx] != NULL);
+
+    long rv = WelsCreateDecoder (&decoder[iIdx]);
+    ASSERT_EQ (0, rv);
+    EXPECT_TRUE (decoder[iIdx] != NULL);
+
+    SDecodingParam decParam;
+    memset (&decParam, 0, sizeof (SDecodingParam));
+    decParam.eOutputColorFormat  = videoFormatI420;
+    decParam.uiTargetDqLayer = UCHAR_MAX;
+    decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
+    decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
+
+    rv = decoder[iIdx]->Initialize (&decParam);
+    ASSERT_EQ (0, rv);
+  }
+
+  rv = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam);
+  ASSERT_TRUE (rv == cmResultSuccess) << "SetOption Failed pParam: rv = " << rv;
+
+  //begin testing
+  for (int iFrame = 0; iFrame < iEncFrameNum; iFrame++) {
+    int iResult;
+    int iLayerLen = 0;
+    unsigned char* pData[3] = { NULL };
+
+    InitialEncDec (sParam.iPicWidth, sParam.iPicHeight);
+    int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
+    memset (buf_.data(), rand() % 256, (frameSize >> 2));
+    memset (buf_.data() + (frameSize >> 2), rand() % 256, (frameSize - (frameSize >> 2)));
+
+    int iStartStrip = 0;
+    //during first half the complex strip is at top, then during the second half it is at bottom
+    if (iFrame > iEncFrameNum / 2) {
+      iStartStrip = EncPic.iPicHeight * EncPic.iPicWidth;
+    }
+    for (int k = 0; k < (EncPic.iPicHeight / 2); k++) {
+      memset (buf_.data() + k * EncPic.iPicWidth + iStartStrip, rand() % 256, (EncPic.iPicWidth));
+    }
+
+    int rv = encoder_->EncodeFrame (&EncPic, &info);
+    ASSERT_TRUE (rv == cmResultSuccess);
+
+    // init
+    for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
+      aLen[iIdx] = 0;
+    }
+    for (int iLayer = 0; iLayer < info.iLayerNum; ++iLayer) {
+      iLayerLen = 0;
+      const SLayerBSInfo& layerInfo = info.sLayerInfo[iLayer];
+      for (int iNal = 0; iNal < layerInfo.iNalCount; ++iNal) {
+        iLayerLen += layerInfo.pNalLengthInByte[iNal];
+      }
+
+      iIdx = layerInfo.uiSpatialId;
+      EXPECT_TRUE (iIdx < iSpatialLayerNum) << "iIdx = " << iIdx << ", iSpatialLayerNum = " << iSpatialLayerNum;
+      memcpy ((pBsBuf[iIdx] + aLen[iIdx]), layerInfo.pBsBuf, iLayerLen * sizeof (unsigned char));
+      aLen[iIdx] += iLayerLen;
+    }
+
+    for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
+      pData[0] = pData[1] = pData[2] = 0;
+      memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+
+#ifdef DEBUG_FILE_SAVE4
+      fwrite (pBsBuf[iIdx], aLen[iIdx], 1, fEnc[iIdx]);
+#endif
+      iResult = decoder[iIdx]->DecodeFrame2 (pBsBuf[iIdx], aLen[iIdx], pData, &dstBufInfo_);
+      EXPECT_TRUE (iResult == cmResultSuccess) << "iResult=" << iResult << ", LayerIdx=" << iIdx;
+
+      iResult = decoder[iIdx]->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_);
+      EXPECT_TRUE (iResult == cmResultSuccess) << "iResult=" << iResult << ", LayerIdx=" << iIdx;
+      EXPECT_EQ (dstBufInfo_.iBufferStatus, 1) << "LayerIdx=" << iIdx;
+    }
+  }
+
+  for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
+    free (pBsBuf[iIdx]);
+
+    if (decoder[iIdx] != NULL) {
+      decoder[iIdx]->Uninitialize();
+      WelsDestroyDecoder (decoder[iIdx]);
+    }
+
+  }
+}
+
