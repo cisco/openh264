@@ -88,6 +88,10 @@ int     g_iEncodedFrame  = 0;
 #endif
 #endif /* _WIN32 */
 
+#if defined(__linux__) || defined(__unix__)
+#define _FILE_OFFSET_BITS 64
+#endif
+
 #include <iostream>
 using namespace std;
 using namespace WelsEnc;
@@ -241,24 +245,24 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
       } else if (strTag[0].compare ("SpsPpsIDStrategy") == 0) {
         int32_t iValue = atoi (strTag[1].c_str());
         switch (iValue) {
-          case 0:
-            pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
-            break;
-          case 0x01:
-            pSvcParam.eSpsPpsIdStrategy  = INCREASING_ID;
-            break;
-          case 0x02:
-            pSvcParam.eSpsPpsIdStrategy  = SPS_LISTING;
-            break;
-          case 0x03:
-            pSvcParam.eSpsPpsIdStrategy  = SPS_LISTING_AND_PPS_INCREASING;
-            break;
-          case 0x06:
-            pSvcParam.eSpsPpsIdStrategy  = SPS_PPS_LISTING;
-            break;
-          default:
-            pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
-            break;
+        case 0:
+          pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
+          break;
+        case 0x01:
+          pSvcParam.eSpsPpsIdStrategy  = INCREASING_ID;
+          break;
+        case 0x02:
+          pSvcParam.eSpsPpsIdStrategy  = SPS_LISTING;
+          break;
+        case 0x03:
+          pSvcParam.eSpsPpsIdStrategy  = SPS_LISTING_AND_PPS_INCREASING;
+          break;
+        case 0x06:
+          pSvcParam.eSpsPpsIdStrategy  = SPS_PPS_LISTING;
+          break;
+        default:
+          pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
+          break;
         }
       } else if (strTag[0].compare ("EnableScalableSEI") == 0) {
         pSvcParam.bEnableSSEI = atoi (strTag[1].c_str()) ? true : false;
@@ -293,7 +297,7 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
         else if (pSvcParam.iMultipleThreadIdc > MAX_THREADS_NUM)
           pSvcParam.iMultipleThreadIdc = MAX_THREADS_NUM;
       } else if (strTag[0].compare ("UseLoadBalancing") == 0) {
-        pSvcParam.bUseLoadBalancing = (atoi (strTag[1].c_str()))?true:false;
+        pSvcParam.bUseLoadBalancing = (atoi (strTag[1].c_str())) ? true : false;
       } else if (strTag[0].compare ("RCMode") == 0) {
         pSvcParam.iRCMode = (RC_MODES) atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("TargetBitrate") == 0) {
@@ -455,27 +459,26 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
     else if (!strcmp (pCommand, "-spsid") && (n < argc)) {
       int32_t iValue = atoi (argv[n++]);
       switch (iValue) {
-        case 0:
-          pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
-          break;
-        case 0x01:
-          pSvcParam.eSpsPpsIdStrategy  = INCREASING_ID;
-          break;
-        case 0x02:
-          pSvcParam.eSpsPpsIdStrategy  = SPS_LISTING;
-          break;
-        case 0x03:
-          pSvcParam.eSpsPpsIdStrategy  = SPS_LISTING_AND_PPS_INCREASING;
-          break;
-        case 0x06:
-          pSvcParam.eSpsPpsIdStrategy  = SPS_PPS_LISTING;
-          break;
-        default:
-          pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
-          break;
+      case 0:
+        pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
+        break;
+      case 0x01:
+        pSvcParam.eSpsPpsIdStrategy  = INCREASING_ID;
+        break;
+      case 0x02:
+        pSvcParam.eSpsPpsIdStrategy  = SPS_LISTING;
+        break;
+      case 0x03:
+        pSvcParam.eSpsPpsIdStrategy  = SPS_LISTING_AND_PPS_INCREASING;
+        break;
+      case 0x06:
+        pSvcParam.eSpsPpsIdStrategy  = SPS_PPS_LISTING;
+        break;
+      default:
+        pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
+        break;
       }
-    }
-    else if (!strcmp (pCommand, "-cabac") && (n < argc))
+    } else if (!strcmp (pCommand, "-cabac") && (n < argc))
       pSvcParam.iEntropyCodingModeFlag = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-denois") && (n < argc))
@@ -505,9 +508,8 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
     else if (!strcmp (pCommand, "-threadIdc") && (n < argc))
       pSvcParam.iMultipleThreadIdc = atoi (argv[n++]);
     else if (!strcmp (pCommand, "-loadbalancing") && (n + 1 < argc)) {
-      pSvcParam.bUseLoadBalancing = (atoi (argv[n++]))?true:false;
-    }
-    else if (!strcmp (pCommand, "-deblockIdc") && (n < argc))
+      pSvcParam.bUseLoadBalancing = (atoi (argv[n++])) ? true : false;
+    } else if (!strcmp (pCommand, "-deblockIdc") && (n < argc))
       pSvcParam.iLoopFilterDisableIdc = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-alphaOffset") && (n < argc))
@@ -614,8 +616,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       unsigned int iLayer = atoi (argv[n++]);
       SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
       pDLayer->sSliceArgument.uiSliceNum = atoi (argv[n++]);
-    }
-    else if (!strcmp (pCommand, "-slcmbnum") && (n + 1 < argc)) {
+    } else if (!strcmp (pCommand, "-slcmbnum") && (n + 1 < argc)) {
       unsigned int iLayer = atoi (argv[n++]);
       SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
       pDLayer->sSliceArgument.uiSliceMbNum[0] = atoi (argv[n++]);
@@ -835,11 +836,27 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
 
   pFileYUV = fopen (fs.strSeqFile.c_str(), "rb");
   if (pFileYUV != NULL) {
+#if defined(_WIN32) || defined(_WIN64)
+#if _MSC_VER >= 1400
+    if (!_fseeki64 (pFileYUV, 0, SEEK_END)) {
+      int64_t i_size = _ftelli64 (pFileYUV);
+      _fseeki64 (pFileYUV, 0, SEEK_SET);
+      iTotalFrameMax = WELS_MAX ((int32_t) (i_size / kiPicResSize), iTotalFrameMax);
+    }
+#else
     if (!fseek (pFileYUV, 0, SEEK_END)) {
       int64_t i_size = ftell (pFileYUV);
       fseek (pFileYUV, 0, SEEK_SET);
       iTotalFrameMax = WELS_MAX ((int32_t) (i_size / kiPicResSize), iTotalFrameMax);
     }
+#endif
+#else
+    if (!fseeko (pFileYUV, 0, SEEK_END)) {
+      int64_t i_size = ftello (pFileYUV);
+      fseeko (pFileYUV, 0, SEEK_SET);
+      iTotalFrameMax = WELS_MAX ((int32_t) (i_size / kiPicResSize), iTotalFrameMax);
+    }
+#endif
   } else {
     fprintf (stderr, "Unable to open source sequence file (%s), check corresponding path!\n",
              fs.strSeqFile.c_str());
