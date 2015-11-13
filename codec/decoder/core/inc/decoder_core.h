@@ -72,21 +72,21 @@ int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen);
 int32_t CheckBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen);
 
 /*
- * WelsInitStaticMemory
- * Memory request for introduced data at decoder start
+ * WelsInitMemory
+ * Memory request for introduced data
  * Especially for:
  * rbsp_au_buffer, cur_dq_layer_ptr and ref_dq_layer_ptr in MB info cache.
  * return:
  *  0 - success; otherwise returned error_no defined in error_no.h.
  */
-int32_t WelsInitStaticMemory (PWelsDecoderContext pCtx);
+int32_t WelsInitMemory (PWelsDecoderContext pCtx);
 
 /*
- * WelsFreeStaticMemory
- * Free memory introduced in WelsInitStaticMemory at destruction of decoder.
+ * WelsFreeMemory
+ * Free memory introduced in WelsInitMemory at destruction of decoder.
  *
  */
-void WelsFreeStaticMemory (PWelsDecoderContext pCtx);
+void WelsFreeMemory (PWelsDecoderContext pCtx);
 
 /*!
  * \brief   request memory when maximal picture width and height are available

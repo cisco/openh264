@@ -86,15 +86,12 @@ int32_t InitDecoder (const SDecodingParam* pParam, PWelsDecoderContext pCtx, SLo
       return cmMallocMemeError;
   }
 
-  pCtx->sLogCtx = *pLogCtx;
-
+  WELS_VERIFY_RETURN_PROC_IF (cmInitParaError, WelsInitDecoder (pCtx, pParam->bParseOnly, pLogCtx), UninitDecoder (pCtx));
   //check param and update decoder context
   pCtx->pParam = (SDecodingParam*) pCtx->pMemAlign->WelsMallocz (sizeof (SDecodingParam), "SDecodingParam");
   WELS_VERIFY_RETURN_PROC_IF (cmMallocMemeError, (NULL == pCtx->pParam), UninitDecoder (pCtx));
-  int32_t iRet = DecoderConfigParam (pCtx, pParam);
+  int32_t iRet = DecoderConfigParam (pCtx, pCtx->pParam);
   WELS_VERIFY_RETURN_IFNEQ (iRet, cmResultSuccess);
-
-  WELS_VERIFY_RETURN_PROC_IF (cmInitParaError, WelsInitDecoder (pCtx, pLogCtx), UninitDecoder (pCtx));
 
   return cmResultSuccess;
 }
