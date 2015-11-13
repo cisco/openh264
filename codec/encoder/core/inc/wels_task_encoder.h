@@ -68,6 +68,8 @@ class CWelsSliceEncodingTask : public CWelsBaseTask {
     return WELS_ENC_TASK_ENCODE_FIXED_SLICE;
   }
  protected:
+  WelsErrorType m_eTaskResult;
+
   int32_t QueryEmptyThread (bool* pThreadBsBufferUsage);
 
   sWelsEncCtx* m_pCtx;
