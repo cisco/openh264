@@ -4839,6 +4839,17 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   pMA->WelsFree (pCurLayer->pSliceEncCtx->pCountMbNumInSlice, "pSliceSeg->pCountMbNumInSlice");
   pCurLayer->pSliceEncCtx->pCountMbNumInSlice = pCountMbNumInSlice;
 
+  uint32_t* pSliceConsumeTime = (uint32_t*)pMA->WelsMalloc (iMaxSliceNum * sizeof (uint32_t),
+                                                          "pSliceSeg->pSliceConsumeTime");
+  if (NULL == pSliceConsumeTime) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
+             "CWelsH264SVCEncoder::DynSliceRealloc: realloc pSliceConsumeTime not successful");
+    return ENC_RETURN_MEMALLOCERR;
+  }
+  memcpy (pSliceConsumeTime, pCurLayer->pSliceEncCtx->pSliceConsumeTime, sizeof (int32_t) * iMaxSliceNumOld);
+  pMA->WelsFree (pCurLayer->pSliceEncCtx->pSliceConsumeTime, "pSliceSeg->pSliceConsumeTime");
+  pCurLayer->pSliceEncCtx->pSliceConsumeTime = pSliceConsumeTime;
+
   //deal with rate control variables
   const int32_t kiCurDid = pCtx->uiDependencyId;
   SRCSlicing* pSlcingOverRc = (SRCSlicing*)pMA->WelsMalloc (iMaxSliceNum * sizeof (SRCSlicing), "SlicingOverRC");

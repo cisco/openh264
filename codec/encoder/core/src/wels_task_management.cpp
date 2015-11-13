@@ -79,7 +79,8 @@ CWelsTaskManageBase::CWelsTaskManageBase()
     m_pThreadPool (NULL),
     m_iTaskNum (0),
     m_iWaitTaskNum (0) {
-  m_cTaskList = new TASKLIST_TYPE();
+  m_cEncodingTaskList = new TASKLIST_TYPE();
+  m_cPreEncodingTaskList = new TASKLIST_TYPE();
   WelsEventOpen (&m_hTaskEvent);
 }
 
@@ -96,6 +97,10 @@ WelsErrorType CWelsTaskManageBase::Init (sWelsEncCtx* pEncCtx) {
                                WelsCommon::CWelsThreadPool);
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == m_pThreadPool)
   //printf("CWelsTaskManageBase Init m_iThreadNum %d pEncCtx->iMaxSliceCount=%d\n", m_iThreadNum, pEncCtx->iMaxSliceCount);
+
+  m_pcAllTaskList[CWelsBaseTask::WELS_ENC_TASK_ENCODING] = m_cEncodingTaskList;
+  m_pcAllTaskList[CWelsBaseTask::WELS_ENC_TASK_PREENCODING] = m_cPreEncodingTaskList;
+
   return CreateTasks (pEncCtx, pEncCtx->iMaxSliceCount);
 }
 
@@ -103,7 +108,8 @@ void   CWelsTaskManageBase::Uninit() {
   DestroyTasks();
   WELS_DELETE_OP (m_pThreadPool);
 
-  delete m_cTaskList;
+  delete m_cEncodingTaskList;
+  delete m_cPreEncodingTaskList;
   WelsEventClose (&m_hTaskEvent);
 }
 
@@ -111,9 +117,16 @@ WelsErrorType CWelsTaskManageBase::CreateTasks (sWelsEncCtx* pEncCtx, const int3
   CWelsBaseTask* pTask = NULL;
 
   for (int idx = 0; idx < kiTaskCount; idx++) {
-    pTask = WELS_NEW_OP (CWelsSliceEncodingTask (pEncCtx, idx), CWelsSliceEncodingTask);
+    pTask = WELS_NEW_OP (CWelsUpdateMbMapTask (pEncCtx, idx), CWelsUpdateMbMapTask);
     WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pTask)
-    m_cTaskList->push_back (pTask);
+    m_cPreEncodingTaskList->push_back (pTask);
+  }
+
+  for (int idx = 0; idx < kiTaskCount; idx++) {
+    pTask = WELS_NEW_OP (CWelsLoadBalancingSlicingEncodingTask (pEncCtx, idx), CWelsLoadBalancingSlicingEncodingTask);
+    //TODO: set this after loadbalancing flagpTask = WELS_NEW_OP (CWelsSliceEncodingTask (pEncCtx, idx), CWelsSliceEncodingTask);
+    WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pTask)
+    m_cEncodingTaskList->push_back (pTask);
   }
   m_iTaskNum = kiTaskCount;
 
@@ -126,15 +139,15 @@ void CWelsTaskManageBase::DestroyTasks() {
     return;
   }
 
-  if (m_cTaskList->size() != m_iTaskNum) {
-    //printf("m_cTaskList %d %d\n", static_cast<int32_t>(m_cTaskList->size()), m_iTaskNum);
+  if (m_cEncodingTaskList->size() != m_iTaskNum) {
+    //printf("m_cEncodingTaskList %d %d\n", static_cast<int32_t>(m_cEncodingTaskList->size()), m_iTaskNum);
     //WELS_ERROR_TRACE ("CWelsTaskManage::DestroyTasks:  Incorrect task numbers");
   }
 
-  while (NULL != m_cTaskList->begin()) {
-    CWelsBaseTask* pTask = m_cTaskList->begin();
+  while (NULL != m_cEncodingTaskList->begin()) {
+    CWelsBaseTask* pTask = m_cEncodingTaskList->begin();
     WELS_DELETE_OP (pTask);
-    m_cTaskList->pop_front();
+    m_cEncodingTaskList->pop_front();
   }
   //WelsLog (&m_pEncCtx->sLogCtx, WELS_LOG_INFO,
   //         "[MT] CWelsTaskManageParallel()DestroyTasks, cleaned %d tasks", m_iTaskNum);
@@ -167,17 +180,21 @@ void CWelsTaskManageBase::InitFrame (const int32_t kiCurDid) {
   //TODO: update mbmap;
 }
 
-WelsErrorType  CWelsTaskManageBase::ExecuteTasks() {
+WelsErrorType  CWelsTaskManageBase::ExecuteTaskList(TASKLIST_TYPE* pTargetTaskList) {
   //printf("ExecuteTasks m_iWaitTaskNum=%d\n", m_iWaitTaskNum);
   int32_t iCurrentTaskCount = m_iWaitTaskNum; //if directly use m_iWaitTaskNum in the loop make cause sync problem
   int32_t iIdx = 0;
-   while (iIdx < iCurrentTaskCount) {
-    m_pThreadPool->QueueTask (m_cTaskList->GetIndexNode(iIdx));
+  while (iIdx < iCurrentTaskCount) {
+    m_pThreadPool->QueueTask (pTargetTaskList->GetIndexNode(iIdx));
     iIdx ++;
   }
   WelsEventWait (&m_hTaskEvent);
 
   return ENC_RETURN_SUCCESS;
+}
+
+WelsErrorType  CWelsTaskManageBase::ExecuteTasks(const CWelsBaseTask::ETaskType iTaskType) {
+  return ExecuteTaskList(m_pcAllTaskList[iTaskType]);
 }
 
 WelsErrorType CWelsTaskManageOne::Init (sWelsEncCtx* pEncCtx) {
@@ -187,24 +204,24 @@ WelsErrorType CWelsTaskManageOne::Init (sWelsEncCtx* pEncCtx) {
   return CreateTasks (pEncCtx, pEncCtx->iMaxSliceCount);
 }
 
-WelsErrorType  CWelsTaskManageOne::ExecuteTasks() {
-  while (NULL != m_cTaskList->begin()) {
-    (m_cTaskList->begin())->Execute();
-    m_cTaskList->pop_front();
+WelsErrorType  CWelsTaskManageOne::ExecuteTasks(const CWelsBaseTask::ETaskType iTaskType) {
+  while (NULL != m_cEncodingTaskList->begin()) {
+    (m_cEncodingTaskList->begin())->Execute();
+    m_cEncodingTaskList->pop_front();
   }
   return ENC_RETURN_SUCCESS;
 }
 
 //TODO: at present there is no diff betweenCWelsTaskManageParallel and CWelsTaskManageBase, to finish later
-WelsErrorType  CWelsTaskManageParallel::ExecuteTasks() {
+WelsErrorType  CWelsTaskManageParallel::ExecuteTasks(const CWelsBaseTask::ETaskType iTaskType) {
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == m_pThreadPool)
 
   // need lock here?
-  m_iWaitTaskNum = static_cast<int32_t> (m_cTaskList->size());
+  m_iWaitTaskNum = static_cast<int32_t> (m_cEncodingTaskList->size());
 
-  while (NULL != m_cTaskList->begin()) {
-    m_pThreadPool->QueueTask (m_cTaskList->begin());
-    m_cTaskList->pop_front();
+  while (NULL != m_cEncodingTaskList->begin()) {
+    m_pThreadPool->QueueTask (m_cEncodingTaskList->begin());
+    m_cEncodingTaskList->pop_front();
   }
   WelsEventWait (&m_hTaskEvent);
 

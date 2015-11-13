@@ -65,7 +65,7 @@
 #include "wels_task_management.h"
 
 #if defined(ENABLE_TRACE_MT)
-#define MT_TRACE_LOG(x, ...) WelsLog(x, __VA_ARGS__)
+#define MT_TRACE_LOG(pLog, x, ...) WelsLog(pLog, x, __VA_ARGS__)
 #else
 #define MT_TRACE_LOG(x, ...)
 #endif
@@ -812,7 +812,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         if (bDsaFlag) {
           pEncPEncCtx->pSliceThreading->pSliceConsumeTime[pEncPEncCtx->uiDependencyId][iSliceIdx] = (uint32_t) (
                 WelsTime() - iSliceStart);
-          MT_TRACE_LOG (pEncPEncCtx, WELS_LOG_INFO,
+          MT_TRACE_LOG (&(pEncPEncCtx->sLogCtx), WELS_LOG_INFO,
                         "[MT] CodingSliceThreadProc(), coding_idx %d, uiSliceIdx %d, pSliceConsumeTime %d, iSliceSize %d, pFirstMbInSlice %d, count_num_mb_in_slice %d",
                         pEncPEncCtx->iCodingIndex, iSliceIdx,
                         pEncPEncCtx->pSliceThreading->pSliceConsumeTime[pEncPEncCtx->uiDependencyId][iSliceIdx], iSliceSize,
@@ -1060,7 +1060,7 @@ int32_t AdjustBaseLayer (sWelsEncCtx* pCtx) {
 #endif//MT_DEBUG
 
   pCtx->pCurDqLayer = pCurDq;
-
+  memcpy((pCtx->pSliceThreading->pSliceConsumeTime[0]), (pCurDq->pSliceEncCtx->pSliceConsumeTime), pCurDq->pSliceEncCtx->iSliceNumInFrame*sizeof(uint32_t));
   // do not need adjust due to not different at both slices of consumed time
   iNeedAdj = NeedDynamicAdjust (pCtx->pSliceThreading->pSliceConsumeTime[0], pCurDq->pSliceEncCtx->iSliceNumInFrame);
   if (iNeedAdj)
@@ -1092,6 +1092,7 @@ int32_t AdjustEnhanceLayer (sWelsEncCtx* pCtx, int32_t iCurDid) {
                                       && (pCtx->pSvcParam->sSpatialLayers[iCurDid - 1].sSliceArgument.uiSliceMode == SM_FIXEDSLCNUM_SLICE
                                           && pCtx->pSvcParam->iMultipleThreadIdc >= pCtx->pSvcParam->sSpatialLayers[iCurDid -
                                               1].sSliceArgument.uiSliceNum);
+  memcpy((pCtx->pSliceThreading->pSliceConsumeTime[iCurDid]), (pCtx->pCurDqLayer->pSliceEncCtx->pSliceConsumeTime), pCtx->pCurDqLayer->pSliceEncCtx->iSliceNumInFrame*sizeof(uint32_t));
 
   if (kbModelingFromSpatial) { // using spatial base layer for complexity estimation
     // do not need adjust due to not different at both slices of consumed time
