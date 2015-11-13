@@ -656,7 +656,7 @@ void RcCalculateGomQp (sWelsEncCtx* pEncCtx, SMB* pCurMb, int32_t iSliceId) {
   int64_t iLeftBits = pSOverRc->iTargetBitsSlice - pSOverRc->iFrameBitsSlice;
   int64_t iTargetLeftBits = iLeftBits + pSOverRc->iGomBitsSlice - pSOverRc->iGomTargetBits;
 
-  if (iLeftBits <= 0) {
+  if ((iLeftBits <= 0)||(iTargetLeftBits <=0)) {
     pSOverRc->iCalculatedQpSlice += 2;
   } else {
 //globe decision
