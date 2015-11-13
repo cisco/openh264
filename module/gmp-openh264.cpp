@@ -364,12 +364,14 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
     // Release the reference to the external objects, because it is no longer safe to call them
     host_     = nullptr;
     callback_ = nullptr;
+    TearDownEncoder();
+
     Release();
   }
 
  private:
   virtual ~OpenH264VideoEncoder() {
-    // Tear down the internal encoder
+    // Tear down the internal encoder in case of EncodingComplete() not being called
     TearDownEncoder();
   }
 
@@ -741,12 +743,14 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     // Release the reference to the external objects, because it is no longer safe to call them
     host_     = nullptr;
     callback_ = nullptr;
+    TearDownDecoder();
+
     Release();
   }
 
  private:
   virtual ~OpenH264VideoDecoder() {
-    // Tear down the internal decoder
+    // Tear down the internal decoder in case of DecodingComplete() not being called
     TearDownDecoder();
   }
 
