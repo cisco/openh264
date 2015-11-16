@@ -692,14 +692,15 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
   SSlice* pSliceList = NULL;
 
   /*syntax for ref_pic_list_reordering()*/
-  if (pCtx->iNumRef0 > 0)
+  if (pCtx->iNumRef0 > 0) {
     iAbsDiffPicNumMinus1 = pCtx->iFrameNum - (pCtx->pRefList0[0]->iFrameNum) - 1;
 
-  if (iAbsDiffPicNumMinus1 < 0) {
-    WelsLog(&(pCtx->sLogCtx), WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1:%d", iAbsDiffPicNumMinus1);
-    iAbsDiffPicNumMinus1 += (1 << (pCtx->pSps->uiLog2MaxFrameNum));
-    WelsLog(&(pCtx->sLogCtx), WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1< 0, update as:%d",
+    if (iAbsDiffPicNumMinus1 < 0) {
+      WelsLog(&(pCtx->sLogCtx), WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1:%d", iAbsDiffPicNumMinus1);
+      iAbsDiffPicNumMinus1 += (1 << (pCtx->pSps->uiLog2MaxFrameNum));
+      WelsLog(&(pCtx->sLogCtx), WELS_LOG_INFO, "WelsUpdateRefSyntax():::uiAbsDiffPicNumMinus1< 0, update as:%d",
              iAbsDiffPicNumMinus1);
+    }
   }
 
   if (pCtx->iActiveThreadsNum >0) {
