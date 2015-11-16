@@ -160,8 +160,8 @@ int32_t NeedDynamicAdjust (void* pConsumeTime, const int32_t iSliceNum) {
   WelsEmms();
 
   while (iSliceIdx < iSliceNum) {
-    uiTotalConsume += pSliceConsume[iSliceIdx] + pSliceConsume[1 + iSliceIdx];
-    iSliceIdx += 2;
+    uiTotalConsume += pSliceConsume[iSliceIdx];
+    iSliceIdx ++;
   }
   if (uiTotalConsume == 0) {
     MT_TRACE_LOG (NULL, WELS_LOG_DEBUG,
