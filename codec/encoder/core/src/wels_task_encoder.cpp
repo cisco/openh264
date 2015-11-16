@@ -55,7 +55,7 @@
 
 namespace WelsEnc {
 
-CWelsSliceEncodingTask::CWelsSliceEncodingTask (sWelsEncCtx* pCtx, const int32_t iSliceIdx) {
+CWelsSliceEncodingTask::CWelsSliceEncodingTask (sWelsEncCtx* pCtx, const int32_t iSliceIdx) : m_eTaskResult(ENC_RETURN_SUCCESS) {
   m_pCtx = pCtx;
   m_iSliceIdx = iSliceIdx;
 }
@@ -66,13 +66,13 @@ CWelsSliceEncodingTask::~CWelsSliceEncodingTask() {
 WelsErrorType CWelsSliceEncodingTask::Execute() {
   WelsThreadSetName ("OpenH264Enc_CWelsSliceEncodingTask_Execute");
 
-  int32_t iReturn = InitTask();
-  WELS_VERIFY_RETURN_IFNEQ (iReturn, ENC_RETURN_SUCCESS)
+  m_eTaskResult = InitTask();
+  WELS_VERIFY_RETURN_IFNEQ (m_eTaskResult, ENC_RETURN_SUCCESS)
 
-  iReturn = ExecuteTask();
+  m_eTaskResult = ExecuteTask();
 
   FinishTask();
-  return ENC_RETURN_SUCCESS;
+  return m_eTaskResult;
 }
 
 WelsErrorType CWelsSliceEncodingTask::SetBoundary (int32_t iStartIdx,  int32_t iEndIdx) {
@@ -131,6 +131,13 @@ void CWelsSliceEncodingTask::FinishTask() {
   WelsLog (&m_pCtx->sLogCtx, WELS_LOG_DEBUG,
            "[MT] CWelsSliceEncodingTask()FinishTask for m_iSliceIdx %d, unlock thread %d",
            m_iSliceIdx, m_iThreadIdx);
+
+  //sync multi-threading error
+  WelsMutexLock (&m_pCtx->mutexEncoderError);
+  if (ENC_RETURN_SUCCESS != m_eTaskResult) {
+    m_pCtx->iEncoderError |= m_eTaskResult;
+  }
+  WelsMutexUnlock (&m_pCtx->mutexEncoderError);
 }
 
 WelsErrorType CWelsSliceEncodingTask::ExecuteTask() {
