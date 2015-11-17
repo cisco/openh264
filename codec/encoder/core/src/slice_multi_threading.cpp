@@ -455,6 +455,15 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   if (bWillUseTaskManage) {
     (*ppCtx)->pTaskManage = IWelsTaskManage::CreateTaskManage (*ppCtx, iNumSpatialLayers, bDynamicSlice);
     WELS_VERIFY_RETURN_PROC_IF (iReturn, (NULL == (*ppCtx)->pTaskManage), FreeMemorySvc (ppCtx))
+  } else {
+    //TODO: will remove once dynamic slice mode using task manage
+    iReturn = CreateSliceThreads (*ppCtx);
+    if (iReturn != 0) {
+      MT_TRACE_LOG (*ppCtx, WELS_LOG_ERROR, "RequestMtResource(), CreateSliceThreads failed return %d.", iReturn);
+      FreeMemorySvc (ppCtx);
+      return iReturn;
+    }
+
   }
 
   memset (&pSmt->bThreadBsBufferUsage, 0, MAX_THREADS_NUM * sizeof (bool));
