@@ -77,9 +77,10 @@
 }
 
 namespace WelsEnc {
-void UpdateMbListNeighborParallel (SSliceCtx* pSliceCtx,
+void UpdateMbListNeighborParallel (SDqLayer* pCurDq,
                                    SMB* pMbList,
                                    const int32_t uiSliceIdc) {
+  SSliceCtx* pSliceCtx           = pCurDq->pSliceEncCtx;
   const uint16_t* kpMbMap        = pSliceCtx->pOverallMbMap;
   const int32_t kiMbWidth        = pSliceCtx->iMbWidth;
   int32_t iIdx                   = pSliceCtx->pFirstMbInSlice[uiSliceIdc];
@@ -960,7 +961,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
       iSliceIdx =
         iEventIdx; // pPrivateData->iSliceIndex; old threads can not be terminated, pPrivateData is not correct for applicable
       pCurDq = pEncPEncCtx->pCurDqLayer;
-      UpdateMbListNeighborParallel (pCurDq->pSliceEncCtx, pCurDq->sMbDataP, iSliceIdx);
+      UpdateMbListNeighborParallel (pCurDq, pCurDq->sMbDataP, iSliceIdx);
       WelsEventSignal (
         &pEncPEncCtx->pSliceThreading->pFinUpdateMbListEvent[iEventIdx]); // mean finished update pMb list for this pSlice
     } else { // WELS_THREAD_ERROR_WAIT_TIMEOUT, or WELS_THREAD_ERROR_WAIT_FAILED
