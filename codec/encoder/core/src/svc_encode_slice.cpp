@@ -94,7 +94,7 @@ void WelsSliceHeaderExtInit (sWelsEncCtx* pEncCtx, SDqLayer* pCurLayer, SSlice* 
 
   pCurSliceExt->bStoreRefBasePicFlag = false;
 
-  pCurSliceHeader->iFirstMbInSlice = WelsGetFirstMbOfSlice (pCurLayer->pSliceEncCtx, pSlice->uiSliceIdx);
+  pCurSliceHeader->iFirstMbInSlice = WelsGetFirstMbOfSlice (&pCurLayer->sSliceEncCtx, pSlice->uiSliceIdx);
 
   pCurSliceHeader->iFrameNum      = pEncCtx->iFrameNum;
   pCurSliceHeader->uiIdrPicId     = pEncCtx->uiIdrPicId;
@@ -483,7 +483,7 @@ void UpdateQpForOverflow (SMB* pCurMb, uint8_t kuiChromaQpIndexOffset) {
 //second. lower than highest Dependency Layer, and for every Dependency Layer with one quality layer(single layer)
 int32_t WelsISliceMdEnc (sWelsEncCtx* pEncCtx, SSlice* pSlice) { //pMd + encoding
   SDqLayer* pCurLayer           = pEncCtx->pCurDqLayer;
-  SSliceCtx* pSliceCtx          = pCurLayer->pSliceEncCtx;
+  SSliceCtx* pSliceCtx          = &pCurLayer->sSliceEncCtx;
   SMbCache* pMbCache            = &pSlice->sMbCacheInfo;
   SSliceHeaderExt* pSliceHdExt  = &pSlice->sSliceHeaderExt;
   SMB* pMbList                  = pCurLayer->sMbDataP;
@@ -546,7 +546,7 @@ TRY_REENCODING:
 int32_t WelsISliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice) { //pMd + encoding
   SBitStringAux* pBs            = pSlice->pSliceBsa;
   SDqLayer* pCurLayer           = pEncCtx->pCurDqLayer;
-  SSliceCtx* pSliceCtx          = pCurLayer->pSliceEncCtx;
+  SSliceCtx* pSliceCtx          = &pCurLayer->sSliceEncCtx;
   SMbCache* pMbCache            = &pSlice->sMbCacheInfo;
   SSliceHeaderExt* pSliceHdExt  = &pSlice->sSliceHeaderExt;
   SMB* pMbList                  = pCurLayer->sMbDataP;
@@ -942,7 +942,7 @@ int32_t WelsMdInterMbLoop (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pWelsMd, 
   SWelsMD* pMd          = (SWelsMD*)pWelsMd;
   SBitStringAux* pBs    = pSlice->pSliceBsa;
   SDqLayer* pCurLayer   = pEncCtx->pCurDqLayer;
-  SSliceCtx* pSliceCtx  = pCurLayer->pSliceEncCtx;
+  SSliceCtx* pSliceCtx  = &pCurLayer->sSliceEncCtx;
   SMbCache* pMbCache    = &pSlice->sMbCacheInfo;
   SMB* pMbList          = pCurLayer->sMbDataP;
   SMB* pCurMb           = NULL;
@@ -1033,7 +1033,7 @@ int32_t WelsMdInterMbLoopOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice,
   SWelsMD* pMd          = (SWelsMD*)pWelsMd;
   SBitStringAux* pBs    = pSlice->pSliceBsa;
   SDqLayer* pCurLayer   = pEncCtx->pCurDqLayer;
-  SSliceCtx* pSliceCtx  = pCurLayer->pSliceEncCtx;
+  SSliceCtx* pSliceCtx  = &pCurLayer->sSliceEncCtx;
   SMbCache* pMbCache    = &pSlice->sMbCacheInfo;
   SMB* pMbList          = pCurLayer->sMbDataP;
   SMB* pCurMb           = NULL;

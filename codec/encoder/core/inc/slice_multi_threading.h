@@ -51,7 +51,7 @@
 #include "WelsThreadLib.h"
 
 namespace WelsEnc {
-void UpdateMbListNeighborParallel (SSliceCtx* pSliceCtx,
+void UpdateMbListNeighborParallel (SDqLayer* pCurDq,
                                    SMB* pMbList,
                                    const int32_t kiSliceIdc);
 

@@ -79,7 +79,7 @@ SWelsPPS*               pPpsP;          // current pPps used
 /* Layer Representation */
 struct TagDqLayer {
 SLayerInfo              sLayerInfo;
-
+SSliceCtx               sSliceEncCtx;   // current slice context
 uint8_t*                pCsData[3];     // pointer to reconstructed picture pData
 int32_t                 iCsStride[3];   // Cs stride
 
@@ -104,8 +104,6 @@ bool                    bDeblockingParallelFlag; //parallel_deblocking_flag
 SPicture*               pRefPic;        // reference picture pointer
 SPicture*               pDecPic;        // reconstruction picture pointer for layer
 SPicture*               pRefOri[MAX_REF_PIC_COUNT];
-
-SSliceCtx*              pSliceEncCtx;   // current slice context
 
 int32_t*                pNumSliceCodedOfPartition;      // for dynamic slicing mode
 int32_t*                pLastCodedMbIdxOfPartition;     // for dynamic slicing mode

@@ -479,7 +479,7 @@ void WlesMarkMMCORefInfo(sWelsEncCtx* pCtx, SLTRState* pLtr,
 }
 void WelsMarkPic (sWelsEncCtx* pCtx) {
   SLTRState* pLtr               = &pCtx->pLtr[pCtx->uiDependencyId];
-  const int32_t kiCountSliceNum = GetCurrentSliceNum (pCtx->pCurDqLayer->pSliceEncCtx);
+  const int32_t kiCountSliceNum = GetCurrentSliceNum (&pCtx->pCurDqLayer->sSliceEncCtx);
   SSlice* pSliceList            = NULL;
 
   if (pCtx->pSvcParam->bEnableLongTermReference && pLtr->bLTRMarkEnable && pCtx->uiTemporalId == 0) {
@@ -641,7 +641,7 @@ static void UpdateBlockStatic (sWelsEncCtx* pCtx) {
 
 void WelsUpdateSliceHeaderSyntax(sWelsEncCtx* pCtx,  const int32_t iAbsDiffPicNumMinus1,
                                  SSlice* pSliceList, const int32_t uiFrameType) {
-  const int32_t kiCountSliceNum = GetCurrentSliceNum(pCtx->pCurDqLayer->pSliceEncCtx);
+  const int32_t kiCountSliceNum = GetCurrentSliceNum(&pCtx->pCurDqLayer->sSliceEncCtx);
   SLTRState* pLtr               = &pCtx->pLtr[pCtx->uiDependencyId];
   int32_t iIdx = 0;
 
@@ -973,7 +973,7 @@ void WelsMarkPicScreen (sWelsEncCtx* pCtx) {
     }
   }
 
-  const int32_t iSliceNum = GetCurrentSliceNum(pCtx->pCurDqLayer->pSliceEncCtx);
+  const int32_t iSliceNum = GetCurrentSliceNum(&pCtx->pCurDqLayer->sSliceEncCtx);
 
   if (pCtx->iActiveThreadsNum > 1) {
     // to do: will replace with thread based buffer later
