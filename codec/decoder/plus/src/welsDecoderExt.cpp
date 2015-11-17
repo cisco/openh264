@@ -289,20 +289,7 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
   if (m_pDecContext == NULL && eOptID != DECODER_OPTION_TRACE_LEVEL &&
       eOptID != DECODER_OPTION_TRACE_CALLBACK && eOptID != DECODER_OPTION_TRACE_CALLBACK_CONTEXT)
     return dsInitialOptExpected;
-
-  if (eOptID == DECODER_OPTION_DATAFORMAT) { // Set color space of decoding output frame
-    if (m_pDecContext->bParseOnly) {
-      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
-               "CWelsDecoder::SetOption for data format meaningless for parseonly.");
-      return cmResultSuccess;
-    }
-    if (pOption == NULL)
-      return cmInitParaError;
-
-    iVal = * ((int*)pOption); // is_rgb
-
-    return DecoderSetCsp (m_pDecContext, iVal);
-  } else if (eOptID == DECODER_OPTION_END_OF_STREAM) { // Indicate bit-stream of the final frame to be decoded
+  if (eOptID == DECODER_OPTION_END_OF_STREAM) { // Indicate bit-stream of the final frame to be decoded
     if (pOption == NULL)
       return cmInitParaError;
 
@@ -371,11 +358,7 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
   if (pOption == NULL)
     return cmInitParaError;
 
-  if (DECODER_OPTION_DATAFORMAT == eOptID) {
-    iVal = (int32_t) m_pDecContext->eOutputColorFormat;
-    * ((int*)pOption) = iVal;
-    return cmResultSuccess;
-  } else if (DECODER_OPTION_END_OF_STREAM == eOptID) {
+  if (DECODER_OPTION_END_OF_STREAM == eOptID) {
     iVal = m_pDecContext->bEndOfStreamFlag;
     * ((int*)pOption) = iVal;
     return cmResultSuccess;

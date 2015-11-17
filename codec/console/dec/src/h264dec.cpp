@@ -102,7 +102,6 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
   int32_t iLastWidth = 0, iLastHeight = 0;
   int32_t iFrameCount = 0;
   int32_t iEndOfStreamFlag = 0;
-  int32_t iColorFormat = videoFormatInternal;
   //for coverage test purpose
   int32_t iErrorConMethod = (int32_t) ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
   pDecoder->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iErrorConMethod);
@@ -168,11 +167,6 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
 
   memcpy (pBuf + iFileSize, &uiStartCode[0], 4); //confirmed_safe_unsafe_usage
 
-  if (pDecoder->SetOption (DECODER_OPTION_DATAFORMAT,  &iColorFormat)) {
-    fprintf (stderr, "SetOption() failed, opt_id : %d  ..\n", DECODER_OPTION_DATAFORMAT);
-    goto label_exit;
-  }
-
   while (true) {
 
     if (iBufPos >= iFileSize) {
@@ -201,8 +195,6 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     }
 
 //for coverage test purpose
-    int32_t iOutputColorFormat;
-    pDecoder->GetOption (DECODER_OPTION_DATAFORMAT, &iOutputColorFormat);
     int32_t iEndOfStreamFlag;
     pDecoder->GetOption (DECODER_OPTION_END_OF_STREAM, &iEndOfStreamFlag);
     int32_t iCurIdrPicId;
@@ -376,8 +368,6 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
             strncpy (sDecParam.pFileNameRestructed, strReconFile.c_str(), iLen); //confirmed_safe_unsafe_usage
           } else if (strTag[0].compare ("TargetDQID") == 0) {
             sDecParam.uiTargetDqLayer = (uint8_t)atol (strTag[1].c_str());
-          } else if (strTag[0].compare ("OutColorFormat") == 0) {
-            sDecParam.eOutputColorFormat = (EVideoFormatType) atoi (strTag[1].c_str());
           } else if (strTag[0].compare ("ErrorConcealmentIdc") == 0) {
             sDecParam.eEcActiveIdc = (ERROR_CON_IDC)atol (strTag[1].c_str());
           } else if (strTag[0].compare ("CPULoad") == 0) {
@@ -394,7 +384,6 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
     } else if (strstr (pArgV[1],
                        ".264")) { // no output dump yuv file, just try to render the decoded pictures //confirmed_safe_unsafe_usage
       strInputFile = pArgV[1];
-      sDecParam.eOutputColorFormat = videoFormatI420;
       sDecParam.uiTargetDqLayer = (uint8_t) - 1;
       sDecParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
       sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
@@ -402,7 +391,6 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
   } else { //iArgC > 2
     strInputFile = pArgV[1];
     strOutputFile = pArgV[2];
-    sDecParam.eOutputColorFormat = videoFormatI420;
     sDecParam.uiTargetDqLayer = (uint8_t) - 1;
     sDecParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
     sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;

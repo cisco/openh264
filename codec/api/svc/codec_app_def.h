@@ -148,8 +148,7 @@ typedef enum {
 * @brief Option types introduced in decoder application
 */
 typedef enum {
-  DECODER_OPTION_DATAFORMAT = 0,        ///< color format, now supports 23 only (I420)
-  DECODER_OPTION_END_OF_STREAM,         ///< end of stream flag
+  DECODER_OPTION_END_OF_STREAM = 1,     ///< end of stream flag
   DECODER_OPTION_VCL_NAL,               ///< feedback whether or not have VCL NAL in current AU for application layer
   DECODER_OPTION_TEMPORAL_ID,           ///< feedback temporal id for application layer
   DECODER_OPTION_FRAME_NUM,             ///< feedback current decoded frame number
@@ -477,7 +476,6 @@ typedef struct {
 typedef struct TagSVCDecodingParam {
   char*     pFileNameRestructed;       ///< file name of reconstructed frame used for PSNR calculation based debug
 
-  EVideoFormatType eOutputColorFormat; ///< color space format to be outputed, EVideoFormatType specified in codec_def.h
   unsigned int  uiCpuLoad;             ///< CPU load
   unsigned char uiTargetDqLayer;       ///< setting target dq layer id
 

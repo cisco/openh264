@@ -500,7 +500,7 @@ void EncodeDecodeTestAPIBase::ValidateParamExtCombination() {
 
     //for slice mode = SM_RASTER_SLICE
     if (SM_RASTER_SLICE == pSpatialLayer->sSliceArgument.uiSliceMode) {
-      if (0!=pSpatialLayer->sSliceArgument.uiSliceMbNum[0]) {
+      if (0 != pSpatialLayer->sSliceArgument.uiSliceMbNum[0]) {
         SliceParamValidationForMode2 (iSpatialIdx);
       } else {
         SliceParamValidationForMode3 (iSpatialIdx);
@@ -1069,7 +1069,6 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECFlag_ERROR_CON_DISABLE) {
   }
   SDecodingParam decParam;
   memset (&decParam, 0, sizeof (SDecodingParam));
-  decParam.eOutputColorFormat  = videoFormatI420;
   decParam.uiTargetDqLayer = UCHAR_MAX;
   decParam.eEcActiveIdc = ERROR_CON_DISABLE;
   decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
@@ -2422,7 +2421,6 @@ TEST_F (DecodeCrashTestAPI, DecoderCrashTest) {
 
         SDecodingParam decParam;
         memset (&decParam, 0, sizeof (SDecodingParam));
-        decParam.eOutputColorFormat = videoFormatI420;
         decParam.uiTargetDqLayer = UCHAR_MAX;
         decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
         decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
@@ -2526,7 +2524,6 @@ class DecodeParseAPI : public ::testing::TestWithParam<EncodeDecodeFileParamBase
       decoder_->Uninitialize();
     SDecodingParam decParam;
     memset (&decParam, 0, sizeof (SDecodingParam));
-    decParam.eOutputColorFormat = videoFormatRGB;
     decParam.uiTargetDqLayer = UCHAR_MAX;
     decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
     decParam.bParseOnly = true;
@@ -3182,7 +3179,6 @@ TEST_F (EncodeDecodeTestAPI, SimulcastSVC) {
 
     SDecodingParam decParam;
     memset (&decParam, 0, sizeof (SDecodingParam));
-    decParam.eOutputColorFormat  = videoFormatI420;
     decParam.uiTargetDqLayer = UCHAR_MAX;
     decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
     decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
@@ -3300,7 +3296,6 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVC) {
 
     SDecodingParam decParam;
     memset (&decParam, 0, sizeof (SDecodingParam));
-    decParam.eOutputColorFormat  = videoFormatI420;
     decParam.uiTargetDqLayer = UCHAR_MAX;
     decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
     decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
@@ -3377,8 +3372,8 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVC_SPS_PPS_LISTING) {
   float fFrameRate = rand() + 0.5f;
   int iEncFrameNum = WelsClip3 ((rand() % ENCODE_FRAME_NUM) + 1, 1, ENCODE_FRAME_NUM);
   int iSliceNum        = 1;
-  iWidth = VALID_SIZE(iWidth);
-  iHeight = VALID_SIZE(iHeight);
+  iWidth = VALID_SIZE (iWidth);
+  iHeight = VALID_SIZE (iHeight);
   // prepare params
   SEncParamExt   sParam1;
   SEncParamExt   sParam2;
@@ -3414,7 +3409,6 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVC_SPS_PPS_LISTING) {
 
     SDecodingParam decParam;
     memset (&decParam, 0, sizeof (SDecodingParam));
-    decParam.eOutputColorFormat  = videoFormatI420;
     decParam.uiTargetDqLayer = UCHAR_MAX;
     decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
     decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
@@ -3533,7 +3527,7 @@ TEST_P (EncodeTestAPI, SetEncOptionSize) {
   param_.sSpatialLayers[0].iVideoHeight = p.iHeight;
   param_.sSpatialLayers[0].fFrameRate = p.fFramerate;
   param_.sSpatialLayers[0].sSliceArgument.uiSliceMode = p.eSliceMode;
-  if ( SM_FIXEDSLCNUM_SLICE == p.eSliceMode ) {
+  if (SM_FIXEDSLCNUM_SLICE == p.eSliceMode) {
     param_.sSpatialLayers[0].sSliceArgument.uiSliceNum = 8;
   }
 
@@ -3554,7 +3548,7 @@ TEST_P (EncodeTestAPI, SetEncOptionSize) {
   unsigned char* pData[3] = { NULL };
 
   //FIXME: remove this after the multi-thread case is correctly handled in encoder
-  if (p.iThreads>1 && SM_SIZELIMITED_SLICE == p.eSliceMode) {
+  if (p.iThreads > 1 && SM_SIZELIMITED_SLICE == p.eSliceMode) {
     p.bAllRandom = false;
   }
 
@@ -3635,7 +3629,6 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVCDiffFps) {
 
     SDecodingParam decParam;
     memset (&decParam, 0, sizeof (SDecodingParam));
-    decParam.eOutputColorFormat  = videoFormatI420;
     decParam.uiTargetDqLayer = UCHAR_MAX;
     decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
     decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
@@ -3729,7 +3722,8 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVCDiffFps) {
 TEST_F (EncodeDecodeTestAPI, DiffSlicingInDlayer) {
   int iSpatialLayerNum = 3;
   int iWidth       = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, (64 << 2), MAX_WIDTH);
-  int iHeight      = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1)  + 1) << 1, (64 << 2), 2240);//TODO: use MAX_HEIGHT after the limit is removed
+  int iHeight      = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1)  + 1) << 1, (64 << 2),
+                                2240);//TODO: use MAX_HEIGHT after the limit is removed
   float fFrameRate = rand() + 0.5f;
   int iEncFrameNum = WelsClip3 ((rand() % ENCODE_FRAME_NUM) + 1, 1, ENCODE_FRAME_NUM);
 
@@ -3774,7 +3768,6 @@ TEST_F (EncodeDecodeTestAPI, DiffSlicingInDlayer) {
 
     SDecodingParam decParam;
     memset (&decParam, 0, sizeof (SDecodingParam));
-    decParam.eOutputColorFormat  = videoFormatI420;
     decParam.uiTargetDqLayer = UCHAR_MAX;
     decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
     decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
@@ -3838,7 +3831,6 @@ TEST_F (EncodeDecodeTestAPI, DiffSlicingInDlayerMixed) {
 
     SDecodingParam decParam;
     memset (&decParam, 0, sizeof (SDecodingParam));
-    decParam.eOutputColorFormat  = videoFormatI420;
     decParam.uiTargetDqLayer = UCHAR_MAX;
     decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
     decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
@@ -3899,7 +3891,6 @@ TEST_F (EncodeDecodeTestAPI, ThreadNumAndSliceNum) {
 
     SDecodingParam decParam;
     memset (&decParam, 0, sizeof (SDecodingParam));
-    decParam.eOutputColorFormat  = videoFormatI420;
     decParam.uiTargetDqLayer = UCHAR_MAX;
     decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
     decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
@@ -3961,7 +3952,6 @@ TEST_F (EncodeDecodeTestAPI, TriggerLoadBalancing) {
 
     SDecodingParam decParam;
     memset (&decParam, 0, sizeof (SDecodingParam));
-    decParam.eOutputColorFormat  = videoFormatI420;
     decParam.uiTargetDqLayer = UCHAR_MAX;
     decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
     decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;

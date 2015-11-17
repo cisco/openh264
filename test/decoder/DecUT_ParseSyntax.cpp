@@ -157,7 +157,6 @@ void DecoderParseSyntaxTest::Init() {
   memset (&m_sDecParam, 0, sizeof (SDecodingParam));
   memset (&m_sParserBsInfo, 0, sizeof (SParserBsInfo));
   m_sDecParam.pFileNameRestructed = NULL;
-  m_sDecParam.eOutputColorFormat = videoFormatI420;
   m_sDecParam.uiCpuLoad = rand() % 100;
   m_sDecParam.uiTargetDqLayer = rand() % 100;
   m_sDecParam.eEcActiveIdc = (ERROR_CON_IDC)7;

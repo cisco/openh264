@@ -34,8 +34,6 @@ class DecoderInterfaceTest : public ::testing::Test {
   void DecoderBs (const char* sFileName);
   //Test Initialize/Uninitialize
   void TestInitUninit();
-  //DECODER_OPTION_DATAFORMAT
-  void TestDataFormat();
   //DECODER_OPTION_END_OF_STREAM
   void TestEndOfStream();
   //DECODER_OPTION_VCL_NAL
@@ -78,7 +76,6 @@ void DecoderInterfaceTest::Init() {
   memset (&m_sBufferInfo, 0, sizeof (SBufferInfo));
   memset (&m_sDecParam, 0, sizeof (SDecodingParam));
   m_sDecParam.pFileNameRestructed = NULL;
-  m_sDecParam.eOutputColorFormat = (EVideoFormatType) (rand() % 100);
   m_sDecParam.uiCpuLoad = rand() % 100;
   m_sDecParam.uiTargetDqLayer = rand() % 100;
   m_sDecParam.eEcActiveIdc = (ERROR_CON_IDC) (rand() & 7);
@@ -90,11 +87,7 @@ void DecoderInterfaceTest::Init() {
   m_szBuffer[3] = 1;
   m_iBufLength = 4;
   CM_RETURN eRet = (CM_RETURN) m_pDec->Initialize (&m_sDecParam);
-  if ((m_sDecParam.eOutputColorFormat != videoFormatI420) &&
-      (m_sDecParam.eOutputColorFormat != videoFormatInternal))
-    ASSERT_EQ (eRet, cmUnsupportedData);
-  else
-    ASSERT_EQ (eRet, cmResultSuccess);
+  ASSERT_EQ (eRet, cmResultSuccess);
 }
 
 void DecoderInterfaceTest::Uninit() {
@@ -210,12 +203,8 @@ void DecoderInterfaceTest::TestInitUninit() {
     EXPECT_EQ (eRet, cmInitExpected);
   }
   //Initialize first, can get input color format
-  m_sDecParam.eOutputColorFormat = (EVideoFormatType) 20; //just for test
   m_sDecParam.bParseOnly = false;
   m_pDec->Initialize (&m_sDecParam);
-  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_DATAFORMAT, &iOutput);
-  EXPECT_EQ (eRet, cmResultSuccess);
-  EXPECT_EQ ((int32_t) videoFormatI420, iOutput);
 
   //Uninitialize, no GetOption can be done
   m_pDec->Uninitialize();
@@ -225,32 +214,6 @@ void DecoderInterfaceTest::TestInitUninit() {
     EXPECT_EQ (iOutput, 21);
     EXPECT_EQ (eRet, cmInitExpected);
   }
-}
-
-//DECODER_OPTION_DATAFORMAT
-void DecoderInterfaceTest::TestDataFormat() {
-  int iTmp = rand();
-  int iOut;
-  CM_RETURN eRet;
-
-  Init();
-
-  //invalid input
-  eRet = (CM_RETURN) m_pDec->SetOption (DECODER_OPTION_DATAFORMAT, NULL);
-  EXPECT_EQ (eRet, cmInitParaError);
-
-  //valid input
-  eRet = (CM_RETURN) m_pDec->SetOption (DECODER_OPTION_DATAFORMAT, &iTmp);
-  if ((iTmp != (int32_t) videoFormatI420) && (iTmp != (int32_t) videoFormatInternal))
-    EXPECT_EQ (eRet, cmUnsupportedData);
-  else
-    EXPECT_EQ (eRet, cmResultSuccess);
-  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_DATAFORMAT, &iOut);
-  EXPECT_EQ (eRet, cmResultSuccess);
-
-  EXPECT_EQ (iOut, (int32_t) videoFormatI420);
-
-  Uninit();
 }
 
 //DECODER_OPTION_END_OF_STREAM
@@ -515,8 +478,6 @@ TEST_F (DecoderInterfaceTest, DecoderInterfaceAll) {
 
   //Initialize Uninitialize
   TestInitUninit();
-  //DECODER_OPTION_DATAFORMAT
-  TestDataFormat();
   //DECODER_OPTION_END_OF_STREAM
   TestEndOfStream();
   //DECODER_OPTION_VCL_NAL

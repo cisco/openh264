@@ -283,7 +283,6 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx, CMemor
 
   pCtx->pArgDec                   = NULL;
 
-  pCtx->eOutputColorFormat        = videoFormatI420;    // yuv in default
   pCtx->bHaveGotMemory            = false;              // not ever request memory blocks for decoder context related
   pCtx->uiCpuFlag                 = 0;
 
@@ -530,12 +529,6 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
     return 1;
 
   memcpy (pCtx->pParam, kpParam, sizeof (SDecodingParam));
-  pCtx->eOutputColorFormat = pCtx->pParam->eOutputColorFormat;
-  if (!pCtx->bParseOnly) {
-    int32_t iRet = DecoderSetCsp (pCtx, pCtx->pParam->eOutputColorFormat);
-    if (iRet)
-      return iRet;
-  }
   if ((pCtx->pParam->eEcActiveIdc > ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE)
       || (pCtx->pParam->eEcActiveIdc < ERROR_CON_DISABLE)) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
@@ -801,29 +794,6 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
   }
 
   return pCtx->iErrorCode;
-}
-
-/*
- * set colorspace format in decoder
- */
-int32_t DecoderSetCsp (PWelsDecoderContext pCtx, const int32_t kiColorFormat) {
-  WELS_VERIFY_RETURN_IF (1, (NULL == pCtx));
-
-  pCtx->eOutputColorFormat = (EVideoFormatType) kiColorFormat;
-  if (pCtx->pParam != NULL) {
-    pCtx->pParam->eOutputColorFormat = (EVideoFormatType) kiColorFormat;
-  }
-
-  //For now, support only videoFormatI420!
-  if (kiColorFormat == (int32_t) videoFormatInternal) {
-    pCtx->pParam->eOutputColorFormat = pCtx->eOutputColorFormat = videoFormatI420;
-  } else if (kiColorFormat != (int32_t) videoFormatI420) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "Support I420 output only for now! Change to I420...");
-    pCtx->pParam->eOutputColorFormat = pCtx->eOutputColorFormat = videoFormatI420;
-    return cmUnsupportedData;
-  }
-
-  return 0;
 }
 
 /*!
