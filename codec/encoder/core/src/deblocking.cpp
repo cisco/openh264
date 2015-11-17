@@ -691,7 +691,7 @@ void  DeblockingFilterFrameAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc) {
 }
 
 void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, const int32_t kiSliceIdx) {
-  SSliceCtx* pSliceCtx                  = pCurDq->pSliceEncCtx;
+  SSliceCtx* pSliceCtx                  = &pCurDq->sSliceEncCtx;
   SMB* pMbList                          = pCurDq->sMbDataP;
   SSliceHeaderExt* sSliceHeaderExt      = &pCurDq->sLayerInfo.pSliceInLayer[kiSliceIdx].sSliceHeaderExt;
   SMB* pCurrentMbBlock;
@@ -755,7 +755,7 @@ void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
     int32_t iSliceIdx   = 0;
 
     if (SM_SIZELIMITED_SLICE != pSpatialLayer->sSliceArgument.uiSliceMode) {
-      iSliceCount = GetCurrentSliceNum (pCurLayer->pSliceEncCtx);
+      iSliceCount = GetCurrentSliceNum (&pCurLayer->sSliceEncCtx);
       do {
         DeblockingFilterSliceAvcbase (pCurLayer, pEnc->pFuncList, iSliceIdx);
         ++ iSliceIdx;
