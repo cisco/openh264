@@ -2764,7 +2764,8 @@ void WelsInitCurrentQBLayerMltslc (sWelsEncCtx* pCtx) {
   DynslcUpdateMbNeighbourInfoListForAllSlices (pSliceCtx, pCurDq->sMbDataP);
 }
 
-void UpdateSlicepEncCtxWithPartition (SSliceCtx* pSliceCtx, int32_t iPartitionNum) {
+void UpdateSlicepEncCtxWithPartition (SDqLayer* pCurDq, int32_t iPartitionNum) {
+  SSliceCtx* pSliceCtx                  = pCurDq->pSliceEncCtx;
   const int32_t kiMbNumInFrame          = pSliceCtx->iMbNumInFrame;
   int32_t iCountMbNumPerPartition       = kiMbNumInFrame;
   int32_t iAssignableMbLeft             = kiMbNumInFrame;
@@ -2800,7 +2801,7 @@ void WelsInitCurrentDlayerMltslc (sWelsEncCtx* pCtx, int32_t iPartitionNum) {
   SDqLayer* pCurDq      = pCtx->pCurDqLayer;
   SSliceCtx* pSliceCtx  = pCurDq->pSliceEncCtx;
 
-  UpdateSlicepEncCtxWithPartition (pSliceCtx, iPartitionNum);
+  UpdateSlicepEncCtxWithPartition (pCurDq, iPartitionNum);
 
   if (I_SLICE == pCtx->eSliceType) { //check if uiSliceSizeConstraint too small
 #define byte_complexIMBat26 (60)
