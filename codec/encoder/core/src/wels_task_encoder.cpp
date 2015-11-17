@@ -216,15 +216,15 @@ WelsErrorType CWelsLoadBalancingSlicingEncodingTask::InitTask() {
 void CWelsLoadBalancingSlicingEncodingTask::FinishTask() {
   CWelsSliceEncodingTask::FinishTask();
 
-  m_pCtx->pCurDqLayer->pSliceEncCtx->pSliceConsumeTime[m_iSliceIdx] = (uint32_t) (WelsTime() - m_iSliceStart);
+  m_pCtx->pCurDqLayer->sSliceEncCtx.pSliceConsumeTime[m_iSliceIdx] = (uint32_t) (WelsTime() - m_iSliceStart);
   WelsLog (&m_pCtx->sLogCtx, WELS_LOG_DEBUG,
            "[MT] CWelsLoadBalancingSlicingEncodingTask()FinishTask, coding_idx %d, um_iSliceIdx %d, pSliceConsumeTime %d, iSliceSize %d, pFirstMbInSlice %d, count_num_mb_in_slice %d",
            m_pCtx->iCodingIndex,
            m_iSliceIdx,
-           m_pCtx->pCurDqLayer->pSliceEncCtx->pSliceConsumeTime[m_iSliceIdx],
+           m_pCtx->pCurDqLayer->sSliceEncCtx.pSliceConsumeTime[m_iSliceIdx],
            m_iSliceSize,
-           m_pCtx->pCurDqLayer->pSliceEncCtx->pFirstMbInSlice[m_iSliceIdx],
-           m_pCtx->pCurDqLayer->pSliceEncCtx->pCountMbNumInSlice[m_iSliceIdx]);
+           m_pCtx->pCurDqLayer->sSliceEncCtx.pFirstMbInSlice[m_iSliceIdx],
+           m_pCtx->pCurDqLayer->sSliceEncCtx.pCountMbNumInSlice[m_iSliceIdx]);
 }
 
 
@@ -237,7 +237,7 @@ CWelsUpdateMbMapTask::~CWelsUpdateMbMapTask() {
 }
 
 WelsErrorType CWelsUpdateMbMapTask::Execute() {
-  UpdateMbListNeighborParallel (m_pCtx->pCurDqLayer->pSliceEncCtx, m_pCtx->pCurDqLayer->sMbDataP, m_iSliceIdx);
+  UpdateMbListNeighborParallel (m_pCtx->pCurDqLayer, m_pCtx->pCurDqLayer->sMbDataP, m_iSliceIdx);
   return ENC_RETURN_SUCCESS;
 }
 

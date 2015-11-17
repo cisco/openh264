@@ -114,7 +114,7 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
   bool bMultiSliceMode = false;
   int32_t iGomRowMode0 = 1, iGomRowMode1 = 1;
   for (j = 0; j < pEncCtx->pSvcParam->iSpatialLayerNum; j++) {
-    SSliceCtx* pSliceCtx = &pEncCtx->pSliceCtxList[j];
+    SSliceCtx* pSliceCtx = &pEncCtx->ppDqLayerList[j]->sSliceEncCtx;
     pWelsSvcRc  = &pEncCtx->pWelsSvcRc[j];
     pDLayerParam = &pEncCtx->pSvcParam->sSpatialLayers[j];
     iMbWidth     = (pDLayerParam->iVideoWidth >> 4);
@@ -511,7 +511,7 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
 }
 
 void RcInitSliceInformation (sWelsEncCtx* pEncCtx) {
-  SSliceCtx* pCurSliceCtx       = pEncCtx->pCurDqLayer->pSliceEncCtx;
+  SSliceCtx* pCurSliceCtx       = &pEncCtx->pCurDqLayer->sSliceEncCtx;
   SWelsSvcRc* pWelsSvcRc        = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   SRCSlicing* pSOverRc          = &pWelsSvcRc->pSlicingOverRc[0];
   const int32_t kiSliceNum      = pWelsSvcRc->iSliceNum;
@@ -922,7 +922,7 @@ void RcTraceFrameBits (sWelsEncCtx* pEncCtx, long long uiTimeStamp) {
 void RcUpdatePictureQpBits (sWelsEncCtx* pEncCtx, int32_t iCodedBits) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   SRCSlicing* pSOverRc = &pWelsSvcRc->pSlicingOverRc[0];
-  SSliceCtx* pCurSliceCtx = pEncCtx->pCurDqLayer->pSliceEncCtx;
+  SSliceCtx* pCurSliceCtx = &pEncCtx->pCurDqLayer->sSliceEncCtx;
   int32_t iTotalQp = 0, iTotalMb = 0;
   int32_t i;
 

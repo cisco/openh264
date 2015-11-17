@@ -137,9 +137,7 @@ typedef struct TagWelsEncCtx {
   SSliceThreading*  pSliceThreading;
   IWelsTaskManage*  pTaskManage; //was planning to put it under CWelsH264SVCEncoder but it may be updated (lock/no lock) when param is changed
 
-// SSlice context
-  SSliceCtx*        pSliceCtxList;// slice context table for each dependency quality layer
-// pointers
+  // pointers
   SPicture*         pEncPic;                // pointer to current picture to be encoded
   SPicture*         pDecPic;                // pointer to current picture being reconstructed
   SPicture*         pRefPic;                // pointer to current reference picture
