@@ -237,7 +237,7 @@ CWelsUpdateMbMapTask::~CWelsUpdateMbMapTask() {
 }
 
 WelsErrorType CWelsUpdateMbMapTask::Execute() {
-  UpdateMbListNeighborParallel (m_pCtx->pCurDqLayer->pSliceEncCtx, m_pCtx->pCurDqLayer->sMbDataP, m_iSliceIdx);
+  UpdateMbListNeighborParallel (m_pCtx->pCurDqLayer, m_pCtx->pCurDqLayer->sMbDataP, m_iSliceIdx);
   return ENC_RETURN_SUCCESS;
 }
 
