@@ -72,7 +72,8 @@ namespace WelsEnc {
 #define JUMPPACKETSIZE_JUDGE(len,mb_idx,max_byte)       ( (len) > JUMPPACKETSIZE_CONSTRAINT(max_byte) ) //( (mb_idx+1)%40/*16slice for compare*/ == 0 )        //
 //cur_mb_idx is for early tests, can be omit in optimization
 
-typedef struct TagSlice SSlice;
+typedef struct TagSlice      SSlice;
+typedef struct TagDqLayer    SDqLayer;
 typedef struct TagWelsEncCtx sWelsEncCtx;
 /*!
  * \brief   SSlice context
@@ -110,7 +111,7 @@ uint8_t         uiLastMbQp;
 /*!
  * \brief   Initialize Wels SSlice context (Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context to be initialized
+ * \param   pCurDq          current layer which its SSlice context will be initialized
  * \param   bFmoUseFlag     flag of using fmo
  * \param   iMbWidth        MB width
  * \param   iMbHeight       MB height
@@ -120,7 +121,7 @@ uint8_t         uiLastMbQp;
  *
  * \return  0 - successful; none 0 - failed;
  */
-int32_t InitSlicePEncCtx (SSliceCtx* pSliceCtx,
+int32_t InitSlicePEncCtx (SDqLayer* pCurDq,
                           CMemoryAlign* pMa,
                           bool bFmoUseFlag,
                           int32_t iMbWidth,
@@ -132,11 +133,11 @@ int32_t InitSlicePEncCtx (SSliceCtx* pSliceCtx,
 /*!
  * \brief   Uninitialize Wels SSlice context (Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context to be initialized
+ * \param   pCurDq       curent layer which its SSlice context will be initialized
  *
  * \return  NONE;
  */
-void UninitSlicePEncCtx (SSliceCtx* pSliceCtx, CMemoryAlign* pMa);
+void UninitSlicePEncCtx (SDqLayer* pCurDq, CMemoryAlign* pMa);
 
 /*!
  * \brief   Get slice idc for given iMbXY (apply in Single/multiple slices and FMO)

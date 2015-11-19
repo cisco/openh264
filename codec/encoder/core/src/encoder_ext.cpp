@@ -1361,7 +1361,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
 
     // Not using FMO in SVC coding so far, come back if need FMO
     {
-      iResult = InitSlicePEncCtx (&(*ppCtx)->ppDqLayerList[iDlayerIndex]->sSliceEncCtx,
+      iResult = InitSlicePEncCtx ((*ppCtx)->ppDqLayerList[iDlayerIndex],
                                   (*ppCtx)->pMemAlign,
                                   false,
                                   pSps->iMbWidth,
@@ -2120,9 +2120,8 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
             pDq->pFeatureSearchPreparation = NULL;
           }
 
-          SSliceCtx* pSliceCtx = &pDq->sSliceEncCtx;
-          if (NULL != pSliceCtx) {
-            UninitSlicePEncCtx (pSliceCtx, pMa);
+          if (NULL != pDq) {
+            UninitSlicePEncCtx (pDq, pMa);
           }
 
           pMa->WelsFree (pDq, "pDq");

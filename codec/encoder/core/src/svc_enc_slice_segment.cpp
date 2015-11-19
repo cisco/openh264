@@ -39,6 +39,7 @@
  */
 #include <string.h>
 #include "rc.h"
+#include "svc_enc_frame.h"
 
 namespace WelsEnc {
 /*!
@@ -343,7 +344,7 @@ int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, S
 /*!
  * \brief   Initialize slice segment (Single/multiple slices)
  *
- * \param   pSliceSeg           SSlice segment to be initialized
+ * \param   pCurDq              current layer which its SSlice segment will be initialized
  * \param   uiSliceMode         SSlice mode
  * \param   multi_slice_argv    Multiple slices argument
  * \param   iMbWidth            MB width
@@ -351,13 +352,14 @@ int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, S
  *
  * \return  0 - successful; none 0 - failed;
  */
-int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
+int32_t InitSliceSegment (SDqLayer* pCurDq,
                           CMemoryAlign* pMa,
                           SSliceArgument* pSliceArgument,
                           const int32_t kiMbWidth,
                           const int32_t kiMbHeight) {
-  const int32_t kiCountMbNum = kiMbWidth * kiMbHeight;
-  SliceModeEnum uiSliceMode = SM_SINGLE_SLICE;
+  SSliceCtx* pSliceSeg        = &pCurDq->sSliceEncCtx;
+  const int32_t kiCountMbNum  = kiMbWidth * kiMbHeight;
+  SliceModeEnum uiSliceMode   = SM_SINGLE_SLICE;
 
   if (NULL == pSliceSeg || NULL == pSliceArgument || kiMbWidth == 0 || kiMbHeight == 0)
     return 1;
@@ -475,11 +477,12 @@ int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
 /*!
  * \brief   Uninitialize slice segment (Single/multiple slices)
  *
- * \param   pSliceSeg           SSlice segment to be uninitialized
+ * \param   pCurDq           current layer which its SSlice segment will be uninitialized
  *
  * \return  none;
  */
-void UninitSliceSegment (SSliceCtx* pSliceSeg, CMemoryAlign* pMa) {
+void UninitSliceSegment (SDqLayer* pCurDq, CMemoryAlign* pMa) {
+  SSliceCtx* pSliceSeg = &pCurDq->sSliceEncCtx;
   if (NULL != pSliceSeg) {
     if (NULL != pSliceSeg->pOverallMbMap) {
       pMa->WelsFree (pSliceSeg->pOverallMbMap, "pSliceSeg->pOverallMbMap");
@@ -514,7 +517,7 @@ void UninitSliceSegment (SSliceCtx* pSliceSeg, CMemoryAlign* pMa) {
 /*!
  * \brief   Initialize Wels SSlice context (Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context to be initialized
+ * \param   pCurDq          current layer which its SSlice context will be initialized
  * \param   bFmoUseFlag     flag of using fmo
  * \param   iMbWidth        MB width
  * \param   iMbHeight       MB height
@@ -524,17 +527,17 @@ void UninitSliceSegment (SSliceCtx* pSliceSeg, CMemoryAlign* pMa) {
  *
  * \return  0 - successful; none 0 - failed;
  */
-int32_t InitSlicePEncCtx (SSliceCtx* pSliceCtx,
+int32_t InitSlicePEncCtx (SDqLayer* pCurDq,
                           CMemoryAlign* pMa,
                           bool bFmoUseFlag,
                           int32_t iMbWidth,
                           int32_t iMbHeight,
                           SSliceArgument* pSliceArgument,
                           void* pPpsArg) {
-  if (NULL == pSliceCtx)
+  if (NULL == pCurDq)
     return 1;
 
-  InitSliceSegment (pSliceCtx,
+  InitSliceSegment (pCurDq,
                     pMa,
                     pSliceArgument,
                     iMbWidth,
@@ -545,13 +548,13 @@ int32_t InitSlicePEncCtx (SSliceCtx* pSliceCtx,
 /*!
  * \brief   Uninitialize Wels SSlice context (Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context to be initialized
+ * \param   pCurDq       current layer which its SSlice context will be initialized
  *
  * \return  NONE;
  */
-void UninitSlicePEncCtx (SSliceCtx* pSliceCtx, CMemoryAlign* pMa) {
-  if (NULL != pSliceCtx) {
-    UninitSliceSegment (pSliceCtx, pMa);
+void UninitSlicePEncCtx (SDqLayer* pCurDq, CMemoryAlign* pMa) {
+  if (NULL != pCurDq) {
+    UninitSliceSegment (pCurDq, pMa);
   }
 }
 
