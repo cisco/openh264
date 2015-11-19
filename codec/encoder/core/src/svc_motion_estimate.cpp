@@ -1016,7 +1016,7 @@ void MotionEstimateFeatureFullSearch (SFeatureSearchIn& sFeatureSearchIn,
 //switch related
 static uint32_t CountFMECostDown (const SDqLayer* pCurLayer) {
   uint32_t uiCostDownSum      = 0;
-  const int32_t kiSliceCount  = GetCurrentSliceNum (pCurLayer->pSliceEncCtx);
+  const int32_t kiSliceCount  = GetCurrentSliceNum (&pCurLayer->sSliceEncCtx);
   if (kiSliceCount >= 1) {
     int32_t iSliceIndex  = 0;
     SSlice* pSlice    = &pCurLayer->sLayerInfo.pSliceInLayer[iSliceIndex];
