@@ -206,6 +206,9 @@ void DecoderInterfaceTest::TestInitUninit() {
   Init();
   m_sDecParam.bParseOnly = false;
   m_pDec->Initialize (&m_sDecParam);
+  eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_END_OF_STREAM, &iOutput);
+  EXPECT_EQ (eRet, cmResultSuccess);
+  EXPECT_EQ (iOutput, 0);
 
   //Uninitialize, no GetOption can be done
   m_pDec->Uninitialize();
