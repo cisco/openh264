@@ -2863,7 +2863,7 @@ void WelsInitCurrentLayer (sWelsEncCtx* pCtx,
   if (fDlp->sSliceArgument.uiSliceMode == SM_SIZELIMITED_SLICE) // need get extra slices for update
     iSliceCount = GetInitialSliceNum (pCurDq->iMbWidth, pCurDq->iMbHeight, &fDlp->sSliceArgument);
   else
-    iSliceCount = GetCurrentSliceNum (&pCurDq->sSliceEncCtx);
+    iSliceCount = GetCurrentSliceNum (pCurDq);
   assert (iSliceCount > 0);
 
   int32_t iCurPpsId = pDqIdc->iPpsId;
@@ -3126,7 +3126,7 @@ static inline void WelsSwapDqLayers (sWelsEncCtx* pCtx, const int32_t kiNextDqId
  */
 static inline void PrefetchReferencePicture (sWelsEncCtx* pCtx, const EVideoFrameType keFrameType) {
   SSlice* pSliceBase = &pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[0];
-  const int32_t kiSliceCount = GetCurrentSliceNum (&pCtx->pCurDqLayer->sSliceEncCtx);
+  const int32_t kiSliceCount = GetCurrentSliceNum (pCtx->pCurDqLayer);
   int32_t iIdx = 0;
   uint8_t uiRefIdx = -1;
 
@@ -4014,7 +4014,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       int32_t iRet = 0;
       // THREAD_FULLY_FIRE_MODE/THREAD_PICK_UP_MODE for any mode of non-SM_SIZELIMITED_SLICE
       if ((SM_SIZELIMITED_SLICE != pParam->sSliceArgument.uiSliceMode) && (pSvcParam->iMultipleThreadIdc > 1)) {
-        iSliceCount = GetCurrentSliceNum (&pCtx->pCurDqLayer->sSliceEncCtx);
+        iSliceCount = GetCurrentSliceNum (pCtx->pCurDqLayer);
         if (iLayerNum + 1 >= MAX_LAYER_NUM_OF_FRAME) { // check available layer_bs_info for further writing as followed
           WelsLog (pLogCtx, WELS_LOG_ERROR,
                    "WelsEncoderEncodeExt(), iLayerNum(%d) overflow(max:%d) at iDid= %d uiSliceMode= %d, iSliceCount= %d!",
@@ -4064,7 +4064,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         const bool bNeedPrefix = pCtx->bNeedPrefixNalFlag;
         int32_t iSliceIdx = 0;
 
-        iSliceCount = GetCurrentSliceNum (&pCtx->pCurDqLayer->sSliceEncCtx);
+        iSliceCount = GetCurrentSliceNum (pCtx->pCurDqLayer);
         while (iSliceIdx < iSliceCount) {
           int32_t iSliceSize    = 0;
           int32_t iPayloadSize  = 0;
@@ -4300,7 +4300,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         && pSvcParam->bUseLoadBalancing
         && pSvcParam->iMultipleThreadIdc > 1 &&
         pSvcParam->iMultipleThreadIdc >= pParam->sSliceArgument.uiSliceNum) {
-      CalcSliceComplexRatio (pCtx->pSliceThreading->pSliceComplexRatio[iCurDid], &pCtx->pCurDqLayer->sSliceEncCtx,
+      CalcSliceComplexRatio (pCtx->pSliceThreading->pSliceComplexRatio[iCurDid], pCtx->pCurDqLayer,
                              pCtx->pSliceThreading->pSliceConsumeTime[iCurDid]);
 #if defined(MT_DEBUG)
       TrackSliceComplexities (pCtx, iCurDid);

@@ -622,14 +622,14 @@ int32_t WelsGetNextMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY) {
 /*!
  * \brief   Get previous mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context
- * \param   kiMbXY          MB xy index
+ * \param   pCurDq     current layer info
+ * \param   kiMbXY     MB xy index
  *
  * \return  prev_mb - successful; -1 - failed;
  */
-int32_t WelsGetPrevMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY) {
-  if (NULL != pSliceCtx) {
-    SSliceCtx* pSliceSeg = pSliceCtx;
+int32_t WelsGetPrevMbOfSlice (SDqLayer* pCurDq, const int32_t kiMbXY) {
+  if (NULL != pCurDq) {
+    SSliceCtx* pSliceSeg = &pCurDq->sSliceEncCtx;
     if (NULL == pSliceSeg || kiMbXY < 0 || kiMbXY >= pSliceSeg->iMbNumInFrame)
       return -1;
     if (pSliceSeg->uiSliceMode == SM_SINGLE_SLICE)
@@ -657,7 +657,8 @@ int32_t WelsGetPrevMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY) {
  *
  * \return  count_num_of_mb - successful; -1 - failed;
  */
-int32_t WelsGetNumMbInSlice (SSliceCtx* pSliceCtx, const int32_t kuiSliceIdc) {
+int32_t WelsGetNumMbInSlice (SDqLayer* pCurDq, const int32_t kuiSliceIdc) {
+  SSliceCtx* pSliceCtx = &pCurDq->sSliceEncCtx;
   if (NULL == pSliceCtx || kuiSliceIdc < 0)
     return -1;
   {
@@ -674,11 +675,13 @@ int32_t WelsGetNumMbInSlice (SSliceCtx* pSliceCtx, const int32_t kuiSliceIdc) {
   }
 }
 
-int32_t GetCurrentSliceNum (const SSliceCtx* kpSliceCtx) {
+int32_t GetCurrentSliceNum (const SDqLayer* pCurDq) {
+  const SSliceCtx* kpSliceCtx = &pCurDq->sSliceEncCtx;
   return (kpSliceCtx != NULL) ? (kpSliceCtx->iSliceNumInFrame) : (-1);
 }
-int32_t DynamicAdjustSlicePEncCtxAll (SSliceCtx* pSliceCtx,
+int32_t DynamicAdjustSlicePEncCtxAll (SDqLayer* pCurDq,
                                       int32_t* pRunLength) {
+  SSliceCtx* pSliceCtx                  = &pCurDq->sSliceEncCtx;
   const int32_t iCountNumMbInFrame      = pSliceCtx->iMbNumInFrame;
   const int32_t iCountSliceNumInFrame   = pSliceCtx->iSliceNumInFrame;
   int32_t iSameRunLenFlag               = 1;

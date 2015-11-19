@@ -172,29 +172,29 @@ int32_t WelsGetNextMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY);
 /*!
  * \brief   Get previous mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context
+ * \param   pCurDq          current layer info
  * \param   kiMbXY          MB xy index
  *
  * \return  prev_mb - successful; -1 - failed;
  */
-int32_t WelsGetPrevMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY);
+int32_t WelsGetPrevMbOfSlice (SDqLayer* pCurDq, const int32_t kiMbXY);
 
 /*!
  * \brief   Get number of mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context
+ * \param   pCurDq          current layer info
  * \param   kiSliceIdc      slice/slice_group idc
  *
  * \return  count_num_of_mb - successful; -1 - failed;
  */
-int32_t WelsGetNumMbInSlice (SSliceCtx* pSliceCtx, const int32_t kiSliceIdc);
+int32_t WelsGetNumMbInSlice (SDqLayer* pCurDq, const int32_t kiSliceIdc);
 
 /*!
  *  Get slice count for multiple slice segment
  *
  */
 int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceArgument* pSliceArgument);
-int32_t GetCurrentSliceNum (const SSliceCtx* kpSliceCtx);
+int32_t GetCurrentSliceNum (const SDqLayer* pCurDq);
 SSlice* GetSliceByIndex(sWelsEncCtx* pCtx, const int32_t kiSliceIdc);
 
 //checking valid para
@@ -208,7 +208,7 @@ bool GomValidCheckSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, u
 bool GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,  SSliceArgument* pSliceArg);
 //end of checking valid para
 
-int32_t DynamicAdjustSlicePEncCtxAll (SSliceCtx* pSliceCtx,
+int32_t DynamicAdjustSlicePEncCtxAll (SDqLayer* pCurDq,
                                       int32_t* pRunLength);
 }
 #endif//WELS_SLICE_SEGMENT_H__

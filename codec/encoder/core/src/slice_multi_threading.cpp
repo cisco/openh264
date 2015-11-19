@@ -127,7 +127,8 @@ void UpdateMbListNeighborParallel (SDqLayer* pCurDq,
   } while (iIdx <= kiEndMbInSlice);
 }
 
-void CalcSliceComplexRatio (void* pRatio, SSliceCtx* pSliceCtx, uint32_t* pSliceConsume) {
+void CalcSliceComplexRatio (void* pRatio, SDqLayer* pCurDq, uint32_t* pSliceConsume) {
+  SSliceCtx* pSliceCtx          = &pCurDq->sSliceEncCtx;
   int32_t* pRatioList           = (int32_t*)pRatio;
   int32_t iAvI[MAX_SLICES_NUM];
   int32_t iSumAv                = 0;
@@ -279,7 +280,7 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
                 iSliceIdx, pSliceComplexRatio[iSliceIdx] * 1.0f / INT_MULTIPLY, pSliceCtx->pCountMbNumInSlice[iSliceIdx], iMbNumLeft);
 
 
-  if (DynamicAdjustSlicePEncCtxAll (pSliceCtx, iRunLen) == 0) {
+  if (DynamicAdjustSlicePEncCtxAll (pCurDqLayer, iRunLen) == 0) {
     const int32_t kiThreadNum   = pCtx->pSvcParam->iCountThreadsNum;
     int32_t iThreadIdx          = 0;
     do {
