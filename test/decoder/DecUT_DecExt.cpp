@@ -203,6 +203,7 @@ void DecoderInterfaceTest::TestInitUninit() {
     EXPECT_EQ (eRet, cmInitExpected);
   }
   //Initialize first, can get input color format
+  Init();
   m_sDecParam.bParseOnly = false;
   m_pDec->Initialize (&m_sDecParam);
 
