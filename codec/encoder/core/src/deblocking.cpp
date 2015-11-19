@@ -691,7 +691,6 @@ void  DeblockingFilterFrameAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc) {
 }
 
 void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, const int32_t kiSliceIdx) {
-  SSliceCtx* pSliceCtx                  = &pCurDq->sSliceEncCtx;
   SMB* pMbList                          = pCurDq->sMbDataP;
   SSliceHeaderExt* sSliceHeaderExt      = &pCurDq->sLayerInfo.pSliceInLayer[kiSliceIdx].sSliceHeaderExt;
   SMB* pCurrentMbBlock;
@@ -731,7 +730,7 @@ void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, co
     DeblockingMbAvcbase (pFunc, pCurrentMbBlock, &pFilter);
 
     ++iNumMbFiltered;
-    iNextMbIdx = WelsGetNextMbOfSlice (pSliceCtx, iCurMbIdx);
+    iNextMbIdx = WelsGetNextMbOfSlice (pCurDq, iCurMbIdx);
     //whether all of MB in current slice filtered or not
     if (iNextMbIdx == -1 || iNextMbIdx >= kiTotalNumMb || iNumMbFiltered >= kiTotalNumMb) {
       break;

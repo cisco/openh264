@@ -87,7 +87,7 @@ int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx,
 
 void WelsInitSliceEncodingFuncs (uint32_t uiCpuFlag);
 
-void UpdateMbNeighbourInfoForNextSlice (SSliceCtx* pSliceCtx,
+void UpdateMbNeighbourInfoForNextSlice (SDqLayer* pCurDq,
                                         SMB* pMbList,
                                         const int32_t kiNextSliceFirstMbIdx,
                                         const int32_t kiLastMbIdxInPartition);
