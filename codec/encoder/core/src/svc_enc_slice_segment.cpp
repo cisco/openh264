@@ -62,12 +62,13 @@ int32_t AssignMbMapSingleSlice (void* pMbMap, const int32_t kiCountMbNum, const 
 /*!
  * \brief   Assign MB map for multiple slice(s) segment
  *
- * \param   pMbMap          overall MB map
- * \param   iCountMbNum     count number of MB
+ * \param   pCurDq              current layer which its MB map will be assigned
+ * \param   kpSliceArgument     slice argument for current layer
  *
  * \return  0 - successful; none 0 - failed
  */
-int32_t AssignMbMapMultipleSlices (SSliceCtx* pSliceSeg, const SSliceArgument* kpSliceArgument) {
+int32_t AssignMbMapMultipleSlices (SDqLayer* pCurDq,const SSliceArgument* kpSliceArgument) {
+  SSliceCtx* pSliceSeg = &pCurDq->sSliceEncCtx;
   if (NULL == pSliceSeg || SM_SINGLE_SLICE == pSliceSeg->uiSliceMode)
     return 1;
 
@@ -469,7 +470,7 @@ int32_t InitSliceSegment (SDqLayer* pCurDq,
     pSliceSeg->iMaxSliceNumConstraint = MAX_SLICES_NUM;
 
 
-    return AssignMbMapMultipleSlices (pSliceSeg, pSliceArgument);
+    return AssignMbMapMultipleSlices (pCurDq, pSliceArgument);
   }
   return 0;
 }
