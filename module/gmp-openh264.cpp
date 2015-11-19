@@ -627,7 +627,6 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
 
     SDecodingParam param;
     memset (&param, 0, sizeof (param));
-    param.eOutputColorFormat = videoFormatI420;
     param.uiTargetDqLayer = UCHAR_MAX;  // Default value
     param.eEcActiveIdc = ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE; // Error concealment on.
     param.sVideoProperty.size = sizeof(param.sVideoProperty);

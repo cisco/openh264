@@ -242,7 +242,6 @@ typedef struct TagWelsDecoderContext {
   SDecodingParam*               pParam;
   uint32_t                      uiCpuFlag;                      // CPU compatibility detected
 
-  EVideoFormatType eOutputColorFormat;          // color space format to be outputed
   VIDEO_BITSTREAM_TYPE eVideoType; //indicate the type of video to decide whether or not to do qp_delta error detection.
   bool                          bHaveGotMemory; // global memory for decoder context related ever requested?
 

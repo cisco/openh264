@@ -114,11 +114,6 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
  */
 void WelsFreeMem (PWelsDecoderContext pCtx);
 
-/*
- * set colorspace format in decoder
- */
-int32_t DecoderSetCsp (PWelsDecoderContext pCtx, const int32_t kiColorFormat);
-
 /*!
  * \brief   make sure synchonozization picture resolution (get from slice header) among different parts (i.e, memory related and so on)
  *          over decoder internal
