@@ -755,7 +755,7 @@ void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
     int32_t iSliceIdx   = 0;
 
     if (SM_SIZELIMITED_SLICE != pSpatialLayer->sSliceArgument.uiSliceMode) {
-      iSliceCount = GetCurrentSliceNum (&pCurLayer->sSliceEncCtx);
+      iSliceCount = GetCurrentSliceNum (pCurLayer);
       do {
         DeblockingFilterSliceAvcbase (pCurLayer, pEnc->pFuncList, iSliceIdx);
         ++ iSliceIdx;
