@@ -764,7 +764,6 @@ static  void  InitMbInfo (sWelsEncCtx* pEnc, SMB*   pList, SDqLayer* pLayer, con
   int32_t  iMbHeight    = pLayer->iMbHeight;
   int32_t  iIdx;
   int32_t  iMbNum       = iMbWidth * iMbHeight;
-  SSliceCtx* pSliceCtx  = &pLayer->sSliceEncCtx;
   uint32_t uiNeighborAvail;
   const int32_t kiOffset = (kiDlayerId & 0x01) * kiMaxMbNum;
   SMVUnitXY (*pLayerMvUnitBlock4x4)[MB_BLOCK4x4_NUM] = (SMVUnitXY (*)[MB_BLOCK4x4_NUM]) (
@@ -784,18 +783,18 @@ static  void  InitMbInfo (sWelsEncCtx* pEnc, SMB*   pList, SDqLayer* pLayer, con
     pList[iIdx].iMbY = pEnc->pStrideTab->pMbIndexY[kiDlayerId][iIdx];
     pList[iIdx].iMbXY = iIdx;
 
-    uiSliceIdc = WelsMbToSliceIdc (pSliceCtx, iIdx);
+    uiSliceIdc = WelsMbToSliceIdc (pLayer, iIdx);
     iLeftXY = iIdx - 1;
     iTopXY = iIdx - iMbWidth;
     iLeftTopXY = iTopXY - 1;
     iRightTopXY = iTopXY + 1;
 
-    bLeft = (pList[iIdx].iMbX > 0) && (uiSliceIdc == WelsMbToSliceIdc (pSliceCtx, iLeftXY));
-    bTop = (pList[iIdx].iMbY > 0) && (uiSliceIdc == WelsMbToSliceIdc (pSliceCtx, iTopXY));
+    bLeft = (pList[iIdx].iMbX > 0) && (uiSliceIdc == WelsMbToSliceIdc (pLayer, iLeftXY));
+    bTop = (pList[iIdx].iMbY > 0) && (uiSliceIdc == WelsMbToSliceIdc (pLayer, iTopXY));
     bLeftTop = (pList[iIdx].iMbX > 0) && (pList[iIdx].iMbY > 0) && (uiSliceIdc ==
-               WelsMbToSliceIdc (pSliceCtx, iLeftTopXY));
+               WelsMbToSliceIdc (pLayer, iLeftTopXY));
     bRightTop = (pList[iIdx].iMbX < (iMbWidth - 1)) && (pList[iIdx].iMbY > 0) && (uiSliceIdc ==
-                WelsMbToSliceIdc (pSliceCtx, iRightTopXY));
+                WelsMbToSliceIdc (pLayer, iRightTopXY));
 
     uiNeighborAvail = 0;
     if (bLeft) {
@@ -2682,7 +2681,8 @@ int32_t GetTemporalLevel (SSpatialLayerInternal* fDlp, const int32_t kiFrameNum,
   return fDlp->uiCodingIdx2TemporalId[kiCodingIdx];
 }
 
-void DynslcUpdateMbNeighbourInfoListForAllSlices (SSliceCtx* pSliceCtx, SMB* pMbList) {
+void DynslcUpdateMbNeighbourInfoListForAllSlices (SDqLayer* pCurDq, SMB* pMbList) {
+  SSliceCtx* pSliceCtx = &pCurDq->sSliceEncCtx;
   const int32_t kiMbWidth       = pSliceCtx->iMbWidth;
   const int32_t kiEndMbInSlice  = pSliceCtx->iMbNumInFrame - 1;
   int32_t  iIdx                 = 0;
@@ -2700,17 +2700,17 @@ void DynslcUpdateMbNeighbourInfoListForAllSlices (SSliceCtx* pSliceCtx, SMB* pMb
     uint16_t  uiSliceIdc;
     int32_t   iLeftXY, iTopXY, iLeftTopXY, iRightTopXY;
 
-    uiSliceIdc = WelsMbToSliceIdc (pSliceCtx, kiMbXY);
+    uiSliceIdc = WelsMbToSliceIdc (pCurDq, kiMbXY);
     pMb->uiSliceIdc = uiSliceIdc;
     iLeftXY = kiMbXY - 1;
     iTopXY = kiMbXY - kiMbWidth;
     iLeftTopXY = iTopXY - 1;
     iRightTopXY = iTopXY + 1;
 
-    bLeft = (kiMbX > 0) && (uiSliceIdc == WelsMbToSliceIdc (pSliceCtx, iLeftXY));
-    bTop = (kiMbY > 0) && (uiSliceIdc == WelsMbToSliceIdc (pSliceCtx, iTopXY));
-    bLeftTop = (kiMbX > 0) && (kiMbY > 0) && (uiSliceIdc == WelsMbToSliceIdc (pSliceCtx, iLeftTopXY));
-    bRightTop = (kiMbX < (kiMbWidth - 1)) && (kiMbY > 0) && (uiSliceIdc == WelsMbToSliceIdc (pSliceCtx, iRightTopXY));
+    bLeft = (kiMbX > 0) && (uiSliceIdc == WelsMbToSliceIdc (pCurDq, iLeftXY));
+    bTop = (kiMbY > 0) && (uiSliceIdc == WelsMbToSliceIdc (pCurDq, iTopXY));
+    bLeftTop = (kiMbX > 0) && (kiMbY > 0) && (uiSliceIdc == WelsMbToSliceIdc (pCurDq, iLeftTopXY));
+    bRightTop = (kiMbX < (kiMbWidth - 1)) && (kiMbY > 0) && (uiSliceIdc == WelsMbToSliceIdc (pCurDq, iRightTopXY));
 
     if (bLeft) {
       uiNeighborAvailFlag |= LEFT_MB_POS;
@@ -2744,10 +2744,8 @@ int32_t PicPartitionNumDecision (sWelsEncCtx* pCtx) {
 void WelsInitCurrentQBLayerMltslc (sWelsEncCtx* pCtx) {
   //pData init
   SDqLayer*  pCurDq    = pCtx->pCurDqLayer;
-  SSliceCtx* pSliceCtx = &(pCurDq->sSliceEncCtx);
-
   //mb_neighbor
-  DynslcUpdateMbNeighbourInfoListForAllSlices (pSliceCtx, pCurDq->sMbDataP);
+  DynslcUpdateMbNeighbourInfoListForAllSlices (pCurDq, pCurDq->sMbDataP);
 }
 
 void UpdateSlicepEncCtxWithPartition (SDqLayer* pCurDq, int32_t iPartitionNum) {

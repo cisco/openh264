@@ -142,12 +142,12 @@ void UninitSlicePEncCtx (SDqLayer* pCurDq, CMemoryAlign* pMa);
 /*!
  * \brief   Get slice idc for given iMbXY (apply in Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context
- * \param   kiMbXY          MB xy index
+ * \param   pCurDq    current layer info
+ * \param   kiMbXY    MB xy index
  *
  * \return  uiSliceIdc - successful; (uint8_t)(-1) - failed;
  */
-uint16_t WelsMbToSliceIdc (SSliceCtx* pSliceCtx, const int32_t kiMbXY);
+uint16_t WelsMbToSliceIdc (SDqLayer* pCurDq, const int32_t kiMbXY);
 
 /*!
  * \brief   Get first mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
@@ -162,12 +162,12 @@ int32_t WelsGetFirstMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiSliceIdc);
 /*!
  * \brief   Get successive mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context
- * \param   kiMbXY          MB xy index
+ * \param   pCurDq       current layer info
+ * \param   kiMbXY       MB xy index
  *
  * \return  next_mb - successful; -1 - failed;
  */
-int32_t WelsGetNextMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY);
+int32_t WelsGetNextMbOfSlice (SDqLayer* pCurDq, const int32_t kiMbXY);
 
 /*!
  * \brief   Get previous mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)

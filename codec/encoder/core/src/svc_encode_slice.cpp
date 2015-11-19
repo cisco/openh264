@@ -483,8 +483,7 @@ void UpdateQpForOverflow (SMB* pCurMb, uint8_t kuiChromaQpIndexOffset) {
 //second. lower than highest Dependency Layer, and for every Dependency Layer with one quality layer(single layer)
 int32_t WelsISliceMdEnc (sWelsEncCtx* pEncCtx, SSlice* pSlice) { //pMd + encoding
   SDqLayer* pCurLayer           = pEncCtx->pCurDqLayer;
-  SSliceCtx* pSliceCtx          = &pCurLayer->sSliceEncCtx;
-  SMbCache* pMbCache            = &pSlice->sMbCacheInfo;
+ SMbCache* pMbCache            = &pSlice->sMbCacheInfo;
   SSliceHeaderExt* pSliceHdExt  = &pSlice->sSliceHeaderExt;
   SMB* pMbList                  = pCurLayer->sMbDataP;
   SMB* pCurMb                   = NULL;
@@ -533,7 +532,7 @@ TRY_REENCODING:
     pEncCtx->pFuncList->pfRc.pfWelsRcMbInfoUpdate (pEncCtx, pCurMb, sMd.iCostLuma, pSlice);
 
     ++iNumMbCoded;
-    iNextMbIdx = WelsGetNextMbOfSlice (pSliceCtx, iCurMbIdx);
+    iNextMbIdx = WelsGetNextMbOfSlice (pCurLayer, iCurMbIdx);
     if (iNextMbIdx == -1 || iNextMbIdx >= kiTotalNumMb || iNumMbCoded >= kiTotalNumMb) {
       break;
     }
@@ -615,7 +614,7 @@ TRY_REENCODING:
 
     ++iNumMbCoded;
 
-    iNextMbIdx = WelsGetNextMbOfSlice (pSliceCtx, iCurMbIdx);
+    iNextMbIdx = WelsGetNextMbOfSlice (pCurLayer, iCurMbIdx);
     //whether all of MB in current pSlice encoded or not
     if (iNextMbIdx == -1 || iNextMbIdx >= kiTotalNumMb || iNumMbCoded >= kiTotalNumMb) {
       pSliceCtx->pCountMbNumInSlice[kiSliceIdx] = iCurMbIdx - pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId];
@@ -759,10 +758,11 @@ int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx, const 
 }
 
 //pFunc: UpdateMbNeighbourInfoForNextSlice()
-void UpdateMbNeighbourInfoForNextSlice (SSliceCtx* pSliceCtx,
+void UpdateMbNeighbourInfoForNextSlice (SDqLayer* pCurDq,
                                         SMB* pMbList,
                                         const int32_t kiFirstMbIdxOfNextSlice,
                                         const int32_t kiLastMbIdxInPartition) {
+  SSliceCtx* pSliceCtx          = &pCurDq->sSliceEncCtx;
   const int32_t kiMbWidth       = pSliceCtx->iMbWidth;
   int32_t iIdx                  = kiFirstMbIdxOfNextSlice;
   int32_t iNextSliceFirstMbIdxRowStart = ((kiFirstMbIdxOfNextSlice % kiMbWidth) ? 1 : 0);
@@ -781,7 +781,7 @@ void UpdateMbNeighbourInfoForNextSlice (SSliceCtx* pSliceCtx,
     bool     bLeftTop;
     bool     bRightTop;
     int32_t   iLeftXY, iTopXY, iLeftTopXY, iRightTopXY;
-    const uint16_t kuiSliceIdc = WelsMbToSliceIdc (pSliceCtx, kiMbXY);
+    const uint16_t kuiSliceIdc = WelsMbToSliceIdc (pCurDq, kiMbXY);
 
     pMb->uiSliceIdc = kuiSliceIdc;
     iLeftXY = kiMbXY - 1;
@@ -789,10 +789,10 @@ void UpdateMbNeighbourInfoForNextSlice (SSliceCtx* pSliceCtx,
     iLeftTopXY = iTopXY - 1;
     iRightTopXY = iTopXY + 1;
 
-    bLeft = (kiMbX > 0) && (kuiSliceIdc == WelsMbToSliceIdc (pSliceCtx, iLeftXY));
-    bTop = (kiMbY > 0) && (kuiSliceIdc == WelsMbToSliceIdc (pSliceCtx, iTopXY));
-    bLeftTop = (kiMbX > 0) && (kiMbY > 0) && (kuiSliceIdc == WelsMbToSliceIdc (pSliceCtx, iLeftTopXY));
-    bRightTop = (kiMbX < (kiMbWidth - 1)) && (kiMbY > 0) && (kuiSliceIdc == WelsMbToSliceIdc (pSliceCtx, iRightTopXY));
+    bLeft = (kiMbX > 0) && (kuiSliceIdc == WelsMbToSliceIdc (pCurDq, iLeftXY));
+    bTop = (kiMbY > 0) && (kuiSliceIdc == WelsMbToSliceIdc (pCurDq, iTopXY));
+    bLeftTop = (kiMbX > 0) && (kiMbY > 0) && (kuiSliceIdc == WelsMbToSliceIdc (pCurDq, iLeftTopXY));
+    bRightTop = (kiMbX < (kiMbWidth - 1)) && (kiMbY > 0) && (kuiSliceIdc == WelsMbToSliceIdc (pCurDq, iRightTopXY));
 
     if (bLeft) {
       uiNeighborAvailFlag |= LEFT_MB_POS;
@@ -848,7 +848,7 @@ void AddSliceBoundary (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, SSliceCtx* pSlic
                              (kiLastMbIdxInPartition - iFirstMbIdxOfNextSlice + 1), sizeof (uint16_t));
 
   //DYNAMIC_SLICING_ONE_THREAD: update pMbList slice_neighbor_info
-  UpdateMbNeighbourInfoForNextSlice (pSliceCtx, pMbList, iFirstMbIdxOfNextSlice, kiLastMbIdxInPartition);
+  UpdateMbNeighbourInfoForNextSlice (pCurLayer, pMbList, iFirstMbIdxOfNextSlice, kiLastMbIdxInPartition);
 }
 
 bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
@@ -942,7 +942,6 @@ int32_t WelsMdInterMbLoop (sWelsEncCtx* pEncCtx, SSlice* pSlice, void* pWelsMd, 
   SWelsMD* pMd          = (SWelsMD*)pWelsMd;
   SBitStringAux* pBs    = pSlice->pSliceBsa;
   SDqLayer* pCurLayer   = pEncCtx->pCurDqLayer;
-  SSliceCtx* pSliceCtx  = &pCurLayer->sSliceEncCtx;
   SMbCache* pMbCache    = &pSlice->sMbCacheInfo;
   SMB* pMbList          = pCurLayer->sMbDataP;
   SMB* pCurMb           = NULL;
@@ -1013,7 +1012,7 @@ TRY_REENCODING:
 
     /*judge if all pMb in cur pSlice has been encoded*/
     ++ iNumMbCoded;
-    iNextMbIdx = WelsGetNextMbOfSlice (pSliceCtx, iCurMbIdx);
+    iNextMbIdx = WelsGetNextMbOfSlice (pCurLayer, iCurMbIdx);
     //whether all of MB in current pSlice encoded or not
     if (iNextMbIdx == -1 || iNextMbIdx >= kiTotalNumMb || iNumMbCoded >= kiTotalNumMb) {
       break;
@@ -1130,7 +1129,7 @@ TRY_REENCODING:
 
     /*judge if all pMb in cur pSlice has been encoded*/
     ++ iNumMbCoded;
-    iNextMbIdx = WelsGetNextMbOfSlice (pSliceCtx, iCurMbIdx);
+    iNextMbIdx = WelsGetNextMbOfSlice (pCurLayer, iCurMbIdx);
     //whether all of MB in current pSlice encoded or not
     if (iNextMbIdx == -1 || iNextMbIdx >= kiTotalNumMb || iNumMbCoded >= kiTotalNumMb) {
       pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId] =
