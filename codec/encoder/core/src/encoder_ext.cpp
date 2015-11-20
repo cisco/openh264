@@ -2750,6 +2750,7 @@ void WelsInitCurrentQBLayerMltslc (sWelsEncCtx* pCtx) {
 
 void UpdateSlicepEncCtxWithPartition (SDqLayer* pCurDq, int32_t iPartitionNum) {
   SSliceCtx* pSliceCtx                  = &pCurDq->sSliceEncCtx;
+  SSlice* pSliceInLayer                 = pCurDq->sLayerInfo.pSliceInLayer;
   const int32_t kiMbNumInFrame          = pSliceCtx->iMbNumInFrame;
   int32_t iCountMbNumPerPartition       = kiMbNumInFrame;
   int32_t iAssignableMbLeft             = kiMbNumInFrame;
@@ -2769,7 +2770,7 @@ void UpdateSlicepEncCtxWithPartition (SDqLayer* pCurDq, int32_t iPartitionNum) {
     } else {
       pSliceCtx->pCountMbNumInSlice[i] = iCountMbNumPerPartition;
     }
-    pSliceCtx->pFirstMbInSlice[i] = iFirstMbIdx;
+    pSliceInLayer[i].sSliceHeaderExt.sSliceHeader.iFirstMbInSlice = iFirstMbIdx;
 
     WelsSetMemMultiplebytes_c (pSliceCtx->pOverallMbMap + iFirstMbIdx, i,
                                pSliceCtx->pCountMbNumInSlice[i], sizeof (uint16_t));
@@ -4797,17 +4798,6 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   }
   pMA->WelsFree (pCurLayer->sLayerInfo.pSliceInLayer, "Slice");
   pCurLayer->sLayerInfo.pSliceInLayer = pSlice;
-
-  int32_t* pFirstMbInSlice = (int32_t*)pMA->WelsMalloc (iMaxSliceNum * sizeof (int32_t), "pSliceSeg->pFirstMbInSlice");
-  if (NULL == pFirstMbInSlice) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "CWelsH264SVCEncoder::DynSliceRealloc: pFirstMbInSlice is NULL");
-    return ENC_RETURN_MEMALLOCERR;
-  }
-  memset (pFirstMbInSlice, 0, sizeof (int32_t) * iMaxSliceNum);
-  memcpy (pFirstMbInSlice, pCurLayer->sSliceEncCtx.pFirstMbInSlice, sizeof (int32_t) * iMaxSliceNumOld);
-  pMA->WelsFree (pCurLayer->sSliceEncCtx.pFirstMbInSlice, "pSliceSeg->pFirstMbInSlice");
-  pCurLayer->sSliceEncCtx.pFirstMbInSlice = pFirstMbInSlice;
-
   int32_t* pCountMbNumInSlice = (int32_t*)pMA->WelsMalloc (iMaxSliceNum * sizeof (int32_t),
                                 "pSliceSeg->pCountMbNumInSlice");
   if (NULL == pCountMbNumInSlice) {
@@ -4881,6 +4871,8 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
 
   SDqLayer* pCurLayer                   = pCtx->pCurDqLayer;
   SSliceCtx* pSliceCtx                  = &pCurLayer->sSliceEncCtx;
+  SSlice* pSliceInLayer                 = pCurLayer->sLayerInfo.pSliceInLayer;
+  SSlice* pStartSlice                   = &pSliceInLayer[iStartSliceIdx];
   int32_t iNalIdxInLayer                = *pNalIdxInLayer;
   int32_t iSliceIdx                     = iStartSliceIdx;
   const int32_t kiSliceStep             = pCtx->iActiveThreadsNum;
@@ -4895,7 +4887,7 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
 
   //init
   {
-    pSliceCtx->pFirstMbInSlice[iSliceIdx]               = iFirstMbInPartition;
+    pStartSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice = iFirstMbInPartition;
     pCurLayer->pNumSliceCodedOfPartition[kiPartitionId] = 1;    // one slice per partition intialized, dynamic slicing inside
     pCurLayer->pLastMbIdxOfPartition[kiPartitionId]     = iEndMbInPartition - 1;
   }
