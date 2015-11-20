@@ -81,9 +81,10 @@ void UpdateMbListNeighborParallel (SDqLayer* pCurDq,
                                    SMB* pMbList,
                                    const int32_t uiSliceIdc) {
   SSliceCtx* pSliceCtx           = &pCurDq->sSliceEncCtx;
+  SSlice* pUpdateSlice           = &pCurDq->sLayerInfo.pSliceInLayer[uiSliceIdc];
   const uint16_t* kpMbMap        = pSliceCtx->pOverallMbMap;
   const int32_t kiMbWidth        = pSliceCtx->iMbWidth;
-  int32_t iIdx                   = pSliceCtx->pFirstMbInSlice[uiSliceIdc];
+  int32_t iIdx                   = pUpdateSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice;
   const int32_t kiEndMbInSlice   = iIdx + pSliceCtx->pCountMbNumInSlice[uiSliceIdc] - 1;
 
   do {
@@ -816,10 +817,11 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
           pEncPEncCtx->pSliceThreading->pSliceConsumeTime[pEncPEncCtx->uiDependencyId][iSliceIdx] = (uint32_t) (
                 WelsTime() - iSliceStart);
           MT_TRACE_LOG (& (pEncPEncCtx->sLogCtx), WELS_LOG_INFO,
-                        "[MT] CodingSliceThreadProc(), coding_idx %d, uiSliceIdx %d, pSliceConsumeTime %d, iSliceSize %d, pFirstMbInSlice %d, count_num_mb_in_slice %d",
+                        "[MT] CodingSliceThreadProc(), coding_idx %d, uiSliceIdx %d, pSliceConsumeTime %d, iSliceSize %d, iFirstMbInSlice %d, count_num_mb_in_slice %d",
                         pEncPEncCtx->iCodingIndex, iSliceIdx,
                         pEncPEncCtx->pSliceThreading->pSliceConsumeTime[pEncPEncCtx->uiDependencyId][iSliceIdx], iSliceSize,
-                        pCurDq->sSliceEncCtx.pFirstMbInSlice[iSliceIdx], pCurDq->sSliceEncCtx.pCountMbNumInSlice[iSliceIdx]);
+                        pCurDq->sLayerInfo.pSliceInLayer[iSliceIdx].sSliceHeaderExt.sSliceHeader.iFirstMbInSlice,
+                        pCurDq->sSliceEncCtx.pCountMbNumInSlice[iSliceIdx]);
         }
 
 #if defined(SLICE_INFO_OUTPUT)
@@ -847,10 +849,10 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         const int32_t kiFirstMbInPartition      = pPrivateData->iStartMbIndex;  // inclusive
         const int32_t kiEndMbInPartition        = pPrivateData->iEndMbIndex;            // exclusive
         int32_t iAnyMbLeftInPartition           = kiEndMbInPartition - kiFirstMbInPartition;
+        SSliceHeaderExt* pStartSliceHeaderExt   = &pCurDq->sLayerInfo.pSliceInLayer[iSliceIdx].sSliceHeaderExt;
 
         iSliceIdx = pPrivateData->iSliceIndex;
-
-        pSliceCtx->pFirstMbInSlice[iSliceIdx]                   = kiFirstMbInPartition;
+        pStartSliceHeaderExt->sSliceHeader.iFirstMbInSlice      = kiFirstMbInPartition;
         pCurDq->pNumSliceCodedOfPartition[kiPartitionId]        =
           1;    // one pSlice per partition intialized, dynamic slicing inside
         pCurDq->pLastMbIdxOfPartition[kiPartitionId]            = kiEndMbInPartition - 1;
@@ -1005,8 +1007,10 @@ int32_t FiredSliceThreads (sWelsEncCtx* pCtx, SSliceThreadPrivateData* pPriData,
   int32_t iEndMbIdx         = 0;
   int32_t iIdx              = 0;
   const int32_t kiEventCnt  = uiNumThreads;
-  int32_t       iLayerBsIdx = pCtx->pOut->iLayerBsIndex;
-  SLayerBSInfo* pLbi = &pFrameBsInfo->sLayerInfo[iLayerBsIdx];
+  int32_t iLayerBsIdx       = pCtx->pOut->iLayerBsIndex;
+  SLayerBSInfo* pLbi        = &pFrameBsInfo->sLayerInfo[iLayerBsIdx];
+  SSlice* pSliceInLayer     = pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer;
+
 
   if (pPriData == NULL || pFrameBsInfo == NULL || pLbi == NULL || kiEventCnt <= 0 || pEventsList == NULL) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
@@ -1019,7 +1023,7 @@ int32_t FiredSliceThreads (sWelsEncCtx* pCtx, SSliceThreadPrivateData* pPriData,
   if (bIsDynamicSlicingMode) {
     iEndMbIdx = pSliceCtx->iMbNumInFrame;
     for (iIdx = kiEventCnt - 1; iIdx >= 0; --iIdx) {
-      const int32_t iFirstMbIdx         = pSliceCtx->pFirstMbInSlice[iIdx];
+      const int32_t iFirstMbIdx         = pSliceInLayer[iIdx].sSliceHeaderExt.sSliceHeader.iFirstMbInSlice;
       pPriData[iIdx].iStartMbIndex      = iFirstMbIdx;
       pPriData[iIdx].iEndMbIndex        = iEndMbIdx;
       iEndMbIdx                         = iFirstMbIdx;

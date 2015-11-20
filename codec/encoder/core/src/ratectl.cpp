@@ -512,6 +512,7 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
 
 void RcInitSliceInformation (sWelsEncCtx* pEncCtx) {
   SSliceCtx* pCurSliceCtx       = &pEncCtx->pCurDqLayer->sSliceEncCtx;
+  SSlice* pSliceInLayer         = pEncCtx->pCurDqLayer->sLayerInfo.pSliceInLayer;
   SWelsSvcRc* pWelsSvcRc        = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   SRCSlicing* pSOverRc          = &pWelsSvcRc->pSlicingOverRc[0];
   const int32_t kiSliceNum      = pWelsSvcRc->iSliceNum;
@@ -520,7 +521,7 @@ void RcInitSliceInformation (sWelsEncCtx* pEncCtx) {
 
   for (int32_t i = 0; i < kiSliceNum; i++) {
     pSOverRc->iStartMbSlice     =
-      pSOverRc->iEndMbSlice     = pCurSliceCtx->pFirstMbInSlice[i];
+      pSOverRc->iEndMbSlice     = pSliceInLayer[i].sSliceHeaderExt.sSliceHeader.iFirstMbInSlice;
     pSOverRc->iEndMbSlice      += (pCurSliceCtx->pCountMbNumInSlice[i] - 1);
     pSOverRc->iTotalQpSlice     = 0;
     pSOverRc->iTotalMbSlice     = 0;

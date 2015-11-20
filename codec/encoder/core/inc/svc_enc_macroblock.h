@@ -69,7 +69,7 @@ SMVUnitXY       sP16x16Mv;
 
 uint8_t         uiLumaQp;       // uiLumaQp: pPps->iInitialQp + sSliceHeader->delta_qp + mb->dquant.
 uint8_t         uiChromaQp;
-uint16_t        uiSliceIdc;     // 2^16=65536 > MaxFS(36864) of level 5.1; AVC: pFirstMbInSlice?; SVC: (pFirstMbInSlice << 7) | ((uiDependencyId << 4) | uiQualityId);
+uint16_t        uiSliceIdc;     // 2^16=65536 > MaxFS(36864) of level 5.1; AVC: iFirstMbInSlice?; SVC: (iFirstMbInSlice << 7) | ((uiDependencyId << 4) | uiQualityId);
 uint32_t        uiChromPredMode;
 int32_t         iLumaDQp;
 SMVUnitXY       sMvd[MB_BLOCK4x4_NUM]; //only for CABAC writing; storage structure the same as sMv, in 4x4 scan order.

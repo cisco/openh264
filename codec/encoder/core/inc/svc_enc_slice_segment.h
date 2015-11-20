@@ -86,7 +86,6 @@ int16_t                 iMbHeight;              /* height of picture size in mb 
 int32_t                 iSliceNumInFrame;       /* count number of slices in frame; */
 int32_t                 iMbNumInFrame;          /* count number of MBs in frame */
 uint16_t*               pOverallMbMap;          /* overall MB map in frame, store virtual slice idc; */
-int32_t*                pFirstMbInSlice;        /* first MB address top-left based in every slice respectively; */
 int32_t*                pCountMbNumInSlice;     /* count number of MBs in every slice respectively; */
 uint32_t                uiSliceSizeConstraint;  /* in byte */
 int32_t                 iMaxSliceNumConstraint; /* maximal number of slices constraint */
@@ -152,12 +151,12 @@ uint16_t WelsMbToSliceIdc (SDqLayer* pCurDq, const int32_t kiMbXY);
 /*!
  * \brief   Get first mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context
+ * \param   pSliceInLayer   slice list in current layer
  * \param   kiSliceIdc      slice idc
  *
  * \return  first_mb - successful; -1 - failed;
  */
-int32_t WelsGetFirstMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiSliceIdc);
+int32_t WelsGetFirstMbOfSlice (SSlice* pSliceInLayer, const int32_t kiSliceIdc);
 
 /*!
  * \brief   Get successive mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
