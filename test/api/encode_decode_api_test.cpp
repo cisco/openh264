@@ -3914,6 +3914,7 @@ TEST_F (EncodeDecodeTestAPI, ThreadNumAndSliceNum) {
 
 
 TEST_F (EncodeDecodeTestAPI, TriggerLoadBalancing) {
+//#define DEBUG_FILE_SAVE_TRIGGER
   int iSpatialLayerNum = 1;
   int iWidth       = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, (64 << 2), MAX_WIDTH);
   int iHeight      = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1)  + 1) << 1, (64 << 2),
@@ -3925,7 +3926,7 @@ TEST_F (EncodeDecodeTestAPI, TriggerLoadBalancing) {
   SEncParamExt   sParam;
   encoder_->GetDefaultParams (&sParam);
   prepareParamDefault (iSpatialLayerNum, 1, iWidth, iHeight, fFrameRate, &sParam);
-  sParam.iMultipleThreadIdc = (rand() % 8) + 1;
+  sParam.iMultipleThreadIdc = 4;
   sParam.bSimulcastAVC = 1;
   sParam.sSpatialLayers[0].iVideoWidth = iWidth;
   sParam.sSpatialLayers[0].iVideoHeight = iHeight;
@@ -3940,6 +3941,11 @@ TEST_F (EncodeDecodeTestAPI, TriggerLoadBalancing) {
 
   int iIdx = 0;
   int aLen[MAX_SPATIAL_LAYER_NUM] = {};
+
+#ifdef DEBUG_FILE_SAVE_TRIGGER
+  FILE* fEnc = fopen ("trigger00.264", "wb");
+  printf("Current Threads is %d\n", sParam.iMultipleThreadIdc);
+#endif
 
   //create decoder
   for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
@@ -4007,8 +4013,8 @@ TEST_F (EncodeDecodeTestAPI, TriggerLoadBalancing) {
       pData[0] = pData[1] = pData[2] = 0;
       memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
 
-#ifdef DEBUG_FILE_SAVE4
-      fwrite (pBsBuf[iIdx], aLen[iIdx], 1, fEnc[iIdx]);
+#ifdef DEBUG_FILE_SAVE_TRIGGER
+      fwrite (pBsBuf[iIdx], aLen[iIdx], 1, fEnc);
 #endif
       iResult = decoder[iIdx]->DecodeFrame2 (pBsBuf[iIdx], aLen[iIdx], pData, &dstBufInfo_);
       EXPECT_TRUE (iResult == cmResultSuccess) << "iResult=" << iResult << ", LayerIdx=" << iIdx;
@@ -4026,7 +4032,9 @@ TEST_F (EncodeDecodeTestAPI, TriggerLoadBalancing) {
       decoder[iIdx]->Uninitialize();
       WelsDestroyDecoder (decoder[iIdx]);
     }
-
   }
+#ifdef DEBUG_FILE_SAVE_TRIGGER
+  fclose(fEnc);
+#endif
 }
 
