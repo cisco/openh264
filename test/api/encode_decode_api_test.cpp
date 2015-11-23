@@ -8,87 +8,11 @@
 #include "utils/HashFunctions.h"
 #include <string>
 #include <vector>
+#include "encode_decode_api_test.h"
 using namespace WelsCommon;
 
-#define TRY_TIME_RANGE           (10)
-#define ENCODE_FRAME_NUM         (30)
-#define LEVEL_ID_RANGE           (18)
-#define MAX_WIDTH                (4096)
-#define MAX_HEIGHT               (2304)
-#define MAX_FRAME_RATE           (30)
-#define MIN_FRAME_RATE           (1)
-#define FRAME_RATE_RANGE         (2*MAX_FRAME_RATE)
-#define RC_MODE_RANGE            (4)
-#define BIT_RATE_RANGE           (10000)
-#define MAX_QP                   (51)
-#define MIN_QP                   (0)
-#define QP_RANGE                 (2*MAX_QP)
-#define SPATIAL_LAYER_NUM_RANGE  (2*MAX_SPATIAL_LAYER_NUM)
-#define TEMPORAL_LAYER_NUM_RANGE (2*MAX_TEMPORAL_LAYER_NUM)
-#define SAVED_NALUNIT_NUM        ( (MAX_SPATIAL_LAYER_NUM*MAX_QUALITY_LAYER_NUM) + 1 + MAX_SPATIAL_LAYER_NUM )
-#define MAX_SLICES_NUM           ( ( MAX_NAL_UNITS_IN_LAYER - SAVED_NALUNIT_NUM ) / 3 )
-#define SLICE_MODE_NUM           (6)
-#define LOOP_FILTER_IDC_NUM      (3)
-#define LOOF_FILTER_OFFSET_RANGE (6)
-#define MAX_REF_PIC_COUNT        (16)
-#define MIN_REF_PIC_COUNT        (1)
-#define LONG_TERM_REF_NUM        (2)
-#define LONG_TERM_REF_NUM_SCREEN (4)
-#define MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA (6)
-#define MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN (8)
-#define VALID_SIZE(iSize) (((iSize)>16)?(iSize):16)
-#define GET_MB_WIDTH(x) (((x) + 15)/16)
 
-typedef struct SLost_Sim {
-  WelsCommon::EWelsNalUnitType eNalType;
-  bool isLost;
-} SLostSim;
-
-
-struct EncodeDecodeFileParamBase {
-  int numframes;
-  int width;
-  int height;
-  float frameRate;
-  int slicenum;
-  bool bLostPara;
-  const char* pLossSequence;
-};
-
-static void welsStderrTraceOrigin (void* ctx, int level, const char* string) {
-  fprintf (stderr, "%s\n", string);
-}
-
-typedef struct STrace_Unit {
-  int iTarLevel;
-} STraceUnit;
-
-static void TestOutPutTrace (void* ctx, int level, const char* string) {
-  STraceUnit* pTraceUnit = (STraceUnit*) ctx;
-  EXPECT_LE (level, pTraceUnit->iTarLevel);
-}
-
-class EncodeDecodeTestBase : public BaseEncoderTest, public BaseDecoderTest {
- public:
-  uint8_t iRandValue;
- public:
-  virtual void SetUp() {
-    BaseEncoderTest::SetUp();
-    BaseDecoderTest::SetUp();
-    pFunc = welsStderrTraceOrigin;
-    pTraceInfo = NULL;
-    encoder_->SetOption (ENCODER_OPTION_TRACE_CALLBACK, &pFunc);
-    encoder_->SetOption (ENCODER_OPTION_TRACE_CALLBACK_CONTEXT, &pTraceInfo);
-    decoder_->SetOption (DECODER_OPTION_TRACE_CALLBACK, &pFunc);
-    decoder_->SetOption (DECODER_OPTION_TRACE_CALLBACK_CONTEXT, &pTraceInfo);
-  }
-
-  virtual void TearDown() {
-    BaseEncoderTest::TearDown();
-    BaseDecoderTest::TearDown();
-  }
-
-  virtual void prepareParam (int iLayers, int iSlices, int width, int height, float framerate, SEncParamExt* pParam) {
+void EncodeDecodeTestBase::prepareParam (int iLayers, int iSlices, int width, int height, float framerate, SEncParamExt* pParam) {
     pParam->iUsageType = CAMERA_VIDEO_REAL_TIME;
     pParam->iPicWidth = width;
     pParam->iPicHeight = height;
@@ -104,9 +28,9 @@ class EncodeDecodeTestBase : public BaseEncoderTest, public BaseDecoderTest {
       pParam->sSpatialLayers[i].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
       pParam->sSpatialLayers[i].sSliceArgument.uiSliceNum = iSlices;
     }
-  }
+}
 
-  virtual void prepareEncDecParam (const EncodeDecodeFileParamBase EncDecFileParam) {
+void EncodeDecodeTestBase::prepareEncDecParam (const EncodeDecodeFileParamBase EncDecFileParam) {
     //for encoder
     //I420: 1(Y) + 1/4(U) + 1/4(V)
     int frameSize = EncDecFileParam.width * EncDecFileParam.height * 3 / 2;
@@ -125,9 +49,9 @@ class EncodeDecodeTestBase : public BaseEncoderTest, public BaseDecoderTest {
     memset (&info, 0, sizeof (SFrameBSInfo));
     //set a fixed random value
     iRandValue = rand() % 256;
-  }
+}
 
-  virtual void encToDecData (const SFrameBSInfo& info, int& len) {
+void EncodeDecodeTestBase::encToDecData (const SFrameBSInfo& info, int& len) {
     len = 0;
     for (int i = 0; i < info.iLayerNum; ++i) {
       const SLayerBSInfo& layerInfo = info.sLayerInfo[i];
@@ -135,68 +59,29 @@ class EncodeDecodeTestBase : public BaseEncoderTest, public BaseDecoderTest {
         len += layerInfo.pNalLengthInByte[j];
       }
     }
-  }
+}
 
-  virtual void encToDecSliceData (const int iLayerNum, const int iSliceNum, const SFrameBSInfo& info, int& len) {
+void EncodeDecodeTestBase::encToDecSliceData (const int iLayerNum, const int iSliceNum, const SFrameBSInfo& info, int& len) {
     ASSERT_TRUE (iLayerNum < MAX_LAYER_NUM_OF_FRAME);
     len = 0;
     const SLayerBSInfo& layerInfo = info.sLayerInfo[iLayerNum];
     if (iSliceNum < layerInfo.iNalCount)
       len = layerInfo.pNalLengthInByte[iSliceNum];
-  }
+}
 
-
-  virtual int GetRandWidth() {
-    return WelsClip3 ((((rand() % MAX_WIDTH) >> 1) + 1) << 1, 16, MAX_WIDTH);
-  }
-
-  virtual int GetRandHeight() {
-    return WelsClip3 ((((rand() % MAX_HEIGHT) >> 1) + 1) << 1, 16, MAX_HEIGHT);
-  }
-
- protected:
-  SEncParamExt   param_;
-  BufferedData   buf_;
-  SSourcePicture EncPic;
-  SFrameBSInfo   info;
-  SBufferInfo    dstBufInfo_;
-  std::vector<SLostSim> m_SLostSim;
-  WelsTraceCallback pFunc;
-  STraceUnit sTrace;
-  STraceUnit* pTraceInfo;
-};
-
-class EncodeDecodeTestAPIBase : public EncodeDecodeTestBase {
- public:
-  uint8_t iRandValue;
- public:
-  void SetUp() {
-    EncodeDecodeTestBase::SetUp();
-  }
-
-  void TearDown() {
-    EncodeDecodeTestBase::TearDown();
-  }
-
-  void prepareParam0 (int iLayers, int iSlices, int width, int height, float framerate, SEncParamExt* pParam) {
+void EncodeDecodeTestAPIBase::prepareParam0 (int iLayers, int iSlices, int width, int height, float framerate, SEncParamExt* pParam) {
     memset (pParam, 0, sizeof (SEncParamExt));
     EncodeDecodeTestBase::prepareParam (iLayers, iSlices, width, height, framerate, pParam);
-  }
+}
 
-  void prepareParamDefault (int iLayers, int iSlices, int width, int height, float framerate, SEncParamExt* pParam) {
+void EncodeDecodeTestAPIBase::prepareParamDefault (int iLayers, int iSlices, int width, int height, float framerate, SEncParamExt* pParam) {
     memset (pParam, 0, sizeof (SEncParamExt));
     encoder_->GetDefaultParams (pParam);
     EncodeDecodeTestBase::prepareParam (iLayers, iSlices, width, height, framerate, pParam);
-  }
+}
 
-  void InitialEncDec (int iWidth, int iHeight);
-  void RandomParamExtCombination();
-  void ValidateParamExtCombination();
-  void SliceParamValidationForMode2 (int iSpatialIdx);
-  void SliceParamValidationForMode3 (int iSpatialIdx);
-  void SliceParamValidationForMode4();
 
-  void EncodeOneFrame (int iCheckTypeIndex) {
+void EncodeDecodeTestAPIBase::EncodeOneFrame (int iCheckTypeIndex) {
     int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
     memset (buf_.data(), iRandValue, (frameSize >> 2));
     memset (buf_.data() + (frameSize >> 2), rand() % 256, (frameSize - (frameSize >> 2)));
@@ -205,9 +90,9 @@ class EncodeDecodeTestAPIBase : public EncodeDecodeTestBase {
       ASSERT_TRUE (rv == cmResultSuccess);
     else if (1 == iCheckTypeIndex)
       ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnknownReason);
-  }
+}
 
-  void EncDecOneFrame (const int iWidth, const int iHeight, const int iFrame, FILE* pfEnc) {
+void EncodeDecodeTestAPIBase::EncDecOneFrame (const int iWidth, const int iHeight, const int iFrame, FILE* pfEnc) {
     int iLen = 0, rv;
     InitialEncDec (iWidth, iHeight);
     EncodeOneFrame (iFrame);
@@ -223,9 +108,9 @@ class EncodeDecodeTestAPIBase : public EncodeDecodeTestBase {
     if (NULL != pfEnc) {
       fwrite (info.sLayerInfo[0].pBsBuf, iLen, 1, pfEnc);
     }
-  }
+}
 
-  void TestOneSimulcastAVC (SEncParamExt* pParam, ISVCDecoder** decoder, unsigned char** pBsBuf, int iSpatialLayerNum,
+void EncodeDecodeTestAPIBase::TestOneSimulcastAVC (SEncParamExt* pParam, ISVCDecoder** decoder, unsigned char** pBsBuf, int iSpatialLayerNum,
                             int iEncFrameNum,
                             int iCallTimes) {
 //#define DEBUG_FILE_SAVE4
@@ -297,18 +182,7 @@ class EncodeDecodeTestAPIBase : public EncodeDecodeTestBase {
     fclose (fEnc[2]);
     fclose (fEnc[3]);
 #endif
-  }
-};
-
-class EncodeDecodeTestAPI : public ::testing::TestWithParam<EncodeDecodeFileParamBase>, public EncodeDecodeTestAPIBase {
-  void SetUp() {
-    EncodeDecodeTestAPIBase::SetUp();
-  }
-
-  void TearDown() {
-    EncodeDecodeTestAPIBase::TearDown();
-  }
-};
+}
 
 void EncodeDecodeTestAPIBase::InitialEncDec (int iWidth, int iHeight) {
 
