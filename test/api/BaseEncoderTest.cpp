@@ -50,6 +50,11 @@ static int InitWithParam (ISVCEncoder* encoder, SEncParamExt* pEncParamExt) {
         param.sSpatialLayers[i].sSliceArgument.uiSliceSizeConstraint = 600;
         param.uiMaxNalSize = 1500;
       }
+      if (eSliceMode == SM_FIXEDSLCNUM_SLICE) {
+        param.sSpatialLayers[i].sSliceArgument.uiSliceNum = 4;
+        param.iMultipleThreadIdc = 4;
+        param.bUseLoadBalancing = false;
+      }
     }
     param.iTargetBitrate *= param.iSpatialLayerNum;
 

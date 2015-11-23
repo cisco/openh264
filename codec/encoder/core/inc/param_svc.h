@@ -281,6 +281,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     SUsedPicRect.iHeight = ((iPicHeight >> 1) << 1);
 
     iMultipleThreadIdc = pCodingParam.iMultipleThreadIdc;
+    bUseLoadBalancing = pCodingParam.bUseLoadBalancing;
 
     /* Deblocking loop filter */
     iLoopFilterDisableIdc       = pCodingParam.iLoopFilterDisableIdc;      // 0: on, 1: off, 2: on except for slice boundaries,
