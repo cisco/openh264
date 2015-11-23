@@ -662,11 +662,23 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
     //0x03 removal and extract all of NAL Unit from current raw data
     pDstNal = pRawData->pCurPos;
 
+    bool bNalStartBytes = false;
+
     while (iSrcConsumed < iSrcLength) {
-      if ((2 + iSrcConsumed < iSrcLength) &&
-          (0 == LD16 (pSrcNal + iSrcIdx)) &&
-          ((pSrcNal[2 + iSrcIdx] == 0x03) || (pSrcNal[2 + iSrcIdx] == 0x01))) {
-        if (pSrcNal[2 + iSrcIdx] == 0x03) {
+      if ((2 + iSrcConsumed < iSrcLength) && (0 == LD16 (pSrcNal + iSrcIdx)) && (pSrcNal[2 + iSrcIdx] <= 0x03)) {
+        if (bNalStartBytes && (pSrcNal[2 + iSrcIdx] != 0x00 && pSrcNal[2 + iSrcIdx] != 0x01)) {
+          pCtx->iErrorCode |= dsBitstreamError;
+          return pCtx->iErrorCode;
+        }
+
+        if (pSrcNal[2 + iSrcIdx] == 0x02) {
+          pCtx->iErrorCode |= dsBitstreamError;
+          return pCtx->iErrorCode;
+        } else if (pSrcNal[2 + iSrcIdx] == 0x00) {
+          pDstNal[iDstIdx++] = pSrcNal[iSrcIdx++];
+          iSrcConsumed++;
+          bNalStartBytes = true;
+        } else if (pSrcNal[2 + iSrcIdx] == 0x03) {
           if ((3 + iSrcConsumed < iSrcLength) && pSrcNal[3 + iSrcIdx] > 0x03) {
             pCtx->iErrorCode |= dsBitstreamError;
             return pCtx->iErrorCode;
@@ -676,7 +688,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
             iSrcIdx      += 3;
             iSrcConsumed += 3;
           }
-        } else {
+        } else { // 0x01
+          bNalStartBytes = false;
 
           iConsumedBytes = 0;
           pDstNal[iDstIdx] = pDstNal[iDstIdx + 1] = pDstNal[iDstIdx + 2] = pDstNal[iDstIdx + 3] =
