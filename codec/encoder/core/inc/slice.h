@@ -182,6 +182,7 @@ SCabacCtx       sCabacCtx;
 int32_t         iCabacInitIdc;
 int32_t         iMbSkipRun;
 uint32_t        uiSliceConsumeTime;
+int32_t         iSliceComplexRatio;
 } SSlice, *PSlice;
 
 }

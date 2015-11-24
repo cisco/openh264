@@ -55,13 +55,12 @@ void UpdateMbListNeighborParallel (SDqLayer* pCurDq,
                                    SMB* pMbList,
                                    const int32_t kiSliceIdc);
 
-void CalcSliceComplexRatio (void* pRatio, SDqLayer* pCurDq);
+void CalcSliceComplexRatio (SDqLayer* pCurDq);
 
 int32_t NeedDynamicAdjust (void* pConsumeTime, const int32_t kiSliceNum);
 
 void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
                            SDqLayer* pCurDqLayer,
-                           void* pComplexRatio,
                            int32_t iCurDid);
 
 int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pParam, const int32_t kiCountBsLen,

@@ -80,8 +80,6 @@ WELS_EVENT                      pThreadMasterEvent[MAX_THREADS_NUM];    // event
 
 WELS_MUTEX                      mutexSliceNumUpdate;    // for dynamic slicing mode MT
 
-int32_t*                        pSliceComplexRatio[MAX_DEPENDENCY_LAYER]; // *INT_MULTIPLY
-
 #ifdef MT_DEBUG
 FILE*                           pFSliceDiff;    // file handle for debug
 #endif//MT_DEBUG
