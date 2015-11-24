@@ -388,11 +388,7 @@ int32_t InitSliceSegment (SDqLayer* pCurDq,
 
       pSliceSeg->pCountMbNumInSlice = NULL;
     }
-    if (NULL != pSliceSeg->pSliceConsumeTime) {
-      pMa->WelsFree (pSliceSeg->pSliceConsumeTime, "pSliceSeg->pSliceConsumeTime");
 
-      pSliceSeg->pSliceConsumeTime = NULL;
-    }
     // just for safe
     pSliceSeg->iSliceNumInFrame = 0;
     pSliceSeg->iMbNumInFrame    = 0;
@@ -411,7 +407,6 @@ int32_t InitSliceSegment (SDqLayer* pCurDq,
                                     "pSliceSeg->pCountMbNumInSlice");
 
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pCountMbNumInSlice)
-    pSliceSeg->pSliceConsumeTime = NULL;
     pSliceSeg->uiSliceMode              = uiSliceMode;
     pSliceSeg->iMbWidth                 = kiMbWidth;
     pSliceSeg->iMbHeight                = kiMbHeight;
@@ -437,10 +432,6 @@ int32_t InitSliceSegment (SDqLayer* pCurDq,
     pSliceSeg->pCountMbNumInSlice = (int32_t*)pMa->WelsMalloc (pSliceSeg->iSliceNumInFrame * sizeof (int32_t),
                                     "pSliceSeg->pCountMbNumInSlice");
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pCountMbNumInSlice)
-
-    pSliceSeg->pSliceConsumeTime = (uint32_t*)pMa->WelsMalloc (pSliceSeg->iSliceNumInFrame * sizeof (uint32_t),
-                                                             "pSliceSeg->pSliceConsumeTime");
-    WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pSliceConsumeTime)
 
     pSliceSeg->uiSliceMode      = pSliceArgument->uiSliceMode;
 
@@ -488,11 +479,6 @@ void UninitSliceSegment (SDqLayer* pCurDq, CMemoryAlign* pMa) {
       pMa->WelsFree (pSliceSeg->pCountMbNumInSlice, "pSliceSeg->pCountMbNumInSlice");
 
       pSliceSeg->pCountMbNumInSlice = NULL;
-    }
-    if (NULL != pSliceSeg->pSliceConsumeTime) {
-      pMa->WelsFree (pSliceSeg->pSliceConsumeTime, "pSliceSeg->pSliceConsumeTime");
-
-      pSliceSeg->pSliceConsumeTime = NULL;
     }
 
     pSliceSeg->iMbNumInFrame    = 0;

@@ -3507,7 +3507,7 @@ int32_t GetSubSequenceId (sWelsEncCtx* pCtx, EVideoFrameType eFrameType) {
 // writing parasets for (simulcast) svc
 int32_t WriteSsvcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
                           SLayerBSInfo*& pLayerBsInfo, int32_t& iLayerNum, int32_t& iFrameSize) {
-  int32_t iNonVclSize = 0, iCountNal = 0, iReturn;
+  int32_t iNonVclSize = 0, iCountNal = 0, iReturn = 0;
   iReturn = WelsWriteParameterSets (pCtx, &pLayerBsInfo->pNalLengthInByte[0], &iCountNal, &iNonVclSize);
   WELS_VERIFY_RETURN_IFNEQ (iReturn, ENC_RETURN_SUCCESS)
 
@@ -4299,8 +4299,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         && pSvcParam->bUseLoadBalancing
         && pSvcParam->iMultipleThreadIdc > 1 &&
         pSvcParam->iMultipleThreadIdc >= pParam->sSliceArgument.uiSliceNum) {
-      CalcSliceComplexRatio (pCtx->pSliceThreading->pSliceComplexRatio[iCurDid], pCtx->pCurDqLayer,
-                             pCtx->pSliceThreading->pSliceConsumeTime[iCurDid]);
+      CalcSliceComplexRatio (pCtx->pSliceThreading->pSliceComplexRatio[iCurDid], pCtx->pCurDqLayer);
 #if defined(MT_DEBUG)
       TrackSliceComplexities (pCtx, iCurDid);
 #endif//#if defined(MT_DEBUG)
@@ -4813,17 +4812,6 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   }
   pMA->WelsFree (pCurLayer->sSliceEncCtx.pCountMbNumInSlice, "pSliceSeg->pCountMbNumInSlice");
   pCurLayer->sSliceEncCtx.pCountMbNumInSlice = pCountMbNumInSlice;
-
-  uint32_t* pSliceConsumeTime = (uint32_t*)pMA->WelsMalloc (iMaxSliceNum * sizeof (uint32_t),
-                                                          "pSliceSeg->pSliceConsumeTime");
-  if (NULL == pSliceConsumeTime) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
-             "CWelsH264SVCEncoder::DynSliceRealloc: realloc pSliceConsumeTime not successful");
-    return ENC_RETURN_MEMALLOCERR;
-  }
-  memcpy (pSliceConsumeTime, pCurLayer->sSliceEncCtx.pSliceConsumeTime, sizeof (int32_t) * iMaxSliceNumOld);
-  pMA->WelsFree (pCurLayer->sSliceEncCtx.pSliceConsumeTime, "pSliceSeg->pSliceConsumeTime");
-  pCurLayer->sSliceEncCtx.pSliceConsumeTime = pSliceConsumeTime;
 
   //deal with rate control variables
   const int32_t kiCurDid = pCtx->uiDependencyId;
