@@ -82,48 +82,12 @@ void UpdateMbListNeighborParallel (SDqLayer* pCurDq,
                                    const int32_t uiSliceIdc) {
   SSliceCtx* pSliceCtx           = &pCurDq->sSliceEncCtx;
   SSlice* pUpdateSlice           = &pCurDq->sLayerInfo.pSliceInLayer[uiSliceIdc];
-  const uint16_t* kpMbMap        = pSliceCtx->pOverallMbMap;
   const int32_t kiMbWidth        = pSliceCtx->iMbWidth;
   int32_t iIdx                   = pUpdateSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice;
   const int32_t kiEndMbInSlice   = iIdx + pSliceCtx->pCountMbNumInSlice[uiSliceIdc] - 1;
 
   do {
-    SMB* pMb                     = &pMbList[iIdx];
-    uint32_t uiNeighborAvailFlag = 0;
-    const int32_t kiMbXY         = pMb->iMbXY;
-    const int32_t kiMbX          = pMb->iMbX;
-    const int32_t kiMbY          = pMb->iMbY;
-    bool     bLeft;
-    bool     bTop;
-    bool     bLeftTop;
-    bool     bRightTop;
-    int32_t   iLeftXY, iTopXY, iLeftTopXY, iRightTopXY;
-
-    iLeftXY = kiMbXY - 1;
-    iTopXY = kiMbXY - kiMbWidth;
-    iLeftTopXY = iTopXY - 1;
-    iRightTopXY = iTopXY + 1;
-
-    bLeft = (kiMbX > 0) && (uiSliceIdc == kpMbMap[iLeftXY]);
-    bTop = (kiMbY > 0) && (uiSliceIdc == kpMbMap[iTopXY]);
-    bLeftTop = (kiMbX > 0) && (kiMbY > 0) && (uiSliceIdc == kpMbMap[iLeftTopXY]);
-    bRightTop = (kiMbX < (kiMbWidth - 1)) && (kiMbY > 0) && (uiSliceIdc == kpMbMap[iRightTopXY]);
-
-    if (bLeft) {
-      uiNeighborAvailFlag |= LEFT_MB_POS;
-    }
-    if (bTop) {
-      uiNeighborAvailFlag |= TOP_MB_POS;
-    }
-    if (bLeftTop) {
-      uiNeighborAvailFlag |= TOPLEFT_MB_POS;
-    }
-    if (bRightTop) {
-      uiNeighborAvailFlag |= TOPRIGHT_MB_POS;
-    }
-    pMb->uiNeighborAvail        = (uint8_t)uiNeighborAvailFlag;
-    pMb->uiSliceIdc             = uiSliceIdc;
-
+    UpdateMbNeighbor(pCurDq, &pMbList[iIdx], kiMbWidth, uiSliceIdc);
     ++ iIdx;
   } while (iIdx <= kiEndMbInSlice);
 }

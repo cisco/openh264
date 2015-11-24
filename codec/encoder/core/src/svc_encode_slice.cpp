@@ -137,6 +137,44 @@ void WelsSliceHeaderExtInit (sWelsEncCtx* pEncCtx, SDqLayer* pCurLayer, SSlice* 
   }
 }
 
+
+void UpdateMbNeighbor(SDqLayer* pCurDq, SMB* pMb, const int32_t kiMbWidth, uint16_t uiSliceIdc) {
+  uint32_t uiNeighborAvailFlag        = 0;
+  const int32_t kiMbXY                = pMb->iMbXY;
+  const int32_t kiMbX                 = pMb->iMbX;
+  const int32_t kiMbY                 = pMb->iMbY;
+  bool     bLeft;
+  bool     bTop;
+  bool     bLeftTop;
+  bool     bRightTop;
+  int32_t   iLeftXY, iTopXY, iLeftTopXY, iRightTopXY;
+
+  pMb->uiSliceIdc = uiSliceIdc;
+  iLeftXY = kiMbXY - 1;
+  iTopXY = kiMbXY - kiMbWidth;
+  iLeftTopXY = iTopXY - 1;
+  iRightTopXY = iTopXY + 1;
+
+  bLeft = (kiMbX > 0) && (uiSliceIdc == WelsMbToSliceIdc (pCurDq, iLeftXY));
+  bTop = (kiMbY > 0) && (uiSliceIdc == WelsMbToSliceIdc (pCurDq, iTopXY));
+  bLeftTop = (kiMbX > 0) && (kiMbY > 0) && (uiSliceIdc == WelsMbToSliceIdc (pCurDq, iLeftTopXY));
+  bRightTop = (kiMbX < (kiMbWidth - 1)) && (kiMbY > 0) && (uiSliceIdc == WelsMbToSliceIdc (pCurDq, iRightTopXY));
+
+  if (bLeft) {
+    uiNeighborAvailFlag |= LEFT_MB_POS;
+  }
+  if (bTop) {
+    uiNeighborAvailFlag |= TOP_MB_POS;
+  }
+  if (bLeftTop) {
+    uiNeighborAvailFlag |= TOPLEFT_MB_POS;
+  }
+  if (bRightTop) {
+    uiNeighborAvailFlag |= TOPRIGHT_MB_POS;
+  }
+  pMb->uiNeighborAvail = (uint8_t)uiNeighborAvailFlag;
+}
+
 /* count MB types if enabled FRAME_INFO_OUTPUT*/
 #if defined(MB_TYPES_CHECK)
 void WelsCountMbType (int32_t (*iMbCount)[18], const EWelsSliceType keSt, const SMB* kpMb) {
@@ -772,42 +810,7 @@ void UpdateMbNeighbourInfoForNextSlice (SDqLayer* pCurDq,
   SMB* pMb = &pMbList[iIdx];
 
   do {
-    uint32_t uiNeighborAvailFlag = 0;
-    const int32_t kiMbXY = pMb->iMbXY;
-    const int32_t kiMbX  = pMb->iMbX;
-    const int32_t kiMbY  = pMb->iMbY;
-    bool     bLeft;
-    bool     bTop;
-    bool     bLeftTop;
-    bool     bRightTop;
-    int32_t   iLeftXY, iTopXY, iLeftTopXY, iRightTopXY;
-    const uint16_t kuiSliceIdc = WelsMbToSliceIdc (pCurDq, kiMbXY);
-
-    pMb->uiSliceIdc = kuiSliceIdc;
-    iLeftXY = kiMbXY - 1;
-    iTopXY = kiMbXY - kiMbWidth;
-    iLeftTopXY = iTopXY - 1;
-    iRightTopXY = iTopXY + 1;
-
-    bLeft = (kiMbX > 0) && (kuiSliceIdc == WelsMbToSliceIdc (pCurDq, iLeftXY));
-    bTop = (kiMbY > 0) && (kuiSliceIdc == WelsMbToSliceIdc (pCurDq, iTopXY));
-    bLeftTop = (kiMbX > 0) && (kiMbY > 0) && (kuiSliceIdc == WelsMbToSliceIdc (pCurDq, iLeftTopXY));
-    bRightTop = (kiMbX < (kiMbWidth - 1)) && (kiMbY > 0) && (kuiSliceIdc == WelsMbToSliceIdc (pCurDq, iRightTopXY));
-
-    if (bLeft) {
-      uiNeighborAvailFlag |= LEFT_MB_POS;
-    }
-    if (bTop) {
-      uiNeighborAvailFlag |= TOP_MB_POS;
-    }
-    if (bLeftTop) {
-      uiNeighborAvailFlag |= TOPLEFT_MB_POS;
-    }
-    if (bRightTop) {
-      uiNeighborAvailFlag |= TOPRIGHT_MB_POS;
-    }
-    pMb->uiNeighborAvail = (uint8_t)uiNeighborAvailFlag;
-
+    UpdateMbNeighbor(pCurDq, pMb, kiMbWidth, WelsMbToSliceIdc (pCurDq, pMb->iMbXY));
     ++ pMb;
     ++ iIdx;
   } while ((iIdx < kiEndMbNeedUpdate) &&
