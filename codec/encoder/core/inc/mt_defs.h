@@ -80,7 +80,6 @@ WELS_EVENT                      pThreadMasterEvent[MAX_THREADS_NUM];    // event
 
 WELS_MUTEX                      mutexSliceNumUpdate;    // for dynamic slicing mode MT
 
-uint32_t*                       pSliceConsumeTime[MAX_DEPENDENCY_LAYER];        // consuming time for each slice, [iSpatialIdx][uiSliceIdx]
 int32_t*                        pSliceComplexRatio[MAX_DEPENDENCY_LAYER]; // *INT_MULTIPLY
 
 #ifdef MT_DEBUG

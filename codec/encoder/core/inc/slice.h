@@ -181,6 +181,7 @@ uint8_t         uiReservedFillByte;     // reserved to meet 4 bytes alignment
 SCabacCtx       sCabacCtx;
 int32_t         iCabacInitIdc;
 int32_t         iMbSkipRun;
+uint32_t        uiSliceConsumeTime;
 } SSlice, *PSlice;
 
 }
