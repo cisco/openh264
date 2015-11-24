@@ -4037,6 +4037,12 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
         pCtx->pTaskManage->ExecuteTasks();
         iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, iSliceCount);
+        if (pCtx->iEncoderError) {
+          WelsLog (pLogCtx, WELS_LOG_ERROR,
+                   "WelsEncoderEncodeExt(), multi-slice (mode %d) encoding error!",
+                   pParam->sSliceArgument.uiSliceMode);
+          return pCtx->iEncoderError;
+        }
       }
       // THREAD_FULLY_FIRE_MODE && SM_SIZELIMITED_SLICE
       else if ((SM_SIZELIMITED_SLICE == pParam->sSliceArgument.uiSliceMode) && (pSvcParam->iMultipleThreadIdc > 1)) {
