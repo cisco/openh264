@@ -703,8 +703,8 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
                &pEventsList[0],
                &pEncPEncCtx->pSliceThreading->pThreadMasterEvent[iEventIdx]); // blocking until at least one event is signalled
     if (WELS_THREAD_ERROR_WAIT_OBJECT_0 == iWaitRet) { // start pSlice coding signal waited
-      int             iLayerIndex  = pEncPEncCtx->pOut->iLayerBsIndex;
-      SFrameBSInfo*   pFrameBsInfo = pPrivateData->pFrameBsInfo;
+      //int             iLayerIndex  = pEncPEncCtx->pOut->iLayerBsIndex;
+      //SFrameBSInfo*   pFrameBsInfo = pPrivateData->pFrameBsInfo;
       //SLayerBSInfo*   pLbi = &pFrameBsInfo->sLayerInfo [iLayerIndex];
 
       const int32_t kiCurDid            = pEncPEncCtx->uiDependencyId;
