@@ -4299,7 +4299,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         && pSvcParam->bUseLoadBalancing
         && pSvcParam->iMultipleThreadIdc > 1 &&
         pSvcParam->iMultipleThreadIdc >= pParam->sSliceArgument.uiSliceNum) {
-      CalcSliceComplexRatio (pCtx->pSliceThreading->pSliceComplexRatio[iCurDid], pCtx->pCurDqLayer);
+      CalcSliceComplexRatio (pCtx->pCurDqLayer);
 #if defined(MT_DEBUG)
       TrackSliceComplexities (pCtx, iCurDid);
 #endif//#if defined(MT_DEBUG)
