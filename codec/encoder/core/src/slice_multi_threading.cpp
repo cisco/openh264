@@ -278,21 +278,10 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
   }
   iRunLen[iSliceIdx] = iMbNumLeft;
   MT_TRACE_LOG (pCtx, WELS_LOG_DEBUG,
-                "[MT] DynamicAdjustSlicing(), iSliceIdx= %d, iSliceComplexRatio= %.2f, slice_run_org= %d, slice_run_adj= %d",
-                iSliceIdx, pSliceInLayer[iSliceIdx].iSliceComplexRatio * 1.0f / INT_MULTIPLY,
-                pSliceInLayer[iSliceIdx].iCountMbNumInSlice, iMbNumLeft);
+                "[MT] DynamicAdjustSlicing(), iSliceIdx= %d, pSliceComplexRatio= %.2f, slice_run_org= %d, slice_run_adj= %d",
+                iSliceIdx, pSliceComplexRatio[iSliceIdx] * 1.0f / INT_MULTIPLY, pSliceCtx->pCountMbNumInSlice[iSliceIdx], iMbNumLeft);
 
-  if (DynamicAdjustSlicePEncCtxAll (pCurDqLayer, iRunLen) == 0) {
-    const int32_t kiThreadNum   = pCtx->pSvcParam->iCountThreadsNum;
-    int32_t iThreadIdx          = 0;
-    do {
-      WelsEventSignal (&pCtx->pSliceThreading->pUpdateMbListEvent[iThreadIdx]);
-      WelsEventSignal (&pCtx->pSliceThreading->pThreadMasterEvent[iThreadIdx]);
-      ++ iThreadIdx;
-    } while (iThreadIdx < kiThreadNum);
-
-    WelsMultipleEventsWaitAllBlocking (kiThreadNum, &pCtx->pSliceThreading->pFinUpdateMbListEvent[0]);
-  }
+  pCurDqLayer->bNeedAdjustingSlicing = !DynamicAdjustSlicePEncCtxAll (pCurDqLayer, iRunLen);
 }
 
 int32_t SetMultiSliceBuffer (sWelsEncCtx** ppCtx, CMemoryAlign* pMa, SSliceThreading* pSmt,

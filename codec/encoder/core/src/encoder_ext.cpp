@@ -1178,6 +1178,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
                                    NULL == pDqLayer->pLastMbIdxOfPartition),
                                   FreeMemorySvc (ppCtx))
     }
+    pDqLayer->bNeedAdjustingSlicing = false;
 
     pDqLayer->iMbWidth  = kiMbW;
     pDqLayer->iMbHeight = kiMbH;
