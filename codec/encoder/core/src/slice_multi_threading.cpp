@@ -821,9 +821,9 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         const int32_t kiFirstMbInPartition      = pPrivateData->iStartMbIndex;  // inclusive
         const int32_t kiEndMbInPartition        = pPrivateData->iEndMbIndex;            // exclusive
         int32_t iAnyMbLeftInPartition           = kiEndMbInPartition - kiFirstMbInPartition;
-        SSliceHeaderExt* pStartSliceHeaderExt   = &pCurDq->sLayerInfo.pSliceInLayer[iSliceIdx].sSliceHeaderExt;
 
         iSliceIdx = pPrivateData->iSliceIndex;
+        SSliceHeaderExt* pStartSliceHeaderExt                   = &pCurDq->sLayerInfo.pSliceInLayer[iSliceIdx].sSliceHeaderExt;
         pStartSliceHeaderExt->sSliceHeader.iFirstMbInSlice      = kiFirstMbInPartition;
         pCurDq->pNumSliceCodedOfPartition[kiPartitionId]        =
           1;    // one pSlice per partition intialized, dynamic slicing inside
