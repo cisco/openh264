@@ -604,23 +604,19 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
         pSliceBs = &pCtx->pSliceBs[iSliceIdx];
         if (pSliceBs != NULL && pSliceBs->uiBsPos > 0) {
           if (iSliceIdx > 0) {
-            int32_t iNalIdx = 0;
-            const int32_t iCountNal = pSliceBs->iNalIndex;
-
             memmove (pCtx->pFrameBs + pCtx->iPosBsBuffer, pSliceBs->pBs, pSliceBs->uiBsPos); // confirmed_safe_unsafe_usage
             pCtx->iPosBsBuffer += pSliceBs->uiBsPos;
-
-            iLayerSize += pSliceBs->uiBsPos;
-
-            while (iNalIdx < iCountNal) {
-              pLbi->pNalLengthInByte[iNalIdxBase + iNalIdx] = pSliceBs->iNalLen[iNalIdx];
-              ++ iNalIdx;
-            }
-            pLbi->iNalCount += iCountNal;
-            iNalIdxBase     += iCountNal;
-          } else {
-            iLayerSize += pSliceBs->uiBsPos;
           }
+
+          const int32_t iCountNal = pSliceBs->iNalIndex;
+          iLayerSize += pSliceBs->uiBsPos;
+          int32_t iNalIdx = 0;
+          while (iNalIdx < iCountNal) {
+            pLbi->pNalLengthInByte[iNalIdxBase + iNalIdx] = pSliceBs->iNalLen[iNalIdx];
+            ++ iNalIdx;
+          }
+          pLbi->iNalCount += iCountNal;
+          iNalIdxBase     += iCountNal;
         }
 
         iSliceIdx += kiPartitionCnt;
@@ -707,9 +703,9 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
                &pEventsList[0],
                &pEncPEncCtx->pSliceThreading->pThreadMasterEvent[iEventIdx]); // blocking until at least one event is signalled
     if (WELS_THREAD_ERROR_WAIT_OBJECT_0 == iWaitRet) { // start pSlice coding signal waited
-      int             iLayerIndex  = pEncPEncCtx->pOut->iLayerBsIndex;
-      SFrameBSInfo*   pFrameBsInfo = pPrivateData->pFrameBsInfo;
-      SLayerBSInfo*   pLbi = &pFrameBsInfo->sLayerInfo [iLayerIndex];
+      //int             iLayerIndex  = pEncPEncCtx->pOut->iLayerBsIndex;
+      //SFrameBSInfo*   pFrameBsInfo = pPrivateData->pFrameBsInfo;
+      //SLayerBSInfo*   pLbi = &pFrameBsInfo->sLayerInfo [iLayerIndex];
 
       const int32_t kiCurDid            = pEncPEncCtx->uiDependencyId;
       SWelsSvcCodingParam* pCodingParam = pEncPEncCtx->pSvcParam;
@@ -874,29 +870,18 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 
           WelsUnloadNalForSlice (pSliceBs);
 
+          int32_t iLeftBufferSize = (iSliceIdx > 0) ? (pSliceBs->uiSize - pSliceBs->uiBsPos) : (pEncPEncCtx->iFrameBsSize - pEncPEncCtx->iPosBsBuffer);
+          iReturn = WriteSliceBs (pEncPEncCtx, pSliceBs->pBs, &pSliceBs->iNalLen[0],
+                                    iLeftBufferSize,
+                                    iSliceIdx, iSliceSize);
+          if (ENC_RETURN_SUCCESS != iReturn) {
+            uiThrdRet = iReturn;
+            WELS_THREAD_SIGNAL_AND_BREAK (pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
+                                          pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
+                                          iEventIdx);
+          }
           if (0 == iSliceIdx) {
-            iReturn = WriteSliceBs (pEncPEncCtx, pLbi->pBsBuf,
-                                    &pLbi->pNalLengthInByte[pLbi->iNalCount],
-                                    pEncPEncCtx->iFrameBsSize - pEncPEncCtx->iPosBsBuffer,
-                                    iSliceIdx, iSliceSize);
-            pLbi->iNalCount    += pSliceBs->iNalIndex;
-            if (ENC_RETURN_SUCCESS != iReturn) {
-              uiThrdRet = iReturn;
-              WELS_THREAD_SIGNAL_AND_BREAK (pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
-                                            pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
-                                            iEventIdx);
-            }
             pEncPEncCtx->iPosBsBuffer += iSliceSize;
-          } else {
-            iReturn = WriteSliceBs (pEncPEncCtx, pSliceBs->pBs, &pSliceBs->iNalLen[0],
-                                    pSliceBs->uiSize - pSliceBs->uiBsPos,
-                                    iSliceIdx, iSliceSize);
-            if (ENC_RETURN_SUCCESS != iReturn) {
-              uiThrdRet = iReturn;
-              WELS_THREAD_SIGNAL_AND_BREAK (pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
-                                            pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
-                                            iEventIdx);
-            }
           }
 
           pEncPEncCtx->pFuncList->pfDeblocking.pfDeblockingFilterSlice (pCurDq, pEncPEncCtx->pFuncList, iSliceIdx);
