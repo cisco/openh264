@@ -920,6 +920,12 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
 
   WELS_READ_VERIFY (BsGetBits (pBs, 8, &uiCode)); //profile_idc
   uiProfileIdc = uiCode;
+  if (uiProfileIdc != PRO_BASELINE && uiProfileIdc != PRO_MAIN && uiProfileIdc != PRO_SCALABLE_BASELINE
+      && uiProfileIdc != PRO_SCALABLE_HIGH
+      && uiProfileIdc != PRO_EXTENDED && uiProfileIdc != PRO_HIGH) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "SPS ID can not be supported!\n");
+    return false;
+  }
   WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //constraint_set0_flag
   bConstraintSetFlags[0] = !!uiCode;
   WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //constraint_set1_flag
