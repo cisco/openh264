@@ -417,9 +417,8 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
     if ((pCodingParam->uiMaxNalSize != 0) && (pSpatialLayer->sSliceArgument.uiSliceMode != SM_SIZELIMITED_SLICE)) {
-      WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid uiSliceMode (%d) settings!,MaxNalSize = %d",
+      WelsLog (pLogCtx, WELS_LOG_WARNING, "ParamValidationExt(), current layer %d uiSliceMode (%d) settings may not fulfill MaxNalSize = %d", i,
                pSpatialLayer->sSliceArgument.uiSliceMode, pCodingParam->uiMaxNalSize);
-      return ENC_RETURN_UNSUPPORTED_PARA;
     }
     CheckProfileSetting (pLogCtx, pCodingParam, i, pSpatialLayer->uiProfileIdc);
     CheckLevelSetting (pLogCtx, pCodingParam, i, pSpatialLayer->uiLevelIdc);
@@ -565,21 +564,22 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
 
-      if (pCodingParam->uiMaxNalSize < (NAL_HEADER_ADD_0X30BYTES + MAX_MACROBLOCK_SIZE_IN_BYTE)) {
-        WelsLog (pLogCtx, WELS_LOG_ERROR,
-                 "ParamValidationExt(), invalid uiMaxNalSize (%d) settings! should be larger than (NAL_HEADER_ADD_0X30BYTES + MAX_MACROBLOCK_SIZE_IN_BYTE)(%d)",
-                 pCodingParam->uiMaxNalSize, (NAL_HEADER_ADD_0X30BYTES + MAX_MACROBLOCK_SIZE_IN_BYTE));
-        return ENC_RETURN_UNSUPPORTED_PARA;
-      }
+      if (pCodingParam->uiMaxNalSize > 0) {
+        if (pCodingParam->uiMaxNalSize < (NAL_HEADER_ADD_0X30BYTES + MAX_MACROBLOCK_SIZE_IN_BYTE)) {
+          WelsLog (pLogCtx, WELS_LOG_ERROR,
+                   "ParamValidationExt(), invalid uiMaxNalSize (%d) settings! should be larger than (NAL_HEADER_ADD_0X30BYTES + MAX_MACROBLOCK_SIZE_IN_BYTE)(%d)",
+                   pCodingParam->uiMaxNalSize, (NAL_HEADER_ADD_0X30BYTES + MAX_MACROBLOCK_SIZE_IN_BYTE));
+          return ENC_RETURN_UNSUPPORTED_PARA;
+        }
 
-      if (pSpatialLayer->sSliceArgument.uiSliceSizeConstraint > (pCodingParam->uiMaxNalSize -
+        if (pSpatialLayer->sSliceArgument.uiSliceSizeConstraint > (pCodingParam->uiMaxNalSize -
           NAL_HEADER_ADD_0X30BYTES)) {
-        WelsLog (pLogCtx, WELS_LOG_WARNING,
+          WelsLog (pLogCtx, WELS_LOG_WARNING,
                  "ParamValidationExt(), slice mode = SM_SIZELIMITED_SLICE, uiSliceSizeConstraint = %d ,uiMaxNalsize = %d, will take uiMaxNalsize!",
                  pSpatialLayer->sSliceArgument.uiSliceSizeConstraint, pCodingParam->uiMaxNalSize);
-        pSpatialLayer->sSliceArgument.uiSliceSizeConstraint =  pCodingParam->uiMaxNalSize - NAL_HEADER_ADD_0X30BYTES;
+          pSpatialLayer->sSliceArgument.uiSliceSizeConstraint =  pCodingParam->uiMaxNalSize - NAL_HEADER_ADD_0X30BYTES;
+        }
       }
-
     }
     break;
     default: {
