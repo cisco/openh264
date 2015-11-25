@@ -304,13 +304,13 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
 
     iVal = * ((int*)pOption); // int value for error concealment idc
     iVal = WELS_CLIP3 (iVal, (int32_t) ERROR_CON_DISABLE, (int32_t) ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE);
-    m_pDecContext->pParam->eEcActiveIdc = m_pDecContext->eErrorConMethod = (ERROR_CON_IDC) iVal;
-    if ((m_pDecContext->bParseOnly) && (m_pDecContext->eErrorConMethod != ERROR_CON_DISABLE)) {
+    if ((m_pDecContext->bParseOnly) && (iVal != (int32_t) ERROR_CON_DISABLE)) {
       WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
                "CWelsDecoder::SetOption for ERROR_CON_IDC = %d not allowd for parse only!.", iVal);
       return cmInitParaError;
     }
 
+    m_pDecContext->pParam->eEcActiveIdc = m_pDecContext->eErrorConMethod = (ERROR_CON_IDC) iVal;
     InitErrorCon (m_pDecContext);
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "CWelsDecoder::SetOption for ERROR_CON_IDC = %d.", iVal);
@@ -438,6 +438,11 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     const int kiSrcLen,
     unsigned char** ppDst,
     SBufferInfo* pDstInfo) {
+  if (m_pDecContext->bParseOnly) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "bParseOnly should be false for this API calling! \n");
+    m_pDecContext->iErrorCode |= dsInvalidArgument;
+    return dsInvalidArgument;
+  }
   if (CheckBsBuffer (m_pDecContext, kiSrcLen)) {
     return dsOutOfMemory;
   }
@@ -578,6 +583,11 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
     const int kiSrcLen,
     SParserBsInfo* pDstInfo) {
+  if (!m_pDecContext->bParseOnly) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "bParseOnly should be true for this API calling! \n");
+    m_pDecContext->iErrorCode |= dsInvalidArgument;
+    return dsInvalidArgument;
+  }
   if (CheckBsBuffer (m_pDecContext, kiSrcLen)) {
     return dsOutOfMemory;
   }
