@@ -86,7 +86,6 @@ int16_t                 iMbHeight;              /* height of picture size in mb 
 int32_t                 iSliceNumInFrame;       /* count number of slices in frame; */
 int32_t                 iMbNumInFrame;          /* count number of MBs in frame */
 uint16_t*               pOverallMbMap;          /* overall MB map in frame, store virtual slice idc; */
-int32_t*                pCountMbNumInSlice;     /* count number of MBs in every slice respectively; */
 uint32_t                uiSliceSizeConstraint;  /* in byte */
 int32_t                 iMaxSliceNumConstraint; /* maximal number of slices constraint */
 

@@ -2766,18 +2766,18 @@ void UpdateSlicepEncCtxWithPartition (SDqLayer* pCurDq, int32_t iPartitionNum) {
   i = 0;
   while (i < iPartitionNum) {
     if (i + 1 == iPartitionNum) {
-      pSliceCtx->pCountMbNumInSlice[i] = iAssignableMbLeft;
+      pSliceInLayer[i].iCountMbNumInSlice = iAssignableMbLeft;
     } else {
-      pSliceCtx->pCountMbNumInSlice[i] = iCountMbNumPerPartition;
+      pSliceInLayer[i].iCountMbNumInSlice = iCountMbNumPerPartition;
     }
     pSliceInLayer[i].sSliceHeaderExt.sSliceHeader.iFirstMbInSlice = iFirstMbIdx;
 
     WelsSetMemMultiplebytes_c (pSliceCtx->pOverallMbMap + iFirstMbIdx, i,
-                               pSliceCtx->pCountMbNumInSlice[i], sizeof (uint16_t));
+                               pSliceInLayer[i].iCountMbNumInSlice, sizeof (uint16_t));
 
     // for next partition(or pSlice)
-    iFirstMbIdx += pSliceCtx->pCountMbNumInSlice[i];
-    iAssignableMbLeft -= pSliceCtx->pCountMbNumInSlice[i];
+    iFirstMbIdx       += pSliceInLayer[i].iCountMbNumInSlice;
+    iAssignableMbLeft -= pSliceInLayer[i].iCountMbNumInSlice;
     ++ i;
   }
 }
@@ -4803,21 +4803,6 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   }
   pMA->WelsFree (pCurLayer->sLayerInfo.pSliceInLayer, "Slice");
   pCurLayer->sLayerInfo.pSliceInLayer = pSlice;
-  int32_t* pCountMbNumInSlice = (int32_t*)pMA->WelsMalloc (iMaxSliceNum * sizeof (int32_t),
-                                "pSliceSeg->pCountMbNumInSlice");
-  if (NULL == pCountMbNumInSlice) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
-             "CWelsH264SVCEncoder::DynSliceRealloc: realloc pCountMbNumInSlice not successful");
-    return ENC_RETURN_MEMALLOCERR;
-  }
-  memcpy (pCountMbNumInSlice, pCurLayer->sSliceEncCtx.pCountMbNumInSlice, sizeof (int32_t) * iMaxSliceNumOld);
-  uiSliceIdx = iMaxSliceNumOld;
-  while (uiSliceIdx < iMaxSliceNum) {
-    pCountMbNumInSlice[uiSliceIdx] = pCurLayer->sSliceEncCtx.iMbNumInFrame;
-    uiSliceIdx++;
-  }
-  pMA->WelsFree (pCurLayer->sSliceEncCtx.pCountMbNumInSlice, "pSliceSeg->pCountMbNumInSlice");
-  pCurLayer->sSliceEncCtx.pCountMbNumInSlice = pCountMbNumInSlice;
 
   //deal with rate control variables
   const int32_t kiCurDid = pCtx->uiDependencyId;
@@ -4837,7 +4822,7 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
     pSORC->iCalculatedQpSlice = pCtx->iGlobalQp;
     pSORC->iTotalQpSlice    = 0;
     pSORC->iTotalMbSlice    = 0;
-    pSORC->iTargetBitsSlice = WELS_DIV_ROUND (kiBitsPerMb * pCurLayer->sSliceEncCtx.pCountMbNumInSlice[uiSliceIdx],
+    pSORC->iTargetBitsSlice = WELS_DIV_ROUND (kiBitsPerMb * pCurLayer->sLayerInfo.pSliceInLayer[uiSliceIdx].iCountMbNumInSlice,
                               INT_MULTIPLY);
     pSORC->iFrameBitsSlice  = 0;
     pSORC->iGomBitsSlice    = 0;

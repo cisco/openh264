@@ -224,7 +224,7 @@ void CWelsLoadBalancingSlicingEncodingTask::FinishTask() {
            m_pSlice->uiSliceConsumeTime,
            m_iSliceSize,
            m_pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[m_iSliceIdx].sSliceHeaderExt.sSliceHeader.iFirstMbInSlice,
-           m_pCtx->pCurDqLayer->sSliceEncCtx.pCountMbNumInSlice[m_iSliceIdx]);
+           m_pSlice->iCountMbNumInSlice);
 }
 
 

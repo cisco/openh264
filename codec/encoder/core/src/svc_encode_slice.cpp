@@ -617,7 +617,7 @@ TRY_REENCODING:
     iNextMbIdx = WelsGetNextMbOfSlice (pCurLayer, iCurMbIdx);
     //whether all of MB in current pSlice encoded or not
     if (iNextMbIdx == -1 || iNextMbIdx >= kiTotalNumMb || iNumMbCoded >= kiTotalNumMb) {
-      pSliceCtx->pCountMbNumInSlice[kiSliceIdx] = iCurMbIdx - pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId];
+      pSlice->iCountMbNumInSlice = iCurMbIdx - pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId];
       pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId] =
         iCurMbIdx; // update pLastCodedMbIdxOfPartition, finish coding, use iCurMbIdx directly
       break;

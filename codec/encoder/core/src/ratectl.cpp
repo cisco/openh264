@@ -511,7 +511,6 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
 }
 
 void RcInitSliceInformation (sWelsEncCtx* pEncCtx) {
-  SSliceCtx* pCurSliceCtx       = &pEncCtx->pCurDqLayer->sSliceEncCtx;
   SSlice* pSliceInLayer         = pEncCtx->pCurDqLayer->sLayerInfo.pSliceInLayer;
   SWelsSvcRc* pWelsSvcRc        = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   SRCSlicing* pSOverRc          = &pWelsSvcRc->pSlicingOverRc[0];
@@ -522,10 +521,10 @@ void RcInitSliceInformation (sWelsEncCtx* pEncCtx) {
   for (int32_t i = 0; i < kiSliceNum; i++) {
     pSOverRc->iStartMbSlice     =
       pSOverRc->iEndMbSlice     = pSliceInLayer[i].sSliceHeaderExt.sSliceHeader.iFirstMbInSlice;
-    pSOverRc->iEndMbSlice      += (pCurSliceCtx->pCountMbNumInSlice[i] - 1);
+    pSOverRc->iEndMbSlice      += (pSliceInLayer[i].iCountMbNumInSlice - 1);
     pSOverRc->iTotalQpSlice     = 0;
     pSOverRc->iTotalMbSlice     = 0;
-    pSOverRc->iTargetBitsSlice  = WELS_DIV_ROUND (kiBitsPerMb * pCurSliceCtx->pCountMbNumInSlice[i], INT_MULTIPLY);
+    pSOverRc->iTargetBitsSlice  = WELS_DIV_ROUND (kiBitsPerMb * pSliceInLayer[i].iCountMbNumInSlice, INT_MULTIPLY);
     pSOverRc->iFrameBitsSlice   = 0;
     pSOverRc->iGomBitsSlice     = 0;
     ++ pSOverRc;
