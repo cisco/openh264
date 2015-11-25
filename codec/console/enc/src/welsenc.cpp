@@ -312,6 +312,10 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
           fprintf (stderr, "Invalid max overall bitrate setting due to RC enabled. Check MaxOverallBitrate field please!\n");
           return 1;
         }
+      } else if (strTag[0].compare ("MaxQp") == 0) {
+          pSvcParam.iMaxQp = atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("MinQp") == 0) {
+          pSvcParam.iMinQp = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("EnableDenoise") == 0) {
         pSvcParam.bEnableDenoise = atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableSceneChangeDetection") == 0) {
@@ -403,6 +407,8 @@ void PrintHelp() {
   printf ("  -rc          rate control mode: 0-quality mode; 1-bitrate mode; 2-bitrate limited mode; -1-rc off \n");
   printf ("  -tarb        Overall target bitrate\n");
   printf ("  -maxbrTotal  Overall max bitrate\n");
+  printf ("  -maxqp       Maximum Qp\n");
+  printf ("  -minqp       Minimum Qp\n");
   printf ("  -numl        Number Of Layers: Must exist with layer_cfg file and the number of input layer_cfg file must equal to the value set by this command\n");
   printf ("  The options below are layer-based: (need to be set with layer id)\n");
   printf ("  -lconfig     (Layer) (spatial layer configure file)\n");
@@ -529,6 +535,12 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
 
     else if (!strcmp (pCommand, "-maxbrTotal") && (n < argc))
       pSvcParam.iMaxBitrate = 1000 * atoi (argv[n++]);
+
+    else if (!strcmp (pCommand, "-maxqp") && (n < argc))
+        pSvcParam.iMaxQp = atoi (argv[n++]);
+
+    else if (!strcmp (pCommand, "-minqp") && (n < argc))
+        pSvcParam.iMinQp = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-numl") && (n < argc)) {
       pSvcParam.iSpatialLayerNum = atoi (argv[n++]);
