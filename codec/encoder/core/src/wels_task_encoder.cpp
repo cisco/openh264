@@ -165,8 +165,7 @@ WelsErrorType CWelsSliceEncodingTask::ExecuteTask() {
   WelsUnloadNalForSlice (m_pSliceBs);
 
   m_iSliceSize = 0;
-  iReturn      = WriteSliceBs (m_pCtx, m_pSliceBs, m_iSliceIdx);
-  m_iSliceSize = m_pSliceBs->uiBsPos;
+  iReturn      = WriteSliceBs (m_pCtx, m_pSliceBs, m_iSliceIdx, m_iSliceSize);
 
   if (ENC_RETURN_SUCCESS != iReturn) {
     WelsLog (&m_pCtx->sLogCtx, WELS_LOG_WARNING,

@@ -628,12 +628,11 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
   return iLayerSize;
 }
 
-int32_t WriteSliceBs (sWelsEncCtx* pCtx,SWelsSliceBs* pSliceBs,const int32_t iSliceIdx) {
+int32_t WriteSliceBs (sWelsEncCtx* pCtx,SWelsSliceBs* pSliceBs,const int32_t iSliceIdx,int32_t& iSliceSize) {
   const int32_t kiNalCnt        = pSliceBs->iNalIndex;
   int32_t iNalIdx               = 0;
   int32_t iNalSize              = 0;
   int32_t iReturn               = ENC_RETURN_SUCCESS;
-  int32_t iSliceSize            = 0;
   int32_t iTotalLeftLength      = (iSliceIdx > 0) ? (pSliceBs->uiSize - pSliceBs->uiBsPos)
                                   : (pCtx->iFrameBsSize - pCtx->iPosBsBuffer);
   SNalUnitHeaderExt* pNalHdrExt = &pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt;
@@ -643,6 +642,7 @@ int32_t WriteSliceBs (sWelsEncCtx* pCtx,SWelsSliceBs* pSliceBs,const int32_t iSl
   if (kiNalCnt > 2)
     return 0;
 
+  iSliceSize = 0;
   while (iNalIdx < kiNalCnt) {
     iNalSize = 0;
     iReturn = WelsEncodeNal (&pSliceBs->sNalList[iNalIdx], pNalHdrExt, iTotalLeftLength - iSliceSize,
@@ -760,8 +760,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 
         WelsUnloadNalForSlice (pSliceBs);
 
-        iReturn    = WriteSliceBs (pEncPEncCtx, pSliceBs, iSliceIdx);
-        iSliceSize = pSliceBs->uiBsPos;
+        iReturn    = WriteSliceBs (pEncPEncCtx, pSliceBs, iSliceIdx, iSliceSize);
         if (ENC_RETURN_SUCCESS != iReturn) {
           uiThrdRet = iReturn;
           WELS_THREAD_SIGNAL_AND_BREAK (pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
@@ -863,8 +862,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 
           WelsUnloadNalForSlice (pSliceBs);
 
-          iReturn    = WriteSliceBs (pEncPEncCtx, pSliceBs, iSliceIdx);
-          iSliceSize = pSliceBs->uiBsPos;
+          iReturn    = WriteSliceBs (pEncPEncCtx, pSliceBs, iSliceIdx, iSliceSize);
           if (ENC_RETURN_SUCCESS != iReturn) {
             uiThrdRet = iReturn;
             WELS_THREAD_SIGNAL_AND_BREAK (pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
