@@ -3507,7 +3507,7 @@ int32_t GetSubSequenceId (sWelsEncCtx* pCtx, EVideoFrameType eFrameType) {
 // writing parasets for (simulcast) svc
 int32_t WriteSsvcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
                           SLayerBSInfo*& pLayerBsInfo, int32_t& iLayerNum, int32_t& iFrameSize) {
-  int32_t iNonVclSize = 0, iCountNal = 0, iReturn = 0;
+  int32_t iNonVclSize = 0, iCountNal = 0, iReturn = ENC_RETURN_SUCCESS;
   iReturn = WelsWriteParameterSets (pCtx, &pLayerBsInfo->pNalLengthInByte[0], &iCountNal, &iNonVclSize);
   WELS_VERIFY_RETURN_IFNEQ (iReturn, ENC_RETURN_SUCCESS)
 
@@ -3532,7 +3532,7 @@ int32_t WriteSsvcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
 // writing parasets for simulcast avc
 int32_t WriteSavcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
                           SLayerBSInfo*& pLayerBsInfo, int32_t& iLayerNum, int32_t& iFrameSize) {
-  int32_t iNonVclSize = 0, iCountNal = 0, iReturn;
+  int32_t iNonVclSize = 0, iCountNal = 0, iReturn = ENC_RETURN_SUCCESS;
 
   // write SPS
   iNonVclSize = 0;
@@ -3542,7 +3542,9 @@ int32_t WriteSavcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
   for (int32_t iIdx = 0; iIdx < pCtx->iSpsNum; iIdx++) {
     //writing one NAL
     int32_t iNalSize = 0;
-    iReturn = WelsWriteOneSPS (pCtx, iIdx, iNalSize);
+    iCountNal        = 0;
+
+    iReturn          = WelsWriteOneSPS (pCtx, iIdx, iNalSize);
     WELS_VERIFY_RETURN_IFNEQ (iReturn, ENC_RETURN_SUCCESS)
 
     pLayerBsInfo->pNalLengthInByte[iCountNal] = iNalSize;
@@ -3562,7 +3564,6 @@ int32_t WriteSavcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
     pLayerBsInfo->pBsBuf           = pCtx->pFrameBs + pCtx->iPosBsBuffer;
     pLayerBsInfo->pNalLengthInByte = (pLayerBsInfo - 1)->pNalLengthInByte + iCountNal;
     //update for external countings
-    iCountNal = 0;
     ++ iLayerNum;
 
   }
@@ -3574,7 +3575,9 @@ int32_t WriteSavcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
   for (int32_t iIdx = 0; iIdx < pCtx->iPpsNum; iIdx++) {
     //writing one NAL
     int32_t iNalSize = 0;
-    iReturn = WelsWriteOnePPS (pCtx, iIdx, iNalSize);
+    iCountNal        = 0;
+
+    iReturn          = WelsWriteOnePPS (pCtx, iIdx, iNalSize);
     WELS_VERIFY_RETURN_IFNEQ (iReturn, ENC_RETURN_SUCCESS)
 
     pLayerBsInfo->pNalLengthInByte[iCountNal] = iNalSize;
@@ -3594,7 +3597,6 @@ int32_t WriteSavcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
     pLayerBsInfo->pBsBuf           = pCtx->pFrameBs + pCtx->iPosBsBuffer;
     pLayerBsInfo->pNalLengthInByte = (pLayerBsInfo - 1)->pNalLengthInByte + iCountNal;
     //update for external countings
-    iCountNal = 0;
     ++ iLayerNum;
   }
 
@@ -3612,7 +3614,7 @@ int32_t WriteSavcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
 //cover the logic of simulcast avc + sps_pps_listing
 int32_t WriteSavcParaset_Listing (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
                                   SLayerBSInfo*& pLayerBsInfo, int32_t& iLayerNum, int32_t& iFrameSize) {
-  int32_t iNonVclSize = 0, iCountNal = 0, iReturn;
+  int32_t iNonVclSize = 0, iCountNal = 0, iReturn = ENC_RETURN_SUCCESS;
 
   // write SPS
   iNonVclSize = 0;
@@ -3643,7 +3645,6 @@ int32_t WriteSavcParaset_Listing (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
     pLayerBsInfo->pBsBuf           = pCtx->pFrameBs + pCtx->iPosBsBuffer;
     pLayerBsInfo->pNalLengthInByte = (pLayerBsInfo - 1)->pNalLengthInByte + iCountNal;
     //update for external countings
-    iCountNal = 0;
     ++ iLayerNum;
   }
 
@@ -3679,7 +3680,6 @@ int32_t WriteSavcParaset_Listing (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
     pLayerBsInfo->pBsBuf           = pCtx->pFrameBs + pCtx->iPosBsBuffer;
     pLayerBsInfo->pNalLengthInByte = (pLayerBsInfo - 1)->pNalLengthInByte + iCountNal;
     //update for external countings
-    iCountNal = 0;
     ++ iLayerNum;
   }
 
