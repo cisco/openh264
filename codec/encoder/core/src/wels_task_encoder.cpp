@@ -165,12 +165,8 @@ WelsErrorType CWelsSliceEncodingTask::ExecuteTask() {
   WelsUnloadNalForSlice (m_pSliceBs);
 
   m_iSliceSize = 0;
-  int32_t iLeftBufferSize = (m_iSliceIdx > 0) ? (m_pSliceBs->uiSize - (int32_t) (m_pSliceBs->sBsWrite.pCurBuf -
-                            m_pSliceBs->sBsWrite.pStartBuf)) : (m_pCtx->iFrameBsSize - m_pCtx->iPosBsBuffer);
-  iReturn = WriteSliceBs (m_pCtx, m_pSliceBs->pBs,
-                          &m_pSliceBs->iNalLen[0],
-                          iLeftBufferSize,
-                          m_iSliceIdx, m_iSliceSize);
+  iReturn      = WriteSliceBs (m_pCtx, m_pSliceBs, m_iSliceIdx, m_iSliceSize);
+
   if (ENC_RETURN_SUCCESS != iReturn) {
     WelsLog (&m_pCtx->sLogCtx, WELS_LOG_WARNING,
              "[MT] CWelsSliceEncodingTask ExecuteTask(), WriteSliceBs not successful: coding_idx %d, um_iSliceIdx %d",

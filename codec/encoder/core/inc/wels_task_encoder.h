@@ -49,7 +49,7 @@ namespace WelsEnc {
 extern int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFrameBsBuffer,
                                     const int32_t iSliceIdx,
                                     int32_t& iSliceSize);
-extern int32_t WriteSliceBs (sWelsEncCtx* pCtx, uint8_t* pSliceBsBuf, const int32_t iSliceIdx, int32_t& iSliceSize);
+extern int32_t WriteSliceBs (sWelsEncCtx* pCtx,SWelsSliceBs* pSliceBs,const int32_t iSliceIdx, int32_t& iSliceSize);
 
 class CWelsSliceEncodingTask : public CWelsBaseTask {
  public:
