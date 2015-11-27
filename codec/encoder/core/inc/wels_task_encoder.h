@@ -132,7 +132,7 @@ class CWelsUpdateMbMapTask : public CWelsBaseTask {
   virtual WelsErrorType Execute();
 
   virtual uint32_t        GetTaskType() const {
-    return WELS_ENC_TASK_PREENCODING;
+    return WELS_ENC_TASK_UPDATEMBMAP;
   }
  protected:
   sWelsEncCtx* m_pCtx;
