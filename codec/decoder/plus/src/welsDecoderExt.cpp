@@ -243,6 +243,7 @@ int32_t CWelsDecoder::InitDecoder (const SDecodingParam* pParam) {
            "CWelsDecoder::init_decoder(), openh264 codec version = %s, ParseOnly = %d",
            VERSION_NUMBER, (int32_t)pParam->bParseOnly);
 
+  //reset decoder context
   if (m_pDecContext) //free
     UninitDecoder();
   m_pDecContext = (PWelsDecoderContext)WelsMallocz (sizeof (SWelsDecoderContext), "m_pDecContext");
@@ -252,8 +253,8 @@ int32_t CWelsDecoder::InitDecoder (const SDecodingParam* pParam) {
   m_pDecContext->pMemAlign = new CMemoryAlign (iCacheLineSize);
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == m_pDecContext->pMemAlign), UninitDecoder())
 
-  WELS_VERIFY_RETURN_PROC_IF (cmInitParaError, WelsInitDecoder (m_pDecContext, pParam->bParseOnly,
-                              &m_pWelsTrace->m_sLogCtx), UninitDecoder())
+  //fill in default value into context
+  WelsDecoderDefaults (m_pDecContext, &m_pWelsTrace->m_sLogCtx);
 
   //check param and update decoder context
   m_pDecContext->pParam = (SDecodingParam*) m_pDecContext->pMemAlign->WelsMallocz (sizeof (SDecodingParam),
@@ -261,6 +262,9 @@ int32_t CWelsDecoder::InitDecoder (const SDecodingParam* pParam) {
   WELS_VERIFY_RETURN_PROC_IF (cmMallocMemeError, (NULL == m_pDecContext->pParam), UninitDecoder());
   int32_t iRet = DecoderConfigParam (m_pDecContext, pParam);
   WELS_VERIFY_RETURN_IFNEQ (iRet, cmResultSuccess);
+
+  //init decoder
+  WELS_VERIFY_RETURN_PROC_IF (cmInitParaError, WelsInitDecoder (m_pDecContext, &m_pWelsTrace->m_sLogCtx), UninitDecoder())
 
   return cmResultSuccess;
 }
@@ -304,7 +308,7 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
 
     iVal = * ((int*)pOption); // int value for error concealment idc
     iVal = WELS_CLIP3 (iVal, (int32_t) ERROR_CON_DISABLE, (int32_t) ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE);
-    if ((m_pDecContext->bParseOnly) && (iVal != (int32_t) ERROR_CON_DISABLE)) {
+    if ((m_pDecContext->pParam->bParseOnly) && (iVal != (int32_t) ERROR_CON_DISABLE)) {
       WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
                "CWelsDecoder::SetOption for ERROR_CON_IDC = %d not allowd for parse only!.", iVal);
       return cmInitParaError;
@@ -438,7 +442,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     const int kiSrcLen,
     unsigned char** ppDst,
     SBufferInfo* pDstInfo) {
-  if (m_pDecContext->bParseOnly) {
+  if (m_pDecContext->pParam->bParseOnly) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "bParseOnly should be false for this API calling! \n");
     m_pDecContext->iErrorCode |= dsInvalidArgument;
     return dsInvalidArgument;
@@ -583,7 +587,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
     const int kiSrcLen,
     SParserBsInfo* pDstInfo) {
-  if (!m_pDecContext->bParseOnly) {
+  if (!m_pDecContext->pParam->bParseOnly) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "bParseOnly should be true for this API calling! \n");
     m_pDecContext->iErrorCode |= dsInvalidArgument;
     return dsInvalidArgument;

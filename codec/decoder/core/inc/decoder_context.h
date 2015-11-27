@@ -375,7 +375,6 @@ typedef struct TagWelsDecoderContext {
   ERROR_CON_IDC eErrorConMethod; //
 
 //for Parse only
-  bool bParseOnly;
   bool bFramePending;
   bool bFrameFinish;
   int32_t iNalNum;
