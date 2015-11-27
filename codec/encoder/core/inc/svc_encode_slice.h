@@ -50,6 +50,7 @@ namespace WelsEnc {
 void WelsCountMbType (int32_t (*iMbCount)[18], const EWelsSliceType eSt, const SMB* pMb);
 #endif
 
+void UpdateMbNeighbor(SDqLayer* pCurDq, SMB* pMb, const int32_t kiMbWidth, uint16_t uiSliceIdc);
 
 void UpdateNonZeroCountCache (SMB* pMb, SMbCache* pMbCache);
 
