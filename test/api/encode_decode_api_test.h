@@ -5,7 +5,6 @@
 #include "BaseDecoderTest.h"
 #include "BaseEncoderTest.h"
 #include "wels_common_defs.h"
-#include "utils/HashFunctions.h"
 #include <string>
 #include <vector>
 using namespace WelsCommon;
@@ -65,11 +64,6 @@ static void welsStderrTraceOrigin (void* ctx, int level, const char* string) {
 typedef struct STrace_Unit {
   int iTarLevel;
 } STraceUnit;
-
-static void TestOutPutTrace (void* ctx, int level, const char* string) {
-  STraceUnit* pTraceUnit = (STraceUnit*) ctx;
-  EXPECT_LE (level, pTraceUnit->iTarLevel);
-}
 
 class EncodeDecodeTestBase : public BaseEncoderTest, public BaseDecoderTest {
  public:
@@ -160,4 +154,14 @@ class EncodeDecodeTestAPI : public ::testing::TestWithParam<EncodeDecodeFilePara
 };
 
 
+bool ToRemainDidNal (const unsigned char* pSrc, EWelsNalUnitType eNalType, int iTarDid);
+void ExtractDidNal (SFrameBSInfo* pBsInfo, int& iSrcLen, std::vector<SLostSim>* p_SLostSim, int iTarDid);
+int SimulateNALLoss (const unsigned char* pSrc,  int& iSrcLen, std::vector<SLostSim>* p_SLostSim,
+                     const char* pLossChars, bool bLossPara, int& iLossIdx, bool& bVCLLoss);
 
+long IsKeyFrameLost (ISVCDecoder* pDecoder, SLTRRecoverRequest* p_LTR_Recover_Request, long hr);
+bool IsLTRMarking (ISVCDecoder* pDecoder);
+void LTRRecoveryRequest (ISVCDecoder* pDecoder, ISVCEncoder* pEncoder, SLTRRecoverRequest* p_LTR_Recover_Request,
+                         long hr, bool m_P2PmodeFlag);
+void LTRMarkFeedback (ISVCDecoder* pDecoder, ISVCEncoder* pEncoder, SLTRMarkingFeedback* p_LTR_Marking_Feedback,
+                      long hr);
