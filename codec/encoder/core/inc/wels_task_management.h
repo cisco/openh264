@@ -83,17 +83,16 @@ class  CWelsTaskManageBase : public IWelsTaskManage, public WelsCommon::IWelsThr
  protected:
   virtual WelsErrorType  CreateTasks (sWelsEncCtx* pEncCtx, const int32_t kiTaskCount);
 
-  WelsErrorType          ExecuteTaskList(TASKLIST_TYPE* pTargetTaskList);
+  WelsErrorType          ExecuteTaskList(TASKLIST_TYPE** pTaskList);
 
  protected:
   sWelsEncCtx*    m_pEncCtx;
   WelsCommon::CWelsThreadPool*   m_pThreadPool;
 
-  TASKLIST_TYPE*  m_pcAllTaskList[CWelsBaseTask::WELS_ENC_TASK_ALL];
-  TASKLIST_TYPE*  m_cEncodingTaskList;
-  TASKLIST_TYPE*  m_cPreEncodingTaskList;
-  int32_t         m_iCurrentTaskNum;
-  int32_t         m_iTotalTaskNum;
+  TASKLIST_TYPE*  m_pcAllTaskList[CWelsBaseTask::WELS_ENC_TASK_ALL][MAX_DEPENDENCY_LAYER];
+  TASKLIST_TYPE*  m_cEncodingTaskList[MAX_DEPENDENCY_LAYER];
+  TASKLIST_TYPE*  m_cPreEncodingTaskList[MAX_DEPENDENCY_LAYER];
+  int32_t         m_iTaskNum[MAX_DEPENDENCY_LAYER];
 
   //SLICE_PAIR_LIST *m_cSliceList;
 
@@ -111,6 +110,8 @@ class  CWelsTaskManageBase : public IWelsTaskManage, public WelsCommon::IWelsThr
   void Uninit();
   void DestroyTasks();
   void DestroyTaskList(TASKLIST_TYPE* pTargetTaskList);
+
+  int32_t        m_iCurDid;
 };
 
 class  CWelsTaskManageOne : public CWelsTaskManageBase {
@@ -120,25 +121,6 @@ class  CWelsTaskManageOne : public CWelsTaskManageBase {
 
   WelsErrorType   Init (sWelsEncCtx* pEncCtx);
   virtual WelsErrorType  ExecuteTasks(const CWelsBaseTask::ETaskType iTaskType = CWelsBaseTask::WELS_ENC_TASK_ENCODING);
-};
-
-class  CWelsTaskManageMultiD : public CWelsTaskManageBase {
-public:
-  virtual WelsErrorType   Init (sWelsEncCtx* pEncCtx);
-  virtual void            InitFrame (const int32_t kiCurDid);
-  virtual WelsErrorType   ExecuteTasks(const CWelsBaseTask::ETaskType iTaskType = CWelsBaseTask::WELS_ENC_TASK_ENCODING);
-
-private:
-  int32_t        m_iTaskNumD[MAX_DEPENDENCY_LAYER];
-  int32_t        m_iCurDid;
-};
-
-class  CWelsTaskManageParallel : public CWelsTaskManageBase {
- public:
-  virtual WelsErrorType  ExecuteTasks(const CWelsBaseTask::ETaskType iTaskType = CWelsBaseTask::WELS_ENC_TASK_ENCODING);
-
- protected:
-  virtual  WelsErrorType  CreateTasks (sWelsEncCtx* pEncCtx, const int32_t kiTaskCount);
 };
 
 }       //namespace
