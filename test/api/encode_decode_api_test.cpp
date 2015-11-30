@@ -373,4 +373,3 @@ int SimulateNALLoss (const unsigned char* pSrc,  int& iSrcLen, std::vector<SLost
   return iSkipedBytes;
 }
 
-
