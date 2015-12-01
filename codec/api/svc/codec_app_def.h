@@ -492,7 +492,7 @@ typedef struct {
   unsigned char uiTemporalId;
   unsigned char uiSpatialId;
   unsigned char uiQualityId;
-
+  EVideoFrameType eFrameType;
   unsigned char uiLayerType;
 
   int   iNalCount;              ///< count number of NAL coded already
