@@ -3232,8 +3232,7 @@ TEST_F (EncodeDecodeTestAPI, SimulcastAVC) {
     }
   }
 #ifdef DEBUG_FILE_SAVE_SimulcastAVCDiffFps
-  for (int i = 0; i <)MAX_SPATIAL_LAYER_NUM;
-  i++) {
+  for (int i = 0; i < MAX_SPATIAL_LAYER_NUM; i++) {
     fclose (fEnc[i]);
   }
 #endif
