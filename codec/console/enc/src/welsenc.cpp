@@ -401,6 +401,7 @@ void PrintHelp() {
   printf ("  -ltr         Control long term reference (default: 0)\n");
   printf ("  -ltrnum      Control the number of long term reference((1-4):screen LTR,(1-2):video LTR \n");
   printf ("  -threadIdc   0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads \n");
+  printf ("  -loadbalancing   0: turn off loadbalancing between slices when multi-threading available; 1: (default value) turn on loadbalancing between slices when multi-threading available\n");
   printf ("  -deblockIdc  Loop filter idc (0: on, 1: off, \n");
   printf ("  -alphaOffset AlphaOffset(-6..+6): valid range \n");
   printf ("  -betaOffset  BetaOffset (-6..+6): valid range\n");
@@ -419,7 +420,7 @@ void PrintHelp() {
   printf ("  -lqp         (Layer) (base quality layer qp : must work with -ldeltaqp or -lqparr)\n");
   printf ("  -ltarb       (Layer) (spatial layer target bitrate)\n");
   printf ("  -lmaxb       (Layer) (spatial layer max bitrate)\n");
-  printf ("  -slcmd       (Layer) (spatial layer slice mode): pls refer to layerX.cfg for details ( -slcnum: set target slice num; -slcsize: set target slice size constraint ; -slcload: turn load-balancing on/off; -slcmbnum: set the first slice mb num under some slice modes) \n");
+  printf ("  -slcmd       (Layer) (spatial layer slice mode): pls refer to layerX.cfg for details ( -slcnum: set target slice num; -slcsize: set target slice size constraint ; -slcmbnum: set the first slice mb num under some slice modes) \n");
   printf ("  -trace       (Level)\n");
   printf ("\n");
 }
