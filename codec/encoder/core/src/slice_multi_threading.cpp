@@ -259,8 +259,8 @@ int32_t SetMultiSliceBuffer (sWelsEncCtx** ppCtx, CMemoryAlign* pMa, SSliceThrea
     return ENC_RETURN_UNEXPECTED;
   }
   //slice 0
-  (*ppCtx)->pSliceBs[0].uiSize = iSlice0Len;
-  (*ppCtx)->pSliceBs[0].pBs    = (*ppCtx)->pFrameBs;
+  (*ppCtx)->pSliceBs[0].uiSize = iSlice1Len;
+  (*ppCtx)->pSliceBs[0].pBs    = (*ppCtx)->pFrameBs + iSlice0Len;
   (*ppCtx)->pSliceBs[0].uiBsPos = 0;
   (*ppCtx)->pSliceBs[0].pBsBuffer = pSmt->pThreadBsBuffer[0];
   if ((iMaxSliceNum == 1) && (!bDynamicSlice)) {
@@ -524,13 +524,11 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
         assert (pSliceBs->bSliceCodedFlag);
 #endif//MT_DEBUG_BS_WR
 
-        if (iSliceIdx > 0) {
-          // pSlice 0 bs has been written to pFrameBs yet by now, so uiSliceIdx base should be 1
-          memmove (pCtx->pFrameBs + pCtx->iPosBsBuffer, pSliceBs->pBs, pSliceBs->uiBsPos); // confirmed_safe_unsafe_usage
-          pCtx->iPosBsBuffer += pSliceBs->uiBsPos;
+        memmove (pCtx->pFrameBs + pCtx->iPosBsBuffer, pSliceBs->pBs, pSliceBs->uiBsPos); // confirmed_safe_unsafe_usage
+        pCtx->iPosBsBuffer += pSliceBs->uiBsPos;
 
-          iLayerSize += pSliceBs->uiBsPos;
-        }
+        iLayerSize += pSliceBs->uiBsPos;
+
         while (iNalIdx < iCountNal) {
           pLbi->pNalLengthInByte[iNalIdxBase + iNalIdx] = pSliceBs->iNalLen[iNalIdx];
           ++ iNalIdx;
@@ -555,10 +553,8 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
       while (iIdx < kiCountSlicesCoded) {
         pSliceBs = &pCtx->pSliceBs[iSliceIdx];
         if (pSliceBs != NULL && pSliceBs->uiBsPos > 0) {
-          if (iSliceIdx > 0) {
-            memmove (pCtx->pFrameBs + pCtx->iPosBsBuffer, pSliceBs->pBs, pSliceBs->uiBsPos); // confirmed_safe_unsafe_usage
-            pCtx->iPosBsBuffer += pSliceBs->uiBsPos;
-          }
+          memmove (pCtx->pFrameBs + pCtx->iPosBsBuffer, pSliceBs->pBs, pSliceBs->uiBsPos); // confirmed_safe_unsafe_usage
+          pCtx->iPosBsBuffer += pSliceBs->uiBsPos;
 
           const int32_t iCountNal = pSliceBs->iNalIndex;
           iLayerSize += pSliceBs->uiBsPos;
@@ -586,8 +582,7 @@ int32_t WriteSliceBs (sWelsEncCtx* pCtx,SWelsSliceBs* pSliceBs,const int32_t iSl
   int32_t iNalIdx               = 0;
   int32_t iNalSize              = 0;
   int32_t iReturn               = ENC_RETURN_SUCCESS;
-  int32_t iTotalLeftLength      = (iSliceIdx > 0) ? (pSliceBs->uiSize - pSliceBs->uiBsPos)
-                                  : (pCtx->iFrameBsSize - pCtx->iPosBsBuffer);
+  int32_t iTotalLeftLength      = pSliceBs->uiSize - pSliceBs->uiBsPos;
   SNalUnitHeaderExt* pNalHdrExt = &pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt;
   uint8_t* pDst                 = pSliceBs->pBs;
 
@@ -720,9 +715,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
                                         pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
                                         iEventIdx);
         }
-        if (0 == iSliceIdx) {
-          pEncPEncCtx->iPosBsBuffer += iSliceSize;
-        }
 
         pEncPEncCtx->pFuncList->pfDeblocking.pfDeblockingFilterSlice (pCurDq, pEncPEncCtx->pFuncList, iSliceIdx);
 
@@ -821,9 +813,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
             WELS_THREAD_SIGNAL_AND_BREAK (pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
                                           pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
                                           iEventIdx);
-          }
-          if (0 == iSliceIdx) {
-            pEncPEncCtx->iPosBsBuffer += iSliceSize;
           }
 
           pEncPEncCtx->pFuncList->pfDeblocking.pfDeblockingFilterSlice (pCurDq, pEncPEncCtx->pFuncList, iSliceIdx);
@@ -936,7 +925,6 @@ int32_t FiredSliceThreads (sWelsEncCtx* pCtx, SSliceThreadPrivateData* pPriData,
   pLbi->uiTemporalId  = pCtx->uiTemporalId;
   pLbi->uiQualityId   = 0;
   pLbi->iNalCount     = 0;
-  pCtx->pSliceBs[0].pBs = pLbi->pBsBuf;
 
   iIdx = 0;
   while (iIdx < kiEventCnt) {
