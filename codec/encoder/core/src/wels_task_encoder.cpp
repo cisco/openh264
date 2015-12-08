@@ -174,9 +174,6 @@ WelsErrorType CWelsSliceEncodingTask::ExecuteTask() {
              m_iSliceIdx);
     return iReturn;
   }
-  if (0 == m_iSliceIdx) {
-    m_pCtx->iPosBsBuffer += m_iSliceSize;
-  }
 
   m_pCtx->pFuncList->pfDeblocking.pfDeblockingFilterSlice (m_pCtx->pCurDqLayer, m_pCtx->pFuncList, m_iSliceIdx);
 
