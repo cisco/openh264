@@ -129,6 +129,7 @@ From the main project directory:
 - `make ARCH=i386` for x86 32bit builds
 - `make ARCH=x86_64` for x86 64bit builds
 - `make V=No` for a silent build (not showing the actual compiler commands)
+- `make DEBUGSYMBOLS=True` for two libraries, one is normal libraries, another one is removed the debugging symbol table entries (those created by the -g option )
 
 The command line programs `h264enc` and `h264dec` will appear in the main project directory.
 
