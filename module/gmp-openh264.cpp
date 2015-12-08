@@ -187,7 +187,8 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
     encoder_ (nullptr),
     max_payload_size_ (0),
     callback_ (nullptr),
-    stats_ ("Encoder") {
+    stats_ ("Encoder"),
+    shutting_down(false) {
       AddRef();
     }
 
@@ -361,6 +362,8 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
   }
 
   virtual void EncodingComplete() {
+    shutting_down = true;
+
     // Release the reference to the external objects, because it is no longer safe to call them
     host_     = nullptr;
     callback_ = nullptr;
@@ -388,6 +391,12 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
        encoder_ = nullptr;
      }
    }
+
+  void TrySyncRunOnMainThread(GMPTask* aTask) {
+    if (!shutting_down && g_platform_api) {
+      g_platform_api->syncrunonmainthread (aTask);
+    }
+  }
 
   void Error (GMPErr error) {
     if (callback_) {
@@ -466,20 +475,20 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
 
     if (!has_frame) {
       // This frame must be destroyed on the main thread.
-      g_platform_api->syncrunonmainthread (WrapTask (
-                                             this,
-                                             &OpenH264VideoEncoder::DestroyInputFrame_m,
-                                             inputImage));
+      TrySyncRunOnMainThread (WrapTask (
+                                   this,
+                                   &OpenH264VideoEncoder::DestroyInputFrame_m,
+                                   inputImage));
       return;
     }
 
     // Synchronously send this back to the main thread for delivery.
-    g_platform_api->syncrunonmainthread (WrapTask (
-                                           this,
-                                           &OpenH264VideoEncoder::Encode_m,
-                                           inputImage,
-                                           &encoded,
-                                           encoded_type));
+    TrySyncRunOnMainThread (WrapTask (
+                                   this,
+                                   &OpenH264VideoEncoder::Encode_m,
+                                   inputImage,
+                                   &encoded,
+                                   encoded_type));
   }
 
   void Encode_m (GMPVideoi420Frame* frame, SFrameBSInfo* encoded,
@@ -574,6 +583,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
   uint32_t max_payload_size_;
   GMPVideoEncoderCallback* callback_;
   FrameStats stats_;
+  bool shutting_down;
 };
 
 uint16_t readU16BE(const uint8_t* in) {
@@ -593,7 +603,8 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     worker_thread_ (nullptr),
     callback_ (nullptr),
     decoder_ (nullptr),
-    stats_ ("Decoder") {
+    stats_ ("Decoder"),
+    shutting_down(false) {
       AddRef();
     }
 
@@ -740,6 +751,8 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
   }
 
   virtual void DecodingComplete() {
+    shutting_down = true;
+
     // Release the reference to the external objects, because it is no longer safe to call them
     host_     = nullptr;
     callback_ = nullptr;
@@ -767,6 +780,13 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
       decoder_ = nullptr;
     }
   }
+
+  void TrySyncRunOnMainThread(GMPTask* aTask) {
+    if (!shutting_down && g_platform_api) {
+      g_platform_api->syncrunonmainthread (aTask);
+    }
+  }
+
   void Error (GMPErr error) {
     if (callback_) {
       callback_->Error (error);
@@ -796,14 +816,14 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
       valid = true;
     }
 
-    g_platform_api->syncrunonmainthread (WrapTask (
-                                           this,
-                                           &OpenH264VideoDecoder::Decode_m,
-                                           inputFrame,
-                                           &decoded,
-                                           data,
-                                           renderTimeMs,
-                                           valid));
+    TrySyncRunOnMainThread (WrapTask (
+                                 this,
+                                 &OpenH264VideoDecoder::Decode_m,
+                                 inputFrame,
+                                 &decoded,
+                                 data,
+                                 renderTimeMs,
+                                 valid));
   }
 
   // Return the decoded data back to the parent.
@@ -884,6 +904,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
   GMPVideoDecoderCallback* callback_;
   ISVCDecoder* decoder_;
   FrameStats stats_;
+  bool shutting_down;
 };
 
 extern "C" {
