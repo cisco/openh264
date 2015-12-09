@@ -272,14 +272,13 @@ void DestroyPicBuff (PPicBuff* ppPicBuf, CMemoryAlign* pMa) {
   pPicBuf = NULL;
   *ppPicBuf = NULL;
 }
+
 /*
  * fill data fields in default for decoder context
  */
-void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx, CMemoryAlign* pMa) {
+void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   int32_t iCpuCores               = 1;
-  memset (pCtx, 0, sizeof (SWelsDecoderContext));       // fill zero first
   pCtx->sLogCtx = *pLogCtx;
-  pCtx->pMemAlign = pMa;
 
   pCtx->pArgDec                   = NULL;
 
@@ -441,18 +440,20 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
 }
 
 /*
- *  free memory blocks in avc
+ *  free memory dynamically allocated during decoder
  */
-void WelsFreeMem (PWelsDecoderContext pCtx) {
+void WelsFreeDynamicMemory (PWelsDecoderContext pCtx) {
   int32_t iListIdx = 0;
   CMemoryAlign* pMa = pCtx->pMemAlign;
 
-  /* TODO: free memory blocks introduced in avc */
+  //free dq layer memory
+  UninitialDqLayersContext (pCtx);
+
+  //free FMO memory
   ResetFmoList (pCtx);
 
+  //free ref-pic list & picture memory
   WelsResetRefPic (pCtx);
-
-  // for sPicBuff
   for (iListIdx = LIST_0; iListIdx < LIST_A; ++ iListIdx) {
     PPicBuff* pPicBuff = &pCtx->pPicBuff[iListIdx];
     if (NULL != pPicBuff && NULL != *pPicBuff) {
@@ -467,6 +468,8 @@ void WelsFreeMem (PWelsDecoderContext pCtx) {
   pCtx->iLastImgHeightInPixel = 0;
   pCtx->bFreezeOutput = true;
   pCtx->bHaveGotMemory = false;
+
+  //free CABAC memory
   pMa->WelsFree (pCtx->pCabacDecEngine, "pCtx->pCabacDecEngine");
 }
 
@@ -474,19 +477,15 @@ void WelsFreeMem (PWelsDecoderContext pCtx) {
  * \brief   Open decoder
  */
 int32_t WelsOpenDecoder (PWelsDecoderContext pCtx) {
-  // function pointers
-  //initial MC function pointer--
   int iRet = ERR_NONE;
-  InitMcFunc (& (pCtx->sMcFunc), pCtx->uiCpuFlag);
-
-  InitExpandPictureFunc (& (pCtx->sExpandPicFunc), pCtx->uiCpuFlag);
-  AssignFuncPointerForRec (pCtx);
+  // function pointers
+  InitDecFuncs (pCtx, pCtx->uiCpuFlag);
 
   // vlc tables
   InitVlcTable (&pCtx->sVlcTable);
 
-  // startup memory
-  iRet = WelsInitMemory (pCtx);
+  // static memory
+  iRet = WelsInitStaticMemory (pCtx);
   if (ERR_NONE != iRet)
     return iRet;
 
@@ -506,11 +505,9 @@ int32_t WelsOpenDecoder (PWelsDecoderContext pCtx) {
  * \brief   Close decoder
  */
 void WelsCloseDecoder (PWelsDecoderContext pCtx) {
-  WelsFreeMem (pCtx);
+  WelsFreeDynamicMemory (pCtx);
 
-  WelsFreeMemory (pCtx);
-
-  UninitialDqLayersContext (pCtx);
+  WelsFreeStaticMemory (pCtx);
 
 #ifdef LONG_TERM_REF
   pCtx->bParamSetsLostFlag       = false;
@@ -539,7 +536,7 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
   }
   pCtx->eErrorConMethod = pCtx->pParam->eEcActiveIdc;
 
-  if (pCtx->bParseOnly) //parse only, disable EC method
+  if (pCtx->pParam->bParseOnly) //parse only, disable EC method
     pCtx->eErrorConMethod = ERROR_CON_DISABLE;
   InitErrorCon (pCtx);
 
@@ -567,15 +564,11 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
  * \note    N/A
  *************************************************************************************
  */
-int32_t WelsInitDecoder (PWelsDecoderContext pCtx, const bool bParseOnly, SLogContext* pLogCtx) {
+int32_t WelsInitDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   if (pCtx == NULL) {
     return ERR_INFO_INVALID_PTR;
   }
 
-  // default
-  WelsDecoderDefaults (pCtx, pLogCtx, pCtx->pMemAlign);
-
-  pCtx->bParseOnly = bParseOnly;
   // open decoder
   return WelsOpenDecoder (pCtx);
 }
@@ -652,7 +645,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
       pRawData->pCurPos = pRawData->pHead;
     }
 
-    if (pCtx->bParseOnly) {
+    if (pCtx->pParam->bParseOnly) {
       pSavedData = &pCtx->sSavedData;
       if ((kiBsLen + 4) > (pSavedData->pEnd - pSavedData->pCurPos)) {
         pSavedData->pCurPos = pSavedData->pHead;
@@ -847,7 +840,15 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
   return iErr;
 }
 
-void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
+void InitDecFuncs (PWelsDecoderContext pCtx, uint32_t uiCpuFlag) {
+  WelsBlockFuncInit (&pCtx->sBlockFunc, uiCpuFlag);
+  InitPredFunc (pCtx, uiCpuFlag);
+  InitMcFunc (& (pCtx->sMcFunc), uiCpuFlag);
+  InitExpandPictureFunc (& (pCtx->sExpandPicFunc), uiCpuFlag);
+  DeblockingInit (&pCtx->sDeblockingFunc, uiCpuFlag);
+}
+
+void InitPredFunc (PWelsDecoderContext pCtx, uint32_t uiCpuFlag) {
   pCtx->pGetI16x16LumaPredFunc[I16_PRED_V     ] = WelsI16x16LumaPredV_c;
   pCtx->pGetI16x16LumaPredFunc[I16_PRED_H     ] = WelsI16x16LumaPredH_c;
   pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC    ] = WelsI16x16LumaPredDc_c;
@@ -899,7 +900,7 @@ void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
   pCtx->pIdctResAddPredFunc8x8  = IdctResAddPred8x8_c;
 
 #if defined(HAVE_NEON)
-  if (pCtx->uiCpuFlag & WELS_CPU_NEON) {
+  if (uiCpuFlag & WELS_CPU_NEON) {
     pCtx->pIdctResAddPredFunc   = IdctResAddPred_neon;
 
     pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_neon;
@@ -924,7 +925,7 @@ void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
 #endif//HAVE_NEON
 
 #if defined(HAVE_NEON_AARCH64)
-  if (pCtx->uiCpuFlag & WELS_CPU_NEON) {
+  if (uiCpuFlag & WELS_CPU_NEON) {
     pCtx->pIdctResAddPredFunc   = IdctResAddPred_AArch64_neon;
 
     pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_AArch64_neon;
@@ -954,7 +955,7 @@ void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
 #endif//HAVE_NEON_AARCH64
 
 #if defined(X86_ASM)
-  if (pCtx->uiCpuFlag & WELS_CPU_MMXEXT) {
+  if (uiCpuFlag & WELS_CPU_MMXEXT) {
     pCtx->pIdctResAddPredFunc   = IdctResAddPred_mmx;
 
     ///////mmx code opt---
@@ -969,7 +970,7 @@ void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
     pCtx->pGetI4x4LumaPredFunc[I4_PRED_DDL]  = WelsDecoderI4x4LumaPredDDL_mmx;
     pCtx->pGetI4x4LumaPredFunc[I4_PRED_VL ]  = WelsDecoderI4x4LumaPredVL_mmx;
   }
-  if (pCtx->uiCpuFlag & WELS_CPU_SSE2) {
+  if (uiCpuFlag & WELS_CPU_SSE2) {
     /////////sse2 code opt---
     pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_sse2;
     pCtx->pGetI16x16LumaPredFunc[I16_PRED_P]  = WelsDecoderI16x16LumaPredPlane_sse2;
@@ -983,9 +984,6 @@ void AssignFuncPointerForRec (PWelsDecoderContext pCtx) {
     pCtx->pGetI4x4LumaPredFunc[I4_PRED_H]     = WelsDecoderI4x4LumaPredH_sse2;
   }
 #endif
-  DeblockingInit (&pCtx->sDeblockingFunc, pCtx->uiCpuFlag);
-
-  WelsBlockFuncInit (&pCtx->sBlockFunc, pCtx->uiCpuFlag);
 }
 
 //reset decoder number related statistics info

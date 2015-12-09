@@ -317,7 +317,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
       iNalSize        -= NAL_UNIT_HEADER_EXT_SIZE;
       *pConsumedBytes += NAL_UNIT_HEADER_EXT_SIZE;
 
-      if (pCtx->bParseOnly) {
+      if (pCtx->pParam->bParseOnly) {
         pCurNal->sNalData.sVclNal.pNalPos = pSavedData->pCurPos;
         int32_t iTrailingZeroByte = 0;
         while (pSrcNal[iSrcNalLen - iTrailingZeroByte - 1] == 0x0) //remove final trailing 0 bytes
@@ -346,7 +346,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
         pSavedData->pCurPos += iActualLen - iOffset;
       }
     } else {
-      if (pCtx->bParseOnly) {
+      if (pCtx->pParam->bParseOnly) {
         pCurNal->sNalData.sVclNal.pNalPos = pSavedData->pCurPos;
         int32_t iTrailingZeroByte = 0;
         while (pSrcNal[iSrcNalLen - iTrailingZeroByte - 1] == 0x0) //remove final trailing 0 bytes
@@ -1119,7 +1119,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //vui_parameters_present_flag
   pSps->bVuiParamPresentFlag = !!uiCode;
 
-  if (pCtx->bParseOnly) {
+  if (pCtx->pParam->bParseOnly) {
     if (kSrcNalLen >= SPS_PPS_BS_SIZE - 4) { //sps bs exceeds!
       pCtx->iErrorCode |= dsOutOfMemory;
       return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_OUT_OF_MEMORY);
@@ -1422,7 +1422,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
     memcpy (&pCtx->sPpsBuffer[uiPpsId], pPps, sizeof (SPps));
     pCtx->bPpsAvailFlags[uiPpsId] = true;
   }
-  if (pCtx->bParseOnly) {
+  if (pCtx->pParam->bParseOnly) {
     if (kSrcNalLen >= SPS_PPS_BS_SIZE - 4) { //pps bs exceeds
       pCtx->iErrorCode |= dsOutOfMemory;
       return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_OUT_OF_MEMORY);
