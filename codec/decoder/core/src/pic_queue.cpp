@@ -83,7 +83,7 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
   iLumaSize     = iPicWidth * iPicHeight;
   iChromaSize   = iPicChromaWidth * iPicChromaHeight;
 
-  if (pCtx->bParseOnly) {
+  if (pCtx->pParam->bParseOnly) {
     pPic->pBuffer[0] = pPic->pBuffer[1] = pPic->pBuffer[2] = NULL;
     pPic->pData[0] = pPic->pData[1] = pPic->pData[2] = NULL;
     pPic->iLinesize[0] = iPicWidth;

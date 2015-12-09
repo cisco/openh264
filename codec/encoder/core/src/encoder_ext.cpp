@@ -1792,7 +1792,7 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
   iCountBsLen = iNonVclLayersBsSizeCount + iVclLayersBsSizeCount;
 
   iMaxSliceBufferSize = WELS_MIN (iMaxSliceBufferSize, iTargetSpatialBsSize);
-  iTotalLength = (pParam->iMultipleThreadIdc == 1) ? iCountBsLen : (iCountBsLen + ((*ppCtx)->iMaxSliceCount - 1) *
+  iTotalLength = (pParam->iMultipleThreadIdc == 1) ? iCountBsLen : (iCountBsLen + (*ppCtx)->iMaxSliceCount  *
                  iMaxSliceBufferSize);
 
   pParam->iNumRefFrame = WELS_CLIP3 (pParam->iNumRefFrame, MIN_REF_PIC_COUNT,
@@ -3998,7 +3998,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         pLayerBsInfo->uiTemporalId  = pCtx->uiTemporalId;
         pLayerBsInfo->uiQualityId   = 0;
         pLayerBsInfo->iNalCount     = 0;
-        pCtx->pSliceBs[0].pBs = pLayerBsInfo->pBsBuf;
 
         pCtx->pTaskManage->ExecuteTasks();
         iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, iSliceCount);

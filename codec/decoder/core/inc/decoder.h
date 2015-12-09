@@ -55,6 +55,11 @@ extern "C" {
 int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpParam);
 
 /*!
+ * \brief   fill in default values of decoder context
+ */
+void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx);
+
+/*!
  *************************************************************************************
  * \brief   Initialize Wels decoder parameters and memory
  *
@@ -68,7 +73,7 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
  * \note    N/A
  *************************************************************************************
  */
-int32_t WelsInitDecoder (PWelsDecoderContext pCtx, const bool bParseOnly, SLogContext* pLogCtx);
+int32_t WelsInitDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx);
 
 /*!
  *************************************************************************************
@@ -110,9 +115,9 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
 
 
 /*
- *  free memory blocks in avc
+ *  free memory dynamically allocated during decoder
  */
-void WelsFreeMem (PWelsDecoderContext pCtx);
+void WelsFreeDynamicMemory (PWelsDecoderContext pCtx);
 
 /*!
  * \brief   make sure synchonozization picture resolution (get from slice header) among different parts (i.e, memory related and so on)
@@ -125,7 +130,19 @@ void WelsFreeMem (PWelsDecoderContext pCtx);
  */
 int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight);
 
-void AssignFuncPointerForRec (PWelsDecoderContext pCtx);
+/*!
+ * \brief   init decoder predictive function pointers including ASM functions during MB reconstruction
+ * \param   pCtx        Wels decoder context
+ * \param   uiCpuFlag   cpu assembly indication
+ */
+void InitPredFunc (PWelsDecoderContext pCtx, uint32_t uiCpuFlag);
+
+/*!
+ * \brief   init decoder internal function pointers including ASM functions
+ * \param   pCtx        Wels decoder context
+ * \param   uiCpuFlag   cpu assembly indication
+ */
+void InitDecFuncs (PWelsDecoderContext pCtx, uint32_t uiCpuFlag);
 
 void GetVclNalTemporalId (PWelsDecoderContext pCtx); //get the info that whether or not have VCL NAL in current AU,
 //and if YES, get the temporal ID
