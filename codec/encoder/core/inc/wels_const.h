@@ -166,7 +166,8 @@ enum {
   ENC_RETURN_CORRECTED = 0x08, //unexpected value but corrected by encoder
   ENC_RETURN_INVALIDINPUT = 0x10, //invalid input
   ENC_RETURN_MEMOVERFLOWFOUND = 0x20,
-  ENC_RETURN_VLCOVERFLOWFOUND = 0x40
+  ENC_RETURN_VLCOVERFLOWFOUND = 0x40,
+  ENC_RETURN_KNOWN_ISSUE = 0x80
 };
 //TODO: need to complete the return checking in encoder and fill in more types if needed
 

@@ -1443,11 +1443,12 @@ TEST_F (EncodeDecodeTestAPI, DiffSlicingInDlayerMixed) {
   SEncParamExt   sParam;
   encoder_->GetDefaultParams (&sParam);
   prepareParamDefault (iSpatialLayerNum, 1, iWidth, iHeight, fFrameRate, &sParam);
-  sParam.iMultipleThreadIdc = (rand() % 4) + 1;
+  sParam.iMultipleThreadIdc = (rand() % 2) ? 4 : ((rand() % 4) + 1);
   sParam.bSimulcastAVC = 1;
   sParam.sSpatialLayers[0].iVideoWidth = (iWidth >> 2);
   sParam.sSpatialLayers[0].iVideoHeight = (iHeight >> 2);
-  sParam.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_RASTER_SLICE;
+  sParam.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_SIZELIMITED_SLICE;
+  sParam.sSpatialLayers[0].sSliceArgument.uiSliceSizeConstraint = 1500;
 
   sParam.sSpatialLayers[1].iVideoWidth = iWidth;
   sParam.sSpatialLayers[1].iVideoHeight = iHeight;

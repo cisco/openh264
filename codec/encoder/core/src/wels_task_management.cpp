@@ -123,8 +123,9 @@ void   CWelsTaskManageBase::Uninit() {
 WelsErrorType CWelsTaskManageBase::CreateTasks (sWelsEncCtx* pEncCtx, const int32_t kiCurDid) {
   CWelsBaseTask* pTask = NULL;
   int32_t kiTaskCount;
+  uint32_t uiSliceMode = pEncCtx->pSvcParam->sSpatialLayers[0].sSliceArgument.uiSliceMode;
 
-  if (pEncCtx->pSvcParam->sSpatialLayers[0].sSliceArgument.uiSliceMode != SM_SIZELIMITED_SLICE) {
+  if (uiSliceMode != SM_SIZELIMITED_SLICE) {
     kiTaskCount = m_iTaskNum[kiCurDid] = pEncCtx->pSvcParam->sSpatialLayers[kiCurDid].sSliceArgument.uiSliceNum;
   } else {
     kiTaskCount = m_iTaskNum[kiCurDid] = pEncCtx->iActiveThreadsNum;
@@ -137,10 +138,14 @@ WelsErrorType CWelsTaskManageBase::CreateTasks (sWelsEncCtx* pEncCtx, const int3
   }
 
   for (int idx = 0; idx < kiTaskCount; idx++) {
+    if (uiSliceMode==SM_SIZELIMITED_SLICE) {
+      pTask = WELS_NEW_OP (CWelsConstrainedSizeSlicingEncodingTask (pEncCtx, idx), CWelsConstrainedSizeSlicingEncodingTask);
+    } else {
     if (pEncCtx->pSvcParam->bUseLoadBalancing) {
       pTask = WELS_NEW_OP (CWelsLoadBalancingSlicingEncodingTask (pEncCtx, idx), CWelsLoadBalancingSlicingEncodingTask);
     } else {
       pTask = WELS_NEW_OP (CWelsSliceEncodingTask (pEncCtx, idx), CWelsSliceEncodingTask);
+    }
     }
     WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pTask)
     m_cEncodingTaskList[kiCurDid]->push_back (pTask);

@@ -55,7 +55,8 @@
 
 namespace WelsEnc {
 
-CWelsSliceEncodingTask::CWelsSliceEncodingTask (sWelsEncCtx* pCtx, const int32_t iSliceIdx) : m_eTaskResult(ENC_RETURN_SUCCESS) {
+CWelsSliceEncodingTask::CWelsSliceEncodingTask (sWelsEncCtx* pCtx,
+    const int32_t iSliceIdx) : m_eTaskResult (ENC_RETURN_SUCCESS) {
   m_pCtx = pCtx;
   m_iSliceIdx = iSliceIdx;
 }
@@ -211,13 +212,106 @@ void CWelsLoadBalancingSlicingEncodingTask::FinishTask() {
 
   m_pSlice->uiSliceConsumeTime = (uint32_t) (WelsTime() - m_iSliceStart);
   WelsLog (&m_pCtx->sLogCtx, WELS_LOG_DEBUG,
-           "[MT] CWelsLoadBalancingSlicingEncodingTask()FinishTask, coding_idx %d, um_iSliceIdx %d, uiSliceConsumeTime %d, iSliceSize %d, iFirstMbInSlice %d, count_num_mb_in_slice %d",
+           "[MT] CWelsLoadBalancingSlicingEncodingTask()FinishTask, coding_idx %d, um_iSliceIdx %d, uiSliceConsumeTime %d, m_iSliceSize %d, iFirstMbInSlice %d, count_num_mb_in_slice %d",
            m_pCtx->iCodingIndex,
            m_iSliceIdx,
            m_pSlice->uiSliceConsumeTime,
            m_iSliceSize,
            m_pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[m_iSliceIdx].sSliceHeaderExt.sSliceHeader.iFirstMbInSlice,
            m_pSlice->iCountMbNumInSlice);
+}
+
+//CWelsConstrainedSizeSlicingEncodingTask
+WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
+
+  SDqLayer* pCurDq            = m_pCtx->pCurDqLayer;
+
+  SSliceCtx* pSliceCtx                    = &pCurDq->sSliceEncCtx;
+  const int32_t kiSliceIdxStep            = m_pCtx->iActiveThreadsNum;
+
+
+  SSliceHeaderExt* pStartSliceHeaderExt   = &pCurDq->sLayerInfo.pSliceInLayer[m_iSliceIdx].sSliceHeaderExt;
+
+  //deal with partition: TODO: here SSliceThreadPrivateData is just for parition info and actually has little relationship with threadbuffer, and iThreadIndex is not used in threadpool model, need renaming after removing old logic to avoid confusion
+  const int32_t kiPartitionId             = m_iSliceIdx%kiSliceIdxStep;
+  SSliceThreadPrivateData* pPrivateData = & (m_pCtx->pSliceThreading->pThreadPEncCtx[kiPartitionId]);
+  const int32_t kiFirstMbInPartition      = pPrivateData->iStartMbIndex;  // inclusive
+  const int32_t kiEndMbInPartition        = pPrivateData->iEndMbIndex;            // exclusive
+  pStartSliceHeaderExt->sSliceHeader.iFirstMbInSlice      = kiFirstMbInPartition;
+  pCurDq->pNumSliceCodedOfPartition[kiPartitionId]        =
+    1;    // one pSlice per partition intialized, dynamic slicing inside
+  pCurDq->pLastMbIdxOfPartition[kiPartitionId]            = kiEndMbInPartition - 1;
+
+  pCurDq->pLastCodedMbIdxOfPartition[kiPartitionId]       = 0;
+  //end of deal with partition
+
+  int32_t iAnyMbLeftInPartition           = kiEndMbInPartition - kiFirstMbInPartition;
+  int32_t iLocalSliceIdx = m_iSliceIdx;
+  while (iAnyMbLeftInPartition > 0) {
+    if (iLocalSliceIdx >= pSliceCtx->iMaxSliceNumConstraint) {
+      WelsLog (&m_pCtx->sLogCtx, WELS_LOG_WARNING,
+               "[MT] CWelsConstrainedSizeSlicingEncodingTask ExecuteTask() coding_idx %d, uiLocalSliceIdx %d, pSliceCtx->iMaxSliceNumConstraint %d",
+               m_pCtx->iCodingIndex,
+               iLocalSliceIdx, pSliceCtx->iMaxSliceNumConstraint);
+      return ENC_RETURN_KNOWN_ISSUE;
+    }
+
+    SetOneSliceBsBufferUnderMultithread (m_pCtx, m_iThreadIdx, iLocalSliceIdx);
+    m_pSlice = &pCurDq->sLayerInfo.pSliceInLayer[iLocalSliceIdx];
+    m_pSliceBs = &m_pCtx->pSliceBs[iLocalSliceIdx];
+
+    m_pSliceBs->uiBsPos     = 0;
+    m_pSliceBs->iNalIndex   = 0;
+    InitBits (&m_pSliceBs->sBsWrite, m_pSliceBs->pBsBuffer, m_pSliceBs->uiSize);
+
+    if (m_bNeedPrefix) {
+      if (m_eNalRefIdc != NRI_PRI_LOWEST) {
+        WelsLoadNalForSlice (m_pSliceBs, NAL_UNIT_PREFIX, m_eNalRefIdc);
+        WelsWriteSVCPrefixNal (&m_pSliceBs->sBsWrite, m_eNalRefIdc, (NAL_UNIT_CODED_SLICE_IDR == m_eNalType));
+        WelsUnloadNalForSlice (m_pSliceBs);
+      } else { // No Prefix NAL Unit RBSP syntax here, but need add NAL Unit Header extension
+        WelsLoadNalForSlice (m_pSliceBs, NAL_UNIT_PREFIX, m_eNalRefIdc);
+        // No need write any syntax of prefix NAL Unit RBSP here
+        WelsUnloadNalForSlice (m_pSliceBs);
+      }
+    }
+
+    WelsLoadNalForSlice (m_pSliceBs, m_eNalType, m_eNalRefIdc);
+    int32_t iReturn = WelsCodeOneSlice (m_pCtx, iLocalSliceIdx, m_eNalType);
+    if (ENC_RETURN_SUCCESS != iReturn) {
+      return iReturn;
+    }
+    WelsUnloadNalForSlice (m_pSliceBs);
+    
+    iReturn    = WriteSliceBs (m_pCtx, m_pSliceBs, iLocalSliceIdx, m_iSliceSize);
+    if (ENC_RETURN_SUCCESS != iReturn) {
+      WelsLog (&m_pCtx->sLogCtx, WELS_LOG_WARNING,
+               "[MT] CWelsConstrainedSizeSlicingEncodingTask ExecuteTask(), WriteSliceBs not successful: coding_idx %d, uiLocalSliceIdx %d, BufferSize %d, m_iSliceSize %d, iPayloadSize %d",
+               m_pCtx->iCodingIndex,
+               iLocalSliceIdx, m_pSliceBs->uiSize, m_iSliceSize, m_pSliceBs->sNalList[0].iPayloadSize);
+      return iReturn;
+    }
+
+    m_pCtx->pFuncList->pfDeblocking.pfDeblockingFilterSlice (pCurDq, m_pCtx->pFuncList, iLocalSliceIdx);
+
+    WelsLog (&m_pCtx->sLogCtx, WELS_LOG_DETAIL,
+             "@pSlice=%-6d sliceType:%c idc:%d size:%-6d\n",
+             iLocalSliceIdx,
+             (m_pCtx->eSliceType == P_SLICE ? 'P' : 'I'),
+             m_eNalRefIdc,
+             m_iSliceSize
+            );
+
+    WelsLog (&m_pCtx->sLogCtx, WELS_LOG_DEBUG,
+             "[MT] CWelsConstrainedSizeSlicingEncodingTask(), coding_idx %d, iPartitionId %d, m_iThreadIdx %d, iLocalSliceIdx %d, m_iSliceSize %d, ParamValidationExt(), invalid uiMaxNalSizeiEndMbInPartition %d, pCurDq->pLastCodedMbIdxOfPartition[%d] %d\n",
+             m_pCtx->iCodingIndex, kiPartitionId, m_iThreadIdx, iLocalSliceIdx, m_iSliceSize,
+             kiEndMbInPartition, kiPartitionId, pCurDq->pLastCodedMbIdxOfPartition[kiPartitionId]);
+
+    iAnyMbLeftInPartition = kiEndMbInPartition - (1 + pCurDq->pLastCodedMbIdxOfPartition[kiPartitionId]);
+    iLocalSliceIdx += kiSliceIdxStep;
+  }
+
+  return ENC_RETURN_SUCCESS;
 }
 
 

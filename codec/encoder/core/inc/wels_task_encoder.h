@@ -92,7 +92,8 @@ class CWelsSliceEncodingTask : public CWelsBaseTask {
 
 class CWelsLoadBalancingSlicingEncodingTask : public CWelsSliceEncodingTask {
  public:
-  CWelsLoadBalancingSlicingEncodingTask(sWelsEncCtx* pCtx, const int32_t iSliceIdx) : CWelsSliceEncodingTask (pCtx, iSliceIdx) {
+  CWelsLoadBalancingSlicingEncodingTask (sWelsEncCtx* pCtx, const int32_t iSliceIdx) : CWelsSliceEncodingTask (pCtx,
+        iSliceIdx) {
   };
 
   virtual WelsErrorType InitTask();
@@ -105,24 +106,21 @@ class CWelsLoadBalancingSlicingEncodingTask : public CWelsSliceEncodingTask {
   int64_t m_iSliceStart;
 };
 
-/*
-class CWelsConstrainedSizeSlicingEncodingTask : public CWelsSliceEncodingTask {
+
+class CWelsConstrainedSizeSlicingEncodingTask : public CWelsLoadBalancingSlicingEncodingTask {
  public:
-  CWelsConstrainedSizeSlicingEncodingTask (sWelsEncCtx* pCtx);
-  ~CWelsConstrainedSizeSlicingEncodingTask();
+  CWelsConstrainedSizeSlicingEncodingTask (sWelsEncCtx* pCtx,
+      const int32_t iSliceIdx) : CWelsLoadBalancingSlicingEncodingTask (pCtx, iSliceIdx) {
+  };
 
-  virtual WelsErrorType Execute();
-
-  WelsErrorType InitTask ();
-  virtual void FinishTask();
+  virtual WelsErrorType ExecuteTask();
 
   virtual uint32_t        GetTaskType() const {
     return WELS_ENC_TASK_ENCODE_SLICE_SIZECONSTRAINED;
   }
- protected:
 
 };
-*/
+
 
 class CWelsUpdateMbMapTask : public CWelsBaseTask {
  public:
