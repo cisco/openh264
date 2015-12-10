@@ -193,6 +193,10 @@ void RcInitTlWeight (sWelsEncCtx* pEncCtx) {
   n = 0;
   while (n <= kiHighestTid) {
     pTOverRc[n].iTlayerWeight = iWeightArray[kiDecompositionStages][n];
+    pTOverRc[n].iMinQp = pWelsSvcRc->iMinQp + (n<<1);
+    pTOverRc[n].iMinQp = WELS_CLIP3(pTOverRc[n].iMinQp, 0, 51);
+    pTOverRc[n].iMaxQp = pWelsSvcRc->iMaxQp + (n<<1);
+    pTOverRc[n].iMaxQp = WELS_CLIP3(pTOverRc[n].iMaxQp, pTOverRc[n].iMinQp, 51);
     ++ n;
   }
 //Calculate the frame index for the current frame and its reference frame
@@ -460,14 +464,14 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
     iLumaQp = WELS_CLIP3 (iLumaQp,
                           pWelsSvcRc->iLastCalculatedQScale - pWelsSvcRc->iFrameDeltaQpLower + iDeltaQpTemporal,
                           pWelsSvcRc->iLastCalculatedQScale + pWelsSvcRc->iFrameDeltaQpUpper + iDeltaQpTemporal);
-    iLumaQp = WELS_CLIP3 (iLumaQp,  pEncCtx->pSvcParam->iMinQp, pEncCtx->pSvcParam->iMaxQp);
+    iLumaQp = WELS_CLIP3 (iLumaQp,  pTOverRc->iMinQp, pTOverRc->iMaxQp);
 
     pWelsSvcRc->iQStep = RcConvertQp2QStep (iLumaQp);
     pWelsSvcRc->iLastCalculatedQScale = iLumaQp;
 
     if (pEncCtx->pSvcParam->bEnableAdaptiveQuant) {
       iLumaQp = WELS_CLIP3 ((iLumaQp * INT_MULTIPLY - pEncCtx->pVaa->sAdaptiveQuantParam.iAverMotionTextureIndexToDeltaQp) /
-                            INT_MULTIPLY, pEncCtx->pSvcParam->iMinQp, pEncCtx->pSvcParam->iMaxQp);
+                            INT_MULTIPLY, pTOverRc->iMinQp, pTOverRc->iMaxQp);
     }
 
     pEncCtx->iGlobalQp = iLumaQp;
@@ -497,7 +501,7 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
                           pWelsSvcRc->iLastCalculatedQScale + pWelsSvcRc->iFrameDeltaQpUpper + iDeltaQpTemporal);
   }
 
-  iLumaQp = WELS_CLIP3 (iLumaQp,  pEncCtx->pSvcParam->iMinQp, pEncCtx->pSvcParam->iMaxQp);
+  iLumaQp = WELS_CLIP3 (iLumaQp,  pTOverRc->iMinQp, pTOverRc->iMaxQp);
 
   pWelsSvcRc->iQStep = RcConvertQp2QStep (iLumaQp);
   pWelsSvcRc->iLastCalculatedQScale = iLumaQp;
@@ -505,7 +509,7 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
 
     iLumaQp =  WELS_DIV_ROUND (iLumaQp * INT_MULTIPLY - pEncCtx->pVaa->sAdaptiveQuantParam.iAverMotionTextureIndexToDeltaQp,
                                INT_MULTIPLY);
-    iLumaQp = WELS_CLIP3 (iLumaQp, pWelsSvcRc->iMinQp, pWelsSvcRc->iMaxQp);
+    iLumaQp = WELS_CLIP3 (iLumaQp, pTOverRc->iMinQp, pTOverRc->iMaxQp);
   }
   pEncCtx->iGlobalQp = iLumaQp;
 }
@@ -579,10 +583,11 @@ void RcCalculateMbQp (sWelsEncCtx* pEncCtx, SMB* pCurMb, const int32_t kiSliceId
   SRCSlicing* pSOverRc          = &pWelsSvcRc->pSlicingOverRc[kiSliceId];
   int32_t iLumaQp               = pSOverRc->iCalculatedQpSlice;
   SDqLayer* pCurLayer           = pEncCtx->pCurDqLayer;
+  SRCTemporal* pTOverRc         = &pWelsSvcRc->pTemporalOverRc[pEncCtx->uiTemporalId];
   const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
   if (pEncCtx->pSvcParam->bEnableAdaptiveQuant) {
     iLumaQp   = (int8_t)WELS_CLIP3 (iLumaQp +
-                                    pEncCtx->pVaa->sAdaptiveQuantParam.pMotionTextureIndexToDeltaQp[pCurMb->iMbXY], pWelsSvcRc->iMinQp, pWelsSvcRc->iMaxQp);
+                                    pEncCtx->pVaa->sAdaptiveQuantParam.pMotionTextureIndexToDeltaQp[pCurMb->iMbXY], pTOverRc->iMinQp, pTOverRc->iMaxQp);
   }
   pCurMb->uiChromaQp    = g_kuiChromaQpTable[CLIP3_QP_0_51 (iLumaQp + kuiChromaQpIndexOffset)];
   pCurMb->uiLumaQp      = iLumaQp;
@@ -1315,6 +1320,8 @@ void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   SSpatialLayerConfig* pDLayerParam = &pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId];
   int32_t iLumaQp = pWelsSvcRc->iLastCalculatedQScale;
+  int32_t iTl                 = pEncCtx->uiTemporalId;
+  SRCTemporal* pTOverRc       = &pWelsSvcRc->pTemporalOverRc[iTl];
   //decide one frame bits allocated
   if (pEncCtx->eSliceType == I_SLICE) {
     if (0 == pWelsSvcRc->iIdrNum) { //iIdrNum == 0 means encoder has been initialed
@@ -1348,7 +1355,7 @@ void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
       } else {
         iLumaQp = pWelsSvcRc->iLastCalculatedQScale + DELTA_QP_BGD_THD;
       }
-      iLumaQp = WELS_CLIP3 (iLumaQp, pWelsSvcRc->iMinQp, pWelsSvcRc->iMaxQp);
+      iLumaQp = WELS_CLIP3 (iLumaQp, pTOverRc->iMinQp, pTOverRc->iMaxQp);
       WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
                "[Rc]I iLumaQp = %d,iQStep = %d,iTargetBits = %d,iBufferFullnessSkip =%" PRId64
                ",iMaxTh=%d,iMinTh = %d,iFrameComplexity= %" PRId64,
@@ -1358,8 +1365,6 @@ void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
     }
 
   } else {
-    int32_t iTl                 = pEncCtx->uiTemporalId;
-    SRCTemporal* pTOverRc       = &pWelsSvcRc->pTemporalOverRc[iTl];
     int32_t iMaxTh = static_cast<int32_t> (pWelsSvcRc->iBufferSizeSkip - pWelsSvcRc->iBufferFullnessSkip);
     int32_t iMinTh = iMaxTh / (iTl + 2);
 
@@ -1387,7 +1392,7 @@ void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
       iLumaQp = pWelsSvcRc->iLastCalculatedQScale + DELTA_QP_BGD_THD;
     }
 
-    iLumaQp = WELS_CLIP3 (iLumaQp,  pWelsSvcRc->iMinQp, pWelsSvcRc->iMaxQp);
+    iLumaQp = WELS_CLIP3 (iLumaQp,  pTOverRc->iMinQp, pTOverRc->iMaxQp);
 
     WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
              "[Rc]P iTl = %d,iLumaQp = %d,iQStep = %d,iTargetBits = %d,iBufferFullnessSkip =%" PRId64
