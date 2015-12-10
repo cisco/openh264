@@ -164,7 +164,8 @@ int32_t   iGopBitsDq;
 int64_t   iLinearCmplx; // *INT_MULTIPLY
 int32_t   iPFrameNum;
 int32_t   iFrameCmplxMean;
-
+int32_t   iMaxQp;
+int32_t   iMinQp;
 } SRCTemporal;
 
 typedef struct TagWelsRc {
