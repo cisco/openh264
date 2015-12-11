@@ -105,7 +105,7 @@ void DecoderInterfaceTest::ValidInit() {
   m_sDecParam.eEcActiveIdc = (ERROR_CON_IDC) (rand() & 7);
   m_sDecParam.sVideoProperty.size = sizeof (SVideoProperty);
   m_sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
-  
+
   m_pData[0] = m_pData[1] = m_pData[2] = NULL;
   m_szBuffer[0] = m_szBuffer[1] = m_szBuffer[2] = 0;
   m_szBuffer[3] = 1;
@@ -502,6 +502,10 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   int32_t iError = 0;
 
   ValidInit();
+  //GetOption before decoding
+  m_pDec->GetOption (DECODER_OPTION_GET_STATISTICS, &sDecStatic);
+  EXPECT_EQ (0u, sDecStatic.uiDecodedFrameCount);
+  EXPECT_TRUE (-1 == sDecStatic.iAvgLumaQp);
   // setoption not support,
   eRet = (CM_RETURN)m_pDec->SetOption (DECODER_OPTION_GET_STATISTICS, NULL);
   EXPECT_EQ (eRet, cmInitParaError);

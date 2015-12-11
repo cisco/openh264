@@ -403,11 +403,13 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
 
     memcpy (pDecoderStatistics, &m_pDecContext->sDecoderStatistics, sizeof (SDecoderStatistics));
 
-    pDecoderStatistics->fAverageFrameSpeedInMs = (float) (m_pDecContext->dDecTime) /
-        (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount);
-    pDecoderStatistics->fActualAverageFrameSpeedInMs = (float) (m_pDecContext->dDecTime) /
-        (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount + m_pDecContext->sDecoderStatistics.uiFreezingIDRNum +
-         m_pDecContext->sDecoderStatistics.uiFreezingNonIDRNum);
+    if (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount != 0) { //not original status
+      pDecoderStatistics->fAverageFrameSpeedInMs = (float) (m_pDecContext->dDecTime) /
+          (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount);
+      pDecoderStatistics->fActualAverageFrameSpeedInMs = (float) (m_pDecContext->dDecTime) /
+          (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount + m_pDecContext->sDecoderStatistics.uiFreezingIDRNum +
+           m_pDecContext->sDecoderStatistics.uiFreezingNonIDRNum);
+    }
     return cmResultSuccess;
   }
 
