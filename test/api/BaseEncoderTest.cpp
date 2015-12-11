@@ -49,6 +49,8 @@ static int InitWithParam (ISVCEncoder* encoder, SEncParamExt* pEncParamExt) {
       if (eSliceMode == SM_SIZELIMITED_SLICE) {
         param.sSpatialLayers[i].sSliceArgument.uiSliceSizeConstraint = 600;
         param.uiMaxNalSize = 1500;
+        param.iMultipleThreadIdc = 4;
+        param.bUseLoadBalancing = false;
       }
       if (eSliceMode == SM_FIXEDSLCNUM_SLICE) {
         param.sSpatialLayers[i].sSliceArgument.uiSliceNum = 4;

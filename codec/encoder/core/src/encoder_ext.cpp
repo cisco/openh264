@@ -3975,7 +3975,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
     } else {
       //other multi-slice uiSliceMode
-      int32_t iRet = 0;
       // THREAD_FULLY_FIRE_MODE/THREAD_PICK_UP_MODE for any mode of non-SM_SIZELIMITED_SLICE
       if ((SM_SIZELIMITED_SLICE != pParam->sSliceArgument.uiSliceMode) && (pSvcParam->iMultipleThreadIdc > 1)) {
         iSliceCount = GetCurrentSliceNum (pCtx->pCurDqLayer);
@@ -4000,18 +3999,21 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         pLayerBsInfo->iNalCount     = 0;
 
         pCtx->pTaskManage->ExecuteTasks();
-        iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, iSliceCount);
         if (pCtx->iEncoderError) {
           WelsLog (pLogCtx, WELS_LOG_ERROR,
                    "WelsEncoderEncodeExt(), multi-slice (mode %d) encoding error!",
                    pParam->sSliceArgument.uiSliceMode);
           return pCtx->iEncoderError;
         }
+
+        iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, iSliceCount);
       }
       // THREAD_FULLY_FIRE_MODE && SM_SIZELIMITED_SLICE
       else if ((SM_SIZELIMITED_SLICE == pParam->sSliceArgument.uiSliceMode) && (pSvcParam->iMultipleThreadIdc > 1)) {
         const int32_t kiPartitionCnt = pCtx->iActiveThreadsNum; //pSvcParam->iCountThreadsNum;
 
+#if 0 //TODO: temporarily use this to keep old codes for a while, will remove old codes later
+        int32_t iRet = 0;
         // to fire slice coding threads
         iRet = FiredSliceThreads (pCtx, &pCtx->pSliceThreading->pThreadPEncCtx[0],
                                   &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
@@ -4027,6 +4029,41 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         WelsMultipleEventsWaitAllBlocking (kiPartitionCnt, &pCtx->pSliceThreading->pSliceCodedEvent[0],
                                            &pCtx->pSliceThreading->pSliceCodedMasterEvent);
         WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
+#else
+        int32_t iEndMbIdx = pCtx->pCurDqLayer->sSliceEncCtx.iMbNumInFrame;
+        for (int32_t iIdx = kiPartitionCnt - 1; iIdx >= 0; --iIdx) {
+          const int32_t iFirstMbIdx         = pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[iIdx].sSliceHeaderExt.sSliceHeader.iFirstMbInSlice;
+          pCtx->pSliceThreading->pThreadPEncCtx[iIdx].iStartMbIndex      = iFirstMbIdx;
+          pCtx->pSliceThreading->pThreadPEncCtx[iIdx].iEndMbIndex        = iEndMbIdx;
+          iEndMbIdx                         = iFirstMbIdx;
+        }
+
+        //TODO: use a function to remove duplicate code here and ln3994
+        int32_t iLayerBsIdx       = pCtx->pOut->iLayerBsIndex;
+        SLayerBSInfo* pLbi        = &pFbi->sLayerInfo[iLayerBsIdx];
+        pLbi->pBsBuf = pCtx->pFrameBs + pCtx->iPosBsBuffer;
+        pLbi->uiLayerType   = VIDEO_CODING_LAYER;
+        pLbi->uiSpatialId   = pCtx->uiDependencyId;
+        pLbi->uiTemporalId  = pCtx->uiTemporalId;
+        pLbi->uiQualityId   = 0;
+        pLbi->iNalCount     = 0;
+
+        int32_t iIdx = 0;
+        while (iIdx < kiPartitionCnt) {
+          pCtx->pSliceThreading->pThreadPEncCtx[iIdx].pFrameBsInfo = pFbi;
+          pCtx->pSliceThreading->pThreadPEncCtx[iIdx].iSliceIndex  = iIdx;
+          SetOneSliceBsBufferUnderMultithread (pCtx, iIdx, iIdx);
+          ++ iIdx;
+        }
+        pCtx->pTaskManage->ExecuteTasks();
+
+        if (pCtx->iEncoderError) {
+          WelsLog (pLogCtx, WELS_LOG_ERROR,
+                   "WelsEncoderEncodeExt(), multi-slice (mode %d) encoding error = %d!",
+                   pParam->sSliceArgument.uiSliceMode, pCtx->iEncoderError);
+          return pCtx->iEncoderError;
+        }
+#endif
 
         iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, kiPartitionCnt);
       } else { // for non-dynamic-slicing mode single threading branch..

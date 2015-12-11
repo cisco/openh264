@@ -319,7 +319,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   iIdx = 0;
   while (iIdx < iNumSpatialLayers) {
     SSliceArgument* pSliceArgument = &pPara->sSpatialLayers[iIdx].sSliceArgument;
-    if (pSliceArgument->uiSliceMode == SM_FIXEDSLCNUM_SLICE || pSliceArgument->uiSliceMode == SM_RASTER_SLICE) {
+   if (pSliceArgument->uiSliceMode == SM_FIXEDSLCNUM_SLICE || pSliceArgument->uiSliceMode == SM_RASTER_SLICE || pSliceArgument->uiSliceMode == SM_SIZELIMITED_SLICE) {
       bWillUseTaskManage = true;
     }
     ++ iIdx;
@@ -763,12 +763,15 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         pCurDq->pLastMbIdxOfPartition[kiPartitionId]            = kiEndMbInPartition - 1;
 
         pCurDq->pLastCodedMbIdxOfPartition[kiPartitionId]       = 0;
-
         while (iAnyMbLeftInPartition > 0) {
           if (iSliceIdx >= pSliceCtx->iMaxSliceNumConstraint) {
             // TODO: need exception handler for not large enough of MAX_SLICES_NUM related memory usage
             // No idea about its solution due MAX_SLICES_NUM is fixed lenght in relevent pData structure
             uiThrdRet = 1;
+            WelsLog (&pEncPEncCtx->sLogCtx, WELS_LOG_WARNING,
+                     "[MT] CodingSliceThreadProc Too many slices: coding_idx %d, iSliceIdx %d, pSliceCtx->iMaxSliceNumConstraint %d",
+                     pEncPEncCtx->iCodingIndex,
+                     iSliceIdx, pSliceCtx->iMaxSliceNumConstraint);
             WELS_THREAD_SIGNAL_AND_BREAK (pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
                                           pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
                                           iEventIdx);
@@ -810,6 +813,11 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
           iReturn    = WriteSliceBs (pEncPEncCtx, pSliceBs, iSliceIdx, iSliceSize);
           if (ENC_RETURN_SUCCESS != iReturn) {
             uiThrdRet = iReturn;
+            WelsLog (&pEncPEncCtx->sLogCtx, WELS_LOG_WARNING,
+                     "[MT] CodingSliceThreadProc, WriteSliceBs not successful: coding_idx %d, iSliceIdx %d, BufferSize %d, m_iSliceSize %d, iPayloadSize %d",
+                     pEncPEncCtx->iCodingIndex,
+                     iSliceIdx, pSliceBs->uiSize, iSliceSize, pSliceBs->sNalList[0].iPayloadSize);
+
             WELS_THREAD_SIGNAL_AND_BREAK (pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
                                           pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
                                           iEventIdx);
