@@ -511,9 +511,7 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
   int32_t iSliceIdx     = 0;
 
   if (!kbIsDynamicSlicingMode) {
-    pSliceBs    = &pCtx->pSliceBs[0];
-    iLayerSize  = pSliceBs->uiBsPos;    // assign with base pSlice first
-    iSliceIdx   = 0;
+    pSliceBs      = &pCtx->pSliceBs[0];
     iNalIdxBase   = pLbi->iNalCount = 0;
     while (iSliceIdx < iSliceCount) {
       if (pSliceBs != NULL && pSliceBs->uiBsPos > 0) {
