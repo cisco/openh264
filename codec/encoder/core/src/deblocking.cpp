@@ -760,7 +760,7 @@ void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
         ++ iSliceIdx;
       } while (iSliceIdx < iSliceCount);
     } else { // for dynamic slicing mode
-      const int32_t kiNumPicPartition = pEnc->iActiveThreadsNum; //pSvcParam->iCountThreadsNum;
+      const int32_t kiNumPicPartition = pEnc->iActiveThreadsNum;
       int32_t iPartitionIdx = 0;
 
       while (iPartitionIdx < kiNumPicPartition) {
