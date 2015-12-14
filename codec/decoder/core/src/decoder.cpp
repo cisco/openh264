@@ -1017,10 +1017,15 @@ void UpdateDecStatNoFreezingInfo (PWelsDecoderContext pCtx) {
   //update QP info
   int32_t iTotalQp = 0;
   const int32_t kiMbNum = pCurDq->iMbWidth * pCurDq->iMbHeight;
+  int32_t iCorrectMbNum = 0;
   for (int32_t iMb = 0; iMb < kiMbNum; ++iMb) {
+    iCorrectMbNum += (int32_t) pCurDq->pMbCorrectlyDecodedFlag[iMb];
     iTotalQp += pCurDq->pLumaQp[iMb] * pCurDq->pMbCorrectlyDecodedFlag[iMb];
   }
-  iTotalQp /= kiMbNum;
+  if (iCorrectMbNum == 0) //non MB is correct, should remain QP statistic info
+    iTotalQp = pDecStat->iAvgLumaQp;
+  else
+    iTotalQp /= iCorrectMbNum;
   if (pDecStat->uiDecodedFrameCount + 1 == 0) { //maximum uint32_t reached
     ResetDecStatNums (pDecStat);
     pDecStat->iAvgLumaQp = iTotalQp;
