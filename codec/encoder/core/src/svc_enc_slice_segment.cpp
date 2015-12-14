@@ -153,7 +153,12 @@ bool CheckFixedSliceNumMultiSliceSetting (const int32_t kiMbNumInFrame, SSliceAr
     pSlicesAssignList[uiSliceIdx] = kiMbNumPerSlice;
     iNumMbLeft -= kiMbNumPerSlice;
   }
+
   pSlicesAssignList[uiSliceIdx] = iNumMbLeft;
+
+  if (iNumMbLeft <= 0 || kiMbNumPerSlice <= 0 ) {
+    return false;
+  }
 
   return true;
 }
@@ -295,7 +300,6 @@ bool GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,
   iMinimalMbNum = iGomSize;
   while (uiSliceIdx + 1 < kuiSliceNum) {
     iMaximalMbNum = iNumMbLeft - (kuiSliceNum - uiSliceIdx - 1) * iMinimalMbNum; // get maximal num_mb in left parts
-
     // make sure one GOM at least in each slice for safe
     if (iNumMbAssigning < iMinimalMbNum)
       iCurNumMbAssigning = iMinimalMbNum;
@@ -317,6 +321,9 @@ bool GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,
     ++ uiSliceIdx;
   }
   pSlicesAssignList[uiSliceIdx] = iNumMbLeft;
+  if ( iNumMbLeft < iMinimalMbNum ) {
+    return false;
+  }
 
   return true;
 }
