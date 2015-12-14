@@ -299,7 +299,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   pMa = (*ppCtx)->pMemAlign;
   pPara = pCodingParam;
   iNumSpatialLayers = pPara->iSpatialLayerNum;
-  iThreadNum = pPara->iCountThreadsNum;
+  iThreadNum = pPara->iMultipleThreadIdc;
   iMaxSliceNum = (*ppCtx)->iMaxSliceCount;
 
   pSmt = (SSliceThreading*)pMa->WelsMalloc (sizeof (SSliceThreading), "SSliceThreading");
@@ -406,8 +406,8 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   iReturn = WelsMutexInit (& (*ppCtx)->mutexEncoderError);
   WELS_VERIFY_RETURN_PROC_IF (1, (WELS_THREAD_ERROR_OK != iReturn), FreeMemorySvc (ppCtx))
 
-  MT_TRACE_LOG (*ppCtx, WELS_LOG_INFO, "RequestMtResource(), iThreadNum=%d, iCountSliceNum= %d",
-                pPara->iCountThreadsNum,
+  MT_TRACE_LOG (*ppCtx, WELS_LOG_INFO, "RequestMtResource(), iThreadNum=%d, iMultipleThreadIdc= %d",
+                pPara->iMultipleThreadIdc,
                 iMaxSliceNum);
 
   return 0;
@@ -426,7 +426,7 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
 
   pMa           = (*ppCtx)->pMemAlign;
   uiSliceNum    = (*ppCtx)->iMaxSliceCount;
-  iThreadNum    = (*ppCtx)->pSvcParam->iCountThreadsNum;
+  iThreadNum    = (*ppCtx)->pSvcParam->iMultipleThreadIdc;
   pSmt          = (*ppCtx)->pSliceThreading;
 
   if (NULL == pSmt)
@@ -882,7 +882,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 }
 
 int32_t CreateSliceThreads (sWelsEncCtx* pCtx) {
-  const int32_t kiThreadCount = pCtx->pSvcParam->iCountThreadsNum;
+  const int32_t kiThreadCount = pCtx->pSvcParam->iMultipleThreadIdc;
   int32_t iIdx = 0;
 
   while (iIdx < kiThreadCount) {
