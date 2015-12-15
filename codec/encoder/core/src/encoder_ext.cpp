@@ -180,6 +180,11 @@ int32_t SliceArgumentValidationFixedSliceMode(SLogContext* pLogCtx,
 
   if (pSliceArgument->uiSliceNum == 0) {
     WelsCPUFeatureDetect (&iCpuCores);
+    if (0 == iCpuCores ) {
+      // cpuid not supported or doesn't expose the number of cores,
+      // use high level system API as followed to detect number of pysical/logic processor
+      iCpuCores = DynamicDetectCpuCores();
+    }
     pSliceArgument->uiSliceNum = iCpuCores;
   }
 
@@ -2245,8 +2250,8 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
   }
 }
 
-int32_t InitSliceSettings (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingParam, const int32_t kiCpuCores,
-                           int16_t* pMaxSliceCount) {
+int32_t InitSliceSettings (SLogContext* pLogCtx,     SWelsSvcCodingParam* pCodingParam,
+                           const int32_t kiCpuCores, int16_t* pMaxSliceCount) {
   int32_t iSpatialIdx = 0, iSpatialNum = pCodingParam->iSpatialLayerNum;
   uint16_t iMaxSliceCount = 0;
 
@@ -2254,11 +2259,6 @@ int32_t InitSliceSettings (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPar
     SSpatialLayerConfig* pDlp           = &pCodingParam->sSpatialLayers[iSpatialIdx];
     SSliceArgument* pSliceArgument      = &pDlp->sSliceArgument;
     int32_t iReturn                     = 0;
-    int32_t iSliceNum                   = (SM_FIXEDSLCNUM_SLICE == pSliceArgument->uiSliceMode && 0==pSliceArgument->uiSliceNum) ? kiCpuCores : pSliceArgument->uiSliceNum;
-    // NOTE: Per design, in case MT/DYNAMIC_SLICE_ASSIGN enabled, for SM_FIXEDSLCNUM_SLICE mode,
-    // uiSliceNum of current spatial layer settings equals to uiCpuCores number; SM_SIZELIMITED_SLICE mode,
-    // uiSliceNum intials as uiCpuCores also, stay tuned dynamically slicing in future
-    pSliceArgument->uiSliceNum = iSliceNum;    // used fixed one
 
     switch (pSliceArgument->uiSliceMode) {
     case SM_SIZELIMITED_SLICE:
@@ -2273,16 +2273,15 @@ int32_t InitSliceSettings (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPar
       if (pSliceArgument->uiSliceNum > iMaxSliceCount) {
         iMaxSliceCount = pSliceArgument->uiSliceNum;
       }
-
     }
       break;
     case SM_SINGLE_SLICE:
-      if (iSliceNum > iMaxSliceCount)
-        iMaxSliceCount = iSliceNum;
+      if (pSliceArgument->uiSliceNum > iMaxSliceCount)
+        iMaxSliceCount = pSliceArgument->uiSliceNum;
       break;
     case SM_RASTER_SLICE:
-      if (iSliceNum > iMaxSliceCount)
-        iMaxSliceCount = iSliceNum;
+      if (pSliceArgument->uiSliceNum > iMaxSliceCount)
+        iMaxSliceCount = pSliceArgument->uiSliceNum;
       break;
     default:
       break;
@@ -2371,16 +2370,19 @@ int32_t GetMultipleThreadIdc (SLogContext* pLogCtx, SWelsSvcCodingParam* pCoding
   iCacheLineSize = 16; // 16 bytes aligned in default
 #endif//X86_ASM
 
-  if (pCodingParam->iMultipleThreadIdc > 0)
-    uiCpuCores = pCodingParam->iMultipleThreadIdc;
-  else {
-    if (uiCpuCores ==
-        0) { // cpuid not supported or doesn't expose the number of cores, use high level system API as followed to detect number of pysical/logic processor
-      uiCpuCores = DynamicDetectCpuCores();
-    }// So far so many cpu cores up to MAX_THREADS_NUM mean for server platforms,
-    // for client application here it is constrained by maximal to MAX_THREADS_NUM
+  if (0 == pCodingParam->iMultipleThreadIdc && uiCpuCores == 0) {
+    // cpuid not supported or doesn't expose the number of cores,
+    // use high level system API as followed to detect number of pysical/logic processor
+    uiCpuCores = DynamicDetectCpuCores();
   }
-  uiCpuCores = WELS_CLIP3 (uiCpuCores, 1, MAX_THREADS_NUM);
+
+  if(0 == pCodingParam->iMultipleThreadIdc)
+      pCodingParam->iMultipleThreadIdc = (uiCpuCores > 0) ? uiCpuCores : 1;
+
+  // So far so many cpu cores up to MAX_THREADS_NUM mean for server platforms,
+  // for client application here it is constrained by maximal to MAX_THREADS_NUM
+  pCodingParam->iMultipleThreadIdc = WELS_CLIP3 (pCodingParam->iMultipleThreadIdc, 1, MAX_THREADS_NUM);
+  uiCpuCores = pCodingParam->iMultipleThreadIdc;
 
   if (InitSliceSettings (pLogCtx, pCodingParam, uiCpuCores, &iSliceNum)) {
     WelsLog (pLogCtx, WELS_LOG_ERROR, "GetMultipleThreadIdc(), InitSliceSettings failed.");
