@@ -114,7 +114,6 @@ typedef struct TagWelsEncCtx {
   SLogContext sLogCtx;
 // Input
   SWelsSvcCodingParam* pSvcParam;   // SVC parameter, WelsSVCParamConfig in svc_param_settings.h
-  SWelsSliceBs*     pSliceBs;       // bitstream buffering for various slices, [uiSliceIdx]
 
   int32_t*          pSadCostMb;
   /* MVD cost tables for Inter MB */
@@ -199,6 +198,7 @@ typedef struct TagWelsEncCtx {
   int32_t           iPosBsBuffer;   // current writing position of frame bs pBuffer
 
   SSpatialPicIndex  sSpatialIndexMap[MAX_DEPENDENCY_LAYER];
+  int32_t           iSliceBufferSize[MAX_DEPENDENCY_LAYER];
 
   bool              bRefOfCurTidIsLtr[MAX_DEPENDENCY_LAYER][MAX_TEMPORAL_LEVEL];
   uint16_t          uiIdrPicId;           // IDR picture id: [0, 65535], this one is used for LTR

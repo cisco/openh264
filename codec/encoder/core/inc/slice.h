@@ -42,6 +42,7 @@
 #include "parameter_sets.h"
 #include "svc_enc_slice_segment.h"
 #include "set_mb_syn_cabac.h"
+#include "nal_encap.h"
 
 namespace WelsEnc {
 
@@ -157,6 +158,7 @@ typedef struct TagSlice {
 // mainly for multiple threads imp.
 SMbCache        sMbCacheInfo;   // MBCache is introduced within slice dependency
 SBitStringAux*  pSliceBsa;
+SWelsSliceBs    sSliceBs;
 
 /*******************************sSliceHeader****************************/
 SSliceHeaderExt sSliceHeaderExt;
