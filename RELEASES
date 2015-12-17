@@ -1,6 +1,10 @@
 
 Releases
 -----------
+v1.5.3
+------
+- Fix GMP Plugin hang on Android devices
+
 v1.5.2
 ------
 - Fix GMP Plugin causing the Browser crash on Android
