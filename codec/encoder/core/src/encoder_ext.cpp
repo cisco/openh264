@@ -1095,15 +1095,37 @@ int32_t FindExistingPps (SWelsSPS* pSps, SSubsetSps* pSubsetSps, const bool kbUs
 }
 
 static inline int32_t InitpSliceInLayer (sWelsEncCtx** ppCtx, SDqLayer* pDqLayer, CMemoryAlign* pMa,
-    const int32_t iMaxSliceNum, bool bMultithread) {
-  int32_t iSliceIdx = 0;
+                                         const int32_t iMaxSliceNum, const int32_t kiDlayerIndex) {
+  int32_t iMaxSliceBufferSize  = (*ppCtx)->iSliceBufferSize[kiDlayerIndex];
+  int32_t iSliceIdx            = 0;
+  SliceModeEnum uiSliceMode    = (*ppCtx)->pSvcParam->sSpatialLayers[kiDlayerIndex].sSliceArgument.uiSliceMode;
+
+  //SM_SINGLE_SLICE mode using single-thread bs writer pOut->sBsWrite
+  //even though multi-thread is on for other layers
+  bool bIndependenceBsBuffer   = ((*ppCtx)->pSvcParam->iMultipleThreadIdc > 1 &&
+                                  SM_SINGLE_SLICE != uiSliceMode) ? true : false;
+
+  if ( iMaxSliceBufferSize <= 0) {
+    return ENC_RETURN_UNEXPECTED;
+  }
+
   while (iSliceIdx < iMaxSliceNum) {
     SSlice* pSlice = &pDqLayer->sLayerInfo.pSliceInLayer[iSliceIdx];
-    pSlice->uiSliceIdx = iSliceIdx;
-    if (bMultithread)
-      pSlice->pSliceBsa = & (*ppCtx)->pSliceBs[iSliceIdx].sBsWrite;
-    else
-      pSlice->pSliceBsa = & (*ppCtx)->pOut->sBsWrite;
+
+    pSlice->uiSliceIdx       = iSliceIdx;
+    pSlice->sSliceBs.uiSize  = iMaxSliceBufferSize;
+    pSlice->sSliceBs.uiBsPos = 0;
+    if (bIndependenceBsBuffer){
+      pSlice->pSliceBsa      = &pSlice->sSliceBs.sBsWrite;
+      pSlice->sSliceBs.pBs   = (uint8_t*)pMa->WelsMalloc (iMaxSliceBufferSize, "SliceBs");
+      if ( NULL == pSlice->sSliceBs.pBs) {
+        return ENC_RETURN_MEMALLOCERR;
+      }
+    } else {
+      pSlice->pSliceBsa      = & (*ppCtx)->pOut->sBsWrite;
+      pSlice->sSliceBs.pBs   = NULL;
+    }
+
     if (AllocMbCacheAligned (&pSlice->sMbCacheInfo, pMa)) {
       FreeMemorySvc (ppCtx);
       return ENC_RETURN_MEMALLOCERR;
@@ -1211,7 +1233,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
       pDqLayer->sLayerInfo.pSliceInLayer = (SSlice*)pMa->WelsMallocz (sizeof (SSlice) * iMaxSliceNum, "pSliceInLayer");
       WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pDqLayer->sLayerInfo.pSliceInLayer), FreeMemorySvc (ppCtx))
 
-      int32_t iReturn = InitpSliceInLayer (ppCtx, pDqLayer, pMa, iMaxSliceNum, pParam->iMultipleThreadIdc > 1);
+      int32_t iReturn = InitpSliceInLayer (ppCtx, pDqLayer, pMa, iMaxSliceNum, iDlayerIndex);
       WELS_VERIFY_RETURN_PROC_IF (1, (ENC_RETURN_SUCCESS != iReturn), FreeMemorySvc (ppCtx))
     }
 
@@ -1809,16 +1831,15 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
       (*ppCtx)->iMaxSliceCount = WELS_MAX ((*ppCtx)->iMaxSliceCount, (int) pSliceArgument->uiSliceNum);
       iSliceBufferSize = ((iLayerBsSize / pSliceArgument->uiSliceNum)<<1) + MAX_MACROBLOCK_SIZE_IN_BYTE_x2;
     }
-    iMaxSliceBufferSize = WELS_MAX(iMaxSliceBufferSize, iSliceBufferSize);
-
+    iMaxSliceBufferSize                = WELS_MAX(iMaxSliceBufferSize, iSliceBufferSize);
+    (*ppCtx)->iSliceBufferSize[iIndex] = iSliceBufferSize;
     ++ iIndex;
   }
   iTargetSpatialBsSize = iLayerBsSize;
   iCountBsLen = iNonVclLayersBsSizeCount + iVclLayersBsSizeCount;
 
   iMaxSliceBufferSize = WELS_MIN (iMaxSliceBufferSize, iTargetSpatialBsSize);
-  iTotalLength = (pParam->iMultipleThreadIdc == 1) ? iCountBsLen : (iCountBsLen + (*ppCtx)->iMaxSliceCount  *
-                 iMaxSliceBufferSize);
+  iTotalLength = iCountBsLen;
 
   pParam->iNumRefFrame = WELS_CLIP3 (pParam->iNumRefFrame, MIN_REF_PIC_COUNT,
                                       (pParam->iUsageType == CAMERA_VIDEO_REAL_TIME ? MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA :
@@ -2125,6 +2146,12 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
             while (iSliceIdx < iSliceNum) {
               SSlice* pSlice = &pDq->sLayerInfo.pSliceInLayer[iSliceIdx];
               FreeMbCache (&pSlice->sMbCacheInfo, pMa);
+
+              //slice bs buffer
+              if(NULL != pSlice->sSliceBs.pBs) {
+                pMa->WelsFree(pSlice->sSliceBs.pBs,"sSliceBs.pBs");
+                pSlice->sSliceBs.pBs = NULL;
+              }
               ++ iSliceIdx;
             }
             pMa->WelsFree (pDq->sLayerInfo.pSliceInLayer, "pSliceInLayer");
@@ -3896,11 +3923,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
       WelsLoadNal (pCtx->pOut, eNalType, eNalRefIdc);
 
-      //the following line is to fix a problem with a specific setting as in test DiffSlicingInDlayerMixed:
-      //      (multi-th on with SM_SINGLE_SLICE in one of the D layers)
-      //TODO: this may not be needed any more after the slice buffer refactoring
-      pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[0].pSliceBsa = &(pCtx->pOut->sBsWrite);
-
       pCtx->iEncoderError = WelsCodeOneSlice (pCtx, 0, eNalType);
       WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
 
@@ -4734,7 +4756,7 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
     SSliceHeaderExt* pSHExt = &pSliceIdx->sSliceHeaderExt;
     pSliceIdx->uiSliceIdx = uiSliceIdx;
     if (pCtx->pSvcParam->iMultipleThreadIdc > 1)
-      pSliceIdx->pSliceBsa = &pCtx->pSliceBs[uiSliceIdx].sBsWrite;
+      pSliceIdx->pSliceBsa = &pSliceIdx->sSliceBs.sBsWrite;
     else
       pSliceIdx->pSliceBsa = &pCtx->pOut->sBsWrite;
     if (AllocMbCacheAligned (&pSliceIdx->sMbCacheInfo, pMA)) {

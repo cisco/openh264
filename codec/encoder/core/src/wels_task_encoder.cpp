@@ -112,7 +112,7 @@ WelsErrorType CWelsSliceEncodingTask::InitTask() {
   SetOneSliceBsBufferUnderMultithread (m_pCtx, m_iThreadIdx, m_iSliceIdx);
 
   m_pSlice = &m_pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[m_iSliceIdx];
-  m_pSliceBs = &m_pCtx->pSliceBs[m_iSliceIdx];
+  m_pSliceBs = &m_pSlice->sSliceBs;
 
   m_pSliceBs->uiBsPos       = 0;
   m_pSliceBs->iNalIndex     = 0;
@@ -258,7 +258,7 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
 
     SetOneSliceBsBufferUnderMultithread (m_pCtx, m_iThreadIdx, iLocalSliceIdx);
     m_pSlice = &pCurDq->sLayerInfo.pSliceInLayer[iLocalSliceIdx];
-    m_pSliceBs = &m_pCtx->pSliceBs[iLocalSliceIdx];
+    m_pSliceBs = &m_pSlice->sSliceBs;
 
     m_pSliceBs->uiBsPos     = 0;
     m_pSliceBs->iNalIndex   = 0;
