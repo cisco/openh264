@@ -19,12 +19,12 @@ runUsage()
     echo "        $0 1280 720 h264enc_master h264enc_target1 h264enc_target2 "
     echo ""
     echo " Pre-test:"
-    echo "      --1) copy welsenc.cfg from ./openh264/testbin/"
+    echo "      --1) copy welsenc.cfg from ./openh264/testbin/ to current dir"
     echo "      --2) set test YUV path in welsenc.cfg "
-    echo "      --3) copy layer0.cfg from ./openh264/testbin/layer2.cfg"
-    echo "      --4) copy layer1.cfg from ./openh264/testbin/layer2.cfg"
-    echo "      --5) copy layer2.cfg from ./openh264/testbin/layer2.cfg"
-    echo "      --6) copy layer3.cfg from ./openh264/testbin/layer2.cfg"
+    echo "      --3) copy layer0.cfg from ./openh264/testbin/layer2.cfg to current dir"
+    echo "      --4) copy layer1.cfg from ./openh264/testbin/layer2.cfg to current dir"
+    echo "      --5) copy layer2.cfg from ./openh264/testbin/layer2.cfg to current dir"
+    echo "      --6) copy layer3.cfg from ./openh264/testbin/layer2.cfg to current dir"
     echo "           layer0.cfg~layer3.cfg are used for multi-layers test cases"
     echo ""
     echo "      --7) generate at least one encoder, "
@@ -67,7 +67,7 @@ runBrief()
     echo "       --the test outout file will be put under ./Trace-AllTestData"
     echo ""
     echo " test cases:"
-    echo "       --add more cases in function runGlogbleInit()"
+    echo "       --add more cases in function runGlobleInit()"
     echo "       --add new argument with for loop  like rc. etc in function "
     echo "         runAllEncodeCasesAndGenerateLog()"
     echo ""
@@ -97,10 +97,10 @@ runPrompt()
     echo -e "\033[32m ********************************************************************* \033[0m"
 }
 
-runGlogbleInit()
+runGlobleInit()
 {
     CurrenDir=`pwd`
-	LogDir="${CurrenDir}/Trace-AllTestData"
+    LogDir="${CurrenDir}/Trace-AllTestData"
     EncoderDir="${CurrenDir}/Encoder"
 
     if [ ! -d ${LogDir} ]
@@ -133,6 +133,7 @@ runGlogbleInit()
 
 
     let "iTraceLevel=4"
+    let "iFrameToBeEncoded = 32"
     let "iMaxNalSize=0"
     #you can add more test case like rc, gop size, et.
     #and add "for loop" in function runAllEncodeCasesAndGenerateLog()
@@ -289,6 +290,7 @@ runAllEncodeCasesAndGenerateLog()
 
     sEncoderCommand1="-lconfig 0 layer0.cfg -lconfig 1 layer1.cfg -lconfig 2 layer2.cfg  -lconfig 3 layer3.cfg"
     TempMemoryUsage=""
+    OtherDataYouWant=""
     TempTestCase=""
     let "CaseNum=1"
     for iSLayerNum in ${aSpatialLayerNum[@]}
@@ -337,7 +339,7 @@ runAllEncodeCasesAndGenerateLog()
                                 sEncoderCommand6="-dw 0 ${aPicW[0]} -dw 1 ${aPicW[1]}  -dw 2 ${aPicW[2]} -dw 3 ${aPicW[3]}"
                                 sEncoderCommand7="-dh 0 ${aPicH[0]} -dh 1 ${aPicH[1]}  -dh 2 ${aPicH[2]} -dh 3 ${aPicH[3]}"
 
-                                sEncoderCommand="${sEncoderCommand1} ${sEncoderCommand2} ${sEncoderCommand3} ${sEncoderCommand4} ${sEncoderCommand5} ${sEncoderCommand6} ${sEncoderCommand7}"
+                                sEncoderCommand="-frms ${iFrameToBeEncoded} ${sEncoderCommand1} ${sEncoderCommand2} ${sEncoderCommand3} ${sEncoderCommand4} ${sEncoderCommand5} ${sEncoderCommand6} ${sEncoderCommand7}"
 
                                 LogFile="${LogDir}/${CaseNum}_LogInfo_iSLNum_${iSLayerNum}_ThrNum_${iThreadNum}_SlcM_${iSliceMode}_SlcN_${iSliceNum}_${eEncoder}.log"
 
@@ -366,7 +368,7 @@ runAllEncodeCasesAndGenerateLog()
                         done
 
                         #output memory usage for all encoders
-                        echo "${TempTestCase}, ${TempMemoryUsage}" >>${MemoryUsageStatic}
+                        echo "${TempTestCase}, ${TempMemoryUsage}, ${OtherDataYouWant}" >>${MemoryUsageStatic}
                         let " CaseNum ++"
                         let "iTotalCaseNum ++"
 
@@ -385,7 +387,7 @@ runAllEncodeCasesAndGenerateLog()
 
 runMain()
 {
-    runGlogbleInit
+    runGlobleInit
     runCheck
     runAllEncodeCasesAndGenerateLog
     runPrompt
