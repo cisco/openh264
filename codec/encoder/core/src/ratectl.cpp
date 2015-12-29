@@ -193,10 +193,10 @@ void RcInitTlWeight (sWelsEncCtx* pEncCtx) {
   n = 0;
   while (n <= kiHighestTid) {
     pTOverRc[n].iTlayerWeight = iWeightArray[kiDecompositionStages][n];
-    pTOverRc[n].iMinQp = pWelsSvcRc->iMinQp + (n<<1);
-    pTOverRc[n].iMinQp = WELS_CLIP3(pTOverRc[n].iMinQp, 0, 51);
-    pTOverRc[n].iMaxQp = pWelsSvcRc->iMaxQp + (n<<1);
-    pTOverRc[n].iMaxQp = WELS_CLIP3(pTOverRc[n].iMaxQp, pTOverRc[n].iMinQp, 51);
+    pTOverRc[n].iMinQp = pWelsSvcRc->iMinQp + (n << 1);
+    pTOverRc[n].iMinQp = WELS_CLIP3 (pTOverRc[n].iMinQp, 0, 51);
+    pTOverRc[n].iMaxQp = pWelsSvcRc->iMaxQp + (n << 1);
+    pTOverRc[n].iMaxQp = WELS_CLIP3 (pTOverRc[n].iMaxQp, pTOverRc[n].iMinQp, 51);
     ++ n;
   }
 //Calculate the frame index for the current frame and its reference frame
@@ -661,7 +661,7 @@ void RcCalculateGomQp (sWelsEncCtx* pEncCtx, SMB* pCurMb, int32_t iSliceId) {
   int64_t iLeftBits = pSOverRc->iTargetBitsSlice - pSOverRc->iFrameBitsSlice;
   int64_t iTargetLeftBits = iLeftBits + pSOverRc->iGomBitsSlice - pSOverRc->iGomTargetBits;
 
-  if ((iLeftBits <= 0)||(iTargetLeftBits <=0)) {
+  if ((iLeftBits <= 0) || (iTargetLeftBits <= 0)) {
     pSOverRc->iCalculatedQpSlice += 2;
   } else {
 //globe decision
@@ -1077,7 +1077,7 @@ void WelsRcMbInitGom (sWelsEncCtx* pEncCtx, SMB* pCurMb, SSlice* pSlice) {
   const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
 
   pSOverRc->iBsPosSlice = BsGetBitsPos (bs);
-  if((pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE)&&(pEncCtx->eSliceType == I_SLICE)){
+  if ((pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE) && (pEncCtx->eSliceType == I_SLICE)) {
     pCurMb->uiLumaQp   = pEncCtx->iGlobalQp;
     pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp + kuiChromaQpIndexOffset)];
     return;
@@ -1289,6 +1289,10 @@ void WelsRcFrameDelayJudgeTimeStamp (sWelsEncCtx* pEncCtx, EVideoFrameType eFram
 
   int32_t iBitRate = pDLayerConfig->iSpatialBitrate;
   int32_t iEncTimeInv = (pWelsSvcRc->uiLastTimeStamp == 0) ? 0 : (int32_t) (uiTimeStamp - pWelsSvcRc->uiLastTimeStamp);
+  if ((iEncTimeInv < 0) || (iEncTimeInv > 1000)) {
+    pWelsSvcRc->uiLastTimeStamp = uiTimeStamp - 1000.0 / pDLayerConfig->fFrameRate;
+    iEncTimeInv = 1000.0 / pDLayerConfig->fFrameRate;
+  }
   int32_t iSentBits  = (int32_t) ((double)iBitRate * iEncTimeInv * (1.0E-3) + 0.5);
   iSentBits = WELS_MAX (iSentBits, 0);
 
