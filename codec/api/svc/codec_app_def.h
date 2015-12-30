@@ -155,7 +155,7 @@ typedef enum {
   DECODER_OPTION_IDR_PIC_ID,            ///< feedback current frame belong to which IDR period
   DECODER_OPTION_LTR_MARKING_FLAG,      ///< feedback wether current frame mark a LTR
   DECODER_OPTION_LTR_MARKED_FRAME_NUM,  ///< feedback frame num marked by current Frame
-  DECODER_OPTION_ERROR_CON_IDC,         ///< not finished yet, indicate decoder error concealment status, in progress
+  DECODER_OPTION_ERROR_CON_IDC,         ///< indicate decoder error concealment method
   DECODER_OPTION_TRACE_LEVEL,
   DECODER_OPTION_TRACE_CALLBACK,        ///< a void (*)(void* context, int level, const char* message) function which receives log messages
   DECODER_OPTION_TRACE_CALLBACK_CONTEXT,///< context info of trace callbac
