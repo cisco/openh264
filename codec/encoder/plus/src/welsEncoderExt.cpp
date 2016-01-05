@@ -313,7 +313,7 @@ int CWelsH264SVCEncoder::InitializeInternal (SWelsSvcCodingParam* pCfg) {
     pCfg->iLTRRefNum = pCfg->bEnableLongTermReference ? LONG_TERM_REF_NUM : 0;
     if (pCfg->iNumRefFrame == AUTO_REF_PIC_COUNT) {
       pCfg->iNumRefFrame = ((pCfg->uiGopSize >> 1) > 1) ? ((pCfg->uiGopSize >> 1) + pCfg->iLTRRefNum) :
-                              (MIN_REF_PIC_COUNT + pCfg->iLTRRefNum);
+                           (MIN_REF_PIC_COUNT + pCfg->iLTRRefNum);
       pCfg->iNumRefFrame = WELS_CLIP3 (pCfg->iNumRefFrame, MIN_REF_PIC_COUNT, MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA);
     }
   }
@@ -402,7 +402,8 @@ int CWelsH264SVCEncoder ::EncodeFrameInternal (const SSourcePicture*  pSrcPic, S
   const int32_t kiEncoderReturn = WelsEncoderEncodeExt (m_pEncContext, pBsInfo, pSrcPic);
   const int64_t kiCurrentFrameMs = (WelsTime() - kiBeforeFrameUs) / 1000;
 
-  if ((kiEncoderReturn == ENC_RETURN_MEMALLOCERR) || (kiEncoderReturn == ENC_RETURN_MEMOVERFLOWFOUND) || (kiEncoderReturn == ENC_RETURN_VLCOVERFLOWFOUND)) {
+  if ((kiEncoderReturn == ENC_RETURN_MEMALLOCERR) || (kiEncoderReturn == ENC_RETURN_MEMOVERFLOWFOUND)
+      || (kiEncoderReturn == ENC_RETURN_VLCOVERFLOWFOUND)) {
     WelsUninitEncoderExt (&m_pEncContext);
     return cmMallocMemeError;
   } else if ((kiEncoderReturn != ENC_RETURN_SUCCESS) && (kiEncoderReturn == ENC_RETURN_CORRECTED)) {
@@ -539,7 +540,7 @@ void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
              pSpatialCfg->sSliceArgument.uiSliceSizeConstraint,
              pSpatialCfg->uiProfileIdc,
              pSpatialCfg->uiLevelIdc
-             );
+            );
     ++ i;
   }
 }
@@ -615,8 +616,10 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
 
       if (WELS_ABS (pStatistics->fLatestFrameRate - m_pEncContext->pSvcParam->fMaxFrameRate) > 30) {
         WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
-                 "Actual input fLatestFrameRate = %f is quite different from framerate in setting %f, please check setting or timestamp unit (ms), cur_Ts = %" PRId64 " start_Ts = %" PRId64,
-                 pStatistics->fLatestFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate, kiCurrentFrameTs, static_cast<int64_t> (pStatistics->iStatisticsTs) );
+                 "Actual input fLatestFrameRate = %f is quite different from framerate in setting %f, please check setting or timestamp unit (ms), cur_Ts = %"
+                 PRId64 " start_Ts = %" PRId64,
+                 pStatistics->fLatestFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate, kiCurrentFrameTs,
+                 static_cast<int64_t> (pStatistics->iStatisticsTs));
       }
 
       if (m_pEncContext->pSvcParam->iRCMode == RC_QUALITY_MODE || m_pEncContext->pSvcParam->iRCMode == RC_BITRATE_MODE) {
@@ -898,7 +901,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_RC_MODE iRCMode= %d (Note: not suggest changing RC-mode in middle of encoding)",
              iValue);
-    WelsRcInitFuncPointers(m_pEncContext, m_pEncContext->pSvcParam->iRCMode);
+    WelsRcInitFuncPointers (m_pEncContext, m_pEncContext->pSvcParam->iRCMode);
   }
   break;
   case ENCODER_OPTION_RC_FRAME_SKIP: { // 0:FRAME-SKIP disabled;1:FRAME-SKIP enabled
