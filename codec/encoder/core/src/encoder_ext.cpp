@@ -3412,7 +3412,7 @@ int32_t ForceCodingIDR (sWelsEncCtx* pCtx) {
   pCtx->bCheckWindowStatusRefreshFlag = false;
 
   WelsLog (&pCtx->sLogCtx, WELS_LOG_INFO, "ForceCodingIDR at InputFrameCount=%d\n",
-           pCtx->sEncoderStatistics.uiInputFrameCount);
+           pCtx->sEncoderStatistics[0].uiInputFrameCount);
   return 0;
 }
 
@@ -3435,7 +3435,7 @@ int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst) {
   pLayerBsInfo->uiQualityId   = 0;
   pLayerBsInfo->uiLayerType   = NON_VIDEO_CODING_LAYER;
   pLayerBsInfo->iNalCount     = iCountNal;
-
+  pLayerBsInfo->eFrameType    = videoFrameTypeIDR;
   //pCtx->eLastNalPriority      = NRI_PRI_HIGHEST;
   pFbi->iLayerNum             = 1;
   pFbi->eFrameType            = videoFrameTypeInvalid;
@@ -3473,7 +3473,7 @@ int32_t WriteSsvcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
   pLayerBsInfo->uiQualityId     = 0;
   pLayerBsInfo->uiLayerType     = NON_VIDEO_CODING_LAYER;
   pLayerBsInfo->iNalCount       = iCountNal;
-
+  pLayerBsInfo->eFrameType      = videoFrameTypeIDR;
   //point to next pLayerBsInfo
   ++ pLayerBsInfo;
   ++ pCtx->pOut->iLayerBsIndex;
@@ -3514,7 +3514,7 @@ int32_t WriteSavcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
     pLayerBsInfo->uiQualityId   = 0;
     pLayerBsInfo->uiLayerType   = NON_VIDEO_CODING_LAYER;
     pLayerBsInfo->iNalCount     = iCountNal;
-
+    pLayerBsInfo->eFrameType    = videoFrameTypeIDR;
     //point to next pLayerBsInfo
     ++ pLayerBsInfo;
     ++ pCtx->pOut->iLayerBsIndex;
@@ -3547,7 +3547,7 @@ int32_t WriteSavcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
     pLayerBsInfo->uiQualityId   = 0;
     pLayerBsInfo->uiLayerType   = NON_VIDEO_CODING_LAYER;
     pLayerBsInfo->iNalCount     = iCountNal;
-
+    pLayerBsInfo->eFrameType    = videoFrameTypeIDR;
     //point to next pLayerBsInfo
     ++ pLayerBsInfo;
     ++ pCtx->pOut->iLayerBsIndex;
@@ -3595,7 +3595,7 @@ int32_t WriteSavcParaset_Listing (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
     pLayerBsInfo->uiQualityId   = 0;
     pLayerBsInfo->uiLayerType   = NON_VIDEO_CODING_LAYER;
     pLayerBsInfo->iNalCount     = iCountNal;
-
+    pLayerBsInfo->eFrameType    = videoFrameTypeIDR;
     //point to next pLayerBsInfo
     ++ pLayerBsInfo;
     ++ pCtx->pOut->iLayerBsIndex;
@@ -3630,7 +3630,7 @@ int32_t WriteSavcParaset_Listing (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
     pLayerBsInfo->uiQualityId   = 0;
     pLayerBsInfo->uiLayerType   = NON_VIDEO_CODING_LAYER;
     pLayerBsInfo->iNalCount     = iCountNal;
-
+    pLayerBsInfo->eFrameType    = videoFrameTypeIDR;
     //point to next pLayerBsInfo
     ++ pLayerBsInfo;
     ++ pCtx->pOut->iLayerBsIndex;
@@ -3745,6 +3745,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   pCtx->bCurFrameMarkedAsSceneLtr = false;
   pFbi->iLayerNum = 0; // for initialization
   pFbi->uiTimeStamp = pSrcPic->uiTimeStamp;
+  for (int32_t iNalIdx = 0; iNalIdx < MAX_LAYER_NUM_OF_FRAME; iNalIdx++) {
+    pFbi->sLayerInfo[iNalIdx].eFrameType = videoFrameTypeSkip;
+  }
   // perform csc/denoise/downsample/padding, generate spatial layers
   iSpatialNum = pCtx->pVpp->BuildSpatialPicList (pCtx, pSrcPic);
   if (pCtx->pFuncList->pfRc.pfWelsUpdateMaxBrWindowStatus) {
@@ -3953,12 +3956,14 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       pLayerBsInfo->uiTemporalId        = iCurTid;
       pLayerBsInfo->uiQualityId         = 0;
       pLayerBsInfo->iNalCount           = ++ iNalIdxInLayer;
+      pLayerBsInfo->eFrameType          = eFrameType;
     }
     // for dynamic slicing single threading..
     else if ((SM_SIZELIMITED_SLICE == pParam->sSliceArgument.uiSliceMode) && (pSvcParam->iMultipleThreadIdc <= 1)) {
       const int32_t kiLastMbInFrame = pCtx->pCurDqLayer->sSliceEncCtx.iMbNumInFrame;
       pCtx->iEncoderError = WelsCodeOnePicPartition (pCtx, pFbi, pLayerBsInfo, &iNalIdxInLayer, &iLayerSize, 0,
                             kiLastMbInFrame, 0);
+      pLayerBsInfo->eFrameType = eFrameType;
       WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
     } else {
       //other multi-slice uiSliceMode
@@ -3984,7 +3989,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         pLayerBsInfo->uiTemporalId  = pCtx->uiTemporalId;
         pLayerBsInfo->uiQualityId   = 0;
         pLayerBsInfo->iNalCount     = 0;
-
+        pLayerBsInfo->eFrameType    = eFrameType;
         pCtx->pTaskManage->ExecuteTasks();
         if (pCtx->iEncoderError) {
           WelsLog (pLogCtx, WELS_LOG_ERROR,
@@ -4035,7 +4040,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         pLbi->uiTemporalId  = pCtx->uiTemporalId;
         pLbi->uiQualityId   = 0;
         pLbi->iNalCount     = 0;
-
+        pLbi->eFrameType = eFrameType;
         int32_t iIdx = 0;
         while (iIdx < kiPartitionCnt) {
           pCtx->pSliceThreading->pThreadPEncCtx[iIdx].pFrameBsInfo = pFbi;
@@ -4103,6 +4108,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         pLayerBsInfo->uiTemporalId      = iCurTid;
         pLayerBsInfo->uiQualityId       = 0;
         pLayerBsInfo->iNalCount         = iNalIdxInLayer;
+        pLayerBsInfo->eFrameType        = eFrameType;
       }
     }
 
@@ -4281,6 +4287,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       pLayerBsInfo->uiLayerType         = NON_VIDEO_CODING_LAYER;
       pLayerBsInfo->iNalCount           = 1;
       pLayerBsInfo->pNalLengthInByte[0] = iPaddingNalSize;
+      pLayerBsInfo->eFrameType          = eFrameType;
       ++ pLayerBsInfo;
       ++ pCtx->pOut->iLayerBsIndex;
       pLayerBsInfo->pBsBuf           = pCtx->pFrameBs + pCtx->iPosBsBuffer;
@@ -4314,6 +4321,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                "WelsEncoderEncodeExt(), Logic Error Found in Preprocess updating. ForceCodingIDR!");
       //the above is to set the next frame IDR
       pFbi->eFrameType = eFrameType;
+      pLayerBsInfo->eFrameType = eFrameType;
       return ENC_RETURN_CORRECTED;
     }
 
@@ -4326,9 +4334,10 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   if (ENC_RETURN_CORRECTED == pCtx->iEncoderError) {
     pCtx->pVpp->UpdateSpatialPictures (pCtx, pSvcParam, iCurTid, (pSpatialIndexMap + iSpatialIdx)->iDid);
     ForceCodingIDR (pCtx);
-    WelsLog (pLogCtx, WELS_LOG_WARNING, "WelsEncoderEncodeExt(), Logic Error Found in temporal level. ForceCodingIDR!");
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsEncoderEncodeExt(), Logic Error Found in temporal level. ForceCodingIDR!");
     //the above is to set the next frame IDR
     pFbi->eFrameType = eFrameType;
+    pLayerBsInfo->eFrameType = eFrameType;
     return ENC_RETURN_CORRECTED;
   }
 
@@ -4509,7 +4518,8 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     int32_t  iTmpPpsIdList[MAX_DQ_LAYER_NUM * MAX_PPS_COUNT];
     uint16_t uiTmpIdrPicId = (*ppCtx)->uiIdrPicId;//this is for LTR!
 
-    SEncoderStatistics sTempEncoderStatistics = (*ppCtx)->sEncoderStatistics;
+    SEncoderStatistics sTempEncoderStatistics[MAX_DEPENDENCY_LAYER];
+    memcpy (sTempEncoderStatistics, (*ppCtx)->sEncoderStatistics, sizeof (sTempEncoderStatistics));
 
     SExistingParasetList sExistingParasetList;
     SExistingParasetList* pExistingParasetList = NULL;
@@ -4568,8 +4578,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     (*ppCtx)->uiIdrPicId = uiTmpIdrPicId;
 
     //for sEncoderStatistics
-    (*ppCtx)->sEncoderStatistics = sTempEncoderStatistics;
-
+    memcpy ((*ppCtx)->sEncoderStatistics, sTempEncoderStatistics, sizeof (sTempEncoderStatistics));
     //load back the needed structure for eSpsPpsIdStrategy
     if ((CONSTANT_ID != iOldSpsPpsIdStrategy) && (CONSTANT_ID != pNewParam->eSpsPpsIdStrategy)) {
       memcpy ((*ppCtx)->sPSOVector.sParaSetOffsetVariable, sTmpPsoVariable,
@@ -4934,7 +4943,6 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
   pLayerBsInfo->uiTemporalId    = pCtx->uiTemporalId;
   pLayerBsInfo->uiQualityId     = 0;
   pLayerBsInfo->iNalCount       = iNalIdxInLayer;
-
   return ENC_RETURN_SUCCESS;
 }
 } // namespace WelsEnc

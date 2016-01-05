@@ -99,8 +99,8 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
  private:
   int InitializeInternal (SWelsSvcCodingParam* argv);
   void TraceParamInfo(SEncParamExt *pParam);
-  void LogStatistics (const int64_t kiCurrentFrameTs);
-  void UpdateStatistics(const int64_t kiCurrentFrameTs, EVideoFrameType eFrameType,  const int32_t kiCurrentFrameSize, const int64_t kiCurrentFrameMs);
+  void LogStatistics (const int64_t kiCurrentFrameTs,int32_t iMaxDid);
+  void UpdateStatistics(const int64_t kiCurrentFrameTs, SFrameBSInfo* pBsInfo, const int64_t kiCurrentFrameMs);
 
   sWelsEncCtx*      m_pEncContext;
 

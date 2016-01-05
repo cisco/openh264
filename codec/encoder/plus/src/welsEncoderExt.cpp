@@ -412,7 +412,7 @@ int CWelsH264SVCEncoder ::EncodeFrameInternal (const SSourcePicture*  pSrcPic, S
     return cmUnknownReason;
   }
 
-  UpdateStatistics (pSrcPic->uiTimeStamp, pBsInfo->eFrameType, pBsInfo->iFrameSizeInBytes, kiCurrentFrameMs);
+  UpdateStatistics (pSrcPic->uiTimeStamp, pBsInfo, kiCurrentFrameMs);
 
   ///////////////////for test
 #ifdef OUTPUT_BIT_STREAM
@@ -481,7 +481,7 @@ int CWelsH264SVCEncoder::ForceIntraFrame (bool bIDR) {
 
   ForceCodingIDR (m_pEncContext);
 
-  m_pEncContext->sEncoderStatistics.uiIDRReqNum++;
+  m_pEncContext->sEncoderStatistics[0].uiIDRReqNum++;
 
   return 0;
 }
@@ -545,102 +545,125 @@ void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
   }
 }
 
-void CWelsH264SVCEncoder::LogStatistics (const int64_t kiCurrentFrameTs) {
-  SEncoderStatistics* pStatistics = & (m_pEncContext->sEncoderStatistics);
-  WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-           "EncoderStatistics: %dx%d, SpeedInMs: %f, fAverageFrameRate=%f, "
-           "LastFrameRate=%f, LatestBitRate=%d, LastFrameQP=%d, uiInputFrameCount=%d, uiSkippedFrameCount=%d, "
-           "uiResolutionChangeTimes=%d, uIDRReqNum=%d, uIDRSentNum=%d, uLTRSentNum=NA, iTotalEncodedBytes=%" PRId64
-           " at Ts = %" PRId64,
-           pStatistics->uiWidth, pStatistics->uiHeight,
-           pStatistics->fAverageFrameSpeedInMs, pStatistics->fAverageFrameRate,
-           pStatistics->fLatestFrameRate, pStatistics->uiBitRate, pStatistics->uiAverageFrameQP,
-           pStatistics->uiInputFrameCount, pStatistics->uiSkippedFrameCount,
-           pStatistics->uiResolutionChangeTimes, pStatistics->uiIDRReqNum, pStatistics->uiIDRSentNum,
-           m_pEncContext->iTotalEncodedBytes, kiCurrentFrameTs);
+void CWelsH264SVCEncoder::LogStatistics (const int64_t kiCurrentFrameTs, int32_t iMaxDid) {
+  for (int32_t iDid = 0; iDid <= iMaxDid; iDid++) {
+    SEncoderStatistics* pStatistics = & (m_pEncContext->sEncoderStatistics[iDid]);
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "EncoderStatistics: SpatialId = %d,%dx%d, SpeedInMs: %f, fAverageFrameRate=%f, "
+             "LastFrameRate=%f, LatestBitRate=%d, LastFrameQP=%d, uiInputFrameCount=%d, uiSkippedFrameCount=%d, "
+             "uiResolutionChangeTimes=%d, uIDRReqNum=%d, uIDRSentNum=%d, uLTRSentNum=NA, iTotalEncodedBytes=%" PRId64
+             " at Ts = %" PRId64,
+             iDid, pStatistics->uiWidth, pStatistics->uiHeight,
+             pStatistics->fAverageFrameSpeedInMs, pStatistics->fAverageFrameRate,
+             pStatistics->fLatestFrameRate, pStatistics->uiBitRate, pStatistics->uiAverageFrameQP,
+             pStatistics->uiInputFrameCount, pStatistics->uiSkippedFrameCount,
+             pStatistics->uiResolutionChangeTimes, pStatistics->uiIDRReqNum, pStatistics->uiIDRSentNum,
+             m_pEncContext->iTotalEncodedBytes[iDid], kiCurrentFrameTs);
+  }
 }
 
-void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVideoFrameType eFrameType,
-    const int32_t kiCurrentFrameSize, const int64_t kiCurrentFrameMs) {
-  SEncoderStatistics* pStatistics = & (m_pEncContext->sEncoderStatistics);
+void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, SFrameBSInfo* pBsInfo,
+    const int64_t kiCurrentFrameMs) {
 
   int32_t iMaxDid = m_pEncContext->pSvcParam->iSpatialLayerNum - 1;
-  if ((0 != pStatistics->uiWidth && 0 != pStatistics->uiHeight)
-      && (pStatistics->uiWidth != (unsigned int) m_pEncContext->pSvcParam->sDependencyLayers[iMaxDid].iActualWidth
-          || pStatistics->uiHeight != (unsigned int) m_pEncContext->pSvcParam->sDependencyLayers[iMaxDid].iActualHeight)) {
-    pStatistics->uiResolutionChangeTimes ++;
-  }
-  pStatistics->uiWidth = m_pEncContext->pSvcParam->sDependencyLayers[iMaxDid].iActualWidth;
-  pStatistics->uiHeight = m_pEncContext->pSvcParam->sDependencyLayers[iMaxDid].iActualHeight;
-
-  const bool kbCurrentFrameSkipped = (videoFrameTypeSkip == eFrameType);
-  pStatistics->uiInputFrameCount ++;
-  pStatistics->uiSkippedFrameCount += (kbCurrentFrameSkipped ? 1 : 0);
-  int32_t iProcessedFrameCount = pStatistics->uiInputFrameCount - pStatistics->uiSkippedFrameCount;
-  if (!kbCurrentFrameSkipped && iProcessedFrameCount != 0) {
-    pStatistics->fAverageFrameSpeedInMs += (kiCurrentFrameMs - pStatistics->fAverageFrameSpeedInMs) / iProcessedFrameCount;
-  }
-
-  // rate control related
-  if (0 != m_pEncContext->uiStartTimestamp) {
-    if (kiCurrentFrameTs > m_pEncContext->uiStartTimestamp + 800) {
-      pStatistics->fAverageFrameRate = (static_cast<float> (pStatistics->uiInputFrameCount) * 1000 /
-                                        (kiCurrentFrameTs - m_pEncContext->uiStartTimestamp));
-    }
-  } else {
-    m_pEncContext->uiStartTimestamp = kiCurrentFrameTs;
-  }
-  //pStatistics->fLatestFrameRate = m_pEncContext->pWelsSvcRc->fLatestFrameRate; //TODO: finish the calculation in RC
-  //pStatistics->uiBitRate = m_pEncContext->pWelsSvcRc->iActualBitRate; //TODO: finish the calculation in RC
-  pStatistics->uiAverageFrameQP = m_pEncContext->pWelsSvcRc->iAverageFrameQp;
-
-  if (videoFrameTypeIDR == eFrameType || videoFrameTypeI == eFrameType) {
-    pStatistics->uiIDRSentNum ++;
-  }
-  if (m_pEncContext->pLtr->bLTRMarkingFlag) {
-    pStatistics->uiLTRSentNum ++;
-  }
-
-  m_pEncContext->iTotalEncodedBytes += kiCurrentFrameSize;
-
-  const int32_t kiDeltaFrames = static_cast<int32_t> (pStatistics->uiInputFrameCount -
-                                m_pEncContext->iLastStatisticsFrameCount);
-  if (kiDeltaFrames > (m_pEncContext->pSvcParam->fMaxFrameRate * 2)) {
-    const int64_t kiTimeDiff = kiCurrentFrameTs - pStatistics->iStatisticsTs;
-    if (kiTimeDiff) {
-      pStatistics->fLatestFrameRate = static_cast<float> ((pStatistics->uiInputFrameCount -
-                                      m_pEncContext->iLastStatisticsFrameCount) * 1000 /
-                                      kiTimeDiff);
-      pStatistics->uiBitRate = static_cast<unsigned int> ((m_pEncContext->iTotalEncodedBytes -
-                               m_pEncContext->iLastStatisticsBytes) * 8 * 1000 / kiTimeDiff);
-
-      if (WELS_ABS (pStatistics->fLatestFrameRate - m_pEncContext->pSvcParam->fMaxFrameRate) > 30) {
-        WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
-                 "Actual input fLatestFrameRate = %f is quite different from framerate in setting %f, please check setting or timestamp unit (ms), cur_Ts = %"
-                 PRId64 " start_Ts = %" PRId64,
-                 pStatistics->fLatestFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate, kiCurrentFrameTs,
-                 static_cast<int64_t> (pStatistics->iStatisticsTs));
-      }
-
-      if (m_pEncContext->pSvcParam->iRCMode == RC_QUALITY_MODE || m_pEncContext->pSvcParam->iRCMode == RC_BITRATE_MODE) {
-        if ((pStatistics->fLatestFrameRate > 0)
-            && WELS_ABS (m_pEncContext->pSvcParam->fMaxFrameRate - pStatistics->fLatestFrameRate) > 5) {
-          WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
-                   "Actual input framerate %f is different from framerate in setting %f, suggest to use other rate control modes",
-                   pStatistics->fLatestFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate);
+  SLayerBSInfo*  pLayerInfo = &pBsInfo->sLayerInfo[0];
+  for (int32_t iDid = 0; iDid <= iMaxDid; iDid++) {
+    EVideoFrameType eFrameType = videoFrameTypeInvalid;
+    int32_t kiCurrentFrameSize = 0;
+    if (pBsInfo->eFrameType == videoFrameTypeSkip) {
+      eFrameType = videoFrameTypeSkip;
+    } else {
+      for (int32_t iLayerNum = 0; iLayerNum < pBsInfo->iLayerNum; iLayerNum++) {
+        pLayerInfo = &pBsInfo->sLayerInfo[iLayerNum];
+        if ((pLayerInfo->uiLayerType == VIDEO_CODING_LAYER) && (pLayerInfo->uiSpatialId == iDid)) {
+          eFrameType = pLayerInfo->eFrameType;
+          for (int32_t iNalIdx = 0; iNalIdx < pLayerInfo->iNalCount; iNalIdx++) {
+             kiCurrentFrameSize += pLayerInfo->pNalLengthInByte[iNalIdx];
+          }
         }
       }
+
+    }
+    SEncoderStatistics* pStatistics = & (m_pEncContext->sEncoderStatistics[iDid]);
+
+
+    if ((0 != pStatistics->uiWidth && 0 != pStatistics->uiHeight)
+        && (pStatistics->uiWidth != (unsigned int) m_pEncContext->pSvcParam->sDependencyLayers[iDid].iActualWidth
+            || pStatistics->uiHeight != (unsigned int) m_pEncContext->pSvcParam->sDependencyLayers[iDid].iActualHeight)) {
+      pStatistics->uiResolutionChangeTimes ++;
+    }
+    pStatistics->uiWidth = m_pEncContext->pSvcParam->sDependencyLayers[iDid].iActualWidth;
+    pStatistics->uiHeight = m_pEncContext->pSvcParam->sDependencyLayers[iDid].iActualHeight;
+
+    const bool kbCurrentFrameSkipped = (videoFrameTypeSkip == eFrameType);
+    pStatistics->uiInputFrameCount ++;
+    pStatistics->uiSkippedFrameCount += (kbCurrentFrameSkipped ? 1 : 0);
+    int32_t iProcessedFrameCount = pStatistics->uiInputFrameCount - pStatistics->uiSkippedFrameCount;
+    if (!kbCurrentFrameSkipped && iProcessedFrameCount != 0) {
+      pStatistics->fAverageFrameSpeedInMs += (kiCurrentFrameMs - pStatistics->fAverageFrameSpeedInMs) / iProcessedFrameCount;
+    }
+    // rate control related
+    if (0 != m_pEncContext->uiStartTimestamp) {
+      if (kiCurrentFrameTs > m_pEncContext->uiStartTimestamp + 800) {
+        pStatistics->fAverageFrameRate = (static_cast<float> (pStatistics->uiInputFrameCount) * 1000 /
+                                          (kiCurrentFrameTs - m_pEncContext->uiStartTimestamp));
+      }
+    } else {
+      m_pEncContext->uiStartTimestamp = kiCurrentFrameTs;
+    }
+    //pStatistics->fLatestFrameRate = m_pEncContext->pWelsSvcRc->fLatestFrameRate; //TODO: finish the calculation in RC
+    //pStatistics->uiBitRate = m_pEncContext->pWelsSvcRc->iActualBitRate; //TODO: finish the calculation in RC
+    pStatistics->uiAverageFrameQP = m_pEncContext->pWelsSvcRc->iAverageFrameQp;
+
+    if (videoFrameTypeIDR == eFrameType || videoFrameTypeI == eFrameType) {
+      pStatistics->uiIDRSentNum ++;
+    }
+    if (m_pEncContext->pLtr->bLTRMarkingFlag) {
+      pStatistics->uiLTRSentNum ++;
     }
 
-    // update variables
-    pStatistics->iStatisticsTs = kiCurrentFrameTs;
-    m_pEncContext->iLastStatisticsBytes = m_pEncContext->iTotalEncodedBytes;
-    m_pEncContext->iLastStatisticsFrameCount = pStatistics->uiInputFrameCount;
+    m_pEncContext->iTotalEncodedBytes[iDid] += kiCurrentFrameSize;
 
-    //TODO: the following statistics will be calculated and added later
-    //pStatistics->uiLTRSentNum
+    const int32_t kiDeltaFrames = static_cast<int32_t> (pStatistics->uiInputFrameCount -
+                                  m_pEncContext->iLastStatisticsFrameCount[iDid]);
+    if (kiDeltaFrames > (m_pEncContext->pSvcParam->fMaxFrameRate * 2)) {
+      const int64_t kiTimeDiff = kiCurrentFrameTs - pStatistics->iStatisticsTs;
+      if (kiTimeDiff) {
+        pStatistics->fLatestFrameRate = static_cast<float> ((pStatistics->uiInputFrameCount -
+                                        m_pEncContext->iLastStatisticsFrameCount[iDid]) * 1000 /
+                                        kiTimeDiff);
+        pStatistics->uiBitRate = static_cast<unsigned int> ((m_pEncContext->iTotalEncodedBytes[iDid] -
+                                 m_pEncContext->iLastStatisticsBytes[iDid]) * 8 * 1000 / kiTimeDiff);
+
+        if (WELS_ABS (pStatistics->fLatestFrameRate - m_pEncContext->pSvcParam->fMaxFrameRate) > 30) {
+          WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
+                   "Actual input fLatestFrameRate = %f is quite different from framerate in setting %f, please check setting or timestamp unit (ms), cur_Ts = %"
+                   PRId64 " start_Ts = %" PRId64,
+                   pStatistics->fLatestFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate, kiCurrentFrameTs,
+                   static_cast<int64_t> (pStatistics->iStatisticsTs));
+        }
+
+        if (m_pEncContext->pSvcParam->iRCMode == RC_QUALITY_MODE || m_pEncContext->pSvcParam->iRCMode == RC_BITRATE_MODE) {
+          if ((pStatistics->fLatestFrameRate > 0)
+              && WELS_ABS (m_pEncContext->pSvcParam->fMaxFrameRate - pStatistics->fLatestFrameRate) > 5) {
+            WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
+                     "Actual input framerate %f is different from framerate in setting %f, suggest to use other rate control modes",
+                     pStatistics->fLatestFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate);
+          }
+        }
+      }
+
+      // update variables
+      pStatistics->iStatisticsTs = kiCurrentFrameTs;
+      m_pEncContext->iLastStatisticsBytes[iDid] = m_pEncContext->iTotalEncodedBytes[iDid];
+      m_pEncContext->iLastStatisticsFrameCount[iDid] = pStatistics->uiInputFrameCount;
+
+      //TODO: the following statistics will be calculated and added later
+      //pStatistics->uiLTRSentNum
+    }
   }
   if (m_pEncContext->iStatisticsLogInterval > 0) {
+    SEncoderStatistics* pStatistics = & (m_pEncContext->sEncoderStatistics[0]);
     const int64_t kiTimeDiff = kiCurrentFrameTs - m_pEncContext->iLastStatisticsLogTs;
     if ((kiTimeDiff > m_pEncContext->iStatisticsLogInterval) || (0 == pStatistics->uiInputFrameCount % 300)) {
       if (WELS_ABS (pStatistics->fAverageFrameRate - m_pEncContext->pSvcParam->fMaxFrameRate) > 30) {
@@ -650,7 +673,7 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, EVid
                  pStatistics->fAverageFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate, m_pEncContext->uiStartTimestamp);
       }
 
-      LogStatistics (kiCurrentFrameTs);
+      LogStatistics (kiCurrentFrameTs, iMaxDid);
       m_pEncContext->iLastStatisticsLogTs = kiCurrentFrameTs;
     }
   }
@@ -788,7 +811,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     //LogStatistics
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, LogStatisticsBeforeNewEncoding");
-    LogStatistics (m_pEncContext->iLastStatisticsLogTs);
+    LogStatistics (m_pEncContext->iLastStatisticsLogTs, sEncodingParam.iSpatialLayerNum - 1);
   }
   break;
   case ENCODER_OPTION_FRAME_RATE: { // Maximal input frame rate
@@ -1214,22 +1237,23 @@ int CWelsH264SVCEncoder::GetOption (ENCODER_OPTION eOptionId, void* pOption) {
   break;
   case ENCODER_OPTION_GET_STATISTICS: {
     SEncoderStatistics* pStatistics = (static_cast<SEncoderStatistics*> (pOption));
-    pStatistics->uiWidth = m_pEncContext->sEncoderStatistics.uiWidth;
-    pStatistics->uiHeight = m_pEncContext->sEncoderStatistics.uiHeight;
-    pStatistics->fAverageFrameSpeedInMs = m_pEncContext->sEncoderStatistics.fAverageFrameSpeedInMs;
+    SEncoderStatistics* pEncStatistics = &m_pEncContext->sEncoderStatistics[m_pEncContext->pSvcParam->iSpatialLayerNum - 1];
+    pStatistics->uiWidth = pEncStatistics->uiWidth;
+    pStatistics->uiHeight = pEncStatistics->uiHeight;
+    pStatistics->fAverageFrameSpeedInMs = pEncStatistics->fAverageFrameSpeedInMs;
 
     // rate control related
-    pStatistics->fAverageFrameRate = m_pEncContext->sEncoderStatistics.fAverageFrameRate;
-    pStatistics->fLatestFrameRate = m_pEncContext->sEncoderStatistics.fLatestFrameRate;
-    pStatistics->uiBitRate = m_pEncContext->sEncoderStatistics.uiBitRate;
+    pStatistics->fAverageFrameRate = pEncStatistics->fAverageFrameRate;
+    pStatistics->fLatestFrameRate = pEncStatistics->fLatestFrameRate;
+    pStatistics->uiBitRate = pEncStatistics->uiBitRate;
 
-    pStatistics->uiInputFrameCount = m_pEncContext->sEncoderStatistics.uiInputFrameCount;
-    pStatistics->uiSkippedFrameCount = m_pEncContext->sEncoderStatistics.uiSkippedFrameCount;
+    pStatistics->uiInputFrameCount = pEncStatistics->uiInputFrameCount;
+    pStatistics->uiSkippedFrameCount = pEncStatistics->uiSkippedFrameCount;
 
-    pStatistics->uiResolutionChangeTimes = m_pEncContext->sEncoderStatistics.uiResolutionChangeTimes;
-    pStatistics->uiIDRReqNum = m_pEncContext->sEncoderStatistics.uiIDRReqNum;
-    pStatistics->uiIDRSentNum = m_pEncContext->sEncoderStatistics.uiIDRSentNum;
-    pStatistics->uiLTRSentNum = m_pEncContext->sEncoderStatistics.uiLTRSentNum;
+    pStatistics->uiResolutionChangeTimes = pEncStatistics->uiResolutionChangeTimes;
+    pStatistics->uiIDRReqNum = pEncStatistics->uiIDRReqNum;
+    pStatistics->uiIDRSentNum = pEncStatistics->uiIDRSentNum;
+    pStatistics->uiLTRSentNum = pEncStatistics->uiLTRSentNum;
   }
   break;
   case ENCODER_OPTION_STATISTICS_LOG_INTERVAL: {
