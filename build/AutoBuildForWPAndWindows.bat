@@ -96,8 +96,8 @@ goto :EOF
   set MinGWPath=C:\MinGW\bin
   set MsysPath=C:\MinGW\msys\1.0\bin
   set GitPath=C:\Program Files (x86)\Git\bin
-  set GasScriptPath=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin
 
+  set VC14Path=C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
   set VC12Path=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
   set VC11Path=C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC
   set VC10Path=C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC
@@ -111,6 +111,9 @@ goto :EOF
   if exist "%VC10Path%" set VCPATH=%VC10Path%
   if exist "%VC11Path%" set VCPATH=%VC11Path%
   if exist "%VC12Path%" set VCPATH=%VC12Path%
+  if exist "%VC14Path%" set VCPATH=%VC14Path%
+
+  set GasScriptPath=%VCPATH%\bin
 
   if "%vArcType%" =="i386"   set PATH=%MinGWPath%;%MsysPath%;%VCPATH%\bin;%GitPath%;%PATH%
   if "%vArcType%" =="x86_64" set PATH=%MinGWPath%;%MsysPath%;%VCPATH%\bin;%GitPath%;%PATH%
