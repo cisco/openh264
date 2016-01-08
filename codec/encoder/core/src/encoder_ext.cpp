@@ -4200,7 +4200,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
              (iSpatialIdx == 0) ? "#AU" : "   ",
              pCtx->iPOC,
              pCtx->iFrameNum,
-             (uiFrameType == videoFrameTypeI || uiFrameType == videoFrameTypeIDR) ? "I" : "P",
+             (eFrameType == videoFrameTypeI || eFrameType == videoFrameTypeIDR) ? "I" : "P",
              iCurTid,
              iCurDid,
              0,
@@ -4916,7 +4916,7 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
              "@slice=%-6d sliceType:%c idc:%d size:%-6d\n",
              iSliceIdx,
              (pCtx->eSliceType == P_SLICE ? 'P' : 'I'),
-             eNalRefIdc,
+             keNalRefIdc,
              iSliceSize);
 #endif//SLICE_INFO_OUTPUT
 
