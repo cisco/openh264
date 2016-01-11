@@ -257,7 +257,6 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   int32_t iThreadNum            = 0;
   int32_t iIdx                  = 0;
   int32_t iReturn = ENC_RETURN_SUCCESS;
-  bool bWillUseTaskManage = false;
 
   if (NULL == ppCtx || NULL == pCodingParam || NULL == *ppCtx || iCountBsLen <= 0)
     return 1;
@@ -280,15 +279,6 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 #else
   WelsSnprintf (pSmt->eventNamespace, sizeof (pSmt->eventNamespace), "%p%x", (void*) *ppCtx, getpid());
 #endif//!_WIN32
-
-  iIdx = 0;
-  while (iIdx < iNumSpatialLayers) {
-    SSliceArgument* pSliceArgument = &pPara->sSpatialLayers[iIdx].sSliceArgument;
-   if (pSliceArgument->uiSliceMode == SM_FIXEDSLCNUM_SLICE || pSliceArgument->uiSliceMode == SM_RASTER_SLICE || pSliceArgument->uiSliceMode == SM_SIZELIMITED_SLICE) {
-      bWillUseTaskManage = true;
-    }
-    ++ iIdx;
-  }
 
 #ifdef MT_DEBUG
   // file handle for MT debug
@@ -353,10 +343,8 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   iReturn = WelsMutexInit (&pSmt->mutexSliceNumUpdate);
   WELS_VERIFY_RETURN_PROC_IF (1, (WELS_THREAD_ERROR_OK != iReturn), FreeMemorySvc (ppCtx))
 
-  if (bWillUseTaskManage) {
-    (*ppCtx)->pTaskManage = IWelsTaskManage::CreateTaskManage (*ppCtx, iNumSpatialLayers, bDynamicSlice);
-    WELS_VERIFY_RETURN_PROC_IF (iReturn, (NULL == (*ppCtx)->pTaskManage), FreeMemorySvc (ppCtx))
-  }
+  (*ppCtx)->pTaskManage = IWelsTaskManage::CreateTaskManage (*ppCtx, iNumSpatialLayers, bDynamicSlice);
+  WELS_VERIFY_RETURN_PROC_IF (iReturn, (NULL == (*ppCtx)->pTaskManage), FreeMemorySvc (ppCtx))
 
   memset (&pSmt->bThreadBsBufferUsage, 0, MAX_THREADS_NUM * sizeof (bool));
   iReturn = WelsMutexInit (&pSmt->mutexThreadBsBufferUsage);
