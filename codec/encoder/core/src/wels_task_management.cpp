@@ -123,7 +123,7 @@ void   CWelsTaskManageBase::Uninit() {
 WelsErrorType CWelsTaskManageBase::CreateTasks (sWelsEncCtx* pEncCtx, const int32_t kiCurDid) {
   CWelsBaseTask* pTask = NULL;
   int32_t kiTaskCount;
-  uint32_t uiSliceMode = pEncCtx->pSvcParam->sSpatialLayers[0].sSliceArgument.uiSliceMode;
+  uint32_t uiSliceMode = pEncCtx->pSvcParam->sSpatialLayers[kiCurDid].sSliceArgument.uiSliceMode;
 
   if (uiSliceMode != SM_SIZELIMITED_SLICE) {
     kiTaskCount = m_iTaskNum[kiCurDid] = pEncCtx->pSvcParam->sSpatialLayers[kiCurDid].sSliceArgument.uiSliceNum;
