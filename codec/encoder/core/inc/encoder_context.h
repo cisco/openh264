@@ -225,12 +225,12 @@ typedef struct TagWelsEncCtx {
 
   //related to Statistics
   int64_t            uiStartTimestamp;
-  SEncoderStatistics sEncoderStatistics;
+  SEncoderStatistics sEncoderStatistics[MAX_DEPENDENCY_LAYER];
   int32_t            iStatisticsLogInterval;
   int64_t            iLastStatisticsLogTs;
-  int64_t            iTotalEncodedBytes;
-  int64_t            iLastStatisticsBytes;
-  int64_t            iLastStatisticsFrameCount;
+  int64_t            iTotalEncodedBytes[MAX_DEPENDENCY_LAYER];
+  int64_t            iLastStatisticsBytes[MAX_DEPENDENCY_LAYER];
+  int64_t            iLastStatisticsFrameCount[MAX_DEPENDENCY_LAYER];
 
   int32_t iEncoderError;
   WELS_MUTEX mutexEncoderError;
