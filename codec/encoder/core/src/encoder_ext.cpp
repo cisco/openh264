@@ -2500,14 +2500,6 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
     return iRet;
   }
 
-  if (pCodingParam->iMultipleThreadIdc > 1) {
-    iRet = CreateSliceThreads (pCtx);
-    if (iRet != 0) {
-      WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), CreateSliceThreads failed return %d.", iRet);
-      FreeMemorySvc (&pCtx);
-      return iRet;
-    }
-  }
   if (pCodingParam->iEntropyCodingModeFlag)
     WelsCabacInit (pCtx);
   WelsRcInitModule (pCtx,  pCtx->pSvcParam->iRCMode);

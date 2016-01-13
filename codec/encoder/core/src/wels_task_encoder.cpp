@@ -201,7 +201,7 @@ WelsErrorType CWelsLoadBalancingSlicingEncodingTask::InitTask() {
 
   m_iSliceStart = WelsTime();
   WelsLog (&m_pCtx->sLogCtx, WELS_LOG_DEBUG,
-           "[MT] CWelsLoadBalancingSlicingEncodingTask()InitTask for m_iSliceIdx %d at %" PRId64,
+           "[MT] CWelsLoadBalancingSlicingEncodingTask()InitTask for m_iSliceIdx %d at time=%" PRId64,
            m_iSliceIdx, m_iSliceStart);
 
   return ENC_RETURN_SUCCESS;
@@ -212,13 +212,14 @@ void CWelsLoadBalancingSlicingEncodingTask::FinishTask() {
 
   m_pSlice->uiSliceConsumeTime = (uint32_t) (WelsTime() - m_iSliceStart);
   WelsLog (&m_pCtx->sLogCtx, WELS_LOG_DEBUG,
-           "[MT] CWelsLoadBalancingSlicingEncodingTask()FinishTask, coding_idx %d, um_iSliceIdx %d, uiSliceConsumeTime %d, m_iSliceSize %d, iFirstMbInSlice %d, count_num_mb_in_slice %d",
+           "[MT] CWelsLoadBalancingSlicingEncodingTask()FinishTask, coding_idx %d, um_iSliceIdx %d, uiSliceConsumeTime %d, m_iSliceSize %d, iFirstMbInSlice %d, count_num_mb_in_slice %d at time=%" PRId64,
            m_pCtx->iCodingIndex,
            m_iSliceIdx,
            m_pSlice->uiSliceConsumeTime,
            m_iSliceSize,
            m_pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[m_iSliceIdx].sSliceHeaderExt.sSliceHeader.iFirstMbInSlice,
-           m_pSlice->iCountMbNumInSlice);
+           m_pSlice->iCountMbNumInSlice,
+           (m_pSlice->uiSliceConsumeTime + m_iSliceStart));
 }
 
 //CWelsConstrainedSizeSlicingEncodingTask

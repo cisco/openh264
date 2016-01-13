@@ -1447,15 +1447,19 @@ TEST_F (EncodeDecodeTestAPI, DiffSlicingInDlayerMixed) {
   sParam.bSimulcastAVC = 1;
   sParam.sSpatialLayers[0].iVideoWidth = (iWidth >> 2);
   sParam.sSpatialLayers[0].iVideoHeight = (iHeight >> 2);
-  sParam.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_SIZELIMITED_SLICE;
+  sParam.sSpatialLayers[0].sSliceArgument.uiSliceMode = (rand() % 2) ? SM_SIZELIMITED_SLICE : SM_FIXEDSLCNUM_SLICE;
   sParam.sSpatialLayers[0].sSliceArgument.uiSliceSizeConstraint = 1500;
 
   sParam.sSpatialLayers[1].iVideoWidth = iWidth;
   sParam.sSpatialLayers[1].iVideoHeight = iHeight;
-  sParam.sSpatialLayers[1].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  sParam.sSpatialLayers[1].sSliceArgument.uiSliceMode = (rand() % 2) ? SM_SIZELIMITED_SLICE : SM_FIXEDSLCNUM_SLICE;
   sParam.sSpatialLayers[1].sSliceArgument.uiSliceNum = 1;
+  sParam.sSpatialLayers[1].sSliceArgument.uiSliceSizeConstraint = 1500;
 
-  int rv = encoder_->InitializeExt (&sParam);
+  int iTraceLevel = WELS_LOG_QUIET;
+  int rv = encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+
+  rv = encoder_->InitializeExt (&sParam);
   ASSERT_TRUE (rv == cmResultSuccess) << "Init Failed sParam: rv = " << rv;;
 
   unsigned char*  pBsBuf[MAX_SPATIAL_LAYER_NUM];
@@ -1568,14 +1572,18 @@ TEST_F (EncodeDecodeTestAPI, TriggerLoadBalancing) {
   SEncParamExt   sParam;
   encoder_->GetDefaultParams (&sParam);
   prepareParamDefault (iSpatialLayerNum, 1, iWidth, iHeight, fFrameRate, &sParam);
-  sParam.iMultipleThreadIdc = (rand() % 8) + 1;
+  sParam.iMultipleThreadIdc = 4;
   sParam.bSimulcastAVC = 1;
   sParam.sSpatialLayers[0].iVideoWidth = iWidth;
   sParam.sSpatialLayers[0].iVideoHeight = iHeight;
   sParam.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  //TODO: use this after the buffer problem is fixed. sParam.sSpatialLayers[0].sSliceArgument.uiSliceMode = (rand()%2) ? SM_FIXEDSLCNUM_SLICE : SM_SIZELIMITED_SLICE;
   sParam.sSpatialLayers[0].sSliceArgument.uiSliceNum = sParam.iMultipleThreadIdc;
+  sParam.sSpatialLayers[0].sSliceArgument.uiSliceSizeConstraint = 1000;
 
-  int rv = encoder_->InitializeExt (&sParam);
+  int iTraceLevel = WELS_LOG_QUIET;
+  int rv = encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  rv = encoder_->InitializeExt (&sParam);
   ASSERT_TRUE (rv == cmResultSuccess) << "Init Failed sParam: rv = " << rv;;
 
   unsigned char*  pBsBuf[MAX_SPATIAL_LAYER_NUM];

@@ -381,8 +381,11 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
 
   const int32_t kiEncoderReturn = EncodeFrameInternal (kpSrcPic, pBsInfo);
 
-  if (kiEncoderReturn != cmResultSuccess)
+  if (kiEncoderReturn != cmResultSuccess) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_DEBUG,
+             "CWelsH264SVCEncoder::EncodeFrame() not succeed, err=%d", kiEncoderReturn);
     return kiEncoderReturn;
+  }
 
 #ifdef REC_FRAME_COUNT
   ++ m_uiCountFrameNum;
