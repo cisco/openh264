@@ -45,11 +45,22 @@
 
 namespace WelsCommon {
 
+class IWelsTaskSink {
+ public:
+  virtual int OnTaskExecuted() = 0;
+  virtual int OnTaskCancelled() = 0;
+};
+
 class IWelsTask {
  public:
+  IWelsTask (IWelsTaskSink* pSink) {
+    m_pSink = pSink;
+  };
   virtual ~IWelsTask() { }
 
   virtual int Execute() = 0;
+ private:
+  IWelsTaskSink*   m_pSink;
 };
 
 }

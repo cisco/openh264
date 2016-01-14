@@ -6,7 +6,7 @@
 
 using namespace WelsCommon;
 
-class CThreadPoolTest : public IWelsThreadPoolSink {
+class CThreadPoolTest : public IWelsThreadPoolSink, public IWelsTaskSink {
  public:
   CThreadPoolTest() {
     m_iTaskCount = 0;
@@ -25,6 +25,20 @@ class CThreadPoolTest : public IWelsThreadPoolSink {
     WelsCommon::CWelsAutoLock cAutoLock (m_cTaskCountLock);
     m_iTaskCount ++;
     //printf("Task execute cancelled count is %d\n", m_iTaskCount);
+    return cmResultSuccess;
+  }
+
+  virtual int OnTaskExecuted() {
+    WelsCommon::CWelsAutoLock cAutoLock (m_cTaskCountLock);
+    m_iTaskCount ++;
+    printf ("Task execute over count is %d\n", m_iTaskCount);
+    return cmResultSuccess;
+  }
+
+  virtual int OnTaskCancelled() {
+    WelsCommon::CWelsAutoLock cAutoLock (m_cTaskCountLock);
+    m_iTaskCount ++;
+    printf ("Task execute cancelled count is %d\n", m_iTaskCount);
     return cmResultSuccess;
   }
 

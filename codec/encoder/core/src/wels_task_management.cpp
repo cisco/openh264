@@ -132,19 +132,19 @@ WelsErrorType CWelsTaskManageBase::CreateTasks (sWelsEncCtx* pEncCtx, const int3
   }
 
   for (int idx = 0; idx < kiTaskCount; idx++) {
-    pTask = WELS_NEW_OP (CWelsUpdateMbMapTask (pEncCtx, idx), CWelsUpdateMbMapTask);
+    pTask = WELS_NEW_OP (CWelsUpdateMbMapTask (this, pEncCtx, idx), CWelsUpdateMbMapTask);
     WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pTask)
     m_cPreEncodingTaskList[kiCurDid]->push_back (pTask);
   }
 
   for (int idx = 0; idx < kiTaskCount; idx++) {
     if (uiSliceMode==SM_SIZELIMITED_SLICE) {
-      pTask = WELS_NEW_OP (CWelsConstrainedSizeSlicingEncodingTask (pEncCtx, idx), CWelsConstrainedSizeSlicingEncodingTask);
+      pTask = WELS_NEW_OP (CWelsConstrainedSizeSlicingEncodingTask (this, pEncCtx, idx), CWelsConstrainedSizeSlicingEncodingTask);
     } else {
     if (pEncCtx->pSvcParam->bUseLoadBalancing) {
-      pTask = WELS_NEW_OP (CWelsLoadBalancingSlicingEncodingTask (pEncCtx, idx), CWelsLoadBalancingSlicingEncodingTask);
+      pTask = WELS_NEW_OP (CWelsLoadBalancingSlicingEncodingTask (this, pEncCtx, idx), CWelsLoadBalancingSlicingEncodingTask);
     } else {
-      pTask = WELS_NEW_OP (CWelsSliceEncodingTask (pEncCtx, idx), CWelsSliceEncodingTask);
+      pTask = WELS_NEW_OP (CWelsSliceEncodingTask (this, pEncCtx, idx), CWelsSliceEncodingTask);
     }
     }
     WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pTask)

@@ -55,8 +55,8 @@
 
 namespace WelsEnc {
 
-CWelsSliceEncodingTask::CWelsSliceEncodingTask (sWelsEncCtx* pCtx,
-    const int32_t iSliceIdx) : m_eTaskResult (ENC_RETURN_SUCCESS) {
+CWelsSliceEncodingTask::CWelsSliceEncodingTask (WelsCommon::IWelsTaskSink* pSink, sWelsEncCtx* pCtx,
+    const int32_t iSliceIdx) : CWelsBaseTask(pSink), m_eTaskResult (ENC_RETURN_SUCCESS) {
   m_pCtx = pCtx;
   m_iSliceIdx = iSliceIdx;
 }
@@ -316,7 +316,7 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
 }
 
 
-CWelsUpdateMbMapTask::CWelsUpdateMbMapTask (sWelsEncCtx* pCtx, const int32_t iSliceIdx) {
+CWelsUpdateMbMapTask::CWelsUpdateMbMapTask (WelsCommon::IWelsTaskSink* pSink, sWelsEncCtx* pCtx, const int32_t iSliceIdx): CWelsBaseTask(pSink) {
   m_pCtx = pCtx;
   m_iSliceIdx = iSliceIdx;
 }

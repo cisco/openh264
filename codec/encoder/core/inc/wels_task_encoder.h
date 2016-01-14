@@ -53,7 +53,7 @@ extern int32_t WriteSliceBs (sWelsEncCtx* pCtx,SWelsSliceBs* pSliceBs,const int3
 
 class CWelsSliceEncodingTask : public CWelsBaseTask {
  public:
-  CWelsSliceEncodingTask (sWelsEncCtx* pCtx, const int32_t iSliceIdx);
+  CWelsSliceEncodingTask (WelsCommon::IWelsTaskSink* pSink, sWelsEncCtx* pCtx, const int32_t iSliceIdx);
   virtual ~CWelsSliceEncodingTask();
 
   CWelsSliceEncodingTask* CreateSliceEncodingTask (sWelsEncCtx* pCtx, const int32_t iSliceIdx);
@@ -92,7 +92,7 @@ class CWelsSliceEncodingTask : public CWelsBaseTask {
 
 class CWelsLoadBalancingSlicingEncodingTask : public CWelsSliceEncodingTask {
  public:
-  CWelsLoadBalancingSlicingEncodingTask (sWelsEncCtx* pCtx, const int32_t iSliceIdx) : CWelsSliceEncodingTask (pCtx,
+  CWelsLoadBalancingSlicingEncodingTask (WelsCommon::IWelsTaskSink* pSink, sWelsEncCtx* pCtx, const int32_t iSliceIdx) : CWelsSliceEncodingTask (pSink, pCtx,
         iSliceIdx) {
   };
 
@@ -109,8 +109,8 @@ class CWelsLoadBalancingSlicingEncodingTask : public CWelsSliceEncodingTask {
 
 class CWelsConstrainedSizeSlicingEncodingTask : public CWelsLoadBalancingSlicingEncodingTask {
  public:
-  CWelsConstrainedSizeSlicingEncodingTask (sWelsEncCtx* pCtx,
-      const int32_t iSliceIdx) : CWelsLoadBalancingSlicingEncodingTask (pCtx, iSliceIdx) {
+  CWelsConstrainedSizeSlicingEncodingTask (WelsCommon::IWelsTaskSink* pSink, sWelsEncCtx* pCtx,
+      const int32_t iSliceIdx) : CWelsLoadBalancingSlicingEncodingTask (pSink, pCtx, iSliceIdx) {
   };
 
   virtual WelsErrorType ExecuteTask();
@@ -124,7 +124,7 @@ class CWelsConstrainedSizeSlicingEncodingTask : public CWelsLoadBalancingSlicing
 
 class CWelsUpdateMbMapTask : public CWelsBaseTask {
  public:
-  CWelsUpdateMbMapTask (sWelsEncCtx* pCtx, const int32_t iSliceIdx);
+  CWelsUpdateMbMapTask (WelsCommon::IWelsTaskSink* pSink, sWelsEncCtx* pCtx, const int32_t iSliceIdx);
   virtual ~CWelsUpdateMbMapTask();
 
   virtual WelsErrorType Execute();
