@@ -1391,6 +1391,7 @@ TEST_F (EncodeDecodeTestAPI, DiffSlicingInDlayer) {
   sParam.sSpatialLayers[2].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
   sParam.sSpatialLayers[2].sSliceArgument.uiSliceNum = (rand() % 30) + 1;
 
+
   int rv = encoder_->InitializeExt (&sParam);
   ASSERT_TRUE (rv == cmResultSuccess) << "Init Failed sParam: rv = " << rv;;
 

@@ -140,7 +140,7 @@ class CWelsPreProcess {
                       const uint32_t kuiShortRefCount);
   void UpdateSrcListLosslessScreenRefSelectionWithLtr (SPicture* pCurPicture, const int32_t kiCurDid,
       const int32_t kuiMarkLongTermPicIdx, SPicture** pLongRefList);
-
+  bool BuildSpatialLayer(sWelsEncCtx* pCtx, const SSourcePicture* kpSrc,int32_t iSpatialLayer);
  private:
   int32_t WelsPreprocessCreate();
   int32_t WelsPreprocessDestroy();

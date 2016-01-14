@@ -679,7 +679,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         const int32_t kiFirstMbInPartition      = pPrivateData->iStartMbIndex;  // inclusive
         const int32_t kiEndMbInPartition        = pPrivateData->iEndMbIndex;            // exclusive
         int32_t iAnyMbLeftInPartition           = kiEndMbInPartition - kiFirstMbInPartition;
-
+        SSpatialLayerInternal *pParamInternal = &pCodingParam->sDependencyLayers[kiCurDid];
         iSliceIdx = pPrivateData->iSliceIndex;
         SSliceHeaderExt* pStartSliceHeaderExt                   = &pCurDq->sLayerInfo.pSliceInLayer[iSliceIdx].sSliceHeaderExt;
         pStartSliceHeaderExt->sSliceHeader.iFirstMbInSlice      = kiFirstMbInPartition;
@@ -695,7 +695,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
             uiThrdRet = 1;
             WelsLog (&pEncPEncCtx->sLogCtx, WELS_LOG_WARNING,
                      "[MT] CodingSliceThreadProc Too many slices: coding_idx %d, iSliceIdx %d, pSliceCtx->iMaxSliceNumConstraint %d",
-                     pEncPEncCtx->iCodingIndex,
+                     pParamInternal->iCodingIndex,
                      iSliceIdx, pSliceCtx->iMaxSliceNumConstraint);
             WELS_THREAD_SIGNAL_AND_BREAK (pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
                                           pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
@@ -740,7 +740,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
             uiThrdRet = iReturn;
             WelsLog (&pEncPEncCtx->sLogCtx, WELS_LOG_WARNING,
                      "[MT] CodingSliceThreadProc, WriteSliceBs not successful: coding_idx %d, iSliceIdx %d, BufferSize %d, m_iSliceSize %d, iPayloadSize %d",
-                     pEncPEncCtx->iCodingIndex,
+                     pParamInternal->iCodingIndex,
                      iSliceIdx, pSliceBs->uiSize, iSliceSize, pSliceBs->sNalList[0].iPayloadSize);
 
             WELS_THREAD_SIGNAL_AND_BREAK (pEncPEncCtx->pSliceThreading->pSliceCodedEvent,

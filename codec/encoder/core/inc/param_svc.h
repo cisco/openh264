@@ -86,7 +86,13 @@ typedef struct TagDLayerParam {
   int8_t        iHighestTemporalId;
   float         fInputFrameRate;                // input frame rate
   float         fOutputFrameRate;               // output frame rate
-
+ // uint16_t          uiIdrPicId;           // IDR picture id: [0, 65535], this one is used for LTR
+  int32_t           iSkipFrameFlag; //_GOM_RC_
+  int32_t           iCodingIndex;
+  int32_t           iFrameIndex;            // count how many frames elapsed during coding context currently
+  bool              bEncCurFrmAsIdrFlag;
+  int32_t           iFrameNum;              // current frame number coding
+  int32_t           iPOC;                   // frame iPOC
 #ifdef ENABLE_FRAME_DUMP
   char          sRecFileName[MAX_FNAME_LEN];    // file to be constructed
 #endif//ENABLE_FRAME_DUMP

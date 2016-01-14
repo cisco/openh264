@@ -685,6 +685,7 @@ void   RcVBufferCalculationSkip (sWelsEncCtx* pEncCtx) {
   SRCTemporal* pTOverRc = pWelsSvcRc->pTemporalOverRc;
   const int32_t kiOutputBits = pWelsSvcRc->iBitsPerFrame;
   const int32_t kiOutputMaxBits = pWelsSvcRc->iMaxBitsPerFrame;
+  SSpatialLayerInternal* pDLayerParamInternal     = &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
 //condition 1: whole pBuffer fullness
   pWelsSvcRc->iBufferFullnessSkip += (pWelsSvcRc->iFrameDqBits - kiOutputBits);
   pWelsSvcRc->iBufferMaxBRFullness[EVEN_TIME_WINDOW] += (pWelsSvcRc->iFrameDqBits - kiOutputMaxBits);
@@ -704,7 +705,7 @@ void   RcVBufferCalculationSkip (sWelsEncCtx* pEncCtx) {
   if ((pWelsSvcRc->iBufferFullnessSkip > pWelsSvcRc->iBufferSizeSkip
        && pWelsSvcRc->iAverageFrameQp > pWelsSvcRc->iSkipQpValue)
       || (dIncPercent > pWelsSvcRc->iRcVaryPercentage)) {
-    pEncCtx->iSkipFrameFlag = 1;
+    pDLayerParamInternal->iSkipFrameFlag = 1;
   }
 }
 void WelsRcFrameDelayJudge (sWelsEncCtx* pEncCtx, EVideoFrameType eFrameType, long long uiTimeStamp) {
@@ -772,35 +773,38 @@ void WelsRcFrameDelayJudge (sWelsEncCtx* pEncCtx, EVideoFrameType eFrameType, lo
 //loop each layer to check if have skip frame when RC and frame skip enable (maxbr>0)
 bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pEncCtx, int32_t iSpatialNum, EVideoFrameType eFrameType,
                                const uint32_t uiTimeStamp) {
-  SSpatialPicIndex* pSpatialIndexMap = &pEncCtx->sSpatialIndexMap[0];
   bool bSkipMustFlag = false;
   if (!pEncCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge)
     return false;
-  for (int32_t i = 0; i < iSpatialNum; i++) {
-    if (UNSPECIFIED_BIT_RATE == pEncCtx->pSvcParam->sSpatialLayers[i].iMaxSpatialBitrate) {
-      break;
-    }
-    pEncCtx->uiDependencyId = (uint8_t) (pSpatialIndexMap + i)->iDid;
+  if( pEncCtx->pSvcParam->bSimulcastAVC){
+      int32_t iDidIdx = pEncCtx->uiDependencyId;
+    if (UNSPECIFIED_BIT_RATE == pEncCtx->pSvcParam->sSpatialLayers[iDidIdx].iMaxSpatialBitrate)
+      return false;
 
     pEncCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge (pEncCtx, eFrameType, uiTimeStamp);
-    if (true == pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId].bSkipFlag) {
-      bSkipMustFlag = true;
-      pEncCtx->iContinualSkipFrames++;
-      break;
+    if (true == pEncCtx->pWelsSvcRc[iDidIdx].bSkipFlag) {
+       bSkipMustFlag = true;
+       pEncCtx->pWelsSvcRc[iDidIdx].uiLastTimeStamp = uiTimeStamp;
+       pEncCtx->iContinualSkipFrames++;
     }
-  }
-  if (bSkipMustFlag) {
-    for (int32_t i = 0; i < iSpatialNum; i++)
-      pEncCtx->pWelsSvcRc[i].uiLastTimeStamp = uiTimeStamp;
+  }else{
+    for(int32_t i = 0;i<iSpatialNum;i++){
+      if (UNSPECIFIED_BIT_RATE == pEncCtx->pSvcParam->sSpatialLayers[i].iMaxSpatialBitrate)
+        break;
+
+       pEncCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge (pEncCtx, eFrameType, uiTimeStamp);
+       if (true == pEncCtx->pWelsSvcRc[i].bSkipFlag) {
+         bSkipMustFlag = true;
+         pEncCtx->pWelsSvcRc[i].uiLastTimeStamp = uiTimeStamp;
+         pEncCtx->iContinualSkipFrames++;
+         break;
+      }
+    }
   }
   return bSkipMustFlag;
 }
 
-void UpdateBufferWhenFrameSkipped (sWelsEncCtx* pEncCtx, int32_t iSpatialNum) {
-  SSpatialPicIndex* pSpatialIndexMap = &pEncCtx->sSpatialIndexMap[0];
-
-  for (int32_t i = 0; i < iSpatialNum; i++) {
-    int32_t iCurDid = (pSpatialIndexMap + i)->iDid;
+void UpdateBufferWhenFrameSkipped (sWelsEncCtx* pEncCtx, int32_t iCurDid) {
     SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[iCurDid];
     const int32_t kiOutputBits = pWelsSvcRc->iBitsPerFrame;
     const int32_t kiOutputMaxBits = pWelsSvcRc->iMaxBitsPerFrame;
@@ -817,7 +821,6 @@ void UpdateBufferWhenFrameSkipped (sWelsEncCtx* pEncCtx, int32_t iSpatialNum) {
     pWelsSvcRc->iSkipFrameNum++;
     pWelsSvcRc->iSkipFrameInVGop++;
 
-  }
   pEncCtx->iContinualSkipFrames++;
   if ((pEncCtx->iContinualSkipFrames % 3) == 0) {
     //output a warning when iContinualSkipFrames is large enough, which may indicate subjective quality problem
@@ -906,7 +909,7 @@ void RcVBufferCalculationPadding (sWelsEncCtx* pEncCtx) {
 
 void RcTraceFrameBits (sWelsEncCtx* pEncCtx, long long uiTimeStamp) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
-
+  SSpatialLayerInternal *pParamInternal = &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
   if (pWelsSvcRc->iPredFrameBit != 0)
     pWelsSvcRc->iPredFrameBit = (int32_t) (LAST_FRAME_PREDICT_WEIGHT * pWelsSvcRc->iFrameDqBits +
                                            (1 - LAST_FRAME_PREDICT_WEIGHT) * pWelsSvcRc->iPredFrameBit);
@@ -919,7 +922,7 @@ void RcTraceFrameBits (sWelsEncCtx* pEncCtx, long long uiTimeStamp) {
            pEncCtx->uiDependencyId, uiTimeStamp, pEncCtx->eSliceType, pEncCtx->iGlobalQp, pWelsSvcRc->iAverageFrameQp,
            pWelsSvcRc->iMaxFrameQp,
            pWelsSvcRc->iMinFrameQp,
-           pEncCtx->iFrameIndex, pEncCtx->uiTemporalId, pWelsSvcRc->iFrameDqBits, pWelsSvcRc->iBitsPerFrame,
+           pParamInternal->iFrameIndex, pEncCtx->uiTemporalId, pWelsSvcRc->iFrameDqBits, pWelsSvcRc->iBitsPerFrame,
            pWelsSvcRc->iTargetBits, pWelsSvcRc->iRemainingBits, pWelsSvcRc->iBufferSizeSkip);
 
 }
