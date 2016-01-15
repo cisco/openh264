@@ -1208,7 +1208,7 @@ int32_t UpdateAccessUnit (PWelsDecoderContext pCtx) {
         pCurAu->uiActualUnitsNum) { // no found IDR nal within incoming AU, need exit to avoid mosaic issue, 11/19/2009
 
       pCtx->sDecoderStatistics.uiIDRLostNum++;
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
                "UpdateAccessUnit():::::Key frame lost.....CAN NOT find IDR from current AU.");
       pCtx->iErrorCode |= dsRefLost;
       if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
