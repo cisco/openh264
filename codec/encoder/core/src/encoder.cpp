@@ -211,7 +211,7 @@ int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam,
   /*init pixel average function*/
   /*get one column or row pixel when refinement*/
   InitMcFunc (&pFuncList->sMcFuncs, uiCpuFlag);
-  InitCoeffFunc (pFuncList,uiCpuFlag,pParam->iEntropyCodingModeFlag);
+  InitCoeffFunc (pFuncList, uiCpuFlag, pParam->iEntropyCodingModeFlag);
 
   WelsInitEncodingFuncs (pFuncList, uiCpuFlag);
   WelsInitReconstructionFuncs (pFuncList, uiCpuFlag);
@@ -226,87 +226,97 @@ int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam,
   return iReturn;
 }
 
-void UpdateFrameNum(sWelsEncCtx* pEncCtx) {
+void UpdateFrameNum (sWelsEncCtx* pEncCtx, const int32_t kiDidx) {
+  SSpatialLayerInternal* pParamInternal = &pEncCtx->pSvcParam->sDependencyLayers[kiDidx];
   bool bNeedFrameNumIncreasing = false;
-  for (int32_t i=0; i<MAX_DEPENDENCY_LAYER; i++) {
-    if (NRI_PRI_LOWEST != pEncCtx->eLastNalPriority[i]) {
-      bNeedFrameNumIncreasing = true;
-    }
+
+  if (NRI_PRI_LOWEST != pEncCtx->eLastNalPriority[kiDidx]) {
+    bNeedFrameNumIncreasing = true;
   }
+
   if (bNeedFrameNumIncreasing) {
-    if (pEncCtx->iFrameNum < (1 << pEncCtx->pSps->uiLog2MaxFrameNum) - 1)
-      ++ pEncCtx->iFrameNum;
+    if (pParamInternal->iFrameNum < (1 << pEncCtx->pSps->uiLog2MaxFrameNum) - 1)
+      ++ pParamInternal->iFrameNum;
     else
-      pEncCtx->iFrameNum = 0;    // if iFrameNum overflow
+      pParamInternal->iFrameNum = 0;    // if iFrameNum overflow
   }
-  for (int32_t i=0; i<MAX_DEPENDENCY_LAYER; i++) {
-    pEncCtx->eLastNalPriority[i] = NRI_PRI_LOWEST;
-  }
+
+  pEncCtx->eLastNalPriority[kiDidx] = NRI_PRI_LOWEST;
+  WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO, "UpdateFrameNum,bNeedFrameNumIncreasing = %d,iFrameNum = %d,kiDidx = %d",
+           bNeedFrameNumIncreasing, pParamInternal->iFrameNum, kiDidx);
 }
 
 
-void LoadBackFrameNum(sWelsEncCtx* pEncCtx) {
-    bool bNeedFrameNumIncreasing = false;
-    for (int32_t i=0; i<MAX_DEPENDENCY_LAYER; i++) {
-      if (NRI_PRI_LOWEST != pEncCtx->eLastNalPriority[i]) {
-        bNeedFrameNumIncreasing = true;
-      }
+void LoadBackFrameNum (sWelsEncCtx* pEncCtx, const int32_t kiDidx) {
+  SSpatialLayerInternal* pParamInternal = &pEncCtx->pSvcParam->sDependencyLayers[kiDidx];
+  bool bNeedFrameNumIncreasing = false;
+
+  if (NRI_PRI_LOWEST != pEncCtx->eLastNalPriority[kiDidx]) {
+    bNeedFrameNumIncreasing = true;
+  }
+
+  if (bNeedFrameNumIncreasing) {
+    if (pParamInternal->iFrameNum != 0) {
+      pParamInternal->iFrameNum --;
+    } else {
+      pParamInternal->iFrameNum = (1 << pEncCtx->pSps->uiLog2MaxFrameNum) - 1;
     }
-    if (bNeedFrameNumIncreasing) {
-      if (pEncCtx->iFrameNum != 0) {
-        pEncCtx->iFrameNum --;
-      } else {
-        pEncCtx->iFrameNum = (1 << pEncCtx->pSps->uiLog2MaxFrameNum) - 1;
-      }
-    }
+  }
+  WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO,
+           "LoadBackFrameNum,bNeedFrameNumIncreasing = %d,iFrameNum = %d,kiDidx = %d", bNeedFrameNumIncreasing,
+           pParamInternal->iFrameNum, kiDidx);
 }
 
-/*!
- * \brief   initialize frame coding
- */
-void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType) {
+void InitBitStream (sWelsEncCtx* pEncCtx) {
   // for bitstream writing
   pEncCtx->iPosBsBuffer         = 0;    // reset bs pBuffer position
   pEncCtx->pOut->iNalIndex      = 0;    // reset NAL index
   pEncCtx->pOut->iLayerBsIndex  = 0;    // reset index of Layer Bs
 
   InitBits (&pEncCtx->pOut->sBsWrite, pEncCtx->pOut->pBsBuffer, pEncCtx->pOut->uiSize);
-
+}
+/*!
+ * \brief   initialize frame coding
+ */
+void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType, const int32_t kiDidx) {
+  SSpatialLayerInternal* pParamInternal = &pEncCtx->pSvcParam->sDependencyLayers[kiDidx];
   if (keFrameType == videoFrameTypeP) {
-    ++pEncCtx->iFrameIndex;
+    ++pParamInternal->iFrameIndex;
 
-    if (pEncCtx->iPOC < (1 << pEncCtx->pSps->iLog2MaxPocLsb) - 2)     // if iPOC type is no 0, this need be modification
-      pEncCtx->iPOC += 2;   // for POC type 0
+    if (pParamInternal->iPOC < (1 << pEncCtx->pSps->iLog2MaxPocLsb) -
+        2)     // if iPOC type is no 0, this need be modification
+      pParamInternal->iPOC += 2;   // for POC type 0
     else
-      pEncCtx->iPOC = 0;
+      pParamInternal->iPOC = 0;
 
-    UpdateFrameNum(pEncCtx);
+    UpdateFrameNum (pEncCtx, kiDidx);
 
     pEncCtx->eNalType           = NAL_UNIT_CODED_SLICE;
     pEncCtx->eSliceType         = P_SLICE;
     pEncCtx->eNalPriority       = NRI_PRI_HIGH;
   } else if (keFrameType == videoFrameTypeIDR) {
-    pEncCtx->iFrameNum          = 0;
-    pEncCtx->iPOC               = 0;
-    pEncCtx->bEncCurFrmAsIdrFlag = false;
-    pEncCtx->iFrameIndex = 0;
+    pParamInternal->iFrameNum          = 0;
+    pParamInternal->iPOC               = 0;
+    pParamInternal->bEncCurFrmAsIdrFlag = false;
+    pParamInternal->iFrameIndex = 0;
 
     pEncCtx->eNalType           = NAL_UNIT_CODED_SLICE_IDR;
     pEncCtx->eSliceType         = I_SLICE;
     pEncCtx->eNalPriority       = NRI_PRI_HIGHEST;
 
-    pEncCtx->iCodingIndex       = 0;
+    pParamInternal->iCodingIndex       = 0;
 
     // reset_ref_list
 
     // rc_init_gop
   } else if (keFrameType == videoFrameTypeI) {
-    if (pEncCtx->iPOC < (1 << pEncCtx->pSps->iLog2MaxPocLsb) - 2)     // if iPOC type is no 0, this need be modification
-      pEncCtx->iPOC += 2;   // for POC type 0
+    if (pParamInternal->iPOC < (1 << pEncCtx->pSps->iLog2MaxPocLsb) -
+        2)     // if iPOC type is no 0, this need be modification
+      pParamInternal->iPOC += 2;   // for POC type 0
     else
-      pEncCtx->iPOC = 0;
+      pParamInternal->iPOC = 0;
 
-    UpdateFrameNum(pEncCtx);
+    UpdateFrameNum (pEncCtx, kiDidx);
 
     pEncCtx->eNalType     = NAL_UNIT_CODED_SLICE;
     pEncCtx->eSliceType   = I_SLICE;
@@ -322,11 +332,12 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType) {
 #endif//FRAME_INFO_OUTPUT
 }
 
-EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum) {
+EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum, const int32_t kiDidx) {
   SWelsSvcCodingParam* pSvcParam = pEncCtx->pSvcParam;
+  SSpatialLayerInternal* pParamInternal = &pEncCtx->pSvcParam->sDependencyLayers[kiDidx];
   EVideoFrameType iFrameType = videoFrameTypeInvalid;
   bool bSceneChangeFlag = false;
-
+  int32_t iSkipFrameFlag = pSvcParam->bSimulcastAVC?pParamInternal->iSkipFrameFlag:pEncCtx->iSkipFrameFlag;
   if (pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
     if ((!pSvcParam->bEnableSceneChangeDetect) || pEncCtx->pVaa->bIdrPeriodFlag ||
         (kiSpatialNum < pSvcParam->iSpatialLayerNum)) {
@@ -334,7 +345,7 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
     } else {
       bSceneChangeFlag = pEncCtx->pVaa->bSceneChangeFlag;
     }
-    if (pEncCtx->pVaa->bIdrPeriodFlag || pEncCtx->bEncCurFrmAsIdrFlag || (!pSvcParam->bEnableLongTermReference
+    if (pEncCtx->pVaa->bIdrPeriodFlag || pParamInternal->bEncCurFrmAsIdrFlag || (!pSvcParam->bEnableLongTermReference
         && bSceneChangeFlag)) {
       iFrameType = videoFrameTypeIDR;
     } else if (pSvcParam->bEnableLongTermReference && (bSceneChangeFlag
@@ -356,11 +367,11 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
     } else {
       iFrameType = videoFrameTypeP;
     }
-    if (videoFrameTypeP == iFrameType && pEncCtx->iSkipFrameFlag > 0) {
-      -- pEncCtx->iSkipFrameFlag;
+    if (videoFrameTypeP == iFrameType && iSkipFrameFlag > 0) {
+      pParamInternal->iSkipFrameFlag = 0;
       iFrameType = videoFrameTypeSkip;
     } else if (videoFrameTypeIDR == iFrameType) {
-      pEncCtx->iCodingIndex = 0;
+      pParamInternal->iCodingIndex = 0;
       pEncCtx->bCurFrameMarkedAsSceneLtr   = true;
     }
 
@@ -368,7 +379,7 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
     // perform scene change detection
     if ((!pSvcParam->bEnableSceneChangeDetect) || pEncCtx->pVaa->bIdrPeriodFlag ||
         (kiSpatialNum < pSvcParam->iSpatialLayerNum)
-        || (pEncCtx->iFrameIndex < (VGOP_SIZE << 1))) { // avoid too frequent I frame coding, rc control
+        || (pParamInternal->iFrameIndex < (VGOP_SIZE << 1))) { // avoid too frequent I frame coding, rc control
       bSceneChangeFlag = false;
     } else {
       bSceneChangeFlag = pEncCtx->pVaa->bSceneChangeFlag;
@@ -378,13 +389,13 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
     //bIdrPeriodFlag: RC disable || iSpatialNum != pSvcParam->iSpatialLayerNum
     //pEncCtx->bEncCurFrmAsIdrFlag: 1. first frame should be IDR; 2. idr pause; 3. idr request
     iFrameType = (pEncCtx->pVaa->bIdrPeriodFlag || bSceneChangeFlag
-                  || pEncCtx->bEncCurFrmAsIdrFlag) ? videoFrameTypeIDR : videoFrameTypeP;
+                  || pParamInternal->bEncCurFrmAsIdrFlag) ? videoFrameTypeIDR : videoFrameTypeP;
 
-    if (videoFrameTypeP == iFrameType && pEncCtx->iSkipFrameFlag > 0) {  // for frame skip, 1/5/2010
-      -- pEncCtx->iSkipFrameFlag;
+    if (videoFrameTypeP == iFrameType && iSkipFrameFlag > 0) {  // for frame skip, 1/5/2010
+      pParamInternal->iSkipFrameFlag = 0;
       iFrameType = videoFrameTypeSkip;
     } else if (videoFrameTypeIDR == iFrameType) {
-      pEncCtx->iCodingIndex = 0;
+      pParamInternal->iCodingIndex = 0;
     }
   }
   return iFrameType;

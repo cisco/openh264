@@ -149,10 +149,7 @@ typedef struct TagWelsEncCtx {
   SLTRState*        pLtr;//[MAX_DEPENDENCY_LAYER];
   bool              bCurFrameMarkedAsSceneLtr;
 // Derived
-  int32_t           iCodingIndex;
-  int32_t           iFrameIndex;            // count how many frames elapsed during coding context currently
-  int32_t           iFrameNum;              // current frame number coding
-  int32_t           iPOC;                   // frame iPOC
+
   EWelsSliceType    eSliceType;             // currently coding slice type
   EWelsNalUnitType  eNalType;               // NAL type
   EWelsNalRefIdc    eNalPriority;           // NAL_Reference_Idc currently
@@ -162,7 +159,6 @@ typedef struct TagWelsEncCtx {
   uint8_t           uiDependencyId;         // Idc of dependecy layer to be coded
   uint8_t           uiTemporalId;           // Idc of temporal layer to be coded
   bool              bNeedPrefixNalFlag;     // whether add prefix nal
-  bool              bEncCurFrmAsIdrFlag;
 
 // Rate control routine
   SWelsSvcRc*       pWelsSvcRc;
@@ -202,7 +198,6 @@ typedef struct TagWelsEncCtx {
 
   bool              bRefOfCurTidIsLtr[MAX_DEPENDENCY_LAYER][MAX_TEMPORAL_LEVEL];
   uint16_t          uiIdrPicId;           // IDR picture id: [0, 65535], this one is used for LTR
-
   int32_t           iMaxSliceCount;// maximal count number of slices for all layers observation
   int16_t           iActiveThreadsNum;      // number of threads active so far
 

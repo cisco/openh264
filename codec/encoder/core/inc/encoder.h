@@ -82,11 +82,11 @@ int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* _param,
 /*!
  * \brief   initialize frame coding
  */
-void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType);
-void LoadBackFrameNum(sWelsEncCtx* pEncCtx);
+void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType,const int32_t kiDidx);
+void LoadBackFrameNum(sWelsEncCtx* pEncCtx,const int32_t kiDidx);
 
-EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum);
-
+EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum,const int32_t kiDidx);
+void InitBitStream(sWelsEncCtx* pEncCtx);
 int32_t GetTemporalLevel (SSpatialLayerInternal* fDlp, const int32_t kiFrameNum, const int32_t kiGopSize);
 /*!
  * \brief   Dump reconstruction for dependency layer

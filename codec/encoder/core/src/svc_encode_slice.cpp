@@ -89,14 +89,14 @@ void WelsSliceHeaderScalExtInit (SDqLayer* pCurLayer, SSlice* pSlice) {
 void WelsSliceHeaderExtInit (sWelsEncCtx* pEncCtx, SDqLayer* pCurLayer, SSlice* pSlice) {
   SSliceHeaderExt* pCurSliceExt = &pSlice->sSliceHeaderExt;
   SSliceHeader* pCurSliceHeader  = &pCurSliceExt->sSliceHeader;
-
+  SSpatialLayerInternal *pParamInternal = &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
   pCurSliceHeader->eSliceType = pEncCtx->eSliceType;
 
   pCurSliceExt->bStoreRefBasePicFlag = false;
 
   pCurSliceHeader->iFirstMbInSlice = WelsGetFirstMbOfSlice (pCurLayer->sLayerInfo.pSliceInLayer, pSlice->uiSliceIdx);
 
-  pCurSliceHeader->iFrameNum      = pEncCtx->iFrameNum;
+  pCurSliceHeader->iFrameNum      = pParamInternal->iFrameNum;
   pCurSliceHeader->uiIdrPicId     = pEncCtx->uiIdrPicId;
 
   pCurSliceHeader->iPicOrderCntLsb = pEncCtx->pEncPic->iFramePoc;      // 0
