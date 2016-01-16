@@ -24,7 +24,8 @@ class CSimpleTask : public IWelsTask {
   }
 
   virtual int32_t Execute() {
-    WelsSleep (300 - m_uiID);
+    uint32_t uiSleepTime = (m_uiID > 99) ? 10 : m_uiID;
+    WelsSleep (uiSleepTime);
     //printf ("Task %d executing\n", m_uiID);
     return cmResultSuccess;
   }
