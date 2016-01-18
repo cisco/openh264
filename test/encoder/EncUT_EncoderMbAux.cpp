@@ -198,6 +198,10 @@ TEST (EncodeMbAuxTest, WelsDctFourT4_sse2) {
   TestDctFourT4 (WelsDctFourT4_sse2);
 }
 
+TEST (EncodeMbAuxTest, WelsDctFourT4_avx2) {
+  TestDctFourT4 (WelsDctFourT4_avx2);
+}
+
 TEST (EncodeMbAuxTest, WelsCalculateSingleCtr4x4_sse2) {
   CMemoryAlign cMemoryAlign (0);
   ALLOC_MEMORY (int16_t, iDctC, 16);

@@ -42,7 +42,7 @@
 
 %include "asm_inc.asm"
 
-SECTION .rodata align=16
+SECTION .rodata align=32
 
 ;***********************************************************************
 ; Constant
@@ -62,6 +62,15 @@ SSE2_DeQuant8 dw  10, 13, 10, 13, 13, 16, 13, 16,
             dw  18, 23, 18, 23, 23, 29, 23, 29,
             dw  18, 23, 18, 23, 23, 29, 23, 29
 
+align 32
+wels_p1m1p1m1w_256:
+    times 8 dw 1, -1
+wels_p1p2p1p2w_256:
+    times 8 dw 1, 2
+wels_rev64w_256:
+    times 2 db 6, 7, 4, 5, 2, 3, 0, 1, 14, 15, 12, 13, 10, 11, 8, 9
+wels_p1m1m1p1w_256:
+    times 4 dw 1, -1, -1, 1
 
 ;***********************************************************************
 ; MMX functions
@@ -501,4 +510,102 @@ WELS_EXTERN WelsHadamardT4Dc_sse2
     movdqa  [r0+16],   xmm2
 
     POP_XMM
+    ret
+
+;***********************************************************************
+; AVX2 functions
+;***********************************************************************
+
+; out=%1 pPixel1=%2 iStride1=%3 pPixel2=%4 iStride2=%5 zero=%6 clobber=%7,%8
+%macro AVX2_LoadDiff16P 8
+    vmovq         x%1, [%2         ]
+    vpbroadcastq  y%7, [%2 + 4 * %3]
+    vpblendd      y%1, y%1, y%7, 11110000b
+    vpunpcklbw    y%1, y%1, y%6
+    vmovq         x%7, [%4         ]
+    vpbroadcastq  y%8, [%4 + 4 * %5]
+    vpblendd      y%7, y%7, y%8, 11110000b
+    vpunpcklbw    y%7, y%7, y%6
+    vpsubw        y%1, y%1, y%7
+%endmacro
+
+; pDct=%1 data=%1,%2,%3,%4 clobber=%5
+%macro AVX2_Store4x16P 6
+    vpunpcklqdq   y%6, y%2,  y%3
+    vmovdqa       [%1+0x00], x%6
+    vextracti128  [%1+0x40], y%6, 1
+    vpunpckhqdq   y%6, y%2,  y%3
+    vmovdqa       [%1+0x20], x%6
+    vextracti128  [%1+0x60], y%6, 1
+    vpunpcklqdq   y%6, y%4,  y%5
+    vmovdqa       [%1+0x10], x%6
+    vextracti128  [%1+0x50], y%6, 1
+    vpunpckhqdq   y%6, y%4,  y%5
+    vmovdqa       [%1+0x30], x%6
+    vextracti128  [%1+0x70], y%6, 1
+%endmacro
+
+; 4-pt DCT
+; out=%1,%2,%3,%4 in=%1,%2,%3,%4 clobber=%5
+%macro AVX2_DCT 5
+    vpsubw        %5, %1, %4  ; s3 = x0 - x3
+    vpaddw        %1, %1, %4  ; s0 = x0 + x3
+    vpsubw        %4, %2, %3  ; s2 = x1 - x2
+    vpaddw        %2, %2, %3  ; s1 = x1 + x2
+    vpsubw        %3, %1, %2  ; y2 = s0 - s1
+    vpaddw        %1, %1, %2  ; y0 = s0 + s1
+    vpsllw        %2, %5, 1
+    vpaddw        %2, %2, %4  ; y1 = 2 * s3 + s2
+    vpsllw        %4, %4, 1
+    vpsubw        %4, %5, %4  ; y3 = s3 - 2 * s2
+%endmacro
+
+; Do 4 horizontal 4-pt DCTs in parallel packed as 16 words in a ymm register.
+; out=%1 in=%1 wels_rev64w_256=%2 clobber=%3
+%macro AVX2_DCT_HORIZONTAL 3
+    vpsignw       %3, %1, [wels_p1m1p1m1w_256]  ; [x[0],-x[1],x[2],-x[3], ...]
+    vpshufb       %1, %1, %2                    ; [x[3],x[2],x[1],x[0], ...]
+    vpaddw        %1, %1, %3                    ; s = [x[0]+x[3],-x[1]+x[2],x[2]+x[1],-x[3]+x[0], ...]
+    vpmullw       %3, %1, [wels_p1m1m1p1w_256]  ; [s[0],-s[1],-s[2],s[3], ...]
+    vpshufd       %1, %1, 0b1h                  ; [s[2],s[3],s[0],s[1], ...]
+    vpmullw       %1, %1, [wels_p1p2p1p2w_256]  ; [s[2],2*s[3],s[0],2*s[1], ...]
+    vpaddw        %1, %1, %3                    ; y = [s[0]+s[2],-s[1]+2*s[3],-s[2]+s[0],s[3]+2*s[1], ...]
+%endmacro
+
+;***********************************************************************
+; void WelsDctFourT4_avx2(int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2)
+;***********************************************************************
+WELS_EXTERN WelsDctFourT4_avx2
+    %assign push_num 0
+    LOAD_5_PARA
+    PUSH_XMM 7
+    SIGN_EXTENSION r2, r2d
+    SIGN_EXTENSION r4, r4d
+
+    vpxor ymm6, ymm6, ymm6
+
+    ;Load 4x16
+    AVX2_LoadDiff16P mm0, r1, r2, r3, r4, mm6, mm4, mm5
+    add r1, r2
+    add r3, r4
+    AVX2_LoadDiff16P mm1, r1, r2, r3, r4, mm6, mm4, mm5
+    add r1, r2
+    add r3, r4
+    AVX2_LoadDiff16P mm2, r1, r2, r3, r4, mm6, mm4, mm5
+    add r1, r2
+    add r3, r4
+    AVX2_LoadDiff16P mm3, r1, r2, r3, r4, mm6, mm4, mm5
+
+    AVX2_DCT ymm0, ymm1, ymm2, ymm3, ymm5
+    vmovdqa ymm6, [wels_rev64w_256]
+    AVX2_DCT_HORIZONTAL ymm0, ymm6, ymm5
+    AVX2_DCT_HORIZONTAL ymm1, ymm6, ymm5
+    AVX2_DCT_HORIZONTAL ymm2, ymm6, ymm5
+    AVX2_DCT_HORIZONTAL ymm3, ymm6, ymm5
+
+    AVX2_Store4x16P r0, mm0, mm1, mm2, mm3, mm5
+    vzeroupper
+
+    POP_XMM
+    LOAD_5_PARA_POP
     ret
