@@ -61,6 +61,14 @@ wels_p1p1m1m1w_256:
     times 4 dw 1, 1, -1, -1
 
 align 16
+wels_p1m1p1m1w_128:
+    times 4 dw 1, -1
+wels_p1p2p1p2w_128:
+    times 4 dw 1, 2
+wels_p1m1m1p1w_128:
+    times 2 dw 1, -1, -1, 1
+
+align 16
 SSE2_DeQuant8 dw  10, 13, 10, 13, 13, 16, 13, 16,
             dw  10, 13, 10, 13, 13, 16, 13, 16,
             dw  11, 14, 11, 14, 14, 18, 14, 18,
@@ -205,12 +213,14 @@ WELS_EXTERN WelsIDctT4Rec_mmx
 ; SSE2 functions
 ;***********************************************************************
 %macro SSE2_Store4x8p 6
-    SSE2_XSawp qdq, %2, %3, %6
-    SSE2_XSawp qdq, %4, %5, %3
-    MOVDQ    [%1+0x00], %2
-    MOVDQ    [%1+0x10], %4
-    MOVDQ    [%1+0x20], %6
-    MOVDQ    [%1+0x30], %3
+    movlps   [%1+0x00], %2
+    movhps   [%1+0x20], %2
+    movlps   [%1+0x08], %3
+    movhps   [%1+0x28], %3
+    movlps   [%1+0x10], %4
+    movhps   [%1+0x30], %4
+    movlps   [%1+0x18], %5
+    movhps   [%1+0x38], %5
 %endmacro
 
 %macro SSE2_Load4x8p 6
@@ -224,9 +234,9 @@ WELS_EXTERN WelsIDctT4Rec_mmx
 
 %macro SSE2_SumSubMul2 3
     movdqa  %3, %1
-    paddw   %1, %1
+    psllw   %1, 1
     paddw   %1, %2
-    psubw   %3, %2
+    psllw   %2, 1
     psubw   %3, %2
 %endmacro
 
@@ -295,6 +305,19 @@ WELS_EXTERN WelsIDctT4Rec_mmx
     SSE2_SumSub      %7, %4, %5
 %endmacro
 
+; Do 2 horizontal 4-pt DCTs in parallel packed as 8 words in an xmm register.
+; out=%1 in=%1 clobber=%2
+%macro SSE2_DCT_HORIZONTAL 2
+    pshuflw       %2, %1, 1bh               ; [x[3],x[2],x[1],x[0]] low qw
+    pmullw        %1, [wels_p1m1p1m1w_128]  ; [x[0],-x[1],x[2],-x[3], ...]
+    pshufhw       %2, %2, 1bh               ; [x[3],x[2],x[1],x[0]] high qw
+    paddw         %1, %2                    ; s = [x[0]+x[3],-x[1]+x[2],x[2]+x[1],-x[3]+x[0], ...]
+    pshufd        %2, %1, 0b1h              ; [s[2],s[3],s[0],s[1], ...]
+    pmullw        %1, [wels_p1m1m1p1w_128]  ; [s[0],-s[1],-s[2],s[3], ...]
+    pmullw        %2, [wels_p1p2p1p2w_128]  ; [s[2],2*s[3],s[0],2*s[1], ...]]
+    paddw         %1, %2                    ; y = [s[0]+s[2],-s[1]+2*s[3],-s[2]+s[0],s[3]+2*s[1], ...]
+%endmacro
+
 ;***********************************************************************
 ; void WelsDctFourT4_sse2(int16_t *pDct, uint8_t *pix1, int32_t i_pix1, uint8_t *pix2, int32_t i_pix2 )
 ;***********************************************************************
@@ -314,11 +337,12 @@ WELS_EXTERN WelsDctFourT4_sse2
     SSE2_LoadDiff8P    xmm3, xmm6, xmm7, [r1+r2], [r3+r4]
 
     SSE2_DCT            xmm1, xmm2, xmm3, xmm4, xmm5, xmm0
-    SSE2_TransTwo4x4W   xmm2, xmm0, xmm3, xmm4, xmm1
-    SSE2_DCT            xmm0, xmm4, xmm1, xmm3, xmm5, xmm2
-    SSE2_TransTwo4x4W   xmm4, xmm2, xmm1, xmm3, xmm0
+    SSE2_DCT_HORIZONTAL xmm2, xmm5
+    SSE2_DCT_HORIZONTAL xmm0, xmm5
+    SSE2_DCT_HORIZONTAL xmm3, xmm5
+    SSE2_DCT_HORIZONTAL xmm4, xmm5
 
-    SSE2_Store4x8p r0, xmm4, xmm2, xmm3, xmm0, xmm5
+    SSE2_Store4x8p r0, xmm2, xmm0, xmm3, xmm4, xmm1
 
     lea     r1, [r1 + 2 * r2]
     lea     r3, [r3 + 2 * r4]
@@ -332,12 +356,12 @@ WELS_EXTERN WelsDctFourT4_sse2
     SSE2_LoadDiff8P    xmm3, xmm6, xmm7, [r1+r2], [r3+r4]
 
     SSE2_DCT            xmm1, xmm2, xmm3, xmm4, xmm5, xmm0
-    SSE2_TransTwo4x4W   xmm2, xmm0, xmm3, xmm4, xmm1
-    SSE2_DCT            xmm0, xmm4, xmm1, xmm3, xmm5, xmm2
-    SSE2_TransTwo4x4W   xmm4, xmm2, xmm1, xmm3, xmm0
+    SSE2_DCT_HORIZONTAL xmm2, xmm5
+    SSE2_DCT_HORIZONTAL xmm0, xmm5
+    SSE2_DCT_HORIZONTAL xmm3, xmm5
+    SSE2_DCT_HORIZONTAL xmm4, xmm5
 
-    lea     r0, [r0+64]
-    SSE2_Store4x8p r0, xmm4, xmm2, xmm3, xmm0, xmm5
+    SSE2_Store4x8p r0+64, xmm2, xmm0, xmm3, xmm4, xmm1
 
     POP_XMM
     LOAD_5_PARA_POP
