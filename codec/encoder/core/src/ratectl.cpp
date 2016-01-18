@@ -1292,8 +1292,8 @@ void WelsRcFrameDelayJudgeTimeStamp (sWelsEncCtx* pEncCtx, EVideoFrameType eFram
   int32_t iBitRate = pDLayerConfig->iSpatialBitrate;
   int32_t iEncTimeInv = (pWelsSvcRc->uiLastTimeStamp == 0) ? 0 : (int32_t) (uiTimeStamp - pWelsSvcRc->uiLastTimeStamp);
   if ((iEncTimeInv < 0) || (iEncTimeInv > 1000)) {
-    pWelsSvcRc->uiLastTimeStamp = uiTimeStamp - 1000.0 / pDLayerConfig->fFrameRate;
-    iEncTimeInv = 1000.0 / pDLayerConfig->fFrameRate;
+    iEncTimeInv = (int32_t) (1000.0 / pDLayerConfig->fFrameRate);
+    pWelsSvcRc->uiLastTimeStamp = uiTimeStamp - iEncTimeInv;
   }
   int32_t iSentBits  = (int32_t) ((double)iBitRate * iEncTimeInv * (1.0E-3) + 0.5);
   iSentBits = WELS_MAX (iSentBits, 0);
