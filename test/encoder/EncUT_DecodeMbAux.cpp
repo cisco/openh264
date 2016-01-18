@@ -354,6 +354,9 @@ TEST (DecodeMbAuxTest, WelsIDctRecI16x16Dc_c) {
 TEST (DecodeMbAuxTest, WelsIDctFourT4Rec_sse2) {
   TestIDctFourT4Rec<int16_t> (WelsIDctFourT4Rec_sse2);
 }
+TEST (DecodeMbAuxTest, WelsIDctFourT4Rec_avx2) {
+  TestIDctFourT4Rec<int16_t> (WelsIDctFourT4Rec_avx2);
+}
 TEST (DecodeMbAuxTest, WelsIDctRecI16x16Dc_sse2) {
   int32_t iCpuCores = 0;
   uint32_t uiCpuFeatureFlag = WelsCPUFeatureDetect (&iCpuCores);
