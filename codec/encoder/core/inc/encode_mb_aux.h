@@ -90,6 +90,7 @@ int32_t WelsCalculateSingleCtr4x4_sse2 (int16_t* pDct);
  ****************************************************************************/
 void WelsDctT4_mmx (int16_t* pDct,  uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2);
 void WelsDctFourT4_sse2 (int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2);
+void WelsDctFourT4_avx2 (int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2);
 
 /****************************************************************************
  * HDM and Quant functions
