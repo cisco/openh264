@@ -57,6 +57,8 @@ wels_rev64w_256:
     times 2 db 6, 7, 4, 5, 2, 3, 0, 1, 14, 15, 12, 13, 10, 11, 8, 9
 wels_p1m1m1p1w_256:
     times 4 dw 1, -1, -1, 1
+wels_p1p1m1m1w_256:
+    times 4 dw 1, 1, -1, -1
 
 align 16
 SSE2_DeQuant8 dw  10, 13, 10, 13, 13, 16, 13, 16,
@@ -529,6 +531,48 @@ WELS_EXTERN WelsHadamardT4Dc_sse2
     vpsubw        y%1, y%1, y%7
 %endmacro
 
+; pRec=%1 iStride=%2 data=%3,%4 pPred=%5 iPredStride=%6 dw32=%7 zero=%8 clobber=%9,%10
+%macro AVX2_StoreDiff32P 10
+    vpaddw        y%3, y%3, y%7
+    vpsraw        y%3, y%3, 6
+    vmovq         x%9,  [%5         ]
+    vpbroadcastq  y%10, [%5 + 4 * %6]
+    add           %5, %6
+    vpblendd      y%9, y%9, y%10, 11110000b
+    vpunpcklbw    y%9, y%9, y%8
+    vpaddsw       y%3, y%3, y%9
+    vpaddw        y%4, y%4, y%7
+    vpsraw        y%4, y%4, 6
+    vmovq         x%9,  [%5         ]
+    vpbroadcastq  y%10, [%5 + 4 * %6]
+    vpblendd      y%9, y%9, y%10, 11110000b
+    vpunpcklbw    y%9, y%9, y%8
+    vpaddsw       y%4, y%4, y%9
+    vpackuswb     y%3, y%3, y%4
+    vextracti128  x%4, y%3, 1
+    vmovlps       [%1         ], x%3
+    vmovlps       [%1 + 4 * %2], x%4
+    add           %1, %2
+    vmovhps       [%1         ], x%3
+    vmovhps       [%1 + 4 * %2], x%4
+%endmacro
+
+; out=%1,%2,%3,%4 pDct=%5 clobber=%6
+%macro AVX2_Load4x16P 6
+    vmovdqa       x%2, [%5+0x00]
+    vinserti128   y%2, [%5+0x40], 1
+    vmovdqa       x%6, [%5+0x20]
+    vinserti128   y%6, [%5+0x60], 1
+    vpunpcklqdq   y%1, y%2, y%6
+    vpunpckhqdq   y%2, y%2, y%6
+    vmovdqa       x%4, [%5+0x10]
+    vinserti128   y%4, [%5+0x50], 1
+    vmovdqa       x%6, [%5+0x30]
+    vinserti128   y%6, [%5+0x70], 1
+    vpunpcklqdq   y%3, y%4, y%6
+    vpunpckhqdq   y%4, y%4, y%6
+%endmacro
+
 ; pDct=%1 data=%1,%2,%3,%4 clobber=%5
 %macro AVX2_Store4x16P 6
     vpunpcklqdq   y%6, y%2,  y%3
@@ -560,6 +604,21 @@ WELS_EXTERN WelsHadamardT4Dc_sse2
     vpsubw        %4, %5, %4  ; y3 = s3 - 2 * s2
 %endmacro
 
+; 4-pt IDCT
+; out=%1,%2,%3,%4 in=%1,%2,%3,%4 clobber=%5
+%macro AVX2_IDCT 5
+    vpsraw        %5, %2, 1
+    vpsubw        %5, %5, %4  ; t3 = (x1 >> 1) - x3
+    vpsraw        %4, %4, 1
+    vpaddw        %4, %2, %4  ; t2 = x1 + (x3 >> 1)
+    vpaddw        %2, %1, %3  ; t0 = x0 + x2
+    vpsubw        %3, %1, %3  ; t1 = x0 - x2
+    vpaddw        %1, %2, %4  ; y0 = t0 + t2
+    vpsubw        %4, %2, %4  ; y3 = t0 - t2
+    vpaddw        %2, %3, %5  ; y1 = t1 + t3
+    vpsubw        %3, %3, %5  ; y2 = t1 - t3
+%endmacro
+
 ; Do 4 horizontal 4-pt DCTs in parallel packed as 16 words in a ymm register.
 ; out=%1 in=%1 wels_rev64w_256=%2 clobber=%3
 %macro AVX2_DCT_HORIZONTAL 3
@@ -570,6 +629,20 @@ WELS_EXTERN WelsHadamardT4Dc_sse2
     vpshufd       %1, %1, 0b1h                  ; [s[2],s[3],s[0],s[1], ...]
     vpmullw       %1, %1, [wels_p1p2p1p2w_256]  ; [s[2],2*s[3],s[0],2*s[1], ...]
     vpaddw        %1, %1, %3                    ; y = [s[0]+s[2],-s[1]+2*s[3],-s[2]+s[0],s[3]+2*s[1], ...]
+%endmacro
+
+; Do 4 horizontal 4-pt IDCTs in parallel packed as 16 words in a ymm register.
+; out=%1 in=%1 wels_rev64w_256=%2 clobber=%3
+%macro AVX2_IDCT_HORIZONTAL 3
+    vpsraw        %3, %1, 1                     ; [x[0]>>1,x[1]>>1,x[2]>>1,x[3]>>1, ...]
+    vpblendw      %3, %1, %3, 10101010b         ; [x[0],x[1]>>1,x[2],x[3]>>1, ...]
+    vpshufd       %1, %1, 0b1h                  ; [x[2],x[3],x[0],x[1], ...]
+    vpsignw       %1, %1, [wels_p1m1m1p1w_256]  ; [x[2],-x[3],-x[0],x[1], ...]
+    vpaddw        %1, %3, %1                    ; s = [x[0]+x[2],(x[1]>>1)-x[3],x[2]-x[0],(x[3]>>1)+x[1], ...]
+    vpshufb       %3, %1, %2                    ; [s[3],s[2],s[1],s[0], ...]
+    vpmullw       %1, %1, [wels_p1p1m1m1w_256]  ; [s[0],s[1],-s[2],-s[3], ...]
+    vpmullw       %3, %3, [wels_p1m1m1p1w_256]  ; [s[3],-s[2],-s[1],s[0], ...]
+    vpaddw        %1, %1, %3                    ; y = [s[0]+s[3],s[1]-s[2],-s[2]-s[1],-s[3]+s[0], ...]
 %endmacro
 
 ;***********************************************************************
@@ -604,6 +677,36 @@ WELS_EXTERN WelsDctFourT4_avx2
     AVX2_DCT_HORIZONTAL ymm3, ymm6, ymm5
 
     AVX2_Store4x16P r0, mm0, mm1, mm2, mm3, mm5
+    vzeroupper
+
+    POP_XMM
+    LOAD_5_PARA_POP
+    ret
+
+;***********************************************************************
+; void WelsIDctFourT4Rec_avx2(uint8_t* pRec, int32_t iStride, uint8_t* pPred, int32_t iPredStride, int16_t* pDct);
+;***********************************************************************
+WELS_EXTERN WelsIDctFourT4Rec_avx2
+    %assign push_num 0
+    LOAD_5_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+
+    AVX2_Load4x16P mm0, mm1, mm2, mm3, r4, mm5
+    vmovdqa ymm6, [wels_rev64w_256]
+    AVX2_IDCT_HORIZONTAL ymm0, ymm6, ymm5
+    AVX2_IDCT_HORIZONTAL ymm1, ymm6, ymm5
+    AVX2_IDCT_HORIZONTAL ymm2, ymm6, ymm5
+    AVX2_IDCT_HORIZONTAL ymm3, ymm6, ymm5
+    AVX2_IDCT ymm0, ymm1, ymm2, ymm3, ymm5
+
+    vpxor ymm6, ymm6, ymm6
+    WELS_DW32_VEX ymm7
+    AVX2_StoreDiff32P r0, r1, mm0, mm1, r2, r3, mm7, mm6, mm5, mm4
+    add r2, r3
+    add r0, r1
+    AVX2_StoreDiff32P r0, r1, mm2, mm3, r2, r3, mm7, mm6, mm5, mm4
     vzeroupper
 
     POP_XMM

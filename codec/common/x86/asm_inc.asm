@@ -605,8 +605,8 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
     packuswb %1,%1
 %endmacro
 
-
-
-
-
-
+%macro WELS_DW32_VEX 1
+    vpcmpeqw %1, %1, %1
+    vpsrlw   %1, %1, 15
+    vpsllw   %1, %1,  5
+%endmacro
