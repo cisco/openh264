@@ -81,6 +81,10 @@ wels_p1p2p1p2w_128:
     times 4 dw 1, 2
 wels_p1m1m1p1w_128:
     times 2 dw 1, -1, -1, 1
+wels_p0m8000p0m8000w_128:
+    times 4 dw 0, -8000h
+wels_p1p1m1m1w_128:
+    times 2 dw 1, 1, -1, -1
 
 ;***********************************************************************
 ; MMX functions
@@ -249,14 +253,20 @@ WELS_EXTERN WelsIDctT4Rec_mmx
     psubw   %4, %3
 %endmacro
 
-%macro SSE2_StoreDiff8p 6
-    paddw       %1, %3
+%macro SSE2_StoreDiff16p 9
+    paddw       %1, %4
     psraw       %1, $06
-    movq        %2, %6
-    punpcklbw   %2, %4
-    paddsw      %2, %1
-    packuswb    %2, %2
-    movq        %5, %2
+    movq        %3, %7
+    punpcklbw   %3, %5
+    paddsw      %1, %3
+    paddw       %2, %4
+    psraw       %2, $06
+    movq        %3, %9
+    punpcklbw   %3, %5
+    paddsw      %2, %3
+    packuswb    %1, %2
+    movlps      %6, %1
+    movhps      %8, %1
 %endmacro
 
 %macro SSE2_StoreDiff8p 5
@@ -316,6 +326,27 @@ WELS_EXTERN WelsIDctT4Rec_mmx
     pmullw        %1, [wels_p1m1m1p1w_128]  ; [s[0],-s[1],-s[2],s[3], ...]
     pmullw        %2, [wels_p1p2p1p2w_128]  ; [s[2],2*s[3],s[0],2*s[1], ...]]
     paddw         %1, %2                    ; y = [s[0]+s[2],-s[1]+2*s[3],-s[2]+s[0],s[3]+2*s[1], ...]
+%endmacro
+
+; Do 2 horizontal 4-pt IDCTs in parallel packed as 8 words in an xmm register.
+;
+; Use a multiply by reciprocal to get -x>>1, and x+=-x>>1 to get x>>1, which
+; avoids a cumbersome blend with SSE2 to get a vector with right-shifted odd
+; elements.
+;
+; out=%1 in=%1 wels_p1m1m1p1w_128=%2 clobber=%3,%4
+%macro SSE2_IDCT_HORIZONTAL 4
+    movdqa        %3, [wels_p0m8000p0m8000w_128]
+    pmulhw        %3, %1                    ; x[0:7] * [0,-8000h,0,-8000h, ...] >> 16
+    pshufd        %4, %1, 0b1h              ; [x[2],x[3],x[0],x[1], ...]
+    pmullw        %4, %2                    ; [x[2],-x[3],-x[0],x[1], ...]
+    paddw         %1, %3                    ; [x[0]+0,x[1]+(-x[1]>>1),x[2]+0,x[3]+(-x[3]>>1), ...]
+    paddw         %1, %4                    ; s = [x[0]+x[2],(x[1]>>1)-x[3],x[2]-x[0],(x[3]>>1)+x[1], ...]
+    pshuflw       %3, %1, 1bh               ; [s[3],s[2],s[1],s[0]] low qw
+    pmullw        %1, [wels_p1p1m1m1w_128]  ; [s[0],s[1],-s[2],-s[3], ...]
+    pshufhw       %3, %3, 1bh               ; [s[3],s[2],s[1],s[0]] high qw
+    pmullw        %3, %2                    ; [s[3],-s[2],-s[1],s[0], ...]
+    paddw         %1, %3                    ; y = [s[0]+s[3],s[1]-s[2],-s[2]-s[1],-s[3]+s[0], ...]
 %endmacro
 
 ;***********************************************************************
@@ -380,40 +411,39 @@ WELS_EXTERN WelsIDctFourT4Rec_sse2
     ;Load 4x8
     SSE2_Load4x8p  r4, xmm0, xmm1, xmm4, xmm2, xmm5
 
-    SSE2_TransTwo4x4W   xmm0, xmm1, xmm4, xmm2, xmm3
-    SSE2_IDCT           xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm0
-    SSE2_TransTwo4x4W   xmm1, xmm4, xmm0, xmm2, xmm3
-    SSE2_IDCT           xmm4, xmm2, xmm3, xmm0, xmm5, xmm6, xmm1
+    movdqa xmm7, [wels_p1m1m1p1w_128]
+    SSE2_IDCT_HORIZONTAL xmm0, xmm7, xmm5, xmm6
+    SSE2_IDCT_HORIZONTAL xmm1, xmm7, xmm5, xmm6
+    SSE2_IDCT_HORIZONTAL xmm4, xmm7, xmm5, xmm6
+    SSE2_IDCT_HORIZONTAL xmm2, xmm7, xmm5, xmm6
+    SSE2_IDCT xmm1, xmm4, xmm2, xmm3, xmm5, xmm6, xmm0
 
     WELS_Zero           xmm7
     WELS_DW32           xmm6
 
-    SSE2_StoreDiff8p   xmm4, xmm5, xmm6, xmm7, [r0      ],  [r2]
-    SSE2_StoreDiff8p   xmm0, xmm5, xmm6, xmm7, [r0 + r1 ],  [r2 + r3]
+    SSE2_StoreDiff16p xmm1, xmm3, xmm5, xmm6, xmm7, [r0], [r2], [r0 + r1], [r2 + r3]
     lea     r0, [r0 + 2 * r1]
     lea     r2, [r2 + 2 * r3]
-    SSE2_StoreDiff8p   xmm1, xmm5, xmm6, xmm7, [r0],            [r2]
-    SSE2_StoreDiff8p   xmm2, xmm5, xmm6, xmm7, [r0 + r1 ],  [r2 + r3]
+    SSE2_StoreDiff16p xmm0, xmm4, xmm5, xmm6, xmm7, [r0], [r2], [r0 + r1], [r2 + r3]
 
-    add     r4, 64
     lea     r0, [r0 + 2 * r1]
     lea     r2, [r2 + 2 * r3]
-    SSE2_Load4x8p  r4, xmm0, xmm1, xmm4, xmm2, xmm5
+    SSE2_Load4x8p  r4+64, xmm0, xmm1, xmm4, xmm2, xmm5
 
-    SSE2_TransTwo4x4W   xmm0, xmm1, xmm4, xmm2, xmm3
-    SSE2_IDCT           xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm0
-    SSE2_TransTwo4x4W   xmm1, xmm4, xmm0, xmm2, xmm3
-    SSE2_IDCT           xmm4, xmm2, xmm3, xmm0, xmm5, xmm6, xmm1
+    movdqa xmm7, [wels_p1m1m1p1w_128]
+    SSE2_IDCT_HORIZONTAL xmm0, xmm7, xmm5, xmm6
+    SSE2_IDCT_HORIZONTAL xmm1, xmm7, xmm5, xmm6
+    SSE2_IDCT_HORIZONTAL xmm4, xmm7, xmm5, xmm6
+    SSE2_IDCT_HORIZONTAL xmm2, xmm7, xmm5, xmm6
+    SSE2_IDCT xmm1, xmm4, xmm2, xmm3, xmm5, xmm6, xmm0
 
     WELS_Zero           xmm7
     WELS_DW32           xmm6
 
-    SSE2_StoreDiff8p   xmm4, xmm5, xmm6, xmm7, [r0      ],  [r2]
-    SSE2_StoreDiff8p   xmm0, xmm5, xmm6, xmm7, [r0 + r1 ],  [r2 + r3]
+    SSE2_StoreDiff16p xmm1, xmm3, xmm5, xmm6, xmm7, [r0], [r2], [r0 + r1], [r2 + r3]
     lea     r0, [r0 + 2 * r1]
     lea     r2, [r2 + 2 * r3]
-    SSE2_StoreDiff8p   xmm1, xmm5, xmm6, xmm7, [r0],            [r2]
-    SSE2_StoreDiff8p   xmm2, xmm5, xmm6, xmm7, [r0 + r1],   [r2 + r3]
+    SSE2_StoreDiff16p xmm0, xmm4, xmm5, xmm6, xmm7, [r0], [r2], [r0 + r1], [r2 + r3]
     POP_XMM
     LOAD_5_PARA_POP
     ; pop        esi
