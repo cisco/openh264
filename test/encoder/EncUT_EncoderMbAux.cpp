@@ -145,7 +145,7 @@ static void Sub8x8DctAnchor (int16_t iDct[4][4][4], uint8_t* pPix1, uint8_t* pPi
   Sub4x4DctAnchor (iDct[2], &pPix1[4 * FENC_STRIDE + 0], &pPix2[4 * FDEC_STRIDE + 0]);
   Sub4x4DctAnchor (iDct[3], &pPix1[4 * FENC_STRIDE + 4], &pPix2[4 * FDEC_STRIDE + 4]);
 }
-static void TestDctT4 (void (*func) (int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2)) {
+static void TestDctT4 (PDctFunc func) {
   int16_t iDctRef[4][4];
   uint8_t uiPix1[16 * FENC_STRIDE], uiPix2[16 * FDEC_STRIDE];
   int16_t iDct[16];
@@ -161,7 +161,7 @@ static void TestDctT4 (void (*func) (int16_t* pDct, uint8_t* pPixel1, int32_t iS
     for (int j = 0; j < 4; j++)
       EXPECT_EQ (iDctRef[j][i], iDct[i * 4 + j]);
 }
-static void TestDctFourT4 (void (*func) (int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2)) {
+static void TestDctFourT4 (PDctFunc func) {
   int16_t iDctRef[4][4][4];
   CMemoryAlign cMemoryAlign (0);
   ALLOC_MEMORY (uint8_t, uiPix1, 16 * FENC_STRIDE);

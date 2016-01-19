@@ -266,7 +266,7 @@ void WelsIDctT8Anchor (uint8_t* p_dst, int16_t dct[4][16]) {
   WelsIDctT4Anchor<clip_t> (&p_dst[4 * FDEC_STRIDE + 4], dct[3]);
 }
 template<typename clip_t>
-void TestIDctFourT4Rec (void (*func) (uint8_t* pRec, int32_t iStride, uint8_t* pPred, int32_t iPredStride, int16_t* pDct)) {
+void TestIDctFourT4Rec (PIDctFunc func) {
   int16_t iRefDct[4][16];
   uint8_t iRefDst[16 * FDEC_STRIDE];
   ENFORCE_STACK_ALIGN_1D (int16_t, iDct, 64, 16);
