@@ -613,16 +613,16 @@ WELS_EXTERN WelsHadamardT4Dc_sse2
 
 ; out=%1,%2,%3,%4 pDct=%5 clobber=%6
 %macro AVX2_Load4x16P 6
-    vmovdqa       x%2, [%5+0x00]
-    vinserti128   y%2, [%5+0x40], 1
-    vmovdqa       x%6, [%5+0x20]
-    vinserti128   y%6, [%5+0x60], 1
+    vmovdqa       x%2,      [%5+0x00]
+    vinserti128   y%2, y%2, [%5+0x40], 1
+    vmovdqa       x%6,      [%5+0x20]
+    vinserti128   y%6, y%6, [%5+0x60], 1
     vpunpcklqdq   y%1, y%2, y%6
     vpunpckhqdq   y%2, y%2, y%6
-    vmovdqa       x%4, [%5+0x10]
-    vinserti128   y%4, [%5+0x50], 1
-    vmovdqa       x%6, [%5+0x30]
-    vinserti128   y%6, [%5+0x70], 1
+    vmovdqa       x%4,      [%5+0x10]
+    vinserti128   y%4, y%4, [%5+0x50], 1
+    vmovdqa       x%6,      [%5+0x30]
+    vinserti128   y%6, y%6, [%5+0x70], 1
     vpunpcklqdq   y%3, y%4, y%6
     vpunpckhqdq   y%4, y%4, y%6
 %endmacro
