@@ -1,4 +1,5 @@
 language: cpp
+dist: trusty
 
 compiler:
   - g++
@@ -6,7 +7,7 @@ compiler:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq nasm g++-4.6-multilib gcc-multilib libc6-dev-i386
+  - sudo apt-get install -qq nasm g++-multilib gcc-multilib libc6-dev-i386
 
 install:
   - make gmp-bootstrap
