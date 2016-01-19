@@ -50,7 +50,7 @@ Processor Support
 
 Building the Library
 --------------------
-NASM needed to be installed for assembly code: workable version 2.07 or above, nasm can downloaded from http://www.nasm.us/
+NASM needed to be installed for assembly code: workable version 2.10 or above, nasm can downloaded from http://www.nasm.us/
 For Mac OSX 64-bit NASM needed to be below version 2.11.08 as nasm 2.11.08 will introduce error when using RIP-relative addresses in Mac OSX 64-bit
 
 To build the arm assembly for Windows Phone, gas-preprocessor is required. It can be downloaded from git://git.libav.org/gas-preprocessor.git
