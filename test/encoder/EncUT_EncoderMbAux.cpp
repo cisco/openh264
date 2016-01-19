@@ -144,64 +144,62 @@ static void Sub8x8DctAnchor (int16_t iDct[4][4][4], uint8_t* pPix1, uint8_t* pPi
   Sub4x4DctAnchor (iDct[2], &pPix1[4 * FENC_STRIDE + 0], &pPix2[4 * FDEC_STRIDE + 0]);
   Sub4x4DctAnchor (iDct[3], &pPix1[4 * FENC_STRIDE + 4], &pPix2[4 * FDEC_STRIDE + 4]);
 }
-TEST (EncodeMbAuxTest, WelsDctT4_c) {
+static void TestDctT4 (void (*func) (int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2)) {
   int16_t iDctRef[4][4];
   uint8_t uiPix1[16 * FENC_STRIDE], uiPix2[16 * FDEC_STRIDE];
   int16_t iDct[16];
-  for (int i = 0; i < 4; i++)
-    for (int j = 0; j < 4; j++)
-      uiPix1[i * FENC_STRIDE + j] = uiPix2[i * FDEC_STRIDE + j] = rand() & 255;
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      uiPix1[i * FENC_STRIDE + j] = rand() & 255;
+      uiPix2[i * FDEC_STRIDE + j] = rand() & 255;
+    }
+  }
   Sub4x4DctAnchor (iDctRef, uiPix1, uiPix2);
-  WelsDctT4_c (iDct, uiPix1, FENC_STRIDE, uiPix2, FDEC_STRIDE);
+  func (iDct, uiPix1, FENC_STRIDE, uiPix2, FDEC_STRIDE);
   for (int i = 0; i < 4; i++)
     for (int j = 0; j < 4; j++)
       EXPECT_EQ (iDctRef[j][i], iDct[i * 4 + j]);
 }
-TEST (EncodeMbAuxTest, WelsDctFourT4_c) {
+static void TestDctFourT4 (void (*func) (int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2)) {
   int16_t iDctRef[4][4][4];
-  uint8_t uiPix1[16 * FENC_STRIDE], uiPix2[16 * FDEC_STRIDE];
-  int16_t iDct[16 * 4];
-  for (int i = 0; i < 8; i++)
-    for (int j = 0; j < 8; j++)
-      uiPix1[i * FENC_STRIDE + j] = uiPix2[i * FDEC_STRIDE + j] = rand() & 255;
+  CMemoryAlign cMemoryAlign (0);
+  ALLOC_MEMORY (uint8_t, uiPix1, 16 * FENC_STRIDE);
+  ALLOC_MEMORY (uint8_t, uiPix2, 16 * FDEC_STRIDE);
+  ALLOC_MEMORY (int16_t, iDct, 16 * 4);
+  for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 8; j++) {
+      uiPix1[i * FENC_STRIDE + j] = rand() & 255;
+      uiPix2[i * FDEC_STRIDE + j] = rand() & 255;
+    }
+  }
   Sub8x8DctAnchor (iDctRef, uiPix1, uiPix2);
-  WelsDctFourT4_c (iDct, uiPix1, FENC_STRIDE, uiPix2, FDEC_STRIDE);
+  func (iDct, uiPix1, FENC_STRIDE, uiPix2, FDEC_STRIDE);
   for (int k = 0; k < 4; k++)
     for (int i = 0; i < 4; i++)
       for (int j = 0; j < 4; j++)
         EXPECT_EQ (iDctRef[k][j][i], iDct[k * 16 + i * 4 + j]);
+  FREE_MEMORY (uiPix1);
+  FREE_MEMORY (uiPix2);
+  FREE_MEMORY (iDct);
+}
+TEST (EncodeMbAuxTest, WelsDctT4_c) {
+  TestDctT4 (WelsDctT4_c);
+}
+TEST (EncodeMbAuxTest, WelsDctFourT4_c) {
+  TestDctFourT4 (WelsDctFourT4_c);
 }
 
 #ifdef X86_ASM
 TEST (EncodeMbAuxTest, WelsDctT4_mmx) {
-  int16_t iDctC[16], iDctM[16];
-  uint8_t uiPix1[16 * FENC_STRIDE], uiPix2[16 * FDEC_STRIDE];
-  for (int i = 0; i < 4; i++)
-    for (int j = 0; j < 4; j++)
-      uiPix1[i * FENC_STRIDE + j] = uiPix2[i * FDEC_STRIDE + j] = rand() & 255;
-  WelsDctT4_c (iDctC, uiPix1, FENC_STRIDE, uiPix2, FDEC_STRIDE);
-  WelsDctT4_mmx (iDctM, uiPix1, FENC_STRIDE, uiPix2, FDEC_STRIDE);
-  for (int i = 0; i < 16; i++)
-    EXPECT_EQ (iDctC[i], iDctM[i]);
+  TestDctT4 (WelsDctT4_mmx);
 }
 
 TEST (EncodeMbAuxTest, WelsDctFourT4_sse2) {
-  CMemoryAlign cMemoryAlign (0);
-  ALLOC_MEMORY (uint8_t, uiPix1, 16 * FENC_STRIDE);
-  ALLOC_MEMORY (uint8_t, uiPix2, 16 * FDEC_STRIDE);
-  ALLOC_MEMORY (int16_t, iDctC, 16 * 4);
-  ALLOC_MEMORY (int16_t, iDctS, 16 * 4);
-  for (int i = 0; i < 8; i++)
-    for (int j = 0; j < 8; j++)
-      uiPix1[i * FENC_STRIDE + j] = uiPix2[i * FDEC_STRIDE + j] = rand() & 255;
-  WelsDctFourT4_c (iDctC, uiPix1, FENC_STRIDE, uiPix2, FDEC_STRIDE);
-  WelsDctFourT4_sse2 (iDctS, uiPix1, FENC_STRIDE, uiPix2, FDEC_STRIDE);
-  for (int i = 0; i < 64; i++)
-    EXPECT_EQ (iDctC[i], iDctS[i]);
-  FREE_MEMORY (uiPix1);
-  FREE_MEMORY (uiPix2);
-  FREE_MEMORY (iDctC);
-  FREE_MEMORY (iDctS);
+  TestDctFourT4 (WelsDctFourT4_sse2);
+}
+
+TEST (EncodeMbAuxTest, WelsDctFourT4_avx2) {
+  TestDctFourT4 (WelsDctFourT4_avx2);
 }
 
 TEST (EncodeMbAuxTest, WelsCalculateSingleCtr4x4_sse2) {

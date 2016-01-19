@@ -42,7 +42,7 @@
 
 %include "asm_inc.asm"
 
-SECTION .rodata align=16
+SECTION .rodata align=32
 
 ;***********************************************************************
 ; Constant
@@ -62,6 +62,29 @@ SSE2_DeQuant8 dw  10, 13, 10, 13, 13, 16, 13, 16,
             dw  18, 23, 18, 23, 23, 29, 23, 29,
             dw  18, 23, 18, 23, 23, 29, 23, 29
 
+align 32
+wels_p1m1p1m1w_256:
+    times 8 dw 1, -1
+wels_p1p2p1p2w_256:
+    times 8 dw 1, 2
+wels_rev64w_256:
+    times 2 db 6, 7, 4, 5, 2, 3, 0, 1, 14, 15, 12, 13, 10, 11, 8, 9
+wels_p1m1m1p1w_256:
+    times 4 dw 1, -1, -1, 1
+wels_p1p1m1m1w_256:
+    times 4 dw 1, 1, -1, -1
+
+align 16
+wels_p1m1p1m1w_128:
+    times 4 dw 1, -1
+wels_p1p2p1p2w_128:
+    times 4 dw 1, 2
+wels_p1m1m1p1w_128:
+    times 2 dw 1, -1, -1, 1
+wels_p0m8000p0m8000w_128:
+    times 4 dw 0, -8000h
+wels_p1p1m1m1w_128:
+    times 2 dw 1, 1, -1, -1
 
 ;***********************************************************************
 ; MMX functions
@@ -194,12 +217,14 @@ WELS_EXTERN WelsIDctT4Rec_mmx
 ; SSE2 functions
 ;***********************************************************************
 %macro SSE2_Store4x8p 6
-    SSE2_XSawp qdq, %2, %3, %6
-    SSE2_XSawp qdq, %4, %5, %3
-    MOVDQ    [%1+0x00], %2
-    MOVDQ    [%1+0x10], %4
-    MOVDQ    [%1+0x20], %6
-    MOVDQ    [%1+0x30], %3
+    movlps   [%1+0x00], %2
+    movhps   [%1+0x20], %2
+    movlps   [%1+0x08], %3
+    movhps   [%1+0x28], %3
+    movlps   [%1+0x10], %4
+    movhps   [%1+0x30], %4
+    movlps   [%1+0x18], %5
+    movhps   [%1+0x38], %5
 %endmacro
 
 %macro SSE2_Load4x8p 6
@@ -213,9 +238,9 @@ WELS_EXTERN WelsIDctT4Rec_mmx
 
 %macro SSE2_SumSubMul2 3
     movdqa  %3, %1
-    paddw   %1, %1
+    psllw   %1, 1
     paddw   %1, %2
-    psubw   %3, %2
+    psllw   %2, 1
     psubw   %3, %2
 %endmacro
 
@@ -228,14 +253,20 @@ WELS_EXTERN WelsIDctT4Rec_mmx
     psubw   %4, %3
 %endmacro
 
-%macro SSE2_StoreDiff8p 6
-    paddw       %1, %3
+%macro SSE2_StoreDiff16p 9
+    paddw       %1, %4
     psraw       %1, $06
-    movq        %2, %6
-    punpcklbw   %2, %4
-    paddsw      %2, %1
-    packuswb    %2, %2
-    movq        %5, %2
+    movq        %3, %7
+    punpcklbw   %3, %5
+    paddsw      %1, %3
+    paddw       %2, %4
+    psraw       %2, $06
+    movq        %3, %9
+    punpcklbw   %3, %5
+    paddsw      %2, %3
+    packuswb    %1, %2
+    movlps      %6, %1
+    movhps      %8, %1
 %endmacro
 
 %macro SSE2_StoreDiff8p 5
@@ -284,6 +315,40 @@ WELS_EXTERN WelsIDctT4Rec_mmx
     SSE2_SumSub      %7, %4, %5
 %endmacro
 
+; Do 2 horizontal 4-pt DCTs in parallel packed as 8 words in an xmm register.
+; out=%1 in=%1 clobber=%2
+%macro SSE2_DCT_HORIZONTAL 2
+    pshuflw       %2, %1, 1bh               ; [x[3],x[2],x[1],x[0]] low qw
+    pmullw        %1, [wels_p1m1p1m1w_128]  ; [x[0],-x[1],x[2],-x[3], ...]
+    pshufhw       %2, %2, 1bh               ; [x[3],x[2],x[1],x[0]] high qw
+    paddw         %1, %2                    ; s = [x[0]+x[3],-x[1]+x[2],x[2]+x[1],-x[3]+x[0], ...]
+    pshufd        %2, %1, 0b1h              ; [s[2],s[3],s[0],s[1], ...]
+    pmullw        %1, [wels_p1m1m1p1w_128]  ; [s[0],-s[1],-s[2],s[3], ...]
+    pmullw        %2, [wels_p1p2p1p2w_128]  ; [s[2],2*s[3],s[0],2*s[1], ...]]
+    paddw         %1, %2                    ; y = [s[0]+s[2],-s[1]+2*s[3],-s[2]+s[0],s[3]+2*s[1], ...]
+%endmacro
+
+; Do 2 horizontal 4-pt IDCTs in parallel packed as 8 words in an xmm register.
+;
+; Use a multiply by reciprocal to get -x>>1, and x+=-x>>1 to get x>>1, which
+; avoids a cumbersome blend with SSE2 to get a vector with right-shifted odd
+; elements.
+;
+; out=%1 in=%1 wels_p1m1m1p1w_128=%2 clobber=%3,%4
+%macro SSE2_IDCT_HORIZONTAL 4
+    movdqa        %3, [wels_p0m8000p0m8000w_128]
+    pmulhw        %3, %1                    ; x[0:7] * [0,-8000h,0,-8000h, ...] >> 16
+    pshufd        %4, %1, 0b1h              ; [x[2],x[3],x[0],x[1], ...]
+    pmullw        %4, %2                    ; [x[2],-x[3],-x[0],x[1], ...]
+    paddw         %1, %3                    ; [x[0]+0,x[1]+(-x[1]>>1),x[2]+0,x[3]+(-x[3]>>1), ...]
+    paddw         %1, %4                    ; s = [x[0]+x[2],(x[1]>>1)-x[3],x[2]-x[0],(x[3]>>1)+x[1], ...]
+    pshuflw       %3, %1, 1bh               ; [s[3],s[2],s[1],s[0]] low qw
+    pmullw        %1, [wels_p1p1m1m1w_128]  ; [s[0],s[1],-s[2],-s[3], ...]
+    pshufhw       %3, %3, 1bh               ; [s[3],s[2],s[1],s[0]] high qw
+    pmullw        %3, %2                    ; [s[3],-s[2],-s[1],s[0], ...]
+    paddw         %1, %3                    ; y = [s[0]+s[3],s[1]-s[2],-s[2]-s[1],-s[3]+s[0], ...]
+%endmacro
+
 ;***********************************************************************
 ; void WelsDctFourT4_sse2(int16_t *pDct, uint8_t *pix1, int32_t i_pix1, uint8_t *pix2, int32_t i_pix2 )
 ;***********************************************************************
@@ -303,11 +368,12 @@ WELS_EXTERN WelsDctFourT4_sse2
     SSE2_LoadDiff8P    xmm3, xmm6, xmm7, [r1+r2], [r3+r4]
 
     SSE2_DCT            xmm1, xmm2, xmm3, xmm4, xmm5, xmm0
-    SSE2_TransTwo4x4W   xmm2, xmm0, xmm3, xmm4, xmm1
-    SSE2_DCT            xmm0, xmm4, xmm1, xmm3, xmm5, xmm2
-    SSE2_TransTwo4x4W   xmm4, xmm2, xmm1, xmm3, xmm0
+    SSE2_DCT_HORIZONTAL xmm2, xmm5
+    SSE2_DCT_HORIZONTAL xmm0, xmm5
+    SSE2_DCT_HORIZONTAL xmm3, xmm5
+    SSE2_DCT_HORIZONTAL xmm4, xmm5
 
-    SSE2_Store4x8p r0, xmm4, xmm2, xmm3, xmm0, xmm5
+    SSE2_Store4x8p r0, xmm2, xmm0, xmm3, xmm4, xmm1
 
     lea     r1, [r1 + 2 * r2]
     lea     r3, [r3 + 2 * r4]
@@ -321,12 +387,12 @@ WELS_EXTERN WelsDctFourT4_sse2
     SSE2_LoadDiff8P    xmm3, xmm6, xmm7, [r1+r2], [r3+r4]
 
     SSE2_DCT            xmm1, xmm2, xmm3, xmm4, xmm5, xmm0
-    SSE2_TransTwo4x4W   xmm2, xmm0, xmm3, xmm4, xmm1
-    SSE2_DCT            xmm0, xmm4, xmm1, xmm3, xmm5, xmm2
-    SSE2_TransTwo4x4W   xmm4, xmm2, xmm1, xmm3, xmm0
+    SSE2_DCT_HORIZONTAL xmm2, xmm5
+    SSE2_DCT_HORIZONTAL xmm0, xmm5
+    SSE2_DCT_HORIZONTAL xmm3, xmm5
+    SSE2_DCT_HORIZONTAL xmm4, xmm5
 
-    lea     r0, [r0+64]
-    SSE2_Store4x8p r0, xmm4, xmm2, xmm3, xmm0, xmm5
+    SSE2_Store4x8p r0+64, xmm2, xmm0, xmm3, xmm4, xmm1
 
     POP_XMM
     LOAD_5_PARA_POP
@@ -345,40 +411,39 @@ WELS_EXTERN WelsIDctFourT4Rec_sse2
     ;Load 4x8
     SSE2_Load4x8p  r4, xmm0, xmm1, xmm4, xmm2, xmm5
 
-    SSE2_TransTwo4x4W   xmm0, xmm1, xmm4, xmm2, xmm3
-    SSE2_IDCT           xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm0
-    SSE2_TransTwo4x4W   xmm1, xmm4, xmm0, xmm2, xmm3
-    SSE2_IDCT           xmm4, xmm2, xmm3, xmm0, xmm5, xmm6, xmm1
+    movdqa xmm7, [wels_p1m1m1p1w_128]
+    SSE2_IDCT_HORIZONTAL xmm0, xmm7, xmm5, xmm6
+    SSE2_IDCT_HORIZONTAL xmm1, xmm7, xmm5, xmm6
+    SSE2_IDCT_HORIZONTAL xmm4, xmm7, xmm5, xmm6
+    SSE2_IDCT_HORIZONTAL xmm2, xmm7, xmm5, xmm6
+    SSE2_IDCT xmm1, xmm4, xmm2, xmm3, xmm5, xmm6, xmm0
 
     WELS_Zero           xmm7
     WELS_DW32           xmm6
 
-    SSE2_StoreDiff8p   xmm4, xmm5, xmm6, xmm7, [r0      ],  [r2]
-    SSE2_StoreDiff8p   xmm0, xmm5, xmm6, xmm7, [r0 + r1 ],  [r2 + r3]
+    SSE2_StoreDiff16p xmm1, xmm3, xmm5, xmm6, xmm7, [r0], [r2], [r0 + r1], [r2 + r3]
     lea     r0, [r0 + 2 * r1]
     lea     r2, [r2 + 2 * r3]
-    SSE2_StoreDiff8p   xmm1, xmm5, xmm6, xmm7, [r0],            [r2]
-    SSE2_StoreDiff8p   xmm2, xmm5, xmm6, xmm7, [r0 + r1 ],  [r2 + r3]
+    SSE2_StoreDiff16p xmm0, xmm4, xmm5, xmm6, xmm7, [r0], [r2], [r0 + r1], [r2 + r3]
 
-    add     r4, 64
     lea     r0, [r0 + 2 * r1]
     lea     r2, [r2 + 2 * r3]
-    SSE2_Load4x8p  r4, xmm0, xmm1, xmm4, xmm2, xmm5
+    SSE2_Load4x8p  r4+64, xmm0, xmm1, xmm4, xmm2, xmm5
 
-    SSE2_TransTwo4x4W   xmm0, xmm1, xmm4, xmm2, xmm3
-    SSE2_IDCT           xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm0
-    SSE2_TransTwo4x4W   xmm1, xmm4, xmm0, xmm2, xmm3
-    SSE2_IDCT           xmm4, xmm2, xmm3, xmm0, xmm5, xmm6, xmm1
+    movdqa xmm7, [wels_p1m1m1p1w_128]
+    SSE2_IDCT_HORIZONTAL xmm0, xmm7, xmm5, xmm6
+    SSE2_IDCT_HORIZONTAL xmm1, xmm7, xmm5, xmm6
+    SSE2_IDCT_HORIZONTAL xmm4, xmm7, xmm5, xmm6
+    SSE2_IDCT_HORIZONTAL xmm2, xmm7, xmm5, xmm6
+    SSE2_IDCT xmm1, xmm4, xmm2, xmm3, xmm5, xmm6, xmm0
 
     WELS_Zero           xmm7
     WELS_DW32           xmm6
 
-    SSE2_StoreDiff8p   xmm4, xmm5, xmm6, xmm7, [r0      ],  [r2]
-    SSE2_StoreDiff8p   xmm0, xmm5, xmm6, xmm7, [r0 + r1 ],  [r2 + r3]
+    SSE2_StoreDiff16p xmm1, xmm3, xmm5, xmm6, xmm7, [r0], [r2], [r0 + r1], [r2 + r3]
     lea     r0, [r0 + 2 * r1]
     lea     r2, [r2 + 2 * r3]
-    SSE2_StoreDiff8p   xmm1, xmm5, xmm6, xmm7, [r0],            [r2]
-    SSE2_StoreDiff8p   xmm2, xmm5, xmm6, xmm7, [r0 + r1],   [r2 + r3]
+    SSE2_StoreDiff16p xmm0, xmm4, xmm5, xmm6, xmm7, [r0], [r2], [r0 + r1], [r2 + r3]
     POP_XMM
     LOAD_5_PARA_POP
     ; pop        esi
@@ -501,4 +566,203 @@ WELS_EXTERN WelsHadamardT4Dc_sse2
     movdqa  [r0+16],   xmm2
 
     POP_XMM
+    ret
+
+;***********************************************************************
+; AVX2 functions
+;***********************************************************************
+
+; out=%1 pPixel1=%2 iStride1=%3 pPixel2=%4 iStride2=%5 zero=%6 clobber=%7,%8
+%macro AVX2_LoadDiff16P 8
+    vmovq         x%1, [%2         ]
+    vpbroadcastq  y%7, [%2 + 4 * %3]
+    vpblendd      y%1, y%1, y%7, 11110000b
+    vpunpcklbw    y%1, y%1, y%6
+    vmovq         x%7, [%4         ]
+    vpbroadcastq  y%8, [%4 + 4 * %5]
+    vpblendd      y%7, y%7, y%8, 11110000b
+    vpunpcklbw    y%7, y%7, y%6
+    vpsubw        y%1, y%1, y%7
+%endmacro
+
+; pRec=%1 iStride=%2 data=%3,%4 pPred=%5 iPredStride=%6 dw32=%7 zero=%8 clobber=%9,%10
+%macro AVX2_StoreDiff32P 10
+    vpaddw        y%3, y%3, y%7
+    vpsraw        y%3, y%3, 6
+    vmovq         x%9,  [%5         ]
+    vpbroadcastq  y%10, [%5 + 4 * %6]
+    add           %5, %6
+    vpblendd      y%9, y%9, y%10, 11110000b
+    vpunpcklbw    y%9, y%9, y%8
+    vpaddsw       y%3, y%3, y%9
+    vpaddw        y%4, y%4, y%7
+    vpsraw        y%4, y%4, 6
+    vmovq         x%9,  [%5         ]
+    vpbroadcastq  y%10, [%5 + 4 * %6]
+    vpblendd      y%9, y%9, y%10, 11110000b
+    vpunpcklbw    y%9, y%9, y%8
+    vpaddsw       y%4, y%4, y%9
+    vpackuswb     y%3, y%3, y%4
+    vextracti128  x%4, y%3, 1
+    vmovlps       [%1         ], x%3
+    vmovlps       [%1 + 4 * %2], x%4
+    add           %1, %2
+    vmovhps       [%1         ], x%3
+    vmovhps       [%1 + 4 * %2], x%4
+%endmacro
+
+; out=%1,%2,%3,%4 pDct=%5 clobber=%6
+%macro AVX2_Load4x16P 6
+    vmovdqa       x%2, [%5+0x00]
+    vinserti128   y%2, [%5+0x40], 1
+    vmovdqa       x%6, [%5+0x20]
+    vinserti128   y%6, [%5+0x60], 1
+    vpunpcklqdq   y%1, y%2, y%6
+    vpunpckhqdq   y%2, y%2, y%6
+    vmovdqa       x%4, [%5+0x10]
+    vinserti128   y%4, [%5+0x50], 1
+    vmovdqa       x%6, [%5+0x30]
+    vinserti128   y%6, [%5+0x70], 1
+    vpunpcklqdq   y%3, y%4, y%6
+    vpunpckhqdq   y%4, y%4, y%6
+%endmacro
+
+; pDct=%1 data=%1,%2,%3,%4 clobber=%5
+%macro AVX2_Store4x16P 6
+    vpunpcklqdq   y%6, y%2,  y%3
+    vmovdqa       [%1+0x00], x%6
+    vextracti128  [%1+0x40], y%6, 1
+    vpunpckhqdq   y%6, y%2,  y%3
+    vmovdqa       [%1+0x20], x%6
+    vextracti128  [%1+0x60], y%6, 1
+    vpunpcklqdq   y%6, y%4,  y%5
+    vmovdqa       [%1+0x10], x%6
+    vextracti128  [%1+0x50], y%6, 1
+    vpunpckhqdq   y%6, y%4,  y%5
+    vmovdqa       [%1+0x30], x%6
+    vextracti128  [%1+0x70], y%6, 1
+%endmacro
+
+; 4-pt DCT
+; out=%1,%2,%3,%4 in=%1,%2,%3,%4 clobber=%5
+%macro AVX2_DCT 5
+    vpsubw        %5, %1, %4  ; s3 = x0 - x3
+    vpaddw        %1, %1, %4  ; s0 = x0 + x3
+    vpsubw        %4, %2, %3  ; s2 = x1 - x2
+    vpaddw        %2, %2, %3  ; s1 = x1 + x2
+    vpsubw        %3, %1, %2  ; y2 = s0 - s1
+    vpaddw        %1, %1, %2  ; y0 = s0 + s1
+    vpsllw        %2, %5, 1
+    vpaddw        %2, %2, %4  ; y1 = 2 * s3 + s2
+    vpsllw        %4, %4, 1
+    vpsubw        %4, %5, %4  ; y3 = s3 - 2 * s2
+%endmacro
+
+; 4-pt IDCT
+; out=%1,%2,%3,%4 in=%1,%2,%3,%4 clobber=%5
+%macro AVX2_IDCT 5
+    vpsraw        %5, %2, 1
+    vpsubw        %5, %5, %4  ; t3 = (x1 >> 1) - x3
+    vpsraw        %4, %4, 1
+    vpaddw        %4, %2, %4  ; t2 = x1 + (x3 >> 1)
+    vpaddw        %2, %1, %3  ; t0 = x0 + x2
+    vpsubw        %3, %1, %3  ; t1 = x0 - x2
+    vpaddw        %1, %2, %4  ; y0 = t0 + t2
+    vpsubw        %4, %2, %4  ; y3 = t0 - t2
+    vpaddw        %2, %3, %5  ; y1 = t1 + t3
+    vpsubw        %3, %3, %5  ; y2 = t1 - t3
+%endmacro
+
+; Do 4 horizontal 4-pt DCTs in parallel packed as 16 words in a ymm register.
+; out=%1 in=%1 wels_rev64w_256=%2 clobber=%3
+%macro AVX2_DCT_HORIZONTAL 3
+    vpsignw       %3, %1, [wels_p1m1p1m1w_256]  ; [x[0],-x[1],x[2],-x[3], ...]
+    vpshufb       %1, %1, %2                    ; [x[3],x[2],x[1],x[0], ...]
+    vpaddw        %1, %1, %3                    ; s = [x[0]+x[3],-x[1]+x[2],x[2]+x[1],-x[3]+x[0], ...]
+    vpmullw       %3, %1, [wels_p1m1m1p1w_256]  ; [s[0],-s[1],-s[2],s[3], ...]
+    vpshufd       %1, %1, 0b1h                  ; [s[2],s[3],s[0],s[1], ...]
+    vpmullw       %1, %1, [wels_p1p2p1p2w_256]  ; [s[2],2*s[3],s[0],2*s[1], ...]
+    vpaddw        %1, %1, %3                    ; y = [s[0]+s[2],-s[1]+2*s[3],-s[2]+s[0],s[3]+2*s[1], ...]
+%endmacro
+
+; Do 4 horizontal 4-pt IDCTs in parallel packed as 16 words in a ymm register.
+; out=%1 in=%1 wels_rev64w_256=%2 clobber=%3
+%macro AVX2_IDCT_HORIZONTAL 3
+    vpsraw        %3, %1, 1                     ; [x[0]>>1,x[1]>>1,x[2]>>1,x[3]>>1, ...]
+    vpblendw      %3, %1, %3, 10101010b         ; [x[0],x[1]>>1,x[2],x[3]>>1, ...]
+    vpshufd       %1, %1, 0b1h                  ; [x[2],x[3],x[0],x[1], ...]
+    vpsignw       %1, %1, [wels_p1m1m1p1w_256]  ; [x[2],-x[3],-x[0],x[1], ...]
+    vpaddw        %1, %3, %1                    ; s = [x[0]+x[2],(x[1]>>1)-x[3],x[2]-x[0],(x[3]>>1)+x[1], ...]
+    vpshufb       %3, %1, %2                    ; [s[3],s[2],s[1],s[0], ...]
+    vpmullw       %1, %1, [wels_p1p1m1m1w_256]  ; [s[0],s[1],-s[2],-s[3], ...]
+    vpmullw       %3, %3, [wels_p1m1m1p1w_256]  ; [s[3],-s[2],-s[1],s[0], ...]
+    vpaddw        %1, %1, %3                    ; y = [s[0]+s[3],s[1]-s[2],-s[2]-s[1],-s[3]+s[0], ...]
+%endmacro
+
+;***********************************************************************
+; void WelsDctFourT4_avx2(int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2)
+;***********************************************************************
+WELS_EXTERN WelsDctFourT4_avx2
+    %assign push_num 0
+    LOAD_5_PARA
+    PUSH_XMM 7
+    SIGN_EXTENSION r2, r2d
+    SIGN_EXTENSION r4, r4d
+
+    vpxor ymm6, ymm6, ymm6
+
+    ;Load 4x16
+    AVX2_LoadDiff16P mm0, r1, r2, r3, r4, mm6, mm4, mm5
+    add r1, r2
+    add r3, r4
+    AVX2_LoadDiff16P mm1, r1, r2, r3, r4, mm6, mm4, mm5
+    add r1, r2
+    add r3, r4
+    AVX2_LoadDiff16P mm2, r1, r2, r3, r4, mm6, mm4, mm5
+    add r1, r2
+    add r3, r4
+    AVX2_LoadDiff16P mm3, r1, r2, r3, r4, mm6, mm4, mm5
+
+    AVX2_DCT ymm0, ymm1, ymm2, ymm3, ymm5
+    vmovdqa ymm6, [wels_rev64w_256]
+    AVX2_DCT_HORIZONTAL ymm0, ymm6, ymm5
+    AVX2_DCT_HORIZONTAL ymm1, ymm6, ymm5
+    AVX2_DCT_HORIZONTAL ymm2, ymm6, ymm5
+    AVX2_DCT_HORIZONTAL ymm3, ymm6, ymm5
+
+    AVX2_Store4x16P r0, mm0, mm1, mm2, mm3, mm5
+    vzeroupper
+
+    POP_XMM
+    LOAD_5_PARA_POP
+    ret
+
+;***********************************************************************
+; void WelsIDctFourT4Rec_avx2(uint8_t* pRec, int32_t iStride, uint8_t* pPred, int32_t iPredStride, int16_t* pDct);
+;***********************************************************************
+WELS_EXTERN WelsIDctFourT4Rec_avx2
+    %assign push_num 0
+    LOAD_5_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+
+    AVX2_Load4x16P mm0, mm1, mm2, mm3, r4, mm5
+    vmovdqa ymm6, [wels_rev64w_256]
+    AVX2_IDCT_HORIZONTAL ymm0, ymm6, ymm5
+    AVX2_IDCT_HORIZONTAL ymm1, ymm6, ymm5
+    AVX2_IDCT_HORIZONTAL ymm2, ymm6, ymm5
+    AVX2_IDCT_HORIZONTAL ymm3, ymm6, ymm5
+    AVX2_IDCT ymm0, ymm1, ymm2, ymm3, ymm5
+
+    vpxor ymm6, ymm6, ymm6
+    WELS_DW32_VEX ymm7
+    AVX2_StoreDiff32P r0, r1, mm0, mm1, r2, r3, mm7, mm6, mm5, mm4
+    add r2, r3
+    add r0, r1
+    AVX2_StoreDiff32P r0, r1, mm2, mm3, r2, r3, mm7, mm6, mm5, mm4
+    vzeroupper
+
+    POP_XMM
+    LOAD_5_PARA_POP
     ret
