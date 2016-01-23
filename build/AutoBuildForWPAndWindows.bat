@@ -3,29 +3,29 @@ rem ****************************************************************************
 rem   usage:
 rem      AutoBuildForWPAndWindows.bat % Configuration %
 rem      --For debug  version:
-rem          Win32-C-Only: AutoBuildForWPAndWindows.bat  Win32-Debug-C
-rem          Win32-ASM:    AutoBuildForWPAndWindows.bat  Win32-Debug-ASM
-rem          Win64-C-Only: AutoBuildForWPAndWindows.bat  Win64-Debug-C
-rem          Win64-ASM:    AutoBuildForWPAndWindows.bat  Win64-Debug-ASM
-rem          ARM-C-Only:   AutoBuildForWPAndWindows.bat  ARM-Debug-C
-rem          ARM-ASM:      AutoBuildForWPAndWindows.bat  ARM-Debug-ASM
+rem          Win32-C-Only:      AutoBuildForWPAndWindows.bat  Win32-Debug-C
+rem          Win32-ASM:         AutoBuildForWPAndWindows.bat  Win32-Debug-ASM
+rem          Win64-C-Only:      AutoBuildForWPAndWindows.bat  Win64-Debug-C
+rem          Win64-ASM:         AutoBuildForWPAndWindows.bat  Win64-Debug-ASM
+rem          ARM-C-Only(WP8):   AutoBuildForWPAndWindows.bat  ARM-Debug-C
+rem          ARM-ASM(WP8):      AutoBuildForWPAndWindows.bat  ARM-Debug-ASM
 rem      --For release version:
-rem          Win32-C-Only: AutoBuildForWPAndWindows.bat  Win32-Release-C
-rem          Win32-ASM:    AutoBuildForWPAndWindows.bat  Win32-Release-ASM
-rem          Win64-C-Only: AutoBuildForWPAndWindows.bat  Win64-Release-C
-rem          Win64-ASM:    AutoBuildForWPAndWindows.bat  Win64-Release-ASM
-rem          ARM-C-Only:   AutoBuildForWPAndWindows.bat  ARM-Release-C
-rem          ARM-ASM:      AutoBuildForWPAndWindows.bat  ARM-Release-ASM
+rem          Win32-C-Only:      AutoBuildForWPAndWindows.bat  Win32-Release-C
+rem          Win32-ASM:         AutoBuildForWPAndWindows.bat  Win32-Release-ASM
+rem          Win64-C-Only:      AutoBuildForWPAndWindows.bat  Win64-Release-C
+rem          Win64-ASM(WP8):    AutoBuildForWPAndWindows.bat  Win64-Release-ASM
+rem          ARM-C-Only(WP8):   AutoBuildForWPAndWindows.bat  ARM-Release-C
+rem          ARM-ASM(WP8):      AutoBuildForWPAndWindows.bat  ARM-Release-ASM
 rem      --For debug and release version:
-rem          Win32-C-Only: AutoBuildForWPAndWindows.bat  Win32-All-C
-rem          Win32-ASM:    AutoBuildForWPAndWindows.bat  Win32-All-ASM
-rem          Win64-C-Only: AutoBuildForWPAndWindows.bat  Win64-All-C
-rem          Win64-ASM:    AutoBuildForWPAndWindows.bat  Win64-All-ASM
-rem          ARM-C-Only:   AutoBuildForWPAndWindows.bat  ARM-All-C
-rem          ARM-ASM:      AutoBuildForWPAndWindows.bat  ARM-All-ASM
+rem          Win32-C-Only:      AutoBuildForWPAndWindows.bat  Win32-All-C
+rem          Win32-ASM:         AutoBuildForWPAndWindows.bat  Win32-All-ASM
+rem          Win64-C-Only:      AutoBuildForWPAndWindows.bat  Win64-All-C
+rem          Win64-ASM:         AutoBuildForWPAndWindows.bat  Win64-All-ASM
+rem          ARM-C-Only(WP8):   AutoBuildForWPAndWindows.bat  ARM-All-C
+rem          ARM-ASM(WP8):      AutoBuildForWPAndWindows.bat  ARM-All-ASM
 rem      --For default:
 rem         AutoBuildForWPAndWindows.bat
-rem           ARM-All-ASM
+rem           ARM-All-ASM(WP8)
 rem
 rem      --lib/dll files will be copied to folder .\bin
 rem         --win32 folder bin\i386*
@@ -46,6 +46,8 @@ rem           --more detail, please refer to http://www.mingw.org/
 rem
 rem   2015/03/15 huashi@cisco.com
 rem *************************************************************************************************
+
+set WP8Flag=0
 call :BasicSetting
 call :PathSetting
 call :SetBuildOption %1
@@ -107,11 +109,12 @@ goto :EOF
   set VC12ArmLib02=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\arm
   set WP8KitLib=C:\Program Files (x86)\Windows Phone Kits\8.1\lib\arm
 
-  if exist "%VC9Path%"  set VCPATH=%VC9Path%
-  if exist "%VC10Path%" set VCPATH=%VC10Path%
-  if exist "%VC11Path%" set VCPATH=%VC11Path%
-  if exist "%VC12Path%" set VCPATH=%VC12Path%
-  if exist "%VC14Path%" set VCPATH=%VC14Path%
+  if exist "%VC9Path%"     set VCPATH=%VC9Path%
+  if exist "%VC10Path%"    set VCPATH=%VC10Path%
+  if exist "%VC11Path%"    set VCPATH=%VC11Path%
+  if exist "%VC12Path%"    set VCPATH=%VC12Path%
+  if exist "%VC14Path%"    set VCPATH=%VC14Path%
+  if %WP8Flag%==1          set VCPATH=%VC12Path%
 
   set GasScriptPath=%VCPATH%\bin
 
@@ -123,7 +126,7 @@ goto :EOF
   if "%vArcType%" =="i386"   call "%VCPATH%\vcvarsall.bat" x86
   if "%vArcType%" =="x86_64" call "%VCPATH%\vcvarsall.bat" x64
   if "%vArcType%" =="arm"    call "%VCPATH%\vcvarsall.bat" x86_arm
-  if "%vArcType%" =="arm"    call :WPSetting
+  if %WP8Flag%==1            call :WPSetting
 
   echo PATH is %PATH%
   echo LIB  is %LIB%
@@ -131,6 +134,8 @@ goto :EOF
 
 :WPSetting
   set LIB=%VC12ArmLib01%;%VC12ArmLib02%;%WP8KitLib%
+  echo LIB setting for wp8 is:
+  echo   %LIB%
   if  not exist "%VC12Path%" (
       echo    VC12 does not exist,
       echo ******************************************
@@ -148,69 +153,73 @@ goto :EOF
       set vOSType=msvc-wp
       set vEnable64BitFlag=No
       set vASMFlag=Yes
-    echo default setting
+      set WP8Flag=1
+      echo default setting
   ) else if "%1"=="Win32-Debug-C" (
       set aConfigurationList=Debug
       set vArcType=i386
       set vOSType=msvc
       set vEnable64BitFlag=No
       set vASMFlag=No
-    echo Win32-Debug-C setting
+      echo Win32-Debug-C setting
   )  else if "%1"=="Win32-Release-C" (
       set aConfigurationList=Release
       set vArcType=i386
       set vOSType=msvc
       set vEnable64BitFlag=No
       set vASMFlag=No
-    echo Win32-Release-C setting
+      echo Win32-Release-C setting
   )  else if "%1"=="Win64-Debug-C" (
       set aConfigurationList=Debug
       set vArcType=x86_64
       set vOSType=msvc
       set vEnable64BitFlag=Yes
       set vASMFlag=No
-    echo All-C setting
+      echo All-C setting
   )  else if "%1"=="Win64-Release-C" (
       set aConfigurationList=Release
       set vArcType=x86_64
       set vOSType=msvc
       set vEnable64BitFlag=Yes
       set vASMFlag=No
-    echo Win64-Release-C setting
+      echo Win64-Release-C setting
   )  else if "%1"=="ARM-Debug-C" (
       set aConfigurationList=Debug
       set vArcType=arm
       set vOSType=msvc-wp
       set vEnable64BitFlag=No
       set vASMFlag=No
-    echo ARM-Debug-C setting
+      set WP8Flag=1
+      echo ARM-Debug-C setting
   )  else if "%1"=="ARM-Release-C" (
       set aConfigurationList=Debug Release
       set vArcType=arm
       set vOSType=msvc-wp
       set vEnable64BitFlag=No
       set vASMFlag=No
-    echo ARM-Release-C setting
+      set WP8Flag=1
+      echo ARM-Release-C setting
   )   else if "%1"=="Win32-All-C" (
       set aConfigurationList=Debug Release
       set vArcType=i386
       set vOSType=msvc
       set vEnable64BitFlag=No
       set vASMFlag=No
-    echo Win32-All-C setting
+      echo Win32-All-C setting
   )  else if "%1"=="Win64-All-C" (
       set aConfigurationList=Debug Release
       set vArcType=x86_64
       set vOSType=msvc
       set vEnable64BitFlag=Yes
       set vASMFlag=No
-    echo All-C setting
+      echo All-C setting
   )  else if "%1"=="ARM-All-C" (
       set aConfigurationList=Debug Release
       set vArcType=arm
       set vOSType=msvc-wp
       set vEnable64BitFlag=No
       set vASMFlag=No
+      set WP8Flag=1
     echo ARM-All-C setting
   )  else if "%1"=="Win32-Debug-ASM" (
       set aConfigurationList=Debug
@@ -218,63 +227,66 @@ goto :EOF
       set vOSType=msvc
       set vEnable64BitFlag=No
       set vASMFlag=Yes
-    echo Win32-Debug-ASM setting
+      echo Win32-Debug-ASM setting
   )  else if "%1"=="Win32-Release-ASM" (
       set aConfigurationList=Release
       set vArcType=i386
       set vOSType=msvc
       set vEnable64BitFlag=No
       set vASMFlag=Yes
-    echo Win32-Release-ASM setting
+      echo Win32-Release-ASM setting
   )  else if "%1"=="Win64-Debug-ASM" (
       set aConfigurationList=Debug
       set vArcType=x86_64
       set vOSType=msvc
       set vEnable64BitFlag=Yes
       set vASMFlag=Yes
-    echo All-ASM setting
+      echo All-ASM setting
   )  else if "%1"=="Win64-Release-ASM" (
       set aConfigurationList=Release
       set vArcType=x86_64
       set vOSType=msvc
       set vEnable64BitFlag=Yes
       set vASMFlag=Yes
-    echo Win64-Release-ASM setting
+      echo Win64-Release-ASM setting
   )  else if "%1"=="ARM-Debug-ASM" (
       set aConfigurationList=Debug
       set vArcType=arm
       set vOSType=msvc-wp
       set vEnable64BitFlag=No
       set vASMFlag=Yes
-    echo ARM-Debug-ASM setting
+      set WP8Flag=1
+      echo ARM-Debug-ASM setting
   )  else if "%1"=="ARM-Release-ASM" (
       set aConfigurationList=Release
       set vArcType=arm
       set vOSType=msvc-wp
       set vEnable64BitFlag=No
       set vASMFlag=Yes
-    echo ARM-Release-ASM setting
+      set WP8Flag=1
+      echo ARM-Release-ASM setting
   )   else if "%1"=="Win32-All-ASM" (
       set aConfigurationList=Debug Release
       set vArcType=i386
       set vOSType=msvc
       set vEnable64BitFlag=No
       set vASMFlag=Yes
-    echo Win32-All-ASM setting
+      echo Win32-All-ASM setting
   )  else if "%1"=="Win64-All-ASM" (
       set aConfigurationList=Debug Release
       set vArcType=x86_64
       set vOSType=msvc
       set vEnable64BitFlag=Yes
       set vASMFlag=Yes
-    echo All-ASM setting
+      echo All-ASM setting
   )  else if "%1"=="ARM-All-ASM" (
       set aConfigurationList=Debug Release
       set vArcType=arm
       set vOSType=msvc-wp
       set vEnable64BitFlag=No
       set vASMFlag=Yes
-    echo ARM-All-ASM setting
+      set WP8Flag=1
+      echo ARM-All-ASM setting
   )  else (
       call :help
       goto :ErrorReturn
@@ -341,29 +353,29 @@ rem ***********************************************
   echo   usage:
   echo      AutoBuildForWPAndWindows.bat % Configuration %
   echo      --For debug  version:
-  echo          Win32-C-Only: AutoBuildForWPAndWindows.bat  Win32-Debug-C
-  echo          Win32-ASM:    AutoBuildForWPAndWindows.bat  Win32-Debug-ASM
-  echo          Win64-C-Only: AutoBuildForWPAndWindows.bat  Win64-Debug-C
-  echo          Win64-ASM:    AutoBuildForWPAndWindows.bat  Win64-Debug-ASM
-  echo          ARM-C-Only:   AutoBuildForWPAndWindows.bat  ARM-Debug-C
-  echo          ARM-ASM:      AutoBuildForWPAndWindows.bat  ARM-Debug-ASM
+  echo          Win32-C-Only:      AutoBuildForWPAndWindows.bat  Win32-Debug-C
+  echo          Win32-ASM:         AutoBuildForWPAndWindows.bat  Win32-Debug-ASM
+  echo          Win64-C-Only:      AutoBuildForWPAndWindows.bat  Win64-Debug-C
+  echo          Win64-ASM:         AutoBuildForWPAndWindows.bat  Win64-Debug-ASM
+  echo          ARM-C-Only(WP8):   AutoBuildForWPAndWindows.bat  ARM-Debug-C
+  echo          ARM-ASM(WP8):      AutoBuildForWPAndWindows.bat  ARM-Debug-ASM
   echo      --For release version:
-  echo          Win32-C-Only: AutoBuildForWPAndWindows.bat  Win32-Release-C
-  echo          Win32-ASM:    AutoBuildForWPAndWindows.bat  Win32-Release-ASM
-  echo          Win64-C-Only: AutoBuildForWPAndWindows.bat  Win64-Release-C
-  echo          Win64-ASM:    AutoBuildForWPAndWindows.bat  Win64-Release-ASM
-  echo          ARM-C-Only:   AutoBuildForWPAndWindows.bat  ARM-Release-C
-  echo          ARM-ASM:      AutoBuildForWPAndWindows.bat  ARM-Release-ASM
+  echo          Win32-C-Only:      AutoBuildForWPAndWindows.bat  Win32-Release-C
+  echo          Win32-ASM:         AutoBuildForWPAndWindows.bat  Win32-Release-ASM
+  echo          Win64-C-Only:      AutoBuildForWPAndWindows.bat  Win64-Release-C
+  echo          Win64-ASM:         AutoBuildForWPAndWindows.bat  Win64-Release-ASM
+  echo          ARM-C-Only(WP8):   AutoBuildForWPAndWindows.bat  ARM-Release-C
+  echo          ARM-ASM(WP8):      AutoBuildForWPAndWindows.bat  ARM-Release-ASM
   echo      --For debug and release version:
-  echo          Win32-C-Only: AutoBuildForWPAndWindows.bat  Win32-All-C
-  echo          Win32-ASM:    AutoBuildForWPAndWindows.bat  Win32-All-ASM
-  echo          Win64-C-Only: AutoBuildForWPAndWindows.bat  Win64-All-C
-  echo          Win64-ASM:    AutoBuildForWPAndWindows.bat  Win64-All-ASM
-  echo          ARM-C-Only:   AutoBuildForWPAndWindows.bat  ARM-All-C
-  echo          ARM-ASM:      AutoBuildForWPAndWindows.bat  ARM-All-ASM
+  echo          Win32-C-Only:      AutoBuildForWPAndWindows.bat  Win32-All-C
+  echo          Win32-ASM:         AutoBuildForWPAndWindows.bat  Win32-All-ASM
+  echo          Win64-C-Only:      AutoBuildForWPAndWindows.bat  Win64-All-C
+  echo          Win64-ASM:         AutoBuildForWPAndWindows.bat  Win64-All-ASM
+  echo          ARM-C-Only(WP8):   AutoBuildForWPAndWindows.bat  ARM-All-C
+  echo          ARM-ASM(WP8):      AutoBuildForWPAndWindows.bat  ARM-All-ASM
   echo      --For default:
   echo         AutoBuildForWPAndWindows.bat
-  echo           ARM-All-ASM
+  echo           ARM-All-ASM(WP8)
   echo *******************************************************************************
 goto :EOF
 
