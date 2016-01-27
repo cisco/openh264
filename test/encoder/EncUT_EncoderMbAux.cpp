@@ -147,8 +147,10 @@ static void Sub8x8DctAnchor (int16_t iDct[4][4][4], uint8_t* pPix1, uint8_t* pPi
 }
 static void TestDctT4 (PDctFunc func) {
   int16_t iDctRef[4][4];
-  uint8_t uiPix1[16 * FENC_STRIDE], uiPix2[16 * FDEC_STRIDE];
-  int16_t iDct[16];
+  CMemoryAlign cMemoryAlign (0);
+  ALLOC_MEMORY (uint8_t, uiPix1, 16 * FENC_STRIDE);
+  ALLOC_MEMORY (uint8_t, uiPix2, 16 * FDEC_STRIDE);
+  ALLOC_MEMORY (int16_t, iDct, 16);
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
       uiPix1[i * FENC_STRIDE + j] = rand() & 255;
@@ -160,6 +162,9 @@ static void TestDctT4 (PDctFunc func) {
   for (int i = 0; i < 4; i++)
     for (int j = 0; j < 4; j++)
       EXPECT_EQ (iDctRef[j][i], iDct[i * 4 + j]);
+  FREE_MEMORY (uiPix1);
+  FREE_MEMORY (uiPix2);
+  FREE_MEMORY (iDct);
 }
 static void TestDctFourT4 (PDctFunc func) {
   int16_t iDctRef[4][4][4];
@@ -193,6 +198,10 @@ TEST (EncodeMbAuxTest, WelsDctFourT4_c) {
 #ifdef X86_ASM
 TEST (EncodeMbAuxTest, WelsDctT4_mmx) {
   TestDctT4 (WelsDctT4_mmx);
+}
+
+TEST (EncodeMbAuxTest, WelsDctT4_sse2) {
+  TestDctT4 (WelsDctT4_sse2);
 }
 
 TEST (EncodeMbAuxTest, WelsDctFourT4_sse2) {

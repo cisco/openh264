@@ -65,6 +65,7 @@ void WelsDequantFour4x4_sse2 (int16_t* pDct, const uint16_t* kpMF);
 void WelsDequantIHadamard4x4_sse2 (int16_t* pRes, const uint16_t kuiMF);
 
 void WelsIDctT4Rec_mmx (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride, int16_t* pDct);
+void WelsIDctT4Rec_sse2 (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride, int16_t* pDct);
 void WelsIDctFourT4Rec_sse2 (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride, int16_t* pDct);
 void WelsIDctRecI16x16Dc_sse2 (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride,
                                int16_t* pDctDc);
