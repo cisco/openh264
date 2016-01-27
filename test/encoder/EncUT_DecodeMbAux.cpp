@@ -239,6 +239,10 @@ TEST (DecodeMbAuxTest, WelsIDctT4Rec_mmx) {
 TEST (DecodeMbAuxTest, WelsIDctT4Rec_sse2) {
   TestIDctT4Rec<int16_t> (WelsIDctT4Rec_sse2);
 }
+TEST (DecodeMbAuxTest, WelsIDctT4Rec_avx2) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
+    TestIDctT4Rec<int16_t> (WelsIDctT4Rec_avx2);
+}
 #endif
 template<typename clip_t>
 void WelsIDctT8Anchor (uint8_t* p_dst, int16_t dct[4][16]) {

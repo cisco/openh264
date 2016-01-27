@@ -69,6 +69,7 @@ void WelsIDctT4Rec_sse2 (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, i
 void WelsIDctFourT4Rec_sse2 (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride, int16_t* pDct);
 void WelsIDctRecI16x16Dc_sse2 (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride,
                                int16_t* pDctDc);
+void WelsIDctT4Rec_avx2 (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride, int16_t* pDct);
 void WelsIDctFourT4Rec_avx2 (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride, int16_t* pDct);
 #endif//X86_ASM
 

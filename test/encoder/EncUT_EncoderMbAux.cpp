@@ -208,6 +208,11 @@ TEST (EncodeMbAuxTest, WelsDctFourT4_sse2) {
   TestDctFourT4 (WelsDctFourT4_sse2);
 }
 
+TEST (EncodeMbAuxTest, WelsDctT4_avx2) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
+    TestDctT4 (WelsDctT4_avx2);
+}
+
 TEST (EncodeMbAuxTest, WelsDctFourT4_avx2) {
   if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
     TestDctFourT4 (WelsDctFourT4_avx2);
