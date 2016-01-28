@@ -179,6 +179,7 @@ TEST (DecodeMbAuxTest, WelsDequantIHadamard2x2Dc) {
   EXPECT_TRUE (ok);
 }
 #define FDEC_STRIDE 32
+template<typename clip_t>
 void WelsIDctT4Anchor (uint8_t* p_dst, int16_t dct[16]) {
   int16_t tmp[16];
   int32_t iStridex2 = (FDEC_STRIDE << 1);
@@ -193,13 +194,13 @@ void WelsIDctT4Anchor (uint8_t* p_dst, int16_t dct[16]) {
   }
   for (i = 0; i < 4; i++) {
     uiDst = p_dst[i];
-    p_dst[i]             = WelsClip1 (uiDst + ((tmp[i] + tmp[4 + i] +     tmp[8 + i] + (tmp[12 + i] >> 1) + 32) >> 6));
+    p_dst[i]             = WelsClip1 (uiDst + (clip_t (tmp[i] + tmp[4 + i] +     tmp[8 + i] + (tmp[12 + i] >> 1) + 32) >> 6));
     uiDst = p_dst[i + FDEC_STRIDE];
-    p_dst[i + FDEC_STRIDE] = WelsClip1 (uiDst + ((tmp[i] + (tmp[4 + i] >> 1) - tmp[8 + i] - tmp[12 + i] + 32)     >> 6));
+    p_dst[i + FDEC_STRIDE] = WelsClip1 (uiDst + (clip_t (tmp[i] + (tmp[4 + i] >> 1) - tmp[8 + i] - tmp[12 + i] + 32)     >> 6));
     uiDst = p_dst[i + iStridex2];
-    p_dst[i + iStridex2]   = WelsClip1 (uiDst + ((tmp[i] - (tmp[4 + i] >> 1) - tmp[8 + i] + tmp[12 + i] + 32)     >> 6));
+    p_dst[i + iStridex2]   = WelsClip1 (uiDst + (clip_t (tmp[i] - (tmp[4 + i] >> 1) - tmp[8 + i] + tmp[12 + i] + 32)     >> 6));
     uiDst = p_dst[i + iStridex3];
-    p_dst[i + iStridex3]   = WelsClip1 (uiDst + ((tmp[i] - tmp[4 + i] +     tmp[8 + i] - (tmp[12 + i] >> 1) + 32) >> 6));
+    p_dst[i + iStridex3]   = WelsClip1 (uiDst + (clip_t (tmp[i] - tmp[4 + i] +     tmp[8 + i] - (tmp[12 + i] >> 1) + 32) >> 6));
   }
 }
 TEST (DecodeMbAuxTest, WelsIDctT4Rec_c) {
@@ -214,7 +215,7 @@ TEST (DecodeMbAuxTest, WelsIDctT4Rec_c) {
       iPred[i * FDEC_STRIDE + j] = iRefDst[i * FDEC_STRIDE + j] = rand() & 255;
     }
   }
-  WelsIDctT4Anchor (iRefDst, iRefDct);
+  WelsIDctT4Anchor<int32_t> (iRefDst, iRefDct);
   WelsIDctT4Rec_c (iRec, FDEC_STRIDE, iPred, FDEC_STRIDE, iDct);
   int ok = -1;
   for (int i = 0; i < 4; i++) {
@@ -257,13 +258,15 @@ TEST (DecodeMbAuxTest, WelsIDctT4Rec_mmx) {
   }
 }
 #endif
+template<typename clip_t>
 void WelsIDctT8Anchor (uint8_t* p_dst, int16_t dct[4][16]) {
-  WelsIDctT4Anchor (&p_dst[0],               dct[0]);
-  WelsIDctT4Anchor (&p_dst[4],               dct[1]);
-  WelsIDctT4Anchor (&p_dst[4 * FDEC_STRIDE + 0], dct[2]);
-  WelsIDctT4Anchor (&p_dst[4 * FDEC_STRIDE + 4], dct[3]);
+  WelsIDctT4Anchor<clip_t> (&p_dst[0],                   dct[0]);
+  WelsIDctT4Anchor<clip_t> (&p_dst[4],                   dct[1]);
+  WelsIDctT4Anchor<clip_t> (&p_dst[4 * FDEC_STRIDE + 0], dct[2]);
+  WelsIDctT4Anchor<clip_t> (&p_dst[4 * FDEC_STRIDE + 4], dct[3]);
 }
-TEST (DecodeMbAuxTest, WelsIDctFourT4Rec_c) {
+template<typename clip_t>
+void TestIDctFourT4Rec (PIDctFunc func) {
   int16_t iRefDct[4][16];
   uint8_t iRefDst[16 * FDEC_STRIDE];
   ENFORCE_STACK_ALIGN_1D (int16_t, iDct, 64, 16);
@@ -277,8 +280,8 @@ TEST (DecodeMbAuxTest, WelsIDctFourT4Rec_c) {
     for (int j = 0; j < 8; j++)
       iPred[i * FDEC_STRIDE + j] = iRefDst[i * FDEC_STRIDE + j] = rand() & 255;
 
-  WelsIDctT8Anchor (iRefDst, iRefDct);
-  WelsIDctFourT4Rec_c (iRec, FDEC_STRIDE, iPred, FDEC_STRIDE, iDct);
+  WelsIDctT8Anchor<clip_t> (iRefDst, iRefDct);
+  func (iRec, FDEC_STRIDE, iPred, FDEC_STRIDE, iDct);
   int ok = -1;
   for (int i = 0; i < 8; i++) {
     for (int j = 0; j < 8; j++) {
@@ -289,6 +292,9 @@ TEST (DecodeMbAuxTest, WelsIDctFourT4Rec_c) {
     }
   }
   EXPECT_EQ (ok, -1);
+}
+TEST (DecodeMbAuxTest, WelsIDctFourT4Rec_c) {
+  TestIDctFourT4Rec<int32_t> (WelsIDctFourT4Rec_c);
 }
 void WelsIDctRecI16x4DcAnchor (uint8_t* p_dst, int16_t dct[4]) {
   for (int i = 0; i < 4; i++, p_dst += FDEC_STRIDE) {
@@ -345,6 +351,13 @@ TEST (DecodeMbAuxTest, WelsIDctRecI16x16Dc_c) {
   EXPECT_EQ (ok, -1);
 }
 #if defined(X86_ASM)
+TEST (DecodeMbAuxTest, WelsIDctFourT4Rec_sse2) {
+  TestIDctFourT4Rec<int16_t> (WelsIDctFourT4Rec_sse2);
+}
+TEST (DecodeMbAuxTest, WelsIDctFourT4Rec_avx2) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
+    TestIDctFourT4Rec<int16_t> (WelsIDctFourT4Rec_avx2);
+}
 TEST (DecodeMbAuxTest, WelsIDctRecI16x16Dc_sse2) {
   int32_t iCpuCores = 0;
   uint32_t uiCpuFeatureFlag = WelsCPUFeatureDetect (&iCpuCores);
