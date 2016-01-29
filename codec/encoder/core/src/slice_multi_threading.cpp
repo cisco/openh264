@@ -961,7 +961,7 @@ int32_t CreateSliceThreads (sWelsEncCtx* pCtx) {
   while (iIdx < kiThreadCount) {
     if (WelsThreadCreate (&pCtx->pSliceThreading->pThreadHandles[iIdx], CodingSliceThreadProc,
                           &pCtx->pSliceThreading->pThreadPEncCtx[iIdx], 0)) {
-      return 1;
+      goto out_fail;
     }
 
 
@@ -969,6 +969,17 @@ int32_t CreateSliceThreads (sWelsEncCtx* pCtx) {
   }
   MT_TRACE_LOG (pCtx, WELS_LOG_INFO, "CreateSliceThreads() exit..");
   return 0;
+
+out_fail:
+  iIdx--;
+  while (iIdx >= 0) {
+	  WelsEventSignal(&pCtx->pSliceThreading->pExitEncodeEvent[iIdx]);
+	  WelsEventSignal(&pCtx->pSliceThreading->pThreadMasterEvent[iIdx]);
+	  WelsThreadJoin(pCtx->pSliceThreading->pThreadHandles[iIdx]);
+	  pCtx->pSliceThreading->pThreadHandles[iIdx] = 0;
+	  iIdx--;
+  }
+  return 1;
 }
 
 int32_t FiredSliceThreads (sWelsEncCtx* pCtx, SSliceThreadPrivateData* pPriData, WELS_EVENT* pEventsList,
