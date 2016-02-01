@@ -21,8 +21,10 @@ TEST_F (EncodeDecodeTestAPI, LogEncoding) {
   //int iEncFrameNum = $TOTAL_FRMS;
 
   //FillFirstParam
-  int rv = encoder_->InitializeExt (&param_);
-  ASSERT_TRUE (rv == cmResultSuccess);
+  int iTraceLevel = WELS_LOG_INFO;
+  int rv = encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  rv = encoder_->InitializeExt (&param_);
+  EXPECT_TRUE (rv == cmResultSuccess);
 
   unsigned char*  pBsBuf[MAX_SPATIAL_LAYER_NUM];
   int aLen[MAX_SPATIAL_LAYER_NUM] = {0};
@@ -45,7 +47,7 @@ TEST_F (EncodeDecodeTestAPI, LogEncoding) {
     aLen[iIdx] = 0;
 
     long rv = WelsCreateDecoder (&decoder[iIdx]);
-    ASSERT_EQ (0, rv);
+    EXPECT_TRUE (0 == rv);
     EXPECT_TRUE (decoder[iIdx] != NULL);
 
     SDecodingParam decParam;
@@ -55,7 +57,7 @@ TEST_F (EncodeDecodeTestAPI, LogEncoding) {
     decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
 
     rv = decoder[iIdx]->Initialize (&decParam);
-    ASSERT_EQ (0, rv);
+    EXPECT_TRUE (0 == rv);
   }
 
 
@@ -64,9 +66,15 @@ TEST_F (EncodeDecodeTestAPI, LogEncoding) {
     int iLayerLen = 0;
     unsigned char* pData[3] = { NULL };
 
+	if (iFrame % 10 == 0) {
+		printf("current iFrame=%d\n", iFrame);
+	}
+
     //FillParam
 
     InitialEncDec (param_.iPicWidth, param_.iPicHeight);
+    rv = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &param_);
+    ASSERT_TRUE (rv == cmResultSuccess) << "SetOption Failed pParam: rv = " << rv;
     EncodeOneFrame (0);
 
     // init
@@ -93,7 +101,7 @@ TEST_F (EncodeDecodeTestAPI, LogEncoding) {
       } else {
         if (layerInfo.uiLayerType == NON_VIDEO_CODING_LAYER) {
           // under SimulcastSVC, need to copy non-VCL to all layers
-          for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
+          for (iIdx = 0; iIdx < param_.iSpatialLayerNum; iIdx++) {
             memcpy ((pBsBuf[iIdx] + aLen[iIdx]), layerInfo.pBsBuf, iLayerLen * sizeof (unsigned char));
             aLen[iIdx] += iLayerLen;
           }
@@ -115,11 +123,11 @@ TEST_F (EncodeDecodeTestAPI, LogEncoding) {
         fwrite (pBsBuf[iIdx], aLen[iIdx], 1, fEnc[iIdx]);
 #endif
         iResult = decoder[iIdx]->DecodeFrame2 (pBsBuf[iIdx], aLen[iIdx], pData, &dstBufInfo_);
-        EXPECT_TRUE (iResult == cmResultSuccess) << "iResult=" << iResult << "LayerIdx=" << iIdx;
+        EXPECT_TRUE (iResult == cmResultSuccess) << "iResult=" << iResult << " iFrame = " << iFrame << " LayerIdx=" << iIdx;
 
         iResult = decoder[iIdx]->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_);
-        EXPECT_TRUE (iResult == cmResultSuccess) << "iResult=" << iResult << "LayerIdx=" << iIdx;
-        EXPECT_EQ (dstBufInfo_.iBufferStatus, 1) << "LayerIdx=" << iIdx;
+        EXPECT_TRUE (iResult == cmResultSuccess) << "iResult=" << iResult << " iFrame = " << iFrame << " LayerIdx=" << iIdx;
+        EXPECT_EQ (dstBufInfo_.iBufferStatus, 1) << "LayerIdx=" << iIdx << " LayerLen=" << aLen[iIdx] << " iFrame = " << iFrame;
       }
     }
   }
