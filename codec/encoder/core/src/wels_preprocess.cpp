@@ -1346,13 +1346,13 @@ void  CWelsPreProcess::WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SP
   const int32_t kiDstStrideUV = pDstPic->iLineSize[1];
 
   if (pSrcY) {
-    if (iSrcWidth <= 0 || iSrcWidth > MAX_WIDTH || iSrcHeight <= 0 || iSrcHeight > MAX_HEIGHT)
+    if (iSrcWidth <= 0 || iSrcHeight <= 0 || (iSrcWidth * iSrcHeight > (MAX_MBS_PER_FRAME << 8)))
       return;
     if (kiSrcTopOffsetY >= iSrcHeight || kiSrcLeftOffsetY >= iSrcWidth || iSrcWidth > kiSrcStrideY)
       return;
   }
   if (pDstY) {
-    if (kiTargetWidth <= 0 || kiTargetWidth > MAX_WIDTH || kiTargetHeight <= 0 || kiTargetHeight > MAX_HEIGHT)
+    if (kiTargetWidth <= 0 || kiTargetHeight <= 0 || (kiTargetWidth * kiTargetHeight > (MAX_MBS_PER_FRAME << 8)))
       return;
     if (kiTargetWidth > kiDstStrideY)
       return;
