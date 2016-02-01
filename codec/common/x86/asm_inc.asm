@@ -79,6 +79,19 @@ BITS 64
 %define arg11 [rsp + push_num*8 + 88]
 %define arg12 [rsp + push_num*8 + 96]
 
+%define arg1d ecx
+%define arg2d edx
+%define arg3d r8d
+%define arg4d r9d
+%define arg5d arg5
+%define arg6d arg6
+%define arg7d arg7
+%define arg8d arg8
+%define arg9d arg9
+%define arg10d arg10
+%define arg11d arg11
+%define arg12d arg12
+
 %define r0 rcx
 %define r1 rdx
 %define r2 r8
@@ -135,6 +148,19 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
 %define arg11 [rsp + push_num*8 + 40]
 %define arg12 [rsp + push_num*8 + 48]
 
+%define arg1d edi
+%define arg2d esi
+%define arg3d edx
+%define arg4d ecx
+%define arg5d r8d
+%define arg6d r9d
+%define arg7d arg7
+%define arg8d arg8
+%define arg9d arg9
+%define arg10d arg10
+%define arg11d arg11
+%define arg12d arg12
+
 %define r0 rdi
 %define r1 rsi
 %define r2 rdx
@@ -188,6 +214,19 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
 %define arg10 [esp + push_num*4 + 40]
 %define arg11 [esp + push_num*4 + 44]
 %define arg12 [esp + push_num*4 + 48]
+
+%define arg1d arg1
+%define arg2d arg2
+%define arg3d arg3
+%define arg4d arg4
+%define arg5d arg5
+%define arg6d arg6
+%define arg7d arg7
+%define arg8d arg8
+%define arg9d arg9
+%define arg10d arg10
+%define arg11d arg11
+%define arg12d arg12
 
 %define r0 eax
 %define r1 ecx
