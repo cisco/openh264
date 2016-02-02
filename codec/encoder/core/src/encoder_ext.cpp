@@ -4460,7 +4460,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     return ENC_RETURN_UNEXPECTED;
   }
 #endif
-  WelsLog (& pCtx->sLogCtx, WELS_LOG_INFO, "return ENC_RETURN_SUCCESS");
   return ENC_RETURN_SUCCESS;
 }
 

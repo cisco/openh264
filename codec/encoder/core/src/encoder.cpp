@@ -242,8 +242,6 @@ void UpdateFrameNum (sWelsEncCtx* pEncCtx, const int32_t kiDidx) {
   }
 
   pEncCtx->eLastNalPriority[kiDidx] = NRI_PRI_LOWEST;
-  WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO, "UpdateFrameNum,bNeedFrameNumIncreasing = %d,iFrameNum = %d,kiDidx = %d",
-           bNeedFrameNumIncreasing, pParamInternal->iFrameNum, kiDidx);
 }
 
 
@@ -262,9 +260,6 @@ void LoadBackFrameNum (sWelsEncCtx* pEncCtx, const int32_t kiDidx) {
       pParamInternal->iFrameNum = (1 << pEncCtx->pSps->uiLog2MaxFrameNum) - 1;
     }
   }
-  WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_INFO,
-           "LoadBackFrameNum,bNeedFrameNumIncreasing = %d,iFrameNum = %d,kiDidx = %d", bNeedFrameNumIncreasing,
-           pParamInternal->iFrameNum, kiDidx);
 }
 
 void InitBitStream (sWelsEncCtx* pEncCtx) {
