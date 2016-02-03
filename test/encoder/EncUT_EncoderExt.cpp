@@ -573,11 +573,28 @@ TEST_F (EncoderInterfaceTest, BasicInitializeTestFalse) {
   iResult = pPtrEnc->Initialize (&sEncParamBase);
   EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
 
-  //TODO: add checking max in interface and then enable this checking
-  //GetValidEncParamBase(&sEncParamBase);
-  //sEncParamBase.iPicWidth = rand()+(MAX_HEIGHT+1);
-  //iResult = pPtrEnc->Initialize (&sEncParamBase);
-  //EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
+  //iPicWidth * iPicHeight <= 36864 * 16 * 16, from Level 5.2 constraint
+  //Initialize test: FALSE
+  GetValidEncParamBase (&sEncParamBase);
+  sEncParamBase.iPicWidth = 5000;
+  sEncParamBase.iPicHeight = 5000;
+  iResult = pPtrEnc->Initialize (&sEncParamBase);
+  EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
+  //Initialize test: TRUE, with SetOption test following
+  GetValidEncParamBase (&sEncParamBase);
+  sEncParamBase.iPicWidth = 36864;
+  sEncParamBase.iPicHeight = 256;
+  iResult = pPtrEnc->Initialize (&sEncParamBase);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  sEncParamBase.iPicWidth = 256;
+  sEncParamBase.iPicHeight = 36864;
+  iResult = pPtrEnc->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_BASE, &sEncParamBase);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+  sEncParamBase.iPicWidth = 5000;
+  sEncParamBase.iPicHeight = 5000;
+  iResult = pPtrEnc->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_BASE, &sEncParamBase);
+  EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
+  pPtrEnc->Uninitialize();
 
   //iTargetBitrate
   GetValidEncParamBase (&sEncParamBase);

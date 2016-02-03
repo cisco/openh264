@@ -485,10 +485,10 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
     int32_t iMbNumInFrame       = 0;
     uint32_t iMaxSliceNum       = MAX_SLICES_NUM;
     int32_t  iReturn            = 0;
-    if ((kiPicWidth <= 0) || (kiPicHeight <= 0) || (kiPicWidth > MAX_WIDTH) || (kiPicHeight > MAX_HEIGHT)) {
+    if ((kiPicWidth <= 0) || (kiPicHeight <= 0) || (kiPicWidth * kiPicHeight > (MAX_MBS_PER_FRAME << 8))) {
       WelsLog (pLogCtx, WELS_LOG_ERROR,
-               "ParamValidationExt(),width(1-%d),height(1-%d)invalid %d x %d in dependency layer settings!", MAX_WIDTH, MAX_HEIGHT,
-               kiPicWidth, kiPicHeight);
+               "ParamValidationExt(), width > 0, height > 0, width * height <= %d, invalid %d x %d in dependency layer settings!",
+               (MAX_MBS_PER_FRAME << 8), kiPicWidth, kiPicHeight);
       return ENC_RETURN_UNSUPPORTED_PARA;
     }
     if ((kiPicWidth & 0x0F) != 0 || (kiPicHeight & 0x0F) != 0) {
