@@ -315,14 +315,14 @@ bool CWelsPreProcess::BuildSpatialLayer (sWelsEncCtx* pCtx, const SSourcePicture
       int32_t iPicturePos               = m_uiSpatialLayersInTemporal[iDependencyId] - 1;
       Scaled_Picture*  pScaledPicture = &m_sScaledPicture;
 
-      int32_t iSrcWidth                 = pSvcParam->SUsedPicRect.iWidth;
-      int32_t iSrcHeight                = pSvcParam->SUsedPicRect.iHeight;
       int32_t iTargetWidth              = pDlayerParam->iVideoWidth;
       int32_t iTargetHeight             = pDlayerParam->iVideoHeight;
 
       SPicture* pSrcPic                 = (pSpatialIndexMap + iMaxDid)->pSrc;; // large
       SPicture* pDstPic                 = m_pSpatialPic[iDependencyId][iPicturePos]; // small
 
+      int32_t iSrcWidth                 = pSrcPic->iWidthInPixel;
+      int32_t iSrcHeight                = pSrcPic->iHeightInPixel;
       int32_t iShrinkWidth = pScaledPicture->iScaledWidth[iDependencyId];
       int32_t iShrinkHeight = pScaledPicture->iScaledHeight[iDependencyId];
       DownsamplePadding (pSrcPic, pDstPic, iSrcWidth, iSrcHeight, iShrinkWidth, iShrinkHeight, iTargetWidth, iTargetHeight,
@@ -384,7 +384,6 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
   }
   DownsamplePadding (pSrcPic, pDstPic, iSrcWidth, iSrcHeight, iShrinkWidth, iShrinkHeight, iTargetWidth, iTargetHeight,
                      false);
-
   if (pSvcParam->bEnableSceneChangeDetect && !pCtx->pVaa->bIdrPeriodFlag) {
     if (pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
       pCtx->pVaa->eSceneChangeIdc = (pDlayerParamInternal->bEncCurFrmAsIdrFlag ? LARGE_CHANGED_SCENE :
