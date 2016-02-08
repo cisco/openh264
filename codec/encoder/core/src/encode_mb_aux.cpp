@@ -516,6 +516,7 @@ void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
     pFuncList->pfScan4x4Ac              = WelsScan4x4Ac_sse2;
     pFuncList->pfCalculateSingleCtr4x4  = WelsCalculateSingleCtr4x4_sse2;
 
+    pFuncList->pfDctT4                  = WelsDctT4_sse2;
     pFuncList->pfDctFourT4              = WelsDctFourT4_sse2;
   }
 //#ifndef MACOS
@@ -523,6 +524,7 @@ void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
     pFuncList->pfScan4x4                = WelsScan4x4DcAc_ssse3;
   }
   if (uiCpuFlag & WELS_CPU_AVX2) {
+    pFuncList->pfDctT4                  = WelsDctT4_avx2;
     pFuncList->pfDctFourT4              = WelsDctFourT4_avx2;
   }
 

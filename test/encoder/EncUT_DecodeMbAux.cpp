@@ -203,7 +203,8 @@ void WelsIDctT4Anchor (uint8_t* p_dst, int16_t dct[16]) {
     p_dst[i + iStridex3]   = WelsClip1 (uiDst + (clip_t (tmp[i] - tmp[4 + i] +     tmp[8 + i] - (tmp[12 + i] >> 1) + 32) >> 6));
   }
 }
-TEST (DecodeMbAuxTest, WelsIDctT4Rec_c) {
+template<typename clip_t>
+void TestIDctT4Rec (PIDctFunc func) {
   int16_t iRefDct[16];
   uint8_t iRefDst[16 * FDEC_STRIDE];
   ENFORCE_STACK_ALIGN_1D (int16_t, iDct, 16, 16);
@@ -215,8 +216,8 @@ TEST (DecodeMbAuxTest, WelsIDctT4Rec_c) {
       iPred[i * FDEC_STRIDE + j] = iRefDst[i * FDEC_STRIDE + j] = rand() & 255;
     }
   }
-  WelsIDctT4Anchor<int32_t> (iRefDst, iRefDct);
-  WelsIDctT4Rec_c (iRec, FDEC_STRIDE, iPred, FDEC_STRIDE, iDct);
+  WelsIDctT4Anchor<clip_t> (iRefDst, iRefDct);
+  func (iRec, FDEC_STRIDE, iPred, FDEC_STRIDE, iDct);
   int ok = -1;
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
@@ -228,34 +229,19 @@ TEST (DecodeMbAuxTest, WelsIDctT4Rec_c) {
   }
   EXPECT_EQ (ok, -1);
 }
+TEST (DecodeMbAuxTest, WelsIDctT4Rec_c) {
+  TestIDctT4Rec<int32_t> (WelsIDctT4Rec_c);
+}
 #if defined(X86_ASM)
 TEST (DecodeMbAuxTest, WelsIDctT4Rec_mmx) {
-  int32_t iCpuCores = 0;
-  uint32_t uiCpuFeatureFlag = WelsCPUFeatureDetect (&iCpuCores);
-  if (uiCpuFeatureFlag & WELS_CPU_MMXEXT) {
-    ENFORCE_STACK_ALIGN_1D (int16_t, iDct, 16, 16);
-    ENFORCE_STACK_ALIGN_1D (uint8_t, iPred, 16 * FDEC_STRIDE, 16);
-    ENFORCE_STACK_ALIGN_1D (uint8_t, iRecC, 16 * FDEC_STRIDE, 16);
-    ENFORCE_STACK_ALIGN_1D (uint8_t, iRecM, 16 * FDEC_STRIDE, 16);
-    for (int i = 0; i < 4; i++) {
-      for (int j = 0; j < 4; j++) {
-        iDct[i * 4 + j] = (rand() & ((1 << 12) - 1)) - (1 << 11);
-        iPred[i * FDEC_STRIDE + j] = rand() & 255;
-      }
-    }
-    WelsIDctT4Rec_c (iRecC, FDEC_STRIDE, iPred,  FDEC_STRIDE, iDct);
-    WelsIDctT4Rec_mmx (iRecM, FDEC_STRIDE, iPred, FDEC_STRIDE, iDct);
-    int ok = -1;
-    for (int i = 0; i < 4; i++) {
-      for (int j = 0; j < 4; j++) {
-        if (iRecC[i * FDEC_STRIDE + j] != iRecM[i * FDEC_STRIDE + j]) {
-          ok = i * 4 + j;
-          break;
-        }
-      }
-    }
-    EXPECT_EQ (ok, -1);
-  }
+  TestIDctT4Rec<int16_t> (WelsIDctT4Rec_mmx);
+}
+TEST (DecodeMbAuxTest, WelsIDctT4Rec_sse2) {
+  TestIDctT4Rec<int16_t> (WelsIDctT4Rec_sse2);
+}
+TEST (DecodeMbAuxTest, WelsIDctT4Rec_avx2) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
+    TestIDctT4Rec<int16_t> (WelsIDctT4Rec_avx2);
 }
 #endif
 template<typename clip_t>
