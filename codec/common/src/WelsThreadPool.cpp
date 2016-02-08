@@ -133,7 +133,7 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::Uninit() {
 }
 
 void CWelsThreadPool::ExecuteTask() {
-  //WELS_INFO_TRACE("ThreadPool: schedule tasks");
+  //fprintf(stdout, "ThreadPool: schedule tasks\n");
   CWelsTaskThread* pThread = NULL;
   IWelsTask*    pTask = NULL;
   while (GetWaitedTaskNum() > 0) {
@@ -142,7 +142,7 @@ void CWelsThreadPool::ExecuteTask() {
       break;
     }
     pTask = GetWaitedTask();
-    //WELS_INFO_TRACE("ThreadPool:  ExecuteTask = "<<(uint32_t)(pTask)<<" at thread = "<<(uint32_t)(pThread));
+    //fprintf(stdout, "ThreadPool:  ExecuteTask = %x at thread %x\n", pTask, pThread);
     pThread->SetTask (pTask);
   }
 }
@@ -150,12 +150,12 @@ void CWelsThreadPool::ExecuteTask() {
 WELS_THREAD_ERROR_CODE CWelsThreadPool::QueueTask (IWelsTask* pTask) {
   CWelsAutoLock  cLock (m_cLockPool);
 
-  //WELS_INFO_TRACE("ThreadPool:  QueueTask = "<<(uint32_t)(pTask));
+  //fprintf(stdout, "ThreadPool:  QueueTask = %x\n", pTask);
   if (GetWaitedTaskNum() == 0) {
     CWelsTaskThread* pThread = GetIdleThread();
 
     if (pThread != NULL) {
-      //WELS_INFO_TRACE("ThreadPool:  ExecuteTask = "<<(uint32_t)(pTask));
+      //fprintf(stdout, "ThreadPool:  ExecuteTask = %x\n", pTask);
       pThread->SetTask (pTask);
 
       return WELS_THREAD_ERROR_OK;
@@ -163,7 +163,7 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::QueueTask (IWelsTask* pTask) {
   }
 
   AddTaskToWaitedList (pTask);
-
+  //fprintf(stdout, "ThreadPool:  AddTaskToWaitedList: %x\n", pTask);
   SignalThread();
   return WELS_THREAD_ERROR_OK;
 }

@@ -60,7 +60,7 @@ class CWelsBaseTask : public WelsCommon::IWelsTask {
     WELS_ENC_TASK_ALL = 3,
   };
 
-  CWelsBaseTask();
+  CWelsBaseTask (WelsCommon::IWelsTaskSink* pSink): IWelsTask (pSink) {};
   virtual ~CWelsBaseTask();
 
   virtual uint32_t GetTaskType() const = 0;

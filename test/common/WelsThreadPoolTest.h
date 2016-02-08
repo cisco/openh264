@@ -6,7 +6,7 @@
 
 using namespace WelsCommon;
 
-class CThreadPoolTest : public IWelsThreadPoolSink {
+class CThreadPoolTest : public IWelsThreadPoolSink, public IWelsTaskSink {
  public:
   CThreadPoolTest() {
     m_iTaskCount = 0;
@@ -17,14 +17,28 @@ class CThreadPoolTest : public IWelsThreadPoolSink {
   virtual int32_t OnTaskExecuted (IWelsTask* pTask) {
     WelsCommon::CWelsAutoLock cAutoLock (m_cTaskCountLock);
     m_iTaskCount ++;
-    //printf("Task execute over count is %d\n", m_iTaskCount);
+    //fprintf(stdout, "Task execute over count is %d\n", m_iTaskCount);
     return cmResultSuccess;
   }
 
   virtual int32_t OnTaskCancelled (IWelsTask* pTask) {
     WelsCommon::CWelsAutoLock cAutoLock (m_cTaskCountLock);
     m_iTaskCount ++;
-    //printf("Task execute cancelled count is %d\n", m_iTaskCount);
+    //fprintf(stdout, "Task execute cancelled count is %d\n", m_iTaskCount);
+    return cmResultSuccess;
+  }
+
+  virtual int OnTaskExecuted() {
+    WelsCommon::CWelsAutoLock cAutoLock (m_cTaskCountLock);
+    m_iTaskCount ++;
+    //fprintf(stdout, "Task execute over count is %d\n", m_iTaskCount);
+    return cmResultSuccess;
+  }
+
+  virtual int OnTaskCancelled() {
+    WelsCommon::CWelsAutoLock cAutoLock (m_cTaskCountLock);
+    m_iTaskCount ++;
+    //fprintf(stdout, "Task execute cancelled count is %d\n", m_iTaskCount);
     return cmResultSuccess;
   }
 

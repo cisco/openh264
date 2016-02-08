@@ -41,8 +41,6 @@
 
 namespace WelsEnc {
 
-CWelsBaseTask::CWelsBaseTask() {
-}
 
 CWelsBaseTask::~CWelsBaseTask() {
 }
