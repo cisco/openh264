@@ -922,6 +922,53 @@ void FreeMbCache (SMbCache* pMbCache, CMemoryAlign* pMa) {
   }
 }
 
+void FreeDqLayer (SDqLayer* pDq, CMemoryAlign* pMa) {
+  if (NULL == pDq) {
+    return;
+  }
+
+  if (NULL != pDq->sLayerInfo.pSliceInLayer) {
+    int32_t iSliceIdx = 0;
+    while (iSliceIdx < pDq->iMaxSliceNum) {
+      SSlice* pSlice = &pDq->sLayerInfo.pSliceInLayer[iSliceIdx];
+      FreeMbCache (&pSlice->sMbCacheInfo, pMa);
+      ++ iSliceIdx;
+    }
+    
+    while (iSliceIdx < pDq->iMaxSliceNum) {
+      SSlice* pSlice = &pDq->sLayerInfo.pSliceInLayer[iSliceIdx];
+      FreeMbCache (&pSlice->sMbCacheInfo, pMa);
+      ++ iSliceIdx;
+    }
+    pMa->WelsFree (pDq->sLayerInfo.pSliceInLayer, "pSliceInLayer");
+    pDq->sLayerInfo.pSliceInLayer = NULL;
+  }
+
+  if (pDq->pNumSliceCodedOfPartition) {
+    pMa->WelsFree (pDq->pNumSliceCodedOfPartition, "pNumSliceCodedOfPartition");
+    pDq->pNumSliceCodedOfPartition = NULL;
+  }
+
+  if (pDq->pLastCodedMbIdxOfPartition) {
+    pMa->WelsFree (pDq->pLastCodedMbIdxOfPartition, "pLastCodedMbIdxOfPartition");
+    pDq->pLastCodedMbIdxOfPartition = NULL;
+  }
+  if (pDq->pLastMbIdxOfPartition) {
+    pMa->WelsFree (pDq->pLastMbIdxOfPartition, "pLastMbIdxOfPartition");
+    pDq->pLastMbIdxOfPartition = NULL;
+  }
+
+  if (pDq->pFeatureSearchPreparation) {
+    ReleaseFeatureSearchPreparation (pMa, pDq->pFeatureSearchPreparation->pFeatureOfBlock);
+    pMa->WelsFree (pDq->pFeatureSearchPreparation, "pFeatureSearchPreparation");
+    pDq->pFeatureSearchPreparation = NULL;
+  }
+
+  UninitSlicePEncCtx (pDq, pMa);
+  pDq->iMaxSliceNum = 0;
+}
+
+
 static int32_t WelsGenerateNewSps (sWelsEncCtx* pCtx, const bool kbUseSubsetSps, const int32_t iDlayerIndex,
                                    const int32_t iDlayerCount, const int32_t kiSpsId,
                                    SWelsSPS*& pSps, SSubsetSps*& pSubsetSps, bool bSVCBaselayer) {
@@ -1155,14 +1202,16 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
     SSpatialLayerConfig* pDlayer    = &pParam->sSpatialLayers[iDlayerIndex];
     const int32_t kiMbW             = (pDlayer->iVideoWidth + 0x0f) >> 4;
     const int32_t kiMbH             = (pDlayer->iVideoHeight + 0x0f) >> 4;
+
+    // pDq layers list
+    pDqLayer = (SDqLayer*)pMa->WelsMallocz (sizeof (SDqLayer), "pDqLayer");
+    WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pDqLayer), FreeDqLayer (pDqLayer, pMa))
+
     int32_t iMaxSliceNum            = 1;
     const int32_t kiSliceNum = GetInitialSliceNum (kiMbW, kiMbH, &pDlayer->sSliceArgument);
     if (iMaxSliceNum < kiSliceNum)
       iMaxSliceNum = kiSliceNum;
-
-    // pDq layers list
-    pDqLayer = (SDqLayer*)pMa->WelsMallocz (sizeof (SDqLayer), "pDqLayer");
-    WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pDqLayer), FreeMemorySvc (ppCtx))
+    pDqLayer->iMaxSliceNum = iMaxSliceNum;
 
     // for dynamic slicing mode
     if (SM_SIZELIMITED_SLICE == pDlayer->sSliceArgument.uiSliceMode) {
@@ -1171,22 +1220,21 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
       pDqLayer->pNumSliceCodedOfPartition       = (int32_t*)pMa->WelsMallocz (iSize, "pNumSliceCodedOfPartition");
       pDqLayer->pLastCodedMbIdxOfPartition      = (int32_t*)pMa->WelsMallocz (iSize, "pLastCodedMbIdxOfPartition");
       pDqLayer->pLastMbIdxOfPartition           = (int32_t*)pMa->WelsMallocz (iSize, "pLastMbIdxOfPartition");
-
       WELS_VERIFY_RETURN_PROC_IF (1,
                                   (NULL == pDqLayer->pNumSliceCodedOfPartition ||
                                    NULL == pDqLayer->pLastCodedMbIdxOfPartition ||
                                    NULL == pDqLayer->pLastMbIdxOfPartition),
-                                  FreeMemorySvc (ppCtx))
+                                  FreeDqLayer (pDqLayer, pMa))
     }
 
     pDqLayer->iMbWidth  = kiMbW;
     pDqLayer->iMbHeight = kiMbH;
     {
       pDqLayer->sLayerInfo.pSliceInLayer = (SSlice*)pMa->WelsMallocz (sizeof (SSlice) * iMaxSliceNum, "pSliceInLayer");
-      WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pDqLayer->sLayerInfo.pSliceInLayer), FreeMemorySvc (ppCtx))
+      WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pDqLayer->sLayerInfo.pSliceInLayer), FreeDqLayer (pDqLayer, pMa))
 
       int32_t iReturn = InitpSliceInLayer (ppCtx, pDqLayer, pMa, iMaxSliceNum, pParam->iMultipleThreadIdc > 1);
-      WELS_VERIFY_RETURN_PROC_IF (1, (ENC_RETURN_SUCCESS != iReturn), FreeMemorySvc (ppCtx))
+      WELS_VERIFY_RETURN_PROC_IF (1, (ENC_RETURN_SUCCESS != iReturn), FreeDqLayer (pDqLayer, pMa))
     }
 
     //deblocking parameters initialization
@@ -1855,12 +1903,6 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
     ResetLtrState (& (*ppCtx)->pLtr[i]);
   }
 
-  (*ppCtx)->ppRefPicListExt = (SRefList**)pMa->WelsMalloc (kiNumDependencyLayers * sizeof (SRefList*), "ppRefPicListExt");
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->ppRefPicListExt), FreeMemorySvc (ppCtx))
-
-  (*ppCtx)->ppDqLayerList = (SDqLayer**)pMa->WelsMalloc (kiNumDependencyLayers * sizeof (SDqLayer*), "ppDqLayerList");
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->ppDqLayerList), FreeMemorySvc (ppCtx))
-
   // stride tables
   if (AllocStrideTables (ppCtx, kiNumDependencyLayers)) {
     WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_WARNING, "RequestMemorySvc(), AllocStrideTables failed!");
@@ -1925,6 +1967,17 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
   }
 
   //End of pVaa memory allocation
+
+  (*ppCtx)->ppRefPicListExt = (SRefList**)pMa->WelsMalloc (kiNumDependencyLayers * sizeof (SRefList*), "ppRefPicListExt");
+  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->ppRefPicListExt), FreeMemorySvc (ppCtx))
+
+  (*ppCtx)->ppDqLayerList = (SDqLayer**)pMa->WelsMalloc (kiNumDependencyLayers * sizeof (SDqLayer*), "ppDqLayerList");
+  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->ppDqLayerList), FreeMemorySvc (ppCtx))
+
+  for (int32_t k = 0; k < kiNumDependencyLayers; k++) {
+    (*ppCtx)->ppRefPicListExt[k] = NULL;
+    (*ppCtx)->ppDqLayerList[k] = NULL;
+  }
 
   iResult = InitDqLayers (ppCtx, pExistingParasetList);
   if (iResult) {
@@ -2080,51 +2133,11 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
     if (NULL != pCtx->ppDqLayerList && pParam != NULL) {
       while (ilayer < pParam->iSpatialLayerNum) {
         SDqLayer* pDq = pCtx->ppDqLayerList[ilayer];
-        SSpatialLayerConfig* pDlp = &pCtx->pSvcParam->sSpatialLayers[ilayer];
-
-        const bool kbIsDynamicSlicing = (SM_SIZELIMITED_SLICE == pDlp->sSliceArgument.uiSliceMode);
 
         // pDq layers
         if (NULL != pDq) {
-          if (NULL != pDq->sLayerInfo.pSliceInLayer) {
-            int32_t iSliceIdx = 0;
-            int32_t iSliceNum = GetInitialSliceNum (pDq->iMbWidth, pDq->iMbHeight, &pDlp->sSliceArgument);
-            if (pDlp->sSliceArgument.uiSliceMode == SM_SIZELIMITED_SLICE && pCtx->iActiveThreadsNum == 1) {
-              if (iSliceNum < pDq->sSliceEncCtx.iMaxSliceNumConstraint) {
-                iSliceNum = pDq->sSliceEncCtx.iMaxSliceNumConstraint;
-              }
-            }
-            if (iSliceNum < 1)
-              iSliceNum = 1;
-            while (iSliceIdx < iSliceNum) {
-              SSlice* pSlice = &pDq->sLayerInfo.pSliceInLayer[iSliceIdx];
-              FreeMbCache (&pSlice->sMbCacheInfo, pMa);
-              ++ iSliceIdx;
-            }
-            pMa->WelsFree (pDq->sLayerInfo.pSliceInLayer, "pSliceInLayer");
-            pDq->sLayerInfo.pSliceInLayer = NULL;
-          }
-          if (kbIsDynamicSlicing) {
-            pMa->WelsFree (pDq->pNumSliceCodedOfPartition, "pNumSliceCodedOfPartition");
-            pDq->pNumSliceCodedOfPartition = NULL;
-            pMa->WelsFree (pDq->pLastCodedMbIdxOfPartition, "pLastCodedMbIdxOfPartition");
-            pDq->pLastCodedMbIdxOfPartition = NULL;
-            pMa->WelsFree (pDq->pLastMbIdxOfPartition, "pLastMbIdxOfPartition");
-            pDq->pLastMbIdxOfPartition = NULL;
-          }
 
-          if (pDq->pFeatureSearchPreparation) {
-            ReleaseFeatureSearchPreparation (pMa, pDq->pFeatureSearchPreparation->pFeatureOfBlock);
-            pMa->WelsFree (pDq->pFeatureSearchPreparation, "pFeatureSearchPreparation");
-            pDq->pFeatureSearchPreparation = NULL;
-          }
-
-          if (NULL != pDq) {
-            UninitSlicePEncCtx (pDq, pMa);
-          }
-
-          pMa->WelsFree (pDq, "pDq");
-          pDq = NULL;
+          FreeDqLayer (pDq, pMa);
           pCtx->ppDqLayerList[ilayer] = NULL;
         }
         ++ ilayer;

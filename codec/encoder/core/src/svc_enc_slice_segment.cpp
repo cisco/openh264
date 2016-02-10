@@ -481,11 +481,13 @@ void UninitSliceSegment (SDqLayer* pCurDq, CMemoryAlign* pMa) {
       pSliceSeg->pCountMbNumInSlice = NULL;
     }
 
-    pSliceSeg->iMbNumInFrame    = 0;
+    pSliceSeg->uiSliceMode      = SM_SINGLE_SLICE;      // single in default
     pSliceSeg->iMbWidth         = 0;
     pSliceSeg->iMbHeight        = 0;
-    pSliceSeg->uiSliceMode      = SM_SINGLE_SLICE;      // single in default
     pSliceSeg->iSliceNumInFrame = 0;
+    pSliceSeg->iMbNumInFrame    = 0;
+    pSliceSeg->uiSliceSizeConstraint = 0;
+    pSliceSeg->iMaxSliceNumConstraint    = 0;
   }
 }
 
