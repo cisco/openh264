@@ -2256,9 +2256,9 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
       pCtx->pVaa = NULL;
     }
 
-    WelsRcFreeMemory (pCtx);
     // rate control module memory free
     if (NULL != pCtx->pWelsSvcRc) {
+      WelsRcFreeMemory (pCtx);
       pMa->WelsFree (pCtx->pWelsSvcRc, "pWelsSvcRc");
       pCtx->pWelsSvcRc = NULL;
     }
