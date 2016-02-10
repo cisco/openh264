@@ -2133,10 +2133,8 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
     if (NULL != pCtx->ppDqLayerList && pParam != NULL) {
       while (ilayer < pParam->iSpatialLayerNum) {
         SDqLayer* pDq = pCtx->ppDqLayerList[ilayer];
-
         // pDq layers
         if (NULL != pDq) {
-
           FreeDqLayer (pDq, pMa);
           pCtx->ppDqLayerList[ilayer] = NULL;
         }
@@ -4863,6 +4861,7 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   if (pCtx->iMaxSliceCount < iMaxSliceNum)
     pCtx->iMaxSliceCount = iMaxSliceNum;
   pCurLayer->sSliceEncCtx.iMaxSliceNumConstraint = iMaxSliceNum;
+  pCurLayer->iMaxSliceNum = iMaxSliceNum;
   return ENC_RETURN_SUCCESS;
 }
 
