@@ -2422,6 +2422,51 @@ int32_t GetMultipleThreadIdc (SLogContext* pLogCtx, SWelsSvcCodingParam* pCoding
 }
 
 /*!
+ * \brief   uninitialize Wels encoder core library
+ * \pParam  pEncCtx     sWelsEncCtx*
+ * \return  none
+ */
+void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
+  if (NULL == ppCtx || NULL == *ppCtx)
+    return;
+
+  WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO,
+           "WelsUninitEncoderExt(), pCtx= %p, iMultipleThreadIdc= %d.",
+           (void*) (*ppCtx), (*ppCtx)->pSvcParam->iMultipleThreadIdc);
+
+#if defined(STAT_OUTPUT)
+  StatOverallEncodingExt (*ppCtx);
+#endif
+
+  if ((*ppCtx)->pSvcParam->iMultipleThreadIdc > 1 && (*ppCtx)->pSliceThreading != NULL) {
+    const int32_t iThreadCount = (*ppCtx)->pSvcParam->iMultipleThreadIdc;
+    int32_t iThreadIdx = 0;
+
+    while (iThreadIdx < iThreadCount) {
+      int res = 0;
+      if ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx]) {
+        WelsEventSignal (& (*ppCtx)->pSliceThreading->pExitEncodeEvent[iThreadIdx]);
+        WelsEventSignal (& (*ppCtx)->pSliceThreading->pThreadMasterEvent[iThreadIdx]);
+        res = WelsThreadJoin ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx]); // waiting thread exit
+        WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO, "WelsUninitEncoderExt(), pthread_join(pThreadHandles%d) return %d..",
+                 iThreadIdx,
+                 res);
+        (*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx] = 0;
+      }
+      ++ iThreadIdx;
+    }
+  }
+
+  if ((*ppCtx)->pVpp) {
+    (*ppCtx)->pVpp->FreeSpatialPictures (*ppCtx);
+    delete (*ppCtx)->pVpp;
+    (*ppCtx)->pVpp = NULL;
+  }
+  FreeMemorySvc (ppCtx);
+  *ppCtx = NULL;
+}
+
+/*!
  * \brief   initialize Wels avc encoder core library
  * \pParam  ppCtx       sWelsEncCtx**
  * \pParam  pParam      SWelsSvcCodingParam*
@@ -2490,7 +2535,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   iRet = RequestMemorySvc (&pCtx, pExistingParasetList);
   if (iRet != 0) {
     WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), RequestMemorySvc failed return %d.", iRet);
-    FreeMemorySvc (&pCtx);
+    WelsUninitEncoderExt (&pCtx);
     return iRet;
   }
 
@@ -2510,12 +2555,12 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   if (pCtx->pVpp == NULL) {
     iRet = 1;
     WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), pOut of memory in case new CWelsPreProcess().");
-    FreeMemorySvc (&pCtx);
+    WelsUninitEncoderExt (&pCtx);
     return iRet;
   }
   if ((iRet = pCtx->pVpp->AllocSpatialPictures (pCtx, pCtx->pSvcParam)) != 0) {
     WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), pVPP alloc spatial pictures failed");
-    FreeMemorySvc (&pCtx);
+    WelsUninitEncoderExt (&pCtx);
     return iRet;
   }
 
@@ -2614,50 +2659,6 @@ void StatOverallEncodingExt (sWelsEncCtx* pCtx) {
   }
 }
 #endif
-/*!
- * \brief   uninitialize Wels encoder core library
- * \pParam  pEncCtx     sWelsEncCtx*
- * \return  none
- */
-void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
-  if (NULL == ppCtx || NULL == *ppCtx)
-    return;
-
-  WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO,
-           "WelsUninitEncoderExt(), pCtx= %p, iMultipleThreadIdc= %d.",
-           (void*) (*ppCtx), (*ppCtx)->pSvcParam->iMultipleThreadIdc);
-
-#if defined(STAT_OUTPUT)
-  StatOverallEncodingExt (*ppCtx);
-#endif
-
-  if ((*ppCtx)->pSvcParam->iMultipleThreadIdc > 1 && (*ppCtx)->pSliceThreading != NULL) {
-    const int32_t iThreadCount = (*ppCtx)->pSvcParam->iMultipleThreadIdc;
-    int32_t iThreadIdx = 0;
-
-    while (iThreadIdx < iThreadCount) {
-      int res = 0;
-      if ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx]) {
-        WelsEventSignal (& (*ppCtx)->pSliceThreading->pExitEncodeEvent[iThreadIdx]);
-        WelsEventSignal (& (*ppCtx)->pSliceThreading->pThreadMasterEvent[iThreadIdx]);
-        res = WelsThreadJoin ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx]); // waiting thread exit
-        WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO, "WelsUninitEncoderExt(), pthread_join(pThreadHandles%d) return %d..",
-                 iThreadIdx,
-                 res);
-        (*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx] = 0;
-      }
-      ++ iThreadIdx;
-    }
-  }
-
-  if ((*ppCtx)->pVpp) {
-    (*ppCtx)->pVpp->FreeSpatialPictures (*ppCtx);
-    delete (*ppCtx)->pVpp;
-    (*ppCtx)->pVpp = NULL;
-  }
-  FreeMemorySvc (ppCtx);
-  *ppCtx = NULL;
-}
 
 /*!
  * \brief   get temporal level due to configuration and coding context
