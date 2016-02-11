@@ -1254,12 +1254,6 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
     pDqLayer = (SDqLayer*)pMa->WelsMallocz (sizeof (SDqLayer), "pDqLayer");
     WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pDqLayer), FreeDqLayer (pDqLayer, pMa))
 
-    int32_t iMaxSliceNum            = 1;
-    const int32_t kiSliceNum = GetInitialSliceNum (kiMbW, kiMbH, &pDlayer->sSliceArgument);
-    if (iMaxSliceNum < kiSliceNum)
-      iMaxSliceNum = kiSliceNum;
-    pDqLayer->iMaxSliceNum = iMaxSliceNum;
-
     // for dynamic slicing mode
     if (SM_SIZELIMITED_SLICE == pDlayer->sSliceArgument.uiSliceMode) {
       const int32_t iSize                       = pParam->iMultipleThreadIdc * sizeof (int32_t);
@@ -1277,6 +1271,12 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
 
     pDqLayer->iMbWidth  = kiMbW;
     pDqLayer->iMbHeight = kiMbH;
+
+    int32_t iMaxSliceNum            = 1;
+    const int32_t kiSliceNum = GetInitialSliceNum (kiMbW, kiMbH, &pDlayer->sSliceArgument);
+    if (iMaxSliceNum < kiSliceNum)
+      iMaxSliceNum = kiSliceNum;
+    pDqLayer->iMaxSliceNum = iMaxSliceNum;
     {
       pDqLayer->sLayerInfo.pSliceInLayer = (SSlice*)pMa->WelsMallocz (sizeof (SSlice) * iMaxSliceNum, "pSliceInLayer");
       WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pDqLayer->sLayerInfo.pSliceInLayer), FreeDqLayer (pDqLayer, pMa))
@@ -2015,16 +2015,11 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
 
   //End of pVaa memory allocation
 
-  (*ppCtx)->ppRefPicListExt = (SRefList**)pMa->WelsMalloc (kiNumDependencyLayers * sizeof (SRefList*), "ppRefPicListExt");
+  (*ppCtx)->ppRefPicListExt = (SRefList**)pMa->WelsMallocz (kiNumDependencyLayers * sizeof (SRefList*), "ppRefPicListExt");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->ppRefPicListExt), FreeMemorySvc (ppCtx))
 
-  (*ppCtx)->ppDqLayerList = (SDqLayer**)pMa->WelsMalloc (kiNumDependencyLayers * sizeof (SDqLayer*), "ppDqLayerList");
+  (*ppCtx)->ppDqLayerList = (SDqLayer**)pMa->WelsMallocz (kiNumDependencyLayers * sizeof (SDqLayer*), "ppDqLayerList");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->ppDqLayerList), FreeMemorySvc (ppCtx))
-
-  for (int32_t k = 0; k < kiNumDependencyLayers; k++) {
-    (*ppCtx)->ppRefPicListExt[k] = NULL;
-    (*ppCtx)->ppDqLayerList[k] = NULL;
-  }
 
   iResult = InitDqLayers (ppCtx, pExistingParasetList);
   if (iResult) {
