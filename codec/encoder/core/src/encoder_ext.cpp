@@ -952,6 +952,68 @@ void FreeMbCache (SMbCache* pMbCache, CMemoryAlign* pMa) {
   }
 }
 
+void FreeDqLayer (SDqLayer* pDq, CMemoryAlign* pMa) {
+  if (NULL == pDq) {
+    return;
+  }
+
+  if (NULL != pDq->sLayerInfo.pSliceInLayer) {
+    int32_t iSliceIdx = 0;
+    while (iSliceIdx < pDq->iMaxSliceNum) {
+      SSlice* pSlice = &pDq->sLayerInfo.pSliceInLayer[iSliceIdx];
+      FreeMbCache (&pSlice->sMbCacheInfo, pMa);
+
+      //slice bs buffer
+      if (NULL != pSlice->sSliceBs.pBs) {
+        pMa->WelsFree (pSlice->sSliceBs.pBs, "sSliceBs.pBs");
+        pSlice->sSliceBs.pBs = NULL;
+      }
+      ++ iSliceIdx;
+    }
+    pMa->WelsFree (pDq->sLayerInfo.pSliceInLayer, "pSliceInLayer");
+    pDq->sLayerInfo.pSliceInLayer = NULL;
+  }
+
+  if (pDq->pNumSliceCodedOfPartition) {
+    pMa->WelsFree (pDq->pNumSliceCodedOfPartition, "pNumSliceCodedOfPartition");
+    pDq->pNumSliceCodedOfPartition = NULL;
+  }
+
+  if (pDq->pLastCodedMbIdxOfPartition) {
+    pMa->WelsFree (pDq->pLastCodedMbIdxOfPartition, "pLastCodedMbIdxOfPartition");
+    pDq->pLastCodedMbIdxOfPartition = NULL;
+  }
+  if (pDq->pLastMbIdxOfPartition) {
+    pMa->WelsFree (pDq->pLastMbIdxOfPartition, "pLastMbIdxOfPartition");
+    pDq->pLastMbIdxOfPartition = NULL;
+  }
+
+  if (pDq->pFeatureSearchPreparation) {
+    ReleaseFeatureSearchPreparation (pMa, pDq->pFeatureSearchPreparation->pFeatureOfBlock);
+    pMa->WelsFree (pDq->pFeatureSearchPreparation, "pFeatureSearchPreparation");
+    pDq->pFeatureSearchPreparation = NULL;
+  }
+
+  UninitSlicePEncCtx (pDq, pMa);
+ //pDq->iMaxSliceNum = 0;
+}
+
+void  FreeRefList (SRefList* pRefList, CMemoryAlign* pMa, const int iMaxNumRefFrame) {
+  if (NULL == pRefList) {
+    return;
+  }
+
+  int32_t iRef = 0;
+  do {
+    if (pRefList->pRef[iRef] != NULL) {
+      FreePicture (pMa, &pRefList->pRef[iRef]);
+    }
+    ++ iRef;
+  } while (iRef < 1 + iMaxNumRefFrame);
+
+
+}
+
 static int32_t WelsGenerateNewSps (sWelsEncCtx* pCtx, const bool kbUseSubsetSps, const int32_t iDlayerIndex,
                                    const int32_t iDlayerCount, const int32_t kiSpsId,
                                    SWelsSPS*& pSps, SSubsetSps*& pSubsetSps, bool bSVCBaselayer) {
@@ -1193,7 +1255,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
     do {
       pRefList->pRef[i] = AllocPicture (pMa, kiWidth, kiHeight, true,
                                         (iDlayerIndex == iDlayerCount - 1) ? kiNeedFeatureStorage : 0); // to use actual size of current layer
-      WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pRefList->pRef[i]), FreeMemorySvc (ppCtx))
+      WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pRefList->pRef[i]), FreeRefList (pRefList, pMa, iNumRef))
       ++ i;
     } while (i < 1 + iNumRef);
 
@@ -2203,19 +2265,9 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
     if (NULL != pCtx->ppRefPicListExt && pParam != NULL) {
       ilayer = 0;
       while (ilayer < pParam->iSpatialLayerNum) {
-        SRefList* pRefList = pCtx->ppRefPicListExt[ilayer];
-        if (NULL != pRefList) {
-          int32_t iRef = 0;
-          do {
-            if (pRefList->pRef[iRef] != NULL) {
-              FreePicture (pMa, &pRefList->pRef[iRef]);
-            }
-            ++ iRef;
-          } while (iRef < 1 + pParam->iMaxNumRefFrame);
-
-          pMa->WelsFree (pCtx->ppRefPicListExt[ilayer], "ppRefPicListExt[]");
-          pCtx->ppRefPicListExt[ilayer] = NULL;
-        }
+        FreeRefList (pCtx->ppRefPicListExt[ilayer], pMa, pParam->iMaxNumRefFrame);
+        pMa->WelsFree (pCtx->ppRefPicListExt[ilayer], "ppRefPicListExt[]");
+        pCtx->ppRefPicListExt[ilayer] = NULL;
         ++ ilayer;
       }
 
