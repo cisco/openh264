@@ -998,7 +998,7 @@ void FreeDqLayer (SDqLayer* pDq, CMemoryAlign* pMa) {
  //pDq->iMaxSliceNum = 0;
 }
 
-void  FreeRefList (SRefList* pRefList, CMemoryAlign* pMa, const int iMaxNumRefFrame) {
+void  FreeRefList (SRefList*& pRefList, CMemoryAlign* pMa, const int iMaxNumRefFrame) {
   if (NULL == pRefList) {
     return;
   }
@@ -1011,7 +1011,8 @@ void  FreeRefList (SRefList* pRefList, CMemoryAlign* pMa, const int iMaxNumRefFr
     ++ iRef;
   } while (iRef < 1 + iMaxNumRefFrame);
 
-
+  pMa->WelsFree (pRefList, "pRefList");
+  pRefList = NULL;
 }
 
 static int32_t WelsGenerateNewSps (sWelsEncCtx* pCtx, const bool kbUseSubsetSps, const int32_t iDlayerIndex,
@@ -2266,7 +2267,6 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
       ilayer = 0;
       while (ilayer < pParam->iSpatialLayerNum) {
         FreeRefList (pCtx->ppRefPicListExt[ilayer], pMa, pParam->iMaxNumRefFrame);
-        pMa->WelsFree (pCtx->ppRefPicListExt[ilayer], "ppRefPicListExt[]");
         pCtx->ppRefPicListExt[ilayer] = NULL;
         ++ ilayer;
       }
