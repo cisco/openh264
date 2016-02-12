@@ -848,7 +848,7 @@ int32_t   InitMbListD (sWelsEncCtx** ppCtx) {
     iOverallMbNum += iMbSize[i];
   }
 
-  (*ppCtx)->ppMbListD = static_cast<SMB**> ((*ppCtx)->pMemAlign->WelsMalloc (iNumDlayer * sizeof (SMB*), "ppMbListD"));
+  (*ppCtx)->ppMbListD = static_cast<SMB**> ((*ppCtx)->pMemAlign->WelsMallocz (iNumDlayer * sizeof (SMB*), "ppMbListD"));
   (*ppCtx)->ppMbListD[0] = NULL;
   WELS_VERIFY_RETURN_PROC_IF (1, (*ppCtx)->ppMbListD == NULL, FreeMemorySvc (ppCtx));
   (*ppCtx)->ppMbListD[0] = static_cast<SMB*> ((*ppCtx)->pMemAlign->WelsMallocz (iOverallMbNum * sizeof (SMB),
@@ -866,23 +866,23 @@ int32_t   InitMbListD (sWelsEncCtx** ppCtx) {
 }
 
 int32_t AllocMbCacheAligned (SMbCache* pMbCache, CMemoryAlign* pMa) {
-  pMbCache->pCoeffLevel = (int16_t*)pMa->WelsMalloc (MB_COEFF_LIST_SIZE * sizeof (int16_t), "pMbCache->pCoeffLevel");
+  pMbCache->pCoeffLevel = (int16_t*)pMa->WelsMallocz (MB_COEFF_LIST_SIZE * sizeof (int16_t), "pMbCache->pCoeffLevel");
   WELS_VERIFY_RETURN_IF (1, (NULL == pMbCache->pCoeffLevel));
-  pMbCache->pMemPredMb = (uint8_t*)pMa->WelsMalloc (2 * 256 * sizeof (uint8_t), "pMbCache->pMemPredMb");
+  pMbCache->pMemPredMb = (uint8_t*)pMa->WelsMallocz (2 * 256 * sizeof (uint8_t), "pMbCache->pMemPredMb");
   WELS_VERIFY_RETURN_IF (1, (NULL == pMbCache->pMemPredMb));
-  pMbCache->pSkipMb = (uint8_t*)pMa->WelsMalloc (384 * sizeof (uint8_t), "pMbCache->pSkipMb");
+  pMbCache->pSkipMb = (uint8_t*)pMa->WelsMallocz (384 * sizeof (uint8_t), "pMbCache->pSkipMb");
   WELS_VERIFY_RETURN_IF (1, (NULL == pMbCache->pSkipMb));
-  pMbCache->pMemPredBlk4 = (uint8_t*)pMa->WelsMalloc (2 * 16 * sizeof (uint8_t), "pMbCache->pMemPredBlk4");
+  pMbCache->pMemPredBlk4 = (uint8_t*)pMa->WelsMallocz (2 * 16 * sizeof (uint8_t), "pMbCache->pMemPredBlk4");
   WELS_VERIFY_RETURN_IF (1, (NULL == pMbCache->pMemPredBlk4));
-  pMbCache->pBufferInterPredMe = (uint8_t*)pMa->WelsMalloc (4 * 640 * sizeof (uint8_t), "pMbCache->pBufferInterPredMe");
+  pMbCache->pBufferInterPredMe = (uint8_t*)pMa->WelsMallocz (4 * 640 * sizeof (uint8_t), "pMbCache->pBufferInterPredMe");
   WELS_VERIFY_RETURN_IF (1, (NULL == pMbCache->pBufferInterPredMe));
-  pMbCache->pPrevIntra4x4PredModeFlag = (bool*)pMa->WelsMalloc (16 * sizeof (bool),
+  pMbCache->pPrevIntra4x4PredModeFlag = (bool*)pMa->WelsMallocz (16 * sizeof (bool),
                                         "pMbCache->pPrevIntra4x4PredModeFlag");
   WELS_VERIFY_RETURN_IF (1, (NULL == pMbCache->pPrevIntra4x4PredModeFlag));
-  pMbCache->pRemIntra4x4PredModeFlag = (int8_t*)pMa->WelsMalloc (16 * sizeof (int8_t),
+  pMbCache->pRemIntra4x4PredModeFlag = (int8_t*)pMa->WelsMallocz (16 * sizeof (int8_t),
                                         "pMbCache->pRemIntra4x4PredModeFlag");
   WELS_VERIFY_RETURN_IF (1, (NULL == pMbCache->pRemIntra4x4PredModeFlag));
-  pMbCache->pDct = (SDCTCoeff*)pMa->WelsMalloc (sizeof (SDCTCoeff), "pMbCache->pDct");
+  pMbCache->pDct = (SDCTCoeff*)pMa->WelsMallocz (sizeof (SDCTCoeff), "pMbCache->pDct");
   WELS_VERIFY_RETURN_IF (1, (NULL == pMbCache->pDct));
   return 0;
 }
@@ -1284,10 +1284,10 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
   // for dynamically malloc for parameter sets memory instead of maximal items for standard to reduce size, 3/18/2010
   const int32_t kiNeededSpsNum = (*ppCtx)->GetNeededSpsNum();
   const int32_t kiNeededSubsetSpsNum = (*ppCtx)->GetNeededSubsetSpsNum();
-  (*ppCtx)->pSpsArray = (SWelsSPS*)pMa->WelsMalloc (kiNeededSpsNum * sizeof (SWelsSPS), "pSpsArray");
+  (*ppCtx)->pSpsArray = (SWelsSPS*)pMa->WelsMallocz (kiNeededSpsNum * sizeof (SWelsSPS), "pSpsArray");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pSpsArray), FreeMemorySvc (ppCtx))
   if (kiNeededSubsetSpsNum > 0) {
-    (*ppCtx)->pSubsetArray = (SSubsetSps*)pMa->WelsMalloc (kiNeededSubsetSpsNum * sizeof (SSubsetSps), "pSubsetArray");
+    (*ppCtx)->pSubsetArray = (SSubsetSps*)pMa->WelsMallocz (kiNeededSubsetSpsNum * sizeof (SSubsetSps), "pSubsetArray");
     WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pSubsetArray), FreeMemorySvc (ppCtx))
   } else {
     (*ppCtx)->pSubsetArray = NULL;
@@ -1307,7 +1307,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
 
   // PPS
   const int32_t kiNeededPpsNum = (*ppCtx)->GetNeededPpsNum();
-  (*ppCtx)->pPPSArray = (SWelsPPS*)pMa->WelsMalloc (kiNeededPpsNum * sizeof (SWelsPPS), "pPPSArray");
+  (*ppCtx)->pPPSArray = (SWelsPPS*)pMa->WelsMallocz (kiNeededPpsNum * sizeof (SWelsPPS), "pPPSArray");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pPPSArray), FreeMemorySvc (ppCtx))
 
   // copy from existing if the pointer exists
@@ -1483,7 +1483,7 @@ int32_t AllocStrideTables (sWelsEncCtx** ppCtx, const int32_t kiNumSpatialLayers
   if (kiNumSpatialLayers <= 0 || kiNumSpatialLayers > MAX_DEPENDENCY_LAYER)
     return 1;
 
-  pPtr = (SStrideTables*)pMa->WelsMalloc (sizeof (SStrideTables), "SStrideTables");
+  pPtr = (SStrideTables*)pMa->WelsMallocz (sizeof (SStrideTables), "SStrideTables");
   if (NULL == pPtr)
     return 1;
   (*ppCtx)->pStrideTab = pPtr;
@@ -1530,7 +1530,7 @@ int32_t AllocStrideTables (sWelsEncCtx** ppCtx, const int32_t kiNumSpatialLayers
 
   iNeedAllocSize = iSizeDec + iSizeEnc + (iUnit2Size << 1);
 
-  pBase = (uint8_t*)pMa->WelsMalloc (iNeedAllocSize, "pBase");
+  pBase = (uint8_t*)pMa->WelsMallocz (iNeedAllocSize, "pBase");
   if (NULL == pBase) {
     return 1;
   }
@@ -1629,7 +1629,7 @@ int32_t AllocStrideTables (sWelsEncCtx** ppCtx, const int32_t kiNumSpatialLayers
   iMaxMbWidth   = WELS_ALIGN (iMaxMbWidth, 4);  // 4 loops for int16_t required introduced as below
   iRowSize      = iMaxMbWidth * sizeof (int16_t);
 
-  pTmpRow = (int16_t*)pMa->WelsMalloc (iRowSize, "pTmpRow");
+  pTmpRow = (int16_t*)pMa->WelsMallocz (iRowSize, "pTmpRow");
   if (NULL == pTmpRow) {
     return 1;
   }
@@ -1850,12 +1850,12 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
                                        MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN));
 
   // Output
-  (*ppCtx)->pOut = (SWelsEncoderOutput*)pMa->WelsMalloc (sizeof (SWelsEncoderOutput), "SWelsEncoderOutput");
+  (*ppCtx)->pOut = (SWelsEncoderOutput*)pMa->WelsMallocz (sizeof (SWelsEncoderOutput), "SWelsEncoderOutput");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pOut), FreeMemorySvc (ppCtx))
-  (*ppCtx)->pOut->pBsBuffer = (uint8_t*)pMa->WelsMalloc (iCountBsLen, "pOut->pBsBuffer");
+  (*ppCtx)->pOut->pBsBuffer = (uint8_t*)pMa->WelsMallocz (iCountBsLen, "pOut->pBsBuffer");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pOut->pBsBuffer), FreeMemorySvc (ppCtx))
   (*ppCtx)->pOut->uiSize = iCountBsLen;
-  (*ppCtx)->pOut->sNalList = (SWelsNalRaw*)pMa->WelsMalloc (iCountNals * sizeof (SWelsNalRaw), "pOut->sNalList");
+  (*ppCtx)->pOut->sNalList = (SWelsNalRaw*)pMa->WelsMallocz (iCountNals * sizeof (SWelsNalRaw), "pOut->sNalList");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pOut->sNalList), FreeMemorySvc (ppCtx))
   (*ppCtx)->pOut->pNalLen = (int32_t*)pMa->WelsMallocz (iCountNals * sizeof (int32_t), "pOut->pNalLen");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pOut->pNalLen), FreeMemorySvc (ppCtx))
@@ -1899,7 +1899,7 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
   (*ppCtx)->bEncCurFrmAsIdrFlag = true;  // make sure first frame is IDR
   (*ppCtx)->iGlobalQp = 26;   // global qp in default
 
-  (*ppCtx)->pLtr = (SLTRState*)pMa->WelsMalloc (kiNumDependencyLayers * sizeof (SLTRState), "SLTRState");
+  (*ppCtx)->pLtr = (SLTRState*)pMa->WelsMallocz (kiNumDependencyLayers * sizeof (SLTRState), "SLTRState");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pLtr), FreeMemorySvc (ppCtx))
   int32_t i = 0;
   for (i = 0; i < kiNumDependencyLayers; i++) {
@@ -2545,7 +2545,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   }
   memcpy (pCtx->pSvcParam, pCodingParam, sizeof (SWelsSvcCodingParam)); // confirmed_safe_unsafe_usage
 
-  pCtx->pFuncList = (SWelsFuncPtrList*)pCtx->pMemAlign->WelsMalloc (sizeof (SWelsFuncPtrList), "SWelsFuncPtrList");
+  pCtx->pFuncList = (SWelsFuncPtrList*)pCtx->pMemAlign->WelsMallocz (sizeof (SWelsFuncPtrList), "SWelsFuncPtrList");
   if (NULL == pCtx->pFuncList) {
     WelsUninitEncoderExt (&pCtx);
     return 1;
@@ -4745,7 +4745,7 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   iCountNals += iMaxSliceNum * (pCtx->pSvcParam->iSpatialLayerNum + pCtx->bNeedPrefixNalFlag);
   iMaxSliceNum *= SLICE_NUM_EXPAND_COEF;
 
-  SWelsNalRaw* pNalList = (SWelsNalRaw*)pMA->WelsMalloc (iCountNals * sizeof (SWelsNalRaw), "pOut->sNalList");
+  SWelsNalRaw* pNalList = (SWelsNalRaw*)pMA->WelsMallocz (iCountNals * sizeof (SWelsNalRaw), "pOut->sNalList");
   if (NULL == pNalList) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "CWelsH264SVCEncoder::DynSliceRealloc: pNalList is NULL");
     return ENC_RETURN_MEMALLOCERR;
@@ -4754,7 +4754,7 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   pMA->WelsFree (pCtx->pOut->sNalList, "pOut->sNalList");
   pCtx->pOut->sNalList = pNalList;
 
-  int32_t* pNalLen = (int32_t*)pMA->WelsMalloc (iCountNals * sizeof (int32_t), "pOut->pNalLen");
+  int32_t* pNalLen = (int32_t*)pMA->WelsMallocz (iCountNals * sizeof (int32_t), "pOut->pNalLen");
   if (NULL == pNalLen) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "CWelsH264SVCEncoder::DynSliceRealloc: pNalLen is NULL");
     return ENC_RETURN_MEMALLOCERR;
@@ -4831,7 +4831,7 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
 
   //deal with rate control variables
   const int32_t kiCurDid = pCtx->uiDependencyId;
-  SRCSlicing* pSlcingOverRc = (SRCSlicing*)pMA->WelsMalloc (iMaxSliceNum * sizeof (SRCSlicing), "SlicingOverRC");
+  SRCSlicing* pSlcingOverRc = (SRCSlicing*)pMA->WelsMallocz (iMaxSliceNum * sizeof (SRCSlicing), "SlicingOverRC");
   if (NULL == pSlcingOverRc) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
              "CWelsH264SVCEncoder::DynSliceRealloc: realloc pSlcingOverRc not successful");
