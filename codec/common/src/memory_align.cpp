@@ -70,6 +70,9 @@ void* WelsMalloc (const uint32_t kuiSize, const char* kpTag, const uint32_t kiAl
   const uint32_t kiPayloadSize          = kuiSize;
 
   uint8_t* pBuf = (uint8_t*) malloc (kiActualRequestedSize);
+  if (NULL == pBuf)
+    return NULL;
+
 #ifdef MEMORY_CHECK
   if (fpMemChkPoint == NULL) {
     fpMemChkPoint    = fopen ("./enc_mem_check_point.txt",  "at+");
@@ -87,10 +90,6 @@ void* WelsMalloc (const uint32_t kuiSize, const char* kpTag, const uint32_t kiAl
   }
 #endif
   uint8_t* pAlignedBuffer;
-
-  if (NULL == pBuf)
-    return NULL;
-
   pAlignedBuffer = pBuf + kiAlignedBytes + kiSizeOfVoidPointer + kiSizeOfInt;
   pAlignedBuffer -= ((uintptr_t) pAlignedBuffer & kiAlignedBytes);
   * ((void**) (pAlignedBuffer - kiSizeOfVoidPointer)) = pBuf;
