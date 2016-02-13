@@ -135,6 +135,7 @@ int32_t CWelsPreProcess::AllocSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCoding
     const uint8_t kuiRefNumInTemporal = kuiLayerInTemporal + pParam->iLTRRefNum;
     uint8_t i = 0;
 
+    m_uiSpatialPicNum[iDlayerIndex] = kuiRefNumInTemporal;
     do {
       SPicture* pPic = AllocPicture (pMa, kiPicWidth, kiPicHeight, false, 0);
       WELS_VERIFY_RETURN_IF (1, (NULL == pPic))
@@ -147,7 +148,6 @@ int32_t CWelsPreProcess::AllocSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCoding
     else
       m_uiSpatialLayersInTemporal[iDlayerIndex] = kuiLayerInTemporal;
 
-    m_uiSpatialPicNum[iDlayerIndex] = kuiRefNumInTemporal;
     ++ iDlayerIndex;
   } while (iDlayerIndex < kiDlayerCount);
 
