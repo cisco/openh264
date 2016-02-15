@@ -952,52 +952,6 @@ void FreeMbCache (SMbCache* pMbCache, CMemoryAlign* pMa) {
   }
 }
 
-void FreeDqLayer (SDqLayer* pDq, CMemoryAlign* pMa) {
-  if (NULL == pDq) {
-    return;
-  }
-
-  if (NULL != pDq->sLayerInfo.pSliceInLayer) {
-    int32_t iSliceIdx = 0;
-    while (iSliceIdx < pDq->iMaxSliceNum) {
-      SSlice* pSlice = &pDq->sLayerInfo.pSliceInLayer[iSliceIdx];
-      FreeMbCache (&pSlice->sMbCacheInfo, pMa);
-
-      //slice bs buffer
-      if (NULL != pSlice->sSliceBs.pBs) {
-        pMa->WelsFree (pSlice->sSliceBs.pBs, "sSliceBs.pBs");
-        pSlice->sSliceBs.pBs = NULL;
-      }
-      ++ iSliceIdx;
-    }
-    pMa->WelsFree (pDq->sLayerInfo.pSliceInLayer, "pSliceInLayer");
-    pDq->sLayerInfo.pSliceInLayer = NULL;
-  }
-
-  if (pDq->pNumSliceCodedOfPartition) {
-    pMa->WelsFree (pDq->pNumSliceCodedOfPartition, "pNumSliceCodedOfPartition");
-    pDq->pNumSliceCodedOfPartition = NULL;
-  }
-
-  if (pDq->pLastCodedMbIdxOfPartition) {
-    pMa->WelsFree (pDq->pLastCodedMbIdxOfPartition, "pLastCodedMbIdxOfPartition");
-    pDq->pLastCodedMbIdxOfPartition = NULL;
-  }
-  if (pDq->pLastMbIdxOfPartition) {
-    pMa->WelsFree (pDq->pLastMbIdxOfPartition, "pLastMbIdxOfPartition");
-    pDq->pLastMbIdxOfPartition = NULL;
-  }
-
-  if (pDq->pFeatureSearchPreparation) {
-    ReleaseFeatureSearchPreparation (pMa, pDq->pFeatureSearchPreparation->pFeatureOfBlock);
-    pMa->WelsFree (pDq->pFeatureSearchPreparation, "pFeatureSearchPreparation");
-    pDq->pFeatureSearchPreparation = NULL;
-  }
-
-  UninitSlicePEncCtx (pDq, pMa);
- //pDq->iMaxSliceNum = 0;
-}
-
 void  FreeRefList (SRefList*& pRefList, CMemoryAlign* pMa, const int iMaxNumRefFrame) {
   if (NULL == pRefList) {
     return;
