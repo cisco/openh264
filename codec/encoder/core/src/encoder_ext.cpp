@@ -2536,18 +2536,18 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   pCtx->sLogCtx = *pLogCtx;
 
   pCtx->pMemAlign = new CMemoryAlign (iCacheLineSize);
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pCtx->pMemAlign), FreeMemorySvc (&pCtx))
+  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pCtx->pMemAlign), WelsUninitEncoderExt (&pCtx))
 
   iRet = AllocCodingParam (&pCtx->pSvcParam, pCtx->pMemAlign);
   if (iRet != 0) {
-    FreeMemorySvc (&pCtx);
+    WelsUninitEncoderExt (&pCtx);
     return iRet;
   }
   memcpy (pCtx->pSvcParam, pCodingParam, sizeof (SWelsSvcCodingParam)); // confirmed_safe_unsafe_usage
 
   pCtx->pFuncList = (SWelsFuncPtrList*)pCtx->pMemAlign->WelsMalloc (sizeof (SWelsFuncPtrList), "SWelsFuncPtrList");
   if (NULL == pCtx->pFuncList) {
-    FreeMemorySvc (&pCtx);
+    WelsUninitEncoderExt (&pCtx);
     return 1;
   }
   InitFunctionPointers (pCtx, pCtx->pSvcParam, uiCpuFeatureFlags);
