@@ -52,16 +52,28 @@ CWelsThreadPool::CWelsThreadPool (IWelsThreadPoolSink* pSink, int32_t iMaxThread
 
   if (NULL == m_cWaitedTasks || NULL == m_cIdleThreads || NULL == m_cBusyThreads) {
     delete m_cWaitedTasks;
+    m_cWaitedTasks = NULL;
+
     delete m_cIdleThreads;
+    m_cIdleThreads = NULL;
+
     delete m_cBusyThreads;
+    m_cBusyThreads = NULL;
+
     return;
   }
 
   if (WELS_THREAD_ERROR_OK != Init (iMaxThreadNum)) {
     Uninit();
+
     delete m_cWaitedTasks;
+    m_cWaitedTasks = NULL;
+
     delete m_cIdleThreads;
+    m_cIdleThreads = NULL;
+
     delete m_cBusyThreads;
+    m_cBusyThreads = NULL;
   }
 }
 
@@ -70,8 +82,13 @@ CWelsThreadPool::~CWelsThreadPool() {
   Uninit();
 
   delete m_cWaitedTasks;
+  m_cWaitedTasks = NULL;
+
   delete m_cIdleThreads;
+  m_cIdleThreads = NULL;
+
   delete m_cBusyThreads;
+  m_cBusyThreads = NULL;
 }
 
 WELS_THREAD_ERROR_CODE CWelsThreadPool::OnTaskStart (CWelsTaskThread* pThread, IWelsTask* pTask) {
