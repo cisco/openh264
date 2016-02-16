@@ -50,7 +50,19 @@ CWelsThreadPool::CWelsThreadPool (IWelsThreadPoolSink* pSink, int32_t iMaxThread
   m_cBusyThreads = new CWelsList<CWelsTaskThread>();
   m_iMaxThreadNum = 0;
 
-  Init (iMaxThreadNum);
+  if (NULL == m_cWaitedTasks || NULL == m_cIdleThreads || NULL == m_cBusyThreads) {
+    delete m_cWaitedTasks;
+    delete m_cIdleThreads;
+    delete m_cBusyThreads;
+    return;
+  }
+
+  if (WELS_THREAD_ERROR_OK != Init (iMaxThreadNum)) {
+    Uninit();
+    delete m_cWaitedTasks;
+    delete m_cIdleThreads;
+    delete m_cBusyThreads;
+  }
 }
 
 
@@ -175,7 +187,9 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::CreateIdleThread() {
     return WELS_THREAD_ERROR_GENERAL;
   }
 
-  pThread->Start();
+  if (WELS_THREAD_ERROR_OK != pThread->Start()) {
+    return WELS_THREAD_ERROR_GENERAL;
+  }
   AddThreadToIdleQueue (pThread);
 
   return WELS_THREAD_ERROR_OK;

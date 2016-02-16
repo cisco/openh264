@@ -67,9 +67,11 @@ IWelsTaskManage*   IWelsTaskManage::CreateTaskManage (sWelsEncCtx* pCtx, const i
   } else {
     pTaskManage = WELS_NEW_OP (CWelsTaskManageBase(), CWelsTaskManageBase);
   }
+  WELS_VERIFY_RETURN_IF (NULL, NULL == pTaskManage)
 
-  if (pTaskManage) {
-    pTaskManage->Init (pCtx);
+  if ( ENC_RETURN_SUCCESS != pTaskManage->Init (pCtx) ) {
+    delete pTaskManage;
+    pTaskManage = NULL;
   }
   return pTaskManage;
 }
