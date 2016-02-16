@@ -971,6 +971,22 @@ void FreeDqLayer (SDqLayer*& pDq, CMemoryAlign* pMa) {
   pDq = NULL;
 }
 
+void  FreeRefList (SRefList*& pRefList, CMemoryAlign* pMa, const int iMaxNumRefFrame) {
+  if (NULL == pRefList) {
+    return;
+  }
+
+  int32_t iRef = 0;
+  do {
+    if (pRefList->pRef[iRef] != NULL) {
+      FreePicture (pMa, &pRefList->pRef[iRef]);
+    }
+    ++ iRef;
+  } while (iRef < 1 + iMaxNumRefFrame);
+
+  pMa->WelsFree (pRefList, "pRefList");
+  pRefList = NULL;
+}
 
 static int32_t WelsGenerateNewSps (sWelsEncCtx* pCtx, const bool kbUseSubsetSps, const int32_t iDlayerIndex,
                                    const int32_t iDlayerCount, const int32_t kiSpsId,
@@ -1190,7 +1206,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
     do {
       pRefList->pRef[i] = AllocPicture (pMa, kiWidth, kiHeight, true,
                                         (iDlayerIndex == iDlayerCount - 1) ? kiNeedFeatureStorage : 0); // to use actual size of current layer
-      WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pRefList->pRef[i]), FreeMemorySvc (ppCtx))
+      WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pRefList->pRef[i]), FreeRefList (pRefList, pMa, iNumRef))
       ++ i;
     } while (i < 1 + iNumRef);
 
@@ -2145,19 +2161,8 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
     if (NULL != pCtx->ppRefPicListExt && pParam != NULL) {
       ilayer = 0;
       while (ilayer < pParam->iSpatialLayerNum) {
-        SRefList* pRefList = pCtx->ppRefPicListExt[ilayer];
-        if (NULL != pRefList) {
-          int32_t iRef = 0;
-          do {
-            if (pRefList->pRef[iRef] != NULL) {
-              FreePicture (pMa, &pRefList->pRef[iRef]);
-            }
-            ++ iRef;
-          } while (iRef < 1 + pParam->iMaxNumRefFrame);
-
-          pMa->WelsFree (pCtx->ppRefPicListExt[ilayer], "ppRefPicListExt[]");
-          pCtx->ppRefPicListExt[ilayer] = NULL;
-        }
+        FreeRefList (pCtx->ppRefPicListExt[ilayer], pMa, pParam->iMaxNumRefFrame);
+        pCtx->ppRefPicListExt[ilayer] = NULL;
         ++ ilayer;
       }
 
