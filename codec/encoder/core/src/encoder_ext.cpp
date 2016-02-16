@@ -2582,7 +2582,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
 #endif//MEMORY_MONITOR
 
   pCtx->iStatisticsLogInterval = STATISTICS_LOG_INTERVAL_MS;
-
+  pCtx->uiLastTimestamp = -1;
   *ppCtx = pCtx;
 
   WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsInitEncoderExt(), pCtx= 0x%p.", (void*)pCtx);
@@ -3716,7 +3716,7 @@ void ClearFrameBsInfo (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi) {
  * \pParam  pSrcPic         Source Picture
  * \return  EFrameType (videoFrameTypeIDR/videoFrameTypeI/videoFrameTypeP)
  */
-int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSourcePicture* pSrcPic) {
+int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSourcePicture* pSrcPic,int64_t uiTimeStamp ) {
   if (pCtx == NULL) {
     return ENC_RETURN_MEMALLOCERR;
   }
@@ -3756,14 +3756,14 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   pCtx->iEncoderError = ENC_RETURN_SUCCESS;
   pCtx->bCurFrameMarkedAsSceneLtr = false;
   pFbi->iLayerNum = 0; // for initialization
-  pFbi->uiTimeStamp = pSrcPic->uiTimeStamp;
+  pFbi->uiTimeStamp = uiTimeStamp;
   for (int32_t iNalIdx = 0; iNalIdx < MAX_LAYER_NUM_OF_FRAME; iNalIdx++) {
     pFbi->sLayerInfo[iNalIdx].eFrameType = videoFrameTypeSkip;
   }
   // perform csc/denoise/downsample/padding, generate spatial layers
   iSpatialNum = pCtx->pVpp->BuildSpatialPicList (pCtx, pSrcPic);
   if (pCtx->pFuncList->pfRc.pfWelsUpdateMaxBrWindowStatus) {
-    pCtx->pFuncList->pfRc.pfWelsUpdateMaxBrWindowStatus (pCtx, iSpatialNum, pSrcPic->uiTimeStamp);
+    pCtx->pFuncList->pfRc.pfWelsUpdateMaxBrWindowStatus (pCtx, iSpatialNum,uiTimeStamp);
   }
 
   if (iSpatialNum < 1) {
@@ -3809,7 +3809,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       pLayerBsInfo->eFrameType = eFrameType;
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
                "[Rc] Frame timestamp = %lld, skip one frame due to target_br, continual skipped %d frames",
-               pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
+               uiTimeStamp, pCtx->iContinualSkipFrames);
       ++ iSpatialIdx;
       if (pSvcParam->bSimulcastAVC) {
         if (pCtx->pFuncList->pfRc.pfWelsUpdateBufferWhenSkip)
@@ -3830,13 +3830,13 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     //loop each layer to check if have skip frame when RC and frame skip enable
     if (pCtx->pFuncList->pfRc.pfWelsCheckSkipBasedMaxbr) {
       bool bSkip = pCtx->pFuncList->pfRc.pfWelsCheckSkipBasedMaxbr (pCtx, iSpatialNum, eFrameType,
-                   (uint32_t)pSrcPic->uiTimeStamp);
+                   (uint32_t)uiTimeStamp);
       if (bSkip) {
         eFrameType = videoFrameTypeSkip;
         pLayerBsInfo->eFrameType = videoFrameTypeSkip;
         WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
                  "[Rc] Frame timestamp = %lld, skip one frame due to max_br, continual skipped %d frames",
-                 pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
+                 uiTimeStamp, pCtx->iContinualSkipFrames);
         ++ iSpatialIdx;
         if (pSvcParam->bSimulcastAVC)
           continue;
@@ -3968,7 +3968,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                          eFrameType); //get reordering syntax used for writing slice header and transmit to encoder.
     PrefetchReferencePicture (pCtx, eFrameType); // update reference picture for current pDq layer
 
-    pCtx->pFuncList->pfRc.pfWelsRcPictureInit (pCtx, pSrcPic->uiTimeStamp);
+    pCtx->pFuncList->pfRc.pfWelsRcPictureInit (pCtx, uiTimeStamp);
     PreprocessSliceCoding (pCtx); // MUST be called after pfWelsRcPictureInit() and WelsInitCurrentLayer()
 
     //TODO Complexity Calculation here for screen content
@@ -4166,7 +4166,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     }
 
     if (NULL != pCtx->pFuncList->pfRc.pfWelsRcPostFrameSkipping
-        && pCtx->pFuncList->pfRc.pfWelsRcPostFrameSkipping (pCtx, iCurDid, pSrcPic->uiTimeStamp)) {
+        && pCtx->pFuncList->pfRc.pfWelsRcPostFrameSkipping (pCtx, iCurDid,uiTimeStamp)) {
 
       StackBackEncoderStatus (pCtx, eFrameType);
       ClearFrameBsInfo (pCtx, pFbi);
@@ -4182,7 +4182,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       WelsRcPostFrameSkippedUpdate (pCtx, iCurDid);
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
                "[Rc] Frame timestamp = %lld, skip one frame due to post skip, continual skipped %d frames",
-               pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
+               uiTimeStamp, pCtx->iContinualSkipFrames);
       pCtx->iEncoderError = ENC_RETURN_SUCCESS;
       return ENC_RETURN_SUCCESS;
     }
@@ -4200,7 +4200,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     }
 
     pCtx->pFuncList->pfRc.pfWelsRcPictureInfoUpdate (pCtx, iLayerSize);
-    RcTraceFrameBits (pCtx, pSrcPic->uiTimeStamp);
+    RcTraceFrameBits (pCtx,uiTimeStamp);
     pCtx->pDecPic->iFrameAverageQp = pCtx->pWelsSvcRc[iDidIdx].iAverageFrameQp;
 
     //update scc related

@@ -235,7 +235,7 @@ typedef struct TagWelsEncCtx {
   bool bDependencyRecFlag[MAX_DEPENDENCY_LAYER];
   bool bRecFlag;
 #endif
-
+  int64_t            uiLastTimestamp;
   uint32_t GetNeededSpsNum() {
     if (0 == sPSOVector.uiNeededSpsNum) {
       sPSOVector.uiNeededSpsNum = ((SPS_LISTING & pSvcParam->eSpsPpsIdStrategy) ? (MAX_SPS_COUNT) : (1));
