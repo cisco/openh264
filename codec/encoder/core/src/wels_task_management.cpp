@@ -63,9 +63,11 @@ IWelsTaskManage*   IWelsTaskManage::CreateTaskManage (sWelsEncCtx* pCtx, const i
 
   IWelsTaskManage* pTaskManage;
   pTaskManage = WELS_NEW_OP (CWelsTaskManageBase(), CWelsTaskManageBase);
+  WELS_VERIFY_RETURN_IF (NULL, NULL == pTaskManage)
 
-  if (pTaskManage) {
-    pTaskManage->Init (pCtx);
+  if ( ENC_RETURN_SUCCESS != pTaskManage->Init (pCtx) ) {
+    delete pTaskManage;
+    pTaskManage = NULL;
   }
   return pTaskManage;
 }
@@ -98,7 +100,7 @@ WelsErrorType CWelsTaskManageBase::Init (sWelsEncCtx* pEncCtx) {
                                WelsCommon::CWelsThreadPool);
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == m_pThreadPool)
 
-  int32_t iReturn = 0;
+  int32_t iReturn = ENC_RETURN_SUCCESS;
   for (int32_t iDid = 0; iDid < MAX_DEPENDENCY_LAYER; iDid++) {
     m_pcAllTaskList[CWelsBaseTask::WELS_ENC_TASK_ENCODING][iDid] = m_cEncodingTaskList[iDid];
     m_pcAllTaskList[CWelsBaseTask::WELS_ENC_TASK_UPDATEMBMAP][iDid] = m_cPreEncodingTaskList[iDid];
