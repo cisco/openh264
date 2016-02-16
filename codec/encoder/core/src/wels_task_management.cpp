@@ -66,6 +66,7 @@ IWelsTaskManage*   IWelsTaskManage::CreateTaskManage (sWelsEncCtx* pCtx, const i
   WELS_VERIFY_RETURN_IF (NULL, NULL == pTaskManage)
 
   if ( ENC_RETURN_SUCCESS != pTaskManage->Init (pCtx) ) {
+    pTaskManage->Uninit();
     delete pTaskManage;
     pTaskManage = NULL;
   }
