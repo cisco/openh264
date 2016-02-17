@@ -4306,8 +4306,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     ++ iLayerNum;
     ++ pLayerBsInfo;
     ++ pCtx->pOut->iLayerBsIndex;
-    WelsLog (pLogCtx, WELS_LOG_DEBUG,
-             "WelsEncoderEncodeExt() test iLayerNum = %d,iCountNal = %d,iLayerSize = %d", iLayerNum, iCountNal, iLayerSize);
     pLayerBsInfo->pBsBuf = pCtx->pFrameBs + pCtx->iPosBsBuffer;
     pLayerBsInfo->pNalLengthInByte = (pLayerBsInfo - 1)->pNalLengthInByte + iCountNal;
 
