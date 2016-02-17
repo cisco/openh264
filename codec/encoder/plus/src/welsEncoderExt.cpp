@@ -402,14 +402,7 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
 
 int CWelsH264SVCEncoder ::EncodeFrameInternal (const SSourcePicture*  pSrcPic, SFrameBSInfo* pBsInfo) {
   const int64_t kiBeforeFrameUs = WelsTime();
-  int64_t uiTimeStamp = pSrcPic->uiTimeStamp;
-  if ((m_pEncContext->uiLastTimestamp == uiTimeStamp) || ((uiTimeStamp == 0) && (m_pEncContext->uiLastTimestamp != -1))) {
-    uiTimeStamp = m_pEncContext->uiLastTimestamp + (int32_t) (1000.0 /
-                  m_pEncContext->pSvcParam->sSpatialLayers->fFrameRate);
-  }
-  m_pEncContext->uiLastTimestamp = uiTimeStamp;
-
-  const int32_t kiEncoderReturn = WelsEncoderEncodeExt (m_pEncContext, pBsInfo, pSrcPic, uiTimeStamp);
+  const int32_t kiEncoderReturn = WelsEncoderEncodeExt (m_pEncContext, pBsInfo, pSrcPic);
   const int64_t kiCurrentFrameMs = (WelsTime() - kiBeforeFrameUs) / 1000;
 
   if ((kiEncoderReturn == ENC_RETURN_MEMALLOCERR) || (kiEncoderReturn == ENC_RETURN_MEMOVERFLOWFOUND)
@@ -422,7 +415,7 @@ int CWelsH264SVCEncoder ::EncodeFrameInternal (const SSourcePicture*  pSrcPic, S
     return cmUnknownReason;
   }
 
-  UpdateStatistics (uiTimeStamp, pBsInfo, kiCurrentFrameMs);
+  UpdateStatistics (pBsInfo, kiCurrentFrameMs);
 
   ///////////////////for test
 #ifdef OUTPUT_BIT_STREAM
@@ -573,8 +566,10 @@ void CWelsH264SVCEncoder::LogStatistics (const int64_t kiCurrentFrameTs, int32_t
   }
 }
 
-void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, SFrameBSInfo* pBsInfo,
+void CWelsH264SVCEncoder::UpdateStatistics (SFrameBSInfo* pBsInfo,
     const int64_t kiCurrentFrameMs) {
+
+  const int64_t kiCurrentFrameTs = m_pEncContext->uiLastTimestamp = pBsInfo->uiTimeStamp;
 
   int32_t iMaxDid = m_pEncContext->pSvcParam->iSpatialLayerNum - 1;
   SLayerBSInfo*  pLayerInfo = &pBsInfo->sLayerInfo[0];

@@ -93,7 +93,7 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx);
  * \param   kpSrcPic    Source picture
  * \return  EFrameType (videoFrameTypeIDR/videoFrameTypeI/videoFrameTypeP)
  */
-int32_t WelsEncoderEncodeExt (sWelsEncCtx*, SFrameBSInfo* pFbi, const SSourcePicture* kpSrcPic,int64_t uiTimeStamp);
+int32_t WelsEncoderEncodeExt (sWelsEncCtx*, SFrameBSInfo* pFbi, const SSourcePicture* kpSrcPic);
 
 int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst);
 
