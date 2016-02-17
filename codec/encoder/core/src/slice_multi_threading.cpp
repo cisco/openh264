@@ -533,8 +533,7 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
   }
 
   if ((*ppCtx)->pTaskManage != NULL) {
-    delete (*ppCtx)->pTaskManage;
-    (*ppCtx)->pTaskManage = NULL;
+    WELS_DELETE_OP((*ppCtx)->pTaskManage);
   }
 
 #ifdef MT_DEBUG

@@ -71,8 +71,7 @@ IWelsTaskManage*   IWelsTaskManage::CreateTaskManage (sWelsEncCtx* pCtx, const i
 
   if ( ENC_RETURN_SUCCESS != pTaskManage->Init (pCtx) ) {
     pTaskManage->Uninit();
-    delete pTaskManage;
-    pTaskManage = NULL;
+    WELS_DELETE_OP(pTaskManage);
   }
   return pTaskManage;
 }
@@ -113,8 +112,8 @@ void   CWelsTaskManageBase::Uninit() {
   DestroyTasks();
   WELS_DELETE_OP (m_pThreadPool);
 
-  delete m_cEncodingTaskList;
-  delete m_cPreEncodingTaskList;
+  WELS_DELETE_OP(m_cEncodingTaskList);
+  WELS_DELETE_OP(m_cPreEncodingTaskList);
   WelsEventClose (&m_hTaskEvent);
 }
 
