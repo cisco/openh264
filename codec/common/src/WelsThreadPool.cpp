@@ -38,6 +38,7 @@
  *************************************************************************************
  */
 #include "typedefs.h"
+#include "memory_align.h"
 #include "WelsThreadPool.h"
 
 namespace WelsCommon {
@@ -51,14 +52,9 @@ CWelsThreadPool::CWelsThreadPool (IWelsThreadPoolSink* pSink, int32_t iMaxThread
   m_iMaxThreadNum = 0;
 
   if (NULL == m_cWaitedTasks || NULL == m_cIdleThreads || NULL == m_cBusyThreads) {
-    delete m_cWaitedTasks;
-    m_cWaitedTasks = NULL;
-
-    delete m_cIdleThreads;
-    m_cIdleThreads = NULL;
-
-    delete m_cBusyThreads;
-    m_cBusyThreads = NULL;
+    WELS_DELETE_OP(m_cWaitedTasks);
+    WELS_DELETE_OP(m_cIdleThreads);
+    WELS_DELETE_OP(m_cBusyThreads);
 
     return;
   }
@@ -66,14 +62,9 @@ CWelsThreadPool::CWelsThreadPool (IWelsThreadPoolSink* pSink, int32_t iMaxThread
   if (WELS_THREAD_ERROR_OK != Init (iMaxThreadNum)) {
     Uninit();
 
-    delete m_cWaitedTasks;
-    m_cWaitedTasks = NULL;
-
-    delete m_cIdleThreads;
-    m_cIdleThreads = NULL;
-
-    delete m_cBusyThreads;
-    m_cBusyThreads = NULL;
+    WELS_DELETE_OP(m_cWaitedTasks);
+    WELS_DELETE_OP(m_cIdleThreads);
+    WELS_DELETE_OP(m_cBusyThreads);
   }
 }
 
@@ -81,14 +72,9 @@ CWelsThreadPool::CWelsThreadPool (IWelsThreadPoolSink* pSink, int32_t iMaxThread
 CWelsThreadPool::~CWelsThreadPool() {
   Uninit();
 
-  delete m_cWaitedTasks;
-  m_cWaitedTasks = NULL;
-
-  delete m_cIdleThreads;
-  m_cIdleThreads = NULL;
-
-  delete m_cBusyThreads;
-  m_cBusyThreads = NULL;
+  WELS_DELETE_OP(m_cWaitedTasks);
+  WELS_DELETE_OP(m_cIdleThreads);
+  WELS_DELETE_OP(m_cBusyThreads);
 }
 
 WELS_THREAD_ERROR_CODE CWelsThreadPool::OnTaskStart (CWelsTaskThread* pThread, IWelsTask* pTask) {
@@ -214,7 +200,7 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::CreateIdleThread() {
 
 void  CWelsThreadPool::DestroyThread (CWelsTaskThread* pThread) {
   pThread->Kill();
-  delete pThread;
+  WELS_DELETE_OP(pThread);
 
   return;
 }
