@@ -3427,6 +3427,10 @@ int32_t ForceCodingIDR (sWelsEncCtx* pCtx) {
 }
 
 int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst) {
+  if (NULL == pCtx || NULL == pDst) {
+    return ENC_RETURN_UNEXPECTED;
+  }
+
   SFrameBSInfo* pFbi          = (SFrameBSInfo*)pDst;
   SLayerBSInfo* pLayerBsInfo  = &pFbi->sLayerInfo[0];
   int32_t iCountNal           = 0;
