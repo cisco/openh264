@@ -190,6 +190,18 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
       for (int32_t idx = 0; idx < kiLesserSliceNum; idx++)
         param.sSpatialLayers[iLayer].sSliceArgument.uiSliceMbNum[idx] = 0; //default, using one row a slice if uiSliceMode is SM_RASTER_MODE
+
+      // 02/18/2016, Greg Wolfe, Kodak Alaris:  Added support for "video signal type present" information.
+      // See codec_app_def.h for more info.  The default values preserve the previous behavior; i.e., no
+      // additional information will be written to the output file.
+      param.sSpatialLayers[iLayer].bVideoSignalTypePresent = false;			// do not write any of the following information to the header
+      param.sSpatialLayers[iLayer].uiVideoFormat = VF_UNDEF;				// undefined
+      param.sSpatialLayers[iLayer].bFullRange = false;						// analog video data range [16, 235]
+      param.sSpatialLayers[iLayer].bColorDescriptionPresent = false;		// do not write any of the following three items to the header
+      param.sSpatialLayers[iLayer].uiColorPrimaries = CP_UNDEF;				// undefined
+      param.sSpatialLayers[iLayer].uiTransferCharacteristics = TRC_UNDEF;	// undefined
+      param.sSpatialLayers[iLayer].uiColorMatrix = CM_UNDEF;				// undefined
+      // ... end 02/18/2016
     }
   }
 
@@ -407,6 +419,17 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
               sizeof (SSliceArgument)) ;
 
       pSpatialLayer->iDLayerQp = pCodingParam.sSpatialLayers[iIdxSpatial].iDLayerQp;
+
+      // 02/18/2016, Greg Wolfe, Kodak Alaris:  Added support for "video signal type present" information.
+      // See codec_app_def.h and parameter_sets.h for more info.
+      pSpatialLayer->bVideoSignalTypePresent =   pCodingParam.sSpatialLayers[iIdxSpatial].bVideoSignalTypePresent;
+      pSpatialLayer->uiVideoFormat =             pCodingParam.sSpatialLayers[iIdxSpatial].uiVideoFormat;
+      pSpatialLayer->bFullRange =                pCodingParam.sSpatialLayers[iIdxSpatial].bFullRange;
+      pSpatialLayer->bColorDescriptionPresent =  pCodingParam.sSpatialLayers[iIdxSpatial].bColorDescriptionPresent;
+      pSpatialLayer->uiColorPrimaries =          pCodingParam.sSpatialLayers[iIdxSpatial].uiColorPrimaries;
+      pSpatialLayer->uiTransferCharacteristics = pCodingParam.sSpatialLayers[iIdxSpatial].uiTransferCharacteristics;
+      pSpatialLayer->uiColorMatrix =             pCodingParam.sSpatialLayers[iIdxSpatial].uiColorMatrix;
+      // ... end 02/18/2016
 
       uiProfileIdc = (!bSimulcastAVC) ? PRO_SCALABLE_BASELINE : PRO_BASELINE;
       ++ pDlp;

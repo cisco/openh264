@@ -343,6 +343,81 @@ typedef struct {
   unsigned int  uiSliceSizeConstraint; ///< now only used when uiSliceMode=4
 } SSliceArgument;
 
+// 02/18/2016, Greg Wolfe, Kodak Alaris:  Added support for "video signal type present" information.
+
+/**
+* @brief Enumerate the type of video format
+*/
+typedef enum {
+  VF_COMPONENT,
+  VF_PAL,
+  VF_NTSC,
+  VF_SECAM,
+  VF_MAC,
+  VF_UNDEF,
+  VF_NUM_ENUM
+} EVideoFormatSPS;	// EVideoFormat is already defined/used elsewhere!
+
+/**
+* @brief Enumerate the type of color primaries
+*/
+typedef enum {
+  CP_RESERVED0,
+  CP_BT709,
+  CP_UNDEF,
+  CP_RESERVED3,
+  CP_BT470M,
+  CP_BT470BG,
+  CP_SMPTE170M,
+  CP_SMPTE240M,
+  CP_FILM,
+  CP_BT2020,
+  CP_NUM_ENUM
+} EColorPrimaries;
+
+/**
+* @brief Enumerate the type of transfer characteristics
+*/
+typedef enum {
+  TRC_RESERVED0,
+  TRC_BT709,
+  TRC_UNDEF,
+  TRC_RESERVED3,
+  TRC_BT470M,
+  TRC_BT470BG,
+  TRC_SMPTE170M,
+  TRC_SMPTE240M,
+  TRC_LINEAR,
+  TRC_LOG100,
+  TRC_LOG316,
+  TRC_IEC61966_2_4,
+  TRC_BT1361E,
+  TRC_IEC61966_2_1,
+  TRC_BT2020_10,
+  TRC_BT2020_12,
+  TRC_NUM_ENUM
+} ETransferCharacteristics;
+
+/**
+* @brief Enumerate the type of color matrix
+*/
+typedef enum {
+  CM_GBR,
+  CM_BT709,
+  CM_UNDEF,
+  CM_RESERVED3,
+  CM_FCC,
+  CM_BT470BG,
+  CM_SMPTE170M,
+  CM_SMPTE240M,
+  CM_YCGCO,
+  CM_BT2020NC,
+  CM_BT2020C,
+  CM_NUM_ENUM
+} EColorMatrix;
+
+// ... end 02/18/2016
+
 /**
 * @brief  Structure for spatial layer configuration
 */
@@ -357,6 +432,20 @@ typedef struct {
   int          iDLayerQp;      ///< value of level IDC (0 for auto-detection)
 
   SSliceArgument sSliceArgument;
+
+  // 02/18/2016, Greg Wolfe, Kodak Alaris:  Added support for "video signal type present" information.
+  // See also parameter_sets.h.
+  bool			bVideoSignalTypePresent;	// false => do not write any of the following information to the header
+  unsigned char	uiVideoFormat;				// EVideoFormatSPS; 3 bits in header; 0-5 => component, kpal, ntsc, secam, mac, undef
+  bool			bFullRange;					// false => analog video data range [16, 235]; true => full data range [0,255]
+  bool			bColorDescriptionPresent;	// false => do not write any of the following three items to the header
+  unsigned char	uiColorPrimaries;			// EColorPrimaries; 8 bits in header; 0 - 9 => ???, bt709, undef, ???, bt470m, bt470bg,
+                                            //    smpte170m, smpte240m, film, bt2020
+  unsigned char	uiTransferCharacteristics;	// ETransferCharacteristics; 8 bits in header; 0 - 15 => ???, bt709, undef, ???, bt470m, bt470bg, smpte170m,
+										    //   smpte240m, linear, log100, log316, iec61966-2-4, bt1361e, iec61966-2-1, bt2020-10, bt2020-12
+  unsigned char	uiColorMatrix;				// EColorMatrix; 8 bits in header (corresponds to FFmpeg "colorspace"); 0 - 10 => GBR, bt709,
+										    //   undef, ???, fcc, bt470bg, smpte170m, smpte240m, YCgCo, bt2020nc, bt2020c
+// ... end 02/18/2016
 } SSpatialLayerConfig;
 
 /**
