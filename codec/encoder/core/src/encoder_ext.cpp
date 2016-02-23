@@ -4834,6 +4834,9 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   SSlice* pBaseSlice = &pCurLayer->sLayerInfo.pSliceInLayer[0];
   SSliceHeaderExt* pBaseSHExt = &pBaseSlice->sSliceHeaderExt;
   SSlice* pSliceIdx = &pSlice[uiSliceIdx];
+  const int32_t kiCurDid = pCtx->uiDependencyId;
+  const int32_t kiBitsPerMb = WELS_DIV_ROUND (pCtx->pWelsSvcRc[kiCurDid].iTargetBits * INT_MULTIPLY,
+                                              pCtx->pWelsSvcRc[kiCurDid].iNumberMbFrame);
   while (uiSliceIdx < iMaxSliceNum) {
     SSliceHeaderExt* pSHExt = &pSliceIdx->sSliceHeaderExt;
     pSliceIdx->uiSliceIdx = uiSliceIdx;
@@ -4848,50 +4851,31 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
       return ENC_RETURN_MEMALLOCERR;
     }
 
-    pSliceIdx->bSliceHeaderExtFlag = pBaseSlice->bSliceHeaderExtFlag;
-    pSHExt->sSliceHeader.iPpsId = pBaseSHExt->sSliceHeader.iPpsId;
-    pSHExt->sSliceHeader.pPps = pBaseSHExt->sSliceHeader.pPps;
-    pSHExt->sSliceHeader.iSpsId = pBaseSHExt->sSliceHeader.iSpsId;
-    pSHExt->sSliceHeader.pSps = pBaseSHExt->sSliceHeader.pSps;
+    pSliceIdx->bSliceHeaderExtFlag  = pBaseSlice->bSliceHeaderExtFlag;
+    pSHExt->sSliceHeader.iPpsId     = pBaseSHExt->sSliceHeader.iPpsId;
+    pSHExt->sSliceHeader.pPps       = pBaseSHExt->sSliceHeader.pPps;
+    pSHExt->sSliceHeader.iSpsId     = pBaseSHExt->sSliceHeader.iSpsId;
+    pSHExt->sSliceHeader.pSps       = pBaseSHExt->sSliceHeader.pSps;
     pSHExt->sSliceHeader.uiRefCount = pCtx->iNumRef0;
     memcpy (&pSHExt->sSliceHeader.sRefMarking, &pBaseSHExt->sSliceHeader.sRefMarking, sizeof (SRefPicMarking));
     memcpy (&pSHExt->sSliceHeader.sRefReordering, &pBaseSHExt->sSliceHeader.sRefReordering,
             sizeof (SRefPicListReorderSyntax));
+
+    pSliceIdx->sSlicingOverRc.iComplexityIndexSlice = 0;
+    pSliceIdx->sSlicingOverRc.iCalculatedQpSlice    = pCtx->iGlobalQp;
+    pSliceIdx->sSlicingOverRc.iTotalQpSlice         = 0;
+    pSliceIdx->sSlicingOverRc.iTotalMbSlice         = 0;
+    pSliceIdx->sSlicingOverRc.iTargetBitsSlice      = WELS_DIV_ROUND (kiBitsPerMb *
+                                                      pCurLayer->sLayerInfo.pSliceInLayer[uiSliceIdx].iCountMbNumInSlice,
+                                                      INT_MULTIPLY);
+    pSliceIdx->sSlicingOverRc.iFrameBitsSlice       = 0;
+    pSliceIdx->sSlicingOverRc.iGomBitsSlice         = 0;
 
     pSliceIdx++;
     uiSliceIdx++;
   }
   pMA->WelsFree (pCurLayer->sLayerInfo.pSliceInLayer, "Slice");
   pCurLayer->sLayerInfo.pSliceInLayer = pSlice;
-
-  //deal with rate control variables
-  const int32_t kiCurDid = pCtx->uiDependencyId;
-  SRCSlicing* pSlcingOverRc = (SRCSlicing*)pMA->WelsMallocz (iMaxSliceNum * sizeof (SRCSlicing), "SlicingOverRC");
-  if (NULL == pSlcingOverRc) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
-             "CWelsH264SVCEncoder::DynSliceRealloc: realloc pSlcingOverRc not successful");
-    return ENC_RETURN_MEMALLOCERR;
-  }
-  memcpy (pSlcingOverRc, pCtx->pWelsSvcRc[kiCurDid].pSlicingOverRc, sizeof (SRCSlicing) * iMaxSliceNumOld);
-  uiSliceIdx = iMaxSliceNumOld;
-  SRCSlicing* pSORC = &pSlcingOverRc[uiSliceIdx];
-  const int32_t kiBitsPerMb = WELS_DIV_ROUND (pCtx->pWelsSvcRc[kiCurDid].iTargetBits * INT_MULTIPLY,
-                              pCtx->pWelsSvcRc[kiCurDid].iNumberMbFrame);
-  while (uiSliceIdx < iMaxSliceNum) {
-    pSORC->iComplexityIndexSlice = 0;
-    pSORC->iCalculatedQpSlice = pCtx->iGlobalQp;
-    pSORC->iTotalQpSlice    = 0;
-    pSORC->iTotalMbSlice    = 0;
-    pSORC->iTargetBitsSlice = WELS_DIV_ROUND (kiBitsPerMb *
-                              pCurLayer->sLayerInfo.pSliceInLayer[uiSliceIdx].iCountMbNumInSlice,
-                              INT_MULTIPLY);
-    pSORC->iFrameBitsSlice  = 0;
-    pSORC->iGomBitsSlice    = 0;
-    pSORC ++;
-    uiSliceIdx ++;
-  }
-  pMA->WelsFree (pCtx->pWelsSvcRc[kiCurDid].pSlicingOverRc, "SlicingOverRC");
-  pCtx->pWelsSvcRc[kiCurDid].pSlicingOverRc = pSlcingOverRc;
 
   if (pCtx->iMaxSliceCount < iMaxSliceNum)
     pCtx->iMaxSliceCount = iMaxSliceNum;

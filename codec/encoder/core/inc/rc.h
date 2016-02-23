@@ -140,21 +140,6 @@ enum {
   TIME_WINDOW_TOTAL =2
 };
 
-typedef struct TagRCSlicing {
-int32_t   iComplexityIndexSlice;
-int32_t   iCalculatedQpSlice;
-int32_t   iStartMbSlice;
-int32_t   iEndMbSlice;
-int32_t   iTotalQpSlice;
-int32_t   iTotalMbSlice;
-int32_t   iTargetBitsSlice;
-int32_t   iBsPosSlice;
-int32_t   iFrameBitsSlice;
-int32_t   iGomBitsSlice;
-int32_t   iGomTargetBits;
-//int32_t   gom_coded_mb;
-} SRCSlicing;
-
 typedef struct TagRCTemporal {
 int32_t   iMinBitsTl;
 int32_t   iMaxBitsTl;
@@ -238,7 +223,6 @@ int32_t   iPaddingSize;
 int32_t   iPaddingBitrateStat;
 bool      bSkipFlag;
 
-SRCSlicing*     pSlicingOverRc;
 SRCTemporal* pTemporalOverRc;
 
 //for scc
