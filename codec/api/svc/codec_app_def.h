@@ -343,8 +343,6 @@ typedef struct {
   unsigned int  uiSliceSizeConstraint; ///< now only used when uiSliceMode=4
 } SSliceArgument;
 
-// 02/18/2016, Greg Wolfe, Kodak Alaris:  Added support for "video signal type present" information.
-
 /**
 * @brief Enumerate the type of video format
 */
@@ -416,8 +414,6 @@ typedef enum {
   CM_NUM_ENUM
 } EColorMatrix;
 
-// ... end 02/18/2016
-
 /**
 * @brief  Structure for spatial layer configuration
 */
@@ -433,8 +429,7 @@ typedef struct {
 
   SSliceArgument sSliceArgument;
 
-  // 02/18/2016, Greg Wolfe, Kodak Alaris:  Added support for "video signal type present" information.
-  // See also parameter_sets.h.
+  // Note: members bVideoSignalTypePresent through uiColorMatrix below are also defined in SWelsSPS in parameter_sets.h.
   bool			bVideoSignalTypePresent;	// false => do not write any of the following information to the header
   unsigned char	uiVideoFormat;				// EVideoFormatSPS; 3 bits in header; 0-5 => component, kpal, ntsc, secam, mac, undef
   bool			bFullRange;					// false => analog video data range [16, 235]; true => full data range [0,255]
@@ -445,7 +440,6 @@ typedef struct {
 										    //   smpte240m, linear, log100, log316, iec61966-2-4, bt1361e, iec61966-2-1, bt2020-10, bt2020-12
   unsigned char	uiColorMatrix;				// EColorMatrix; 8 bits in header (corresponds to FFmpeg "colorspace"); 0 - 10 => GBR, bt709,
 										    //   undef, ???, fcc, bt470bg, smpte170m, smpte240m, YCgCo, bt2020nc, bt2020c
-// ... end 02/18/2016
 } SSpatialLayerConfig;
 
 /**

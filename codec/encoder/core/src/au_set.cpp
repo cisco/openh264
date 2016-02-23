@@ -203,8 +203,7 @@ int32_t WelsWriteVUI (SWelsSPS* pSps, SBitStringAux* pBitStringAux) {
   BsWriteOneBit (pLocalBitStringAux, false); //aspect_ratio_info_present_flag
   BsWriteOneBit (pLocalBitStringAux, false); //overscan_info_present_flag
 
-  // 02/18/2016, Greg Wolfe, Kodak Alaris:  Added support for "video signal type present" information.
-  // See parameter_sets.h for more info.
+  // See codec_app_def.h and parameter_sets.h for more info about members bVideoSignalTypePresent through uiColorMatrix.
   BsWriteOneBit (pLocalBitStringAux, pSps->bVideoSignalTypePresent); //video_signal_type_present_flag
   if  ( pSps->bVideoSignalTypePresent )
   {//write video signal type info to header
@@ -223,7 +222,6 @@ int32_t WelsWriteVUI (SWelsSPS* pSps, SBitStringAux* pBitStringAux) {
     }//write color description info to header
 
   }//write video signal type info to header
-  // ... end 02/18/2016
 
   BsWriteOneBit (pLocalBitStringAux, false); //chroma_loc_info_present_flag
   BsWriteOneBit (pLocalBitStringAux, false); //timing_info_present_flag
@@ -540,8 +538,7 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
 
   pSps->bVuiParamPresentFlag = true;
 
-  // 02/18/2016, Greg Wolfe, Kodak Alaris:  Added support for "video signal type present" information.
-  // See codec_app_def.h and parameter_sets.h for more info.
+  // See codec_app_def.h and parameter_sets.h for more info about members bVideoSignalTypePresent through uiColorMatrix.
   pSps->bVideoSignalTypePresent =   pLayerParam->bVideoSignalTypePresent;
   pSps->uiVideoFormat =             pLayerParam->uiVideoFormat;
   pSps->bFullRange =                pLayerParam->bFullRange;
@@ -549,7 +546,6 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
   pSps->uiColorPrimaries =          pLayerParam->uiColorPrimaries;
   pSps->uiTransferCharacteristics = pLayerParam->uiTransferCharacteristics;
   pSps->uiColorMatrix =             pLayerParam->uiColorMatrix;
-  // ... end 02/18/2016
 
   return 0;
 }

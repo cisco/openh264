@@ -79,15 +79,8 @@ bool            bVuiParamPresentFlag;
 // bool            bTimingInfoPresentFlag;
 // bool            bFixedFrameRateFlag;
 
-bool            bConstraintSet0Flag;
-bool            bConstraintSet1Flag;
-bool            bConstraintSet2Flag;
-bool            bConstraintSet3Flag;
-// bool            bSeparateColorPlaneFlag;  // =false,: only used in decoder, encoder in general_***; it can be removed when removed general up_sample
-
-// 02/18/2016, Greg Wolfe, Kodak Alaris:  Added support for "video signal type present" information.
-// See also codec_app_def.h for definitions of enumerators EVideoFormatSPS, EColorPrimaries, ETransferCharacteristics,
-// and EColorMatrix.
+// Note: members bVideoSignalTypePresent through uiColorMatrix below are also defined in SSpatialLayerConfig in codec_app_def.h,
+// along with definitions for enumerators EVideoFormatSPS, EColorPrimaries, ETransferCharacteristics, and EColorMatrix.
 bool	bVideoSignalTypePresent;	// false => do not write any of the following information to the header
 uint8_t	uiVideoFormat;				// EVideoFormatSPS; 3 bits in header; 0-5 => component, kpal, ntsc, secam, mac, undef
 bool	bFullRange;					// false => analog video data range [16, 235]; true => full data range [0,255]
@@ -98,7 +91,12 @@ uint8_t	uiTransferCharacteristics;	// ETransferCharacteristics; 8 bits in header
                                     //   smpte240m, linear, log100, log316, iec61966-2-4, bt1361e, iec61966-2-1, bt2020-10, bt2020-12
 uint8_t	uiColorMatrix;				// EColorMatrix; 8 bits in header (corresponds to FFmpeg "colorspace"); 0 - 10 => GBR, bt709,
                                     //   undef, ???, fcc, bt470bg, smpte170m, smpte240m, YCgCo, bt2020nc, bt2020c
-// ... end 02/18/2016
+
+bool            bConstraintSet0Flag;
+bool            bConstraintSet1Flag;
+bool            bConstraintSet2Flag;
+bool            bConstraintSet3Flag;
+// bool            bSeparateColorPlaneFlag;  // =false,: only used in decoder, encoder in general_***; it can be removed when removed general up_sample
 
 } SWelsSPS, *PWelsSPS;
 
