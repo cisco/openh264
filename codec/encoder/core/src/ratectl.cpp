@@ -1544,4 +1544,11 @@ void  WelsRcFreeMemory (sWelsEncCtx* pEncCtx) {
   }
 }
 
+long long GetTimestampForRc(const long long uiTimeStamp, const long long uiLastTimeStamp, const float fFrameRate) {
+  if ((uiLastTimeStamp >= uiTimeStamp) || ((uiTimeStamp == 0) && (uiLastTimeStamp != -1))) {
+    return (uiLastTimeStamp + (int32_t) (1000.0 / fFrameRate));
+  }
+  return uiTimeStamp;
+}
+
 }//end of namespace

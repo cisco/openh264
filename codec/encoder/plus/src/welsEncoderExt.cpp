@@ -415,7 +415,7 @@ int CWelsH264SVCEncoder ::EncodeFrameInternal (const SSourcePicture*  pSrcPic, S
     return cmUnknownReason;
   }
 
-  UpdateStatistics (pSrcPic->uiTimeStamp, pBsInfo, kiCurrentFrameMs);
+  UpdateStatistics (pBsInfo, kiCurrentFrameMs);
 
   ///////////////////for test
 #ifdef OUTPUT_BIT_STREAM
@@ -566,8 +566,10 @@ void CWelsH264SVCEncoder::LogStatistics (const int64_t kiCurrentFrameTs, int32_t
   }
 }
 
-void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, SFrameBSInfo* pBsInfo,
+void CWelsH264SVCEncoder::UpdateStatistics (SFrameBSInfo* pBsInfo,
     const int64_t kiCurrentFrameMs) {
+
+  const int64_t kiCurrentFrameTs = m_pEncContext->uiLastTimestamp = pBsInfo->uiTimeStamp;
 
   int32_t iMaxDid = m_pEncContext->pSvcParam->iSpatialLayerNum - 1;
   SLayerBSInfo*  pLayerInfo = &pBsInfo->sLayerInfo[0];
@@ -582,7 +584,7 @@ void CWelsH264SVCEncoder::UpdateStatistics (const int64_t kiCurrentFrameTs, SFra
         if ((pLayerInfo->uiLayerType == VIDEO_CODING_LAYER) && (pLayerInfo->uiSpatialId == iDid)) {
           eFrameType = pLayerInfo->eFrameType;
           for (int32_t iNalIdx = 0; iNalIdx < pLayerInfo->iNalCount; iNalIdx++) {
-             kiCurrentFrameSize += pLayerInfo->pNalLengthInByte[iNalIdx];
+            kiCurrentFrameSize += pLayerInfo->pNalLengthInByte[iNalIdx];
           }
         }
       }
