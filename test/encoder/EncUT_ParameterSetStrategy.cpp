@@ -123,7 +123,6 @@ TEST_F (ParameterSetStrategyTest, FindExistingSps) {
 TEST_F (ParameterSetStrategyTest, TestVSTPParameters) {
   int32_t iRet = 0;
   bool FalseLocal = false;	// EXPECT_EQ does not like "true" or "false" as its first arg
-  bool TrueLocal = true;
 
   // this test verifies that the client's "video signal type present" parameter values end up in SWelsSPS 
 
