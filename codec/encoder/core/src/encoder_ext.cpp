@@ -4783,7 +4783,7 @@ int32_t WelsEncoderApplyLTR (SLogContext* pLogCtx, sWelsEncCtx** ppCtx, SLTRConf
   iRet = WelsEncoderParamAdjust (ppCtx, &sConfig);
   return iRet;
 }
-int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
+int32_t FrameBsRealloc (sWelsEncCtx* pCtx,
                          SFrameBSInfo* pFrameBsInfo,
                          SLayerBSInfo* pLayerBsInfo) {
   CMemoryAlign* pMA = pCtx->pMemAlign;
@@ -4822,6 +4822,17 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
     ++ pLBI1;
     pLBI1->pNalLengthInByte = pLBI2->pNalLengthInByte + pLBI2->iNalCount;
   }
+
+  return ENC_RETURN_SUCCESS;
+
+}
+
+int32_t SliceBufferRealloc (sWelsEncCtx* pCtx) {
+  CMemoryAlign* pMA = pCtx->pMemAlign;
+  SDqLayer* pCurLayer = pCtx->pCurDqLayer;
+  int32_t iMaxSliceNumOld = pCurLayer->sSliceEncCtx.iMaxSliceNumConstraint;
+  int32_t iMaxSliceNum = iMaxSliceNumOld;
+  iMaxSliceNum *= SLICE_NUM_EXPAND_COEF;
 
   SSlice* pSlice = (SSlice*)pMA->WelsMallocz (sizeof (SSlice) * iMaxSliceNum, "Slice");
   if (NULL == pSlice) {
@@ -4882,6 +4893,20 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   pCurLayer->sSliceEncCtx.iMaxSliceNumConstraint = iMaxSliceNum;
   pCurLayer->iMaxSliceNum = iMaxSliceNum;
   return ENC_RETURN_SUCCESS;
+}
+
+int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
+                         SFrameBSInfo* pFrameBsInfo,
+                         SLayerBSInfo* pLayerBsInfo) {
+  int32_t iRet = 0;
+
+  iRet = FrameBsRealloc (pCtx, pFrameBsInfo, pLayerBsInfo);
+  if(ENC_RETURN_SUCCESS != iRet)
+    return iRet;
+
+  iRet = SliceBufferRealloc (pCtx);
+
+  return iRet;
 }
 
 int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
