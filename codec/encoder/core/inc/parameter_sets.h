@@ -79,6 +79,19 @@ bool            bVuiParamPresentFlag;
 // bool            bTimingInfoPresentFlag;
 // bool            bFixedFrameRateFlag;
 
+// Note: members bVideoSignalTypePresent through uiColorMatrix below are also defined in SSpatialLayerConfig in codec_app_def.h,
+// along with definitions for enumerators EVideoFormatSPS, EColorPrimaries, ETransferCharacteristics, and EColorMatrix.
+bool	bVideoSignalTypePresent;	// false => do not write any of the following information to the header
+uint8_t	uiVideoFormat;				// EVideoFormatSPS; 3 bits in header; 0-5 => component, kpal, ntsc, secam, mac, undef
+bool	bFullRange;					// false => analog video data range [16, 235]; true => full data range [0,255]
+bool	bColorDescriptionPresent;	// false => do not write any of the following three items to the header
+uint8_t	uiColorPrimaries;			// EColorPrimaries; 8 bits in header; 0 - 9 => ???, bt709, undef, ???, bt470m, bt470bg,
+                                    //    smpte170m, smpte240m, film, bt2020
+uint8_t	uiTransferCharacteristics;	// ETransferCharacteristics; 8 bits in header; 0 - 15 => ???, bt709, undef, ???, bt470m, bt470bg, smpte170m,
+                                    //   smpte240m, linear, log100, log316, iec61966-2-4, bt1361e, iec61966-2-1, bt2020-10, bt2020-12
+uint8_t	uiColorMatrix;				// EColorMatrix; 8 bits in header (corresponds to FFmpeg "colorspace"); 0 - 10 => GBR, bt709,
+                                    //   undef, ???, fcc, bt470bg, smpte170m, smpte240m, YCgCo, bt2020nc, bt2020c
+
 bool            bConstraintSet0Flag;
 bool            bConstraintSet1Flag;
 bool            bConstraintSet2Flag;
