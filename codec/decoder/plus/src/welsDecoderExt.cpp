@@ -330,8 +330,8 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
     if (m_pWelsTrace) {
       WelsTraceCallback callback = * ((WelsTraceCallback*)pOption);
       m_pWelsTrace->SetTraceCallback (callback);
-      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::SetOption(), openh264 codec version = %s.",
-               VERSION_NUMBER);
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsDecoder::SetOption():DECODER_OPTION_TRACE_CALLBACK callback = %p.",
+               callback);
     }
     return cmResultSuccess;
   } else if (eOptID == DECODER_OPTION_TRACE_CALLBACK_CONTEXT) {
