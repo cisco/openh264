@@ -44,7 +44,9 @@
 #include "codec_app_def.h"
 #include "wels_const.h"
 #include "WelsThreadLib.h"
+#include "slice.h"
 
+using namespace WelsEnc;
 /*
  *  MT_DEBUG: output trace MT related into log file
  */
@@ -87,6 +89,12 @@ FILE*                           pFSliceDiff;    // file handle for debug
 uint8_t*                        pThreadBsBuffer[MAX_THREADS_NUM]; //actual memory for slice buffer
 bool                            bThreadBsBufferUsage[MAX_THREADS_NUM];
 WELS_MUTEX                      mutexThreadBsBufferUsage;
+
+SSlice*                         pSliceInThread[MAX_THREADS_NUM]; //slice buffer
+int32_t*                        piSliceIndexInThread[MAX_THREADS_NUM];
+int32_t                         iMaxSliceNumInThread[MAX_THREADS_NUM];
+int32_t                         iEncodedSliceNumInThread[MAX_THREADS_NUM];
+
 } SSliceThreading;
 
 #endif//MULTIPLE_THREADING_DEFINES_H__
