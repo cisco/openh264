@@ -113,6 +113,7 @@ BITS 64
 %define r1w  dx
 %define r2w  r8w
 %define r3w  r9w
+%define r4w  ax
 %define r6w  r11w
 
 %define r0b  cl
@@ -182,6 +183,7 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
 %define r1w  si
 %define r2w  dx
 %define r3w  cx
+%define r4w  r8w
 %define r6w  r10w
 
 %define r0b  dil
@@ -249,6 +251,7 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
 %define r1w cx
 %define r2w dx
 %define r3w bx
+%define r4w si
 %define r6w bp
 
 %define r0b al
