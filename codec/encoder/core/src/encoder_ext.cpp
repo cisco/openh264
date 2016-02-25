@@ -4877,7 +4877,7 @@ int32_t SliceBufferRealloc (sWelsEncCtx* pCtx) {
     pSliceIdx->sSlicingOverRc.iTotalQpSlice         = 0;
     pSliceIdx->sSlicingOverRc.iTotalMbSlice         = 0;
     pSliceIdx->sSlicingOverRc.iTargetBitsSlice      = WELS_DIV_ROUND (kiBitsPerMb *
-                                                      pCurLayer->sLayerInfo.pSliceInLayer[uiSliceIdx].iCountMbNumInSlice,
+                                                      pSlice[uiSliceIdx].iCountMbNumInSlice,
                                                       INT_MULTIPLY);
     pSliceIdx->sSlicingOverRc.iFrameBitsSlice       = 0;
     pSliceIdx->sSlicingOverRc.iGomBitsSlice         = 0;
