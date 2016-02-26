@@ -133,7 +133,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
         pCtx->pDec->bIsComplete = false;
         pCtx->bFrameFinish = false; //current frame not finished
         pCtx->iErrorCode |= dsFramePending;
-        return -1;
+        return ERR_INFO_PARSEONLY_PENDING;
         //pCtx->pParserBsInfo->iNalNum = 0;
       }
     } else { //error
@@ -141,9 +141,9 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
       pCtx->pParserBsInfo->iNalNum = 0;
       pCtx->pParserBsInfo->iSpsWidthInPixel = 0;
       pCtx->pParserBsInfo->iSpsHeightInPixel = 0;
-      return -1;
+      return ERR_INFO_PARSEONLY_ERROR;
     }
-    return 0;
+    return ERR_NONE;
   }
 
   if (pCtx->iTotalNumMbRec != kiTotalNumMbInCurLayer) {
@@ -152,7 +152,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
              pCtx->iTotalNumMbRec, kiTotalNumMbInCurLayer, pCurDq->iMbWidth, pCurDq->iMbHeight);
     bFrameCompleteFlag = false; //return later after output buffer is done
     if (pCtx->bInstantDecFlag) //no-delay decoding, wait for new slice
-      return -1;
+      return ERR_INFO_MB_NUM_INADEQUATE;
   } else if (pCurDq->sLayerInfo.sNalHeaderExt.bIdrFlag
              && (pCtx->iErrorCode == dsErrorFree)) { //complete non-ECed IDR frame done
     pCtx->pDec->bIsComplete = true;
@@ -193,7 +193,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   if (pDstInfo->iBufferStatus == 0) {
     if (!bFrameCompleteFlag)
       pCtx->iErrorCode |= dsBitstreamError;
-    return -1;
+    return ERR_INFO_MB_NUM_INADEQUATE;
   }
   if (pCtx->bFreezeOutput) {
     pDstInfo->iBufferStatus = 0;
@@ -206,7 +206,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   pCtx->iMbEcedPropNum = pPic->iMbEcedPropNum;
   UpdateDecStat (pCtx, pDstInfo->iBufferStatus != 0);
 
-  return 0;
+  return ERR_NONE;
 }
 
 inline bool    CheckSliceNeedReconstruct (uint8_t uiLayerDqId, uint8_t uiTargetDqId) {
@@ -971,7 +971,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     if (pSliceHead->uiDisableDeblockingFilterIdc > 6) {
       WelsLog (pLogCtx, WELS_LOG_WARNING, "disable_deblock_filter_idc (%d) out of range [0, 6]",
                pSliceHead->uiDisableDeblockingFilterIdc);
-      return ERR_INFO_INVALID_DBLOCKING_IDC;
+      return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_DBLOCKING_IDC);
     }
     if (pSliceHead->uiDisableDeblockingFilterIdc != 1) {
       WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //slice_alpha_c0_offset_div2
@@ -1018,7 +1018,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
         if (pSliceHeadExt->uiDisableInterLayerDeblockingFilterIdc > 6) {
           WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "disable_inter_layer_deblock_filter_idc (%d) out of range [0, 6]",
                    pSliceHeadExt->uiDisableInterLayerDeblockingFilterIdc);
-          return ERR_INFO_INVALID_DBLOCKING_IDC;
+          return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_DBLOCKING_IDC);
         }
         if (pSliceHeadExt->uiDisableInterLayerDeblockingFilterIdc != 1) {
           WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //inter_layer_slice_alpha_c0_offset_div2
@@ -1298,7 +1298,6 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
                              "pCtx->sMb.pSliceIdc[]"); // using int32_t for slice_idc, 4/21/2010
     pCtx->sMb.pResidualPredFlag[i] = (int8_t*) pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
                                      "pCtx->sMb.pResidualPredFlag[]");
-    //pCtx->sMb.pMotionPredFlag[i] = (uint8_t *) pMa->WelsMallocz(pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(uint8_t), "pCtx->sMb.pMotionPredFlag[]");
     pCtx->sMb.pInterPredictionDoneFlag[i] = (int8_t*) pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
         int8_t), "pCtx->sMb.pInterPredictionDoneFlag[]");
 
@@ -1314,6 +1313,8 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
                             (NULL == pCtx->sMb.pMv[i][0]) ||
                             (NULL == pCtx->sMb.pRefIndex[i][0]) ||
                             (NULL == pCtx->sMb.pLumaQp[i]) ||
+                            (NULL == pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i]) ||
+                            (NULL == pCtx->sMb.pTransformSize8x8Flag[i]) ||
                             (NULL == pCtx->sMb.pChromaQp[i]) ||
                             (NULL == pCtx->sMb.pMvd[i][0]) ||
                             (NULL == pCtx->sMb.pCbfDc[i]) ||
@@ -1322,6 +1323,7 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
                             (NULL == pCtx->sMb.pScaledTCoeff[i]) ||
                             (NULL == pCtx->sMb.pIntraPredMode[i]) ||
                             (NULL == pCtx->sMb.pIntra4x4FinalMode[i]) ||
+                            (NULL == pCtx->sMb.pIntraNxNAvailFlag[i]) ||
                             (NULL == pCtx->sMb.pChromaPredMode[i]) ||
                             (NULL == pCtx->sMb.pCbp[i]) ||
                             (NULL == pCtx->sMb.pSubMbType[i]) ||
@@ -2007,7 +2009,7 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
     return iErr;
   }
 
-  return 0;
+  return ERR_NONE;
 }
 
 static inline void InitDqLayerInfo (PDqLayer pDqLayer, PLayerInfo pLayerInfo, PNalUnit pNalUnit, PPicture pPicDec) {
@@ -2251,7 +2253,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
 #else
               pCtx->bReferenceLostAtT0Flag = true;
 #endif
-              return ERR_INFO_REFERENCE_PIC_LOST;
+              return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_REFERENCE_PIC_LOST);
             }
           }
         }
@@ -2290,9 +2292,9 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         }
 
         if (bReconstructSlice) {
-          if (WelsDecodeConstructSlice (pCtx, pNalCur)) {
+          if (iRet = WelsDecodeConstructSlice (pCtx, pNalCur)) {
             pCtx->pDec->bIsComplete = false; // reconstruction error, directly set the flag false
-            return -1;
+            return iRet;
           }
         }
         if (bAllRefComplete && pCtx->eSliceType != I_SLICE) {
@@ -2479,6 +2481,8 @@ bool CheckRefPicturesComplete (PWelsDecoderContext pCtx) {
     }
     iRealMbIdx = (pCtx->pPps->uiNumSliceGroups > 1) ? FmoNextMb (pCtx->pFmo, iRealMbIdx) :
                  (pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iFirstMbInSlice + iMbIdx);
+    if (iRealMbIdx == -1) //caused by abnormal return of FmoNextMb()
+      return false;
   }
   return bAllRefComplete;
 }

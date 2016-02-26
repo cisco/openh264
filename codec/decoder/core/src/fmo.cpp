@@ -40,6 +40,7 @@
 
 #include "fmo.h"
 #include "memory_align.h"
+#include "error_code.h"
 
 namespace WelsDec {
 
@@ -56,10 +57,11 @@ static inline int32_t FmoGenerateMbAllocMapType0 (PFmo pFmo, PPps pPps) {
   int32_t iMbNum = 0;
   int32_t i = 0;
 
-  WELS_VERIFY_RETURN_IF (1, (NULL == pFmo || NULL == pPps))
+  WELS_VERIFY_RETURN_IF (ERR_INFO_INVALID_PARAM, (NULL == pFmo || NULL == pPps))
   uiNumSliceGroups = pPps->uiNumSliceGroups;
   iMbNum = pFmo->iCountMbNum;
-  WELS_VERIFY_RETURN_IF (1, (NULL == pFmo->pMbAllocMap || iMbNum <= 0 || uiNumSliceGroups > MAX_SLICEGROUP_IDS))
+  WELS_VERIFY_RETURN_IF (ERR_INFO_INVALID_PARAM, (NULL == pFmo->pMbAllocMap || iMbNum <= 0
+                         || uiNumSliceGroups > MAX_SLICEGROUP_IDS))
 
   do {
     uint8_t uiGroup = 0;
@@ -75,7 +77,7 @@ static inline int32_t FmoGenerateMbAllocMapType0 (PFmo pFmo, PPps pPps) {
     } while (uiGroup < uiNumSliceGroups && i < iMbNum);
   } while (i < iMbNum);
 
-  return 0; // well here
+  return ERR_NONE; // well here
 }
 
 /*!
@@ -91,18 +93,18 @@ static inline int32_t FmoGenerateMbAllocMapType1 (PFmo pFmo, PPps pPps, const in
   uint32_t uiNumSliceGroups = 0;
   int32_t iMbNum = 0;
   int32_t i = 0;
-  WELS_VERIFY_RETURN_IF (1, (NULL == pFmo || NULL == pPps))
+  WELS_VERIFY_RETURN_IF (ERR_INFO_INVALID_PARAM, (NULL == pFmo || NULL == pPps))
   uiNumSliceGroups = pPps->uiNumSliceGroups;
   iMbNum = pFmo->iCountMbNum;
-  WELS_VERIFY_RETURN_IF (1, (NULL == pFmo->pMbAllocMap || iMbNum <= 0 || kiMbWidth == 0
-                             || uiNumSliceGroups > MAX_SLICEGROUP_IDS))
+  WELS_VERIFY_RETURN_IF (ERR_INFO_INVALID_PARAM, (NULL == pFmo->pMbAllocMap || iMbNum <= 0 || kiMbWidth == 0
+                         || uiNumSliceGroups > MAX_SLICEGROUP_IDS))
 
   do {
     pFmo->pMbAllocMap[i] = (uint8_t) (((i % kiMbWidth) + (((i / kiMbWidth) * uiNumSliceGroups) >> 1)) % uiNumSliceGroups);
     ++ i;
   } while (i < iMbNum);
 
-  return 0; // well here
+  return ERR_NONE; // well here
 }
 
 /*!
@@ -122,18 +124,18 @@ static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const 
   bool bResolutionChanged = false;
 
   // the cases we would not like
-  WELS_VERIFY_RETURN_IF (1, (NULL == pFmo || NULL == kpPps))
+  WELS_VERIFY_RETURN_IF (ERR_INFO_INVALID_PARAM, (NULL == pFmo || NULL == kpPps))
 
   iNumMb        = pFmo->iCountMbNum;
 
   iNumMb = kiMbWidth * kiMbHeight;
 
   if (0 == iNumMb)
-    return 1;
+    return ERR_INFO_INVALID_PARAM;
 
   pMa->WelsFree (pFmo->pMbAllocMap, "_fmo->pMbAllocMap");
   pFmo->pMbAllocMap = (uint8_t*)pMa->WelsMallocz (iNumMb * sizeof (uint8_t), "_fmo->pMbAllocMap");
-  WELS_VERIFY_RETURN_IF (1, (NULL == pFmo->pMbAllocMap)) // out of memory
+  WELS_VERIFY_RETURN_IF (ERR_INFO_OUT_OF_MEMORY, (NULL == pFmo->pMbAllocMap)) // out of memory
 
   pFmo->iCountMbNum = iNumMb;
 
@@ -142,7 +144,7 @@ static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const 
 
     pFmo->iSliceGroupCount = 1;
 
-    return 0;
+    return ERR_NONE;
   }
 
   if (bResolutionChanged || ((int32_t)kpPps->uiSliceGroupMapType != pFmo->iSliceGroupType)
@@ -163,7 +165,7 @@ static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const 
       iErr = 1;
       break;
     default:
-      return 1;
+      return ERR_INFO_UNSUPPORTED_FMOTYPE;
     }
   }
 
