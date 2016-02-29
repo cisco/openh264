@@ -782,7 +782,7 @@ int32_t DecodeSpsSvcExt (PWelsDecoderContext pCtx, PSubsetSps pSpsExt, PBitStrin
 
 
 
-  return 0;
+  return ERR_NONE;
 }
 
 const SLevelLimits* GetLevelLimits (int32_t iLevelIdx, bool bConstraint3) {
@@ -915,6 +915,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   int32_t iSpsId;
   uint32_t uiCode;
   int32_t iCode;
+  int32_t iRet = ERR_NONE;
   bool bConstraintSetFlags[6] = { false };
   const bool kbUseSubsetFlag   = IS_SUBSET_SPS_NAL (pNalHead->eNalUnitType);
 
@@ -1207,8 +1208,8 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   }
   // Check if SPS SVC extension applicated
   if (kbUseSubsetFlag && (PRO_SCALABLE_BASELINE == uiProfileIdc || PRO_SCALABLE_HIGH == uiProfileIdc)) {
-    if (DecodeSpsSvcExt (pCtx, pSubsetSps, pBs) != ERR_NONE) {
-      return -1;
+    if ((iRet = DecodeSpsSvcExt (pCtx, pSubsetSps, pBs)) != ERR_NONE) {
+      return iRet;
     }
 
     WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //svc_vui_parameters_present_flag
@@ -1271,7 +1272,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     pCtx->bSpsAvailFlags[iSpsId] = true;
     pCtx->bSpsExistAheadFlag = true;
   }
-  return 0;
+  return ERR_NONE;
 }
 
 /*!
@@ -1301,7 +1302,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
   WELS_READ_VERIFY (BsGetUe (pBsAux, &uiCode)); //pic_parameter_set_id
   uiPpsId = uiCode;
   if (uiPpsId >= MAX_PPS_COUNT) {
-    return ERR_INFO_PPS_ID_OVERFLOW;
+    return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_PPS_ID_OVERFLOW);
   }
   pPps = &sTempPps;
   memset (pPps, 0, sizeof (SPps));
@@ -1311,7 +1312,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
   pPps->iSpsId = uiCode;
 
   if (pPps->iSpsId >= MAX_SPS_COUNT) {
-    return ERR_INFO_SPS_ID_OVERFLOW;
+    return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_SPS_ID_OVERFLOW);
   }
 
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //entropy_coding_mode_flag
@@ -1323,7 +1324,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
   pPps->uiNumSliceGroups = NUM_SLICE_GROUPS_OFFSET + uiCode;
 
   if (pPps->uiNumSliceGroups > MAX_SLICEGROUP_IDS) {
-    return ERR_INFO_INVALID_SLICEGROUP;
+    return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_SLICEGROUP);
   }
 
   if (pPps->uiNumSliceGroups > 1) {
@@ -1354,7 +1355,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
 
   if (pPps->uiNumRefIdxL0Active > MAX_REF_PIC_COUNT ||
       pPps->uiNumRefIdxL1Active > MAX_REF_PIC_COUNT) {
-    return ERR_INFO_REF_COUNT_OVERFLOW;
+    return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_REF_COUNT_OVERFLOW);
   }
 
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //weighted_pred_flag

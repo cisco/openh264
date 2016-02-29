@@ -401,7 +401,7 @@ int32_t ParseInterMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNe
         iRef[0] = 0;
         pCtx->iErrorCode |= dsBitstreamError;
       } else {
-        return ERR_INFO_INVALID_REF_INDEX;
+        return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
       }
     }
     pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[iRef[0]]
@@ -427,7 +427,7 @@ int32_t ParseInterMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNe
           iRef[i] = 0;
           pCtx->iErrorCode |= dsBitstreamError;
         } else {
-          return ERR_INFO_INVALID_REF_INDEX;
+          return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
         }
       }
       pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[iRef[i]]
@@ -457,7 +457,7 @@ int32_t ParseInterMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNe
           iRef[i] = 0;
           pCtx->iErrorCode |= dsBitstreamError;
         } else {
-          return ERR_INFO_INVALID_REF_INDEX;
+          return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
         }
       }
       pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[iRef[i]]
@@ -485,7 +485,7 @@ int32_t ParseInterMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNe
     for (i = 0; i < 4; i++) {
       WELS_READ_VERIFY (ParseSubMBTypeCabac (pCtx, pNeighAvail, uiSubMbType));
       if (uiSubMbType >= 4) { //invalid sub_mb_type
-        return ERR_INFO_INVALID_SUB_MB_TYPE;
+        return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_SUB_MB_TYPE);
       }
       pCurDqLayer->pSubMbType[iMbXy][i] = g_ksInterSubMbTypeInfo[uiSubMbType].iType;
       pSubPartCount[i] = g_ksInterSubMbTypeInfo[uiSubMbType].iPartCount;
@@ -505,7 +505,7 @@ int32_t ParseInterMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNe
           pRefIdx[i] = 0;
           pCtx->iErrorCode |= dsBitstreamError;
         } else {
-          return ERR_INFO_INVALID_REF_INDEX;
+          return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
         }
       }
       pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[pRefIdx[i]]
@@ -973,7 +973,7 @@ int32_t ParseIPCMInfoCabac (PWelsDecoderContext pCtx) {
   RestoreCabacDecEngineToBS (pCabacDecEngine, pBsAux);
   intX_t iBytesLeft = pBsAux->pEndBuf - pBsAux->pCurBuf;
   if (iBytesLeft < 384) {
-    return ERR_CABAC_NO_BS_TO_READ;
+    return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_CABAC_NO_BS_TO_READ);
   }
   pPtrSrc = pBsAux->pCurBuf;
   for (i = 0; i < 16; i++) {   //luma
