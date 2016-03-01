@@ -356,6 +356,46 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\..\common\x86\dct.asm"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName)_common.obj $(InputPath)&#x0D;&#x0A;"
+						Outputs="$(IntDir)\$(InputName)_common.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -DWIN64 -o $(IntDir)\$(InputName)_common.obj $(InputPath)&#x0D;&#x0A;"
+						Outputs="$(IntDir)\$(InputName)_common.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName)_common.obj $(InputPath)&#x0D;&#x0A;"
+						Outputs="$(IntDir)\$(InputName)_common.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -DWIN64 -o $(IntDir)\$(InputName)_common.obj $(InputPath)&#x0D;&#x0A;"
+						Outputs="$(IntDir)\$(InputName)_common.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath="..\..\..\decoder\core\x86\dct.asm"
 				>
 				<FileConfiguration

@@ -186,27 +186,21 @@ int32_t RecI16x16Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLe
 
   /*common use by decoder&encoder*/
   int32_t iYStride = pDqLayer->iLumaStride;
-  int32_t* pBlockOffset = pCtx->iDecBlockOffsetArray;
   int16_t* pRS = pScoeffLevel;
 
   uint8_t* pPred = pDqLayer->pPred[0];
 
-  PIdctResAddPredFunc pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc;
-
-  uint8_t i = 0;
+  PIdctFourResAddPredFunc pIdctFourResAddPredFunc = pCtx->pIdctFourResAddPredFunc;
 
   /*decode i16x16 y*/
   pGetI16x16LumaPredFunc[iI16x16PredMode] (pPred, iYStride);
 
   /*1 mb is divided 16 4x4_block to idct*/
-  for (i = 0; i < 16; i++) {
-    int16_t* pRSI4x4 = pRS + (i << 4);
-    uint8_t* pPredI4x4 = pPred + pBlockOffset[i];
-
-    if (pDqLayer->pNzc[iMBXY][g_kuiMbCountScan4Idx[i]] || pRSI4x4[0]) {
-      pIdctResAddPredFunc (pPredI4x4, iYStride, pRSI4x4);
-    }
-  }
+  const int8_t* pNzc = pDqLayer->pNzc[iMBXY];
+  pIdctFourResAddPredFunc (pPred + 0 * iYStride + 0, iYStride, pRS + 0 * 64, pNzc +  0);
+  pIdctFourResAddPredFunc (pPred + 0 * iYStride + 8, iYStride, pRS + 1 * 64, pNzc +  2);
+  pIdctFourResAddPredFunc (pPred + 8 * iYStride + 0, iYStride, pRS + 2 * 64, pNzc +  8);
+  pIdctFourResAddPredFunc (pPred + 8 * iYStride + 8, iYStride, pRS + 3 * 64, pNzc + 10);
 
   /*decode intra mb cb&cr*/
   pPred = pDqLayer->pPred[1];
@@ -541,9 +535,9 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
 
 int32_t RecChroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
   int32_t iChromaStride = pCtx->pCurDqLayer->pDec->iLinesize[1];
-  PIdctResAddPredFunc pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc;
+  PIdctFourResAddPredFunc pIdctFourResAddPredFunc = pCtx->pIdctFourResAddPredFunc;
 
-  uint8_t i = 0, j = 0;
+  uint8_t i = 0;
   uint8_t uiCbpC = pDqLayer->pCbp[iMBXY] >> 4;
 
   if (1 == uiCbpC || 2 == uiCbpC) {
@@ -552,17 +546,10 @@ int32_t RecChroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLeve
     for (i = 0; i < 2; i++) {
       int16_t* pRS = pScoeffLevel + 256 + (i << 6);
       uint8_t* pPred = pDqLayer->pPred[i + 1];
-      int32_t* pBlockOffset = i == 0 ? &pCtx->iDecBlockOffsetArray[16] : &pCtx->iDecBlockOffsetArray[20];
+      const int8_t* pNzc = pDqLayer->pNzc[iMBXY] + 16 + 2 * i;
 
       /*1 chroma is divided 4 4x4_block to idct*/
-      for (j = 0; j < 4; j++) {
-        int16_t* pRSI4x4 = &pRS[j << 4];
-        uint8_t* pPredI4x4 = pPred + pBlockOffset[j];
-
-        if (pDqLayer->pNzc[iMBXY][g_kuiMbCountScan4Idx[16 + (i << 2) + j]] || pRSI4x4[0]) {
-          pIdctResAddPredFunc (pPredI4x4, iChromaStride, pRSI4x4);
-        }
-      }
+      pIdctFourResAddPredFunc (pPred, iChromaStride, pRS, pNzc);
     }
   }
 

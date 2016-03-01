@@ -168,28 +168,21 @@ int32_t WelsMbInterSampleConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLa
       }
     }
   } else {
-    for (i = 0; i < 16; i++) { //luma
-      iIndex = g_kuiMbCountScan4Idx[i];
-      if (pCurLayer->pNzc[iMbXy][iIndex]) {
-        iOffset = ((iIndex >> 2) << 2) * iStrideL + ((iIndex % 4) << 2);
-        pCtx->pIdctResAddPredFunc (pDstY + iOffset, iStrideL, pCurLayer->pScaledTCoeff[iMbXy] + (i << 4));
-      }
-    }
+    // luma.
+    const int8_t* pNzc = pCurLayer->pNzc[iMbXy];
+    int16_t* pScaledTCoeff = pCurLayer->pScaledTCoeff[iMbXy];
+    pCtx->pIdctFourResAddPredFunc (pDstY + 0 * iStrideL + 0, iStrideL, pScaledTCoeff + 0 * 64, pNzc +  0);
+    pCtx->pIdctFourResAddPredFunc (pDstY + 0 * iStrideL + 8, iStrideL, pScaledTCoeff + 1 * 64, pNzc +  2);
+    pCtx->pIdctFourResAddPredFunc (pDstY + 8 * iStrideL + 0, iStrideL, pScaledTCoeff + 2 * 64, pNzc +  8);
+    pCtx->pIdctFourResAddPredFunc (pDstY + 8 * iStrideL + 8, iStrideL, pScaledTCoeff + 3 * 64, pNzc + 10);
   }
 
-  for (i = 0; i < 4; i++) { //chroma
-    iIndex = g_kuiMbCountScan4Idx[i + 16]; //Cb
-    if (pCurLayer->pNzc[iMbXy][iIndex] || * (pCurLayer->pScaledTCoeff[iMbXy] + ((i + 16) << 4))) {
-      iOffset = (((iIndex - 16) >> 2) << 2) * iStrideC + (((iIndex - 16) % 4) << 2);
-      pCtx->pIdctResAddPredFunc (pDstU + iOffset, iStrideC, pCurLayer->pScaledTCoeff[iMbXy] + ((i + 16) << 4));
-    }
-
-    iIndex = g_kuiMbCountScan4Idx[i + 20]; //Cr
-    if (pCurLayer->pNzc[iMbXy][iIndex] || * (pCurLayer->pScaledTCoeff[iMbXy] + ((i + 20) << 4))) {
-      iOffset = (((iIndex - 18) >> 2) << 2) * iStrideC + (((iIndex - 18) % 4) << 2);
-      pCtx->pIdctResAddPredFunc (pDstV + iOffset, iStrideC , pCurLayer->pScaledTCoeff[iMbXy] + ((i + 20) << 4));
-    }
-  }
+  const int8_t* pNzc = pCurLayer->pNzc[iMbXy];
+  int16_t* pScaledTCoeff = pCurLayer->pScaledTCoeff[iMbXy];
+  // Cb.
+  pCtx->pIdctFourResAddPredFunc (pDstU, iStrideC, pScaledTCoeff + 4 * 64, pNzc + 16);
+  // Cr.
+  pCtx->pIdctFourResAddPredFunc (pDstV, iStrideC, pScaledTCoeff + 5 * 64, pNzc + 18);
 
   return ERR_NONE;
 }
