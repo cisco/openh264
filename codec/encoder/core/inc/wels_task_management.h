@@ -65,8 +65,7 @@ class IWelsTaskManage {
 };
 
 
-class  CWelsTaskManageBase : public IWelsTaskManage, public WelsCommon::IWelsThreadPoolSink,
-  public WelsCommon::IWelsTaskSink {
+class  CWelsTaskManageBase : public IWelsTaskManage, public WelsCommon::IWelsTaskSink {
  public:
   typedef  CWelsCircleQueue<CWelsBaseTask>            TASKLIST_TYPE;
   //typedef  std::pair<int, int>                  SLICE_BOUNDARY_PAIR;
@@ -79,10 +78,6 @@ class  CWelsTaskManageBase : public IWelsTaskManage, public WelsCommon::IWelsThr
   virtual void           InitFrame (const int32_t kiCurDid = 0);
 
   virtual WelsErrorType  ExecuteTasks (const CWelsBaseTask::ETaskType iTaskType = CWelsBaseTask::WELS_ENC_TASK_ENCODING);
-
-  //IWelsThreadPoolSink
-  virtual WelsErrorType  OnTaskExecuted (WelsCommon::IWelsTask* pTask);
-  virtual WelsErrorType  OnTaskCancelled (WelsCommon::IWelsTask* pTask);
 
   //IWelsTaskSink
   virtual WelsErrorType OnTaskExecuted();

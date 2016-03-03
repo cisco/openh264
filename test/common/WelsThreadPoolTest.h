@@ -6,7 +6,7 @@
 
 using namespace WelsCommon;
 
-class CThreadPoolTest : public IWelsThreadPoolSink, public IWelsTaskSink {
+class CThreadPoolTest : public IWelsTaskSink {
  public:
   CThreadPoolTest() {
     m_iTaskCount = 0;
