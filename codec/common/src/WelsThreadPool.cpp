@@ -179,7 +179,6 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::QueueTask (IWelsTask* pTask) {
 
   AddTaskToWaitedList (pTask);
   //fprintf(stdout, "ThreadPool:  AddTaskToWaitedList: %x\n", pTask);
-  SignalThread();
   return WELS_THREAD_ERROR_OK;
 }
 
