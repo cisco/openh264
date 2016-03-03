@@ -42,6 +42,8 @@
 namespace WelsCommon {
 
 CWelsTaskThread::CWelsTaskThread (IWelsTaskThreadSink* pSink) : m_pSink (pSink) {
+  WelsThreadSetName ("CWelsTaskThread");
+
   m_uiID = (uintptr_t) (this);
   m_pTask = NULL;
 }

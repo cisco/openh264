@@ -10,7 +10,7 @@
 #include "WelsTask.h"
 #include "WelsThreadPoolTest.h"
 
-#define  TEST_TASK_NUM  20
+#define  TEST_TASK_NUM  30
 
 class CSimpleTask : public IWelsTask {
  public:
@@ -36,11 +36,10 @@ class CSimpleTask : public IWelsTask {
 
 uint32_t CSimpleTask::id = 0;
 
-
-TEST (CThreadPoolTest, CThreadPoolTest) {
+void* OneCallingFunc() {
   CThreadPoolTest cThreadPoolTest;
   CSimpleTask* aTasks[TEST_TASK_NUM];
-  CWelsThreadPool  cThreadPool (&cThreadPoolTest);
+  CWelsThreadPool* pThreadPool = & (CWelsThreadPool::AddReference (&cThreadPoolTest));
 
   int32_t  i;
   for (i = 0; i < TEST_TASK_NUM; i++) {
@@ -48,7 +47,7 @@ TEST (CThreadPoolTest, CThreadPoolTest) {
   }
 
   for (i = 0; i < TEST_TASK_NUM; i++) {
-    cThreadPool.QueueTask (aTasks[i]);
+    pThreadPool->QueueTask (aTasks[i]);
   }
 
   while (cThreadPoolTest.GetTaskCount() < TEST_TASK_NUM) {
@@ -58,5 +57,66 @@ TEST (CThreadPoolTest, CThreadPoolTest) {
   for (i = 0; i < TEST_TASK_NUM; i++) {
     delete aTasks[i];
   }
+  pThreadPool->RemoveInstance();
+
+  return 0;
+}
+
+
+TEST (CThreadPoolTest, CThreadPoolTest) {
+  OneCallingFunc();
+
+  int iRet = CWelsThreadPool::SetThreadNum (8);
+  EXPECT_EQ (0, iRet);
+  EXPECT_FALSE (CWelsThreadPool::IsReferenced());
+
+  CWelsThreadPool* pThreadPool = & (CWelsThreadPool::AddReference (NULL));
+  EXPECT_TRUE(pThreadPool->IsReferenced());
+  EXPECT_EQ (8, pThreadPool->GetThreadNum());
+
+  iRet = CWelsThreadPool::SetThreadNum (4);
+  EXPECT_TRUE (0 != iRet);
+  EXPECT_EQ (8, pThreadPool->GetThreadNum());
+
+  pThreadPool->RemoveInstance();
+
+  iRet = CWelsThreadPool::SetThreadNum (4);
+  EXPECT_EQ (0, iRet);
+  pThreadPool = & (CWelsThreadPool::AddReference (NULL));
+  EXPECT_TRUE (pThreadPool->IsReferenced());
+  EXPECT_EQ (4, pThreadPool->GetThreadNum());
+  pThreadPool->RemoveInstance();
+
+  EXPECT_FALSE (CWelsThreadPool::IsReferenced());
+}
+
+
+TEST (CThreadPoolTest, CThreadPoolTestMulti) {
+  int iCallingNum = 10;
+  WELS_THREAD_HANDLE mThreadID[30];
+  int i = 0;
+
+  for (i = 0; i < iCallingNum; i++) {
+    WelsThreadCreate (& (mThreadID[i]), (LPWELS_THREAD_ROUTINE)OneCallingFunc, NULL, 0);
+    WelsSleep (1);
+  }
+
+  for (i = iCallingNum; i < iCallingNum * 2; i++) {
+    WelsThreadCreate (& (mThreadID[i]), (LPWELS_THREAD_ROUTINE)OneCallingFunc, NULL, 0);
+    WelsSleep (1);
+    WelsThreadJoin (mThreadID[i]);
+  }
+
+  for (i = 0; i < iCallingNum; i++) {
+    WelsThreadJoin (mThreadID[i]);
+  }
+
+  for (i = iCallingNum * 2; i < iCallingNum * 3; i++) {
+    WelsThreadCreate (& (mThreadID[i]), (LPWELS_THREAD_ROUTINE)OneCallingFunc, NULL, 0);
+    WelsSleep (1);
+    WelsThreadJoin (mThreadID[i]);
+  }
+
+  EXPECT_FALSE (CWelsThreadPool::IsReferenced());
 }
 

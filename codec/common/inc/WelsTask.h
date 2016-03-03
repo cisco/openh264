@@ -59,7 +59,12 @@ class IWelsTask {
   virtual ~IWelsTask() { }
 
   virtual int Execute() = 0;
- private:
+
+  IWelsTaskSink* GetSink() {
+    return m_pSink;
+  };
+
+ protected:
   IWelsTaskSink*   m_pSink;
 };
 

@@ -60,6 +60,8 @@ class IWelsTaskManage {
     = 0;
 
   static IWelsTaskManage* CreateTaskManage (sWelsEncCtx* pCtx, const int32_t iSpatialLayer, const bool bNeedLock);
+
+  virtual int32_t  GetThreadPoolThreadNum() = 0;
 };
 
 
@@ -83,12 +85,10 @@ class  CWelsTaskManageBase : public IWelsTaskManage, public WelsCommon::IWelsThr
   virtual WelsErrorType  OnTaskCancelled (WelsCommon::IWelsTask* pTask);
 
   //IWelsTaskSink
-  virtual int OnTaskExecuted() {
-    return 0;
-  };
-  virtual int OnTaskCancelled() {
-    return 0;
-  };
+  virtual WelsErrorType OnTaskExecuted();
+  virtual WelsErrorType OnTaskCancelled();
+
+  int32_t  GetThreadPoolThreadNum();
 
  protected:
   virtual WelsErrorType  CreateTasks (sWelsEncCtx* pEncCtx, const int32_t kiTaskCount);
@@ -131,6 +131,8 @@ class  CWelsTaskManageOne : public CWelsTaskManageBase {
 
   WelsErrorType   Init (sWelsEncCtx* pEncCtx);
   virtual WelsErrorType  ExecuteTasks(const CWelsBaseTask::ETaskType iTaskType = CWelsBaseTask::WELS_ENC_TASK_ENCODING);
+
+  int32_t  GetThreadPoolThreadNum() {return 1;};
 };
 
 }       //namespace
