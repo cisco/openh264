@@ -444,7 +444,7 @@ int32_t ParseIntra4x4Mode (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail
     }
 
     iFinalMode = CheckIntraNxNPredMode (&iSampleAvail[0], &iBestMode, i, false);
-    if (iFinalMode  == ERR_INVALID_INTRA4X4_MODE) {
+    if (iFinalMode == GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INVALID_INTRA4X4_MODE)) {
       return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_I4x4_PRED_MODE);
     }
 
@@ -528,7 +528,7 @@ int32_t ParseIntra8x8Mode (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail
 
     iFinalMode = CheckIntraNxNPredMode (&iSampleAvail[0], &iBestMode, i << 2, true);
 
-    if (iFinalMode  == ERR_INVALID_INTRA4X4_MODE) {
+    if (iFinalMode == GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INVALID_INTRA4X4_MODE)) {
       return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_I4x4_PRED_MODE);
     }
 
