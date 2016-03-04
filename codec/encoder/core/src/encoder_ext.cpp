@@ -2048,7 +2048,8 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
 
   //End of pVaa memory allocation
 
-  (*ppCtx)->ppRefPicListExt = (SRefList**)pMa->WelsMallocz (kiNumDependencyLayers * sizeof (SRefList*), "ppRefPicListExt");
+  (*ppCtx)->ppRefPicListExt = (SRefList**)pMa->WelsMallocz (kiNumDependencyLayers * sizeof (SRefList*),
+                              "ppRefPicListExt");
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->ppRefPicListExt), FreeMemorySvc (ppCtx))
 
   (*ppCtx)->ppDqLayerList = (SDqLayer**)pMa->WelsMallocz (kiNumDependencyLayers * sizeof (SDqLayer*), "ppDqLayerList");
@@ -2290,7 +2291,7 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
     if ((*ppCtx)->pMemAlign != NULL) {
       WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO, "FreeMemorySvc(), verify memory usage (%d bytes) after free..",
                (*ppCtx)->pMemAlign->WelsGetMemoryUsage());
-      WELS_DELETE_OP((*ppCtx)->pMemAlign);
+      WELS_DELETE_OP ((*ppCtx)->pMemAlign);
     }
 
     free (*ppCtx);
@@ -2397,6 +2398,87 @@ void OutputCpuFeaturesLog (SLogContext* pLogCtx, uint32_t uiCpuFeatureFlags, uin
            uiCpuCores,
            iCacheLineSize);
 }
+/*
+ *
+ * status information output
+ */
+#if defined(STAT_OUTPUT)
+void StatOverallEncodingExt (sWelsEncCtx* pCtx) {
+  int8_t i = 0;
+  int8_t j = 0;
+  for (i = 0; i < pCtx->pSvcParam->iSpatialLayerNum; i++) {
+    fprintf (stdout, "\nDependency layer : %d\n", i);
+    fprintf (stdout, "Quality layer : %d\n", j);
+    {
+      const int32_t iCount = pCtx->sStatData[i][j].sSliceData.iSliceCount[I_SLICE] +
+                             pCtx->sStatData[i][j].sSliceData.iSliceCount[P_SLICE] +
+                             pCtx->sStatData[i][j].sSliceData.iSliceCount[B_SLICE];
+#if defined(MB_TYPES_CHECK)
+      if (iCount > 0) {
+        int32_t iCountNumIMb = pCtx->sStatData[i][j].sSliceData.iMbCount[I_SLICE][Intra4x4] +
+                               pCtx->sStatData[i][j].sSliceData.iMbCount[I_SLICE][Intra16x16] + pCtx->sStatData[i][j].sSliceData.iMbCount[I_SLICE][7];
+        int32_t iCountNumPMb =  pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Intra4x4] +
+                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Intra16x16] +
+                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][7] +
+                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter16x16] +
+                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter16x8] +
+                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter8x16] +
+                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter8x8] +
+                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][10] +
+                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][PSkip];
+        int32_t count_p_mbL0 =  pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter16x16] +
+                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter16x8] +
+                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter8x16] +
+                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter8x8] +
+                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][10];
+
+        int32_t iMbCount = iCountNumIMb + iCountNumPMb;
+        if (iMbCount > 0) {
+          fprintf (stderr,
+                   "SVC: overall Slices MBs: %d Avg\nI4x4: %.3f%% I16x16: %.3f%% IBL: %.3f%%\nP16x16: %.3f%% P16x8: %.3f%% P8x16: %.3f%% P8x8: %.3f%% SUBP8x8: %.3f%% PSKIP: %.3f%%\nILP(All): %.3f%% ILP(PL0): %.3f%% BLSKIP(PL0): %.3f%% RP(PL0): %.3f%%\n",
+                   iMbCount,
+                   (100.0f * (pCtx->sStatData[i][j].sSliceData.iMbCount[I_SLICE][Intra4x4] +
+                              pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Intra4x4]) / iMbCount),
+                   (100.0f * (pCtx->sStatData[i][j].sSliceData.iMbCount[I_SLICE][Intra16x16] +
+                              pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Intra16x16]) / iMbCount),
+                   (100.0f * (pCtx->sStatData[i][j].sSliceData.iMbCount[I_SLICE][7] +
+                              pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][7]) / iMbCount),
+                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter16x16] / iMbCount),
+                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter16x8] / iMbCount),
+                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter8x16] / iMbCount),
+                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter8x8] / iMbCount),
+                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][10] / iMbCount),
+                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][PSkip] / iMbCount),
+                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][11] / iMbCount),
+                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][11] / count_p_mbL0),
+                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][8] / count_p_mbL0),
+                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][9] / count_p_mbL0)
+                  );
+        }
+      }
+#endif //#if defined(MB_TYPES_CHECK)
+
+      if (iCount > 0) {
+        fprintf (stdout, "SVC: overall PSNR Y: %2.3f U: %2.3f V: %2.3f kb/s: %.1f fps: %.3f\n\n",
+                 (pCtx->sStatData[i][j].sQualityStat.rYPsnr[I_SLICE] + pCtx->sStatData[i][j].sQualityStat.rYPsnr[P_SLICE] +
+                  pCtx->sStatData[i][j].sQualityStat.rYPsnr[B_SLICE]) / (float) (iCount),
+                 (pCtx->sStatData[i][j].sQualityStat.rUPsnr[I_SLICE] + pCtx->sStatData[i][j].sQualityStat.rUPsnr[P_SLICE] +
+                  pCtx->sStatData[i][j].sQualityStat.rUPsnr[B_SLICE]) / (float) (iCount),
+                 (pCtx->sStatData[i][j].sQualityStat.rVPsnr[I_SLICE] + pCtx->sStatData[i][j].sQualityStat.rVPsnr[P_SLICE] +
+                  pCtx->sStatData[i][j].sQualityStat.rVPsnr[B_SLICE]) / (float) (iCount),
+                 1.0f * pCtx->pSvcParam->sDependencyLayers[i].fOutputFrameRate * (pCtx->sStatData[i][j].sSliceData.iSliceSize[I_SLICE] +
+                     pCtx->sStatData[i][j].sSliceData.iSliceSize[P_SLICE] + pCtx->sStatData[i][j].sSliceData.iSliceSize[B_SLICE]) / (float) (
+                   iCount + pCtx->pWelsSvcRc[i].iSkipFrameNum) / 1000,
+                 1.0f * pCtx->pSvcParam->sDependencyLayers[i].fOutputFrameRate);
+
+      }
+
+    }
+
+  }
+}
+#endif
+
 
 int32_t GetMultipleThreadIdc (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingParam, int16_t& iSliceNum,
                               int32_t& iCacheLineSize, uint32_t& uiCpuFeatureFlags) {
@@ -2478,7 +2560,7 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
 
   if ((*ppCtx)->pVpp) {
     (*ppCtx)->pVpp->FreeSpatialPictures (*ppCtx);
-    WELS_DELETE_OP((*ppCtx)->pVpp);
+    WELS_DELETE_OP ((*ppCtx)->pVpp);
   }
   FreeMemorySvc (ppCtx);
   *ppCtx = NULL;
@@ -2589,87 +2671,6 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
 
   return 0;
 }
-/*
- *
- * status information output
- */
-#if defined(STAT_OUTPUT)
-void StatOverallEncodingExt (sWelsEncCtx* pCtx) {
-  int8_t i = 0;
-  int8_t j = 0;
-  for (i = 0; i < pCtx->pSvcParam->iSpatialLayerNum; i++) {
-    fprintf (stdout, "\nDependency layer : %d\n", i);
-    fprintf (stdout, "Quality layer : %d\n", j);
-    {
-      const int32_t iCount = pCtx->sStatData[i][j].sSliceData.iSliceCount[I_SLICE] +
-                             pCtx->sStatData[i][j].sSliceData.iSliceCount[P_SLICE] +
-                             pCtx->sStatData[i][j].sSliceData.iSliceCount[B_SLICE];
-#if defined(MB_TYPES_CHECK)
-      if (iCount > 0) {
-        int32_t iCountNumIMb = pCtx->sStatData[i][j].sSliceData.iMbCount[I_SLICE][Intra4x4] +
-                               pCtx->sStatData[i][j].sSliceData.iMbCount[I_SLICE][Intra16x16] + pCtx->sStatData[i][j].sSliceData.iMbCount[I_SLICE][7];
-        int32_t iCountNumPMb =  pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Intra4x4] +
-                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Intra16x16] +
-                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][7] +
-                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter16x16] +
-                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter16x8] +
-                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter8x16] +
-                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter8x8] +
-                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][10] +
-                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][PSkip];
-        int32_t count_p_mbL0 =  pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter16x16] +
-                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter16x8] +
-                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter8x16] +
-                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter8x8] +
-                                pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][10];
-
-        int32_t iMbCount = iCountNumIMb + iCountNumPMb;
-        if (iMbCount > 0) {
-          fprintf (stderr,
-                   "SVC: overall Slices MBs: %d Avg\nI4x4: %.3f%% I16x16: %.3f%% IBL: %.3f%%\nP16x16: %.3f%% P16x8: %.3f%% P8x16: %.3f%% P8x8: %.3f%% SUBP8x8: %.3f%% PSKIP: %.3f%%\nILP(All): %.3f%% ILP(PL0): %.3f%% BLSKIP(PL0): %.3f%% RP(PL0): %.3f%%\n",
-                   iMbCount,
-                   (100.0f * (pCtx->sStatData[i][j].sSliceData.iMbCount[I_SLICE][Intra4x4] +
-                              pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Intra4x4]) / iMbCount),
-                   (100.0f * (pCtx->sStatData[i][j].sSliceData.iMbCount[I_SLICE][Intra16x16] +
-                              pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Intra16x16]) / iMbCount),
-                   (100.0f * (pCtx->sStatData[i][j].sSliceData.iMbCount[I_SLICE][7] +
-                              pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][7]) / iMbCount),
-                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter16x16] / iMbCount),
-                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter16x8] / iMbCount),
-                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter8x16] / iMbCount),
-                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][Inter8x8] / iMbCount),
-                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][10] / iMbCount),
-                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][PSkip] / iMbCount),
-                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][11] / iMbCount),
-                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][11] / count_p_mbL0),
-                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][8] / count_p_mbL0),
-                   (100.0f * pCtx->sStatData[i][j].sSliceData.iMbCount[P_SLICE][9] / count_p_mbL0)
-                  );
-        }
-      }
-#endif //#if defined(MB_TYPES_CHECK)
-
-      if (iCount > 0) {
-        fprintf (stdout, "SVC: overall PSNR Y: %2.3f U: %2.3f V: %2.3f kb/s: %.1f fps: %.3f\n\n",
-                 (pCtx->sStatData[i][j].sQualityStat.rYPsnr[I_SLICE] + pCtx->sStatData[i][j].sQualityStat.rYPsnr[P_SLICE] +
-                  pCtx->sStatData[i][j].sQualityStat.rYPsnr[B_SLICE]) / (float) (iCount),
-                 (pCtx->sStatData[i][j].sQualityStat.rUPsnr[I_SLICE] + pCtx->sStatData[i][j].sQualityStat.rUPsnr[P_SLICE] +
-                  pCtx->sStatData[i][j].sQualityStat.rUPsnr[B_SLICE]) / (float) (iCount),
-                 (pCtx->sStatData[i][j].sQualityStat.rVPsnr[I_SLICE] + pCtx->sStatData[i][j].sQualityStat.rVPsnr[P_SLICE] +
-                  pCtx->sStatData[i][j].sQualityStat.rVPsnr[B_SLICE]) / (float) (iCount),
-                 1.0f * pCtx->pSvcParam->sDependencyLayers[i].fOutputFrameRate * (pCtx->sStatData[i][j].sSliceData.iSliceSize[I_SLICE] +
-                     pCtx->sStatData[i][j].sSliceData.iSliceSize[P_SLICE] + pCtx->sStatData[i][j].sSliceData.iSliceSize[B_SLICE]) / (float) (
-                   iCount + pCtx->pWelsSvcRc[i].iSkipFrameNum) / 1000,
-                 1.0f * pCtx->pSvcParam->sDependencyLayers[i].fOutputFrameRate);
-
-      }
-
-    }
-
-  }
-}
-#endif
-
 /*!
  * \brief   get temporal level due to configuration and coding context
  */
@@ -3716,7 +3717,7 @@ void ClearFrameBsInfo (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi) {
  * \pParam  pSrcPic         Source Picture
  * \return  EFrameType (videoFrameTypeIDR/videoFrameTypeI/videoFrameTypeP)
  */
-int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSourcePicture* pSrcPic ) {
+int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSourcePicture* pSrcPic) {
   if (pCtx == NULL) {
     return ENC_RETURN_MEMALLOCERR;
   }
@@ -3756,7 +3757,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   pCtx->iEncoderError = ENC_RETURN_SUCCESS;
   pCtx->bCurFrameMarkedAsSceneLtr = false;
   pFbi->iLayerNum = 0; // for initialization
-  pFbi->uiTimeStamp = GetTimestampForRc(pSrcPic->uiTimeStamp, pCtx->uiLastTimestamp, pCtx->pSvcParam->sSpatialLayers[pCtx->pSvcParam->iSpatialLayerNum-1].fFrameRate);
+  pFbi->uiTimeStamp = GetTimestampForRc (pSrcPic->uiTimeStamp, pCtx->uiLastTimestamp,
+                                         pCtx->pSvcParam->sSpatialLayers[pCtx->pSvcParam->iSpatialLayerNum - 1].fFrameRate);
   for (int32_t iNalIdx = 0; iNalIdx < MAX_LAYER_NUM_OF_FRAME; iNalIdx++) {
     pFbi->sLayerInfo[iNalIdx].eFrameType = videoFrameTypeSkip;
   }
@@ -4784,8 +4786,8 @@ int32_t WelsEncoderApplyLTR (SLogContext* pLogCtx, sWelsEncCtx** ppCtx, SLTRConf
   return iRet;
 }
 int32_t FrameBsRealloc (sWelsEncCtx* pCtx,
-                         SFrameBSInfo* pFrameBsInfo,
-                         SLayerBSInfo* pLayerBsInfo) {
+                        SFrameBSInfo* pFrameBsInfo,
+                        SLayerBSInfo* pLayerBsInfo) {
   CMemoryAlign* pMA = pCtx->pMemAlign;
   SDqLayer* pCurLayer = pCtx->pCurDqLayer;
 
@@ -4847,7 +4849,7 @@ int32_t SliceBufferRealloc (sWelsEncCtx* pCtx) {
   SSlice* pSliceIdx = &pSlice[uiSliceIdx];
   const int32_t kiCurDid = pCtx->uiDependencyId;
   const int32_t kiBitsPerMb = WELS_DIV_ROUND (pCtx->pWelsSvcRc[kiCurDid].iTargetBits * INT_MULTIPLY,
-                                              pCtx->pWelsSvcRc[kiCurDid].iNumberMbFrame);
+                              pCtx->pWelsSvcRc[kiCurDid].iNumberMbFrame);
   while (uiSliceIdx < iMaxSliceNum) {
     SSliceHeaderExt* pSHExt = &pSliceIdx->sSliceHeaderExt;
     pSliceIdx->uiSliceIdx = uiSliceIdx;
@@ -4877,8 +4879,8 @@ int32_t SliceBufferRealloc (sWelsEncCtx* pCtx) {
     pSliceIdx->sSlicingOverRc.iTotalQpSlice         = 0;
     pSliceIdx->sSlicingOverRc.iTotalMbSlice         = 0;
     pSliceIdx->sSlicingOverRc.iTargetBitsSlice      = WELS_DIV_ROUND (kiBitsPerMb *
-                                                      pSlice[uiSliceIdx].iCountMbNumInSlice,
-                                                      INT_MULTIPLY);
+        pSlice[uiSliceIdx].iCountMbNumInSlice,
+        INT_MULTIPLY);
     pSliceIdx->sSlicingOverRc.iFrameBitsSlice       = 0;
     pSliceIdx->sSlicingOverRc.iGomBitsSlice         = 0;
 
@@ -4901,7 +4903,7 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   int32_t iRet = 0;
 
   iRet = FrameBsRealloc (pCtx, pFrameBsInfo, pLayerBsInfo);
-  if(ENC_RETURN_SUCCESS != iRet)
+  if (ENC_RETURN_SUCCESS != iRet)
     return iRet;
 
   iRet = SliceBufferRealloc (pCtx);
