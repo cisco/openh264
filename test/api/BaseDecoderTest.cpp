@@ -46,10 +46,13 @@ static void ReadFrame (std::ifstream* file, BufferedData* buf) {
 BaseDecoderTest::BaseDecoderTest()
   : decoder_ (NULL), decodeStatus_ (OpenFile) {}
 
-void BaseDecoderTest::SetUp() {
+int32_t BaseDecoderTest::SetUp() {
   long rv = WelsCreateDecoder (&decoder_);
-  ASSERT_EQ (0, rv);
-  ASSERT_TRUE (decoder_ != NULL);
+  EXPECT_EQ (0, rv);
+  EXPECT_TRUE (decoder_ != NULL);
+  if (decoder_ == NULL) {
+    return rv;
+  }
 
   SDecodingParam decParam;
   memset (&decParam, 0, sizeof (SDecodingParam));
@@ -58,7 +61,8 @@ void BaseDecoderTest::SetUp() {
   decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
 
   rv = decoder_->Initialize (&decParam);
-  ASSERT_EQ (0, rv);
+  EXPECT_EQ (0, rv);
+  return (int32_t)rv;
 }
 
 void BaseDecoderTest::TearDown() {

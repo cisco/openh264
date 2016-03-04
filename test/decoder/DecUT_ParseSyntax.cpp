@@ -128,7 +128,7 @@ class DecoderParseSyntaxTest : public ::testing::Test {
     }
   }
   //Init members
-  void Init();
+  int32_t Init();
   //Uninit members
   void Uninit();
   //Decoder real bitstream
@@ -155,7 +155,7 @@ class DecoderParseSyntaxTest : public ::testing::Test {
 };
 
 //Init members
-void DecoderParseSyntaxTest::Init() {
+int32_t DecoderParseSyntaxTest::Init() {
   memset (&m_sBufferInfo, 0, sizeof (SBufferInfo));
   memset (&m_sDecParam, 0, sizeof (SDecodingParam));
   memset (&m_sParserBsInfo, 0, sizeof (SParserBsInfo));
@@ -180,7 +180,7 @@ void DecoderParseSyntaxTest::Init() {
     m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);
   }
   CM_RETURN eRet = (CM_RETURN)Initialize (&m_sDecParam, m_pCtx, &m_pWelsTrace->m_sLogCtx);
-  (void) eRet;
+  return (int32_t)eRet;
 }
 
 void DecoderParseSyntaxTest::Uninit() {
@@ -262,7 +262,9 @@ void DecoderParseSyntaxTest::TestScalingList() {
   uint8_t iScalingListPPS[6][16];
   memset (iScalingListPPS, 0, 6 * 16 * sizeof (uint8_t));
   //Scalinglist matrix not written into sps or pps
-  Init();
+  int32_t iRet = ERR_NONE;
+  iRet = Init();
+  ASSERT_EQ (iRet, ERR_NONE);
   DecodeBs ("res/BA_MW_D.264");
   ASSERT_TRUE (m_pCtx->sSpsBuffer[0].bSeqScalingMatrixPresentFlag == false);
   EXPECT_EQ (0, memcmp (iScalingListPPS, m_pCtx->sSpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
@@ -270,7 +272,8 @@ void DecoderParseSyntaxTest::TestScalingList() {
   EXPECT_EQ (0, memcmp (iScalingListPPS, m_pCtx->sPpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
   Uninit();
   //Scalinglist value just written into sps and pps
-  Init();
+  iRet = Init();
+  ASSERT_EQ (iRet, ERR_NONE);
   DecodeBs ("res/test_scalinglist_jm.264");
   ASSERT_TRUE (m_pCtx->sSpsBuffer[0].bSeqScalingMatrixPresentFlag);
   for (int i = 0; i < 6; i++) {
@@ -280,8 +283,6 @@ void DecoderParseSyntaxTest::TestScalingList() {
   ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bPicScalingMatrixPresentFlag == false);
   EXPECT_EQ (0, memcmp (iScalingListPPS, m_pCtx->sPpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
   Uninit();
-
-
 }
 
 //TEST here for whole tests
