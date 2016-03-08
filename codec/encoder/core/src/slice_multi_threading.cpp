@@ -347,7 +347,6 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
     pSmt->piSliceIndexInThread[iIdx] = NULL;
   }
 
-
   WelsSnprintf (name, SEM_NAME_MAX, "scm%s", pSmt->eventNamespace);
   err = WelsEventOpen (&pSmt->pSliceCodedMasterEvent, name);
   MT_TRACE_LOG (pLogCtx, WELS_LOG_INFO, "[MT] Open pSliceCodedMasterEvent named(%s) ret%d err%d", name, err, errno);

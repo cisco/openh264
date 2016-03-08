@@ -99,7 +99,7 @@ WelsErrorType CWelsTaskManageBase::Init (sWelsEncCtx* pEncCtx) {
   int32_t iReturn = ENC_RETURN_SUCCESS;
   //fprintf(stdout, "m_pThreadPool = &(CWelsThreadPool::GetInstance, this=%x\n", this);
   iReturn = CWelsThreadPool::SetThreadNum (m_iThreadNum);
-  m_pThreadPool = & (CWelsThreadPool::AddReference (this));
+  m_pThreadPool = & (CWelsThreadPool::AddReference ());
   if ( (iReturn != ENC_RETURN_SUCCESS) && pEncCtx ) {
     WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_WARNING, "Set Thread Num to %d did not succeed, current thread num in use: %d",
              m_iThreadNum, m_pThreadPool->GetThreadNum());
@@ -199,16 +199,6 @@ void  CWelsTaskManageBase::OnTaskMinusOne() {
     //fprintf(stdout, "OnTaskMinusOne WelsEventSignal m_iWaitTaskNum=%d\n", m_iWaitTaskNum);
   }
   //fprintf(stdout, "OnTaskMinusOne m_iWaitTaskNum=%d\n", m_iWaitTaskNum);
-}
-
-WelsErrorType  CWelsTaskManageBase::OnTaskCancelled (WelsCommon::IWelsTask* pTask) {
-  OnTaskMinusOne();
-  return ENC_RETURN_SUCCESS;
-}
-
-WelsErrorType  CWelsTaskManageBase::OnTaskExecuted (WelsCommon::IWelsTask* pTask) {
-  OnTaskMinusOne();
-  return ENC_RETURN_SUCCESS;
 }
 
 WelsErrorType  CWelsTaskManageBase::OnTaskCancelled() {
