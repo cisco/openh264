@@ -444,6 +444,13 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     const int kiSrcLen,
     unsigned char** ppDst,
     SBufferInfo* pDstInfo) {
+  if (m_pDecContext == NULL || m_pDecContext->pParam == NULL) {
+    if (m_pWelsTrace != NULL) {
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "Call DecodeFrame2 without Initialize.\n");
+    }
+    return dsInitialOptExpected;
+  }
+
   if (m_pDecContext->pParam->bParseOnly) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "bParseOnly should be false for this API calling! \n");
     m_pDecContext->iErrorCode |= dsInvalidArgument;
@@ -503,7 +510,8 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     eNalType = m_pDecContext->sCurNalHead.eNalUnitType;
 
     if (m_pDecContext->iErrorCode & dsOutOfMemory) {
-      ResetDecoder();
+      if(ResetDecoder())
+        return dsOutOfMemory;
     }
     //for AVC bitstream (excluding AVC with temporal scalability, including TP), as long as error occur, SHOULD notify upper layer key frame loss.
     if ((IS_PARAM_SETS_NALS (eNalType) || NAL_UNIT_CODED_SLICE_IDR == eNalType) ||
@@ -589,6 +597,13 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
     const int kiSrcLen,
     SParserBsInfo* pDstInfo) {
+  if (m_pDecContext == NULL || m_pDecContext->pParam == NULL) {
+    if (m_pWelsTrace != NULL) {
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "Call DecodeParser without Initialize.\n");
+    }
+    return dsInitialOptExpected;
+  }
+
   if (!m_pDecContext->pParam->bParseOnly) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "bParseOnly should be true for this API calling! \n");
     m_pDecContext->iErrorCode |= dsInvalidArgument;
