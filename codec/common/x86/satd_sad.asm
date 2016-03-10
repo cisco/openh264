@@ -1500,6 +1500,237 @@ loop_get_satd_16x16_right:
 
 ;***********************************************************************
 ;
+;Pixel_satd_wxh_avx2 BEGIN
+;
+;***********************************************************************
+
+; out=%1 pSrcA=%2 pSrcB=%3 HSumSubDB1_256=%4 ymm_clobber=%5
+%macro AVX2_LoadDiffSatd16x1 5
+    vbroadcasti128   %1, [%2]
+    vpmaddubsw       %1, %1, %4             ; hadamard neighboring horizontal sums and differences
+    vbroadcasti128   %5, [%3]
+    vpmaddubsw       %5, %5, %4             ; hadamard neighboring horizontal sums and differences
+    vpsubw           %1, %1, %5             ; diff srcA srcB
+%endmacro
+
+; out=%1 pSrcA=%2 pSrcA+4*iStride=%3 pSrcB=%4 pSrcB+4*iStride=%5 HSumSubDB1_128x2=%6 ymm_clobber=%7,%8
+%macro AVX2_LoadDiffSatd8x2 8
+    vpbroadcastq     %1, [%2]
+    vpbroadcastq     %7, [%3]
+    vpblendd         %1, %1, %7, 11110000b
+    vpmaddubsw       %1, %1, %6             ; hadamard neighboring horizontal sums and differences
+    vpbroadcastq     %7, [%4]
+    vpbroadcastq     %8, [%5]
+    vpblendd         %7, %7, %8, 11110000b
+    vpmaddubsw       %7, %7, %6             ; hadamard neighboring horizontal sums and differences
+    vpsubw           %1, %1, %7             ; diff srcA srcB
+%endmacro
+
+; in/out=%1,%2,%3,%4 clobber=%5
+%macro AVX2_HDMFour4x4 5
+    vpsubw           %5, %1, %4             ; s3 = x0 - x3
+    vpaddw           %1, %1, %4             ; s0 = x0 + x3
+    vpsubw           %4, %2, %3             ; s2 = x1 - x2
+    vpaddw           %2, %2, %3             ; s1 = x1 + x2
+    vpsubw           %3, %1, %2             ; y2 = s0 - s1
+    vpaddw           %1, %1, %2             ; y0 = s0 + s1
+    vpaddw           %2, %5, %4             ; y1 = s3 + s2
+    vpsubw           %4, %5, %4             ; y3 = s3 - s2
+%endmacro
+
+; out=%1 in=%1,%2,%3,%4 clobber=%5
+%macro AVX2_SatdFour4x4 5
+    AVX2_HDMFour4x4  %1, %2, %3, %4, %5
+    vpabsw           %1, %1
+    vpabsw           %2, %2
+    vpabsw           %3, %3
+    vpabsw           %4, %4
+    ; second stage of horizontal hadamard.
+    ; utilizes that |a + b| + |a - b| = 2 * max(|a|, |b|)
+    vpblendw         %5, %1, %2, 10101010b
+    vpslld           %2, %2, 16
+    vpsrld           %1, %1, 16
+    vpor             %2, %2, %1
+    vpmaxuw          %2, %2, %5
+    vpblendw         %5, %3, %4, 10101010b
+    vpslld           %4, %4, 16
+    vpsrld           %3, %3, 16
+    vpor             %4, %4, %3
+    vpmaxuw          %3, %5, %4
+    vpaddw           %1, %2, %3
+%endmacro
+
+; out=%1 pSrcA=%2 iStrideA=%3 3*iStrideA=%4 pSrcB=%5 iStrideB=%6 3*iStrideB=%7 HSumSubDB1_256=%8 ymm_clobber=%9,%10,%11,%12
+%macro AVX2_GetSatd16x4 12
+    AVX2_LoadDiffSatd16x1  %1, %2 + 0 * %3, %5 + 0 * %6, %8, %12
+    AVX2_LoadDiffSatd16x1  %9, %2 + 1 * %3, %5 + 1 * %6, %8, %12
+    AVX2_LoadDiffSatd16x1 %10, %2 + 2 * %3, %5 + 2 * %6, %8, %12
+    AVX2_LoadDiffSatd16x1 %11, %2 + 1 * %4, %5 + 1 * %7, %8, %12
+    AVX2_SatdFour4x4 %1, %9, %10, %11, %12
+%endmacro
+
+; out=%1 pSrcA=%2 iStrideA=%3 3*iStrideA=%4 pSrcB=%5 iStrideB=%6 3*iStrideB=%7 HSumSubDB1_128x2=%8 ymm_clobber=%9,%10,%11,%12,%13
+%macro AVX2_GetSatd8x8 13
+    AVX2_LoadDiffSatd8x2  %1, %2 + 0 * %3, %2 + 4 * %3, %5 + 0 * %6, %5 + 4 * %6, %8, %12, %13
+    AVX2_LoadDiffSatd8x2 %10, %2 + 2 * %3, %2 + 2 * %4, %5 + 2 * %6, %5 + 2 * %7, %8, %12, %13
+    add              %2, %3
+    add              %5, %6
+    AVX2_LoadDiffSatd8x2  %9, %2 + 0 * %3, %2 + 4 * %3, %5 + 0 * %6, %5 + 4 * %6, %8, %12, %13
+    AVX2_LoadDiffSatd8x2 %11, %2 + 2 * %3, %2 + 2 * %4, %5 + 2 * %6, %5 + 2 * %7, %8, %12, %13
+    AVX2_SatdFour4x4 %1, %9, %10, %11, %12
+%endmacro
+
+; d_out=%1 mm_in=%2 mm_clobber=%3
+%macro AVX2_SumWHorizon 3
+    WELS_DW1_VEX     y%3
+    vpmaddwd         y%2, y%2, y%3
+    vextracti128     x%3, y%2, 1
+    vpaddd           x%2, x%2, x%3
+    vpunpckhqdq      x%3, x%2, x%2
+    vpaddd           x%2, x%2, x%3
+    vpsrldq          x%3, x%2, 4
+    vpaddd           x%2, x%2, x%3
+    vmovd            %1, x%2
+%endmacro
+
+;***********************************************************************
+;
+;int32_t WelsSampleSatd8x16_avx2( uint8_t *, int32_t, uint8_t *, int32_t, );
+;
+;***********************************************************************
+
+WELS_EXTERN WelsSampleSatd8x16_avx2
+    %assign push_num 0
+%ifdef X86_32
+    push r4
+    %assign push_num 1
+%endif
+    mov r4, 2                      ; loop cnt
+    jmp WelsSampleSatd8x8N_avx2
+
+;***********************************************************************
+;
+;int32_t WelsSampleSatd8x8_avx2( uint8_t *, int32_t, uint8_t *, int32_t, );
+;
+;***********************************************************************
+
+WELS_EXTERN WelsSampleSatd8x8_avx2
+    %assign push_num 0
+%ifdef X86_32
+    push           r4
+    %assign push_num 1
+%endif
+    mov            r4, 1           ; loop cnt
+                                   ; fall through
+WelsSampleSatd8x8N_avx2:
+%ifdef X86_32
+    push           r5
+    push           r6
+    %assign push_num push_num+2
+%endif
+    LOAD_4_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+
+    vbroadcasti128 ymm7, [HSumSubDB1]
+    lea            r5, [3 * r1]
+    lea            r6, [3 * r3]
+    vpxor          ymm6, ymm6, ymm6
+.loop:
+    AVX2_GetSatd8x8 ymm0, r0, r1, r5, r2, r3, r6, ymm7, ymm1, ymm2, ymm3, ymm4, ymm5
+    vpaddw         ymm6, ymm6, ymm0
+    sub            r4, 1
+    jbe            .loop_end
+    add            r0, r5
+    add            r2, r6
+    lea            r0, [r0 + 4 * r1]
+    lea            r2, [r2 + 4 * r3]
+    jmp            .loop
+.loop_end:
+    AVX2_SumWHorizon retrd, mm6, mm5
+    vzeroupper
+    POP_XMM
+    LOAD_4_PARA_POP
+%ifdef X86_32
+    pop            r6
+    pop            r5
+    pop            r4
+%endif
+    ret
+
+;***********************************************************************
+;
+;int32_t WelsSampleSatd16x16_avx2( uint8_t *, int32_t, uint8_t *, int32_t, );
+;
+;***********************************************************************
+
+WELS_EXTERN WelsSampleSatd16x16_avx2
+    %assign push_num 0
+%ifdef X86_32
+    push r4
+    %assign push_num 1
+%endif
+    mov r4, 4                      ; loop cnt
+    jmp WelsSampleSatd16x4N_avx2
+
+;***********************************************************************
+;
+;int32_t WelsSampleSatd16x8_avx2( uint8_t *, int32_t, uint8_t *, int32_t, );
+;
+;***********************************************************************
+
+WELS_EXTERN WelsSampleSatd16x8_avx2
+    %assign push_num 0
+%ifdef X86_32
+    push r4
+    %assign push_num 1
+%endif
+    mov r4, 2                      ; loop cnt
+                                   ; fall through
+WelsSampleSatd16x4N_avx2:
+%ifdef X86_32
+    push r5
+    push r6
+    %assign push_num push_num+2
+%endif
+    LOAD_4_PARA
+    PUSH_XMM 7
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+
+    vpbroadcastq xmm0, [HSumSubDB1]
+    vpbroadcastq ymm6, [HSumSubDB1 + 8]
+    vpblendd     ymm6, ymm0, ymm6, 11110000b
+    lea          r5, [3 * r1]
+    lea          r6, [3 * r3]
+    vpxor        ymm5, ymm5, ymm5
+.loop:
+    AVX2_GetSatd16x4 ymm0, r0, r1, r5, r2, r3, r6, ymm6, ymm1, ymm2, ymm3, ymm4
+    vpaddw       ymm5, ymm5, ymm0
+    lea          r0, [r0 + 4 * r1]
+    lea          r2, [r2 + 4 * r3]
+    sub          r4, 1
+    ja           .loop
+    AVX2_SumWHorizon retrd, mm5, mm0
+    vzeroupper
+    POP_XMM
+    LOAD_4_PARA_POP
+%ifdef X86_32
+    pop r6
+    pop r5
+    pop r4
+%endif
+    ret
+
+;***********************************************************************
+;
+;Pixel_satd_wxh_avx2 END
+;
+;***********************************************************************
+
+;***********************************************************************
+;
 ;Pixel_sad_wxh_sse2 BEGIN
 ;
 ;***********************************************************************
