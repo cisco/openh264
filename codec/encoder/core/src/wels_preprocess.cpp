@@ -252,10 +252,6 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
     if (bNeededMbAq) {
       SPicture* pCurPic = m_pLastSpatialPicture[kiDidx][1];
       SPicture* pRefPic = m_pLastSpatialPicture[kiDidx][0];
-      //printf("pCurPicDid = %d,pCurPicTid = %d,pRefPicDid = %d,pRefPicTid = %d,kiDidx = %d,pCurPic = %x,pRefPic = %x,bbCurPic = %x\n",
-      //         pCurPic->uiSpatialId,pCurPic->uiTemporalId,pCurPic->uiSpatialId,pCurPic->uiTemporalId,kiDidx,pCurPic,pRefPic,m_pSpatialPic[kiDidx][iCurTemporalIdx]);
-
-
       AdaptiveQuantCalculation (pCtx->pVaa, pCurPic, pRefPic);
     }
   }
@@ -295,46 +291,9 @@ int32_t CWelsPreProcess::UpdateSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCodin
 
 
 /*
-*   SingleLayerPreprocess: down sampling if applicable
-*  @return: exact number of spatial layers need to encoder indeed
-*/
-bool CWelsPreProcess::BuildSpatialLayer (sWelsEncCtx* pCtx, const SSourcePicture* kpSrc, int32_t iDependencyId) {
-  SWelsSvcCodingParam* pSvcParam    = pCtx->pSvcParam;
-  int32_t iMaxDid = pSvcParam->iSpatialLayerNum - 1;
-  SSpatialPicIndex* pSpatialIndexMap = &pCtx->sSpatialIndexMap[0];
-  SSpatialLayerConfig* pDlayerParam = &pSvcParam->sSpatialLayers[iDependencyId];
-  SSpatialLayerInternal* pDlayerParamInternal = &pSvcParam->sDependencyLayers[iDependencyId];
-  int32_t iTemporalId = pDlayerParamInternal->uiCodingIdx2TemporalId[pDlayerParamInternal->iCodingIndex &
-                        (pSvcParam->uiGopSize - 1)];
-
-
-  if (iTemporalId != INVALID_TEMPORAL_ID) {
-    if (iDependencyId == iMaxDid) {
-      return true;
-    } else {
-      int32_t iPicturePos               = m_uiSpatialLayersInTemporal[iDependencyId] - 1;
-      Scaled_Picture*  pScaledPicture = &m_sScaledPicture;
-
-      int32_t iTargetWidth              = pDlayerParam->iVideoWidth;
-      int32_t iTargetHeight             = pDlayerParam->iVideoHeight;
-
-      SPicture* pSrcPic                 = (pSpatialIndexMap + iMaxDid)->pSrc;; // large
-      SPicture* pDstPic                 = m_pSpatialPic[iDependencyId][iPicturePos]; // small
-
-      int32_t iSrcWidth                 = pSrcPic->iWidthInPixel;
-      int32_t iSrcHeight                = pSrcPic->iHeightInPixel;
-      int32_t iShrinkWidth = pScaledPicture->iScaledWidth[iDependencyId];
-      int32_t iShrinkHeight = pScaledPicture->iScaledHeight[iDependencyId];
-      DownsamplePadding (pSrcPic, pDstPic, iSrcWidth, iSrcHeight, iShrinkWidth, iShrinkHeight, iTargetWidth, iTargetHeight,
-                         true);
-      WelsUpdateSpatialIdxMap (pCtx, iDependencyId, pDstPic, iDependencyId);
-      m_pLastSpatialPicture[iDependencyId][1] = m_pSpatialPic[iDependencyId][iPicturePos];
-      return true;
-    }
-  }
-  return false;
-}
-
+ *   SingleLayerPreprocess: down sampling if applicable
+ *  @return: exact number of spatial layers need to encoder indeed
+ */
 int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSourcePicture* kpSrc,
     Scaled_Picture* pScaledPicture) {
   SWelsSvcCodingParam* pSvcParam    = pCtx->pSvcParam;
@@ -351,7 +310,8 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
   int32_t iTargetWidth              = 0;
   int32_t iTargetHeight             = 0;
   int32_t iTemporalId = 0;
-
+  SSpatialPicIndex* pSpatialIndexMap = &pCtx->sSpatialIndexMap[0];
+  int32_t iClosestDid =  iDependencyId;
   pDlayerParamInternal = &pSvcParam->sDependencyLayers[iDependencyId];
   pDlayerParam = &pSvcParam->sSpatialLayers[iDependencyId];
   iTargetWidth   = pDlayerParam->iVideoWidth;
@@ -360,13 +320,12 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
                    (pSvcParam->uiGopSize - 1)];
   iSrcWidth   = pSvcParam->SUsedPicRect.iWidth;
   iSrcHeight  = pSvcParam->SUsedPicRect.iHeight;
-
   if (pSvcParam->uiIntraPeriod)
     pCtx->pVaa->bIdrPeriodFlag = (1 + pDlayerParamInternal->iFrameIndex >= (int32_t)pSvcParam->uiIntraPeriod) ? true :
-                                 false;
-
+        false;
   pSrcPic = pScaledPicture->pScaledInputPicture ? pScaledPicture->pScaledInputPicture :
             m_pSpatialPic[iDependencyId][iPicturePos];
+
   WelsMoveMemoryWrapper (pSvcParam, pSrcPic, kpSrc, iSrcWidth, iSrcHeight);
 
   if (pSvcParam->bEnableDenoise)
@@ -384,6 +343,7 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
   }
   DownsamplePadding (pSrcPic, pDstPic, iSrcWidth, iSrcHeight, iShrinkWidth, iShrinkHeight, iTargetWidth, iTargetHeight,
                      false);
+
   if (pSvcParam->bEnableSceneChangeDetect && !pCtx->pVaa->bIdrPeriodFlag) {
     if (pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
       pCtx->pVaa->eSceneChangeIdc = (pDlayerParamInternal->bEncCurFrmAsIdrFlag ? LARGE_CHANGED_SCENE :
@@ -401,29 +361,54 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
       }
     }
   }
-
-  WelsUpdateSpatialIdxMap (pCtx, iDependencyId, pDstPic, iDependencyId);
-  m_pLastSpatialPicture[iDependencyId][1] = m_pSpatialPic[iDependencyId][iPicturePos];
-
   if (iTemporalId != INVALID_TEMPORAL_ID) {
     ++ iSpatialNum;
   }
+
+  WelsUpdateSpatialIdxMap (pCtx, iDependencyId, pDstPic, iDependencyId);
+  m_pLastSpatialPicture[iDependencyId][1] = m_pSpatialPic[iDependencyId][iPicturePos];
   -- iDependencyId;
+
+  // generate other spacial layer
+  // pSrc is
+  //    -- padded input pic, if downsample should be applied to generate highest layer, [if] block above
+  //    -- highest layer, if no downsampling, [else] block above
   if (pSvcParam->iSpatialLayerNum > 1) {
     while (iDependencyId >= 0) {
       pDlayerParamInternal = &pSvcParam->sDependencyLayers[iDependencyId];
+      pDlayerParam = &pSvcParam->sSpatialLayers[iDependencyId];
+      SPicture* pSrcPic  = (pSpatialIndexMap + iClosestDid)->pSrc;; // large
+      //SPicture* pSrcPic  = (pSpatialIndexMap + (pSvcParam->iSpatialLayerNum - 1))->pSrc;; // large
+      iTargetWidth  = pDlayerParam->iVideoWidth;
+      iTargetHeight = pDlayerParam->iVideoHeight;
       iTemporalId = pDlayerParamInternal->uiCodingIdx2TemporalId[pDlayerParamInternal->iCodingIndex &
                     (pSvcParam->uiGopSize - 1)];
+      iPicturePos = m_uiSpatialLayersInTemporal[iDependencyId] - 1;
 
-      if ((iTemporalId != INVALID_TEMPORAL_ID)) {
+      // down sampling performed
+      int32_t iSrcWidth                 = pScaledPicture->iScaledWidth[iClosestDid];
+      int32_t iSrcHeight                = pScaledPicture->iScaledHeight[iClosestDid];
+      pDstPic = m_pSpatialPic[iDependencyId][iPicturePos]; // small
+      iShrinkWidth = pScaledPicture->iScaledWidth[iDependencyId];
+      iShrinkHeight = pScaledPicture->iScaledHeight[iDependencyId];
+      DownsamplePadding (pSrcPic, pDstPic, iSrcWidth, iSrcHeight, iShrinkWidth, iShrinkHeight, iTargetWidth, iTargetHeight,
+                         true);
+
+      WelsUpdateSpatialIdxMap (pCtx, iDependencyId, pDstPic, iDependencyId);
+      if ((iTemporalId != INVALID_TEMPORAL_ID))
         ++ iSpatialNum;
-      }
+      m_pLastSpatialPicture[iDependencyId][1] = m_pSpatialPic[iDependencyId][iPicturePos];
+
+      iClosestDid = iDependencyId;
       -- iDependencyId;
+
     }
   }
   return iSpatialNum;
 
 }
+
+
 /*!
  * \brief   Whether input picture need be scaled?
  */
@@ -437,7 +422,6 @@ bool JudgeNeedOfScaling (SWelsSvcCodingParam* pParam, Scaled_Picture* pScaledPic
   int32_t iSpatialIdx = pParam->iSpatialLayerNum - 1;
 
   if (kiDstPicWidth >= kiInputPicWidth && kiDstPicHeight >= kiInputPicHeight) {
-    iSpatialIdx --;  // highest D layer do not need downsampling
     bNeedDownsampling = false;
   }
 

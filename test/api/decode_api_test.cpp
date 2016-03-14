@@ -759,7 +759,7 @@ const uint32_t kiHeight = 96; //DO NOT CHANGE!
 const uint32_t kiFrameRate = 12; //DO NOT CHANGE!
 const uint32_t kiFrameNum = 100; //DO NOT CHANGE!
 const char* pHashStr[] = { //DO NOT CHANGE!
-  "585663f78cadb70d9c9f179b9b53b90ffddf3178",
+  "9c4e6146b29bac5d5d4be3c5bbab9c072dcb3f3f",
   "f350001c333902029800bd291fbed915a4bdf19a",
   "eb9d853b7daec03052c4850027ac94adc84c3a7e"
 };
