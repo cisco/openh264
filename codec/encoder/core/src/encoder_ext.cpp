@@ -3743,7 +3743,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   EWelsNalUnitType eNalType     = NAL_UNIT_UNSPEC_0;
   EWelsNalRefIdc eNalRefIdc     = NRI_PRI_LOWEST;
   int8_t iCurDid                = 0;
-  int8_t iCurTid                = 0;
+  int32_t iCurTid                = 0;
   bool bAvcBased                = false;
   SLogContext* pLogCtx = & (pCtx->sLogCtx);
   bool bFinishedWriteHeader = false;
@@ -3792,19 +3792,18 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   pCtx->pCurDqLayer             = pCtx->ppDqLayerList[pSpatialIndexMap->iDid];
   pCtx->pCurDqLayer->pRefLayer  = NULL;
 
-  while (iSpatialIdx < iSpatialNum) {
-    bool bEncoding = pCtx->pVpp->BuildSpatialLayer (pCtx, pSrcPic, iSpatialIdx);
-    if (!bEncoding) {
-      ++iSpatialIdx;
-      continue;
-    }
+  while (iSpatialIdx < pSvcParam->iSpatialLayerNum) {
     const int32_t iDidIdx  = (pSpatialIndexMap + iSpatialIdx)->iDid;
     SSpatialLayerConfig* pParam = &pSvcParam->sSpatialLayers[iDidIdx];
     SSpatialLayerInternal* pParamInternal = &pSvcParam->sDependencyLayers[iDidIdx];
     int32_t  iDecompositionStages = pSvcParam->sDependencyLayers[iDidIdx].iDecompositionStages;
     pCtx->pCurDqLayer           = pCtx->ppDqLayerList[iDidIdx];
     pCtx->uiDependencyId        = iCurDid = (int8_t)iDidIdx;
-
+    //skip this spatial layer
+    if(GetTemporalLevel (pParamInternal, pParamInternal->iCodingIndex,pSvcParam->uiGopSize) == INVALID_TEMPORAL_ID){
+      ++iSpatialIdx;
+      continue;
+    }
     eFrameType = DecideFrameType (pCtx, iSpatialNum, iDidIdx);
     if (eFrameType == videoFrameTypeSkip) {
       eFrameType = videoFrameTypeSkip;
@@ -3847,11 +3846,10 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       }
     }
     pCtx->iContinualSkipFrames = 0;
-
-    InitFrameCoding (pCtx, eFrameType, iDidIdx);
-    iCurTid = GetTemporalLevel (&pSvcParam->sDependencyLayers[iSpatialIdx], pParamInternal->iCodingIndex,
-                                pSvcParam->uiGopSize);
+    iCurTid = GetTemporalLevel (&pSvcParam->sDependencyLayers[iDidIdx], pParamInternal->iCodingIndex,
+                                  pSvcParam->uiGopSize);
     pCtx->uiTemporalId = iCurTid;
+    InitFrameCoding (pCtx, eFrameType, iDidIdx);
 
     if (eFrameType == videoFrameTypeIDR) {
       // write parameter sets bitstream or SEI/SSEI (if any) here
@@ -4433,9 +4431,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
            pFbi->iSubSeqId, iFrameSize);
   for (int32_t i = 0; i < iLayerNum; i++)
     WelsLog (pLogCtx, WELS_LOG_DEBUG,
-             "WelsEncoderEncodeExt() OutputInfo iLayerId = %d,iNalType = %d,iNalCount = %d, first Nal Length=%d,uiSpatialId = %d", i,
+             "WelsEncoderEncodeExt() OutputInfo iLayerId = %d,iNalType = %d,iNalCount = %d, first Nal Length=%d,uiSpatialId = %d,uiTemporalId = %d", i,
              pFbi->sLayerInfo[i].uiLayerType, pFbi->sLayerInfo[i].iNalCount, pFbi->sLayerInfo[i].pNalLengthInByte[0],
-             pFbi->sLayerInfo[i].uiSpatialId);
+             pFbi->sLayerInfo[i].uiSpatialId,pFbi->sLayerInfo[i].uiTemporalId);
   WelsEmms();
 
   pLayerBsInfo->eFrameType = eFrameType;
