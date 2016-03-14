@@ -347,6 +347,119 @@ struct EncodeDecodeParamBase {
   int iTarBitrate;
 };
 
+//#define DEBUG_FILE_SAVE_INCREASING_ID
+TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_INCREASING_ID) {
+
+  int iWidth       = GetRandWidth();
+  int iHeight      = GetRandHeight();
+  float fFrameRate = rand() + 0.5f;
+  int iEncFrameNum = 0;
+  int iSpatialLayerNum = 1;
+  int iSliceNum        = 1;
+
+  // prepare params
+  SEncParamExt   sParam1;
+  SEncParamExt   sParam2;
+  SEncParamExt   sParam3;
+  encoder_->GetDefaultParams (&sParam1);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam1);
+  sParam1.bSimulcastAVC = 1;
+  sParam1.eSpsPpsIdStrategy = INCREASING_ID;
+  //prepare param2
+  memcpy (&sParam2, &sParam1, sizeof (SEncParamExt));
+  while (GET_MB_WIDTH (sParam2.iPicWidth) == GET_MB_WIDTH (sParam1.iPicWidth)) {
+    sParam2.iPicWidth = GetRandWidth();
+  }
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, sParam2.iPicWidth, sParam2.iPicHeight, fFrameRate, &sParam2);
+  sParam2.bSimulcastAVC = 1;
+  sParam2.eSpsPpsIdStrategy = INCREASING_ID;
+  //prepare param3
+  memcpy (&sParam3, &sParam1, sizeof (SEncParamExt));
+  while (GET_MB_WIDTH (sParam3.iPicHeight) == GET_MB_WIDTH (sParam1.iPicHeight)) {
+    sParam3.iPicHeight = GetRandHeight();
+  }
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, sParam3.iPicWidth, sParam3.iPicHeight, fFrameRate, &sParam3);
+  sParam3.bSimulcastAVC = 1;
+  sParam3.eSpsPpsIdStrategy = INCREASING_ID;
+
+  //prepare output if needed
+  FILE* fEnc =  NULL;
+#ifdef DEBUG_FILE_SAVE_INCREASING_ID
+  fEnc = fopen ("enc_i.264", "wb");
+#endif
+
+  // Test part#1
+  // step#1: pParam1
+  //int TraceLevel = WELS_LOG_INFO;
+  //encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
+  int rv = encoder_->InitializeExt (&sParam1);
+  ASSERT_TRUE (rv == cmResultSuccess) << "InitializeExt: rv = " << rv << " at " << sParam1.iPicWidth << "x" <<
+                                      sParam1.iPicHeight;
+  EncDecOneFrame (sParam1.iPicWidth, sParam1.iPicHeight, iEncFrameNum++, fEnc);
+
+  // new IDR
+  rv = encoder_->ForceIntraFrame (true);
+  ASSERT_TRUE (rv == cmResultSuccess) << "rv = " << rv;
+  EncDecOneFrame (sParam1.iPicWidth, sParam1.iPicHeight, iEncFrameNum++, fEnc);
+
+  // step#2: pParam2
+  rv = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam2);
+  ASSERT_TRUE (rv == cmResultSuccess) << "SetOption: rv = " << rv << " at " << sParam2.iPicWidth << "x" <<
+                                      sParam2.iPicHeight;
+  EncDecOneFrame (sParam2.iPicWidth, sParam2.iPicHeight, iEncFrameNum++, fEnc);
+
+  // new IDR
+  rv = encoder_->ForceIntraFrame (true);
+  ASSERT_TRUE (rv == cmResultSuccess) << "rv = " << rv;
+  EncDecOneFrame (sParam2.iPicWidth, sParam2.iPicHeight, iEncFrameNum++, fEnc);
+
+  // step#3: back to pParam1
+  rv = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam1);
+  ASSERT_TRUE (rv == cmResultSuccess) << "SetOption: rv = " << rv << " at " << sParam1.iPicWidth << "x" <<
+                                      sParam1.iPicHeight;
+  EncDecOneFrame (sParam1.iPicWidth, sParam1.iPicHeight, iEncFrameNum++, fEnc);
+
+  // step#4: back to pParam2
+  rv = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam2);
+  ASSERT_TRUE (rv == cmResultSuccess) << "rv = " << rv << sParam2.iPicWidth << sParam2.iPicHeight;
+  EncDecOneFrame (sParam2.iPicWidth, sParam2.iPicHeight, iEncFrameNum++, fEnc);
+
+#ifdef DEBUG_FILE_SAVE_INCREASING_ID
+  fclose (fEnc);
+#endif
+  rv = encoder_->Uninitialize();
+  ASSERT_TRUE (rv == cmResultSuccess) << "rv = " << rv;
+
+  // Test part#2
+  // step#1: pParam1
+  rv = encoder_->InitializeExt (&sParam1);
+  ASSERT_TRUE (rv == cmResultSuccess) << "InitializeExt Failed: rv = " << rv;
+  rv = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam2);
+  ASSERT_TRUE (rv == cmResultSuccess) << "SetOption Failed sParam2: rv = " << rv;
+  rv = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam3);
+  ASSERT_TRUE (rv == cmResultSuccess) << "SetOption Failed sParam3: rv = " << rv;
+
+#ifdef DEBUG_FILE_SAVE_INCREASING_ID
+  fEnc = fopen ("enc3.264", "wb");
+#endif
+  iEncFrameNum = 0;
+  EncDecOneFrame (sParam3.iPicWidth, sParam3.iPicHeight, iEncFrameNum++, fEnc);
+
+  rv = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam2);
+  ASSERT_TRUE (rv == cmResultSuccess) << "SetOption Failed sParam2: rv = " << rv;
+  EncDecOneFrame (sParam2.iPicWidth, sParam2.iPicHeight, iEncFrameNum++, fEnc);
+
+  rv = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam1);
+  ASSERT_TRUE (rv == cmResultSuccess) << "SetOption Failed sParam2: rv = " << rv;
+  EncDecOneFrame (sParam1.iPicWidth, sParam1.iPicHeight, iEncFrameNum++, fEnc);
+
+#ifdef DEBUG_FILE_SAVE_INCREASING_ID
+  fclose (fEnc);
+#endif
+  rv = encoder_->Uninitialize();
+  ASSERT_TRUE (rv == cmResultSuccess) << "rv = " << rv;
+}
+
 //#define DEBUG_FILE_SAVE2
 TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING1) {
 
