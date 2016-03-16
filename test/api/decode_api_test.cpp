@@ -766,6 +766,13 @@ const char* pHashStr[] = { //DO NOT CHANGE!
 
 class DecodeParseAPI : public ::testing::TestWithParam<EncodeDecodeFileParamBase>, public EncodeDecodeTestBase {
  public:
+  DecodeParseAPI() {
+    memset (&BsInfo_, 0, sizeof (SParserBsInfo));
+    fYuv_ = NULL;
+    iWidth_ = 0;
+    iHeight_ = 0;
+    memset (&ctx_, 0, sizeof (SHA1Context));
+  }
   void SetUp() {
     SHA1Reset (&ctx_);
     EncodeDecodeTestBase::SetUp();
@@ -789,7 +796,9 @@ class DecodeParseAPI : public ::testing::TestWithParam<EncodeDecodeFileParamBase
   }
   void TearDown() {
     EncodeDecodeTestBase::TearDown();
-    fclose (fYuv_);
+    if (fYuv_ != NULL) {
+      fclose (fYuv_);
+    }
   }
 
   void prepareEncDecParam (const EncodeDecodeFileParamBase p) {

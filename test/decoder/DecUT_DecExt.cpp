@@ -3,6 +3,7 @@
 #include "codec_def.h"
 #include "codec_app_def.h"
 #include "codec_api.h"
+#include "error_code.h"
 #include "wels_common_basis.h"
 #include "memory_align.h"
 #include "ls_defines.h"
@@ -25,9 +26,9 @@ class DecoderInterfaceTest : public ::testing::Test {
     }
   }
   //Init members
-  void Init();
+  int32_t Init();
   //Init valid members
-  void ValidInit();
+  int32_t ValidInit();
   //Uninit members
   void Uninit();
   //Mock input data for test
@@ -77,7 +78,7 @@ class DecoderInterfaceTest : public ::testing::Test {
 };
 
 //Init members
-void DecoderInterfaceTest::Init() {
+int32_t DecoderInterfaceTest::Init() {
   memset (&m_sBufferInfo, 0, sizeof (SBufferInfo));
   memset (&m_sParserBsInfo, 0, sizeof (SParserBsInfo));
   memset (&m_sDecParam, 0, sizeof (SDecodingParam));
@@ -93,10 +94,11 @@ void DecoderInterfaceTest::Init() {
   m_szBuffer[3] = 1;
   m_iBufLength = 4;
   CM_RETURN eRet = (CM_RETURN) m_pDec->Initialize (&m_sDecParam);
-  ASSERT_EQ (eRet, cmResultSuccess);
+  EXPECT_EQ (eRet, cmResultSuccess);
+  return (int32_t)eRet;
 }
 
-void DecoderInterfaceTest::ValidInit() {
+int32_t DecoderInterfaceTest::ValidInit() {
   memset (&m_sBufferInfo, 0, sizeof (SBufferInfo));
   memset (&m_sDecParam, 0, sizeof (SDecodingParam));
   m_sDecParam.pFileNameRestructed = NULL;
@@ -111,7 +113,8 @@ void DecoderInterfaceTest::ValidInit() {
   m_szBuffer[3] = 1;
   m_iBufLength = 4;
   CM_RETURN eRet = (CM_RETURN) m_pDec->Initialize (&m_sDecParam);
-  ASSERT_EQ (eRet, cmResultSuccess);
+  EXPECT_EQ (eRet, cmResultSuccess);
+  return (int32_t)eRet;
 }
 
 void DecoderInterfaceTest::Uninit() {
@@ -220,6 +223,7 @@ void DecoderInterfaceTest::MockPacketType (const EWelsNalUnitType eNalUnitType, 
 void DecoderInterfaceTest::TestInitUninit() {
   int iOutput;
   CM_RETURN eRet;
+  int32_t iRet = ERR_NONE;
   //No initialize, no GetOption can be done
   m_pDec->Uninitialize();
   for (int i = 0; i <= (int) DECODER_OPTION_TRACE_CALLBACK_CONTEXT; ++i) {
@@ -227,9 +231,13 @@ void DecoderInterfaceTest::TestInitUninit() {
     EXPECT_EQ (eRet, cmInitExpected);
   }
   //Initialize first, can get input color format
-  Init();
+  iRet = Init();
+  ASSERT_EQ (iRet, ERR_NONE);
+
   m_sDecParam.bParseOnly = false;
-  m_pDec->Initialize (&m_sDecParam);
+  eRet = (CM_RETURN)m_pDec->Initialize (&m_sDecParam);
+  ASSERT_EQ (eRet, cmResultSuccess);
+
   eRet = (CM_RETURN) m_pDec->GetOption (DECODER_OPTION_END_OF_STREAM, &iOutput);
   EXPECT_EQ (eRet, cmResultSuccess);
   EXPECT_EQ (iOutput, 0);
@@ -329,8 +337,10 @@ void DecoderInterfaceTest::TestParseOnlyAPI() {
 void DecoderInterfaceTest::TestEndOfStream() {
   int iTmp, iOut;
   CM_RETURN eRet;
+  int32_t iRet = ERR_NONE;
 
-  ValidInit();
+  iRet = ValidInit();
+  ASSERT_EQ (iRet, ERR_NONE);
 
   //invalid input
   eRet = (CM_RETURN) m_pDec->SetOption (DECODER_OPTION_END_OF_STREAM, NULL);
@@ -391,8 +401,10 @@ void DecoderInterfaceTest::TestEndOfStream() {
 void DecoderInterfaceTest::TestVclNal() {
   int iTmp, iOut;
   CM_RETURN eRet;
+  int32_t iRet = ERR_NONE;
 
-  ValidInit();
+  iRet = ValidInit();
+  ASSERT_EQ (iRet, ERR_NONE);
 
   //Test SetOption
   //VclNal never supports SetOption
@@ -453,8 +465,10 @@ void DecoderInterfaceTest::TestLtrMarkedFrameNum() {
 void DecoderInterfaceTest::TestErrorConIdc() {
   int iTmp, iOut;
   CM_RETURN eRet;
+  int32_t iRet = ERR_NONE;
 
-  Init();
+  iRet = Init();
+  ASSERT_EQ (iRet, ERR_NONE);
 
   //Test GetOption
   //invalid input
@@ -498,10 +512,12 @@ void DecoderInterfaceTest::TestTraceCallbackContext() {
 //DECODER_OPTION_GET_STATISTICS
 void DecoderInterfaceTest::TestGetDecStatistics() {
   CM_RETURN eRet;
+  int32_t iRet;
   SDecoderStatistics sDecStatic;
   int32_t iError = 0;
 
-  ValidInit();
+  iRet = ValidInit();
+  ASSERT_EQ (iRet, ERR_NONE);
   //GetOption before decoding
   m_pDec->GetOption (DECODER_OPTION_GET_STATISTICS, &sDecStatic);
   EXPECT_EQ (0u, sDecStatic.uiDecodedFrameCount);
@@ -528,7 +544,8 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   Uninit();
 
   //Decoder error bs when the first IDR lost
-  ValidInit();
+  iRet = ValidInit();
+  ASSERT_EQ (iRet, ERR_NONE);
   iError = 2;
   m_pDec->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iError);
   DecoderBs ("res/BA_MW_D_IDR_LOST.264");
@@ -546,7 +563,9 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   Uninit();
 
   //ecoder error bs when the first P lost
-  ValidInit();
+  iRet = ValidInit();
+  ASSERT_EQ (iRet, ERR_NONE);
+
   iError = 2;
   m_pDec->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iError);
 
@@ -567,7 +586,9 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   //EC enable
 
   //EC Off UT just correc bitstream
-  ValidInit();
+  iRet = ValidInit();
+  ASSERT_EQ (iRet, ERR_NONE);
+
   iError = 0;
   m_pDec->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iError);
   DecoderBs ("res/test_vd_1d.264");
