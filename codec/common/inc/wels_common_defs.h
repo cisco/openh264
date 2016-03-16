@@ -97,12 +97,12 @@ enum EWelsNalUnitType {
   NAL_UNIT_SPS_EXT              = 13,
   NAL_UNIT_PREFIX               = 14,
   NAL_UNIT_SUBSET_SPS           = 15,
-  NAL_UNIT_RESV_16              = 16,
+  NAL_UNIT_DEPTH_PARAM          = 16, // NAL_UNIT_RESV_16
   NAL_UNIT_RESV_17              = 17,
   NAL_UNIT_RESV_18              = 18,
   NAL_UNIT_AUX_CODED_SLICE      = 19,
   NAL_UNIT_CODED_SLICE_EXT      = 20,
-  NAL_UNIT_RESV_21              = 21,
+  NAL_UNIT_MVC_SLICE_EXT        = 21, // NAL_UNIT_RESV_21
   NAL_UNIT_RESV_22              = 22,
   NAL_UNIT_RESV_23              = 23,
   NAL_UNIT_UNSPEC_24            = 24,
