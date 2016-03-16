@@ -992,7 +992,7 @@ void InitPredFunc (PWelsDecoderContext pCtx, uint32_t uiCpuFlag) {
   }
   if (uiCpuFlag & WELS_CPU_SSE2) {
     pCtx->pIdctResAddPredFunc     = IdctResAddPred_sse2;
-    pCtx->pIdctFourResAddPredFunc = IdctFourResAddPred_sse2;
+    pCtx->pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_sse2>;
 
     pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_sse2;
     pCtx->pGetI16x16LumaPredFunc[I16_PRED_P]  = WelsDecoderI16x16LumaPredPlane_sse2;

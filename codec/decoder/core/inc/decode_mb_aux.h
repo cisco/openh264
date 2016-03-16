@@ -49,7 +49,6 @@ extern "C" {
 void IdctResAddPred_mmx (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
 void IdctResAddPred_sse2 (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
 void IdctResAddPred_avx2 (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
-void IdctFourResAddPred_sse2 (uint8_t* pPred, int32_t iStride, int16_t* pRs, const int8_t* pNzc);
 void IdctFourResAddPred_avx2 (uint8_t* pPred, int32_t iStride, int16_t* pRs, const int8_t* pNzc);
 #endif//X86_ASM
 

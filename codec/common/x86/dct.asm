@@ -510,20 +510,11 @@ WELS_EXTERN WelsDctFourT4_sse2
     ret
 
 ;***********************************************************************
-; void IdctFourResAddPred_sse2(uint8_t* pPred, int32_t iStride, const int16_t* pDct, const int8_t* pNzc);
-;***********************************************************************
-WELS_EXTERN IdctFourResAddPred_sse2
-    %assign push_num 0
-    LOAD_3_PARA_TO_5_PARA_IDCT
-    jmp prefixed(WelsIDctFourT4Rec_sse2.begin)
-
-;***********************************************************************
 ; void WelsIDctFourT4Rec_sse2(uint8_t *rec, int32_t stride, uint8_t *pred, int32_t pred_stride, int16_t *rs);
 ;***********************************************************************
 WELS_EXTERN WelsIDctFourT4Rec_sse2
     %assign push_num 0
     LOAD_5_PARA
-.begin:
     PUSH_XMM 8
     SIGN_EXTENSION r1, r1d
     SIGN_EXTENSION r3, r3d
