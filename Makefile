@@ -51,6 +51,7 @@ endif
 # Configurations
 ifeq ($(BUILDTYPE), Release)
 CFLAGS += $(CFLAGS_OPT)
+CFLAGS += -DNDEBUG
 USE_ASM = Yes
 else
 CFLAGS += $(CFLAGS_DEBUG)
