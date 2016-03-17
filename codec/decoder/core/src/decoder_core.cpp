@@ -1246,6 +1246,7 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
     if (pDq == NULL)
       return ERR_INFO_OUT_OF_MEMORY;
 
+    pCtx->pDqLayersList[i] = pDq; //to keep consistence with in UninitialDqLayersContext()
     memset (pDq, 0, sizeof (SDqLayer));
 
     pCtx->sMb.pMbType[i] = (int16_t*)pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int16_t),
@@ -1334,7 +1335,6 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
 
     memset (pCtx->sMb.pSliceIdc[i], 0xff, (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int32_t)));
 
-    pCtx->pDqLayersList[i] = pDq;
     ++ i;
   } while (i < LAYER_NUM_EXCHANGEABLE);
 
