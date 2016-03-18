@@ -1331,10 +1331,20 @@ void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
   int32_t iLumaQp = pWelsSvcRc->iLastCalculatedQScale;
   int32_t iTl                 = pEncCtx->uiTemporalId;
   SRCTemporal* pTOverRc       = &pWelsSvcRc->pTemporalOverRc[iTl];
-  //decide one frame bits allocated
   if (pEncCtx->eSliceType == I_SLICE) {
     if (0 == pWelsSvcRc->iIdrNum) { //iIdrNum == 0 means encoder has been initialed
       RcInitRefreshParameter (pEncCtx);
+    }
+  }
+  if (RcJudgeBitrateFpsUpdate (pEncCtx)) {
+    RcUpdateBitrateFps (pEncCtx);
+  }
+  if (pEncCtx->uiTemporalId == 0) {
+    RcUpdateTemporalZero (pEncCtx);
+  }
+  //decide one frame bits allocated
+  if (pEncCtx->eSliceType == I_SLICE) {
+    if (0 == pWelsSvcRc->iIdrNum) { //iIdrNum == 0 means encoder has been initialed
       RcInitIdrQp (pEncCtx);
       iLumaQp = pWelsSvcRc->iInitialQp;
       pWelsSvcRc->iTargetBits = static_cast<int32_t> (((double) (pDLayerParam->iSpatialBitrate) / (double) (

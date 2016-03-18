@@ -4718,7 +4718,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
       pOldDlpInternal->fInputFrameRate  = pNewDlpInternal->fInputFrameRate;     // input frame rate
       pOldDlpInternal->fOutputFrameRate = pNewDlpInternal->fOutputFrameRate;    // output frame rate
       pOldDlp->iSpatialBitrate          = pNewDlp->iSpatialBitrate;
-
+      pOldDlp->iMaxSpatialBitrate       = pNewDlp->iMaxSpatialBitrate;
       pOldDlp->uiProfileIdc             =
         pNewDlp->uiProfileIdc;                        // value of profile IDC (0 for auto-detection)
       pOldDlp->iDLayerQp                = pNewDlp->iDLayerQp;
