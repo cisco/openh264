@@ -57,7 +57,7 @@ void UpdateMbListNeighborParallel (SDqLayer* pCurDq,
 
 void CalcSliceComplexRatio (SDqLayer* pCurDq);
 
-int32_t NeedDynamicAdjust (void* pConsumeTime, const int32_t kiSliceNum);
+int32_t NeedDynamicAdjust (SSlice** ppSliceInLayer, const int32_t iSliceNum);
 
 void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
                            SDqLayer* pCurDqLayer,
