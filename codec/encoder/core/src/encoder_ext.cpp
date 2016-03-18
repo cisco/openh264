@@ -4627,9 +4627,6 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     /* Update new parameters */
     if (WelsInitEncoderExt (ppCtx, pNewParam, &sLogCtx, pExistingParasetList))
       return 1;
-
-    // reset the scaled spatial picture size
-    (*ppCtx)->pVpp->WelsPreprocessReset (*ppCtx);
     //if WelsInitEncoderExt succeed
     //for LTR
     (*ppCtx)->uiIdrPicId = uiTmpIdrPicId ;//this is for LTR!; //this is for LTR!

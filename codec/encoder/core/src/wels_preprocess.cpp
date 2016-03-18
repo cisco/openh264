@@ -196,6 +196,23 @@ int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePi
     m_iAvaliableRefInSpatialPicList = pSvcParam->iNumRefFrame;
 
     m_bInitDone = true;
+  } else {
+    int32_t iWidth = ((kpSrcPic->iPicWidth >> 1) << 1);
+    int32_t iHeight = ((kpSrcPic->iPicHeight >> 1) << 1);
+    if ((iWidth != pSvcParam->SUsedPicRect.iWidth) || (iHeight != pSvcParam->SUsedPicRect.iHeight)) {
+      pSvcParam->SUsedPicRect.iLeft = 0;
+      pSvcParam->SUsedPicRect.iTop  = 0;
+      pSvcParam->SUsedPicRect.iWidth = iWidth;
+      pSvcParam->SUsedPicRect.iHeight = iHeight;
+      if ((pSvcParam->SUsedPicRect.iWidth < 16) || ((pSvcParam->SUsedPicRect.iHeight < 16))) {
+        WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "Don't support width(%d) or height(%d) which is less than 16 ",
+                 pSvcParam->SUsedPicRect.iWidth, pSvcParam->SUsedPicRect.iHeight);
+        return -1;
+      }
+      if (WelsPreprocessReset (pCtx) != 0)
+        return -1;
+    }
+
   }
 
   if (m_pInterfaceVp == NULL)
@@ -322,7 +339,7 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
   iSrcHeight  = pSvcParam->SUsedPicRect.iHeight;
   if (pSvcParam->uiIntraPeriod)
     pCtx->pVaa->bIdrPeriodFlag = (1 + pDlayerParamInternal->iFrameIndex >= (int32_t)pSvcParam->uiIntraPeriod) ? true :
-        false;
+                                 false;
   pSrcPic = pScaledPicture->pScaledInputPicture ? pScaledPicture->pScaledInputPicture :
             m_pSpatialPic[iDependencyId][iPicturePos];
 
