@@ -21,6 +21,7 @@ COMMON_OBJS += $(COMMON_CPP_SRCS:.cpp=.$(OBJ))
 
 COMMON_ASM_SRCS=\
 	$(COMMON_SRCDIR)/x86/cpuid.asm\
+	$(COMMON_SRCDIR)/x86/dct.asm\
 	$(COMMON_SRCDIR)/x86/deblock.asm\
 	$(COMMON_SRCDIR)/x86/expand_picture.asm\
 	$(COMMON_SRCDIR)/x86/intra_pred_com.asm\
