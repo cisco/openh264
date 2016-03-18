@@ -68,10 +68,8 @@ int32_t AssignMbMapSingleSlice (void* pMbMap, const int32_t kiCountMbNum, const 
  * \return  0 - successful; none 0 - failed
  */
 int32_t AssignMbMapMultipleSlices (SDqLayer* pCurDq,const SSliceArgument* kpSliceArgument) {
-  SSliceCtx* pSliceSeg             = &pCurDq->sSliceEncCtx;
-  SSlice* pSliceInLayer            = pCurDq->sLayerInfo.pSliceInLayer;
-  SSliceHeaderExt* pSliceHeaderExt = NULL;
-  int32_t iSliceIdx  = 0;
+  SSliceCtx* pSliceSeg   = &pCurDq->sSliceEncCtx;
+  int32_t iSliceIdx      = 0;
   if (NULL == pSliceSeg || SM_SINGLE_SLICE == pSliceSeg->uiSliceMode)
     return 1;
 
@@ -82,9 +80,6 @@ int32_t AssignMbMapMultipleSlices (SDqLayer* pCurDq,const SSliceArgument* kpSlic
     iSliceIdx = 0;
     while (iSliceIdx < iSliceNum) {
       const int32_t kiFirstMb                       = iSliceIdx * kiMbWidth;
-      SSliceHeaderExt* pSliceHeaderExt              = &pSliceInLayer[iSliceIdx].sSliceHeaderExt;
-      pSliceInLayer[iSliceIdx].iCountMbNumInSlice   = kiMbWidth;
-      pSliceHeaderExt->sSliceHeader.iFirstMbInSlice = kiFirstMb;
       WelsSetMemMultiplebytes_c(pSliceSeg->pOverallMbMap + kiFirstMb, iSliceIdx,
                                 kiMbWidth, sizeof(uint16_t));
       ++ iSliceIdx;
@@ -102,9 +97,6 @@ int32_t AssignMbMapMultipleSlices (SDqLayer* pCurDq,const SSliceArgument* kpSlic
     do {
       const int32_t kiCurRunLength                  = kpSlicesAssignList[iSliceIdx];
       int32_t iRunIdx                               = 0;
-      pSliceHeaderExt                               = &pSliceInLayer[iSliceIdx].sSliceHeaderExt;
-      pSliceHeaderExt->sSliceHeader.iFirstMbInSlice = iMbIdx;
-      pSliceInLayer[iSliceIdx].iCountMbNumInSlice   = kiCurRunLength;
 
       // due here need check validate mb_assign_map for input pData, can not use memset
       do {
@@ -116,16 +108,7 @@ int32_t AssignMbMapMultipleSlices (SDqLayer* pCurDq,const SSliceArgument* kpSlic
       ++ iSliceIdx;
     } while (iSliceIdx < kiCountSliceNumInFrame && iMbIdx < kiCountNumMbInFrame);
   } else if (SM_SIZELIMITED_SLICE == pSliceSeg->uiSliceMode) {
-    const int32_t kiMaxSliceNum       = pSliceSeg->iMaxSliceNumConstraint;
-    const int32_t kiCountNumMbInFrame = pSliceSeg->iMbNumInFrame;
-
-    iSliceIdx = 0;
-    do {
-      pSliceHeaderExt                                 = &pSliceInLayer[iSliceIdx].sSliceHeaderExt;
-      pSliceHeaderExt->sSliceHeader.iFirstMbInSlice   = 0;
-      pSliceInLayer[iSliceIdx].iCountMbNumInSlice     = kiCountNumMbInFrame;
-      iSliceIdx++;
-    } while (iSliceIdx < kiMaxSliceNum);
+     // do nothing,pSliceSeg->pOverallMbMap will be initial later
   } else { // any else uiSliceMode?
     assert (0);
   }
