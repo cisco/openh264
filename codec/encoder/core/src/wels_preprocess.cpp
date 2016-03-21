@@ -109,9 +109,18 @@ int32_t CWelsPreProcess::WelsPreprocessDestroy() {
   return 0;
 }
 
-int32_t CWelsPreProcess::WelsPreprocessReset (sWelsEncCtx* pCtx) {
+int32_t CWelsPreProcess::WelsPreprocessReset (sWelsEncCtx* pCtx,int32_t iWidth,int32_t iHeight) {
   int32_t iRet = -1;
-
+  SWelsSvcCodingParam* pSvcParam = pCtx->pSvcParam;
+  //init source width and height
+  pSvcParam->SUsedPicRect.iLeft = 0;
+  pSvcParam->SUsedPicRect.iTop  = 0;
+  pSvcParam->SUsedPicRect.iWidth =  iWidth;
+  pSvcParam->SUsedPicRect.iHeight = iHeight;
+  if ((iWidth < 16) || ((iHeight < 16))) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "Don't support width(%d) or height(%d) which is less than 16 ",iWidth, iHeight);
+    return iRet;
+  }
   if (pCtx) {
     FreeScaledPic (&m_sScaledPicture, pCtx->pMemAlign);
     iRet = InitLastSpatialPictures (pCtx);
@@ -175,44 +184,24 @@ void CWelsPreProcess::FreeSpatialPictures (sWelsEncCtx* pCtx) {
 int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePicture* kpSrcPic) {
   SWelsSvcCodingParam* pSvcParam = pCtx->pSvcParam;
   int32_t iSpatialNum = 0;
+  int32_t iWidth = ((kpSrcPic->iPicWidth >> 1) << 1);
+  int32_t iHeight = ((kpSrcPic->iPicHeight >> 1) << 1);
 
   if (!m_bInitDone) {
     if (WelsPreprocessCreate() != 0)
       return -1;
 
-    //init source width and height
-    pSvcParam->SUsedPicRect.iLeft = 0;
-    pSvcParam->SUsedPicRect.iTop  = 0;
-    pSvcParam->SUsedPicRect.iWidth = ((kpSrcPic->iPicWidth >> 1) << 1);
-    pSvcParam->SUsedPicRect.iHeight = ((kpSrcPic->iPicHeight >> 1) << 1);
-    if ((pSvcParam->SUsedPicRect.iWidth < 16) || ((pSvcParam->SUsedPicRect.iHeight < 16))) {
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "Don't support width(%d) or height(%d) which is less than 16 ",
-               pSvcParam->SUsedPicRect.iWidth, pSvcParam->SUsedPicRect.iHeight);
-      return -1;
-    }
-    if (WelsPreprocessReset (pCtx) != 0)
+    if (WelsPreprocessReset (pCtx,iWidth,iHeight) != 0)
       return -1;
 
     m_iAvaliableRefInSpatialPicList = pSvcParam->iNumRefFrame;
 
     m_bInitDone = true;
   } else {
-    int32_t iWidth = ((kpSrcPic->iPicWidth >> 1) << 1);
-    int32_t iHeight = ((kpSrcPic->iPicHeight >> 1) << 1);
     if ((iWidth != pSvcParam->SUsedPicRect.iWidth) || (iHeight != pSvcParam->SUsedPicRect.iHeight)) {
-      pSvcParam->SUsedPicRect.iLeft = 0;
-      pSvcParam->SUsedPicRect.iTop  = 0;
-      pSvcParam->SUsedPicRect.iWidth = iWidth;
-      pSvcParam->SUsedPicRect.iHeight = iHeight;
-      if ((pSvcParam->SUsedPicRect.iWidth < 16) || ((pSvcParam->SUsedPicRect.iHeight < 16))) {
-        WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "Don't support width(%d) or height(%d) which is less than 16 ",
-                 pSvcParam->SUsedPicRect.iWidth, pSvcParam->SUsedPicRect.iHeight);
-        return -1;
-      }
-      if (WelsPreprocessReset (pCtx) != 0)
+      if (WelsPreprocessReset (pCtx,iWidth,iHeight) != 0)
         return -1;
     }
-
   }
 
   if (m_pInterfaceVp == NULL)
