@@ -121,7 +121,7 @@ class CWelsPreProcess {
   virtual  ~CWelsPreProcess();
 
  public:
-  int32_t WelsPreprocessReset (sWelsEncCtx* pEncCtx);
+  int32_t WelsPreprocessReset (sWelsEncCtx* pEncCtx,int32_t iWidth,int32_t iHeight);
   int32_t AllocSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCodingParam* pParam);
   void    FreeSpatialPictures (sWelsEncCtx* pCtx);
   int32_t BuildSpatialPicList (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrcPic);
