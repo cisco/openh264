@@ -3205,6 +3205,21 @@ void UpdatePpsList (sWelsEncCtx* pCtx) {
 
 }
 
+void UpdateSpsPpsIdStrategyWithIncreasingId (SParaSetOffset* pPSOVector, const uint32_t kuiId, const int iParasetType) {
+#if _DEBUG
+  pPSOVector->eSpsPpsIdStrategy = INCREASING_ID;
+  assert (iIdx < MAX_DQ_LAYER_NUM);
+#endif
+
+  ParasetIdAdditionIdAdjust (& (pPSOVector->sParaSetOffsetVariable[iParasetType]),
+                             kuiId,
+                             (iParasetType != PARA_SET_TYPE_PPS) ? MAX_SPS_COUNT : MAX_PPS_COUNT);
+}
+
+void UpdateSpsPpsIdStrategyWithConstantId (SParaSetOffset* pPSOVector, const uint32_t kuiId, const int iParasetType) {
+  memset (pPSOVector, 0, sizeof (SParaSetOffset));
+}
+
 /*!
  * \brief   write all parameter sets introduced in SVC extension
  * \return  writing results, success or error
@@ -3227,16 +3242,9 @@ int32_t WelsWriteParameterSets (sWelsEncCtx* pCtx, int32_t* pNalLen, int32_t* pN
   while (iIdx < pCtx->iSpsNum) {
     // TODO (Sijia) wrap different operation of eSpsPpsIdStrategy to classes to hide the details
     if (INCREASING_ID == pCtx->pSvcParam->eSpsPpsIdStrategy) {
-#if _DEBUG
-      pCtx->sPSOVector.eSpsPpsIdStrategy = INCREASING_ID;
-      assert (iIdx < MAX_DQ_LAYER_NUM);
-#endif
-
-      ParasetIdAdditionIdAdjust (& (pCtx->sPSOVector.sParaSetOffsetVariable[PARA_SET_TYPE_AVCSPS]),
-                                 pCtx->pSpsArray[0].uiSpsId,
-                                 MAX_SPS_COUNT);
+      UpdateSpsPpsIdStrategyWithIncreasingId (& (pCtx->sPSOVector), pCtx->pSpsArray[0].uiSpsId, PARA_SET_TYPE_AVCSPS);
     } else if (CONSTANT_ID == pCtx->pSvcParam->eSpsPpsIdStrategy) {
-      memset (& (pCtx->sPSOVector), 0, sizeof (pCtx->sPSOVector));
+      UpdateSpsPpsIdStrategyWithConstantId (& (pCtx->sPSOVector), pCtx->pSpsArray[0].uiSpsId, PARA_SET_TYPE_AVCSPS);
     }
 
     /* generate sequence parameters set */
@@ -3257,15 +3265,9 @@ int32_t WelsWriteParameterSets (sWelsEncCtx* pCtx, int32_t* pNalLen, int32_t* pN
     iNal = pCtx->pOut->iNalIndex;
 
     if (INCREASING_ID == pCtx->pSvcParam->eSpsPpsIdStrategy) {
-#if _DEBUG
-      pCtx->sPSOVector.eSpsPpsIdStrategy = INCREASING_ID;
-      assert (iIdx < MAX_DQ_LAYER_NUM);
-#endif
-
-      ParasetIdAdditionIdAdjust (& (pCtx->sPSOVector.sParaSetOffsetVariable[PARA_SET_TYPE_SUBSETSPS]),
-                                 pCtx->pSubsetArray[iIdx].pSps.uiSpsId,
-                                 MAX_SPS_COUNT);
+      UpdateSpsPpsIdStrategyWithIncreasingId (& (pCtx->sPSOVector), pCtx->pSubsetArray[iIdx].pSps.uiSpsId, PARA_SET_TYPE_SUBSETSPS);
     }
+
 
     iId = iIdx;
 
@@ -3298,9 +3300,7 @@ int32_t WelsWriteParameterSets (sWelsEncCtx* pCtx, int32_t* pNalLen, int32_t* pN
   iIdx = 0;
   while (iIdx < pCtx->iPpsNum) {
     if ((INCREASING_ID & pCtx->pSvcParam->eSpsPpsIdStrategy)) {
-      //para_set_type = 2: PPS, use MAX_PPS_COUNT
-      ParasetIdAdditionIdAdjust (&pCtx->sPSOVector.sParaSetOffsetVariable[PARA_SET_TYPE_PPS], pCtx->pPPSArray[iIdx].iPpsId,
-                                 MAX_PPS_COUNT);
+      UpdateSpsPpsIdStrategyWithIncreasingId (& (pCtx->sPSOVector), pCtx->pPPSArray[iIdx].iPpsId, PARA_SET_TYPE_PPS);
     }
 
     WelsWriteOnePPS (pCtx, iIdx, iNalLength);
@@ -3515,6 +3515,12 @@ int32_t WriteSavcParaset (sWelsEncCtx* pCtx, const int32_t iIdx,
   int32_t iNalSize = 0;
   iCountNal        = 0;
 
+  if (INCREASING_ID == pCtx->pSvcParam->eSpsPpsIdStrategy) {
+    UpdateSpsPpsIdStrategyWithIncreasingId (& (pCtx->sPSOVector), pCtx->pSpsArray[iIdx].uiSpsId, PARA_SET_TYPE_AVCSPS);
+  } else if (CONSTANT_ID == pCtx->pSvcParam->eSpsPpsIdStrategy) {
+    UpdateSpsPpsIdStrategyWithConstantId (& (pCtx->sPSOVector), pCtx->pSpsArray[iIdx].uiSpsId, PARA_SET_TYPE_AVCSPS);
+  }
+
   iReturn          = WelsWriteOneSPS (pCtx, iIdx, iNalSize);
   WELS_VERIFY_RETURN_IFNEQ (iReturn, ENC_RETURN_SUCCESS)
 
@@ -3545,6 +3551,12 @@ int32_t WriteSavcParaset (sWelsEncCtx* pCtx, const int32_t iIdx,
   //writing one NAL
   iNalSize = 0;
   iCountNal        = 0;
+
+  if (INCREASING_ID == pCtx->pSvcParam->eSpsPpsIdStrategy) {
+    UpdateSpsPpsIdStrategyWithIncreasingId (& (pCtx->sPSOVector), pCtx->pPPSArray[iIdx].iPpsId, PARA_SET_TYPE_PPS);
+  } else if (CONSTANT_ID == pCtx->pSvcParam->eSpsPpsIdStrategy) {
+    UpdateSpsPpsIdStrategyWithConstantId (& (pCtx->sPSOVector), pCtx->pPPSArray[iIdx].iPpsId, PARA_SET_TYPE_PPS);
+  }
 
   iReturn          = WelsWriteOnePPS (pCtx, iIdx, iNalSize);
   WELS_VERIFY_RETURN_IFNEQ (iReturn, ENC_RETURN_SUCCESS)
