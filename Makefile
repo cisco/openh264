@@ -119,11 +119,11 @@ PROCESSING_INCLUDES += \
     -I$(SRC_PATH)codec/processing/src/vaacalc
 
 GTEST_INCLUDES += \
-    -I$(SRC_PATH)gtest \
-    -I$(SRC_PATH)gtest/include
+    -I$(SRC_PATH)gtest/googletest \
+    -I$(SRC_PATH)gtest/googletest/include
 
 CODEC_UNITTEST_INCLUDES += \
-    -I$(SRC_PATH)gtest/include \
+    -I$(SRC_PATH)gtest/googletest/include \
     -I$(SRC_PATH)codec/common/inc \
     -I$(SRC_PATH)test
 
@@ -172,7 +172,7 @@ gmp-bootstrap:
 	cd gmp-api && git fetch origin && git checkout $(GMP_API_BRANCH)
 
 gtest-bootstrap:
-	svn co https://googletest.googlecode.com/svn/trunk/ gtest
+	git clone https://github.com/google/googletest.git gtest
 
 ifeq ($(HAVE_GTEST),Yes)
 
