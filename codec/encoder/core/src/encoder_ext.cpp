@@ -3237,7 +3237,7 @@ void UpdatePpsList (sWelsEncCtx* pCtx) {
 void UpdateSpsPpsIdStrategyWithIncreasingId (SParaSetOffset* pPSOVector, const uint32_t kuiId, const int iParasetType) {
 #if _DEBUG
   pPSOVector->eSpsPpsIdStrategy = INCREASING_ID;
-  assert (iIdx < MAX_DQ_LAYER_NUM);
+  assert(kuiId < MAX_DQ_LAYER_NUM);
 #endif
 
   ParasetIdAdditionIdAdjust (& (pPSOVector->sParaSetOffsetVariable[iParasetType]),
