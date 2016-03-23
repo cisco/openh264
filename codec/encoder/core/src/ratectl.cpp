@@ -1372,7 +1372,7 @@ void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
                               pWelsSvcRc->iLastCalculatedQScale + DELTA_QP_BGD_THD);
 
       } else {
-        iLumaQp = pWelsSvcRc->iLastCalculatedQScale + DELTA_QP_BGD_THD;
+        iLumaQp = pEncCtx->iGlobalQp + DELTA_QP_BGD_THD;
       }
       iLumaQp = WELS_CLIP3 (iLumaQp, pTOverRc->iMinQp, pTOverRc->iMaxQp);
       WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
@@ -1408,7 +1408,7 @@ void  WelsRcPictureInitGomTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
                               pWelsSvcRc->iLastCalculatedQScale + DELTA_QP_BGD_THD);
       }
     } else {
-      iLumaQp = pWelsSvcRc->iLastCalculatedQScale + DELTA_QP_BGD_THD;
+      iLumaQp = pEncCtx->iGlobalQp + DELTA_QP_BGD_THD;
     }
 
     iLumaQp = WELS_CLIP3 (iLumaQp,  pTOverRc->iMinQp, pTOverRc->iMaxQp);
