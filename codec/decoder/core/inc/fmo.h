@@ -48,7 +48,7 @@
 namespace WelsDec {
 
 #ifndef MB_XY_T
-#define MB_XY_T int16_t
+#define MB_XY_T int32_t
 #endif//MB_XY_T
 
 /*!

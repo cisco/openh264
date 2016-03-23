@@ -1057,9 +1057,11 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     return  GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_MAX_MB_SIZE);
   }
   if (((uint64_t)pSps->iMbWidth * (uint64_t)pSps->iMbWidth) > (uint64_t) (8 * pSLevelLimits->uiMaxFS)) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, " the pic_width_in_mbs exceeds the level limits!");
     if (((uint64_t)pSps->iMbWidth * (uint64_t)pSps->iMbWidth) > (uint64_t) (8 * pSMaxLevelLimits->uiMaxFS)) {
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "the pic_width_in_mbs exceeds the level limits!");
       return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_MAX_MB_SIZE);
+    } else {
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "the pic_width_in_mbs exceeds the level limits!");
     }
   }
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //pic_height_in_map_units_minus1
@@ -1069,16 +1071,23 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     return  GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_MAX_MB_SIZE);
   }
   if (((uint64_t)pSps->iMbHeight * (uint64_t)pSps->iMbHeight) > (uint64_t) (8 * pSLevelLimits->uiMaxFS)) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, " the pic_height_in_mbs exceeds the level limits!");
     if (((uint64_t)pSps->iMbHeight * (uint64_t)pSps->iMbHeight) > (uint64_t) (8 * pSMaxLevelLimits->uiMaxFS)) {
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "the pic_height_in_mbs exceeds the level limits!");
       return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_MAX_MB_SIZE);
+    } else {
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "the pic_height_in_mbs exceeds the level limits!");
     }
   }
-  uint32_t uiTmp32 = pSps->iMbWidth * pSps->iMbHeight;
-  if (uiTmp32 > (uint32_t)pSLevelLimits->uiMaxFS) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, " the total count of mb exceeds the level limits!");
+  uint64_t uiTmp64 = (uint64_t)pSps->iMbWidth * (uint64_t)pSps->iMbHeight;
+  if (uiTmp64 > (uint64_t)pSLevelLimits->uiMaxFS) {
+    if (uiTmp64 > (uint64_t)pSMaxLevelLimits->uiMaxFS) {
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "the total count of mb exceeds the level limits!");
+      return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_MAX_MB_SIZE);
+    } else {
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "the total count of mb exceeds the level limits!");
+    }
   }
-  pSps->uiTotalMbCount = uiTmp32;
+  pSps->uiTotalMbCount = (uint32_t)uiTmp64;
   WELS_CHECK_SE_UPPER_ERROR (pSps->iNumRefFrames, SPS_MAX_NUM_REF_FRAMES_MAX, "max_num_ref_frames",
                              GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_MAX_NUM_REF_FRAMES));
   // here we check max_num_ref_frames
