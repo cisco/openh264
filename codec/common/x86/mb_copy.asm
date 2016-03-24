@@ -68,6 +68,8 @@ WELS_EXTERN WelsCopy16x16_sse2
     %assign  push_num 2
     LOAD_4_PARA
     PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
 
     lea r4, [r1+2*r1]   ;ebx, [eax+2*eax]   ; x3
     lea r5, [r3+2*r3]   ;edx, [ecx+2*ecx]   ; x3
@@ -132,6 +134,8 @@ WELS_EXTERN WelsCopy16x16NotAligned_sse2
     %assign  push_num 2
     LOAD_4_PARA
     PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
 
     lea r4, [r1+2*r1]   ;ebx, [eax+2*eax]   ; x3
     lea r5, [r3+2*r3]   ;edx, [ecx+2*ecx]   ; x3
@@ -196,6 +200,8 @@ WELS_EXTERN WelsCopy16x8NotAligned_sse2
     %assign  push_num 2
     LOAD_4_PARA
     PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
 
     lea r4, [r1+2*r1]   ;ebx, [eax+2*eax]   ; x3
     lea r5, [r3+2*r3]   ;edx, [ecx+2*ecx]   ; x3
@@ -235,6 +241,8 @@ WELS_EXTERN WelsCopy16x8NotAligned_sse2
 WELS_EXTERN WelsCopy8x16_mmx
     %assign  push_num 0
     LOAD_4_PARA
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
 
     movq mm0, [r2]
     movq mm1, [r2+r3]
@@ -300,6 +308,8 @@ WELS_EXTERN WelsCopy8x8_mmx
     push r4
     %assign  push_num 1
     LOAD_4_PARA
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
     lea r4, [r3+2*r3]   ;edx, [ebx+2*ebx]
 
     ; to prefetch next loop
