@@ -14,7 +14,6 @@ API_TEST_CPP_SRCS=\
 	$(API_TEST_SRCDIR)/ltr_test.cpp\
 	$(API_TEST_SRCDIR)/simple_test.cpp\
 
-
 API_TEST_OBJS += $(API_TEST_CPP_SRCS:.cpp=.$(OBJ))
 
 API_TEST_C_SRCS=\
