@@ -3797,6 +3797,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 #endif//_DEBUG
   pCtx->iEncoderError = ENC_RETURN_SUCCESS;
   pCtx->bCurFrameMarkedAsSceneLtr = false;
+  pFbi->eFrameType = videoFrameTypeSkip;
   pFbi->iLayerNum = 0; // for initialization
   pFbi->uiTimeStamp = GetTimestampForRc (pSrcPic->uiTimeStamp, pCtx->uiLastTimestamp, pCtx->pSvcParam->sSpatialLayers[pCtx->pSvcParam->iSpatialLayerNum - 1].fFrameRate);
   for (int32_t iNalIdx = 0; iNalIdx < MAX_LAYER_NUM_OF_FRAME; iNalIdx++) {
@@ -3811,7 +3812,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   if (iSpatialNum < 1) {
     // ++ pCtx->iCodingIndex;
     pLayerBsInfo->eFrameType = videoFrameTypeSkip;
-    pFbi->eFrameType = videoFrameTypeSkip;
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
              "[Rc] Frame timestamp = %lld, skip one frame due to preprocessing return (temporal layer settings or else), continual skipped %d frames",
              pSrcPic->uiTimeStamp, pCtx->iContinualSkipFrames);
