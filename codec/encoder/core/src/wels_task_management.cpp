@@ -120,13 +120,15 @@ WelsErrorType CWelsTaskManageBase::Init (sWelsEncCtx* pEncCtx) {
 }
 
 void   CWelsTaskManageBase::Uninit() {
-  m_pThreadPool->RemoveInstance();
-  //WELS_DELETE_OP (m_pThreadPool);
 
-  //fprintf(stdout, "m_pThreadPool = m_pThreadPool->RemoveInstance2\n");
 
   DestroyTasks();
-  //fprintf(stdout, "m_pThreadPool = m_pThreadPool->RemoveInstance\n");
+  fprintf(stdout, "DestroyTasks\n");
+  
+  m_pThreadPool->RemoveInstance();
+  //WELS_DELETE_OP (m_pThreadPool);
+  
+  fprintf(stdout, "m_pThreadPool = m_pThreadPool->RemoveInstance\n");
   
   for (int32_t iDid = 0; iDid < MAX_DEPENDENCY_LAYER; iDid++) {
     WELS_DELETE_OP(m_cEncodingTaskList[iDid]);
@@ -176,7 +178,9 @@ void CWelsTaskManageBase::DestroyTaskList (TASKLIST_TYPE* pTargetTaskList) {
   //fprintf(stdout, "CWelsTaskManageBase: pTargetTaskList size=%d m_iTotalTaskNum=%d\n", static_cast<int32_t> (pTargetTaskList->size()), m_iTotalTaskNum);
   while (NULL != pTargetTaskList->begin()) {
     CWelsBaseTask* pTask = pTargetTaskList->begin();
+    fprintf(stdout, "RemoveWaitedTask\n");
     m_pThreadPool->RemoveWaitedTask(pTask);
+    fprintf(stdout, "RemoveWaitedTask2\n");
     WELS_DELETE_OP (pTask);
     pTargetTaskList->pop_front();
   }

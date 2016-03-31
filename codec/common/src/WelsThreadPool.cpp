@@ -353,6 +353,7 @@ void  CWelsThreadPool::ClearWaitedTasks() {
   void CWelsThreadPool::RemoveWaitedTask(IWelsTask* pTask) {
     CWelsAutoLock cLock (m_cLockWaitedTasks);
     if (0 == m_cWaitedTasks->size()) {
+      fprintf(stdout, "CWelsThreadPool::RemoveWaitedTask m_cWaitedTasks %d\n", m_cWaitedTasks->size());
       return;
     }
     fprintf(stdout, "CWelsThreadPool::RemoveWaitedTask %x\n", pTask);
