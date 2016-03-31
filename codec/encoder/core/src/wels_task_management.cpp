@@ -119,13 +119,14 @@ WelsErrorType CWelsTaskManageBase::Init (sWelsEncCtx* pEncCtx) {
 }
 
 void   CWelsTaskManageBase::Uninit() {
-  DestroyTasks();
-  //fprintf(stdout, "m_pThreadPool = m_pThreadPool->RemoveInstance\n");
   m_pThreadPool->RemoveInstance();
   //WELS_DELETE_OP (m_pThreadPool);
 
   //fprintf(stdout, "m_pThreadPool = m_pThreadPool->RemoveInstance2\n");
 
+  DestroyTasks();
+  //fprintf(stdout, "m_pThreadPool = m_pThreadPool->RemoveInstance\n");
+  
   for (int32_t iDid = 0; iDid < MAX_DEPENDENCY_LAYER; iDid++) {
     WELS_DELETE_OP(m_cEncodingTaskList[iDid]);
     WELS_DELETE_OP(m_cPreEncodingTaskList[iDid]);
@@ -173,6 +174,7 @@ void CWelsTaskManageBase::DestroyTaskList (TASKLIST_TYPE* pTargetTaskList) {
   //fprintf(stdout, "CWelsTaskManageBase: pTargetTaskList size=%d m_iTotalTaskNum=%d\n", static_cast<int32_t> (pTargetTaskList->size()), m_iTotalTaskNum);
   while (NULL != pTargetTaskList->begin()) {
     CWelsBaseTask* pTask = pTargetTaskList->begin();
+    m_pThreadPool->RemoveWaitedTask(pTask);
     WELS_DELETE_OP (pTask);
     pTargetTaskList->pop_front();
   }

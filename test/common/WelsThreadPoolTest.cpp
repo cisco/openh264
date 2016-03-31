@@ -10,7 +10,7 @@
 #include "WelsTask.h"
 #include "WelsThreadPoolTest.h"
 
-#define  TEST_TASK_NUM  30
+#define  TEST_TASK_NUM  4
 
 class CSimpleTask : public IWelsTask {
  public:
@@ -44,6 +44,7 @@ void* OneCallingFunc() {
   int32_t  i;
   for (i = 0; i < TEST_TASK_NUM; i++) {
     aTasks[i] = new CSimpleTask (&cThreadPoolTest);
+    fprintf(stdout, "OneCallingFunc pTask=%x pSink=%d\n", aTasks[i], aTasks[i]->GetSink());
   }
 
   for (i = 0; i < TEST_TASK_NUM; i++) {
@@ -54,10 +55,10 @@ void* OneCallingFunc() {
     WelsSleep (1);
   }
 
+  pThreadPool->RemoveInstance();
   for (i = 0; i < TEST_TASK_NUM; i++) {
     delete aTasks[i];
   }
-  pThreadPool->RemoveInstance();
 
   return 0;
 }

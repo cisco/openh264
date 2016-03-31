@@ -75,7 +75,7 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   int32_t        GetThreadNum() const {
     return m_iMaxThreadNum;
   }
-
+  void RemoveWaitedTask(IWelsTask* pTask);
 
  protected:
   WELS_THREAD_ERROR_CODE Init();
@@ -104,7 +104,7 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   static CWelsLock m_cInitLock;
   static int32_t   m_iMaxThreadNum;
 
-  CWelsCircleQueue<IWelsTask>* m_cWaitedTasks;
+  CWelsList<IWelsTask>* m_cWaitedTasks;
   CWelsCircleQueue<CWelsTaskThread>* m_cIdleThreads;
   CWelsList<CWelsTaskThread>* m_cBusyThreads;
 
