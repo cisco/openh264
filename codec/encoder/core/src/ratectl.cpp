@@ -707,9 +707,9 @@ void   RcVBufferCalculationSkip (sWelsEncCtx* pEncCtx) {
     pDLayerParamInternal->iSkipFrameFlag = 1;
   }
 }
-void WelsRcFrameDelayJudge (sWelsEncCtx* pEncCtx, EVideoFrameType eFrameType, long long uiTimeStamp) {
-  SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
-  SSpatialLayerConfig* pDLayerParam     = &pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId];
+void WelsRcFrameDelayJudge (sWelsEncCtx* pEncCtx, EVideoFrameType eFrameType, long long uiTimeStamp,int32_t iDidIdx) {
+  SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[iDidIdx];
+  SSpatialLayerConfig* pDLayerParam     = &pEncCtx->pSvcParam->sSpatialLayers[iDidIdx];
   //SSpatialLayerInternal* pDLayerParamInternal     = &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
   if (!pEncCtx->pSvcParam->bEnableFrameSkip)
     return;
@@ -773,14 +773,15 @@ void WelsRcFrameDelayJudge (sWelsEncCtx* pEncCtx, EVideoFrameType eFrameType, lo
 bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pEncCtx, int32_t iSpatialNum, EVideoFrameType eFrameType,
                                const uint32_t uiTimeStamp) {
   bool bSkipMustFlag = false;
+  int32_t iDidIdx = pEncCtx->uiDependencyId;
+  SSpatialPicIndex* pSpatialIndexMap = &pEncCtx->sSpatialIndexMap[0];
   if (!pEncCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge)
     return false;
   if( pEncCtx->pSvcParam->bSimulcastAVC){
-      int32_t iDidIdx = pEncCtx->uiDependencyId;
     if (UNSPECIFIED_BIT_RATE == pEncCtx->pSvcParam->sSpatialLayers[iDidIdx].iMaxSpatialBitrate)
       return false;
 
-    pEncCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge (pEncCtx, eFrameType, uiTimeStamp);
+    pEncCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge (pEncCtx, eFrameType, uiTimeStamp,iDidIdx);
     if (true == pEncCtx->pWelsSvcRc[iDidIdx].bSkipFlag) {
        bSkipMustFlag = true;
        pEncCtx->pWelsSvcRc[iDidIdx].uiLastTimeStamp = uiTimeStamp;
@@ -790,8 +791,8 @@ bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pEncCtx, int32_t iSpatialNum, EVideo
     for(int32_t i = 0;i<iSpatialNum;i++){
       if (UNSPECIFIED_BIT_RATE == pEncCtx->pSvcParam->sSpatialLayers[i].iMaxSpatialBitrate)
         break;
-
-       pEncCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge (pEncCtx, eFrameType, uiTimeStamp);
+       iDidIdx = (pSpatialIndexMap + i)->iDid;
+       pEncCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge (pEncCtx, eFrameType, uiTimeStamp,iDidIdx);
        if (true == pEncCtx->pWelsSvcRc[i].bSkipFlag) {
          bSkipMustFlag = true;
          pEncCtx->pWelsSvcRc[i].uiLastTimeStamp = uiTimeStamp;
@@ -1285,9 +1286,9 @@ void InitRcModuleTimeStamp (sWelsEncCtx* pEncCtx) {
   pWelsSvcRc->iAvgCost2Bits = 1;
   pWelsSvcRc->iSkipBufferRatio  = SKIP_RATIO;
 }
-void WelsRcFrameDelayJudgeTimeStamp (sWelsEncCtx* pEncCtx, EVideoFrameType eFrameType, long long uiTimeStamp) {
+void WelsRcFrameDelayJudgeTimeStamp (sWelsEncCtx* pEncCtx, EVideoFrameType eFrameType, long long uiTimeStamp,int32_t iDidIdx) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
-  SSpatialLayerConfig* pDLayerConfig   = &pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId];
+  SSpatialLayerConfig* pDLayerConfig   = &pEncCtx->pSvcParam->sSpatialLayers[iDidIdx];
 
   if (pDLayerConfig->iSpatialBitrate > pDLayerConfig->iMaxSpatialBitrate)
     pDLayerConfig->iSpatialBitrate = pDLayerConfig->iMaxSpatialBitrate;
