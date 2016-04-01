@@ -60,7 +60,7 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   static WELS_THREAD_ERROR_CODE SetThreadNum (int32_t iMaxThreadNum);
 
   static CWelsThreadPool& AddReference();
-  void RemoveInstance();
+  void RemoveInstance(IWelsTaskSink* pSink);
 
   static bool IsReferenced();
 
@@ -75,7 +75,6 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   int32_t        GetThreadNum() const {
     return m_iMaxThreadNum;
   }
-  void RemoveWaitedTask(IWelsTask* pTask);
 
  protected:
   WELS_THREAD_ERROR_CODE Init();
@@ -84,8 +83,8 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   WELS_THREAD_ERROR_CODE CreateIdleThread();
   void           DestroyThread (CWelsTaskThread* pThread);
   WELS_THREAD_ERROR_CODE AddThreadToIdleQueue (CWelsTaskThread* pThread);
-  WELS_THREAD_ERROR_CODE AddThreadToBusyList (CWelsTaskThread* pThread);
-  WELS_THREAD_ERROR_CODE RemoveThreadFromBusyList (CWelsTaskThread* pThread);
+  WELS_THREAD_ERROR_CODE AddThreadToBusyList (CWelsTaskThread* pThread, IWelsTask* pTask);
+  WELS_THREAD_ERROR_CODE RemoveThreadFromBusyList (CWelsTaskThread* pThread, IWelsTask* pTask);
   void           AddTaskToWaitedList (IWelsTask* pTask);
   CWelsTaskThread*   GetIdleThread();
   IWelsTask*         GetWaitedTask();
@@ -93,7 +92,8 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   int32_t            GetBusyThreadNum();
   int32_t            GetWaitedTaskNum();
   void               ClearWaitedTasks();
-
+  void RemoveWaitedTask(IWelsTaskSink* pTask);
+  void RemoveBusyTask (IWelsTaskSink* pSink);
  private:
   CWelsThreadPool();
   virtual ~CWelsThreadPool();
@@ -107,6 +107,7 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   CWelsList<IWelsTask>* m_cWaitedTasks;
   CWelsCircleQueue<CWelsTaskThread>* m_cIdleThreads;
   CWelsList<CWelsTaskThread>* m_cBusyThreads;
+  CWelsList<IWelsTask>* m_cBusyTasks;
 
   CWelsLock   m_cLockPool;
   CWelsLock   m_cLockWaitedTasks;
