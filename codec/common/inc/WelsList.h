@@ -99,6 +99,20 @@ class CWelsList {
     return NULL;
   }
 
+  TNodeType* index (int32_t iIndex) {
+    int32_t iIdx = 0;
+    SNode<TNodeType>* pNode = m_pFirst;
+    while ((pNode != NULL) && (iIdx <= iIndex)) {
+      if (iIdx == iIndex) {
+        return pNode->pPointer;
+      }
+      pNode = pNode->pNextNode;
+      iIdx ++;
+    }
+
+    return NULL;
+  }
+
   void pop_front() {
     if (m_iCurrentNodeCount == 0) {
       return;
