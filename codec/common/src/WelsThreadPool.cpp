@@ -119,7 +119,7 @@ bool CWelsThreadPool::IsReferenced() {
 
 
 WELS_THREAD_ERROR_CODE CWelsThreadPool::OnTaskStart (CWelsTaskThread* pThread, IWelsTask* pTask) {
-  AddThreadToBusyList (pThread, pTask);
+  //AddThreadToBusyList (pThread, pTask);
   //fprintf(stdout, "CWelsThreadPool::AddThreadToBusyList: Task %x at Thread %x\n", pTask, pThread);
   return WELS_THREAD_ERROR_OK;
 }
@@ -127,15 +127,16 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::OnTaskStart (CWelsTaskThread* pThread, I
 WELS_THREAD_ERROR_CODE CWelsThreadPool::OnTaskStop (CWelsTaskThread* pThread, IWelsTask* pTask) {
   fprintf (stdout, "CWelsThreadPool::OnTaskStop 0: Task %x at Thread %x Finished\n", pTask, pThread);
 
-  RemoveThreadFromBusyList (pThread, pTask);
-  AddThreadToIdleQueue (pThread);
-  fprintf (stdout, "CWelsThreadPool::OnTaskStop 1: Task %x at Thread %x Finished\n", pTask, pThread);
 
   if (pTask->GetSink()) {
-    fprintf (stdout, "CWelsThreadPool::OnTaskStop 2: Task %x at Thread %x Finished, sink=%x\n", pTask, pThread,
+    fprintf (stdout, "CWelsThreadPool::OnTaskStop 1: Task %x at Thread %x Finished, sink=%x\n", pTask, pThread,
              pTask->GetSink());
     pTask->GetSink()->OnTaskExecuted();
   }
+  RemoveThreadFromBusyList (pThread, pTask);
+  AddThreadToIdleQueue (pThread);
+  fprintf (stdout, "CWelsThreadPool::OnTaskStop 2: Task %x at Thread %x Finished\n", pTask, pThread);
+ 
   fprintf (stdout, "CWelsThreadPool::OnTaskStop 3: Task %x at Thread %x Finished\n", pTask, pThread);
 
   SignalThread();
@@ -229,6 +230,7 @@ void CWelsThreadPool::ExecuteTask() {
     pTask = GetWaitedTask();
     if (pTask) {
     fprintf(stdout, "ThreadPool:  ExecuteTask = %x at thread %x\n", pTask, pThread);
+      AddThreadToBusyList (pThread, pTask);
     pThread->SetTask (pTask);
     }
   }
@@ -239,11 +241,12 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::QueueTask (IWelsTask* pTask) {
 
   fprintf(stdout, "CWelsThreadPool::QueueTask: %d, pTask=%x\n", m_iRefCount, pTask);
   if (GetWaitedTaskNum() == 0) {
-    fprintf(stdout, "CWelsThreadPool::ExecuteTask: GetIdleThread11\n");
+    fprintf(stdout, "CWelsThreadPool::QueueTask: GetIdleThread11\n");
     CWelsTaskThread* pThread = GetIdleThread();
 fprintf(stdout, "CWelsThreadPool::ExecuteTask: GetIdleThread12\n");
     if (pThread != NULL) {
-      fprintf (stdout, "ThreadPool:  ExecuteTask = %x at thread %x\n", pTask, pThread);
+      fprintf (stdout, "ThreadPool:  QueueTask = %x at thread %x\n", pTask, pThread);
+      AddThreadToBusyList (pThread, pTask);
       pThread->SetTask (pTask);
 
       return WELS_THREAD_ERROR_OK;
@@ -325,18 +328,18 @@ CWelsTaskThread*   CWelsThreadPool::GetIdleThread() {
 }
 
 int32_t  CWelsThreadPool::GetBusyThreadNum() {
-  CWelsAutoLock cLock (m_cLockBusyTasks);
+  //CWelsAutoLock cLock (m_cLockBusyTasks);
   return (m_cBusyThreads) ? (m_cBusyThreads->size()) : (-1);
 }
 
 int32_t  CWelsThreadPool::GetIdleThreadNum() {
-    CWelsAutoLock cLock (m_cLockIdleTasks);
+   // CWelsAutoLock cLock (m_cLockIdleTasks);
   return (m_cIdleThreads) ? (m_cIdleThreads->size()) : (-1);
 }
 
 int32_t  CWelsThreadPool::GetWaitedTaskNum() {
   fprintf (stdout, "CWelsThreadPool::GetWaitedTaskNum\n");
-  CWelsAutoLock cLock (m_cLockWaitedTasks);
+  //CWelsAutoLock cLock (m_cLockWaitedTasks);
   fprintf (stdout, "CWelsThreadPool::GetWaitedTaskNum m_cWaitedTasks=%x\n", m_cWaitedTasks);
   fprintf (stdout, "CWelsThreadPool::GetWaitedTaskNum m_cWaitedTasks=%d\n", m_cWaitedTasks->size());
   return (m_cWaitedTasks) ? (m_cWaitedTasks->size()) : (-1);
@@ -394,7 +397,7 @@ void CWelsThreadPool::RemoveWaitedTask (IWelsTaskSink* pSink) {
   }
   fprintf (stdout, "CWelsThreadPool::RemoveWaitedTask %d\n", m_cWaitedTasks->size());
   IWelsTask* pTask = FindTaskWithSink (m_cWaitedTasks, pSink);
-  fprintf (stdout, "CWelsThreadPool::RemoveWaitedTask0 %x\n", pTask);
+  fprintf (stdout, "CWelsThreadPool::RemoveWaitedsTask0 %x\n", pTask);
   while (pTask) {
     fprintf (stdout, "CWelsThreadPool::RemoveWaitedTask1 %x\n", pTask);
     pTask->GetSink()->OnTaskCancelled();
