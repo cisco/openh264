@@ -60,7 +60,7 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   static WELS_THREAD_ERROR_CODE SetThreadNum (int32_t iMaxThreadNum);
 
   static CWelsThreadPool& AddReference();
-  void RemoveInstance(IWelsTaskSink* pSink);
+  void RemoveInstance (IWelsTaskSink* pSink);
 
   static bool IsReferenced();
 
@@ -92,12 +92,12 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   int32_t            GetBusyThreadNum();
   int32_t            GetWaitedTaskNum();
   void               ClearWaitedTasks();
-  void RemoveWaitedTask(IWelsTaskSink* pTask);
+  void RemoveWaitedTask (IWelsTaskSink* pTask);
   void RemoveBusyTask (IWelsTaskSink* pSink);
  private:
   CWelsThreadPool();
   virtual ~CWelsThreadPool();
-  
+
   WELS_THREAD_ERROR_CODE StopAllRunning();
 
   static int32_t   m_iRefCount;
