@@ -29,17 +29,17 @@ class CThreadPoolTest : public IWelsTaskSink {
   }*/
 
   virtual int32_t OnTaskExecuted() {
-    fprintf(stdout, "OnTaskExecuted %x\n", this);
+    //fprintf(stdout, "OnTaskExecuted %x\n", this);
     WelsCommon::CWelsAutoLock cAutoLock (m_cTaskCountLock);
     m_iTaskCount ++;
-    fprintf(stdout, "Task execute over count is %d\n", m_iTaskCount);
+    //fprintf(stdout, "Task execute over count is %d\n", m_iTaskCount);
     return cmResultSuccess;
   }
 
   virtual int32_t OnTaskCancelled() {
     WelsCommon::CWelsAutoLock cAutoLock (m_cTaskCountLock);
     m_iTaskCount ++;
-    fprintf(stdout, "Task execute cancelled count is %d\n", m_iTaskCount);
+    //fprintf(stdout, "Task execute cancelled count is %d\n", m_iTaskCount);
     return cmResultSuccess;
   }
 
