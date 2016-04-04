@@ -95,10 +95,10 @@ TEST (CThreadPoolTest, CThreadPoolTest) {
 
 
 TEST (CThreadPoolTest, CThreadPoolTestMulti) {
-  int iCallingNum = 1;
+  int iCallingNum = 10;
   WELS_THREAD_HANDLE mThreadID[30];
   int i = 0;
-  while (1) {
+  //while (1) {
     for (i = 0; i < iCallingNum; i++) {
       WelsThreadCreate (& (mThreadID[i]), (LPWELS_THREAD_ROUTINE)OneCallingFunc, NULL, 0);
       WelsSleep (1);
@@ -121,6 +121,6 @@ TEST (CThreadPoolTest, CThreadPoolTestMulti) {
     }
 
     EXPECT_FALSE (CWelsThreadPool::IsReferenced());
-  }
+  //}
 }
 
