@@ -124,10 +124,10 @@ void   CWelsTaskManageBase::Uninit() {
   m_pThreadPool = NULL;
   //WELS_DELETE_OP (m_pThreadPool);
 
-  fprintf (stdout, "m_pThreadPool = m_pThreadPool->RemoveInstance\n");
+  //fprintf (stdout, "m_pThreadPool = m_pThreadPool->RemoveInstance\n");
 
   DestroyTasks();
-  fprintf (stdout, "DestroyTasks\n");
+  //fprintf (stdout, "DestroyTasks\n");
 
   for (int32_t iDid = 0; iDid < MAX_DEPENDENCY_LAYER; iDid++) {
     WELS_DELETE_OP (m_cEncodingTaskList[iDid]);
