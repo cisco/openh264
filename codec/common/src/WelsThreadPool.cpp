@@ -211,6 +211,7 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::Uninit() {
   WELS_DELETE_OP (m_cWaitedTasks);
   WELS_DELETE_OP (m_cIdleThreads);
   WELS_DELETE_OP (m_cBusyThreads);
+  WELS_DELETE_OP (m_cBusyTasks);
 
   return iReturn;
 }
