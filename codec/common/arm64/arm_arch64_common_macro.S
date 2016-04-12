@@ -62,3 +62,7 @@ ret
 .endm
 
 #endif
+
+.macro SIGN_EXTENSION arg0, arg1
+  sxtw \arg0, \arg1
+.endm
