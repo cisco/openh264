@@ -305,6 +305,7 @@ WELS_ASM_AARCH64_FUNC_END
 WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaLt4V_AArch64_neon //uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* tc
     dup v16.16b, w2 //alpha
     dup v17.16b, w3 //beta
+    SIGN_EXTENSION x1,w1
     add x2, x1, x1, lsl #1
     sub x2, x0, x2
     movi v23.16b, #128
@@ -363,8 +364,8 @@ WELS_ASM_AARCH64_FUNC_END
 WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaEq4V_AArch64_neon
     dup     v16.16b, w2 //alpha
     dup     v17.16b, w3 //beta
+    SIGN_EXTENSION x1,w1
     sub     x3, x0, x1, lsl #2
-
     ld1     {v0.16b}, [x3], x1
     ld1     {v4.16b}, [x0], x1
     ld1     {v1.16b}, [x3], x1
@@ -431,7 +432,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaLt4H_AArch64_neon //uint8_t* pPix, int32_
     dup v17.16b, w3 //beta
     sub x2, x0, #3
     movi v23.16b, #128
-
+    SIGN_EXTENSION x1,w1
     LOAD_LUMA_DATA_3      v0, v1, v2, v3, v4, v5, 0
     LOAD_LUMA_DATA_3      v0, v1, v2, v3, v4, v5, 1
     LOAD_LUMA_DATA_3      v0, v1, v2, v3, v4, v5, 2
@@ -515,7 +516,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaEq4H_AArch64_neon
     dup     v16.16b, w2 //alpha
     dup     v17.16b, w3 //beta
     sub     x3, x0, #4
-
+    SIGN_EXTENSION x1,w1
     LOAD_LUMA_DATA_4      v0, v1, v2, v3, v4, v5, v6, v7, 0
     LOAD_LUMA_DATA_4      v0, v1, v2, v3, v4, v5, v6, v7, 1
     LOAD_LUMA_DATA_4      v0, v1, v2, v3, v4, v5, v6, v7, 2
