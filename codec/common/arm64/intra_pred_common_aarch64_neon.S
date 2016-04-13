@@ -34,7 +34,9 @@
 #include "arm_arch64_common_macro.S"
 
 //for Luma 16x16
+;void WelsI16x16LumaPredV_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsI16x16LumaPredV_AArch64_neon
+    SIGN_EXTENSION x2,w2
     sub     x3, x1, x2
     ld1     {v0.16b}, [x3]
 .rept 16
@@ -42,7 +44,9 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsI16x16LumaPredV_AArch64_neon
 .endr
 WELS_ASM_AARCH64_FUNC_END
 
+;void WelsI16x16LumaPredH_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsI16x16LumaPredH_AArch64_neon
+    SIGN_EXTENSION x2,w2
     sub     x3, x1, #1
 .rept 16
     ld1r    {v0.16b}, [x3], x2
