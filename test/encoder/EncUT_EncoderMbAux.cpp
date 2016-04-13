@@ -292,6 +292,7 @@ TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_sse2) {
 #define WELS_ABS_LC(a) ((sign ^ (int32_t)(a)) - sign)
 #define NEW_QUANT(pDct, ff, mf) (((ff)+ WELS_ABS_LC(pDct))*(mf)) >>16
 #define WELS_NEW_QUANT(pDct,ff,mf) WELS_ABS_LC(NEW_QUANT(pDct, ff, mf))
+namespace {
 void WelsQuantFour4x4MaxAnchor (int16_t* pDct, int16_t* ff,  int16_t* mf, int16_t* max) {
   int32_t i, j, k, sign;
   int16_t max_abs;
@@ -308,25 +309,7 @@ void WelsQuantFour4x4MaxAnchor (int16_t* pDct, int16_t* ff,  int16_t* mf, int16_
     max[k] = max_abs;
   }
 }
-TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_c) {
-  int16_t ff[8], mf[8];
-  int16_t iDctA[64], iMaxA[16];
-  int16_t iDctC[64], iMaxC[16];
-  for (int i = 0; i < 8; i++) {
-    ff[i] = rand() & 32767;
-    mf[i] = rand() & 32767;
-  }
-  for (int i = 0; i < 64; i++)
-    iDctA[i] = iDctC[i] = (rand() & 65535) - 32767;
-  WelsQuantFour4x4MaxAnchor (iDctA, ff, mf, iMaxA);
-  WelsQuantFour4x4Max_c (iDctC, ff, mf, iMaxC);
-  for (int i = 0; i < 64; i++)
-    EXPECT_EQ (iDctA[i], iDctC[i]);
-  for (int i = 0; i < 4; i++)
-    EXPECT_EQ (iMaxA[i], iMaxC[i]);
-}
-#ifdef X86_ASM
-TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_sse2) {
+void TestWelsQuantFour4x4Max (PQuantizationMaxFunc func) {
   CMemoryAlign cMemoryAlign (0);
   ALLOC_MEMORY (int16_t, ff, 8);
   ALLOC_MEMORY (int16_t, mf, 8);
@@ -340,8 +323,8 @@ TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_sse2) {
   }
   for (int i = 0; i < 64; i++)
     iDctC[i] = iDctS[i] = (rand() & 65535) - 32767;
-  WelsQuantFour4x4Max_c (iDctC, ff, mf, iMaxC);
-  WelsQuantFour4x4Max_sse2 (iDctS, ff, mf, iMaxS);
+  WelsQuantFour4x4MaxAnchor (iDctC, ff, mf, iMaxC);
+  func (iDctS, ff, mf, iMaxS);
   for (int i = 0; i < 64; i++)
     EXPECT_EQ (iDctC[i], iDctS[i]);
   for (int i = 0; i < 4; i++)
@@ -352,6 +335,14 @@ TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_sse2) {
   FREE_MEMORY (iDctS);
   FREE_MEMORY (iMaxC);
   FREE_MEMORY (iMaxS);
+}
+} // anon ns
+TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_c) {
+  TestWelsQuantFour4x4Max (WelsQuantFour4x4Max_c);
+}
+#ifdef X86_ASM
+TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_sse2) {
+  TestWelsQuantFour4x4Max (WelsQuantFour4x4Max_sse2);
 }
 #endif
 int32_t WelsHadamardQuant2x2SkipAnchor (int16_t* rs, int16_t ff,  int16_t mf) {
