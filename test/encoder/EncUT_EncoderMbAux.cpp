@@ -429,6 +429,22 @@ TEST (EncodeMbAuxTest, WelsQuantFour4x4_sse2) {
 TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_sse2) {
   TestWelsQuantFour4x4Max (WelsQuantFour4x4Max_sse2);
 }
+TEST (EncodeMbAuxTest, WelsQuant4x4_avx2) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
+    TestWelsQuant4x4 (WelsQuant4x4_avx2);
+}
+TEST (EncodeMbAuxTest, WelsQuant4x4Dc_avx2) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
+    TestWelsQuant4x4Dc (WelsQuant4x4Dc_avx2);
+}
+TEST (EncodeMbAuxTest, WelsQuantFour4x4_avx2) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
+    TestWelsQuantFour4x4 (WelsQuantFour4x4_avx2);
+}
+TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_avx2) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
+    TestWelsQuantFour4x4Max (WelsQuantFour4x4Max_avx2);
+}
 #endif
 int32_t WelsHadamardQuant2x2SkipAnchor (int16_t* rs, int16_t ff,  int16_t mf) {
   int16_t pDct[4], s[4];

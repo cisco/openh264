@@ -657,3 +657,8 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
     vpsrlw   %1, %1, 15
     vpsllw   %1, %1,  5
 %endmacro
+
+%macro WELS_DW32767_VEX 1
+    vpcmpeqw %1, %1, %1
+    vpsrlw   %1, %1,  1
+%endmacro
