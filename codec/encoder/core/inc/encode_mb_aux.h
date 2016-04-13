@@ -106,6 +106,11 @@ void WelsQuant4x4Dc_sse2 (int16_t* pDct, int16_t iFF, int16_t iMF);
 void WelsQuantFour4x4_sse2 (int16_t* pDct, const int16_t* pFF, const int16_t* pMF);
 void WelsQuantFour4x4Max_sse2 (int16_t* pDct, const int16_t* pFF, const int16_t* pMF, int16_t* pMax);
 
+void WelsQuant4x4_avx2 (int16_t* pDct, const int16_t* pFF, const int16_t* pMF);
+void WelsQuant4x4Dc_avx2 (int16_t* pDct, int16_t iFF, int16_t iMF);
+void WelsQuantFour4x4_avx2 (int16_t* pDct, const int16_t* pFF, const int16_t* pMF);
+void WelsQuantFour4x4Max_avx2 (int16_t* pDct, const int16_t* pFF, const int16_t* pMF, int16_t* pMax);
+
 #endif
 
 #ifdef HAVE_NEON
