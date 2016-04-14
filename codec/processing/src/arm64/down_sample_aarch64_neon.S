@@ -174,9 +174,9 @@ comp_ds_bilinear_onethird_loop0:
     //restore   the tailer for the unasigned size
     st1     {v16.16b}, [x0]
 WELS_ASM_AARCH64_FUNC_END
-;void DyadicBilinearQuarterDownsampler_AArch64_neon(uint8_t* pDst, const int32_t kiDstStride,
-;uint8_t* pSrc, const int32_t kiSrcStride,
-;const int32_t kiSrcWidth, const int32_t kiHeight);
+//void DyadicBilinearQuarterDownsampler_AArch64_neon(uint8_t* pDst, const int32_t kiDstStride,
+//uint8_t* pSrc, const int32_t kiSrcStride,
+//const int32_t kiSrcWidth, const int32_t kiHeight);
 
 WELS_ASM_AARCH64_FUNC_BEGIN DyadicBilinearQuarterDownsampler_AArch64_neon
     //Initialize the register
@@ -232,9 +232,9 @@ comp_ds_bilinear_quarter_loop0:
     st1     {v16.16b}, [x0]
 WELS_ASM_AARCH64_FUNC_END
 
-;void GeneralBilinearAccurateDownsampler_AArch64_neon (uint8_t* pDst, const int32_t kiDstStride,
-;    const int32_t kiDstWidth, const int32_t kiDstHeight,
-;   uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX, const uint32_t kuiScaleY);
+//void GeneralBilinearAccurateDownsampler_AArch64_neon (uint8_t* pDst, const int32_t kiDstStride,
+//    const int32_t kiDstWidth, const int32_t kiDstHeight,
+//   uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX, const uint32_t kuiScaleY);
 WELS_ASM_AARCH64_FUNC_BEGIN GeneralBilinearAccurateDownsampler_AArch64_neon
     mov     w10, #32767
     and     w8, w6, w10
