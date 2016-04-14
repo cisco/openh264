@@ -440,7 +440,7 @@ WELS_ASM_AARCH64_FUNC_END
 .align 4
 intra_1_to_8: .short 5, 10, 15, 20, 25, 30, 35, 40
 intra_m7_to_p8: .short -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8
-;void WelsI16x16LumaPredPlane_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+//void WelsI16x16LumaPredPlane_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsI16x16LumaPredPlane_AArch64_neon
     SIGN_EXTENSION x2,w2
     sub     x3, x1, x2

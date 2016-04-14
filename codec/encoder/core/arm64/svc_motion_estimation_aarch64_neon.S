@@ -32,7 +32,7 @@
 
 #ifdef HAVE_NEON_AARCH64
 #include "arm_arch64_common_macro.S"
-;int32_t SumOf8x8SingleBlock_AArch64_neon (uint8_t* pRef, const int32_t kiRefStride);
+//int32_t SumOf8x8SingleBlock_AArch64_neon (uint8_t* pRef, const int32_t kiRefStride);
 WELS_ASM_AARCH64_FUNC_BEGIN SumOf8x8SingleBlock_AArch64_neon
     SIGN_EXTENSION x1,w1
     ld1 {v0.d}[0], [x0], x1
@@ -51,7 +51,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN SumOf8x8SingleBlock_AArch64_neon
     mov    x0, v0.d[0]
 WELS_ASM_AARCH64_FUNC_END
 
-;int32_t SumOf16x16SingleBlock_AArch64_neon (uint8_t* pRef, const int32_t kiRefStride);
+//int32_t SumOf16x16SingleBlock_AArch64_neon (uint8_t* pRef, const int32_t kiRefStride);
 WELS_ASM_AARCH64_FUNC_BEGIN SumOf16x16SingleBlock_AArch64_neon
     SIGN_EXTENSION x1,w1
     ld1 {v0.16b}, [x0], x1
@@ -64,9 +64,9 @@ WELS_ASM_AARCH64_FUNC_BEGIN SumOf16x16SingleBlock_AArch64_neon
     mov    x0, v0.d[0]
 WELS_ASM_AARCH64_FUNC_END
 
-;void SumOf8x8BlockOfFrame_AArch64_neon (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
- ;                               const int32_t kiRefStride,
-;                                uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
+//void SumOf8x8BlockOfFrame_AArch64_neon (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
+//                               const int32_t kiRefStride,
+//                                uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
 WELS_ASM_AARCH64_FUNC_BEGIN SumOf8x8BlockOfFrame_AArch64_neon
 //(uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,const int32_t kiRefStride,uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[])
     //x5: pTimesOfFeatureValue

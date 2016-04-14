@@ -105,7 +105,7 @@
 //  }
 .endm
 
-;void WelsCopy8x8_AArch64_neon (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS);
+//void WelsCopy8x8_AArch64_neon (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsCopy8x8_AArch64_neon
     SIGN_EXTENSION x1,w1
     SIGN_EXTENSION x3,w3

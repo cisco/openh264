@@ -33,7 +33,7 @@
 #ifdef HAVE_NEON_AARCH64
 #include "arm_arch64_common_macro.S"
 
-;void WelsSetMemZero_AArch64_neon (void* pDst, int32_t iSize);
+//void WelsSetMemZero_AArch64_neon (void* pDst, int32_t iSize);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsSetMemZero_AArch64_neon
     eor v0.16b, v0.16b, v0.16b
     SIGN_EXTENSION x1,w1

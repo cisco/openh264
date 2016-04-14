@@ -32,7 +32,7 @@
 
 #ifdef HAVE_NEON_AARCH64
 #include "arm_arch64_common_macro.S"
-;void ExpandPictureLuma_AArch64_neon (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicW, const int32_t kiPicH);
+//void ExpandPictureLuma_AArch64_neon (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicW, const int32_t kiPicH);
 WELS_ASM_AARCH64_FUNC_BEGIN ExpandPictureLuma_AArch64_neon
     SIGN_EXTENSION x1,w1
     SIGN_EXTENSION x2,w2
@@ -76,8 +76,8 @@ _expand_picture_luma_loop1:
     cbnz x2, _expand_picture_luma_loop0
 WELS_ASM_AARCH64_FUNC_END
 
-;void ExpandPictureChroma_AArch64_neon (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicW,
-;                                       const int32_t kiPicH);
+//void ExpandPictureChroma_AArch64_neon (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicW,
+//                                       const int32_t kiPicH);
 WELS_ASM_AARCH64_FUNC_BEGIN ExpandPictureChroma_AArch64_neon
     //Save the dst
     SIGN_EXTENSION x1,w1
